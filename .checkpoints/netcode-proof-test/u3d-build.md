@@ -66,3 +66,90 @@ committed; no iptables, no tc, no network.
 DONE (2026-11-09 about 02:50 UTC). Changed: spikes/netcode-proof/crates/net/src/l2/socket_tests.rs,
 spikes/netcode-proof/marks/SERIES.md; new: spikes/netcode-proof/results/u3d-timing/run.sh. Notes and scratch:
 u3d-build.md, u3d-bites.py, u3d-bites-output.txt, u3d-build-runsh-check-20261109T024229Z.txt. Nothing committed.
+
+## Fix pass
+
+Fixer: workflow agent, same worktree, 2026-11-09 from 03:24 UTC. Inputs: the three build reviews
+(u3d-build-review-netcode.md, -rust.md, -test.md in the main folder's notes), the plan and the advisor's verdict. Same
+build rules as above (shared folder, touch every .rs under crates before each build, df before each build, each run's
+test count checked against the one before; no iptables, tc or network; nothing committed). Baseline sha256 at 03:24:
+socket_tests.rs 31294953...0625, SERIES.md b06b67a0...fc45, run.sh 32babfb1...602e, socket.rs 7ad7cb22...76f9,
+stats.rs 27dfd326...9e22, Cargo.lock d0158c8a...6397 (= the builder's and the test-engineer's).
+
+### Plan (one line per item)
+1. Slack condition: under SCHED_FIFO/RR accept 0 or 1 ns both at start and now (start 1 when chrt comes from outside
+   after the thread's birth; 0 when the whole process is born under chrt on a kernel with ed4fb6d7ef68, as thread.rs:12
+   names that form too); under any other policy 1 and 1. The accepted values printed on the slack line. Prove: the
+   chrt-after run (now valid), the chrt-born run (still valid), bites S7 (start 50,000), a "now" bite, S7 under chrt.
+2. Asserts reordered: rate, pre-touch, `fate_log_full` 0, per direction drops, accounted, the log's fates = n, then the
+   loss band. Prove: S3, S4, S5 re-run, plus S5b (one entry left in the log: only the new fates assert catches it).
+3. `touched == cap` after the prints (INVALID). Prove: S6.
+4. NotUnicode → the INVALID panic; only NotPresent takes the default. Prove: \xff exits INVALID at once.
+5. T6: agree's two "agree" branches; the 106-of-10,106 loss case. Prove: X1, X2 now fail T6.
+6. Nits: samples() counts Delivered fates with out < t_in (`early`) instead of panicking, the self-test asserts 0 after
+   the prints, T6 asserts the count (up 0; down one planted early fate counted, not a delay); run.sh:52 touches every
+   file under crates (§7.1 item 2); SERIES.md:396 "The event's lateness fields"; FATE_BYTES imported; agree keeps &str
+   (item 5's asserts as written, X1's anchor kept); the poller's buffer unchanged. Prove: early bites (self-test, T6),
+   the builder's T6b form.
+7. Short self-test (NPT_L2_SELFTEST_SECS=5); check.mjs 9/9 twice; clippy -D warnings with and without --all-features;
+   fmt --check; M13's lines and Cargo.lock unchanged.
+
+### Progress
+- Edits made (03:30): all six items in socket_tests.rs, SERIES.md:396, run.sh:29 and :52. fmt --check clean (no
+  rewrite needed). First debug build after a touch: socket tests 18 passed, 2 ignored (= the builder's count).
+- Clean runs (u3d-fix-proof.py clean; output u3d-fix-clean-output.txt, logs u3d-fix-*.log), release binary built
+  after a touch (newer than it), fixed socket_tests.rs sha256 ca17a9f6...b2b9: --list 172 tests, T1-T7 by name,
+  --ignored names M13's run and l2_timing_self_test.
+  - SHORT (5 s): exit 0, 39 prints; up E (L0 = 0) 55,338 ns, down 47,330 ns, both would MISS, -3's p99.9 FAIL both:
+    agree; CPU 0.364 core; slack line "now 1 ns, at start 1 ns ... SCHED_OTHER 0: the run condition accepts [1] ns".
+  - CHRT-AFTER (item 1; chrt allowed here): `chrt -f -p 1` on npt-l2-release ~1 s into 6 s (SCHED_OTHER -> SCHED_FIFO,
+    slack read from outside 0): exit 0 (INVALID before the fix: the test-engineer's u3d-test-run-chrt-after.txt); slack
+    "now 0 ns, at start 1 ns ... SCHED_FIFO 1: accepts [0, 1]".
+  - CHRT-BORN: the whole process under `chrt -f 1`, 3 s: exit 0; "now 0, at start 0 ... SCHED_FIFO 1" (still valid).
+  - ENV (item 4): b'\xff' exit 101 in 0.07 s, "INVALID: NPT_L2_SELFTEST_SECS="\xFF" is not UTF-8 ...", no self-test
+    print; 0, 601, abc INVALID as before; unset: still running at 3 s, no INVALID (the 100 s default).
+- Bites (u3d-fix-proof.py bites; outputs u3d-fix-bites-unit-output.txt, -self1-, -self2-; logs u3d-fix-bite-<id>.log):
+  each planted alone, built after a touch (binary newer than the touch every time), ran exactly 1 test, failed by
+  name, restored with sha256 == the fixed state (socket_tests.rs ca17a9f6...b2b9, socket.rs 7ad7cb22...76f9). 16 of
+  16 BITE (5 unit, 11 self-test). Every self-test bite printed all 39 lines before its panic.
+  - Item 5 (T6, debug): X1 (agree always "disagree") fails "E MISS and p99.9 FAIL" (left "disagree"); X2 (loss share
+    over Delivered) fails "106 lost of 10,106 ..." (pass[1] false). Both PASSED T6 before the fix (u3d-test-bites-extra).
+  - Item 6 (T6, debug): E1 (early fate taken as a delay of 0) fails "down: the one fate released before it arrived is
+    counted" (0 vs 1); the builder's T6b form (Lost taken as Delivered) fails "up: a fate released before it arrived"
+    (10 vs 0); the test-engineer's T6b form (saturating_sub over Delivered|Lost) fails the Cross assert (n 1,010,
+    p001 0).
+  - Items 2-3 (self-test, release, 3 s): S2 (no stop wait) still "up: every datagram accounted for" 29,757 vs 30,000
+    (order kept); S3 (2 x ppm) "up: 325 lost, outside P1's band 480-720"; S4 (capacity n) now "the fate log filled"
+    30,000 (was the loss band); S5 (drain removed) now "the fate log filled" 60,000 (was the loss band); S5b (new: one
+    pre-touch entry left after the drain) "up: the fate log holds 30001 fates of the 30000 sent" (by reading, the old
+    code would pass it: band over 30,001 is 215-385 with ~325 lost); S6 (pre-touch skipped) now "the fate log
+    pre-touched with 0 of its 61000 entries" (passed before).
+  - Item 1 (slack): S7 (start left at the default) "the slack read back 50000 ns at start and 50000 ns now under
+    SCHED_OTHER 0, outside [1]"; S9 (new: the header-time read writes 50,000) "1 ns at start and 50000 ns now ...
+    outside [1]"; S7c (S7 plus chrt -f -p 1 from outside ~1 s in) "50000 ns at start and 0 ns now under SCHED_FIFO 1,
+    outside [0, 1]": the real-time branch still checks the start.
+  - Item 6 (self-test early assert): E2 (delays under 40 ms read as early) "up: Delivered fates released before they
+    arrived" 29,675 vs 0, after all prints.
+  - Item 4: U4 (the old Err(_) => 100 arm) with b'\xff': still running at 5 s, no INVALID: the new arm is what makes it
+    INVALID.
+- After the bites: socket_tests.rs, socket.rs, stats.rs and Cargo.lock hash as the fixed state / baseline; no npt_net
+  process left.
+- check.mjs run 1 (touch 03:33:48, shared folder, df 14 GB): 9/9 PASS; test 81.1 s, measured 267 passed 0 failed 0
+  skips, bites 281 passed 0 failed 0 skips; self 43/43; redact 10/10, 150 items 0 findings; refs 481; marks 81. Both
+  npt_net debug test binaries newer than the touch (03:33:54, 03:34:33).
+- check.mjs run 2 (touch 03:35:21): 9/9 PASS; test 76.4 s, 267 / 281, 0 failed, 0 skips (= run 1 = the builder's);
+  binaries 03:35:25, 03:36:01.
+- clippy --workspace --all-targets -D warnings, after a touch each: default features exit 0; --all-features exit 0.
+  `cargo +1.99.1 fmt --all --check` exit 0. run.sh `bash -n` OK.
+- M13's lines: base 483-639 and new 484-640 both sha256 29b21eab4938ffa2...; socket_tests.rs hunks still only @@-1 (doc
+  line + import) and the block appended after :637; Cargo.lock d0158c8a...6397 (no diff); no production file changed;
+  the added lines carry no unsafe, libc, HashMap or pub item (two doc comments name HashMap and pub(crate), as before).
+- Left as they are: socket_tests.rs:256 (an older test outside U3d's block) still names FATE_BYTES by path, kept so the
+  diff touches nothing before M13; agree() keeps its &str (item 5's asserts as written); the poller's buffer; the CPU
+  dilution note (netcode F6) is for U3d's report. SCHED_DEADLINE stays under the strict branch (1 and 1): the recorded
+  switch is `chrt -f`, and whether ed4fb6d7ef68 covers DEADLINE is not verified (rust-reviewer), so a DEADLINE run
+  reading 0 is INVALID, never a pass.
+- Final sha256: socket_tests.rs ca17a9f6f6be0322...b2b9, SERIES.md a902d10dc16b80b8...0bd1, run.sh
+  f4a73a5b2b558a50...dfe3.
+
+DONE (fix pass, 2026-11-09 about 03:40 UTC). Nothing committed.

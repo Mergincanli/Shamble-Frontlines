@@ -1,0 +1,42 @@
+# U3d fix pass proof, mode bites, 2026-11-09T03:31:50Z
+fixed state: socket_tests.rs sha256 ca17a9f6f6be03224c8921ef21f1731c1c0d86f3161c7bf7add0afb6b032b2b9
+fixed state: socket.rs sha256 7ad7cb22e4316c9f98f4d3abedc36fcab8ddea312239dd5e0b95f2c0856e76f9
+S7: the release thread leaves its slack at the default (start 50,000 ns) (l2_timing_self_test)
+    df /home/user: 14.2 GB free
+    built npt_net-f72f21a42e60b4c9 (release) in 11.9 s; newer than the touch: True
+  BITES S7: exit 101; ran 1; test result: FAILED. 0 passed; 1 failed; prints before the panic 39
+    message: the slack read back 50000 ns at start and 50000 ns now under SCHED_OTHER 0, outside [1]: the run is INVALID, not a lateness verdict | stack backtrace: | 0: __rustc::rust_begin_unwind | 1: core::panicking::panic_fmt
+    expected in it: 'the slack read back 50000 ns at start'
+    slack now 50000 ns, at start 50000 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+    restored: {'socket.rs': True}
+S9: the header-time read writes 50,000 ns (now 50,000, start 1) (l2_timing_self_test)
+    df /home/user: 14.2 GB free
+    built npt_net-f72f21a42e60b4c9 (release) in 11.9 s; newer than the touch: True
+  BITES S9: exit 101; ran 1; test result: FAILED. 0 passed; 1 failed; prints before the panic 39
+    message: the slack read back 1 ns at start and 50000 ns now under SCHED_OTHER 0, outside [1]: the run is INVALID, not a lateness verdict | stack backtrace: | 0: __rustc::rust_begin_unwind | 1: core::panicking::panic_fmt
+    expected in it: '1 ns at start and 50000 ns now'
+    slack now 50000 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+    restored: {'socket.rs': True}
+E2: every live delay under 40 ms read as released before it arrived (l2_timing_self_test)
+    df /home/user: 14.2 GB free
+    built npt_net-f72f21a42e60b4c9 (release) in 11.7 s; newer than the touch: True
+  BITES E2: exit 101; ran 1; test result: FAILED. 0 passed; 1 failed; prints before the panic 39
+    message: assertion `left == right` failed: up: Delivered fates released before they arrived: the run is INVALID, not a lateness verdict | left: 29675 | right: 0 | stack backtrace:
+    expected in it: 'released before they arrived'
+    slack now 1 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+    restored: {'socket_tests.rs': True}
+S7c: S7 with chrt -f -p 1 from outside ~1 s into 6 s (start 50,000 under SCHED_FIFO) (l2_timing_self_test)
+    df /home/user: 14.2 GB free
+    built npt_net-f72f21a42e60b4c9 (release) in 12.2 s; newer than the touch: True
+    release thread tid 19984; before: pid 19984's current scheduling policy: SCHED_OTHER; chrt exit 0 ; after: pid 19984's current scheduling policy: SCHED_FIFO; its slack read from outside after the switch: 0
+  BITES S7c: exit 101; ran 1; test result: FAILED. 0 passed; 1 failed; prints before the panic 39
+    message: the slack read back 50000 ns at start and 0 ns now under SCHED_FIFO 1, outside [0, 1]: the run is INVALID, not a lateness verdict | stack backtrace: | 0: __rustc::rust_begin_unwind | 1: core::panicking::panic_fmt
+    expected in it: 'the slack read back 50000 ns at start'
+    slack now 0 ns, at start 50000 ns, set 1, error None; policy SCHED_FIFO 1: the run condition accepts [0, 1] ns at both reads (a real-time policy: a kernel with ed4fb6d7ef68 reports 0)
+    restored: {'socket.rs': True}
+U4: a non-UTF-8 NPT_L2_SELFTEST_SECS taken as the default (Err(_)) (l2_timing_self_test)
+    df /home/user: 14.2 GB free
+    built npt_net-f72f21a42e60b4c9 (release) in 11.5 s; newer than the touch: True
+  BITES U4: value b'\xff': exit timeout after 5.0 s (timeout = still running: the default taken); INVALID printed: False
+    restored: {'socket_tests.rs': True}
+summary: S7 BITES; S9 BITES; E2 BITES; S7c BITES; U4 BITES
