@@ -1,0 +1,28 @@
+   Compiling npt-link v0.0.0 (/home/user/Shamble-Frontlines/.claude/worktrees/wf_2c76ec82-8fc-1/spikes/netcode-proof/crates/link)
+   Compiling npt-tcpinfo v0.0.0 (/home/user/Shamble-Frontlines/.claude/worktrees/wf_2c76ec82-8fc-1/spikes/netcode-proof/crates/tcpinfo)
+   Compiling npt-l1 v0.0.0 (/home/user/Shamble-Frontlines/.claude/worktrees/wf_2c76ec82-8fc-1/spikes/netcode-proof/crates/l1)
+   Compiling npt-net v0.0.0 (/home/user/Shamble-Frontlines/.claude/worktrees/wf_2c76ec82-8fc-1/spikes/netcode-proof/crates/net)
+    Finished `release` profile [optimized] target(s) in 14.08s
+# U3d dry run (u3d-plan.md §3.4, §5.1): CHECK RUN (a build copy's check of this script, built in /home/user/Shamble-Frontlines/.gate/shared-target): not evidence. Reported, not judged here; RS judges at R1 (U8).
+commit dae4f0f396d655d194e4300e8d56f07b619be908 (uncommitted changes under spikes/netcode-proof)
+rustc rustc 1.99.1 (58cf8f9c3 2026-10-13)
+binary /home/user/Shamble-Frontlines/.gate/shared-target/release/deps/npt_net-f72f21a42e60b4c9
+binary_sha256 d05313165b2c6e886219a0c4c68c21f04845d97fa371c802981f73f4454f898d
+date_utc 2026-11-09T03:12:28Z
+nproc 4
+cargo_target_dir /home/user/Shamble-Frontlines/.gate/shared-target
+lengths: self-test 5 s (NPT_L2_SELFTEST_SECS), M13 2 s (NPT_L2_SECS); rounds 3
+kernel 6.18.44-fc-v310
+clocksource tsc (available: tsc kvm-clock )
+cpuidle_driver none
+cpuidle_governor menu
+config_hz 250 (from /proc/config.gz)
+thp_enabled always [madvise] never
+loadavg_start 0.91 1.08 0.77 1/121 4454
+SELFTEST 1 (P1, 5 s): exit status 0
+M13 1 (P2, 2 s): exit status 0
+SELFTEST 2 (P1, 5 s): exit status 0
+M13 2 (P2, 2 s): exit status 0
+SELFTEST 3 (P1, 5 s): exit status 0
+M13 3 (P2, 2 s): exit status 0
+record: /home/user/Shamble-Frontlines/.claude/worktrees/wf_2c76ec82-8fc-1/spikes/netcode-proof/results/u3d-timing/selftest-20261109T031214Z.txt
