@@ -587,7 +587,16 @@
     LOW the loss band checked before log completeness (wrong cause on bites S4, S5); LOW the pre-touch not asserted;
     nits (non-UTF-8 env, T6's agree branches and loss denominator, samples() panic before prints, run.sh check-mode
     touch, SERIES.md "Its", FATE_BYTES import). INFO for the report: the CPU share's dilution against M13's 0.27.
-  - **About 03:32 UTC: the fix pass launched, workflow `wf_5c8d15c1-1f7` (npt-u3d-fix):** fix:u3d in the same worktree
+  - **About 03:55 UTC: U3d MERGED at 1ccff06** (pushed): the fix pass complete per the test-engineer (u3d-fix-review-test.md;
+    16 of 16 bites; the slack condition now accepts 0 or 1 under SCHED_FIFO/RR at both reads, since a process born
+    under `chrt -f 1` reads 0 at start; the plan allows it). check.mjs 9/9 in the main folder (267 measured, 281 bites,
+    self 43, redact 150 items, 0 findings); gate PASS --no-smoke. run.sh read in full by the main session before
+    running it (reads /proc and /sys, builds once, runs that binary, writes only its own new record file).
+  - **About 03:56 UTC: the dry run RUNNING** (background, `bash spikes/netcode-proof/results/u3d-timing/run.sh`, quiet
+    machine, CARGO_TARGET_DIR unset, about 6-7 min; record results/u3d-timing/selftest-<UTC>.txt). Then: commit it, write
+    U3d's report (u3d-report.md: reported, not judged; the CPU-share dilution note against M13's 0.27), send it to the
+    advisor for the U3d close. If cut: rerun the script (it never overwrites a record).
+  - **Done: the fix pass, workflow `wf_5c8d15c1-1f7` (npt-u3d-fix):** fix:u3d in the same worktree
     (no isolation), then check:u3d-fix (test-engineer, the changed lines; notes u3d-fix-review-test.md). If cut:
     snapshot the worktree (worktree_patch.py ... wip/u3d-build.patch u3d-build), then Workflow({scriptPath:
     /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u3d-fix-wf_5c8d15c1-1f7.js,
