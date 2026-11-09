@@ -625,6 +625,25 @@
       them on its own branch; you fold its results in the next morning. Items that need building or testing stay
       with you during the day." Tonight's items, after the main merge: the U4e brief draft; a skeptic check of U4s's
       merged code (f080551); the U4r brief draft (with O1); a skeptic check of U3d's merged code (1ccff06).
+  - **About 22:05 UTC: main merged, tonight's items posted, wave 1 resumed.**
+    - **Main merged: df8975b** (merge of e3e11d2 and origin/main 44446a5; conflicts in docs/REPO_MAP.md, main's date,
+      and docs/STATUS.md, main's text plus the netcode lines; pushed from `.gate/main-merge`). The guard lets only
+      origin/main merge into the main folder, so the main folder did the plain merge itself (allowed: the branch
+      changed no kit file since the merge base), with the same resolution, and committed with the same message and
+      dates: the same commit, df8975b (the SSH signature is deterministic; `git commit-tree` checked it first). Kit,
+      CI and gate files equal main's (`git diff origin/main -- .claude .github CLAUDE.md tools`: empty). Checks: gate
+      PASS `--no-smoke`; check.mjs `--only marks,refs,redact` all pass (81 marks; main's ADR 0006 edits touch no
+      marked row); repo-map check OK. `.gate/main-merge` removed (plain `git worktree remove`). This session now runs
+      main's kit-v3-4 rules (CLAUDE.md: risk tiers, review budget, one severity scale, rollback).
+    - **Tonight's items posted:** plans `night-2026-11-10.md` (pushed at 2dc1f31); issue #16's body, Queue items 2-5
+      as `- [ ]` APPROVED entries (2 npt-u4e-brief, 3 npt-u4s-skeptic, 4 npt-u4r-brief, 5 npt-u3d-skeptic), each on
+      its own cs/ branch from origin/main, reading this branch at df8975b in a read-only worktree `.gate/npt-spike`;
+      no build, no test run, no pull request; comment 6752613836. **Morning:** fetch each cs/npt-* branch, read its
+      checkpoint and notes, fold the drafts and findings into this branch's notes (Write), a Critical or High from a
+      skeptic check to the day's work (the budget's third round), Medium and Low to the unit report's follow-ups.
+    - **Wave 1 resumed:** U4a's builder continued by SendMessage (agent a9297644e7c0354f3, its own worktree);
+      U4d and U4c by the edited workflow script (wf_f54246ff-e0d resumed, task w0ynfq9yu: the builders continue in
+      their existing worktrees wf_f54246ff-e0d-1 and -2 from their notes, no new worktree). Three agents running.
   - **About 18:00 UTC: conditions 1-3 applied** (u4-build-plan.md sha256 7ec1b324…, recorded under the ruling; carries
     completed and corrected per the check, sha256 4a8c0ee8…, 45 entries; F1 sizes and F2 the U4b/U4e tick-constant
     route to the advisor, background agent). **Wave 1 lanes U4d and U4c launched:** workflow `wf_f54246ff-e0d`
