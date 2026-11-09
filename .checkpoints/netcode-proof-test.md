@@ -3,7 +3,7 @@
   advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (revision 3.2: APPROVED by the advisor (C1-C12) and by Mustafa, 2026-11-06; revision 1 786b7d2, revision 2 d8f0712, revision 3 a6607bc) · verdict: `.checkpoints/netcode-proof-test/advisor-verdict.md`
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main `af8393e9d40f3bd382e77f86e6df2612785c706c`
-- **Last update:** 2026-11-08 about 23:50 Amsterdam (U3c CLOSED on 768d00b; next U3d's plan)
+- **Last update:** 2026-11-09 about 05:30 Amsterdam (U3d CLOSED, and U3 with it, on ef2bcef; next U4's plan)
 
 ## Steps done
 1. SSH reachability probe (plan item 1, first pass) · this commit · NO: no ssh client in the image; TCP 22 and every
@@ -519,6 +519,27 @@
   always "DNS only" (grey cloud).
 
 ## Running work
+- **2026-11-09 about 04:30 UTC: U3d CLOSED, and U3 (U3a-U3d) with it, on the closing head ef2bcef** (spike code
+  1ccff06, the dry run's record 78b0c07; pushed). The advisor's close ruling (advisor-u3d.md, "Close ruling: U3d"):
+  APPROVE WITH CONDITIONS, five text-only conditions, all met: (1) the report fixed (a)-(i) (u3d-report.md, folded:
+  round 3's lines, its down direction the first E-vs-(-3) disagreement, explained by -3's p99.9 capping a datagram's
+  excess at 2a = 10 ms while E counts all of it; the CPU note's attribution and size; best-yet up only; loss per
+  direction; commit-and-push; ImpairSocket's own drops vs kernel drops; the 04:05:56 snmp read; the reader-stall
+  limit; "one stall" consistent, not shown); (2) R-31 amended ("predicts -3's P1 p99.9 exactly while no lateness
+  exceeds 2a + 0.25 ms; past that it can MISS where -3 passes, never the reverse"); (3) the U8 row's slack rule
+  replaced with U3d's built rule; (4) C-U8-6 (U3D-RCVBUF: the probe socket's own drops and the Udp/Udp6 counters
+  around every L2 leg; a P1 drop makes the self-test INVALID and goes to the advisor, never re-run away; no SO_RCVBUF
+  sizing without its ruling) added, its run condition in C-U8-4; (5) this entry and the header (1c902e1 committed
+  (1)-(4)). The advisor reproduced check.mjs 9/9 (267/281) and the gate on ef2bcef. Nothing for Mustafa but
+  LEFTOVER-DELETE, still open.
+  - **Lesson (the advisor's):** a future dry run goes in the background without ending the turn, so the stop hook
+    never commits during a measured run.
+  - **Next: U4's plan** (plan §12.1's U4 row: npt-sim, npt-proto, npt-room and npt-client; npt-lab's scenario runner;
+    `due_ticks` with PM-0004-67's bites on a fake clock; the native-against-Wasm hash test; then the L1 row groups
+    with their bites). Plan first, then the advisor; agent copies build in .gate/shared-target (Mustafa's rule).
+    Spike follow-ons still owed: marks.json -18 split (parts by transport, the WS three checks, count >= 480, the
+    bites); the ws-practice validity rule; SERIES burst_heal and burst_return; the R3 run plan; fixes.rs's
+    run-structured bound (needs U4's scene sizes).
 - **About 22:50 UTC: U3c CLOSED on the closing head 768d00ba7a77529b524fc9f6df90d6494f87abcc** (pushed). The advisor's
   U3C-CLOSE conditions: (1) C2d's critic complete, no gap, no regression (u3c-fix4-review-c2d.md; 10 of 12 bites, the 2
   missed are design details cargo itself refuses); (2) check.mjs 9/9 on the clean closing head (260 measured, 274
