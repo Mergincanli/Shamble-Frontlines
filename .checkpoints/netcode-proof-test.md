@@ -561,8 +561,12 @@
     formula unbitten, no producer for the L0 = 0 form at R1, judged window not tied to -3's; low/nits F6-F12;
     u3d-plan-review-test.md); rust-reviewer APPROVE WITH FINDINGS (F1 medium: spawn the poller onto a multi-thread
     runtime, not block_on; F2 medium: pre-touch the fate log; F3-F10 low/nits; u3d-plan-review-rust.md).
-  - **Next (launched about 01:45 UTC):** one workflow: fold both critiques + Mustafa's shared-target rule into rev 2
-    (netcode-architect), a completeness check (test-engineer), then the advisor's review of rev 2.
+  - **Next (launched about 01:38 UTC): workflow `wf_bbda74db-c79` (npt-u3d-plan-rev2) on dacdb77:** fold both critiques
+    + Mustafa's shared-target rule into rev 2 (netcode-architect; notes u3d-plan-rev2-notes.md), a completeness check
+    (test-engineer; u3d-plan-rev2-check.md; one fix pass if gaps), then the advisor's review of rev 2 (it returns text;
+    the main session writes it to advisor-u3d.md). If cut: Workflow({scriptPath:
+    /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u3d-plan-rev2-wf_bbda74db-c79.js,
+    resumeFromRunId: "wf_bbda74db-c79", args: {head: "dacdb77"}}). No code before the advisor's APPROVE.
   - **2026-11-09 about 01:05 UTC (after the reset; Mustafa: "continue"):** wf_77078bc9-95f had ended with all 5 agents
     failed on the spend limit (none completed, so nothing to replay). The script now tells each agent to continue its
     notes file if it exists; relaunched as **`wf_941d1cee-cfa`** (same script path, args {head: "95dac9c"}); the saver
