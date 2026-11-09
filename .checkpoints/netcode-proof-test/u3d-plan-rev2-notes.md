@@ -73,3 +73,7 @@ No earlier rev-2 notes file existed (checked at start).
   10/1010); M13 untouched (copy, no helper); pre-touch; window rule; control round P1 thread poller; all ^cpu lines;
   THP; binary run directly after --no-run with its SHA; carries C-U6-1..7, C-U8-1..4; shared-target build rules.
 - M17 Line pins re-read: socket.rs lock :501, now :503, Delivered :527, slack ask :667-677, wake :713, try_send :724, stamp :726; socket_tests.rs inbound test fn :185 (#[test] :184), pace :485, M13 fn :512; impair.rs late_run :246, record :682, take_second :737. Writing rev 2 now.
+- M18 Rev 2 written (513 lines): §0.1 table (25 rows), §7.1 build rules, T5/T6 added, C-U6-5..7, C-U8-4, U3D-WINDOW.
+  Citations re-checked after writing: SERIES.md pacer :405-406 (fixed from :402-406); advisor-u3c-plan.md:158 (hop
+  p50); checkpoint Q9 :501; T5's last bite reworded. u3d-plan-notes.md gained a "Rev 2" block (R2-1..R2-5).
+DONE 2026-11-09

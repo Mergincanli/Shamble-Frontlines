@@ -92,3 +92,25 @@ No earlier notes file existed (checked: no u3d-plan*.md in the folder at start).
   :114 (not :113-114), :155-157 (clock = VM wake), marks/README.md:103-104 (nearest rank), u3-build-plan.md:9 (M1-M19
   win), stats.rs:537, SERIES.md:391-396 and :405-406.
 DONE 2026-11-09
+
+## Rev 2 (2026-11-09, head dacdb77; the step's own notes: u3d-plan-rev2-notes.md M0-M17)
+- R2-1 Both critiques read in full; every finding re-checked at its lines; all hold (test T-1..T-12 = F-A..F-L,
+  T-12a..c = F-M..F-O; rust F1-F10). None found wrong. F-O and the fate-log-off control deferred with reasons (§3.7).
+- R2-2 Code facts re-read: socket.rs :501/:503/:527 (poll_recv lock, stamp, finish), :667-677 (slack ask under the
+  lock), :713 then :724-726 (wake before the batch's sends), :427 (drain_fate_log, the only per-datagram stamp source
+  among the pub methods :176-427), :739-741 (tests are socket's child); stats.rs :470-505 (FateLog; drain keeps
+  capacity; cfg(test) entries()); impair.rs :119-123 (no offset), :246/:682 (late_run never resets), :680-684 (the E
+  sample set); tokio multi_thread/mod.rs:80-91 (block_on on the caller), sync/notify.rs:1224-1247; quinn endpoint.rs
+  :152-160, :497-512, :754-759, :772ff/:793; quinn-proto config/mod.rs:60 (1,472 B); judge eval.rs:261-265.
+- R2-3 Fixes in rev 2: T1 order (blocker first, holds until first_seen + 110 ms); T5 exact E fixture (10,000 / 10,100
+  ns); T6 cross-check fixture (p999 30,280,000 vs 29,980,000 by due - t_in; 10/1,010 loss); T4 integer; poller spawned
+  on a built runtime; pre-touch; window rule; prints before asserts; M13 untouched; all ^cpu lines; THP; binary run
+  directly after --no-run with its SHA-256.
+- R2-4 R1: the judged E comes from the probe's fate log over -3's measured records (C-U6-5), which answers F-D and F-E
+  without a reset method (rust F7) or a stats.rs field; new carries C-U6-5..7, C-U8-4; U3D-L0 recommendation (a) -> (b);
+  new question U3D-WINDOW; U3D-POLL gains (b+) (the control round, not built by default).
+- R2-5 Build rules §7.1: CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/shared-target in every copy (the spike's
+  .cargo/config.toml would otherwise put the cache in the copy; check.mjs inherits the env: check.mjs:1070-1071), touch
+  before each build, test counts 266/280 checked (U3c's close 260/274 + T1-T6), the main folder's own cache for merge
+  checks and the dry run.
+DONE rev 2 2026-11-09
