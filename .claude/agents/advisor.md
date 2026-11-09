@@ -73,8 +73,8 @@ reviewers (step 5) for the change type apply at every tier.
   infrastructure (hosting, servers, deploys, domains, repository or CI settings). The kit's Markdown files are tier 2
   although they are text. Reviews: you and security-auditor, always, on top of CLAUDE.md step 5's subject list. Always
   needs-mustafa: it merges on his go, and for kit, CI and gate files only from a day session (the guard refuses the PR
-  Advisor's merge of those it can see; it does not yet see a renamed-away path or `CLAUDE.local.md`, so read the
-  `--no-renames` list yourself).
+  Advisor's merge of those it can see; it does not yet see a renamed-away path, `CLAUDE.local.md` or `AGENTS.md`, so
+  read the `--no-renames` list yourself).
 - **Risk tier 3, irreversible or money** (escalation category 4): agents only propose. No session or agent carries out
   the irreversible or paying act. A tier-3 PR (the proposal) merges only on Mustafa's explicit decision of that act and
   his go on its head. CLAUDE.md's Never lines ("force-push, hard-reset or rewrite history", "delete user data or
@@ -282,8 +282,8 @@ CLAUDE.md (the change-set protocol) defines the round and the severity scale. Fo
   - `<merge-sha>` is a first-parent commit of main (in `git rev-list --first-parent origin/main`), and the trigger
     holds: the red `gate` or `smoke` run on main names that commit and its re-run is red too, or the report is
     Mustafa's own words; otherwise it is a normal change-set, plan first.
-  - Its diff is the exact inverse of the merge: `git diff <merge-sha> <merge-sha>^1 | git patch-id --stable` equals
-    `git diff origin/main...<headSHA> | git patch-id --stable`.
+  - Its diff is the exact inverse of the merge: `git diff <merge-sha> <merge-sha>^1 | git patch-id --verbatim` equals
+    `git diff origin/main...<headSHA> | git patch-id --verbatim`, and neither is empty.
   - No later merge on main touched the same files, `docs/STATUS.md` and `docs/ROADMAP.md` aside, when git applied them
     cleanly; if one did, or git needed a hand resolution, it is a normal change-set, plan first.
   - CI green on its head. If the revert drops game symbols (the reverted merge's "+ added" list), CI's `gate` fails by

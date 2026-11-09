@@ -558,7 +558,7 @@ read them at its parent 6c6c91a (`git show 6c6c91a:<path>`; the same files as at
       `docs/EDITOR_V2.md:39` (the "Validation panel" line), which is :48 at this head (the verifier, Low); VISION_V2:66
       cites DESIGN_NOTES for "team colours never change", which no version of DESIGN_NOTES says (art-director, Low).
   - From kit-v3-4 (PR #44; the advisor's fix-pass ruling, `.checkpoints/kit-v3-4/advisor-fix-pass.md`, readable at
-    c3cf647):
+    c3cf647, and for F5 its ruling on H1, `.checkpoints/kit-v3-4/advisor-h1.md`, readable at 20b4be5):
     - **F1, the guard's rename gap** (risk tier 2, its own change-set; security-auditor SA-1, Critical, on main and
       outside kit-v3-4's diff; SA-8, Low): the PR Advisor's merge check reads both names of a renamed file
       (`.filename, (.previous_filename // empty)`), refuses a pr-advisor merge when the PR's `changed_files` is 3000
@@ -578,6 +578,11 @@ read them at its parent 6c6c91a (`git show 6c6c91a:<path>`; the same files as at
       changes no word or decision" and "not CLAUDE.md, CLAUDE.local.md, AGENTS.md or a rename"; one clause "steps 4
       and 5 apply at every tier; decision docs always need his go". Not in kit-v3-4: advisor.md governs (CLAUDE.md:91
       points there), every gap is on the strict side, and it would cost a third approval prompt.
+    - **F5, the third "main breaks" case in the revert check** (next kit pass, with F4; the verifier's L3, Low):
+      advisor.md's check of a revert PR accepts a red `gate` or `smoke` run or Mustafa's own words, so "a merged kit
+      change stops sessions working" qualifies only through his report (the strict side). To decide then: accept it
+      when the advisor reproduces the refusal or error on main itself (a loosening: needs his words), or drop the
+      case from "Main breaks" and CLAUDE.md's Rollback line, leaving it to his report.
   - The kit-v3-1 Windows test follow-up stays in Open bugs and risks (kit-v3-1 item 1; its own change-set).
 - **Queued, in Mustafa's words** (word for word, each with its date and source; each removed by the change-set
   that carries it out; copied from the A2 and A3 day session's queue files, session_0173vVo7FcYUpbWgRW8oQyHU):
