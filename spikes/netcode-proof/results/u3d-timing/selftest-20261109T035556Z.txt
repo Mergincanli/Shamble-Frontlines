@@ -218,3 +218,116 @@ cpu2 80893 0 11050 957194 8506 0 1908 3472 0 0
 cpu3 78649 0 10799 959439 8269 0 1968 3592 0 0
 
 running 1 test
+test l2::socket::tests::l2_timing_self_test has been running for over 60 seconds
+U3d self-test: P1 (seed 11), 1000000 per direction in 100.000 s = 10000 pps each way; received down 990091 (the sink), up 989926 (the poller)
+  poller: a tokio task spawned on a 4-worker multi-thread runtime, quinn's 32 buffers of 1472 B, polled until Pending
+  fate log: capacity 2001000 entries (112.1 MB), pre-touched with 2001000 entries before the pacers; 1999913 entries after the stop
+  loadavg at the start: 1.52 1.20 1.00 3/121 14140
+  up: delivered 989926 lost 9987 queue 0 pool 0 shaper 0 overtaken 5003 reordered 864675; lateness us: n 989926 p50 36.5 p99 111.5 p99.9 4159.3 max 34172.1 E[(L-L0-0.25ms)+] 15.442 over 5612
+  down: delivered 990091 lost 9909 queue 0 pool 0 shaper 0 overtaken 5037 reordered 864507; lateness us: n 990091 p50 31.5 p99 87.5 p99.9 2392.0 max 34214.6 E[(L-L0-0.25ms)+] 11.269 over 3505
+  up fate log: n 989926 (finished fates but Oversize); E with L0 = the histogram's p50 (36482 ns) 15442 ns (the histogram's own 15442 ns); E with L0 = 0 15655 ns; E with L0 = the exact p50 (36352 ns) 15443 ns
+  down fate log: n 990091 (finished fates but Oversize); E with L0 = the histogram's p50 (31487 ns) 11269 ns (the histogram's own 11269 ns); E with L0 = 0 11383 ns; E with L0 = the exact p50 (31288 ns) 11270 ns
+  up: E with L0 = 0, the judged form (U3D-L0): 15655 ns vs bar 10000 ns: would MISS (reported, not judged here)
+  down: E with L0 = 0, the judged form (U3D-L0): 11383 ns vs bar 10000 ns: would MISS (reported, not judged here)
+  up: E with L0 = the exact p50: 15443 ns vs bar 10000 ns: would MISS (reported, not judged here)
+  down: E with L0 = the exact p50: 11270 ns vs bar 10000 ns: would MISS (reported, not judged here)
+  up: E with L0 = the histogram's p50: 15442 ns vs bar 10000 ns: would MISS (reported, not judged here)
+  down: E with L0 = the histogram's p50: 11269 ns vs bar 10000 ns: would MISS (reported, not judged here)
+  -3 L2 P1 up on the same samples (reported): delays n 989926 (Delivered only, out − t_in)
+  -3 L2 P1 up count: 999913 (every fate of the direction; at least 1000000): would FAIL
+  -3 L2 P1 up loss: 9987 lost of 999913 (0.9988 %; band 9500-10500 ppm): would PASS
+  -3 L2 P1 up mean: 25076617 ns, rounded down (band 23750000-26250000): would PASS
+  -3 L2 P1 up p001: 20044919 ns (band 19750000-20250000): would PASS
+  -3 L2 P1 up p90: 29060692 ns (band 28750000-29250000): would PASS
+  -3 L2 P1 up p99.9: 30750757 ns (band 29750000-30250000): would FAIL
+  up: E with L0 = 0, the judged form (U3D-L0): would MISS; -3's p99.9: would FAIL; agree
+  up: E with L0 = the exact p50: would MISS; -3's p99.9: would FAIL; agree
+  up: E with L0 = the histogram's p50: would MISS; -3's p99.9: would FAIL; agree
+  -3 L2 P1 down on the same samples (reported): delays n 990091 (Delivered only, out − t_in)
+  -3 L2 P1 down count: 1000000 (every fate of the direction; at least 1000000): would PASS
+  -3 L2 P1 down loss: 9909 lost of 1000000 (0.9909 %; band 9500-10500 ppm): would PASS
+  -3 L2 P1 down mean: 25062219 ns, rounded down (band 23750000-26250000): would PASS
+  -3 L2 P1 down p001: 20042979 ns (band 19750000-20250000): would PASS
+  -3 L2 P1 down p90: 29053525 ns (band 28750000-29250000): would PASS
+  -3 L2 P1 down p99.9: 30055981 ns (band 29750000-30250000): would PASS
+  down: E with L0 = 0, the judged form (U3D-L0): would MISS; -3's p99.9: would PASS; disagree
+  down: E with L0 = the exact p50: would MISS; -3's p99.9: would PASS; disagree
+  down: E with L0 = the histogram's p50: would MISS; -3's p99.9: would PASS; disagree
+  -3's RTT mean check: not computable here (no echo)
+  release thread CPU 39.905 s over 100.557 s = 0.397 core (M13's 0.27 core: advisor-u3q.md:269; c10's 0.393 and 0.414); reorder up 873 down 873 permille
+  slack now 1 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+  loadavg at the end: 1.43 1.24 1.03 1/120 14294
+
+thread 'l2::socket::tests::l2_timing_self_test' (14134) panicked at crates/net/src/l2/socket_tests.rs:1657:9:
+assertion `left == right` failed: up: every datagram accounted for: the run is INVALID, not a lateness verdict
+  left: 999913
+ right: 1000000
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: core::panicking::assert_failed_inner
+   3: core::panicking::assert_failed::<u64, u64>
+   4: npt_net::l2::socket::tests::l2_timing_self_test
+   5: <npt_net::l2::socket::tests::l2_timing_self_test::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+test l2::socket::tests::l2_timing_self_test ... FAILED
+
+failures:
+
+failures:
+    l2::socket::tests::l2_timing_self_test
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 171 filtered out; finished in 100.83s
+
+/proc/stat after:
+cpu  311935 0 47610 3865140 36736 0 10218 14314 0 0
+cpu0 73196 0 11992 967955 11599 0 3437 3675 0 0
+cpu1 78548 0 11996 966626 8361 0 2508 3503 0 0
+cpu2 81222 0 11955 964138 8506 0 2105 3501 0 0
+cpu3 78968 0 11666 966420 8269 0 2166 3634 0 0
+steal cpu: 153 of 33603 ticks = 0.0046
+steal cpu0: 48 of 8380 ticks = 0.0057
+steal cpu1: 34 of 8412 ticks = 0.0040
+steal cpu2: 29 of 8404 ticks = 0.0035
+steal cpu3: 42 of 8407 ticks = 0.0050
+ 04:01:40 up  3:00,  0 user,  load average: 1.43, 1.24, 1.03
+exit_status 101 (the run failed or was INVALID: its output above says why; it stays in the record)
+=== M13 3 (P2, 10 s) 20261109T040140Z
+ 04:01:40 up  3:00,  0 user,  load average: 1.43, 1.24, 1.03
+/proc/stat before:
+cpu  311935 0 47610 3865142 36736 0 10218 14314 0 0
+cpu0 73196 0 11992 967956 11599 0 3437 3675 0 0
+cpu1 78548 0 11996 966626 8361 0 2508 3503 0 0
+cpu2 81222 0 11955 964138 8506 0 2105 3501 0 0
+cpu3 78968 0 11666 966420 8269 0 2166 3634 0 0
+
+running 1 test
+M13: 100000 per direction in 10.000 s = 10000 pps each way; received down 98017, up 97926
+  up: delivered 97926 lost 2074 queue 0 pool 0 shaper 0 overtaken 507 reordered 89140; lateness us: n 97926 p50 27.5 p99 92.5 p99.9 1888.3 max 4111.5 E[(L-L0-0.25ms)+] 4.272 over 452
+  down: delivered 98017 lost 1983 queue 0 pool 0 shaper 0 overtaken 486 reordered 89141; lateness us: n 98017 p50 31.5 p99 91.5 p99.9 1800.6 max 4176.6 E[(L-L0-0.25ms)+] 3.350 over 289
+  release thread CPU 4.130 s over 10.578 s = 0.390 core; reorder up 910 down 909 permille; slack Some(("l2_timer_slack_ns", 1))
+test l2::socket::tests::l2_sustains_10000_per_second_each_way ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 171 filtered out; finished in 10.64s
+
+/proc/stat after:
+cpu  312165 0 48152 3868275 36737 0 10432 14332 0 0
+cpu0 73257 0 12128 968734 11599 0 3493 3679 0 0
+cpu1 78601 0 12124 967409 8361 0 2557 3508 0 0
+cpu2 81281 0 12095 964925 8506 0 2156 3504 0 0
+cpu3 79025 0 11803 967206 8269 0 2224 3639 0 0
+steal cpu: 18 of 4138 ticks = 0.0043
+steal cpu0: 4 of 1035 ticks = 0.0039
+steal cpu1: 5 of 1018 ticks = 0.0049
+steal cpu2: 3 of 1040 ticks = 0.0029
+steal cpu3: 5 of 1043 ticks = 0.0048
+ 04:01:51 up  3:00,  0 user,  load average: 1.47, 1.26, 1.04
+exit_status 0
+=== summary
+SELFTEST 1 (P1, 100 s): 0
+M13 1 (P2, 10 s): 0
+SELFTEST 2 (P1, 100 s): 0
+M13 2 (P2, 10 s): 0
+SELFTEST 3 (P1, 100 s): 101
+M13 3 (P2, 10 s): 0
+loadavg_end 1.47 1.26 1.04 1/116 14323
