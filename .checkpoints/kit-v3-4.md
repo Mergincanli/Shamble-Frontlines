@@ -70,7 +70,11 @@
   is empty" (the advisor's own Low: a failed `patch-id` prints nothing), and :76-77 names `AGENTS.md` (L1). Notes:
   rows 66, 68, 76, 80 and 82 set to the ruled texts (L2; row 68 stays looser, confirmed). STATUS: F5 under F4 (L3),
   and the follow-ups' source line names the H1 ruling. Kit tests 1034/127/27, gate PASS +0 −0, repo map OK.
-- **Current step:** 8, the verifier's re-check of the new head (`advisor-h1.md` §2's list; not a round), then the
-  advisor's review of the pushed head (closing IE-1, SA-2, H1), the report (draft in the session scratchpad,
-  `kit-v3-4-report-draft.md` and `kit-v3-4-appx.py`), the notes' deletion, the final-head review, GUARD-RENAME and
-  his go.
+- **Done (2026-11-09):** the H1 fix pushed (3d39527; notes 2894a1f), CI `gate` and `smoke` green on it (runs
+  42614755781, 42614762040); the verifier's re-check (`verifier-h1.md`): PASS, no finding at any severity (the
+  whitespace fake fails, honest and offset reverts pass, empty ids fail; rows and F5 as ruled; tests 1034/127/27;
+  gate +0 −0; repo map OK; scope and line lengths PASS). Its correction: 50afd389efe7 was the inverse's `--stable` id.
+- **Current step:** 9, finishing: this commit is the notes' last state. Next, one commit with the report
+  (`docs/reports/2026-11-08-kit-v3-4.md`, appendices A-D), STATUS and ROADMAP made current, and the notes deleted
+  (CHECKPOINTS.md §9); push; PR #44 ready with a new description; the advisor's final-head review (closing IE-1,
+  SA-2 and H1); its comment and `needs-mustafa`; his GUARD-RENAME answer and his go.
