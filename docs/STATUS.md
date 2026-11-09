@@ -525,7 +525,7 @@ read them at its parent 6c6c91a (`git show 6c6c91a:<path>`; the same files as at
       "merge #43"), word for word: "XP-TERM: (a), all account progression (the account level and Service points),
       never the in-match weapon XP: amps reset every match, so there's nothing to farm, and cutting them would only
       make practice with bots feel worse." Recorded by kit-v3-4 (PR #44): a pointer beside his rule (VISION_V2:72-75)
-      and the register's R2-ROOM-OQ7 row (`docs/adr/README.md:183`); it settles the "XP" part of B.2's
+      and the register's R2-ROOM-OQ7 row (`docs/adr/README.md:184`); it settles the "XP" part of B.2's
       rented-servers follow-up above. Facts kept for the community-servers design session (nothing decided here):
       Service points come only from a share of the team's uplink tech, never from kills (LOOP_V2:45-52, :132-133), so
       with the weapon XP left out, the Advisor's open suggestion (1), XP weighed per action, fits only an account-level
@@ -536,7 +536,7 @@ read them at its parent 6c6c91a (`git show 6c6c91a:<path>`; the same files as at
       (EDITOR_V2 §7) against LOOK_V2:63's `[DEFAULT]` "Comic impact touches for big moments," "used sparingly"
       (LOOK_V2 §7). The lists differ too: only halftone flashes are in both, and §7's ink "line boil" is not in his.
       One reading finds no conflict: his line says what the tool can make, §7 how often to use it. It also bears on
-      OQ-0003-15 (the legacy look touches, comic words first; README:103, which now points at it). vfx-xp-notes asked
+      OQ-0003-15 (the legacy look touches, comic words first; README:104, which now points at it). vfx-xp-notes asked
       him (its report's "Decisions needed", LOOK). Mustafa answered on 2026-11-07 (his message that gave "merge
       #43"), word for word: "LOOK: (a)." His word is "(a)"; the option's text is the report's: "no, §7 stands until
       his VFX style guide and the look proof test". So LOOK_V2 §7 stands, and no LOOK_V2 line is edited. His "A VFX
@@ -557,6 +557,27 @@ read them at its parent 6c6c91a (`git show 6c6c91a:<path>`; the same files as at
     - **Stale citations, older than this pass** (left unedited): `docs/research/r1-simulation-core.md:3631` cites
       `docs/EDITOR_V2.md:39` (the "Validation panel" line), which is :48 at this head (the verifier, Low); VISION_V2:66
       cites DESIGN_NOTES for "team colours never change", which no version of DESIGN_NOTES says (art-director, Low).
+  - From kit-v3-4 (PR #44; the advisor's fix-pass ruling, `.checkpoints/kit-v3-4/advisor-fix-pass.md`, readable at
+    c3cf647):
+    - **F1, the guard's rename gap** (risk tier 2, its own change-set; security-auditor SA-1, Critical, on main and
+      outside kit-v3-4's diff; SA-8, Low): the PR Advisor's merge check reads both names of a renamed file
+      (`.filename, (.previous_filename // empty)`), refuses a pr-advisor merge when the PR's `changed_files` is 3000
+      or more (the API's cap), and `protectedRel` protects `CLAUDE.local.md` and `AGENTS.md` anywhere; with test rows.
+      SA-5 (Low: a mechanical refusal of pr-advisor merges of `docs/adr/**` and the decision docs) rides F1 if Mustafa
+      wants it. Once F1 is on main, advisor.md's tier-2 bracket ("it does not yet see a renamed-away path ...") goes.
+      Whether A4 waits for F1 is his open GUARD-RENAME (kit-v3-4's report).
+    - **F2, CI and a pure revert's dropped symbols** (risk tier 2, its own change-set; infra-engineer IE-1, High,
+      fixed in advisor.md's text by kit-v3-4): CI passes no `--allow-drop`, so CI's `gate` fails on a revert of a
+      merge that added game symbols. A way for CI to accept a pure revert's drops, with security-auditor SA-3's note:
+      only for a first-parent merge of main named in "This reverts commit <sha>", and exactly that merge's added
+      symbols. Until then advisor.md's "Revert" sends such a revert to Mustafa.
+    - **F3, register line drift from #45** (docs-keeper; the verifier's L1, Low, second half): #45 added a register
+      row at README:88, so the rows below it moved down one. Stale in lines kit-v3-4 did not touch: STATUS :116,
+      :117, :465, :466, :484, :485, :492, :495, :545.
+    - **F4, CLAUDE.md's short risk-tier table** (next kit pass; the verifier's L3, Low): row 0 to read "that adds or
+      changes no word or decision" and "not CLAUDE.md, CLAUDE.local.md, AGENTS.md or a rename"; one clause "steps 4
+      and 5 apply at every tier; decision docs always need his go". Not in kit-v3-4: advisor.md governs (CLAUDE.md:91
+      points there), every gap is on the strict side, and it would cost a third approval prompt.
   - The kit-v3-1 Windows test follow-up stays in Open bugs and risks (kit-v3-1 item 1; its own change-set).
 - **Queued, in Mustafa's words** (word for word, each with its date and source; each removed by the change-set
   that carries it out; copied from the A2 and A3 day session's queue files, session_0173vVo7FcYUpbWgRW8oQyHU):
