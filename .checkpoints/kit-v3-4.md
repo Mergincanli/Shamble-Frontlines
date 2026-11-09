@@ -59,7 +59,13 @@
   STATUS/ROADMAP-only later merges don't count), F1-F4 follow-ups. The fix pass: docs part 9f0c6a2 (L1, F1-F4, table
   rows); the kit part (this commit): advisor.md (SA-2, IE-1-IE-7, SA-3, SA-4, SA-6, SA-7; +23 lines) and CHECKPOINTS.md
   §10 (IE-8-IE-10; +9; the spike paths marked as on its branch until it merges), each shown to Mustafa, one at a time.
-- **Current step:** 6, the verifier's check of the new head, then the advisor's review of the pushed head (closing IE-1
-  and SA-2), then the report (C12 appendix), the notes' deletion, the final-head review, GUARD-RENAME and his go.
-  (parts A, B, C, E: CLAUDE.md, advisor.md, changeset SKILL.md, security-auditor.md; four asks). Then docs-keeper's
-  pass (#43 merged, this change-set's rows), the review round, the report.
+- **Done (2026-11-09):** the verifier's check of the fix pass (`verifier-fixpass.md`, f1dfa2e): FAIL on one High,
+  H1: advisor.md:285-286's "exact undo" check uses `git patch-id --stable`, which strips whitespace, so a fake revert
+  that only changes whitespace matches; fix `--verbatim` on both sides. Lows L1 (name `AGENTS.md` at :76), L2 (rows 80
+  and 82 copy the landed words), L3 (the trigger test's kit case, strict side); row 68 (IE-3) looser, to confirm.
+  Everything else PASS (his words, the fix list, tests 1034/127/27, gate +0 −0, repo map, line numbers, long lines).
+  The session reproduced H1 and checked binary ids and file order (`session-h1.md`, 26255a9).
+- **Current step:** 7, the advisor's ruling on H1's fix (`advisor-h1.md`, running), then the one-word kit edit
+  (shown to Mustafa, one `cp`), tests, gate, push; then the verifier's re-check (or a second round, as ruled), the
+  advisor's review of the pushed head (closing IE-1, SA-2, H1), the report (C12 appendix; draft started), the
+  notes' deletion, the final-head review, GUARD-RENAME and his go.
