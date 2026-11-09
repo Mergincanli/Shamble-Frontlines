@@ -6,15 +6,17 @@ review (REVISE: u3d-plan-review-test.md, findings 1-12 = F-A to F-L, plus the ni
 u3d-plan-rev2-notes.md M0-M17). It also applies Mustafa's shared-target rule of 2026-11-09 (§7.1). What changed from
 rev 1:
 - §0.1 maps every finding to where rev 2 meets it.
-- The tests: T1's order fixed; two new pure tests (T5 exact E, T6 -3's cross-check); T4 in integers.
+- The tests: T1's order fixed; two new pure tests (T5 exact E, T6 -3's cross-check); T4 in integers; and, in the gap
+  pass, T7 (a held lock makes both directions late: F-O's lower bound).
 - The run: the poller is spawned onto a runtime the test builds; the fate log is pre-touched; a window rule (no observer
   call inside the run); M13's run is not edited.
 - R1 judges E as computed by the probe over -3's own measured records (C-U6-5), which also gives the L0 = 0 form a
   producer. So U3D-L0's recommendation moves to (b), and a new question, U3D-WINDOW, asks which value R1 reads.
 - The build rules: §7.1.
 
-Rev 1 was written on 49bd1ac (scouts u3d-scout-req.md, u3d-scout-r1.md; notes u3d-plan-notes.md N1-N25). Next: the
-completeness check (u3d-plan-rev2-check.md), then the advisor. **No code before the advisor's APPROVE.**
+Rev 1 was written on 49bd1ac (scouts u3d-scout-req.md, u3d-scout-r1.md; notes u3d-plan-notes.md N1-N25). The
+completeness check (u3d-plan-rev2-check.md) found gaps, none structural; the gap pass closes them (§0.1, its last
+paragraph; notes u3d-plan-rev2-notes.md P2-*). Next: the advisor. **No code before the advisor's APPROVE.**
 
 ## 0. In plain words
 - **What it is.** L2's impairment layer (ImpairSocket) delays every datagram by the profile's amount and hands it over
@@ -33,7 +35,7 @@ completeness check (u3d-plan-rev2-check.md), then the advisor. **No code before 
   A script runs it three times in a quiet container. It records the kernel facts U3-Q9 asks for, the huge-page mode,
   and the steal on every CPU line before and after each run. Everything here is reported, never judged: this container
   is no evidence for a µs-level bar (advisor-u3c-plan.md:114). RS judges at R1, on the probe's P1 leg (§5.2).
-- **Size.** Test code only: in one test file, one new ignored run, six fast tests and their helpers. Plus a results
+- **Size.** Test code only: in one test file, one new ignored run, seven fast tests and their helpers. Plus a results
   script, two SERIES.md row texts and plan text. No production code, no public item, no log name, no dependency. M13's
   run is not edited.
 - **What it expects here.** A miss. ImpairSocket's own E was 11.6 and 16.9 µs inbound, and 12.9 µs outbound in run 2,
@@ -52,9 +54,9 @@ Severity as each critic gave it. "Holds" means I re-checked the claim at the lin
 | T-2 (F-B) | T2 near-vacuous: both E's are often 0 at 2,000/s for 1 s (medium) | Holds: E is 0 with no sample above p50 + 0.25 ms (stats.rs:129-155) | §4 T5: exact E on fixed samples, both L0 forms, PASS/MISS either side of the bar; T2 also asserts lost > 0 and no send error |
 | T-3 (F-C) | -3's cross-check delay formula has no bite (medium) | Holds: rev 1 tests only the rank (T4) | §4 T6: fixed fates with known D and L; bites `due − t_in` and lost entries kept; bands derived from P1 and pinned to marks.json's numbers |
 | T-4 (F-D) | No producer for the L0 = 0 E at R1 (medium) | Holds: one E field (stats.rs:58-59). The probe must read the fate log anyway: it is the only per-datagram stamp source (socket.rs:427), and -3's L2 series need those stamps (SERIES.md:401-406) | C-U6-5: the probe computes both forms from those entries; §5.2 |
-| T-5 (F-E) | The judged window is not -3's: -3 reads `measured` records only, `late_run` covers the socket's life (medium) | Holds: no `window` key in -3's checks (marks.json:752-1021), so `measured` (marks/README.md:100); `late_run` never resets (impair.rs:246, :682) | C-U6-5 computes E over -3's measured records; C-U6-2 one socket per leg; U3D-WINDOW |
+| T-5 (F-E) | The judged window is not -3's: -3 reads `measured` records only, `late_run` covers the socket's life (medium) | Holds: no `window` key in -3's checks (marks.json:752-1030), so `measured` (marks/README.md:100); `late_run` never resets (impair.rs:246, :682) | C-U6-5 computes E over -3's measured records; C-U6-2 one socket per leg; U3D-WINDOW |
 | T-6 (F-F) | R1 lacks a rate condition; the probe's up stream may carry echoes too (low-medium) | Holds: "sends up, echoes" (SERIES.md:405-406); the count (marks.json:752) does not bound the rate | §5.2 run conditions gain the rate; C-U6-6 (composition and poller kind recorded); C-U8-4 |
-| T-7 (F-G) | C-U6-1 and C-U6-2 carry designs without proofs (low) | Holds | C-U6-1: T1 re-run on the probe's poller; C-U6-2: a two-legs test; C-U6-5: a warm-up-outside-the-window test |
+| T-7 (F-G) | C-U6-1 and C-U6-2 carry designs without proofs (low) | Holds | C-U6-1: T1 re-run on the probe's poller; C-U6-2: a two-legs test; C-U6-5: a warm-up-outside-the-window test, a planted-inside test with its exact excess, and T5's samples (gap pass) |
 | T-8 (F-H) | The dry run's comparisons are confounded (profile, poller, length, fate log); "10-19 µs" rests on two single runs (low) | Holds (u3-verify-timing.md:152-159) | §0, §5.1 and U3D-POLL say what the rounds can show. A P1 thread-poller control round is offered as U3D-POLL (b+), not built by default. Fate log off: not needed after the pre-touch (§3.7) |
 | T-9 (F-I) | Steal from `head -1` only; prints after asserts; INVALID rounds (low) | Holds (M13 prints first: socket_tests.rs:579-614, then asserts :616-637) | §3.4 every `^cpu` line; §3.1 every print before any assert; an INVALID round stays in the record with its cause |
 | T-10 (F-J) | Folding M13 into a shared helper risks the c10 comparison (low) | Holds | §3.2: M13's function is not edited; the self-test is its own function, reusing `pace`, `transmit`, `value`, `local`, `Unpark` |
@@ -62,8 +64,8 @@ Severity as each critic gave it. "Holds" means I re-checked the claim at the lin
 | T-12 (F-L) | Citations: U3 row is plan.md:1222; quinn's loop is `poll_socket`; buffers ~64 KB; checkpoint lines moved (nit) | Holds (plan.md:1221 is U2) | Fixed throughout: U3 :1222; drive_recv endpoint.rs:497-512 calls `poll_socket` :772ff (loop :793); 1,472 B (rust F8); checkpoint :488-501 |
 | T-12a (F-M) | T2's count identity needs no SendError/WouldBlock (they enter the histogram) (nit) | Holds (impair.rs:680-684) | §4 T2 asserts send errors and would-blocks 0; the sample sets as rust F5 |
 | T-12b (F-N) | T3 bakes "≤ 10,000" from U3D-BAR (a) (nit) | Holds | T3's constant follows the advisor's U3D-BAR ruling |
-| T-12c (F-O) | Optional deterministic stall test (hold the lock 50 ms once) (nit) | The critic calls rev 1's reasoning otherwise sound | Deferred: §3.7 gives the reason |
-| R-F1 | The precedent `#[tokio::test]` runs its body under `block_on` on the test thread, a park/unpark hop, not quinn's (medium) | Holds: tokio-1.54.1 multi_thread/mod.rs:80-91; delay_tests.rs:3084; quinn spawns its driver (endpoint.rs:152-160) | §3.1: `rt.spawn` onto `Builder::new_multi_thread().worker_threads(4).enable_all()`; one poller fn shared by T1 and the run; T1 bites a `block_on` poller too |
+| T-12c (F-O) | Optional deterministic stall test: hold the lock 50 ms once; the over count at least the datagrams due in the held window (nit) | Holds, and it fills a hole: no test shows a release-path stall entering down's L (socket_tests.rs:215-237 checks the send time by wall clock and the counts only) | Built in the gap pass: §4 T7. F25's live rise test stays deferred, with its own reason (§3.7) |
+| R-F1 | The precedent `#[tokio::test]` runs its body under `block_on` on the test thread, a park/unpark hop, not quinn's (medium) | Holds: tokio-1.54.1 multi_thread/mod.rs:80-91; delay_tests.rs:3084; quinn spawns its driver (endpoint.rs:152-160) | §3.1: spawned onto `Builder::new_multi_thread().worker_threads(4).enable_all()` by one helper, `start_poller`, that the run, T1, T2 and T7 all call; T1's bites (a std-thread poller, a `block_on` poller) are planted inside that helper, so they reach the run's poller (gap pass) |
 | R-F2 | Fate-log pages are first touched under the state lock (medium) | Holds: `Vec::with_capacity` at bind (stats.rs:476-480); pushes under the lock from `finish` and intake drops (impair.rs:338-343, :500-506, :576-579, :686-697) | §3.1 pre-touch before the pacers (test-only: the child module sees `shared`, `im` and `fates`: socket.rs:63-64, :739-741; impair.rs:248). `Vec::drain` keeps the pages (stats.rs:495-500). THP mode in the header; risk 2 reworded ("a VM guest"); C-U6-3 |
 | R-F3 | Observer calls inside the window take the state lock, and the release thread reads /proc under it (low) | Holds: socket.rs:667-677 (slack ask), :394-415, :262-264, :427-429 | §3.1 window rule: inside the run only `try_send` and `poll_recv`; the stop from the pacers' joins, never by polling `run_summary`; every read after the stop; C-U6-7 |
 | R-F4 | T1's race (low) | = T-1 | §4 T1 takes the test-engineer's form: rust's 200 ms sleep form holds only if the drain comes within 130 ms of the signal |
@@ -72,7 +74,20 @@ Severity as each critic gave it. "Holds" means I re-checked the claim at the lin
 | R-F7 | A run-window reset is a new public method (low) | Holds: plan.md:580-584 | C-U6-2: one ImpairSocket per leg; no reset method |
 | R-F8 | Cites: stamp :503/:527; drive_recv :497-512; 1,472 B buffers (nit) | Holds (quinn-proto-0.11.19 config/mod.rs:60; ImpairSocket's 1 segment: socket.rs:549-551) | Fixed |
 | R-F9 | The stop branch's order: a `Notify` polled while waiting locks its waiter list (nit) | Holds: tokio sync/notify.rs:1224-1247 | §3.1: `poll_recv` first, the stop polled only after Pending |
-| R-F10 | Bounds and integers: cap the length; integer loss band; u128 sums; no HashMap (nit) | Holds (Cargo.toml lints: `iter_over_hash_type` deny) | §3.1: length 1-600 s or INVALID; `u64::isqrt` band; u128 sums; per-direction arrays |
+| R-F10 | Bounds and integers: cap the length; integer loss band; u128 sums; no HashMap (nit) | Holds (Cargo.toml lints: `iter_over_hash_type` deny) | §3.1: length 1-600 s or INVALID; the integer `loss_band` (u128, rounding down), pinned in T4 (gap pass); u128 sums; per-direction arrays |
+
+**The gap pass (2026-11-09, still rev 2).** The completeness check (u3d-plan-rev2-check.md: VERDICT GAPS, nothing
+structural or medium; 2 low-medium, 3 low, 4 nits, plus one citation nit in its notes :46) found these; notes P2-* in
+u3d-plan-rev2-notes.md. This pass changed: (1) one helper, `start_poller`, spawns the poller for the run, T1, T2 and
+T7, and T1's bites are planted inside it, so they reach the run's poller (§3.1, §4 T1); (2) C-U6-5 gains a
+planted-inside test with its exact excess and T5's samples, so an E stuck at 0 fails (§3.6, risk 8); (3) C-U6-6:
+another rate makes the leg's self-test INVALID, as §5.2 says; (4) the cross-check's count is every fate of the
+direction, as -3 counts `probe_*_lost`, and T6 asserts it (1,010); (5) T2 waits until every datagram is accounted for
+before it stops its poller and reads; (6) the loss band is a pure integer function pinned in T4 (±495 at 1,000,000:
+the standard deviation rounds down); (7) T5's would-lines follow the U3D-BAR ruling, as T3's do; (8) F-O's lower
+bound is built as T7 (the counts become 267 / 281, not 266 / 280), and F25's live rise test stays deferred with a
+reason that answers it (§3.7); (9) every build and bite brief names the shared folder and the two steps (§7, §7.1
+item 8); (10) marks.json's ranges are exact: -3's P1 block :752-1030, the bands :763-1003.
 
 ## 1. Requirements
 | # | Requirement | Source | Exists | Gap U3d closes |
@@ -93,7 +108,7 @@ Severity as each critic gave it. "Holds" means I re-checked the claim at the lin
 - **The bar's origin** (u3-verify-timing.md:42-48): with the delay uniform on d ± a and an independent lateness L′,
   PM-0001-3's p99.9 upper check (d + 1.05a) holds iff E[(L′ − 0.25 ms)+] ≤ 0.001 × 2a. At P1, a = 5 ms per direction
   (half of the ±10 ms jitter: npt-l1 lib.rs:156-158; impair.rs:105, :119-123), so 2a = 10 ms and the budget is
-  **10,000 ns**. P2's would be about 20 µs: P1 binds. The bands: marks.json PM-0001-3 P1 checks (:752-1021: count
+  **10,000 ns**. P2's would be about 20 µs: P1 binds. The bands: marks.json PM-0001-3 P1 checks (:752-1030: count
   ≥ 1,000,000; loss share [0.0095, 0.0105]; mean [23.75, 26.25] ms; p001 [19.75, 20.25]; p999 [29.75, 30.25]; p90
   [28.75, 29.25]; RTT mean [47.5, 52.5]; parts "L2 P1", process `probe`). Both critics re-derived the bar (test V1).
 - **The predictor has agreed with the check** in all seven of the verifier's m3 runs here: 14 run-direction pairs, with
@@ -123,10 +138,13 @@ Severity as each critic gave it. "Holds" means I re-checked the claim at the lin
   bind (R-F10). It is its own variable, so a script setting M13's `NPT_L2_SECS` cannot shorten it.
 - **The inbound poller is a task spawned on a runtime the test builds** (RQ2; R-F1):
   `tokio::runtime::Builder::new_multi_thread().worker_threads(4).enable_all()`, as npt-server's runtime will be (4
-  workers: RS has 4 vCPUs, u3-verify-timing.md:150). The test thread calls `rt.spawn(poller(..))`. Never the test body,
-  never `block_on`: either would run the poller on a parked thread, M13's hop and not quinn's (tokio
-  multi_thread/mod.rs:80-91).
-  - One private fn, `poller`, is shared by the run, T1 and T2. Inside `poll_fn` it calls `poll_recv` with
+  workers: RS has 4 vCPUs, u3-verify-timing.md:150). Never the test body, never `block_on`: either would run the
+  poller on a parked thread, M13's hop and not quinn's (tokio multi_thread/mod.rs:80-91).
+  - **One helper starts every poller** (R-F1, gap 1): `start_poller(handle: &tokio::runtime::Handle, ..) ->
+    tokio::task::JoinHandle<..>` calls `handle.spawn(poller(..))`, and nothing else starts `poller`. The run, T1, T2
+    and T7 all start their pollers through it, so T1's bites, planted inside the helper, reach the run's own call. A
+    run that bypassed the helper would escape them: the diff review checks that it does not (§9).
+  - `poller` is private and called only by `start_poller`. Inside `poll_fn` it calls `poll_recv` with
     `quinn::udp::BATCH_SIZE` (32) buffers of 1,472 B, quinn's size (R-F8), and loops until Pending, as quinn's
     `poll_socket` does (endpoint.rs:772ff, loop :793).
   - The release thread then wakes a spawned task's waker: the hop quinn pays.
@@ -163,8 +181,10 @@ Severity as each critic gave it. "Holds" means I re-checked the claim at the lin
   - **-3's L2 P1 checks on the same samples** (U3D-XCHECK; T6's function): delays = `out − t_in` of Delivered fates
     only (`checked_sub` after the filter; the probe's stamps: SERIES.md:401-406). By nearest rank in integers (T4):
     p001, p90, p99.9, mean, and the loss share (Lost over all fates of the direction), each `would PASS/FAIL
-    (reported)` against P1's bands; the count against 1,000,000. Then, per direction, whether E's line (in each form)
-    and the p99.9 line agree. The RTT mean check is not computable here (no echo) and is named as such;
+    (reported)` against P1's bands; the count against 1,000,000, where the count is every fate of the direction (one
+    per datagram sent), as -3 counts `second.s.probe_*_lost` (marks.json:752-756, :881-885; SERIES.md:114, :117),
+    never the Delivered count, which -3 uses for delays (SERIES.md:116) (gap 4). Then, per direction, whether E's line
+    (in each form) and the p99.9 line agree. The RTT mean check is not computable here (no echo) and is named as such;
   - the release thread's CPU in cores, beside M13's 0.27 (advisor-u3q.md:269) and c10's 0.393 / 0.414;
   - the slack now and at start, whether it was set, the error if any, and the scheduling policy (`header_numbers`,
     `header_texts`: socket.rs:312-366);
@@ -175,9 +195,13 @@ Severity as each critic gave it. "Holds" means I re-checked the claim at the lin
     lateness result: u3d-scout-r1.md F20);
   - no queue, pool, oversize or shaper drop (as :617-620); every datagram accounted for (:623); no send error or
     would-block (:629-632); the poller's count equals the delivered count (:633); `l2_fate_log_full_count` 0;
-  - the loss count inside a 5-standard-deviation band around n × 1 %, in integers (`u64::isqrt`; R-F10). Not the exact
-    `band` of delay_tests.rs:164-193: it starts from q^n, which underflows to 0 at this n (0.99^1,000,000 ≈ e^−10,050),
-    so every pmf is 0 and it returns the vacuous (0, n) (rust-reviewer's confirmation);
+  - the loss count inside `loss_band(n, loss_ppm)`, a pure integer function pinned in T4 (R-F10, gap 6), with n the
+    direction's fates and P1's `loss_ppm` 10,000 (npt-l1 lib.rs:118-121): centre n × ppm / 10⁶, half-width
+    5 × `isqrt`(n × ppm × (10⁶ − ppm) / 10¹²), in u128. Every division and the square root round down, so the standard
+    deviation rounds down: at n = 1,000,000 the variance is 9,900, `isqrt` gives 99 and the band is [9,505, 10,495]
+    (±495, not ±497.5). Not the exact `band` of delay_tests.rs:164-193: it starts from q^n, which underflows to 0 at
+    this n (0.99^1,000,000 ≈ e^−10,050), so every pmf is 0 and it returns the vacuous (0, n) (rust-reviewer's
+    confirmation);
   - the slack read back 1 at start under SCHED_OTHER (0 accepted under a real-time policy: SERIES.md:470);
   - below 100 s it prints "short run: under -3's 1,000,000 per direction" and does not assert the count.
 - **Integers and order:** sums in u128 as `summarize` does (stats.rs:131-152); per-direction values in `[_; 2]` arrays
@@ -187,10 +211,10 @@ Severity as each critic gave it. "Holds" means I re-checked the claim at the lin
 `l2_sustains_10000_per_second_each_way` (socket_tests.rs:507-639) keeps P2, seed 11, the thread poller, no fate log,
 its prints and its asserts. Its lines are not touched in the diff (T-10): it is U3b's evidence and the c10 comparison.
 The self-test is its own function; it reuses the existing private helpers `pace`, `transmit`, `value`, `local` and
-`Unpark` unchanged, and adds its own (`poller`, the E forms, the cross-check, the verdict line, the nearest rank, the
-loss band).
+`Unpark` unchanged, and adds its own (`start_poller`, `poller`, the E forms, the cross-check, the verdict line, the
+nearest rank, `loss_band`).
 
-### 3.3 Six fast tests (no `#[ignore]`: they run in check.mjs's test step on both builds, check.mjs:1121-1128)
+### 3.3 Seven fast tests (no `#[ignore]`: they run in check.mjs's test step on both builds, check.mjs:1121-1128)
 Table in §4.
 
 ### 3.4 The dry run's script (`spikes/netcode-proof/results/u3d-timing/run.sh`)
@@ -258,12 +282,16 @@ the socket's whole life; R1's bar reads the probe's own computation (U6)".
     - on the sample set of the histogram (finished fates but Oversize); -3's delays use Delivered only;
     - written in the leg's summary event, under names U6 adds to SERIES.md (M15).
 
-    Two tests: a planted late datagram in the warm-up stays out of E; with no warm-up, E with L0 = the histogram's p50
-    equals `l2_summary`'s within 1,000 ns (U3d's T2 identity, re-run).
+    Its tests (gap 2), on fixed fate entries: a planted late datagram in the warm-up stays out of E; the same datagram
+    planted inside the measured window (the window's other samples under the allowance) enters E with exactly its
+    excess over n, (L − L0 − 0.25 ms) / n, in both L0 forms; and U6's E function gives T5's values on T5's fixed
+    samples (10,000 ns with L0 = p50, 10,100 ns with L0 = 0). Live: with no warm-up, E with L0 = the histogram's p50
+    equals `l2_summary`'s within 1,000 ns (U3d's T2 identity, re-run). An E stuck at 0, or read over the wrong window,
+    fails one of them.
   - **C-U6-6 (rate and composition; T-6)** U6 states the up stream's composition (LG's fresh sends against its echoes:
     SERIES.md:405-406), so that the probe's socket sees 10,000 per second each way (20,000 releases per second). If it
-    sees another rate, that rate is recorded and named with the verdict. The header records the composition and the
-    poller kind.
+    sees another rate, the leg's self-test is INVALID (§5.2's rate condition), and that rate is recorded (gap 3). The
+    header records the composition and the poller kind.
   - **C-U6-7 (observer calls; R-F3)** Inside the measured window the probe calls only `try_send`, `poll_recv`,
     `take_second` once per second and the drain. `header_numbers`, `header_texts` and `run_summary` run at the leg's
     edges: `header_numbers` makes the release thread read /proc under the state lock (socket.rs:667-677). This is the
@@ -287,8 +315,8 @@ the socket's whole life; R1's bar reads the probe's own computation (U6)".
 | A per-release split for ImpairSocket | A scale check (advisor-u3c-plan.md:163); no traced need yet | A U3D-MISS step, if the advisor asks |
 | A run-window reset, or a second E field in stats.rs | A reset is a new public item (R-F7). The L0 = 0 form and -3's window come from the probe's fate log at U6 (C-U6-5), so stats.rs needs neither | U6 (C-U6-2, -5) |
 | A production pre-fault of the fate log | The test pre-touches it with crate-visible code (§3.1). The probe's choice depends on its drain cadence | U6 (C-U6-3) |
-| Reading marks.json's bands at test time (T-3's drift check) | npt-net has no JSON parser (crates/net/Cargo.toml dev-dependencies: futures-util only), and one would change Cargo.lock. The bands are derived from npt-l1's P1 by the rule each check's name states, and T6 pins them to marks.json's numbers (:763-1021) as cited literals. The cross-check is report-only, and npt-judge, reading marks.json itself, judges -3 at R1 | Not carried |
-| A live stall test (T-12c), or a fate-log-off control round (T-8) | Each piece is proven: E against brute force (stats.rs:537), only beyond the allowance (:593), windows (:613, :656), both stamps taken after the lock (socket.rs:501-503, :724-726; socket_tests.rs:184-237), a blocked consumer's delay entering L (T1). A live verdict bite cannot discriminate in a container that already misses (u3d-scout-r1.md F25). After the pre-touch, the log costs one 56 B copy per datagram under the lock, far under 0.25 ms, which adds nothing to E (§2) | Not carried; the advisor may ask |
+| Reading marks.json's bands at test time (T-3's drift check) | npt-net has no JSON parser (crates/net/Cargo.toml dev-dependencies: futures-util only), and one would change Cargo.lock. The bands are derived from npt-l1's P1 by the rule each check's name states, and T6 pins them to marks.json's numbers (:763-1003) as cited literals. The cross-check is report-only, and npt-judge, reading marks.json itself, judges -3 at R1 | Not carried |
+| A live stall rise test (u3d-scout-r1.md F25, S6: E's rise under a planted stall against a clean twin), or a fate-log-off control round (T-8) | F-O's deterministic lower bound (T-12c) is built as T7: a held lock makes both directions late through the stamps, the fate log and the over count. The rise test would prove no further link: E against brute force (stats.rs:537), only beyond the allowance (:593), windows (:613, :656), the inbound stamp after the lock (socket.rs:501-503; socket_tests.rs:184-212), a blocked consumer's delay entering L (T1), and a release-path stall entering both directions' L and `over` (T7). What it adds is the size of E's rise, which rests on this container's own pauses beside the planted one (§2; the clean run already misses here: F25), so its pass mark would be a guess. After the pre-touch, the log costs one 56 B copy per datagram under the lock, far under 0.25 ms, which adds nothing to E (§2) | Not carried; the advisor may ask |
 | A P1 thread-poller control round (T-8) | Optional: U3D-POLL (b+) | The advisor's choice |
 | A real quinn endpoint at 10,000 per second each way | U3D-POLL (c) | Not carried |
 | UP-STAMP 1-3; DelayStream's RS run; the C10-B fallback; S14; M12; M15 | U6 (plan.md:1225); U8 (:1227); R1; R1's run plan (u3-build-plan.md:47); done in U3b | As listed |
@@ -299,16 +327,18 @@ must fail its own test for its own reason.
 
 | Test | What it proves | Fixed inputs | Bite that must fail it |
 |---|---|---|---|
-| T1 `the_task_poller_takes_lateness_where_the_task_runs` | The shared `poller` measures where a spawned task polls: the hop enters L (RQ2) | Fixed 20 ms one way, no jitter (`fixed(20)`, :17-26); a 1-worker runtime (`enable_all`). (1) Spawn `poller`; wait on a std channel for its first Pending (waker stored). (2) Spawn a blocker task: it signals "running" on a std channel, then holds the only worker (std sleeps of 1 ms) until `first_seen(peer)` + 110 ms has passed; it gives up after 2 s and the test fails with "no drain". (3) Only after "running", the peer sends one datagram. Asserts the up lateness in [50 ms, at − first − 20 ms], with `at` stamped by the poller on Ready (the bound of :207-211). The lower bound holds by construction: due = first + 20 ms, poll ≥ first + 110 ms (T-1, R-F4) | (a) `poller` on its own std thread (the old `recv`): it polls at due, lateness near 0. (b) `poller` under `block_on` on a std thread (R-F1): the same |
-| T2 `the_fate_log_and_the_histogram_agree` | The fate-log forms and -3's cross-check read the same samples as the instrument's own E | P1 (jitter, 1 % loss, the reorder step), seed fixed, 2,000 per second per direction for 1 s through `poller`, the fate log on. Asserts per direction: lost > 0 (fixed by the seed; P(0) ≈ 2 × 10⁻⁹ for any seed), so the count bite always discriminates (T-2); send errors and would-blocks 0 (T-12a); fate-log entries of the E set (Delivered, SendError, WouldBlock) = `l2_late_*_count`; Delivered entries = `l2_*_delivered_count`; the fate log's E with L0 = the summary's p50 within 1,000 ns of `l2_late_*_excess_ns` (stats.rs:3-8's bound). Identities only: no timing assert | (a) L taken as `out − t_in` (the delay, not the lateness): E off by about 25 ms. (b) Lost fates not filtered out: the count differs |
+| T1 `the_task_poller_takes_lateness_where_the_task_runs` | `start_poller`, the helper the run also uses, polls where a spawned task polls: the hop enters L (RQ2) | Fixed 20 ms one way, no jitter (`fixed(20)`, :17-26); a 1-worker runtime (`enable_all`). (1) Start the poller with `start_poller`; wait on a std channel for its first Pending (waker stored). (2) Spawn a blocker task: it signals "running" on a std channel, then holds the only worker (std sleeps of 1 ms) until `first_seen(peer)` + 110 ms has passed; it gives up after 2 s and the test fails with "no drain". (3) Only after "running", the peer sends one datagram. Asserts the up lateness in [50 ms, at − first − 20 ms], with `at` stamped by the poller on Ready (the bound of :207-211). The lower bound holds by construction: due = first + 20 ms, poll ≥ first + 110 ms (T-1, R-F4) | Both planted inside `start_poller`, so each also reaches the run's poller (gap 1). (a) `poller` driven on its own thread with a parked-thread waker, the old `recv`'s way (for example inside `spawn_blocking`, outside the one worker, the return type unchanged): it polls at due, lateness near 0. (b) `poller` under `block_on` on its own thread (for example `spawn_blocking` around `Handle::block_on`, the return type unchanged; R-F1): the same |
+| T2 `the_fate_log_and_the_histogram_agree` | The fate-log forms and -3's cross-check read the same samples as the instrument's own E | P1 (jitter, 1 % loss, the reorder step), seed fixed, 2,000 per second per direction for 1 s through `start_poller`, the fate log on. T2 is outside the self-test's window rule, so it may wait (gap 5): it stops its poller only after `run_summary` shows every datagram accounted for in both directions (`l2_*_delivered_count` + `l2_*_lost_count` = sent, as :623; polling up to 10 s), asserts that first, and only then drains the fate log and reads `run_summary` again. Asserts per direction: lost > 0 (fixed by the seed; P(0) ≈ 2 × 10⁻⁹ for any seed), so the count bite always discriminates (T-2); send errors and would-blocks 0 (T-12a); fate-log entries of the E set (Delivered, SendError, WouldBlock) = `l2_late_*_count`; Delivered entries = `l2_*_delivered_count`; the fate log's E with L0 = the summary's p50 within 1,000 ns of `l2_late_*_excess_ns` (stats.rs:3-8's bound). Identities only: no timing assert | (a) L taken as `out − t_in` (the delay, not the lateness): E off by about 25 ms. (b) Lost fates not filtered out: the count differs |
 | T3 `the_verdict_line_is_per_direction_and_inclusive` | The would-line applies "≤ 10,000 ns" (U3D-BAR's ruling, T-12b) per direction, never pooled | E 10,000 → PASS; 10,001 → MISS; up 10,001 with down 0 → up MISS, down PASS | `<` for `≤` fails at 10,000; a pooled mean (5,000.5) fails the mixed case |
-| T4 `nearest_rank_matches_the_judge` | -3's cross-check ranks as npt-judge does (⌈q × n⌉ in integers: eval.rs:261-265) | 36,000 values give the 35,640th for p99 (eval.rs:1595-1597; marks/README.md:103-104); 1,001 values give the 1,000th for p99.9; 1,000,000 give the 1,000th for p001 | ⌊q × n⌋ (gives the 999th of 1,001) or an interpolated quantile |
-| T5 `the_exact_excess_on_fixed_samples` (new; T-2) | The exact E forms: the right L0, divided by n, (L − L0 − 0.25 ms)+ | 1,000 lateness samples: 999 of 100,000 ns and one of 10,350,000 ns; nearest-rank p50 = 100,000. E with L0 = p50 = 10,000,000 / 1,000 = **10,000 ns** (would PASS); E with L0 = 0 = 10,100,000 / 1,000 = **10,100 ns** (would MISS). Asserts both values exactly and both would-lines | L0 swapped (both asserts fail); divided by the over count (10,000,000); L0 = the mean (110,250 → 9,989); the allowance not subtracted, (L − L0)+ above the threshold (10,250) |
-| T6 `the_cross_check_reads_delay_plus_lateness` (new; T-3) | -3's P1 cross-check: delay = `out − t_in` (D + L), Delivered only, nearest rank, loss share, P1's bands | Up fates: 1,000 Delivered with D_i = 20,000,000 + 10,000 × i ns (i = 0..999), L = 0 except i = 998, 999 with L = 300,000 ns; 10 Lost (due 0, out 0). Hand values: p001 20,000,000 PASS; p90 28,990,000 PASS; p99.9 **30,280,000 FAIL** (> 30,250,000); mean 24,995,600 PASS; loss 10 / 1,010 PASS; n 1,000. E (both forms) 100 ns: the agree line says "disagree". Also: P1's bands derived from `Profile::p1()` (d = 25 ms, a = 5 ms: d − a, d + 0.8a, d + a each ± 0.05a; mean and loss ± 5 %) equal marks.json's numbers (:763-1021) | `due − t_in` (D only): p99.9 29,980,000 → PASS, the assert fails. Lost entries kept: n 1,010 and p001 0 (or a `checked_sub` panic naming a lost entry). A band rule off by one term fails the pinned numbers |
+| T4 `nearest_rank_and_loss_band_on_fixed_inputs` | -3's cross-check ranks as npt-judge does (⌈q × n⌉ in integers: eval.rs:261-265), and the run's loss band is §3.1's integer rule (gap 6) | 36,000 values give the 35,640th for p99 (eval.rs:1595-1597; marks/README.md:103-104); 1,001 values give the 1,000th for p99.9; 1,000,000 give the 1,000th for p001. `loss_band(1,000,000, 10,000)` = [9,505, 10,495]; `loss_band(10,000, 10,000)` = [55, 145] (variance 99, `isqrt` 9, ±45) | ⌊q × n⌋ (gives the 999th of 1,001) or an interpolated quantile. A band returning (0, n) (the trap of delay_tests.rs's `band` at this n); the standard deviation rounded up (±500) or taken in f64 (±497) |
+| T5 `the_exact_excess_on_fixed_samples` (new; T-2) | The exact E forms: the right L0, divided by n, (L − L0 − 0.25 ms)+ | 1,000 lateness samples: 999 of 100,000 ns and one of 10,350,000 ns; nearest-rank p50 = 100,000. E with L0 = p50 = 10,000,000 / 1,000 = **10,000 ns** (would PASS); E with L0 = 0 = 10,100,000 / 1,000 = **10,100 ns** (would MISS). Asserts both values exactly and both would-lines; the would-lines follow the U3D-BAR ruling, as T3's constant does (gap 7) | L0 swapped (both asserts fail); divided by the over count (10,000,000); L0 = the mean (110,250 → 9,989); the allowance not subtracted, (L − L0)+ above the threshold (10,250) |
+| T6 `the_cross_check_reads_delay_plus_lateness` (new; T-3) | -3's P1 cross-check: delay = `out − t_in` (D + L), Delivered only, nearest rank, loss share, P1's bands | Up fates: 1,000 Delivered with D_i = 20,000,000 + 10,000 × i ns (i = 0..999), L = 0 except i = 998, 999 with L = 300,000 ns; 10 Lost (due 0, out 0). Hand values: p001 20,000,000 PASS; p90 28,990,000 PASS; p99.9 **30,280,000 FAIL** (> 30,250,000); mean 24,995,600 PASS; loss 10 / 1,010 PASS; n (the delays) 1,000; the count (every fate, as -3 counts `probe_*_lost`) **1,010**, asserted (gap 4). E (both forms) 100 ns: the agree line says "disagree". Also: P1's bands derived from `Profile::p1()` (d = 25 ms, a = 5 ms: d − a, d + 0.8a, d + a each ± 0.05a; mean and loss ± 5 %) equal marks.json's numbers (:763-1003) | `due − t_in` (D only): p99.9 29,980,000 → PASS, the assert fails. Lost entries kept: n 1,010 and p001 0 (or a `checked_sub` panic naming a lost entry). A band rule off by one term fails the pinned numbers. The count taken over Delivered gives 1,000: the count assert fails |
+| T7 `a_held_lock_makes_both_directions_late` (gap pass; T-12c, F-O) | A stall of the release path enters L and the over count in both directions, through the stamps (up at `poll_recv` after its lock: socket.rs:501-503; down after `try_send`: :724-726), the fate log and the histogram. No other test shows a late down stamp (socket_tests.rs:215-237 checks the send time and the counts) | `L2Config::new(7, fixed(100))` (no jitter, no loss) with its default pool of 8,192 buffers (config.rs:104), not `cfg`'s 256 (:28-33): about 200 datagrams per direction are in flight. 2,000 per second per direction for 1 s through `start_poller` (4 workers), the fate log on. About 400 ms in, the test thread takes `s.shared.lock()` (the child module: socket.rs:739-741; `Shared::lock` :117), then reads t0 = `s.now_ns()` (the fate log's clock: :256, :113), sleeps 50 ms, reads t1 and only then drops the guard. No entry due in (t0, t1] can leave before t1: the release thread reads `now` and pops under the lock (:678-681), and `poll_recv` stamps after its lock. It waits as T2 does (and asserts no queue, pool, oversize or shaper drop), stops the poller, then reads. Per direction, with m = the summary's p50 + 0.25 ms + 1 µs (`over` takes every bucket above the threshold's; 1 µs buckets below 8.192 ms: stats.rs:13-14, :131-159): B = the E-set entries due in (t0, t1 − m]; A = the run's E-set entries with `out − due` ≥ m. Asserts: B ≥ 20 (about 99 expected) and each of the B has `out − due` ≥ m; `l2_late_*_over_count` ≥ A (A ≥ B, and noise elsewhere cannot hide an undercount); p50 + 0.25 ms + 1 µs < 8.191 ms, else it fails as "p50 too high for the bound" | (a) down's release stamp taken as the entry's due: down's B entries have L 0, fails naming down. (b) The same for up (`poll_recv`'s stamp = due): fails naming up. (c) `summarize` skipping the log buckets (≥ 8.192 ms): the entries late by more than 8.192 ms drop out of `over`, which falls under A |
 
-T1 and T2 inject latency, jitter and loss. They decide on identities and on a lower bound that a blocked worker sets,
-never on how fast this container is or on the order threads happen to start in. T3-T6 are pure. The self-test itself
-(§3.1) asserts only run conditions. check.mjs's counts rise by exactly six per build (§7.1).
+T1, T2 and T7 inject latency (T2 also jitter and loss). They decide on identities and on lower bounds that a blocked
+worker or a held lock sets, never on how fast this container is or on the order threads happen to start in. T3-T6 are
+pure. The self-test itself (§3.1) asserts only run conditions. check.mjs's counts rise by exactly seven per build
+(§7.1).
 
 ## 5. Evidence and what is judged
 ### 5.1 Here: the dry run (reported, not judged)
@@ -360,14 +390,15 @@ never on how fast this container is or on the order threads happen to start in. 
 ## 7. Order and build route
 1. **Plan text** (§3.6, §3.5): the main session, committed before the code merges.
 2. **Build:** one agent (general-purpose, opus, xhigh) in an isolated worktree, under §7.1; or the main session itself,
-   the change being one test file and a script. It covers §3.1-§3.4 and ends with:
-   - check.mjs 9/9, with the counts stated: measured 266 and bites 280 (U3c's close: 260 and 274, checkpoint
-     :523-524, plus T1-T6), skips 0;
+   the change being one test file and a script. The builder's brief names the shared folder and the two steps
+   (§7.1 item 8). It covers §3.1-§3.4 and ends with:
+   - check.mjs 9/9, with the counts stated: measured 267 and bites 281 (U3c's close: 260 and 274, checkpoint
+     :523-524, plus T1-T7), skips 0;
    - clippy -D warnings with and without features, fmt, Cargo.lock unchanged;
    - M13's lines unchanged in the diff;
    - notes in `.checkpoints/netcode-proof-test/u3d-build.md`.
-3. **Bites** (§4): planted by a scratch script under §7.1, each failing its own test by name; the output kept in the
-   notes.
+3. **Bites** (§4): planted by a scratch script under §7.1 (its brief, too, names the folder and the two steps), each
+   failing its own test by name; the output kept in the notes.
 4. **Merge**, then, in the main folder with its own cache: check.mjs 9/9, `node tools/gate.mjs --no-smoke`, a commit
    and a checkpoint.
 5. **The dry run** (§3.4, §5.1) by the main session, one evidence run at a time.
@@ -390,8 +421,8 @@ behind." The main session's application (:406-413) for U3d's copies:
    each clippy run, each bite build), the copy touches its own crate sources, mtime only:
    `find <copy>/spikes/netcode-proof/crates -type f -exec touch {} +`. The reason: cargo's fingerprint ignores a copy's
    location, so another copy's newer artifact can read as fresh.
-3. **Check each run's test count.** check.mjs's summary must read measured 266, bites 280, skips 0.
-   `cargo test -p npt-net --lib -- --list` must name T1-T6, and `--ignored --list` must name `l2_timing_self_test` and
+3. **Check each run's test count.** check.mjs's summary must read measured 267, bites 281, skips 0.
+   `cargo test -p npt-net --lib -- --list` must name T1-T7, and `--ignored --list` must name `l2_timing_self_test` and
    M13's run. A bite run must show its own test failing by name. A count or name that does not match means another
    copy's artifact ran: touch, rebuild, and never report that run.
 4. **Bites and clean builds alternate safely.** After the last bite, the clean copy touches and rebuilds before any
@@ -403,6 +434,9 @@ behind." The main session's application (:406-413) for U3d's copies:
    artifacts.
 7. **No copy cleans the shared folder.** Its cleanup is the main session's (`cargo clean --target-dir`; cargo created
    the folder, so it carries CACHEDIR.TAG: checkpoint :406-408).
+8. **Every brief names it** (checkpoint :412-413; gap 9). Each workflow or agent brief for U3d's build and bites states
+   the folder (`CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/shared-target`) and the two steps: touch the
+   copy's crate sources before each build (item 2), and check each run's test count and names (item 3).
 
 ## 8. Risks
 1. **This container decides nothing at the µs level** (advisor-u3c-plan.md:114). The release thread's own OS wake
@@ -423,12 +457,12 @@ behind." The main session's application (:406-413) for U3d's copies:
 6. **"About 10 µs" is not a number npt-judge or a reader can apply** (marks/README.md:109-110): U3D-BAR.
 7. **E's two forms can straddle the bar** (§2): U3D-L0. -3's own p99.9 is reported beside it.
 8. **The judged value moves to U6's code** (C-U6-5): a new computation, not ImpairSocket's histogram. Mitigation: it
-   reads the same stamps the histogram records. T2's identity (re-run at U6) and the warm-up test pin it, and
-   `l2_summary`'s E is reported beside it.
+   reads the same stamps the histogram records. C-U6-5's tests pin it: the warm-up test, the planted-inside test with
+   its exact excess, T5's fixed samples and T2's identity (re-run at U6); `l2_summary`'s E is reported beside it.
 
 ## 9. Change type, evidence rule, reviewers
 - **Change type:** netcode (the L2 measurement instrument), test code only. Evidence rule: deterministic tests with
-  injected latency, jitter and loss (T1, T2; T3-T6 pure), each bite failing; the dry run reported, not judged.
+  injected latency, jitter and loss (T1, T2, T7; T3-T6 pure), each bite failing; the dry run reported, not judged.
 - **Gate:** check.mjs 9/9 on both builds with the counts of §7.1, clippy -D warnings with and without features, fmt,
   `node tools/gate.mjs --no-smoke`, Cargo.lock unchanged, all under §7.1's build rules.
 - **Reviewers on the final diff:**
@@ -446,8 +480,8 @@ behind." The main session's application (:406-413) for U3d's copies:
   - (b) A margin, for example ≤ 11,000 ns.
   - (c) Leave it "about" and read it each time.
 
-  **Recommend (a)**, recorded in §15 as a reading. T3's constant follows your ruling. If you read it as changing
-  Mustafa's bar, it goes to him.
+  **Recommend (a)**, recorded in §15 as a reading. T3's and T5's would-lines follow your ruling. If you read it as
+  changing Mustafa's bar, it goes to him.
 - **U3D-L0, which E is judged.** Plain words: the bar counts how far hand-overs run past 0.25 ms. M1 measures that past
   each window's typical lateness, its median (L0 = p50, `l2_late_*_excess_ns`). Mustafa's recorded words and -3 itself
   measure it from zero (L0 = 0). The facts:
