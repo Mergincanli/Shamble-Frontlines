@@ -584,6 +584,14 @@
     belong to the room), netcode 2 (canonical command order), arch F1 (the grid's bite ids must sit where their code
     lives: -57's coarsening to npt-proto's Quant), arch F2 (the per-kind field layout defined in npt-sim; VELOCITY fixed
     for wave 1).
+  - **About 17:30 UTC: U4s MERGED at f080551** (pushed). The last small round (G1 bite-id uniqueness; G2 the doc step,
+    check.mjs now 10 steps; the npt-sim membership message) checked by the rust-reviewer: one low gap G1a (the bite-id
+    pattern missed 16 of 114 marks.json ids: upper case, dots), fixed by the main session (BITE_ID widened; tests: every
+    marks.json id matches, an upper-case id in two crates refused; the old pattern fails the test). check.mjs 10/10 in
+    the main folder (275 measured, 292 bites, self 48, doc 3.2 s, redact 157 items 0 findings); gate PASS --no-smoke.
+    Report u4s-report.md to the advisor (background agent, about 17:31): U4S-ACCEPT, NF-D4, U4S-BUILDER (also U4b,
+    U4j), U4S-CARRIES; its ruling to be appended to advisor-u4.md. Next: wave 1 (U4a wire, U4c link model, U4d stand-in
+    sim in lanes; U4b loop policy and U4j judge by the main session or as the advisor rules), at most 3 agents.
   - **About 17:05 UTC: the fix pass's check DONE** (resumed run; u4s-fix-review-rust.md): all 11 items in, no
     regression; two low gaps: G1 no check that a bite id lives in one crate only (a re-added id in grid.rs passes
     everything); G2 check.mjs runs no rustdoc (a broken doc link passes). Nits: s6's ALL.len() literal (U4d carry 12),
