@@ -644,6 +644,14 @@
     - **Wave 1 resumed:** U4a's builder continued by SendMessage (agent a9297644e7c0354f3, its own worktree);
       U4d and U4c by the edited workflow script (wf_f54246ff-e0d resumed, task w0ynfq9yu: the builders continue in
       their existing worktrees wf_f54246ff-e0d-1 and -2 from their notes, no new worktree). Three agents running.
+  - **About 22:40 UTC: U4b built by the main session** (worktree `.gate/u4b-wt`, local branch u4b-build from
+    4b5812a, uncommitted there; snapshot wip/u4b.patch; record u4b-build.md). schedule.rs (`Schedule`, `Due`,
+    `Dropped`, `LoopCounters`, `due_ticks`; bites: `with_bite`, `BITES`), lib.rs re-exports, server/clippy.toml
+    (the clock ban; tokio's entries `allow-invalid`, dormant until U6 adds tokio), tests/schedule.rs: 10 clean tests,
+    16 in bites builds; clippy clean both builds; the three bites' in-place plants each FAILED its own named test
+    (file restored, sha256 dfb7da2c…); carries 6 and 35 met. check.mjs twice: running (task bw4l1atnp, outputs
+    scratchpad/u4b-check-1.txt and -2.txt). **Next for U4b:** its review (netcode-architect, rust-reviewer,
+    test-engineer) when slots free; then merge it into the main folder (on committed state, between lane merges).
   - **About 18:00 UTC: conditions 1-3 applied** (u4-build-plan.md sha256 7ec1b324…, recorded under the ruling; carries
     completed and corrected per the check, sha256 4a8c0ee8…, 45 entries; F1 sizes and F2 the U4b/U4e tick-constant
     route to the advisor, background agent). **Wave 1 lanes U4d and U4c launched:** workflow `wf_f54246ff-e0d`
