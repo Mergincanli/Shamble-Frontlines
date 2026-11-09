@@ -149,3 +149,73 @@ Then: u4s-carries.md in the main folder's notes. Final: check.mjs 9/9 twice, cli
   record of what was fixed, and the advisor's question NF-D4 on non_finite and D-4).
 
 DONE (fix pass, 2026-11-09). Nothing committed.
+
+## Last small round
+Builder: a workflow agent, same worktree, still uncommitted on base c8abc85. Input: the rust-reviewer's fix-review
+(main folder's notes, u4s-fix-review-rust.md: G1, G2, the npt-sim allow-list nit). Same build rules (§7.1;
+CARGO_NET_OFFLINE=true; Write/Edit only; plants in place, one at a time, sha256 restored; commit nothing). Start
+hashes (= the fix-review's baseline): check.mjs 508cd49f, check.test.mjs 0cfec1e5, grid ede88bbe, sim lib 073aba27,
+seam a203150c, client lib c4c4797d.
+
+### Plan
+1. G1: check.mjs `biteHomeProblems(files, read)` in the deps step: every string literal that is exactly a bite id
+   (`^PM-\d{4}-\d+/[a-z0-9-]+$`) in crates/<crate>/src/ (not tests/), refused when found in two crates, naming each
+   crate's first file:line. Real-tree probe first (scratch u4s-last-probe.mjs): npt-lab's src/probe.rs names npt-l1's
+   PM-0001-3/rtt-each-way inside its `#[cfg(test)] mod tests` (:335, :467, :475), so a `#[cfg(test)]` inline module in
+   src/ is read as tests are (skipped); any other cfg(test) item is read (fails closed). DEPS_CHECKED + header updated.
+   check.test.mjs: a clean fixture (client -17, sim -41, l1 -3 ids, lab's test module) passes; -17's id in
+   crates/sim/src/grid.rs is refused naming both file:line; plus the deps-step fixture's one plant (C2R-5's pattern).
+2. G2: a `doc` step (after clippy-wasm32): `cargo doc --locked --no-deps --workspace`, RUSTDOCFLAGS="-D warnings"
+   (CARGO_ENCODED_RUSTDOCFLAGS dropped from its environment: cargo prefers it), measured then --all-features; summary
+   line in lintBothBuilds' form. Plain `cargo` as every other step (rust-toolchain.toml pins 1.99.1; `cargo +1.99.1`
+   for the manual runs). First a manual whole-workspace rustdoc run, both builds, to see the tree is clean.
+3. Nit: dependencyProblems' npt-sim check reports "npt-sim is not a workspace member" when it is missing, tcpinfo's
+   form; npt-sim is also a LEAF crate, whose loop says the same sentence, so it is pushed once. Self-test.
+4. Plants: G1 in the real tree (grid.rs takes -17's id: deps FAIL), G2 a broken intra-doc link in npt-sim (doc FAIL),
+   each self-test's bite, each restored + sha256.
+5. Final: check.mjs all 10 steps twice (counts equal run to run), clippy -D warnings host + wasm32 both builds (the
+   clippy steps), `cargo +1.99.1 fmt --all --check`.
+
+### Progress
+- Probe (u4s-last-probe.mjs, read-only): bite-id literals in crates/*/src: client lib.rs:12 (-17), l1 lib.rs:390-393
+  (four -3), lab probe.rs:467, :475 (-3/rtt-each-way, in mod tests from :335), :481 (-3/nothing), sim lib.rs:33 (-41).
+- Whole-workspace rustdoc before the step (touch, df 13G; `cargo +1.99.1 doc --locked --no-deps --workspace`, then
+  `--all-features`): 16 crates documented, one warning in both builds, outside U4s: crates/l1/src/lib.rs:241,
+  rustdoc::private_intra_doc_links (`for_each_canonical`'s public doc links to the private CANONICAL_TAG), an error
+  under -D warnings. Fixed as the fix pass fixed floor_rounding's link: plain code text (doc only; l1 lib.rs 3e05f444
+  -> new hash below). Process note: that run's output went to the scratchpad by one shell redirect (a deviation; no
+  project file).
+- Written: check.mjs header (doc step, third grep); dependencyProblems npt-sim missing (tcpinfo's form, said once);
+  BITE_ID, BITE_ID_LITERAL, testModules, biteHomeProblems (after roomFloatProblems), in depsStep and DEPS_CHECKED;
+  run() takes an env; docBothBuilds + STEPS.doc after clippy-wasm32. check.test.mjs: imports, the npt-sim test's
+  missing case, biteTwice + the deps fixture's plant (grid.rs + client lib.rs), BITE_CLEAN + the G1 test.
+- First runs: `node --test check.test.mjs` 48 of 48 (47 + 1). check.mjs --only doc,deps,self (touch, df 13G): doc
+  PASS 2.6 s, deps PASS, self 48 of 48.
+- Plants (Edit in place, one at a time, reverse Edit, sha256 checked equal after each):
+  P1 G1 real tree: grid.rs end + `#[cfg(feature = "bites")] pub const BITES: [&str; 1] = ["PM-0001-17/client-rounding"];`
+    -> deps FAIL "PM-0001-17/client-rounding is planted in 2 crates, crates/client/src/lib.rs:12 and
+    crates/sim/src/grid.rs:204: ..." ; restored ede88bbe.
+  P2 G2 measured: seam.rs:60 `rewind_outside` -> `rewind_outsde` (touch, df 13G) -> doc FAIL 1.3 s "unresolved link
+    to `InputReports::rewind_outsde`" (-D rustdoc::broken-intra-doc-links); restored a203150c.
+  P3 G2 bites half: sim lib.rs:37 (bites-only own_copy_snap_with_bite's doc) `floor_rounding` -> `floor_roundng` ->
+    doc FAIL, measured build passed, bites build "unresolved link to `grid::Config::floor_roundng`". Its summary line
+    read "both documented" on that failure, so docBothBuilds' summary now says "the bites build's rustdoc failed (the
+    measured build's passed)" when it does (re-run: so; 3.0 s); restored 073aba27. check.mjs new hash 81181036.
+    (lintBothBuilds has the same summary-on-failure wording; left as is, outside this round.)
+  B1 biteHomeProblems unhooked from depsStep -> self 47 of 48, not ok 38 (the deps-step test: "biteHomeProblems's plant
+    is not reported"). B2 the `#[cfg(test)] mod` skip off -> not ok 48 (clean tree) and real-tree deps FAIL
+    "PM-0001-3/rtt-each-way ... crates/l1/src/lib.rs:390 and crates/lab/src/probe.rs:467" (why the skip). B3 two crates
+    -> three -> not ok 38 and 48. Nit: B4 the sim check's new report removed -> 48 of 48 (the LEAF loop still says it:
+    expected); B4b the LEAF loop's membership line removed -> 48 of 48 (the sim check's own report holds it); B4c both
+    -> not ok 9 (the npt-sim test: expected the one sentence, got none). check.mjs restored 81181036 after each.
+- Final, run 1 (touch, df 13G): check.mjs exit 0, "check: all 10 steps pass": fmt 0.3 s; clippy 2.8 s;
+  clippy-wasm32 0.7 s; doc 3.0 s; test 80.8 s, measured 275 / bites 292 passed, 0 failed, 0 skips; deps 0.5 s; refs
+  528 tracked files; marks 81; self 48 of 48; redact 10 of 10, 157 items, 0 findings. Run 2 (touch, df 13G, 68% used):
+  the same, doc 3.5 s, test 79.5 s, 275 / 292, deps 84 crate files and 1 cargo config, self 48 of 48. Counts equal run
+  to run and to the fix pass (275 / 292); self 47 -> 48. clippy -D warnings host (all targets) and wasm32, measured
+  and bites: check.mjs's clippy and clippy-wasm32 steps, PASS in both runs. `cargo +1.99.1 fmt --all --check`: clean.
+- End hashes: check.mjs 81181036, check.test.mjs 6c2fc993, l1 lib.rs 4a9ce268 (was 3e05f444; one doc line), grid
+  ede88bbe, seam a203150c, sim lib 073aba27, client lib c4c4797d (the last four = the start). git status: the fix
+  pass's 21 entries + l1 lib.rs (M) + this notes folder's u4s-last-probe.mjs (??). No target/ or .gate/ in the copy.
+
+DONE (last small round, 2026-11-09). Nothing committed.
