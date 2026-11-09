@@ -3,12 +3,12 @@
 Read this instead of exploring. It says which file answers which question; `MODULE_MAP.md` maps the inside of the
 engine files, and `START_HERE.md` explains how they work and why. docs-keeper keeps this map current and checks it with
 `node .claude/scripts/repo-map-check.mjs`. `.checkpoints/` holds in-progress task checkpoints
-(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-11-06.
+(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-11-08.
 
 ## Top level
 | Path | What it is |
 |---|---|
-| `CLAUDE.md` | The rules for Claude Code: v2 phase 0 (the look brief is `docs/LOOK_V2.md`), protocol, models, checkpoints (at most 3 agents at a time), reporting, agents, never-list |
+| `CLAUDE.md` | The rules for Claude Code: v2 phase 0 (the look brief is `docs/LOOK_V2.md`), protocol (risk tiers, the review budget, the severity scale, rollback), models, checkpoints (at most 3 agents at a time), reporting, agents, never-list |
 | `README.md` | The project in one page, for people |
 | `FIRST_PROMPTS.md` | The first prompts Mustafa used (Phase 0, scale test, build spike, ADR run): history |
 | `index.html` | Legacy player build: three.js r128 → core → game → `bootGame();` |
@@ -74,13 +74,13 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 ## .claude/
 | Path | What it is |
 |---|---|
-| `.claude/CHECKPOINTS.md` | The checkpoint system: never lose work to a usage limit. For every session: at most 3 agents at a time, workflow agents included (§4, §7); each agent writes its plan first and saves each block as it goes, and a restart trusts the blocks its notes mark done (§4); scratch text and small scripts in the notes folder, builds and binaries under `.gate/<task-slug>/` (§4); the background saver checked at every update while agents run, and restarted if it has stopped (§3, §5) |
+| `.claude/CHECKPOINTS.md` | The checkpoint system: never lose work to a usage limit. For every session: at most 3 agents at a time, workflow agents included (§4, §7); each agent writes its plan first and saves each block as it goes, and a restart trusts the blocks its notes mark done (§4); scratch text and small scripts in the notes folder, builds and binaries under `.gate/<task-slug>/` (§4); the background saver checked at every update while agents run, and restarted if it has stopped (§3, §5); disk hygiene (§10) |
 | `.claude/NIGHT_SHIFT.md` | The night shift's rules (window 00:10–07:30 Amsterdam) |
 | `.claude/settings.json` | Permissions (allow, deny, empty ask), `effortLevel: "high"` (the cloud routines run at the effort set on the routine instead: STATUS, Routines), the syntax hook and the routine guard (PreToolUse / PermissionRequest / ConfigChange; each of the three handlers starts `guard.mjs` through a one-line `node -e` bootstrap) |
 | `.claude/claude-security-guidance.md` | Security guidance for the security plugin |
 | `.claude/security-patterns.json` | Security plugin patterns (server, shared sim, HTML sinks) |
 | `.claude/agents/` | The crew (one file each, below) |
-| `.claude/agents/advisor.md` | Plan and PR reviews (a plan's checkpoint, the 3-agent cap, models and effort), merges by the PR Advisor routine, escalations to Mustafa |
+| `.claude/agents/advisor.md` | Plan and PR reviews (a plan's checkpoint, the 3-agent cap, models and effort), risk tiers with per-tier checklists, the review budget, the revert steps, merges by the PR Advisor routine, escalations to Mustafa |
 | `.claude/agents/verifier.md` | The gate plus change-type evidence; research claim spot-checks |
 | `.claude/agents/docs-keeper.md` | STATUS, ROADMAP, this map, doc drift |
 | `.claude/agents/art-director.md` | The legacy look (Living Comic) and UI; v2 rendering work against the look brief `docs/LOOK_V2.md`, never choosing the look |
