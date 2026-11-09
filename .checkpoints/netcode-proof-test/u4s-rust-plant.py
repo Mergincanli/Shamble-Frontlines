@@ -60,6 +60,10 @@ BITES = {
                                 "pub const LOOP_CATCHUP: u32 = loop_catchup_at(TICK_HZ);",
                                 "pub const LOOP_CATCHUP: u32 = 7;"),
     "R3-room-tick-hz": ("crates/room/src/lib.rs", ("append", "\npub const TICK_HZ: u32 = 30;\n")),
+    # Mine, expected to EVADE both guards: a wrong derivation that names TICK_HZ (7 at 30 Hz, 14 at 60, not 15).
+    "R4-loop-catchup-misderived": ("crates/sim/src/ticks.rs",
+                                   "pub const LOOP_CATCHUP: u32 = loop_catchup_at(TICK_HZ);",
+                                   "pub const LOOP_CATCHUP: u32 = 7 * TICK_HZ / 30;"),
 }
 
 

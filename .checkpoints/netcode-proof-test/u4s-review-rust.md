@@ -14,7 +14,7 @@ against the baseline; no copy of any source file is made.
 2. Run 1: touch, df, `node spikes/netcode-proof/check.mjs` unchanged; record the nine step lines and counts.
 3. Bites (one at a time, in place; run; record failure by name; restore; sha256 check):
    the plan's two (G1 grid floor, H1 ring one short), one more ring variant (H2), check.mjs self-test bites
-   (C1-C10, builder's and mine), real-tree deps plants (R1-R3).
+   (C1-C10, builder's and mine), real-tree deps plants (R1-R4).
 4. Review the Rust: unsafe, determinism (floats, libm, hash maps, const fns), overflow, allocation, wasm32;
    libm =0.2.16 pin, features, Cargo.lock (no new package), cargo tree -d; a native vs wasm32 run of the grid.
 5. Final: touch, df, check.mjs again; fingerprint equal to step 1.
@@ -55,5 +55,50 @@ against the baseline; no copy of any source file is made.
 - Real tree, `node check.mjs --only deps` (touch, df 13G each): R1 `pub const SCALE: f32 = 0.5;` in room lib.rs:
   FAIL deps "crates/room/src/lib.rs:7 has `f32` (2 float token(s))". R2 LOOP_CATCHUP = 7: FAIL deps
   "crates/sim/src/ticks.rs:36 sets LOOP_CATCHUP from `7`". R3 (mine) `pub const TICK_HZ: u32 = 30;` in room: FAIL deps
-  "crates/room/src/lib.rs:7 sets TICK_HZ from `30` outside crates/sim/src/". All restored == baseline; status: all
-  five plant targets == baseline.
+  "crates/room/src/lib.rs:7 sets TICK_HZ from `30` outside crates/sim/src/". All restored == baseline.
+- R4 (mine, an evasion probe) `LOOP_CATCHUP = 7 * TICK_HZ / 30` (7 at 30 Hz, 14 at 60, plan says 15): deps PASS,
+  npt-sim 6 passed (s1 included), clippy clean. Restored b5bbcbf2 == baseline. -> FINDING low: the grep accepts any
+  initializer naming TICK_HZ and s1 links each constant to its function only at TICK_HZ = 30 (tests/seam.rs:93-96).
+- Deps: Cargo.lock diff adds 0 [[package]] (only dependency lines), so no new package and no new duplicate possible.
+  `cargo tree -d -e normal,build` (host): getrandom 0.2.17 / 0.4.3 only. `--all-features --target all`: getrandom,
+  syn 2/3, synstructure 0.13/0.14, windows-link, windows-sys: the builder's baseline set. libm features: default+arch
+  on host (npt-server's tree, also via fastbloom) and on wasm32 (npt-client-wasm's tree): one feature set. rand_chacha
+  and rand_core default-features = false (Cargo.toml:47-48). cargo-deny / cargo-audit not installed here: NOT run
+  (plan.md §4.8 puts them at U5).
+- bites features: `cargo tree --workspace -e features -i <crate>`: measured 0 bites edges for npt-sim, -proto, -room,
+  -client, -server; --all-features 1 each; npt-lab measured -> npt-sim "default" only, --features bites -> + "bites".
+- Cross-target probe (my scratch crate u4s-rust-xtarget/, edition 2021, cdylib + bin, path dep on the copy's npt-sim;
+  own Cargo.lock resolved offline): FNV-1a over every integer's from_grid bits and round trip, 25 values around each
+  grid point's quarter/half steps (to_grid + snap), and every 2^shift-th f32 bit pattern (NaN, inf, subnormals) per
+  field. shift 8: native release, native debug and wasm32 (Node, 0 imports) all 2878a85531a57dd8 over 178,261,964
+  values (1.09 s / 9.97 s / 3.96 s). shift 4: native release and wasm32 both e1b681efc276dc55 over 2,694,844,364
+  values (16.3 s / 57.4 s). -> grid identical on x86-64 and wasm32.
+- clone_from probe (u4s-rust-xtarget/src/bin/clonefrom.rs, release): "derived clone_from keeps the Vec's storage:
+  false"; "manual clone_from keeps the Vec's storage: true". -> history.rs:46-57's reuse needs a hand-written Clone.
+- npt-client-wasm (still a 2-line stub) release wasm32: 292 B raw, 278 B gzip -9; no npt_sim/libm/chacha strings.
+  U4s adds no bytes to it (nothing calls npt-sim yet). Base not built (no second checkout).
+- Extra lints (informational, npt-sim lib, bites): missing_docs 14 pub fields/variants undocumented (seam.rs:73-74,
+  :79, :91, :136, :140-143, :146, :153-154); arithmetic hits all proven bounded except ticks.rs:45 (32 * tick_hz
+  overflows above 134,217,727 Hz: panics at run time with overflow-checks; doc :7 says rates <= 1,000, nothing asserts);
+  history.rs:20 panics on 0 (no # Panics doc).
+- Final run (touch; df 13G): exit 0, all 9 PASS: fmt 0.4 s; clippy 3.2 s; clippy-wasm32 0.5 s; test 81.3 s 273 / 288,
+  0 failed, 0 skips; deps 0.4 s; refs 528; marks 81; self 45 of 45; redact 10 of 10, 156 items, 0 findings.
+- Unchanged by me: fingerprint after = 074e11d25c14f29b9e0c4826a463bf9ad3ae5b6aebe092d534c2806233968858 (391 files),
+  equal to step 1; git status 18 entries, same list; no .gate or target/ in the copy; plant status all == baseline.
+
+## Findings
+1. LOW ticks.rs:36,40,49,58 + check.mjs:540-550 + tests/seam.rs:93-96: R4 (`7 * TICK_HZ / 30`) evades grep, s1 and
+   clippy. Fix: grep requires each derived name's initializer be its own fn at TICK_HZ (or ticks_for_ms(<int>), or a
+   path); self-test plant `7 * TICK_HZ / 30`.
+2. LOW (U4d brief) seam.rs:115 HitVolumes derives Clone: derived clone_from allocates (probe); history.rs:46-57 relies
+   on it. Fix: hand-written field-wise clone_from + counting-allocator test on a full ring's push (netcode F9).
+3. LOW history.rs:20-22: new(0) panics; capacity from data via ticks_for_ms; no 1 MB cap (§4.9). Fix: NonZeroU32 or
+   from-ms constructor returning an error (with netcode F6).
+4. LOW/NIT ticks.rs:44-46 (+ :7): 32 * tick_hz overflow > 134,217,727 unasserted. Fix: const assert on TICK_HZ range;
+   u64 or # Panics.
+5. NIT Cargo.toml:50-53: libm `arch` list wrong (x86-64: sqrt + run-time-dispatched fma; wasm32: nothing on stable).
+6. NIT missing docs on 14 pub fields/variants (seam.rs:73-74, :79, :91, :136, :140-143, :146, :153-154).
+7. NIT (U4d brief) seam.rs:26, :29: i8 -128 / i32 aims reach the sim from recordings; widen before arithmetic (overflow
+   checks on); HitVolumes.tick from the world's counter, not TickInput.tick (history.rs:49-53 debug assert).
+VERDICT: APPROVE WITH FINDINGS (no high or medium of mine; the two other reviewers' mediums stand as they wrote them).
+DONE 2026-11-09

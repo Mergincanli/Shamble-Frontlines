@@ -577,6 +577,20 @@
     then Workflow({scriptPath:
     /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u4s-wf_aa2cc979-004.js,
     resumeFromRunId: "wf_aa2cc979-004", args: {sha: "c8abc857d9bc5e7fb3a848ddcf430ab9c4b65c31"}}).
+  - **About 13:10 UTC: U4s built and reviewed** (worktree .claude/worktrees/wf_aa2cc979-004-1, uncommitted on c8abc85;
+    snapshot wip/u4s.patch). Builder: check.mjs 9/9 twice (273 measured / 288 bites, self 45), 9 of 9 bites, cargo tree
+    -d unchanged, Cargo.lock +12 lines offline. Reviews: netcode-architect, engine-architect, rust-reviewer all APPROVE
+    WITH FINDINGS (u4s-review-*.md), no high. Medium: netcode 1 (the sim reads only accepted fields; tick and view time
+    belong to the room), netcode 2 (canonical command order), arch F1 (the grid's bite ids must sit where their code
+    lives: -57's coarsening to npt-proto's Quant), arch F2 (the per-kind field layout defined in npt-sim; VELOCITY fixed
+    for wave 1).
+  - **About 13:15 UTC: U4s's fix pass launched, workflow `wf_841d72c0-291` (npt-u4s-fix):** fix:u4s in the same
+    worktree (items 1-11; non_finite kept and documented as always 0, its drop and D-4's rewording a question for the
+    advisor), then check:u4s-fix (rust-reviewer; u4s-fix-review-rust.md); the carries for the U4a/U4d/U4h briefs in
+    u4s-carries.md. If cut: snapshot the worktree, then Workflow({scriptPath:
+    /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u4s-fix-wf_841d72c0-291.js,
+    resumeFromRunId: "wf_841d72c0-291"}). After it: merge, check.mjs 9/9 and the gate in the main folder, commit,
+    push, a short U4s report to the advisor (with the main-session-builds deviation and the non_finite question).
   - **Done:** a workflow applied conditions 1-11 and the nits to u4-build-plan.md (netcode-architect) and drafted the
     exact plan.md edits (§4.2 three exceptions; §4.7 RoomControl; E7's text; §4.4's per-tick inputs and the clamp
     column; :562 loss to U6; the U7 row's C-U7-1; risk 11's moves) for the main session; a test-engineer checks
