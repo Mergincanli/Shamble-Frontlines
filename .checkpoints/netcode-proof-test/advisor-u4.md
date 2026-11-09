@@ -381,3 +381,19 @@ so nothing joins the readings PR.
 
 ## For Mustafa (U4s)
 Nothing.
+
+## Main session: the U4s ruling's conditions applied (2026-11-09 about 18:15 UTC)
+- **Recorded, as condition 1 asks:** u4-build-plan.md after condition 1 (a)-(d), sha256
+  7ec1b324287faefc7b1968184b599c8da691fcde9f992c888f195ed57579ff87 (1,031 lines; 12 edits, each marked "(the advisor's
+  U4s ruling, condition 1 (x))"); checked by the test-engineer (u4s-conditions-check.md): every changed line traces to
+  (a)-(d), the new D-4 and the freeze word for word.
+- **u4s-carries.md after condition 2 and O1:** 44 entries (0b4b896b…), then the main session's edits from the check:
+  entries 35 and 39's unruled route replaced by "open: the advisor rules on it before U4b's (U4e's) brief is written
+  (F2)"; entry 34's "or a stated deferral" made "a fix listed in its report (a deferral leaves this entry unmet, and
+  entry 42 applies)"; the header's stale "uncommitted" text and the open NF-D4 text marked as superseded; entry 45 added
+  (NF-D4's U4h line, the check's F3). Its sha256 after these edits is in the checkpoint's Running work.
+- **The U4 verdict's condition 1 list above** loses "non-finite components", as the U4s ruling's NF-D4 says; its text
+  is left as returned, and this line records the amendment.
+- **To the advisor:** F1 (§4.15's recording sizes still derived from the old 1,973 B a tick: about 16.8 MB per 9,000
+  ticks and 50.5 MB for three, about 4.2 million Wasm calls each, at 1,872 B) and F2 (where U4b and U4e put a tick
+  constant they need outside npt-sim, when crates/sim is U4d's lane in wave 1 and check.mjs U4a's, U4d2's in wave 2).

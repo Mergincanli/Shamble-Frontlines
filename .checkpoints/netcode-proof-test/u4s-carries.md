@@ -1,10 +1,10 @@
 # U4s carries: the review findings the fix pass did not fix, by the brief that carries each
 
 Written by the U4s fix-pass builder (workflow agent), 2026-11-09, from u4s-review-netcode.md, u4s-review-arch.md and
-u4s-review-rust.md (this folder) and the fix pass's own changes. The build is uncommitted in
-.claude/worktrees/wf_aa2cc979-004-1 (base c8abc85); its notes are that copy's
-.checkpoints/netcode-proof-test/u4s-build.md, "## Fix pass". Paths below are under spikes/netcode-proof/ of that copy;
-line numbers are the fix pass's.
+u4s-review-rust.md (this folder) and the fix pass's own changes. (Main session, 2026-11-09: U4s has since merged at
+f080551; paths below are under spikes/netcode-proof/ and line numbers are the fix pass's, as merged. NF-D4 is ruled:
+the advisor's U4s ruling, advisor-u4.md, "Rulings (U4s)", option (a) in its own words, the carries file's option
+letters being swapped; the NF-D4 text at :32 and in "For the advisor" below is that ruling's record, no longer open.)
 
 Each entry: the finding (review, id), then **the text the brief must carry**, word for word. A brief may reword the
 plain parts, never the rule.
@@ -60,7 +60,7 @@ with the ruling. The file now holds 44 entries; the wave-1 briefs carry them wor
    config (u4-build-plan.md §5 U4a's 'set through the grid config' is superseded by the fix pass: see the main
    session's plan-text item below)."
 34. **rust fix2 nits (u4s-fix2-review-rust.md:90-93; the advisor's U4s ruling, condition 2):** "U4a addresses each of
-    four check.mjs nits, by a fix or a stated deferral in its report: nothing in check.test.mjs pins `STEPS.doc` or its
+    four check.mjs nits, by a fix listed in its report (a deferral leaves this entry unmet, and entry 42 applies): nothing in check.test.mjs pins `STEPS.doc` or its
     `-D warnings` (as for fmt, clippy and test); the doc step documents the host build only (npt-tcpinfo's non-Linux
     stub is never documented); `lintBothBuilds` says 'both linted' when only the bites build fails; a measured-build
     doc failure's one-line summary is cargo's last line ('warning: build failed, waiting for other jobs to
@@ -77,8 +77,8 @@ with the ruling. The file now holds 44 entries; the wave-1 briefs carry them wor
     needed outside npt-sim goes into npt-sim as `<name>_at` plus its constant (carry 18's route), and the crate uses it
     by path. Why: check.mjs:627 lets an initializer that merely names `TICK_HZ` through, and nothing pins such a value
     at 60 Hz." (For the brief writer: in wave 1 crates/sim is U4d's lane and check.mjs U4a's (u4-build-plan.md Lanes),
-    so a U4b builder that needs such a constant asks the main session, which places it; flagged to the advisor in
-    u4s-conditions-notes.md.)
+    so where a U4b builder puts such a constant is open: the advisor rules on it before U4b's brief is written
+    (u4s-conditions-notes.md F2).)
 
 ## U4d (the stand-in sim: npt-sim; wave 1)
 7. **netcode F1 (reworded by the advisor's U4s ruling, condition 2):** "A unit test: two commands that differ only in
@@ -163,8 +163,8 @@ with the ruling. The file now holds 44 entries; the wave-1 briefs carry them wor
     needed outside npt-sim goes into npt-sim as `<name>_at` plus its constant (carry 18's route), and the crate uses it
     by path. Why: check.mjs:627 lets an initializer that merely names `TICK_HZ` through, and nothing pins such a value
     at 60 Hz." (For the brief writer: in wave 2 crates/sim is no lane's and check.mjs is U4d2's (u4-build-plan.md
-    Lanes), so a U4e builder that needs such a constant asks the main session, which places it; flagged to the advisor
-    in u4s-conditions-notes.md.)
+    Lanes), so where a U4e builder puts such a constant is open: the advisor rules on it before U4e's brief is written
+    (u4s-conditions-notes.md F2).)
 
 ## U4r (the L1 runner and its judged runs)
 40. **O1 (u4-conditions-check.md:42-45; advisor-u4.md:343-347; the advisor's U4s ruling, O1):** "U4r's brief, which
@@ -177,6 +177,9 @@ with the ruling. The file now holds 44 entries; the wave-1 briefs carry them wor
 ## U4h (lag compensation and aim)
 28. **netcode F6 / rust 3:** "The ring's span is U4h's test cap plus its margin in ms, recorded; the room builds it with
     `HitHistory::for_ms(span_ms)` (no tick count is ever written for it), and the recording header carries the span."
+45. **NF-D4's U4h line (the advisor's U4s ruling, "Rulings (U4s)", NF-D4; added by the main session, the conditions
+    check's F3):** "`World::ray_cast`'s ray is the only float that reaches npt-sim code from outside; it takes `&self`
+    and changes no state; U4h's AimCast states what a non-finite ray does."
 
 ## U4d2 or the main session (the workspace Cargo.toml, crates/proto/Cargo.toml and check.mjs; wave 2 or later)
 29. **rust 5 (nit):** "The workspace Cargo.toml's libm comment says `arch` gives 'hardware sqrt, floor, ceil, trunc and
