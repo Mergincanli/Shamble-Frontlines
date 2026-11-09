@@ -584,6 +584,16 @@
     belong to the room), netcode 2 (canonical command order), arch F1 (the grid's bite ids must sit where their code
     lives: -57's coarsening to npt-proto's Quant), arch F2 (the per-kind field layout defined in npt-sim; VELOCITY fixed
     for wave 1).
+  - **About 17:05 UTC: the fix pass's check DONE** (resumed run; u4s-fix-review-rust.md): all 11 items in, no
+    regression; two low gaps: G1 no check that a bite id lives in one crate only (a re-added id in grid.rs passes
+    everything); G2 check.mjs runs no rustdoc (a broken doc link passes). Nits: s6's ALL.len() literal (U4d carry 12),
+    the npt-sim allow-list silent if the crate is missing, check.mjs:609 by design.
+  - **About 17:06 UTC: U4s's last small round launched, workflow `wf_4e7cf236-450` (npt-u4s-fix2):** fix:u4s-g (G1's
+    uniqueness check, G2's doc step making check.mjs 10 steps, the missing-crate message; same worktree), then
+    check:u4s-g (rust-reviewer; u4s-fix2-review-rust.md). If cut: Workflow({scriptPath:
+    /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u4s-fix2-wf_4e7cf236-450.js,
+    resumeFromRunId: "wf_4e7cf236-450"}). Then merge U4s, check.mjs and the gate in the main folder, commit, push, the
+    U4s report to the advisor (the builder deviation; NF-D4).
   - **About 16:45 UTC (save at Mustafa's ask; the spend limit cut the checker, reset 16:40):** fix:u4s DONE (items
     1-11 in; 31 bites as expected; check.mjs 9/9 twice: 275 measured / 292 bites, self 47; carries in u4s-carries.md,
     33 entries by brief, with the advisor's question NF-D4 on non_finite and D-4). check:u4s-fix (rust-reviewer) was
