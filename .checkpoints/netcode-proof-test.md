@@ -3,7 +3,8 @@
   advisor's review and Mustafa's (no code before approval) · plan: `.checkpoints/netcode-proof-test/plan.md` (revision 3.2: APPROVED by the advisor (C1-C12) and by Mustafa, 2026-11-06; revision 1 786b7d2, revision 2 d8f0712, revision 3 a6607bc) · verdict: `.checkpoints/netcode-proof-test/advisor-verdict.md`
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main `af8393e9d40f3bd382e77f86e6df2612785c706c`
-- **Last update:** 2026-11-09 about 05:30 Amsterdam (U3d CLOSED, and U3 with it, on ef2bcef; next U4's plan)
+- **Last update:** 2026-11-09 about 22:45 Amsterdam (U4s merged f080551; wave 1 cut by the spend limit and
+  snapshotted (wip/u4a, u4c, u4d.patch), resuming; the main merge in .gate/main-merge; tonight's night items next)
 
 ## Steps done
 1. SSH reachability probe (plan item 1, first pass) · this commit · NO: no ssh client in the image; TCP 22 and every
@@ -593,6 +594,37 @@
     third agent beside the U4d/U4c workflow. Its reviews (netcode, rust, test per §5) wait for free slots. If cut:
     snapshot its worktree (`git worktree list` names it agent-…) with worktree_patch.py (wip/u4a.patch u4a-), then a
     fresh builder continues from its notes. Then U4b and U4j.
+  - **About 21:45 UTC: wave 1 cut by the spend limit and snapshotted; the main merge in progress; new rules.**
+    - All three wave-1 builders stopped about 18:40 UTC on the org's monthly spend limit (reset 21:40 UTC):
+      wf_f54246ff-e0d's build:u4d and build:u4c (the workflow ended, both failed), and U4a's agent a9297644e7c0354f3.
+      Snapshots at 21:44 (worktree_patch.py; the worktrees are kept): **wip/u4d.patch** (base 097f897; crates/sim, 10
+      files, 150 KB; notes u4d-build.md: step 1 library written, clippy clean host, bites and wasm32; tests next;
+      carry 13's counting allocator cannot compile under `unsafe_code = "forbid"`, a storage-identity test stands in,
+      to be reported as not met); **wip/u4c.patch** (base 097f897; crates/l1 lib.rs and tests.rs, 117 KB; notes
+      u4c-build.md and u4c-build/: item 1 done, U2's full hashes reproduced on the old code, the three FNV pins
+      recorded); **wip/u4a.patch** (base dffef0e; crates/proto, 11 files, 130 KB; notes u4a-build.md: plan only).
+    - **Resume:** each builder continues in its own worktree (.claude/worktrees/wf_f54246ff-e0d-1 = U4d,
+      wf_f54246ff-e0d-2 = U4c, agent-a9297644e7c0354f3 = U4a) from its notes; if a worktree is gone, a fresh one at
+      its base applies the patch first. Then the reviewers per lane, within the review budget.
+    - **The main merge (kit-v3-4, origin/main 44446a5) in progress** in the detached worktree `.gate/main-merge`
+      (from 0d97e58): conflicts in docs/REPO_MAP.md (take main's "Last checked") and docs/STATUS.md (main's
+      _Last updated_ and In-flight text, plus the spike's "Also in flight" netcode paragraph brought up to date; main's
+      kit-v3-4 and vfx-xp-notes rows plus the spike's netcode-proof-test row). Then commit, push to this branch,
+      `git merge --ff-only` in the main folder, check.mjs (marks step: main changed docs/adr/0006) and the gate, and a
+      plain `git worktree remove .gate/main-merge`. Why now: the night shift switches only to a branch whose rules,
+      CI and gate files equal main's, so its cs/ branches start from this branch after the merge.
+    - **New rules from main (PR #44, kit-v3-4):** risk tiers 0-3 (spikes tier 1: CI, the advisor, the type's
+      reviewers); review budget (two rounds at most, the second on what changed; a third only for an open Critical
+      or High; lower findings become STATUS follow-ups; a Low never triggers a push on its own); one severity scale
+      (Critical, High, Medium, Low); the rollback rule. **Advisor calls:** main's advisor.md changed after this
+      session started, so the advisor is called as a general-purpose agent that reads
+      `git show origin/main:.claude/agents/advisor.md` and acts as it.
+    - **Mustafa, 2026-11-09 (verbatim, the adjusted version):** "From tonight, the night shift takes night work off
+      your hands. Each evening, post the next night items to issue #16 as approved Night queue entries: review rounds
+      and skeptic checks on the day's merged code, scouting and plan drafts for the next unit. The night shift works
+      them on its own branch; you fold its results in the next morning. Items that need building or testing stay
+      with you during the day." Tonight's items, after the main merge: the U4e brief draft; a skeptic check of U4s's
+      merged code (f080551); the U4r brief draft (with O1); a skeptic check of U3d's merged code (1ccff06).
   - **About 18:00 UTC: conditions 1-3 applied** (u4-build-plan.md sha256 7ec1b324…, recorded under the ruling; carries
     completed and corrected per the check, sha256 4a8c0ee8…, 45 entries; F1 sizes and F2 the U4b/U4e tick-constant
     route to the advisor, background agent). **Wave 1 lanes U4d and U4c launched:** workflow `wf_f54246ff-e0d`

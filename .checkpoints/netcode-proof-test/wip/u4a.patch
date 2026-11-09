@@ -1,0 +1,3097 @@
+diff --git a/spikes/netcode-proof/crates/proto/src/lib.rs b/spikes/netcode-proof/crates/proto/src/lib.rs
+index 97542ce..f0df569 100644
+--- a/spikes/netcode-proof/crates/proto/src/lib.rs
++++ b/spikes/netcode-proof/crates/proto/src/lib.rs
+@@ -1,4 +1,45 @@
+ //! npt-proto: the netcode proof test's wire format (plan E3, E4, §4.7; ADR 0001:654-678 and its catalogue).
+ //!
+ //! Messages and session controls, each with its channel, class, authority and size limit as
+-//! docs/design/netcode-proof-messages.md lists them; E3 quantisation; the delta codec. Built in unit U4.
++//! docs/design/netcode-proof-messages.md lists them; E3 quantisation; the delta codec. Built in unit U4a
++//! (u4-build-plan.md §5): the 15 built types and `SessionControl`'s four variants, [`RoomControl`], framing per
++//! channel, [`Limits`], [`Quant`], [`Wrap`], the `Input` codec with U2's delta repeats, the `Snapshot` container and
++//! its field-group layout table, the `EntityRecord` ↔ wire mapping ([`EntityDelta`]), [`client_hash`], [`encode`] and
++//! [`decode`].
++//!
++//! - **One grid, from npt-sim:** every float becomes a grid integer through `npt_sim::grid` (the sim's own-copy snap,
++//!   the room's encoder and the client call the same function); npt-proto packs the integers ([`Quant`]) and reads
++//!   each entity kind's fields from `EntityKind::layout()`, never from a copy.
++//! - **Decoders of network input** check the size first, refuse unknown types, wrong directions and channels,
++//!   trailing bytes and set reserved bits, and every value outside its field; they return an error and never panic
++//!   (ADR 0001:446; .claude/rules/netcode.md).
++//! - **Planted defects** (bites builds only): `BITES`, each chosen per caller through `Quant::with_bite`, and
++//!   `Wrap::plain_lt`, whose ids live at their sites (msg.rs, quant.rs and wrap.rs say which).
++//! - No transport, no clock; builds for wasm32. Its clippy.toml is npt-sim's, below its header (check.mjs compares
++//!   them).
++
++mod bits;
++mod control;
++mod error;
++mod hash;
++mod input;
++mod limits;
++mod msg;
++mod quant;
++mod snapshot;
++mod wrap;
++
++pub use control::{ProfileId, RoomControl, SessionControl, SessionStatus, StepResult, TokenKind};
++pub use error::{DecodeError, EncodeError};
++pub use hash::client_hash;
++pub use input::Input;
++pub use limits::Limits;
++pub use msg::{
++    ClientSettings, Direction, EndReason, Join, JoinAccepted, JoinRejected, Kick, Leave, Message, Ping, Pong,
++    Resync, RoomEnded, decode, encode,
++};
++#[cfg(feature = "bites")]
++pub use quant::BITES;
++pub use quant::Quant;
++pub use snapshot::{Class, EntityDelta, FullState, Snapshot};
++pub use wrap::Wrap;
+diff --git a/spikes/netcode-proof/crates/proto/src/bits.rs b/spikes/netcode-proof/crates/proto/src/bits.rs
+new file mode 100644
+index 0000000..a201d1d
+--- /dev/null
++++ b/spikes/netcode-proof/crates/proto/src/bits.rs
+@@ -0,0 +1,190 @@
++//! Bit packing, least significant bit first: a value's low bit goes into the lowest free bit of the current byte, so a
++//! byte-aligned 16-, 32- or 64-bit value lands little-endian. Every message body is read and written through these
++//! two, so a byte-aligned field and a packed one follow one rule.
++
++use crate::error::DecodeError;
++
++/// Writes values of 1 to 64 bits into a byte buffer.
++pub(crate) struct BitWriter<'a> {
++    out: &'a mut Vec<u8>,
++    /// Bits already used in the last byte of `out` (0 when it is full or `out` holds nothing of ours yet).
++    used: u32,
++}
++
++impl<'a> BitWriter<'a> {
++    /// Appends to `out`, starting at a byte boundary.
++    pub(crate) fn new(out: &'a mut Vec<u8>) -> BitWriter<'a> {
++        BitWriter { out, used: 0 }
++    }
++
++    /// The low `bits` bits of `value` (1 to 64; the caller has checked that `value` fits).
++    pub(crate) fn put(&mut self, value: u64, bits: u32) {
++        debug_assert!((1..=64).contains(&bits));
++        debug_assert!(bits == 64 || value >> bits == 0, "{value} does not fit in {bits} bits");
++        let mut left = bits;
++        let mut v = value;
++        while left > 0 {
++            if self.used == 0 {
++                self.out.push(0);
++            }
++            let take = (8 - self.used).min(left);
++            let part = (v & ((1u64 << take) - 1)) as u8;
++            if let Some(last) = self.out.last_mut() {
++                *last |= part << self.used;
++            }
++            self.used = (self.used + take) % 8;
++            v >>= take;
++            left -= take;
++        }
++    }
++
++    /// A byte-aligned run of bytes (the writer must be at a byte boundary).
++    pub(crate) fn bytes(&mut self, b: &[u8]) {
++        debug_assert_eq!(self.used, 0);
++        self.out.extend_from_slice(b);
++    }
++
++    /// Ends the current byte with zero bits, so the next value starts at a byte boundary.
++    pub(crate) fn align(&mut self) {
++        self.used = 0;
++    }
++}
++
++/// Reads values of 1 to 64 bits from a byte slice; reading past its end is [`DecodeError::Truncated`], never a panic.
++pub(crate) struct BitReader<'a> {
++    bytes: &'a [u8],
++    /// The next bit to read.
++    pos: usize,
++}
++
++impl<'a> BitReader<'a> {
++    pub(crate) fn new(bytes: &'a [u8]) -> BitReader<'a> {
++        BitReader { bytes, pos: 0 }
++    }
++
++    /// The next `bits` bits (1 to 64) as an unsigned value.
++    pub(crate) fn get(&mut self, bits: u32) -> Result<u64, DecodeError> {
++        debug_assert!((1..=64).contains(&bits));
++        let end = self.pos.checked_add(bits as usize).ok_or(DecodeError::Truncated)?;
++        if end > self.bytes.len().saturating_mul(8) {
++            return Err(DecodeError::Truncated);
++        }
++        let mut value = 0u64;
++        let mut got = 0u32;
++        while got < bits {
++            let byte = *self.bytes.get(self.pos / 8).ok_or(DecodeError::Truncated)?;
++            let off = (self.pos % 8) as u32;
++            let take = (8 - off).min(bits - got);
++            let part = (u64::from(byte) >> off) & ((1u64 << take) - 1);
++            value |= part << got;
++            got += take;
++            self.pos += take as usize;
++        }
++        Ok(value)
++    }
++
++    pub(crate) fn u8(&mut self) -> Result<u8, DecodeError> {
++        Ok(self.get(8)? as u8)
++    }
++
++    pub(crate) fn u16(&mut self) -> Result<u16, DecodeError> {
++        Ok(self.get(16)? as u16)
++    }
++
++    pub(crate) fn u32(&mut self) -> Result<u32, DecodeError> {
++        Ok(self.get(32)? as u32)
++    }
++
++    pub(crate) fn u64(&mut self) -> Result<u64, DecodeError> {
++        self.get(64)
++    }
++
++    /// The next `N` bytes (the reader must be at a byte boundary).
++    pub(crate) fn array<const N: usize>(&mut self) -> Result<[u8; N], DecodeError> {
++        debug_assert_eq!(self.pos % 8, 0);
++        let start = self.pos / 8;
++        let end = start.checked_add(N).ok_or(DecodeError::Truncated)?;
++        let slice = self.bytes.get(start..end).ok_or(DecodeError::Truncated)?;
++        self.pos = end * 8;
++        let mut a = [0u8; N];
++        a.copy_from_slice(slice);
++        Ok(a)
++    }
++
++    /// The next `n` bytes (the reader must be at a byte boundary).
++    pub(crate) fn take(&mut self, n: usize) -> Result<&'a [u8], DecodeError> {
++        debug_assert_eq!(self.pos % 8, 0);
++        let start = self.pos / 8;
++        let end = start.checked_add(n).ok_or(DecodeError::Truncated)?;
++        let slice = self.bytes.get(start..end).ok_or(DecodeError::Truncated)?;
++        self.pos = end * 8;
++        Ok(slice)
++    }
++
++    /// Skips to the next byte boundary. With `strict`, the skipped bits must be zero: a set pad bit is a field the
++    /// format does not have ([`DecodeError::UnknownField`]).
++    pub(crate) fn align(&mut self, strict: bool) -> Result<(), DecodeError> {
++        let rest = (8 - self.pos % 8) % 8;
++        if rest > 0 {
++            let pad = self.get(rest as u32)?;
++            if strict && pad != 0 {
++                return Err(DecodeError::UnknownField);
++            }
++        }
++        Ok(())
++    }
++
++    /// The end of the message: aligned, and, with `strict`, every pad bit zero and no byte left
++    /// ([`DecodeError::TrailingBytes`]).
++    pub(crate) fn finish(&mut self, strict: bool) -> Result<(), DecodeError> {
++        self.align(strict)?;
++        if strict && self.pos / 8 != self.bytes.len() {
++            return Err(DecodeError::TrailingBytes);
++        }
++        Ok(())
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn packed_values_come_back_in_order_and_aligned_ones_are_little_endian() {
++        let mut out = Vec::new();
++        let mut w = BitWriter::new(&mut out);
++        w.put(0b101, 3);
++        w.put(0x3ff, 10);
++        w.put(u64::MAX, 64);
++        w.put(1, 1);
++        w.align();
++        w.put(0xbeef, 16);
++        assert_eq!(out.len(), 1 + 2 + 7 + 1 + 2);
++        assert_eq!(&out[out.len() - 2..], &[0xef, 0xbe]);
++        let mut r = BitReader::new(&out);
++        assert_eq!(r.get(3), Ok(0b101));
++        assert_eq!(r.get(10), Ok(0x3ff));
++        assert_eq!(r.get(64), Ok(u64::MAX));
++        assert_eq!(r.get(1), Ok(1));
++        assert_eq!(r.align(true), Ok(()));
++        assert_eq!(r.u16(), Ok(0xbeef));
++        assert_eq!(r.finish(true), Ok(()));
++        assert_eq!(r.get(1), Err(DecodeError::Truncated));
++    }
++
++    #[test]
++    fn a_set_pad_bit_and_a_trailing_byte_are_refused_only_when_strict() {
++        let bytes = [0b1000_0001u8, 7];
++        let mut r = BitReader::new(&bytes);
++        assert_eq!(r.get(1), Ok(1));
++        assert_eq!(r.align(true), Err(DecodeError::UnknownField));
++        let mut r = BitReader::new(&bytes);
++        assert_eq!(r.get(1), Ok(1));
++        assert_eq!(r.finish(false), Ok(()));
++        let mut r = BitReader::new(&bytes);
++        assert_eq!(r.u8(), Ok(0b1000_0001));
++        assert_eq!(r.finish(true), Err(DecodeError::TrailingBytes));
++        assert_eq!(BitReader::new(&bytes).take(3), Err(DecodeError::Truncated));
++        assert_eq!(BitReader::new(&bytes).array::<3>(), Err(DecodeError::Truncated));
++    }
++}
+diff --git a/spikes/netcode-proof/crates/proto/src/control.rs b/spikes/netcode-proof/crates/proto/src/control.rs
+new file mode 100644
+index 0000000..45153cd
+--- /dev/null
++++ b/spikes/netcode-proof/crates/proto/src/control.rs
+@@ -0,0 +1,622 @@
++//! The controls: `SessionControl` and its four variants, which a browser holding its slot's capability sends on its
++//! control stream, `SessionStatus`, the room's answer for that browser's overlay (catalogue §2, §4; plan §10.2), and
++//! `RoomControl`, the room-wide controls that never travel on the wire, only on the room's local sockets (catalogue
++//! §5; the advisor's Q7 ruling: built here, unfeatured, for catalogue item 6 and U5's fuzz target).
++//!
++//! **`SessionControl`'s body** (after the type): variant 1 B (0 `SetProfile`, 1 `TriggerBurst`, 2 `BlockUdp`,
++//! 3 `RecordStep`), the 16 B capability, then the variant's fields: a profile 1 B (0 to 4 for P0 to P4, 5 for
++//! `default`); nothing; `on` 1 B (0 or 1); step 1 B (1 to 14), result 1 B (0 achieved, 1 not yet, 2 observation), the
++//! note's length 2 B and the note, at most 480 B of UTF-8 with no control (Cc) or format (Cf) character (catalogue §4:
++//! part 11's rule for display names). The capability is compared in constant time by npt-server, never here.
++//!
++//! **`SessionStatus`'s body:** the profile in force 1 B (as above), the server's round trip in µs 4 B, the rewind cap
++//! in ticks 2 B, the command-timing option 1 B (0 for OQ-0001-6's (a), 1 for (b)), the clipped-shot count 4 B, the
++//! form's last saved step 1 B (0 for none, else 1 to 14): 16 B with its framing, inside its 32 B.
++//!
++//! **A room-wide control** on its socket: a 2 B little-endian length of what follows, a 1 B control code (1 to 11 in
++//! [`RoomControl`]'s order), then its fields, at most [`Limits::ROOM_CONTROL`] bytes in all, decoded with the same
++//! checks as a network message and never a panic. A peer set is a count 1 B (1 to 16; 255 for `default` or `all`
++//! where the control takes one), then per address a family 1 B (4 or 6) and 16 B: an IPv4 address in its first 4,
++//! an IPv6 /64 prefix in its first 8, every other byte zero. Replies (a status code, and the minted token or
++//! capability) are npt-server's `ControlSocket`'s, at U6.
++
++use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
++
++use crate::bits::{BitReader, BitWriter};
++use crate::error::{DecodeError, EncodeError};
++use crate::limits::Limits;
++
++/// A network profile a control names: P0 to P4 (npt-l1's and L2's profiles), or `Default` to clear the holder's.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum ProfileId {
++    P0,
++    P1,
++    P2,
++    P3,
++    P4,
++    /// The profile each new peer gets (`SetProfile`'s `default`).
++    Default,
++}
++
++/// `RecordStep`'s result (the checklist's form: catalogue §4).
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum StepResult {
++    Achieved,
++    NotYet,
++    Observation,
++}
++
++/// `SessionControl`: a control from a joined browser session holding its slot's capability (catalogue §4).
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub enum SessionControl {
++    /// Applies `profile` to every connection from the holder's source address.
++    SetProfile { cap: [u8; 16], profile: ProfileId },
++    /// One second of total loss on this live session, both ways.
++    TriggerBurst { cap: [u8; 16] },
++    /// Every UDP datagram to and from the holder's address dropped while `on`.
++    BlockUdp { cap: [u8; 16], on: bool },
++    /// One form record: the checklist's `step` (1 to 14), its `result` and a `note`.
++    RecordStep {
++        cap: [u8; 16],
++        step: u8,
++        result: StepResult,
++        note: String,
++    },
++}
++
++/// The overlay's room-side values for the capability holder (catalogue §2, the advisor's A1 ruling).
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub struct SessionStatus {
++    pub profile: ProfileId,
++    /// The server's round trip to this client, in µs.
++    pub rtt_us: u32,
++    /// The rewind cap in force, in ticks.
++    pub rewind_cap: u16,
++    /// OQ-0001-6's command-timing option: 0 for (a), 1 for (b).
++    pub cmd_timing: u8,
++    /// Shots whose rewind the cap clipped.
++    pub clipped: u32,
++    /// The form's last saved step: 0 for none, else 1 to 14.
++    pub last_step: u8,
++}
++
++impl Default for SessionStatus {
++    fn default() -> SessionStatus {
++        SessionStatus {
++            profile: ProfileId::Default,
++            rtt_us: 0,
++            rewind_cap: 0,
++            cmd_timing: 0,
++            clipped: 0,
++            last_step: 0,
++        }
++    }
++}
++
++fn profile_code(p: ProfileId) -> u64 {
++    p as u64
++}
++
++fn profile_of(code: u8) -> Result<ProfileId, DecodeError> {
++    Ok(match code {
++        0 => ProfileId::P0,
++        1 => ProfileId::P1,
++        2 => ProfileId::P2,
++        3 => ProfileId::P3,
++        4 => ProfileId::P4,
++        5 => ProfileId::Default,
++        _ => return Err(DecodeError::OutOfRange),
++    })
++}
++
++fn bool_of(code: u8) -> Result<bool, DecodeError> {
++    match code {
++        0 => Ok(false),
++        1 => Ok(true),
++        _ => Err(DecodeError::OutOfRange),
++    }
++}
++
++/// Unicode's format characters, general category Cf (Unicode 15.1.0, as Python 3's unicodedata lists them).
++const FORMAT: [(u32, u32); 21] = [
++    (0x00ad, 0x00ad),
++    (0x0600, 0x0605),
++    (0x061c, 0x061c),
++    (0x06dd, 0x06dd),
++    (0x070f, 0x070f),
++    (0x0890, 0x0891),
++    (0x08e2, 0x08e2),
++    (0x180e, 0x180e),
++    (0x200b, 0x200f),
++    (0x202a, 0x202e),
++    (0x2060, 0x2064),
++    (0x2066, 0x206f),
++    (0xfeff, 0xfeff),
++    (0xfff9, 0xfffb),
++    (0x110bd, 0x110bd),
++    (0x110cd, 0x110cd),
++    (0x13430, 0x1343f),
++    (0x1bca0, 0x1bca3),
++    (0x1d173, 0x1d17a),
++    (0xe0001, 0xe0001),
++    (0xe0020, 0xe007f),
++];
++
++/// Whether `note` is one the form takes: at most 480 B, with no control (Cc) or format (Cf) character.
++fn note_ok(note: &str) -> bool {
++    note.len() <= Limits::NOTE
++        && note.chars().all(|c| {
++            let u = u32::from(c);
++            !c.is_control() && !FORMAT.iter().any(|&(a, b)| (a..=b).contains(&u))
++        })
++}
++
++impl SessionControl {
++    /// The variants' names, in the catalogue's "Session controls" order.
++    pub const VARIANTS: [&'static str; 4] = ["SetProfile", "TriggerBurst", "BlockUdp", "RecordStep"];
++
++    /// This control's variant name, one of [`SessionControl::VARIANTS`].
++    pub fn variant(&self) -> &'static str {
++        Self::VARIANTS[self.code()]
++    }
++
++    fn code(&self) -> usize {
++        match self {
++            SessionControl::SetProfile { .. } => 0,
++            SessionControl::TriggerBurst { .. } => 1,
++            SessionControl::BlockUdp { .. } => 2,
++            SessionControl::RecordStep { .. } => 3,
++        }
++    }
++
++    pub(crate) fn put(&self, w: &mut BitWriter<'_>) -> Result<(), EncodeError> {
++        w.put(self.code() as u64, 8);
++        match self {
++            SessionControl::SetProfile { cap, profile } => {
++                w.bytes(cap);
++                w.put(profile_code(*profile), 8);
++            }
++            SessionControl::TriggerBurst { cap } => w.bytes(cap),
++            SessionControl::BlockUdp { cap, on } => {
++                w.bytes(cap);
++                w.put(u64::from(*on), 8);
++            }
++            SessionControl::RecordStep {
++                cap,
++                step,
++                result,
++                note,
++            } => {
++                if !(1..=Limits::RECORD_STEPS).contains(step) || !note_ok(note) {
++                    return Err(EncodeError::OutOfRange);
++                }
++                w.bytes(cap);
++                w.put(u64::from(*step), 8);
++                w.put(*result as u64, 8);
++                w.put(note.len() as u64, 16);
++                w.bytes(note.as_bytes());
++            }
++        }
++        Ok(())
++    }
++
++    pub(crate) fn get(r: &mut BitReader<'_>) -> Result<SessionControl, DecodeError> {
++        let variant = r.u8()?;
++        let cap = r.array()?;
++        Ok(match variant {
++            0 => SessionControl::SetProfile {
++                cap,
++                profile: profile_of(r.u8()?)?,
++            },
++            1 => SessionControl::TriggerBurst { cap },
++            2 => SessionControl::BlockUdp {
++                cap,
++                on: bool_of(r.u8()?)?,
++            },
++            3 => {
++                let step = r.u8()?;
++                if !(1..=Limits::RECORD_STEPS).contains(&step) {
++                    return Err(DecodeError::OutOfRange);
++                }
++                let result = match r.u8()? {
++                    0 => StepResult::Achieved,
++                    1 => StepResult::NotYet,
++                    2 => StepResult::Observation,
++                    _ => return Err(DecodeError::OutOfRange),
++                };
++                let len = usize::from(r.u16()?);
++                if len > Limits::NOTE {
++                    return Err(DecodeError::OutOfRange);
++                }
++                let bytes = r.take(len)?;
++                let note = core::str::from_utf8(bytes).map_err(|_| DecodeError::Malformed)?;
++                if !note_ok(note) {
++                    return Err(DecodeError::Malformed);
++                }
++                SessionControl::RecordStep {
++                    cap,
++                    step,
++                    result,
++                    note: note.to_owned(),
++                }
++            }
++            _ => return Err(DecodeError::OutOfRange),
++        })
++    }
++}
++
++impl SessionStatus {
++    pub(crate) fn put(&self, w: &mut BitWriter<'_>) -> Result<(), EncodeError> {
++        if self.cmd_timing > 1 || self.last_step > Limits::RECORD_STEPS {
++            return Err(EncodeError::OutOfRange);
++        }
++        w.put(profile_code(self.profile), 8);
++        w.put(u64::from(self.rtt_us), 32);
++        w.put(u64::from(self.rewind_cap), 16);
++        w.put(u64::from(self.cmd_timing), 8);
++        w.put(u64::from(self.clipped), 32);
++        w.put(u64::from(self.last_step), 8);
++        Ok(())
++    }
++
++    pub(crate) fn get(r: &mut BitReader<'_>) -> Result<SessionStatus, DecodeError> {
++        let s = SessionStatus {
++            profile: profile_of(r.u8()?)?,
++            rtt_us: r.u32()?,
++            rewind_cap: r.u16()?,
++            cmd_timing: r.u8()?,
++            clipped: r.u32()?,
++            last_step: r.u8()?,
++        };
++        if s.cmd_timing > 1 || s.last_step > Limits::RECORD_STEPS {
++            return Err(DecodeError::OutOfRange);
++        }
++        Ok(s)
++    }
++}
++
++/// What kind of client a minted token is for (`MintToken`'s `kind`).
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum TokenKind {
++    Bot,
++    Browser,
++    Runner,
++}
++
++/// A room-wide control (catalogue §5), from the run script on RS or the laptop session over SSH, on the room slot's
++/// local socket. Each field's check that needs no room state is the decoder's; the rest (a slot below the room's N,
++/// a tick in the future, an address on the run's lists) are npt-server's and npt-room's.
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub enum RoomControl {
++    MintToken { slot: u8, kind: TokenKind },
++    MintCapability { slot: u8 },
++    /// At least 1.
++    SetRewindCap { ticks: u16 },
++    /// IPv4 addresses and IPv6 /64 prefixes, 1 to 16.
++    RaiseAddrCap { cap: u16, addrs: Vec<IpAddr> },
++    /// `target` `None` for the tick thread, else that slot's connection task (a slot below 255).
++    InjectPanic { target: Option<u8>, at: u32 },
++    /// At most 1,000 ms.
++    InjectStall { ms: u16, at: u32 },
++    /// `peers` `None` for `default`; `profile` P0 to P4.
++    SetPeerProfile { peers: Option<Vec<IpAddr>>, profile: ProfileId },
++    /// `kbps` above 0, `secs` at most 600.
++    SetPeerThrottle { peers: Vec<IpAddr>, kbps: u16, secs: u16 },
++    /// `percent` 1 to 100, `secs` at most 600.
++    SetPeerBottleneck { peers: Vec<IpAddr>, percent: u8, secs: u16 },
++    /// At most 1,000 ms.
++    PeerBurst { peers: Vec<IpAddr>, ms: u16 },
++    /// `peers` `None` for `all`.
++    BlockPeerUdp { peers: Option<Vec<IpAddr>>, on: bool },
++}
++
++/// A peer-set count that stands for `default` or `all`.
++const EVERY_PEER: u8 = 255;
++
++fn put_peers(w: &mut BitWriter<'_>, peers: Option<&[IpAddr]>) -> Result<(), EncodeError> {
++    let Some(peers) = peers else {
++        w.put(u64::from(EVERY_PEER), 8);
++        return Ok(());
++    };
++    if peers.is_empty() {
++        return Err(EncodeError::OutOfRange);
++    }
++    if peers.len() > Limits::PEERS {
++        return Err(EncodeError::TooMany);
++    }
++    w.put(peers.len() as u64, 8);
++    for p in peers {
++        let mut bytes = [0u8; 16];
++        match p {
++            IpAddr::V4(a) => {
++                w.put(4, 8);
++                bytes[..4].copy_from_slice(&a.octets());
++            }
++            IpAddr::V6(a) => {
++                let o = a.octets();
++                if o[8..].iter().any(|&b| b != 0) {
++                    return Err(EncodeError::OutOfRange);
++                }
++                w.put(6, 8);
++                bytes = o;
++            }
++        }
++        w.bytes(&bytes);
++    }
++    Ok(())
++}
++
++/// A peer set: `None` for the count that stands for every peer, where `every` allows it.
++fn get_peers(r: &mut BitReader<'_>, every: bool) -> Result<Option<Vec<IpAddr>>, DecodeError> {
++    let n = r.u8()?;
++    if n == EVERY_PEER && every {
++        return Ok(None);
++    }
++    if n == 0 || usize::from(n) > Limits::PEERS {
++        return Err(DecodeError::OutOfRange);
++    }
++    let mut out = Vec::with_capacity(usize::from(n));
++    for _ in 0..n {
++        let family = r.u8()?;
++        let b: [u8; 16] = r.array()?;
++        let addr = match family {
++            4 if b[4..].iter().all(|&x| x == 0) => IpAddr::V4(Ipv4Addr::new(b[0], b[1], b[2], b[3])),
++            6 if b[8..].iter().all(|&x| x == 0) => IpAddr::V6(Ipv6Addr::from(b)),
++            4 | 6 => return Err(DecodeError::UnknownField),
++            _ => return Err(DecodeError::OutOfRange),
++        };
++        out.push(addr);
++    }
++    Ok(Some(out))
++}
++
++fn listed(r: &mut BitReader<'_>) -> Result<Vec<IpAddr>, DecodeError> {
++    get_peers(r, false)?.ok_or(DecodeError::OutOfRange)
++}
++
++impl RoomControl {
++    /// The controls' names, in the catalogue's "Room-wide controls" order less `npt-load-ctl` (not a room socket's);
++    /// the control code is the position, from 1.
++    pub const NAMES: [&'static str; 11] = [
++        "MintToken",
++        "MintCapability",
++        "SetRewindCap",
++        "RaiseAddrCap",
++        "InjectPanic",
++        "InjectStall",
++        "SetPeerProfile",
++        "SetPeerThrottle",
++        "SetPeerBottleneck",
++        "PeerBurst",
++        "BlockPeerUdp",
++    ];
++
++    /// This control's name, one of [`RoomControl::NAMES`].
++    pub fn name(&self) -> &'static str {
++        Self::NAMES[self.code() - 1]
++    }
++
++    fn code(&self) -> usize {
++        match self {
++            RoomControl::MintToken { .. } => 1,
++            RoomControl::MintCapability { .. } => 2,
++            RoomControl::SetRewindCap { .. } => 3,
++            RoomControl::RaiseAddrCap { .. } => 4,
++            RoomControl::InjectPanic { .. } => 5,
++            RoomControl::InjectStall { .. } => 6,
++            RoomControl::SetPeerProfile { .. } => 7,
++            RoomControl::SetPeerThrottle { .. } => 8,
++            RoomControl::SetPeerBottleneck { .. } => 9,
++            RoomControl::PeerBurst { .. } => 10,
++            RoomControl::BlockPeerUdp { .. } => 11,
++        }
++    }
++
++    /// Appends this control, framed for its socket, to `out`.
++    ///
++    /// # Errors
++    /// [`EncodeError`] for a value its field does not take (the module text); nothing is appended then.
++    pub fn encode(&self, out: &mut Vec<u8>) -> Result<(), EncodeError> {
++        let start = out.len();
++        let r = self.encode_into(out);
++        match r {
++            Ok(()) if out.len() - start <= Limits::ROOM_CONTROL => {
++                let length = (out.len() - start - 2) as u16;
++                out[start..start + 2].copy_from_slice(&length.to_le_bytes());
++                Ok(())
++            }
++            Ok(()) => {
++                out.truncate(start);
++                Err(EncodeError::TooLarge)
++            }
++            Err(e) => {
++                out.truncate(start);
++                Err(e)
++            }
++        }
++    }
++
++    fn encode_into(&self, out: &mut Vec<u8>) -> Result<(), EncodeError> {
++        out.extend_from_slice(&[0, 0, self.code() as u8]);
++        let mut w = BitWriter::new(out);
++        match self {
++            RoomControl::MintToken { slot, kind } => {
++                w.put(u64::from(*slot), 8);
++                w.put(*kind as u64, 8);
++            }
++            RoomControl::MintCapability { slot } => w.put(u64::from(*slot), 8),
++            RoomControl::SetRewindCap { ticks } => {
++                if *ticks == 0 {
++                    return Err(EncodeError::OutOfRange);
++                }
++                w.put(u64::from(*ticks), 16);
++            }
++            RoomControl::RaiseAddrCap { cap, addrs } => {
++                w.put(u64::from(*cap), 16);
++                put_peers(&mut w, Some(addrs))?;
++            }
++            RoomControl::InjectPanic { target, at } => {
++                let t = match target {
++                    None => EVERY_PEER,
++                    Some(s) if *s != EVERY_PEER => *s,
++                    Some(_) => return Err(EncodeError::OutOfRange),
++                };
++                w.put(u64::from(t), 8);
++                w.put(u64::from(*at), 32);
++            }
++            RoomControl::InjectStall { ms, at } => {
++                if *ms > 1_000 {
++                    return Err(EncodeError::OutOfRange);
++                }
++                w.put(u64::from(*ms), 16);
++                w.put(u64::from(*at), 32);
++            }
++            RoomControl::SetPeerProfile { peers, profile } => {
++                if *profile == ProfileId::Default {
++                    return Err(EncodeError::OutOfRange);
++                }
++                put_peers(&mut w, peers.as_deref())?;
++                w.put(profile_code(*profile), 8);
++            }
++            RoomControl::SetPeerThrottle { peers, kbps, secs } => {
++                if *kbps == 0 || *secs > 600 {
++                    return Err(EncodeError::OutOfRange);
++                }
++                put_peers(&mut w, Some(peers))?;
++                w.put(u64::from(*kbps), 16);
++                w.put(u64::from(*secs), 16);
++            }
++            RoomControl::SetPeerBottleneck { peers, percent, secs } => {
++                if !(1..=100).contains(percent) || *secs > 600 {
++                    return Err(EncodeError::OutOfRange);
++                }
++                put_peers(&mut w, Some(peers))?;
++                w.put(u64::from(*percent), 8);
++                w.put(u64::from(*secs), 16);
++            }
++            RoomControl::PeerBurst { peers, ms } => {
++                if *ms > 1_000 {
++                    return Err(EncodeError::OutOfRange);
++                }
++                put_peers(&mut w, Some(peers))?;
++                w.put(u64::from(*ms), 16);
++            }
++            RoomControl::BlockPeerUdp { peers, on } => {
++                put_peers(&mut w, peers.as_deref())?;
++                w.put(u64::from(*on), 8);
++            }
++        }
++        Ok(())
++    }
++
++    /// Decodes one control as its socket delivered it, length prefix included: the size first (at most
++    /// [`Limits::ROOM_CONTROL`] bytes), then the prefix, the code and the fields, which must end at the last byte.
++    ///
++    /// # Errors
++    /// [`DecodeError`] for anything that is not one valid control.
++    pub fn decode(bytes: &[u8]) -> Result<RoomControl, DecodeError> {
++        if bytes.len() > Limits::ROOM_CONTROL {
++            return Err(DecodeError::TooLarge);
++        }
++        let mut r = BitReader::new(bytes);
++        let length = usize::from(r.u16()?);
++        if length != bytes.len() - 2 {
++            return Err(DecodeError::BadLength);
++        }
++        let code = r.u8()?;
++        let c = match code {
++            1 => RoomControl::MintToken {
++                slot: r.u8()?,
++                kind: match r.u8()? {
++                    0 => TokenKind::Bot,
++                    1 => TokenKind::Browser,
++                    2 => TokenKind::Runner,
++                    _ => return Err(DecodeError::OutOfRange),
++                },
++            },
++            2 => RoomControl::MintCapability { slot: r.u8()? },
++            3 => match r.u16()? {
++                0 => return Err(DecodeError::OutOfRange),
++                ticks => RoomControl::SetRewindCap { ticks },
++            },
++            4 => {
++                let cap = r.u16()?;
++                RoomControl::RaiseAddrCap {
++                    cap,
++                    addrs: listed(&mut r)?,
++                }
++            }
++            5 => {
++                let t = r.u8()?;
++                RoomControl::InjectPanic {
++                    target: (t != EVERY_PEER).then_some(t),
++                    at: r.u32()?,
++                }
++            }
++            6 => {
++                let ms = r.u16()?;
++                if ms > 1_000 {
++                    return Err(DecodeError::OutOfRange);
++                }
++                RoomControl::InjectStall { ms, at: r.u32()? }
++            }
++            7 => {
++                let peers = get_peers(&mut r, true)?;
++                let profile = profile_of(r.u8()?)?;
++                if profile == ProfileId::Default {
++                    return Err(DecodeError::OutOfRange);
++                }
++                RoomControl::SetPeerProfile { peers, profile }
++            }
++            8 => {
++                let peers = listed(&mut r)?;
++                let (kbps, secs) = (r.u16()?, r.u16()?);
++                if kbps == 0 || secs > 600 {
++                    return Err(DecodeError::OutOfRange);
++                }
++                RoomControl::SetPeerThrottle { peers, kbps, secs }
++            }
++            9 => {
++                let peers = listed(&mut r)?;
++                let (percent, secs) = (r.u8()?, r.u16()?);
++                if !(1..=100).contains(&percent) || secs > 600 {
++                    return Err(DecodeError::OutOfRange);
++                }
++                RoomControl::SetPeerBottleneck { peers, percent, secs }
++            }
++            10 => {
++                let peers = listed(&mut r)?;
++                let ms = r.u16()?;
++                if ms > 1_000 {
++                    return Err(DecodeError::OutOfRange);
++                }
++                RoomControl::PeerBurst { peers, ms }
++            }
++            11 => {
++                let peers = get_peers(&mut r, true)?;
++                RoomControl::BlockPeerUdp {
++                    peers,
++                    on: bool_of(r.u8()?)?,
++                }
++            }
++            _ => return Err(DecodeError::UnknownType),
++        };
++        r.finish(true)?;
++        Ok(c)
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn a_note_with_a_control_or_format_character_is_refused() {
++        assert!(note_ok("saw a rubber-band at 0:42, café"));
++        for bad in ["tab\there", "nul\u{0}", "del\u{7f}", "c1\u{85}", "rlo\u{202e}", "zwsp\u{200b}", "bom\u{feff}", "tag\u{e0041}"] {
++            assert!(!note_ok(bad), "{bad:?}");
++        }
++        assert!(note_ok(&"é".repeat(240)));
++        assert!(!note_ok(&"a".repeat(481)));
++    }
++}
+diff --git a/spikes/netcode-proof/crates/proto/src/error.rs b/spikes/netcode-proof/crates/proto/src/error.rs
+new file mode 100644
+index 0000000..83d6ceb
+--- /dev/null
++++ b/spikes/netcode-proof/crates/proto/src/error.rs
+@@ -0,0 +1,68 @@
++//! Why a buffer is not a message, and why a value cannot be sent.
++
++/// Why [`crate::decode`] refused a buffer. Every decoder returns one of these and never panics (ADR 0001:446); the
++/// size is checked before anything else is read (catalogue item 3, the size half), and nothing is allocated before the
++/// size check passes.
++///
++/// npt-server's pump counts each refusal by its kind (PM-0001-21's counters): `TrailingBytes`, `UnknownField` and
++/// `WrongChannel` are the socket checks of plan §4.4's server column, implemented here (u4-build-plan.md §4.4, A26).
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum DecodeError {
++    /// Larger than what the receiving end takes on that channel, or than the type's own limit
++    /// ([`crate::Limits`]), whatever the bytes hold.
++    TooLarge,
++    /// The bytes end inside the framing, the header or a field.
++    Truncated,
++    /// A stream message whose length prefix does not count its bytes.
++    BadLength,
++    /// A type byte no message has.
++    UnknownType,
++    /// A type the receiving end never receives: a room → client type from a client, or the reverse (refused and
++    /// counted as forged: the catalogue's `Snapshot` row).
++    WrongDirection,
++    /// A known type on a channel it does not travel on (catalogue item 2; plan E7).
++    WrongChannel,
++    /// Bytes after the message's last field (ADR 0001:238: the datagram is dropped whole).
++    TrailingBytes,
++    /// A field the format does not have: a reserved or pad bit set (ADR 0001:238).
++    UnknownField,
++    /// A field's code outside its range: an integer its grid field does not hold (pitch's 10-bit code -512), an enum
++    /// code no variant has, a count above its cap, a step outside 1 to 14.
++    OutOfRange,
++    /// Well framed, but not a message: a group index not below its count, an entity update that changes nothing, a
++    /// note that is not UTF-8 or holds a control or format character, a delta whose baseline entity is missing.
++    Malformed,
++}
++
++/// Why [`crate::encode`] could not code a message: a value the wire does not carry. The sender's bug, never the
++/// network's; nothing is written when it is returned.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum EncodeError {
++    /// A value outside what its field carries: an integer outside its grid field's range, a view time more than
++    /// 65,535 ticks before its command, a repeat more than 255 ticks before the command beside it, a group index not
++    /// below the group count, a note above 480 B, a step outside 1 to 14.
++    OutOfRange,
++    /// More items than the format holds: commands above the redundancy cap, a group count above 8, more entities or
++    /// events than their counts carry, more than 16 peers.
++    TooMany,
++    /// The encoding is above its type's limit ([`crate::Limits`]).
++    TooLarge,
++    /// A value the format codes in one form only, given in another: a repeat whose sequence is not the one before the
++    /// command beside it, an entity update that changes nothing or sets an entry it does not mark changed.
++    NotCanonical,
++}
++
++impl core::fmt::Display for DecodeError {
++    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
++        core::fmt::Debug::fmt(self, f)
++    }
++}
++
++impl core::fmt::Display for EncodeError {
++    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
++        core::fmt::Debug::fmt(self, f)
++    }
++}
++
++impl std::error::Error for DecodeError {}
++impl std::error::Error for EncodeError {}
+diff --git a/spikes/netcode-proof/crates/proto/src/hash.rs b/spikes/netcode-proof/crates/proto/src/hash.rs
+new file mode 100644
+index 0000000..538c34c
+--- /dev/null
++++ b/spikes/netcode-proof/crates/proto/src/hash.rs
+@@ -0,0 +1,92 @@
++//! `client_hash`: what both ends of PM-0001-17 hash for one client and one tick (u4-build-plan.md §4.6; the advisor's
++//! Q11 ruling). The room's encoder hashes what it intends the client to hold after decoding that tick, with the
++//! server's own 32-bit tick and event numbers; the client hashes what it holds, turned back into grid integers through
++//! `npt_sim::grid`, with the tick and event numbers as it rebuilt them. One function, so the two agree bit for bit
++//! when the client holds what was sent.
++//!
++//! **What it covers, in this order:** the full 32-bit tick; the client's entity set in entity-id order (kind, then
++//! index, then generation), each entity's kind, index, generation and its layout's grid integers
++//! (`EntityKind::layout()`); the own-state section's records, the same way; the event section's events as (32-bit
++//! event number, kind), in number order. The authority-only streams stay out (plan.md:531), and so do a record's
++//! `area` and `raw`, which the wire never carries.
++//!
++//! **The hash:** FNV-1a, 64 bits, over that canonical little-endian byte string (spike-local, as npt-sim's state
++//! hash is). It is never 0: 0 is the client's sentinel for a tick with a group it could not decode, which always
++//! mismatches (§4.6), so a computed 0 becomes 1.
++
++use npt_sim::{EntityKind, EntityRecord, SimEvent};
++
++const FNV_OFFSET: u64 = 0xcbf2_9ce4_8422_2325;
++const FNV_PRIME: u64 = 0x0000_0100_0000_01b3;
++
++struct Fnv(u64);
++
++impl Fnv {
++    fn bytes(&mut self, b: &[u8]) {
++        for &x in b {
++            self.0 ^= u64::from(x);
++            self.0 = self.0.wrapping_mul(FNV_PRIME);
++        }
++    }
++}
++
++fn kind_code(kind: EntityKind) -> u8 {
++    EntityKind::ALL.iter().position(|k| *k == kind).unwrap_or(0) as u8
++}
++
++fn event_kind(e: &SimEvent) -> u8 {
++    match e {
++        SimEvent::Shot { .. } => 0,
++        SimEvent::Hit { .. } => 1,
++        SimEvent::Kill { .. } => 2,
++    }
++}
++
++fn id(r: &EntityRecord) -> (u8, u16, u16) {
++    (kind_code(r.kind), r.index, r.generation)
++}
++
++fn records(h: &mut Fnv, list: &[EntityRecord]) {
++    h.bytes(&(list.len() as u32).to_le_bytes());
++    let mut one = |r: &EntityRecord| {
++        let (k, index, generation) = id(r);
++        h.bytes(&[k]);
++        h.bytes(&index.to_le_bytes());
++        h.bytes(&generation.to_le_bytes());
++        for g in &r.grid[..r.kind.layout().len()] {
++            h.bytes(&g.to_le_bytes());
++        }
++    };
++    if list.is_sorted_by_key(id) {
++        list.iter().for_each(&mut one);
++    } else {
++        let mut sorted: Vec<&EntityRecord> = list.iter().collect();
++        sorted.sort_by_key(|r| id(r));
++        sorted.into_iter().for_each(one);
++    }
++}
++
++/// The client-held hash of one client's view at `tick` (the module text): `entities` its entity set, `own` its
++/// own-state records, `events` its events as (32-bit event number, event). Either side may pass the records and the
++/// events in any order. Never 0.
++pub fn client_hash(tick: u32, entities: &[EntityRecord], own: &[EntityRecord], events: &[(u32, SimEvent)]) -> u64 {
++    let mut h = Fnv(FNV_OFFSET);
++    h.bytes(&tick.to_le_bytes());
++    records(&mut h, entities);
++    records(&mut h, own);
++    h.bytes(&(events.len() as u32).to_le_bytes());
++    let key = |e: &(u32, SimEvent)| (e.0, event_kind(&e.1));
++    let mut one = |e: &(u32, SimEvent)| {
++        let (number, kind) = key(e);
++        h.bytes(&number.to_le_bytes());
++        h.bytes(&[kind]);
++    };
++    if events.is_sorted_by_key(key) {
++        events.iter().for_each(&mut one);
++    } else {
++        let mut sorted: Vec<&(u32, SimEvent)> = events.iter().collect();
++        sorted.sort_by_key(|e| key(e));
++        sorted.into_iter().for_each(one);
++    }
++    if h.0 == 0 { 1 } else { h.0 }
++}
+diff --git a/spikes/netcode-proof/crates/proto/src/input.rs b/spikes/netcode-proof/crates/proto/src/input.rs
+new file mode 100644
+index 0000000..619a39f
+--- /dev/null
++++ b/spikes/netcode-proof/crates/proto/src/input.rs
+@@ -0,0 +1,283 @@
++//! `Input`: a client's commands, the newest whole and each older one delta-coded against the newer one beside it
++//! (ADR 0001 part 5: option U2), with the newest snapshot the client decoded (u4-build-plan.md §4.4, §4.5).
++//!
++//! **The field table** (u4-build-plan.md §4.4's "stated by U4a and read by the limit test"; net F116's proposal), in
++//! bits, least significant bit first, each command starting at a byte and ending with zero pad bits:
++//!
++//! | Part | Fields | Bits |
++//! |---|---|---|
++//! | header | type 8, the acknowledged tick's low 16 bits 16, its group mask 8, command count 8 | 40 (5 B) |
++//! | whole command (the newest) | tick 32, sequence 16, buttons 16, press counters 4 × 8, move 2 × 8, aim (`POSITION_XY`, `POSITION_XY`, `POSITION_Z`: 16 + 16 + 12), view offset 16, view fraction 8 | 180 (23 B) |
++//! | repeat (each older one) | change mask 8, tick step 8, then the fields its mask names: buttons 16, press counters 32, move 16, aim 44, view offset and fraction 24 | at most 148 (19 B) |
++//!
++//! At the redundancy cap: 5 + 23 + 7 × 19 = 161 B, inside `Input`'s 166 B; a repeat is never larger than a whole
++//! command (19 B against 23 B); the aim is 44 bits, under ADR 0001:226-227's 80. Every width is read from the grid's
++//! fields (the aim's) or the `Command` field's own type.
++//!
++//! - **The view time** goes as its offset back from the command's own tick (`tick - view_tick`, at most 65,535) and
++//!   its fraction; a repeat's mask names it when either differs from the newer command's.
++//! - **A repeat's tick** is the newer command's tick less its step (0 to 255: ticks may repeat or skip under
++//!   OQ-0001-6 (b)'s re-align); **its sequence** is the newer command's less one: the unacknowledged commands are
++//!   consecutive, so it is not sent.
++//! - **The mask:** bit 0 buttons, 1 the press counters, 2 the move, 3 the aim, 4 the view time; bits 5 to 7 are
++//!   reserved and must be zero (an unknown field: ADR 0001:238).
++//! - **The acknowledgement:** a group mask of 0 means the client has decoded no snapshot yet.
++//! - **`Command::slot`** is not on the wire: the session gives it. The decoder writes 0, and the room sets it.
++//!
++//! Values are checked here for what the wire can carry, not for what the room accepts: the move vector's length, the
++//! aim's map bounds, the ticks and sequences are the room's checks (catalogue §2, `Input`'s row).
++
++use npt_sim::Command;
++use npt_sim::grid::{Field, POSITION_XY, POSITION_Z};
++
++use crate::bits::{BitReader, BitWriter};
++use crate::error::{DecodeError, EncodeError};
++use crate::limits::Limits;
++use crate::quant::Quant;
++
++/// `Input`: the client's newest commands and the newest snapshot it decoded (the module text).
++#[derive(Clone, Debug, Default, PartialEq, Eq)]
++pub struct Input {
++    /// The low 16 bits of the newest snapshot tick the client decoded a group of.
++    pub ack_tick: u16,
++    /// Which groups of that tick it decoded, one bit per group index; 0 when it has decoded none.
++    pub ack_groups: u8,
++    /// The newest command first, then every unacknowledged one before it, newest to oldest, at most
++    /// [`Limits::REDUNDANCY_CAP`]. Each older one's sequence is the one before its newer neighbour's.
++    pub commands: Vec<Command>,
++}
++
++/// The aim point's three fields.
++const AIM: [Field; 3] = [POSITION_XY, POSITION_XY, POSITION_Z];
++const AIM_BITS: u32 = AIM[0].bits() + AIM[1].bits() + AIM[2].bits();
++/// Bits of each `Command` field on the wire: from its own type, the press counters 4 of them.
++const TICK_BITS: u32 = u32::BITS;
++const SEQ_BITS: u32 = u16::BITS;
++const BUTTONS_BITS: u32 = u16::BITS;
++const PRESSES_BITS: u32 = 4 * u8::BITS;
++const MOVE_BITS: u32 = 2 * i8::BITS;
++const VIEW_BITS: u32 = u16::BITS + u8::BITS;
++const MASK_BITS: u32 = u8::BITS;
++const STEP_BITS: u32 = u8::BITS;
++
++/// The header's bytes: type, acknowledged tick, group mask, count.
++pub(crate) const HEADER_BYTES: usize = 5;
++/// A whole command's bytes.
++pub(crate) const WHOLE_BYTES: usize =
++    ((TICK_BITS + SEQ_BITS + BUTTONS_BITS + PRESSES_BITS + MOVE_BITS + AIM_BITS + VIEW_BITS) as usize).div_ceil(8);
++/// The largest repeat's bytes: every field changed.
++pub(crate) const REPEAT_BYTES: usize =
++    ((MASK_BITS + STEP_BITS + BUTTONS_BITS + PRESSES_BITS + MOVE_BITS + AIM_BITS + VIEW_BITS) as usize).div_ceil(8);
++
++// The catalogue's rule: a repeat is never larger than a whole command, and a full datagram fits Input's limit.
++const _: () = assert!(REPEAT_BYTES <= WHOLE_BYTES);
++const _: () = assert!(HEADER_BYTES + WHOLE_BYTES + (Limits::REDUNDANCY_CAP - 1) * REPEAT_BYTES <= Limits::INPUT);
++
++const BUTTONS: u8 = 1;
++const PRESSES: u8 = 1 << 1;
++const MOVE: u8 = 1 << 2;
++const AIM_CHANGED: u8 = 1 << 3;
++const VIEW: u8 = 1 << 4;
++const KNOWN: u8 = BUTTONS | PRESSES | MOVE | AIM_CHANGED | VIEW;
++
++/// A command's view time as the wire carries it: the offset back from its own tick, and the fraction.
++fn view(c: &Command) -> Result<(u16, u8), EncodeError> {
++    let offset = u16::try_from(c.tick.wrapping_sub(c.view_tick)).map_err(|_| EncodeError::OutOfRange)?;
++    Ok((offset, c.view_fraction))
++}
++
++fn put_presses(w: &mut BitWriter<'_>, p: [u8; 4]) {
++    for x in p {
++        w.put(u64::from(x), 8);
++    }
++}
++
++fn put_move(w: &mut BitWriter<'_>, m: [i8; 2]) {
++    for x in m {
++        w.put(u64::from(x as u8), 8);
++    }
++}
++
++fn put_aim(q: Quant, w: &mut BitWriter<'_>, aim: [i32; 3]) -> Result<(), EncodeError> {
++    for (f, k) in AIM.into_iter().zip(aim) {
++        q.put(w, f, k)?;
++    }
++    Ok(())
++}
++
++fn get_presses(r: &mut BitReader<'_>) -> Result<[u8; 4], DecodeError> {
++    Ok([r.u8()?, r.u8()?, r.u8()?, r.u8()?])
++}
++
++fn get_move(r: &mut BitReader<'_>) -> Result<[i8; 2], DecodeError> {
++    Ok([r.u8()? as i8, r.u8()? as i8])
++}
++
++fn get_aim(q: Quant, r: &mut BitReader<'_>) -> Result<[i32; 3], DecodeError> {
++    Ok([q.get(r, AIM[0])?, q.get(r, AIM[1])?, q.get(r, AIM[2])?])
++}
++
++impl Input {
++    pub(crate) fn put(&self, q: Quant, w: &mut BitWriter<'_>) -> Result<(), EncodeError> {
++        if self.commands.len() > Limits::REDUNDANCY_CAP {
++            return Err(EncodeError::TooMany);
++        }
++        w.put(u64::from(self.ack_tick), 16);
++        w.put(u64::from(self.ack_groups), 8);
++        w.put(self.commands.len() as u64, 8);
++        let mut newer: Option<&Command> = None;
++        for c in &self.commands {
++            let (offset, fraction) = view(c)?;
++            match newer {
++                None => {
++                    w.put(u64::from(c.tick), TICK_BITS);
++                    w.put(u64::from(c.seq), SEQ_BITS);
++                    w.put(u64::from(c.buttons), BUTTONS_BITS);
++                    put_presses(w, c.presses);
++                    put_move(w, c.move_xy);
++                    put_aim(q, w, c.aim)?;
++                    w.put(u64::from(offset), 16);
++                    w.put(u64::from(fraction), 8);
++                }
++                Some(n) => {
++                    if c.seq != n.seq.wrapping_sub(1) {
++                        return Err(EncodeError::NotCanonical);
++                    }
++                    let step = u8::try_from(n.tick.wrapping_sub(c.tick)).map_err(|_| EncodeError::OutOfRange)?;
++                    let mut mask = 0u8;
++                    if c.buttons != n.buttons {
++                        mask |= BUTTONS;
++                    }
++                    if c.presses != n.presses {
++                        mask |= PRESSES;
++                    }
++                    if c.move_xy != n.move_xy {
++                        mask |= MOVE;
++                    }
++                    if c.aim != n.aim {
++                        mask |= AIM_CHANGED;
++                    }
++                    if (offset, fraction) != view(n)? {
++                        mask |= VIEW;
++                    }
++                    w.put(u64::from(mask), MASK_BITS);
++                    w.put(u64::from(step), STEP_BITS);
++                    if mask & BUTTONS != 0 {
++                        w.put(u64::from(c.buttons), BUTTONS_BITS);
++                    }
++                    if mask & PRESSES != 0 {
++                        put_presses(w, c.presses);
++                    }
++                    if mask & MOVE != 0 {
++                        put_move(w, c.move_xy);
++                    }
++                    if mask & AIM_CHANGED != 0 {
++                        put_aim(q, w, c.aim)?;
++                    }
++                    if mask & VIEW != 0 {
++                        w.put(u64::from(offset), 16);
++                        w.put(u64::from(fraction), 8);
++                    }
++                }
++            }
++            w.align();
++            newer = Some(c);
++        }
++        Ok(())
++    }
++
++    pub(crate) fn get(q: Quant, r: &mut BitReader<'_>) -> Result<Input, DecodeError> {
++        let ack_tick = r.u16()?;
++        let ack_groups = r.u8()?;
++        let count = usize::from(r.u8()?);
++        if count > Limits::REDUNDANCY_CAP {
++            return Err(DecodeError::OutOfRange);
++        }
++        let mut commands: Vec<Command> = Vec::with_capacity(count);
++        for i in 0..count {
++            let c = match commands.last() {
++                None => {
++                    let tick = r.u32()?;
++                    let seq = r.u16()?;
++                    let buttons = r.u16()?;
++                    let presses = get_presses(r)?;
++                    let move_xy = get_move(r)?;
++                    let aim = get_aim(q, r)?;
++                    let offset = r.u16()?;
++                    let fraction = r.u8()?;
++                    Command {
++                        slot: 0,
++                        tick,
++                        seq,
++                        buttons,
++                        presses,
++                        move_xy,
++                        aim,
++                        view_tick: tick.wrapping_sub(u32::from(offset)),
++                        view_fraction: fraction,
++                    }
++                }
++                Some(n) => {
++                    let mask = r.u8()?;
++                    if mask & !KNOWN != 0 && q.strict() {
++                        return Err(DecodeError::UnknownField);
++                    }
++                    let step = r.u8()?;
++                    let tick = n.tick.wrapping_sub(u32::from(step));
++                    let (n_offset, n_fraction) = (n.tick.wrapping_sub(n.view_tick), n.view_fraction);
++                    let buttons = if mask & BUTTONS != 0 { r.u16()? } else { n.buttons };
++                    let presses = if mask & PRESSES != 0 { get_presses(r)? } else { n.presses };
++                    let move_xy = if mask & MOVE != 0 { get_move(r)? } else { n.move_xy };
++                    let aim = if mask & AIM_CHANGED != 0 { get_aim(q, r)? } else { n.aim };
++                    let (offset, fraction) = if mask & VIEW != 0 {
++                        (u32::from(r.u16()?), r.u8()?)
++                    } else {
++                        (n_offset, n_fraction)
++                    };
++                    // Canonical: a field its mask names differs from the newer command's (else the encoder leaves it
++                    // out), so one command list has one encoding.
++                    let same = (mask & BUTTONS != 0 && buttons == n.buttons)
++                        || (mask & PRESSES != 0 && presses == n.presses)
++                        || (mask & MOVE != 0 && move_xy == n.move_xy)
++                        || (mask & AIM_CHANGED != 0 && aim == n.aim)
++                        || (mask & VIEW != 0 && (offset, fraction) == (n_offset, n_fraction));
++                    if same && q.strict() {
++                        return Err(DecodeError::Malformed);
++                    }
++                    Command {
++                        slot: 0,
++                        tick,
++                        seq: n.seq.wrapping_sub(1),
++                        buttons,
++                        presses,
++                        move_xy,
++                        aim,
++                        view_tick: tick.wrapping_sub(offset),
++                        view_fraction: fraction,
++                    }
++                }
++            };
++            let _ = i;
++            r.align(q.strict())?;
++            commands.push(c);
++        }
++        Ok(Input {
++            ack_tick,
++            ack_groups,
++            commands,
++        })
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn the_field_table_gives_23_b_whole_19_b_repeats_and_161_b_at_the_cap() {
++        assert_eq!(AIM_BITS, 44);
++        assert_eq!(WHOLE_BYTES, 23);
++        assert_eq!(REPEAT_BYTES, 19);
++        assert_eq!(HEADER_BYTES + WHOLE_BYTES + 7 * REPEAT_BYTES, 161);
++    }
++}
+diff --git a/spikes/netcode-proof/crates/proto/src/limits.rs b/spikes/netcode-proof/crates/proto/src/limits.rs
+new file mode 100644
+index 0000000..c7b84b1
+--- /dev/null
++++ b/spikes/netcode-proof/crates/proto/src/limits.rs
+@@ -0,0 +1,71 @@
++//! Every size limit and cap the wire has, as the catalogue gives them (docs/design/netcode-proof-messages.md §2's
++//! Size limit column, §1's framing, §4 and §5): catalogue item 3 compares [`Limits::TYPES`] with that column.
++
++use npt_link::Channel;
++
++use crate::msg::Direction;
++
++/// The wire's limits and caps (plan §4.7; catalogue §2). Each message type's limit counts what the catalogue's Size
++/// limit column counts: a datagram whole; a control-stream message with its 2 B length, its type and its body; a
++/// full state's type and body, after its 4 B length (catalogue §1, "Framing and channels").
++#[derive(Clone, Copy, Debug)]
++pub struct Limits;
++
++impl Limits {
++    /// Commands one `Input` carries: the newest and every unacknowledged one before it, up to this cap (ADR 0001
++    /// part 5, proposed 8). npt-room's `CMD_CATCHUP` is set from it (u4-build-plan.md §4.3).
++    pub const REDUNDANCY_CAP: usize = 8;
++    /// Groups one tick's snapshot may split into: the width of the `Input`'s acknowledgement mask, one bit per group
++    /// (u4-build-plan.md §4.5).
++    pub const GROUPS: usize = 8;
++    /// `Input` (166 B: the catalogue's proposal; the codec's maxima, 5 + 23 + 7 × 19 = 161 B, are inside it).
++    pub const INPUT: usize = 166;
++    /// `Snapshot` at the send side: the datagram cap until PM-0001-36 measures (catalogue §2; plan.md E4).
++    pub const SNAPSHOT: usize = 1_000;
++    /// `Snapshot` at the receive side: npt-client refuses a datagram above it (catalogue §2).
++    pub const SNAPSHOT_RECEIVE: usize = 1_150;
++    /// `FullState`, its type and body, after the 4 B length (proposed: about 10 × the stress scene's whole world).
++    pub const FULL_STATE: usize = 65_536;
++    pub const RESYNC: usize = 8;
++    pub const PING: usize = 32;
++    pub const PONG: usize = 32;
++    pub const JOIN: usize = 128;
++    pub const JOIN_ACCEPTED: usize = 256;
++    pub const JOIN_REJECTED: usize = 16;
++    pub const CLIENT_SETTINGS: usize = 8;
++    pub const ROOM_ENDED: usize = 64;
++    pub const LEAVE: usize = 16;
++    pub const KICK: usize = 16;
++    /// `SessionControl`, the largest client message (its `RecordStep` variant is 504 B at most).
++    pub const SESSION_CONTROL: usize = 512;
++    pub const SESSION_STATUS: usize = 32;
++    /// A room-wide control on its local socket ([`crate::RoomControl`]; catalogue §5).
++    pub const ROOM_CONTROL: usize = 1_024;
++    /// `RecordStep`'s note, in bytes of UTF-8.
++    pub const NOTE: usize = 480;
++    /// The checklist's steps, `RecordStep`'s `step` 1 to this (held as data: catalogue §4).
++    pub const RECORD_STEPS: u8 = 14;
++    /// Addresses in one room-wide control's peer set (catalogue §5's size line).
++    pub const PEERS: usize = 16;
++
++    /// Each built message type, in the catalogue's order (plan §4.7's 13, `SessionControl`, then `SessionStatus`):
++    /// its name, channel, direction and size limit (the Size limit column's leading number; `Snapshot`'s is its
++    /// send-side cap). The type byte on the wire is the row's position, from 1.
++    pub const TYPES: [(&'static str, Channel, Direction, usize); 15] = [
++        ("Input", Channel::Datagram, Direction::ClientToRoom, Limits::INPUT),
++        ("Snapshot", Channel::Datagram, Direction::RoomToClient, Limits::SNAPSHOT),
++        ("FullState", Channel::FullState, Direction::RoomToClient, Limits::FULL_STATE),
++        ("Resync", Channel::Control, Direction::ClientToRoom, Limits::RESYNC),
++        ("Ping", Channel::Datagram, Direction::BothWays, Limits::PING),
++        ("Pong", Channel::Datagram, Direction::BothWays, Limits::PONG),
++        ("Join", Channel::Control, Direction::ClientToRoom, Limits::JOIN),
++        ("JoinAccepted", Channel::Control, Direction::RoomToClient, Limits::JOIN_ACCEPTED),
++        ("JoinRejected", Channel::Control, Direction::RoomToClient, Limits::JOIN_REJECTED),
++        ("ClientSettings", Channel::Control, Direction::ClientToRoom, Limits::CLIENT_SETTINGS),
++        ("RoomEnded", Channel::Control, Direction::RoomToClient, Limits::ROOM_ENDED),
++        ("Leave", Channel::Control, Direction::ClientToRoom, Limits::LEAVE),
++        ("Kick", Channel::Control, Direction::RoomToClient, Limits::KICK),
++        ("SessionControl", Channel::Control, Direction::ClientToRoom, Limits::SESSION_CONTROL),
++        ("SessionStatus", Channel::Control, Direction::RoomToClient, Limits::SESSION_STATUS),
++    ];
++}
+diff --git a/spikes/netcode-proof/crates/proto/src/msg.rs b/spikes/netcode-proof/crates/proto/src/msg.rs
+new file mode 100644
+index 0000000..5016f7a
+--- /dev/null
++++ b/spikes/netcode-proof/crates/proto/src/msg.rs
+@@ -0,0 +1,497 @@
++//! The 15 built message types (plan §4.7: 13, `SessionControl`, and `SessionStatus` by the advisor's A1 ruling), their
++//! framing per channel, and [`encode`] and [`decode`] (catalogue §1, "Framing and channels"; §2's rows).
++//!
++//! **Framing:** a datagram is one message, its 1 B type, then its body. A control-stream message is a 2 B
++//! little-endian length of what follows, then the type, then the body. A full-state stream carries a 4 B length, then
++//! one `FullState` (its type, then its body). Every field is little-endian; packed fields go least significant bit
++//! first (bits.rs), and every pad bit is zero.
++//!
++//! **Decoding, in this order** ([`decode`]): the size against the largest message the receiving end takes on that
++//! channel; the type byte; the size against that type's own limit (so a buffer one byte over is
++//! [`DecodeError::TooLarge`] whatever else it holds: catalogue item 3's size half); a stream's length prefix; the
++//! direction (npt-server decodes only client → room types: a room type from a client is refused as forged); the
++//! channel (catalogue item 2); then the body, which must end exactly at the last byte with every pad and reserved bit
++//! zero (ADR 0001:238: trailing bytes or unknown fields drop the message whole). Nothing is allocated before the size
++//! checks pass, and nothing panics.
++
++use npt_link::Channel;
++
++use crate::bits::{BitReader, BitWriter};
++use crate::control::{SessionControl, SessionStatus};
++use crate::error::{DecodeError, EncodeError};
++use crate::input::Input;
++use crate::limits::Limits;
++use crate::quant::Quant;
++use crate::snapshot::{FullState, Snapshot};
++
++/// Which way a message travels (the catalogue's Direction column). [`decode`] takes the way the bytes came: the
++/// room decodes with `ClientToRoom`, a client with `RoomToClient`, and each refuses a type that never travels that way.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum Direction {
++    ClientToRoom,
++    RoomToClient,
++    /// `Ping` and `Pong`. Passed to [`decode`], it takes these two types alone.
++    BothWays,
++}
++
++/// `Resync`: a joined client that has lost its state asks for a `FullState` (catalogue §2; no body).
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
++pub struct Resync;
++
++/// `Ping`: either end of a joined session, a few times a second (catalogue §2).
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
++pub struct Ping {
++    /// The sender's id for this ping, echoed by its `Pong`.
++    pub id: u8,
++    /// The sender's time when it sent it, in ns on its own clock.
++    pub sent_ns: u64,
++}
++
++/// `Pong`: the answer to a `Ping` (catalogue §2; ADR 0001 part 5).
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
++pub struct Pong {
++    /// The `Ping`'s id.
++    pub id: u8,
++    /// The `Ping`'s `sent_ns`, echoed.
++    pub echo_ns: u64,
++    /// The answering end's tick.
++    pub tick: u32,
++    /// The hold time from the ping's arrival to this answer, in µs (the room counts at most one tick period of it).
++    pub hold_us: u16,
++}
++
++/// `Join`: a connection's first control-stream message (catalogue §2, with its notes on `bind`).
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
++pub struct Join {
++    /// The slot's test token (plan §10.3), compared in constant time by npt-room.
++    pub token: [u8; 16],
++    /// The client's bind value (the catalogue's note on `bind`).
++    pub bind: [u8; 16],
++    /// The protocol version.
++    pub version: u16,
++    /// The content hash: the scene data and the build.
++    pub content_hash: [u8; 32],
++}
++
++/// `JoinAccepted`: the room's answer to an accepted `Join` (catalogue §2).
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
++pub struct JoinAccepted {
++    pub slot: u8,
++    pub team: u8,
++    pub squad: u8,
++    /// The mode id: it names the scene (the catalogue's note).
++    pub mode_id: u16,
++    pub mode_hash: [u8; 32],
++    pub content_hash: [u8; 32],
++    /// The server's tick.
++    pub tick: u32,
++    /// The tick rate, ticks per second.
++    pub tick_hz: u16,
++    /// The snapshot rate, snapshots per second.
++    pub snapshot_hz: u16,
++}
++
++/// `JoinRejected`: why the room refused a `Join` (the catalogue's proposed codes); a code, never the offending bytes.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum JoinRejected {
++    BadToken,
++    BindMismatch,
++    RosterFull,
++    WrongVersion,
++    WrongContentHash,
++}
++
++/// `ClientSettings`: the client's announced interpolation delay, sent when it changes (catalogue §2).
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
++pub struct ClientSettings {
++    /// The delay in 256ths of a snapshot interval (512 is 2 intervals, 1,280 is 5), integers so the float-free room
++    /// clamps it to the mode's range and moves it by at most one interval a second exactly. Any value decodes: the
++    /// room clamps, never refuses.
++    pub delay: u16,
++}
++
++/// Why a room ended (`RoomEnded`'s reason: catalogue §2).
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum EndReason {
++    /// The run reached its end.
++    Ended,
++    /// The operator stopped it.
++    Stopped,
++    /// The tick thread's top-level catch sent it.
++    Crash,
++}
++
++/// `RoomEnded`: sent to every session at the run's end, or with the crash reason (catalogue §2).
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub struct RoomEnded {
++    pub reason: EndReason,
++    /// The room's last tick.
++    pub final_tick: u32,
++}
++
++/// `Leave`: a joined client ends its own session (catalogue §2; reason codes proposed here: the catalogue names none).
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum Leave {
++    /// The player left.
++    Quit,
++    /// The client stops on an error of its own.
++    Error,
++}
++
++/// `Kick`: the room ends a session, then closes it (the catalogue's proposed reasons).
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum Kick {
++    /// A newer `Join` took the slot.
++    Replaced,
++    /// A stream message failed its framing, size or type checks.
++    Malformed,
++    /// The client's event queue overflowed again, or its resync went unacknowledged (u4-build-plan.md §4.7).
++    Overflow,
++    /// The operator stopped the session.
++    Stopped,
++}
++
++/// Every built message, as [`encode`] takes it and [`decode`] returns it.
++#[derive(Clone, Debug, PartialEq)]
++pub enum Message {
++    Input(Input),
++    Snapshot(Snapshot),
++    FullState(FullState),
++    Resync(Resync),
++    Ping(Ping),
++    Pong(Pong),
++    Join(Join),
++    JoinAccepted(JoinAccepted),
++    JoinRejected(JoinRejected),
++    ClientSettings(ClientSettings),
++    RoomEnded(RoomEnded),
++    Leave(Leave),
++    Kick(Kick),
++    SessionControl(SessionControl),
++    SessionStatus(SessionStatus),
++}
++
++impl Message {
++    /// The message's type name, as the catalogue's Type column and [`Limits::TYPES`] give it.
++    pub fn name(&self) -> &'static str {
++        Limits::TYPES[self.ty() - 1].0
++    }
++
++    /// The type byte: the type's position in [`Limits::TYPES`], from 1. An exhaustive match, so a new variant must
++    /// be given its row.
++    fn ty(&self) -> usize {
++        match self {
++            Message::Input(_) => 1,
++            Message::Snapshot(_) => 2,
++            Message::FullState(_) => 3,
++            Message::Resync(_) => 4,
++            Message::Ping(_) => 5,
++            Message::Pong(_) => 6,
++            Message::Join(_) => 7,
++            Message::JoinAccepted(_) => 8,
++            Message::JoinRejected(_) => 9,
++            Message::ClientSettings(_) => 10,
++            Message::RoomEnded(_) => 11,
++            Message::Leave(_) => 12,
++            Message::Kick(_) => 13,
++            Message::SessionControl(_) => 14,
++            Message::SessionStatus(_) => 15,
++        }
++    }
++}
++
++/// The framing bytes before a message's type on `channel`: none, the 2 B length or the 4 B length.
++fn framing(channel: Channel) -> usize {
++    match channel {
++        Channel::Datagram => 0,
++        Channel::Control => 2,
++        Channel::FullState => 4,
++    }
++}
++
++/// Type `t`'s row (t from 1).
++fn row(t: usize) -> (&'static str, Channel, Direction, usize) {
++    Limits::TYPES[t - 1]
++}
++
++/// The most bytes type `t` may have after its framing (its type and body) at the receiving end: its limit, less the
++/// 2 B length a control-stream limit counts; `Snapshot` at its receive limit.
++fn content_limit(t: usize) -> usize {
++    let (name, channel, _, limit) = row(t);
++    let limit = if name == "Snapshot" { Limits::SNAPSHOT_RECEIVE } else { limit };
++    if channel == Channel::Control { limit - 2 } else { limit }
++}
++
++/// Whether type `t` travels the way `way` says.
++fn travels(t: usize, way: Direction) -> bool {
++    let d = row(t).2;
++    d == way || d == Direction::BothWays
++}
++
++/// The largest message, framing included, the end receiving `way` takes on `channel`: the largest of the types that
++/// travel that way on that channel, or, on a channel none of them uses (a client's full-state stream), of every type
++/// that travels that way, framed for that channel.
++pub(crate) fn channel_max(way: Direction, channel: Channel) -> usize {
++    let ways = 1..=Limits::TYPES.len();
++    let on = ways.clone().filter(|&t| travels(t, way) && row(t).1 == channel).map(content_limit).max();
++    let any = ways.filter(|&t| travels(t, way)).map(content_limit).max().unwrap_or(0);
++    framing(channel) + on.unwrap_or(any)
++}
++
++/// Codes `msg` with the wire's [`Quant`], appending its framed bytes to `out` (`Quant::encode` for a chosen one).
++///
++/// # Errors
++/// [`EncodeError`] for a value the wire does not carry; nothing is appended then.
++pub fn encode(msg: &Message, out: &mut Vec<u8>) -> Result<(), EncodeError> {
++    Quant::default().encode(msg, out)
++}
++
++/// Decodes one received message with the wire's [`Quant`]: `way` is the direction the bytes came (`ClientToRoom` at
++/// the room), `channel` the channel they came on, `bytes` the whole message as the link delivered it (the module text
++/// gives the order of the checks).
++///
++/// # Errors
++/// [`DecodeError`] for anything that is not one valid message of a type that travels that way on that channel.
++pub fn decode(way: Direction, channel: Channel, bytes: &[u8]) -> Result<Message, DecodeError> {
++    Quant::default().decode(way, channel, bytes)
++}
++
++impl Quant {
++    /// [`encode`] with this `Quant`'s choices (its packing, and in a bites build its planted defect).
++    ///
++    /// # Errors
++    /// As [`encode`].
++    pub fn encode(self, msg: &Message, out: &mut Vec<u8>) -> Result<(), EncodeError> {
++        let start = out.len();
++        let r = self.encode_into(msg, out);
++        if r.is_err() {
++            out.truncate(start);
++        }
++        r
++    }
++
++    fn encode_into(self, msg: &Message, out: &mut Vec<u8>) -> Result<(), EncodeError> {
++        let start = out.len();
++        let t = msg.ty();
++        let (_, channel, _, _) = row(t);
++        let frame = framing(channel);
++        out.resize(start + frame, 0);
++        out.push(t as u8);
++        {
++            let mut w = BitWriter::new(out);
++            match msg {
++                Message::Input(m) => m.put(self, &mut w)?,
++                Message::Snapshot(m) => m.put(self, &mut w)?,
++                Message::FullState(m) => m.put(self, &mut w)?,
++                Message::Resync(Resync) => {}
++                Message::Ping(m) => {
++                    w.put(u64::from(m.id), 8);
++                    w.put(m.sent_ns, 64);
++                }
++                Message::Pong(m) => {
++                    w.put(u64::from(m.id), 8);
++                    w.put(m.echo_ns, 64);
++                    w.put(u64::from(m.tick), 32);
++                    w.put(u64::from(m.hold_us), 16);
++                }
++                Message::Join(m) => {
++                    w.bytes(&m.token);
++                    w.bytes(&m.bind);
++                    w.put(u64::from(m.version), 16);
++                    w.bytes(&m.content_hash);
++                }
++                Message::JoinAccepted(m) => {
++                    w.put(u64::from(m.slot), 8);
++                    w.put(u64::from(m.team), 8);
++                    w.put(u64::from(m.squad), 8);
++                    w.put(u64::from(m.mode_id), 16);
++                    w.bytes(&m.mode_hash);
++                    w.bytes(&m.content_hash);
++                    w.put(u64::from(m.tick), 32);
++                    w.put(u64::from(m.tick_hz), 16);
++                    w.put(u64::from(m.snapshot_hz), 16);
++                }
++                Message::JoinRejected(m) => w.put(*m as u64, 8),
++                Message::ClientSettings(m) => w.put(u64::from(m.delay), 16),
++                Message::RoomEnded(m) => {
++                    w.put(m.reason as u64, 8);
++                    w.put(u64::from(m.final_tick), 32);
++                }
++                Message::Leave(m) => w.put(*m as u64, 8),
++                Message::Kick(m) => w.put(*m as u64, 8),
++                Message::SessionControl(m) => m.put(&mut w)?,
++                Message::SessionStatus(m) => m.put(&mut w)?,
++            }
++        }
++        let total = out.len() - start;
++        if total - frame > content_limit(t) {
++            return Err(EncodeError::TooLarge);
++        }
++        let length = total - frame;
++        match frame {
++            2 => out[start..start + 2].copy_from_slice(&(length as u16).to_le_bytes()),
++            4 => out[start..start + 4].copy_from_slice(&(length as u32).to_le_bytes()),
++            _ => {}
++        }
++        Ok(())
++    }
++
++    /// [`decode`] with this `Quant`'s choices (in a bites build, its planted defect).
++    ///
++    /// # Errors
++    /// As [`decode`].
++    pub fn decode(self, way: Direction, channel: Channel, bytes: &[u8]) -> Result<Message, DecodeError> {
++        let frame = framing(channel);
++        if bytes.len() > channel_max(way, channel) {
++            return Err(DecodeError::TooLarge);
++        }
++        let code = *bytes.get(frame).ok_or(DecodeError::Truncated)?;
++        let t = usize::from(code);
++        if !(1..=Limits::TYPES.len()).contains(&t) {
++            return Err(DecodeError::UnknownType);
++        }
++        if bytes.len() > frame + content_limit(t) {
++            return Err(DecodeError::TooLarge);
++        }
++        let length = match frame {
++            2 => usize::from(u16::from_le_bytes([bytes[0], bytes[1]])),
++            4 => u32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]) as usize,
++            _ => bytes.len(),
++        };
++        if length != bytes.len() - frame {
++            return Err(DecodeError::BadLength);
++        }
++        if !travels(t, way) {
++            return Err(DecodeError::WrongDirection);
++        }
++        if row(t).1 != channel && self.checks_channel() {
++            return Err(DecodeError::WrongChannel);
++        }
++        let strict = self.strict();
++        let mut r = BitReader::new(&bytes[frame + 1..]);
++        let msg = match t {
++            1 => Message::Input(Input::get(self, &mut r)?),
++            2 => Message::Snapshot(Snapshot::get(self, &mut r)?),
++            3 => Message::FullState(FullState::get(self, &mut r)?),
++            4 => Message::Resync(Resync),
++            5 => Message::Ping(Ping {
++                id: r.u8()?,
++                sent_ns: r.u64()?,
++            }),
++            6 => Message::Pong(Pong {
++                id: r.u8()?,
++                echo_ns: r.u64()?,
++                tick: r.u32()?,
++                hold_us: r.u16()?,
++            }),
++            7 => Message::Join(Join {
++                token: r.array()?,
++                bind: r.array()?,
++                version: r.u16()?,
++                content_hash: r.array()?,
++            }),
++            8 => Message::JoinAccepted(JoinAccepted {
++                slot: r.u8()?,
++                team: r.u8()?,
++                squad: r.u8()?,
++                mode_id: r.u16()?,
++                mode_hash: r.array()?,
++                content_hash: r.array()?,
++                tick: r.u32()?,
++                tick_hz: r.u16()?,
++                snapshot_hz: r.u16()?,
++            }),
++            9 => Message::JoinRejected(match r.u8()? {
++                0 => JoinRejected::BadToken,
++                1 => JoinRejected::BindMismatch,
++                2 => JoinRejected::RosterFull,
++                3 => JoinRejected::WrongVersion,
++                4 => JoinRejected::WrongContentHash,
++                _ => return Err(DecodeError::OutOfRange),
++            }),
++            10 => Message::ClientSettings(ClientSettings { delay: r.u16()? }),
++            11 => {
++                let reason = match r.u8()? {
++                    0 => EndReason::Ended,
++                    1 => EndReason::Stopped,
++                    2 => EndReason::Crash,
++                    _ => return Err(DecodeError::OutOfRange),
++                };
++                Message::RoomEnded(RoomEnded {
++                    reason,
++                    final_tick: r.u32()?,
++                })
++            }
++            12 => Message::Leave(match r.u8()? {
++                0 => Leave::Quit,
++                1 => Leave::Error,
++                _ => return Err(DecodeError::OutOfRange),
++            }),
++            13 => Message::Kick(match r.u8()? {
++                0 => Kick::Replaced,
++                1 => Kick::Malformed,
++                2 => Kick::Overflow,
++                3 => Kick::Stopped,
++                _ => return Err(DecodeError::OutOfRange),
++            }),
++            14 => Message::SessionControl(SessionControl::get(&mut r)?),
++            _ => Message::SessionStatus(SessionStatus::get(&mut r)?),
++        };
++        r.finish(strict)?;
++        Ok(msg)
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn the_type_table_and_the_message_enum_agree_both_ways() {
++        // Every row is a variant's: ty() is an exhaustive match (a new variant does not compile without a row), and
++        // each row's position is the type byte of the variant whose name it carries.
++        let one_of_each = [
++            Message::Input(Input::default()),
++            Message::Snapshot(Snapshot::default()),
++            Message::FullState(FullState::default()),
++            Message::Resync(Resync),
++            Message::Ping(Ping::default()),
++            Message::Pong(Pong::default()),
++            Message::Join(Join::default()),
++            Message::JoinAccepted(JoinAccepted::default()),
++            Message::JoinRejected(JoinRejected::BadToken),
++            Message::ClientSettings(ClientSettings::default()),
++            Message::RoomEnded(RoomEnded {
++                reason: EndReason::Ended,
++                final_tick: 0,
++            }),
++            Message::Leave(Leave::Quit),
++            Message::Kick(Kick::Replaced),
++            Message::SessionControl(SessionControl::TriggerBurst { cap: [0; 16] }),
++            Message::SessionStatus(SessionStatus::default()),
++        ];
++        assert_eq!(one_of_each.len(), Limits::TYPES.len());
++        for (i, m) in one_of_each.iter().enumerate() {
++            assert_eq!(m.ty(), i + 1, "{m:?}");
++            let mut out = Vec::new();
++            encode(m, &mut out).unwrap_or_else(|e| panic!("{}: {e}", m.name()));
++            let (_, channel, way, _) = Limits::TYPES[i];
++            let way = if way == Direction::BothWays { Direction::ClientToRoom } else { way };
++            assert_eq!(decode(way, channel, &out).as_ref(), Ok(m), "{}", m.name());
++        }
++    }
++
++    #[test]
++    fn each_receiving_end_takes_the_largest_message_of_its_way_on_each_channel() {
++        use Direction::*;
++        // The catalogue's numbers: any client datagram above 166 B, any client stream message above 512 B, any
++        // room datagram above 1,150 B; a room stream message above JoinAccepted's 256 B; a full state's 4 B more.
++        assert_eq!(channel_max(ClientToRoom, Channel::Datagram), 166);
++        assert_eq!(channel_max(ClientToRoom, Channel::Control), 512);
++        assert_eq!(channel_max(ClientToRoom, Channel::FullState), 4 + 510);
++        assert_eq!(channel_max(RoomToClient, Channel::Datagram), 1_150);
++        assert_eq!(channel_max(RoomToClient, Channel::Control), 256);
++        assert_eq!(channel_max(RoomToClient, Channel::FullState), 4 + 65_536);
++        assert_eq!(channel_max(BothWays, Channel::Datagram), 32);
++    }
++}
+diff --git a/spikes/netcode-proof/crates/proto/src/quant.rs b/spikes/netcode-proof/crates/proto/src/quant.rs
+new file mode 100644
+index 0000000..5adc796
+--- /dev/null
++++ b/spikes/netcode-proof/crates/proto/src/quant.rs
+@@ -0,0 +1,400 @@
++//! `Quant`: the codec as one caller chose it. It packs each grid integer into its field's width
++//! (u4-build-plan.md §4.4: the grid's integers come from `npt_sim::grid`, one function each way for the sim's own-copy
++//! snap and both codec ends; npt-proto only packs them), and it is the one value through which a caller of
++//! [`Quant::encode`] or [`Quant::decode`] chooses npt-proto's planted defects, per instance and never through a static
++//! (u4-build-plan.md §4.11). In a measured build every `Quant` is the wire's, `Quant::default()`.
++//!
++//! **A field's code** is its integer in the field's [`Field::bits`], read from the field's own `min()`, `max()` and
++//! `bits()` and never from a copy (u4s-carries.md carry 1): two's complement when the field has negative integers and
++//! they fit (positions, yaw, pitch, velocity, a tick by its u32 bits), plain binary when it has none and they fit
++//! (height, flag bits), and the offset from `min()` otherwise (an integer field such as `Field::integer(100, 101)`).
++//! A code that is no integer of its field is refused on decode, never clamped: pitch's 10-bit code -512
++//! (`grid::PITCH` is -511 to 511) is [`DecodeError::OutOfRange`] (u4s-carries.md carry 4).
++//!
++//! **The planted defects** (bites builds only; `BITES` names each, and no other crate names these ids:
++//! u4-build-plan.md §4.14):
++//! - PM-0001-57's three, as integer coarsening of the grid integer before it is packed (u4s-carries.md carry 2): to
++//!   the nearest multiple of the coarse step in integers (a tie away from zero, as the grid rounds), inside the
++//!   field's range; `pos-4cm` every 4th integer of `POSITION_XY` and `POSITION_Z` (errors up to 2 cm),
++//!   `yaw-12bit` every 16th of `YAW` (0.088 degree steps, wrapping around the turn), `pitch-8bit` every 4th of
++//!   `PITCH` (0.70 degree steps). Every other field, `VELOCITY` included (one range with `POSITION_XY`, another kind),
++//!   is untouched. At a non-wrapping field's end, where the nearest multiple lies outside the range, the coarse value
++//!   is the nearest multiple inside it (`POSITION_XY`'s 32,767 codes as 32,764).
++//! - PM-0001-17/tick16 and PM-0001-58/tick16: the snapshot header's writer keeps only the tick's low 16 bits.
++//! - PM-0001-21/no-trailing: the decoder accepts bytes after the last field and set reserved or pad bits.
++//! - PM-0001-21/no-channel: the decoder accepts a message on a channel its type does not travel on.
++
++use npt_sim::grid::Field;
++
++use crate::bits::{BitReader, BitWriter};
++use crate::error::{DecodeError, EncodeError};
++
++/// The bite ids npt-proto plants (bites builds only), each chosen through [`Quant::with_bite`].
++#[cfg(feature = "bites")]
++pub const BITES: [&str; 7] = [
++    "PM-0001-57/pos-4cm",
++    "PM-0001-57/yaw-12bit",
++    "PM-0001-57/pitch-8bit",
++    "PM-0001-17/tick16",
++    "PM-0001-58/tick16",
++    "PM-0001-21/no-trailing",
++    "PM-0001-21/no-channel",
++];
++
++#[cfg(feature = "bites")]
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++enum Bite {
++    Pos4cm,
++    Yaw12bit,
++    Pitch8bit,
++    Tick16,
++    NoTrailing,
++    NoChannel,
++}
++
++/// The codec as one caller chose it: in a measured build always the wire's; in a bites build it may carry one of
++/// npt-proto's planted defects (`BITES`) for that caller alone (the module text).
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
++pub struct Quant {
++    #[cfg(feature = "bites")]
++    bite: Option<Bite>,
++}
++
++/// How a field's integers become its code (the module text).
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++enum Coding {
++    Unsigned,
++    Signed,
++    Offset,
++}
++
++fn coding(field: Field) -> Coding {
++    let top = 1i64 << field.bits();
++    let (min, max) = (i64::from(field.min()), i64::from(field.max()));
++    if min >= 0 && max < top {
++        Coding::Unsigned
++    } else if min >= -(top / 2) && max < top / 2 {
++        Coding::Signed
++    } else {
++        Coding::Offset
++    }
++}
++
++/// The field's `bits()` low bits set.
++fn mask(field: Field) -> u64 {
++    (1u64 << field.bits()) - 1
++}
++
++/// The multiple of `s` nearest `k`, a tie away from zero (the grid's tie rule: npt_sim::grid).
++fn nearest_multiple(k: i64, s: i64) -> i64 {
++    let q = if k >= 0 { (k + s / 2) / s } else { -((-k + s / 2) / s) };
++    q * s
++}
++
++impl Quant {
++    /// The `Quant` that plants `bite`, one of [`BITES`] (bites builds only); `None` for an id npt-proto does not
++    /// plant.
++    #[cfg(feature = "bites")]
++    pub fn with_bite(bite: &str) -> Option<Quant> {
++        let b = match bite {
++            "PM-0001-57/pos-4cm" => Bite::Pos4cm,
++            "PM-0001-57/yaw-12bit" => Bite::Yaw12bit,
++            "PM-0001-57/pitch-8bit" => Bite::Pitch8bit,
++            "PM-0001-17/tick16" | "PM-0001-58/tick16" => Bite::Tick16,
++            "PM-0001-21/no-trailing" => Bite::NoTrailing,
++            "PM-0001-21/no-channel" => Bite::NoChannel,
++            _ => return None,
++        };
++        Some(Quant { bite: Some(b) })
++    }
++
++    /// Whether the decoder refuses trailing bytes and set reserved or pad bits (always, but under no-trailing).
++    pub(crate) fn strict(self) -> bool {
++        #[cfg(feature = "bites")]
++        if self.bite == Some(Bite::NoTrailing) {
++            return false;
++        }
++        true
++    }
++
++    /// Whether the decoder refuses a message on the wrong channel (always, but under no-channel).
++    pub(crate) fn checks_channel(self) -> bool {
++        #[cfg(feature = "bites")]
++        if self.bite == Some(Bite::NoChannel) {
++            return false;
++        }
++        true
++    }
++
++    /// The tick the snapshot header's writer writes: the tick itself, or under tick16 its low 16 bits.
++    pub(crate) fn header_tick(self, tick: u32) -> u32 {
++        #[cfg(feature = "bites")]
++        if self.bite == Some(Bite::Tick16) {
++            return tick & 0xffff;
++        }
++        tick
++    }
++
++    /// The coarse step this `Quant` applies to `field`'s integers before packing: 1 (none) but under -57's bites.
++    fn step(self, field: Field) -> i64 {
++        #[cfg(feature = "bites")]
++        {
++            use npt_sim::grid::{PITCH, POSITION_XY, POSITION_Z, YAW};
++            match self.bite {
++                Some(Bite::Pos4cm) if field == POSITION_XY || field == POSITION_Z => return 4,
++                Some(Bite::Yaw12bit) if field == YAW => return 16,
++                Some(Bite::Pitch8bit) if field == PITCH => return 4,
++                _ => {}
++            }
++        }
++        let _ = field;
++        1
++    }
++
++    /// The integer this `Quant` sends for `k`, an integer of `field`: `k` itself, or under -57's bites the nearest
++    /// multiple of the coarse step inside the field's range (the module text).
++    pub(crate) fn coarse(self, field: Field, k: i32) -> i32 {
++        let s = self.step(field);
++        if s == 1 {
++            return k;
++        }
++        let (min, max) = (i64::from(field.min()), i64::from(field.max()));
++        let mut c = nearest_multiple(i64::from(k), s);
++        if field.wraps() {
++            c = (c - min).rem_euclid(max - min + 1) + min;
++        } else {
++            if c > max {
++                c -= s;
++            }
++            if c < min {
++                c += s;
++            }
++        }
++        c as i32
++    }
++
++    /// `field`'s code for its integer `k` (after this `Quant`'s coarsening): [`EncodeError::OutOfRange`] for an
++    /// integer the field does not hold.
++    pub(crate) fn code(self, field: Field, k: i32) -> Result<u64, EncodeError> {
++        if k < field.min() || k > field.max() {
++            return Err(EncodeError::OutOfRange);
++        }
++        let k = i64::from(self.coarse(field, k));
++        let code = match coding(field) {
++            Coding::Unsigned => k,
++            Coding::Signed => k & mask(field) as i64,
++            Coding::Offset => k - i64::from(field.min()),
++        };
++        Ok(code as u64)
++    }
++
++    /// The integer `field`'s code `code` (its low `bits()` bits) stands for: [`DecodeError::OutOfRange`] for a code
++    /// that is no integer of the field, such as pitch's -512, never a clamp.
++    pub(crate) fn value(self, field: Field, code: u64) -> Result<i32, DecodeError> {
++        let code = code & mask(field);
++        let bits = field.bits();
++        let k = match coding(field) {
++            Coding::Unsigned => code as i64,
++            Coding::Signed => {
++                let sign = 1u64 << (bits - 1);
++                if code & sign != 0 {
++                    code as i64 - (1i64 << bits)
++                } else {
++                    code as i64
++                }
++            }
++            Coding::Offset => code as i64 + i64::from(field.min()),
++        };
++        if k < i64::from(field.min()) || k > i64::from(field.max()) {
++            return Err(DecodeError::OutOfRange);
++        }
++        Ok(k as i32)
++    }
++
++    /// Writes `k`, an integer of `field`, in the field's width.
++    pub(crate) fn put(self, w: &mut BitWriter<'_>, field: Field, k: i32) -> Result<(), EncodeError> {
++        let code = self.code(field, k)?;
++        w.put(code, field.bits());
++        Ok(())
++    }
++
++    /// Reads one integer of `field`.
++    pub(crate) fn get(self, r: &mut BitReader<'_>, field: Field) -> Result<i32, DecodeError> {
++        let code = r.get(field.bits())?;
++        self.value(field, code)
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use npt_sim::grid::{PITCH, POSITION_XY, POSITION_Z, VELOCITY, YAW};
++
++    const FIELDS: [(&str, Field); 5] = [
++        ("POSITION_XY", POSITION_XY),
++        ("POSITION_Z", POSITION_Z),
++        ("YAW", YAW),
++        ("PITCH", PITCH),
++        ("VELOCITY", VELOCITY),
++    ];
++
++    /// Every integer of `field`, packed and read back in its width.
++    fn round_trip(q: Quant, field: Field, k: i32) -> i32 {
++        let mut out = Vec::new();
++        let mut w = BitWriter::new(&mut out);
++        q.put(&mut w, field, k).expect("an integer of the field");
++        assert_eq!(out.len(), (field.bits() as usize).div_ceil(8));
++        q.get(&mut BitReader::new(&out), field).expect("its own code")
++    }
++
++    #[test]
++    fn a4_each_packed_width_holds_its_range_ends_and_every_integer_between() {
++        let q = Quant::default();
++        for (name, f) in FIELDS {
++            // The widths the plan states (u4-build-plan.md §4.4: position 16/16/12 bits, yaw 16, pitch 10; velocity
++            // 1 cm/s in 16, a given from npt-sim: u4s-carries.md carry 1).
++            let want = match name {
++                "POSITION_Z" => 12,
++                "PITCH" => 10,
++                _ => 16,
++            };
++            assert_eq!(f.bits(), want, "{name}");
++            for k in f.min()..=f.max() {
++                assert_eq!(round_trip(q, f, k), k, "{name}: {k}");
++            }
++            // The ends code as the width's own extremes or inside them, and one past an end is refused.
++            assert_eq!(q.code(f, f.min() - 1), Err(EncodeError::OutOfRange), "{name}");
++            assert_eq!(q.code(f, f.max().saturating_add(1)), Err(EncodeError::OutOfRange), "{name}");
++        }
++        // The codes at the ends: XY, yaw and velocity two's complement in 16 bits, Z plain in 12, pitch in 10.
++        assert_eq!(q.code(POSITION_XY, -32_768), Ok(0x8000));
++        assert_eq!(q.code(POSITION_XY, 32_767), Ok(0x7fff));
++        assert_eq!(q.code(POSITION_Z, 4_095), Ok(0xfff));
++        assert_eq!(q.code(PITCH, -511), Ok(0x201));
++        assert_eq!(q.code(PITCH, 511), Ok(0x1ff));
++        // Integer fields of every shape: a tick by its u32 bits, flag bits, and one whose integers need the offset.
++        for f in [
++            Field::integer(i32::MIN, i32::MAX),
++            Field::integer(0, 255),
++            Field::integer(0, 1),
++            Field::integer(100, 101),
++            Field::integer(-1, 300),
++        ] {
++            for k in [f.min(), f.min() + 1, f.max() - 1, f.max()] {
++                assert_eq!(round_trip(q, f, k), k, "{f:?}: {k}");
++            }
++        }
++        assert_eq!(q.code(Field::integer(i32::MIN, i32::MAX), -1), Ok(0xffff_ffff));
++        assert_eq!(q.code(Field::integer(100, 101), 101), Ok(1));
++    }
++
++    #[test]
++    fn the_pitch_code_minus_512_is_a_decode_error_never_a_panic_or_a_clamp() {
++        // u4s-carries.md carry 4: grid::PITCH is -511..=511, so the 10-bit code -512 (0x200) is no pitch.
++        let q = Quant::default();
++        assert_eq!(q.value(PITCH, 0x200), Err(DecodeError::OutOfRange));
++        assert_eq!(q.get(&mut BitReader::new(&[0x00, 0x02]), PITCH), Err(DecodeError::OutOfRange));
++        // Its neighbours are the two ends.
++        assert_eq!(q.value(PITCH, 0x201), Ok(-511));
++        assert_eq!(q.value(PITCH, 0x1ff), Ok(511));
++        // Every other field's unused codes are refused the same way: Z holds every 12-bit code, and an offset field
++        // its span only.
++        assert_eq!(q.value(Field::integer(100, 102), 3), Err(DecodeError::OutOfRange));
++        assert_eq!(q.value(Field::integer(-1, 300), 302), Err(DecodeError::OutOfRange));
++    }
++
++    /// The worst error of `q`'s coarsening of `field` over its integers, as (the worst over the integers whose
++    /// nearest multiple lies inside the range, or every integer when the field wraps, measured around the turn; the
++    /// worst at the range's own ends).
++    #[cfg(feature = "bites")]
++    fn worst(q: Quant, field: Field, step: i64) -> (i64, i64) {
++        let span = i64::from(field.max()) - i64::from(field.min()) + 1;
++        let (mut inside, mut ends) = (0i64, 0i64);
++        for k in field.min()..=field.max() {
++            let c = q.coarse(field, k);
++            assert!((field.min()..=field.max()).contains(&c), "{field:?}: {k} → {c}");
++            assert_eq!(c.rem_euclid(step as i32), 0, "{field:?}: {k} → {c}, not a multiple of {step}");
++            // It decodes as itself: the coarse integer is what the client gets.
++            assert_eq!(round_trip(q, field, k), c);
++            let mut e = (i64::from(c) - i64::from(k)).abs();
++            if field.wraps() {
++                e = e.min(span - e);
++            }
++            let nearest = nearest_multiple(i64::from(k), step);
++            let nearest_outside = !field.wraps()
++                && (nearest > i64::from(field.max()) || nearest < i64::from(field.min()));
++            if nearest_outside {
++                ends = ends.max(e);
++            } else {
++                inside = inside.max(e);
++            }
++        }
++        (inside, ends)
++    }
++
++    #[cfg(feature = "bites")]
++    #[test]
++    fn a4_pm_0001_57s_three_bites_coarsen_their_fields_alone_by_half_the_coarse_step() {
++        for (id, fields, step) in [
++            ("PM-0001-57/pos-4cm", &[POSITION_XY, POSITION_Z][..], 4i64),
++            ("PM-0001-57/yaw-12bit", &[YAW][..], 16),
++            ("PM-0001-57/pitch-8bit", &[PITCH][..], 4),
++        ] {
++            let q = Quant::with_bite(id).expect("npt-proto plants it");
++            for &f in fields {
++                let (inside, ends) = worst(q, f, step);
++                // Within half the coarse step, and above half the step less one: the defect is really there.
++                assert!(inside <= step / 2 && inside > step / 2 - 1, "{id} on {f:?}: worst {inside}");
++                // At a non-wrapping field's ends the nearest multiple inside the range is less than one step off.
++                assert!(ends < step, "{id} on {f:?}: at the ends {ends}");
++                // The range ends themselves.
++                for k in [f.min(), f.max()] {
++                    let c = q.coarse(f, k);
++                    assert!((f.min()..=f.max()).contains(&c), "{id}: {k} → {c}");
++                }
++            }
++            // Every other field is untouched, VELOCITY included (POSITION_XY's range, another kind).
++            for (name, f) in FIELDS {
++                if fields.contains(&f) {
++                    continue;
++                }
++                for k in [f.min(), -3, -2, -1, 0, 1, 2, 3, 5, 7, f.max()] {
++                    if (f.min()..=f.max()).contains(&k) {
++                        assert_eq!(q.coarse(f, k), k, "{id} touched {name} at {k}");
++                    }
++                }
++            }
++        }
++        // The pinned ends: 32,767 to 32,764 (the nearest multiple of 4 inside), 4,095 to 4,092, pitch ±511 to ±508,
++        // yaw 32,767 around the turn to -32,768 (one step of 16 off, wrapped: an error of 1).
++        let pos = Quant::with_bite("PM-0001-57/pos-4cm").expect("planted");
++        assert_eq!(pos.coarse(POSITION_XY, 32_767), 32_764);
++        assert_eq!(pos.coarse(POSITION_XY, -32_768), -32_768);
++        assert_eq!(pos.coarse(POSITION_XY, 2), 4);
++        assert_eq!(pos.coarse(POSITION_XY, -2), -4);
++        assert_eq!(pos.coarse(POSITION_Z, 4_095), 4_092);
++        let yaw = Quant::with_bite("PM-0001-57/yaw-12bit").expect("planted");
++        assert_eq!(yaw.coarse(YAW, 32_767), -32_768);
++        assert_eq!(yaw.coarse(YAW, 8), 16);
++        let pitch = Quant::with_bite("PM-0001-57/pitch-8bit").expect("planted");
++        assert_eq!(pitch.coarse(PITCH, 511), 508);
++        assert_eq!(pitch.coarse(PITCH, -511), -508);
++    }
++
++    #[cfg(feature = "bites")]
++    #[test]
++    fn npt_proto_plants_its_seven_ids_and_no_other_sites_id() {
++        for id in BITES {
++            assert!(Quant::with_bite(id).is_some(), "{id}");
++            assert_ne!(Quant::with_bite(id), Some(Quant::default()), "{id}");
++        }
++        for other in [
++            "PM-0001-17/client-rounding",
++            "PM-0001-41/server-quant-differs",
++            "PM-0001-58/lt-cmd-seq",
++            "PM-0001-57/no-such-bite",
++        ] {
++            assert!(Quant::with_bite(other).is_none(), "{other}");
++        }
++    }
++}
+diff --git a/spikes/netcode-proof/crates/proto/src/snapshot.rs b/spikes/netcode-proof/crates/proto/src/snapshot.rs
+new file mode 100644
+index 0000000..b44c608
+--- /dev/null
++++ b/spikes/netcode-proof/crates/proto/src/snapshot.rs
+@@ -0,0 +1,609 @@
++//! `Snapshot` and `FullState`: the room's view of the world for one client, the field-group layout table, and the
++//! `EntityRecord` ↔ wire mapping (u4-build-plan.md §4.4, §4.5; catalogue §3).
++//!
++//! **One layout, from npt-sim:** every entity kind's fields are `EntityKind::layout()`'s, in its order, read each time
++//! and never copied (u4s-carries.md carry 1), for every kind in `EntityKind::ALL`; each field is packed by [`Quant`]
++//! in its own width, so every size here follows from the layout. U4d completes the lists in wave 1 and nothing here
++//! changes.
++//!
++//! **A snapshot** goes out as one or more groups that each decode alone, all against one baseline: the header carries
++//! the full 32-bit tick, the baseline as its age in ticks (0: coded against the per-type defaults, so every entity
++//! comes whole), the newest command received and the last command run (16-bit sequences), and the group's index and
++//! the group count, so the client knows when a tick is complete (§4.5, §4.6). The body holds the group's own-state
++//! records, its spatial records and its events.
++//!
++//! **The wire, in bits** (least significant first; every pad and reserved bit zero):
++//! - header (bytes, after the type): tick 32, baseline age 16, newest command received 16, last command run 16,
++//!   flags 8 (bit 0: the newest command is known; bit 1: the last command run is known), group 8 (bits 0-2 the
++//!   index, bits 3-5 the count less one);
++//! - body: own-state count 8, entity count 16, event count 8, then each own-state delta, each entity delta and each
++//!   event;
++//! - an entity delta: its kind (3 bits: its position in `EntityKind::ALL`), its index 16, its operation 2 (0 add,
++//!   1 update, 2 remove), then for an add its generation 16 and every layout field, for an update a mask of one bit
++//!   per layout field and each changed field, for a removal nothing;
++//! - an event: its number's low 16 bits, its age in ticks 8 (how long before the header's tick it happened), its kind
++//!   2 (0 shot, 1 hit, 2 kill), then its fields (slots 8, sequences 16, damage 16).
++//!
++//! `FullState`'s header (after the type): tick 32, last command run 16, flags 8 (bit 0: it is known); its body:
++//! own-state count 8, entity count 16, then each record whole (kind, index, generation, every layout field). It has
++//! no baseline and no event section (catalogue §3; Q8).
++
++use npt_sim::{EntityKind, EntityRecord, SimEvent};
++
++use crate::bits::{BitReader, BitWriter};
++use crate::error::{DecodeError, EncodeError};
++use crate::limits::Limits;
++use crate::quant::Quant;
++
++/// A field group's visibility class (the catalogue's §1 vocabulary, less `authority-only`: such a group is never
++/// written, so it has no layout entry).
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum Class {
++    /// Only the slot's own client.
++    Owner,
++    /// Only clients on that team.
++    Team,
++    /// Only clients whose relevance region holds it and whose area connects to it, or whose event test it passes.
++    Spatial,
++    /// Every client.
++    Public,
++}
++
++/// One entity's change against the baseline the snapshot is coded against: the `EntityRecord` ↔ wire mapping
++/// (u4-build-plan.md §4.4, A18). A record's `area` and `raw` are the room's and never sent: a record from the wire has
++/// them 0.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum EntityDelta {
++    /// The entity whole: it enters the client's set, comes back with a new generation (a removal and an addition: ADR
++    /// 0001 part 6), or the snapshot is coded against the defaults.
++    Add(EntityRecord),
++    /// The fields of an entity the baseline holds that changed: bit `i` of `changed` for the kind's layout field `i`,
++    /// whose new integer is `grid[i]`; every other entry is 0.
++    Update {
++        kind: EntityKind,
++        index: u16,
++        changed: u16,
++        grid: [i32; EntityRecord::FIELDS],
++    },
++    /// The entity left the client's set.
++    Remove { kind: EntityKind, index: u16 },
++}
++
++// One mask bit per layout field.
++const _: () = assert!(EntityRecord::FIELDS <= u16::BITS as usize);
++
++impl EntityDelta {
++    /// What the wire sends for `now` against `baseline`, the client's record of the same entity (by kind and index)
++    /// in the baseline frame: `None` when nothing changed. A missing baseline record, or one of another generation, is
++    /// an [`EntityDelta::Add`].
++    pub fn between(now: &EntityRecord, baseline: Option<&EntityRecord>) -> Option<EntityDelta> {
++        match baseline {
++            Some(b) if b.kind == now.kind && b.index == now.index && b.generation == now.generation => {
++                let mut changed = 0u16;
++                let mut grid = [0; EntityRecord::FIELDS];
++                for i in 0..now.kind.layout().len() {
++                    if now.grid[i] != b.grid[i] {
++                        changed |= 1 << i;
++                        grid[i] = now.grid[i];
++                    }
++                }
++                (changed != 0).then_some(EntityDelta::Update {
++                    kind: now.kind,
++                    index: now.index,
++                    changed,
++                    grid,
++                })
++            }
++            _ => Some(EntityDelta::Add(wire_record(now))),
++        }
++    }
++
++    /// The entity's record after this delta, from `baseline`, the client's record of it in the baseline frame:
++    /// `None` after a removal.
++    ///
++    /// # Errors
++    /// [`DecodeError::Malformed`] for an update whose baseline record is missing or another entity's.
++    pub fn apply(&self, baseline: Option<&EntityRecord>) -> Result<Option<EntityRecord>, DecodeError> {
++        match *self {
++            EntityDelta::Add(r) => Ok(Some(wire_record(&r))),
++            EntityDelta::Update {
++                kind,
++                index,
++                changed,
++                grid,
++            } => {
++                let b = baseline
++                    .filter(|b| b.kind == kind && b.index == index)
++                    .ok_or(DecodeError::Malformed)?;
++                let mut r = wire_record(b);
++                for (i, g) in grid.iter().enumerate().take(kind.layout().len()) {
++                    if changed & (1 << i) != 0 {
++                        r.grid[i] = *g;
++                    }
++                }
++                Ok(Some(r))
++            }
++            EntityDelta::Remove { .. } => Ok(None),
++        }
++    }
++
++    /// The entity this delta is about: its kind and index.
++    pub fn id(&self) -> (EntityKind, u16) {
++        match *self {
++            EntityDelta::Add(r) => (r.kind, r.index),
++            EntityDelta::Update { kind, index, .. } | EntityDelta::Remove { kind, index } => (kind, index),
++        }
++    }
++}
++
++/// `r` as the wire carries it: `area` and `raw` 0, and every `grid` entry past its kind's layout 0.
++fn wire_record(r: &EntityRecord) -> EntityRecord {
++    let mut out = EntityRecord {
++        area: 0,
++        raw: [0; EntityRecord::FIELDS],
++        grid: [0; EntityRecord::FIELDS],
++        ..*r
++    };
++    let n = r.kind.layout().len();
++    out.grid[..n].copy_from_slice(&r.grid[..n]);
++    out
++}
++
++/// Bits of an entity's kind on the wire: enough for every position in `EntityKind::ALL`.
++const KIND_BITS: u32 = usize::BITS - (EntityKind::ALL.len() - 1).leading_zeros();
++
++fn put_kind(w: &mut BitWriter<'_>, kind: EntityKind) {
++    let code = EntityKind::ALL.iter().position(|k| *k == kind).unwrap_or(0);
++    w.put(code as u64, KIND_BITS);
++}
++
++fn get_kind(r: &mut BitReader<'_>) -> Result<EntityKind, DecodeError> {
++    let code = r.get(KIND_BITS)?;
++    EntityKind::ALL.get(code as usize).copied().ok_or(DecodeError::OutOfRange)
++}
++
++/// A record's every layout field, each in its width; an entry past the layout must be 0.
++fn put_fields(q: Quant, w: &mut BitWriter<'_>, r: &EntityRecord) -> Result<(), EncodeError> {
++    let layout = r.kind.layout();
++    if r.grid[layout.len()..].iter().any(|&g| g != 0) {
++        return Err(EncodeError::NotCanonical);
++    }
++    for (f, &k) in layout.iter().zip(&r.grid) {
++        q.put(w, *f, k)?;
++    }
++    Ok(())
++}
++
++fn get_fields(q: Quant, r: &mut BitReader<'_>, kind: EntityKind) -> Result<[i32; EntityRecord::FIELDS], DecodeError> {
++    let mut grid = [0; EntityRecord::FIELDS];
++    for (f, g) in kind.layout().iter().zip(&mut grid) {
++        *g = q.get(r, *f)?;
++    }
++    Ok(grid)
++}
++
++/// A whole record: kind, index, generation, every layout field.
++fn put_record(q: Quant, w: &mut BitWriter<'_>, r: &EntityRecord) -> Result<(), EncodeError> {
++    put_kind(w, r.kind);
++    w.put(u64::from(r.index), 16);
++    w.put(u64::from(r.generation), 16);
++    put_fields(q, w, r)
++}
++
++fn get_record(q: Quant, r: &mut BitReader<'_>) -> Result<EntityRecord, DecodeError> {
++    let kind = get_kind(r)?;
++    let index = r.u16()?;
++    let generation = r.u16()?;
++    let grid = get_fields(q, r, kind)?;
++    Ok(EntityRecord {
++        kind,
++        index,
++        generation,
++        area: 0,
++        grid,
++        raw: [0; EntityRecord::FIELDS],
++    })
++}
++
++const ADD: u64 = 0;
++const UPDATE: u64 = 1;
++const REMOVE: u64 = 2;
++
++fn put_delta(q: Quant, w: &mut BitWriter<'_>, d: &EntityDelta, coded_from_defaults: bool) -> Result<(), EncodeError> {
++    match d {
++        EntityDelta::Add(rec) => {
++            put_kind(w, rec.kind);
++            w.put(u64::from(rec.index), 16);
++            w.put(ADD, 2);
++            w.put(u64::from(rec.generation), 16);
++            put_fields(q, w, rec)
++        }
++        EntityDelta::Update {
++            kind,
++            index,
++            changed,
++            grid,
++        } => {
++            let n = kind.layout().len();
++            let all = (1u32 << n) - 1;
++            if coded_from_defaults || *changed == 0 || u32::from(*changed) & !all != 0 {
++                return Err(EncodeError::NotCanonical);
++            }
++            if grid.iter().enumerate().any(|(i, &g)| changed & (1 << i) == 0 && g != 0) {
++                return Err(EncodeError::NotCanonical);
++            }
++            put_kind(w, *kind);
++            w.put(u64::from(*index), 16);
++            w.put(UPDATE, 2);
++            w.put(u64::from(*changed), n as u32);
++            for (i, f) in kind.layout().iter().enumerate() {
++                if changed & (1 << i) != 0 {
++                    q.put(w, *f, grid[i])?;
++                }
++            }
++            Ok(())
++        }
++        EntityDelta::Remove { kind, index } => {
++            if coded_from_defaults {
++                return Err(EncodeError::NotCanonical);
++            }
++            put_kind(w, *kind);
++            w.put(u64::from(*index), 16);
++            w.put(REMOVE, 2);
++            Ok(())
++        }
++    }
++}
++
++fn get_delta(q: Quant, r: &mut BitReader<'_>, coded_from_defaults: bool) -> Result<EntityDelta, DecodeError> {
++    let kind = get_kind(r)?;
++    let index = r.u16()?;
++    let op = r.get(2)?;
++    let d = match op {
++        ADD => {
++            let generation = r.u16()?;
++            let grid = get_fields(q, r, kind)?;
++            EntityDelta::Add(EntityRecord {
++                kind,
++                index,
++                generation,
++                area: 0,
++                grid,
++                raw: [0; EntityRecord::FIELDS],
++            })
++        }
++        UPDATE => {
++            let layout = kind.layout();
++            // A kind with no fields has no update: its mask would be empty.
++            if layout.is_empty() {
++                return Err(DecodeError::Malformed);
++            }
++            let changed = r.get(layout.len() as u32)? as u16;
++            if changed == 0 {
++                return Err(DecodeError::Malformed);
++            }
++            let mut grid = [0; EntityRecord::FIELDS];
++            for (i, f) in layout.iter().enumerate() {
++                if changed & (1 << i) != 0 {
++                    grid[i] = q.get(r, *f)?;
++                }
++            }
++            EntityDelta::Update {
++                kind,
++                index,
++                changed,
++                grid,
++            }
++        }
++        REMOVE => EntityDelta::Remove { kind, index },
++        _ => return Err(DecodeError::OutOfRange),
++    };
++    if coded_from_defaults && !matches!(d, EntityDelta::Add(_)) {
++        return Err(DecodeError::Malformed);
++    }
++    Ok(d)
++}
++
++fn put_event(w: &mut BitWriter<'_>, (number, age, event): &(u16, u8, SimEvent)) {
++    w.put(u64::from(*number), 16);
++    w.put(u64::from(*age), 8);
++    match *event {
++        SimEvent::Shot { slot, seq } => {
++            w.put(0, 2);
++            w.put(u64::from(slot), 8);
++            w.put(u64::from(seq), 16);
++        }
++        SimEvent::Hit {
++            shooter,
++            seq,
++            victim,
++            damage,
++        } => {
++            w.put(1, 2);
++            w.put(u64::from(shooter), 8);
++            w.put(u64::from(seq), 16);
++            w.put(u64::from(victim), 8);
++            w.put(u64::from(damage), 16);
++        }
++        SimEvent::Kill { killer, victim } => {
++            w.put(2, 2);
++            w.put(u64::from(killer), 8);
++            w.put(u64::from(victim), 8);
++        }
++    }
++}
++
++fn get_event(r: &mut BitReader<'_>) -> Result<(u16, u8, SimEvent), DecodeError> {
++    let number = r.u16()?;
++    let age = r.u8()?;
++    let event = match r.get(2)? {
++        0 => SimEvent::Shot {
++            slot: r.u8()?,
++            seq: r.u16()?,
++        },
++        1 => SimEvent::Hit {
++            shooter: r.u8()?,
++            seq: r.u16()?,
++            victim: r.u8()?,
++            damage: r.u16()?,
++        },
++        2 => SimEvent::Kill {
++            killer: r.u8()?,
++            victim: r.u8()?,
++        },
++        _ => return Err(DecodeError::OutOfRange),
++    };
++    Ok((number, age, event))
++}
++
++/// One group of one tick's snapshot for one client (the module text). Its `Default` is an empty single group at
++/// tick 0.
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub struct Snapshot {
++    /// The server tick, all 32 bits.
++    pub tick: u32,
++    /// The baseline's age, `tick` less the baseline's tick; 0: coded against the per-type defaults, every entity an
++    /// [`EntityDelta::Add`].
++    pub baseline_age: u16,
++    /// The newest command received from this client, which ends its repeats (`None` before the first).
++    pub newest_received: Option<u16>,
++    /// The last command run, where the client's replay starts (`None` before the first).
++    pub last_run: Option<u16>,
++    /// This group's index, below `groups`.
++    pub group: u8,
++    /// How many groups this tick's snapshot has, 1 to [`Limits::GROUPS`].
++    pub groups: u8,
++    /// The own-state section's deltas: the client's own soldier and its effect rows.
++    pub own: Vec<EntityDelta>,
++    /// The spatial records' deltas.
++    pub entities: Vec<EntityDelta>,
++    /// The event section: each event's number (low 16 bits), its age in ticks before `tick`, and the event.
++    pub events: Vec<(u16, u8, SimEvent)>,
++}
++
++impl Default for Snapshot {
++    fn default() -> Snapshot {
++        Snapshot {
++            tick: 0,
++            baseline_age: 0,
++            newest_received: None,
++            last_run: None,
++            group: 0,
++            groups: 1,
++            own: Vec::new(),
++            entities: Vec::new(),
++            events: Vec::new(),
++        }
++    }
++}
++
++impl Snapshot {
++    /// The field groups a snapshot's encoder writes, in the catalogue's order (§3's `Snapshot` rows less the
++    /// authority-only three, which have no entry): each group's name as the catalogue gives it, its class, and the
++    /// entity kinds whose records it carries (each kind's fields are its `EntityKind::layout()`). The own-state group
++    /// carries the client's own soldier and its effect rows.
++    pub const GROUPS: [(&'static str, Class, &'static [EntityKind]); 12] = [
++        ("header: server tick", Class::Public, &[]),
++        ("header: baseline and acknowledgements", Class::Owner, &[]),
++        ("own state", Class::Owner, &[EntityKind::Soldier, EntityKind::Effect]),
++        ("remote soldiers", Class::Spatial, &[EntityKind::Soldier]),
++        ("vehicles", Class::Spatial, &[EntityKind::Vehicle, EntityKind::VehiclePart]),
++        ("projectiles", Class::Spatial, &[EntityKind::Projectile]),
++        ("world pieces", Class::Spatial, &[EntityKind::Door, EntityKind::Wall]),
++        ("gameplay events", Class::Spatial, &[]),
++        ("hit confirmation", Class::Owner, &[]),
++        ("cosmetic events", Class::Spatial, &[]),
++        ("team section", Class::Team, &[]),
++        ("public section", Class::Public, &[]),
++    ];
++
++    pub(crate) fn put(&self, q: Quant, w: &mut BitWriter<'_>) -> Result<(), EncodeError> {
++        if usize::from(self.groups) > Limits::GROUPS {
++            return Err(EncodeError::TooMany);
++        }
++        if self.group >= self.groups {
++            return Err(EncodeError::OutOfRange);
++        }
++        if self.own.len() > usize::from(u8::MAX)
++            || self.entities.len() > usize::from(u16::MAX)
++            || self.events.len() > usize::from(u8::MAX)
++        {
++            return Err(EncodeError::TooMany);
++        }
++        w.put(u64::from(q.header_tick(self.tick)), 32);
++        w.put(u64::from(self.baseline_age), 16);
++        w.put(u64::from(self.newest_received.unwrap_or(0)), 16);
++        w.put(u64::from(self.last_run.unwrap_or(0)), 16);
++        let flags = u64::from(self.newest_received.is_some()) | u64::from(self.last_run.is_some()) << 1;
++        w.put(flags, 8);
++        w.put(u64::from(self.group) | u64::from(self.groups - 1) << 3, 8);
++        w.put(self.own.len() as u64, 8);
++        w.put(self.entities.len() as u64, 16);
++        w.put(self.events.len() as u64, 8);
++        let from_defaults = self.baseline_age == 0;
++        for d in self.own.iter().chain(&self.entities) {
++            put_delta(q, w, d, from_defaults)?;
++        }
++        for e in &self.events {
++            put_event(w, e);
++        }
++        Ok(())
++    }
++
++    pub(crate) fn get(q: Quant, r: &mut BitReader<'_>) -> Result<Snapshot, DecodeError> {
++        let strict = q.strict();
++        let tick = r.u32()?;
++        let baseline_age = r.u16()?;
++        let newest = r.u16()?;
++        let last = r.u16()?;
++        let flags = r.u8()?;
++        let group_byte = r.u8()?;
++        if strict && (flags & !0b11 != 0 || group_byte & !0b11_1111 != 0) {
++            return Err(DecodeError::UnknownField);
++        }
++        let known = |bit: u8, v: u16| {
++            if flags & bit != 0 {
++                Ok(Some(v))
++            } else if v != 0 && strict {
++                Err(DecodeError::UnknownField)
++            } else {
++                Ok(None)
++            }
++        };
++        let newest_received = known(1, newest)?;
++        let last_run = known(2, last)?;
++        let group = group_byte & 0b111;
++        let groups = ((group_byte >> 3) & 0b111) + 1;
++        if group >= groups {
++            return Err(DecodeError::Malformed);
++        }
++        let n_own = usize::from(r.u8()?);
++        let n_entities = usize::from(r.u16()?);
++        let n_events = usize::from(r.u8()?);
++        let from_defaults = baseline_age == 0;
++        // Each count is bounded by its width and every item is at least 21 bits, so the datagram's own size bounds
++        // what is read; the vectors grow with what decodes.
++        let mut own = Vec::new();
++        for _ in 0..n_own {
++            own.push(get_delta(q, r, from_defaults)?);
++        }
++        let mut entities = Vec::new();
++        for _ in 0..n_entities {
++            entities.push(get_delta(q, r, from_defaults)?);
++        }
++        let mut events = Vec::new();
++        for _ in 0..n_events {
++            events.push(get_event(r)?);
++        }
++        Ok(Snapshot {
++            tick,
++            baseline_age,
++            newest_received,
++            last_run,
++            group,
++            groups,
++            own,
++            entities,
++            events,
++        })
++    }
++}
++
++/// A client's whole view at one tick, on its own stream: at join, after a `Resync`, or when the room forces a resync
++/// (the module text).
++#[derive(Clone, Debug, Default, PartialEq, Eq)]
++pub struct FullState {
++    /// The tick the whole state is taken at, all 32 bits.
++    pub tick: u32,
++    /// The last command run, where the client's prediction starts (`None` before the first).
++    pub last_run: Option<u16>,
++    /// The own-state section: the client's own soldier and its effect rows, whole.
++    pub own: Vec<EntityRecord>,
++    /// Every entity of the client's interest set at that tick, whole.
++    pub entities: Vec<EntityRecord>,
++}
++
++impl FullState {
++    /// The field groups a full state's encoder writes (catalogue §3's `FullState` rows less the authority-only
++    /// three), as [`Snapshot::GROUPS`] gives them.
++    pub const GROUPS: [(&'static str, Class, &'static [EntityKind]); 6] = [
++        ("header: server tick", Class::Public, &[]),
++        ("header: baseline and acknowledgements", Class::Owner, &[]),
++        ("own state", Class::Owner, &[EntityKind::Soldier, EntityKind::Effect]),
++        (
++            "spatial world",
++            Class::Spatial,
++            &[
++                EntityKind::Soldier,
++                EntityKind::Vehicle,
++                EntityKind::VehiclePart,
++                EntityKind::Projectile,
++                EntityKind::Door,
++                EntityKind::Wall,
++            ],
++        ),
++        ("team section", Class::Team, &[]),
++        ("public section", Class::Public, &[]),
++    ];
++
++    pub(crate) fn put(&self, q: Quant, w: &mut BitWriter<'_>) -> Result<(), EncodeError> {
++        if self.own.len() > usize::from(u8::MAX) || self.entities.len() > usize::from(u16::MAX) {
++            return Err(EncodeError::TooMany);
++        }
++        w.put(u64::from(self.tick), 32);
++        w.put(u64::from(self.last_run.unwrap_or(0)), 16);
++        w.put(u64::from(self.last_run.is_some()), 8);
++        w.put(self.own.len() as u64, 8);
++        w.put(self.entities.len() as u64, 16);
++        for rec in self.own.iter().chain(&self.entities) {
++            put_record(q, w, rec)?;
++        }
++        Ok(())
++    }
++
++    pub(crate) fn get(q: Quant, r: &mut BitReader<'_>) -> Result<FullState, DecodeError> {
++        let strict = q.strict();
++        let tick = r.u32()?;
++        let last = r.u16()?;
++        let flags = r.u8()?;
++        if strict && (flags & !1 != 0 || (flags & 1 == 0 && last != 0)) {
++            return Err(DecodeError::UnknownField);
++        }
++        let last_run = (flags & 1 != 0).then_some(last);
++        let n_own = usize::from(r.u8()?);
++        let n_entities = usize::from(r.u16()?);
++        let mut own = Vec::new();
++        for _ in 0..n_own {
++            own.push(get_record(q, r)?);
++        }
++        let mut entities = Vec::new();
++        for _ in 0..n_entities {
++            entities.push(get_record(q, r)?);
++        }
++        Ok(FullState {
++            tick,
++            last_run,
++            own,
++            entities,
++        })
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn every_kind_has_a_group_in_both_layout_tables_and_effect_rows_are_owner_only() {
++        for table in [&Snapshot::GROUPS[..], &FullState::GROUPS[..]] {
++            for kind in EntityKind::ALL {
++                let homes: Vec<_> = table.iter().filter(|g| g.2.contains(&kind)).collect();
++                assert!(!homes.is_empty(), "{kind:?} has no group");
++                if kind == EntityKind::Effect {
++                    assert!(homes.iter().all(|g| g.1 == Class::Owner), "{kind:?}: {homes:?}");
++                }
++            }
++        }
++        assert_eq!(KIND_BITS, 3);
++    }
++}
+diff --git a/spikes/netcode-proof/crates/proto/src/wrap.rs b/spikes/netcode-proof/crates/proto/src/wrap.rs
+new file mode 100644
+index 0000000..b46ef7b
+--- /dev/null
++++ b/spikes/netcode-proof/crates/proto/src/wrap.rs
+@@ -0,0 +1,154 @@
++//! `Wrap`: the wrap-aware compares, one per counter width, each called with its counter's name (u4-build-plan.md §4.4;
++//! PM-0001-58). Every counter that wraps in the proof test goes through one of these: press counters (8 bits);
++//! command sequences, the 16-bit tick and event numbers on the wire and the acknowledgement (16 bits); ticks
++//! (32 bits). The counters themselves, each with its injectable start value, are their owners' (npt-room's and
++//! npt-client's, U4e); this type is the one compare they share.
++//!
++//! **The rule:** `b` comes after `a` when `b - a`, wrapped to the width and read as a signed number, is above 0: up to
++//! half the counter's range ahead. At exactly half (`b - a` = 2^(width - 1)) neither comes after the other.
++//!
++//! **The planted defect** (bites builds only): `Wrap::plain_lt(counter)` compares that one named counter with a plain
++//! `<` and widens it without carrying across the wrap; every other counter keeps the rule. It names no bite: PM-0001-58's
++//! ids live at their sites, the room's and the client's compares (u4-build-plan.md §4.14, as `npt_sim::grid`'s one
++//! defect is planted by ids in npt-client and npt-sim), which map each id to its counter's name.
++
++/// The wrap-aware compares (the module text). In a measured build every `Wrap` is the rule, `Wrap::default()`.
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
++pub struct Wrap {
++    /// The one counter compared with a plain `<` (bites builds only).
++    #[cfg(feature = "bites")]
++    plain: Option<&'static str>,
++}
++
++impl Wrap {
++    /// The `Wrap` whose compares of `counter` use a plain `<` (bites builds only): the module text's defect.
++    #[cfg(feature = "bites")]
++    pub const fn plain_lt(counter: &'static str) -> Wrap {
++        Wrap {
++            plain: Some(counter),
++        }
++    }
++
++    /// Whether this `Wrap` compares `counter` with a plain `<`.
++    fn plain(self, counter: &str) -> bool {
++        #[cfg(feature = "bites")]
++        if self.plain == Some(counter) {
++            return true;
++        }
++        let _ = counter;
++        false
++    }
++
++    /// Whether `b` comes after `a` on the 8-bit counter `counter` (press counters).
++    pub fn after8(self, counter: &str, a: u8, b: u8) -> bool {
++        if self.plain(counter) {
++            return a < b;
++        }
++        b.wrapping_sub(a) as i8 > 0
++    }
++
++    /// Whether `b` comes after `a` on the 16-bit counter `counter` (command sequences, wire tick and event numbers,
++    /// acknowledgements).
++    pub fn after16(self, counter: &str, a: u16, b: u16) -> bool {
++        if self.plain(counter) {
++            return a < b;
++        }
++        b.wrapping_sub(a) as i16 > 0
++    }
++
++    /// Whether `b` comes after `a` on the 32-bit counter `counter` (ticks).
++    pub fn after32(self, counter: &str, a: u32, b: u32) -> bool {
++        if self.plain(counter) {
++            return a < b;
++        }
++        b.wrapping_sub(a) as i32 > 0
++    }
++
++    /// The 32-bit value of the 16-bit counter `counter` whose low 16 bits are `low`, the one nearest `near` (a value
++    /// already known in full: the newest tick, the newest event number): from 32,768 before `near` to 32,767 after
++    /// it. How a 16-bit acknowledgement or event number is rebuilt.
++    pub fn widen16(self, counter: &str, near: u32, low: u16) -> u32 {
++        if self.plain(counter) {
++            return (near & !0xffff) | u32::from(low);
++        }
++        let step = low.wrapping_sub(near as u16) as i16;
++        near.wrapping_add_signed(i32::from(step))
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    /// a5: each width across its wrap, from a start value a few steps below it (the injectable start of PM-0001-58's
++    /// counters), and every counter name alike.
++    #[test]
++    fn a5_each_width_compares_and_widens_across_its_wrap_for_every_counter() {
++        let w = Wrap::default();
++        for counter in ["cmd_seq", "press", "tick_offset", "event_seq", "ack", "tick"] {
++            // 8 bits: 253, 254, 255, 0, 1, 2 each after the one before; 127 ahead is after, 128 is neither.
++            let mut a = 253u8;
++            for _ in 0..6 {
++                let b = a.wrapping_add(1);
++                assert!(w.after8(counter, a, b) && !w.after8(counter, b, a), "{counter}: {a} {b}");
++                a = b;
++            }
++            assert!(w.after8(counter, 200, 200u8.wrapping_add(127)));
++            assert!(!w.after8(counter, 200, 200u8.wrapping_add(128)) && !w.after8(counter, 200u8.wrapping_add(128), 200));
++            assert!(!w.after8(counter, 7, 7));
++            // 16 bits.
++            let mut a = 65_533u16;
++            for _ in 0..6 {
++                let b = a.wrapping_add(1);
++                assert!(w.after16(counter, a, b) && !w.after16(counter, b, a), "{counter}: {a} {b}");
++                a = b;
++            }
++            assert!(w.after16(counter, 65_000, 65_000u16.wrapping_add(32_767)));
++            assert!(!w.after16(counter, 65_000, 65_000u16.wrapping_add(32_768)));
++            // 32 bits.
++            let mut a = u32::MAX - 2;
++            for _ in 0..6 {
++                let b = a.wrapping_add(1);
++                assert!(w.after32(counter, a, b) && !w.after32(counter, b, a), "{counter}: {a} {b}");
++                a = b;
++            }
++            assert!(w.after32(counter, 5, 5u32.wrapping_add(i32::MAX as u32)));
++            assert!(!w.after32(counter, 5, 5u32.wrapping_add(1 << 31)));
++            // Widening: across the 16-bit wrap in both directions, and across the 32-bit one.
++            for (near, low, want) in [
++                (65_534u32, 1u16, 65_537u32),
++                (65_537, 65_534, 65_534),
++                (65_536, 0, 65_536),
++                (65_536 + 40_000, 7_000, 131_072 + 7_000),
++                (u32::MAX - 1, 2, 2),
++                (3, 65_530, u32::MAX - 5),
++                (100, 100 + 32_767, 100 + 32_767),
++                (40_000, 40_000 - 32_768, 40_000 - 32_768),
++            ] {
++                assert_eq!(w.widen16(counter, near, low), want, "{counter}: {near} {low}");
++            }
++            for near in [0u32, 1, 30_000, 65_535, 65_536, 1 << 31, u32::MAX] {
++                for d in [-32_768i32, -1, 0, 1, 32_767] {
++                    let v = near.wrapping_add_signed(d);
++                    assert_eq!(w.widen16(counter, near, v as u16), v, "{counter}: {near} {d}");
++                }
++            }
++        }
++    }
++
++    /// a5's bite: the plain `<` for one named counter fails a5 for that counter, across its wrap, and for no other.
++    #[cfg(feature = "bites")]
++    #[test]
++    fn a5_the_plain_lt_defect_breaks_its_one_named_counter_across_the_wrap() {
++        let bitten = Wrap::plain_lt("cmd_seq");
++        let rule = Wrap::default();
++        assert!(!bitten.after16("cmd_seq", 65_535, 0), "the defect: 0 is not after 65,535");
++        assert!(bitten.after16("event_seq", 65_535, 0), "another counter keeps the rule");
++        assert!(!bitten.after8("cmd_seq", 255, 0) && !bitten.after32("cmd_seq", u32::MAX, 0));
++        assert_eq!(bitten.widen16("cmd_seq", 65_534, 1), 1, "no carry across the wrap");
++        assert_eq!(bitten.widen16("ack", 65_534, 1), 65_537);
++        // Away from the wrap the defect agrees with the rule, so it shows only where the counter wraps.
++        assert_eq!(bitten.after16("cmd_seq", 10, 11), rule.after16("cmd_seq", 10, 11));
++        assert_eq!(bitten.widen16("cmd_seq", 70_000, 4_470), rule.widen16("cmd_seq", 70_000, 4_470));
++    }
++}
