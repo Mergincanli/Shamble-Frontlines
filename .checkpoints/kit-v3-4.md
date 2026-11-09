@@ -65,7 +65,12 @@
   and 82 copy the landed words), L3 (the trigger test's kit case, strict side); row 68 (IE-3) looser, to confirm.
   Everything else PASS (his words, the fix list, tests 1034/127/27, gate +0 −0, repo map, line numbers, long lines).
   The session reproduced H1 and checked binary ids and file order (`session-h1.md`, 26255a9).
-- **Current step:** 7, the advisor's ruling on H1's fix (`advisor-h1.md`, running), then the one-word kit edit
-  (shown to Mustafa, one `cp`), tests, gate, push; then the verifier's re-check (or a second round, as ruled), the
-  advisor's review of the pushed head (closing IE-1, SA-2, H1), the report (C12 appendix; draft started), the
-  notes' deletion, the final-head review, GUARD-RENAME and his go.
+- **Done (2026-11-09):** the advisor's ruling on H1 (`advisor-h1.md`, 20b4be5): REVISE with the change, no second
+  round. One advisor.md write, shown to Mustafa and approved: :285-286 `--verbatim` on both sides plus "and neither
+  is empty" (the advisor's own Low: a failed `patch-id` prints nothing), and :76-77 names `AGENTS.md` (L1). Notes:
+  rows 66, 68, 76, 80 and 82 set to the ruled texts (L2; row 68 stays looser, confirmed). STATUS: F5 under F4 (L3),
+  and the follow-ups' source line names the H1 ruling. Kit tests 1034/127/27, gate PASS +0 −0, repo map OK.
+- **Current step:** 8, the verifier's re-check of the new head (`advisor-h1.md` §2's list; not a round), then the
+  advisor's review of the pushed head (closing IE-1, SA-2, H1), the report (draft in the session scratchpad,
+  `kit-v3-4-report-draft.md` and `kit-v3-4-appx.py`), the notes' deletion, the final-head review, GUARD-RENAME and
+  his go.
