@@ -42,3 +42,29 @@ Branch claude/netcode-proof-test-plan-hcky5g; HEAD a99dd7f (autosaves on f985226
   Cargo.toml; counts per brief from U3d baseline go stale after first merge (§5 :249-252, lanes :476-479).
 - A10 MED U4e too large (L, ~7 crates + judge + marks + run scripts + 5 mark groups); judge/marks change has no
   dependency on room (npt-judge -> npt-log only, plan.md:426): split out to wave 1.
+- A6+ the server's own ping schedule (sender) is not in U4e's server-lib list (:388-389 has "ping answers" only), yet
+  -50's ws RTT and its >=145 ms gap check need server pings (ADR 0001:1647; :367-368). Fold into A6.
+- A11 LOW World::ray_cast as a World method (:110) - must take mover volumes as input (client: interpolated set,
+  ADR 0001:258-260; server: blended rewound set, :358-362).
+- A12 MED one replay driver: hash-wasm exports (:359-364) vs lab's native runs: no shared driver named (net F97);
+  hash-wasm bites feature/arm export unstated; features comparison builds unnamed (arch F28: like vs like).
+- A13 LOW hash-wasm: lint level (deny+per-export allow vs allow), LEAF/WASM_CRATES (check.mjs:25, :1110), a
+  "npt-sim only" deps rule like tcpinfo's (check.mjs:94-102); §4.1 layout line.
+- A14 LOW clock bans for server/bots must name tokio::time::Instant (std-only pattern room/clippy.toml:2-9; server
+  -> npt-net -> tokio); bots clippy.toml is crate-wide, U6's glue/npt-load need reviewed allows.
+- A15 LOW AddrTable, Join deadline, handshake cap, rate buckets: no U4 mark or test (-25 RS parts, V-S; -21 bites
+  list has none); name E6's unit test or move to U6.
+- A16 LOW U4e deps omit U4b (lab calls due_ticks: :138-139) and U4d2 (its evidence :427).
+- A17 LOW S1 top-up count on L1 unstated: 2.80 ms x 18,000 ticks = 50.4 s CPU/run, x ~230 runs = ~3.2 h (arith).
+- A18 LOW EntityRecord<->wire mapping split room (encode) / client (decode for load_movers): name one home + round
+  trip test.
+- A19 LOW narrow public surfaces unchecked (check.mjs:1132-1135); ~40 new pub items; name the review step.
+- A25 LOW assert Room<World>/Decoder Send (no Rc) so U6 can move them; no Send bound on Link.
+- A26 LOW server-column checks (trailing, channel: plan.md:503) planted in proto's decode (a6/a7): state reading.
+- N1 ADR 0001:1462-1463 -> :1466-1467 (plan :18). N2 CMD_CATCHUP=8 and proto's redundancy cap=8: one source.
+  N3 "six crates" cites five (:23). N4 due_ticks(&mut Schedule) vs "pure" (plan.md:549). N5 RoomControl in proto
+  puts operator types in npt-client's closure.
+- Verdict: REVISE (A1 high; seam shape fixed in wave-1 U4d).
+- A15 note: the catalogue marks Join (its 2 s deadline) and the rate limits "built in U4" (catalogue :87, :93), so
+  for those the fix is a named fake-clock unit test; AddrTable/handshake cap stay the pull-forward (-25 only).
+DONE (final output returned to the workflow; 1 high, 10 medium, 11 low, 5 nits; verdict REVISE)

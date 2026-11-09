@@ -17,10 +17,14 @@ heredoc before I read that rule; this rewrite carries it unchanged.)
 ## Progress
 - step 1 done: read u4-build-plan.md rev 1 in full (646 lines).
 - step 3 done: scouts read (marks F1-F32, arch F1-F48, net F1-F124) and the plan's notes (M1-M25).
-- step 2/4 in progress: marks.json read by python (read only) for -2, -17, -18, -20, -21, -22, -30, -41, -42, -45,
-  -47, -48, -49, -50, -51, -54, -55, -57, -58, -60, -61, -62, PM-0004-67; judge eval.rs :15-75, :921-935,
-  :1052-1360; README §3-§5 (:140-215); SERIES figures (:259-300, :736 Q30); figures.rs :150-240; log lib.rs :36-120;
-  l1 lib.rs :1-60, :105-170, :348-365; advisor-u3q.md:158-190; advisor-ws-docs-r2.md:368-386; checkpoint :296-330.
+- step 2/4 done: marks.json read by python (read only) for -1, -2, -3, -17, -18, -20, -21, -22, -30, -41, -42, -45,
+  -47, -48, -49, -50, -51, -54, -55, -56, -57, -58, -60, -61, -62, PM-0004-67; judge eval.rs :15-75, :460-516,
+  :741-790, :921-935, :1052-1360; README §3-§5 (:140-215); SERIES figures (:259-300, :736 Q30); figures.rs
+  :150-240; log lib.rs :36-120; l1 lib.rs :1-60, :105-170, :225-270, :348-365, :858-868; Cargo.toml :90-107;
+  advisor-u3q.md:158-190; advisor-ws-docs-r2.md:368-386; advisor-u2.md:15-35; checkpoint :296-330, :615-620;
+  ADR 0001:1465-1467, :1636, :1641, :1650; ADR 0002:498-506; ADR 0004:1142; routine-guard.mjs:24-44;
+  catalogue :240-253; plan.md:532-552, :607-611.
+- step 5 done: findings T1-T23 below; verdict REVISE.
 
 ## Sources read (summary per source, as read)
 - S-RFC9002 (www.rfc-editor.org/rfc/rfc9002.html, fetched 2026-11-09, first 100,000 of 105,234 chars): §6.2.2 "When
@@ -31,30 +35,37 @@ heredoc before I read that rule; this rewrite carries it unchanged.)
   exception). Sure: high (spec text).
 
 ## Hypotheses checked (H-n -> finding or dropped)
-- H12 check.mjs protected? DROPPED: routine-guard.mjs:26-27 GATE_FILES lists only tools/ files; spikes/ is not protected.
-- H6 -41 per option: LOW only. -41's parts select scene + profile, no cmd_timing (marks.json -41); checks are per run
-  (eval.rs:1141-1160, pooled only if marked), so A+B runs pooled in one part still each must pass; per-option numbers
-  come from verdict.json's per-run lines. Plan should say so.
-- H19 process `server`: no U4 L1 check reads process server (marks.json, the checks above); server-lib counters land
-  in which log is still unstated (nit).
+- H12 check.mjs protected? DROPPED: routine-guard.mjs:26-27 GATE_FILES lists only tools/ files; spikes/ is not.
+- H6 -41 per option: LOW (T21). Checks are per run (eval.rs:1141-1160), so pooled A+B runs each must pass.
+- H19 process `server`: no U4 L1 check reads it; nit only.
+- H20 machine_named: -1's parts select RS/LG/ML/RD/MAC only (marks.json -1): no U4 run feeds it; fixtures only. Dropped.
+- H1 -18 eviction: recomputed (T15): at P2 B's age at the first tick after return is at least 32 ticks (one-way
+  minimum 40 ms; acks sent before the burst; tick grid floor/ceil), so eviction is certain iff the ring keeps ages 0-31;
+  an off-by-one (ages 1-32) keeps B on the age-32 bursts. The run still fails under the bite (other bursts evict).
 
-## Findings (a line each as found)
-- T1 HIGH Q22 x §4.7 x -22: Q22 (a) adds scene, clients and pre:PM-0001-2 to -14, -16..-25, -27 (plan :638-640;
-  checkpoint :325-328), so -17, -18, -20, -21, -22's L1 parts get the precondition. README :195-200: a run must pass
-  PM-0001-2's checks else INVALID. PM-0001-2 checks "a connected snapshot-receiving client on every soldier" min >= 48
-  and "48 soldiers on every measured tick" (marks.json -2). §4.7 (plan :173-176) Kicks and drops a never-acker after
-  one unacknowledged FullState: -22's suite is a never-acker (marks.json -22: "resynced or dropped"), so with Q22 every
-  -22 run is INVALID by design. Also B1's bursts (option A runs nothing without inputs: -17/-18 B1) and the forged
-  suites (-21) cut second.v.shots_count against 665-735; none analysed. The contract test (§4.12) does not name
-  PM-0001-2's series. Fix: a per-mark Q22 table (which parts get scene/clients/pre), -22's part without the pre (47 + a
-  never-acker by design) or a drop rule that keeps the slot's soldier and a client; the contract test resolves
-  PM-0001-2's checks on every SS suite; B1 and forged suites shown to hold 665-735 by arithmetic before the runs.
-- T2 HIGH -30 pre-check vs the C part: marks.json -30's C part selects {params.suite both-transports, profile P0,
-  machine.role C} with NO layer (marks.json -30). A U4 pre-check run on Loopback/L1 P0 that lists PM-0001-30 and uses
-  suite both-transports would be judged as the marked "C: loopback, 3 recordings x 2 transports" part (WT vs WS, U6):
-  a mislabelled PASS. If it does not list -30, the judge cannot judge it, yet plan :408 puts it under "Marks moved
-  (L1 parts ... judged by npt-judge --only)", and -30 has no L1 part. late-command is expect-invalid on late-zero
-  (marks.json -30; eval.rs:1282-1311) and needs a part to match. Fix: the pre-check uses its own suite (e.g.
-  `replay-precheck`) and does not serve -30; its PASS and both bites are a test that calls the judge's twin figure and
-  late-zero rule on the pre-check's logs as fixtures (or a provisional part by marks change, the advisor's call); the
-  report never calls it a -30 part.
+## Findings (one line each; the final message carries the full text)
+- T1 HIGH Q22 pre:PM-0001-2 makes -22 INVALID by design (never-acker kicked: plan :173-176; PM-0001-2's >= 48 clients).
+- T2 HIGH -30 pre-check: matches the C part (no layer select) or cannot be judged; Loopback has no layer value.
+- T3 HIGH -17's mirror hash undefined under group splits and loss (plan :156-170; SS near the cap).
+- T4 MEDIUM -17's tick16 and client-rounding bites have no site that must change the hash.
+- T5 MEDIUM hash-map bite flake (first-key outcome p ~ 1/32; PM-0004-21's "two orders logged" omitted).
+- T6 MEDIUM bites needing run configuration: -45, -48, -62, -58, -21 not-older-than, -41 reading.
+- T7 MEDIUM -21 twin not ack-aligned for voided datagrams; feedback from decoded state.
+- T8 MEDIUM -21 catch-up forged kind vs the alignment rule (count field max, datagrams per tick).
+- T9 MEDIUM determinism legs' profile (ADR 0002:500-505) and check.mjs time; recordings' source in check.mjs.
+- T10 MEDIUM bite selection per instance (parallel tests; l1 lib.rs:858-868 precedent).
+- T11 MEDIUM split: judge change its own sub-unit before U4c's -3 re-judge; U4e build apart from its runs.
+- T12 MEDIUM C1' gaps: initial PTO, kGranularity, bites for one packet-number space, poll independence, tie rule.
+- T13 MEDIUM unbitten parts (-42 L1, -49 test cap) and vacuous PASS of -42's P2/P4 parts (no checks).
+- T14 LOW-MED test cap calibrated on judged seeds makes clipped == 0 true by construction.
+- T15 LOW-MED -18 eviction rests on the ring's off-by-one; pin it and log eviction per burst.
+- T16 LOW-MED check-script additions without self-test bites; TICK_HZ derivation beyond LOOP_CATCHUP untested.
+- T17 LOW-MED negative cases: Join rejections, pre-Join, rate buckets, deadline, AddrTable, Resync, ML/RS-only logic.
+- T18 LOW-MED contract test must cover validity inputs (roster vacuous without admit events).
+- T19 LOW codec test wording (a2 prefixes, a3 precedence, a4 tolerance).
+- T20 LOW -57 pairing with the carrying snapshot.
+- T21 LOW accounting and citation slips.
+- T22 LOW D-7's "no usize" untestable; use PM-0004-21's cross-target bytes.
+- T23 LOW-MED L-c8: compare SHA-256 of (v1 tag + new entries) to the committed hashes; say whether acks write entries.
+
+DONE
