@@ -98,7 +98,13 @@ Bites builds add `bites::` with 6 tests:
 - Tests:
   - `cargo test -p npt-server`: 10 passed;
   - `--features bites`: 16 passed.
-- check.mjs, all 10 steps, twice: running (results below when done).
+- check.mjs, all 10 steps, twice, in the worktree (shared target, crates touched before each run): **all 10 pass both
+  times**.
+  - test step: measured build 285 passed (base 275 + 10), bites build 308 passed (base 292 + 16), 0 failed, 0 skips.
+  - doc step: both builds documented, rustdoc warnings as errors.
+  - self step: 48 of 48. redact: 160 items, 0 findings. marks: 81 marks, the docs/adr rows unchanged.
+  - Wall time: test step 101.5 s on run 1, 84.1 s on run 2.
+  - Outputs: scratchpad u4b-check-1.txt and u4b-check-2.txt.
 
 ## Reviews (plan §5 U4b): netcode-architect, rust-reviewer, test-engineer
 They wait for free slots: the three wave-1 builders hold all 3 (CLAUDE.md, at most 3 agents).

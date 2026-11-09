@@ -649,8 +649,9 @@
     `Dropped`, `LoopCounters`, `due_ticks`; bites: `with_bite`, `BITES`), lib.rs re-exports, server/clippy.toml
     (the clock ban; tokio's entries `allow-invalid`, dormant until U6 adds tokio), tests/schedule.rs: 10 clean tests,
     16 in bites builds; clippy clean both builds; the three bites' in-place plants each FAILED its own named test
-    (file restored, sha256 dfb7da2c…); carries 6 and 35 met. check.mjs twice: running (task bw4l1atnp, outputs
-    scratchpad/u4b-check-1.txt and -2.txt). **Next for U4b:** its review (netcode-architect, rust-reviewer,
+    (file restored, sha256 dfb7da2c…); carries 6 and 35 met. **check.mjs twice: all 10 steps pass both times**
+    (measured 285 = 275 + 10, bites 308 = 292 + 16, self 48 of 48). CI was green on df8975b (PR #40's last CI run;
+    the checkpoint commits after it skip CI). **Next for U4b:** its review (netcode-architect, rust-reviewer,
     test-engineer) when slots free; then merge it into the main folder (on committed state, between lane merges).
   - **About 18:00 UTC: conditions 1-3 applied** (u4-build-plan.md sha256 7ec1b324…, recorded under the ruling; carries
     completed and corrected per the check, sha256 4a8c0ee8…, 45 entries; F1 sizes and F2 the U4b/U4e tick-constant
