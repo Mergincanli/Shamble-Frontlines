@@ -1,12 +1,13 @@
-# U4 build plan, rev 1: the wire, the stand-in sim, the room, the client and the L1 runner
+# U4 build plan, rev 2: the wire, the stand-in sim, the room, the client and the L1 runner
 
-**Revision 1, 2026-11-09** (netcode-architect; branch claude/netcode-proof-test-plan-hcky5g, code as at f985226; the
-folder's HEAD f2573f4 adds only checkpoint autosaves). Inputs: the three scouts, read in full
-(u4-scout-arch.md F1-F48, u4-scout-marks.md F1-F32, u4-scout-netcode.md F1-F124), the approved U3 build plan
-(u3-build-plan.md) and U3d plan rev 2 (u3d-plan.md) for the shape, and my own checks of the lines this plan leans on
-(u4-build-plan-notes.md M1-M25). Next: the critics (test-engineer, engine-architect), the fold (rev 2), then the
-advisor. **No code before the advisor's APPROVE.** References "arch Fn", "marks Fn" and "net Fn" are the scouts'
-findings; "Mn" are my notes.
+**Revision 2, 2026-11-09** (netcode-architect; branch claude/netcode-proof-test-plan-hcky5g, code as at f985226; the
+folder's later commits are checkpoint autosaves only). Rev 1 (same file, same day) was reviewed by test-engineer
+(u4-plan-review-test.md: T1-T23, REVISE) and engine-architect (u4-plan-review-arch.md: A1-A19, A25, A26, N1-N5,
+REVISE). I checked every finding against the code myself (u4-plan-rev2-notes.md); §0.1 maps each one to where rev 2
+meets it. Inputs as rev 1: the three scouts (u4-scout-arch.md F1-F48, u4-scout-marks.md F1-F32, u4-scout-netcode.md
+F1-F124), the U3 plans, and my rev 1 notes (u4-build-plan-notes.md M1-M25). Next: the advisor. **No code before the
+advisor's APPROVE.** "arch Fn", "marks Fn" and "net Fn" are the scouts' findings; "Mn" my rev 1 notes; "Tn" and "An"
+the critics'.
 
 ## 0. In plain words
 - **What U4 is.** The first unit that builds the game-shaped parts of the proof test: the message format (npt-proto),
@@ -15,631 +16,886 @@ findings; "Mn" are my notes.
   scenario runner that drives 48 headless clients through L1 on simulated time. Then the L1 halves of the 21 marks the
   U4 row names (plan.md:1223, quoted in §1), each shown first by its planted defects ("bites") failing.
 - **What it proves, and what it does not.** L1 is logic only: counts, shares and hashes, never a time mark
-  (ADR 0001:1462-1463). So U4 proves that the protocol carries each client's server view under P0 to P4 and B1 (RTT 0 to
+  (ADR 0001:1466-1467). So U4 proves that the protocol carries each client's server view under P0 to P4 and B1 (RTT 0 to
   200 ms, jitter ±0 to ±40 ms, loss 0 to 5 %, 1 s total-loss bursts: npt-l1 lib.rs:114-138), across every counter wrap;
   that forged input changes nothing; that prediction is exact when commands arrive in time; that hits register as the
-  shooter saw them. It proves no timing budget: tick times, encode costs and bandwidth on real sockets are R2's and
-  later (ADR 0001:164-184).
-- **Why it is split.** U4 starts six crates from doc-only stubs (sim/src/lib.rs:1-5, proto :1-4, room :1-5, client
-  :1-6, server lib :1-5; arch F9), changes npt-l1's stream model (C1'), and carries 52 planted defects (49 from
-  marks.json, 2 from §4.5, 1 from the catalogue: net F101) and about 230 L1 runs (marks F31). That is too big to build,
-  review or roll back as one change. **Nine sub-units** (§5): U4a the wire, U4b the loop policy, U4c the link model,
-  U4d the stand-in sim, U4d2 the Wasm-in-Node hash, U4e the room and the codec marks, U4f clock and commands, U4g
-  prediction and interpolation, U4h lag compensation. U4a, U4b, U4c and U4d do not depend on each other.
-- **What needs a ruling first.** Seven questions change the structure (§10: U4-SEAM, U4-HIT, U4-WASM, U4-REPLAY,
-  U4-SERVER, U4-LOSS, U4-CTL). U4a to U4c can start on the advisor's APPROVE of this plan whatever those say, except
-  U4-LOSS for U4c's C3 part and U4-CTL for U4a's control types.
+  shooter saw them. It proves no timing budget (ADR 0001:164-184).
+- **Why it is split, now into twelve sub-units.** U4 starts six crates from doc-only stubs (sim/src/lib.rs:1-5, proto
+  :1-4, room :1-5, client :1-6, server lib :1-5, bots lib :1-3; arch F9), changes npt-l1's stream model (C1'), and
+  carries 52 planted defects and about 270 L1 runs (§9). The order (§5): **U4s** the seam types, the wire grid and every
+  manifest change, alone and first; then in parallel **U4a** the wire, **U4b** the loop policy, **U4c** the link model,
+  **U4d** the stand-in sim and **U4j** the judge and marks change; then **U4d2** the Wasm-in-Node hash and **U4e** the
+  room and the codec path; then **U4r** the L1 runner and its judged runs; then **U4f** clock and commands, **U4g**
+  prediction and interpolation, **U4h** lag compensation. Every sub-unit that moves marks builds, merges, and only then
+  runs its judged set.
+- **What rev 2 changes, in short.** Four high findings, all fixed in text:
+  - **-22 would have been INVALID by design** (T1): it keeps no stress-scene precondition; each mark's precondition is
+    now decided in a per-mark table (§4.12).
+  - **-30's pre-check could be judged as a -30 part** (T2): it now has its own suite, layer value and pre-check file.
+  - **-17's hash was undefined when a snapshot splits** (T3, T4): a client logs a tick's hash only once every group of
+    that tick decoded; a refused group logs a value that always mismatches; the hash covers the rebuilt tick, the event
+    numbers and the client's own held values, so both -17 bites have a site.
+  - **The rewind's data was unspecified** (A1): a shot crosses the seam as four integers, the ring of past hit volumes
+    becomes an npt-sim type the room owns and lends, and a 5-minute recording is about 18 MB, not gigabytes.
+- **What needs a ruling first.** Q1 to Q26 in §10. Four are new (Q23 the server snapping its own copy, Q24 the reading
+  of -41's "run speed", Q25 the clamp's home, Q26 the CPU burn on L1); Q2, Q10, Q11, Q16 and Q22 changed. U4s needs Q1,
+  Q2 and Q23; the rest of wave 1 can start once U4s merges.
 - **What it expects.** Every L1 part PASS, with every bite FAIL. A mark with L2, RS or ML parts stays NOT-RUN overall
-  (marks F8, F35): U4's claim is "its L1 parts PASS and its bites FAIL", never "the mark passes". Two bites cannot fail
-  on L1 at U4; they are carried by name (§6).
+  (marks F8): U4's claim is "its L1 parts PASS and its bites FAIL", never "the mark passes". Stated plainly where a
+  part passes without a bite at U4: -42's L1 P3 parts and -49's test-cap parts; -42's P2 and P4 parts have no checks at
+  all and are recorded, never claimed as passing (§5 U4g, U4h).
+
+## 0.1 The critics' findings, and where rev 2 meets each
+"Agree" means I re-checked the evidence at the lines given and it holds.
+
+| Id | Sev | My check | Where rev 2 meets it |
+|---|---|---|---|
+| T1 | HIGH | Agree: PM-0001-2's "SS runs" part checks `tick.v.snapshot_clients_count` min ≥ 48 and `soldiers_count` min ≥ 48 (marks.json PM-0001-2); `pre:` applies the matched part's checks (eval.rs:850-887; README:193-200); -22's drop leaves 47 | §4.12's per-mark table: -22 gains scene and clients only, no precondition; -17, -18, -20 and -21 gain it with the shot-band arithmetic (§4.13); marks with no U4 L1 part go to the R run plans; the contract test resolves PM-0001-2's checks on every SS suite. Q22 |
+| T2 | HIGH | Agree: -30's C part selects no layer (marks.json -30; matched_parts eval.rs:921-930 drops only `role`); README:32 has no Loopback value; catalogue item 5 is a test, not a mark | §5 U4r: suite `precheck-30`, layers `L1` and `loopback` (README §1 gains the value in U4j), judged as `PRE-0001-30` from marks/prechecks.json, results in results/u4r-precheck-30/, never a -30 part, never U6's folder. Items 4 and 5 listed as tests. Q10 |
+| T3 | HIGH | Agree: SERIES.md:266 pairs by (client, tick); a split tick with a lost group has no defined client hash | §4.6: whole-tick hash only on a complete tick; a refused group logs the sentinel; a lost group leaves the tick unlogged and counted (`snap_incomplete`); six figure fixtures (§5 U4j). Q11 |
+| T4 | MED | Agree: -17 has only the figure and the S30 setup (marks.json -17); a rejecting client gives no pairs; the client decodes integers and rounds nothing | §4.6: the hash covers the rebuilt 32-bit tick and event numbers; a client hash with no server partner counts as a mismatch; the client hashes its held floats re-gridded, so client-rounding has a real site; §4.14 lists both sites |
+| T5 | MED | Agree: PM-0004-21 asks for "its two orders logged" (ADR 0004:1142); a first-key outcome repeats with p ≈ 1/32 | §5 U4d: the bite folds the whole order, each process logs its order digest, equal digests mean "not exercised" |
+| T6 | MED | Agree for -45, -48, -62, -58, -41; -21's not-older-than is already pinned in marks.json -21's notes | §4.14: the site, failing check, run setting and unit proof per bite; Q23, Q24 for -41 |
+| T7 | MED | Agree: a voided datagram drops its ack too, so baselines, sizes, group counts and the server-to-client packet indexes differ | §4.10: the twin's slot repeats the previous ack; the forged and clamp suites run open-loop scripts; the fate test also compares group counts per tick. Q16 |
+| T8 | MED | Agree: the catch-up cap equals the redundancy cap (ADR 0001:238-239), which one datagram cannot exceed | §4.10: the catch-up kind's extra datagrams stay inside the per-connection bucket and are mirrored in the twin |
+| T9 | MED | Agree: the runner is "built as the server builds the sim" (ADR 0002:500-505) | §4.15, §5 U4d2: native legs on npt-lab's release build; a 5-minute budget for the step, measured; recordings regenerated from committed seeds and checked against committed SHA-256s |
+| T10 | MED | Agree: L1 picks its bite per instance (l1/src/lib.rs:856-868) | §4.11: every bite per instance or per config value, never a static; a parallel-threads test |
+| T11 | MED | Agree | §5: U4j apart, merged before U4c's L-c8 re-judge; builds apart from judged runs |
+| T12 | MED | Agree: RFC 9002 §5.3, §6.1.2, §6.2.1, §6.2.2 (read 2026-11-09) | §5 U4c: kInitialRtt 333 ms (initial PTO 1,024 ms), kGranularity 1 ms; L-c9; three new bites |
+| T13 | MED | Agree (marks.json -42, -49) | §0 and §5 U4g, U4h: those parts named as unbitten or check-less |
+| T14 | LOW-MED | Agree | §5 U4h: calibrate on seeds 101-103, judge on seeds 1-3 |
+| T15 | LOW-MED | Agree | §4.5: ring ages 0-31 pinned; `event.burst_eviction` per burst |
+| T16 | LOW-MED | Agree | §5: a self-test bite for every check.mjs addition; §4.3's constants at 30 and 60 Hz |
+| T17 | LOW-MED | Agree | §5 U4e's negative tests; §4.11's rule for paths only L2, RS or ML would run |
+| T18 | LOW-MED | Agree: `roster` reads `admit` events (README:171) | §4.12: the contract test asserts the validity inputs |
+| T19 | LOW | Agree | §5 U4a a2-a4 and U4s s2 reworded |
+| T20 | LOW | Agree | §4.6: -57 pairs only fields the tick's snapshot carried and the client decoded |
+| T21 | LOW | Partly: 49 mark bites hold (46 in the 21 marks plus PM-0004-67's 3); the run count was low | §9: about 270 L1 runs; -41's per-option report is runs.txt's, not the judge's |
+| T22 | LOW | Agree | §5 U4d2: PM-0004-21's cross-target vectors replace "no usize" |
+| T23 | LOW-MED | Agree | §5 U4c L-c8: SHA-256 of (v1 tag + v2's datagram entries); acks' own stream and entries. Q15 |
+| A1 | HIGH | Agree (plan.md:577 puts HitHistory in npt-room; hash-wasm depends on npt-sim only) | §4.2, §4.9, §4.15: integer `Rewind`; `HitHistory` in npt-sim, owned by the room, lent to `step`; one replay driver; recording fields and size. Q2, Q4 |
+| A2 | MED | Agree (E5, plan.md:452) | §4.2: `portal_states()` and an area id per `EntityRecord` |
+| A3 | MED | Problem agreed; fix differs | §4.2, §4.10: the clamp inside npt-sim's shot phase on integer cm; npt-room float-free (interest on integer cm; a grep). Q25 |
+| A4 | MED | Agree (plan.md:485; ADR 0002:336-337) | §4.3: `npt_sim::LOOP_CATCHUP`; `Schedule` takes the cap; U4b depends on U4s only |
+| A5 | MED | Agree (plan.md:544-546) | §4.3: every tick-counted value a const fn of TICK_HZ, tested at 30 and 60 Hz |
+| A6 | MED | Agree, with the folded A6+ (ADR 0001:367-368; link lib.rs:79-81) | §4.9: the pump hands the room one RTT per client and runs the server's ping sender |
+| A7 | MED | Agree (plan.md:505-506) | §4.5: the room owns the window; the pump reports its bytes sent |
+| A8 | MED | Agree (check.mjs:903-942 reads lint-lowering flags only) | §5 U4d2: a build-flag check with self-test bites |
+| A9 | MED | Agree | §5 Lanes: U4s takes every wave-1 manifest change; one check.mjs editor per wave; counts as deltas |
+| A10 | MED | Agree | §5: U4j apart; U4e split into U4e and U4r; runs apart |
+| A11 | LOW | Agree | §4.2: `World::ray_cast(ray, movers)` |
+| A12 | MED | Agree | §4.15, §5 U4d2: one `Replayer`; bites through `begin`; like-for-like features |
+| A13 | LOW | Agree (check.mjs:25, :135-137, :1110; tcpinfo's rule :94-102) | §5 U4d2: deny plus per-export allows; LEAF, WASM_CRATES; npt-sim only |
+| A14 | LOW | Agree | §4.11: tokio's Instant in the bans; U6's reviewed allows |
+| A15 | LOW | Agree | §5 U4e's fake-clock tests; AddrTable and the handshake cap to U6 (§6) |
+| A16 | LOW | Agree | §5: dependencies restated per sub-unit |
+| A17 | LOW | Agree (2.80 ms x 18,000 ticks = 50.4 s per run) | §4.13: burn and top-up off on L1, recorded. Q26 |
+| A18 | LOW | Agree | §4.4: the mapping in npt-proto, with a round-trip test |
+| A19 | LOW | Agree (check.mjs:1134-1135) | §7.2: each report lists its new pub items; engine-architect checks them |
+| A25 | LOW | Agree | §4.11: Send asserts |
+| A26 | LOW | Agree | §4.4: the reading stated |
+| N1 | nit | Agree | §0, §1: ADR 0001:1466-1467 |
+| N2 | nit | Agree | §4.3: `CMD_CATCHUP = Limits::REDUNDANCY_CAP`, const-asserted |
+| N3 | nit | Agree | §0: the sixth stub is npt-bots' library |
+| N4 | nit | Agree (plan.md:549 "pure") | §4.3: `due_ticks(now, &Schedule) -> Due` |
+| N5 | nit | Deferred | §4.1: `RoomControl` stays unfeatured in npt-proto (types and a decoder npt-client never calls; unreferenced code is dropped at link time, which U7's Wasm size shows); a feature gate is Q7's fallback |
 
 ## 1. Requirements
 | # | Requirement (quoted where short) | Source | Exists today | Where in U4 |
 |---|---|---|---|---|
-| RQ1 | "npt-sim, npt-proto, npt-room and npt-client; npt-lab's scenario runner; `due_ticks` with PM-0004-67's bites on a fake clock; the Node-hosted native-against-Wasm hash test (§4.5); then the L1 row groups with their bites: codec (-17, -57, -58); commands and hostile input (-20, -21, -22); prediction (-41, -42, -60); interpolation, clock and events (-45, -47, -61, -62); lag compensation (-48 to -51); bursts (-18); stand-ins (-54, -55); -30 on loopback" | plan.md:1223 | The crates are doc stubs (arch F9); npt-lab has `probe` only (lab/src/main.rs:1-3) | All of §5 |
-| RQ2 | Layout: sim "no I/O, clock, transport or bot logic"; room "tick-counted timers only; no I/O, async runtime or clock; builds for wasm32 and native"; client "no bindings, transport or clock"; lab "the L1 scenario runner ..., the x86-64 re-decode and replay tool, the native-against-Wasm hash comparer" | plan.md:376-380, :390, :399-400 | The manifests carry these as comments (M7) | U4d, U4e-U4h |
-| RQ3 | Leaf crates (link, l1, sim, proto, room, client, log) reach no tokio, quinn, wtransport, web-transport-quinn or tungstenite, and pass `cargo check --target wasm32-unknown-unknown`; "Narrow public surfaces: each crate's public items are those in §4.7; everything else is `pub(crate)`" | plan.md:420-422, :444 | check.mjs:24 (LEAF); the deps step | Every sub-unit; §4.1 lists each addition with its reason |
-| RQ4 | Determinism: ADR 0004's float allow-list, libm only, no NaN in state; the hash-map and clock bans; no `+fma`, no `target-cpu=native`, no relaxed-simd, simd128 off; overflow-checks in sim and proto; "one feature set for npt-sim in the server and Wasm builds, compared with `cargo tree -e features`"; ChaCha8Rng pinned, seeded by the host; a canonical-serialization hash | plan.md:513-531 | sim/clippy.toml:9-58; Cargo.toml:103-107; no features comparison (M8) | U4d, U4d2 |
-| RQ5 | "The check (from U4)": 3 recordings x 5 min = 27,000 ticks; natively twice in separate processes, once as Wasm in Node (Chromium is U7's); "the report names the first mismatching tick, with a field diff"; pass mark 0 mismatching ticks; bites one std `sin` and one hash-map iteration, "each caught at the first tick it changes" | plan.md:532-537; U7 row plan.md:1226 | Nothing; check.mjs:1156-1158 says "no wasm test is planned" | U4d (native), U4d2 (Wasm) |
-| RQ6 | The seam: "one trait with one implementation": `step(commands)`, `state_hash`, the snapshot-field read-out, the hit-volume read-out, spawn and teleport; `TICK_HZ` one build-time constant; `LOOP_CATCHUP` = ⌊0.25 x TICK_HZ⌋, "no literal 7 anywhere"; `CMD_CATCHUP` = 8, separate; `due_ticks(now, schedule) -> (to_run, dropped)`, pure, fake-clock tests with PM-0004-67's bites; "The 60 Hz run's own change-set replaces npt-sim through this seam and changes no other crate" | plan.md:539-552 | Nothing | U4b, U4d, U4e (Q1 U4-SEAM) |
-| RQ7 | Check homes: the room counts ticks, the server takes an injected `now` (the table); the room gets per client "the RTT, loss, send-buffer space, maximum datagram size and unsent count"; "On L1: npt-lab drives the npt-server library and npt-room on its simulated clock" | plan.md:495-511 | Nothing | U4e, U4f (Q5 U4-SERVER, Q6 U4-LOSS) |
-| RQ8 | L1's step order per simulated instant: packets due by arrival, then fate index, never in the instant sent; the server's I/O step; the tick if due at base + ⌊k x 10⁹ / TICK_HZ⌋; client frames at 60 Hz with a seeded phase; the clients whose next due time has come, in slot order. Each client's host clock is offset + rate x SimClock (rate 1.5 for -21's cheat); fates per (seed, link, direction, packet index) | plan.md:597-607 | npt-l1 draws fates per flow (l1/src/lib.rs:9-12) | U4e (the runner) |
-| RQ9 | The catalogue's six U4 assertions: the types both ways; channel and direction, a wrong channel refused and counted; Limits = the Size column, one byte over refused before allocation; the layout table = the Field-group rows; an L1 class audit at P2 with an owner-to-all bite; the control-socket messages decode at 1,024 B and never panic | docs/design/netcode-proof-messages.md:240-253 | U1's audit test checks the doc only (proto/tests/catalogue.rs:4-5) | U4a (items 1-3 and 6), U4e (4-5) (Q7, Q8) |
-| RQ10 | "Bites first: every automated mark's planted defect must FAIL before its pass counts" | plan.md:680-683 | U2's pattern (advisor-u2.md:97-100) | Every sub-unit |
-| RQ11 | "the same seed gives the same packet-fate log and the same per-tick hashes" | plan.md:749-750 | -3 on L1 (U2) | U4c, U4e (the runner's twin test) |
-| RQ12 | -7's history is "sized for the largest cap the test uses (-48's test cap, fixed in U4 from L1's largest honest rewind at P3 and P4) plus the margin as data, recorded" | plan.md:696 | Nothing | U4h |
-| RQ13 | Mustafa, 2026-11-09: "from U3d on, point all copies at one shared Cargo target folder (CARGO_TARGET_DIR), so each unit doesn't leave a 4–6 GB cache behind", with the touch and count safeguards | checkpoint :404-413 | Applied in U3d (u3d-plan.md §7.1) | §7 |
-| RQ14 | Netcode evidence: "deterministic tests with injected latency, jitter and loss" | CLAUDE.md, the change-set protocol, item 4 | | §9 |
+| RQ1 | "npt-sim, npt-proto, npt-room and npt-client; npt-lab's scenario runner; `due_ticks` with PM-0004-67's bites on a fake clock; the Node-hosted native-against-Wasm hash test (§4.5); then the L1 row groups with their bites: codec (-17, -57, -58); commands and hostile input (-20, -21, -22); prediction (-41, -42, -60); interpolation, clock and events (-45, -47, -61, -62); lag compensation (-48 to -51); bursts (-18); stand-ins (-54, -55); -30 on loopback" | plan.md:1223 | The crates are doc stubs (arch F9); npt-lab has `probe` only | All of §5 |
+| RQ2 | Layout: sim "no I/O, clock, transport or bot logic"; room "tick-counted timers only; no I/O, async runtime or clock; builds for wasm32 and native"; client "no bindings, transport or clock"; lab the L1 runner, the re-decode and replay tool, the hash comparer | plan.md:376-380, :390, :399-400 | Manifest comments (M7) | U4s, U4d, U4e, U4r |
+| RQ3 | Leaf crates reach no transport crate or runtime and pass the wasm32 check; "each crate's public items are those in §4.7; everything else is `pub(crate)`" | plan.md:420-422, :444 | check.mjs:25 (LEAF); the deps step | Every sub-unit; §4.1 lists each addition |
+| RQ4 | Determinism: ADR 0004's float allow-list, libm only, no NaN in state; the hash-map and clock bans; no `+fma`, no `target-cpu=native`, no relaxed-simd, simd128 off; overflow-checks in sim and proto; one npt-sim feature set in the server and Wasm builds; ChaCha8Rng pinned; a canonical-serialization hash | plan.md:513-531 | sim/clippy.toml; Cargo.toml:103-107; no flag or features check (A8, M8) | U4s, U4d, U4d2 |
+| RQ5 | "The check (from U4)": 3 recordings x 5 min = 27,000 ticks; natively twice in separate processes, once as Wasm in Node; first mismatching tick with a field diff; 0 mismatches; bites one std `sin` and one hash-map iteration | plan.md:532-537; ADR 0002:500-505 | Nothing; check.mjs:1156-1158 "no wasm test is planned" | U4d, U4d2 (U4r adds its recordings) |
+| RQ6 | The seam: one trait, one implementation; `TICK_HZ` one constant; `LOOP_CATCHUP` = ⌊0.25 x TICK_HZ⌋, "no literal 7 anywhere"; `CMD_CATCHUP` = 8, separate; `due_ticks` pure, fake-clock tests; "the 60 Hz run's own change-set replaces npt-sim through this seam and changes no other crate"; every tick-counted timer derives from TICK_HZ | plan.md:539-552 | Nothing | U4s, U4b, U4d |
+| RQ7 | Check homes: the room counts ticks, the server takes an injected `now`; the room gets per client RTT, loss, send-buffer space, max datagram size and unsent count; "On L1: npt-lab drives the npt-server library and npt-room on its simulated clock" | plan.md:495-511 | Nothing | U4e, U4f (Q5, Q6, Q13) |
+| RQ8 | L1's step order per simulated instant; each client's host clock offset + rate x SimClock; fates per (seed, link, direction, packet index) | plan.md:597-607 | npt-l1 draws fates per flow (l1/src/lib.rs:9-12) | U4r |
+| RQ9 | The catalogue's six U4 assertions | docs/design/netcode-proof-messages.md:240-253 | U1's doc audit (proto/tests/catalogue.rs:4-5) | U4a (1-3, 6), U4e (4), U4r (5) (Q7, Q8) |
+| RQ10 | "Bites first: every automated mark's planted defect must FAIL before its pass counts" | plan.md:680-683 | U2's pattern | Every sub-unit; §4.14 |
+| RQ11 | "the same seed gives the same packet-fate log and the same per-tick hashes" | plan.md:749-750 | -3 on L1 (U2) | U4c, U4r |
+| RQ12 | -7's history sized from -48's test cap "fixed in U4 from L1's largest honest rewind at P3 and P4" plus the margin, recorded | plan.md:696 | Nothing | U4h |
+| RQ13 | Mustafa, 2026-11-09: one shared CARGO_TARGET_DIR for every copy, with the touch and count safeguards | checkpoint :404-413 | Applied in U3d | §7 |
+| RQ14 | Netcode evidence: "deterministic tests with injected latency, jitter and loss" | CLAUDE.md, change-set protocol item 4 | | §9 |
 
-**The numbers U4 works to** (each from its source; U4 measures the ones marked as estimates):
+**The numbers U4 works to** (sources as rev 1; estimates marked):
 - 48 soldiers in 3 x 16, each with a snapshot-receiving client; 15 big vehicles, 4 of at least 20 parts; 300 live
   projectiles; hitscan at 700 shots per second ± 5 %; one portal change per second (PM-0001-2, ADR 0001:1589).
-- A 30 Hz tick, a snapshot every tick, one input per tick (ADR 0001:125-163, TICK-30).
+- A 30 Hz tick, a snapshot every tick, one input per tick (ADR 0001:125-163).
 - Per client 256 kbps = 1,066.7 B per tick, counted as UDP payload + 28 B per datagram (catalogue :262); a datagram cap
-  of 1,000 B "until -36 measures" (plan.md:452); `Input` at most 166 B (catalogue :66).
+  of 1,000 B until -36 measures (plan.md:452); `Input` at most 166 B (catalogue :66); the per-connection Input bucket
+  8 datagrams, refilled at 2 x TICK_HZ a second (catalogue, Input row).
 - The hit history at most 1 MB in the stress scene (plan.md:459, E11).
-- Estimates, not measurements: a stress-scene snapshot of about 690 B per client per tick (net F112); about 350 B more
-  of event resends at P2 if every hit is a resent gameplay event (net F121); a hit-history tick of about 3 KB (net
-  F106); `Input` at about 23 B whole and at most 19 B per repeat (net F116).
+- Estimates: a stress-scene snapshot of about 690 B per client per tick (net F112); about 350 B more of event resends at
+  P2 (net F121); a hit-volume tick of about 3 KB (net F106); `Input` about 23 B whole, at most 19 B per repeat (net F116);
+  a recording about 18 MB per 9,000 ticks (§4.15, my arithmetic).
 
 ## 2. Carried items U4 must meet
 | Id | What (short) | Source | Where | Proof |
 |---|---|---|---|---|
-| C1' | L1's streams as quinn's QUIC: packets of at most 1,200 B, each with its own fate; lost once a later packet is acked and 3 later packets are, or 9/8 x max(srtt, latest) has passed; else the PTO srtt + max(4 rttvar, 1 ms) + 25 ms, doubling, reset by an ack, counted from the last ack-eliciting send; each resend its own fate; in order per stream; three unit tests; the doc says L1 has no congestion window. Replaces C1 | advisor-u3q.md:160-173 | U4c | L-c1 to L-c8 (§5 U4c) |
-| C2 | An RTT sample only when the newest packet of the link and direction is acked (RFC 9002 §5.1); a stream message's sample from its own packet, not its in-order delivery; tests; "due before npt-room reads rtt_ns" | advisor-u2.md:79-83 | U4c | L-c7 |
-| C3 | `loss` on Link "with npt-room, its first consumer", each backend's own estimate; §4.4's send-buffer space settled | advisor-u2.md:84-89 | U4c or U6 (Q6 U4-LOSS) | per the ruling |
-| C4 | The judge: a measured run (or its twin) whose build lists `bites` or names a bite, and a bite run whose build lacks it, are INVALID, with fixtures | advisor-u2.md:101-103 | U4e (with the judge change) | PASS and INVALID fixtures |
-| U6 note | `Box<dyn Link>` without `Send` (L1 is Rc/RefCell); U4 adds no Send bound | advisor-u2.md:59-60 | all | review |
-| -18 split | marks.json -18's parts per transport, its checks (a)-(e), its bites, SERIES's `burst_heal` (the fresh delta) and `burst_return`, and the `ws-practice` validity rule with fixtures | advisor-ws-docs-r2.md:375-377; checkpoint :540-541; marks.json still holds the old row (M10) | U4e (Q20 U4-18) | the marks step; judge fixtures |
-| Sizes for fixes.rs | L1 B1 runs of the stress scene log each client's per-tick snapshot payload and datagram count, each input's payload, and the Join, JoinAccepted and FullState sizes, so the run-structured bound replaces SNAP = 1,050 and INPUT = 88 (crates/net/src/tcp_model/fixes.rs:34, :36) | advisor-ws-docs-r2.md:383 | U4e logs them; the bound is its own small unit after U4e | the series and their SERIES.md rows |
-| Scene selects | -14, -16 to -25 and -27 add scene and clients to their selects, and `pre:PM-0001-2`, once the runner names each run's scene | checkpoint :325-328 | U4e (Q22 U4-SCENES) | the marks step |
-| -48 test cap, -7 size | the test cap from L1's largest honest rewind at P3 and P4; -7's history size from it | plan.md:696 | U4h | recorded |
-| -56 items | item (6): OQ-0001-6's two options, each with -42's correction share, -48's registration and -49's honest rewind at P2 to P4; item (10): R-10's cover item, both variants recorded on L1 | marks.json:10517; plan.md:1382 | U4g, U4h | the record series |
-| `hs` | the tick record's per-client hash list: "npt-log adds it with its first writer" | marks/README.md:147-148; log/src/lib.rs:104-117 has none | U4e | a schema test |
-| Stale text | the checkpoint's Open findings still describe C1, not C1' | checkpoint :298-301 (M11) | the main session, before U4c's brief | text |
-| Drift | proto/clippy.toml says the check script compares it with sim's; nothing does | proto/clippy.toml:1-2; M8 | U4a (a check.mjs comparison, with a bite) | check.test.mjs |
-| Features | one npt-sim feature set in the server and Wasm builds, by `cargo tree -e features`; bite: an extra feature on a shared dependency (PM-0004-74) | plan.md:522; ADR 0004:1184 | U4d2 | a deps-step line and its bite |
-| Rules file | .claude/rules/netcode.md loads only for server/, shared/ and net/ paths (:2-5), yet its rules bind proto, room and client too | net F98; plan.md:416-417 | every brief names the file (changing the globs is a kit edit: Mustafa's, not asked) | the brief's text |
+| C1' | L1's streams as quinn's QUIC (packets ≤ 1,200 B, own fates, the RFC 9002 loss rules, PTO doubling, in-order streams; three unit tests; the doc says L1 has no congestion window). Rev 2 adds RFC 9002's initial RTT and kGranularity (T12) | advisor-u3q.md:160-173; RFC 9002 §5.3, §6.1.2, §6.2.1, §6.2.2 | U4c | L-c1 to L-c9 |
+| C2 | An RTT sample only from the newest packet of its link and direction; a stream message samples from its own packet; due before npt-room reads rtt_ns | advisor-u2.md:79-83 | U4c | L-c7 |
+| C3 | `loss` on Link with npt-room, its first consumer | advisor-u2.md:84-89 | U6 if Q6 (b) | per the ruling |
+| C4 | The judge: a measured run (or twin) whose build lists `bites` or names a bite, and a bite run whose build lacks it, are INVALID, with fixtures | advisor-u2.md:101-103 | U4j | fixtures |
+| U6 note | `Box<dyn Link>` without `Send`; U4 adds no Send bound on Link (rev 2 asserts Send on Room, Decoder and ClientEndpoint, which hold no link) | advisor-u2.md:59-60 | all | §4.11 |
+| -18 split | marks.json -18 per transport, checks (a)-(e), SERIES's `burst_heal` and `burst_return`, the `ws-practice` rule with fixtures | advisor-ws-docs-r2.md:375-377 | U4j (Q20) | fixtures |
+| Sizes for fixes.rs | L1 B1 runs of the stress scene log each client's per-tick snapshot payload and datagram count, each input's payload, and Join, JoinAccepted and FullState sizes (fixes.rs:34, :36) | advisor-ws-docs-r2.md:383 | U4r logs them; the bound is its own small unit after U4r | series with SERIES.md rows |
+| Scene selects | the selects of -14, -16 to -25 and -27, and `pre:PM-0001-2` | checkpoint :325-328 | U4j, per §4.12's table (Q22) | the marks step |
+| -48 test cap, -7 size | from L1's largest honest rewind at P3 and P4, on calibration seeds (T14) | plan.md:696 | U4h | recorded |
+| -56 items | (6) OQ-0001-6's options with -42's share, -48's registration, -49's honest rewind at P2 to P4; (10) R-10's cover variants | marks.json -56; plan.md:1382 | U4g, U4h | the record series |
+| `hs` | per-client hash list on tick records | marks/README.md:147-148 | U4j | a schema test |
+| Stale text | the checkpoint's Open findings still describe C1 | checkpoint :298-301 | the main session, before U4c's brief | text |
+| Drift | proto/clippy.toml says the check script compares it with sim's; nothing does | proto/clippy.toml:1-2 | U4a | check.test.mjs bite |
+| Features | one npt-sim feature set, server against Wasm, like for like (A12) | plan.md:522; ADR 0004:1184 | U4d2 | a deps-step line and its bite |
+| Rules file | .claude/rules/netcode.md loads only for server/, shared/ and net/ paths, yet binds proto, room and client | net F98 | every brief names it (the glob change is a kit edit: Mustafa's, not asked) | brief text |
 
 ## 3. Rulings the structure rests on (asked in §10; this plan is written to the recommendations)
-- **U4-SEAM:** the trait `SimCore` and its plain-data types live in npt-sim; npt-room is generic over `S: SimCore` and
-  depends on npt-sim; npt-server and npt-lab name `npt_sim::World` once. Rust lets `impl SimCore for World` sit only in
-  the trait's crate or the type's (arch F11). This keeps "sim depends on content only" (ADR 0002:186-189) and the 60 Hz
-  swap inside npt-sim (plan.md:552). §4.7's npt-room line loses `SimCore`; npt-sim's gains it.
-- **U4-HIT:** for each command with fire held or a fire edge, the room picks two history entries and a fraction
-  (integers only) for that command's accepted view time and passes them with the command into `step`. npt-sim blends the
-  volumes, casts from its own fire origin, and uses the rewound set only if the shot fires. All float geometry stays in
-  npt-sim under its bans (arch F22, net F107, F123).
-- **U4-WASM:** a small check-only crate over npt-sim with integer-only exports, run by Node's WebAssembly API (arch F26
-  option B; M23).
-- **U4-REPLAY:** recordings hold each tick's seam inputs, and the replay runs npt-sim alone (arch F27). -30's U4 leg
-  replays the same recording's commands through the room (Q10).
-- **U4-SERVER:** npt-server's U4 half is transport-free and runtime-free (arch F34); npt-bots' behaviours likewise
-  (arch F38).
-- **U4-LOSS:** `loss` and send-buffer space join Link at U6 with their consumer, rate adaptation (M13).
-- **U4-CTL:** the room-wide control types and their decoder go in npt-proto at U4 (M3, M15).
+- **U4-SEAM (Q1):** the trait `SimCore` and its plain-data types live in npt-sim; npt-room is generic over `S: SimCore`
+  and depends on npt-sim (ADR 0002:186-189); npt-server and npt-lab name `npt_sim::World` once.
+- **U4-HIT (Q2):** a lag-compensated shot crosses the seam as an integer `Rewind`; the ring of past hit volumes is an
+  npt-sim type, owned by the room and lent to `step`; `rewind_at` (tolerance, cap) stays in npt-room. All float
+  geometry stays in npt-sim.
+- **U4-WASM (Q3):** a check-only crate over npt-sim with integer-only exports, run by Node (option B).
+- **U4-REPLAY (Q4):** recordings hold each tick's `TickInput`; npt-sim replays them alone.
+- **U4-SERVER (Q5):** npt-server's and npt-bots' U4 halves are transport-free and clock-injected; AddrTable and the
+  handshake cap go to U6 with -25.
+- **U4-LOSS (Q6):** `loss` and send-buffer space join Link at U6.
+- **U4-CTL (Q7):** the room-wide control types and their decoder in npt-proto at U4.
+- **U4-OWNSNAP (Q23):** the sim snaps each soldier's own state to the wire grid every tick; the grid lives in npt-sim
+  and npt-proto depends on npt-sim (ADR 0002:188 allows sim types in the protocol crate).
+- **U4-CLAMP (Q25):** the clamp beyond reach runs inside npt-sim's shot phase.
 
 ## 4. Design rules U4 builds to (each becomes a test in §5)
-### 4.1 Public items: §4.7 plus these, each with its reason
+### 4.1 Public items: plan §4.7 plus these, each with its reason
 | Crate | Added or changed | Why |
 |---|---|---|
 | npt-sim | `SimCore` (moved from npt-room) | U4-SEAM |
-| npt-sim | `TICK_HZ` | plan.md:544 asks for one constant and names no home; the sim owns dt (ADR 0004:185-187), so the 60 Hz swap edits only npt-sim |
-| npt-sim | seam data: `Command`, `Rewind`, `TickInput` (one tick's commands, rewinds, spawns, teleports and scripted attribute changes), `EntityRecord` (the snapshot-field read-out), `HitVolumes` (the hit-volume read-out), `SimEvent` (the tick's events) | §4.6 names the read-outs but no types; plain data, no behaviour |
-| npt-sim | `Recording` (the seam-level record codec, fixed-width little-endian), `StateDump` (the canonical state with its field table) | RQ5's first mismatching tick and field diff (plan.md:535); U4-REPLAY |
-| npt-sim | the methods `World::predict`, `World::load_movers`, `World::ray_cast`; `Scene::estimate`, `Scene::course`, `Scene::targets` beside `Scene::stress` | ADR 0004:166-178's prediction entry; ADR 0001:258-260's one ray query for AimCast and the server; the ES, CO and TC scenes (ADR 0001:1470-1482) |
-| npt-proto | `RoomControl` (the room-wide controls and their decoder) | catalogue item 6 (:253); U5's fuzz target needs it (catalogue :280, the answer to its Q6); plan.md:377 already homes "controls" in npt-proto |
-| npt-proto | `Wrap` (one wrap-aware compare per counter width) | -58's six plain-`<` bites need one shared site per width (ADR 0001:1607) |
-| npt-proto | `client_hash` | -17: the room and the client must call one function over one quantiser (arch F33; Q11) |
-| npt-proto, npt-client | a dependency on npt-link, for `Channel` only | catalogue item 2 and the wrong-channel check use one enum (arch F37); leaf to leaf |
+| npt-sim | `TICK_HZ`, `LOOP_CATCHUP`, the tick-constant functions and their derived constants (§4.3) | plan.md:544-546; A4, A5: the Worker reaches npt-sim, never npt-server |
+| npt-sim | `grid` (the wire grid, each way, per field kind) | U4-OWNSNAP: the sim's own-copy snap and both codec ends need one function |
+| npt-sim | seam data: `Command`, `Rewind`, `TickInput`, `EntityRecord`, `HitVolumes`, `HitHistory` (moved from npt-room), `PortalStates`, `SimEvent` | §4.2; A1, A2 |
+| npt-sim | `Recording`, `StateDump`, `replay::Replayer` | RQ5's field diff; U4-REPLAY; A12's one driver |
+| npt-sim | `World::predict`, `World::load_movers`, `World::ray_cast`; `Scene::estimate`, `Scene::course`, `Scene::targets` beside `Scene::stress` | ADR 0004:166-178; ADR 0001:258-260; ADR 0001:1470-1482 |
+| npt-proto | `RoomControl` (unfeatured; N5) | catalogue item 6 (:253); U5's fuzz target (catalogue :280) |
+| npt-proto | `Wrap` (one compare per width, called with its counter's name) | -58's per-counter bites (§4.14) |
+| npt-proto | `client_hash`; the `EntityRecord` ↔ wire mapping | -17 (§4.6); A18 |
+| npt-proto | dependencies on npt-sim (grid, seam types) and npt-link (`Channel`) | U4-OWNSNAP, A18; catalogue item 2 (arch F37); leaf to leaf |
+| npt-client | a dependency on npt-link, for `Channel` | as above |
 | npt-room | `Room<S: SimCore>`; `InputBuffer::CMD_CATCHUP` | U4-SEAM; RQ6 |
-| npt-server | `Decoder::pump` (the I/O step over `&mut dyn Link` with an injected `now`); `Schedule::LOOP_CATCHUP` | U4-SERVER; RQ6 |
-| npt-l1 | `L1Net::next_event_ns` | C1' makes L1 event-driven (net F115 iv) |
-| npt-bots (library) | `Behaviour` (the honest brawl, the target-course shooter, the cheats, the never-acker), transport-free and clock-injected | E12 (plan.md:460); lab drives them on SimClock (U4-SERVER) |
-| npt-lab | the subcommands `scenario` (with `--record`), `replay` and `hash` | plan.md:590-591 |
+| npt-server | `Decoder::pump` (the I/O step over `&mut dyn Link`, injected `now`, the ping sender, per-client RTT and bytes sent); `Schedule`, `Due` | U4-SERVER; §4.3; A6, A7 |
+| npt-l1 | `L1Net::next_event_ns` | C1' makes L1 event-driven |
+| npt-bots (library) | `Behaviour` (the brawl, the open-loop scripts, the target-course shooter, the cheats, the never-acker), clock-injected | E12; U4-SERVER |
+| npt-lab | subcommands `scenario` (with `--record`), `replay` and `hash` | plan.md:590-591 |
 | npt-log | `TickRecord.hs` | marks/README.md:147-148 |
-| a new crate | `npt-hash-wasm` (cdylib; its exports only, integers only) | U4-WASM (B) |
-| not built at U4 | `BlockWriter` (U7: only the page reads the block, and no U4 row needs it: arch F45c); `TickLoop`, `PhaseTimers`, `ControlSocket`'s socket (U6) | §6 |
+| npt-judge | accepts `PRE-` ids only in a file whose top level says `"kind": "precheck"` | Q10 (T2) |
+| a new crate | `npt-hash-wasm` (cdylib; integer-only exports) | U4-WASM (B) |
+| not built at U4 | `BlockWriter` (U7); `TickLoop`, `PhaseTimers`, `ControlSocket`'s socket, `AddrTable`, the handshake cap (U6) | §6 |
 
 ### 4.2 The seam
-- `SimCore`: `step(&mut self, input: &TickInput) -> &[SimEvent]`; `state_hash(&self) -> u64`;
-  `entity_records(&self) -> &[EntityRecord]`; `hit_volumes(&self) -> &HitVolumes`; spawn and teleport through
-  `TickInput`. One implementation: `World`.
-- Two sim entry points over the same phase functions (ADR 0004:166-178): the authority `step` (all phases) and
-  `World::predict` (one slot and its vehicle: own movement, own weapon state and cosmetic shot events, against the movers
-  `World::load_movers` loaded from the last decoded snapshot, drawing from no random stream).
-- Pools have fixed capacity, set at scene start; a full pool refuses the new row and counts it (ADR 0004:131-152).
-- The tick's event list is part of the state and of its hash (ADR 0004:544-561).
+- `SimCore`:
+  - `step(&mut self, input: &TickInput, history: &HitHistory) -> &[SimEvent]`;
+  - `state_hash(&self) -> u64`;
+  - `entity_records(&self) -> &[EntityRecord]`: per entity its id, kind, area id, grid integers, and the pre-grid
+    values as `u32` bits (for -57's log; the room copies bits and never computes with them);
+  - `hit_volumes(&self) -> &HitVolumes`; `portal_states(&self) -> &PortalStates` (each portal open or closed: A2);
+  - spawn, teleport and scripted attribute changes go in through `TickInput`.
+  - One implementation: `World`. The static graph is npt-sim's plain-data `Areas` and `Portals` (plan.md:567), so the
+    room's `AreaFlood` re-floods when `portal_states` changes, with no float and no sim internals.
+- **`Rewind`** rides with each command that has fire held or a fire edge: `tick_a: u32`, `fraction: u8` (the blend
+  from tick_a toward tick_a + 1; U4a's field table fixes the bits, net F116 proposes 8), `cover: CoverVariant`
+  (R-10's two variants). Integers only. A Rewind naming a tick the lent ring does not hold is refused and counted by
+  the sim (a debug assert too: a correct room never sends one).
+- **`HitHistory`** is npt-sim's fixed ring of `HitVolumes` per tick (capacity set at construction from U4h's test cap,
+  in ms, through §4.3's functions). The room owns its instance and pushes `world.hit_volumes()` after each `step`; the
+  replay driver does the same, so a recording needs no volumes. The client's predicting World carries none.
+- **The clamp** (Q25): inside the shot phase, on the aim point in integer cm, from the in-step fire origin: a point
+  beyond the weapon's reach + 0.87 cm (one grid cell's half-diagonal) moves along its own ray to exactly the reach and
+  is snapped to the grid; `SimEvent::Clamped { slot, seq, point }` reports it. A point within reach + 0.87 cm is never
+  clamped again, so a clamped point sent back is stable (the twin's rule, §4.10).
+- **Two entry points** over the same phase functions (ADR 0004:166-178): the authority `step` and `World::predict` (one
+  slot and its vehicle, against the movers `World::load_movers` loaded from the last decoded snapshot, drawing from no
+  random stream). Both end each tick with the own-copy snap through `grid` (Q23).
+- `World::ray_cast(&self, ray, movers: &HitVolumes) -> RayHit`: the static world from self, the movers supplied (the
+  client's interpolated set for AimCast, the blended rewound set for a server shot: ADR 0001:258-260, :358-362; A11).
+- Pools have fixed capacity; a full pool refuses and counts. The tick's event list is state and hashed
+  (ADR 0004:544-561).
 
-### 4.3 The tick constant and the loop policy
-- `npt_sim::TICK_HZ = 30`. `Schedule::for_tick_hz(TICK_HZ)` derives the period and `LOOP_CATCHUP = TICK_HZ / 4` (7 at
-  30 Hz, 15 at 60 Hz). A test derives 7 and 15; a check.mjs grep refuses `LOOP_CATCHUP` set from a literal.
-- `due_ticks(now_ns, &mut Schedule) -> (to_run, dropped)`: tick k is due at base + ⌊k x 10⁹ / TICK_HZ⌋ ns; at most
-  LOOP_CATCHUP run per wake; a longer stall drops the excess, counts it, and rebases. npt-lab calls the same function
-  with SimClock's now (arch F35): one schedule, never two.
+### 4.3 The tick constant, the derived constants and the loop policy
+- In npt-sim: `TICK_HZ = 30`; `LOOP_CATCHUP = TICK_HZ / 4` (7 at 30 Hz, 15 at 60 Hz); `const fn ticks_for_ms(ms)` =
+  ⌈ms x TICK_HZ / 1,000⌉. Every tick-counted value is such a function of TICK_HZ, never a literal (A5):
+  - the FullState acknowledgement bound: `ticks_for_ms(2_000)` (60 at 30 Hz, 120 at 60 Hz);
+  - the AckRing and the client's frame ring: `32 x TICK_HZ / 30` ticks (32, 64; 1.067 s);
+  - the ClientSettings step: one interval per second, `TICK_HZ` ticks;
+  - the HitHistory capacity: `ticks_for_ms(test cap + margin)` from U4h's data.
+  A test evaluates each function at 30 and at 60 and pins the values; a check.mjs grep refuses those names set from a
+  literal (U4s, with its self-test bite).
+- `CMD_CATCHUP = npt_proto::Limits::REDUNDANCY_CAP` (8), with a const assert that it is no larger (ADR 0001:238-239; N2).
+- npt-server: `Schedule::new(tick_hz, catchup)`; `due_ticks(now_ns, &Schedule) -> Due { to_run, dropped, next:
+  Schedule }`, pure (N4): tick k is due at base + ⌊k x 10⁹ / TICK_HZ⌋ ns; at most `catchup` per wake; a longer stall
+  drops the excess, counts it and rebases in `next`. npt-server and npt-lab pass `npt_sim::LOOP_CATCHUP`; the Worker's
+  host (U7) reads the same constant through npt-client-wasm, which reaches npt-sim and never npt-server.
 
 ### 4.4 The wire
-- Framing, channels and limits as the catalogue gives them (:61-78; rows :87-101). Every decoder checks the size
-  first, returns an error and never panics (ADR 0001:446).
-- Quantisation (`Quant`, one function each way, used by both ends): positions at 1 cm in 16/16/12 bits (±327.68 m; 0 to
-  40.95 m), yaw in 16 bits, pitch in 10 bits over ±90° (net F37, F55); round to nearest with one stated tie rule,
-  computed in integers after one scale multiply.
-- The `Input` field table is stated by U4a and read by the limit test. net F116's proposal: a whole command of about
-  23 B; a repeat as a change mask + a tick delta + the changed fields, never larger than the whole command; 5 + 23 +
-  7 x 19 = 161 B at the redundancy cap, under 166 B. The aim point at 1 cm in 44 bits, under the 80-bit limit
-  (ADR 0001:226-227).
-- The snapshot header: the full 32-bit server tick, then 16-bit offsets (baseline, newest command received, last
-  command run) and the group index (the catalogue's Snapshot row, :88).
-- Wrap-aware compares per width through `Wrap`; every counter takes an injectable start value (-58).
+- Framing, channels and limits as the catalogue gives them (:61-78; rows :87-101). Every decoder checks the size first,
+  returns an error and never panics (ADR 0001:446).
+- **The grid** (`npt_sim::grid`): positions at 1 cm, yaw in 16 bits, pitch in 10 bits over ±90° (net F37, F55),
+  velocity as U4a's table states; round to nearest with one stated tie rule, in integers after one scale multiply. The
+  sim's own-copy snap, the encoder and the client all call it. Bites on it are chosen through a grid config value the
+  caller passes, never a static (§4.11).
+- **npt-proto's `Quant`** packs grid integers into their widths (position 16/16/12 bits: ±327.68 m, 0 to 40.95 m). The
+  `EntityRecord` ↔ wire-field mapping lives here, one home for the room's encode and the client's decode, with a round
+  trip test (A18).
+- The `Input` field table is stated by U4a and read by the limit test (net F116's proposal: about 23 B whole; a repeat
+  as change mask + tick delta + changed fields, never larger than the whole command; 5 + 23 + 7 x 19 = 161 B at the
+  redundancy cap, under 166 B; the aim at 1 cm in 44 bits, under ADR 0001:226-227's 80).
+- The snapshot header: the full 32-bit server tick, the 16-bit offsets (baseline, newest command received, last command
+  run), the group index **and the group count** (so the client knows when a tick is complete: §4.6).
+- `Wrap`: one wrap-aware compare per width, called with its counter's name; every counter takes an injectable start
+  value (-58).
+- **Reading (A26):** plan §4.4's server column lists "trailing bytes and unknown fields; the wrong channel". Those
+  checks run in npt-server's `Decoder::pump`, which counts them; they are implemented as npt-proto decode errors
+  (`TrailingBytes`, `WrongChannel`), and only the pump calls the decoder on client input. Their bite sites are in
+  proto's decode.
 
-### 4.5 Baselines, groups and the window (Q12 U4-BASELINE, Q13 U4-WINDOW)
+### 4.5 Baselines, groups and the window (Q12, Q13)
 - A snapshot that splits goes out as entity groups that each decode alone, all against one baseline B: the newest sent
-  snapshot whose every group the client has acknowledged (the input's ack carries the low 16 bits of the tick plus a
-  group mask). A partly acknowledged tick is never a baseline. A B older than the 32-entry ring (1.07 s) means coding
-  against the per-type defaults (net F111). Events ride one group and are acknowledged with it.
-- The per-client 256 kbps cap is one budget for every datagram the room side sends that client, pings and pongs
-  included; the encoder's per-tick budget is what that budget leaves (net F110). Otherwise a 1,066 B snapshot every tick
-  plus about 600 B per second of pings and pongs breaks PM-0001-12's 1 s window by design.
-- The encoder exposes one tick's whole snapshot as a unit, for WsServer's gate at U6 (plan.md:1225, W18).
+  snapshot whose every group the client acknowledged (the input's ack carries the low 16 bits of the tick plus a group
+  mask). A partly acknowledged tick is never a baseline.
+- **The AckRing keeps ages 0 to 31** (age = this tick minus the snapshot's tick; 32 entries at 30 Hz), pinned by a unit
+  test at both edges (age 31 kept, age 32 evicted: T15). A B older than that means coding against the per-type
+  defaults. The client keeps its complete frames for the same ages, so every B the server can pick, the client holds.
+- **Each burst logs `event.burst_eviction`** (1 if the last acknowledged baseline had left the ring at the first tick
+  after the burst, else 0), so -18's bite shows whether it could bite.
+- **The window (A7):** the room owns each client's 256 kbps window (plan.md:503's room column). The pump reports per
+  client the bytes it sent since the last tick (pings, pongs: payload + 28 B each); the window counts them, and the
+  encoder's budget is what remains. plan.md §4.4's list of per-tick inputs gains "bytes sent by the server side".
+- The encoder exposes one tick's whole snapshot as a unit, for WsServer's gate at U6 (plan.md:1225).
 
-### 4.6 The client-held hash (Q11 U4-MIRROR)
-- Per client per tick, the server side hashes what the encoder intends that client to hold after decoding: the baseline
-  plus this tick's delta, over that client's entity set, quantised, with the own-state section as sent. The client
-  hashes what it decoded. Both call `client_hash` (net F122). Hashing "the server's quantised state" literally would
-  mismatch by design whenever the priority accumulator skips an entity, which it may do for up to 3 snapshots
-  (ADR 0001:405-407). The authority-only streams stay out (plan.md:531).
+### 4.6 The client-held hash (Q11)
+- **What both sides hash** with one function, `client_hash`: the full 32-bit tick; the client's entity set for that
+  tick in entity-id order, each entity's id, kind and grid integers; the own-state section; the event section's events
+  as (32-bit event number, kind). The authority-only streams stay out (plan.md:531). The output is never 0.
+- **The server side** hashes what the encoder intends the client to hold after decoding that tick: baseline B plus this
+  tick's delta over the client's set (an entity skipped by the priority accumulator at B's value), the own-state
+  section and the events as sent, with the server's own 32-bit tick and event numbers.
+- **The client side** hashes its own held state for that tick: the frame it built, taken as the floats it holds for
+  interpolation and prediction and turned back into grid integers through `grid`, with the 32-bit tick and event
+  numbers as it rebuilt them. A correct client gives the same integers (an exhaustive round-trip test, U4s s2); a
+  client that places an entity a cell off, rebuilds the wrong tick or numbers an event wrongly does not.
+- **When the client logs:**
+  - a tick whose every group decoded: its hash, under the tick it rebuilt;
+  - a tick with a received group the client could not decode (no baseline, a bad header, a size or decode error): the
+    sentinel 0, which always mismatches. In an honest run this never happens (the client holds every baseline the
+    server can pick, and L1 neither corrupts nor duplicates: l1/src/lib.rs:42-43);
+  - a tick with a group lost and none refused: nothing, and `tick.s.snap_incomplete` = 1 for that client.
+- **The figure** (`decoded_hash_mismatch_count`, U4j) counts (client, tick) pairs whose hashes differ, plus every client
+  hash at a (client, tick) the server never logged (a client that labels a frame with the wrong tick); server-only
+  pairs are loss, not mismatches; 0 compared fails. `decoded_hash_compared_count` and the incomplete count are reported
+  beside it.
+- **-57's pairing (T20):** npt-lab pairs (client, tick, entity) only for fields that tick's snapshot carried and the
+  client decoded, against the server's pre-grid value at that tick.
 
-### 4.7 Events (Q14 U4-EVENTS)
-- The per-client event queue is bounded (its cap as data). On overflow the room forces one resync (the FullState clears
-  the client's unacknowledged events: the catalogue's Q8, :282). If that FullState is not acknowledged within a bound
-  (data; proposed 60 ticks), or the queue overflows again inside it, the room sends Kick(overflow) and drops the client
-  (net F119). Event ids are 16-bit and wrap-aware.
-- The cap is set from the stress scene's measured rate of relevant gameplay events x (B1's 1 s + RTT + a margin), and
-  recorded. At about 350 hit events per second (net F121), a cap below about 400 would resync all 48 clients on every
-  burst and change -18's heal path. Whether a hit on a third party is a resent gameplay event or a once-only cosmetic
-  one is part of Q14.
+### 4.7 Events (Q14)
+- The per-client event queue is bounded (cap as data). On overflow the room forces one resync (the FullState clears the
+  client's unacknowledged events: catalogue Q8, :282). If that FullState is not acknowledged within
+  `ticks_for_ms(2_000)` (60 ticks at 30 Hz), or the queue overflows again inside it, the room sends Kick(overflow) and
+  drops the client (net F119). Event numbers are 16-bit on the wire, rebuilt to 32 bits by `Wrap`.
+- The cap: the stress scene's measured rate of relevant gameplay events x (B1's 1 s + RTT + a margin), recorded. At
+  about 350 hit events per second (net F121), a cap below about 400 would resync all 48 clients on every burst.
 
-### 4.8 Clocks and time on the client (Q19 U4-UNITS)
-- Two clocks, kept apart (net F117). The command clock (the server-time offset from the client's own pings: a filtered
-  estimator over the lowest-RTT samples; drift at most 1-2 ms per frame, errors over 100 ms halved, over 500 ms reset:
-  ADR 0001:239-242) decides which tick a command is stamped for. The interpolation clock (the newest snapshot's tick
-  plus the local clock since its arrival stamp, minus the adaptive delay) is monotonic and rate-slewed.
-- npt-client's API takes integer nanoseconds (arch F39), not E7's milliseconds (plan.md:476-477); npt-client-wasm
-  converts `performance.now()` once (U7).
-- Interp buffer slots = the 5-interval maximum delay + 1 of extrapolation + 1 being written = 7 at 30 Hz; -45's bite is
-  the P2-derived size minus one (net F118).
+### 4.8 Clocks and time on the client (Q19)
+- As rev 1: the command clock (server-time offset from the client's own pings, ADR 0001:239-242's filter) and the
+  interpolation clock (monotonic, rate-slewed), kept apart (net F117); integer ns at npt-client's API (arch F39); Interp
+  slots = the 5-interval maximum delay + 1 of extrapolation + 1 being written = 7 at 30 Hz.
 
 ### 4.9 Lag compensation
-- `HitHistory` stores the seam's `HitVolumes` per tick: soldiers, vehicle parts, and the R-10 cover items (doors, the
-  wall stand-in, vehicle part transforms: net F105). The proposed ring is 64 ticks (about 192 KB at about 3 KB a tick:
-  net F106), fixed by U4h from the measured test cap plus a margin, recorded, at most 1 MB.
-- `rewind_at` picks the two entries around the accepted view time, and the fraction (U4a's field table gives the view
-  time's fraction bits; net F116 proposes 8). The sim blends linearly, as the client's Interp drew it (net F107): a
-  tick-step rewind errs by up to 30 cm at 9 m/s.
-- A view time is accepted within one snapshot interval of the server's estimate (RTT + interpolation delay + input-buffer
-  wait + half a tick); otherwise it is replaced by the estimate and counted (ADR 0001:358-395). The RTT source follows
-  `params.transport`: `wt` reads `Link::rtt_ns`, `ws` the room's own lowest recent ping sample (ADR 0001:367-368;
-  net F103).
-- The cap is switchable: the test cap (above every honest rewind), then, after R3, the rule cap (plan.md:818-820).
-- Cover variants for R-10: rewound with the victim, and present; both recorded (plan.md:1382).
+- `HitHistory` (§4.2) stores `HitVolumes` per tick: soldiers, vehicle parts, and R-10's cover items (doors, the wall
+  stand-in, vehicle part transforms: net F105). Its capacity comes from the measured test cap plus a margin (U4h),
+  recorded, at most 1 MB (proposed 64 ticks, about 192 KB at about 3 KB a tick: net F106).
+- `rewind_at` (npt-room) turns a command's accepted view time into a `Rewind` (tick_a, fraction, cover), or replaces the
+  view time by the estimate and counts it, or clips to the cap and counts it. The sim blends linearly, as the client's
+  Interp drew it (net F107).
+- **The tolerance** (ADR 0001:358-395): a view time is accepted within one snapshot interval of the server's estimate
+  (RTT + announced interpolation delay + input-buffer wait + half a tick). **The RTT comes from the pump (A6):** for a
+  `wt` or L1 session the link's `rtt_ns`, for a `ws` session the lowest recent sample of the server's own pings
+  (ADR 0001:367-368). The pump knows each session's kind from the listener that accepted it, so the room never reads a
+  run parameter. The pump runs the server's ping sender (a few a second: catalogue Ping row), which -50's WebSocket leg
+  and its ≥ 145 ms gap check read.
+- The cap is switchable: the test cap, then after R3 the rule cap (plan.md:818-820). Cover variants: rewound with the
+  victim, and present; both recorded (plan.md:1382).
 
-### 4.10 Hostile input (Q16 U4-TWIN)
-- Every check in plan §4.4's table gets its home and a -21 counter (the room in ticks; the server on the injected now).
-- **The clamp is stable under the wire's rounding** (net F108). The room clamps only points beyond the reach + 0.87 cm
-  (one quantum's half-diagonal), clamps along its own ray to exactly the reach, then snaps the result to the wire grid
-  with `Quant`. The harness builds the clamp twin's point as `Quant(clamp(P))` with the room's own function, so the
-  twin's sent point equals the forged run's clamped one. A unit test shows that quantising after the clamp is
-  idempotent.
-- **-21's twin is fate-aligned** (marks F27, M22). Forged content rides only inside packets the honest client sends
-  anyway, at the same instants, on the same flows. A forgery that voids a whole datagram (trailing bytes, an unknown
-  field) has, in its twin, a datagram in that slot carrying the header and acknowledgement only, with no commands. A
-  wrong-channel forgery on the control stream has, in its twin, a message in that slot of a valid no-effect kind (a
-  ClientSettings repeating the current delay). A wrong-channel message of a known type within its limits is refused and
-  counted, never a Kick, so no forged kind closes the session (the catalogue's Input row, :87, against its Kick row,
-  :99, which kicks on "type checks": Q16 settles the reading). A test shows the forged run's fate log and its twin's
-  equal on every flow.
+### 4.10 Hostile input (Q16)
+- Every check in plan §4.4's table gets its home and a -21 counter; the clamp is "(in the sim)", as cooldown, ammo and
+  reload already are (Q25).
+- **The clamp twin:** the forged run logs each `SimEvent::Clamped` point; the twin run sends exactly those points at
+  the same instants. Since a point within reach + 0.87 cm is never clamped again, the twin's shots use the same points,
+  and a unit test shows clamp-then-grid is idempotent.
+- **-21's twins are fate-aligned (marks F27, M22) and ack-aligned (T7):**
+  - forged content rides only inside datagrams the honest script sends anyway, at the same instants, on the same flows;
+  - a forgery that voids a whole datagram (trailing bytes, an unknown field) has, in its twin, a datagram in that slot
+    with the header only, no commands, and an ack equal to the previous datagram's (no new information), so the
+    server's acks, baselines, snapshot sizes and group counts match the forged run's;
+  - every client of the forged and clamp suites runs an open-loop seeded script (commands a function of seed, slot and
+    tick only), so nothing it decodes feeds back into what it sends;
+  - a wrong-channel forgery on the control stream has, in its twin, a valid no-effect message in that slot (a
+    ClientSettings repeating the current delay); a wrong-channel message of a known type within its limits is refused
+    and counted, never kicked, so no forged kind closes the session (catalogue Input row :87 against Kick row :99);
+  - **the catch-up kind (T8):** one datagram holds at most 8 commands, the cap itself, so this kind sends extra
+    datagrams in one tick (16 new commands in two), inside the per-connection bucket (8 datagrams, refilled at 2 x
+    TICK_HZ a second), so the catch-up check refuses the excess, not the bucket. The twin sends the same number of
+    datagrams at the same instants, carrying repeats only;
+  - a test shows the forged run's and its twin's fate logs equal on every flow, and their snapshot group counts equal on
+    every tick.
 
-### 4.11 Determinism outside npt-sim (Q9 U4-BANS)
-- The HashMap and HashSet type bans join room's and client's clippy.toml; new clippy.toml files for npt-server (with the
-  clock ban) and npt-lab, and for npt-bots' behaviour code (with the clock ban) (net F28, F114; arch F36). The
-  workspace's `iter_over_hash_type` deny (Cargo.toml) may cover only `for` loops (M21: not verified); the type ban
-  settles it either way.
-- The runner's own twin test: two processes, same seed and scenario, equal fate-log hashes and equal per-tick server and
-  client hashes; bite: a HashMap-ordered client order (marks F29).
+### 4.11 Determinism and hygiene outside npt-sim (Q9)
+- The HashMap and HashSet type bans join room's and client's clippy.toml; new clippy.toml files for npt-server and
+  npt-lab, and for npt-bots (all three with the clock ban, naming `std::time::Instant`, `std::time::SystemTime`,
+  `tokio::time::Instant` and their `now`: A14). npt-bots' file is crate-wide; U6's runtime half and its npt-net glue
+  then carry reviewed per-item allows, listed in U6's plan.
+- **npt-room is float-free (A3):** interest, priority and the window work on grid integers; a check.mjs grep refuses
+  `f32` and `f64` in crates/room/src (U4s, with its self-test bite).
+- **Bites per instance (T10):** every bite is chosen by a constructor argument or a config value the caller passes
+  (`World::with_bite`, `Room::with_bite`, the grid config), never a static, as `L1Net::with_bite` does
+  (l1/src/lib.rs:856-868). A test runs a bite instance and a clean instance on parallel threads in one process.
+- **Send (A25):** compile-time asserts that `Room<World>`, `Decoder` and `ClientEndpoint` are `Send`, so U6 can move
+  them to the tick thread; none holds a `Link`.
+- **Paths no L1 run reaches (T17):** a U4-built path whose only marks are L2, RS or ML parts gets a named unit test in
+  U4, or moves to the unit that first runs it (AddrTable and the handshake cap move to U6).
+- The runner's own twin test (two processes, same seed and scenario: equal fate-log hashes, equal per-tick server and
+  client hashes); bite: a HashMap-ordered client order (marks F29).
 
-### 4.12 Logs per process
+### 4.12 Logs, the contract test and the stress-scene precondition
 - On L1 one npt-lab process writes one log per process value the checks select on (`room`, `client`, `lab`), each with
-  its own header (marks/README.md:9: "One file per process and run"; marks F28). A contract test on a short scenario
-  shows that every check of every U4 L1 part resolves (no gap), and that every written name has its SERIES.md row (U3's
-  pattern: net/src/l2/names.rs:139-151).
+  its own header (marks/README.md:9; marks F28).
+- **The contract test** (a short scenario per suite) shows that every check of every U4 L1 part resolves (no gap),
+  every written name has its SERIES.md row, and **the validity inputs exist (T18):** one `admit` event per client (so
+  the roster rule, README:171, is not vacuous), a footer per log, and `tick.v.late_count` wherever `late-zero` applies.
+  It also resolves PM-0001-2's checks on every SS suite (T1).
+- **Which marks gain the scene, the clients and `pre:PM-0001-2` (Q22, T1):**
+
+| Mark | U4 L1 parts | Select gains | `pre:PM-0001-2` | Why |
+|---|---|---|---|---|
+| -17 | P0, P2, P3, B1 | scene SS, clients 48 | yes | the codec under the real load; shots hold (§4.13) |
+| -18 | B1 | scene SS, clients 48 | yes | B1 under option A loses about 1.2 % of shots, inside the band (§4.13) |
+| -20 | P3, A and B | scene SS, clients 48 | yes | redundancy repairs P3's losses |
+| -21 | 8 suites | scene SS, clients 48 | yes | at most about 9 shots per second lost to refusals (§4.13) |
+| -22 | never-ack | scene SS, clients 48 | **no** | the drop leaves 47 clients by design, which PM-0001-2's "a client on every soldier" refuses |
+| -14, -16, -19, -23 to -25, -27 | none at U4 | unchanged | unchanged | no U4 run feeds them; their scenes belong to the R run plans |
 
 ### 4.13 Scenes (data, recorded in each header)
-- SS, the stress scene, with net F113's numbers: 48 soldiers in 3 x 16 in one cluster in the centre field; 15 big
-  vehicles (the 4 of at least 20 parts in the fight, 11 moving elsewhere); 300 live projectiles as trajectory records;
-  384 effect rows (8 per soldier) in the state and the hash; doors giving one portal change per second near the fight;
-  one destructible-wall stand-in; the stand-in weapon's interval in integer sub-tick units so that 48 shooters give
-  700 shots per second with deaths counted (about 48/700 s = 0.0686 s; the legacy 0.072 s gives 666.7 per second,
-  inside the band by 1.7: net F113), measured by the scene's counters; DM_Tri's extent (LEGACY_INVENTORY.md:153),
-  inside E3's range.
-- ES, CO and TC as ADR 0001:1470-1482 gives them. TC's static targets are thin plates (at most 2 cm thick) on the
-  ground, at 2.5 m and at 4 m (Q17 U4-TARGETS): a solid target can hide its own top from the chest-height fire origin,
-  so -51 would measure the target's shape (net F109).
+- **SS, the stress scene,** with net F113's numbers: 48 soldiers in 3 x 16 in one cluster in the centre field; 15 big
+  vehicles (the 4 of at least 20 parts in the fight); 300 live projectiles as trajectory records; 384 effect rows (8 per
+  soldier) in the state and the hash; doors giving one portal change per second near the fight; one destructible-wall
+  stand-in; the stand-in weapon's interval in integer sub-tick units for 700 shots per second with deaths counted;
+  DM_Tri's extent (LEGACY_INVENTORY.md:153). A soldier counts in `soldiers_count` whether alive or awaiting respawn
+  (one per slot), so deaths never drop it below 48.
+- **The shot band under each precondition suite (arithmetic, before any run):** 700 / (48 x 30) = 0.486 shots per
+  command-tick.
+  - B1 under option A (nothing runs during a burst: OQ-0001-6 (a), ADR 0001:1156-1162): each 1 s burst loses about 22
+    of its 30 ticks of commands (the redundancy cap recovers 8), about 0.73 s of shots; 10 bursts in 600 s give a mean of
+    about 700 x (1 - 7.3 / 600) = 691.5 ≥ 665. Under option B the server repeats the last command on a miss, so about 700.
+  - -21's forged suite: 11 forging clients, one kind each, 1,000 forged commands each; if every refusal costs that
+    tick's shot, about 11 x 1,000 x 0.486 = 5,350 shots over 600 s, about 8.9 a second: a mean of about 691.
+  - Any one client silent for a whole run: 700 x 47 / 48 = 685.4 ≥ 665. No suite can raise shots above 735: the
+    command cap and the sim's cooldown bound each soldier's rate.
+  U4r's contract test shows the band per suite on its short runs; a suite outside it goes to the advisor before its
+  marks count.
+- **S1's stand-ins on L1 (A17, Q26):** the 1 ms burn and the 2.80 ms top-up are off on L1 (no L1 mark reads time: ADR
+  0001:1466-1467), recorded in `params.stand_ins`; the 384 effect rows stay, since they are state.
+- ES, CO and TC as ADR 0001:1470-1482 gives them; TC's static targets are thin plates (at most 2 cm thick) on the
+  ground, at 2.5 m and at 4 m (Q17; net F109).
+
+### 4.14 Bites that need a site or a run setting (T4, T6, risk 3)
+Each is planted where its code lives, shown to change state by a unit test in that sub-unit, and run judged in the
+sub-unit that moves its mark.
+
+| Bite | Its site | The check it fails | Run setting | Unit proof |
+|---|---|---|---|---|
+| -17/tick16, -58/tick16 | proto's header writer and the client's tick rebuild (the 16-bit value taken as the tick) | decoded hash: post-wrap frames logged under the wrong tick (an orphan pair) or as the sentinel | -17: `tick_start` = 63,736; -58: `ticks_below_wrap` = 30 | a frame at tick 65,537 hashes differently or is refused |
+| -17/client-rounding | npt-client's call into `grid` (floor in place of nearest) | decoded hash | any -17 profile | the floor variant differs on about half of all position values |
+| -18/no-fallback | the encoder's baseline choice, never falling back to the defaults | `burst_heal` (the fresh delta) | B1, ring ages 0-31 | a 1 s gap evicts B; `burst_eviction` = 1 |
+| -21/not-older-than | the room's tick check (≥ in place of >) | fast clock's excess commands | the fast-clock suite, option A (marks.json -21 notes) | an equal-tick command runs |
+| -21/no-catchup-cap | the room's per-tick command cap | forged: unrejected | the forged suite, option A, two datagrams in one tick | 16 commands run in one tick |
+| -41/server-speed-1pct | the authority step's run speed x 1.01, not `predict`'s (Q24) | untraced corrections | CO, every profile | one moving tick differs |
+| -41/server-quant-differs | the authority step's own-copy snap with another rounding than `grid`'s (Q23) | untraced corrections | CO | the snapped copy differs from the sent one |
+| -45/buffer-one-short | Interp's slot count | L1 P2: extrapolated share < 1 % | P2; size = the clean P2 runs' logged largest delay in intervals + 2 - 1; the delay never clamped to the buffer | extrapolation on a fixed P2 arrival trace |
+| -48/no-buffer-wait | the estimate without the input-buffer wait | view-hit share | where the buffer settles at 2 ticks or more (P3, option B, read from -20's logged depth; below 2, the advisor is asked before a fixed minimum is set) | honest view times replaced |
+| -58/lt-cmd-seq | the room's sequence-forward compare | 0 commands refused | sequence 2 below its wrap | post-wrap commands refused |
+| -58/lt-press | the room's press-edge compare | 0 presses lost or doubled | presses scripted through the wrap | an edge lost |
+| -58/lt-tick-offset | the client's "last command run" compare, where its replay starts | 0 untraced corrections | offsets crossing the wrap | replay starts at the wrong command |
+| -58/lt-event-seq | the client's event-number rebuild | decoded hash (event numbers are hashed: §4.6) | event numbers 3 below the wrap; SS's hits flow | a post-wrap event rebuilt wrong |
+| -58/lt-ack | the room's rebuild of the 16-bit ack: a wrong rebuild names a snapshot never sent, and the check "the acknowledgement names a sent snapshot" refuses that datagram's commands | 0 commands refused | acks crossing the wrap | a post-wrap ack refused |
+| -62/cues-from-replay | CueLog written from replays | plays at most once | suite `cues`: the replay skip off, a replay on every snapshot (as PM-0001-44: ADR 0001:1650) | a replayed shot plays twice |
+| -62/server-echo | the room sending the owner its own cosmetic shot events | own cosmetic sent = 0 | `cues` | one event sent |
+| -22/unbounded | the event queue's cap | headroom min = 0 | a full S30 of simulated time (marks.json -22) | headroom below 0 |
+| PM-0004-21 hash-map | a bites-only HashMap of at least 32 keys whose whole iteration order folds into a state value | D-2 and U4d2: first mismatching tick = T | two processes; each logs its order digest | the two digests differ; equal digests mean "not exercised", never caught or missed |
+
+### 4.15 Recordings (A1, A12, T9; Q4)
+- **Fields:** a header (scene, seed, TICK_HZ, pool sizes); then per tick a `TickInput`: per soldier one `Command`
+  (slot 1 B, tick 4, sequence 2, buttons 2, press counters 4, move 4, aim in cm 12, view tick 4 and fraction 1) and its
+  `Rewind` (present 1, tick_a 4, fraction 1, cover 1); spawns, teleports and scripted attribute changes when they occur.
+  Fixed-width little-endian, no `usize` (plan.md:527-529).
+- **Size:** about 41 B per command; 48 commands a tick, about 1,973 B a tick, about 17.8 MB per 9,000 ticks and 53 MB
+  for three (my arithmetic; U4d states the measured size). Fed to Wasm as 32-bit words: about 4.4 million calls each.
+- **Both uses:** the sim-only replay steps npt-sim with each `TickInput` and the ring the driver rebuilds; -30's
+  pre-check re-encodes the same commands as `Input` (stamped ticks, view times, sequences and press counters from the
+  recording; the ack from what that leg's replay client decodes live) and lets the room compute its own Rewinds.
+- **One driver:** `npt_sim::replay::Replayer` (feed words, step, per-tick hash and dump). npt-lab's `hash` subcommand
+  runs it natively; npt-hash-wasm's exports wrap it; D-2 calls it in a test.
+- **Sources:** U4d's three synthetic recordings from a seeded generator in npt-sim's test support (open-loop commands,
+  Rewinds drawn inside the ring), needing no room; U4r's three runner recordings (`scenario --record`: SS P2 seed 1, ES
+  P3 seed 2, TC B1 seed 3), which hold the room's real Rewinds.
+- **Where they live:** regenerated at check time under .gate/ from a committed recordings manifest (scene, seed,
+  script, generator version) with each file's SHA-256; a different hash fails the step and names the recording.
+  Never committed as files.
 
 ## 5. The sub-units, in dependency order
-Every sub-unit ends with: check.mjs green on both builds, with its counts stated in its brief (from U3d's 267
-measured, 281 bites, self 43: checkpoint :620-621); clippy -D warnings, host and wasm32, on both builds; fmt;
-Cargo.lock changed only by the named dependency; the merge into the main folder, one at a time; check.mjs and
-`node tools/gate.mjs --no-smoke` there, on its own cache; a commit, a checkpoint save and a push. A "bite" is a planted
-defect compiled only into the `bites` build and chosen at run time (plan.md:609-610), which must fail the named test or
-check.
+Every sub-unit ends with: check.mjs green on both builds, its counts stated **as deltas on its base** (from U3d's
+267 measured, 281 bites, self 43: checkpoint :620-621) and recomputed after the merge, both stated in its report;
+clippy -D warnings, host and wasm32, both builds; fmt; Cargo.lock changed only by the dependencies named; the merge
+into the main folder, one at a time; check.mjs and `node tools/gate.mjs --no-smoke` there, on its own cache; a commit,
+a checkpoint save and a push. A "bite" is a planted defect compiled only into the `bites` build and chosen at run time
+(plan.md:609-610), which must fail the named test or check. Each report lists its new pub items (§7.2).
 
-### U4a, the wire (npt-proto; depends on nothing; size S-M)
-- **Builds:** in crates/proto/src: the 14 messages and SessionControl's 4 variants (plan.md:569-575), `RoomControl`
-  (Q7), framing per channel, `Limits`, `Quant`, `Wrap`, the `Input` codec with U2's delta repeats, the Snapshot
-  container and its field-group layout table, `client_hash`, `encode`, `decode`. crates/proto/tests/catalogue.rs gains
-  items 1, 2, 3 (the size half) and 6. check.mjs gains the sim/proto clippy.toml comparison (§2, Drift).
+### U4s, the seam types, the grid and the manifests (depends on Q1, Q2, Q23; size S-M; alone, before wave 1)
+- **Builds:** crates/sim/src: `TICK_HZ`, `LOOP_CATCHUP`, `ticks_for_ms` and the derived constants (§4.3); `grid`
+  (§4.4); the seam types and the `SimCore` trait (§4.2), `HitHistory` included; no `World`. Manifests, the only wave-1
+  manifest change: npt-sim gains libm (exact pin), rand_chacha =0.10.0 and rand_core =0.10.1 (the workspace's pins);
+  npt-proto gains npt-sim and npt-link; npt-client gains npt-link; npt-room gains npt-sim; Cargo.lock by those only.
+  check.mjs: the derived-constant grep (§4.3) and npt-room's float grep (§4.11), each with a self-test bite in
+  check.test.mjs.
+- **Tests:** s1 each derived constant at 30 and 60 Hz; s2 the grid: `from` then `to` returns every integer of every
+  field width (exhaustive), and `to` errs by at most half a step plus one ulp of the scaled value over a sweep with the
+  half-steps and range ends (T19); s3 the tie rule pinned; s4 `HitHistory` keeps exactly its capacity, oldest evicted;
+  s5 the seam types are `Send`.
+- **Bites:** grid floor-rounding (s2), the ring kept one short (s4).
+- **Reviewers:** netcode-architect, engine-architect (the seam), rust-reviewer.
+
+### U4a, the wire (npt-proto; depends on U4s; size S-M)
+- **Builds:** the 14 messages and SessionControl's 4 variants (plan.md:569-575), `RoomControl` (Q7), framing per
+  channel, `Limits`, `Quant` (packing over the grid), `Wrap`, the `Input` codec with U2's delta repeats, the Snapshot
+  container (header with group index and count) and its field-group layout table, the `EntityRecord` ↔ wire mapping,
+  `client_hash` (§4.6), `encode`, `decode`. proto/tests/catalogue.rs gains items 1, 2, 3 (the size half) and 6.
+  check.mjs gains the sim/proto clippy.toml comparison (§2, Drift). In wave 1, U4a is the only check.mjs editor.
 - **Tests, and the bites that must fail them:**
-  - a1 a round trip per type on fixed seeds, 10,000 cases each.
-  - a2 totality: every truncation of every valid encoding, and 100,000 fixed-seed random buffers per type, return an
-    error, never a panic.
-  - a3 limits: one byte over each type's limit is refused by the size check before any decoding (the allocation count:
-    Q8 U4-ALLOC).
-  - a4 quantiser bounds over a sweep that includes the half-steps and the range ends: position error at most 0.5 cm,
-    yaw at most half of 360/65,536°, pitch at most half of 180/1,024° (bites pos-4cm, yaw-12bit, pitch-8bit: -57's
-    sites).
-  - a5 wrap: each width's compare across its wrap (bites: a plain `<` at each of -58's six sites; tick16, a 16-bit
-    header tick, the site -17 and -58 share).
-  - a6 `Input`: the whole command and a repeat at their stated maxima; a repeat never larger than the whole command; 8
-    commands within 166 B; trailing bytes drop the datagram whole (bite no-trailing, -21's site).
-  - a7 the catalogue's items 1, 2 and 6, each with a broken-copy bite (the catalogue's rule, :237-238); a
-    wrong-channel message refused and counted (bite no-channel, -21's site).
-  - a8 `client_hash`'s canonical vectors pinned; a client quantiser that rounds differently changes it (bite
-    client-rounding, -17's site).
-  - a9 the clippy.toml comparison (bite: one line changed in proto's copy).
-- **Marks moved:** none judged; U4e and U4f run their marks against these bite sites.
-- **Evidence:** the test list with its counts; each bite failing its test by name (in the build's notes).
-- **Reviewers on the final diff:** netcode-architect, security-auditor (decoders of network input), rust-reviewer,
-  test-engineer.
+  - a1 a round trip per type on fixed seeds, 10,000 cases each; the `EntityRecord` mapping round trip.
+  - a2 totality: every proper prefix of every valid encoding (a cut at every byte) and 100,000 fixed-seed random
+    buffers per type return an error, never a panic.
+  - a3 limits: the size check runs first: a buffer one byte over its type's limit returns the size error whatever its
+    content, even when it is also malformed (the allocation half is U5's: Q8).
+  - a4 the packed widths at their range ends (bites pos-4cm, yaw-12bit, pitch-8bit, set through the grid config:
+    -57's sites).
+  - a5 `Wrap`: each width across its wrap, per counter name (bites: a plain `<` for one named counter; tick16).
+  - a6 `Input`: whole command and repeat at their maxima; a repeat never larger; 8 commands within 166 B; trailing bytes
+    give `TrailingBytes` (bite no-trailing).
+  - a7 the catalogue's items 1, 2 and 6, each with a broken-copy bite; a wrong channel gives `WrongChannel` (bite
+    no-channel).
+  - a8 `client_hash`'s canonical vectors pinned, the 32-bit tick and the event numbers inside; it never returns 0.
+  - a9 the clippy.toml comparison (self-test bite: one line changed in proto's copy).
+- **Marks moved:** none judged.
+- **Reviewers:** netcode-architect, security-auditor (decoders of network input), rust-reviewer, test-engineer.
 
-### U4b, the loop policy (npt-server's library; depends on nothing; size S)
-- **Builds:** crates/server/src/schedule.rs: `Schedule`, `due_ticks`, `Schedule::LOOP_CATCHUP`; a
-  crates/server/clippy.toml with the clock ban (Q9). npt-server's manifest already lists npt-net (server/Cargo.toml:24),
-  so this compiles the transport stack too; `due_ticks` itself uses no tokio type.
-- **Tests on a fake clock:** on schedule, one tick per period; a wake late by less than a period runs one; a 200 ms
-  stall runs 6 at the next wake (at most 7) and is back on schedule; a 1 s stall runs 7, drops 23 ticks' time, counts it
-  and rebases; never more than LOOP_CATCHUP per wake; the overrun and dropped counters; LOOP_CATCHUP derived as 7 at
-  30 Hz and 15 at 60 Hz. **Bites** (PM-0004-67's three): timer-period counting (counting wakes, not elapsed time: the
-  200 ms stall fails); an uncapped catch-up (30 in one wake: "at most 7" fails); an uncounted drop (dropped stays 0: the
-  counter test fails).
-- **Marks moved:** none judged; PM-0004-67 is judged at R2, VS3 (plan.md:720; marks F14).
+### U4b, the loop policy (npt-server's library; depends on U4s; size S; the main session)
+- **Builds:** crates/server/src/schedule.rs: `Schedule`, `Due`, `due_ticks` (§4.3); crates/server/clippy.toml with the
+  std and tokio clock bans (§4.11). No check.mjs edit.
+- **Tests on a fake clock:** as rev 1, at 30 Hz with catch-up 7 and at 60 Hz with 15: on schedule, one tick per period;
+  a late wake under a period runs one; a 200 ms stall runs 6 at the next wake and is back on schedule; a 1 s stall runs
+  7, drops 23 ticks' time, counts it and rebases; never more than the cap per wake; the counters. **Bites**
+  (PM-0004-67's three, per instance): timer-period counting, an uncapped catch-up, an uncounted drop.
+- **Marks moved:** none judged; PM-0004-67 is judged at R2 (plan.md:720).
 - **Reviewers:** netcode-architect, rust-reviewer, test-engineer.
 
-### U4c, the link model (npt-link, npt-l1; depends on nothing; size M)
-- **Builds:** C1' in npt-l1 (today's model: l1/src/lib.rs:21-35, :159-162, send_stream :651-711), event-driven:
-  internal events (ack arrivals, loss declarations, PTO expiries, resends) processed in (time, fate index) order whenever
-  a call's `now` passes them; `L1Net::next_event_ns`. One packet-number space per link and direction for loss
-  detection, so datagram packets count as later packets (RFC 9000 §12.3, not re-read here; DATAGRAM frames are
-  ack-eliciting: RFC 9221 §5.2, read 2026-11-09). Fates stay drawn per (seed, link, direction, channel, packet index)
-  (l1/src/lib.rs:9-12), so datagram fates do not move. Acknowledgements are immediate, cross the other direction with
-  its drawn delay, and are lost inside a burst (Q15 U4-ACKS). C2's two sampling rules. The crate doc rewritten to C1'
-  (a)-(g), and the old E15 sentence gone. C3 per Q6.
-- **The fate log:** stream entries become one per packet send; datagram entries keep their 40 B form (:241-266). The
-  tag moves to `npt-l1 fate log v2` (Q15); a test shows a datagram-only log's entries (the tag excluded) byte-equal to
-  v1's.
+### U4c, the link model (npt-l1; depends on nothing; size M)
+- **Builds:** C1' in npt-l1, event-driven (internal events processed in (time, fate index) order whenever a call's
+  `now` passes them; `L1Net::next_event_ns`). One packet-number space per link and direction (datagrams are
+  ack-eliciting: RFC 9221 §5.2), so datagram packets count as later packets. **RFC 9002's starting state (T12):**
+  before the first sample, smoothed RTT 333 ms and variance 166.5 ms (§6.2.2, §5.3), so the first PTO is 333 +
+  max(4 x 166.5, 1) + 25 = 1,024 ms; the first sample sets both (§5.3); the time threshold is max(9/8 x max(srtt,
+  latest), 1 ms) (§6.1.2). Acknowledgements are immediate, delayed by the other direction's draw, lost inside bursts
+  only (Q15); **acks draw from their own per-flow stream** and write their own fate-log entries (T23), so datagram
+  fates do not move. C2's two sampling rules. The crate doc rewritten to C1' (a)-(g) plus the starting state; the old
+  E15 sentence gone.
+- **The fate log:** stream and ack entries one per packet send; datagram entries keep their 40 B form (:241-266); the
+  tag moves to `npt-l1 fate log v2` (Q15).
 - **Tests:**
   - L-c1 a single control-message loss under 30 Hz datagram traffic at P2: declared lost on the third later packet's
-    ack or after 9/8 x max(srtt, latest), resent, delivered within its computed window.
+    ack or after the time threshold, resent, delivered within its computed window.
   - L-c2 a lost message on a quiet link at P2: resent at the PTO (about 155-160 ms: advisor-u3q.md:170).
-  - L-c3 a 1 s burst at P2: the PTO doubles while acks are lost; the first resend after the burst comes at its
-    backed-off PTO; the recovery falls inside the bound computed from the formula.
-  - L-c4 a 3,000 B message cut into 3 packets, one of them lost: the message waits for that packet's resend; delivery
-    in order across messages.
-  - L-c5 poll independence: the same sends, polled every 1 ms and polled only at `next_event_ns`, give equal fate logs
-    and arrivals (net F115 ii).
-  - L-c6 the tie rule: at one instant, internal events come before application sends, by (time, fate index).
+  - L-c3 a 1 s burst at P2: the PTO doubles while acks are lost; the first resend after the burst at its backed-off PTO.
+  - L-c4 a 3,000 B message in 3 packets, one lost: the message waits for that resend; in order across messages.
+  - L-c5 the same sends polled every 1 ms and only at `next_event_ns` give equal fate logs and arrivals.
+  - L-c6 at one instant, internal events come before application sends, by (time, fate index).
   - L-c7 C2: an overtaken or reordered packet gives no sample; a message held behind a resent one samples about one
     RTT, not RTT + PTO.
-  - L-c8 -3's regression: its five L1 parts re-run on the new build and re-judged PASS, its four bites failing as
-    before (advisor-u2.md:20-22); the datagram entries equal to U2's committed logs at P2, B1 and P4 seed 1 (913db8e9,
-    feabf2f0, b8a04f2f: advisor-u2.md:31-32).
-  - **Bites** (unit): no PTO doubling (L-c3 fails); acks delivered inside bursts (L-c3); every packet sampled (L-c7);
-    stream samples from in-order delivery (L-c7); one loss draw per message (L-c4).
-- **Marks moved:** -3's L1 parts re-committed (results/u4c-pm-0001-3/<commit>/); this unblocks -18's L1 part and
-  -50's RTT.
+  - L-c8 -3's regression: its five L1 parts re-run on the new build and re-judged PASS (after U4j merges, so C4
+    applies), its four bites failing as before (advisor-u2.md:20-22); and for P2, B1 and P4 seed 1, SHA-256 of (the v1
+    tag + the v2 log's datagram entries) equals U2's committed 913db8e9, feabf2f0 and b8a04f2f (advisor-u2.md:31-32).
+  - L-c9 a message lost before any RTT sample is resent at 1,024 ms.
+  - **Bites** (unit, per instance): no PTO doubling (L-c3); acks delivered inside bursts (L-c3); every packet sampled
+    (L-c7); stream samples from in-order delivery (L-c7); one loss draw per message (L-c4); **new:** separate
+    packet-number spaces, so datagrams never count as later packets (L-c1 falls back to the PTO and misses its window);
+    internal events applied only at polls (L-c5); application sends before internal events (L-c6).
+- **Marks moved:** -3's L1 parts re-committed (results/u4c-pm-0001-3/<commit>/).
 - **Reviewers:** netcode-architect, rust-reviewer, test-engineer.
 
-### U4d, the stand-in sim (npt-sim; depends on U4-SEAM and U4-HIT; size M-L)
-- **Builds:** in crates/sim/src: `World` with fixed pools; the seam (§4.2); `Scene` (SS, ES, CO and TC: §4.13);
-  movement; hitscan against the supplied rewound volumes and the static world; `trajectory_at` (closed form, libm only);
-  the greybox with areas, portals, doors at 1/s and the wall stand-in; vehicles and parts; S1's stand-ins as data (the
-  2.80 ms top-up at 30 Hz as a counted loop, never timed here); `SimRng` (ChaCha8, one stream per purpose, our own
-  sampling, the authority-only spread stream); the event list; the canonical hash (64 bits, spike-local: FNV-1a-64, no
-  dependency; the TickRecord's 16 hex digits: log/src/lib.rs:114); `StateDump`; `Recording`. Cargo: libm (exact pin);
-  rand_chacha =0.10.0 and rand_core =0.10.1 (the workspace's pins).
+### U4d, the stand-in sim (npt-sim; depends on U4s; size M-L)
+- **Builds:** `World` implementing `SimCore`, with fixed pools; `Scene` (SS, ES, CO, TC: §4.13); movement with the
+  own-copy snap; hitscan against the lent, blended history and the static world; the clamp (§4.2); `trajectory_at`
+  (closed form, libm only); the greybox with areas, portals, doors at 1/s and the wall stand-in; vehicles and parts;
+  S1's stand-ins as data (the burn and top-up switchable off: §4.13); `SimRng` (ChaCha8, one stream per purpose, the
+  authority-only spread stream); the event list; the canonical hash (FNV-1a-64, spike-local); `StateDump`;
+  `Recording`; `replay::Replayer`; the synthetic recording generator (test support).
 - **Tests:**
-  - D-1 one build, one process: two Worlds on one recording agree every tick.
-  - D-2 two native processes (the test re-runs itself as a child through `std::env::current_exe()`): equal per-tick
-    hashes over 3 synthetic recordings of 9,000 ticks each (27,000 ticks); a mismatch names the first tick and the
-    field.
-  - D-3 prediction equals authority for one slot, bit for bit, given exact movers; the predicting World's streams are
-    untouched.
-  - D-4 NaN never enters: a non-finite command component is refused and counted; a debug assert runs each tick.
+  - D-1 two Worlds on one recording agree every tick.
+  - D-2 two processes (the test re-runs itself through `std::env::current_exe()`): equal per-tick hashes over the 3
+    synthetic recordings of 9,000 ticks; a mismatch names the first tick and the field. A quick test; the judged check
+    is U4d2's release-build step.
+  - D-3 prediction equals authority for one slot, bit for bit, given exact movers, snap included; the predicting World's
+    streams untouched.
+  - D-4 a non-finite command component is refused and counted; a debug assert each tick.
   - D-5 a full pool refuses and counts.
-  - D-6 the SS counters per tick: 48 soldiers; 15 vehicles with at least 4 x 20 parts; about 300 projectiles; shots
-    per second in 665-735 (PM-0001-2's ± 5 %); one portal change per second; 384 effect rows.
-  - D-7 the hash and dump vectors pinned; the serialization holds no `usize`.
-  - **Bites:** the hash-map iteration (a bites-only HashMap of at least 32 keys whose order decides an outcome, armed at
-    a known tick T, in PM-0004-21's form: ADR 0004:1142): D-2's two processes must report T as the first mismatching
-    tick. The std `sin` bite is caught native against Wasm, so its proof is U4d2's. Both bite sites carry a bites-only
-    clippy allow (sim/clippy.toml denies both: marks F22).
-- **Marks moved:** none judged; RQ5's native half; PM-0001-2's counters exist for U4e.
+  - D-6 the SS counters per tick: 48 soldiers (alive or awaiting respawn); 15 vehicles with at least 4 x 20 parts;
+    about 300 projectiles; shots per second in 665-735; one portal change per second; 384 effect rows.
+  - D-7 the hash and dump vectors pinned (their cross-target half is U4d2's).
+  - D-8 the clamp: a point beyond reach + 0.87 cm lands at the reach on the grid; a point within it is untouched; a
+    clamped point sent again is not moved.
+  - D-9 a `Rewind` blends tick_a and tick_a + 1 by its fraction against a reference; a Rewind outside the ring is
+    refused and counted.
+- **Bites:** the hash-map (§4.14's form: the whole order folded, each process logging its order digest; D-2 must report
+  T as the first mismatching tick); the std `sin` site (its proof is U4d2's); -41's two sites (§4.14), unit-shown here
+  and run judged in U4g. Each bite site carries a bites-only clippy allow (sim/clippy.toml denies them: marks F22).
 - **Reviewers:** netcode-architect, rust-reviewer (determinism, floats), engine-architect (the seam), test-engineer.
 
-### U4d2, the Wasm-in-Node hash (depends on U4d and U4-WASM; size S)
-- **Builds (option B):** crates/hash-wasm (a cdylib that depends on npt-sim only), with integer-only exports
-  (`begin(seed_lo, seed_hi, scene)`, `feed(word)`, `step() -> status`, `hash_lo`, `hash_hi`, `dump_len`,
-  `dump_word(i)`), each `#[unsafe(no_mangle)] extern "C"`, with no unsafe block and no pointer: the third named exception
-  in plan §4.2 and in check.mjs's tables (the attribute only; the scan refuses any `unsafe` block in that crate). A Node
-  script loads the file with `WebAssembly.instantiate`, streams a recording into it and collects the per-tick hashes;
-  npt-lab's `hash` subcommand and `HashCompare` compare them with the native runs and print the first mismatching tick
-  and the field diff (from both sides' dumps). check.mjs gains a `wasm` step (a release build with §4.5's flags; the
-  Node run is a script, so the cargo-runner refusal at check.mjs:1156-1158 stands, with its note updated) and the
-  `cargo tree -e features` comparison (§2, Features).
-- **Not here:** wasm-opt. U7 adds wasm-bindgen and wasm-opt; if U7 changes the file, Node and Chromium both run the
-  changed file there. Option A would instead bring npt-client-wasm and wasm-bindgen forward (Q3).
-- **Tests:** 0 mismatching ticks over the 27,000 (U4d's recordings; U4e's three runner recordings join this step when
-  U4e lands). **Bites:** the std `sin`, its input chosen by a scan for inputs where glibc's `sinf` and the wasm32
-  builtin differ (a bites-only export returns the bits). If none differs, that is recorded as "not catchable on these
-  targets" and PM-0004-21's 1-ulp planted change stands in (ADR 0004:1142; arch F48). Either is caught at its armed
-  tick. The hash-map bite is caught here too, or recorded as not (std documents no seeding for wasm32: marks S-HashMap).
-  The features bite: an extra feature on a shared dependency in the server build (PM-0004-74) fails the comparison.
-- **Reviewers:** rust-reviewer (the exception, Wasm), engine-architect (the Wasm boundary), test-engineer.
+### U4j, the judge and marks change (npt-judge, npt-log, marks/; depends on nothing; size M; the main session or the first free lane)
+- **Builds:** npt-log `hs` and its schema test. npt-judge: C4 with fixtures; the figures
+  `decoded_hash_mismatch_count` (§4.6's rules), `decoded_hash_compared_count`, `twin_hash_mismatch_count`, and, with
+  fixtures only since no U4 run feeds them, `cross_arch_mismatch_count` (L2) and `machine_named` (-1's parts select
+  RS, LG, ML, RD and MAC); `PRE-` ids accepted only in a file marked `"kind": "precheck"`, refused in marks.json.
+  marks.json: -18's split, `burst_heal` and `burst_return`, the `ws-practice` rule (Q20); §4.12's table (Q22).
+  marks/prechecks.json: `PRE-0001-30` (Q10). README: the `loopback` layer value; `hs`. SERIES.md: the rows rev 2 adds
+  (`snap_incomplete`, `burst_eviction`, the clamp events, the precheck suite) and the figure rows' formulas.
+- **Tests:** PASS, FAIL, gap and INVALID fixtures per figure and rule; for the decoded hash six cases (equal; differing;
+  a lost group, not compared; a refused group, sentinel; a client pair with no server pair; 0 compared, FAIL); C4's
+  four cases; `--check-marks` on both files; the drift test.
+- **Marks moved:** none judged here; every later judged set reads this judge.
+- **Reviewers:** test-engineer, netcode-architect, security-auditor (validity rules).
 
-### U4e, the room, the server's I/O half, the client's decoding and the L1 runner (depends on U4a, U4c, U4d; size L)
-U4e gets a short build brief, checked by the advisor before its build (Q21): the exact encoder budget rule, the group
-splitter, the run scripts and the run count.
+### U4d2, the Wasm-in-Node hash and the determinism step (depends on U4d and Q3; size S-M)
+- **Builds (option B):** crates/hash-wasm, a cdylib depending on npt-sim only, its exports thin wrappers over
+  `Replayer`: `begin(seed_lo, seed_hi, scene, bite, arm_tick)`, `feed(word)`, `step() -> status`, `hash_lo`,
+  `hash_hi`, `dump_len`, `dump_word(i)`, each `#[unsafe(no_mangle)] extern "C"`, integers only; its `bites` feature
+  forwards to npt-sim's. A Node script loads it with `WebAssembly.instantiate` and streams a recording in; npt-lab's
+  `hash` subcommand, on the release build, runs the two native legs in two processes and `HashCompare` prints the first
+  mismatching tick and the field diff.
+- **check.mjs** (U4d2 is its only editor in its wave), each with a self-test bite in check.test.mjs:
+  - a `wasm` step: the release build with §4.5's flags, the Node run (a script, so the runner refusal at
+    check.mjs:1156-1158 stands, its note updated), the comparison; its wall time printed, budget 5 minutes;
+  - the features comparison, like for like: npt-sim's resolved features under the server build against the hash-wasm
+    build, measured builds together and bites builds together (A12);
+  - **the build-flag check (A8):** `+fma`, `target-cpu=native`, `+simd128` and `+relaxed-simd` refused in the sources
+    the deps step already reads (environment rustflags and cargo configs: check.mjs:903-942), and the effective
+    target features read back with `rustc --print cfg` per target (that the wasm32 default excludes simd128 is
+    expected, not verified: the step reports what it reads);
+  - **hash-wasm's rules (A13):** its `[lints.rust]` denies unsafe_code, each listed export carries one allow (the
+    pattern npt-tcpinfo has: check.mjs:135-137), and the scan refuses any other `unsafe`; it joins LEAF and
+    WASM_CRATES (check.mjs:25, :1110); it depends on npt-sim only and nothing depends on it (as tcpinfo's rule,
+    check.mjs:94-102). plan.md §4.1 gains its layout line.
+- **Tests:** 0 mismatching ticks over the 27,000 synthetic ticks, native twice and Wasm once; PM-0004-21's cross-target
+  vectors: one committed byte string's digest and one committed state's bytes equal on x86-64 and wasm32 (T22).
+- **Bites:** the std `sin` (input from a scan for inputs where glibc's `sinf` and the wasm32 builtin differ; if none
+  differs, recorded as not catchable on these targets and a 1-ulp planted change stands in: ADR 0004:1142); the hash-map
+  (caught, or recorded as not catchable on wasm32, where std documents no seeding: marks S-HashMap); an extra feature on
+  a shared dependency (PM-0004-74); each flag; a stray `unsafe` block in hash-wasm.
+- **Reviewers:** rust-reviewer (the exception, Wasm), engine-architect (the boundary), test-engineer, infra-engineer
+  (the step's time in CI).
+
+### U4e, the room and the codec path (depends on U4a, U4b, U4d; size M-L; its own brief)
 - **Builds:**
-  - npt-room: `Room<S>`; `Roster` and the slot token compare (lab passes the tokens in; minting is U6's: arch F44);
-    `ClientSlot`; `AckRing` (32 entries); `Encoder` (the budget of §4.5, the groups, the layout table, the class filter,
-    the per-client mirror hash of §4.6); `EventQueue` (§4.7); `InterestGrid`, `AreaFlood`, `Priority`; `InputBuffer`
-    option B with `buffer_depth_ticks`; and the room-side checks that -58's counters pass through (the tick strictly
-    newer, the sequence forward, the press-counter edges, the ack naming a sent snapshot). Option A and the other checks
-    are U4f's.
-  - npt-server's library: `Decoder` with `pump`, `ConnLimits`, `AddrTable` (fixed capacity), `Counters`, ping answers
-    with their hold time, the rate buckets, the Join deadline on the injected now.
-  - npt-client: decoding, acknowledging, `client_hash`; a minimal `ClientEndpoint` (input, step, the next due time in
-    ns).
-  - npt-bots' library: the honest brawl's `Behaviour`.
-  - npt-lab: `SimClock`; `L1Scenario` (RQ8's order); `ReplayX86`; the `scenario`, `replay` and `hash` subcommands; the
-    header params (scene, clients, profile, seed, `cmd_timing`, `tick_start`, suite); the `--bite` dispatch; the
-    per-process logs (§4.12); the three §4.5 recordings (`scenario --record`: SS at P2 seed 1, ES at P3 seed 2, TC at
-    B1 seed 3).
-  - npt-log: `hs`. npt-judge: C4, with fixtures; the figures `decoded_hash_mismatch_count`,
-    `decoded_hash_compared_count`, `twin_hash_mismatch_count`, `cross_arch_mismatch_count` and `machine_named`
-    (figures.rs:175-224), each with PASS, FAIL and gap fixtures (plan.md:676); the -18 split and `ws-practice` (Q20);
-    the scene selects (Q22).
-  - Run scripts ops/runs/c-u4e-*.mjs, as U2's c-u2-pm-0001-3.mjs.
-- **Tests:** the runner's twin test (§4.11); the log contract test (§4.12); the class audit (the catalogue's item 5) at
-  SS P2 over 3 seeds, with the owner-to-all bite; item 4 (the layout table equals the Field-group rows; the
-  authority-only groups absent); a forced group split, each group decoding alone; the baseline rule (a partly
-  acknowledged tick is never a baseline; past 32 entries, the defaults); a 1 s burst at B1 evicting the last
-  acknowledged baseline from the 32-entry ring (about 1.08 s old against 1.07 s: shown by arithmetic and a unit test,
-  so -18's bite can bite: marks F26); the window counting pings and pongs.
-- **Marks moved (L1 parts, 3 seeds each, judged by `npt-judge --only`):**
-  - -17 at L1 P0, P2, P3 and B1 (10 min each, 48 clients: 864,000 hash pairs per run); bites tick16 (its runs start at
-    `tick_start` = 65,536 - 1,800, so they cross the wrap: marks F26) and client-rounding.
-  - -57 on -17's runs; bites pos-4cm, yaw-12bit, pitch-8bit.
-  - -58 for 10 s at P0 and P3, every counter started a few steps below its wrap, at least 6 wraps and 300 ticks; the six
-    plain-`<` bites and tick16.
-  - -18 at L1 B1 (10 bursts, 48 clients, each burst offset 0 to 1 tick; the fresh-delta reading: advisor-u3q.md:180-186);
-    bite no-fallback.
-  - -30's U4 pre-check (Q10): replay clients send one recording's commands (re-encoded as `Input` with their stamped
-    ticks and view times) to the room over Loopback and over L1 P0; identical server hashes every tick, the late-command
-    counter 0; bites wallclock (a wall-clock read on one path's command handling) and late-command (INVALID). The view
-    times must stay inside the tolerance on both legs (each replacement is logged per shot); a replacement on one leg
-    only is the first cause to check, since the tolerance reads each leg's RTT (§4.9).
-  - The catalogue's items 4 and 5.
-  - The sizes for fixes.rs (§2), as series with SERIES.md rows; the WebSocket framing they assume, stated: a 1 B
-    channel tag (catalogue :73); a 2 B header under 126 B and 4 B up to 65,535 B (RFC 6455 §5.2); +4 B for the client's
-    mask; TLS 1.3's +22 B (RFC 8446 §5.2).
-- **Evidence:** results/u4e/<commit>/verdict.json and runs.txt (the commit, the binaries' SHA-256s, one line per run);
-  the runner's measured ticks per second, and the total wall time stated before the full set; the three recordings'
-  SHA-256s, and U4d2's step green on them.
-- **Reviewers:** netcode-architect, security-auditor (the server decode path, the roster and token compare),
-  engine-architect (the crate boundaries, npt-server's half), rust-reviewer, test-engineer.
+  - npt-room: `Room<S>`; `Roster` and the slot token compare (lab passes tokens in; minting is U6's); `ClientSlot`;
+    `AckRing` (§4.5); `Encoder` (the window's remainder, groups with index and count, the layout table, the class
+    filter, the mirror hash of §4.6); `EventQueue` (§4.7); `InterestGrid` (integer cm), `AreaFlood` (from
+    `portal_states`), `Priority`; `InputBuffer` option B with `buffer_depth_ticks`; `rewind_at` (the integer half; the
+    tolerance and cap rules land in U4h); the room-side checks -58's counters pass through; Resync one in flight.
+    room/clippy.toml gains the hash-map type bans.
+  - npt-server's library: `Decoder::pump` (decode, socket checks, the ping sender and answers with their hold time,
+    per-client RTT and bytes sent: §4.5, §4.9), `ConnLimits`, `Counters`, the rate buckets and the Join deadline on the
+    injected now. No AddrTable and no handshake cap (U6).
+  - npt-client: decoding into integer frames and held floats, the complete-tick rule and the sentinel (§4.6), acks with
+    the group mask, a minimal `ClientEndpoint` (input, step, the next due time in ns).
+- **Tests:** catalogue item 4 (the layout table equals the Field-group rows; the authority-only groups absent); a forced
+  group split, each group decoding alone; a lost group leaves its tick unlogged and counted, a refused one logs the
+  sentinel; the baseline rule and the ring's age edges; a 1 s gap evicting B; the window counting the pump's bytes;
+  the mirror equal to the client's hash over Loopback at P0 for 1,000 ticks; the Send asserts; **negative cases (T17,
+  A15):** each JoinRejected reason (bad token, bind mismatch, roster full, wrong version, wrong content hash); a
+  datagram before Join dropped and counted; a control message before Join closing the session as malformed, counted,
+  never INVALID; the Input bucket (8, refilled at 60 a second) and the Ping limit (10 a second) on a fake clock; the 2 s
+  Join deadline on a fake clock; a second Resync before the FullState's ack dropped and counted.
+- **Bites (unit-shown):** no-fallback (-18), tick16, client-rounding (the client's call site), lt-ack, lt-tick-offset
+  and lt-event-seq (§4.14), owner-to-all (catalogue item 5's), no-trailing and no-channel through the pump.
+- **Marks moved:** none judged (U4r runs them).
+- **Reviewers:** netcode-architect, security-auditor (the decode path, roster and token compare), engine-architect
+  (crate boundaries), rust-reviewer, test-engineer.
 
-### U4f, clock and commands (depends on U4e; size M; its own brief)
-- **Builds:** `ClockSync` (§4.8); the client's tick-lead controller (target lead = the one-way estimate + a jitter
-  margin + the buffer target, the same for both options: net F104); `InputBuffer` option A; every other room-side check
-  with its -21 counter (the catalogue's Input row, :87; plan §4.4); the server-side checks (size, trailing bytes, wrong
-  channel, the rate bucket); the cheats' `Behaviour`s: the 11 forged kinds, the clamp points, the 1.5x clock, the lag
-  switch, the never-acker.
-- **Marks moved:** -47 (1,000 connects with random true offsets at P2, error at most 5 ms after 2 s; bites
-  newest-raw-sample and tick-quantised receive times); -20 (P3, both options; bite redundancy-1); -21's 8 parts (forged,
-  clamp, fast-clock and lag-switch, each under A and B; the 13 bites; the twins of §4.10 with their fate-alignment test);
-  -22 (one never-acker among 48 for 10 min; bite unbounded, run over a full S30 of simulated time: marks F26).
+### U4r, the L1 runner and its judged runs (depends on U4c, U4d2, U4e, U4j; size M; its own brief)
+- **Builds:** npt-lab: `SimClock`; `L1Scenario` (RQ8's order); the header params (scene, clients, profile, seed,
+  `cmd_timing`, `tick_start`, `ticks_below_wrap`, suite, `stand_ins`); the `--bite` dispatch to each instance; the
+  per-process logs with `admit` events and footers (§4.12); `scenario` (with `--record`) and `replay`; the three runner
+  recordings (§4.15); -57's pairing (§4.6). npt-bots' library: the brawl `Behaviour` and the open-loop scripts. Run
+  scripts ops/runs/c-u4r-*.mjs, as U2's c-u2-pm-0001-3.mjs.
+- **Tests:** the runner's twin test with its bite (§4.11); the contract test (§4.12); the class audit, catalogue item
+  5, at SS P2 over 3 seeds with the owner-to-all bite; the runner's measured ticks per second, and the total wall time
+  of the run set stated before it starts.
+- **Then the judged runs** (after the merge, in the main folder, by `npt-judge --only`, 3 seeds per part):
+  - -17 at L1 P0, P2, P3 and B1 (10 min, 48 clients, SS); bites tick16 (runs starting at `tick_start` = 63,736) and
+    client-rounding.
+  - -57 on -17's runs; bites pos-4cm, yaw-12bit, pitch-8bit.
+  - -58 for 10 s at P0 and P3, every counter a few steps below its wrap; its six bites (§4.14).
+  - -18 at L1 B1 (10 bursts, each offset 0 to 1 tick; the fresh-delta reading: advisor-u3q.md:180-186); bite
+    no-fallback, with `burst_eviction` logged.
+  - **-30's pre-check, as `PRE-0001-30` (Q10, T2):** suite `precheck-30`; one leg over Loopback (layer `loopback`), one
+    over L1 P0 (layer `L1`); replay clients send one recording's commands (§4.15) to the room on both legs; identical
+    server hashes every tick (`twin_hash_mismatch_count`), `late-zero` holding; bites wallclock (a wall-clock read in
+    the pump for one leg's sessions, bites build only) and late-command (expect INVALID by `late-zero`). The view times
+    must stay inside the tolerance on both legs; each replacement is logged per shot. Judged from
+    marks/prechecks.json into results/u4r-precheck-30/<commit>/; reported as a pre-check, never as -30's part, never
+    in U6's folder.
+  - The sizes for fixes.rs (§2), as series with SERIES.md rows; the WebSocket framing they assume, stated (a 1 B channel
+    tag, catalogue :73; a 2 B header under 126 B and 4 B up to 65,535 B, RFC 6455 §5.2; +4 B for the client's mask;
+    TLS 1.3's +22 B, RFC 8446 §5.2).
+- **Evidence:** results/u4r/<commit>/verdict.json and runs.txt (the commit, the binaries' SHA-256s, one line per run);
+  the recordings' SHA-256s and U4d2's step green on them (in check.mjs if the step stays within 5 minutes, else
+  through ops/runs/det-u4.mjs at every merge that touches sim, proto, room or hash-wasm, on the advisor's ok).
+- **Reviewers:** netcode-architect, test-engineer, engine-architect, rust-reviewer.
+
+### U4f, clock and commands (depends on U4r; size M; its own brief)
+- **Builds:** `ClockSync` (§4.8); the client's tick-lead controller (net F104); `InputBuffer` option A; every other
+  room-side check with its -21 counter; the server-side checks (size, trailing bytes, wrong channel, the bucket); the
+  cheats' `Behaviour`s (the 11 forged kinds per §4.10, the clamp points, the 1.5x clock, the lag switch, the never-acker).
+- **Marks moved** (build, merge, then the judged runs): -47 (1,000 connects at P2; bites newest-raw-sample and
+  tick-quantised receive times); -20 (P3, both options; bite redundancy-1); -21's 8 parts with their twins (§4.10) and
+  13 bites, each bite run in the suite and option §4.14 or marks.json's notes name; -22 (one never-acker among 48 for
+  10 min, no precondition; bite unbounded over a full S30).
 - **Reviewers:** netcode-architect, security-auditor (hostile input), test-engineer, rust-reviewer.
 
 ### U4g, prediction, interpolation and events (depends on U4f; size M; its own brief)
 - **Builds:** `Predictor` (reset to the server's state for the last command run, newer commands replayed through
-  `World::predict`, the replay skipped when the stored prediction matches bit for bit, a 100 ms fade, a 2 m snap,
-  cleared on respawn or teleport); the own-state section's move-speed and fire-interval attributes (-60); `Interp`
-  (§4.8; extrapolation for at most one interval, then hold; placed respawns); the ClientSettings clamp (2 to 5
-  intervals, at most one interval per second); `CueLog`, keyed by (entity, weapon, command sequence); event release by
+  `World::predict`, the replay skipped when the stored prediction matches bit for bit except in suite `cues`, a 100 ms
+  fade, a 2 m snap, cleared on respawn or teleport); the own-state section's move-speed and fire-interval attributes;
+  `Interp` (§4.8); the ClientSettings clamp; `CueLog`, keyed by (entity, weapon, command sequence); event release by
   delayed time.
-- **Marks moved:** -41 (CO, P0-P4; bites a server running 1 % fast, and the own copy quantised differently), run under
-  both OQ-0001-6 options and reported per option (plan.md:819; marks F24); -42's L1 share (the P3 brawl; its bite
-  smoothing-off cannot fail on L1: carried to R7); -60 (100 changes per kind; bite an own state without the changed
-  value); -45's L1 part (bite one slot short); -61 (bite release on arrival); -62 (bites cues written from replay, and
-  the server echoing a client's own shots); -55 (bite a vehicle collision that snaps); -56 item (6)'s -42 share per
-  option.
+- **Marks moved:** -41 (CO, P0-P4, both OQ-0001-6 options, 6 runs per part; its parts pool both options, so each run
+  must pass, and runs.txt reports per option; bites §4.14); -42 (the P3 parts PASS **unbitten** at U4, smoothing-off
+  being ML-only; the P2 and P4 parts have **no checks**, so they are recorded for -56 item (6), never claimed as
+  passing); -60 (100 changes per kind; bite own-state-missing); -45's L1 parts (bite §4.14); -61 (bite release on
+  arrival); -62 (§4.14); -55 (bite a vehicle collision that snaps); -56 item (6)'s -42 share per option.
 - **Reviewers:** netcode-architect, test-engineer, rust-reviewer.
 
 ### U4h, lag compensation and aim (depends on U4g and on U4c's C2; size M; its own brief)
-- **Builds:** `HitHistory` and `rewind_at` (§4.9); the view-time estimate and its tolerance; the switchable cap; the
-  per-shot log of its parts (RTT, announced delay, buffer wait, blend fraction, frame-to-tick wait); `AimCast` through
-  `World::ray_cast` on the published interpolated state; the TC shooter's `Behaviour` with a page-like 60 Hz frame
-  loop, the tolerance-edge stamper and the 150 ms pong delayer; the judge figures `view_hit_registered_share`,
-  `false_hit_share`, `rule_cap_set_by_rule` and `throw_desync_count`, with fixtures.
-- **Order inside:** measure the largest honest rewind at P3 and P4; round it up to ticks and add the margin (data): the
-  test cap. Size HitHistory from it (recorded: -7, plan.md:696). Then the test-cap runs, with the setup check
-  `clipped == 0`.
-- **Marks moved:** -48 (TC, P0-P3, under A and B, 2,000 shots per profile; bites a rewind without the interpolation
-  delay, and an estimate without the buffer wait); -49's test-cap parts only (its rule-cap parts and its bite
-  cap-estimate-only wait for R3's pick: marks F24); -50 (P0, P1, and the recorded WebSocket path with the ping-RTT
-  source; bite no tolerance check); -51 (thin targets, 1,000 shots per height and profile, the aim at most 80 bits;
-  bite a parallel ray plus a 10 cm fire-origin error); -54 (1,000 throws per kind; bite a 1/60 s client step). -56's
-  items (6) and (10): both options and both cover variants recorded.
-- **Reviewers:** netcode-architect, security-auditor (the rewind's bounds against cheats), test-engineer,
-  rust-reviewer.
+- **Builds:** `HitHistory`'s sizing and `rewind_at`'s rules (§4.9); the view-time estimate with the pump's RTT; the
+  switchable cap; the per-shot log of its parts; `AimCast` through `World::ray_cast` on the published interpolated
+  movers; the TC shooter's `Behaviour` (a page-like 60 Hz frame loop), the tolerance-edge stamper and the 150 ms pong
+  delayer; the figures `view_hit_registered_share`, `false_hit_share`, `rule_cap_set_by_rule` (fixtures only at U4) and
+  `throw_desync_count`, with fixtures.
+- **Order inside (T14):** measure the largest honest rewind at P3 and P4, both options, on **calibration seeds 101-103**;
+  round it up to ticks and add the margin (data): the test cap; size HitHistory from it (recorded: -7). Then the judged
+  test-cap runs on **seeds 1-3**, with the setup check `clipped == 0` able to fail.
+- **Marks moved:** -48 (TC, P0-P3, A and B, 2,000 shots per profile; bites §4.14 and no-interp-delay); -49's test-cap
+  parts only, PASS **unbitten** until R3's rule cap (its bite cap-estimate-only waits: marks F24); -50 (P0, P1, and the
+  recorded WebSocket leg with the ping RTT; bite no tolerance check); -51 (thin targets, 1,000 shots per height and
+  profile; bite a parallel ray plus a 10 cm fire-origin error); -54 (1,000 throws per kind; bite a 1/60 s client step).
+  -56's items (6) and (10).
+- **Reviewers:** netcode-architect, security-auditor (the rewind's bounds), test-engineer, rust-reviewer.
 
 ### Lanes (at most 3 agents at a time, in worktrees, merged one at a time)
-- First: U4a, U4c and U4d in parallel. U4b is small: the main session, or the first free lane.
-- Then U4d2; then U4e; then U4f, U4g and U4h in order (they share the room's and the client's files: never two at
-  once).
+- **Step 0:** U4s alone (the main session or one builder), merged before anything else. It makes every manifest and
+  Cargo.lock change wave 1 needs, so no wave-1 lane touches Cargo.toml or Cargo.lock.
+- **Wave 1:** U4a, U4c and U4d as three agents; U4b and U4j in the main session (or the first free lane). File
+  ownership: U4a crates/proto and check.mjs; U4c crates/l1; U4d crates/sim; U4b crates/server/src/schedule.rs and
+  server/clippy.toml; U4j crates/judge, crates/log and marks/. No file is shared. U4c's L-c8 judged re-run waits for
+  U4j's merge.
+- **Wave 2:** U4d2 (after U4d) and U4e (after U4a, U4b, U4d) in parallel: U4d2 owns check.mjs, Cargo.toml's members,
+  Cargo.lock, crates/hash-wasm and npt-lab's `hash`; U4e owns crates/room, crates/server (beyond schedule.rs) and
+  crates/client.
+- **Then** U4r (after U4c, U4d2, U4e, U4j) and its runs; then U4f, U4g and U4h in order (they share the room's and the
+  client's files: never two at once).
+- After each merge the next lane's base moves: its brief's counts are deltas, and the merge step recomputes the
+  absolute counts on the merged tree.
 
 ## 6. What U4 does not build
-- **U5:** fuzzing every message type and the room-wide controls (-34); the counting allocator, and with it the
-  allocation half of the catalogue's item 3 (Q8); the audit of libm and of any other U4 dependency (-35, §4.8).
-- **U6:** the tokio runtime, `TickLoop`'s thread, `PhaseTimers`, `ControlSocket`'s socket, the metrics, the panic
-  catch, npt-server's binary (server/src/main.rs:3-6); WtServer, WsServer and their clients; -30's marked C part on both
-  real transports (marks F11, net F100); `+ Send` on L2 links; token minting and the prefixed form; `loss`, the
-  send-buffer space and rate adaptation under pressure (Q6; judged by -23 and -24 on L2); npt-bots' npt-net glue and
-  npt-load.
-- **U7:** npt-client-wasm, wasm-bindgen, wasm-opt, web/, `BlockWriter`, `mode`, the hash check in Chromium.
-- **U8 and the R runs:** every L2, RS and ML part; PM-0004-67's judged run (R2, VS3); -49's rule cap (after R3); -42's
-  frame check and its bite (R7); every time mark.
-- **Its own small unit after U4e:** fixes.rs's run-structured bound (advisor-ws-docs-r2.md:383: "before R3's run
-  plan").
-- **Two bites that cannot fail at U4, carried by name:** PM-0001-42/smoothing-off (R7) and PM-0001-49/cap-estimate-only
-  (after R3) (M24).
+- **U5:** fuzzing every message type and the room-wide controls (-34); the counting allocator and the allocation half
+  of catalogue item 3 (Q8); the audit of libm and every other U4 dependency (-35).
+- **U6:** the tokio runtime, `TickLoop`'s thread, `PhaseTimers`, `ControlSocket`'s socket, the metrics, the panic catch,
+  npt-server's binary (server/src/main.rs:3-6); WtServer, WsServer and their clients; -30's marked C part on both real
+  transports; `+ Send` on L2 links; token minting; **AddrTable and the handshake cap** (their only mark is -25: A15);
+  `loss`, the send-buffer space and rate adaptation (Q6); npt-bots' npt-net glue and npt-load, with the clock bans'
+  reviewed allows (§4.11).
+- **U7:** npt-client-wasm, wasm-bindgen, wasm-opt, web/, `BlockWriter`, `mode`, the hash check in Chromium (it loads
+  U4d2's file).
+- **U8 and the R runs:** every L2, RS and ML part; PM-0004-67's judged run; -49's rule cap; -42's frame check and its
+  bite; every time mark; the scene selects of the marks §4.12's table leaves unchanged.
+- **Its own small unit after U4r:** fixes.rs's run-structured bound (advisor-ws-docs-r2.md:383).
+- **Two bites that cannot fail at U4, carried by name:** PM-0001-42/smoothing-off (R7) and
+  PM-0001-49/cap-estimate-only (after R3).
 
 ## 7. Build rules
-### 7.1 Mustafa's shared-target rule (2026-11-09, verbatim at checkpoint :404-405; applied as at :406-413 and u3d-plan.md §7.1)
-1. **One folder for every copy.** In each builder's worktree and each bite's scratch copy, every cargo call (test,
-   clippy, fmt, check.mjs's steps, the wasm32 build) runs with
-   `CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/shared-target`. Checked once after the first build: the copy
-   has no `.gate/netcode-proof-test/target` of its own, and the shared folder has the new artifacts.
-2. **Touch before each build:** `find <copy>/spikes/netcode-proof/crates -type f -exec touch {} +` (mtime only),
-   because cargo's fingerprint ignores a copy's location, so another copy's newer artifact can read as fresh.
-3. **Check each run's test count.** check.mjs's summary must read the counts the sub-unit's brief states; `--list`
-   must name the new tests; a bite run must show its own test failing by name. A count or name that does not match
-   means another copy's artifact ran: touch, rebuild, and never report that run.
-4. **Bites and clean builds alternate safely:** after the last bite, touch and rebuild before any further claim.
-5. **Cargo's own lock** serializes two copies' builds ("Blocking waiting for file lock"): expected, not an error.
-6. **The main folder keeps its own cache** (.gate/netcode-proof-test/target): the merge checks, the gate and every
-   judged L1 run happen there, with `CARGO_TARGET_DIR` unset.
-7. **No copy cleans the shared folder;** that is the main session's job.
-8. **Every brief names the folder and the two steps** (items 2 and 3), and names .claude/rules/netcode.md as binding
-   on proto, room, client and server code (§2, Rules file).
+### 7.1 Mustafa's shared-target rule (2026-11-09; checkpoint :404-413; as u3d-plan.md §7.1)
+1. Every cargo call in each builder's worktree and each bite's scratch copy runs with
+   `CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/shared-target`; checked once after the first build.
+2. Touch before each build: `find <copy>/spikes/netcode-proof/crates -type f -exec touch {} +`.
+3. Each run's test count matches the brief's delta; `--list` names the new tests; a bite run shows its own test
+   failing by name; a mismatch means another copy's artifact ran: touch, rebuild, never report that run.
+4. After the last bite, touch and rebuild before any further claim.
+5. Cargo's own lock serializes two copies' builds: expected.
+6. The main folder keeps its own cache (.gate/netcode-proof-test/target): the merge checks, the gate and every judged
+   L1 run happen there, with `CARGO_TARGET_DIR` unset.
+7. No copy cleans the shared folder.
+8. Every brief names the folder, items 2 and 3, and .claude/rules/netcode.md as binding on proto, room, client and
+   server code.
 
 ### 7.2 Who builds, and how
 - Each sub-unit: one builder (general-purpose, opus, effort xhigh) in an isolated worktree, or the main session for
-  U4b; the bites planted by a scratch script under §7.1; merged by the main session, one at a time.
-- Judged L1 runs: the main session, in the main folder, on release builds, one evidence run set at a time; raw logs
-  under .gate/, verdicts and runs.txt committed under results/ (never raw data: plan §4.1's results/ line).
-- One review round per sub-unit on its final diff, then a short report to the advisor; U4's report folds them at the
-  end.
+  U4s, U4b and U4j; the bites planted by a scratch script under §7.1; merged by the main session, one at a time.
+- Judged L1 runs: the main session, in the main folder, on release builds, one set at a time, in the background;
+  raw logs under .gate/, verdicts and runs.txt committed under results/.
+- **Public items (A19):** each report lists the pub items it adds, by crate, against §4.1; engine-architect checks them
+  in review. check.mjs does not check narrow surfaces (check.mjs:1134-1135), so review is the check.
+- One review round per sub-unit on its final diff, then a short report to the advisor; U4's report folds them.
 
 ## 8. Risks
-1. **Size and drift.** U4 is about three times U3. Mitigation: nine sub-units, each with its own merge, review and
-   report; U4e to U4h with short briefs the advisor checks (Q21).
-2. **C1' moves L1 under U2's evidence.** Mitigation: L-c8 re-runs -3's L1 set and shows the datagram entries
-   unchanged.
-3. **Bites that cannot bite by construction:** the std `sin` bite if glibc and the Wasm builtin agree (arch F48); the
-   hash-map bite if a process's iteration order changes no state; tick16 below the wrap; no-fallback if the ring
-   outlives the burst; -22's bite on a short run. Mitigation: each bite's run is configured to exercise it (§5), and
-   each is shown to change state, never assumed.
-4. **Run volume.** About 230 L1 runs, most of them 18,000 ticks with 48 clients (marks F31); the runner's speed is
-   unknown. Mitigation: U4e measures ticks per second on its first run and reports the total wall time before the full
-   set; runs go in the background without ending the turn (the advisor's lesson, checkpoint :535-536). Evidence is
-   never shrunk to save time.
-5. **The stress scene may not fit the budget.** The estimates put a snapshot near 690 B, plus up to 350 B of event
-   resends, against 1,000 B per datagram and 1,066 B per tick (net F112, F121). Mitigation: U4e measures; a scene that
-   cannot fit by design goes to the advisor before any codec mark counts, never tuned silently.
-6. **Determinism outside the sim:** hash ordering or a clock in lab, room, server or bots code would break same-seed
-   identity. Mitigation: §4.11's bans, and the runner's twin test with its bite.
-7. **Selectors that find no data** make a part NOT-RUN, not PASS. Mitigation: §4.12's contract test.
-8. **A third unsafe exception (U4-WASM B)** widens a rule the advisor set. Mitigation: the attribute only, integer
-   signatures, no unsafe block, and a scan that refuses any unsafe block in that crate.
+1. **Size and drift.** Twelve sub-units, each with its own merge, review and report; U4e, U4r, U4f, U4g and U4h with
+   short briefs the advisor checks (Q21).
+2. **C1' moves L1 under U2's evidence.** L-c8 re-runs -3's set and compares the datagram entries by hash.
+3. **Bites that cannot bite by construction.** §4.14 gives each its site, its failing check, its run setting and a unit
+   proof; the hash-map bite's order digests show whether it was exercised.
+4. **Run volume.** About 270 L1 runs, most 18,000 ticks with 48 clients; U4r measures ticks per second first and states
+   the wall time before the full set. Evidence is never shrunk to save time.
+5. **The stress scene may not fit the budget** (about 690 B plus up to 350 B of resends against 1,000 B per datagram and
+   1,066 B per tick). U4e and U4r measure; a scene that cannot fit goes to the advisor before any codec mark counts.
+6. **Determinism outside the sim.** §4.11's bans and the runner's twin test.
+7. **Selectors that find no data** make a part NOT-RUN; a validity rule with no inputs passes vacuously. §4.12's
+   contract test covers both.
+8. **A third unsafe exception (Q3 B):** the attribute only, integer signatures, deny plus listed allows, a scan.
 9. **Float code in the client** (Predictor, Interp, ClockSync) is not under the sim's bans. Only npt-sim's state is
-   hashed, prediction runs npt-sim's own functions, and the "skip when it matches" compare is bitwise.
-10. **Plan text moves** (§4.7, §4.2, E7's units): each change lands in plan.md in the sub-unit that needs it, before
-    its code merges, as U3's did.
+   hashed; prediction runs npt-sim's functions; the skip compare is bitwise; the client-held hash re-grids the floats,
+   so a float slip there shows as a mismatch.
+10. **The own-copy snap (Q23)** changes the stand-in's movement to a 1 cm grid. It is a throwaway sim; the 60 Hz run and
+    the real sim make their own call.
+11. **Plan text moves** (plan §4.4's clamp and per-tick inputs, §4.7's HitHistory and SimCore lines, E7's units, the
+    proto → sim edge): each lands in plan.md in the sub-unit that needs it, before its code merges.
+12. **The `PRE-` id** is a new judge concept; it is refused in marks.json by test, so it can never reach a mark's
+    verdict.
 
 ## 9. Change type and evidence rule
 - **Change type:** netcode (protocol, simulation, room, client, the L1 model), plus a judge change.
-- **Evidence rule:** deterministic tests with injected latency, jitter and loss: L1's P0 to P4 and B1 profiles on
-  simulated time, fixed seeds, 3 seeds per part, each bite failing; verdicts by npt-judge; same-seed identity by the twin
-  tests.
-- **Gate:** check.mjs green on both builds with the stated counts (from U4d2 on, with its `wasm` step); clippy host and
-  wasm32 on both builds; fmt; `node tools/gate.mjs --no-smoke` (the legacy gate: symbols +0 -0); Cargo.lock changed
-  only by named dependencies; all under §7.1.
+- **Evidence rule:** deterministic tests with injected latency, jitter and loss: L1's P0 to P4 and B1 on simulated time,
+  fixed seeds, 3 seeds per part, each bite failing; verdicts by npt-judge; same-seed identity by the twin tests.
+- **The run count (T21), by marks.json's `min` and §5:** about 196 measured L1 runs (-17 12, -58 6, -18 3, -20 6, -21
+  24 plus 12 twins, -22 3, -41 30 with both options, -42 18, -60 3, -45 9, -47 3, -61 3, -62 3, -48 24, -49's P4 test
+  cap 6 beyond -48's, -50 7, -51 12, -54 3, -55 3, the pre-check 6); 12 calibration runs (U4h); 44 bite runs (46 bites
+  less the two carried); about 20 for -3's re-run: about 270 in all. Each brief gives its exact list.
+- **Gate:** check.mjs green on both builds with the stated counts; clippy host and wasm32 on both builds; fmt;
+  `node tools/gate.mjs --no-smoke` (symbols +0 -0); Cargo.lock changed only by named dependencies; all under §7.1.
 
 ## 10. Questions for the advisor
 Plain words first, then the options, then my recommendation. None is Mustafa's to decide before U4 builds. Where an
-answer is a reading of an ADR row's words (Q10, Q11, Q16's clamp, Q17), the words go into the readings PR before R5 on
-his go, as Q15 (a) does (checkpoint :320-324).
+answer is a reading of an ADR row's words (Q10, Q11, Q16's clamp, Q17, Q24), the words go into the readings PR before
+R5 on his go (checkpoint :320-324). Changed in rev 2: Q2, Q3, Q4, Q5, Q9, Q10, Q11, Q13, Q15, Q16, Q21, Q22; new: Q23
+to Q26.
 
-- **U4-SEAM (Q1), where the sim trait lives.** Rust lets the trait's implementation sit only in the trait's crate or
-  the type's. (a) The trait in npt-sim; npt-room generic over it, depending on npt-sim. (b) The trait in npt-room, with
-  World implementing it in npt-sim: npt-sim then depends on npt-room, against ADR 0002:186-189, and the client's Worker
-  pulls the room in. (c) Trait and implementation in npt-room, over npt-sim's concrete World: the seam is a name only,
-  and the 60 Hz swap edits the room (plan.md:552). **Recommend (a)**; §4.7's two lines move (arch F11, F19).
-- **U4-HIT (Q2), how a lag-compensated shot crosses the seam.** (a) The room passes, per firing command, two history
-  entries and a fraction; the sim blends, casts, and decides whether the shot fires. (b) The room resolves hits itself:
-  float geometry in the room, outside the sim's bans, and the room must know whether a shot fires. **Recommend (a)**
-  (arch F22, net F107, F123).
-- **U4-WASM (Q3), which Wasm file Node runs.** (A) npt-client-wasm and wasm-bindgen brought forward from U7, with a
-  replay mode: keeps two unsafe exceptions and ADR 0002:503's "exact file" idea, but pulls U7's export design into U4.
-  (B) A check-only crate over npt-sim with integer-only exports: a third named exception, for the attribute only (the
-  unsafe_code lint catches `no_mangle`: rustc's lint listing, arch F25); U7's Chromium check loads the same file.
-  (C) A wasm32-wasip1 binary under Node's WASI: a new target, not the browser's. **Recommend (B)**, medium confidence;
-  (A) if you want one Wasm file from the start.
-- **U4-REPLAY (Q4), what the recordings hold.** (a) Each tick's seam inputs; npt-sim alone replays them on every target.
-  (b) Whole datagram streams, replayed through room and sim: the Wasm file then needs the room. **Recommend (a)**
-  (arch F27).
-- **U4-SERVER (Q5), npt-server's and npt-bots' U4 halves.** The U4 row names neither (plan.md:1223), yet `due_ticks` and
-  the L1 I/O step live in npt-server (plan.md:510-511, :549, :578) and the cheats in npt-bots (plan.md:460). (a) U4
-  builds their transport-free, clock-injected halves (§4.1's list); U6 the runtime, the sockets and the glue. (b) Put
-  them provisionally in npt-room or npt-lab and move them at U6. **Recommend (a)**; with it, `BlockWriter` moves to U7
-  (arch F45c).
-- **U4-LOSS (Q6), your C3.** Plain words: the room's only use for a loss estimate is rate adaptation under pressure
-  (ADR 0001:449-451), which -23 and -24 judge on L2 (ADR 0001:1613-1614); L1 has no rate limit (l1/src/lib.rs:42-43), so
-  no U4 mark reads it. (a) Build `loss` at U4 as C3 says (L1 from its implicit acks, Loopback None), with the encoder's
-  pressure path unit-tested only. (b) `loss` and the send-buffer space join Link at U6, with quinn's path stats and the
-  rate adaptation, their real consumer; the room never reads the send-buffer space (WsServer applies fix 1 and returns
-  BufferFull: plan.md:507-509), so §4.4's list loses it. **Recommend (b)**; it is your condition to amend.
-- **U4-CTL (Q7), the room-wide control types.** The catalogue puts their decoding at U4 (:253), the plan puts the socket
-  at U6 (plan.md:1225), and U5 fuzzes them (catalogue :280). (a) The types and the decoder in npt-proto at U4 (plan.md:377
-  already says "controls"), the socket at U6. (b) Item 6 and its fuzz target move to U6. **Recommend (a)**.
-- **U4-ALLOC (Q8), the catalogue item 3's "refused before anything is allocated".** A counting allocator implements
-  `GlobalAlloc`, which is unsafe to implement: forbidden in this workspace (M14). (a) U4 proves the size-first refusal;
-  the allocation count joins with PM-0001-34's fuzz crate at U5. (b) A counting-allocator dependency in proto's tests
-  (a new dependency, audited at U5). (c) A fourth unsafe exception. **Recommend (a)**.
+- **U4-SEAM (Q1), where the sim trait lives.** (a) In npt-sim; npt-room generic over it, depending on npt-sim. (b) In
+  npt-room, so npt-sim depends on npt-room, against ADR 0002:186-189. (c) Trait and implementation in npt-room: the
+  60 Hz swap then edits the room (plan.md:552). **Recommend (a)** (arch F11, F19).
+- **U4-HIT (Q2), how a lag-compensated shot crosses the seam, and who owns the volume ring.** (a) The room turns each
+  firing command's view time into four integers (tick_a, fraction, cover variant, and their presence); the ring type
+  `HitHistory` moves from npt-room to npt-sim, the room owns its instance and lends it to `step`, and the replay driver
+  rebuilds it from `hit_volumes()`; `rewind_at` stays in npt-room. plan §4.7 moves one name. (b) The same, but the
+  World owns the ring inside itself, outside the hash: a simpler seam, but every World, the client's predicting one
+  too, carries up to 1 MB, and the sim sets a size the room's cap decides. (c) Rev 1's reading, two history entries by
+  value: about 288 KB per tick in a recording (arch A1). **Recommend (a).**
+- **U4-WASM (Q3), which Wasm file Node runs.** (A) npt-client-wasm and wasm-bindgen brought forward from U7. (B) A
+  check-only crate over npt-sim with integer-only exports: a third named exception, for the attribute only, denied with
+  a listed allow per export (npt-tcpinfo's pattern); U7's Chromium check loads the same file. (C) A wasm32-wasip1 binary
+  under Node's WASI: not the browser's target. **Recommend (B)**, medium confidence; (A) if you want one Wasm file from
+  the start.
+- **U4-REPLAY (Q4), what the recordings hold.** (a) Each tick's `TickInput` (commands with their integer Rewinds;
+  spawns, teleports, attribute changes): about 18 MB per 9,000 ticks, regenerated at check time from committed seeds and
+  checked by committed SHA-256s (§4.15). (b) Whole datagram streams replayed through room and sim: the Wasm file then
+  needs the room. **Recommend (a).**
+- **U4-SERVER (Q5), npt-server's and npt-bots' U4 halves.** (a) U4 builds their transport-free, clock-injected halves;
+  AddrTable and the handshake cap move to U6 with -25, their only mark (arch A15). (b) Put them provisionally in
+  npt-room or npt-lab. **Recommend (a)**; `BlockWriter` moves to U7.
+- **U4-LOSS (Q6), your C3.** No U4 mark reads a loss estimate (its consumer is rate adaptation, judged by -23 and -24
+  on L2: ADR 0001:1613-1614; L1 has no rate limit: l1/src/lib.rs:42-43). (a) Build `loss` at U4 with a unit-tested
+  pressure path. (b) `loss` and the send-buffer space join Link at U6 with their consumer. **Recommend (b).**
+- **U4-CTL (Q7), the room-wide control types.** (a) The types and the decoder in npt-proto at U4, unfeatured: npt-client
+  never calls them and unreferenced code is dropped at link time, which U7's Wasm size shows (arch N5); a `control`
+  feature is the fallback. (b) Item 6 and its fuzz target move to U6. **Recommend (a).**
+- **U4-ALLOC (Q8), catalogue item 3's "refused before anything is allocated".** (a) U4 proves the size-first refusal;
+  the allocation count joins PM-0001-34's fuzz crate at U5. (b) A counting-allocator dependency in proto's tests. (c) A
+  fourth unsafe exception. **Recommend (a).**
 - **U4-BANS (Q9), determinism beyond npt-sim.** (a) The HashMap and HashSet type bans in room, client, server, lab and
-  bots, and the clock ban in server and in bots' behaviours (§4.11). (b) Bans in room and client only, with BTreeMap by
-  review elsewhere. **Recommend (a)**; plan §4.5's text (:517-518) follows.
-- **U4-30 (Q10), "-30 on loopback" at U4.** Both real transports are U6's (plan.md:1225). (a) U4 builds the recording,
-  the replay, the late-command validity and both bites, run as a pre-check on Loopback against L1 P0; the marked C part
-  runs at U6. (b) All of -30 at U6. **Recommend (a)**.
-- **U4-MIRROR (Q11), what -17's server side hashes.** (a) The per-client mirror (§4.6). (b) The literal world state of
-  the client's set, which mismatches by design whenever an entity is skipped. **Recommend (a)**; SERIES.md's row
-  follows.
-- **U4-BASELINE (Q12).** (a) One baseline per tick, the newest completely acknowledged, the defaults past the ring
-  (§4.5). (b) A baseline per group: more bytes saved, more state, harder to test. **Recommend (a)**.
-- **U4-WINDOW (Q13).** (a) One 256 kbps budget per client for every room-side datagram, pings and pongs included.
-  (b) The encoder alone at 1,066 B per tick, which breaks -12's window by design. **Recommend (a)**.
-- **U4-EVENTS (Q14).** (a) The queue cap from the stress scene's measured event rate, the resync-then-Kick rule, and hits
-  on third parties as resent gameplay events (ADR 0001:297-303 as I read it). (b) The same, but third-party hits sent
-  once as cosmetic events, which shrinks the event section. **Recommend (a)** for the spike; (b) is a design change, for
-  your reading.
-- **U4-ACKS (Q15), C1' details.** (a) Acks immediate, lost inside bursts and never outside them (QUIC's cumulative ACK
-  ranges repair one lost ack within a packet spacing: RFC 9000 §19.3, not re-read here); the fate-log tag moves to v2,
-  with the datagram entries shown unchanged. (b) Acks also lost at the profile's rate outside bursts. (c) Keep the tag
-  at v1. **Recommend (a)**.
-- **U4-TWIN (Q16), -21's twins.** (a) §4.10: forged content inside packets the honest client sends anyway; a
-  header-only twin for a voided datagram; a no-effect twin for a wrong-channel stream message; no forged kind closes the
-  session (a wrong-channel message of a known type within its limits is refused and counted, never kicked); the
-  quantise-stable clamp. (b) Twins matched by command count only: fates shift, and hashes differ for reasons that are
-  not forging. **Recommend (a)**.
-- **U4-TARGETS (Q17).** (a) TC's static targets are thin plates. (b) Solid targets, with -51 reading the first surface
-  the server's ray meets. **Recommend (a)**.
-- **U4-49 (Q18).** -49's rule-cap parts and its bite cap-estimate-only, and -42's bite smoothing-off, cannot run at U4
-  (marks F24, F26). (a) Carry them by name (§6); -49 and -42 stay NOT-RUN past U4. (b) Build cheat shooters into the
-  test-cap parts now. **Recommend (a)**.
-- **U4-UNITS (Q19).** (a) npt-client's API in integer ns (§4.8), with E7's text changed. (b) Keep E7's ms. **Recommend
-  (a)**.
-- **U4-18 (Q20).** (a) marks.json -18's split, SERIES's burst_heal and burst_return, and the `ws-practice` rule with its
-  fixtures, all in U4e's judge change beside C4. (b) The split now, `ws-practice` with R3's run plan. **Recommend (a)**:
-  one judge change, one review, and the L1 B1 part judged against its final checks.
-- **U4-BRIEFS (Q21).** (a) This plan is the umbrella; U4a to U4d2 build from it; U4e to U4h each get a short brief
-  (field tables, budgets, run counts) that you check before its build. (b) Everything from this plan. **Recommend (a)**.
-- **U4-SCENES (Q22), your item from the session (checkpoint :325-328).** (a) U4e adds scene and clients to the selects
-  of -14, -16 to -25 and -27, and `pre:PM-0001-2`, once the runner writes the scene. (b) Leave it to the R run plans.
-  **Recommend (a)**.
+  bots; the clock bans in server, lab and bots naming std's and tokio's `Instant` (U6's runtime half then carries
+  reviewed per-item allows); npt-room float-free, by a check.mjs grep. (b) Bans in room and client only. **Recommend
+  (a).**
+- **U4-30 (Q10), "-30 on loopback" at U4, and how it is judged.** Both real transports are U6's. (a) A pre-check under
+  its own suite `precheck-30`, on a Loopback leg (layer `loopback`, new in README) and an L1 P0 leg, judged as
+  `PRE-0001-30` from marks/prechecks.json (the judge takes `PRE-` ids only from a file marked as pre-checks), its bites
+  shown by the same twin figure and `late-zero` rule, results in results/u4r-precheck-30/: never a -30 part. (b) The
+  same runs, judged only inside npt-judge's tests as fixtures (no second file). (c) A provisional part in marks.json's
+  -30 (it stays in -30's verdict until removed). (d) All of -30 at U6. **Recommend (a).**
+- **U4-MIRROR (Q11), what -17's two sides hash.** (a) §4.6: a whole-tick hash only on complete ticks; the sentinel for
+  a refused group; the rebuilt 32-bit tick and event numbers inside; the client's held floats re-gridded; a client hash
+  with no server partner counts as a mismatch. (b) One hash per group with a per-group mirror: more pairs compared under
+  loss, but a per-group `hs` format and more judge code. (c) The literal world state of the client's set, which
+  mismatches whenever an entity is skipped. **Recommend (a)**; SERIES.md:266 follows.
+- **U4-BASELINE (Q12).** (a) One baseline per tick, the newest completely acknowledged, ages 0 to 31, the defaults
+  beyond. (b) A baseline per group. **Recommend (a).**
+- **U4-WINDOW (Q13).** (a) One 256 kbps window per client, owned by the room, counting the pump's pings and pongs, which
+  the pump reports each tick (plan §4.4's per-tick inputs gain them). (b) The encoder alone at 1,066 B per tick, which
+  breaks -12's window by design. **Recommend (a).**
+- **U4-EVENTS (Q14).** (a) The queue cap from the stress scene's measured event rate, resync then Kick (the bound 2 s),
+  third-party hits as resent gameplay events (ADR 0001:297-303 as I read it). (b) Third-party hits sent once as
+  cosmetic events. **Recommend (a)** for the spike; (b) is a design change, for your reading.
+- **U4-ACKS (Q15), C1' details.** (a) Acks immediate, lost inside bursts only, drawn from their own per-flow stream and
+  logged; the fate-log tag moves to v2; L-c8 compares SHA-256(v1 tag + v2's datagram entries) with U2's hashes.
+  (b) Acks also lost at the profile's rate outside bursts. (c) Keep the tag at v1. **Recommend (a).**
+- **U4-TWIN (Q16), -21's twins.** (a) §4.10: fate- and ack-aligned twins (a voided datagram's slot repeats the previous
+  ack), open-loop scripts in the forged and clamp suites, the catch-up kind's extra datagrams mirrored in the twin and
+  inside the bucket, the clamp twin built from the forged run's clamp events; no forged kind closes the session.
+  (b) Twins matched by command count only: fates shift. **Recommend (a).**
+- **U4-TARGETS (Q17).** (a) TC's static targets are thin plates. (b) Solid targets, -51 reading the first surface the
+  ray meets. **Recommend (a).**
+- **U4-49 (Q18).** -49's rule-cap parts and its bite, and -42's bite, cannot run at U4. (a) Carry them by name; -49 and
+  -42 stay NOT-RUN past U4, their U4 parts labelled unbitten or check-less. (b) Build cheat shooters into the test-cap
+  parts now. **Recommend (a).**
+- **U4-UNITS (Q19).** (a) npt-client's API in integer ns, E7's text changed. (b) Keep E7's ms. **Recommend (a).**
+- **U4-18 (Q20).** (a) -18's split, `burst_heal` and `burst_return`, and `ws-practice` with its fixtures, all in U4j
+  beside C4. (b) The split now, `ws-practice` with R3's run plan. **Recommend (a).**
+- **U4-BRIEFS (Q21).** (a) This plan is the umbrella; U4s, U4a, U4b, U4c, U4d, U4j and U4d2 build from it; U4e, U4r,
+  U4f, U4g and U4h each get a short brief (field tables, budgets, run lists with counts) that you check before its
+  build. (b) Everything from this plan. **Recommend (a).**
+- **U4-SCENES (Q22), your item from the session (checkpoint :325-328).** (a) §4.12's table: -17, -18, -20 and -21 gain
+  scene SS, clients 48 and `pre:PM-0001-2`; -22 gains scene and clients only, since its designed drop leaves 47
+  clients; the marks with no U4 L1 part stay for the R run plans. (b) Leave all of it to the R run plans. **Recommend
+  (a).**
+- **U4-OWNSNAP (Q23, new), how the own-state section stays exact.** ADR 0001:207-208 lets it go "unquantised, or the
+  server quantises its own copy the same way each tick". -41's bite, "the server quantising its own copy differently
+  from what it sends", has a site only in the second. (a) The sim snaps each soldier's own state to the wire grid at
+  the end of every tick, in `step` and `predict` alike; the grid lives in npt-sim and npt-proto depends on npt-sim
+  (ADR 0002:188 lets the protocol crate use sim types). (b) An unquantised own-state section: the bite then has no site,
+  its run passes, and -41 comes out FAIL. **Recommend (a).**
+- **U4-41RUN (Q24, new, a reading).** -41's other bite is "the server's run speed 1 % above the client's"
+  (ADR 0001:1636). (a) The soldier's movement speed, 1 % higher in the authority step than in `predict`: prediction is
+  wrong on every moving tick while every command is on time, so the untraced-corrections check fails. (b) The server's
+  tick rate 1 % fast: the clock sync's slew follows it (ADR 0001:239-242) and any late command is traced, so the bite
+  would likely be missed. **Recommend (a).**
+- **U4-CLAMP (Q25, new), where the clamp beyond reach runs.** (a) Inside npt-sim's shot phase, on integer cm, from the
+  fire origin the shot really uses; plan §4.4's room column marks it "(in the sim)", as it does cooldown, ammo and
+  reload. (b) Arch A3's proposal: a pure npt-sim function the room calls before `step`, with a fire-origin read-out;
+  that origin is the one before the tick's movement, up to one tick's movement from the shot's own. **Recommend (a).**
+- **U4-L1BURN (Q26, new).** S1's 1 ms burn and 2.80 ms top-up cost 50.4 s of CPU per 18,000-tick run (arch A17), about
+  3.8 h over U4's runs, and L1 judges no time mark (ADR 0001:1466-1467). (a) Off on L1, recorded in
+  `params.stand_ins`; the 384 effect rows stay, since they are state. (b) On everywhere. **Recommend (a).**
 
 ## 11. For Mustafa
-Nothing now. Later, the readings PR before R5 carries the words of Q10, Q11, Q16's clamp and Q17, if the advisor rules
-them as readings. A third unsafe exception (Q3 B) is the advisor's call: plan §4.2's exceptions come from his ruling of
-2026-11-08 (plan.md:430-438).
+Nothing now. Later, the readings PR before R5 carries the words of Q10, Q11, Q16's clamp, Q17 and Q24, if the advisor
+rules them as readings. A third unsafe exception (Q3 B) is the advisor's call (plan.md:430-438).

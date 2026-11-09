@@ -401,6 +401,13 @@
   (its "Initial RTO" line).
 
 ## Decisions taken
+- **Mustafa, 2026-11-09 about 10:00 UTC, LEFTOVER-DELETE (verbatim):** "leave them. 14 GB free is enough, and a
+  one-off delete past the deny list isn't a habit we start; if it's ever needed, it becomes a narrow kit rule
+  instead." Applied: .gate/u3c-review-target (4.0 GB, no CACHEDIR.TAG) and the nine plain scratch copies stay; no
+  delete outside the approved methods (`cargo clean --target-dir`, plain `git worktree remove`). If a delete of that
+  kind is ever needed, it goes to Mustafa as a narrow kit-rule change (a `.claude/` edit, asked first), not as a
+  one-off. Agent briefs keep critics' scratch work in forms the approved methods can remove (a cargo target dir, or a
+  git worktree), never plain source copies.
 - **Mustafa, 2026-11-09 about 01:10 UTC (verbatim):** "yes, by the approved method. And from U3d on, point all copies
   at one shared Cargo target folder (CARGO_TARGET_DIR), so each unit doesn't leave a 4–6 GB cache behind."
   - **How it is applied (the main session):** every agent copy (worktree or scratch) from U3d on builds with
