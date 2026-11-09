@@ -397,3 +397,79 @@ Nothing.
 - **To the advisor:** F1 (§4.15's recording sizes still derived from the old 1,973 B a tick: about 16.8 MB per 9,000
   ticks and 50.5 MB for three, about 4.2 million Wasm calls each, at 1,872 B) and F2 (where U4b and U4e put a tick
   constant they need outside npt-sim, when crates/sim is U4d's lane in wave 1 and check.mjs U4a's, U4d2's in wave 2).
+
+## Ruling: F1 and F2 (2026-11-09)
+(Returned by the advisor, read-only, about 18:10 UTC; recorded by the main session. Formatting compacted; the words are
+the advisor's.)
+
+F1 is approved, and the same fix covers three more lines the conditions check missed. On F2, the main session's
+option (a) has nothing to carry: as the plan stands, neither U4b nor U4e needs a new tick count. Two rate values U4e
+builds get a rule, and anything found later takes route (b), timed for when no lane owns the files. Nothing goes to
+Mustafa.
+
+**What I checked (file:line; spike paths under spikes/netcode-proof/):** the size arithmetic: plan :463 gives the
+field widths; the command is 1+4+2+2+4+2+12+4+1 = 32 B and its Rewind 1+4+1+1 = 7 B, so 39 B in all; 39 × 48 = 1,872
+B a tick of commands (the old 1,973 B was 41 × 48 + 5); 1,872 × 9,000 = 16,848,000 B (16.8 MB); three recordings
+50,544,000 B (50.5 MB); divided by 4, 4,212,000 words (4.2 million); with the 5 B tick header: 16.9 MB, 50.7 MB, 4.22
+million; MB means 10⁶ B, as in the old 17.757 → 17.8; the aebe8ea text (its :437-438) confirms the old figures came
+from 1,973 B. The same stale figure elsewhere: "about 18 MB" in three more plan lines: :46 (§0), :138 (§1, "§4.15, my
+arithmetic") and :946 (§10, Q4); the conditions check's grep (u4s-conditions-check.md:33-35) looked only for "17.8",
+"53 MB" and "4.4 million", so it missed them; plan.md, the spike's docs and code, and the main checkpoint hold none.
+F2, the rule and its guards: carry 18 (u4s-carries.md:125-128) and carries 35 and 39 (:76-81, :162-167); check.mjs:541
+(`TICK_DERIVED`), :581-633 (`tickConstantProblems`; :621-625 refuses a tick-count name in npt-sim that is not in
+`TICK_DERIVED`; :627 the outside-npt-sim pass); ticks.rs:12-112, sim lib.rs:22-26 (the re-exports), tests/seam.rs:21-39
+and :83-120 (s1's table and pins); u4s-fix-review-rust.md:114-115 (the nit itself). F2, what U4b and U4e need: plan
+§4.3 :243-257, §4.5 :285-293, §4.7 :319-325, §1 :130-134; §5 U4b :540-548, U4e :683-713, U4f :771-774; Lanes :812-842;
+carry 6 (:72-75); the catalogue's Input row (docs/design/netcode-proof-messages.md:87: "refilled at 2 × TICK_HZ a
+second"); the current server, room and client sources: no use of `tick_hz` or `TICK_HZ` yet. Not checked: I did not
+run check.mjs or the gate (text edits); I did not search the code for a constant U4e's builder might invent later
+(the builder's and the review's job).
+
+**F1 (U4-SIZES): APPROVE.** Replace u4-build-plan.md :467-468 exactly as proposed (the arithmetic holds: 16.8 MB, 50.5
+MB, 4.2 million): "about 16.8 MB per 9,000 ticks and 50.5 MB for three, commands only (my arithmetic; U4d states the
+measured size). Fed to Wasm as 32-bit words: about 4.2 million calls each." Also approved: "about 18 MB" becomes "about
+17 MB" at :46, :138 and :946 (they derive from the same §4.15 arithmetic, and :138 cites it). Mark each edit "(the
+advisor's F1 ruling)". Record the plan's new sha256 under this ruling. No other edit is covered. My U4 verdict's
+"Numbers I re-derived" line (advisor-u4.md:67: 41 B, 1,973 B, 17.8 MB) is replaced by this ruling (39 B, 1,872 B, 16.8
+MB); leave that line as it was returned; this ruling is the record of the change.
+
+**F2 (U4-TICKROUTE): none of (a), (b) or (c) as offered.** (1) Nothing is needed today, so (a) has nothing to put in
+U4d's brief: U4b needs no new tick count (`Schedule::new` takes the rate and the catch-up cap as arguments, §4.3:254-256,
+carry 6; the period ⌊k × 10⁹ / tick_hz⌋ is computed from the rate passed in, tested at 30 and 60 Hz, :543); U4e's tick
+counts are the FullState bound (`FULL_STATE_ACK_TICKS`: §4.7, the second-Resync rule) and the AckRing and client frame
+ring (`ACK_RING_TICKS`: §4.5), both in npt-sim since U4s (lib.rs:22-26) and pinned by s1; U4e's Join deadline (2 s) and
+Ping limit (10 a second) run in ns on the injected now (:692-693, :701-703) and do not depend on the tick rate; naming
+constants in U4d's brief "for U4b and U4e" would add items nobody uses yet: the "for later" pattern, so no. (2) Two
+values U4e builds depend on the tick rate but are not tick counts, and neither carry 35 nor the grep covers them: the
+Input bucket's refill, 2 × TICK_HZ a second (:133-134; catalogue :87; tested at 60 a second, :702); the window's
+per-tick budget, 256 kbps at TICK_HZ ticks a second (:132; §4.5:290-292). The rule: they follow carry 6's pattern: the
+type takes the rate as an argument, production callers pass `npt_sim::TICK_HZ` by path, and a test pins each value at
+30 and 60 Hz (the refill 60 and 120 a second; the window 32,000 B a second at both rates); no const or static outside
+npt-sim is derived from TICK_HZ (the grep cannot see one under a name that does not end in `_TICKS` or contain
+`CATCHUP`); this keeps the window's integer design with U4e instead of fixing it in npt-sim now. (3) Anything found
+later takes (b): a new tick count, or a named constant (an array length, a const generic) that needs a value derived
+from the rate: the builder writes no local form (no literal, no local formula, no local `ticks_for_ms` constant),
+records the need in its report (name, definition, values at 30 and 60 Hz, the site) and builds the rest; the main
+session then adds the constant by carry 18's route, as one commit of its own on committed state (condition 10 (d)): the
+`_at` function, the constant and the const assert in ticks.rs; the re-export in lib.rs; s1's DERIVED row; check.mjs's
+`TICK_DERIVED`; plan §4.1 and §4.3; timing: only when no lane owns crates/sim or check.mjs (in wave 1 after U4d and
+U4a have merged; in wave 2 after U4d2 has merged), check.mjs and the gate green; the site is finished and the lane
+merges after that commit; the needing lane's rust-reviewer reviews the commit; this costs nothing on the critical path
+(U4e already waits for all of wave 1, and U4r already waits for U4d2). (4) (c) is not taken: pinning a local constant at
+both rates needs a local `_at` function, which gives a derived value a second home (§4.3; arch F6's "never derived
+again"); point 2's pattern already gives the 60 Hz pin wherever no constant is needed. (5) Replacement text for the
+"open: the advisor rules…" parentheticals (the quoted rule in each entry stays word for word): entry 35 and entry 39 as
+the main session has now written them in u4s-carries.md; record the carries file's new sha256 under this ruling. (6)
+Note for later briefs: U4f, U4g and U4h run one at a time, and no lane holds crates/sim or check.mjs then, so each of
+their briefs may give that unit the places carry 18 names, without a main-session step; the first known case is U4f's
+lead bound (plan.md:514; U4f's "every other room-side check", :772-773).
+
+**Decisions needed:** none (both points technical, inside the approved spike, text only; no ADR reading changes and no
+bar lowered, so nothing joins the readings PR). **For Mustafa:** nothing.
+
+**Recorded by the main session (about 18:15 UTC):** u4-build-plan.md after F1's four edits (each marked "(the
+advisor's F1 ruling)"), sha256 0d69332c3c60c83c9328504259c279609b546e15cc5510f528346471aabc3b84; u4s-carries.md after
+F2's two parentheticals (entries 35 and 39, each "(Route, the advisor's F2 ruling, 2026-11-09: …)"), sha256
+505e54d6c0259092f08767a4052648898040437b4f2f01a8c47877adadff9c29. The wave-1 builders already running (U4d, U4c) were
+briefed before these edits: F1 changes only §4.15's derived sizes (U4d states the measured size anyway) and F2 only
+U4b's and U4e's entries, so neither running brief is affected.

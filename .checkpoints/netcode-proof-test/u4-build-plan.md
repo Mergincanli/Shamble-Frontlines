@@ -43,7 +43,8 @@ the critics'.
     that tick decoded; a refused group logs a value that always mismatches; the hash covers the rebuilt tick, the event
     numbers and the client's own held values, so both -17 bites have a site.
   - **The rewind's data was unspecified** (A1): a shot crosses the seam as four integers, the ring of past hit volumes
-    becomes an npt-sim type the room owns and lends, and a 5-minute recording is about 18 MB, not gigabytes.
+    becomes an npt-sim type the room owns and lends, and a 5-minute recording is about 17 MB, not gigabytes (the
+    advisor's F1 ruling).
 - **What needs a ruling first.** Q1 to Q26 in §10. Four are new (Q23 the server snapping its own copy, Q24 the reading
   of -41's "run speed", Q25 the clamp's home, Q26 the CPU burn on L1); Q2, Q10, Q11, Q16 and Q22 changed. U4s needs Q1,
   Q2 and Q23; the rest of wave 1 can start once U4s merges.
@@ -135,7 +136,7 @@ the critics'.
 - The hit history at most 1 MB in the stress scene (plan.md:459, E11).
 - Estimates: a stress-scene snapshot of about 690 B per client per tick (net F112); about 350 B more of event resends at
   P2 (net F121); a hit-volume tick of about 3 KB (net F106); `Input` about 23 B whole, at most 19 B per repeat (net F116);
-  a recording about 18 MB per 9,000 ticks (§4.15, my arithmetic).
+  a recording about 17 MB per 9,000 ticks (§4.15, my arithmetic; the advisor's F1 ruling).
 
 ## 2. Carried items U4 must meet
 | Id | What (short) | Source | Where | Proof |
@@ -464,8 +465,9 @@ sub-unit that moves its mark.
   `Rewind` (present 1, tick_a 4, fraction 1, cover 1); spawns, teleports and scripted attribute changes when they occur.
   Fixed-width little-endian, no `usize` (plan.md:527-529).
 - **Size:** 39 B per command (move is 2 B), so about 1,872 B a tick of commands for 48 soldiers before spawns and the
-  tick's own header (the advisor's U4s ruling, condition 1 (a)); about 17.8 MB per 9,000 ticks and 53 MB for three (my
-  arithmetic; U4d states the measured size). Fed to Wasm as 32-bit words: about 4.4 million calls each.
+  tick's own header (the advisor's U4s ruling, condition 1 (a)); about 16.8 MB per 9,000 ticks and 50.5 MB for three,
+  commands only (my arithmetic; U4d states the measured size). Fed to Wasm as 32-bit words: about 4.2 million calls
+  each (the advisor's F1 ruling).
 - **Both uses:** the sim-only replay steps npt-sim with each `TickInput` and the ring the driver rebuilds; -30's
   pre-check (a recorded npt-lab test, never judged: the advisor's condition 2) takes the SS P0 recording below (the
   advisor's condition 3) and re-encodes its commands as `Input` (stamped ticks, view times, sequences and press
@@ -943,7 +945,7 @@ to Q26.
   under Node's WASI: not the browser's target. **Recommend (B)**, medium confidence; (A) if you want one Wasm file from
   the start.
 - **U4-REPLAY (Q4), what the recordings hold.** (a) Each tick's `TickInput` (commands with their integer Rewinds;
-  spawns, teleports, attribute changes): about 18 MB per 9,000 ticks, regenerated at check time from committed seeds and
+  spawns, teleports, attribute changes): about 17 MB per 9,000 ticks (the advisor's F1 ruling), regenerated at check time from committed seeds and
   checked by committed SHA-256s (§4.15). (b) Whole datagram streams replayed through room and sim: the Wasm file then
   needs the room. **Recommend (a).**
 - **U4-SERVER (Q5), npt-server's and npt-bots' U4 halves.** (a) U4 builds their transport-free, clock-injected halves;

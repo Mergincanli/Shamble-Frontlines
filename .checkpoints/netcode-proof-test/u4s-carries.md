@@ -76,9 +76,11 @@ with the ruling. The file now holds 44 entries; the wave-1 briefs carry them wor
 35. **rust fix review nit (u4s-fix-review-rust.md:114-115; the advisor's U4s ruling, condition 2):** "A tick count
     needed outside npt-sim goes into npt-sim as `<name>_at` plus its constant (carry 18's route), and the crate uses it
     by path. Why: check.mjs:627 lets an initializer that merely names `TICK_HZ` through, and nothing pins such a value
-    at 60 Hz." (For the brief writer: in wave 1 crates/sim is U4d's lane and check.mjs U4a's (u4-build-plan.md Lanes),
-    so where a U4b builder puts such a constant is open: the advisor rules on it before U4b's brief is written
-    (u4s-conditions-notes.md F2).)
+    at 60 Hz." (Route, the advisor's F2 ruling, 2026-11-09: the plan names no new tick count for U4b; `Schedule::new`
+    takes the rate and the catch-up cap as arguments (carry 6) and computes the period from the rate passed, tested at
+    30 and 60 Hz. If U4b finds it needs one, it writes no local form and records the need (name, definition, values at
+    30 and 60 Hz, the site) in its report; the main session adds it by carry 18's route in its own commit once U4d and
+    U4a have merged, and U4b merges after it.)
 
 ## U4d (the stand-in sim: npt-sim; wave 1)
 7. **netcode F1 (reworded by the advisor's U4s ruling, condition 2):** "A unit test: two commands that differ only in
@@ -162,9 +164,14 @@ with the ruling. The file now holds 44 entries; the wave-1 briefs carry them wor
 39. **rust fix review nit (u4s-fix-review-rust.md:114-115; the advisor's U4s ruling, condition 2):** "A tick count
     needed outside npt-sim goes into npt-sim as `<name>_at` plus its constant (carry 18's route), and the crate uses it
     by path. Why: check.mjs:627 lets an initializer that merely names `TICK_HZ` through, and nothing pins such a value
-    at 60 Hz." (For the brief writer: in wave 2 crates/sim is no lane's and check.mjs is U4d2's (u4-build-plan.md
-    Lanes), so where a U4e builder puts such a constant is open: the advisor rules on it before U4e's brief is written
-    (u4s-conditions-notes.md F2).)
+    at 60 Hz." (Route, the advisor's F2 ruling, 2026-11-09: the plan names no new tick count for U4e; its counts are
+    `FULL_STATE_ACK_TICKS` and `ACK_RING_TICKS`, in npt-sim since U4s, and its deadlines and limits run in ns on the
+    injected now. The Input bucket's refill (2 × TICK_HZ a second) and the window's per-tick budget (256 kbps) follow
+    carry 6's pattern: the type takes the rate as an argument, production callers pass `npt_sim::TICK_HZ`, a test pins
+    each at 30 and 60 Hz, and no const or static outside npt-sim is derived from TICK_HZ. If U4e finds it needs a new
+    tick count or a named constant derived from the rate, it writes no local form and records the need in its report;
+    the main session adds it by carry 18's route in its own commit once U4d2 has merged, and the site and U4e's merge
+    follow it.)
 
 ## U4r (the L1 runner and its judged runs)
 40. **O1 (u4-conditions-check.md:42-45; advisor-u4.md:343-347; the advisor's U4s ruling, O1):** "U4r's brief, which
