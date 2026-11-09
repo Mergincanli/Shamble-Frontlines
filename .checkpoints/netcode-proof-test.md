@@ -281,6 +281,23 @@
     R1 still waits for stop B.
 
 ## Next steps
+**Now (2026-11-09, about 22:25 UTC):** wave 1 of U4. Agent slots (3 at most, reviewers included) in this order as they
+free:
+1. **The workflow wf_f54246ff-e0d runs its own lanes** (U4d, U4c): builder, then reviewers, then a test-engineer.
+   When it ends, fold each lane's report and notes and run the fix pass within the review budget (two rounds at most).
+2. **The first free slot outside it: U4j's builder.** The brief is ready in `u4j-brief.md`: its "Prompt" section,
+   with `<base>` set to the branch head at launch. It runs as general-purpose, opus, xhigh, with
+   `isolation: worktree` (U4S-BUILDER).
+3. **When U4a's builder (agent a9297644e7c0354f3) returns: one review round for U4a and U4b together.**
+   netcode-architect, rust-reviewer and test-engineer each cover both diffs: U4a in its worktree, U4b in
+   `.gate/u4b-wt` (record u4b-build.md).
+4. **Merges, one at a time, on committed state:** U4b and U4a after their review; U4d and U4c after their lane; U4j
+   after its review (test-engineer, netcode-architect, security-auditor). After each merge, check.mjs and the gate,
+   with counts as deltas.
+5. **Morning:** fold the night items (issue #16 items 2-5: the cs/npt-* branches' notes) per "About 22:05 UTC" in
+   Running work.
+6. **Then wave 2:** U4d2 and U4e. U4e's brief comes from the night draft and goes to the advisor before its build.
+**Older next steps** (U1 era, kept for the record):
 1. On Mustafa's "merge #41": check gate and smoke green on 1b4094a, merge with that SHA as the expected head; then
    `git merge origin/main` into this branch (only reviewed main comes in) so marks.json's row hashes match; remove
    the worktree `.gate/npt-readings`.
