@@ -569,9 +569,16 @@
     form named in the SERIES.md and U8 row texts; C-U8-5; C-U6-6 never INVALID by design), each marked; the plan
     text of §3.6 made in plan.md (§12.1 U3 row's U3d sentence, U6 row's C-U6-1..7, U8 row's ImpairSocket self-test
     with C-U8-1..5) and §15's new reading R-31. Condition 6's nits go to the builder's brief.
-  - **Next: U3d's build** (a workflow: one builder at xhigh in a worktree with CARGO_TARGET_DIR=.gate/shared-target;
-    then netcode-architect, rust-reviewer and test-engineer on the final diff; then the main session merges, runs
-    check.mjs and the gate, then the dry run on a quiet machine, reported, not judged).
+  - **About 02:25 UTC: U3d's build launched, workflow `wf_2c76ec82-8fc` (npt-u3d-build) on dae4f0f:** build:u3d
+    (general-purpose, xhigh, worktree from isolation, CARGO_TARGET_DIR=.gate/shared-target, notes u3d-build.md in the
+    worktree), then review:netcode and review:rust read-only in parallel (u3d-build-review-netcode.md,
+    u3d-build-review-rust.md), then prove:test (the only one that builds and plants bites; u3d-build-review-test.md).
+    **If cut:** snapshot the builder's worktree with worktree_patch.py (wip/u3d-build.patch), then Workflow({scriptPath:
+    /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u3d-build-wf_2c76ec82-8fc.js,
+    resumeFromRunId: "wf_2c76ec82-8fc", args: {sha: "dae4f0f396d655d194e4300e8d56f07b619be908"}}).
+    **After it:** fold findings (a fix pass if needed), merge (worktree_patch.py, git apply), check.mjs 9/9 and the gate
+    on the main folder's own cache, commit, push; then the dry run (results/u3d-timing/run.sh) on a quiet machine,
+    reported, not judged; then U3d's report to the advisor.
   - **Done (launched about 01:38 UTC): workflow `wf_bbda74db-c79` (npt-u3d-plan-rev2) on dacdb77:** fold both critiques
     + Mustafa's shared-target rule into rev 2 (netcode-architect; notes u3d-plan-rev2-notes.md), a completeness check
     (test-engineer; u3d-plan-rev2-check.md; one fix pass if gaps), then the advisor's review of rev 2 (it returns text;
