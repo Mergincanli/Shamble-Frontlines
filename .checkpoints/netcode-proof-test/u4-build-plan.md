@@ -1,5 +1,10 @@
 # U4 build plan, rev 2: the wire, the stand-in sim, the room, the client and the L1 runner
 
+**rev 2, approved with conditions by the advisor (advisor-u4.md); conditions 1-11 and nits (a)-(f) applied** (each
+edit marked "(the advisor's condition N)" or "(nit x)"; the approved text is aebe8ea's, sha256
+27e0315857e51bd5667605d032b57a0ce75701d0ba6a08bd2b9319315e3b4dc2; the plan.md edits the verdict calls for are drafted
+in u4-plan-md-edits.md, for the main session to make).
+
 **Revision 2, 2026-11-09** (netcode-architect; branch claude/netcode-proof-test-plan-hcky5g, code as at f985226; the
 folder's later commits are checkpoint autosaves only). Rev 1 (same file, same day) was reviewed by test-engineer
 (u4-plan-review-test.md: T1-T23, REVISE) and engine-architect (u4-plan-review-arch.md: A1-A19, A25, A26, N1-N5,
@@ -32,6 +37,8 @@ the critics'.
   - **-22 would have been INVALID by design** (T1): it keeps no stress-scene precondition; each mark's precondition is
     now decided in a per-mark table (§4.12).
   - **-30's pre-check could be judged as a -30 part** (T2): it now has its own suite, layer value and pre-check file.
+    Superseded by the advisor's condition 2: no pre-check file and no `PRE-` id; a recorded npt-lab test whose headers
+    list no mark, read by the advisor (§5 U4r).
   - **-17's hash was undefined when a snapshot splits** (T3, T4): a client logs a tick's hash only once every group of
     that tick decoded; a refused group logs a value that always mismatches; the hash covers the rebuilt tick, the event
     numbers and the client's own held values, so both -17 bites have a site.
@@ -51,7 +58,7 @@ the critics'.
 | Id | Sev | My check | Where rev 2 meets it |
 |---|---|---|---|
 | T1 | HIGH | Agree: PM-0001-2's "SS runs" part checks `tick.v.snapshot_clients_count` min ≥ 48 and `soldiers_count` min ≥ 48 (marks.json PM-0001-2); `pre:` applies the matched part's checks (eval.rs:850-887; README:193-200); -22's drop leaves 47 | §4.12's per-mark table: -22 gains scene and clients only, no precondition; -17, -18, -20 and -21 gain it with the shot-band arithmetic (§4.13); marks with no U4 L1 part go to the R run plans; the contract test resolves PM-0001-2's checks on every SS suite. Q22 |
-| T2 | HIGH | Agree: -30's C part selects no layer (marks.json -30; matched_parts eval.rs:921-930 drops only `role`); README:32 has no Loopback value; catalogue item 5 is a test, not a mark | §5 U4r: suite `precheck-30`, layers `L1` and `loopback` (README §1 gains the value in U4j), judged as `PRE-0001-30` from marks/prechecks.json, results in results/u4r-precheck-30/, never a -30 part, never U6's folder. Items 4 and 5 listed as tests. Q10 |
+| T2 | HIGH | Agree: -30's C part selects no layer (marks.json -30; matched_parts eval.rs:921-930 drops only `role`); README:32 has no Loopback value; catalogue item 5 is a test, not a mark | §5 U4r: suite `precheck-30`, layers `L1` and `loopback` (README §1 gains the value in U4j), judged as `PRE-0001-30` from marks/prechecks.json, results in results/u4r-precheck-30/, never a -30 part, never U6's folder. Items 4 and 5 listed as tests. Superseded by the advisor's condition 2: no `PRE-` id and no prechecks.json; a recorded npt-lab test the judge never reads (§5 U4r). Q10 |
 | T3 | HIGH | Agree: SERIES.md:266 pairs by (client, tick); a split tick with a lost group has no defined client hash | §4.6: whole-tick hash only on a complete tick; a refused group logs the sentinel; a lost group leaves the tick unlogged and counted (`snap_incomplete`); six figure fixtures (§5 U4j). Q11 |
 | T4 | MED | Agree: -17 has only the figure and the S30 setup (marks.json -17); a rejecting client gives no pairs; the client decodes integers and rounds nothing | §4.6: the hash covers the rebuilt 32-bit tick and event numbers; a client hash with no server partner counts as a mismatch; the client hashes its held floats re-gridded, so client-rounding has a real site; §4.14 lists both sites |
 | T5 | MED | Agree: PM-0004-21 asks for "its two orders logged" (ADR 0004:1142); a first-key outcome repeats with p ≈ 1/32 | §5 U4d: the bite folds the whole order, each process logs its order digest, equal digests mean "not exercised" |
@@ -172,7 +179,7 @@ the critics'.
 | npt-sim | `SimCore` (moved from npt-room) | U4-SEAM |
 | npt-sim | `TICK_HZ`, `LOOP_CATCHUP`, the tick-constant functions and their derived constants (§4.3) | plan.md:544-546; A4, A5: the Worker reaches npt-sim, never npt-server |
 | npt-sim | `grid` (the wire grid, each way, per field kind) | U4-OWNSNAP: the sim's own-copy snap and both codec ends need one function |
-| npt-sim | seam data: `Command`, `Rewind`, `TickInput`, `EntityRecord`, `HitVolumes`, `HitHistory` (moved from npt-room), `PortalStates`, `SimEvent` | §4.2; A1, A2 |
+| npt-sim | seam data: `Command`, `Rewind`, `TickInput`, `EntityRecord`, `HitVolumes`, `HitHistory` (moved from npt-room), `PortalStates`, `SimEvent`; `InputReports` and `SimCore::reports` (the clamp reports and the refusal counters, outside the hash: the advisor's condition 1) | §4.2; A1, A2; the advisor's condition 1 |
 | npt-sim | `Recording`, `StateDump`, `replay::Replayer` | RQ5's field diff; U4-REPLAY; A12's one driver |
 | npt-sim | `World::predict`, `World::load_movers`, `World::ray_cast`; `Scene::estimate`, `Scene::course`, `Scene::targets` beside `Scene::stress` | ADR 0004:166-178; ADR 0001:258-260; ADR 0001:1470-1482 |
 | npt-proto | `RoomControl` (unfeatured; N5) | catalogue item 6 (:253); U5's fuzz target (catalogue :280) |
@@ -186,7 +193,7 @@ the critics'.
 | npt-bots (library) | `Behaviour` (the brawl, the open-loop scripts, the target-course shooter, the cheats, the never-acker), clock-injected | E12; U4-SERVER |
 | npt-lab | subcommands `scenario` (with `--record`), `replay` and `hash` | plan.md:590-591 |
 | npt-log | `TickRecord.hs` | marks/README.md:147-148 |
-| npt-judge | accepts `PRE-` ids only in a file whose top level says `"kind": "precheck"` | Q10 (T2) |
+| npt-judge | nothing for -30's pre-check: the `PRE-` id, marks/prechecks.json and the `"kind": "precheck"` rule are dropped (the advisor's condition 2) | Q10 (T2); the advisor's condition 2 |
 | a new crate | `npt-hash-wasm` (cdylib; integer-only exports) | U4-WASM (B) |
 | not built at U4 | `BlockWriter` (U7); `TickLoop`, `PhaseTimers`, `ControlSocket`'s socket, `AddrTable`, the handshake cap (U6) | §6 |
 
@@ -197,20 +204,26 @@ the critics'.
   - `entity_records(&self) -> &[EntityRecord]`: per entity its id, kind, area id, grid integers, and the pre-grid
     values as `u32` bits (for -57's log; the room copies bits and never computes with them);
   - `hit_volumes(&self) -> &HitVolumes`; `portal_states(&self) -> &PortalStates` (each portal open or closed: A2);
+  - `reports(&self) -> &InputReports`: the tick's clamp reports and the running refusal counters per kind, outside
+    `state_hash` and outside the hashed event list; the room reads them through this accessor alone and logs them
+    (the advisor's condition 1);
   - spawn, teleport and scripted attribute changes go in through `TickInput`.
   - One implementation: `World`. The static graph is npt-sim's plain-data `Areas` and `Portals` (plan.md:567), so the
     room's `AreaFlood` re-floods when `portal_states` changes, with no float and no sim internals.
 - **`Rewind`** rides with each command that has fire held or a fire edge: `tick_a: u32`, `fraction: u8` (the blend
   from tick_a toward tick_a + 1; U4a's field table fixes the bits, net F116 proposes 8), `cover: CoverVariant`
   (R-10's two variants). Integers only. A Rewind naming a tick the lent ring does not hold is refused and counted by
-  the sim (a debug assert too: a correct room never sends one).
+  the sim, in `reports()` and never in the hash (the advisor's condition 1); the debug assert that a correct room never
+  sends one sits in the room's `rewind_at`, not in the sim, so that condition 1's unit test can feed the sim one (the
+  advisor's condition 1).
 - **`HitHistory`** is npt-sim's fixed ring of `HitVolumes` per tick (capacity set at construction from U4h's test cap,
   in ms, through §4.3's functions). The room owns its instance and pushes `world.hit_volumes()` after each `step`; the
   replay driver does the same, so a recording needs no volumes. The client's predicting World carries none.
 - **The clamp** (Q25): inside the shot phase, on the aim point in integer cm, from the in-step fire origin: a point
   beyond the weapon's reach + 0.87 cm (one grid cell's half-diagonal) moves along its own ray to exactly the reach and
-  is snapped to the grid; `SimEvent::Clamped { slot, seq, point }` reports it. A point within reach + 0.87 cm is never
-  clamped again, so a clamped point sent back is stable (the twin's rule, §4.10).
+  is snapped to the grid; a clamp report `{ slot, seq, point }` in `reports()` records it, never a `SimEvent` and never
+  in the hash (the advisor's condition 1). A point within reach + 0.87 cm is never clamped again, so a clamped point
+  sent back is stable (the twin's rule, §4.10).
 - **Two entry points** over the same phase functions (ADR 0004:166-178): the authority `step` and `World::predict` (one
   slot and its vehicle, against the movers `World::load_movers` loaded from the last decoded snapshot, drawing from no
   random stream). Both end each tick with the own-copy snap through `grid` (Q23).
@@ -218,6 +231,12 @@ the critics'.
   client's interpolated set for AimCast, the blended rewound set for a server shot: ADR 0001:258-260, :358-362; A11).
 - Pools have fixed capacity; a full pool refuses and counts. The tick's event list is state and hashed
   (ADR 0004:544-561).
+- **Refused input leaves no trace in the hash (the advisor's condition 1).** ADR 0004:544-556 hashes the tick's event
+  list, so the clamp reports and every refusal counter (the cooldown, ammunition and reload edges, non-finite
+  components, Rewinds outside the ring, a full pool) stay outside `state_hash` and outside that list: they live in
+  `reports()`, and the room logs them. Any per-soldier input state the sim keeps holds what the server accepted, never
+  what the client claimed, so a refused part changes nothing on the ticks after it either (the press counters are the
+  case to watch: D-10 runs past the next accepted press).
 
 ### 4.3 The tick constant, the derived constants and the loop policy
 - In npt-sim: `TICK_HZ = 30`; `LOOP_CATCHUP = TICK_HZ / 4` (7 at 30 Hz, 15 at 60 Hz); `const fn ticks_for_ms(ms)` =
@@ -326,9 +345,16 @@ the critics'.
 ### 4.10 Hostile input (Q16)
 - Every check in plan §4.4's table gets its home and a -21 counter; the clamp is "(in the sim)", as cooldown, ammo and
   reload already are (Q25).
-- **The clamp twin:** the forged run logs each `SimEvent::Clamped` point; the twin run sends exactly those points at
-  the same instants. Since a point within reach + 0.87 cm is never clamped again, the twin's shots use the same points,
-  and a unit test shows clamp-then-grid is idempotent.
+- **The clamp twin:** the forged run's room logs each clamp report's point (read through `reports()`, never from the
+  hashed event list: the advisor's condition 1); the twin run sends exactly those points at the same instants. Since a
+  point within reach + 0.87 cm is never clamped again, the twin's shots use the same points, and a unit test shows
+  clamp-then-grid is idempotent.
+- **The twin's command for a kind the sim checks** (the cooldown, ammunition and reload edges; the clamp, whose twin
+  sends the clamped point) is the forged command with only the refused part removed, everything else equal (the
+  advisor's condition 1).
+- **`event.clamp_kind.counted_count` counts refusals only, never clamp reports** (SERIES.md:144; marks.json -21's
+  "clamp: never refused or counted"): npt-lab writes it from the refusal counters, and a clamp report adds nothing to
+  it (the advisor's condition 1).
 - **-21's twins are fate-aligned (marks F27, M22) and ack-aligned (T7):**
   - forged content rides only inside datagrams the honest script sends anyway, at the same instants, on the same flows;
   - a forgery that voids a whole datagram (trailing bytes, an unknown field) has, in its twin, a datagram in that slot
@@ -430,20 +456,26 @@ sub-unit that moves its mark.
 | PM-0004-21 hash-map | a bites-only HashMap of at least 32 keys whose whole iteration order folds into a state value | D-2 and U4d2: first mismatching tick = T | two processes; each logs its order digest | the two digests differ; equal digests mean "not exercised", never caught or missed |
 
 ### 4.15 Recordings (A1, A12, T9; Q4)
-- **Fields:** a header (scene, seed, TICK_HZ, pool sizes); then per tick a `TickInput`: per soldier one `Command`
+- **Fields:** a header (scene, seed, TICK_HZ, pool sizes, HitHistory's capacity (nit b)); then per tick a `TickInput`: per soldier one `Command`
   (slot 1 B, tick 4, sequence 2, buttons 2, press counters 4, move 4, aim in cm 12, view tick 4 and fraction 1) and its
   `Rewind` (present 1, tick_a 4, fraction 1, cover 1); spawns, teleports and scripted attribute changes when they occur.
   Fixed-width little-endian, no `usize` (plan.md:527-529).
 - **Size:** about 41 B per command; 48 commands a tick, about 1,973 B a tick, about 17.8 MB per 9,000 ticks and 53 MB
   for three (my arithmetic; U4d states the measured size). Fed to Wasm as 32-bit words: about 4.4 million calls each.
 - **Both uses:** the sim-only replay steps npt-sim with each `TickInput` and the ring the driver rebuilds; -30's
-  pre-check re-encodes the same commands as `Input` (stamped ticks, view times, sequences and press counters from the
-  recording; the ack from what that leg's replay client decodes live) and lets the room compute its own Rewinds.
+  pre-check (a recorded npt-lab test, never judged: the advisor's condition 2) takes the SS P0 recording below (the
+  advisor's condition 3) and re-encodes its commands as `Input` (stamped ticks, view times, sequences and press
+  counters from the recording; the ack from what that leg's replay client decodes live) and lets the room compute its
+  own Rewinds.
 - **One driver:** `npt_sim::replay::Replayer` (feed words, step, per-tick hash and dump). npt-lab's `hash` subcommand
   runs it natively; npt-hash-wasm's exports wrap it; D-2 calls it in a test.
 - **Sources:** U4d's three synthetic recordings from a seeded generator in npt-sim's test support (open-loop commands,
   Rewinds drawn inside the ring), needing no room; U4r's three runner recordings (`scenario --record`: SS P2 seed 1, ES
-  P3 seed 2, TC B1 seed 3), which hold the room's real Rewinds.
+  P3 seed 2, TC B1 seed 3), which hold the room's real Rewinds; and a fourth runner recording, **SS P0 seed 4**
+  (`scenario --record`), the -30 pre-check's source (the advisor's condition 3). Replayed at P0, the other three's view
+  times sit about one RTT older than P0's estimate, so the room would replace them on both legs, each from its own RTT;
+  a recording made at P0 keeps them inside the tolerance. The determinism step keeps its three; the fourth serves the
+  pre-check only.
 - **Where they live:** regenerated at check time under .gate/ from a committed recordings manifest (scene, seed,
   script, generator version) with each file's SHA-256; a different hash fails the step and names the recording.
   Never committed as files.
@@ -560,6 +592,11 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
     clamped point sent again is not moved.
   - D-9 a `Rewind` blends tick_a and tick_a + 1 by its fraction against a reference; a Rewind outside the ring is
     refused and counted.
+  - D-10 refused input leaves no trace (the advisor's condition 1): one unit test per kind the sim checks (the
+    cooldown, ammunition and reload edges; the clamp; a Rewind outside the ring): the forged command and its twin (the
+    forged command with only the refused part removed) give equal state hashes on that tick and on every tick after,
+    run on past the soldier's next accepted press; `reports()` shows the refusal or the clamp report, and the hashed
+    event list holds neither.
 - **Bites:** the hash-map (§4.14's form: the whole order folded, each process logging its order digest; D-2 must report
   T as the first mismatching tick); the std `sin` site (its proof is U4d2's); -41's two sites (§4.14), unit-shown here
   and run judged in U4g. Each bite site carries a bites-only clippy allow (sim/clippy.toml denies them: marks F22).
@@ -569,13 +606,17 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
 - **Builds:** npt-log `hs` and its schema test. npt-judge: C4 with fixtures; the figures
   `decoded_hash_mismatch_count` (§4.6's rules), `decoded_hash_compared_count`, `twin_hash_mismatch_count`, and, with
   fixtures only since no U4 run feeds them, `cross_arch_mismatch_count` (L2) and `machine_named` (-1's parts select
-  RS, LG, ML, RD and MAC); `PRE-` ids accepted only in a file marked `"kind": "precheck"`, refused in marks.json.
+  RS, LG, ML, RD and MAC). No `PRE-` id, no marks/prechecks.json and no `"kind": "precheck"` rule, nor their tests:
+  -30's pre-check is a recorded npt-lab test the judge never reads (the advisor's condition 2).
   marks.json: -18's split, `burst_heal` and `burst_return`, the `ws-practice` rule (Q20); §4.12's table (Q22).
-  marks/prechecks.json: `PRE-0001-30` (Q10). README: the `loopback` layer value; `hs`. SERIES.md: the rows rev 2 adds
-  (`snap_incomplete`, `burst_eviction`, the clamp events, the precheck suite) and the figure rows' formulas.
+  README: the `loopback` layer value in §1, one line, since the pre-check's Loopback leg writes an npt-log header
+  (the comparer reads both legs' room logs), with no judge change (the advisor's condition 2); `hs`, stating how it
+  writes a client that has no hash at a tick (`null`), the form the six decoded-hash fixtures use (nit c). SERIES.md:
+  the rows rev 2 adds (`snap_incomplete`, `burst_eviction`, the clamp events, the precheck suite) and the figure rows'
+  formulas.
 - **Tests:** PASS, FAIL, gap and INVALID fixtures per figure and rule; for the decoded hash six cases (equal; differing;
   a lost group, not compared; a refused group, sentinel; a client pair with no server pair; 0 compared, FAIL); C4's
-  four cases; `--check-marks` on both files; the drift test.
+  four cases; `--check-marks` on marks.json (the second file is dropped: the advisor's condition 2); the drift test.
 - **Marks moved:** none judged here; every later judged set reads this judge.
 - **Reviewers:** test-engineer, netcode-architect, security-auditor (validity rules).
 
@@ -585,7 +626,8 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
   `hash_hi`, `dump_len`, `dump_word(i)`, each `#[unsafe(no_mangle)] extern "C"`, integers only; its `bites` feature
   forwards to npt-sim's. A Node script loads it with `WebAssembly.instantiate` and streams a recording in; npt-lab's
   `hash` subcommand, on the release build, runs the two native legs in two processes and `HashCompare` prints the first
-  mismatching tick and the field diff.
+  mismatching tick and the field diff. `HashCompare` takes two per-tick hash lists, so U4r's -30 pre-check reuses it
+  on the two legs' per-tick server hashes (the advisor's condition 2).
 - **check.mjs** (U4d2 is its only editor in its wave), each with a self-test bite in check.test.mjs:
   - a `wasm` step: the release build with §4.5's flags, the Node run (a script, so the runner refusal at
     check.mjs:1156-1158 stands, its note updated), the comparison; its wall time printed, budget 5 minutes;
@@ -651,13 +693,31 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
   - -58 for 10 s at P0 and P3, every counter a few steps below its wrap; its six bites (§4.14).
   - -18 at L1 B1 (10 bursts, each offset 0 to 1 tick; the fresh-delta reading: advisor-u3q.md:180-186); bite
     no-fallback, with `burst_eviction` logged.
-  - **-30's pre-check, as `PRE-0001-30` (Q10, T2):** suite `precheck-30`; one leg over Loopback (layer `loopback`), one
-    over L1 P0 (layer `L1`); replay clients send one recording's commands (§4.15) to the room on both legs; identical
-    server hashes every tick (`twin_hash_mismatch_count`), `late-zero` holding; bites wallclock (a wall-clock read in
-    the pump for one leg's sessions, bites build only) and late-command (expect INVALID by `late-zero`). The view times
-    must stay inside the tolerance on both legs; each replacement is logged per shot. Judged from
-    marks/prechecks.json into results/u4r-precheck-30/<commit>/; reported as a pre-check, never as -30's part, never
-    in U6's folder.
+  - **-30's pre-check, a recorded npt-lab test, not a judged id (Q10; the advisor's conditions 2 and 3):**
+    - suite `precheck-30`; one leg over Loopback (layer `loopback`), one over L1 P0 (layer `L1`); replay clients send
+      the SS P0 recording's commands (§4.15) to the room on both legs, under option B with the input buffer deep enough
+      for P0; both legs' input-buffer depth (`buffer_depth_ticks`) recorded (marks.json -30's notes; condition 3);
+    - the comparer: npt-lab's `HashCompare` (built in U4d2) compares the two legs' per-tick server hashes and names the
+      first tick that differs; `tick.v.late_count` must sum to 0 on both legs (condition 2);
+    - the setup condition (condition 3): 0 view-time replacements and 0 clipped shots on both legs, each replacement
+      and clip logged per shot; a leg with any, or with `late_count` above 0, makes the pair VOID, reported, never a
+      pass or a fail;
+    - why the L1 leg's RTT before its first sample cannot make the legs decide differently (condition 3): Loopback's
+      `rtt_ns` is always Some(0) (link/src/lib.rs:203-205), while L1 starts at U4c's 333 ms. The RTT reaches the room
+      only through the tolerance's accept-or-replace and the cap's clip (§4.9), and an accepted view time's Rewind
+      depends on the view time alone, so the legs can differ through the RTT only by a replacement or a clip, which the
+      setup condition makes VOID. In a correct build it does not arise: each replay client sends its first `Input` only
+      after it decodes `JoinAccepted`, whose packet it acknowledges at once (U4c's immediate acks; at one instant
+      internal events come before application sends: L-c6), so the server's L1 link holds its first sample (about 0 at
+      P0) before the room reads that client's RTT for any command. The runner logs per client the instant of that first
+      sample and the tick of its first command run; a client whose first command ran before its first sample makes the
+      leg VOID;
+    - the bites: wallclock (a wall-clock read in the pump for one leg's sessions, bites build only) must give a
+      mismatch; late-command (one replayed command delayed past its tick) must make the pair VOID, never a pass;
+    - the headers list no mark, so the judge never reads these runs; results/u4r-precheck-30/<commit>/runs.txt and the
+      comparer's output are committed, and the advisor reads them in U4r's review, as for U3d's self-test
+      (advisor-u3d.md, U3D-JUDGE); nothing goes into marks.json;
+    - -30 stays NOT-RUN until U6: never reported as -30's part, never in U6's folder.
   - The sizes for fixes.rs (§2), as series with SERIES.md rows; the WebSocket framing they assume, stated (a 1 B channel
     tag, catalogue :73; a 2 B header under 126 B and 4 B up to 65,535 B, RFC 6455 §5.2; +4 B for the client's mask;
     TLS 1.3's +22 B, RFC 8446 §5.2).
@@ -781,8 +841,8 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
     the real sim make their own call.
 11. **Plan text moves** (plan §4.4's clamp and per-tick inputs, §4.7's HitHistory and SimCore lines, E7's units, the
     proto → sim edge): each lands in plan.md in the sub-unit that needs it, before its code merges.
-12. **The `PRE-` id** is a new judge concept; it is refused in marks.json by test, so it can never reach a mark's
-    verdict.
+12. **The `PRE-` id** is dropped (the advisor's condition 2): -30's pre-check is a recorded npt-lab test whose headers
+    list no mark, so it can never reach a mark's verdict, and the judge gains no new concept.
 
 ## 9. Change type and evidence rule
 - **Change type:** netcode (protocol, simulation, room, client, the L1 model), plus a judge change.
