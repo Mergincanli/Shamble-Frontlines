@@ -584,6 +584,16 @@
     belong to the room), netcode 2 (canonical command order), arch F1 (the grid's bite ids must sit where their code
     lives: -57's coarsening to npt-proto's Quant), arch F2 (the per-kind field layout defined in npt-sim; VELOCITY fixed
     for wave 1).
+  - **About 18:00 UTC: conditions 1-3 applied** (u4-build-plan.md sha256 7ec1b324…, recorded under the ruling; carries
+    completed and corrected per the check, sha256 4a8c0ee8…, 45 entries; F1 sizes and F2 the U4b/U4e tick-constant
+    route to the advisor, background agent). **Wave 1 lanes U4d and U4c launched:** workflow `wf_f54246ff-e0d`
+    (npt-u4-wave1-cd) on 097f897: per lane a builder (worktree, shared target; U4d's brief holds carries 7-20 and
+    36-38 word for word), read-only reviewers (U4d: netcode, rust, then arch; U4c: netcode, rust), then a
+    test-engineer with the bites (u4d-*.md, u4c-*.md notes). U4c builds and unit-tests only; its L-c8 judged re-run
+    waits for U4j. U4a, U4b (after F2) and U4j follow as slots free (at most 3 agents; the workflow's cap is 2). If cut:
+    snapshot each builder's worktree, then Workflow({scriptPath:
+    /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u4-wave1-cd-wf_f54246ff-e0d.js,
+    resumeFromRunId: "wf_f54246ff-e0d", args: {sha: "097f89704d9925dee0dc62f7d7373cb13fbbc9a0"}}).
   - **About 17:45 UTC: the advisor ACCEPTED U4s WITH CONDITIONS** (advisor-u4.md, "Ruling: U4s"): wave 1 may start once
     conditions 1 (the approved plan edits (a)-(d): carries 30-33 and 5; NF-D4's new D-4; §7.2 = Lanes on the builder;
     the wave-1 seam freeze) and 2 (u4s-carries.md completed; O1 for U4r's brief) are in the text; 3 the freeze; 4 the
