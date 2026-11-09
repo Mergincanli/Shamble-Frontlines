@@ -401,6 +401,26 @@
   (its "Initial RTO" line).
 
 ## Decisions taken
+- **Mustafa, 2026-11-09 about 01:10 UTC (verbatim):** "yes, by the approved method. And from U3d on, point all copies
+  at one shared Cargo target folder (CARGO_TARGET_DIR), so each unit doesn't leave a 4–6 GB cache behind."
+  - **How it is applied (the main session):** every agent copy (worktree or scratch) from U3d on builds with
+    `CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/shared-target`, one folder for all copies, created by cargo
+    on first use (so it carries cargo's CACHEDIR.TAG and `cargo clean --target-dir` can empty it later). The main
+    folder keeps its own cache (.gate/netcode-proof-test/target, from the spike's .cargo/config.toml), so the merge
+    checks never read a copy's artifacts. The G-METHOD safeguards stay, because cargo's hash ignores a copy's location
+    and another copy's newer artifact can read as fresh: before each build a copy touches its own crate sources (mtime
+    only) and checks each run's test count (`--list` where it matters); cargo's own lock serializes two copies'
+    builds in the folder. Every workflow brief from U3d on names this folder and these two steps.
+  - **The cleanup (2026-11-09 about 01:15 UTC):** 16 dirty copies' leftovers committed to local branches
+    `leftover/<copy>` (never pushed), then all 17 copies removed with a plain `git worktree remove` (the 15 under
+    .claude/worktrees, .gate/flaky-wt, .gate/npt-readings); `cargo clean --target-dir` emptied
+    u3v3-harness-check-target (6.8 GiB), u3v3-model-target (5.0 GiB), netcode-proof-test/u3vf-target (203 MiB),
+    c2b-review-scratch-target (66 MiB), c2b-review-mini-target, and the target folders inside the old probe projects
+    netcode-proof-test/u0-wt and u3-wt-probe (303 + 412 MiB). Free disk 5.2 GB -> 17 GB. **Not removable by the approved
+    method** (cargo 1.99.1 refuses a folder without its CACHEDIR.TAG, "to prevent accidental deletion of unrelated
+    files"): .gate/u3c-review-target (4.0 GB; its tag is missing) and the plain scratch copies c1b-, c1c-, c2c-,
+    c2d-review-scratch, u3c-fixrev-c1, u3c-review-f1 (+ .tar), u3bfix-base (+ .tar), u3bv-copy, u3bfix-copy (about 27 MB),
+    and the probe projects' small sources: asked Mustafa whether to leave them or allow a plain delete of those paths.
 - **Mustafa, 2026-11-08 about 09:58 UTC (verbatim):** "Yes to committing each dirty agent copy's leftovers to its own
   local branch and then removing the copy normally, for the two U3b copies now too. And if the reviewers confirm the
   lock-while-encrypting lead, fix it in U3c's fix pass if it's small: it may remove the timing tail we accepted."

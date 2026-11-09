@@ -79,3 +79,16 @@ No earlier notes file existed (checked: no u3d-plan*.md in the folder at start).
   on for the exact E forms and -3's cross-check; 4 fast tests in check.mjs (task-poller stamp, fate-log identity,
   verdict line, nearest-rank) each with a bite; no live stall test (pieces proven: stats.rs:537/:593/:613/:656,
   socket_tests.rs:184-237).
+- N22 Verifier lines fixed by grep: m3 runs :126-151 (7 runs; E and -3's P1 p999 agree in all 14 run-direction pairs:
+  :126-130, :131-133, :140-141, :142-143, :144-147, :148-151); G^2/(2T) derivation :134-139; inbound hand-off :152-156
+  (+19 us of E at :155) and :158-159 (+10 us); design problems 3 :189, 4 :190-192, 6 :195 (scouts' :200-201 for 6 is
+  off by 5). Container facts re-read 2026-11-09: clocksource tsc, cpuidle driver none, governor menu, /boot empty,
+  /proc/config.gz present (CONFIG_HZ=250 per scout A's zcat; not re-run). No local proc(5) man page.
+- N23 npt-judge's nearest rank: eval.rs:260-261 (pub fn nearest_rank, ceil(q x n)), fixture :1595-1597 (36,000 -> 35,640
+  for p99). npt-net cannot depend on npt-judge for a test without a dependency change: duplicate the one line + same fixture.
+- N24 Checkpoint lines: Q2 (b) "never a spin" is :474-475; Q9 :481 (both hold).
+- N25 Draft written: u3d-plan.md rev 1 (sections 0-11; RQ1-RQ10; T1-T4; carries C-U6-1..4, C-U8-1..3; questions
+  U3D-BAR, U3D-L0, U3D-POLL, U3D-JUDGE, U3D-MISS, U3D-XCHECK). Citations re-checked by grep and fixed: advisor-u3c-plan
+  :114 (not :113-114), :155-157 (clock = VM wake), marks/README.md:103-104 (nearest rank), u3-build-plan.md:9 (M1-M19
+  win), stats.rs:537, SERIES.md:391-396 and :405-406.
+DONE 2026-11-09
