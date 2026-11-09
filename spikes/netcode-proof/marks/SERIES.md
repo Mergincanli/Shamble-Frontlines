@@ -393,8 +393,9 @@ rule by a unit test). Up is inbound (client to server: the socket sits on RS), d
 levels `l2_peers_count`, `l2_pool_free_count`, `l2_up_queued_bytes` and `l2_down_queued_bytes` as at the run's end);
 then `l2_release_cpu_ns` (the release thread's CPU over the run, in place of the per-second permille) and the measured
 reorder shares under the existing names `reorder_up_permille`, `reorder_down_permille` and `reorder_permille`. A unit
-test checks every field it writes against this file. `base_rtt_ns` and `reorder_step_permille` (rows above) are
-written by `ImpairSocket` too.
+test checks every field it writes against this file. The event's lateness fields cover the socket's whole life; R1's
+bar reads the probe's own computation (U6). `base_rtt_ns` and `reorder_step_permille` (rows above) are written by
+`ImpairSocket` too.
 
 **Done at U3c (M15):** the TCP model's rows (the model's name and version, and S12's stall and repair counts) are in
 the DelayStream section below, which DelayStream writes.
@@ -424,7 +425,7 @@ directions, and each round trip as the echo's release minus the original send); 
 | `second.v.l2_late_up_p99_ns` | ns | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound, client to server, lateness L = release − due at `poll_recv`'s return, where quinn receives it (M1): its 99th percentile |
 | `second.v.l2_late_up_p999_ns` | ns | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound, client to server, lateness L = release − due at `poll_recv`'s return, where quinn receives it (M1): its 99.9th percentile |
 | `second.v.l2_late_up_max_ns` | ns | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound, client to server, lateness L = release − due at `poll_recv`'s return, where quinn receives it (M1): its maximum |
-| `second.v.l2_late_up_excess_ns` | ns | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound, client to server, lateness L = release − due at `poll_recv`'s return, where quinn receives it (M1): U3-Q1's statistic E[(L − L0 − 0.25 ms)+] over the second, L0 its median (Mustafa's bar: about 10 µs or less at P1, judged on RS at R1) |
+| `second.v.l2_late_up_excess_ns` | ns | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound, client to server, lateness L = release − due at `poll_recv`'s return, where quinn receives it (M1): U3-Q1's statistic E[(L − L0 − 0.25 ms)+], per second, reported (L0 = that second's median); the judged bar is E with L0 = 0, ≤ 10,000 ns per direction (U3D-BAR, U3D-L0), over the probe's P1 measured records at R1 (plan §12.1 U8), never per second |
 | `second.v.l2_late_up_over_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound, client to server, lateness L = release − due at `poll_recv`'s return, where quinn receives it (M1): samples with L − L0 above 0.25 ms |
 | `second.v.l2_down_delivered_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client: datagrams released this second: sent on the real socket (down) or handed to quinn by `poll_recv` (up) |
 | `second.v.l2_down_lost_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client: datagrams the profile's loss draw dropped |
@@ -449,7 +450,7 @@ directions, and each round trip as the echo's release minus the original send); 
 | `second.v.l2_late_down_p99_ns` | ns | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client, lateness L = release − due at `try_send`'s return on the real socket (M1): its 99th percentile |
 | `second.v.l2_late_down_p999_ns` | ns | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client, lateness L = release − due at `try_send`'s return on the real socket (M1): its 99.9th percentile |
 | `second.v.l2_late_down_max_ns` | ns | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client, lateness L = release − due at `try_send`'s return on the real socket (M1): its maximum |
-| `second.v.l2_late_down_excess_ns` | ns | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client, lateness L = release − due at `try_send`'s return on the real socket (M1): U3-Q1's statistic E[(L − L0 − 0.25 ms)+] over the second, L0 its median (Mustafa's bar: about 10 µs or less at P1, judged on RS at R1) |
+| `second.v.l2_late_down_excess_ns` | ns | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client, lateness L = release − due at `try_send`'s return on the real socket (M1): U3-Q1's statistic E[(L − L0 − 0.25 ms)+], per second, reported (L0 = that second's median); the judged bar is E with L0 = 0, ≤ 10,000 ns per direction (U3D-BAR, U3D-L0), over the probe's P1 measured records at R1 (plan §12.1 U8), never per second |
 | `second.v.l2_late_down_over_count` | count | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound, server to client, lateness L = release − due at `try_send`'s return on the real socket (M1): samples with L − L0 above 0.25 ms |
 | `second.v.l2_up_queued_bytes` | bytes | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | inbound: buffer bytes queued at the second's end, 1,500 B per datagram whatever its payload (each holds one pool buffer: M10's charge), the datagrams in their delay, held by the reorder step, or due and waiting for quinn's `poll_recv` |
 | `second.v.l2_down_queued_bytes` | bytes | npt-net (ImpairSocket; the owning process's writer: npt-server on RS) | outbound: buffer bytes queued at the second's end, 1,500 B per datagram whatever its payload (M10's charge), the datagrams in their shaper wait and delay, held by the reorder step, or in the release thread's batch being sent |
