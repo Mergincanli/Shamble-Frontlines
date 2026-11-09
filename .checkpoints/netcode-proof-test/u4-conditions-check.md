@@ -25,3 +25,22 @@ u4-plan-md-edits.md: old text verbatim in plan.md, new text matches ruling, none
   - Residual stale text not required by a condition: Q16 text :970 "clamp twin built from the forged run's clamp
     events"; Q10 text :946-951 (record of the question); §4.12 :396-399 contract test "resolves" (U4r :713-716 adds
     "passing"); §2 C3 row :145 "U6 if Q6 (b)".
+- Step 5a: plan.md sha256 daf25395... matches the edits file's pin; all 13 Old blocks + 2 checkpoint anchors occur
+  exactly once at the stated lines (430, 391, 574, 476, 485, 603, 505, 503, 562, 1226, 567, 576, 423; ckpt 305, 311);
+  no overlaps. Checkpoint file sha256 9bc00568... (no pin in the edits file).
+- Step 4 done (every changed line): word-diff of all 43 hunks read; every removed span is replaced by its condition's
+  text (e.g. :87 "about 300" -> "at least 300"; -30 bullet's judged form -> recorded test). No unmapped change.
+  H1 (top provenance line) is bookkeeping under cond 12's pin. Author choices accepted: debug assert moved to the
+  room's rewind_at (needed by D-10, and by approved D-9 :602-603 already); "a full pool" counted outside the hash
+  (:237; literal "every refusal counter"; pool contents stay hashed, so no determinism loss); fourth recording;
+  replay kept at U4 with its test; wave-2 manifest lines in U4s (serve 10 (b); dev deps don't count, plan.md §4.2).
+- Step 5 done (edits file): all 13 + 2 Old texts verbatim, once, at stated lines; new texts match rulings: E1 cond
+  7(c) (+ADR 0002:264-265 verified), E2 backed by approved plan old :601, E3 Q7 (§10.2 is plan.md:1037), E4-E6 Q19
+  (no other _ms left: plan.md:476,477,485,603 only), E7 Q13+Q6, E8 Q25, E9 Q6 (:562), E10 cond 8 (ADR 0002:502
+  verified), E11-E12 risk 11 SimCore/HitHistory (:567,:576 only), E13 proto->sim (ADR 0002:188 verified), ckpt C3
+  :305, ckpt C-U7-1 after :311-312. Nothing on the verdict's list is missing.
+- Out of scope, for the advisor (O1): at U4r the tolerance and cap do not exist yet (U4e :678-679 "tolerance and cap
+  rules land in U4h"; U4h :787), so the -30 pre-check's setup condition (0 replacements, 0 clips) and the RTT
+  argument hold by construction at U4r: the guard cannot fire. Fix: re-run the pre-check pair after U4h merges, or
+  state it. Needs the advisor (cond 12).
+- VERDICT: complete. Only cosmetic/optional items. Final answer returned.

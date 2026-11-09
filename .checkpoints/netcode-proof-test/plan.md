@@ -389,6 +389,8 @@ spikes/netcode-proof/
                     unsafe exception (§4.2)
   crates/client/    npt-client: the client endpoint library: no bindings, transport or clock; native and wasm32
   crates/client-wasm/  npt-client-wasm: the wasm-bindgen exports only
+  crates/hash-wasm/    npt-hash-wasm (U4): a check-only cdylib over npt-sim with integer-only exports, which Node runs
+                    for the native-against-Wasm check (§4.5); the workspace's third unsafe exception (§4.2)
   crates/bots/      npt-bots (headless, cheating and hostile clients) and npt-load (the load orchestrator on LG)
   crates/super/     npt-super: the supervisor stand-in (process control, exit log, SIGKILL)
   crates/host/      npt-host: the page host and the ACME client
@@ -421,6 +423,9 @@ fall under `.claude/rules/netcode.md`.
   wtransport, web-transport-quinn or tungstenite. Each passes
   `cargo check --locked --target wasm32-unknown-unknown`. Clock reads are banned in them by clippy (§4.5).
 - **The client:** npt-client never depends on npt-net; the bots get transports by composing npt-client with npt-net.
+- **The protocol and the sim:** npt-proto may depend on npt-sim, for the wire grid (one function for the sim's
+  own-copy snap and both codec ends) and the seam's plain-data types (ADR 0002:188: the `protocol` crate uses "`sim`
+  and `content` types only"; the advisor's Q23 ruling, 2026-11-09, advisor-u4.md).
 - **npt-super** depends on no npt-sim, npt-room or npt-proto. **npt-host** depends on none of the sim, room, proto or
   client crates.
 - **npt-judge** depends only on npt-log, plus serde ("serde" here and in §4.1 means serde and serde_json). Nothing
@@ -428,14 +433,19 @@ fall under `.claude/rules/netcode.md`.
 - **npt-tcpinfo** depends on libc only (pinned =0.2.191, already in the lock through tokio, mio and quinn-udp), and
   only npt-net uses it (U3c; the advisor's C12).
 - **Unsafe code** is forbidden in the workspace (`unsafe_code = "forbid"`, the compiler backstop of the advisor's
-  ruling of 2026-11-08: no `#[allow]` can relax it in a crate that inherits the workspace's lints), with two named
+  ruling of 2026-11-08: no `#[allow]` can relax it in a crate that inherits the workspace's lints), with three named
   exceptions under ADR 0002:264-265's rule ("an exception needs a written invariant, a test and an `#[allow]` with its
   reason"), each carrying its own `[lints]` table equal to the workspace's but for unsafe_code:
   - npt-client-wasm (`allow`), for wasm-bindgen's generated code;
   - npt-tcpinfo (`deny`): its two functions (getsockopt TCP_INFO and ioctl SIOCOUTQ), each `#[allow]` on the function
-    only, holding four unsafe blocks of one foreign call each, each with its SAFETY comment.
-  The spike's test command checks both, and greps that `allow(unsafe_code` appears nowhere else. npt-net stays free of
-  unsafe code and libc (the advisor's M14).
+    only, holding four unsafe blocks of one foreign call each, each with its SAFETY comment;
+  - npt-hash-wasm (`deny`; U4, the advisor's Q3 ruling and condition 7, 2026-11-09, advisor-u4.md): the check-only
+    cdylib over npt-sim that Node runs for the native-against-Wasm check (§4.5); each listed export carries one
+    `#[allow]` for its `#[unsafe(no_mangle)]` attribute, and no `unsafe` block exists; its written invariant: no
+    exported name collides with another symbol, and every export has integer signatures only; its test: the Node
+    loader lists the module's exports and refuses any not on the list.
+  The spike's test command checks all three, and greps that `allow(unsafe_code` appears nowhere else. npt-net stays
+  free of unsafe code and libc (the advisor's M14).
 - **How they are read** (the advisor's C10): with every feature and every target; dev dependencies do not count (they
   never ship), except for "nothing depends on npt-lab", which counts every kind.
 - **No reference into `spikes/`** from outside it: a grep in the test command, until the foundation's G5 and G8 exist.
@@ -473,16 +483,17 @@ fall under `.claude/rules/netcode.md`.
 **E7, the Worker host's shape** (engine EA-4; ADR 0002:313-373). Built now for the boundary spike to measure; none of
 PM-0002-* is judged here.
 - **npt-client** (no bindings, no transport, no clock):
-  - `ClientEndpoint::input(page_input, received: &[(Channel, bytes, arrival_ms)], prev_send_ms, now_ms)`;
-  - `ClientEndpoint::step() -> StepOut { datagrams, reliable: [(Channel, bytes)], block, next_due_ms }`. Still one
-    input call and one step call per tick. A message on the wrong channel is dropped and counted as forged (-21);
+  - `ClientEndpoint::input(page_input, received: &[(Channel, bytes, arrival_ns)], prev_send_ns, now_ns)`;
+  - `ClientEndpoint::step() -> StepOut { datagrams, reliable: [(Channel, bytes)], block, next_due_ns }`, every time in
+    integer ns (the advisor's Q19 ruling, 2026-11-09, advisor-u4.md). Still one input call and one step call per tick.
+    A message on the wrong channel is dropped and counted as forged (-21);
   - `AimCast`: the aim cast against the state published for the page's view time;
   - `BlockWriter`, with one layout table.
 - **npt-client-wasm:** the wasm-bindgen exports only: create, mode, input, step.
 - **web:**
   - `net.ts`: the Worker's WebTransport first, with a 1.5 s timeout, then WebSocket. It uses `requireUnreliable`,
     reads `maxDatagramSize` every 10 s, and stamps `performance.now()` in each datagram's own event;
-  - `host.ts`: the timer set from `next_due_ms`, at most 7 ticks per wake (from the tick constant, §4.6), a fresh
+  - `host.ts`: the timer set from `next_due_ns`, at most 7 ticks per wake (from the tick constant, §4.6), a fresh
     `memory.buffer` view after each call, and a Worker restart plus rejoin after a trap;
   - `block.ts`: the page's typed-array views, keeping the two newest blocks;
   - `main.ts`: the page posts the newest input, the cursor ray and the view time once per drawn frame;
@@ -500,10 +511,13 @@ PM-0002-* is judged here.
 
 | In npt-room (counted in ticks; no clock) | In npt-server (wall time, from an injected `now`) |
 |---|---|
-| strictly newer tick; the lead bound; commands per client per tick within the redundancy cap (`CMD_CATCHUP`, §4.6); the clamp beyond reach; sequence forward and wrap; move length at most 1; one press edge per tick; aim inside the map bounds; cooldown, ammo and reload (in the sim); the acknowledgement names a sent snapshot; one Resync in flight; the ClientSettings clamp; the view-time tolerance; input buffer depth and the late-command counter; the event queue's cap, with resync or drop; the per-client 256 kbps cap per tick window; interest hysteresis; the rewind cap in ticks; the roster and the slot's token (§10.3) | the Join deadline (2 s from TCP accept or the first QUIC packet, never from the end of a delay); the handshake cap; the bounded per-address table (/32 and /64); slow-loris deadlines; size limits at the socket (datagram, stream frame, WebSocket message, applied before any delay buffering); trailing bytes and unknown fields; the wrong channel; per-connection and new-session rate limits; ping rate and the hold-time cap; stream count and windows; the Join's version and content hash; the Origin check; the capability check of per-session controls; the S17 loop; the control sockets; the panic catch |
+| strictly newer tick; the lead bound; commands per client per tick within the redundancy cap (`CMD_CATCHUP`, §4.6); the clamp beyond reach (in the sim); sequence forward and wrap; move length at most 1; one press edge per tick; aim inside the map bounds; cooldown, ammo and reload (in the sim); the acknowledgement names a sent snapshot; one Resync in flight; the ClientSettings clamp; the view-time tolerance; input buffer depth and the late-command counter; the event queue's cap, with resync or drop; the per-client 256 kbps cap per tick window; interest hysteresis; the rewind cap in ticks; the roster and the slot's token (§10.3) | the Join deadline (2 s from TCP accept or the first QUIC packet, never from the end of a delay); the handshake cap; the bounded per-address table (/32 and /64); slow-loris deadlines; size limits at the socket (datagram, stream frame, WebSocket message, applied before any delay buffering); trailing bytes and unknown fields; the wrong channel; per-connection and new-session rate limits; ping rate and the hold-time cap; stream count and windows; the Join's version and content hash; the Origin check; the capability check of per-session controls; the S17 loop; the control sockets; the panic catch |
 
 - **What npt-room gets from npt-server each tick:** the decoded messages with their arrival stamps, and per client the
-  RTT, loss, send-buffer space, maximum datagram size and unsent count.
+  RTT, the bytes the server side sent since the last tick (pings and pongs, each counted as payload + 28 B, so the
+  room's 256 kbps window counts them: the advisor's Q13 ruling), maximum datagram size and unsent count; loss and
+  send-buffer space join at U6 with rate adaptation, their first consumer (the advisor's Q6 ruling, amending its C3;
+  both 2026-11-09, advisor-u4.md).
 - **WebSocket's send budget (fix 1; E15):** WsServer in npt-net applies it in its send path through U3c's shared
   functions, never in npt-room. npt-room sees `SendResult::BufferFull` and the skipped count. DelayStream's free budget
   is the send-buffer space it reports.
@@ -559,22 +573,28 @@ PM-0002-* is judged here.
     - `send_reliable(channel, bytes, now)`;
     - `poll_recv(now) -> Option<Recv { channel: Datagram | Control | FullState, bytes, arrival_ns }>`;
     - `state -> LinkState { Connecting, Open, Closed }`, `rtt_ns`, `max_datagram_size`, and `unsent_unreliable`.
-      WebSocket's newest-only replace sits inside its backend; `loss` joins at U4 with npt-room, its first user (the
-      advisor's C3, 2026-11-06);
+      WebSocket's newest-only replace sits inside its backend; `loss` joins at U6 with rate adaptation, its first
+      consumer, and §4.4's send-buffer space with it (the advisor's C3, 2026-11-06, as amended by its Q6 ruling of
+      2026-11-09, advisor-u4.md);
   - `Listener`, which also yields each peer's address;
   - `Channel` and `Loopback` (as built in U2; the advisor approved the names, U2-R4).
 - **npt-l1:** `L1Net`, `Profile`, `FateLog`, `ReorderStep`.
-- **npt-sim:** `World` (implements the seam), `Scene::stress`, `Greybox`, `Areas`, `Portals`, `SimRng`,
-  `trajectory_at`, `StandIns`.
+- **npt-sim:** `SimCore` (the seam trait, with its plain-data input and output types; moved from npt-room: the
+  advisor's Q1 ruling, 2026-11-09, advisor-u4.md), `World` (implements the seam), `HitHistory` (the ring of past hit
+  volumes, owned by the room and lent to `step`; moved from npt-room: the advisor's Q2 ruling), `Scene::stress`,
+  `Greybox`, `Areas`, `Portals`, `SimRng`, `trajectory_at`, `StandIns`.
 - **npt-proto:**
   - the messages: `Input`, `Snapshot`, `FullState`, `Resync`, `Ping`, `Pong`, `Join`, `JoinAccepted`, `JoinRejected`,
     `ClientSettings`, `RoomEnded`, `Leave`, `Kick`, and `SessionStatus` (room → client, owner, to the capability
     holder: the overlay's room-side values and the form's last saved step; the advisor's A1 ruling, 2026-11-06, with
     its own fuzz target);
   - the session controls (§10.2): `SessionControl`, with `SetProfile`, `TriggerBurst`, `BlockUdp` and `RecordStep`;
+  - the room-wide controls (§10.2): `RoomControl` and its decoder, unfeatured (npt-client never calls them), built at
+    U4 for the catalogue's item 6 and U5's fuzz target (the advisor's Q7 ruling, 2026-11-09, advisor-u4.md);
   - the rest: `encode`, `decode`, `Quant`, `Limits`.
-- **npt-room:** `SimCore` (the seam trait), `Room`, `Roster`, `ClientSlot`, `InputBuffer` (option A or B),
-  `EventQueue`, `AckRing`, `Encoder`, `InterestGrid`, `AreaFlood`, `Priority`, `HitHistory`, `rewind_at`.
+- **npt-room:** `Room` (generic over npt-sim's `SimCore`; it owns the `HitHistory` instance), `Roster`,
+  `ClientSlot`, `InputBuffer` (option A or B), `EventQueue`, `AckRing`, `Encoder`, `InterestGrid`, `AreaFlood`,
+  `Priority`, `rewind_at` (the advisor's Q1 and Q2 rulings, 2026-11-09, advisor-u4.md).
 - **npt-server** (library): `due_ticks`, `Schedule`, `TickLoop`, `PhaseTimers`, `Counters`, `ControlSocket`,
   `ConnLimits`, `AddrTable`, `Decoder`; plus its thin binary.
 - **npt-net:** `WtServer`, `WtClient`, `WsServer`, `WsClient` (features `wt-wtransport` and `wt-wtq`),
@@ -600,7 +620,7 @@ PM-0002-* is judged here.
     2. the server's I/O step: decoding, socket checks, ping answers;
     3. the server tick if due: tick k is due at base + ⌊k × 10⁹ / TICK_HZ⌋ ns;
     4. the client frames that are due (60 Hz, seeded phase);
-    5. each client whose `next_due_ms` has come, in slot order.
+    5. each client whose `next_due_ns` has come, in slot order.
   - **Each client's own host clock:** offset + rate × SimClock, both seeded; rate 1.5 for -21's cheat.
   - **L1's RTT** is an RFC 9002-style smoothed estimate, not the simulator's true value.
   - **Packet fates** are drawn per (seed, link, direction, packet index), so both command-timing options see the same
@@ -1223,7 +1243,7 @@ Besides these: his go for R-PR and W-PR, and his OK of each run's cap.
 | U4 | M | npt-sim, npt-proto, npt-room and npt-client; npt-lab's scenario runner; `due_ticks` with PM-0004-67's bites on a fake clock; the Node-hosted native-against-Wasm hash test (§4.5); then the L1 row groups with their bites: codec (-17, -57, -58); commands and hostile input (-20, -21, -22); prediction (-41, -42, -60); interpolation, clock and events (-45, -47, -61, -62); lag compensation (-48 to -51); bursts (-18); stand-ins (-54, -55); -30 on loopback |
 | U5 | S | Fuzzing (-34); the dependency and swap checks (-35); the audits (§4.8) |
 | U6 | M | npt-server, npt-net, npt-super and npt-host: both WebTransport crates and WebSocket with L2 on loopback; the per-slot control sockets with their peer check, the systemd units and the capabilities; the roster and tokens; interest under load; instrumentation; metrics and logs; instant-acme's profile and revocation calls; the `npt-ctl` and `npt-cert` wrappers. **WsServer's send path with fix 1** (U3c's carries, the advisor's C14):<br>• the gate: `snapshot_budget` and `may_write`, shared, not copied; its inputs come from DelayStream on L2 and from npt-tcpinfo on the plain path; owed = everything above the kernel socket (tungstenite's buffer plus rustls's unsent TLS); the plain path's free value stated with its reason;<br>• U3c's writer properties, test (c) and the queueing-writer bite re-run on WsServer;<br>• a plain-path check: a client with a small receive buffer stops reading; after any write SIOCOUTQ ≤ N × size, and writes stop;<br>• the run-time bite ws-budget-x2 in a npt-net `bites` feature (R11);<br>• how WsServer sees one tick's whole snapshot through Link's per-message send (W18);<br>• SetProfile on a DelayStream connection;<br>• where the per-tick syscalls run;<br>• the header records whether the wrapper is on.<br>**More carries from U3c's review rounds (2026-11-08):**<br>• WsServer reads `gate_inputs()` once per tick: one lock, one model step (F11);<br>• npt-server range-checks a client-triggered B1 burst's start and length before `DelayStream::add_burst` (S7, F1);<br>• `header_numbers` blocks on the clock thread, so call it through spawn_blocking or once at start-up (F6);<br>• size the accept cap at about 0.31 MB per DelayStream connection, plus a fixed amount per process (F7; the advisor's split ruling (b));<br>• record whether -25's never-joining sessions get a DelayStream at all (at P0 the wrapper is refused);<br>• build tungstenite's limits and DelayStream's from one `&L2Config` (S5 a);<br>• the Join deadline covers the TLS accept too (S5 b);<br>• the plain path's free value is stated with its reason (S5 d);<br>• WsServer uses tokio-tungstenite with futures-util as a normal dependency, listed in §4.8 and audited at U5;<br>• the lateness split's histograms are pooled per process and never reset (delay.rs's POOL; C1b's review, INFO 5): one measured run per server process, or the pool reset at each run's start, stated in the run's header;<br>• DelayStream's shutdown now returns S's own error when the pump ended on one (C1c): a browser that drops TCP without TLS close_notify gives rustls's UnexpectedEof there, so WsServer treats a shutdown error after the peer's close as a normal end, not a run failure (C1c's review, INFO);<br>• **the reader stamp (the advisor's UP-STAMP ruling, 2026-11-08):** stamp R at the reader's wake (DelayStream's closing `wake_all`, delay.rs:1884, not at the release, which is already P or T), so up's woken work splits into pass = R − P and reader = (3) − R (in the other class the pass is from T); a reader that returns before R gets its own counted class with no reader part, so the sum stays exact; an identity test and a misattribution bite, as b5c9009 did; U6's loopback self-test of WsServer (its own reader task, split halves) reports the four parts before the run package is built; the bar stays on L as defined.<br>**U3d's carries (u3d-plan.md §3.6, the advisor's APPROVE WITH CONDITIONS of 2026-11-09):**<br>• **C-U6-1 the poller:** the -3 probe's inbound poller is a task spawned on npt-server's multi-thread runtime (never `block_on`), calling `poll_recv` with quinn's 32 buffers of 1,472 B until Pending, so -3's L2 up series and the leg's E include the hop quinn pays; U3d's blocked-worker test (T1) re-run on the probe's own poller; the pacer stays a dedicated thread;<br>• **C-U6-2 one socket per leg:** one ImpairSocket per profile leg, so each `l2_summary` is one leg's; no reset method (plan §4.7 lists none) and `set_default` never carries a socket across legs; a test shows two legs' summaries never mix;<br>• **C-U6-3 the fate log:** U6 chooses the drain cadence (per second with capacity for one to two seconds, its pages touched in the warm-up; or one log per leg pre-faulted before the measured phase); the drain's closure only copies into a buffer the probe owns, no I/O under the socket's lock; the lock hold per drain measured and reported;<br>• **C-U6-4:** the probe process writes `second.v.steal_permille` as npt-server does;<br>• **C-U6-5 the judged E's producer:** at the P1 leg's end the probe computes per direction, from its fate log and over exactly -3's measured records: n, E with L0 = 0 (judged), E with L0 = the window's nearest-rank p50, the over count, p50, p99, p99.9 and max, on the histogram's sample set (finished fates but Oversize; -3's delays use Delivered only), in the leg's summary event under names U6 adds to SERIES.md; tested on fixed fate entries (a late datagram in the warm-up stays out of E; inside the window it enters E with exactly its excess over n in both forms; T5's samples give 10,000 and 10,100 ns) and live (U3d's T2 identity re-run);<br>• **C-U6-6 rate and composition:** U6 states the up stream's composition (LG's fresh sends against its echoes) so the probe's socket sees 10,000 per second each way; another rate makes the leg's self-test INVALID and is recorded, but never by design: if -3's sends plus echoes cannot give 10,000 per direction through the probe's socket (ADR 0001:1590), U6's plan brings it to the advisor before R1's run plan is built;<br>• **C-U6-7 observer calls:** inside the measured window the probe calls only `try_send`, `poll_recv`, `take_second` once per second and the drain; `header_numbers`, `header_texts` and `run_summary` run at the leg's edges |
-| U7 | M | npt-client-wasm and the harness (E7); the browser smoke in local Chromium; the hash check in Chromium |
+| U7 | M | npt-client-wasm and the harness (E7); the browser smoke in local Chromium; the hash check in Chromium. **C-U7-1** (the advisor's condition 8, 2026-11-09, advisor-u4.md): U4's native-against-Wasm check (U4d2) does not cover wasm-opt, while ADR 0002:500-505 checks "the exact file G6 ships" (after wasm-bindgen and wasm-opt); U7 reruns U4d2's check on npt-hash-wasm passed through the same wasm-opt step and flags as the shipped npt-client-wasm, or states why not |
 | U8 | S | The run package: cloud-init files (32 KiB check), firewall lists, R1's run plan (with S14's veth + netem check, which also reads npt-tcpinfo's srtt against netem's 100 ms round trip: U3c's C12 (f), since this container has no tc; and DelayStream's self-test on RS, the advisor's condition-10 ruling of 2026-11-08: 48 connections at P2 with the room running, at least 10,000 samples per direction, judged per direction E[(L − L0 − 0.25 ms)+] < about 10 µs and p99 ≤ 1 ms, with p50, p99.9 and max reported; the split built in U3c (b5c9009) plus U6's reader stamp; steal recorded (/proc/stat read before and after each DelayStream and ImpairSocket self-test run); a max over 10 ms comes to the advisor with the result; a miss goes to the advisor before -18's and -31's WebSocket parts count, and R1 then follows the advisor's fallback order of 2026-11-08: the split with the reader stamp to the advisor first; a miss in up's pass part: first measure waking the reader right after the step that releases its record, and yielding; (b), the pumps off tokio, only for a miss in the hop); **ImpairSocket's R1 self-test (u3d-plan.md §5.2; the advisor's APPROVE WITH CONDITIONS of 2026-11-09):** on the -3 L2 probe's P1 leg in R1's L2 probe block (npt-server's probe mode, one ImpairSocket per leg, 10,000 per second each way, 0 added hours), judged per direction by the advisor (U3D-JUDGE (J3)) as **E with L0 = 0, ≤ 10,000 ns per direction (U3D-BAR, U3D-L0), over the probe's P1 measured records** (at least 1,000,000 sent per direction; U3D-WINDOW (W1)); run conditions that make it INVALID, never a pass: -3's own count, the rate within 1 %, slack: under SCHED_OTHER 1 at both reads (start and header); under SCHED_FIFO or SCHED_RR 0 or 1 at both reads (0 only on a kernel with ed4fb6d7ef68); under any other policy, SCHED_DEADLINE included, 1 at both reads (U3d's built rule, socket_tests.rs:1480-1486), no queue, pool, oversize or shaper drop and no send error, the steal reads and U3-Q9's facts present; reported: p50, p99, p99.9, max, over, the median form and `l2_summary`'s E, the release thread's CPU, slack and policy, the poller kind and stream composition, steal, U3-Q9's facts, THP, loadavg, the drain's lock hold, a max over 10 ms flagged; a miss goes to the advisor before any L2 mark counts, the first remedy the recorded `chrt -f` switch run as its own leg, a spin lead to Mustafa (U3D-MISS); -3's own L2 P1 checks judged by npt-judge beside it; **C-U8-1** U3-Q9's four facts (kernel, CONFIG_HZ, cpuidle driver, clocksource) and the THP mode read by shell before any timing judgement, with U3d's dry-run commands; **C-U8-2** every `^cpu` line of /proc/stat read before and after the probe's P1 leg; **C-U8-3** DelayStream's loaded self-test has no hours in R1's row yet: U8 sizes it; **C-U8-4** the self-test's run conditions, the rate among them, and C-U8-6's: no drop on the probe's P1 socket between its two reads; **C-U8-6** (the advisor's U3D-RCVBUF ruling, 2026-11-09, advisor-u3d.md) before and after every L2 probe leg (P1-P4 and B1), in the probe's network namespace and outside the measured path, read alongside C-U8-2's leg-edge reads by the same mechanism: the probe socket's own `drops` column in /proc/net/udp or /proc/net/udp6 (matched by its local port) and /proc/net/snmp's Udp lines (/proc/net/snmp6's Udp6 lines when present); a drop on the probe's P1 socket between the two reads makes ImpairSocket's self-test INVALID with its cause named, and that leg comes to the advisor before any L2 mark counts with its printed E, its max and the counters, never set aside and re-run as noise; no SO_RCVBUF sizing without the advisor's ruling (quinn leaves the OS default; a bigger buffer would erase the only trace of a long reader stall); if U8's plan cannot place the reads at the leg edges, U6 adds them to C-U6-7's leg-edge calls and brings any new npt-log name to the advisor; **C-U8-5** U3D-L0 covers ImpairSocket's self-test only: U8's plan states DelayStream's judged form against U3D-L0 and brings it to the advisor, so one bar is never read in two forms without a ruling; the operator `settings.json` and `rules.md`, the pre-push hook, the sudo wrapper list, the WebdriverIO specs, the netcode checklist (test-engineer), W-PR's workflow file |
 
 ### 12.2 Stops (where the work waits for a person)

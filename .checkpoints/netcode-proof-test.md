@@ -302,14 +302,19 @@
   - **C2 (U4, before npt-room reads `rtt_ns`):** a sample only from a packet that is the newest of its link and
     direction to arrive (RFC 9002 §5.1); a stream message's sample from its own packet's arrival, not its in-order
     delivery; tests for both.
-  - **C3 (U4):** `loss` on Link, with §4.4's send-buffer space settled at the same time; each backend reports its own
-    estimate, never the simulator's true fate; plan §4.7 then.
+  - **C3 (U6; moved from U4 by the advisor's Q6 ruling, 2026-11-09, advisor-u4.md):** `loss` on Link, with §4.4's
+    send-buffer space settled at the same time, joining with its first consumer, rate adaptation; each backend reports
+    its own estimate, never the simulator's true fate; plan §4.7 then.
   - **C4 (U4, with the next judge change):** INVALID, with fixtures: a measured run (or its twin) whose build lists
     `bites` or names a bite; a bite run whose build lacks `bites`.
   - **C5 (U3/U6):** ImpairSocket's reorder step uses L1's model; SERIES.md names the binary that writes L2's probe
     log, not only the npt-net library.
   - **Note (U6):** links are `Box<dyn Link>` without `Send`; if npt-server moves links across tasks, the L2 backends
     need `+ Send`.
+- **From the advisor's U4 verdict (advisor-u4.md, 2026-11-09), carried past U4:**
+  - **C-U7-1 (U7):** U4d2's native-against-Wasm check does not cover wasm-opt, while ADR 0002:500-505 checks "the
+    exact file G6 ships"; U7 reruns U4d2's check on npt-hash-wasm passed through the same wasm-opt step and flags as
+    the shipped npt-client-wasm, or states why not (condition 8; also in plan.md's U7 row).
 - Review round 1's 49 findings: fixed in revision 2 (§0.1). Review round 2's 46 findings: fixed in revision 3 (§0.2). The advisor's C1-C12: folded into revision 3.1 (§0.3).
 - **Carried forward from the advisor's U1 rulings** (advisor-u1.md): C4 (`params.killed` only with npt-super's kill
   record) and C6 (tokens only in their prefixed form, with a test) at U6; A3's systemd readiness check for real at
