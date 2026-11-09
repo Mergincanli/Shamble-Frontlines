@@ -121,3 +121,4 @@ cpu2 80574 0 10157 949492 8505 0 1713 3426 0 0
 cpu3 78364 0 9902 951683 8269 0 1768 3527 0 0
 
 running 1 test
+test l2::socket::tests::l2_timing_self_test has been running for over 60 seconds
