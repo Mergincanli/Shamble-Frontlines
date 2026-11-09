@@ -1,0 +1,26 @@
+# U3d dry run (u3d-plan.md §3.4, §5.1): evidence run. Reported, not judged here; RS judges at R1 (U8).
+commit f50bd549ddeef4541e639c8665e8d5344b706cb6
+rustc rustc 1.99.1 (58cf8f9c3 2026-10-13)
+binary /home/user/Shamble-Frontlines/spikes/netcode-proof/../../.gate/netcode-proof-test/target/release/deps/npt_net-f72f21a42e60b4c9
+binary_sha256 c236b449d13deb2d842c4eb5f2b6279f6143fbe9731b8ec47529ca211c5ff3bb
+date_utc 2026-11-09T03:56:16Z
+nproc 4
+cargo_target_dir unset
+lengths: self-test 100 s (NPT_L2_SELFTEST_SECS), M13 10 s (NPT_L2_SECS); rounds 3
+kernel 6.18.44-fc-v310
+clocksource tsc (available: tsc kvm-clock )
+cpuidle_driver none
+cpuidle_governor menu
+config_hz 250 (from /proc/config.gz)
+thp_enabled always [madvise] never
+loadavg_start 1.17 1.04 0.91 1/121 13546
+=== SELFTEST 1 (P1, 100 s) 20261109T035616Z
+ 03:56:16 up  2:54,  0 user,  load average: 1.17, 1.04, 0.91
+/proc/stat before:
+cpu  308001 0 36774 3776043 36730 0 7097 13593 0 0
+cpu0 72221 0 9358 945624 11598 0 2649 3481 0 0
+cpu1 77541 0 9240 944412 8359 0 1718 3320 0 0
+cpu2 80196 0 9178 941950 8503 0 1325 3341 0 0
+cpu3 78041 0 8997 944055 8268 0 1403 3450 0 0
+
+running 1 test
