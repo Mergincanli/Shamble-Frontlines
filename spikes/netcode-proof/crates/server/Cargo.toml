@@ -16,6 +16,11 @@ path = "src/lib.rs"
 name = "npt-server"
 path = "src/main.rs"
 
+[features]
+# The planted defects (plan §4.7, E19), bites builds only, with those of the crates it calls (PM-0004-67's three in
+# `due_ticks`, U4b: u4-build-plan.md §5).
+bites = ["npt-sim/bites", "npt-proto/bites", "npt-room/bites"]
+
 [dependencies]
 npt-link.workspace = true
 npt-proto.workspace = true
@@ -23,3 +28,8 @@ npt-room.workspace = true
 npt-sim.workspace = true
 npt-net.workspace = true
 npt-log.workspace = true
+
+[dev-dependencies]
+# U4e's Loopback tests run the library against the real client endpoint in npt-server's own tests, never in crates/lab
+# (u4-build-plan.md §5 Lanes, the advisor's condition 10 (b)). A dev dependency: it never ships (plan §4.2, C10).
+npt-client.workspace = true

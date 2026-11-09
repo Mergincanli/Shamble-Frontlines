@@ -2,11 +2,14 @@
 // The spike's test command (plan §12.4): every unit runs it, and its summary goes into the checkpoint.
 //   node spikes/netcode-proof/check.mjs [--only <step,...>]
 // Steps: fmt, clippy (host, all targets) and clippy-wasm32 (the leaf crates and npt-tcpinfo's non-Linux stub), each on
-// the measured build and on the bites build with warnings as errors; test (cargo test on the measured build, then on
+// the measured build and on the bites build with warnings as errors; doc (rustdoc on every member, no dependency, both
+// builds, warnings as errors: a broken intra-doc link fails it); test (cargo test on the measured build, then on
 // the bites build, its counts and any test that reported a skip); deps (the dependency rules of plan §4.2 that
 // `cargo metadata` shows, with every feature and target, and its unsafe_code rule, from the crates' files, the
 // manifests and the environment and cargo configs this command's cargo reads: DEPS_CHECKED says what it checks, and
-// the comment above it what it does not); refs (nothing outside spikes/ references it, §4.2 and §4.9);
+// the comment above it what it does not; with U4s's three greps: the tick constants of u4-build-plan.md §4.3,
+// npt-room's float-free sources, §4.11, and each bite id in one crate's sources, §4.14); refs (nothing outside spikes/
+// references it, §4.2 and §4.9);
 // marks (marks.json compiles in the judge, covers exactly the plan's marks, and every row it hashed is unchanged); self
 // (this file's own tests); redact (redact-check's tests, then a scan of the spike's folder). It runs every step and
 // exits 1 if any failed.
@@ -63,6 +66,13 @@ export function closures(meta) {
 /** A normal or build dependency ships; a dev dependency does not. */
 const isShipped = (d) => d.dep_kinds.some((k) => k.kind === null || k.kind === "build");
 
+/**
+ * npt-sim's only shipped dependencies (U4s; plan §4.5): libm, the one source of transcendentals (ADR 0004's float
+ * allow-list), and ChaCha8Rng's two crates for `SimRng`, all pinned in the workspace. A new one is a reviewed change
+ * to this list.
+ */
+export const SIM_DEPENDENCIES = ["libm", "rand_chacha", "rand_core"];
+
 /** Every broken dependency rule, as a sentence; empty when the rules hold. */
 export function dependencyProblems(meta) {
   const problems = [];
@@ -105,6 +115,19 @@ export function dependencyProblems(meta) {
     const name = byId.get(n.id).name;
     if (name === "npt-net") continue;
     for (const d of n.deps) if (byId.get(d.pkg).name === "npt-tcpinfo") problems.push(`${name} depends on npt-tcpinfo`);
+  }
+  // npt-sim (U4s; the arch review's F4): it ships with SIM_DEPENDENCIES alone, so the sim stays free of every crate
+  // above it and of any dependency no review has read; a dev dependency does not ship (C10). A missing npt-sim fails
+  // here too, not only in the LEAF loop above (it is a leaf crate), which says the same sentence: it is said once.
+  const simId = meta.workspace_members.find((id) => byId.get(id).name === "npt-sim");
+  if (!simId) {
+    if (!problems.includes("npt-sim is not a workspace member")) problems.push("npt-sim is not a workspace member");
+  } else {
+    const simNode = meta.resolve.nodes.find((n) => n.id === simId);
+    for (const d of (simNode?.deps ?? []).filter(isShipped)) {
+      const name = byId.get(d.pkg).name;
+      if (!SIM_DEPENDENCIES.includes(name)) problems.push(`npt-sim depends on ${name}`);
+    }
   }
   // npt-net stays free of libc (plan §4.2, the advisor's M14): no direct normal or build dependency on it, so its kernel
   // calls go through npt-tcpinfo alone. Reaching libc through tokio or npt-tcpinfo is fine; a dev dependency does not
@@ -506,6 +529,221 @@ export function crateFiles(cratesDir) {
     else if (e.isFile() && (f.endsWith(".rs") || f.endsWith("/Cargo.toml"))) files.push(f);
   }
   return { files: files.sort(), links: links.sort() };
+}
+
+/**
+ * The tick constant's one home (plan §4.6, RQ6: "`TICK_HZ` one constant"): npt-sim's sources. Every tick-counted value
+ * is a const fn of it (u4-build-plan.md §4.3). TICK_DERIVED are the constants npt-sim derives from it, each written
+ * `<name in lower case>_at(TICK_HZ)`, its own function at the rate, which s1 pins at 30 and 60 Hz and ticks.rs's const
+ * asserts tie to the constant at any rate.
+ */
+export const TICK_HZ_HOME = "crates/sim/src/";
+export const TICK_DERIVED = ["LOOP_CATCHUP", "FULL_STATE_ACK_TICKS", "ACK_RING_TICKS", "SETTINGS_STEP_TICKS"];
+/**
+ * Every other name that holds a tick count, by the derived constants' own naming (plan §4.6: "no literal 7 anywhere";
+ * the netcode review's F8): a name ending in `_TICKS` or holding `CATCHUP`. NOT_TICK_COUNTS are the names that match
+ * and are not one, each with its reason.
+ */
+export const TICK_NAMED = /_TICKS$|CATCHUP/;
+export const NOT_TICK_COUNTS = {
+  // plan §4.6 (netcode NC2-F16): commands per client per tick, the redundancy cap of 8, not derived from TICK_HZ;
+  // u4-build-plan.md §4.3 sets it from npt_proto::Limits::REDUNDANCY_CAP with a const assert.
+  CMD_CATCHUP: "the redundancy cap",
+};
+/**
+ * The crates the name rule does not read, each with its reason: npt-net's L2 harness drives transport tests with its
+ * own 30 Hz traffic model (fixes.rs's TICK; HANG_TICKS in its tests), never links npt-sim, and keeps 30 Hz in the 60 Hz
+ * run, which changes npt-sim alone (plan §4.6). TICK_HZ and the TICK_DERIVED names are read there too.
+ */
+export const TICK_NAMED_SKIP = ["crates/net/"];
+/**
+ * A `const` or `static` item (associated ones too): its name and initializer. The type may hold an array's `[T; N]`;
+ * the initializer runs to the first `;`, so a block initializer is cut short and never matches a rule's form.
+ */
+const CONST_ITEM = /\b(?:const|static)\s+(?:mut\s+)?([A-Za-z_]\w*)\b\s*(?::(?:[^=;[\]]|\[[^\]]*\])*)?=([^;]*);/g;
+
+/**
+ * Every tick-counted name set in a form u4-build-plan.md §4.3 refuses, under crates/, as a sentence, read in lexRust's
+ * mask (comments and strings blanked; whitespace in an initializer ignored):
+ * - TICK_HZ is set from a literal once, in TICK_HZ_HOME; any other TICK_HZ item is a path to it.
+ * - A TICK_DERIVED name, in TICK_HZ_HOME, is exactly its own function at the rate, `loop_catchup_at(TICK_HZ)` for
+ *   LOOP_CATCHUP (the rust review's R4: `7 * TICK_HZ / 30` is 7 at 30 Hz and 14 at 60, and is refused); anywhere else
+ *   it is a path to the same name (`npt_sim::LOOP_CATCHUP`), never derived again (the arch review's F6).
+ * - Any other const or static named as a tick count (TICK_NAMED, bar NOT_TICK_COUNTS) names TICK_HZ, calls
+ *   `ticks_for_ms` (the TICK_HZ form), or is a path to TICK_HZ or another tick-count name; never a literal (`7`,
+ *   `30 / 4`, `SEVEN`, `ticks_for_ms_at(60, 500)`). In TICK_HZ_HOME such a name must join TICK_DERIVED, so s1 pins it.
+ * Why not plan §4.6's "no literal 7 anywhere" word for word: a grep cannot tell a tick count from any other 7 (a test's
+ * pinned `assert_eq!(LOOP_CATCHUP, 7)`, a sequence number, `0..7`), so a ban on the digit would refuse correct code;
+ * the rules above cover every item named as a tick count, and LOOP_CATCHUP has one home.
+ * Known limit: a grep, not rustc's name resolution. A tick count under another name (a struct field, a `let`, a
+ * literal passed to a function such as `Schedule::new(30, 7)`) is review's and the tests' (s1; U4b's caller test).
+ */
+export function tickConstantProblems(files, read) {
+  const problems = [];
+  let home = null;
+  const pathTo = (init, names) => new RegExp(`^(?:[A-Za-z_]\\w*::)*(?:${names.join("|")})$`).test(init);
+  for (const f of files) {
+    if (!f.startsWith("crates/") || !f.endsWith(".rs")) continue;
+    const inHome = f.startsWith(TICK_HZ_HOME);
+    const nameRule = !TICK_NAMED_SKIP.some((d) => f.startsWith(d));
+    const { mask } = lexRust(read(f));
+    for (const m of mask.matchAll(CONST_ITEM)) {
+      const [, name, raw] = m;
+      const derived = TICK_DERIVED.includes(name);
+      const named = name !== "TICK_HZ" && !derived && TICK_NAMED.test(name) && !Object.hasOwn(NOT_TICK_COUNTS, name);
+      if (name !== "TICK_HZ" && !derived && !(named && nameRule)) continue;
+      const init = raw.replace(/\s+/g, "");
+      const shown = raw.trim().replace(/\s+/g, " ");
+      const at = `${f}:${lineAt(mask, m.index)}`;
+      if (name === "TICK_HZ") {
+        if (pathTo(init, ["TICK_HZ"])) continue;
+        if (inHome && home === null) {
+          home = at;
+          continue;
+        }
+        const where = inHome ? `a second time (the first: ${home})` : `outside ${TICK_HZ_HOME}`;
+        problems.push(`${at} sets TICK_HZ from \`${shown}\` ${where}: npt_sim::TICK_HZ is the one tick constant (plan §4.6)`);
+      } else if (derived && inHome) {
+        const own = `${name.toLowerCase()}_at(TICK_HZ)`;
+        if (init !== own) {
+          problems.push(
+            `${at} sets ${name} from \`${shown}\`: in npt-sim it is its own function at the tick rate, \`${own}\`, ` +
+              "which s1 pins at 30 and 60 Hz (u4-build-plan.md §4.3)",
+          );
+        }
+      } else if (derived) {
+        if (!pathTo(init, [name])) {
+          problems.push(
+            `${at} sets ${name} from \`${shown}\` outside ${TICK_HZ_HOME}: there it is a path to npt_sim::${name}, ` +
+              "never derived again (one home: plan §4.6)",
+          );
+        }
+      } else if (inHome) {
+        problems.push(
+          `${at} sets ${name}, a tick count by its name, in npt-sim outside TICK_DERIVED: it joins TICK_DERIVED as ` +
+            `\`${name.toLowerCase()}_at(TICK_HZ)\`, its function pinned in s1 (u4-build-plan.md §4.3)`,
+        );
+      } else if (
+        !(pathTo(init, ["TICK_HZ", ...TICK_DERIVED, "\\w*_TICKS", "\\w*CATCHUP\\w*"]) || /\bTICK_HZ\b/.test(init) || /\bticks_for_ms\(/.test(init))
+      ) {
+        problems.push(
+          `${at} sets ${name} from \`${shown}\`: a tick-counted value is a const fn of npt_sim::TICK_HZ, never a literal ` +
+            "(u4-build-plan.md §4.3)",
+        );
+      }
+    }
+  }
+  return problems;
+}
+
+/** npt-room's sources, which hold no float (u4-build-plan.md §4.11, A3). */
+export const FLOAT_FREE = "crates/room/src/";
+/**
+ * A float in Rust code: the types `f32` and `f64` (as names, paths or literal suffixes) and the float literals (`1.5`,
+ * `1.`, `1e3`), but not a range (`0..5`), a tuple field (`t.0`), a method on an integer (`1.max(2)`), a hex literal or
+ * a name that holds the digits (`buf32`).
+ */
+const FLOAT_TOKEN =
+  /\bf(?:32|64)\b|(?<![\w.])\d[\d_]*(?:\.\d[\d_]*(?:[eE][+-]?\d[\d_]*)?(?:_*f(?:32|64))?|\.(?![\w.])|[eE][+-]?\d[\d_]*|_*f(?:32|64)\b)/g;
+
+/**
+ * Every file of npt-room's sources that holds a float, as a sentence: the room's interest, priority and window work on
+ * grid integers, and every float stays in npt-sim (u4-build-plan.md §4.11, A3: "a check.mjs grep refuses `f32` and
+ * `f64` in crates/room/src"). Read in lexRust's mask, so comments and strings may name them.
+ * Known limit: a grep, not type inference. A float the room receives and passes on without naming its type (a value
+ * from an npt-sim function, held in a `let` or a field of an npt-sim type) is not seen; the seam's types are integers
+ * so that the room has none to hold (crates/sim/src/seam.rs), and review is the wall.
+ */
+export function roomFloatProblems(files, read) {
+  const problems = [];
+  for (const f of files) {
+    if (!f.startsWith(FLOAT_FREE) || !f.endsWith(".rs")) continue;
+    const { mask } = lexRust(read(f));
+    const found = [...mask.matchAll(FLOAT_TOKEN)];
+    if (found.length) {
+      problems.push(
+        `${f}:${lineAt(mask, found[0].index)} has \`${found[0][0]}\` (${found.length} float token(s)): npt-room is ` +
+          "float-free (u4-build-plan.md §4.11)",
+      );
+    }
+  }
+  return problems;
+}
+
+/**
+ * A bite id, as a string literal holds it whole (marks.json's ids): `PM-<ADR>-<row>/<name>`, the name with upper case
+ * and dots too (`PM-0001-7/B-S`, `PM-0001-35/quinn-proto-0.11.17`; the rust fix-review's G1a): check.test.mjs pins
+ * that every marks.json bite id matches.
+ */
+export const BITE_ID = /^PM-\d{4}-\d+\/[A-Za-z0-9.-]+$/;
+/** A string literal that is exactly a bite id, in lexRust's code (its opening quote not an escaped one). */
+const BITE_ID_LITERAL = new RegExp(`(?<!\\\\)"(${BITE_ID.source.slice(1, -1)})"`, "g");
+
+/**
+ * The spans of a mask's (lexRust's) inline modules under `#[cfg(test)]`: `#[cfg(test)] mod <name> { ... }`, other outer
+ * attributes between allowed, from the attribute to the module's closing brace.
+ */
+function testModules(mask) {
+  const attrs = rustAttributes(mask);
+  const spans = [];
+  for (const a of attrs) {
+    if (a.inner || !/^\s*cfg\s*\(\s*test\s*\)\s*$/.test(mask.slice(a.bodyStart, a.bodyEnd))) continue;
+    let j = a.end;
+    for (;;) {
+      while (j < mask.length && /\s/.test(mask[j])) j++;
+      const next = attrs.find((b) => b.start === j && !b.inner);
+      if (!next) break;
+      j = next.end;
+    }
+    const head = mask.slice(j).match(/^(?:pub(?:\s*\([^)]*\))?\s+)?mod\s+[A-Za-z_]\w*\s*\{/);
+    if (!head) continue;
+    let depth = 0;
+    let k = j + head[0].length - 1;
+    do {
+      if (mask[k] === "{") depth++;
+      else if (mask[k] === "}") depth--;
+      k++;
+    } while (depth > 0 && k < mask.length);
+    spans.push([a.start, k]);
+  }
+  return spans;
+}
+
+/**
+ * Every bite id planted in more than one crate, as a sentence naming each crate's first file:line (u4-build-plan.md
+ * §4.14: each bite is planted where its code lives, so its id is in that one crate's sources; the rust fix-review's G1:
+ * -17's id put back in npt-sim's grid beside npt-client's passed every check). Read in lexRust's code, so a comment
+ * names nothing: each string literal that is exactly a bite id (BITE_ID), in crates/<crate>/src/. Tests name the ids
+ * they run, and are not read: crates/<crate>/tests/, and an inline `#[cfg(test)] mod` in src/ (npt-lab's probe tests
+ * run npt-l1's PM-0001-3 ids).
+ * Known limit: a grep, not rustc's. An id built at run time (concat!, format!) is not seen; any other item under
+ * #[cfg(test)] in src/ (a function, a constant, a test file a `#[cfg(test)] #[path]` module brings in) is read, which
+ * fails closed.
+ */
+export function biteHomeProblems(files, read) {
+  const homes = new Map();
+  for (const f of files) {
+    const crate = f.match(/^crates\/([^/]+)\/src\//)?.[1];
+    if (!crate || !f.endsWith(".rs")) continue;
+    const { code, mask } = lexRust(read(f));
+    const tests = testModules(mask);
+    for (const m of code.matchAll(BITE_ID_LITERAL)) {
+      if (mask.slice(m.index, m.index + m[0].length).trim()) continue;
+      if (tests.some(([s, e]) => m.index > s && m.index < e)) continue;
+      if (!homes.has(m[1])) homes.set(m[1], new Map());
+      const sites = homes.get(m[1]);
+      if (!sites.has(crate)) sites.set(crate, `${f}:${lineAt(code, m.index)}`);
+    }
+  }
+  const problems = [];
+  for (const [id, sites] of homes) {
+    if (sites.size < 2) continue;
+    problems.push(
+      `${id} is planted in ${sites.size} crates, ${[...sites.values()].join(" and ")}: a bite's id lives in the one ` +
+        "crate whose code it plants (u4-build-plan.md §4.14)",
+    );
+  }
+  return problems;
 }
 
 /**
@@ -1067,8 +1305,8 @@ export function marksProblems(marks, readFile) {
   return problems;
 }
 
-function run(cmd, args, cwd) {
-  const r = spawnSync(cmd, args, { cwd, encoding: "utf8", maxBuffer: 1 << 28 });
+function run(cmd, args, cwd, env = process.env) {
+  const r = spawnSync(cmd, args, { cwd, env, encoding: "utf8", maxBuffer: 1 << 28 });
   // `stdout` alone is kept for the steps that parse it: cargo writes progress lines ("Blocking waiting for file
   // lock", "Downloaded …") to stderr, and they must never reach a JSON parser.
   return { ok: r.status === 0, out: `${r.stdout ?? ""}${r.stderr ?? ""}`, stdout: r.stdout ?? "", status: r.status };
@@ -1118,6 +1356,25 @@ function lintBothBuilds(scope) {
   return { ok: bites.ok, out: `${measured.out}${bites.out}\nmeasured build and bites build both linted`, status: bites.status };
 }
 
+/**
+ * rustdoc on every member's own items, no dependency's, with warnings as errors (the rust fix-review's G2: a broken
+ * intra-doc link had passed every step), on the measured build, then on the bites build: a feature compiles items, and
+ * their docs, in and out. The flags go in RUSTDOCFLAGS; CARGO_ENCODED_RUSTDOCFLAGS, which cargo would read in its
+ * place, is dropped from this run's environment.
+ */
+function docBothBuilds() {
+  const { CARGO_ENCODED_RUSTDOCFLAGS: _, ...env } = process.env;
+  env.RUSTDOCFLAGS = "-D warnings";
+  const args = ["doc", "--locked", "--no-deps", "--workspace"];
+  const measured = run("cargo", args, HERE, env);
+  if (!measured.ok) return measured;
+  const bites = run("cargo", [...args, "--all-features"], HERE, env);
+  const summary = bites.ok
+    ? "measured build and bites build both documented, rustdoc warnings as errors"
+    : "the bites build's rustdoc failed (the measured build's passed)";
+  return { ok: bites.ok, out: `${measured.out}${bites.out}\n${summary}`, status: bites.status };
+}
+
 /** Both builds' tests: the measured build (no features), then the bites build (every feature, the planted defects
  * compiled in: plan §4.7). Each count is reported, skips included (cargoCounts). */
 function testBothBuilds() {
@@ -1160,7 +1417,8 @@ function testBothBuilds() {
 const DEPS_CHECKED =
   "held: no leaf crate reaches a transport or runtime; npt-client has no npt-net; npt-super and npt-host keep off the " +
   "sim, room, proto (and client) crates; npt-judge ships npt-log and serde only; npt-tcpinfo ships libc only and only " +
-  "npt-net uses it; npt-net has no direct libc; nothing depends on npt-lab; the workspace forbids unsafe_code and " +
+  "npt-net uses it; npt-net has no direct libc; npt-sim ships libm, rand_chacha and rand_core only; nothing depends " +
+  "on npt-lab; the workspace forbids unsafe_code and " +
   "every member inherits its lints but npt-client-wasm (allow) and npt-tcpinfo (deny), whose own lint tables are the " +
   "workspace's otherwise, key for key, with no lint given in a form the reader does not read (a lint's own table, a " +
   "quoted, dotted, hyphenated or uppercase name); no manifest has a cargo-features or rustflags key; as the scan " +
@@ -1171,7 +1429,9 @@ const DEPS_CHECKED =
   "no test runner, and the environment has no RUSTC_BOOTSTRAP or cargo channel override; every member lives in " +
   "crates/ and builds only .rs files in its own folder, in edition 2024, none " +
   "a proc-macro, and every path dependency is a member; no symbolic link under crates/; every #[path] and include! " +
-  "literal names a .rs file in its own crate";
+  "literal names a .rs file in its own crate; TICK_HZ is set from a literal once, in npt-sim; each derived tick " +
+  "constant is its own function at TICK_HZ in npt-sim and a path to it elsewhere, and no other *_TICKS or *CATCHUP* " +
+  "constant is set from a literal; npt-room's sources hold no float; no bite id is in two crates' sources";
 
 /** `cargo metadata` for the spike in `here`, with every feature, parsed: { ok, meta }, or the failed run. */
 function cargoMetadata(here) {
@@ -1203,6 +1463,9 @@ export function depsStep(here = HERE, env = process.env, metadata = cargoMetadat
     ...links.map((l) => `${l} is a symbolic link: the scan does not follow it, and rustc would`),
     ...cargoConfigProblems(env, configs),
     ...unsafeProblems(files, read),
+    ...tickConstantProblems(files, read),
+    ...roomFloatProblems(files, read),
+    ...biteHomeProblems(files, read),
   ];
   const counts = `${files.length} crate files and ${configs.length} cargo config file(s) read`;
   return { ok: problems.length === 0, out: problems.join("\n") || `${DEPS_CHECKED} (${counts})` };
@@ -1214,6 +1477,7 @@ export const STEPS = {
   // compile code out as well as in (npt-lab's probe has `cfg(not(feature = "bites"))` code), so one pass is not enough.
   clippy: () => lintBothBuilds(["--workspace", "--all-targets"]),
   "clippy-wasm32": () => lintBothBuilds(WASM_ARGS),
+  doc: docBothBuilds,
   test: testBothBuilds,
   deps: depsStep,
   refs: () => {

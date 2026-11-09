@@ -238,7 +238,7 @@ impl FateLog {
         self.entries.is_empty()
     }
 
-    /// Feeds the log's canonical form to `f`: [`CANONICAL_TAG`], then 40 bytes per entry in index order, every field
+    /// Feeds the log's canonical form to `f`: `CANONICAL_TAG`, then 40 bytes per entry in index order, every field
     /// fixed-width little-endian (link u32; direction, channel, kind and overtaken u8; index in flow, send time and
     /// arrival u64, arrival 0 unless delivered; size and retransmissions u32). Two logs are the same exactly when these
     /// bytes are.

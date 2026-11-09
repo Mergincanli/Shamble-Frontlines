@@ -11,7 +11,14 @@ workspace = true
 
 [features]
 # The bites build (plan §4.7): the planted defects of the crates it runs, chosen at run time by --bite.
-bites = ["npt-l1/bites"]
+bites = [
+    "npt-l1/bites",
+    "npt-sim/bites",
+    "npt-proto/bites",
+    "npt-room/bites",
+    "npt-server/bites",
+    "npt-client/bites",
+]
 
 [dependencies]
 # ADR 0002's devtools analogue: it may depend on anything, and nothing depends on it (plan §4.2).

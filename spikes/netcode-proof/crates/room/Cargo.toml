@@ -9,6 +9,13 @@ publish.workspace = true
 [lints]
 workspace = true
 
+[features]
+# The planted defects (plan §4.7, E19), bites builds only, with those of the crates it calls (U4s adds it for U4e:
+# u4-build-plan.md §5 Lanes, the advisor's condition 10 (b)).
+bites = ["npt-sim/bites", "npt-proto/bites"]
+
 [dependencies]
-# No I/O, async runtime or clock; tick-counted timers only; builds for wasm32 (plan §4.1, §4.4; engine EA-1).
+# No I/O, async runtime or clock; tick-counted timers only; builds for wasm32 (plan §4.1, §4.4; engine EA-1). npt-sim
+# for the seam (`SimCore`, its plain-data types, `HitHistory`: the advisor's Q1 and Q2 rulings; ADR 0002:189).
 npt-proto.workspace = true
+npt-sim.workspace = true

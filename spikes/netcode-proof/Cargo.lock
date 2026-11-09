@@ -787,6 +787,7 @@ dependencies = [
 name = "npt-client"
 version = "0.0.0"
 dependencies = [
+ "npt-link",
  "npt-proto",
  "npt-sim",
 ]
@@ -872,18 +873,26 @@ dependencies = [
 [[package]]
 name = "npt-proto"
 version = "0.0.0"
+dependencies = [
+ "npt-link",
+ "npt-sim",
+ "rand_chacha",
+ "rand_core",
+]
 
 [[package]]
 name = "npt-room"
 version = "0.0.0"
 dependencies = [
  "npt-proto",
+ "npt-sim",
 ]
 
 [[package]]
 name = "npt-server"
 version = "0.0.0"
 dependencies = [
+ "npt-client",
  "npt-link",
  "npt-log",
  "npt-net",
@@ -895,6 +904,11 @@ dependencies = [
 [[package]]
 name = "npt-sim"
 version = "0.0.0"
+dependencies = [
+ "libm",
+ "rand_chacha",
+ "rand_core",
+]
 
 [[package]]
 name = "npt-super"

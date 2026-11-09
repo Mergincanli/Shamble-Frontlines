@@ -9,5 +9,14 @@ publish.workspace = true
 [lints]
 workspace = true
 
+[features]
+# The planted defects (plan §4.7, E19): compiled only into the bites build and chosen at run time, per instance or per
+# config value (u4-build-plan.md §4.11). Measured builds never contain them.
+bites = []
+
 [dependencies]
-# No I/O, clock, transport or bot logic (plan §4.2, §4.5). libm and rand_chacha join at U4, pinned.
+# No I/O, clock, transport or bot logic (plan §4.2, §4.5). Pinned in the workspace: libm, the one source of
+# transcendentals (ADR 0004's float allow-list), and ChaCha8Rng for `SimRng` (plan §4.5), all three already in the lock.
+libm.workspace = true
+rand_chacha.workspace = true
+rand_core.workspace = true

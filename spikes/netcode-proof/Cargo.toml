@@ -47,6 +47,11 @@ serde_json = "=1.0.154"
 rand_chacha = { version = "=0.10.0", default-features = false }
 rand_core = { version = "=0.10.1", default-features = false }
 sha2 = "=0.11.1"
+# U4s: npt-sim's one source of transcendentals (plan §4.5: ADR 0004's float allow-list, "transcendentals through libm
+# only"), pure Rust; already in Cargo.lock through quinn-proto's fastbloom, so no new package. Default features kept
+# (`arch`: hardware sqrt, floor, ceil, trunc and rint, each exact, where the target has them), the set fastbloom already
+# turns on in the server build, so npt-sim's libm resolves one feature set on native and wasm32 (plan §4.5 "Features").
+libm = "=0.2.16"
 # U3: the transports and L2 (plan §4.1's npt-net; PM-0001-35's floors: quinn-proto >= 0.11.18, rustls >= 0.23.46,
 # ring >= 0.17.12, tokio >= 1.54.1; U0 resolved these versions).
 wtransport = "=0.7.2"

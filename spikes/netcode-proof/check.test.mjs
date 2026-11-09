@@ -10,8 +10,10 @@ import { dirname, join, relative } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
+  BITE_ID,
   STEPS,
   WASM_CRATES,
+  biteHomeProblems,
   cargoConfigProblems,
   cargoCounts,
   crateFiles,
@@ -23,7 +25,12 @@ import {
   lexRust,
   manifestKeyProblems,
   marksProblems,
+  NOT_TICK_COUNTS,
   referenceProblems,
+  roomFloatProblems,
+  SIM_DEPENDENCIES,
+  TICK_NAMED_SKIP,
+  tickConstantProblems,
   unsafeProblems,
   workspaceLintProblems,
 } from "./check.mjs";
@@ -54,7 +61,8 @@ function clean() {
   return {
     "npt-link": [],
     "npt-l1": n("npt-link"),
-    "npt-sim": [],
+    "npt-sim": [...n("libm", "rand_chacha", "rand_core"), ["proptest", "dev"]],
+    rand_chacha: n("rand_core", "ppv-lite86"),
     "npt-proto": n("serde"),
     "npt-room": n("npt-proto"),
     "npt-server": n("npt-link", "npt-proto", "npt-room", "npt-sim", "npt-net", "npt-log", "tokio"),
@@ -147,6 +155,25 @@ test("npt-tcpinfo ships with libc alone, a dev dependency aside", () => {
     e["npt-net"] = e["npt-net"].filter(([d]) => d !== "npt-tcpinfo");
   });
   assert.ok(gone.includes("npt-tcpinfo is not a workspace member"), gone.join("\n"));
+});
+
+test("npt-sim ships with libm, rand_chacha and rand_core alone, a dev dependency aside (U4s, the arch review's F4)", () => {
+  assert.deepEqual(SIM_DEPENDENCIES, ["libm", "rand_chacha", "rand_core"]);
+  assert.deepEqual(problemsWith((e) => e["npt-sim"].push(["serde", null])), ["npt-sim depends on serde"]);
+  assert.deepEqual(problemsWith((e) => e["npt-sim"].push(["cc", "build"])), ["npt-sim depends on cc"], "a build dependency ships");
+  const above = problemsWith((e) => e["npt-sim"].push(["npt-proto", null]));
+  assert.ok(above.includes("npt-sim depends on npt-proto"), above.join("\n"));
+  assert.deepEqual(problemsWith((e) => e["npt-sim"].push(["tempfile", "dev"])), [], "a dev dependency does not ship (C10)");
+  assert.deepEqual(problemsWith((e) => (e["npt-sim"] = n("libm"))), [], "a subset of the list is fine");
+  // The list is of direct dependencies: what they reach (rand_chacha's ppv-lite86) is theirs.
+  assert.deepEqual(problemsWith((e) => (e.libm = n("helper"))), []);
+  // A missing npt-sim fails, as the other named members do, and is said once (it is a leaf crate too: the rust
+  // fix-review's nit).
+  const gone = problemsWith((e) => {
+    delete e["npt-sim"];
+    for (const k of Object.keys(e)) e[k] = e[k].filter(([d]) => d !== "npt-sim");
+  });
+  assert.deepEqual(gone, ["npt-sim is not a workspace member"]);
 });
 
 test("only npt-net depends on npt-tcpinfo, in any kind; reaching it through npt-net is fine", () => {
@@ -987,6 +1014,25 @@ test("RUSTC_BOOTSTRAP, cargo's channel override, and a manifest's cargo-features
   assert.deepEqual(manifestKeyProblems(own), []);
 });
 
+/** The tick grep's message for a tick-count name (not a derived one) set from `init` at `at` (u4-build-plan.md §4.3). */
+const fromLiteral = (at, name, init) =>
+  `${at} sets ${name} from \`${init}\`: a tick-counted value is a const fn of npt_sim::TICK_HZ, never a literal ` +
+  "(u4-build-plan.md §4.3)";
+/** Its message for a derived name set outside npt-sim's sources other than by a path to npt-sim's (plan §4.6). */
+const notAPath = (at, name, init) =>
+  `${at} sets ${name} from \`${init}\` outside crates/sim/src/: there it is a path to npt_sim::${name}, never derived ` +
+  "again (one home: plan §4.6)";
+/** Its message for a derived name in npt-sim's sources that is not its own function at TICK_HZ (§4.3; rust R4). */
+const notOwnFn = (at, name, init) =>
+  `${at} sets ${name} from \`${init}\`: in npt-sim it is its own function at the tick rate, ` +
+  `\`${name.toLowerCase()}_at(TICK_HZ)\`, which s1 pins at 30 and 60 Hz (u4-build-plan.md §4.3)`;
+/** The float grep's message for its first token in `at` (u4-build-plan.md §4.11). */
+const roomFloat = (at, token, n = 1) => `${at} has \`${token}\` (${n} float token(s)): npt-room is float-free (u4-build-plan.md §4.11)`;
+/** The bite-id grep's message for `id` planted at `sites` (each crate's first file:line; u4-build-plan.md §4.14). */
+const biteTwice = (id, ...sites) =>
+  `${id} is planted in ${sites.length} crates, ${sites.join(" and ")}: a bite's id lives in the one crate whose code it ` +
+  "plants (u4-build-plan.md §4.14)";
+
 /**
  * A spike folder for depsStep (the workspace manifest, the two exceptions, npt-room and a cargo config) and cargo
  * metadata's shape for it, from clean()'s graph: every member at crates/<name without npt->/ with one lib target there.
@@ -1041,6 +1087,10 @@ test("the deps step is depsStep, and it calls every check: one plant per check, 
       f["crates/tcpinfo/Cargo.toml"] = f["crates/tcpinfo/Cargo.toml"].replace('disallowed_types = "deny"\n', "");
       f[".cargo/config.toml"] = `include = ["extra.toml"]\n${f[".cargo/config.toml"]}`;
       f["crates/room/src/evil.rs"] = UNSAFE_FN;
+      // U4s's three greps (u4-build-plan.md §4.3, §4.11, §4.14).
+      f["crates/room/src/ticks.rs"] = "pub const LOOP_CATCHUP: u32 = 7;\npub fn g() -> f64 {\n    0.0\n}\n";
+      f["crates/sim/src/grid.rs"] = 'pub const BITES: [&str; 1] = ["PM-0001-17/client-rounding"];\n';
+      f["crates/client/src/lib.rs"] = 'pub const BITES: [&str; 1] = ["PM-0001-17/client-rounding"];\n';
     },
     (e) => (e["npt-sim"] = n("tokio")),
   );
@@ -1066,6 +1116,9 @@ test("the deps step is depsStep, and it calls every check: one plant per check, 
     ["layoutProblems", "npt-room's lib target npt-room compiles crates/tcpinfo/src/linux.rs, outside its folder crates/room/"],
     ["cargoConfigProblems", `${join(bad.dir, ".cargo", "config.toml")} has a key \`include\`: it loads a config file this check does not read`],
     ["unsafeProblems", "crates/room/src/evil.rs:3 has unsafe code (1 `unsafe` or `global_asm`; only npt-client-wasm and npt-tcpinfo may)"],
+    ["tickConstantProblems", notAPath("crates/room/src/ticks.rs:1", "LOOP_CATCHUP", "7")],
+    ["roomFloatProblems", roomFloat("crates/room/src/ticks.rs:2", "f64", 2)],
+    ["biteHomeProblems", biteTwice("PM-0001-17/client-rounding", "crates/client/src/lib.rs:1", "crates/sim/src/grid.rs:1")],
   ]) {
     assert.ok(lines.includes(line), `${check}'s plant is not reported:\n${r.out}`);
   }
@@ -1227,4 +1280,228 @@ test("only code outside spikes/ is read for references to it", () => {
     "spikes/netcode-proof/check.mjs": "spikes/",
   };
   assert.deepEqual(referenceProblems(files, (f) => text[f]), ["index.html references spikes/"]);
+});
+
+/**
+ * The tick grep's clean tree: npt-sim's constants each its own function at TICK_HZ, and outside it uses, asserts,
+ * paths, tick counts derived from TICK_HZ or ticks_for_ms, CMD_CATCHUP and npt-net's own HANG_TICKS (U4s, §4.3).
+ */
+const TICK_CLEAN = {
+  "crates/sim/src/ticks.rs":
+    "pub const TICK_HZ: u32 = 30;\n" +
+    "pub const LOOP_CATCHUP: u32 = loop_catchup_at(TICK_HZ);\n" +
+    "pub const FULL_STATE_ACK_TICKS: u32 = full_state_ack_ticks_at(TICK_HZ);\n" +
+    "pub const ACK_RING_TICKS: u32 = ack_ring_ticks_at( TICK_HZ );\n" +
+    "pub const SETTINGS_STEP_TICKS: u32 =\n    settings_step_ticks_at(TICK_HZ);\n" +
+    "// const LOOP_CATCHUP: u32 = 7; in a comment sets nothing\n" +
+    'const NOTE: &str = "const ACK_RING_TICKS: u32 = 32;";\n' +
+    "const MAX_TICK_HZ: u32 = 1_000;\nconst XYZ: [u32; 3] = [1, 2, 3];\n" +
+    "const _: () = assert!(LOOP_CATCHUP == loop_catchup_at(TICK_HZ), \"x\");\n" +
+    "pub const fn loop_catchup_at(tick_hz: u32) -> u32 {\n    tick_hz / 4\n}\n",
+  "crates/room/src/lib.rs":
+    "use npt_sim::LOOP_CATCHUP;\nconst TICK_HZ: u32 = npt_sim::TICK_HZ;\n" +
+    "impl Ring {\n    const ACK_RING_TICKS: u32 = npt_sim :: ACK_RING_TICKS;\n}\n" +
+    "impl InputBuffer {\n    pub const CMD_CATCHUP: usize = npt_proto::Limits::REDUNDANCY_CAP;\n}\n" +
+    "const EVENT_ACK_TICKS: u32 = npt_sim::ticks_for_ms(2_000);\nconst WINDOW_TICKS: u32 = 2 * npt_sim::TICK_HZ;\n" +
+    "const ALIAS_TICKS: u32 = npt_sim::ACK_RING_TICKS;\nconst MOST_CATCHUP: usize = InputBuffer::CMD_CATCHUP;\n",
+  "crates/sim/tests/seam.rs": "fn s1() {\n    assert_eq!(LOOP_CATCHUP, 7);\n    assert_eq!(loop_catchup_at(60), 15);\n}\n",
+  "crates/net/src/l2/delay_tests.rs": "fn c() {\n    const HANG_TICKS: u64 = 900;\n}\n",
+};
+const tickRun = (change = () => {}) => {
+  const files = { ...TICK_CLEAN };
+  change(files);
+  return tickConstantProblems(Object.keys(files).sort(), (f) => files[f]);
+};
+
+test("tick constants: TICK_HZ is set once, in npt-sim, and a derived name elsewhere is only a path to it, in any form (U4s, §4.3)", () => {
+  const run = tickRun;
+  assert.deepEqual(run(), [], "the clean tree, uses and asserts and paths to npt-sim's constants included");
+  const room = "crates/room/src/lib.rs";
+  const at = `${room}:${TICK_CLEAN[room].split("\n").length}`;
+  for (const [plant, want] of [
+    ["const LOOP_CATCHUP: u32 = 7;\n", notAPath(at, "LOOP_CATCHUP", "7")],
+    ["pub static ACK_RING_TICKS: u32 = 32;\n", notAPath(at, "ACK_RING_TICKS", "32")],
+    ["static mut LOOP_CATCHUP: u32 = 30 / 4;\n", notAPath(at, "LOOP_CATCHUP", "30 / 4")],
+    ["const SETTINGS_STEP_TICKS: u32 = SEVEN;\n", notAPath(at, "SETTINGS_STEP_TICKS", "SEVEN")],
+    ["const LOOP_CATCHUP: u32 = npt_sim::loop_catchup_at(30);\n", notAPath(at, "LOOP_CATCHUP", "npt_sim::loop_catchup_at(30)")],
+    // Derived again outside npt-sim, even from TICK_HZ itself (the arch review's F6): one home.
+    ["const LOOP_CATCHUP: u32 = npt_sim::TICK_HZ / 4;\n", notAPath(at, "LOOP_CATCHUP", "npt_sim::TICK_HZ / 4")],
+    ["const FULL_STATE_ACK_TICKS: u32 = npt_sim::ticks_for_ms(2_000);\n", notAPath(at, "FULL_STATE_ACK_TICKS", "npt_sim::ticks_for_ms(2_000)")],
+    ["impl X {\n    pub const FULL_STATE_ACK_TICKS: u32 = 60;\n}\n", notAPath(at.replace(/\d+$/, (k) => +k + 1), "FULL_STATE_ACK_TICKS", "60")],
+    ["const ACK_RING_TICKS: u32 =\n    32;\n", notAPath(at, "ACK_RING_TICKS", "32")],
+    [
+      "const TICK_HZ: u32 = 60;\n",
+      `${at} sets TICK_HZ from \`60\` outside crates/sim/src/: npt_sim::TICK_HZ is the one tick constant (plan §4.6)`,
+    ],
+  ]) {
+    assert.deepEqual(run((f) => (f[room] += plant)), [want], plant);
+  }
+  // In npt-net too: the name rule skips it, these names never.
+  assert.deepEqual(
+    run((f) => (f["crates/net/src/l2/delay_tests.rs"] += "const LOOP_CATCHUP: u32 = 7;\n")),
+    [notAPath("crates/net/src/l2/delay_tests.rs:4", "LOOP_CATCHUP", "7")],
+  );
+  // A second TICK_HZ inside npt-sim (files are read in sorted order, so grid.rs's is the first), and one in npt-client.
+  assert.deepEqual(
+    run((f) => (f["crates/sim/src/grid.rs"] = "const TICK_HZ: u32 = 60;\n")),
+    [
+      "crates/sim/src/ticks.rs:1 sets TICK_HZ from `30` a second time (the first: crates/sim/src/grid.rs:1): npt_sim::TICK_HZ is the one tick constant (plan §4.6)",
+    ],
+  );
+  assert.deepEqual(
+    run((f) => (f["crates/client/src/lib.rs"] = "pub const TICK_HZ: u32 = 60;\n")),
+    ["crates/client/src/lib.rs:1 sets TICK_HZ from `60` outside crates/sim/src/: npt_sim::TICK_HZ is the one tick constant (plan §4.6)"],
+  );
+  // A derived constant at a literal rate in npt-sim's own tests is refused too: they are outside its sources.
+  assert.deepEqual(
+    run((f) => (f["crates/sim/tests/seam.rs"] += "const LOOP_CATCHUP: u32 = loop_catchup_at(60);\n")),
+    [notAPath("crates/sim/tests/seam.rs:5", "LOOP_CATCHUP", "loop_catchup_at(60)")],
+  );
+});
+
+test("tick constants: in npt-sim each derived name is its own function at TICK_HZ; no other tick-count name is a literal (U4s fix pass, §4.3, plan §4.6)", () => {
+  const ticks = "crates/sim/src/ticks.rs";
+  const swap = (from, to) => (f) => {
+    assert.ok(f[ticks].includes(from), from);
+    f[ticks] = f[ticks].replace(from, to);
+  };
+  const loop = "loop_catchup_at(TICK_HZ)";
+  // The rust review's R4 and its kin: each gives 7 at 30 Hz, and only its own function gives 15 at 60.
+  for (const init of ["7 * TICK_HZ / 30", "TICK_HZ / 4", "7", "ticks_for_ms(233)", "loop_catchup_at(30)", "crate::LOOP_CATCHUP"]) {
+    assert.deepEqual(tickRun(swap(loop, init)), [notOwnFn(`${ticks}:2`, "LOOP_CATCHUP", init)], init);
+  }
+  // FULL_STATE_ACK_TICKS's own function, not the ms form it computes (s1 pins full_state_ack_ticks_at at both rates).
+  assert.deepEqual(
+    tickRun(swap("full_state_ack_ticks_at(TICK_HZ)", "ticks_for_ms(2_000)")),
+    [notOwnFn(`${ticks}:3`, "FULL_STATE_ACK_TICKS", "ticks_for_ms(2_000)")],
+  );
+  // A tick-count name in npt-sim must join TICK_DERIVED, whatever it is set from.
+  assert.deepEqual(tickRun((f) => (f["crates/sim/src/grid.rs"] = "pub const RESEND_TICKS: u32 = ticks_for_ms(500);\n")), [
+    "crates/sim/src/grid.rs:1 sets RESEND_TICKS, a tick count by its name, in npt-sim outside TICK_DERIVED: it joins " +
+      "TICK_DERIVED as `resend_ticks_at(TICK_HZ)`, its function pinned in s1 (u4-build-plan.md §4.3)",
+  ]);
+  // Outside npt-sim, every other name of a tick count (`*_TICKS`, `*CATCHUP*`) is never a literal, in any form.
+  const room = "crates/room/src/lib.rs";
+  const at = `${room}:${TICK_CLEAN[room].split("\n").length}`;
+  for (const [plant, name, init] of [
+    ["const LOOP_CATCHUP_ALIAS: u32 = 7;\n", "LOOP_CATCHUP_ALIAS", "7"],
+    ["const FAST_CATCHUP: u32 = 30 / 4;\n", "FAST_CATCHUP", "30 / 4"],
+    ["const STALL_TICKS: u32 = SEVEN;\n", "STALL_TICKS", "SEVEN"],
+    ["pub static RESEND_TICKS: u64 = 60;\n", "RESEND_TICKS", "60"],
+    ["static mut HOLD_TICKS: u32 = npt_sim::ticks_for_ms_at(60, 500);\n", "HOLD_TICKS", "npt_sim::ticks_for_ms_at(60, 500)"],
+    ["const RING_TICKS: [u32; 2] = [32, 64];\n", "RING_TICKS", "[32, 64]"],
+    ["impl Q {\n    const EVENT_CAP_TICKS: u32 =\n        90;\n}\n", "EVENT_CAP_TICKS", "90"],
+  ]) {
+    const line = plant.startsWith("impl") ? at.replace(/\d+$/, (k) => +k + 1) : at;
+    assert.deepEqual(tickRun((f) => (f[room] += plant)), [fromLiteral(line, name, init)], plant);
+  }
+  // CMD_CATCHUP is the redundancy cap, not a tick count (plan §4.6); npt-net's L2 harness keeps its own 30 Hz.
+  assert.deepEqual(tickRun((f) => (f[room] += "const CMD_CATCHUP: usize = 8;\n")), []);
+  assert.deepEqual(tickRun((f) => (f["crates/net/src/l2/delay_tests.rs"] += "const SEND_TICKS: u64 = 30;\n")), []);
+  assert.deepEqual(Object.keys(NOT_TICK_COUNTS), ["CMD_CATCHUP"]);
+  assert.deepEqual(TICK_NAMED_SKIP, ["crates/net/"]);
+});
+
+test("npt-room is float-free: f32, f64 and float literals in crates/room/src fail; prose, strings, ranges and integers pass (U4s, §4.11)", () => {
+  const clean = {
+    "crates/room/src/lib.rs":
+      "//! No f32 or f64 here: 1.5 in a comment is prose.\n" +
+      'const S: &str = "f32 1.5 2e3";\n' +
+      "fn f(t: (u8, u8), v: &[u32]) -> u32 {\n    let r = 0..5;\n    let s = 0..=5;\n    let x = t.0 + t.1;\n" +
+      "    let m = 1.max(2) + 2_u32.pow(3);\n    let h = 0x1e3 + 0xff_f32 + 0b1;\n    let buf32 = 7u32 + 1_000i64 as u32;\n" +
+      "    v[r.start] + s.start() + u32::from(x) + m + h + buf32\n}\n",
+    "crates/sim/src/lib.rs": "pub fn f() -> f32 {\n    1.5\n}\n",
+    "crates/room/tests/t.rs": "const X: f64 = 1.0;\n",
+    "crates/room/Cargo.toml": '[package]\nname = "npt-room"\ndescription = "f32 1.5"\n',
+  };
+  const run = (change = () => {}) => {
+    const files = { ...clean };
+    change(files);
+    return roomFloatProblems(Object.keys(files).sort(), (f) => files[f]);
+  };
+  assert.deepEqual(run(), [], "the clean tree: other crates, room's tests and its manifest are not read");
+  const file = "crates/room/src/interest.rs";
+  for (const [plant, token] of [
+    ["fn g() -> f32 {\n    0\n}\n", "f32"],
+    ["use core::f64::consts::PI;\n", "f64"],
+    ["const A: u64 = 1.5 as u64;\n", "1.5"],
+    ["const B: u32 = 1. as u32;\n", "1."],
+    ["const C: u32 = 1e3 as u32;\n", "1e3"],
+    ["const D: u32 = 2.5e-3 as u32;\n", "2.5e-3"],
+    ["const E: u32 = 2f64 as u32;\n", "2f64"],
+    ["const F: u32 = 1_000.0_f32 as u32;\n", "1_000.0_f32"],
+  ]) {
+    assert.deepEqual(run((f) => (f[file] = plant)), [roomFloat(`${file}:1`, token)], plant);
+  }
+  assert.deepEqual(run((f) => (f[file] = "\n\nfn g(x: f32) -> f64 {\n    f64::from(x) * 0.5\n}\n")), [roomFloat(`${file}:3`, "f32", 4)]);
+});
+
+/**
+ * The bite-id grep's clean tree, as the spike plants its ids (u4-build-plan.md §4.14): -17's in npt-client, -41's in
+ * npt-sim's own-copy snap, npt-l1's -3 ids, npt-lab's probe tests running one of them inside `#[cfg(test)] mod tests`,
+ * tests naming every id, and prose and longer strings that name them.
+ */
+const BITE_CLEAN = {
+  "crates/client/src/lib.rs":
+    "/// PM-0001-17/client-rounding's site is the client's call into the grid.\n" +
+    '#[cfg(feature = "bites")]\npub const BITES: [&str; 1] = ["PM-0001-17/client-rounding"];\n',
+  "crates/client/tests/bites.rs": 'const OTHERS: [&str; 2] = ["PM-0001-41/server-quant-differs", "PM-0001-3/clock-seed"];\n',
+  "crates/l1/src/lib.rs": 'const BITE_IDS: [(&str, u8); 2] = [\n    ("PM-0001-3/rtt-each-way", 0),\n    ("PM-0001-3/clock-seed", 1),\n];\n',
+  "crates/lab/src/probe.rs":
+    "pub fn run() {}\n\n#[cfg(test)]\n#[allow(clippy::unwrap_used)]\nmod tests {\n    #[test]\n    fn a_bite_runs() {\n" +
+    '        let s = Some("PM-0001-3/rtt-each-way");\n        let r = r#"PM-0001-3/clock-seed"#;\n    }\n}\n',
+  "crates/room/src/lib.rs":
+    'const NOTE: &str = "see PM-0001-17/client-rounding";\nconst QUOTED: &str = "\\"PM-0001-41/server-quant-differs\\"";\n',
+  "crates/sim/src/grid.rs": "//! The grid's one defect; -17 and -41 plant it, and their ids live with their sites.\npub struct Config;\n",
+  "crates/sim/src/lib.rs": '#[cfg(feature = "bites")]\npub const OWN_COPY_SNAP_BITES: [&str; 1] = ["PM-0001-41/server-quant-differs"];\n',
+  "crates/sim/tests/seam.rs": 'const OTHERS: [&str; 2] = ["PM-0001-17/client-rounding", "PM-0001-3/rtt-each-way"];\n',
+};
+
+test("a bite id lives in one crate's sources: one id in two crates fails, naming both file:line (the rust fix-review's G1, §4.14)", () => {
+  const run = (change = () => {}) => {
+    const files = { ...BITE_CLEAN };
+    change(files);
+    return biteHomeProblems(Object.keys(files).sort(), (f) => files[f]);
+  };
+  assert.ok(BITE_ID.test("PM-0001-17/client-rounding") && !BITE_ID.test("PM-0001-17") && !BITE_ID.test("see PM-0001-3/x"));
+  // G1a: every bite id marks.json names is one BITE_ID matches (upper case and dots included).
+  const marks = JSON.parse(readFileSync(join(HERE, "marks", "marks.json"), "utf8"));
+  const ids = marks.marks.flatMap((m) => (m.bites ?? []).map((b) => b.id));
+  assert.ok(ids.length > 100, `marks.json's bite ids read: ${ids.length}`);
+  assert.deepEqual(
+    ids.filter((id) => !BITE_ID.test(id)),
+    [],
+    "every marks.json bite id is a BITE_ID",
+  );
+  assert.deepEqual(run(), [], "the clean tree: tests, a #[cfg(test)] module, prose and longer strings name ids freely");
+  // G1a: an upper-case id (a busy-wait bite planned for room and sim code) in two crates fails too.
+  assert.deepEqual(
+    run((f) => {
+      f["crates/room/src/lib.rs"] += 'const B: &str = "PM-0001-7/B-S";\n';
+      f["crates/sim/src/grid.rs"] += 'const B: &str = "PM-0001-7/B-S";\n';
+    }),
+    [biteTwice("PM-0001-7/B-S", "crates/room/src/lib.rs:3", "crates/sim/src/grid.rs:3")],
+  );
+  // The arch review's F1 come back: -17's id in npt-sim's grid beside npt-client's.
+  const grid = "crates/sim/src/grid.rs";
+  assert.deepEqual(run((f) => (f[grid] += '#[cfg(feature = "bites")]\npub const BITES: [&str; 1] = ["PM-0001-17/client-rounding"];\n')), [
+    biteTwice("PM-0001-17/client-rounding", "crates/client/src/lib.rs:3", `${grid}:4`),
+  ]);
+  // A second site inside the one crate is that crate's affair.
+  assert.deepEqual(run((f) => (f["crates/client/src/endpoint.rs"] = 'const ID: &str = "PM-0001-17/client-rounding";\n')), []);
+  // Outside its test module npt-lab names npt-l1's id as a source does; a raw string counts; three crates are named.
+  assert.deepEqual(run((f) => (f["crates/lab/src/main.rs"] = 'const DEFAULT: &str = "PM-0001-3/rtt-each-way";\n')), [
+    biteTwice("PM-0001-3/rtt-each-way", "crates/l1/src/lib.rs:2", "crates/lab/src/main.rs:1"),
+  ]);
+  assert.deepEqual(
+    run((f) => {
+      f["crates/client/src/lib.rs"] += 'const SNAP: &str = r#"PM-0001-41/server-quant-differs"#;\n';
+      f["crates/room/src/lib.rs"] += 'const S: &str = "PM-0001-41/server-quant-differs";\n';
+    }),
+    [biteTwice("PM-0001-41/server-quant-differs", "crates/client/src/lib.rs:4", "crates/room/src/lib.rs:3", "crates/sim/src/lib.rs:2")],
+  );
+  // Only an inline `#[cfg(test)] mod` is skipped: a function under it is read, which fails closed.
+  assert.deepEqual(run((f) => (f["crates/lab/src/probe.rs"] += '#[cfg(test)]\nfn id() -> &\'static str {\n    "PM-0001-3/clock-seed"\n}\n')), [
+    biteTwice("PM-0001-3/clock-seed", "crates/l1/src/lib.rs:3", "crates/lab/src/probe.rs:14"),
+  ]);
 });
