@@ -1,6 +1,6 @@
 # U4b build: the loop policy (npt-server's schedule.rs), the main session's record
 
-Built 2026-11-09 about 22:10-22:40 UTC by the main session (u4-build-plan.md §5 U4b; Lanes: "U4b and U4j in the main
+Built 2026-11-09 about 22:05-22:15 UTC by the main session (u4-build-plan.md §5 U4b; Lanes: "U4b and U4j in the main
 session"), in its own worktree `.gate/u4b-wt` (local branch u4b-build from 4b5812a, committed state: condition 10 (d)),
 shared target `.gate/shared-target`, offline. Uncommitted there until its review and merge.
 

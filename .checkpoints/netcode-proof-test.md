@@ -644,7 +644,7 @@
     - **Wave 1 resumed:** U4a's builder continued by SendMessage (agent a9297644e7c0354f3, its own worktree);
       U4d and U4c by the edited workflow script (wf_f54246ff-e0d resumed, task w0ynfq9yu: the builders continue in
       their existing worktrees wf_f54246ff-e0d-1 and -2 from their notes, no new worktree). Three agents running.
-  - **About 22:40 UTC: U4b built by the main session** (worktree `.gate/u4b-wt`, local branch u4b-build from
+  - **About 22:15 UTC: U4b built by the main session** (worktree `.gate/u4b-wt`, local branch u4b-build from
     4b5812a, uncommitted there; snapshot wip/u4b.patch; record u4b-build.md). schedule.rs (`Schedule`, `Due`,
     `Dropped`, `LoopCounters`, `due_ticks`; bites: `with_bite`, `BITES`), lib.rs re-exports, server/clippy.toml
     (the clock ban; tokio's entries `allow-invalid`, dormant until U6 adds tokio), tests/schedule.rs: 10 clean tests,
