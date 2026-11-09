@@ -48,3 +48,45 @@ code as at 768d00b). Read-only: no code edits, builds, test runs or network.
   T4 covers only the rank. Fix: a fixed-input test of the cross-check (entries with known D and L; p001/p90/p999/
   mean/loss share against hand values and against the bands read from marks.json), with bites due - t_in and lost
   entries kept in the delay series.
+- F-D (medium) R1 handoff: the L0 = 0 E has no producer at R1 under U3D-L0 (a). §5.2 reports "the other E form" and
+  U3D-L0 (a)'s straddle rule needs it, but l2_summary carries only M1's form (stats.rs:58-59) and §3.7 sends a second
+  E field to U6 only "if (b) is ruled"; p50 and over (L > p50 + 0.25 ms) cannot bound it (P(L > 0.25 ms) unknown).
+  Fix: carry C-U6-5 (the probe computes E with L0 = 0 from its fate log at the leg's end, SERIES row per M15), or
+  drop it from §5.2 and let -3's own p99.9 alone break a tie.
+- F-E (medium) R1 handoff, window: §2 says the judged window must be the very window -3 reads; -3's P1 checks have no
+  "window" key, so they read `measured` records only (marks/README.md:100), while late_run covers everything since
+  bind (impair.rs:246, :682). C-U6-2 aligns per leg only: warm-up seconds, base-RTT pings if sent through the same
+  socket (marks.json notes :2348), and the after tail would sit in E but not in -3. Fix: C-U6-2 = reset at the
+  measured phase's start, summary at its end (or no warm-up in the leg), with a U6 test.
+- F-F (low-medium) R1 run conditions lack the rate: §3.1 asserts > 9,900/s here, §5.2 does not; the bar is defined at
+  20,000 releases/s and -3's count (>= 1,000,000) does not bound the rate. The probe's up stream composition ("sends
+  up, echoes": SERIES.md:405-406) can make RS's releases 20,000 or 30,000/s. Fix: condition from the per-second
+  delivered counts; carry the composition (and the poller kind in the record) to U6.
+- F-G (low) C-U6-1 and C-U6-2 carry designs without proofs: T1 proves the test helper only. Fix: "with T1's
+  blocked-worker test re-run on the probe's poller"; "with a test that two legs' summaries never mix".
+- F-H (low) Dry-run confounds: self-test vs M13 differ in profile, poller, length and fate log, so nothing here
+  attributes E to the hop or clears the fate log; "about 10-19 us of E" for the hop rests on two single runs each with
+  a 40-61 ms pause (u3-verify-timing.md:152-159). Fix: say so in §0/U3D-POLL and the report; optional one-variable
+  controls at P1 (poller = thread; fate log off), reported.
+- F-I (low) Record/order: steal from `head -1` only; take every `^cpu` line (per-vCPU steal; 4 lines here). Print
+  everything (cross-check included) BEFORE the run-condition asserts (M13 prints first, :579-614 then :616-637), so an
+  INVALID round still yields numbers; an INVALID round stays in the record with its cause (plan.md:683), never
+  replaced.
+- F-J (low) M13 refactor into a shared helper risks c10 comparability: require for M13 no runtime built, fate log 0,
+  thread poller, same pacing; critics compare behaviour, not only asserts/prints (or copy instead of share).
+- F-K (low) C-U6-3 "drained only at the leg's end" is unquantified and clashes with -3's per-second second.s.probe_*
+  records; by the plan's own G^2/(2T) a sub-ms per-second drain adds ~0.03 us of E over 100 s. Fix: U6 chooses, with
+  the drain pause measured.
+- F-L (nit) citations: U3 row is plan.md:1222 (RQ10, §3.6 say :1221 = U2); quinn's loop is poll_socket
+  (endpoint.rs:772-857), called by drive_recv :497; quinn's buffers ~64 KB each (:754-758), test's 1,500 B fine for
+  40 B payloads (say so); checkpoint cites are 49bd1ac's lines (now :488-501).
+- F-M (nit) T2's count identity holds only with no SendError/WouldBlock (they enter the histogram, impair.rs:680-684):
+  assert them 0. F-N (nit) T3 bakes U3D-BAR (a)'s "<= 10,000": follows the ruling. F-O (nit, optional) a
+  deterministic lower-bound stall test (hold the lock G = 50 ms once; over_count >= datagrams due in [t0, t0+G-c] from
+  the fate log) would prove the release path's chain under a burst; the plan's F25 reasoning is otherwise sound.
+- Checked, no finding: the bar derivation (exact, 10,000 ns at P1); M1-lenience bound p50 x P(L > 0.25 ms); 5-sd band
+  (sd 99.5; exact band underflows: delay_tests.rs:167-170); nearest-rank fixtures (eval.rs:261-265, :1595-1597; f64
+  ceil agrees for these q up to n 200,000); THP madvise (risk 2 holds); no npt-net serde_json (Cargo.lock rule), so
+  bands are copies: F-C's drift check.
+- VERDICT: REVISE (five medium fixes, all local to §4, §5.2 and the U6 carries; no structural change).
+DONE 2026-11-09

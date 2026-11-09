@@ -552,6 +552,17 @@
     reruns: tell it to continue its notes file after the last line); if the run is gone, relaunch the same script.
     Then fold the critics into u3d-plan.md rev 2 and send it to the advisor. Also restart the saver
     (`node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "..."`), and check Mustafa's cleanup answer.
+  - **2026-11-09 about 01:40 UTC: U3d's planning run wf_941d1cee-cfa DONE** (5 of 5). Scouts: U3d is mostly packaging
+    (u3d-scout-req.md; u3d-scout-r1.md F1-F25, S1-S7). Draft: u3d-plan.md rev 1 (285 lines) + u3d-plan-notes.md: a
+    test-only change (a new ignored run `l2_timing_self_test` at P1, 10,000/s each way for 100 s, a tokio-task poller
+    with quinn's 32-buffer batch, the fate log for exact E forms and -3's own L2 P1 checks; four fast tests with bites;
+    a dry-run script with U3-Q9's four kernel facts and steal; plan text), questions U3D-BAR, U3D-L0, U3D-POLL, R1
+    judging, a miss's route, -3's checks. Critics: test-engineer REVISE (5 medium: T1 race, T2 near-vacuous, -3 delay
+    formula unbitten, no producer for the L0 = 0 form at R1, judged window not tied to -3's; low/nits F6-F12;
+    u3d-plan-review-test.md); rust-reviewer APPROVE WITH FINDINGS (F1 medium: spawn the poller onto a multi-thread
+    runtime, not block_on; F2 medium: pre-touch the fate log; F3-F10 low/nits; u3d-plan-review-rust.md).
+  - **Next (launched about 01:45 UTC):** one workflow: fold both critiques + Mustafa's shared-target rule into rev 2
+    (netcode-architect), a completeness check (test-engineer), then the advisor's review of rev 2.
   - **2026-11-09 about 01:05 UTC (after the reset; Mustafa: "continue"):** wf_77078bc9-95f had ended with all 5 agents
     failed on the spend limit (none completed, so nothing to replay). The script now tells each agent to continue its
     notes file if it exists; relaunched as **`wf_941d1cee-cfa`** (same script path, args {head: "95dac9c"}); the saver
