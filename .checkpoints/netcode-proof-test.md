@@ -584,6 +584,12 @@
     belong to the room), netcode 2 (canonical command order), arch F1 (the grid's bite ids must sit where their code
     lives: -57's coarsening to npt-proto's Quant), arch F2 (the per-kind field layout defined in npt-sim; VELOCITY fixed
     for wave 1).
+  - **About 16:45 UTC (save at Mustafa's ask; the spend limit cut the checker, reset 16:40):** fix:u4s DONE (items
+    1-11 in; 31 bites as expected; check.mjs 9/9 twice: 275 measured / 292 bites, self 47; carries in u4s-carries.md,
+    33 entries by brief, with the advisor's question NF-D4 on non_finite and D-4). check:u4s-fix (rust-reviewer) was
+    cut partway (its notes u4s-fix-review-rust.md, 39 lines, on disk). The worktree snapshotted again
+    (wip/u4s.patch, 97,516 B, 18 files). **Resume:** the script's CHECK prompt now tells the checker to continue its
+    notes; Workflow({scriptPath: the same, resumeFromRunId: "wf_841d72c0-291"}) replays fix:u4s from cache.
   - **About 13:15 UTC: U4s's fix pass launched, workflow `wf_841d72c0-291` (npt-u4s-fix):** fix:u4s in the same
     worktree (items 1-11; non_finite kept and documented as always 0, its drop and D-4's rewording a question for the
     advisor), then check:u4s-fix (rust-reviewer; u4s-fix-review-rust.md); the carries for the U4a/U4d/U4h briefs in
