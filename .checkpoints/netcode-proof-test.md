@@ -592,6 +592,12 @@
     under `chrt -f 1` reads 0 at start; the plan allows it). check.mjs 9/9 in the main folder (267 measured, 281 bites,
     self 43, redact 150 items, 0 findings); gate PASS --no-smoke. run.sh read in full by the main session before
     running it (reads /proc and /sys, builds once, runs that binary, writes only its own new record file).
+  - **About 04:02 UTC: the dry run DONE** (record committed at 78b0c07; four in-progress commits 41f9cd1, 133dc8d,
+    d6186bf, 4f37623 during it, at the stop hook's demand: their times are in the report). SELFTEST 1 and 2 valid:
+    E (L0 = 0) up 17,067 / 19,728 ns, down 11,540 / 12,450 ns, all would MISS; -3's p99.9 would FAIL in all four, the
+    12 agree lines all "agree"; every other -3 L2 P1 check would pass. SELFTEST 3 INVALID: 87 up datagrams never reached
+    ImpairSocket = the kernel's Udp RcvbufErrors 87 since boot, in a ~34 ms stall of both directions. M13 rounds: E up
+    40.3 / 52.8 / 4.27 us, down 45.7 / 55.9 / 3.35 us. Report: u3d-report.md (to the advisor: U3D-CLOSE, U3D-RCVBUF).
   - **About 03:56 UTC: the dry run RUNNING** (background, `bash spikes/netcode-proof/results/u3d-timing/run.sh`, quiet
     machine, CARGO_TARGET_DIR unset, about 6-7 min; record results/u3d-timing/selftest-<UTC>.txt). Then: commit it, write
     U3d's report (u3d-report.md: reported, not judged; the CPU-share dilution note against M13's 0.27), send it to the
