@@ -547,7 +547,23 @@
     Spike follow-ons still owed: marks.json -18 split (parts by transport, the WS three checks, count >= 480, the
     bites); the ws-practice validity rule; SERIES burst_heal and burst_return; the R3 run plan; fixes.rs's
     run-structured bound (needs U4's scene sizes).
-  - **About 09:50 UTC: U4's planning workflow `wf_899b9cf1-c90` (npt-u4-plan) launched on f985226:** scouts
+  - **About 11:50 UTC: U4's build plan APPROVED WITH CONDITIONS by the advisor** (advisor-u4.md; the approved plan
+    pinned at aebe8ea's rev 2, u4-build-plan.md sha256 27e03158...). Twelve sub-units in dependency order: U4s alone
+    (seam types, the grid, every manifest), then U4a wire, U4b loop policy (main session), U4c link model (C1', C2),
+    U4d stand-in sim, U4j judge and marks (main session), U4d2 Wasm-in-Node hash and determinism step, U4e room and
+    codec, U4r the L1 runner and its judged runs, U4f clock and commands, U4g prediction, interpolation and events,
+    U4h lag compensation. Conditions 1-11 (refusals outside the state hash; -30's pre-check a recorded npt-lab test
+    from a P0 recording with 0 replacements as setup; -22's exception in README §4; the precondition passes; -18's
+    bite end to end; U4d2's checks refuse and hash-wasm as the third unsafe exception; C-U7-1 for wasm-opt; `replay`
+    tested at U4 or moved; lanes; the readings list) + nits (a)-(g); condition 12: only those edits without coming back;
+    the five briefs (U4e, U4r, U4f, U4g, U4h) to the advisor before their builds. 26 questions ruled; six readings
+    (Q11, Q16's clamp, Q17, Q22's -22 exception, Q24, Q26) go to Mustafa in the readings PR before R5. Nit (g) done:
+    the stray spikes/netcode-proof/target (209 MiB, with CACHEDIR.TAG) removed by `cargo clean --target-dir`.
+  - **Next:** a workflow applies conditions 1-11 and the nits to u4-build-plan.md (netcode-architect) and drafts the
+    exact plan.md edits (§4.2 three exceptions; §4.7 RoomControl; E7's text; §4.4's per-tick inputs and the clamp
+    column; :562 loss to U6; the U7 row's C-U7-1; risk 11's moves) for the main session; a test-engineer checks
+    completeness and that nothing else changed; then the main session applies the plan.md edits, then U4s.
+  - **Done (about 09:50-11:45 UTC): U4's planning workflow `wf_899b9cf1-c90` (npt-u4-plan) on f985226:** scouts
     (engine-architect u4-scout-arch.md; test-engineer u4-scout-marks.md; netcode-architect u4-scout-netcode.md), a
     netcode-architect drafter (u4-build-plan.md rev 1, u4-build-plan-notes.md), critics (u4-plan-review-test.md,
     u4-plan-review-arch.md), the fold (rev 2, u4-plan-rev2-notes.md), then the advisor (its verdict returned as text;
