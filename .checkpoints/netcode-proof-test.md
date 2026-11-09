@@ -579,6 +579,19 @@
     **After it:** fold findings (a fix pass if needed), merge (worktree_patch.py, git apply), check.mjs 9/9 and the gate
     on the main folder's own cache, commit, push; then the dry run (results/u3d-timing/run.sh) on a quiet machine,
     reported, not judged; then U3d's report to the advisor.
+  - **About 03:30 UTC: the build DONE** (worktree .claude/worktrees/wf_2c76ec82-8fc-1, uncommitted on dae4f0f;
+    socket_tests.rs about 990 lines appended, M13 untouched by sha256; SERIES.md :427/:452 + one sentence; run.sh new;
+    check.mjs 9/9 twice: 267 measured / 281 bites; 22 of 22 bites). Reviews: netcode-architect, rust-reviewer and
+    test-engineer all APPROVE WITH FINDINGS, no regression. Findings: LOW (all three) the slack run condition demands
+    0 under a real-time policy, so the recorded `chrt -f -p` switch always makes the run INVALID (shown by a run);
+    LOW the loss band checked before log completeness (wrong cause on bites S4, S5); LOW the pre-touch not asserted;
+    nits (non-UTF-8 env, T6's agree branches and loss denominator, samples() panic before prints, run.sh check-mode
+    touch, SERIES.md "Its", FATE_BYTES import). INFO for the report: the CPU share's dilution against M13's 0.27.
+  - **About 03:32 UTC: the fix pass launched, workflow `wf_5c8d15c1-1f7` (npt-u3d-fix):** fix:u3d in the same worktree
+    (no isolation), then check:u3d-fix (test-engineer, the changed lines; notes u3d-fix-review-test.md). If cut:
+    snapshot the worktree (worktree_patch.py ... wip/u3d-build.patch u3d-build), then Workflow({scriptPath:
+    /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u3d-fix-wf_5c8d15c1-1f7.js,
+    resumeFromRunId: "wf_5c8d15c1-1f7"}).
   - **Done (launched about 01:38 UTC): workflow `wf_bbda74db-c79` (npt-u3d-plan-rev2) on dacdb77:** fold both critiques
     + Mustafa's shared-target rule into rev 2 (netcode-architect; notes u3d-plan-rev2-notes.md), a completeness check
     (test-engineer; u3d-plan-rev2-check.md; one fix pass if gaps), then the advisor's review of rev 2 (it returns text;

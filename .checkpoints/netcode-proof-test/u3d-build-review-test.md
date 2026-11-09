@@ -84,3 +84,43 @@ without -C / -c.
 - Extra coverage bites (debug; u3d-test-bites-extra.txt), restores == builder's: X1 agree() always "disagree": T6 PASSES
   (T6 tests only the disagree case). X2 the loss share over the Delivered count instead of every fate: T6 PASSES (10/1,010
   and 10/1,000 are both inside 0.95-1.05 %). Two report-only branches no test reaches: nits.
+- Step 4, run.sh in check mode (U3D_CHECK=1, shared folder, touch first; NPT_L2_SELFTEST_SECS=5, NPT_L2_SECS=2, 3
+  rounds): exit 0. Record moved out of results/ to u3d-test-runsh-check-20261109T031214Z.txt (not evidence; results/
+  holds run.sh only again). Built once (14 s), binary npt_net-f72f21a42e60b4c9 sha256 d0531316...898d (the same hash as
+  my clean build: the touch-rebuild is reproducible). Header: commit dae4f0f + "uncommitted changes", rustc 1.99.1,
+  binary + sha256, date, nproc 4, cargo_target_dir, lengths. U3-Q9's four facts all read: kernel 6.18.44-fc-v310;
+  clocksource tsc (available tsc kvm-clock); cpuidle driver none, governor menu; CONFIG_HZ 250 (from /proc/config.gz,
+  not CLK_TCK); THP "always [madvise] never". Six runs, each between uptime and every ^cpu line (cpu + cpu0-3) before
+  and after, a steal share per line (hand-checked SELFTEST 1's cpu line: Δ 58+0+169+1652+4+0+49+4 = 1,936, steal 4,
+  0.0021 = the script's), exit status 0 each, summary and loadavg_end. Self-test E (L0 = 0) up per round: 961 / 36,934 /
+  27,736 ns: pause-dominated, as plan §2 says.
+- Flake look (u3d-test-repeat.txt; debug binary built 03:13:44 after a touch): T1 + T2 + T7 together x 30 runs: 0
+  failed; the whole npt-net lib suite x 8 (160 passed, 12 ignored each, ~24.8 s): 0 failed.
+- M13's lines: base 483-639 and new 484-640 both sha256 29b21eab4938ffa2...; diff hunks only @@-2 (doc line), @@-3,0 +4
+  (import), @@-639,0 +641,992 (appended). No diff in Cargo.lock, socket.rs, stats.rs, thread.rs.
+- check.mjs run 2 (fresh touch 03:17:54, shared folder): 9/9 PASS. fmt 0.4 s; clippy 2.5 s; clippy-wasm32 0.4 s; test
+  77.1 s, measured 267 passed 0 failed 0 skips, bites 281 passed 0 failed 0 skips; deps 0.4 s; refs 481; marks 81; self
+  43/43; redact 10/10, 150 items 0 findings. Both npt_net test binaries newer than the touch (03:18:00, 03:18:36).
+  Counts equal run 1's.
+- End state: git status identical to the baseline (M socket_tests.rs, M SERIES.md, ?? results/u3d-timing/ with run.sh
+  only, ?? the builder's 4 notes); sha256 of socket_tests.rs, SERIES.md, run.sh, socket.rs, stats.rs, impair.rs,
+  Cargo.lock all equal the baseline; no .gate inside the worktree. The worktree is unchanged by me.
+
+## Findings (ranked)
+1. LOW, proven by a run: socket_tests.rs:1445-1449, :1627-1631. The slack condition demands start 0 under FIFO/RR, so
+   the recorded switch (chrt applied to the release thread after it started) is INVALID by construction (chrt-after
+   run: start 1, FIFO, left 1 right 0). Fix as netcode F1 / rust LOW.
+2. LOW: socket_tests.rs:1605-1610 before :1622-1626. The loss band is computed over the fate log's own count and asserted
+   before fate_log_full, so a short or pre-filled log (S4, S5) is INVALID under the wrong cause, and S5's prints read
+   E 0 ns "would PASS". Fix: assert the log complete (fate_log_full 0 and sm[d].fates == n) before the loss band.
+3. LOW: socket_tests.rs:1355-1374, :1466-1468. The pre-touch is no run condition: S6 (skipped) passes. Fix: assert
+   touched == cap after the prints (netcode F3, now shown to matter).
+4. NIT: socket_tests.rs:1326-1327. Non-UTF-8 NPT_L2_SELFTEST_SECS runs the 100 s default silently (proven).
+5. NIT: socket_tests.rs:900-906, :886, T6 :1231. agree()'s "agree" branch and the loss share's denominator are unbitten
+   (X1, X2 pass). Fix: two agree asserts; a 106-of-10,106 loss case (1.049 % PASS vs 1.06 % over Delivered FAIL).
+6. NIT: netcode F4 (samples() panic before prints), F5 (run.sh:52 touches *.rs only), F2 (SERIES.md:396 "Its"):
+   confirmed by reading.
+7. INFO: drive's accounting wait (:967-972) never exercised in a clean run (T2x); CPU dilution (F6): 0.383 core over
+   10.533 s vs ~0.404 over the 10 s send window.
+VERDICT: APPROVE WITH FINDINGS. Regressions: none.
+DONE (2026-11-09 03:20 UTC).
