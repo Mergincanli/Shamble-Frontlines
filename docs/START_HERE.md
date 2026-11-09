@@ -28,8 +28,8 @@ Gears of War (gun feel). Visual style: **"Living Comic"** (`ART_DIRECTION.md`). 
    `ART_DIRECTION.md` (the locked look) · `ANIMATION_PLAN.md`
    (animation system) · `AUDIT_BUGS_PERF.md` (what was measured/fixed, and what was kept on purpose) ·
    `ROADMAP.md` (history + plan) · `UNITS.md` (planned roster, not what's built) · `ui_theme_mockup.html` (UI look).
-5. **Plan first** (plan mode): your understanding of the relevant systems and your plan; **wait for Mustafa's
-   approval** before editing.
+5. **Plan first** (plan mode): your understanding of the relevant systems and your plan; **wait for the advisor's
+   approval** (or Mustafa's) before editing; a pure revert needs none (`CLAUDE.md`, Rollback) [verified 2026-11-08].
 
 ## 2. Architecture (compact — full map in `MODULE_MAP.md`)  **[verified]**
 

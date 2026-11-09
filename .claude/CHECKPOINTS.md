@@ -206,3 +206,24 @@ the agents' notes reach the remote even if the whole session is cut off:
    nothing; untracked notes don't count): the session checks it before marking the PR ready, and the advisor on review.
 4. A review fix that takes more than one step turns the PR back into a draft, starts a new checkpoint, and deletes it
    again in its last commit before the PR is marked ready once more.
+
+## 10. Disk hygiene (Mustafa, 2026-11-08; guidance, no rule change)
+His words: "clean finished units' build output with cargo clean --target-dir <dir>, and remove merged agent copies
+with git worktree remove (never --force; git refuses if a copy has unsaved work). Consider one shared Cargo target
+folder for all copies. No rule change: rm -rf stays denied."
+- Who runs it: day sessions. The night shift may remove merged copies but cannot run cargo; the PR Advisor runs
+  neither (the guard refuses both).
+- When a unit is finished, clean its build output. For the netcode proof test's spike (`spikes/netcode-proof/`, on its
+  branch until it merges): from its folder, `cargo clean` (its `.cargo/config.toml` names the folder); from the root,
+  `cargo clean --manifest-path spikes/netcode-proof/Cargo.toml --target-dir .gate/netcode-proof-test/target`.
+- When a change-set is merged, remove its agent copies with `git worktree remove <path>`, never with `--force`. Git
+  refuses a copy with changed or untracked files, but deletes ignored files (`.gate/`, builds, logs) and drops commits
+  on a detached HEAD. Before removing: nothing to keep in `git -C <path> status --short --ignored`; its HEAD is on a
+  pushed branch or inside main (`git merge-base --is-ancestor <HEAD> origin/main`); copies nested under it removed
+  first; then `git worktree prune`. A copy with work to keep stays until that work is saved. The night shift's
+  removals make the same checks.
+- To consider: one shared Cargo target folder for all copies, so each copy does not rebuild the same crates. Not for
+  two copies of the same workspace: Cargo gives their crates one slot, so a copy can run the other's build, and the
+  folder's lock lets one build run at a time. The netcode spike keeps one per copy (its `.cargo/config.toml` puts it
+  under the copy's `.gate/netcode-proof-test/target`).
+- `rm -rf` stays denied.

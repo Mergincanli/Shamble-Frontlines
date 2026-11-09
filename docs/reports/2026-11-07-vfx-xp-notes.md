@@ -68,6 +68,26 @@ A4, the review policy (kit, plan first): the kit freeze has lifted (his UNDER-WA
    (EDITOR_V2 §7, VISION_V2 §5) and that "XP" stays as you wrote it until XP-TERM. No Brave check.
 2. XP-TERM and LOOK, whenever suits you.
 
+## Corrections after the merge (2026-11-07, kit-v3-4)
+PR #43 merged as 69ea88e. The advisor's APPROVE WITH NOTES of the final head 4e03bb5 (PR #43 comment 6701970962) had
+four Low notes. Note 2 ("four register rows" in STATUS:107 and ROADMAP:94; there are five, OQ-0003-15 (README:103
+at 69ea88e) the fifth) is fixed where it lives, by kit-v3-4 (PR #44). The other three correct this report; the lines
+above keep their merged words.
+- Evidence, E4: "STATUS:660" should read STATUS:681. At #43's merge (69ea88e) the EDITOR_V2 citations (`:94` and
+  `:95`) stand on STATUS:681; STATUS:660 holds other text.
+- What changed: no clause went on R6-TEL-OQ2 (README:202 at 69ea88e), OQ-0005-AB3 (:69) or OQ-0005-AB5 (:66), and the
+  report did not say why. R6-TEL-OQ2 is about balance rates (whether bot and private matches count in them); AB3 is
+  the in-match weapon XP (a track's levels, earned in the match); AB5 is how an account-unlocked weapon reaches a
+  match, not what a match earns. None of them is about how much account progression a private match gives, so a
+  clause there would have mapped his "XP" by where it sits, before XP-TERM was answered.
+- Decisions needed, LOOK: it should have named OQ-0003-15 (the legacy look touches, comic words first; README:103 at
+  69ea88e), which his "Comic flavour" line bears on, as STATUS's LOOK follow-up does.
+
+Mustafa answered both questions on 2026-11-07, in the message that gave "merge #43": XP-TERM (a) and LOOK (a). His
+words are in STATUS ("From vfx-xp-notes"); kit-v3-4 records XP-TERM (a) beside his rule (VISION_V2:72-75) and in the
+register's R2-ROOM-OQ7 row (README:184). For LOOK his word is "(a)": LOOK_V2 §7 stands until his VFX style guide and
+the look proof test, as option (a) above reads.
+
 ## Appendix A: his words, whole (from the session's words file)
 The VFX editor item (2026-11-06, 23:27 UTC, session_0173vVo7FcYUpbWgRW8oQyHU):
 ```text
