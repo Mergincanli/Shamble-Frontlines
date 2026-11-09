@@ -1,5 +1,5 @@
 diff --git a/spikes/netcode-proof/crates/l1/src/lib.rs b/spikes/netcode-proof/crates/l1/src/lib.rs
-index c30d4ed..04367af 100644
+index c30d4ed..ab63ac5 100644
 --- a/spikes/netcode-proof/crates/l1/src/lib.rs
 +++ b/spikes/netcode-proof/crates/l1/src/lib.rs
 @@ -6,10 +6,12 @@
@@ -19,7 +19,7 @@ index c30d4ed..04367af 100644
  //! - **Datagrams** arrive at their send time plus their own delay, so the jitter reorders them where it is wider than
  //!   their spacing. **The reorder step** (R-5; part 13, the advisor's reading, 2026-11-06) adds what the jitter cannot:
  //!   a datagram it draws (1 % of a flow's datagrams) is overtaken by the next datagram of its flow: it is held until
-@@ -18,27 +20,54 @@
+@@ -18,27 +20,55 @@
  //!   ceiling, by up to one spacing: at P2 to P4 at 30 Hz about 1 % of datagrams do (P2's highest is about 93 ms against
  //!   its 60 ms ceiling; the advisor's U2 check). Where the spacing is wider than the delay (P0; one datagram per tick at
  //!   P1) the step finds nothing to swap, and the run's measured share says so. The step is on in every run.
@@ -60,9 +60,10 @@ index c30d4ed..04367af 100644
 +//! - **What L1 leaves out of QUIC** (C1' (g)): there is no congestion window, so after a burst L1 sends at once, while
 +//!   quinn, its window full of lost packets, waits for its next backed-off PTO (about 0.15 to 0.6 s after a burst at P2
 +//!   by quinn's formula, the phase deciding). Also left out: a second probe per PTO (quinn sends two; RFC 9002 §6.2.4
-+//!   allows up to two); a probe while only datagrams are in flight (quinn sends a PING; L1 arms no PTO then); the
-+//!   acknowledgement's own packet number, its delay and its frequency (L1 acknowledges every packet at once); and any
-+//!   undo of a spurious loss.
++//!   allows up to two); a probe while only datagrams are in flight (quinn sends a PING; L1 arms no PTO then), or when
++//!   every stream packet in flight carries data already acknowledged through another copy (L1 counts the expiry and
++//!   sends nothing; quinn sends a PING); the acknowledgement's own packet number, its delay and its frequency (L1
++//!   acknowledges every packet at once); and any undo of a spurious loss.
 +//! - **RTT** (the advisor's C2, advisor-u2.md:79-83) is each end's RFC 9002 §5.3 smoothed estimate from its
 +//!   acknowledgements, never the profile's value (plan §4.7, npt-lab). A sample comes only from the acknowledgement of
 +//!   the newest packet of its link and direction to arrive, when that acknowledgement newly acknowledges it at the
@@ -93,7 +94,7 @@ index c30d4ed..04367af 100644
  //! - **Not built:** a rate limit and duplication. No L1 row of the netcode proof test needs them (the throttle and the
  //!   bottleneck are L2's, PM-0001-23 and -24).
  //!
-@@ -50,19 +79,23 @@ use rand_chacha::ChaCha8Rng;
+@@ -50,19 +80,23 @@ use rand_chacha::ChaCha8Rng;
  use rand_core::{Rng, SeedableRng};
  use std::cell::RefCell;
  use std::cmp::{Ordering, Reverse};
@@ -120,7 +121,7 @@ index c30d4ed..04367af 100644
  /// Six words: twelve 32-bit uniforms for the normal-jitter bite.
  #[cfg(feature = "bites")]
  const W_NORMAL: usize = 4;
-@@ -70,6 +103,32 @@ const W_NORMAL: usize = 4;
+@@ -70,6 +104,32 @@ const W_NORMAL: usize = 4;
  /// The fixed part of the 32-byte ChaCha8 key; the run's seed, little-endian, fills the first 8 bytes.
  const KEY_TAG: &[u8; 24] = b"npt-l1 fate draws, v1\0\0\0";
  
@@ -153,7 +154,7 @@ index c30d4ed..04367af 100644
  /// The explicit reorder step per flow and direction (R-5; ADR 0001 part 13).
  #[derive(Debug, Clone, Copy, PartialEq, Eq)]
  pub struct ReorderStep {
-@@ -156,10 +215,6 @@ impl Profile {
+@@ -156,10 +216,6 @@ impl Profile {
      pub fn half_jitter_ns(&self) -> u64 {
          self.jitter_ns / 2
      }
@@ -164,7 +165,7 @@ index c30d4ed..04367af 100644
      fn in_burst(&self, t: u64) -> bool {
          self.bursts_ns
              .iter()
-@@ -191,6 +246,15 @@ fn recv_dir(end: usize) -> Dir {
+@@ -191,6 +247,15 @@ fn recv_dir(end: usize) -> Dir {
      if end == CLIENT { Dir::Down } else { Dir::Up }
  }
  
@@ -180,7 +181,7 @@ index c30d4ed..04367af 100644
  fn channel_code(c: Channel) -> u8 {
      match c {
          Channel::Datagram => 0,
-@@ -199,6 +263,14 @@ fn channel_code(c: Channel) -> u8 {
+@@ -199,6 +264,14 @@ fn channel_code(c: Channel) -> u8 {
      }
  }
  
@@ -195,7 +196,7 @@ index c30d4ed..04367af 100644
  #[derive(Debug, Clone, Copy, PartialEq, Eq)]
  enum Outcome {
      Delivered { arrival_ns: u64 },
-@@ -206,28 +278,49 @@ enum Outcome {
+@@ -206,28 +279,52 @@ enum Outcome {
      Burst,
  }
  
@@ -215,7 +216,10 @@ index c30d4ed..04367af 100644
 +    },
 +    /// An acknowledgement: the number of the packet whose arrival sent it (in the other direction's space) and the
 +    /// largest number received in that space by then.
-+    Ack { acked: u64, largest: u64 },
++    Ack {
++        acked: u64,
++        largest: u64,
++    },
 +}
 +
 +/// One packet's or acknowledgement's entry in the fate log.
@@ -250,7 +254,7 @@ index c30d4ed..04367af 100644
  
  impl FateLog {
      pub fn len(&self) -> usize {
-@@ -238,22 +331,33 @@ impl FateLog {
+@@ -238,22 +335,33 @@ impl FateLog {
          self.entries.is_empty()
      }
  
@@ -290,7 +294,7 @@ index c30d4ed..04367af 100644
              b[6] = kind;
              b[7] = u8::from(e.overtaken);
              b[8..16].copy_from_slice(&e.seq.to_le_bytes());
-@@ -261,7 +365,28 @@ impl FateLog {
+@@ -261,7 +369,28 @@ impl FateLog {
              b[24..32].copy_from_slice(&arrival.to_le_bytes());
              b[32..36].copy_from_slice(&e.len.to_le_bytes());
              b[36..40].copy_from_slice(&e.retransmits.to_le_bytes());
@@ -320,7 +324,7 @@ index c30d4ed..04367af 100644
          }
      }
  
-@@ -276,7 +401,7 @@ impl FateLog {
+@@ -276,7 +405,7 @@ impl FateLog {
              .iter()
              .enumerate()
              .filter_map(|(i, e)| match e.outcome {
@@ -329,7 +333,7 @@ index c30d4ed..04367af 100644
                      Some(((e.link, e.dir), (arrival_ns, i, e.seq)))
                  }
                  _ => None,
-@@ -305,55 +430,185 @@ impl FateLog {
+@@ -305,55 +434,187 @@ impl FateLog {
      }
  }
  
@@ -381,7 +385,9 @@ index c30d4ed..04367af 100644
 +    HeldDue,
 +    Ack(AckInfo),
 +    /// A space's loss-detection timer: the time threshold's or the PTO.
-+    Timer { generation: u64 },
++    Timer {
++        generation: u64,
++    },
 +}
 +
 +/// An internal event, applied in (time, fate-log index, kind) order; the rest only makes the order total.
@@ -534,7 +540,7 @@ index c30d4ed..04367af 100644
          match self.smoothed {
              None => {
                  self.smoothed = Some(s);
-@@ -365,14 +620,99 @@ impl Rtt {
+@@ -365,14 +626,99 @@ impl Rtt {
              }
          }
      }
@@ -638,7 +644,7 @@ index c30d4ed..04367af 100644
  }
  
  #[cfg(feature = "bites")]
-@@ -382,15 +722,32 @@ enum Bite {
+@@ -382,6 +728,14 @@ enum Bite {
      LossPerRoundTrip,
      NormalJitter,
      ClockSeed,
@@ -652,16 +658,16 @@ index c30d4ed..04367af 100644
 +    SendsBeforeEvents,
  }
  
--/// The planted defects of PM-0001-3's L1 half (its row's bites; marks.json's ids).
-+/// The planted defects: PM-0001-3's L1 half (its row's bites; marks.json's ids), then the link model's own (U4c: C1'
-+/// and C2, each failing its L-c test; no mark names them).
- #[cfg(feature = "bites")]
--const BITE_IDS: [(&str, Bite); 4] = [
-+const BITE_IDS: [(&str, Bite); 12] = [
-     ("PM-0001-3/rtt-each-way", Bite::RttEachWay),
-     ("PM-0001-3/loss-per-round-trip", Bite::LossPerRoundTrip),
-     ("PM-0001-3/normal-jitter", Bite::NormalJitter),
+ /// The planted defects of PM-0001-3's L1 half (its row's bites; marks.json's ids).
+@@ -393,6 +747,21 @@ const BITE_IDS: [(&str, Bite); 4] = [
      ("PM-0001-3/clock-seed", Bite::ClockSeed),
+ ];
+ 
++/// The link model's own planted defects (U4c: C1' and C2, each failing its L-c test). No mark names them, so only this
++/// crate's unit tests choose them (`L1Net::with_model_bite`); the planted code is in every `bites` build, as the marks'
++/// bites are.
++#[cfg(all(test, feature = "bites"))]
++const MODEL_BITE_IDS: [(&str, Bite); 8] = [
 +    ("npt-l1/no-pto-doubling", Bite::NoPtoDoubling),
 +    ("npt-l1/acks-in-bursts", Bite::AcksInBursts),
 +    ("npt-l1/every-packet-sampled", Bite::EveryPacketSampled),
@@ -670,10 +676,12 @@ index c30d4ed..04367af 100644
 +    ("npt-l1/separate-spaces", Bite::SeparateSpaces),
 +    ("npt-l1/events-at-polls", Bite::EventsAtPolls),
 +    ("npt-l1/sends-before-events", Bite::SendsBeforeEvents),
- ];
- 
++];
++
  /// The bite PM-0001-3/clock-seed itself: the seed read from the wall clock, the defect the fate-log identity catches.
-@@ -442,25 +799,34 @@ impl Model {
+ #[cfg(feature = "bites")]
+ #[allow(clippy::disallowed_methods, clippy::disallowed_types)]
+@@ -442,25 +811,34 @@ impl Model {
      }
  }
  
@@ -716,7 +724,7 @@ index c30d4ed..04367af 100644
  }
  
  struct Net {
-@@ -468,8 +834,11 @@ struct Net {
+@@ -468,8 +846,14 @@ struct Net {
      links: Vec<LinkSim>,
      log: FateLog,
      accepts: VecDeque<u32>,
@@ -725,10 +733,13 @@ index c30d4ed..04367af 100644
      bite: Option<Bite>,
 +    #[cfg(test)]
 +    trace: Trace,
++    /// Plants for links not yet connected, (link, plant): each moves to its link at the connect.
++    #[cfg(test)]
++    forced: Vec<(u32, Forced)>,
  }
  
  fn stream_rng(key: &[u8; 32], stream: u64) -> ChaCha8Rng {
-@@ -478,8 +847,8 @@ fn stream_rng(key: &[u8; 32], stream: u64) -> ChaCha8Rng {
+@@ -478,8 +862,8 @@ fn stream_rng(key: &[u8; 32], stream: u64) -> ChaCha8Rng {
      rng
  }
  
@@ -739,7 +750,7 @@ index c30d4ed..04367af 100644
  }
  
  fn draw(rng: &mut ChaCha8Rng) -> [u64; WORDS] {
-@@ -490,6 +859,12 @@ fn draw(rng: &mut ChaCha8Rng) -> [u64; WORDS] {
+@@ -490,6 +874,12 @@ fn draw(rng: &mut ChaCha8Rng) -> [u64; WORDS] {
      w
  }
  
@@ -752,7 +763,7 @@ index c30d4ed..04367af 100644
  impl LinkSim {
      fn up(&self) -> bool {
          self.open[CLIENT] && self.open[SERVER]
-@@ -509,39 +884,122 @@ impl LinkSim {
+@@ -509,39 +899,122 @@ impl LinkSim {
          below(w[W_LOSS], 1_000_000) < u64::from(self.model.loss_ppm)
      }
  
@@ -776,18 +787,18 @@ index c30d4ed..04367af 100644
 +        base.saturating_mul(1u64.checked_shl(self.pto_count[d]).unwrap_or(u64::MAX))
      }
 +}
- 
--    fn advance_acks(&mut self, end: usize, now_ns: u64) {
--        while self.acks[end].peek().is_some_and(|a| a.0.at_ns <= now_ns) {
--            if let Some(Reverse(a)) = self.acks[end].pop() {
--                self.rtt[end].sample(a.sample_ns);
++
 +/// Which kind of call enters the net: a poll, or any other call that takes `now_ns`.
 +#[derive(Clone, Copy, PartialEq, Eq)]
 +enum Call {
 +    Send,
 +    Poll,
 +}
-+
+ 
+-    fn advance_acks(&mut self, end: usize, now_ns: u64) {
+-        while self.acks[end].peek().is_some_and(|a| a.0.at_ns <= now_ns) {
+-            if let Some(Reverse(a)) = self.acks[end].pop() {
+-                self.rtt[end].sample(a.sample_ns);
 +impl Net {
 +    /// What a call does before its own work: apply every event due at or before `now_ns` (the events-at-polls bite: only
 +    /// in polls, each at the poll's instant; the sends-before-events bite: in a send, only those before its instant).
@@ -896,7 +907,22 @@ index c30d4ed..04367af 100644
              })
          });
          let model = Model {
-@@ -564,22 +1022,39 @@ impl Net {
+@@ -557,6 +1030,14 @@ impl Net {
+             Ipv4Addr::new(10, b, c, d),
+             40_000 + u16::from(a),
+         ));
++        #[cfg(test)]
++        let forced: Vec<Forced> = {
++            let (mine, rest) = std::mem::take(&mut self.forced)
++                .into_iter()
++                .partition(|(l, _)| *l == id);
++            self.forced = rest;
++            mine.into_iter().map(|(_, f)| f).collect()
++        };
+         self.links.push(LinkSim {
+             profile,
+             model,
+@@ -564,22 +1045,39 @@ impl Net {
              addr,
              max_datagram,
              flows,
@@ -913,7 +939,7 @@ index c30d4ed..04367af 100644
              round_trip: [0u64, 1, 2]
                  .map(|ch| stream_rng(&key, (u64::from(id) << 16) | (0xFF << 8) | ch)),
 +            #[cfg(test)]
-+            forced: Vec::new(),
++            forced,
          });
          self.accepts.push_back(id);
          id
@@ -941,7 +967,7 @@ index c30d4ed..04367af 100644
          if !l.up() {
              return SendResult::Sent;
          }
-@@ -587,15 +1062,15 @@ impl Net {
+@@ -587,15 +1085,15 @@ impl Net {
              return SendResult::TooLarge;
          }
          let dir = send_dir(end);
@@ -964,7 +990,7 @@ index c30d4ed..04367af 100644
              Outcome::Lost
          } else {
              Outcome::Delivered {
-@@ -604,9 +1079,9 @@ impl Net {
+@@ -604,9 +1102,9 @@ impl Net {
          };
          let index = log.entries.len() as u64;
          log.entries.push(Fate {
@@ -976,7 +1002,7 @@ index c30d4ed..04367af 100644
              seq,
              sent_ns: now_ns,
              len: u32::try_from(bytes.len()).unwrap_or(u32::MAX),
-@@ -614,35 +1089,57 @@ impl Net {
+@@ -614,35 +1112,57 @@ impl Net {
              overtaken: false,
              retransmits: 0,
          });
@@ -1049,7 +1075,7 @@ index c30d4ed..04367af 100644
              }
          }
          SendResult::Sent
-@@ -656,95 +1153,536 @@ impl Net {
+@@ -656,95 +1176,536 @@ impl Net {
          bytes: &[u8],
          now_ns: u64,
      ) -> SendResult {
@@ -1452,7 +1478,8 @@ index c30d4ed..04367af 100644
 +                sample_ns,
 +                pn,
 +            });
-+        }
+         }
+-        let inbox = &mut l.inbox[dir as usize];
 +        if !newly {
 +            return;
 +        }
@@ -1525,8 +1552,7 @@ index c30d4ed..04367af 100644
 +        let want = due.map(|(at, key)| (at.max(t), key));
 +        if want == sp.timer {
 +            return;
-         }
--        let inbox = &mut l.inbox[dir as usize];
++        }
 +        sp.timer = want;
 +        sp.generation += 1;
 +        if let Some((at_ns, key)) = want {
@@ -1644,7 +1670,7 @@ index c30d4ed..04367af 100644
  /// One end of a simulated link.
  struct End {
      net: Rc<RefCell<Net>>,
-@@ -782,7 +1720,7 @@ impl Link for End {
+@@ -782,7 +1743,7 @@ impl Link for End {
      }
  
      fn rtt_ns(&self) -> Option<u64> {
@@ -1653,7 +1679,7 @@ index c30d4ed..04367af 100644
      }
  
      fn max_datagram_size(&self) -> usize {
-@@ -807,6 +1745,7 @@ struct L1Listener {
+@@ -807,6 +1768,7 @@ struct L1Listener {
  impl Listener for L1Listener {
      fn poll_accept(&mut self, now_ns: u64) -> Option<(Box<dyn Link>, SocketAddr)> {
          let mut net = self.net.borrow_mut();
@@ -1661,7 +1687,7 @@ index c30d4ed..04367af 100644
          let &id = net.accepts.front()?;
          let l = &net.links[id as usize];
          if l.created_ns >= now_ns {
-@@ -842,18 +1781,34 @@ impl L1Net {
+@@ -842,8 +1804,13 @@ impl L1Net {
                  links: Vec::new(),
                  log: FateLog::default(),
                  accepts: VecDeque::new(),
@@ -1670,38 +1696,29 @@ index c30d4ed..04367af 100644
                  bite: None,
 +                #[cfg(test)]
 +                trace: Trace::default(),
++                #[cfg(test)]
++                forced: Vec::new(),
              })),
          }
      }
+@@ -867,6 +1834,16 @@ impl L1Net {
+         Some(net)
+     }
  
--    /// The bite ids this crate plants (`bites` builds only).
-+    /// The bite ids this crate plants (`bites` builds only): PM-0001-3's four (marks.json's ids), then the link model's
-+    /// own eight (U4c), which only its unit tests run.
-     #[cfg(feature = "bites")]
--    pub const BITES: [&'static str; 4] =
--        [BITE_IDS[0].0, BITE_IDS[1].0, BITE_IDS[2].0, BITE_IDS[3].0];
--
--    /// A net with one planted defect, by its marks.json id (`bites` builds only); `None` for an id it does not plant.
-+    pub const BITES: [&'static str; 12] = [
-+        BITE_IDS[0].0,
-+        BITE_IDS[1].0,
-+        BITE_IDS[2].0,
-+        BITE_IDS[3].0,
-+        BITE_IDS[4].0,
-+        BITE_IDS[5].0,
-+        BITE_IDS[6].0,
-+        BITE_IDS[7].0,
-+        BITE_IDS[8].0,
-+        BITE_IDS[9].0,
-+        BITE_IDS[10].0,
-+        BITE_IDS[11].0,
-+    ];
++    /// A net with one of the link model's planted defects, by its `npt-l1/` id (the unit tests' only); `None` for an id
++    /// it does not plant.
++    #[cfg(all(test, feature = "bites"))]
++    fn with_model_bite(seed: u64, bite: &str) -> Option<L1Net> {
++        let (_, b) = MODEL_BITE_IDS.iter().find(|(id, _)| *id == bite)?;
++        let net = L1Net::new(seed);
++        net.net.borrow_mut().bite = Some(*b);
++        Some(net)
++    }
 +
-+    /// A net with one planted defect, by its id (`bites` builds only); `None` for an id it does not plant.
-     #[cfg(feature = "bites")]
-     pub fn with_bite(seed: u64, bite: &str) -> Option<L1Net> {
-         let (_, b) = BITE_IDS.iter().find(|(id, _)| *id == bite)?;
-@@ -893,149 +1848,22 @@ impl L1Net {
+     /// Opens a link under `profile` and returns its client end; its server end waits for the listener from the next
+     /// instant on.
+     pub fn connect(
+@@ -893,149 +1870,26 @@ impl L1Net {
          })
      }
  
@@ -1761,7 +1778,14 @@ index c30d4ed..04367af 100644
 -                ReorderStep::PART_13,
 -                "{name}: every run also reordering"
 -            );
--        }
++    /// Plants a send's loss for a unit test (link by connect order), before or after its connect.
++    #[cfg(test)]
++    fn force(&self, link: u32, f: Forced) {
++        let mut net = self.net.borrow_mut();
++        match net.links.get_mut(link as usize) {
++            Some(l) => l.forced.push(f),
++            None => net.forced.push((link, f)),
+         }
 -        let b1 = Profile::b1(&[5 * SEC]);
 -        assert_eq!(b1.bursts_ns, vec![(5 * SEC, SEC)]);
 -        assert!(!b1.in_burst(5 * SEC - 1) && b1.in_burst(5 * SEC) && b1.in_burst(6 * SEC - 1));
@@ -1857,18 +1881,234 @@ index c30d4ed..04367af 100644
 -            ],
 -        };
 -        assert_eq!(log.reorder_counts(), [(6, 2), (0, 0)]);
-+    /// Plants a send's loss for a unit test (link by connect order).
-+    #[cfg(test)]
-+    fn force(&self, link: u32, f: Forced) {
-+        self.net.borrow_mut().links[link as usize].forced.push(f);
      }
  }
+diff --git a/spikes/netcode-proof/crates/l1/tests/l1.rs b/spikes/netcode-proof/crates/l1/tests/l1.rs
+index c7b2593..f683e75 100644
+--- a/spikes/netcode-proof/crates/l1/tests/l1.rs
++++ b/spikes/netcode-proof/crates/l1/tests/l1.rs
+@@ -48,9 +48,9 @@ struct Run {
+ }
+ 
+ /// `n` datagrams each way, one every `spacing_ns` from `spacing_ns` on, both ends polled before sending at every step,
+-/// then steps until everything has arrived.
++/// then steps until everything has arrived (a datagram is never resent, so 4 s is ample).
+ fn exchange(net: L1Net, profile: Profile, n: u64, spacing_ns: u64) -> Run {
+-    let drain_until = n * spacing_ns + 4 * SEC + 8 * profile.rto_ns();
++    let drain_until = n * spacing_ns + 4 * SEC;
+     let mut client = net.connect(profile, 1200, 0);
+     let mut listener = net.listener();
+     let mut server: Option<Box<dyn Link>> = None;
+@@ -346,7 +346,6 @@ fn delivery_follows_arrival_order_and_stamps_the_arrival_never_the_poll() {
+ #[test]
+ fn streams_lose_nothing_keep_their_order_and_wait_out_a_burst() {
+     let p = Profile::b1(&[2 * SEC]);
+-    let rto = p.rto_ns();
+     let net = L1Net::new(3);
+     let mut c = net.connect(p, 1200, 0);
+     let mut listener = net.listener();
+@@ -355,7 +354,7 @@ fn streams_lose_nothing_keep_their_order_and_wait_out_a_burst() {
+     let mut full = Vec::new();
+     let mut t = MS;
+     let mut k = 0u64;
+-    while t <= 6 * SEC + 8 * rto {
++    while t <= 8 * SEC {
+         if s.is_none() {
+             s = listener.poll_accept(t).map(|(l, _)| l);
+         }
+@@ -382,24 +381,172 @@ fn streams_lose_nothing_keep_their_order_and_wait_out_a_burst() {
+     for stream in [&control, &full] {
+         assert!(stream.windows(2).all(|w| w[0].seq < w[1].seq), "in order");
+     }
+-    // A message sent inside the burst [2 s, 3 s) waits for the first retry outside it.
+-    for g in control
+-        .iter()
+-        .filter(|g| (2 * SEC..3 * SEC).contains(&g.sent_ns))
+-    {
+-        assert!(
+-            g.arrival_ns >= 3 * SEC + 40 * MS,
+-            "seq {} arrived at {}",
+-            g.seq,
+-            g.arrival_ns
+-        );
++    // A message sent inside the burst [2 s, 3 s) waits for its first resend outside it. With a packet sent every
++    // millisecond the PTO never fires (each send restarts it); the first acknowledgement after the burst, about 3.1 s,
++    // declares every packet of the burst lost by the packet threshold, and their resends arrive about 50 ms later.
++    for stream in [&control, &full] {
++        for g in stream
++            .iter()
++            .filter(|g| (2 * SEC..3 * SEC).contains(&g.sent_ns))
++        {
++            assert!(
++                (3 * SEC + 40 * MS..3 * SEC + 600 * MS).contains(&g.arrival_ns),
++                "seq {} arrived at {}",
++                g.seq,
++                g.arrival_ns
++            );
++        }
+     }
+-    // Outside the burst, about 2 % of messages wait one retransmission timeout, and hold back those behind them.
++    // Outside the burst, P2's 2 % loss makes some messages wait for a resend, past the one-way ceiling of 60 ms, and
++    // hold back those behind them.
+     let late = control
+         .iter()
+-        .filter(|g| g.sent_ns < 2 * SEC && g.delay() >= rto)
++        .filter(|g| g.sent_ns < 2 * SEC && g.delay() > 60 * MS)
+         .count();
+-    assert!(late > 0, "some messages were retransmitted");
++    assert!(late > 0, "some messages were resent");
++    let resent = net.with_fate_log(|log| {
++        let mut n = 0u64;
++        log.for_each_canonical(|b| {
++            // A stream packet's entry (64 bytes) whose resends field is above 0.
++            if b.len() == 64 && u32::from_le_bytes(b[36..40].try_into().unwrap()) > 0 {
++                n += 1;
++            }
++        });
++        n
++    });
++    assert!(
++        resent > 1_000,
++        "{resent} resends: the burst's packets and 2 % of the rest"
++    );
++}
++
++/// The mixed run of L-c8's unit half: 3,000 steps of 1 ms, a datagram each way per step, a control message up every
++/// 3rd step and a 1,500 B full state down every 5th, then 4 s of polls.
++fn mixed(profile: Profile, seed: u64) -> L1Net {
++    let net = L1Net::new(seed);
++    let mut c = net.connect(profile, 1200, 0);
++    let mut listener = net.listener();
++    let mut s: Option<Box<dyn Link>> = None;
++    let mut t = MS;
++    let mut k = 0u64;
++    let big = [7u8; 1500];
++    while t <= 3_000 * MS + 4 * SEC {
++        if s.is_none() {
++            s = listener.poll_accept(t).map(|(l, _)| l);
++        }
++        let srv = s.as_mut().expect("accepted at the first step");
++        while srv.poll_recv(t).is_some() {}
++        while c.poll_recv(t).is_some() {}
++        if k < 3_000 {
++            if k.is_multiple_of(3) {
++                c.send_reliable(Channel::Control, b"a control", t);
++            }
++            c.send_unreliable(&payload(k, t), t);
++            if k.is_multiple_of(5) {
++                srv.send_reliable(Channel::FullState, &big, t);
++            }
++            srv.send_unreliable(&payload(k, t), t);
++            k += 1;
++        }
++        t += MS;
++    }
++    net
++}
++
++/// FNV-1a-64 of v1's tag (`npt-l1 fate log v1` and a newline) followed by the log's datagram entries in its canonical
++/// form (each 40 bytes, flow code 0), and how many of each kind of entry the log holds: (datagram, stream, ack).
++fn v1_datagram_fnv(log: &FateLog) -> (u64, [u64; 3]) {
++    let mut h: u64 = 0xcbf2_9ce4_8422_2325;
++    let mut eat = |b: &[u8]| {
++        for &x in b {
++            h ^= u64::from(x);
++            h = h.wrapping_mul(0x0000_0100_0000_01b3);
++        }
++    };
++    eat(b"npt-l1 fate log v1\n");
++    let mut counts = [0u64; 3];
++    let mut tag = true;
++    log.for_each_canonical(|b| {
++        if tag {
++            assert_eq!(b, b"npt-l1 fate log v2\n");
++            tag = false;
++            return;
++        }
++        match (b.len(), b[5]) {
++            (40, 0) => {
++                counts[0] += 1;
++                eat(b);
++            }
++            (64, 1 | 2) => counts[1] += 1,
++            (56, 3) => counts[2] += 1,
++            other => panic!("an entry of {} bytes with flow code {}", other.0, other.1),
++        }
++    });
++    (h, counts)
++}
++
++/// L-c8's unit half (u4-build-plan.md §5 U4c; Q15's fate log v2): a datagram's entry keeps v1's 40-byte form, and its
++/// fate does not move with the stream packets and acknowledgements around it, so v1's tag followed by a v2 log's
++/// datagram entries are the bytes v1's tag and datagram entries were for the same run. For the probe, whose v1 log holds
++/// only datagrams, that is v1's whole log, the hash L-c8 compares. The pins are those bytes' FNV-1a-64 for this mixed
++/// run on the U2 code (097f897, before U4c), for P2, B1 with a burst at 1 s, and P4, seed 1. (The judged half, the
++/// probe's SHA-256 against U2's committed 913db8e9, feabf2f0 and b8a04f2f, runs with -3's re-run after U4j.)
++#[test]
++fn v1s_tag_and_the_v2_logs_datagram_entries_hash_as_v1s_log_did() {
++    for (p, pin) in [
++        (Profile::p2(), 0xadfb_ebe4_bb1a_bf64_u64),
++        (Profile::b1(&[SEC]), 0x4374_9a62_922e_9b35),
++        (Profile::p4(), 0x246e_7a24_1a2a_0a18),
++    ] {
++        let name = p.name;
++        let (h, [datagrams, stream, acks]) = mixed(p, 1).with_fate_log(v1_datagram_fnv);
++        assert_eq!(datagrams, 6_000, "{name}: every datagram has its entry");
++        assert!(
++            stream > 1_600 && acks > datagrams,
++            "{name}: {stream} stream packets and {acks} acknowledgements logged beside them"
++        );
++        assert_eq!(
++            h, pin,
++            "{name}: the datagram entries are not v1's ({h:#018x})"
++        );
++    }
++}
++
++#[test]
++fn next_event_ns_names_the_next_arrival_then_its_acknowledgement_then_nothing() {
++    let net = L1Net::new(5);
++    assert_eq!(net.next_event_ns(), None, "nothing pending on a new net");
++    let mut c = net.connect(Profile::p2(), 1200, 0);
++    let mut listener = net.listener();
++    let (mut s, _) = listener.poll_accept(1).unwrap();
++    assert_eq!(net.next_event_ns(), None);
++    c.send_unreliable(b"one", 10 * MS);
++    let arrival = net.next_event_ns().expect("the datagram's arrival");
++    assert!((50 * MS..=70 * MS).contains(&arrival), "{arrival}");
++    assert!(s.poll_recv(arrival - 1).is_none(), "nothing before it");
++    let r = s.poll_recv(arrival).expect("handed out at its arrival");
++    assert_eq!(r.arrival_ns, arrival);
++    let ack = net.next_event_ns().expect("its acknowledgement's arrival");
++    assert!(
++        (arrival + 40 * MS..=arrival + 60 * MS).contains(&ack),
++        "{ack}"
++    );
++    assert_eq!(
++        c.rtt_ns(),
++        None,
++        "no sample before the acknowledgement arrives"
++    );
++    assert!(c.poll_recv(ack).is_none());
++    assert_eq!(
++        c.rtt_ns(),
++        Some(ack - 10 * MS),
++        "the first sample sets the estimate"
++    );
++    assert_eq!(
++        net.next_event_ns(),
++        None,
++        "a datagram arms no probe timer, so nothing is left"
++    );
+ }
+ 
+ #[test]
 diff --git a/spikes/netcode-proof/crates/l1/src/tests.rs b/spikes/netcode-proof/crates/l1/src/tests.rs
 new file mode 100644
-index 0000000..fa088c4
+index 0000000..f81dbe5
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/l1/src/tests.rs
-@@ -0,0 +1,1183 @@
+@@ -0,0 +1,1331 @@
 +//! npt-l1's unit tests: the helpers, and the link model's L-c tests (u4-build-plan.md §5 U4c; the advisor's C1' and C2),
 +//! which read the model's state and its test-only trace. Each L-c test is a check that returns its first failure as an
 +//! `Err` naming it, run on clean nets here and, in bites builds, on each planted defect, which must fail it.
@@ -1913,7 +2153,9 @@ index 0000000..fa088c4
 +        let ends: Vec<[Box<dyn Link>; 2]> = clients
 +            .into_iter()
 +            .map(|c| {
-+                let (s, _) = listener.poll_accept(1).expect("accepted from the next instant on");
++                let (s, _) = listener
++                    .poll_accept(1)
++                    .expect("accepted from the next instant on");
 +                [c, s]
 +            })
 +            .collect();
@@ -2183,10 +2425,21 @@ index 0000000..fa088c4
 +        "a datagram lost in a burst"
 +    );
 +    assert_eq!(&d[16..24], &9u64.to_le_bytes());
-+    assert_eq!(&d[24..32], &0u64.to_le_bytes(), "no arrival for a lost packet");
-+    assert_eq!(&a[0..8], &[2, 0, 0, 0, 0, 3, 1, 0], "an acknowledgement, lost");
++    assert_eq!(
++        &d[24..32],
++        &0u64.to_le_bytes(),
++        "no arrival for a lost packet"
++    );
++    assert_eq!(
++        &a[0..8],
++        &[2, 0, 0, 0, 0, 3, 1, 0],
++        "an acknowledgement, lost"
++    );
 +    assert_eq!(&a[8..16], &10u64.to_le_bytes());
-+    assert_eq!(&a[40..56], &[11, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0]);
++    assert_eq!(
++        &a[40..56],
++        &[11, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0]
++    );
 +}
 +
 +#[test]
@@ -2318,7 +2571,7 @@ index 0000000..fa088c4
 +}
 +
 +#[test]
-+fn lc1_a_lost_control_message_under_30_hz_datagrams_at_p2_is_declared_lost_by_the_loss_rules_and_resent() {
++fn lc1_a_lost_control_message_under_30_hz_datagrams_at_p2_is_declared_lost_and_resent() {
 +    for seed in [1, 2, 3] {
 +        lc1(L1Net::new(seed)).unwrap();
 +    }
@@ -2327,7 +2580,9 @@ index 0000000..fa088c4
 +/// L-c2 (C1' (c), (f)): P2's delays with no loss but the planted one; 4 s of 30 Hz datagrams both ways settle the
 +/// estimate, then the link is quiet; at 5 s one control message, its first packet lost, and nothing else. It is resent
 +/// at its PTO, smoothed RTT + max(4 x variance, 1 ms) + 25 ms after its send: about 155-160 ms (advisor-u3q.md:170).
-+/// Returns that PTO.
++/// The estimate is an average of samples 80 to 120 ms (two uniform ±10 ms one-way delays), so the PTO is near 100 +
++/// 4 x 6.9 + 25 = 152.6 ms and spreads with the variance's 1/4-weight average: 60 seeds gave 138.3 to 175.6 ms, mean
++/// 152.7 (measured at U4c's build). Each seed's lies in [130, 180] ms. Returns that PTO.
 +fn lc2(net: L1Net) -> Result<u64, String> {
 +    lose_up(&net, 0, piece(Channel::Control, 0, 0), 0);
 +    let mut rig = Rig::new(net, &[lossless(Profile::p2())]);
@@ -2349,8 +2604,8 @@ index 0000000..fa088c4
 +        ms(pto)
 +    );
 +    ensure!(
-+        (140 * MS..=170 * MS).contains(&pto),
-+        "L-c2: a PTO of {:.3} ms at P2, not about 155-160 ms",
++        (130 * MS..=180 * MS).contains(&pto),
++        "L-c2: a PTO of {:.3} ms at P2, outside [130, 180] ms",
 +        ms(pto)
 +    );
 +    let log = rig.entries();
@@ -2361,19 +2616,31 @@ index 0000000..fa088c4
 +        sends.len()
 +    );
 +    let a = arrival_of(&sends[1].1);
++    let control: Vec<&Got> = rig.got[0][SERVER]
++        .iter()
++        .filter(|g| g.0 == Channel::Control)
++        .collect();
 +    ensure!(
-+        rig.got[0][SERVER] == [(Channel::Control, b"quiet".to_vec(), a.unwrap_or(0))],
-+        "L-c2: the message was not handed out at its resend's arrival"
++        a.is_some() && control == [&(Channel::Control, b"quiet".to_vec(), a.unwrap_or(0))],
++        "L-c2: the message was not handed out once, at its resend's arrival"
 +    );
 +    Ok(pto)
 +}
 +
 +#[test]
 +fn lc2_a_lost_message_on_a_quiet_link_at_p2_is_resent_at_its_pto() {
-+    for seed in [1, 2, 3] {
++    let mut sum = 0;
++    for seed in 1..=10 {
 +        let pto = lc2(L1Net::new(seed)).unwrap();
 +        println!("L-c2 seed {seed}: PTO {:.3} ms", ms(pto));
++        sum += pto;
 +    }
++    let mean = sum / 10;
++    assert!(
++        (145 * MS..=160 * MS).contains(&mean),
++        "L-c2: a mean PTO of {:.3} ms over seeds 1 to 10 at P2, not about 152.6 ms",
++        ms(mean)
++    );
 +}
 +
 +/// L-c3 (C1' (c), (d), (f)): B1's delays with no loss but its 1 s burst at 6 s; 30 Hz datagrams both ways until 5 s
@@ -2448,16 +2715,30 @@ index 0000000..fa088c4
 +    let first0 = sends_of(&log, 0, Dir::Up, Channel::Control, 0)[0].1.clone();
 +    let a0 = arrival_of(&first0).unwrap_or(0);
 +    let ack0 = log.iter().find(|e| {
-+        e.link == 0 && e.dir == Dir::Down && matches!(e.carries, Carries::Ack { acked, .. } if acked == pn_of(&first0))
++        e.link == 0
++            && e.dir == Dir::Down
++            && matches!(e.carries, Carries::Ack { acked, .. } if acked == pn_of(&first0))
 +    });
 +    ensure!(
 +        (6 * SEC..7 * SEC).contains(&a0) && ack0.is_some_and(|e| e.outcome == Outcome::Burst),
 +        "L-c3: link 0: its message did not arrive inside the burst with its acknowledgement lost"
 +    );
++    let control = |link: usize| -> Vec<(Vec<u8>, u64)> {
++        rig.got[link][SERVER]
++            .iter()
++            .filter(|g| g.0 == Channel::Control)
++            .map(|g| (g.1.clone(), g.2))
++            .collect()
++    };
++    let (c0, c1) = (control(0), control(1));
 +    ensure!(
-+        rig.got[0][SERVER] == [(Channel::Control, b"before".to_vec(), a0)]
-+            && rig.got[1][SERVER] == [(Channel::Control, b"inside".to_vec(), handed[1])],
-+        "L-c3: link 0's message not handed out at its arrival, or link 1's not at its delivered probe's"
++        c0 == [(b"before".to_vec(), a0)] && c1 == [(b"inside".to_vec(), handed[1])],
++        "L-c3: link 0's message not handed out once at its arrival {:.3} ms, or link 1's not once at its delivered \
++         probe's {:.3} ms: {:?} ms, {:?} ms",
++        ms(a0),
++        ms(handed[1]),
++        c0.iter().map(|g| ms(g.1)).collect::<Vec<_>>(),
++        c1.iter().map(|g| ms(g.1)).collect::<Vec<_>>()
 +    );
 +    Ok(())
 +}
@@ -2502,7 +2783,11 @@ index 0000000..fa088c4
 +    let log = rig.entries();
 +    // Link 0.
 +    let sends = sends_of(&log, 0, Dir::Up, Channel::Control, 1);
-+    let firsts: Vec<&Fate> = sends.iter().map(|s| &s.1).filter(|e| e.retransmits == 0).collect();
++    let firsts: Vec<&Fate> = sends
++        .iter()
++        .map(|s| &s.1)
++        .filter(|e| e.retransmits == 0)
++        .collect();
 +    let shape: Vec<(u32, u32)> = firsts
 +        .iter()
 +        .map(|e| match e.carries {
@@ -2511,44 +2796,55 @@ index 0000000..fa088c4
 +        })
 +        .collect();
 +    ensure!(
-+        firsts.iter().map(|e| e.len).collect::<Vec<_>>() == [1_200, 1_200, 600] && shape == [(0, 3), (1, 3), (2, 3)],
++        firsts.iter().map(|e| e.len).collect::<Vec<_>>() == [1_200, 1_200, 600]
++            && shape == [(0, 3), (1, 3), (2, 3)],
 +        "L-c4: the 3,000 B message did not go as three packets of 1,200, 1,200 and 600 B"
 +    );
 +    ensure!(
-+        firsts[1].outcome == Outcome::Lost && arrival_of(firsts[0]).is_some() && arrival_of(firsts[2]).is_some(),
++        firsts[1].outcome == Outcome::Lost
++            && arrival_of(firsts[0]).is_some()
++            && arrival_of(firsts[2]).is_some(),
 +        "L-c4: its middle packet alone was not lost (each packet draws its own fate)"
 +    );
-+    ensure!(
-+        sends.len() == 4 && sends[3].1.retransmits == 1 && matches!(sends[3].1.carries, Carries::Stream { part: 1, .. }),
-+        "L-c4: {} sends of the big message, not its three and one resend of the middle packet",
-+        sends.len()
-+    );
-+    let r = arrival_of(&sends[3].1).unwrap_or(0);
-+    let own: Vec<u64> = [0u64, 2]
++    // Its middle piece is resent; its other pieces may be too, spuriously: the jitter reorders the instant's packets, and
++    // a later one's acknowledgement can declare an earlier one lost by the packet threshold, as in QUIC.
++    let middle: Vec<&Fate> = sends
 +        .iter()
-+        .map(|&m| {
-+            arrival_of(&sends_of(&log, 0, Dir::Up, Channel::Control, m)[0].1).unwrap_or(u64::MAX)
-+        })
++        .map(|s| &s.1)
++        .filter(|e| matches!(e.carries, Carries::Stream { part: 1, .. }))
 +        .collect();
-+    let got: Vec<&Got> = rig.got[0][SERVER]
++    let ready = piece_arrivals(&log, 0, Dir::Up, Channel::Control);
++    let pieces = |m: u64| ready.get(&m).map(|x| x.1.clone()).unwrap_or_default();
++    let big = pieces(1);
++    let r = big.get(&1).copied().unwrap_or(u64::MAX);
++    ensure!(
++        middle.len() >= 2 && middle[1].retransmits == 1 && r < u64::MAX,
++        "L-c4: the middle packet was not resent and delivered ({} sends)",
++        middle.len()
++    );
++    let got: Vec<(Vec<u8>, u64)> = rig.got[0][SERVER]
 +        .iter()
 +        .filter(|g| g.0 == Channel::Control)
++        .map(|g| (g.1.clone(), g.2))
 +        .collect();
 +    ensure!(
-+        got.len() == 3 && (0..3).all(|i| got[i].1 == msgs[i]),
++        got.len() == 3 && (0..3).all(|i| got[i].0 == msgs[i]),
 +        "L-c4: the three messages were not handed out once each, in order"
 +    );
++    let due = handouts(&ready, 3);
 +    ensure!(
-+        r > arrival_of(firsts[0]).unwrap_or(0)
-+            && r > arrival_of(firsts[2]).unwrap_or(0)
-+            && got[0].2 == own[0]
-+            && got[1].2 == r
-+            && got[2].2 == own[1].max(r),
-+        "L-c4: handed out at {:?} ms: the first at its arrival {:.3}, the big one at its resend's {:.3}, the last behind \
-+         it",
-+        got.iter().map(|g| ms(g.2)).collect::<Vec<_>>(),
-+        ms(own[0]),
-+        ms(r)
++        got.iter().map(|g| g.1).collect::<Vec<_>>() == due,
++        "L-c4: handed out at {:?} ms, not at {:?} ms (each message once all its pieces have arrived and every earlier one \
++         is out)",
++        got.iter().map(|g| ms(g.1)).collect::<Vec<_>>(),
++        due.iter().map(|&x| ms(x)).collect::<Vec<_>>()
++    );
++    ensure!(
++        due[1] == r && big.iter().all(|(&p, &a)| p == 1 || a < r) && due[2] >= r,
++        "L-c4: the big message did not wait for its middle packet's resend ({:.3} ms), or the last not behind it: {:?} \
++         ms",
++        ms(r),
++        due.iter().map(|&x| ms(x)).collect::<Vec<_>>()
 +    );
 +    let pns: Vec<u64> = (0..3)
 +        .flat_map(|m| sends_of(&log, 0, Dir::Up, Channel::Control, m))
@@ -2593,7 +2889,62 @@ index 0000000..fa088c4
 +                .all(|(i, g)| g.1.len() == 3_000 && g.1[..8] == (i as u64).to_le_bytes()),
 +        "L-c4: the full-state messages were not handed out once each, whole and in order"
 +    );
++    let due = handouts(
++        &piece_arrivals(&log, 1, Dir::Down, Channel::FullState),
++        FULL,
++    );
++    let at: Vec<u64> = full.iter().map(|g| g.2).collect();
++    ensure!(
++        at == due,
++        "L-c4: a full-state message was not handed out when the in-order rule says (first difference at message {:?})",
++        at.iter().zip(&due).position(|(a, b)| a != b)
++    );
 +    Ok(())
++}
++
++/// Each message of one stream, from the log alone: its piece count and each piece's earliest arrival over its sends
++/// (`u64::MAX` for a piece never delivered).
++fn piece_arrivals(
++    log: &[Fate],
++    link: u32,
++    dir: Dir,
++    channel: Channel,
++) -> BTreeMap<u64, (u32, BTreeMap<u32, u64>)> {
++    let mut out: BTreeMap<u64, (u32, BTreeMap<u32, u64>)> = BTreeMap::new();
++    for e in log.iter().filter(|e| e.link == link && e.dir == dir) {
++        if let Carries::Stream {
++            channel: c,
++            message,
++            part,
++            parts,
++            ..
++        } = e.carries
++            && c == channel
++        {
++            let m = out.entry(message).or_insert((parts, BTreeMap::new()));
++            let a = m.1.entry(part).or_insert(u64::MAX);
++            *a = (*a).min(arrival_of(e).unwrap_or(u64::MAX));
++        }
++    }
++    out
++}
++
++/// When the in-order rule hands out each of a stream's first `n` messages: once all its pieces have arrived and every
++/// earlier message is out (`u64::MAX`: never).
++fn handouts(pieces: &BTreeMap<u64, (u32, BTreeMap<u32, u64>)>, n: u64) -> Vec<u64> {
++    let mut out = Vec::new();
++    let mut prev = 0;
++    for m in 0..n {
++        let ready = match pieces.get(&m) {
++            Some((parts, p)) if p.len() == *parts as usize => {
++                p.values().copied().max().unwrap_or(u64::MAX)
++            }
++            _ => u64::MAX,
++        };
++        prev = ready.max(prev);
++        out.push(prev);
++    }
++    out
 +}
 +
 +#[test]
@@ -2690,7 +3041,11 @@ index 0000000..fa088c4
 +        a.2,
 +        a.3
 +    );
-+    ensure!(b.4 == 0, "L-c5: next_event_ns named a past instant {} times", b.4);
++    ensure!(
++        b.4 == 0,
++        "L-c5: next_event_ns named a past instant {} times",
++        b.4
++    );
 +    ensure!(
 +        a.0 == b.0,
 +        "L-c5: the fate logs differ ({} and {} bytes) between polling every millisecond and at next_event_ns",
@@ -2712,8 +3067,9 @@ index 0000000..fa088c4
 +}
 +
 +/// L-c6 (the event order): at one instant, internal events come before application sends, by (time, fate-log index).
-+/// Link 0, P2's delays with no loss but the planted one: datagrams from 1 s to 4 s settle the estimate, then quiet; at
-+/// 4 s a control message, lost; at its PTO's instant exactly the client sends another. Link 1, P0: at 10 ms the client
++/// Link 0, P2's delays with no loss but the planted one: datagrams from 1 s to 3 s settle the estimate, then quiet
++/// (their acknowledgements are all back by 3.1 s, so nothing moves the timer); at 4 s a control message, lost; at its
++/// PTO's instant exactly the client sends another. Link 1, P0: at 10 ms the client
 +/// sends a datagram, which arrives in that instant, and the server end sends one in the same instant. Links 2 and 3,
 +/// P0: both clients send at 20 ms. The probe goes before the application's message (a lower fate-log index and packet
 +/// number); link 1's acknowledgement before the server's datagram; link 2's acknowledgement before link 3's.
@@ -2726,7 +3082,7 @@ index 0000000..fa088c4
 +    rig.send(2, CLIENT, b"X", 20 * MS);
 +    rig.send(3, CLIENT, b"Y", 20 * MS);
 +    rig.poll(20 * MS);
-+    for k in 0..90 {
++    for k in 0..60 {
 +        let t = SEC + k * TICK;
 +        rig.poll(t);
 +        rig.tick(0, t);
@@ -2743,6 +3099,12 @@ index 0000000..fa088c4
 +        "L-c6: the timer is armed for {:.3} ms, not the PTO {:.3} ms",
 +        ms(at - s),
 +        ms(pto)
++    );
++    rig.poll(at - 1);
++    ensure!(
++        rig.timer(0, Dir::Up).is_some_and(|x| x.0 == at),
++        "L-c6: the timer moved from {:.3} ms before its instant",
++        ms(at)
 +    );
 +    rig.send_on(0, CLIENT, Channel::Control, b"N", at);
 +    rig.poll(at + 2 * SEC);
@@ -2774,13 +3136,20 @@ index 0000000..fa088c4
 +    };
 +    let l1 = kinds(1);
 +    ensure!(
-+        l1.len() >= 3 && l1[..3] == [(0, Dir::Up, 10 * MS), (ACK_CODE, Dir::Down, 10 * MS), (0, Dir::Down, 10 * MS)],
++        l1.len() >= 3
++            && l1[..3]
++                == [
++                    (0, Dir::Up, 10 * MS),
++                    (ACK_CODE, Dir::Down, 10 * MS),
++                    (0, Dir::Down, 10 * MS)
++                ],
 +        "L-c6: link 1's entries at 10 ms are {:?}: the acknowledgement of the arrival goes before the server's send",
 +        &l1[..l1.len().min(3)]
 +    );
 +    let ack_index = |link: u32| {
-+        log.iter()
-+            .position(|e| e.link == link && matches!(e.carries, Carries::Ack { .. }) && e.sent_ns == 20 * MS)
++        log.iter().position(|e| {
++            e.link == link && matches!(e.carries, Carries::Ack { .. }) && e.sent_ns == 20 * MS
++        })
 +    };
 +    let (i2, i3) = (ack_index(2), ack_index(3));
 +    ensure!(
@@ -2898,11 +3267,13 @@ index 0000000..fa088c4
 +        .collect();
 +    ensure!(
 +        late.iter().all(|x| x.sample_ns <= 100 * MS)
-+            && late
-+                .iter()
-+                .any(|x| x.at_ns == s + 110 * MS && x.sample_ns == 100 * MS && Some(x.pn) == m2.first().map(|e| pn_of(&e.1))),
++            && late.iter().any(|x| x.at_ns == s + 110 * MS
++                && x.sample_ns == 100 * MS
++                && Some(x.pn) == m2.first().map(|e| pn_of(&e.1))),
 +        "L-c7: link 1's samples after 4 s are {:?} ms: M2, held behind M1, samples one round trip, 100 ms, at 4.11 s",
-+        late.iter().map(|x| (ms(x.at_ns), ms(x.sample_ns))).collect::<Vec<_>>()
++        late.iter()
++            .map(|x| (ms(x.at_ns), ms(x.sample_ns)))
++            .collect::<Vec<_>>()
 +    );
 +    let handed = s + 162_500_000;
 +    ensure!(
@@ -2959,20 +3330,25 @@ index 0000000..fa088c4
 +    let ptos0 = rig.ptos(0, Dir::Up);
 +    let s0 = sends_of(&log, 0, Dir::Up, Channel::Control, 0);
 +    ensure!(
-+        ptos0.first().is_some_and(|p| p.at_ns == SEC + 1_024 * MS) && s0.get(1).is_some_and(|e| e.1.sent_ns == SEC + 1_024 * MS),
++        ptos0.first().is_some_and(|p| p.at_ns == SEC + 1_024 * MS)
++            && s0.get(1).is_some_and(|e| e.1.sent_ns == SEC + 1_024 * MS),
 +        "L-c9: link 0's first PTO at {:?} ms after the send, not 1,024 ms",
 +        ptos0.first().map(|p| ms(p.at_ns - SEC))
 +    );
 +    let ptos1 = rig.ptos(1, Dir::Up);
 +    ensure!(
-+        rig.est(1, Dir::Up).smoothed == Some(0) && ptos1.first().is_some_and(|p| p.at_ns == s + 26 * MS),
++        rig.est(1, Dir::Up).smoothed == Some(0)
++            && ptos1.first().is_some_and(|p| p.at_ns == s + 26 * MS),
 +        "L-c9: link 1's PTO at {:?} ms with a zero estimate, not 26 ms",
 +        ptos1.first().map(|p| ms(p.at_ns - s))
 +    );
 +    let d2 = rig.declared(2, Dir::Up);
 +    let s2 = sends_of(&log, 2, Dir::Up, Channel::Control, 0);
 +    ensure!(
-+        d2.iter().any(|d| d.pn == pn_of(&s2[0].1) && d.at_ns == s + MS && !d.by_count && d.delay_ns == MS)
++        d2.iter().any(|d| d.pn == pn_of(&s2[0].1)
++            && d.at_ns == s + MS
++            && !d.by_count
++            && d.delay_ns == MS)
 +            && s2.get(1).is_some_and(|e| e.1.sent_ns == s + MS)
 +            && rig.ptos(2, Dir::Up).is_empty(),
 +        "L-c9: link 2's message was not declared lost and resent 1 ms after its send"
@@ -2981,7 +3357,8 @@ index 0000000..fa088c4
 +}
 +
 +#[test]
-+fn lc9_a_message_lost_before_any_rtt_sample_is_resent_at_1024_ms_and_kgranularity_floors_both_timers() {
++fn lc9_a_message_lost_before_any_rtt_sample_is_resent_at_1024_ms_and_kgranularity_floors_both_timers()
++ {
 +    lc9(L1Net::new(1)).unwrap();
 +}
 +
@@ -2990,7 +3367,18 @@ index 0000000..fa088c4
 +    use super::*;
 +
 +    fn bitten(id: &str) -> L1Net {
-+        L1Net::with_bite(1, id).expect(id)
++        L1Net::with_model_bite(1, id).expect(id)
++    }
++
++    /// The link model's bites are the unit tests' own: npt-lab and the marks reach PM-0001-3's four only.
++    #[test]
++    fn the_model_bites_are_chosen_only_here() {
++        assert_eq!(MODEL_BITE_IDS.len(), 8);
++        for (id, _) in MODEL_BITE_IDS {
++            assert!(id.starts_with("npt-l1/") && L1Net::with_model_bite(1, id).is_some());
++            assert!(L1Net::with_bite(1, id).is_none() && !L1Net::BITES.contains(&id));
++        }
++        assert!(L1Net::with_model_bite(1, "PM-0001-3/rtt-each-way").is_none());
 +    }
 +
 +    /// The check fails, naming its L-c test.

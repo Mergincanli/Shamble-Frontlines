@@ -1,5 +1,523 @@
+diff --git a/spikes/netcode-proof/check.mjs b/spikes/netcode-proof/check.mjs
+index 3b46fc6..6d121d8 100644
+--- a/spikes/netcode-proof/check.mjs
++++ b/spikes/netcode-proof/check.mjs
+@@ -3,12 +3,15 @@
+ //   node spikes/netcode-proof/check.mjs [--only <step,...>]
+ // Steps: fmt, clippy (host, all targets) and clippy-wasm32 (the leaf crates and npt-tcpinfo's non-Linux stub), each on
+ // the measured build and on the bites build with warnings as errors; doc (rustdoc on every member, no dependency, both
+-// builds, warnings as errors: a broken intra-doc link fails it); test (cargo test on the measured build, then on
++// builds, then the wasm32 crates for wasm32, warnings as errors: a broken intra-doc link fails it); test (cargo test on
++// the measured build, then on
+ // the bites build, its counts and any test that reported a skip); deps (the dependency rules of plan §4.2 that
+ // `cargo metadata` shows, with every feature and target, and its unsafe_code rule, from the crates' files, the
+ // manifests and the environment and cargo configs this command's cargo reads: DEPS_CHECKED says what it checks, and
+ // the comment above it what it does not; with U4s's three greps: the tick constants of u4-build-plan.md §4.3,
+-// npt-room's float-free sources, §4.11, and each bite id in one crate's sources, §4.14); refs (nothing outside spikes/
++// npt-room's float-free sources, §4.11, and each bite id in one crate's sources, §4.14; and U4a's two: npt-proto's
++// clippy.toml against npt-sim's, §2, and npt-link's Channel alone in npt-proto and npt-client); refs (nothing outside
++// spikes/
+ // references it, §4.2 and §4.9);
+ // marks (marks.json compiles in the judge, covers exactly the plan's marks, and every row it hashed is unchanged); self
+ // (this file's own tests); redact (redact-check's tests, then a scan of the spike's folder). It runs every step and
+@@ -138,6 +141,14 @@ export function dependencyProblems(meta) {
+   for (const d of netNode?.deps ?? []) {
+     if (byId.get(d.pkg).name === "libc" && isShipped(d)) problems.push("npt-net depends on libc directly");
+   }
++  // npt-proto and npt-client name npt-link `npt_link`, never renamed, so linkUseProblems sees every use of it (U4a;
++  // u4s-carries.md carry 3).
++  for (const p of meta.packages) {
++    if (!["npt-proto", "npt-client"].includes(p.name)) continue;
++    for (const d of p.dependencies ?? []) {
++      if (d.name === "npt-link" && d.rename) problems.push(`${p.name} renames its npt-link dependency to ${d.rename}`);
++    }
++  }
+   // Nothing depends on npt-lab, in any kind.
+   for (const n of meta.resolve.nodes) {
+     for (const d of n.deps) {
+@@ -746,6 +757,85 @@ export function biteHomeProblems(files, read) {
+   return problems;
+ }
+ 
++/**
++ * The clippy.toml files that must be one list below their headers (u4-build-plan.md §2, "Drift"; plan §4.5): npt-proto
++ * shares npt-sim's determinism bans, since its quantisation and decoding must give the same bits on native and Wasm,
++ * and its file says the check script compares them.
++ */
++export const CLIPPY_TWINS = [["crates/sim/clippy.toml", "crates/proto/clippy.toml"]];
++
++/** A clippy.toml's lines below its header (the leading `#` comment lines and blank lines), with each line's number. */
++function belowHeader(text) {
++  const lines = text.split("\n");
++  if (lines.at(-1) === "") lines.pop();
++  const start = lines.findIndex((l) => l.trim() !== "" && !l.trimStart().startsWith("#"));
++  return start < 0 ? [] : lines.slice(start).map((line, i) => ({ line, at: start + i + 1 }));
++}
++
++/**
++ * Every CLIPPY_TWINS pair that differs below its headers, as a sentence naming the first differing line of each
++ * (a missing file is a problem too). Below the header every byte counts, comments included: the copy is the list.
++ */
++export function clippyTwinProblems(read) {
++  const problems = [];
++  for (const [home, copy] of CLIPPY_TWINS) {
++    const texts = [];
++    for (const f of [home, copy]) {
++      try {
++        texts.push(read(f));
++      } catch {
++        problems.push(`${f} is missing: it is one of the clippy.toml files that must match (${home}, ${copy})`);
++      }
++    }
++    if (texts.length < 2) continue;
++    const [a, b] = texts.map(belowHeader);
++    for (let i = 0; i < Math.max(a.length, b.length); i++) {
++      if (a[i]?.line === b[i]?.line) continue;
++      const where = (f, lines) => (lines[i] ? `${f}:${lines[i].at}` : `${f}:${lines.at(-1)?.at ?? 0} (its end)`);
++      problems.push(
++        `${where(copy, b)} differs from ${where(home, a)} below their headers: ` +
++          `${copy} is ${home}'s list, line for line (u4-build-plan.md §2, plan §4.5)`,
++      );
++      break;
++    }
++  }
++  return problems;
++}
++
++/**
++ * The sources that use npt-link for `Channel` only (catalogue item 2; u4-build-plan.md §4.1: npt-link is a dependency
++ * of npt-proto and npt-client for `Channel`; the arch review's F5, u4s-carries.md carry 3).
++ */
++export const CHANNEL_ONLY = ["crates/proto/src/", "crates/client/src/"];
++/** What may follow the name `npt_link` there: `::Channel` (a path into it, `::Channel::Datagram`, or `as` a name), or a
++ * use list holding `Channel` alone. */
++const CHANNEL_PATH = /^\s*::\s*(?:Channel\b|\{\s*Channel(?:\s+as\s+[A-Za-z_]\w*)?\s*,?\s*\})/;
++
++/**
++ * Every place in CHANNEL_ONLY's sources that names anything from `npt_link` but `Channel`, as a sentence naming its
++ * file and line, read in lexRust's mask (comments and literals blanked): `use npt_link::Link;`, a use list with more,
++ * a glob, the bare crate (`use npt_link;`, `extern crate npt_link as l;`), any other path.
++ * Known limit: a grep, not rustc's. A renamed dependency would hide the name, so dependencyProblems refuses a rename
++ * of npt-link in npt-proto's and npt-client's manifests; a macro that builds the path is review's.
++ */
++export function linkUseProblems(files, read) {
++  const problems = [];
++  for (const f of files) {
++    if (!CHANNEL_ONLY.some((d) => f.startsWith(d)) || !f.endsWith(".rs")) continue;
++    const { mask } = lexRust(read(f));
++    for (const m of mask.matchAll(/\bnpt_link\b/g)) {
++      const rest = mask.slice(m.index + m[0].length);
++      if (CHANNEL_PATH.test(rest)) continue;
++      const shown = `npt_link${rest.split(/[;\n]/, 1)[0]}`.replace(/\s+/g, " ").trim();
++      problems.push(
++        `${f}:${lineAt(mask, m.index)} names \`${shown}\` from npt_link: npt-proto and npt-client use npt-link for ` +
++          "Channel only (catalogue item 2; u4-build-plan.md §4.1)",
++      );
++    }
++  }
++  return problems;
++}
++
+ /**
+  * The dotted key that starts at `from` in a tomlScan (spaces and tabs before it skipped), read no further than `end`:
+  * its parts, each bare (letters, digits, `_` and `-`, from the mask) or quoted (a string, its value decoded), and the
+@@ -1348,41 +1438,65 @@ function summarized(r, summary) {
+ export const WASM_CRATES = [...LEAF, "npt-tcpinfo"];
+ const WASM_ARGS = ["--target", "wasm32-unknown-unknown", ...WASM_CRATES.flatMap((c) => ["-p", c])];
+ 
+-/** clippy with warnings as errors on the measured build (no features), then on the bites build (every feature). */
+-function lintBothBuilds(scope) {
+-  const measured = run("cargo", ["clippy", "--locked", ...scope, "--", "-D", "warnings"], HERE);
+-  if (!measured.ok) return measured;
+-  const bites = run("cargo", ["clippy", "--locked", ...scope, "--all-features", "--", "-D", "warnings"], HERE);
+-  return { ok: bites.ok, out: `${measured.out}${bites.out}\nmeasured build and bites build both linted`, status: bites.status };
++/**
++ * A failed cargo run with its summary line (the step's last line, which main prints) naming the first `error` line of
++ * its output, not cargo's last line ("warning: build failed, waiting for other jobs to finish..."; the rust fix2
++ * review's nit, u4s-carries.md entry 34): `what` says which run failed. The detail stays in the lines above it.
++ */
++export function failedRun(r, what, before = "") {
++  const first = r.out.split("\n").find((l) => /^error(?:\[\w+\])?:/.test(l.trim()));
++  const said = first ? first.trim() : "its output has no error line (the lines above)";
++  return { ...r, ok: false, out: `${before}${r.out}\n${what} failed: ${said}` };
++}
++
++/**
++ * clippy with warnings as errors on the measured build (no features), then on the bites build (every feature), through
++ * `runner` (`run`; check.test.mjs passes a recorder). A failure's summary names its build and its first error.
++ */
++export function lintBothBuilds(scope, runner = run) {
++  const measured = runner("cargo", ["clippy", "--locked", ...scope, "--", "-D", "warnings"], HERE);
++  if (!measured.ok) return failedRun(measured, "the measured build's clippy");
++  const bites = runner("cargo", ["clippy", "--locked", ...scope, "--all-features", "--", "-D", "warnings"], HERE);
++  if (!bites.ok) return failedRun(bites, "the bites build's clippy (the measured build's passed)", measured.out);
++  return { ok: true, out: `${measured.out}${bites.out}\nmeasured build and bites build both linted`, status: bites.status };
+ }
+ 
+ /**
+  * rustdoc on every member's own items, no dependency's, with warnings as errors (the rust fix-review's G2: a broken
+  * intra-doc link had passed every step), on the measured build, then on the bites build: a feature compiles items, and
+- * their docs, in and out. The flags go in RUSTDOCFLAGS; CARGO_ENCODED_RUSTDOCFLAGS, which cargo would read in its
+- * place, is dropped from this run's environment.
++ * their docs, in and out; then the same two for wasm32 on WASM_CRATES, so the code a target compiles in (npt-tcpinfo's
++ * non-Linux stub) is documented too (the rust fix2 review's nit, u4s-carries.md entry 34). The flags go in
++ * RUSTDOCFLAGS; CARGO_ENCODED_RUSTDOCFLAGS, which cargo would read in its place, is dropped from this run's
++ * environment (`base`, process.env when check.mjs runs it). Through `runner`, as lintBothBuilds.
+  */
+-function docBothBuilds() {
+-  const { CARGO_ENCODED_RUSTDOCFLAGS: _, ...env } = process.env;
++export function docBothBuilds(runner = run, base = process.env) {
++  const { CARGO_ENCODED_RUSTDOCFLAGS: _, ...env } = base;
+   env.RUSTDOCFLAGS = "-D warnings";
+-  const args = ["doc", "--locked", "--no-deps", "--workspace"];
+-  const measured = run("cargo", args, HERE, env);
+-  if (!measured.ok) return measured;
+-  const bites = run("cargo", [...args, "--all-features"], HERE, env);
+-  const summary = bites.ok
+-    ? "measured build and bites build both documented, rustdoc warnings as errors"
+-    : "the bites build's rustdoc failed (the measured build's passed)";
+-  return { ok: bites.ok, out: `${measured.out}${bites.out}\n${summary}`, status: bites.status };
++  const host = ["doc", "--locked", "--no-deps", "--workspace"];
++  const wasm = ["doc", "--locked", "--no-deps", ...WASM_ARGS];
++  let out = "";
++  for (const [args, what] of [
++    [host, "the measured build's rustdoc"],
++    [[...host, "--all-features"], "the bites build's rustdoc"],
++    [wasm, "the measured build's wasm32 rustdoc"],
++    [[...wasm, "--all-features"], "the bites build's wasm32 rustdoc"],
++  ]) {
++    const r = runner("cargo", args, HERE, env);
++    if (!r.ok) return failedRun(r, what, out);
++    out += r.out;
++  }
++  return { ok: true, out: `${out}\nmeasured build and bites build both documented, host and wasm32, rustdoc warnings as errors` };
+ }
+ 
+ /** Both builds' tests: the measured build (no features), then the bites build (every feature, the planted defects
+- * compiled in: plan §4.7). Each count is reported, skips included (cargoCounts). */
+-function testBothBuilds() {
+-  const measured = run("cargo", ["test", "--locked", "--workspace"], HERE);
+-  if (!measured.ok) return measured;
+-  const bites = run("cargo", ["test", "--locked", "--workspace", "--all-features"], HERE);
++ * compiled in: plan §4.7). Each count is reported, skips included (cargoCounts). Through `runner`, as lintBothBuilds. */
++export function testBothBuilds(runner = run) {
++  const measured = runner("cargo", ["test", "--locked", "--workspace"], HERE);
++  if (!measured.ok) return failedRun(measured, `the measured build's tests (${cargoCounts(measured.out)})`);
++  const bites = runner("cargo", ["test", "--locked", "--workspace", "--all-features"], HERE);
+   const summary = `measured build: ${cargoCounts(measured.out)}; bites build: ${cargoCounts(bites.out)}`;
+-  return { ok: bites.ok, out: `${measured.out}${bites.out}\n${summary}`, status: bites.status };
++  if (!bites.ok) return failedRun(bites, `the bites build's tests (${summary})`, measured.out);
++  return { ok: true, out: `${measured.out}${bites.out}\n${summary}`, status: bites.status };
+ }
+ 
+ /**
+@@ -1431,7 +1545,9 @@ const DEPS_CHECKED =
+   "a proc-macro, and every path dependency is a member; no symbolic link under crates/; every #[path] and include! " +
+   "literal names a .rs file in its own crate; TICK_HZ is set from a literal once, in npt-sim; each derived tick " +
+   "constant is its own function at TICK_HZ in npt-sim and a path to it elsewhere, and no other *_TICKS or *CATCHUP* " +
+-  "constant is set from a literal; npt-room's sources hold no float; no bite id is in two crates' sources";
++  "constant is set from a literal; npt-room's sources hold no float; no bite id is in two crates' sources; " +
++  "npt-proto's clippy.toml is npt-sim's below its header; npt-proto's and npt-client's sources name only Channel " +
++  "from npt_link, which neither manifest renames";
+ 
+ /** `cargo metadata` for the spike in `here`, with every feature, parsed: { ok, meta }, or the failed run. */
+ function cargoMetadata(here) {
+@@ -1466,17 +1582,21 @@ export function depsStep(here = HERE, env = process.env, metadata = cargoMetadat
+     ...tickConstantProblems(files, read),
+     ...roomFloatProblems(files, read),
+     ...biteHomeProblems(files, read),
++    ...clippyTwinProblems(read),
++    ...linkUseProblems(files, read),
+   ];
+   const counts = `${files.length} crate files and ${configs.length} cargo config file(s) read`;
+   return { ok: problems.length === 0, out: problems.join("\n") || `${DEPS_CHECKED} (${counts})` };
+ }
+ 
++// Each cargo step takes the runner it calls cargo through (`run` when main calls it), so check.test.mjs pins what each
++// step runs: its commands, its flags, -D warnings included (the rust fix2 review's nit, u4s-carries.md entry 34).
+ export const STEPS = {
+-  fmt: () => run("cargo", ["fmt", "--all", "--check"], HERE),
++  fmt: (runner = run) => runner("cargo", ["fmt", "--all", "--check"], HERE),
+   // Both builds, as the tests run: the measured build (no features) and the bites build (every feature). A feature can
+   // compile code out as well as in (npt-lab's probe has `cfg(not(feature = "bites"))` code), so one pass is not enough.
+-  clippy: () => lintBothBuilds(["--workspace", "--all-targets"]),
+-  "clippy-wasm32": () => lintBothBuilds(WASM_ARGS),
++  clippy: (runner = run) => lintBothBuilds(["--workspace", "--all-targets"], runner),
++  "clippy-wasm32": (runner = run) => lintBothBuilds(WASM_ARGS, runner),
+   doc: docBothBuilds,
+   test: testBothBuilds,
+   deps: depsStep,
+diff --git a/spikes/netcode-proof/check.test.mjs b/spikes/netcode-proof/check.test.mjs
+index 5da44df..10442b7 100644
+--- a/spikes/netcode-proof/check.test.mjs
++++ b/spikes/netcode-proof/check.test.mjs
+@@ -11,18 +11,25 @@ import { test } from "node:test";
+ import { fileURLToPath } from "node:url";
+ import {
+   BITE_ID,
++  CHANNEL_ONLY,
++  CLIPPY_TWINS,
+   STEPS,
+   WASM_CRATES,
+   biteHomeProblems,
+   cargoConfigProblems,
+   cargoCounts,
++  clippyTwinProblems,
+   crateFiles,
+   dependencyProblems,
+   depsStep,
++  docBothBuilds,
+   exceptionLintProblems,
+   expectedMarks,
++  failedRun,
+   layoutProblems,
+   lexRust,
++  linkUseProblems,
++  lintBothBuilds,
+   manifestKeyProblems,
+   marksProblems,
+   NOT_TICK_COUNTS,
+@@ -30,6 +37,7 @@ import {
+   roomFloatProblems,
+   SIM_DEPENDENCIES,
+   TICK_NAMED_SKIP,
++  testBothBuilds,
+   tickConstantProblems,
+   unsafeProblems,
+   workspaceLintProblems,
+@@ -1032,6 +1040,14 @@ const roomFloat = (at, token, n = 1) => `${at} has \`${token}\` (${n} float toke
+ const biteTwice = (id, ...sites) =>
+   `${id} is planted in ${sites.length} crates, ${sites.join(" and ")}: a bite's id lives in the one crate whose code it ` +
+   "plants (u4-build-plan.md §4.14)";
++/** The clippy.toml comparison's message for the first differing lines (U4a; u4-build-plan.md §2, Drift). */
++const clippyDrift = (copyAt, homeAt) =>
++  `${copyAt} differs from ${homeAt} below their headers: crates/proto/clippy.toml is crates/sim/clippy.toml's list, ` +
++  "line for line (u4-build-plan.md §2, plan §4.5)";
++/** The npt-link grep's message for `shown` at `at` (U4a; u4s-carries.md carry 3). */
++const linkUse = (at, shown) =>
++  `${at} names \`${shown}\` from npt_link: npt-proto and npt-client use npt-link for Channel only (catalogue item 2; ` +
++  "u4-build-plan.md §4.1)";
+ 
+ /**
+  * A spike folder for depsStep (the workspace manifest, the two exceptions, npt-room and a cargo config) and cargo
+@@ -1050,6 +1066,9 @@ function depsFixture(t, plant = () => {}, change = () => {}) {
+     "crates/room/Cargo.toml": '[package]\nname = "npt-room"\n\n[lints]\nworkspace = true\n',
+     "crates/room/src/lib.rs": "pub fn f() {}\n",
+     ".cargo/config.toml": '[build]\ntarget-dir = "t"\n',
++    // U4a's clippy.toml pair (u4-build-plan.md §2, Drift): headers of different lengths, one list below them.
++    "crates/sim/clippy.toml": "# npt-sim's bans.\n# Its header.\n\ndisallowed-types = []\n",
++    "crates/proto/clippy.toml": "# npt-proto shares them.\n\ndisallowed-types = []\n",
+   };
+   plant(files);
+   for (const [f, text] of Object.entries(files)) {
+@@ -1091,10 +1110,14 @@ test("the deps step is depsStep, and it calls every check: one plant per check,
+       f["crates/room/src/ticks.rs"] = "pub const LOOP_CATCHUP: u32 = 7;\npub fn g() -> f64 {\n    0.0\n}\n";
+       f["crates/sim/src/grid.rs"] = 'pub const BITES: [&str; 1] = ["PM-0001-17/client-rounding"];\n';
+       f["crates/client/src/lib.rs"] = 'pub const BITES: [&str; 1] = ["PM-0001-17/client-rounding"];\n';
++      // U4a's two (u4-build-plan.md §2's Drift; u4s-carries.md carry 3).
++      f["crates/proto/clippy.toml"] += "disallowed-methods = []\n";
++      f["crates/proto/src/lib.rs"] = "use npt_link::Link;\n";
+     },
+     (e) => (e["npt-sim"] = n("tokio")),
+   );
+   bad.meta.packages.find((p) => p.name === "npt-room").targets[0].src_path = join(bad.dir, "crates", "tcpinfo", "src", "linux.rs");
++  bad.meta.packages.find((p) => p.name === "npt-proto").dependencies = [{ name: "npt-link", rename: "link" }];
+   let linked = true;
+   try {
+     symlinkSync("lib.rs", join(bad.dir, "crates", "room", "src", "k.rs"));
+@@ -1119,6 +1142,9 @@ test("the deps step is depsStep, and it calls every check: one plant per check,
+     ["tickConstantProblems", notAPath("crates/room/src/ticks.rs:1", "LOOP_CATCHUP", "7")],
+     ["roomFloatProblems", roomFloat("crates/room/src/ticks.rs:2", "f64", 2)],
+     ["biteHomeProblems", biteTwice("PM-0001-17/client-rounding", "crates/client/src/lib.rs:1", "crates/sim/src/grid.rs:1")],
++    ["clippyTwinProblems", clippyDrift("crates/proto/clippy.toml:4", "crates/sim/clippy.toml:4 (its end)")],
++    ["linkUseProblems", linkUse("crates/proto/src/lib.rs:1", "npt_link::Link")],
++    ["dependencyProblems (a renamed npt-link)", "npt-proto renames its npt-link dependency to link"],
+   ]) {
+     assert.ok(lines.includes(line), `${check}'s plant is not reported:\n${r.out}`);
+   }
+@@ -1505,3 +1531,168 @@ test("a bite id lives in one crate's sources: one id in two crates fails, naming
+     biteTwice("PM-0001-3/clock-seed", "crates/l1/src/lib.rs:3", "crates/lab/src/probe.rs:14"),
+   ]);
+ });
++
++test("npt-proto's clippy.toml is npt-sim's below its header: one changed line fails, naming both (U4a, u4-build-plan.md §2's Drift)", () => {
++  assert.deepEqual(CLIPPY_TWINS, [["crates/sim/clippy.toml", "crates/proto/clippy.toml"]]);
++  // The spike's own two files hold.
++  const real = (f) => readFileSync(join(HERE, f), "utf8");
++  assert.deepEqual(clippyTwinProblems(real), []);
++  const sim = real("crates/sim/clippy.toml");
++  const proto = real("crates/proto/clippy.toml");
++  const twins = (p, s = sim) => clippyTwinProblems((f) => (f.endsWith("proto/clippy.toml") ? p : s));
++  // a9's self-test bite: one line of proto's copy changed (a ban dropped from the list).
++  const simHead = sim.split("\n").findIndex((l) => l.startsWith("disallowed-types"));
++  const protoHead = proto.split("\n").findIndex((l) => l.startsWith("disallowed-types"));
++  const dropped = proto.replace('    "f32::sin", "f64::sin",\n', '    "f32::sin",\n');
++  const at = proto.split("\n").findIndex((l) => l === '    "f32::sin", "f64::sin",') + 1;
++  assert.notEqual(dropped, proto);
++  assert.deepEqual(twins(dropped), [
++    clippyDrift(`crates/proto/clippy.toml:${at}`, `crates/sim/clippy.toml:${at - protoHead + simHead}`),
++  ]);
++  // Below the header a comment counts; a longer or shorter header does not; a line added at the end is found there.
++  assert.equal(twins(proto.replace("disallowed-methods", "# note\ndisallowed-methods")).length, 1);
++  assert.deepEqual(twins(`# one more header line\n${proto}`), []);
++  assert.equal(twins(`${proto}extra = 1\n`)[0]?.includes("(its end)"), true);
++  // A missing file is a problem, not a pass.
++  const missing = clippyTwinProblems((f) => {
++    if (f.endsWith("proto/clippy.toml")) throw new Error("ENOENT");
++    return sim;
++  });
++  assert.equal(missing.length, 1);
++  assert.match(missing[0], /^crates\/proto\/clippy\.toml is missing/);
++});
++
++test("npt-proto's and npt-client's sources name only Channel from npt_link, by file and line (U4a, u4s-carries.md carry 3)", () => {
++  assert.deepEqual(CHANNEL_ONLY, ["crates/proto/src/", "crates/client/src/"]);
++  const files = { "crates/proto/src/msg.rs": "", "crates/client/src/lib.rs": "", "crates/room/src/lib.rs": "use npt_link::Link;\n" };
++  const run = (text, f = "crates/proto/src/msg.rs") => linkUseProblems(Object.keys({ ...files, [f]: 1 }), (g) => (g === f ? text : files[g]));
++  // The real tree holds.
++  const { files: real } = crateFiles(join(HERE, "crates"));
++  assert.deepEqual(linkUseProblems(real, (f) => readFileSync(join(HERE, f), "utf8")), []);
++  // Channel, whichever way it is named; prose and strings may name anything; another crate's sources are not read.
++  for (const ok of [
++    "use npt_link::Channel;\n",
++    "use npt_link :: Channel as Ch;\n",
++    "use npt_link::{Channel};\nuse npt_link::{ Channel as C, };\n",
++    "fn f(c: npt_link::Channel) -> bool { c == npt_link::Channel::Datagram }\n",
++    "// npt_link::Link is not ours\nconst S: &str = \"npt_link::Loopback\";\n",
++  ]) {
++    assert.deepEqual(run(ok), [], ok);
++  }
++  assert.deepEqual(run("use npt_link::Link;\n", "crates/room/src/lib.rs"), []);
++  // Anything else fails, named by file and line, in either crate.
++  for (const [bad, line, shown] of [
++    ["use npt_link::Link;\n", 1, "npt_link::Link"],
++    ["\nuse npt_link::{Channel, Link};\n", 2, "npt_link::{Channel, Link}"],
++    ["use npt_link::*;\n", 1, "npt_link::*"],
++    ["use npt_link;\n", 1, "npt_link"],
++    ["extern crate npt_link as l;\n", 1, "npt_link as l"],
++    ["fn f() { let _ = npt_link::Loopback::pair(); }\n", 1, "npt_link::Loopback::pair()"],
++    ["use npt_link::ChannelSet;\n", 1, "npt_link::ChannelSet"],
++  ]) {
++    assert.deepEqual(run(bad), [linkUse(`crates/proto/src/msg.rs:${line}`, shown)], bad);
++    assert.deepEqual(run(bad, "crates/client/src/lib.rs"), [linkUse(`crates/client/src/lib.rs:${line}`, shown)], bad);
++  }
++  // A renamed dependency would hide the name from the grep: refused in npt-proto's and npt-client's manifests only.
++  const renamed = (crate) => {
++    const m = meta(clean());
++    m.packages.find((p) => p.name === crate).dependencies = [{ name: "npt-link", rename: "link" }];
++    return dependencyProblems(m);
++  };
++  assert.deepEqual(renamed("npt-proto"), ["npt-proto renames its npt-link dependency to link"]);
++  assert.deepEqual(renamed("npt-client"), ["npt-client renames its npt-link dependency to link"]);
++  assert.deepEqual(renamed("npt-room"), []);
++});
++
++/** A runner that records each cargo call and answers from `results` (then success). */
++function recorder(results = []) {
++  const calls = [];
++  const runner = (cmd, args, cwd, env) => {
++    calls.push({ cmd, args, cwd, env });
++    return results.shift() ?? { ok: true, out: `ran ${args[0]}\n`, stdout: "", status: 0 };
++  };
++  return { calls, runner };
++}
++
++test("each cargo step runs what it says: fmt, clippy and its wasm32 twin, doc and test, both builds, -D warnings (U4a, the rust fix2 review's nits)", () => {
++  const steps = (name) => {
++    const r = recorder();
++    const out = STEPS[name](r.runner);
++    return { out, calls: r.calls.map((c) => `${c.cmd} ${c.args.join(" ")}`), env: r.calls.map((c) => c.env) };
++  };
++  assert.deepEqual(steps("fmt").calls, ["cargo fmt --all --check"]);
++  assert.deepEqual(steps("clippy").calls, [
++    "cargo clippy --locked --workspace --all-targets -- -D warnings",
++    "cargo clippy --locked --workspace --all-targets --all-features -- -D warnings",
++  ]);
++  const wasm = `--target wasm32-unknown-unknown ${WASM_CRATES.map((c) => `-p ${c}`).join(" ")}`;
++  assert.deepEqual(steps("clippy-wasm32").calls, [
++    `cargo clippy --locked ${wasm} -- -D warnings`,
++    `cargo clippy --locked ${wasm} --all-features -- -D warnings`,
++  ]);
++  assert.deepEqual(steps("test").calls, ["cargo test --locked --workspace", "cargo test --locked --workspace --all-features"]);
++  // doc: both builds on the host, then both for wasm32 (npt-tcpinfo's non-Linux stub documented too), rustdoc's
++  // warnings as errors through RUSTDOCFLAGS, whatever the environment held, and no CARGO_ENCODED_RUSTDOCFLAGS.
++  assert.equal(STEPS.doc, docBothBuilds);
++  assert.equal(STEPS.test, testBothBuilds);
++  const r = recorder();
++  const doc = docBothBuilds(r.runner, { PATH: "/bin", RUSTDOCFLAGS: "--cap-lints=allow", CARGO_ENCODED_RUSTDOCFLAGS: "--cap-lints=allow" });
++  assert.equal(doc.ok, true);
++  assert.deepEqual(
++    r.calls.map((c) => `${c.cmd} ${c.args.join(" ")}`),
++    [
++      "cargo doc --locked --no-deps --workspace",
++      "cargo doc --locked --no-deps --workspace --all-features",
++      `cargo doc --locked --no-deps ${wasm}`,
++      `cargo doc --locked --no-deps ${wasm} --all-features`,
++    ],
++  );
++  assert.ok(WASM_CRATES.includes("npt-tcpinfo"));
++  for (const c of r.calls) {
++    assert.equal(c.env.RUSTDOCFLAGS, "-D warnings");
++    assert.equal(Object.hasOwn(c.env, "CARGO_ENCODED_RUSTDOCFLAGS"), false);
++    assert.equal(c.env.PATH, "/bin");
++  }
++  assert.match(lastLine(doc.out), /^measured build and bites build both documented, host and wasm32, rustdoc warnings as errors$/);
++  assert.match(lastLine(steps("clippy").out.out), /^measured build and bites build both linted$/);
++});
++
++const lastLine = (text) => text.trimEnd().split("\n").at(-1);
++const cargoTail = "error: this URL is not a hyperlink\n --> crates/room/src/lib.rs:7:27\nerror: could not document `npt-room`\nwarning: build failed, waiting for other jobs to finish...\n";
++const failed = (out = cargoTail) => ({ ok: false, out, stdout: "", status: 101 });
++
++test("a failed build's summary names the build and its first error, not cargo's last line (U4a, the rust fix2 review's nits)", () => {
++  // The measured build's rustdoc failing: its first error, and no further run.
++  let r = recorder([failed()]);
++  let s = docBothBuilds(r.runner, {});
++  assert.equal(s.ok, false);
++  assert.equal(r.calls.length, 1);
++  assert.equal(lastLine(s.out), "the measured build's rustdoc failed: error: this URL is not a hyperlink");
++  // Only the bites build's clippy failing: never "both linted".
++  r = recorder([{ ok: true, out: "measured ok\n" }, failed("error[E0425]: cannot find value `x` in this scope\nerror: could not compile\n")]);
++  s = lintBothBuilds(["--workspace"], r.runner);
++  assert.equal(s.ok, false);
++  assert.equal(lastLine(s.out), "the bites build's clippy (the measured build's passed) failed: error[E0425]: cannot find value `x` in this scope");
++  assert.ok(!s.out.includes("both linted"), s.out);
++  assert.ok(s.out.startsWith("measured ok\n"), "the measured build's output is kept");
++  // The measured build's clippy, then each of doc's later runs, and the tests.
++  r = recorder([failed()]);
++  assert.equal(lastLine(lintBothBuilds([], r.runner).out), "the measured build's clippy failed: error: this URL is not a hyperlink");
++  for (const [at, what] of [
++    [1, "the bites build's rustdoc"],
++    [2, "the measured build's wasm32 rustdoc"],
++    [3, "the bites build's wasm32 rustdoc"],
++  ]) {
++    r = recorder([...Array(at).fill({ ok: true, out: "" }), failed()]);
++    assert.equal(lastLine(docBothBuilds(r.runner, {}).out), `${what} failed: error: this URL is not a hyperlink`);
++    assert.equal(r.calls.length, at + 1);
++  }
++  const testOut = "test result: FAILED. 3 passed; 1 failed; 0 ignored\nerror: test failed, to rerun pass `-p npt-proto --test wire`\n";
++  r = recorder([failed(testOut)]);
++  assert.equal(
++    lastLine(testBothBuilds(r.runner).out),
++    "the measured build's tests (3 tests passed, 1 failed, 0 reported a skip) failed: error: test failed, to rerun pass `-p npt-proto --test wire`",
++  );
++  // Output with no error line says so.
++  assert.equal(lastLine(failedRun(failed("warning: build failed\n"), "x").out), "x failed: its output has no error line (the lines above)");
++});
+diff --git a/spikes/netcode-proof/crates/proto/clippy.toml b/spikes/netcode-proof/crates/proto/clippy.toml
+index fbb63b3..c0b4034 100644
+--- a/spikes/netcode-proof/crates/proto/clippy.toml
++++ b/spikes/netcode-proof/crates/proto/clippy.toml
+@@ -1,5 +1,6 @@
+ # npt-proto shares npt-sim's bans (plan §4.5): its quantisation and decoding must give the same bits on native and Wasm.
+-# Keep this file identical to crates/sim/clippy.toml below this header; the spike's check script compares them.
++# Keep this file identical to crates/sim/clippy.toml below this header; check.mjs's deps step compares them line for
++# line (clippyTwinProblems, U4a).
+ 
+ disallowed-types = [
+     { path = "std::collections::HashMap", reason = "hash-map ban (GLOSSARY §7): iteration order is not deterministic" },
 diff --git a/spikes/netcode-proof/crates/proto/src/lib.rs b/spikes/netcode-proof/crates/proto/src/lib.rs
-index 97542ce..f0df569 100644
+index 97542ce..405a1d2 100644
 --- a/spikes/netcode-proof/crates/proto/src/lib.rs
 +++ b/spikes/netcode-proof/crates/proto/src/lib.rs
 @@ -1,4 +1,45 @@
@@ -41,20 +559,486 @@ index 97542ce..f0df569 100644
 +pub use input::Input;
 +pub use limits::Limits;
 +pub use msg::{
-+    ClientSettings, Direction, EndReason, Join, JoinAccepted, JoinRejected, Kick, Leave, Message, Ping, Pong,
-+    Resync, RoomEnded, decode, encode,
++    ClientSettings, Direction, EndReason, Join, JoinAccepted, JoinRejected, Kick, Leave, Message,
++    Ping, Pong, Resync, RoomEnded, decode, encode,
 +};
 +#[cfg(feature = "bites")]
 +pub use quant::BITES;
 +pub use quant::Quant;
 +pub use snapshot::{Class, EntityDelta, FullState, Snapshot};
 +pub use wrap::Wrap;
+diff --git a/spikes/netcode-proof/crates/proto/tests/catalogue.rs b/spikes/netcode-proof/crates/proto/tests/catalogue.rs
+index 8557ae8..b37a3f8 100644
+--- a/spikes/netcode-proof/crates/proto/tests/catalogue.rs
++++ b/spikes/netcode-proof/crates/proto/tests/catalogue.rs
+@@ -5,6 +5,16 @@
+ //! limits and the encoder's layout table against these rows.
+ 
+ use std::collections::BTreeSet;
++use std::net::{IpAddr, Ipv4Addr};
++
++use npt_link::Channel;
++use npt_proto::{
++    ClientSettings, DecodeError, Direction, EndReason, FullState, Input, Join, JoinAccepted,
++    JoinRejected, Kick, Leave, Limits, Message, Ping, Pong, Resync, RoomControl, RoomEnded,
++    SessionControl, SessionStatus, Snapshot, decode, encode,
++};
++use rand_chacha::ChaCha8Rng;
++use rand_core::{Rng, SeedableRng};
+ 
+ const DOC: &str = concat!(
+     env!("CARGO_MANIFEST_DIR"),
+@@ -410,6 +420,444 @@ fn every_assertion_bites() {
+     }
+ }
+ 
++/// A size cell's leading whole bytes (`1,000 B …` is 1,000).
++fn leading_bytes(size: &str) -> Option<usize> {
++    let (number, _) = size.split_once(" B")?;
++    number.replace(',', "").parse().ok()
++}
++
++/// The doc's words for npt-proto's channel and direction values.
++fn channel_word(c: Channel) -> &'static str {
++    match c {
++        Channel::Datagram => "datagram",
++        Channel::Control => "control stream",
++        Channel::FullState => "full-state stream",
++    }
++}
++
++fn direction_word(d: Direction) -> &'static str {
++    match d {
++        Direction::ClientToRoom => "client → room",
++        Direction::RoomToClient => "room → client",
++        Direction::BothWays => "both ways",
++    }
++}
++
++/// The U4 part of the audit (catalogue §6, "At U4": items 1, 2, 3's size half and 6), the doc read against npt-proto's
++/// own tables: every broken assertion as a sentence starting with its item, empty when they hold.
++fn audit_u4(text: &str) -> Vec<String> {
++    let mut problems = Vec::new();
++    let all = tables(text);
++    let find = |header: &str| all.iter().find(|t| t.header == header);
++    let built: Vec<&Vec<String>> = find(WIRE)
++        .map(|t| {
++            t.rows
++                .iter()
++                .filter(|r| r.len() == 8 && r[6] == "built in U4")
++                .collect()
++        })
++        .unwrap_or_default();
++    let doc_names: BTreeSet<String> = built.iter().map(|r| name(&r[0])).collect();
++    let code_names: BTreeSet<String> = Limits::TYPES.iter().map(|t| t.0.to_owned()).collect();
++    // 1. The message types, both ways round; and the session controls' variants.
++    for n in doc_names.difference(&code_names) {
++        problems.push(format!("u4-1: the built row {n} has no npt-proto type"));
++    }
++    for n in code_names.difference(&doc_names) {
++        problems.push(format!("u4-1: npt-proto's type {n} has no built row"));
++    }
++    let doc_variants: Vec<String> = find(SESSION)
++        .map(|t| {
++            t.rows
++                .iter()
++                .filter(|r| !r.is_empty())
++                .map(|r| name(&r[0]))
++                .collect()
++        })
++        .unwrap_or_default();
++    if doc_variants.iter().map(String::as_str).collect::<Vec<_>>() != SessionControl::VARIANTS {
++        problems.push(format!(
++            "u4-1: the session controls are {doc_variants:?}, npt-proto's SessionControl {:?}",
++            SessionControl::VARIANTS
++        ));
++    }
++    for (ty, channel, direction, limit) in Limits::TYPES {
++        let Some(r) = built.iter().find(|r| name(&r[0]) == ty) else {
++            continue;
++        };
++        // 2. Each type's channel and direction.
++        if r[2] != channel_word(channel) {
++            problems.push(format!(
++                "u4-2: {ty} travels on {:?} in npt-proto, on {:?} in the doc",
++                channel_word(channel),
++                r[2]
++            ));
++        }
++        if r[1] != direction_word(direction) {
++            problems.push(format!(
++                "u4-2: {ty} goes {:?} in npt-proto, {:?} in the doc",
++                direction_word(direction),
++                r[1]
++            ));
++        }
++        // 3. Each type's limit: the Size limit column's leading number; for `Snapshot` also the receive limit its
++        // cell names.
++        if leading_bytes(&r[5]) != Some(limit) {
++            problems.push(format!(
++                "u4-3: {ty}'s limit is {limit} B in npt-proto, {:?} in the doc",
++                r[5]
++            ));
++        }
++        if ty == "Snapshot"
++            && !r[5].contains(&format!(
++                "refuses a datagram above {} B",
++                thousands(Limits::SNAPSHOT_RECEIVE)
++            ))
++        {
++            problems.push(format!(
++                "u4-3: the doc's Snapshot cell does not name npt-client's {} B",
++                Limits::SNAPSHOT_RECEIVE
++            ));
++        }
++    }
++    // 6. The room-wide controls: the doc's rows are npt-proto's RoomControl, npt-load-ctl apart (its row says it is not
++    // a room socket), and their size limit is RoomControl's.
++    let doc_controls: Vec<String> = find(ROOM)
++        .map(|t| {
++            t.rows
++                .iter()
++                .filter(|r| !r.is_empty())
++                .map(|r| name(&r[0]))
++                .filter(|n| n != "npt-load-ctl")
++                .collect()
++        })
++        .unwrap_or_default();
++    if doc_controls.iter().map(String::as_str).collect::<Vec<_>>() != RoomControl::NAMES {
++        problems.push(format!(
++            "u4-6: the room-wide controls are {doc_controls:?}, npt-proto's {:?}",
++            RoomControl::NAMES
++        ));
++    }
++    let size_line = format!(
++        "**Size:** at most {} B a message",
++        thousands(Limits::ROOM_CONTROL)
++    );
++    if !text.contains(&size_line) {
++        problems.push(format!(
++            "u4-6: the doc's room-wide controls do not say {size_line:?}"
++        ));
++    }
++    problems
++}
++
++/// `n` with commas between thousands, as the doc writes sizes.
++fn thousands(n: usize) -> String {
++    let s = n.to_string();
++    let mut out = String::new();
++    for (i, c) in s.chars().enumerate() {
++        if i > 0 && (s.len() - i).is_multiple_of(3) {
++            out.push(',');
++        }
++        out.push(c);
++    }
++    out
++}
++
++#[test]
++fn u4_items_1_2_3_and_6_hold_against_npt_proto() {
++    let problems = audit_u4(&doc());
++    assert!(problems.is_empty(), "{}", problems.join("\n"));
++}
++
++/// One broken copy of the doc per U4 assertion: each must fail, naming its item (the plan's "bites first", §6.1; a7's
++/// broken-copy bites).
++#[test]
++fn u4_every_assertion_bites() {
++    let text = doc();
++    let row = |ty: &str| {
++        text.lines()
++            .find(|l| l.starts_with(&format!("| `{ty}` |")))
++            .unwrap_or_else(|| panic!("the {ty} row"))
++            .to_owned()
++    };
++    let replace_cell = |line: &str, index: usize, value: &str| {
++        let mut c = cells(line);
++        c[index] = value.to_owned();
++        format!("| {} |", c.join(" | "))
++    };
++    let (input, ping, pong, kick, burst, block) = (
++        row("Input"),
++        row("Ping"),
++        row("Pong"),
++        row("Kick"),
++        row("PeerBurst"),
++        row("BlockUdp"),
++    );
++    let cases: Vec<(&str, String)> = vec![
++        ("u4-1:", text.replace(&format!("{kick}\n"), "")),
++        ("u4-1:", text.replace("| `Kick` |", "| `Boot` |")),
++        (
++            "u4-1:",
++            text.replace(&block, &block.replace("`BlockUdp`", "`BlockTcp`")),
++        ),
++        (
++            "u4-2:",
++            text.replace(&input, &replace_cell(&input, 2, "control stream")),
++        ),
++        (
++            "u4-2:",
++            text.replace(&pong, &replace_cell(&pong, 1, "room → client")),
++        ),
++        (
++            "u4-3:",
++            text.replace(&ping, &ping.replace("| 32 B (proposed", "| 33 B (proposed")),
++        ),
++        (
++            "u4-3:",
++            text.replace(
++                "refuses a datagram above 1,150 B",
++                "refuses a datagram above 1,151 B",
++            ),
++        ),
++        (
++            "u4-6:",
++            text.replace(&burst, &burst.replace("`PeerBurst`", "`PeerBlast`")),
++        ),
++        (
++            "u4-6:",
++            text.replace("at most 1,024 B a message", "at most 1,025 B a message"),
++        ),
++    ];
++    for (expect, broken) in &cases {
++        assert_ne!(
++            broken, &text,
++            "the broken copy for {expect} changed nothing"
++        );
++        let problems = audit_u4(broken);
++        assert!(
++            problems.iter().any(|p| p.starts_with(expect)),
++            "a copy broken for {expect} passed: {problems:?}"
++        );
++    }
++}
++
++/// A type's bytes after their framing (its type and body), framed for `channel` (catalogue §1).
++fn reframed(bytes: &[u8], from: Channel, to: Channel) -> Vec<u8> {
++    let frame = |c: Channel| match c {
++        Channel::Datagram => 0,
++        Channel::Control => 2,
++        Channel::FullState => 4,
++    };
++    let content = &bytes[frame(from)..];
++    let mut out = match frame(to) {
++        2 => (content.len() as u16).to_le_bytes().to_vec(),
++        4 => (content.len() as u32).to_le_bytes().to_vec(),
++        _ => Vec::new(),
++    };
++    out.extend_from_slice(content);
++    out
++}
++
++/// Item 2, the code's half: each type decodes at its receiver on its own channel and is refused there on every other
++/// one (`WrongChannel`), and refused at the other end (`WrongDirection`) unless it travels both ways. Item 3's size
++/// half: one byte over the limit the doc gives is the size error, whatever the buffer holds (a3 in tests/wire.rs runs
++/// it per type on 1,000 cases).
++#[test]
++fn u4_items_2_and_3_each_type_on_its_channel_its_direction_and_its_limit() {
++    let text = doc();
++    let empty = [
++        Message::Input(Input::default()),
++        Message::Snapshot(Snapshot::default()),
++        Message::FullState(FullState::default()),
++        Message::Resync(Resync),
++        Message::Ping(Ping::default()),
++        Message::Pong(Pong::default()),
++        Message::Join(Join::default()),
++        Message::JoinAccepted(JoinAccepted::default()),
++        Message::JoinRejected(JoinRejected::RosterFull),
++        Message::ClientSettings(ClientSettings::default()),
++        Message::RoomEnded(RoomEnded {
++            reason: EndReason::Crash,
++            final_tick: 7,
++        }),
++        Message::Leave(Leave::Quit),
++        Message::Kick(Kick::Overflow),
++        Message::SessionControl(SessionControl::TriggerBurst { cap: [1; 16] }),
++        Message::SessionStatus(SessionStatus::default()),
++    ];
++    for m in &empty {
++        let (ty, channel, direction, limit) = Limits::TYPES
++            .iter()
++            .copied()
++            .find(|t| t.0 == m.name())
++            .expect("a row");
++        let mut bytes = Vec::new();
++        encode(m, &mut bytes).expect("encodes");
++        let receivers: &[Direction] = match direction {
++            Direction::BothWays => &[Direction::ClientToRoom, Direction::RoomToClient],
++            d => &[d],
++        };
++        for &at in receivers {
++            assert_eq!(decode(at, channel, &bytes).as_ref(), Ok(m), "{ty}");
++            for other in [Channel::Datagram, Channel::Control, Channel::FullState] {
++                if other != channel {
++                    let b = reframed(&bytes, channel, other);
++                    assert_eq!(
++                        decode(at, other, &b),
++                        Err(DecodeError::WrongChannel),
++                        "{ty} on {other:?}"
++                    );
++                }
++            }
++        }
++        if direction != Direction::BothWays {
++            let wrong = if direction == Direction::ClientToRoom {
++                Direction::RoomToClient
++            } else {
++                Direction::ClientToRoom
++            };
++            assert_eq!(
++                decode(wrong, channel, &bytes),
++                Err(DecodeError::WrongDirection),
++                "{ty}"
++            );
++        }
++        // The size half: the doc's limit (for Snapshot, the receive limit its cell names), counted as the doc counts.
++        let wire = text
++            .lines()
++            .find(|l| l.starts_with(&format!("| `{ty}` |")))
++            .map(cells)
++            .expect("its row");
++        let doc_limit = if ty == "Snapshot" {
++            Limits::SNAPSHOT_RECEIVE
++        } else {
++            leading_bytes(&wire[5]).expect("bytes")
++        };
++        assert_eq!(leading_bytes(&wire[5]), Some(limit));
++        let over = doc_limit + 1 + if channel == Channel::FullState { 4 } else { 0 };
++        let mut b = bytes.clone();
++        b.resize(over, 0xa5);
++        assert_eq!(
++            decode(direction_or_room(direction), channel, &b),
++            Err(DecodeError::TooLarge),
++            "{ty}"
++        );
++    }
++}
++
++fn direction_or_room(d: Direction) -> Direction {
++    if d == Direction::BothWays {
++        Direction::ClientToRoom
++    } else {
++        d
++    }
++}
++
++/// Item 6: the room-wide controls decode with the 1,024 B limit and never panic: every control at its largest decodes,
++/// one byte over the limit is the size error, and 10,000 fixed-seed random buffers up to the limit give an error or
++/// the control that encodes to them (tests/wire.rs's a1 and a2 run 10,000 and 100,000 more).
++#[test]
++fn u4_item_6_room_controls_decode_within_1_024_b_and_never_panic() {
++    let sixteen: Vec<IpAddr> = (0..16u8)
++        .map(|i| {
++            if i % 2 == 0 {
++                IpAddr::V4(Ipv4Addr::new(10, 0, 0, i))
++            } else {
++                "2001:db8:0:1::".parse().expect("an address")
++            }
++        })
++        .collect();
++    let largest = RoomControl::RaiseAddrCap {
++        cap: 48,
++        addrs: sixteen,
++    };
++    let mut b = Vec::new();
++    largest.encode(&mut b).expect("encodes");
++    assert!(b.len() <= Limits::ROOM_CONTROL, "{}", b.len());
++    assert_eq!(RoomControl::decode(&b), Ok(largest));
++    // The enum and its names, both ways round: one control of each kind names NAMES in order (an exhaustive match
++    // gives each its code), as item 1 holds SessionControl's variants to the doc's rows.
++    let peers = vec![IpAddr::V4(Ipv4Addr::LOCALHOST)];
++    let one_of_each = [
++        RoomControl::MintToken {
++            slot: 1,
++            kind: npt_proto::TokenKind::Runner,
++        },
++        RoomControl::MintCapability { slot: 2 },
++        RoomControl::SetRewindCap { ticks: 9 },
++        RoomControl::RaiseAddrCap {
++            cap: 3,
++            addrs: peers.clone(),
++        },
++        RoomControl::InjectPanic {
++            target: None,
++            at: 4,
++        },
++        RoomControl::InjectStall { ms: 200, at: 5 },
++        RoomControl::SetPeerProfile {
++            peers: None,
++            profile: npt_proto::ProfileId::P3,
++        },
++        RoomControl::SetPeerThrottle {
++            peers: peers.clone(),
++            kbps: 128,
++            secs: 10,
++        },
++        RoomControl::SetPeerBottleneck {
++            peers: peers.clone(),
++            percent: 50,
++            secs: 600,
++        },
++        RoomControl::PeerBurst {
++            peers: peers.clone(),
++            ms: 1_000,
++        },
++        RoomControl::BlockPeerUdp {
++            peers: None,
++            on: true,
++        },
++    ];
++    assert_eq!(one_of_each.map(|c| c.name()), RoomControl::NAMES);
++    let variants = [
++        SessionControl::SetProfile {
++            cap: [0; 16],
++            profile: npt_proto::ProfileId::Default,
++        },
++        SessionControl::TriggerBurst { cap: [0; 16] },
++        SessionControl::BlockUdp {
++            cap: [0; 16],
++            on: false,
++        },
++        SessionControl::RecordStep {
++            cap: [0; 16],
++            step: 14,
++            result: npt_proto::StepResult::Observation,
++            note: String::new(),
++        },
++    ];
++    assert_eq!(variants.map(|v| v.variant()), SessionControl::VARIANTS);
++    let mut over = vec![0u8; Limits::ROOM_CONTROL + 1];
++    over[..2].copy_from_slice(&((Limits::ROOM_CONTROL - 1) as u16).to_le_bytes());
++    over[2] = 4;
++    assert_eq!(RoomControl::decode(&over), Err(DecodeError::TooLarge));
++    let mut rng = ChaCha8Rng::seed_from_u64(0xc6);
++    for _ in 0..10_000 {
++        let len = rng.next_u32() as usize % (Limits::ROOM_CONTROL + 1);
++        let mut buf = vec![0u8; len];
++        rng.fill_bytes(&mut buf);
++        if len >= 3 {
++            buf[..2].copy_from_slice(&((len - 2) as u16).to_le_bytes());
++            buf[2] = 1 + (rng.next_u32() % 11) as u8;
++        }
++        let r = std::panic::catch_unwind(|| RoomControl::decode(&buf)).expect("never a panic");
++        if let Ok(c) = r {
++            let mut again = Vec::new();
++            c.encode(&mut again).expect("encodes");
++            assert_eq!(again, buf);
++        }
++    }
++}
++
+ #[test]
+ fn sizes_read_as_whole_bytes() {
+     for ok in ["166 B (proposed)", "1,000 B of payload", "65,536 B", "8 B"] {
 diff --git a/spikes/netcode-proof/crates/proto/src/bits.rs b/spikes/netcode-proof/crates/proto/src/bits.rs
 new file mode 100644
-index 0000000..a201d1d
+index 0000000..7592ded
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/proto/src/bits.rs
-@@ -0,0 +1,190 @@
+@@ -0,0 +1,200 @@
 +//! Bit packing, least significant bit first: a value's low bit goes into the lowest free bit of the current byte, so a
 +//! byte-aligned 16-, 32- or 64-bit value lands little-endian. Every message body is read and written through these
 +//! two, so a byte-aligned field and a packed one follow one rule.
@@ -77,7 +1061,10 @@ index 0000000..a201d1d
 +    /// The low `bits` bits of `value` (1 to 64; the caller has checked that `value` fits).
 +    pub(crate) fn put(&mut self, value: u64, bits: u32) {
 +        debug_assert!((1..=64).contains(&bits));
-+        debug_assert!(bits == 64 || value >> bits == 0, "{value} does not fit in {bits} bits");
++        debug_assert!(
++            bits == 64 || value >> bits == 0,
++            "{value} does not fit in {bits} bits"
++        );
 +        let mut left = bits;
 +        let mut v = value;
 +        while left > 0 {
@@ -122,7 +1109,10 @@ index 0000000..a201d1d
 +    /// The next `bits` bits (1 to 64) as an unsigned value.
 +    pub(crate) fn get(&mut self, bits: u32) -> Result<u64, DecodeError> {
 +        debug_assert!((1..=64).contains(&bits));
-+        let end = self.pos.checked_add(bits as usize).ok_or(DecodeError::Truncated)?;
++        let end = self
++            .pos
++            .checked_add(bits as usize)
++            .ok_or(DecodeError::Truncated)?;
 +        if end > self.bytes.len().saturating_mul(8) {
 +            return Err(DecodeError::Truncated);
 +        }
@@ -216,7 +1206,8 @@ index 0000000..a201d1d
 +        w.put(1, 1);
 +        w.align();
 +        w.put(0xbeef, 16);
-+        assert_eq!(out.len(), 1 + 2 + 7 + 1 + 2);
++        // 3 + 10 + 64 + 1 = 78 bits in 10 bytes, then the aligned 2.
++        assert_eq!(out.len(), 10 + 2);
 +        assert_eq!(&out[out.len() - 2..], &[0xef, 0xbe]);
 +        let mut r = BitReader::new(&out);
 +        assert_eq!(r.get(3), Ok(0b101));
@@ -242,15 +1233,18 @@ index 0000000..a201d1d
 +        assert_eq!(r.u8(), Ok(0b1000_0001));
 +        assert_eq!(r.finish(true), Err(DecodeError::TrailingBytes));
 +        assert_eq!(BitReader::new(&bytes).take(3), Err(DecodeError::Truncated));
-+        assert_eq!(BitReader::new(&bytes).array::<3>(), Err(DecodeError::Truncated));
++        assert_eq!(
++            BitReader::new(&bytes).array::<3>(),
++            Err(DecodeError::Truncated)
++        );
 +    }
 +}
 diff --git a/spikes/netcode-proof/crates/proto/src/control.rs b/spikes/netcode-proof/crates/proto/src/control.rs
 new file mode 100644
-index 0000000..45153cd
+index 0000000..588dfb4
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/proto/src/control.rs
-@@ -0,0 +1,622 @@
+@@ -0,0 +1,675 @@
 +//! The controls: `SessionControl` and its four variants, which a browser holding its slot's capability sends on its
 +//! control stream, `SessionStatus`, the room's answer for that browser's overlay (catalogue §2, §4; plan §10.2), and
 +//! `RoomControl`, the room-wide controls that never travel on the wire, only on the room's local sockets (catalogue
@@ -406,7 +1400,8 @@ index 0000000..45153cd
 +
 +impl SessionControl {
 +    /// The variants' names, in the catalogue's "Session controls" order.
-+    pub const VARIANTS: [&'static str; 4] = ["SetProfile", "TriggerBurst", "BlockUdp", "RecordStep"];
++    pub const VARIANTS: [&'static str; 4] =
++        ["SetProfile", "TriggerBurst", "BlockUdp", "RecordStep"];
 +
 +    /// This control's variant name, one of [`SessionControl::VARIANTS`].
 +    pub fn variant(&self) -> &'static str {
@@ -541,26 +1536,59 @@ index 0000000..45153cd
 +/// a tick in the future, an address on the run's lists) are npt-server's and npt-room's.
 +#[derive(Clone, Debug, PartialEq, Eq)]
 +pub enum RoomControl {
-+    MintToken { slot: u8, kind: TokenKind },
-+    MintCapability { slot: u8 },
++    MintToken {
++        slot: u8,
++        kind: TokenKind,
++    },
++    MintCapability {
++        slot: u8,
++    },
 +    /// At least 1.
-+    SetRewindCap { ticks: u16 },
++    SetRewindCap {
++        ticks: u16,
++    },
 +    /// IPv4 addresses and IPv6 /64 prefixes, 1 to 16.
-+    RaiseAddrCap { cap: u16, addrs: Vec<IpAddr> },
++    RaiseAddrCap {
++        cap: u16,
++        addrs: Vec<IpAddr>,
++    },
 +    /// `target` `None` for the tick thread, else that slot's connection task (a slot below 255).
-+    InjectPanic { target: Option<u8>, at: u32 },
++    InjectPanic {
++        target: Option<u8>,
++        at: u32,
++    },
 +    /// At most 1,000 ms.
-+    InjectStall { ms: u16, at: u32 },
++    InjectStall {
++        ms: u16,
++        at: u32,
++    },
 +    /// `peers` `None` for `default`; `profile` P0 to P4.
-+    SetPeerProfile { peers: Option<Vec<IpAddr>>, profile: ProfileId },
++    SetPeerProfile {
++        peers: Option<Vec<IpAddr>>,
++        profile: ProfileId,
++    },
 +    /// `kbps` above 0, `secs` at most 600.
-+    SetPeerThrottle { peers: Vec<IpAddr>, kbps: u16, secs: u16 },
++    SetPeerThrottle {
++        peers: Vec<IpAddr>,
++        kbps: u16,
++        secs: u16,
++    },
 +    /// `percent` 1 to 100, `secs` at most 600.
-+    SetPeerBottleneck { peers: Vec<IpAddr>, percent: u8, secs: u16 },
++    SetPeerBottleneck {
++        peers: Vec<IpAddr>,
++        percent: u8,
++        secs: u16,
++    },
 +    /// At most 1,000 ms.
-+    PeerBurst { peers: Vec<IpAddr>, ms: u16 },
++    PeerBurst {
++        peers: Vec<IpAddr>,
++        ms: u16,
++    },
 +    /// `peers` `None` for `all`.
-+    BlockPeerUdp { peers: Option<Vec<IpAddr>>, on: bool },
++    BlockPeerUdp {
++        peers: Option<Vec<IpAddr>>,
++        on: bool,
++    },
 +}
 +
 +/// A peer-set count that stands for `default` or `all`.
@@ -613,7 +1641,9 @@ index 0000000..45153cd
 +        let family = r.u8()?;
 +        let b: [u8; 16] = r.array()?;
 +        let addr = match family {
-+            4 if b[4..].iter().all(|&x| x == 0) => IpAddr::V4(Ipv4Addr::new(b[0], b[1], b[2], b[3])),
++            4 if b[4..].iter().all(|&x| x == 0) => {
++                IpAddr::V4(Ipv4Addr::new(b[0], b[1], b[2], b[3]))
++            }
 +            6 if b[8..].iter().all(|&x| x == 0) => IpAddr::V6(Ipv6Addr::from(b)),
 +            4 | 6 => return Err(DecodeError::UnknownField),
 +            _ => return Err(DecodeError::OutOfRange),
@@ -739,7 +1769,11 @@ index 0000000..45153cd
 +                w.put(u64::from(*kbps), 16);
 +                w.put(u64::from(*secs), 16);
 +            }
-+            RoomControl::SetPeerBottleneck { peers, percent, secs } => {
++            RoomControl::SetPeerBottleneck {
++                peers,
++                percent,
++                secs,
++            } => {
 +                if !(1..=100).contains(percent) || *secs > 600 {
 +                    return Err(EncodeError::OutOfRange);
 +                }
@@ -835,7 +1869,11 @@ index 0000000..45153cd
 +                if !(1..=100).contains(&percent) || secs > 600 {
 +                    return Err(DecodeError::OutOfRange);
 +                }
-+                RoomControl::SetPeerBottleneck { peers, percent, secs }
++                RoomControl::SetPeerBottleneck {
++                    peers,
++                    percent,
++                    secs,
++                }
 +            }
 +            10 => {
 +                let peers = listed(&mut r)?;
@@ -866,7 +1904,16 @@ index 0000000..45153cd
 +    #[test]
 +    fn a_note_with_a_control_or_format_character_is_refused() {
 +        assert!(note_ok("saw a rubber-band at 0:42, café"));
-+        for bad in ["tab\there", "nul\u{0}", "del\u{7f}", "c1\u{85}", "rlo\u{202e}", "zwsp\u{200b}", "bom\u{feff}", "tag\u{e0041}"] {
++        for bad in [
++            "tab\there",
++            "nul\u{0}",
++            "del\u{7f}",
++            "c1\u{85}",
++            "rlo\u{202e}",
++            "zwsp\u{200b}",
++            "bom\u{feff}",
++            "tag\u{e0041}",
++        ] {
 +            assert!(!note_ok(bad), "{bad:?}");
 +        }
 +        assert!(note_ok(&"é".repeat(240)));
@@ -949,10 +1996,10 @@ index 0000000..83d6ceb
 +impl std::error::Error for EncodeError {}
 diff --git a/spikes/netcode-proof/crates/proto/src/hash.rs b/spikes/netcode-proof/crates/proto/src/hash.rs
 new file mode 100644
-index 0000000..538c34c
+index 0000000..7ac3fc4
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/proto/src/hash.rs
-@@ -0,0 +1,92 @@
+@@ -0,0 +1,97 @@
 +//! `client_hash`: what both ends of PM-0001-17 hash for one client and one tick (u4-build-plan.md §4.6; the advisor's
 +//! Q11 ruling). The room's encoder hashes what it intends the client to hold after decoding that tick, with the
 +//! server's own 32-bit tick and event numbers; the client hashes what it holds, turned back into grid integers through
@@ -1024,7 +2071,12 @@ index 0000000..538c34c
 +/// The client-held hash of one client's view at `tick` (the module text): `entities` its entity set, `own` its
 +/// own-state records, `events` its events as (32-bit event number, event). Either side may pass the records and the
 +/// events in any order. Never 0.
-+pub fn client_hash(tick: u32, entities: &[EntityRecord], own: &[EntityRecord], events: &[(u32, SimEvent)]) -> u64 {
++pub fn client_hash(
++    tick: u32,
++    entities: &[EntityRecord],
++    own: &[EntityRecord],
++    events: &[(u32, SimEvent)],
++) -> u64 {
 +    let mut h = Fnv(FNV_OFFSET);
 +    h.bytes(&tick.to_le_bytes());
 +    records(&mut h, entities);
@@ -1047,10 +2099,10 @@ index 0000000..538c34c
 +}
 diff --git a/spikes/netcode-proof/crates/proto/src/input.rs b/spikes/netcode-proof/crates/proto/src/input.rs
 new file mode 100644
-index 0000000..619a39f
+index 0000000..1607367
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/proto/src/input.rs
-@@ -0,0 +1,283 @@
+@@ -0,0 +1,308 @@
 +//! `Input`: a client's commands, the newest whole and each older one delta-coded against the newer one beside it
 +//! (ADR 0001 part 5: option U2), with the newest snapshot the client decoded (u4-build-plan.md §4.4, §4.5).
 +//!
@@ -1117,14 +2169,20 @@ index 0000000..619a39f
 +pub(crate) const HEADER_BYTES: usize = 5;
 +/// A whole command's bytes.
 +pub(crate) const WHOLE_BYTES: usize =
-+    ((TICK_BITS + SEQ_BITS + BUTTONS_BITS + PRESSES_BITS + MOVE_BITS + AIM_BITS + VIEW_BITS) as usize).div_ceil(8);
++    ((TICK_BITS + SEQ_BITS + BUTTONS_BITS + PRESSES_BITS + MOVE_BITS + AIM_BITS + VIEW_BITS)
++        as usize)
++        .div_ceil(8);
 +/// The largest repeat's bytes: every field changed.
 +pub(crate) const REPEAT_BYTES: usize =
-+    ((MASK_BITS + STEP_BITS + BUTTONS_BITS + PRESSES_BITS + MOVE_BITS + AIM_BITS + VIEW_BITS) as usize).div_ceil(8);
++    ((MASK_BITS + STEP_BITS + BUTTONS_BITS + PRESSES_BITS + MOVE_BITS + AIM_BITS + VIEW_BITS)
++        as usize)
++        .div_ceil(8);
 +
 +// The catalogue's rule: a repeat is never larger than a whole command, and a full datagram fits Input's limit.
 +const _: () = assert!(REPEAT_BYTES <= WHOLE_BYTES);
-+const _: () = assert!(HEADER_BYTES + WHOLE_BYTES + (Limits::REDUNDANCY_CAP - 1) * REPEAT_BYTES <= Limits::INPUT);
++const _: () = assert!(
++    HEADER_BYTES + WHOLE_BYTES + (Limits::REDUNDANCY_CAP - 1) * REPEAT_BYTES <= Limits::INPUT
++);
 +
 +const BUTTONS: u8 = 1;
 +const PRESSES: u8 = 1 << 1;
@@ -1135,7 +2193,8 @@ index 0000000..619a39f
 +
 +/// A command's view time as the wire carries it: the offset back from its own tick, and the fraction.
 +fn view(c: &Command) -> Result<(u16, u8), EncodeError> {
-+    let offset = u16::try_from(c.tick.wrapping_sub(c.view_tick)).map_err(|_| EncodeError::OutOfRange)?;
++    let offset =
++        u16::try_from(c.tick.wrapping_sub(c.view_tick)).map_err(|_| EncodeError::OutOfRange)?;
 +    Ok((offset, c.view_fraction))
 +}
 +
@@ -1196,7 +2255,8 @@ index 0000000..619a39f
 +                    if c.seq != n.seq.wrapping_sub(1) {
 +                        return Err(EncodeError::NotCanonical);
 +                    }
-+                    let step = u8::try_from(n.tick.wrapping_sub(c.tick)).map_err(|_| EncodeError::OutOfRange)?;
++                    let step = u8::try_from(n.tick.wrapping_sub(c.tick))
++                        .map_err(|_| EncodeError::OutOfRange)?;
 +                    let mut mask = 0u8;
 +                    if c.buttons != n.buttons {
 +                        mask |= BUTTONS;
@@ -1277,11 +2337,28 @@ index 0000000..619a39f
 +                    }
 +                    let step = r.u8()?;
 +                    let tick = n.tick.wrapping_sub(u32::from(step));
-+                    let (n_offset, n_fraction) = (n.tick.wrapping_sub(n.view_tick), n.view_fraction);
-+                    let buttons = if mask & BUTTONS != 0 { r.u16()? } else { n.buttons };
-+                    let presses = if mask & PRESSES != 0 { get_presses(r)? } else { n.presses };
-+                    let move_xy = if mask & MOVE != 0 { get_move(r)? } else { n.move_xy };
-+                    let aim = if mask & AIM_CHANGED != 0 { get_aim(q, r)? } else { n.aim };
++                    let (n_offset, n_fraction) =
++                        (n.tick.wrapping_sub(n.view_tick), n.view_fraction);
++                    let buttons = if mask & BUTTONS != 0 {
++                        r.u16()?
++                    } else {
++                        n.buttons
++                    };
++                    let presses = if mask & PRESSES != 0 {
++                        get_presses(r)?
++                    } else {
++                        n.presses
++                    };
++                    let move_xy = if mask & MOVE != 0 {
++                        get_move(r)?
++                    } else {
++                        n.move_xy
++                    };
++                    let aim = if mask & AIM_CHANGED != 0 {
++                        get_aim(q, r)?
++                    } else {
++                        n.aim
++                    };
 +                    let (offset, fraction) = if mask & VIEW != 0 {
 +                        (u32::from(r.u16()?), r.u8()?)
 +                    } else {
@@ -1336,10 +2413,10 @@ index 0000000..619a39f
 +}
 diff --git a/spikes/netcode-proof/crates/proto/src/limits.rs b/spikes/netcode-proof/crates/proto/src/limits.rs
 new file mode 100644
-index 0000000..c7b84b1
+index 0000000..2d87dc8
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/proto/src/limits.rs
-@@ -0,0 +1,71 @@
+@@ -0,0 +1,136 @@
 +//! Every size limit and cap the wire has, as the catalogue gives them (docs/design/netcode-proof-messages.md §2's
 +//! Size limit column, §1's framing, §4 and §5): catalogue item 3 compares [`Limits::TYPES`] with that column.
 +
@@ -1394,29 +2471,94 @@ index 0000000..c7b84b1
 +    /// its name, channel, direction and size limit (the Size limit column's leading number; `Snapshot`'s is its
 +    /// send-side cap). The type byte on the wire is the row's position, from 1.
 +    pub const TYPES: [(&'static str, Channel, Direction, usize); 15] = [
-+        ("Input", Channel::Datagram, Direction::ClientToRoom, Limits::INPUT),
-+        ("Snapshot", Channel::Datagram, Direction::RoomToClient, Limits::SNAPSHOT),
-+        ("FullState", Channel::FullState, Direction::RoomToClient, Limits::FULL_STATE),
-+        ("Resync", Channel::Control, Direction::ClientToRoom, Limits::RESYNC),
++        (
++            "Input",
++            Channel::Datagram,
++            Direction::ClientToRoom,
++            Limits::INPUT,
++        ),
++        (
++            "Snapshot",
++            Channel::Datagram,
++            Direction::RoomToClient,
++            Limits::SNAPSHOT,
++        ),
++        (
++            "FullState",
++            Channel::FullState,
++            Direction::RoomToClient,
++            Limits::FULL_STATE,
++        ),
++        (
++            "Resync",
++            Channel::Control,
++            Direction::ClientToRoom,
++            Limits::RESYNC,
++        ),
 +        ("Ping", Channel::Datagram, Direction::BothWays, Limits::PING),
 +        ("Pong", Channel::Datagram, Direction::BothWays, Limits::PONG),
-+        ("Join", Channel::Control, Direction::ClientToRoom, Limits::JOIN),
-+        ("JoinAccepted", Channel::Control, Direction::RoomToClient, Limits::JOIN_ACCEPTED),
-+        ("JoinRejected", Channel::Control, Direction::RoomToClient, Limits::JOIN_REJECTED),
-+        ("ClientSettings", Channel::Control, Direction::ClientToRoom, Limits::CLIENT_SETTINGS),
-+        ("RoomEnded", Channel::Control, Direction::RoomToClient, Limits::ROOM_ENDED),
-+        ("Leave", Channel::Control, Direction::ClientToRoom, Limits::LEAVE),
-+        ("Kick", Channel::Control, Direction::RoomToClient, Limits::KICK),
-+        ("SessionControl", Channel::Control, Direction::ClientToRoom, Limits::SESSION_CONTROL),
-+        ("SessionStatus", Channel::Control, Direction::RoomToClient, Limits::SESSION_STATUS),
++        (
++            "Join",
++            Channel::Control,
++            Direction::ClientToRoom,
++            Limits::JOIN,
++        ),
++        (
++            "JoinAccepted",
++            Channel::Control,
++            Direction::RoomToClient,
++            Limits::JOIN_ACCEPTED,
++        ),
++        (
++            "JoinRejected",
++            Channel::Control,
++            Direction::RoomToClient,
++            Limits::JOIN_REJECTED,
++        ),
++        (
++            "ClientSettings",
++            Channel::Control,
++            Direction::ClientToRoom,
++            Limits::CLIENT_SETTINGS,
++        ),
++        (
++            "RoomEnded",
++            Channel::Control,
++            Direction::RoomToClient,
++            Limits::ROOM_ENDED,
++        ),
++        (
++            "Leave",
++            Channel::Control,
++            Direction::ClientToRoom,
++            Limits::LEAVE,
++        ),
++        (
++            "Kick",
++            Channel::Control,
++            Direction::RoomToClient,
++            Limits::KICK,
++        ),
++        (
++            "SessionControl",
++            Channel::Control,
++            Direction::ClientToRoom,
++            Limits::SESSION_CONTROL,
++        ),
++        (
++            "SessionStatus",
++            Channel::Control,
++            Direction::RoomToClient,
++            Limits::SESSION_STATUS,
++        ),
 +    ];
 +}
 diff --git a/spikes/netcode-proof/crates/proto/src/msg.rs b/spikes/netcode-proof/crates/proto/src/msg.rs
 new file mode 100644
-index 0000000..5016f7a
+index 0000000..726f485
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/proto/src/msg.rs
-@@ -0,0 +1,497 @@
+@@ -0,0 +1,522 @@
 +//! The 15 built message types (plan §4.7: 13, `SessionControl`, and `SessionStatus` by the advisor's A1 ruling), their
 +//! framing per channel, and [`encode`] and [`decode`] (catalogue §1, "Framing and channels"; §2's rows).
 +//!
@@ -1637,8 +2779,16 @@ index 0000000..5016f7a
 +/// 2 B length a control-stream limit counts; `Snapshot` at its receive limit.
 +fn content_limit(t: usize) -> usize {
 +    let (name, channel, _, limit) = row(t);
-+    let limit = if name == "Snapshot" { Limits::SNAPSHOT_RECEIVE } else { limit };
-+    if channel == Channel::Control { limit - 2 } else { limit }
++    let limit = if name == "Snapshot" {
++        Limits::SNAPSHOT_RECEIVE
++    } else {
++        limit
++    };
++    if channel == Channel::Control {
++        limit - 2
++    } else {
++        limit
++    }
 +}
 +
 +/// Whether type `t` travels the way `way` says.
@@ -1652,8 +2802,16 @@ index 0000000..5016f7a
 +/// that travels that way, framed for that channel.
 +pub(crate) fn channel_max(way: Direction, channel: Channel) -> usize {
 +    let ways = 1..=Limits::TYPES.len();
-+    let on = ways.clone().filter(|&t| travels(t, way) && row(t).1 == channel).map(content_limit).max();
-+    let any = ways.filter(|&t| travels(t, way)).map(content_limit).max().unwrap_or(0);
++    let on = ways
++        .clone()
++        .filter(|&t| travels(t, way) && row(t).1 == channel)
++        .map(content_limit)
++        .max();
++    let any = ways
++        .filter(|&t| travels(t, way))
++        .map(content_limit)
++        .max()
++        .unwrap_or(0);
 +    framing(channel) + on.unwrap_or(any)
 +}
 +
@@ -1759,7 +2917,12 @@ index 0000000..5016f7a
 +    ///
 +    /// # Errors
 +    /// As [`decode`].
-+    pub fn decode(self, way: Direction, channel: Channel, bytes: &[u8]) -> Result<Message, DecodeError> {
++    pub fn decode(
++        self,
++        way: Direction,
++        channel: Channel,
++        bytes: &[u8],
++    ) -> Result<Message, DecodeError> {
 +        let frame = framing(channel);
 +        if bytes.len() > channel_max(way, channel) {
 +            return Err(DecodeError::TooLarge);
@@ -1895,7 +3058,11 @@ index 0000000..5016f7a
 +            let mut out = Vec::new();
 +            encode(m, &mut out).unwrap_or_else(|e| panic!("{}: {e}", m.name()));
 +            let (_, channel, way, _) = Limits::TYPES[i];
-+            let way = if way == Direction::BothWays { Direction::ClientToRoom } else { way };
++            let way = if way == Direction::BothWays {
++                Direction::ClientToRoom
++            } else {
++                way
++            };
 +            assert_eq!(decode(way, channel, &out).as_ref(), Ok(m), "{}", m.name());
 +        }
 +    }
@@ -1916,10 +3083,10 @@ index 0000000..5016f7a
 +}
 diff --git a/spikes/netcode-proof/crates/proto/src/quant.rs b/spikes/netcode-proof/crates/proto/src/quant.rs
 new file mode 100644
-index 0000000..5adc796
+index 0000000..22d31b3
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/proto/src/quant.rs
-@@ -0,0 +1,400 @@
+@@ -0,0 +1,440 @@
 +//! `Quant`: the codec as one caller chose it. It packs each grid integer into its field's width
 +//! (u4-build-plan.md §4.4: the grid's integers come from `npt_sim::grid`, one function each way for the sim's own-copy
 +//! snap and both codec ends; npt-proto only packs them), and it is the one value through which a caller of
@@ -2009,7 +3176,11 @@ index 0000000..5adc796
 +
 +/// The multiple of `s` nearest `k`, a tie away from zero (the grid's tie rule: npt_sim::grid).
 +fn nearest_multiple(k: i64, s: i64) -> i64 {
-+    let q = if k >= 0 { (k + s / 2) / s } else { -((-k + s / 2) / s) };
++    let q = if k >= 0 {
++        (k + s / 2) / s
++    } else {
++        -((-k + s / 2) / s)
++    };
 +    q * s
 +}
 +
@@ -2134,7 +3305,12 @@ index 0000000..5adc796
 +    }
 +
 +    /// Writes `k`, an integer of `field`, in the field's width.
-+    pub(crate) fn put(self, w: &mut BitWriter<'_>, field: Field, k: i32) -> Result<(), EncodeError> {
++    pub(crate) fn put(
++        self,
++        w: &mut BitWriter<'_>,
++        field: Field,
++        k: i32,
++    ) -> Result<(), EncodeError> {
 +        let code = self.code(field, k)?;
 +        w.put(code, field.bits());
 +        Ok(())
@@ -2166,7 +3342,8 @@ index 0000000..5adc796
 +        let mut w = BitWriter::new(&mut out);
 +        q.put(&mut w, field, k).expect("an integer of the field");
 +        assert_eq!(out.len(), (field.bits() as usize).div_ceil(8));
-+        q.get(&mut BitReader::new(&out), field).expect("its own code")
++        q.get(&mut BitReader::new(&out), field)
++            .expect("its own code")
 +    }
 +
 +    #[test]
@@ -2185,8 +3362,16 @@ index 0000000..5adc796
 +                assert_eq!(round_trip(q, f, k), k, "{name}: {k}");
 +            }
 +            // The ends code as the width's own extremes or inside them, and one past an end is refused.
-+            assert_eq!(q.code(f, f.min() - 1), Err(EncodeError::OutOfRange), "{name}");
-+            assert_eq!(q.code(f, f.max().saturating_add(1)), Err(EncodeError::OutOfRange), "{name}");
++            assert_eq!(
++                q.code(f, f.min() - 1),
++                Err(EncodeError::OutOfRange),
++                "{name}"
++            );
++            assert_eq!(
++                q.code(f, f.max().saturating_add(1)),
++                Err(EncodeError::OutOfRange),
++                "{name}"
++            );
 +        }
 +        // The codes at the ends: XY, yaw and velocity two's complement in 16 bits, Z plain in 12, pitch in 10.
 +        assert_eq!(q.code(POSITION_XY, -32_768), Ok(0x8000));
@@ -2206,7 +3391,10 @@ index 0000000..5adc796
 +                assert_eq!(round_trip(q, f, k), k, "{f:?}: {k}");
 +            }
 +        }
-+        assert_eq!(q.code(Field::integer(i32::MIN, i32::MAX), -1), Ok(0xffff_ffff));
++        assert_eq!(
++            q.code(Field::integer(i32::MIN, i32::MAX), -1),
++            Ok(0xffff_ffff)
++        );
 +        assert_eq!(q.code(Field::integer(100, 101), 101), Ok(1));
 +    }
 +
@@ -2215,14 +3403,23 @@ index 0000000..5adc796
 +        // u4s-carries.md carry 4: grid::PITCH is -511..=511, so the 10-bit code -512 (0x200) is no pitch.
 +        let q = Quant::default();
 +        assert_eq!(q.value(PITCH, 0x200), Err(DecodeError::OutOfRange));
-+        assert_eq!(q.get(&mut BitReader::new(&[0x00, 0x02]), PITCH), Err(DecodeError::OutOfRange));
++        assert_eq!(
++            q.get(&mut BitReader::new(&[0x00, 0x02]), PITCH),
++            Err(DecodeError::OutOfRange)
++        );
 +        // Its neighbours are the two ends.
 +        assert_eq!(q.value(PITCH, 0x201), Ok(-511));
 +        assert_eq!(q.value(PITCH, 0x1ff), Ok(511));
 +        // Every other field's unused codes are refused the same way: Z holds every 12-bit code, and an offset field
 +        // its span only.
-+        assert_eq!(q.value(Field::integer(100, 102), 3), Err(DecodeError::OutOfRange));
-+        assert_eq!(q.value(Field::integer(-1, 300), 302), Err(DecodeError::OutOfRange));
++        assert_eq!(
++            q.value(Field::integer(100, 102), 3),
++            Err(DecodeError::OutOfRange)
++        );
++        assert_eq!(
++            q.value(Field::integer(-1, 300), 302),
++            Err(DecodeError::OutOfRange)
++        );
 +    }
 +
 +    /// The worst error of `q`'s coarsening of `field` over its integers, as (the worst over the integers whose
@@ -2234,8 +3431,15 @@ index 0000000..5adc796
 +        let (mut inside, mut ends) = (0i64, 0i64);
 +        for k in field.min()..=field.max() {
 +            let c = q.coarse(field, k);
-+            assert!((field.min()..=field.max()).contains(&c), "{field:?}: {k} → {c}");
-+            assert_eq!(c.rem_euclid(step as i32), 0, "{field:?}: {k} → {c}, not a multiple of {step}");
++            assert!(
++                (field.min()..=field.max()).contains(&c),
++                "{field:?}: {k} → {c}"
++            );
++            assert_eq!(
++                c.rem_euclid(step as i32),
++                0,
++                "{field:?}: {k} → {c}, not a multiple of {step}"
++            );
 +            // It decodes as itself: the coarse integer is what the client gets.
 +            assert_eq!(round_trip(q, field, k), c);
 +            let mut e = (i64::from(c) - i64::from(k)).abs();
@@ -2266,7 +3470,10 @@ index 0000000..5adc796
 +            for &f in fields {
 +                let (inside, ends) = worst(q, f, step);
 +                // Within half the coarse step, and above half the step less one: the defect is really there.
-+                assert!(inside <= step / 2 && inside > step / 2 - 1, "{id} on {f:?}: worst {inside}");
++                assert!(
++                    inside <= step / 2 && inside > step / 2 - 1,
++                    "{id} on {f:?}: worst {inside}"
++                );
 +                // At a non-wrapping field's ends the nearest multiple inside the range is less than one step off.
 +                assert!(ends < step, "{id} on {f:?}: at the ends {ends}");
 +                // The range ends themselves.
@@ -2322,10 +3529,10 @@ index 0000000..5adc796
 +}
 diff --git a/spikes/netcode-proof/crates/proto/src/snapshot.rs b/spikes/netcode-proof/crates/proto/src/snapshot.rs
 new file mode 100644
-index 0000000..b44c608
+index 0000000..030e70e
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/proto/src/snapshot.rs
-@@ -0,0 +1,609 @@
+@@ -0,0 +1,653 @@
 +//! `Snapshot` and `FullState`: the room's view of the world for one client, the field-group layout table, and the
 +//! `EntityRecord` ↔ wire mapping (u4-build-plan.md §4.4, §4.5; catalogue §3).
 +//!
@@ -2406,13 +3613,22 @@ index 0000000..b44c608
 +    /// an [`EntityDelta::Add`].
 +    pub fn between(now: &EntityRecord, baseline: Option<&EntityRecord>) -> Option<EntityDelta> {
 +        match baseline {
-+            Some(b) if b.kind == now.kind && b.index == now.index && b.generation == now.generation => {
++            Some(b)
++                if b.kind == now.kind && b.index == now.index && b.generation == now.generation =>
++            {
 +                let mut changed = 0u16;
 +                let mut grid = [0; EntityRecord::FIELDS];
-+                for i in 0..now.kind.layout().len() {
-+                    if now.grid[i] != b.grid[i] {
++                let n = now.kind.layout().len();
++                for (i, ((g, &new), &old)) in grid
++                    .iter_mut()
++                    .zip(&now.grid)
++                    .zip(&b.grid)
++                    .take(n)
++                    .enumerate()
++                {
++                    if new != old {
 +                        changed |= 1 << i;
-+                        grid[i] = now.grid[i];
++                        *g = new;
 +                    }
 +                }
 +                (changed != 0).then_some(EntityDelta::Update {
@@ -2431,7 +3647,10 @@ index 0000000..b44c608
 +    ///
 +    /// # Errors
 +    /// [`DecodeError::Malformed`] for an update whose baseline record is missing or another entity's.
-+    pub fn apply(&self, baseline: Option<&EntityRecord>) -> Result<Option<EntityRecord>, DecodeError> {
++    pub fn apply(
++        &self,
++        baseline: Option<&EntityRecord>,
++    ) -> Result<Option<EntityRecord>, DecodeError> {
 +        match *self {
 +            EntityDelta::Add(r) => Ok(Some(wire_record(&r))),
 +            EntityDelta::Update {
@@ -2452,14 +3671,6 @@ index 0000000..b44c608
 +                Ok(Some(r))
 +            }
 +            EntityDelta::Remove { .. } => Ok(None),
-+        }
-+    }
-+
-+    /// The entity this delta is about: its kind and index.
-+    pub fn id(&self) -> (EntityKind, u16) {
-+        match *self {
-+            EntityDelta::Add(r) => (r.kind, r.index),
-+            EntityDelta::Update { kind, index, .. } | EntityDelta::Remove { kind, index } => (kind, index),
 +        }
 +    }
 +}
@@ -2487,7 +3698,10 @@ index 0000000..b44c608
 +
 +fn get_kind(r: &mut BitReader<'_>) -> Result<EntityKind, DecodeError> {
 +    let code = r.get(KIND_BITS)?;
-+    EntityKind::ALL.get(code as usize).copied().ok_or(DecodeError::OutOfRange)
++    EntityKind::ALL
++        .get(code as usize)
++        .copied()
++        .ok_or(DecodeError::OutOfRange)
 +}
 +
 +/// A record's every layout field, each in its width; an entry past the layout must be 0.
@@ -2502,7 +3716,11 @@ index 0000000..b44c608
 +    Ok(())
 +}
 +
-+fn get_fields(q: Quant, r: &mut BitReader<'_>, kind: EntityKind) -> Result<[i32; EntityRecord::FIELDS], DecodeError> {
++fn get_fields(
++    q: Quant,
++    r: &mut BitReader<'_>,
++    kind: EntityKind,
++) -> Result<[i32; EntityRecord::FIELDS], DecodeError> {
 +    let mut grid = [0; EntityRecord::FIELDS];
 +    for (f, g) in kind.layout().iter().zip(&mut grid) {
 +        *g = q.get(r, *f)?;
@@ -2537,7 +3755,12 @@ index 0000000..b44c608
 +const UPDATE: u64 = 1;
 +const REMOVE: u64 = 2;
 +
-+fn put_delta(q: Quant, w: &mut BitWriter<'_>, d: &EntityDelta, coded_from_defaults: bool) -> Result<(), EncodeError> {
++fn put_delta(
++    q: Quant,
++    w: &mut BitWriter<'_>,
++    d: &EntityDelta,
++    coded_from_defaults: bool,
++) -> Result<(), EncodeError> {
 +    match d {
 +        EntityDelta::Add(rec) => {
 +            put_kind(w, rec.kind);
@@ -2557,7 +3780,11 @@ index 0000000..b44c608
 +            if coded_from_defaults || *changed == 0 || u32::from(*changed) & !all != 0 {
 +                return Err(EncodeError::NotCanonical);
 +            }
-+            if grid.iter().enumerate().any(|(i, &g)| changed & (1 << i) == 0 && g != 0) {
++            if grid
++                .iter()
++                .enumerate()
++                .any(|(i, &g)| changed & (1 << i) == 0 && g != 0)
++            {
 +                return Err(EncodeError::NotCanonical);
 +            }
 +            put_kind(w, *kind);
@@ -2583,7 +3810,11 @@ index 0000000..b44c608
 +    }
 +}
 +
-+fn get_delta(q: Quant, r: &mut BitReader<'_>, coded_from_defaults: bool) -> Result<EntityDelta, DecodeError> {
++fn get_delta(
++    q: Quant,
++    r: &mut BitReader<'_>,
++    coded_from_defaults: bool,
++) -> Result<EntityDelta, DecodeError> {
 +    let kind = get_kind(r)?;
 +    let index = r.u16()?;
 +    let op = r.get(2)?;
@@ -2733,11 +3964,23 @@ index 0000000..b44c608
 +    pub const GROUPS: [(&'static str, Class, &'static [EntityKind]); 12] = [
 +        ("header: server tick", Class::Public, &[]),
 +        ("header: baseline and acknowledgements", Class::Owner, &[]),
-+        ("own state", Class::Owner, &[EntityKind::Soldier, EntityKind::Effect]),
++        (
++            "own state",
++            Class::Owner,
++            &[EntityKind::Soldier, EntityKind::Effect],
++        ),
 +        ("remote soldiers", Class::Spatial, &[EntityKind::Soldier]),
-+        ("vehicles", Class::Spatial, &[EntityKind::Vehicle, EntityKind::VehiclePart]),
++        (
++            "vehicles",
++            Class::Spatial,
++            &[EntityKind::Vehicle, EntityKind::VehiclePart],
++        ),
 +        ("projectiles", Class::Spatial, &[EntityKind::Projectile]),
-+        ("world pieces", Class::Spatial, &[EntityKind::Door, EntityKind::Wall]),
++        (
++            "world pieces",
++            Class::Spatial,
++            &[EntityKind::Door, EntityKind::Wall],
++        ),
 +        ("gameplay events", Class::Spatial, &[]),
 +        ("hit confirmation", Class::Owner, &[]),
 +        ("cosmetic events", Class::Spatial, &[]),
@@ -2762,7 +4005,8 @@ index 0000000..b44c608
 +        w.put(u64::from(self.baseline_age), 16);
 +        w.put(u64::from(self.newest_received.unwrap_or(0)), 16);
 +        w.put(u64::from(self.last_run.unwrap_or(0)), 16);
-+        let flags = u64::from(self.newest_received.is_some()) | u64::from(self.last_run.is_some()) << 1;
++        let flags =
++            u64::from(self.newest_received.is_some()) | u64::from(self.last_run.is_some()) << 1;
 +        w.put(flags, 8);
 +        w.put(u64::from(self.group) | u64::from(self.groups - 1) << 3, 8);
 +        w.put(self.own.len() as u64, 8);
@@ -2857,7 +4101,11 @@ index 0000000..b44c608
 +    pub const GROUPS: [(&'static str, Class, &'static [EntityKind]); 6] = [
 +        ("header: server tick", Class::Public, &[]),
 +        ("header: baseline and acknowledgements", Class::Owner, &[]),
-+        ("own state", Class::Owner, &[EntityKind::Soldier, EntityKind::Effect]),
++        (
++            "own state",
++            Class::Owner,
++            &[EntityKind::Soldier, EntityKind::Effect],
++        ),
 +        (
 +            "spatial world",
 +            Class::Spatial,
@@ -2928,7 +4176,10 @@ index 0000000..b44c608
 +                let homes: Vec<_> = table.iter().filter(|g| g.2.contains(&kind)).collect();
 +                assert!(!homes.is_empty(), "{kind:?} has no group");
 +                if kind == EntityKind::Effect {
-+                    assert!(homes.iter().all(|g| g.1 == Class::Owner), "{kind:?}: {homes:?}");
++                    assert!(
++                        homes.iter().all(|g| g.1 == Class::Owner),
++                        "{kind:?}: {homes:?}"
++                    );
 +                }
 +            }
 +        }
@@ -2937,10 +4188,10 @@ index 0000000..b44c608
 +}
 diff --git a/spikes/netcode-proof/crates/proto/src/wrap.rs b/spikes/netcode-proof/crates/proto/src/wrap.rs
 new file mode 100644
-index 0000000..b46ef7b
+index 0000000..2da8c83
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/proto/src/wrap.rs
-@@ -0,0 +1,154 @@
+@@ -0,0 +1,197 @@
 +//! `Wrap`: the wrap-aware compares, one per counter width, each called with its counter's name (u4-build-plan.md §4.4;
 +//! PM-0001-58). Every counter that wraps in the proof test goes through one of these: press counters (8 bits);
 +//! command sequences, the 16-bit tick and event numbers on the wire and the acknowledgement (16 bits); ticks
@@ -3028,22 +4279,38 @@ index 0000000..b46ef7b
 +    #[test]
 +    fn a5_each_width_compares_and_widens_across_its_wrap_for_every_counter() {
 +        let w = Wrap::default();
-+        for counter in ["cmd_seq", "press", "tick_offset", "event_seq", "ack", "tick"] {
++        for counter in [
++            "cmd_seq",
++            "press",
++            "tick_offset",
++            "event_seq",
++            "ack",
++            "tick",
++        ] {
 +            // 8 bits: 253, 254, 255, 0, 1, 2 each after the one before; 127 ahead is after, 128 is neither.
 +            let mut a = 253u8;
 +            for _ in 0..6 {
 +                let b = a.wrapping_add(1);
-+                assert!(w.after8(counter, a, b) && !w.after8(counter, b, a), "{counter}: {a} {b}");
++                assert!(
++                    w.after8(counter, a, b) && !w.after8(counter, b, a),
++                    "{counter}: {a} {b}"
++                );
 +                a = b;
 +            }
 +            assert!(w.after8(counter, 200, 200u8.wrapping_add(127)));
-+            assert!(!w.after8(counter, 200, 200u8.wrapping_add(128)) && !w.after8(counter, 200u8.wrapping_add(128), 200));
++            assert!(
++                !w.after8(counter, 200, 200u8.wrapping_add(128))
++                    && !w.after8(counter, 200u8.wrapping_add(128), 200)
++            );
 +            assert!(!w.after8(counter, 7, 7));
 +            // 16 bits.
 +            let mut a = 65_533u16;
 +            for _ in 0..6 {
 +                let b = a.wrapping_add(1);
-+                assert!(w.after16(counter, a, b) && !w.after16(counter, b, a), "{counter}: {a} {b}");
++                assert!(
++                    w.after16(counter, a, b) && !w.after16(counter, b, a),
++                    "{counter}: {a} {b}"
++                );
 +                a = b;
 +            }
 +            assert!(w.after16(counter, 65_000, 65_000u16.wrapping_add(32_767)));
@@ -3052,7 +4319,10 @@ index 0000000..b46ef7b
 +            let mut a = u32::MAX - 2;
 +            for _ in 0..6 {
 +                let b = a.wrapping_add(1);
-+                assert!(w.after32(counter, a, b) && !w.after32(counter, b, a), "{counter}: {a} {b}");
++                assert!(
++                    w.after32(counter, a, b) && !w.after32(counter, b, a),
++                    "{counter}: {a} {b}"
++                );
 +                a = b;
 +            }
 +            assert!(w.after32(counter, 5, 5u32.wrapping_add(i32::MAX as u32)));
@@ -3068,12 +4338,20 @@ index 0000000..b46ef7b
 +                (100, 100 + 32_767, 100 + 32_767),
 +                (40_000, 40_000 - 32_768, 40_000 - 32_768),
 +            ] {
-+                assert_eq!(w.widen16(counter, near, low), want, "{counter}: {near} {low}");
++                assert_eq!(
++                    w.widen16(counter, near, low),
++                    want,
++                    "{counter}: {near} {low}"
++                );
 +            }
 +            for near in [0u32, 1, 30_000, 65_535, 65_536, 1 << 31, u32::MAX] {
 +                for d in [-32_768i32, -1, 0, 1, 32_767] {
 +                    let v = near.wrapping_add_signed(d);
-+                    assert_eq!(w.widen16(counter, near, v as u16), v, "{counter}: {near} {d}");
++                    assert_eq!(
++                        w.widen16(counter, near, v as u16),
++                        v,
++                        "{counter}: {near} {d}"
++                    );
 +                }
 +            }
 +        }
@@ -3085,13 +4363,1422 @@ index 0000000..b46ef7b
 +    fn a5_the_plain_lt_defect_breaks_its_one_named_counter_across_the_wrap() {
 +        let bitten = Wrap::plain_lt("cmd_seq");
 +        let rule = Wrap::default();
-+        assert!(!bitten.after16("cmd_seq", 65_535, 0), "the defect: 0 is not after 65,535");
-+        assert!(bitten.after16("event_seq", 65_535, 0), "another counter keeps the rule");
++        assert!(
++            !bitten.after16("cmd_seq", 65_535, 0),
++            "the defect: 0 is not after 65,535"
++        );
++        assert!(
++            bitten.after16("event_seq", 65_535, 0),
++            "another counter keeps the rule"
++        );
 +        assert!(!bitten.after8("cmd_seq", 255, 0) && !bitten.after32("cmd_seq", u32::MAX, 0));
-+        assert_eq!(bitten.widen16("cmd_seq", 65_534, 1), 1, "no carry across the wrap");
++        assert_eq!(
++            bitten.widen16("cmd_seq", 65_534, 1),
++            1,
++            "no carry across the wrap"
++        );
 +        assert_eq!(bitten.widen16("ack", 65_534, 1), 65_537);
 +        // Away from the wrap the defect agrees with the rule, so it shows only where the counter wraps.
-+        assert_eq!(bitten.after16("cmd_seq", 10, 11), rule.after16("cmd_seq", 10, 11));
-+        assert_eq!(bitten.widen16("cmd_seq", 70_000, 4_470), rule.widen16("cmd_seq", 70_000, 4_470));
++        assert_eq!(
++            bitten.after16("cmd_seq", 10, 11),
++            rule.after16("cmd_seq", 10, 11)
++        );
++        assert_eq!(
++            bitten.widen16("cmd_seq", 70_000, 4_470),
++            rule.widen16("cmd_seq", 70_000, 4_470)
++        );
 +    }
 +}
+diff --git a/spikes/netcode-proof/crates/proto/tests/bites.rs b/spikes/netcode-proof/crates/proto/tests/bites.rs
+new file mode 100644
+index 0000000..657a502
+--- /dev/null
++++ b/spikes/netcode-proof/crates/proto/tests/bites.rs
+@@ -0,0 +1,217 @@
++//! npt-proto's planted defects (bites builds only; u4-build-plan.md §4.14, §5 U4a): each chosen per caller through
++//! `Quant::with_bite`, each shown here to change what the codec does where its test (a4, a5, a6, a7) and its mark
++//! look, and nowhere a clean `Quant` does.
++#![cfg(feature = "bites")]
++
++use npt_link::Channel;
++use npt_proto::{
++    BITES, DecodeError, Direction, EntityDelta, Input, Message, Quant, Snapshot, client_hash,
++    decode, encode,
++};
++use npt_sim::grid::{PITCH, POSITION_XY, POSITION_Z, VELOCITY, YAW};
++use npt_sim::{Command, EntityKind, EntityRecord};
++
++fn bitten(id: &str) -> Quant {
++    Quant::with_bite(id).unwrap_or_else(|| panic!("npt-proto plants {id}"))
++}
++
++fn bytes_with(q: Quant, m: &Message) -> Vec<u8> {
++    let mut out = Vec::new();
++    q.encode(m, &mut out).expect("encodes");
++    out
++}
++
++#[test]
++fn npt_proto_lists_its_seven_ids() {
++    assert_eq!(
++        BITES,
++        [
++            "PM-0001-57/pos-4cm",
++            "PM-0001-57/yaw-12bit",
++            "PM-0001-57/pitch-8bit",
++            "PM-0001-17/tick16",
++            "PM-0001-58/tick16",
++            "PM-0001-21/no-trailing",
++            "PM-0001-21/no-channel",
++        ]
++    );
++    for other in [
++        "PM-0001-17/client-rounding",
++        "PM-0001-41/server-quant-differs",
++        "PM-0001-58/lt-ack",
++    ] {
++        assert!(Quant::with_bite(other).is_none(), "{other}");
++    }
++}
++
++/// A soldier at tick `tick`, every field at its value from `pick`.
++fn soldier(pick: impl Fn(npt_sim::grid::Field) -> i32) -> EntityRecord {
++    let mut grid = [0; EntityRecord::FIELDS];
++    for (g, f) in grid.iter_mut().zip(EntityKind::Soldier.layout()) {
++        *g = pick(*f);
++    }
++    EntityRecord {
++        kind: EntityKind::Soldier,
++        index: 4,
++        generation: 1,
++        area: 0,
++        grid,
++        raw: [0; EntityRecord::FIELDS],
++    }
++}
++
++fn sent_and_decoded(q: Quant, r: EntityRecord) -> EntityRecord {
++    let s = Snapshot {
++        tick: 100,
++        entities: vec![EntityDelta::Add(r)],
++        ..Snapshot::default()
++    };
++    let b = bytes_with(q, &Message::Snapshot(s));
++    let Ok(Message::Snapshot(back)) = decode(Direction::RoomToClient, Channel::Datagram, &b) else {
++        panic!("decodes")
++    };
++    let EntityDelta::Add(got) = back.entities[0] else {
++        panic!("an add")
++    };
++    got
++}
++
++#[test]
++fn pm_0001_57s_bites_send_coarse_integers_the_client_decodes_as_they_are() {
++    let layout = EntityKind::Soldier.layout();
++    for (id, fields, step) in [
++        ("PM-0001-57/pos-4cm", &[POSITION_XY, POSITION_Z][..], 4),
++        ("PM-0001-57/yaw-12bit", &[YAW][..], 16),
++        ("PM-0001-57/pitch-8bit", &[PITCH][..], 4),
++    ] {
++        let q = bitten(id);
++        // An interior tie (half a coarse step off a multiple) is off by half the step; the top end by the nearest
++        // multiple inside (for yaw, around the turn); every other field, velocity included, arrives as sent.
++        for what in ["half a step", "the top end"] {
++            let r = soldier(|f| match what {
++                "the top end" => f.max(),
++                _ if fields.contains(&f) => step / 2,
++                _ => 3,
++            });
++            let got = sent_and_decoded(q, r);
++            let clean = sent_and_decoded(Quant::default(), r);
++            assert_eq!(clean, r, "the wire's Quant sends every integer as it is");
++            for (i, f) in layout.iter().enumerate() {
++                if !fields.contains(f) {
++                    assert_eq!(got.grid[i], r.grid[i], "{id} {what}: field {i} touched");
++                    continue;
++                }
++                let e = (i64::from(got.grid[i]) - i64::from(r.grid[i])).abs();
++                let e = if f.wraps() { e.min(65_536 - e) } else { e };
++                assert!(
++                    e > 0 && e < i64::from(step),
++                    "{id} {what}: field {i} off by {e}"
++                );
++                assert_eq!(
++                    got.grid[i].rem_euclid(step),
++                    0,
++                    "{id} {what}: field {i} is {}",
++                    got.grid[i]
++                );
++            }
++        }
++    }
++    // VELOCITY shares POSITION_XY's range and is another kind of field: pos-4cm leaves it alone.
++    assert_eq!(VELOCITY.min(), POSITION_XY.min());
++    assert_ne!(VELOCITY, POSITION_XY);
++}
++
++#[test]
++fn tick16_writes_the_header_tick_in_16_bits_so_a_frame_past_the_wrap_is_labelled_wrongly() {
++    for id in ["PM-0001-17/tick16", "PM-0001-58/tick16"] {
++        let q = bitten(id);
++        for (tick, seen) in [
++            (65_537u32, 1u32),
++            (63_736 + 2_000, 63_736 + 2_000 - 65_536),
++            (1_000, 1_000),
++        ] {
++            let s = Snapshot {
++                tick,
++                ..Snapshot::default()
++            };
++            let b = bytes_with(q, &Message::Snapshot(s));
++            let Ok(Message::Snapshot(back)) =
++                decode(Direction::RoomToClient, Channel::Datagram, &b)
++            else {
++                panic!("decodes")
++            };
++            assert_eq!(back.tick, seen, "{id} at {tick}");
++            // §4.14's unit proof: past the wrap the client's frame hashes differently from the server's.
++            assert_eq!(
++                client_hash(back.tick, &[], &[], &[]) == client_hash(tick, &[], &[], &[]),
++                tick < 65_536,
++                "{id} at {tick}"
++            );
++        }
++    }
++}
++
++fn one_command_input() -> Vec<u8> {
++    let m = Message::Input(Input {
++        commands: vec![Command {
++            tick: 9,
++            view_tick: 7,
++            ..Command::default()
++        }],
++        ..Input::default()
++    });
++    let mut out = Vec::new();
++    encode(&m, &mut out).expect("encodes");
++    out
++}
++
++#[test]
++fn no_trailing_lets_trailing_bytes_and_set_reserved_bits_through_as_a6_refuses_them() {
++    let q = bitten("PM-0001-21/no-trailing");
++    let mut trailing = one_command_input();
++    trailing.extend_from_slice(&[0xde, 0xad]);
++    assert_eq!(
++        decode(Direction::ClientToRoom, Channel::Datagram, &trailing),
++        Err(DecodeError::TrailingBytes)
++    );
++    assert_eq!(
++        q.decode(Direction::ClientToRoom, Channel::Datagram, &trailing)
++            .map(|m| m.name()),
++        Ok("Input")
++    );
++    let mut pad = one_command_input();
++    *pad.last_mut().expect("bytes") |= 0x80;
++    assert_eq!(
++        decode(Direction::ClientToRoom, Channel::Datagram, &pad),
++        Err(DecodeError::UnknownField)
++    );
++    assert_eq!(
++        q.decode(Direction::ClientToRoom, Channel::Datagram, &pad)
++            .map(|m| m.name()),
++        Ok("Input")
++    );
++}
++
++#[test]
++fn no_channel_lets_an_input_through_on_the_control_stream_as_a7_refuses_it() {
++    let q = bitten("PM-0001-21/no-channel");
++    let datagram = one_command_input();
++    let mut on_stream = (datagram.len() as u16).to_le_bytes().to_vec();
++    on_stream.extend_from_slice(&datagram);
++    assert_eq!(
++        decode(Direction::ClientToRoom, Channel::Control, &on_stream),
++        Err(DecodeError::WrongChannel)
++    );
++    let Ok(Message::Input(i)) = q.decode(Direction::ClientToRoom, Channel::Control, &on_stream)
++    else {
++        panic!("the forged kind gets through")
++    };
++    assert_eq!(i.commands[0].tick, 9);
++    // The direction check stays: a room type from a client is still refused.
++    let mut snap = Vec::new();
++    encode(&Message::Snapshot(Snapshot::default()), &mut snap).expect("encodes");
++    assert_eq!(
++        q.decode(Direction::ClientToRoom, Channel::Datagram, &snap),
++        Err(DecodeError::WrongDirection)
++    );
++}
+diff --git a/spikes/netcode-proof/crates/proto/tests/common/mod.rs b/spikes/netcode-proof/crates/proto/tests/common/mod.rs
+new file mode 100644
+index 0000000..b0be5cb
+--- /dev/null
++++ b/spikes/netcode-proof/crates/proto/tests/common/mod.rs
+@@ -0,0 +1,503 @@
++//! Fixed-seed generators of valid messages for npt-proto's tests (u4-build-plan.md §5 U4a: a1, a2, a3), from
++//! ChaCha8Rng, the workspace's pinned generator. Every value is one the wire carries; entity fields are read from
++//! `EntityKind::layout()`, so U4d's completed lists need no edit here.
++
++#![allow(
++    dead_code,
++    reason = "each test file uses its own part of the generators"
++)]
++
++use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
++
++use npt_link::Channel;
++use npt_proto::{
++    ClientSettings, Direction, EndReason, EntityDelta, FullState, Input, Join, JoinAccepted,
++    JoinRejected, Kick, Leave, Limits, Message, Ping, Pong, ProfileId, Resync, RoomControl,
++    RoomEnded, SessionControl, SessionStatus, Snapshot, StepResult, TokenKind, encode,
++};
++use npt_sim::grid::Field;
++use npt_sim::{Command, EntityKind, EntityRecord, SimEvent};
++use rand_chacha::ChaCha8Rng;
++use rand_core::{Rng, SeedableRng};
++
++pub struct Gen(pub ChaCha8Rng);
++
++impl Gen {
++    pub fn new(seed: u64) -> Gen {
++        Gen(ChaCha8Rng::seed_from_u64(seed))
++    }
++
++    pub fn u64(&mut self) -> u64 {
++        self.0.next_u64()
++    }
++
++    /// 0 to n - 1.
++    pub fn below(&mut self, n: u64) -> u64 {
++        self.0.next_u64() % n
++    }
++
++    pub fn coin(&mut self) -> bool {
++        self.below(2) == 0
++    }
++
++    pub fn u8(&mut self) -> u8 {
++        self.0.next_u32() as u8
++    }
++
++    pub fn u16(&mut self) -> u16 {
++        self.0.next_u32() as u16
++    }
++
++    pub fn u32(&mut self) -> u32 {
++        self.0.next_u32()
++    }
++
++    pub fn bytes<const N: usize>(&mut self) -> [u8; N] {
++        let mut b = [0u8; N];
++        self.0.fill_bytes(&mut b);
++        b
++    }
++
++    pub fn fill(&mut self, b: &mut [u8]) {
++        self.0.fill_bytes(b);
++    }
++
++    /// An integer of `field`, its ends one time in four.
++    pub fn int(&mut self, field: Field) -> i32 {
++        let (min, max) = (i64::from(field.min()), i64::from(field.max()));
++        match self.below(8) {
++            0 => field.min(),
++            1 => field.max(),
++            _ => (min + self.below((max - min + 1) as u64) as i64) as i32,
++        }
++    }
++
++    pub fn kind(&mut self) -> EntityKind {
++        EntityKind::ALL[self.below(EntityKind::ALL.len() as u64) as usize]
++    }
++
++    /// A record as the wire carries it: every layout field in range, every entry past the layout, `area` and `raw` 0.
++    pub fn record(&mut self, kind: EntityKind) -> EntityRecord {
++        let mut grid = [0; EntityRecord::FIELDS];
++        for (g, f) in grid.iter_mut().zip(kind.layout()) {
++            *g = self.int(*f);
++        }
++        EntityRecord {
++            kind,
++            index: self.u16(),
++            generation: self.u16(),
++            area: 0,
++            grid,
++            raw: [0; EntityRecord::FIELDS],
++        }
++    }
++
++    /// A delta; against the defaults (`from_defaults`) always an add.
++    pub fn delta(&mut self, from_defaults: bool) -> EntityDelta {
++        let kind = self.kind();
++        let n = kind.layout().len();
++        match if from_defaults { 0 } else { self.below(3) } {
++            1 if n > 0 => {
++                let mut changed = 0u16;
++                while changed == 0 {
++                    changed = (self.u32() & ((1 << n) - 1)) as u16;
++                }
++                let mut grid = [0; EntityRecord::FIELDS];
++                for (i, f) in kind.layout().iter().enumerate() {
++                    if changed & (1 << i) != 0 {
++                        grid[i] = self.int(*f);
++                    }
++                }
++                EntityDelta::Update {
++                    kind,
++                    index: self.u16(),
++                    changed,
++                    grid,
++                }
++            }
++            2 => EntityDelta::Remove {
++                kind,
++                index: self.u16(),
++            },
++            _ => EntityDelta::Add(self.record(kind)),
++        }
++    }
++
++    pub fn event(&mut self) -> SimEvent {
++        match self.below(3) {
++            0 => SimEvent::Shot {
++                slot: self.u8(),
++                seq: self.u16(),
++            },
++            1 => SimEvent::Hit {
++                shooter: self.u8(),
++                seq: self.u16(),
++                victim: self.u8(),
++                damage: self.u16(),
++            },
++            _ => SimEvent::Kill {
++                killer: self.u8(),
++                victim: self.u8(),
++            },
++        }
++    }
++
++    /// A command the wire carries: aim on the position grid, the view time at most 65,535 ticks back.
++    pub fn command(&mut self) -> Command {
++        let tick = self.u32();
++        Command {
++            slot: 0,
++            tick,
++            seq: self.u16(),
++            buttons: self.u16(),
++            presses: self.bytes(),
++            move_xy: [self.u8() as i8, self.u8() as i8],
++            aim: [
++                self.int(npt_sim::grid::POSITION_XY),
++                self.int(npt_sim::grid::POSITION_XY),
++                self.int(npt_sim::grid::POSITION_Z),
++            ],
++            view_tick: tick.wrapping_sub(u32::from(self.u16())),
++            view_fraction: self.u8(),
++        }
++    }
++
++    /// `count` commands, newest first, each older one consecutive in sequence, its fields kept or changed at random.
++    pub fn commands(&mut self, count: usize) -> Vec<Command> {
++        let mut out: Vec<Command> = Vec::new();
++        for _ in 0..count {
++            let c = match out.last() {
++                None => self.command(),
++                Some(n) => {
++                    let n = *n;
++                    let fresh = self.command();
++                    let tick = n.tick.wrapping_sub(self.below(256) as u32);
++                    let offset = if self.coin() {
++                        n.tick.wrapping_sub(n.view_tick)
++                    } else {
++                        u32::from(self.u16())
++                    };
++                    Command {
++                        slot: 0,
++                        tick,
++                        seq: n.seq.wrapping_sub(1),
++                        buttons: if self.coin() {
++                            n.buttons
++                        } else {
++                            fresh.buttons
++                        },
++                        presses: if self.coin() {
++                            n.presses
++                        } else {
++                            fresh.presses
++                        },
++                        move_xy: if self.coin() {
++                            n.move_xy
++                        } else {
++                            fresh.move_xy
++                        },
++                        aim: if self.coin() { n.aim } else { fresh.aim },
++                        view_tick: tick.wrapping_sub(offset),
++                        view_fraction: if self.coin() {
++                            n.view_fraction
++                        } else {
++                            fresh.view_fraction
++                        },
++                    }
++                }
++            };
++            out.push(c);
++        }
++        out
++    }
++
++    pub fn input(&mut self) -> Input {
++        let count = self.below(Limits::REDUNDANCY_CAP as u64 + 1) as usize;
++        Input {
++            ack_tick: self.u16(),
++            ack_groups: self.u8(),
++            commands: self.commands(count),
++        }
++    }
++
++    /// A snapshot group that fits its datagram: entities are dropped until it does (U4d's wider layouts included).
++    pub fn snapshot(&mut self) -> Snapshot {
++        let baseline_age = if self.below(4) == 0 { 0 } else { self.u16() };
++        let from_defaults = baseline_age == 0;
++        let groups = 1 + self.below(Limits::GROUPS as u64) as u8;
++        let mut s = Snapshot {
++            tick: self.u32(),
++            baseline_age,
++            newest_received: self.coin().then(|| self.u16()),
++            last_run: self.coin().then(|| self.u16()),
++            group: self.below(u64::from(groups)) as u8,
++            groups,
++            own: (0..self.below(5))
++                .map(|_| self.delta(from_defaults))
++                .collect(),
++            entities: (0..self.below(25))
++                .map(|_| self.delta(from_defaults))
++                .collect(),
++            events: (0..self.below(13))
++                .map(|_| (self.u16(), self.u8(), self.event()))
++                .collect(),
++        };
++        while encoded(&Message::Snapshot(s.clone())).is_none() {
++            if s.entities.pop().is_none() && s.own.pop().is_none() {
++                s.events.pop();
++            }
++        }
++        s
++    }
++
++    pub fn full_state(&mut self) -> FullState {
++        FullState {
++            tick: self.u32(),
++            last_run: self.coin().then(|| self.u16()),
++            own: (0..self.below(10))
++                .map(|_| self.record(EntityKind::ALL[0]))
++                .collect(),
++            entities: (0..self.below(60))
++                .map(|_| {
++                    let k = self.kind();
++                    self.record(k)
++                })
++                .collect(),
++        }
++    }
++
++    pub fn profile(&mut self) -> ProfileId {
++        [
++            ProfileId::P0,
++            ProfileId::P1,
++            ProfileId::P2,
++            ProfileId::P3,
++            ProfileId::P4,
++            ProfileId::Default,
++        ][self.below(6) as usize]
++    }
++
++    /// A note the form takes: up to 480 B of UTF-8, letters from several scripts, no control or format character.
++    pub fn note(&mut self) -> String {
++        const POOL: [char; 12] = ['a', 'Z', '0', ' ', '.', ',', 'é', 'ß', 'Ж', 'ж', '中', '🙂'];
++        let mut s = String::new();
++        let want = self.below(Limits::NOTE as u64 + 1) as usize;
++        loop {
++            let c = POOL[self.below(POOL.len() as u64) as usize];
++            if s.len() + c.len_utf8() > want {
++                break;
++            }
++            s.push(c);
++        }
++        s
++    }
++
++    pub fn session_control(&mut self) -> SessionControl {
++        let cap = self.bytes();
++        match self.below(4) {
++            0 => SessionControl::SetProfile {
++                cap,
++                profile: self.profile(),
++            },
++            1 => SessionControl::TriggerBurst { cap },
++            2 => SessionControl::BlockUdp {
++                cap,
++                on: self.coin(),
++            },
++            _ => SessionControl::RecordStep {
++                cap,
++                step: 1 + self.below(u64::from(Limits::RECORD_STEPS)) as u8,
++                result: [
++                    StepResult::Achieved,
++                    StepResult::NotYet,
++                    StepResult::Observation,
++                ][self.below(3) as usize],
++                note: self.note(),
++            },
++        }
++    }
++
++    /// A message of type `t` (its position in `Limits::TYPES`, from 1).
++    pub fn message(&mut self, t: usize) -> Message {
++        match t {
++            1 => Message::Input(self.input()),
++            2 => Message::Snapshot(self.snapshot()),
++            3 => Message::FullState(self.full_state()),
++            4 => Message::Resync(Resync),
++            5 => Message::Ping(Ping {
++                id: self.u8(),
++                sent_ns: self.u64(),
++            }),
++            6 => Message::Pong(Pong {
++                id: self.u8(),
++                echo_ns: self.u64(),
++                tick: self.u32(),
++                hold_us: self.u16(),
++            }),
++            7 => Message::Join(Join {
++                token: self.bytes(),
++                bind: self.bytes(),
++                version: self.u16(),
++                content_hash: self.bytes(),
++            }),
++            8 => Message::JoinAccepted(JoinAccepted {
++                slot: self.u8(),
++                team: self.u8(),
++                squad: self.u8(),
++                mode_id: self.u16(),
++                mode_hash: self.bytes(),
++                content_hash: self.bytes(),
++                tick: self.u32(),
++                tick_hz: self.u16(),
++                snapshot_hz: self.u16(),
++            }),
++            9 => Message::JoinRejected(
++                [
++                    JoinRejected::BadToken,
++                    JoinRejected::BindMismatch,
++                    JoinRejected::RosterFull,
++                    JoinRejected::WrongVersion,
++                    JoinRejected::WrongContentHash,
++                ][self.below(5) as usize],
++            ),
++            10 => Message::ClientSettings(ClientSettings { delay: self.u16() }),
++            11 => Message::RoomEnded(RoomEnded {
++                reason: [EndReason::Ended, EndReason::Stopped, EndReason::Crash]
++                    [self.below(3) as usize],
++                final_tick: self.u32(),
++            }),
++            12 => Message::Leave([Leave::Quit, Leave::Error][self.below(2) as usize]),
++            13 => Message::Kick(
++                [
++                    Kick::Replaced,
++                    Kick::Malformed,
++                    Kick::Overflow,
++                    Kick::Stopped,
++                ][self.below(4) as usize],
++            ),
++            14 => Message::SessionControl(self.session_control()),
++            _ => Message::SessionStatus(SessionStatus {
++                profile: self.profile(),
++                rtt_us: self.u32(),
++                rewind_cap: self.u16(),
++                cmd_timing: self.below(2) as u8,
++                clipped: self.u32(),
++                last_step: self.below(u64::from(Limits::RECORD_STEPS) + 1) as u8,
++            }),
++        }
++    }
++
++    /// 1 to 16 addresses: IPv4, or IPv6 /64 prefixes.
++    pub fn peers(&mut self) -> Vec<IpAddr> {
++        (0..1 + self.below(Limits::PEERS as u64))
++            .map(|_| {
++                if self.coin() {
++                    IpAddr::V4(Ipv4Addr::from(self.u32()))
++                } else {
++                    let mut b = [0u8; 16];
++                    self.fill(&mut b[..8]);
++                    IpAddr::V6(Ipv6Addr::from(b))
++                }
++            })
++            .collect()
++    }
++
++    pub fn room_control(&mut self) -> RoomControl {
++        match self.below(11) {
++            0 => RoomControl::MintToken {
++                slot: self.u8(),
++                kind: [TokenKind::Bot, TokenKind::Browser, TokenKind::Runner]
++                    [self.below(3) as usize],
++            },
++            1 => RoomControl::MintCapability { slot: self.u8() },
++            2 => RoomControl::SetRewindCap {
++                ticks: 1 + self.below(u64::from(u16::MAX)) as u16,
++            },
++            3 => RoomControl::RaiseAddrCap {
++                cap: self.u16(),
++                addrs: self.peers(),
++            },
++            4 => RoomControl::InjectPanic {
++                target: self.coin().then(|| self.below(255) as u8),
++                at: self.u32(),
++            },
++            5 => RoomControl::InjectStall {
++                ms: self.below(1_001) as u16,
++                at: self.u32(),
++            },
++            6 => RoomControl::SetPeerProfile {
++                peers: self.coin().then(|| self.peers()),
++                profile: [
++                    ProfileId::P0,
++                    ProfileId::P1,
++                    ProfileId::P2,
++                    ProfileId::P3,
++                    ProfileId::P4,
++                ][self.below(5) as usize],
++            },
++            7 => RoomControl::SetPeerThrottle {
++                peers: self.peers(),
++                kbps: 1 + self.below(u64::from(u16::MAX)) as u16,
++                secs: self.below(601) as u16,
++            },
++            8 => RoomControl::SetPeerBottleneck {
++                peers: self.peers(),
++                percent: 1 + self.below(100) as u8,
++                secs: self.below(601) as u16,
++            },
++            9 => RoomControl::PeerBurst {
++                peers: self.peers(),
++                ms: self.below(1_001) as u16,
++            },
++            _ => RoomControl::BlockPeerUdp {
++                peers: self.coin().then(|| self.peers()),
++                on: self.coin(),
++            },
++        }
++    }
++}
++
++/// `msg`'s encoding, or `None` when it is above its limit.
++pub fn encoded(msg: &Message) -> Option<Vec<u8>> {
++    let mut out = Vec::new();
++    encode(msg, &mut out).ok().map(|()| out)
++}
++
++/// Type `t`'s row: name, channel, the direction its receiver decodes with (a both-ways type at the room), limit.
++pub fn row(t: usize) -> (&'static str, Channel, Direction, usize) {
++    let (name, channel, way, limit) = Limits::TYPES[t - 1];
++    let way = if way == Direction::BothWays {
++        Direction::ClientToRoom
++    } else {
++        way
++    };
++    (name, channel, way, limit)
++}
++
++/// The framing bytes before a message's type on `channel`.
++pub fn framing(channel: Channel) -> usize {
++    match channel {
++        Channel::Datagram => 0,
++        Channel::Control => 2,
++        Channel::FullState => 4,
++    }
++}
++
++/// The most bytes type `t`'s receiver takes, framing included (the catalogue's counting: catalogue §1).
++pub fn framed_limit(t: usize) -> usize {
++    let (name, channel, _, limit) = Limits::TYPES[t - 1];
++    let limit = if name == "Snapshot" {
++        Limits::SNAPSHOT_RECEIVE
++    } else {
++        limit
++    };
++    if channel == Channel::FullState {
++        limit + 4
++    } else {
++        limit
++    }
++}
++
++pub fn hex(b: &[u8]) -> String {
++    b.iter().map(|x| format!("{x:02x}")).collect()
++}
+diff --git a/spikes/netcode-proof/crates/proto/tests/wire.rs b/spikes/netcode-proof/crates/proto/tests/wire.rs
+new file mode 100644
+index 0000000..2d91c7b
+--- /dev/null
++++ b/spikes/netcode-proof/crates/proto/tests/wire.rs
+@@ -0,0 +1,655 @@
++//! npt-proto's codec tests (u4-build-plan.md §5 U4a): a1 round trips, a2 totality, a3 the size check first, a6 the
++//! `Input` field table, a8 `client_hash`'s pinned vectors, and the `EntityRecord` ↔ wire mapping's round trip. Every
++//! case comes from a fixed seed (tests/common), so a failure names its type and case and repeats.
++
++mod common;
++
++use std::panic::{AssertUnwindSafe, catch_unwind};
++
++use common::{Gen, encoded, framed_limit, framing, hex, row};
++use npt_link::Channel;
++use npt_proto::{
++    DecodeError, Direction, EncodeError, EntityDelta, FullState, Input, Limits, Message,
++    RoomControl, Snapshot, client_hash, decode, encode,
++};
++use npt_sim::grid::{POSITION_XY, POSITION_Z};
++use npt_sim::{Command, EntityKind, EntityRecord, SimEvent};
++
++const TYPES: usize = Limits::TYPES.len();
++
++/// Decodes `bytes` as type `t`'s receiver does, a panic caught and reported as the test's failure.
++fn decode_at(t: usize, bytes: &[u8]) -> Result<Message, DecodeError> {
++    let (name, channel, way, _) = row(t);
++    catch_unwind(AssertUnwindSafe(|| decode(way, channel, bytes)))
++        .unwrap_or_else(|_| panic!("{name}: the decoder panicked on {}", hex(bytes)))
++}
++
++fn decode_control(bytes: &[u8]) -> Result<RoomControl, DecodeError> {
++    catch_unwind(AssertUnwindSafe(|| RoomControl::decode(bytes)))
++        .unwrap_or_else(|_| panic!("RoomControl: the decoder panicked on {}", hex(bytes)))
++}
++
++fn control_bytes(c: &RoomControl) -> Vec<u8> {
++    let mut out = Vec::new();
++    c.encode(&mut out).unwrap_or_else(|e| panic!("{c:?}: {e}"));
++    out
++}
++
++#[test]
++fn a1_every_message_type_round_trips_on_fixed_seeds_10_000_cases_each() {
++    for t in 1..=TYPES {
++        let name = row(t).0;
++        let mut g = Gen::new(0xa10000 + t as u64);
++        for case in 0..10_000 {
++            let m = g.message(t);
++            let bytes =
++                encoded(&m).unwrap_or_else(|| panic!("{name} case {case} did not encode: {m:?}"));
++            assert_eq!(m.name(), name);
++            assert_eq!(
++                decode_at(t, &bytes).as_ref(),
++                Ok(&m),
++                "{name} case {case}: {}",
++                hex(&bytes)
++            );
++        }
++    }
++    let mut g = Gen::new(0xa1c0);
++    for case in 0..10_000 {
++        let c = g.room_control();
++        let bytes = control_bytes(&c);
++        assert_eq!(
++            decode_control(&bytes).as_ref(),
++            Ok(&c),
++            "RoomControl case {case}: {}",
++            hex(&bytes)
++        );
++    }
++}
++
++#[test]
++fn a1_the_entity_record_mapping_round_trips_for_every_kind() {
++    let mut g = Gen::new(0xa1e0);
++    for kind in EntityKind::ALL {
++        for case in 0..2_000 {
++            let now = g.record(kind);
++            // The baseline: none, the same entity with other values, or another generation at its index.
++            let base = match g.below(3) {
++                0 => None,
++                1 => {
++                    let mut b = g.record(kind);
++                    (b.index, b.generation) = (now.index, now.generation);
++                    if g.coin() {
++                        // Some fields equal, so an update carries part of the layout.
++                        for i in 0..kind.layout().len() {
++                            if g.coin() {
++                                b.grid[i] = now.grid[i];
++                            }
++                        }
++                    }
++                    Some(b)
++                }
++                _ => {
++                    let mut b = now;
++                    b.generation = now.generation.wrapping_add(1);
++                    Some(b)
++                }
++            };
++            let what = format!("{kind:?} case {case}");
++            // The room's own fields never reach the wire.
++            let mut sent = now;
++            sent.area = g.u16();
++            sent.raw = [g.u32(); EntityRecord::FIELDS];
++            match EntityDelta::between(&sent, base.as_ref()) {
++                None => assert_eq!(
++                    base,
++                    Some(now),
++                    "{what}: no delta, yet the baseline differs"
++                ),
++                Some(d) => {
++                    let id = match d {
++                        EntityDelta::Add(r) => (r.kind, r.index),
++                        EntityDelta::Update { kind, index, .. }
++                        | EntityDelta::Remove { kind, index } => (kind, index),
++                    };
++                    assert_eq!(id, (kind, now.index), "{what}");
++                    assert_eq!(d.apply(base.as_ref()), Ok(Some(now)), "{what}: {d:?}");
++                    // Through the wire: a snapshot against a baseline (age 1), or against the defaults for an add.
++                    let s = Snapshot {
++                        baseline_age: if matches!(d, EntityDelta::Add(_)) {
++                            0
++                        } else {
++                            1
++                        },
++                        entities: vec![d],
++                        ..Snapshot::default()
++                    };
++                    let bytes = encoded(&Message::Snapshot(s.clone())).expect("one entity fits");
++                    let Ok(Message::Snapshot(back)) = decode_at(2, &bytes) else {
++                        panic!("{what}: {}", hex(&bytes));
++                    };
++                    assert_eq!(back, s, "{what}");
++                    assert_eq!(
++                        back.entities[0].apply(base.as_ref()),
++                        Ok(Some(now)),
++                        "{what}"
++                    );
++                }
++            }
++        }
++        // Whole records, as a full state carries them.
++        let f = FullState {
++            own: (0..3).map(|_| g.record(kind)).collect(),
++            entities: (0..50).map(|_| g.record(kind)).collect(),
++            ..FullState::default()
++        };
++        let bytes = encoded(&Message::FullState(f.clone())).expect("fits");
++        assert_eq!(decode_at(3, &bytes), Ok(Message::FullState(f)), "{kind:?}");
++    }
++    // An update without its baseline entity, or against another entity, is refused when applied.
++    let r = g.record(EntityKind::Soldier);
++    let mut moved = r;
++    moved.grid[0] = if r.grid[0] == 0 { 1 } else { 0 };
++    let d = EntityDelta::between(&moved, Some(&r)).expect("x changed");
++    assert_eq!(d.apply(None), Err(DecodeError::Malformed));
++    let mut other = r;
++    other.index = r.index.wrapping_add(1);
++    assert_eq!(d.apply(Some(&other)), Err(DecodeError::Malformed));
++    assert_eq!(
++        EntityDelta::Remove {
++            kind: r.kind,
++            index: r.index
++        }
++        .apply(Some(&r)),
++        Ok(None)
++    );
++}
++
++/// How many valid encodings per type a2 cuts at every byte.
++const PREFIX_CASES: usize = 1_000;
++
++#[test]
++fn a2_every_proper_prefix_of_every_valid_encoding_is_an_error() {
++    for t in 1..=TYPES {
++        let name = row(t).0;
++        let mut g = Gen::new(0xa20000 + t as u64);
++        let cases = if matches!(name, "Snapshot" | "FullState") {
++            PREFIX_CASES / 5
++        } else {
++            PREFIX_CASES
++        };
++        for case in 0..cases {
++            let bytes = encoded(&g.message(t)).expect("valid");
++            for cut in 0..bytes.len() {
++                let r = decode_at(t, &bytes[..cut]);
++                assert!(
++                    r.is_err(),
++                    "{name} case {case} cut at {cut} of {} decoded: {r:?}",
++                    bytes.len()
++                );
++            }
++        }
++    }
++    let mut g = Gen::new(0xa2c0);
++    for case in 0..PREFIX_CASES {
++        let bytes = control_bytes(&g.room_control());
++        for cut in 0..bytes.len() {
++            assert!(
++                decode_control(&bytes[..cut]).is_err(),
++                "RoomControl case {case} cut at {cut}"
++            );
++        }
++    }
++}
++
++/// A random buffer for type `t`: random length (small half the time; at most 1,200 B, which holds a whole snapshot
++/// datagram and a full state's first records: a3 covers the sizes at each limit) and bytes, the type byte in its
++/// place, and for a stream half the time a length prefix that counts its bytes, so the body is reached.
++fn random_buffer(g: &mut Gen, t: usize) -> Vec<u8> {
++    let channel = row(t).1;
++    let frame = framing(channel);
++    let max = (framed_limit(t) + 1).min(1_200);
++    let len = if g.coin() {
++        g.below(64.min(max as u64) + 1)
++    } else {
++        g.below(max as u64 + 1)
++    } as usize;
++    let mut b = vec![0u8; len];
++    g.fill(&mut b);
++    if let Some(x) = b.get_mut(frame) {
++        *x = t as u8;
++    }
++    if len >= frame && frame > 0 && g.coin() {
++        let n = (len - frame) as u32;
++        b[..frame].copy_from_slice(&n.to_le_bytes()[..frame]);
++    }
++    b
++}
++
++#[test]
++fn a2_random_buffers_are_errors_or_the_message_that_encodes_to_them_never_a_panic() {
++    // 100,000 fixed-seed buffers per type (u4-build-plan.md §5 U4a a2). A random buffer can be a valid message (any
++    // ten bytes after a Ping's type byte are one), so the rule is: an error, or a message whose encoding is exactly
++    // those bytes (one encoding per message: nothing decodes that the encoder would not write).
++    for t in 1..=TYPES {
++        let name = row(t).0;
++        let mut g = Gen::new(0xa2b000 + t as u64);
++        let mut seen = std::collections::BTreeMap::new();
++        for case in 0..100_000 {
++            let b = random_buffer(&mut g, t);
++            let r = decode_at(t, &b);
++            if let Ok(m) = &r {
++                assert_eq!(
++                    encoded(m).as_deref(),
++                    Some(&b[..]),
++                    "{name} case {case} decoded {}",
++                    hex(&b)
++                );
++            }
++            *seen
++                .entry(format!("{:?}", r.map(|_| "decoded")))
++                .or_insert(0u32) += 1;
++        }
++        // Random bytes rarely pass a header, so valid encodings with one to three bits flipped reach every body field
++        // too (10,000 per type).
++        for case in 0..10_000 {
++            let mut b = encoded(&g.message(t)).expect("valid");
++            for _ in 0..1 + g.below(3) {
++                let bit = g.below(b.len() as u64 * 8) as usize;
++                b[bit / 8] ^= 1 << (bit % 8);
++            }
++            let r = decode_at(t, &b);
++            if let Ok(m) = &r {
++                assert_eq!(
++                    encoded(m).as_deref(),
++                    Some(&b[..]),
++                    "{name} flipped case {case} decoded {}",
++                    hex(&b)
++                );
++            }
++            *seen
++                .entry(format!("flipped {:?}", r.map(|_| "decoded")))
++                .or_insert(0u32) += 1;
++        }
++        // What the buffers met (shown with --nocapture): the size, framing and body checks all reached.
++        eprintln!("a2 {name}: {seen:?}");
++    }
++    let mut g = Gen::new(0xa2bc0);
++    for case in 0..100_000 {
++        let len = if g.coin() {
++            g.below(40)
++        } else {
++            g.below(Limits::ROOM_CONTROL as u64 + 2)
++        } as usize;
++        let mut b = vec![0u8; len];
++        g.fill(&mut b);
++        if len >= 3 {
++            b[2] = 1 + g.below(11) as u8;
++            if g.coin() {
++                b[..2].copy_from_slice(&((len - 2) as u16).to_le_bytes());
++            }
++        }
++        if let Ok(c) = decode_control(&b) {
++            assert_eq!(
++                control_bytes(&c),
++                b,
++                "RoomControl case {case} decoded {}",
++                hex(&b)
++            );
++        }
++    }
++}
++
++#[test]
++fn a3_one_byte_over_its_types_limit_is_the_size_error_whatever_the_buffer_holds() {
++    for t in 1..=TYPES {
++        let (name, channel, way, _) = row(t);
++        let frame = framing(channel);
++        let over = framed_limit(t) + 1;
++        let mut g = Gen::new(0xa30000 + t as u64);
++        for case in 0..1_000 {
++            // A valid encoding with random bytes after it, its length prefix counting them: malformed too.
++            let mut b = encoded(&g.message(t)).expect("valid");
++            let mut rest = vec![0u8; over - b.len()];
++            g.fill(&mut rest);
++            b.extend_from_slice(&rest);
++            if frame > 0 {
++                let n = (over - frame) as u32;
++                b[..frame].copy_from_slice(&n.to_le_bytes()[..frame]);
++            }
++            assert_eq!(
++                decode_at(t, &b),
++                Err(DecodeError::TooLarge),
++                "{name} case {case} (a padded encoding)"
++            );
++            // Random bytes with only the type byte in its place: its prefix is garbage.
++            let mut b = vec![0u8; over];
++            g.fill(&mut b);
++            b[frame] = t as u8;
++            assert_eq!(
++                decode_at(t, &b),
++                Err(DecodeError::TooLarge),
++                "{name} case {case} (random)"
++            );
++            // At exactly the limit the size passes, and the next check decides.
++            b.pop();
++            assert_ne!(
++                decode_at(t, &b),
++                Err(DecodeError::TooLarge),
++                "{name} case {case} (at the limit)"
++            );
++        }
++        let _ = way;
++    }
++    // Above the largest message a receiving end takes on a channel, any bytes at all (an unknown type byte, or none
++    // that is readable) are the size error: the catalogue's 166 B and 512 B for the room, 1,150 B, 256 B and a full
++    // state's 65,536 + 4 B for a client.
++    let mut g = Gen::new(0xa3c4);
++    for (way, channel, max) in [
++        (Direction::ClientToRoom, Channel::Datagram, 166),
++        (Direction::ClientToRoom, Channel::Control, 512),
++        (Direction::ClientToRoom, Channel::FullState, 4 + 510),
++        (Direction::RoomToClient, Channel::Datagram, 1_150),
++        (Direction::RoomToClient, Channel::Control, 256),
++        (Direction::RoomToClient, Channel::FullState, 4 + 65_536),
++    ] {
++        for _ in 0..100 {
++            let mut b = vec![0u8; max + 1];
++            g.fill(&mut b);
++            assert_eq!(
++                decode(way, channel, &b),
++                Err(DecodeError::TooLarge),
++                "{way:?} {channel:?}"
++            );
++        }
++        let unknown = vec![0xffu8; max + 1];
++        assert_eq!(
++            decode(way, channel, &unknown),
++            Err(DecodeError::TooLarge),
++            "{way:?} {channel:?}"
++        );
++    }
++    let mut b = vec![0u8; Limits::ROOM_CONTROL + 1];
++    g.fill(&mut b);
++    assert_eq!(decode_control(&b), Err(DecodeError::TooLarge));
++    // And the encoder never writes what the receiver refuses.
++    let s = Snapshot {
++        baseline_age: 0,
++        entities: (0..200)
++            .map(|_| EntityDelta::Add(g.record(EntityKind::Soldier)))
++            .collect(),
++        ..Snapshot::default()
++    };
++    let mut out = vec![7u8];
++    assert_eq!(
++        encode(&Message::Snapshot(s), &mut out),
++        Err(EncodeError::TooLarge)
++    );
++    assert_eq!(out, [7], "nothing appended");
++}
++
++/// Eight commands, each older one changing every field its repeat can carry: the field table's maxima.
++fn widest_commands() -> Vec<Command> {
++    let mut out = vec![Command {
++        slot: 0,
++        tick: 1_000_000,
++        seq: 3,
++        buttons: 0xffff,
++        presses: [9, 8, 7, 6],
++        move_xy: [127, -127],
++        aim: [POSITION_XY.max(), POSITION_XY.min(), POSITION_Z.max()],
++        view_tick: 1_000_000 - 65_535,
++        view_fraction: 255,
++    }];
++    for i in 1..Limits::REDUNDANCY_CAP {
++        let n = out[i - 1];
++        let tick = n.tick - 255;
++        out.push(Command {
++            slot: 0,
++            tick,
++            seq: n.seq.wrapping_sub(1),
++            buttons: !n.buttons,
++            presses: n.presses.map(|p| p.wrapping_add(1)),
++            move_xy: n.move_xy.map(|m| m.wrapping_neg()),
++            aim: [n.aim[0] - 1, n.aim[1] + 1, n.aim[2] - 1],
++            view_tick: tick - (i as u32),
++            view_fraction: n.view_fraction.wrapping_sub(1),
++        });
++    }
++    out
++}
++
++fn input_bytes(commands: &[Command]) -> Vec<u8> {
++    encoded(&Message::Input(Input {
++        ack_tick: 65_535,
++        ack_groups: 0xff,
++        commands: commands.to_vec(),
++    }))
++    .expect("encodes")
++}
++
++#[test]
++fn a6_input_whole_and_repeats_at_their_maxima_eight_within_166_b_and_trailing_bytes_refused() {
++    let widest = widest_commands();
++    // The field table: header 5 B, the whole command 23 B, each repeat at most 19 B.
++    assert_eq!(input_bytes(&[]).len(), 5);
++    for k in 1..=widest.len() {
++        assert_eq!(
++            input_bytes(&widest[..k]).len(),
++            5 + 23 + (k - 1) * 19,
++            "{k} commands"
++        );
++    }
++    let full = input_bytes(&widest);
++    assert_eq!(full.len(), 161);
++    assert!(full.len() <= Limits::INPUT);
++    assert_eq!(decode_at(1, &full).map(|m| m.name()), Ok("Input"));
++    // A repeat is never larger than a whole command, over 10,000 random command lists.
++    let mut g = Gen::new(0xa6);
++    for case in 0..10_000 {
++        let cs = g.commands(Limits::REDUNDANCY_CAP);
++        let whole = input_bytes(&cs[..1]).len() - 5;
++        assert_eq!(whole, 23);
++        for k in 2..=cs.len() {
++            let repeat = input_bytes(&cs[..k]).len() - input_bytes(&cs[..k - 1]).len();
++            assert!(
++                (2..=19).contains(&repeat) && repeat <= whole,
++                "case {case}: repeat {k} is {repeat} B"
++            );
++        }
++    }
++    // Trailing bytes give TrailingBytes; a reserved mask bit or a pad bit set gives UnknownField.
++    let two = input_bytes(&widest[..2]);
++    let mut trailing = two.clone();
++    trailing.push(0);
++    assert_eq!(decode_at(1, &trailing), Err(DecodeError::TrailingBytes));
++    let mut reserved = two.clone();
++    reserved[5 + 23] |= 1 << 5;
++    assert_eq!(decode_at(1, &reserved), Err(DecodeError::UnknownField));
++    let mut pad = input_bytes(&widest[..1]);
++    *pad.last_mut().expect("bytes") |= 0x80;
++    assert_eq!(decode_at(1, &pad), Err(DecodeError::UnknownField));
++    // A count above the cap is refused by both ends; so is a value the wire cannot carry.
++    let mut nine = full.clone();
++    nine[4] = 9;
++    assert_eq!(decode_at(1, &nine), Err(DecodeError::OutOfRange));
++    let too_many = Input {
++        commands: g.commands(9),
++        ..Input::default()
++    };
++    assert_eq!(
++        encode(&Message::Input(too_many), &mut Vec::new()),
++        Err(EncodeError::TooMany)
++    );
++    let mut c = widest[..2].to_vec();
++    c[0].view_tick = c[0].tick - 65_536;
++    assert_eq!(
++        encode(
++            &Message::Input(Input {
++                commands: c,
++                ..Input::default()
++            }),
++            &mut Vec::new()
++        ),
++        Err(EncodeError::OutOfRange)
++    );
++    let mut c = widest[..2].to_vec();
++    c[1].tick = c[0].tick - 256;
++    c[1].view_tick = c[1].tick;
++    assert_eq!(
++        encode(
++            &Message::Input(Input {
++                commands: c,
++                ..Input::default()
++            }),
++            &mut Vec::new()
++        ),
++        Err(EncodeError::OutOfRange)
++    );
++    let mut c = widest[..2].to_vec();
++    c[1].seq = c[0].seq;
++    assert_eq!(
++        encode(
++            &Message::Input(Input {
++                commands: c,
++                ..Input::default()
++            }),
++            &mut Vec::new()
++        ),
++        Err(EncodeError::NotCanonical)
++    );
++    let mut c = widest[..1].to_vec();
++    c[0].aim[2] = POSITION_Z.max() + 1;
++    assert_eq!(
++        encode(
++            &Message::Input(Input {
++                commands: c,
++                ..Input::default()
++            }),
++            &mut Vec::new()
++        ),
++        Err(EncodeError::OutOfRange)
++    );
++    // The slot is the session's, never on the wire.
++    let mut c = widest[..1].to_vec();
++    c[0].slot = 47;
++    let Ok(Message::Input(back)) = decode_at(1, &input_bytes(&c)) else {
++        panic!("decodes")
++    };
++    assert_eq!(back.commands[0].slot, 0);
++}
++
++fn hash_case() -> (Vec<EntityRecord>, Vec<EntityRecord>, Vec<(u32, SimEvent)>) {
++    let mut g = Gen::new(0xa8);
++    let entities = EntityKind::ALL.iter().map(|&k| g.record(k)).collect();
++    let own = vec![g.record(EntityKind::Soldier), g.record(EntityKind::Effect)];
++    let events = vec![
++        (70_000, SimEvent::Shot { slot: 3, seq: 9 }),
++        (
++            70_001,
++            SimEvent::Hit {
++                shooter: 3,
++                seq: 9,
++                victim: 4,
++                damage: 25,
++            },
++        ),
++        (
++            70_002,
++            SimEvent::Kill {
++                killer: 3,
++                victim: 4,
++            },
++        ),
++    ];
++    (entities, own, events)
++}
++
++/// hash.rs's byte string, spelled out from its module text, and FNV-1a-64 over it, written apart from the crate's: the
++/// reference the records' vector is checked against (a record's bytes follow its kind's layout, which U4d completes,
++/// so the vectors with records are pinned through this rather than as numbers).
++fn reference(
++    tick: u32,
++    entities: &[EntityRecord],
++    own: &[EntityRecord],
++    events: &[(u32, SimEvent)],
++) -> u64 {
++    let mut b = tick.to_le_bytes().to_vec();
++    for list in [entities, own] {
++        let mut sorted = list.to_vec();
++        let code = |k: EntityKind| {
++            EntityKind::ALL
++                .iter()
++                .position(|x| *x == k)
++                .expect("a kind") as u8
++        };
++        sorted.sort_by_key(|r| (code(r.kind), r.index, r.generation));
++        b.extend((sorted.len() as u32).to_le_bytes());
++        for r in &sorted {
++            b.push(code(r.kind));
++            b.extend(r.index.to_le_bytes());
++            b.extend(r.generation.to_le_bytes());
++            for g in &r.grid[..r.kind.layout().len()] {
++                b.extend(g.to_le_bytes());
++            }
++        }
++    }
++    let kind = |e: &SimEvent| match e {
++        SimEvent::Shot { .. } => 0u8,
++        SimEvent::Hit { .. } => 1,
++        SimEvent::Kill { .. } => 2,
++    };
++    let mut ev: Vec<(u32, u8)> = events.iter().map(|(n, e)| (*n, kind(e))).collect();
++    ev.sort();
++    b.extend((ev.len() as u32).to_le_bytes());
++    for (n, k) in ev {
++        b.extend(n.to_le_bytes());
++        b.push(k);
++    }
++    let mut h = 0xcbf2_9ce4_8422_2325u64;
++    for x in b {
++        h = (h ^ u64::from(x)).wrapping_mul(0x0000_0100_0000_01b3);
++    }
++    if h == 0 { 1 } else { h }
++}
++
++#[test]
++fn a8_client_hash_vectors_are_pinned_with_the_32_bit_tick_and_event_numbers_inside_and_never_0() {
++    let (entities, own, events) = hash_case();
++    let h = client_hash(65_537, &entities, &own, &events);
++    // The canonical vectors: without records, as numbers; with records, as the reference's byte string.
++    assert_eq!(client_hash(0, &[], &[], &[]), PINNED_EMPTY);
++    assert_eq!(client_hash(65_537, &[], &[], &events), PINNED_EVENTS);
++    assert_eq!(reference(0, &[], &[], &[]), PINNED_EMPTY);
++    assert_eq!(h, reference(65_537, &entities, &own, &events), "{h:#018x}");
++    // The full 32-bit tick and event numbers are inside: 16 bits of either would not tell these apart.
++    assert_ne!(client_hash(1, &entities, &own, &events), h);
++    let mut wrapped = events.clone();
++    wrapped[1].0 += 65_536;
++    assert_ne!(client_hash(65_537, &entities, &own, &wrapped), h);
++    // So are each record's integers, and the own-state section apart from the entity set.
++    let mut moved = entities.clone();
++    moved[0].grid[0] = moved[0].grid[0].wrapping_add(1);
++    assert_ne!(client_hash(65_537, &moved, &own, &events), h);
++    assert_ne!(client_hash(65_537, &own, &entities, &events), h);
++    // Order does not matter (entity-id order, number order); the room's own fields do not either.
++    let mut shuffled = entities.clone();
++    shuffled.reverse();
++    let mut late = events.clone();
++    late.rotate_left(1);
++    let mut roomside = own.clone();
++    roomside[0].area = 9;
++    roomside[0].raw[0] = 0x3f80_0000;
++    assert_eq!(client_hash(65_537, &shuffled, &roomside, &late), h);
++    // Never 0: over 100,000 random views.
++    let mut g = Gen::new(0xa80);
++    for _ in 0..100_000 {
++        let k = g.kind();
++        let e = [g.record(k)];
++        assert_ne!(client_hash(g.u32(), &e, &[], &[(g.u32(), g.event())]), 0);
++    }
++}
++
++/// The two vectors without records, each computed apart by a Python FNV-1a-64 over the byte string (u4a-build.md):
++/// 16 zero bytes; and tick 65,537, no records, the three events numbered 70,000 to 70,002 (shot, hit, kill).
++const PINNED_EMPTY: u64 = 0x8820_1fb9_60ff_6465;
++const PINNED_EVENTS: u64 = 0x8d9e_8dda_afef_41e8;

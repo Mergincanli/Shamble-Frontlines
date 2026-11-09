@@ -1,5 +1,20 @@
+diff --git a/spikes/netcode-proof/crates/sim/src/grid.rs b/spikes/netcode-proof/crates/sim/src/grid.rs
+index a5e1709..ba28c8a 100644
+--- a/spikes/netcode-proof/crates/sim/src/grid.rs
++++ b/spikes/netcode-proof/crates/sim/src/grid.rs
+@@ -159,6 +159,10 @@ pub const VELOCITY: Field = Field {
+ 
+ /// The grid a caller uses: in a measured build always the wire grid; in a bites build it may hold the grid's one
+ /// planted defect, `Config::floor_rounding`, for that caller alone.
++///
++/// **Its shape differs by build** (the arch review's N2): the field it holds exists in bites builds only. So it is
++/// never hashed, recorded or compared across builds (npt-sim's state hash, its dump and its recordings hold no
++/// `Config`), and it is passed by value.
+ #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+ pub struct Config {
+     /// Rounds down in place of to the nearest (bites builds only).
 diff --git a/spikes/netcode-proof/crates/sim/src/history.rs b/spikes/netcode-proof/crates/sim/src/history.rs
-index ae1cbf5..6411cc3 100644
+index ae1cbf5..c80c9d2 100644
 --- a/spikes/netcode-proof/crates/sim/src/history.rs
 +++ b/spikes/netcode-proof/crates/sim/src/history.rs
 @@ -2,6 +2,9 @@
@@ -19,7 +34,7 @@ index ae1cbf5..6411cc3 100644
 -    /// above 0 holds at least one tick. `None` for a span of 0 ms, which would hold none.
 +    /// above 0 holds at least one tick. `None` for a span of 0 ms, which would hold none, and for a span whose ring
 +    /// would exceed 1 MB: capacity × [`HitVolumes::MAX_BYTES`], one tick's volumes at most (u4-build-plan.md §4.9: the
-+    /// hit history at most 1 MB; carry 14).
++    /// hit history at most 1 MB; carry 14). At 30 Hz that is 231 ticks, a span of at most 7,700 ms.
      pub fn for_ms(span_ms: u32) -> Option<HitHistory> {
          let capacity = crate::ticks_for_ms(span_ms) as usize;
 -        if capacity == 0 {
@@ -28,10 +43,10 @@ index ae1cbf5..6411cc3 100644
          }
          Some(HitHistory {
 diff --git a/spikes/netcode-proof/crates/sim/src/lib.rs b/spikes/netcode-proof/crates/sim/src/lib.rs
-index 36029dc..701abeb 100644
+index 36029dc..45a62aa 100644
 --- a/spikes/netcode-proof/crates/sim/src/lib.rs
 +++ b/spikes/netcode-proof/crates/sim/src/lib.rs
-@@ -4,29 +4,45 @@
+@@ -4,29 +4,44 @@
  //! S1's stand-ins as data behind one narrow seam, and a per-tick state hash. It follows ADR 0004 part 7's float
  //! allow-list (enforced by this crate's clippy.toml) and builds for wasm32. Built in unit U4.
  //!
@@ -60,7 +75,6 @@ index 36029dc..701abeb 100644
 +pub use hash::{FieldDiff, StateDump};
  pub use history::HitHistory;
 +pub use replay::Recording;
-+pub use rng::SimRng;
 +pub use scene::{Scene, StandIns};
  pub use seam::{
 -    ClampReport, Command, CoverVariant, EntityKind, EntityRecord, HitVolumes, InputReports,
@@ -84,7 +98,7 @@ index 36029dc..701abeb 100644
  /// the wire grid.
  #[cfg(feature = "bites")]
 diff --git a/spikes/netcode-proof/crates/sim/src/seam.rs b/spikes/netcode-proof/crates/sim/src/seam.rs
-index 17b8b63..1ec948e 100644
+index 17b8b63..6fe8fbe 100644
 --- a/spikes/netcode-proof/crates/sim/src/seam.rs
 +++ b/spikes/netcode-proof/crates/sim/src/seam.rs
 @@ -1,10 +1,10 @@
@@ -330,7 +344,7 @@ index 17b8b63..1ec948e 100644
      pub kind: EntityKind,
      /// The entity's index among its kind (a soldier's slot, a pool index).
      pub index: u16,
-@@ -194,13 +327,62 @@ const _: () = {
+@@ -194,13 +327,68 @@ const _: () = {
  };
  
  /// One tick's hit volumes for lag compensation (u4-build-plan.md §4.2, §4.9), as the world reads them out after a
@@ -363,11 +377,17 @@ index 17b8b63..1ec948e 100644
 +    pub const MAX_SOLDIERS: usize = 64;
 +    /// The most cover boxes one tick holds: 128 vehicle parts, 16 doors and the wall, rounded up.
 +    pub const MAX_COVER: usize = 160;
-+    /// One tick's bytes at most: the struct and both vectors full. [`HitHistory::for_ms`] refuses a ring that would
-+    /// hold more than 1 MB of them (u4-build-plan.md §4.9; carry 14).
-+    pub const MAX_BYTES: usize = core::mem::size_of::<HitVolumes>()
-+        + (HitVolumes::MAX_SOLDIERS + HitVolumes::MAX_COVER) * core::mem::size_of::<VolumeBox>();
++    /// One tick's bytes at most, the same on every target: the struct at its 64-bit size (the tick, then two vectors
++    /// of three 8-byte words: 56 bytes; 28 on wasm32), and both vectors full of 20-byte boxes. [`HitHistory::for_ms`]
++    /// refuses a ring that would hold more than 1 MB of them (u4-build-plan.md §4.9; carry 14), so a recording's ring
++    /// span replays alike natively and in Wasm.
++    pub const MAX_BYTES: usize =
++        56 + (HitVolumes::MAX_SOLDIERS + HitVolumes::MAX_COVER) * core::mem::size_of::<VolumeBox>();
 +}
++
++// MAX_BYTES's two sizes hold on every target: the struct at most its 64-bit size, a box 20 bytes.
++const _: () =
++    assert!(core::mem::size_of::<HitVolumes>() <= 56 && core::mem::size_of::<VolumeBox>() == 20);
 +
 +impl Clone for HitVolumes {
 +    fn clone(&self) -> HitVolumes {
@@ -398,7 +418,7 @@ index 17b8b63..1ec948e 100644
  }
  
  /// Each portal of the static graph, open or closed (u4-build-plan.md §4.2, A2): the room's AreaFlood re-floods when
-@@ -218,24 +400,40 @@ pub struct PortalStates {
+@@ -218,24 +406,40 @@ pub struct PortalStates {
  pub enum SimEvent {
      /// Cosmetic: `slot` fired the shot of its command `seq`; sent once, never to the shooter's own client
      /// (ADR 0001 part 6).
@@ -441,7 +461,7 @@ index 17b8b63..1ec948e 100644
      pub seq: u16,
      /// The point the shot used, in the position grid's integers (cm).
      pub point: [i32; 3],
-@@ -254,10 +452,6 @@ pub struct InputReports {
+@@ -254,10 +458,6 @@ pub struct InputReports {
      pub ammunition: u64,
      /// ... a reload edge the weapon's state refuses ...
      pub reload: u64,
@@ -452,6 +472,129 @@ index 17b8b63..1ec948e 100644
      /// ... a [`Rewind`] naming a tick the lent ring does not hold ...
      pub rewind_outside: u64,
      /// ... and an action refused because its pool was full (pools have fixed capacity: §4.2).
+diff --git a/spikes/netcode-proof/crates/sim/tests/seam.rs b/spikes/netcode-proof/crates/sim/tests/seam.rs
+index 12373e2..ebcd858 100644
+--- a/spikes/netcode-proof/crates/sim/tests/seam.rs
++++ b/spikes/netcode-proof/crates/sim/tests/seam.rs
+@@ -57,9 +57,26 @@ fn scale(f: Field) -> f64 {
+     }
+ }
+ 
+-/// One tick's hit volumes, as the tests push them (U4d's World gives them their volumes).
++/// One tick's hit volumes, as the tests push them: the tick alone (U4d's World fills the boxes; tests/world.rs).
+ fn volumes(tick: u32) -> HitVolumes {
+-    HitVolumes { tick }
++    HitVolumes {
++        tick,
++        ..HitVolumes::default()
++    }
++}
++
++/// The kind declared after `kind`, by an exhaustive match (the rust fix review's nit; carry 36): a new variant fails to
++/// compile here until it takes its place in the walk, and s6 holds `EntityKind::ALL` equal to the walk.
++fn next_kind(kind: EntityKind) -> Option<EntityKind> {
++    match kind {
++        EntityKind::Soldier => Some(EntityKind::Vehicle),
++        EntityKind::Vehicle => Some(EntityKind::VehiclePart),
++        EntityKind::VehiclePart => Some(EntityKind::Projectile),
++        EntityKind::Projectile => Some(EntityKind::Door),
++        EntityKind::Door => Some(EntityKind::Wall),
++        EntityKind::Wall => Some(EntityKind::Effect),
++        EntityKind::Effect => None,
++    }
+ }
+ 
+ /// One unit in the last place of a finite f64, by its bits (std's next_up is outside the sim's float allow-list).
+@@ -426,6 +443,7 @@ fn s5_the_seam_types_are_send() {
+                 Some(fire(0, 128)),
+             ),
+         ],
++        ..TickInput::default()
+     };
+     assert_eq!(room_tick(&mut sim, &mut history, &input), 1);
+     assert_eq!(sim.events, [SimEvent::Shot { slot: 1, seq: 7 }]);
+@@ -437,7 +455,12 @@ fn s5_the_seam_types_are_send() {
+ 
+ #[test]
+ fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
+-    assert_eq!(EntityKind::ALL.len(), 7);
++    // ALL is the enum's every variant in declaration order: the exhaustive match's walk from the first (carry 36).
++    let mut walk = vec![EntityKind::Soldier];
++    while let Some(k) = walk.last().copied().and_then(next_kind) {
++        walk.push(k);
++    }
++    assert_eq!(walk, EntityKind::ALL);
+     for (i, kind) in EntityKind::ALL.into_iter().enumerate() {
+         // In declaration order, each kind once.
+         assert!(EntityKind::ALL[..i].iter().all(|k| *k < kind), "{kind:?}");
+@@ -452,9 +475,11 @@ fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
+             );
+         }
+     }
+-    // The catalogue's rows (docs/design/netcode-proof-messages.md §3), U4d to complete: a soldier's position, yaw,
+-    // pitch, velocity and 8 flag bits; a projectile's start tick (32 bits), start position and velocity.
++    // The catalogue's rows (docs/design/netcode-proof-messages.md §3), U4s's fields first and U4d's after them (carry
++    // 12): a soldier's position, yaw, pitch, velocity and 8 flag bits, then its health, weapon id and weapon state; a
++    // projectile's start tick (32 bits), start position and velocity, then its type and fuse.
+     let flags = Field::integer(0, 255);
++    let health = Field::integer(0, 1_023);
+     assert_eq!(
+         EntityKind::Soldier.layout(),
+         [
+@@ -466,7 +491,10 @@ fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
+             VELOCITY,
+             VELOCITY,
+             VELOCITY,
+-            flags
++            flags,
++            health,
++            Field::integer(0, 15),
++            Field::integer(0, 3),
+         ]
+     );
+     let tick = Field::integer(i32::MIN, i32::MAX);
+@@ -479,9 +507,40 @@ fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
+             POSITION_Z,
+             VELOCITY,
+             VELOCITY,
+-            VELOCITY
++            VELOCITY,
++            Field::integer(0, 3),
++            Field::integer(0, 65_535),
++        ]
++    );
++    // U4d's other kinds: a hull's transform; a part's transform, health and hull; a door's state; the wall's health and
++    // standing; an effect row's kind, ticks left and magnitude.
++    assert_eq!(
++        EntityKind::Vehicle.layout(),
++        [POSITION_XY, POSITION_XY, POSITION_Z, YAW]
++    );
++    assert_eq!(
++        EntityKind::VehiclePart.layout(),
++        [
++            POSITION_XY,
++            POSITION_XY,
++            POSITION_Z,
++            YAW,
++            health,
++            Field::integer(0, 63)
++        ]
++    );
++    assert_eq!(EntityKind::Door.layout(), [Field::integer(0, 1)]);
++    assert_eq!(EntityKind::Wall.layout(), [health, Field::integer(0, 1)]);
++    assert_eq!(
++        EntityKind::Effect.layout(),
++        [
++            Field::integer(0, 7),
++            Field::integer(0, 4_095),
++            Field::integer(0, 255)
+         ]
+     );
++    // The soldier fills the record: EntityRecord::FIELDS is its 12.
++    assert_eq!(EntityKind::Soldier.layout().len(), EntityRecord::FIELDS);
+     // An integer field takes the fewest bits that hold its range, never wraps, and is its own kind: never equal to a
+     // grid field of the same integers.
+     for (min, max, bits) in [
 diff --git a/spikes/netcode-proof/crates/sim/src/greybox.rs b/spikes/netcode-proof/crates/sim/src/greybox.rs
 new file mode 100644
 index 0000000..a204aca
@@ -802,10 +945,10 @@ index 0000000..6d79f44
 +}
 diff --git a/spikes/netcode-proof/crates/sim/src/replay.rs b/spikes/netcode-proof/crates/sim/src/replay.rs
 new file mode 100644
-index 0000000..1aebece
+index 0000000..3d30d95
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/sim/src/replay.rs
-@@ -0,0 +1,683 @@
+@@ -0,0 +1,695 @@
 +//! Recordings and their one replay driver (u4-build-plan.md §4.15; the advisor's Q4 ruling; A12).
 +//!
 +//! A recording is a header and each tick's [`TickInput`], fixed-width little-endian and never a `usize` (plan.md:527-
@@ -984,7 +1127,11 @@ index 0000000..1aebece
 +            buttons: r.u16().ok_or(CUT)?,
 +            presses: r.take().ok_or(CUT)?,
 +            move_xy: [r.i8().ok_or(CUT)?, r.i8().ok_or(CUT)?],
-+            aim: [r.i32().ok_or(CUT)?, r.i32().ok_or(CUT)?, r.i32().ok_or(CUT)?],
++            aim: [
++                r.i32().ok_or(CUT)?,
++                r.i32().ok_or(CUT)?,
++                r.i32().ok_or(CUT)?,
++            ],
 +            view_tick: r.u32().ok_or(CUT)?,
 +            view_fraction: r.u8().ok_or(CUT)?,
 +        };
@@ -1146,12 +1293,19 @@ index 0000000..1aebece
 +    /// `span_ms` long. Every non-plate soldier sends one command a tick (a function of the seed, the slot and the tick
 +    /// alone), now and then holding one back and sending it beside the next (the catch-up case) or losing one; it moves
 +    /// in a random walk steered toward its team's home by its own dead reckoning, aims at a point among the other
-+    /// teams, holds fire (the stress and estimate scenes always; the courses in bursts) and presses fire, reload and
-+    /// throw now and then; a rare aim point lies beyond the weapon's reach (the clamp) and a rare Rewind outside the
++    /// teams, holds fire (the stress and estimate scenes always; the courses in bursts) and presses fire and throw now
++    /// and then, and reload on the courses; a rare aim point lies beyond the weapon's reach (the clamp) and a rare
++    /// Rewind outside the
 +    /// ring (the refusal). Each firing command's Rewind names ticks the ring holds, and its view time is that Rewind's.
 +    /// Every few hundred ticks a soldier is spawned at its home, teleported there, or its move speed set. The commands
 +    /// are written in the canonical order (carry 8).
-+    pub fn synthetic(scene: &Scene, seed: u64, first_tick: u32, ticks: u32, span_ms: u32) -> Recording {
++    pub fn synthetic(
++        scene: &Scene,
++        seed: u64,
++        first_tick: u32,
++        ticks: u32,
++        span_ms: u32,
++    ) -> Recording {
 +        let mut key = *b"npt-sim synthetic recordings....";
 +        key[..8].copy_from_slice(&seed.to_le_bytes());
 +        let mut rng = ChaCha8Rng::from_seed(key);
@@ -1171,9 +1325,8 @@ index 0000000..1aebece
 +            held_back: Option<(Command, Option<Rewind>)>,
 +        }
 +        let homes = scene.homes;
-+        let home_of = |slot: u8| -> [i32; 2] {
-+            homes[usize::from(scene.team(slot).unwrap_or(0)).min(2)]
-+        };
++        let home_of =
++            |slot: u8| -> [i32; 2] { homes[usize::from(scene.team(slot).unwrap_or(0)).min(2)] };
 +        let mut clients: Vec<Client> = (0..slots)
 +            .map(|s| Client {
 +                est: home_of(s).map(|k| k as f32 / 100.0),
@@ -1228,7 +1381,9 @@ index 0000000..1aebece
 +                if draw(40) == 0 {
 +                    c.presses[Command::PRESS_FIRE] = c.presses[Command::PRESS_FIRE].wrapping_add(1);
 +                }
-+                if draw(300) == 0 {
++                // Reloads: the courses only (a stress or estimate soldier's magazine outlasts the run, and a reload
++                // would pause its fire for 2 s).
++                if !always_fire && draw(300) == 0 {
 +                    c.presses[Command::PRESS_RELOAD] =
 +                        c.presses[Command::PRESS_RELOAD].wrapping_add(1);
 +                }
@@ -1491,10 +1646,10 @@ index 0000000..1aebece
 +}
 diff --git a/spikes/netcode-proof/crates/sim/src/rng.rs b/spikes/netcode-proof/crates/sim/src/rng.rs
 new file mode 100644
-index 0000000..a9c944a
+index 0000000..8139741
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/sim/src/rng.rs
-@@ -0,0 +1,71 @@
+@@ -0,0 +1,72 @@
 +//! The sim's random streams (plan §4.5: `ChaCha8Rng`, pinned; the seed passed in by the host; our own sampling
 +//! functions; the authority-only spread stream kept apart).
 +
@@ -1506,8 +1661,9 @@ index 0000000..a9c944a
 +/// state and in the state hash; the client-held hash leaves the authority-only ones out (plan §4.5).
 +///
 +/// The sampling functions are the sim's own (integers only, the same on every target), never `rand`'s distributions.
++/// The world's alone: nothing outside npt-sim draws from its streams, so it is not public.
 +#[derive(Clone, Debug)]
-+pub struct SimRng {
++pub(crate) struct SimRng {
 +    rng: ChaCha8Rng,
 +}
 +
@@ -1568,10 +1724,10 @@ index 0000000..a9c944a
 +}
 diff --git a/spikes/netcode-proof/crates/sim/src/scene.rs b/spikes/netcode-proof/crates/sim/src/scene.rs
 new file mode 100644
-index 0000000..5e976f5
+index 0000000..457c5e0
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/sim/src/scene.rs
-@@ -0,0 +1,267 @@
+@@ -0,0 +1,268 @@
 +//! The scenes, as data (u4-build-plan.md §4.13; ADR 0001:1470-1482): SS the stress scene, ES R2's estimate scene, CO
 +//! the correction course and TC the target course. Each is recorded in a run's header by its id.
 +
@@ -1677,7 +1833,8 @@ index 0000000..5e976f5
 +    /// centre field; 15 big vehicles, 4 of them of 20 parts; 300 live stand-in projectiles as trajectory records; 384
 +    /// effect rows (8 per soldier); the doors' one portal change a second; the wall stand-in; the weapon's interval set
 +    /// for 700 shots per second with every soldier firing (48 × 30 ticks a second × 1,000,000 / (68,571 µs × 30) =
-+    /// 700.0), a hit taking 1 of 100 health so that deaths, which pause a soldier's fire for the 1 s respawn, stay rare.
++    /// 700.0), a hit taking 1 of 1,000 health so that deaths, which pause a soldier's fire for the 1 s respawn, stay rare
++    /// (D-6 measures the mean with them counted), and a magazine that outlasts a 5-minute run (about 4,400 shots).
 +    /// S1's CPU stand-ins at the build's rate.
 +    pub fn stress() -> Scene {
 +        Scene {
@@ -1702,7 +1859,7 @@ index 0000000..5e976f5
 +                spread_urad: 5_000,
 +            },
 +            move_speed: 600,
-+            health: 100,
++            health: 1_000,
 +            respawn_ms: 1_000,
 +            homes: CLUSTER,
 +            stand_ins: StandIns::s1(),
@@ -1873,10 +2030,10 @@ index 0000000..3ccd8d4
 +}
 diff --git a/spikes/netcode-proof/crates/sim/src/world.rs b/spikes/netcode-proof/crates/sim/src/world.rs
 new file mode 100644
-index 0000000..fbbce00
+index 0000000..1158077
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/sim/src/world.rs
-@@ -0,0 +1,1862 @@
+@@ -0,0 +1,1878 @@
 +//! `World`, the stand-in sim's one implementation of the seam (u4-build-plan.md §5 U4d, §4.2; plan E1).
 +//!
 +//! **One step, in phases** (each a function below, in this order):
@@ -2244,9 +2401,19 @@ index 0000000..fbbce00
 +    I(i32),
 +}
 +
-+fn record(kind: EntityKind, index: u16, generation: u16, area: u16, values: &[Val]) -> EntityRecord {
++fn record(
++    kind: EntityKind,
++    index: u16,
++    generation: u16,
++    area: u16,
++    values: &[Val],
++) -> EntityRecord {
 +    let layout = kind.layout();
-+    debug_assert_eq!(layout.len(), values.len(), "{kind:?}'s record fills its layout");
++    debug_assert_eq!(
++        layout.len(),
++        values.len(),
++        "{kind:?}'s record fills its layout"
++    );
 +    let mut r = EntityRecord {
 +        kind,
 +        index,
@@ -2523,12 +2690,8 @@ index 0000000..fbbce00
 +    /// The bite ids `World` plants (bites builds only): PM-0004-21's two injections, -41's speed bite, and the
 +    /// own-copy snap's ([`crate::OWN_COPY_SNAP_BITES`]).
 +    #[cfg(feature = "bites")]
-+    pub const BITES: [&'static str; 4] = [
-+        BITE_IDS[0].0,
-+        BITE_IDS[1].0,
-+        BITE_IDS[2].0,
-+        BITE_IDS[3].0,
-+    ];
++    pub const BITES: [&'static str; 4] =
++        [BITE_IDS[0].0, BITE_IDS[1].0, BITE_IDS[2].0, BITE_IDS[3].0];
 +
 +    /// A world with one planted defect by its id (bites builds only), armed from the step that runs `arm_tick` on
 +    /// (at or after `first_tick`); `None` for an id it does not plant. PM-0001-41/server-quant-differs takes its
@@ -2567,7 +2730,9 @@ index 0000000..fbbce00
 +
 +    #[cfg(feature = "bites")]
 +    fn bitten(&self, bite: Bite) -> bool {
-+        self.bite.as_ref().is_some_and(|b| b.armed && b.bite == bite)
++        self.bite
++            .as_ref()
++            .is_some_and(|b| b.armed && b.bite == bite)
 +    }
 +
 +    /// The grid the authority's own-copy snap uses: the wire grid, or under PM-0001-41/server-quant-differs its own.
@@ -2924,7 +3089,10 @@ index 0000000..fbbce00
 +        } else {
 +            s.move_speed
 +        };
-+        #[allow(unused_mut, reason = "PM-0001-41/server-speed-1pct scales it in bites builds")]
++        #[allow(
++            unused_mut,
++            reason = "PM-0001-41/server-speed-1pct scales it in bites builds"
++        )]
 +        let mut speed = speed_cm as f32 / 100.0;
 +        #[cfg(feature = "bites")]
 +        if authority && self.bitten(Bite::Speed) {
@@ -3149,7 +3317,8 @@ index 0000000..fbbce00
 +                }
 +            }
 +            CoverVariant::Present => {
-+                self.blend_cover.extend(self.volumes.cover.iter().map(FBox::of));
++                self.blend_cover
++                    .extend(self.volumes.cover.iter().map(FBox::of));
 +            }
 +        }
 +        self.blend_key = Some(key);
@@ -3167,7 +3336,8 @@ index 0000000..fbbce00
 +            });
 +            // The spread, from the authority-only stream: up to spread_urad × the distance, per axis.
 +            let target = f.point.map(|k| (f64::from(k) / 100.0) as f32);
-+            let width = w.spread_urad as f32 / 1_000_000.0 * length(sub(target, f.origin)) / 1_000.0;
++            let width =
++                w.spread_urad as f32 / 1_000_000.0 * length(sub(target, f.origin)) / 1_000.0;
 +            let r = &mut self.rngs[Stream::Spread as usize - 1];
 +            let off = [0; 3].map(|_| r.between(-1_000, 1_000) as f32 * width);
 +            let d = sub(
@@ -3246,6 +3416,8 @@ index 0000000..fbbce00
 +            s.respawn_left = ticks_for_ms(self.scene.respawn_ms).max(1);
 +            s.flags = FLAG_DEAD;
 +            s.vel = [0.0; 3];
++            // Its record shows the stop too, so the record's grid stays the wire grid of the snapped copy (carry 9).
++            self.pre[v].vel = [0.0; 3];
 +            self.events.push(SimEvent::Kill {
 +                killer: shooter,
 +                victim,
@@ -3316,11 +3488,7 @@ index 0000000..fbbce00
 +            live: true,
 +            kind: STAND_IN,
 +            start_tick: tick,
-+            p0: [
-+                cm(p0[0]),
-+                cm(p0[1]),
-+                wire.from_grid(POSITION_Z, p0[2]),
-+            ],
++            p0: [cm(p0[0]), cm(p0[1]), wire.from_grid(POSITION_Z, p0[2])],
 +            v0: v0.map(|k| wire.from_grid(VELOCITY, k)),
 +            fuse: fuse.min(u32::from(u16::MAX)) as u16,
 +            owner: 0,
@@ -3425,7 +3593,12 @@ index 0000000..fbbce00
 +                i as u16,
 +                0,
 +                area(v.pos),
-+                &[Val::F(v.pos[0]), Val::F(v.pos[1]), Val::F(v.pos[2]), Val::F(v.yaw)],
++                &[
++                    Val::F(v.pos[0]),
++                    Val::F(v.pos[1]),
++                    Val::F(v.pos[2]),
++                    Val::F(v.yaw),
++                ],
 +            ));
 +        }
 +        for (i, p) in self.parts.iter().enumerate() {
@@ -3737,5 +3910,2329 @@ index 0000000..fbbce00
 +
 +    fn reports(&self) -> &InputReports {
 +        &self.reports
++    }
++}
+diff --git a/spikes/netcode-proof/crates/sim/tests/replay.rs b/spikes/netcode-proof/crates/sim/tests/replay.rs
+new file mode 100644
+index 0000000..3a4a511
+--- /dev/null
++++ b/spikes/netcode-proof/crates/sim/tests/replay.rs
+@@ -0,0 +1,629 @@
++//! U4d's tests of the recordings and their one driver (u4-build-plan.md §4.15, §5 U4d): D-2 two processes over the
++//! three synthetic recordings, D-7 the pinned hash and dump vectors, the recording's byte layout and size (carry 19),
++//! its canonical order (carry 8), and the replayer's refusals. In bites builds, PM-0004-21/hash-map through D-2.
++
++use std::io::{BufRead, BufReader, Write};
++use std::process::{Child, ChildStdin, ChildStdout, Command as Process, Stdio};
++
++use npt_sim::replay::{Replayer, Step};
++use npt_sim::{
++    Attribute, AttributeChange, Command, CoverVariant, HitHistory, Placement, Recording, Rewind,
++    Scene, SimCore, TICK_HZ, TickInput, World,
++};
++
++/// The ring span the recordings carry: 2 s.
++const SPAN_MS: u32 = 2_000;
++/// Set in a D-2 child's environment: `clean`, or a bite id and its arming tick as `<id>@<tick>`.
++const CHILD: &str = "NPT_SIM_D2_CHILD";
++/// The prefix of every line a D-2 child writes for its parent.
++const MARK: &str = "npt-d2 ";
++
++/// The three synthetic recordings (u4-build-plan.md §4.15): SS seed 1, ES seed 2 and TC seed 3, 9,000 ticks each (5
++/// minutes at 30 Hz), their rings 2 s long; ES's ticks start high and TC's cross the u32 wrap.
++fn recordings() -> [Recording; 3] {
++    [
++        Recording::synthetic(&Scene::stress(), 1, 0, 9_000, SPAN_MS),
++        Recording::synthetic(&Scene::estimate(), 2, 1_000_000, 9_000, SPAN_MS),
++        Recording::synthetic(&Scene::targets(), 3, u32::MAX - 4_499, 9_000, SPAN_MS),
++    ]
++}
++
++/// A recording as the 32-bit words npt-hash-wasm's `feed` takes: its bytes, little-endian, the last word zero-padded.
++fn words(rec: &Recording) -> Vec<u32> {
++    le_words(&rec.encode())
++}
++
++/// Bytes as little-endian 32-bit words, the last zero-padded.
++fn le_words(bytes: &[u8]) -> Vec<u32> {
++    let mut b = bytes.to_vec();
++    b.resize(b.len().div_ceil(4) * 4, 0);
++    let (words, rest) = b.as_chunks::<4>();
++    assert!(rest.is_empty());
++    words.iter().map(|w| u32::from_le_bytes(*w)).collect()
++}
++
++/// FNV-1a-64, written again here from its definition (the offset basis 0xcbf29ce484222325, the prime 0x100000001b3).
++fn fnv(bytes: &[u8]) -> u64 {
++    let mut h: u64 = 0xcbf2_9ce4_8422_2325;
++    for b in bytes {
++        h = (h ^ u64::from(*b)).wrapping_mul(0x0000_0100_0000_01b3);
++    }
++    h
++}
++
++/// FNV-1a-64 over 32-bit words' little-endian bytes.
++fn fnv_words(words: &[u32]) -> u64 {
++    let bytes: Vec<u8> = words.iter().flat_map(|w| w.to_le_bytes()).collect();
++    fnv(&bytes)
++}
++
++/// The D-2 child's mode, from its environment: `None` in the parent.
++fn child_mode() -> Option<Option<(String, u32)>> {
++    let mode = std::env::var(CHILD).ok()?;
++    if mode == "clean" {
++        return Some(None);
++    }
++    let (id, arm) = mode.rsplit_once('@').expect("<id>@<tick>");
++    Some(Some((id.to_string(), arm.parse().expect("an arming tick"))))
++}
++
++/// A D-2 child: replays each recording (the first with `bite`, armed at its tick), and after each tick writes its
++/// hash for the parent and waits for its word: `n` the next tick, `d` this tick's dump words, `c <words>` the first
++/// field where this tick's dump differs from those words, `q` stop. A bitten world's order digest is written once
++/// armed. Each process logs its own digest (u4-build-plan.md §4.14).
++fn serve(bite: Option<(String, u32)>) {
++    let mut out = std::io::stdout().lock();
++    let mut lines = std::io::stdin().lock().lines();
++    for (r, rec) in recordings().iter().enumerate() {
++        #[cfg(feature = "bites")]
++        let bitten = bite
++            .as_ref()
++            .filter(|_| r == 0)
++            .map(|(id, arm)| Replayer::with_bite(id, *arm).expect("a bite World plants"));
++        #[cfg(not(feature = "bites"))]
++        let bitten: Option<Replayer> = {
++            assert!(bite.is_none(), "a bite asked of a measured build");
++            None
++        };
++        let mut rp = bitten.unwrap_or_default();
++        for w in words(rec) {
++            rp.feed(w);
++        }
++        #[cfg(feature = "bites")]
++        let mut digest_logged = false;
++        loop {
++            let tick = match rp.step() {
++                Step::Stepped(tick) => tick,
++                Step::Done => break,
++                other => panic!("recording {r}: {other:?}"),
++            };
++            #[cfg(feature = "bites")]
++            if !digest_logged && let Some(d) = rp.world().and_then(World::bite_order_digest) {
++                writeln!(out, "{MARK}o {d:016x}").expect("stdout");
++                digest_logged = true;
++            }
++            let hash = rp.state_hash().expect("a stepped replayer has a world");
++            writeln!(out, "{MARK}h {r} {tick} {hash:016x}").expect("stdout");
++            out.flush().expect("stdout");
++            loop {
++                let line = lines.next().expect("the parent's word").expect("stdin");
++                let dump = rp.dump().expect("a stepped replayer has a world");
++                match line
++                    .split_once(' ')
++                    .map_or((line.as_str(), ""), |(a, b)| (a, b))
++                {
++                    ("n", _) => break,
++                    ("q", _) => return,
++                    ("d", _) => {
++                        let ws: Vec<String> =
++                            dump.words().iter().map(|w| format!("{w:x}")).collect();
++                        writeln!(out, "{MARK}d {}", ws.join(" ")).expect("stdout");
++                    }
++                    ("c", theirs) => {
++                        let theirs: Vec<u32> = theirs
++                            .split(' ')
++                            .map(|w| u32::from_str_radix(w, 16).expect("a hex word"))
++                            .collect();
++                        let diff = dump.first_difference(&theirs).expect("the dumps differ");
++                        writeln!(
++                            out,
++                            "{MARK}f {} {} {:08x} {:08x}",
++                            diff.word, diff.field, diff.ours, diff.theirs
++                        )
++                        .expect("stdout");
++                    }
++                    other => panic!("a word the child does not know: {other:?}"),
++                }
++                out.flush().expect("stdout");
++            }
++        }
++    }
++    writeln!(out, "{MARK}end").expect("stdout");
++}
++
++/// One D-2 leg: this test binary re-run through `std::env::current_exe()` as a child, its stdin and stdout piped.
++struct Leg {
++    child: Child,
++    stdin: ChildStdin,
++    out: BufReader<ChildStdout>,
++    /// The order digest it logged, if its world was bitten.
++    digest: Option<String>,
++}
++
++impl Leg {
++    fn spawn(test: &str, mode: &str) -> Leg {
++        let exe = std::env::current_exe().expect("the test binary's path");
++        let mut child = Process::new(exe)
++            .args([test, "--exact", "--nocapture", "--test-threads", "1", "-q"])
++            .env(CHILD, mode)
++            .stdin(Stdio::piped())
++            .stdout(Stdio::piped())
++            .spawn()
++            .expect("the child starts");
++        let stdin = child.stdin.take().expect("piped");
++        let out = BufReader::new(child.stdout.take().expect("piped"));
++        Leg {
++            child,
++            stdin,
++            out,
++            digest: None,
++        }
++    }
++
++    /// Its next line for the parent (the harness's own lines skipped, a digest line kept aside).
++    fn next(&mut self) -> String {
++        loop {
++            let mut line = String::new();
++            let n = self.out.read_line(&mut line).expect("the child's stdout");
++            assert!(n > 0, "a D-2 child ended without its last line");
++            if let Some(at) = line.find(MARK) {
++                let rest = line[at + MARK.len()..].trim_end().to_string();
++                if let Some(d) = rest.strip_prefix("o ") {
++                    self.digest = Some(d.to_string());
++                    continue;
++                }
++                return rest;
++            }
++        }
++    }
++
++    fn send(&mut self, word: &str) {
++        writeln!(self.stdin, "{word}").expect("the child's stdin");
++        self.stdin.flush().expect("the child's stdin");
++    }
++
++    fn finish(mut self) {
++        drop(self.stdin);
++        let status = self.child.wait().expect("the child ends");
++        assert!(status.success(), "a D-2 child failed: {status}");
++    }
++}
++
++/// What D-2 found: the ticks compared, the first mismatch (recording, tick, field) and each leg's order digest.
++#[derive(Debug)]
++struct Outcome {
++    compared: u32,
++    first: Option<(u32, u32, String)>,
++    digests: [Option<String>; 2],
++}
++
++/// D-2's comparison: two child processes of `test` in `mode`, stepped in lock step; at the first tick whose hashes
++/// differ, the second leg's dump words go to the first, which names the first field that differs.
++fn compare(test: &str, mode: &str) -> Outcome {
++    let (mut a, mut b) = (Leg::spawn(test, mode), Leg::spawn(test, mode));
++    let mut compared = 0;
++    let mut first = None;
++    loop {
++        let (x, y) = (a.next(), b.next());
++        if x == "end" && y == "end" {
++            break;
++        }
++        let (px, py) = (parse_hash(&x), parse_hash(&y));
++        assert_eq!((px.0, px.1), (py.0, py.1), "the legs step the same ticks");
++        compared += 1;
++        if px.2 != py.2 {
++            b.send("d");
++            let theirs = b.next();
++            let theirs = theirs.strip_prefix("d ").expect("a dump line");
++            a.send(&format!("c {theirs}"));
++            let diff = a.next();
++            let field = diff
++                .strip_prefix("f ")
++                .and_then(|d| d.split(' ').nth(1))
++                .expect("a field line")
++                .to_string();
++            first = Some((px.0, px.1, field));
++            a.send("q");
++            b.send("q");
++            break;
++        }
++        a.send("n");
++        b.send("n");
++    }
++    let digests = [a.digest.clone(), b.digest.clone()];
++    a.finish();
++    b.finish();
++    Outcome {
++        compared,
++        first,
++        digests,
++    }
++}
++
++/// A hash line's recording, tick and hash.
++fn parse_hash(line: &str) -> (u32, u32, String) {
++    let mut p = line
++        .strip_prefix("h ")
++        .unwrap_or_else(|| panic!("a hash line: {line}"))
++        .split(' ');
++    let r = p.next().and_then(|x| x.parse().ok()).expect("a recording");
++    let t = p.next().and_then(|x| x.parse().ok()).expect("a tick");
++    (r, t, p.next().expect("a hash").to_string())
++}
++
++#[test]
++fn d2_two_processes_give_equal_per_tick_hashes_over_the_three_synthetic_recordings() {
++    if let Some(mode) = child_mode() {
++        serve(mode);
++        return;
++    }
++    // A quick test of the judged check (U4d2's release-build step): two processes, each its own std seeds and its own
++    // allocator's addresses, replay the three recordings through the one driver; every tick's hashes are equal.
++    let test = "d2_two_processes_give_equal_per_tick_hashes_over_the_three_synthetic_recordings";
++    let outcome = compare(test, "clean");
++    assert_eq!(outcome.first, None, "{outcome:?}");
++    assert_eq!(
++        outcome.compared, 27_000,
++        "every tick of the three recordings compared"
++    );
++    assert_eq!(outcome.digests, [None, None]);
++}
++
++#[cfg(feature = "bites")]
++#[test]
++fn d2_pm_0004_21_hash_map_is_first_seen_at_its_arming_tick() {
++    if let Some(mode) = child_mode() {
++        serve(mode);
++        return;
++    }
++    // u4-build-plan.md §4.14: a bites-only std HashMap of 64 keys, its whole iteration order folded into a state word
++    // at the arming tick T. Each process logs its order digest; D-2 must report T as the first mismatching tick and
++    // the folded word as the field. Two equal digests mean "not exercised" (never caught or missed): then no tick may
++    // differ.
++    let test = "d2_pm_0004_21_hash_map_is_first_seen_at_its_arming_tick";
++    let arm = 1_234;
++    let outcome = compare(test, &format!("PM-0004-21/hash-map@{arm}"));
++    let [Some(a), Some(b)] = &outcome.digests else {
++        panic!("each process logs its order digest: {outcome:?}");
++    };
++    println!("PM-0004-21/hash-map: order digests {a} and {b}; {outcome:?}");
++    if a == b {
++        assert_eq!(outcome.first, None, "not exercised, yet a tick differed");
++    } else {
++        assert_eq!(
++            outcome.first,
++            Some((0, arm, "bite[0].hash_map_order".to_string())),
++            "D-2 reports the arming tick and the folded word"
++        );
++    }
++}
++
++#[test]
++fn d7_the_hash_and_dump_vectors_are_pinned() {
++    // The hash function: FNV-1a-64's published vectors, by the second implementation above.
++    assert_eq!(fnv(b""), 0xcbf2_9ce4_8422_2325);
++    assert_eq!(fnv(b"a"), 0xaf63_dc4c_8601_ec8c);
++    assert_eq!(fnv(b"foobar"), 0x8594_4171_f739_67e8);
++    // Each scene's world before its first tick, and the stress scene's after 1, 30 and 300 ticks of its synthetic
++    // recording: the dump's length and the state hash, which is FNV-1a-64 over the dump's words (carry 38). Pinned
++    // here for this build; their cross-target half (x86-64 against wasm32) is U4d2's.
++    let pinned: [(Scene, usize, u64); 4] = [
++        (Scene::stress(), 6_984, 14_902_069_109_701_799_078),
++        (Scene::estimate(), 2_184, 18_365_153_506_875_948_742),
++        (Scene::course(), 260, 12_984_630_011_248_297_851),
++        (Scene::targets(), 340, 5_080_305_515_375_423_141),
++    ];
++    for (scene, words, hash) in &pinned {
++        let world = World::new(scene, 1, 0);
++        let d = world.dump();
++        assert_eq!(d.hash(), world.state_hash(), "{}", scene.name());
++        assert_eq!(fnv_words(d.words()), world.state_hash(), "{}", scene.name());
++        assert_eq!(
++            (d.words().len(), world.state_hash()),
++            (*words, *hash),
++            "{}",
++            scene.name()
++        );
++    }
++    let rec = Recording::synthetic(&Scene::stress(), 1, 0, 300, SPAN_MS);
++    let mut world = World::new(&Scene::stress(), 1, 0);
++    let mut history = HitHistory::for_ms(SPAN_MS).expect("2 s");
++    let mut after = Vec::new();
++    for (k, t) in rec.ticks.iter().enumerate() {
++        world.step(t, &history);
++        history.push(world.hit_volumes());
++        if [0, 29, 299].contains(&k) {
++            let d = world.dump();
++            assert_eq!(fnv_words(d.words()), world.state_hash());
++            after.push((k + 1, d.words().len(), world.state_hash()));
++        }
++    }
++    assert_eq!(
++        after,
++        [
++            (1, 7_308, 18_252_234_173_897_161_173),
++            (30, 7_124, 8_166_482_889_541_977_892),
++            (300, 7_140, 884_988_356_812_575_107),
++        ]
++    );
++    // The dump's first names: the world's tick, its 64-bit tick count (two words), then soldier 0's fields.
++    let names: Vec<String> = (0..6).filter_map(|i| world.dump().field(i)).collect();
++    assert_eq!(
++        names,
++        [
++            "world[0].next_tick",
++            "world[0].elapsed",
++            "world[0].elapsed",
++            "soldier[0].alive",
++            "soldier[0].respawn_left",
++            "soldier[0].generation"
++        ]
++    );
++    // The three synthetic recordings' bytes (generator version 1): length and FNV-1a-64, for the recordings manifest
++    // (u4-build-plan.md §4.15: regenerated at check time, each file's digest committed).
++    let digests: Vec<(usize, u64)> = recordings()
++        .iter()
++        .map(|r| {
++            let b = r.encode();
++            (b.len(), fnv(&b))
++        })
++        .collect();
++    assert_eq!(Recording::GENERATOR, 1);
++    assert_eq!(
++        digests,
++        [
++            (16_697_066, 2_695_722_420_930_191_497),
++            (16_698_782, 2_428_757_491_580_269_395),
++            (798_759, 3_177_023_422_367_409_324),
++        ]
++    );
++}
++
++#[test]
++fn recordings_round_trip_and_a_command_is_39_bytes() {
++    // u4-build-plan.md §4.15 (the netcode side nit; carry 19): a command with its Rewind is 39 B (slot 1, tick 4,
++    // sequence 2, buttons 2, press counters 4, move 2, aim 12, view tick 4, view fraction 1; present 1, tick_a 4,
++    // fraction 1, cover 1), a spawn or teleport 13 B, an attribute change 6 B; a tick's own header 12 B; the header
++    // 60 B. Measured here from the encoder.
++    let empty = Recording {
++        scene: Scene::stress().id(),
++        seed: 9,
++        first_tick: 5,
++        span_ms: SPAN_MS,
++        generator: 0,
++        ticks: vec![TickInput {
++            tick: 5,
++            ..TickInput::default()
++        }],
++    };
++    let size = |rec: &Recording| rec.encode().len();
++    assert_eq!(size(&empty), 60 + 12);
++    let c = Command {
++        slot: 3,
++        tick: 5,
++        seq: 7,
++        buttons: Command::FIRE | Command::CROUCH,
++        presses: [1, 2, 3, 4],
++        move_xy: [-128, 127],
++        aim: [i32::MIN, -1, i32::MAX],
++        view_tick: 4,
++        view_fraction: 200,
++    };
++    let r = Rewind {
++        tick_a: u32::MAX,
++        fraction: 255,
++        cover: CoverVariant::Present,
++    };
++    let mut one = empty.clone();
++    one.ticks[0].commands = vec![(c, Some(r))];
++    assert_eq!(size(&one) - size(&empty), 39, "a command with its Rewind");
++    let mut forty_eight = empty.clone();
++    forty_eight.ticks[0].commands = (0..48)
++        .map(|s| {
++            (
++                Command {
++                    slot: s,
++                    ..Command::default()
++                },
++                None,
++            )
++        })
++        .collect();
++    assert_eq!(size(&forty_eight) - 60, 12 + 1_872, "a tick of 48 soldiers");
++    let mut placed = empty.clone();
++    placed.ticks[0].spawns = vec![Placement {
++        slot: 1,
++        position: [-1, 2, i32::MAX],
++    }];
++    placed.ticks[0].teleports = vec![Placement::default()];
++    placed.ticks[0].attributes = vec![AttributeChange {
++        slot: 2,
++        attribute: Attribute::FireInterval,
++        value: u32::MAX,
++    }];
++    assert_eq!(size(&placed) - size(&empty), 13 + 13 + 6);
++    for rec in [&empty, &one, &forty_eight, &placed] {
++        assert_eq!(Recording::decode(&rec.encode()).as_ref(), Ok(rec));
++    }
++    // The three synthetic recordings: each round-trips; their measured sizes.
++    for rec in recordings() {
++        let bytes = rec.encode();
++        assert_eq!(Recording::decode(&bytes).as_ref(), Ok(&rec));
++        let commands: usize = rec.ticks.iter().map(|t| t.commands.len()).sum();
++        println!(
++            "recording scene {} seed {}: {} ticks, {commands} commands, {} bytes",
++            rec.scene,
++            rec.seed,
++            rec.ticks.len(),
++            bytes.len()
++        );
++    }
++}
++
++/// Whether `commands` is in the canonical order, by netcode F2's words: slot ascending; within a slot, command tick
++/// strictly ascending, wrap-aware.
++fn canonical(commands: &[(Command, Option<Rewind>)]) -> bool {
++    commands.windows(2).all(|w| {
++        let (a, b) = (&w[0].0, &w[1].0);
++        a.slot < b.slot || (a.slot == b.slot && (b.tick.wrapping_sub(a.tick) as i32) > 0)
++    })
++}
++
++#[test]
++fn a_synthetic_recording_is_in_the_canonical_order_and_the_replayer_feeds_it_unchanged() {
++    // Carry 8's other half: the generator writes the canonical order (with a slot's held-back command beside its next
++    // one now and then), and the replayer feeds the world the recorded order unchanged, so its per-tick hashes are a
++    // world stepped directly on the recording's ticks.
++    let mut doubled = 0;
++    for rec in recordings() {
++        let scene = Scene::by_id(rec.scene).expect("a known scene");
++        let mut direct = World::new(&scene, rec.seed, rec.first_tick);
++        let mut history = HitHistory::for_ms(rec.span_ms).expect("the header's span");
++        let mut rp = Replayer::new();
++        for w in words(&rec) {
++            rp.feed(w);
++        }
++        for (k, t) in rec.ticks.iter().take(1_500).enumerate() {
++            assert!(canonical(&t.commands), "tick {k}: {:?}", t.commands);
++            doubled += t
++                .commands
++                .windows(2)
++                .filter(|w| w[0].0.slot == w[1].0.slot)
++                .count();
++            let tick = direct.next_tick();
++            direct.step(t, &history);
++            history.push(direct.hit_volumes());
++            assert_eq!(rp.step(), Step::Stepped(tick), "tick {k}");
++            assert_eq!(rp.state_hash(), Some(direct.state_hash()), "tick {k}");
++        }
++    }
++    assert!(doubled > 100, "{doubled} ticks with a slot's two commands");
++}
++
++#[test]
++fn the_replayer_steps_a_tick_only_when_its_words_are_whole() {
++    let rec = Recording::synthetic(&Scene::targets(), 8, u32::MAX - 20, 60, SPAN_MS);
++    let all = words(&rec);
++    let mut whole = Replayer::new();
++    for w in &all {
++        whole.feed(*w);
++    }
++    let mut hashes = Vec::new();
++    while let Step::Stepped(_) = whole.step() {
++        hashes.push(whole.state_hash());
++    }
++    assert_eq!(hashes.len(), 60);
++    assert_eq!(whole.step(), Step::Done);
++    // Word by word: NeedMore until a tick is whole, then that tick; the same hashes.
++    let mut rp = Replayer::new();
++    assert_eq!(rp.step(), Step::NeedMore, "no header yet");
++    assert!(rp.world().is_none() && rp.state_hash().is_none() && rp.dump().is_none());
++    let mut got = Vec::new();
++    for w in &all {
++        rp.feed(*w);
++        while let Step::Stepped(_) = rp.step() {
++            got.push(rp.state_hash());
++        }
++    }
++    assert_eq!(got, hashes);
++    assert_eq!(rp.step(), Step::Done);
++}
++
++#[test]
++fn the_replayer_refuses_a_recording_it_cannot_replay() {
++    // Hostile or foreign bytes fail with a reason and step nothing more (the failure sticks); decode refuses the same
++    // and also a cut recording or trailing bytes.
++    let rec = Recording::synthetic(&Scene::course(), 4, 0, 5, SPAN_MS);
++    let good = rec.encode();
++    let run = |bytes: &[u8]| {
++        let mut rp = Replayer::new();
++        for w in le_words(bytes) {
++            rp.feed(w);
++        }
++        let mut last = rp.step();
++        while let Step::Stepped(_) = last {
++            last = rp.step();
++        }
++        last
++    };
++    assert_eq!(run(&good), Step::Done);
++    let word_at = |i: usize, w: u32| {
++        let mut b = good.clone();
++        b[i * 4..i * 4 + 4].copy_from_slice(&w.to_le_bytes());
++        b
++    };
++    // The header's words: magic, version, scene, seed, TICK_HZ, first tick, ticks, span, generator, then the pools.
++    // The span is the replayer's to refuse (HitHistory::for_ms: carry 14); decode reads it as written.
++    for (why, bytes, decodes) in [
++        ("magic", word_at(0, 0), false),
++        ("version", word_at(1, 2), false),
++        ("scene", word_at(2, 9), false),
++        ("TICK_HZ", word_at(5, TICK_HZ + 30), false),
++        ("pools", word_at(10, 47), false),
++        ("a zero span", word_at(8, 0), true),
++        ("a span above 1 MB", word_at(8, 7_701), true),
++    ] {
++        let step = run(&bytes);
++        assert!(matches!(step, Step::Failed(_)), "{why}: {step:?}");
++        assert_eq!(Recording::decode(&bytes).is_ok(), decodes, "{why}");
++    }
++    // The span at the 1 MB edge replays.
++    assert_eq!(run(&word_at(8, 7_700)), Step::Done);
++    // A command's presence, cover and an attribute byte out of range: the first tick's first command starts at byte
++    // 60 + 12; its Rewind's presence byte is at offset 32 in it, the cover at 38, and the attribute change follows it.
++    let one = Recording {
++        ticks: vec![TickInput {
++            tick: 0,
++            commands: vec![(Command::default(), None)],
++            attributes: vec![AttributeChange {
++                slot: 0,
++                attribute: Attribute::MoveSpeed,
++                value: 1,
++            }],
++            ..TickInput::default()
++        }],
++        ..rec.clone()
++    };
++    let base = one.encode();
++    for (why, at, value) in [
++        ("presence", 72 + 32, 2u8),
++        ("cover", 72 + 38, 2),
++        ("attribute", 72 + 39 + 1, 2),
++    ] {
++        let mut b = base.clone();
++        b[at] = value;
++        assert!(matches!(run(&b), Step::Failed(_)), "{why}");
++        assert!(Recording::decode(&b).is_err(), "{why}");
++    }
++    // Cut inside a tick: decode refuses it; the replayer waits for the rest (NeedMore), never steps a part.
++    let cut = &good[..good.len() - 5];
++    assert!(Recording::decode(cut).is_err());
++    assert_eq!(run(cut), Step::NeedMore);
++    // Trailing bytes past the last tick: up to three zero bytes are a word's padding; anything else is refused.
++    let mut padded = good.clone();
++    padded.extend_from_slice(&[0, 0, 0]);
++    assert!(Recording::decode(&padded).is_ok());
++    padded.push(0);
++    assert!(Recording::decode(&padded).is_err());
++    let mut trailing = good.clone();
++    trailing.push(1);
++    assert!(Recording::decode(&trailing).is_err());
++    // A failure sticks.
++    let mut rp = Replayer::new();
++    for w in le_words(&word_at(0, 0)) {
++        rp.feed(w);
++    }
++    let failed = rp.step();
++    assert!(matches!(failed, Step::Failed(_)));
++    assert_eq!(rp.step(), failed);
++}
+diff --git a/spikes/netcode-proof/crates/sim/tests/world.rs b/spikes/netcode-proof/crates/sim/tests/world.rs
+new file mode 100644
+index 0000000..cf6dc43
+--- /dev/null
++++ b/spikes/netcode-proof/crates/sim/tests/world.rs
+@@ -0,0 +1,1683 @@
++//! U4d's tests of `World` (u4-build-plan.md §5 U4d): D-1, D-3 to D-6 and D-8 to D-10, and the carries of
++//! u4s-carries.md that hold `World` (7, 8, 9, 10, 13, 14, 15, 37, 38); in bites builds, the unit proofs of the sites
++//! `World` plants (§4.14: PM-0001-41's two; PM-0004-21's std `sin` site) and bites per instance (§4.11, T10). D-2 and
++//! D-7 are tests/replay.rs's.
++
++use npt_sim::grid::{Config, Field, PITCH, POSITION_XY, POSITION_Z, VELOCITY, YAW};
++use npt_sim::{
++    Attribute, AttributeChange, Command, CoverVariant, EntityKind, EntityRecord, HitHistory,
++    HitVolumes, InputReports, Placement, Ray, RayHit, Recording, Rewind, Scene, SimCore, SimEvent,
++    StateDump, TICK_HZ, TickInput, VolumeBox, World, ticks_for_ms,
++};
++
++/// The ring span the tests lend: 2 s, 60 ticks at 30 Hz.
++const SPAN_MS: u32 = 2_000;
++/// The courses' weapon reach (Scene::course and Scene::targets), cm, and the clamp's slack: one grid cell's
++/// half-diagonal, rounded up (u4-build-plan.md §4.2: 0.87 cm).
++const REACH_CM: f64 = 6_000.0;
++const SLACK_M: f64 = 0.0087;
++/// The fire origin's height above the feet (World's chest point), m.
++const CHEST: f32 = 1.4;
++
++fn ring() -> HitHistory {
++    HitHistory::for_ms(SPAN_MS).expect("2 s of ticks")
++}
++
++/// One room tick (u4-build-plan.md §4.2): step on the lent ring, then push the new volumes into it.
++fn room_tick(world: &mut World, history: &mut HitHistory, input: &TickInput) -> Vec<SimEvent> {
++    let events = world.step(input, history).to_vec();
++    history.push(world.hit_volumes());
++    events
++}
++
++/// A small integer generator for the tests' scripts (xorshift32): no float, no std random.
++struct Dice(u32);
++
++impl Dice {
++    fn next(&mut self) -> u32 {
++        let mut x = self.0;
++        x ^= x << 13;
++        x ^= x >> 17;
++        x ^= x << 5;
++        self.0 = x;
++        x
++    }
++
++    fn below(&mut self, n: u32) -> u32 {
++        ((u64::from(self.next()) * u64::from(n)) >> 32) as u32
++    }
++
++    fn between(&mut self, lo: i32, hi: i32) -> i32 {
++        lo + self.below((hi - lo + 1) as u32) as i32
++    }
++}
++
++/// Slot `slot`'s record.
++fn soldier(world: &World, slot: u8) -> EntityRecord {
++    *world
++        .entity_records()
++        .iter()
++        .find(|r| r.kind == EntityKind::Soldier && r.index == u16::from(slot))
++        .expect("every slot has a record")
++}
++
++/// The dump's words whose names start with `prefix`, by index.
++fn named(d: &StateDump, prefix: &str) -> Vec<usize> {
++    (0..d.words().len())
++        .filter(|&i| d.field(i).is_some_and(|f| f.starts_with(prefix)))
++        .collect()
++}
++
++/// The dump word named exactly `name`.
++fn word(d: &StateDump, name: &str) -> u32 {
++    let i = (0..d.words().len())
++        .find(|&i| d.field(i).as_deref() == Some(name))
++        .unwrap_or_else(|| panic!("the dump has no {name}"));
++    d.words()[i]
++}
++
++/// An input of `commands` alone, for the world's next tick.
++fn input(world: &World, commands: Vec<(Command, Option<Rewind>)>) -> TickInput {
++    TickInput {
++        tick: world.next_tick(),
++        commands,
++        ..TickInput::default()
++    }
++}
++
++/// The eight headings the scripts walk, at full speed.
++const HEADINGS: [[i8; 2]; 8] = [
++    [127, 0],
++    [89, 89],
++    [0, 127],
++    [-89, 89],
++    [-127, 0],
++    [-89, -89],
++    [0, -127],
++    [89, -89],
++];
++
++/// Slot `slot`'s scripted command at step `k` from `at` (its feet, cm): a new heading every 45 steps, its aim 10 m
++/// ahead at chest height, fire held, crouch or sprint by stretches, a fire press every 13 steps and a reload press every
++/// 97 (no throw: the authority alone throws).
++fn walk(slot: u8, tick: u32, k: u32, at: [i32; 3], presses: &mut [u8; 4]) -> Command {
++    let h = HEADINGS[((k / 45) % 8) as usize];
++    let buttons = match (k / 45) % 4 {
++        0 => 0,
++        1 => Command::FIRE,
++        2 => Command::CROUCH | Command::FIRE,
++        _ => Command::SPRINT,
++    };
++    if k % 13 == 5 {
++        presses[Command::PRESS_FIRE] = presses[Command::PRESS_FIRE].wrapping_add(1);
++    }
++    if k % 97 == 50 {
++        presses[Command::PRESS_RELOAD] = presses[Command::PRESS_RELOAD].wrapping_add(1);
++    }
++    Command {
++        slot,
++        tick,
++        seq: k as u16,
++        buttons,
++        presses: *presses,
++        move_xy: h,
++        aim: [
++            at[0] + i32::from(h[0]) * 8,
++            at[1] + i32::from(h[1]) * 8,
++            at[2] + 140,
++        ],
++        view_tick: tick.wrapping_sub(3),
++        view_fraction: 0,
++    }
++}
++
++/// Each scene, a seed and a first tick (one crossing the u32 wrap), for the tests that run all four.
++fn scenes() -> [(Scene, u64, u32); 4] {
++    [
++        (Scene::stress(), 11, 1_000),
++        (Scene::estimate(), 12, u32::MAX - 299),
++        (Scene::course(), 13, 0),
++        (Scene::targets(), 14, 77),
++    ]
++}
++
++#[test]
++fn d1_two_worlds_on_one_recording_agree_every_tick() {
++    // World and the replay driver are Send (u4-build-plan.md §4.11, A25: U6 moves the room's world to its tick thread).
++    fn send<T: Send>() {}
++    send::<World>();
++    send::<npt_sim::replay::Replayer>();
++    let (mut events, mut hits, mut clamps) = (0usize, 0usize, 0usize);
++    for (scene, seed, first) in scenes() {
++        let rec = Recording::synthetic(&scene, seed, first, 600, SPAN_MS);
++        let mut a = World::new(&scene, seed, first);
++        let mut b = World::new(&scene, seed, first);
++        let (mut ha, mut hb) = (ring(), ring());
++        assert_eq!(a.state_hash(), b.state_hash(), "{}", scene.name());
++        for (k, t) in rec.ticks.iter().enumerate() {
++            let ea = room_tick(&mut a, &mut ha, t);
++            let eb = room_tick(&mut b, &mut hb, t);
++            let at = format!("{} tick {k}", scene.name());
++            assert_eq!(ea, eb, "{at}: events");
++            assert_eq!(a.state_hash(), b.state_hash(), "{at}: state hash");
++            assert_eq!(a.entity_records(), b.entity_records(), "{at}: records");
++            assert_eq!(a.hit_volumes(), b.hit_volumes(), "{at}: volumes");
++            assert_eq!(a.portal_states(), b.portal_states(), "{at}: portals");
++            assert_eq!(a.reports(), b.reports(), "{at}: reports");
++            // The dump is the hashed state, word for word (carry 38).
++            assert_eq!(a.dump().hash(), a.state_hash(), "{at}: dump hash");
++            events += ea.len();
++            hits += ea
++                .iter()
++                .filter(|e| matches!(e, SimEvent::Hit { .. }))
++                .count();
++            clamps += a.reports().clamps.len();
++        }
++    }
++    // Not vacuous: the runs shot, hit and clamped.
++    assert!(
++        events > 0 && hits > 0 && clamps > 0,
++        "{events} events, {hits} hits, {clamps} clamps"
++    );
++}
++
++#[test]
++fn d3_prediction_equals_authority_for_one_slot_bit_for_bit() {
++    let mut blocked = 0u32;
++    for scene in [Scene::course(), Scene::stress()] {
++        let mut authority = World::new(&scene, 7, 500);
++        let mut history = ring();
++        let mut presses = [0u8; 4];
++        let mut fired = 0u32;
++        for k in 0..1_200u32 {
++            let at = soldier(&authority, 0).grid;
++            let c = walk(
++                0,
++                authority.next_tick(),
++                k,
++                [at[0], at[1], at[2]],
++                &mut presses,
++            );
++            let mut client = authority.clone();
++            let before = client.dump();
++            let fire_held = c.buttons & Command::FIRE != 0;
++            let rewind = fire_held.then(|| Rewind {
++                tick_a: authority.next_tick().wrapping_sub(2),
++                fraction: 0,
++                cover: CoverVariant::Present,
++            });
++            let t = input(&authority, vec![(c, rewind)]);
++            room_tick(&mut authority, &mut history, &t);
++            // The client: the movers of the snapshot it decoded (here exact: the authority's records), then predict.
++            client.load_movers(authority.entity_records());
++            fired += u32::from(client.predict(&c));
++            let at = format!("{} step {k}", scene.name());
++            // Bit for bit, the snap included: the record's raw (pre-snap) and grid words, and the snapped state.
++            assert_eq!(soldier(&client, 0), soldier(&authority, 0), "{at}: record");
++            let (a, p) = (authority.dump(), client.dump());
++            for i in named(&a, "soldier[0].") {
++                assert_eq!(a.words()[i], p.words()[i], "{at}: {:?}", a.field(i));
++            }
++            // The predicting world drew from no random stream.
++            for i in named(&before, "rng[") {
++                assert_eq!(before.words()[i], p.words()[i], "{at}: {:?}", p.field(i));
++            }
++            // A move the world stopped: velocity 0 on an axis the command moved along.
++            let r = soldier(&authority, 0);
++            let vel = [r.grid[5], r.grid[6]];
++            blocked +=
++                u32::from((c.move_xy[0] != 0 && vel[0] == 0) || (c.move_xy[1] != 0 && vel[1] == 0));
++        }
++        assert!(fired > 50, "{}: {fired} predicted shots", scene.name());
++    }
++    assert!(blocked > 20, "{blocked} blocked moves: the collision ran");
++}
++
++/// `Command`'s fields' types, in order: integers only.
++type CommandFields = (u8, u32, u16, u16, [u8; 4], [i8; 2], [i32; 3], u32, u8);
++/// `TickInput`'s fields' types, in order: integers and integer types only.
++type TickInputFields = (
++    u32,
++    Vec<(Command, Option<Rewind>)>,
++    Vec<Placement>,
++    Vec<Placement>,
++    Vec<AttributeChange>,
++);
++
++/// Each type's fields, by an exhaustive destructuring, bound to a tuple of integer types: a field added, or one whose
++/// type is a float, fails to compile here (D-4: "finite by type"; carry 37).
++#[test]
++fn d4_every_value_that_enters_the_sim_is_an_integer_by_type() {
++    let Command {
++        slot,
++        tick,
++        seq,
++        buttons,
++        presses,
++        move_xy,
++        aim,
++        view_tick,
++        view_fraction,
++    } = Command::default();
++    let _: CommandFields = (
++        slot,
++        tick,
++        seq,
++        buttons,
++        presses,
++        move_xy,
++        aim,
++        view_tick,
++        view_fraction,
++    );
++    let Rewind {
++        tick_a,
++        fraction,
++        cover,
++    } = Rewind {
++        tick_a: 0,
++        fraction: 0,
++        cover: CoverVariant::Rewound,
++    };
++    let _: (u32, u8) = (tick_a, fraction);
++    match cover {
++        CoverVariant::Rewound | CoverVariant::Present => {}
++    }
++    let TickInput {
++        tick,
++        commands,
++        spawns,
++        teleports,
++        attributes,
++    } = TickInput::default();
++    let _: TickInputFields = (tick, commands, spawns, teleports, attributes);
++    let Placement { slot, position } = Placement::default();
++    let _: (u8, [i32; 3]) = (slot, position);
++    let AttributeChange {
++        slot,
++        attribute,
++        value,
++    } = AttributeChange {
++        slot: 0,
++        attribute: Attribute::MoveSpeed,
++        value: 0,
++    };
++    let _: (u8, u32) = (slot, value);
++    match attribute {
++        Attribute::MoveSpeed | Attribute::FireInterval => {}
++    }
++    // So nothing is refused or counted as non-finite: InputReports has no such counter (NF-D4).
++    let InputReports {
++        clamps,
++        cooldown,
++        ammunition,
++        reload,
++        rewind_outside,
++        pool_full,
++    } = InputReports::default();
++    assert!(clamps.is_empty());
++    assert_eq!(
++        [cooldown, ammunition, reload, rewind_outside, pool_full],
++        [0; 5]
++    );
++}
++
++#[test]
++#[cfg_attr(
++    not(debug_assertions),
++    ignore = "World's finite assert is a debug assertion"
++)]
++fn d4_the_state_holds_no_non_finite_value_on_any_tick() {
++    // World::step debug-asserts, after every tick, that no float of the state is NaN or infinite (each read by its
++    // bits, as the hash reads it); this drives it over every scene. A planted 0.0 / 0.0 in a phase trips it at that
++    // tick (the scratch plant, u4d-build.md). Ignored where debug assertions are off.
++    for (scene, seed, first) in scenes() {
++        let rec = Recording::synthetic(&scene, seed, first, 300, SPAN_MS);
++        let mut world = World::new(&scene, seed, first);
++        let mut history = ring();
++        for t in &rec.ticks {
++            room_tick(&mut world, &mut history, t);
++        }
++    }
++}
++
++#[test]
++fn d4_extreme_recorded_commands_step_without_an_overflow() {
++    // Carry 15: every integer a recording can hold, at its ends, steps with overflow checks on (the dev profile's, and
++    // the release profile's for npt-sim: Cargo.toml) and without a panic: move_xy at -128 and 127 (the room never
++    // sends -128), aim at i32::MIN and i32::MAX, counters and sequences wrapping, Rewinds at the u32 ends, placements at
++    // i32's ends, attributes at u32's.
++    let moves = [
++        [-128, -128],
++        [127, 127],
++        [-128, 127],
++        [127, -128],
++        [0, -128],
++        [-128, 0],
++    ];
++    let aims = [
++        [i32::MIN; 3],
++        [i32::MAX; 3],
++        [i32::MIN, i32::MAX, i32::MIN],
++        [i32::MAX, i32::MIN, 0],
++        [0, 0, i32::MAX],
++    ];
++    for scene in [Scene::course(), Scene::stress(), Scene::targets()] {
++        let mut world = World::new(&scene, 3, u32::MAX - 60);
++        let mut history = ring();
++        for k in 0..120u32 {
++            let mut t = input(&world, Vec::new());
++            for slot in 0..scene.slots().min(6) {
++                let i = (k + u32::from(slot)) as usize;
++                let c = Command {
++                    slot,
++                    tick: t.tick,
++                    seq: u16::MAX.wrapping_add(k as u16),
++                    buttons: u16::MAX,
++                    presses: [(255u32.wrapping_add(k) & 0xff) as u8; 4],
++                    move_xy: moves[i % moves.len()],
++                    aim: aims[i % aims.len()],
++                    view_tick: u32::MAX,
++                    view_fraction: u8::MAX,
++                };
++                let rewind = Rewind {
++                    tick_a: [u32::MAX, 0, t.tick.wrapping_sub(1)][i % 3],
++                    fraction: u8::MAX,
++                    cover: CoverVariant::Rewound,
++                };
++                t.commands.push((c, Some(rewind)));
++            }
++            t.commands.push((
++                Command {
++                    slot: u8::MAX,
++                    tick: t.tick,
++                    ..Command::default()
++                },
++                None,
++            ));
++            if k % 10 == 0 {
++                let ends = [i32::MIN, i32::MAX, i32::MIN];
++                t.spawns.push(Placement {
++                    slot: 0,
++                    position: ends,
++                });
++                t.teleports.push(Placement {
++                    slot: 1,
++                    position: [i32::MAX, i32::MIN, i32::MAX],
++                });
++                t.spawns.push(Placement {
++                    slot: u8::MAX,
++                    position: ends,
++                });
++                t.attributes.push(AttributeChange {
++                    slot: 0,
++                    attribute: Attribute::MoveSpeed,
++                    value: u32::MAX,
++                });
++                t.attributes.push(AttributeChange {
++                    slot: 1,
++                    attribute: [Attribute::FireInterval, Attribute::MoveSpeed]
++                        [(k / 10 % 2) as usize],
++                    value: [0, u32::MAX][(k / 20 % 2) as usize],
++                });
++            }
++            room_tick(&mut world, &mut history, &t);
++        }
++        // Each soldier's grid entries stay in their fields' ranges (the snap brings every float into its field).
++        for r in world.entity_records() {
++            for (f, k) in r.kind.layout().iter().zip(r.grid) {
++                assert!((f.min()..=f.max()).contains(&k), "{r:?}");
++            }
++        }
++    }
++}
++
++#[test]
++fn d5_a_full_pool_refuses_and_counts_and_leaves_no_trace() {
++    // CO's projectile pool holds 16 (no stand-ins): a throw each tick fills it in 16 ticks (a grenade's fuse is 2 s),
++    // and the next 4 throws are refused and counted. The twin's stream is the forged one with the 4 refused presses
++    // removed (the throw counter one lower from each on): equal state hashes on every tick, past the next accepted
++    // throw at step 80.
++    let scene = Scene::course();
++    let (mut forged, mut twin) = (Vec::new(), Vec::new());
++    let (mut pf, mut pt) = ([0u8; 4], [0u8; 4]);
++    for k in 0..120u32 {
++        let press = k < 20 || k == 80;
++        if press {
++            pf[Command::PRESS_THROW] = pf[Command::PRESS_THROW].wrapping_add(1);
++        }
++        if press && !(16..20).contains(&k) {
++            pt[Command::PRESS_THROW] = pt[Command::PRESS_THROW].wrapping_add(1);
++        }
++        let c = |presses| Command {
++            slot: 0,
++            tick: k,
++            seq: k as u16,
++            presses,
++            move_xy: [0, 40],
++            aim: [0, -500, 140],
++            ..Command::default()
++        };
++        forged.push(TickInput {
++            tick: k,
++            commands: vec![(c(pf), None)],
++            ..TickInput::default()
++        });
++        twin.push(TickInput {
++            tick: k,
++            commands: vec![(c(pt), None)],
++            ..TickInput::default()
++        });
++    }
++    let (rf, rt, worlds) = twins(&scene, &forged, &twin, |k, w| {
++        if k == 19 {
++            let live = w
++                .entity_records()
++                .iter()
++                .filter(|r| r.kind == EntityKind::Projectile)
++                .count();
++            assert_eq!(live, 16, "the pool full at step 19");
++        }
++    });
++    assert_eq!(rf.pool_full, 4, "four throws refused and counted");
++    assert_eq!(rt.pool_full, 0);
++    let thrown = worlds
++        .entity_records()
++        .iter()
++        .filter(|r| r.kind == EntityKind::Projectile)
++        .count();
++    assert_eq!(
++        thrown, 1,
++        "the throw at step 80 accepted, the first 16 blown"
++    );
++}
++
++/// Runs `forged` and `twin` on two worlds of `scene` (seed 5, each its own ring) and asserts equal state hashes and
++/// equal event lists on every tick (u4-build-plan.md §4.2: refused input leaves no trace; D-10). `each` sees the forged
++/// world after each tick. Returns both worlds' last reports and the forged world.
++fn twins(
++    scene: &Scene,
++    forged: &[TickInput],
++    twin: &[TickInput],
++    mut each: impl FnMut(usize, &World),
++) -> (InputReports, InputReports, World) {
++    let first = forged[0].tick;
++    let (mut f, mut t) = (World::new(scene, 5, first), World::new(scene, 5, first));
++    let (mut hf, mut ht) = (ring(), ring());
++    let (mut clamps_f, mut clamps_t) = (Vec::new(), Vec::new());
++    for (k, (a, b)) in forged.iter().zip(twin).enumerate() {
++        let ef = room_tick(&mut f, &mut hf, a);
++        let et = room_tick(&mut t, &mut ht, b);
++        assert_eq!(ef, et, "step {k}: the event lists");
++        assert_eq!(f.state_hash(), t.state_hash(), "step {k}: the state hashes");
++        assert_eq!(f.dump(), t.dump(), "step {k}: the dumps");
++        clamps_f.extend_from_slice(&f.reports().clamps);
++        clamps_t.extend_from_slice(&t.reports().clamps);
++        each(k, &f);
++    }
++    let mut rf = f.reports().clone();
++    let mut rt = t.reports().clone();
++    rf.clamps = clamps_f;
++    rt.clamps = clamps_t;
++    (rf, rt, f)
++}
++
++/// Statistics of a stress-scene run, per tick and per second (PM-0001-2's series).
++#[derive(Default)]
++struct Load {
++    ticks: u32,
++    min_soldiers: usize,
++    min_team: usize,
++    min_vehicles: usize,
++    min_large: usize,
++    min_projectiles: usize,
++    effects: [usize; 2],
++    shots: u64,
++    portal_changes: u64,
++}
++
++#[test]
++fn d6_the_stress_scene_meets_pm_0001_2_on_every_tick() {
++    // PM-0001-2's thresholds exactly (marks.json; the advisor's condition 5): on every tick 48 soldiers (alive or
++    // awaiting respawn), three teams of at least 16, at least 15 big vehicles of which at least 4 have 20 parts or more,
++    // at least 300 projectiles, and 384 effect rows; the run's means of shots per second in 665-735 and of portal
++    // changes per second in 0.95-1.05. Over the synthetic SS recording, 3,000 ticks (100 s).
++    let scene = Scene::stress();
++    let seconds = 100u32;
++    let rec = Recording::synthetic(&scene, 1, 0, seconds * TICK_HZ, SPAN_MS);
++    let mut world = World::new(&scene, 1, 0);
++    let mut history = ring();
++    let mut load = Load {
++        min_soldiers: usize::MAX,
++        min_team: usize::MAX,
++        min_vehicles: usize::MAX,
++        min_large: usize::MAX,
++        min_projectiles: usize::MAX,
++        effects: [usize::MAX, 0],
++        ..Load::default()
++    };
++    let mut open = world.portal_states().open.clone();
++    for t in &rec.ticks {
++        let events = room_tick(&mut world, &mut history, t);
++        let records = world.entity_records();
++        let of = |k: EntityKind| records.iter().filter(move |r| r.kind == k);
++        let soldiers: Vec<&EntityRecord> = of(EntityKind::Soldier).collect();
++        let mut teams = [0usize; 3];
++        for s in &soldiers {
++            let team = scene
++                .team(s.index as u8)
++                .expect("a soldier's slot is the scene's");
++            teams[usize::from(team)] += 1;
++        }
++        let mut parts = [0usize; 64];
++        for p in of(EntityKind::VehiclePart) {
++            parts[p.grid[5] as usize] += 1;
++        }
++        load.ticks += 1;
++        load.min_soldiers = load.min_soldiers.min(soldiers.len());
++        load.min_team = load.min_team.min(teams.into_iter().min().unwrap_or(0));
++        load.min_vehicles = load.min_vehicles.min(of(EntityKind::Vehicle).count());
++        load.min_large = load
++            .min_large
++            .min(parts.iter().filter(|&&n| n >= 20).count());
++        load.min_projectiles = load.min_projectiles.min(of(EntityKind::Projectile).count());
++        let effects = of(EntityKind::Effect).count();
++        load.effects = [load.effects[0].min(effects), load.effects[1].max(effects)];
++        load.shots += events
++            .iter()
++            .filter(|e| matches!(e, SimEvent::Shot { .. }))
++            .count() as u64;
++        let now = &world.portal_states().open;
++        load.portal_changes += now.iter().zip(&open).filter(|(a, b)| a != b).count() as u64;
++        open.clone_from(now);
++    }
++    assert_eq!(load.ticks, seconds * TICK_HZ);
++    assert!(load.min_soldiers >= 48, "soldiers: {}", load.min_soldiers);
++    assert!(load.min_team >= 16, "smallest team: {}", load.min_team);
++    assert!(
++        load.min_vehicles >= 15,
++        "big vehicles: {}",
++        load.min_vehicles
++    );
++    assert!(load.min_large >= 4, "units of 20 parts: {}", load.min_large);
++    assert!(
++        load.min_projectiles >= 300,
++        "projectiles: {}",
++        load.min_projectiles
++    );
++    assert_eq!(load.effects, [384, 384], "effect rows");
++    // Means per second, in integers: shots × 1,000 / seconds against 665,000-735,000; portal changes × 100 against
++    // 95-105 per second.
++    let shots_milli = load.shots * 1_000 / u64::from(seconds);
++    let portals_centi = load.portal_changes * 100 / u64::from(seconds);
++    println!(
++        "D-6: {} shots in {seconds} s, mean {}.{:03} a second; {} portal changes, mean {}.{:02}",
++        load.shots,
++        shots_milli / 1_000,
++        shots_milli % 1_000,
++        load.portal_changes,
++        portals_centi / 100,
++        portals_centi % 100
++    );
++    assert!(
++        (665_000..=735_000).contains(&shots_milli),
++        "shots a second: {shots_milli} thousandths"
++    );
++    assert!(
++        (95..=105).contains(&portals_centi),
++        "portal changes a second: {portals_centi} hundredths"
++    );
++}
++
++/// The course's one soldier spawned at `feet` (cm), and the fire origin a still command fires from, m.
++fn still_soldier(feet: [i32; 3]) -> (World, HitHistory, [f64; 3]) {
++    let scene = Scene::course();
++    let mut world = World::new(&scene, 9, 0);
++    let mut history = ring();
++    let t = TickInput {
++        tick: 0,
++        spawns: vec![Placement {
++            slot: 0,
++            position: feet,
++        }],
++        ..TickInput::default()
++    };
++    room_tick(&mut world, &mut history, &t);
++    let wire = Config::default();
++    let origin = [
++        f64::from(wire.from_grid(POSITION_XY, feet[0])),
++        f64::from(wire.from_grid(POSITION_XY, feet[1])),
++        f64::from(wire.from_grid(POSITION_Z, feet[2]) + CHEST),
++    ];
++    (world, history, origin)
++}
++
++/// A point's distance from `o`, m, as the clamp computes it (f64, from integer cm).
++fn dist(o: [f64; 3], p: [i32; 3]) -> f64 {
++    let d = [
++        f64::from(p[0]) / 100.0 - o[0],
++        f64::from(p[1]) / 100.0 - o[1],
++        f64::from(p[2]) / 100.0 - o[2],
++    ];
++    (d[0] * d[0] + d[1] * d[1] + d[2] * d[2]).sqrt()
++}
++
++/// One still, firing command of slot 0 aimed at `aim`; returns the clamp reports of that tick.
++fn aim_at(world: &mut World, history: &mut HitHistory, k: u32, aim: [i32; 3]) -> Vec<[i32; 3]> {
++    let c = Command {
++        slot: 0,
++        tick: world.next_tick(),
++        seq: k as u16,
++        buttons: Command::FIRE,
++        aim,
++        ..Command::default()
++    };
++    let t = input(world, vec![(c, None)]);
++    room_tick(world, history, &t);
++    world.reports().clamps.iter().map(|r| r.point).collect()
++}
++
++#[test]
++fn d8_the_clamp_moves_a_far_point_to_the_reach_and_never_again() {
++    let feet = [0, -1_500, 0];
++    let (mut world, mut history, o) = still_soldier(feet);
++    let reach = REACH_CM / 100.0;
++    let oc = [0, -1_500, 140];
++    let mut dice = Dice(0x5eed);
++    let mut k = 0u32;
++    let mut on_reach = 0;
++    for case in 0..400 {
++        // A far point in a random direction: 1.01 to 1,000 reaches away.
++        let scale = [1.01, 2.0, 30.0, 1_000.0][case % 4];
++        let d = [
++            dice.between(-1_000, 1_000),
++            dice.between(-1_000, 1_000),
++            dice.between(-1_000, 1_000),
++        ];
++        let n = f64::from(d[0] * d[0] + d[1] * d[1] + d[2] * d[2]).sqrt();
++        if n < 1.0 {
++            continue;
++        }
++        let far = d.map(|x| (f64::from(x) / n * REACH_CM * scale) as i32);
++        let aim = [oc[0] + far[0], oc[1] + far[1], oc[2] + far[2]];
++        let reports = aim_at(&mut world, &mut history, k, aim);
++        k += 1;
++        assert_eq!(reports.len(), 1, "case {case}: {aim:?} is beyond the reach");
++        let p = reports[0];
++        // The point at the reach along the aim's own ray, m.
++        let along = [
++            f64::from(aim[0]) / 100.0 - o[0],
++            f64::from(aim[1]) / 100.0 - o[1],
++            f64::from(aim[2]) / 100.0 - o[2],
++        ];
++        let len = dist(o, aim);
++        let on = [
++            o[0] + along[0] / len * reach,
++            o[1] + along[1] / len * reach,
++            o[2] + along[2] / len * reach,
++        ];
++        // At the reach on the grid, where the reach point lies inside the grid's ranges (z from 0 to 40.95 m; outside
++        // them the grid saturates the point, as it does every position): within one cell's half-diagonal of the reach,
++        // and of the ray.
++        if (0.01..40.9).contains(&on[2]) {
++            on_reach += 1;
++            let r = dist(o, p);
++            assert!((r - reach).abs() <= SLACK_M, "case {case}: {p:?} at {r} m");
++            let off = [0, 1, 2].map(|a| f64::from(p[a]) / 100.0 - on[a]);
++            let off = (off[0] * off[0] + off[1] * off[1] + off[2] * off[2]).sqrt();
++            assert!(off <= SLACK_M, "case {case}: {p:?} is {off} m off the ray");
++        } else {
++            assert!(
++                p[2] == 0 || p[2] == 4_095,
++                "case {case}: {p:?} saturated in z"
++            );
++        }
++        // Sent again, the clamped point is not moved (clamp-then-grid is idempotent: §4.10).
++        assert!(
++            aim_at(&mut world, &mut history, k, p).is_empty(),
++            "case {case}: {p:?} clamped twice"
++        );
++        k += 1;
++    }
++    assert!(
++        on_reach > 80,
++        "{on_reach} cases with the reach point in range"
++    );
++    // At the boundary: every integer point within reach + 0.87 cm is untouched, every one beyond it is clamped.
++    let (mut inside, mut beyond) = (0, 0);
++    for case in 0..600 {
++        let d = [
++            dice.between(-1_000, 1_000),
++            dice.between(-1_000, 1_000),
++            dice.between(-1_000, 1_000),
++        ];
++        let n = f64::from(d[0] * d[0] + d[1] * d[1] + d[2] * d[2]).sqrt();
++        if n < 1.0 {
++            continue;
++        }
++        let out = REACH_CM + f64::from(dice.between(-300, 300)) / 100.0;
++        let aim = [0, 1, 2].map(|a| oc[a] + (f64::from(d[a]) / n * out).round() as i32);
++        let r = dist(o, aim);
++        if (r - (reach + SLACK_M)).abs() < 1e-9 {
++            continue;
++        }
++        let reports = aim_at(&mut world, &mut history, k, aim);
++        k += 1;
++        if r <= reach + SLACK_M {
++            inside += 1;
++            assert!(reports.is_empty(), "case {case}: {aim:?} at {r} m clamped");
++        } else {
++            beyond += 1;
++            assert_eq!(
++                reports.len(),
++                1,
++                "case {case}: {aim:?} at {r} m not clamped"
++            );
++        }
++    }
++    assert!(
++        inside > 100 && beyond > 100,
++        "{inside} inside, {beyond} beyond"
++    );
++    // The soldier never moved: every shot left from the same origin.
++    assert_eq!(&soldier(&world, 0).grid[..3], &feet);
++}
++
++/// The target course's shooter spawned at (-60 m, -10 m): its world, and its fire origin, m.
++fn shooter() -> (World, [f32; 3]) {
++    let mut world = World::new(&Scene::targets(), 21, 500);
++    let t = TickInput {
++        tick: 500,
++        spawns: vec![Placement {
++            slot: 0,
++            position: [-6_000, -1_000, 0],
++        }],
++        ..TickInput::default()
++    };
++    world.step(&t, &ring());
++    (world, [-60.0, -10.0, CHEST])
++}
++
++/// A ring holding ticks 99, 100 and 101, with slot 1's box 2 m ahead of the shooter (5 cm wide, 1 m tall, at chest
++/// height), moved `dy` cm along y from tick 100 to tick 101, and `cover` as each tick's cover boxes.
++fn moving_target(o: [f32; 3], dy: i32, cover: Vec<VolumeBox>) -> HitHistory {
++    let mut history = ring();
++    let c = [
++        (o[0] * 100.0) as i32 + 200,
++        (o[1] * 100.0) as i32,
++        (o[2] * 100.0) as i32,
++    ];
++    for (tick, y) in [(99, 0), (100, 0), (101, dy)] {
++        let target = VolumeBox {
++            center: [c[0], c[1] + y, c[2]],
++            half: [3, 3, 50],
++            live: true,
++        };
++        let away = VolumeBox::default();
++        history.push(&HitVolumes {
++            tick,
++            soldiers: vec![away, target, away, away, away],
++            cover: cover.clone(),
++        });
++    }
++    history
++}
++
++/// Fires slot 0 at `aim` (cm) with `rewind`: whether the shot hit slot 1, and the world after.
++fn shoot(history: &HitHistory, aim: [i32; 3], rewind: Option<Rewind>) -> (bool, World) {
++    let (mut world, _) = shooter();
++    let c = Command {
++        slot: 0,
++        tick: world.next_tick(),
++        seq: 1,
++        buttons: Command::FIRE,
++        aim,
++        ..Command::default()
++    };
++    let t = input(&world, vec![(c, rewind)]);
++    let events = world.step(&t, history).to_vec();
++    assert!(
++        events.contains(&SimEvent::Shot { slot: 0, seq: 1 }),
++        "the shot ran"
++    );
++    let hit = events
++        .iter()
++        .any(|e| matches!(e, SimEvent::Hit { victim: 1, .. }));
++    (hit, world)
++}
++
++#[test]
++fn d9_a_rewind_blends_tick_a_and_tick_a_plus_one_by_its_fraction() {
++    // Slot 1 moves 256 cm along y from tick 100 to 101, so at fraction f (in 256ths) the blend puts it f cm along: the
++    // reference, a + (b − a) × f / 256, as the client's Interp draws it. A shot aimed at the reference hits; one aimed
++    // at tick 100's place misses once the blend has moved the 6 cm box past it (the spread is about ±1 cm at 2 m).
++    let (_, o) = shooter();
++    let history = moving_target(o, 256, Vec::new());
++    let base = [
++        (o[0] * 100.0) as i32 + 200,
++        (o[1] * 100.0) as i32,
++        (o[2] * 100.0) as i32,
++    ];
++    for f in [0u8, 1, 32, 64, 100, 128, 192, 255] {
++        let r = Rewind {
++            tick_a: 100,
++            fraction: f,
++            cover: CoverVariant::Rewound,
++        };
++        let reference = [base[0], base[1] + i32::from(f), base[2]];
++        let (hit, world) = shoot(&history, reference, Some(r));
++        assert!(hit, "fraction {f}: the shot at the reference blend hits");
++        assert_eq!(world.reports().rewind_outside, 0);
++        // The reference itself, cast through World::ray_cast: it puts slot 1 where the blend did.
++        let mut movers = history.get(100).expect("held").clone();
++        movers.soldiers[1].center[1] += i32::from(f);
++        let ray = Ray {
++            origin: o,
++            to: [o[0] + 4.0, o[1] + f32::from(f) / 50.0, o[2]],
++            skip: Some(0),
++        };
++        assert!(
++            matches!(
++                world.ray_cast(&ray, &movers),
++                RayHit::Soldier { slot: 1, .. }
++            ),
++            "fraction {f}: the reference volumes put slot 1 on the ray"
++        );
++        let (hit, _) = shoot(&history, base, Some(r));
++        assert_eq!(hit, f < 4, "fraction {f}: the shot at tick 100's place");
++    }
++    // The cover variants: a box between shooter and target in the ring blocks a Rewound shot; a Present one takes the
++    // cover as it is now (the course's doors and wall, far away) and hits.
++    let wall = VolumeBox {
++        center: [base[0] - 100, base[1], base[2]],
++        half: [2, 50, 50],
++        live: true,
++    };
++    let history = moving_target(o, 0, vec![wall]);
++    for (cover, hits) in [
++        (CoverVariant::Rewound, false),
++        (CoverVariant::Present, true),
++    ] {
++        let r = Rewind {
++            tick_a: 100,
++            fraction: 128,
++            cover,
++        };
++        assert_eq!(shoot(&history, base, Some(r)).0, hits, "{cover:?}");
++    }
++}
++
++#[test]
++fn d9_a_rewind_outside_the_ring_is_refused_and_counted() {
++    // The ring holds 99, 100 and 101. Refused, counted in reports() and run as None (carry 10): tick_a not held;
++    // fraction > 0 with tick_a held and tick_a + 1 not held; tick_a not held though tick_a + 1 is. Accepted: fraction 0
++    // at the newest tick (only tick_a is read), any fraction between held ticks.
++    let (_, o) = shooter();
++    let history = moving_target(o, 256, Vec::new());
++    let aim = [
++        (o[0] * 100.0) as i32 + 200,
++        (o[1] * 100.0) as i32 + 128,
++        (o[2] * 100.0) as i32,
++    ];
++    let rewind = |tick_a, fraction| {
++        Some(Rewind {
++            tick_a,
++            fraction,
++            cover: CoverVariant::Rewound,
++        })
++    };
++    let (_, none) = shoot(&history, aim, None);
++    for (tick_a, fraction, refused) in [
++        (98, 0, true),
++        (102, 0, true),
++        (101, 1, true),
++        (101, 255, true),
++        (98, 128, true),
++        (u32::MAX, 0, true),
++        (101, 0, false),
++        (100, 255, false),
++        (99, 128, false),
++    ] {
++        let (_, world) = shoot(&history, aim, rewind(tick_a, fraction));
++        let at = format!("tick_a {tick_a}, fraction {fraction}");
++        assert_eq!(
++            world.reports().rewind_outside,
++            u64::from(refused),
++            "{at}: counted"
++        );
++        if refused {
++            // One rule for None and a refused Rewind: the same state, the same events.
++            assert_eq!(world.state_hash(), none.state_hash(), "{at}: as None");
++        }
++    }
++}
++
++/// A course stream of `n` steps for slot 0: still, aimed 10 m north, with `buttons` held at each step and the press
++/// counters advanced by `press` at each step (index, steps).
++fn course_stream(n: u32, buttons: impl Fn(u32) -> u16, press: &[(usize, u32)]) -> Vec<TickInput> {
++    let mut presses = [0u8; 4];
++    (0..n)
++        .map(|k| {
++            for &(i, at) in press {
++                if at == k {
++                    presses[i] = presses[i].wrapping_add(1);
++                }
++            }
++            let c = Command {
++                slot: 0,
++                tick: k,
++                seq: k as u16,
++                buttons: buttons(k),
++                presses,
++                move_xy: [0, 0],
++                aim: [0, -500, 140],
++                ..Command::default()
++            };
++            TickInput {
++                tick: k,
++                commands: vec![(c, None)],
++                ..TickInput::default()
++            }
++        })
++        .collect()
++}
++
++/// The steps of `world`'s run at which slot 0 fired: its Shot events.
++fn shots_of(stream: &[TickInput]) -> Vec<usize> {
++    let scene = Scene::course();
++    let mut world = World::new(&scene, 5, stream[0].tick);
++    let mut history = ring();
++    stream
++        .iter()
++        .enumerate()
++        .filter(|(_, t)| {
++            room_tick(&mut world, &mut history, t)
++                .iter()
++                .any(|e| matches!(e, SimEvent::Shot { slot: 0, .. }))
++        })
++        .map(|(k, _)| k)
++        .collect()
++}
++
++#[test]
++fn d10_a_fire_press_in_the_cooldown_leaves_no_trace() {
++    // The course's weapon fires every 3 ticks: a press at 10 fires, the press at 11 is in the cooldown (refused,
++    // counted), the next press at 20 fires. The twin is the forged stream with the press at 11 removed.
++    let forged = course_stream(60, |_| 0, &[(0, 10), (0, 11), (0, 20)]);
++    let twin = course_stream(60, |_| 0, &[(0, 10), (0, 20)]);
++    assert_eq!(shots_of(&forged), [10, 20], "the presses at 10 and 20 fire");
++    let (rf, rt, _) = twins(&Scene::course(), &forged, &twin, |_, _| {});
++    assert_eq!((rf.cooldown, rt.cooldown), (1, 0));
++    assert_eq!(rf.clamps, rt.clamps);
++}
++
++#[test]
++fn d10_a_fire_press_with_no_ammunition_leaves_no_trace() {
++    // Fire held from 0 to 94 empties the 30-round magazine (a shot every 3 ticks); the press at 100 finds it empty
++    // (refused, counted); the reload press at 105 runs 2 s; the press at 170 fires.
++    let held = |k: u32| if k < 95 { Command::FIRE } else { 0 };
++    let forged = course_stream(200, held, &[(0, 100), (1, 105), (0, 170)]);
++    let twin = course_stream(200, held, &[(1, 105), (0, 170)]);
++    assert!(
++        shots_of(&forged).ends_with(&[170]),
++        "the press at 170 fires"
++    );
++    let (rf, rt, _) = twins(&Scene::course(), &forged, &twin, |_, _| {});
++    assert_eq!((rf.ammunition, rt.ammunition), (1, 0));
++}
++
++#[test]
++fn d10_a_reload_press_the_weapon_refuses_leaves_no_trace() {
++    // A reload press at 5 with the magazine full is refused and counted; fire held from 10 to 39 spends ten rounds; the
++    // reload press at 50 runs.
++    let held = |k: u32| {
++        if (10..40).contains(&k) {
++            Command::FIRE
++        } else {
++            0
++        }
++    };
++    let forged = course_stream(140, held, &[(1, 5), (1, 50)]);
++    let twin = course_stream(140, held, &[(1, 50)]);
++    let (rf, rt, world) = twins(&Scene::course(), &forged, &twin, |k, w| {
++        // Reloading from 50 to 110 (weapon state 2), and not before.
++        let state = soldier(w, 0).grid[11];
++        assert_eq!(
++            state == 2,
++            (50..110).contains(&k),
++            "step {k}: weapon state {state}"
++        );
++    });
++    assert_eq!((rf.reload, rt.reload), (1, 0));
++    assert_eq!(soldier(&world, 0).grid[11], 0, "reloaded, ready");
++}
++
++#[test]
++fn d10_a_clamped_aim_point_leaves_no_trace() {
++    // The forged command at step 10 aims 3 km away; its twin sends the clamped point the forged run's report gives, at
++    // the same instant (§4.10). A fire press at 30 fires in both.
++    let far = [300_000, -500, 140];
++    let make = |aim10: [i32; 3]| {
++        let mut s = course_stream(60, |k| if k == 10 { Command::FIRE } else { 0 }, &[(0, 30)]);
++        s[10].commands[0].0.aim = aim10;
++        s
++    };
++    let forged = make(far);
++    let mut world = World::new(&Scene::course(), 5, 0);
++    let mut history = ring();
++    let mut clamped = None;
++    for t in &forged {
++        room_tick(&mut world, &mut history, t);
++        if let Some(r) = world.reports().clamps.first() {
++            clamped = Some(r.point);
++        }
++    }
++    let point = clamped.expect("the far point is clamped");
++    let twin = make(point);
++    let (rf, rt, _) = twins(&Scene::course(), &forged, &twin, |_, _| {});
++    assert_eq!(rf.clamps.len(), 1, "the forged run's one clamp report");
++    assert_eq!((rf.clamps[0].seq, rf.clamps[0].point), (10, point));
++    assert!(
++        rt.clamps.is_empty(),
++        "the twin's point is not clamped again"
++    );
++    assert_eq!(
++        [
++            rf.cooldown,
++            rf.ammunition,
++            rf.reload,
++            rf.rewind_outside,
++            rf.pool_full
++        ],
++        [0; 5],
++        "a clamp is never a refusal"
++    );
++}
++
++#[test]
++fn d10_a_rewind_outside_the_ring_leaves_no_trace() {
++    // Fire held from 10 to 40, every command carrying a Rewind; the forged run's at 15 names a future tick and at 25
++    // blends toward one (refused, counted); its twin has None there. A press at 50 fires in both.
++    let held = |k: u32| {
++        if (10..=40).contains(&k) {
++            Command::FIRE
++        } else {
++            0
++        }
++    };
++    let mut forged = course_stream(80, held, &[(0, 50)]);
++    for (k, t) in forged.iter_mut().enumerate() {
++        let k = k as u32;
++        if (10..=40).contains(&k) {
++            t.commands[0].1 = Some(Rewind {
++                tick_a: k - 3,
++                fraction: 77,
++                cover: CoverVariant::Rewound,
++            });
++        }
++    }
++    let mut twin = forged.clone();
++    forged[15].commands[0].1 = Some(Rewind {
++        tick_a: 20,
++        fraction: 0,
++        cover: CoverVariant::Present,
++    });
++    forged[25].commands[0].1 = Some(Rewind {
++        tick_a: 24,
++        fraction: 1,
++        cover: CoverVariant::Rewound,
++    });
++    twin[15].commands[0].1 = None;
++    twin[25].commands[0].1 = None;
++    let (rf, rt, _) = twins(&Scene::course(), &forged, &twin, |_, _| {});
++    assert_eq!((rf.rewind_outside, rt.rewind_outside), (2, 0));
++}
++
++#[test]
++fn carry7_tick_view_tick_and_view_fraction_never_reach_the_state() {
++    // Two streams that differ only in each command's tick, view_tick and view_fraction (equal Rewinds) step to equal
++    // state hashes on every tick (netcode F1 as the U4s ruling worded it). The ticks move by one offset per tick, so the
++    // canonical order holds in both.
++    for (scene, seed, first) in scenes() {
++        let rec = Recording::synthetic(&scene, seed, first, 300, SPAN_MS);
++        let mut dice = Dice(0xfeed ^ seed as u32);
++        let mut other = rec.clone();
++        for t in &mut other.ticks {
++            let shift = dice.next();
++            for (c, _) in &mut t.commands {
++                c.tick = c.tick.wrapping_add(shift);
++                c.view_tick = dice.next();
++                c.view_fraction = dice.below(256) as u8;
++            }
++        }
++        let (mut a, mut b) = (
++            World::new(&scene, seed, first),
++            World::new(&scene, seed, first),
++        );
++        let (mut ha, mut hb) = (ring(), ring());
++        let differing = rec
++            .ticks
++            .iter()
++            .zip(&other.ticks)
++            .filter(|(x, y)| x != y)
++            .count();
++        assert!(
++            differing > 250,
++            "{}: {differing} ticks differ",
++            scene.name()
++        );
++        for (k, (x, y)) in rec.ticks.iter().zip(&other.ticks).enumerate() {
++            let (ea, eb) = (room_tick(&mut a, &mut ha, x), room_tick(&mut b, &mut hb, y));
++            assert_eq!(ea, eb, "{} tick {k}", scene.name());
++            assert_eq!(a.state_hash(), b.state_hash(), "{} tick {k}", scene.name());
++            assert_eq!(a.reports(), b.reports(), "{} tick {k}", scene.name());
++        }
++    }
++}
++
++#[test]
++#[cfg(debug_assertions)]
++fn carry8_an_out_of_order_tick_input_panics_in_a_debug_build() {
++    // Netcode F2: slot ascending; within a slot, command tick strictly ascending, wrap-aware (b after a when
++    // b.wrapping_sub(a) as i32 > 0).
++    let c = |slot, tick| {
++        (
++            Command {
++                slot,
++                tick,
++                ..Command::default()
++            },
++            None,
++        )
++    };
++    let cases = [
++        (vec![c(1, 5), c(0, 6)], false),
++        (vec![c(0, 5), c(0, 5)], false),
++        (vec![c(0, 6), c(0, 5)], false),
++        (vec![c(0, 0), c(0, u32::MAX)], false),
++        (vec![c(0, 0), c(0, 1 << 31)], false),
++        (vec![c(0, u32::MAX), c(0, 0)], true),
++        (vec![c(0, 5), c(0, 9), c(1, 2), c(1, 3)], true),
++        (vec![c(0, 1), c(0, (1 << 31) - 1)], true),
++        (vec![c(2, 0), c(5, 0)], true),
++    ];
++    for (i, (commands, ordered)) in cases.into_iter().enumerate() {
++        let mut world = World::new(&Scene::stress(), 1, 0);
++        let t = TickInput {
++            tick: 0,
++            commands,
++            ..TickInput::default()
++        };
++        let run = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
++            world.step(&t, &ring());
++        }));
++        match run {
++            Ok(()) => assert!(ordered, "case {i}: an out-of-order input stepped"),
++            Err(why) => {
++                let text = why
++                    .downcast_ref::<String>()
++                    .cloned()
++                    .or_else(|| why.downcast_ref::<&str>().map(|s| (*s).to_string()))
++                    .unwrap_or_default();
++                assert!(!ordered, "case {i}: an ordered input panicked: {text}");
++                assert!(text.contains("canonical order"), "case {i}: {text}");
++            }
++        }
++    }
++}
++
++#[test]
++fn carry9_each_record_holds_its_pre_snap_value_and_the_wire_grids_integer_of_it() {
++    // Netcode F4: raw is each float field's value before the own-copy snap (f32 bits), grid is the wire grid's
++    // integer of that value, and the snapped copy the state holds is from_grid of that integer (a clean build). The
++    // raw value is the pre-snap one: on moving ticks it is off the grid.
++    let wire = Config::default();
++    let scene = Scene::stress();
++    let rec = Recording::synthetic(&scene, 4, 0, 300, SPAN_MS);
++    let mut world = World::new(&scene, 4, 0);
++    let mut history = ring();
++    let names = [
++        "pos.x", "pos.y", "pos.z", "yaw", "pitch", "vel.x", "vel.y", "vel.z",
++    ];
++    let (mut off_grid, mut floats) = ([0u32; 8], 0u32);
++    for (k, t) in rec.ticks.iter().enumerate() {
++        room_tick(&mut world, &mut history, t);
++        let dump = world.dump();
++        for r in world.entity_records() {
++            for (i, f) in r.kind.layout().iter().enumerate() {
++                if is_integer(*f) {
++                    assert_eq!(r.raw[i], 0, "tick {k} {r:?}: an integer field's raw");
++                    continue;
++                }
++                floats += 1;
++                let x = f32::from_bits(r.raw[i]);
++                assert_eq!(r.grid[i], wire.to_grid(*f, x), "tick {k} {r:?}: field {i}");
++            }
++            for i in r.kind.layout().len()..EntityRecord::FIELDS {
++                assert_eq!((r.grid[i], r.raw[i]), (0, 0), "tick {k}: past the layout");
++            }
++            if r.kind == EntityKind::Soldier {
++                for (i, name) in names.iter().enumerate() {
++                    let field = r.kind.layout()[i];
++                    let held = word(&dump, &format!("soldier[{}].{name}", r.index));
++                    let sent = wire.from_grid(field, r.grid[i]).to_bits();
++                    assert_eq!(held, sent, "tick {k}: soldier {} {name}", r.index);
++                    off_grid[i] += u32::from(r.raw[i] != held);
++                }
++            }
++        }
++    }
++    assert!(floats > 100_000, "{floats} float fields read");
++    // Each field a moving soldier changes has raw values off the grid, so each is taken before the snap (height and
++    // vertical speed stay 0 on flat ground, always on the grid).
++    for (i, name) in names.iter().enumerate() {
++        let moves = !matches!(*name, "pos.z" | "vel.z");
++        assert_eq!(
++            off_grid[i] > 1_000,
++            moves,
++            "{name}: {} raw values off the grid",
++            off_grid[i]
++        );
++    }
++}
++
++/// Whether a layout field is one of `Field::integer`'s (not a grid field).
++fn is_integer(f: Field) -> bool {
++    ![POSITION_XY, POSITION_Z, YAW, PITCH, VELOCITY].contains(&f)
++}
++
++#[test]
++fn carry13_a_push_into_a_full_hit_history_reuses_the_evicted_entrys_storage() {
++    // Rust 2: HitVolumes's hand-written clone_from copies into the evicted entry's vectors, so a push into a full ring
++    // allocates no buffer. A counting allocator cannot be written in npt-sim (the workspace forbids unsafe_code on every
++    // target, and GlobalAlloc is an unsafe trait), so this shows it by storage identity: after each push the newest
++    // entry's buffers are the evicted entry's own. A derived clone_from (`*self = source.clone()`) clones before it
++    // drops the old value, so its buffers are always new ones: the control below shows the test tells the two apart.
++    let scene = Scene::stress();
++    let rec = Recording::synthetic(&scene, 2, 0, 80, SPAN_MS);
++    let mut world = World::new(&scene, 2, 0);
++    let mut history = HitHistory::for_ms(66).expect("2 ticks");
++    assert_eq!(history.capacity(), 2);
++    for (k, t) in rec.ticks.iter().enumerate() {
++        world.step(t, &history);
++        let tick = world.hit_volumes().tick;
++        let evicted = history.get(tick.wrapping_sub(2)).map(|v| {
++            (
++                v.soldiers.as_ptr(),
++                v.soldiers.capacity(),
++                v.cover.as_ptr(),
++                v.cover.capacity(),
++            )
++        });
++        history.push(world.hit_volumes());
++        let newest = history.get(tick).expect("the newest is held");
++        assert_eq!(newest, world.hit_volumes(), "tick {k}: copied");
++        if let Some((soldiers, sc, cover, cc)) = evicted {
++            assert_eq!(
++                newest.soldiers.as_ptr(),
++                soldiers,
++                "tick {k}: soldiers' buffer"
++            );
++            assert_eq!(newest.cover.as_ptr(), cover, "tick {k}: cover's buffer");
++            assert_eq!(
++                (newest.soldiers.capacity(), newest.cover.capacity()),
++                (sc, cc)
++            );
++        } else {
++            assert!(k < 2, "tick {k}: the ring is full after two pushes");
++        }
++    }
++    // The control: replacing the value allocates new buffers.
++    let mut copy = world.hit_volumes().clone();
++    let old = copy.soldiers.as_ptr();
++    copy = world.hit_volumes().clone();
++    assert_ne!(copy.soldiers.as_ptr(), old, "a replacement allocates");
++    // And clone_from into a value with room keeps its buffers.
++    let mut into = world.hit_volumes().clone();
++    let kept = (into.soldiers.as_ptr(), into.cover.as_ptr());
++    into.clone_from(world.hit_volumes());
++    assert_eq!((into.soldiers.as_ptr(), into.cover.as_ptr()), kept);
++}
++
++#[test]
++fn carry14_the_ring_is_refused_above_one_megabyte_at_the_edge() {
++    // Rust 3: capacity × one tick's HitVolumes bytes at most (HitVolumes::MAX_BYTES, the same on every target) stays
++    // within 1 MB. At 30 Hz: 231 ticks, a span of 7,700 ms; 7,701 ms rounds up to 232 ticks and is refused.
++    const MB: usize = 1 << 20;
++    let most = MB / HitVolumes::MAX_BYTES;
++    let edge_ms = (most as u64 * 1_000 / u64::from(TICK_HZ)) as u32;
++    let at_edge = HitHistory::for_ms(edge_ms).expect("the edge is accepted");
++    assert_eq!(at_edge.capacity() as usize, most);
++    assert!(most * HitVolumes::MAX_BYTES <= MB && (most + 1) * HitVolumes::MAX_BYTES > MB);
++    assert!(
++        HitHistory::for_ms(edge_ms + 1).is_none(),
++        "one ms past the edge"
++    );
++    assert!(HitHistory::for_ms(u32::MAX).is_none());
++    assert_eq!(
++        (HitVolumes::MAX_BYTES, most, edge_ms),
++        (4_536, 231, 7_700),
++        "at 30 Hz"
++    );
++    assert_eq!(ticks_for_ms(edge_ms + 1) as usize, most + 1);
++    // Every scene's volumes fit MAX_BYTES's maxima.
++    for (scene, seed, first) in scenes() {
++        let world = World::new(&scene, seed, first);
++        let v = world.hit_volumes();
++        assert!(
++            v.soldiers.len() <= HitVolumes::MAX_SOLDIERS && v.cover.len() <= HitVolumes::MAX_COVER,
++            "{}: {} soldiers, {} cover",
++            scene.name(),
++            v.soldiers.len(),
++            v.cover.len()
++        );
++    }
++}
++
++#[test]
++fn carry15_hit_volumes_take_the_worlds_own_tick_never_the_inputs() {
++    // Rust 7: World sets HitVolumes::tick from its own tick counter, never from TickInput::tick, so a wrong label
++    // changes nothing: HitHistory::push (which debug-asserts consecutive ticks) takes every push, and the states agree.
++    let scene = Scene::course();
++    let rec = Recording::synthetic(&scene, 6, u32::MAX - 10, 200, SPAN_MS);
++    let (mut a, mut b) = (
++        World::new(&scene, 6, u32::MAX - 10),
++        World::new(&scene, 6, u32::MAX - 10),
++    );
++    let (mut ha, mut hb) = (ring(), ring());
++    let mut dice = Dice(77);
++    for (k, t) in rec.ticks.iter().enumerate() {
++        let mut wrong = t.clone();
++        wrong.tick = dice.next();
++        let expected = a.next_tick();
++        room_tick(&mut a, &mut ha, t);
++        room_tick(&mut b, &mut hb, &wrong);
++        assert_eq!(a.hit_volumes().tick, expected, "tick {k}");
++        assert_eq!(
++            b.hit_volumes().tick,
++            expected,
++            "tick {k}: the label ignored"
++        );
++        assert_eq!(a.state_hash(), b.state_hash(), "tick {k}");
++    }
++}
++
++#[test]
++fn carry38_the_dump_holds_exactly_the_hashed_state() {
++    // Condition 1's rule: StateDump holds exactly what state_hash hashes, never InputReports, so a twin's field diff
++    // never shows a counter. Its sections are the state's; its hash is the state hash; two worlds that differ only in
++    // their reports (D-10's twins) dump alike.
++    let scene = Scene::stress();
++    let rec = Recording::synthetic(&scene, 8, 0, 120, SPAN_MS);
++    let mut world = World::new(&scene, 8, 0);
++    let mut history = ring();
++    let sections = [
++        "world",
++        "soldier",
++        "effect",
++        "vehicle",
++        "part",
++        "projectile",
++        "door",
++        "wall",
++        "spawner",
++        "rng",
++        "events",
++        "event",
++    ];
++    let mut clamps = 0;
++    for t in &rec.ticks {
++        room_tick(&mut world, &mut history, t);
++        clamps += world.reports().clamps.len();
++        let d = world.dump();
++        assert_eq!(d.hash(), world.state_hash());
++        for i in 0..d.words().len() {
++            let f = d.field(i).expect("every word is named");
++            let section = f.split('[').next().unwrap_or_default();
++            assert!(sections.contains(&section), "{f}");
++        }
++        assert!(d.field(d.words().len()).is_none());
++    }
++    // Not vacuous: the run had refusals and clamps, which the dump never names.
++    let r = world.reports();
++    assert!(r.cooldown > 0 && clamps > 0, "{r:?}, {clamps} clamps");
++}
++
++#[test]
++fn ray_cast_meets_the_nearest_live_box_and_changes_nothing() {
++    // World::ray_cast (ADR 0001:258-260): the static world from the world, the movers supplied; it passes through the
++    // skipped soldier and every box that is not live, and a ray that is not finite misses.
++    let (world, o) = shooter();
++    let before = world.dump();
++    let b = |x: i32, live| VolumeBox {
++        center: [x, -1_000, 140],
++        half: [10, 10, 10],
++        live,
++    };
++    let movers = HitVolumes {
++        tick: 0,
++        soldiers: vec![b(-6_000, true), b(-5_700, false), b(-5_500, true)],
++        cover: vec![b(-5_200, true)],
++    };
++    let ray = |to: [f32; 3], skip| Ray {
++        origin: o,
++        to,
++        skip,
++    };
++    let ahead = [o[0] + 10.0, o[1], o[2]];
++    match world.ray_cast(&ray(ahead, Some(0)), &movers) {
++        RayHit::Soldier { slot: 2, at } => assert!((at - 0.49).abs() < 0.001, "{at}"),
++        other => panic!("{other:?}"),
++    }
++    assert!(matches!(
++        world.ray_cast(&ray(ahead, None), &movers),
++        RayHit::Soldier { slot: 0, .. }
++    ));
++    let mut no_soldier = movers.clone();
++    no_soldier.soldiers[2].live = false;
++    assert!(matches!(
++        world.ray_cast(&ray(ahead, Some(0)), &no_soldier),
++        RayHit::Cover { index: 0, .. }
++    ));
++    // The map's east edge, 188 m on.
++    assert!(matches!(
++        world.ray_cast(
++            &ray([o[0] + 200.0, o[1], o[2]], Some(0)),
++            &HitVolumes::default()
++        ),
++        RayHit::World { .. }
++    ));
++    assert_eq!(
++        world.ray_cast(
++            &ray([o[0] + 1.0, o[1], o[2]], Some(0)),
++            &HitVolumes::default()
++        ),
++        RayHit::Miss
++    );
++    for bad in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
++        assert_eq!(
++            world.ray_cast(&ray([bad, o[1], o[2]], Some(0)), &movers),
++            RayHit::Miss
++        );
++    }
++    assert_eq!(
++        world.dump(),
++        before,
++        "ray_cast takes &self and changes nothing"
++    );
++}
++
++#[cfg(feature = "bites")]
++mod bites {
++    //! The unit proofs of the sites `World` plants (u4-build-plan.md §4.14; bites builds only), each shown to change
++    //! state here and run judged in the sub-unit that moves its mark (-41's in U4g; PM-0004-21's in U4d2).
++
++    use super::*;
++
++    #[test]
++    fn world_plants_its_four_bite_ids_and_no_other() {
++        assert_eq!(
++            World::BITES,
++            [
++                "PM-0004-21/hash-map",
++                "PM-0004-21/std-sin",
++                "PM-0001-41/server-speed-1pct",
++                "PM-0001-41/server-quant-differs",
++            ]
++        );
++        // The own-copy snap's id is lib.rs's list (carry 11): World's list includes it.
++        assert!(
++            npt_sim::OWN_COPY_SNAP_BITES
++                .iter()
++                .all(|id| World::BITES.contains(id))
++        );
++        let scene = Scene::course();
++        for id in World::BITES {
++            assert!(World::with_bite(&scene, 1, 0, id, 0).is_some(), "{id}");
++            assert!(
++                npt_sim::replay::Replayer::with_bite(id, 0).is_some(),
++                "{id}"
++            );
++        }
++        for other in ["PM-0001-17/client-rounding", "PM-0001-41/no-such-bite", ""] {
++            assert!(
++                World::with_bite(&scene, 1, 0, other, 0).is_none(),
++                "{other}"
++            );
++            assert!(
++                npt_sim::replay::Replayer::with_bite(other, 0).is_none(),
++                "{other}"
++            );
++        }
++    }
++
++    /// The course's soldier walking under `world`, with a predicting clone each step: the steps at which the
++    /// authority's slot 0 differs from its prediction, and the steps whose snapped copy differs from the record's grid.
++    fn walk_both(mut authority: World, steps: u32) -> (Vec<u32>, Vec<u32>) {
++        let wire = Config::default();
++        let mut history = ring();
++        let mut presses = [0u8; 4];
++        let (mut predicted, mut snapped) = (Vec::new(), Vec::new());
++        for k in 0..steps {
++            let at = soldier(&authority, 0).grid;
++            let c = walk(
++                0,
++                authority.next_tick(),
++                k,
++                [at[0], at[1], at[2]],
++                &mut presses,
++            );
++            let mut client = authority.clone();
++            let t = input(&authority, vec![(c, None)]);
++            room_tick(&mut authority, &mut history, &t);
++            client.load_movers(authority.entity_records());
++            client.predict(&c);
++            if soldier(&client, 0) != soldier(&authority, 0) {
++                predicted.push(k);
++            }
++            let r = soldier(&authority, 0);
++            let held = word(&authority.dump(), "soldier[0].pos.x");
++            if held != wire.from_grid(POSITION_XY, r.grid[0]).to_bits() {
++                snapped.push(k);
++            }
++        }
++        (predicted, snapped)
++    }
++
++    #[test]
++    fn pm_0001_41_server_speed_1pct_moves_the_authority_step_and_not_predict() {
++        // Q24: the authority step runs at 1.01 × the speed, predict does not, so a moving tick differs from the arming
++        // tick on; before it, none does. The clean world (D-3) never differs.
++        let scene = Scene::course();
++        let id = "PM-0001-41/server-speed-1pct";
++        let bitten = World::with_bite(&scene, 7, 0, id, 100).expect("World plants it");
++        let (predicted, snapped) = walk_both(bitten, 300);
++        assert!(predicted.iter().all(|&k| k >= 100), "{predicted:?}");
++        assert!(
++            predicted.len() > 100,
++            "{} moving ticks differ",
++            predicted.len()
++        );
++        assert!(snapped.is_empty(), "the speed bite leaves the snap alone");
++        let (predicted, _) = walk_both(World::new(&scene, 7, 0), 300);
++        assert!(predicted.is_empty(), "the clean world: {predicted:?}");
++    }
++
++    #[test]
++    fn pm_0001_41_server_quant_differs_snaps_the_authoritys_own_copy_off_the_records_grid() {
++        // Carry 9's unit proof and arch F1: under the bite the authority's own-copy snap takes its grid from
++        // own_copy_snap_with_bite (floor rounding), while the records keep the wire grid: on moving ticks the snapped
++        // copy differs from from_grid of the record's grid entry (about half the time), and the prediction (on the
++        // wire grid) differs from the authority.
++        let scene = Scene::course();
++        let id = "PM-0001-41/server-quant-differs";
++        let bitten = World::with_bite(&scene, 7, 0, id, 50).expect("World plants it");
++        let (predicted, snapped) = walk_both(bitten, 300);
++        assert!(snapped.iter().all(|&k| k >= 50), "{snapped:?}");
++        assert!(
++            snapped.len() > 40,
++            "{} ticks off the record's grid",
++            snapped.len()
++        );
++        assert!(!predicted.is_empty() && predicted.iter().all(|&k| k >= 50));
++        let (_, snapped) = walk_both(World::new(&scene, 7, 0), 300);
++        assert!(snapped.is_empty(), "the clean world: {snapped:?}");
++    }
++
++    #[test]
++    fn world_bites_are_per_instance_a_bitten_and_a_clean_world_on_parallel_threads() {
++        // u4-build-plan.md §4.11 (T10): a bite is a constructor argument, never a static, so a bitten world and a clean
++        // one run side by side in one process, and the clean one's hashes are a clean run's.
++        let scene = Scene::stress();
++        let rec = Recording::synthetic(&scene, 3, 0, 200, SPAN_MS);
++        let run = |world: World| {
++            let rec = rec.clone();
++            std::thread::spawn(move || {
++                let mut world = world;
++                let mut history = ring();
++                rec.ticks
++                    .iter()
++                    .map(|t| {
++                        room_tick(&mut world, &mut history, t);
++                        world.state_hash()
++                    })
++                    .collect::<Vec<u64>>()
++            })
++        };
++        let bitten = World::with_bite(&scene, 3, 0, "PM-0001-41/server-speed-1pct", 20)
++            .expect("World plants it");
++        let (b, c) = (run(bitten), run(World::new(&scene, 3, 0)));
++        let (b, c) = (b.join().expect("bitten"), c.join().expect("clean"));
++        let reference = run(World::new(&scene, 3, 0)).join().expect("reference");
++        assert_eq!(c, reference, "the clean world beside the bitten one");
++        assert_eq!(b[..20], reference[..20], "equal before the arming tick");
++        assert_ne!(
++            b[20..],
++            reference[20..],
++            "the bite changes the state from its tick"
++        );
++    }
++
++    #[test]
++    fn pm_0004_21_std_sin_is_planted_at_the_vehicles_loops_from_its_arming_tick() {
++        // The site only: from the arming tick the vehicles' loops take std's sin (the target's libm) in place of the
++        // pinned libm crate. Before it the state is the clean one's; whether this target's std sin differs from libm's
++        // on these inputs is U4d2's scan and cross-target proof (u4-build-plan.md §5 U4d2), so this test only reports it.
++        let scene = Scene::stress();
++        let rec = Recording::synthetic(&scene, 5, 0, 300, SPAN_MS);
++        let mut bitten =
++            World::with_bite(&scene, 5, 0, "PM-0004-21/std-sin", 100).expect("World plants it");
++        let mut clean = World::new(&scene, 5, 0);
++        let (mut hb, mut hc) = (ring(), ring());
++        let mut first = None;
++        for (k, t) in rec.ticks.iter().enumerate() {
++            room_tick(&mut bitten, &mut hb, t);
++            room_tick(&mut clean, &mut hc, t);
++            if bitten.state_hash() != clean.state_hash() {
++                assert!(k >= 100, "tick {k}: a difference before the arming tick");
++                first.get_or_insert(k);
++            }
++        }
++        println!("PM-0004-21/std-sin on this target: first differing tick {first:?}");
 +    }
 +}
