@@ -1,5 +1,5 @@
 diff --git a/spikes/netcode-proof/Cargo.lock b/spikes/netcode-proof/Cargo.lock
-index d1027e5..2f7858e 100644
+index d1027e5..2720623 100644
 --- a/spikes/netcode-proof/Cargo.lock
 +++ b/spikes/netcode-proof/Cargo.lock
 @@ -787,6 +787,7 @@ dependencies = [
@@ -10,13 +10,15 @@ index d1027e5..2f7858e 100644
   "npt-proto",
   "npt-sim",
  ]
-@@ -872,18 +873,24 @@ dependencies = [
+@@ -872,18 +873,26 @@ dependencies = [
  [[package]]
  name = "npt-proto"
  version = "0.0.0"
 +dependencies = [
 + "npt-link",
 + "npt-sim",
++ "rand_chacha",
++ "rand_core",
 +]
  
  [[package]]
@@ -35,7 +37,7 @@ index d1027e5..2f7858e 100644
   "npt-link",
   "npt-log",
   "npt-net",
-@@ -895,6 +902,11 @@ dependencies = [
+@@ -895,6 +904,11 @@ dependencies = [
  [[package]]
  name = "npt-sim"
  version = "0.0.0"
@@ -64,7 +66,7 @@ index 61fcbc6..36fc8e5 100644
  # ring >= 0.17.12, tokio >= 1.54.1; U0 resolved these versions).
  wtransport = "=0.7.2"
 diff --git a/spikes/netcode-proof/check.mjs b/spikes/netcode-proof/check.mjs
-index a43c180..bfd3e54 100644
+index a43c180..ddfca11 100644
 --- a/spikes/netcode-proof/check.mjs
 +++ b/spikes/netcode-proof/check.mjs
 @@ -6,7 +6,8 @@
@@ -77,51 +79,136 @@ index a43c180..bfd3e54 100644
  // marks (marks.json compiles in the judge, covers exactly the plan's marks, and every row it hashed is unchanged); self
  // (this file's own tests); redact (redact-check's tests, then a scan of the spike's folder). It runs every step and
  // exits 1 if any failed.
-@@ -508,6 +509,89 @@ export function crateFiles(cratesDir) {
+@@ -63,6 +64,13 @@ export function closures(meta) {
+ /** A normal or build dependency ships; a dev dependency does not. */
+ const isShipped = (d) => d.dep_kinds.some((k) => k.kind === null || k.kind === "build");
+ 
++/**
++ * npt-sim's only shipped dependencies (U4s; plan §4.5): libm, the one source of transcendentals (ADR 0004's float
++ * allow-list), and ChaCha8Rng's two crates for `SimRng`, all pinned in the workspace. A new one is a reviewed change
++ * to this list.
++ */
++export const SIM_DEPENDENCIES = ["libm", "rand_chacha", "rand_core"];
++
+ /** Every broken dependency rule, as a sentence; empty when the rules hold. */
+ export function dependencyProblems(meta) {
+   const problems = [];
+@@ -106,6 +114,14 @@ export function dependencyProblems(meta) {
+     if (name === "npt-net") continue;
+     for (const d of n.deps) if (byId.get(d.pkg).name === "npt-tcpinfo") problems.push(`${name} depends on npt-tcpinfo`);
+   }
++  // npt-sim (U4s; the arch review's F4): it ships with SIM_DEPENDENCIES alone, so the sim stays free of every crate
++  // above it and of any dependency no review has read; a dev dependency does not ship (C10).
++  const simId = meta.workspace_members.find((id) => byId.get(id).name === "npt-sim");
++  const simNode = meta.resolve.nodes.find((n) => n.id === simId);
++  for (const d of (simNode?.deps ?? []).filter(isShipped)) {
++    const name = byId.get(d.pkg).name;
++    if (!SIM_DEPENDENCIES.includes(name)) problems.push(`npt-sim depends on ${name}`);
++  }
+   // npt-net stays free of libc (plan §4.2, the advisor's M14): no direct normal or build dependency on it, so its kernel
+   // calls go through npt-tcpinfo alone. Reaching libc through tokio or npt-tcpinfo is fine; a dev dependency does not
+   // ship (C10).
+@@ -508,6 +524,145 @@ export function crateFiles(cratesDir) {
    return { files: files.sort(), links: links.sort() };
  }
  
 +/**
 + * The tick constant's one home (plan §4.6, RQ6: "`TICK_HZ` one constant"): npt-sim's sources. Every tick-counted value
-+ * is a const fn of it (u4-build-plan.md §4.3), and TICK_DERIVED are the constants those functions give at TICK_HZ.
++ * is a const fn of it (u4-build-plan.md §4.3). TICK_DERIVED are the constants npt-sim derives from it, each written
++ * `<name in lower case>_at(TICK_HZ)`, its own function at the rate, which s1 pins at 30 and 60 Hz and ticks.rs's const
++ * asserts tie to the constant at any rate.
 + */
 +export const TICK_HZ_HOME = "crates/sim/src/";
 +export const TICK_DERIVED = ["LOOP_CATCHUP", "FULL_STATE_ACK_TICKS", "ACK_RING_TICKS", "SETTINGS_STEP_TICKS"];
-+/** A `const` or `static` item (associated ones too) named TICK_HZ or a TICK_DERIVED name: its name and initializer. */
-+const TICK_ITEM = new RegExp(`\\b(?:const|static)\\s+(?:mut\\s+)?(TICK_HZ|${TICK_DERIVED.join("|")})\\b\\s*(?::[^=;]*)?=([^;]*);`, "g");
++/**
++ * Every other name that holds a tick count, by the derived constants' own naming (plan §4.6: "no literal 7 anywhere";
++ * the netcode review's F8): a name ending in `_TICKS` or holding `CATCHUP`. NOT_TICK_COUNTS are the names that match
++ * and are not one, each with its reason.
++ */
++export const TICK_NAMED = /_TICKS$|CATCHUP/;
++export const NOT_TICK_COUNTS = {
++  // plan §4.6 (netcode NC2-F16): commands per client per tick, the redundancy cap of 8, not derived from TICK_HZ;
++  // u4-build-plan.md §4.3 sets it from npt_proto::Limits::REDUNDANCY_CAP with a const assert.
++  CMD_CATCHUP: "the redundancy cap",
++};
++/**
++ * The crates the name rule does not read, each with its reason: npt-net's L2 harness drives transport tests with its
++ * own 30 Hz traffic model (fixes.rs's TICK; HANG_TICKS in its tests), never links npt-sim, and keeps 30 Hz in the 60 Hz
++ * run, which changes npt-sim alone (plan §4.6). TICK_HZ and the TICK_DERIVED names are read there too.
++ */
++export const TICK_NAMED_SKIP = ["crates/net/"];
++/**
++ * A `const` or `static` item (associated ones too): its name and initializer. The type may hold an array's `[T; N]`;
++ * the initializer runs to the first `;`, so a block initializer is cut short and never matches a rule's form.
++ */
++const CONST_ITEM = /\b(?:const|static)\s+(?:mut\s+)?([A-Za-z_]\w*)\b\s*(?::(?:[^=;[\]]|\[[^\]]*\])*)?=([^;]*);/g;
 +
 +/**
-+ * Every tick-counted name set from a literal under crates/ (u4-build-plan.md §4.3: "a check.mjs grep refuses those
-+ * names set from a literal"; plan §4.6: "no literal 7 anywhere"), as a sentence, read in lexRust's mask (comments and
-+ * strings blanked). A TICK_DERIVED item's initializer must name TICK_HZ, call `ticks_for_ms` (the TICK_HZ form), or
-+ * be a path to the same name (`npt_sim::LOOP_CATCHUP`); anything else (`7`, `30 / 4`, `SEVEN`, `loop_catchup_at(30)`)
-+ * is refused. TICK_HZ is set from a literal once, in TICK_HZ_HOME; any other TICK_HZ item must be a path to it.
-+ * Known limit: a grep, not rustc's name resolution. It reads items by these names only, so a tick count under another
-+ * name (a struct field, a `let`, a literal passed to a function) is review's and the tests' (s1 evaluates every tick
-+ * function at 30 and 60 Hz).
++ * Every tick-counted name set in a form u4-build-plan.md §4.3 refuses, under crates/, as a sentence, read in lexRust's
++ * mask (comments and strings blanked; whitespace in an initializer ignored):
++ * - TICK_HZ is set from a literal once, in TICK_HZ_HOME; any other TICK_HZ item is a path to it.
++ * - A TICK_DERIVED name, in TICK_HZ_HOME, is exactly its own function at the rate, `loop_catchup_at(TICK_HZ)` for
++ *   LOOP_CATCHUP (the rust review's R4: `7 * TICK_HZ / 30` is 7 at 30 Hz and 14 at 60, and is refused); anywhere else
++ *   it is a path to the same name (`npt_sim::LOOP_CATCHUP`), never derived again (the arch review's F6).
++ * - Any other const or static named as a tick count (TICK_NAMED, bar NOT_TICK_COUNTS) names TICK_HZ, calls
++ *   `ticks_for_ms` (the TICK_HZ form), or is a path to TICK_HZ or another tick-count name; never a literal (`7`,
++ *   `30 / 4`, `SEVEN`, `ticks_for_ms_at(60, 500)`). In TICK_HZ_HOME such a name must join TICK_DERIVED, so s1 pins it.
++ * Why not plan §4.6's "no literal 7 anywhere" word for word: a grep cannot tell a tick count from any other 7 (a test's
++ * pinned `assert_eq!(LOOP_CATCHUP, 7)`, a sequence number, `0..7`), so a ban on the digit would refuse correct code;
++ * the rules above cover every item named as a tick count, and LOOP_CATCHUP has one home.
++ * Known limit: a grep, not rustc's name resolution. A tick count under another name (a struct field, a `let`, a
++ * literal passed to a function such as `Schedule::new(30, 7)`) is review's and the tests' (s1; U4b's caller test).
 + */
 +export function tickConstantProblems(files, read) {
 +  const problems = [];
 +  let home = null;
++  const pathTo = (init, names) => new RegExp(`^(?:[A-Za-z_]\\w*::)*(?:${names.join("|")})$`).test(init);
 +  for (const f of files) {
 +    if (!f.startsWith("crates/") || !f.endsWith(".rs")) continue;
++    const inHome = f.startsWith(TICK_HZ_HOME);
++    const nameRule = !TICK_NAMED_SKIP.some((d) => f.startsWith(d));
 +    const { mask } = lexRust(read(f));
-+    for (const m of mask.matchAll(TICK_ITEM)) {
++    for (const m of mask.matchAll(CONST_ITEM)) {
 +      const [, name, raw] = m;
-+      const init = raw.trim().replace(/\s+/g, " ");
++      const derived = TICK_DERIVED.includes(name);
++      const named = name !== "TICK_HZ" && !derived && TICK_NAMED.test(name) && !Object.hasOwn(NOT_TICK_COUNTS, name);
++      if (name !== "TICK_HZ" && !derived && !(named && nameRule)) continue;
++      const init = raw.replace(/\s+/g, "");
++      const shown = raw.trim().replace(/\s+/g, " ");
 +      const at = `${f}:${lineAt(mask, m.index)}`;
-+      const isPath = new RegExp(`^(?:[A-Za-z_]\\w*\\s*::\\s*)*${name}$`).test(init);
 +      if (name === "TICK_HZ") {
-+        if (isPath) continue;
-+        if (f.startsWith(TICK_HZ_HOME) && home === null) {
++        if (pathTo(init, ["TICK_HZ"])) continue;
++        if (inHome && home === null) {
 +          home = at;
 +          continue;
 +        }
-+        const where = f.startsWith(TICK_HZ_HOME) ? `a second time (the first: ${home})` : `outside ${TICK_HZ_HOME}`;
-+        problems.push(`${at} sets TICK_HZ from \`${init}\` ${where}: npt_sim::TICK_HZ is the one tick constant (plan §4.6)`);
-+      } else if (!(isPath || /\bTICK_HZ\b/.test(init) || /\bticks_for_ms\s*\(/.test(init))) {
++        const where = inHome ? `a second time (the first: ${home})` : `outside ${TICK_HZ_HOME}`;
++        problems.push(`${at} sets TICK_HZ from \`${shown}\` ${where}: npt_sim::TICK_HZ is the one tick constant (plan §4.6)`);
++      } else if (derived && inHome) {
++        const own = `${name.toLowerCase()}_at(TICK_HZ)`;
++        if (init !== own) {
++          problems.push(
++            `${at} sets ${name} from \`${shown}\`: in npt-sim it is its own function at the tick rate, \`${own}\`, ` +
++              "which s1 pins at 30 and 60 Hz (u4-build-plan.md §4.3)",
++          );
++        }
++      } else if (derived) {
++        if (!pathTo(init, [name])) {
++          problems.push(
++            `${at} sets ${name} from \`${shown}\` outside ${TICK_HZ_HOME}: there it is a path to npt_sim::${name}, ` +
++              "never derived again (one home: plan §4.6)",
++          );
++        }
++      } else if (inHome) {
 +        problems.push(
-+          `${at} sets ${name} from \`${init}\`: a tick-counted value is a const fn of npt_sim::TICK_HZ, never a literal ` +
++          `${at} sets ${name}, a tick count by its name, in npt-sim outside TICK_DERIVED: it joins TICK_DERIVED as ` +
++            `\`${name.toLowerCase()}_at(TICK_HZ)\`, its function pinned in s1 (u4-build-plan.md §4.3)`,
++        );
++      } else if (
++        !(pathTo(init, ["TICK_HZ", ...TICK_DERIVED, "\\w*_TICKS", "\\w*CATCHUP\\w*"]) || /\bTICK_HZ\b/.test(init) || /\bticks_for_ms\(/.test(init))
++      ) {
++        problems.push(
++          `${at} sets ${name} from \`${shown}\`: a tick-counted value is a const fn of npt_sim::TICK_HZ, never a literal ` +
 +            "(u4-build-plan.md §4.3)",
 +        );
 +      }
@@ -167,17 +254,28 @@ index a43c180..bfd3e54 100644
  /**
   * The dotted key that starts at `from` in a tomlScan (spaces and tabs before it skipped), read no further than `end`:
   * its parts, each bare (letters, digits, `_` and `-`, from the mask) or quoted (a string, its value decoded), and the
-@@ -1171,7 +1255,8 @@ const DEPS_CHECKED =
+@@ -1160,7 +1315,8 @@ function testBothBuilds() {
+ const DEPS_CHECKED =
+   "held: no leaf crate reaches a transport or runtime; npt-client has no npt-net; npt-super and npt-host keep off the " +
+   "sim, room, proto (and client) crates; npt-judge ships npt-log and serde only; npt-tcpinfo ships libc only and only " +
+-  "npt-net uses it; npt-net has no direct libc; nothing depends on npt-lab; the workspace forbids unsafe_code and " +
++  "npt-net uses it; npt-net has no direct libc; npt-sim ships libm, rand_chacha and rand_core only; nothing depends " +
++  "on npt-lab; the workspace forbids unsafe_code and " +
+   "every member inherits its lints but npt-client-wasm (allow) and npt-tcpinfo (deny), whose own lint tables are the " +
+   "workspace's otherwise, key for key, with no lint given in a form the reader does not read (a lint's own table, a " +
+   "quoted, dotted, hyphenated or uppercase name); no manifest has a cargo-features or rustflags key; as the scan " +
+@@ -1171,7 +1327,9 @@ const DEPS_CHECKED =
    "no test runner, and the environment has no RUSTC_BOOTSTRAP or cargo channel override; every member lives in " +
    "crates/ and builds only .rs files in its own folder, in edition 2024, none " +
    "a proc-macro, and every path dependency is a member; no symbolic link under crates/; every #[path] and include! " +
 -  "literal names a .rs file in its own crate";
-+  "literal names a .rs file in its own crate; TICK_HZ is set from a literal once, in npt-sim, and no tick-counted " +
-+  "constant is set from one; npt-room's sources hold no float";
++  "literal names a .rs file in its own crate; TICK_HZ is set from a literal once, in npt-sim; each derived tick " +
++  "constant is its own function at TICK_HZ in npt-sim and a path to it elsewhere, and no other *_TICKS or *CATCHUP* " +
++  "constant is set from a literal; npt-room's sources hold no float";
  
  /** `cargo metadata` for the spike in `here`, with every feature, parsed: { ok, meta }, or the failed run. */
  function cargoMetadata(here) {
-@@ -1203,6 +1288,8 @@ export function depsStep(here = HERE, env = process.env, metadata = cargoMetadat
+@@ -1203,6 +1361,8 @@ export function depsStep(here = HERE, env = process.env, metadata = cargoMetadat
      ...links.map((l) => `${l} is a symbolic link: the scan does not follow it, and rustc would`),
      ...cargoConfigProblems(env, configs),
      ...unsafeProblems(files, read),
@@ -187,33 +285,74 @@ index a43c180..bfd3e54 100644
    const counts = `${files.length} crate files and ${configs.length} cargo config file(s) read`;
    return { ok: problems.length === 0, out: problems.join("\n") || `${DEPS_CHECKED} (${counts})` };
 diff --git a/spikes/netcode-proof/check.test.mjs b/spikes/netcode-proof/check.test.mjs
-index ba62bcc..f24851a 100644
+index ba62bcc..3744726 100644
 --- a/spikes/netcode-proof/check.test.mjs
 +++ b/spikes/netcode-proof/check.test.mjs
-@@ -24,6 +24,8 @@ import {
+@@ -23,7 +23,12 @@ import {
+   lexRust,
    manifestKeyProblems,
    marksProblems,
++  NOT_TICK_COUNTS,
    referenceProblems,
 +  roomFloatProblems,
++  SIM_DEPENDENCIES,
++  TICK_NAMED_SKIP,
 +  tickConstantProblems,
    unsafeProblems,
    workspaceLintProblems,
  } from "./check.mjs";
-@@ -987,6 +989,13 @@ test("RUSTC_BOOTSTRAP, cargo's channel override, and a manifest's cargo-features
+@@ -54,7 +59,8 @@ function clean() {
+   return {
+     "npt-link": [],
+     "npt-l1": n("npt-link"),
+-    "npt-sim": [],
++    "npt-sim": [...n("libm", "rand_chacha", "rand_core"), ["proptest", "dev"]],
++    rand_chacha: n("rand_core", "ppv-lite86"),
+     "npt-proto": n("serde"),
+     "npt-room": n("npt-proto"),
+     "npt-server": n("npt-link", "npt-proto", "npt-room", "npt-sim", "npt-net", "npt-log", "tokio"),
+@@ -149,6 +155,18 @@ test("npt-tcpinfo ships with libc alone, a dev dependency aside", () => {
+   assert.ok(gone.includes("npt-tcpinfo is not a workspace member"), gone.join("\n"));
+ });
+ 
++test("npt-sim ships with libm, rand_chacha and rand_core alone, a dev dependency aside (U4s, the arch review's F4)", () => {
++  assert.deepEqual(SIM_DEPENDENCIES, ["libm", "rand_chacha", "rand_core"]);
++  assert.deepEqual(problemsWith((e) => e["npt-sim"].push(["serde", null])), ["npt-sim depends on serde"]);
++  assert.deepEqual(problemsWith((e) => e["npt-sim"].push(["cc", "build"])), ["npt-sim depends on cc"], "a build dependency ships");
++  const above = problemsWith((e) => e["npt-sim"].push(["npt-proto", null]));
++  assert.ok(above.includes("npt-sim depends on npt-proto"), above.join("\n"));
++  assert.deepEqual(problemsWith((e) => e["npt-sim"].push(["tempfile", "dev"])), [], "a dev dependency does not ship (C10)");
++  assert.deepEqual(problemsWith((e) => (e["npt-sim"] = n("libm"))), [], "a subset of the list is fine");
++  // The list is of direct dependencies: what they reach (rand_chacha's ppv-lite86) is theirs.
++  assert.deepEqual(problemsWith((e) => (e.libm = n("helper"))), []);
++});
++
+ test("only npt-net depends on npt-tcpinfo, in any kind; reaching it through npt-net is fine", () => {
+   assert.ok(problemsWith((e) => e["npt-server"].push(["npt-tcpinfo", null])).includes("npt-server depends on npt-tcpinfo"));
+   assert.ok(problemsWith((e) => e["npt-bots"].push(["npt-tcpinfo", "dev"])).includes("npt-bots depends on npt-tcpinfo"));
+@@ -987,6 +1005,21 @@ test("RUSTC_BOOTSTRAP, cargo's channel override, and a manifest's cargo-features
    assert.deepEqual(manifestKeyProblems(own), []);
  });
  
-+/** The derived-constant grep's message for `name` set from `init` at `at` (u4-build-plan.md §4.3). */
++/** The tick grep's message for a tick-count name (not a derived one) set from `init` at `at` (u4-build-plan.md §4.3). */
 +const fromLiteral = (at, name, init) =>
 +  `${at} sets ${name} from \`${init}\`: a tick-counted value is a const fn of npt_sim::TICK_HZ, never a literal ` +
 +  "(u4-build-plan.md §4.3)";
++/** Its message for a derived name set outside npt-sim's sources other than by a path to npt-sim's (plan §4.6). */
++const notAPath = (at, name, init) =>
++  `${at} sets ${name} from \`${init}\` outside crates/sim/src/: there it is a path to npt_sim::${name}, never derived ` +
++  "again (one home: plan §4.6)";
++/** Its message for a derived name in npt-sim's sources that is not its own function at TICK_HZ (§4.3; rust R4). */
++const notOwnFn = (at, name, init) =>
++  `${at} sets ${name} from \`${init}\`: in npt-sim it is its own function at the tick rate, ` +
++  `\`${name.toLowerCase()}_at(TICK_HZ)\`, which s1 pins at 30 and 60 Hz (u4-build-plan.md §4.3)`;
 +/** The float grep's message for its first token in `at` (u4-build-plan.md §4.11). */
 +const roomFloat = (at, token, n = 1) => `${at} has \`${token}\` (${n} float token(s)): npt-room is float-free (u4-build-plan.md §4.11)`;
 +
  /**
   * A spike folder for depsStep (the workspace manifest, the two exceptions, npt-room and a cargo config) and cargo
   * metadata's shape for it, from clean()'s graph: every member at crates/<name without npt->/ with one lib target there.
-@@ -1041,6 +1050,8 @@ test("the deps step is depsStep, and it calls every check: one plant per check,
+@@ -1041,6 +1074,8 @@ test("the deps step is depsStep, and it calls every check: one plant per check,
        f["crates/tcpinfo/Cargo.toml"] = f["crates/tcpinfo/Cargo.toml"].replace('disallowed_types = "deny"\n', "");
        f[".cargo/config.toml"] = `include = ["extra.toml"]\n${f[".cargo/config.toml"]}`;
        f["crates/room/src/evil.rs"] = UNSAFE_FN;
@@ -222,52 +361,67 @@ index ba62bcc..f24851a 100644
      },
      (e) => (e["npt-sim"] = n("tokio")),
    );
-@@ -1066,6 +1077,8 @@ test("the deps step is depsStep, and it calls every check: one plant per check,
+@@ -1066,6 +1101,8 @@ test("the deps step is depsStep, and it calls every check: one plant per check,
      ["layoutProblems", "npt-room's lib target npt-room compiles crates/tcpinfo/src/linux.rs, outside its folder crates/room/"],
      ["cargoConfigProblems", `${join(bad.dir, ".cargo", "config.toml")} has a key \`include\`: it loads a config file this check does not read`],
      ["unsafeProblems", "crates/room/src/evil.rs:3 has unsafe code (1 `unsafe` or `global_asm`; only npt-client-wasm and npt-tcpinfo may)"],
-+    ["tickConstantProblems", fromLiteral("crates/room/src/ticks.rs:1", "LOOP_CATCHUP", "7")],
++    ["tickConstantProblems", notAPath("crates/room/src/ticks.rs:1", "LOOP_CATCHUP", "7")],
 +    ["roomFloatProblems", roomFloat("crates/room/src/ticks.rs:2", "f64", 2)],
    ]) {
      assert.ok(lines.includes(line), `${check}'s plant is not reported:\n${r.out}`);
    }
-@@ -1228,3 +1241,94 @@ test("only code outside spikes/ is read for references to it", () => {
+@@ -1228,3 +1265,157 @@ test("only code outside spikes/ is read for references to it", () => {
    };
    assert.deepEqual(referenceProblems(files, (f) => text[f]), ["index.html references spikes/"]);
  });
 +
-+test("tick constants: TICK_HZ is set once, in npt-sim, and no derived name from a literal, in any form (U4s, §4.3)", () => {
-+  const clean = {
-+    "crates/sim/src/ticks.rs":
-+      "pub const TICK_HZ: u32 = 30;\n" +
-+      "pub const LOOP_CATCHUP: u32 = loop_catchup_at(TICK_HZ);\n" +
-+      "pub const FULL_STATE_ACK_TICKS: u32 = ticks_for_ms(2_000);\n" +
-+      "pub const ACK_RING_TICKS: u32 = ack_ring_ticks_at(TICK_HZ);\n" +
-+      "pub const SETTINGS_STEP_TICKS: u32 =\n    settings_step_ticks_at(TICK_HZ);\n" +
-+      "// const LOOP_CATCHUP: u32 = 7; in a comment sets nothing\n" +
-+      'const NOTE: &str = "const ACK_RING_TICKS: u32 = 32;";\n' +
-+      "pub const fn loop_catchup_at(tick_hz: u32) -> u32 {\n    tick_hz / 4\n}\n",
-+    "crates/room/src/lib.rs":
-+      "use npt_sim::LOOP_CATCHUP;\nconst TICK_HZ: u32 = npt_sim::TICK_HZ;\n" +
-+      "impl Ring {\n    const ACK_RING_TICKS: u32 = npt_sim :: ACK_RING_TICKS;\n}\nconst LOOP_CATCHUP_ALIAS: u32 = 7;\n",
-+    "crates/sim/tests/seam.rs": "fn s1() {\n    assert_eq!(LOOP_CATCHUP, 7);\n    assert_eq!(loop_catchup_at(60), 15);\n}\n",
-+  };
-+  const run = (change = () => {}) => {
-+    const files = { ...clean };
-+    change(files);
-+    return tickConstantProblems(Object.keys(files).sort(), (f) => files[f]);
-+  };
++/**
++ * The tick grep's clean tree: npt-sim's constants each its own function at TICK_HZ, and outside it uses, asserts,
++ * paths, tick counts derived from TICK_HZ or ticks_for_ms, CMD_CATCHUP and npt-net's own HANG_TICKS (U4s, §4.3).
++ */
++const TICK_CLEAN = {
++  "crates/sim/src/ticks.rs":
++    "pub const TICK_HZ: u32 = 30;\n" +
++    "pub const LOOP_CATCHUP: u32 = loop_catchup_at(TICK_HZ);\n" +
++    "pub const FULL_STATE_ACK_TICKS: u32 = full_state_ack_ticks_at(TICK_HZ);\n" +
++    "pub const ACK_RING_TICKS: u32 = ack_ring_ticks_at( TICK_HZ );\n" +
++    "pub const SETTINGS_STEP_TICKS: u32 =\n    settings_step_ticks_at(TICK_HZ);\n" +
++    "// const LOOP_CATCHUP: u32 = 7; in a comment sets nothing\n" +
++    'const NOTE: &str = "const ACK_RING_TICKS: u32 = 32;";\n' +
++    "const MAX_TICK_HZ: u32 = 1_000;\nconst XYZ: [u32; 3] = [1, 2, 3];\n" +
++    "const _: () = assert!(LOOP_CATCHUP == loop_catchup_at(TICK_HZ), \"x\");\n" +
++    "pub const fn loop_catchup_at(tick_hz: u32) -> u32 {\n    tick_hz / 4\n}\n",
++  "crates/room/src/lib.rs":
++    "use npt_sim::LOOP_CATCHUP;\nconst TICK_HZ: u32 = npt_sim::TICK_HZ;\n" +
++    "impl Ring {\n    const ACK_RING_TICKS: u32 = npt_sim :: ACK_RING_TICKS;\n}\n" +
++    "impl InputBuffer {\n    pub const CMD_CATCHUP: usize = npt_proto::Limits::REDUNDANCY_CAP;\n}\n" +
++    "const EVENT_ACK_TICKS: u32 = npt_sim::ticks_for_ms(2_000);\nconst WINDOW_TICKS: u32 = 2 * npt_sim::TICK_HZ;\n" +
++    "const ALIAS_TICKS: u32 = npt_sim::ACK_RING_TICKS;\nconst MOST_CATCHUP: usize = InputBuffer::CMD_CATCHUP;\n",
++  "crates/sim/tests/seam.rs": "fn s1() {\n    assert_eq!(LOOP_CATCHUP, 7);\n    assert_eq!(loop_catchup_at(60), 15);\n}\n",
++  "crates/net/src/l2/delay_tests.rs": "fn c() {\n    const HANG_TICKS: u64 = 900;\n}\n",
++};
++const tickRun = (change = () => {}) => {
++  const files = { ...TICK_CLEAN };
++  change(files);
++  return tickConstantProblems(Object.keys(files).sort(), (f) => files[f]);
++};
++
++test("tick constants: TICK_HZ is set once, in npt-sim, and a derived name elsewhere is only a path to it, in any form (U4s, §4.3)", () => {
++  const run = tickRun;
 +  assert.deepEqual(run(), [], "the clean tree, uses and asserts and paths to npt-sim's constants included");
 +  const room = "crates/room/src/lib.rs";
-+  const at = `${room}:7`;
++  const at = `${room}:${TICK_CLEAN[room].split("\n").length}`;
 +  for (const [plant, want] of [
-+    ["const LOOP_CATCHUP: u32 = 7;\n", fromLiteral(at, "LOOP_CATCHUP", "7")],
-+    ["pub static ACK_RING_TICKS: u32 = 32;\n", fromLiteral(at, "ACK_RING_TICKS", "32")],
-+    ["static mut LOOP_CATCHUP: u32 = 30 / 4;\n", fromLiteral(at, "LOOP_CATCHUP", "30 / 4")],
-+    ["const SETTINGS_STEP_TICKS: u32 = SEVEN;\n", fromLiteral(at, "SETTINGS_STEP_TICKS", "SEVEN")],
-+    ["const LOOP_CATCHUP: u32 = npt_sim::loop_catchup_at(30);\n", fromLiteral(at, "LOOP_CATCHUP", "npt_sim::loop_catchup_at(30)")],
-+    ["impl X {\n    pub const FULL_STATE_ACK_TICKS: u32 = 60;\n}\n", fromLiteral(`${room}:8`, "FULL_STATE_ACK_TICKS", "60")],
-+    ["const ACK_RING_TICKS: u32 =\n    32;\n", fromLiteral(at, "ACK_RING_TICKS", "32")],
++    ["const LOOP_CATCHUP: u32 = 7;\n", notAPath(at, "LOOP_CATCHUP", "7")],
++    ["pub static ACK_RING_TICKS: u32 = 32;\n", notAPath(at, "ACK_RING_TICKS", "32")],
++    ["static mut LOOP_CATCHUP: u32 = 30 / 4;\n", notAPath(at, "LOOP_CATCHUP", "30 / 4")],
++    ["const SETTINGS_STEP_TICKS: u32 = SEVEN;\n", notAPath(at, "SETTINGS_STEP_TICKS", "SEVEN")],
++    ["const LOOP_CATCHUP: u32 = npt_sim::loop_catchup_at(30);\n", notAPath(at, "LOOP_CATCHUP", "npt_sim::loop_catchup_at(30)")],
++    // Derived again outside npt-sim, even from TICK_HZ itself (the arch review's F6): one home.
++    ["const LOOP_CATCHUP: u32 = npt_sim::TICK_HZ / 4;\n", notAPath(at, "LOOP_CATCHUP", "npt_sim::TICK_HZ / 4")],
++    ["const FULL_STATE_ACK_TICKS: u32 = npt_sim::ticks_for_ms(2_000);\n", notAPath(at, "FULL_STATE_ACK_TICKS", "npt_sim::ticks_for_ms(2_000)")],
++    ["impl X {\n    pub const FULL_STATE_ACK_TICKS: u32 = 60;\n}\n", notAPath(at.replace(/\d+$/, (k) => +k + 1), "FULL_STATE_ACK_TICKS", "60")],
++    ["const ACK_RING_TICKS: u32 =\n    32;\n", notAPath(at, "ACK_RING_TICKS", "32")],
 +    [
 +      "const TICK_HZ: u32 = 60;\n",
 +      `${at} sets TICK_HZ from \`60\` outside crates/sim/src/: npt_sim::TICK_HZ is the one tick constant (plan §4.6)`,
@@ -275,6 +429,11 @@ index ba62bcc..f24851a 100644
 +  ]) {
 +    assert.deepEqual(run((f) => (f[room] += plant)), [want], plant);
 +  }
++  // In npt-net too: the name rule skips it, these names never.
++  assert.deepEqual(
++    run((f) => (f["crates/net/src/l2/delay_tests.rs"] += "const LOOP_CATCHUP: u32 = 7;\n")),
++    [notAPath("crates/net/src/l2/delay_tests.rs:4", "LOOP_CATCHUP", "7")],
++  );
 +  // A second TICK_HZ inside npt-sim (files are read in sorted order, so grid.rs's is the first), and one in npt-client.
 +  assert.deepEqual(
 +    run((f) => (f["crates/sim/src/grid.rs"] = "const TICK_HZ: u32 = 60;\n")),
@@ -286,11 +445,54 @@ index ba62bcc..f24851a 100644
 +    run((f) => (f["crates/client/src/lib.rs"] = "pub const TICK_HZ: u32 = 60;\n")),
 +    ["crates/client/src/lib.rs:1 sets TICK_HZ from `60` outside crates/sim/src/: npt_sim::TICK_HZ is the one tick constant (plan §4.6)"],
 +  );
-+  // A derived constant at a literal rate in npt-sim's own tests is refused too.
++  // A derived constant at a literal rate in npt-sim's own tests is refused too: they are outside its sources.
 +  assert.deepEqual(
 +    run((f) => (f["crates/sim/tests/seam.rs"] += "const LOOP_CATCHUP: u32 = loop_catchup_at(60);\n")),
-+    [fromLiteral("crates/sim/tests/seam.rs:5", "LOOP_CATCHUP", "loop_catchup_at(60)")],
++    [notAPath("crates/sim/tests/seam.rs:5", "LOOP_CATCHUP", "loop_catchup_at(60)")],
 +  );
++});
++
++test("tick constants: in npt-sim each derived name is its own function at TICK_HZ; no other tick-count name is a literal (U4s fix pass, §4.3, plan §4.6)", () => {
++  const ticks = "crates/sim/src/ticks.rs";
++  const swap = (from, to) => (f) => {
++    assert.ok(f[ticks].includes(from), from);
++    f[ticks] = f[ticks].replace(from, to);
++  };
++  const loop = "loop_catchup_at(TICK_HZ)";
++  // The rust review's R4 and its kin: each gives 7 at 30 Hz, and only its own function gives 15 at 60.
++  for (const init of ["7 * TICK_HZ / 30", "TICK_HZ / 4", "7", "ticks_for_ms(233)", "loop_catchup_at(30)", "crate::LOOP_CATCHUP"]) {
++    assert.deepEqual(tickRun(swap(loop, init)), [notOwnFn(`${ticks}:2`, "LOOP_CATCHUP", init)], init);
++  }
++  // FULL_STATE_ACK_TICKS's own function, not the ms form it computes (s1 pins full_state_ack_ticks_at at both rates).
++  assert.deepEqual(
++    tickRun(swap("full_state_ack_ticks_at(TICK_HZ)", "ticks_for_ms(2_000)")),
++    [notOwnFn(`${ticks}:3`, "FULL_STATE_ACK_TICKS", "ticks_for_ms(2_000)")],
++  );
++  // A tick-count name in npt-sim must join TICK_DERIVED, whatever it is set from.
++  assert.deepEqual(tickRun((f) => (f["crates/sim/src/grid.rs"] = "pub const RESEND_TICKS: u32 = ticks_for_ms(500);\n")), [
++    "crates/sim/src/grid.rs:1 sets RESEND_TICKS, a tick count by its name, in npt-sim outside TICK_DERIVED: it joins " +
++      "TICK_DERIVED as `resend_ticks_at(TICK_HZ)`, its function pinned in s1 (u4-build-plan.md §4.3)",
++  ]);
++  // Outside npt-sim, every other name of a tick count (`*_TICKS`, `*CATCHUP*`) is never a literal, in any form.
++  const room = "crates/room/src/lib.rs";
++  const at = `${room}:${TICK_CLEAN[room].split("\n").length}`;
++  for (const [plant, name, init] of [
++    ["const LOOP_CATCHUP_ALIAS: u32 = 7;\n", "LOOP_CATCHUP_ALIAS", "7"],
++    ["const FAST_CATCHUP: u32 = 30 / 4;\n", "FAST_CATCHUP", "30 / 4"],
++    ["const STALL_TICKS: u32 = SEVEN;\n", "STALL_TICKS", "SEVEN"],
++    ["pub static RESEND_TICKS: u64 = 60;\n", "RESEND_TICKS", "60"],
++    ["static mut HOLD_TICKS: u32 = npt_sim::ticks_for_ms_at(60, 500);\n", "HOLD_TICKS", "npt_sim::ticks_for_ms_at(60, 500)"],
++    ["const RING_TICKS: [u32; 2] = [32, 64];\n", "RING_TICKS", "[32, 64]"],
++    ["impl Q {\n    const EVENT_CAP_TICKS: u32 =\n        90;\n}\n", "EVENT_CAP_TICKS", "90"],
++  ]) {
++    const line = plant.startsWith("impl") ? at.replace(/\d+$/, (k) => +k + 1) : at;
++    assert.deepEqual(tickRun((f) => (f[room] += plant)), [fromLiteral(line, name, init)], plant);
++  }
++  // CMD_CATCHUP is the redundancy cap, not a tick count (plan §4.6); npt-net's L2 harness keeps its own 30 Hz.
++  assert.deepEqual(tickRun((f) => (f[room] += "const CMD_CATCHUP: usize = 8;\n")), []);
++  assert.deepEqual(tickRun((f) => (f["crates/net/src/l2/delay_tests.rs"] += "const SEND_TICKS: u64 = 30;\n")), []);
++  assert.deepEqual(Object.keys(NOT_TICK_COUNTS), ["CMD_CATCHUP"]);
++  assert.deepEqual(TICK_NAMED_SKIP, ["crates/net/"]);
 +});
 +
 +test("npt-room is float-free: f32, f64 and float literals in crates/room/src fail; prose, strings, ranges and integers pass (U4s, §4.11)", () => {
@@ -346,6 +548,30 @@ index a99b8ce..4e3c5f3 100644
 +npt-link.workspace = true
  npt-proto.workspace = true
  npt-sim.workspace = true
+diff --git a/spikes/netcode-proof/crates/client/src/lib.rs b/spikes/netcode-proof/crates/client/src/lib.rs
+index 2d74d6a..e59d87d 100644
+--- a/spikes/netcode-proof/crates/client/src/lib.rs
++++ b/spikes/netcode-proof/crates/client/src/lib.rs
+@@ -4,3 +4,19 @@
+ //! stamp, and `step` returns the datagrams and reliable messages to send, the block for the page, and when the next
+ //! tick is due. Prediction and reconciliation, interpolation, clock sync, the aim cast and the block writer live here.
+ //! No bindings, no transport, no clock; native for the bots and wasm32 for the Worker. Built in units U4 and U7.
++
++/// The bite ids this crate plants (bites builds only). u4-build-plan.md §4.14 plants each bite where its code lives:
++/// PM-0001-17/client-rounding's site is the client's call into the wire grid, so its id lives here and not in npt-sim's
++/// grid. U4e's endpoint takes the grid for its every call into it from [`grid_with_bite`].
++#[cfg(feature = "bites")]
++pub const BITES: [&str; 1] = ["PM-0001-17/client-rounding"];
++
++/// The grid a client with the planted defect `bite` uses for its every call into it (bites builds only): for
++/// PM-0001-17/client-rounding ("a client quantiser that rounds differently from the server's") the grid's one defect,
++/// `npt_sim::grid::Config::floor_rounding`; `None` for an id this crate does not plant.
++#[cfg(feature = "bites")]
++pub fn grid_with_bite(bite: &str) -> Option<npt_sim::grid::Config> {
++    BITES
++        .contains(&bite)
++        .then(npt_sim::grid::Config::floor_rounding)
++}
 diff --git a/spikes/netcode-proof/crates/lab/Cargo.toml b/spikes/netcode-proof/crates/lab/Cargo.toml
 index e7898e9..5177345 100644
 --- a/spikes/netcode-proof/crates/lab/Cargo.toml
@@ -367,10 +593,10 @@ index e7898e9..5177345 100644
  [dependencies]
  # ADR 0002's devtools analogue: it may depend on anything, and nothing depends on it (plan §4.2).
 diff --git a/spikes/netcode-proof/crates/proto/Cargo.toml b/spikes/netcode-proof/crates/proto/Cargo.toml
-index a9457a0..3124cc7 100644
+index a9457a0..af05788 100644
 --- a/spikes/netcode-proof/crates/proto/Cargo.toml
 +++ b/spikes/netcode-proof/crates/proto/Cargo.toml
-@@ -9,5 +9,13 @@ publish.workspace = true
+@@ -9,5 +9,20 @@ publish.workspace = true
  [lints]
  workspace = true
  
@@ -385,6 +611,13 @@ index a9457a0..3124cc7 100644
 +# types (plan §4.2: ADR 0002:188, the advisor's Q23 ruling); npt-link for `Channel` (catalogue item 2). Leaf to leaf.
 +npt-sim.workspace = true
 +npt-link.workspace = true
++
++[dev-dependencies]
++# U4a's fixed-seed cases (u4-build-plan.md §5 U4a: a1's 10,000 round trips per type, a2's 100,000 random buffers per
++# type) draw from ChaCha8Rng, the workspace's pinned generator; U4s adds them so no wave-1 lane edits a manifest or
++# Cargo.lock (the arch review's F7). Dev dependencies: they never ship (plan §4.2, C10).
++rand_chacha.workspace = true
++rand_core.workspace = true
 diff --git a/spikes/netcode-proof/crates/room/Cargo.toml b/spikes/netcode-proof/crates/room/Cargo.toml
 index 5b25f97..300951a 100644
 --- a/spikes/netcode-proof/crates/room/Cargo.toml
@@ -450,17 +683,18 @@ index 4a86149..a5b0d5c 100644
 +rand_chacha.workspace = true
 +rand_core.workspace = true
 diff --git a/spikes/netcode-proof/crates/sim/src/lib.rs b/spikes/netcode-proof/crates/sim/src/lib.rs
-index 95da824..5034c5e 100644
+index 95da824..36029dc 100644
 --- a/spikes/netcode-proof/crates/sim/src/lib.rs
 +++ b/spikes/netcode-proof/crates/sim/src/lib.rs
-@@ -3,3 +3,22 @@
+@@ -3,3 +3,41 @@
  //! Movement and hitscan, its soldiers driven by protocol clients (no bot logic here), the stress scene's counts and
  //! S1's stand-ins as data behind one narrow seam, and a per-tick state hash. It follows ADR 0004 part 7's float
  //! allow-list (enforced by this crate's clippy.toml) and builds for wasm32. Built in unit U4.
 +//!
 +//! U4s (u4-build-plan.md §5) builds what every other U4 crate needs first: the tick constant and the values derived
 +//! from it ([`TICK_HZ`], [`LOOP_CATCHUP`] and the rest: §4.3), the wire grid ([`grid`]: §4.4), and the seam
-+//! ([`SimCore`], its plain-data types and [`HitHistory`]: §4.2). `World`, the one implementation, is U4d's.
++//! ([`SimCore`], its plain-data types, each entity kind's field layout and [`HitHistory`]: §4.2). `World`, the one
++//! implementation, is U4d's.
 +
 +pub mod grid;
 +mod history;
@@ -474,14 +708,74 @@ index 95da824..5034c5e 100644
 +};
 +pub use ticks::{
 +    ACK_RING_TICKS, FULL_STATE_ACK_TICKS, LOOP_CATCHUP, SETTINGS_STEP_TICKS, TICK_HZ,
-+    ack_ring_ticks_at, loop_catchup_at, settings_step_ticks_at, ticks_for_ms, ticks_for_ms_at,
++    ack_ring_ticks_at, full_state_ack_ticks_at, loop_catchup_at, settings_step_ticks_at,
++    ticks_for_ms, ticks_for_ms_at,
 +};
++
++/// The bite ids the authority step's own-copy snap plants (bites builds only). u4-build-plan.md §4.14 plants each bite
++/// where its code lives, and the snap is the sim's, so its id lives here and not in [`grid`]: U4d's `World::with_bite`
++/// takes its snap's grid from [`own_copy_snap_with_bite`] for these ids, while the grid the encoder codes with stays
++/// the wire grid.
++#[cfg(feature = "bites")]
++pub const OWN_COPY_SNAP_BITES: [&str; 1] = ["PM-0001-41/server-quant-differs"];
++
++/// The grid the authority step's own-copy snap uses under the planted defect `bite` (bites builds only): for
++/// PM-0001-41/server-quant-differs ("the server quantising its own copy differently from what it sends") the grid's one
++/// defect, [`grid::Config::floor_rounding`]; `None` for an id the snap does not plant.
++#[cfg(feature = "bites")]
++pub fn own_copy_snap_with_bite(bite: &str) -> Option<grid::Config> {
++    OWN_COPY_SNAP_BITES
++        .contains(&bite)
++        .then(grid::Config::floor_rounding)
++}
+diff --git a/spikes/netcode-proof/crates/client/tests/bites.rs b/spikes/netcode-proof/crates/client/tests/bites.rs
+new file mode 100644
+index 0000000..cb19fdd
+--- /dev/null
++++ b/spikes/netcode-proof/crates/client/tests/bites.rs
+@@ -0,0 +1,36 @@
++//! npt-client's planted defects (bites builds only; u4-build-plan.md §4.14: each planted where its code lives). U4s
++//! plants PM-0001-17/client-rounding's id here, at the client's call into the wire grid; U4e's endpoint adds the rest.
++#![cfg(feature = "bites")]
++
++use npt_sim::grid::{Config, POSITION_XY};
++
++#[test]
++fn pm_0001_17_client_rounding_is_planted_here_alone_and_moves_about_half_of_all_positions() {
++    let id = "PM-0001-17/client-rounding";
++    assert_eq!(npt_client::BITES, [id]);
++    let bitten = npt_client::grid_with_bite(id).expect("the client plants -17's");
++    assert_eq!(bitten, Config::floor_rounding());
++    // No id of another site: the own-copy snap's (-41), the encoder's (-57), an unknown one.
++    for other in [
++        "PM-0001-41/server-quant-differs",
++        "PM-0001-57/pos-4cm",
++        "PM-0001-57/yaw-12bit",
++        "PM-0001-57/pitch-8bit",
++        "PM-0001-17/no-such-bite",
++    ] {
++        assert!(npt_client::grid_with_bite(other).is_none(), "{other}");
++    }
++    // u4-build-plan.md §4.14's unit proof: the floor variant differs from the wire grid on about half of all position
++    // values (from 0 to 20 m, in sixteenths of a centimetre).
++    let wire = Config::default();
++    let (mut differ, mut all) = (0u32, 0u32);
++    for k in 0..2_000 {
++        for sixteenth in 0..16 {
++            let x = ((f64::from(k) + f64::from(sixteenth) / 16.0) / 100.0) as f32;
++            differ += u32::from(bitten.to_grid(POSITION_XY, x) != wire.to_grid(POSITION_XY, x));
++            all += 1;
++        }
++    }
++    let share = f64::from(differ) / f64::from(all);
++    assert!((0.45..=0.6).contains(&share), "{share}");
++}
 diff --git a/spikes/netcode-proof/crates/sim/src/grid.rs b/spikes/netcode-proof/crates/sim/src/grid.rs
 new file mode 100644
-index 0000000..92d7de0
+index 0000000..a5e1709
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/sim/src/grid.rs
-@@ -0,0 +1,217 @@
+@@ -0,0 +1,201 @@
 +//! The wire grid (u4-build-plan.md §4.4; the advisor's Q23 ruling): one function each way between the sim's values and
 +//! the integers the wire carries, per field kind. The sim's own-copy snap, the room's encoder and the client all call
 +//! it, so the three agree bit for bit; npt-proto's `Quant` packs its integers into their widths.
@@ -495,20 +789,31 @@ index 0000000..92d7de0
 +//!   integer of a field comes back from the grid as itself (the tests run all of them).
 +//!
 +//! Positions are metres, angles radians, velocities metres per second. A field's integers are `min()..=max()`, which
-+//! fit in `bits()` bits.
++//! fit in `bits()` bits. [`Field::integer`] describes the record fields the sim holds as integers (flag bits, a tick),
++//! so one type names every field of an entity's layout (`EntityKind::layout`).
 +//!
-+//! Bites (bites builds only) are chosen through the [`Config`] value a caller passes, never a static
-+//! (u4-build-plan.md §4.11): a client, the sim's own-copy snap or the encoder each holds its own.
++//! **Fixed for wave 1:** the five field constants below are fixed as built while U4a (npt-proto's `Quant` and field
++//! table) and U4d (npt-sim) build in parallel; [`VELOCITY`]'s step included. A change to any of them waits for U4d's
++//! merge and goes through its own change, so both lanes build against one grid.
++//!
++//! The grid's one planted defect, bites builds only, is the float side's: `Config::floor_rounding`, chosen through
++//! the [`Config`] value a caller passes, never a static (u4-build-plan.md §4.11). It carries no bite id: each bite id
++//! lives in the crate of its site, which maps it to the defect (u4-build-plan.md §4.14: "planted where its code
++//! lives"): npt-client's PM-0001-17/client-rounding (`npt_client::BITES`), the authority step's own-copy snap's
++//! PM-0001-41/server-quant-differs (`npt_sim::OWN_COPY_SNAP_BITES`). PM-0001-57's coarsening bites act on integers, in
++//! npt-proto's `Quant` (U4a).
 +
 +use core::f64::consts::{FRAC_PI_2, TAU};
 +
-+/// Which values a field carries, for the bites that coarsen one kind.
++/// Which values a field carries; part of a field's identity, so two fields of one range but different kinds differ.
 +#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 +enum Kind {
 +    Position,
 +    Yaw,
 +    Pitch,
 +    Velocity,
++    /// A value the sim holds as an integer: no scale.
++    Integer,
 +}
 +
 +/// One field kind of the wire grid: its scale (grid steps per sim unit), its integers and its width.
@@ -523,6 +828,25 @@ index 0000000..92d7de0
 +}
 +
 +impl Field {
++    /// A field the sim holds as an integer (flag bits, a tick by its u32 bits, a weapon id): no scale, the integers
++    /// `min..=max`, in the fewest bits that hold them, never wrapping. Its value is never a float, so an entity
++    /// record's `raw` is 0 for it.
++    ///
++    /// # Panics
++    /// If `min` is not below `max` (a field of one value carries nothing); in a const, a compile error.
++    pub const fn integer(min: i32, max: i32) -> Field {
++        assert!(min < max, "an integer field holds at least two values");
++        let span = (max as i64 - min as i64) as u64;
++        Field {
++            kind: Kind::Integer,
++            scale: 1.0,
++            min,
++            max,
++            bits: u64::BITS - span.leading_zeros(),
++            wraps: false,
++        }
++    }
++
 +    /// The field's lowest integer.
 +    pub const fn min(self) -> i32 {
 +        self.min
@@ -598,9 +922,10 @@ index 0000000..92d7de0
 +    wraps: false,
 +};
 +
-+/// Velocity, metres per second: 1 cm/s steps in 16 bits, -327.68 to 327.67 m/s. Provisional: u4-build-plan.md §4.4
-+/// leaves velocity's step to U4a's field table, and the own-copy snap needs one now; U4a's table states it, and a
-+/// different step changes only this constant.
++/// Velocity, metres per second: 1 cm/s steps in 16 bits, -327.68 to 327.67 m/s. u4-build-plan.md §4.4 left velocity's
++/// step to U4a's field table, and the own-copy snap needs one now: this step is fixed for wave 1 as built (the module
++/// text above), so U4a's table states it as given; a different step waits for U4d's merge and changes only this
++/// constant.
 +pub const VELOCITY: Field = Field {
 +    kind: Kind::Velocity,
 +    scale: 100.0,
@@ -610,12 +935,13 @@ index 0000000..92d7de0
 +    wraps: false,
 +};
 +
-+/// The grid a caller uses: in a measured build always the wire grid; in a bites build it may hold one planted defect,
-+/// chosen by [`Config::with_bite`] for that caller alone.
++/// The grid a caller uses: in a measured build always the wire grid; in a bites build it may hold the grid's one
++/// planted defect, `Config::floor_rounding`, for that caller alone.
 +#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 +pub struct Config {
++    /// Rounds down in place of to the nearest (bites builds only).
 +    #[cfg(feature = "bites")]
-+    bite: Option<Bite>,
++    floor: bool,
 +}
 +
 +impl Config {
@@ -624,8 +950,8 @@ index 0000000..92d7de0
 +    pub fn to_grid(self, field: Field, x: f32) -> i32 {
 +        let scaled = f64::from(x) * field.scale;
 +        #[cfg(feature = "bites")]
-+        if let Some(bite) = self.bite {
-+            return field.fit(bite.to_line(field.kind, scaled));
++        if self.floor {
++            return field.fit(scaled.floor() as i64);
 +        }
 +        field.fit(scaled.round() as i64)
 +    }
@@ -642,77 +968,30 @@ index 0000000..92d7de0
 +    }
 +}
 +
-+/// The grid's planted defects (bites builds only).
-+#[cfg(feature = "bites")]
-+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-+enum Bite {
-+    /// Rounds down in place of to the nearest.
-+    Floor,
-+    /// Positions to 4 cm.
-+    Pos4cm,
-+    /// Yaw to 12 bits (every 16th integer).
-+    Yaw12bit,
-+    /// Pitch to 8 bits (every 4th integer).
-+    Pitch8bit,
-+}
-+
-+#[cfg(feature = "bites")]
-+impl Bite {
-+    /// The scaled value's integer under this defect, before the field's range.
-+    fn to_line(self, kind: Kind, scaled: f64) -> i64 {
-+        let every: i64 = match (self, kind) {
-+            (Bite::Floor, _) => return scaled.floor() as i64,
-+            (Bite::Pos4cm, Kind::Position) => 4,
-+            (Bite::Yaw12bit, Kind::Yaw) => 16,
-+            (Bite::Pitch8bit, Kind::Pitch) => 4,
-+            _ => 1,
-+        };
-+        ((scaled / every as f64).round() as i64).saturating_mul(every)
-+    }
-+}
-+
-+/// The grid's bites, by their marks.json ids: the site is the caller's (u4-build-plan.md §4.14): PM-0001-17's in
-+/// npt-client's call, PM-0001-41's in the authority step's own-copy snap, PM-0001-57's three in the encoder's.
-+#[cfg(feature = "bites")]
-+const BITE_IDS: [(&str, Bite); 5] = [
-+    ("PM-0001-17/client-rounding", Bite::Floor),
-+    ("PM-0001-41/server-quant-differs", Bite::Floor),
-+    ("PM-0001-57/pos-4cm", Bite::Pos4cm),
-+    ("PM-0001-57/yaw-12bit", Bite::Yaw12bit),
-+    ("PM-0001-57/pitch-8bit", Bite::Pitch8bit),
-+];
-+
 +#[cfg(feature = "bites")]
 +impl Config {
-+    /// The bite ids the grid plants (bites builds only).
-+    pub const BITES: [&'static str; 5] = [
-+        BITE_IDS[0].0,
-+        BITE_IDS[1].0,
-+        BITE_IDS[2].0,
-+        BITE_IDS[3].0,
-+        BITE_IDS[4].0,
-+    ];
-+
-+    /// A grid with one planted defect, by its marks.json id (bites builds only); `None` for an id it does not plant.
-+    pub fn with_bite(bite: &str) -> Option<Config> {
-+        let (_, b) = BITE_IDS.iter().find(|(id, _)| *id == bite)?;
-+        Some(Config { bite: Some(*b) })
++    /// The grid's one planted defect (bites builds only): [`Config::to_grid`] rounds down in place of to the nearest,
++    /// which moves about half of all values one step off the wire grid; [`Config::from_grid`] is unchanged. It names
++    /// no bite: the sites that plant it map their own ids to it (the module text).
++    pub const fn floor_rounding() -> Config {
++        Config { floor: true }
 +    }
 +}
 diff --git a/spikes/netcode-proof/crates/sim/src/history.rs b/spikes/netcode-proof/crates/sim/src/history.rs
 new file mode 100644
-index 0000000..68a21a5
+index 0000000..ae1cbf5
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/sim/src/history.rs
-@@ -0,0 +1,94 @@
+@@ -0,0 +1,98 @@
 +//! The ring of past hit volumes (u4-build-plan.md §4.2, §4.9; the advisor's Q2 ruling).
 +
 +use crate::seam::HitVolumes;
 +
 +/// A fixed ring of [`HitVolumes`], one entry per tick, oldest evicted. The room owns its instance, pushes
 +/// `world.hit_volumes()` after each step and lends it to the next; the replay driver does the same, so a recording
-+/// needs no volumes. Its capacity is set at construction, from U4h's test cap in ms through
-+/// [`crate::ticks_for_ms`], and never changes.
++/// needs no volumes. Its span is set at construction in milliseconds (U4h's test cap plus its margin:
++/// u4-build-plan.md §4.9), turned into ticks by [`crate::ticks_for_ms`] alone, so no tick count is ever written for it
++/// (A5); it never changes.
 +#[derive(Clone, Debug)]
 +pub struct HitHistory {
 +    /// The entries, allocated once; until the ring is full they are in push order.
@@ -723,15 +1002,18 @@ index 0000000..68a21a5
 +}
 +
 +impl HitHistory {
-+    /// An empty ring holding `capacity_ticks` ticks; at least 1.
-+    pub fn new(capacity_ticks: u32) -> HitHistory {
-+        assert!(capacity_ticks > 0, "a hit history holds at least one tick");
-+        let capacity = capacity_ticks as usize;
-+        HitHistory {
++    /// An empty ring covering `span_ms` milliseconds: [`crate::ticks_for_ms`]`(span_ms)` ticks, rounded up, so any span
++    /// above 0 holds at least one tick. `None` for a span of 0 ms, which would hold none.
++    pub fn for_ms(span_ms: u32) -> Option<HitHistory> {
++        let capacity = crate::ticks_for_ms(span_ms) as usize;
++        if capacity == 0 {
++            return None;
++        }
++        Some(HitHistory {
 +            slots: Vec::with_capacity(capacity),
 +            next: 0,
 +            capacity,
-+        }
++        })
 +    }
 +
 +    /// The ticks the ring holds when full.
@@ -801,10 +1083,10 @@ index 0000000..68a21a5
 +}
 diff --git a/spikes/netcode-proof/crates/sim/src/seam.rs b/spikes/netcode-proof/crates/sim/src/seam.rs
 new file mode 100644
-index 0000000..165b3c2
+index 0000000..17b8b63
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/sim/src/seam.rs
-@@ -0,0 +1,200 @@
+@@ -0,0 +1,287 @@
 +//! The seam between the room and the sim (u4-build-plan.md §4.2; plan §4.6; the advisor's Q1 and Q2 rulings): one
 +//! trait, [`SimCore`], with one implementation (`World`, built in U4d), and the plain-data types that cross it.
 +//!
@@ -813,15 +1095,23 @@ index 0000000..165b3c2
 +//! field (§4.15). U4d's `World` adds what only it decides: the volumes inside [`HitVolumes`], and the spawns,
 +//! teleports and scripted attribute changes that §4.2 also routes through [`TickInput`].
 +
++use crate::grid::{Field, PITCH, POSITION_XY, POSITION_Z, VELOCITY, YAW};
 +use crate::history::HitHistory;
 +
 +/// One soldier's command for one tick, as the room accepted it: the decoded `Input` command after the room's checks
 +/// (plan §4.4), and what a recording holds for it (u4-build-plan.md §4.15). Integers only.
++///
++/// **What the sim reads:** `slot`, `seq`, `buttons`, `presses`, `move_xy` and `aim`, and nothing else. `tick`,
++/// `view_tick` and `view_fraction` are what the client claimed: they belong to the room (its strictly-newer tick check
++/// and `rewind_at`) and to the recording (-30's pre-check re-encodes them as `Input`: u4-build-plan.md §4.15). For lag
++/// compensation the sim uses the command's [`Rewind`], the view time the room accepted, never the claimed one (the
++/// advisor's condition 1: the sim keeps what the server accepted), so two commands that differ only in these three
++/// fields step to equal state hashes (U4d's test).
 +#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 +pub struct Command {
 +    /// The soldier's slot.
 +    pub slot: u8,
-+    /// The tick the client stamped the command for.
++    /// The tick the client stamped the command for: the room's and the recording's, never read by the sim.
 +    pub tick: u32,
 +    /// The command's sequence number (16 bits, compared wrap-aware: PM-0001-58).
 +    pub seq: u16,
@@ -834,9 +1124,10 @@ index 0000000..165b3c2
 +    /// The aim point in the position grid's integers (cm): [`crate::grid::POSITION_XY`] for x and y,
 +    /// [`crate::grid::POSITION_Z`] for z. The sim clamps a point beyond the weapon's reach (§4.2).
 +    pub aim: [i32; 3],
-+    /// The client's view time as the command reports it: the tick of the older snapshot it drew ...
++    /// The client's view time as the command claims it: the tick of the older snapshot it drew ...
 +    pub view_tick: u32,
-+    /// ... and the blend from that tick toward the next, in 256ths. The room turns it into a [`Rewind`].
++    /// ... and the blend from that tick toward the next, in 256ths. The room turns the pair into a [`Rewind`] (or
++    /// replaces it by its estimate); the sim never reads either.
 +    pub view_fraction: u8,
 +}
 +
@@ -851,8 +1142,16 @@ index 0000000..165b3c2
 +
 +/// How a lag-compensated shot sees the past (u4-build-plan.md §4.2; the advisor's Q2 ruling): the room's `rewind_at`
 +/// turns a command's accepted view time into these integers, and the sim blends the two history ticks linearly, as the
-+/// client's Interp drew them. It rides with each command that holds fire or presses it. A Rewind naming a tick the
-+/// lent ring does not hold is refused and counted by the sim, in [`InputReports`] and never in the hash.
++/// client's Interp drew them. It rides with each command that holds fire or presses it.
++///
++/// **A tick the lent ring does not hold:** the ring lacks `tick_a`, or `fraction` is above 0 and the ring lacks
++/// `tick_a + 1` (wrapping), the tick the blend reaches toward; at `fraction` 0 only `tick_a` is read. Such a Rewind is
++/// refused and counted by the sim, in [`InputReports::rewind_outside`] and never in the hash.
++///
++/// **A refused Rewind behaves as `None`:** the command steps exactly as the same command with no Rewind, on that tick
++/// and after (D-10's twin is the forged command with only the refused part removed, so the two must give equal state
++/// hashes). What a command that holds or presses fire does without a Rewind is `World`'s rule, U4d's; it is one rule
++/// for both.
 +#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 +pub struct Rewind {
 +    /// The older of the two history ticks the view time falls between.
@@ -869,8 +1168,11 @@ index 0000000..165b3c2
 +pub struct TickInput {
 +    /// The tick this input steps: the world's next tick.
 +    pub tick: u32,
-+    /// The accepted commands in the order the room runs them, each with the [`Rewind`] the room computed for it
-+    /// (present when the command holds or presses fire).
++    /// The accepted commands, each with the [`Rewind`] the room computed for it (present when the command holds or
++    /// presses fire), in **the canonical order**: slot ascending, then, within one slot, command tick strictly
++    /// ascending, compared wrap-aware (`b` comes after `a` when `b.wrapping_sub(a) as i32 > 0`). The room sorts into
++    /// it, a recording holds it and the sim runs the commands in it, so legs that received the same commands in
++    /// different arrival orders step alike (-30's per-tick hash comparison). U4d's `World` debug-asserts it.
 +    pub commands: Vec<(Command, Option<Rewind>)>,
 +}
 +
@@ -890,6 +1192,55 @@ index 0000000..165b3c2
 +    Effect,
 +}
 +
++/// Eight flag bits, for stance and actions (the catalogue's remote-soldier row).
++const FLAGS: Field = Field::integer(0, 255);
++/// A tick by its u32 bits, held as i32 (a projectile's start tick).
++const TICK: Field = Field::integer(i32::MIN, i32::MAX);
++/// A door's state: 0 closed, 1 open.
++const OPEN: Field = Field::integer(0, 1);
++/// A position: x, y, z.
++const XYZ: [Field; 3] = [POSITION_XY, POSITION_XY, POSITION_Z];
++const SOLDIER: [Field; 9] = [
++    XYZ[0], XYZ[1], XYZ[2], YAW, PITCH, VELOCITY, VELOCITY, VELOCITY, FLAGS,
++];
++/// A transform on the ground: x, y, z and yaw (a hull, a part).
++const TRANSFORM: [Field; 4] = [XYZ[0], XYZ[1], XYZ[2], YAW];
++const PROJECTILE: [Field; 7] = [TICK, XYZ[0], XYZ[1], XYZ[2], VELOCITY, VELOCITY, VELOCITY];
++const DOOR: [Field; 1] = [OPEN];
++
++impl EntityKind {
++    /// Every kind, in declaration order: npt-proto builds its field-group table for each.
++    pub const ALL: [EntityKind; 7] = [
++        EntityKind::Soldier,
++        EntityKind::Vehicle,
++        EntityKind::VehiclePart,
++        EntityKind::Projectile,
++        EntityKind::Door,
++        EntityKind::Wall,
++        EntityKind::Effect,
++    ];
++
++    /// The kind's field layout: what each entry of an [`EntityRecord`]'s `grid` and `raw` holds, in order. The one
++    /// home of that order (the arch review's F2): U4d's `World` fills records in it, and npt-proto's field-group table
++    /// and its `EntityRecord` ↔ wire mapping are built from this function, never from a copy, so a change here needs
++    /// no edit in npt-proto.
++    ///
++    /// U4s's lists are the catalogue's spatial rows (docs/design/netcode-proof-messages.md §3): a soldier's position,
++    /// yaw, pitch, velocity and 8 flag bits; a hull's and a part's transform; a projectile's start tick, start position
++    /// and velocity; a door's state. U4d completes them (health, weapon id and state, a projectile's type and fuse, the
++    /// wall's and the effect rows' fields) with the grid's fields and [`Field::integer`], within
++    /// [`EntityRecord::FIELDS`] (a const assert below holds every layout to it).
++    pub const fn layout(self) -> &'static [Field] {
++        match self {
++            EntityKind::Soldier => &SOLDIER,
++            EntityKind::Vehicle | EntityKind::VehiclePart => &TRANSFORM,
++            EntityKind::Projectile => &PROJECTILE,
++            EntityKind::Door => &DOOR,
++            EntityKind::Wall | EntityKind::Effect => &[],
++        }
++    }
++}
++
 +/// One entity's snapshot fields, read out after a step (u4-build-plan.md §4.2): the encoder codes them, npt-proto
 +/// maps them to and from the wire (one home, §4.4), and -57's log takes the pre-grid values. The room copies `raw` and
 +/// never computes with it.
@@ -902,18 +1253,34 @@ index 0000000..165b3c2
 +    pub generation: u16,
 +    /// The area it is in (the static graph's numbering), for interest.
 +    pub area: u16,
-+    /// Its fields as grid integers, in its kind's order (U4a's field-group layout table); unused fields 0, a tick by
-+    /// its u32 bits.
++    /// Its fields as integers, in its kind's [`EntityKind::layout`] order; entries past the layout 0. A float field's
++    /// entry is the **wire** grid's `Config::default().to_grid(field, value)` of the value `raw` holds, computed apart
++    /// from the own-copy snap and its own [`crate::grid::Config`], so a snap that rounds otherwise
++    /// (PM-0001-41/server-quant-differs) shows as this entry differing from the snapped copy; an integer field's entry
++    /// is the integer itself, a tick by its u32 bits.
 +    pub grid: [i32; EntityRecord::FIELDS],
-+    /// The same fields before the grid, each f32 by its bits (`to_bits`), for -57's log; 0 for a field that is not a
-+    /// float.
++    /// The same fields' values **before the own-copy snap**, each f32 by its bits (`to_bits`), for -57's log, which
++    /// pairs them with what the client decoded (u4-build-plan.md §4.6, T20); 0 for a field that is not a float.
 +    pub raw: [u32; EntityRecord::FIELDS],
 +}
 +
 +impl EntityRecord {
-+    /// Fields per record: a soldier's position, yaw, pitch, velocity, health, flags, weapon and weapon state fill 12.
++    /// Fields per record: U4d's full soldier (position, yaw, pitch, velocity, health, flags, weapon and weapon state)
++    /// fills 12.
 +    pub const FIELDS: usize = 12;
 +}
++
++// Every kind's layout fits a record.
++const _: () = {
++    let mut i = 0;
++    while i < EntityKind::ALL.len() {
++        assert!(
++            EntityKind::ALL[i].layout().len() <= EntityRecord::FIELDS,
++            "every kind's layout fits EntityRecord::FIELDS"
++        );
++        i += 1;
++    }
++};
 +
 +/// One tick's hit volumes for lag compensation (u4-build-plan.md §4.2, §4.9), as the world reads them out after a
 +/// step: the room pushes them into its [`HitHistory`], and the replay driver does the same. U4s fixes their tick; the
@@ -976,7 +1343,9 @@ index 0000000..165b3c2
 +    pub ammunition: u64,
 +    /// ... a reload edge the weapon's state refuses ...
 +    pub reload: u64,
-+    /// ... a non-finite command component ...
++    /// ... a non-finite command component: always 0 while [`Command`] holds integers only, since no integer is
++    /// non-finite; kept because u4-build-plan.md §4.2 lists the kind and D-4 tests it (whether to drop both is the
++    /// advisor's question) ...
 +    pub non_finite: u64,
 +    /// ... a [`Rewind`] naming a tick the lent ring does not hold ...
 +    pub rewind_outside: u64,
@@ -1007,23 +1376,34 @@ index 0000000..165b3c2
 +}
 diff --git a/spikes/netcode-proof/crates/sim/src/ticks.rs b/spikes/netcode-proof/crates/sim/src/ticks.rs
 new file mode 100644
-index 0000000..2e7a415
+index 0000000..756b066
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/sim/src/ticks.rs
-@@ -0,0 +1,58 @@
+@@ -0,0 +1,98 @@
 +//! The tick constant and every tick-counted value derived from it (u4-build-plan.md §4.3; plan §4.6; RQ6).
 +//!
 +//! `TICK_HZ` is the one build-time tick constant. Every tick-counted value is a const fn of a tick rate, and each
-+//! constant below is that function at `TICK_HZ`, never a literal: the tests evaluate every function at 30 and at 60 Hz,
-+//! and check.mjs's deps step refuses these names set from a literal anywhere under crates/. The `_at` forms take the
-+//! rate as an argument, for those tests and for the 60 Hz run's change-set; everything else uses the constants.
-+//! Rates are at most 1,000 ticks per second, so no result overflows.
++//! constant below is its own function at `TICK_HZ`, written `<name>_at(TICK_HZ)` and never a literal: the tests pin
++//! every function at 30 and at 60 Hz, a const assert holds each constant equal to its function at whatever `TICK_HZ`
++//! is (so the 60 Hz run's build refuses to compile a constant that drifted from its function), and check.mjs's deps
++//! step refuses these names set in any other form. The `_at` forms take the rate as an argument, for those tests and for
++//! the 60 Hz run's change-set; everything else uses the constants.
 +
 +/// The tick rate in ticks per second: the one tick constant (plan §4.6). The 60 Hz run's own change-set replaces
-+/// npt-sim through the seam and changes no other crate.
++/// npt-sim through the seam and changes no other crate. A const assert below holds it in 1 to 1,000.
 +pub const TICK_HZ: u32 = 30;
 +
++/// The highest tick rate the build may set: at it, `ack_ring_ticks_at`'s `32 × tick_hz` is 32,000, far inside u32, and
++/// `ticks_for_ms_at` works in u64, so no derived constant overflows.
++const MAX_TICK_HZ: u32 = 1_000;
++
++const _: () = assert!(
++    TICK_HZ >= 1 && TICK_HZ <= MAX_TICK_HZ,
++    "TICK_HZ is 1 to 1,000 ticks per second"
++);
++
 +/// The ticks that cover `ms` milliseconds at `tick_hz`, rounded up: ⌈ms × tick_hz / 1,000⌉ (u4-build-plan.md §4.3).
++/// Worked in u64 and saturated at `u32::MAX`, so it never overflows.
 +pub const fn ticks_for_ms_at(tick_hz: u32, ms: u32) -> u32 {
 +    let ticks = (ms as u64 * tick_hz as u64).div_ceil(1_000);
 +    if ticks > u32::MAX as u64 {
@@ -1048,12 +1428,22 @@ index 0000000..2e7a415
 +/// [`loop_catchup_at`] at [`TICK_HZ`]: what npt-server's `Schedule` and the Worker's host pass as the catch-up cap.
 +pub const LOOP_CATCHUP: u32 = loop_catchup_at(TICK_HZ);
 +
-+/// The FullState acknowledgement bound: a forced resync not acknowledged within 2 s ends in Kick(overflow)
-+/// (u4-build-plan.md §4.7): [`ticks_for_ms`] of 2,000 (60 ticks at 30 Hz, 120 at 60 Hz).
-+pub const FULL_STATE_ACK_TICKS: u32 = ticks_for_ms(2_000);
++/// The FullState acknowledgement bound at `tick_hz`: a forced resync not acknowledged within 2 s ends in
++/// Kick(overflow) (u4-build-plan.md §4.7): [`ticks_for_ms_at`] of 2,000 (60 ticks at 30 Hz, 120 at 60 Hz).
++pub const fn full_state_ack_ticks_at(tick_hz: u32) -> u32 {
++    ticks_for_ms_at(tick_hz, 2_000)
++}
++
++/// [`full_state_ack_ticks_at`] at [`TICK_HZ`], [`ticks_for_ms`] of 2,000.
++pub const FULL_STATE_ACK_TICKS: u32 = full_state_ack_ticks_at(TICK_HZ);
 +
 +/// The length in ticks of the room's AckRing and of the client's ring of complete frames at `tick_hz`: 32 × tick_hz
-+/// / 30, so the ring keeps ages 0 to 31 at 30 Hz, about 1.067 s (u4-build-plan.md §4.5; ADR 0001 part 6).
++/// / 30, so the ring keeps ages 0 to 31 at 30 Hz, about 1.067 s (u4-build-plan.md §4.5; ADR 0001 part 6). At most
++/// 1,066 within `TICK_HZ`'s asserted range.
++///
++/// # Panics
++/// Above 134,217,727 ticks per second `32 × tick_hz` overflows u32 (a panic where overflow checks are on, a compile
++/// error in a const); `TICK_HZ`'s const assert keeps the build's own rate far below that.
 +pub const fn ack_ring_ticks_at(tick_hz: u32) -> u32 {
 +    32 * tick_hz / 30
 +}
@@ -1069,22 +1459,69 @@ index 0000000..2e7a415
 +
 +/// [`settings_step_ticks_at`] at [`TICK_HZ`].
 +pub const SETTINGS_STEP_TICKS: u32 = settings_step_ticks_at(TICK_HZ);
++
++// Each derived constant is its own function at TICK_HZ, at every TICK_HZ: written so, check.mjs refuses any other
++// form, and these hold it should the form be evaded (the 60 Hz build then fails here, naming the constant).
++const _: () = assert!(
++    LOOP_CATCHUP == loop_catchup_at(TICK_HZ),
++    "LOOP_CATCHUP is loop_catchup_at(TICK_HZ)"
++);
++const _: () = assert!(
++    FULL_STATE_ACK_TICKS == full_state_ack_ticks_at(TICK_HZ),
++    "FULL_STATE_ACK_TICKS is full_state_ack_ticks_at(TICK_HZ)"
++);
++const _: () = assert!(
++    ACK_RING_TICKS == ack_ring_ticks_at(TICK_HZ),
++    "ACK_RING_TICKS is ack_ring_ticks_at(TICK_HZ)"
++);
++const _: () = assert!(
++    SETTINGS_STEP_TICKS == settings_step_ticks_at(TICK_HZ),
++    "SETTINGS_STEP_TICKS is settings_step_ticks_at(TICK_HZ)"
++);
 diff --git a/spikes/netcode-proof/crates/sim/tests/seam.rs b/spikes/netcode-proof/crates/sim/tests/seam.rs
 new file mode 100644
-index 0000000..464fc48
+index 0000000..12373e2
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/sim/tests/seam.rs
-@@ -0,0 +1,459 @@
+@@ -0,0 +1,577 @@
 +//! U4s's tests (u4-build-plan.md §5 U4s): s1 the tick constants at 30 and 60 Hz, s2 the wire grid each way, s3 its tie
-+//! rule, s4 the hit history's ring, s5 the seam types are `Send`; and, in bites builds, the grid's planted defects.
++//! rule, s4 the hit history's ring (and s4b its refusal of a zero span), s5 the seam types are `Send`, s6 each entity
++//! kind's field layout; and, in bites builds, the grid's one planted defect and the own-copy snap's bite id.
 +
-+use npt_sim::grid::{self, Config, Field};
++use npt_sim::grid::{self, Config, Field, PITCH, POSITION_XY, POSITION_Z, VELOCITY, YAW};
 +use npt_sim::{
 +    ACK_RING_TICKS, ClampReport, Command, CoverVariant, EntityKind, EntityRecord,
 +    FULL_STATE_ACK_TICKS, HitHistory, HitVolumes, InputReports, LOOP_CATCHUP, PortalStates, Rewind,
-+    SETTINGS_STEP_TICKS, SimCore, SimEvent, TICK_HZ, TickInput, ack_ring_ticks_at, loop_catchup_at,
-+    settings_step_ticks_at, ticks_for_ms, ticks_for_ms_at,
++    SETTINGS_STEP_TICKS, SimCore, SimEvent, TICK_HZ, TickInput, ack_ring_ticks_at,
++    full_state_ack_ticks_at, loop_catchup_at, settings_step_ticks_at, ticks_for_ms,
++    ticks_for_ms_at,
 +};
++
++/// A derived constant's name, its value, its function of the tick rate, and the function's values at 30 and 60 Hz.
++type Derived = (&'static str, u32, fn(u32) -> u32, u32, u32);
++
++/// Each derived constant, its function of the tick rate, and that function's pinned values at 30 and at 60 Hz
++/// (u4-build-plan.md §4.3). check.mjs's deps step holds each constant's initializer to `<name>_at(TICK_HZ)`, and
++/// ticks.rs's const asserts hold each constant equal to its function at whatever TICK_HZ is, so the function's value at
++/// 60 Hz is the constant the 60 Hz build gets.
++const DERIVED: [Derived; 4] = [
++    ("LOOP_CATCHUP", LOOP_CATCHUP, loop_catchup_at, 7, 15),
++    (
++        "FULL_STATE_ACK_TICKS",
++        FULL_STATE_ACK_TICKS,
++        full_state_ack_ticks_at,
++        60,
++        120,
++    ),
++    ("ACK_RING_TICKS", ACK_RING_TICKS, ack_ring_ticks_at, 32, 64),
++    (
++        "SETTINGS_STEP_TICKS",
++        SETTINGS_STEP_TICKS,
++        settings_step_ticks_at,
++        30,
++        60,
++    ),
++];
 +
 +const FIELDS: [(&str, Field); 5] = [
 +    ("POSITION_XY", grid::POSITION_XY),
@@ -1131,22 +1568,18 @@ index 0000000..464fc48
 +
 +#[test]
 +fn s1_every_tick_constant_is_its_function_of_the_tick_rate_at_30_and_60_hz() {
-+    // The functions at both rates, pinned (u4-build-plan.md §4.3): catch-up 7 and 15, the FullState bound 60 and 120,
-+    // the AckRing 32 and 64, the ClientSettings step 30 and 60.
-+    for (hz, catchup, full_state, ring, step) in [(30, 7, 60, 32, 30), (60, 15, 120, 64, 60)] {
-+        assert_eq!(loop_catchup_at(hz), catchup, "LOOP_CATCHUP at {hz} Hz");
-+        assert_eq!(
-+            ticks_for_ms_at(hz, 2_000),
-+            full_state,
-+            "the FullState bound at {hz} Hz"
-+        );
-+        assert_eq!(ack_ring_ticks_at(hz), ring, "the AckRing at {hz} Hz");
-+        assert_eq!(
-+            settings_step_ticks_at(hz),
-+            step,
-+            "the ClientSettings step at {hz} Hz"
-+        );
++    // Each derived constant is its function at TICK_HZ, and the function is pinned at both rates (u4-build-plan.md
++    // §4.3): catch-up 7 and 15, the FullState bound 60 and 120, the AckRing 32 and 64, the ClientSettings step 30 and 60.
++    for (name, constant, at, at_30, at_60) in DERIVED {
++        assert_eq!(constant, at(TICK_HZ), "{name} is its function at TICK_HZ");
++        assert_eq!(at(30), at_30, "{name} at 30 Hz");
++        assert_eq!(at(60), at_60, "{name} at 60 Hz");
 +    }
++    // The FullState bound is 2 s at every rate, and the AckRing stays small at the highest rate TICK_HZ may take.
++    for hz in [1, 30, 60, 1_000] {
++        assert_eq!(full_state_ack_ticks_at(hz), ticks_for_ms_at(hz, 2_000));
++    }
++    assert_eq!(ack_ring_ticks_at(1_000), 1_066);
 +    // ticks_for_ms rounds up, at both rates.
 +    for (hz, ms, ticks) in [
 +        (30, 0, 0),
@@ -1165,12 +1598,8 @@ index 0000000..464fc48
 +        u32::MAX,
 +        "no overflow at the largest rate"
 +    );
-+    // The build's constants are those functions at TICK_HZ, 30 here.
++    // The build's rate is 30, and ticks_for_ms is ticks_for_ms_at at it.
 +    assert_eq!(TICK_HZ, 30);
-+    assert_eq!(LOOP_CATCHUP, loop_catchup_at(TICK_HZ));
-+    assert_eq!(FULL_STATE_ACK_TICKS, ticks_for_ms_at(TICK_HZ, 2_000));
-+    assert_eq!(ACK_RING_TICKS, ack_ring_ticks_at(TICK_HZ));
-+    assert_eq!(SETTINGS_STEP_TICKS, settings_step_ticks_at(TICK_HZ));
 +    for ms in [0, 1, 33, 34, 2_000, 100_000] {
 +        assert_eq!(ticks_for_ms(ms), ticks_for_ms_at(TICK_HZ, ms));
 +    }
@@ -1297,8 +1726,14 @@ index 0000000..464fc48
 +
 +#[test]
 +fn s4_the_hit_history_keeps_exactly_its_capacity_and_evicts_the_oldest() {
-+    for capacity in [64, 32, 2, 1] {
-+        let mut h = HitHistory::new(capacity);
++    // Spans in ms (the ring is built from one: u4-build-plan.md §4.9), rounded up to whole ticks: at 30 Hz 64, 32, 2, 1
++    // and 1 ticks.
++    let spans = [2_133, 1_066, 66, 33, 1];
++    assert_eq!(spans.map(ticks_for_ms), [64, 32, 2, 1, 1]);
++    for span_ms in spans {
++        let capacity = ticks_for_ms(span_ms);
++        let mut h = HitHistory::for_ms(span_ms).expect("a span above 0 ms holds a tick");
++        assert_eq!(h.capacity(), capacity);
 +        assert!(h.is_empty());
 +        // Ticks that cross the u32 wrap.
 +        let start = u32::MAX - 40;
@@ -1334,6 +1769,15 @@ index 0000000..464fc48
 +    }
 +}
 +
++#[test]
++fn s4b_a_hit_history_of_zero_ms_is_refused() {
++    // A span of 0 ms holds no tick, so the ring refuses it rather than build one that could never hold its newest tick.
++    assert!(HitHistory::for_ms(0).is_none(), "0 ms is refused");
++    // Any span above it rounds up to at least one tick.
++    let one = HitHistory::for_ms(1).expect("1 ms holds a tick");
++    assert_eq!(one.capacity(), 1);
++}
++
 +/// A stand-in implementation: the seam is a trait a sim can implement with these types, and a room generic over it.
 +struct Stub {
 +    events: Vec<SimEvent>,
@@ -1343,11 +1787,17 @@ index 0000000..464fc48
 +    reports: InputReports,
 +}
 +
++/// Whether the lent ring holds what a Rewind names (seam.rs's rule): `tick_a`, and `tick_a + 1` when it blends toward it.
++fn held(history: &HitHistory, r: &Rewind) -> bool {
++    history.get(r.tick_a).is_some()
++        && (r.fraction == 0 || history.get(r.tick_a.wrapping_add(1)).is_some())
++}
++
 +impl SimCore for Stub {
 +    fn step(&mut self, input: &TickInput, history: &HitHistory) -> &[SimEvent] {
 +        self.events.clear();
 +        for (c, rewind) in &input.commands {
-+            if rewind.is_some_and(|r| history.get(r.tick_a).is_some()) {
++            if rewind.is_some_and(|r| held(history, &r)) {
 +                self.events.push(SimEvent::Shot {
 +                    slot: c.slot,
 +                    seq: c.seq,
@@ -1404,7 +1854,8 @@ index 0000000..464fc48
 +    send::<Field>();
 +    send::<Config>();
 +    send::<Stub>();
-+    // And the trait carries a tick: a shot whose Rewind the lent ring holds runs; one outside it does not.
++    // And the trait carries a tick: a shot whose Rewind the lent ring holds runs; one outside it does not (a tick the
++    // ring lacks, or a blend toward a tick it lacks), and a refused Rewind is as none.
 +    let mut sim = Stub {
 +        events: Vec::new(),
 +        records: vec![EntityRecord {
@@ -1419,11 +1870,11 @@ index 0000000..464fc48
 +        portals: PortalStates::default(),
 +        reports: InputReports::default(),
 +    };
-+    let mut history = HitHistory::new(4);
++    let mut history = HitHistory::for_ms(1_000).expect("1 s of ticks");
 +    history.push(&volumes(0));
-+    let fire = |tick_a| Rewind {
++    let fire = |tick_a, fraction| Rewind {
 +        tick_a,
-+        fraction: 128,
++        fraction,
 +        cover: CoverVariant::Rewound,
 +    };
 +    let input = TickInput {
@@ -1435,7 +1886,7 @@ index 0000000..464fc48
 +                    seq: 7,
 +                    ..Command::default()
 +                },
-+                Some(fire(0)),
++                Some(fire(0, 0)),
 +            ),
 +            (
 +                Command {
@@ -1443,7 +1894,7 @@ index 0000000..464fc48
 +                    seq: 9,
 +                    ..Command::default()
 +                },
-+                Some(fire(99)),
++                Some(fire(99, 0)),
 +            ),
 +            (
 +                Command {
@@ -1451,6 +1902,14 @@ index 0000000..464fc48
 +                    ..Command::default()
 +                },
 +                None,
++            ),
++            (
++                Command {
++                    slot: 4,
++                    seq: 2,
++                    ..Command::default()
++                },
++                Some(fire(0, 128)),
 +            ),
 +        ],
 +    };
@@ -1462,75 +1921,143 @@ index 0000000..464fc48
 +    assert!(sim.portal_states().open.is_empty() && sim.reports().clamps.is_empty());
 +}
 +
++#[test]
++fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
++    assert_eq!(EntityKind::ALL.len(), 7);
++    for (i, kind) in EntityKind::ALL.into_iter().enumerate() {
++        // In declaration order, each kind once.
++        assert!(EntityKind::ALL[..i].iter().all(|k| *k < kind), "{kind:?}");
++        let layout = kind.layout();
++        assert!(layout.len() <= EntityRecord::FIELDS, "{kind:?}");
++        for f in layout {
++            let span = i64::from(f.max()) - i64::from(f.min()) + 1;
++            assert!(
++                span <= 1 << f.bits() && span > 1 << (f.bits() - 1),
++                "{kind:?}: {span} integers in {} bits, the fewest",
++                f.bits()
++            );
++        }
++    }
++    // The catalogue's rows (docs/design/netcode-proof-messages.md §3), U4d to complete: a soldier's position, yaw,
++    // pitch, velocity and 8 flag bits; a projectile's start tick (32 bits), start position and velocity.
++    let flags = Field::integer(0, 255);
++    assert_eq!(
++        EntityKind::Soldier.layout(),
++        [
++            POSITION_XY,
++            POSITION_XY,
++            POSITION_Z,
++            YAW,
++            PITCH,
++            VELOCITY,
++            VELOCITY,
++            VELOCITY,
++            flags
++        ]
++    );
++    let tick = Field::integer(i32::MIN, i32::MAX);
++    assert_eq!(
++        EntityKind::Projectile.layout(),
++        [
++            tick,
++            POSITION_XY,
++            POSITION_XY,
++            POSITION_Z,
++            VELOCITY,
++            VELOCITY,
++            VELOCITY
++        ]
++    );
++    // An integer field takes the fewest bits that hold its range, never wraps, and is its own kind: never equal to a
++    // grid field of the same integers.
++    for (min, max, bits) in [
++        (0, 1, 1),
++        (0, 255, 8),
++        (0, 256, 9),
++        (-1, 0, 1),
++        (-511, 511, 10),
++        (i32::MIN, i32::MAX, 32),
++    ] {
++        let f = Field::integer(min, max);
++        assert_eq!(
++            (f.min(), f.max(), f.bits(), f.wraps()),
++            (min, max, bits, false),
++            "{min}..={max}"
++        );
++    }
++    assert_ne!(Field::integer(-32_768, 32_767), POSITION_XY);
++    assert_ne!(POSITION_XY, VELOCITY, "one range, two kinds");
++}
++
++/// The share of position values from 0 to 20 m, in sixteenths of a centimetre, on which `a` and `b` differ.
++#[cfg(feature = "bites")]
++fn differing_share(a: impl Fn(f32) -> f32, b: impl Fn(f32) -> f32) -> f64 {
++    let (mut differ, mut all) = (0u32, 0u32);
++    for k in 0..2_000 {
++        for sixteenth in 0..16 {
++            let x = ((f64::from(k) + f64::from(sixteenth) / 16.0) / 100.0) as f32;
++            differ += u32::from(a(x).to_bits() != b(x).to_bits());
++            all += 1;
++        }
++    }
++    f64::from(differ) / f64::from(all)
++}
++
 +#[cfg(feature = "bites")]
 +#[test]
-+fn the_grids_bites_are_listed_chosen_per_value_and_each_moves_values_off_the_wire_grid() {
-+    assert_eq!(Config::BITES.len(), 5);
-+    for id in Config::BITES {
-+        assert!(
-+            Config::with_bite(id).is_some_and(|c| c != Config::default()),
-+            "{id}"
-+        );
-+    }
-+    assert!(Config::with_bite("PM-0001-17/no-such-bite").is_none());
-+    let wire = Config::default();
-+    // Floor rounding (-17's client site, -41's own-copy snap): it differs from the nearest on about half of all
-+    // position values (u4-build-plan.md §4.14's unit proof for PM-0001-17/client-rounding).
-+    for id in [
-+        "PM-0001-17/client-rounding",
-+        "PM-0001-41/server-quant-differs",
-+    ] {
-+        let floor = Config::with_bite(id).unwrap();
-+        let (mut differ, mut all) = (0u32, 0u32);
-+        for k in 0..2_000 {
-+            for sixteenth in 0..16 {
-+                let x = ((f64::from(k) + f64::from(sixteenth) / 16.0) / 100.0) as f32;
-+                differ += u32::from(
-+                    floor.to_grid(grid::POSITION_XY, x) != wire.to_grid(grid::POSITION_XY, x),
-+                );
-+                all += 1;
-+            }
-+        }
-+        let share = f64::from(differ) / f64::from(all);
-+        assert!((0.45..=0.6).contains(&share), "{id}: {share}");
-+    }
-+    // The coarse bites (-57's encoder sites): the stated steps, on their own kind only, never past the field.
-+    for (id, f, every, other) in [
-+        ("PM-0001-57/pos-4cm", grid::POSITION_XY, 4, grid::YAW),
-+        ("PM-0001-57/pos-4cm", grid::POSITION_Z, 4, grid::PITCH),
-+        ("PM-0001-57/yaw-12bit", grid::YAW, 16, grid::POSITION_XY),
-+        ("PM-0001-57/pitch-8bit", grid::PITCH, 4, grid::VELOCITY),
-+    ] {
-+        let bite = Config::with_bite(id).unwrap();
-+        let mut worst = 0.0f64;
-+        for k in (f.min()..=f.max()).step_by(3) {
++fn the_grids_one_defect_rounds_down_and_moves_about_half_of_all_positions_off_the_wire_grid() {
++    let (wire, floor) = (Config::default(), Config::floor_rounding());
++    assert_ne!(floor, wire);
++    // Down, not to the nearest: 12.5 cm and 12.9 cm to 12, -12.5 cm to -13; a grid value stays itself.
++    assert_eq!(floor.to_grid(POSITION_XY, 0.125), 12);
++    assert_eq!(floor.to_grid(POSITION_XY, 0.129), 12);
++    assert_eq!(floor.to_grid(POSITION_XY, -0.125), -13);
++    // Each field's ends still hold, and from_grid is the wire grid's.
++    for (name, f) in FIELDS {
++        for k in [f.min(), f.min() + 1, 0.max(f.min()), f.max() - 1, f.max()] {
 +            let x = wire.from_grid(f, k);
-+            let got = bite.to_grid(f, x);
-+            // A multiple of the coarse step, or a field end where the step's multiple fell outside.
-+            assert!(
-+                got % every == 0 || got == f.min() || got == f.max(),
-+                "{id}: {k} → {got}"
-+            );
-+            assert!((f.min()..=f.max()).contains(&got), "{id}: {k} → {got}");
-+            let e = error_in_steps(f, x, got).abs();
-+            if e > worst {
-+                worst = e;
-+            }
-+            assert_eq!(
-+                bite.to_grid(other, wire.from_grid(other, 0)),
-+                0,
-+                "{id} leaves other kinds alone"
-+            );
-+            assert_eq!(
-+                bite.from_grid(f, k).to_bits(),
-+                x.to_bits(),
-+                "{id}: from_grid unchanged"
-+            );
++            assert_eq!(floor.from_grid(f, k).to_bits(), x.to_bits(), "{name}: {k}");
++            let got = floor.to_grid(f, x);
++            assert!((f.min()..=f.max()).contains(&got), "{name}: {k} → {got}");
 +        }
-+        let half = f64::from(every) / 2.0;
-+        assert!(
-+            worst > half - 1.0 && worst <= half + 0.01,
-+            "{id}: worst error {worst} steps"
++        assert_eq!(
++            floor.to_grid(f, f32::INFINITY),
++            wire.to_grid(f, f32::INFINITY)
 +        );
 +    }
++    // About half of all positions off the wire grid (the share -17's and -41's unit proofs rest on).
++    let share = differing_share(
++        |x| floor.from_grid(POSITION_XY, floor.to_grid(POSITION_XY, x)),
++        |x| wire.from_grid(POSITION_XY, wire.to_grid(POSITION_XY, x)),
++    );
++    assert!((0.45..=0.6).contains(&share), "{share}");
++}
++
++#[cfg(feature = "bites")]
++#[test]
++fn pm_0001_41_server_quant_differs_is_planted_at_the_own_copy_snap_alone() {
++    let id = "PM-0001-41/server-quant-differs";
++    assert_eq!(npt_sim::OWN_COPY_SNAP_BITES, [id]);
++    let own = npt_sim::own_copy_snap_with_bite(id).expect("the own-copy snap plants -41's");
++    assert_eq!(own, Config::floor_rounding());
++    // No id of another site: the client's (-17), the encoder's (-57), the authority step's other (-41's speed bite,
++    // U4d's World), an unknown one.
++    for other in [
++        "PM-0001-17/client-rounding",
++        "PM-0001-57/pos-4cm",
++        "PM-0001-57/yaw-12bit",
++        "PM-0001-57/pitch-8bit",
++        "PM-0001-41/server-speed-1pct",
++        "PM-0001-41/no-such-bite",
++    ] {
++        assert!(npt_sim::own_copy_snap_with_bite(other).is_none(), "{other}");
++    }
++    // u4-build-plan.md §4.14's unit proof: the snapped copy differs from the one sent. The record carries the wire
++    // grid's integer (EntityRecord's rule), the bitten snap keeps its own: about half of all positions differ.
++    let wire = Config::default();
++    let share = differing_share(
++        |x| own.snap(POSITION_XY, x),
++        |x| wire.from_grid(POSITION_XY, wire.to_grid(POSITION_XY, x)),
++    );
++    assert!((0.45..=0.6).contains(&share), "{share}");
 +}
