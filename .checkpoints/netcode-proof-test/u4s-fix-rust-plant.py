@@ -50,6 +50,10 @@ BITES = {
     # Item 10, self-test: the name rule forgets `*CATCHUP*` names.
     "F10b-catchup-names-dropped": ("check.mjs", [(
         "export const TICK_NAMED = /_TICKS$|CATCHUP/;", "export const TICK_NAMED = /_TICKS$/;")]),
+    # Item 3: a broken intra-doc link in the Rewind rule's text (rustdoc -D warnings must refuse it; check.mjs runs no
+    # rustdoc, so it is expected to PASS check.mjs).
+    "F3-doc-link": ("crates/sim/src/seam.rs", [(
+        "[`InputReports::rewind_outside`]", "[`InputReports::rewind_outsde`]")]),
 }
 
 
