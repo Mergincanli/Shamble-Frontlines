@@ -584,6 +584,15 @@
     belong to the room), netcode 2 (canonical command order), arch F1 (the grid's bite ids must sit where their code
     lives: -57's coarsening to npt-proto's Quant), arch F2 (the per-kind field layout defined in npt-sim; VELOCITY fixed
     for wave 1).
+  - **About 18:15 UTC: the advisor's F1/F2 ruling applied** (advisor-u4.md "Ruling: F1 and F2"; plan sha256
+    0d69332c…, carries 505e54d6…): F1 the sizes (16.8 MB, 50.5 MB, 4.2 million; "about 17 MB" at :46, :138, :946);
+    F2: no new tick count is needed by U4b or U4e; the Input refill and the window budget take the rate as an argument
+    (carry 6's pattern, pinned at 30 and 60 Hz); anything found later goes to the main session's own commit by carry
+    18's route once no lane owns crates/sim or check.mjs. **U4a's builder launched** (single background agent,
+    worktree, base dffef0e, shared target; carries 1-5 and 34 word for word; notes u4a-build.md in its worktree): the
+    third agent beside the U4d/U4c workflow. Its reviews (netcode, rust, test per §5) wait for free slots. If cut:
+    snapshot its worktree (`git worktree list` names it agent-…) with worktree_patch.py (wip/u4a.patch u4a-), then a
+    fresh builder continues from its notes. Then U4b and U4j.
   - **About 18:00 UTC: conditions 1-3 applied** (u4-build-plan.md sha256 7ec1b324…, recorded under the ruling; carries
     completed and corrected per the check, sha256 4a8c0ee8…, 45 entries; F1 sizes and F2 the U4b/U4e tick-constant
     route to the advisor, background agent). **Wave 1 lanes U4d and U4c launched:** workflow `wf_f54246ff-e0d`
