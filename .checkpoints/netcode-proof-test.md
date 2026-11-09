@@ -540,6 +540,13 @@
     Spike follow-ons still owed: marks.json -18 split (parts by transport, the WS three checks, count >= 480, the
     bites); the ws-practice validity rule; SERIES burst_heal and burst_return; the R3 run plan; fixes.rs's
     run-structured bound (needs U4's scene sizes).
+  - **About 09:50 UTC: U4's planning workflow `wf_899b9cf1-c90` (npt-u4-plan) launched on f985226:** scouts
+    (engine-architect u4-scout-arch.md; test-engineer u4-scout-marks.md; netcode-architect u4-scout-netcode.md), a
+    netcode-architect drafter (u4-build-plan.md rev 1, u4-build-plan-notes.md), critics (u4-plan-review-test.md,
+    u4-plan-review-arch.md), the fold (rev 2, u4-plan-rev2-notes.md), then the advisor (its verdict returned as text;
+    the main session writes advisor-u4.md). Read-only agents in the main folder. If cut: Workflow({scriptPath:
+    /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u4-plan-wf_899b9cf1-c90.js,
+    resumeFromRunId: "wf_899b9cf1-c90", args: {head: "f985226"}}).
 - **About 22:50 UTC: U3c CLOSED on the closing head 768d00ba7a77529b524fc9f6df90d6494f87abcc** (pushed). The advisor's
   U3C-CLOSE conditions: (1) C2d's critic complete, no gap, no regression (u3c-fix4-review-c2d.md; 10 of 12 bites, the 2
   missed are design details cargo itself refuses); (2) check.mjs 9/9 on the clean closing head (260 measured, 274
