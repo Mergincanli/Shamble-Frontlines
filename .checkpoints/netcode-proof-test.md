@@ -532,6 +532,11 @@
     reruns: tell it to continue its notes file after the last line); if the run is gone, relaunch the same script.
     Then fold the critics into u3d-plan.md rev 2 and send it to the advisor. Also restart the saver
     (`node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "..."`), and check Mustafa's cleanup answer.
+  - **2026-11-09 about 01:05 UTC (after the reset; Mustafa: "continue"):** wf_77078bc9-95f had ended with all 5 agents
+    failed on the spend limit (none completed, so nothing to replay). The script now tells each agent to continue its
+    notes file if it exists; relaunched as **`wf_941d1cee-cfa`** (same script path, args {head: "95dac9c"}); the saver
+    restarted. If cut again: Workflow({scriptPath: the same script, resumeFromRunId: "wf_941d1cee-cfa", args: {head:
+    "95dac9c"}}). Mustafa has not answered the cleanup ask yet.
 - **About 22:10 UTC: the condition-10 diagnostic DONE and committed (ecdeeb0)**:
   results/u3c-lateness/c10-diagnostic-20261108T2152Z.txt (identical to the raw output; redact 0). Split violations 0.
   Clock part p99.9 1.6-2.3 ms, max 3.1-6.8 ms; hop p99.9 1.5-2.0 ms, max 2.7-3.8 ms; work down max 3.1-6.5 ms, up (the
