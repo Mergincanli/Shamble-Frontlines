@@ -183,11 +183,12 @@ the critics'.
 | npt-sim | seam data: `Command`, `Rewind`, `TickInput`, `EntityRecord`, `HitVolumes`, `HitHistory` (moved from npt-room), `PortalStates`, `SimEvent`; `InputReports` and `SimCore::reports` (the clamp reports and the refusal counters, outside the hash: the advisor's condition 1) | §4.2; A1, A2; the advisor's condition 1 |
 | npt-sim | `Recording`, `StateDump`, `replay::Replayer` | RQ5's field diff; U4-REPLAY; A12's one driver |
 | npt-sim | `World::predict`, `World::load_movers`, `World::ray_cast`; `Scene::estimate`, `Scene::course`, `Scene::targets` beside `Scene::stress` | ADR 0004:166-178; ADR 0001:258-260; ADR 0001:1470-1482 |
+| npt-sim | `EntityKind::ALL` and `EntityKind::layout`; `grid::Field::integer`; `full_state_ack_ticks_at`; `HitHistory::for_ms` in place of `HitHistory::new`; bites builds only: `grid::Config::floor_rounding`, `OWN_COPY_SNAP_BITES` and `own_copy_snap_with_bite`. Removed: bites-only `grid::Config::BITES` and `grid::Config::with_bite` (the advisor's U4s ruling, condition 1 (a)) | u4s-carries.md carry 30: arch F2 (one home for the per-kind field order; one type for a layout's fields); rust 1 (each derived constant is `<name>_at(TICK_HZ)`); netcode F6, A5; arch F1 |
 | npt-proto | `RoomControl` (unfeatured; N5) | catalogue item 6 (:253); U5's fuzz target (catalogue :280) |
 | npt-proto | `Wrap` (one compare per width, called with its counter's name) | -58's per-counter bites (§4.14) |
 | npt-proto | `client_hash`; the `EntityRecord` ↔ wire mapping | -17 (§4.6); A18 |
 | npt-proto | dependencies on npt-sim (grid, seam types) and npt-link (`Channel`) | U4-OWNSNAP, A18; catalogue item 2 (arch F37); leaf to leaf |
-| npt-client | a dependency on npt-link, for `Channel` | as above |
+| npt-client | a dependency on npt-link, for `Channel`; bites builds only, `BITES` and `grid_with_bite` (the advisor's U4s ruling, condition 1 (a)) | as above; u4s-carries.md carry 30: arch F1 |
 | npt-room | `Room<S: SimCore>`; `InputBuffer::CMD_CATCHUP` | U4-SEAM; RQ6 |
 | npt-server | `Decoder::pump` (the I/O step over `&mut dyn Link`, injected `now`, the ping sender, per-client RTT and bytes sent); `Schedule`, `Due` | U4-SERVER; §4.3; A6, A7 |
 | npt-l1 | `L1Net::next_event_ns` | C1' makes L1 event-driven |
@@ -233,16 +234,17 @@ the critics'.
 - Pools have fixed capacity; a full pool refuses and counts. The tick's event list is state and hashed
   (ADR 0004:544-561).
 - **Refused input leaves no trace in the hash (the advisor's condition 1).** ADR 0004:544-556 hashes the tick's event
-  list, so the clamp reports and every refusal counter (the cooldown, ammunition and reload edges, non-finite
-  components, Rewinds outside the ring, a full pool) stay outside `state_hash` and outside that list: they live in
-  `reports()`, and the room logs them. Any per-soldier input state the sim keeps holds what the server accepted, never
-  what the client claimed, so a refused part changes nothing on the ticks after it either (the press counters are the
-  case to watch: D-10 runs past the next accepted press).
+  list, so the clamp reports and every refusal counter (the cooldown, ammunition and reload edges, Rewinds outside the
+  ring, a full pool) stay outside `state_hash` and outside that list (the advisor's U4s ruling, condition 1 (b)): they
+  live in `reports()`, and the room logs them. Any per-soldier input state the sim keeps holds what the server accepted,
+  never what the client claimed, so a refused part changes nothing on the ticks after it either (the press counters
+  are the case to watch: D-10 runs past the next accepted press).
 
 ### 4.3 The tick constant, the derived constants and the loop policy
 - In npt-sim: `TICK_HZ = 30`; `LOOP_CATCHUP = TICK_HZ / 4` (7 at 30 Hz, 15 at 60 Hz); `const fn ticks_for_ms(ms)` =
   ⌈ms x TICK_HZ / 1,000⌉. Every tick-counted value is such a function of TICK_HZ, never a literal (A5):
-  - the FullState acknowledgement bound: `ticks_for_ms(2_000)` (60 at 30 Hz, 120 at 60 Hz);
+  - the FullState acknowledgement bound: `full_state_ack_ticks_at(TICK_HZ)`, which is `ticks_for_ms(2_000)` (60 at
+    30 Hz, 120 at 60 Hz); `TICK_HZ` is asserted in 1 to 1,000 (the advisor's U4s ruling, condition 1 (a));
   - the AckRing and the client's frame ring: `32 x TICK_HZ / 30` ticks (32, 64; 1.067 s);
   - the ClientSettings step: one interval per second, `TICK_HZ` ticks;
   - the HitHistory capacity: `ticks_for_ms(test cap + margin)` from U4h's data.
@@ -438,12 +440,12 @@ sub-unit that moves its mark.
 | Bite | Its site | The check it fails | Run setting | Unit proof |
 |---|---|---|---|---|
 | -17/tick16, -58/tick16 | proto's header writer and the client's tick rebuild (the 16-bit value taken as the tick) | decoded hash: post-wrap frames logged under the wrong tick (an orphan pair) or as the sentinel | -17: `tick_start` = 63,736; -58: `ticks_below_wrap` = 30 | a frame at tick 65,537 hashes differently or is refused |
-| -17/client-rounding | npt-client's call into `grid` (floor in place of nearest) | decoded hash | any -17 profile | the floor variant differs on about half of all position values |
+| -17/client-rounding | npt-client's call into `grid` (floor in place of nearest); the id lives in npt-client (`npt_client::BITES`, `grid_with_bite`), the grid holding only the defect (the advisor's U4s ruling, condition 1 (a)) | decoded hash | any -17 profile | the floor variant differs on about half of all position values |
 | -18/no-fallback | the encoder's baseline choice, never falling back to the defaults | `burst_heal` (the fresh delta) | B1, ring ages 0-31 | a 1 s gap evicts B; `burst_eviction` = 1 |
 | -21/not-older-than | the room's tick check (≥ in place of >) | fast clock's excess commands | the fast-clock suite, option A (marks.json -21 notes) | an equal-tick command runs |
 | -21/no-catchup-cap | the room's per-tick command cap | forged: unrejected | the forged suite, option A, two datagrams in one tick | 16 commands run in one tick |
 | -41/server-speed-1pct | the authority step's run speed x 1.01, not `predict`'s (Q24) | untraced corrections | CO, every profile | one moving tick differs |
-| -41/server-quant-differs | the authority step's own-copy snap with another rounding than `grid`'s (Q23) | untraced corrections | CO | the snapped copy differs from the sent one |
+| -41/server-quant-differs | the authority step's own-copy snap with another rounding than `grid`'s (Q23); the id lives at npt-sim's own-copy snap side (`OWN_COPY_SNAP_BITES`, `own_copy_snap_with_bite`), the grid holding only the defect (the advisor's U4s ruling, condition 1 (a)) | untraced corrections | CO | the snapped copy differs from the sent one |
 | -45/buffer-one-short | Interp's slot count | L1 P2: extrapolated share < 1 % | P2; size = the clean P2 runs' logged largest delay in intervals + 2 - 1; the delay never clamped to the buffer | extrapolation on a fixed P2 arrival trace |
 | -48/no-buffer-wait | the estimate without the input-buffer wait | view-hit share | where the buffer settles at 2 ticks or more (P3, option B, read from -20's logged depth; below 2, the advisor is asked before a fixed minimum is set) | honest view times replaced |
 | -58/lt-cmd-seq | the room's sequence-forward compare | 0 commands refused | sequence 2 below its wrap | post-wrap commands refused |
@@ -458,11 +460,12 @@ sub-unit that moves its mark.
 
 ### 4.15 Recordings (A1, A12, T9; Q4)
 - **Fields:** a header (scene, seed, TICK_HZ, pool sizes, HitHistory's capacity (nit b)); then per tick a
-  `TickInput`: per soldier one `Command` (slot 1 B, tick 4, sequence 2, buttons 2, press counters 4, move 4, aim in cm 12, view tick 4 and fraction 1) and its
+  `TickInput`: per soldier one `Command` (slot 1 B, tick 4, sequence 2, buttons 2, press counters 4, move 2 (the advisor's U4s ruling, condition 1 (a)), aim in cm 12, view tick 4 and fraction 1) and its
   `Rewind` (present 1, tick_a 4, fraction 1, cover 1); spawns, teleports and scripted attribute changes when they occur.
   Fixed-width little-endian, no `usize` (plan.md:527-529).
-- **Size:** about 41 B per command; 48 commands a tick, about 1,973 B a tick, about 17.8 MB per 9,000 ticks and 53 MB
-  for three (my arithmetic; U4d states the measured size). Fed to Wasm as 32-bit words: about 4.4 million calls each.
+- **Size:** 39 B per command (move is 2 B), so about 1,872 B a tick of commands for 48 soldiers before spawns and the
+  tick's own header (the advisor's U4s ruling, condition 1 (a)); about 17.8 MB per 9,000 ticks and 53 MB for three (my
+  arithmetic; U4d states the measured size). Fed to Wasm as 32-bit words: about 4.4 million calls each.
 - **Both uses:** the sim-only replay steps npt-sim with each `TickInput` and the ring the driver rebuilds; -30's
   pre-check (a recorded npt-lab test, never judged: the advisor's condition 2) takes the SS P0 recording below (the
   advisor's condition 3) and re-encodes its commands as `Input` (stamped ticks, view times, sequences and press
@@ -521,8 +524,9 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
     buffers per type return an error, never a panic.
   - a3 limits: the size check runs first: a buffer one byte over its type's limit returns the size error whatever its
     content, even when it is also malformed (the allocation half is U5's: Q8).
-  - a4 the packed widths at their range ends (bites pos-4cm, yaw-12bit, pitch-8bit, set through the grid config:
-    -57's sites).
+  - a4 the packed widths at their range ends (bites pos-4cm, yaw-12bit, pitch-8bit: -57's sites, set through `Quant`'s
+    own bite choice in npt-proto, as integer coarsening, not through the grid config; the ids in npt-proto's own list)
+    (the advisor's U4s ruling, condition 1 (a)).
   - a5 `Wrap`: each width across its wrap, per counter name (bites: a plain `<` for one named counter; tick16).
   - a6 `Input`: whole command and repeat at their maxima; a repeat never larger; 8 commands within 166 B; trailing bytes
     give `TrailingBytes` (bite no-trailing).
@@ -590,7 +594,13 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
     is U4d2's release-build step.
   - D-3 prediction equals authority for one slot, bit for bit, given exact movers, snap included; the predicting World's
     streams untouched.
-  - D-4 a non-finite command component is refused and counted; a debug assert each tick.
+  - D-4 every value that enters the sim from outside is finite by type: `Command`, `Rewind` and `TickInput`, its spawn,
+    teleport and attribute fields included, hold integers only, so nothing is refused or counted; a debug and test
+    assertion each tick that the World holds no non-finite value (every float read by `to_bits`, as the hash reads
+    it), shown by a planted `0.0 / 0.0` in one phase that trips it at its tick (a scratch plant, §7.2); and an overflow
+    test: recorded commands with `move_xy` at -128 and 127 and `aim` at `i32::MIN` and `i32::MAX` step in a debug
+    build (overflow checks on) without a panic (carry 15). The words are the ruling's new D-4; carry 15 is
+    u4s-carries.md's (the advisor's U4s ruling, condition 1 (b)).
   - D-5 a full pool refuses and counts.
   - D-6 the SS counters, asserting PM-0001-2's thresholds exactly, never "about" (the advisor's condition 5): on every
     tick 48 soldiers (alive or awaiting respawn), teams of at least 16, at least 15 big vehicles of which at least 4
@@ -809,6 +819,14 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
   ownership: U4a crates/proto and check.mjs; U4c crates/l1; U4d crates/sim; U4b crates/server/src/schedule.rs and
   server/clippy.toml; U4j crates/judge, crates/log and marks/. No file is shared. U4c's L-c8 judged re-run waits for
   U4j's merge.
+  - **Freeze the seam's shapes for wave 1.** Through wave 1, U4d keeps unchanged every existing field, variant and
+    width of `Command`, `Rewind`, `CoverVariant`, `EntityKind` and `EntityRecord` (FIELDS 12), and the five grid
+    fields as built at f080551. It may add items (World, carry 17's button constants, `TickInput`'s new fields),
+    complete `layout()` within FIELDS (carry 12), and drop `InputReports::non_finite` (NF-D4). A change to an
+    existing item waits for U4d's merge and goes to the main session, as carry 1 already says for the grid. Why: U4a
+    builds its codec and field tables against these types at the same time, so a silent change breaks the second
+    merge. The words are the ruling's condition 3; the carries are u4s-carries.md's
+    (the advisor's U4s ruling, condition 1 (d)).
 - **Wave 2:** U4d2 (after U4d) and U4e (after U4a, U4b, U4d) in parallel: U4d2 owns check.mjs, Cargo.toml's members,
   Cargo.lock, crates/hash-wasm and npt-lab's `hash`; U4e owns crates/room, crates/server (beyond schedule.rs) and
   crates/client. In wave 2 only U4d2 edits crates/lab, its Cargo.toml included; U4e's tests live in its own crates
@@ -857,8 +875,9 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
    server code.
 
 ### 7.2 Who builds, and how
-- Each sub-unit: one builder (general-purpose, opus, effort xhigh) in an isolated worktree, or the main session for
-  U4s, U4b and U4j; the bites planted by a scratch script under §7.1; merged by the main session, one at a time.
+- Each sub-unit: one builder (general-purpose, opus, effort xhigh) in an isolated worktree, or, for U4s, U4b and U4j,
+  the main session or one builder in a free lane (the advisor's U4s ruling, condition 1 (c)); the bites planted by a
+  scratch script under §7.1; merged by the main session, one at a time.
 - Judged L1 runs: the main session, in the main folder, on release builds, one set at a time, in the background;
   raw logs under .gate/, verdicts and runs.txt committed under results/.
 - **Public items (A19):** each report lists the pub items it adds, by crate, against §4.1; engine-architect checks them

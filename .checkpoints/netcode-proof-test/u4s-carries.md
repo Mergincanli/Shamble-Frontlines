@@ -9,6 +9,10 @@ line numbers are the fix pass's.
 Each entry: the finding (review, id), then **the text the brief must carry**, word for word. A brief may reword the
 plain parts, never the rule.
 
+Completed by the netcode-architect, 2026-11-09, under the advisor's U4s ruling (advisor-u4.md:236-375): its condition 2
+(:313-327) adds entries 34-39 and 41-44 and rewords carry 7; its open item O1 (:343-347) adds entry 40. Each is marked
+with the ruling. The file now holds 44 entries; the wave-1 briefs carry them word for word (its condition 4).
+
 ## What the fix pass fixed (for the record; not carried)
 - netcode F1 / arch N1: seam.rs:15-21, :26, :38-42 (the sim reads slot, seq, buttons, presses, move_xy, aim; tick and
   view time are the room's and the recording's; the sim uses the Rewind). Its test is carried to U4d (below).
@@ -55,17 +59,33 @@ plain parts, never the rule.
 5. **this pass (§5 U4a's a4 text):** "a4's -57 bites are set through `Quant`'s own bite choice, not through the grid
    config (u4-build-plan.md §5 U4a's 'set through the grid config' is superseded by the fix pass: see the main
    session's plan-text item below)."
+34. **rust fix2 nits (u4s-fix2-review-rust.md:90-93; the advisor's U4s ruling, condition 2):** "U4a addresses each of
+    four check.mjs nits, by a fix or a stated deferral in its report: nothing in check.test.mjs pins `STEPS.doc` or its
+    `-D warnings` (as for fmt, clippy and test); the doc step documents the host build only (npt-tcpinfo's non-Linux
+    stub is never documented); `lintBothBuilds` says 'both linted' when only the bites build fails; a measured-build
+    doc failure's one-line summary is cargo's last line ('warning: build failed, waiting for other jobs to
+    finish...'), with the detail in the lines below it. Their home is U4a's brief (wave 1's only check.mjs editor:
+    u4-build-plan.md Lanes, wave 1) or, if U4a's report does not list this entry as met, U4d2's (entry 42); never the
+    main session while U4a owns check.mjs."
 
 ## U4b (the loop policy: npt-server's schedule.rs; wave 1)
 6. **arch F6 / rust 1 (the grep's stated limit):** "The tick grep cannot see a literal passed as an argument. npt-server's
    and npt-lab's callers build `Schedule::new(npt_sim::TICK_HZ, npt_sim::LOOP_CATCHUP)`; the 60 Hz tests pass
    `npt_sim::loop_catchup_at(60)`, never a literal 15; a test asserts the server's schedule's catch-up cap equals
    `npt_sim::LOOP_CATCHUP`."
+35. **rust fix review nit (u4s-fix-review-rust.md:114-115; the advisor's U4s ruling, condition 2):** "A tick count
+    needed outside npt-sim goes into npt-sim as `<name>_at` plus its constant (carry 18's route), and the crate uses it
+    by path. Why: check.mjs:627 lets an initializer that merely names `TICK_HZ` through, and nothing pins such a value
+    at 60 Hz." (For the brief writer: in wave 1 crates/sim is U4d's lane and check.mjs U4a's (u4-build-plan.md Lanes),
+    so a U4b builder that needs such a constant asks the main session, which places it; flagged to the advisor in
+    u4s-conditions-notes.md.)
 
 ## U4d (the stand-in sim: npt-sim; wave 1)
-7. **netcode F1:** "A unit test: two commands that differ only in `tick`, `view_tick` and `view_fraction` (with equal
-   Rewinds) step to equal state hashes on that tick and on every tick after; the sim reads no `Command` field but
-   `slot`, `seq`, `buttons`, `presses`, `move_xy` and `aim` (seam.rs `Command`)."
+7. **netcode F1 (reworded by the advisor's U4s ruling, condition 2):** "A unit test: two commands that differ only in
+   `tick`, `view_tick` and `view_fraction` (with equal Rewinds) step to equal state hashes on that tick and on every
+   tick after; of `Command`'s fields, the state reads `slot`, `seq`, `buttons`, `presses`, `move_xy` and `aim`, and no
+   state depends on any other `Command` field (seam.rs `Command`; carry 8's order assert reads `tick`, and that is
+   correct)."
 8. **netcode F2:** "`World::step` debug-asserts that `TickInput::commands` is in the canonical order (slot ascending;
    within a slot, command tick strictly ascending, wrap-aware: `b` after `a` when `b.wrapping_sub(a) as i32 > 0`),
    with a debug-build test that an out-of-order input panics. The synthetic recording generator writes the order, and
@@ -110,6 +130,15 @@ plain parts, never the rule.
     U4d states the measured size."
 20. **arch N2:** "`grid::Config` has a bites-only field, so its shape differs by build: never hash, record or compare it
     across builds; pass it by value."
+36. **rust fix review nit (u4s-fix-review-rust.md:112-113; the advisor's U4s ruling, condition 2):** "s6 ties
+    `EntityKind::ALL` to the enum with an exhaustive match in place of the literal length assert
+    (`assert_eq!(EntityKind::ALL.len(), 7)`, crates/sim/tests/seam.rs:440), so a new variant fails to compile."
+37. **NF-D4 (advisor-u4.md:351-364; the advisor's U4s ruling, condition 2):** "`TickInput` stays integer-only, its
+    spawn, teleport and attribute fields included, so every value that enters the sim from outside is finite by type
+    (the new D-4, u4-build-plan.md §5 U4d); U4d removes `InputReports::non_finite`. If a float field ever joins
+    `TickInput`, the counter and its refusal test come back (none is planned)."
+38. **condition 1's rule (advisor-u4.md:83-84; the advisor's U4s ruling, condition 2):** "`StateDump` holds exactly
+    what `state_hash` hashes, never `InputReports`, so a twin's field diff never shows a counter."
 
 ## U4e (the room, the server I/O step and the client)
 21. **netcode F2 (the room's half):** "The room sorts each tick's accepted commands into the canonical order
@@ -130,16 +159,36 @@ plain parts, never the rule.
 27. **this pass (CMD_CATCHUP):** "`InputBuffer::CMD_CATCHUP = npt_proto::Limits::REDUNDANCY_CAP` with its const assert
     (§4.3). The tick grep exempts the name `CMD_CATCHUP` alone (check.mjs `NOT_TICK_COUNTS`); every other `*_TICKS` or
     `*CATCHUP*` const or static under crates/ but crates/net/ is never set from a literal, tests included."
+39. **rust fix review nit (u4s-fix-review-rust.md:114-115; the advisor's U4s ruling, condition 2):** "A tick count
+    needed outside npt-sim goes into npt-sim as `<name>_at` plus its constant (carry 18's route), and the crate uses it
+    by path. Why: check.mjs:627 lets an initializer that merely names `TICK_HZ` through, and nothing pins such a value
+    at 60 Hz." (For the brief writer: in wave 2 crates/sim is no lane's and check.mjs is U4d2's (u4-build-plan.md
+    Lanes), so a U4e builder that needs such a constant asks the main session, which places it; flagged to the advisor
+    in u4s-conditions-notes.md.)
+
+## U4r (the L1 runner and its judged runs)
+40. **O1 (u4-conditions-check.md:42-45; advisor-u4.md:343-347; the advisor's U4s ruling, O1):** "U4r's brief, which
+    comes to the advisor, states that at U4r the room has neither the view-time tolerance nor the cap (both land in
+    U4h: u4-build-plan.md §5 U4e's `rewind_at` and §5 U4h), so the -30 pre-check's setup condition (0 view-time
+    replacements and 0 clipped shots on both legs: the advisor's condition 3) holds by construction at U4r, and its
+    RTT argument cannot be tested there; and it either re-runs the pre-check pair after U4h merges (6 runs) or says
+    why not (the advisor's lean is the re-run)."
 
 ## U4h (lag compensation and aim)
 28. **netcode F6 / rust 3:** "The ring's span is U4h's test cap plus its margin in ms, recorded; the room builds it with
     `HitHistory::for_ms(span_ms)` (no tick count is ever written for it), and the recording header carries the span."
 
-## U4d2 or the main session (the workspace Cargo.toml, wave 2)
+## U4d2 or the main session (the workspace Cargo.toml, crates/proto/Cargo.toml and check.mjs; wave 2 or later)
 29. **rust 5 (nit):** "The workspace Cargo.toml's libm comment says `arch` gives 'hardware sqrt, floor, ceil, trunc and
     rint'. Per the rust review (libm 0.2.16 configure.rs:82-101, arch/x86/fma.rs:9-27) it gives sqrt and sqrtf (x86-64
     `sqrtsd`) and fma and fmaf with run-time CPU dispatch on x86-64, and nothing on wasm32 stable; all correctly
     rounded. Reword it at the next edit of that file."
+41. **proto's bites comment (the advisor's U4s ruling, condition 2):** "At the next edit of crates/proto/Cargo.toml
+    (U4d2 or later), reword its bites comment (:13-14), which still says the grid's bites are chosen through its
+    config: after carry 2, npt-proto's bites are its own."
+42. **entry 34's second home (the advisor's U4s ruling, condition 2):** "If U4a's report does not list entry 34 as
+    met, U4d2's brief carries entry 34's text word for word, U4d2 in place of U4a (U4d2 owns check.mjs in wave 2:
+    u4-build-plan.md Lanes)."
 
 ## The main session (plan text, before the code merges: risk 11)
 30. **A19 (§4.1's table):** "npt-sim's rows gain `EntityKind::ALL` and `EntityKind::layout` (arch F2: one home for the
@@ -155,6 +204,14 @@ plain parts, never the rule.
     `TICK_HZ` is asserted in 1 to 1,000."
 33. **§4.15:** "39 B per command (move is 2 B), so about 1,872 B a tick of commands for 48 soldiers before spawns and
     the tick's own header; U4d states the measured size." (Item 19's plan half.)
+
+## U4's report (when it folds u4s-report.md)
+43. **the 1 MB cap (the advisor's U4s ruling, condition 2):** "The 1 MB cap on `HitHistory` is carry 14, at U4d, once
+    `HitVolumes` holds its volumes, not U4h (u4s-report.md:58-59 says U4h)."
+44. **the public items (the advisor's U4s ruling, condition 2):** "The public-items line (u4s-report.md:38-40) takes
+    carry 30's list: it adds what the line leaves out, `OWN_COPY_SNAP_BITES`, `own_copy_snap_with_bite`,
+    `Config::floor_rounding`, `Field::integer`, the five field constants, and `EntityKind::ALL` and
+    `EntityKind::layout` (advisor-u4.md:268-270)."
 
 ## For the advisor
 **NF-D4: drop `InputReports::non_finite` and reword D-4?**
