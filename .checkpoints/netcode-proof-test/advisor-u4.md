@@ -232,3 +232,152 @@ precondition its own design cannot meet; its own checks stay, and its runs log t
 
 ## For Mustafa
 Nothing now. Later, your go on the readings PR before R5, which will carry these readings.
+
+## Ruling: U4s (2026-11-09)
+(Returned by the advisor, read-only, about 17:45 UTC; recorded by the main session. Formatting compacted; the words
+are the advisor's.)
+
+**APPROVE WITH CONDITIONS. U4s is accepted. Wave 1 (U4a, U4b, U4c, U4d, U4j) may start once conditions 1 and 2 are in
+the text.** It covers the spike code at f08055134b03a6ea6e2b25d8f6cc8a8457f3eadd (HEAD e816a5f adds only the checkpoint
+and the report). It meets §5 U4s; §4.1-§4.4; §4.11's float grep; §4.14's two U4s sites; condition 10 (a) and (b). I
+reproduced check.mjs (10 of 10 steps) and the gate myself. The conditions are text only: no code changes and no re-run.
+One real gap: the fix pass wrote four plan-text carries that had to land "before the code merges"
+(u4s-carries.md:144-157, plus item 5 at :55-57). None landed: the plan is still the 12:05 text (sha256 f7961cfe…, the
+conditions-applied version), so §5 U4a's a4 (u4-build-plan.md:524-525) still sends -57's bites "through the grid
+config", and the fix pass removed that route. Condition 12 makes these edits mine to approve; I approve them below.
+
+**What I reviewed:** u4s-report.md (77 lines, sha256 97054a02…); u4s-carries.md (33 entries, sha256 1500ca04…); the
+five review notes; advisor-u4.md; u4-build-plan.md at f7961cfe… (unchanged since 12:05, equal to the version the
+checkpoint records as checked complete, u4-conditions-check.md); `git show f080551` (19 files, +1,979 -13) and the code
+at HEAD. I edited nothing.
+
+**What I ran** (main folder, its own cache, CARGO_TARGET_DIR unset; `git status` clean before and after): check.mjs
+(ended 17:32:14 UTC): all 10 steps pass (fmt, clippy and clippy-wasm32 pass; doc 2.0 s; test: measured 275, bites
+292, 0 failed, 0 skips; deps pass; refs 556 tracked files; marks 81; self 48 of 48; redact 157 items, 0 findings). The
+gate `node tools/gate.mjs --no-smoke` (17:32:47 UTC): GATE PASS (base 626df67; checks 1-4 and 5b-5d pass; symbols +0
+-0; 5a skipped). CI: `gate` and `smoke` success on f080551. marks.json, a read-only Node parse: 114 bite ids, all
+unique; G1a's old pattern misses 16 of them; check.mjs:678's pattern misses 0 (the reviewer's exact fix text,
+u4s-fix2-review-rust.md:85-89).
+
+**What I checked (file:line; spike paths under spikes/netcode-proof/):**
+- The counts: measured 267 + 8 = 275; bites 281 + 11 = 292 (sim +10, client +1); self 43 + 5 = 48: deltas on U3d's
+  base, as §5 asks.
+- §4.1, the public items: crates/sim/src/lib.rs:12-26 re-exports only items in §4.1's npt-sim rows, the five field and
+  config types the report names, and carry 30's additions; the bites-only items: sim lib.rs:33 and :39-43; grid.rs:198;
+  npt-client: bites-only `BITES` (client/src/lib.rs:12) and `grid_with_bite` (:18-22); npt-proto adds manifest lines
+  only. Report gap: its public-items line leaves out `OWN_COPY_SNAP_BITES`, `own_copy_snap_with_bite`,
+  `Config::floor_rounding`, `Field::integer`, the five field constants and `EntityKind::ALL`/`layout`; carry 30 lists
+  them (condition 2).
+- §4.2, the seam: `step` is word for word §4.2:203 (seam.rs:271); `reports()` stays outside the hash (:273, :286;
+  `InputReports` :247-265); `ClampReport` is not an event (:234-242); `Rewind` is integers only (:66-74); outside the
+  ring names `tick_a + 1` when fraction > 0, and a refused Rewind acts as `None`, which D-10's twin needs (:58-65); what
+  the sim reads (:15-20, netcode F1); the canonical order (:82-87, F2); the grid/raw rule (:167-175, F4).
+- §4.3, the tick constants (ticks.rs): :12 `TICK_HZ` 30; :18-21 rate held in 1-1,000; :25-32 the ceiling, in u64 and
+  saturating; :47 `LOOP_CATCHUP`; :83-98 the const asserts; s1 (tests/seam.rs:83-120) pins 7/15, 60/120, 32/64 and 30/60.
+- §4.4, the grid (grid.rs): the fields :106-158 (XY 16 bits, ±327.68 m; Z 12 bits, 0 to 40.95 m; yaw 16 bits wrapping;
+  pitch ±511 in 10 bits; velocity 1 cm/s); ties round away from zero (:5-9, :178); the defect is chosen per value and
+  exists in bites builds only (:162-167, :193-200); s2 is exhaustive over 201,727 integers (tests/seam.rs:122-152); the
+  error-bound sweep :154-213; s3 :215-239.
+- HitHistory (history.rs): :22-32 `for_ms` via `ticks_for_ms`, None at 0 ms; :52-67 push; :70-83 get, wrap-safe; s4
+  and s4b: tests/seam.rs:241-293.
+- check.mjs greps (each wired into deps at :1466-1468): sim allow-list :74; tick grep :581; room float grep :657;
+  bite-home grep :678 and :723; doc step :1365 and :1480; their self-tests: check.test.mjs:160, :1316, :1362, :1405,
+  :1460-1474.
+- §4.14, the bite ids at their sites: -17 lives in npt-client (client/src/lib.rs:12; client/tests/bites.rs); -41 lives
+  at the own-copy snap side (sim lib.rs:33); the grid holds no id (grid.rs:21-26); both match §4.14:441 and :446. -57
+  moves to U4a's `Quant` as integer coarsening: that changes the approved §5 U4a a4, so condition 1 covers it; the
+  coarsening reproduces marks.json -57's three defects (4 cm, 0.088° and 0.70° steps).
+- Condition 10: (a) bites features: sim Cargo.toml:15, proto :15, server :22; lab/Cargo.toml:14-21 forwards all six;
+  (b) room :15; client :15; npt-server's dev dependency on npt-client. Cargo.lock: +14 lines, 0 new `[[package]]`.
+- The reviews: three APPROVE WITH FINDINGS, no high; the four mediums settled in the code (netcode F1/F2: seam.rs:15-20,
+  :82-87; arch F1: grid.rs:21-26, sim lib.rs:28-43, client lib.rs:8-22; arch F2: seam.rs:134-152, grid.rs:17-19); the
+  rust-reviewer checked the fix pass (items 1-11, no regression) and the last round (G1, G2).
+- The builder: u4-build-plan.md:803 (Lanes, step 0) says "U4s alone (the main session or one builder)"; the approved
+  text at aebe8ea:709 says the same; §7.2 (:860-861) is what contradicts it.
+
+**What I did not check:** I planted no bite (read-only; the plants are the builder's and the rust-reviewer's: 9, 31 and
+the last round's, each restored by sha256 per their notes); I did not re-run `cargo tree -d` against the base
+(Cargo.lock adds no package, so no new duplicate is possible); I did not repeat the rust-reviewer's native-against-
+wasm32 grid probe (u4s-review-rust.md:70-75) or its reading of libm; no 60 Hz build (the const asserts and s1's 60 Hz
+rows stand in for it); the 3-agent cap during the U4s workflows (from the checkpoint only).
+
+**Conditions:**
+1. **Plan text, before any wave-1 build starts.** Under condition 12 I approve exactly these edits to
+   u4-build-plan.md: (a) carries 30-33 and 5, as written (u4s-carries.md:55-57, :145-157): §4.1's npt-sim and
+   npt-client rows; §5 U4a a4 and §4.14: -57's bites go through `Quant`'s own bite choice, as integer coarsening, and
+   the ids' homes are named; §4.3's FullState line; §4.15: 39 B a command, about 1,872 B a tick of commands. (b)
+   NF-D4's text (below): §4.1:183 and §4.2:236-237 drop "non-finite components" and `non_finite`; §5 U4d's D-4 (:593)
+   is replaced. (c) §7.2 (:860-861) matches Lanes: "…or, for U4s, U4b and U4j, the main session or one builder in a
+   free lane". (d) Condition 3's freeze joins Lanes' wave-1 bullet (:808). Record the plan's new sha256 here, under this
+   ruling. Any edit beyond (a)-(d) comes back to me.
+2. **Complete u4s-carries.md before the wave-1 briefs are written:** add to U4d: s6 ties `EntityKind::ALL` to the enum
+   with an exhaustive match (u4s-fix-review-rust.md:112-113; the report lists this carry, but the file does not);
+   `TickInput` stays integer-only, its spawn, teleport and attribute fields included (NF-D4); `StateDump` holds exactly
+   what `state_hash` hashes, never `InputReports` (condition 1's rule), so a twin's field diff never shows a counter.
+   Reword carry 7: "no state depends on any other `Command` field" (carry 8's order assert reads `tick`, and that is
+   correct). Add to U4b and U4e: a tick count needed outside npt-sim goes into npt-sim as `<name>_at` plus its constant
+   (carry 18's route), and the crate uses it by path (why: check.mjs:627 lets an initializer that merely names `TICK_HZ`
+   through, and nothing pins such a value at 60 Hz; u4s-fix-review-rust.md:114-115). The check.mjs nits
+   (u4s-fix2-review-rust.md:90-93): nothing pins `STEPS.doc`; the doc step documents the host build only;
+   `lintBothBuilds` says "both linted" when only the bites build fails; a measured-build doc failure's summary line is
+   cargo's last line (the report leaves this fourth nit out); home: U4a's brief (wave 1's only check.mjs editor, :809)
+   or U4d2's, never the main session while U4a owns check.mjs. The next edit of crates/proto/Cargo.toml (U4d2 or
+   later): its bites comment (:13-14) still says the grid's bites are chosen through its config; after carry 2,
+   npt-proto's bites are its own. Two report lines, fixed when U4's report folds this one: the 1 MB cap is carry 14, at
+   U4d, once `HitVolumes` holds its volumes, not U4h; the public-items line takes carry 30's list.
+3. **Freeze the seam's shapes for wave 1.** Through wave 1, U4d keeps unchanged every existing field, variant and width
+   of `Command`, `Rewind`, `CoverVariant`, `EntityKind` and `EntityRecord` (FIELDS 12), and the five grid fields as
+   built at f080551. It may add items (World, carry 17's button constants, `TickInput`'s new fields), complete
+   `layout()` within FIELDS (carry 12), and drop `InputReports::non_finite` (NF-D4). A change to an existing item waits
+   for U4d's merge and goes to the main session, as carry 1 already says for the grid. Why: U4a builds its codec and
+   field tables against these types at the same time, so a silent change breaks the second merge.
+4. **The wave-1 briefs carry the file's entries word for word** (u4s-carries.md:9-10). Each wave-1 report lists the
+   carries it met, by number.
+
+**What stands as built:** the seam and the integer Rewind, with `reports()` outside the hash; `HitHistory` built from
+milliseconds; the tick constants as functions of `TICK_HZ`, held by const asserts and by s1 at 30 and 60 Hz; the grid's
+one float-side defect, with each bite id at its own site; the four greps and the doc step (review-driven additions
+guarding plan rules, §4.3, §4.11, §4.14, plan §4.5; none is scope creep); the proto dev dependencies (arch F7: already
+in the lock, same pins, never shipped).
+
+**Not asked, still open (O1, u4-conditions-check.md:39-42).** At U4r the room has neither the view-time tolerance nor
+the cap; both land in U4h (u4-build-plan.md:678-679, :787). So the -30 pre-check's setup condition (0 replacements and
+0 clips: my condition 3) holds by construction, and the RTT argument cannot be tested. This never reached me. U4r's
+brief, which comes to me, must state it and either re-run the pre-check pair after U4h merges (6 runs) or say why not.
+My lean is the re-run.
+
+## Rulings (U4s)
+- **U4S-ACCEPT:** accepted with conditions 1-4. Wave 1 may start once conditions 1 and 2 are in the text.
+- **NF-D4:** option (a), in the words below (the report's (a) is the carries file's (b), because the letters are
+  swapped; this ruling is on the words). Why: `Command` and `Rewind` hold integers only (seam.rs:21-43, :66-74), so the
+  counter can never count, and a test that cannot fail is evidence of nothing. The rule is still met: ADR 0004:285-286
+  ("every input and data value is checked finite where it enters", plus the assert each tick) and plan.md:529-530
+  hold: an integer is finite by type, and the per-tick assert stays. **New D-4:** "every value that enters the sim from
+  outside is finite by type: `Command`, `Rewind` and `TickInput`, its spawn, teleport and attribute fields included,
+  hold integers only, so nothing is refused or counted; a debug and test assertion each tick that the World holds no
+  non-finite value (every float read by `to_bits`, as the hash reads it), shown by a planted `0.0 / 0.0` in one phase
+  that trips it at its tick (a scratch plant, §7.2); and an overflow test: recorded commands with `move_xy` at -128 and
+  127 and `aim` at `i32::MIN` and `i32::MAX` step in a debug build (overflow checks on) without a panic (carry 15)."
+  The field goes: U4d removes `InputReports::non_finite`. If a float field ever joins `TickInput`, the counter and its
+  refusal test come back (none is planned, and the float-free room could not fill one anyway). `World::ray_cast`'s ray
+  is the only float that reaches npt-sim code from outside; it takes `&self` and changes no state; U4h's AimCast states
+  what a non-finite ray does. My condition 1's list loses "non-finite components"; the rest of it stands.
+- **U4S-BUILDER:** acceptable. It is not a deviation from the approved plan: Lanes step 0 (:803; aebe8ea:709) allows
+  one builder, and §7.2's contrary text is fixed by condition 1 (c). U4b and U4j: the same holds, under Lanes' wave-1
+  "(or the first free lane)" (:808) and U4j's header (:614). A builder agent may build either, on these terms: only in a
+  free slot, never as a 4th agent (reviewers count: condition 10 (c)); general-purpose, opus, effort xhigh, in an
+  isolated worktree under §7.1; its files as Lanes gives them (U4b may also add its one `mod schedule;` line to
+  crates/server/src/lib.rs, which no other wave-1 lane touches); merged by the main session, one at a time, with the
+  reviewers §5 names; its report says who built it. Condition 10 (d) binds only the main session's own builds.
+- **U4S-CARRIES:** almost complete: I matched every finding of the five review notes to a fix or a carry; the gaps are
+  listed in condition 2. Before wave 1: only text (the plan-text carries 30-33 and 5, condition 1, and the freeze,
+  condition 3). Every code carry can wait: each needs code its own later unit builds (World, Quant, the room, the ring's
+  span).
+
+## Decisions needed (U4s)
+None. All four questions are technical and sit inside the approved spike: NF-D4 keeps ADR 0004 part 7's rule and lowers
+no bar; the -57 bite move keeps §4.14's "planted where its code lives" and the float-free room; no ADR reading changes,
+so nothing joins the readings PR.
+
+## For Mustafa (U4s)
+Nothing.

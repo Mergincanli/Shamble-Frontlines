@@ -584,6 +584,13 @@
     belong to the room), netcode 2 (canonical command order), arch F1 (the grid's bite ids must sit where their code
     lives: -57's coarsening to npt-proto's Quant), arch F2 (the per-kind field layout defined in npt-sim; VELOCITY fixed
     for wave 1).
+  - **About 17:45 UTC: the advisor ACCEPTED U4s WITH CONDITIONS** (advisor-u4.md, "Ruling: U4s"): wave 1 may start once
+    conditions 1 (the approved plan edits (a)-(d): carries 30-33 and 5; NF-D4's new D-4; §7.2 = Lanes on the builder;
+    the wave-1 seam freeze) and 2 (u4s-carries.md completed; O1 for U4r's brief) are in the text; 3 the freeze; 4 the
+    wave-1 briefs carry the entries word for word and each report lists the carries met by number. NF-D4: (a), the
+    counter goes, new D-4 as worded. U4S-BUILDER: acceptable (also U4b and U4j, as a builder in a free lane).
+    Applying 1-3: workflow `wf_0edfc217-58a` (npt-u4s-conditions; netcode-architect then a test-engineer check; notes
+    u4s-conditions-notes.md, u4s-conditions-check.md). Then record the plan's new sha256 under the ruling, then wave 1.
   - **About 17:30 UTC: U4s MERGED at f080551** (pushed). The last small round (G1 bite-id uniqueness; G2 the doc step,
     check.mjs now 10 steps; the npt-sim membership message) checked by the rust-reviewer: one low gap G1a (the bite-id
     pattern missed 16 of 114 marks.json ids: upper case, dots), fixed by the main session (BITE_ID widened; tests: every
