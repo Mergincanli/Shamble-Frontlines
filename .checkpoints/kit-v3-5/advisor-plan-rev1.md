@@ -239,3 +239,109 @@ or deferred in writing; the plan should say so in §6.
 1. Answer SA5-RIDE: (a) or (b).
 2. Nothing else now. Later in this change-set: approve each kit-file edit as it asks; give your go on the final head;
    then re-enable the PR Advisor routine yourself.
+
+---
+
+# Revision 2 delta check (2026-11-10, on `plan-rev2.md` at 890ed2d)
+
+## Verdict: APPROVE, with conditions D1-D6
+
+Revision 2 meets conditions 1-14 in substance. But C3's git call as written fails on every run (exit 128, three
+separate ways), so the PR Advisor routine would refuse every merge. That fails closed, so it is safe, but it is
+broken. The test fake would hide it. The fixes are mechanical and are checked at the final-head review and by E9.
+No revision 3 is needed.
+
+## What I ran (read-only, in this worktree, git 2.43.0; `tools/node_modules` absent, as in the routine's checkout)
+- The plan's exact form, `git -c core.ignoreCase=true check-ignore --no-index -z -- <names>`, prints
+  `fatal: -z only makes sense with --stdin`, exit 128.
+- Without `-z`, but with `GIT_LITERAL_PATHSPECS=1`, which `realIo()` sets on every guard git call
+  (`routine-guard.mjs`, `run()` in `realIo`), it prints `fatal: <name>: pathspec magic not supported by this command:
+  'literal'`, exit 128. The same happens through `--stdin -z`.
+- An empty name, which is what a non-rename line's empty second field gives, prints
+  `fatal: empty string is not a valid pathspec`, exit 128.
+- With `GIT_LITERAL_PATHSPECS=0` and no `-z`, all the rows behave right:
+  - Exit 0, listing: `.claude/agent-memory-local/advisor/MEMORY.md`, `tools/node_modules/acorn/dist/acorn.js`,
+    `tools/Node_Modules/acorn/package.json`, `.gate/x.mjs`, `.env`, `dist/a.js`, `CLAUDE.local.md`,
+    `docs/CLAUDE.local.md`, `.Claude/settings.local.json`, `Claude.local.md` and
+    `.Claude/agent-memory-local/a/MEMORY.md`. So directory patterns match even when the folder does not exist, and
+    `core.ignoreCase=true` folds case.
+  - `docs/a.md` plus `.env.example` gives exit 1.
+  - Without `core.ignoreCase`, `tools/Node_Modules/x.js` gives exit 1, so the `-c` flag is needed.
+  - Output quotes unusual names (`"docs/a\\\\tb.log"`), so use it for the message only.
+  - Pathspec-magic names: `:(exclude)...` and `:!...` exit 128; `:(top)x` is read as magic (exit 1).
+- C4's list matches advisor.md's decision docs (:60-63) exactly. All nine files exist on main, and `docs/adr/` holds
+  the register (`README.md`), the template and 0001-0006. `docs/DECISIONS.md` does not exist yet, which is fine: it is
+  listed for STATUS-DIET.
+
+## Conditions 1-14
+| # | Met? | Note |
+|---|---|---|
+| 1 letter case | met | rows, fold mutant and the Windows aliases go to the security-auditor; C4's fold: D5 |
+| 2 gitignored paths | met in design; the build fails | D1, D2 |
+| 3 each clause alone | met, with D3 and D4 | the table holds: see below |
+| 4 CANON | met | |
+| 5 check runs | met | |
+| 6 D rows | met, with D3 | |
+| 7 pagination | met | |
+| 8 @tsv parse | met, with D1 (empty second field) | |
+| 9 rules text | met; D5 adds the tier-1 line for SA5 (a) | |
+| 10 write-side limits | met | |
+| 11 F5 (and F2) | met | |
+| 12 report correction | met | |
+| 13 small text | met | the one-line conflict answer is recorded as given |
+| 14 build order | met | |
+
+**The clause table (§1), checked row by row against the other clauses:**
+- `docs/Claude.md`: only C0 refuses it (C3: `CLAUDE.md` is not gitignored).
+- `Tools/gate.mjs` and `agents.md`: only C1 (not gitignored, no `.claude`).
+- `docs/.claude/skills/x/SKILL.md`: only C2.
+- `tools/node_modules/...`: only C3.
+- The decision docs: only C4.
+- The `.claude/settings.json` to `docs/settings.json` rename: only C5.
+- Root `.claude/agent-memory-local/...` is caught by both C2 and C3. That is fine, because neither clause depends on
+  that row.
+- C1 versus C3 on `CLAUDE.local.md`: in merges, C3 also catches it, so part A's new `CLAUDE.local.md` test is pinned
+  only by write rows. See D4.
+
+**Order (§2): cap, then list, then count.** Right, as long as every refusal comes before `return null` and the name
+clauses run on the whole list after the count. A consequence for the rows is in D3.
+
+## Conditions D1-D6
+- **D1, C3's call.**
+  - Run this one call without literal pathspecs: `io.git` gains an option (an env override) used only here, and that
+    `realIo` change goes in §3's symbols.
+  - Pass the names as arguments, without `-z`. Drop empty names first. Refuse outright, before the call, any name that
+    starts with `:` (pathspec magic; no real file needs it).
+  - Decide by exit code: 0 refuses, 1 passes, anything else refuses. Exit 0 with empty output also refuses. Use git's
+    output only for the message, cut short.
+- **D2, E9 and the fake.**
+  - E9 runs the guard's own merge check through `realIo()`'s git, the real code path, against real git. Its file list
+    is a faked `gh` answer: PR #1's real `@tsv` output plus the C3 rows. A shell line typed by hand would miss the
+    literal-pathspec failure.
+  - `fakeIo`'s git answers `check-ignore` with exit 1 by default (its catch-all answers exit 0 with nothing printed,
+    which D1 refuses).
+  - Add rows: `check-ignore` exits 128 (refused), exit 0 with empty output (refused), and a name starting with `:`
+    (refused). Add a mutant on the "other exit code refuses" branch.
+- **D3, the cap rows.**
+  - The 3000 row carries 3000 matching docs lines, so that only the cap refuses it. Otherwise the count check also
+    refuses it, and the `>=` to `>` mutant survives.
+  - The missing and `2.5` rows are also refused by the strict count check. Give the whole-number test no mutant (or
+    drop the test).
+- **D4, pin `CLAUDE.local.md` in `protectedRel`.**
+  - Use night-shift write rows (a routine write to `CLAUDE.local.md` and to `docs/AGENTS.md` refused) and a
+    day-session ask row.
+  - A pr-advisor write row proves nothing: the notes-only allow-list (:417) refuses it anyway.
+- **D5, C4 (only if he answers SA5-RIDE (a)).**
+  - Compare the lower-cased path against a lower-cased list, or add the names to `CANON`.
+  - Refused rows: `Docs/Vision_V2.md` and `docs/adr/README.md`.
+  - Text, carried in E6's table:
+    - advisor.md tier 1 gains "Decision-doc PRs merge from a day session on his go: the guard refuses the PR
+      Advisor's merge of them."
+    - CLAUDE.md's tier table, row 1's "Merges" cell, gains "(decision docs: a day session)".
+- **D6, scope.** §3's file and symbol list adds the `realIo`/`io.git` change (D1). E8 confirms it.
+
+## Decisions needed
+- SA5-RIDE is with Mustafa, in the rewritten text. Nothing new.
+
+## For Mustafa
+- Nothing new beyond SA5-RIDE.
