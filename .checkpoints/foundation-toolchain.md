@@ -2,10 +2,11 @@
 - **Goal:** plan foundation step 2.2, the toolchain (ADR 0002 part 2, migration plan 2.2), as a change-set plan that
   delivers Mustafa's four asks (what 2.2 pins now; the empty slots until the boundary spike, each by its open question;
   the CI job that runs the Rust checks; its own plan review by the advisor agent). Plan only: no build, no code.
-  Plan: `.checkpoints/foundation-toolchain/plan.md` (revision 4; the advisor's APPROVE of revision 3, bf1737f).
+  Plan: `.checkpoints/foundation-toolchain/plan.md` (revision 5: revision 4 plus Mustafa's answers; the advisor's
+  APPROVE of revision 3, bf1737f).
 - **Branch:** `claude/laughing-pasteur-fwya24` (this cloud session's branch, standing in for `cs/foundation-toolchain`)
   · **Base:** main 2d22b69 (PR #46 merged)
-- **Last update:** 2026-11-10 19:41 Amsterdam
+- **Last update:** 2026-11-10 19:58 Amsterdam
 
 ## Steps done
 1. Model check: `get_session` shows `session_context.model` claude-opus-5-5 (Opus 5.5) · no commit · go.
@@ -39,13 +40,18 @@
 10. Plan revision 4: L-a to L-f folded as written (FDN-HEADING added per L-f) · this commit. The advisor tool was not
     consulted before the plan was committed or before it was called done: it is not among this session's tools.
 
+11. Mustafa's answers of 2026-11-10 recorded (`mustafa-2026-11-10-answers-2-2.md`, word for word): FDN-NOCODE (a),
+    FDN-HEADING (a), the build started in a fresh session (steps 1-4 before 2.1b merges; step 5 waits), his rule for
+    the network cut (one fix round, then the offline flags, PM-0002-37 partly proven, tell him), his go on the ADR
+    index entry in the PR · plan revision 5 · this commit.
+
 ## Current step
-Done for this session (plan only). Waiting on Mustafa: FDN-NOCODE and FDN-HEADING (before the build's step 5), and his
-start of the build.
+Planning done. The build runs in a fresh session from Mustafa's prompt; it carries this checkpoint onto its own branch.
 
 ## Next steps
-1. The build session (when Mustafa starts it): read plan.md revision 4, Part 8's steps 1-7, in order; its PR stays a
-   draft until 2.1b has merged; the kit lines (K2a-K4) only after his FDN answers and condition 5's check.
+1. The build session: copy this checkpoint and its notes folder onto its own branch, then plan.md revision 5, Part 8's
+   steps 1-4 now; step 5 (main merged in, condition 5's check, K2a-K4) after 2.1b and LANE-RULES have merged; steps
+   6-7 after; its PR stays a draft until 2.1b has merged.
 2. This checkpoint and the plan are folded into the build's report and deleted before its PR is marked ready
    (CHECKPOINTS §9).
 
@@ -65,6 +71,10 @@ start of the build.
 - Runner image 20261101.360.1: Rustup 1.29.2, Rust 1.99.1 (= the pin).
 
 ## Decisions taken
+- Mustafa, 2026-11-10: FDN-NOCODE (a) ("One clause per line naming my 2026-11-10 decision as the exception; each edit
+  asks me and merges on my go."); FDN-HEADING (a) ("The edit asks me and merges on my go."); the build starts now in a
+  fresh session, steps 1-4 before 2.1b merges, step 5 waits; the network cut: one fix round, then cargo's and npm's
+  own offline flags, PM-0002-37 recorded as partly proven, and he is told; his go on the ADR index entry in the PR.
 - The advisor agent, 2026-11-10: Q2.2-a (a) final (G0's exit-2 mark to 2.3); Q2.2-c (a) Node 22 final, with a dated
   follow-up (tools/ and v2 to Node 26 together, after 2.3, merged before 2027-03-31); the sketch's three changes
   approved; planted-failure commits on the change-set's branch approved with condition 3.

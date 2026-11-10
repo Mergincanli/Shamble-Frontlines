@@ -1,6 +1,9 @@
-# Plan: foundation step 2.2, the toolchain (revision 4)
+# Plan: foundation step 2.2, the toolchain (revision 5)
 
-Status: revision 4. The advisor agent reviewed revision 1 (f5357520329a1ce76b7bf3ec3a873ea86f378cbc) at effort xhigh:
+Status: revision 5 records Mustafa's answers of 2026-11-10 (`mustafa-2026-11-10-answers-2-2.md`, word for word):
+FDN-NOCODE (a) and FDN-HEADING (a); the build starts now in a fresh session, steps 1 to 4 before 2.1b merges and step 5
+waiting as Part 8 says; his rule for the network cut (4.4); and his go on the ADR index entry given in the pull
+request. Nothing else changed from revision 4. Revision 4's own status follows. The advisor agent reviewed revision 1 (f5357520329a1ce76b7bf3ec3a873ea86f378cbc) at effort xhigh:
 **APPROVE**, with conditions 1-6 (its returned verdict, word for word: `advisor-plan-rev1-verdict.md`; its notes:
 `advisor-plan-rev1.md`). Its words: "No new plan review is needed if you fold conditions 1 to 5 in as written.
 Condition 1 must go into the plan before FDN-NOCODE is sent to Mustafa." Revision 2 (b6c20be) folded them; an
@@ -38,19 +41,21 @@ check's notes `fold-check-*.md` (this folder).
   root, then `setpriv` back to the runner's user with no docker group and `no_new_privs`. Researched (GitHub's docs:
   passwordless sudo on Linux VMs; job containers refuse `--network`), so PM-0002-37 is promised; its proof is the job's
   own control and probe (a TCP connection to an address resolved outside the cut) plus four planted failures, each
-  left red before its revert.
-- **Kit, guard and CI edits** (Part 5), all protected: K1 the new workflow (covered: his answer); K2a CLAUDE.md's
-  hard-constraints heading (named by his words; asked to confirm, FDN-HEADING); K2b, K3, K4, the three lines that
-  forbid v2 code (two say "No engine code", one "Phase 0 writes no v2 code"; asked, FDN-NOCODE). Both answers are
-  needed before the kit lines are written, not for the build. Not in 2.2:
+  left red before its revert. His rule: if the runner refuses the cut and one fix round does not solve it, the job
+  falls back to cargo's and npm's own offline flags and PM-0002-37 is recorded as partly proven (4.4).
+- **Kit, guard and CI edits** (Part 5), all protected, all covered by his answers, each asking him at the write and
+  merging on his go: K1 the new workflow; K2a CLAUDE.md's hard-constraints heading (his FDN-HEADING (a)); K2b, K3, K4,
+  the three lines that forbid v2 code (two say "No engine code", one "Phase 0 writes no v2 code"; his FDN-NOCODE (a):
+  "One clause per line naming my 2026-11-10 decision as the exception"). Not in 2.2:
   the rules' globs (2.5, which brings the first v2 page), CLAUDE.md's Layout lines (REPO_MAP carries the new paths),
   guard checks for the new pins (2.3, his answer), the per-edit hook (its kit change-set).
 - **The advisor's rulings:** G0's exit-2 mark moves to 2.3 (final); Node 22 (final; Node 22's end of life is
   2027-04-30, so a dated follow-up moves `tools/` and v2 to Node 26 together after 2.3, merged before 2027-03-31, with
   his ask, since the toolkit's files are gate files); the lint tools enter with 2.3; `.gitignore` takes two lines; the
   job has its own file; the planted failures are commits on the change-set's own branch.
-- **Order:** builds when Mustafa starts it; the PR stays a draft until 2.1b has merged (his answer: "2.2 merges after
-  2.1b"); once main must be merged in, the work moves to a branch worktree under `.gate/`; risk tier 2; no Brave check
+- **Order:** the build starts now in a fresh session (his word, 2026-11-10: "Steps 1 to 4 can run before 2.1b merges;
+  step 5 waits as your plan says"); the PR stays a draft until 2.1b has merged (his answer: "2.2 merges after 2.1b");
+  once main must be merged in, the work moves to a branch worktree under `.gate/`; risk tier 2; no Brave check
   (nothing a player sees, hears or feels).
 
 ## Part 1. Goal, scope, rules, risk tier
@@ -78,6 +83,13 @@ security: CI hygiene, the cut-off and the dependency review). Legacy symbols +0 
   it is covered. ... Guard checks for the new pins are not covered; they wait for the gate step (2.3)." and "Merge
   order: 2.2 merges after 2.1b."; and the review's effort: "have the advisor agent review it at effort xhigh and record
   its verdict against the plan’s commit SHA".
+- His answers for 2.2 (`mustafa-2026-11-10-answers-2-2.md`): "FDN-NOCODE (the three "no v2 code" lines): (a). One
+  clause per line naming my 2026-11-10 decision as the exception; each edit asks me and merges on my go."
+  "FDN-HEADING (the hard-constraints heading limited to legacy/): (a). The edit asks me and merges on my go." "Steps 1
+  to 4 can run before 2.1b merges; step 5 waits as your plan says." "One rule for the network cut: if the runner
+  refuses it and one fix round does not solve it, do not engineer further. Fall back to cargo's and npm's own offline
+  flags, record PM-0002-37 as partly proven, and tell me." "The ADR index entry that moves the missing-toolchain-file
+  check to step 2.3: I will give my go on it in the pull request."
 - LANE-RULES' Models line (`docs/STATUS.md:704-705`): "on my personal account, Fable 5.2 may be the session's advisor
   through Claude Code's advisor tool. The main model and every agent stay Opus 5.5."; with his addition
   (`:709-710`): "it is an extra. The recorded plan review by the advisor agent stays required." (The advisor tool is
@@ -90,7 +102,7 @@ security: CI hygiene, the cut-off and the dependency review). Legacy symbols +0 
 | `CLAUDE.md:45-50` | the hard constraints (classic scripts, r128, ...) | SCOPE (a): they apply to `legacy/` only once the files have moved; 2.2 merges after 2.1b |
 | `advisor.md:107` | "No engine code. Throwaway spikes only ..." | his decision, as above |
 | `advisor.md:323` | Never: "Merge a hard-constraint change before its accepted ADR is on main." | ADR 0002 part 1 accepted (SCOPE (a)), recorded in its Status line by 2.1b's docs pass; step 5 checks it is on main before K2a and K2b are written, and stops for the advisor if it is not (condition 5) |
-| KIT-FREEZE-2 (`STATUS:682-683`) | the kit freezes until the gate step | FREEZE-FDN (1.2): the CI job (his answer) and the constraint-scope lines (FDN-HEADING confirms the heading); FDN-NOCODE asks about three more lines |
+| KIT-FREEZE-2 (`STATUS:682-683`) | the kit freezes until the gate step | FREEZE-FDN (1.2): the CI job (his answer); the heading (his FDN-HEADING (a)); the three lines that forbid v2 code (his FDN-NOCODE (a)) |
 | `engine-architect.md:52`, `graphics-engineer.md:41` | Never: "write engine code in phase 0" | they bind only those agents' own writing (the main session builds); engine-architect reviews 2.2 and is briefed on his decision (step 7); graphics-engineer when it next reviews v2 work |
 | `V2_PHASE0_BRIEF.md:20-21`, `:144` | "No engine code" in phase 0 | his decision. The brief's own `:22` names "Phase 1: the repository restructure, toolchain, CI gate v2". It is the claude.ai Advisor's file: no session edits it, so these lines stay stale, and the report says so |
 | `NIGHT_SHIFT.md:54-55` | "No v2 spike runs until ..." | not night work: 2.2 needs cargo, which the guard refuses to routines (`CHECKPOINTS.md` §10) |
@@ -286,12 +298,21 @@ at 2.5).
 ### 4.4 What the cut proves, and what it does not
 It proves honest code builds and tests with no network: a test or build step that reaches out fails (M1a, M1b). It is
 not a sandbox against hostile pull-request code (the job holds no secret and `contents: read` only); the cleared groups
-and `no_new_privs` close the two easy ways out (docker, sudo). If the runner refuses any part of it (E2 shows), the
-build stops and the advisor rules; there is no silent fallback to `--offline` flags alone, which would not cover the
-tests themselves.
+and `no_new_privs` close the two easy ways out (docker, sudo).
+**If the runner refuses the cut (his rule, 2026-11-10):** "if the runner refuses it and one fix round does not solve
+it, do not engineer further. Fall back to cargo's and npm's own offline flags, record PM-0002-37 as partly proven, and
+tell me." Read as: E2 shows a refusal of the cut itself (`sudo -n`, `unshare`, `ip link set lo up`, `setpriv`, or a
+probe that stays inconclusive), not a test failing inside it; one fix round is one edit of the workflow (a K1 write, so
+it asks him) and one CI run; if the cut still fails, the last step runs without the namespace, with the package
+managers' own offline flags: `cargo test --workspace --frozen` (cargo's `--locked` plus `--offline`), `cargo build
+--frozen --target wasm32-unknown-unknown -p sim -p protocol -p room -p client-endpoint -p sim-wasm`, `npm ci --offline
+--ignore-scripts --no-audit --no-fund` and `npm test --workspaces`. That proves the install steps leave nothing to
+download (cargo and npm refuse the network), not that the tests use none: M1a and M1b cannot be shown and are recorded
+as not proven, and PM-0002-37 is recorded as partly proven in the report and the register's reading; the session tells
+him in its report. No further engineering of the cut in 2.2.
 
 ### 4.5 The marks
-- PM-0002-37: promised (E2, M1a, M1b).
+- PM-0002-37: promised (E2, M1a, M1b); under his fallback rule (4.4), recorded as partly proven.
 - PM-0002-38: 2.2's part only, "`rustc --version` in CI equals the pin" (E2); every tool's version against its pin in
   every job is 2.3's aggregate job (its method).
 - PM-0002-39: "a pull request that edits `Cargo.toml` without `Cargo.lock` fails at the first cargo step" is 2.2's (M3);
@@ -306,10 +327,10 @@ advisor reproduced every mark with its own script, `advisor-marks.mjs`, this fol
 | # | File and lines (2d22b69) | Edit | Marks | His words on main name it? | Status |
 |---|---|---|---|---|---|
 | K1 | `.github/workflows/toolchain.yml` (new) | the CI job (Part 4) | P, not M | "the toolchain's CI job" | covered (his answer in this session's prompt); one ask at the write; merges on his go |
-| K2a | `CLAUDE.md:45` (the heading) | scope the hard constraints to `legacy/` (ADR 0002 part 1, SCOPE (a)) | P, not M | "the lines that scope the legacy constraints" | named by his words; asked to confirm: FDN-HEADING (the advisor's L-f); one ask at the write, after condition 5's check |
-| K2b | `CLAUDE.md:52` ("Phase 0 writes no v2 code.") | his 2026-11-10 exception for steps 2.1 and 2.2, one clause | P, not M | not in the parenthesis | asked: FDN-NOCODE |
-| K3 | `CLAUDE.md:20-22` ("No engine code: throwaway spikes only, and only after Mustafa and the Advisor have approved the drafts; until then, stop.") | the same exception, one clause | P, not M | not in the parenthesis | asked: FDN-NOCODE |
-| K4 | `.claude/agents/advisor.md:107` ("No engine code. Throwaway spikes only, and only after Mustafa and you have approved the decision drafts.") | the same exception, one clause (else the advisor's own rule reads 2.3's crates as a REVISE) | P, not M | not in the parenthesis | asked: FDN-NOCODE |
+| K2a | `CLAUDE.md:45` (the heading) | scope the hard constraints to `legacy/` (ADR 0002 part 1, SCOPE (a)) | P, not M | "the lines that scope the legacy constraints" | covered: his FDN-HEADING (a), 2026-11-10; one ask at the write, after condition 5's check |
+| K2b | `CLAUDE.md:52` ("Phase 0 writes no v2 code.") | his 2026-11-10 exception for steps 2.1 and 2.2, one clause | P, not M | not in the parenthesis | covered: his FDN-NOCODE (a), 2026-11-10; one ask at the write |
+| K3 | `CLAUDE.md:20-22` ("No engine code: throwaway spikes only, and only after Mustafa and the Advisor have approved the drafts; until then, stop.") | the same exception, one clause | P, not M | not in the parenthesis | covered: his FDN-NOCODE (a); one ask at the write |
+| K4 | `.claude/agents/advisor.md:107` ("No engine code. Throwaway spikes only, and only after Mustafa and you have approved the decision drafts.") | the same exception, one clause (else the advisor's own rule reads 2.3's crates as a REVISE) | P, not M | not in the parenthesis | covered: his FDN-NOCODE (a); one ask at the write |
 | — | `CLAUDE.md:41-43` (the Layout lines) | none: they list the legacy layering and a few top-level items, not every folder (no `.github/`, no `README.md`), and stay true; REPO_MAP carries the new paths (E8) | P, not M | "paths in ... CLAUDE.md" would allow it | not needed (the advisor's F-6) |
 | — | `.claude/rules/pages.md:3-4`, `engine-core.md:3`, `engine-game.md:3`, `engine-editor.md:3` (globs) | none in 2.2 (Part 6) | P, not M | option (a) named "the rules' globs"; his words on main do not | 2.5's plan |
 | — | `.claude/rules/netcode.md:3-5` (`**/net/**`) | none: it starts loading for `packages/net/**`, as its own heading says ("active once these folders exist"); its bullets fit transport code | P, not M | — | observation |
@@ -381,11 +402,13 @@ only then commit and push its `git revert` (with `cancel-in-progress`, a revert 
 lose the evidence). No checkpoint save runs while a planted commit or its revert is unpushed. Reverts are new commits,
 never a force-push or a reset; none carries `[skip ci]`; none touches a protected file, so none needs an ask; the final
 diff against main contains none of them; the report lists each run's id and its failing step. The control and probe
-inside E2's one green run already show that the probe bites.
+inside E2's one green run already show that the probe bites. Under his fallback rule (4.4), M1a and M1b are not run
+(with the network up they would pass, proving nothing) and are recorded as not proven; M2 and M3 still run.
 
 ## Part 8. Steps, reviewers, models
 Where the work runs: the change-set's own branch. A session limited to a `claude/…` branch uses it as the stand-in and
-pushes only that branch (which is also why the planted failures are commits on it). Steps (each one commit; the gate
+pushes only that branch (which is also why the planted failures are commits on it). Order (his word, 2026-11-10):
+"Steps 1 to 4 can run before 2.1b merges; step 5 waits as your plan says." Steps (each one commit; the gate
 after each; the checkpoint `foundation-toolchain` updated, committed and pushed after every step, except as Part 7's
 procedure says; the saver while agents run):
 1. Root pins: `rust-toolchain.toml`, `Cargo.toml`, `package.json`, `.gitignore`; `Cargo.lock` (`cargo
@@ -409,8 +432,8 @@ procedure says; the saver while agents run):
    merge origin/main` there and push from there; restart the saver from there and carry on there. Then check that ADR
    0002's Status line on main records part 1 as accepted (2.1b's docs pass), since `advisor.md:323` forbids merging a
    hard-constraint change before its accepted ADR is on main (condition 5); if it does not, stop and ask the advisor,
-   and write no K2a or K2b. Only then K2a (one ask), and K2b, K3 and K4 if FDN-NOCODE is (a) (one ask each). Re-run
-   E1-E11.
+   and write no K2a or K2b. Only then K2a (his FDN-HEADING (a); one ask), and K2b, K3 and K4 (his FDN-NOCODE (a): "One
+   clause per line naming my 2026-11-10 decision as the exception"; one ask each). Re-run E1-E11.
 6. Docs: REPO_MAP (E8); the register (the G0 done-when reading, Q2.2-a; his go); STATUS (or DECISIONS) and ROADMAP by
    docs-keeper, with the dated follow-up for Node (Q2.2-c: one change-set moving `tools/` and v2 to Node 26 together,
    after 2.3, merged before 2027-03-31; Node 22's end of life is 2027-04-30; the toolkit's `package.json` and lockfile
@@ -513,7 +536,8 @@ nor before it was called done; his words make it an extra, and the advisor agent
 
 ## Part 10. Risks
 1. The runner refuses part of the cut (`sudo -n`, `ip link set lo up`, `setpriv`'s options, `nogroup`): E2 shows it on
-   the first push; the build stops for the advisor's ruling (4.4).
+   the first push; one fix round, then his fallback to the offline flags with PM-0002-37 partly proven, and he is told
+   (4.4).
 2. A red `toolchain` job on main is not a rollback trigger: CLAUDE.md's Rollback names `gate` and `smoke`. Until 2.3's
    one required check, a red `toolchain` on main is fixed forward, plan first; advisor.md:322 already forbids merging
    with "failing or pending checks", so the job blocks merges by the rules, though not by branch protection or the
@@ -532,6 +556,11 @@ nor before it was called done; his words make it an extra, and the advisor agent
     version.
 
 ## Decisions needed (Mustafa)
+None open. Both questions below were answered by Mustafa on 2026-11-10 (`mustafa-2026-11-10-answers-2-2.md`):
+FDN-NOCODE: "(a). One clause per line naming my 2026-11-10 decision as the exception; each edit asks me and merges on
+my go." FDN-HEADING: "(a). The edit asks me and merges on my go." The questions as they were asked, kept for the
+record:
+
 Line numbers are main 2d22b69's; the build re-finds them after 2.1b and LANE-RULES have merged.
 - **FDN-NOCODE: does your freeze exception for the foundation (FREEZE-FDN) also cover adding your decision of
   2026-11-10 ("The second account may plan and build foundation steps 2.1 and 2.2 now.") as an exception to the three
@@ -564,13 +593,14 @@ Line numbers are main 2d22b69's; the build re-finds them after 2.1b and LANE-RUL
   merges after 2.1b. Not asked now: the rules' globs (2.5's plan asks).
 
 ## For Mustafa
-No Brave check: 2.2 adds no page and nothing a player sees, hears or feels.
-1. Answer FDN-NOCODE and FDN-HEADING (before the plan's step 5).
-2. Start 2.2's build when you choose.
-3. Approve the kit asks as they come: K1 (the new workflow); K2a (the heading) if you answer FDN-HEADING (a); K2b, K3
-   and K4 if you answer FDN-NOCODE (a).
-4. Give your go on the register entry that moves G0's exit-2 mark to 2.3 (Q2.2-a), in the same pull request.
-5. Give your go on the final head after 2.1b has merged.
+No Brave check: 2.2 adds no page and nothing a player sees, hears or feels. Done: FDN-NOCODE (a) and FDN-HEADING (a);
+the build started in a fresh session (2026-11-10).
+1. During the build, approve each kit ask as it comes: K1 (the new workflow), K2a (the heading), K2b, K3 and K4 (the
+   three clauses naming your decision), and a fix-round edit of K1 if the network cut needs one.
+2. If the session reports that the cut fell back to the offline flags (PM-0002-37 partly proven), nothing to decide:
+   your rule already covers it.
+3. Give your go on the register entry that moves G0's exit-2 mark to 2.3 (Q2.2-a), in the pull request.
+4. Give your go on the final head after 2.1b has merged.
 
 ## Appendix A. Cited lines, re-found on main 2d22b69
 - ADR 0002: part 1 `:137-156`; part 2 `:157-181`; part 3 `:182-246`; part 4 `:247-278`; part 7 `:416-484` (the
