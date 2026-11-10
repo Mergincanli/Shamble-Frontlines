@@ -46,6 +46,15 @@
   io option named). The scratch build (`build.md`, 001d47b): red 38 rows on main's guard; green 1078/1078 (main 1034),
   settings 127/127, checkpoint 27/27; E5 and E9 live. Rules drafts in the scratchpad (`kb5/role-next.md`,
   `kb5/rules-next.md`); SHA-256 of the four scratch files in `kb5/SHA256SUMS`.
-- **Current step:** 4, waiting on Mustafa's SA5-RIDE; then the four kit writes, one ask each (the test file, then a
-  red run in the worktree; the guard, then green; advisor.md; CLAUDE.md), the docs part, the gate, the review round.
-- **Open with Mustafa:** SA5-RIDE (the advisor's rewritten text); ORDER (unit walk vs STATUS-DIET first).
+- **His answers of 2026-11-10** (`mustafa-2026-11-10-answers.md`, 055236f): ORDER (b) (STATUS-DIET with LANE-RULES
+  first, then the unit walk); SA5-RIDE (a), the fixed list and nothing more; LANE-RULES' Models line gains "the advisor
+  tool's advice is an extra; the recorded plan review by the advisor agent stays required"; switch to an allow-list if
+  smaller (the session: yes, five lines in chat); do not build for Windows short names, `::$DATA`, trailing dots and
+  spaces (known limits). His second message (`mustafa-2026-11-10-second.md`, ffdf5b4): ACCOUNTS (joins LANE-RULES),
+  KIT-FREEZE-2's meaning (FREEZE-FDN: the foundation's smallest kit edits after its own moves still allowed, each on his
+  go), the foundation chat's SPLIT (a) and SCOPE (a) for the record, a Slice 1 note to queue.
+- **Done:** plan revision 3 (`plan-rev3.md`, d7526f5), the allow-list `mergeAllowed` L1-L7; its scratch build (`kb6/`,
+  fbab132): red 39, green 1081/1081, settings 127, checkpoint 27, E9.
+- **Current step:** 5, the advisor's check of revision 3 (resumed after the spend limit, 10:08 UTC); then the four kit
+  writes, one ask each (the test file and a red run; the guard and green; advisor.md; CLAUDE.md), the docs part, the
+  gate, the one review round.
