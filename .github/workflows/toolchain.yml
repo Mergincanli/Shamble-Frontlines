@@ -1,0 +1,87 @@
+# Foundation step 2.2 (ADR 0002 part 2, migration plan 2.2): the pinned Rust toolchain from rust-toolchain.toml, then
+# the Rust and npm workspaces' builds and tests with the network cut off. One job, `toolchain`; the gate and smoke jobs
+# stay in gate.yml. Step 2.3 replaces this file with the gate v2's workflow.
+# The cut: the last step runs in its own network namespace (sudo unshare --net), with loopback up, back as the runner's
+# user with no docker group and no_new_privs; a TCP probe to an address resolved before the cut must connect outside
+# and fail inside (only curl exit 7 or 28 counts as cut).
+name: toolchain
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: toolchain-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Only the explicit install below brings a toolchain: rustup turned automatic install back on by default in 1.28.1.
+  RUSTUP_AUTO_INSTALL: "0"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  toolchain:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+
+      - name: Install the pinned Rust toolchain from rust-toolchain.toml (before any cargo call)
+        run: rustup toolchain install
+
+      - name: Check rustc against the pin
+        run: |
+          pin=$(sed -n 's/^channel = "\([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\}\)"$/\1/p' rust-toolchain.toml)
+          [ -n "$pin" ] && [ "$(printf '%s\n' "$pin" | wc -l)" -eq 1 ] || { echo "rust-toolchain.toml: no single exact x.y.z channel"; exit 1; }
+          [ -z "${RUSTUP_TOOLCHAIN-}" ] || { echo "RUSTUP_TOOLCHAIN is set: it would beat rust-toolchain.toml"; exit 1; }
+          active=$(rustup show active-toolchain); echo "$active"
+          case "$active" in *rust-toolchain.toml*) ;; *) echo "the active toolchain does not come from rust-toolchain.toml"; exit 1 ;; esac
+          v=$(rustc --version); echo "$v"
+          case "$v" in "rustc $pin "*) echo "rustc equals the pin $pin" ;; *) echo "rustc is not the pin $pin"; exit 1 ;; esac
+          cargo --version; node --version; npm --version
+
+      - name: Fetch every dependency (the last step with the network)
+        run: |
+          cargo fetch --locked
+          npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Build and test with the network cut off
+        run: |
+          command -v unshare setpriv ip curl getent
+          probe_ip=$(getent ahostsv4 github.com | awk 'NR == 1 { print $1 }' || true)
+          [ -n "$probe_ip" ] || { echo "control failed: github.com has no IPv4 address before the cut"; exit 1; }
+          curl -sS --max-time 20 -o /dev/null --resolve "github.com:443:$probe_ip" https://github.com/ \
+            || { echo "control failed: no connection before the cut, so the probe below would prove nothing"; exit 1; }
+          echo "control: connected to $probe_ip:443 before the cut"
+          sudo -n unshare --net -- bash -ec 'ip link set lo up; exec "$@"' lo-up \
+            setpriv --reuid="$(id -u)" --regid=nogroup --clear-groups --no-new-privs -- \
+            env -i HOME="$HOME" PATH="$PATH" USER="$USER" CI=true LANG=C.UTF-8 PROBE_IP="$probe_ip" \
+              CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}" RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}" \
+              RUSTUP_AUTO_INSTALL=0 npm_config_update_notifier=false \
+            bash --norc --noprofile -euo pipefail -c '
+              id; ip -o link; rustc --version
+              getent hosts github.com || echo "getent: no answer (printed, not judged)"
+              rc=0; curl -sS --max-time 10 -o /dev/null --resolve "github.com:443:$PROBE_IP" https://github.com/ || rc=$?
+              case "$rc" in
+                0) echo "the network is still reachable inside the cut"; exit 1 ;;
+                7|28) echo "the network is cut: no TCP connection to $PROBE_IP:443 (curl exit $rc)" ;;
+                *) echo "probe inconclusive: curl exit $rc"; exit 1 ;;
+              esac
+              cargo test --workspace --locked
+              cargo build --locked --target wasm32-unknown-unknown -p sim -p protocol -p room -p client-endpoint -p sim-wasm
+              npm ci --offline --ignore-scripts --no-audit --no-fund
+              npm test --workspaces
+              npx --no -- tsc --version
+            '
