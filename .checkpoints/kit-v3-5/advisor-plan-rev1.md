@@ -345,3 +345,133 @@ clauses run on the whole list after the count. A consequence for the rows is in 
 
 ## For Mustafa
 - Nothing new beyond SA5-RIDE.
+
+---
+
+# Revision 3 check (2026-11-10, on `plan-rev3.md` at d7526f5; a plan check, not a review round)
+
+## Verdict: APPROVE, with conditions E1-E5
+
+The allow-list is the better design. It is smaller, it follows his words ("plain", "a short list of allowed places",
+"not a rules-file name in any letter case", "Everything else waits for my go"), and it fails safe: anything new or
+moved is refused until someone allows it. One gap that both designs share and that predates this pass must be closed
+here: npm's shrinkwrap file (E1). Some rules text must follow the widened day-session merge path (E3), and three
+known-limit lines need correcting (E4). None of this needs a revision 4. The scratch build is redone with these, then
+built as planned.
+
+## What I checked (read-only)
+- The scratch build (`scratchpad/kb6/hooks/routine-guard.mjs`): `mergeAllowed` (:88-99), the places (:83), and the
+  merge check's cap, then list, then count, then names (:1489-1501). I ran `node --test routine-guard.test.mjs` there:
+  1081 tests, 1081 pass, 0 fail (no surviving mutant). I did not re-run the red run on main's guard (39 rows) or the
+  settings and checkpoint suites.
+- I ran `mergeAllowed` on edge cases:
+  - Refused: `docs//a.md`, `tools/Package-Lock.json`, `docs/ADR/x.md`, `readme.md`.
+  - Allowed: `README.md`, `docs/reports/a.md`, `tools/npm-shrinkwrap.json`, `tools/sub/package.json`,
+    `docs/status.md`, `tools/dist/x.js`, `docs/x.log`, `docs/CLAUDE.md.`.
+- Every name tracked today in `docs/`, `tools/`, `README.md` and `FIRST_PROMPTS.md` passes L1 and L2. No file there
+  holds an unusual character or a dot segment, so no legitimate docs or tools PR breaks.
+- The real lists of PRs #42, #43 and #45 (docs-only) each change `docs/adr/README.md` (the register), and #42 and #43
+  also change `docs/VISION_V2.md`. Under SA5-RIDE (a), L7 refuses all three. That is correct, since advisor.md
+  already makes them needs-mustafa. But it means most docs-keeper PRs now merge from a day session (E5).
+- CI installs the gate's packages with `npm ci --prefix tools ... --ignore-scripts` (`.github/workflows`, lines 34
+  and 65). Every machine's setup runs `cd tools && npm ci` (CLAUDE.md, Commands).
+
+## The "needs it alone" rows
+All are right, as the code reads:
+- L1: `docs/a b.md`; L2: `docs/.claude/skills/x/SKILL.md`; L3: `tools/node_modules/acorn/dist/acorn.js`;
+  L4: `dist/a.js`, `shamble-game.js`; L5: `docs/Claude.md`; L6: `tools/Gate.mjs`; L7: `docs/Vision_V2.md`,
+  `docs/adr/0001-x.md`; C5: the rename from `.claude/settings.json`.
+- No other rule refuses any of them.
+- Low: `docs/DECISIONS.md` and `docs/adr/README.md` are listed as "covered more than once" but only L7 covers them.
+  Relabel them; nothing else changes.
+- Count order: a missing or text `changed_files` is refused by the strict count (`lines.length !== cf`). An empty
+  list with `changed_files` = 0 passes; that is harmless.
+
+## The allow-list against C0-C5, for an attacker who can open a same-repository PR
+- **What C0-C5 refused and the allow-list lets through:** only gitignored names that `.gitignore` matches at any
+  depth: today `dist/` and `*.log` inside `docs/` and `tools/` (for example `tools/dist/x.js`, `docs/x.log`). Nothing
+  loads them today. Rev 3's limit line calls this "a future entry", but it is a present one (E4).
+- **What the allow-list refuses and C0-C5 let through:** game code, the pages, other root files, every dotfile
+  (`.gitignore`, `.gitattributes`, `.gitmodules`), non-ASCII names (no homoglyph or Unicode-normalization questions),
+  names with a backslash (so `@tsv`'s escapes need no care), and a rename from any place outside the list (this matches
+  advisor.md's tier-0 rule).
+- **What both let through, unchanged from main:**
+  - **`tools/npm-shrinkwrap.json` (Critical, though it predates this pass).** npm uses `npm-shrinkwrap.json` in place
+    of `package-lock.json` when both are present (npm's lock-file documentation; from memory, not fetched in this
+    review: the security-auditor confirms). So a routine-merged shrinkwrap decides what `npm ci` installs for the gate,
+    in CI and on every machine. The gate's `require('acorn')`, `'three'` and the rest (gate.mjs:63, :291;
+    battery.js:15-16; smoke.mjs:121) then run its code, and `--ignore-scripts` does not stop a `require`. It is a file
+    "read as settings" by the gate (advisor.md, escalation category 3), yet it is on no list. E1 fixes it.
+  - **Case-only twins inside the places** (for example `docs/status.md` beside `docs/STATUS.md`). On Windows and macOS
+    one overwrites the other in the checkout; which wins depends on git's order. Data, not instructions, and the diff
+    shows a new file. A limit line (E4).
+  - **Symlinks.** The file list carries no file mode, so a symlink at an allowed path merges. Git checks out nothing
+    beyond a symlink, and the guard's write checks follow the real path. A limit line (E4).
+  - **Trailing dots and spaces, 8.3 names, `::$DATA`:** not built, by his direction. L1 refuses spaces, `~`, `:` and
+    `$`; a trailing dot passes (`docs/CLAUDE.md.` is allowed).
+- **Moves inside `tools/`.** L6 matches exact paths, so a gate file moved within `tools/` (say `tools/ci/gate.mjs`)
+  would be an allowed name. Matching gate basenames anywhere under `tools/` closes that without a later edit (E2).
+
+## The foundation's restructure, against his second message (item 2)
+- His words: the freeze "does not stop the smallest edits the foundation needs to keep the kit true after its own
+  moves (paths in the gate and in CLAUDE.md, the toolchain's CI job, the lines that scope the legacy constraints).
+  Each such edit still asks me and merges on my go."
+- **Moving an existing place or a gate file to its new path keeps the kit true.** For example, the foundation moves
+  `tools/` or a gate file, and the same foundation PR updates `MERGE_PLACES` or `GATE_FILES` to the new path. That is
+  his "paths in the gate", so it may ride the foundation's PR, asking him.
+- **Adding a new place (`legacy/`, the v2 folders) is a widening, and his call.** It is not a keep-true edit, for
+  three reasons:
+  - The kit stays true without it: those PRs simply merge from a day session on his go, which is his own "Everything
+    else waits for my go".
+  - Game and v2 code PRs are needs-mustafa anyway ("verify in a day session", advisor.md step 2).
+  - A new place widens what the PR Advisor may merge without him being present. Under KIT-FREEZE-2 ("stops new rules,
+    new guard checks") it waits for the gate step or his explicit decision.
+- Rev 3's line ("one list edit, made when KIT-FREEZE-2 lifts") is right for new places but misses the keep-true case
+  (E4).
+
+## Conditions
+- **E1, the shrinkwrap.**
+  - `GATE_FILES` gains `tools/npm-shrinkwrap.json`, so writes, day-session asks and merges all refuse it.
+  - advisor.md's two "today" gate-file lists gain it: escalation category 3, and step 2's list (`package*.json` does
+    not match it).
+  - A refused merge row and a night write row. E6's table marks each line stricter.
+- **E2, L6 by basename under `tools/`.**
+  - The merge test refuses any `tools/` path whose last segment, in lower case, is a gate file's name
+    (`gate.mjs`, `smoke.mjs`, `battery.js`, `gate-globals.json`, `package.json`, `package-lock.json`,
+    `npm-shrinkwrap.json`).
+  - Rows, refused: `tools/sub/package.json` and `tools/ci/Gate.mjs`. Its mutant must be caught.
+  - `GATE_FILES` stays exact for writes.
+- **E3, the text of the widened day-session path.** In place of D5's decision-doc-only tier-1 sentence:
+  - advisor.md tier 1: "Only plain paths in `docs/`, `tools/`, `README.md` and `FIRST_PROMPTS.md`, with no rules,
+    gate or decision-doc name, can merge through the PR Advisor (the guard's allow-list); every other PR merges from a
+    day session on his go."
+  - CLAUDE.md's tier table, row 1's "Merges" cell: "`ready`: the PR Advisor; else his go (outside the guard's
+    allow-list: from a day session)".
+  - advisor.md step 6, "APPROVE + needs-mustafa", after "merge the PR": "(if the guard's allow-list admits it;
+    otherwise say it merges from a day session)".
+  - Each goes in E6's table.
+- **E4, the known-limit lines,** corrected to say what is true:
+  - **Trailing dots:** "a trailing dot passes (`docs/CLAUDE.md.`); whether Windows git checks such a name out, and
+    loads it as `docs/CLAUDE.md`, was not verified".
+  - **Gitignored names:** "gitignored names inside the places are not refused: today `.gitignore`'s `dist/` and
+    `*.log` match at any depth (for example `tools/dist/x.js`); a `.gitignore` change needs a look at the list".
+  - **New lines:**
+    - case-only twins inside the places (Windows and macOS overwrite one with the other);
+    - symlinks (no file mode in the list).
+  - **The foundation line:** "a foundation PR that moves a place or a gate file updates `MERGE_PLACES` or
+    `GATE_FILES` in the same PR (a keep-the-kit-true edit, his second message of 2026-11-10, item 2, asking him); a
+    new place (`legacy/`, the v2 folders) widens the PR Advisor's merges and is his decision, after the gate step or
+    by his explicit word".
+- **E5, the docs part.**
+  - STATUS records his two messages of 2026-11-10 word for word: ORDER (b) closes ORDER; SA5-RIDE (a); the LANE-RULES
+    Models addition; and items 1-4 of the second, with item 2 next to KIT-FREEZE-2.
+  - The report tells him, in one line, that under SA5-RIDE (a) most docs-keeper PRs touch the register
+    (`docs/adr/README.md`; #42, #43 and #45 did), so they now merge from a day session on his go.
+  - The session gives his second message's one-line conflict answer, if not yet given.
+
+## Decisions needed
+- None new. Adding `legacy/` or the v2 folders as merge places comes to him later, at the gate step or when the
+  foundation asks. It is not part of this pass.
+
+## For Mustafa
+- Nothing new.

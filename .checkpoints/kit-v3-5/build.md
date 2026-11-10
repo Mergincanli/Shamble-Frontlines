@@ -50,3 +50,20 @@ answers (b), C4's lines, rows and mutant come out before the writes.
   `tools/node_modules/...`, `tools/Node_Modules/...`, `.gate/x.mjs`, `.env`, `dist/a.js`, `notes.log`, and the real
   lists of PRs #1 (`.claude/agents/art-director.md`), #43 (`docs/EDITOR_V2.md`) and #44 (`.claude/CHECKPOINTS.md`).
 - SHA-256 of the two files: `kb6/SHA256SUMS`.
+
+## Revision 3 with the advisor's E1-E5 (the scratchpad's `kb7/`, 2026-11-10): the build that is applied
+- The advisor's revision 3 check (appended to `advisor-plan-rev1.md`): APPROVE with E1-E5. E1: `GATE_FILES` gains
+  `tools/npm-shrinkwrap.json` (npm reads it before `package-lock.json`; the security-auditor confirms the precedence),
+  and so do advisor.md's two gate-file lists. E2: a gate file's name is refused anywhere under `tools/` in a merge, in
+  any letter case (this replaces L6's exact-path test, which E2 would otherwise leave a surviving mutant). E3: the
+  widened day-session text (advisor.md tier 1 and step 6, CLAUDE.md row 1). E4: the known-limit lines as the advisor
+  worded them. E5: STATUS records both 2026-11-10 messages word for word; the report says SA5-RIDE (a) moves most
+  docs-keeper PRs (they touch the register) to a day session.
+- Red (the new tests on main's guard): 43 rows fail, 39 routine and 4 day; the four new ones among them (a routine may
+  write `tools/npm-shrinkwrap.json` today).
+- Green: routine-guard 1086/1086, no surviving mutant; settings 127/127 and checkpoint 27/27 in a `git archive` copy.
+- The rules drafts: `kb7/role-next.md` (advisor.md: category 3's list, tier 0, tier 1, tier 2 and its bracket, step 2's
+  list, step 6; 20 added lines, none over 120 characters) and `kb7/rules-next.md` (CLAUDE.md :64, rows 0 and 1, the line
+  under the table; 7 added lines).
+- SHA-256 of the four files to apply: `kb7/SHA256SUMS` (guard 6507f795..., tests 240ea071..., advisor.md 9eb2b3ba...,
+  CLAUDE.md a7c1f741...).
