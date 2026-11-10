@@ -30,4 +30,11 @@
 - **The PR Advisor routine:** paused by Mustafa (enabled false, 2026-11-09 18:22 UTC); it did not run at 18:45.
 - **Facts:** `facts.md` B1-B8 done; the agent stopped on the org's spend limit (2026-11-09 18:30 UTC) and was resumed
   2026-11-10 for B9 (not found, tensions).
-- **Current step:** 1, the facts' last block; next: plan revision 1, the advisor's plan review.
+- **Done:** the facts (`facts.md`, B1-B9, 360 lines); plan revision 1 (`plan-rev1.md`, f6be38e): parts A-G
+  (protectedRel gains CLAUDE.local.md and AGENTS.md; a merge-only `mergeProtected` for agent memory and nested
+  `.claude/`; the file list reads both names via `@tsv`; the 3000 cap and a short-list check; test rows red then green,
+  mutants; advisor.md tier-2 lines, CLAUDE.md:64, F4 if ruled; the docs part), decisions SA5-RIDE (his), F4-RIDE and
+  MERGE-ONLY (the advisor's).
+- **Current step:** 2, the advisor's plan review (`advisor-plan-rev1.md`, running); then his SA5-RIDE answer, the
+  tests red first, the guard edit (asks), mutants, rules lines, docs, the review round.
+- **Open with Mustafa:** ORDER (after kit-v3-5: his unit walk first, as queued, or STATUS-DIET with LANE-RULES first).
