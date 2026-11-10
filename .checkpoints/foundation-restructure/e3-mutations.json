@@ -1,0 +1,486 @@
+[
+ {
+  "id": "P1",
+  "what": "delete the top-level function refreshRect (shamble-game.js)",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "function refreshRect(){ _cvR=renderer.domElement.getBoundingClientRect(); }\n",
+    "replace": ""
+   }
+  ],
+  "expected": [
+   "3"
+  ],
+  "notes": "PREDICTED ON 44446a5: [\"3\",\"5a\",\"5b\"]. The Phase 0 report (2026-10-13) predates check 5. refreshRect is still referenced at shamble-game.js:3275 (inside bootGame, runs at boot) and in both pages' inline resize handlers (index.html:1263, editor.html:1266): 5b reports it not defined and 5a gets a ReferenceError at boot."
+ },
+ {
+  "id": "P2",
+  "what": "bootEditor(); added at the end of bootGame (unguarded editor-only call on the player build)",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "navPath(-79,-90,-79,-70,w); }\n}\n",
+    "replace": "navPath(-79,-90,-79,-70,w); }\n  bootEditor();\n}\n"
+   }
+  ],
+  "expected": [
+   "4"
+  ],
+  "notes": "PREDICTED ON 44446a5: [\"4\",\"5a\"]. index.html runs bootGame, so the call throws a ReferenceError at boot (5a). 5b exempts index.html's editor-only names (check 4's job) and editor.html declares bootEditor, so 5b stays green. On editor.html bootEditor then runs twice (once inside bootGame, once from the inline script); whether that also errors there is not known (index.html fails 5a anyway)."
+ },
+ {
+  "id": "P3",
+  "what": "syntax error: a stray ) in the PLAYER_FACTION declaration (shamble-game.js line 26)",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "const PLAYER_FACTION='Allies';   //",
+    "replace": "const PLAYER_FACTION='Allies');   //"
+   }
+  ],
+  "expected": [
+   "1"
+  ],
+  "notes": "PREDICTED ON 44446a5: [\"1\",\"2\",\"3\",\"4\",\"5a\",\"5b\"]. A syntax error cascades: check 2 concatenation, check 3 (battery.js cannot parse the head), check 4 (not run, counted as FAIL), 5a (the game script never loads), 5b (cannot analyse). 5c and 5d stay green (core parses; the gate skips an unparsable upper file in 5c). The Phase 0 report named only check 1 (its gate had checks 1-4; it did not record what 2-4 printed)."
+ },
+ {
+  "id": "P4",
+  "what": "the wrType function declaration copied into shamble-core.js (before hyp2)",
+  "edits": [
+   {
+    "file": "shamble-core.js",
+    "find": "function hyp2(a,b){ return Math.sqrt(a*a+b*b); }",
+    "replace": "function wrType(el){ const text=el.dataset.text||(el.dataset.text=el.textContent.trim()), tok=++WR.typeTok; el.textContent='';\n  if(WR.reduce){ el.textContent=text; return; }\n  const tn=document.createTextNode(''), cur=document.createElement('span'); cur.className='wr-cur'; cur.textContent='\\u00a0'; el.appendChild(tn); el.appendChild(cur); let i=0;\n  (function step(){ if(tok!==WR.typeTok||mode!=='menu'||i>=text.length) return; const ch=text[i++]; tn.data=text.slice(0,i); if(ch!==' ') sfxTypeTick(); setTimeout(step,22+Math.random()*30); })(); }\nfunction hyp2(a,b){ return Math.sqrt(a*a+b*b); }"
+   }
+  ],
+  "expected": [
+   "3"
+  ],
+  "notes": "PREDICTED ON 44446a5: [\"3\",\"5c\"]. Check 3: cross-file duplicate wrType (core, game). wrType references WR, mode and sfxTypeTick, which are game top-levels, so 5c also fails. At runtime the game's declaration replaces the core one, so 5a should pass."
+ },
+ {
+  "id": "M1",
+  "what": "const PLAYER_FACTION moved below its first use (PLAYER_TEAM), a TDZ ReferenceError at load",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "const PLAYER_FACTION='Allies';   // the player's faction: uniform + vehicle livery\nconst PLAYER_TEAM=(TEAMS.find(t=>t.faction===PLAYER_FACTION)||TEAMS[0]).id;   // the player's team id (D3: allies); TEAMS loads with core, so no TDZ\n",
+    "replace": "const PLAYER_TEAM=(TEAMS.find(t=>t.faction===PLAYER_FACTION)||TEAMS[0]).id;   // the player's team id (D3: allies); TEAMS loads with core, so no TDZ\nconst PLAYER_FACTION='Allies';   // the player's faction: uniform + vehicle livery\n"
+   }
+  ],
+  "expected": [
+   "5a"
+  ],
+  "notes": ""
+ },
+ {
+  "id": "M2",
+  "what": "deploy() throws as its first statement",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "function deploy(){ started=true;",
+    "replace": "function deploy(){ throw new Error('E3 mutation M2: deploy throws'); started=true;"
+   }
+  ],
+  "expected": [
+   "5a"
+  ],
+  "notes": ""
+ },
+ {
+  "id": "M3",
+  "what": "player movement dead: keys['KeyW'] -> keys['KeyWW'] in the player's move code (update)",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "if(keys['KeyW']){wish.x+=fwdX;wish.z+=fwdZ;}",
+    "replace": "if(keys['KeyWW']){wish.x+=fwdX;wish.z+=fwdZ;}"
+   }
+  ],
+  "expected": [
+   "5a"
+  ],
+  "notes": "The smoke fails on its own 30 s wait for the player to move 0.1 m."
+ },
+ {
+  "id": "M4",
+  "what": "deploy() opens a WebSocket",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "function deploy(){ started=true;",
+    "replace": "function deploy(){ new window.WebSocket('ws://127.0.0.1:9/e3'); started=true;"
+   }
+  ],
+  "expected": [
+   "5a"
+  ],
+  "notes": "Written as window.WebSocket because tools/gate-globals.json does not list WebSocket: a bare name would also fail 5b. How the 2026-10-14 session wrote it is not recorded."
+ },
+ {
+  "id": "M5",
+  "what": "deploy() loads an image from a file outside the repo (file:///e3-outside-repo.png)",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "function deploy(){ started=true;",
+    "replace": "function deploy(){ const e3img=new window.Image(); e3img.src='file:///e3-outside-repo.png'; started=true;"
+   }
+  ],
+  "expected": [
+   "5a"
+  ],
+  "notes": "window.Image because gate-globals.json does not list Image. Relies on Chromium issuing a file:// request event for the image (smoke.mjs flags any file: request outside the root); a missing file may also log a console error, which fails 5a as well. The path is outside any build folder unless the folder is the filesystem root."
+ },
+ {
+  "id": "M6",
+  "what": "the whole shamble-editor.js replaced by main's version of 2026-10-14 before the editor fix (refreshPrefabList, refreshMapList, edSavePrefab nested in bootEditor)",
+  "edits": [
+   {
+    "file": "shamble-editor.js",
+    "from_commit": "58588648e4b65b4c77d4e18255facceb3bcfc31b"
+   }
+  ],
+  "expected": [
+   "5a",
+   "5b"
+  ],
+  "notes": "from_commit = 5858864 (main after PR #3, 2026-10-14 16:52 +0200; blob e37b6d48, identical at 2d30e4a, b23a133 and dbe24f8^; path shamble-editor.js at the root). dbe24f8 (cs/editor-prefab-list, merged to main by PR #4 at 20:58) hoisted the three. PREDICTED ON 44446a5: [\"3\",\"5a\",\"5b\"]. Against base 44446a5 the old file drops 7 editor top-level symbols (_edCanRot, _edToolKind, edFlashHint, edSavePrefab, ovHostileSpawn, refreshMapList, refreshPrefabList; battery.analyze in memory), so check 3 FAILS too. The 2026-10-14 run saw only 5a+5b because its default base was the merge-base with main (2d30e4a/5858864), where the three were still nested. 5b should list exactly the three names. The old file is weeks older than today's game: other 5a errors beyond the three ReferenceErrors are possible."
+ },
+ {
+  "id": "M7",
+  "what": "refreshMapList re-nested: its top-level declaration moved into the start of bootEditor()",
+  "edits": [
+   {
+    "file": "shamble-editor.js",
+    "find": "async function refreshMapList(){ const names=await MapStore.list(); edMapList.innerHTML='';\n  if(!names.length){ const e=document.createElement('div'); e.className='edEmpty'; e.textContent='No saved maps yet.'; edMapList.appendChild(e); return; }\n  names.forEach(name=>{ const row=document.createElement('div'); row.className='edMapRow';\n    const nm=document.createElement('span'); nm.className='edMapName'; nm.textContent=name;\n    const load=document.createElement('div'); load.className='edBtn edBtnSm'; load.textContent='Load';\n    const del=document.createElement('div'); del.className='edBtn edBtnSm edBtnDel'; del.textContent='Delete';\n    load.onclick=async()=>{ const saved=await MapStore.load(name); if(!saved)return;\n      const dd=dedupeMapDef(saved), parts=[];\n      if(dd.droppedTrees)parts.push(dd.droppedTrees+' tree'+(dd.droppedTrees===1?'':'s'));\n      if(dd.droppedProps)parts.push(dd.droppedProps+' prop'+(dd.droppedProps===1?'':'s'));\n      buildMap(dd.def); player.position.copy(mapSpawn); player.userData.editSel={kind:'spawn'}; edSetSel([]); edUndoStack.length=0; edRedoStack.length=0; _edLastTag=null; edUpdateUndoBtns(); edSyncWorldPanel(); document.getElementById('edMapName').textContent=name; edMapsModal.style.display='none';\n      edFlashHint(parts.length?'Removed exact duplicates: '+parts.join(', ')+'. Save to keep.':''); };\n    let armed=false, tmr=null;\n    del.onclick=async()=>{ if(!armed){ armed=true; del.textContent='Confirm?'; del.classList.add('arm'); clearTimeout(tmr); tmr=setTimeout(()=>{armed=false;del.textContent='Delete';del.classList.remove('arm');},2200); return; } await MapStore.del(name); refreshMapList(); };\n    row.append(nm,load,del); edMapList.appendChild(row);\n  });\n}\n",
+    "replace": ""
+   },
+   {
+    "file": "shamble-editor.js",
+    "find": "function bootEditor(){\n",
+    "replace": "function bootEditor(){\nasync function refreshMapList(){ const names=await MapStore.list(); edMapList.innerHTML='';\n  if(!names.length){ const e=document.createElement('div'); e.className='edEmpty'; e.textContent='No saved maps yet.'; edMapList.appendChild(e); return; }\n  names.forEach(name=>{ const row=document.createElement('div'); row.className='edMapRow';\n    const nm=document.createElement('span'); nm.className='edMapName'; nm.textContent=name;\n    const load=document.createElement('div'); load.className='edBtn edBtnSm'; load.textContent='Load';\n    const del=document.createElement('div'); del.className='edBtn edBtnSm edBtnDel'; del.textContent='Delete';\n    load.onclick=async()=>{ const saved=await MapStore.load(name); if(!saved)return;\n      const dd=dedupeMapDef(saved), parts=[];\n      if(dd.droppedTrees)parts.push(dd.droppedTrees+' tree'+(dd.droppedTrees===1?'':'s'));\n      if(dd.droppedProps)parts.push(dd.droppedProps+' prop'+(dd.droppedProps===1?'':'s'));\n      buildMap(dd.def); player.position.copy(mapSpawn); player.userData.editSel={kind:'spawn'}; edSetSel([]); edUndoStack.length=0; edRedoStack.length=0; _edLastTag=null; edUpdateUndoBtns(); edSyncWorldPanel(); document.getElementById('edMapName').textContent=name; edMapsModal.style.display='none';\n      edFlashHint(parts.length?'Removed exact duplicates: '+parts.join(', ')+'. Save to keep.':''); };\n    let armed=false, tmr=null;\n    del.onclick=async()=>{ if(!armed){ armed=true; del.textContent='Confirm?'; del.classList.add('arm'); clearTimeout(tmr); tmr=setTimeout(()=>{armed=false;del.textContent='Delete';del.classList.remove('arm');},2200); return; } await MapStore.del(name); refreshMapList(); };\n    row.append(nm,load,del); edMapList.appendChild(row);\n  });\n}\n"
+   }
+  ],
+  "expected": [
+   "5a",
+   "5b"
+  ],
+  "notes": "Edits apply in order (remove, then insert). PREDICTED ON 44446a5: [\"3\",\"5a\",\"5b\"]. Check 3 reports refreshMapList DROPPED against base 44446a5 (battery counts top-level declarations only); 2026-10-14's base had it nested, hence no check 3 then. 5b: openMaps (shamble-editor.js:702) references it; 5a: the Maps list never fills."
+ },
+ {
+  "id": "M8",
+  "what": "index.html: core and game script tags swapped (game loads before core)",
+  "edits": [
+   {
+    "file": "index.html",
+    "find": "<script src=\"shamble-core.js\"></script>\n<script src=\"shamble-game.js\"></script>\n",
+    "replace": "<script src=\"shamble-game.js\"></script>\n<script src=\"shamble-core.js\"></script>\n"
+   }
+  ],
+  "expected": [
+   "5a",
+   "5d"
+  ],
+  "notes": "Applied to index.html only; the report does not say which page. The game throws at load (TEAMS, a core const, is read at shamble-game.js:27)."
+ },
+ {
+  "id": "M9",
+  "what": "index.html: defer on the game script tag",
+  "edits": [
+   {
+    "file": "index.html",
+    "find": "<script src=\"shamble-game.js\"></script>\n",
+    "replace": "<script src=\"shamble-game.js\" defer></script>\n"
+   }
+  ],
+  "expected": [
+   "5a",
+   "5d"
+  ],
+  "notes": "index.html only; the report does not say which page. The inline bootGame(); runs before the deferred game script."
+ },
+ {
+  "id": "M10",
+  "what": "index.html: an onclick handler calling an undefined name (on the dev panel FPS readout)",
+  "edits": [
+   {
+    "file": "index.html",
+    "find": "<span id=\"dvFps\">",
+    "replace": "<span id=\"dvFps\" onclick=\"e3NoSuchHandler()\">"
+   }
+  ],
+  "expected": [
+   "5b"
+  ],
+  "notes": "The smoke never clicks #dvFps. Not check 4: the name is not an editor-only symbol."
+ },
+ {
+  "id": "M11",
+  "what": "editor.html: an onclick handler with a typo (edUndoDoo for edUndoDo) on the Undo button",
+  "edits": [
+   {
+    "file": "editor.html",
+    "find": "id=\"edUndo\" data-ic=\"undo\"",
+    "replace": "id=\"edUndo\" onclick=\"edUndoDoo()\" data-ic=\"undo\""
+   }
+  ],
+  "expected": [
+   "5b"
+  ],
+  "notes": "The smoke never clicks #edUndo."
+ },
+ {
+  "id": "M12",
+  "what": "typo in code the smoke never runs: devReset calls updateCareerChp (for updateCareerChip)",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "function devReset(){ Prog.xp=0;Prog.level=1;Prog.prestige=0;Prog.kills=0;Prog.deaths=0;Prog.headshots=0;Prog.weapon={}; updateCareerChip();",
+    "replace": "function devReset(){ Prog.xp=0;Prog.level=1;Prog.prestige=0;Prog.kills=0;Prog.deaths=0;Prog.headshots=0;Prog.weapon={}; updateCareerChp();"
+   }
+  ],
+  "expected": [
+   "5b"
+  ],
+  "notes": "devReset runs only from the dev panel's Reset button (shamble-game.js:3351), which the smoke never clicks."
+ },
+ {
+  "id": "M13",
+  "what": "implicit global: devReset assigns an undeclared name (e3ImplicitGlobal=1)",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "function devReset(){ Prog.xp=0;",
+    "replace": "function devReset(){ e3ImplicitGlobal=1; Prog.xp=0;"
+   }
+  ],
+  "expected": [
+   "5b"
+  ],
+  "notes": "In devReset (never run by the smoke); the files are sloppy-mode scripts, so it would not throw even if run."
+ },
+ {
+  "id": "M14",
+  "what": "bare localStorage in devReset (persistence must go through KVStore)",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "function devReset(){ Prog.xp=0;",
+    "replace": "function devReset(){ localStorage.removeItem('e3'); Prog.xp=0;"
+   }
+  ],
+  "expected": [
+   "5b"
+  ],
+  "notes": "localStorage is not in gate-globals.json; devReset never runs in the smoke."
+ },
+ {
+  "id": "M15",
+  "what": "bare status (a window property) read in devReset",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "function devReset(){ Prog.xp=0;",
+    "replace": "function devReset(){ void status; Prog.xp=0;"
+   }
+  ],
+  "expected": [
+   "5b"
+  ],
+  "notes": "status is deliberately not in gate-globals.json."
+ },
+ {
+  "id": "M16",
+  "what": "THREE.CapsuleGeometry referenced in devReset (not in three r128)",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "function devReset(){ Prog.xp=0;",
+    "replace": "function devReset(){ void THREE.CapsuleGeometry; Prog.xp=0;"
+   }
+  ],
+  "expected": [
+   "5b"
+  ],
+  "notes": "Referenced, not called, and in code the smoke never runs."
+ },
+ {
+  "id": "M17",
+  "what": "assignment to a const of the same script: devReset assigns PLAYER_FACTION (a shamble-game.js const)",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "function devReset(){ Prog.xp=0;",
+    "replace": "function devReset(){ PLAYER_FACTION='Axis'; Prog.xp=0;"
+   }
+  ],
+  "expected": [
+   "5b"
+  ],
+  "notes": ""
+ },
+ {
+  "id": "M18",
+  "what": "assignment to a const from another script: devReset (game) assigns GROUND_W (a shamble-core.js const)",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "function devReset(){ Prog.xp=0;",
+    "replace": "function devReset(){ GROUND_W=1; Prog.xp=0;"
+   }
+  ],
+  "expected": [
+   "5b"
+  ],
+  "notes": "game -> core reference, so not a layering (5c) case."
+ },
+ {
+  "id": "M19",
+  "what": "index.html: unquoted handler onclick=noSuchFn() (on the dev panel triangle readout)",
+  "edits": [
+   {
+    "file": "index.html",
+    "find": "<span id=\"dvTris\">",
+    "replace": "<span id=\"dvTris\" onclick=noSuchFn()>"
+   }
+  ],
+  "expected": [
+   "5b",
+   "5d"
+  ],
+  "notes": "The report lists M19 and M20 together under \"5b + 5d\"; it does not say which check each one fails. PREDICTED ON 44446a5: [\"5b\"] for this one: an unquoted handler on a <span> is a 5b case only; nothing in 5d reads handlers."
+ },
+ {
+  "id": "M20",
+  "what": "index.html: an extra unquoted <script src=shamble-editor.js></script> after the game script",
+  "edits": [
+   {
+    "file": "index.html",
+    "find": "<script src=\"shamble-game.js\"></script>\n",
+    "replace": "<script src=\"shamble-game.js\"></script>\n<script src=shamble-editor.js></script>\n"
+   }
+  ],
+  "expected": [
+   "5b",
+   "5d"
+  ],
+  "notes": "The report lists M19 and M20 together under \"5b + 5d\" and does not say where the tag went. PREDICTED ON 44446a5: [\"5d\"] for this one: the editor's names all resolve in index.html's build (0 unresolved by eslint-scope, e3-analyze.cjs), and the pages share their DOM, so 5b and 5a are expected to stay green. With the tag left unclosed it would swallow the inline script instead (a different mutation); this entry closes it."
+ },
+ {
+  "id": "M21",
+  "what": "shamble-core.js calls a game function: makeInputCommand calls deploy()",
+  "edits": [
+   {
+    "file": "shamble-core.js",
+    "find": "function makeInputCommand(seq,tick){ return {",
+    "replace": "function makeInputCommand(seq,tick){ if(seq<0)deploy(); return {"
+   }
+  ],
+  "expected": [
+   "5c"
+  ],
+  "notes": "makeInputCommand is declared and never called anywhere (one occurrence in the repo), so nothing runs. 5b resolves deploy in the page build."
+ },
+ {
+  "id": "M22",
+  "what": "index.html: an extra <script type=\"text/ecmascript\" src=\"shamble-editor.js\"></script> (a legacy JavaScript MIME type) after the game script",
+  "edits": [
+   {
+    "file": "index.html",
+    "find": "<script src=\"shamble-game.js\"></script>\n",
+    "replace": "<script src=\"shamble-game.js\"></script>\n<script type=\"text/ecmascript\" src=\"shamble-editor.js\"></script>\n"
+   }
+  ],
+  "expected": [
+   "5d"
+  ],
+  "notes": "Read as \"the editor script tag, with a legacy JS type, added to index.html\". battery.scriptKind treats text/ecmascript as classic JavaScript, so 5d sees an extra script. Same runtime effect as M20 (only the tag form differs)."
+ },
+ {
+  "id": "C1",
+  "what": "control: valid inline handlers on index.html (double and single quotes, &amp; &quot; &#39; entities, event, return)",
+  "edits": [
+   {
+    "file": "index.html",
+    "find": "<span id=\"dvCalls\">",
+    "replace": "<span id=\"dvCalls\" onclick=\"if(event&amp;&amp;mode===&quot;menu&quot;)return false;\" ondblclick='return typeof deploy===&#39;function&#39;&amp;&amp;!!event'>"
+   }
+  ],
+  "expected": [],
+  "notes": "index.html only (check 4 reads index.html handlers, 5b reads both pages). mode and deploy are game top-levels. The smoke never clicks #dvCalls."
+ },
+ {
+  "id": "C2",
+  "what": "control: a commented-out editor script tag, an on… variable in the inline script, and the inline script closed with </script > (index.html)",
+  "edits": [
+   {
+    "file": "index.html",
+    "find": "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js\"></script>\n",
+    "replace": "<!-- <script src=\"shamble-editor.js\"></script> -->\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js\"></script>\n"
+   },
+   {
+    "file": "index.html",
+    "find": "<script>\nbootGame();\n",
+    "replace": "<script>\nvar onE3Probe=\"e3NoSuchFn()\";\nbootGame();\n"
+   },
+   {
+    "file": "index.html",
+    "find": "</script>\n</body>",
+    "replace": "</script >\n</body>"
+   }
+  ],
+  "expected": [],
+  "notes": "onE3Probe is a new top-level var of index.html's inline script: check 3 should print it as +added (not a failure). Its string value looks like a handler to a naive scanner."
+ },
+ {
+  "id": "C3",
+  "what": "control: the Deploy button (#mPlay) animated endlessly (a CSS pulse in index.html)",
+  "edits": [
+   {
+    "file": "index.html",
+    "find": "</head>",
+    "replace": "<style>#mPlay{animation:e3pulse .6s ease-in-out infinite}@keyframes e3pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}</style>\n</head>"
+   }
+  ],
+  "expected": [],
+  "notes": "If an existing rule on #mPlay is more specific, the pulse could be overridden; check the shot or computed style if C3 passes suspiciously."
+ },
+ {
+  "id": "PC1",
+  "what": "control: P1 (refreshRect deleted) with --allow-drop refreshRect",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "function refreshRect(){ _cvR=renderer.domElement.getBoundingClientRect(); }\n",
+    "replace": ""
+   }
+  ],
+  "flags": [
+   "--allow-drop",
+   "refreshRect"
+  ],
+  "expected": [],
+  "notes": "PREDICTED ON 44446a5: [\"5a\",\"5b\"], not a PASS. The flag only turns check 3's drop into \"allowed\"; refreshRect is still referenced (shamble-game.js:3275 inside bootGame, index.html:1263, editor.html:1266), so 5b and 5a fail. The Phase 0 report's PASS was on checks 1-4 only. The control holds if check 3 passes with the drop listed as allowed; the plan's \"every control passes in both\" cannot hold for PC1 as written."
+ },
+ {
+  "id": "PC2",
+  "what": "control: pure move of _aLerp from shamble-game.js to shamble-core.js (placed before hyp2)",
+  "edits": [
+   {
+    "file": "shamble-game.js",
+    "find": "function _aLerp(a,b,t){ return a+(b-a)*t; }\n",
+    "replace": ""
+   },
+   {
+    "file": "shamble-core.js",
+    "find": "function hyp2(a,b){ return Math.sqrt(a*a+b*b); }",
+    "replace": "function _aLerp(a,b,t){ return a+(b-a)*t; }\nfunction hyp2(a,b){ return Math.sqrt(a*a+b*b); }"
+   }
+  ],
+  "expected": [],
+  "notes": "_aLerp(a,b,t) uses only its parameters, so core references nothing above it (5c) and the player build resolves it. Check 3 should list \"~ moved: _aLerp (game -> core)\"."
+ }
+]
