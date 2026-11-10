@@ -5,7 +5,7 @@
   #46's merge (main 2d22b69). His words: main STATUS:674-761 and docs/reports/2026-11-10-kit-v3-5.md Appendix A.
   Plan: `.checkpoints/status-diet/plan-rev1.md` (next).
 - **Branch:** `claude/busy-turing-48e4i9` (stands in for `cs/status-diet`) · **Base:** main 2d22b69
-- **Last update:** 2026-11-10 21:37 Amsterdam
+- **Last update:** 2026-11-10 21:40 Amsterdam
 
 ## Steps done
 1. Facts gathered · 9e33794 · `.checkpoints/status-diet/facts.md`: line ranges and destinations, live PR and
@@ -36,6 +36,13 @@ notes `.checkpoints/status-diet/security-auditor-review.md` and `verifier-review
 3. Fold and delete the checkpoint; mark #49 ready; the advisor's final-head review; his go.
 
 ## Open findings
+- security-auditor on 37434d5: PASS WITH NOTES (notes security-auditor-review.md, DONE). Lows: N1 (a pasted block is
+  his word vs advisor.md's "his own words"), N2 ("the advisor" in Standing permission could be read as the tool), N3
+  (the Lanes rule is enforced by nothing; one GitHub user), N4 (docs-keeper item 1 does not name STATUS's Follow-ups and
+  Open risks, which his #46 go keeps in STATUS), N8 ("typed" in the #46 go entry: "given in"). Notes: N5 (the reading to
+  reconfirm: For Mustafa), N6 (the archive's copies of his words mergeable by path, as STATUS was), N7 (docs-keeper item
+  5 makes docs passes day-session merges). Plan: N8 rides the report's push; N1-N4 and N6 become follow-ups (after the
+  gate step); N5 in the report.
 - Night shift cron: daily 06:00 Amsterdam from 2026-11-07, back to hourly 00:10-06:10 since 2026-11-10 18:00 UTC (read 20:10 UTC); recorded in STATUS.
 - PR #40's branch holds his 2026-11-06 answers not on main: tell its lane (report), never push to it.
 
