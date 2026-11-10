@@ -35,3 +35,18 @@ answers (b), C4's lines, rows and mutant come out before the writes.
   package.json`, `.gate/x.mjs`, `.env`, `dist/a.js`, `notes.log`.
 - PR #1's real list: refused (`.claude/agents/art-director.md`); PR #44's: refused (`.claude/CHECKPOINTS.md`); PR #43's:
   refused (`docs/EDITOR_V2.md`, a decision doc, C4).
+
+## Revision 3 build (the allow-list; the scratchpad's `kb6/`, 2026-11-10)
+- `kb6/hooks/routine-guard.mjs`: part A and CANON as before; `mergeAllowed` (L1 plain names, L2 no dot or empty
+  segment, L3 no `node_modules`, L4 places `docs/`, `tools/`, `README.md`, `FIRST_PROMPTS.md` in exact case, L5-L7 no
+  rules, gate or decision-doc name in lower case); the check list's `total_count`; the pr-advisor block (cap, `@tsv`
+  list, count, C5 both names, the allow-list). No git call added; `realIo` unchanged.
+- `kb6/hooks/routine-guard.test.mjs`: 41 merge rows (L1-L7 each with a row only it refuses; dot, case, Windows-name
+  and stream rows; passing rows), 2 night rows, 5 day rows; 14 routine mutants, 1 day mutant.
+- Red (the new tests on main's guard): 39 rows fail, 35 routine and 4 day.
+- Green: routine-guard 1081/1081 (main 1034), no surviving mutant, on the first run; settings 127/127 and checkpoint
+  27/27 in a `git archive` copy of the tree with the new hooks.
+- E9 (`kb6/e9/e9.mjs`, decide() with gh faked on live lists): docs only merges; refused: `docs/a*.md`, `.env.example`,
+  `tools/node_modules/...`, `tools/Node_Modules/...`, `.gate/x.mjs`, `.env`, `dist/a.js`, `notes.log`, and the real
+  lists of PRs #1 (`.claude/agents/art-director.md`), #43 (`docs/EDITOR_V2.md`) and #44 (`.claude/CHECKPOINTS.md`).
+- SHA-256 of the two files: `kb6/SHA256SUMS`.
