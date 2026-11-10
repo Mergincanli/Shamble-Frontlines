@@ -27,7 +27,7 @@ _Last updated: 2026-11-10 (status-diet, PR #49; main 2d22b69)._
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done, U4 in build | its units, runs and report; his OK of each run's plan and cost cap |
 | #47 | the foundation, 2.1a: the legacy gate and tools read both layouts (no file moves) | `claude/advisor-fable-4hxq72` (his personal account) | draft; built | this change-set's merge; then the advisor and his go; 2.1b next |
 | #48 | the foundation, 2.2: the toolchain (pins, empty crates and packages, the offline CI job) | `claude/laughing-pasteur-fwya24` | draft | 2.1b's merge |
-| #49 | status-diet: STATUS-DIET with LANE-RULES (ACCOUNTS, the Models addition) | `claude/busy-turing-48e4i9` (for `cs/status-diet`) | draft; building | the review round; the advisor's final-head review; his go (risk tier 2) |
+| #49 | status-diet: STATUS-DIET with LANE-RULES (ACCOUNTS, the Models addition) | `claude/busy-turing-48e4i9` (for `cs/status-diet`) | the review round (two PASS WITH NOTES), the fix pass and the report done | the advisor's final-head review; his go (risk tier 2) |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10): this change-set; then his unit walk of 2026-11-09 (a docs change-set: UNITS.md

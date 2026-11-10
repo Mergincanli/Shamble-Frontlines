@@ -95,6 +95,14 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
+**STATUS-DIET with LANE-RULES [2026-11-10, PR #49: in review]** — status-diet (Mustafa's queue of 2026-11-10, items 2
+and 3, with ACCOUNTS and his Models addition): STATUS (1233 lines) split by a line-range script into STATUS (109 lines:
+the phase, in flight, next, waiting on Mustafa, the routines, pointers), `docs/DECISIONS.md` (his decisions word for
+word, newest first, and the queue of his words) and `docs/STATUS_ARCHIVE.md` (the rest; Follow-ups and Open bugs and
+risks stay live); every moved line byte for byte, no decision id lost. CLAUDE.md: the read list, "Lanes and accounts"
+and the Fable 5.2 advisor-tool exception, his words quoted; docs-keeper.md follows the split; #46 recorded as merged.
+Report `docs/reports/2026-11-10-status-diet.md`. Next: the advisor's final-head review and his go.
+
 **Kit v3.5, the guard's rename gap [2026-11-09 to 11-10, MERGED]** — kit-v3-5 (F1 from kit-v3-4, agent
 memory included: Mustafa's GUARD-RENAME (c); rules and kit code, symbols +0 −0; plan revisions 1-3 with the advisor's
 REVISE, then APPROVE with D1-D6, then APPROVE with E1-E5; his ORDER (b), SA5-RIDE (a) and allow-list direction of
