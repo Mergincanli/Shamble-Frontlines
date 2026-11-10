@@ -61,15 +61,39 @@
       PM-0001-7 judges 10^6; D-9's "by its fraction"; prediction on a catch-up tick; load_movers).
     - rust-reviewer: APPROVE WITH FINDINGS, 2 Medium and 9 Low. engine-architect: APPROVE WITH FINDINGS, 2 Medium,
       the gaps U4g and U4h will hit, tied to S1.
-  - **U4d's fix pass waits for the advisor's rulings** (below); then one fix pass and round 2 on what changed.
-- **The advisor, at work** (a general-purpose agent reading main's advisor.md; notes advisor-u4-wave1.md):
-  - W1-U4D (U4d's High and Mediums: fix now, carry, or rule);
-  - W1-S1 (the soldier's layout fix and its timing);
-  - W1-N2 (U4a's header plan text);
-  - W1-PUB (the public items beyond §4.1, for U4a, U4b and U4d);
-  - W1-U4E (the U4e brief's 9 questions);
-  - W1-PLAN (the plan text SQUASH-CITES and TCP-FREEZE need);
-  - W1-TARGET (a note on the shared target).
+  - **U4d's fix pass is running** (workflow wf_a8ff8550-67d, task wihgj9fvm), to the advisor's W1-U4D and W1-S1's
+    npt-sim half. Its pre-fix copy is `.gate/u4d-prefix`.
+  - **U4d's round 2** waits for U4a's merge and the main session's npt-proto half of S1. It runs on the combined diff
+    in a scratch worktree, with the security-auditor added for S1's part.
+- **The advisor's wave-1 rulings: done** (advisor-u4-wave1.md, 626 lines, with the exact words for every text
+  change).
+  - **The order:** U4b merges as it is. U4a merges after its round 2, before the S1 fix. U4d merges after U4a.
+  - **W1-S1:** an owner-only record kind in npt-sim; the freeze is lifted for exactly this change, in U4d's fix pass.
+    - npt-proto's half belongs to the main session, in U4d's merge commit after U4a merges: the kind joins both GROUPS
+      tables' own-state rows; the codec refuses a kind its section's rows do not list (this closes SEC-U4a-2); the
+      GROUPS test is extended; the -57 bites test sends the new record.
+    - Lanes gets a "Lifted for one change" sentence.
+  - **W1-U4D:**
+    - Fix now: H1, N-M1, N-M3 = T-M4, N-M4, N-M5, R-M1 = T-M5, A-M1, T-M1, T-M2, T-M3.
+    - The press counters: the build is right. Condition 1's words are amended, §4.2's and §4.10's words change, and
+      InputReports gains per-command refusal records; there is a new U4f carry and a new reading.
+    - A-M2 is carried to U4g. The tuning is approved with conditions. Carry 13's counting-allocator half goes to U5.
+  - **W1-N2:** approved, with new words for §4.4 and §4.14. -58's whole judged set moves from U4r to U4g. marks.json's
+    lt-tick-offset text changes in U4j's brief. A reading, and a new U4e carry: no event ages past 255 ticks.
+  - **W1-PUB:** all approved; nits.
+  - **W1-U4E:** Q1-Q11 answered; the brief's rev 3 carries them with W1-S1, W1-N2 and the new U4e carries.
+  - **W1-PLAN:** SQUASH-CITES and TCP-FREEZE confirmed, with new words.
+    - plan.md:1436-1438 changes.
+    - ws-reconnect.md's `.checkpoints/` cites at 95a04a1 (:26, :74) must point at a kept copy: the closing report's
+      appendix.
+    - The U8 row and §15's R-25 row change for TCP-FREEZE.
+  - **W1-TARGET, for wave 2:**
+    - a `flock` lock on `.gate/shared-target/.lane.lock` (shared for builds, exclusive for counted and bite runs);
+    - a provenance check: the log shows "Compiling <crate> (<this copy's path>)";
+    - at least 4 GB free before a wasm32 or release build;
+    - `cargo clean --target-dir .gate/shared-target` between waves.
+  - **The plan text edits** (plan.md, u4-build-plan.md, u4s-carries.md, advisor-u4.md's amendment line) are the main
+    session's, with the advisor's words, at the next natural stop.
 - **U4c (the link model):** built and not merged.
   - netcode-architect and rust-reviewer: both APPROVE WITH FINDINGS. The rust Medium: one test cannot catch a fault
     in `next_event_ns`.
@@ -102,6 +126,12 @@
    - The brief itself goes to the advisor after wave 1 merges, with its 28-row recheck done.
 
 **Open questions for Mustafa**
+- **NETEM-BAR** (the advisor's, 2026-11-10; blocks nothing before R1): when netem wins under TCP-FREEZE, does WS-BAR's
+  "never looser than the model ... beyond 10 %, investigate first and never loosen" still cap the WebSocket bar?
+  - (a) it stays capped, and a failure is reported as the kernel's, with the netem numbers, to Mustafa;
+  - (b) netem's practice run sets the numbers (this changes WS-BAR);
+  - (c) decide at R1.
+  - The advisor recommends (a).
 - **NS-START (a), his edit:** the night-shift routine back to `CRON_TZ=Europe/Amsterdam 10 0-7 * * *` at
   https://claude.ai/code/routines/trig_01QpV6y6UaG1Na2q3jumRDxh. Agents cannot edit it: it was created through the
   API. Nothing else is open.

@@ -76,7 +76,7 @@ foreign processes recorded). Flake repeats: u4c-test-repeat.py; under contention
     instant each item is handed out; advance() applies events at their own time, so any next_event_ns passes.
   - no-packet-threshold (PACKET_THRESHOLD 1,000,000): ALL 28 PASS. packet-threshold-2: ALL 28 PASS.
     -> C1' (b)'s kPacketThreshold is pinned by no test: L-c1's 33 ms spacing makes the time threshold win always
-    (3 later packets = 100 ms + RTT > 9/8 RTT). The stream test's comment (tests/l1.rs:385-386) names the packet
+    (3 later packets = 100 ms + RTT > 9/8 RTT). The stream test's comment (tests/l1.rs:384-386) names the packet
     threshold too, unpinned.
   - time-threshold-srtt-only (latest RTT dropped from max): ALL 28 PASS (L-c7 link 1 has srtt = latest).
   - acks-lost-at-profile-rate (acks also lost at the profile's loss outside bursts): ALL 28 PASS: Q15's "lost inside
@@ -97,7 +97,8 @@ foreign processes recorded). Flake repeats: u4c-test-repeat.py; under contention
   913db8e914bdb773f6f1..., B1 s1 feabf2f02d023fa9784b..., P4 s1 b8a04f2f8ddc0d39624d... = the 16-hex prefixes in the
   committed results/c-u2-pm-0001-3/81c6d01e371b/runs.txt:16,28,34 (2,000,000 / 2,020,000 / 2,000,000 datagram
   entries of 3,959,634 / 3,979,629 / 3,899,978). Pins: 0xadfbebe4bb1abf64, 0x43749a62922e9b35, 0x246e7a241a2a0a18 =
-  tests/l1.rs. 3 s per probe run. Not re-derived on the OLD code by me (provenance: builder notes 18:20Z item 1).
+  tests/l1.rs. 3 s per probe run. Not re-derived on the OLD code by me (provenance: builder notes u4c-build.md:38-45,
+  item 1 on the OLD code, which also reproduced U2's three full hashes there).
   Scratch files' sha256 unchanged by the run (main.rs f0cc015d, Cargo.toml 954ed45f, Cargo.lock 0f305fab).
 - 10:47-10:49Z check.mjs R2: all 10 PASS, 285 / 312, but another lane's `cargo test -p npt-sim --test te_probe` was
   running at its start (my pgrep showed it; the command did not wait): NOT counted.
@@ -123,6 +124,44 @@ foreign processes recorded). Flake repeats: u4c-test-repeat.py; under contention
   on the very binary R3 ran. It stays the leading candidate for R3 (the builder's runs A-D and G failed the same way),
   though R3's 2 s sampling saw no foreign cargo. The script now copies the binary to .gate/u4c-review-test/ at once and
   checks its debug info names only this worktree (ok: ea5bbd1a..., reproducible).
-- 15:32Z load cpu1k2 (2 copies at once on CPU 0, 3 rounds) running in the background.
-- Next: cpu1k2 results; plants plant2 (max-ack-delay-0, initial-rtt-300, granularity-0, max-packet-1100,
-  max-packet-1500, var-from-new-smoothed); the final counted check.mjs (step 4); final sha256; findings + verdict.
+- 15:32-15:39Z load cpu1k2 (the copied binary, 2 copies at once on CPU 0, 8 test threads on one CPU, 3 rounds):
+  6/6 "160 passed; 0 failed; 12 ignored" in 143.3-151.4 s (5.4x). R3 not reproduced in 13 runs in all (6 quiet, 7
+  starved). NOT root-caused. Also found: check.mjs's run() keeps stdout then stderr (check.mjs:1312), so a failed
+  test step's 40-line tail (:1529) is cargo's stderr and cuts the "failures:" list and the panic: why R3's name is lost.
+- 15:33-15:35Z plant2 (constants, measured build, marker present, this copy's npt-l1 compiled, no foreign cargo,
+  restored + sha256 each): all six caught.
+  - max-ack-delay-0: lc2 "a PTO of 114.229 ms at P2, outside [130, 180] ms", lc9 "first PTO at 999.0 ms ... not
+    1,024 ms", the_rtt_estimator_follows_rfc_9002_from_its_starting_state (999000000 vs 1024000000).
+  - initial-rtt-300: lc9 "925.0 ms", the estimator test ((300 ms, 150 ms) vs (333 ms, 166.5 ms)).
+  - granularity-0: lc9 "link 1's PTO at 25.0 ms with a zero estimate, not 26 ms", the estimator test.
+  - max-packet-1100 and max-packet-1500: lc4 "the 3,000 B message did not go as three packets of 1,200, 1,200 and
+    600 B" (so 1,200 is pinned exactly, not only the piece count).
+  - var-from-new-smoothed (rttvar from the new smoothed RTT): the estimator test (59 vs 62).
+- 15:40:37-15:43:14Z Task step 4, check.mjs R4 (after a fresh touch; 20 s idle first; touch every 2 s; df 12 GB; no
+  foreign cargo/rustc during it): all 10 PASS. fmt 0.4 s; clippy 8.1 s; clippy-wasm32 0.8 s; doc 21.4 s; test 120.0 s
+  measured 285 passed 0 failed 0 skip, bites 312 passed 0 failed 0 skip; deps 0.6 s; refs 0.4 s (562); marks 2.9 s
+  (81, drafts 626df678); self 1.3 s 48/48; redact 0.8 s 10/10 (158 items, 0 findings). Counted: R1 and R4.
+- 15:43Z Final: sha256 -c of all 158 spike files vs u4c-sha-before.txt ALL MATCH; lib.rs 1647e75d, tests.rs
+  c21a362f, tests/l1.rs 639ab9c5; git status = the build's files only; HEAD 097f897. The worktree is unchanged by me.
+  Outside it: my notes, logs and scripts here, and the binary copy .gate/u4c-review-test/npt_net-lib-test.
+
+## Findings (round 1)
+- M1 Medium: L-c5 cannot fail on a wrong next_event_ns (tests.rs:893-911): next-event-none, -no-timers, -no-ready all
+  pass L-c5; -no-timers and -no-ready pass all 28 tests. Fix: event mode calls only at next_event_ns and the script's
+  real send instants; assert each item's hand-out call instant; a direct PTO-timer and loss-timer case.
+- M2 Medium: kPacketThreshold (lib.rs:111, :1556) pinned by no test: 1,000,000 and 2 pass all 28; L-c1 accepts either
+  rule (tests.rs:433). Fix: staggered back-to-back pieces with fixed delay; declared by count at the third later
+  packet's ack, exactly; both plants must fail.
+- L1 Low: the latest-RTT term of the time threshold (lib.rs:641) unpinned (time-threshold-srtt-only passes all 28).
+- L2 Low: Q15's "acks lost inside bursts only" has no negative test (acks-lost-at-profile-rate passes all 28;
+  lib.rs:1423). Fix: assert no ack entry Lost outside a burst in a lossy run's v2 log.
+- L3 Low: L-c6 does not tell (time, fate index) from (time, link) (event-order-link-first passes all 28;
+  tests.rs:971-972, 1038-1046). Fix: send on link 3 before link 2.
+- L4 Low: tests/l1.rs:384-386 says the burst's packets are declared lost "by the packet threshold"; no assertion (the
+  no-packet-threshold plant passes it).
+- N1 nit: fails() accepts any "L-cN" error (tests.rs:1274-1277); all 8 bites hit each test's main check today.
+- O1 Medium, outside U4c: R3's one npt-net lib failure, unnamed, not reproduced in 13 runs; same-name binary in the
+  shared target replaced by another copy's build (witnessed 15:30Z). Not root-caused: STATUS follow-up.
+- O2 Medium, outside U4c (check.mjs, U4a's file): failed test step hides the failing name (check.mjs:1312, :1529).
+- Verdict: APPROVE WITH FINDINGS (M1, M2 for the fix pass; L1-L4 the fix pass or STATUS; O1, O2 follow-ups).
+DONE
