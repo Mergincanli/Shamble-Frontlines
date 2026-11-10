@@ -154,6 +154,12 @@ Total 603 docs hits, every one read in context by the docs agent (`inv-docs.md`)
 2.1a (the tools learn both layouts; nothing moves):
 - `tools/gate.mjs`: add one top-level name, `BUILD`: the folder that holds all five files, `legacy/` or the root; if
   both hold them, or neither, the gate stops with exit 2 and says which (two copies must never be judged by guess).
+  **As built (dd12aeb, 2026-11-10; a departure, stated in PR #47):** the marker is the three `shamble-*.js` files, any
+  of them: `legacy/` when it holds one, else the root; any engine file in both places → exit 2; a missing file keeps
+  today's "is missing from the working tree" (exit 2). Why: any overlap is caught, and a future v2 `index.html` at the
+  root never makes the root look like the legacy build. The rule lives once, in smoke.mjs's exported `findBuild`
+  (with `LEGACY_JS`), which gate.mjs loads in a guarded import; `baseFile(b, f)` takes the base object. Proven by
+  `rows-test.mjs` (8 rows, 2 smoke rows) and `e3-bases.md`.
   `headFile` reads `BUILD/<f>`; `baseFile` tries `legacy/<f>`, then `<f>` (a base from before the move), then
   `shamble-frontlines-repo/<f>` (CS-1's era), `legacy/` first so a later root file of the same name is never read as
   legacy; `classicParts` resolves `<script src>` against `BUILD` and keeps the containment check under it; the smoke
