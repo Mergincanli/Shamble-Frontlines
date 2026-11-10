@@ -130,6 +130,11 @@ reset at 20:00):**
   - Then commit with `git rm` of `wip/u4a.patch`, and push.
   - N8's last items (the event wire form; the proposals for Leave, ClientSettings, the peer set and SessionStatus):
     a follow-up, Low.
+- **SAVE at about 20:50 UTC (Mustafa at 91 % usage):** snapshots refreshed: wip/u4d.patch (14 files), wip/u4c.patch
+  (3 files), and **wip/u4j.patch** (29 files, base 411eeee). U4j's worktree is
+  `.claude/worktrees/agent-a3b8dfeb01ed52b50`, with notes u4j-build.md, copied to this folder.
+  - To resume U4j: SendMessage to its agent; or, if the worktree is gone, a fresh builder at 411eeee applies
+    wip/u4j.patch and continues from u4j-build.md.
 - **Resumed at 20:36:**
   - U4d's fixer (wf_a8ff8550-67d, task wsnzz9qtq);
   - U4c's fixer and its round 2 (wf_610486f7-cc1, task w11llknmp);

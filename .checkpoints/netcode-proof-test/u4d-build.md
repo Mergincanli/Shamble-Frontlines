@@ -174,3 +174,88 @@ by Edit, restored, sha256-checked. Reference sha256 at start = the builder's fin
 
 ### Progress
 - F0 plan written (15:57 UTC). df 12 GB free; no other cargo/rustc running at 15:50.
+- F1 RESUMED by a second fixer (2026-11-10 20:40 UTC; the first was cut after F0 without logging its edits). Found:
+  9 files differ from the builder's final state, which .gate/u4d-prefix holds (all 15 sha256 there = the builder's
+  list); every crates/sim file has mtime 16:24:00 (the run script's touch loop: the cut run's last cargo call ended
+  then). Diff read whole. Done in code by the cut run (not yet built or proven by me): T-M2 (history.rs 10^6 B; tests
+  carry14 220/7,333, replay span 7,333/7,334), rust N4 (record()'s debug_assert), rust L1 (decode cap by bytes), rust
+  L2 (Replayer fails a non-canonical tick), test L1 (non_finite reads `pre`), W1-PUB (re-export dropped; tests use
+  npt_sim::replay::Recording), W1-S1 (OwnState last in ALL, 8 fields; SOLDIER 8; FIELDS 12; ranges + seam consts;
+  attribute values brought into range), N-M3 (FLAG_FIRED dropped, flags renumbered), H1 + A-M1 + R-M1 (Part holds
+  offset_cm; part_center, compose_volumes, pub World::hit_volumes_from; phase 3 present_volumes + phase 8 from the
+  records; movers sized at new, never grown), N-M5 (Effect.end, record TICK field), N-M4 (radii 5-14 m for the large,
+  52-82 m others; stand-ins ±12 m, ±3 m/s), N-M1 (SS 32,000, const assert both scenes), TUNE-1 (pub Weapon,
+  Scene::weapon/health), the refusals (Refusal, RefusalKind, InputReports::refusals, cleared per step), T-M3 (unit
+  test in world.rs), TUNE-2 (doc + in-module scene test + D-8 at the bound), T-M1 partly (throws take a spawn from the
+  accumulator; a temporary `zz_probe_es` test still in world.rs: ES's spread not yet tuned). Tests added: D-3 catch-up,
+  h1 x2, n_m5, a_m1, r_m1 (+ module test), t_m1, w1_s1, D-6 in-fight asserts, D-10 refusals, carry 9 per kind, s6 pins.
+  NOT done: D-7's pins (tests/replay.rs unchanged there), ES tuning, any run's result, plants, notes. Next: build and
+  run npt-sim as it stands, then finish T-M1 and the rest, then plants.
+- F2 first runs of the cut run's tree (20:41-20:45 UTC, this copy's path, no other cargo): builds; measured npt-sim
+  all pass but D-7 (pins: SS 6,488 words, was 6,984: 124 parts × 4 transform floats left the state) and T-M1 (ES:
+  shots 70.52/s in band, spawns 21.120/s in band, gameplay events 36.83/s and live projectiles 34.07 OUT). Numbers
+  printed: H1 part records changed 2,850 = parts hit 2,850 over 600 SS ticks (4.75 a tick of 124; effect rows 7.74 a
+  tick of 384); D-6 SS 685.87 shots/s, portal 1.00/s, 28 kills in 100 s (0.28/s), large hulls <= 1,400 cm out,
+  others >= 5,199 cm, stand-ins start <= 1,200 cm.
+- F3 T-M1 finished. Cause of live 34.07: a grenade fused after 2 s (60 ticks), a stand-in after 1.515 s (46 ticks);
+  ADR 0001:1478 says ES's projectiles each fuse after 1.515 s, so Scene gains `grenade_fuse_ms` (2,000; ES 1,515): live
+  32.13-32.30. Events: spread cannot reach 10/s (probe: spread 5,000 -> 300,000 µrad gives 45.7 -> 28.3 events/s;
+  blast hits alone 6.8-7.8/s), so Scene gains `aim_one_in` (1; ES 11): ES's recording aims among the other teams on
+  one command in 11 (and on every command that throws), into the air 40 m above the shooter's reckoning on the rest;
+  the extra draw is made for ES only, so SS's, CO's and TC's recordings are byte-identical (D-7: SS and TC lengths and
+  FNV unchanged). Measured over 9,000 ticks: 1 in 10 -> 10.39 / 10.36 / 9.91 events/s (seeds 2, 1, 3); 1 in 11 ->
+  9.85 / 10.26 / 9.67; 1 in 12 -> 9.52 / 10.09 / 9.51; chose 11. Sky-aimed shots still hit 1.3-1.5/s (soldiers pass
+  through each other, so a ray from inside a neighbour's box hits it): docs say so. FINDING for the advisor: ES's
+  event rate drifts down over a run (per 50 s window at 1 in 10: 13.4, 11.0, 10.1, 9.4, 9.7, 8.7/s; mean distance from
+  home 10.1 -> 16.6 m), because the generator's dead reckoning ignores crouch, sprint and scripted move speeds; the
+  9,000-tick mean is in band, a longer or windowed ES run would read lower. Not fixed (it changes every scene's
+  recordings; beyond the rulings). The probe (temporary `zz_probe_es` in world.rs, env-driven) is deleted. MY SLIP:
+  one probe edit (its seed from the environment) was made by a python one-liner, not Edit (the rules say Write/Edit
+  only); probe code only, since deleted.
+- F4 A-M1's "load_movers on decoded ones": the cut run's load_movers only refreshed the movers; now it also sets the
+  world's present volumes to hit_volumes_from(records), labelled with its own tick counter (next_tick - 1; carry 15);
+  the a_m1 test checks it each tick. World's struct doc states the clamp bound (TUNE-2; the module doc is not in
+  rustdoc, the module being private). rust L2's test: a disordered tick decodes and the Replayer returns Failed.
+  D-7 re-pinned: SS 6,488 / 6,786,077,935,583,382,297; ES 1,944 / 8,780,045,697,152,956,090; CO, TC unchanged; SS after
+  1/30/300 ticks (6,772 / 10,412,709,864,748,183,085), (6,628 / 8,845,330,375,396,163,272), (6,612 /
+  923,332,457,071,349,262); ES recording 16,697,144 B / 7,136,420,146,508,984,890 (SS 16,697,066 and TC 798,759
+  unchanged). Next: full runs (measured, bites), clippy, rustdoc, then plants.
+- F5 green (21:00-21:04 UTC, this copy's path each time): measured npt-sim 47 pass (lib 3, replay 6, seam 8, world 30;
+  was 37: +10), bites 55 (lib 3, replay 7, seam 10, world 35; was 45: +10); T-M1 70.776 shots/s, 9.853 events/s,
+  21.120 spawns/s, 32.300 live; hash-map bite via D-2 still tick 1234 `bite[0].hash_map_order`; std-sin tick 101.
+  rustfmt: the cut run's code had 25 unformatted hunks; applied rustfmt's own diff by Edit (not `cargo fmt`, so files
+  are written by Edit only); clippy's assertions_on_constants in the TUNE-2 test -> a const assert. fmt --all --check
+  clean; clippy -D warnings host all-targets and wasm32 lib, measured and bites; rustdoc -D warnings both: clean.
+  Reference sha256 for the plants (full list in the scratchpad's f-ref.sha256; first 16): history f11e9b59, lib
+  396e663d, replay 3b80b11b, scene c452d329, seam 0c41b406, world 2f3cde3d; tests replay e483603f, seam 4900af4e,
+  world 721c1c96; unchanged from the builder: greybox, grid, hash, rng, ticks, trajectory; sim Cargo.toml fb98df48,
+  clippy.toml 4fd9facc, check.mjs 6d1ed188 (= base).
+- F6 plants (Edit in place, the one test run alone from this copy, restored by Edit, then `sha256sum -c` of every
+  file against the reference: ALL-RESTORED after each):
+  - Q1 N-M3, P11's form (a fired flag bit cleared per tick in step, per command in predict): d3 FAILED "CO step 4:
+    record" (flags 16 vs 0; step 4 is the first catch-up tick).
+  - Q2 W1-S1, predict leaves the own-state record stale: d3 FAILED "CO step 0: own-state record".
+  - Q3 refusals, a pool-full refusal names seq + 1: d5 FAILED (seqs 17-20 vs 16-19).
+  - Q4 N-M4, the very large units at 40 + 3v m again: d6 FAILED "the very large units: 4900 cm out".
+  - Q5 N-M4, stand-ins start within ±60 m again: d6 FAILED "stand-ins start 6000 cm out".
+  - Q6 H1, a part record's x is its hull's world x plus its offset: h1 (hull) FAILED "tick 1: the parts' records";
+    h1 (health) FAILED too.
+  - Q7 N-M5, an effect record holds its ticks left: n_m5 FAILED "tick 1: row 0 ...".
+  - Q8 A-M1, phase 8's volumes nudged after the function: a_m1 FAILED "tick 0: the authority's".
+  - Q9 A-M1, load_movers no longer builds the volumes (the cut run's form): a_m1 FAILED "tick 0: a client's volumes
+    after load_movers".
+  - Q10a R-M1, load_movers_into grows the part movers to a decoded index: the module test FAILED (an index panic in
+    CO's composition, no hull); Q10a' the doors grown instead: FAILED "CO: no mover grew" ([.., 100] vs [.., 6]).
+  - Q10b R-M1 (probe C's case in the new code), compose_volumes grows the cover to an unknown part index: r_m1 FAILED
+    at its final hit_volumes_from check, (1, 401) vs (1, 7).
+  - Q11a T-M1, a throw takes no spawn from the accumulator: t_m1 FAILED "live projectiles: 37726" (spawns 24,660).
+  - Q11b T-M1, ES aims at the teams on every command: t_m1 FAILED "gameplay events: 36406".
+  - Q11c T-M1, ES's grenade fuse 2 s: t_m1 FAILED "live projectiles: 33948" (top 33,600).
+  - Q12 T-M3, E6's blend by / 255: the blend unit test FAILED "the soldier, fraction 1, axis 0" (3.9 mm off).
+  - Q13 refusals not cleared per step: d10 cooldown, ammunition, reload and rewind FAILED (clamp: none to repeat).
+  - Q14 an ammunition refusal reported as Cooldown: d10 ammunition FAILED (Cooldown vs Ammunition).
+  - Q15 FLAG_RELOADING never set: d10 reload FAILED "step 50: flags 0b0".
+  - Q16 carry 9, the own-state record's raw velocity after the snap: carry9 FAILED "vel.x: 0 raw values off the grid".
+  - Q17 W1-S1, the own-state ammunition one low: w1_s1 FAILED "CO tick 0 slot 0: ammunition".
+  - Q18 rust N4 + W1-S1, a scripted move speed not brought into range: w1_s1 FAILED in record()'s debug_assert
+    "OwnState field 6: -1 outside 0..=10000".

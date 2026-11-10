@@ -1,0 +1,3355 @@
+diff --git a/spikes/netcode-proof/crates/judge/src/eval.rs b/spikes/netcode-proof/crates/judge/src/eval.rs
+index 8ba877e..afef95a 100644
+--- a/spikes/netcode-proof/crates/judge/src/eval.rs
++++ b/spikes/netcode-proof/crates/judge/src/eval.rs
+@@ -3,8 +3,10 @@
+ 
+ use crate::figures;
+ use crate::marks::{
+-    Against, Combine, Cond, Kind, Mark, Marks, Measure, Part, Rule, Source, Stat, Threshold, Window,
++    Against, BoundNumber, Combine, Cond, Kind, Mark, Marks, Measure, Part, Rule, Source, Stat,
++    Threshold, Window,
+ };
++use crate::practice;
+ use crate::ratio::Ratio;
+ use npt_log::{Header, Log, Phase};
+ use serde::Serialize;
+@@ -72,11 +74,13 @@ pub fn runs(logs: &[Log]) -> Vec<Run<'_>> {
+         .collect()
+ }
+ 
+-/// Why a value could not be had: a gap in the record (the run is invalid), or code not built yet (NOT-RUN).
++/// Why a value could not be had: a gap in the record (the run is invalid), code not built yet (NOT-RUN), or a
++/// comparison that compared nothing (its check fails: README §2.3).
+ #[derive(Debug, Clone, PartialEq, Eq)]
+ pub(crate) enum Missing {
+     Gap(String),
+     NotBuilt(String),
++    Empty(String),
+ }
+ 
+ fn header_value(h: &Header, key: &str) -> Option<Value> {
+@@ -343,6 +347,16 @@ pub enum Outcome {
+     Gap,
+     /// Not decidable yet (code not built, a reference run missing): NOT-RUN.
+     Cannot,
++    /// A comparison that compared nothing (a decoded or twin hash figure with 0 pairs): the run fails, as for `Fail`,
++    /// but no bite is shown by it (a bite run that compared nothing did not test its bite: README §5).
++    Empty,
++}
++
++impl Outcome {
++    /// The check failed the run: a plain failure, or an empty comparison.
++    pub fn fails(self) -> bool {
++        matches!(self, Outcome::Fail | Outcome::Empty)
++    }
+ }
+ 
+ #[derive(Debug, Clone, Serialize)]
+@@ -377,7 +391,7 @@ fn reference(
+         ));
+     }
+     let as_text = |e: Missing| match e {
+-        Missing::Gap(s) | Missing::NotBuilt(s) => s,
++        Missing::Gap(s) | Missing::NotBuilt(s) | Missing::Empty(s) => s,
+     };
+     match against.combine {
+         Combine::Pooled => measure(m, &refs, set, from).map_err(as_text),
+@@ -402,7 +416,66 @@ fn reference(
+     }
+ }
+ 
+-fn eval_check(check: &crate::marks::Check, runs: &[&Run<'_>], set: &[&Run<'_>]) -> CheckOut {
++/// The ws-practice rule's tolerance for a check's parts (the mark's rule, else its first part's).
++fn practice_tolerance(mark: &Mark, check: &crate::marks::Check) -> Option<Ratio> {
++    let tolerance = |r: &Rule| match r {
++        Rule::WsPractice { tolerance, .. } => Some(*tolerance),
++        _ => None,
++    };
++    mark.validity.iter().find_map(tolerance).or_else(|| {
++        mark.parts
++            .iter()
++            .filter(|p| check.parts.contains(&p.name))
++            .flat_map(|p| &p.validity)
++            .find_map(tolerance)
++    })
++}
++
++/// A `ws_bound` check with the numbers in force: the bound's number times the practice run's factor, rounded up to
++/// the millisecond (README §2.3); k stays. The ws-practice rule has already held, so a lookup failing here is a gap.
++fn in_force(
++    check: &crate::marks::Check,
++    n: BoundNumber,
++    run: &Run<'_>,
++    set: &[&Run<'_>],
++    ctx: &Ctx<'_>,
++) -> Result<(crate::marks::Check, String), String> {
++    let tolerance = practice_tolerance(ctx.mark, check)
++        .ok_or_else(|| format!("{} holds no ws-practice rule", ctx.mark.id))?;
++    let p = practice::find(run, set, ctx.mark, tolerance)?;
++    let mut moved = check.clone();
++    match (n, &mut moved.measure) {
++        (BoundNumber::Y, Measure::Series { cond: Some(c), .. }) => c.value = p.moved(n),
++        _ => moved.threshold = Threshold::Value(p.moved(n)),
++    }
++    moved.ws_bound = None;
++    Ok((moved, p.describe(n)))
++}
++
++fn eval_check(
++    check: &crate::marks::Check,
++    runs: &[&Run<'_>],
++    set: &[&Run<'_>],
++    ctx: &Ctx<'_>,
++) -> CheckOut {
++    if let (Some(n), [run]) = (check.ws_bound, runs) {
++        return match in_force(check, n, run, set, ctx) {
++            Ok((moved, how)) => {
++                let mut o = eval_check(&moved, runs, set, ctx);
++                o.name = check.name.clone();
++                o.needs = format!("{} ({how})", o.needs);
++                o
++            }
++            Err(why) => CheckOut {
++                name: check.name.clone(),
++                outcome: Outcome::Gap,
++                value: None,
++                needs: String::new(),
++                note: Some(format!("ws-practice: {why}")),
++                setup: check.setup,
++            },
++        };
++    }
+     let (op, needs_text) = (check.op, |t: &str| format!("{} {t}", check.op.text()));
+     let out = |outcome, value: Option<Ratio>, needs: String, note: Option<String>| CheckOut {
+         name: check.name.clone(),
+@@ -416,6 +489,13 @@ fn eval_check(check: &crate::marks::Check, runs: &[&Run<'_>], set: &[&Run<'_>])
+         Ok(v) => v,
+         Err(Missing::Gap(why)) => return out(Outcome::Gap, None, String::new(), Some(why)),
+         Err(Missing::NotBuilt(why)) => return out(Outcome::Cannot, None, String::new(), Some(why)),
++        Err(Missing::Empty(why)) => {
++            let needs = match &check.threshold {
++                Threshold::Value(t) => needs_text(&format!("{t} over at least 1 compared")),
++                Threshold::Against { .. } => String::new(),
++            };
++            return out(Outcome::Empty, None, needs, Some(why));
++        }
+     };
+     match &check.threshold {
+         Threshold::Value(t) => {
+@@ -456,7 +536,8 @@ fn field_bool(f: &BTreeMap<String, Value>, name: &str) -> Option<bool> {
+     f.get(name).and_then(Value::as_bool)
+ }
+ 
+-/// The three rules that hold for every run: consistent headers, complete logs, the roster, and capabilities.
++/// The rules that hold for every run: consistent headers, complete logs, the roster, capabilities, and the build
++/// (the advisor's C4): a measured build never names a bite, and a bite never runs without the bites build.
+ pub(crate) fn always_rules(run: &Run<'_>) -> Vec<String> {
+     let mut why = Vec::new();
+     if !run.inconsistent.is_empty() {
+@@ -465,6 +546,34 @@ pub(crate) fn always_rules(run: &Run<'_>) -> Vec<String> {
+             run.inconsistent.join(", ")
+         ));
+     }
++    let bites_build = run
++        .logs
++        .iter()
++        .any(|l| l.header.build.features.iter().any(|f| f == "bites"));
++    match run.bite {
++        Some(id) => {
++            if run.role != "bite" && run.role != "twin" {
++                why.push(format!(
++                    "build: a {} run names the bite {id}; only a bite run or a bite run's twin may",
++                    run.role
++                ));
++            }
++            if !bites_build {
++                why.push(format!(
++                    "build: the run names the bite {id}, but none of its logs comes from a bites build"
++                ));
++            }
++        }
++        None => {
++            if bites_build {
++                why.push(format!(
++                    "build: a {} run names no bite, but a log of it comes from a bites build (measured builds never \
++                     contain the bites)",
++                    run.role
++                ));
++            }
++        }
++    }
+     for log in &run.logs {
+         let h = &log.header;
+         let killed = h.params.get("killed") == Some(&Value::Bool(true));
+@@ -870,7 +979,7 @@ fn rule(
+                 return;
+             }
+             for c in checks {
+-                let o = eval_check(c, &[run], set);
++                let o = eval_check(c, &[run], set, ctx);
+                 let note = o.note.clone().unwrap_or_default();
+                 match o.outcome {
+                     Outcome::Pass => {}
+@@ -880,11 +989,17 @@ fn rule(
+                         o.value.as_deref().unwrap_or("?"),
+                         o.needs
+                     )),
++                    Outcome::Empty => why.push(format!("pre:{id}: {}: {note}", c.name)),
+                     Outcome::Gap => why.push(format!("pre:{id}: a gap in the record: {note}")),
+                     Outcome::Cannot => undecided.push(format!("pre:{id}: {note}")),
+                 }
+             }
+         }
++        Rule::WsPractice { tolerance, .. } => {
++            if let Err(e) = practice::find(run, set, ctx.mark, *tolerance) {
++                why.push(format!("ws-practice: {e}"));
++            }
++        }
+     }
+ }
+ 
+@@ -895,7 +1010,7 @@ struct Validity {
+     undecided: Vec<String>,
+ }
+ 
+-/// The three rules that hold for every run, then each named rule.
++/// The four rules that hold for every run, then each named rule.
+ fn validity<'r>(
+     run: &Run<'_>,
+     rules: impl IntoIterator<Item = &'r Rule>,
+@@ -912,9 +1027,11 @@ fn validity<'r>(
+     v
+ }
+ 
+-/// What every judgement may consult: the whole marks file (for preconditions).
++/// What every judgement may consult: the whole marks file (for preconditions) and the mark being judged (whose
++/// practice run the ws-practice rule looks for).
+ pub(crate) struct Ctx<'m> {
+     marks: &'m Marks,
++    mark: &'m Mark,
+ }
+ 
+ /// The parts of a mark whose `select` a run matches, its role aside.
+@@ -1071,7 +1188,7 @@ fn judge_run<'c>(
+     }
+     let (setup, plain): (Vec<_>, Vec<_>) = checks.partition(|c| c.setup);
+     for c in setup {
+-        let o = eval_check(c, &[run], &set);
++        let o = eval_check(c, &[run], &set, ctx);
+         let note = o.note.clone().unwrap_or_default();
+         match o.outcome {
+             Outcome::Pass => {}
+@@ -1081,7 +1198,9 @@ fn judge_run<'c>(
+                 o.value.as_deref().unwrap_or("?"),
+                 o.needs
+             )),
+-            Outcome::Gap => out.invalid_why.push(format!("setup: {}: {note}", c.name)),
++            Outcome::Gap | Outcome::Empty => {
++                out.invalid_why.push(format!("setup: {}: {note}", c.name))
++            }
+             Outcome::Cannot => out.undecided.push(note),
+         }
+         out.checks.push(o);
+@@ -1091,7 +1210,7 @@ fn judge_run<'c>(
+         return out;
+     }
+     for c in plain {
+-        out.checks.push(eval_check(c, &[run], &set));
++        out.checks.push(eval_check(c, &[run], &set, ctx));
+     }
+     let gaps: Vec<String> = out
+         .checks
+@@ -1104,7 +1223,7 @@ fn judge_run<'c>(
+             )
+         })
+         .collect();
+-    if out.checks.iter().any(|c| c.outcome == Outcome::Fail) {
++    if out.checks.iter().any(|c| c.outcome.fails()) {
+         out.gaps = gaps;
+     } else if !gaps.is_empty() {
+         out.invalid_why = gaps;
+@@ -1127,7 +1246,17 @@ fn rules_of<'m>(mark: &'m Mark, parts: &[&'m Part]) -> Vec<&'m Rule> {
+ }
+ 
+ fn fail_lines(part: &str, r: &RunOut, out: &mut Vec<String>) {
+-    for c in r.checks.iter().filter(|c| c.outcome == Outcome::Fail) {
++    for c in r.checks.iter().filter(|c| c.outcome.fails()) {
++        if c.outcome == Outcome::Empty {
++            out.push(format!(
++                "{part}: run {}: {}: {}; an empty comparison fails (needs {})",
++                r.run,
++                c.name,
++                c.note.as_deref().unwrap_or(""),
++                c.needs
++            ));
++            continue;
++        }
+         out.push(format!(
+             "{part}: run {}: {} = {}, needs {}",
+             r.run,
+@@ -1174,14 +1303,14 @@ fn eval_part(
+             .iter()
+             .filter(|c| c.pooled && applies(c, &part.name))
+         {
+-            pooled.push(eval_check(c, &valid_runs, &set));
++            pooled.push(eval_check(c, &valid_runs, &set, ctx));
+         }
+     }
+     let mut why = Vec::new();
+     let failed = runs
+         .iter()
+-        .any(|r| r.valid && r.checks.iter().any(|c| c.outcome == Outcome::Fail))
+-        || pooled.iter().any(|c| c.outcome == Outcome::Fail);
++        .any(|r| r.valid && r.checks.iter().any(|c| c.outcome.fails()))
++        || pooled.iter().any(|c| c.outcome.fails());
+     let invalid = runs.iter().any(|r| !r.valid) || pooled.iter().any(|c| c.outcome == Outcome::Gap);
+     let cannot = runs.iter().any(|r| {
+         r.valid
+@@ -1194,7 +1323,7 @@ fn eval_part(
+                 why.push(format!("{}: run {}: also {g}", part.name, r.run));
+             }
+         }
+-        for c in pooled.iter().filter(|c| c.outcome == Outcome::Fail) {
++        for c in pooled.iter().filter(|c| c.outcome.fails()) {
+             why.push(format!(
+                 "{}: pooled: {} = {}, needs {}",
+                 part.name,
+@@ -1327,8 +1456,22 @@ fn eval_bite(
+                 matched.iter().any(|p| applies(c, &p.name))
+             }
+         });
+-        let o = judge_run(run, all, &rules, checks, ctx);
+-        // Shown when a check fails on a run that held its validity rules and setup checks (C2: gaps aside).
++        let mut o = judge_run(run, all, &rules, checks, ctx);
++        // Shown when a check fails on a run that held its validity rules and setup checks (C2: gaps aside). A bite
++        // run whose only failure is an empty comparison compared nothing, so it did not test its bite: INVALID.
++        if o.valid
++            && !o.checks.iter().any(|c| c.outcome == Outcome::Fail)
++            && o.checks.iter().any(|c| c.outcome == Outcome::Empty)
++        {
++            o.valid = false;
++            for c in o.checks.iter().filter(|c| c.outcome == Outcome::Empty) {
++                o.invalid_why.push(format!(
++                    "{}: {}; an empty comparison shows no bite",
++                    c.name,
++                    c.note.as_deref().unwrap_or("")
++                ));
++            }
++        }
+         statuses.push(if !o.valid {
+             BiteStatus::Invalid
+         } else if o.checks.iter().any(|c| c.outcome == Outcome::Fail) {
+@@ -1366,7 +1509,9 @@ fn report_values(
+ ) -> Vec<ReportOut> {
+     let text = |v: Result<Ratio, Missing>| match v {
+         Ok(v) => v.to_string(),
+-        Err(Missing::Gap(why) | Missing::NotBuilt(why)) => format!("not available: {why}"),
++        Err(Missing::Gap(why) | Missing::NotBuilt(why) | Missing::Empty(why)) => {
++            format!("not available: {why}")
++        }
+     };
+     let mut out = Vec::new();
+     for part in parts {
+@@ -1567,7 +1712,7 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
+         }
+     }
+     if mark.arm_rule && kind == VerdictKind::Fail {
+-        why.push("the Arm rule (ADR 0001): an aarch64-only mismatch is a cross-architecture finding; this judge does not apply it yet (U4)".to_owned());
++        why.push("the Arm rule (ADR 0001): an aarch64-only mismatch is a cross-architecture finding; this judge applies it to the decoded hashes (decoded_hash_mismatch_count, against the x86-64 re-decode), and the shot view test's and throw landing's kinds with their figures (U4h)".to_owned());
+     }
+     v.report = report_values(mark, &v.parts, &members, all);
+     v.verdict = kind;
+@@ -1578,11 +1723,10 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
+ /// One verdict per mark, in `marks.json`'s order.
+ pub fn judge(marks: &Marks, logs: &[Log]) -> Vec<Verdict> {
+     let all = runs(logs);
+-    let ctx = Ctx { marks };
+     marks
+         .marks
+         .iter()
+-        .map(|m| judge_mark(m, &all, &ctx))
++        .map(|m| judge_mark(m, &all, &Ctx { marks, mark: m }))
+         .collect()
+ }
+ 
+diff --git a/spikes/netcode-proof/crates/judge/src/figures.rs b/spikes/netcode-proof/crates/judge/src/figures.rs
+index 9686222..4fb7525 100644
+--- a/spikes/netcode-proof/crates/judge/src/figures.rs
++++ b/spikes/netcode-proof/crates/judge/src/figures.rs
+@@ -2,10 +2,11 @@
+ //! slopes, arithmetic against a formula). Every name `marks.json` uses must be listed here; one that is listed but
+ //! not built yet says which unit builds it, and its check comes out NOT-RUN rather than guessed.
+ 
+-use crate::eval::{Missing, Run};
++use crate::eval::{Missing, Run, always_rules};
+ use crate::ratio::Ratio;
+ use npt_log::Phase;
+ use serde_json::Value;
++use std::collections::{BTreeMap, BTreeSet};
+ 
+ /// Why a figure has no value.
+ pub enum Lack {
+@@ -14,6 +15,8 @@ pub enum Lack {
+     /// A run the figure compares with is not in the set yet: the part is NOT-RUN, as for a missing `against`
+     /// reference (README §2.3).
+     Waiting(String),
++    /// A comparison that compared nothing: its check fails, never passes, and shows no bite (README §2.3).
++    Empty(String),
+ }
+ 
+ /// PM-0001-2: the least share, over client slots, of measured ticks on which that slot's snapshot held every other
+@@ -89,41 +92,52 @@ fn fate_log_hash<'r>(run: &'r Run<'_>) -> Result<&'r str, Lack> {
+     }
+ }
+ 
+-/// PM-0001-3 ("on L1, the same seed and profile give an identical packet-fate log on two runs"): 1 when the run's
+-/// `params.fate_log_sha256` equals its twin's, 0 when they differ. The twin is the run of the same set named in
+-/// `params.twin`, with role `twin` and the same layer, profile, seed and bite (a bite run's twin runs the same bite).
+-/// A run that names no twin, a twin that is not one or differs in those fields, and a missing hash are gaps; a twin not
+-/// in the set yet leaves the check NOT-RUN.
+-fn fate_log_twin_equal(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, Lack> {
++/// The run a run names in `params.twin`, from its set: a gap if it names none, names itself, or names a run that
++/// breaks a rule every run holds (complete logs, the roster, capabilities, and C4's build rule: a twin of a measured
++/// run built with the bites, or of a bite run without them); NOT-RUN while the twin is not in the set yet. `fields`
++/// are the header fields the twin must share (`bite` among them: a bite run's twin runs the same bite).
++fn twin_of<'r, 'a>(
++    run: &Run<'_>,
++    set: &[&'r Run<'a>],
++    fields: &[&str],
++) -> Result<&'r Run<'a>, Lack> {
+     let Some(name) = run_param(run, "twin")?.and_then(Value::as_str) else {
+         return Err(Lack::Gap(format!(
+             "run {}: params.twin names no twin run",
+             run.id
+         )));
+     };
+-    let own = fate_log_hash(run)?;
+-    let Some(twin) = set.iter().find(|r| r.id == name) else {
++    if name == run.id {
++        return Err(Lack::Gap(format!(
++            "run {}: params.twin names the run itself",
++            run.id
++        )));
++    }
++    let Some(twin) = set.iter().copied().find(|r| r.id == name) else {
+         return Err(Lack::Waiting(format!(
+             "run {}: its twin {name} is not in set {} yet",
+             run.id, run.set
+         )));
+     };
+-    if twin.role != "twin" {
++    let broken = always_rules(twin);
++    if !broken.is_empty() {
+         return Err(Lack::Gap(format!(
+-            "run {}: {name} has role {}, not twin",
+-            run.id, twin.role
++            "run {}: its twin {name} is invalid: {}",
++            run.id,
++            broken.join("; ")
+         )));
+     }
+     let (Some(a), Some(b)) = (run.logs.first(), twin.logs.first()) else {
+         return Err(Lack::Gap(format!("run {}: a run without a log", run.id)));
+     };
+     let (a, b) = (&a.header, &b.header);
+-    for (field, same) in [
+-        ("layer", a.layer == b.layer),
+-        ("profile", a.profile == b.profile),
+-        ("seed", a.seed == b.seed),
+-        ("bite", run.bite == twin.bite),
+-    ] {
++    for field in fields {
++        let same = match *field {
++            "layer" => a.layer == b.layer,
++            "profile" => a.profile == b.profile,
++            "seed" => a.seed == b.seed,
++            _ => run.bite == twin.bite,
++        };
+         if !same {
+             return Err(Lack::Gap(format!(
+                 "run {}: its twin {name} has another {field}",
+@@ -131,9 +145,250 @@ fn fate_log_twin_equal(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, Lack> {
+             )));
+         }
+     }
++    Ok(twin)
++}
++
++/// PM-0001-3 ("on L1, the same seed and profile give an identical packet-fate log on two runs"): 1 when the run's
++/// `params.fate_log_sha256` equals its twin's, 0 when they differ. The twin is the run of the same set named in
++/// `params.twin`, with role `twin` and the same layer, profile, seed and bite (a bite run's twin runs the same bite).
++/// A run that names no twin, a twin that is not one, differs in those fields or is invalid (`twin_of`), and a missing
++/// hash are gaps; a twin not in the set yet leaves the check NOT-RUN.
++fn fate_log_twin_equal(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, Lack> {
++    let own = fate_log_hash(run)?;
++    let twin = twin_of(run, set, &["layer", "profile", "seed", "bite"])?;
++    if twin.role != "twin" {
++        return Err(Lack::Gap(format!(
++            "run {}: {} has role {}, not twin",
++            run.id, twin.id, twin.role
++        )));
++    }
+     Ok(Ratio::int(i128::from(own == fate_log_hash(twin)?)))
+ }
+ 
++/// A run's state hash per tick (`h`), over all its logs and every phase: a gap if a hash is not 16 lowercase hex
++/// digits, or if two logs give one tick two hashes.
++fn state_hashes(run: &Run<'_>) -> Result<BTreeMap<u64, u64>, Lack> {
++    let mut out = BTreeMap::new();
++    for log in &run.logs {
++        for t in log.ticks.iter().filter(|t| t.h.is_some()) {
++            let Some(h) = t.hash() else {
++                return Err(Lack::Gap(format!(
++                    "run {}: tick {}'s h is not 16 lowercase hex digits",
++                    run.id, t.t
++                )));
++            };
++            if out.insert(t.t, h).is_some_and(|old| old != h) {
++                return Err(Lack::Gap(format!(
++                    "run {}: two logs give tick {} two state hashes",
++                    run.id, t.t
++                )));
++            }
++        }
++    }
++    Ok(out)
++}
++
++/// PM-0001-21 and -30 ("identical server state hashes on every tick"): the tick numbers whose state hash (`h`) differs
++/// between the run and the run it names in `params.twin`, a tick hashed in one only counting; every phase. The twin
++/// (`twin_of`) has the same profile, seed and bite, any role (-30's twins are each other's measured runs). It fails,
++/// never passes, when neither run hashed a tick.
++fn twin_hash_mismatch_count(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, Lack> {
++    let own = state_hashes(run)?;
++    let twin = twin_of(run, set, &["profile", "seed", "bite"])?;
++    let other = state_hashes(twin)?;
++    let ticks: BTreeSet<u64> = own.keys().chain(other.keys()).copied().collect();
++    if ticks.is_empty() {
++        return Err(Lack::Empty(format!(
++            "run {} and its twin {} hashed no tick",
++            run.id, twin.id
++        )));
++    }
++    let differ = ticks
++        .iter()
++        .filter(|t| own.get(t) != other.get(t))
++        .count();
++    Ok(Ratio::int(differ as i128))
++}
++
++/// One `hs` name's hashes in a run, merged over its logs and every phase: per tick one entry per client slot, each
++/// with whether its log was written on aarch64 (the Arm rule). `None` when no log has the name. Gaps: lists of
++/// different lengths, a malformed entry, or two logs giving one (slot, tick) a hash.
++type SlotHashes = BTreeMap<u64, Vec<Option<(u64, bool)>>>;
++
++fn slot_hashes(run: &Run<'_>, name: &str) -> Result<Option<(usize, SlotHashes)>, Lack> {
++    let mut out: SlotHashes = BTreeMap::new();
++    let mut slots: Option<usize> = None;
++    for log in &run.logs {
++        let arm = log.header.machine.arch == "aarch64";
++        for t in log.ticks.iter().filter(|t| t.hs.contains_key(name)) {
++            let Some(list) = t.hashes(name) else {
++                return Err(Lack::Gap(format!(
++                    "run {}: tick {}'s hs.{name} is malformed",
++                    run.id, t.t
++                )));
++            };
++            if *slots.get_or_insert(list.len()) != list.len() {
++                return Err(Lack::Gap(format!(
++                    "run {}: tick {}'s hs.{name} has {} slots, not {}",
++                    run.id,
++                    t.t,
++                    list.len(),
++                    slots.unwrap_or(0)
++                )));
++            }
++            let merged = out.entry(t.t).or_insert_with(|| vec![None; list.len()]);
++            for (slot, h) in list.into_iter().enumerate() {
++                let Some(h) = h else { continue };
++                if merged[slot].is_some() {
++                    return Err(Lack::Gap(format!(
++                        "run {}: two logs give slot {slot} at tick {} an hs.{name}",
++                        run.id, t.t
++                    )));
++                }
++                merged[slot] = Some((h, arm));
++            }
++        }
++    }
++    Ok(slots.map(|n| (n, out)))
++}
++
++/// The decoded-hash comparison of one run (u4-build-plan.md §4.6, the advisor's Q11 ruling).
++struct Decoded {
++    /// Client hashes looked at: a (client, tick) pair with the server's hash, or a client hash at a (client, tick) the
++    /// server never logged.
++    compared: i128,
++    /// Of those, the ones that count: a different hash, the sentinel 0, or no server hash there; on aarch64 only when
++    /// the x86-64 re-decode misses the server's hash too (the Arm rule).
++    mismatched: i128,
++    /// aarch64 mismatches the x86-64 re-decode does not reproduce: a cross-architecture finding, deciding nothing.
++    cross_arch: i128,
++}
++
++/// Compares `hs.decoded_hash` (each client's hash of the state it holds, under the tick it rebuilt; the sentinel 0 for
++/// a tick with a group it refused; `null` for none) with `hs.server_hash` (the server's hash of what it meant that
++/// client to hold), over every phase. A server-only (client, tick) is loss, never compared. An aarch64 client's
++/// mismatch is checked against `hs.replay_hash` (its logged bytes decoded again on x86-64, process `replay`): it
++/// counts when the replay's entry differs from the server's too (both absent is agreement). Gaps: either name missing
++/// from every log, the lists' slot counts disagreeing, two logs at one (slot, tick), or a server hash of 0 (the hash
++/// is never 0, so 0 is the client's sentinel alone). NOT-RUN while an aarch64 mismatch has no replay log in the run.
++fn decoded(run: &Run<'_>) -> Result<Decoded, Lack> {
++    let missing = |name: &str| {
++        Lack::Gap(format!(
++            "run {}: no log gives hs.{name} (decoded_hash_mismatch_count's input)",
++            run.id
++        ))
++    };
++    let (n_server, server) = slot_hashes(run, "server_hash")?.ok_or_else(|| missing("server_hash"))?;
++    let (n_client, client) =
++        slot_hashes(run, "decoded_hash")?.ok_or_else(|| missing("decoded_hash"))?;
++    let replay = slot_hashes(run, "replay_hash")?;
++    let n_replay = replay.as_ref().map_or(n_client, |(n, _)| *n);
++    if n_server != n_client || n_replay != n_client {
++        return Err(Lack::Gap(format!(
++            "run {}: the hash lists' slot counts differ (server {n_server}, decoded {n_client}, replay {n_replay})",
++            run.id
++        )));
++    }
++    for (t, list) in &server {
++        if let Some(slot) = list.iter().position(|e| matches!(e, Some((0, _)))) {
++            return Err(Lack::Gap(format!(
++                "run {}: the server logged 0 for slot {slot} at tick {t}; its hash is never 0",
++                run.id
++            )));
++        }
++    }
++    let at = |map: &SlotHashes, t: u64, slot: usize| {
++        map.get(&t)
++            .and_then(|l| l.get(slot).copied().flatten())
++            .map(|(h, _)| h)
++    };
++    let mut d = Decoded {
++        compared: 0,
++        mismatched: 0,
++        cross_arch: 0,
++    };
++    for (t, list) in &client {
++        for (slot, entry) in list.iter().enumerate() {
++            let Some((h, arm)) = *entry else { continue };
++            d.compared += 1;
++            let theirs = at(&server, *t, slot);
++            if theirs == Some(h) {
++                continue;
++            }
++            if !arm {
++                d.mismatched += 1;
++                continue;
++            }
++            let Some((_, rep)) = &replay else {
++                return Err(Lack::Waiting(format!(
++                    "run {}: slot {slot}'s aarch64 hash at tick {t} differs, and the run has no x86-64 re-decode \
++                     (hs.replay_hash, process replay) yet",
++                    run.id
++                )));
++            };
++            if at(rep, *t, slot) == theirs {
++                d.cross_arch += 1;
++            } else {
++                d.mismatched += 1;
++            }
++        }
++    }
++    Ok(d)
++}
++
++/// PM-0001-17, -19 and -58: the (client, tick) mismatches `decoded` counts; it fails, never passes, on 0 compared.
++fn decoded_hash_mismatch_count(run: &Run<'_>, _set: &[&Run<'_>]) -> Result<Ratio, Lack> {
++    let d = decoded(run)?;
++    if d.compared == 0 {
++        return Err(Lack::Empty(format!(
++            "run {}: no client logged a hash (0 compared)",
++            run.id
++        )));
++    }
++    Ok(Ratio::int(d.mismatched))
++}
++
++/// PM-0001-17, reported: the client hashes `decoded` looked at.
++fn decoded_hash_compared_count(run: &Run<'_>, _set: &[&Run<'_>]) -> Result<Ratio, Lack> {
++    Ok(Ratio::int(decoded(run)?.compared))
++}
++
++/// The Arm rule's finding, reported: aarch64 client hashes that differ from the server's while their x86-64 re-decode
++/// agrees with it. The hash kind only: the shot view test's and the throw landing's kinds join with the figures that
++/// read them (U4h's view_hit_registered_share, false_hit_share and throw_desync_count), so a run without decoded
++/// hashes is a gap here, never a 0.
++fn cross_arch_mismatch_count(run: &Run<'_>, _set: &[&Run<'_>]) -> Result<Ratio, Lack> {
++    Ok(Ratio::int(decoded(run)?.cross_arch))
++}
++
++/// PM-0001-1 and PM-0006-11: 1 when every log's header names its machine in full (role, name, plan, arch, cpu,
++/// location and kernel not empty; vcpus, mem_mb, threads_per_core and clock_res_ns above 0; the SMT map with every
++/// sibling list filled) and every VM (RS, LG, MV) gives its day address; else 0.
++fn machine_named(run: &Run<'_>, _set: &[&Run<'_>]) -> Result<Ratio, Lack> {
++    let named = run.logs.iter().all(|log| {
++        let m = &log.header.machine;
++        let texts = [
++            &m.role,
++            &m.name,
++            &m.plan,
++            &m.arch,
++            &m.cpu,
++            &m.location,
++            &m.kernel,
++        ];
++        let vm = matches!(m.role.as_str(), "RS" | "LG" | "MV");
++        texts.iter().all(|t| !t.is_empty())
++            && m.vcpus > 0
++            && m.mem_mb > 0
++            && m.threads_per_core > 0
++            && m.clock_res_ns > 0
++            && !m.smt.is_empty()
++            && m.smt.iter().all(|s| !s.is_empty())
++            && (!vm || !m.address.is_empty())
++    });
++    Ok(Ratio::int(i128::from(named)))
++}
++
+ /// A figure's computation: the run under judgement and every run of its set.
+ pub type Compute = fn(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, Lack>;
+ 
+@@ -172,26 +427,30 @@ pub const FIGURES: &[Figure] = &[
+         unit: "U1",
+         what: "the least share of a slot's snapshots with all 47 others in its set (-2)",
+     },
+-    planned(
+-        "decoded_hash_mismatch_count",
+-        "U4",
+-        "decoded snapshots whose hash differs from the server's (-17, -19, -58)",
+-    ),
+-    planned(
+-        "decoded_hash_compared_count",
+-        "U4",
+-        "the (client, tick) pairs compared (-17)",
+-    ),
+-    planned(
+-        "twin_hash_mismatch_count",
+-        "U4",
+-        "ticks whose hash differs from the twin run's (-21, -30)",
+-    ),
+-    planned(
+-        "cross_arch_mismatch_count",
+-        "U4",
+-        "L2 mismatches the x86-64 replay does not reproduce (the Arm rule)",
+-    ),
++    Figure {
++        name: "decoded_hash_mismatch_count",
++        compute: Some(decoded_hash_mismatch_count),
++        unit: "U4j",
++        what: "decoded snapshots whose hash differs from the server's (-17, -19, -58)",
++    },
++    Figure {
++        name: "decoded_hash_compared_count",
++        compute: Some(decoded_hash_compared_count),
++        unit: "U4j",
++        what: "the (client, tick) pairs compared (-17)",
++    },
++    Figure {
++        name: "twin_hash_mismatch_count",
++        compute: Some(twin_hash_mismatch_count),
++        unit: "U4j",
++        what: "ticks whose hash differs from the twin run's (-21, -30)",
++    },
++    Figure {
++        name: "cross_arch_mismatch_count",
++        compute: Some(cross_arch_mismatch_count),
++        unit: "U4j",
++        what: "aarch64 hash mismatches the x86-64 re-decode does not reproduce (the Arm rule; the hash kind)",
++    },
+     planned(
+         "view_hit_registered_share",
+         "U4",
+@@ -212,11 +471,12 @@ pub const FIGURES: &[Figure] = &[
+         "U4",
+         "throws that desync, the x86-64 replay agreeing (-54)",
+     ),
+-    planned(
+-        "machine_named",
+-        "U4",
+-        "every header names its machine in full (-1, PM-0006-11)",
+-    ),
++    Figure {
++        name: "machine_named",
++        compute: Some(machine_named),
++        unit: "U4j",
++        what: "every header names its machine in full (-1, PM-0006-11)",
++    },
+     planned(
+         "sync_unit_cost",
+         "U6",
+@@ -361,6 +621,7 @@ pub(crate) fn compute(name: &str, run: &Run<'_>, set: &[&Run<'_>]) -> Result<Rat
+         }) => f(run, set).map_err(|lack| match lack {
+             Lack::Gap(why) => Missing::Gap(why),
+             Lack::Waiting(why) => Missing::NotBuilt(why),
++            Lack::Empty(why) => Missing::Empty(why),
+         }),
+         Some(Figure { unit, .. }) => Err(Missing::NotBuilt(format!(
+             "figure {name} is not built yet ({unit})"
+diff --git a/spikes/netcode-proof/crates/judge/src/lib.rs b/spikes/netcode-proof/crates/judge/src/lib.rs
+index 1fab867..20c6c2e 100644
+--- a/spikes/netcode-proof/crates/judge/src/lib.rs
++++ b/spikes/netcode-proof/crates/judge/src/lib.rs
+@@ -6,6 +6,7 @@
+ pub mod eval;
+ pub mod figures;
+ pub mod marks;
++mod practice;
+ pub mod ratio;
+ 
+ pub use eval::{Verdict, VerdictKind, judge};
+diff --git a/spikes/netcode-proof/crates/judge/src/marks.rs b/spikes/netcode-proof/crates/judge/src/marks.rs
+index 36bf953..87fb770 100644
+--- a/spikes/netcode-proof/crates/judge/src/marks.rs
++++ b/spikes/netcode-proof/crates/judge/src/marks.rs
+@@ -114,6 +114,10 @@ struct RawCheck {
+     setup: bool,
+     #[serde(default)]
+     first: Option<u64>,
++    /// `x`, `y` or `z`: the check's number is that number of the WebSocket bound, applied times the practice run's
++    /// factor (README §2.3, the `ws-practice` rule).
++    #[serde(default)]
++    ws_bound: Option<String>,
+ }
+ 
+ /// A planted defect that must fail the mark first (plan §6.1, "Bites first"); or, with `expect: "invalid"`, one that
+@@ -251,6 +255,17 @@ pub enum Threshold {
+     Against { factor: Ratio, against: Against },
+ }
+ 
++/// Which number of PM-0001-18's WebSocket bound a check holds (README §2.3, `ws_bound`).
++#[derive(Debug, Clone, Copy, PartialEq, Eq)]
++pub enum BoundNumber {
++    /// The median's limit: the check's `value`.
++    X,
++    /// The count's limit: the check's `where` value is Y and its `value` is k.
++    Y,
++    /// The maximum's limit: the check's `value`.
++    Z,
++}
++
+ #[derive(Debug, Clone, PartialEq, Eq)]
+ pub struct Check {
+     pub name: String,
+@@ -262,6 +277,8 @@ pub struct Check {
+     pub pooled: bool,
+     /// A setup condition: when it fails, the run did not test the mark, so it is INVALID, never FAIL.
+     pub setup: bool,
++    /// The check holds a number of the WebSocket bound, which the judge applies times the practice run's factor.
++    pub ws_bound: Option<BoundNumber>,
+ }
+ 
+ #[derive(Debug, Clone, PartialEq, Eq)]
+@@ -284,7 +301,7 @@ pub struct Part {
+     pub validity: Vec<Rule>,
+ }
+ 
+-/// A validity rule a mark or a part may name (README §4); the three that hold for every run are not listed.
++/// A validity rule a mark or a part may name (README §4); the four that hold for every run are not listed.
+ #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+ pub enum Rule {
+     VS,
+@@ -298,6 +315,14 @@ pub enum Rule {
+     LoggingOff,
+     /// The run must pass another mark's checks (`pre:PM-0001-2`: it carried the stress scene's load).
+     Pre(String),
++    /// PM-0001-18's WebSocket part (`ws-practice:<tolerance>`): the run's set holds its practice run, whose record is
++    /// in tolerance, and the numbers in force are the bound's times its factor (README §4).
++    WsPractice {
++        /// The largest slowdown the numbers may move by (Mustafa's 10 %: 1.10, never raised).
++        tolerance: Ratio,
++        /// The tolerance as `marks.json` writes it.
++        text: String,
++    },
+ }
+ 
+ impl Rule {
+@@ -311,10 +336,25 @@ impl Rule {
+             "late-zero" => Rule::LateZero,
+             "reorder" => Rule::Reorder,
+             "clean-ref" => Rule::CleanRef,
+-            other => match other.strip_prefix("pre:") {
+-                Some(id) if id.starts_with("PM-000") => Rule::Pre(id.to_owned()),
+-                _ => return Err(format!("validity rule {s:?} is not one of README §4's")),
+-            },
++            other => {
++                if let Some(id) = other.strip_prefix("pre:") {
++                    if id.starts_with("PM-000") {
++                        return Ok(Rule::Pre(id.to_owned()));
++                    }
++                } else if let Some(text) = other.strip_prefix("ws-practice:") {
++                    let tolerance = Ratio::parse(text)?;
++                    if tolerance < Ratio::int(1) || tolerance > Ratio::new(11, 10) {
++                        return Err(format!(
++                            "{s:?}: the tolerance is at least 1 and at most 1.10 (Mustafa's 10 %, never raised)"
++                        ));
++                    }
++                    return Ok(Rule::WsPractice {
++                        tolerance,
++                        text: text.to_owned(),
++                    });
++                }
++                return Err(format!("validity rule {s:?} is not one of README §4's"));
++            }
+         })
+     }
+ 
+@@ -330,6 +370,7 @@ impl Rule {
+             Rule::Reorder => "reorder".to_owned(),
+             Rule::CleanRef => "clean-ref".to_owned(),
+             Rule::Pre(id) => format!("pre:{id}"),
++            Rule::WsPractice { text, .. } => format!("ws-practice:{text}"),
+         }
+     }
+ }
+@@ -543,6 +584,37 @@ fn compile_check(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Check, Str
+     if c.setup && (c.pooled || matches!(threshold, Threshold::Against { .. })) {
+         return Err("a setup check reads its own run only: no pooled or against".to_owned());
+     }
++    let ws_bound = match c.ws_bound.as_deref() {
++        None => None,
++        Some(letter) => {
++            let n = match letter {
++                "x" => BoundNumber::X,
++                "y" => BoundNumber::Y,
++                "z" => BoundNumber::Z,
++                other => return Err(format!("ws_bound {other:?} is not x, y or z")),
++            };
++            let Measure::Series { stat, cond, .. } = &measure else {
++                return Err("ws_bound holds a series check's number, not a figure's".to_owned());
++            };
++            if c.pooled || c.setup || !matches!(threshold, Threshold::Value(_)) {
++                return Err("a ws_bound check is a plain check: no pooled, setup or against".to_owned());
++            }
++            if c.parts.is_empty() {
++                return Err("a ws_bound check names its parts (each with ws-practice)".to_owned());
++            }
++            match (n, stat, cond) {
++                (BoundNumber::Y, Stat::Count, Some(_)) => {}
++                (BoundNumber::Y, _, _) => {
++                    return Err("ws_bound y is a count with a where (over Y, at most k)".to_owned());
++                }
++                (_, Stat::Count | Stat::Share, _) | (_, _, Some(_)) => {
++                    return Err("ws_bound x or z is a limit on a statistic, with no where".to_owned());
++                }
++                _ => {}
++            }
++            Some(n)
++        }
++    };
+     Ok(Check {
+         name: c.name.clone(),
+         measure,
+@@ -552,12 +624,15 @@ fn compile_check(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Check, Str
+         parts: c.parts.clone(),
+         pooled: c.pooled,
+         setup: c.setup,
++        ws_bound,
+     })
+ }
+ 
+ fn compile_report(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Report, String> {
+-    if c.setup {
+-        return Err("a reported statistic decides nothing, so it is no setup check".to_owned());
++    if c.setup || c.ws_bound.is_some() {
++        return Err(
++            "a reported statistic decides nothing, so it is no setup or ws_bound check".to_owned(),
++        );
+     }
+     if c.op.is_some() || c.value.is_some() || c.factor.is_some() || c.against.is_some() {
+         return Err(
+@@ -667,6 +742,30 @@ fn compile_mark(m: &RawMark) -> Result<Mark, Vec<String>> {
+             Err(e) => errors.push(e),
+         }
+     }
++    // A ws_bound check sits only on parts the ws-practice rule judges, and each bound number has one check: the rule
++    // compares the bound's numbers with these checks'.
++    let practice = |r: &Rule| matches!(r, Rule::WsPractice { .. });
++    let mut letters = BTreeSet::new();
++    for c in checks.iter().filter(|c| c.ws_bound.is_some()) {
++        if !letters.insert(format!("{:?}", c.ws_bound)) {
++            errors.push(format!(
++                "check {:?}: a second check for ws_bound {:?}",
++                c.name, c.ws_bound
++            ));
++        }
++        for p in &c.parts {
++            let ruled = validity.iter().any(practice)
++                || parts
++                    .iter()
++                    .any(|q| &q.name == p && q.validity.iter().any(practice));
++            if !ruled {
++                errors.push(format!(
++                    "check {:?}: its part {p:?} is not judged by ws-practice",
++                    c.name
++                ));
++            }
++        }
++    }
+     // The shape is judged on the file's lists, so a check that failed to compile is reported once, not twice.
+     match kind {
+         Kind::Pass => {
+@@ -914,4 +1013,58 @@ mod tests {
+         let unknown_field = file(&mark(r#""verdict":"outside","notes":"x","extra":1"#));
+         assert!(parse(&unknown_field).is_err());
+     }
++
++    /// PM-0001-18's WebSocket checks (README §2.3 `ws_bound`, §4 `ws-practice`): only on parts the rule judges, one
++    /// per bound number, each in the shape its number needs; the tolerance between 1 and 1.10.
++    #[test]
++    fn ws_bound_checks_keep_their_shape() {
++        let ws = |rule: &str, checks: &str| {
++            file(&mark(&format!(
++                r#""verdict":"pass","parts":[{{"name":"ws","select":{{"layer":"L2"}},"min":1,"validity":["{rule}"]}},
++                   {{"name":"wt","select":{{"layer":"L1"}},"min":1}}],"checks":[{checks}]"#
++            )))
++        };
++        const X: &str = r#"{"name":"x","series":"event.burst_heal.after_link_ns","stat":"p50","op":"<=","value":670000000,"parts":["ws"],"ws_bound":"x"}"#;
++        const Y: &str = r#"{"name":"y","series":"event.burst_heal.after_link_ns","stat":"count","where":{"op":">","value":2500000000},"op":"<=","value":5,"parts":["ws"],"ws_bound":"y"}"#;
++        const Z: &str = r#"{"name":"z","series":"event.burst_heal.after_link_ns","stat":"max","op":"<=","value":6900000000,"parts":["ws"],"ws_bound":"z"}"#;
++        let good = parse(&ws("ws-practice:1.10", &format!("{X},{Y},{Z}"))).expect("compiles");
++        let m = &good.marks[0];
++        assert_eq!(
++            m.checks.iter().map(|c| c.ws_bound).collect::<Vec<_>>(),
++            [
++                Some(BoundNumber::X),
++                Some(BoundNumber::Y),
++                Some(BoundNumber::Z)
++            ]
++        );
++        assert_eq!(
++            m.parts[0].validity,
++            [Rule::WsPractice {
++                tolerance: Ratio::new(11, 10),
++                text: "1.10".to_owned()
++            }]
++        );
++        assert_eq!(m.parts[0].validity[0].name(), "ws-practice:1.10");
++        let bad = [
++            (ws("ws-practice:1.11", X), "a raised tolerance"),
++            (ws("ws-practice:0.99", X), "a tolerance below 1"),
++            (ws("ws-practice:ten", X), "a tolerance that is no number"),
++            (ws("ws-practice:1.10", &X.replace(r#""x"}"#, r#""w"}"#)), "no such number"),
++            (ws("ws-practice:1.10", &X.replace(r#"["ws"]"#, r#"["wt"]"#)), "a part the rule does not judge"),
++            (ws("ws-practice:1.10", &X.replace(r#","parts":["ws"]"#, "")), "no parts"),
++            (ws("ws-practice:1.10", &format!("{X},{}", X.replace(r#""name":"x""#, r#""name":"x2""#))), "two x checks"),
++            (ws("ws-practice:1.10", &Y.replace(r#""where":{"op":">","value":2500000000},"#, "")), "y with no where"),
++            (ws("ws-practice:1.10", &X.replace(r#""stat":"p50""#, r#""stat":"count""#)), "x on a count"),
++            (ws("ws-practice:1.10", &X.replace(r#""ws_bound":"x""#, r#""ws_bound":"x","pooled":true"#)), "pooled"),
++            (ws("ws-practice:1.10", &X.replace(r#""ws_bound":"x""#, r#""ws_bound":"x","setup":true"#)), "a setup check"),
++            (ws("ws-practice:1.10", r#"{"name":"f","figure":"machine_named","op":"==","value":1,"parts":["ws"],"ws_bound":"x"}"#), "a figure"),
++        ];
++        for (text, why) in bad {
++            assert!(parse(&text).is_err(), "{why} must be refused");
++        }
++        let report = file(&mark(&format!(
++            r#""verdict":"reported",{PART},"report":[{{"name":"r","series":"tick.v.w","stat":"max","ws_bound":"x"}}]"#
++        )));
++        assert!(parse(&report).is_err(), "a report holds no bound number");
++    }
+ }
+diff --git a/spikes/netcode-proof/crates/judge/tests/engine.rs b/spikes/netcode-proof/crates/judge/tests/engine.rs
+index eeccdf3..9e1b1f5 100644
+--- a/spikes/netcode-proof/crates/judge/tests/engine.rs
++++ b/spikes/netcode-proof/crates/judge/tests/engine.rs
+@@ -32,6 +32,10 @@ struct LogSpec {
+     seconds: Vec<SecondSpec>,
+     events: Vec<EventRecord>,
+     footer: bool,
++    /// The build's features; `None` follows the bite (C4): the bites build exactly when the log names a bite.
++    features: Option<Vec<&'static str>>,
++    arch: &'static str,
++    binary: &'static str,
+ }
+ 
+ impl LogSpec {
+@@ -52,6 +56,9 @@ impl LogSpec {
+             seconds: vec![],
+             events: vec![],
+             footer: true,
++            features: None,
++            arch: "x86_64",
++            binary: "0000000000000000000000000000000000000000000000000000000000000000",
+         }
+     }
+ 
+@@ -74,7 +81,7 @@ impl LogSpec {
+                 role: self.machine_role.to_owned(),
+                 name: format!("{}1", self.machine_role),
+                 plan: "test".to_owned(),
+-                arch: "x86_64".to_owned(),
++                arch: self.arch.to_owned(),
+                 cpu: "test".to_owned(),
+                 vcpus: 4,
+                 mem_mb: 16_384,
+@@ -87,8 +94,12 @@ impl LogSpec {
+             },
+             build: Build {
+                 commit: "0".repeat(40),
+-                binary_sha256: "0".repeat(64),
+-                features: vec![],
++                binary_sha256: self.binary.to_owned(),
++                features: match &self.features {
++                    Some(f) => f.iter().map(|s| (*s).to_owned()).collect(),
++                    None if self.bite.is_some() => vec!["bites".to_owned()],
++                    None => vec![],
++                },
+                 profile: "release".to_owned(),
+             },
+             bite: self.bite.map(str::to_owned),
+@@ -1186,3 +1197,566 @@ fn u2_a_twin_record_that_cannot_be_compared_is_a_gap() {
+         );
+     }
+ }
++
++// ---------------------------------------------------------------------------------------------------------------
++// U4j: C4's build rule, the decoded and twin hash figures, machine_named, and -18's ws-practice rule.
++
++fn says(why: &[String], text: &str) -> bool {
++    why.iter().any(|w| w.contains(text))
++}
++
++/// C4 (the advisor's U2 ruling): a measured run built with the bites, a measured run naming a bite, and a bite run
++/// built without them are INVALID; so is a measured run's twin built with them (checked where the twin is read).
++#[test]
++fn c4_the_build_matches_the_bite() {
++    let bite_run = |features: Option<Vec<&'static str>>| {
++        let mut s = LogSpec::room("bite-1", "set-a", M).ticks("work_ns", &[150]);
++        s.role = "bite";
++        s.bite = Some("PM-0001-4/B-S");
++        s.features = features;
++        s.build()
++    };
++    let with = |i: usize, change: &dyn Fn(&mut LogSpec)| {
++        let mut logs = three_runs(M, [90, 95, 100]);
++        let mut s = LogSpec::room(["run-1", "run-2", "run-3"][i], "set-a", M).ticks("work_ns", &[10, 95]);
++        change(&mut s);
++        logs[i] = s.build();
++        logs.push(bite_run(None));
++        verdict_of(&[tick_mark(M, json!({}))], &logs)
++    };
++    let (k, why) = with(1, &|_| {});
++    assert_eq!(k, VerdictKind::Pass, "the base: {why:?}");
++    let (k, why) = with(1, &|s| s.features = Some(vec!["bites"]));
++    assert_eq!(k, VerdictKind::Invalid, "{why:?}");
++    assert!(
++        says(&why, "run run-2: build: a measured run names no bite, but a log of it comes from a bites build"),
++        "{why:?}"
++    );
++    let (k, why) = with(2, &|s| s.bite = Some("PM-0001-4/B-S"));
++    assert_eq!(k, VerdictKind::Invalid, "{why:?}");
++    assert!(
++        says(&why, "run run-3: build: a measured run names the bite PM-0001-4/B-S"),
++        "{why:?}"
++    );
++    let mut logs = three_runs(M, [90, 95, 100]);
++    logs.push(bite_run(Some(vec![])));
++    let v = judge(&marks_file(&[tick_mark(M, json!({}))]), &logs);
++    assert_eq!(v[0].verdict, VerdictKind::Invalid, "{:?}", v[0].why);
++    assert_eq!(v[0].bites[0].status, BiteStatus::Invalid);
++    assert!(
++        says(
++            &v[0].bites[0].runs[0].invalid_why,
++            "build: the run names the bite PM-0001-4/B-S, but none of its logs comes from a bites build"
++        ),
++        "{:?}",
++        v[0].bites[0].runs
++    );
++    // On L2 the bite lives in one binary: RS's room from the bites build, LG's bots from the measured one, is right.
++    let mut lg = LogSpec::room("bite-1", "set-a", M);
++    lg.role = "bite";
++    lg.bite = Some("PM-0001-4/B-S");
++    lg.machine_role = "LG";
++    lg.process = "bots";
++    lg.features = Some(vec![]);
++    let mut logs = three_runs(M, [90, 95, 100]);
++    logs.extend([bite_run(None), lg.build()]);
++    assert_eq!(verdict_of(&[tick_mark(M, json!({}))], &logs).0, VerdictKind::Pass);
++    // A measured run's twin from the bites build: the twin figure reads it, so the measured run is INVALID.
++    let mut twin = probe("b1-twin", "twin", 'a', None);
++    twin.features = Some(vec!["bites"]);
++    let mut logs = vec![probe("b1", "measured", 'a', Some("b1-twin")).build(), twin.build()];
++    logs.extend(shown_clock_bite());
++    let (k, why) = verdict_of(&[twin_mark()], &logs);
++    assert_eq!(k, VerdictKind::Invalid, "{why:?}");
++    assert!(
++        says(&why, "run b1: its twin b1-twin is invalid: build: a twin run names no bite, but a log of it comes from a bites build"),
++        "{why:?}"
++    );
++}
++
++/// A decoded-hash mark like PM-0001-17: one L1 part, the figure, the compared count and the Arm rule's report.
++fn hash_mark() -> Value {
++    json!({
++        "id": "PM-0001-17", "title": "decoded", "draft": draft(), "verdict": "pass",
++        "parts": [{"name": "L1", "select": {"layer": "L1"}, "min": 1}],
++        "checks": [{"name": "0 mismatches", "figure": "decoded_hash_mismatch_count", "op": "==", "value": 0}],
++        "report": [{"name": "compared", "figure": "decoded_hash_compared_count"},
++                   {"name": "aarch64 only", "figure": "cross_arch_mismatch_count"}],
++        "bites": [{"id": "PM-0001-17/tick16", "what": "a 16-bit tick"}]
++    })
++}
++
++/// One log of a hashed run: `name`'s list on each tick 1, 2, ... (an empty list leaves that tick without it).
++fn hash_log(run: &'static str, process: &'static str, name: &str, per_tick: &[&[Option<u64>]], edit: &dyn Fn(&mut LogSpec)) -> Log {
++    let mut s = LogSpec::room(run, "set-h", "PM-0001-17");
++    s.layer = "L1";
++    s.process = process;
++    s.ticks = per_tick.iter().map(|_| (Phase::Measured, vec![])).collect();
++    edit(&mut s);
++    let mut log = s.build();
++    for (t, list) in log.ticks.iter_mut().zip(per_tick) {
++        if !list.is_empty() {
++            t.set_hashes(name, list);
++        }
++    }
++    log
++}
++
++const SERVER: [&[Option<u64>]; 3] = [&[Some(11), Some(21)], &[Some(12), Some(22)], &[Some(13), Some(23)]];
++
++fn report<'v>(v: &'v npt_judge::Verdict, name: &str) -> Vec<&'v str> {
++    v.report.iter().filter(|r| r.name == name).map(|r| r.value.as_str()).collect()
++}
++
++#[test]
++fn u4j_the_decoded_hash_gaps_and_its_every_phase() {
++    let no = &|_: &mut LogSpec| {};
++    let room = hash_log("h1", "room", "server_hash", &SERVER, no);
++    let client = |lists: &[&[Option<u64>]]| hash_log("h1", "client", "decoded_hash", lists, no);
++    let equal = client(&SERVER);
++    let (k, why) = verdict_of(&[hash_mark()], &[room.clone(), equal.clone()]);
++    assert_eq!(k, VerdictKind::NotRun, "the bite has no run: {why:?}");
++    let cases: Vec<(Vec<Log>, &str)> = vec![
++        (vec![equal.clone()], "no log gives hs.server_hash"),
++        (vec![room.clone()], "no log gives hs.decoded_hash"),
++        (
++            vec![room.clone(), client(&[&[Some(11), Some(21), None], &[], &[]])],
++            "the hash lists' slot counts differ (server 2, decoded 3, replay 3)",
++        ),
++        (
++            vec![room.clone(), equal.clone(), hash_log("h1", "lab", "decoded_hash", &[&[Some(11), None]], no)],
++            "two logs give slot 0 at tick 1 an hs.decoded_hash",
++        ),
++        (
++            vec![hash_log("h1", "room", "server_hash", &[&[Some(0), Some(21)]], no), client(&[&[Some(0), Some(21)]])],
++            "the server logged 0 for slot 0 at tick 1; its hash is never 0",
++        ),
++    ];
++    for (logs, expected) in cases {
++        let v = judge(&marks_file(&[hash_mark()]), &logs);
++        assert_eq!(v[0].verdict, VerdictKind::Invalid, "{expected}: {:?}", v[0].why);
++        assert!(says(&v[0].why, expected), "{expected}: {:?}", v[0].why);
++    }
++    // A warm-up tick is read too (-58's wraps fall in its first seconds): a mismatch there fails the run.
++    let warm = hash_log("h1", "client", "decoded_hash", &[&[Some(11), Some(99)]], &|s| {
++        s.ticks = vec![(Phase::Warmup, vec![])];
++    });
++    let (k, why) = verdict_of(&[hash_mark()], &[room, warm]);
++    assert_eq!(k, VerdictKind::Fail, "{why:?}");
++    assert!(says(&why, "0 mismatches = 1, needs == 0"), "{why:?}");
++}
++
++#[test]
++fn u4j_the_arm_rule_counts_an_aarch64_mismatch_only_when_the_x86_64_re_decode_misses_too() {
++    let no = &|_: &mut LogSpec| {};
++    let arm = &|s: &mut LogSpec| s.arch = "aarch64";
++    let room = hash_log("h1", "room", "server_hash", &SERVER, no);
++    let wrong: [&[Option<u64>]; 3] = [&[Some(11), Some(21)], &[Some(12), Some(99)], &[Some(13), Some(23)]];
++    let client = hash_log("h1", "bots", "decoded_hash", &wrong, arm);
++    let replay = |lists: &[&[Option<u64>]]| hash_log("h1", "replay", "replay_hash", lists, no);
++    // The x86-64 re-decode agrees with the server: an aarch64-only finding, reported, deciding nothing.
++    let v = judge(&marks_file(&[hash_mark()]), &[room.clone(), client.clone(), replay(&SERVER)]);
++    assert_eq!(v[0].parts[0].verdict, VerdictKind::Pass, "{:?}", v[0].parts[0].why);
++    assert_eq!(report(&v[0], "aarch64 only"), ["1"]);
++    assert_eq!(report(&v[0], "compared"), ["6"]);
++    // It misses the server's hash too: a real mismatch.
++    let (k, why) = verdict_of(&[hash_mark()], &[room.clone(), client.clone(), replay(&wrong)]);
++    assert_eq!(k, VerdictKind::Fail, "{why:?}");
++    // No re-decode yet: NOT-RUN, never a guess.
++    let v = judge(&marks_file(&[hash_mark()]), &[room.clone(), client]);
++    assert_eq!(v[0].parts[0].verdict, VerdictKind::NotRun, "{:?}", v[0].parts[0].why);
++    assert!(says(&v[0].parts[0].why, "the run has no x86-64 re-decode"), "{:?}", v[0].parts[0].why);
++    // On x86-64 a mismatch counts as it stands, with or without a replay.
++    let x86 = hash_log("h1", "client", "decoded_hash", &wrong, no);
++    let (k, _) = verdict_of(&[hash_mark()], &[room, x86, replay(&SERVER)]);
++    assert_eq!(k, VerdictKind::Fail);
++}
++
++#[test]
++fn u4j_an_empty_comparison_fails_the_run_and_shows_no_bite() {
++    let no = &|_: &mut LogSpec| {};
++    let room = hash_log("h1", "room", "server_hash", &SERVER, no);
++    let none: [&[Option<u64>]; 3] = [&[None, None], &[None, None], &[None, None]];
++    let v = judge(&marks_file(&[hash_mark()]), &[room.clone(), hash_log("h1", "client", "decoded_hash", &none, no)]);
++    assert_eq!(v[0].verdict, VerdictKind::Fail, "{:?}", v[0].why);
++    assert!(
++        says(&v[0].why, "L1: run h1: 0 mismatches: run h1: no client logged a hash (0 compared); an empty comparison fails"),
++        "{:?}",
++        v[0].why
++    );
++    assert_eq!(report(&v[0], "compared"), ["0"]);
++    let bite = |id: &'static str, lists: &[&[Option<u64>]]| {
++        let b = &|s: &mut LogSpec| {
++            s.role = "bite";
++            s.bite = Some("PM-0001-17/tick16");
++        };
++        let mut logs = vec![
++            hash_log(id, "room", "server_hash", &SERVER, b),
++            hash_log(id, "client", "decoded_hash", lists, b),
++        ];
++        for l in &mut logs {
++            l.header.run = id.to_owned();
++        }
++        logs
++    };
++    let equal = hash_log("h1", "client", "decoded_hash", &SERVER, no);
++    // A bite run that compared nothing did not test the bite: INVALID, never shown.
++    let mut logs = vec![room.clone(), equal.clone()];
++    logs.extend(bite("b1", &none));
++    let v = judge(&marks_file(&[hash_mark()]), &logs);
++    assert_eq!(v[0].verdict, VerdictKind::Invalid, "{:?}", v[0].why);
++    assert_eq!(v[0].bites[0].status, BiteStatus::Invalid);
++    assert!(
++        says(&v[0].bites[0].runs[0].invalid_why, "an empty comparison shows no bite"),
++        "{:?}",
++        v[0].bites[0].runs
++    );
++    // Post-wrap frames under the wrong tick: hashes at ticks the server never logged count, and show the bite.
++    let mut logs = vec![room, equal];
++    let mut wrapped = bite("b1", &[&[Some(11), Some(21)]]);
++    wrapped[1].ticks[0].t = 9;
++    logs.extend(wrapped);
++    let v = judge(&marks_file(&[hash_mark()]), &logs);
++    assert_eq!(v[0].verdict, VerdictKind::Pass, "{:?}", v[0].why);
++    assert_eq!(v[0].bites[0].status, BiteStatus::Shown);
++}
++
++/// A twin-hash mark like PM-0001-21's forged part.
++fn twin_hash_mark() -> Value {
++    json!({
++        "id": "PM-0001-21", "title": "forged", "draft": draft(), "verdict": "pass",
++        "parts": [{"name": "forged", "select": {"params.suite": "forged"}, "min": 1}],
++        "checks": [{"name": "state hash equals the twin's", "figure": "twin_hash_mismatch_count", "op": "==", "value": 0}]
++    })
++}
++
++/// A room log with one state hash per tick (`None`: no `h` on that tick), naming its twin.
++fn hashed(run: &'static str, role: &'static str, twin: Option<&'static str>, hashes: &[Option<u64>]) -> LogSpec {
++    let mut s = LogSpec::room(run, "set-w", "PM-0001-21");
++    s.role = role;
++    s.layer = "L1";
++    s.params = vec![("suite", json!("forged"))];
++    if let Some(t) = twin {
++        s.params.push(("twin", json!(t)));
++    }
++    s.ticks = hashes.iter().map(|_| (Phase::Measured, vec![])).collect();
++    s
++}
++
++fn with_hashes(s: LogSpec, hashes: &[Option<u64>]) -> Log {
++    let mut log = s.build();
++    for (t, h) in log.ticks.iter_mut().zip(hashes) {
++        if let Some(h) = h {
++            t.set_hash(*h);
++        }
++    }
++    log
++}
++
++#[test]
++fn u4j_the_twin_hash_compares_every_tick_and_its_twin_whole() {
++    let pair = |own: &[Option<u64>], other: &[Option<u64>]| {
++        vec![
++            with_hashes(hashed("f1", "measured", Some("f1-twin"), own), own),
++            with_hashes(hashed("f1-twin", "twin", None, other), other),
++        ]
++    };
++    let h = [Some(1), Some(2), Some(3)];
++    assert_eq!(verdict_of(&[twin_hash_mark()], &pair(&h, &h)).0, VerdictKind::Pass);
++    let (k, why) = verdict_of(&[twin_hash_mark()], &pair(&h, &[Some(1), Some(9), Some(3)]));
++    assert_eq!(k, VerdictKind::Fail);
++    assert!(says(&why, "state hash equals the twin's = 1, needs == 0"), "{why:?}");
++    let (k, why) = verdict_of(&[twin_hash_mark()], &pair(&h, &[Some(1), Some(2), None]));
++    assert_eq!(k, VerdictKind::Fail, "a tick hashed in one only counts: {why:?}");
++    let (k, why) = verdict_of(&[twin_hash_mark()], &pair(&[None], &[None]));
++    assert_eq!(k, VerdictKind::Fail, "{why:?}");
++    assert!(says(&why, "hashed no tick; an empty comparison fails"), "{why:?}");
++    let (k, why) = verdict_of(&[twin_hash_mark()], &pair(&h, &h)[..1]);
++    assert_eq!(k, VerdictKind::NotRun, "{why:?}");
++    assert!(says(&why, "its twin f1-twin is not in set set-w yet"), "{why:?}");
++    let mut seed = hashed("f1-twin", "twin", None, &h);
++    seed.seed = 2;
++    let mut bites = hashed("f1-twin", "twin", None, &h);
++    bites.features = Some(vec!["bites"]);
++    let mut cut = hashed("f1-twin", "twin", None, &h);
++    cut.footer = false;
++    let own = || with_hashes(hashed("f1", "measured", Some("f1-twin"), &h), &h);
++    let mut bad_h = own();
++    bad_h.ticks[1].h = Some("not-a-hash".to_owned());
++    let mut second = LogSpec::room("f1", "set-w", "PM-0001-21");
++    second.layer = "L1";
++    second.process = "lab";
++    second.params = vec![("suite", json!("forged"))];
++    second.ticks = vec![(Phase::Measured, vec![])];
++    let cases: Vec<(Vec<Log>, &str)> = vec![
++        (vec![with_hashes(seed, &h), own()], "its twin f1-twin has another seed"),
++        (vec![with_hashes(bites, &h), own()], "its twin f1-twin is invalid: build:"),
++        (vec![with_hashes(cut, &h), own()], "its twin f1-twin is invalid: complete:"),
++        (vec![with_hashes(hashed("f1", "measured", Some("f1"), &h), &h)], "params.twin names the run itself"),
++        (vec![with_hashes(hashed("f1", "measured", None, &h), &h)], "params.twin names no twin run"),
++        (pair(&h, &h).into_iter().skip(1).chain([bad_h]).collect(), "tick 2's h is not 16 lowercase hex digits"),
++        (
++            pair(&h, &h).into_iter().chain([with_hashes(second, &[Some(7)])]).collect(),
++            "two logs give tick 1 two state hashes",
++        ),
++    ];
++    for (logs, expected) in cases {
++        let (k, why) = verdict_of(&[twin_hash_mark()], &logs);
++        assert_eq!(k, VerdictKind::Invalid, "{expected}: {why:?}");
++        assert!(says(&why, expected), "{expected}: {why:?}");
++    }
++}
++
++#[test]
++fn u4j_machine_named_needs_every_field_and_a_vm_its_address() {
++    let mark = json!({
++        "id": "PM-0006-11", "title": "RS named", "draft": draft(), "verdict": "pass",
++        "parts": [{"name": "RS", "select": {"process": "room"}, "min": 1}],
++        "checks": [{"name": "named", "figure": "machine_named", "op": "==", "value": 1}]
++    });
++    let run = |role: &'static str, edit: &dyn Fn(&mut npt_log::Machine)| {
++        let mut s = LogSpec::room("m1", "set-m", "PM-0006-11");
++        s.machine_role = role;
++        let mut log = s.build();
++        log.header.machine.address = "203.0.113.10".to_owned();
++        edit(&mut log.header.machine);
++        verdict_of(std::slice::from_ref(&mark), &[log]).0
++    };
++    assert_eq!(run("RS", &|_| {}), VerdictKind::Pass);
++    assert_eq!(run("C", &|m| m.address.clear()), VerdictKind::Pass, "not a VM: no address");
++    let missing: [(&str, &dyn Fn(&mut npt_log::Machine)); 8] = [
++        ("a VM with no address", &|m| m.address.clear()),
++        ("no kernel", &|m| m.kernel.clear()),
++        ("no CPU model", &|m| m.cpu.clear()),
++        ("no location", &|m| m.location.clear()),
++        ("no vCPU count", &|m| m.vcpus = 0),
++        ("no SMT map", &|m| m.smt.clear()),
++        ("an empty sibling list", &|m| m.smt.push(vec![])),
++        ("no clock resolution", &|m| m.clock_res_ns = 0),
++    ];
++    for (why, edit) in missing {
++        assert_eq!(run("RS", edit), VerdictKind::Fail, "{why}");
++    }
++}
++
++// PM-0001-18's WebSocket part, judged with the real marks.json: the ws-practice rule and the numbers in force.
++
++fn real_marks() -> npt_judge::Marks {
++    let text = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../../marks/marks.json")).expect("marks");
++    parse_marks(&text).expect("marks.json compiles")
++}
++
++const WS_BOUND: &str = r#"npt-ws-bound v1 {"model":"linux-6.8-tcp v3","commit":"bf9d248000000000000000000000000000000000","runs_count":2000,"client_bursts_count":480,"x_ns":670000000,"y_ns":2500000000,"k_count":5,"z_ns":6900000000,"m_m_ns":654000000,"band_low":"0.965","band_high":"1.035","tolerance":"1.10","guard_share":"0.0000"}"#;
++
++/// One WebSocket B1 run of 480 client-bursts: `low` at 600 ms, the 240th (the median) at `median`, then `high` at
++/// 700 ms, and `slow` at `slow_ns`.
++fn heals(median: i64, slow: usize, slow_ns: i64) -> Vec<i64> {
++    let mut v = vec![600_000_000; 239];
++    v.push(median);
++    v.extend(std::iter::repeat_n(700_000_000, 240 - slow));
++    v.extend(std::iter::repeat_n(slow_ns, slow));
++    v
++}
++
++/// Everything a ws-practice scenario changes.
++#[derive(Clone)]
++struct Ws {
++    counted: Vec<i64>,
++    practice: Vec<i64>,
++    record: Vec<(&'static str, Value)>,
++    practice_started: &'static str,
++    practice_binary: &'static str,
++    practice_scene: &'static str,
++    practice_spacing: i64,
++    practice_footer: bool,
++    records: usize,
++    counted_started: Option<&'static str>,
++    second_practice: bool,
++}
++
++/// The base: M_p 680 ms against M_m 654 ms, so s = f = 680/654; the numbers in force are 697 ms, 2.6 s and 7.175 s
++/// (the bound's 670 ms, 2.5 s and 6.9 s times f, rounded up to the ms); the counted run's median, 690 ms, and its 6
++/// heals at 2.55 s pass only at those numbers.
++fn ws_base() -> Ws {
++    Ws {
++        counted: heals(690_000_000, 6, 2_550_000_000),
++        practice: heals(680_000_000, 5, 2_590_000_000),
++        record: vec![
++            ("class", json!("IN TOLERANCE")),
++            ("m_p_ns", json!(680_000_000)),
++            ("bound", json!(WS_BOUND)),
++            ("bound_file", json!("spikes/netcode-proof/results/u3-ws-fallback/bound.txt")),
++            ("bound_sha256", json!("0".repeat(64))),
++            ("x_moved_ns", json!(697_000_000)),
++            ("y_moved_ns", json!(2_600_000_000_i64)),
++            ("z_moved_ns", json!(7_175_000_000_i64)),
++            ("k_count", json!(5)),
++            ("s", json!("1.039755")),
++            ("f", json!("1.039755")),
++        ],
++        practice_started: "2026-11-20T18:00:00Z",
++        practice_binary: "a",
++        practice_scene: "SS",
++        practice_spacing: 30_000_000_000,
++        practice_footer: true,
++        records: 1,
++        counted_started: Some("2026-11-20T21:00:00Z"),
++        second_practice: false,
++    }
++}
++
++fn ws_log(run: &'static str, role: &'static str, binary: &'static str, started: Option<&'static str>, heals: &[i64]) -> LogSpec {
++    let mut s = LogSpec::room(run, "set-ws", "PM-0001-18");
++    s.role = role;
++    s.machine_role = "LG";
++    s.process = "bots";
++    s.profile = "B1";
++    s.binary = binary;
++    s.params = vec![("transport", json!("ws")), ("burst_spacing_ns", json!(30_000_000_000_i64))];
++    if let Some(t) = started {
++        s.params.push(("started_utc", json!(t)));
++    }
++    s.events = heals
++        .iter()
++        .enumerate()
++        .map(|(i, h)| {
++            EventRecord::new("burst_heal", Phase::Measured)
++                .with("after_link_ns", *h)
++                .with("slot", i as i64 % 48)
++                .with("burst", i as i64 / 48)
++        })
++        .collect();
++    s
++}
++
++fn ws_logs(w: &Ws) -> Vec<Log> {
++    let binary = |c: &str| -> &'static str { if c == "a" { "aa" } else { "bb" } };
++    let mut practice = ws_log("ws-practice", "practice", binary(w.practice_binary), Some(w.practice_started), &w.practice);
++    practice.footer = w.practice_footer;
++    practice.params[1] = ("burst_spacing_ns", json!(w.practice_spacing));
++    for _ in 0..w.records {
++        let mut e = EventRecord::new("ws_practice", Phase::After);
++        for (k, v) in &w.record {
++            e = e.with(k, v.clone());
++        }
++        practice.events.push(e);
++    }
++    let mut practice = practice.build();
++    practice.header.scene = w.practice_scene.to_owned();
++    let mut logs = vec![ws_log("ws-1", "measured", "aa", w.counted_started, &w.counted).build(), practice];
++    if w.second_practice {
++        let mut p = logs[1].clone();
++        p.header.run = "ws-practice-0".to_owned();
++        p.header.params.insert("started_utc".to_owned(), json!("2026-11-20T17:00:00Z"));
++        logs.push(p);
++    }
++    let mut bite = ws_log("ws-bite", "bite", "cc", Some("2026-11-20T22:00:00Z"), &heals(776_000_000, 0, 0));
++    bite.bite = Some("PM-0001-18/ws-budget-x2");
++    logs.push(bite.build());
++    logs
++}
++
++fn ws_part(w: &Ws) -> (npt_judge::eval::PartOut, npt_judge::Verdict) {
++    let marks = real_marks();
++    let i = marks.marks.iter().position(|m| m.id == "PM-0001-18").expect("-18");
++    let v = judge(&marks, &ws_logs(w)).remove(i);
++    let part = v.parts.iter().find(|p| p.name == "L2 B1 ws").expect("the WebSocket part").clone();
++    (part, v)
++}
++
++#[test]
++fn u4j_ws_practice_puts_the_practice_runs_numbers_in_force() {
++    let (part, v) = ws_part(&ws_base());
++    assert_eq!(part.verdict, VerdictKind::Pass, "{:?}", part.why);
++    let checks = &part.runs[0].checks;
++    let median = checks.iter().find(|c| c.name.starts_with("WebSocket: half")).expect("check c");
++    assert_eq!(median.value.as_deref(), Some("690000000"));
++    assert!(median.needs.starts_with("<= 697000000 (X 670000000 x f 1.039755 = 697000000"), "{}", median.needs);
++    assert!(median.needs.contains("M_p 680000000 / M_m 654000000"), "{}", median.needs);
++    let over = checks.iter().find(|c| c.name.starts_with("WebSocket: at most")).expect("check d");
++    assert_eq!(over.value.as_deref(), Some("0"), "none over Y' = 2.6 s (6 over the unmoved 2.5 s)");
++    let bite = v.bites.iter().find(|b| b.id == "PM-0001-18/ws-budget-x2").expect("the WebSocket bite");
++    assert_eq!(bite.status, BiteStatus::Shown, "{:?}", bite.runs);
++    // FAR BETTER, with the advisor's chance ruling: f = 1, so the bound itself is in force and 690 ms fails it.
++    let mut w = ws_base();
++    w.practice = heals(600_000_000, 5, 2_590_000_000);
++    w.record[0].1 = json!("FAR BETTER");
++    w.record[1].1 = json!(600_000_000);
++    w.record.extend([("chance_ruling", json!("advisor-r3.md:12"))]);
++    w.record[5].1 = json!(670_000_000);
++    w.record[6].1 = json!(2_500_000_000_i64);
++    w.record[7].1 = json!(6_900_000_000_i64);
++    w.practice = heals(600_000_000, 0, 0);
++    let (part, _) = ws_part(&w);
++    assert_eq!(part.verdict, VerdictKind::Fail, "{:?}", part.why);
++    assert!(says(&part.why, "WebSocket: half the client-bursts heal within X x f"), "{:?}", part.why);
++    // A second practice run of one build counts only with its ruling; the latest is the one in force.
++    let mut w = ws_base();
++    w.second_practice = true;
++    let (part, _) = ws_part(&w);
++    assert_eq!(part.verdict, VerdictKind::Invalid, "{:?}", part.why);
++    assert!(says(&part.why, "2 practice runs of one build"), "{:?}", part.why);
++    w.record.push(("second_ruling", json!("advisor-r3.md:40: the cause found and fixed")));
++    assert_eq!(ws_part(&w).0.verdict, VerdictKind::Pass);
++}
++
++#[test]
++fn u4j_ws_practice_refuses_every_number_not_set_by_its_rules() {
++    let field = |name: &'static str, value: Value| {
++        move |w: &mut Ws| {
++            for f in &mut w.record {
++                if f.0 == name {
++                    f.1 = value.clone();
++                }
++            }
++        }
++    };
++    let bound = |from: &'static str, to: &'static str| field("bound", json!(WS_BOUND.replacen(from, to, 1)));
++    type Edit = Box<dyn Fn(&mut Ws)>;
++    let cases: Vec<(Edit, &str)> = vec![
++        (Box::new(|w| w.practice_binary = "b"), "holds no practice run of run ws-1's build"),
++        (Box::new(|w| w.practice_started = "2026-11-20T22:00:00Z"), "did not start before run ws-1"),
++        (Box::new(|w| w.counted_started = None), "run ws-1 has no params.started_utc"),
++        (Box::new(|w| w.counted_started = Some("20 Nov 2026 21:00")), "is not YYYY-MM-DDTHH:MM:SSZ"),
++        (Box::new(|w| w.practice_scene = "ES"), "ran another scene or profile"),
++        (Box::new(|w| w.practice_spacing = 20_000_000_000), "ran another burst spacing"),
++        (Box::new(|w| w.practice_footer = false), "practice run ws-practice is invalid: complete:"),
++        (Box::new(|w| w.records = 0), "holds 0 ws_practice records, not 1"),
++        (Box::new(|w| w.records = 2), "holds 2 ws_practice records, not 1"),
++        (Box::new(field("class", json!("BEYOND"))), "is \"BEYOND\" at s = 1.039755"),
++        (Box::new(field("class", json!("INVALID"))), "is \"INVALID\""),
++        (Box::new(field("m_p_ns", json!(681_000_000))), "the record's m_p_ns is not practice run ws-practice's median"),
++        (Box::new(field("x_moved_ns", json!(700_000_000))), "the record's x_moved_ns is not the judge's X 670000000"),
++        (Box::new(field("k_count", json!(6))), "the record's k_count is not the bound's"),
++        (Box::new(bound(r#""tolerance":"1.10""#, r#""tolerance":"1.05""#)), "the bound's tolerance 1.05 is not marks.json's 1.1"),
++        (Box::new(bound(r#""x_ns":670000000"#, r#""x_ns":680000000"#)), "holds 670000000 as the bound's X, the bound line says 680000000"),
++        (Box::new(bound(r#""k_count":5"#, r#""k_count":4"#)), "allows 5 over Y, the bound's k is 4"),
++        (Box::new(bound("npt-ws-bound v1 ", "npt-ws-bound ")), "the bound line does not start with"),
++        (Box::new(|w| w.practice = heals(680_000_000, 6, 2_610_000_000)), "but practice run ws-practice has 6 heals over 2600000000 ns"),
++        (
++            Box::new(|w| {
++                // M_p 740 ms: s = 740/654 = 1.1315, beyond the tolerance (the 240th of 480 heals, 750 ms above it).
++                let mut v = vec![600_000_000; 239];
++                v.push(740_000_000);
++                v.extend(std::iter::repeat_n(750_000_000, 235));
++                v.extend(std::iter::repeat_n(2_590_000_000, 5));
++                w.practice = v;
++                w.record[1].1 = json!(740_000_000);
++            }),
++            "is \"IN TOLERANCE\" at s = 1.131498",
++        ),
++    ];
++    for (edit, expected) in cases {
++        let mut w = ws_base();
++        edit(&mut w);
++        let (part, v) = ws_part(&w);
++        assert_eq!(part.verdict, VerdictKind::Invalid, "{expected}: {:?}", part.why);
++        assert!(says(&part.why, expected), "{expected}: {:?}", part.why);
++        assert_eq!(v.verdict, VerdictKind::Invalid, "{expected}");
++    }
++    // BEYOND with the advisor's chance ruling (a lone count or maximum failure, s within the tolerance) counts.
++    let mut w = ws_base();
++    field("class", json!("BEYOND"))(&mut w);
++    w.record.push(("chance_ruling", json!("advisor-r3.md:20")));
++    assert_eq!(ws_part(&w).0.verdict, VerdictKind::Pass);
++}
+diff --git a/spikes/netcode-proof/crates/log/src/lib.rs b/spikes/netcode-proof/crates/log/src/lib.rs
+index bca48d6..b480b0c 100644
+--- a/spikes/netcode-proof/crates/log/src/lib.rs
++++ b/spikes/netcode-proof/crates/log/src/lib.rs
+@@ -114,6 +114,18 @@ pub struct TickRecord {
+     /// The tick's state hash, 16 lowercase hex digits.
+     #[serde(default, skip_serializing_if = "Option::is_none")]
+     pub h: Option<String>,
++    /// A list of hashes per name, one entry per client slot (index = slot): 16 lowercase hex digits, or `null` where
++    /// this log has no hash for that slot at this tick (`marks/README.md` §1). A 64-bit hash does not fit JSON's safe
++    /// integers, so it is a string, as `h` is.
++    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
++    pub hs: BTreeMap<String, Vec<Option<String>>>,
++}
++
++/// True for a hash in the log's form: 16 lowercase hex digits.
++fn hash_form(h: &str) -> bool {
++    h.len() == 16
++        && h.bytes()
++            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+ }
+ 
+ impl TickRecord {
+@@ -124,6 +136,7 @@ impl TickRecord {
+             v: BTreeMap::new(),
+             s: BTreeMap::new(),
+             h: None,
++            hs: BTreeMap::new(),
+         }
+     }
+ 
+@@ -135,15 +148,47 @@ impl TickRecord {
+     /// The state hash, if the record has one in the right form.
+     pub fn hash(&self) -> Option<u64> {
+         let h = self.h.as_deref()?;
+-        if h.len() != 16
+-            || !h
+-                .bytes()
+-                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+-        {
++        if !hash_form(h) {
+             return None;
+         }
+         u64::from_str_radix(h, 16).ok()
+     }
++
++    /// Stores one hash per client slot under `name`, each as 16 lowercase hex digits, `None` as `null`.
++    pub fn set_hashes(&mut self, name: &str, hashes: &[Option<u64>]) {
++        let list = hashes
++            .iter()
++            .map(|h| h.map(|h| format!("{h:016x}")))
++            .collect();
++        self.hs.insert(name.to_owned(), list);
++    }
++
++    /// The hashes under `name`, one per client slot (`None` for `null`); `None` if the record has no such list or an
++    /// entry is not in the right form.
++    pub fn hashes(&self, name: &str) -> Option<Vec<Option<u64>>> {
++        self.hs
++            .get(name)?
++            .iter()
++            .map(|h| match h.as_deref() {
++                None => Some(None),
++                Some(h) if hash_form(h) => u64::from_str_radix(h, 16).ok().map(Some),
++                Some(_) => None,
++            })
++            .collect()
++    }
++}
++
++/// Every `hs` list's entries are `null` or a hash in the log's form.
++fn check_hs(r: &TickRecord) -> Result<(), String> {
++    for (name, list) in &r.hs {
++        if let Some(bad) = list.iter().flatten().find(|h| !hash_form(h)) {
++            return Err(format!(
++                "tick {}: hs.{name} holds {bad:?}, not 16 lowercase hex digits or null",
++                r.t
++            ));
++        }
++    }
++    Ok(())
+ }
+ 
+ /// One second's measurements, per process.
+@@ -320,7 +365,8 @@ impl<W: Write> Writer<W> {
+                 self.last_tick.unwrap_or(0)
+             )));
+         }
+-        check_names(r.v.keys().chain(r.s.keys()))?;
++        check_names(r.v.keys().chain(r.s.keys()).chain(r.hs.keys()))?;
++        check_hs(r).map_err(invalid)?;
+         self.line(&Line::Tick(r))?;
+         self.last_tick = Some(r.t);
+         Ok(())
+@@ -443,6 +489,7 @@ pub fn read_log<R: BufRead>(input: R) -> Result<Log, ReadError> {
+             "tick" => {
+                 let r: TickRecord =
+                     serde_json::from_value(value).map_err(|e| err(format!("tick: {e}")))?;
++                check_hs(&r).map_err(err)?;
+                 if last_tick.is_some_and(|last| r.t <= last) {
+                     return Err(err(format!(
+                         "tick {} after tick {}",
+@@ -616,6 +663,72 @@ mod tests {
+         assert_eq!(r.hash(), None, "short is not the format");
+     }
+ 
++    /// `hs` (marks/README.md §1, the advisor's nit c): one entry per client slot, a client with no hash at the tick
++    /// written as `null`, and nothing else accepted on either side.
++    #[test]
++    fn hs_holds_one_hash_or_null_per_slot() {
++        let mut r = TickRecord::new(4, Phase::Measured);
++        r.set_hashes("decoded_hash", &[Some(0xab), None, Some(0)]);
++        assert_eq!(
++            r.hs["decoded_hash"],
++            vec![
++                Some("00000000000000ab".to_owned()),
++                None,
++                Some("0000000000000000".to_owned())
++            ]
++        );
++        assert_eq!(
++            r.hashes("decoded_hash"),
++            Some(vec![Some(0xab), None, Some(0)])
++        );
++        assert_eq!(r.hashes("server_hash"), None, "no such list");
++        let mut w = Writer::new(Vec::new(), &header()).expect("header");
++        w.tick(&r).expect("tick");
++        w.tick(&TickRecord::new(5, Phase::Measured))
++            .expect("a tick with no hs");
++        let text = String::from_utf8(w.finish(Ended::Clean).expect("footer")).expect("utf-8");
++        let lines: Vec<&str> = text.lines().collect();
++        assert!(
++            lines[1].contains(
++                r#""hs":{"decoded_hash":["00000000000000ab",null,"0000000000000000"]}"#
++            ),
++            "{}",
++            lines[1]
++        );
++        assert!(!lines[2].contains("hs"), "an empty hs is not written");
++        let log = read_log(text.as_bytes()).expect("reads back");
++        assert_eq!(log.ticks[0], r);
++        assert!(log.ticks[1].hs.is_empty());
++    }
++
++    #[test]
++    fn hs_refuses_a_bad_entry_or_name_when_writing_and_reading() {
++        let mut w = Writer::new(Vec::new(), &header()).expect("header");
++        for (t, name, entry) in [
++            (1, "decoded_hash", "00000000000000AB"),
++            (2, "decoded_hash", "ab"),
++            (3, "decoded_hash", "0x000000000000ab"),
++        ] {
++            let mut r = TickRecord::new(t, Phase::Measured);
++            r.hs.insert(name.to_owned(), vec![Some(entry.to_owned())]);
++            let e = w.tick(&r).expect_err(entry);
++            assert!(e.to_string().contains("16 lowercase hex digits"), "{e}");
++            assert_eq!(r.hashes(name), None, "{entry} is not in the form");
++        }
++        let mut bad_name = TickRecord::new(4, Phase::Measured);
++        bad_name.set_hashes("Decoded-Hash", &[None]);
++        assert!(w.tick(&bad_name).is_err(), "a bad list name");
++        assert_eq!(w.records(), 1, "only the header was written");
++        let text = String::from_utf8(sample_log()).expect("utf-8");
++        let header_line = text.lines().next().expect("header");
++        for entry in [r#""ABCDEF0123456789""#, r#""1""#, "1"] {
++            let line = format!(
++                "{header_line}\n{{\"k\":\"tick\",\"t\":1,\"ph\":\"measured\",\"hs\":{{\"decoded_hash\":[{entry}]}}}}\n"
++            );
++            assert!(read_log(line.as_bytes()).is_err(), "{entry} read back");
++        }
++    }
++
+     #[test]
+     fn the_header_comes_first_and_once() {
+         let text = String::from_utf8(sample_log()).expect("utf-8");
+diff --git a/spikes/netcode-proof/marks/README.md b/spikes/netcode-proof/marks/README.md
+index 50ddd8d..109c832 100644
+--- a/spikes/netcode-proof/marks/README.md
++++ b/spikes/netcode-proof/marks/README.md
+@@ -12,16 +12,17 @@ header; tick, second and event records follow in time order. Every record has a
+ | `k` | Fields | Meaning |
+ |---|---|---|
+ | `header` | `schema` (1), `run`, `set`, `role`, `marks`, `machine`, `build`, `bite`, `layer`, `profile`, `seed`, `tick_hz`, `clients`, `scene`, `process`, `slot`, `date`, `params` | one per file, first; see below |
+-| `tick` | `t` (tick number), `ph` (phase), `v` (name → integer), `s` (name → list of integers), `h` (state hash, 16 hex digits, optional) | one per simulated tick that the process measured |
++| `tick` | `t` (tick number), `ph` (phase), `v` (name → integer), `s` (name → list of integers), `h` (state hash, 16 hex digits, optional), `hs` (name → list of hashes, one per client slot, optional) | one per simulated tick that the process measured |
+ | `second` | `sec` (seconds since the log's start), `ph`, `v`, `s` | one per second per process |
+ | `event` | `ev` (name), `ph`, `t` (tick, optional), `ns` (monotonic ns since the log's start, optional), `f` (name → JSON value) | anything that happens once |
+ | `footer` | `records` (the count of records before it), `ended` (`clean`, `crash` or `stopped`) | one per file, last; a file without it was cut short |
+ 
+ - **`header`:**
+   - `run` names the run; `set` names the run set that is judged together; `role` is the run's part in its set:
+-    `measured` (the default), `bite` (the bites build, `bite` naming the planted defect), `clean` (a clean reference
+-    run), `bracket-first` and `bracket-last` (PM-0006-13's lone room), or any role a mark's checks name (`n24`,
+-    `logging-off`, `cubic`, …);
++    `measured` (the default), `bite` (the bites build, `bite` naming the planted defect), `twin` (a run's twin from
++    the same build, named in the other's `params.twin`: PM-0001-3, -21), `clean` (a clean reference run),
++    `bracket-first` and `bracket-last` (PM-0006-13's lone room), `practice` (PM-0001-18's unjudged WebSocket
++    practice run, §2.5), or any role a mark's checks name (`n24`, `logging-off`, `cubic`, …);
+   - `marks` lists the marks this run serves; the judge reads a run only for those marks;
+   - `machine`: `role` (`RS`, `LG`, `MV`, `C`, `ML`, `MP`, `MAC`, `RD`), `name` (the instance: `RS`, `LG1`, `LG2`,
+     …; `ML` the named laptop and `ML*` its stand-in, `MAC-r` the runner and `MAC-b` a borrowed Mac),
+@@ -30,7 +31,8 @@ header; tick, second and event records follow in time order. Every record has a
+   - `build`: `commit`, `binary_sha256`, `features`, `profile`;
+   - `bite`: the bite id, or `null` in every measured build (plan §4.7);
+   - `layer` (`L1`, `L2`, `real`), `profile` (`P0` to `P4`, `B1`, `real-path`), `seed`, `tick_hz`, `clients`,
+-    `scene` (`SS`, `ES`, `TC`, `CO`, …), `process` (`room`, `bots`, `load`, `lab`, `browser`, …), `slot`;
++    `scene` (`SS`, `ES`, `TC`, `CO`, …), `process` (`room`, `bots`, `load`, `lab`, `browser`, `replay`, …), `slot`;
++  - `layer` `loopback`: the -30 pre-check's Loopback leg, an npt-lab test whose headers list no mark (never judged);
+   - `date`: the run's date (`YYYY-MM-DD`), passed in by the caller (npt-log reads no clock);
+   - `params`: name → JSON value, every other setting a mark needs from the header (for example `sim`, which is
+     `stress` or `stand-in`; `padding_target_ns`; the queue depths of PM-0001-23 and -24; `cmd_timing`, `A` or `B`).
+@@ -38,6 +40,20 @@ header; tick, second and event records follow in time order. Every record has a
+ - **Names in `v` and `s`** are lowercase with underscores, and end in their unit: `_ns`, `_bytes`, `_bits`,
+   `_permille`, `_count`, `_um` (micrometres) or `_microdeg` (millionths of a degree), or are a 0/1 flag with no unit
+   suffix. `SERIES.md` lists every name a mark reads, with its unit and the crate that writes it.
++- **`hs`** in a tick record (U4j; PM-0001-17, -19, -58): name → one entry per client slot of the run (index = slot,
++  the same length in every record of the run), each 16 lowercase hex digits, or `null` where this log has no hash
++  for that slot at that tick (a client not connected, a tick it could not complete, a slot another log holds). Read
++  only by figures; npt-log's writer and reader refuse any other entry (a 64-bit hash does not fit JSON's safe
++  integers, so it is a string, as `h` is). Its names:
++  - `server_hash` (the room's log, at tick t): the server's hash of what it meant that client to hold after decoding
++    tick t (`npt_proto::client_hash` over baseline plus delta, the own-state section and the events as sent), never 0;
++  - `decoded_hash` (the clients' log, at the tick t the client rebuilt): its hash of the state it holds for t, or the
++    sentinel `0000000000000000` for a tick with a received group it could not decode; `null` for a tick with a group
++    lost and none refused (counted in `tick.s.snap_incomplete`). A client's rebuilt ticks can go back (a wrong 16-bit
++    rebuild), and records are strictly in tick order, so its writer files every hash under its rebuilt tick,
++    buffering and sorting before it writes; a client with two hashes for one tick writes the sentinel there;
++  - `replay_hash` (process `replay`, the x86-64 re-decode of an L2 client's logged bytes, R-8): the same as
++    `decoded_hash`, decoded again natively, for the Arm rule.
+ - **Events the judge reads for validity** (§4): `admit` (`session`, `in_roster`), `control` (`source`: `socket` or
+   `session`; `kind`; `applied`; `rostered`; `cap_valid` for session controls; `peer_ok` for socket controls),
+   `affinity` (`when`: `start` or `end`; `cpu`; `alone`; `sibling_free`), `person` (`who`, `mark`, `verdict`:
+@@ -59,7 +75,7 @@ header; tick, second and event records follow in time order. Every record has a
+ | `verdict` | string | the mark's kind: `pass` (pass numbers, judged by script), `reported` (no pass number), `person` (judged by a person), `outside` (not in this change-set: always NOT-RUN with `notes`; it has no parts or checks, and may keep its `bites` as data for the change-set that runs it) |
+ | `where` | list of strings | where and when it runs (plan §6.2's key: `C`, `R1` to `R7`, `ML*`, `MAC-r`, `MAC-b`, `MP`); informative |
+ | `parts` | list of parts | the evidence the mark needs (2.2); empty for `outside` |
+-| `validity` | list of strings | the validity rules of §4 that apply to its runs, beyond the three that apply to every run (a part may add its own: 2.2) |
++| `validity` | list of strings | the validity rules of §4 that apply to its runs, beyond the four that apply to every run (a part may add its own: 2.2) |
+ | `checks` | list of checks | the pass numbers (2.3); empty for `reported`, `person` and `outside` |
+ | `report` | list of statistics | what is reported beside the verdict (2.4) |
+ | `bites` | list of objects | `id` and `what`: each planted defect that must fail the mark first; or, with `expect: "invalid"` and `rule`, one that must make its run INVALID by that rule alone (§5) |
+@@ -122,6 +138,15 @@ A part selects runs and says how many valid runs it needs:
+ - **`setup`** (optional, `true`): a setup condition of the run (the S30 starts below the wrap, the queue holds 4
+   datagrams, the cheat fired). Its failure or gap makes the run INVALID, never FAIL: the run did not test the mark.
+   No bite is shown by a setup check. A setup check reads its own run only (no `pooled`, no `against`).
++- **`ws_bound`** (optional, `x`, `y` or `z`; PM-0001-18's WebSocket part): the check holds that number of the
++  WebSocket bound (§2.5): `x` and `z` as its `value` (a limit on a statistic), `y` as its `where` value with its
++  `value` the bound's k (a count over Y). The judge applies the number times the practice run's factor f, rounded up
++  to the next millisecond (k never moves), and prints the numbers in force with M_p, M_m, s and f beside the check.
++  Such a check names its parts, each judged by the `ws-practice` rule (§4); a mark has at most one check per letter,
++  and the rule makes a run INVALID unless these checks' numbers are the bound's.
++- **An empty comparison** (the advisor's Q11 ruling, u4-build-plan.md §4.6): a figure that compares pairs
++  (`decoded_hash_mismatch_count`, `twin_hash_mismatch_count`) fails, never passes, when it compared nothing. Its check
++  comes out `empty`: the run fails, as on a failure (its gaps listed beside it), and no bite is shown by it (§5).
+ 
+ ### 2.4 Reported statistics
+ `{ "name": "tick p50", "series": "tick.v.work_ns", "stat": "p50" }`, or `{ "name": …, "figure": … }`, with the
+@@ -144,8 +169,36 @@ from the part's valid runs, never judged (B10).
+ - `params.killed`: only on a room killed on purpose (PM-0001-27's SIGKILL, PM-0006-22's soak kill), and the exemption
+   from `complete` holds only if npt-super's log records that kill of that slot (built at U6: C4). PM-0001-59's crashed
+   rooms need none: their catch writes the `crash` footer.
+-- `hs` in a tick record: name → list of 16-hex-digit hashes (one per client: the decoded or the server's quantised
+-  state hash, PM-0001-17, -19, -58), read only by figures (B15; npt-log adds it with its first writer).
++- `hs` in a tick record: built at U4j, §1 (B15).
++- `params.burst_spacing_ns` (B1 runs of PM-0001-18): the scheduled interval between burst starts, before each burst's
++  random offset; the practice run and its counted run must share it. `params.config_hz` (L2): RS's kernel CONFIG_HZ,
++  beside `machine.kernel` (the ruling's `machine.config_hz`: a header param, since npt-log's `Machine` is built by
++  npt-lab's machine reader; the WebSocket practice record's header checks read it).
++- **The WebSocket bound's machine-readable line** (PM-0001-18; the advisor's nit (f) on U4; fixes.rs's
++  run-structured bound writes it, one line in its committed output under `results/u3-ws-fallback/`, in the form
++  npt-judge's own parser reads, `parse_bound` in crates/judge/src/practice.rs): the tag `npt-ws-bound v1 `, then
++  one JSON object with exactly these fields, no others:
++  `model` (the TCP model, `linux-6.8-tcp v3`), `commit` (the full 40-digit commit it ran at), `runs_count` (simulated
++  runs, at least 2,000), `client_bursts_count` (per run, 480 for 48 clients x 10 bursts), `x_ns` (X: the smallest
++  10 ms step with P(run median <= X) >= 0.99), `y_ns` and `k_count` (Y = 2.5 s and k: P(at most k over Y) >= 0.98),
++  `z_ns` (Z: the smallest 100 ms step with P(none over Z) >= 0.98), `m_m_ns` (M_m, the median of the run medians),
++  `band_low` and `band_high` (the 1st and 99th percentiles of a correct build's run median / M_m), `tolerance` (1.10,
++  or lower by the guard; never above 1.10) and `guard_share` (the share of budget-x2 runs whose run median / M_m is at
++  most `tolerance`, at most 0.01). Times are integer ns; the four fractions are decimal strings (`"0.965"`), read
++  exactly. For example (bf9d248's first bound as numbers; its M_m, band and runs are placeholders):
++  `npt-ws-bound v1 {"model":"linux-6.8-tcp v3","commit":"<40 hex digits>","runs_count":2000,"client_bursts_count":480,"x_ns":670000000,"y_ns":2500000000,"k_count":5,"z_ns":6900000000,"m_m_ns":654000000,"band_low":"0.965","band_high":"1.035","tolerance":"1.10","guard_share":"0.0000"}`.
++  marks.json's PM-0001-18 holds the same X, k, Y, Z (its `ws_bound` checks) and tolerance (`ws-practice:<t>`),
++  named in its notes by the file's path and commit.
++- **The WebSocket practice run's outcome record** (the run script writes it beside the run, from the run's series and
++  the bound's line): one event `ws_practice` (phase `after`) in a log of the practice run (role `practice`, listing
++  PM-0001-18), with fields `class` (`IN TOLERANCE`, `BEYOND`, `FAR BETTER` or `INVALID`, the advisor's R7), `m_p_ns`
++  (M_p: the run's nearest-rank median over its measured `burst_heal.after_link_ns`), `bound` (the bound's line,
++  verbatim), `bound_file` and `bound_sha256` (where that line is committed), `x_moved_ns`, `y_moved_ns`, `z_moved_ns`
++  and `k_count` (the numbers in force), and, only when they exist, `chance_ruling` (the advisor's ruling of chance,
++  R8 (v)) and `second_ruling` (a ruling naming a found and fixed cause, for a second practice run of one build). The
++  record's other fields are for people (`s`, `f`, the band, the record count, the mean message size, the header
++  checks), and the judge reads none of them: it recomputes s = M_p / M_m and f = max(1, s) exactly, and each moved
++  number as the bound's times f rounded up to the next millisecond, from M_p and the bound's line.
+ 
+ ## 3. How a verdict is reached
+ 1. The judge reads every results log under the given folder and keeps, per mark, the runs whose header lists it.
+@@ -153,7 +206,8 @@ from the part's valid runs, never judged (B10).
+    nor a fail (ADR 0001's V-S).
+ 3. Then its setup checks: a failure or a gap makes the run INVALID.
+ 4. Then every other check (pooled checks once per part). Any failing check fails the run, its gaps listed beside the
+-   failure; with no failure, any gap makes the run INVALID (the advisor's C2 ruling: a gap never hides a failure).
++   failure; with no failure, any gap makes the run INVALID (the advisor's C2 ruling: a gap never hides a failure). An
++   empty comparison (§2.3) fails the run as a failure does.
+ 5. Per part: any valid run that failed makes the part FAIL; else any invalid run makes it INVALID; else anything not
+    decidable yet (a figure not built, a precondition that cannot be checked) or fewer than `min` valid runs make it
+    NOT-RUN; otherwise it passes.
+@@ -165,9 +219,16 @@ from the part's valid runs, never judged (B10).
+    always NOT-RUN.
+ 
+ ## 4. Validity rules
+-Three rules hold for every run of every mark (plan §6.1, security F1, F3, N11):
++Four rules hold for every run of every mark (plan §6.1, security F1, F3, N11; the advisor's C4), and for every run a
++figure compares with (a twin, a practice run):
+ - **complete:** every log of the run ends with its `footer`, unless its header has `params.killed` true (a room the
+   run kills on purpose, as PM-0001-27 does); a cut log makes the run INVALID;
++- **build** (C4: plan §4.7's "measured builds never contain them", checked by the judge, not by the run script alone):
++  a run that names a bite (header `bite`) must have role `bite` or `twin` (a bite run's twin runs the same bite) and
++  at least one log whose `build.features` lists `bites`; in a run that names none (measured, a measured run's twin,
++  clean, practice, …) no log may list `bites`. "At least one log": on L2 the bite lives in one binary (RS's room)
++  while LG's bots may run the measured build. Either way round, the run is INVALID (a `bite` run naming no bite is
++  never judged: it matches no bite and no part);
+ - **roster:** any `admit` event with `in_roster` false makes the run INVALID;
+ - **capability:** a `control` event that was `applied` with `cap_valid` false (session) or `peer_ok` false
+   (socket), or one from a `rostered` session with `cap_valid` false, makes the run INVALID. A control-type message
+@@ -194,8 +255,27 @@ The others apply where a mark lists them:
+   parts the run matches (its role aside), else those naming no parts; a failure or gap makes the run INVALID (it did
+   not run what the mark measures), and a check not computable yet makes it NOT-RUN. `pre:PM-0001-2` is on the SS and
+   ES parts at N = 48 of PM-0001-4 to -27 that select on the scene, and on PM-0001-10's scale steps, whose N = 24 and
+-  36 counts PM-0001-2 checks by GLOSSARY §3's scaling (soldiers, teams and clients with N; 15, 4 and 300 fixed). The
+-  precondition must be a pass mark with no precondition of its own.
++  36 counts PM-0001-2 checks by GLOSSARY §3's scaling (soldiers, teams and clients with N; 15, 4 and 300 fixed);
++  except PM-0001-22's never-ack part, which selects scene SS and 48 clients yet carries no precondition: its designed
++  drop leaves 47 clients, which PM-0001-2's "a client on every soldier" refuses (and it changes the slot count
++  `everyone_in_view` reads), so the precondition could never hold. Its runs still log PM-0001-2's series (shots,
++  projectiles, vehicles, teams, portals), and U4f's report states the load each run carried (the advisor's
++  condition 4 on U4; a reading of ADR 0001:1589, for the readings PR). The precondition must be a pass mark with no
++  precondition of its own.
++- **`ws-practice:<tolerance>`** (PM-0001-18's WebSocket part; Mustafa's WS-BAR and the 10 % tolerance, 2026-11-07;
++  the advisor's rulings R4 to R8 on the docs PR): the run is INVALID unless its set holds its practice run and that
++  run's record (§2.5) puts the numbers in force. The practice run: role `practice`, listing the mark, built from the
++  same binaries (`build.binary_sha256` over its logs; a bite run takes the measured build's practice run of its set),
++  the same `scene`, `profile` and `params.burst_spacing_ns`, started (`params.started_utc`) before the run, holding
++  the four rules above, with exactly one `ws_practice` record; one practice run counts per build, so with more than
++  one the latest counts and only if its record has a `second_ruling`. The record: its bound line parses (§2.5), its
++  `tolerance` equals the rule's and its X, k, Y and Z equal the mark's `ws_bound` checks'; `m_p_ns` is the practice
++  run's own median heal time; with s = M_p / M_m, `IN TOLERANCE` needs band_low <= s <= tolerance (and the practice
++  run's heals at most k over Y' and none over Z', the moved numbers), `BEYOND` needs a `chance_ruling` and s <=
++  tolerance (a lone count or maximum failure), `FAR BETTER` needs a `chance_ruling` and s < band_low, and `INVALID`
++  never counts; f = max(1, s); its moved numbers equal the judge's (the bound's times f, rounded up to the next
++  millisecond; k unmoved). So no number is set by hand, and nothing in marks.json changes between the practice run
++  and the counted run.
+ 
+ ## 5. Bites first
+ Each bite of a mark needs at least one run with role `bite` whose header names that bite and lists the mark. That run
+@@ -204,7 +284,9 @@ if it matches none, the checks that name no `parts`. A bite run that passes ever
+ ("the bite did not fail: the check cannot be shown to work"). A bite with no run makes the mark NOT-RUN, naming the
+ bite. If no check applies to a bite run, the bite is undecided and the mark NOT-RUN. Bite runs follow the same
+ validity rules, apart from `min`, with the rules of the parts they match; a bite run is shown when any applicable
+-check fails on a run that holds its validity rules and setup checks, gaps notwithstanding.
++check fails on a run that holds its validity rules and setup checks, gaps notwithstanding. An empty comparison
++(§2.3) shows no bite: a bite run whose only failing checks compared nothing did not test its bite, and is INVALID.
++A bite run from a measured build is INVALID by the build rule (§4).
+ 
+ A bite with `expect: "invalid"` and a `rule` (PM-0001-30's "the validity check itself") targets that validity rule:
+ it is shown only when its run is INVALID by that rule alone, every other rule holding; a run that holds the rule makes
+diff --git a/spikes/netcode-proof/marks/SERIES.md b/spikes/netcode-proof/marks/SERIES.md
+index 3a82f11..2e210a4 100644
+--- a/spikes/netcode-proof/marks/SERIES.md
++++ b/spikes/netcode-proof/marks/SERIES.md
+@@ -53,7 +53,7 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
+ | `tick.v.soldiers_count` | count | npt-room | soldiers in the sim this tick | -2 |
+ | `tick.v.start_jitter_ns` | ns | npt-server | actual minus scheduled start of the tick (S17), from the loop's monotonic clock | 0004-67 |
+ | `tick.v.tick_allocs_count` | count | npt-server | allocations on the tick thread this tick (counting GlobalAlloc) | 0006-20 |
+-| `tick.v.unsent_snaps_max_count` | count | npt-server | the most unsent snapshots any client has queued (WebSocket newest-only), sampled each tick | -31 |
++| `tick.v.unsent_snaps_max_count` | count | npt-server | the most snapshots any client has waiting above the socket (not yet written to it, held by the room or its WebSocket library), sampled each tick | -31 |
+ | `tick.v.untraced_corrections_count` | count | npt-client | client: corrections above 1 mm this tick NOT traced to a late or lost command (PM-0001-41's count; read by -58 too) | -58, -41 |
+ | `tick.v.very_large_units_count` | count | npt-room | very large units of at least 20 parts live | -2 |
+ | `tick.v.wake_ticks_count` | count | npt-server | ticks run in the wake this tick ran in (at most LOOP_CATCHUP = 7 at 30 Hz) | 0004-67 |
+@@ -131,7 +131,7 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
+ | `event.aim_encoded.size_bits` | bits | npt-proto | per sampled command: the aim field's size before delta coding | -51 |
+ | `event.attempt.ok` | flag | web | per connection attempt: 1 when the session is ready and its exchange worked (PM-0001-28: datagrams + one bidirectional stream; PM-0006-15 and PM-0006-25: one echo; PM-0006-27: 0 = rejected) | -28, 0006-15, 0006-25, 0006-27 |
+ | `event.bulk_transfer.size_bytes` | bytes | npt-bots | per bulk transfer on its own stream: its size | -38 |
+-| `event.burst_heal.after_link_ns` | ns | npt-bots (L2), npt-lab (L1) | per client per burst: link back to first delta decoded | -18 |
++| `event.burst_heal.after_link_ns` | ns | npt-bots (L2), npt-lab (L1) | per client per burst: from the link's return to the decode of the first snapshot the room writes at or after the return instant (a fresh delta; V29, fixes.rs:786-787); fields `slot` and `burst` (below) | -18 |
+ | `event.canary_grep.address_matches_count` | count | npt-lab | matches for client addresses | 0006-21 |
+ | `event.canary_grep.canaries_count` | count | npt-lab | canary values it searched for | 0006-21 |
+ | `event.canary_grep.ip_pattern_matches_count` | count | npt-lab | IPv4/IPv6 pattern matches other than the VMs' own | 0006-21 |
+@@ -141,7 +141,7 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
+ | `event.canary_grep.token_matches_count` | count | npt-lab | matches for join tokens | 0006-21 |
+ | `event.capture.fragments_count` | count | npt-lab | once per run: fragmented IP packets in RS's packet capture (summary of the capture) | -14 |
+ | `event.cargo_tree.sim_transport_deps_count` | count | npt-lab | transport crates in npt-sim's `cargo tree` | -35 |
+-| `event.clamp_kind.counted_count` | count | npt-lab | per weapon kind: of those, refused or counted as forged | -21 |
++| `event.clamp_kind.counted_count` | count | npt-lab | per weapon kind: of those, refused and counted, from the sim's refusal counters only: a clamp report adds nothing to it (a clamped point is neither refused nor counted; the advisor's condition 1 on U4) | -21 |
+ | `event.clamp_kind.sent_count` | count | npt-lab | per weapon kind: aim points beyond reach sent | -21 |
+ | `event.conn_panic.closed` | flag | npt-server | per injected connection panic, a minute after: 1 when that connection closed | -26 |
+ | `event.conn_panic.others_dropped_count` | count | npt-server | the other connections that dropped in that minute | -26 |
+@@ -261,9 +261,9 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
+ | `alloc_twin_diff_count` | count | npt-judge | count of measured tick numbers where tick.v.tick_allocs_count differs between the run and its params.twin (role logging-off) | PM-0006-20 'on every tick after the warm-up ... equals the count with logging off', 'compared tick by tick' | 0006-20 |
+ | `bulk_control_p99_rise_ns` | ns | npt-judge | p99(second.s.control_delay_bulk_ns) - p99(second.s.control_delay_idle_ns) | PM-0001-38 'raises the control stream's p99 message delay by at most 5 ms (p99 with the transfer minus p99 without)' | -38 |
+ | `crash_close_max_ns` | ns | npt-judge | max over the run's clients of (its RoomEnded or close, event.room_end.server_est_ns on LG's server-clock estimate) minus the room's event.tick_panic.server_ns; a client with no room_end fails | PM-0001-59 'every client gets RoomEnded with a crash reason or has its connection closed within that second (0 left open)' | -59 |
+-| `cross_arch_mismatch_count` | count | npt-judge | L2 mismatches (hash, shot view test, throw landing) that the x86-64 replay does not reproduce | the Arm rule: 'reported as a cross-architecture finding and decides nothing' (-17, -19, -48, -54) | -17, -19, -48, -54 |
+-| `decoded_hash_compared_count` | count | npt-judge | the (client, tick) pairs decoded_hash_mismatch_count compared | PM-0001-17, reported | -17 |
+-| `decoded_hash_mismatch_count` | count | npt-judge | count of (client, tick) whose decoded hash differs from the server's logged quantised hash for that client and tick; with arm_rule on L2, only those the x86-64 re-decode (process `replay`) also misses; fails on 0 compared. Inputs: per-client hashes per tick (format: Q30) | PM-0001-17 '100 % of decoded snapshots rebuild the server's quantised state'; -58; -19's join hash | -17, -58, -19 |
++| `cross_arch_mismatch_count` | count | npt-judge | the hash kind (built at U4j): count of (client, tick) whose aarch64 client's `hs.decoded_hash` differs from `hs.server_hash` (or has no server hash there) while `hs.replay_hash`, the x86-64 re-decode (process `replay`), equals the server's entry (both absent is agreement); over every tick record of the run, any phase. A run with no `hs.decoded_hash` or no `hs.server_hash` is a gap, never 0; an aarch64 mismatch with no replay log in the run is NOT-RUN. The shot view test's and the throw landing's kinds join with the figures that read them (U4h: view_hit_registered_share, false_hit_share, throw_desync_count) | the Arm rule: 'reported as a cross-architecture finding and decides nothing' (-17, -19, -48, -54) | -17, -19, -48, -54 |
++| `decoded_hash_compared_count` | count | npt-judge | the client hashes decoded_hash_mismatch_count looked at: every non-null `hs.decoded_hash` entry, paired with the server's or not (0 is a real count here; the mismatch figure fails on it) | PM-0001-17, reported | -17 |
++| `decoded_hash_mismatch_count` | count | npt-judge | over every tick record of the run, any phase (-58's wraps fall in its first seconds), per client slot and tick: a non-null `hs.decoded_hash` (each client's hash of the state it holds, under the tick it rebuilt; the sentinel 0 for a tick with a refused group) counts when `hs.server_hash` at that (slot, tick) differs or is absent (a client hash at a tick the server never logged: a wrong tick label); equal hashes count nothing; a server hash with no client hash is loss, not compared (`tick.s.snap_incomplete` counts the ticks a client could not complete). On an aarch64 client's log (machine.arch), a mismatch counts only when `hs.replay_hash` at that (slot, tick) differs from the server's too (the Arm rule; else cross_arch_mismatch_count). Fails, never passes, on 0 compared (the check comes out `empty`: README §2.3). Gaps: no log with `hs.server_hash` or `hs.decoded_hash`, lists of different slot counts, two logs giving one (slot, tick) a hash, a server hash of 0. Inputs: `hs` (README §1; Q30) | PM-0001-17 '100 % of decoded snapshots rebuild the server's quantised state'; -58; -19's join hash; u4-build-plan.md §4.6 (the advisor's Q11 ruling) | -17, -58, -19 |
+ | `down_client_mean_max_bits` | bits | npt-judge | max over client slots of the mean of second.s.down_bits[slot] over the measured seconds | PM-0001-12 'mean at most 160 kbps ... counted per client' | -12 |
+ | `down_mean_ipv6_bits` | bits | npt-judge | mean over client-seconds of second.s.down_bits + 160 x second.s.down_datagrams_count (20 B more header per datagram) | PM-0001-12 'if LG reaches RS over IPv6, the IPv6 figure' | -12 |
+ | `egress_interface_bytes` | bytes | npt-judge | event.iface.tx_bytes at the end minus at the start | PM-0006-17 'the interface's transmitted-byte counter read at the start and end' | 0006-17 |
+@@ -271,12 +271,12 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
+ | `egress_vs_r2_ratio` | fraction (exact) | npt-judge | egress_interface_bytes / r2_egress_formula_bytes | PM-0006-17 'within +-20 % of R2's E3 estimate at the counts that ran' | 0006-17 |
+ | `everyone_in_view_min_share` | fraction (exact) | npt-judge | min over client slots of the share of that slot's snapshots with tick.s.everyone_in_view = 1. Inputs: tick.s.everyone_in_view (index = slot) | PM-0001-2 'every client's relevant set holds all 47 other soldiers on at least 99 % of its snapshots' | -2 |
+ | `false_hit_share` | fraction (exact) | npt-judge | among view misses (event.view_test.hit = 0), the share registered as hits; Arm rule on L2 as above | PM-0001-48 'false hits (a miss in the view counted as a hit) below 0.5 %' | -48 |
+-| `fate_log_twin_equal` | 0/1 | npt-judge | 1 if header.params.fate_log_sha256 equals that of the run named in header.params.twin, 0 if they differ. The twin must be in the same set, with role twin and the same layer, profile, seed and bite (a bite run's twin runs the same bite); a twin not in the set yet leaves the check NOT-RUN; a run naming no twin, a twin that differs in those fields or is not role twin, and a hash that is not 64 lowercase hex digits are gaps (built in U2) | PM-0001-3 'on L1, the same seed and profile give an identical packet-fate log on two runs' | -3 |
++| `fate_log_twin_equal` | 0/1 | npt-judge | 1 if header.params.fate_log_sha256 equals that of the run named in header.params.twin, 0 if they differ. The twin must be in the same set, with role twin and the same layer, profile, seed and bite (a bite run's twin runs the same bite); a twin not in the set yet leaves the check NOT-RUN; a run naming no twin, a twin that differs in those fields or is not role twin, and a hash that is not 64 lowercase hex digits are gaps (built in U2); so is a twin that breaks a rule every run holds (README §4: complete, roster, capability, and C4's build rule, added at U4j) | PM-0001-3 'on L1, the same seed and profile give an identical packet-fate log on two runs' | -3 |
+ | `input_latency_p50_rise_ns` | ns | npt-judge | the same with medians | PM-0001-43 'and the same for the medians' | -43 |
+ | `input_latency_p99_rise_ns` | ns | npt-judge | max over kinds (params.kind: move, flash) of p99(event.input_latency.to_screen_ns at P4) - p99(at P0), over the part's runs | PM-0001-43 'p99 at P4 minus p99 at P0 at most 33.33 ms' | -43 |
+ | `kill_p99_ratio` | fraction (exact) | npt-judge | p99 of tick.v.work_ns over the ticks after the set's `kill` event (ph = after) / p99 over the measured ticks | PM-0001-27 'killing one room's process (SIGKILL) leaves the others' p99 within 5 %' | -27 |
+ | `logging_cost_ratio` | fraction (exact) | npt-judge | p99 over the pooled measured ticks of the part's 3 runs / p99 over the pooled ticks of the set's 3 role logging-off runs (tick.v.work_ns) | PM-0006-19 'the pooled p99 of the 3 on runs (54,000 ticks) with that of the 3 off runs', 'at most 1.02 x' | 0006-19 |
+-| `machine_named` | 0/1 | npt-judge | 1 if every log's header `machine` has role, name, plan, arch, cpu, vcpus, mem_mb, location, kernel, threads_per_core, smt and clock_res_ns, and a VM (RS, LG, MV) its day address; else 0. Inputs: headers | PM-0001-1 'RS and LG named with plan, CPU model, vCPU count, memory, location, kernel and the day's address'; PM-0006-11's list | -1, 0006-11 |
++| `machine_named` | 0/1 | npt-judge | 1 if every log's header `machine` has role, name, plan, arch, cpu, location and kernel not empty, vcpus, mem_mb, threads_per_core and clock_res_ns above 0, and an SMT map (`smt`) whose every sibling list is filled, and a VM (RS, LG, MV) its day address (`address` not empty); else 0 (built at U4j). Inputs: headers | PM-0001-1 'RS and LG named with plan, CPU model, vCPU count, memory, location, kernel and the day's address'; PM-0006-11's list | -1, 0006-11 |
+ | `one_build_hash` | 0/1 | npt-judge | 1 if every run of the mark has the same client build (build.binary_sha256 of the web bundle) | PM-0001-32 'the same build (one hash)' | -32 |
+ | `one_shot_dropped_count` | count | npt-judge | sum of LG's second.v.one_shots_sent_count minus the room's second.v.one_shots_received_count over the run | PM-0001-38 '0 of 10,000 scripted one-shot actions dropped' | -38 |
+ | `queue_growth_count` | count | npt-judge | per client slot, for second.s.out_queue_count and second.s.event_queue_count: count of (slot, queue) whose max over the last 10 measured minutes exceeds its max over the first 10 | PM-0001-15 'its max over the last 10 minutes at most its max over the first 10 minutes' | -15 |
+@@ -291,7 +291,7 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
+ | `sync_unit_cost` | fraction (exact) | npt-judge | U per run, as above (ns per client-entity, a decimal) | PM-0001-10, reported | -10 |
+ | `throw_desync_count` | count | npt-judge | throws with event.throw.desync = 1; on L2 only those whose x86-64 replay (process replay) also desyncs | PM-0001-54 '0 desyncs of client-side flight against the server over 1,000 throws, per projectile kind' | -54 |
+ | `times_of_day_rule` | 0/1 | npt-judge | 1 if the mark's sessions (sets) start (header.params.started_utc) pairwise at least 6 h apart and at least one starts between 18:00 and 23:00 Europe/Amsterdam | ADR 0006's key: 'three sessions at least 6 hours apart, one of them between 18:00 and 23:00 Amsterdam time'; 'npt-judge checks the 6-hour and 18:00-23:00 rule from the results' UTC times' | -27, 0006-13, 0006-14 |
+-| `twin_hash_mismatch_count` | count | npt-judge | count of tick numbers whose `h` differs between the run and the run named in header.params.twin (a tick in one only counts); fails on 0 compared | PM-0001-21 'the state hash of a run with the forged set equals that of a run with only their valid parts'; -30 'identical server state hashes on every tick' | -21, -30 |
++| `twin_hash_mismatch_count` | count | npt-judge | count of tick numbers, over every tick record of both runs (any phase), whose `h` differs between the run and the run named in header.params.twin (a tick hashed in one only counts); fails, never passes, on 0 ticks hashed in either (`empty`). The twin: in the same set, the same profile, seed and bite, any role (-21's twins are role twin, -30's each other's measured runs), not the run itself, and holding the four rules every run holds (README §4, the build rule among them: C4); a twin that breaks one, a run naming no twin, a malformed `h` and two logs giving one tick two hashes are gaps; a twin not in the set yet is NOT-RUN (built at U4j) | PM-0001-21 'the state hash of a run with the forged set equals that of a run with only their valid parts'; -30 'identical server state hashes on every tick' | -21, -30 |
+ | `up_client_mean_max_bits` | bits | npt-judge | the same over second.s.up_bits | PM-0001-13 'mean at most 48 kbps per client' | -13 |
+ | `view_hit_registered_share` | fraction (exact) | npt-judge | among shots whose shooter's view test hit (event.view_test.hit = 1), the share the server registered (event.shot.registered = 1), joined by shot id; on L2 a non-registered view hit counts only if the x86-64 replay's view test also hits | PM-0001-48 'of the shots whose ray hits the target's volume in the shooter's view ... at least 99 % register' | -48, -49 |
+ 
+@@ -307,6 +307,28 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
+ | `header.params.cc` | `newreno` or `cubic` | the room unit's configuration | the congestion controller, a start-up setting never changed in a run (A2) | -24 |
+ | `header.params.bite_size_ns`, `header.params.bite_pad_bytes` | ns, bytes | the bites build | a bite's B-S or B-N size, printed beside the bite, never judged (B10) | every B-S or B-N bite |
+ 
++### Names added with U4j (u4-build-plan.md rev 2 and the advisor's U4 rulings; PM-0001-18's split, advisor-ws-docs-r2.md:374-379; 2026-11-10)
++
++`hs` lists (README §1) are read by the decoded-hash figures only; identifiers (`slot`, `burst`, `seq`) name an event's subject and are not measured values. -18's reports also read `event.burst_return.outstanding_bytes` and `srtt_ns` (DelayStream's rows, below; U6's writer adds what is held above DelayStream to `outstanding_bytes`, NC-U3c-4). The practice run is a header `role`, `practice` (README §1).
++
++| Name | Unit | Written by (crate) | Meaning | Marks |
++|---|---|---|---|---|
++| `hs.server_hash` | 16 hex digits or null, per client slot | npt-room (the encoder's mirror, §4.6) | at tick t: the server's hash (`npt_proto::client_hash`) of what it meant that client to hold after decoding t; never 0; null where it sent that client nothing for t | -17, -19, -58 (figures) |
++| `hs.decoded_hash` | 16 hex digits or null, per client slot | npt-client (L1, through npt-lab's client log), npt-bots (L2), web (browser) | at the tick t the client rebuilt: its hash of the state it holds for t (its held floats re-gridded); the sentinel 0 for a tick with a received group it could not decode; null for none (a group lost, none refused) | -17, -19, -58 (figures) |
++| `hs.replay_hash` | 16 hex digits or null, per client slot | npt-lab (`replay`, process replay: the x86-64 re-decode of an L2 client's logged bytes, R-8) | the same as `decoded_hash`, decoded again natively; read for the Arm rule | -17, -19 (figures) |
++| `tick.s.snap_incomplete` | flag | npt-client (L1, through npt-lab's client log), npt-bots (L2) | one per client slot, at the tick its groups' headers name: 1 when a group of that tick was lost and none refused, so the client logs no hash for it (§4.6) | -17 (reported) |
++| `event.burst_eviction.evicted` | flag | npt-room | per client per burst (fields `slot`, `burst`): 1 when the client's last acknowledged baseline had left the AckRing (ages 0 to 31) at the first tick after the burst, else 0; shows whether -18's no-fallback bite could bite (§4.5) | -18 (recorded) |
++| `event.clamp_report.x_um`, `.y_um`, `.z_um` | µm | npt-room (from npt-sim's `reports()`) | per clamp report (fields `slot`, `seq`): the aim point the sim clamped to the weapon's reach, its grid cm x 10,000; read from `reports()`, never from the hashed event list; the clamp twin sends exactly these points (§4.10, the advisor's condition 1) | -21 (the clamp twin's input) |
++| `event.burst_heal.burst` | identifier (0 to 9) | npt-bots (L2), npt-lab (L1) | the burst's index in the run, beside `slot` on each heal record | -18 |
++| `event.burst_return.offset_ns` | ns | npt-server | per burst: its start's random offset of 0 to one tick period, drawn from the run's seed | -18 (recorded) |
++| `event.burst_return.tick_phase_ns` | ns | npt-server | per burst: the return minus the room's last tick start | -18 (recorded) |
++| `event.burst_return.budget_bytes` | bytes | npt-server | per WebSocket client per burst: the send budget at the return | -18 (reported) |
++| `event.burst_return.snap_bytes` | bytes | npt-server | per WebSocket client per burst: the last written snapshot's size | -18 (recorded) |
++| `tick.v.ws_skipped_snaps_count` | count | npt-server | snapshots the WebSocket send budget skipped this tick, all clients | -18 (recorded) |
++| `event.ws_practice.class`, `.m_p_ns`, `.bound`, `.bound_file`, `.bound_sha256`, `.x_moved_ns`, `.y_moved_ns`, `.z_moved_ns`, `.k_count`, `.chance_ruling`, `.second_ruling` | README §2.5 | the run script (ops/runs, R3) | the WebSocket practice run's outcome record, its fields and their units as README §2.5 fixes them; read by the `ws-practice` rule | -18 (the rule) |
++| `header.params.burst_spacing_ns` | ns | npt-lab (L1), the run script (L2) | B1's scheduled interval between burst starts, before each burst's offset; a practice run and its counted run share it | -18 (the rule) |
++| `header.params.config_hz` | Hz | the run script (L2) | RS's kernel CONFIG_HZ (the ruling's `machine.config_hz`, as a header param: README §2.5) | -18 (the practice record's header checks) |
++
+ ## Series read only by figures (18)
+ 
+ | Name | Unit | Written by (crate) | Meaning | Figures |
+@@ -350,10 +372,10 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
+ | `sim` | stress or stand-in | -4's STAND-IN |
+ | `stand_ins` | list of names | -2 (reported in the detail: Q16) |
+ | `cmd_timing` | A or B (OQ-0001-6) | -20, -21, -42, -48, -49 |
+-| `suite` | the run's test suite (wrap, joins, forged, clamp, fast-clock, lag-switch, never-ack, throttle, bottleneck, flood, origin, conn-panic, tick-panic, wt-attempts, fallback, fallback-443, both-transports, ws-stall, one-build, rtt, rtt-fixed-100, fuzz, deps, mds, datagram-timing, one-shots, brawl, own-change, input-latency, replay, extrapolation, delay-adapt, events, clock, rewind-cheat, aim-height, feedback, cues, checklist, throws, beside-vehicle, record, stalls, ping, firewall, fw-probe, rule-list, metrics-probe, egress, bill, logging-cost, logging-alloc, soak-8, cert-14d, cert-15d, rotation) | selects throughout |
++| `suite` | the run's test suite (wrap, joins, forged, clamp, fast-clock, lag-switch, never-ack, throttle, bottleneck, flood, origin, conn-panic, tick-panic, wt-attempts, fallback, fallback-443, both-transports, ws-stall, one-build, rtt, rtt-fixed-100, fuzz, deps, mds, datagram-timing, one-shots, brawl, own-change, input-latency, replay, extrapolation, delay-adapt, events, clock, rewind-cheat, aim-height, feedback, cues, checklist, throws, beside-vehicle, record, stalls, ping, firewall, fw-probe, rule-list, metrics-probe, egress, bill, logging-cost, logging-alloc, soak-8, cert-14d, cert-15d, rotation; and precheck-30, the -30 pre-check's recorded npt-lab test, whose headers list no mark, so no part selects it) | selects throughout |
+ | `browser` | chrome, edge, firefox, safari, brave | browser parts |
+ | `backend` | webgpu or webgl2 | -32 |
+-| `transport` | wt or ws | -25, -50, PM-0006-15 |
++| `transport` | wt or ws | -18, -25, -50, PM-0006-15 |
+ | `crate` | wtransport or web-transport-quinn | -28 (and -11, -25, -35 for -56's item 1) |
+ | `path` | loopback, eu-path, internet | -28, -36 |
+ | `cc` | newreno or cubic | -24 |
+@@ -733,7 +755,7 @@ and which of these names it can write from TCP_INFO and SIOCOUTQ.
+ ## Open naming questions
+ 
+ - Q3: no length or angle unit (`_um`, `_microdeg` proposed).
+-- Q30: per-client quantised hashes per tick (48 per tick) have no home: `h` holds one hash per tick record, and `s` holds integers (a 64-bit hash exceeds JSON's safe 2^53). Proposal: an `hs` map (name -> list of 16-hex strings) on tick records, or the hash as two 32-bit halves in `s`.
++- Q30 (answered at U4j): per-client hashes per tick live in `hs` on tick records (name -> one 16-hex string or null per client slot; README §1), under the names `server_hash`, `decoded_hash` and `replay_hash` (the U4j section above).
+ - Q16: string values (the negotiated draft, browser versions, the stand-ins, the certificate presented) need the verdict detail to print named header params.
+ - Q25: `params.started_utc` for the times-of-day rule.
+ 
+diff --git a/spikes/netcode-proof/marks/marks.json b/spikes/netcode-proof/marks/marks.json
+index 7d8d181..1777735 100644
+--- a/spikes/netcode-proof/marks/marks.json
++++ b/spikes/netcode-proof/marks/marks.json
+@@ -3858,33 +3858,53 @@
+           "name": "L1 P0",
+           "select": {
+             "layer": "L1",
+-            "profile": "P0"
++            "scene": "SS",
++            "profile": "P0",
++            "clients": 48
+           },
+-          "min": 3
++          "min": 3,
++          "validity": [
++            "pre:PM-0001-2"
++          ]
+         },
+         {
+           "name": "L1 P2",
+           "select": {
+             "layer": "L1",
+-            "profile": "P2"
++            "scene": "SS",
++            "profile": "P2",
++            "clients": 48
+           },
+-          "min": 3
++          "min": 3,
++          "validity": [
++            "pre:PM-0001-2"
++          ]
+         },
+         {
+           "name": "L1 P3",
+           "select": {
+             "layer": "L1",
+-            "profile": "P3"
++            "scene": "SS",
++            "profile": "P3",
++            "clients": 48
+           },
+-          "min": 3
++          "min": 3,
++          "validity": [
++            "pre:PM-0001-2"
++          ]
+         },
+         {
+           "name": "L1 B1",
+           "select": {
+             "layer": "L1",
+-            "profile": "B1"
++            "scene": "SS",
++            "profile": "B1",
++            "clients": 48
+           },
+-          "min": 3
++          "min": 3,
++          "validity": [
++            "pre:PM-0001-2"
++          ]
+         },
+         {
+           "name": "L2 P0",
+@@ -3958,6 +3978,12 @@
+         {
+           "name": "decoded snapshots compared",
+           "figure": "decoded_hash_compared_count"
++        },
++        {
++          "name": "client-ticks left incomplete (a group lost, none refused: not compared, u4-build-plan.md §4.6)",
++          "series": "tick.s.snap_incomplete",
++          "stat": "sum",
++          "window": "all"
+         }
+       ],
+       "bites": [
+@@ -3976,7 +4002,7 @@
+         "R-5",
+         "R-8"
+       ],
+-      "notes": "L1: 48 headless clients, 3 seeds per profile, 10 minutes each under P0, P2, P3 and B1; L2: LG's 48 clients, 1 run per profile (R3, VS4). The server logs each client's quantised hash per tick, the client logs its decoded hash; each LG client logs every datagram and stream byte it receives (kept on LG). Arm rule: an L2 mismatch counts only once those bytes, decoded again on x86-64 (npt-lab, in this container or on RS: R-8), miss the server's hash too; a mismatch only on aarch64 is reported. The figure fails, never passes, on 0 compared snapshots."
++      "notes": "L1: 48 headless clients, 3 seeds per profile, 10 minutes each under P0, P2, P3 and B1, in the stress scene (its L1 parts select scene SS and 48 clients and carry pre:PM-0001-2: u4-build-plan.md §4.12, the advisor's Q22 ruling); L2: LG's 48 clients, 1 run per profile (R3, VS4; their scene is the R run plans'). The server logs each client's quantised hash per tick (`hs.server_hash`), the client its decoded hash under the tick it rebuilt (`hs.decoded_hash`: the sentinel 0 for a tick with a group it refused, null for a tick it could not complete, counted in `tick.s.snap_incomplete`: §4.6, the advisor's Q11 ruling); each LG client logs every datagram and stream byte it receives (kept on LG). Arm rule: an L2 mismatch counts only once those bytes, decoded again on x86-64 (npt-lab, in this container or on RS: R-8; `hs.replay_hash`, process replay), miss the server's hash too; a mismatch only on aarch64 is reported. The figure fails, never passes, on 0 compared snapshots; a client hash at a tick the server never logged counts as a mismatch."
+     },
+     {
+       "id": "PM-0001-57",
+@@ -4176,7 +4202,7 @@
+           "setup": true
+         },
+         {
+-          "name": "every 16-bit or narrower counter wrapped in the run (server tick's low 16 bits, command sequence, press counters, tick offsets, event numbers, acknowledgement numbers)",
++          "name": "every 16-bit or narrower counter wrapped in the run (server tick's low 16 bits, command sequence, press counters, the header's command acknowledgements, event numbers, acknowledgement numbers)",
+           "series": "event.counter_wrap.tick_count",
+           "stat": "count",
+           "window": "all",
+@@ -4210,7 +4236,7 @@
+         },
+         {
+           "id": "PM-0001-58/lt-tick-offset",
+-          "what": "the snapshot's tick offsets compared with a plain <"
++          "what": "the snapshot header's command acknowledgements (16-bit sequences) compared with a plain <"
+         },
+         {
+           "id": "PM-0001-58/lt-event-seq",
+@@ -4249,28 +4275,51 @@
+           "name": "L1 B1",
+           "select": {
+             "layer": "L1",
+-            "profile": "B1"
++            "scene": "SS",
++            "profile": "B1",
++            "clients": 48
+           },
+-          "min": 3
++          "min": 3,
++          "validity": [
++            "pre:PM-0001-2"
++          ]
+         },
+         {
+-          "name": "L2 B1",
++          "name": "L2 B1 wt",
+           "select": {
+             "layer": "L2",
+             "profile": "B1",
+-            "machine.role": "LG"
++            "machine.role": "LG",
++            "params.transport": "wt"
+           },
+           "min": 1
++        },
++        {
++          "name": "L2 B1 ws",
++          "select": {
++            "layer": "L2",
++            "profile": "B1",
++            "machine.role": "LG",
++            "params.transport": "ws"
++          },
++          "min": 1,
++          "validity": [
++            "ws-practice:1.10"
++          ]
+         }
+       ],
+       "validity": [],
+       "checks": [
+         {
+-          "name": "every client decodes deltas again within 500 ms of the link coming back",
++          "name": "WebTransport: every client decodes a fresh delta within 500 ms of the link coming back",
+           "series": "event.burst_heal.after_link_ns",
+           "stat": "max",
+           "op": "<=",
+-          "value": 500000000
++          "value": 500000000,
++          "parts": [
++            "L1 B1",
++            "L2 B1 wt"
++          ]
+         },
+         {
+           "name": "every client after every burst: 48 x 10 heal records",
+@@ -4278,6 +4327,43 @@
+           "stat": "count",
+           "op": ">=",
+           "value": 480
++        },
++        {
++          "name": "WebSocket: half the client-bursts heal within X x f (X provisional: bf9d248's first bound, 0.67 s)",
++          "series": "event.burst_heal.after_link_ns",
++          "stat": "p50",
++          "op": "<=",
++          "value": 670000000,
++          "parts": [
++            "L2 B1 ws"
++          ],
++          "ws_bound": "x"
++        },
++        {
++          "name": "WebSocket: at most k client-bursts over Y x f (k and Y provisional: bf9d248's first bound, 5 over 2.5 s)",
++          "series": "event.burst_heal.after_link_ns",
++          "stat": "count",
++          "where": {
++            "op": ">",
++            "value": 2500000000
++          },
++          "op": "<=",
++          "value": 5,
++          "parts": [
++            "L2 B1 ws"
++          ],
++          "ws_bound": "y"
++        },
++        {
++          "name": "WebSocket: no client-burst over Z x f (Z provisional: bf9d248's first bound, 6.9 s)",
++          "series": "event.burst_heal.after_link_ns",
++          "stat": "max",
++          "op": "<=",
++          "value": 6900000000,
++          "parts": [
++            "L2 B1 ws"
++          ],
++          "ws_bound": "z"
+         }
+       ],
+       "report": [
+@@ -4290,12 +4376,60 @@
+           "name": "heal time p99",
+           "series": "event.burst_heal.after_link_ns",
+           "stat": "p99"
++        },
++        {
++          "name": "WebSocket: heal time p99.9",
++          "series": "event.burst_heal.after_link_ns",
++          "stat": "p999",
++          "parts": [
++            "L2 B1 ws"
++          ]
++        },
++        {
++          "name": "WebSocket: client-bursts over 1 s",
++          "series": "event.burst_heal.after_link_ns",
++          "stat": "count",
++          "where": {
++            "op": ">",
++            "value": 1000000000
++          },
++          "parts": [
++            "L2 B1 ws"
++          ]
++        },
++        {
++          "name": "WebSocket: unsent plus unacknowledged bytes at a return, max (the server's per-return series)",
++          "series": "event.burst_return.outstanding_bytes",
++          "stat": "max",
++          "parts": [
++            "L2 B1 ws"
++          ]
++        },
++        {
++          "name": "WebSocket: the send budget at a return, max",
++          "series": "event.burst_return.budget_bytes",
++          "stat": "max",
++          "parts": [
++            "L2 B1 ws"
++          ]
++        },
++        {
++          "name": "WebSocket: smoothed RTT at a return, p50",
++          "series": "event.burst_return.srtt_ns",
++          "stat": "p50",
++          "parts": [
++            "L2 B1 ws"
++          ]
+         }
+       ],
+       "bites": [
+         {
+           "id": "PM-0001-18/no-fallback",
+-          "what": "a baseline that never falls back (deltas only against the last acknowledged snapshot)"
++          "what": "a baseline that never falls back (deltas only against the last acknowledged snapshot); WebTransport's parts only (L1 B1, L2 B1 wt)"
++        },
++        {
++          "id": "PM-0001-18/ws-budget-x2",
++          "what": "a send budget twice the formula's (budget_scale 2): fails the WebSocket median check on the L2 B1 ws part, at the measured build's numbers in force"
+         }
+       ],
+       "stand_in": false,
+@@ -4304,7 +4438,7 @@
+         "R-5",
+         "R-12"
+       ],
+-      "notes": "B1 with 48 clients, 10 bursts per run (proposed); L1 3 seeds, L2 1 run (R3, VS4). A plain limit per client and burst. Each client writes one `burst_heal` event per burst, when it first decodes a delta after the link returns; a client that never heals writes none, so the count catches it. On L2 the time uses the client's server-clock estimate, whose error bound is PM-0001-47's."
++      "notes": "B1 with 48 clients, 10 bursts per run (proposed), each burst's start moved by a random offset of 0 to one tick period against the room's tick (the advisor's reading, 2026-11-07); L1 3 seeds in the stress scene (scene SS, 48 clients, pre:PM-0001-2: u4-build-plan.md §4.12, the advisor's Q22 ruling); L2 1 run per transport (R3, VS4), the WebSocket one through the accept path's delay wrapper, whose clients run Linux's TCP as the model's do. Each client writes one `burst_heal` event per burst: from the link's return to the decode of the first snapshot the room writes at or after the return instant (a fresh delta; deltas queued during the burst do not count); a client that never heals writes none, so the count catches it. WebTransport keeps the plain 500 ms limit. WebSocket (Mustafa's WS-BAR, 2026-11-07): the median at most X, at most k over Y, none over Z, from the run-structured bound for a correct build with fix 1 and one unjudged practice run of the same build (role practice, listing this mark, earlier, the same scene, profile and burst spacing). The judge reads that run's `ws_practice` record (README §2.5), recomputes s = M_p / M_m and f = max(1, s), and applies X, Y and Z times f, each rounded up to the next millisecond, k unmoved; checks (c) to (e) print the numbers in force with M_p, M_m, s and f beside them. The `ws-practice` rule makes the counted run INVALID unless the record is IN TOLERANCE, or names the advisor's chance ruling (R8 (v)), and its numbers are the judge's; one practice run counts per build (a second needs a ruling naming a found and fixed cause). The tolerance is 1.10 (Mustafa's 10 %), lowered only before the practice run by the bound's guard, never raised. PROVISIONAL: X 0.67 s, k 5 over Y 2.5 s and Z 6.9 s are bf9d248's first, single-burst bound (spikes/netcode-proof/results/u3-ws-fallback/bar-fix1-bf9d248.txt); the run-structured bound (fixes.rs, its own unit after U4r) replaces them, and the tolerance if its guard lowers it, with its committed machine-readable line, named here by path and commit, before R3's run plan. Bites: no-fallback on WebTransport's parts only; ws-budget-x2 on the WebSocket part, judged at the measured build's numbers in force (a bites build has no practice run of its own). On L2 the time uses the client's server-clock estimate, whose error bound is PM-0001-47's. The row's last reported item, the time until a decoded snapshot's extra delay is back under PM-0001-31's 250 ms, gets its series with its writer at U6; the client's fast reconnect over WebSocket is not measured here (OQ-0001-19)."
+     },
+     {
+       "id": "PM-0001-19",
+@@ -4482,19 +4616,29 @@
+           "name": "L1 P3 option A",
+           "select": {
+             "layer": "L1",
++            "scene": "SS",
+             "profile": "P3",
++            "clients": 48,
+             "params.cmd_timing": "A"
+           },
+-          "min": 3
++          "min": 3,
++          "validity": [
++            "pre:PM-0001-2"
++          ]
+         },
+         {
+           "name": "L1 P3 option B",
+           "select": {
+             "layer": "L1",
++            "scene": "SS",
+             "profile": "P3",
++            "clients": 48,
+             "params.cmd_timing": "B"
+           },
+-          "min": 3
++          "min": 3,
++          "validity": [
++            "pre:PM-0001-2"
++          ]
+         },
+         {
+           "name": "L2 P3 option A",
+@@ -4614,7 +4758,7 @@
+       "readings": [
+         "R-5"
+       ],
+-      "notes": "48 clients, 10 minutes under P3, under each of OQ-0001-6's two command-timing options (`params.cmd_timing`; PM-0001-56 records them); L1 3 seeds, L2 1 run (R3, VS4). The server logs each command's arrival against its tick, each press counter's edges and each client's buffer depth every second. The buffer depth feeds PM-0001-49 (each buffered tick adds 33.3 ms to every honest rewind). The reorder rule applies: the presses run 'with reordering'."
++      "notes": "L1's runs are in the stress scene (scene SS, 48 clients, pre:PM-0001-2: u4-build-plan.md §4.12, the advisor's Q22 ruling; redundancy repairs P3's losses, so the shots hold); L2's scene is the R run plans'. 48 clients, 10 minutes under P3, under each of OQ-0001-6's two command-timing options (`params.cmd_timing`; PM-0001-56 records them); L1 3 seeds, L2 1 run (R3, VS4). The server logs each command's arrival against its tick, each press counter's edges and each client's buffer depth every second. The buffer depth feeds PM-0001-49 (each buffered tick adds 33.3 ms to every honest rewind). The reorder rule applies: the presses run 'with reordering'."
+     },
+     {
+       "id": "PM-0001-21",
+@@ -4632,75 +4776,115 @@
+           "name": "forged, option A",
+           "select": {
+             "layer": "L1",
++            "scene": "SS",
++            "clients": 48,
+             "params.suite": "forged",
+             "params.cmd_timing": "A"
+           },
+-          "min": 3
++          "min": 3,
++          "validity": [
++            "pre:PM-0001-2"
++          ]
+         },
+         {
+           "name": "forged, option B",
+           "select": {
+             "layer": "L1",
++            "scene": "SS",
++            "clients": 48,
+             "params.suite": "forged",
+             "params.cmd_timing": "B"
+           },
+-          "min": 3
++          "min": 3,
++          "validity": [
++            "pre:PM-0001-2"
++          ]
+         },
+         {
+           "name": "clamp, option A",
+           "select": {
+             "layer": "L1",
++            "scene": "SS",
++            "clients": 48,
+             "params.suite": "clamp",
+             "params.cmd_timing": "A"
+           },
+-          "min": 3
++          "min": 3,
++          "validity": [
++            "pre:PM-0001-2"
++          ]
+         },
+         {
+           "name": "clamp, option B",
+           "select": {
+             "layer": "L1",
++            "scene": "SS",
++            "clients": 48,
+             "params.suite": "clamp",
+             "params.cmd_timing": "B"
+           },
+-          "min": 3
++          "min": 3,
++          "validity": [
++            "pre:PM-0001-2"
++          ]
+         },
+         {
+           "name": "fast-clock, option A",
+           "select": {
+             "layer": "L1",
++            "scene": "SS",
++            "clients": 48,
+             "params.suite": "fast-clock",
+             "params.cmd_timing": "A"
+           },
+-          "min": 3
++          "min": 3,
++          "validity": [
++            "pre:PM-0001-2"
++          ]
+         },
+         {
+           "name": "fast-clock, option B",
+           "select": {
+             "layer": "L1",
++            "scene": "SS",
++            "clients": 48,
+             "params.suite": "fast-clock",
+             "params.cmd_timing": "B"
+           },
+-          "min": 3
++          "min": 3,
++          "validity": [
++            "pre:PM-0001-2"
++          ]
+         },
+         {
+           "name": "lag-switch, option A",
+           "select": {
+             "layer": "L1",
++            "scene": "SS",
++            "clients": 48,
+             "params.suite": "lag-switch",
+             "params.cmd_timing": "A",
+             "profile": "P1"
+           },
+-          "min": 3
++          "min": 3,
++          "validity": [
++            "pre:PM-0001-2"
++          ]
+         },
+         {
+           "name": "lag-switch, option B",
+           "select": {
+             "layer": "L1",
++            "scene": "SS",
++            "clients": 48,
+             "params.suite": "lag-switch",
+             "params.cmd_timing": "B",
+             "profile": "P1"
+           },
+-          "min": 3
++          "min": 3,
++          "validity": [
++            "pre:PM-0001-2"
++          ]
+         }
+       ],
+       "validity": [],
+@@ -4915,7 +5099,7 @@
+       "stand_in": false,
+       "arm_rule": false,
+       "readings": [],
+-      "notes": "L1, 3 seeds, each suite under each OQ-0001-6 option. Kinds: part 5's checks (ADR 0001:231-239) plus the wrong channel (plan §4.4), 11 in all; the beyond-reach point leaves the set (clamped) and the equal-or-older tick joins it. npt-lab writes one `forged_kind` event per kind (sent, and sent minus rejected-and-counted) and one `clamp_kind` per weapon kind (hitscan; melee and throw where built). The fast clock (1.5x for 60 s) and lag switch write their excess over the bound as signed integers (0 or less passes), with the bound's inputs beside them. A twin is the run with only valid parts (or with points at the reach), named in `params.twin`, role `twin`. Each bite run matches its suite's part (the no-* bites the forged suite; not-older-than the fast clock under option A; refuse-not-clamp the clamp suite)."
++      "notes": "L1, 3 seeds, each suite under each OQ-0001-6 option, in the stress scene (scene SS, 48 clients, pre:PM-0001-2: u4-build-plan.md §4.12, the advisor's Q22 ruling; at most about 9 shots a second are lost to refusals, inside PM-0001-2's band: §4.13). Kinds: part 5's checks (ADR 0001:231-239) plus the wrong channel (plan §4.4), 11 in all; the beyond-reach point leaves the set (clamped) and the equal-or-older tick joins it. npt-lab writes one `forged_kind` event per kind (sent, and sent minus rejected-and-counted) and one `clamp_kind` per weapon kind (hitscan; melee and throw where built). The fast clock (1.5x for 60 s) and lag switch write their excess over the bound as signed integers (0 or less passes), with the bound's inputs beside them. A twin is the run with only valid parts (or with points at the reach), named in `params.twin`, role `twin`. Each bite run matches its suite's part (the no-* bites the forged suite; not-older-than the fast clock under option A; refuse-not-clamp the clamp suite)."
+     },
+     {
+       "id": "PM-0001-22",
+@@ -4933,6 +5117,8 @@
+           "name": "L1, one never-acker among 48",
+           "select": {
+             "layer": "L1",
++            "scene": "SS",
++            "clients": 48,
+             "params.suite": "never-ack"
+           },
+           "min": 3
+@@ -4996,7 +5182,7 @@
+       "stand_in": false,
+       "arm_rule": false,
+       "readings": [],
+-      "notes": "L1, one non-acknowledging client among 48 for 10 minutes, 3 seeds. The room writes the never-acker's queue headroom (cap minus length) per tick, so an unbounded queue goes negative. The cap is a design constant written in `header.params.event_queue_cap_count` and reported."
++      "notes": "L1, one non-acknowledging client among 48 for 10 minutes, 3 seeds, in the stress scene (scene SS, 48 clients: u4-build-plan.md §4.12, the advisor's Q22 ruling) with no pre:PM-0001-2: the designed drop leaves 47 clients, which PM-0001-2's 'a client on every soldier' refuses, and changes the slot count everyone_in_view reads (README §4 states the exception: the advisor's condition 4; a reading of ADR 0001:1589 for the readings PR). Its runs still log PM-0001-2's series (shots, projectiles, vehicles, teams, portals), and U4f's report states the load each run carried. The room writes the never-acker's queue headroom (cap minus length) per tick, so an unbounded queue goes negative. The cap is a design constant written in `header.params.event_queue_cap_count` and reported."
+     },
+     {
+       "id": "PM-0001-23",
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/base/p2-client.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/base/p2-client.jsonl
+new file mode 100644
+index 0000000..869e772
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/base/p2-client.jsonl
+@@ -0,0 +1,5 @@
++{"k":"header","schema":1,"run":"p2-1","set":"u4r-17","role":"measured","marks":["PM-0001-17"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P2","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"client","slot":0,"date":"2026-11-10","params":{}}
++{"k":"tick","t":1,"ph":"measured","s":{"snap_incomplete":[0,0]},"hs":{"decoded_hash":["0000000000000101","0000000000000102"]}}
++{"k":"tick","t":2,"ph":"measured","s":{"snap_incomplete":[0,0]},"hs":{"decoded_hash":["0000000000000201","0000000000000202"]}}
++{"k":"tick","t":3,"ph":"measured","s":{"snap_incomplete":[0,0]},"hs":{"decoded_hash":["0000000000000301","0000000000000302"]}}
++{"k":"footer","records":4,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/base/p2-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/base/p2-room.jsonl
+new file mode 100644
+index 0000000..7a4bfe1
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/base/p2-room.jsonl
+@@ -0,0 +1,7 @@
++{"k":"header","schema":1,"run":"p2-1","set":"u4r-17","role":"measured","marks":["PM-0001-17"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P2","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":0,"date":"2026-11-10","params":{}}
++{"k":"tick","t":1,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]},"hs":{"server_hash":["0000000000000101","0000000000000102"]}}
++{"k":"tick","t":2,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]},"hs":{"server_hash":["0000000000000201","0000000000000202"]}}
++{"k":"tick","t":3,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]},"hs":{"server_hash":["0000000000000301","0000000000000302"]}}
++{"k":"second","sec":0,"ph":"measured","v":{"shots_count":700,"portal_changes_count":1}}
++{"k":"second","sec":1,"ph":"measured","v":{"shots_count":700,"portal_changes_count":1}}
++{"k":"footer","records":6,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/differ/p2-client.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/differ/p2-client.jsonl
+new file mode 100644
+index 0000000..02fd16f
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/differ/p2-client.jsonl
+@@ -0,0 +1,5 @@
++{"k":"header","schema":1,"run":"p2-1","set":"u4r-17","role":"measured","marks":["PM-0001-17"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P2","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"client","slot":0,"date":"2026-11-10","params":{}}
++{"k":"tick","t":1,"ph":"measured","s":{"snap_incomplete":[0,0]},"hs":{"decoded_hash":["0000000000000101","0000000000000102"]}}
++{"k":"tick","t":2,"ph":"measured","s":{"snap_incomplete":[0,0]},"hs":{"decoded_hash":["0000000000000201","0000000000000299"]}}
++{"k":"tick","t":3,"ph":"measured","s":{"snap_incomplete":[0,0]},"hs":{"decoded_hash":["0000000000000301","0000000000000302"]}}
++{"k":"footer","records":4,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/lost-group/p2-client.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/lost-group/p2-client.jsonl
+new file mode 100644
+index 0000000..ce3e6b2
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/lost-group/p2-client.jsonl
+@@ -0,0 +1,5 @@
++{"k":"header","schema":1,"run":"p2-1","set":"u4r-17","role":"measured","marks":["PM-0001-17"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P2","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"client","slot":0,"date":"2026-11-10","params":{}}
++{"k":"tick","t":1,"ph":"measured","s":{"snap_incomplete":[0,0]},"hs":{"decoded_hash":["0000000000000101","0000000000000102"]}}
++{"k":"tick","t":2,"ph":"measured","s":{"snap_incomplete":[0,1]},"hs":{"decoded_hash":["0000000000000201",null]}}
++{"k":"tick","t":3,"ph":"measured","s":{"snap_incomplete":[0,0]},"hs":{"decoded_hash":["0000000000000301","0000000000000302"]}}
++{"k":"footer","records":4,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/none-compared/p2-client.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/none-compared/p2-client.jsonl
+new file mode 100644
+index 0000000..b9d40a0
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/none-compared/p2-client.jsonl
+@@ -0,0 +1,5 @@
++{"k":"header","schema":1,"run":"p2-1","set":"u4r-17","role":"measured","marks":["PM-0001-17"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P2","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"client","slot":0,"date":"2026-11-10","params":{}}
++{"k":"tick","t":1,"ph":"measured","s":{"snap_incomplete":[1,1]},"hs":{"decoded_hash":[null,null]}}
++{"k":"tick","t":2,"ph":"measured","s":{"snap_incomplete":[1,1]},"hs":{"decoded_hash":[null,null]}}
++{"k":"tick","t":3,"ph":"measured","s":{"snap_incomplete":[1,1]},"hs":{"decoded_hash":[null,null]}}
++{"k":"footer","records":4,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/orphan/p2-client.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/orphan/p2-client.jsonl
+new file mode 100644
+index 0000000..d5e2aa0
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/orphan/p2-client.jsonl
+@@ -0,0 +1,6 @@
++{"k":"header","schema":1,"run":"p2-1","set":"u4r-17","role":"measured","marks":["PM-0001-17"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P2","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"client","slot":0,"date":"2026-11-10","params":{}}
++{"k":"tick","t":1,"ph":"measured","s":{"snap_incomplete":[0,0]},"hs":{"decoded_hash":["0000000000000101","0000000000000102"]}}
++{"k":"tick","t":2,"ph":"measured","s":{"snap_incomplete":[0,0]},"hs":{"decoded_hash":["0000000000000201","0000000000000202"]}}
++{"k":"tick","t":3,"ph":"measured","s":{"snap_incomplete":[0,0]},"hs":{"decoded_hash":["0000000000000301","0000000000000302"]}}
++{"k":"tick","t":65539,"ph":"measured","s":{"snap_incomplete":[0,0]},"hs":{"decoded_hash":["0000000000000301",null]}}
++{"k":"footer","records":5,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/refused-group/p2-client.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/refused-group/p2-client.jsonl
+new file mode 100644
+index 0000000..cf3061c
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/refused-group/p2-client.jsonl
+@@ -0,0 +1,5 @@
++{"k":"header","schema":1,"run":"p2-1","set":"u4r-17","role":"measured","marks":["PM-0001-17"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P2","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"client","slot":0,"date":"2026-11-10","params":{}}
++{"k":"tick","t":1,"ph":"measured","s":{"snap_incomplete":[0,0]},"hs":{"decoded_hash":["0000000000000101","0000000000000102"]}}
++{"k":"tick","t":2,"ph":"measured","s":{"snap_incomplete":[0,0]},"hs":{"decoded_hash":["0000000000000201","0000000000000000"]}}
++{"k":"tick","t":3,"ph":"measured","s":{"snap_incomplete":[0,0]},"hs":{"decoded_hash":["0000000000000301","0000000000000302"]}}
++{"k":"footer","records":4,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/base/forged-lab.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/base/forged-lab.jsonl
+new file mode 100644
+index 0000000..11bd78e
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/base/forged-lab.jsonl
+@@ -0,0 +1,13 @@
++{"k":"header","schema":1,"run":"forged-a-1","set":"u4f-21","role":"measured","marks":["PM-0001-21"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P0","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"lab","slot":0,"date":"2026-11-10","params":{"suite":"forged","cmd_timing":"A"}}
++{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"lead-bound","sent_count":1000,"unrejected_count":0}}
++{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"newer-tick","sent_count":1000,"unrejected_count":0}}
++{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"seq-forward","sent_count":1000,"unrejected_count":0}}
++{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"move-length","sent_count":1000,"unrejected_count":0}}
++{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"press-edge","sent_count":1000,"unrejected_count":0}}
++{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"aim-bounds","sent_count":1000,"unrejected_count":0}}
++{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"cooldown","sent_count":1000,"unrejected_count":0}}
++{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"ack-sent","sent_count":1000,"unrejected_count":0}}
++{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"trailing","sent_count":1000,"unrejected_count":0}}
++{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"catchup-cap","sent_count":1000,"unrejected_count":0}}
++{"k":"event","ev":"forged_kind","ph":"measured","f":{"kind":"channel","sent_count":1000,"unrejected_count":0}}
++{"k":"footer","records":12,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/base/forged-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/base/forged-room.jsonl
+new file mode 100644
+index 0000000..0b1df9b
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/base/forged-room.jsonl
+@@ -0,0 +1,7 @@
++{"k":"header","schema":1,"run":"forged-a-1","set":"u4f-21","role":"measured","marks":["PM-0001-21"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P0","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":0,"date":"2026-11-10","params":{"suite":"forged","cmd_timing":"A","twin":"forged-a-1-twin"}}
++{"k":"tick","t":1,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]},"h":"00000000000a0001"}
++{"k":"tick","t":2,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]},"h":"00000000000a0002"}
++{"k":"tick","t":3,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]},"h":"00000000000a0003"}
++{"k":"second","sec":0,"ph":"measured","v":{"shots_count":700,"portal_changes_count":1}}
++{"k":"second","sec":1,"ph":"measured","v":{"shots_count":700,"portal_changes_count":1}}
++{"k":"footer","records":6,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/base/twin-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/base/twin-room.jsonl
+new file mode 100644
+index 0000000..731f004
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/base/twin-room.jsonl
+@@ -0,0 +1,5 @@
++{"k":"header","schema":1,"run":"forged-a-1-twin","set":"u4f-21","role":"twin","marks":["PM-0001-21"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P0","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":0,"date":"2026-11-10","params":{"suite":"forged","cmd_timing":"A"}}
++{"k":"tick","t":1,"ph":"measured","h":"00000000000a0001"}
++{"k":"tick","t":2,"ph":"measured","h":"00000000000a0002"}
++{"k":"tick","t":3,"ph":"measured","h":"00000000000a0003"}
++{"k":"footer","records":4,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/twin-bites-build/twin-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/twin-bites-build/twin-room.jsonl
+new file mode 100644
+index 0000000..ccc68b2
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/twin-bites-build/twin-room.jsonl
+@@ -0,0 +1,5 @@
++{"k":"header","schema":1,"run":"forged-a-1-twin","set":"u4f-21","role":"twin","marks":["PM-0001-21"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"1111111111111111111111111111111111111111111111111111111111111111","features":["bites"],"profile":"release"},"bite":null,"layer":"L1","profile":"P0","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":0,"date":"2026-11-10","params":{"suite":"forged","cmd_timing":"A"}}
++{"k":"tick","t":1,"ph":"measured","h":"00000000000a0001"}
++{"k":"tick","t":2,"ph":"measured","h":"00000000000a0002"}
++{"k":"tick","t":3,"ph":"measured","h":"00000000000a0003"}
++{"k":"footer","records":4,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/twin-differs/twin-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/twin-differs/twin-room.jsonl
+new file mode 100644
+index 0000000..71843d6
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/twin-differs/twin-room.jsonl
+@@ -0,0 +1,5 @@
++{"k":"header","schema":1,"run":"forged-a-1-twin","set":"u4f-21","role":"twin","marks":["PM-0001-21"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P0","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":0,"date":"2026-11-10","params":{"suite":"forged","cmd_timing":"A"}}
++{"k":"tick","t":1,"ph":"measured","h":"00000000000a0001"}
++{"k":"tick","t":2,"ph":"measured","h":"00000000000b0002"}
++{"k":"tick","t":3,"ph":"measured","h":"00000000000a0003"}
++{"k":"footer","records":4,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/twin-missing/twin-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/twin-missing/twin-room.jsonl
+new file mode 100644
+index 0000000..1b49657
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/twin-missing/twin-room.jsonl
+@@ -0,0 +1,3 @@
++{"k":"header","schema":1,"run":"forged-a-2-twin","set":"u4f-21","role":"twin","marks":["PM-0001-21"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P0","seed":2,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":0,"date":"2026-11-10","params":{"suite":"forged","cmd_timing":"A"}}
++{"k":"tick","t":1,"ph":"measured","h":"00000000000a0001"}
++{"k":"footer","records":2,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/twin-unnamed/forged-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/twin-unnamed/forged-room.jsonl
+new file mode 100644
+index 0000000..cf3da72
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-21/twin-unnamed/forged-room.jsonl
+@@ -0,0 +1,7 @@
++{"k":"header","schema":1,"run":"forged-a-1","set":"u4f-21","role":"measured","marks":["PM-0001-21"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P0","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":0,"date":"2026-11-10","params":{"suite":"forged","cmd_timing":"A"}}
++{"k":"tick","t":1,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]},"h":"00000000000a0001"}
++{"k":"tick","t":2,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]},"h":"00000000000a0002"}
++{"k":"tick","t":3,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]},"h":"00000000000a0003"}
++{"k":"second","sec":0,"ph":"measured","v":{"shots_count":700,"portal_changes_count":1}}
++{"k":"second","sec":1,"ph":"measured","v":{"shots_count":700,"portal_changes_count":1}}
++{"k":"footer","records":6,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-4/bite-measured-build/bite-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-4/bite-measured-build/bite-room.jsonl
+new file mode 100644
+index 0000000..7379d34
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-4/bite-measured-build/bite-room.jsonl
+@@ -0,0 +1,7 @@
++{"k":"header","schema":1,"run":"bite-bs","set":"r2-vs2","role":"bite","marks":["PM-0001-4"],"machine":{"role":"RS","name":"RS","plan":"CCX23","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fsn1","kernel":"fixture","address":"203.0.113.10","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":"PM-0001-4/B-S","layer":"L2","profile":"P2","seed":4,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":1,"date":"2026-11-20","params":{"sim":"stress","soak":"S30","bite_size_ns":9037000}}
++{"k":"event","ev":"affinity","ph":"warmup","f":{"when":"start","cpu":3,"alone":true,"sibling_free":true}}
++{"k":"tick","t":1,"ph":"measured","v":{"work_ns":18337000,"overrun":0,"dropped_ns":0,"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]}}
++{"k":"tick","t":2,"ph":"measured","v":{"work_ns":18437000,"overrun":0,"dropped_ns":0,"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]}}
++{"k":"second","sec":0,"ph":"measured","v":{"steal_permille":2,"shots_count":700,"portal_changes_count":1}}
++{"k":"event","ev":"affinity","ph":"after","f":{"when":"end","cpu":3,"alone":true,"sibling_free":true}}
++{"k":"footer","records":6,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-4/measured-bites-build/s30-1-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-4/measured-bites-build/s30-1-room.jsonl
+new file mode 100644
+index 0000000..819c009
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-4/measured-bites-build/s30-1-room.jsonl
+@@ -0,0 +1,10 @@
++{"k":"header","schema":1,"run":"s30-1","set":"r2-vs2","role":"measured","marks":["PM-0001-2","PM-0001-4"],"machine":{"role":"RS","name":"RS","plan":"CCX23","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fsn1","kernel":"fixture","address":"203.0.113.10","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"1111111111111111111111111111111111111111111111111111111111111111","features":["bites"],"profile":"release"},"bite":null,"layer":"L2","profile":"P2","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":1,"date":"2026-11-20","params":{"sim":"stress","soak":"S30"}}
++{"k":"event","ev":"affinity","ph":"warmup","f":{"when":"start","cpu":3,"alone":true,"sibling_free":true}}
++{"k":"tick","t":1,"ph":"warmup","v":{"work_ns":12000000,"overrun":0,"dropped_ns":0}}
++{"k":"tick","t":2,"ph":"measured","v":{"work_ns":9100000,"overrun":0,"dropped_ns":0,"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]}}
++{"k":"tick","t":3,"ph":"measured","v":{"work_ns":9200000,"overrun":0,"dropped_ns":0,"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]}}
++{"k":"tick","t":4,"ph":"measured","v":{"work_ns":9300000,"overrun":0,"dropped_ns":0,"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]}}
++{"k":"second","sec":0,"ph":"measured","v":{"steal_permille":2,"shots_count":700,"portal_changes_count":1}}
++{"k":"second","sec":1,"ph":"measured","v":{"steal_permille":3,"shots_count":700,"portal_changes_count":1}}
++{"k":"event","ev":"affinity","ph":"after","f":{"when":"end","cpu":3,"alone":true,"sibling_free":true}}
++{"k":"footer","records":9,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-4/measured-names-bite/s30-2-lg.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-4/measured-names-bite/s30-2-lg.jsonl
+new file mode 100644
+index 0000000..1626baf
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-4/measured-names-bite/s30-2-lg.jsonl
+@@ -0,0 +1,4 @@
++{"k":"header","schema":1,"run":"s30-2","set":"r2-vs2","role":"measured","marks":["PM-0001-4"],"machine":{"role":"LG","name":"LG1","plan":"CAX21","arch":"aarch64","cpu":"fixture","vcpus":4,"mem_mb":8192,"location":"fsn1","kernel":"fixture","address":"203.0.113.20","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":"PM-0001-4/B-S","layer":"L2","profile":"P2","seed":2,"tick_hz":30,"clients":48,"scene":"SS","process":"bots","slot":0,"date":"2026-11-20","params":{}}
++{"k":"second","sec":0,"ph":"measured","v":{"cpu_permille":640},"s":{"inputs_count":[30,30]}}
++{"k":"second","sec":1,"ph":"measured","v":{"cpu_permille":650},"s":{"inputs_count":[30,30]}}
++{"k":"footer","records":3,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-4/measured-names-bite/s30-2-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-4/measured-names-bite/s30-2-room.jsonl
+new file mode 100644
+index 0000000..c906573
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-4/measured-names-bite/s30-2-room.jsonl
+@@ -0,0 +1,10 @@
++{"k":"header","schema":1,"run":"s30-2","set":"r2-vs2","role":"measured","marks":["PM-0001-2","PM-0001-4"],"machine":{"role":"RS","name":"RS","plan":"CCX23","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fsn1","kernel":"fixture","address":"203.0.113.10","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"1111111111111111111111111111111111111111111111111111111111111111","features":["bites"],"profile":"release"},"bite":"PM-0001-4/B-S","layer":"L2","profile":"P2","seed":2,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":1,"date":"2026-11-20","params":{"sim":"stress","soak":"S30"}}
++{"k":"event","ev":"affinity","ph":"warmup","f":{"when":"start","cpu":3,"alone":true,"sibling_free":true}}
++{"k":"tick","t":1,"ph":"warmup","v":{"work_ns":12000000,"overrun":0,"dropped_ns":0}}
++{"k":"tick","t":2,"ph":"measured","v":{"work_ns":9150000,"overrun":0,"dropped_ns":0,"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]}}
++{"k":"tick","t":3,"ph":"measured","v":{"work_ns":9250000,"overrun":0,"dropped_ns":0,"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]}}
++{"k":"tick","t":4,"ph":"measured","v":{"work_ns":16670000,"overrun":0,"dropped_ns":0,"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]}}
++{"k":"second","sec":0,"ph":"measured","v":{"steal_permille":4,"shots_count":690,"portal_changes_count":1}}
++{"k":"second","sec":1,"ph":"measured","v":{"steal_permille":4,"shots_count":710,"portal_changes_count":1}}
++{"k":"event","ev":"affinity","ph":"after","f":{"when":"end","cpu":3,"alone":true,"sibling_free":true}}
++{"k":"footer","records":9,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0006-11/base/rs-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0006-11/base/rs-room.jsonl
+new file mode 100644
+index 0000000..ab40bd1
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0006-11/base/rs-room.jsonl
+@@ -0,0 +1,5 @@
++{"k":"header","schema":1,"run":"rs-1","set":"r1-rs","role":"measured","marks":["PM-0006-11"],"machine":{"role":"RS","name":"RS","plan":"CCX23","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fsn1","kernel":"fixture","address":"203.0.113.10","threads_per_core":2,"smt":[[0,2],[1,3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L2","profile":"P2","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":1,"date":"2026-11-20","params":{}}
++{"k":"event","ev":"cpu_read","ph":"warmup","f":{"changed":0}}
++{"k":"event","ev":"affinity","ph":"measured","f":{"when":"start","cpu":3,"alone":true,"sibling_free":true}}
++{"k":"event","ev":"affinity","ph":"measured","f":{"when":"end","cpu":3,"alone":true,"sibling_free":true}}
++{"k":"footer","records":4,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/src/practice.rs b/spikes/netcode-proof/crates/judge/src/practice.rs
+new file mode 100644
+index 0000000..af1605a
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/src/practice.rs
+@@ -0,0 +1,484 @@
++//! PM-0001-18's WebSocket part (`marks/README.md` §2.5 and §4, the `ws-practice` rule): the run-structured bound's
++//! machine-readable line, the practice run's outcome record, and the factor the judge applies to the bound. The rules
++//! are the advisor's on Mustafa's WS-BAR (2026-11-07): one unjudged practice run per build, its slowdown s = M_p / M_m,
++//! the numbers moved by f = max(1, s) only while s is within the tolerance, never set by hand.
++
++use crate::eval::{Run, always_rules, nearest_rank};
++use crate::marks::{BoundNumber, Mark, Measure, Threshold};
++use crate::ratio::Ratio;
++use npt_log::{EventRecord, Phase};
++use serde::Deserialize;
++use serde_json::Value;
++use std::collections::BTreeSet;
++
++/// The tag the bound's machine-readable line starts with; a JSON object follows it.
++pub(crate) const BOUND_TAG: &str = "npt-ws-bound v1 ";
++
++#[derive(Deserialize)]
++#[serde(deny_unknown_fields)]
++struct RawBound {
++    model: String,
++    commit: String,
++    runs_count: u64,
++    client_bursts_count: u64,
++    x_ns: i64,
++    y_ns: i64,
++    k_count: i64,
++    z_ns: i64,
++    m_m_ns: i64,
++    band_low: String,
++    band_high: String,
++    tolerance: String,
++    guard_share: String,
++}
++
++/// The run-structured bound, as its machine-readable line gives it (README §2.5).
++#[derive(Debug, Clone, PartialEq, Eq)]
++pub(crate) struct Bound {
++    pub x_ns: i64,
++    pub y_ns: i64,
++    pub k_count: i64,
++    pub z_ns: i64,
++    /// The median, over the bound's simulated runs of a correct build, of each run's median.
++    pub m_m_ns: i64,
++    pub band_low: Ratio,
++    pub band_high: Ratio,
++    pub tolerance: Ratio,
++}
++
++/// Reads the bound's machine-readable line: [`BOUND_TAG`], then one JSON object with exactly README §2.5's fields.
++pub(crate) fn parse_bound(line: &str) -> Result<Bound, String> {
++    let json = line
++        .strip_prefix(BOUND_TAG)
++        .ok_or_else(|| format!("the bound line does not start with {BOUND_TAG:?}"))?;
++    let raw: RawBound =
++        serde_json::from_str(json).map_err(|e| format!("the bound line's object: {e}"))?;
++    let decimal = |name: &str, s: &str| {
++        Ratio::parse(s).map_err(|e| format!("the bound line's {name}: {e}"))
++    };
++    let b = Bound {
++        x_ns: raw.x_ns,
++        y_ns: raw.y_ns,
++        k_count: raw.k_count,
++        z_ns: raw.z_ns,
++        m_m_ns: raw.m_m_ns,
++        band_low: decimal("band_low", &raw.band_low)?,
++        band_high: decimal("band_high", &raw.band_high)?,
++        tolerance: decimal("tolerance", &raw.tolerance)?,
++    };
++    let guard = decimal("guard_share", &raw.guard_share)?;
++    let hex = |s: &str| {
++        s.len() == 40
++            && s.bytes()
++                .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
++    };
++    let problems = [
++        (raw.model.is_empty(), "no model"),
++        (!hex(&raw.commit), "a commit that is not 40 lowercase hex digits"),
++        (raw.runs_count < 2_000, "fewer than 2,000 simulated runs"),
++        (raw.client_bursts_count == 0, "no client-bursts per run"),
++        (
++            b.x_ns <= 0 || b.y_ns <= 0 || b.z_ns <= 0 || b.m_m_ns <= 0,
++            "a time that is not above 0",
++        ),
++        (b.k_count < 0, "a k below 0"),
++        (
++            b.band_low <= Ratio::int(0) || b.band_low > b.band_high,
++            "a band that is not 0 < low <= high",
++        ),
++        (
++            b.tolerance < Ratio::int(1) || b.tolerance > Ratio::new(11, 10),
++            "a tolerance outside 1 to 1.10 (Mustafa's 10 %, never raised)",
++        ),
++        (
++            guard < Ratio::int(0) || guard > Ratio::new(1, 100),
++            "a guard share outside 0 to 0.01 (budget x2 within the tolerance in more than 1 % of runs)",
++        ),
++    ];
++    match problems.iter().find(|(bad, _)| *bad) {
++        Some((_, what)) => Err(format!("the bound line has {what}")),
++        None => Ok(b),
++    }
++}
++
++/// `v` rounded up to the next whole millisecond (the advisor's R6: each moved number "rounded up to the next
++/// millisecond").
++pub(crate) fn ceil_ms(v: Ratio) -> Ratio {
++    let unit: i128 = 1_000_000;
++    let den = v.den() * unit;
++    let q = if v.num() >= 0 {
++        (v.num() + den - 1) / den
++    } else {
++        v.num() / den
++    };
++    Ratio::int(q * unit)
++}
++
++/// What the ws-practice rule found for a run: its practice run, the bound, and the factor applied.
++pub(crate) struct Practice {
++    pub run: String,
++    pub bound: Bound,
++    pub m_p_ns: i64,
++    pub s: Ratio,
++    pub f: Ratio,
++}
++
++impl Practice {
++    /// The bound's number, unmoved.
++    pub fn bound_of(&self, n: BoundNumber) -> i64 {
++        match n {
++            BoundNumber::X => self.bound.x_ns,
++            BoundNumber::Y => self.bound.y_ns,
++            BoundNumber::Z => self.bound.z_ns,
++        }
++    }
++
++    /// The number in force: the bound's times f, rounded up to the next millisecond (k never moves).
++    pub fn moved(&self, n: BoundNumber) -> Ratio {
++        ceil_ms(Ratio::int(i128::from(self.bound_of(n))) * self.f)
++    }
++
++    /// How the number in force was reached, for the verdict's detail.
++    pub fn describe(&self, n: BoundNumber) -> String {
++        format!(
++            "{n:?} {} x f {} = {} rounded up to the ms; f = max(1, s), s = M_p {} / M_m {} = {}; practice run {}",
++            self.bound_of(n),
++            self.f,
++            self.moved(n),
++            self.m_p_ns,
++            self.bound.m_m_ns,
++            self.s,
++            self.run
++        )
++    }
++}
++
++/// One header param of a run, the same in every log that has it.
++fn param<'r>(run: &'r Run<'_>, name: &str) -> Result<Option<&'r Value>, String> {
++    let mut found: Option<&Value> = None;
++    for log in &run.logs {
++        if let Some(v) = log.header.params.get(name) {
++            if found.is_some_and(|f| f != v) {
++                return Err(format!("run {}: its logs disagree on params.{name}", run.id));
++            }
++            found = Some(v);
++        }
++    }
++    Ok(found)
++}
++
++/// A run's `params.started_utc`, in README §2.5's form (`2026-11-20T18:05:00Z`), which sorts as time does.
++fn started(run: &Run<'_>) -> Result<String, String> {
++    let s = param(run, "started_utc")?
++        .and_then(Value::as_str)
++        .ok_or_else(|| format!("run {} has no params.started_utc", run.id))?;
++    let b = s.as_bytes();
++    let form = b.len() == 20
++        && b.iter().enumerate().all(|(i, c)| match i {
++            4 | 7 => *c == b'-',
++            10 => *c == b'T',
++            13 | 16 => *c == b':',
++            19 => *c == b'Z',
++            _ => c.is_ascii_digit(),
++        });
++    if form {
++        Ok(s.to_owned())
++    } else {
++        Err(format!(
++            "run {}: params.started_utc {s:?} is not YYYY-MM-DDTHH:MM:SSZ",
++            run.id
++        ))
++    }
++}
++
++fn spacing(run: &Run<'_>) -> Result<i64, String> {
++    param(run, "burst_spacing_ns")?
++        .and_then(Value::as_i64)
++        .ok_or_else(|| format!("run {} has no integer params.burst_spacing_ns", run.id))
++}
++
++/// The binaries a run's logs came from.
++fn builds<'r>(run: &'r Run<'_>) -> BTreeSet<&'r str> {
++    run.logs
++        .iter()
++        .map(|l| l.header.build.binary_sha256.as_str())
++        .collect()
++}
++
++/// A run's measured heal times (`event.burst_heal.after_link_ns`), sorted.
++fn heals(run: &Run<'_>) -> Result<Vec<i64>, String> {
++    let mut v = Vec::new();
++    for e in run
++        .logs
++        .iter()
++        .flat_map(|l| &l.events)
++        .filter(|e| e.ev == "burst_heal" && e.ph == Phase::Measured)
++    {
++        match e.f.get("after_link_ns").and_then(Value::as_i64) {
++            Some(x) => v.push(x),
++            None => {
++                return Err(format!(
++                    "run {}: a burst_heal event has no integer after_link_ns",
++                    run.id
++                ));
++            }
++        }
++    }
++    v.sort_unstable();
++    Ok(v)
++}
++
++fn text<'e>(e: &'e EventRecord, name: &str) -> Option<&'e str> {
++    e.f.get(name)
++        .and_then(Value::as_str)
++        .filter(|s| !s.trim().is_empty())
++}
++
++fn int(e: &EventRecord, name: &str) -> Result<i64, String> {
++    e.f.get(name)
++        .and_then(Value::as_i64)
++        .ok_or_else(|| format!("the ws_practice record has no integer {name}"))
++}
++
++/// The practice run whose numbers are in force for `run`, checked whole (README §4, `ws-practice`). A bite run takes
++/// the measured build's practice run of its set (a bites build has none of its own).
++pub(crate) fn find(
++    run: &Run<'_>,
++    set: &[&Run<'_>],
++    mark: &Mark,
++    tolerance: Ratio,
++) -> Result<Practice, String> {
++    let when = started(run)?;
++    let gap = spacing(run)?;
++    let mine = builds(run);
++    let mut candidates: Vec<(&Run<'_>, String)> = Vec::new();
++    for p in set
++        .iter()
++        .copied()
++        .filter(|p| p.role == "practice" && p.serves(&mark.id))
++    {
++        if run.role == "bite" || builds(p) == mine {
++            candidates.push((p, started(p)?));
++        }
++    }
++    if run.role == "bite" {
++        let kinds: BTreeSet<BTreeSet<&str>> = candidates.iter().map(|(p, _)| builds(p)).collect();
++        if kinds.len() > 1 {
++            return Err(format!(
++                "set {} holds practice runs of {} builds, so bite run {} cannot tell whose numbers are in force",
++                run.set,
++                kinds.len(),
++                run.id
++            ));
++        }
++    }
++    candidates.sort_by(|a, b| a.1.cmp(&b.1));
++    let Some((p, p_when)) = candidates.last() else {
++        return Err(format!(
++            "set {} holds no practice run of run {}'s build (role practice, listing {})",
++            run.set, run.id, mark.id
++        ));
++    };
++    let records: Vec<&EventRecord> = p
++        .logs
++        .iter()
++        .flat_map(|l| &l.events)
++        .filter(|e| e.ev == "ws_practice")
++        .collect();
++    let [record] = records.as_slice() else {
++        return Err(format!(
++            "practice run {} holds {} ws_practice records, not 1",
++            p.id,
++            records.len()
++        ));
++    };
++    if candidates.len() > 1 && text(record, "second_ruling").is_none() {
++        return Err(format!(
++            "{} practice runs of one build: a second counts only with a ruling naming a found and fixed cause \
++             (second_ruling)",
++            candidates.len()
++        ));
++    }
++    let broken = always_rules(p);
++    if !broken.is_empty() {
++        return Err(format!(
++            "practice run {} is invalid: {}",
++            p.id,
++            broken.join("; ")
++        ));
++    }
++    let (a, b) = (&run.logs[0].header, &p.logs[0].header);
++    if a.scene != b.scene || a.profile != b.profile {
++        return Err(format!(
++            "practice run {} ran another scene or profile",
++            p.id
++        ));
++    }
++    if spacing(p)? != gap {
++        return Err(format!(
++            "practice run {} ran another burst spacing",
++            p.id
++        ));
++    }
++    if *p_when >= when {
++        return Err(format!(
++            "practice run {} did not start before run {}",
++            p.id, run.id
++        ));
++    }
++    let line = text(record, "bound").ok_or("the ws_practice record has no bound line")?;
++    let bound = parse_bound(line)?;
++    if bound.tolerance != tolerance {
++        return Err(format!(
++            "the bound's tolerance {} is not marks.json's {tolerance}",
++            bound.tolerance
++        ));
++    }
++    let numbers = mark
++        .checks
++        .iter()
++        .filter_map(|c| c.ws_bound.map(|n| (n, c)));
++    for (n, c) in numbers {
++        let value = match &c.threshold {
++            Threshold::Value(v) => *v,
++            Threshold::Against { .. } => continue,
++        };
++        let (got, want) = match n {
++            BoundNumber::X => (value, bound.x_ns),
++            BoundNumber::Z => (value, bound.z_ns),
++            BoundNumber::Y => {
++                // marks.rs gives every ws_bound y check a where: its value is Y, the check's value k.
++                let Measure::Series { cond: Some(w), .. } = &c.measure else {
++                    continue;
++                };
++                if value != Ratio::int(i128::from(bound.k_count)) {
++                    return Err(format!(
++                        "check {:?} allows {value} over Y, the bound's k is {}",
++                        c.name, bound.k_count
++                    ));
++                }
++                (w.value, bound.y_ns)
++            }
++        };
++        if got != Ratio::int(i128::from(want)) {
++            return Err(format!(
++                "check {:?} holds {got} as the bound's {n:?}, the bound line says {want}",
++                c.name
++            ));
++        }
++    }
++    let heal = heals(p)?;
++    if heal.is_empty() {
++        return Err(format!("practice run {} has no heal records", p.id));
++    }
++    let m_p_ns = heal[nearest_rank(heal.len(), Ratio::new(1, 2)) - 1];
++    if int(record, "m_p_ns")? != m_p_ns {
++        return Err(format!(
++            "the record's m_p_ns is not practice run {}'s median heal time {m_p_ns}",
++            p.id
++        ));
++    }
++    let s = Ratio::new(i128::from(m_p_ns), i128::from(bound.m_m_ns));
++    let class = text(record, "class").unwrap_or("");
++    let chance = text(record, "chance_ruling").is_some();
++    let class_ok = match class {
++        "IN TOLERANCE" => s >= bound.band_low && s <= tolerance,
++        "BEYOND" => chance && s <= tolerance,
++        "FAR BETTER" => chance && s < bound.band_low,
++        _ => false,
++    };
++    if !class_ok {
++        return Err(format!(
++            "practice run {}'s record is {class:?} at s = {s} (band {} to {}, tolerance {tolerance}){}: its numbers \
++             are not in force",
++            p.id,
++            bound.band_low,
++            bound.band_high,
++            if chance { "" } else { ", with no chance ruling" }
++        ));
++    }
++    let f = if s > Ratio::int(1) { s } else { Ratio::int(1) };
++    let practice = Practice {
++        run: p.id.to_owned(),
++        bound,
++        m_p_ns,
++        s,
++        f,
++    };
++    for (n, field) in [
++        (BoundNumber::X, "x_moved_ns"),
++        (BoundNumber::Y, "y_moved_ns"),
++        (BoundNumber::Z, "z_moved_ns"),
++    ] {
++        if Ratio::int(i128::from(int(record, field)?)) != practice.moved(n) {
++            return Err(format!(
++                "the record's {field} is not the judge's {}",
++                practice.describe(n)
++            ));
++        }
++    }
++    if int(record, "k_count")? != practice.bound.k_count {
++        return Err("the record's k_count is not the bound's (k never moves)".to_owned());
++    }
++    if class == "IN TOLERANCE" {
++        let y = practice.moved(BoundNumber::Y);
++        let over = heal
++            .iter()
++            .filter(|h| Ratio::int(i128::from(**h)) > y)
++            .count();
++        let worst = Ratio::int(i128::from(heal[heal.len() - 1]));
++        if over as i64 > practice.bound.k_count || worst > practice.moved(BoundNumber::Z) {
++            return Err(format!(
++                "the record says IN TOLERANCE, but practice run {} has {over} heals over {y} ns and its slowest is \
++                 {worst} ns",
++                p.id
++            ));
++        }
++    }
++    Ok(practice)
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    const LINE: &str =r#"npt-ws-bound v1 {"model":"linux-6.8-tcp v3","commit":"bf9d248000000000000000000000000000000000","runs_count":2000,"client_bursts_count":480,"x_ns":670000000,"y_ns":2500000000,"k_count":5,"z_ns":6900000000,"m_m_ns":654000000,"band_low":"0.965","band_high":"1.035","tolerance":"1.10","guard_share":"0.0000"}"#;
++
++    #[test]
++    fn the_bound_line_reads_as_readme_writes_it() {
++        let b = parse_bound(LINE).expect("README §2.5's example");
++        assert_eq!((b.x_ns, b.y_ns, b.k_count, b.z_ns), (670_000_000, 2_500_000_000, 5, 6_900_000_000));
++        assert_eq!(b.m_m_ns, 654_000_000);
++        assert_eq!(b.tolerance, Ratio::new(11, 10));
++        for (from, to, why) in [
++            ("npt-ws-bound v1 ", "npt-ws-bound v2 ", "another tag"),
++            (r#""runs_count":2000"#, r#""runs_count":1999"#, "too few runs"),
++            (r#""tolerance":"1.10""#, r#""tolerance":"1.11""#, "a raised tolerance"),
++            (r#""tolerance":"1.10""#, r#""tolerance":"0.99""#, "a tolerance below 1"),
++            (r#""guard_share":"0.0000""#, r#""guard_share":"0.0101""#, "a failed guard"),
++            (r#""band_low":"0.965""#, r#""band_low":"1.04""#, "a band upside down"),
++            (r#""k_count":5"#, r#""k_count":-1"#, "a negative k"),
++            (r#""x_ns":670000000"#, r#""x_ns":0"#, "a zero time"),
++            (r#""commit":"bf9d248"#, r#""commit":"BF9D248"#, "an upper-case commit"),
++            (r#""model":"linux-6.8-tcp v3","#, r#""model":"","#, "no model"),
++            (r#","guard_share":"0.0000""#, "", "a missing field"),
++            (r#""guard_share":"0.0000""#, r#""guard_share":"0.0000","x":1"#, "an unknown field"),
++            (r#""x_ns":670000000"#, r#""x_ns":670000000.5"#, "a float"),
++        ] {
++            assert!(LINE.contains(from), "{why}: {from}");
++            assert!(parse_bound(&LINE.replacen(from, to, 1)).is_err(), "{why}");
++        }
++    }
++
++    #[test]
++    fn moved_numbers_round_up_to_the_millisecond() {
++        assert_eq!(ceil_ms(Ratio::int(704_000_000)), Ratio::int(704_000_000));
++        assert_eq!(ceil_ms(Ratio::int(704_000_001)), Ratio::int(705_000_000));
++        assert_eq!(ceil_ms(Ratio::new(1_407_000_001, 2)), Ratio::int(704_000_000));
++        // The advisor's R6 example: the provisional bound at f = 1.10 gives 0.737 s, 2.75 s and 7.59 s.
++        let f = Ratio::new(11, 10);
++        assert_eq!(ceil_ms(Ratio::int(670_000_000) * f), Ratio::int(737_000_000));
++        assert_eq!(ceil_ms(Ratio::int(2_500_000_000) * f), Ratio::int(2_750_000_000));
++        assert_eq!(ceil_ms(Ratio::int(6_900_000_000) * f), Ratio::int(7_590_000_000));
++    }
++}

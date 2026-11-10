@@ -255,3 +255,92 @@ Start hashes: lib.rs 1647e75d, src/tests.rs c21a362f, tests/l1.rs 639ab9c5 (= th
   sends-before-events still fails L-c6 on "did not resend message 0 in its instant". Hashes: lib.rs d6e6e130,
   tests.rs 50cfbcdc, tests/l1.rs 9c23f9cc. tests.rs's only change since the M1, M2, L1 and N1 plant runs (on ef2ecfd5)
   is lc6's (the L3 fix), which none of those runs' failing tests use. Next: fmt --check, check.mjs twice.
+- 20:40Z RESUMED (a new fixer agent; the run above was cut after 16:26Z). Found: lib.rs d6e6e130 and tests/l1.rs
+  9c23f9cc as last recorded, but src/tests.rs e8014c67, NOT the 50cfbcdc recorded at 16:17Z: an unrecorded change
+  after the last line (no copy of 50cfbcdc kept). Two check.mjs logs exist with no notes line (u4c-fix/check-1.log
+  16:21-16:24Z, check-2.log 16:24-16:26Z: 10 of 10, measured 289, bites 316); check-1 ended with a foreign cargo
+  running (npt-sim zz_probe_es), and neither is known to have run on e8014c67: NEITHER COUNTS. Plan for the rest: read
+  the three files' diffs whole; re-check each fix against its finding; redo every plant on the final code (the tests.rs
+  change is unknown, so the earlier plant evidence is the record of the method, not of the final file); then fmt
+  --check, check.mjs twice in a row, hashes, report.
+- 20:50Z Read whole: lib.rs (1,898 lines), src/tests.rs (1,723), tests/l1.rs's diff. lib.rs differs from the build
+  only in the handshake sentence (lines 54-57): every line the three reviewers cite sits exactly 3 lines lower now
+  (PACKET_THRESHOLD :111 -> :114, detect_lost :1556 -> :1559, the ack loss :1423 -> :1426, Rtt::START :610 -> :613,
+  BITES :1818 -> :1821). The fixes in the code match the 15:55Z design. Final-code plant list (run.sh, the earlier
+  fixer's script, unchanged: waits for 5 s with no cargo/rustc, df, touch before and every 2 s, foreign processes
+  logged; measured runs `cargo test --locked -p npt-l1 --no-fail-fast`, bites runs add `--features bites` and
+  `-- --nocapture`): clean measured + clean bites first; M1 x6 (none, no-timers, no-ready, skips, no-acks, no-held);
+  M2 x2 (threshold 1,000,000, 2); L1 srtt-only; L2 acks at the profile's rate; L3 rank link-first; L4 PTO from the
+  oldest unacked; N1 x2 (another check of the same test; another L-c test); then clean again, both builds. Logs in
+  u4c-fix/r2-<name>.log (the earlier fixer's logs kept as they are).
+  (Clock note: the two lines above were stamped 20:40Z and 20:50Z by estimate; `date -u` read 20:41:44Z just after
+  them. Times below are read from the logs.)
+- 20:41-20:42Z Clean, final code (lib.rs d6e6e130, tests.rs e8014c67, tests/l1.rs 9c23f9cc), this copy's npt-l1
+  compiled each time: measured lib 16 of 16, tests/l1.rs 16 of 16 [r2-clean-measured.log]; bites lib 26 of 26,
+  tests/l1.rs 21 of 21 [r2-clean-bites.log], each of the 8 bites failing its own check (the build's messages, word for
+  word); L-c2 PTOs seeds 1-10 = round 1's (139.229 ... 145.595); time-threshold steps up 5, 6, 1 on seeds 1-3. (A
+  foreign `cargo clippy`/`cargo check` was seen at the bites run's end, after its tests had run.)
+- 20:44-20:48Z M1 on the final code: six plants in lib.rs `Net::next_event`, one at a time, measured build, restored
+  with Edit, sha256 d6e6e130 checked after each; no foreign cargo/rustc at any run's end:
+  - none (returns None): new test FAILED "next_event_ns: link 0, end 1: 31 of 33 items handed out when the host
+    stopped at 3001.000 ms (next_event_ns said nothing was left)"; L-c5 FAILED "L-c5: link 0: an item that arrived at
+    51.757190 ms was handed out at 67.000000 ms, not in its instant, 51.757190 ms"; tests/l1.rs next_event_ns_names_...
+    FAILED ("the datagram's arrival") [r2-m1-none.log].
+  - no timers (Timer events left out): new test FAILED "... 32 of 33 items handed out when the host stopped at
+    3101.000 ms ..."; L-c5 FAILED "L-c5: the host was never called at 23 instants with an internal event, the first
+    112.781568 ms"; tests/l1.rs 16 of 16 pass [r2-m1-no-timers.log].
+  - no ready (hand-out instants left out): new test FAILED "next_event_ns: link 1: an item that arrived at 20.000000
+    ms was handed out at 30.000000 ms, not in its instant, 20.000001 ms"; L-c5 passes [r2-m1-no-ready.log].
+  - skips (max in place of min): new test FAILED, the same message [r2-m1-skips.log].
+  - no acks (Ack events left out): new test FAILED "next_event_ns: the host was never called at 37 instants with an
+    internal event, the first 101.000000 ms"; L-c5 FAILED "... never called at 876 instants ..., the first 102.651679
+    ms"; tests/l1.rs next_event_ns_names_... FAILED ("its acknowledgement's arrival") [r2-m1-no-acks.log].
+  - no held (HeldDue events left out): new test FAILED "next_event_ns: link 2: an item that arrived at 80.000000 ms
+    was handed out at 84.333333 ms, not in its instant, 80.000000 ms"; L-c5 passes [r2-m1-no-held.log].
+  All six equal the 16:10Z messages. Clean (20:41Z): both tests pass.
+- 20:48-20:53Z The rest on the final code, one plant at a time, restored with Edit, sha256 checked after each (lib.rs
+  d6e6e130, tests.rs e8014c67); this copy's npt-l1 compiled and no foreign cargo/rustc at each run's end:
+  - M2, PACKET_THRESHOLD 1,000,000: the_packet_threshold_... FAILED "packet threshold: losses declared at [1112.5] ms
+    (by count [false]), not the first message's alone, by count, at the third later packet's acknowledgement, 1,103
+    ms"; every other npt-l1 test passes [r2-m2-threshold-1m.log]. PACKET_THRESHOLD 2: FAILED "... declared at
+    [1102.0] ms (by count [true]) ..."; every other test passes [r2-m2-threshold-2.log].
+  - L1, `Rtt::loss_delay_ns` from the smoothed RTT only: the_time_threshold_... FAILED "time threshold: trial 1:
+    declared lost Some(110.514853) ms after its send, not 9/8 x max(98.235, 100.619) = 113.196 ms"; every other test
+    passes [r2-l1-srtt-only.log].
+  - L2, `send_ack`: acknowledgements also lost at the profile's rate outside bursts (Outcome::Lost, from the ack's
+    own word 0): tests/l1.rs acknowledgements_are_lost_only_inside_bursts FAILED "361 acknowledgements with the wrong
+    fate, the first (kind, sent ns) Some((1, 69879691))"; every other test passes [r2-l2-acks-at-rate.log]. (The
+    16:12Z plant marked them kind 2; this one is the plainer defect, kind 1; the same 361 acknowledgements.)
+  - L3, `Event::rank` as (time, link, order, key, ...): lc6 FAILED "L-c6: the two arrivals at 70 ms were not
+    acknowledged in fate-log order, link 3's first (links 2 and 3 at Some(6), Some(7))"; every other test passes
+    [r2-l3-link-first.log].
+  - L4, `set_timer`: the PTO from the oldest unacknowledged retransmittable packet, not the last ack-eliciting send:
+    tests/l1.rs streams_lose_nothing_... FAILED "2 stream packets resent inside the burst after 2.2 s, the first at
+    2415856348 ns: a PTO fired"; also lc1 "L-c1: 1 probe timeouts fired (the first at 6645.003 ms)"
+    [r2-l4-pto-oldest.log].
+  - N1, bites build: (a) bite_no_pto_doubling_fails_lc3 given acks-in-bursts (it trips another L-c3 check): FAILED
+    "failed on another check than L-c3's \"doubles at each expiry\": L-c3: link 0: no probe timeout fired"
+    [r2-n1-other-check.log]; (b) bite_events_at_polls_fails_lc5 running lc1 on its bite (another L-c test): FAILED
+    "failed on another check than L-c5's \"the fate logs differ\": L-c1: message 0: declared lost 166.667 ms after its
+    send, outside [113.3, 153.3] ms" [r2-n1-other-test.log]. The old fails() (any "L-c" error) passes both; shown for
+    (a) at 16:06Z [n1-before.log]. Every other test passes in both runs (25 of 26 lib, 21 of 21 tests/l1.rs).
+  After the last: lib.rs d6e6e130, tests.rs e8014c67, tests/l1.rs 9c23f9cc (= the clean runs' files).
+- 20:53-20:54Z Clean again, measured: lib 16 of 16, tests/l1.rs 16 of 16 [r2-clean2-measured.log] (the bites build's
+  clean run, 20:41Z, was on these same bytes). `cargo +1.99.1 fmt --all --check`: exit 0, no diff [r2-fmt.log].
+  Counted check.mjs runs go through u4c-fix/run2.sh (run.sh plus a 20 s idle wait and, every 2 s during the run, a log
+  of each cargo/rustc/clippy/rustdoc process whose working directory is outside this copy, with its
+  CARGO_TARGET_DIR: <label>.foreign.log). Expected counts: measured 285 + 4 = 289 (lib +3: the next_event_ns host,
+  the packet threshold, the time threshold; tests/l1.rs +1: acknowledgements lost only inside bursts), bites
+  312 + 4 = 316.
+- 20:55-21:04Z check.mjs r2-check-1 (20:55:14-20:58:54Z, after 20 s with no cargo/rustc anywhere; touch every 2 s):
+  all 10 PASS; measured 289, bites 316, 0 failed, 0 skips (= 285 + 4, 312 + 4); fmt 0.3 s, clippy 33.8, wasm32 4.2,
+  doc 25.6, test 149.9, deps 0.5, refs 0.9 (562), marks 3.2 (81, drafts 626df678), self 0.9 (48/48), redact 0.7 (10/10,
+  158 items, 0 findings). Foreign lanes in the shared target in its last 8 s (from 20:58:46Z: agent-a3b8dfeb01ed52b50
+  `cargo build --tests -p npt-log -p npt-judge`, then wf_f54246ff-e0d-1 `cargo test -p npt-sim --test replay` at its
+  end) [r2-check-1.log, .foreign.log]. r2-check-2 (21:02:04-21:04:02Z, the same waits): all 10 PASS; measured 289,
+  bites 316, 0 failed, 0 skips; fmt 0.4, clippy 3.1, wasm32 0.6, doc 19.5, test 89.8, deps 0.5, refs 0.0 (562),
+  marks 2.0 (81, 626df678), self 1.1 (48/48), redact 0.7 (10/10, 158, 0). Foreign in the shared target: 21:02:12-26Z
+  agent-a3b8... `cargo test -p npt-judge --test fixtures` and `cargo run -p npt-judge -- --check-marks` (during my
+  doc step); 21:03:58-04:00Z wf_f54246ff-e0d-1 `cargo check`/`clippy -p npt-sim` (during my marks step). Neither
+  foreign lane built npt-l1 or npt-link in either window. The other lanes (U4j, U4d) keep the shared target busy; a
+  third run follows with a 60 s idle wait, to try for a quiet pair.
