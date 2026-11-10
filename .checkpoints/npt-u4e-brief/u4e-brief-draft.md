@@ -41,7 +41,7 @@ spikes/netcode-proof/crates/. "Needs a run (day)" marks what only a build or a r
    - the code as merged at `<base>`: sim/src/seam.rs, grid.rs, ticks.rs, history.rs; proto (U4a's); server/src/
      schedule.rs (U4b's); room, server and client as they stand (at df8975b: room/src/lib.rs:1-5 and
      server/src/lib.rs:1-5 are doc stubs; client/src/lib.rs:8-22 holds `BITES` and `grid_with_bite`); check.mjs's
-     deps step (:1447-1472), whose tick, float and bite-id checks are :581-637, :657-671 and :723-745.
+     deps step (:1447-1472), whose tick, float and bite-id checks are :581-637, :657-671 and :723-747.
 
 ---
 
@@ -185,7 +185,7 @@ fails by name in the bites build (§7.1 item 3, :869-870), and passes in the cle
 | owner-to-all (catalogue item 5's) | the encoder's class filter: one `owner` group sent to every client (catalogue :251-252) | a test that every group a client receives is one its class lets it see fails; the L1 audit is U4r's (plan :731) |
 | no-trailing and no-channel, through the pump | npt-proto's decode (U4a's sites: plan :533-536; §4.4 :279-280) | with the bite, the pump's `TrailingBytes` or `WrongChannel` count stays 0, and the pump test fails |
 
-- Bite ids are `PM-<ADR>-<row>/<name>` (check.mjs:678); each id lives in one crate's sources (check.mjs:712-745;
+- Bite ids are `PM-<ADR>-<row>/<name>` (check.mjs:678); each id lives in one crate's sources (check.mjs:712-747;
   carry 24). The owner-to-all id is not spelled in the plan: use marks.json's, if it lists one (recheck row R27).
 - -58/lt-cmd-seq and -58/lt-press: their sites are U4e's, but U4e's Bites line omits them: U4E-Q1.
 
@@ -405,7 +405,7 @@ list, as npt-client has (client/src/lib.rs:11-12)?
 
 **U4E-Q4 (tick16's id home).** Where do PM-0001-17/tick16 and PM-0001-58/tick16 live?
 - Why it matters: U4a plants tick16 in npt-proto's header writer (plan :532), carry 24 puts "-17/tick16's client half"
-  in `npt_client::BITES`, and check.mjs refuses an id literal in two crates' sources (check.mjs:712-745).
+  in `npt_client::BITES`, and check.mjs refuses an id literal in two crates' sources (check.mjs:712-747).
 - Options: (a) the ids stay in npt-proto; the client's rebuild takes the bite through a proto value it is passed (as
   the grid's defect reaches the client through `grid_with_bite`), so the literal lives once; (b) the ids move to
   npt-client and proto's half is selected through it; (c) each half gets its own id.
@@ -437,7 +437,7 @@ hash (`hs`) into npt-log records, or expose them for U4r's per-process logs?
 
 **U4E-Q8 (client's hash-map ban).** Does U4e add the HashMap and HashSet type bans to crates/client/clippy.toml?
 - Why it matters: §4.11 :380 says they join room's and client's clippy.toml; §5 U4e (:691) names only room's;
-  client/clippy.toml at df8975b holds the clock ban only (:1-8), and crates/client is U4e's lane.
+  client/clippy.toml at df8975b holds the clock ban only (:1-9), and crates/client is U4e's lane.
 - Options: (a) yes, in U4e; (b) no, a later unit.
 - Recommendation: (a): §4.11's text, U4e's lane, and the client hash depends on iteration order.
 
@@ -449,10 +449,15 @@ Hz" (catalogue :92)?
   test pins the limit at 30 and 60 Hz; (b) a constant added to npt-sim by carry 18's route.
 - Recommendation: (a), the F2 ruling's pattern for a rate value that is not a tick count.
 
-**U4E-Q10 (carry 24's -45 and -62 ids).** Does U4e add the -45 and -62 bite ids to `npt_client::BITES`?
-- Why it matters: carry 24 says `npt_client::BITES` "grows with U4e's other ids (... -45's, -62's)", but their sites
-  are `Interp`'s slot count and `CueLog` (§4.14 :450, :457), which U4g builds (plan :789-790); an id with no site is a
-  bite that cannot bite.
-- Options: (a) U4e adds only the ids whose sites it builds; -45's and -62's join in U4g, and U4e reports carry 24 as met
-  for its part; (b) U4e adds them now, with no site.
-- Recommendation: (a).
+**U4E-Q10 (carry 24's -45 and -62 ids, and -62's room site).** Does U4e add the -45 and -62 bite ids, and does it
+plant PM-0001-62/server-echo?
+- Why it matters: carry 24 says `npt_client::BITES` "grows with U4e's other ids (... -45's, -62's)", but the client
+  sites of those ids are `Interp`'s slot count and `CueLog` (§4.14 :450, :457), which U4g builds (plan :789-790); an
+  id with no site is a bite that cannot bite. -62/server-echo's site is the room sending the owner its own cosmetic
+  shot events (§4.14 :458; seam.rs:219-220: "never to the shooter's own client"), which is U4e's event routing, while
+  -62 moves in U4g (plan :794).
+- Options: (a) U4e adds only the ids whose sites it builds: it plants -62/server-echo in npt-room with a unit proof
+  ("one event sent"), and -45's and -62/cues-from-replay join npt-client in U4g; U4e reports carry 24 as met for its
+  part; (b) U4e plants none of -45's or -62's, and U4g plants server-echo in the room's code then; (c) U4e adds the
+  client ids now, with no site.
+- Recommendation: (a): each bite planted where its code lives (§4.14 :438), by the unit that builds that code.
