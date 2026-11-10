@@ -112,7 +112,10 @@ reset at 20:00):**
 - **U4b MERGED at 411eeee** (pushed): check.mjs all 10 steps, measured 286 = 275 + 11, bites 309 = 292 + 17, self 48;
   gate PASS --no-smoke. wip/u4b.patch was deleted in that commit.
 - **U4a MERGED at 952f734** (pushed; about 20:45 UTC): check.mjs all 10 steps, measured 311, bites 342, self 52;
-  gate PASS. wip/u4a.patch was deleted in that commit. CI was green on 411eeee (U4b).
+  gate PASS. wip/u4a.patch was deleted in that commit. CI was green on 411eeee (U4b) and on 952f734 (U4a).
+  - The merge checks' output file mixed two overlapping runs; both exited 0.
+  - **The clean evidence:** a fresh run on 17a8b2c (952f734 plus checkpoint notes only) passed all 10 steps: measured
+    311, bites 342, self 52 (scratchpad post-u4a-check-952f734.txt).
   - Housekeeping later, by the approved method (leftovers to a local branch, then a plain `git worktree remove`):
     `.gate/u4a-prefix`, `.gate/u4b-prefix`, `.gate/u4b-wt`, `.claude/worktrees/agent-a9297644e7c0354f3`.
   - **Next merges:** U4c after its round 2. U4d after its fix pass, then the main session's npt-proto half of S1 in
