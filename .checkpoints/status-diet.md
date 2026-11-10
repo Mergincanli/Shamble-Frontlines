@@ -10,10 +10,10 @@
 ## Steps done
 1. Facts gathered · 9e33794 · `.checkpoints/status-diet/facts.md`: line ranges and destinations, live PR and
    routine states, kit references, the LANE-RULES edit shape.
-2. Plan revision 1 · (this commit) · `.checkpoints/status-diet/plan-rev1.md`.
+2. Plan revision 1 · 2f9d467 · `.checkpoints/status-diet/plan-rev1.md`.
 
 ## Current step
-Plan revision 1 written (`.checkpoints/status-diet/plan-rev1.md`); next: the advisor's plan review.
+The advisor's plan review of revision 1 is running (background); the saver runs.
 
 ## Next steps
 1. Advisor plan review (advisor agent, Opus 5.5 high; its notes under .checkpoints/status-diet/advisor-plan-rev1.md).
@@ -30,4 +30,7 @@ Plan revision 1 written (`.checkpoints/status-diet/plan-rev1.md`); next: the adv
 - Split first from 2d22b69 (pure move, provable), then record #46 in a separate small commit · the session · 11-10.
 
 ## Running work
-- none (no agents running; no saver)
+- advisor plan review of rev 1 · background agent · notes `.checkpoints/status-diet/advisor-plan-rev1.md` · launched
+  17:33 Amsterdam · running. A restart re-runs it with the same prompt; it continues from its notes.
+- saver: background task bn2k4nf3e · output /tmp/claude-0/-home-user-Shamble-Frontlines/7c0a3d46-1eae-5891-9697-3fff27d4d074/tasks/bn2k4nf3e.output ·
+  started 17:32 · stops by 19:22 (110 minutes on) · last check 17:33: started
