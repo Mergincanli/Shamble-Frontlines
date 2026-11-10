@@ -78,3 +78,34 @@ Runner: scratchpad te-run.sh (round 1's: waits 8 s idle, logs df, touches, touch
   its random half would need a random 1,001-1,151 B buffer to decode as a strict, canonical, exactly-ending snapshot.
   So as_sent's None branch is, in practice, never taken: R2-L1 (rust-reviewer) has no reach today, and the asymmetric
   rule's guards are msg's a3 snapshot test (send half: the before-fix FAIL) and P2's two (receive half).
+- 16:00-16:02 UTC check.mjs, U4b copy, counted (log r2/check-u4b.log; idle 8 s first, df 12 G, toucher on): all 10
+  steps PASS; test: measured 286, bites 309, 0 failed, 0 skips (= 275 + 11, 292 + 17, as expected); self 48 of 48;
+  test step 102.1 s.
+- 16:02-16:05 UTC check.mjs, U4a copy, counted (log r2/check-u4a.log; another lane's `cargo test -p npt-l1` was
+  running first, the runner waited 19 s for idle; df 12 G): all 10 steps PASS; test: measured 300, bites 325, 0 failed,
+  0 skips (= the fixer's 296 + 4 and 321 + 4: 3 lib, 1 wire); self 52 of 52; doc "host and wasm32"; test step 128.2 s.
+  Neither count is off.
+- Step 6 done: U4a 126 of 126 files sha256 = start, file count 126 (none added); U4b 116 of 116 = start, count 116;
+  `git status --porcelain` of both = start. Left outside the copies: scratchpad r2/ (lists, diffs, logs, *.orig).
+
+## Closures (round-1 ids)
+- T-A1 (= N1, SEC-U4a-7, F-A3) CLOSED: send half failed before the fix (fixer's log), passes now; P1 shows the
+  full-state test is the only pin of a non-Snapshot send check; P2 shows the receive half has two guards (msg a3,
+  wire a3 at-the-limit). No defect added: Quant::encode truncates on every Err, the length prefix written before the
+  check is truncated away with it (msg.rs:308-322, :378-383).
+- T-A6 (= SEC-U4a-6, N6) CLOSED: decoder half failed before, encoder half PF2. New Low R2-T1 (the rule's other edge).
+- T-A7 (= F-A6) CLOSED for the guard's logic (PF4); the call site client_hash -> finish is held by reading only
+  (rust-reviewer's residual; not reopened).
+- SEC-U4a-3 CLOSED: Join half failed before; SessionControl half P3. Test bytes appear in no other printed field.
+- F-A8 nit (`let _ = i`) CLOSED (no test; a nit).
+- N2: text only, the main session's (catalogue §3 row and plan §4.4/§4.14 wording); not a test item.
+- T-B1 CLOSED: the main session's plant of the dropped "- 1" failed the new test by name; arithmetic re-read (at(3,30)
+  = 1e8 and at(3,60) = 5e7 exact, premise asserted at tests/schedule.rs:304); not re-planted.
+- T-B2 CLOSED: the equality is labelled documentation (tests/schedule.rs:294-295); it still cannot fail, and says so.
+- T-B3 CLOSED as raised (P5a: the new lines fail). New Low R2-T2 (P5b: a rate-derived cap survives).
+- Not reopened (follow-ups): T-A2..T-A5, T-A8, T-A9, T-B4; the rust-reviewer's R2-L1 (reach: none today, P4 note).
+
+## Verdicts (round 2)
+- U4a: APPROVE WITH FINDINGS (R2-T1 Low; R2-L1 Low is the rust-reviewer's).
+- U4b: APPROVE WITH FINDINGS (R2-T2 Low).
+DONE 16:07 UTC.
