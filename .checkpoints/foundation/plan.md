@@ -53,6 +53,33 @@ Checked by full read, nothing to change: `.claude/CHECKPOINTS.md`, `NIGHT_SHIFT.
 
 <!-- PART-2.1-INVENTORY-CODE-DOCS -->
 
+### 1.7 Reviewers (the final diff; one round, one fix pass; 3 at a time)
+The advisor (plan, then every pushed head) and security-auditor (every risk-tier-2 change) always; test-engineer (is
+the move proven: E1-E6); infra-engineer (CI and the gate's behaviour on old bases); then the verifier until PASS.
+No art-director: nothing a player sees changes (bytes unchanged), and Mustafa's Brave check covers it.
+
+### 1.8 What Mustafa checks in Brave (ADR 0002's foundation checklist, step 1)
+1. Before: if E5 says saves do not carry over, open the editor in your current copy, Maps, and for each map you want,
+   Export, then Copy and save the text (`editor.html:1058`, one map at a time; there is no import button, so your old
+   copy keeps working as the way back to them). If E5 says they carry over, skip this.
+2. Download the branch as a zip, unzip it to a new folder, double-click `legacy/index.html`. Expected: the menu opens;
+   Deploy starts a match; you can move, shoot and pause, as before.
+3. Double-click `legacy/editor.html`. Expected: the editor's menu opens; Map editor and Maps open, and your saved maps
+   are listed (or, if E5 said they do not carry over, the list is empty and nothing is lost: your old copy still has
+   them).
+4. Say "done" or "not yet" for each step.
+
+### 1.9 Risks
+- **A tool or command missed by the grep** → the dry run (step 1) and E6 run every changed command once; the critic's
+  sweep (`inv-critic.md`) looked for names built at run time, globs and relative paths.
+- **The gate reads the wrong copy** (a stray root copy beside `legacy/`) → the head reads `legacy/` only; optional:
+  the gate fails when a root copy of any of the five reappears (a proposal for the advisor, Q-A5's neighbour).
+- **Old bases break the gate** (a PR cut before the move, or 8e58937's CS-1 layout) → the base fallback chain and E3's
+  three bases.
+- **Saves seem lost in Brave** → E5 before the check; the old folder keeps its storage; nothing is deleted.
+- **Collisions** → Part 4: no file of PR #46's current list, no `spikes/` file, no PM row of ADR 0001, 0004 or 0006.
+- **The PR Advisor routine is paused** until #46 merges → 2.1 is `needs-mustafa` anyway and merges on his go.
+
 ### 1.5 Evidence (it must not lean on the edited gate)
 advisor.md:90-91 and :153-156: CI's green does not stand when a gate file changes; advisor.md:150-152: a day-session
 advisor reproduces with main's copy of a changed tool, and main's `gate.mjs` reads the five files at the root, so it
