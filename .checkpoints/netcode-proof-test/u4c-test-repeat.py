@@ -1,8 +1,8 @@
-# U4c test-engineer review: repeat one cargo test command N times in the U4c copy under plan §7.1 (wait for 20 s with
-# no cargo/rustc, touch every file under crates/ before and every 2 s during each run, record any other copy's
-# cargo/rustc seen during it), to root-cause a test that failed once. Prints each run's result lines, failing tests
-# and the lines after each panic; full output to u4c-review-test/repeat-<label>-<i>.log.
-# Run: python3 -I <this> <worktree> <label> <n> <cargo args...>
+# U4c test-engineer review: repeat one cargo test command N times in the U4c copy under plan §7.1 (wait until no
+# cargo/rustc has run for QUIET seconds, touch every file under crates/ before and every 2 s during each run, record
+# any other copy's cargo/rustc seen during it), to root-cause a test that failed once. Prints each run's result lines,
+# failing tests and the lines after each panic; full output to u4c-review-test/repeat-<label>-<i>.log.
+# Run: python3 -I -u <this> <worktree> <label> <n> <quiet seconds> <cargo args...>
 import os
 import pathlib
 import re
@@ -14,7 +14,8 @@ import time
 WT = pathlib.Path(sys.argv[1]).resolve()
 LABEL = sys.argv[2]
 N = int(sys.argv[3])
-ARGS = sys.argv[4:]
+QUIET = float(sys.argv[4])
+ARGS = sys.argv[5:]
 SPIKE = WT / "spikes/netcode-proof"
 CRATES = SPIKE / "crates"
 LOGS = pathlib.Path("/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u4c-review-test")
@@ -64,11 +65,11 @@ def wait_idle():
             quiet = None
         elif quiet is None:
             quiet = time.time()
-        if quiet is not None and time.time() - quiet >= 20:
+        if quiet is not None and time.time() - quiet >= QUIET:
             return time.time() - t0
-        if time.time() - t0 > 540:
-            sys.exit("ABORT: other cargo kept running for 9 minutes")
-        time.sleep(2)
+        if time.time() - t0 > 3000:
+            sys.exit("ABORT: other cargo kept running for 50 minutes")
+        time.sleep(1)
 
 
 LOGS.mkdir(exist_ok=True)

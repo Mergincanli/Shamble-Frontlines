@@ -11,7 +11,8 @@ exact-match replace with occurrence count, a stderr marker in L1Net::new as the 
 build ran, wait for no foreign cargo/rustc, touch before and every 2 s, run `cargo test --locked -p npt-l1
 --no-fail-fast [--features bites] -- --nocapture`, restore the bytes, sha256 check; logs in u4c-review-test/<name>.log;
 backups of the three files in the session scratchpad). Precedent: u4s-bites.py, u3d-test-bites.py. Never sed,
-redirects, heredocs or python3 -c.
+redirects, heredocs or python3 -c. Counted check.mjs runs: u4c-test-check.py (20 s of no cargo first, touch loop,
+foreign processes recorded). Flake repeats: u4c-test-repeat.py.
 
 ## Plan
 1. sha256 of the three changed files (and every file under crates/l1) before anything; compare with the builder's.
@@ -97,4 +98,14 @@ redirects, heredocs or python3 -c.
   entries of 3,959,634 / 3,979,629 / 3,899,978). Pins: 0xadfbebe4bb1abf64, 0x43749a62922e9b35, 0x246e7a241a2a0a18 =
   tests/l1.rs. 3 s per probe run. Not re-derived on the OLD code by me (provenance: builder notes 18:20Z item 1).
   Scratch files' sha256 unchanged by the run (main.rs f0cc015d, Cargo.toml 954ed45f, Cargo.lock 0f305fab).
-- Next: final check.mjs (step 4), final sha256 vs u4c-sha-before.txt, findings.
+- 10:47-10:49Z check.mjs R2: all 10 PASS, 285 / 312, but another lane's `cargo test -p npt-sim --test te_probe` was
+  running at its start (my pgrep showed it; the command did not wait): NOT counted.
+- 10:50:55-10:52:03Z check.mjs R3 (u4c-test-check.py: 68 s wait for 20 s idle; touch loop; no foreign cargo/rustc
+  seen during it; df 12 GB): test step FAILED: measured build `-p npt-net --lib`: "159 passed; 1 failed; 12
+  ignored" (the failing test's name fell outside check.mjs's 40-line tail, check.mjs:1529); 9 other steps PASS.
+  npt-net uses only npt-l1's Profile and ReorderStep (net/Cargo.toml:19-20; src/l2/*, tcp_model.rs:72), both
+  unchanged by U4c (base lib.rs:75-160 = new); npt-net has wall-clock L2 tests (l2/socket_tests.rs, delay_tests.rs,
+  wt_tests.rs, delay_clock.rs). -> a pre-existing flake candidate, not U4c's; root-causing by repeats.
+- 10:53-10:54Z repeat net 1/6 of `-p npt-net --lib`: 160 passed 0 failed (27.25 s); repeats 2-6 aborted (other lanes'
+  cargo never quiet for 20 s in 9 min). 11:05Z relaunched (label net2, 5 runs, 3 s quiet) in the background.
+- Next: net2 results; a counted final check.mjs (step 4); final sha256 vs u4c-sha-before.txt; findings.
