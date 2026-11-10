@@ -167,16 +167,11 @@ reset at 20:00):**
    - the U4e brief's 9 questions (`git show 0dccbf0:.checkpoints/npt-u4e-brief/u4e-brief-draft.md`).
    - The brief itself goes to the advisor after wave 1 merges, with its 28-row recheck done.
 
-**Open questions for Mustafa**
-- **NETEM-BAR** (the advisor's, 2026-11-10; blocks nothing before R1): when netem wins under TCP-FREEZE, does WS-BAR's
-  "never looser than the model ... beyond 10 %, investigate first and never loosen" still cap the WebSocket bar?
-  - (a) it stays capped, and a failure is reported as the kernel's, with the netem numbers, to Mustafa;
-  - (b) netem's practice run sets the numbers (this changes WS-BAR);
-  - (c) decide at R1.
-  - The advisor recommends (a).
-- **NS-START (a), his edit:** the night-shift routine back to `CRON_TZ=Europe/Amsterdam 10 0-7 * * *` at
-  https://claude.ai/code/routines/trig_01QpV6y6UaG1Na2q3jumRDxh. Agents cannot edit it: it was created through the
-  API. Nothing else is open.
+**Open questions for Mustafa:** none.
+- **Answered 2026-11-10 about 20:40 UTC** (history.md, "Decisions taken"):
+  - NETEM-BAR (a): the bar stays capped as WS-BAR says; a WebSocket row that fails because the kernel is slower than
+    the model is reported to him as the kernel's, with the netem numbers, and he decides.
+  - NS-START: he sets the routine to `10 0-7 * * *` himself tonight.
 
 **Rules in force** (his words, verbatim, in history.md's "Decisions taken" unless marked)
 - **Mustafa, 2026-11-10** (history.md, "Decisions taken": his seven points and his "A"):

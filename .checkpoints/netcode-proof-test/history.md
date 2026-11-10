@@ -278,6 +278,12 @@ checkpoint's resume card is the handoff; open this file only when a step needs t
     R1 still waits for stop B.
 
 ## Decisions taken
+- **Mustafa, 2026-11-10 about 20:40 UTC (verbatim):** "NETEM-BAR (may the WebSocket pass bar loosen when real Linux
+  disagrees with the model): (a). The bar stays capped as WS-BAR says. If a WebSocket row fails because the kernel is
+  slower than the model, report it to me as the kernel's, with the netem numbers, and I decide." And: "The night
+  shift: I am setting it to CRON_TZ=Europe/Amsterdam 10 0-7 * * * myself tonight."
+  - The U8 row's TCP-FREEZE text (W1-PLAN) takes NETEM-BAR (a) at the next plan edit.
+  - NS-START: his edit, so nothing is left for the session.
 - **Mustafa, 2026-11-10 about 06:45 UTC (verbatim): "A"**, to the two open questions, both of whose recommendations
   were (a). Read as both:
   - **SQUASH-CITES (a):** PR #40 squashes; the closing commit re-points the four citations (bf9d248, 975e72b, 95a04a1,
