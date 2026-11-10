@@ -1,16 +1,18 @@
 # U4c test-engineer review: try to reproduce check.mjs run R3's one npt-net lib failure (name lost) under CPU
 # contention. Builds the npt-net lib test binary in the U4c copy under plan §7.1 (wait for no cargo/rustc/rustdoc,
 # touch every file under crates/ before and every 2 s during the build), takes its path from cargo's
-# "Executable unittests" line, records its sha256, then runs ROUNDS rounds of K copies of that binary at once (no
-# cargo involved), pinned with taskset to the CPU list CPUS (so the contention stays on those CPUs and other lanes'
-# runs keep the rest), naming every failing test and the lines after each panic. The binary's sha256 is checked after
-# every round (a change means another copy's build replaced it: that round is void). Any cargo/rustc/rustdoc seen
+# "Executable unittests" line and copies it at once to .gate/u4c-review-test/ (the shared target's file has one name
+# for every copy, so another copy's build replaces it: seen at 15:30Z). The copy must name this worktree in its debug
+# info and no other worktree (else ABORT: not this copy's build). Then ROUNDS rounds of K copies of that binary at
+# once (no cargo involved), pinned with taskset to the CPU list CPUS (so the contention stays on those CPUs and other
+# lanes' runs keep the rest), naming every failing test and the lines after each panic. Any cargo/rustc/rustdoc seen
 # during a round is recorded. Full outputs: u4c-review-test/load-<label>-<round>-<copy>.log.
 # Run: python3 -I -u <this> <worktree> <label> <rounds> <k> <cpus, e.g. 0 or 0,1>
 import hashlib
 import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 import threading
@@ -24,6 +26,7 @@ CPUS = sys.argv[5]
 SPIKE = WT / "spikes/netcode-proof"
 CRATES = SPIKE / "crates"
 LOGS = pathlib.Path("/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u4c-review-test")
+BIN_DIR = pathlib.Path("/home/user/Shamble-Frontlines/.gate/u4c-review-test")
 ENV = {
     **os.environ,
     "CARGO_TARGET_DIR": "/home/user/Shamble-Frontlines/.gate/shared-target",
@@ -82,6 +85,7 @@ def sha(p):
 
 
 LOGS.mkdir(exist_ok=True)
+BIN_DIR.mkdir(parents=True, exist_ok=True)
 waited = wait_idle()
 touch_all()
 build = subprocess.Popen(["cargo", "test", "--locked", "-p", "npt-net", "--lib", "--no-run"], cwd=SPIKE, env=ENV,
@@ -105,14 +109,21 @@ bout, _ = build.communicate()
 stop.set()
 th.join()
 m = re.search(r"Executable unittests src/lib\.rs \((\S+)\)", bout)
-compiled = [l.strip() for l in bout.splitlines() if l.strip().startswith("Compiling")]
+compiled = [l.strip().split(" (")[0] for l in bout.splitlines() if l.strip().startswith("Compiling")]
 print(f"build [waited {waited:.0f} s] exit {build.returncode}; compiled: {compiled}; foreign: {sorted(foreign) or 'none'}")
 if not m or build.returncode != 0:
     print(bout[-3000:])
     sys.exit("ABORT: no test binary")
-binary = m.group(1)
+binary = BIN_DIR / "npt_net-lib-test"
+shutil.copyfile(m.group(1), binary)
+os.chmod(binary, 0o755)
+data = binary.read_bytes()
+trees = sorted(set(re.findall(rb"/home/user/Shamble-Frontlines/\.claude/worktrees/[A-Za-z0-9_-]+", data)))
+mine = str(WT).encode()
+if trees != [mine]:
+    sys.exit(f"ABORT: the binary names {trees}, not only this worktree: another copy's build")
 h0 = sha(binary)
-print(f"binary {binary} sha256 {h0}")
+print(f"binary copied from {m.group(1)} to {binary}; sha256 {h0}; worktrees named in it: {[t.decode() for t in trees]}")
 for r in range(1, ROUNDS + 1):
     foreign = set()
     stop = threading.Event()
@@ -120,16 +131,15 @@ for r in range(1, ROUNDS + 1):
     load = open("/proc/loadavg").read().split()[:3]
     t0 = time.time()
     start = time.strftime("%H:%M:%SZ", time.gmtime())
-    ps = [subprocess.Popen(["taskset", "-c", CPUS, binary], cwd=CRATES / "net", stdout=subprocess.PIPE,
+    ps = [subprocess.Popen(["taskset", "-c", CPUS, str(binary)], cwd=CRATES / "net", stdout=subprocess.PIPE,
                            stderr=subprocess.STDOUT, text=True) for _ in range(K)]
     th.start()
     outs = [p.communicate()[0] for p in ps]
     stop.set()
     th.join()
     secs = time.time() - t0
-    h1 = sha(binary)
-    print(f"== {LABEL} round {r}/{ROUNDS} x{K} on CPUs {CPUS} [{start}, {secs:.1f} s, load before {load}] binary "
-          f"{'same' if h1 == h0 else 'CHANGED: VOID'}; foreign cargo/rustc: {sorted(foreign) or 'none'}")
+    print(f"== {LABEL} round {r}/{ROUNDS} x{K} on CPUs {CPUS} [{start}, {secs:.1f} s, load before {load}]; binary "
+          f"{'same' if sha(binary) == h0 else 'CHANGED'}; foreign cargo/rustc: {len(foreign)} kinds")
     for i, (p, out) in enumerate(zip(ps, outs), 1):
         (LOGS / f"load-{LABEL}-{r}-{i}.log").write_text(out)
         res = [l.strip() for l in out.splitlines() if l.strip().startswith("test result:")]
@@ -141,5 +151,3 @@ for r in range(1, ROUNDS + 1):
                 print(f"     {l.strip()[:220]}")
                 for k in lines[j + 1:j + 4]:
                     print(f"       {k.strip()[:260]}")
-    if h1 != h0:
-        break

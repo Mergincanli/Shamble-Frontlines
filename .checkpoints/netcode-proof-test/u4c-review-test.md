@@ -12,7 +12,8 @@ build ran, wait for no foreign cargo/rustc, touch before and every 2 s, run `car
 --no-fail-fast [--features bites] -- --nocapture`, restore the bytes, sha256 check; logs in u4c-review-test/<name>.log;
 backups of the three files in the session scratchpad). Precedent: u4s-bites.py, u3d-test-bites.py. Never sed,
 redirects, heredocs or python3 -c. Counted check.mjs runs: u4c-test-check.py (20 s of no cargo first, touch loop,
-foreign processes recorded). Flake repeats: u4c-test-repeat.py.
+foreign processes recorded). Flake repeats: u4c-test-repeat.py; under contention: u4c-test-load.py. More plants
+(resumed run): u4c-test-plant2.py (loads u4c-test-plant.py by path, adds to its PLANTS).
 
 ## Plan
 1. sha256 of the three changed files (and every file under crates/l1) before anything; compare with the builder's.
@@ -113,6 +114,15 @@ foreign processes recorded). Flake repeats: u4c-test-repeat.py.
 - (usage-limit cut 11:07Z to 15:20Z; the container restarted at about 15:17Z: PID 1 3 min old at 15:20Z.)
 - 15:20Z RESUMED. sha256 -c of all 158 spike files vs u4c-sha-before.txt: ALL MATCH; git status = the build's 3
   files + builder notes; HEAD 097f897. No cargo/rustc running; load 0.50; 4 CPUs; df 12 GB free; shared target 4.6 GB.
-- Next: (a) reproduce the npt-net flake under CPU contention (the test binary run directly, K copies at once, its sha256
-  before/after, no cargo running) to name the test; (b) the final counted check.mjs (step 4); (c) final sha256;
-  (d) findings + verdict.
+- 15:28:57Z load cpu1 round 1 (u4c-test-load.py, my npt-net lib binary sha256 ea5bbd1a..., taskset -c 0, all 4 test
+  threads on one CPU): 160 passed 0 failed in 111.7 s (4.1x the quiet 27 s), so CPU starvation alone does not make
+  npt-net fail. But the shared target's npt_net-088534cbcaf56b90 CHANGED during the round (the round VOID by the
+  script's rule): at 15:31Z that file named only /home/user/Shamble-Frontlines/.claude/worktrees/agent-a9297644e7c0354f3
+  in its debug info (sha256 45aac531...), not this copy. So the same artifact name serves every copy and another
+  copy's build replaces this copy's test binary in place: the collision mechanism plan §7.1 guards against, witnessed
+  on the very binary R3 ran. It stays the leading candidate for R3 (the builder's runs A-D and G failed the same way),
+  though R3's 2 s sampling saw no foreign cargo. The script now copies the binary to .gate/u4c-review-test/ at once and
+  checks its debug info names only this worktree (ok: ea5bbd1a..., reproducible).
+- 15:32Z load cpu1k2 (2 copies at once on CPU 0, 3 rounds) running in the background.
+- Next: cpu1k2 results; plants plant2 (max-ack-delay-0, initial-rtt-300, granularity-0, max-packet-1100,
+  max-packet-1500, var-from-new-smoothed); the final counted check.mjs (step 4); final sha256; findings + verdict.
