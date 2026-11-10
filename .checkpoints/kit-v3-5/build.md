@@ -67,3 +67,19 @@ answers (b), C4's lines, rows and mutant come out before the writes.
   under the table; 7 added lines).
 - SHA-256 of the four files to apply: `kb7/SHA256SUMS` (guard 6507f795..., tests 240ea071..., advisor.md 9eb2b3ba...,
   CLAUDE.md a7c1f741...).
+
+## The fix pass after the review round (the scratchpad's `kb8/`, applied as 08423ce, 2026-11-10)
+- The advisor's ruling (`advisor-fix-pass.md`, e621d45): fix now TE1-TE4 (Medium) with V1, V2, TE5, TE7 riding, in the
+  test file; SA5-2 and SA5-1 riding, in the guard; SA5-4 riding, in advisor.md; the docs Lows ride the report's push;
+  no second round; the verifier re-checks what changed; PX1-ROUTE to Mustafa.
+- Tests: 21 new rows (the places' edges, the ten decision docs and `docs/ADR/`, agent memory, a docs-then-rules @tsv
+  list, an empty list, a nameless line, two night shrinkwrap rows) and 6 mutants; the fake gh answers the file list
+  only for the guard's exact read.
+- Red (the new tests on the 9bacf47 guard): the 4 rows whose code changed fail (2 night shrinkwrap, the empty list, the
+  nameless line), 7 of 1107 tests in all; the test-only rows pass there.
+- Green: routine-guard 1107/1107, no surviving mutant (first run); settings 127/127, checkpoint 27/27; gate PASS,
+  symbols +0 −0; repo map OK. Hashes in `kb8/SHA256SUMS` (guard bb680283..., tests bfd12367..., advisor.md da27814e...).
+- The docs Lows (this commit): STATUS:145's register lines (V3, checked against the register: 104, 105, 123, 161, 184);
+  the foundation limit's full E4 wording (V6); the write-side severities W1, W2 Medium, W3 Low; the Windows reserved
+  names limit (SA5-3); ENGINE_OVERVIEW's line (SA5-5); PX-1's follow-up; the "next" lines. STATUS:710 left at its
+  length (a quote of his); ROADMAP:110 is 120 characters (the verifier counted bytes: a "−" sign is three).

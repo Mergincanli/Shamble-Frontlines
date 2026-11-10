@@ -25,6 +25,14 @@ The rules text:
 | 12 | advisor.md, step 2's gate-file list | `package*.json`, any `.npmrc` | adds `npm-shrinkwrap.json` | stricter | E1 |
 | 13 | advisor.md, step 6 (APPROVE + needs-mustafa) | "merge the PR if every check is green" | adds "(if the guard's allow-list admits it; otherwise say it merges from a day session)" | same | Describes the guard's refusal; gives no seat a new power |
 | 14 | CLAUDE.md:64, the guard's protected files | "`.claude/` except agent memory, every `CLAUDE.md`, `.github/`, `tools/gate.mjs` and the other gate files" | adds "`CLAUDE.local.md` and `AGENTS.md`" | stricter | Part A (row 4) |
-| 15 | CLAUDE.md, risk-tier row 0 | "docs with no word or decision of Mustafa's; not ADRs, the register, design or look docs" | "docs that add or change no word or decision of Mustafa's; ...; not a `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `.claude/` folder, agent memory or other gitignored path, or a file renamed or moved from outside tier 0" | stricter | F4-RIDE (the advisor), revision 2's text |
+| 15 | CLAUDE.md, risk-tier row 0 | "docs with no word or decision of Mustafa's; not ADRs, the register, design or look docs" | "docs that add or change no word or decision of Mustafa's; ...; not a `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `.claude/` folder, agent memory or other gitignored path, or a file renamed or moved from outside tier 0" | stricter | F4-RIDE (the advisor), revision 2's text. Read alone, the first clause ("that add or change") is narrower than "with no"; advisor.md's tier 0 governs (CLAUDE.md points there) and still says a doc that records his words or decisions is not tier 0, so nothing is loosened in effect (the verifier's V5) |
 | 16 | CLAUDE.md, risk-tier row 1, Merges | "`ready`: the PR Advisor; else his go" | adds "(outside the guard's allow-list: from a day session)" | stricter | E3 |
 | 17 | CLAUDE.md, under the tier table | (none) | "Steps 4 and 5 apply at every tier; decision docs always need his go." | same | Restates advisor.md's steps 4 and 5 and its decision-doc rule (F4) |
+
+The fix pass after the review round (08423ce, the advisor's ruling):
+
+| # | File and place | Before (9bacf47) | After (08423ce) | Verdict | Why |
+|---|---|---|---|---|---|
+| 18 | routine-guard.mjs, the PR Advisor's file list | `changed_files` 0 and a line with no name went on | refused: `cf < 1`, and any line whose first field is empty | stricter | SA5-2 = TE6 |
+| 19 | routine-guard.mjs, the night install | compares `tools/package.json` and `tools/package-lock.json` with main's | also `tools/npm-shrinkwrap.json`, and refuses an untracked one | stricter | SA5-1 |
+| 20 | advisor.md, tier 2's bracket | "never a rules, gate or decision-doc name in any letter case ... so still read the `--no-renames` list yourself" | "never a rules or decision-doc name in any letter case, and never a gate file's name under `tools/`"; names what it lets through (symlinks, case-only twins, gitignored and Windows reserved names); "read `git diff --raw --no-renames origin/main...<headSHA>` yourself" | same or stricter | SA5-4; the guard is unchanged by it, and the text states its reach exactly |
