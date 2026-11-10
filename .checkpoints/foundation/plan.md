@@ -194,9 +194,10 @@ either layout (0002:1358), so the path counts decide:
   byte-identical.
 
 ### 1.5 Evidence (it must not lean on the edited gate)
-advisor.md:90-91 and :153-156: CI's green does not stand when a gate file changes; advisor.md:150-152: a day-session
-advisor reproduces with main's copy of a changed tool, and main's `gate.mjs` reads the five files at the root, so it
-cannot read 2.1's head. So the proof comes in three independent parts, each a command whose output goes into the report:
+advisor.md:90-91 and :153-156: CI's green does not stand when a gate file changes. A day-session advisor runs the PR
+head's own gate in a worktree (advisor.md:149-150), but for a PR that edits the gate that run is not independent: the
+judge is the thing under change. So the proof comes in parts that do not trust the edited gate, each a command whose
+output goes into the report:
 - **E1, the bytes did not change.** `git diff --find-renames=100% --name-status <base> HEAD` lists exactly five `R100`
   rows for the five files, and `git rev-parse <base>:<f>` equals `git rev-parse HEAD:legacy/<f>` for each (same blob).
 - **E2, main's untouched gate passes on those bytes.** In a throwaway worktree of 2.1's head under `.gate/`, main's
@@ -229,7 +230,8 @@ cannot read 2.1's head. So the proof comes in three independent parts, each a co
   page at `<site>/index.html` writes a KVStore key (asserting `KVStore.backend === 'localStorage'`); after a relaunch,
   the same page reads it back (the control: else the test proves nothing); then `<site>/editor.html` (same folder),
   `<site>/legacy/index.html`, `<site>/legacy/editor.html` and an unrelated folder read it. Recorded: shared, per folder,
-  or per file. UNKNOWN until run; headless Chromium on Linux is not Brave on Windows, so Mustafa's backup (1.8) stays
+  or per file. UNKNOWN until run (CS-1's earlier move left the same question untested: `docs/reports/
+  2026-10-13-repo-root.md:55`); headless Chromium on Linux is not Brave on Windows, so Mustafa's backup (1.8) stays
   whatever it says.
 - **E6, the smoke and the commands.** The full gate with smoke on the head (5a: both pages); every command the edit list
   changes, run once as written (`preview.js legacy shot`, `pageshot.js legacy index.html`, `village.py` with no
@@ -440,9 +442,12 @@ What 2.1 changes for it, and what #40 must do once 2.1 is on main:
   #46; (c) leave it until a later kit pass. Recommended: (a), since 2.1 already opens CLAUDE.md in a kit sitting.
 
 ### For the advisor agent (readings and choices it may make)
-- **Q-A1, PM-0002-36's reading.** E4 (dumps at `.` and `legacy` byte-identical, then R7's builder reproduces
-  `docs/legacy-tuning.json` and `docs/LEGACY_TUNING.md` byte for byte) against the mark's words ("reproduces
-  `docs/legacy-tuning.json` byte for byte", with a command that lacks `--pre`).
+- **Q-A1, PM-0002-36's reading.** As written the mark cannot pass: `docs/legacy-tuning.json` is R7's builder's output,
+  not the dump's, and without `--pre=tools/tuning-dump.js` the eval returns no table (tuning-dump.js:3-5; ADR
+  0002:1288, :1429-1430; r5:1245). E4 (dumps at `.` and `legacy` byte-identical, then R7's builder reproduces both
+  tuning files byte for byte) is an equivalent, not the mark. Asked: accept E4 as the mark's reading for 2.1b, with the
+  mark's wording corrected in ADR 0002 (a decision doc: his go) in 2.1b's docs pass, or recorded in the register until
+  the drafts' next revision.
 - **Q-A2, OQ-0002-2's three parts** (its decider: "the phase 1 restructure plan (the main session with docs-keeper)"):
   the legacy tools: (a), stay in `tools/`; the legacy docs (row KT21): 1.4; the gate v2's script: deferred to 2.3's
   plan, which must also teach the guard the gate v2's files.
