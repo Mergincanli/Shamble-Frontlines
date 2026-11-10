@@ -5,10 +5,4 @@
 mod tests {
     #[test]
     fn stub_builds() {}
-
-    // Planted failure M1a (reverted in the next commit): a test that needs the network must fail inside the cut.
-    #[test]
-    fn planted_network_use() {
-        std::net::TcpStream::connect(("github.com", 443)).expect("planted M1a: this test needs the network");
-    }
 }
