@@ -34,8 +34,15 @@
    wording (STATUS:1009) folded into 2.1a; the rules' globs vs a v2 `index.html` (2.2 note); the wrong saves claim
    (CS-1 never tested it) and battery.js (no edit) corrected.
 
+5. Advisor tool before committing to the plan (go, with six fixes): judge pinned to OLD = 44446a5; E8 rehearses
+   `git revert -m 1` of a local merge, with the gate and `--smoke-only`; his 2026-11-10 decision recorded on main by
+   2.1a (STATUS, pointers in ADR 0002 step 1, SPIKE_PLAN order and Depends on, STATUS Next); the hand-over (branch,
+   plan location across 2.1a and 2.1b); SPLIT as his decision; HC-PATH and SCOPE with advisor.md:313's consequence
+   (HC-PATH now recommends leaving :46 untouched; SCOPE needs ADR 0002 part 1 accepted, before 2.2). Also Appendix A
+   (all 63 paths, script-generated), Appendix B (2.2's coexistence rules). Plan revision 2 at 8bbebfa.
+
 ## Current step
-5. Consult the advisor tool before committing to the plan; then the advisor agent's plan review.
+6. The advisor agent's plan review of revision 2 (8bbebfa), running; notes `.checkpoints/foundation/advisor-plan-rev2.md`.
 
 ## Next steps
 3. Plan draft `.checkpoints/foundation/plan.md`; the `advisor` agent's plan review; fix; advisor tool before done.
@@ -88,4 +95,5 @@
 - Workflow wf_92d477b2-b78 (task wbpbds2b5) · script copy `.checkpoints/foundation/inventory-run1.js` · no args ·
   notes `.checkpoints/foundation/inv-{code,kit,docs,critic}.md` · launched 07:31 Amsterdam · done (4 of 4 returned).
 - Saver: background task bsmtuh7qm · output `/tmp/claude-0/-home-user-Shamble-Frontlines/cf54bb72-a605-502c-af5b-b590dcc1cda7/tasks/bsmtuh7qm.output`
-  · started 07:31 · stops by 09:21 · last check 07:32: started.
+  · started 07:31 · stops by 09:21 · last check 08:47: ok (saved and pushed at 07:41, 07:51, 08:11).
+- The advisor agent's plan review of revision 2 (8bbebfa), launched 08:46 Amsterdam, running (Opus 5.5, xhigh).
