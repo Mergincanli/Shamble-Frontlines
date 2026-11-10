@@ -47,3 +47,24 @@ Memory: none found (memory: local, no folder).
   :1645-1647; hash.rs:8-9) while write_state's doc says "every field that decides a later tick"; condition 1's words
   "never what the client claimed": the build keeps the claim (outside the hash). Meets the intent (twin equal);
   a reading -> state it to the advisor; doc the exception.
+- Other lanes: no reference to non_finite, `HitVolumes {`, `TickInput {` outside crates/sim in U4a's, U4c's, U4b's
+  worktrees or the main folder (grep). The builder's main-folder slip (u4d-build.md:112-119) wrote only that folder's
+  gitignored cache; rust reviewer saw main git status clean of source.
+- FINDING D (low): two tick owners (TickInput::tick label vs World::next_tick, seam.rs:112-113; world.rs:1806); ring
+  keyed by world ticks, Rewinds by the room's; nothing checks agreement; carry 15 test pins the label is ignored
+  (tests/world.rs:1377-1403). Fix: room-side debug assert (U4e carry) + Replayer refuses non-consecutive labels.
+- FINDING E (low): dump() builds a fresh StateDump (words + names) per call (world.rs:738-742, replay.rs:618-620);
+  hash.rs:63-64 points at npt-hash-wasm's per-word `dump_word`: per-word dump = O(n^2) across the Wasm boundary.
+  Carry to U4d2: dump once per mismatching tick, export from the held dump.
+- FINDING F (nit): SimRng narrower than plan.md §4.7 (rng.rs:12 documented) -> list in report; Recording at two
+  paths (lib.rs:17 + :28); Greybox::dm_tri pub (greybox.rs:83) = second route to the static graph beside
+  World::greybox (world.rs:728); Recording::synthetic in library (replay.rs:351) vs "test support" (§5 U4d, §4.15):
+  OK for U4d2's regeneration, say so. Builder's "for the advisor" list overstates: Greybox, Areas, Portals,
+  StandIns, trajectory_at named at plan.md:582-585; Placement/AttributeChange/Attribute/VolumeBox/FieldDiff/Ray/
+  RayHit/replay::Step are plain-data types of named items.
+- Concur: netcode H1 (part world transforms) is fixable inside the freeze (same fields, parent-relative values) and
+  then makes A's one-home records->volumes function more needed. Netcode/rust M2 = my C (ownership angle only).
+- Verdict draft: APPROVE WITH FINDINGS (seam kept; A, B routed as carries; C-F small).
+- Final: APPROVE WITH FINDINGS. 2 medium (A volumes-from-records home; B own-state reset and FIELDS full), 3 low
+  (C claimed ownership, D two tick owners, E dump per word), 1 nit group (F). Read only; nothing built or run.
+DONE (2026-11-10)

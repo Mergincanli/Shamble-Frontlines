@@ -33,3 +33,38 @@ Run helper: scratchpad te-run.sh (waits 8 s idle, df, touches, toucher every 2 s
 - 10:20 UTC U4b: my first plant (last_due without "- 1") was NOT applied (the Edit call failed); the run that followed
   was therefore a clean bites-build run: 16 passed, 0 failed (matches u4b-build.md's 16). sha256 of all four U4b
   files re-checked: unchanged. Not counted as a plant.
+- 10:23 UTC probe crate .gate/te-probe (Cargo.toml with an empty [workspace], path deps on U4a's proto, sim, link;
+  src/main.rs prints measurements; shared target, offline, U4a's crates touched before and every 2 s): log scratchpad
+  te-probe-1.log, exit 0. Results:
+  - N1 CONFIRMED by run: 49 soldier Adds encode to 1,016 B, `encode` Ok, above Limits::SNAPSHOT (1,000 B, the send
+    cap); the largest encode Ok is 55 soldiers, 1,138 B; 56 is TooLarge (the 1,150 B receive limit). The client
+    decodes the 1,016 B datagram. msg.rs:219-231 (content_limit) used by encode_into msg.rs:343.
+  - SEC-2 CONFIRMED: an Effect Add in `entities` encodes (22 B) and decodes; a Vehicle Add in `own` encodes (30 B)
+    and decodes. GROUPS rows listing Soldier: own state (Owner) and remote soldiers (Spatial).
+  - S1 MEASURED: the Soldier layout is 126 bits of fields, [16,16,12,16,10,16,16,16,8], three of them grid::VELOCITY
+    (48 bits); one soldier Add costs 20 B in `entities`, so every remote soldier carries velocity today.
+  - SEC-6/N6 CONFIRMED: Input {ack_tick 5, ack_groups 0} decodes and round-trips, as does {0, 0}: two values that
+    both mean "no snapshot decoded" (input.rs:24, :198-199). Semantic, not byte, non-canonicality (a2's re-encode
+    rule cannot see it).
+  - SEC-5 MEASURED: with the prefix kept (a2's prefix half, wire.rs:180-189), every cut of every stream type and of
+    RoomControl is BadLength or Truncated inside the framing: FullState 55 BadLength + 5 Truncated, Join 66 + 3,
+    JoinAccepted 77 + 3, SessionControl(RecordStep, 40 B note) 61 + 3, SessionStatus 13 + 3, RoomControl 21 + 2, the
+    small ones alike; no cut reaches a body. With the prefix rewritten to the cut, every cut reaches the body and is
+    Truncated (and none panics). So a2's prefix half proves only the length check for 12 of 16 types (11 stream types
+    + RoomControl); bodies' truncation is reached only by a2's random half (half its buffers carry a matching prefix)
+    and its bit flips. By arithmetic the flips likely catch an unchecked `take` (about 17 RecordStep cases per run
+    whose flipped length runs past the end), so the gap is in what the prefix half claims, not in a2 as a whole.
+- 10:24 UTC U4b plant B-P3 (clock ban live?): server lib.rs + `pub fn te_plant_clock() -> std::time::Instant {
+  std::time::Instant::now() }`; `cargo clippy --locked -p npt-server --all-targets -- -D warnings` exit 101: "use of
+  a disallowed type `std::time::Instant`" (lib.rs:17:28, :18:5) and "use of a disallowed method
+  `std::time::Instant::now`" (lib.rs:18:5), lib and lib test. The record's "the std bans are live now" holds. Restored
+  by Write; sha256 of the four U4b files = baseline. (Log te-b-p3.log.)
+- 10:25 UTC U4b plant B-P1 (the closed form's exact boundary): schedule.rs:140 `... * tick_hz as u128 - 1) /` ->
+  `... * tick_hz as u128) /` (claims tick k due 1 ns early whenever k x 10^9 / hz is an integer: at 30 Hz a wake at
+  99,999,999 ns runs tick 3). npt-server recompiled ("Compiling npt-server"), bites build: 16 passed, 0 failed. The
+  mutant SURVIVES every test, the 120,000-wake reference comparison included: no test wakes at at(k) - 1 for an exact
+  at(k) (the early-wake test uses at(1) - 1, and 10^9/30 and 10^9/60 are not integers). Restored by Write; sha256 =
+  baseline. Finding T-B1 (Low). (Log te-b-p1b.log.)
+- Not run, by reasoning: B-P2 (the base_ns guard, schedule.rs:156): random_wakes reaches it after a drop whenever the
+  next gap is shorter than (base - now), about 0.5% of drop wakes, so a few hundred times per run; F-A6 (hash's never-0
+  guard): no input reaches a computed 0 (p about 5e-15 per view), so removing it passes every test (rust F-A6 stands).
