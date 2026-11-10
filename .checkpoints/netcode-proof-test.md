@@ -111,7 +111,15 @@
 reset at 20:00):**
 - **U4b MERGED at 411eeee** (pushed): check.mjs all 10 steps, measured 286 = 275 + 11, bites 309 = 292 + 17, self 48;
   gate PASS --no-smoke. wip/u4b.patch was deleted in that commit.
-- **U4a's merge, in progress in the main folder, uncommitted:**
+- **U4a MERGED at 952f734** (pushed; about 20:45 UTC): check.mjs all 10 steps, measured 311, bites 342, self 52;
+  gate PASS. wip/u4a.patch was deleted in that commit. CI was green on 411eeee (U4b).
+  - Housekeeping later, by the approved method (leftovers to a local branch, then a plain `git worktree remove`):
+    `.gate/u4a-prefix`, `.gate/u4b-prefix`, `.gate/u4b-wt`, `.claude/worktrees/agent-a9297644e7c0354f3`.
+  - **Next merges:** U4c after its round 2. U4d after its fix pass, then the main session's npt-proto half of S1 in
+    a scratch worktree, then round 2 on the combined diff (with the security-auditor for S1), then the merge.
+  - **The plan text edits** (W1 rulings with the advisor's words, plus NETEM-BAR (a) in the U8 row): give them to an
+    agent when a slot frees, then a test-engineer check, as with the U4 conditions.
+- **(Done) U4a's merge, as it stood at 20:40:**
   - `wip/u4a.patch` (the fixed copy) is applied, with three catalogue edits: the Input row's codec maxima (5, 23, 19,
     161 B); §3's header row as built, in W1-N2's words; §6 item 3's U5 note.
   - check.mjs and the gate are re-running (task bdu2c9yb1; scratchpad merge-u4a-check.txt and merge-u4a-gate.txt).
