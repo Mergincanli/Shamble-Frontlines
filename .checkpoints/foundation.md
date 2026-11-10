@@ -23,10 +23,12 @@
 
 2. Advisor tool consulted (go; notes under Open findings). Inventory workflow launched 07:31 (Running work).
 
+3. Plan revision 1 written (`.checkpoints/foundation/plan.md`): the one-screen summary, Part 1 (2.1: goal, the
+   inventory of 63 files, the edits, OQ-0002-2, evidence E1-E7, steps, reviewers, Brave check, risks), Part 2 (2.2
+   sketch), Part 3 (2.3-2.6 waits), Part 4 (#46, #40), Part 5 (questions). inv-code, inv-kit, inv-docs DONE.
+
 ## Current step
-3. While the workflow runs: plan draft `.checkpoints/foundation/plan.md` revision 0: Part 2 (2.2 sketch), Part 3
-   (2.3-2.6 waits), Part 4 (PR #46, PR #40) written; Part 1 (2.1) waits for the inventory. inv-kit's notes are done
-   (2 kit files, 3 places required: verifier.md:28, CLAUDE.md:41-42 and :19; six questions for Mustafa).
+4. The critic (inv-critic) runs; then fold its findings, consult the advisor tool, the advisor agent's plan review.
 
 ## Next steps
 3. Plan draft `.checkpoints/foundation/plan.md`; the `advisor` agent's plan review; fix; advisor tool before done.
