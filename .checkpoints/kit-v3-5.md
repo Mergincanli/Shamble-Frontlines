@@ -55,6 +55,9 @@
   go), the foundation chat's SPLIT (a) and SCOPE (a) for the record, a Slice 1 note to queue.
 - **Done:** plan revision 3 (`plan-rev3.md`, d7526f5), the allow-list `mergeAllowed` L1-L7; its scratch build (`kb6/`,
   fbab132): red 39, green 1081/1081, settings 127, checkpoint 27, E9.
-- **Current step:** 5, the advisor's check of revision 3 (resumed after the spend limit, 10:08 UTC); then the four kit
-  writes, one ask each (the test file and a red run; the guard and green; advisor.md; CLAUDE.md), the docs part, the
-  gate, the one review round.
+- **Done:** the advisor's revision 3 check: APPROVE with E1-E5 (ec892d6). The four kit writes, one ask each, approved by
+  Mustafa, hashes equal to the scratch build: the test file (red in the repo: 47 of 1086 tests fail on main's guard),
+  the guard (green: 1086/1086, settings 127/127, checkpoint 27/27), advisor.md, CLAUDE.md; gate PASS +0 −0 (with a4's
+  tools/node_modules linked for the run, then unlinked); repo map OK. Kit commit 9bacf47 (CI runs on it).
+- **Current step:** 6, the docs part (docs-keeper: STATUS, ROADMAP, his words in the queue, the known limits, the
+  kit-v3-4 report correction); then the review round (security-auditor, test-engineer, the verifier), the report.
