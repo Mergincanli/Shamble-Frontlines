@@ -40,3 +40,27 @@ Notes:
   same on all three gates. A note on the report's grouping, not a fail.
 - Local smoke on Chromium 1243 through `.gate/pw-browsers` on all three columns (the comparison is like for like); CI's
   run 42801926823 on 9ae4037 (dd12aeb inside) ran gate and smoke with the pinned Chromium: both success.
+
+Two further checks (2026-11-10, after the run):
+- M5's 5a detail names the outside-folder read on all three gates: old "read a file outside the repo:
+  file:///e3-outside-repo.png", new and newleg "read a file outside the build folder: file:///e3-outside-repo.png"
+  (plus Chromium's own console error). So the one smoke behaviour 2.1a changed is covered.
+- Stricter under legacy/: on newleg, `deploy()` loading `../README.md` (a repo-root file, inside the repo but outside
+  `legacy/`) fails 5a: "read a file outside the build folder: .../README.md" (only 5a fails); file restored, clean.
+- CI: run 42801926823 (push) and run 42802055698 (pull_request, PR #47), both on 9ae4037 (dd12aeb inside): gate and
+  smoke success with the pinned Chromium. The PR's later heads are `[skip ci]` checkpoint commits.
+
+How to rebuild the proof (the copies and the local commit 9af08f7 live only in this container), from the repo root:
+    npm ci --prefix tools --ignore-scripts --no-audit --no-fund
+    # browser alias, only where Playwright 1.56.1's Chromium 1194 is missing and 1243 is at /opt/pw-browsers:
+    mkdir -p .gate/pw-browsers/chromium_headless_shell-1194/chrome-linux .gate/pw-browsers/chromium-1194/chrome-linux
+    ln -sfn /opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell .gate/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell
+    ln -sfn /opt/pw-browsers/chromium-1243/chrome-linux64/chrome .gate/pw-browsers/chromium-1194/chrome-linux/chrome
+    touch .gate/pw-browsers/chromium{_headless_shell,}-1194/{INSTALLATION_COMPLETE,DEPENDENCIES_VALIDATED}
+    git worktree add --detach .gate/fdn-old 44446a5
+    git worktree add --detach .gate/fdn-new dd12aeb
+    git worktree add --detach .gate/fdn-newleg dd12aeb
+    # in .gate/fdn-newleg: mkdir legacy && git mv shamble-core.js shamble-game.js shamble-editor.js index.html editor.html legacy/ && git commit -m "throwaway: the move"
+    # in each of the three: ln -s ../../../tools/node_modules tools/node_modules
+    PLAYWRIGHT_BROWSERS_PATH=$PWD/.gate/pw-browsers node .checkpoints/foundation-restructure/e3-run.mjs
+    # (e3-run.mjs skips entries already in e3-results.json: move that file aside for a fresh run)

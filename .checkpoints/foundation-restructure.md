@@ -9,7 +9,7 @@
   the same.
 - **Branch:** `claude/advisor-fable-4hxq72` (this cloud session may push only there), standing in for
   `cs/foundation-restructure`; Mustafa's personal account. **Base / OLD:** main 44446a5 (unchanged on 2026-11-10 10:15).
-- **Last update:** 2026-11-10 13:30 Amsterdam
+- **Last update:** 2026-11-10 13:50 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -42,8 +42,12 @@
    M19/M20 split the report's "5b + 5d" pair (5b and 5d one each, the same on all three): a note. Worktrees restored
    clean. CI run 42801926823 on 9ae4037: gate and smoke success (pinned Chromium).
 
+5. PR #47's body updated with E3; M5 covers the outside-folder check on all three gates; the stricter `legacy/` rule
+   proven (a repo-root read from `legacy/` fails 5a); CI also ran on the PR (run 42802055698, success); rebuild commands
+   in `e3-summary.md`.
+
 ## Current step
-5. PR #47's body updated with E3; the report to Mustafa.
+Waiting for 2.1a's turn (after #46, STATUS-DIET, LANE-RULES), PR #47 a draft. Nothing runs.
 
 ## Next steps
 6. At 2.1a's turn (after #46, STATUS-DIET, LANE-RULES): merge main in; step 4 (his decision recorded, in
@@ -65,4 +69,4 @@
 
 ## Running work
 - E3 run: done (31 of 31). Worktrees `.gate/fdn-*` kept until 2.1a's turn (the verifier may re-run E3); remove then.
-- Saver: background task bod2js7dn, started 10:44 Amsterdam, stops by 12:34; check at each update.
+- Saver: background task bod2js7dn, 10:44-12:34 Amsterdam, ended by time (last save d403bd3); not running.
