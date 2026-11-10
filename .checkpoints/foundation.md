@@ -27,8 +27,15 @@
    inventory of 63 files, the edits, OQ-0002-2, evidence E1-E7, steps, reviewers, Brave check, risks), Part 2 (2.2
    sketch), Part 3 (2.3-2.6 waits), Part 4 (#46, #40), Part 5 (questions). inv-code, inv-kit, inv-docs DONE.
 
+4. The workflow finished (4 of 4 agents, 0 errors; 729k agent tokens, 27 min). The critic: 5 missing, 2 wrong, 21 of
+   22 spot-checks upheld, 6 design issues; all folded into plan revision 1: F1 (a pure revert of a one-PR 2.1 turns
+   CI red) → 2.1a (tools learn both layouts) then 2.1b (the move), E8 rehearses the revert, Q-A6; F2 (no `"type":
+   "module"` at the root, 2.2); F3 (PM-0002-36 cannot pass as written, Q-A1 widened); the deferred gate-globals
+   wording (STATUS:1009) folded into 2.1a; the rules' globs vs a v2 `index.html` (2.2 note); the wrong saves claim
+   (CS-1 never tested it) and battery.js (no edit) corrected.
+
 ## Current step
-4. The critic (inv-critic) runs; then fold its findings, consult the advisor tool, the advisor agent's plan review.
+5. Consult the advisor tool before committing to the plan; then the advisor agent's plan review.
 
 ## Next steps
 3. Plan draft `.checkpoints/foundation/plan.md`; the `advisor` agent's plan review; fix; advisor tool before done.
@@ -79,7 +86,6 @@
 
 ## Running work
 - Workflow wf_92d477b2-b78 (task wbpbds2b5) · script copy `.checkpoints/foundation/inventory-run1.js` · no args ·
-  notes `.checkpoints/foundation/inv-{code,kit,docs,critic}.md` · launched 07:31 Amsterdam · running. Resume with
-  `resumeFromRunId` and the copy if cut off.
+  notes `.checkpoints/foundation/inv-{code,kit,docs,critic}.md` · launched 07:31 Amsterdam · done (4 of 4 returned).
 - Saver: background task bsmtuh7qm · output `/tmp/claude-0/-home-user-Shamble-Frontlines/cf54bb72-a605-502c-af5b-b590dcc1cda7/tasks/bsmtuh7qm.output`
   · started 07:31 · stops by 09:21 · last check 07:32: started.

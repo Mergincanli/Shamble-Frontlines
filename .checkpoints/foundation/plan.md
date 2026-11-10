@@ -144,15 +144,19 @@ Total 603 docs hits, every one read in context by the docs agent (`inv-docs.md`)
   its CLI follows); `ROOT`, `ROOT_URL` and `rel` stay; the header's "outside the repo" → "outside the build folder"
   (a page may read only files under its own folder: stricter under `legacy/`, and the pages read no sibling file).
 - `tools/village.py`: its default core path is `legacy/shamble-core.js` when that exists, else the root one.
+- The deferred Low of kit-v2-1 (STATUS:1009, "fix the wording when gate.mjs is next touched"): gate.mjs:333 and
+  tools/README.md:35 call `gate-globals.json` "reviewed data, not a gate-tool change", against kit-v2-1's category 3
+  (it is a gate file: his go). 2.1a fixes both lines (e.g. "a gate file: a change needs Mustafa's go"), and
+  docs-keeper closes the STATUS line.
 - `tools/battery.js`: none (it takes the folder as an argument).
 - Symbols: the gate gains `BUILD` (and the option's two names); the five game files are untouched (+0 −0).
 
 2.1b (the move): the five files with `git mv`; the edits below. The gate files are not touched again.
 
-**Not protected:** `tools/village.py` (:10 default path, :2), `tools/README.md` (every `.` folder argument →
-`legacy`; :21 "outside the repo" → "outside `legacy/`"; one line saying the legacy build lives in `legacy/`), the
-header comments of `preview.js`, `pageshot.js`, `sim.js`, `reach.js`, `perfbots.js`, `tuning-dump.js`, `aabbs.js`,
-and `README.md` (:12, :13, :19-22).
+**Not protected (2.1b):** `tools/README.md` (every `.` folder argument → `legacy`; :21 "outside the repo" →
+"outside `legacy/`"; one line saying the legacy build lives in `legacy/`), `tools/village.py`'s doc line :2, the header
+comments of `preview.js`, `pageshot.js`, `sim.js`, `reach.js`, `perfbots.js`, `tuning-dump.js`, `aabbs.js`, and the
+root `README.md` (:12, :13, :19-22).
 
 **Kit lines (each asks Mustafa):** `CLAUDE.md` :19, :41, :42 as in 1.2, plus :46 and the scope line only as he
 answers HC-PATH and SCOPE (and the model rule if MODEL-RULE is (a)); `.claude/agents/verifier.md:28` (`.` → `legacy`).
@@ -202,7 +206,8 @@ output goes into the report:
   rows for the five files, and `git rev-parse <base>:<f>` equals `git rev-parse HEAD:legacy/<f>` for each (same blob).
 - **E2, main's untouched gate passes on those bytes.** In a throwaway worktree of 2.1's head under `.gate/`, main's
   own gate files are written into `legacy/tools/` (`git show origin/main:tools/<x> > …/legacy/tools/<x>` for gate.mjs,
-  smoke.mjs, battery.js, gate-globals.json, package.json, each named; `node_modules` linked). Main's gate takes its
+  smoke.mjs, battery.js, gate-globals.json, package.json, each named; `node_modules` linked, which prompts once: the
+  allow rule at settings.json:74 covers one folder depth only). Main's gate takes its
   root as the folder above its own (gate.mjs:32-33, smoke.mjs:17-18), so it reads the moved bytes as its head and the
   root paths of `origin/main` as its base: `node …/legacy/tools/gate.mjs origin/main` must PASS with symbols +0 -0 and
   the smoke passing. Plus CI's green on main for the same blobs.
@@ -246,7 +251,8 @@ output goes into the report:
    every failure (expected: exit 2, "shamble-core.js is missing from the working tree", gate.mjs:98). Nothing is
    committed from it; it confirms the inventory (grep only so far) or adds to it.
 2. **The tools** (one commit; gate files: each edit asks Mustafa): `tools/gate.mjs`, `tools/smoke.mjs`,
-   `tools/village.py` (1.3). The gate with smoke PASS on the root layout.
+   `tools/village.py`, and the gate-globals wording in gate.mjs:333 and tools/README.md:35 (1.3). The gate with smoke
+   PASS on the root layout.
 3. **Its evidence:** E3 on the root layout (the edited gate fails each of the 26 mutations exactly as main's gate
    does); the edited gate on the dry-run worktree's `legacy/` layout PASS against `origin/main`; the both-copies case
    stops with exit 2; the three bases of E3.
@@ -362,6 +368,10 @@ after the install steps; `rustc --version` in CI equals the pin; a pull request 
   in place (`.claude/hooks/syntax-gate.mjs:3, :21-23`), and Node takes a `.js` file's module type from the nearest
   `package.json`, so the legacy scripts would be checked as modules. Each package sets its own type (the gate itself is
   safe: it checks `.cjs` temp copies, gate.mjs:115).
+- The legacy rules' globs (`.claude/rules/pages.md:3-4` `**/index.html`, `**/editor.html`; `engine-*.md:3`) will also
+  match a v2 `index.html` once one exists, and load "edit both pages identically" on v2 files; CLAUDE.md:46's bare
+  `index.html` becomes ambiguous then too. 2.2 (or 2.5, which brings the first v2 page) narrows them to `legacy/…`:
+  a kit edit, his ask.
 - Must be checked in 2.2's build, not assumed: `cargo metadata` from `spikes/netcode-proof/` still names the spike's
   own workspace once a root workspace exists (the spike's `Cargo.toml` has its own `[workspace]`), and
   `npm ci --prefix tools` still installs the legacy toolkit from `tools/package-lock.json` once a root `package.json`
