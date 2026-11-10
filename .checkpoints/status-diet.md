@@ -5,7 +5,7 @@
   #46's merge (main 2d22b69). His words: main STATUS:674-761 and docs/reports/2026-11-10-kit-v3-5.md Appendix A.
   Plan: `.checkpoints/status-diet/plan-rev1.md` (next).
 - **Branch:** `claude/busy-turing-48e4i9` (stands in for `cs/status-diet`) · **Base:** main 2d22b69
-- **Last update:** 2026-11-10 21:40 Amsterdam
+- **Last update:** 2026-11-10 21:44 Amsterdam
 
 ## Steps done
 1. Facts gathered · 9e33794 · `.checkpoints/status-diet/facts.md`: line ranges and destinations, live PR and
@@ -36,6 +36,12 @@ notes `.checkpoints/status-diet/security-auditor-review.md` and `verifier-review
 3. Fold and delete the checkpoint; mark #49 ready; the advisor's final-head review; his go.
 
 ## Open findings
+- the verifier on 37434d5: PASS WITH NOTES (verifier-review.md, DONE). M-1 Medium: docs-keeper item 1 drops the old
+  duties (recently landed, pending decisions, open risks, health table; the archive's live sections unnamed) = N4: fix
+  now (restate, one kit edit, ask). Lows: L-1 (A3 note's place: leave, report), L-2 (the report: write), L-3 (the index
+  misses wrapped dated lines; nothing lost: report + follow-up), L-4 ("authoritative": meaning holds), L-5 (E5 line
+  numbers: the report's table corrected), L-6 (STATUS:16 FREEZE-FDN's allowance: rides the push), L-7 (STATUS:9-11 SCOPE
+  (a) wording: rides the push); method note (check.mjs's dated-line count reads the script's output: report).
 - security-auditor on 37434d5: PASS WITH NOTES (notes security-auditor-review.md, DONE). Lows: N1 (a pasted block is
   his word vs advisor.md's "his own words"), N2 ("the advisor" in Standing permission could be read as the tool), N3
   (the Lanes rule is enforced by nothing; one GitHub user), N4 (docs-keeper item 1 does not name STATUS's Follow-ups and
