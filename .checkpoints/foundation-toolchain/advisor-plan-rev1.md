@@ -17,3 +17,8 @@ Notes:
 - B2 done: plan read (421 lines). Session words file read (untracked, not in f535752; quotes in plan 1.2 match it).
 - F? (K2 split): K2 bundles (i) heading scope to legacy/ (covered: "the lines that scope the legacy constraints") with (ii) "Phase 0 writes no v2 code" + exception at CLAUDE.md:51-53, which is the same kind of edit as K3/K4 (FDN-NOCODE). Plan marks K2 wholly "covered" -> inconsistent; (ii) belongs in FDN-NOCODE. Check CLAUDE.md lines.
 - Note: his session prompt asks to "ask Mustafa whether his FREEZE-FDN covers each" kit edit; plan asks only K3/K4; K1 answered; K2 claimed covered. Check against that.
+- B3 done: his words match plan 1.2 (decision "may plan and build foundation steps 2.1 and 2.2 now"; SCOPE (a); FREEZE-FDN at STATUS:686-690; LANE-RULES Models addition STATUS ~700-710). His 2.2 prompt: "Plan only, no build" -> build needs his start (plan says so). Next B4.
+- B4 done: sketch Part 2 (Q2.2-a..d), Part 5, App B read; advisor rev2 Q-A3 provisional (a) confirmed in notes.
+- F-1 (Medium): SCOPE (a) as he picked it (plan rev3, d389d91:.checkpoints/foundation/plan.md:524-536) reads "...and 2.2's kit edit scopes the constraints and adds your 2026-11-10 decision as the exception to the "no v2 code" lines". FDN-NOCODE omits this option text; it bears directly on the question (his own reply words do not repeat it, so asking is still right, but quote it). Plan 1.2 also lacks it.
+- F-2 (Medium): K2's second half (CLAUDE.md:51-53 "Phase 0 writes no v2 code" + exception) is the same "no v2 code" edit as K3/K4, yet K2 is marked "covered". Fold into FDN-NOCODE (three lines, not two), or split K2.
+- Sketch App B rule 4 said "2.2 (or 2.5 ...) narrows" the globs: leaving to 2.5 is within it.
