@@ -1,7 +1,7 @@
 # STATUS: the one-screen dashboard
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
-next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first: `docs/DECISIONS.md`.
-The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
+next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
+`docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
 _Last updated: 2026-11-10 (status-diet, PR #49; main 2d22b69)._
 
 ## Phase
@@ -65,7 +65,8 @@ _Last updated: 2026-11-10 (status-diet, PR #49; main 2d22b69)._
 A finding below the review budget's bar becomes a follow-up: its id goes here, its text in the archive.
 - **Security, staying in STATUS until the foundation's gate step** (his go for #46, 2026-11-10: `docs/DECISIONS.md`):
   PX-1, the CI results trusted by name alone (its two test gaps ride it); W1 and W2, the two write-side gaps; W3, the
-  folder check; the recorded Windows-name limits (W1-W3 and the limits: the archive's "Open bugs and risks", kit-v3-5).
+  folder check; the recorded Windows-name limits (PX-1 and its test gaps: the archive's "Follow-ups", "From kit-v3-5";
+  W1-W3 and the limits: its "Open bugs and risks", kit-v3-5).
 - **Kit, after the foundation's gate step (KIT-FREEZE-2):** F2 and F5 (kit-v3-4); F-1; L12, L14, L9 / SA-9, L13, L1's
   runners, A-4, FU-P3a, FU-P4a, FU-P4b, FU-P4c and FU-P4d (kit-v3-3); A3's plan readers; A3's cuts; CHECKPOINTS.md §7's
   cap line; E9's untested cases; KIT-ALIGN; the kit-v3-1 Windows test (its own change-set).

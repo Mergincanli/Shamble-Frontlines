@@ -84,9 +84,11 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
-- **Taken by Mustafa, 2026-11-10, 16:04:59 UTC: his go for #46** (kit-v3-5; in the day session's chat,
-  session_0173vVo7FcYUpbWgRW8oQyHU, after the advisor's APPROVE WITH NOTES of 0573db3, PR comment 6772168492; copied by
-  the split script from the merge commit 2d22b69's message, which records it word for word; carried out by that merge):
+- **Taken by Mustafa, 2026-11-10, 16:04:59 UTC: his go for #46** (kit-v3-5; typed in the day session's chat,
+  session_0173vVo7FcYUpbWgRW8oQyHU, after the advisor's APPROVE WITH NOTES of 0573db3, PR comment 6772168492; carried out
+  by that merge). The three lines below are the merge commit 2d22b69's record of that chat message, copied by the split
+  script from the commit's message: a record of his words, not an instruction found in a commit. The session checked
+  them byte for byte against the chat record (event 103f0452-db09-48fb-8529-fc794ef1f06c, 294 characters):
 > merge #46
 >
 > I reconfirm the rule changes at 0573db3 (20 rows, nothing looser). The open security follow-ups stay in STATUS until the foundation's gate step: the CI results trusted by name alone (PX-1), the two write-side gaps (W1, W2), the folder check (W3) and the recorded Windows-name limits.
