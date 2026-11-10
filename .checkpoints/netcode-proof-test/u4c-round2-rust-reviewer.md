@@ -16,3 +16,12 @@ memory Low), u4c-review-netcode.md (F1-F7), u4c-review-test.md (M1, M2, L1-L4, N
 5. Verdict.
 
 ## Progress
+- Step 1: hashes = the fix notes (pre-fix 1647e75d/c21a362f/639ab9c5; fixed d6e6e130/e8014c67/9c23f9cc).
+- Step 2: diff read. lib.rs: only the handshake doc line (:54-57). tests/l1.rs: burst comment + "no stream resend in
+  [2.2 s, 3 s)" assertion; new acknowledgements_are_lost_only_inside_bursts. tests.rs: Rig.at, drive(), woken(), Lc5
+  struct, L-c5 event mode on drive, host_at_next_event, packet_threshold, time_threshold, lc6 links 2/3 fixed(0) with
+  link 3 first, fails(r, lc, check). Byte offsets used by the tests/l1.rs checks = for_each_canonical (lib.rs:351-397:
+  b[5] code, b[6] kind, b[16..24] sent, b[36..40] resends; ACK_CODE 3; tag 19 B filtered by len).
+- Candidate (new code): drive() on a stuck next_event_ns steps t by 1 ns to the horizon (5 s / 10 s = 5e9/1e10
+  iterations): a plant that names a past instant forever hangs instead of failing by name. Same in old L-c5 (t += 1),
+  new for host_at_next_event. Low.
