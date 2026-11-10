@@ -86,3 +86,10 @@ Started 2026-11-10. Read-only on both worktrees. Focus: U4a decoders as attack s
 | RecordStep note | <= 480 B UTF-8, no Cc/Cf | logged with source | none |
 | Ping / Pong | sizes; ids u8 | server: 10/s rate, outstanding id, hold <= 1 tick | carry (echo_ns) |
 | what a client may see | GROUPS classes descriptive only | room interest (U4e) | SEC-1 (whole layout to every section), SEC-2 |
+
+## Verdict
+U4a: APPROVE WITH FINDINGS. The decoders hold: size first, no allocation before it, totality (no reachable panic
+found), trailing bytes / reserved bits / unknown codes refused, per-type and per-channel limits as the catalogue.
+SEC-U4a-1 needs the advisor's (a)/(b) ruling before merge; (a) turns it into a U4a revision. Lows 2-7: follow-ups
+(each a security finding: open ones keep the PR needs-mustafa unless addressed or explicitly deferred).
+U4b: not reviewed (out of my brief). DONE 2026-11-10.
