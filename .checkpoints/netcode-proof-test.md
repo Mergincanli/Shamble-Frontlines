@@ -661,6 +661,38 @@ free:
     - **Wave 1 resumed:** U4a's builder continued by SendMessage (agent a9297644e7c0354f3, its own worktree);
       U4d and U4c by the edited workflow script (wf_f54246ff-e0d resumed, task w0ynfq9yu: the builders continue in
       their existing worktrees wf_f54246ff-e0d-1 and -2 from their notes, no new worktree). Three agents running.
+  - **2026-11-10 about 06:35 UTC: morning.**
+    - **The builders were cut again** by the spend limit at about 22:35 UTC; the limit reset at 02:40.
+      - The 06:30 snapshots show their sources unchanged since 22:28; only U4a's notes gained a line (it was at its
+        final checks: measured 296, bites 321, self 52 expected; carries 1-5 and 34 met; four items for the main
+        session).
+      - Resumed at 06:33: U4a by SendMessage (with night finding S1 to answer in its report); U4d and U4c by
+        wf_f54246ff-e0d again (task wz87zkv57, the RESUME preface dated).
+      - Saver restarted (bjdku8jwv).
+    - **The night shift's results (issue #16 report, comment 6759962485):** one run, from 06:04 to 06:49 Amsterdam.
+      - **Item 2 done:** `cs/npt-u4e-brief` at 0dccbf0.
+        - `.checkpoints/npt-u4e-brief/u4e-brief-draft.md`, rev 2 (rev 1 at ea2dd8a), and
+          `test-engineer-u4e-check.md`: 23 findings (11 Medium, 12 Low), all fixed in rev 2.
+        - A 28-row recheck table against U4a, U4b and U4d, and 9 questions for the advisor (U4E-Q1 to Q6, Q8, Q10,
+          Q11).
+        - Needs a day run: the base counts, check.mjs's step count, recheck row R11.
+      - **Item 3 done:** `cs/npt-u4s-skeptic` at 6652be4 (summary `.checkpoints/npt-u4s-skeptic.md`). Nothing
+        Critical or High.
+        - **S1, Medium:** `EntityKind::layout()`'s soldier list (seam.rs:114-116) serves two catalogue rows. It sends
+          velocity to everyone, while the remote-soldier row (netcode-proof-messages.md:137) leaves it out, and it
+          has no ammo or fire timers for the owner's own-state row (:136). About +54 % bytes per remote soldier (a
+          false FAIL risk, never a false pass); High if U4g's prediction needs the weapon timers. Fix: an audience
+          per field, or an own-state layout, before U4a's table lands. Goes to U4a's review and the advisor.
+        - **11 Lows**, follow-ups for U4's report: S2 (a room/World tick mismatch turns lag compensation off
+          silently), T1/F-L1 (`LOOP_CATCHUP` is 0 at 1-3 Hz, which the range check allows; U4b's `Schedule::new`
+          panics on cap 0), F-L4 (integer fields above 2^24 through the f32 grid), F-L7 to F-L9 (three check.mjs grep
+          gaps), the rest in the summary.
+      - **Items 4 (U4r brief) and 5 (U3d skeptic): not started** (06:45 rule). They stay queued for tonight
+        (NQ-CARRY (a): U4r's brief is not needed before then).
+    - **NS-START found:** the active routine "Shamble Frontline Night shift" (trig_01QpV6y6UaG1Na2q3jumRDxh) has cron
+      `CRON_TZ=Europe/Amsterdam 0 6 * * *`, one run a day at 06:00 Amsterdam (fires about 05:04 UTC), last updated
+      2026-11-07 00:02 UTC; last run SUCCEEDED 05:04-05:07 UTC. STATUS's `10 0-7 * * *` is the retired "Night shift"
+      routine's (trig_019LtRqmAdzddyk6K3e3kDJz, disabled). Changing it is Mustafa's setting: a decision for him.
   - **About 22:15 UTC: U4b built by the main session** (worktree `.gate/u4b-wt`, local branch u4b-build from
     4b5812a, uncommitted there; snapshot wip/u4b.patch; record u4b-build.md). schedule.rs (`Schedule`, `Due`,
     `Dropped`, `LoopCounters`, `due_ticks`; bites: `with_bite`, `BITES`), lib.rs re-exports, server/clippy.toml
