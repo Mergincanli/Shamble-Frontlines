@@ -1,0 +1,17 @@
+{
+  "name": "shamble-frontlines",
+  "private": true,
+  "description": "The v2 TypeScript workspaces (ADR 0002 parts 2 and 3; foundation step 2.2). Exact versions only.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": "22.x"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@playwright/test": "1.65.0",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  }
+}

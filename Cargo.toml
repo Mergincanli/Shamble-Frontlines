@@ -1,0 +1,26 @@
+# The v2 Rust workspace (ADR 0002 parts 2, 3, 4 and 7; foundation step 2.2). Every CI cargo command takes --locked.
+[workspace]
+members = ["crates/*"]
+resolver = "3"
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.99.1"
+publish = false
+
+# Shared dependency versions, set once here; each enters with the first crate that needs it (ADR 0002 part 3).
+[workspace.dependencies]
+
+# Every crate opts in with `[lints] workspace = true` (ADR 0002 parts 4 and 7).
+[workspace.lints.rust]
+unsafe_code = "deny"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+
+# Overflow checks in every profile for the simulation and the protocol (ADR 0002 part 4).
+[profile.release.package.sim]
+overflow-checks = true
+
+[profile.release.package.protocol]
+overflow-checks = true
