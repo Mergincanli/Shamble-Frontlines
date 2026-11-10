@@ -51,7 +51,30 @@ Checked by full read, nothing to change: `.claude/CHECKPOINTS.md`, `NIGHT_SHIFT.
 `hooks/guard.mjs`, `hooks/routine-guard.mjs` (`protectedRel` never matches `legacy/`), `hooks/syntax-gate.mjs`
 (path-free), `scripts/*` (`repo-map-check.mjs` needs no edit; REPO_MAP does, 1.3).
 
-<!-- PART-2.1-INVENTORY-CODE-DOCS -->
+**Code, CI, hooks and root files**
+| File | Protected | Hits | Class | 2.1 does |
+|---|---|---|---|---|
+| `tools/gate.mjs` | yes (gate) | 24 | BREAKS :33-35 (ROOT and FILES at the root), :96-100 (`headFile` reads ROOT/<f>), :150 (`classicParts` resolves `<script src>` against ROOT), :190 (`runSmoke({ root: ROOT })`); NAME the rest (check labels, 5d's `WANT` names relative to the page) | **edit** (1.3) |
+| `tools/smoke.mjs` | yes (gate) | 4 | BREAKS :18, :118, :201 (default root = the repo root; the CLI runs `runSmoke()` with it); NAME the page names | **edit**: default root = `<repo>/legacy` |
+| `tools/battery.js` | yes (gate) | 5 | NAME; `readBuild(dir)` :64-68 and its CLI :210-213 take a folder; the gate passes strings | none |
+| `tools/preview.js` | no | 4 | COMMAND :2 (`preview.js . <cmd>`); code takes the folder (:17, :93-94) | edit the comment |
+| `tools/pageshot.js` | no | 3 | COMMAND :8 (`pageshot.js . index.html`); code takes the folder (:19, :36) | edit the comment |
+| `tools/village.py` | no | 2 | BREAKS :10 (default `<repo>/shamble-core.js`); COMMAND :2 | **edit** :10 → `os.path.join(_REPO, 'legacy', 'shamble-core.js')`; :2 |
+| `tools/README.md` | no | 8 (+ :22, :24-27, :58 without a name) | COMMAND :22 (`battery.js .`), :23-28, :56, :58 (`preview.js .`, `pageshot.js .`); NAME the rest | **edit** `.` → `legacy` |
+| `tools/sim.js`, `reach.js`, `perfbots.js`, `tuning-dump.js`, `aabbs.js` | no | 0 (a folder `.` each) | COMMAND in the header comment (`preview.js . eval …`) | edit the comment |
+| `README.md` | no | 6 | STALE :12 ("Double-click `index.html`"), :13, :19-22 (the layout table) | **edit** → `legacy/…` |
+| `index.html`, `editor.html`, the three `.js` files | no | 4, 7, 3, 4, 6 | NAME (headers, comments); `<script src>` relative (index.html:1256-1257, editor.html:1257-1259); three.js from its CDN URL; no link, fetch or asset path between files | **move only** (bytes unchanged) |
+| `FIRST_PROMPTS.md` | no | 5 | HISTORY | none |
+| `.claude/hooks/routine-guard.test.mjs`, `settings.test.mjs` | yes | 15, 1 | TESTDATA (above) | none |
+Checked by full read, nothing to change: `.github/workflows/gate.yml` (no paths; `node tools/gate.mjs "$BASE"` stays,
+and on 2.1's own PR its base is the root layout, so the base fallback must read the root), `tools/package.json`,
+`tools/gate-globals.json`, `.gitignore`, `.gitattributes` (`* text=auto eol=lf` covers `legacy/` too),
+`docs/ui_theme_mockup.html` (self-contained), `.claude/settings.json`, `.claude/hooks/*.mjs`, `.claude/scripts/*.mjs`.
+Found beyond the grep: the night shift runs only tracked scripts equal to main's (routine-guard.mjs:959-984), so after
+2.1 merges a night item on a branch cut before 2.1 can no longer run its own `tools/gate.mjs`: such branches are
+re-cut from main (2.1's report checks the Night queue, issue #16, for such items; the legacy items there are paused).
+
+<!-- PART-2.1-INVENTORY-DOCS -->
 
 ### 1.7 Reviewers (the final diff; one round, one fix pass; 3 at a time)
 The advisor (plan, then every pushed head) and security-auditor (every risk-tier-2 change) always; test-engineer (is
@@ -167,10 +190,12 @@ after the install steps; `rustc --version` in CI equals the pin; a pull request 
   `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`, `package.json`, `package-lock.json`, `deny.toml`, `.cargo/
   config.toml`. Whether they join the guard's gate files is a guard edit, after PR #46 merges (it rewrites the guard),
   most naturally with 2.3, when the gate v2 starts reading them.
-- **Q2.2-c, Node 22 or 24.** Part 2 says "the way the legacy toolkit pins 22". Node 22 leaves maintenance in April 2027
-  and Node 24 is the active LTS (Node's release schedule; to be read again in 2.2's plan). Options: (a) 22, one Node for
-  legacy and v2; (b) 24 for v2, legacy stays on 22. A toolchain choice for the advisor; Mustafa only if the advisor
-  escalates.
+- **Q2.2-c, which Node.** Part 2 says "the way the legacy toolkit pins 22". Node's release table
+  (github.com/nodejs/Release, read 2026-11-10; "Dates are subject to change") lists 22.x as "Maintenance LTS",
+  end-of-life "2027-04-30", and 24.x as "Maintenance LTS" since "2026-10-20", end-of-life "2028-04-30"; the line now in
+  active LTS was not read. Options: (a) 22, one Node for legacy and v2, with a bump change-set before April 2027;
+  (b) a newer LTS for v2 (read the active line first), legacy stays on 22. Read as "pin the major the way TL17 does",
+  part 2 allows either. A toolchain choice for the advisor; Mustafa only if it escalates.
 - **Q2.2-d, the offline proof.** PM-0002-37's network cut-off tool is proposed, not researched (a network namespace).
   2.2's plan reads how a GitHub runner can run a step with no network before it promises the mark.
 
