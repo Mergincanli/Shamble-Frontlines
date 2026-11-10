@@ -10,3 +10,9 @@ Notes:
 - check: gate check 1 has no glob: FILES list (gate.mjs:34) + inline scripts (:227-231). .gitattributes `* text=auto eol=lf` covers legacy/. .gitignore no root patterns hitting legacy/.
 - check: settings.test.mjs:232 join(root,'shamble-game.js') -> upheld (realOf routine-guard.mjs:45-51).
 - check: repo-map-check claims upheld (:22-35).
+- F3 MISSED (inv-code design 4, inv-docs): PM-0002-36's own words (adr/0002:1288, done-when :1429-1430, r5:1245) say `node tools/preview.js legacy eval tools/tuning-dump.js` output is cmp'd with docs/legacy-tuning.json. As written it cannot pass: the JSON is the builder's output (facts.md), and without --pre=tools/tuning-dump.js the eval only snapshots and returns undefined (tuning-dump.js:3-5,:50). inv-code's dump+builder route is an equivalent, not the mark: the plan must say so and get it accepted (advisor; ADR wording is tier 1, Mustafa).
+- F4 WRONG (inv-docs saves finding): "CS-1's earlier move checked that rank, tutorial and maps were still there" - repo-root.md:55 lists saves surviving the move as UNTESTED, :58 is only the proposed Brave step; no recorded result (grep STATUS/reports).
+- F5 WRONG-ish (inv-kit indirect advisor.md:150-152): advisor.md:149-150 already runs the PR head's own gate in a worktree; "use main's copy" (:152) is for reproduction tools (preview.js, sim.js). Real gap: for a gate-changing PR the head's gate is not independent - fix is the differential evidence, not a reading of :152.
+- F6 WRONG minor (inv-kit design 4): lists battery.js among changed gate files; inv-code: battery.js no edit (battery.js:64-68,:210-213). Tier 2 stands on gate.mjs, smoke.mjs, CLAUDE.md, verifier.md.
+- check: TESTDATA command strings `preview.js . eval` at routine-guard.test.mjs:207 and settings.test.mjs:41 (allow-rule tests): no change needed, settings rules `node tools/preview.js *` still match `legacy`.
+- B1 sweep mostly done; next: guard.mjs, checkpoint.mjs, then B2.
