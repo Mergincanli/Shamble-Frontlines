@@ -305,10 +305,10 @@ index 0000000..e5587d3
 +}
 diff --git a/spikes/netcode-proof/crates/server/tests/schedule.rs b/spikes/netcode-proof/crates/server/tests/schedule.rs
 new file mode 100644
-index 0000000..c55081c
+index 0000000..01c465e
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/server/tests/schedule.rs
-@@ -0,0 +1,389 @@
+@@ -0,0 +1,416 @@
 +//! U4b's tests on a fake clock (u4-build-plan.md §5 U4b): the S17 loop policy at 30 Hz with catch-up 7 and at 60 Hz
 +//! with 15, the caps always taken from npt-sim (u4s-carries.md entry 6). Each scenario is a check that says what went
 +//! wrong, so the bites build shows each of PM-0004-67's bites failing the very check the clean schedule passes.
@@ -523,6 +523,18 @@ index 0000000..c55081c
 +    let s = Schedule::new(npt_sim::TICK_HZ, npt_sim::LOOP_CATCHUP);
 +    assert_eq!(s.catchup(), npt_sim::LOOP_CATCHUP);
 +    assert_eq!(s.tick_hz(), npt_sim::TICK_HZ);
++    assert_eq!(
++        npt_sim::LOOP_CATCHUP,
++        npt_sim::loop_catchup_at(npt_sim::TICK_HZ)
++    );
++    // The cap the schedule acts on, not only the one it stores (the round-1 test finding T-B3): after a 1 s stall
++    // the server's schedule runs exactly LOOP_CATCHUP ticks and drops the rest of the TICK_HZ owed.
++    let stalled = due_ticks(1_000 * MS, &due_ticks(0, &s).next);
++    assert_eq!(stalled.to_run, npt_sim::LOOP_CATCHUP);
++    assert_eq!(
++        stalled.dropped.ticks,
++        u64::from(npt_sim::TICK_HZ - npt_sim::LOOP_CATCHUP)
++    );
 +    // The two caps the plan pins (7 and 15), read from npt-sim's function.
 +    assert_eq!(rates(), [(30, 7), (60, 15)]);
 +}
@@ -590,8 +602,23 @@ index 0000000..c55081c
 +            (early.to_run, early.dropped, early.next),
 +            (0, Default::default(), s)
 +        );
-+        // The same arguments give the same answer (N4: no clock, no state outside the schedule).
++        // N4's purity is held by the types (a &Schedule in, a Copy Due out, no statics) and by the clock ban; this
++        // equality only documents it (the round-1 test finding T-B2: no implementation without hidden state fails it).
 +        assert_eq!(due_ticks(5 * at(1, hz), &s), due_ticks(5 * at(1, hz), &s));
++    }
++}
++
++#[test]
++fn a_wake_1_ns_before_an_exact_due_time_does_not_run_that_tick() {
++    // Where k × 10⁹ / hz is a whole number (tick 3 at 30 and at 60 Hz), the closed form's "- 1" decides whether
++    // tick k is due 1 ns early. The round-1 test finding T-B1: a plant that dropped it passed every other test.
++    for (hz, cap) in rates() {
++        assert_eq!(u64::from(hz) * at(3, hz), 3_000_000_000);
++        let s = due_ticks(0, &Schedule::new(hz, cap)).next;
++        let before = due_ticks(at(3, hz) - 1, &s);
++        assert_eq!((before.to_run, before.next.next_due_ns()), (2, at(3, hz)));
++        let on_time = due_ticks(at(3, hz), &s);
++        assert_eq!((on_time.to_run, on_time.next.next_due_ns()), (3, at(4, hz)));
 +    }
 +}
 +
