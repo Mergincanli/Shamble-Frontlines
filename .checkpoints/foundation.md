@@ -10,7 +10,7 @@
 - **Account:** Mustafa's personal account (one account per branch). The university account runs PR #40 (netcode
   proof test, `claude/netcode-proof-test-plan-hcky5g`) and PR #46 (kit-v3-5, `claude/sleepy-tesla-ofsxsr`): never
   push there, never touch `spikes/`.
-- **Last update:** 2026-11-10 09:07 Amsterdam
+- **Last update:** 2026-11-10 09:55 Amsterdam
 
 ## Steps done
 0. Read CLAUDE.md, CHECKPOINTS.md, REPO_MAP, ADR 0002's migration plan, SPIKE_PLAN's foundation entry, STATUS
@@ -46,12 +46,19 @@
    (d7526f5): KIT-FREEZE-2 and LANE-RULES are his words of 2026-11-10 06:33 and 07:08 UTC; SPIKE-SCOPE (a) was taken
    by the Advisor on 2026-10-25 (STATUS:739-746). Conditions C1-C8 applied: plan revision 3.
 
+7. Advisor tool before calling the plan done: six consistency fixes (E3 in 2.1b, the 1.2 rows, two stale risks, #40
+   after each PR, the docs count, models named by CLAUDE.md's section) and one full read of the plan; applied.
+
 ## Current step
-7. Plan revision 3 saved; the advisor tool before calling the plan done; then the final report.
+Done, for this session: plan revision 3 at `.checkpoints/foundation/plan.md` (this branch). The checkpoint folder stays:
+it is the plan's home until 2.1a's build moves it (plan 1.1, Hand-over).
 
 ## Next steps
-8. Mustafa answers FREEZE-FDN, SPLIT, SCOPE. Then 2.1a's build may start (its step 0: re-read the open PRs' file
-   lists, record OLD's SHA, move the plan to `.checkpoints/foundation-restructure/plan.md`).
+1. Mustafa answers FREEZE-FDN, SPLIT and SCOPE (plan Part 5), and says whether a session on this account starts
+   building 2.1a now (allowed by the advisor's approval: the dry run, the tool edits with their asks, E3; not its merge).
+2. 2.1a's step 0: re-read the open PRs' file lists (#46, STATUS-DIET, LANE-RULES, #40), record OLD's SHA, move the plan
+   to `.checkpoints/foundation-restructure/plan.md`.
+3. 2.2: its own plan and plan review, after SCOPE is answered (Part 2 is the sketch).
 
 ## Open findings
 - PR #46 (kit-v3-5, draft, step 0 on 2026-11-09): will edit `.claude/hooks/routine-guard.mjs` and its tests,
@@ -105,6 +112,6 @@
 ## Running work
 - Workflow wf_92d477b2-b78 (task wbpbds2b5) · script copy `.checkpoints/foundation/inventory-run1.js` · no args ·
   notes `.checkpoints/foundation/inv-{code,kit,docs,critic}.md` · launched 07:31 Amsterdam · done (4 of 4 returned).
-- Saver: background task bsmtuh7qm · output `/tmp/claude-0/-home-user-Shamble-Frontlines/cf54bb72-a605-502c-af5b-b590dcc1cda7/tasks/bsmtuh7qm.output`
-  · started 07:31 · stops by 09:21 · last check 08:47: ok (saved and pushed at 07:41, 07:51, 08:11).
+- Saver: background task bsmtuh7qm, started 07:31, stopped 09:55 by TaskStop after the last agent finished (its output ends
+  "[killed]": the final save was made by hand); ok throughout (saved and pushed at 07:41, 07:51, 08:11).
 - The advisor agent's plan review of revision 2 (8bbebfa), launched 08:46 Amsterdam: done (APPROVE WITH CONDITIONS).
