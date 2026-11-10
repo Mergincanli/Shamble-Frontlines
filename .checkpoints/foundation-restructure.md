@@ -9,7 +9,7 @@
   the same.
 - **Branch:** `claude/advisor-fable-4hxq72` (this cloud session may push only there), standing in for
   `cs/foundation-restructure`; Mustafa's personal account. **Base / OLD:** main 44446a5 (unchanged on 2026-11-10 10:15).
-- **Last update:** 2026-11-10 11:10 Amsterdam
+- **Last update:** 2026-11-10 11:48 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -43,8 +43,13 @@
    running in the background since 11:05 Amsterdam (log `.gate/e3-run1.log`). PC1 judged on check 3 only (the Phase 0
    gate had checks 1-4; refreshRect is still called at boot, so 5a/5b fail on every gate).
 
+   - Pushed (dd12aeb inside 9ae4037); draft PR #47 opened 2026-11-10 (stays a draft until its turn); CI run 42801926823
+     (push, head 9ae4037) in progress at 11:47 Amsterdam.
+   - E3 so far: P1 PASS (old, new, newleg all fail [3, 5a, 5b]; the report's [3] included).
+
 ## Next steps
-5. Push; draft PR (stays a draft until its turn); report to Mustafa: PR number, the proof, his asks.
+5. When E3 ends: results into PR #47's body and the checkpoint; CI run ids; report to Mustafa: PR number, the proof,
+   his asks.
 6. At 2.1a's turn (after #46, STATUS-DIET, LANE-RULES): merge main in; step 4 (his decision recorded, in
    `docs/DECISIONS.md` if STATUS-DIET split STATUS); the plan updated for the marker departure; reviews
    (security-auditor, test-engineer, infra-engineer), the verifier, the report; worktrees removed (links first, then
