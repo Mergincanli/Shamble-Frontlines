@@ -5,7 +5,7 @@
   #46's merge (main 2d22b69). His words: main STATUS:674-761 and docs/reports/2026-11-10-kit-v3-5.md Appendix A.
   Plan: `.checkpoints/status-diet/plan-rev1.md` (next).
 - **Branch:** `claude/busy-turing-48e4i9` (stands in for `cs/status-diet`) · **Base:** main 2d22b69
-- **Last update:** 2026-11-10 21:44 Amsterdam
+- **Last update:** 2026-11-10 21:52 Amsterdam
 
 ## Steps done
 1. Facts gathered · 9e33794 · `.checkpoints/status-diet/facts.md`: line ranges and destinations, live PR and
@@ -23,17 +23,18 @@
 9. The advisor's addendum on his #46 go words (OK with (a)-(c); advisor-addendum-46go.md) · 37434d5 · the PX-1 pointer,
    the go entry's record line; his chat message saved (mustafa-2026-11-10-go46.md: event 103f0452..., 294 chars,
    equal to 2d22b69's quote byte for byte).
+10. The review round on 37434d5 · notes in this folder · security-auditor PASS WITH NOTES; the verifier PASS WITH NOTES.
+11. The fix pass · adfe108 · M-1 = N4 (docs-keeper item 1's old duties, an Edit, the guard asking), L-6, L-7, N8; the
+    round's follow-ups SD-N1, SD-N2, SD-N3, SD-N6, SD-L3; 1217 of 1218 moved lines intact; gate; tests 1107/127/27.
+12. The report, ROADMAP's entry, STATUS's #49 row · 212d74e · gate PASS; repo map OK.
 
 ## Current step
-The review round on 37434d5 (origin/main...37434d5): security-auditor and the verifier, Opus 5.5 high, background;
-notes `.checkpoints/status-diet/security-auditor-review.md` and `verifier-review.md`.
+The verifier's re-check of adfe108 and 212d74e (resumed; notes verifier-recheck.md).
 
 ## Next steps
-1. Collect both verdicts; the fix pass (below the bar: STATUS follow-ups; Lows ride a needed push or become follow-ups).
-2. The report `docs/reports/2026-11-10-status-diet.md` (cond. 2: the live archive sections as a reading; cond. 9: his
-   153 KB / 1,033 lines vs 177 KB / 1233; cond. 12: #40 conflicts and moves his 2026-11-06 answers into DECISIONS.md;
-   addendum (a): For Mustafa reconfirms the security follow-ups reading; ask him to confirm both kit-write prompts).
-3. Fold and delete the checkpoint; mark #49 ready; the advisor's final-head review; his go.
+1. On PASS: the last commit deletes `.checkpoints/status-diet*` (CI runs); mark #49 ready (the PR body names the
+   parent of the deletion commit, where the notes stay readable).
+2. The advisor's final-head review (the advisor agent, day session); then his go ("merge #49"), from this session.
 
 ## Open findings
 - the verifier on 37434d5: PASS WITH NOTES (verifier-review.md, DONE). M-1 Medium: docs-keeper item 1 drops the old
