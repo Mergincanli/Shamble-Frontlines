@@ -24,3 +24,24 @@ B6 final review, DONE
 - finding: makeInputCommand (core:1481) is declared and never called anywhere -> host for M21 (no 5a). devReset (game:2214) only runs from the dev panel button (never clicked by the smoke) -> host for M12-M18.
 - PC2 choice: _aLerp (game:234, frees none beyond builtins), moved into core just before hyp2 (core:743).
 - B4 in progress: finds chosen; next write builder + verifier.
+- B4 done: finds chosen (see e3-build.cjs, which builds the JSON from git show 44446a5 and slices wrType, refreshMapList, _aLerp by acorn ranges).
+- B5 done: e3-mutations.json written (31 entries: P1-P4, M1-M22, C1-C3, PC1, PC2; 35 edits). Verifier e3-verify.cjs: ALL CHECKS PASS: every find occurs exactly once in its file at 44446a5 and once in the file as edited so far (edits in order); every edit changes its file; ids/order complete; expected ids valid, non-empty for mutations, empty for controls; flags only on PC1; every mutated file still parses (acorn on JS, inline scripts and handlers of pages) except P3, which fails to parse as intended. M6's from_commit resolves and differs from base.
+- convention: `expected` = the report's named checks verbatim; where gate.mjs logic predicts a different result on base 44446a5, `notes` has a sentence starting "PREDICTED ON 44446a5: [...]".
+- predictions differing from the reports: P1 [3,5a,5b]; P2 [4,5a]; P3 [1,2,3,4,5a,5b]; P4 [3,5c]; M6 [3,5a,5b]; M7 [3,5a,5b]; M19 [5b]; M20 [5d]; PC1 [5a,5b] (NOT a pass: the control cannot pass the full gate as written).
+- M6 shape: edits: [{file:"shamble-editor.js", from_commit:"<full sha>"}] (the object the task gave, inside edits).
+- C3: index.html:321 has a prefers-reduced-motion rule that kills #title animations; Playwright's default is no-preference, so the pulse runs in the smoke.
+- Next: B6 final review (advisor), then DONE.
+- C3 check: no animationend/transitionend listener in shamble-game.js, shamble-core.js or index.html, so the pulse cannot stall the Deploy flow.
+- B6 done (advisor review: table ships as built).
+
+## Uncertainties (for the answer)
+U1 PC1 cannot PASS the full gate on base 44446a5: refreshRect is still referenced (shamble-game.js:3275 in bootGame; index.html:1263, editor.html:1266), so 5a and 5b fail; only check 3 flips to "dropped (allowed)". The plan's rule "every control passes in both" (plan.md:255) cannot hold for PC1 as written: the session decides (judge PC1 on check 3's line, or redefine it).
+U2 Base difference: the reports ran under other conditions (Phase 0: checks 1-4 only; check 5: default base = merge-base with main 2d30e4a/5858864, where the three editor functions were nested). Predicted on 44446a5: P1 [3,5a,5b], P2 [4,5a], P3 [1,2,3,4,5a,5b], P4 [3,5c], M6 [3,5a,5b] (7 editor symbols dropped), M7 [3,5a,5b]. `expected` keeps the report's checks; the predictions are in `notes`.
+U3 M19/M20: the report pairs them under "5b + 5d" without saying which fails which. Predicted M19 [5b], M20 [5d].
+U4 M6 shape: {file, from_commit} placed as the single element of `edits` (the task wording also allows it in place of `edits`). Full sha 58588648e4b65b4c77d4e18255facceb3bcfc31b. M6 may show more 5a errors than the three ReferenceErrors (an old file on today's game).
+U5 M5 relies on Chromium emitting a file: request event for an <img> from a file:// page (smoke.mjs flags file: requests outside the root); a console error for the missing file would fail 5a anyway.
+U6 M4/M5 use window.WebSocket / new window.Image() (gate-globals.json lists neither); how the 2026-10-14 session wrote them is not recorded.
+U7 M8, M9, C1, C2, C3 apply to index.html only (the report names no page); M22 is read as an extra editor tag with type text/ecmascript in index.html; M20 is a closed tag.
+U8 Assumed, not verified: M20/M22 stay green on 5a (the pages share their DOM; the editor's top level is declarations only); P2's double bootEditor on editor.html is of unknown effect (index.html fails 5a regardless).
+U9 C2 adds a top-level var onE3Probe to index.html's inline script: check 3 should print +added (not a failure).
+DONE
