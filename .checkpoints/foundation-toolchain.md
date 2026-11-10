@@ -111,6 +111,12 @@ Steps 1-4 done. Step 5 waits for 2.1b and LANE-RULES to merge (his word); the PR
   "is an extra. The recorded plan review by the advisor agent stays required". The advisor agent review goes ahead.
 - STATUS on main still calls kit-v3-5 in flight; PR #46 merged as 2d22b69 (docs drift for docs-keeper, not 2.2's).
 - The local `unshare` rehearsal was refused by the session's permission check; not retried (plan Appendix B).
+- K1's ask (the session's event log, list_events): the guard's PreToolUse ask fired for the workflow write at
+  20:02:42 UTC ("kit and gate files ask first in a day session: .github/workflows/toolchain.yml", a can_use_tool
+  request) and was answered "allow" at 20:02:48 UTC; the log does not say whether Mustafa or the session's auto mode
+  allowed it. His reply of 2026-11-10 carried both template options ("I saw it and approved it. / no prompt reached
+  me."); asked him which. If no prompt reached him, step 5's kit writes are asked in chat first, and the auto-mode path
+  past the guard's ask becomes a kit finding for the gate step.
 - Kit follow-up for STATUS (the advisor, outside this plan): CHECKPOINTS.md §10's `git -C <path> status` is refused by
   the guard (`routine-guard.mjs:1046`); waits for the kit to unfreeze; docs-keeper records it in the build's docs pass.
 
