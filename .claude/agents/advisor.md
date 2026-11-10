@@ -79,8 +79,11 @@ reviewers (step 5) for the change type apply at every tier.
   security-auditor, always, on top of CLAUDE.md step 5's subject list. Always needs-mustafa: it merges on his go, and
   for kit, CI and gate files only from a day session (the guard lets the PR Advisor merge only plain paths in `docs/`,
   `tools/`, `README.md` and `FIRST_PROMPTS.md`, read with both names of a renamed or copied file and with whole lists,
-  and never a rules, gate or decision-doc name in any letter case; everything else merges from a day session on his
-  go. It cannot judge a word or decision of Mustafa's, so still read the `--no-renames` list yourself).
+  never a rules or decision-doc name in any letter case, and never a gate file's name under `tools/`; everything else
+  merges from a day session on his go. It cannot judge a word or decision of Mustafa's, and inside those places it lets
+  through symlinks, case-only twins, gitignored names and Windows reserved names, so still read
+  `git diff --raw --no-renames origin/main...<headSHA>` yourself: it shows each file's mode, so a symlink (120000) or a
+  submodule (160000) stands out).
 - **Risk tier 3, irreversible or money** (escalation category 4): agents only propose. No session or agent carries out
   the irreversible or paying act. A tier-3 PR (the proposal) merges only on Mustafa's explicit decision of that act and
   his go on its head. CLAUDE.md's Never lines ("force-push, hard-reset or rewrite history", "delete user data or

@@ -558,8 +558,11 @@ function npmCheck(argv, vcwd, role, io) {
     }
     const shadow = originMainCheck(io.projectDir, io, role); // SA-2
     if (shadow) return deny(shadow);
-    const same = io.git(['diff', '--quiet', 'origin/main', '--', 'tools/package.json', 'tools/package-lock.json'], io.projectDir);
-    return same.code === 0 ? null : deny("routine (night-shift): the toolkit's manifest differs from main's; install only main's lockfile");
+    const same = io.git(['diff', '--quiet', 'origin/main', '--', 'tools/package.json', 'tools/package-lock.json', 'tools/npm-shrinkwrap.json'], io.projectDir);
+    if (same.code !== 0) return deny("routine (night-shift): the toolkit's manifest differs from main's; install only main's lockfile");
+    // kit-v3-5 (SA5-1): npm reads tools/npm-shrinkwrap.json before the lockfile, so an untracked one refuses too
+    const loose = io.git(['ls-files', '--others', '--', 'tools/npm-shrinkwrap.json'], io.projectDir);
+    return loose.code === 0 && !loose.out.trim() ? null : deny('routine (night-shift): an untracked tools/npm-shrinkwrap.json would decide what npm installs');
   }
   return deny(`routine (${role}): npm only as "${NIGHT_NPM}" (night shift; the PR Advisor installs nothing)`);
 }
@@ -1492,11 +1495,13 @@ async function mergeCheck(ti, role, io) {
     // and mergeAllowed refuses the backslash.
     const cf = pr.changed_files;
     if (cf >= 3000) return deny(`routine (pr-advisor): the PR changes ${cf} files, more than GitHub lists; it merges from a day session`);
+    if (cf < 1) return deny(`routine (pr-advisor): GitHub lists no changed file (${cf}); it merges from a day session`);
     const r = io.gh(['api', '--paginate', `repos/${repo}/pulls/${ti.pullNumber}/files?per_page=100`, '--jq', '.[] | [.filename, (.previous_filename // "")] | @tsv']);
     if (r.code !== 0) throw new Error('gh api pulls/files failed');
     const lines = r.out.split('\n');
     if (lines[lines.length - 1] === '') lines.pop();
     if (lines.length !== cf) return deny(`routine (pr-advisor): the file list was not read whole (${lines.length} read, ${cf} changed)`);
+    if (lines.some((l) => !l.split('\t')[0])) return deny('routine (pr-advisor): the file list has a line without a name; it merges from a day session');
     const names = lines.flatMap((l) => l.split('\t')).filter(Boolean);
     const hit = names.find((f) => !mergeAllowed(f));
     if (hit) return deny(`routine (pr-advisor): the PR changes ${hit}; only plain docs and tools paths merge here, everything else merges from a day session on Mustafa's go`);
