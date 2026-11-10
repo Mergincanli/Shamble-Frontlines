@@ -1,6 +1,8 @@
-# Plan: the foundation, steps 2.1 and 2.2 (revision 2)
+# Plan: the foundation, steps 2.1 and 2.2 (revision 3)
 
-Status: revision 2 (the advisor tool's six fixes applied), for the advisor agent's plan review. This session plans only: no code, no file moves.
+Status: revision 3. The advisor agent reviewed revision 2 (8bbebfa): APPROVE WITH CONDITIONS, for 2.1 only;
+conditions C1-C8 are applied here (Part 5 records its rulings). 2.2 needs its own plan and plan review. This session
+plans only: no code, no file moves.
 Source: Mustafa's decision of 2026-11-10 and his task list, word for word in `mustafa-2026-11-10.md` (this folder).
 Base: main 44446a5. Branch of this plan: `claude/advisor-fable-4hxq72` (Mustafa's personal account; one account per
 branch). Everything below is from reading at 44446a5 (grep and read only); nothing was moved or run after a move,
@@ -25,9 +27,13 @@ except one control: R7's tuning builder rerun on its own dumps (E4).
   (wasm-bindgen, one Wasm instance or two, isolation, generated types, build sizes) stay empty slots.
 - **2.3-2.6** wait for the netcode proof test (L1, the protocol messages), the sim core spike (replay and hash), the
   boundary spike (types, the boundary layer, the Worker layout) and the preview hosting check; 2.3 also waits for #46.
-- **PR #46:** 2.1 shares only STATUS and ROADMAP with it, so it can build beside it, but merges after it.
+- **PR #46 and his queue (STATUS-DIET, LANE-RULES):** 2.1a shares no file with them and can be built now; 2.1b shares
+  CLAUDE.md, STATUS, REPO_MAP and ROADMAP; both merge after them, on his go.
   **PR #40:** after 2.1 merges, it merges main, keeps both sides of REPO_MAP and STATUS, and changes nothing else.
-- **For Mustafa:** SPLIT, HC-PATH, SCOPE (before 2.2), MODEL-RULE (Part 5).
+- **Approval:** the advisor agent approved 2.1 with conditions (applied); 2.1a may be built now, but its merge and
+  2.1b's kit sitting wait for FREEZE-FDN and SPLIT. 2.2 needs its own plan and review.
+- **For Mustafa:** FREEZE-FDN (does KIT-FREEZE-2 cover the foundation's own edits?), SPLIT, SCOPE (before 2.2's merge)
+  (Part 5).
 
 ## Part 1. Step 2.1, the restructure, as its own change-set
 
@@ -56,8 +62,10 @@ except one control: R7's tuning builder rerun on its own dumps (E4).
   build commit moves the plan to `.checkpoints/foundation-restructure/plan.md` and the planning checkpoint
   `.checkpoints/foundation.md` becomes the build checkpoint), or on a new session's branch cut from main, whose first
   commit copies the plan from this branch's last commit (its SHA is in the final report). 2.1a's last commit deletes
-  the checkpoint folder (CHECKPOINTS §9), so 2.1a's report records the plan's last SHA; 2.1b restarts the same branch
-  from main once 2.1a has merged (the merged-PR rule) and copies the plan back from that SHA as its step 0.
+  the checkpoint folder (CHECKPOINTS §9), so 2.1a's report records the plan's last SHA; 2.1b then starts the same branch
+  again from main once 2.1a has merged (by merge commit), by a fast-forward to main, never a force-push (the cloud
+  session's own instructions say a merged PR's branch restarts from main; no repo rule says so), and copies the plan
+  back from that SHA as its step 0.
 
 ### 1.2 Every file that names a legacy path
 Method: `git grep -E 'shamble-(core|game|editor)\.js|shamble-\*\.js|shamble-\*|shamble-\{|index\.html|editor\.html'`
@@ -75,8 +83,8 @@ in this folder.
 **Kit files (all protected: an edit asks Mustafa)**
 | File | Hits | Class | 2.1 does |
 |---|---|---|---|
-| `CLAUDE.md` | 5 (+ :19, :21-22, :52 without a name) | STALE :19 ("It moves to `legacy/` in phase 1"), :41-42 (Layout lists the five at the root); NAME :43, :71, :73, :98, :214-219 (`<dir>` placeholders); rule text :46, :21-22, :52, :149-159 (Part 5) | **edit** :19 → "It lives in `legacy/`."; :41 → "`legacy/`: `shamble-core.js` (engine) ← …"; :42 → "`legacy/index.html` (player build) · `legacy/editor.html` (authoring build) · …"; :46 only if Mustafa picks HC-PATH (b); the scope line is 2.2's (SCOPE) |
-| `.claude/agents/verifier.md` | 1 (+ :28 with the folder `.`) | COMMAND :28 `node tools/preview.js . eval tools/sim.js` (preview.js:93 reads `<dir>/shamble-core.js`: fails after the move); NAME :18-21 | **edit** :28 `.` → `legacy` (or Q-A4's fallback) |
+| `CLAUDE.md` | 5 (+ :19, :21-22, :52 without a name) | STALE :19 ("It moves to `legacy/` in phase 1"), :41-42 (Layout lists the five at the root); NAME :43, :71, :73, :98, :214-219 (`<dir>` placeholders); rule text :46, :20-22, :52-53 (Part 5, SCOPE); :149-159 the model rule (LANE-RULES') | **edit** :19 → "It lives in `legacy/`."; :41 → "`legacy/`: `shamble-core.js` (engine) ← …"; :42 → "`legacy/index.html` (player build) · `legacy/editor.html` (authoring build) · …"; :46 stays untouched (SCOPE); the scope line is 2.2's |
+| `.claude/agents/verifier.md` | 1 (+ :28 with the folder `.`) | COMMAND :28 `node tools/preview.js . eval tools/sim.js` (preview.js:93 reads `<dir>/shamble-core.js`: fails after the move); NAME :18-21 | **edit** :28 `.` → `legacy` if FREEZE-FDN allows kit lines; else a known-stale note in STATUS (Q-A4) |
 | `.claude/agents/advisor.md` | 3 | NAME :67, :91, :156 (`shamble-*.js`, `index.html`, `editor.html` still name the files) | none (and #46 edits this file) |
 | `.claude/agents/netcode-architect.md` | 1 | NAME :21 | none |
 | `.claude/rules/engine-core.md`, `engine-game.md`, `engine-editor.md`, `pages.md` | 2, 2, 3, 4 | NAME: their `paths:` globs are `**/<name>` and already match `legacy/<name>`; prose names | none |
@@ -146,9 +154,11 @@ Total 603 docs hits, every one read in context by the docs agent (`inv-docs.md`)
   legacy; `classicParts` resolves `<script src>` against `BUILD` and keeps the containment check under it; the smoke
   runs with `root: BUILD`; the base line and the header comment name the folder. Unchanged: `ROOT` (git and `TOOLS`),
   `FILES`, `OLD_PREFIX`, `toBuild`, checks 5c and 5d (their names are relative to the page). Removed names: none.
-  Option (Q-A5): one prefix per base, chosen where all five files exist (adds `BASE_PREFIXES` and `basePrefix`).
-- `tools/smoke.mjs`: `runSmoke`'s default root is the same folder (`legacy/` when it holds both pages, else the root;
-  its CLI follows); `ROOT`, `ROOT_URL` and `rel` stay; the header's "outside the repo" → "outside the build folder"
+  One prefix per base (Q-A5, ruled): try `legacy/`, the root, then `shamble-frontlines-repo/`, take the first holding
+  all five files, never mix within one base; none: exit 2 naming the base and the prefixes tried; the chosen prefix is
+  printed on the base line and in `--json` (adds `BASE_PREFIXES` and `basePrefix`).
+- `tools/smoke.mjs`: `runSmoke`'s default root is the gate's `BUILD`, by one shared rule (the folder that holds all
+  five files; both or neither: exit 2), not a separate "both pages" test (the advisor's L6); its CLI follows; `ROOT`, `ROOT_URL` and `rel` stay; the header's "outside the repo" → "outside the build folder"
   (a page may read only files under its own folder: stricter under `legacy/`, and the pages read no sibling file).
 - `tools/village.py`: its default core path is `legacy/shamble-core.js` when that exists, else the root one.
 - The deferred Low of kit-v2-1 (STATUS:1009, "fix the wording when gate.mjs is next touched"): gate.mjs:333 and
@@ -156,7 +166,7 @@ Total 603 docs hits, every one read in context by the docs agent (`inv-docs.md`)
   (it is a gate file: his go). 2.1a fixes both lines (e.g. "a gate file: a change needs Mustafa's go"), and
   docs-keeper closes the STATUS line.
 - `tools/battery.js`: none (it takes the folder as an argument).
-- Symbols: the gate gains `BUILD` (and the option's two names); the five game files are untouched (+0 −0).
+- Symbols: the gate gains `BUILD`, `BASE_PREFIXES` and `basePrefix`; the five game files are untouched (+0 −0).
 
 2.1b (the move): the five files with `git mv`; the edits below. The gate files are not touched again.
 
@@ -165,8 +175,9 @@ Total 603 docs hits, every one read in context by the docs agent (`inv-docs.md`)
 comments of `preview.js`, `pageshot.js`, `sim.js`, `reach.js`, `perfbots.js`, `tuning-dump.js`, `aabbs.js`, and the
 root `README.md` (:12, :13, :19-22).
 
-**Kit lines (2.1b; each asks Mustafa):** `CLAUDE.md` :19, :41, :42 as in 1.2; :46 only if he picks HC-PATH (b);
-the model rule if MODEL-RULE is (a); `.claude/agents/verifier.md:28` (`.` → `legacy`). The scope line (SCOPE) is 2.2's.
+**Kit lines (2.1b; each asks Mustafa):** `CLAUDE.md` :19, :41, :42 as in 1.2 (:46 stays untouched);
+`.claude/agents/verifier.md:28` (`.` → `legacy`); all of them only as FREEZE-FDN allows. The model rule is LANE-RULES'
+and the scope line is 2.2's (SCOPE).
 
 **Docs:** 1.4.
 
@@ -237,9 +248,14 @@ OLD's gate.
 - **E8, the rollback works the way CI would see it** (2.1b). In a throwaway worktree of A: `git merge --no-ff` of 2.1b's
   head (a local merge commit M, as GitHub would make it), then `git revert -m 1 --no-edit M` (the whole merge, as
   advisor.md:271-274 does it); on that tree, `node tools/gate.mjs M` (CI's base on the revert PR is the main that holds
-  M) and `node tools/gate.mjs --smoke-only` must both PASS. No commit leaves the worktree.
-- **E4, the oracle (PM-0002-36).** The dump with `--pre=tools/tuning-dump.js` for both maps (default and
-  `--map=tri`), at base with folder `.` and at head with folder `legacy`, twice each: all four head runs byte-identical
+  M) and `node tools/gate.mjs --smoke-only` must both PASS. No commit leaves the worktree. The merge and the revert
+  write CLAUDE.md and verifier.md in that worktree, and the guard does not read `git revert` (STATUS, limit L4): the
+  main session runs E8 itself, never a subagent, after one ask to Mustafa (advisor.md, Revert, step 2).
+- **C7, every command under the guard of the day:** each evidence command is re-checked against the guard on main when
+  it runs (PR #46 rewrites it first); a refusal is a finding for the checkpoint, never something to work around.
+- **E4, the oracle (PM-0002-36; the advisor accepted this reading, Q-A1).** The dump with `--pre=tools/tuning-dump.js`
+  for both maps (default and `--map=tri`), at base with folder `.` and at head with folder `legacy`, twice each, with
+  A's copies of `preview.js` and `tuning-dump.js` for both runs (2.1b edits their header comments): all four head runs byte-identical
   to the base runs; then R7's builder (`build-tuning.py` at a715be2, run unchanged except its input and output paths,
   into `.gate/foundation/`) on the head dumps gives files `cmp`-equal to `docs/legacy-tuning.json` and
   `docs/LEGACY_TUNING.md`. Control already run in this session (inv-code B7b): the builder on R7's own dumps of
@@ -260,7 +276,8 @@ OLD's gate.
 
 ### 1.6 Steps (each one commit, the gate after each; checkpoint `foundation-restructure`)
 **2.1a**
-0. Re-read PR #46's file list; confirm no overlap with 1.3's list (or hold the overlapping file).
+0. Re-read the open PRs' file lists (#46, STATUS-DIET, LANE-RULES, #40); a file one of them edits waits until it
+   merges. Record OLD's exact SHA.
 1. **Dry run** in a throwaway worktree under `.gate/`: `git mv` the five files, run today's gate and the smoke, list
    every failure (expected: exit 2, "shamble-core.js is missing from the working tree", gate.mjs:98). Nothing is
    committed from it; it confirms the inventory (grep only so far) or adds to it.
@@ -272,11 +289,14 @@ OLD's gate.
    exit 2; the three bases of E3.
 4. **His decision on main** (docs-keeper; decision docs, so his go): his words of 2026-11-10, verbatim, in STATUS's
    "Decisions pending", and a dated pointer to them in each line they overtake: ADR 0002's migration plan step 1
-   ("The spikes before the foundation", 0002:1422-1425), SPIKE_PLAN's order paragraph (:86-91, :115) and the
-   foundation entry's "Depends on" (:429-432), STATUS's "Next". Until this lands, the only record is this plan's
-   folder on a branch.
-5. **Reviews** (security-auditor, test-engineer; the advisor), the report, PR ready, `needs-mustafa` (gate files and
-   decision docs; no Brave check: nothing a player sees changes). Merged after PR #46, on his go.
+   ("The spikes before the foundation", 0002:1422-1425), SLICE-ORDER's condition 3 (STATUS:654: "The netcode proof
+   test ... still runs before the foundation"), SPIKE_PLAN's order paragraph (:86-91, :115) and the foundation entry's
+   "Depends on" (:429-432), STATUS's "Next" (in `docs/DECISIONS.md` instead if STATUS-DIET lands first). Until this
+   lands, the only record is this plan's folder on a branch; and a revert of 2.1a would remove it again (its report
+   says so).
+5. **Reviews** (security-auditor, test-engineer, infra-engineer for the gate on old bases; the advisor), the report, PR
+   ready, `needs-mustafa` (gate files and decision docs; no Brave check: nothing a player sees changes). Merged after
+   PR #46 and his queue's items, on his go, once FREEZE-FDN allows it.
 
 **2.1b** (from main with 2.1a merged)
 6. **The move** (one commit, nothing else): `git mv` of the five files into `legacy/`. The gate with smoke PASS.
@@ -289,24 +309,36 @@ OLD's gate.
 11. **Reviews** on the final diff (1.7), one fix pass, the report, the checkpoint deleted in the last commit, PR ready;
     Mustafa's backup and Brave check (1.8), then his go.
 
-### 1.7 Reviewers (the final diff; one round, one fix pass; 3 at a time)
-The advisor (plan, then every pushed head) and security-auditor (every risk-tier-2 change) always; test-engineer (is
-the move proven: E1-E6); infra-engineer (CI and the gate's behaviour on old bases); then the verifier until PASS.
-No art-director: nothing a player sees changes (bytes unchanged), and Mustafa's Brave check covers it.
+### 1.7 Reviewers, models and effort (the final diff of each PR; one round, one fix pass; 3 agents at a time)
+- **2.1a:** security-auditor (every risk-tier-2 change), test-engineer (is it proven: E3, the three bases, the
+  both-copies stop), infra-engineer (CI and the gate on old bases); then the verifier until PASS; the advisor on every
+  pushed head.
+- **2.1b:** security-auditor, test-engineer (E1, E2, E4 to E6, E8), infra-engineer (the move against CI and the gate);
+  docs-keeper for the docs; the verifier until PASS; the advisor on every pushed head. No art-director: nothing a player
+  sees changes (bytes unchanged), and Mustafa's Brave check covers it.
+- **Models and effort (CLAUDE.md, "Models and effort"):** the main session and every agent run Opus 5.5; the reviewer
+  agents, the verifier and docs-keeper run from their agent files (`model: opus`, their stated effort); docs-keeper's
+  ADR and register edits get `xhigh`; built-in and workflow agents get `model: 'opus'` and `effort: 'high'` passed
+  explicitly. Fable 5.2 only through the advisor tool on this account (his LANE-RULES), never as an agent. At most 3
+  agents at a time, the saver running while they do.
 
-### 1.8 What Mustafa checks in Brave (ADR 0002's foundation checklist, step 1)
-1. Before (whatever E5 says, and before you take the merged main, whose root no longer has the game): back up your
+### 1.8 What Mustafa checks in Brave (ADR 0002's foundation checklist, step 1; 2.1b only)
+0. Confirm you have this version: download the PR's branch as a zip from its GitHub page (Code, Download ZIP) and unzip
+   it to a new folder. On screen, the folder holds `legacy/` with the game in it, and no `index.html` at its top.
+1. Before (whatever E5 says, and before you take the merged main, whose top no longer has the game): back up your
    saves. In Brave, open your current `index.html`, press F12, Console (type `allow pasting` if asked), paste the line
-   the session gives you (it copies every saved key as one text), paste that into a text file outside the repository;
-   do the same on your current `editor.html` (maps, prefabs, Character Lab). The editor's Export shows one map at a
-   time and has no import (`editor.html:1058`, `:1248` read-only), so the session also gives a restore line that puts
-   back only missing keys. Your old copy keeps its saves either way: nothing is deleted.
-2. Download the branch as a zip, unzip it to a new folder, double-click `legacy/index.html`. Expected: the menu opens;
-   Deploy starts a match; you can move, shoot and pause, as before.
+   the session gives you (it copies every saved key as one text), and paste that into a text file outside the
+   repository; do the same on your current `editor.html` (maps, prefabs, Character Lab). Expected: each text file
+   starts with `{` and holds your keys (`shamble_prog`, `vmap:…` for each map). The editor's Export shows one map at a
+   time and has no import (`editor.html:1058`; `:1248` is read-only), so the session also gives a restore line that
+   puts back only missing keys. Your old copy keeps its saves either way: nothing is deleted. (Both console lines are
+   in 2.1b's report, for security-auditor to read first.)
+2. Double-click `legacy/index.html` in the new folder. Expected: the menu opens; Deploy starts a match; you can move,
+   shoot and pause, as before.
 3. Double-click `legacy/editor.html`. Expected: the editor's menu opens; Map editor and Maps open, and your saved maps
-   are listed (or, if E5 said they do not carry over, the list is empty and nothing is lost: your old copy still has
-   them).
-4. Say "done" or "not yet" for each step.
+   are listed (or, if E5 said they do not carry over, the list is empty and nothing is lost: your old copy has them,
+   and the restore line puts them back).
+4. Say "done" or "not yet" for each step. If every step passes, say "merge #<n>" in a session's chat.
 
 ### 1.9 Risks
 - **A tool or command missed by the grep** → the dry run (step 1) and E6 run every changed command once; the critic's
@@ -322,6 +354,9 @@ No art-director: nothing a player sees changes (bytes unchanged), and Mustafa's 
 - **The PR Advisor routine is paused** until #46 merges → 2.1 is `needs-mustafa` anyway and merges on his go.
 
 ## Part 2. Step 2.2, the toolchain: a one-page sketch
+
+**Status:** a sketch only. The advisor agent's approval covers 2.1, not 2.2: 2.2 gets its own plan and plan review,
+and its merge also waits for SCOPE and FREEZE-FDN.
 
 **What 2.2 is** (ADR 0002 migration plan 2.2, part 2, part 3): the two workspaces and the pins; the first crates
 `sim`, `protocol`, `room`, `client-endpoint`, `sim-wasm`, `devtools` and packages `client`, `sim-worker`, `net`,
@@ -397,24 +432,34 @@ Phase); his decision lifted that for 2.1 and 2.2 only.
 
 ## Part 4. The other two pull requests
 
-### PR #46 (kit-v3-5, the guard's rename gap; university account)
-- **Where it stands** (its branch `claude/sleepy-tesla-ofsxsr`, read 2026-11-10 at cb6636d): a draft at step 0, his
-  words saved, no plan yet; it will edit `.claude/hooks/routine-guard.mjs` and its tests, advisor.md's tier-2 bracket,
-  STATUS, ROADMAP and the kit-v3-4 report. Its file list is not final until its plan exists.
+### PR #46 (kit-v3-5, the guard's rename gap; university account), and the queue behind it
+- **Where it stands** (its branch `claude/sleepy-tesla-ofsxsr`, read 2026-11-10 at d7526f5): plan revision 3, an
+  allow-list for the PR Advisor's merges; its build order writes the guard's test file, the guard, `advisor.md` and
+  `CLAUDE.md` (plan-rev3.md §5), then STATUS, ROADMAP and the kit-v3-4 report. Its rev 3 already counts the
+  foundation: "`legacy/` and the v2 folders are not allowed places. Their PRs wait for his go until the foundation's
+  gate step adds them" (plan-rev3.md:54-55; that lane's reading, not his words).
 - **His words make it first:** "the guard fix, agent memory included, is the very next change-set. Until it merges,
-  I'm pausing the PR Advisor routine" (GUARD-RENAME (c), 2026-11-09, in its checkpoint).
-- **Can 2.1 build beside it?** Yes, on files #46 does not name. With the legacy tools left in `tools/` (OQ-0002-2 (a),
-  Part 1), 2.1 edits no guard file, no `.claude/settings.json`, no `.github/` file and no guard test, and leaves
-  advisor.md alone (its `shamble-*.js`, `index.html`, `editor.html` stay true as names). The only shared files are
-  STATUS and ROADMAP, which 2.1's docs pass touches last.
-- **When 2.1 merges:** both of its PRs (2.1a, then 2.1b) after #46. Three reasons: his words make #46 the next change-set; 2.1 is mostly renames and #46
-  rewrites how the guard's merge check reads a renamed file ("reads both names of a renamed file", its F1), so the fixed
-  check should be the one that judges 2.1; and the PR Advisor routine stays paused until #46 merges anyway (2.1 is
-  `needs-mustafa` in any case: kit edits and a Brave check).
-- **Before 2.1 builds:** re-read #46's file list once its plan exists; if it names any file in 2.1's edit list (Part 1),
-  that file's edit waits until #46 merges. Before 2.1's docs pass: merge main (with #46) into 2.1's branch, in a
-  worktree, or in the main folder with the guard's ask (CLAUDE.md, Never: only `--ff-only` merges of `origin/main` run
-  there without one).
+  I'm pausing the PR Advisor routine" (GUARD-RENAME (c), 2026-11-09).
+- **His queue of 2026-11-10 behind it** (word for word in `.checkpoints/kit-v3-5/mustafa-2026-11-10-queue.md` and
+  `mustafa-2026-11-10-answers.md` on that branch, d7526f5): KIT-FREEZE-2 ("After kit-v3-5 merges, the kit freezes
+  again until the foundation's gate step. Exceptions: a broken main, and items 2 and 3 below."), STATUS-DIET (STATUS
+  split into STATUS, DECISIONS and STATUS_ARCHIVE by a line-range script; REPO_MAP and CLAUDE.md's read list follow)
+  and LANE-RULES (three CLAUDE.md edits: lanes, models, the read list), and ORDER (b): "STATUS-DIET and LANE-RULES
+  first, then the unit walk". KIT-FREEZE-2 bears on 2.1's merges: FREEZE-FDN, Part 5.
+- **Can 2.1 build beside them?** 2.1a, yes: its files (`tools/gate.mjs`, `tools/smoke.mjs`, `tools/village.py`,
+  `tools/README.md`) are in none of those lists. 2.1b shares `CLAUDE.md` (with #46 and LANE-RULES), STATUS and REPO_MAP
+  (with STATUS-DIET and #40) and ROADMAP; it touches neither `advisor.md` nor the guard.
+- **Order of merges:** #46, then STATUS-DIET and LANE-RULES (his ORDER (b)), then 2.1a and 2.1b, each on his go
+  (FREEZE-FDN decides whether they may merge before the gate step). Whichever of two PRs that share a file merges
+  second brings main in and resolves. Three reasons for 2.1 after #46: his words make #46 next; 2.1 is mostly renames
+  and #46 rewrites how the guard reads a renamed file, so the fixed check should judge 2.1; and the PR Advisor routine
+  stays paused until #46 merges (2.1 is `needs-mustafa` either way).
+- **If STATUS-DIET lands first:** 2.1a's record of his decision goes to `docs/DECISIONS.md`, not STATUS; the plan's
+  STATUS line numbers (:654, :739-746, :987, :1009) are found again in the split files; and no 2.1 edit to STATUS lands
+  while STATUS-DIET's line-range script is in flight.
+- **Before each build step:** re-read the open PRs' file lists; a file another open PR edits waits until that PR
+  merges. Bringing main into 2.1's branch: in a worktree, or in the main folder with the guard's ask (CLAUDE.md, Never:
+  only `--ff-only` merges of `origin/main` run there without one).
 
 ### PR #40 (the netcode proof test; university account)
 What 2.1 changes for it, and what #40 must do once 2.1 is on main:
@@ -434,54 +479,60 @@ What 2.1 changes for it, and what #40 must do once 2.1 is on main:
 ## Part 5. Questions
 
 ### For Mustafa (rule text and choices only he can settle; each asked, never read into)
-Two rules frame the first two: CLAUDE.md's hard constraints change "ONLY through an accepted ADR signed off by
-Mustafa" (and its Never list: "change a hard constraint without an accepted ADR"), and the advisor's Never list says
-"Merge a hard-constraint change before its accepted ADR is on main" (advisor.md:313). ADR 0002 is Proposed.
+Two rules frame SCOPE: CLAUDE.md's hard constraints change "ONLY through an accepted ADR signed off by Mustafa" (and
+its Never list: "change a hard constraint without an accepted ADR"), and the advisor's Never list says "Merge a
+hard-constraint change before its accepted ADR is on main" (advisor.md:313). ADR 0002 is Proposed. The model rule is
+not asked: his LANE-RULES of 2026-11-10 settles it ("on my personal account, Fable 5.2 may be the session's advisor
+through Claude Code's advisor tool. The main model and every agent stay Opus 5.5", with his addition "it is an extra.
+The recorded plan review by the advisor agent stays required"); LANE-RULES makes that CLAUDE.md edit, not 2.1.
+- **FREEZE-FDN.** Your KIT-FREEZE-2 (2026-11-10 06:33 UTC, after your foundation decision of the same day) reads "After
+  kit-v3-5 merges, the kit freezes again until the foundation's gate step. Exceptions: a broken main, and items 2 and 3
+  below." Does it also cover the foundation's own kit and gate edits? 2.1 cannot move the files without editing the
+  gate, and 2.1 and 2.2 would merge inside the freeze. Options: (a) the foundation's minimum edits are exempt, each
+  still asked and merged on your go: for 2.1, `tools/gate.mjs`, `tools/smoke.mjs`, CLAUDE.md :19 and :41-42,
+  `verifier.md:28`; for 2.2, its CI job, the constraint-scope lines and the rules' globs; (b) gate files are exempt,
+  but `.claude/`, CLAUDE.md and `.github/` stay frozen: 2.1b leaves those 3 kit lines stale until 2.3, and 2.2's CI
+  marks move to 2.3; (c) everything is frozen: 2.1 then waits for 2.3, which needs 2.1 (a deadlock). Recommended: (a).
+  Until you answer, 2.1a may be built but not merged, and 2.1b's kit sitting waits.
 - **SPLIT.** You asked for 2.1 "as its own change-set". The rollback rule needs a pure revert with CI green
-  (advisor.md:285-289), and a one-PR 2.1 cannot give that (1.1). Options: (a) two PRs under this one plan, 2.1a (the
-  tools learn both layouts) then 2.1b (the move): two gos, two kit sittings (2.1a's gate files, 2.1b's CLAUDE.md and
-  verifier.md lines), and only 2.1b needs your Brave check; (b) one PR, accepting that if it breaks main, the fix is a
-  planned fix-forward PR instead of a revert. Recommended: (a).
-- **HC-PATH.** CLAUDE.md:46 reads "the game runs by double-clicking index.html (file://)"; after 2.1b the page is
-  `legacy/index.html`, and ADRs 0001:1067, 0002:951, 0004:840 and 0006:806 quote the line word for word. Options:
-  (a) leave :46 untouched: its words stay true by name, and CLAUDE.md's Layout lines (:41-42, edited in 2.1b) give the
-  path; no hard-constraint line changes, so no ADR is needed; (b) add a clause to :46, "(since foundation step 2.1:
-  `legacy/index.html`)": the rule stays the same, but the advisor may read any edit of that line as a hard-constraint
-  change, and then 2.1b cannot merge before ADR 0002 is accepted (advisor.md:313); (c) 2.1b waits for ADR 0002's
-  acceptance. Recommended: (a).
-- **SCOPE (needed before 2.2, not for 2.1).** Your SPIKE-SCOPE (a) reads "once the drafts are approved, the legacy
-  constraints apply to `legacy/` only" (STATUS:745); STATUS:14-15 says the drafts are "signed off as the basis for the
-  spikes, not yet accepted". 2.2's Rust and TypeScript modules break the constraints if they apply to the whole
-  repository ("classic scripts sharing globals", "Three.js r128", "No addons"), and CLAUDE.md:52 ("Phase 0 writes no v2
-  code"), CLAUDE.md:21-22, advisor.md:98 ("No engine code") and NIGHT_SHIFT.md:54-55 still forbid v2 code. Scoping the
-  constraints to `legacy/` is a hard-constraint change, so it needs an accepted ADR on main before it merges.
-  Options: (a) you accept ADR 0002's part 1 alone now (the repository after the restructure, with "the legacy hard
-  constraints then apply to `legacy/` only"), recorded in its Status line; 2.2's kit edit then scopes the constraints
-  and adds your 2026-11-10 decision as the exception to the four "no v2 code" lines; (b) 2.2 waits until ADR 0002 is
-  accepted after the boundary spike; (c) you change the Never lines yourself to allow this one case. Recommended: (a).
-- **MODEL-RULE.** Your decision overrides CLAUDE.md's model rule on this account "until that rule is updated".
-  Options: (a) 2.1b's CLAUDE.md sitting adds your words to the rule, in their own commit; (b) its own small kit
-  change-set after #46; (c) leave it until a later kit pass. Recommended: (a), since 2.1b already opens CLAUDE.md.
+  (advisor.md:285-289), and a one-PR 2.1 cannot give that (1.1). Options: (a) two PRs under this one plan, still one
+  change-set: 2.1a (the tools learn both layouts) then 2.1b (the move); two gos, two kit sittings (2.1a's gate files,
+  2.1b's CLAUDE.md and verifier.md lines), and only 2.1b needs your Brave check; (b) one PR, accepting that if it breaks
+  main, the fix is a planned fix-forward PR instead of a revert. Recommended: (a) (the advisor agent: "the reasoning
+  holds").
+- **SCOPE (HC-PATH folded in; needed before 2.2's merge, not for 2.1).** SPIKE-SCOPE (a), taken by the Advisor on
+  2026-10-25 (STATUS:739-746), reads "once the drafts are approved, the legacy constraints apply to `legacy/` only";
+  STATUS:14-15 says the drafts are "signed off as the basis for the spikes, not yet accepted". 2.2's Rust and
+  TypeScript modules break the constraints if they apply to the whole repository ("classic scripts sharing globals",
+  "Three.js r128", "No addons"), and CLAUDE.md:20-22 and :52-54, advisor.md:98 ("No engine code"),
+  V2_PHASE0_BRIEF.md:20-21 and :144 (the Advisor's document: no session edits it) and NIGHT_SHIFT.md:54-55 still forbid
+  v2 code. Scoping the constraints to `legacy/` is a hard-constraint change, so it needs an accepted ADR on main before
+  it merges. Options: (a) you accept ADR 0002's part 1 alone now (the repository after the restructure, with "the
+  legacy hard constraints then apply to `legacy/` only"), recorded in its Status line: the move then has an accepted
+  ADR too, and 2.2's kit edit scopes the constraints and adds your 2026-11-10 decision as the exception to the "no v2
+  code" lines; (b) 2.2 waits until ADR 0002 is accepted after the boundary spike; (c) you change the Never lines
+  yourself for this one case. Recommended: (a). Either way 2.1b leaves CLAUDE.md:46 ("the game runs by
+  double-clicking index.html (file://)", quoted word for word by ADRs 0001:1067, 0002:951, 0004:840, 0006:806)
+  untouched: its words stay true by name and the Layout lines give the path, so advisor.md:313 cannot bite 2.1b.
 
-### For the advisor agent (readings and choices it may make)
-- **Q-A1, PM-0002-36's reading.** As written the mark cannot pass: `docs/legacy-tuning.json` is R7's builder's output,
-  not the dump's, and without `--pre=tools/tuning-dump.js` the eval returns no table (tuning-dump.js:3-5; ADR
-  0002:1288, :1429-1430; r5:1245). E4 (dumps at `.` and `legacy` byte-identical, then R7's builder reproduces both
-  tuning files byte for byte) is an equivalent, not the mark. Asked: accept E4 as the mark's reading for 2.1b, with the
-  mark's wording corrected in ADR 0002 (a decision doc: his go) in 2.1b's docs pass, or recorded in the register until
-  the drafts' next revision.
-- **Q-A2, OQ-0002-2's three parts** (its decider: "the phase 1 restructure plan (the main session with docs-keeper)"):
-  the legacy tools: (a), stay in `tools/`; the legacy docs (row KT21): 1.4; the gate v2's script: deferred to 2.3's
-  plan, which must also teach the guard the gate v2's files.
-- **Q-A3, G0.** Q2.2-a: the "fails G0 with exit 2" mark moves to 2.3.
-- **Q-A4, verifier.md:28.** Edit the kit line (proposed), or make `preview.js` fall back to `legacy/` when the folder
-  holds no game files (no kit edit, but a silent fallback in a repro tool).
-- **Q-A5, the gate's base fallback.** One prefix per base where all five files exist (proposed), not a per-file mix.
-- **Q-A6, two pull requests for step 2.1.** Mustafa asked for 2.1 "as its own change-set". The rollback rule makes one
-  PR unsafe (1.1, the critic's F1): its pure revert would turn CI red. Proposed: 2.1a (the tools learn both layouts)
-  then 2.1b (the move), both under this one plan. The other way, one PR whose revert is not pure, needs a planned fix
-  PR instead of a revert if main breaks. The advisor rules; if it reads "its own change-set" as one PR only, it
-  escalates to Mustafa.
+### The advisor agent's rulings on this plan (revision 2, 8bbebfa: APPROVE WITH CONDITIONS, for 2.1 only)
+Its notes: `advisor-plan-rev2.md` (this folder). 2.1a's build may start (the dry run, the three tool edits with their
+asks, E3); both merges and 2.1b's kit sitting wait for FREEZE-FDN and SPLIT; 2.2 needs its own plan and plan review.
+- **Q-A1, PM-0002-36:** E4 accepted as the mark's reading for 2.1b (dumps byte-identical over two runs each, then R7's
+  builder at a715be2 reproduces both files with `cmp`; A's copies of `preview.js` and `tuning-dump.js` for both runs).
+  The reading is recorded in the register (`docs/adr/README.md`) in 2.1b's docs pass (his go); the PM row's wording is
+  fixed at ADR 0002's next revision, not in 2.1b (r5:1245 has the same command).
+- **Q-A2, OQ-0002-2:** approved as proposed: tools stay in `tools/` (the fewest kit edits, which matters more under
+  KIT-FREEZE-2), docs stay in `docs/`, the gate v2's path deferred to 2.3's plan.
+- **Q-A3, G0:** provisionally (a): the "fails G0 with exit 2" mark moves to 2.3 (PM-0002-39 puts it under `--prove`);
+  2.2 keeps "rustc --version in CI equals the pin". Final in 2.2's plan review, the done-when change in the register.
+- **Q-A4, verifier.md:28:** follows FREEZE-FDN: edit the line if kit lines are allowed; if not, leave it and record it
+  in STATUS as a known stale command (it fails loudly, ENOENT). Never a fallback in `preview.js`.
+- **Q-A5, the base prefix:** one prefix per base: try `legacy/`, then the root, then `shamble-frontlines-repo/`, take the
+  first that holds all five; if none, exit 2 naming the base and the prefixes tried; print the chosen prefix in the
+  base line and in `--json`; never mix prefixes within one base.
+- **Q-A6, two PRs:** the reasoning holds; recommend SPLIT (a); his choice. Two PRs under one plan are still one
+  change-set (ADR 0002:1427).
 
 ## Appendix A. The 63 files that name a legacy file, by path
 From `git grep -c` at 44446a5 (outside `.checkpoints/`); "Kit or gate" from the guard's `protectedRel`; the class of
@@ -493,7 +544,7 @@ each "none" row is in 1.2. Not in this list because no line names a file, yet ed
 |---|---|---|---|---|
 | 1 | `.claude/agents/advisor.md` | 3 | yes | none (NAME) |
 | 2 | `.claude/agents/netcode-architect.md` | 1 | yes | none (NAME) |
-| 3 | `.claude/agents/verifier.md` | 1 | yes | edit (2.1b): :28 `.` → `legacy` |
+| 3 | `.claude/agents/verifier.md` | 1 | yes | edit (2.1b, as FREEZE-FDN allows): :28 `.` → `legacy` |
 | 4 | `.claude/hooks/routine-guard.test.mjs` | 15 | yes | none (TESTDATA) |
 | 5 | `.claude/hooks/settings.test.mjs` | 1 | yes | none (TESTDATA) |
 | 6 | `.claude/rules/engine-core.md` | 2 | yes | none (NAME) |
@@ -502,7 +553,7 @@ each "none" row is in 1.2. Not in this list because no line names a file, yet ed
 | 9 | `.claude/rules/pages.md` | 4 | yes | none (NAME) |
 | 10 | `.claude/skills/gate/SKILL.md` | 2 | yes | none (NAME) |
 | 11 | `.claude/skills/render-ab/SKILL.md` | 1 | yes | none (NAME) |
-| 12 | `CLAUDE.md` | 5 | yes | edit (2.1b): :19, :41-42; :46 only if HC-PATH (b) |
+| 12 | `CLAUDE.md` | 5 | yes | edit (2.1b, as FREEZE-FDN allows): :19, :41-42; :46 untouched |
 | 13 | `FIRST_PROMPTS.md` | 5 | no | none (HISTORY) |
 | 14 | `README.md` | 6 | no | edit (2.1b): :12-13, :19-22 |
 | 15 | `docs/ART_DIRECTION.md` | 2 | no | none (NAME) |

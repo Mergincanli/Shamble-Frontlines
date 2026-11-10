@@ -10,7 +10,7 @@
 - **Account:** Mustafa's personal account (one account per branch). The university account runs PR #40 (netcode
   proof test, `claude/netcode-proof-test-plan-hcky5g`) and PR #46 (kit-v3-5, `claude/sleepy-tesla-ofsxsr`): never
   push there, never touch `spikes/`.
-- **Last update:** 2026-11-10 01:10 Amsterdam
+- **Last update:** 2026-11-10 09:07 Amsterdam
 
 ## Steps done
 0. Read CLAUDE.md, CHECKPOINTS.md, REPO_MAP, ADR 0002's migration plan, SPIKE_PLAN's foundation entry, STATUS
@@ -41,11 +41,17 @@
    (HC-PATH now recommends leaving :46 untouched; SCOPE needs ADR 0002 part 1 accepted, before 2.2). Also Appendix A
    (all 63 paths, script-generated), Appendix B (2.2's coexistence rules). Plan revision 2 at 8bbebfa.
 
+6. The advisor agent's plan review of revision 2 (8bbebfa): APPROVE WITH CONDITIONS, for 2.1 only (notes
+   `.checkpoints/foundation/advisor-plan-rev2.md`). Its H1-H3 checked against the source files on PR #46's branch
+   (d7526f5): KIT-FREEZE-2 and LANE-RULES are his words of 2026-11-10 06:33 and 07:08 UTC; SPIKE-SCOPE (a) was taken
+   by the Advisor on 2026-10-25 (STATUS:739-746). Conditions C1-C8 applied: plan revision 3.
+
 ## Current step
-6. The advisor agent's plan review of revision 2 (8bbebfa), running; notes `.checkpoints/foundation/advisor-plan-rev2.md`.
+7. Plan revision 3 saved; the advisor tool before calling the plan done; then the final report.
 
 ## Next steps
-3. Plan draft `.checkpoints/foundation/plan.md`; the `advisor` agent's plan review; fix; advisor tool before done.
+8. Mustafa answers FREEZE-FDN, SPLIT, SCOPE. Then 2.1a's build may start (its step 0: re-read the open PRs' file
+   lists, record OLD's SHA, move the plan to `.checkpoints/foundation-restructure/plan.md`).
 
 ## Open findings
 - PR #46 (kit-v3-5, draft, step 0 on 2026-11-09): will edit `.claude/hooks/routine-guard.mjs` and its tests,
@@ -90,10 +96,15 @@
 
 ## Decisions taken
 - Plan home: `.checkpoints/foundation/plan.md` on this branch (precedent: `.checkpoints/netcode-proof-test/plan.md`).
+- OQ-0002-2 (decider: this plan, with docs-keeper): tools stay in `tools/`, legacy docs stay in `docs/`, the gate v2's
+  path deferred to 2.3 · proposed here, approved by the advisor agent (Q-A2) · 2026-11-10.
+- Q-A1 E4 accepted as PM-0002-36's reading (register in 2.1b; PM row fixed at ADR 0002's next revision); Q-A3 G0 to
+  2.3 (provisional); Q-A4 follows FREEZE-FDN, no preview.js fallback; Q-A5 one prefix per base; Q-A6 the split's
+  reasoning holds (his choice) · the advisor agent · 2026-11-10.
 
 ## Running work
 - Workflow wf_92d477b2-b78 (task wbpbds2b5) · script copy `.checkpoints/foundation/inventory-run1.js` · no args ·
   notes `.checkpoints/foundation/inv-{code,kit,docs,critic}.md` · launched 07:31 Amsterdam · done (4 of 4 returned).
 - Saver: background task bsmtuh7qm · output `/tmp/claude-0/-home-user-Shamble-Frontlines/cf54bb72-a605-502c-af5b-b590dcc1cda7/tasks/bsmtuh7qm.output`
   · started 07:31 · stops by 09:21 · last check 08:47: ok (saved and pushed at 07:41, 07:51, 08:11).
-- The advisor agent's plan review of revision 2 (8bbebfa), launched 08:46 Amsterdam, running (Opus 5.5, xhigh).
+- The advisor agent's plan review of revision 2 (8bbebfa), launched 08:46 Amsterdam: done (APPROVE WITH CONDITIONS).
