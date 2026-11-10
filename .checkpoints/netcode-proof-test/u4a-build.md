@@ -111,6 +111,20 @@ u4s-carries.md entries 1-5 and 34. Files: crates/proto, check.mjs, check.test.mj
 - 22:30 the other lanes ran workspace tests back to back (never 30 s idle by 22:27). Final runs now by a scratchpad
   script (u4a-final-runs.sh, logs in the scratchpad's u4a-runs/): each run waits for 15 s with no cargo/rustc/rustdoc/
   clippy-driver, touches, runs check.mjs; a pair needs exit 0, all 10 steps, 296/321 and self 52; else it restarts.
+- 22:29 SAVE (coordinator: usage limit close). State: ALL BUILD WORK DONE (src 11 files, tests wire/bites/catalogue/
+  common, check.mjs + check.test.mjs; plants P1-P20 done and restored, sha256 = the baseline list above). Half-done:
+  only the two final check.mjs runs: the script was started in the background at 22:28 (task b70332tdr), no run
+  logged yet (other lanes busy). EXACT NEXT STEP if resumed: re-run
+  `bash /tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/scratchpad/u4a-final-runs.sh`
+  (or, if the scratchpad is gone, touch crates/ and run `node check.mjs` twice when no other cargo runs; expect 10 of
+  10, measured 296, bites 321, self 52), check sha256 against the baseline, then `cargo +1.99.1 fmt --all --check`,
+  then write the report (items listed under "For the main session" and the carries below).
+- Carries for the report: 1 met (layout()-built tables and mapping, sizes from each Field, VELOCITY != POSITION_XY
+  tested); 2 met with one reading (literal multiples; at a non-wrapping end whose nearest multiple is outside the
+  range the error is < one step, 3 integers; within half the step everywhere else, worst = half the step); 3 met
+  (grep + self-test + rename refusal; P10); 4 met (unit test; P4); 5 met; 34 met by 4 listed fixes (STEPS pinned via a
+  runner recorder; doc adds wasm32 for WASM_CRATES; bites-only clippy failure named; failedRun's first-error summary),
+  seen live in run B's clippy line. Freeze: no seam change needed.
 - For the main session (outside my files): (1) the catalogue's §6 item 3 note (plan §5 U4a, nit e), proposed words:
   "(The allocation half, refused before anything is allocated, is checked with PM-0001-34's counting allocator in U5:
   the advisor's Q8 ruling; U4 proves the size-first refusal.)"; (2) the catalogue's Input row: the codec's maxima are
