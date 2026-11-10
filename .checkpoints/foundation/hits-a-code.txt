@@ -1,0 +1,101 @@
+.claude/hooks/routine-guard.test.mjs:138:  ['day: edit a game file', DAY, ev('Edit', { file_path: `${P}/shamble-game.js` }), false],
+.claude/hooks/routine-guard.test.mjs:684:  ['A8s worktree /w game file', dsh('echo x > /w/shamble-game.js'), null],
+.claude/hooks/routine-guard.test.mjs:688:  ['A9d-s .gate/x worktree game file', dsh('echo x > /p/.gate/x/shamble-core.js'), null],
+.claude/hooks/routine-guard.test.mjs:730:  ['T7 git switch -c cs/new, HEAD equals origin/main', dsh('git switch -c cs/new'), null, { diffs: { HEAD: 'shamble-game.js\n' } }],
+.claude/hooks/routine-guard.test.mjs:741:  ['T16d git switch to a branch that changes only game files', dsh('git switch cs/other'), null, { diffs: { 'cs/other': 'shamble-game.js\n' } }],
+.claude/hooks/routine-guard.test.mjs:759:  ['A8 Edit a game file in worktree /w', ded('Edit', '/w/shamble-game.js'), null],
+.claude/hooks/routine-guard.test.mjs:763:  ['A9d Edit .gate/x worktree game file', ded('Edit', '/p/.gate/x/shamble-core.js'), null],
+.claude/hooks/routine-guard.test.mjs:767:  ['A22 a subagent Edit of a game file', ded('Edit', '/p/shamble-game.js', { agent_id: 'a1' }), null],
+.claude/hooks/routine-guard.test.mjs:784:  ['T5g plain merge, the branch changed only game files', dsh('git merge origin/main'), null, { threeDot: 'shamble-game.js\n' }],
+.claude/hooks/routine-guard.test.mjs:958:  ['SA-5 control: sed -i on a game file', dsh('sed -i s/a/b/ shamble-game.js'), null],
+.claude/hooks/routine-guard.test.mjs:1471:    writeFileSync(join(dir, 'shamble-game.js'), 'a\n');
+.claude/hooks/routine-guard.test.mjs:1481:    writeFileSync(join(dir, 'shamble-game.js'), 'b\n');
+.claude/hooks/routine-guard.test.mjs:1747:    { kit: { 'cs/x': KIT('shamble-game.js', '.claude/hooks/guard.mjs') } }, /cs\/x's rules, CI or gate files differ from main's \(\.claude\/hooks\/guard\.mjs\)/],
+.claude/hooks/routine-guard.test.mjs:1755:  ['T16 night, a diff of shamble-game.js only: goes on', dsh('git switch cs/x'), null, { kit: { 'cs/x': KIT('shamble-game.js') } }],
+.claude/hooks/routine-guard.test.mjs:1801:    { kit: { 'refs/remotes/origin/cs/y': KIT('shamble-game.js') } }],
+.claude/hooks/settings.test.mjs:232:    const game = out(runGuardHook('PreToolUse', root, { ...input, tool_input: { file_path: join(root, 'shamble-game.js') } }, ''));
+FIRST_PROMPTS.md:29:   shamble-game.js into an editor-only function, (c) a syntax error, (d) a game function defined a second time in
+FIRST_PROMPTS.md:30:   shamble-core.js. Delete the branch afterwards.
+FIRST_PROMPTS.md:31:5. Prove the syntax hook: introduce a syntax error in shamble-game.js with the Edit tool, show the hook's report, revert.
+FIRST_PROMPTS.md:77:1. Scan shamble-core.js, shamble-game.js and shamble-editor.js for what breaks as ES modules: implicit globals,
+FIRST_PROMPTS.md:81:   the globals the rest of the code expects, and produce a double-clickable dist/index.html with Vite or esbuild,
+README.md:12:- Double-click `index.html`. It needs an internet connection for now: three.js loads from a CDN.
+README.md:13:- `editor.html` is the authoring build: Map Editor, Character Lab, Anim Lab.
+README.md:19:| `shamble-core.js` | Engine: render pipeline (NPR), characters and factions, gun and building kits, map data, simulation math |
+README.md:20:| `shamble-game.js` | Gameplay, AI, economy, HUD, menus, animation, the main loop and `bootGame` |
+README.md:21:| `shamble-editor.js` | Authoring tools (loaded by editor.html only) |
+README.md:22:| `index.html` / `editor.html` | Player build / authoring build |
+editor.html:3:     editor.html — Shamble Frontlines AUTHORING build.  See MODULE_MAP.md.
+editor.html:5:     LOADS:     THREE (r128 UMD, cdnjs) then shamble-core.js then shamble-game.js
+editor.html:6:                then shamble-editor.js, then inline: bootGame(); bootEditor(); + tail.
+editor.html:8:     NOTE:      identical head/DOM to index.html except this page keeps the
+editor.html:1257:<script src="shamble-core.js"></script>
+editor.html:1258:<script src="shamble-game.js"></script>
+editor.html:1259:<script src="shamble-editor.js"></script>
+index.html:3:     index.html — Shamble Frontlines PLAYER build.  See MODULE_MAP.md.
+index.html:5:     LOADS:     THREE (r128 UMD, cdnjs) then shamble-core.js then shamble-game.js,
+index.html:1256:<script src="shamble-core.js"></script>
+index.html:1257:<script src="shamble-game.js"></script>
+shamble-core.js:2: * shamble-core.js — Shamble Frontlines shared core.  See MODULE_MAP.md.
+shamble-core.js:22: * LOAD ORDER: THREE -> shamble-core.js -> shamble-game.js -> [shamble-editor.js].
+shamble-core.js:1477: * scene is mirrored into SIM by the game-side bridge (shamble-game.js).
+shamble-editor.js:2: * shamble-editor.js — Shamble Frontlines map editor + Character Lab.  See MODULE_MAP.md.
+shamble-editor.js:3: * PURPOSE:   Authoring tools. Loaded ONLY by editor.html, NEVER by the player
+shamble-editor.js:4: *            build (index.html). No index.html live path may depend on this file.
+shamble-editor.js:12: *            effects incl. the menu Editor-button wiring; editor.html calls it
+shamble-editor.js:14: * REQUIRES:  shamble-game.js + shamble-core.js (may reference both freely).
+shamble-editor.js:15: * LOAD ORDER: THREE -> core -> game -> shamble-editor.js.
+shamble-game.js:2: * shamble-game.js — Shamble Frontlines gameplay + shared dispatch.  See MODULE_MAP.md.
+shamble-game.js:20: * REQUIRES:  shamble-core.js (THREE + all core globals/helpers). Editor refs here
+shamble-game.js:22: *            guarded, so none fire in the editor-less index.html.
+shamble-game.js:23: * LOAD ORDER: THREE -> core -> shamble-game.js -> [editor].
+tools/README.md:3:Nothing here is loaded by `index.html` or `editor.html`. The tools load the real game files into Node or Chromium to
+tools/README.md:23:| `node tools/preview.js . menu <out.png>` | Renders the real 3D scene headless (WebGL1). Also `shot <out.png> <x> <z>`, `top`, `eval <snippet.js>`, `evalshot`, `measure`, `time`, `list`. No HUD/DOM/CSS. Flags anywhere on
+tools/README.md:28:| `node tools/pageshot.js . index.html[?map=tri] <prefix> [--headed] <steps…>` | Renders the real pages (DOM + HUD + CSS + WebGL) in Chromium; a `?query` on the page name is passed to the page. Steps: `wait:<ms> shot:<n
+tools/README.md:36:  - `typeof x` operands are exempt. index.html's references to editor-only symbols are check 4's (it proves they are
+tools/README.md:37:    guarded); a page-specific hook called from shared code behind `typeof` therefore belongs in `shamble-editor.js`.
+tools/README.md:42:- **5c layering**: `shamble-core.js` references nothing declared in game, editor or the inline scripts, not even
+tools/README.md:56:node tools/pageshot.js . index.html .gate/gpu --headed size:1600x900 wait:2500 shot:menu "eval:(deploy(),0)" wait:1500 "eval:(closeTutorial(),setPause(true),0)" wait:600 shot:pause
+tools/README.md:61:Then, in Claude Code at the repo root, ask it to put a syntax error into `shamble-game.js` with the Edit tool and revert
+tools/battery.js:8:// to a symbol that exists ONLY in shamble-editor.js, classified as
+tools/battery.js:12://   FLAGGED  - unguarded on a reachable path (would throw in index.html).
+tools/battery.js:66:  return { core: rd('shamble-core.js'), game: rd('shamble-game.js'), editor: rd('shamble-editor.js'),
+tools/battery.js:67:           indexHtml: rd('index.html'), editorHtml: rd('editor.html') };
+tools/battery.js:175:  // (non-function statements + ALL var initialisers, conservatively) + identifiers in index.html's inline DOM handlers
+tools/gate.mjs:6://   [4] player build   battery.js check 4: no reachable, unguarded reference from index.html's build to an editor-only symbol
+tools/gate.mjs:11://                      (typeof operands exempt; index.html's refs to editor-only symbols are check 4's); no assignment to a
+tools/gate.mjs:13://   [5c] layering      shamble-core.js references no game, editor or inline-script top-level symbol, guarded or not
+tools/gate.mjs:14://   [5d] script order  each page loads exactly: three r128 (cdnjs) -> core -> game [-> editor, editor.html] -> one inline script
+tools/gate.mjs:34:const FILES = ['shamble-core.js', 'shamble-game.js', 'shamble-editor.js', 'index.html', 'editor.html'];
+tools/gate.mjs:101:const toBuild = get => ({ core: get('shamble-core.js'), game: get('shamble-game.js'), editor: get('shamble-editor.js'),
+tools/gate.mjs:102:                          indexHtml: get('index.html'), editorHtml: get('editor.html') });
+tools/gate.mjs:222:const LOCAL = { 'shamble-core.js': head.core, 'shamble-game.js': head.game, 'shamble-editor.js': head.editor };
+tools/gate.mjs:223:const PAGES = [['index.html', head.indexHtml], ['editor.html', head.editorHtml]];
+tools/gate.mjs:228:    { label: 'shamble-core.js', code: head.core }, { label: 'shamble-game.js', code: head.game },
+tools/gate.mjs:229:    { label: 'shamble-editor.js', code: head.editor },
+tools/gate.mjs:230:    ...pageScripts('index.html', head.indexHtml).filter(s => s.code), ...pageScripts('editor.html', head.editorHtml).filter(s => s.code),
+tools/gate.mjs:281:      [...flagged.map(r => `FLAGGED ${r.name} at ${r.file} line ${r.line} (in ${r.owner}): unguarded on a reachable path, throws in index.html`),
+tools/gate.mjs:282:       ...dom.map(d => d.parseError ? `index.html handler does not parse: "${d.handler}"` : `index.html handler uses editor-only ${d.editorOnlyRef}: "${d.handler}"`)]);
+tools/gate.mjs:295:  // index.html's references to editor-only symbols are check 4's job (it proves each one is guarded): same set as battery.js
+tools/gate.mjs:298:    for (const p of classicParts('index.html', head.indexHtml)) scoped(p.code).top.forEach(n => indexTop.add(n));
+tools/gate.mjs:313:    const exempt = page === 'index.html' ? editorOnly : new Set();
+tools/gate.mjs:338:// [5c] layering: shamble-core.js stands alone (no reference into game, editor or inline-script symbols, typeof included)
+tools/gate.mjs:341:  const above = [['shamble-game.js', head.game], ['shamble-editor.js', head.editor],
+tools/gate.mjs:345:  add('5c', 'layering', !hits.length, `shamble-core.js uses ${outside.size} names it does not declare; ${hits.length} references into game/editor/inline symbols`,
+tools/gate.mjs:346:      hits.map(f => `shamble-core.js line ${f.line}: ${f.typeofOp ? 'typeof ' : ''}${f.name} (declared in ${upper.get(f.name)})`));
+tools/gate.mjs:347:} catch (e) { add('5c', 'layering', false, 'cannot analyse shamble-core.js (see check 1)', [firstLine(e.message)]); }
+tools/gate.mjs:352:  const WANT = { 'index.html': [THREE_URL, 'shamble-core.js', 'shamble-game.js', 'inline'],
+tools/gate.mjs:353:                 'editor.html': [THREE_URL, 'shamble-core.js', 'shamble-game.js', 'shamble-editor.js', 'inline'] };
+tools/pageshot.js:5:// USAGE (from the repo root): node tools/pageshot.js <buildDir> <index.html|editor.html>[?query] <outPrefix> [--headed] [steps...]
+tools/pageshot.js:8://   e.g. node tools/pageshot.js . index.html .gate/s wait:1500 shot:menu "eval:deploy()" wait:900 "eval:(closeTutorial(),setPause(true))" shot:pause
+tools/pageshot.js:34:  const qAt = pageName.indexOf('?');   // index.html?map=tri: pathToFileURL would encode the '?' as %3F, so carry the query past it
+tools/preview.js:5:// Headless preview of the REAL build: three r128 + shamble-core.js + shamble-game.js, bootGame(), gameplay camera.
+tools/preview.js:13:// --map=<id> (anywhere on the line) boots that map the way index.html?map=<id> does, e.g. --map=tri for DM_Tri
+tools/preview.js:93:run(fs.readFileSync(dir + '/shamble-core.js', 'utf8'), 'shamble-core.js');
+tools/preview.js:94:run(fs.readFileSync(dir + '/shamble-game.js', 'utf8'), 'shamble-game.js');
+tools/smoke.mjs:4://   index.html : menu -> Deploy (#mPlay) -> close the tutorial -> W held 1 s, two shots, ~5 s of play -> Esc (pause) -> Menu
+tools/smoke.mjs:5://   editor.html: menu -> Map editor (#mEditor; fills the prefab list) -> Maps (#edMaps; fills the map list) -> close -> Menu
+tools/smoke.mjs:41:  'index.html': async (step, page, info) => {
+tools/smoke.mjs:90:  'editor.html': async (step, page) => {
+tools/village.py:2:#   defaults: <repo>/shamble-core.js, <repo>/.gate/aabbs.json (from: node tools/preview.js . eval tools/aabbs.js > .gate/aabbs.json),
+tools/village.py:10:CORE_JS = _ARGS[0] or os.path.join(_REPO, 'shamble-core.js')

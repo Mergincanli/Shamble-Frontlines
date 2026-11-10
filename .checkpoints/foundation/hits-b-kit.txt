@@ -1,0 +1,24 @@
+.claude/agents/advisor.md:67:- **Risk tier 1, game code and tools:** `shamble-*.js`, `index.html`, `editor.html`, `tools/` except the gate files,
+.claude/agents/advisor.md:91:  - step 2: CI's green does not stand because `.github/` or a gate file changed; a change to `shamble-*.js` or the
+.claude/agents/advisor.md:156:     ran the PR's own gate, so it is at most needs-mustafa. A PR that changes `shamble-*.js` or the pages, or whose
+.claude/agents/netcode-architect.md:21:The legacy code is reference, not the base: the fenced SIM block in shamble-core.js (pure-math rays, LOS, collision),
+.claude/agents/verifier.md:19:   shamble-*.js and on each page's inline script; concatenation check in load order for both pages; `node tools/battery.js`
+.claude/rules/engine-core.md:3:  - "**/shamble-core.js"
+.claude/rules/engine-core.md:5:# Rules for shamble-core.js (engine / shared truth)
+.claude/rules/engine-editor.md:3:  - "**/shamble-editor.js"
+.claude/rules/engine-editor.md:5:# Rules for shamble-editor.js (authoring; loaded by editor.html only)
+.claude/rules/engine-editor.md:6:- May reference game and core freely. Nothing on index.html's live path may resolve only here (gate check 4).
+.claude/rules/engine-game.md:3:  - "**/shamble-game.js"
+.claude/rules/engine-game.md:5:# Rules for shamble-game.js (gameplay + shared dispatch)
+.claude/rules/pages.md:3:  - "**/index.html"
+.claude/rules/pages.md:4:  - "**/editor.html"
+.claude/rules/pages.md:7:- index.html (player: THREE → core → game) and editor.html (+ editor) are identical except the manifest comment, the
+.claude/rules/pages.md:9:- The inline script is only `bootGame();` [`bootEditor();`] plus the menu tail. Logic belongs in shamble-game.js.
+.claude/skills/gate/SKILL.md:3:description: 'The SHAMBLE FRONTLINES verification gate: syntax of every file and inline script, load-order concatenation for both pages, symbol conservation against a base ref, player-build resolvability, and 
+.claude/skills/gate/SKILL.md:10:1. `node --check` each shamble-*.js, and each page's inline script extracted to a temp file.
+.claude/skills/render-ab/SKILL.md:11:   - Pages / UI: `node tools/pageshot.js <dir> index.html <prefix> <steps…>` at 1600x900 and 1280x720; use headed GPU
+CLAUDE.md:41:`shamble-core.js` (engine) ← `shamble-game.js` (gameplay + dispatch + `bootGame`) ← `shamble-editor.js` (authoring, editor.html only)
+CLAUDE.md:42:`index.html` (player build) · `editor.html` (authoring build) · `docs/` · `tools/` (verification toolkit, never shipped) · `.claude/`
+CLAUDE.md:43:Layering is hard: core references nothing above it; anything on index.html's live path resolves in core ∪ game, never editor.
+CLAUDE.md:46:- Classic scripts sharing globals in a fixed load order; the game runs by double-clicking index.html (file://).
+CLAUDE.md:218:- Real pages (DOM + HUD + WebGL): `node tools/pageshot.js <dir> index.html <outPrefix> [--headed] <steps…>` (`--headed`: real GPU; every shot prints its WebGL renderer)

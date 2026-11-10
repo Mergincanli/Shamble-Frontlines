@@ -14,8 +14,8 @@
 
 ## Steps done
 0. Read CLAUDE.md, CHECKPOINTS.md, REPO_MAP, ADR 0002's migration plan, SPIKE_PLAN's foundation entry, STATUS
-   Phase / In flight / Next. First turn stopped on the model rule (main model was not Opus 5.5); Mustafa switched it to
-   Opus 5.5 and said to carry on (2026-11-10). Nothing written before that.
+   Phase / In flight / Next. The first turn stopped on the model rule; resolved by Mustafa (2026-11-10), who said to
+   carry on. Nothing written before that.
 
 1. Facts gathered (no commit of their own; recorded here): ADR 0002 parts 1-3, OQ-0002-1..9, the boundary spike's
    items 1-10, PM-0002-35..69; R5-LAYOUT-REC1 and REC6; the tools' path handling; the guard's gate-file list; PR #46
@@ -46,9 +46,15 @@
   `tools/package*.json`. If the legacy tools stay in `tools/` (OQ-0002-2 (a)) the guard needs no edit; if they move
   into `legacy/` (b), the guard, settings.json (17 `tools/` allow rules) and gate.yml all change.
 - `.claude/rules/*` globs are `**/shamble-core.js`, `**/index.html` etc.: they already match `legacy/…` (no edit).
-- PM-0002-36 as written cannot hold: `docs/legacy-tuning.json` is curated (keys about, tables{where, group,
-  look_brief_pending, values}, boot_changes, skipped), not the dump's raw output; and the mark's command lacks
-  `--pre=tools/tuning-dump.js`. Needs a reading (dump at base `.` vs head `legacy` byte for byte, plus values equal).
+- PM-0002-36: `docs/legacy-tuning.json` is not the dump's raw output; R7's builder
+  `.checkpoints/r7-legacy-inventory/build-tuning.py` (at a715be2) builds it from two raw dumps (also at a715be2), its
+  `where` fields from `git show 48ffb51:shamble-*.js`; the mark's command lacks `--pre=tools/tuning-dump.js`. So the
+  mark is reachable through R7's builder (dumps at `legacy` → builder → `cmp`); the reading goes to the advisor
+  agent. 2.1 must not edit `docs/legacy-tuning.json` or `docs/LEGACY_TUNING.md`.
+- Advisor tool (2026-11-10, before the workflow): go; keep tools in `tools/`; pass `model: 'opus'` and effort on every
+  agent; grep without the prefix guard (done: 63 files, 728 hits); kit column from `protectedRel` (done); OQ-0002-2's
+  three parts; evidence that does not lean on the edited gate; rule conflicts go to Mustafa as questions; #46 file list
+  not final; #40's marks.json rows; 2.2 vs `check.mjs`; G0 belongs to 2.3; saves unknown; label "grep only".
 - The four Phase 0 mutation proofs: `docs/reports/2026-10-13-phase-0.md:25-27` (deleted `refreshRect` → [3] DROPPED;
   `bootEditor();` in `bootGame` → [4] FLAGGED; syntax error → [1]; `wrType` copied into core → [3] duplicate);
   check-5's 22 mutations: `docs/reports/2026-10-14-gate-check-5.md:30-41`.
@@ -58,7 +64,9 @@
   `spikes/` is throwaway".
 
 ## Key numbers
-- 62 files / 692 hits (raw `git grep` of the five names, outside `.checkpoints/`).
+- 63 files / 728 hits (`git grep` of the five names with no prefix guard, outside `.checkpoints/`; the first,
+  guarded grep gave 62 / 692). Area lists: `.checkpoints/foundation/hits-{a-code,b-kit,c-docs}.txt` (101 / 24 / 603).
+- 15 of the 63 files are PROTECTED by the guard's `protectedRel` (12 under `.claude/` or CLAUDE.md, 3 gate files).
 
 ## Decisions taken
 - Plan home: `.checkpoints/foundation/plan.md` on this branch (precedent: `.checkpoints/netcode-proof-test/plan.md`).
