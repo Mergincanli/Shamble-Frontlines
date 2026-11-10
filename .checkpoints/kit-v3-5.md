@@ -62,5 +62,9 @@
 - **Done:** the docs part (docs-keeper, f9728c9): STATUS (#44 merged, kit-v3-5 in flight, the routine paused, F1-F5,
   the known limits, his queue and record word for word: 16 quoted paragraphs byte-equal), ROADMAP, the kit-v3-4
   report's dated correction (additions only); E6 `rule-diff.md` (17 rows, nothing looser). CI green on 9bacf47.
-- **Current step:** 7, the review round on f9728c9 (security-auditor, test-engineer, the verifier; running in
-  parallel); then one fix pass, the report, the notes' deletion, PR ready, the advisor's final-head review, his go.
+- **Done:** the review round on f9728c9 (notes committed: 624af9c, 7db0087): security-auditor PASS WITH NOTES (SA5-1 to
+  SA5-4 Low, SA5-5 note, PX-1 outside the diff and untested, Critical if confirmed; write-side severities W1 and W2
+  Medium, W3 Low); the verifier PASS WITH NOTES (V1-V6 Low; every E-check PASS; hashes equal); test-engineer PASS WITH
+  NOTES (TE1-TE4 Medium test gaps, TE5-TE8 Low). Nothing Critical or High in the diff.
+- **Current step:** 8, the advisor's fix-pass ruling (`advisor-fix-pass.md`, running); then the fix pass (kit writes,
+  one ask each), the verifier's re-check, the report, PX1-ROUTE to Mustafa.
