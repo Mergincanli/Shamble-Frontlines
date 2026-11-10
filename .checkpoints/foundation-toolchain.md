@@ -2,10 +2,10 @@
 - **Goal:** plan foundation step 2.2, the toolchain (ADR 0002 part 2, migration plan 2.2), as a change-set plan that
   delivers Mustafa's four asks (what 2.2 pins now; the empty slots until the boundary spike, each by its open question;
   the CI job that runs the Rust checks; its own plan review by the advisor agent). Plan only: no build, no code.
-  Plan: `.checkpoints/foundation-toolchain/plan.md` (revision 1).
+  Plan: `.checkpoints/foundation-toolchain/plan.md` (revision 2, b6c20be; the advisor's APPROVE of revision 1, f535752).
 - **Branch:** `claude/laughing-pasteur-fwya24` (this cloud session's branch, standing in for `cs/foundation-toolchain`)
   · **Base:** main 2d22b69 (PR #46 merged)
-- **Last update:** 2026-11-10 18:53 Amsterdam
+- **Last update:** 2026-11-10 19:11 Amsterdam
 
 ## Steps done
 1. Model check: `get_session` shows `session_context.model` claude-opus-5-5 (Opus 5.5) · no commit · go.
@@ -20,16 +20,21 @@
    4eb3e65 · GitHub docs: passwordless sudo on Linux VMs, job containers refuse `--network`; util-linux unshare and
    setpriv, the kernel's no_new_privs; npm `--offline`, cargo `--offline`/`fetch`, rustup auto-install (on by default
    since 1.28.1); Node 26 is Active LTS, 22 ends 2027-04-30. PM-0002-37 can be promised.
-4. Plan revision 1 written (`foundation-toolchain/plan.md`) · this commit · the advisor tool is not available in this
+4. Plan revision 1 written (`foundation-toolchain/plan.md`) · f535752 · the advisor tool is not available in this
    session (recorded in Part 9).
+5. The advisor agent's review of revision 1 at effort xhigh · notes `advisor-plan-rev1.md` (DONE), `advisor-marks.mjs`
+   · APPROVE f5357520329a1ce76b7bf3ec3a873ea86f378cbc with conditions 1-6; "No new plan review is needed if you fold
+   conditions 1 to 5 in as written."
+6. Plan revision 2: conditions 1-5 folded as written, the Lows of 6 folded, the verdict recorded in Part 9 · b6c20be.
 
 ## Current step
-The advisor agent's plan review of revision 1 at effort xhigh (notes `foundation-toolchain/advisor-plan-rev1.md`).
+Ultracode fold check: workflow `verify-2-2-plan-fold` (three lenses, then a completeness critic; 3 agents at most at
+a time), notes `fold-check-a.md`, `-b.md`, `-c.md`, `-critic.md`.
 
 ## Next steps
-1. Run the advisor agent on plan revision 1 (effort xhigh); record its verdict and the SHA in plan.md Part 9 and here.
-2. On REVISE: revision 2 with the exact changes, then the advisor's check of it. On ESCALATE: Mustafa's decision.
-3. The final report: the plan's path and SHA, a one-screen summary, the verdict, Decisions needed (FDN-NOCODE), For
+1. Read the fold check's results (count them: 3 checkers + 1 critic); fix what holds up in a revision 2a commit, or
+   record each finding as answered; a change beyond the conditions goes back to the advisor.
+2. The final report: the plan's path and SHA, a one-screen summary, the verdict, Decisions needed (FDN-NOCODE), For
    Mustafa.
 
 ## Open findings
@@ -46,10 +51,15 @@ The advisor agent's plan review of revision 1 at effort xhigh (notes `foundation
 - Runner image 20261101.360.1: Rustup 1.29.2, Rust 1.99.1 (= the pin).
 
 ## Decisions taken
+- The advisor agent, 2026-11-10: Q2.2-a (a) final (G0's exit-2 mark to 2.3); Q2.2-c (a) Node 22 final, with a dated
+  follow-up (tools/ and v2 to Node 26 together, after 2.3, merged before 2027-03-31); the sketch's three changes
+  approved; planted-failure commits on the change-set's branch approved with condition 3.
 - Mustafa, 2026-11-10 (this session's prompt): FREEZE-FDN covers the toolchain's CI job (each such edit asks him and
   merges on his go); guard checks for the new pins are not covered and wait for the gate step (2.3); 2.2 merges after
   2.1b.
 
 ## Running work
 - saver: background task b04hgafwt · output `/tmp/claude-0/-home-user-Shamble-Frontlines/29a42dc7-ecd4-506e-b90a-121dd5e50988/tasks/b04hgafwt.output`
-  · started 18:35 Amsterdam · stops by 20:25 · last check 18:52: ok (saved and pushed 4eb3e65).
+  · started 18:35 Amsterdam · stops by 20:25 · last check 19:11: ok (saved and pushed 18ac84a).
+- workflow run wf_93f9ff1a-f0b (task wt8ab4d43) · script as launched `foundation-toolchain/verify-fold-run1.js` · no
+  args · notes `.checkpoints/foundation-toolchain/fold-check-*.md` · launched 19:10 Amsterdam · running.
