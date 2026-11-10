@@ -2,10 +2,10 @@
 - **Goal:** plan foundation step 2.2, the toolchain (ADR 0002 part 2, migration plan 2.2), as a change-set plan that
   delivers Mustafa's four asks (what 2.2 pins now; the empty slots until the boundary spike, each by its open question;
   the CI job that runs the Rust checks; its own plan review by the advisor agent). Plan only: no build, no code.
-  Plan: `.checkpoints/foundation-toolchain/plan.md` (revision 2, b6c20be; the advisor's APPROVE of revision 1, f535752).
+  Plan: `.checkpoints/foundation-toolchain/plan.md` (revision 3; the advisor's APPROVE of revision 1, f535752).
 - **Branch:** `claude/laughing-pasteur-fwya24` (this cloud session's branch, standing in for `cs/foundation-toolchain`)
   · **Base:** main 2d22b69 (PR #46 merged)
-- **Last update:** 2026-11-10 19:11 Amsterdam
+- **Last update:** 2026-11-10 19:36 Amsterdam
 
 ## Steps done
 1. Model check: `get_session` shows `session_context.model` claude-opus-5-5 (Opus 5.5) · no commit · go.
@@ -27,13 +27,19 @@
    conditions 1 to 5 in as written."
 6. Plan revision 2: conditions 1-5 folded as written, the Lows of 6 folded, the verdict recorded in Part 9 · b6c20be.
 
+7. Fold check of revision 2: workflow wf_93f9ff1a-f0b, 4 of 4 returned (notes `fold-check-a.md`, `-b.md`, `-c.md`,
+   `-critic.md`, all DONE) · Medium: step 5's detached worktree stops the saver; E11 fails on the workspace links;
+   Part 9 overclaimed the advisor's checks. Lows: wording, the probe's DNS loophole, push-by-hand for planted
+   failures, E2's interface rule, the plan's ending order, unsaved advisor verdict (saved:
+   `advisor-plan-rev1-verdict.md`), his xhigh sentence added to `mustafa-2026-11-10-session.md`.
+8. Plan revision 3: every fold-check finding fixed · this commit.
+
 ## Current step
-Ultracode fold check: workflow `verify-2-2-plan-fold` (three lenses, then a completeness critic; 3 agents at most at
-a time), notes `fold-check-a.md`, `-b.md`, `-c.md`, `-critic.md`.
+The advisor agent's check of revision 3 against its conditions (effort xhigh; notes `advisor-plan-rev3.md`).
 
 ## Next steps
-1. Read the fold check's results (count them: 3 checkers + 1 critic); fix what holds up in a revision 2a commit, or
-   record each finding as answered; a change beyond the conditions goes back to the advisor.
+1. Record the advisor's check of revision 3 in plan.md Part 9 against revision 3's SHA; on conditions, fold and
+   re-record.
 2. The final report: the plan's path and SHA, a one-screen summary, the verdict, Decisions needed (FDN-NOCODE), For
    Mustafa.
 
@@ -62,4 +68,4 @@ a time), notes `fold-check-a.md`, `-b.md`, `-c.md`, `-critic.md`.
 - saver: background task b04hgafwt · output `/tmp/claude-0/-home-user-Shamble-Frontlines/29a42dc7-ecd4-506e-b90a-121dd5e50988/tasks/b04hgafwt.output`
   · started 18:35 Amsterdam · stops by 20:25 · last check 19:11: ok (saved and pushed 18ac84a).
 - workflow run wf_93f9ff1a-f0b (task wt8ab4d43) · script as launched `foundation-toolchain/verify-fold-run1.js` · no
-  args · notes `.checkpoints/foundation-toolchain/fold-check-*.md` · launched 19:10 Amsterdam · running.
+  args · notes `.checkpoints/foundation-toolchain/fold-check-*.md` · launched 19:10 Amsterdam · done 19:24, 4 of 4.

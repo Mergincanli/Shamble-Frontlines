@@ -1,18 +1,20 @@
-# Plan: foundation step 2.2, the toolchain (revision 2)
+# Plan: foundation step 2.2, the toolchain (revision 3)
 
-Status: revision 2. The advisor agent reviewed revision 1 (f5357520329a1ce76b7bf3ec3a873ea86f378cbc) at effort xhigh:
-**APPROVE**, with conditions 1-6 (Part 9 records the verdict, the rulings and where each condition landed). Its words:
-"No new plan review is needed if you fold conditions 1 to 5 in as written. Condition 1 must go into the plan before
-FDN-NOCODE is sent to Mustafa." This revision folds conditions 1-5 as written and the Low items of condition 6. This
-session plans only: no build, no code, no file outside `.checkpoints/` changed. Branch: `claude/laughing-pasteur-fwya24`
-(this cloud session's branch, standing in for `cs/foundation-toolchain`). Base: main 2d22b69 (PR #46 merged;
-STATUS-DIET, LANE-RULES, 2.1a and 2.1b not merged). Every line number was re-found on 2d22b69 (Appendix A); the build
-re-finds them after 2.1b and LANE-RULES merge.
+Status: revision 3. The advisor agent reviewed revision 1 (f5357520329a1ce76b7bf3ec3a873ea86f378cbc) at effort xhigh:
+**APPROVE**, with conditions 1-6 (its returned verdict, word for word: `advisor-plan-rev1-verdict.md`; its notes:
+`advisor-plan-rev1.md`). Its words: "No new plan review is needed if you fold conditions 1 to 5 in as written.
+Condition 1 must go into the plan before FDN-NOCODE is sent to Mustafa." Revision 2 (b6c20be) folded them; an
+adversarial fold check (Part 9) found three Medium and several Low defects in that fold; revision 3 fixes them, and the
+advisor agent's check of revision 3 against its conditions is recorded in Part 9. This session plans only: no build, no
+code, no file outside `.checkpoints/` changed. Branch: `claude/laughing-pasteur-fwya24` (this cloud session's branch,
+standing in for `cs/foundation-toolchain`). Base: main 2d22b69 (PR #46 merged; STATUS-DIET, LANE-RULES, 2.1a and 2.1b
+not merged). Every line number was re-found on 2d22b69 (Appendix A); the build re-finds them after 2.1b and LANE-RULES
+merge.
 Sources: ADR 0002 (Proposed; parts 1-4 and 7-9, OQ-0002-1, -3, -4, -7, spike items 4 and 8, PM-0002-37 to -39,
 migration plan 2.2), SPIKE_PLAN's foundation entry, the restructure plan at 828a3e0 (Part 2's sketch, Q2.2-a to -d,
-Part 5, Appendix B) and at d389d91 (the SCOPE options), the advisor's rulings (`advisor-plan-rev2.md` at 828a3e0;
-`advisor-plan-rev1.md`, this folder), Mustafa's words (1.2), PR #40's head 411eeee, and `research-network.md` (this
-folder).
+Part 5, Appendix B) and at d389d91 (the SCOPE options), the advisor's rulings (`advisor-plan-rev2.md` at 828a3e0; this
+folder's `advisor-plan-rev1*.md`), Mustafa's words (1.2), PR #40's head 411eeee, `research-network.md` and the fold
+check's notes `fold-check-*.md` (this folder).
 
 ## In one screen
 - **Mustafa's four asks** (his follow-up of 2026-11-10, item 3: "what it pins now, what stays an empty slot until the
@@ -32,17 +34,20 @@ folder).
   build, and `npm ci && npm test --workspaces` inside a network namespace: `sudo unshare --net`, loopback brought up as
   root, then `setpriv` back to the runner's user with no docker group and `no_new_privs`. Researched (GitHub's docs:
   passwordless sudo on Linux VMs; job containers refuse `--network`), so PM-0002-37 is promised; its proof is the job's
-  own control and probe (judged on a TCP connection) plus four planted failures, each left red before its revert.
+  own control and probe (a TCP connection to an address resolved outside the cut) plus four planted failures, each
+  left red before its revert.
 - **Kit, guard and CI edits** (Part 5): K1 the new workflow and K2a CLAUDE.md's hard-constraints heading (both
-  protected, both covered by his words); K2b, K3, K4, the three "no engine code" lines (protected: asked, FDN-NOCODE,
-  needed before step 5 only). Not in 2.2: the rules' globs (2.5, which brings the first v2 page), CLAUDE.md's Layout
-  lines (REPO_MAP carries the new paths), guard checks for the new pins (2.3, his answer), the per-edit hook (its kit
-  change-set).
-- **The advisor's rulings:** G0's exit-2 mark moves to 2.3 (final); Node 22 (final, with a dated follow-up to move
-  `tools/` and v2 to Node 26 together before 2027-03-31); the lint tools enter with 2.3; `.gitignore` takes two lines;
-  the job has its own file; the planted failures are commits on the change-set's own branch.
+  protected, both covered by his words); K2b, K3, K4, the three lines that forbid v2 code (two say "No engine code",
+  one "Phase 0 writes no v2 code"; protected: asked, FDN-NOCODE, needed before the kit lines are written). Not in 2.2:
+  the rules' globs (2.5, which brings the first v2 page), CLAUDE.md's Layout lines (REPO_MAP carries the new paths),
+  guard checks for the new pins (2.3, his answer), the per-edit hook (its kit change-set).
+- **The advisor's rulings:** G0's exit-2 mark moves to 2.3 (final); Node 22 (final; Node 22's end of life is
+  2027-04-30, so a dated follow-up moves `tools/` and v2 to Node 26 together after 2.3, merged before 2027-03-31, with
+  his ask, since the toolkit's files are gate files); the lint tools enter with 2.3; `.gitignore` takes two lines; the
+  job has its own file; the planted failures are commits on the change-set's own branch.
 - **Order:** builds when Mustafa starts it; the PR stays a draft until 2.1b has merged (his answer: "2.2 merges after
-  2.1b"); risk tier 2; no Brave check (nothing a player sees, hears or feels).
+  2.1b"); once main must be merged in, the work moves to a branch worktree under `.gate/`; risk tier 2; no Brave check
+  (nothing a player sees, hears or feels).
 
 ## Part 1. Goal, scope, rules, risk tier
 
@@ -67,10 +72,12 @@ security: CI hygiene, the cut-off and the dependency review). Legacy symbols +0 
   such edit still asks me and merges on my go."
 - His answers in this session's prompt (`mustafa-2026-11-10-session.md`, this folder): "FREEZE-FDN and the CI job: yes,
   it is covered. ... Guard checks for the new pins are not covered; they wait for the gate step (2.3)." and "Merge
-  order: 2.2 merges after 2.1b."
-- LANE-RULES' Models line with his addition (`docs/STATUS.md:700-710`): Fable 5.2 may advise through the advisor tool;
-  "it is an extra. The recorded plan review by the advisor agent stays required." (The advisor tool is not among this
-  session's tools; the advisor agent's review is recorded in Part 9.)
+  order: 2.2 merges after 2.1b."; and the review's effort: "have the advisor agent review it at effort xhigh and record
+  its verdict against the plan’s commit SHA".
+- LANE-RULES' Models line (`docs/STATUS.md:704-705`): "on my personal account, Fable 5.2 may be the session's advisor
+  through Claude Code's advisor tool. The main model and every agent stay Opus 5.5."; with his addition
+  (`:709-710`): "it is an extra. The recorded plan review by the advisor agent stays required." (The advisor tool is
+  not among this session's tools; the advisor agent's review is recorded in Part 9.)
 
 ### 1.3 Does any rule forbid 2.2 that his decisions do not cover? No (the advisor: "holds").
 | Rule (main 2d22b69) | What it says | What covers 2.2 |
@@ -78,7 +85,7 @@ security: CI hygiene, the cut-off and the dependency review). Legacy symbols +0 
 | `CLAUDE.md:20-22`, `:52` | "No engine code: throwaway spikes only ..."; "Phase 0 writes no v2 code." | his decision: "may plan and build foundation steps 2.1 and 2.2 now" |
 | `CLAUDE.md:45-50` | the hard constraints (classic scripts, r128, ...) | SCOPE (a): they apply to `legacy/` only once the files have moved; 2.2 merges after 2.1b |
 | `advisor.md:107` | "No engine code. Throwaway spikes only ..." | his decision, as above |
-| `advisor.md:323` | Never: "Merge a hard-constraint change before its accepted ADR is on main." | ADR 0002 part 1 accepted (SCOPE (a)), recorded in its Status line by 2.1b's docs pass; step 5 checks it is on main before K2a and K2b are written (condition 5) |
+| `advisor.md:323` | Never: "Merge a hard-constraint change before its accepted ADR is on main." | ADR 0002 part 1 accepted (SCOPE (a)), recorded in its Status line by 2.1b's docs pass; step 5 checks it is on main before K2a and K2b are written, and stops for the advisor if it is not (condition 5) |
 | KIT-FREEZE-2 (`STATUS:682-683`) | the kit freezes until the gate step | FREEZE-FDN (1.2): the CI job and the constraint-scope lines; FDN-NOCODE asks about three more lines |
 | `engine-architect.md:52`, `graphics-engineer.md:41` | Never: "write engine code in phase 0" | they bind only those agents' own writing (the main session builds); engine-architect reviews 2.2 and is briefed on his decision (step 7); graphics-engineer when it next reviews v2 work |
 | `V2_PHASE0_BRIEF.md:20-21`, `:144` | "No engine code" in phase 0 | his decision. The brief's own `:22` names "Phase 1: the repository restructure, toolchain, CI gate v2". It is the claude.ai Advisor's file: no session edits it, so these lines stay stale, and the report says so |
@@ -168,8 +175,8 @@ at 2.5).
 - Workflow env `RUSTUP_AUTO_INSTALL: "0"`: since rustup 1.28.1 "Automatic install is enabled by default" (the image has
   rustup 1.29.2), so without it "before any cargo call" is only an order; with it the explicit install is the only way
   a toolchain arrives (N4).
-- The control and the probe use `https://github.com/` (the advisor's F-4: the runner must reach GitHub to run at all,
-  so the control adds no dependency the job does not already have).
+- The control and the probe use github.com (the advisor's optional F-4, taken: the runner must reach GitHub to run at
+  all, so the control adds no dependency the job does not already have).
 
 ### 4.2 Steps (draft; the build may only tighten it)
 ```yaml
@@ -198,20 +205,22 @@ at 2.5).
       - name: Build and test with the network cut off
         run: |
           command -v unshare setpriv ip curl getent
-          curl -sS --max-time 20 -o /dev/null https://github.com/ \
-            || { echo "control failed: no network before the cut, so the probe below would prove nothing"; exit 1; }
+          probe_ip=$(getent ahostsv4 github.com | awk 'NR == 1 { print $1 }')
+          [ -n "$probe_ip" ] || { echo "control failed: github.com has no IPv4 address before the cut"; exit 1; }
+          curl -sS --max-time 20 -o /dev/null --resolve "github.com:443:$probe_ip" https://github.com/ \
+            || { echo "control failed: no connection before the cut, so the probe below would prove nothing"; exit 1; }
           sudo -n unshare --net -- bash -ec 'ip link set lo up; exec "$@"' lo-up \
             setpriv --reuid="$(id -u)" --regid=nogroup --clear-groups --no-new-privs -- \
-            env -i HOME="$HOME" PATH="$PATH" USER="$USER" CI=true LANG=C.UTF-8 \
+            env -i HOME="$HOME" PATH="$PATH" USER="$USER" CI=true LANG=C.UTF-8 PROBE_IP="$probe_ip" \
               CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}" RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}" \
               RUSTUP_AUTO_INSTALL=0 npm_config_update_notifier=false \
-            bash -euo pipefail -c '
+            bash --norc --noprofile -euo pipefail -c '
               id; ip -o link; rustc --version
               getent hosts github.com || echo "getent: no answer (printed, not judged)"
-              if curl -sS --max-time 10 -o /dev/null https://github.com/; then
+              if curl -sS --max-time 10 -o /dev/null --resolve "github.com:443:$PROBE_IP" https://github.com/; then
                 echo "the network is still reachable inside the cut"; exit 1
               fi
-              echo "the network is cut"
+              echo "the network is cut: no TCP connection to $PROBE_IP:443"
               cargo test --workspace --locked
               cargo build --locked --target wasm32-unknown-unknown -p sim -p protocol -p room -p client-endpoint -p sim-wasm
               npm ci --offline --ignore-scripts --no-audit --no-fund
@@ -226,8 +235,9 @@ at 2.5).
   network requests will be done during install") rebuilds `node_modules` from the cache alone, which is PM-0002-37's
   literal "`npm ci && npm test --workspaces` pass with no network access after the install steps".
 - `npm test --workspaces` without `--if-present`, so a package without a test script fails (N3, proved by L3).
-- Inside the cut the job prints `id` (no docker group), `ip -o link` (only `lo`, up), `rustc --version` (the pin, read
-  through the same toolchain file) and the DNS answer, if any; it judges only the TCP probe.
+- Inside the cut the job prints `id` (no docker group), `ip -o link` (`lo` up; any other device printed and noted),
+  `rustc --version` (the pin, read through the same toolchain file) and the DNS answer, if any; it judges only the TCP
+  probe to the address resolved outside the cut.
 
 ### 4.3 How a runner cuts the network: the research (`research-network.md`, B1-B3)
 - GitHub's runner docs: "The Linux and macOS virtual machines both run using passwordless `sudo`." and "each
@@ -248,11 +258,14 @@ at 2.5).
   "the setuid and setgid bits will no longer change the uid or gid", so code inside cannot `sudo` its way out. With the
   group set to `nogroup` and supplementary groups cleared, no docker group remains (the Docker daemon's socket is a
   file, reachable from any network namespace by a member of its group: reasoning, N2; `id` inside the cut shows it).
-- DNS is printed, not judged (the advisor's F-3): a local resolver can answer through a socket file, which a network
-  namespace does not cut, so a name may resolve inside the cut while no connection can leave it (N5). The probe judges
-  a TCP connection to github.com:443, after the same connection succeeded outside (the control).
-- What a new namespace contains is not stated on the pages read (network_namespaces(7), ip-netns(8)); the job does not
-  rest on it: it prints `ip -o link` inside, and its probe must fail inside after the control passed outside.
+- The probe is judged on a TCP connection only (the advisor's F-3, tightened by the fold check): the address is resolved
+  outside the cut and passed in, and curl connects to it with `--resolve`, so neither a DNS answer inside (a local
+  resolver can answer through a socket file, which a network namespace does not cut: N5) nor a DNS failure inside can
+  decide the verdict; the DNS answer is printed only.
+- What a new namespace contains is not stated on the pages read (network_namespaces(7), ip-netns(8)), and fallback
+  tunnel devices can appear in a new namespace when their kernel modules are loaded (the fold check's critic, N6); the
+  job does not rest on it: it prints `ip -o link` inside, and the TCP probe must fail inside after the control passed
+  outside.
 - The image (runner-images, Ubuntu 24.04, image 20261101.360.1) lists "Rustup 1.29.2", "Rust 1.99.1", iproute2; it does
   not list util-linux, so the job's `command -v` line fails loudly if a tool were missing. Its default Rust equals the
   pin today (N1), so the version check alone cannot show the toolchain came from the file: the job also checks that
@@ -284,7 +297,7 @@ advisor reproduced every mark with its own script, `advisor-marks.mjs`, this fol
 | # | File and lines (2d22b69) | Edit | Marks | His words on main name it? | Status |
 |---|---|---|---|---|---|
 | K1 | `.github/workflows/toolchain.yml` (new) | the CI job (Part 4) | P, not M | "the toolchain's CI job" | covered (his answer in this session's prompt); one ask at the write; merges on his go |
-| K2a | `CLAUDE.md:45` (the heading) | scope the hard constraints to `legacy/` (ADR 0002 part 1, SCOPE (a)) | P, not M | "the lines that scope the legacy constraints" | covered; one ask at the write, after condition 5's check |
+| K2a | `CLAUDE.md:45` (the heading) | scope the hard constraints to `legacy/` (ADR 0002 part 1, SCOPE (a)) | P, not M | "the lines that scope the legacy constraints" | covered (said to him in Decisions needed, so he can object); one ask at the write, after condition 5's check |
 | K2b | `CLAUDE.md:52` ("Phase 0 writes no v2 code.") | his 2026-11-10 exception for steps 2.1 and 2.2, one clause | P, not M | not in the parenthesis | asked: FDN-NOCODE |
 | K3 | `CLAUDE.md:20-22` ("No engine code: throwaway spikes only, and only after Mustafa and the Advisor have approved the drafts; until then, stop.") | the same exception, one clause | P, not M | not in the parenthesis | asked: FDN-NOCODE |
 | K4 | `.claude/agents/advisor.md:107` ("No engine code. Throwaway spikes only, and only after Mustafa and you have approved the decision drafts.") | the same exception, one clause (else the advisor's own rule reads 2.3's crates as a REVISE) | P, not M | not in the parenthesis | asked: FDN-NOCODE |
@@ -338,8 +351,8 @@ Local cargo runs build into `.gate/foundation-toolchain/target` (`--target-dir`)
 | L1 | the lint table bites | an `unsafe {}` block in one stub, `cargo test` | compile error from `unsafe_code`; reverted |
 | L2 | a stale npm lock fails | a devDependency added to `package.json` without the lock, `npm ci` | npm's mismatch error; reverted |
 | L3 | a package without a test script fails | its `test` script removed, `npm test --workspaces` | non-zero exit (N3); reverted |
-| E2 | the job on the PR's head (1 run, PM-0002-37's count) | CI log | green; rustup installs `1.99.1` from the file; the active toolchain names `rust-toolchain.toml`; `rustc 1.99.1 (...)` outside and inside the cut; the control passes outside; inside, `id` shows no docker group, `ip -o link` shows only `lo` (up), the DNS answer is printed, the TCP probe fails, every test passes; the job's wall time reported |
-| M1a | a Rust test that opens a TCP connection to `github.com:443` | Part 7's procedure below | red at `cargo test` inside the cut |
+| E2 | the job on the PR's head (1 run, PM-0002-37's count) | CI log | green; rustup installs `1.99.1` from the file; the active toolchain names `rust-toolchain.toml`; `rustc 1.99.1 (...)` outside and inside the cut; the control connects outside; inside, `id` shows no docker group, `lo` is up (any other device printed and noted), the DNS answer is printed, the TCP probe to the address resolved outside fails, every test passes; the job's wall time reported |
+| M1a | a Rust test that opens a TCP connection to `github.com:443` | the procedure below | red at `cargo test` inside the cut |
 | M1b | a Vitest test that fetches `https://github.com/` | the same | red at `npm test --workspaces` |
 | M2 | `rust-toolchain.toml` deleted | the same | red at the install or the pin check (its `sed`); no cargo step runs |
 | M3 | a path dependency added (`protocol` on `sim`) without `Cargo.lock` | the same | red at `cargo fetch --locked`, the first step that reads the lock |
@@ -350,75 +363,115 @@ Local cargo runs build into `.gate/foundation-toolchain/target` (`--target-dir`)
 | E8 | the repository map | `node .claude/scripts/repo-map-check.mjs` | exit 0 (new top-level entries listed) |
 | E9 | the kit-edit list is complete | `marks.mjs` on the final file list | every P path is in Part 5 and was asked; no new path but the docs is M |
 | E10 | the kit's own tests still pass | `node --test .claude/hooks/routine-guard.test.mjs .claude/hooks/settings.test.mjs .claude/scripts/checkpoint.test.mjs` | main's counts |
-| E11 | the dependency review (condition 4) | from `package-lock.json`: the package count, every package with `hasInstallScript`, and every `resolved` address (each must point at `https://registry.npmjs.org/`) | listed in security-auditor's brief and the report |
+| E11 | the dependency review (condition 4) | from `package-lock.json`: the package count, stated with and without the five workspace links; every package with `hasInstallScript`; every `resolved` address of an entry without `link: true`, each of which must start with `https://registry.npmjs.org/`; the five workspace links (`resolved: packages/<name>`, `link: true`) listed on their own | listed in security-auditor's brief and the report; any other `resolved` value fails it |
 
 **The planted failures** (M1a, M1b, M2, M3; condition 3): each is one commit on the change-set's own branch while its PR
-is a draft. Push it alone, then wait until its run is red at the expected step; only then push its `git revert` (with
-`cancel-in-progress`, a revert pushed early can cancel the red run and lose the evidence). Reverts are new commits,
+is a draft. Push it alone, by hand (`git push origin <branch>`), never through a checkpoint save (a foreground
+`checkpoint.mjs save` pushes any code commit that is ahead); then wait until its run is red at the expected step;
+only then commit and push its `git revert` (with `cancel-in-progress`, a revert pushed early can cancel the red run and
+lose the evidence). No checkpoint save runs while a planted commit or its revert is unpushed. Reverts are new commits,
 never a force-push or a reset; none carries `[skip ci]`; none touches a protected file, so none needs an ask; the final
 diff against main contains none of them; the report lists each run's id and its failing step. The control and probe
 inside E2's one green run already show that the probe bites.
 
 ## Part 8. Steps, reviewers, models
-Steps (each one commit; the gate after each; the checkpoint `foundation-toolchain` updated, committed and pushed after
-every step; the saver while agents run):
+Where the work runs: the change-set's own branch. A session limited to a `claude/…` branch uses it as the stand-in and
+pushes only that branch (which is also why the planted failures are commits on it). Steps (each one commit; the gate
+after each; the checkpoint `foundation-toolchain` updated, committed and pushed after every step, except as Part 7's
+procedure says; the saver while agents run):
 1. Root pins: `rust-toolchain.toml`, `Cargo.toml`, `package.json`, `.gitignore`; `Cargo.lock` (`cargo
    generate-lockfile`) and `package-lock.json` (`npm install --ignore-scripts`), the versions recorded.
 2. The six crates and five packages. E1, L1-L3, E6, E7, E11.
 3. K1, the workflow (one ask). Push (draft PR); E2.
 4. M1a, M1b, M2, M3, each by Part 7's procedure; run ids recorded.
 5. After 2.1b and LANE-RULES have merged: bring main in. If the build started from main after both merged, there is
-   nothing to merge. Otherwise merge in a worktree under `.gate/`, never in the main folder (CLAUDE.md's Never list
-   counts `merge` as a switch; only `git merge --ff-only origin/main` is allowed there): `git worktree add --detach
-   .gate/foundation-toolchain-merge HEAD`, `git merge origin/main` there, push `HEAD:<branch>` from there (a
-   fast-forward of the remote branch), and carry on in that worktree (`CHECKPOINTS.md` §8). Then check that ADR 0002's
-   Status line on main records part 1 as accepted (2.1b's docs pass), since `advisor.md:323` forbids merging a
-   hard-constraint change before its accepted ADR is on main (condition 5); only then K2a (one ask), and K2b, K3 and
-   K4 if FDN-NOCODE is (a) (one ask each). Re-run E1-E11.
+   nothing to merge. Otherwise (and whenever main must be merged in later), never in the main folder: CLAUDE.md's
+   Never list counts `merge` as a switch, and the only merge allowed there, `git merge --ff-only origin/main`, cannot
+   bring main into a branch with commits of its own (condition 2). Move the work into a branch worktree first
+   (`CHECKPOINTS.md` §8's form): stop the saver; free the branch in the main folder with the allowed `git switch -c
+   <name> origin/main`; `git worktree add .gate/foundation-toolchain-wt <branch>` (a real branch checkout, so the saver
+   runs there and the main folder holds no stale copy); `cd` into it in its own call (the guard refuses `git -C`);
+   install there what the gate needs (`cd tools && npm ci`, and Playwright's Chromium, CLAUDE.md "Commands"); `git
+   merge origin/main` there and push from there; restart the saver from there and carry on there. Then check that ADR
+   0002's Status line on main records part 1 as accepted (2.1b's docs pass), since `advisor.md:323` forbids merging a
+   hard-constraint change before its accepted ADR is on main (condition 5); if it does not, stop and ask the advisor,
+   and write no K2a or K2b. Only then K2a (one ask), and K2b, K3 and K4 if FDN-NOCODE is (a) (one ask each). Re-run
+   E1-E11.
 6. Docs: REPO_MAP (E8); the register (the G0 done-when reading, Q2.2-a; his go); STATUS (or DECISIONS) and ROADMAP by
    docs-keeper, with the dated follow-up for Node (Q2.2-c: one change-set moving `tools/` and v2 to Node 26 together,
-   after 2.3, merged before 2027-03-31).
+   after 2.3, merged before 2027-03-31; Node 22's end of life is 2027-04-30; the toolkit's `package.json` and lockfile
+   are gate files, so it asks Mustafa).
 7. The review round on the final diff, 3 at a time: security-auditor (tier 2: the workflow, sudo, the cut, CI hygiene,
-   and the dependency review of E11: CLAUDE.md's Never line on running unreviewed code from the internet is met the way
-   `tools/` meets it today, by a pinned lockfile plus this review), infra-engineer (CI), rust-reviewer (manifests, the
+   and E11's dependency review: CLAUDE.md's Never line on running unreviewed code from the internet is met the way
+   `tools/` meets it today, by a pinned lockfile plus this review; the Rust toolchain comes from rustup's official
+   channel at an exact version, and 2.2 has no third-party crates), infra-engineer (CI), rust-reviewer (manifests, the
    toolchain file); then test-engineer (is it proven) and engine-architect (the crate and package boundaries; briefed
    that his 2026-11-10 decision is the exception to its file's "write engine code in phase 0" line). One fix pass
    within the review budget; the verifier on the final diff; the report (`/advisor-report`, which also says that
    `V2_PHASE0_BRIEF.md:20-21` and `:144` stay stale, the claude.ai Advisor's file); the checkpoint folded in and
-   deleted; the PR ready; the advisor's review of that head; his go.
+   deleted; the worktree, if one was made, removed (`git worktree remove`, never `--force`, with §10's checks); the PR
+   ready; the advisor's review of that head; his go.
 Every agent runs Opus 5.5 (`model: opus`) at its file's effort: `high` for all but engine-architect, whose file says
-`xhigh` (the advisor's F-7); this plan's review ran at `xhigh` at his instruction. At most 3 agents at a time. Not
-night-queue work.
+`xhigh` (the advisor's F-7). This plan's review ran at `xhigh` because his prompt asked for it ("have the advisor agent
+review it at effort xhigh", `mustafa-2026-11-10-session.md`). At most 3 agents at a time. Not night-queue work.
 
 ## Part 9. Its own plan review (ask 4)
 **The advisor agent's verdict on revision 1** (f5357520329a1ce76b7bf3ec3a873ea86f378cbc; effort xhigh; from main's
-`.claude/agents/advisor.md`; notes `advisor-plan-rev1.md`, this folder, ending DONE): **APPROVE**, with conditions:
+`.claude/agents/advisor.md`; its returned verdict `advisor-plan-rev1-verdict.md`, its notes `advisor-plan-rev1.md`,
+ending DONE): **APPROVE**, with conditions:
 1. FDN-NOCODE's text: three lines, not two (K2 split into K2a, covered, and K2b, asked); quote the SCOPE option (a)
    text he picked and say his reply does not repeat that clause; open in plain words; needed before step 5 only.
    → Landed: Part 5 (K2a, K2b), Decisions needed.
-2. Step 5's "merge main" in a worktree under `.gate/`, pushed from there. → Landed: Part 8 step 5.
+2. Step 5's "merge main": a non-fast-forward merge in a worktree under `.gate/`, pushed from there (its notes add "or
+   ff-only", where `git merge --ff-only origin/main` is allowed). → Landed: Part 8 step 5 (a branch worktree, so the
+   saver can run there).
 3. `cancel-in-progress` stated; each planted failure pushed alone and left red before its revert. → Landed: 4.1,
    Part 7's procedure.
 4. security-auditor's brief names the dependency review (package count, install scripts, `resolved` addresses).
-   → Landed: E11, Part 8 step 7.
-5. Before K2 is written, check that ADR 0002's Status line on main records part 1 as accepted. → Landed: Part 8 step
-   5, 1.3.
+   → Landed: E11 (workspace links listed on their own), Part 8 step 7.
+5. Before K2a and K2b are written, check that ADR 0002's Status line on main records part 1 as accepted. → Landed:
+   Part 8 step 5, 1.3.
 6. Low items, folded in: F-3 (the probe judged on TCP, DNS printed: 4.2, 4.3, N5); F-5 (the active-toolchain check,
-   `rustc --version` inside the cut: 4.2, 4.3); F-10 (`lo` up as root before the drop: 4.2, 4.3); F-4 (the control
-   and probe on github.com: 4.1); F-6 (the Layout row: Part 5); F-7 (each agent at its file's effort: Part 8); F-11
-   (local cargo runs under `.gate/`: Part 7); engine-architect and graphics-engineer briefed (1.3, step 7);
-   V2_PHASE0_BRIEF stays stale, said in the report (1.3, step 7).
+   `rustc --version` inside the cut: 4.2, 4.3); F-10 (`lo` up as root before the drop: 4.2, 4.3); F-6 (the Layout row:
+   Part 5); F-7 (each agent at its file's effort: Part 8); F-11 (local cargo runs under `.gate/`: Part 7);
+   engine-architect and graphics-engineer briefed (1.3, step 7); V2_PHASE0_BRIEF stays stale, said in the report (1.3,
+   step 7). F-4 was optional; taken (4.1).
 Its rulings: Q2.2-a (a) final ("G0 is a stage of the gate v2, and PM-0002-39 already runs it under `--prove`"; the
 register entry needs his go); Q2.2-c (a) Node 22 final, with the dated follow-up (step 6); the three changes from the
 sketch approved (the lint tools to 2.3, `.gitignore` to `/target/` and `test-results/`, the job in its own file); the
 planted-failure commits approved with condition 3; plan 1.3 holds; Part 5 complete on the guard's marks (reproduced);
 FDN-NOCODE needed; the globs left to 2.5 justified; the workflow draft holds (permissions, pins, no secrets, no caches,
 no `pull_request_target`, the order sudo, unshare, setpriv, a real control), with conditions 3 and 6.
-Its own checks: the marks on 35 paths; every cited line; the npm versions; `rustup toolchain install --help` ("by
-default the active toolchain"); util-linux 2.39.3 in an Ubuntu 24.04.5 container; the research's claims quoted or, for
-two inferences, proved by L3 and E2.
+Its own checks: the guard's marks on 35 paths; the cited lines it spot-checked (its notes list them; it read the
+guard's `:84-100`, inside the `:80-100` block Appendix A cites); the npm versions; `rustup toolchain install --help`
+("by default the active toolchain"); util-linux 2.39.3 in an Ubuntu 24.04.5 container; the research's claims quoted
+or, for two inferences, proved by L3 and E2.
+
+**The fold check of revision 2** (b6c20be; workflow run wf_93f9ff1a-f0b, script `verify-fold-run1.js`: three
+adversarial checkers, one lens each, then a completeness critic; Opus 5.5 at effort high, 3 at a time; 4 of 4
+returned; notes `fold-check-a.md`, `-b.md`, `-c.md`, `-critic.md`, this folder). It found, and revision 3 fixes:
+- Medium: step 5's detached worktree would stop the saver ("refused: detached HEAD") and leave the main folder's copy of
+  the branch stale (now a branch worktree, step 5); E11's `resolved` rule would fail on npm's five workspace links,
+  written as `resolved: packages/<name>` with `link: true` (now listed on their own); Part 9 said the advisor checked
+  every cited line (now "the cited lines it spot-checked").
+- Low: FDN-NOCODE's "step 5" and "SCOPE" were unexplained, and "no engine code" misquoted `CLAUDE.md:52` (fixed);
+  Part 9's leftover "K2" (fixed); the advisor's returned verdict was saved nowhere (now `advisor-plan-rev1-verdict.md`);
+  a foreground checkpoint save could push a planted commit or its revert (now pushed by hand); a DNS failure inside the
+  cut could pass for a cut (now `--resolve` to an address resolved outside); the guard refuses `git -C`, and the
+  worktree needs the gate's setup (step 5); the inner bash could read the system bashrc (`--norc --noprofile`); the
+  Node rationale and the own-branch reason had been dropped (restored); no worktree removal (step 7); rustup's download
+  under the Never line (step 7); the xhigh instruction had no source (1.2, Part 8); K2a was taken as covered without
+  telling him (Decisions needed); E2's "only `lo`" criterion (now `lo` up, others noted); his go on the register entry
+  was missing from his actions (For Mustafa); LANE-RULES was paraphrased under a word-for-word heading (quoted exactly,
+  1.2); and Decisions needed now comes before For Mustafa, at the end.
+- Holding, by the checkers' own reading: condition 1's three lines, the SCOPE clause byte for byte, the plain lead, the
+  timing, both FREEZE-FDN texts, every other quotation of his words; condition 3; F-3, F-4, F-5, F-10; the YAML traced
+  argument by argument; condition 4; F-6, F-7, F-11; the 1.3 rows; the cited lines (twenty and more spot-checked).
+
+**The advisor agent's check of revision 3:** recorded below once returned.
+
 The advisor tool (Fable 5.2) is not among this session's tools, so it was not consulted before the plan was committed
-nor before it was called done; his words make it an extra, and this recorded review is the required one.
+nor before it was called done; his words make it an extra, and the advisor agent's recorded review is the required one.
 
 ## Part 10. Risks
 1. The runner refuses part of the cut (`sudo -n`, `ip link set lo up`, `setpriv`'s options, `nogroup`): E2 shows it on
@@ -437,31 +490,39 @@ nor before it was called done; his words make it an extra, and this recorded rev
 8. `npm ci --offline` from a cache filled by the online `npm ci` is assumed to need nothing more (A3); E2 proves it.
 9. The new workspace changes nothing the legacy gate reads (`gate.mjs:34` lists the five files); E5 and E6 check it.
 10. The npm tree is new code from the internet: the pinned lockfile, `--ignore-scripts` everywhere and E11's review
-    (condition 4) are its guard until 2.3's checks.
-
-## Part 11. What Mustafa checks
-No Brave check: 2.2 adds no page and nothing a player sees, hears or feels. His actions: answer FDN-NOCODE (before step
-5); start the build when he chooses; approve the kit asks as they come (K1, K2a, and K2b, K3 and K4 if he answers
-FDN-NOCODE (a)); his go on the final head after 2.1b has merged.
+    (condition 4) are its guard until 2.3's checks; the Rust side adds only rustup's official toolchain at an exact
+    version.
 
 ## Decisions needed (Mustafa)
-- **FDN-NOCODE: does your freeze exception for the foundation (FREEZE-FDN) also cover adding your 2026-11-10
-  exception to the three "no engine code" lines, `CLAUDE.md:20-22`, `CLAUDE.md:52` and
-  `.claude/agents/advisor.md:107`?**
-  - Why it matters: once 2.2 merges, main holds v2 crates while those three lines still say "no engine code"; the
-    advisor works from its own file and would read 2.3's plan against it.
+- **FDN-NOCODE: does your freeze exception for the foundation (FREEZE-FDN) also cover adding your 2026-11-10 exception
+  to the three lines that forbid v2 code: `CLAUDE.md:20-22` and `.claude/agents/advisor.md:107` (both "No engine
+  code") and `CLAUDE.md:52` ("Phase 0 writes no v2 code")?**
+  - Why it matters: once 2.2 merges, main holds v2 crates while those three lines still forbid v2 code; the advisor
+    works from its own file and would read 2.3's plan against it.
   - The texts: the FREEZE-FDN option (a) you picked listed, for 2.2, "its CI job, the constraint-scope lines and the
     rules' globs"; your words on main say the freeze "does not stop the smallest edits the foundation needs to keep the
     kit true after its own moves (paths in the gate and in CLAUDE.md, the toolchain's CI job, the lines that scope the
-    legacy constraints)". The SCOPE option (a) you picked (`d389d91:.checkpoints/foundation/plan.md:524-536`) said
-    "... and 2.2's kit edit scopes the constraints and adds your 2026-11-10 decision as the exception to the "no v2
-    code" lines"; your reply to it ("I accept ADR 0002's part 1 alone ...") does not repeat that clause.
+    legacy constraints)". The SCOPE question (whether the legacy hard constraints apply to `legacy/` only) had an option
+    (a), which you picked (`d389d91:.checkpoints/foundation/plan.md:524-536`); it said "... and 2.2's kit edit scopes
+    the constraints and adds your 2026-11-10 decision as the exception to the "no v2 code" lines"; your reply to it
+    ("I accept ADR 0002's part 1 alone ...") does not repeat that clause.
   - Options: (a) yes: each line gets one clause, each edit asks you first and merges on your go; (b) no: the three lines
     stay until the kit unfreezes, and every plan and review until then cites your decision as the exception.
   - Recommendation: (a).
-  - Needed before step 5 only, not for the build.
+  - Needed before the kit lines are written (the plan's step 5, after 2.1b has merged), not for the build.
+- Taken as covered unless you say otherwise: K2a, the hard-constraints heading scoped to `legacy/` (`CLAUDE.md:45`),
+  which both texts name ("the constraint-scope lines" in the option; "the lines that scope the legacy constraints" in
+  your words); it still asks you at the write.
 - Already answered in this session's prompt: the CI job is covered; guard checks for the new pins wait for 2.3; 2.2
   merges after 2.1b. Not asked now: the rules' globs (2.5's plan asks).
+
+## For Mustafa
+No Brave check: 2.2 adds no page and nothing a player sees, hears or feels.
+1. Answer FDN-NOCODE (before the plan's step 5).
+2. Start 2.2's build when you choose.
+3. Approve the kit asks as they come: K1 (the new workflow), K2a (the heading), and K2b, K3 and K4 if you answer (a).
+4. Give your go on the register entry that moves G0's exit-2 mark to 2.3 (Q2.2-a), in the same pull request.
+5. Give your go on the final head after 2.1b has merged.
 
 ## Appendix A. Cited lines, re-found on main 2d22b69
 - ADR 0002: part 1 `:137-156`; part 2 `:157-181`; part 3 `:182-246`; part 4 `:247-278`; part 7 `:416-484` (the
@@ -470,25 +531,29 @@ FDN-NOCODE (a)); his go on the final head after 2.1b has merged.
   `:1165-1171`; PM-0002-37 `:1289`, -38 `:1290`, -39 `:1291`, -62 `:1314`; migration plan 2.2 `:1432-1438`.
 - SPIKE_PLAN foundation entry `:420-442`. CLAUDE.md `:19`, `:20-22`, `:41-43`, `:45-53`. advisor.md `:107` (was `:98`
   at 44446a5), `:322`, `:323` (was `:313`), the revert steps `:280-290`. `engine-architect.md:52`,
-  `graphics-engineer.md:41`. STATUS: KIT-FREEZE-2 and FREEZE-FDN `:680-690`, LANE-RULES `:700-710`, SPIKE-SCOPE (a)
-  `:918-919` (was `:739-746`), SLICE-ORDER condition 3 `:827` (was `:654`). V2_PHASE0_BRIEF `:20-22`, `:144`.
-  NIGHT_SHIFT `:54-55`. `syntax-gate.mjs:3`, `:21-23`. `gate.mjs:34`, `:115`. `routine-guard.mjs:28-29`, `:35-48`,
-  `:80-100` (`mergeAllowed` and its lists), `:1483-1490` (the merge check reads `gate` and `smoke`). Rules' globs:
-  `pages.md:3-4`, `engine-core.md:3`, `engine-game.md:3`, `engine-editor.md:3`, `netcode.md:3-5`.
-- The SCOPE options at d389d91: `.checkpoints/foundation/plan.md:524-536`.
+  `graphics-engineer.md:41`. STATUS: KIT-FREEZE-2 and FREEZE-FDN `:680-690`, LANE-RULES `:700-710` (the Models line
+  `:704-705`, his addition `:709-710`), SPIKE-SCOPE (a) `:918-919` (was `:739-746`), SLICE-ORDER condition 3 `:827`
+  (was `:654`). V2_PHASE0_BRIEF `:20-22`, `:144`. NIGHT_SHIFT `:54-55`. `syntax-gate.mjs:3`, `:21-23`.
+  `gate.mjs:34`, `:115`. `routine-guard.mjs:28-29`, `:35-48`, `:80-100` (`mergeAllowed` and its lists), `:1483-1490`
+  (the merge check reads `gate` and `smoke`). Rules' globs: `pages.md:3-4`, `engine-core.md:3`, `engine-game.md:3`,
+  `engine-editor.md:3`, `netcode.md:3-5`.
+- The SCOPE options at d389d91: `.checkpoints/foundation/plan.md:524-536` (the clause at `:532-534`).
 - PR #40 at 411eeee: `spikes/netcode-proof/rust-toolchain.toml` (1.99.1, minimal, clippy and rustfmt, wasm32);
   `check.mjs:1226-1245` (`cargoConfigFiles`), `:1250-1264` (`referenceProblems`); `.cargo/config.toml` sets only
   `target-dir`; the PR changes nothing outside `spikes/` (no `.github/`, `.claude/`, `tools/` or root file).
 
-## Appendix B. Findings from this plan's research and review
+## Appendix B. Findings from this plan's research and reviews
 - N1: the runner image's default Rust is 1.99.1, equal to the pin; the job checks the active toolchain's source (4.3).
 - N2: the runner's docker group would reach the Docker socket from inside the cut; the group is dropped (4.3).
 - N3: npm's docs do not state that a workspace without a `test` script fails `npm test --workspaces` (L3 proves it).
 - N4: rustup auto-installs by default since 1.28.1; the job sets `RUSTUP_AUTO_INSTALL=0` (4.1).
-- N5: a name may resolve inside the cut through a local resolver's socket; the probe judges a TCP connection (4.3;
-  the advisor's F-3).
+- N5: a name may resolve inside the cut through a local resolver's socket, or fail to; the probe connects to an address
+  resolved outside, so only a TCP connection decides (4.3; the advisor's F-3 and the fold check).
+- N6: fallback tunnel devices can appear in a new namespace when their modules are loaded; E2 asks only that `lo` is up
+  (the fold check's critic).
 - A1-A3 (assumed, proved in the build): `sudo -n unshare` with `ip link set lo up` and `setpriv` works on the runner
   (E2); Playwright Test runs a browserless test without browsers (E1); `npm ci --offline` needs only the cache the
   online `npm ci` filled (E2).
 - The local rehearsal of `unshare` in this session's container was refused by the session's permission check and not
-  retried; nothing in the plan rests on it.
+  retried; nothing in the plan rests on it (the advisor and one fold checker later ran util-linux, rustup and npm checks
+  in their own runs, as their notes record).
