@@ -26,13 +26,15 @@ from a day session). One review round, PASS WITH NOTES twice, nothing Critical o
 - E1, the move (`check.mjs --rev 8ead8f1`: ALL PASS; the verifier's own count: 0 short): 1233 = 1218 moved lines
   (STATUS 3, DECISIONS 424, archive 791) + 15 structure lines (the title, 7 headings, 7 blank). At the head, 1217 of
   1218 are still byte for byte; the one changed is the kit-v3-5 row (1b030e3, #46's merge).
-- E2, decision ids before and after, none lost: answered codes 65 and 65 (104 mentions kept); hyphenated codes 248 and
-  254 (6 new: ranges in new text); codes that lead an entry 112 and 132 (20 new: the index); his dated lines 109, 109.
+- E2, decision ids before (2d22b69) and after the move (8ead8f1), none lost: answered codes 65 and 65 (104 mentions
+  kept); hyphenated codes 248 and 254 (6 new: ranges in new text); codes that lead an entry 112 and 132 (20 new: the
+  index); his dated lines 109 and 109. At the head 259 and 137 (the fix pass's SD- ids and entries), still none lost.
 - E3, his words: 9 of 9 quotes in CLAUDE.md equal STATUS 702-726 and the kit-v3-5 report's Appendix A; the blockquote
   is exactly his six bullets. His #46 go: the merge message's lines equal his chat message byte for byte (event
   103f0452-db09-48fb-8529-fc794ef1f06c, 294 characters; the session read it, the verifier checked the saved copy).
-- E4: gate PASS (`--no-smoke`), symbols +0 −0; CI gate and smoke green on every pushed head; repo map OK; kit tests on
-  main and head: routine-guard 1107/1107, settings 127/127, checkpoint 27/27.
+- E4: gate PASS (`--no-smoke`), symbols +0 −0; CI's gate green on every pushed head, its smoke green wherever it ran
+  to the end (smoke on 8ead8f1 once and on 1b030e3 twice was cancelled, by the look of it by the next push); repo map
+  OK; kit tests on main and head: routine-guard 1107/1107, settings 127/127, checkpoint 27/27.
 - E5, the rule-diff table (Appendix B): nine rows, one looser, by his own Models line.
 - E6: #46 by git and the API (the verifier); the routines read with get_trigger, 2026-11-10 20:10 UTC (session only).
 - His STATUS-DIET says "153 KB and 1,033 lines"; at 2d22b69 the file had 177,445 bytes and 1233 lines (it grew after he
@@ -40,9 +42,12 @@ from a day session). One review round, PASS WITH NOTES twice, nothing Critical o
 - Not verified: smoke locally (CI runs it); whether the guard's three "ask" prompts reached him (L13: untested here).
 ## Reviews (one round on 37434d5; two agents, Opus 5.5 at high)
 - security-auditor, PASS WITH NOTES: nothing looser than his words; every open security item still listed; the merge
-  path not widened. N4 and N8 fixed; N1, N2, N3, N6 follow-ups (SD-N1 to SD-N6); N5 Decisions needed; N7 noted.
+  path not widened. N4 and N8 fixed; N1, N2, N3 and N6 follow-ups (SD-N1, SD-N2, SD-N3, SD-N6); N5 Decisions
+  needed; N7 noted.
 - The verifier, PASS WITH NOTES: E1-E6 reproduced on its own. M-1 (Medium, the same as N4) fixed in adfe108; L-6 and
   L-7 fixed; L-5 corrected below; L-3 a follow-up (SD-L3); L-1 and L-4 left (harmless); L-2 is this report.
+- The verifier's re-check of the fix pass and this report (212d74e; not a round): PASS WITH NOTES, three Lows on this
+  report's wording (RL-1 to RL-3), fixed in the last commit.
 ## Decisions and deviations
 - The advisor agent's rulings went to the archive, not DECISIONS.md (Q1). STATUS-DIET and LANE-RULES left "Queued" for
   the dated list (Q5); KIT-FREEZE-2, the unit walk and the Slice 1 note stay queued.
@@ -74,8 +79,8 @@ His unit walk (UNITS.md §0 and LOOP_V2), in a fresh chat, from his words in DEC
 
 ## Appendix A: the line ranges (STATUS at 2d22b69, `git show 2d22b69:docs/STATUS.md`)
 The script and its checks: `.checkpoints/status-diet/` (split.mjs, check.mjs, e3.mjs, the templates in tpl/,
-followups.tsv), deleted in the last commit before the PR was marked ready; read them at that commit's parent
-(`git show <parent>:.checkpoints/status-diet/<file>`; the parent is named in the PR).
+followups.tsv; the plan, the advisor's verdicts, the reviews and his #46 go's chat record beside them), deleted in the
+last commit before the PR was marked ready; read them at 10f02ce (`git show 10f02ce:.checkpoints/status-diet/<file>`).
 - DECISIONS.md: "Queued" 674-690, 727-762, a pointer line, 763-774; "Decisions, newest first": his go for #46 (lines
   5-7 of 2d22b69's message), a header line, 691-726, 200-239, 198-199, 240-272, 281-291, 292-316, 317-339, 340-370,
   371-391, 392-400, 401-420, 775-787, 788-799, 813-819, 820-827, 828-836, 837-846, 880-884, 885-887, 888-907, 908-911,
