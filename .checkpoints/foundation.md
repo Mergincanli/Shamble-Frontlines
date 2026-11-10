@@ -21,8 +21,12 @@
    items 1-10, PM-0002-35..69; R5-LAYOUT-REC1 and REC6; the tools' path handling; the guard's gate-file list; PR #46
    and #40 files. Raw grep: 62 tracked files (outside `.checkpoints/`) name a legacy file, 692 hits.
 
+2. Advisor tool consulted (go; notes under Open findings). Inventory workflow launched 07:31 (Running work).
+
 ## Current step
-2. Consult the advisor tool on the approach, then the inventory workflow (3 classifier agents, then 1 critic).
+3. While the workflow runs: plan draft `.checkpoints/foundation/plan.md` revision 0: Part 2 (2.2 sketch), Part 3
+   (2.3-2.6 waits), Part 4 (PR #46, PR #40) written; Part 1 (2.1) waits for the inventory. inv-kit's notes are done
+   (2 kit files, 3 places required: verifier.md:28, CLAUDE.md:41-42 and :19; six questions for Mustafa).
 
 ## Next steps
 3. Plan draft `.checkpoints/foundation/plan.md`; the `advisor` agent's plan review; fix; advisor tool before done.
@@ -72,4 +76,8 @@
 - Plan home: `.checkpoints/foundation/plan.md` on this branch (precedent: `.checkpoints/netcode-proof-test/plan.md`).
 
 ## Running work
-- (none)
+- Workflow wf_92d477b2-b78 (task wbpbds2b5) · script copy `.checkpoints/foundation/inventory-run1.js` · no args ·
+  notes `.checkpoints/foundation/inv-{code,kit,docs,critic}.md` · launched 07:31 Amsterdam · running. Resume with
+  `resumeFromRunId` and the copy if cut off.
+- Saver: background task bsmtuh7qm · output `/tmp/claude-0/-home-user-Shamble-Frontlines/cf54bb72-a605-502c-af5b-b590dcc1cda7/tasks/bsmtuh7qm.output`
+  · started 07:31 · stops by 09:21 · last check 07:32: started.
