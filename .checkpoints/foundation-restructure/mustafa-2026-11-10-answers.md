@@ -20,3 +20,13 @@ Both Claude accounts are mine, and work from either one counts the same. The kit
 
 When 2.1a is built, end with: the pull request's number, what the proof showed, and anything you need from me.
 ```
+
+His follow-up of 2026-11-10, after 2.1a's report (PR #47), word for word:
+
+```text
+1. The two gate prompts this morning (tools/gate.mjs and tools/smoke.mjs): yes, I approved both.
+
+2. Do not watch PR #47 (foundation step 2.1a). It is a draft waiting for its turn, and I will tell you when that turn comes.
+
+3. Yes, plan step 2.2 (the toolchain) now, in a fresh session on this account. Give me its prompt in one paragraph. Plan only, no build: what it pins now, what stays an empty slot until the boundary spike, the CI job that runs the Rust checks, and its own plan review by the advisor agent. The main model stays Opus 5.5.
+```

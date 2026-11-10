@@ -9,7 +9,7 @@
   the same.
 - **Branch:** `claude/advisor-fable-4hxq72` (this cloud session may push only there), standing in for
   `cs/foundation-restructure`; Mustafa's personal account. **Base / OLD:** main 44446a5 (unchanged on 2026-11-10 10:15).
-- **Last update:** 2026-11-10 13:50 Amsterdam
+- **Last update:** 2026-11-10 14:05 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -66,6 +66,8 @@ Waiting for 2.1a's turn (after #46, STATUS-DIET, LANE-RULES), PR #47 a draft. No
 - FREEZE-FDN (a), SPLIT (a), SCOPE (a) · Mustafa · 2026-11-10 (word for word in `mustafa-2026-11-10-answers.md`).
 - Build 2.1a in this chat (no CLAUDE.md rule calls for a fresh session: plan approved for 2.1a's build, his decisions
   in, this branch is the session's own) · the session · 2026-11-10.
+- He approved both gate prompts (gate.mjs, smoke.mjs); PR #47 is not watched (he says when its turn comes); 2.2 is
+  planned in a fresh session on this account, from a one-paragraph prompt given in this chat · Mustafa · 2026-11-10.
 
 ## Running work
 - E3 run: done (31 of 31). Worktrees `.gate/fdn-*` kept until 2.1a's turn (the verifier may re-run E3); remove then.
