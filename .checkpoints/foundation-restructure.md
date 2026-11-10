@@ -9,7 +9,7 @@
   the same.
 - **Branch:** `claude/advisor-fable-4hxq72` (this cloud session may push only there), standing in for
   `cs/foundation-restructure`; Mustafa's personal account. **Base / OLD:** main 44446a5 (unchanged on 2026-11-10 10:15).
-- **Last update:** 2026-11-10 11:48 Amsterdam
+- **Last update:** 2026-11-10 13:30 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -36,20 +36,16 @@
      root look like the legacy build. New names: smoke.mjs `findBuild` (export), `LEGACY_JS`; gate.mjs `BUILD`,
      `BUILD_PREFIX`, `BASE_PREFIXES`, `basePrefix`; `baseFile(b, f)` now takes the base object.
 
-## Current step
-4. Build step 3, E3: `e3-run.mjs` over `e3-mutations.json` (31 entries: P1-P4, M1-M22, C1-C3, PC1, PC2, drafted by an
-   Opus agent, notes `agent-mutations.md`) in `.gate/fdn-old` (44446a5), `.gate/fdn-new` (dd12aeb) and
-   `.gate/fdn-newleg` (9af08f7: dd12aeb + a local commit of the move, never pushed); results to `e3-results.json`;
-   running in the background since 11:05 Amsterdam (log `.gate/e3-run1.log`). PC1 judged on check 3 only (the Phase 0
-   gate had checks 1-4; refreshRect is still called at boot, so 5a/5b fail on every gate).
+4. Build step 3, E3 (`e3-summary.md`, `e3-results.json`): 31 of 31 PASS. For every mutation OLD's gate (44446a5), the
+   edited gate at the root (dd12aeb) and the edited gate on `legacy/` (9af08f7) fail exactly the same checks, never none;
+   every control exits 0 on all three (PC1 on check 3). P1-P4 fail on the Phase 0 report's checks for its reasons.
+   M19/M20 split the report's "5b + 5d" pair (5b and 5d one each, the same on all three): a note. Worktrees restored
+   clean. CI run 42801926823 on 9ae4037: gate and smoke success (pinned Chromium).
 
-   - Pushed (dd12aeb inside 9ae4037); draft PR #47 opened 2026-11-10 (stays a draft until its turn); CI run 42801926823
-     (push, head 9ae4037) in progress at 11:47 Amsterdam.
-   - E3 so far: P1 PASS (old, new, newleg all fail [3, 5a, 5b]; the report's [3] included).
+## Current step
+5. PR #47's body updated with E3; the report to Mustafa.
 
 ## Next steps
-5. When E3 ends: results into PR #47's body and the checkpoint; CI run ids; report to Mustafa: PR number, the proof,
-   his asks.
 6. At 2.1a's turn (after #46, STATUS-DIET, LANE-RULES): merge main in; step 4 (his decision recorded, in
    `docs/DECISIONS.md` if STATUS-DIET split STATUS); the plan updated for the marker departure; reviews
    (security-auditor, test-engineer, infra-engineer), the verifier, the report; worktrees removed (links first, then
@@ -59,7 +55,8 @@
 - (none yet)
 
 ## Key numbers
-- (none yet)
+- E3: 31 of 31 PASS (4 Phase 0 mutations, 22 check-5 mutations, 3 + 2 controls) × 3 gates = 93 full gate runs.
+- Folder-rule table: 8 + 2 rows PASS. Base checks: 7 edited-gate runs PASS over root, CS-1 and legacy/ bases; OLD dies on a legacy/ base.
 
 ## Decisions taken
 - FREEZE-FDN (a), SPLIT (a), SCOPE (a) · Mustafa · 2026-11-10 (word for word in `mustafa-2026-11-10-answers.md`).
@@ -67,6 +64,5 @@
   in, this branch is the session's own) · the session · 2026-11-10.
 
 ## Running work
-- E3 run: background task b93x1ze3s, `node .checkpoints/foundation-restructure/e3-run.mjs` (resumable: skips entries
-  already in `e3-results.json`), started 11:05 Amsterdam.
+- E3 run: done (31 of 31). Worktrees `.gate/fdn-*` kept until 2.1a's turn (the verifier may re-run E3); remove then.
 - Saver: background task bod2js7dn, started 10:44 Amsterdam, stops by 12:34; check at each update.
