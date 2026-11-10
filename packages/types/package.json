@@ -4,8 +4,5 @@
   "private": true,
   "description": "Types generated from Rust (ADR 0002 part 5). Empty until the generated-types step.",
   "license": "UNLICENSED",
-  "type": "module",
-  "scripts": {
-    "test": "vitest run"
-  }
+  "type": "module"
 }
