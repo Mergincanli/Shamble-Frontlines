@@ -5,7 +5,7 @@
   Plan: `.checkpoints/foundation-toolchain/plan.md` (revision 4; the advisor's APPROVE of revision 3, bf1737f).
 - **Branch:** `claude/laughing-pasteur-fwya24` (this cloud session's branch, standing in for `cs/foundation-toolchain`)
   · **Base:** main 2d22b69 (PR #46 merged)
-- **Last update:** 2026-11-10 19:52 Amsterdam
+- **Last update:** 2026-11-10 19:41 Amsterdam
 
 ## Steps done
 1. Model check: `get_session` shows `session_context.model` claude-opus-5-5 (Opus 5.5) · no commit · go.
@@ -74,7 +74,7 @@ start of the build.
 
 ## Running work
 - saver: background task b04hgafwt · output `/tmp/claude-0/-home-user-Shamble-Frontlines/29a42dc7-ecd4-506e-b90a-121dd5e50988/tasks/b04hgafwt.output`
-  · started 18:35 Amsterdam · stopped by the session at 19:52 after the last save (the task's work in this session
+  · started 18:35 Amsterdam · stopped by the session at 19:41 after the last save (the task's work in this session
   is done).
 - workflow run wf_93f9ff1a-f0b (task wt8ab4d43) · script as launched `foundation-toolchain/verify-fold-run1.js` · no
   args · notes `.checkpoints/foundation-toolchain/fold-check-*.md` · launched 19:10 Amsterdam · done 19:24, 4 of 4.
