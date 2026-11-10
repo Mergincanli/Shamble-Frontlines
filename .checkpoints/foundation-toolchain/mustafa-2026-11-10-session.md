@@ -16,3 +16,7 @@ Two answers in advance, so you do not have to stop for them:
 - FREEZE-FDN and the CI job: yes, it is covered. My words on main, next to KIT-FREEZE-2 in STATUS, name "the toolchain's CI job" among the allowed edits. Each such edit still asks me and merges on my go. Guard checks for the new pins are not covered; they wait for the gate step (2.3).
 - Merge order: 2.2 merges after 2.1b.
 ```
+
+```text
+Consult the advisor tool before committing to the plan and before calling it done, then have the advisor agent review it at effort xhigh and record its verdict against the plan’s commit SHA.
+```
