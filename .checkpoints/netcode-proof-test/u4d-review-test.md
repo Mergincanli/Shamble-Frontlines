@@ -6,7 +6,8 @@ Plan: u4-build-plan.md §5 U4d, §4.2, §4.10, §4.13-4.15, §7.1. Reviewer note
 Rules: CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/shared-target, CARGO_NET_OFFLINE=true; `cd <wt> || exit 1`
 on its own line; touch crates before each build and every 2 s during counted runs; no other cargo/rustc before a
 counted run; df > 2 GB; plants in place, one at a time, restore + sha256; commit nothing. No Edit tool in this run:
-plants by a scratch script (plan §7.2's form, as u3d-test-bites.py), notes rewritten whole with Write.
+plants by scratch scripts (plan §7.2's form, as u3d-test-bites.py): u4d-test-bites.py, u4d-test-bites2.py (this
+folder); notes rewritten whole with Write.
 
 ## Plan
 1. Reference sha256 of every crates/sim file (done below). Check no other cargo/rustc, df.
@@ -59,4 +60,22 @@ plants by a scratch script (plan §7.2's form, as u3d-test-bites.py), notes rewr
     spawns/s 20.064-22.176, 10 reliable events/s 9.5-10.5, 15 big vehicles): no U4d test -> probe G.
   - d10 clamp twin never asserts the step-10 shot ran (events equal could both be shot-less) -> probe H.
   - D-2 child protocol: blocking pipes, no timeout (a hung child hangs the suite; no flake source seen).
-- [4] Bite script: u4d-test-bites.py (this folder). Next: run it (bites B*, E*, probe P).
+  - carry14 pins MB = 1 << 20 (1,048,576): marks.json's hit-history row is `<= 1000000` with "MB = 10^6 B"
+    (marks.json:2688-2694, :2739). 231 x 4,536 = 1,047,816 B > 1,000,000: spans 7,334-7,700 ms pass for_ms and fail the
+    mark. Source mismatch, MEDIUM (small reach). Fix: 1_000_000 -> 220 ticks, 7,333 ms.
+- [4] Bite script run 1 (u4d-test-bites.py, all ids), results so far (each restored, sha256 checked):
+  - B1 BITES: measured D-2, hash-map fold at tick 1234: "Outcome { compared: 1235, first: Some((0, 1234,
+    \"spawner[0].acc\")) }" (replay.rs:274).
+  - B1-clippy BITES: "use of a disallowed type std::collections::HashMap" + "iteration over unordered hash-based type"
+    at world.rs:1818-1819 (measured clippy, this copy's npt-sim checked).
+  - B2 BITES (weakly): measured std sin in World::sinf: D-7 fails on the 30-tick pin only (hash 3247652229372912894 vs
+    8166482889541977892); the 1- and 300-tick pins and every World::new pin still equal. std sin differs from libm
+    only on some ticks' inputs: D-7's native catch rests on 1 of 3 sampled ticks.
+  - B2-clippy BITES: "use of a disallowed method f32::sin" world.rs:719.
+  - B3 BITES: D-3 "CO step 0: record" (vel grid 600 vs 606).
+  - B4 BITES: D-3 "CO step 3: record" (raw pitch differs; the aim origin comes from the floor-snapped position).
+  - B5 BITES: D-4 "a non-finite value in the state after tick 1150: soldier[0].pitch" (world.rs:1852).
+  - E1 BITES: D-1 "SS" before the first tick (a process-wide counter in World::new).
+  - E2 BITES: D-3 "CO step 0: Some(\"rng[0].position.lo\")" (predict drew from the spread stream).
+  - E3 BITES: D-5 "step 16: the state hashes" (a refused throw drew from the projectiles' stream).
+  - E4a BITES: D-6 "big vehicles: 14".

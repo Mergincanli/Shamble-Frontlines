@@ -33,7 +33,17 @@
       U4a's half is two lines (the kind joins the own-state rows of both GROUPS tables). It goes in the main session's
       commit, with the advisor.
     - **Lows:** N3-N7 and U4b-L1 (the time origin for U6), follow-ups.
-  - **Left:** rust-reviewer, then test-engineer (cut at 07:3x, re-running).
+  - **Round 1 complete:**
+    - rust-reviewer and test-engineer: REVISE for U4a, for the send cap alone; APPROVE WITH FINDINGS for U4b (Lows).
+    - All four reviewers name the send cap as U4a's one blocking fix. Security marks S1 (SEC-U4a-1) as before the
+      merge; the other three say after U4d. It goes to the advisor with all four views.
+  - **The U4b fix pass:** done by the main session (u4b-build.md, "Round 1 and its fix pass"): T-B1's new test (its
+    plant fails it by name), T-B3, T-B2. 11 clean tests, 17 bites.
+  - **The U4a fix pass, then round 2 on what changed:** workflow wf_5a059972-5c8 (task w0yg500x5).
+    - The fixer works in U4a's worktree: the send cap, the single "no ack" encoding, Debug redaction, the never-0
+      guard's test, a nit, and the N2 record.
+    - Then rust-reviewer, test-engineer, netcode-architect and security-auditor, one at a time, on the diff against
+      the pre-fix copies `.gate/u4a-prefix` and `.gate/u4b-prefix` (remove both after the merge).
 - **U4d (the stand-in sim):** built and not merged.
   - check.mjs twice: measured 304 = 275 + 29, bites 327 = 292 + 35.
   - Carry 13 is partly met: a counting allocator is impossible under `unsafe_code = "forbid"`, so a storage-identity

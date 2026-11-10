@@ -39,6 +39,9 @@ redirects, heredocs or python3 -c.
   advisor-u3q.md:160-173 (C1'), advisor-u2.md:72-103 (C1, C2).
 - 10:30Z Controls (marker only): measured lib 13 + tests/l1.rs 15 + doc 0, all pass, marker 74 lines, "Compiling
   npt-l1 (this copy's path)", 16 s; bites lib 23 + 20 + 0, all pass, marker 102. No foreign cargo in any run below.
+  Names (from the control logs) = the builder's: 8 new lc tests + v1s_tag_... + next_event_ns_... measured; + 8
+  bite_*_fails_lcN + two-thread + the_model_bites_are_chosen_only_here in bites. L-c2 PTOs seeds 1-10: 139.229
+  145.974 154.005 175.217 149.907 155.599 167.569 158.779 149.389 145.595 (mean 154.13).
 - 10:30-10:38Z The 8 named bites, planted DIRECTLY in the measured model (not through with_model_bite; the builder used
   the bites build), except stream-sample-in-order (bites-only state: the L-c7 #[test] switched to with_model_bite).
   Each restored, sha256 = build after each. Failing tests by name (lib unit tests unless said):
@@ -60,3 +63,38 @@ redirects, heredocs or python3 -c.
   - sends-before-events (both `if bitten!(SendsBeforeEvents)` -> true): lc6 only, "the PTO due at 4166.215 ms did not
     resend message 0 in its instant".
   All 8 = the builder's messages word for word: the bites-build bite code is what the measured defect does.
+- 10:40-10:44Z Bites the plan missed (measured build, all npt-l1 tests, marker present, our path compiled, no foreign
+  cargo, restored + sha256 each):
+  - next-event-none (next_event_ns always None): lib 13/13 PASS incl. lc5; only tests/l1.rs
+    next_event_ns_names_the_next_arrival_... fails ("the datagram's arrival"). L-c5 cannot see it.
+  - next-event-no-timers (next_event_ns blind to loss/PTO timers): ALL 28 PASS.
+  - next-event-no-ready (blind to the inbox's hand-out instants, the P0 gate+1 case): ALL 28 PASS.
+    -> confirms rust-reviewer M: L-c5's event mode calls at every whole ms until 6 s (tests.rs:895, next_send =
+    (t/MS+1)*MS whatever the script sends) and once at 10 s (tests.rs:911), and compares arrival stamps, not the
+    instant each item is handed out; advance() applies events at their own time, so any next_event_ns passes.
+  - no-packet-threshold (PACKET_THRESHOLD 1,000,000): ALL 28 PASS. packet-threshold-2: ALL 28 PASS.
+    -> C1' (b)'s kPacketThreshold is pinned by no test: L-c1's 33 ms spacing makes the time threshold win always
+    (3 later packets = 100 ms + RTT > 9/8 RTT). The stream test's comment (tests/l1.rs:385-386) names the packet
+    threshold too, unpinned.
+  - time-threshold-srtt-only (latest RTT dropped from max): ALL 28 PASS (L-c7 link 1 has srtt = latest).
+  - acks-lost-at-profile-rate (acks also lost at the profile's loss outside bursts): ALL 28 PASS: Q15's "lost inside
+    bursts only" has no negative test (L-c1..3 run lossless; L-c4's link 1 checks hand-outs from the log).
+  - acks-share-datagram-flow (acks draw from the datagram flow): tests/l1.rs 3 FAIL: v1s_tag_... ("P2: the datagram
+    entries are not v1's (0x167f703a471bb105)"), fates_belong_to_their_flow_..., a_datagram_refused_.... L-c8's unit
+    half bites.
+  - event-order-link-first (rank (time, link, fate index, ...)): ALL 28 PASS: L-c6's link 2/3 check (tests.rs:971-972,
+    1038-1046) sends link 2 before link 3, so fate order = link order.
+  - pto-from-oldest-unacked (PTO from the oldest unacked stream packet, not the last ack-eliciting send): lc1 FAILS
+    "1 probe timeouts fired (the first at 6645.003 ms)": caught, by one event in 36 messages.
+  - rfc-a7-sampling (sample whenever the ack newly acks its largest: RFC 9002 A.7): lc7 FAILS "link 0 took 504 RTT
+    samples where the newest-packet rule gives 145": L-c7 pins C2's strict wording; at 30 Hz P2 (L-c2) the two rules
+    differ by <= 0.3 ms of PTO in 5 of 10 seeds (139.229 146.236 154.005 175.217 149.909 155.577 167.388 158.852
+    149.389 145.595): netcode F3's "rare at 30 Hz" holds; at 1 kHz P4 it is 3.5x fewer samples.
+- 10:44Z L-c8 SHA check: the builder's lc8-scratch (own [workspace], path deps on this copy; `cargo +1.99.1 build
+  --release --locked`, shared target, touch loop), on the NEW model: SHA-256(v1 tag + datagram entries) P2 s1
+  913db8e914bdb773f6f1..., B1 s1 feabf2f02d023fa9784b..., P4 s1 b8a04f2f8ddc0d39624d... = the 16-hex prefixes in the
+  committed results/c-u2-pm-0001-3/81c6d01e371b/runs.txt:16,28,34 (2,000,000 / 2,020,000 / 2,000,000 datagram
+  entries of 3,959,634 / 3,979,629 / 3,899,978). Pins: 0xadfbebe4bb1abf64, 0x43749a62922e9b35, 0x246e7a241a2a0a18 =
+  tests/l1.rs. 3 s per probe run. Not re-derived on the OLD code by me (provenance: builder notes 18:20Z item 1).
+  Scratch files' sha256 unchanged by the run (main.rs f0cc015d, Cargo.toml 954ed45f, Cargo.lock 0f305fab).
+- Next: final check.mjs (step 4), final sha256 vs u4c-sha-before.txt, findings.

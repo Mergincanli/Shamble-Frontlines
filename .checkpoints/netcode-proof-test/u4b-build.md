@@ -106,5 +106,28 @@ Bites builds add `bites::` with 6 tests:
   - Wall time: test step 101.5 s on run 1, 84.1 s on run 2.
   - Outputs: scratchpad u4b-check-1.txt and u4b-check-2.txt.
 
+## Round 1 and its fix pass (2026-11-10)
+- **Round 1 (wf_4153791e-ba1):** netcode-architect, rust-reviewer and test-engineer each returned APPROVE WITH
+  FINDINGS, all Low. Notes: u4ab-review-netcode.md, -rust.md, -test.md.
+- **The fix pass** (main session, about 10:20 UTC, tests/schedule.rs only):
+  - **T-B1:** a new test, `a_wake_1_ns_before_an_exact_due_time_does_not_run_that_tick` (tick 3 at 30 and 60 Hz, where
+    k × 10⁹ / hz is whole). The test-engineer's plant had dropped the closed form's "- 1" and passed every other
+    test. Re-planted by the main session: this test FAILED by name ("left: (3, 133333333), right: (2, 100000000)");
+    schedule.rs was restored and checked against sha256 f9076ff8….
+  - **T-B3:** carry 6's test now reads the cap through `due_ticks`, so it fails if `Schedule::new` ignored its cap
+    argument: after a 1 s stall it runs exactly LOOP_CATCHUP ticks and drops TICK_HZ − LOOP_CATCHUP. It also asserts
+    `LOOP_CATCHUP == loop_catchup_at(TICK_HZ)`.
+  - **T-B2:** the purity line is labelled as documentation; purity is held by the types and the clock ban.
+  - **Tests:** 11 clean, 17 bites. New sha256 of tests/schedule.rs: 05e2068b…. The other three files are unchanged.
+- **Follow-ups**, carried to later briefs and the U4 report:
+  - U4b-L1 (U6): pass ns since the loop started, never raw monotonic ns, or the first wake counts a huge drop.
+  - U4b-L2 (R2): the jitter log's scheduled start comes from loop start + ⌊(run + dropped) × 10⁹ / hz⌋, never
+    next_due_ns().
+  - F-B1 / T-B4 (U6): drop allow-invalid once tokio is a direct dependency, and plant `tokio::time::Instant::now()`
+    to show the ban bites.
+  - F-B2 (U4r, U6): validate a rate or cap read from content before `Schedule::new`, which panics.
+  - F-B3: nits.
+- **Round 2 (on what changed):** wf_5a059972-5c8, together with U4a's.
+
 ## Reviews (plan §5 U4b): netcode-architect, rust-reviewer, test-engineer
 They wait for free slots: the three wave-1 builders hold all 3 (CLAUDE.md, at most 3 agents).
