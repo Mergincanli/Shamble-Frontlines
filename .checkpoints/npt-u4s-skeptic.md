@@ -5,17 +5,32 @@
   2dc1f31, approved in issue #16's Queue under Mustafa's rule of 2026-11-09
 - **Branch:** cs/npt-u4s-skeptic · **Base:** origin/main 44446a5
 - **Spike read in:** `.gate/npt-spike` (read-only worktree, detached at df8975b; never edited)
-- **Last update:** 2026-11-10 06:37 Amsterdam
+- **Last update:** 2026-11-10 06:47 Amsterdam
 
 ## Summary (findings by severity, each with its proof)
-pending
+pending the rust-reviewer. netcode-architect's part (DONE 06:46): no Critical or High.
+- S1 Medium (may become High): one field layout per kind serves two catalogue rows. The soldier layout carries
+  velocity (`seam.rs:114-116`) that the remote-soldier row leaves out (`messages.md:137`), and has no ammo or fire
+  timers, which the own-state row needs (`:136`). The doc at `seam.rs:139-141` calls the lists "the catalogue's spatial
+  rows", which is false for velocity. **Checked by the night main session at 06:46 by reading those lines: holds.** Not
+  High: it costs bytes (about +54 % per remote soldier record, the agent's estimate) and risks a false FAIL, never a
+  false pass. Proof: read the lines; day run: a npt-proto test that the remote soldier group's width equals the row's.
+  Fix: an audience per layout entry or a separate own-state layout, before U4a's table lands.
+- S2 Low: nothing ties `TickInput::tick` to the World's counter (`seam.rs:67-71`, `:80-81`, `:201-204`); a World built
+  with a first tick other than the room's `tick_start` would miss every history lookup (lag compensation silently off).
+  Proof: `debug_assert_eq!(input.tick, self.next_tick)` in U4d's `World::step`; a U4e test at `tick_start` 63,736.
+- G1 Low (design note for the ADR): the per-tick 1 cm snap makes speed depend on direction and tick rate (about 6 %
+  diagonal vs straight at 60 Hz; below 0.15 m/s per axis at 30 Hz never moves). Needs a run (day): a World test.
+- G2 Low: a projectile's start tick is 32 bits per add where the catalogue re-bases it (`messages.md:139`).
+- T1 Low: `LOOP_CATCHUP = TICK_HZ / 4` is 0 for 1-3 Hz, which the 1-1,000 assert allows (`ticks.rs:18-21`, `:42-47`).
 
 ## Steps done
-1. Branch set up (the worktree from item 2 reused as it is, plan rule 1) · (this commit) · ok
+1. Branch set up (the worktree from item 2 reused as it is, plan rule 1) · cd2a3e3 · ok
+2b. netcode-architect (xhigh) → `.checkpoints/npt-u4s-skeptic/netcode-architect-u4s.md` (DONE 06:46) · 5 findings,
+   no Critical or High; the seam, the grid and the tick constants otherwise held up
 
 ## Current step
-2. In parallel (Opus 5.5, xhigh): rust-reviewer → `.checkpoints/npt-u4s-skeptic/rust-reviewer-u4s.md`;
-   netcode-architect → `.checkpoints/npt-u4s-skeptic/netcode-architect-u4s.md`. Asked to finish by 07:05.
+2a. rust-reviewer (xhigh) → `.checkpoints/npt-u4s-skeptic/rust-reviewer-u4s.md`, asked to finish by 07:05.
 
 ## Next steps
 3. The night main session tries once more to refute each Critical or High; a refuted finding is kept with its
