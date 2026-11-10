@@ -108,4 +108,11 @@ foreign processes recorded). Flake repeats: u4c-test-repeat.py.
   wt_tests.rs, delay_clock.rs). -> a pre-existing flake candidate, not U4c's; root-causing by repeats.
 - 10:53-10:54Z repeat net 1/6 of `-p npt-net --lib`: 160 passed 0 failed (27.25 s); repeats 2-6 aborted (other lanes'
   cargo never quiet for 20 s in 9 min). 11:05Z relaunched (label net2, 5 runs, 3 s quiet) in the background.
-- Next: net2 results; a counted final check.mjs (step 4); final sha256 vs u4c-sha-before.txt; findings.
+- 11:05-11:07Z net2 1-5 (logs repeat-net2-1..5.log): 5/5 "160 passed; 0 failed; 12 ignored" (26.1-27.9 s). So
+  6/6 quiet repeats pass: the R3 failure does not reproduce in a quiet run.
+- (usage-limit cut 11:07Z to 15:20Z; the container restarted at about 15:17Z: PID 1 3 min old at 15:20Z.)
+- 15:20Z RESUMED. sha256 -c of all 158 spike files vs u4c-sha-before.txt: ALL MATCH; git status = the build's 3
+  files + builder notes; HEAD 097f897. No cargo/rustc running; load 0.50; 4 CPUs; df 12 GB free; shared target 4.6 GB.
+- Next: (a) reproduce the npt-net flake under CPU contention (the test binary run directly, K copies at once, its sha256
+  before/after, no cargo running) to name the test; (b) the final counted check.mjs (step 4); (c) final sha256;
+  (d) findings + verdict.
