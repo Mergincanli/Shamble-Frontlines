@@ -19,5 +19,15 @@
   PR Advisor routine's Low); F4 to name agent memory and its "every gap is on the strict side" (the advisor's Low);
   the kit-v3-4 report's two Lows (mixed verdict rows counted by their first word; Appendix D's ddb06a5 and 2894a1f);
   his 2026-11-09 answers recorded.
-- **Current step:** 0, his words saved; next: the draft PR, the facts (the guard's merge check, `protectedRel`, the
-  tests, F1's sources), plan revision 1, the advisor's plan review.
+- **Queued, his words:** his unit walk of 2026-11-09 (cb6636d, `mustafa-2026-11-09-unit-walk.md`, 2449 characters,
+  byte-equal to the transcript) and his queue of 2026-11-10 (d410292, `mustafa-2026-11-10-queue.md`, 1484 characters):
+  KIT-FREEZE-2 (the kit freezes after kit-v3-5 merges, until the foundation's gate step; exceptions: a broken main,
+  STATUS-DIET, LANE-RULES), STATUS-DIET (docs), LANE-RULES (rules). This pass's docs part queues all of them in
+  STATUS's "Queued, in Mustafa's words".
+- **Main after #44:** the push run on 44446a5 (42673290304) lost its `gate` job on GitHub's side (the run read failure
+  with only `smoke`, green); the gate on main's exact tree (a4 at 7c36d5a, the same tree) vs 626df67: PASS, +0 −0;
+  one re-run (attempt 2, 2026-11-10 06:37 UTC): `gate` and `smoke` success. Main is green; it was never broken.
+- **The PR Advisor routine:** paused by Mustafa (enabled false, 2026-11-09 18:22 UTC); it did not run at 18:45.
+- **Facts:** `facts.md` B1-B8 done; the agent stopped on the org's spend limit (2026-11-09 18:30 UTC) and was resumed
+  2026-11-10 for B9 (not found, tensions).
+- **Current step:** 1, the facts' last block; next: plan revision 1, the advisor's plan review.
