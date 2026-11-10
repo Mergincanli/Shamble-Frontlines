@@ -65,3 +65,14 @@ his words: main's docs/STATUS.md:674-761 (2d22b69) and docs/reports/2026-11-10-k
 - Risk tier 2 (CLAUDE.md, docs-keeper.md); DECISIONS.md is a decision doc. Reviews: advisor + security-auditor +
   verifier. Kit writes: one Write per file, one ask each.
 DONE (step 1 facts)
+
+## Added 2026-11-10 21:05 Amsterdam (after the usage reset)
+- His go for #46, word for word in the merge commit 2d22b69's message (given 16:04:59 UTC in session
+  0173vVo7FcYUpbWgRW8oQyHU): "merge #46 / I reconfirm the rule changes at 0573db3 (20 rows, nothing looser). The open
+  security follow-ups stay in STATUS until the foundation's gate step: the CI results trusted by name alone (PX-1), the
+  two write-side gaps (W1, W2), the folder check (W3) and the recorded Windows-name limits." -> STATUS's Follow-ups
+  must list these (id + one line); DECISIONS.md gets the go as its newest entry, copied by script from the commit
+  message. Sent to the advisor for its Q2 ruling.
+- CI on main: gate workflow run 42851159265 on 2d22b69, success, completed 16:06:48 UTC.
+- #40: U4b in progress (last commit 411eeee 16:21 UTC, "U4b: the loop policy"); #47: 2.1a built, waiting its turn
+  (a7487f2 15:05 UTC); 2.2 planned in a fresh session.
