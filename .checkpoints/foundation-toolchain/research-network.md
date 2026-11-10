@@ -103,3 +103,7 @@ DONE B3, next B4.
 - The npm registry, read 2026-11-10 with `npm view` (this container): typescript dist-tag latest "7.0.2"; the 6.0 line
   has 6.0.2 and 6.0.3; vitest 5.1.0, engines `^22.12.0||^24.0.0||>=26.0.0`; @playwright/test 1.65.0, engines `>=20`.
 DONE B4, next B5 (the design, written into plan.md).
+
+## B5 The design and its proof runs (done)
+Written into `plan.md` Part 4 (the job), Part 7 (E2, M1a, M1b, M2, M3) and Appendix B (N1-N4, A1-A3).
+DONE
