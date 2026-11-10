@@ -61,8 +61,9 @@ accepts them. Until then, the constraints above stand.
    branch changes it runs a general agent that reads it from main.
 3. Implement in the main session. Two agents never edit the same file at the same time; parallel implementation only in
    isolated worktrees (`isolation: worktree`), merged one at a time. In a day session, an edit to a kit or gate file
-   (the guard's protected files: `.claude/` except agent memory, every `CLAUDE.md`, `.github/`, `tools/gate.mjs` and
-   the other gate files) made with a file tool or a shell write asks Mustafa first, in any worktree of this repository
+   (the guard's protected files: `.claude/` except agent memory, every `CLAUDE.md`, `CLAUDE.local.md` and `AGENTS.md`,
+   `.github/`, `tools/gate.mjs` and the other gate files) made with a file tool or a shell write asks Mustafa first, in
+   any worktree of this repository
    (in auto mode, Claude Code's own classifier may refuse a `.claude/` edit before the prompt; make that edit in Accept
    edits or Manual mode); agents and teammates may not edit them. The ask is a seatbelt, not the wall: the PR review
    and Mustafa's go are the wall.
@@ -94,10 +95,12 @@ A PR takes the highest tier any changed file or effect reaches; a tier lifts no 
 
 | Risk tier | Covers | Reviews | Merges |
 |---|---|---|---|
-| 0 | docs with no word or decision of Mustafa's; not ADRs, the register, design or look docs | CI + the PR Advisor | the PR Advisor |
-| 1 | game code, pages, `tools/` (not gate files), tests, spikes; the docs tier 0 leaves out | CI + the advisor + the type's reviewers | `ready`: the PR Advisor; else his go |
+| 0 | docs that add or change no word or decision of Mustafa's; not ADRs, the register, design or look docs; not a `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `.claude/` folder, agent memory or other gitignored path, or a file renamed or moved from outside tier 0 | CI + the PR Advisor | the PR Advisor |
+| 1 | game code, pages, `tools/` (not gate files), tests, spikes; the docs tier 0 leaves out | CI + the advisor + the type's reviewers | `ready`: the PR Advisor; else his go (outside the guard's allow-list: from a day session) |
 | 2 | CLAUDE.md, `.claude/`, `.github/`, gate files, the guard, secrets, infrastructure | the advisor + security-auditor | his go (kit, CI, gate: a day session) |
 | 3 | anything irreversible, or that costs money | agents only propose | his decision of the act, then his go |
+
+Steps 4 and 5 apply at every tier; decision docs always need his go.
 
 - **Review budget** (A4): a round is one review of one head by all the change-set's reviewers (3 at a time is still one
   round), then one fix pass. At most two rounds, the second on what changed; a third only for an open Critical or High.

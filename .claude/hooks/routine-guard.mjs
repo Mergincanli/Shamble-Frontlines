@@ -3,7 +3,9 @@
 // Who is bound by what:
 //   every session (day sessions have no SHAMBLE_ROLE): git and gh option forms (a long option must be spelled in full,
 //     no dangerous option or bundled short flag, no option before the git subcommand) and the merge check
-//     (expectedHeadSha, same repository, gate and smoke green on that SHA);
+//     (expectedHeadSha, same repository, the whole check list read, gate and smoke green on that SHA); for the PR
+//     Advisor it also reads the PR's whole file list, both names of a renamed or copied file, and merges only plain
+//     paths in its few places, never a rules, gate or decision-doc name in any letter case (mergeAllowed, kit-v3-5);
 //   routines (SHAMBLE_ROLE = night-shift or pr-advisor, set only by the routine-only cloud environments): the role rules
 //     below as well;
 //   day sessions only (no SHAMBLE_ROLE; kit-v3-3): file-tool and shell writes to kit and gate files ask first, and so
@@ -24,15 +26,18 @@ import { homedir } from 'node:os';
 export const REPO = 'Mergincanli/Shamble-Frontlines';
 export const ROLES = new Set(['night-shift', 'pr-advisor']);
 const GATE_FILES = new Set(['tools/gate.mjs', 'tools/smoke.mjs', 'tools/battery.js', 'tools/gate-globals.json',
-  'tools/package.json', 'tools/package-lock.json']);
+  'tools/package.json', 'tools/package-lock.json', 'tools/npm-shrinkwrap.json']);
 const NIGHT_NPM = 'npm ci --prefix tools --ignore-scripts --no-audit --no-fund';
 
 // ---------- paths ----------
-// A path routines may not write: the rules, CI, the gate's own files, agent instructions anywhere, git internals.
+// A path routines may not write: the rules, CI, the gate's own files, CLAUDE.md, CLAUDE.local.md and AGENTS.md at any
+// depth, git internals. Agent memory stays writable for the memory agents; a merge allows far less (mergeAllowed).
 export function protectedRel(rel) {
   const p = rel.split('/').filter((s) => s && s !== '.');
   const base = p[p.length - 1] || '';
   if (base === 'CLAUDE.md' || base === '.npmrc' || base === '.mcp.json') return true;
+  if (base === 'CLAUDE.local.md') return true;
+  if (base === 'AGENTS.md') return true;
   if (p[0] === '.github' || p[0] === '.git') return true;
   if (p[0] === '.claude') {
     if (p[1] === 'agent-memory-local') return false;
@@ -67,10 +72,32 @@ function insideDir(p, dir, cwd, io) {
 const foldsCase = (io) => ['win32', 'darwin'].includes(io.platform ?? process.platform);
 const fold = (s, io) => (foldsCase(io) ? s.toLowerCase() : s);
 // Where case does not matter, a segment that matches a protected name in another case is read as it.
-const CANON = new Map(['CLAUDE.md', '.npmrc', '.mcp.json', '.github', '.git', '.claude', 'agent-memory-local',
-  'worktrees', 'tools', ...[...GATE_FILES].map((f) => f.slice(6))].map((s) => [s.toLowerCase(), s]));
+const CANON = new Map(['CLAUDE.md', 'CLAUDE.local.md', 'AGENTS.md', '.npmrc', '.mcp.json', '.github', '.git', '.claude',
+  'agent-memory-local', 'worktrees', 'tools', ...[...GATE_FILES].map((f) => f.slice(6))].map((s) => [s.toLowerCase(), s]));
 const protectedFold = (rel, io) =>
   protectedRel(foldsCase(io) ? rel.split('/').map((s) => CANON.get(s.toLowerCase()) ?? s).join('/') : rel);
+// The PR Advisor's merge test (kit-v3-5, Mustafa's allow-list of 2026-11-10): it merges only plain paths in a few
+// places; everything else merges from a day session on his go. Names compare in lower case on every platform, because
+// a merged tree is checked out on Windows and macOS too; the places are exact. A gate file's name is refused anywhere
+// under tools/ (npm reads npm-shrinkwrap.json before package-lock.json). Known limits, not handled: Windows short
+// names, NTFS streams, and trailing dots or spaces.
+const MERGE_PLACES = ['docs/', 'tools/', 'README.md', 'FIRST_PROMPTS.md'];
+const RULES_NAMES = new Set(['claude.md', 'claude.local.md', 'agents.md']);
+const GATE_NAMES = new Set([...GATE_FILES].map((f) => f.slice(6).toLowerCase()));
+const DECISION_DOCS = new Set(['VISION_V2.md', 'LOOP_V2.md', 'LOOK_V2.md', 'EDITOR_V2.md', 'V2_PHASE0_BRIEF.md',
+  'DESIGN_NOTES.md', 'ART_DIRECTION.md', 'GAME_DESIGN.md', 'UNITS.md', 'DECISIONS.md'].map((f) => `docs/${f}`.toLowerCase()));
+export function mergeAllowed(rel) {
+  if (!/^[A-Za-z0-9_./-]+$/.test(rel)) return false;
+  const segs = rel.split('/');
+  if (segs.some((s) => s === '' || s.startsWith('.'))) return false;
+  if (segs.some((s) => s.toLowerCase() === 'node_modules')) return false;
+  if (!MERGE_PLACES.some((p) => (p.endsWith('/') ? rel.startsWith(p) : rel === p))) return false;
+  const low = rel.toLowerCase();
+  if (RULES_NAMES.has(segs[segs.length - 1].toLowerCase())) return false;
+  if (low.startsWith('tools/') && GATE_NAMES.has(segs[segs.length - 1].toLowerCase())) return false;
+  if (low.startsWith('docs/adr/') || DECISION_DOCS.has(low)) return false;
+  return true;
+}
 const relIn = (top, abs) => {
   const rel = relative(top, abs);
   return rel === '' ? '.' : (rel.startsWith('..') || isAbsolute(rel)) ? null : rel.split('\\').join('/');
@@ -1450,7 +1477,9 @@ async function mergeCheck(ti, role, io) {
   const pr = ghJson(io, `repos/${repo}/pulls/${ti.pullNumber}`);
   if (pr.head?.sha !== sha) return deny(`merge: the PR's head is ${pr.head?.sha}, not ${sha}`);
   if (pr.head?.repo?.full_name?.toLowerCase() !== pr.base?.repo?.full_name?.toLowerCase()) return deny('merge: the head is in another repository (a fork); not merged here');
-  const runs = ghJson(io, `repos/${repo}/commits/${sha}/check-runs?per_page=100`).check_runs ?? [];
+  const cr = ghJson(io, `repos/${repo}/commits/${sha}/check-runs?per_page=100`);
+  const runs = cr.check_runs ?? [];
+  if (!Number.isInteger(cr.total_count) || cr.total_count > runs.length) return deny(`merge: the check list on ${sha.slice(0, 7)} was not read whole (${cr.total_count} reported, ${runs.length} read)`);
   for (const nm of ['gate', 'smoke']) {
     const rs = runs.filter((r) => r.name === nm);
     if (!rs.length) return deny(`merge: no ${nm} check on ${sha.slice(0, 7)}`);
@@ -1458,10 +1487,19 @@ async function mergeCheck(ti, role, io) {
     if (rs.some((r) => !['success', 'skipped', 'neutral'].includes(r.conclusion)) || !rs.some((r) => r.conclusion === 'success')) return deny(`merge: ${nm} is not green on ${sha.slice(0, 7)}`);
   }
   if (role === 'pr-advisor') {
-    const r = io.gh(['api', '--paginate', `repos/${repo}/pulls/${ti.pullNumber}/files?per_page=100`, '--jq', '.[].filename']);
+    // kit-v3-5: GitHub lists at most 3000 files; the list is read whole, one line per file (@tsv: the new name, a tab,
+    // the old name of a renamed or copied file or nothing). A tab, newline or backslash inside a name stays escaped,
+    // and mergeAllowed refuses the backslash.
+    const cf = pr.changed_files;
+    if (cf >= 3000) return deny(`routine (pr-advisor): the PR changes ${cf} files, more than GitHub lists; it merges from a day session`);
+    const r = io.gh(['api', '--paginate', `repos/${repo}/pulls/${ti.pullNumber}/files?per_page=100`, '--jq', '.[] | [.filename, (.previous_filename // "")] | @tsv']);
     if (r.code !== 0) throw new Error('gh api pulls/files failed');
-    const hit = r.out.split('\n').map((f) => f.trim()).filter(Boolean).find(protectedRel);
-    if (hit) return deny(`routine (pr-advisor): the PR changes ${hit}; rules, CI and gate changes merge from a day session on Mustafa's go`);
+    const lines = r.out.split('\n');
+    if (lines[lines.length - 1] === '') lines.pop();
+    if (lines.length !== cf) return deny(`routine (pr-advisor): the file list was not read whole (${lines.length} read, ${cf} changed)`);
+    const names = lines.flatMap((l) => l.split('\t')).filter(Boolean);
+    const hit = names.find((f) => !mergeAllowed(f));
+    if (hit) return deny(`routine (pr-advisor): the PR changes ${hit}; only plain docs and tools paths merge here, everything else merges from a day session on Mustafa's go`);
   }
   return null;
 }
