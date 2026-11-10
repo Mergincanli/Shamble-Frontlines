@@ -147,8 +147,8 @@ Steps 1-4 done. Step 5 waits for 2.1b and LANE-RULES to merge (his word); the PR
 ## Running work
 - saver: background task b04hgafwt · output `/tmp/claude-0/-home-user-Shamble-Frontlines/29a42dc7-ecd4-506e-b90a-121dd5e50988/tasks/b04hgafwt.output`
   · started 18:35 Amsterdam · stopped by the session at 19:41 after the last save.
-- saver (restarted for the build, his word): background task bz6ds367a · output
-  `/tmp/claude-0/-home-user-Shamble-Frontlines/29a42dc7-ecd4-506e-b90a-121dd5e50988/tasks/bz6ds367a.output` · started
-  20:55 Amsterdam · stops by 22:45.
+- saver (restarted for the build, his word): background task bz6ds367a · started 20:55 Amsterdam · ended 22:45
+  Amsterdam at its time limit ("watch stopped: time is up", last tick "nothing to save") · not restarted while the
+  build waits for 2.1b and LANE-RULES (no agents, no workflow); restart it when step 5 begins.
 - workflow run wf_93f9ff1a-f0b (task wt8ab4d43) · script as launched `foundation-toolchain/verify-fold-run1.js` · no
   args · notes `.checkpoints/foundation-toolchain/fold-check-*.md` · launched 19:10 Amsterdam · done 19:24, 4 of 4.
