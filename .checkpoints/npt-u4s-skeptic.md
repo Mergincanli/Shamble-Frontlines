@@ -33,4 +33,7 @@ pending
   night shift · 2026-11-10
 
 ## Running work
-- none yet
+- rust-reviewer (xhigh) · notes `.checkpoints/npt-u4s-skeptic/rust-reviewer-u4s.md` · launched 06:37 · running
+- netcode-architect (xhigh) · notes `.checkpoints/npt-u4s-skeptic/netcode-architect-u4s.md` · launched 06:37 · running
+- saver: background task bnnx8ohmi · started 06:37 · stops by 08:27 (110 minutes on) · last check 06:40: started
+- Night report comment: issue #16 comment 6759962485 (created 06:40 with item 2); status comment 6759514658.
