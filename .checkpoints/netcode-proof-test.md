@@ -52,7 +52,24 @@
     into the main folder's gitignored `.gate/netcode-proof-test/target`; `git status` is clean.
   - **Its shared-target lesson:** cargo's build records do not tell copies apart, so keep touching the crate files
     every 2 s during a run. The test-engineers' prompts now say so.
-  - Reviewers (netcode, rust, then arch) and the test-engineer: re-running (wf_f54246ff-e0d, task wtvqdqbpn).
+  - **Round 1 complete** (u4d-review-{netcode,rust,arch,test}.md):
+    - netcode-architect: REVISE, one High (vehicle parts written as world transforms that change every tick, not
+      travelling with their parent) and five Mediums (the stress scene's magazine runs dry in an S30; press counters
+      against condition 1's wording; the fired flag; vehicles and stand-in projectiles not "in the fight"; effect rows
+      changing every tick).
+    - test-engineer: REVISE, five Mediums (ES out of two PM-0001-2 bands, untested; the 1 MB cap as 2^20 where
+      PM-0001-7 judges 10^6; D-9's "by its fraction"; prediction on a catch-up tick; load_movers).
+    - rust-reviewer: APPROVE WITH FINDINGS, 2 Medium and 9 Low. engine-architect: APPROVE WITH FINDINGS, 2 Medium,
+      the gaps U4g and U4h will hit, tied to S1.
+  - **U4d's fix pass waits for the advisor's rulings** (below); then one fix pass and round 2 on what changed.
+- **The advisor, at work** (a general-purpose agent reading main's advisor.md; notes advisor-u4-wave1.md):
+  - W1-U4D (U4d's High and Mediums: fix now, carry, or rule);
+  - W1-S1 (the soldier's layout fix and its timing);
+  - W1-N2 (U4a's header plan text);
+  - W1-PUB (the public items beyond §4.1, for U4a, U4b and U4d);
+  - W1-U4E (the U4e brief's 9 questions);
+  - W1-PLAN (the plan text SQUASH-CITES and TCP-FREEZE need);
+  - W1-TARGET (a note on the shared target).
 - **U4c (the link model):** built and not merged.
   - netcode-architect and rust-reviewer: both APPROVE WITH FINDINGS. The rust Medium: one test cannot catch a fault
     in `next_event_ns`.

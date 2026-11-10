@@ -139,3 +139,62 @@ u4s-carries.md entries 1-5 and 34. Files: crates/proto, check.mjs, check.test.mj
   6 B" and "at most 20 B"; (3) proposals the catalogue may record: Leave's reasons (quit, error), ClientSettings'
   delay in 256ths of an interval, the peer-set encoding, SessionStatus's 16 B layout; (4) crates/proto/Cargo.toml's
   bites comment (entry 41) is still stale (no manifest edit in my lane).
+
+## Fix pass, round 1
+Fixer: general-purpose agent, opus, same worktree, 2026-11-10. Round 1's notes: u4ab-review-netcode.md (N1, N2, N6),
+u4ab-review-security.md (SEC-U4a-3, -6, -7), u4ab-review-rust.md (F-A3, F-A6, F-A8), u4ab-review-test.md (T-A1, T-A6,
+T-A7). Files: crates/proto src and tests only (no manifest, no check.mjs). Commit nothing. Every other finding the
+reviewers listed is a follow-up or waits for U4d (S1): not touched.
+
+### Plan
+1. Baseline sha256 of the 15 proto src/test files (= the builder's baseline above).
+2. Write the new tests against today's limits (for fix 1 the size check moves from `encode_into` into `Quant::encode`,
+   same limit, so a test can build an exact-length snapshot uncapped; behaviour unchanged), run them: fix 1's, 2's and
+   3's tests FAIL on today's code; fix 4's passes (the guard is there; its evidence is a plant, step 5).
+   - Fix 1: msg.rs unit tests: a Snapshot of exactly 1,000 B encodes, 1,001 B TooLarge; a received 1,150 B Snapshot
+     decodes, a 1,151 B one TooLarge; FullState (the only other type whose encoder can reach its limit) at 65,536 B
+     encodes, 65,537 TooLarge, received at 65,536 + 4 decodes, + 1 TooLarge. Every other type's send and receive
+     limits checked by reading against Limits::TYPES and the catalogue (recorded below).
+   - Fix 2: an a6 case: Input with ack_groups 0 and ack_tick 5 decodes as UnknownField; the encoder refuses that value
+     (NotCanonical); {0, 0} still round-trips.
+   - Fix 3: tests/wire.rs: Debug of Join, Message::Join, every SessionControl variant and Message::SessionControl holds
+     none of the token's, bind's or capability's bytes (decimal or hex), only their length.
+   - Fix 4: hash.rs unit test: the finishing step fed 0 gives 1, any other value itself.
+3. Apply fixes 1-5 (msg.rs send/receive limits; input.rs ack rule + encoder refusal + generator; Debug by hand for Join
+   and SessionControl; hash.rs `finish`; input.rs `let _ = i;`), run the proto tests both builds: PASS.
+4. Plant for fix 4: the guard removed from `finish` -> the new test FAILS; restored, sha256 checked.
+5. fmt, clippy both builds (host and wasm32 for proto) as check.mjs runs them; then check.mjs twice in a row, all 10
+   steps (expect measured 296 + new, bites 321 + new, self 52).
+6. Record each file's new sha256 and each fix's test with its failing-then-passing evidence here. N2's text below.
+
+### Progress
+- 1 done: the 15 proto files + clippy.toml = the builder's baseline (bits 4a390bdd, control 390c1fa0, error ce66d7b5,
+  hash 5a24907f, input 75b167fd, lib a8603264, limits 08e80997, msg 63677d4f, quant 0d41e906, snapshot ef9e6013, wrap
+  9f2613c7, tests/bites 9d7cb2f8, catalogue 14313b7b, wire 8675723a, common 17bee55e, clippy.toml 30ab9b21).
+- 2 written (not yet run): msg.rs size check moved from encode_into into Quant::encode, still content_limit (today's
+  limits); msg.rs tests a3_a_snapshot_is_taken_up_to_1_150_b_and_sent_up_to_1_000_b and
+  a3_a_full_state_is_sent_and_taken_up_to_65_536_b_after_its_length (uncapped() + exactly() search helpers); wire.rs
+  a6 gains the ack case at its end; wire.rs debug_output_shows_a_secrets_length_never_its_bytes; hash.rs finish() +
+  a8_the_finishing_step_turns_0_into_1_and_keeps_every_other_value. Runner: scratchpad u4a-fix-run.sh.
+- 2 run 10:58 UTC on today's limits (`cargo test --locked -p npt-proto --no-fail-fast`, measured build; log scratchpad
+  u4a-fix/step2-today.log; idle 156 s first, df 12 G): lib 12 pass 1 FAIL, catalogue 7 pass, wire 6 pass 2 FAIL.
+  - fix 1 FAILED at msg.rs:603 `encode(1,001 B snapshot)`: left Ok(()), right Err(TooLarge); the lines before it held
+    (1,001 B and 1,150 B decode, 1,151 B TooLarge, 1,000 B encodes). The full-state test passed (no defect there).
+  - fix 2 FAILED at wire.rs:548: Input { ack_tick: 5, ack_groups: 0, .. } decoded Ok where UnknownField.
+  - fix 3 FAILED at wire.rs:600: `Join { token: [167, 167, ...], bind: [179, ...], ..}`.
+  - fix 4's test passed (the guard is in today's code; its evidence is the plant at step 4).
+- 3 fixes applied: msg.rs content_limit split into send_limit (encode; the row's limit, Snapshot 1,000) and
+  receive_limit (decode and channel_max; Snapshot 1,150), after_length for the control stream's 2 B, module text and
+  error.rs/limits.rs docs; input.rs: decoder refuses ack_groups 0 with ack_tick != 0 as UnknownField (strict, as
+  Snapshot's known()), encoder refuses it as NotCanonical, `for _ in 0..count` and the `let _ = i;` gone; common's
+  input() generator gives tick 0 when no group (same RNG draws); Join and SessionControl Debug by hand through
+  control.rs's pub(crate) Redacted ("[16 B]"); wire.rs a2's re-encode rule through as_sent() (a decoded Snapshot above
+  1,000 B must be refused by encode, else the same bytes: the rule stays true under the asymmetry). fmt clean.
+- 3 run 11:02 UTC (log u4a-fix/step3-fixed.log; idle 107 s, df 12 G): measured lib 13, catalogue 7, wire 8; bites
+  lib 16, bites 5, catalogue 7, wire 8; 0 failed. Proto +4 tests per build (3 lib, 1 wire): expect check.mjs 300/325.
+- 4 plants (in place, one at a time, restored, sha256 checked):
+  - PF4 hash.rs finish() returns h (the guard gone): lib a8_the_finishing_step... FAILED at hash.rs:112 (left 0,
+    right 1), while wire's 8 tests, a8 among them, passed (the gap F-A6/T-A7 named); restored, hash.rs d3a9f95b =
+    before. Log u4a-fix/plant-hash-guard.log.
+  - PF2 input.rs the encoder's NotCanonical check removed: wire a6 FAILED at wire.rs:556 (left Ok(()), right
+    Err(NotCanonical)); restored, input.rs a94e669a = before. Log u4a-fix/plant-ack-encoder.log.
