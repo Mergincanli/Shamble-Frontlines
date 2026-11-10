@@ -1,0 +1,11 @@
+{
+  "name": "@shamble/sim-worker",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Hosts sim-wasm, paces the tick and runs the local match (ADR 0002 parts 3 and 5). Empty until the skeleton step.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@shamble/types",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Types generated from Rust (ADR 0002 part 5). Empty until the generated-types step.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@shamble/net",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The browser's two transport backends, WebTransport and WebSocket (ADR 0002 part 3; ADR 0001). Empty until slice 3.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  }
+}
