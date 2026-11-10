@@ -297,6 +297,19 @@ free:
 5. **Morning:** fold the night items (issue #16 items 2-5: the cs/npt-* branches' notes) per "About 22:05 UTC" in
    Running work.
 6. **Then wave 2:** U4d2 and U4e. U4e's brief comes from the night draft and goes to the advisor before its build.
+**Closing checklist for PR #40** (written 2026-11-10 by Mustafa's SQUASH-40):
+- **PR #40 merges by squash** (SQUASH-40: "Its history carries about 28 MB, most of it checkpoints").
+  - **Conflict to settle first:** plan.md:1436 says "merges with a merge commit, never squashed". That rule comes from
+    the advisor's finding 4 on #45: ADR 0001 and docs/design/ws-reconnect.md on main cite bf9d248, 975e72b, 95a04a1
+    and 1e020a7, which exist only on this branch.
+  - Before the squash, re-point those cites to paths in the final tree, or to PR #40's commit links (GitHub keeps
+    them), with the advisor's check. plan.md:1436 is changed to match (SQUASH-CITES, for Mustafa).
+- **No .checkpoints/ in the final tree:** fold the checkpoint into the report and delete `.checkpoints/netcode-proof-test*`
+  in the last commit before the PR is marked ready (CHECKPOINTS.md §9).
+- **No wip/*.patch left** (WIP-CLEAN: each one is deleted in the commit that merges or replaces its builder).
+- **PROMOTE's one-pager** (engine-architect) at U4's close, not before. Moving crates "as they are" would reverse
+  SPIKE-SCOPE (a) (plan.md:347; §4.9 :653-662, "the foundation writes its crates fresh"), so that decision is
+  Mustafa's, with the advisor's view.
 **Older next steps** (U1 era, kept for the record):
 1. On Mustafa's "merge #41": check gate and smoke green on 1b4094a, merge with that SHA as the expected head; then
    `git merge origin/main` into this branch (only reviewed main comes in) so marks.json's row hashes match; remove
@@ -424,6 +437,31 @@ free:
   (its "Initial RTO" line).
 
 ## Decisions taken
+- **Mustafa, 2026-11-10 about 06:40 UTC, for the netcode session (verbatim, "Record these as my words of 2026-11-10.
+  None of them stops wave 1."):**
+  - "1. RESUME-CARD. The checkpoint is 148 KB and the plan 144 KB, against CHECKPOINTS.md's "keep it short: it is a
+    handoff, not a log". At the next natural stop, put a resume card at the top of .checkpoints/netcode-proof-test.md:
+    at most 150 lines, with the current step, the next three actions, the open questions for me, and pointers. Move
+    the "Steps done" and "Decisions taken" history into .checkpoints/netcode-proof-test/history.md. A resuming
+    session reads the card first and opens the rest only when a step needs it."
+  - "2. WIP-CLEAN. When a wip/*.patch is merged or replaced, delete it in the same commit. Keep one snapshot per live
+    builder."
+  - "3. TCP-FREEZE. The Linux TCP model is done. No more fidelity work on it. If U8's netem check on the VM disagrees
+    with the model, netem wins: the WebSocket rows are then judged on VM runs with netem, and the model is not
+    repaired. Tell me if any later unit plans work on the model."
+  - "4. SQUASH-40. PR #40 merges by squash. Its history carries about 28 MB, most of it checkpoints. Write that into
+    the closing checklist now. No .checkpoints/ in the final tree, as always."
+  - "5. PROMOTE, a question to answer at U4's close and not before. engine-architect lists, on one page, which crates
+    could move into the real engine as they are (my guess: npt-link, npt-l1, npt-proto, npt-room, npt-client), what
+    each would need, and what must be rewritten. Plan §4.9 says the foundation writes its crates fresh. I want to
+    decide that with numbers, because U4 builds the protocol, the room, prediction and lag compensation to a
+    standard I do not want to pay for twice."
+  - "6. SIZE-CHECK. U3 was sized S and came to about 20,000 lines. From now on, when a unit grows well past its plan,
+    stop and tell me in three lines: what grew, why, and the cheaper option."
+  - "7. A second lane starts on my personal account (the foundation's first steps). It does not touch spikes/ or your
+    branch. After its PRs merge, merge main as usual."
+  - "Reply with: which of 1 to 6 you can do without slowing wave 1, and anything here that conflicts with a ruling I
+    already gave."
 - **Mustafa, 2026-11-09 about 10:00 UTC, LEFTOVER-DELETE (verbatim):** "leave them. 14 GB free is enough, and a
   one-off delete past the deny list isn't a habit we start; if it's ever needed, it becomes a narrow kit rule
   instead." Applied: .gate/u3c-review-target (4.0 GB, no CACHEDIR.TAG) and the nine plain scratch copies stay; no
