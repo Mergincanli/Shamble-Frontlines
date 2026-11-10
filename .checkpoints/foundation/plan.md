@@ -1,6 +1,6 @@
-# Plan: the foundation, steps 2.1 and 2.2 (revision 1)
+# Plan: the foundation, steps 2.1 and 2.2 (revision 2)
 
-Status: revision 1, for the advisor agent's plan review. This session plans only: no code, no file moves.
+Status: revision 2 (the advisor tool's six fixes applied), for the advisor agent's plan review. This session plans only: no code, no file moves.
 Source: Mustafa's decision of 2026-11-10 and his task list, word for word in `mustafa-2026-11-10.md` (this folder).
 Base: main 44446a5. Branch of this plan: `claude/advisor-fable-4hxq72` (Mustafa's personal account; one account per
 branch). Everything below is from reading at 44446a5 (grep and read only); nothing was moved or run after a move,
