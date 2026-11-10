@@ -14,27 +14,29 @@ index a5e1709..ba28c8a 100644
  pub struct Config {
      /// Rounds down in place of to the nearest (bites builds only).
 diff --git a/spikes/netcode-proof/crates/sim/src/history.rs b/spikes/netcode-proof/crates/sim/src/history.rs
-index ae1cbf5..c80c9d2 100644
+index ae1cbf5..2e9359c 100644
 --- a/spikes/netcode-proof/crates/sim/src/history.rs
 +++ b/spikes/netcode-proof/crates/sim/src/history.rs
-@@ -2,6 +2,9 @@
+@@ -2,6 +2,10 @@
  
  use crate::seam::HitVolumes;
  
-+/// The ring's bound in bytes: 1 MB (plan.md:459, E11).
-+const MAX_RING_BYTES: usize = 1 << 20;
++/// The ring's bound in bytes: 1 MB (plan.md:459, E11), as 10^6 B, the megabyte PM-0001-7 judges (the advisor's
++/// W1-U4D T-M2).
++const MAX_RING_BYTES: usize = 1_000_000;
 +
  /// A fixed ring of [`HitVolumes`], one entry per tick, oldest evicted. The room owns its instance, pushes
  /// `world.hit_volumes()` after each step and lends it to the next; the replay driver does the same, so a recording
  /// needs no volumes. Its span is set at construction in milliseconds (U4h's test cap plus its margin:
-@@ -18,10 +21,12 @@ pub struct HitHistory {
+@@ -18,10 +22,13 @@ pub struct HitHistory {
  
  impl HitHistory {
      /// An empty ring covering `span_ms` milliseconds: [`crate::ticks_for_ms`]`(span_ms)` ticks, rounded up, so any span
 -    /// above 0 holds at least one tick. `None` for a span of 0 ms, which would hold none.
 +    /// above 0 holds at least one tick. `None` for a span of 0 ms, which would hold none, and for a span whose ring
-+    /// would exceed 1 MB: capacity × [`HitVolumes::MAX_BYTES`], one tick's volumes at most (u4-build-plan.md §4.9: the
-+    /// hit history at most 1 MB; carry 14). At 30 Hz that is 231 ticks, a span of at most 7,700 ms.
++    /// would exceed 1 MB (10^6 B, as PM-0001-7 judges it): capacity × [`HitVolumes::MAX_BYTES`], one tick's volumes
++    /// at most (u4-build-plan.md §4.9: the hit history at most 1 MB; carry 14). At 30 Hz that is 220 ticks, a span of
++    /// at most 7,333 ms.
      pub fn for_ms(span_ms: u32) -> Option<HitHistory> {
          let capacity = crate::ticks_for_ms(span_ms) as usize;
 -        if capacity == 0 {
@@ -43,10 +45,10 @@ index ae1cbf5..c80c9d2 100644
          }
          Some(HitHistory {
 diff --git a/spikes/netcode-proof/crates/sim/src/lib.rs b/spikes/netcode-proof/crates/sim/src/lib.rs
-index 36029dc..45a62aa 100644
+index 36029dc..5ca4d07 100644
 --- a/spikes/netcode-proof/crates/sim/src/lib.rs
 +++ b/spikes/netcode-proof/crates/sim/src/lib.rs
-@@ -4,29 +4,44 @@
+@@ -4,29 +4,43 @@
  //! S1's stand-ins as data behind one narrow seam, and a per-tick state hash. It follows ADR 0004 part 7's float
  //! allow-list (enforced by this crate's clippy.toml) and builds for wasm32. Built in unit U4.
  //!
@@ -57,7 +59,7 @@ index 36029dc..45a62aa 100644
 -//! implementation, is U4d's.
 +//! ([`SimCore`], its plain-data types, each entity kind's field layout and [`HitHistory`]: §4.2). U4d builds the one
 +//! implementation, [`World`], on the [`Greybox`] and a [`Scene`]; the canonical [`StateDump`] and hash; the
-+//! [`Recording`] and its one driver, [`replay::Replayer`]; and [`trajectory_at`].
++//! [`replay::Recording`] and its one driver, [`replay::Replayer`]; and [`trajectory_at`].
  
 +mod greybox;
  pub mod grid;
@@ -74,14 +76,13 @@ index 36029dc..45a62aa 100644
 +pub use greybox::{Areas, Greybox, Portals};
 +pub use hash::{FieldDiff, StateDump};
  pub use history::HitHistory;
-+pub use replay::Recording;
-+pub use scene::{Scene, StandIns};
++pub use scene::{Scene, StandIns, Weapon};
  pub use seam::{
 -    ClampReport, Command, CoverVariant, EntityKind, EntityRecord, HitVolumes, InputReports,
 -    PortalStates, Rewind, SimCore, SimEvent, TickInput,
 +    Attribute, AttributeChange, ClampReport, Command, CoverVariant, EntityKind, EntityRecord,
-+    HitVolumes, InputReports, Placement, PortalStates, Rewind, SimCore, SimEvent, TickInput,
-+    VolumeBox,
++    HitVolumes, InputReports, Placement, PortalStates, Refusal, RefusalKind, Rewind, SimCore,
++    SimEvent, TickInput, VolumeBox,
  };
  pub use ticks::{
      ACK_RING_TICKS, FULL_STATE_ACK_TICKS, LOOP_CATCHUP, SETTINGS_STEP_TICKS, TICK_HZ,
@@ -98,10 +99,10 @@ index 36029dc..45a62aa 100644
  /// the wire grid.
  #[cfg(feature = "bites")]
 diff --git a/spikes/netcode-proof/crates/sim/src/seam.rs b/spikes/netcode-proof/crates/sim/src/seam.rs
-index 17b8b63..6fe8fbe 100644
+index 17b8b63..de782db 100644
 --- a/spikes/netcode-proof/crates/sim/src/seam.rs
 +++ b/spikes/netcode-proof/crates/sim/src/seam.rs
-@@ -1,10 +1,10 @@
+@@ -1,11 +1,12 @@
  //! The seam between the room and the sim (u4-build-plan.md §4.2; plan §4.6; the advisor's Q1 and Q2 rulings): one
 -//! trait, [`SimCore`], with one implementation (`World`, built in U4d), and the plain-data types that cross it.
 +//! trait, [`SimCore`], with one implementation ([`crate::World`]), and the plain-data types that cross it.
@@ -113,9 +114,11 @@ index 17b8b63..6fe8fbe 100644
 +//! field (§4.15): the commands with their Rewinds, and the spawns, teleports and scripted attribute changes that §4.2
 +//! also routes through [`TickInput`]. [`HitVolumes`] holds integer boxes the room copies into its ring.
  
++use crate::TICK_HZ;
  use crate::grid::{Field, PITCH, POSITION_XY, POSITION_Z, VELOCITY, YAW};
  use crate::history::HitHistory;
-@@ -42,6 +42,34 @@ pub struct Command {
+ 
+@@ -42,6 +43,34 @@ pub struct Command {
      pub view_fraction: u8,
  }
  
@@ -150,7 +153,7 @@ index 17b8b63..6fe8fbe 100644
  /// R-10's two cover variants (OQ-0001-9; plan.md:1382): the state a lag-compensated shot sees cover items in.
  #[derive(Clone, Copy, Debug, PartialEq, Eq)]
  pub enum CoverVariant {
-@@ -75,9 +103,14 @@ pub struct Rewind {
+@@ -75,9 +104,14 @@ pub struct Rewind {
  
  /// Everything one step takes from outside the sim (u4-build-plan.md §4.2, §4.15). The room fills one per tick and the
  /// replay driver reads one per tick from a recording.
@@ -166,7 +169,7 @@ index 17b8b63..6fe8fbe 100644
      pub tick: u32,
      /// The accepted commands, each with the [`Rewind`] the room computed for it (present when the command holds or
      /// presses fire), in **the canonical order**: slot ascending, then, within one slot, command tick strictly
-@@ -85,17 +118,57 @@ pub struct TickInput {
+@@ -85,43 +119,173 @@ pub struct TickInput {
      /// it, a recording holds it and the sim runs the commands in it, so legs that received the same commands in
      /// different arrival orders step alike (-30's per-tick hash comparison). U4d's `World` debug-asserts it.
      pub commands: Vec<(Command, Option<Rewind>)>,
@@ -176,8 +179,8 @@ index 17b8b63..6fe8fbe 100644
 +    pub teleports: Vec<Placement>,
 +    /// Scripted attribute changes this tick, before any command runs (PM-0001-60's own-state changes).
 +    pub attributes: Vec<AttributeChange>,
-+}
-+
+ }
+ 
 +/// A soldier put at a point by [`TickInput::spawns`] or [`TickInput::teleports`].
 +#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 +pub struct Placement {
@@ -196,19 +199,40 @@ index 17b8b63..6fe8fbe 100644
 +    pub slot: u8,
 +    /// Which attribute.
 +    pub attribute: Attribute,
-+    /// Its new value, in the attribute's unit.
++    /// Its new value, in the attribute's unit, brought into the attribute's range (each [`Attribute`]'s), so the
++    /// own-state record's field holds every value a soldier can reach (the advisor's W1-S1).
 +    pub value: u32,
 +}
 +
 +/// A soldier attribute a script may set.
 +#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 +pub enum Attribute {
-+    /// The walking speed in cm/s (crouching halves it, sprinting multiplies it by 1.5).
++    /// The walking speed in cm/s (crouching halves it, sprinting multiplies it by 1.5); above 10,000 (100 m/s) is
++    /// taken as 10,000.
 +    MoveSpeed,
-+    /// The weapon's interval between automatic shots in µs; 0 is taken as 1.
++    /// The weapon's interval between automatic shots in µs; 0 is taken as 1, and above 10,000,000 (10 s) as
++    /// 10,000,000.
 +    FireInterval,
- }
- 
++}
++
++/// The weapon clock's units in one tick (`World`'s fire timer and reload): one µs is `TICK_HZ` units, so an interval of
++/// `i` µs costs `i × TICK_HZ` units at any tick rate (u4-build-plan.md §4.13: "the stand-in weapon's interval in
++/// integer sub-tick units").
++pub(crate) const UNITS_PER_TICK: i64 = 1_000_000;
++/// The ranges `World` keeps a soldier's attributes and its weapon's reload in ([`Attribute`]; the advisor's W1-S1: the
++/// own-state record's fields hold every value the world can reach). A scene's starting values are inside them
++/// (`World::new` asserts it), and a scripted change is brought into them. The move speed's top, cm/s ...
++pub(crate) const MOVE_SPEED_MAX_CM_S: u32 = 10_000;
++/// ... the fire interval's, µs (its bottom is 1) ...
++pub(crate) const FIRE_INTERVAL_MAX_US: u32 = 10_000_000;
++/// ... and the longest reload a scene's weapon may have, ms.
++pub(crate) const RELOAD_MAX_MS: u32 = 10_000;
++// Both clocks' largest values fit an i32 at this tick rate: the fire timer's (one interval) and the reload's.
++const _: () = assert!(
++    FIRE_INTERVAL_MAX_US as i64 * TICK_HZ as i64 <= i32::MAX as i64
++        && RELOAD_MAX_MS as i64 * 1_000 * TICK_HZ as i64 <= i32::MAX as i64
++);
++
  /// What kind of entity a record describes; an entity's id is its kind, index and generation (ADR 0001 part 6).
  #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
  pub enum EntityKind {
@@ -224,8 +248,14 @@ index 17b8b63..6fe8fbe 100644
      Door,
      /// The destructible-wall stand-in (R-10).
      Wall,
-@@ -103,21 +176,71 @@ pub enum EntityKind {
+     /// One of S1's effect rows (8 per soldier, §4.13), in its owner's own-state section.
      Effect,
++    /// One soldier's owner-only state (the advisor's W1-S1): every value that decides that soldier's next ticks and
++    /// is not in its [`EntityKind::Soldier`] record (its velocity, its weapon's ammunition, fire timer and reload, its
++    /// move-speed and fire-interval attributes). Its index is the slot and its generation the soldier's; it travels
++    /// only in its owner's own-state section, never to another client (the catalogue's remote-soldier row has none of
++    /// it).
++    OwnState,
  }
  
 -/// Eight flag bits, for stance and actions (the catalogue's remote-soldier row).
@@ -239,8 +269,6 @@ index 17b8b63..6fe8fbe 100644
 +const HEALTH: Field = Field::integer(0, 1_023);
 +/// A weapon id (the stand-in has one weapon, 0).
 +const WEAPON: Field = Field::integer(0, 15);
-+/// A weapon's state: 0 ready, 1 cooling down, 2 reloading, 3 empty.
-+const WEAPON_STATE: Field = Field::integer(0, 3);
 +/// A vehicle part's hull: the index of its vehicle.
 +const PARENT: Field = Field::integer(0, 63);
 +/// A projectile's type: 0 the stress scene's stand-in (inert), 1 a thrown grenade.
@@ -251,35 +279,49 @@ index 17b8b63..6fe8fbe 100644
 +const STANDING: Field = Field::integer(0, 1);
 +/// An effect row's kind (0 to 7).
 +const EFFECT_KIND: Field = Field::integer(0, 7);
-+/// An effect row's ticks left.
-+const EFFECT_LEFT: Field = Field::integer(0, 4_095);
 +/// An effect row's magnitude.
 +const EFFECT_MAGNITUDE: Field = Field::integer(0, 255);
++/// A soldier's ammunition: the rounds in its magazine.
++const AMMO: Field = Field::integer(0, u16::MAX as i32);
++/// The weapon's fire timer, in weapon clock units ([`UNITS_PER_TICK`] a tick): at most 0 is ready; it runs from one
++/// tick's carry below 0 up to one whole interval.
++const FIRE_TIMER: Field = Field::integer(
++    1 - UNITS_PER_TICK as i32,
++    (FIRE_INTERVAL_MAX_US as i64 * TICK_HZ as i64) as i32,
++);
++/// The reload left, in weapon clock units (0: not reloading).
++const RELOAD_LEFT: Field = Field::integer(0, (RELOAD_MAX_MS as i64 * 1_000 * TICK_HZ as i64) as i32);
++/// The move-speed attribute, cm/s.
++const MOVE_SPEED: Field = Field::integer(0, MOVE_SPEED_MAX_CM_S as i32);
++/// The fire-interval attribute, µs.
++const FIRE_INTERVAL: Field = Field::integer(1, FIRE_INTERVAL_MAX_US as i32);
  /// A position: x, y, z.
  const XYZ: [Field; 3] = [POSITION_XY, POSITION_XY, POSITION_Z];
 -const SOLDIER: [Field; 9] = [
 -    XYZ[0], XYZ[1], XYZ[2], YAW, PITCH, VELOCITY, VELOCITY, VELOCITY, FLAGS,
-+/// U4s's nine (position, yaw, pitch, velocity, flags), then U4d's health, weapon id and weapon state: 12, the record.
-+const SOLDIER: [Field; 12] = [
-+    XYZ[0],
-+    XYZ[1],
-+    XYZ[2],
-+    YAW,
-+    PITCH,
++/// The catalogue's remote-soldier row (docs/design/netcode-proof-messages.md §3; ADR 0001:309-311; the advisor's
++/// W1-S1): U4s's position, yaw, pitch and 8 flag bits, then U4d's health and weapon id. Velocity and the weapon's state
++/// are the owner's alone ([`OWN_STATE`]); "reloading" is a flag bit.
++const SOLDIER: [Field; 8] = [XYZ[0], XYZ[1], XYZ[2], YAW, PITCH, FLAGS, HEALTH, WEAPON];
++/// A soldier's owner-only state (the advisor's W1-S1): its velocity (x, y, z), its ammunition, its fire timer, its
++/// reload left, and its move-speed and fire-interval attributes (PM-0001-60's two rows).
++const OWN_STATE: [Field; 8] = [
 +    VELOCITY,
 +    VELOCITY,
 +    VELOCITY,
-+    FLAGS,
-+    HEALTH,
-+    WEAPON,
-+    WEAPON_STATE,
++    AMMO,
++    FIRE_TIMER,
++    RELOAD_LEFT,
++    MOVE_SPEED,
++    FIRE_INTERVAL,
  ];
 -/// A transform on the ground: x, y, z and yaw (a hull, a part).
 +/// A transform on the ground: x, y, z and yaw (a hull).
  const TRANSFORM: [Field; 4] = [XYZ[0], XYZ[1], XYZ[2], YAW];
 -const PROJECTILE: [Field; 7] = [TICK, XYZ[0], XYZ[1], XYZ[2], VELOCITY, VELOCITY, VELOCITY];
-+/// A part: its transform, then its health and its hull ("hull and turret transforms and health per part": the
-+/// catalogue's vehicles row).
++/// A part: its transform relative to its hull, in the hull's frame (offset x, y and z, and yaw), then its health and
++/// its hull ("hull and turret transforms and health per part; parts travel with their parent": the catalogue's
++/// vehicles row; the advisor's W1-U4D H1). A rigid part's record changes only when its health does.
 +const PART: [Field; 6] = [XYZ[0], XYZ[1], XYZ[2], YAW, HEALTH, PARENT];
 +/// U4s's start tick, start position and velocity, then U4d's type and fuse (ADR 0001 part 6's trajectory record).
 +const PROJECTILE: [Field; 9] = [
@@ -296,12 +338,26 @@ index 17b8b63..6fe8fbe 100644
  const DOOR: [Field; 1] = [OPEN];
 +/// The wall stand-in: its health and whether it stands.
 +const WALL: [Field; 2] = [HEALTH, STANDING];
-+/// An effect row: kind, ticks left, magnitude (its owner is its index / 8).
-+const EFFECT: [Field; 3] = [EFFECT_KIND, EFFECT_LEFT, EFFECT_MAGNITUDE];
++/// An effect row: kind, the tick it ends (its u32 bits), magnitude (its owner is its index / 8). It changes only when
++/// the row starts or ends (the advisor's W1-U4D N-M5).
++const EFFECT: [Field; 3] = [EFFECT_KIND, TICK, EFFECT_MAGNITUDE];
  
  impl EntityKind {
      /// Every kind, in declaration order: npt-proto builds its field-group table for each.
-@@ -136,18 +259,27 @@ impl EntityKind {
+-    pub const ALL: [EntityKind; 7] = [
++    pub const ALL: [EntityKind; 8] = [
+         EntityKind::Soldier,
+         EntityKind::Vehicle,
+         EntityKind::VehiclePart,
+@@ -129,6 +293,7 @@ impl EntityKind {
+         EntityKind::Door,
+         EntityKind::Wall,
+         EntityKind::Effect,
++        EntityKind::OwnState,
+     ];
+ 
+     /// The kind's field layout: what each entry of an [`EntityRecord`]'s `grid` and `raw` holds, in order. The one
+@@ -136,18 +301,31 @@ impl EntityKind {
      /// and its `EntityRecord` ↔ wire mapping are built from this function, never from a copy, so a change here needs
      /// no edit in npt-proto.
      ///
@@ -313,15 +369,18 @@ index 17b8b63..6fe8fbe 100644
 +    /// The lists are the catalogue's spatial rows (docs/design/netcode-proof-messages.md §3), U4s's fields first and
 +    /// U4d's after them (carry 12), each a grid field or a [`Field::integer`], within [`EntityRecord::FIELDS`] (a const
 +    /// assert below holds every layout to it):
-+    /// - a soldier: position (x, y, z), yaw, pitch, velocity (x, y, z), 8 flag bits, then health, weapon id and weapon
-+    ///   state (0 ready, 1 cooling down, 2 reloading, 3 empty);
++    /// - a soldier (the catalogue's remote row): position (x, y, z), yaw, pitch, 8 flag bits, then health and weapon
++    ///   id;
 +    /// - a hull: its transform (x, y, z, yaw);
-+    /// - a part: its transform, then its health and its hull's index;
++    /// - a part: its transform relative to its hull, in the hull's frame (offset x, y, z, and yaw), then its health and
++    ///   its hull's index;
 +    /// - a projectile: start tick (its u32 bits), start position, velocity, then its type (0 the stand-in, 1 a
 +    ///   grenade) and its fuse in ticks;
 +    /// - a door: open (1) or closed (0);
 +    /// - the wall stand-in: its health, and standing (1) or down (0);
-+    /// - an effect row: its kind, its ticks left and its magnitude.
++    /// - an effect row: its kind, the tick it ends (its u32 bits) and its magnitude;
++    /// - a soldier's own state (owner only): velocity (x, y, z), ammunition, fire timer and reload left (weapon clock
++    ///   units), move speed (cm/s) and fire interval (µs).
      pub const fn layout(self) -> &'static [Field] {
          match self {
              EntityKind::Soldier => &SOLDIER,
@@ -333,10 +392,11 @@ index 17b8b63..6fe8fbe 100644
 -            EntityKind::Wall | EntityKind::Effect => &[],
 +            EntityKind::Wall => &WALL,
 +            EntityKind::Effect => &EFFECT,
++            EntityKind::OwnState => &OWN_STATE,
          }
      }
  }
-@@ -157,6 +289,7 @@ impl EntityKind {
+@@ -157,6 +335,7 @@ impl EntityKind {
  /// never computes with it.
  #[derive(Clone, Copy, Debug, PartialEq, Eq)]
  pub struct EntityRecord {
@@ -344,7 +404,17 @@ index 17b8b63..6fe8fbe 100644
      pub kind: EntityKind,
      /// The entity's index among its kind (a soldier's slot, a pool index).
      pub index: u16,
-@@ -194,13 +327,68 @@ const _: () = {
+@@ -176,8 +355,7 @@ pub struct EntityRecord {
+ }
+ 
+ impl EntityRecord {
+-    /// Fields per record: U4d's full soldier (position, yaw, pitch, velocity, health, flags, weapon and weapon state)
+-    /// fills 12.
++    /// Fields per record: 12, which every kind's layout fits (the longest, a projectile's, has 9).
+     pub const FIELDS: usize = 12;
+ }
+ 
+@@ -194,13 +372,69 @@ const _: () = {
  };
  
  /// One tick's hit volumes for lag compensation (u4-build-plan.md §4.2, §4.9), as the world reads them out after a
@@ -353,9 +423,10 @@ index 17b8b63..6fe8fbe 100644
 -/// as plain data the room copies and never reads.
 -#[derive(Clone, Debug, Default, PartialEq)]
 +/// step: the room pushes them into its [`HitHistory`], and the replay driver does the same. Plain integer data the room
-+/// copies and never reads: boxes in the position grid's centimetres, as the snapshot carries the entities (a soldier's
-+/// position is on the grid after the own-copy snap; a part's is its record's grid integers), so a client can build the
-+/// same volumes from what it decoded (`World::ray_cast`'s movers).
++/// copies and never reads: boxes in the position grid's centimetres, built from the entities' records by one function,
++/// [`crate::World::hit_volumes_from`] (a soldier's box from its record's position; a part's from its hull's record
++/// composed with its own), so a client builds the same volumes from the records it decoded (`World::ray_cast`'s
++/// movers; the advisor's W1-U4D A-M1).
 +///
 +/// Its `Clone` is written by hand: `clone_from` copies field by field into the existing vectors (the rust review's
 +/// item 2: a derived `clone_from` replaces them, which allocates), so a push into a full [`HitHistory`] reuses the
@@ -379,8 +450,8 @@ index 17b8b63..6fe8fbe 100644
 +    pub const MAX_COVER: usize = 160;
 +    /// One tick's bytes at most, the same on every target: the struct at its 64-bit size (the tick, then two vectors
 +    /// of three 8-byte words: 56 bytes; 28 on wasm32), and both vectors full of 20-byte boxes. [`HitHistory::for_ms`]
-+    /// refuses a ring that would hold more than 1 MB of them (u4-build-plan.md §4.9; carry 14), so a recording's ring
-+    /// span replays alike natively and in Wasm.
++    /// refuses a ring that would hold more than 1 MB of them (10^6 B, as PM-0001-7 judges it: u4-build-plan.md §4.9;
++    /// carry 14), so a recording's ring span replays alike natively and in Wasm.
 +    pub const MAX_BYTES: usize =
 +        56 + (HitVolumes::MAX_SOLDIERS + HitVolumes::MAX_COVER) * core::mem::size_of::<VolumeBox>();
 +}
@@ -418,7 +489,7 @@ index 17b8b63..6fe8fbe 100644
  }
  
  /// Each portal of the static graph, open or closed (u4-build-plan.md §4.2, A2): the room's AreaFlood re-floods when
-@@ -218,24 +406,40 @@ pub struct PortalStates {
+@@ -218,29 +452,72 @@ pub struct PortalStates {
  pub enum SimEvent {
      /// Cosmetic: `slot` fired the shot of its command `seq`; sent once, never to the shooter's own client
      /// (ADR 0001 part 6).
@@ -461,7 +532,48 @@ index 17b8b63..6fe8fbe 100644
      pub seq: u16,
      /// The point the shot used, in the position grid's integers (cm).
      pub point: [i32; 3],
-@@ -254,10 +458,6 @@ pub struct InputReports {
+ }
+ 
++/// One refused part of one command (the advisor's W1-U4D ruling on the press counters): which slot's command, by its
++/// sequence number, and what was refused, so a twin removes exactly the refused parts (§4.10; D-10).
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub struct Refusal {
++    /// The slot whose command it was.
++    pub slot: u8,
++    /// That command's sequence number.
++    pub seq: u16,
++    /// What was refused.
++    pub kind: RefusalKind,
++}
++
++/// What a [`Refusal`] refused: one per running counter of [`InputReports`].
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum RefusalKind {
++    /// A fire press in the weapon's cooldown.
++    Cooldown,
++    /// A fire press with no ammunition.
++    Ammunition,
++    /// A reload press the weapon's state refuses (the magazine full, or a reload running).
++    Reload,
++    /// A [`Rewind`] naming a tick the lent ring does not hold (the command then runs as with none).
++    RewindOutside,
++    /// A throw into a full projectile pool.
++    PoolFull,
++}
++
+ /// What the sim did with refused or clamped input, outside `state_hash` and outside the hashed event list (the
+ /// advisor's condition 1): the room reads it through [`SimCore::reports`] alone and logs it. Refused input leaves no
+ /// trace in the state.
+@@ -248,16 +525,15 @@ pub struct ClampReport {
+ pub struct InputReports {
+     /// This tick's clamp reports, in the order the shots ran.
+     pub clamps: Vec<ClampReport>,
++    /// This tick's refusals, one per refused part of a command, in the order the commands ran (cleared each step, as
++    /// the clamp reports are; the advisor's W1-U4D ruling): what a twin removes (§4.10).
++    pub refusals: Vec<Refusal>,
+     /// Running refusal counters since the world began, one per kind: a fire edge in the weapon's cooldown ...
+     pub cooldown: u64,
+     /// ... a fire edge with no ammunition ...
      pub ammunition: u64,
      /// ... a reload edge the weapon's state refuses ...
      pub reload: u64,
@@ -472,11 +584,19 @@ index 17b8b63..6fe8fbe 100644
      /// ... a [`Rewind`] naming a tick the lent ring does not hold ...
      pub rewind_outside: u64,
      /// ... and an action refused because its pool was full (pools have fixed capacity: §4.2).
+@@ -282,6 +558,6 @@ pub trait SimCore {
+     /// Each portal open or closed after the last step.
+     fn portal_states(&self) -> &PortalStates;
+ 
+-    /// The last step's clamp reports and the running refusal counters.
++    /// The last step's clamp reports and refusals, and the running refusal counters.
+     fn reports(&self) -> &InputReports;
+ }
 diff --git a/spikes/netcode-proof/crates/sim/tests/seam.rs b/spikes/netcode-proof/crates/sim/tests/seam.rs
-index 12373e2..ebcd858 100644
+index 12373e2..08febdc 100644
 --- a/spikes/netcode-proof/crates/sim/tests/seam.rs
 +++ b/spikes/netcode-proof/crates/sim/tests/seam.rs
-@@ -57,9 +57,26 @@ fn scale(f: Field) -> f64 {
+@@ -57,9 +57,27 @@ fn scale(f: Field) -> f64 {
      }
  }
  
@@ -500,12 +620,13 @@ index 12373e2..ebcd858 100644
 +        EntityKind::Projectile => Some(EntityKind::Door),
 +        EntityKind::Door => Some(EntityKind::Wall),
 +        EntityKind::Wall => Some(EntityKind::Effect),
-+        EntityKind::Effect => None,
++        EntityKind::Effect => Some(EntityKind::OwnState),
++        EntityKind::OwnState => None,
 +    }
  }
  
  /// One unit in the last place of a finite f64, by its bits (std's next_up is outside the sim's float allow-list).
-@@ -426,6 +443,7 @@ fn s5_the_seam_types_are_send() {
+@@ -426,6 +444,7 @@ fn s5_the_seam_types_are_send() {
                  Some(fire(0, 128)),
              ),
          ],
@@ -513,7 +634,7 @@ index 12373e2..ebcd858 100644
      };
      assert_eq!(room_tick(&mut sim, &mut history, &input), 1);
      assert_eq!(sim.events, [SimEvent::Shot { slot: 1, seq: 7 }]);
-@@ -437,7 +455,12 @@ fn s5_the_seam_types_are_send() {
+@@ -437,7 +456,12 @@ fn s5_the_seam_types_are_send() {
  
  #[test]
  fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
@@ -527,33 +648,51 @@ index 12373e2..ebcd858 100644
      for (i, kind) in EntityKind::ALL.into_iter().enumerate() {
          // In declaration order, each kind once.
          assert!(EntityKind::ALL[..i].iter().all(|k| *k < kind), "{kind:?}");
-@@ -452,9 +475,11 @@ fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
+@@ -452,9 +476,12 @@ fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
              );
          }
      }
 -    // The catalogue's rows (docs/design/netcode-proof-messages.md §3), U4d to complete: a soldier's position, yaw,
 -    // pitch, velocity and 8 flag bits; a projectile's start tick (32 bits), start position and velocity.
 +    // The catalogue's rows (docs/design/netcode-proof-messages.md §3), U4s's fields first and U4d's after them (carry
-+    // 12): a soldier's position, yaw, pitch, velocity and 8 flag bits, then its health, weapon id and weapon state; a
-+    // projectile's start tick (32 bits), start position and velocity, then its type and fuse.
++    // 12): a soldier's record is the remote row (the advisor's W1-S1: position, yaw, pitch and 8 flag bits, then its
++    // health and weapon id: what every client in view gets, so no velocity and no weapon state); a projectile's start
++    // tick (32 bits), start position and velocity, then its type and fuse.
      let flags = Field::integer(0, 255);
 +    let health = Field::integer(0, 1_023);
      assert_eq!(
          EntityKind::Soldier.layout(),
          [
-@@ -466,7 +491,10 @@ fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
+@@ -463,10 +490,27 @@ fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
+             POSITION_Z,
+             YAW,
+             PITCH,
++            flags,
++            health,
++            Field::integer(0, 15),
++        ]
++    );
++    // W1-S1's owner-only kind, last in ALL: the soldier's velocity, then its ammunition (u16), fire timer and reload
++    // left (weapon clock units: 1,000,000 a tick, one µs being TICK_HZ units; the fire timer from one tick's carry below
++    // 0 to a whole 10 s interval, the reload to 10 s), move speed (to 100 m/s) and fire interval (1 µs to 10 s).
++    assert_eq!(EntityKind::ALL.last(), Some(&EntityKind::OwnState));
++    let units = |us: i64| (us * i64::from(TICK_HZ)) as i32;
++    assert_eq!(
++        EntityKind::OwnState.layout(),
++        [
              VELOCITY,
              VELOCITY,
              VELOCITY,
 -            flags
-+            flags,
-+            health,
-+            Field::integer(0, 15),
-+            Field::integer(0, 3),
++            Field::integer(0, 65_535),
++            Field::integer(1 - 1_000_000, units(10_000_000)),
++            Field::integer(0, units(10_000_000)),
++            Field::integer(0, 10_000),
++            Field::integer(1, 10_000_000),
          ]
      );
      let tick = Field::integer(i32::MIN, i32::MAX);
-@@ -479,9 +507,40 @@ fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
+@@ -479,9 +523,38 @@ fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
              POSITION_Z,
              VELOCITY,
              VELOCITY,
@@ -563,8 +702,8 @@ index 12373e2..ebcd858 100644
 +            Field::integer(0, 65_535),
 +        ]
 +    );
-+    // U4d's other kinds: a hull's transform; a part's transform, health and hull; a door's state; the wall's health and
-+    // standing; an effect row's kind, ticks left and magnitude.
++    // U4d's other kinds: a hull's transform; a part's transform relative to its hull, its health and its hull; a door's
++    // state; the wall's health and standing; an effect row's kind, the tick it ends (32 bits) and its magnitude.
 +    assert_eq!(
 +        EntityKind::Vehicle.layout(),
 +        [POSITION_XY, POSITION_XY, POSITION_Z, YAW]
@@ -578,20 +717,18 @@ index 12373e2..ebcd858 100644
 +            YAW,
 +            health,
 +            Field::integer(0, 63)
-+        ]
-+    );
+         ]
+     );
 +    assert_eq!(EntityKind::Door.layout(), [Field::integer(0, 1)]);
 +    assert_eq!(EntityKind::Wall.layout(), [health, Field::integer(0, 1)]);
 +    assert_eq!(
 +        EntityKind::Effect.layout(),
-+        [
-+            Field::integer(0, 7),
-+            Field::integer(0, 4_095),
-+            Field::integer(0, 255)
-         ]
-     );
-+    // The soldier fills the record: EntityRecord::FIELDS is its 12.
-+    assert_eq!(EntityKind::Soldier.layout().len(), EntityRecord::FIELDS);
++        [Field::integer(0, 7), tick, Field::integer(0, 255)]
++    );
++    // EntityRecord::FIELDS stays 12 (the W1-S1 ruling); the longest layout, a projectile's, has 9.
++    assert_eq!(EntityRecord::FIELDS, 12);
++    let longest = EntityKind::ALL.iter().map(|k| k.layout().len()).max();
++    assert_eq!(longest, Some(9));
      // An integer field takes the fewest bits that hold its range, never wraps, and is its own kind: never equal to a
      // grid field of the same integers.
      for (min, max, bits) in [
@@ -945,10 +1082,10 @@ index 0000000..6d79f44
 +}
 diff --git a/spikes/netcode-proof/crates/sim/src/replay.rs b/spikes/netcode-proof/crates/sim/src/replay.rs
 new file mode 100644
-index 0000000..3d30d95
+index 0000000..49c6520
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/sim/src/replay.rs
-@@ -0,0 +1,695 @@
+@@ -0,0 +1,703 @@
 +//! Recordings and their one replay driver (u4-build-plan.md §4.15; the advisor's Q4 ruling; A12).
 +//!
 +//! A recording is a header and each tick's [`TickInput`], fixed-width little-endian and never a `usize` (plan.md:527-
@@ -1268,7 +1405,10 @@ index 0000000..3d30d95
 +    pub fn decode(bytes: &[u8]) -> Result<Recording, &'static str> {
 +        let mut r = Reader { b: bytes, at: 0 };
 +        let h = read_header(&mut r)?;
-+        let mut ticks = Vec::with_capacity(h.ticks.min(1 << 20) as usize);
++        // At most as many ticks as the bytes present can hold (each is at least its own 12-byte header), so a short
++        // file's header cannot reserve more than its own size suggests (the rust review's L1).
++        let room = bytes.len().saturating_sub(HEADER_BYTES) / TICK_HEADER_BYTES;
++        let mut ticks = Vec::with_capacity((h.ticks as usize).min(room));
 +        for _ in 0..h.ticks {
 +            let mut t = TickInput::default();
 +            read_tick(&mut r, &mut t)?;
@@ -1633,6 +1773,11 @@ index 0000000..3d30d95
 +        if let Err(why) = read_tick(&mut r, &mut self.input) {
 +            return Step::Failed(why);
 +        }
++        // A tick out of the canonical order is a recording this build cannot replay, never a panic of World's order
++        // assert (the rust review's L2).
++        if !crate::world::canonical(&self.input.commands) {
++            return Step::Failed("a tick's commands are not in the canonical order");
++        }
 +        self.read += len;
 +        let (Some(world), Some(history)) = (&mut self.world, &mut self.history) else {
 +            return Step::Failed("no world");
@@ -1724,10 +1869,10 @@ index 0000000..8139741
 +}
 diff --git a/spikes/netcode-proof/crates/sim/src/scene.rs b/spikes/netcode-proof/crates/sim/src/scene.rs
 new file mode 100644
-index 0000000..457c5e0
+index 0000000..21bd84b
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/sim/src/scene.rs
-@@ -0,0 +1,268 @@
+@@ -0,0 +1,296 @@
 +//! The scenes, as data (u4-build-plan.md §4.13; ADR 0001:1470-1482): SS the stress scene, ES R2's estimate scene, CO
 +//! the correction course and TC the target course. Each is recorded in a run's header by its id.
 +
@@ -1770,22 +1915,49 @@ index 0000000..457c5e0
 +    }
 +}
 +
-+/// The stand-in weapon (one weapon, id 0).
++/// The stand-in weapon (one weapon, id 0), as plain data: what a run's header records of it with the soldiers'
++/// health ([`Scene::weapon`], [`Scene::health`]; the advisor's W1-U4D TUNE-1).
 +#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-+pub(crate) struct Weapon {
++pub struct Weapon {
 +    /// The interval between automatic shots, µs: the soldier's starting `Attribute::FireInterval`.
-+    pub(crate) interval_us: u32,
++    pub interval_us: u32,
 +    /// Health points a hit takes.
-+    pub(crate) damage: u16,
++    pub damage: u16,
 +    /// How far a shot reaches, cm.
-+    pub(crate) reach_cm: u32,
++    pub reach_cm: u32,
 +    /// Rounds per magazine.
-+    pub(crate) magazine: u16,
++    pub magazine: u16,
 +    /// A reload's length, ms.
-+    pub(crate) reload_ms: u32,
++    pub reload_ms: u32,
 +    /// The spread's half width, in millionths of the distance to the aim point (micro-radians).
-+    pub(crate) spread_urad: u32,
++    pub spread_urad: u32,
 +}
++
++/// The stress scene's weapon: 700 shots a second with every soldier firing (48 × 1,000,000 / 68,571 µs = 700.0), a
++/// hit taking 1 of 1,000 health, and a magazine that covers an S30 plus 5 minutes at one soldier's rate.
++const SS_WEAPON: Weapon = Weapon {
++    interval_us: 68_571,
++    damage: 1,
++    reach_cm: 6_000,
++    magazine: 32_000,
++    reload_ms: 2_000,
++    spread_urad: 5_000,
++};
++/// The estimate scene's weapon: 1.5 shots per player per second (72 a second), the stress weapon's magazine.
++const ES_WEAPON: Weapon = Weapon {
++    interval_us: 666_667,
++    damage: 10,
++    ..SS_WEAPON
++};
++/// An S30 (a 30-minute run) and 5 minutes more, µs.
++const S30_PLUS_5_US: u64 = 35 * 60 * 1_000_000;
++// SS and ES script no reloads (TUNE-1), so a soldier firing at its weapon's interval must not run dry inside an S30
++// (the advisor's W1-U4D N-M1): magazine × interval covers 35 minutes. SS: 35 × 60 × 700 / 48 = 30,625 rounds at
++// 68,571 µs, and its magazine holds 32,000; ES: 3,150 rounds at 666,667 µs.
++const _: () = assert!(
++    SS_WEAPON.magazine as u64 * SS_WEAPON.interval_us as u64 >= S30_PLUS_5_US
++        && ES_WEAPON.magazine as u64 * ES_WEAPON.interval_us as u64 >= S30_PLUS_5_US
++);
 +
 +/// One scene: what a world starts from and how it runs (u4-build-plan.md §4.13).
 +#[derive(Clone, Debug, PartialEq, Eq)]
@@ -1830,12 +2002,14 @@ index 0000000..457c5e0
 +
 +impl Scene {
 +    /// SS, the stress scene (u4-build-plan.md §4.13; net F113; PM-0001-2): 48 soldiers in 3 × 16 in one cluster in the
-+    /// centre field; 15 big vehicles, 4 of them of 20 parts; 300 live stand-in projectiles as trajectory records; 384
-+    /// effect rows (8 per soldier); the doors' one portal change a second; the wall stand-in; the weapon's interval set
-+    /// for 700 shots per second with every soldier firing (48 × 30 ticks a second × 1,000,000 / (68,571 µs × 30) =
-+    /// 700.0), a hit taking 1 of 1,000 health so that deaths, which pause a soldier's fire for the 1 s respawn, stay rare
-+    /// (D-6 measures the mean with them counted), and a magazine that outlasts a 5-minute run (about 4,400 shots).
-+    /// S1's CPU stand-ins at the build's rate.
++    /// centre field; 15 big vehicles, the 4 of 20 parts looping inside the fight and the other 11 elsewhere; 300 live
++    /// stand-in projectiles as trajectory records, started inside the fight; 384 effect rows (8 per soldier); the
++    /// doors' one portal change a second; the wall stand-in; the weapon's interval set for 700 shots per second with
++    /// every soldier firing (48 × 30 ticks a second × 1,000,000 / (68,571 µs × 30) = 700.0), a hit taking 1 of 1,000
++    /// health so that deaths, which pause a soldier's fire for the 1 s respawn, stay rare (D-6 measures the mean with
++    /// them counted), and a magazine of 32,000 rounds that covers an S30 plus 5 minutes at one soldier's rate (30,625
++    /// shots), so its recordings script no reload (the advisor's W1-U4D TUNE-1 and N-M1). S1's CPU stand-ins at the
++    /// build's rate.
 +    pub fn stress() -> Scene {
 +        Scene {
 +            id: 1,
@@ -1850,14 +2024,7 @@ index 0000000..457c5e0
 +            fuse_ms: [2_000, 6_000],
 +            projectile_capacity: 320,
 +            effect_rows: 8,
-+            weapon: Weapon {
-+                interval_us: 68_571,
-+                damage: 1,
-+                reach_cm: 6_000,
-+                magazine: 10_000,
-+                reload_ms: 2_000,
-+                spread_urad: 5_000,
-+            },
++            weapon: SS_WEAPON,
 +            move_speed: 600,
 +            health: 1_000,
 +            respawn_ms: 1_000,
@@ -1879,11 +2046,7 @@ index 0000000..457c5e0
 +            fuse_ms: [1_515, 1_515],
 +            projectile_capacity: 64,
 +            effect_rows: 0,
-+            weapon: Weapon {
-+                interval_us: 666_667,
-+                damage: 10,
-+                ..Scene::stress().weapon
-+            },
++            weapon: ES_WEAPON,
 +            stand_ins: StandIns::OFF,
 +            ..Scene::stress()
 +        }
@@ -1979,6 +2142,16 @@ index 0000000..457c5e0
 +        self.stand_ins
 +    }
 +
++    /// Its weapon (interval, damage, reach, magazine, reload, spread), which a run's header records (TUNE-1).
++    pub fn weapon(&self) -> Weapon {
++        self.weapon
++    }
++
++    /// Its soldiers' health, which a run's header records beside the weapon (TUNE-1).
++    pub fn health(&self) -> u16 {
++        self.health
++    }
++
 +    /// The same scene with other CPU stand-ins (`StandIns::OFF` on L1: §4.13). The state is the same either way.
 +    pub fn with_stand_ins(self, stand_ins: StandIns) -> Scene {
 +        Scene { stand_ins, ..self }
@@ -2030,10 +2203,10 @@ index 0000000..3ccd8d4
 +}
 diff --git a/spikes/netcode-proof/crates/sim/src/world.rs b/spikes/netcode-proof/crates/sim/src/world.rs
 new file mode 100644
-index 0000000..1158077
+index 0000000..5186114
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/sim/src/world.rs
-@@ -0,0 +1,1878 @@
+@@ -0,0 +1,2391 @@
 +//! `World`, the stand-in sim's one implementation of the seam (u4-build-plan.md §5 U4d, §4.2; plan E1).
 +//!
 +//! **One step, in phases** (each a function below, in this order):
@@ -2043,12 +2216,18 @@ index 0000000..1158077
 +//!    authority collides against exactly what a client decodes ([`World::load_movers`]);
 +//! 2. the commands, in the canonical order: per command, the soldier's move (one tick of it), the own-copy snap, its
 +//!    aim (the clamp) and its weapon (fire, reload, throw);
-+//! 3. the present hit volumes;
++//! 3. the present hit volumes, from the soldiers' records after the moves ([`World::hit_volumes_from`]);
 +//! 4. the shots: each against the lent ring blended at its [`Rewind`], or at the present;
-+//! 5. the projectiles: blasts at their fuse, the stand-ins kept live;
-+//! 6. S1's effect rows;
++//! 5. the projectiles: blasts at their fuse, the stand-ins kept live (or spawned at the scene's rate);
++//! 6. S1's effect rows: each row's end checked, a row that ended rolled again;
 +//! 7. respawns;
-+//! 8. the records, the volumes and the portals of the tick.
++//! 8. the records, the volumes (from those records, [`World::hit_volumes_from`]) and the portals of the tick.
++//!
++//! **The records** (the advisor's W1-S1 and W1-U4D): a soldier's record is the catalogue's remote row, and its owner's
++//! [`EntityKind::OwnState`] record holds the rest of what decides its next ticks; a vehicle part's record is its
++//! transform relative to its hull, so a rigid part's record changes only when its health does, and every world box of
++//! a part is its hull's record composed with its own by one function; an effect row's record holds the tick it ends,
++//! so it changes only when the row starts or ends.
 +//!
 +//! **Rules the tests hold** (D-1 to D-10; the carries of u4s-carries.md):
 +//! - The state reads, of a [`Command`], `slot`, `seq`, `buttons`, `presses`, `move_xy` and `aim`, nothing else; the
@@ -2059,15 +2238,26 @@ index 0000000..1158077
 +//!   (carry 10).
 +//! - **Refused input leaves no trace in the state** (the advisor's condition 1): a fire press in the cooldown or with
 +//!   no ammunition, a reload press the weapon refuses, a throw into a full pool and a Rewind outside the ring are
-+//!   counted in [`InputReports`] and change nothing hashed; a clamped aim point is reported there and the shot uses
-+//!   the clamped point. The commands' press counters are the client's claim: the world keeps the last counter it saw
-+//!   per button to find the press edges, outside the hash and the dump, so a refused press is gone once seen. Its twin
-+//!   is the same command stream with that press removed: that button's counter one lower from that command on.
++//!   counted in [`InputReports`], each listed there as a [`crate::Refusal`] (slot, sequence, kind) for the tick, and
++//!   change nothing hashed; a clamped aim point is reported there and the shot uses the clamped point. The world's one
++//!   piece of per-slot input bookkeeping is the press counters of the last command it ran for that slot: a press edge
++//!   is a counter that differs from them, and a refused press's edge is consumed there and changes nothing hashed. They
++//!   stay outside the hash and the dump (a twin's counters differ by design) and are a function of the command stream
++//!   alone. A refused press's twin is the same stream with that press removed: that button's counter one lower from
++//!   the refused command on, every other field equal (the advisor's W1-U4D ruling).
 +//! - Integers come in widened before any arithmetic (`move_xy` to i32, `aim` to f64), so no recorded command trips an
 +//!   overflow check (carry 15); every float the state holds is finite, asserted each tick in debug builds (D-4).
 +//! - `HitVolumes::tick` is the world's own tick counter, never `TickInput::tick` (carry 15).
 +//! - The own-copy snap (the advisor's Q23 ruling) ends every command's move, in `step` and in [`World::predict`] alike;
-+//!   each soldier record carries the values before it in `raw` and the wire grid's integers of them in `grid` (carry 9).
++//!   each soldier's records carry the values before it in `raw` and the wire grid's integers of them in `grid` (carry
++//!   9): position, yaw and pitch in its soldier record, velocity in its own-state record.
++//! - **The clamp's bound** (the advisor's W1-U4D TUNE-2): an aim point that came over the wire lies inside the grid's
++//!   ranges, so for a fire origin at or below the grid's top, 40.95 m (feet at or below 39.55 m, 3,955 cm), the
++//!   point at the reach lies between the origin and the aim point and so inside those ranges
++//!   too: the clamp puts it at the reach (within one cell's half-diagonal) and a clamped point sent again is not moved.
++//!   Above it a reach point can leave the grid's z range, saturates there, and is not claimed to lie at the reach
++//!   (measured: the second clamp first moves a sent-back point for feet at about 40.57 m, the test review's probe A).
++//!   No scene places a fire origin near it: every spawn point, plate and greybox surface is below 10 m (a test).
 +
 +use core::f32::consts::{FRAC_PI_2, TAU};
 +
@@ -2078,30 +2268,41 @@ index 0000000..1158077
 +use crate::rng::{STREAMS, SimRng, Stream};
 +use crate::scene::{LARGE_PARTS, SMALL_PARTS, Scene};
 +use crate::seam::{
-+    Attribute, ClampReport, Command, CoverVariant, EntityKind, EntityRecord, HitVolumes,
-+    InputReports, PortalStates, Rewind, SimCore, SimEvent, TickInput, VolumeBox,
++    Attribute, ClampReport, Command, CoverVariant, EntityKind, EntityRecord,
++    FIRE_INTERVAL_MAX_US, HitVolumes, InputReports, MOVE_SPEED_MAX_CM_S, PortalStates,
++    RELOAD_MAX_MS, Refusal, RefusalKind, Rewind, SimCore, SimEvent, TickInput, UNITS_PER_TICK,
++    VolumeBox,
 +};
 +use crate::{TICK_HZ, ticks_for_ms, trajectory_at};
 +
-+/// The weapon's clock: one tick is this many units, so one µs is `TICK_HZ` units and an interval of `i` µs costs
-+/// `i × TICK_HZ` units at any tick rate (u4-build-plan.md §4.13: "the stand-in weapon's interval in integer sub-tick
-+/// units").
-+const UNITS_PER_TICK: i64 = 1_000_000;
++/// The clamp's bound (the module text, TUNE-2): the highest feet, cm, whose fire origin ([`CHEST`] above them) is at
++/// or below the position grid's top, 4,095 cm. Its test holds every scene far below it.
++#[cfg(test)]
++const FEET_Z_BOUND_CM: i32 = POSITION_Z.max() - CHEST_CM;
 +/// One tick, in seconds.
 +const DT: f32 = 1.0 / TICK_HZ as f32;
 +
 +/// A soldier's half width (x and y) and height, metres, for collision.
 +const RADIUS: f32 = 0.4;
 +const HEIGHT: f32 = 1.8;
-+/// The fire origin's height above the soldier's feet, metres.
-+const CHEST: f32 = 1.4;
++/// The fire origin's height above the soldier's feet, cm and metres.
++const CHEST_CM: i32 = 140;
++const CHEST: f32 = CHEST_CM as f32 / 100.0;
 +/// A soldier's hit box, half extents in cm (80 × 80 × 180 cm), and a plate's (100 × 2 × 100 cm: TC's thin targets).
 +const SOLDIER_HALF: [u16; 3] = [40, 40, 90];
 +const PLATE_HALF: [u16; 3] = [50, 1, 50];
-+/// A vehicle part: a 1 m cube whose centre is 1 m up.
++/// A vehicle part: a 1 m cube whose centre is 1 m above its hull's origin (its record's relative z).
 +const PART_HALF_CM: i32 = 50;
 +const PART_Z_CM: i32 = 100;
 +const PART_HEALTH: u16 = 200;
++/// The most vehicles a scene has: a part's record names its hull in [`EntityKind::VehiclePart`]'s 6-bit parent field.
++const MAX_VEHICLES: usize = 64;
++/// The fields of a record [`World`] reads back from records (each kind's [`EntityKind::layout`] order): a soldier's
++/// 8 flag bits; a part's hull; a door's state; the wall's standing.
++const SOLDIER_FLAGS: usize = 5;
++const PART_PARENT: usize = 5;
++const DOOR_OPEN: usize = 0;
++const WALL_STANDING: usize = 1;
 +/// A box blocks a move only past this overlap, metres, so a soldier pushed to touch it slides along it.
 +const SKIN: f32 = 0.001;
 +/// A box the soldier starts more than this far inside, metres, never blocks it (a door that closed on it, the wall
@@ -2122,12 +2323,12 @@ index 0000000..1158077
 +const WALL_HEALTH: u16 = 500;
 +const WALL_DOWN_MS: u32 = 10_000;
 +
-+/// The soldier record's flag bits (its 8 flag bits for stance and actions).
++/// The soldier record's flag bits (its 8 flag bits for stance and action states, which change rarely: ADR
++/// 0001:309-313). A shot is no flag: it is the tick's [`SimEvent::Shot`] (the advisor's W1-U4D N-M3).
 +const FLAG_CROUCH: u8 = 1 << 0;
 +const FLAG_SPRINT: u8 = 1 << 1;
-+const FLAG_FIRED: u8 = 1 << 2;
-+const FLAG_RELOADING: u8 = 1 << 3;
-+const FLAG_DEAD: u8 = 1 << 4;
++const FLAG_RELOADING: u8 = 1 << 2;
++const FLAG_DEAD: u8 = 1 << 3;
 +
 +/// The sim's own float helpers (ADR 0004's allow-list replaces std's min and max).
 +fn fmin(a: f32, b: f32) -> f32 {
@@ -2264,7 +2465,7 @@ index 0000000..1158077
 +
 +/// Whether `commands` is in the canonical order ([`TickInput::commands`]): slot ascending, then command tick strictly
 +/// ascending within a slot, wrap-aware.
-+fn canonical(commands: &[(Command, Option<Rewind>)]) -> bool {
++pub(crate) fn canonical(commands: &[(Command, Option<Rewind>)]) -> bool {
 +    commands.windows(2).all(|w| {
 +        let (a, b) = (&w[0].0, &w[1].0);
 +        a.slot < b.slot || (a.slot == b.slot && (b.tick.wrapping_sub(a.tick) as i32) > 0)
@@ -2323,7 +2524,8 @@ index 0000000..1158077
 +#[derive(Clone, Copy, Debug, Default)]
 +struct Effect {
 +    kind: u8,
-+    left: u16,
++    /// The tick it ends: at the step that runs this tick (or later, wrap-aware) it is rolled again.
++    end: u32,
 +    magnitude: u8,
 +}
 +
@@ -2343,11 +2545,11 @@ index 0000000..1158077
 +#[derive(Clone, Copy, Debug)]
 +struct Part {
 +    vehicle: u8,
-+    /// Where it sits on its hull, m, before the hull's yaw.
-+    offset: [f32; 2],
++    /// Where it sits on its hull, in the hull's frame (x and y before the hull's yaw, z above the hull's origin), in
++    /// the position grid's centimetres: its record's relative transform (the advisor's W1-U4D H1). A rigid part's yaw
++    /// relative to its hull is 0.
++    offset_cm: [i32; 3],
 +    health: u16,
-+    pos: [f32; 3],
-+    yaw: f32,
 +}
 +
 +#[derive(Clone, Copy, Debug, Default)]
@@ -2372,13 +2574,17 @@ index 0000000..1158077
 +    down_left: u32,
 +}
 +
-+/// The soldiers' collision movers, read from records' grid integers ([`World::load_movers`]).
++/// The soldiers' collision movers, read from records' grid integers ([`World::load_movers`]). Sized once from the
++/// scene and never grown: a record of an entity the world has not is skipped (the rust review's M1).
 +#[derive(Clone, Debug, Default)]
 +struct Movers {
-+    /// Each part's centre, cm, and its box, m.
-+    parts_cm: Vec<[i32; 3]>,
-+    parts: Vec<([f32; 3], [f32; 3])>,
-+    /// Each vehicle's centre, m (x, y).
++    /// Each hull's last record integers: x, y, z and yaw.
++    hulls: Vec<[i32; 4]>,
++    /// Each part's last record integers: its x, y and z relative to its hull, then its hull's index.
++    parts: Vec<[i32; 4]>,
++    /// Each part's world box, m: its hull composed with it ([`part_center`]).
++    boxes: Vec<([f32; 3], [f32; 3])>,
++    /// Each hull's centre, m (x, y): the collision's broad phase.
 +    vehicles: Vec<[f32; 2]>,
 +    doors_closed: Vec<bool>,
 +    wall_standing: bool,
@@ -2429,10 +2635,125 @@ index 0000000..1158077
 +                r.raw[i] = x.to_bits();
 +                r.grid[i] = wire.to_grid(*field, x);
 +            }
-+            Val::I(k) => r.grid[i] = k,
++            Val::I(k) => {
++                // An integer field holds every value the world can reach (the rust review's N4; W1-S1).
++                debug_assert!(
++                    (field.min()..=field.max()).contains(&k),
++                    "{kind:?} field {i}: {k} outside {}..={}",
++                    field.min(),
++                    field.max()
++                );
++                r.grid[i] = k;
++            }
 +        }
 +    }
 +    r
++}
++
++/// A part's world centre in the position grid's centimetres: its hull's record integers (`hull`: x, y, z and yaw)
++/// composed with its own (`part`: x, y and z relative to the hull, in the hull's frame). Hull ∘ part's one home (the
++/// advisor's W1-U4D H1 and A-M1): every world box of a part, the authority's collision and volumes, a client's movers
++/// and AimCast's volumes, is this function of the records' grid integers.
++fn part_center(hull: [i32; 4], part: [i32; 3]) -> [i32; 3] {
++    let wire = Config::default();
++    let yaw = wire.from_grid(YAW, hull[3]);
++    let (c, s) = (libm::cosf(yaw), libm::sinf(yaw));
++    let (ox, oy) = (cm(part[0]), cm(part[1]));
++    [
++        wire.to_grid(POSITION_XY, cm(hull[0]) + ox * c - oy * s),
++        wire.to_grid(POSITION_XY, cm(hull[1]) + ox * s + oy * c),
++        fit(POSITION_Z, hull[2].saturating_add(part[2])),
++    ]
++}
++
++/// A part's box, m, around its world centre `c` (cm).
++fn part_box(c: [i32; 3]) -> ([f32; 3], [f32; 3]) {
++    let wire = Config::default();
++    let at = [
++        cm(c[0]),
++        cm(c[1]),
++        wire.from_grid(POSITION_Z, c[2]),
++    ];
++    let h = PART_HALF_CM as f32 / 100.0;
++    (
++        [at[0] - h, at[1] - h, at[2] - h],
++        [at[0] + h, at[1] + h, at[2] + h],
++    )
++}
++
++/// The parts of one scene's world that `records` names, for [`compose_volumes`]: how many soldiers, hulls and parts.
++#[derive(Clone, Copy)]
++struct Counts {
++    slots: usize,
++    vehicles: usize,
++    parts: usize,
++}
++
++/// The hit volumes of `records` into `into`, its storage reused ([`World::hit_volumes_from`]'s body): each soldier's
++/// box from its record (feet on the grid, live unless its flags say dead, TC's plates thin), then the cover in the
++/// world's order: each part composed with its hull's record ([`part_center`]), each door (live while its record says
++/// closed), the wall stand-in (live while its record says standing). An entity with no record gives a box that is not
++/// live; a record of an entity the world has not (an index past its count, a part naming a hull it has not, or whose
++/// hull has no record) is skipped.
++fn compose_volumes(
++    scene: &Scene,
++    greybox: &Greybox,
++    n: Counts,
++    records: &[EntityRecord],
++    tick: u32,
++    into: &mut HitVolumes,
++) {
++    into.tick = tick;
++    into.soldiers.clear();
++    into.soldiers.resize(n.slots, VolumeBox::default());
++    into.cover.clear();
++    into.cover.resize(n.parts, VolumeBox::default());
++    for b in greybox.doors.iter().chain([&greybox.wall]) {
++        into.cover.push(VolumeBox {
++            center: [0, 1, 2].map(|a| (b.min_cm[a] + b.max_cm[a]) / 2),
++            half: [0, 1, 2].map(|a| ((b.max_cm[a] - b.min_cm[a]) / 2) as u16),
++            live: false,
++        });
++    }
++    let doors = greybox.doors.len();
++    let mut hulls = [None::<[i32; 4]>; MAX_VEHICLES];
++    for r in records {
++        let i = usize::from(r.index);
++        let g = &r.grid;
++        match r.kind {
++            EntityKind::Soldier if i < n.slots => {
++                let half = if scene.is_plate(r.index as u8) {
++                    PLATE_HALF
++                } else {
++                    SOLDIER_HALF
++                };
++                into.soldiers[i] = VolumeBox {
++                    center: [g[0], g[1], g[2].saturating_add(i32::from(half[2]))],
++                    half,
++                    live: g[SOLDIER_FLAGS] & i32::from(FLAG_DEAD) == 0,
++                };
++            }
++            EntityKind::Vehicle if i < n.vehicles => hulls[i] = Some([g[0], g[1], g[2], g[3]]),
++            EntityKind::Door if i < doors => into.cover[n.parts + i].live = g[DOOR_OPEN] == 0,
++            EntityKind::Wall if i == 0 => into.cover[n.parts + doors].live = g[WALL_STANDING] == 1,
++            _ => {}
++        }
++    }
++    for r in records {
++        let i = usize::from(r.index);
++        if r.kind != EntityKind::VehiclePart || i >= n.parts {
++            continue;
++        }
++        let g = &r.grid;
++        let Some(Some(hull)) = usize::try_from(g[PART_PARENT]).ok().and_then(|p| hulls.get(p)) else {
++            continue;
++        };
++        into.cover[i] = VolumeBox {
++            center: part_center(*hull, [g[0], g[1], g[2]]),
++            half: [PART_HALF_CM as u16; 3],
++            live: true,
++        };
++    }
 +}
 +
 +/// The planted defects `World` carries (bites builds only), each chosen per instance (u4-build-plan.md §4.11).
@@ -2522,8 +2843,9 @@ index 0000000..1158077
 +    projectiles: Vec<Projectile>,
 +    doors: Vec<bool>,
 +    wall: Wall,
-+    /// The estimate scene's spawn-rate accumulator, thousandths of a spawn × TICK_HZ.
-+    spawn_acc: u64,
++    /// The estimate scene's spawn-rate accumulator, thousandths of a spawn × TICK_HZ: below 0 after grenades took
++    /// spawns the stand-ins have not yet given up.
++    spawn_acc: i64,
 +    rngs: [SimRng; 4],
 +    events: Vec<SimEvent>,
 +    reports: InputReports,
@@ -2565,6 +2887,16 @@ index 0000000..1158077
 +            assert!(!points.is_empty(), "every team has a free spawn point");
 +            spawn_points.push(points);
 +        }
++        // A scene's starting values are inside the ranges the own-state record's fields hold (W1-S1), and a part names
++        // its hull in a 6-bit field.
++        let w = scene.weapon;
++        assert!(
++            scene.move_speed <= MOVE_SPEED_MAX_CM_S
++                && (1..=FIRE_INTERVAL_MAX_US).contains(&w.interval_us)
++                && w.reload_ms <= RELOAD_MAX_MS
++                && usize::from(scene.vehicles) <= MAX_VEHICLES,
++            "a scene's soldiers start inside their own-state record's ranges"
++        );
 +        let mut soldiers = Vec::new();
 +        let per_team = usize::from(scene.slots / scene.teams).max(1);
 +        for slot in 0..scene.slots {
@@ -2602,27 +2934,40 @@ index 0000000..1158077
 +            };
 +            let first = parts.len();
 +            let mut reach = 0.0f32;
-+            for k in 0..n {
-+                let offset = if n == LARGE_PARTS {
-+                    [(k % 5) as f32 * 1.2 - 2.4, (k / 5) as f32 * 1.2 - 1.8]
++            for k in 0..n as i32 {
++                // On a 1.2 m grid across the hull, in cm: 5 × 4 for a very large unit, 2 × 2 for the others.
++                let offset_cm = if n == LARGE_PARTS {
++                    [(k % 5) * 120 - 240, (k / 5) * 120 - 180, PART_Z_CM]
 +                } else {
-+                    [(k % 2) as f32 * 1.2 - 0.6, (k / 2) as f32 * 1.2 - 0.6]
++                    [(k % 2) * 120 - 60, (k / 2) * 120 - 60, PART_Z_CM]
 +                };
-+                reach = fmax(
-+                    reach,
-+                    (offset[0] * offset[0] + offset[1] * offset[1]).sqrt() + 0.71,
++                // Every relative offset fits its field (POSITION_Z has no negative values: H1).
++                assert!(
++                    [POSITION_XY, POSITION_XY, POSITION_Z]
++                        .iter()
++                        .zip(offset_cm)
++                        .all(|(f, k)| fit(*f, k) == k),
++                    "a part's offset fits its record's fields"
 +                );
++                let [ox, oy] = [cm(offset_cm[0]), cm(offset_cm[1])];
++                reach = fmax(reach, (ox * ox + oy * oy).sqrt() + 0.71);
 +                parts.push(Part {
 +                    vehicle: v,
-+                    offset,
++                    offset_cm,
 +                    health: PART_HEALTH,
-+                    pos: [0.0; 3],
-+                    yaw: 0.0,
 +                });
 +            }
 +            let period = ticks_for_ms(60_000 + 5_000 * u32::from(v));
++            // In the fight (the advisor's W1-U4D N-M4; §4.13, F113): the very large units loop round the soldiers'
++            // cluster's centre, 5 to 14 m out, so their parts (within 3.71 m of the hull) stay inside the cluster and
++            // its reach; the others loop elsewhere, 52 m out and beyond, past the buildings.
++            let radius = if v < scene.large_vehicles {
++                5.0 + 3.0 * f32::from(v)
++            } else {
++                40.0 + 3.0 * f32::from(v)
++            };
 +            vehicles.push(Vehicle {
-+                radius: 40.0 + 3.0 * f32::from(v),
++                radius,
 +                period,
 +                phase: period / u32::from(scene.vehicles) * u32::from(v),
 +                reach,
@@ -2638,6 +2983,20 @@ index 0000000..1158077
 +        );
 +        let doors: Vec<bool> = (0..greybox.doors.len()).map(|i| i % 2 == 0).collect();
 +        let slots = usize::from(scene.slots);
++        let movers = Movers {
++            hulls: vec![[0; 4]; vehicles.len()],
++            parts: parts
++                .iter()
++                .map(|p| {
++                    let [x, y, z] = p.offset_cm;
++                    [x, y, z, i32::from(p.vehicle)]
++                })
++                .collect(),
++            boxes: vec![([0.0; 3], [0.0; 3]); parts.len()],
++            vehicles: vec![[0.0; 2]; vehicles.len()],
++            doors_closed: vec![false; doors.len()],
++            wall_standing: false,
++        };
 +        let mut world = World {
 +            greybox,
 +            spawn_points,
@@ -2646,7 +3005,14 @@ index 0000000..1158077
 +            pre: soldiers.iter().map(PreSnap::of).collect(),
 +            soldiers,
 +            claimed: vec![[0; 4]; slots],
-+            effects: vec![Effect::default(); slots * usize::from(scene.effect_rows)],
++            // Each row ends at the first step: it is rolled there.
++            effects: vec![
++                Effect {
++                    end: first_tick,
++                    ..Effect::default()
++                };
++                slots * usize::from(scene.effect_rows)
++            ],
 +            vehicles,
 +            parts,
 +            projectiles: vec![Projectile::default(); usize::from(scene.projectile_capacity)],
@@ -2670,7 +3036,7 @@ index 0000000..1158077
 +                soldiers: Vec::with_capacity(HitVolumes::MAX_SOLDIERS),
 +                cover: Vec::with_capacity(HitVolumes::MAX_COVER),
 +            },
-+            movers: Movers::default(),
++            movers,
 +            fired: Vec::with_capacity(256),
 +            blend_soldiers: Vec::with_capacity(HitVolumes::MAX_SOLDIERS),
 +            blend_cover: Vec::with_capacity(HitVolumes::MAX_COVER),
@@ -2683,8 +3049,49 @@ index 0000000..1158077
 +        world.place_vehicles();
 +        world.write_records();
 +        load_movers_into(&mut world.movers, &world.records);
-+        world.build_volumes(first_tick.wrapping_sub(1));
++        world.compose_own_volumes(first_tick.wrapping_sub(1));
 +        world
++    }
++
++    /// The counts [`compose_volumes`] reads this world's records against.
++    fn counts(&self) -> Counts {
++        Counts {
++            slots: self.soldiers.len(),
++            vehicles: self.vehicles.len(),
++            parts: self.parts.len(),
++        }
++    }
++
++    /// The authority's own volumes, from its own records (phase 3 and phase 8; [`World::hit_volumes_from`]).
++    fn compose_own_volumes(&mut self, tick: u32) {
++        let n = self.counts();
++        compose_volumes(
++            &self.scene,
++            &self.greybox,
++            n,
++            &self.records,
++            tick,
++            &mut self.volumes,
++        );
++    }
++
++    /// The hit volumes `records` describe, at `tick`, into `into` (its vectors' storage reused): the one function from
++    /// records to [`HitVolumes`] (the advisor's W1-U4D A-M1). The authority's step builds its own volumes with it from
++    /// its own records (phase 3 and phase 8), a client from the records it decoded, and AimCast from its interpolated
++    /// ones, so the boxes' sizes and a part composed with its hull stay in npt-sim. Each soldier's box comes from its
++    /// record (live unless the record says dead); the cover keeps this world's order, each vehicle part (its hull's
++    /// record composed with its own), then each door (live while closed), then the wall stand-in (live while
++    /// standing). An entity with no record in `records` gives a box that is not live; a record of an entity this world
++    /// has not (an index past its count, or a part naming a hull it has not or whose hull has no record) is skipped.
++    pub fn hit_volumes_from(&self, records: &[EntityRecord], tick: u32, into: &mut HitVolumes) {
++        compose_volumes(
++            &self.scene,
++            &self.greybox,
++            self.counts(),
++            records,
++            tick,
++            into,
++        );
 +    }
 +
 +    /// The bite ids `World` plants (bites builds only): PM-0004-21's two injections, -41's speed bite, and the
@@ -2781,32 +3188,38 @@ index 0000000..1158077
 +    /// one tick, through the same phase functions as [`SimCore::step`] (the move, the own-copy snap on the wire grid,
 +    /// the aim and the weapon), against the movers [`World::load_movers`] last loaded. It draws from no random stream,
 +    /// resolves no shot, spawns nothing and counts nothing (a predicted throw is the authority's to accept), and
-+    /// refreshes that soldier's record. Returns whether the command fired. A stand-in soldier has no vehicle, so the
-+    /// "one slot and its vehicle" of §4.2 is the slot alone.
++    /// refreshes that soldier's two records (its soldier record and its own-state record). Returns whether the command
++    /// fired. A stand-in soldier has no vehicle, so the "one slot and its vehicle" of §4.2 is the slot alone. Two
++    /// commands of one tick (a catch-up tick) are two calls, and predict the authority's tick bit for bit (D-3).
 +    pub fn predict(&mut self, command: &Command) -> bool {
 +        let slot = usize::from(command.slot);
 +        if slot >= self.soldiers.len() {
 +            return false;
 +        }
 +        let s = &mut self.soldiers[slot];
-+        s.flags &= !FLAG_FIRED;
 +        s.vel = [0.0; 3];
 +        self.pre[slot] = PreSnap::of(s);
 +        let fired = self.run_command(command, None, false);
-+        if let Some(i) = self
-+            .records
-+            .iter()
-+            .position(|r| r.kind == EntityKind::Soldier && usize::from(r.index) == slot)
-+        {
-+            self.records[i] = self.soldier_record(slot);
++        for i in 0..self.records.len() {
++            let r = &self.records[i];
++            if usize::from(r.index) != slot {
++                continue;
++            }
++            match r.kind {
++                EntityKind::Soldier => self.records[i] = self.soldier_record(slot),
++                EntityKind::OwnState => self.records[i] = self.own_state_record(slot),
++                _ => {}
++            }
 +        }
 +        fired
 +    }
 +
 +    /// Loads the movers the soldiers collide with from records (a client: its last decoded snapshot's; the authority:
-+    /// its own, each tick): each vehicle part's centre, each door open or closed and the wall standing or down, from
-+    /// the records' grid integers. A record of another kind, or one this world has no entity for, is skipped; a mover
-+    /// with no record keeps its last value.
++    /// its own, each tick): each hull's transform and each part's transform relative to its hull, each door open or
++    /// closed and the wall standing or down, from the records' grid integers; each part's box is then its hull
++    /// composed with it (the one composition: [`World::hit_volumes_from`]'s). A record of another kind, or one this
++    /// world has no entity for (an index past the scene's count, a part naming a hull it has not), is skipped, and no
++    /// mover is ever added from a record; a mover with no record keeps its last value.
 +    pub fn load_movers(&mut self, records: &[EntityRecord]) {
 +        load_movers_into(&mut self.movers, records);
 +    }
@@ -2890,9 +3303,12 @@ index 0000000..1158077
 +        }
 +        for a in &input.attributes {
 +            if let Some(s) = self.soldiers.get_mut(usize::from(a.slot)) {
++                // Brought into the attribute's range ([`Attribute`]), which the own-state record's field holds.
 +                match a.attribute {
-+                    Attribute::MoveSpeed => s.move_speed = a.value,
-+                    Attribute::FireInterval => s.fire_interval = a.value.max(1),
++                    Attribute::MoveSpeed => s.move_speed = a.value.min(MOVE_SPEED_MAX_CM_S),
++                    Attribute::FireInterval => {
++                        s.fire_interval = a.value.clamp(1, FIRE_INTERVAL_MAX_US);
++                    }
 +                }
 +            }
 +        }
@@ -2947,7 +3363,7 @@ index 0000000..1158077
 +        load_movers_into(&mut self.movers, &self.records);
 +    }
 +
-+    /// Each vehicle on its loop at this tick, and its parts on it.
++    /// Each vehicle on its loop at this tick (its parts ride on it: their records are relative to it).
 +    fn place_vehicles(&mut self) {
 +        for v in 0..self.vehicles.len() {
 +            let (radius, period, phase) = {
@@ -2957,21 +3373,8 @@ index 0000000..1158077
 +            let along = ((self.elapsed + u64::from(phase)) % u64::from(period)) as f32;
 +            let theta = TAU * along / period as f32;
 +            let (c, s) = (libm::cosf(theta), self.sinf(theta));
-+            let yaw = theta + FRAC_PI_2;
-+            let (cy, sy) = (libm::cosf(yaw), self.sinf(yaw));
-+            let pos = [radius * c, radius * s, 0.0];
-+            let range = self.vehicles[v].parts.clone();
-+            self.vehicles[v].pos = pos;
-+            self.vehicles[v].yaw = yaw;
-+            for p in &mut self.parts[range] {
-+                let [ox, oy] = p.offset;
-+                p.pos = [
-+                    pos[0] + ox * cy - oy * sy,
-+                    pos[1] + ox * sy + oy * cy,
-+                    PART_Z_CM as f32 / 100.0,
-+                ];
-+                p.yaw = yaw;
-+            }
++            self.vehicles[v].pos = [radius * c, radius * s, 0.0];
++            self.vehicles[v].yaw = theta + FRAC_PI_2;
 +        }
 +    }
 +
@@ -3018,7 +3421,7 @@ index 0000000..1158077
 +                if dx * dx + dy * dy > near * near {
 +                    continue;
 +                }
-+                for &(min, max) in self.movers.parts.get(v.parts.clone()).unwrap_or(&[]) {
++                for &(min, max) in self.movers.boxes.get(v.parts.clone()).unwrap_or(&[]) {
 +                    test(min, max);
 +                }
 +            }
@@ -3169,6 +3572,7 @@ index 0000000..1158077
 +            if s.reload_left > 0 || s.ammo >= w.magazine {
 +                if authority {
 +                    self.reports.reload += 1;
++                    self.refuse(c, RefusalKind::Reload);
 +                }
 +            } else {
 +                s.reload_left = i64::from(w.reload_ms) * 1_000 * i64::from(TICK_HZ);
@@ -3178,15 +3582,16 @@ index 0000000..1158077
 +        if edge[Command::PRESS_FIRE] && !ready && authority {
 +            if s.ammo == 0 {
 +                self.reports.ammunition += 1;
++                self.refuse(c, RefusalKind::Ammunition);
 +            } else {
 +                self.reports.cooldown += 1;
++                self.refuse(c, RefusalKind::Cooldown);
 +            }
 +        }
 +        let fired = ready && (fire_held || edge[Command::PRESS_FIRE]);
 +        if fired {
 +            s.wait += cost;
 +            s.ammo -= 1;
-+            s.flags |= FLAG_FIRED;
 +            if authority {
 +                self.fired.push(Fired {
 +                    slot: c.slot,
@@ -3207,13 +3612,27 @@ index 0000000..1158077
 +        fired
 +    }
 +
++    /// One refused part of `c`, for the tick's [`InputReports::refusals`] (the authority's only).
++    fn refuse(&mut self, c: &Command, kind: RefusalKind) {
++        self.reports.refusals.push(Refusal {
++            slot: c.slot,
++            seq: c.seq,
++            kind,
++        });
++    }
++
 +    /// A grenade from `origin` toward the aim (`d` from the origin to it), on the grid, or a refusal when the pool is
-+    /// full.
++    /// full. In a scene that spawns its stand-ins at a rate (ES), a grenade is one of the rate's spawns: it takes one
++    /// from the spawner, which fills the rest (the advisor's W1-U4D T-M1).
 +    fn throw(&mut self, c: &Command, origin: [f32; 3], d: [f32; 3]) {
 +        let Some(i) = self.projectiles.iter().position(|p| !p.live) else {
 +            self.reports.pool_full += 1;
++            self.refuse(c, RefusalKind::PoolFull);
 +            return;
 +        };
++        if self.scene.spawn_millihertz > 0 {
++            self.spawn_acc -= 1_000 * i64::from(TICK_HZ);
++        }
 +        let flat = (d[0] * d[0] + d[1] * d[1]).sqrt();
 +        let (ux, uy) = if flat > 0.0 {
 +            (d[0] / flat, d[1] / flat)
@@ -3243,45 +3662,13 @@ index 0000000..1158077
 +        };
 +    }
 +
-+    // Phase 3 (and 8): the present volumes.
-+    fn build_volumes(&mut self, tick: u32) {
-+        let wire = Config::default();
-+        self.volumes.tick = tick;
-+        self.volumes.soldiers.clear();
-+        for (slot, s) in self.soldiers.iter().enumerate() {
-+            let feet = [
-+                wire.to_grid(POSITION_XY, s.pos[0]),
-+                wire.to_grid(POSITION_XY, s.pos[1]),
-+                wire.to_grid(POSITION_Z, s.pos[2]),
-+            ];
-+            let half = if self.scene.is_plate(slot as u8) {
-+                PLATE_HALF
-+            } else {
-+                SOLDIER_HALF
-+            };
-+            self.volumes.soldiers.push(VolumeBox {
-+                center: [feet[0], feet[1], feet[2] + i32::from(half[2])],
-+                half,
-+                live: s.alive,
-+            });
++    // Phase 3: the present volumes, after this tick's moves: the soldiers' records refreshed (the first `slots` records
++    // are theirs, in slot order), then the volumes of the records (the cover's are phase 1's: nothing moved them since).
++    fn present_volumes(&mut self, tick: u32) {
++        for slot in 0..self.soldiers.len() {
++            self.records[slot] = self.soldier_record(slot);
 +        }
-+        self.volumes.cover.clear();
-+        for c in &self.movers.parts_cm {
-+            self.volumes.cover.push(VolumeBox {
-+                center: *c,
-+                half: [PART_HALF_CM as u16; 3],
-+                live: true,
-+            });
-+        }
-+        let boxes = self.greybox.doors.iter().zip(&self.movers.doors_closed);
-+        let wall = (&self.greybox.wall, &self.movers.wall_standing);
-+        for (b, live) in boxes.chain([wall]) {
-+            self.volumes.cover.push(VolumeBox {
-+                center: [0, 1, 2].map(|a| (b.min_cm[a] + b.max_cm[a]) / 2),
-+                half: [0, 1, 2].map(|a| ((b.max_cm[a] - b.min_cm[a]) / 2) as u16),
-+                live: *live,
-+            });
-+        }
++        self.compose_own_volumes(tick);
 +    }
 +
 +    /// The blended volumes of `r` (accepted: the ring holds what it names) in `blend_soldiers` and `blend_cover`, kept
@@ -3454,8 +3841,10 @@ index 0000000..1158077
 +            self.spawn_stand_in(tick);
 +        }
 +        if self.scene.spawn_millihertz > 0 {
-+            let whole = 1_000 * u64::from(TICK_HZ);
-+            self.spawn_acc += u64::from(self.scene.spawn_millihertz);
++            // The scene's rate of spawns, grenades included: a grenade thrown took its spawn from the accumulator
++            // (`throw`), so the stand-ins fill the rest (T-M1).
++            let whole = 1_000 * i64::from(TICK_HZ);
++            self.spawn_acc += i64::from(self.scene.spawn_millihertz);
 +            while self.spawn_acc >= whole {
 +                self.spawn_acc -= whole;
 +                self.spawn_stand_in(tick);
@@ -3464,7 +3853,9 @@ index 0000000..1158077
 +    }
 +
 +    /// One stand-in projectile, its start and fuse drawn from the projectiles' stream, on the grid; none if the pool
-+    /// is full (the scene keeps room for the stand-ins it asks for).
++    /// is full (the scene keeps room for the stand-ins it asks for). It starts inside the fight (the advisor's W1-U4D
++    /// N-M4: "300 live projectiles in the fight"): within 12 m of the cluster's centre in x and y, up to 2 m up, at up
++    /// to 3 m/s across and 2 to 12 m/s up, so it lands within about 8 m of its start (at most 2.6 s in the air).
 +    fn spawn_stand_in(&mut self, tick: u32) {
 +        let Some(i) = self.projectiles.iter().position(|p| !p.live) else {
 +            return;
@@ -3472,13 +3863,13 @@ index 0000000..1158077
 +        let [lo, hi] = self.scene.fuse_ms;
 +        let r = &mut self.rngs[Stream::Projectiles as usize - 1];
 +        let p0 = [
-+            r.between(-6_000, 6_000),
-+            r.between(-6_000, 6_000),
++            r.between(-1_200, 1_200),
++            r.between(-1_200, 1_200),
 +            r.between(0, 200),
 +        ];
 +        let v0 = [
-+            r.between(-800, 800),
-+            r.between(-800, 800),
++            r.between(-300, 300),
++            r.between(-300, 300),
 +            r.between(200, 1_200),
 +        ];
 +        let fuse = ticks_for_ms(r.between(lo as i32, hi as i32) as u32);
@@ -3497,16 +3888,15 @@ index 0000000..1158077
 +        };
 +    }
 +
-+    // Phase 6: S1's effect rows, each re-rolled from the effects' stream when it runs out.
-+    fn run_effects(&mut self) {
++    // Phase 6: S1's effect rows: each row's end checked every tick (S1's per-row work), a row at or past its end rolled
++    // again from the effects' stream, to end 0.5 to 3 s on. A row's record changes only when it is rolled (N-M5).
++    fn run_effects(&mut self, tick: u32) {
 +        let r = &mut self.rngs[Stream::Effects as usize - 1];
 +        for e in &mut self.effects {
-+            if e.left == 0 {
++            if tick.wrapping_sub(e.end) as i32 >= 0 {
 +                e.kind = r.below(8) as u8;
-+                e.left = ticks_for_ms(r.between(500, 3_000) as u32) as u16;
++                e.end = tick.wrapping_add(ticks_for_ms(r.between(500, 3_000) as u32));
 +                e.magnitude = r.below(256) as u8;
-+            } else {
-+                e.left -= 1;
 +            }
 +        }
 +    }
@@ -3531,49 +3921,64 @@ index 0000000..1158077
 +        }
 +    }
 +
-+    fn weapon_state(s: &Soldier) -> i32 {
-+        if s.ammo == 0 {
-+            3
-+        } else if s.reload_left > 0 {
-+            2
-+        } else if s.wait > 0 {
-+            1
-+        } else {
-+            0
-+        }
++    /// The area of a soldier's feet.
++    fn soldier_area(&self, slot: usize) -> u16 {
++        let s = &self.soldiers[slot];
++        let wire = Config::default();
++        self.greybox.area_of(
++            wire.to_grid(POSITION_XY, s.pos[0]),
++            wire.to_grid(POSITION_XY, s.pos[1]),
++        )
 +    }
 +
++    /// Slot `slot`'s soldier record: the catalogue's remote row (W1-S1).
 +    fn soldier_record(&self, slot: usize) -> EntityRecord {
 +        let s = &self.soldiers[slot];
 +        let pre = &self.pre[slot];
-+        let wire = Config::default();
-+        let area = self.greybox.area_of(
-+            wire.to_grid(POSITION_XY, s.pos[0]),
-+            wire.to_grid(POSITION_XY, s.pos[1]),
-+        );
 +        record(
 +            EntityKind::Soldier,
 +            slot as u16,
 +            s.generation,
-+            area,
++            self.soldier_area(slot),
 +            &[
 +                Val::F(pre.pos[0]),
 +                Val::F(pre.pos[1]),
 +                Val::F(pre.pos[2]),
 +                Val::F(pre.yaw),
 +                Val::F(pre.pitch),
-+                Val::F(pre.vel[0]),
-+                Val::F(pre.vel[1]),
-+                Val::F(pre.vel[2]),
 +                Val::I(i32::from(s.flags)),
 +                Val::I(i32::from(s.health)),
 +                Val::I(0),
-+                Val::I(World::weapon_state(s)),
 +            ],
 +        )
 +    }
 +
-+    /// Every entity's record, in kind order: soldiers, vehicles, parts, live projectiles, doors, the wall, effect rows.
++    /// Slot `slot`'s own-state record (owner only: W1-S1): the velocity before the own-copy snap (its `raw`, the wire
++    /// grid's integers of it in `grid`), then the weapon's ammunition, fire timer and reload left, and the move-speed
++    /// and fire-interval attributes, each exactly as the state holds it.
++    fn own_state_record(&self, slot: usize) -> EntityRecord {
++        let s = &self.soldiers[slot];
++        let pre = &self.pre[slot];
++        record(
++            EntityKind::OwnState,
++            slot as u16,
++            s.generation,
++            self.soldier_area(slot),
++            &[
++                Val::F(pre.vel[0]),
++                Val::F(pre.vel[1]),
++                Val::F(pre.vel[2]),
++                Val::I(i32::from(s.ammo)),
++                Val::I(s.wait as i32),
++                Val::I(s.reload_left as i32),
++                Val::I(s.move_speed as i32),
++                Val::I(s.fire_interval as i32),
++            ],
++        )
++    }
++
++    /// Every entity's record, in kind order ([`EntityKind::ALL`]'s): soldiers, vehicles, parts, live projectiles,
++    /// doors, the wall, effect rows, the soldiers' own states.
 +    fn write_records(&mut self) {
 +        let wire = Config::default();
 +        let mut records = core::mem::take(&mut self.records);
@@ -3601,17 +4006,20 @@ index 0000000..1158077
 +                ],
 +            ));
 +        }
++        // A part's record: its transform relative to its hull (on the cm grid, so `raw` is exactly its grid integer's
++        // value) and its hull's area, since it travels with its hull (H1).
 +        for (i, p) in self.parts.iter().enumerate() {
++            let hull = &self.vehicles[usize::from(p.vehicle)];
 +            records.push(record(
 +                EntityKind::VehiclePart,
 +                i as u16,
 +                0,
-+                area(p.pos),
++                area(hull.pos),
 +                &[
-+                    Val::F(p.pos[0]),
-+                    Val::F(p.pos[1]),
-+                    Val::F(p.pos[2]),
-+                    Val::F(p.yaw),
++                    Val::F(cm(p.offset_cm[0])),
++                    Val::F(cm(p.offset_cm[1])),
++                    Val::F(wire.from_grid(POSITION_Z, p.offset_cm[2])),
++                    Val::F(0.0),
 +                    Val::I(i32::from(p.health)),
 +                    Val::I(i32::from(p.vehicle)),
 +                ],
@@ -3670,17 +4078,21 @@ index 0000000..1158077
 +                area(owner.pos),
 +                &[
 +                    Val::I(i32::from(e.kind)),
-+                    Val::I(i32::from(e.left)),
++                    Val::I(e.end as i32),
 +                    Val::I(i32::from(e.magnitude)),
 +                ],
 +            ));
++        }
++        for slot in 0..self.soldiers.len() {
++            records.push(self.own_state_record(slot));
 +        }
 +        self.records = records;
 +    }
 +
 +    /// The state, as the hash reads it: every field that decides a later tick, in a fixed order, as 32-bit words.
-+    /// Left out: the commands' claimed press counters, the reports, and what each tick rebuilds from the state (the
-+    /// records, the volumes, the movers, the blend).
++    /// Left out: the press counters of the last command run per slot (input bookkeeping, a function of the command
++    /// stream alone), the reports, what each tick rebuilds from the state (the records, the volumes, the movers, the
++    /// blend), and what the scene fixes (a part's place on its hull).
 +    fn write_state(&self, s: &mut impl Sink) {
 +        s.word("world", 0, "next_tick", self.next_tick);
 +        s.wide("world", 0, "elapsed", self.elapsed);
@@ -3708,7 +4120,7 @@ index 0000000..1158077
 +        for (i, e) in self.effects.iter().enumerate() {
 +            let i = i as u32;
 +            s.word("effect", i, "kind", u32::from(e.kind));
-+            s.word("effect", i, "left", u32::from(e.left));
++            s.word("effect", i, "end", e.end);
 +            s.word("effect", i, "magnitude", u32::from(e.magnitude));
 +        }
 +        for (i, v) in self.vehicles.iter().enumerate() {
@@ -3719,12 +4131,7 @@ index 0000000..1158077
 +            s.float("vehicle", i, "yaw", v.yaw);
 +        }
 +        for (i, p) in self.parts.iter().enumerate() {
-+            let i = i as u32;
-+            s.float("part", i, "pos.x", p.pos[0]);
-+            s.float("part", i, "pos.y", p.pos[1]);
-+            s.float("part", i, "pos.z", p.pos[2]);
-+            s.float("part", i, "yaw", p.yaw);
-+            s.word("part", i, "health", u32::from(p.health));
++            s.word("part", i as u32, "health", u32::from(p.health));
 +        }
 +        for (i, p) in self.projectiles.iter().enumerate() {
 +            let i = i as u32;
@@ -3749,7 +4156,7 @@ index 0000000..1158077
 +        s.word("wall", 0, "standing", u32::from(self.wall.standing));
 +        s.word("wall", 0, "falling", u32::from(self.wall.falling));
 +        s.word("wall", 0, "down_left", self.wall.down_left);
-+        s.wide("spawner", 0, "acc", self.spawn_acc);
++        s.wide("spawner", 0, "acc", self.spawn_acc as u64);
 +        for (i, r) in self.rngs.iter().enumerate() {
 +            let at = r.position();
 +            s.wide("rng", i as u32, "position.lo", at as u64);
@@ -3784,51 +4191,61 @@ index 0000000..1158077
 +        }
 +    }
 +
-+    /// The first non-finite float of the state, by name (D-4).
++    /// The first non-finite float of the state, by name (D-4), and then of each soldier's values before the own-copy
++    /// snap (the records' `raw`), where a NaN the snap would turn into 0 is caught at the tick it arose (the test
++    /// review's L1).
 +    fn non_finite(&self) -> Option<String> {
 +        let mut f = Finite(None);
 +        self.write_state(&mut f);
++        for (i, p) in self.pre.iter().enumerate() {
++            let i = i as u32;
++            let values = [
++                ("pos.x", p.pos[0]),
++                ("pos.y", p.pos[1]),
++                ("pos.z", p.pos[2]),
++                ("vel.x", p.vel[0]),
++                ("vel.y", p.vel[1]),
++                ("vel.z", p.vel[2]),
++                ("yaw", p.yaw),
++                ("pitch", p.pitch),
++            ];
++            for (name, x) in values {
++                f.float("pre", i, name, x);
++            }
++        }
 +        f.0
 +    }
 +}
 +
-+/// Reads the movers from records' grid integers ([`World::load_movers`]).
++/// Reads the movers from records' grid integers ([`World::load_movers`]): each record of an entity the movers hold
++/// updates that entity's integers, any other is skipped and nothing is added (the movers are sized from the scene at
++/// `World::new`); then each part's box is its hull composed with it ([`part_center`]).
 +fn load_movers_into(movers: &mut Movers, records: &[EntityRecord]) {
-+    let wire = Config::default();
++    let vehicles = movers.hulls.len();
 +    for r in records {
 +        let i = usize::from(r.index);
++        let g = &r.grid;
 +        match r.kind {
-+            EntityKind::VehiclePart => {
-+                if movers.parts_cm.len() <= i {
-+                    movers.parts_cm.resize(i + 1, [0; 3]);
-+                    movers.parts.resize(i + 1, ([0.0; 3], [0.0; 3]));
-+                }
-+                let c = [r.grid[0], r.grid[1], r.grid[2]];
-+                movers.parts_cm[i] = c;
-+                let x = wire.from_grid(POSITION_XY, c[0]);
-+                let y = wire.from_grid(POSITION_XY, c[1]);
-+                let z = wire.from_grid(POSITION_Z, c[2]);
-+                let h = PART_HALF_CM as f32 / 100.0;
-+                movers.parts[i] = ([x - h, y - h, z - h], [x + h, y + h, z + h]);
++            EntityKind::Vehicle if i < vehicles => movers.hulls[i] = [g[0], g[1], g[2], g[3]],
++            EntityKind::VehiclePart
++                if i < movers.parts.len()
++                    && usize::try_from(g[PART_PARENT]).is_ok_and(|p| p < vehicles) =>
++            {
++                movers.parts[i] = [g[0], g[1], g[2], g[PART_PARENT]];
 +            }
-+            EntityKind::Vehicle => {
-+                if movers.vehicles.len() <= i {
-+                    movers.vehicles.resize(i + 1, [0.0; 2]);
-+                }
-+                movers.vehicles[i] = [
-+                    wire.from_grid(POSITION_XY, r.grid[0]),
-+                    wire.from_grid(POSITION_XY, r.grid[1]),
-+                ];
++            EntityKind::Door if i < movers.doors_closed.len() => {
++                movers.doors_closed[i] = g[DOOR_OPEN] == 0;
 +            }
-+            EntityKind::Door => {
-+                if movers.doors_closed.len() <= i {
-+                    movers.doors_closed.resize(i + 1, false);
-+                }
-+                movers.doors_closed[i] = r.grid[0] == 0;
-+            }
-+            EntityKind::Wall => movers.wall_standing = r.grid[1] == 1,
-+            EntityKind::Soldier | EntityKind::Projectile | EntityKind::Effect => {}
++            EntityKind::Wall if i == 0 => movers.wall_standing = g[WALL_STANDING] == 1,
++            _ => {}
 +        }
++    }
++    for (v, h) in movers.vehicles.iter_mut().zip(&movers.hulls) {
++        *v = [cm(h[0]), cm(h[1])];
++    }
++    for (b, p) in movers.boxes.iter_mut().zip(&movers.parts) {
++        let hull = movers.hulls[p[3] as usize];
++        *b = part_box(part_center(hull, [p[0], p[1], p[2]]));
 +    }
 +}
 +
@@ -3852,10 +4269,10 @@ index 0000000..1158077
 +        }
 +        self.events.clear();
 +        self.reports.clamps.clear();
++        self.reports.refusals.clear();
 +        self.fired.clear();
 +        self.blend_key = None;
 +        for s in &mut self.soldiers {
-+            s.flags &= !FLAG_FIRED;
 +            s.vel = [0.0; 3];
 +        }
 +        self.apply_inputs(input);
@@ -3867,19 +4284,20 @@ index 0000000..1158077
 +            let rewind = match rewind {
 +                Some(r) if !held(history, r) => {
 +                    self.reports.rewind_outside += 1;
++                    self.refuse(c, RefusalKind::RewindOutside);
 +                    None
 +                }
 +                other => *other,
 +            };
 +            self.run_command(c, rewind, true);
 +        }
-+        self.build_volumes(tick);
++        self.present_volumes(tick);
 +        self.run_shots(history);
 +        self.run_projectiles(tick);
-+        self.run_effects();
++        self.run_effects(tick);
 +        self.run_respawns();
 +        self.write_records();
-+        self.build_volumes(tick);
++        self.compose_own_volumes(tick);
 +        self.next_tick = tick.wrapping_add(1);
 +        self.elapsed += 1;
 +        debug_assert!(
@@ -3912,9 +4330,277 @@ index 0000000..1158077
 +        &self.reports
 +    }
 +}
++
++#[cfg(test)]
++mod tests {
++    //! The tests that read `World`'s private parts: the blend's boxes (T-M3) and the clamp's bound (TUNE-2).
++
++    use super::*;
++    use crate::replay::Recording;
++
++    /// A box's centre and half extents as the reference reads them, m, in f64 from its integer centimetres.
++    fn metres(b: &VolumeBox) -> ([f64; 3], [f64; 3]) {
++        (
++            b.center.map(|k| f64::from(k) / 100.0),
++            b.half.map(|k| f64::from(k) / 100.0),
++        )
++    }
++
++    /// `got` against the reference blend of `a` toward `b` by `fraction` 256ths: centre a + (b − a) × fraction / 256,
++    /// a's half extents, within 0.1 mm (f32's rounding of metres below 330 m is under 0.05 mm).
++    fn assert_blend(got: &FBox, a: &VolumeBox, b: &VolumeBox, fraction: u8, live: bool, what: &str) {
++        let ((ca, h), (cb, _)) = (metres(a), metres(b));
++        let t = f64::from(fraction) / 256.0;
++        for k in 0..3 {
++            let c = ca[k] + (cb[k] - ca[k]) * t;
++            let (lo, hi) = (f64::from(got.min[k]), f64::from(got.max[k]));
++            assert!(
++                (lo - (c - h[k])).abs() <= 1e-4 && (hi - (c + h[k])).abs() <= 1e-4,
++                "{what}, fraction {fraction}, axis {k}: [{lo}, {hi}] against the reference centre {c} ± {}",
++                h[k]
++            );
++        }
++        assert_eq!(got.live, live, "{what}, fraction {fraction}: live");
++    }
++
++    #[test]
++    fn the_blend_puts_each_box_at_its_fraction_of_the_way() {
++        // T-M3 (the test review's M3; the advisor's W1-U4D): the blended boxes `World::blend` gives a shot, pinned
++        // against a reference computed here, for fractions 0, 1, 127, 128 and 255. The boxes move 256 m (and 25.6 m up)
++        // between the two ticks, so one 256th is 1 m: a blend by another divisor (E6's / 255) is 3.9 mm off at fraction
++        // 1 and 1 m off at 255, where the hit-or-miss check (tests/world.rs, D-9) sees only past its 6 cm box.
++        let mut world = World::new(&Scene::course(), 1, 0);
++        let mut history = HitHistory::for_ms(1_000).expect("1 s of ticks");
++        let shift = |b: VolumeBox, d: [i32; 3], half: [u16; 3], live: bool| VolumeBox {
++            center: [0, 1, 2].map(|k| b.center[k] + d[k]),
++            half,
++            live,
++        };
++        let soldier = VolumeBox {
++            center: [-12_800, 3_000, 90],
++            half: [40, 40, 90],
++            live: true,
++        };
++        let part = VolumeBox {
++            center: [1_000, -12_800, 100],
++            half: [50, 50, 50],
++            live: true,
++        };
++        let door = VolumeBox {
++            center: [-5_000, 7_000, 150],
++            half: [15, 100, 150],
++            live: false,
++        };
++        let a = HitVolumes {
++            tick: 100,
++            soldiers: vec![soldier],
++            cover: vec![part, door],
++        };
++        let b = HitVolumes {
++            tick: 101,
++            soldiers: vec![shift(soldier, [25_600, -25_600, 2_560], [10, 10, 10], false)],
++            cover: vec![
++                shift(part, [25_600, 25_600, 0], [5, 5, 5], false),
++                shift(door, [-25_600, 0, 2_560], [1, 1, 1], true),
++            ],
++        };
++        history.push(&a);
++        history.push(&b);
++        for fraction in [0u8, 1, 127, 128, 255] {
++            for cover in [CoverVariant::Rewound, CoverVariant::Present] {
++                world.blend_key = None;
++                world.blend(
++                    &history,
++                    &Rewind {
++                        tick_a: 100,
++                        fraction,
++                        cover,
++                    },
++                );
++                // The victim takes a's size and a's liveness, and is live only while it is alive now (it is).
++                assert_eq!(world.blend_soldiers.len(), 1);
++                assert_blend(
++                    &world.blend_soldiers[0],
++                    &a.soldiers[0],
++                    &b.soldiers[0],
++                    fraction,
++                    true,
++                    "the soldier",
++                );
++                match cover {
++                    CoverVariant::Rewound => {
++                        assert_eq!(world.blend_cover.len(), 2);
++                        for i in 0..2 {
++                            let what = format!("rewound cover {i}");
++                            let live = a.cover[i].live;
++                            assert_blend(&world.blend_cover[i], &a.cover[i], &b.cover[i], fraction, live, &what);
++                        }
++                    }
++                    CoverVariant::Present => {
++                        // The cover as it is now, whatever the ring held.
++                        assert_eq!(world.blend_cover.len(), world.volumes.cover.len());
++                        for (got, now) in world.blend_cover.iter().zip(&world.volumes.cover) {
++                            assert_blend(got, now, now, fraction, now.live, "present cover");
++                        }
++                    }
++                }
++            }
++        }
++    }
++
++    #[test]
++    #[ignore = "PROBE (temporary)"]
++    fn zz_probe_es() {
++        let spreads: Vec<u32> = std::env::var("SPREADS")
++            .unwrap_or_else(|_| "5000".into())
++            .split(',')
++            .map(|s| s.parse().unwrap())
++            .collect();
++        let fuse: u32 = std::env::var("FUSE").map_or(1_515, |s| s.parse().unwrap());
++        let ticks: u32 = std::env::var("TICKS").map_or(3_000, |s| s.parse().unwrap());
++        for spread in spreads {
++            let mut scene = Scene::estimate();
++            scene.weapon.spread_urad = spread;
++            scene.fuse_ms = [fuse, fuse];
++            let rec = Recording::synthetic(&scene, 2, 1_000_000, ticks, 2_000);
++            let mut world = World::new(&scene, 2, 1_000_000);
++            let mut history = HitHistory::for_ms(2_000).unwrap();
++            let (mut shots, mut shot_hits, mut blast_hits, mut kills, mut live) = (0u64, 0u64, 0u64, 0u64, 0u64);
++            for t in &rec.ticks {
++                let e = world.step(t, &history).to_vec();
++                history.push(world.hit_volumes());
++                for ev in &e {
++                    match ev {
++                        SimEvent::Shot { .. } => shots += 1,
++                        SimEvent::Hit { damage, .. } if *damage == BLAST_DAMAGE => blast_hits += 1,
++                        SimEvent::Hit { .. } => shot_hits += 1,
++                        SimEvent::Kill { .. } => kills += 1,
++                    }
++                }
++                live += world.records.iter().filter(|r| r.kind == EntityKind::Projectile).count() as u64;
++            }
++            let s = f64::from(ticks) / 30.0;
++            println!(
++                "PROBE spread {spread} fuse {fuse}: shots {:.2}/s shot hits {:.2}/s blast hits {:.2}/s kills {:.2}/s \
++                 events {:.2}/s live {:.2}",
++                shots as f64 / s,
++                shot_hits as f64 / s,
++                blast_hits as f64 / s,
++                kills as f64 / s,
++                (shot_hits + blast_hits + kills) as f64 / s,
++                live as f64 / f64::from(ticks)
++            );
++        }
++    }
++
++    #[test]
++    fn load_movers_never_grows_a_mover_from_decoded_records() {
++        // The rust review's M1 = the test review's M5 (probe C: cover 7 -> 408): `load_movers` skips a record whose
++        // index the world has no entity for, as its doc says, and never grows a pool from decoded data. In CO (no
++        // vehicle) and SS (15 hulls, 124 parts): records past every count, and a part naming a hull the world has not;
++        // the movers keep their sizes and every value a valid record did not set.
++        let bogus = |kind, index: u16, values: &[i32]| {
++            let mut grid = [0; EntityRecord::FIELDS];
++            grid[..values.len()].copy_from_slice(values);
++            EntityRecord {
++                kind,
++                index,
++                generation: 0,
++                area: 0,
++                grid,
++                raw: [0; EntityRecord::FIELDS],
++            }
++        };
++        for scene in [Scene::course(), Scene::stress()] {
++            let mut world = World::new(&scene, 1, 0);
++            let before = world.movers.clone();
++            let (vehicles, parts) = (world.vehicles.len() as u16, world.parts.len() as u16);
++            let records = [
++                bogus(EntityKind::VehiclePart, 400, &[0, -1_500, 100, 0, 200, 0]),
++                bogus(EntityKind::VehiclePart, parts, &[1, 2, 3, 0, 200, 0]),
++                bogus(EntityKind::VehiclePart, 0, &[1, 2, 3, 0, 200, 63]),
++                bogus(EntityKind::Vehicle, vehicles, &[100, 100, 0, 0]),
++                bogus(EntityKind::Vehicle, 63, &[100, 100, 0, 0]),
++                bogus(EntityKind::Door, 99, &[1]),
++                bogus(EntityKind::Wall, 3, &[0, 0]),
++            ];
++            world.load_movers(&records);
++            let m = &world.movers;
++            let sizes = |m: &Movers| {
++                [
++                    m.hulls.len(),
++                    m.parts.len(),
++                    m.boxes.len(),
++                    m.vehicles.len(),
++                    m.doors_closed.len(),
++                ]
++            };
++            assert_eq!(sizes(m), sizes(&before), "{}: no mover grew", scene.name());
++            assert_eq!(
++                (&m.hulls, &m.parts, &m.boxes, &m.vehicles, &m.doors_closed, m.wall_standing),
++                (
++                    &before.hulls,
++                    &before.parts,
++                    &before.boxes,
++                    &before.vehicles,
++                    &before.doors_closed,
++                    before.wall_standing
++                ),
++                "{}: nothing changed",
++                scene.name()
++            );
++        }
++    }
++
++    #[test]
++    fn no_scene_places_a_fire_origin_near_the_clamp_bound() {
++        // TUNE-2 (the advisor's W1-U4D): the clamp puts a far point at the reach for every fire origin at or below the
++        // grid's top (feet at or below 3,955 cm: the module text). Every place a scene puts a soldier's feet (its spawn
++        // points, its soldiers' starts, TC's plates, its synthetic recording's spawns and teleports) and every greybox
++        // surface (the map's edge, the buildings, the crates, the doors, the wall stand-in) is at or below 10 m, 29.55 m
++        // under it. A scripted teleport above it is a scenario error the runner refuses (U4r's carry).
++        const FAR_BELOW_CM: i32 = 1_000;
++        assert_eq!(FEET_Z_BOUND_CM, 3_955);
++        assert!(FAR_BELOW_CM < FEET_Z_BOUND_CM);
++        let wire = Config::default();
++        for scene in [
++            Scene::stress(),
++            Scene::estimate(),
++            Scene::course(),
++            Scene::targets(),
++        ] {
++            let name = scene.name();
++            let world = World::new(&scene, 1, 0);
++            for p in world.spawn_points.iter().flatten() {
++                assert!(p[2] <= FAR_BELOW_CM, "{name}: spawn point {p:?}");
++            }
++            for (slot, s) in world.soldiers.iter().enumerate() {
++                let feet = wire.to_grid(POSITION_Z, s.pos[2]);
++                let top = if scene.is_plate(slot as u8) {
++                    feet + 2 * i32::from(PLATE_HALF[2])
++                } else {
++                    feet
++                };
++                assert!(top <= FAR_BELOW_CM, "{name}: slot {slot} at {feet} cm, its top {top} cm");
++            }
++            let greybox = &world.greybox;
++            for b in greybox.solids.iter().chain(&greybox.doors).chain([&greybox.wall]) {
++                assert!(b.max_cm[2] <= FAR_BELOW_CM, "{name}: a greybox box {:?} to {:?}", b.min_cm, b.max_cm);
++            }
++            let rec = Recording::synthetic(&scene, 1, 0, 3_000, 2_000);
++            let placed = rec.ticks.iter().flat_map(|t| t.spawns.iter().chain(&t.teleports));
++            let mut n = 0;
++            for p in placed {
++                n += 1;
++                assert!(p.position[2] <= FAR_BELOW_CM, "{name}: a scripted placement {p:?}");
++            }
++            assert!(n > 0, "{name}: the recording places soldiers");
++        }
++    }
++}
 diff --git a/spikes/netcode-proof/crates/sim/tests/replay.rs b/spikes/netcode-proof/crates/sim/tests/replay.rs
 new file mode 100644
-index 0000000..3a4a511
+index 0000000..641e8db
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/sim/tests/replay.rs
 @@ -0,0 +1,629 @@
@@ -3925,10 +4611,10 @@ index 0000000..3a4a511
 +use std::io::{BufRead, BufReader, Write};
 +use std::process::{Child, ChildStdin, ChildStdout, Command as Process, Stdio};
 +
-+use npt_sim::replay::{Replayer, Step};
++use npt_sim::replay::{Recording, Replayer, Step};
 +use npt_sim::{
-+    Attribute, AttributeChange, Command, CoverVariant, HitHistory, Placement, Recording, Rewind,
-+    Scene, SimCore, TICK_HZ, TickInput, World,
++    Attribute, AttributeChange, Command, CoverVariant, HitHistory, Placement, Rewind, Scene,
++    SimCore, TICK_HZ, TickInput, World,
 +};
 +
 +/// The ring span the recordings carry: 2 s.
@@ -4491,14 +5177,14 @@ index 0000000..3a4a511
 +        ("TICK_HZ", word_at(5, TICK_HZ + 30), false),
 +        ("pools", word_at(10, 47), false),
 +        ("a zero span", word_at(8, 0), true),
-+        ("a span above 1 MB", word_at(8, 7_701), true),
++        ("a span above 1 MB", word_at(8, 7_334), true),
 +    ] {
 +        let step = run(&bytes);
 +        assert!(matches!(step, Step::Failed(_)), "{why}: {step:?}");
 +        assert_eq!(Recording::decode(&bytes).is_ok(), decodes, "{why}");
 +    }
-+    // The span at the 1 MB edge replays.
-+    assert_eq!(run(&word_at(8, 7_700)), Step::Done);
++    // The span at the 1 MB edge (10^6 B: 220 ticks at 30 Hz) replays.
++    assert_eq!(run(&word_at(8, 7_333)), Step::Done);
 +    // A command's presence, cover and an attribute byte out of range: the first tick's first command starts at byte
 +    // 60 + 12; its Rewind's presence byte is at offset 32 in it, the cover at 38, and the attribute change follows it.
 +    let one = Recording {
@@ -4549,20 +5235,21 @@ index 0000000..3a4a511
 +}
 diff --git a/spikes/netcode-proof/crates/sim/tests/world.rs b/spikes/netcode-proof/crates/sim/tests/world.rs
 new file mode 100644
-index 0000000..cf6dc43
+index 0000000..5fc4339
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/sim/tests/world.rs
-@@ -0,0 +1,1683 @@
+@@ -0,0 +1,2209 @@
 +//! U4d's tests of `World` (u4-build-plan.md §5 U4d): D-1, D-3 to D-6 and D-8 to D-10, and the carries of
 +//! u4s-carries.md that hold `World` (7, 8, 9, 10, 13, 14, 15, 37, 38); in bites builds, the unit proofs of the sites
 +//! `World` plants (§4.14: PM-0001-41's two; PM-0004-21's std `sin` site) and bites per instance (§4.11, T10). D-2 and
 +//! D-7 are tests/replay.rs's.
 +
 +use npt_sim::grid::{Config, Field, PITCH, POSITION_XY, POSITION_Z, VELOCITY, YAW};
++use npt_sim::replay::Recording;
 +use npt_sim::{
 +    Attribute, AttributeChange, Command, CoverVariant, EntityKind, EntityRecord, HitHistory,
-+    HitVolumes, InputReports, Placement, Ray, RayHit, Recording, Rewind, Scene, SimCore, SimEvent,
-+    StateDump, TICK_HZ, TickInput, VolumeBox, World, ticks_for_ms,
++    HitVolumes, InputReports, Placement, Ray, RayHit, Refusal, RefusalKind, Rewind, Scene,
++    SimCore, SimEvent, StateDump, TICK_HZ, TickInput, VolumeBox, World, ticks_for_ms,
 +};
 +
 +/// The ring span the tests lend: 2 s, 60 ticks at 30 Hz.
@@ -4607,13 +5294,24 @@ index 0000000..cf6dc43
 +    }
 +}
 +
-+/// Slot `slot`'s record.
-+fn soldier(world: &World, slot: u8) -> EntityRecord {
++/// Slot `slot`'s record of `kind`.
++fn record_of(world: &World, kind: EntityKind, slot: u8) -> EntityRecord {
 +    *world
 +        .entity_records()
 +        .iter()
-+        .find(|r| r.kind == EntityKind::Soldier && r.index == u16::from(slot))
-+        .expect("every slot has a record")
++        .find(|r| r.kind == kind && r.index == u16::from(slot))
++        .expect("every slot has a record of each soldier kind")
++}
++
++/// Slot `slot`'s soldier record (the remote row: position 0-2, yaw 3, pitch 4, flags 5, health 6, weapon 7).
++fn soldier(world: &World, slot: u8) -> EntityRecord {
++    record_of(world, EntityKind::Soldier, slot)
++}
++
++/// Slot `slot`'s own-state record (W1-S1: velocity 0-2, ammunition 3, fire timer 4, reload left 5, move speed 6, fire
++/// interval 7).
++fn own_state(world: &World, slot: u8) -> EntityRecord {
++    record_of(world, EntityKind::OwnState, slot)
 +}
 +
 +/// The dump's words whose names start with `prefix`, by index.
@@ -4738,37 +5436,59 @@ index 0000000..cf6dc43
 +
 +#[test]
 +fn d3_prediction_equals_authority_for_one_slot_bit_for_bit() {
-+    let mut blocked = 0u32;
++    // Each step the authority runs slot 0's command(s) and a clone of it before the step predicts them; both of the
++    // slot's records (its soldier record and its own-state record, W1-S1) and its state words agree bit for bit. Every
++    // ninth step is a catch-up tick (the advisor's W1-U4D N-M3): two commands of the slot in one tick, the first holding
++    // fire, which the client predicts as two calls; a per-tick rule in the step that predict applies per command (P11's
++    // form) differs there.
++    let (mut blocked, mut catch_ups) = (0u32, 0u32);
 +    for scene in [Scene::course(), Scene::stress()] {
 +        let mut authority = World::new(&scene, 7, 500);
 +        let mut history = ring();
 +        let mut presses = [0u8; 4];
 +        let mut fired = 0u32;
-+        for k in 0..1_200u32 {
++        let mut k = 0u32;
++        for step in 0..1_200u32 {
 +            let at = soldier(&authority, 0).grid;
-+            let c = walk(
-+                0,
-+                authority.next_tick(),
-+                k,
-+                [at[0], at[1], at[2]],
-+                &mut presses,
-+            );
++            let feet = [at[0], at[1], at[2]];
++            let tick = authority.next_tick();
++            let mut commands = vec![walk(0, tick, k, feet, &mut presses)];
++            k += 1;
++            if step % 9 == 4 {
++                commands[0].tick = tick.wrapping_sub(1);
++                commands[0].buttons |= Command::FIRE;
++                commands.push(walk(0, tick, k, feet, &mut presses));
++                k += 1;
++            }
 +            let mut client = authority.clone();
 +            let before = client.dump();
-+            let fire_held = c.buttons & Command::FIRE != 0;
-+            let rewind = fire_held.then(|| Rewind {
-+                tick_a: authority.next_tick().wrapping_sub(2),
-+                fraction: 0,
-+                cover: CoverVariant::Present,
-+            });
-+            let t = input(&authority, vec![(c, rewind)]);
++            let with_rewinds = commands
++                .iter()
++                .map(|c| {
++                    let fire_held = c.buttons & Command::FIRE != 0;
++                    let rewind = fire_held.then(|| Rewind {
++                        tick_a: tick.wrapping_sub(2),
++                        fraction: 0,
++                        cover: CoverVariant::Present,
++                    });
++                    (*c, rewind)
++                })
++                .collect();
++            let t = input(&authority, with_rewinds);
 +            room_tick(&mut authority, &mut history, &t);
 +            // The client: the movers of the snapshot it decoded (here exact: the authority's records), then predict.
 +            client.load_movers(authority.entity_records());
-+            fired += u32::from(client.predict(&c));
-+            let at = format!("{} step {k}", scene.name());
-+            // Bit for bit, the snap included: the record's raw (pre-snap) and grid words, and the snapped state.
++            let shots: Vec<bool> = commands.iter().map(|c| client.predict(c)).collect();
++            fired += shots.iter().filter(|s| **s).count() as u32;
++            catch_ups += u32::from(shots.len() == 2 && shots[0]);
++            let at = format!("{} step {step}", scene.name());
++            // Bit for bit, the snap included: the records' raw (pre-snap) and grid words, and the snapped state.
 +            assert_eq!(soldier(&client, 0), soldier(&authority, 0), "{at}: record");
++            assert_eq!(
++                own_state(&client, 0),
++                own_state(&authority, 0),
++                "{at}: own-state record"
++            );
 +            let (a, p) = (authority.dump(), client.dump());
 +            for i in named(&a, "soldier[0].") {
 +                assert_eq!(a.words()[i], p.words()[i], "{at}: {:?}", a.field(i));
@@ -4777,15 +5497,19 @@ index 0000000..cf6dc43
 +            for i in named(&before, "rng[") {
 +                assert_eq!(before.words()[i], p.words()[i], "{at}: {:?}", p.field(i));
 +            }
-+            // A move the world stopped: velocity 0 on an axis the command moved along.
-+            let r = soldier(&authority, 0);
-+            let vel = [r.grid[5], r.grid[6]];
++            // A move the world stopped: velocity 0 on an axis the last command moved along.
++            let c = commands[commands.len() - 1];
++            let vel = own_state(&authority, 0).grid;
 +            blocked +=
 +                u32::from((c.move_xy[0] != 0 && vel[0] == 0) || (c.move_xy[1] != 0 && vel[1] == 0));
 +        }
 +        assert!(fired > 50, "{}: {fired} predicted shots", scene.name());
 +    }
 +    assert!(blocked > 20, "{blocked} blocked moves: the collision ran");
++    assert!(
++        catch_ups > 40,
++        "{catch_ups} catch-up ticks whose first command fired"
++    );
 +}
 +
 +/// `Command`'s fields' types, in order: integers only.
@@ -4861,16 +5585,27 @@ index 0000000..cf6dc43
 +    match attribute {
 +        Attribute::MoveSpeed | Attribute::FireInterval => {}
 +    }
-+    // So nothing is refused or counted as non-finite: InputReports has no such counter (NF-D4).
++    // So nothing is refused or counted as non-finite: InputReports has no such counter (NF-D4), and a refusal's kind is
++    // one of the five.
 +    let InputReports {
 +        clamps,
++        refusals,
 +        cooldown,
 +        ammunition,
 +        reload,
 +        rewind_outside,
 +        pool_full,
 +    } = InputReports::default();
-+    assert!(clamps.is_empty());
++    for r in &refusals {
++        match r.kind {
++            RefusalKind::Cooldown
++            | RefusalKind::Ammunition
++            | RefusalKind::Reload
++            | RefusalKind::RewindOutside
++            | RefusalKind::PoolFull => {}
++        }
++    }
++    assert!(clamps.is_empty() && refusals.is_empty());
 +    assert_eq!(
 +        [cooldown, ammunition, reload, rewind_outside, pool_full],
 +        [0; 5]
@@ -5036,6 +5771,16 @@ index 0000000..cf6dc43
 +    });
 +    assert_eq!(rf.pool_full, 4, "four throws refused and counted");
 +    assert_eq!(rt.pool_full, 0);
++    // Each refused throw is listed for its tick by slot, sequence and kind: what the twin removed (W1-U4D).
++    let refused: Vec<Refusal> = (16..20)
++        .map(|seq| Refusal {
++            slot: 0,
++            seq,
++            kind: RefusalKind::PoolFull,
++        })
++        .collect();
++    assert_eq!(rf.refusals, refused);
++    assert!(rt.refusals.is_empty());
 +    let thrown = worlds
 +        .entity_records()
 +        .iter()
@@ -5049,7 +5794,8 @@ index 0000000..cf6dc43
 +
 +/// Runs `forged` and `twin` on two worlds of `scene` (seed 5, each its own ring) and asserts equal state hashes and
 +/// equal event lists on every tick (u4-build-plan.md §4.2: refused input leaves no trace; D-10). `each` sees the forged
-+/// world after each tick. Returns both worlds' last reports and the forged world.
++/// world after each tick. Returns both worlds' last reports, with every tick's clamp reports and refusals gathered in
++/// them, and the forged world.
 +fn twins(
 +    scene: &Scene,
 +    forged: &[TickInput],
@@ -5060,6 +5806,7 @@ index 0000000..cf6dc43
 +    let (mut f, mut t) = (World::new(scene, 5, first), World::new(scene, 5, first));
 +    let (mut hf, mut ht) = (ring(), ring());
 +    let (mut clamps_f, mut clamps_t) = (Vec::new(), Vec::new());
++    let (mut refusals_f, mut refusals_t) = (Vec::new(), Vec::new());
 +    for (k, (a, b)) in forged.iter().zip(twin).enumerate() {
 +        let ef = room_tick(&mut f, &mut hf, a);
 +        let et = room_tick(&mut t, &mut ht, b);
@@ -5068,12 +5815,14 @@ index 0000000..cf6dc43
 +        assert_eq!(f.dump(), t.dump(), "step {k}: the dumps");
 +        clamps_f.extend_from_slice(&f.reports().clamps);
 +        clamps_t.extend_from_slice(&t.reports().clamps);
++        refusals_f.extend_from_slice(&f.reports().refusals);
++        refusals_t.extend_from_slice(&t.reports().refusals);
 +        each(k, &f);
 +    }
 +    let mut rf = f.reports().clone();
 +    let mut rt = t.reports().clone();
-+    rf.clamps = clamps_f;
-+    rt.clamps = clamps_t;
++    (rf.clamps, rt.clamps) = (clamps_f, clamps_t);
++    (rf.refusals, rt.refusals) = (refusals_f, refusals_t);
 +    (rf, rt, f)
 +}
 +
@@ -5088,7 +5837,13 @@ index 0000000..cf6dc43
 +    min_projectiles: usize,
 +    effects: [usize; 2],
 +    shots: u64,
++    kills: u64,
 +    portal_changes: u64,
++    /// The farthest a very large unit's hull came from the cluster's centre, and the nearest any other came, cm.
++    large_out: i64,
++    other_in: i64,
++    /// The farthest a stand-in projectile started from the centre in x or y, cm.
++    start_out: i32,
 +}
 +
 +#[test]
@@ -5096,7 +5851,22 @@ index 0000000..cf6dc43
 +    // PM-0001-2's thresholds exactly (marks.json; the advisor's condition 5): on every tick 48 soldiers (alive or
 +    // awaiting respawn), three teams of at least 16, at least 15 big vehicles of which at least 4 have 20 parts or more,
 +    // at least 300 projectiles, and 384 effect rows; the run's means of shots per second in 665-735 and of portal
-+    // changes per second in 0.95-1.05. Over the synthetic SS recording, 3,000 ticks (100 s).
++    // changes per second in 0.95-1.05. Over the synthetic SS recording, 3,000 ticks (100 s). In the fight (the advisor's
++    // W1-U4D N-M4; §4.13, F113): every tick the 4 very large units' hulls within 14 m of the cluster's centre (their
++    // parts within 3.71 m of them) and the other 11 at least 52 m out; every stand-in projectile starts within 12 m in
++    // x and y. The magazine (N-M1): SS and ES script no reloads, so magazine × interval covers an S30 plus 5 minutes.
++    let s30_plus_5_us = 35 * 60 * 1_000_000u64;
++    for s in [Scene::stress(), Scene::estimate()] {
++        let w = s.weapon();
++        let covered = u64::from(w.magazine) * u64::from(w.interval_us);
++        assert!(covered >= s30_plus_5_us, "{}: {w:?}", s.name());
++        println!(
++            "D-6: {} weapon {w:?}, health {}; the magazine lasts {} s at one soldier's rate",
++            s.name(),
++            s.health(),
++            covered / 1_000_000
++        );
++    }
 +    let scene = Scene::stress();
 +    let seconds = 100u32;
 +    let rec = Recording::synthetic(&scene, 1, 0, seconds * TICK_HZ, SPAN_MS);
@@ -5109,6 +5879,7 @@ index 0000000..cf6dc43
 +        min_large: usize::MAX,
 +        min_projectiles: usize::MAX,
 +        effects: [usize::MAX, 0],
++        other_in: i64::MAX,
 +        ..Load::default()
 +    };
 +    let mut open = world.portal_states().open.clone();
@@ -5128,6 +5899,18 @@ index 0000000..cf6dc43
 +        for p in of(EntityKind::VehiclePart) {
 +            parts[p.grid[5] as usize] += 1;
 +        }
++        for v in of(EntityKind::Vehicle) {
++            let (x, y) = (i64::from(v.grid[0]), i64::from(v.grid[1]));
++            let out = (((x * x + y * y) as f64).sqrt()) as i64;
++            if parts[usize::from(v.index)] >= 20 {
++                load.large_out = load.large_out.max(out);
++            } else {
++                load.other_in = load.other_in.min(out);
++            }
++        }
++        for p in of(EntityKind::Projectile).filter(|p| p.grid[7] == 0) {
++            load.start_out = load.start_out.max(p.grid[1].abs()).max(p.grid[2].abs());
++        }
 +        load.ticks += 1;
 +        load.min_soldiers = load.min_soldiers.min(soldiers.len());
 +        load.min_team = load.min_team.min(teams.into_iter().min().unwrap_or(0));
@@ -5142,11 +5925,23 @@ index 0000000..cf6dc43
 +            .iter()
 +            .filter(|e| matches!(e, SimEvent::Shot { .. }))
 +            .count() as u64;
++        load.kills += events
++            .iter()
++            .filter(|e| matches!(e, SimEvent::Kill { .. }))
++            .count() as u64;
 +        let now = &world.portal_states().open;
 +        load.portal_changes += now.iter().zip(&open).filter(|(a, b)| a != b).count() as u64;
 +        open.clone_from(now);
 +    }
 +    assert_eq!(load.ticks, seconds * TICK_HZ);
++    println!(
++        "D-6: very large units at most {} cm out, the others at least {} cm out; stand-ins start within {} cm; {} \
++         kills in {seconds} s",
++        load.large_out, load.other_in, load.start_out, load.kills
++    );
++    assert!(load.large_out <= 1_401, "the very large units: {} cm out", load.large_out);
++    assert!(load.other_in >= 5_199, "the other vehicles: {} cm out", load.other_in);
++    assert!(load.start_out <= 1_200, "stand-ins start {} cm out", load.start_out);
 +    assert!(load.min_soldiers >= 48, "soldiers: {}", load.min_soldiers);
 +    assert!(load.min_team >= 16, "smallest team: {}", load.min_team);
 +    assert!(
@@ -5182,6 +5977,273 @@ index 0000000..cf6dc43
 +        (95..=105).contains(&portals_centi),
 +        "portal changes a second: {portals_centi} hundredths"
 +    );
++}
++
++/// `world`'s records of `kind`, in order.
++fn records_of(world: &World, kind: EntityKind) -> Vec<EntityRecord> {
++    world
++        .entity_records()
++        .iter()
++        .filter(|r| r.kind == kind)
++        .copied()
++        .collect()
++}
++
++#[test]
++fn h1_a_hull_that_moves_and_turns_leaves_its_parts_records_unchanged() {
++    // The advisor's W1-U4D H1 (ADR 0001:313-314; the catalogue's vehicles row: "parts travel with their parent"): a
++    // part's record holds its transform relative to its hull, so while nothing hits it, it stays the same as its hull
++    // drives and turns, and its world box, its hull's record composed with it, moves with the hull. The stress scene's
++    // 124 parts (4 × 20 + 11 × 4), 300 ticks with no command.
++    let scene = Scene::stress();
++    let mut world = World::new(&scene, 3, 0);
++    let mut history = ring();
++    let parts = records_of(&world, EntityKind::VehiclePart);
++    let hulls = records_of(&world, EntityKind::Vehicle);
++    let cover = world.hit_volumes().cover.clone();
++    assert_eq!((parts.len(), hulls.len()), (124, 15));
++    for k in 0..300 {
++        let t = input(&world, Vec::new());
++        room_tick(&mut world, &mut history, &t);
++        assert_eq!(
++            records_of(&world, EntityKind::VehiclePart),
++            parts,
++            "tick {k}: the parts' records"
++        );
++    }
++    for (a, b) in hulls.iter().zip(&records_of(&world, EntityKind::Vehicle)) {
++        assert_ne!(a.grid[..2], b.grid[..2], "hull {} moved", a.index);
++        assert_ne!(a.grid[3], b.grid[3], "hull {} turned", a.index);
++    }
++    let now = &world.hit_volumes().cover;
++    for i in 0..parts.len() {
++        assert!(now[i].live, "part {i}");
++        assert_ne!(now[i].center, cover[i].center, "part {i}'s box moved with its hull");
++    }
++}
++
++#[test]
++fn h1_part_records_change_only_when_their_health_does() {
++    // Probe K's count re-run (the test review; W1-U4D H1): over a stress run, on every tick the part records that
++    // changed number at most the parts whose health changed. The other kinds' changes a tick are counted beside them,
++    // for U4e's budget (reported, not judged).
++    let scene = Scene::stress();
++    let ticks = 600u32;
++    let rec = Recording::synthetic(&scene, 1, 0, ticks, SPAN_MS);
++    let mut world = World::new(&scene, 1, 0);
++    let mut history = ring();
++    let key = |r: &EntityRecord| (r.kind, r.index, r.generation);
++    let mut before: std::collections::BTreeMap<_, EntityRecord> =
++        world.entity_records().iter().map(|r| (key(r), *r)).collect();
++    let mut health = world.dump();
++    let mut changed = std::collections::BTreeMap::<EntityKind, u64>::new();
++    let (mut hit_parts, mut changed_parts) = (0u64, 0u64);
++    for (k, t) in rec.ticks.iter().enumerate() {
++        room_tick(&mut world, &mut history, t);
++        let now: std::collections::BTreeMap<_, EntityRecord> =
++            world.entity_records().iter().map(|r| (key(r), *r)).collect();
++        let mut parts = 0;
++        for (id, r) in &now {
++            if before.get(id) != Some(r) {
++                *changed.entry(id.0).or_default() += 1;
++                parts += u64::from(id.0 == EntityKind::VehiclePart);
++            }
++        }
++        let d = world.dump();
++        let hit = named(&d, "part[")
++            .into_iter()
++            .filter(|&i| d.words()[i] != health.words()[i])
++            .count() as u64;
++        assert!(parts <= hit, "tick {k}: {parts} part records changed, {hit} parts' health");
++        (hit_parts, changed_parts) = (hit_parts + hit, changed_parts + parts);
++        (before, health) = (now, d);
++    }
++    assert!(hit_parts > 0, "not vacuous: shots hit the parts in the fight");
++    let per_tick: Vec<String> = changed
++        .iter()
++        .map(|(k, n)| format!("{k:?} {}.{:02}", n / u64::from(ticks), n * 100 / u64::from(ticks) % 100))
++        .collect();
++    println!(
++        "H1: records changed a tick over {ticks} ticks: {}; parts hit {hit_parts}, part records changed {changed_parts}",
++        per_tick.join(", ")
++    );
++}
++
++#[test]
++fn n_m5_an_effect_rows_record_changes_only_when_the_row_starts_or_ends() {
++    // The advisor's W1-U4D N-M5: an effect row's record holds the tick it ends, so it changes only at the tick the row
++    // ends and is rolled again (its end then 0.5 to 3 s on: 15 to 90 ticks at 30 Hz), or when its owner's generation or
++    // area changes. The per-tick expiry check stays (S1's load). Over a stress run every changed row is one of those,
++    // and a few change a tick, where all 384 did when the record counted down.
++    let scene = Scene::stress();
++    let ticks = 600u32;
++    let rec = Recording::synthetic(&scene, 1, 0, ticks, SPAN_MS);
++    let mut world = World::new(&scene, 1, 0);
++    let mut history = ring();
++    let mut before = records_of(&world, EntityKind::Effect);
++    assert_eq!(before.len(), 384);
++    let (lo, hi) = (ticks_for_ms(500), ticks_for_ms(3_000));
++    let mut changed = 0u64;
++    for (k, t) in rec.ticks.iter().enumerate() {
++        let tick = world.next_tick();
++        room_tick(&mut world, &mut history, t);
++        let now = records_of(&world, EntityKind::Effect);
++        for (a, b) in before.iter().zip(&now) {
++            if a == b {
++                continue;
++            }
++            changed += 1;
++            let (end_a, end_b) = (a.grid[1] as u32, b.grid[1] as u32);
++            let rolled = end_a == tick && (lo..=hi).contains(&end_b.wrapping_sub(tick));
++            let owner = a.generation != b.generation || a.area != b.area;
++            assert!(rolled || owner, "tick {k}: row {} {a:?} -> {b:?}", a.index);
++        }
++        before = now;
++    }
++    let milli = changed * 1_000 / u64::from(ticks);
++    println!(
++        "N-M5: {changed} effect records changed in {ticks} ticks, {}.{:03} a tick of 384",
++        milli / 1_000,
++        milli % 1_000
++    );
++    assert!(milli < 20_000, "{milli} thousandths of a row a tick");
++}
++
++#[test]
++fn a_m1_the_authoritys_volumes_are_the_function_of_its_records() {
++    // The advisor's W1-U4D A-M1: `World::hit_volumes_from` is the one function from records to HitVolumes. On every
++    // tick of a stress run the authority's volumes equal the function applied to its own records, and another World of
++    // the scene (a client) given the same records (what it decoded) builds the same volumes, into its own storage,
++    // which it keeps. 1,200 ticks: SS's kills are rare (about 0.3 a second), and a dead soldier's box must show.
++    let scene = Scene::stress();
++    let rec = Recording::synthetic(&scene, 5, 0, 1_200, SPAN_MS);
++    let mut world = World::new(&scene, 5, 0);
++    let client = World::new(&scene, 77, 9);
++    let mut history = ring();
++    let (mut own, mut decoded) = (HitVolumes::default(), HitVolumes::default());
++    let mut storage = None;
++    let mut dead = 0;
++    for (k, t) in rec.ticks.iter().enumerate() {
++        room_tick(&mut world, &mut history, t);
++        let tick = world.hit_volumes().tick;
++        world.hit_volumes_from(world.entity_records(), tick, &mut own);
++        assert_eq!(&own, world.hit_volumes(), "tick {k}: the authority's");
++        client.hit_volumes_from(world.entity_records(), tick, &mut decoded);
++        assert_eq!(&decoded, world.hit_volumes(), "tick {k}: a client's");
++        let at = (decoded.soldiers.as_ptr(), decoded.cover.as_ptr());
++        assert_eq!(*storage.get_or_insert(at), at, "tick {k}: the storage kept");
++        dead += decoded.soldiers.iter().filter(|b| !b.live).count();
++    }
++    assert_eq!(world.hit_volumes().cover.len(), 124 + 6 + 1);
++    assert!(dead > 0, "not vacuous: dead soldiers' boxes are not live");
++}
++
++#[test]
++fn r_m1_a_record_of_an_entity_the_world_has_not_changes_nothing() {
++    // The rust review's M1 = the test review's M5 (probe C): `load_movers` and `hit_volumes_from` skip a record whose
++    // index the world has no entity for, and grow nothing from decoded data. CO (no vehicle, 6 doors, the wall): probe
++    // C's part record of index 400, a hull of index 9, a door of index 99, a wall of index 3; then a predict and a step.
++    // Its volumes keep CO's 7 cover boxes and equal a world's that never loaded them, and so do its state and records.
++    // (The movers' own sizes are world.rs's test.)
++    let bogus = |kind, index, values: &[i32]| {
++        let mut grid = [0; EntityRecord::FIELDS];
++        grid[..values.len()].copy_from_slice(values);
++        EntityRecord {
++            kind,
++            index,
++            generation: 0,
++            area: 0,
++            grid,
++            raw: [0; EntityRecord::FIELDS],
++        }
++    };
++    let records = [
++        bogus(EntityKind::VehiclePart, 400, &[0, -1_500, 100, 0, 200, 0]),
++        bogus(EntityKind::Vehicle, 9, &[0, -1_400, 0, 0]),
++        bogus(EntityKind::Door, 99, &[0]),
++        bogus(EntityKind::Wall, 3, &[500, 0]),
++        bogus(EntityKind::Soldier, 7, &[0, -1_400, 0, 0, 0, 0, 100, 0]),
++    ];
++    let scene = Scene::course();
++    let (mut a, mut b) = (World::new(&scene, 1, 0), World::new(&scene, 1, 0));
++    a.load_movers(&records);
++    let (mut ha, mut hb) = (ring(), ring());
++    for k in 0..40u32 {
++        let c = Command {
++            slot: 0,
++            tick: k,
++            seq: k as u16,
++            buttons: Command::FIRE,
++            move_xy: [0, 127],
++            aim: [0, -500, 140],
++            ..Command::default()
++        };
++        let (mut pa, mut pb) = (a.clone(), b.clone());
++        assert_eq!(pa.predict(&c), pb.predict(&c), "step {k}: predicted");
++        assert_eq!(pa.entity_records(), pb.entity_records(), "step {k}: predicted records");
++        let t = input(&a, vec![(c, None)]);
++        room_tick(&mut a, &mut ha, &t);
++        room_tick(&mut b, &mut hb, &t);
++        assert_eq!(a.hit_volumes(), b.hit_volumes(), "step {k}: volumes");
++        assert_eq!(a.hit_volumes().cover.len(), 7, "step {k}: CO's cover");
++        assert_eq!(a.state_hash(), b.state_hash(), "step {k}: state");
++        a.load_movers(&records);
++    }
++    let mut v = HitVolumes::default();
++    a.hit_volumes_from(&records, 0, &mut v);
++    assert_eq!((v.soldiers.len(), v.cover.len()), (1, 7));
++    assert!(v.soldiers.iter().chain(&v.cover).all(|b| !b.live), "{v:?}");
++}
++
++#[test]
++fn t_m1_the_estimate_scene_meets_pm_0001_2s_es_bands() {
++    // The advisor's W1-U4D T-M1 (the test review's M1; PM-0001-2's ES checks, marks.json; ADR 0001:1474-1479): over
++    // ES's synthetic recording (seed 2, 9,000 ticks: tests/replay.rs's), every tick has 48 soldiers and 15 vehicles,
++    // and the run's means lie in PM-0001-2's bands exactly: 72 shots a second (68.4-75.6), 10 gameplay events (hits and
++    // kills) a second (9.5-10.5), 32 live projectiles a tick (30.4-33.6) and 21.12 spawns a second (20.064-22.176).
++    // Thrown grenades count toward both projectile bands; the stand-in spawner fills the rest.
++    let scene = Scene::estimate();
++    let ticks = 9_000u32;
++    let seconds = u64::from(ticks / TICK_HZ);
++    let rec = Recording::synthetic(&scene, 2, 1_000_000, ticks, SPAN_MS);
++    let mut world = World::new(&scene, 2, 1_000_000);
++    let mut history = ring();
++    let (mut shots, mut events, mut live, mut spawns, mut thrown) = (0u64, 0u64, 0u64, 0u64, 0u64);
++    let (mut min_soldiers, mut min_vehicles) = (usize::MAX, usize::MAX);
++    let mut before = std::collections::BTreeSet::new();
++    for t in &rec.ticks {
++        let e = room_tick(&mut world, &mut history, t);
++        shots += e.iter().filter(|e| matches!(e, SimEvent::Shot { .. })).count() as u64;
++        events += e
++            .iter()
++            .filter(|e| matches!(e, SimEvent::Hit { .. } | SimEvent::Kill { .. }))
++            .count() as u64;
++        let projectiles = records_of(&world, EntityKind::Projectile);
++        live += projectiles.len() as u64;
++        let now: std::collections::BTreeSet<(u16, u16)> =
++            projectiles.iter().map(|p| (p.index, p.generation)).collect();
++        for p in &projectiles {
++            if !before.contains(&(p.index, p.generation)) {
++                spawns += 1;
++                thrown += u64::from(p.grid[7] == 1);
++            }
++        }
++        before = now;
++        min_soldiers = min_soldiers.min(records_of(&world, EntityKind::Soldier).len());
++        min_vehicles = min_vehicles.min(records_of(&world, EntityKind::Vehicle).len());
++    }
++    let per_s = |n: u64| n * 1_000 / seconds;
++    let (shots_m, events_m, spawns_m) = (per_s(shots), per_s(events), per_s(spawns));
++    let live_m = live * 1_000 / u64::from(ticks);
++    println!(
++        "T-M1: ES over {seconds} s: shots {shots_m}, gameplay events {events_m}, spawns {spawns_m} ({thrown} \
++         thrown) thousandths a second; live projectiles {live_m} thousandths a tick"
++    );
++    assert!(min_soldiers >= 48 && min_vehicles >= 15, "{min_soldiers} soldiers, {min_vehicles} vehicles");
++    assert!((68_400..=75_600).contains(&shots_m), "shots: {shots_m}");
++    assert!((9_500..=10_500).contains(&events_m), "gameplay events: {events_m}");
++    assert!((30_400..=33_600).contains(&live_m), "live projectiles: {live_m}");
++    assert!((20_064..=22_176).contains(&spawns_m), "spawns: {spawns_m}");
 +}
 +
 +/// The course's one soldier spawned at `feet` (cm), and the fire origin a still command fires from, m.
@@ -5234,6 +6296,12 @@ index 0000000..cf6dc43
 +
 +#[test]
 +fn d8_the_clamp_moves_a_far_point_to_the_reach_and_never_again() {
++    // u4-build-plan.md §5 U4d's D-8, for every fire origin below the bound World's doc states (no scene places one
++    // above it: world.rs's test); above it a reach point saturates in z and is not claimed to lie at the reach (the
++    // advisor's W1-U4D TUNE-2). The bound: a fire origin at or below the grid's top, 40.95 m (feet at or below 39.55 m),
++    // for which a reach point toward any aim point in the grid's range is in that range too. First from feet on the
++    // ground, with far points in every direction (some outside the grid's range, as no wire aim is); then from feet
++    // at the bound, with far points inside the grid's range, as an aim from the wire is.
 +    let feet = [0, -1_500, 0];
 +    let (mut world, mut history, o) = still_soldier(feet);
 +    let reach = REACH_CM / 100.0;
@@ -5336,6 +6404,40 @@ index 0000000..cf6dc43
 +    );
 +    // The soldier never moved: every shot left from the same origin.
 +    assert_eq!(&soldier(&world, 0).grid[..3], &feet);
++    // At the bound: feet at 39.55 m, the fire origin at the grid's top. Every far aim point inside the grid's range
++    // (z 0 to 40.95 m) is clamped to the reach and, sent again, not moved.
++    let top = [0, -1_500, 3_955];
++    let (mut world, mut history, o) = still_soldier(top);
++    let oc = [top[0], top[1], top[2] + 140];
++    for case in 0..400 {
++        let d = [
++            dice.between(-1_000, 1_000),
++            dice.between(-1_000, 1_000),
++            dice.between(-1_000, 0),
++        ];
++        let n = f64::from(d[0] * d[0] + d[1] * d[1] + d[2] * d[2]).sqrt();
++        if n < 1.0 {
++            continue;
++        }
++        let scale = [1.01, 1.5, 2.0, 3.0][case % 4];
++        let far = d.map(|x| (f64::from(x) / n * REACH_CM * scale) as i32);
++        let aim = [oc[0] + far[0], oc[1] + far[1], (oc[2] + far[2]).clamp(0, 4_095)];
++        if dist(o, aim) <= reach * 1.001 {
++            continue;
++        }
++        let reports = aim_at(&mut world, &mut history, k, aim);
++        k += 1;
++        assert_eq!(reports.len(), 1, "at the bound, case {case}: {aim:?}");
++        let p = reports[0];
++        let r = dist(o, p);
++        assert!((r - reach).abs() <= SLACK_M, "at the bound, case {case}: {p:?} at {r} m");
++        assert!(
++            aim_at(&mut world, &mut history, k, p).is_empty(),
++            "at the bound, case {case}: {p:?} clamped twice"
++        );
++        k += 1;
++    }
++    assert_eq!(&soldier(&world, 0).grid[..3], &top);
 +}
 +
 +/// The target course's shooter spawned at (-60 m, -10 m): its world, and its fire origin, m.
@@ -5564,6 +6666,14 @@ index 0000000..cf6dc43
 +    let (rf, rt, _) = twins(&Scene::course(), &forged, &twin, |_, _| {});
 +    assert_eq!((rf.cooldown, rt.cooldown), (1, 0));
 +    assert_eq!(rf.clamps, rt.clamps);
++    // The refused command's record: what the twin removed (the advisor's W1-U4D ruling).
++    assert_eq!(rf.refusals, [refusal(11, RefusalKind::Cooldown)]);
++    assert!(rt.refusals.is_empty());
++}
++
++/// Slot 0's refusal of its command `seq`.
++fn refusal(seq: u16, kind: RefusalKind) -> Refusal {
++    Refusal { slot: 0, seq, kind }
 +}
 +
 +#[test]
@@ -5579,6 +6689,8 @@ index 0000000..cf6dc43
 +    );
 +    let (rf, rt, _) = twins(&Scene::course(), &forged, &twin, |_, _| {});
 +    assert_eq!((rf.ammunition, rt.ammunition), (1, 0));
++    assert_eq!(rf.refusals, [refusal(100, RefusalKind::Ammunition)]);
++    assert!(rt.refusals.is_empty());
 +}
 +
 +#[test]
@@ -5595,16 +6707,22 @@ index 0000000..cf6dc43
 +    let forged = course_stream(140, held, &[(1, 5), (1, 50)]);
 +    let twin = course_stream(140, held, &[(1, 50)]);
 +    let (rf, rt, world) = twins(&Scene::course(), &forged, &twin, |k, w| {
-+        // Reloading from 50 to 110 (weapon state 2), and not before.
-+        let state = soldier(w, 0).grid[11];
-+        assert_eq!(
-+            state == 2,
-+            (50..110).contains(&k),
-+            "step {k}: weapon state {state}"
-+        );
++        // Reloading from 50 to 110 (reload left above 0 in the own-state record, and the remote row's reloading flag,
++        // bit 2), and not before.
++        let (left, flags) = (own_state(w, 0).grid[5], soldier(w, 0).grid[5]);
++        let reloading = (50..110).contains(&k);
++        assert_eq!(left > 0, reloading, "step {k}: reload left {left}");
++        assert_eq!(flags & 1 << 2 != 0, reloading, "step {k}: flags {flags:#b}");
 +    });
 +    assert_eq!((rf.reload, rt.reload), (1, 0));
-+    assert_eq!(soldier(&world, 0).grid[11], 0, "reloaded, ready");
++    assert_eq!(rf.refusals, [refusal(5, RefusalKind::Reload)]);
++    assert!(rt.refusals.is_empty());
++    let own = own_state(&world, 0).grid;
++    assert_eq!(
++        (own[3], own[5]),
++        (30, 0),
++        "reloaded: a full magazine, no reload left"
++    );
 +}
 +
 +#[test]
@@ -5647,6 +6765,7 @@ index 0000000..cf6dc43
 +        [0; 5],
 +        "a clamp is never a refusal"
 +    );
++    assert!(rf.refusals.is_empty() && rt.refusals.is_empty());
 +}
 +
 +#[test]
@@ -5686,6 +6805,14 @@ index 0000000..cf6dc43
 +    twin[25].commands[0].1 = None;
 +    let (rf, rt, _) = twins(&Scene::course(), &forged, &twin, |_, _| {});
 +    assert_eq!((rf.rewind_outside, rt.rewind_outside), (2, 0));
++    assert_eq!(
++        rf.refusals,
++        [
++            refusal(15, RefusalKind::RewindOutside),
++            refusal(25, RefusalKind::RewindOutside)
++        ]
++    );
++    assert!(rt.refusals.is_empty());
 +}
 +
 +#[test]
@@ -5791,9 +6918,16 @@ index 0000000..cf6dc43
 +    let rec = Recording::synthetic(&scene, 4, 0, 300, SPAN_MS);
 +    let mut world = World::new(&scene, 4, 0);
 +    let mut history = ring();
++    // The float fields of a soldier's two records, by the state word each snaps: its soldier record's position, yaw
++    // and pitch, its own-state record's velocity (W1-S1).
 +    let names = [
 +        "pos.x", "pos.y", "pos.z", "yaw", "pitch", "vel.x", "vel.y", "vel.z",
 +    ];
++    let first_name = |kind: EntityKind| match kind {
++        EntityKind::Soldier => Some(0),
++        EntityKind::OwnState => Some(5),
++        _ => None,
++    };
 +    let (mut off_grid, mut floats) = ([0u32; 8], 0u32);
 +    for (k, t) in rec.ticks.iter().enumerate() {
 +        room_tick(&mut world, &mut history, t);
@@ -5811,13 +6945,15 @@ index 0000000..cf6dc43
 +            for i in r.kind.layout().len()..EntityRecord::FIELDS {
 +                assert_eq!((r.grid[i], r.raw[i]), (0, 0), "tick {k}: past the layout");
 +            }
-+            if r.kind == EntityKind::Soldier {
-+                for (i, name) in names.iter().enumerate() {
-+                    let field = r.kind.layout()[i];
++            if let Some(first) = first_name(r.kind) {
++                let floats = r.kind.layout().iter().take_while(|f| !is_integer(**f));
++                for (i, field) in floats.enumerate() {
++                    let n = first + i;
++                    let name = names[n];
 +                    let held = word(&dump, &format!("soldier[{}].{name}", r.index));
-+                    let sent = wire.from_grid(field, r.grid[i]).to_bits();
-+                    assert_eq!(held, sent, "tick {k}: soldier {} {name}", r.index);
-+                    off_grid[i] += u32::from(r.raw[i] != held);
++                    let sent = wire.from_grid(*field, r.grid[i]).to_bits();
++                    assert_eq!(held, sent, "tick {k}: {:?} {} {name}", r.kind, r.index);
++                    off_grid[n] += u32::from(r.raw[i] != held);
 +                }
 +            }
 +        }
@@ -5839,6 +6975,81 @@ index 0000000..cf6dc43
 +/// Whether a layout field is one of `Field::integer`'s (not a grid field).
 +fn is_integer(f: Field) -> bool {
 +    ![POSITION_XY, POSITION_Z, YAW, PITCH, VELOCITY].contains(&f)
++}
++
++#[test]
++fn w1_s1_the_own_state_record_holds_the_soldiers_weapon_and_attributes_exactly() {
++    // The advisor's W1-S1: each soldier's own-state record holds what decides its next ticks and is not in its remote
++    // row: its ammunition, fire timer, reload left, move speed and fire interval, each exactly as the state holds it
++    // (U4g's reset sets a predicting world's soldier from them), on every tick of a course run (reloads, refusals,
++    // spawns and attribute changes), of a stress run and of the extreme script's attributes (u32::MAX, 0: brought into
++    // the fields' ranges). Its index is the slot and its generation the soldier's; it comes last, in slot order.
++    let mut runs: Vec<(Scene, Recording)> = [Scene::course(), Scene::stress()]
++        .into_iter()
++        .map(|s| {
++            let rec = Recording::synthetic(&s, 31, 0, 1_200, SPAN_MS);
++            (s, rec)
++        })
++        .collect();
++    // Extreme attributes, every few ticks, on the course.
++    let mut extreme = runs[0].1.clone();
++    for (k, t) in extreme.ticks.iter_mut().enumerate() {
++        let value = [u32::MAX, 0, 1, 10_000_001][k % 4];
++        let attribute = [Attribute::MoveSpeed, Attribute::FireInterval][k / 4 % 2];
++        t.attributes.push(AttributeChange {
++            slot: 0,
++            attribute,
++            value,
++        });
++    }
++    runs.push((Scene::course(), extreme));
++    let mut seen = [0u64; 3];
++    for (scene, rec) in &runs {
++        let mut world = World::new(scene, 31, 0);
++        let mut history = ring();
++        let slots = usize::from(scene.slots());
++        // Each soldier's state words, found by name once (the soldiers' section leads the dump, so they keep their
++        // places; the names are checked again at every tick).
++        let fields = ["generation", "ammo", "wait", "reload_left", "move_speed", "fire_interval"];
++        let first = world.dump();
++        let at_of = |slot: usize, f: &str| {
++            let name = format!("soldier[{slot}].{f}");
++            (0..first.words().len())
++                .find(|&i| first.field(i).as_deref() == Some(name.as_str()))
++                .unwrap_or_else(|| panic!("the dump has no {name}"))
++        };
++        let places: Vec<Vec<usize>> = (0..slots)
++            .map(|s| fields.iter().map(|f| at_of(s, f)).collect())
++            .collect();
++        for (k, t) in rec.ticks.iter().enumerate() {
++            room_tick(&mut world, &mut history, t);
++            let d = world.dump();
++            let records = world.entity_records();
++            let own = &records[records.len() - slots..];
++            for (slot, r) in own.iter().enumerate() {
++                let at = format!("{} tick {k} slot {slot}", scene.name());
++                assert_eq!((r.kind, usize::from(r.index)), (EntityKind::OwnState, slot), "{at}");
++                let p = &places[slot];
++                let w = |i: usize| d.words()[p[i]];
++                let wide = |i: usize| (u64::from(w(i)) | u64::from(d.words()[p[i] + 1]) << 32) as i64;
++                assert_eq!(d.field(p[2] + 1), Some(format!("soldier[{slot}].wait")), "{at}");
++                assert_eq!(u32::from(r.generation), w(0), "{at}: generation");
++                assert_eq!(r.grid[3] as u32, w(1), "{at}: ammunition");
++                assert_eq!(i64::from(r.grid[4]), wide(2), "{at}: fire timer");
++                assert_eq!(i64::from(r.grid[5]), wide(3), "{at}: reload left");
++                assert_eq!(r.grid[6] as u32, w(4), "{at}: move speed");
++                assert_eq!(r.grid[7] as u32, w(5), "{at}: fire interval");
++                for (f, g) in r.kind.layout().iter().zip(r.grid) {
++                    assert!((f.min()..=f.max()).contains(&g), "{at}: {g} in {f:?}");
++                }
++                seen[0] += u64::from(r.grid[5] > 0);
++                seen[1] += u64::from(r.grid[4] > 0);
++                seen[2] += u64::from(r.grid[6] == 10_000 || r.grid[7] == 10_000_000);
++            }
++        }
++    }
++    // Not vacuous: reloads ran, the fire timer cooled down, and the extreme attributes were brought to their tops.
++    assert!(seen.iter().all(|n| *n > 10), "{seen:?}");
 +}
 +
 +#[test]
@@ -5897,8 +7108,9 @@ index 0000000..cf6dc43
 +#[test]
 +fn carry14_the_ring_is_refused_above_one_megabyte_at_the_edge() {
 +    // Rust 3: capacity × one tick's HitVolumes bytes at most (HitVolumes::MAX_BYTES, the same on every target) stays
-+    // within 1 MB. At 30 Hz: 231 ticks, a span of 7,700 ms; 7,701 ms rounds up to 232 ticks and is refused.
-+    const MB: usize = 1 << 20;
++    // within 1 MB, 10^6 B as PM-0001-7 judges it (the advisor's W1-U4D T-M2). At 30 Hz: 220 ticks, a span of 7,333 ms;
++    // 7,334 ms rounds up to 221 ticks and is refused.
++    const MB: usize = 1_000_000;
 +    let most = MB / HitVolumes::MAX_BYTES;
 +    let edge_ms = (most as u64 * 1_000 / u64::from(TICK_HZ)) as u32;
 +    let at_edge = HitHistory::for_ms(edge_ms).expect("the edge is accepted");
@@ -5911,7 +7123,7 @@ index 0000000..cf6dc43
 +    assert!(HitHistory::for_ms(u32::MAX).is_none());
 +    assert_eq!(
 +        (HitVolumes::MAX_BYTES, most, edge_ms),
-+        (4_536, 231, 7_700),
++        (4_536, 220, 7_333),
 +        "at 30 Hz"
 +    );
 +    assert_eq!(ticks_for_ms(edge_ms + 1) as usize, most + 1);

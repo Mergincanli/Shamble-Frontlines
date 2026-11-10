@@ -107,6 +107,29 @@
     `cs/npt-u4s-skeptic` 6652be4, nothing Critical or High, S1 Medium, 11 Lows;
   - items 4 (the U4r brief) and 5 (the U3d skeptic check) are queued for tonight.
 
+**SAVE POINT, 2026-11-10 about 16:05 UTC (Mustafa at 92 % usage):**
+- **U4b's merge is in progress in the main folder.** `wip/u4b.patch` (the fixed U4b, with tests/schedule.rs at
+  05e2068b) is applied, uncommitted: crates/server's lib.rs, clippy.toml, src/schedule.rs, tests/schedule.rs.
+  - check.mjs and the gate were running (task bvya54bq9; outputs in the scratchpad, merge-u4b-check.txt and
+    merge-u4b-gate.txt).
+  - On resume, if they are lost: re-run `node spikes/netcode-proof/check.mjs` (expect measured 286 = 275 + 11, bites
+    309 = 292 + 17) and `node tools/gate.mjs --no-smoke`.
+  - Then commit "U4b: the loop policy …" with `git rm .checkpoints/netcode-proof-test/wip/u4b.patch` in the same
+    commit (WIP-CLEAN), and push.
+- **U4a: round 2 complete, ready to merge after U4b** (wf_5a059972-5c8).
+  - All four reviewers APPROVE WITH FINDINGS, Lows only: R2-L1, R2-T1, R2-N2a; for U4b, R2-T2. Under the budget these
+    are follow-ups; there is no third round.
+  - The fixer's counts: measured 300, bites 325, self 52.
+  - The merge: apply `wip/u4a.patch` (the fixed copy), and in the same commit make the catalogue edits N8 lists (item
+    3's note, the codec maxima, the header's sequence fields per W1-N2, the event form, the proposals) and delete
+    `wip/u4a.patch`. Then check.mjs and the gate.
+- **U4c: fix pass, then round 2, running** (wf_610486f7-cc1). Pre-fix copy: `.gate/u4c-prefix`.
+- **U4d: fix pass running** (wf_a8ff8550-67d). Pre-fix copy: `.gate/u4d-prefix`. Its round 2 comes after U4a's
+  merge and the npt-proto half of S1.
+- **Resume the workflows:** `Workflow({scriptPath: <the run's script under /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/>, resumeFromRunId})`:
+  - npt-u4c-fix-round2-wf_610486f7-cc1.js;
+  - npt-u4d-fix-wf_a8ff8550-67d.js.
+
 **The next three actions**
 1. **When the U4a + U4b review returns:** a fix pass within the budget (two rounds at most; Medium and Low become
    follow-ups).

@@ -198,3 +198,76 @@ reviewers listed is a follow-up or waits for U4d (S1): not touched.
     before. Log u4a-fix/plant-hash-guard.log.
   - PF2 input.rs the encoder's NotCanonical check removed: wire a6 FAILED at wire.rs:556 (left Ok(()), right
     Err(NotCanonical)); restored, input.rs a94e669a = before. Log u4a-fix/plant-ack-encoder.log.
+- 5a 11:07 clippy -D warnings (host both builds, wasm32 both builds) and the proto doc: ALL-CLEAN (log
+  u4a-fix/clippy-proto.log). (Cut by the usage limit after this; resumed 15:20 UTC: every file's sha256 read back =
+  the post-fix values, hash d3a9f95b and input a94e669a after their plants.)
+- The other types' send and receive limits, read 15:25 against Limits::TYPES (limits.rs:56-137) and the catalogue's
+  §2 Size limit column (leading numbers): Input 166, FullState 65,536 (after its 4 B length), Resync 8, Ping 32, Pong
+  32, Join 128, JoinAccepted 256, JoinRejected 16, ClientSettings 8, RoomEnded 64, Leave 16, Kick 16, SessionControl
+  512, SessionStatus 32: every row equals its cell; each of these has one limit for both ends (only Snapshot's cell
+  names two: 1,000 B at the send side, 1,150 B npt-client refuses above), so send_limit = receive_limit for all 14,
+  and `encode` now applies the row's limit to every type, not only Snapshot. Reachable by a valid value only for
+  Snapshot and FullState (both tested at the limit and one over); the others' largest encodings are below their
+  limits (Input 161 B by input.rs's const assert, SessionControl 504 B, the rest fixed-size: 3 to 80 B), so their
+  send check cannot be met by a valid message; their receive limits are a3's (wire.rs, every type, one byte over).
+- 5b check.mjs twice in a row (runner u4a-fix-run.sh: 15 s idle first, every file under crates/ touched before and
+  every 2 s during; df 12 G free both times): run 1 15:22:52-15:28:44, run 2 15:29:13-15:31:45 (it waited 20 s for
+  another lane's `cargo test -p npt-net` to end), each exit 0, "check: all 10 steps pass", test "measured build: 300
+  tests passed, 0 failed, 0 reported a skip; bites build: 325 tests passed, 0 failed, 0 reported a skip", self 52 of
+  52, deps PASS (proto's clippy.toml = sim's; proto and client name only Channel from npt_link), doc "host and
+  wasm32". Counts = the builder's 296 / 321 + 4 each (3 lib, 1 wire): neither run is off. Logs: scratchpad
+  u4a-fix/check-run1.log, check-run2.log. Then `cargo +1.99.1 fmt --all --check` exit 0.
+
+### N2: the snapshot header carries command sequences (text only; the catalogue and the plan are the main session's)
+u4-build-plan.md §4.4 (lines 273-274, sha256 0d69332c) names the header's "16-bit offsets (baseline, newest command
+received, last command run)", and §4.14's -58/lt-tick-offset row (line 454) names "the client's 'last command run'
+compare" over "offsets crossing the wrap". The built header (snapshot.rs:9-17, :392-395; `Snapshot::newest_received`
+and `last_run`, `FullState::last_run`) keeps the baseline as a 16-bit tick offset (`baseline_age`), but carries the
+other two as **16-bit command sequences** (`Command::seq`'s low 16 bits, each with a known flag), not tick offsets.
+Why: a command is named by its sequence, not its tick. Under OQ-0001-6 (b)'s re-align, command ticks can repeat or
+skip (input.rs's module text: a repeat's tick step is 0 to 255), so a tick offset can name two commands or none, and
+the client's replay could not tell where to start; the sequence is consecutive and unique per command (input.rs: each
+older command's sequence is its newer neighbour's less one), so "the newest received" ends the repeats exactly and
+"the last run" names exactly where the replay starts. What this asks of the text: §4.4's header line and §4.14's
+-58/lt-tick-offset row read "the 16-bit last-command-run sequence" (its compare is Wrap's 16-bit sequence compare,
+with a start value injectable below the wrap). The catalogue's §3 Snapshot header row (netcode-proof-messages.md:135)
+says "the baseline tick and other ticks as 16-bit offsets from the header tick (319)" and names the two commands
+without a form: it could add "the newest command received and the last command run as 16-bit command sequences" (and
+the group count, which §4.4 adds). Not done here: the catalogue and the plan are the main session's.
+
+### Fix pass result (round 1's fixes; files changed, sha256 after)
+Changed (8, all crates/proto; the pre-fix copy, = the builder's baseline, is /home/user/Shamble-Frontlines/.gate/
+u4a-prefix/spikes/netcode-proof/crates/proto: `diff -r` it against this copy's crates/proto for round 2):
+- src/msg.rs 8a170d9b2ffb590ea6867773b3e9d93e40c9995c25d28e7b36f7f71e3b38fa62 (+175 -16: send_limit / receive_limit
+  / after_length, the size check in Quant::encode, 2 tests and their helpers)
+- src/input.rs a94e669afd0a84e46e48904d47e53d9c4d242c27eaba16b90a4f99cad2bb5410 (+11 -4)
+- src/control.rs 881c6eaefcf6b72e95ecb9bffb0ae386b63b92f297d666cd1acd440e780e1679 (+46 -2: Redacted, Debug by hand)
+- src/hash.rs d3a9f95b26e694ae30fbd86fd113120c58c0b69f7cb397d24e7825b7c490ea7d (+21 -1: finish() and its test)
+- src/error.rs e72bcc4e86bcfa603f0fe49e06516edbfad17c865fd3e793c1106ce75ea27188 (+8 -5, docs only)
+- src/limits.rs 82c7c74ed81ae4674c1ebd91eedc0ca01a2e4afcecae77e6eeef5dd524e10f20 (+4 -2, docs only)
+- tests/wire.rs 8c09389a28ddd7cff55e40930eaebe8dcabb45f262e59e725c79990a01f38e83 (+77 -5)
+- tests/common/mod.rs 254ffc7a9b5c8976f32cefdace5513118ab3f0855eda8faea3b6267763d61779 (+4 -2)
+Unchanged (= the builder's baseline): bits, lib, quant, snapshot, wrap, tests/bites, tests/catalogue, clippy.toml,
+Cargo.toml (21715f7b), check.mjs (7eddc285), check.test.mjs (da63983f).
+
+Each fix, its test, failing on the builder's code then passing (logs in the scratchpad's u4a-fix/):
+1. Snapshot send cap: msg::tests::a3_a_snapshot_is_taken_up_to_1_150_b_and_sent_up_to_1_000_b (1,001 B and 1,150 B
+   decode, 1,151 B TooLarge; 1,000 B encodes to 1,000 B; 1,001 B TooLarge with nothing appended). Before: FAILED at
+   the 1,001 B encode, left Ok(()), right Err(TooLarge) (step2-today.log; its receive half held). After: ok
+   (step3-fixed.log; both check.mjs runs). With it msg::tests::a3_a_full_state_is_sent_and_taken_up_to_65_536_b_after
+   _its_length (65,536 B after the length encodes and decodes, 65,537 TooLarge both ways): passed before and after
+   (no defect there; it pins the one other reachable limit). The other 13 types: read above (5a).
+2. One "no snapshot acknowledged": wire.rs a6_input_whole_and_repeats_at_their_maxima_eight_within_166_b_and_trailing
+   _bytes_refused, its last case ({0, 0} round-trips; ack_tick 5 with ack_groups 0 decodes as UnknownField; encode
+   refuses it NotCanonical). Before: FAILED, decoded Ok(Input { ack_tick: 5, ack_groups: 0, .. }) where
+   Err(UnknownField). After: ok. Plant PF2 (the encoder's refusal removed): FAILED, Ok(()) where Err(NotCanonical);
+   restored.
+3. No secrets in Debug: wire.rs debug_output_shows_a_secrets_length_never_its_bytes (Join, Message::Join, the 4
+   SessionControl variants and each as Message::SessionControl: none shows the token's, bind's or capability's byte in
+   decimal or hex, each shows "16 B"). Before: FAILED, `Join { token: [167, 167, ...], bind: [179, ...] ..}`. After: ok.
+4. Never-0 guard: hash::tests::a8_the_finishing_step_turns_0_into_1_and_keeps_every_other_value (finish(0) = 1; 1, 2,
+   the FNV offset and u64::MAX kept). The guard was in the builder's code, so the test passes there; plant PF4
+   (finish returns h): FAILED left 0, right 1, while wire's a8 still passed (the gap F-A6/T-A7 named); restored.
+5. Nit F-A8: input.rs's `let _ = i;` gone (`for _ in 0..count`); no test (a nit).
+6. N2: the text above.
+Check: check.mjs twice, all 10 steps, measured 300, bites 325, self 52 (5b); fmt --all --check exit 0. DONE.

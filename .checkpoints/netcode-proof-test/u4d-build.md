@@ -131,3 +131,46 @@ Scratch plants (Edit, restore, sha256): D-4's 0.0/0.0, plus a few test-guard pla
   scene 4d8a04b5, seam a176cd0d, ticks 5d852f1a (unchanged), trajectory 2c0968b3, world 57b0cf9c; tests replay
   a547314c, seam d91b8c0c, world 41ffc20f. Nothing committed.
 DONE (2026-11-10 06:52 UTC).
+
+## Fix pass, round 1
+Fixer: workflow agent (opus), same worktree, base 097f897, started 2026-11-10 15:55 UTC. Builds to the advisor's
+W1-U4D (advisor-u4-wave1.md:113-304) and W1-S1's npt-sim half (:45-112), read whole. Round 1's notes read:
+u4d-review-{netcode,rust,arch,test}.md. Files: crates/sim (src, tests) only; commit nothing; Write/Edit only; plants
+by Edit, restored, sha256-checked. Reference sha256 at start = the builder's final list (checked 15:50).
+
+### Plan
+1. Lows first (they touch few lines): T-M2 (history.rs cap 10^6 B: 220 ticks, 7,333 ms; carry 14's edge and the
+   replayer's span refusal move); rust N4 (record() debug-asserts each integer in its field's range); rust L1 (decode
+   caps its pre-allocation by the bytes present); rust L2 (Replayer fails a non-canonical tick); test L1 (D-4's finite
+   check reads the pre-snap values too); W1-PUB nit (Recording at npt_sim::replay::Recording only).
+2. W1-S1 + N-M3: `EntityKind::OwnState` appended last (8 kinds): velocity x, y, z (VELOCITY; raw pre-snap, grid of
+   it), ammunition, the fire timer (`wait`), the reload left, move speed, fire interval, each `Field::integer` with a
+   range the World cannot leave (attribute values brought into stated bounds on entry, so `wait` fits i32; asserted).
+   SOLDIER: position x, y, z, yaw, pitch, flags, health, weapon id (the list the ruling and catalogue :137 give: 8
+   fields; the ruling's "(9 fields)" counts 8 names: reported). FLAG_FIRED dropped (flag bits renumbered dense).
+   predict refreshes both records of its slot. FIELDS stays 12.
+3. H1 + A-M1 + R-M1: a part's record holds its transform relative to its hull (offset x, y, z, yaw; health; parent),
+   offsets on the cm grid, asserted in range. One function composes hull ∘ part (grid integers); one public function
+   builds `HitVolumes` from records into existing storage (`World::hit_volumes_from`); phase 3 and phase 8 call it on
+   the authority's own records; `load_movers` keeps the last hull and part integers per entity (sized at `new`, never
+   grown: an unknown index is skipped) and composes its collision boxes with the same function.
+4. N-M5: an effect row records the tick it ends; the per-tick expiry check stays.
+5. N-M4: the 4 very large units loop inside the fight (radii 4, 7, 10, 13 m round the cluster's centre: parts within
+   16.7 m); the other 11 loop 52-82 m out; stand-in projectiles start within ±12 m, horizontal speed ±3 m/s.
+   N-M1: SS's magazine 32,000 (covers 35 min at 14.58 shots/s: 30,625), a const assert, and ES's at its own rate.
+   TUNE-1: `Scene::weapon()` and `Scene::health()` for the run header.
+6. T-M1: ES meets PM-0001-2's four ES bands (72 shots/s, 10 gameplay events/s, 32 live projectiles, 21.12 spawns/s);
+   accepted throws count toward both projectile bands, the stand-in spawner fills the rest; measured first.
+7. N-M2's code half: `InputReports::refusals`, records `{ slot, seq, kind }`, cleared each step; D-10 asserts them.
+8. T-M3: a unit test in world.rs's own module pins `blend`'s boxes against a reference for fractions 0, 1, 127, 128,
+   255 (E6's / 255 must fail it).
+9. TUNE-2: the z bound measured, stated in World's doc and D-8; an in-module test that no scene's spawn points,
+   plates or greybox surfaces come near it.
+10. Tests: s6 and carry 12's pins; D-3 compares the own-state record and gains a catch-up tick; carry 9 per field over
+    both records; the hull test (parts' records unchanged while the hull moves and turns); probe K's count as a test
+    (part records changed ≤ parts whose health changed); A-M1's volumes test; R-M1's test (probe C's case); D-6
+    re-measured; ES's band test; D-7 re-pinned.
+11. Plants (Edit, run alone, restore, sha256) for each new or changed test; then fmt, clippy, rustdoc, check.mjs twice.
+
+### Progress
+- F0 plan written (15:57 UTC). df 12 GB free; no other cargo/rustc running at 15:50.

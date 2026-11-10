@@ -159,3 +159,99 @@ check.mjs); Write/Edit only; commit nothing. No judged L1 run (L-c8's judged re-
   `rtt_ns` stays `None` until a sample (quinn's `rtt()` would report 333 ms then). Not mine to decide: flagged.
   Final hashes: tests.rs c21a362f, lib.rs 1647e75d, tests/l1.rs 639ab9c5.
 - DONE 06:46Z.
+
+## Fix pass, round 1
+
+Fixer: a workflow agent, same copy, base 097f897, after round 1's notes (main folder .checkpoints/netcode-proof-test:
+u4c-review-netcode.md, u4c-review-rust.md, u4c-review-test.md). Files: crates/l1 only (src/lib.rs, src/tests.rs,
+tests/l1.rs). Rules as §7.1 above, plus: wait for no other cargo/rustc before each counted run, touch every file under
+crates/ before and every 2 s during it; plants in place one at a time, restored, sha256-checked; commit nothing.
+Start hashes: lib.rs 1647e75d, src/tests.rs c21a362f, tests/l1.rs 639ab9c5 (= the build's).
+
+### Plan
+1. Read lib.rs and src/tests.rs whole (event queue, next_event_ns, loss detection, the L-c tests, `fails()`).
+2. M1: a test that drives the net only by `next_event_ns` (and the script's real send instants), fails if it returns
+   None while an event is pending or names a later instant than one that changes state; covering arrivals, acks,
+   loss/PTO timers and the reorder step's held hand-outs (gate + 1). Plants: next_event_ns -> None; blind to timers;
+   blind to held hand-outs: each must fail it.
+3. M2: pieces sent 1 ms apart over a fixed delay (no jitter, no loss but a forced loss of the first); the first must be
+   declared lost by count exactly at the ack of the third later packet (not at the second's, and before the time
+   threshold). Plants: PACKET_THRESHOLD 1,000,000 and 2: each must fail it.
+4. Lows: L1 latest-RTT term (RTT step-up case; plant srtt-only); L2 no ack Lost outside a burst in a lossy run's v2
+   log (plant acks lost at the profile's rate); L3 L-c6 sends link 3 first (plant link-first order); L4 tests/l1.rs
+   burst comment: assert or reword (plant no-packet-threshold); N1 `fails()` takes the expected L-c number.
+5. Other Mediums in crates/l1 (netcode F1, F2; rust M = M1): F1 needs a ruling (no handshake, plan T12), F2 is in
+   crates/lab: list both for the main session; a doc line for F1's "left out" gap if it is a fact, not a ruling.
+6. End: clippy (host, wasm32, both builds), fmt --check, check.mjs twice in a row (10 of 10; counts as deltas on
+   285 / 312), sha256 of each changed file, evidence per fix in this section.
+
+### Progress
+- 15:47Z Start: hashes = the build's (1647e75d, c21a362f, 639ab9c5); df 12 GB free; no cargo/rustc running.
+- 15:55Z Item 1 (read) done. Design: Rig records each hand-out's call instant (`at`); `drive()` = an event-driven
+  host (calls only at next_event_ns and the script's own send instants; sends, then polls); `woken()` = every
+  hand-out in its due instant and every internal event instant (log arrivals, PTOs, losses declared) a call instant.
+  L-c5's event mode moves to `drive()` with the script's real send instants (its doc already claimed that); new test
+  `a_host_called_only_at_next_event_ns_and_its_sends_misses_nothing` (quiet PTO, loss timer, P0 gate + 1, held and
+  overtaken datagrams; completeness before a late poll). M2: `the_packet_threshold_...` (5 one-piece messages 1 ms
+  apart, 100 ms fixed RTT). L1: time-threshold trials on a jittered link (10 per seed, step-ups required). L2 in
+  tests/l1.rs on `mixed(B1)`'s canonical log. L3: lc6 sends link 3 first. L4: the burst comment reworded, and its
+  "the PTO never fires" asserted (no stream resend sent in [2.2 s, 3 s)). N1: fails(r, "L-cN", words of the check).
+  F1: a doc line in "What L1 leaves out" (no handshake), its ruling for the main session; F2: crates/lab, not mine.
+- 16:02Z Code written (tests.rs: Rig.at, drive, woken, Lc5 struct, L-c5's event mode, host_at_next_event,
+  packet_threshold, time_threshold, lc6 link order; tests/l1.rs: the burst comment + its assertion,
+  acknowledgements_are_lost_only_inside_bursts; lib.rs: the handshake line). Build 1 (run.sh; this copy's npt-l1
+  compiled; no foreign cargo): measured lib 16 of 16, tests/l1.rs 16 of 16. `cargo fmt -p npt-l1` applied.
+- 16:06Z N1 done. Plant (tests.rs, bite_no_pto_doubling_fails_lc3 given acks-in-bursts, which trips L-c3's other check)
+  with the OLD fails(): bites lib 26 of 26 PASS, the planted test "ok" on "L-c3: link 0: no probe timeout fired"
+  (the gap: n1-before.log). New fails(r, "L-cN", words of the check) for all 8 bite tests; same plant: FAILED by name,
+  "failed on another check than L-c3's \"doubles at each expiry\": L-c3: link 0: no probe timeout fired"
+  (n1-after-plant.log). Restored (grep: 2 no-pto-doubling ids, as before): bites lib 26 of 26 (n1-after-clean.log);
+  each bite still fails its own check (L-c5 "the fate logs differ", L-c6 "did not resend message 0 in its instant",
+  the other six as the build's). Time-threshold trials: steps up 5, 6, 1 on seeds 1-3 (deterministic).
+  Hashes now, the plants' base: lib.rs d6e6e130, tests.rs ef2ecfd5, tests/l1.rs 9c23f9cc.
+- 16:10Z M1 done: six plants in lib.rs `Net::next_event`, one at a time, measured build, all npt-l1 tests (run.sh: this
+  copy's npt-l1 compiled each time, no foreign cargo/rustc), restored with Edit, sha256 d6e6e130 checked after each:
+  - none (always None): new test FAILED "next_event_ns: link 0, end 1: 31 of 33 items handed out when the host stopped
+    at 3001.000 ms (next_event_ns said nothing was left)"; L-c5 FAILED "L-c5: link 0: an item that arrived at
+    51.757190 ms was handed out at 67.000000 ms, not in its instant, 51.757190 ms"; also tests/l1.rs
+    next_event_ns_names_... ("the datagram's arrival"). [m1-none.log]
+  - no timers (loss and PTO timers ignored): new test FAILED "... 32 of 33 items handed out when the host stopped at
+    3101.000 ms ..." (the loss-timer message); L-c5 FAILED "L-c5: the host was never called at 23 instants with an
+    internal event, the first 112.781568 ms"; tests/l1.rs 16 of 16 pass (round 1's gap). [m1-no-timers.log]
+  - no ready (hand-out instants ignored): new test FAILED "next_event_ns: link 1: an item that arrived at 20.000000 ms
+    was handed out at 30.000000 ms, not in its instant, 20.000001 ms"; L-c5 passes (no same-instant arrivals in its
+    script: expected). [m1-no-ready.log]
+  - skips (max for min of event and hand-out): new test FAILED, the same message as no-ready. [m1-skips.log]
+  - no acks (acknowledgement arrivals ignored): new test FAILED "next_event_ns: the host was never called at 37
+    instants with an internal event, the first 101.000000 ms"; L-c5 FAILED "... never called at 876 instants ..., the
+    first 102.651679 ms"; tests/l1.rs next_event_ns_names_... ("its acknowledgement's arrival"). [m1-no-acks.log]
+  - no held (the reorder step's HeldDue ignored): new test FAILED "next_event_ns: link 2: an item that arrived at
+    80.000000 ms was handed out at 84.333333 ms, not in its instant, 80.000000 ms"; L-c5 passes. [m1-no-held.log]
+  Clean (build 1, 16:02Z): both pass.
+- 16:11Z M2 done (lib.rs PACKET_THRESHOLD, restored, d6e6e130 checked after each): 1,000,000: new test FAILED
+  "packet threshold: losses declared at [1112.5] ms (by count [false]), not the first message's alone, by count, at
+  the third later packet's acknowledgement, 1,103 ms" [m2-threshold-1m.log]; 2: FAILED "... declared at [1102.0] ms
+  (by count [true]) ..." [m2-threshold-2.log]. All other npt-l1 tests pass under both (round 1's gap). Clean: passes.
+- 16:12Z L1 done (lib.rs Rtt::loss_delay_ns from the smoothed RTT only): new test FAILED "time threshold: trial 1:
+  declared lost Some(110.514853) ms after its send, not 9/8 x max(98.235, 100.619) = 113.196 ms" [l1-srtt-only.log];
+  restored d6e6e130; clean passes (steps up 5, 6, 1 on seeds 1-3).
+- 16:12Z L2 done (lib.rs send_ack: acknowledgements also lost at the profile's rate, as kind 2): new test FAILED "361
+  acknowledgements with the wrong fate, the first (kind, sent ns) Some((2, 69879691))"; every other npt-l1 test passes
+  under it [l2-acks-at-rate.log]; restored d6e6e130; clean passes.
+- 16:14Z L3: FIRST TRY WRONG, found by its plant. Sending link 3 first on P0 changed nothing: on P0 the second send's
+  own call applies the first link's arrival before it sends, so the order follows the sends and the rank is never
+  consulted (the link-first plant passed every test, the new check included) [l3-link-first.log]. Fixed: links 2 and 3
+  get a fixed 100 ms round trip (`fixed(0)`), both datagrams sent at 20 ms (link 3 first) arrive at 70 ms and one call
+  applies both; the check reads the acknowledgements sent at 70 ms. Plant (Event::rank as (time, link, order, key,
+  ...)): lc6 FAILED "L-c6: the two arrivals at 70 ms were not acknowledged in fate-log order, link 3's first (links 2
+  and 3 at Some(6), Some(7))" [l3-link-first-2.log]; restored d6e6e130; clean passes.
+- 16:16Z L4 done (tests/l1.rs comment reworded: "by the loss rules (the unit tests pin the packet and the time
+  threshold)", no claim left on the packet threshold alone; its PTO claim asserted: no stream packet resent in
+  [2.2 s, 3 s)). Plant (lib.rs set_timer: the PTO from the oldest unacknowledged stream packet, not the last
+  ack-eliciting send; round 1 saw it caught by L-c1 alone): streams_lose_nothing_... FAILED "2 stream packets resent
+  inside the burst after 2.2 s, the first at 2415856348 ns: a PTO fired" (and L-c1) [l4-pto-oldest.log]; restored
+  d6e6e130; clean passes.
+- 16:17Z Clean, bites build (after `cargo fmt -p npt-l1`): lib 26 of 26, tests/l1.rs 21 of 21 [clean2-bites.log];
+  sends-before-events still fails L-c6 on "did not resend message 0 in its instant". Hashes: lib.rs d6e6e130,
+  tests.rs 50cfbcdc, tests/l1.rs 9c23f9cc. tests.rs's only change since the M1, M2, L1 and N1 plant runs (on ef2ecfd5)
+  is lc6's (the L3 fix), which none of those runs' failing tests use. Next: fmt --check, check.mjs twice.
