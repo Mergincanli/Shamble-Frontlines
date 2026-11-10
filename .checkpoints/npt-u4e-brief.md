@@ -25,9 +25,17 @@
 ## Key numbers
 - none
 
+## Notes for the night report
+- This run started at 06:04 Amsterdam (05:04 UTC); issue #16 has no comment from an earlier run tonight. The schedule
+  in STATUS ("Routines", line 785) is hourly from 00:10. The nights of 2026-11-08 and 11-09 also posted first at
+  05:04 UTC. With the 06:45 no-new-item rule, only item 2 fits tonight; items 3-5 stay unchecked.
+
 ## Decisions taken
 - Items worked one at a time, top to bottom, in the main folder (the guard refuses `git -C` and `cd`, and the main
   folder may only `git switch -c <new> origin/main`) · night shift · 2026-11-10 06:06
 
 ## Running work
-- none yet
+- netcode-architect (xhigh) drafting · notes `.checkpoints/npt-u4e-brief/netcode-architect-u4e.md` · launched 06:07 ·
+  running (asked for a complete draft by 06:40)
+- saver: background task bmd9klxvv · its output file in the session's tasks folder · started 06:06 · stops by 07:56
+  (110 minutes on) · last check 06:10: ok (watching)
