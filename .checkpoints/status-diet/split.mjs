@@ -40,6 +40,26 @@ export const MANUAL = {
        '(a3f0471, team-prep-fixes\' docs pass), before the advisor agent existed (kit-v2-0, 2026-10-17), so the ' +
        'approval came through his chat (his own or the Advisor\'s relayed); not verified further',
 };
+// Who took each code the index lists (from the text at each place and the reports it cites; checked by the session).
+export const WHO = {
+  'A4-FREEZE (a)': 'Mustafa, 2026-11-05 (his words: docs/reports/2026-11-05-kit-v3-3.md, appendix A)',
+  'AF-AGENT (b)': 'the advisor agent (A3)', 'AF-MECH (b)': 'the advisor agent (A3)', 'F1-FIT (b)': 'the advisor agent (A3)',
+  'NODE-ALLOW (a)': 'the advisor agent (A3)', 'QUEUE-HOME (a)': 'the advisor agent (A3)', 'READ-SCOPE (b)': 'the advisor agent (A3)',
+  'SECRET-DECODE (A)': 'the advisor agent (A3)', 'WT-DAY (ii)': 'the advisor agent (A3)', 'WT-UPDATE (a)': 'the advisor agent (A3)',
+  'ASSET-RESEARCH (a)': 'the advisor agent (2026-10-31)',
+  'DOCS-RIDE (a)': "the advisor agent (kit-v3-4's plan review)", 'SCALE-HOME (a)': "the advisor agent (kit-v3-4's plan review)",
+  'T0-MERGE (a)': "the advisor agent (kit-v3-4's plan review)", 'P-TAG (a)': "the advisor agent (B.1's plan review)",
+  'GUARD-FILE (a)': 'Mustafa, 2026-11-03 (docs/reports/2026-10-27-kit-v3-1.md)',
+  'LOOK (a)': 'Mustafa, 2026-11-07 (word for word in the archive\'s "Follow-ups", "From vfx-xp-notes")',
+  'XP-TERM (a)': 'Mustafa, 2026-11-07 (word for word in the archive\'s "Follow-ups", "From vfx-xp-notes")',
+  'PX1-ROUTE (a)': 'Mustafa, 2026-11-10 (word for word in the archive\'s "Follow-ups", PX-1, and docs/reports/2026-11-10-kit-v3-5.md, Appendix A)',
+  'REVERT-EXCEPTION (a)': 'Mustafa, 2026-11-08 (his words: docs/reports/2026-11-08-kit-v3-4.md, Appendix B)',
+  'TIER0-SCOPE (a)': 'Mustafa, 2026-11-08 (his words: docs/reports/2026-11-08-kit-v3-4.md, Appendix B)',
+  'UNDER-WAY (a)': "Mustafa, 2026-11-06 (his words stand on PR #40's branch, not yet on main)",
+  'VFX-ORDER (a)': 'Mustafa, 2026-11-06 (docs/reports/2026-11-06-b2-community-servers.md, Decisions needed)',
+  'MODES-3 (b)': 'an option named, not taken (his answer, MODES-3 (a), is above)',
+  'WT-NIGHT (b)': 'an option named, not taken (his answer, WT-NIGHT (a), is above)',
+};
 
 // Expand one template: returns [{text, old}] where old is the old line number or null for new text.
 export function expand(f, lines, index) {
@@ -66,7 +86,10 @@ const sectionOf = (rows, k) => { for (let i = k; i >= 0; i--) if (/^## /.test(ro
 export function build(lines) {
   const pass1 = Object.fromEntries(FILES.map(f => [f, expand(f, lines, [])]));
   const inDec = new Set();
-  for (const r of pass1['DECISIONS.md']) if (r.old) for (const m of r.text.matchAll(RA)) inDec.add(m[0]);
+  for (const r of pass1['DECISIONS.md']) if (r.old) {
+    for (const m of r.text.matchAll(RA)) inDec.add(m[0]);
+    for (const m of r.text.matchAll(/\b([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*): \(([a-eA-E]|i{1,3}|iv)\)/g)) inDec.add(`${m[1]} (${m[2]})`);
+  }
   const codes = new Map(); // code -> Set of "file, section"
   const dated = new Map(); // "file, section" -> [old line numbers]
   for (const f of ['STATUS_ARCHIVE.md', 'STATUS.md']) {
@@ -75,14 +98,17 @@ export function build(lines) {
       const where = `${f}, "${sectionOf(pass1[f], k)}"`;
       for (const m of r.text.matchAll(RA)) if (!inDec.has(m[0])) {
         if (!codes.has(m[0])) codes.set(m[0], new Map());
-        const w = codes.get(m[0]); if (!w.has(where)) w.set(where, []); w.get(where).push(r.old);
+        const w = codes.get(m[0]); if (!w.has(where)) w.set(where, []); if (!w.get(where).includes(r.old)) w.get(where).push(r.old);
       }
       if (RM.test(r.text) || MANUAL[r.old]) { if (!dated.has(where)) dated.set(where, []); dated.get(where).push(r.old); }
     });
   }
-  const index = ['- **Answered codes that stand only outside this file** (each with where it stands and its old lines):'];
-  for (const [c, w] of [...codes].sort((x, y) => x[0].localeCompare(y[0])))
-    index.push(`  - ${c}: ${[...w].map(([k, v]) => `${k}, old ${v.join(', ')}`).join('; ')}`);
+  const index = ['- **Codes with an option letter that stand only outside this file**, each with who took it (the text at each',
+    '  place says more) and where it stands, with its old lines:'];
+  for (const [c, w] of [...codes].sort((x, y) => x[0].localeCompare(y[0]))) {
+    if (!WHO[c]) throw new Error(`no WHO entry for ${c}`);
+    index.push(`  - ${c}, ${WHO[c]}: ${[...w].map(([k, v]) => `${k}, old ${v.join(', ')}`).join('; ')}`);
+  }
   index.push('- **Lines that name Mustafa with a date, or record a go, check or approval of his** (by section; old lines):');
   for (const [k, v] of dated) index.push(`  - ${k}: ${v.join(', ')}`);
   for (const [n, note] of Object.entries(MANUAL)) index.push(`  - old line ${n}: ${note}`);

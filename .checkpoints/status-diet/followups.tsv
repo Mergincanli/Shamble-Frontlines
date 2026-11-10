@@ -1,0 +1,66 @@
+# old line	state	key that STATUS's "Follow-ups" section must name (open entries only); groups and closed ones say why
+423	closed	TOY-BOX: done with kit-v3-2
+424	closed	A3's own items: done with kit-v3-3
+428	open	LATER's design session
+430	open	the B3 report's
+435	open	R-1, R-2
+439	open	F-1
+444	open	"B3" means three things
+448	open	local smoke's Chromium build
+451	open	routine proofs to record
+454	open	CHECKPOINTS.md §7's cap line
+457	open	E9's untested cases
+459	open	the toy-box tone
+461	open	A3's plan readers
+468	open	A3's cuts
+472	group	From A3's fix-round ruling
+475	closed	SA-3: done in A3's fix pass 4
+479	open	L12
+480	open	L14
+482	open	L9 / SA-9
+483	open	L13
+484	open	L1's runners
+487	group	From A3's fix-pass-2 ruling
+488	open	A-4
+490	group	From A3's pass-3 ruling
+492	open	FU-P3a
+495	group	From A3's pass-4 ruling
+498	open	FU-P4a
+503	open	FU-P4b
+510	open	FU-P4c
+516	group	From the verifier's check of A3's fix pass 4
+518	open	FU-P4d
+523	group	From B.1
+526	open	"1 unit = 1 metre"
+532	open	editing while the match runs
+539	group	From B.1's review round
+542	open	B1-MODES
+546	open	B1-LEAP
+549	open	the objectives list
+552	open	the fairness panel's pass rule
+555	open	heatmaps and sightlines
+558	open	quality bars
+560	group	From B.2
+562	open	OQ-0006-21's pointer
+569	open	VISION_V2's line ranges in ADR 0005
+575	open	rented servers
+584	open	"the war around the matches"
+586	open	the stale citations left unedited
+589	group	From vfx-xp-notes
+591	closed	XP-TERM: answered 2026-11-07 (his words in it; index in DECISIONS.md)
+607	open	the VFX style guide
+617	closed	the need rule: a record, nothing to do
+621	open	the VFX tool's design session
+629	open	the stale citations left unedited
+632	group	From kit-v3-4
+634	closed	F1: carried out by kit-v3-5
+639	open	F2
+645	closed	F3: fixed by kit-v3-5's docs pass
+648	closed	F4: carried out by kit-v3-5
+653	open	F5
+659	group	From kit-v3-5
+661	open	PX-1
+669	open	its two test gaps
+673	open	the kit-v3-1 Windows test
+862	open	KIT-ALIGN
+873	open	DOCS-ALIGN
