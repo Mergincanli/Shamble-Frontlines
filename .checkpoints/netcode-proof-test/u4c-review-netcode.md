@@ -32,3 +32,40 @@ order, L-c8 judged re-run needs after U4j.
   - O6 Event rank (time, key, order, link, dir, space, tie) unique (:505-509); apply at e.at_ns (:949-954). OK.
   - O7 rtt_ns/state read without advancing (:1737-1747): stale between calls; doc says "every call that takes now".
     Candidate NIT (doc).
+- Source S-RFC9002 (www.rfc-editor.org/rfc/rfc9002.html, fetched 2026-11-10, chars 0-100,000 of 105,234): §6.2.2
+  "When no previous RTT is available, the initial RTT SHOULD be set to 333 milliseconds", and that this yields a 1 s
+  initial *handshake* PTO (TCP's RFC 6298 §2 RTO); §6.2.1: max_ack_delay is 0 in the Initial and Handshake spaces;
+  "An endpoint MUST NOT set its PTO timer for the Application Data packet number space until the handshake is
+  confirmed"; A.8 "Skip Application Data until handshake confirmed", "duration += max_ack_delay * (2 ^ pto_count)";
+  A.7 RTT update iff newly_acked.largest().pn == ack.largest_acked && IncludesAckEliciting; pto_count = 0 near the
+  end of OnAckReceived (after the newly-acked early return), if PeerCompletedAddressValidation. Sure: high (spec).
+- O7 dropped: npt-link's trait doc (link/src/lib.rs:79-80) already says rtt_ns is "as of the last call that took
+  now_ns".
+- O3 confirmed by S-RFC9002: 333 ms is the handshake's starting state; an Application Data PTO is never armed before
+  the handshake is confirmed, so quinn's first 1-RTT stream message always has handshake samples (plus the extended
+  CONNECT exchange). Plan's Join rule: catalogue :93 "within 2 s of its ... QUIC handshake's first packet"; L1: Join
+  lost twice -> resent at 1,024 then 3,072 ms > 2 s (P3: 0.25 %/join; -19's ~100 joins -> ~22 % of P3 runs); quinn
+  ~0.2-0.5 s. -> MEDIUM F1.
+- O2 confirmed by A.7: RFC samples when ack.largest is newly acked, whichever packet sent the ack. L1 needs the ack to be
+  the largest's own. Frequency at 30 Hz small (needs a forward-reordered packet's ack to overtake the newest's):
+  ~1 % of samples at P4 by my arithmetic; L-c7's oracle (tests.rs:1120-1129) pins the stricter rule. -> LOW F3.
+- tests.rs read (1,331 lines); tests/l1.rs diff read; scratch lc8 harness read (replicates probe.rs send loop only).
+- probe.rs:210-241: the probe records only SHA-256 of the WHOLE canonical log (now v2). No code path writes
+  SHA-256(v1 tag + datagram entries) from an npt-lab run; crates/lab is outside U4c's lane. -> F2 (L-c8 needs).
+- Step 4-5 done. Checked OK (no finding): PTO doubling of the whole PTO incl. max_ack_delay (lib.rs:903-909, A.8);
+  pto_count reset only on newly acked (:1515-1517, A.7); sample before detect_lost (:1512-1531, A.7 order); loss
+  timer precedence over PTO (:1590-1596, A.8); probe takes the oldest unacked retransmittable piece and strips its
+  retransmits (:1642-1660, quinn maybe_queue_probe); detect_lost break equivalence (:1552-1560); datagram path and
+  reorder step equal to U2's (diff; HeldDue event :1152-1163 vs old poll-time release); flow keys unchanged
+  (:865-867); event ranks unique, applied at e.at_ns (:505-509, :949-954); bites reachable only via with_bite's 4 ids
+  or the test-only with_model_bite (:741-763, :1824-1845). L-c1..L-c7, L-c9 oracles read (tests.rs:369-1252).
+- Marks: -3's five L1 parts select layer+profile only (no scene), so U4j's pre:PM-0001-2 selects do not touch them.
+  -19 is L2 only; L1 joins happen at every L1 run's start (48 clients): -17 P3/P4, -20 P3 -> F1's reach.
+- Extra: lib.rs:13 "traffic on one link or flow never moves another's fates" now false for stream and ack flows
+  (resend counts follow datagram acks; ack index = arrivals in its direction). -> LOW F4. Plan :750 / advisor-u4.md:105
+  "L1 starts at 333 ms" vs rtt_ns None (lib.rs:61, :1745-1747): builder's flag right -> LOW F5. 1,200 B is payload in
+  L1, UDP payload in RFC 9000 §14 -> NIT F6. v2 log ~2x entries (P2 3,959,634) ~80 B each in memory -> NIT F7.
+- Step 6 (L-c8 after U4j) drafted in the report: source for the datagram hash (F2), C4 provenance, 35-run set
+  (nit 13(a)), per-check bite outcomes (advisor-u2.md:20-22), exact figure diff vs results/c-u2-pm-0001-3/81c6d01e371b.
+- Verdict: APPROVE WITH FINDINGS (F1 M, F2 M, F3-F5 L, F6-F7 nit).
+DONE

@@ -55,3 +55,28 @@ Started 2026-11-10. Read only: no edit, build or run in either worktree.
 - U4b-L2 (Low): R2's jitter log must take "scheduled start" from an independent reference (loop start +
   ⌊(k_run + dropped_ticks)·1e9/hz⌋), never next_due_ns(): under timer-period next_due_ns() tracks the drift, so the
   jitter and "no ticks owed" checks would pass and only the 1 s stall's counter check would catch it. U6/R2 brief.
+- U4a tests read: bites.rs (7 ids; -57 x3 through encode/decode; tick16 65,537 -> 1, hashes apart; no-trailing;
+  no-channel), wire.rs a1 mapping (every kind, None/same/other-generation baselines, area/raw never sent), a3.
+  Panic paths checked by reading: frame 2/4 index after get(frame); groups=0 caught before `groups - 1`
+  (snapshot.rs:460 before :476); Field::integer asserts min<max so bits>=1 (grid.rs:60); RoomControl len-2 after u16.
+- U4a-N6 (Low): input.rs:198-200 ack_groups 0 with ack_tick != 0 decodes (two encodings of one Input), unlike
+  Snapshot's known() rule (snapshot.rs:501-509). Refuse as UnknownField. Follow-up.
+- U4a-N7 (Low, design): one (tick, mask) ack per Input, of the newest tick decoded (input.rs:41-44): under reorder a
+  tick the client holds complete may never be acked complete; B falls back older (correct, larger). U4e's client
+  should ack the newest COMPLETE tick when the newest is partial, or U4r logs how often. Follow-up.
+- U4a-N8 (Low, before merge by plan text): the catalogue edits are "in U4a's change-set" (§5 U4a: item 3's note) and
+  rules/netcode.md: the builder lists them for the main session (u4a-build.md last bullet); add the header's
+  sequences (N2), the event wire form and the send cap (N1).
+- S1 view: cheapest correct fix = an owner-only record kind in npt-sim (velocity + ammo, fire timer, reload,
+  active reload; ≤ 12), velocity out of SOLDIER (ADR 0001 part 6's remote row has none); U4a: the kind joins the two
+  "own state" rows (2 lines; KIND_BITS stays 3 with 8 kinds; hash and generators follow ALL) + a test that owner-only
+  kinds sit only in Owner groups and the remote soldier's width equals the catalogue row's. Not a per-(group,kind)
+  field mask: a second home of layout positions (carry 1), group-dependent masks and hash, and it cannot fit (pos 3
+  + yaw + pitch + vel 3 + flags + health + weapon + ammo/fire/reload/active = 15 > FIELDS 12). When: the main
+  session's commit right after U4d merges (condition 3 freezes EntityKind and SOLDIER in wave 1), before U4e builds
+  (its brief rev 2 at 0dccbf0 must carry it) and before U4g; tell U4d's lane now to keep weapon state out of SOLDIER.
+  Not a U4a merge blocker.
+- Verdicts: U4a APPROVE WITH FINDINGS (before merge: N1 fix + test; N2 and N8 text). U4b APPROVE WITH FINDINGS
+  (L1, L2 follow-ups for U6/R2).
+- Correction: N2's plan cite is u4-build-plan.md:273-274 (§4.4; plan sha256 0d69332c, as the builder's), and
+  §4.14's row :454. Review done; returned to the workflow.
