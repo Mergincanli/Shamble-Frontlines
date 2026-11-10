@@ -1,9 +1,31 @@
-# Plan: the foundation, steps 2.1 and 2.2 (revision 0, draft; the inventory sections are being filled)
+# Plan: the foundation, steps 2.1 and 2.2 (revision 1)
 
-Status: draft, not yet reviewed by the advisor agent. This session plans only: no code, no file moves.
+Status: revision 1, for the advisor agent's plan review. This session plans only: no code, no file moves.
 Source: Mustafa's decision of 2026-11-10 and his task list, word for word in `mustafa-2026-11-10.md` (this folder).
 Base: main 44446a5. Branch of this plan: `claude/advisor-fable-4hxq72` (Mustafa's personal account; one account per
-branch). Everything below is from reading at 44446a5 (grep and read only); nothing was moved or run after a move.
+branch). Everything below is from reading at 44446a5 (grep and read only); nothing was moved or run after a move,
+except one control: R7's tuning builder rerun on its own dumps (E4).
+
+## In one screen
+- **2.1, the restructure:** the five legacy files move into `legacy/` with `git mv`, bytes unchanged. 63 files name
+  them (728 hits); after reading each, 2.1 edits 2 gate files (`tools/gate.mjs`, `tools/smoke.mjs`), 2 kit files
+  (`CLAUDE.md` 3 lines, `.claude/agents/verifier.md` 1 line), `tools/village.py`, `tools/README.md`, 7 tool header
+  comments, the root `README.md`, and 8 docs (REPO_MAP, START_HERE, MODULE_MAP, TECHNICAL, STATUS, ROADMAP, the
+  register and ADR 0002's OQ-0002-2 entry); everything else stays true as a name, a pinned citation or history. No
+  guard, settings, CI or `spikes/` file changes.
+- **OQ-0002-2** (this plan decides it, the ADR says): the legacy tools stay in `tools/`; the legacy docs stay in
+  `docs/`; the gate v2's path is left to 2.3. Each choice costs the fewest path changes.
+- **Proof that does not trust the edited gate:** same blobs before and after (E1); main's untouched gate passes on
+  the moved bytes (E2); the edited gate fails the same 26 mutations as main's (E3); the tuning oracle rebuilt byte for
+  byte (E4); a saves test (E5); Mustafa plays `legacy/index.html` in Brave.
+- **2.2, the toolchain:** pin now Rust 1.99.1 (the same as the netcode spike), the Cargo and npm workspaces, TypeScript
+  6.0.x, Node's major, the test and lint tool versions; empty stub crates and packages. The boundary spike's answers
+  (wasm-bindgen, one Wasm instance or two, isolation, generated types, build sizes) stay empty slots.
+- **2.3-2.6** wait for the netcode proof test (L1, the protocol messages), the sim core spike (replay and hash), the
+  boundary spike (types, the boundary layer, the Worker layout) and the preview hosting check; 2.3 also waits for #46.
+- **PR #46:** 2.1 shares only STATUS and ROADMAP with it, so it can build beside it, but merges after it.
+  **PR #40:** after 2.1 merges, it merges main, keeps both sides of REPO_MAP and STATUS, and changes nothing else.
+- **For Mustafa:** HC-PATH, SCOPE, MODEL-RULE (Part 5).
 
 ## Part 1. Step 2.1, the restructure, as its own change-set
 
@@ -155,36 +177,6 @@ either layout (0002:1358), so the path counts decide:
 - PM rows: of ADR 0001's 63, 0004's 75 and 0006's 32, none contains a legacy path, so PR #40's hashed rows stay
   byte-identical.
 
-### 1.7 Reviewers (the final diff; one round, one fix pass; 3 at a time)
-The advisor (plan, then every pushed head) and security-auditor (every risk-tier-2 change) always; test-engineer (is
-the move proven: E1-E6); infra-engineer (CI and the gate's behaviour on old bases); then the verifier until PASS.
-No art-director: nothing a player sees changes (bytes unchanged), and Mustafa's Brave check covers it.
-
-### 1.8 What Mustafa checks in Brave (ADR 0002's foundation checklist, step 1)
-1. Before (whatever E5 says, and before you take the merged main, whose root no longer has the game): back up your
-   saves. In Brave, open your current `index.html`, press F12, Console (type `allow pasting` if asked), paste the line
-   the session gives you (it copies every saved key as one text), paste that into a text file outside the repository;
-   do the same on your current `editor.html` (maps, prefabs, Character Lab). The editor's Export shows one map at a
-   time and has no import (`editor.html:1058`, `:1248` read-only), so the session also gives a restore line that puts
-   back only missing keys. Your old copy keeps its saves either way: nothing is deleted.
-2. Download the branch as a zip, unzip it to a new folder, double-click `legacy/index.html`. Expected: the menu opens;
-   Deploy starts a match; you can move, shoot and pause, as before.
-3. Double-click `legacy/editor.html`. Expected: the editor's menu opens; Map editor and Maps open, and your saved maps
-   are listed (or, if E5 said they do not carry over, the list is empty and nothing is lost: your old copy still has
-   them).
-4. Say "done" or "not yet" for each step.
-
-### 1.9 Risks
-- **A tool or command missed by the grep** → the dry run (step 1) and E6 run every changed command once; the critic's
-  sweep (`inv-critic.md`) looked for names built at run time, globs and relative paths.
-- **The gate reads the wrong copy** (a stray root copy beside `legacy/`) → the head reads `legacy/` only; optional:
-  the gate fails when a root copy of any of the five reappears (a proposal for the advisor, Q-A5's neighbour).
-- **Old bases break the gate** (a PR cut before the move, or 8e58937's CS-1 layout) → the base fallback chain and E3's
-  three bases.
-- **Saves seem lost in Brave** → E5 before the check; the old folder keeps its storage; nothing is deleted.
-- **Collisions** → Part 4: no file of PR #46's current list, no `spikes/` file, no PM row of ADR 0001, 0004 or 0006.
-- **The PR Advisor routine is paused** until #46 merges → 2.1 is `needs-mustafa` anyway and merges on his go.
-
 ### 1.5 Evidence (it must not lean on the edited gate)
 advisor.md:90-91 and :153-156: CI's green does not stand when a gate file changes; advisor.md:150-152: a day-session
 advisor reproduces with main's copy of a changed tool, and main's `gate.mjs` reads the five files at the root, so it
@@ -239,6 +231,36 @@ cannot read 2.1's head. So the proof comes in three independent parts, each a co
 6. **The docs** (docs-keeper): 1.3's docs list, REPO_MAP, STATUS, ROADMAP; the register's OQ-0002-2 row and ADR 0002's
    OQ-0002-2 entry ("answered by the restructure plan").
 7. **Reviews** on the final diff (1.7), one fix pass, the report, the checkpoint deleted in the last commit, PR ready.
+
+### 1.7 Reviewers (the final diff; one round, one fix pass; 3 at a time)
+The advisor (plan, then every pushed head) and security-auditor (every risk-tier-2 change) always; test-engineer (is
+the move proven: E1-E6); infra-engineer (CI and the gate's behaviour on old bases); then the verifier until PASS.
+No art-director: nothing a player sees changes (bytes unchanged), and Mustafa's Brave check covers it.
+
+### 1.8 What Mustafa checks in Brave (ADR 0002's foundation checklist, step 1)
+1. Before (whatever E5 says, and before you take the merged main, whose root no longer has the game): back up your
+   saves. In Brave, open your current `index.html`, press F12, Console (type `allow pasting` if asked), paste the line
+   the session gives you (it copies every saved key as one text), paste that into a text file outside the repository;
+   do the same on your current `editor.html` (maps, prefabs, Character Lab). The editor's Export shows one map at a
+   time and has no import (`editor.html:1058`, `:1248` read-only), so the session also gives a restore line that puts
+   back only missing keys. Your old copy keeps its saves either way: nothing is deleted.
+2. Download the branch as a zip, unzip it to a new folder, double-click `legacy/index.html`. Expected: the menu opens;
+   Deploy starts a match; you can move, shoot and pause, as before.
+3. Double-click `legacy/editor.html`. Expected: the editor's menu opens; Map editor and Maps open, and your saved maps
+   are listed (or, if E5 said they do not carry over, the list is empty and nothing is lost: your old copy still has
+   them).
+4. Say "done" or "not yet" for each step.
+
+### 1.9 Risks
+- **A tool or command missed by the grep** → the dry run (step 1) and E6 run every changed command once; the critic's
+  sweep (`inv-critic.md`) looked for names built at run time, globs and relative paths.
+- **The gate reads the wrong copy** (a stray root copy beside `legacy/`) → the head reads `legacy/` only; optional:
+  the gate fails when a root copy of any of the five reappears (a proposal for the advisor, Q-A5's neighbour).
+- **Old bases break the gate** (a PR cut before the move, or 8e58937's CS-1 layout) → the base fallback chain and E3's
+  three bases.
+- **Saves seem lost in Brave** → E5 before the check; the old folder keeps its storage; nothing is deleted.
+- **Collisions** → Part 4: no file of PR #46's current list, no `spikes/` file, no PM row of ADR 0001, 0004 or 0006.
+- **The PR Advisor routine is paused** until #46 merges → 2.1 is `needs-mustafa` anyway and merges on his go.
 
 ## Part 2. Step 2.2, the toolchain: a one-page sketch
 
