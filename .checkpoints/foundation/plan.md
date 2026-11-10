@@ -13,11 +13,13 @@ except one control: R7's tuning builder rerun on its own dumps (E4).
   comments, the root `README.md`, and 8 docs (REPO_MAP, START_HERE, MODULE_MAP, TECHNICAL, STATUS, ROADMAP, the
   register and ADR 0002's OQ-0002-2 entry); everything else stays true as a name, a pinned citation or history. No
   guard, settings, CI or `spikes/` file changes.
+- **Two pull requests:** 2.1a teaches the gate both layouts (nothing moves), 2.1b moves the files. One PR would make
+  its own revert fail CI (the rollback rule needs a pure revert with CI green).
 - **OQ-0002-2** (this plan decides it, the ADR says): the legacy tools stay in `tools/`; the legacy docs stay in
   `docs/`; the gate v2's path is left to 2.3. Each choice costs the fewest path changes.
 - **Proof that does not trust the edited gate:** same blobs before and after (E1); main's untouched gate passes on
   the moved bytes (E2); the edited gate fails the same 26 mutations as main's (E3); the tuning oracle rebuilt byte for
-  byte (E4); a saves test (E5); Mustafa plays `legacy/index.html` in Brave.
+  byte (E4); a saves test (E5); a rehearsed revert stays green (E8); Mustafa plays `legacy/index.html` in Brave.
 - **2.2, the toolchain:** pin now Rust 1.99.1 (the same as the netcode spike), the Cargo and npm workspaces, TypeScript
   6.0.x, Node's major, the test and lint tool versions; empty stub crates and packages. The boundary spike's answers
   (wasm-bindgen, one Wasm instance or two, isolation, generated types, build sizes) stay empty slots.
@@ -38,9 +40,17 @@ except one control: R7's tuning builder rerun on its own dumps (E4).
 - **Change type:** a move plus tool and docs edits; risk tier 2 (CLAUDE.md, `.claude/` files, gate files, and "a file
   renamed or moved from a path outside tier 0", advisor.md:63-64). Merge route: `needs-mustafa`, on his go in a day
   session, after the advisor's APPROVE of the final head, with his Brave check first (he plays the moved game).
-- **Branch:** a `cs/foundation-restructure` stand-in on this account (one account per branch), from main once PR #46
-  has merged, or from main now if 2.1 builds beside #46 (Part 4); the plan's slug for its checkpoint:
-  `foundation-restructure`.
+- **Two pull requests, one after the other** (Q-A6): a revert must be "the exact inverse of the merge" with "CI green
+  on its head" (advisor.md:285-290). If one PR held both the gate edit and the move, its revert would bring back
+  today's gate, whose base reader knows only the root and `shamble-frontlines-repo/` (gate.mjs:92-95), while CI's base
+  (`origin/main`, gate.yml:42-49) would hold the files in `legacy/`: the gate dies with exit 2, on the revert PR and on
+  main after it (the critic's F1). So:
+  - **2.1a, the tools learn both layouts** (gate files and `village.py` only; nothing moves): merged first. A revert of
+    it is plain (the files are still at the root).
+  - **2.1b, the move** (the five files, the kit lines, the commands in text, the docs): merged second. A revert of it
+    leaves 2.1a's gate, which reads a `legacy/` base and a root head, so CI stays green (rehearsed: E8).
+- **Branch:** a stand-in for `cs/foundation-restructure` on this account (one account per branch), each PR from main;
+  checkpoint slug `foundation-restructure` for both.
 
 ### 1.2 Every file that names a legacy path
 Method: `git grep -E 'shamble-(core|game|editor)\.js|shamble-\*\.js|shamble-\*|shamble-\{|index\.html|editor\.html'`
@@ -121,17 +131,23 @@ Total 603 docs hits, every one read in context by the docs agent (`inv-docs.md`)
 `legacy/`. Game symbols +0 −0 (the gate's check 3 lists a pure move as "moved").
 
 **Gate files (each edit asks Mustafa):**
-- `tools/gate.mjs`: add one top-level name, `const BUILD = join(ROOT, 'legacy')`. `headFile` reads `BUILD/<f>` and
-  dies with "`legacy/<f>` is missing"; `baseFile` tries `legacy/<f>`, then `<f>` (a base from before the move), then
+2.1a (the tools learn both layouts; nothing moves):
+- `tools/gate.mjs`: add one top-level name, `BUILD`: the folder that holds all five files, `legacy/` or the root; if
+  both hold them, or neither, the gate stops with exit 2 and says which (two copies must never be judged by guess).
+  `headFile` reads `BUILD/<f>`; `baseFile` tries `legacy/<f>`, then `<f>` (a base from before the move), then
   `shamble-frontlines-repo/<f>` (CS-1's era), `legacy/` first so a later root file of the same name is never read as
-  legacy; `classicParts` resolves `<script src>` against `BUILD` and reports a src "outside legacy/"; the smoke runs with
-  `root: BUILD`; the header comment names `legacy/`. Unchanged: `ROOT` (git and `TOOLS`), `FILES`, `OLD_PREFIX`,
-  `toBuild`, checks 5c and 5d (their names are relative to the page). Removed names: none. Option (Q-A5): one prefix
-  per base, chosen where all five files exist, printed on the base line (adds `BASE_PREFIXES` and `basePrefix`).
-- `tools/smoke.mjs`: add `const BUILD = join(ROOT, 'legacy')`; `runSmoke`'s default root is `BUILD` (its CLI follows);
-  `ROOT`, `ROOT_URL` and `rel` stay (messages then read `legacy/…`); the header's "outside the repo" → "outside
-  `legacy/`" (a page may read only files under its own folder: stricter, and the pages read no sibling file).
+  legacy; `classicParts` resolves `<script src>` against `BUILD` and keeps the containment check under it; the smoke
+  runs with `root: BUILD`; the base line and the header comment name the folder. Unchanged: `ROOT` (git and `TOOLS`),
+  `FILES`, `OLD_PREFIX`, `toBuild`, checks 5c and 5d (their names are relative to the page). Removed names: none.
+  Option (Q-A5): one prefix per base, chosen where all five files exist (adds `BASE_PREFIXES` and `basePrefix`).
+- `tools/smoke.mjs`: `runSmoke`'s default root is the same folder (`legacy/` when it holds both pages, else the root;
+  its CLI follows); `ROOT`, `ROOT_URL` and `rel` stay; the header's "outside the repo" → "outside the build folder"
+  (a page may read only files under its own folder: stricter under `legacy/`, and the pages read no sibling file).
+- `tools/village.py`: its default core path is `legacy/shamble-core.js` when that exists, else the root one.
 - `tools/battery.js`: none (it takes the folder as an argument).
+- Symbols: the gate gains `BUILD` (and the option's two names); the five game files are untouched (+0 −0).
+
+2.1b (the move): the five files with `git mv`; the edits below. The gate files are not touched again.
 
 **Not protected:** `tools/village.py` (:10 default path, :2), `tools/README.md` (every `.` folder argument →
 `legacy`; :21 "outside the repo" → "outside `legacy/`"; one line saying the legacy build lives in `legacy/`), the
@@ -196,8 +212,12 @@ cannot read 2.1's head. So the proof comes in three independent parts, each a co
   Phase 0 ones (`docs/reports/2026-10-13-phase-0.md:25-27`) and check 5's 22 (`docs/reports/2026-10-14-gate-check-5.md:
   30-41`); the controls: `--allow-drop refreshRect`, a pure move, and check 5's 3. Pass: for every mutation the two
   failing sets are equal and not empty; every control passes in both. (The report's own grouping is loose, e.g. its
-  "5b + 5d" pairs two mutations; a difference from that wording is a note, not a fail.) Also the edited gate against
+  "5b + 5d" pairs two mutations; a difference from that wording is a note, not a fail.) Run in 2.1a with the files at
+  the root in both worktrees, and again in 2.1b with them in `legacy/` on the head side. Also the edited gate against
   three bases: main 44446a5 (root layout), 8e58937 (CS-1's `shamble-frontlines-repo/` layout) and its own head.
+- **E8, the rollback works** (2.1b): in a throwaway worktree of 2.1b's head, `git revert --no-edit HEAD` of the move
+  (no commit leaves the worktree); `node tools/gate.mjs <2.1b head>` there must PASS: the root head against a `legacy/`
+  base, the case CI meets on a revert PR and on main after it.
 - **E4, the oracle (PM-0002-36).** The dump with `--pre=tools/tuning-dump.js` for both maps (default and
   `--map=tri`), at base with folder `.` and at head with folder `legacy`, twice each: all four head runs byte-identical
   to the base runs; then R7's builder (`build-tuning.py` at a715be2, run unchanged except its input and output paths,
@@ -218,19 +238,29 @@ cannot read 2.1's head. So the proof comes in three independent parts, each a co
 - **E7, Mustafa in Brave** (ADR 0002's foundation checklist, step 1): below, 1.8.
 
 ### 1.6 Steps (each one commit, the gate after each; checkpoint `foundation-restructure`)
+**2.1a**
 0. Re-read PR #46's file list; confirm no overlap with 1.3's list (or hold the overlapping file).
-1. **Dry run** in a throwaway worktree under `.gate/foundation/`: `git mv` the five files, run today's gate and the
-   smoke, list every failure. Nothing is committed from it; it confirms the inventory (grep only so far) or adds to it.
-2. **The move and the code that reads it** (one commit, so the gate passes at every commit): `git mv` of the five
-   files into `legacy/`; `tools/gate.mjs` and `tools/smoke.mjs` (gate files: each edit asks Mustafa) read the head from
-   `legacy/` only; `tools/village.py`'s default path. The gate with smoke PASS. `git diff -M100%` still shows the five
-   renames as `R100` beside the tool edits (E1).
-3. **The commands in text** (one commit): `tools/README.md` and the tool header comments (`preview.js . ` → `legacy`).
-4. **The kit lines** (one commit, each edit asks Mustafa): CLAUDE.md and verifier.md (1.3).
-5. **E1 to E6**, outputs into the checkpoint notes.
-6. **The docs** (docs-keeper): 1.3's docs list, REPO_MAP, STATUS, ROADMAP; the register's OQ-0002-2 row and ADR 0002's
-   OQ-0002-2 entry ("answered by the restructure plan").
-7. **Reviews** on the final diff (1.7), one fix pass, the report, the checkpoint deleted in the last commit, PR ready.
+1. **Dry run** in a throwaway worktree under `.gate/`: `git mv` the five files, run today's gate and the smoke, list
+   every failure (expected: exit 2, "shamble-core.js is missing from the working tree", gate.mjs:98). Nothing is
+   committed from it; it confirms the inventory (grep only so far) or adds to it.
+2. **The tools** (one commit; gate files: each edit asks Mustafa): `tools/gate.mjs`, `tools/smoke.mjs`,
+   `tools/village.py` (1.3). The gate with smoke PASS on the root layout.
+3. **Its evidence:** E3 on the root layout (the edited gate fails each of the 26 mutations exactly as main's gate
+   does); the edited gate on the dry-run worktree's `legacy/` layout PASS against `origin/main`; the both-copies case
+   stops with exit 2; the three bases of E3.
+4. **Reviews** (security-auditor, test-engineer; the advisor), the report, PR ready, `needs-mustafa` (gate files; no
+   Brave check: nothing a player sees changes). Merged after PR #46, on his go.
+
+**2.1b** (from main with 2.1a merged)
+5. **The move** (one commit, nothing else): `git mv` of the five files into `legacy/`. The gate with smoke PASS.
+6. **The commands in text** (one commit): `tools/README.md` and the tool header comments (`.` → `legacy`), the root
+   `README.md`.
+7. **The kit lines** (one commit, each edit asks Mustafa): CLAUDE.md and verifier.md (1.3).
+8. **E1, E2, E4 to E6, E8**, outputs into the checkpoint notes.
+9. **The docs** (docs-keeper): 1.4's list; the register's OQ-0002-2 row and ADR 0002's OQ-0002-2 entry ("answered by
+   the restructure plan").
+10. **Reviews** on the final diff (1.7), one fix pass, the report, the checkpoint deleted in the last commit, PR ready;
+    Mustafa's backup and Brave check (1.8), then his go.
 
 ### 1.7 Reviewers (the final diff; one round, one fix pass; 3 at a time)
 The advisor (plan, then every pushed head) and security-auditor (every risk-tier-2 change) always; test-engineer (is
@@ -258,6 +288,8 @@ No art-director: nothing a player sees changes (bytes unchanged), and Mustafa's 
   the gate fails when a root copy of any of the five reappears (a proposal for the advisor, Q-A5's neighbour).
 - **Old bases break the gate** (a PR cut before the move, or 8e58937's CS-1 layout) → the base fallback chain and E3's
   three bases.
+- **A revert of the move turns CI red** → 2.1a lands the both-layout gate first, so 2.1b's revert is pure and green
+  (E8). A revert of 2.1a after 2.1b has merged would break the gate: revert 2.1b first (2.1b's report says so).
 - **Saves seem lost in Brave** → E5 before the check; the old folder keeps its storage; nothing is deleted.
 - **Collisions** → Part 4: no file of PR #46's current list, no `spikes/` file, no PM row of ADR 0001, 0004 or 0006.
 - **The PR Advisor routine is paused** until #46 merges → 2.1 is `needs-mustafa` anyway and merges on his go.
@@ -324,6 +356,10 @@ after the install steps; `rustc --version` in CI equals the pin; a pull request 
 - No root `.cargo/config.toml`: cargo reads config files in every folder above the one it runs in, and the spike's
   check reads them too (`cargoConfigFiles`, `cargoConfigProblems`): a root `rustflags`, alias, `runner` or `include` key
   would change or fail the spike's builds. Put the target folder and flags on the CI command line instead.
+- No `"type": "module"` in the root `package.json` (the critic's F2): the syntax hook runs `node --check` on the file
+  in place (`.claude/hooks/syntax-gate.mjs:3, :21-23`), and Node takes a `.js` file's module type from the nearest
+  `package.json`, so the legacy scripts would be checked as modules. Each package sets its own type (the gate itself is
+  safe: it checks `.cjs` temp copies, gate.mjs:115).
 - Must be checked in 2.2's build, not assumed: `cargo metadata` from `spikes/netcode-proof/` still names the spike's
   own workspace once a root workspace exists (the spike's `Cargo.toml` has its own `[workspace]`), and
   `npm ci --prefix tools` still installs the legacy toolkit from `tools/package-lock.json` once a root `package.json`
@@ -358,7 +394,7 @@ Phase); his decision lifted that for 2.1 and 2.2 only.
   Part 1), 2.1 edits no guard file, no `.claude/settings.json`, no `.github/` file and no guard test, and leaves
   advisor.md alone (its `shamble-*.js`, `index.html`, `editor.html` stay true as names). The only shared files are
   STATUS and ROADMAP, which 2.1's docs pass touches last.
-- **When 2.1 merges:** after #46. Three reasons: his words make #46 the next change-set; 2.1 is mostly renames and #46
+- **When 2.1 merges:** both of its PRs (2.1a, then 2.1b) after #46. Three reasons: his words make #46 the next change-set; 2.1 is mostly renames and #46
   rewrites how the guard's merge check reads a renamed file ("reads both names of a renamed file", its F1), so the fixed
   check should be the one that judges 2.1; and the PR Advisor routine stays paused until #46 merges anyway (2.1 is
   `needs-mustafa` in any case: kit edits and a Brave check).
@@ -414,3 +450,8 @@ What 2.1 changes for it, and what #40 must do once 2.1 is on main:
 - **Q-A4, verifier.md:28.** Edit the kit line (proposed), or make `preview.js` fall back to `legacy/` when the folder
   holds no game files (no kit edit, but a silent fallback in a repro tool).
 - **Q-A5, the gate's base fallback.** One prefix per base where all five files exist (proposed), not a per-file mix.
+- **Q-A6, two pull requests for step 2.1.** Mustafa asked for 2.1 "as its own change-set". The rollback rule makes one
+  PR unsafe (1.1, the critic's F1): its pure revert would turn CI red. Proposed: 2.1a (the tools learn both layouts)
+  then 2.1b (the move), both under this one plan. The other way, one PR whose revert is not pure, needs a planned fix
+  PR instead of a revert if main breaks. The advisor rules; if it reads "its own change-set" as one PR only, it
+  escalates to Mustafa.
