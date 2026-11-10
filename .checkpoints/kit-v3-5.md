@@ -59,5 +59,8 @@
   Mustafa, hashes equal to the scratch build: the test file (red in the repo: 47 of 1086 tests fail on main's guard),
   the guard (green: 1086/1086, settings 127/127, checkpoint 27/27), advisor.md, CLAUDE.md; gate PASS +0 −0 (with a4's
   tools/node_modules linked for the run, then unlinked); repo map OK. Kit commit 9bacf47 (CI runs on it).
-- **Current step:** 6, the docs part (docs-keeper: STATUS, ROADMAP, his words in the queue, the known limits, the
-  kit-v3-4 report correction); then the review round (security-auditor, test-engineer, the verifier), the report.
+- **Done:** the docs part (docs-keeper, f9728c9): STATUS (#44 merged, kit-v3-5 in flight, the routine paused, F1-F5,
+  the known limits, his queue and record word for word: 16 quoted paragraphs byte-equal), ROADMAP, the kit-v3-4
+  report's dated correction (additions only); E6 `rule-diff.md` (17 rows, nothing looser). CI green on 9bacf47.
+- **Current step:** 7, the review round on f9728c9 (security-auditor, test-engineer, the verifier; running in
+  parallel); then one fix pass, the report, the notes' deletion, PR ready, the advisor's final-head review, his go.
