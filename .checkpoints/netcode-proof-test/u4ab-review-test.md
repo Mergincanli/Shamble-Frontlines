@@ -68,3 +68,50 @@ Run helper: scratchpad te-run.sh (waits 8 s idle, df, touches, toucher every 2 s
 - Not run, by reasoning: B-P2 (the base_ns guard, schedule.rs:156): random_wakes reaches it after a drop whenever the
   next gap is shorter than (base - now), about 0.5% of drop wakes, so a few hundred times per run; F-A6 (hash's never-0
   guard): no input reaches a computed 0 (p about 5e-15 per view), so removing it passes every test (rust F-A6 stands).
+- By grep (not planted): no test names an EncodeError of Snapshot or FullState (tests/*.rs: only Input's TooMany,
+  NotCanonical and OutOfRange, wire.rs:471-531); the snapshot encoder's refusals are untested (T-A5).
+- 10:27-10:30 UTC check.mjs, U4b copy (te-u4b-check.log): all 10 steps PASS; test: measured 285, bites 308, 0 failed,
+  0 skips (= 275 + 10, 292 + 16); self 48 of 48; doc both builds; test step 107.1 s. df 12 G free.
+- 10:32-10:35 UTC check.mjs, U4a copy, run 1: 10 PASS but bites build counted 304 (+12, not +29; measured 296 held):
+  another copy's artifact ran (U4c/U4d lanes' cargo test in flight before and after). NOT REPORTED as evidence.
+- 10:38-10:40 UTC check.mjs, U4a copy, run 2 (te-u4a-check2.log; idle 117 s first): all 10 steps PASS; test: measured
+  296, bites 321, 0 failed, 0 skips (= 275 + 21, 292 + 29); self 52 of 52; doc "host and wasm32"; test step 123.9 s.
+- Step 5: both copies byte-identical to step 1 (U4a 18 of 18 OK, U4b 4 of 4 OK); `git status` file sets unchanged.
+  Left outside the copies: .gate/te-probe (probe crate, gitignored); scratchpad scripts and logs.
+
+## Carries
+- U4a 1 met (GROUPS and the mapping from layout() for every kind in ALL; sizes from each Field; KIND_BITS from ALL;
+  VELOCITY != POSITION_XY: bites.rs:119-121). S1 is a consequence of the given, not a breach of carry 1.
+- U4a 2 met (Quant's own per-instance bite; ids only in npt-proto's BITES, check.mjs bite-home grep green; a4 at the
+  ends, worst = half the step: quant.rs:372-422; the builder's P17). Reading to state: at a non-wrapping end whose
+  nearest multiple is outside the range the error is under one step (the test's `ends < step`).
+- U4a 3 met (linkUseProblems, the rename refusal, self-tests; the builder's P10). 4 met (quant.rs:312-334; P4).
+  5 met (text); crates/proto/Cargo.toml:13-14's bites comment is still stale (entry 41, the next manifest edit's).
+- U4a 34 met (all four, each pinned by check.test.mjs's two new tests; P13-P16).
+- U4b 6 met for the type and the 60 Hz tests (rates() from loop_catchup_at; no literal cap in a run test); its
+  "server's schedule" assertion (tests/schedule.rs:209-217) reads back its own argument and cannot fail: the binding
+  half is U6's and U4r's callers (T-B3). U4b 35 met (only NS_PER_S; nothing derived from TICK_HZ).
+
+## Findings (ranked)
+- T-A1 Medium, U4a, before merge (= N1, SEC-7, F-A3): msg.rs:219-231 + :343; limits.rs:23-24; error.rs:184. Shown.
+- T-A2 Medium, U4a (S1; with SEC-1, F-A1): snapshot.rs:429-454, :481-483; seam.rs:114-116; the table's test
+  snapshot.rs:637-652 cannot see it. Not a U4a merge blocker (condition 3 freezes the seam); gate before U4e's brief.
+- T-A3 Low, U4a (SEC-2, F-A2): GROUPS not enforced; shown; folds into T-A2's fix.
+- T-A4 Low, U4a (SEC-5): a2's prefix half vacuous for 12 of 16 types; measured. wire.rs:180-201.
+- T-A5 Low, U4a: the snapshot encoder's refusals untested (snapshot.rs:457-468, :175-177, :245-254, :267-268, :591).
+- T-A6 Low, U4a (SEC-6, N6): input.rs:198-199; shown.
+- T-A7 Low, U4a (F-A6): hash.rs:96 never-0 guard untestable as written; wire.rs:643-649 cannot fail.
+- T-A8 Low, U4a (F-A7): a8's vectors native only; to U4d2's Wasm-in-Node step.
+- T-A9 Low, U4a (N8): catalogue §6 item 3 note and the Input row's sizes, in U4a's change-set per plan §5 U4a; the
+  catalogue tests re-run on the changed doc.
+- T-B1 Low, U4b: schedule.rs:139-141 boundary; mutant survives (B-P1).
+- T-B2 Low, U4b: tests/schedule.rs:283 purity assertion cannot fail; the property is held by the type and the clock
+  ban (B-P3 shows the std half live).
+- T-B3 Low, U4b: carry 6's read-back test is tautological (tests/schedule.rs:209-217).
+- T-B4 Low, U4b (F-B1): the tokio entries (clippy.toml:7, :12) cannot be shown live until tokio resolves; plant then.
+
+## Verdicts
+- U4a: REVISE, for T-A1 alone (a public encode contract U4e's splitter builds on, and a3's encoder half cannot see
+  it); the rest follow-ups, T-A2 gating U4e's brief.
+- U4b: APPROVE WITH FINDINGS (four Lows, follow-ups).
+DONE 10:42 UTC.

@@ -7,17 +7,20 @@ Rules: plan §7.1 (shared target .gate/shared-target, CARGO_NET_OFFLINE, touch c
 counted run, wait for no other cargo/rustc, df before each build). Plants in place, one at a time, restore, sha256.
 No commit. Only crates/l1 touched, and only to plant and restore. This agent has no Edit tool: notes are rewritten
 whole with Write; plants go through a plant script written with Write into this notes folder (u4c-test-plant.py:
-exact unique-match replace, run, restore, sha256 check; the precedent of u4s-bites.py / u3d-test-bites.py), never
-sed, redirects, heredocs or python3 -c.
+exact-match replace with occurrence count, a stderr marker in L1Net::new as the positive control that the planted
+build ran, wait for no foreign cargo/rustc, touch before and every 2 s, run `cargo test --locked -p npt-l1
+--no-fail-fast [--features bites] -- --nocapture`, restore the bytes, sha256 check; logs in u4c-review-test/<name>.log;
+backups of the three files in the session scratchpad). Precedent: u4s-bites.py, u3d-test-bites.py. Never sed,
+redirects, heredocs or python3 -c.
 
 ## Plan
 1. sha256 of the three changed files (and every file under crates/l1) before anything; compare with the builder's.
 2. Read plan §5 U4c (L-c1..L-c9 and its bites), §4.1, §7.1; the builder notes; the two reviewers' notes.
 3. Step 1 of the task: check.mjs unchanged, record ten step lines and counts (expected: measured 285, bites 312).
-4. Step 2: plant each §5 U4c bite in place (8 model bites + any listed elsewhere), run the named L-c test, record the
-   failure by name, restore, sha256. Add bites the plan missed (candidates from reading + reviewers' findings).
+4. Step 2: plant each §5 U4c bite in place (8 model bites), run, record the failure by name, restore, sha256. Add
+   bites the plan missed (candidates from reading + reviewers' findings).
 5. Step 3: each test can fail, none vacuous, numbers vs their sources (RFC 9002 constants, 1,200 B, PTO 1,024 ms,
-   L-c2 bands, L-c8 pins).
+   L-c2 bands, L-c8 pins; the lc8-scratch SHA-256 vs U2's committed runs.txt).
 6. Step 4: check.mjs again after a fresh touch; sha256 of every file = step 1.
 7. Findings list + verdict; DONE.
 
@@ -31,4 +34,29 @@ sed, redirects, heredocs or python3 -c.
   failed 0 skip, bites 312 passed 0 failed 0 skip; deps 1.7 s; refs 0.6 s (562 tracked files); marks 3.5 s (81
   marks, drafts 626df678); self 1.2 s 48/48; redact 0.8 s 10/10 (158 items, 0 findings). Counts = 275+10 / 292+20.
 - Reviewers' candidates a run can settle: rust M "L-c5 cannot fail on a wrong next_event_ns" (plant next_event_ns
-  -> None / wrong value); netcode F3 (C2 stricter than RFC A.7; read); netcode F1 (first-loss 1,024 ms; L-c9 pins it).
+  -> None / no timers / no inbox); netcode F3 (C2 stricter than RFC A.7: plant A.7's rule, does L-c7 tell them apart).
+- Read: lib.rs whole; tests.rs whole; tests/l1.rs diff; lc8-scratch main.rs; plan §5 U4c :552-583, §4.1, §7.1;
+  advisor-u3q.md:160-173 (C1'), advisor-u2.md:72-103 (C1, C2).
+- 10:30Z Controls (marker only): measured lib 13 + tests/l1.rs 15 + doc 0, all pass, marker 74 lines, "Compiling
+  npt-l1 (this copy's path)", 16 s; bites lib 23 + 20 + 0, all pass, marker 102. No foreign cargo in any run below.
+- 10:30-10:38Z The 8 named bites, planted DIRECTLY in the measured model (not through with_model_bite; the builder used
+  the bites build), except stream-sample-in-order (bites-only state: the L-c7 #[test] switched to with_model_bite).
+  Each restored, sha256 = build after each. Failing tests by name (lib unit tests unless said):
+  - separate-spaces (both `let space =` lines -> 1): lc1 "L-c1: 12 probe timeouts fired (the first at 3144.168 ms)";
+    also lc3 "link 0: its message did not arrive inside the burst with its acknowledgement lost" and lc9 "link 2's
+    message was not declared lost and resent 1 ms after its send". 3 failed, 10 passed; tests/l1.rs 15 pass.
+  - no-pto-doubling (pto_ns returns base): lc3 only, "probe timeout 2 at 6278.775 ms, not at 6428.162 ms (the PTO,
+    149.387 ms, doubles at each expiry)".
+  - acks-in-bursts (ack `lost = false`): lc3 only, "link 0: no probe timeout fired".
+  - every-packet-sampled (every_sampled = true): lc7 only, "link 0 took 4000 RTT samples where the newest-packet rule
+    gives 145 (first difference at Some(1))".
+  - stream-sample-in-order (bites build, lc7's #[test] on with_model_bite): lc7 only, "link 1's samples after 4 s are
+    [(4236.0, 226.0), (4236.0, 100.0)] ms". 22 passed 1 failed; tests/l1.rs 20 pass.
+  - one-draw-per-message (shared = first): lc4 only, "its middle packet alone was not lost".
+  - EXTRA one-draw-per-message with the planted loss kept (`Some(x) => x || forced`): lc4 only, "0 of 600 messages
+    (0.0000) had pieces both lost and delivered, not about 0.1425": the statistical half bites on its own.
+  - events-at-polls (both `if bitten!(EventsAtPolls)` -> true): lc5 "the fate logs differ (93267 and 93387 bytes)";
+    also lc1, lc2, lc3, lc4, lc6, lc7, lc9 and 3 tests/l1.rs tests (reorder step x2, half the latency). 8+3 failed.
+  - sends-before-events (both `if bitten!(SendsBeforeEvents)` -> true): lc6 only, "the PTO due at 4166.215 ms did not
+    resend message 0 in its instant".
+  All 8 = the builder's messages word for word: the bites-build bite code is what the measured defect does.

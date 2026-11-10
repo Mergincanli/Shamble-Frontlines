@@ -5,7 +5,8 @@ Plan: u4-build-plan.md §5 U4d, §4.2, §4.10, §4.13-4.15, §7.1. Reviewer note
 -arch.md. Builder notes: <worktree>/.checkpoints/netcode-proof-test/u4d-build.md. Memory: none (memory: local, no folder).
 Rules: CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/shared-target, CARGO_NET_OFFLINE=true; `cd <wt> || exit 1`
 on its own line; touch crates before each build and every 2 s during counted runs; no other cargo/rustc before a
-counted run; df > 2 GB; plants in place, one at a time, restore + sha256; commit nothing.
+counted run; df > 2 GB; plants in place, one at a time, restore + sha256; commit nothing. No Edit tool in this run:
+plants by a scratch script (plan §7.2's form, as u3d-test-bites.py), notes rewritten whole with Write.
 
 ## Plan
 1. Reference sha256 of every crates/sim file (done below). Check no other cargo/rustc, df.
@@ -43,3 +44,19 @@ counted run; df > 2 GB; plants in place, one at a time, restore + sha256; commit
 
 ## Progress
 - [0] Notes started; no earlier notes of mine (fresh). sha256 all equal the builder's final list.
+- [1] Runner: scratchpad/u4d-te-run.sh (waits 8 s idle, df, touch, 2 s toucher, output to stdout only).
+- [2] check.mjs run A, 10:32:05-10:36:57 UTC (80 s idle wait first; 12 GB free): all 10 steps PASS, but test step
+  measured 318 (expected 304), bites 327 (expected 327). NOT COUNTED: two other lanes ran cargo during it
+  (agent-a929... `cargo test --workspace`; wf_...-e0d-2 `cargo test -p npt-l1`): +14 measured = another copy's test
+  binary linked. Step lines otherwise: fmt 0.5 s; clippy 11.5 s; clippy-wasm32 6.3 s; doc 23.8 s; test 244.3 s; deps
+  0.6 s (93 crate files); refs 0.3 s (562 tracked); marks 2.5 s (81 marks); self 1.1 s (48 of 48); redact 0.8 s (10 of
+  10, 166 items, 0 findings). Re-run needed when the lanes are quiet.
+- [3] Test read (tests/world.rs, tests/replay.rs) candidates:
+  - std-sin unit test can never fail on an unwired site (only "no diff before arm"; prints first tick) -> plant B2b.
+  - D-9 reference tolerance: target box half-width 3 cm; a /255 blend denominator (1 cm off at f=255) likely passes
+    -> plant E6.
+  - D-6 asserts SS only; PM-0001-2 also has ES bands (72 shots/s 68.4-75.6, 32 projectiles mean 30.4-33.6, 21.12
+    spawns/s 20.064-22.176, 10 reliable events/s 9.5-10.5, 15 big vehicles): no U4d test -> probe G.
+  - d10 clamp twin never asserts the step-10 shot ran (events equal could both be shot-less) -> probe H.
+  - D-2 child protocol: blocking pipes, no timeout (a hung child hangs the suite; no flake source seen).
+- [4] Bite script: u4d-test-bites.py (this folder). Next: run it (bites B*, E*, probe P).
