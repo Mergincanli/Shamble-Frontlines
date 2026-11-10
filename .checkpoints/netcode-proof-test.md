@@ -302,8 +302,8 @@ free:
   - **Conflict to settle first:** plan.md:1436 says "merges with a merge commit, never squashed". That rule comes from
     the advisor's finding 4 on #45: ADR 0001 and docs/design/ws-reconnect.md on main cite bf9d248, 975e72b, 95a04a1
     and 1e020a7, which exist only on this branch.
-  - Before the squash, re-point those cites to paths in the final tree, or to PR #40's commit links (GitHub keeps
-    them), with the advisor's check. plan.md:1436 is changed to match (SQUASH-CITES, for Mustafa).
+  - **Decided, SQUASH-CITES (a) (Mustafa, 2026-11-10):** in the closing commit, re-point the four cites to files in
+    the final tree, with the advisor's check; plan.md:1436 changes to match.
 - **No .checkpoints/ in the final tree:** fold the checkpoint into the report and delete `.checkpoints/netcode-proof-test*`
   in the last commit before the PR is marked ready (CHECKPOINTS.md §9).
 - **No wip/*.patch left** (WIP-CLEAN: each one is deleted in the commit that merges or replaces its builder).
@@ -437,6 +437,15 @@ free:
   (its "Initial RTO" line).
 
 ## Decisions taken
+- **Mustafa, 2026-11-10 about 06:45 UTC (verbatim): "A"**, to the two open questions, both of whose recommendations
+  were (a). Read as both:
+  - **SQUASH-CITES (a):** PR #40 squashes; the closing commit re-points the four citations (bf9d248, 975e72b, 95a04a1,
+    1e020a7 in ADR 0001 and docs/design/ws-reconnect.md) to files in the final tree, checked by the advisor; plan.md:1436
+    changes to match at the next plan edit.
+  - **NS-START (a):** the night shift runs hourly from 00:10 to 07:10 Amsterdam again (`CRON_TZ=Europe/Amsterdam 10 0-7
+    * * *`). The session's `update_trigger` call was refused: the routine was created via http_api, not by an agent,
+    so only Mustafa can edit it (https://claude.ai/code/routines/trig_01QpV6y6UaG1Na2q3jumRDxh). It is in his For
+    Mustafa list.
 - **Mustafa, 2026-11-10 about 06:40 UTC, for the netcode session (verbatim, "Record these as my words of 2026-11-10.
   None of them stops wave 1."):**
   - "1. RESUME-CARD. The checkpoint is 148 KB and the plan 144 KB, against CHECKPOINTS.md's "keep it short: it is a
