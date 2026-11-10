@@ -23,3 +23,18 @@ Plan: u4-build-plan.md §5 U4d + §4.2, §4.10, §4.13, §4.15; advisor-u4.md; A
   L: ES lacks "10 reliable gameplay events a second" (ADR 0001:1478); clamp reported for every command w/ far aim, not only shots (§4.2 "inside the shot phase"); carry 13 counting allocator -> storage-identity stand-in (route to U5 with PM-0001-34); 1 MB = 1<<20 vs F1's MB=10^6 (nit); PARENT field redundant (nit); held-back command's Rewind may fall out of ring (nit); non-finite ray -> Miss decided now (carry 45 nit).
 - [5] ADR 0001:313-314 + catalogue :138: "parts, and the pilot, travel with their parent" -> build writes each VehiclePart record as a WORLD transform changing every tick (124 parts in SS) = F112's "breaks 1,000 B" case -> candidate HIGH (H1). Effect rows: EFFECT_LEFT decrements every tick -> 384 records change every tick; catalogue has no wire group for effect rows -> MEDIUM (state room-only or store end tick). FLAG_FIRED in the 8 flag bits toggles every shot vs ADR 0001:310-313 (flags change rarely; action starts are cosmetic events) -> fold into M3 (drop FLAG_FIRED fixes both).
 - [6] Resumed after cut (2026-11-10). All 15 file sha256 match builder's report. Next: re-pin line numbers for H1/M1-M4/L, check freeze shapes vs base, recordings, carries 7-20/36-38 wording, U4e-U4h pull-forward.
+- [7] Re-verified after resume (line numbers on the sha256 the builder reported):
+  - Freeze: Command/Rewind/CoverVariant/EntityKind/EntityRecord(FIELDS 12) unchanged; grid doc only; TickInput fields added; non_finite dropped; layouts completed within FIELDS (Soldier 12, Part 6, Projectile 9, Wall 2, Effect 3). KEPT.
+  - Refusals: cooldown/ammo/reload/rewind_outside/pool_full + clamps only in reports (world.rs:1132-1148, 1016-1022, 1832-1834, 1178); write_state excludes reports and `claimed` (world.rs:1645-1647). OK. `claimed` decides later edges (world.rs:1036-1040) -> M2.
+  - H1 confirmed: place_vehicles world.rs:930-938 writes world pos; write_records :1568-1583; load_movers_into :1765-1777; volumes :1233-1239. Catalogue :138, ADR 0001:313-314, scout F112.
+  - M1 confirmed: scene.rs:105-107,127; marks.json PM-0001-2 notes (S30 bite run past 10 min); generator no reloads replay.rs:433-438.
+  - M3 confirmed: step clears FLAG_FIRED once per tick world.rs:1821-1824; predict per command :756; FLAG_FIRED set :1153; flags in soldier record :1532.
+  - M4 confirmed: world.rs:587-591 radius 40+3v m for every vehicle; large = v<4 -> 40-49 m; spawn_stand_in ±60 m :1438-1442.
+  - Effects: EFFECT_LEFT seam.rs:202 counts down world.rs:1468-1474, record :1637 -> every effect record changes every tick.
+  - ES: no source for "10 reliable events/s" (marks PM-0001-2 ES band; only L2 PM-0001-12 selects ES) -> LOW.
+  - 1 MB: history.rs MAX_RING_BYTES 1<<20 vs marks.json 1,000,000 -> LOW.
+  - TC plates vertical (thin in y) facing the shooter: OK for -51 (a horizontal plate at 30 m would put the underside hit ~23 cm off at a grazing ray); no finding.
+  - Carries 7-12, 14-20, 36-38 met; 13 partial (storage identity, no counting allocator); 18 vacuous (no new tick constant).
+  - No U4e-U4h pull-forward beyond ray_cast's non-finite -> Miss (carry 45, U4h states it): nit.
+- Verdict: REVISE (H1), with M1-M5 fixed or routed.
+DONE

@@ -35,3 +35,12 @@ Plan: u4-build-plan.md (sha 7ec1b324 per builder; plan now 0d69332c after F1) §
 - NaN audit: every division guarded (len2>127^2, dist>reach, flat>0, dist>=0.01, d[a]!=0, period>0); sqrt args >= 0; atan2f(0,0)=0; u32::MAX move speed stays finite (4.3e7 m/s). No NaN reachable from integer input.
 - Tests read: replay.rs (D-2 child protocol, D-7 pins, round trip, refusals), world.rs D-4 x3, carry 13/14/15, bites module. D-2 children feed whole recording then step -> F-drain applies (16.7 MB fed first).
 - perf: write_records runs twice a tick (phase 1 for movers, phase 8), ~878 records each incl. 300 trajectory_at; phase 1 needs only parts/doors/wall. Low.
+- More candidates: F-claimed upgraded to medium (predict updates claimed too, world.rs:1040; U4g's replay after a correction sees false press edges unless it restores claimed, and World has no API for it). N: record() writes Val::I unchecked vs field range (world.rs:396; SS health 1,000 vs HEALTH max 1,023). N: clamp runs for every command, firing or not (world.rs:1095) though §4.2 says "inside the shot phase" (netcode). Test perf: D-2 child builds a full dump for every parent word incl. "n" (tests/replay.rs:103-104).
+- Main folder: git status shows only notes files (no stray source from the builder's "Not counted" slip).
+
+## Final findings (ranked)
+M1 F-movers (world.rs:770-773 doc vs :1760-1797 code; :1233-1239; :1349). M2 F-claimed (world.rs:480-481, :1036-1040, :1645-1647; plan §4.2 last bullet).
+L1 decode pre-alloc (replay.rs:320). L2 non-canonical recording debug panic (world.rs:1801-1805; replay.rs:682-690). L3 damage index (world.rs:1364, :829). L4 clamp z (world.rs:1009-1015). L5 carry 13 partly met (tests/world.rs:1290-1340; Cargo.toml:93). L6 events/fired capacity (world.rs:629, :638). L7 drain + dump-per-word perf (replay.rs:631-634; tests/replay.rs:88-104). L8 finite check scope (world.rs:1751-1756). L9 write_records twice (world.rs:910, :1845).
+N1 Clone destructure (seam.rs Clone impl). N2 stream index const assert (rng.rs:19-37; world.rs:1305,1437,1466,1492). N3 trailing bytes (replay.rs:327 vs :667). N4 record range debug_assert (world.rs:396). N5 clamp on non-firing commands (world.rs:1095).
+Verdict: APPROVE WITH FINDINGS (fix M1 in U4d; M2 to netcode-architect/advisor).
+DONE
