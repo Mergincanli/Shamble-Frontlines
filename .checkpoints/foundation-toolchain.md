@@ -50,8 +50,15 @@
     rule requires a fresh session (protocol step 3); K4 needs Accept edits or Manual mode (CLAUDE.md:67-68); after K4
     the advisor runs as a general agent reading main's advisor.md (CLAUDE.md:59-61).
 
+13. Build step 1, the root pins · d3a1e9c · `rust-toolchain.toml` (1.99.1), `Cargo.toml`, `package.json` (TypeScript
+    6.0.3, Vitest 5.1.0, @playwright/test 1.65.0, Node 22), `package-lock.json` (39 packages), `.gitignore` (+2);
+    Cargo.lock moves to step 2 (cargo cannot lock a workspace with no members); E4a none, E6 and E7 hold; E4c: the
+    toolkit installs from its own lockfile with the root `package.json` present (159 packages); gate `--no-smoke`
+    PASS (1-4, 5b-5d); 5a cannot start here (the toolkit's Playwright 1.56.1 wants Chromium 1194, the container has
+    1243, and a second Playwright install is forbidden): 5a runs in CI's smoke job.
+
 ## Current step
-Build step 1: the root pins (`rust-toolchain.toml`, `Cargo.toml`, `package.json`, `.gitignore`) and both lockfiles.
+Build step 2: the six crates and five packages, `Cargo.lock`, E1, L1-L3, E6, E7, E11.
 
 ## Next steps
 1. Build steps 1-4 of plan.md revision 5, Part 8, here: 1 root pins and lockfiles; 2 the crates and packages with E1,
@@ -76,6 +83,8 @@ Build step 1: the root pins (`rust-toolchain.toml`, `Cargo.toml`, `package.json`
   only the docs among them (REPO_MAP, STATUS, ROADMAP, SPIKE_PLAN, reports), not the register or the ADRs.
 - npm registry 2026-11-10: typescript 6.0 line 6.0.2, 6.0.3 (latest 7.0.2); vitest 5.1.0; @playwright/test 1.65.0.
 - Runner image 20261101.360.1: Rustup 1.29.2, Rust 1.99.1 (= the pin).
+- Local: rustup 1.28.2; `rustup toolchain install` installed 1.99.1 with clippy, rustfmt, wasm32 from the file;
+  `rustup show active-toolchain` prints `1.99.1-x86_64-unknown-linux-gnu (overridden by '<repo>/rust-toolchain.toml')`.
 
 ## Decisions taken
 - Mustafa, 2026-11-10: FDN-NOCODE (a) ("One clause per line naming my 2026-11-10 decision as the exception; each edit
@@ -91,7 +100,9 @@ Build step 1: the root pins (`rust-toolchain.toml`, `Cargo.toml`, `package.json`
 
 ## Running work
 - saver: background task b04hgafwt · output `/tmp/claude-0/-home-user-Shamble-Frontlines/29a42dc7-ecd4-506e-b90a-121dd5e50988/tasks/b04hgafwt.output`
-  · started 18:35 Amsterdam · stopped by the session at 19:41 after the last save (the task's work in this session
-  is done).
+  · started 18:35 Amsterdam · stopped by the session at 19:41 after the last save.
+- saver (restarted for the build, his word): background task bz6ds367a · output
+  `/tmp/claude-0/-home-user-Shamble-Frontlines/29a42dc7-ecd4-506e-b90a-121dd5e50988/tasks/bz6ds367a.output` · started
+  20:55 Amsterdam · stops by 22:45.
 - workflow run wf_93f9ff1a-f0b (task wt8ab4d43) · script as launched `foundation-toolchain/verify-fold-run1.js` · no
   args · notes `.checkpoints/foundation-toolchain/fold-check-*.md` · launched 19:10 Amsterdam · done 19:24, 4 of 4.
