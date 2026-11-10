@@ -5,7 +5,7 @@
   #46's merge (main 2d22b69). His words: main STATUS:674-761 and docs/reports/2026-11-10-kit-v3-5.md Appendix A.
   Plan: `.checkpoints/status-diet/plan-rev1.md` (next).
 - **Branch:** `claude/busy-turing-48e4i9` (stands in for `cs/status-diet`) · **Base:** main 2d22b69
-- **Last update:** 2026-11-10 21:52 Amsterdam
+- **Last update:** 2026-11-10 21:53 Amsterdam
 
 ## Steps done
 1. Facts gathered · 9e33794 · `.checkpoints/status-diet/facts.md`: line ranges and destinations, live PR and
@@ -27,6 +27,8 @@
 11. The fix pass · adfe108 · M-1 = N4 (docs-keeper item 1's old duties, an Edit, the guard asking), L-6, L-7, N8; the
     round's follow-ups SD-N1, SD-N2, SD-N3, SD-N6, SD-L3; 1217 of 1218 moved lines intact; gate; tests 1107/127/27.
 12. The report, ROADMAP's entry, STATUS's #49 row · 212d74e · gate PASS; repo map OK.
+13. The verifier's re-check of 212d74e · PASS WITH NOTES (verifier-recheck.md, DONE): M-1, L-6, L-7, N8 fixed; RL-1 to
+    RL-3, report wording, ride the last commit. The saver stopped (TaskStop); this is the last checkpoint commit.
 
 ## Current step
 The verifier's re-check of adfe108 and 212d74e (resumed; notes verifier-recheck.md).
@@ -62,8 +64,4 @@ The verifier's re-check of adfe108 and 212d74e (resumed; notes verifier-recheck.
 - Split first from 2d22b69 (pure move, provable), then record #46 in a separate small commit · the session · 11-10.
 
 ## Running work
-- review round on 37434d5 · two background agents: the verifier (notes `verifier-review.md`) and security-auditor
-  (notes `security-auditor-review.md`) · launched 21:38 Amsterdam · running. A restart re-sends each the same prompt;
-  each continues from its notes.
-- saver: background task b162m354f · output /tmp/claude-0/-home-user-Shamble-Frontlines/7c0a3d46-1eae-5891-9697-3fff27d4d074/tasks/b162m354f.output ·
-  started 21:02 · stops by 22:52 (110 minutes on) · last check 21:38: ok ("saved and pushed 56b229f" at 21:22)
+- none (the reviewers done; the saver stopped at 21:53 Amsterdam after its last save)
