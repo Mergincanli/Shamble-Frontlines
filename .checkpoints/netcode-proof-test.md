@@ -107,6 +107,25 @@
     `cs/npt-u4s-skeptic` 6652be4, nothing Critical or High, S1 Medium, 11 Lows;
   - items 4 (the U4r brief) and 5 (the U3d skeptic check) are queued for tonight.
 
+**NOW, 2026-11-10 about 20:40 UTC (after the container restart; the spend limit cut the fixers about 16:25 UTC and
+reset at 20:00):**
+- **U4b MERGED at 411eeee** (pushed): check.mjs all 10 steps, measured 286 = 275 + 11, bites 309 = 292 + 17, self 48;
+  gate PASS --no-smoke. wip/u4b.patch was deleted in that commit.
+- **U4a's merge, in progress in the main folder, uncommitted:**
+  - `wip/u4a.patch` (the fixed copy) is applied, with three catalogue edits: the Input row's codec maxima (5, 23, 19,
+    161 B); §3's header row as built, in W1-N2's words; §6 item 3's U5 note.
+  - check.mjs and the gate are re-running (task bdu2c9yb1; scratchpad merge-u4a-check.txt and merge-u4a-gate.txt).
+    The first run was killed by the restart. Expect measured 300 + 11 = 311, bites 325 + 17 = 342, self 52.
+  - Then commit with `git rm` of `wip/u4a.patch`, and push.
+  - N8's last items (the event wire form; the proposals for Leave, ClientSettings, the peer set and SessionStatus):
+    a follow-up, Low.
+- **Resumed at 20:36:**
+  - U4d's fixer (wf_a8ff8550-67d, task wsnzz9qtq);
+  - U4c's fixer and its round 2 (wf_610486f7-cc1, task w11llknmp);
+  - **U4j's builder** (an Agent in its own worktree; brief u4j-brief.md, plus W1-N2's marks change and the
+    shared-target lessons; base 411eeee).
+- Their snapshots, taken at 20:35, are unchanged since 16:05.
+
 **SAVE POINT, 2026-11-10 about 16:05 UTC (Mustafa at 92 % usage):**
 - **U4b's merge is in progress in the main folder.** `wip/u4b.patch` (the fixed U4b, with tests/schedule.rs at
   05e2068b) is applied, uncommitted: crates/server's lib.rs, clippy.toml, src/schedule.rs, tests/schedule.rs.
