@@ -17,13 +17,37 @@
 - **U4b, the loop policy (npt-server's schedule.rs):** built by the main session, not merged.
   - all 10 steps pass twice: measured 285 = 275 + 10, bites 308 = 292 + 16; carries 6 and 35 met;
   - worktree `.gate/u4b-wt` (base 4b5812a); record u4b-build.md; snapshot wip/u4b.patch.
-- **The U4a + U4b review, round 1 of 2:** workflow wf_4153791e-ba1 (task wd14ows5z).
-  - one reviewer at a time: netcode-architect, security-auditor (U4a only), rust-reviewer, then test-engineer, who
-    runs the tests and the plants;
-  - notes u4ab-review-{netcode,security,rust,test}.md.
-- **U4d (the stand-in sim) and U4c (the link model):** building in their worktrees, resumed 06:33.
-  - workflow wf_f54246ff-e0d (task wz87zkv57); each lane then runs its own reviewers and a test-engineer;
-  - notes u4d-build.md, u4c-build.md and u4c-build/; snapshots wip/u4d.patch, wip/u4c.patch.
+- **The U4a + U4b review, round 1 of 2:** workflow wf_4153791e-ba1, resumed 10:05 after the 07:3x spend-limit cut
+  (task wum1henzm). Notes u4ab-review-{netcode,security,rust,test}.md.
+  - **Done:** netcode-architect, APPROVE WITH FINDINGS for both; security-auditor, APPROVE WITH FINDINGS for U4a.
+    - **Before U4a merges:**
+      - N1, Medium: encode never applies Limits::SNAPSHOT (1,000 B); content_limit gives the 1,150 B receive cap to
+        both sides. Fix in msg.rs, with a 1,000/1,001 B test.
+      - N2, Medium: the snapshot header carries 16-bit command sequences where §4.4 and §4.14 say tick offsets. The
+        sequences are the better choice; record it in the catalogue and U4a's report; §4.14's -58 row changes. A
+        plan text edit: the advisor rules on it (condition 12).
+      - N8, Low: the catalogue edits the builder listed (item 3's note, the codec maxima, the header fields, the event
+        form, the proposals). The main session makes them at the merge.
+    - **After U4d merges, before U4e's brief goes out:** S1 holds, and SEC-U4a-1 is its security side. The fix: an
+      owner-only record kind in npt-sim (velocity, ammo, fire timer, reload, active reload; velocity leaves SOLDIER);
+      U4a's half is two lines (the kind joins the own-state rows of both GROUPS tables). It goes in the main session's
+      commit, with the advisor.
+    - **Lows:** N3-N7 and U4b-L1 (the time origin for U6), follow-ups.
+  - **Left:** rust-reviewer, then test-engineer (cut at 07:3x, re-running).
+- **U4d (the stand-in sim):** built and not merged.
+  - check.mjs twice: measured 304 = 275 + 29, bites 327 = 292 + 35.
+  - Carry 13 is partly met: a counting allocator is impossible under `unsafe_code = "forbid"`, so a storage-identity
+    test stands in. The freeze stopped nothing.
+  - **Its slip:** at 06:38 a backgrounded `cd` chain ran check.mjs in the main folder. It wrote only 408 build files
+    into the main folder's gitignored `.gate/netcode-proof-test/target`; `git status` is clean.
+  - **Its shared-target lesson:** cargo's build records do not tell copies apart, so keep touching the crate files
+    every 2 s during a run. The test-engineers' prompts now say so.
+  - Reviewers (netcode, rust, then arch) and the test-engineer: re-running (wf_f54246ff-e0d, task wtvqdqbpn).
+- **U4c (the link model):** built and not merged.
+  - netcode-architect and rust-reviewer: both APPROVE WITH FINDINGS. The rust Medium: one test cannot catch a fault
+    in `next_event_ns`.
+  - Its test-engineer: re-running in the same workflow.
+  - Notes u4d-build.md, u4c-build.md and u4c-build/; snapshots wip/u4d.patch and wip/u4c.patch, refreshed 10:06.
 - **U4j (the judge and marks change):** not started. Its brief is ready (u4j-brief.md): the first free slot, or the
   main session.
 - **Agents:** 3 at most, reviewers included. Now: 2 in wf_f54246ff-e0d and 1 in wf_4153791e-ba1.

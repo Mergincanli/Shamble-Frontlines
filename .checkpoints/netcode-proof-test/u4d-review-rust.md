@@ -18,3 +18,4 @@ Plan: u4-build-plan.md (sha 7ec1b324 per builder; plan now 0d69332c after F1) §
   - F-finite: D-4's finite check walks write_state only; pre (records' raw), movers, blend boxes not checked. Low.
   - F-stream-idx: rngs[Stream::X as usize - 1] relies on discriminant = STREAMS position + 1; no const assert. Nit.
   - F-fired-cap: fired Vec::with_capacity(256) can grow past 256 with catch-up (48x8 commands); one-time growth. Low.
+- RESUME (after usage-limit cut): sha256s still match builder list; touch loop pid 15338 no longer running. Re-reading files to finish steps 3-5 (replay, tests, world detail).

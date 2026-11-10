@@ -138,3 +138,24 @@ check.mjs); Write/Edit only; commit nothing. No judged L1 run (L-c8's judged re-
   22:24:28Z. Same signature as runs B and D, each time with another lane's cargo building beside it. G VOID; F stands
   alone, so two clean runs in a row are still owed. Next: a background loop that waits for 30 s with no other cargo
   or check.mjs, touches, runs check.mjs, and repeats until two consecutive passes with exactly 285 / 312 (6 tries).
+- 06:33Z (2026-11-10) RESUMED after the second spend-limit cut (~22:35Z). Checked: HEAD 097f897; files equal the last
+  hashes (tests.rs c21a362f, lib.rs 1647e75d, tests/l1.rs 639ab9c5); no cargo or check.mjs running; df 12 GB free.
+  The wait-and-run loop left no log, so no run after G counts. Next: re-read §5 U4c against the code (pub items,
+  tests), then check.mjs twice in a row, clippy both builds host and wasm32, fmt --check.
+- 06:38Z Re-read §5 U4c, §4.1, advisor-u3q.md:160-173 and advisor-u2.md:72-103 against the code: all items there.
+  Pub items vs base: added `L1Net::next_event_ns`; removed `Profile::rto_ns` (U2's RTO model, gone with C1'; no other
+  crate uses it). check.mjs run H (no other cargo running; touch first; df 12 GB; 06:33:33-06:37:56Z): all 10 steps
+  PASS; measured 285, bites 312, 0 failed, 0 skips (fmt, clippy, clippy-wasm32, doc, test, deps, refs, marks, self
+  48/48, redact 10/10). Run I next, at once.
+- 06:41Z check.mjs run I (no other cargo at start; touch first; df 12 GB; 06:38:04-06:40:33Z): all 10 steps PASS;
+  measured 285, bites 312, 0 failed, 0 skips. H and I: two clean runs in a row, exact counts. Next: the explicit
+  clippy and fmt lines and the `--list` names for the report.
+- 06:45Z Explicit lines on the final code (touch first; another lane's cargo was running, so the shared lock
+  serialized us): `cargo +1.99.1 fmt --all --check` OK; `clippy --locked -p npt-l1 -- -D warnings` host all targets,
+  host all targets + bites, wasm32, wasm32 + bites: each "Checking npt-l1 (this copy's path)", clean. `--list`:
+  measured lib 13 + tests/l1.rs 15; bites lib 23 + tests/l1.rs 20 (names as at 22:16Z). Found for the report:
+  advisor-u4.md:105 says "L1 starts at 333 ms after U4c", but npt-link's `rtt_ns` contract (link/src/lib.rs:79-81:
+  `None` before its first sample) is what L1 follows: the 333 ms starting state drives L1's timers only, and
+  `rtt_ns` stays `None` until a sample (quinn's `rtt()` would report 333 ms then). Not mine to decide: flagged.
+  Final hashes: tests.rs c21a362f, lib.rs 1647e75d, tests/l1.rs 639ab9c5.
+- DONE 06:46Z.

@@ -95,3 +95,39 @@ Scratch plants (Edit, restore, sha256): D-4's 0.0/0.0, plus a few test-guard pla
     to 16 bits) NOT exercised (glibc thread arenas are 64 MB-aligned: about 2 random bits; ASLR is on, mode 2); full
     address: d2 FAILED "first: Some((0, 500, \"spawner[0].acc\"))" after 501 ticks compared.
   - all restored: every src file at its reference sha256; tests/world.rs c9f372e8f7393c97 (the carry 9 change).
+- resumed after the second cut (about 22:35 UTC 2026-11-09; resumed 2026-11-10): HEAD 097f897 checked; every src file
+  at its Progress 4 reference sha256 (world.rs 57b0cf9c, seam.rs a176cd0d, history.rs 0c9012ac, replay.rs 8c566b8a,
+  scene.rs 4d8a04b5); no plant left (grep). tests/world.rs now 41ffc20ff978ad9a, not the c9f372e8 noted: its carry 9
+  test is the strengthened form (per-field off-grid counts); the likely cause is a fmt pass after the note (the names
+  array is in rustfmt's wrapped form); to be confirmed by fmt --check and a full run. Files touched at 22:32: the cut
+  landed in or before check.mjs run 1. Next: fmt check, npt-sim counts, then check.mjs twice.
+- 6 `cargo +1.99.1 fmt --all --check` clean (so tests/world.rs is in fmt form); touched, npt-sim measured 37 (replay 6,
+  seam 8, world 23; "Compiling npt-sim (this copy's path)"), --list 37. check.mjs run 1 started (background).
+- 7 check.mjs attempt at 06:35 NOT COUNTED (a shared-target clash): measured 304 (right), but the bites build linked
+  another copy's npt-sim (HitVolumes with `tick` only: E0560/E0609 in tests/world.rs), and clippy-wasm32 took 1.3 s
+  (likely another copy's fresh fingerprint, so my code unchecked there). Cargo keys a workspace member's fingerprint
+  without its path and keeps dep-info paths package-relative, so a copy that builds after my touch makes my stale
+  sources look fresh. Remedy: re-run with a touch of every crate file every 2 s for the whole run (so each cargo call
+  in it rebuilds from this copy), then confirm by separate clippy and --list runs that show this copy's path.
+- 8 MY ERROR, 06:38-06:41 UTC, NOT COUNTED: the command `cd $C && df && export && (touch loop) &` backgrounded the
+  whole && list, so `cd` and the exports stayed in the background job and check.mjs ran in the MAIN FOLDER
+  (/home/user/Shamble-Frontlines), without CARGO_TARGET_DIR or CARGO_NET_OFFLINE: all 10 steps passed there (275/292,
+  refs 564, redact 157: the main folder's tree, not mine). What it wrote: 408 build files in the main folder's own
+  gitignored cache, .gate/netcode-proof-test/target (its .cargo/config.toml target-dir); check.mjs writes no source
+  file (fmt --check, clippy, doc, test, cargo metadata, git ls-files, judge --check-marks, node tests). Not undone (a
+  cache; removing it would be another write there). Reported to the main session. Fix: `cd "$C" || exit 1` on its own
+  line, the loop alone backgrounded, `pwd` printed.
+- 9 check.mjs RUN 1 (counted), 06:42:05-06:45:50 UTC, cwd this copy, shared target, offline, 2 s touch loop: all 10
+  steps pass; test: measured 304 (275 + 29), bites 327 (292 + 35), 0 failed, 0 skips; refs 562; marks 81; self 48 of
+  48; redact 10 of 10, 166 items, 0 findings. Then clippy -D warnings run alone, touched before each: wasm32 (the 8
+  WASM_CRATES) measured and bites, host --workspace --all-targets measured and bites: each prints "Checking npt-sim
+  v0.0.0 (this copy's crates/sim)", 0 warnings (incremental: a touch-only recheck takes 0.3-1.5 s, which is why the
+  steps are fast). Next: run 2.
+- 10 check.mjs RUN 2 (counted), 06:46:28-06:49:59 UTC, same set-up: all 10 steps pass, the same counts (304 / 327, 0
+  failed, 0 skips; refs 562; marks 81; self 48; redact 166 items, 0 findings). Then, touched: `cargo test -p npt-sim
+  -- --list` measured 37 (replay 6, seam 8, world 23) and bites 45 (replay 7, seam 10, world 28), each "Compiling
+  npt-sim (this copy's path)", every new test named; `cargo +1.99.1 fmt --all --check` clean. Final sha256 (first 16):
+  greybox 2d75cb0b, grid a0e24c08, hash 4663b2a8, history 0c9012ac, lib 70eb8262, replay 8c566b8a, rng d6b61bbe,
+  scene 4d8a04b5, seam a176cd0d, ticks 5d852f1a (unchanged), trajectory 2c0968b3, world 57b0cf9c; tests replay
+  a547314c, seam d91b8c0c, world 41ffc20f. Nothing committed.
+DONE (2026-11-10 06:52 UTC).
