@@ -5,6 +5,16 @@
 //! limits and the encoder's layout table against these rows.
 
 use std::collections::BTreeSet;
+use std::net::{IpAddr, Ipv4Addr};
+
+use npt_link::Channel;
+use npt_proto::{
+    ClientSettings, DecodeError, Direction, EndReason, FullState, Input, Join, JoinAccepted,
+    JoinRejected, Kick, Leave, Limits, Message, Ping, Pong, Resync, RoomControl, RoomEnded,
+    SessionControl, SessionStatus, Snapshot, decode, encode,
+};
+use rand_chacha::ChaCha8Rng;
+use rand_core::{Rng, SeedableRng};
 
 const DOC: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
@@ -407,6 +417,444 @@ fn every_assertion_bites() {
             problems.iter().any(|p| p.starts_with(expect)),
             "a copy broken for assertion {expect} passed: {problems:?}"
         );
+    }
+}
+
+/// A size cell's leading whole bytes (`1,000 B …` is 1,000).
+fn leading_bytes(size: &str) -> Option<usize> {
+    let (number, _) = size.split_once(" B")?;
+    number.replace(',', "").parse().ok()
+}
+
+/// The doc's words for npt-proto's channel and direction values.
+fn channel_word(c: Channel) -> &'static str {
+    match c {
+        Channel::Datagram => "datagram",
+        Channel::Control => "control stream",
+        Channel::FullState => "full-state stream",
+    }
+}
+
+fn direction_word(d: Direction) -> &'static str {
+    match d {
+        Direction::ClientToRoom => "client → room",
+        Direction::RoomToClient => "room → client",
+        Direction::BothWays => "both ways",
+    }
+}
+
+/// The U4 part of the audit (catalogue §6, "At U4": items 1, 2, 3's size half and 6), the doc read against npt-proto's
+/// own tables: every broken assertion as a sentence starting with its item, empty when they hold.
+fn audit_u4(text: &str) -> Vec<String> {
+    let mut problems = Vec::new();
+    let all = tables(text);
+    let find = |header: &str| all.iter().find(|t| t.header == header);
+    let built: Vec<&Vec<String>> = find(WIRE)
+        .map(|t| {
+            t.rows
+                .iter()
+                .filter(|r| r.len() == 8 && r[6] == "built in U4")
+                .collect()
+        })
+        .unwrap_or_default();
+    let doc_names: BTreeSet<String> = built.iter().map(|r| name(&r[0])).collect();
+    let code_names: BTreeSet<String> = Limits::TYPES.iter().map(|t| t.0.to_owned()).collect();
+    // 1. The message types, both ways round; and the session controls' variants.
+    for n in doc_names.difference(&code_names) {
+        problems.push(format!("u4-1: the built row {n} has no npt-proto type"));
+    }
+    for n in code_names.difference(&doc_names) {
+        problems.push(format!("u4-1: npt-proto's type {n} has no built row"));
+    }
+    let doc_variants: Vec<String> = find(SESSION)
+        .map(|t| {
+            t.rows
+                .iter()
+                .filter(|r| !r.is_empty())
+                .map(|r| name(&r[0]))
+                .collect()
+        })
+        .unwrap_or_default();
+    if doc_variants.iter().map(String::as_str).collect::<Vec<_>>() != SessionControl::VARIANTS {
+        problems.push(format!(
+            "u4-1: the session controls are {doc_variants:?}, npt-proto's SessionControl {:?}",
+            SessionControl::VARIANTS
+        ));
+    }
+    for (ty, channel, direction, limit) in Limits::TYPES {
+        let Some(r) = built.iter().find(|r| name(&r[0]) == ty) else {
+            continue;
+        };
+        // 2. Each type's channel and direction.
+        if r[2] != channel_word(channel) {
+            problems.push(format!(
+                "u4-2: {ty} travels on {:?} in npt-proto, on {:?} in the doc",
+                channel_word(channel),
+                r[2]
+            ));
+        }
+        if r[1] != direction_word(direction) {
+            problems.push(format!(
+                "u4-2: {ty} goes {:?} in npt-proto, {:?} in the doc",
+                direction_word(direction),
+                r[1]
+            ));
+        }
+        // 3. Each type's limit: the Size limit column's leading number; for `Snapshot` also the receive limit its
+        // cell names.
+        if leading_bytes(&r[5]) != Some(limit) {
+            problems.push(format!(
+                "u4-3: {ty}'s limit is {limit} B in npt-proto, {:?} in the doc",
+                r[5]
+            ));
+        }
+        if ty == "Snapshot"
+            && !r[5].contains(&format!(
+                "refuses a datagram above {} B",
+                thousands(Limits::SNAPSHOT_RECEIVE)
+            ))
+        {
+            problems.push(format!(
+                "u4-3: the doc's Snapshot cell does not name npt-client's {} B",
+                Limits::SNAPSHOT_RECEIVE
+            ));
+        }
+    }
+    // 6. The room-wide controls: the doc's rows are npt-proto's RoomControl, npt-load-ctl apart (its row says it is not
+    // a room socket), and their size limit is RoomControl's.
+    let doc_controls: Vec<String> = find(ROOM)
+        .map(|t| {
+            t.rows
+                .iter()
+                .filter(|r| !r.is_empty())
+                .map(|r| name(&r[0]))
+                .filter(|n| n != "npt-load-ctl")
+                .collect()
+        })
+        .unwrap_or_default();
+    if doc_controls.iter().map(String::as_str).collect::<Vec<_>>() != RoomControl::NAMES {
+        problems.push(format!(
+            "u4-6: the room-wide controls are {doc_controls:?}, npt-proto's {:?}",
+            RoomControl::NAMES
+        ));
+    }
+    let size_line = format!(
+        "**Size:** at most {} B a message",
+        thousands(Limits::ROOM_CONTROL)
+    );
+    if !text.contains(&size_line) {
+        problems.push(format!(
+            "u4-6: the doc's room-wide controls do not say {size_line:?}"
+        ));
+    }
+    problems
+}
+
+/// `n` with commas between thousands, as the doc writes sizes.
+fn thousands(n: usize) -> String {
+    let s = n.to_string();
+    let mut out = String::new();
+    for (i, c) in s.chars().enumerate() {
+        if i > 0 && (s.len() - i).is_multiple_of(3) {
+            out.push(',');
+        }
+        out.push(c);
+    }
+    out
+}
+
+#[test]
+fn u4_items_1_2_3_and_6_hold_against_npt_proto() {
+    let problems = audit_u4(&doc());
+    assert!(problems.is_empty(), "{}", problems.join("\n"));
+}
+
+/// One broken copy of the doc per U4 assertion: each must fail, naming its item (the plan's "bites first", §6.1; a7's
+/// broken-copy bites).
+#[test]
+fn u4_every_assertion_bites() {
+    let text = doc();
+    let row = |ty: &str| {
+        text.lines()
+            .find(|l| l.starts_with(&format!("| `{ty}` |")))
+            .unwrap_or_else(|| panic!("the {ty} row"))
+            .to_owned()
+    };
+    let replace_cell = |line: &str, index: usize, value: &str| {
+        let mut c = cells(line);
+        c[index] = value.to_owned();
+        format!("| {} |", c.join(" | "))
+    };
+    let (input, ping, pong, kick, burst, block) = (
+        row("Input"),
+        row("Ping"),
+        row("Pong"),
+        row("Kick"),
+        row("PeerBurst"),
+        row("BlockUdp"),
+    );
+    let cases: Vec<(&str, String)> = vec![
+        ("u4-1:", text.replace(&format!("{kick}\n"), "")),
+        ("u4-1:", text.replace("| `Kick` |", "| `Boot` |")),
+        (
+            "u4-1:",
+            text.replace(&block, &block.replace("`BlockUdp`", "`BlockTcp`")),
+        ),
+        (
+            "u4-2:",
+            text.replace(&input, &replace_cell(&input, 2, "control stream")),
+        ),
+        (
+            "u4-2:",
+            text.replace(&pong, &replace_cell(&pong, 1, "room → client")),
+        ),
+        (
+            "u4-3:",
+            text.replace(&ping, &ping.replace("| 32 B (proposed", "| 33 B (proposed")),
+        ),
+        (
+            "u4-3:",
+            text.replace(
+                "refuses a datagram above 1,150 B",
+                "refuses a datagram above 1,151 B",
+            ),
+        ),
+        (
+            "u4-6:",
+            text.replace(&burst, &burst.replace("`PeerBurst`", "`PeerBlast`")),
+        ),
+        (
+            "u4-6:",
+            text.replace("at most 1,024 B a message", "at most 1,025 B a message"),
+        ),
+    ];
+    for (expect, broken) in &cases {
+        assert_ne!(
+            broken, &text,
+            "the broken copy for {expect} changed nothing"
+        );
+        let problems = audit_u4(broken);
+        assert!(
+            problems.iter().any(|p| p.starts_with(expect)),
+            "a copy broken for {expect} passed: {problems:?}"
+        );
+    }
+}
+
+/// A type's bytes after their framing (its type and body), framed for `channel` (catalogue §1).
+fn reframed(bytes: &[u8], from: Channel, to: Channel) -> Vec<u8> {
+    let frame = |c: Channel| match c {
+        Channel::Datagram => 0,
+        Channel::Control => 2,
+        Channel::FullState => 4,
+    };
+    let content = &bytes[frame(from)..];
+    let mut out = match frame(to) {
+        2 => (content.len() as u16).to_le_bytes().to_vec(),
+        4 => (content.len() as u32).to_le_bytes().to_vec(),
+        _ => Vec::new(),
+    };
+    out.extend_from_slice(content);
+    out
+}
+
+/// Item 2, the code's half: each type decodes at its receiver on its own channel and is refused there on every other
+/// one (`WrongChannel`), and refused at the other end (`WrongDirection`) unless it travels both ways. Item 3's size
+/// half: one byte over the limit the doc gives is the size error, whatever the buffer holds (a3 in tests/wire.rs runs
+/// it per type on 1,000 cases).
+#[test]
+fn u4_items_2_and_3_each_type_on_its_channel_its_direction_and_its_limit() {
+    let text = doc();
+    let empty = [
+        Message::Input(Input::default()),
+        Message::Snapshot(Snapshot::default()),
+        Message::FullState(FullState::default()),
+        Message::Resync(Resync),
+        Message::Ping(Ping::default()),
+        Message::Pong(Pong::default()),
+        Message::Join(Join::default()),
+        Message::JoinAccepted(JoinAccepted::default()),
+        Message::JoinRejected(JoinRejected::RosterFull),
+        Message::ClientSettings(ClientSettings::default()),
+        Message::RoomEnded(RoomEnded {
+            reason: EndReason::Crash,
+            final_tick: 7,
+        }),
+        Message::Leave(Leave::Quit),
+        Message::Kick(Kick::Overflow),
+        Message::SessionControl(SessionControl::TriggerBurst { cap: [1; 16] }),
+        Message::SessionStatus(SessionStatus::default()),
+    ];
+    for m in &empty {
+        let (ty, channel, direction, limit) = Limits::TYPES
+            .iter()
+            .copied()
+            .find(|t| t.0 == m.name())
+            .expect("a row");
+        let mut bytes = Vec::new();
+        encode(m, &mut bytes).expect("encodes");
+        let receivers: &[Direction] = match direction {
+            Direction::BothWays => &[Direction::ClientToRoom, Direction::RoomToClient],
+            d => &[d],
+        };
+        for &at in receivers {
+            assert_eq!(decode(at, channel, &bytes).as_ref(), Ok(m), "{ty}");
+            for other in [Channel::Datagram, Channel::Control, Channel::FullState] {
+                if other != channel {
+                    let b = reframed(&bytes, channel, other);
+                    assert_eq!(
+                        decode(at, other, &b),
+                        Err(DecodeError::WrongChannel),
+                        "{ty} on {other:?}"
+                    );
+                }
+            }
+        }
+        if direction != Direction::BothWays {
+            let wrong = if direction == Direction::ClientToRoom {
+                Direction::RoomToClient
+            } else {
+                Direction::ClientToRoom
+            };
+            assert_eq!(
+                decode(wrong, channel, &bytes),
+                Err(DecodeError::WrongDirection),
+                "{ty}"
+            );
+        }
+        // The size half: the doc's limit (for Snapshot, the receive limit its cell names), counted as the doc counts.
+        let wire = text
+            .lines()
+            .find(|l| l.starts_with(&format!("| `{ty}` |")))
+            .map(cells)
+            .expect("its row");
+        let doc_limit = if ty == "Snapshot" {
+            Limits::SNAPSHOT_RECEIVE
+        } else {
+            leading_bytes(&wire[5]).expect("bytes")
+        };
+        assert_eq!(leading_bytes(&wire[5]), Some(limit));
+        let over = doc_limit + 1 + if channel == Channel::FullState { 4 } else { 0 };
+        let mut b = bytes.clone();
+        b.resize(over, 0xa5);
+        assert_eq!(
+            decode(direction_or_room(direction), channel, &b),
+            Err(DecodeError::TooLarge),
+            "{ty}"
+        );
+    }
+}
+
+fn direction_or_room(d: Direction) -> Direction {
+    if d == Direction::BothWays {
+        Direction::ClientToRoom
+    } else {
+        d
+    }
+}
+
+/// Item 6: the room-wide controls decode with the 1,024 B limit and never panic: every control at its largest decodes,
+/// one byte over the limit is the size error, and 10,000 fixed-seed random buffers up to the limit give an error or
+/// the control that encodes to them (tests/wire.rs's a1 and a2 run 10,000 and 100,000 more).
+#[test]
+fn u4_item_6_room_controls_decode_within_1_024_b_and_never_panic() {
+    let sixteen: Vec<IpAddr> = (0..16u8)
+        .map(|i| {
+            if i % 2 == 0 {
+                IpAddr::V4(Ipv4Addr::new(10, 0, 0, i))
+            } else {
+                "2001:db8:0:1::".parse().expect("an address")
+            }
+        })
+        .collect();
+    let largest = RoomControl::RaiseAddrCap {
+        cap: 48,
+        addrs: sixteen,
+    };
+    let mut b = Vec::new();
+    largest.encode(&mut b).expect("encodes");
+    assert!(b.len() <= Limits::ROOM_CONTROL, "{}", b.len());
+    assert_eq!(RoomControl::decode(&b), Ok(largest));
+    // The enum and its names, both ways round: one control of each kind names NAMES in order (an exhaustive match
+    // gives each its code), as item 1 holds SessionControl's variants to the doc's rows.
+    let peers = vec![IpAddr::V4(Ipv4Addr::LOCALHOST)];
+    let one_of_each = [
+        RoomControl::MintToken {
+            slot: 1,
+            kind: npt_proto::TokenKind::Runner,
+        },
+        RoomControl::MintCapability { slot: 2 },
+        RoomControl::SetRewindCap { ticks: 9 },
+        RoomControl::RaiseAddrCap {
+            cap: 3,
+            addrs: peers.clone(),
+        },
+        RoomControl::InjectPanic {
+            target: None,
+            at: 4,
+        },
+        RoomControl::InjectStall { ms: 200, at: 5 },
+        RoomControl::SetPeerProfile {
+            peers: None,
+            profile: npt_proto::ProfileId::P3,
+        },
+        RoomControl::SetPeerThrottle {
+            peers: peers.clone(),
+            kbps: 128,
+            secs: 10,
+        },
+        RoomControl::SetPeerBottleneck {
+            peers: peers.clone(),
+            percent: 50,
+            secs: 600,
+        },
+        RoomControl::PeerBurst {
+            peers: peers.clone(),
+            ms: 1_000,
+        },
+        RoomControl::BlockPeerUdp {
+            peers: None,
+            on: true,
+        },
+    ];
+    assert_eq!(one_of_each.map(|c| c.name()), RoomControl::NAMES);
+    let variants = [
+        SessionControl::SetProfile {
+            cap: [0; 16],
+            profile: npt_proto::ProfileId::Default,
+        },
+        SessionControl::TriggerBurst { cap: [0; 16] },
+        SessionControl::BlockUdp {
+            cap: [0; 16],
+            on: false,
+        },
+        SessionControl::RecordStep {
+            cap: [0; 16],
+            step: 14,
+            result: npt_proto::StepResult::Observation,
+            note: String::new(),
+        },
+    ];
+    assert_eq!(variants.map(|v| v.variant()), SessionControl::VARIANTS);
+    let mut over = vec![0u8; Limits::ROOM_CONTROL + 1];
+    over[..2].copy_from_slice(&((Limits::ROOM_CONTROL - 1) as u16).to_le_bytes());
+    over[2] = 4;
+    assert_eq!(RoomControl::decode(&over), Err(DecodeError::TooLarge));
+    let mut rng = ChaCha8Rng::seed_from_u64(0xc6);
+    for _ in 0..10_000 {
+        let len = rng.next_u32() as usize % (Limits::ROOM_CONTROL + 1);
+        let mut buf = vec![0u8; len];
+        rng.fill_bytes(&mut buf);
+        if len >= 3 {
+            buf[..2].copy_from_slice(&((len - 2) as u16).to_le_bytes());
+            buf[2] = 1 + (rng.next_u32() % 11) as u8;
+        }
+        let r = std::panic::catch_unwind(|| RoomControl::decode(&buf)).expect("never a panic");
+        if let Ok(c) = r {
+            let mut again = Vec::new();
+            c.encode(&mut again).expect("encodes");
+            assert_eq!(again, buf);
+        }
     }
 }
 

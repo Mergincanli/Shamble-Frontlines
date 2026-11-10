@@ -1,5 +1,6 @@
 # npt-proto shares npt-sim's bans (plan §4.5): its quantisation and decoding must give the same bits on native and Wasm.
-# Keep this file identical to crates/sim/clippy.toml below this header; the spike's check script compares them.
+# Keep this file identical to crates/sim/clippy.toml below this header; check.mjs's deps step compares them line for
+# line (clippyTwinProblems, U4a).
 
 disallowed-types = [
     { path = "std::collections::HashMap", reason = "hash-map ban (GLOSSARY §7): iteration order is not deterministic" },

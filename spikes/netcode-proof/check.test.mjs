@@ -11,18 +11,25 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
   BITE_ID,
+  CHANNEL_ONLY,
+  CLIPPY_TWINS,
   STEPS,
   WASM_CRATES,
   biteHomeProblems,
   cargoConfigProblems,
   cargoCounts,
+  clippyTwinProblems,
   crateFiles,
   dependencyProblems,
   depsStep,
+  docBothBuilds,
   exceptionLintProblems,
   expectedMarks,
+  failedRun,
   layoutProblems,
   lexRust,
+  linkUseProblems,
+  lintBothBuilds,
   manifestKeyProblems,
   marksProblems,
   NOT_TICK_COUNTS,
@@ -30,6 +37,7 @@ import {
   roomFloatProblems,
   SIM_DEPENDENCIES,
   TICK_NAMED_SKIP,
+  testBothBuilds,
   tickConstantProblems,
   unsafeProblems,
   workspaceLintProblems,
@@ -1032,6 +1040,14 @@ const roomFloat = (at, token, n = 1) => `${at} has \`${token}\` (${n} float toke
 const biteTwice = (id, ...sites) =>
   `${id} is planted in ${sites.length} crates, ${sites.join(" and ")}: a bite's id lives in the one crate whose code it ` +
   "plants (u4-build-plan.md §4.14)";
+/** The clippy.toml comparison's message for the first differing lines (U4a; u4-build-plan.md §2, Drift). */
+const clippyDrift = (copyAt, homeAt) =>
+  `${copyAt} differs from ${homeAt} below their headers: crates/proto/clippy.toml is crates/sim/clippy.toml's list, ` +
+  "line for line (u4-build-plan.md §2, plan §4.5)";
+/** The npt-link grep's message for `shown` at `at` (U4a; u4s-carries.md carry 3). */
+const linkUse = (at, shown) =>
+  `${at} names \`${shown}\` from npt_link: npt-proto and npt-client use npt-link for Channel only (catalogue item 2; ` +
+  "u4-build-plan.md §4.1)";
 
 /**
  * A spike folder for depsStep (the workspace manifest, the two exceptions, npt-room and a cargo config) and cargo
@@ -1050,6 +1066,9 @@ function depsFixture(t, plant = () => {}, change = () => {}) {
     "crates/room/Cargo.toml": '[package]\nname = "npt-room"\n\n[lints]\nworkspace = true\n',
     "crates/room/src/lib.rs": "pub fn f() {}\n",
     ".cargo/config.toml": '[build]\ntarget-dir = "t"\n',
+    // U4a's clippy.toml pair (u4-build-plan.md §2, Drift): headers of different lengths, one list below them.
+    "crates/sim/clippy.toml": "# npt-sim's bans.\n# Its header.\n\ndisallowed-types = []\n",
+    "crates/proto/clippy.toml": "# npt-proto shares them.\n\ndisallowed-types = []\n",
   };
   plant(files);
   for (const [f, text] of Object.entries(files)) {
@@ -1091,10 +1110,14 @@ test("the deps step is depsStep, and it calls every check: one plant per check, 
       f["crates/room/src/ticks.rs"] = "pub const LOOP_CATCHUP: u32 = 7;\npub fn g() -> f64 {\n    0.0\n}\n";
       f["crates/sim/src/grid.rs"] = 'pub const BITES: [&str; 1] = ["PM-0001-17/client-rounding"];\n';
       f["crates/client/src/lib.rs"] = 'pub const BITES: [&str; 1] = ["PM-0001-17/client-rounding"];\n';
+      // U4a's two (u4-build-plan.md §2's Drift; u4s-carries.md carry 3).
+      f["crates/proto/clippy.toml"] += "disallowed-methods = []\n";
+      f["crates/proto/src/lib.rs"] = "use npt_link::Link;\n";
     },
     (e) => (e["npt-sim"] = n("tokio")),
   );
   bad.meta.packages.find((p) => p.name === "npt-room").targets[0].src_path = join(bad.dir, "crates", "tcpinfo", "src", "linux.rs");
+  bad.meta.packages.find((p) => p.name === "npt-proto").dependencies = [{ name: "npt-link", rename: "link" }];
   let linked = true;
   try {
     symlinkSync("lib.rs", join(bad.dir, "crates", "room", "src", "k.rs"));
@@ -1119,6 +1142,9 @@ test("the deps step is depsStep, and it calls every check: one plant per check, 
     ["tickConstantProblems", notAPath("crates/room/src/ticks.rs:1", "LOOP_CATCHUP", "7")],
     ["roomFloatProblems", roomFloat("crates/room/src/ticks.rs:2", "f64", 2)],
     ["biteHomeProblems", biteTwice("PM-0001-17/client-rounding", "crates/client/src/lib.rs:1", "crates/sim/src/grid.rs:1")],
+    ["clippyTwinProblems", clippyDrift("crates/proto/clippy.toml:4", "crates/sim/clippy.toml:4 (its end)")],
+    ["linkUseProblems", linkUse("crates/proto/src/lib.rs:1", "npt_link::Link")],
+    ["dependencyProblems (a renamed npt-link)", "npt-proto renames its npt-link dependency to link"],
   ]) {
     assert.ok(lines.includes(line), `${check}'s plant is not reported:\n${r.out}`);
   }
@@ -1504,4 +1530,169 @@ test("a bite id lives in one crate's sources: one id in two crates fails, naming
   assert.deepEqual(run((f) => (f["crates/lab/src/probe.rs"] += '#[cfg(test)]\nfn id() -> &\'static str {\n    "PM-0001-3/clock-seed"\n}\n')), [
     biteTwice("PM-0001-3/clock-seed", "crates/l1/src/lib.rs:3", "crates/lab/src/probe.rs:14"),
   ]);
+});
+
+test("npt-proto's clippy.toml is npt-sim's below its header: one changed line fails, naming both (U4a, u4-build-plan.md §2's Drift)", () => {
+  assert.deepEqual(CLIPPY_TWINS, [["crates/sim/clippy.toml", "crates/proto/clippy.toml"]]);
+  // The spike's own two files hold.
+  const real = (f) => readFileSync(join(HERE, f), "utf8");
+  assert.deepEqual(clippyTwinProblems(real), []);
+  const sim = real("crates/sim/clippy.toml");
+  const proto = real("crates/proto/clippy.toml");
+  const twins = (p, s = sim) => clippyTwinProblems((f) => (f.endsWith("proto/clippy.toml") ? p : s));
+  // a9's self-test bite: one line of proto's copy changed (a ban dropped from the list).
+  const simHead = sim.split("\n").findIndex((l) => l.startsWith("disallowed-types"));
+  const protoHead = proto.split("\n").findIndex((l) => l.startsWith("disallowed-types"));
+  const dropped = proto.replace('    "f32::sin", "f64::sin",\n', '    "f32::sin",\n');
+  const at = proto.split("\n").findIndex((l) => l === '    "f32::sin", "f64::sin",') + 1;
+  assert.notEqual(dropped, proto);
+  assert.deepEqual(twins(dropped), [
+    clippyDrift(`crates/proto/clippy.toml:${at}`, `crates/sim/clippy.toml:${at - protoHead + simHead}`),
+  ]);
+  // Below the header a comment counts; a longer or shorter header does not; a line added at the end is found there.
+  assert.equal(twins(proto.replace("disallowed-methods", "# note\ndisallowed-methods")).length, 1);
+  assert.deepEqual(twins(`# one more header line\n${proto}`), []);
+  assert.equal(twins(`${proto}extra = 1\n`)[0]?.includes("(its end)"), true);
+  // A missing file is a problem, not a pass.
+  const missing = clippyTwinProblems((f) => {
+    if (f.endsWith("proto/clippy.toml")) throw new Error("ENOENT");
+    return sim;
+  });
+  assert.equal(missing.length, 1);
+  assert.match(missing[0], /^crates\/proto\/clippy\.toml is missing/);
+});
+
+test("npt-proto's and npt-client's sources name only Channel from npt_link, by file and line (U4a, u4s-carries.md carry 3)", () => {
+  assert.deepEqual(CHANNEL_ONLY, ["crates/proto/src/", "crates/client/src/"]);
+  const files = { "crates/proto/src/msg.rs": "", "crates/client/src/lib.rs": "", "crates/room/src/lib.rs": "use npt_link::Link;\n" };
+  const run = (text, f = "crates/proto/src/msg.rs") => linkUseProblems(Object.keys({ ...files, [f]: 1 }), (g) => (g === f ? text : files[g]));
+  // The real tree holds.
+  const { files: real } = crateFiles(join(HERE, "crates"));
+  assert.deepEqual(linkUseProblems(real, (f) => readFileSync(join(HERE, f), "utf8")), []);
+  // Channel, whichever way it is named; prose and strings may name anything; another crate's sources are not read.
+  for (const ok of [
+    "use npt_link::Channel;\n",
+    "use npt_link :: Channel as Ch;\n",
+    "use npt_link::{Channel};\nuse npt_link::{ Channel as C, };\n",
+    "fn f(c: npt_link::Channel) -> bool { c == npt_link::Channel::Datagram }\n",
+    "// npt_link::Link is not ours\nconst S: &str = \"npt_link::Loopback\";\n",
+  ]) {
+    assert.deepEqual(run(ok), [], ok);
+  }
+  assert.deepEqual(run("use npt_link::Link;\n", "crates/room/src/lib.rs"), []);
+  // Anything else fails, named by file and line, in either crate.
+  for (const [bad, line, shown] of [
+    ["use npt_link::Link;\n", 1, "npt_link::Link"],
+    ["\nuse npt_link::{Channel, Link};\n", 2, "npt_link::{Channel, Link}"],
+    ["use npt_link::*;\n", 1, "npt_link::*"],
+    ["use npt_link;\n", 1, "npt_link"],
+    ["extern crate npt_link as l;\n", 1, "npt_link as l"],
+    ["fn f() { let _ = npt_link::Loopback::pair(); }\n", 1, "npt_link::Loopback::pair()"],
+    ["use npt_link::ChannelSet;\n", 1, "npt_link::ChannelSet"],
+  ]) {
+    assert.deepEqual(run(bad), [linkUse(`crates/proto/src/msg.rs:${line}`, shown)], bad);
+    assert.deepEqual(run(bad, "crates/client/src/lib.rs"), [linkUse(`crates/client/src/lib.rs:${line}`, shown)], bad);
+  }
+  // A renamed dependency would hide the name from the grep: refused in npt-proto's and npt-client's manifests only.
+  const renamed = (crate) => {
+    const m = meta(clean());
+    m.packages.find((p) => p.name === crate).dependencies = [{ name: "npt-link", rename: "link" }];
+    return dependencyProblems(m);
+  };
+  assert.deepEqual(renamed("npt-proto"), ["npt-proto renames its npt-link dependency to link"]);
+  assert.deepEqual(renamed("npt-client"), ["npt-client renames its npt-link dependency to link"]);
+  assert.deepEqual(renamed("npt-room"), []);
+});
+
+/** A runner that records each cargo call and answers from `results` (then success). */
+function recorder(results = []) {
+  const calls = [];
+  const runner = (cmd, args, cwd, env) => {
+    calls.push({ cmd, args, cwd, env });
+    return results.shift() ?? { ok: true, out: `ran ${args[0]}\n`, stdout: "", status: 0 };
+  };
+  return { calls, runner };
+}
+
+test("each cargo step runs what it says: fmt, clippy and its wasm32 twin, doc and test, both builds, -D warnings (U4a, the rust fix2 review's nits)", () => {
+  const steps = (name) => {
+    const r = recorder();
+    const out = STEPS[name](r.runner);
+    return { out, calls: r.calls.map((c) => `${c.cmd} ${c.args.join(" ")}`), env: r.calls.map((c) => c.env) };
+  };
+  assert.deepEqual(steps("fmt").calls, ["cargo fmt --all --check"]);
+  assert.deepEqual(steps("clippy").calls, [
+    "cargo clippy --locked --workspace --all-targets -- -D warnings",
+    "cargo clippy --locked --workspace --all-targets --all-features -- -D warnings",
+  ]);
+  const wasm = `--target wasm32-unknown-unknown ${WASM_CRATES.map((c) => `-p ${c}`).join(" ")}`;
+  assert.deepEqual(steps("clippy-wasm32").calls, [
+    `cargo clippy --locked ${wasm} -- -D warnings`,
+    `cargo clippy --locked ${wasm} --all-features -- -D warnings`,
+  ]);
+  assert.deepEqual(steps("test").calls, ["cargo test --locked --workspace", "cargo test --locked --workspace --all-features"]);
+  // doc: both builds on the host, then both for wasm32 (npt-tcpinfo's non-Linux stub documented too), rustdoc's
+  // warnings as errors through RUSTDOCFLAGS, whatever the environment held, and no CARGO_ENCODED_RUSTDOCFLAGS.
+  assert.equal(STEPS.doc, docBothBuilds);
+  assert.equal(STEPS.test, testBothBuilds);
+  const r = recorder();
+  const doc = docBothBuilds(r.runner, { PATH: "/bin", RUSTDOCFLAGS: "--cap-lints=allow", CARGO_ENCODED_RUSTDOCFLAGS: "--cap-lints=allow" });
+  assert.equal(doc.ok, true);
+  assert.deepEqual(
+    r.calls.map((c) => `${c.cmd} ${c.args.join(" ")}`),
+    [
+      "cargo doc --locked --no-deps --workspace",
+      "cargo doc --locked --no-deps --workspace --all-features",
+      `cargo doc --locked --no-deps ${wasm}`,
+      `cargo doc --locked --no-deps ${wasm} --all-features`,
+    ],
+  );
+  assert.ok(WASM_CRATES.includes("npt-tcpinfo"));
+  for (const c of r.calls) {
+    assert.equal(c.env.RUSTDOCFLAGS, "-D warnings");
+    assert.equal(Object.hasOwn(c.env, "CARGO_ENCODED_RUSTDOCFLAGS"), false);
+    assert.equal(c.env.PATH, "/bin");
+  }
+  assert.match(lastLine(doc.out), /^measured build and bites build both documented, host and wasm32, rustdoc warnings as errors$/);
+  assert.match(lastLine(steps("clippy").out.out), /^measured build and bites build both linted$/);
+});
+
+const lastLine = (text) => text.trimEnd().split("\n").at(-1);
+const cargoTail = "error: this URL is not a hyperlink\n --> crates/room/src/lib.rs:7:27\nerror: could not document `npt-room`\nwarning: build failed, waiting for other jobs to finish...\n";
+const failed = (out = cargoTail) => ({ ok: false, out, stdout: "", status: 101 });
+
+test("a failed build's summary names the build and its first error, not cargo's last line (U4a, the rust fix2 review's nits)", () => {
+  // The measured build's rustdoc failing: its first error, and no further run.
+  let r = recorder([failed()]);
+  let s = docBothBuilds(r.runner, {});
+  assert.equal(s.ok, false);
+  assert.equal(r.calls.length, 1);
+  assert.equal(lastLine(s.out), "the measured build's rustdoc failed: error: this URL is not a hyperlink");
+  // Only the bites build's clippy failing: never "both linted".
+  r = recorder([{ ok: true, out: "measured ok\n" }, failed("error[E0425]: cannot find value `x` in this scope\nerror: could not compile\n")]);
+  s = lintBothBuilds(["--workspace"], r.runner);
+  assert.equal(s.ok, false);
+  assert.equal(lastLine(s.out), "the bites build's clippy (the measured build's passed) failed: error[E0425]: cannot find value `x` in this scope");
+  assert.ok(!s.out.includes("both linted"), s.out);
+  assert.ok(s.out.startsWith("measured ok\n"), "the measured build's output is kept");
+  // The measured build's clippy, then each of doc's later runs, and the tests.
+  r = recorder([failed()]);
+  assert.equal(lastLine(lintBothBuilds([], r.runner).out), "the measured build's clippy failed: error: this URL is not a hyperlink");
+  for (const [at, what] of [
+    [1, "the bites build's rustdoc"],
+    [2, "the measured build's wasm32 rustdoc"],
+    [3, "the bites build's wasm32 rustdoc"],
+  ]) {
+    r = recorder([...Array(at).fill({ ok: true, out: "" }), failed()]);
+    assert.equal(lastLine(docBothBuilds(r.runner, {}).out), `${what} failed: error: this URL is not a hyperlink`);
+    assert.equal(r.calls.length, at + 1);
+  }
+  const testOut = "test result: FAILED. 3 passed; 1 failed; 0 ignored\nerror: test failed, to rerun pass `-p npt-proto --test wire`\n";
+  r = recorder([failed(testOut)]);
+  assert.equal(
+    lastLine(testBothBuilds(r.runner).out),
+    "the measured build's tests (3 tests passed, 1 failed, 0 reported a skip) failed: error: test failed, to rerun pass `-p npt-proto --test wire`",
+  );
+  // Output with no error line says so.
+  assert.equal(lastLine(failedRun(failed("warning: build failed\n"), "x").out), "x failed: its output has no error line (the lines above)");
 });

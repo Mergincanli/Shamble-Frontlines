@@ -3,12 +3,15 @@
 //   node spikes/netcode-proof/check.mjs [--only <step,...>]
 // Steps: fmt, clippy (host, all targets) and clippy-wasm32 (the leaf crates and npt-tcpinfo's non-Linux stub), each on
 // the measured build and on the bites build with warnings as errors; doc (rustdoc on every member, no dependency, both
-// builds, warnings as errors: a broken intra-doc link fails it); test (cargo test on the measured build, then on
+// builds, then the wasm32 crates for wasm32, warnings as errors: a broken intra-doc link fails it); test (cargo test on
+// the measured build, then on
 // the bites build, its counts and any test that reported a skip); deps (the dependency rules of plan §4.2 that
 // `cargo metadata` shows, with every feature and target, and its unsafe_code rule, from the crates' files, the
 // manifests and the environment and cargo configs this command's cargo reads: DEPS_CHECKED says what it checks, and
 // the comment above it what it does not; with U4s's three greps: the tick constants of u4-build-plan.md §4.3,
-// npt-room's float-free sources, §4.11, and each bite id in one crate's sources, §4.14); refs (nothing outside spikes/
+// npt-room's float-free sources, §4.11, and each bite id in one crate's sources, §4.14; and U4a's two: npt-proto's
+// clippy.toml against npt-sim's, §2, and npt-link's Channel alone in npt-proto and npt-client); refs (nothing outside
+// spikes/
 // references it, §4.2 and §4.9);
 // marks (marks.json compiles in the judge, covers exactly the plan's marks, and every row it hashed is unchanged); self
 // (this file's own tests); redact (redact-check's tests, then a scan of the spike's folder). It runs every step and
@@ -137,6 +140,14 @@ export function dependencyProblems(meta) {
   const netNode = meta.resolve.nodes.find((n) => n.id === netId);
   for (const d of netNode?.deps ?? []) {
     if (byId.get(d.pkg).name === "libc" && isShipped(d)) problems.push("npt-net depends on libc directly");
+  }
+  // npt-proto and npt-client name npt-link `npt_link`, never renamed, so linkUseProblems sees every use of it (U4a;
+  // u4s-carries.md carry 3).
+  for (const p of meta.packages) {
+    if (!["npt-proto", "npt-client"].includes(p.name)) continue;
+    for (const d of p.dependencies ?? []) {
+      if (d.name === "npt-link" && d.rename) problems.push(`${p.name} renames its npt-link dependency to ${d.rename}`);
+    }
   }
   // Nothing depends on npt-lab, in any kind.
   for (const n of meta.resolve.nodes) {
@@ -747,6 +758,85 @@ export function biteHomeProblems(files, read) {
 }
 
 /**
+ * The clippy.toml files that must be one list below their headers (u4-build-plan.md §2, "Drift"; plan §4.5): npt-proto
+ * shares npt-sim's determinism bans, since its quantisation and decoding must give the same bits on native and Wasm,
+ * and its file says the check script compares them.
+ */
+export const CLIPPY_TWINS = [["crates/sim/clippy.toml", "crates/proto/clippy.toml"]];
+
+/** A clippy.toml's lines below its header (the leading `#` comment lines and blank lines), with each line's number. */
+function belowHeader(text) {
+  const lines = text.split("\n");
+  if (lines.at(-1) === "") lines.pop();
+  const start = lines.findIndex((l) => l.trim() !== "" && !l.trimStart().startsWith("#"));
+  return start < 0 ? [] : lines.slice(start).map((line, i) => ({ line, at: start + i + 1 }));
+}
+
+/**
+ * Every CLIPPY_TWINS pair that differs below its headers, as a sentence naming the first differing line of each
+ * (a missing file is a problem too). Below the header every byte counts, comments included: the copy is the list.
+ */
+export function clippyTwinProblems(read) {
+  const problems = [];
+  for (const [home, copy] of CLIPPY_TWINS) {
+    const texts = [];
+    for (const f of [home, copy]) {
+      try {
+        texts.push(read(f));
+      } catch {
+        problems.push(`${f} is missing: it is one of the clippy.toml files that must match (${home}, ${copy})`);
+      }
+    }
+    if (texts.length < 2) continue;
+    const [a, b] = texts.map(belowHeader);
+    for (let i = 0; i < Math.max(a.length, b.length); i++) {
+      if (a[i]?.line === b[i]?.line) continue;
+      const where = (f, lines) => (lines[i] ? `${f}:${lines[i].at}` : `${f}:${lines.at(-1)?.at ?? 0} (its end)`);
+      problems.push(
+        `${where(copy, b)} differs from ${where(home, a)} below their headers: ` +
+          `${copy} is ${home}'s list, line for line (u4-build-plan.md §2, plan §4.5)`,
+      );
+      break;
+    }
+  }
+  return problems;
+}
+
+/**
+ * The sources that use npt-link for `Channel` only (catalogue item 2; u4-build-plan.md §4.1: npt-link is a dependency
+ * of npt-proto and npt-client for `Channel`; the arch review's F5, u4s-carries.md carry 3).
+ */
+export const CHANNEL_ONLY = ["crates/proto/src/", "crates/client/src/"];
+/** What may follow the name `npt_link` there: `::Channel` (a path into it, `::Channel::Datagram`, or `as` a name), or a
+ * use list holding `Channel` alone. */
+const CHANNEL_PATH = /^\s*::\s*(?:Channel\b|\{\s*Channel(?:\s+as\s+[A-Za-z_]\w*)?\s*,?\s*\})/;
+
+/**
+ * Every place in CHANNEL_ONLY's sources that names anything from `npt_link` but `Channel`, as a sentence naming its
+ * file and line, read in lexRust's mask (comments and literals blanked): `use npt_link::Link;`, a use list with more,
+ * a glob, the bare crate (`use npt_link;`, `extern crate npt_link as l;`), any other path.
+ * Known limit: a grep, not rustc's. A renamed dependency would hide the name, so dependencyProblems refuses a rename
+ * of npt-link in npt-proto's and npt-client's manifests; a macro that builds the path is review's.
+ */
+export function linkUseProblems(files, read) {
+  const problems = [];
+  for (const f of files) {
+    if (!CHANNEL_ONLY.some((d) => f.startsWith(d)) || !f.endsWith(".rs")) continue;
+    const { mask } = lexRust(read(f));
+    for (const m of mask.matchAll(/\bnpt_link\b/g)) {
+      const rest = mask.slice(m.index + m[0].length);
+      if (CHANNEL_PATH.test(rest)) continue;
+      const shown = `npt_link${rest.split(/[;\n]/, 1)[0]}`.replace(/\s+/g, " ").trim();
+      problems.push(
+        `${f}:${lineAt(mask, m.index)} names \`${shown}\` from npt_link: npt-proto and npt-client use npt-link for ` +
+          "Channel only (catalogue item 2; u4-build-plan.md §4.1)",
+      );
+    }
+  }
+  return problems;
+}
+
+/**
  * The dotted key that starts at `from` in a tomlScan (spaces and tabs before it skipped), read no further than `end`:
  * its parts, each bare (letters, digits, `_` and `-`, from the mask) or quoted (a string, its value decoded), and the
  * offset just past it; null when no key starts there. `stringAt` maps each string's start to it.
@@ -1348,41 +1438,65 @@ function summarized(r, summary) {
 export const WASM_CRATES = [...LEAF, "npt-tcpinfo"];
 const WASM_ARGS = ["--target", "wasm32-unknown-unknown", ...WASM_CRATES.flatMap((c) => ["-p", c])];
 
-/** clippy with warnings as errors on the measured build (no features), then on the bites build (every feature). */
-function lintBothBuilds(scope) {
-  const measured = run("cargo", ["clippy", "--locked", ...scope, "--", "-D", "warnings"], HERE);
-  if (!measured.ok) return measured;
-  const bites = run("cargo", ["clippy", "--locked", ...scope, "--all-features", "--", "-D", "warnings"], HERE);
-  return { ok: bites.ok, out: `${measured.out}${bites.out}\nmeasured build and bites build both linted`, status: bites.status };
+/**
+ * A failed cargo run with its summary line (the step's last line, which main prints) naming the first `error` line of
+ * its output, not cargo's last line ("warning: build failed, waiting for other jobs to finish..."; the rust fix2
+ * review's nit, u4s-carries.md entry 34): `what` says which run failed. The detail stays in the lines above it.
+ */
+export function failedRun(r, what, before = "") {
+  const first = r.out.split("\n").find((l) => /^error(?:\[\w+\])?:/.test(l.trim()));
+  const said = first ? first.trim() : "its output has no error line (the lines above)";
+  return { ...r, ok: false, out: `${before}${r.out}\n${what} failed: ${said}` };
+}
+
+/**
+ * clippy with warnings as errors on the measured build (no features), then on the bites build (every feature), through
+ * `runner` (`run`; check.test.mjs passes a recorder). A failure's summary names its build and its first error.
+ */
+export function lintBothBuilds(scope, runner = run) {
+  const measured = runner("cargo", ["clippy", "--locked", ...scope, "--", "-D", "warnings"], HERE);
+  if (!measured.ok) return failedRun(measured, "the measured build's clippy");
+  const bites = runner("cargo", ["clippy", "--locked", ...scope, "--all-features", "--", "-D", "warnings"], HERE);
+  if (!bites.ok) return failedRun(bites, "the bites build's clippy (the measured build's passed)", measured.out);
+  return { ok: true, out: `${measured.out}${bites.out}\nmeasured build and bites build both linted`, status: bites.status };
 }
 
 /**
  * rustdoc on every member's own items, no dependency's, with warnings as errors (the rust fix-review's G2: a broken
  * intra-doc link had passed every step), on the measured build, then on the bites build: a feature compiles items, and
- * their docs, in and out. The flags go in RUSTDOCFLAGS; CARGO_ENCODED_RUSTDOCFLAGS, which cargo would read in its
- * place, is dropped from this run's environment.
+ * their docs, in and out; then the same two for wasm32 on WASM_CRATES, so the code a target compiles in (npt-tcpinfo's
+ * non-Linux stub) is documented too (the rust fix2 review's nit, u4s-carries.md entry 34). The flags go in
+ * RUSTDOCFLAGS; CARGO_ENCODED_RUSTDOCFLAGS, which cargo would read in its place, is dropped from this run's
+ * environment (`base`, process.env when check.mjs runs it). Through `runner`, as lintBothBuilds.
  */
-function docBothBuilds() {
-  const { CARGO_ENCODED_RUSTDOCFLAGS: _, ...env } = process.env;
+export function docBothBuilds(runner = run, base = process.env) {
+  const { CARGO_ENCODED_RUSTDOCFLAGS: _, ...env } = base;
   env.RUSTDOCFLAGS = "-D warnings";
-  const args = ["doc", "--locked", "--no-deps", "--workspace"];
-  const measured = run("cargo", args, HERE, env);
-  if (!measured.ok) return measured;
-  const bites = run("cargo", [...args, "--all-features"], HERE, env);
-  const summary = bites.ok
-    ? "measured build and bites build both documented, rustdoc warnings as errors"
-    : "the bites build's rustdoc failed (the measured build's passed)";
-  return { ok: bites.ok, out: `${measured.out}${bites.out}\n${summary}`, status: bites.status };
+  const host = ["doc", "--locked", "--no-deps", "--workspace"];
+  const wasm = ["doc", "--locked", "--no-deps", ...WASM_ARGS];
+  let out = "";
+  for (const [args, what] of [
+    [host, "the measured build's rustdoc"],
+    [[...host, "--all-features"], "the bites build's rustdoc"],
+    [wasm, "the measured build's wasm32 rustdoc"],
+    [[...wasm, "--all-features"], "the bites build's wasm32 rustdoc"],
+  ]) {
+    const r = runner("cargo", args, HERE, env);
+    if (!r.ok) return failedRun(r, what, out);
+    out += r.out;
+  }
+  return { ok: true, out: `${out}\nmeasured build and bites build both documented, host and wasm32, rustdoc warnings as errors` };
 }
 
 /** Both builds' tests: the measured build (no features), then the bites build (every feature, the planted defects
- * compiled in: plan §4.7). Each count is reported, skips included (cargoCounts). */
-function testBothBuilds() {
-  const measured = run("cargo", ["test", "--locked", "--workspace"], HERE);
-  if (!measured.ok) return measured;
-  const bites = run("cargo", ["test", "--locked", "--workspace", "--all-features"], HERE);
+ * compiled in: plan §4.7). Each count is reported, skips included (cargoCounts). Through `runner`, as lintBothBuilds. */
+export function testBothBuilds(runner = run) {
+  const measured = runner("cargo", ["test", "--locked", "--workspace"], HERE);
+  if (!measured.ok) return failedRun(measured, `the measured build's tests (${cargoCounts(measured.out)})`);
+  const bites = runner("cargo", ["test", "--locked", "--workspace", "--all-features"], HERE);
   const summary = `measured build: ${cargoCounts(measured.out)}; bites build: ${cargoCounts(bites.out)}`;
-  return { ok: bites.ok, out: `${measured.out}${bites.out}\n${summary}`, status: bites.status };
+  if (!bites.ok) return failedRun(bites, `the bites build's tests (${summary})`, measured.out);
+  return { ok: true, out: `${measured.out}${bites.out}\n${summary}`, status: bites.status };
 }
 
 /**
@@ -1431,7 +1545,9 @@ const DEPS_CHECKED =
   "a proc-macro, and every path dependency is a member; no symbolic link under crates/; every #[path] and include! " +
   "literal names a .rs file in its own crate; TICK_HZ is set from a literal once, in npt-sim; each derived tick " +
   "constant is its own function at TICK_HZ in npt-sim and a path to it elsewhere, and no other *_TICKS or *CATCHUP* " +
-  "constant is set from a literal; npt-room's sources hold no float; no bite id is in two crates' sources";
+  "constant is set from a literal; npt-room's sources hold no float; no bite id is in two crates' sources; " +
+  "npt-proto's clippy.toml is npt-sim's below its header; npt-proto's and npt-client's sources name only Channel " +
+  "from npt_link, which neither manifest renames";
 
 /** `cargo metadata` for the spike in `here`, with every feature, parsed: { ok, meta }, or the failed run. */
 function cargoMetadata(here) {
@@ -1466,17 +1582,21 @@ export function depsStep(here = HERE, env = process.env, metadata = cargoMetadat
     ...tickConstantProblems(files, read),
     ...roomFloatProblems(files, read),
     ...biteHomeProblems(files, read),
+    ...clippyTwinProblems(read),
+    ...linkUseProblems(files, read),
   ];
   const counts = `${files.length} crate files and ${configs.length} cargo config file(s) read`;
   return { ok: problems.length === 0, out: problems.join("\n") || `${DEPS_CHECKED} (${counts})` };
 }
 
+// Each cargo step takes the runner it calls cargo through (`run` when main calls it), so check.test.mjs pins what each
+// step runs: its commands, its flags, -D warnings included (the rust fix2 review's nit, u4s-carries.md entry 34).
 export const STEPS = {
-  fmt: () => run("cargo", ["fmt", "--all", "--check"], HERE),
+  fmt: (runner = run) => runner("cargo", ["fmt", "--all", "--check"], HERE),
   // Both builds, as the tests run: the measured build (no features) and the bites build (every feature). A feature can
   // compile code out as well as in (npt-lab's probe has `cfg(not(feature = "bites"))` code), so one pass is not enough.
-  clippy: () => lintBothBuilds(["--workspace", "--all-targets"]),
-  "clippy-wasm32": () => lintBothBuilds(WASM_ARGS),
+  clippy: (runner = run) => lintBothBuilds(["--workspace", "--all-targets"], runner),
+  "clippy-wasm32": (runner = run) => lintBothBuilds(WASM_ARGS, runner),
   doc: docBothBuilds,
   test: testBothBuilds,
   deps: depsStep,
