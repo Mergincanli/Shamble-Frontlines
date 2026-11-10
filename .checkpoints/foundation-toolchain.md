@@ -57,8 +57,17 @@
     PASS (1-4, 5b-5d); 5a cannot start here (the toolkit's Playwright 1.56.1 wants Chromium 1194, the container has
     1243, and a second Playwright install is forbidden): 5a runs in CI's smoke job.
 
+14. Build step 2, the crates and packages · 566363f · E1 (cargo test 6/6; wasm32 build of the five Wasm crates;
+    release overflow tests pass, and fail "did not panic as expected" with sim's override removed: the control); L1
+    (an unsafe block: "usage of an `unsafe` block"); E7 (6 package.json files exact; packages private with their own
+    type); E11 (69 lock entries = 64 registry packages, all npmjs with sha512 integrity, + 5 workspace links; install
+    scripts: fsevents only, optional, macOS); E4a none; gate `--no-smoke` PASS, symbols +0 -0; local build folder
+    cleaned (48.5 MiB). The session's permission check refused running npm scripts here twice (`npm test`, also in a
+    scratch workspace): not retried; E1's npm half runs in CI (E2), L2 rests on npm's own docs (B3 quote), and L3
+    becomes planted failure M4 in CI.
+
 ## Current step
-Build step 2: the six crates and five packages, `Cargo.lock`, E1, L1-L3, E6, E7, E11.
+Build step 3: K1, `.github/workflows/toolchain.yml` (asks Mustafa), push, draft PR, E2.
 
 ## Next steps
 1. Build steps 1-4 of plan.md revision 5, Part 8, here: 1 root pins and lockfiles; 2 the crates and packages with E1,
@@ -87,6 +96,9 @@ Build step 2: the six crates and five packages, `Cargo.lock`, E1, L1-L3, E6, E7,
   `rustup show active-toolchain` prints `1.99.1-x86_64-unknown-linux-gnu (overridden by '<repo>/rust-toolchain.toml')`.
 
 ## Decisions taken
+- The session, 2026-11-10 (method, not design): the npm test runs move from local (E1's npm half, L3) to CI (E2, a
+  fifth planted failure M4: a package without a test script), because the session's permission check refused npm
+  script runs; L2 rests on npm's documented behaviour. To fold into the report.
 - Mustafa, 2026-11-10: FDN-NOCODE (a) ("One clause per line naming my 2026-11-10 decision as the exception; each edit
   asks me and merges on my go."); FDN-HEADING (a) ("The edit asks me and merges on my go."); the build starts now in a
   fresh session, steps 1-4 before 2.1b merges, step 5 waits; the network cut: one fix round, then cargo's and npm's
