@@ -1,0 +1,22 @@
+Task: advisor plan review, foundation step 2.2 toolchain, plan revision 3 (bf1737f)
+
+## Plan (blocks in order)
+B1. Equality check: git show bf1737f:plan.md vs working copy.
+B2. Read my rev1 verdict + rev1 notes (conditions 1-6 as I meant them).
+B3. Read fold-check notes a, b, c, critic.
+B4. Read diff b6c20be..bf1737f (rev2 -> rev3) and the relevant plan parts (Part 9).
+B5. Read diff f535752..bf1737f where needed (conditions folded overall).
+B6. Check sources: Mustafa's words (session file, 828a3e0 files), STATUS 680-710, CHECKPOINTS.md §5 §8, CLAUDE.md Never switch, checkpoint.mjs detached refusal, guard switch rules.
+B7. Rule on each changed mechanic + FDN-NOCODE + new issues.
+B8. Write verdict section. DONE.
+
+## Notes
+- B1 done: working copy plan.md equals bf1737f (diff empty). Next B2.
+- B2 done: rev1 verdict + notes reread (conditions 1-6 as meant: C1 FDN-NOCODE 3 lines+SCOPE quote+plain lead+timing; C2 non-ff merge in .gate/ worktree, push from there; C3 cancel-in-progress stated, each mutation alone, wait red, then revert; C4 sec brief dep review; C5 ADR0002 Status before K2; C6 Lows). Next B3.
+- B3 done: fold-check a/b/c/critic read. Mediums found by fold: (B) C2b detached worktree vs saver refusal + stale main-folder branch; (C) E11 link entries; (C) Part 9 'every cited line' overclaim. Lows: F-3 overclaim (cut verdict from DNS fail), C3b foreground save pushes code (checkpoint.mjs:168,180-184), git -C refused, worktree removal, E2 'only lo' (fb tunnels), misc wording. Next B4.
+- B4 done: diff b6c20be..bf1737f read (plan +267/-109). Changes: step 5 branch worktree (stop saver; main folder `git switch -c <name> origin/main`; `git worktree add .gate/foundation-toolchain-wt <branch>`; cd own call; tools npm ci + chromium; merge origin/main there; push; saver restarted there); Part 7 planted pushes by hand, no save while planted/revert unpushed, revert committed only after red; E11 link entries; probe via getent ahostsv4 outside + curl --resolve inside, --norc --noprofile; E2 lo up + others noted; FDN-NOCODE wording (three lines with their exact words, SCOPE explained, timing "before the kit lines are written (step 5)"); K2a told to him; For Mustafa list incl. register go; Part 9 fold-check record; Node rationale restored.
+- to check: (a) step 5 does not say "save + push checkpoint, clean tree" before the switch; (b) background watch saver during step 4 (a [skip ci] checkpoint commit on top of a planted commit = PR head skip -> no run); (c) probe's "cut" verdict = any curl failure (TLS etc.), not strictly TCP; (d) E11 non-link entry without resolved; (e) resume after cut-off when work lives in .gate worktree (§5/§8). Next B5/B6 sources.
+- B5/B6 partial (sources on main 2d22b69): CHECKPOINTS §5 (saver stops when branch changes; refuses detached; background never publishes code: commits locally, skips push; one saver per task), §8 (resume: worktree `.gate/<slug>-wt <branch>`, saver from there), §10 (worktree remove checks). checkpoint.mjs:168 a save with code ahead carries NO [skip ci] -> a held background checkpoint commit pushed with a planted commit still triggers the run (evidence holds); :90 detached refusal; :88 run from repo root (worktree root ok). Guard mainFolderMove (:1308-1362): `git switch -c <new> origin/main` in main folder -> no ask when origin/main resolves (isOriginMain); merge in another worktree -> not inspected (sameDir false). So step 5's mechanics pass the guard and match §8's form.
+- finding L-a (Low): step 5 does not say the tree must be clean and pushed before `git switch -c` (stopping the saver makes its last save; untracked notes would stay in the main folder, not the worktree; dirty tracked files block the switch = safe). Add "git status --short empty, branch pushed".
+- finding L-b (Low): checkpoint should record (Running work) that work lives in .gate/foundation-toolchain-wt and the main folder sits on <name>, so a same-container resume cds there instead of a §8 `worktree add` that would fail (branch already checked out).
+- E11 reproduced (npm 10.9.9, offline, scratchpad ws): node_modules/@s/a {resolved: packages/a, link: true}; packages/a {name, version} no resolved; root no resolved. Rev3 E11 rule handles links. finding L-c (Low): a node_modules/ entry with no link and no resolved passes the rule silently; require every node_modules/ entry to be one of the five links or carry a registry resolved + integrity.
