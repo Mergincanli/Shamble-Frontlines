@@ -104,7 +104,8 @@ renamed file with whole lists; `CLAUDE.local.md` and `AGENTS.md` protected anywh
 file (9bacf47). Tests red on main's guard (47 of 1086 fail), then green (1086/1086, settings 127, checkpoint 27); gate
 PASS. Docs: #44 merged, his queue word for word (KIT-FREEZE-2, STATUS-DIET, LANE-RULES, the unit walk, the Slice 1
 note), the known limits, the kit-v3-4 report's correction. The review round (three PASS WITH NOTES, nothing Critical or
-High) and its fix pass (08423ce: routine-guard 1107/1107). Next: the verifier's re-check, the report and his go.
+High) and its fix pass (08423ce: routine-guard 1107/1107); the verifier's re-check (PASS WITH NOTES); the report
+`docs/reports/2026-11-10-kit-v3-5.md`. Next: the advisor's final-head review and his go.
 
 **Kit v3.4, the review policy [2026-11-07 to 11-09, MERGED]** — kit-v3-4 (PR #44, 44446a5, 2026-11-09 18:21 UTC, by
 merge commit, on Mustafa's go ("merge #44") after the advisor's APPROVE WITH NOTES of 7c36d5a; CI green on main after
