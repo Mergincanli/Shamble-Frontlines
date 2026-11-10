@@ -12,16 +12,10 @@ u4d-test-probe.py (this folder); notes rewritten whole with Write.
 ## Plan
 1. Reference sha256 of every crates/sim file (done below). Check no other cargo/rustc, df.
 2. check.mjs run A (unchanged): ten step lines, counts (expect measured 304, bites 327, 0 failed).
-3. Bites from §5 U4d: B1 hash-map via D-2 (first mismatch = T, digests differ); B2 std-sin site (state changes at
-   arm tick; proof U4d2's); B3 -41 speed 1 %; B4 -41 quant; B5 D-4 planted 0.0/0.0 (independent site); B6 bites-only
-   clippy allow (sim/clippy.toml denies HashMap / std sin outside the allow).
-4. Extra bites (missed or not done by the builder): D-1, D-5 (other pool), D-6 thresholds (soldiers/teams/vehicles/
-   parts/projectiles/effects), D-7 pins, D-8 reach, D-9 blend ref, D-10 ammo, reload, clamp, rewind-outside twins,
-   carry 38 event list, D-3 untouched streams.
-5. Settle reviewer findings by probe (temporary test, restored): clamp z idempotency (rust L4), FLAG_FIRED catch-up
-   mispredict (netcode M3), load_movers extra records (rust M1), decode pre-alloc (rust L1), non-canonical recording
-   panic (rust L2), magazine dry at 11.4 min (netcode M1) if affordable.
-6. Read tests vs plan: can each fail, vacuous checks, numbers vs sources (PM-0001-2 bands, §4.13, §4.15 sizes).
+3. Bites from §5 U4d: B1 hash-map via D-2; B2 std-sin site; B3 -41 speed; B4 -41 quant; B5 D-4 0.0/0.0; B6 clippy allows.
+4. Extra bites: D-1, D-3 streams, D-5 trace, D-6 thresholds, D-7 pins, D-8 slack, D-9 reference, D-10 traces.
+5. Probes for reviewer findings (temporary test file, deleted).
+6. Read tests vs plan: can each fail, vacuous checks, numbers vs sources.
 7. check.mjs run B after fresh touch; sha256 all equal reference; git status unchanged.
 
 ## Reference sha256 (full; taken 2026-11-10 at start, equal to the builder's report)
@@ -46,54 +40,71 @@ u4d-test-probe.py (this folder); notes rewritten whole with Write.
 ## Progress
 - [0] Notes started; no earlier notes of mine (fresh). sha256 all equal the builder's final list.
 - [1] Runner: scratchpad/u4d-te-run.sh (waits 8 s idle, df, touch, 2 s toucher, output to stdout only).
-- [2] check.mjs run A, 10:32:05-10:36:57 UTC (80 s idle wait first; 12 GB free): all 10 steps PASS, but test step
-  measured 318 (expected 304), bites 327 (expected 327). NOT COUNTED: two other lanes ran cargo during it
-  (agent-a929... `cargo test --workspace`; wf_...-e0d-2 `cargo test -p npt-l1`): +14 measured = another copy's test
-  binary linked. Step lines otherwise: fmt 0.5 s; clippy 11.5 s; clippy-wasm32 6.3 s; doc 23.8 s; test 244.3 s; deps
-  0.6 s (93 crate files); refs 0.3 s (562 tracked); marks 2.5 s (81 marks); self 1.1 s (48 of 48); redact 0.8 s (10 of
-  10, 166 items, 0 findings). Re-run needed when the lanes are quiet.
-- [3] Test read (tests/world.rs, tests/replay.rs) candidates:
-  - std-sin unit test can never fail on an unwired site (only "no diff before arm"; prints first tick) -> plant B2b.
-  - D-9 reference tolerance: target box half-width 3 cm -> plant E6.
-  - D-6 asserts SS only; PM-0001-2 also has ES bands (72 shots/s 68.4-75.6, 32 projectiles mean 30.4-33.6, 21.12
-    spawns/s 20.064-22.176, 10 reliable events/s 9.5-10.5, 15 big vehicles): no U4d test -> probe G.
-  - d10 clamp twin never asserts the step-10 shot ran -> probe H.
-  - D-2 child protocol: blocking pipes, no timeout (a hung child hangs the suite; no flake source seen).
-  - carry14 pins MB = 1 << 20 (history.rs:5-6, tests/world.rs:1346): PM-0001-7's row is `<= 1000000` with "MB = 10^6
-    B" (marks.json:2688-2694, :2739; plan.md E11 "at most 1 MB"). 231 x 4,536 = 1,047,816 B > 1,000,000: spans
-    7,334-7,700 ms pass for_ms and fail the mark. MEDIUM (small reach). Fix: 1_000_000 -> 220 ticks, 7,333 ms.
-- [4] Bite script run 1 (u4d-test-bites.py, all ids; each restored, sha256 checked):
-  - B1 BITES: measured D-2, hash-map fold at tick 1234: "Outcome { compared: 1235, first: Some((0, 1234,
-    \"spawner[0].acc\")) }" (replay.rs:274).
-  - B1-clippy BITES: "use of a disallowed type std::collections::HashMap" + "iteration over unordered hash-based type"
-    at world.rs:1818-1819 (measured clippy, this copy's npt-sim checked).
-  - B2 BITES (weakly): measured std sin in World::sinf: D-7 fails on the 30-tick pin only (hash 3247652229372912894 vs
-    8166482889541977892); the 1- and 300-tick pins and every World::new pin still equal. D-7's native catch of a std
-    sin swap rests on 1 of 3 sampled ticks.
-  - B2-clippy BITES: "use of a disallowed method f32::sin" world.rs:719.
-  - B3 BITES: D-3 "CO step 0: record" (vel grid 600 vs 606).
-  - B4 BITES: D-3 "CO step 3: record" (raw pitch differs; the aim origin comes from the floor-snapped position).
-  - B5 BITES: D-4 "a non-finite value in the state after tick 1150: soldier[0].pitch" (world.rs:1852).
-  - E1 BITES: D-1 "SS" before the first tick (a process-wide counter in World::new).
-  - E2 BITES: D-3 "CO step 0: Some(\"rng[0].position.lo\")" (predict drew from the spread stream).
-  - E3 BITES: D-5 "step 16: the state hashes" (a refused throw drew from the projectiles' stream).
-  - E4a BITES "big vehicles: 14"; E4b BITES "units of 20 parts: 3"; E4c BITES "projectiles: 299"; E4d BITES "shots a
-    second: 625650 thousandths" (portal 1.00).
-  - E5 BITES: D-7 "SS" World::new pin (FNV prime + 2).
-  - E6 NOT CAUGHT: D-9 passes with the blend by fraction / 255 (1 cm off at 255). FINDING (MEDIUM): D-9's reference
-    holds to the 6 cm box only (target half 3 cm, spread about 1 cm), world.rs:1266 / tests/world.rs:811-815, :861-887.
-  - E7 BITES "step 100: the state hashes"; E8 BITES "step 5: the state hashes"; E10 BITES "step 10: the state hashes";
-    E11 BITES "step 15: the state hashes"; E12 BITES "case 5: ... at 60.019 m not clamped".
-  - E9 (Shot event on a cooldown refusal): the test FAILS by name, at its own shots_of check ("the presses at 10 and 20
-    fire": [10, 11, 20]), before the twins' event check -> rerun as E9b with a Kill event (script 2).
-  - P (probe file, 9 tests ran and passed, file deleted): my filter kept only lines starting "PROBE-", so most lines
-    were lost; kept: PROBE-A feet z 3900/3955/4000 cm: clamped point sent again not clamped; feet z 4095 cm: first
-    [6000,-1500,4095], sent again clamped AGAIN to [5998,-1500,4095] (rust L4 confirmed: idempotence fails for feet z
-    above about 40.57 m, origin z above 40.95 + 1.02). PROBE-B field 8 (flags) grid 4 (authority) vs 0 (predicted) on
-    a catch-up tick, control (one command a tick) equal: netcode M3 confirmed (FLAG_FIRED = 4, world.rs:92, cleared
-    per tick at :1822, per command at :756). PROBE-E decode Ok(()) of a non-canonical recording; the Replayer panics
-    (debug assert world.rs:1801) instead of Step::Failed: rust L2 confirmed. -> rerun probes via u4d-test-probe.py.
-  - B1b PASSES: bites D-2 hash-map: digests fe045de3aed9a645 vs 7636a7bbf8fae345; first Some((0, 1234,
-    "bite[0].hash_map_order")) = T.
-- Next: rest of run 1 (B1c, B2b, B3b, B4b, B6a, B6b), then u4d-test-bites2.py (E9b, E13, E13-c9, C1), then
-  u4d-test-probe.py, then --list both builds and check.mjs run B when the lanes are quiet.
+- [2] check.mjs run A, 10:32:05-10:36:57 UTC: all 10 steps PASS, but measured 318 (expected 304), bites 327 (=).
+  NOT COUNTED: two other lanes ran cargo during it (agent-a929... `cargo test --workspace`; wf_...-e0d-2 npt-l1).
+- [3] Test read findings: std-sin unit test cannot fail (B2b); D-9 tolerance (E6); ES bands untested (probe G); d10
+  clamp's shot not asserted (probe H: it does shoot at 10 and 30); D-2 no timeout (nit); carry14 MB = 2^20 vs
+  PM-0001-7's 1,000,000 ("MB = 10^6 B", marks.json:2688-2694, :2739): 231 x 4,536 = 1,047,816 B; MEDIUM.
+- [4] Run 1 (u4d-test-bites.py) summary, every file restored and sha256 = reference at the end:
+  B1 BITES (D-2 measured: first Some((0, 1234, "spawner[0].acc"))); B1-clippy BITES (disallowed type HashMap,
+  world.rs:1818); B2 BITES weakly (D-7: only the 30-tick pin differs); B2-clippy BITES (f32::sin, world.rs:719);
+  B3 BITES (D-3 CO step 0 record); B4 BITES (D-3 CO step 3 record); B5 BITES (D-4 tick 1150 soldier[0].pitch);
+  E1 BITES (D-1 SS); E2 BITES (D-3 rng[0].position.lo); E3 BITES (D-5 step 16); E4a-d BITES (14 vehicles; 3 large;
+  299 projectiles; 625.65 shots/s); E5 BITES (D-7 SS); E6 NOT CAUGHT (D-9 with / 255); E7 BITES (step 100); E8 BITES
+  (step 5); E9 caught by the test's own shots_of check ([10, 11, 20]); E10 BITES (step 10); E11 BITES (step 15); E12
+  BITES (case 5 at 60.019 m not clamped); B1b PASSES (digests fe045de3aed9a645 vs 7636a7bbf8fae345, first (0, 1234,
+  bite[0].hash_map_order)); B1c BITES (fold left out of the dump: first None, 27,000 compared); B2b NOT CAUGHT (std-sin
+  unit test passes with its site disarmed: first differing tick None); B3b BITES (0 moving ticks differ); B4b BITES (0
+  ticks off the record's grid); B6a BITES (disallowed type, world.rs:434); B6b BITES (f32::sin, world.rs:451).
+- [5] Run 2 (u4d-test-bites2.py): E9b BITES (Kill event: "step 11: the event lists"); E13 NOT CAUGHT (NaN yaw
+  before the own-copy snap at elapsed 150: D-4 passes; the snap turns NaN into 0, grid.rs:176-182, and non_finite reads
+  write_state only, world.rs:1751-1756); E13-c9 NOT CAUGHT (carry 9 passes too); C1 PASSES (D-6: 68,362 shots in 100 s,
+  683.620/s; 100 portal changes, 1.00/s: the builder's numbers). End: all files = reference.
+- [6] Probes (u4d-test-probe.py; 9 passed; file deleted; all = reference):
+  - A: clamp idempotent at feet z 0/3900/3955/4000 cm; at 4095 cm clamped again ([6000,-1500,4095] -> [5998,...]).
+  - B: catch-up tick (2 commands, first fires): records differ in field 8 (flags) 4 vs 0; control equal. M3 confirmed.
+  - C: CO cover 7 -> 408 after load_movers of one part record of index 400 + a step (MAX_COVER 160). rust M1 confirmed.
+  - D: size_of::<TickInput>() 104 B; 60 B header claiming 2^20 ticks: Err("a recording cut inside a tick"); VmPeak
+    137,480 kB -> 178,460 kB (peak, not the size). rust L1 confirmed (109 MB reserved by arithmetic).
+  - E: decode Ok of a non-canonical recording; Replayer panics (world.rs:1801). rust L2 confirmed.
+  - F: SS shots/s by minute over 13 min: 684.10 682.30 683.36 682.95 683.93 682.71 682.63 684.95 684.63 683.93 682.26
+    685.21 676.31; kills 329; 1 soldier at ammo 0 at the end. netcode M1 real but small by 13 min.
+  - G: ES 100 s: shots 70.62/s (in 68.4-75.6); live projectiles mean 39.91 (OUT of 30.4-33.6); spawns 25.06/s (OUT
+    of 20.064-22.176); vehicles min 15; soldiers min 48; kills 50. Cause: the recording's throws (1 in 400 per command,
+    replay.rs:439: 48 x 30 / 400 = 3.6/s, fuse 2 s, world.rs:79) on top of the 21.12/s stand-ins. NEW, MEDIUM.
+  - H: d10 clamp stream shots at [10, 30]: the test's shot ran (not asserted: nit).
+  - K: SS records changed per tick: Soldier 47.8/48, Vehicle 14.9/15, VehiclePart 123.5/124, Projectile 3.1/307.1,
+    Door 0/6, Wall 0.5/1, Effect 384/384 (574 changed records a tick): supports netcode H1 and the effect-row finding.
+- [7] check.mjs run B, 10:54:29-10:58:25 UTC (COUNTED: no other cargo seen during it by the 5 s watcher): all 10 PASS;
+  fmt 0.4 s; clippy 7.5 s; clippy-wasm32 1.1 s; doc 18.2 s; test 204.0 s measured 304 passed 0 failed 0 skip, bites
+  327 passed 0 failed 0 skip; deps 0.5 s (93 crate files, 1 config); refs 0.0 s (562 tracked); marks 2.2 s (81 marks,
+  drafts 626df678); self 1.2 s (48 of 48); redact 0.8 s (10 of 10; 166 items, 0 findings).
+- [8] --list (10:58:55): measured npt-sim 37 (replay 6, seam 8, world 23), bites 45 (7, 10, 28), each "Compiling
+  npt-sim (this copy's crates/sim)"; clippy wasm32 -p npt-sim both builds: "Checking npt-sim (this copy)", 0 warnings.
+- [9] check.mjs run C (final, fresh touch), 10:59:12-11:02:43 UTC (COUNTED: no other cargo seen): all 10 PASS; fmt
+  0.4 s; clippy 3.1 s; clippy-wasm32 0.6 s; doc 17.8 s; test 185.1 s measured 304 / bites 327, 0 failed, 0 skip; deps
+  0.5 s; refs 0.0 s (562); marks 0.7 s (81); self 1.2 s (48 of 48); redact 0.8 s (166 items, 0 findings).
+  After: every crates/sim file, Cargo.toml, clippy.toml and check.mjs at the reference sha256; tests/ holds replay.rs,
+  seam.rs, world.rs only; git status identical to the start; HEAD 097f8970. The worktree is unchanged by me.
+
+## Findings (ranked)
+- M1 ES misses two PM-0001-2 bands on its synthetic recording (probe G); no ES test (D-6 is SS only).
+- M2 carry 14's 1 MB = 2^20 vs PM-0001-7's 1,000,000 B (tests/world.rs:1346, :1357-1361; history.rs:5-6).
+- M3 D-9 reference holds to the 6 cm box only: / 255 passes (E6; world.rs:1266; tests/world.rs:811-815, :861-887).
+- M4 catch-up tick: predict clears FLAG_FIRED per command, step per tick (probe B; world.rs:756, :1821-1824); D-3
+  is one command a tick only (tests/world.rs:184-234). Confirms netcode M3.
+- M5 load_movers grows movers to any record index (probe C: 408 cover > 160; world.rs:770-773 vs :1760-1797).
+  Confirms rust M1.
+- L1 D-4 misses a NaN laundered by the own-copy snap (E13, E13-c9; world.rs:1101-1111, :1751-1756; grid.rs:176-182).
+- L2 std-sin unit test cannot fail (B2b; tests/world.rs:1661-1682); D-7 catches a native std-sin swap on 1 of 3 pins.
+- L3 clamp idempotence breaks for feet above about 40.57 m (probe A; world.rs:1009-1015). Confirms rust L4.
+- L4 Replayer panics (debug) on a non-canonical recording that decode accepts (probe E). Confirms rust L2.
+- L5 decode reserves 2^20 x 104 B from a 60 B header (probe D; replay.rs:320). Confirms rust L1.
+- L6 SS magazine: 676.31 shots/s in minute 13, 1 soldier dry (probe F; scene.rs:105-107, :127). Confirms netcode M1
+  as small; D-6's 100 s cannot see it.
+- N1 d10 clamp test does not assert its shots (probe H shows them). N2 D-2's pipes have no timeout. N3 carry 13
+  storage identity in place of a counting allocator (agreed).
+- Info: probe K's 574 changed records a tick (parts 123.5/124, effects 384/384) for U4e's budget (netcode H1).
+Verdict: REVISE (M1-M3 are U4d test or data fixes for the fix pass netcode's H1 already needs; M4, M5 routed with
+their reviewers' findings; Lows as follow-ups).
+DONE (2026-11-10 11:04 UTC)
