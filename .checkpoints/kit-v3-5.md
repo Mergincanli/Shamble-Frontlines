@@ -35,6 +35,11 @@
   `.claude/`; the file list reads both names via `@tsv`; the 3000 cap and a short-list check; test rows red then green,
   mutants; advisor.md tier-2 lines, CLAUDE.md:64, F4 if ruled; the docs part), decisions SA5-RIDE (his), F4-RIDE and
   MERGE-ONLY (the advisor's).
-- **Current step:** 2, the advisor's plan review (`advisor-plan-rev1.md`, running); then his SA5-RIDE answer, the
-  tests red first, the guard edit (asks), mutants, rules lines, docs, the review round.
-- **Open with Mustafa:** ORDER (after kit-v3-5: his unit walk first, as queued, or STATUS-DIET with LANE-RULES first).
+- **Done:** the advisor's plan review (`advisor-plan-rev1.md`, a36d369): REVISE, R1-R14, conditions 1-14 (letter
+  case on every platform; every gitignored path; each clause needed alone; CANON's new names; check-run total_count;
+  changed_files rows; pagination recorded (PR #40 fails closed here); the `@tsv` parse; exact rules texts; write-side
+  limits recorded; F5 waits; the kit-v3-4 correction appended; small text; ask SA5-RIDE now). Rulings: F4-RIDE fold
+  in; MERGE-ONLY approved. Plan revision 2 (`plan-rev2.md`, 890ed2d): C0-C5 clause table, C3 by `git check-ignore`.
+- **Current step:** 3, the advisor's delta check of revision 2 (running), and SA5-RIDE asked of Mustafa; then the
+  scratch build (tests red, guard, rules lines), the writes after his answer (one ask per kit file).
+- **Open with Mustafa:** SA5-RIDE (the advisor's rewritten text); ORDER (unit walk vs STATUS-DIET first).
