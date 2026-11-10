@@ -74,7 +74,86 @@ Found beyond the grep: the night shift runs only tracked scripts equal to main's
 2.1 merges a night item on a branch cut before 2.1 can no longer run its own `tools/gate.mjs`: such branches are
 re-cut from main (2.1's report checks the Night queue, issue #16, for such items; the legacy items there are paused).
 
-<!-- PART-2.1-INVENTORY-DOCS -->
+**Docs (none protected; ADRs, the register, design and look docs keep his go, tier 1)**
+| File | Hits | Class | 2.1 does |
+|---|---|---|---|
+| `docs/LEGACY_INVENTORY.md` | 238 | CITATION 226 (pinned to 48ffb51's lines, :25-26), NAME 12; :389-390 a recorded run | none |
+| `docs/LEGACY_TUNING.md`, `docs/legacy-tuning.json` | 60, 60 | CITATION (the `where` fields, from 48ffb51); :9 and `about.produced_by` hold `preview.js .` as produced | none: frozen (the oracle's reference) |
+| `docs/EDITOR_V1_INVENTORY.md` | 39 | CITATION 37 (pinned to 67cf55b), NAME 2 | none |
+| `docs/TECHNICAL.md` | 34 | NAME; CITATION :96; STALE by omission §9 :238-239 | edit §9 (1.4) |
+| `docs/research/r1`, `r2`, `r4`, `r5`, `UNREAD_SOURCES.md` | 26, 15, 6, 8, 3 | 31 are URLs ending in `/index.html` (NAME); CITATION 25; HISTORY 2 | none (research records) |
+| `docs/MODULE_MAP.md` | 20 | NAME | one line (1.4) |
+| `docs/START_HERE.md` | 16 (+ :104, :114 with `.`) | STALE :12, :21-22; COMMAND :104, :114-116 | edit (1.4) |
+| `docs/REPO_MAP.md` | 8 | STALE :14-18 (the check fails on them); NAME :100-102 | edit (1.4) |
+| `docs/adr/0002-…md` | 8 | already in after-move terms (:138-139, :955, :1405, :1431); quotes (:56, :951) | only OQ-0002-2's answer (1.4) |
+| `docs/adr/0003-rendering.md` | 7 | CITATION (line numbers kept), one inside PM-0003-47 (not hashed by #40) | none |
+| `docs/STATUS.md` | 7 | HISTORY, CITATION; the risk at :987 is wrong under `git mv` | 2.1's row; correct :987 (1.4) |
+| `docs/adr/0001`, `0004`, `0006` | 1 each | CITATION: quotes of CLAUDE.md:46, outside every PM row | none |
+| `docs/adr/0005-…md` | 2 | CITATION | none |
+| `docs/ART_DIRECTION.md`, `docs/EDITOR_V2.md`, `docs/ROADMAP.md` | 2, 1, 1 | NAME (EDITOR_V2:94 is the v2 editor's rule; ROADMAP:3 the banner) | none (ROADMAP gets 2.1's entry) |
+| `docs/reports/*` (14 files) | 39 | HISTORY | none |
+Total 603 docs hits, every one read in context by the docs agent (`inv-docs.md`).
+
+### 1.3 The edits, file by file (layout: OQ-0002-2 (a))
+**Moved, bytes unchanged:** `shamble-core.js`, `shamble-game.js`, `shamble-editor.js`, `index.html`, `editor.html` →
+`legacy/`. Game symbols +0 −0 (the gate's check 3 lists a pure move as "moved").
+
+**Gate files (each edit asks Mustafa):**
+- `tools/gate.mjs`: add one top-level name, `const BUILD = join(ROOT, 'legacy')`. `headFile` reads `BUILD/<f>` and
+  dies with "`legacy/<f>` is missing"; `baseFile` tries `legacy/<f>`, then `<f>` (a base from before the move), then
+  `shamble-frontlines-repo/<f>` (CS-1's era), `legacy/` first so a later root file of the same name is never read as
+  legacy; `classicParts` resolves `<script src>` against `BUILD` and reports a src "outside legacy/"; the smoke runs with
+  `root: BUILD`; the header comment names `legacy/`. Unchanged: `ROOT` (git and `TOOLS`), `FILES`, `OLD_PREFIX`,
+  `toBuild`, checks 5c and 5d (their names are relative to the page). Removed names: none. Option (Q-A5): one prefix
+  per base, chosen where all five files exist, printed on the base line (adds `BASE_PREFIXES` and `basePrefix`).
+- `tools/smoke.mjs`: add `const BUILD = join(ROOT, 'legacy')`; `runSmoke`'s default root is `BUILD` (its CLI follows);
+  `ROOT`, `ROOT_URL` and `rel` stay (messages then read `legacy/…`); the header's "outside the repo" → "outside
+  `legacy/`" (a page may read only files under its own folder: stricter, and the pages read no sibling file).
+- `tools/battery.js`: none (it takes the folder as an argument).
+
+**Not protected:** `tools/village.py` (:10 default path, :2), `tools/README.md` (every `.` folder argument →
+`legacy`; :21 "outside the repo" → "outside `legacy/`"; one line saying the legacy build lives in `legacy/`), the
+header comments of `preview.js`, `pageshot.js`, `sim.js`, `reach.js`, `perfbots.js`, `tuning-dump.js`, `aabbs.js`,
+and `README.md` (:12, :13, :19-22).
+
+**Kit lines (each asks Mustafa):** `CLAUDE.md` :19, :41, :42 as in 1.2, plus :46 and the scope line only as he
+answers HC-PATH and SCOPE (and the model rule if MODEL-RULE is (a)); `.claude/agents/verifier.md:28` (`.` → `legacy`).
+
+**Docs:** 1.4.
+
+**Never in 2.1:** the text `spikes/` in any of these edits (PR #40's `referenceProblems`); `docs/legacy-tuning.json`
+and `docs/LEGACY_TUNING.md` (the oracle's reference); a PM row of ADR 0001, 0004 or 0006.
+
+### 1.4 OQ-0002-2's three parts, and the docs
+ADR 0002:998-1007: "Where do the legacy gate and tools live after the move, and where does the gate v2's script
+live?", decided by "the phase 1 restructure plan (the main session with docs-keeper)", by "which layout keeps
+R5-LAYOUT-REC6's marks ... with the fewest path changes, and where the legacy docs go (row KT21)". The marks hold in
+either layout (0002:1358), so the path counts decide:
+| Part | Proposed | Cost of the other option |
+|---|---|---|
+| The legacy gate and tools | **(a) stay in `tools/`**, learning `legacy/`: 2 gate files and 2 kit files edited (1.3) | (b) inside `legacy/`: the guard's `GATE_FILES`, `DENIED_SCRIPTS`, `CANON` and its npm check (routine-guard.mjs:26-28, :71, :437, :534: PR #46's file), 17 `tools/` allow rules in `.claude/settings.json`, `gate.yml`'s `--prefix tools` and both gate steps, and kit lines in about 8 more files (inv-kit B10) |
+| The legacy docs (KT21: START_HERE, MODULE_MAP, TECHNICAL, GAME_DESIGN, ART_DIRECTION, ANIMATION_PLAN, AUDIT_BUGS_PERF, `ui_theme_mockup.html`) | **stay in `docs/`**, marked legacy (REPO_MAP already labels most; one banner line where 2.1 edits anyway): 0 path changes | to `legacy/docs/`: 27 lines in 12 files, 8 of them protected, 2 relative links broken (GAME_DESIGN.md:69, :90), and about 25 references in history and ADRs left dangling. KT21's mark is "redesign": START_HERE gets rewritten for v2, not archived. The R7 files (LEGACY_INVENTORY, LEGACY_TUNING, legacy-tuning.json, EDITOR_V1_INVENTORY) stay in `docs/` either way: ADRs cite them and PM-0002-36 names `docs/legacy-tuning.json` |
+| The gate v2's script | **deferred to 2.3's plan**, which edits the guard anyway to teach it the gate v2's files: either the gate v2 gets its own name beside `tools/gate.mjs`, or it takes `tools/gate.mjs` and the legacy gate moves then. Either way after PR #46 | deciding now would edit the guard in 2.1 |
+
+**The docs edits** (not protected; docs-keeper, in step 6):
+- `docs/REPO_MAP.md`: :14-18 (the five root rows) → one `legacy/` row, which also says that `file:line` citations keep
+  their numbers after the move (`shamble-game.js:N` means `legacy/shamble-game.js:N`); :6's date. Without this,
+  `repo-map-check.mjs` exits 1 (stale rows, `legacy/` missing).
+- `docs/START_HERE.md`: :12 (the double-click rule names `legacy/index.html`), :21-22 ("The five code files sit at the
+  repo root" → "in `legacy/`"), the commands at :104, :114, :115, :116 (`.` → `legacy`).
+- `docs/MODULE_MAP.md`: one line above the file table (all five live in `legacy/`).
+- `docs/TECHNICAL.md`: §9's file inventory (:238-239) says `legacy/`; :10 optional.
+- `docs/STATUS.md`: 2.1's in-flight row; the risk at :987 ("The inventory's line numbers go stale once phase 1 moves
+  the legacy files") is corrected: `git mv` keeps bytes and line numbers.
+- `docs/ROADMAP.md`: 2.1's entry; its banner at :3 optional.
+- `docs/adr/README.md` (the register) and ADR 0002's OQ-0002-2 entry: the answer above (decision docs: his go).
+- Not edited: `docs/legacy-tuning.json` and `docs/LEGACY_TUNING.md` (their `produced_by` and :9 commands keep `.`, as
+  produced at 48ffb51), every report, ROADMAP's history, the research files, LEGACY_INVENTORY and EDITOR_V1_INVENTORY
+  (226 and 37 citations, pinned to their commits), the ADRs' quotes of CLAUDE.md:46 (ADR 0001:1067, 0002:951,
+  0004:840, 0006:806; none in a PM row), ADR 0002's own text (it already speaks of `legacy/index.html`), EDITOR_V2.md:94
+  (the v2 editor's rule, OQ-0002-1), ART_DIRECTION and GAME_DESIGN (names that stay true).
+- PM rows: of ADR 0001's 63, 0004's 75 and 0006's 32, none contains a legacy path, so PR #40's hashed rows stay
+  byte-identical.
 
 ### 1.7 Reviewers (the final diff; one round, one fix pass; 3 at a time)
 The advisor (plan, then every pushed head) and security-auditor (every risk-tier-2 change) always; test-engineer (is
@@ -82,9 +161,12 @@ the move proven: E1-E6); infra-engineer (CI and the gate's behaviour on old base
 No art-director: nothing a player sees changes (bytes unchanged), and Mustafa's Brave check covers it.
 
 ### 1.8 What Mustafa checks in Brave (ADR 0002's foundation checklist, step 1)
-1. Before: if E5 says saves do not carry over, open the editor in your current copy, Maps, and for each map you want,
-   Export, then Copy and save the text (`editor.html:1058`, one map at a time; there is no import button, so your old
-   copy keeps working as the way back to them). If E5 says they carry over, skip this.
+1. Before (whatever E5 says, and before you take the merged main, whose root no longer has the game): back up your
+   saves. In Brave, open your current `index.html`, press F12, Console (type `allow pasting` if asked), paste the line
+   the session gives you (it copies every saved key as one text), paste that into a text file outside the repository;
+   do the same on your current `editor.html` (maps, prefabs, Character Lab). The editor's Export shows one map at a
+   time and has no import (`editor.html:1058`, `:1248` read-only), so the session also gives a restore line that puts
+   back only missing keys. Your old copy keeps its saves either way: nothing is deleted.
 2. Download the branch as a zip, unzip it to a new folder, double-click `legacy/index.html`. Expected: the menu opens;
    Deploy starts a match; you can move, shoot and pause, as before.
 3. Double-click `legacy/editor.html`. Expected: the editor's menu opens; Map editor and Maps open, and your saved maps
@@ -109,21 +191,34 @@ advisor reproduces with main's copy of a changed tool, and main's `gate.mjs` rea
 cannot read 2.1's head. So the proof comes in three independent parts, each a command whose output goes into the report:
 - **E1, the bytes did not change.** `git diff --find-renames=100% --name-status <base> HEAD` lists exactly five `R100`
   rows for the five files, and `git rev-parse <base>:<f>` equals `git rev-parse HEAD:legacy/<f>` for each (same blob).
-- **E2, main's untouched gate passes on those bytes.** In a throwaway worktree of main under `.gate/foundation/`, with
-  the five files checked out from 2.1's head (`git show HEAD:legacy/<f> > <f>`; by E1 they are main's own bytes), run
-  main's `node tools/gate.mjs origin/main`: PASS, symbols +0 -0. Plus CI's green on main itself for the same blobs.
-- **E3, the edited gate still bites.** In throwaway worktrees of 2.1's head: the four Phase 0 mutations
-  (`docs/reports/2026-10-13-phase-0.md:25-27`) and check 5's 22 mutations with its 3 controls
-  (`docs/reports/2026-10-14-gate-check-5.md:30-41`), each planted in `legacy/`, each failing exactly the checks those
-  reports name; the controls `--allow-drop refreshRect` and "a pure move" pass. Also the edited gate against three
-  bases: main 44446a5 (root layout), 8e58937 (CS-1's `shamble-frontlines-repo/` layout) and 2.1's own head (`legacy/`).
+- **E2, main's untouched gate passes on those bytes.** In a throwaway worktree of 2.1's head under `.gate/`, main's
+  own gate files are written into `legacy/tools/` (`git show origin/main:tools/<x> > …/legacy/tools/<x>` for gate.mjs,
+  smoke.mjs, battery.js, gate-globals.json, package.json, each named; `node_modules` linked). Main's gate takes its
+  root as the folder above its own (gate.mjs:32-33, smoke.mjs:17-18), so it reads the moved bytes as its head and the
+  root paths of `origin/main` as its base: `node …/legacy/tools/gate.mjs origin/main` must PASS with symbols +0 -0 and
+  the smoke passing. Plus CI's green on main for the same blobs.
+- **E3, the edited gate bites exactly like main's.** Two worktrees: main with main's gate (files at the root) and 2.1's
+  head with the edited gate (files in `legacy/`). One script in the notes plants each mutation in both (an exact string
+  edit, asserted to hit once), runs `node tools/gate.mjs origin/main --json`, records the failing checks, and restores
+  the file with `git show HEAD:<path> > <path>` (`git checkout` and `git restore` are denied). The mutations: the four
+  Phase 0 ones (`docs/reports/2026-10-13-phase-0.md:25-27`) and check 5's 22 (`docs/reports/2026-10-14-gate-check-5.md:
+  30-41`); the controls: `--allow-drop refreshRect`, a pure move, and check 5's 3. Pass: for every mutation the two
+  failing sets are equal and not empty; every control passes in both. (The report's own grouping is loose, e.g. its
+  "5b + 5d" pairs two mutations; a difference from that wording is a note, not a fail.) Also the edited gate against
+  three bases: main 44446a5 (root layout), 8e58937 (CS-1's `shamble-frontlines-repo/` layout) and its own head.
 - **E4, the oracle (PM-0002-36).** The dump with `--pre=tools/tuning-dump.js` for both maps (default and
   `--map=tri`), at base with folder `.` and at head with folder `legacy`, twice each: all four head runs byte-identical
   to the base runs; then R7's builder (`build-tuning.py` at a715be2, run unchanged except its input and output paths,
   into `.gate/foundation/`) on the head dumps gives files `cmp`-equal to `docs/legacy-tuning.json` and
-  `docs/LEGACY_TUNING.md`. Whether this is the mark's reading is the advisor agent's ruling (Q-A1 below).
-- **E5, the saves.** A headless Chromium test with one persistent profile: a page at `<tmp>/index.html` writes a
-  KVStore key, a page at `<tmp>/legacy/index.html` reads it; result recorded as carried over or not. UNKNOWN until run.
+  `docs/LEGACY_TUNING.md`. Control already run in this session (inv-code B7b): the builder on R7's own dumps of
+  a715be2 reproduces both files today, byte for byte. Whether this is the mark's reading is the advisor agent's ruling
+  (Q-A1 below).
+- **E5, the saves.** A headless Chromium test with one persistent profile (Playwright from `tools/node_modules`): a
+  page at `<site>/index.html` writes a KVStore key (asserting `KVStore.backend === 'localStorage'`); after a relaunch,
+  the same page reads it back (the control: else the test proves nothing); then `<site>/editor.html` (same folder),
+  `<site>/legacy/index.html`, `<site>/legacy/editor.html` and an unrelated folder read it. Recorded: shared, per folder,
+  or per file. UNKNOWN until run; headless Chromium on Linux is not Brave on Windows, so Mustafa's backup (1.8) stays
+  whatever it says.
 - **E6, the smoke and the commands.** The full gate with smoke on the head (5a: both pages); every command the edit list
   changes, run once as written (`preview.js legacy shot`, `pageshot.js legacy index.html`, `village.py` with no
   arguments, `battery.js legacy`); `node .claude/scripts/repo-map-check.mjs` exit 0; the kit tests unchanged and
@@ -270,9 +365,10 @@ What 2.1 changes for it, and what #40 must do once 2.1 is on main:
 ### For Mustafa (rule text only he can settle; each asked, never read into)
 - **HC-PATH.** CLAUDE.md:46's hard constraint reads "the game runs by double-clicking index.html (file://)"; after 2.1
   the page is `legacy/index.html`. Hard constraints change "ONLY through an accepted ADR", and ADR 0002 is Proposed.
-  Options: (a) 2.1 changes the line to `legacy/index.html` (the same rule at its new path), covered by your go of
-  2026-11-10 for 2.1; (b) leave the line (the name stays true) until ADR 0002 is accepted; (c) 2.1 waits for ADR 0002's
-  acceptance. Recommended: (a).
+  ADRs 0001:1067, 0002:951, 0004:840 and 0006:806 quote the line word for word. Options: (a) 2.1 keeps the words and
+  adds a clause, "(since foundation step 2.1: `legacy/index.html`)", so the rule is the same, its path is current and
+  the quotes stay true, covered by your go of 2026-11-10 for 2.1; (b) leave the line (the name stays true) until ADR
+  0002 is accepted; (c) 2.1 waits for ADR 0002's acceptance. Recommended: (a).
 - **SCOPE.** Your SPIKE-SCOPE (a) reads "once the drafts are approved, the legacy constraints apply to `legacy/` only"
   (STATUS:745), while STATUS:14-15 says the drafts are "signed off as the basis for the spikes, not yet accepted". It
   matters for 2.2: its Rust and TypeScript modules break the constraints as written if they apply to the whole
