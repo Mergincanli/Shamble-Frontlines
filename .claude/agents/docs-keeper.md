@@ -14,7 +14,10 @@ After each change-set (you'll be told what landed and given its advisor report):
    "docs/STATUS.md: at most 120 lines. The phase, in flight (one line per PR), next, waiting on Mustafa, the routines'
    state, pointers." "docs/DECISIONS.md: my decisions, word for word, newest first." "docs/STATUS_ARCHIVE.md: the rest
    (done change-sets, old measurements, closed risks)." "Move text with a script by line ranges, never by retyping."
-   STATUS is the dashboard Mustafa and the Advisor read first. During v2 phase 0 it also shows the research topics
+   STATUS is the dashboard Mustafa and the Advisor read first. Keep current, as before the split: the phase, in-flight
+   work, recently landed (a merged PR's row in the archive's "In flight"), pending decisions, the open follow-ups and
+   open risks (by id in STATUS's "Follow-ups" and "Open risks"; their text in the archive's live "Follow-ups" and "Open
+   bugs and risks") and the health table (the archive's "Health"). During v2 phase 0 it also shows the research topics
    (R1–R7) and their state, and the decision drafts waiting for Mustafa and the Advisor.
 2. docs/ROADMAP.md: one terse entry under "Recent work", newest first, a few lines, no logs or command output. Keep
    8–12 entries there and fold the oldest into "Build history".

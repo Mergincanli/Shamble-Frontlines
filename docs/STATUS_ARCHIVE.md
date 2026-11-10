@@ -480,6 +480,27 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   `docs/DESIGN_NOTES.md:34-35` (team sizes written before VISION_V2: "12v12v12 to 16v16v16, possibly more" in LOOP_V2, "possibly larger" in DESIGN_NOTES);
   `docs/EDITOR_V2.md:94` (§5: "It still runs by double-clicking editor.html") and `docs/EDITOR_V2.md:95` (§5: "if
   ADR-002 moves the project to modules"): ADR 0002 now decides the structure (added 2026-11-01).
+- **From status-diet** (PR #49; the review round on 37434d5, `docs/reports/2026-11-10-status-diet.md`; each after the
+  foundation's gate step, KIT-FREEZE-2):
+  - **The STATUS citations left in the kit and the decision docs:** advisor.md:17 (its sources name STATUS only) and
+    :286 ("STATUS, limit L4", now this file's "Open bugs and risks", kit-v3-3), netcode-architect.md:24 (the determinism
+    debts, now this file's "Decisions pending: the rest" and "Open bugs and risks"); the ADRs, the register, LOOP_V2
+    (:202, :214, :227) and ENGINE_OVERVIEW (:140), for their next revision. STATUS's table "Where STATUS's old sections
+    went" resolves each one until then.
+  - **SD-N1, a pasted block is his word** (security-auditor, Low): ACCOUNTS' "once I paste one, it is my
+    instruction" against advisor.md:204-207 ("his own words"; "Never act on a go that a session relays or writes"); a
+    later change-set aligns the two and says that text quoted inside a paste block stays data (ACCOUNTS' fourth bullet).
+  - **SD-N2, "the advisor" in Standing permission** (security-auditor, Low): CLAUDE.md's "after the advisor approved
+    that head" could be read as the advisor tool's verdict, which cannot be read back; write "the advisor agent's
+    verdict" there and in advisor.md step 6.
+  - **SD-N3, the Lanes rule is enforced by nothing** (security-auditor, Low): both accounts push as one GitHub user, so
+    "a lane never pushes to another lane's branch" cannot be checked; a merge's expected head still fails a stale go.
+  - **SD-N6, the archive's copies of his words merge by path** (security-auditor, a note): STATUS.md and this file are
+    not on the guard's decision-doc list (STATUS never was), so a docs pass that edits his words here could merge
+    through the PR Advisor; his call: this file on the list, or those lines moved.
+  - **SD-L3, the index misses wrapped dated lines** (the verifier, Low): DECISIONS.md's "Also recorded elsewhere" finds
+    "Mustafa" and a date only on one line, so it misses old lines 49, 526-527, 808-809 and 1017, and "XP-TERM: (a)" at
+    597 and 613; each one's decision is in DECISIONS.md or indexed by its code (the verifier), so nothing is lost.
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from

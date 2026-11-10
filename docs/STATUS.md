@@ -8,12 +8,15 @@ _Last updated: 2026-11-10 (status-diet, PR #49; main 2d22b69)._
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
   kit-v3-5), the research (R1-R7) and the decision drafts are merged. The six drafts (`docs/adr/0001`-`0006`, with
   `docs/ENGINE_OVERVIEW.md` and `docs/SPIKE_PLAN.md`) are the basis for the spikes and stay Proposed (the stop's
-  answers, 2026-11-03, and ADR 0002 part 1 alone, SCOPE (a), 2026-11-10: `docs/DECISIONS.md`).
+  answers, 2026-11-03: `docs/DECISIONS.md`), but for his SCOPE (a) of 2026-11-10: "I accept ADR 0002's part 1 alone
+  (the repository layout, with the legacy constraints applying to legacy/ only)", recorded in its Status line by 2.1b.
 - **Last merged:** kit-v3-5, F1, the guard's rename gap (PR #46, 2d22b69, 2026-11-10 16:05:52 UTC, by merge commit, on
   Mustafa's go after the advisor's APPROVE WITH NOTES of 0573db3, comment 6772168492): the PR Advisor merges only from
   an allow-list. Every merged change-set: `docs/STATUS_ARCHIVE.md`, "In flight"; `docs/ROADMAP.md`.
 - **The kit is frozen** until the foundation's gate step (KIT-FREEZE-2, and what he meant by it, FREEZE-FDN:
-  `docs/DECISIONS.md`, "Queued"). His exceptions: a broken main, STATUS-DIET and LANE-RULES (this change-set).
+  `docs/DECISIONS.md`, "Queued"). His exceptions: a broken main, STATUS-DIET and LANE-RULES (this change-set); and by
+  FREEZE-FDN it "does not stop the smallest edits the foundation needs to keep the kit true after its own moves"
+  ("Each such edit still asks me and merges on my go").
 - **The legacy game is frozen** (critical fixes only). Legacy phase 0 stays PARTIAL until his Windows run.
 - **main** is protected (a pull request with the `gate` and `smoke` checks green); CI green on 2d22b69 (run
   42851159265). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16).
@@ -28,7 +31,8 @@ _Last updated: 2026-11-10 (status-diet, PR #49; main 2d22b69)._
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10): this change-set; then his unit walk of 2026-11-09 (a docs change-set: UNITS.md
-   §0 and LOOP_V2), then the Slice 1 note of 2026-11-10, each in a fresh chat. His words: `docs/DECISIONS.md`, "Queued".
+   §0 and LOOP_V2), then the Slice 1 note of 2026-11-10, each in a fresh chat. His words: `docs/DECISIONS.md`,
+   "Queued".
 2. v2: the netcode proof test (#40); the foundation after this change-set (2.1a, #47; then 2.1b; then 2.2, #48). Wave 1
    runs one heavy spike at a time (SPIKE_PLAN: the netcode proof test, the sim core spike and its 60 Hz run, the
    boundary spike, the look proof test once its models exist; the preview hosting check alongside any). Then phase 1
@@ -80,8 +84,9 @@ A finding below the review budget's bar becomes a follow-up: its id goes here, i
   and quality bars.
 - **Docs passes:** the B3 report's and the kit-v3-2 report's edits (R-1, R-2); the toy-box tone; DOCS-ALIGN (the
   Advisor's documents); routine proofs to record; local smoke's Chromium build; the stale citations left unedited.
-- **From this change-set, after the gate step:** advisor.md (:17, its sources; :286, "STATUS, limit L4") and
-  netcode-architect.md:24 cite STATUS for text now in the archive (one hop through the table below).
+- **From status-diet (PR #49), after the gate step:** the STATUS citations left in advisor.md (:17, :286),
+  netcode-architect.md (:24) and the decision docs (one hop through the table below until then); SD-N1, SD-N2, SD-N3
+  and SD-N6 (security-auditor) and SD-L3 (the verifier): the archive's "Follow-ups", "From status-diet".
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100
