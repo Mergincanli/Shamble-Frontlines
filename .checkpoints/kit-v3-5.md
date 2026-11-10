@@ -66,5 +66,13 @@
   SA5-4 Low, SA5-5 note, PX-1 outside the diff and untested, Critical if confirmed; write-side severities W1 and W2
   Medium, W3 Low); the verifier PASS WITH NOTES (V1-V6 Low; every E-check PASS; hashes equal); test-engineer PASS WITH
   NOTES (TE1-TE4 Medium test gaps, TE5-TE8 Low). Nothing Critical or High in the diff.
-- **Current step:** 8, the advisor's fix-pass ruling (`advisor-fix-pass.md`, running); then the fix pass (kit writes,
-  one ask each), the verifier's re-check, the report, PX1-ROUTE to Mustafa.
+- **Done:** the advisor's fix-pass ruling (e621d45); the fix pass 08423ce (three kit writes on his approval; 1107/1107,
+  127, 27; gate +0 −0); the docs Lows bb335ae; his third message of 2026-11-10 (PX1-ROUTE (a); finish kit-v3-5 and
+  nothing more; the hand-over to a fresh chat) saved and PX1-ROUTE recorded in STATUS (258afb0); the verifier's
+  re-check of the fix pass (`verifier-fixpass.md`): PASS WITH NOTES, Lows L1 and L2 (test gaps on the fix pass's Low
+  checks: follow-ups that ride PX-1's change-set) and L3 (SA5-3's line worded without the ruling's "his direction"
+  clause, since his 2026-11-10 words do not name reserved names: the report says so).
+- **Current step:** 9, finishing: this commit is the notes' last state. Next, one commit with the report
+  (`docs/reports/2026-11-10-kit-v3-5.md`), STATUS's pointers to this commit, the LANE-RULES facts line and the L1/L2
+  follow-ups, and the notes deleted; PR #46 ready; the advisor's final-head review; his go; after the merge he
+  re-enables the PR Advisor routine, KIT-FREEZE-2 starts, and the queue goes to a fresh chat.
