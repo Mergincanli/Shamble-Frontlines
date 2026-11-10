@@ -77,16 +77,32 @@
     the cache), `npm test --workspaces` 5/5 (Playwright's test ran with no browser installed: A2), tsc 6.0.3. Job
     23 s (the cut step 4 s). A1, A2, A3 proven; his fallback rule not needed.
 
+16. Build step 4, the planted failures, each pushed alone by hand and red at the expected step before its revert:
+    - M1a 1bee16c, run 42891819768 (job 130094623250): red at `cargo test` inside the cut, `planted_network_use`
+      panicked "failed to lookup address information: Temporary failure in name resolution"; revert 2ee2bff.
+    - M1b 363c455, run 42892038296 (job 130095416867): red at `npm test --workspaces` inside the cut, @shamble/net
+      "1 failed | 1 passed", "Lifecycle script `test` failed"; revert 5c64404.
+    - M2 0d3ec36, run 42892226674 (job 130098974545): with no toolchain file `rustup toolchain install` fell back to
+      the image's default ("using existing install for stable-x86_64-unknown-linux-gnu ... it's the default
+      toolchain", 1.99.1 today); the pin check failed closed, "sed: can't read rust-toolchain.toml", exit 2; the fetch
+      and cut steps skipped, no cargo step ran; revert b60a996.
+    - M3 af65262, run 42893284193 (job 130099681197): red at `cargo fetch --locked`, "cannot update the lock file ...
+      because --locked was passed to prevent this", exit 101 (the pin check had passed); revert 00cee0b.
+    - M4 2d9766f (L3 moved to CI), run 42893510607 (job 130100473389): red at `npm test --workspaces`, "workspace
+      @shamble/types@0.0.0 ... Missing script: "test"" (N3 proven); revert 66d9888.
+    Each revert exact (`git diff HEAD~2 HEAD` empty); the tree at 66d9888 equals fb17451 outside `.checkpoints/`.
+    Final head 66d9888 all green: toolchain push 42893708734 and pull_request 42893718519; gate workflow push
+    42893708791 and pull_request 42893718283 (gate and smoke jobs, 6 check runs, all success).
+
 ## Current step
-Build step 4: planted failures M1a, M1b, M2, M3, M4 (L3), each pushed alone by hand, red at the expected step before its
-revert; no checkpoint edit while a planted commit or its revert is unpushed.
+Steps 1-4 done. Step 5 waits for 2.1b and LANE-RULES to merge (his word); the PR stays a draft.
 
 ## Next steps
-1. Build steps 1-4 of plan.md revision 5, Part 8, here: 1 root pins and lockfiles; 2 the crates and packages with E1,
-   L1-L3, E6, E7, E11; 3 K1 (one ask), push, draft PR, E2; 4 M1a, M1b, M2, M3 by Part 7's procedure (pushed by hand,
-   red before the revert; no checkpoint edit while a planted commit is unpushed).
-2. Step 5 (main merged in by the worktree path, condition 5's check, K2a-K4 with his asks) after 2.1b and LANE-RULES
-   have merged; steps 6-7 after.
+1. Step 5 (main merged in by the worktree path, condition 5's check, K2a-K4 with his asks) after 2.1b and LANE-RULES
+   have merged (K4 in Accept edits or Manual mode, CLAUDE.md:67-68; after K4 the advisor runs as a general agent
+   reading main's advisor.md, CLAUDE.md:59-61); steps 6-7 after (docs incl. REPO_MAP and the register's G0 reading;
+   the review round 3 at a time; the verifier; the report; the checkpoint folded in and deleted; ready; the
+   advisor's review of the head; his go).
 2. This checkpoint and the plan are folded into the build's report and deleted before its PR is marked ready
    (CHECKPOINTS §9).
 
