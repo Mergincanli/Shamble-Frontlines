@@ -1,7 +1,8 @@
 # Checkpoint: foundation-toolchain
-- **Goal:** plan foundation step 2.2, the toolchain (ADR 0002 part 2, migration plan 2.2), as a change-set plan that
-  delivers Mustafa's four asks (what 2.2 pins now; the empty slots until the boundary spike, each by its open question;
-  the CI job that runs the Rust checks; its own plan review by the advisor agent). Plan only: no build, no code.
+- **Goal:** build foundation step 2.2, the toolchain (ADR 0002 part 2, migration plan 2.2), from its approved plan, in
+  this session on this branch (Mustafa's change of plan, 2026-11-10, `mustafa-2026-11-10-build-here.md`): steps 1-4
+  now; step 5 after 2.1b and LANE-RULES merge; the network-cut rule; each kit edit asks him; the PR a draft until 2.1b
+  has merged. (The planning part of this task is done: steps 1-11 below.)
   Plan: `.checkpoints/foundation-toolchain/plan.md` (revision 5: revision 4 plus Mustafa's answers; the advisor's
   APPROVE of revision 3, bf1737f).
 - **Branch:** `claude/laughing-pasteur-fwya24` (this cloud session's branch, standing in for `cs/foundation-toolchain`)
@@ -45,13 +46,19 @@
     the network cut (one fix round, then the offline flags, PM-0002-37 partly proven, tell him), his go on the ADR
     index entry in the PR · plan revision 5 · this commit.
 
+12. His change of plan recorded (`mustafa-2026-11-10-build-here.md`): the build runs here, on this branch; no CLAUDE.md
+    rule requires a fresh session (protocol step 3); K4 needs Accept edits or Manual mode (CLAUDE.md:67-68); after K4
+    the advisor runs as a general agent reading main's advisor.md (CLAUDE.md:59-61).
+
 ## Current step
-Planning done. The build runs in a fresh session from Mustafa's prompt; it carries this checkpoint onto its own branch.
+Build step 1: the root pins (`rust-toolchain.toml`, `Cargo.toml`, `package.json`, `.gitignore`) and both lockfiles.
 
 ## Next steps
-1. The build session: copy this checkpoint and its notes folder onto its own branch, then plan.md revision 5, Part 8's
-   steps 1-4 now; step 5 (main merged in, condition 5's check, K2a-K4) after 2.1b and LANE-RULES have merged; steps
-   6-7 after; its PR stays a draft until 2.1b has merged.
+1. Build steps 1-4 of plan.md revision 5, Part 8, here: 1 root pins and lockfiles; 2 the crates and packages with E1,
+   L1-L3, E6, E7, E11; 3 K1 (one ask), push, draft PR, E2; 4 M1a, M1b, M2, M3 by Part 7's procedure (pushed by hand,
+   red before the revert; no checkpoint edit while a planted commit is unpushed).
+2. Step 5 (main merged in by the worktree path, condition 5's check, K2a-K4 with his asks) after 2.1b and LANE-RULES
+   have merged; steps 6-7 after.
 2. This checkpoint and the plan are folded into the build's report and deleted before its PR is marked ready
    (CHECKPOINTS §9).
 
