@@ -1,8 +1,9 @@
 # Plan: the foundation, steps 2.1 and 2.2 (revision 3)
 
 Status: revision 3. The advisor agent reviewed revision 2 (8bbebfa): APPROVE WITH CONDITIONS, for 2.1 only;
-conditions C1-C8 are applied here (Part 5 records its rulings). 2.2 needs its own plan and plan review. This session
-plans only: no code, no file moves.
+conditions C1-C8 are applied here (Part 5 records its rulings). Revision 3 itself is not reviewed: the advisor checks
+C1-C8 at 2.1a's PR head. 2.2 is a sketch and needs its own plan and plan review. This session plans only: no code, no
+file moves.
 Source: Mustafa's decision of 2026-11-10 and his task list, word for word in `mustafa-2026-11-10.md` (this folder).
 Base: main 44446a5. Branch of this plan: `claude/advisor-fable-4hxq72` (Mustafa's personal account; one account per
 branch). Everything below is from reading at 44446a5 (grep and read only); nothing was moved or run after a move,
@@ -12,9 +13,10 @@ except one control: R7's tuning builder rerun on its own dumps (E4).
 - **2.1, the restructure:** the five legacy files move into `legacy/` with `git mv`, bytes unchanged. 63 files name
   them (728 hits); after reading each, 2.1 edits 2 gate files (`tools/gate.mjs`, `tools/smoke.mjs`), 2 kit files
   (`CLAUDE.md` 3 lines, `.claude/agents/verifier.md` 1 line), `tools/village.py`, `tools/README.md`, 7 tool header
-  comments, the root `README.md`, and 8 docs (REPO_MAP, START_HERE, MODULE_MAP, TECHNICAL, STATUS, ROADMAP, the
-  register and ADR 0002's OQ-0002-2 entry); everything else stays true as a name, a pinned citation or history. No
-  guard, settings, CI or `spikes/` file changes.
+  comments, the root `README.md`, and 9 docs (REPO_MAP, START_HERE, MODULE_MAP, TECHNICAL, STATUS, ROADMAP, the
+  register, ADR 0002 and SPIKE_PLAN; the last two only with pointers to his decision and OQ-0002-2's answer);
+  everything else stays true as a name, a pinned citation or history. No guard, settings, CI or `spikes/` file
+  changes.
 - **Two pull requests:** 2.1a teaches the gate both layouts (nothing moves), 2.1b moves the files. One PR would make
   its own revert fail CI (the rollback rule needs a pure revert with CI green).
 - **OQ-0002-2** (this plan decides it, the ADR says): the legacy tools stay in `tools/`; the legacy docs stay in
@@ -29,7 +31,8 @@ except one control: R7's tuning builder rerun on its own dumps (E4).
   boundary spike (types, the boundary layer, the Worker layout) and the preview hosting check; 2.3 also waits for #46.
 - **PR #46 and his queue (STATUS-DIET, LANE-RULES):** 2.1a shares no file with them and can be built now; 2.1b shares
   CLAUDE.md, STATUS, REPO_MAP and ROADMAP; both merge after them, on his go.
-  **PR #40:** after 2.1 merges, it merges main, keeps both sides of REPO_MAP and STATUS, and changes nothing else.
+  **PR #40:** after each of 2.1a and 2.1b merges, it merges main and keeps both sides of STATUS (and, after 2.1b,
+  REPO_MAP); nothing else changes for it.
 - **Approval:** the advisor agent approved 2.1 with conditions (applied); 2.1a may be built now, but its merge and
   2.1b's kit sitting wait for FREEZE-FDN and SPLIT. 2.2 needs its own plan and review.
 - **For Mustafa:** FREEZE-FDN (does KIT-FREEZE-2 cover the foundation's own edits?), SPLIT, SCOPE (before 2.2's merge)
@@ -44,15 +47,17 @@ except one control: R7's tuning builder rerun on its own dumps (E4).
 - **Not in 2.1:** no v2 file (no `Cargo.toml`, `package.json`, `crates/`, `packages/`: that is 2.2), no game-code
   change, no edit inside `spikes/`, no guard or settings or CI edit, no rewrite of reports, research or ROADMAP history.
 - **Change type:** a move plus tool and docs edits; risk tier 2 (CLAUDE.md, `.claude/` files, gate files, and "a file
-  renamed or moved from a path outside tier 0", advisor.md:63-64). Merge route: `needs-mustafa`, on his go in a day
-  session, after the advisor's APPROVE of the final head, with his Brave check first (he plays the moved game).
+  renamed or moved from a path outside tier 0", advisor.md:63-64). Merge route for each PR: `needs-mustafa`, on his
+  go in a day session after the advisor's APPROVE of its final head, as FREEZE-FDN allows; 2.1b with his Brave check
+  first (he plays the moved game).
 - **Two pull requests, one after the other** (Q-A6): a revert must be "the exact inverse of the merge" with "CI green
   on its head" (advisor.md:285-290). If one PR held both the gate edit and the move, its revert would bring back
   today's gate, whose base reader knows only the root and `shamble-frontlines-repo/` (gate.mjs:92-95), while CI's base
   (`origin/main`, gate.yml:42-49) would hold the files in `legacy/`: the gate dies with exit 2, on the revert PR and on
   main after it (the critic's F1). So:
-  - **2.1a, the tools learn both layouts** (gate files and `village.py` only; nothing moves): merged first. A revert of
-    it is plain (the files are still at the root).
+  - **2.1a, the tools learn both layouts** (the two gate files, `village.py`, the gate-globals wording, and his
+    2026-11-10 decision recorded on main; nothing moves): merged first. A revert of it is plain (the files are still
+    at the root).
   - **2.1b, the move** (the five files, the kit lines, the commands in text, the docs): merged second. A revert of it
     leaves 2.1a's gate, which reads a `legacy/` base and a root head, so CI stays green (rehearsed: E8).
 - **Hand-over (who builds, on which branch, where the plan lives):** this account builds both (his decision; one
@@ -102,12 +107,12 @@ Checked by full read, nothing to change: `.claude/CHECKPOINTS.md`, `NIGHT_SHIFT.
 | File | Protected | Hits | Class | 2.1 does |
 |---|---|---|---|---|
 | `tools/gate.mjs` | yes (gate) | 24 | BREAKS :33-35 (ROOT and FILES at the root), :96-100 (`headFile` reads ROOT/<f>), :150 (`classicParts` resolves `<script src>` against ROOT), :190 (`runSmoke({ root: ROOT })`); NAME the rest (check labels, 5d's `WANT` names relative to the page) | **edit** (1.3) |
-| `tools/smoke.mjs` | yes (gate) | 4 | BREAKS :18, :118, :201 (default root = the repo root; the CLI runs `runSmoke()` with it); NAME the page names | **edit**: default root = `<repo>/legacy` |
+| `tools/smoke.mjs` | yes (gate) | 4 | BREAKS :18, :118, :201 (default root = the repo root; the CLI runs `runSmoke()` with it); NAME the page names | **edit** (2.1a): default root = the gate's `BUILD`, one shared rule (1.3) |
 | `tools/battery.js` | yes (gate) | 5 | NAME; `readBuild(dir)` :64-68 and its CLI :210-213 take a folder; the gate passes strings | none |
 | `tools/preview.js` | no | 4 | COMMAND :2 (`preview.js . <cmd>`); code takes the folder (:17, :93-94) | edit the comment |
 | `tools/pageshot.js` | no | 3 | COMMAND :8 (`pageshot.js . index.html`); code takes the folder (:19, :36) | edit the comment |
-| `tools/village.py` | no | 2 | BREAKS :10 (default `<repo>/shamble-core.js`); COMMAND :2 | **edit** :10 → `os.path.join(_REPO, 'legacy', 'shamble-core.js')`; :2 |
-| `tools/README.md` | no | 8 (+ :22, :24-27, :58 without a name) | COMMAND :22 (`battery.js .`), :23-28, :56, :58 (`preview.js .`, `pageshot.js .`); NAME the rest | **edit** `.` → `legacy` |
+| `tools/village.py` | no | 2 | BREAKS :10 (default `<repo>/shamble-core.js`); COMMAND :2 | **edit** :10 (2.1a): `legacy/shamble-core.js` when it exists, else the root one; :2 doc (2.1b) |
+| `tools/README.md` | no | 8 (+ :22, :24-27, :58 without a name) | COMMAND :22 (`battery.js .`), :23-28, :56, :58 (`preview.js .`, `pageshot.js .`); STALE :35 (gate-globals wording); NAME the rest | **edit**: :35 in 2.1a; `.` → `legacy` in 2.1b |
 | `tools/sim.js`, `reach.js`, `perfbots.js`, `tuning-dump.js`, `aabbs.js` | no | 0 (a folder `.` each) | COMMAND in the header comment (`preview.js . eval …`) | edit the comment |
 | `README.md` | no | 6 | STALE :12 ("Double-click `index.html`"), :13, :19-22 (the layout table) | **edit** → `legacy/…` |
 | `index.html`, `editor.html`, the three `.js` files | no | 4, 7, 3, 4, 6 | NAME (headers, comments); `<script src>` relative (index.html:1256-1257, editor.html:1257-1259); three.js from its CDN URL; no link, fetch or asset path between files | **move only** (bytes unchanged) |
@@ -132,9 +137,9 @@ re-cut from main (2.1's report checks the Night queue, issue #16, for such items
 | `docs/MODULE_MAP.md` | 20 | NAME | one line (1.4) |
 | `docs/START_HERE.md` | 16 (+ :104, :114 with `.`) | STALE :12, :21-22; COMMAND :104, :114-116 | edit (1.4) |
 | `docs/REPO_MAP.md` | 8 | STALE :14-18 (the check fails on them); NAME :100-102 | edit (1.4) |
-| `docs/adr/0002-…md` | 8 | already in after-move terms (:138-139, :955, :1405, :1431); quotes (:56, :951) | only OQ-0002-2's answer (1.4) |
+| `docs/adr/0002-…md` | 8 | already in after-move terms (:138-139, :955, :1405, :1431); quotes (:56, :951) | a pointer to his decision at step 1 (2.1a); OQ-0002-2's answer (2.1b) |
 | `docs/adr/0003-rendering.md` | 7 | CITATION (line numbers kept), one inside PM-0003-47 (not hashed by #40) | none |
-| `docs/STATUS.md` | 7 | HISTORY, CITATION; the risk at :987 is wrong under `git mv` | 2.1's row; correct :987 (1.4) |
+| `docs/STATUS.md` | 7 | HISTORY, CITATION; the risk at :987 is wrong under `git mv` | his decision and :1009 closed (2.1a); 2.1's row, :987 corrected (2.1b) |
 | `docs/adr/0001`, `0004`, `0006` | 1 each | CITATION: quotes of CLAUDE.md:46, outside every PM row | none |
 | `docs/adr/0005-…md` | 2 | CITATION | none |
 | `docs/ART_DIRECTION.md`, `docs/EDITOR_V2.md`, `docs/ROADMAP.md` | 2, 1, 1 | NAME (EDITOR_V2:94 is the v2 editor's rule; ROADMAP:3 the banner) | none (ROADMAP gets 2.1's entry) |
@@ -158,8 +163,9 @@ Total 603 docs hits, every one read in context by the docs agent (`inv-docs.md`)
   all five files, never mix within one base; none: exit 2 naming the base and the prefixes tried; the chosen prefix is
   printed on the base line and in `--json` (adds `BASE_PREFIXES` and `basePrefix`).
 - `tools/smoke.mjs`: `runSmoke`'s default root is the gate's `BUILD`, by one shared rule (the folder that holds all
-  five files; both or neither: exit 2), not a separate "both pages" test (the advisor's L6); its CLI follows; `ROOT`, `ROOT_URL` and `rel` stay; the header's "outside the repo" → "outside the build folder"
-  (a page may read only files under its own folder: stricter under `legacy/`, and the pages read no sibling file).
+  five files; both or neither: exit 2), not a separate "both pages" test (the advisor's L6); its CLI follows; `ROOT`,
+  `ROOT_URL` and `rel` stay; the header's "outside the repo" → "outside the build folder" (a page may read only files
+  under its own folder: stricter under `legacy/`, and the pages read no sibling file).
 - `tools/village.py`: its default core path is `legacy/shamble-core.js` when that exists, else the root one.
 - The deferred Low of kit-v2-1 (STATUS:1009, "fix the wording when gate.mjs is next touched"): gate.mjs:333 and
   tools/README.md:35 call `gate-globals.json` "reviewed data, not a gate-tool change", against kit-v2-1's category 3
@@ -195,7 +201,7 @@ either layout (0002:1358), so the path counts decide:
 | The legacy docs (KT21: START_HERE, MODULE_MAP, TECHNICAL, GAME_DESIGN, ART_DIRECTION, ANIMATION_PLAN, AUDIT_BUGS_PERF, `ui_theme_mockup.html`) | **stay in `docs/`**, marked legacy (REPO_MAP already labels most; one banner line where 2.1 edits anyway): 0 path changes | to `legacy/docs/`: 27 lines in 12 files, 8 of them protected, 2 relative links broken (GAME_DESIGN.md:69, :90), and about 25 references in history and ADRs left dangling. KT21's mark is "redesign": START_HERE gets rewritten for v2, not archived. The R7 files (LEGACY_INVENTORY, LEGACY_TUNING, legacy-tuning.json, EDITOR_V1_INVENTORY) stay in `docs/` either way: ADRs cite them and PM-0002-36 names `docs/legacy-tuning.json` |
 | The gate v2's script | **deferred to 2.3's plan**, which edits the guard anyway to teach it the gate v2's files: either the gate v2 gets its own name beside `tools/gate.mjs`, or it takes `tools/gate.mjs` and the legacy gate moves then. Either way after PR #46 | deciding now would edit the guard in 2.1 |
 
-**The docs edits** (not protected; docs-keeper, in step 6):
+**The docs edits** (not protected; docs-keeper; 2.1a's step 4 records his decision, 2.1b's step 10 does the rest):
 - `docs/REPO_MAP.md`: :14-18 (the five root rows) → one `legacy/` row, which also says that `file:line` citations keep
   their numbers after the move (`shamble-game.js:N` means `legacy/shamble-game.js:N`); :6's date. Without this,
   `repo-map-check.mjs` exits 1 (stale rows, `legacy/` missing).
@@ -203,10 +209,14 @@ either layout (0002:1358), so the path counts decide:
   repo root" → "in `legacy/`"), the commands at :104, :114, :115, :116 (`.` → `legacy`).
 - `docs/MODULE_MAP.md`: one line above the file table (all five live in `legacy/`).
 - `docs/TECHNICAL.md`: §9's file inventory (:238-239) says `legacy/`; :10 optional.
-- `docs/STATUS.md`: 2.1's in-flight row; the risk at :987 ("The inventory's line numbers go stale once phase 1 moves
-  the legacy files") is corrected: `git mv` keeps bytes and line numbers.
+- `docs/STATUS.md`: in 2.1a, his 2026-11-10 decision (step 4) and the deferred gate-globals Low at :1009 closed; in
+  2.1b, 2.1's in-flight row, and the risk at :987 ("The inventory's line numbers go stale once phase 1 moves the legacy
+  files") corrected: `git mv` keeps bytes and line numbers. (In `docs/DECISIONS.md` and the split files if STATUS-DIET
+  lands first.)
 - `docs/ROADMAP.md`: 2.1's entry; its banner at :3 optional.
-- `docs/adr/README.md` (the register) and ADR 0002's OQ-0002-2 entry: the answer above (decision docs: his go).
+- `docs/adr/README.md` (the register) and ADR 0002's OQ-0002-2 entry: the answer above, and the register records
+  PM-0002-36's reading (Q-A1) (decision docs: his go).
+- `docs/SPIKE_PLAN.md` and ADR 0002's migration step 1: only 2.1a's dated pointers to his decision (step 4).
 - Not edited: `docs/legacy-tuning.json` and `docs/LEGACY_TUNING.md` (their `produced_by` and :9 commands keep `.`, as
   produced at 48ffb51), every report, ROADMAP's history, the research files, LEGACY_INVENTORY and EDITOR_V1_INVENTORY
   (226 and 37 citations, pinned to their commits), the ADRs' quotes of CLAUDE.md:46 (ADR 0001:1067, 0002:951,
@@ -219,12 +229,14 @@ either layout (0002:1358), so the path counts decide:
 advisor.md:90-91 and :153-156: CI's green does not stand when a gate file changes. A day-session advisor runs the PR
 head's own gate in a worktree (advisor.md:149-150), but for a PR that edits the gate that run is not independent: the
 judge is the thing under change. So the proof comes in parts that do not trust the edited gate, each a command whose
-output goes into the report:
+output goes into the report.
+
 The independent judge is pinned by SHA: **OLD = 44446a5** here, or the main that 2.1a branches from if a later merge
 (PR #46, PR #40) lands first; 2.1a's checkpoint records the exact SHA, and its gate files must equal 44446a5's (no
 open PR touches them). After 2.1a merges, `origin/main` holds the edited gate, so "main's gate" is no longer
 independent. In 2.1a the base is OLD; in 2.1b it is the main that holds 2.1a (call it A), and the judge is still
 OLD's gate.
+
 - **E1, the bytes did not change** (2.1b). `git diff --find-renames=100% --name-status A HEAD` lists exactly five
   `R100` rows for the five files, and `git rev-parse A:<f>` equals `git rev-parse HEAD:legacy/<f>` for each (same blob;
   A's five blobs equal OLD's, since 2.1a moves nothing).
@@ -245,22 +257,13 @@ OLD's gate.
   wording is a note, not a fail.) Run in 2.1a with the files at the root on both sides, and again in 2.1b with them in
   `legacy/` on the head side. Also the edited gate against three bases: OLD (root layout), 8e58937 (CS-1's
   `shamble-frontlines-repo/` layout) and its own head.
-- **E8, the rollback works the way CI would see it** (2.1b). In a throwaway worktree of A: `git merge --no-ff` of 2.1b's
-  head (a local merge commit M, as GitHub would make it), then `git revert -m 1 --no-edit M` (the whole merge, as
-  advisor.md:271-274 does it); on that tree, `node tools/gate.mjs M` (CI's base on the revert PR is the main that holds
-  M) and `node tools/gate.mjs --smoke-only` must both PASS. No commit leaves the worktree. The merge and the revert
-  write CLAUDE.md and verifier.md in that worktree, and the guard does not read `git revert` (STATUS, limit L4): the
-  main session runs E8 itself, never a subagent, after one ask to Mustafa (advisor.md, Revert, step 2).
-- **C7, every command under the guard of the day:** each evidence command is re-checked against the guard on main when
-  it runs (PR #46 rewrites it first); a refusal is a finding for the checkpoint, never something to work around.
 - **E4, the oracle (PM-0002-36; the advisor accepted this reading, Q-A1).** The dump with `--pre=tools/tuning-dump.js`
   for both maps (default and `--map=tri`), at base with folder `.` and at head with folder `legacy`, twice each, with
-  A's copies of `preview.js` and `tuning-dump.js` for both runs (2.1b edits their header comments): all four head runs byte-identical
-  to the base runs; then R7's builder (`build-tuning.py` at a715be2, run unchanged except its input and output paths,
-  into `.gate/foundation/`) on the head dumps gives files `cmp`-equal to `docs/legacy-tuning.json` and
+  A's copies of `preview.js` and `tuning-dump.js` for both runs (2.1b edits their header comments): all four head runs
+  byte-identical to the base runs; then R7's builder (`build-tuning.py` at a715be2, run unchanged except its input and
+  output paths, into `.gate/foundation/`) on the head dumps gives files `cmp`-equal to `docs/legacy-tuning.json` and
   `docs/LEGACY_TUNING.md`. Control already run in this session (inv-code B7b): the builder on R7's own dumps of
-  a715be2 reproduces both files today, byte for byte. Whether this is the mark's reading is the advisor agent's ruling
-  (Q-A1 below).
+  a715be2 reproduces both files today, byte for byte.
 - **E5, the saves.** A headless Chromium test with one persistent profile (Playwright from `tools/node_modules`): a
   page at `<site>/index.html` writes a KVStore key (asserting `KVStore.backend === 'localStorage'`); after a relaunch,
   the same page reads it back (the control: else the test proves nothing); then `<site>/editor.html` (same folder),
@@ -272,6 +275,14 @@ OLD's gate.
   changes, run once as written (`preview.js legacy shot`, `pageshot.js legacy index.html`, `village.py` with no
   arguments, `battery.js legacy`); `node .claude/scripts/repo-map-check.mjs` exit 0; the kit tests unchanged and
   passing with main's counts (`node --test .claude/hooks/*.test.mjs .claude/scripts/checkpoint.test.mjs`).
+- **E8, the rollback works the way CI would see it** (2.1b). In a throwaway worktree of A: `git merge --no-ff` of 2.1b's
+  head (a local merge commit M, as GitHub would make it), then `git revert -m 1 --no-edit M` (the whole merge, as
+  advisor.md:271-274 does it); on that tree, `node tools/gate.mjs M` (CI's base on the revert PR is the main that holds
+  M) and `node tools/gate.mjs --smoke-only` must both PASS. No commit leaves the worktree. The merge and the revert
+  write CLAUDE.md and verifier.md in that worktree, and the guard does not read `git revert` (STATUS, limit L4): the
+  main session runs E8 itself, never a subagent, after one ask to Mustafa (advisor.md, Revert, step 2).
+- **C7, every command under the guard of the day:** each evidence command is re-checked against the guard on main when
+  it runs (PR #46 rewrites it first); a refusal is a finding for the checkpoint, never something to work around.
 - **E7, Mustafa in Brave** (ADR 0002's foundation checklist, step 1): below, 1.8.
 
 ### 1.6 Steps (each one commit, the gate after each; checkpoint `foundation-restructure`)
@@ -303,7 +314,8 @@ OLD's gate.
 7. **The commands in text** (one commit): `tools/README.md` and the tool header comments (`.` → `legacy`), the root
    `README.md`.
 8. **The kit lines** (one commit, each edit asks Mustafa): CLAUDE.md and verifier.md (1.3).
-9. **E1, E2, E4 to E6, E8**, outputs into the checkpoint notes.
+9. **E1 to E6, E8** (E3 again, now with the files in `legacy/` on the head side: PM-0002-35 is judged after the
+   move), outputs into the checkpoint notes.
 10. **The docs** (docs-keeper): 1.4's list; the register's OQ-0002-2 row and ADR 0002's OQ-0002-2 entry ("answered by
    the restructure plan").
 11. **Reviews** on the final diff (1.7), one fix pass, the report, the checkpoint deleted in the last commit, PR ready;
@@ -313,14 +325,14 @@ OLD's gate.
 - **2.1a:** security-auditor (every risk-tier-2 change), test-engineer (is it proven: E3, the three bases, the
   both-copies stop), infra-engineer (CI and the gate on old bases); then the verifier until PASS; the advisor on every
   pushed head.
-- **2.1b:** security-auditor, test-engineer (E1, E2, E4 to E6, E8), infra-engineer (the move against CI and the gate);
+- **2.1b:** security-auditor, test-engineer (E1 to E6, E8), infra-engineer (the move against CI and the gate);
   docs-keeper for the docs; the verifier until PASS; the advisor on every pushed head. No art-director: nothing a player
   sees changes (bytes unchanged), and Mustafa's Brave check covers it.
-- **Models and effort (CLAUDE.md, "Models and effort"):** the main session and every agent run Opus 5.5; the reviewer
+- **Models and effort:** as CLAUDE.md's "Models and effort" section and his LANE-RULES (Part 5) say: the reviewer
   agents, the verifier and docs-keeper run from their agent files (`model: opus`, their stated effort); docs-keeper's
   ADR and register edits get `xhigh`; built-in and workflow agents get `model: 'opus'` and `effort: 'high'` passed
-  explicitly. Fable 5.2 only through the advisor tool on this account (his LANE-RULES), never as an agent. At most 3
-  agents at a time, the saver running while they do.
+  explicitly; the advisor tool is an extra, never an agent. At most 3 agents at a time, the saver running while they
+  do.
 
 ### 1.8 What Mustafa checks in Brave (ADR 0002's foundation checklist, step 1; 2.1b only)
 0. Confirm you have this version: download the PR's branch as a zip from its GitHub page (Code, Download ZIP) and unzip
@@ -343,14 +355,16 @@ OLD's gate.
 ### 1.9 Risks
 - **A tool or command missed by the grep** → the dry run (step 1) and E6 run every changed command once; the critic's
   sweep (`inv-critic.md`) looked for names built at run time, globs and relative paths.
-- **The gate reads the wrong copy** (a stray root copy beside `legacy/`) → the head reads `legacy/` only; optional:
-  the gate fails when a root copy of any of the five reappears (a proposal for the advisor, Q-A5's neighbour).
+- **The gate reads the wrong copy** (a stray root copy beside `legacy/`) → `BUILD` is the folder that holds all five;
+  if both the root and `legacy/` hold them, the gate stops with exit 2 (1.3), tested in 2.1a's step 3.
 - **Old bases break the gate** (a PR cut before the move, or 8e58937's CS-1 layout) → the base fallback chain and E3's
   three bases.
 - **A revert of the move turns CI red** → 2.1a lands the both-layout gate first, so 2.1b's revert is pure and green
   (E8). A revert of 2.1a after 2.1b has merged would break the gate: revert 2.1b first (2.1b's report says so).
 - **Saves seem lost in Brave** → E5 before the check; the old folder keeps its storage; nothing is deleted.
-- **Collisions** → Part 4: no file of PR #46's current list, no `spikes/` file, no PM row of ADR 0001, 0004 or 0006.
+- **Collisions** → Part 4: 2.1a shares no file with the open PRs; 2.1b shares CLAUDE.md (with #46 and LANE-RULES),
+  STATUS and REPO_MAP (with STATUS-DIET and #40) and ROADMAP, and merges after them; no `spikes/` file; no PM row of
+  ADR 0001, 0004 or 0006.
 - **The PR Advisor routine is paused** until #46 merges → 2.1 is `needs-mustafa` anyway and merges on his go.
 
 ## Part 2. Step 2.2, the toolchain: a one-page sketch
@@ -376,7 +390,7 @@ after the install steps; `rustc --version` in CI equals the pin; a pull request 
 | TypeScript | 6.0.x, one exact patch | root `package.json` | part 2 |
 | Test tools | Vitest (Node) for the packages; Playwright Test for `e2e` (an empty spec) | root `package.json` | part 8 |
 | Lint tools | ESLint 10, typescript-eslint, Prettier: versions pinned now; configs and enforcement are gate stages G1-G3 (2.3) | root `package.json` | part 7, part 9 |
-| `.gitignore` | adds `target/`, `pkg/`, `dist/`, `coverage/`, `playwright-report/`, `test-results/`, proptest's and insta's pending files (no line naming the spikes folder: see the rule below) | `.gitignore` | part 1, R5-LAYOUT-REC6 |
+| `.gitignore` | adds `target/`, `pkg/`, `dist/`, `coverage/`, `playwright-report/`, `test-results/`, proptest's and insta's pending files (no line naming the spikes folder: Appendix B) | `.gitignore` | part 1, R5-LAYOUT-REC6 |
 | CI | one new workflow job: install the pinned toolchain with `rustup toolchain install` before any cargo call, then the two test commands with the network cut off | `.github/workflows/` | part 2; PM-0002-37's offline tool is "proposed, not researched" |
 
 **What waits for the boundary spike** (each open question named; 2.2 leaves its slot empty):
@@ -396,11 +410,12 @@ after the install steps; `rustc --version` in CI equals the pin; a pull request 
 **Open questions for 2.2's own plan** (not decided here):
 - **Q2.2-a, G0 belongs to 2.3.** 2.2's done-when says "deleting the toolchain file fails G0 with exit 2", but G0 is a
   stage of the gate v2 (2.3, part 9). Options: (a) that mark moves to 2.3, where `--prove` runs it (PM-0002-39);
-  (b) 2.2 ships a one-step setup check that 2.3's G0 absorbs. Proposed: (a), for the advisor to rule.
+  (b) 2.2 ships a one-step setup check that 2.3's G0 absorbs. The advisor agent ruled (a) provisionally (Q-A3); final
+  in 2.2's plan review.
 - **Q2.2-b, the guard does not protect the new pins.** `protectedRel` (run 2026-11-10) returns false for root
   `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`, `package.json`, `package-lock.json`, `deny.toml`, `.cargo/
-  config.toml`. Whether they join the guard's gate files is a guard edit, after PR #46 merges (it rewrites the guard),
-  most naturally with 2.3, when the gate v2 starts reading them.
+  config.toml`. Whether they join the guard's gate files is a guard edit, after PR #46 merges (it rewrites the guard)
+  and inside KIT-FREEZE-2's window, so most naturally with 2.3, the gate step, when the gate v2 starts reading them.
 - **Q2.2-c, which Node.** Part 2 says "the way the legacy toolkit pins 22". Node's release table
   (github.com/nodejs/Release, read 2026-11-10; "Dates are subject to change") lists 22.x as "Maintenance LTS",
   end-of-life "2027-04-30", and 24.x as "Maintenance LTS" since "2026-10-20", end-of-life "2028-04-30"; the line now in
@@ -462,19 +477,25 @@ Phase); his decision lifted that for 2.1 and 2.2 only.
   only `--ff-only` merges of `origin/main` run there without one).
 
 ### PR #40 (the netcode proof test; university account)
-What 2.1 changes for it, and what #40 must do once 2.1 is on main:
-1. **Merge main into its branch** before its own merge (in a worktree, as its notes already do). Expect conflicts in
-   `docs/REPO_MAP.md` and `docs/STATUS.md` only: #40 adds the `spikes/` rows and its status; 2.1 adds the `legacy/` rows
-   and moves the five files' rows. Keep both, then run `node .claude/scripts/repo-map-check.mjs` and the gate.
-2. **Nothing in `spikes/` changes.** Its `check.mjs` `referenceProblems` reads the moved files under `legacy/` (non-
+What 2.1 changes for it, and what #40 must do once each PR is on main. #40's own files outside `spikes/` are
+`docs/REPO_MAP.md`, `docs/STATUS.md` and `docs/design/*`; its `check.mjs` reads only its marks' rows in ADR 0001, 0004
+and 0006 (`marksProblems`, `expectedMarks`) and the non-Markdown files outside `spikes/`, `docs/`, `.checkpoints/`
+(`referenceProblems`), so 2.1a's pointers in ADR 0002 and SPIKE_PLAN and 2.1b's OQ-0002-2 entry are not read by it.
+1. **After 2.1a merges:** merge main into its branch before its own merge (in a worktree, as its notes already do);
+   expect a conflict in `docs/STATUS.md` at most (2.1a's record of his decision, or `docs/DECISIONS.md` if STATUS-DIET
+   came first). Its gate run then uses 2.1a's gate, which reads the root layout as before.
+2. **After 2.1b merges:** merge main again; expect conflicts in `docs/REPO_MAP.md` and `docs/STATUS.md`: #40 adds the
+   `spikes/` rows and its status, 2.1b adds the `legacy/` row and drops the five root rows. Keep both, then run
+   `node .claude/scripts/repo-map-check.mjs` and the gate.
+3. **Nothing in `spikes/` changes.** Its `check.mjs` `referenceProblems` reads the moved files under `legacy/` (non-
    Markdown, outside `spikes/`): they contain no `spikes/` text, so the check still passes; `check.test.mjs`'s fixtures
    use the old names as data only (lines 1263-1283 on its branch).
-3. **Its gate command stays** `node tools/gate.mjs --no-smoke` (the tools stay in `tools/`); after the merge the gate
+4. **Its gate command stays** `node tools/gate.mjs --no-smoke` (the tools stay in `tools/`); after the merge the gate
    reads `legacy/` and its base is the post-move main. Its notes cite `tools/gate.mjs:34` (FILES): that line moves in
    2.1; notes are records and need no change, but a new citation should read the new line.
-4. **Its marks file is safe if 2.1 leaves the PM rows alone:** `marks.json` hashes PM rows of ADR 0001, 0004 and 0006
+5. **Its marks file is safe if 2.1 leaves the PM rows alone:** `marks.json` hashes PM rows of ADR 0001, 0004 and 0006
    by their text. 2.1's docs pass edits no `| PM-` row in those three ADRs (Part 1 checks each hit).
-5. **If #40 merges first:** 2.1 merges main and resolves the same two files; nothing else changes.
+6. **If #40 merges first:** 2.1a and 2.1b merge main and resolve the same files; nothing else changes.
 
 ## Part 5. Questions
 
@@ -531,8 +552,8 @@ asks, E3); both merges and 2.1b's kit sitting wait for FREEZE-FDN and SPLIT; 2.2
 - **Q-A5, the base prefix:** one prefix per base: try `legacy/`, then the root, then `shamble-frontlines-repo/`, take the
   first that holds all five; if none, exit 2 naming the base and the prefixes tried; print the chosen prefix in the
   base line and in `--json`; never mix prefixes within one base.
-- **Q-A6, two PRs:** the reasoning holds; recommend SPLIT (a); his choice. Two PRs under one plan are still one
-  change-set (ADR 0002:1427).
+- **Q-A6, two PRs:** the reasoning holds; recommend SPLIT (a); his choice. In its reading, two PRs under one plan are
+  still one change-set (ADR 0002:1426: "one change-set per step").
 
 ## Appendix A. The 63 files that name a legacy file, by path
 From `git grep -c` at 44446a5 (outside `.checkpoints/`); "Kit or gate" from the guard's `protectedRel`; the class of
