@@ -9,7 +9,7 @@
   the same.
 - **Branch:** `claude/advisor-fable-4hxq72` (this cloud session may push only there), standing in for
   `cs/foundation-restructure`; Mustafa's personal account. **Base / OLD:** main 44446a5 (unchanged on 2026-11-10 10:15).
-- **Last update:** 2026-11-10 10:20 Amsterdam
+- **Last update:** 2026-11-10 11:10 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -22,19 +22,33 @@
      a folder of links naming 1243's executables as 1194 (smoke on main: PASS, index 8/8, editor 5/5). Caveat for the
      report: locally a newer Chromium than pinned; CI runs the pinned one.
 
+2. Build step 1, the dry run (`.gate/fdn-dry`, worktree of 44446a5): `git mv` of the five files → five `R100`; today's
+   gate: exit 2, "gate: shamble-core.js is missing from the working tree" (gate.mjs:98), as the plan expected.
+3. Build step 2, the tools (dd12aeb): built and proven first in a plain scratch folder `.gate/fdn-scratch` (not a
+   worktree; `protectedRel` false there), then written with one ask each for `tools/gate.mjs` and `tools/smoke.mjs`
+   (`cp` from scratch, `cmp` equal), plus `tools/village.py` and `tools/README.md`. Full gate with smoke PASS on the root
+   layout (base 44446a5). Folder rule table `rows-test.mjs`: 8 rows + 2 smoke-CLI rows ALL PASS. Without Playwright
+   (`--omit=optional`): `--no-smoke` PASS. Base checks (`e3-bases.md`): the edited gate reads root, CS-1
+   (`shamble-frontlines-repo/`) and legacy/ bases with a root or a legacy/ head, all PASS; OLD's gate DIES on a legacy/
+   base (the revert case the split prevents); both copies → exit 2.
+   - Departure from plan 1.3 (to state in the plan and the PR body): the folder marker is the three `shamble-*.js` files,
+     any of them, not "all five files": any overlap → exit 2, and a future v2 `index.html` at the root never makes the
+     root look like the legacy build. New names: smoke.mjs `findBuild` (export), `LEGACY_JS`; gate.mjs `BUILD`,
+     `BUILD_PREFIX`, `BASE_PREFIXES`, `basePrefix`; `baseFile(b, f)` now takes the base object.
+
 ## Current step
-2. Build step 1, the dry run (plan 1.6).
+4. Build step 3, E3: `e3-run.mjs` over `e3-mutations.json` (31 entries: P1-P4, M1-M22, C1-C3, PC1, PC2, drafted by an
+   Opus agent, notes `agent-mutations.md`) in `.gate/fdn-old` (44446a5), `.gate/fdn-new` (dd12aeb) and
+   `.gate/fdn-newleg` (9af08f7: dd12aeb + a local commit of the move, never pushed); results to `e3-results.json`;
+   running in the background since 11:05 Amsterdam (log `.gate/e3-run1.log`). PC1 judged on check 3 only (the Phase 0
+   gate had checks 1-4; refreshRect is still called at boot, so 5a/5b fail on every gate).
 
 ## Next steps
-3. Step 2: the tools commit (plan 1.3): gate.mjs (`BUILD`, `BASE_PREFIXES`, `basePrefix`, both copies → exit 2, the
-   prefix on the base line and in `--json`, :333 wording), smoke.mjs (default root = `BUILD`'s rule), village.py
-   (default), tools/README.md:35 wording. Each gate-file edit asks Mustafa. Gate with smoke PASS on the root layout.
-4. Step 3: E3 (26 mutations + controls, OLD's gate vs the edited gate, failing check ids equal, not empty); the edited
-   gate on the dry run's `legacy/` layout vs OLD; both copies → exit 2; bases OLD, 8e58937, own head.
-5. Push; draft PR (stays a draft); report to Mustafa: PR number, the proof, his asks.
+5. Push; draft PR (stays a draft until its turn); report to Mustafa: PR number, the proof, his asks.
 6. At 2.1a's turn (after #46, STATUS-DIET, LANE-RULES): merge main in; step 4 (his decision recorded, in
-   `docs/DECISIONS.md` if STATUS-DIET split STATUS); reviews (security-auditor, test-engineer, infra-engineer), the
-   verifier, the report; checkpoint deleted in the last commit; PR ready; his go.
+   `docs/DECISIONS.md` if STATUS-DIET split STATUS); the plan updated for the marker departure; reviews
+   (security-auditor, test-engineer, infra-engineer), the verifier, the report; worktrees removed (links first, then
+   `git worktree remove`, never `--force`); checkpoint deleted in the last commit; PR ready; his go.
 
 ## Open findings
 - (none yet)
@@ -48,4 +62,6 @@
   in, this branch is the session's own) · the session · 2026-11-10.
 
 ## Running work
-- (none)
+- E3 run: background task b93x1ze3s, `node .checkpoints/foundation-restructure/e3-run.mjs` (resumable: skips entries
+  already in `e3-results.json`), started 11:05 Amsterdam.
+- Saver: background task bod2js7dn, started 10:44 Amsterdam, stops by 12:34; check at each update.
