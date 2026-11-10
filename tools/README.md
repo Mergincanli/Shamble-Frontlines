@@ -32,7 +32,7 @@ smoke FAILS with this setup command (it never skips silently); `--no-smoke` runs
 - **5b names**: every bare name resolves (eslint-scope over each page's scripts and inline `on…="…"` handlers) to a
   local, a top-level declaration of that page's build, an ECMAScript built-in, or `tools/gate-globals.json`. Also: no
   assignment to a `const`, and every `THREE.<member>` exists in three r128 (so no `CapsuleGeometry`).
-  - A browser API the code really needs is one line in `gate-globals.json`. That file is reviewed data, not a gate tool.
+  - A browser API the code really needs is one line in `gate-globals.json`. That file is a gate file: a change to it needs Mustafa's go.
   - `typeof x` operands are exempt. index.html's references to editor-only symbols are check 4's (it proves they are
     guarded); a page-specific hook called from shared code behind `typeof` therefore belongs in `shamble-editor.js`.
   - Handlers resolve against the page's globals only: write `document.body` or `this.value`, not `body` or `value`.
