@@ -6,8 +6,17 @@ import { fileURLToPath } from 'node:url';
 import { oldLines, build, readTemplate, FILES, RA, RB, RC, RM, MANUAL, BASE } from './split.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const di = process.argv.indexOf('--dir');
-const dir = di > 0 ? process.argv[di + 1] : '.gate/status-diet/out';
+// --rev <commit>: check the three files as that commit holds them (E1 runs on the pure-move commit: condition 11).
+const di = process.argv.indexOf('--dir'), ri = process.argv.indexOf('--rev');
+let dir = di > 0 ? process.argv[di + 1] : '.gate/status-diet/out';
+if (ri > 0) {
+  const { execFileSync } = await import('node:child_process');
+  const rev = process.argv[ri + 1];
+  dir = `.gate/status-diet/rev-${rev}`;
+  fs.mkdirSync(dir, { recursive: true });
+  for (const f of FILES) fs.writeFileSync(path.join(dir, f), execFileSync('git', ['show', `${rev}:docs/${f}`], { encoding: 'utf8', maxBuffer: 1 << 26 }));
+  console.log(`checking the three files as ${rev} holds them`);
+}
 let fails = 0;
 const fail = (m) => { fails++; console.log('FAIL ' + m); };
 const ok = (m) => console.log('ok   ' + m);

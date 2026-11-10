@@ -5,7 +5,7 @@
   #46's merge (main 2d22b69). His words: main STATUS:674-761 and docs/reports/2026-11-10-kit-v3-5.md Appendix A.
   Plan: `.checkpoints/status-diet/plan-rev1.md` (next).
 - **Branch:** `claude/busy-turing-48e4i9` (stands in for `cs/status-diet`) · **Base:** main 2d22b69
-- **Last update:** 2026-11-10 21:07 Amsterdam
+- **Last update:** 2026-11-10 21:25 Amsterdam
 
 ## Steps done
 1. Facts gathered · 9e33794 · `.checkpoints/status-diet/facts.md`: line ranges and destinations, live PR and
@@ -13,21 +13,25 @@
 2. Plan revision 1 · 2f9d467 · `.checkpoints/status-diet/plan-rev1.md`.
 3. The advisor's plan review · (this commit) · APPROVE with conditions 1-12, rulings Q1-Q5
    (`advisor-plan-rev1-verdict.md`; its notes `advisor-plan-rev1.md`, DONE); no new revision needed.
+4. Draft PR #49 opened (subscribed); templates, split.mjs, check.mjs, followups.tsv, kit-build.py, e3.mjs · 8edf607,
+   dffbbad (autosave).
+5. The pure move · 8ead8f1 · check.mjs ALL PASS (E1, E2, Q2; STATUS 103 lines); gate PASS +0 -0.
+6. #46 recorded (the archive's kit-v3-5 row, ROADMAP) · 1b030e3 · check.mjs --rev 8ead8f1 ALL PASS; gate PASS.
 
 ## Current step
-Build step 1: templates + split.mjs + check.mjs in the notes folder, dry run into .gate/status-diet/out (no docs/
-edit yet). Waiting in parallel: the advisor's ruling on his #46 go words (2d22b69's message: "The open security
-follow-ups stay in STATUS until the foundation's gate step").
+Docs pointers (REPO_MAP, START_HERE:20, TECHNICAL:240); the kit files are built in .gate/status-diet/kit/ (E3 PASS).
+Waiting in parallel: the advisor's ruling on his #46 go words (STATUS lists the security follow-ups already; DECISIONS
+has the go entry, copied from 2d22b69's message).
 
 ## Next steps
-1. Dry run; then the pure-move commit (docs/STATUS.md, DECISIONS.md, STATUS_ARCHIVE.md; E1 on it alone, cond. 11).
-2. The record-#46 commit (archive's kit-v3-5 row as a diff; STATUS; ROADMAP); his #46 go in DECISIONS.md (copied
-   from the commit message by script) once the advisor rules.
-3. Docs: REPO_MAP, START_HERE:20, TECHNICAL:240. 4. Kit writes, one ask each: CLAUDE.md (cond. 3, 6, 7, 8),
-   docs-keeper.md (cond. 4). 5. Gate, E1-E6, kit tests on main and head (cond. 10). 6. PR (draft), review round.
+1. Docs pointers commit; repo-map check.
+2. Kit writes, one ask each (Write of CLAUDE.md, then docs-keeper.md, from .gate/status-diet/kit/); E3 on the real
+   CLAUDE.md; E5 rule-diff table; kit tests on main and head (cond. 10); gate.
+3. Review round: security-auditor + verifier (Opus 5.5 high), notes in this folder; saver on.
+4. Fix pass; report docs/reports/2026-11-10-status-diet.md (cond. 2, 9, 12); delete the checkpoint; PR ready.
 
 ## Open findings
-- Night shift cron is daily 06:00 Amsterdam since 2026-11-07, STATUS says hourly: record the read state.
+- Night shift cron: daily 06:00 Amsterdam from 2026-11-07, back to hourly 00:10-06:10 since 2026-11-10 18:00 UTC (read 20:10 UTC); recorded in STATUS.
 - PR #40's branch holds his 2026-11-06 answers not on main: tell its lane (report), never push to it.
 
 ## Key numbers
