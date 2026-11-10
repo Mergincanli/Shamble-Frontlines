@@ -66,8 +66,20 @@
     scratch workspace): not retried; E1's npm half runs in CI (E2), L2 rests on npm's own docs (B3 quote), and L3
     becomes planted failure M4 in CI.
 
+15. Build step 3, K1 · fb17451 · `.github/workflows/toolchain.yml` (the write went through the session's ask path; the
+    YAML parses, the three scripts pass `bash -n`, the same action SHAs as gate.yml, gate.yml unchanged); pushed; draft
+    PR #48 (https://github.com/Mergincanli/Shamble-Frontlines/pull/48). E2 on fb17451: push run 42891450472 (job
+    130093350804) and pull_request run 42891534489, both success. The log: rustup installed 1.99.1 "because:
+    overridden by '.../rust-toolchain.toml'"; `rustc 1.99.1 (58cf8f9c3 2026-10-13)`, "rustc equals the pin 1.99.1";
+    control "connected to 140.82.114.4:443 before the cut"; inside: `uid=1001(runner) gid=65534(nogroup)
+    groups=65534(nogroup)`, only `lo` (UP), rustc 1.99.1, "getent: no answer (printed, not judged)", `curl: (7)`,
+    "the network is cut: ... (curl exit 7)"; cargo test 6/6, the wasm32 build, `npm ci --offline` (46 packages from
+    the cache), `npm test --workspaces` 5/5 (Playwright's test ran with no browser installed: A2), tsc 6.0.3. Job
+    23 s (the cut step 4 s). A1, A2, A3 proven; his fallback rule not needed.
+
 ## Current step
-Build step 3: K1, `.github/workflows/toolchain.yml` (asks Mustafa), push, draft PR, E2.
+Build step 4: planted failures M1a, M1b, M2, M3, M4 (L3), each pushed alone by hand, red at the expected step before its
+revert; no checkpoint edit while a planted commit or its revert is unpushed.
 
 ## Next steps
 1. Build steps 1-4 of plan.md revision 5, Part 8, here: 1 root pins and lockfiles; 2 the crates and packages with E1,
