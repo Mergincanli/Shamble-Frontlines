@@ -125,6 +125,13 @@ u4s-carries.md entries 1-5 and 34. Files: crates/proto, check.mjs, check.test.mj
   (grep + self-test + rename refusal; P10); 4 met (unit test; P4); 5 met; 34 met by 4 listed fixes (STEPS pinned via a
   runner recorder; doc adds wasm32 for WASM_CRATES; bites-only clippy failure named; failedRun's first-error summary),
   seen live in run B's clippy line. Freeze: no seam change needed.
+- FINAL RUNS (completed before the 22:35 cut; read back 06:32 UTC 2026-11-10): run 1 22:32:46-22:35:33, run 2
+  22:35:43-22:37:52, each exit 0, "check: all 10 steps pass", test "measured build: 296 tests passed, 0 failed, 0
+  reported a skip; bites build: 321 tests passed, 0 failed, 0 reported a skip", self 52 of 52, deps PASS, doc "host
+  and wasm32", df 12G free. Logs: scratchpad u4a-runs/run1.txt, run2.txt. 06:32 all 18 files' sha256 = the baseline
+  (unchanged since); `cargo +1.99.1 fmt --all --check` exit 0. S1 (U4s skeptic, coordinator 06:30): my tables do
+  not separate owner-only fields (the soldier's whole layout goes in both "own state" and "remote soldiers"); what
+  U4a would need is in the report. DONE (report next).
 - For the main session (outside my files): (1) the catalogue's §6 item 3 note (plan §5 U4a, nit e), proposed words:
   "(The allocation half, refused before anything is allocated, is checked with PM-0001-34's counting allocator in U5:
   the advisor's Q8 ruling; U4 proves the size-first refusal.)"; (2) the catalogue's Input row: the codec's maxima are
