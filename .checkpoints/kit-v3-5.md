@@ -40,6 +40,12 @@
   changed_files rows; pagination recorded (PR #40 fails closed here); the `@tsv` parse; exact rules texts; write-side
   limits recorded; F5 waits; the kit-v3-4 correction appended; small text; ask SA5-RIDE now). Rulings: F4-RIDE fold
   in; MERGE-ONLY approved. Plan revision 2 (`plan-rev2.md`, 890ed2d): C0-C5 clause table, C3 by `git check-ignore`.
-- **Current step:** 3, the advisor's delta check of revision 2 (running), and SA5-RIDE asked of Mustafa; then the
-  scratch build (tests red, guard, rules lines), the writes after his answer (one ask per kit file).
+- **Done:** the advisor's delta check (appended to `advisor-plan-rev1.md`, 4725d91): revision 2 APPROVE with D1-D6
+  (check-ignore without `-z` and with literal pathspecs off for that call; drop empty names; refuse `:` names; E9 via
+  realIo; D3's cap row with 3000 matching lines; D4 write rows; D5 decision-doc fold and rules lines if (a); D6 the
+  io option named). The scratch build (`build.md`, 001d47b): red 38 rows on main's guard; green 1078/1078 (main 1034),
+  settings 127/127, checkpoint 27/27; E5 and E9 live. Rules drafts in the scratchpad (`kb5/role-next.md`,
+  `kb5/rules-next.md`); SHA-256 of the four scratch files in `kb5/SHA256SUMS`.
+- **Current step:** 4, waiting on Mustafa's SA5-RIDE; then the four kit writes, one ask each (the test file, then a
+  red run in the worktree; the guard, then green; advisor.md; CLAUDE.md), the docs part, the gate, the review round.
 - **Open with Mustafa:** SA5-RIDE (the advisor's rewritten text); ORDER (unit walk vs STATUS-DIET first).
