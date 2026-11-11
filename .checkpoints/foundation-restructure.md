@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 14:56 Amsterdam
+- **Last update:** 2026-11-11 16:05 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -117,14 +117,24 @@
    follow-up for 2.3, L-2 by hand in the fix pass; L-1, L-3, L-4, F-L, the C1-C8 rebuild and the exception line in the
    report.
 
+11. His answer (2026-11-11 14:54 UTC; `mustafa-2026-11-11-f1.md`, captured by `capture-2026-11-11-f1.py` from the
+   session's events): F1-FIX (a); FREEZE-FDN (a) for this one check ("Any other new check still asks me"); yes to the
+   exact change, covering only that write; smoke.mjs unchanged, its wording Low a follow-up for 2.3; round 2 the last;
+   the report to give the Windows step with its exact command and how full this chat is; his words into DECISIONS.md.
+   The write (3f29cb8): anchors checked first (tools/gate.mjs was 2bfab53; the notes patch = the patch at eaf5a45; the
+   patch applied to a copy gives 7a8480ce8225f320de7627575321c052b8f76bd3 = the scratch copy); one plain `cp`, no
+   guard refusal; after it: blob 7a8480c, `cmp` equal, smoke.mjs 18058e4, only tools/gate.mjs changed; gate with smoke
+   PASS (+0 -0, 8/8, 5/5); committed alone and pushed.
+
 ## Current step
 
-Stopped for Mustafa (2026-11-11 15:00 Amsterdam): F1-FIX (a)/(b)/(c), FREEZE-FDN (a)/(b), and his yes or no for the exact
-change in `f1-gate.patch`. On (a)+(a)+yes: `cp .gate/fdn-scratch-f1/tools/gate.mjs tools/gate.mjs`, `cmp`, commit, push;
-then the advisor agent's conditions (2)-(5) above, his words captured by script, L-2, round 2, the verifier (its brief in
-the session's scratchpad needs the fix commit and fresh worktrees: `.gate/fdn-new` and `.gate/fdn-newleg` at the fix
-commit, a new move commit), the report, the PR body, the STATUS row, the checkpoint deleted, #50 ready, the advisor's
-delta review of the final head. On (b) or (c): no gate write; the follow-up recorded; continue to the verifier and report.
+The evidence on the new gate, smoke users first and E3 last and alone: rows-test-f1 against 3f29cb8's gate (fresh out
+folders) plus the red run on the unfixed gate; both base directions raw with exit codes (worktrees rebuilt at 3f29cb8
+with a new move commit); the decoy (from security-auditor's notes) on main's gate, the unfixed gate and the new gate,
+plus `--smoke-only` on the new gate; then the full E3 (`e3-run-f1.mjs`, a copy writing `e3-results-f1.json`; background,
+max timeout; compared per id and column with `e3-results.json` by script). During E3: his words (appendix A3.3,
+DECISIONS entry, the check script extended), L-2, the follow-ups. Then round 2 pinned to a head holding all of it (and
+infra-engineer's question on 2.1b's push runs), the verifier, the report, ready, the advisor's delta review.
 
 ## Next steps (on PR #50, this branch)
 
@@ -244,6 +254,16 @@ delta review of the final head. On (b) or (c): no gate write; the follow-up reco
    scratch path; plumbing for the legacy/ base (a worktree commit if the guard refused); after his yes, the full E3 on
    the new blob; one self-contained ask with the patch saved first; the verifier brief, #50's body, his new words, L2
    and round 2 marked stale for after his yes.
+
+5. 2026-11-11 15:58 Amsterdam · after his yes, before the write (his moments 1 and 3): is the write and the rest of the
+   plan sound? · changed: three anchors before the `cp` (current blob 2bfab53; the notes patch equal to eaf5a45's; the
+   patched copy hashing to 7a8480c), the patch applied to a copy, never edited; the write one plain `cp` alone in its
+   call; status, smoke.mjs blob and the gate checked after it; the fix commit's CI let finish before the next non-[skip
+   ci] push; smoke users first, E3 last and alone with the maximum timeout and a by-script comparison; the decoy built
+   from the auditor's notes, `--smoke-only` shown passing; round 2 pinned to a head holding all the evidence;
+   infra-engineer's question on 2.1b's push runs; docs-keeper's check script extended, not a second one; the Windows
+   step built from "Check a new machine", saying what it exercises, plus 2.1b's branch command; the verifier brief,
+   104d675's mentions and F-L marked stale.
 
 ## Running work
 - Saver: background task bjteqwe4t, started 14:02 Amsterdam, stops by 15:52 (110 min); last check 14:40: ok (autosaves pushed).
