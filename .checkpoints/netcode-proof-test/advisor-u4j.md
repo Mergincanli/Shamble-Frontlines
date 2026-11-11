@@ -15,4 +15,8 @@ I rule; I edit no code, build nothing, run nothing, commit nothing.
    R5 Decisions needed; then "What I checked, and what I did not".
 
 ## Progress
-- [ ] step 1  - [ ] step 2  - [ ] step 3  - [ ] step 4  - [ ] step 5
+- [x] step 1 (the readings (a)-(f) are not in u4j-build.md; they are in the builder's handback, read from its
+  transcript agent-a3b8dfeb01ed52b50.jsonl, "Readings for the advisor or reviewers", quoted in R3 below)
+- [x] step 2 (plan §2, §4.6, §4.12, §5 U4j, Q11/Q20/Q22; advisor-u4.md conditions 1-13; W1-N2; ws-docs-r2 :375-400
+  R3-R12; history.md :292-294 NETEM-BAR (a), :381-386 WS-BAR refinement, :387-391 WS-BAR; plan.md:359 the Arm rule)
+- [ ] step 3  - [x] step 4 (three reviews read whole)  - [ ] step 5
