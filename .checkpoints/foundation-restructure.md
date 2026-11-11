@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 17:46 Amsterdam
+- **Last update:** 2026-11-11 17:50 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -163,7 +163,7 @@
 
 15. The docs commit 8d8c422 (his words A3.3 and A3.4 in the appendix and DECISIONS, L-2, the follow-ups, the CI risk line): gate --no-smoke PASS; pushed after the pull-request re-run on 3f29cb8 ended (cancelled at 16:42 UTC by the job timeout, still in the library step). E3 on the new gate at 8 of 31: identical to 2026-11-10 in every column (.gate/foundation-restructure/e3-compare.mjs writes evidence-f1/e3-compare.txt).
 
-16. The prompt tally (the general-purpose agent; notes general-purpose-prompt-tally.md, prompt-tally.json): 19 pages, 09:59:00-16:37:55 UTC, no gap; 499 tool results, each with a decision: classifier 318, settings rule 99, permission mode 40, answered by Mustafa 14 (all main session: git worktree add in .gate/ x3, git switch --detach in a worktree x2, git merge --ff-only x1 (the one fast-forward); shell writes the guard cannot resolve x8, incl. the gate write cp at 16:01, answered after his chat yes), refused by the guard 27, by the deny list 1 (rm -rf). Unique refusals 29 (28 in the window + 1 by the tally agent): write target unresolvable 17, git -C 5, git checkout 2, git restore 2, worktree remove --force 1, rm -rf 1; by who: main 4, infra-engineer 8, security-auditor 6, test-engineer 4, advisor 3, docs-keeper 3. Subagents cannot raise a prompt (requestNonInteractive). The script double-counts refusals (57): use 29. After 16:37:55 not tallied.
+16. The prompt tally (the general-purpose agent; notes general-purpose-prompt-tally.md, prompt-tally.json): 19 pages, 09:59:00-16:37:55 UTC, no gap; 499 tool results, each with a decision: classifier 318, settings rule 99, permission mode 40, answered by Mustafa 14 (all main session: git worktree add in .gate/ x3, git switch --detach in a worktree x2, git merge --ff-only x1 (the one fast-forward); shell writes the guard cannot resolve x8, incl. the gate write cp at 16:01, answered after his chat yes), refused by the guard 27, by the deny list 1 (rm -rf). Unique refusals 29 (28 in the window + 1 by the tally agent): write target unresolvable 17, git -C 5, git checkout 2, git restore 2, worktree remove --force 1, rm -rf 1; by who: main 4, infra-engineer 8, security-auditor 6, test-engineer 4, advisor 3, docs-keeper 3. Subagents cannot raise a prompt (requestNonInteractive). The script double-counts refusals (57): use 29. After 16:37:55 not tallied. Every refusal with its route (the next call): .gate/foundation-restructure/refusal-routes.mjs writes refusal-routes.md (29 rows, no email or secret; for the report's Appendix B).
 
 ## Current step
 
