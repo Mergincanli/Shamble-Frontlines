@@ -20,3 +20,7 @@ Reviewer: netcode-architect. Round 2 of at most 2, on what changed since round 1
 
 ## Progress log
 - (start) plan written.
+- step 1 partly: packet read (src diff, README/SERIES/marks diff, rulings FX-1..14, FU-1..6, carries, R2, R4, my
+  round-1 F1-F14, Mustafa's bars, §4.6, §4.12, carry 54). My routing: 1->FX-1, 2->FX-2, 3->FX-12, 4->FX-4,
+  5(i)->FX-10, 5(ii-iv)->FX-12, 6->FX-5(b)+FU-5, 7->FX-7, 8->FX-5(a), 9->FX-6, 10->R2.4 U4r carry, 11->FX-12,
+  12->FX-5 fixtures, 13->U6-b carry, 14->FX-11.
