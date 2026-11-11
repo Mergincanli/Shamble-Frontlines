@@ -38,7 +38,7 @@ ones run again.
    ruled". The old block: history.md, "Running work, U4 wave 1 (3)".
    - Open from U4j, as routed: carries 61 (§U4e), 62 and 63 (§U4r), 64 (the next change to crates/judge), 65
      (§U4d2, or the main session sooner); C-U6-9 to C-U6-11 (plan.md's U6 row); the FU list for PR #40's report (the
-     closing checklist); TE2-5 (b) and U4c's L-c8 judged re-run (next steps); one more reading only if U4e's client
+     closing checklist); TE2-5 (b) (next steps; L-c8's re-run done, 9cd7c39); one more reading only if U4e's client
      drops stale groups (advisor-u4j-r2.md B5).
 2. **The U4e builder brief, rev 3** (task wnwulchr5; run wf_c92cd986-072; script npt-u4e-brief-r3-wf_c92cd986-072.js).
    - Done: the draft, u4e-brief.md (719 lines; notes u4e-brief-r3-notes.md): W1-U4E's answers, W1-S1, W1-N2, W1-TARGET's
@@ -81,13 +81,15 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
   as follow-ups for U3d's part of PR #40's report; B2's U4g and U4h notes stay follow-ups (named in u4d-report.md).
 
 **Next steps, in order (Mustafa: "follow the card's order: U4j's round 2, then the U4e brief's check, then U4d-F"):**
-1. **U4j: MERGED** (4d2b0ef, d50396a; about 20:10 UTC), M1-M9 met. Next, M9's last part: **U4c's L-c8 judged re-run
-   on U4j** (u4-build-plan.md §5 U4c, :591-593: -3's five L1 parts re-run on the merged build and re-judged PASS, its
-   four bites failing as before, and for P2, B1 and P4 seed 1 the SHA-256 of the v1 tag plus the v2 log's datagram
-   entries equal to U2's 913db8e9, feabf2f0 and b8a04f2f). Then **TE2-5 (b)** (advisor-u4j-r2.md B2.3), before the
-   next merge into the spike branch: the bites build's workspace tests ten times (`cargo test --locked --workspace
-   --all-features --no-fail-fast` through main-run.sh), each run's whole output under .gate/te2-5/; any failure's
-   name and panic into the notes, tagged TE2-5; none in ten is recorded, and the rule stays.
+1. **U4j: MERGED** (4d2b0ef, d50396a; about 20:10 UTC), M1-M9 met. **U4c's L-c8 judged re-run: done** (9cd7c39;
+   u4c-lc8-rerun.md): U2's script at 6586991; the five L1 parts PASS with every check's outcome and value equal to
+   U2's; the four bites fail exactly U2's checks; the hash half holds through U4c's scratch (equal whole-v2-log
+   hashes), since npt-lab still records only the whole log's hash (U4c's netcode F2, Medium, open; a carry for U4d2,
+   crates/lab's lane in wave 2, goes to the advisor with the U4e brief's check). Next **TE2-5 (b)** (advisor-u4j-r2.md
+   B2.3), before the next merge into the spike branch: the bites build's workspace tests ten times (`cargo test
+   --locked --workspace --all-features --no-fail-fast` through main-run.sh, by te2-5-runs.sh), each run's whole output
+   under .gate/te2-5/; any failure's name and panic into the notes, tagged TE2-5; none in ten is recorded, and the
+   rule stays.
 2. The U4e brief: **check and revision done (about 18:35 UTC; read in full).** The check said FAIL with 3 High (F1: the
    main session's fold reached 3.1 and 3.2 only, not e12, 2.6, the return list or carry 51's route; F2: the bite
    proofs as worded clash with a green check.mjs, so wave 1's two-part form is stated; F3: the owner-to-all proof was a
