@@ -90,10 +90,24 @@ U4 wave 1", moved by card_refresh.py.
     `set_hashes`, `hashes`; `marks::BoundNumber`, `Check.ws_bound`, `Rule::WsPractice`; `Outcome::Empty`,
     `fails()`; `Lack::Empty`); the builder's readings (a)-(f) go to the advisor with the reviewers' views.
   - Then U4c's L-c8 judged re-run on U4j.
-- **Agents (3 at most), since about 12:20:**
+- **The advisor's Part B: done** (advisor-u4d-close.md, 521 lines, about 12:40): no escalation.
+  - **U4d-F** (B1.2 and B1.3 are its approved plan, with its files and symbols): one move rule shared by the World and
+    the generator; the generator reckons what it emits (crouch, its own MoveSpeed, dropped commands), still
+    open-loop; ES's 15 hulls loop within 1,400 cm (a scene knob); `Recording::GENERATOR` 1 to 2; the measurement on 3
+    seeds (12 minutes, the last 10, all four bands and both halves in 9.5-10.5); `aim_one_in` set from it; T2-L1's
+    two tests first. No setting works: stop and bring the numbers to the advisor; the floor never moves. Its own
+    review budget: netcode-architect and test-engineer. It merges before U4d2's brief is final; U4e need not wait.
+  - **The text batch (for the main session, when a slot frees; copied from the file's code blocks by line range,
+    never retyped):** carry 52's tail (B1.2) and new carries 59 (U4r), 53-57 (U4e) and 58, 60 (U4r); carry 51's span
+    fix; the erratum block appended to advisor-u4-wave1.md (B1.4: "(9 fields)" and three more slips); §4.1's npt-sim
+    rows gain Weapon, Scene::weapon, Scene::health (B1.5, u4-build-plan.md:184-185); u4d-report.md's TUNE-1 kill-rate
+    bullet (B1.6: 0.272 a second over an S30); F10 ("never" to "not", u4-build-plan.md:247), F3, F4, F5, F6, F7, F9
+    (B3); plan.md's NA1 (R-31 at :1424), the U8 row's new case and NA4's run condition (:1248), NA5 (C-U8-6, C-U8-4),
+    C-U6-8 and the U6 row's weapon and health (:1246) (B4). Then a test-engineer check, as for the W1 batch.
+- **Agents (3 at most), since about 12:45:**
   - U4j's fix pass and round 2 (wf_0906017a-a9b, task wgj6zbosy);
-  - the advisor's Part B (agent a1424b7584259af65, writing advisor-u4d-close.md): U4d's open points, N2-M1's fix form,
-    N2-M2, the public items, the U4e carries, the plan batch's Lows (F10 first), NA1 and NA5;
+  - **U4d-F's build and review** (wf_9ce88fa3-452, task wg0l1ugq1): one builder in a fresh worktree from the spike
+    head (notes u4df-build.md there), then netcode-architect and test-engineer (u4df-review-{netcode,test}.md);
   - the U4e brief's rev 3 (wf_c92cd986-072, task wnwulchr5): netcode-architect drafts u4e-brief.md from the night's
     rev 2 (0dccbf0) with W1-U4E's answers, the carries as they stand, W1-TARGET and the 28-row recheck against
     39f4290; test-engineer checks (u4e-brief-r3-check.md); one revision. Then the advisor checks the brief.
