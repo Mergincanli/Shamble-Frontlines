@@ -1,4 +1,4 @@
-# Checkpoint: foundation-restructure (foundation step 2.1; now building 2.1a)
+# Checkpoint: foundation-restructure (foundation step 2.1; finishing 2.1a on PR #50, which replaces #47)
 - **Goal:** 2.1a, the legacy gate and tools learn both layouts (root and `legacy/`) without moving anything; then 2.1b,
   the move. Plan: `.checkpoints/foundation-restructure/plan.md` (revision 3; the advisor agent's APPROVE WITH CONDITIONS
   of revision 2, 8bbebfa, notes `advisor-plan-rev2.md`). The planning task's history: this file at d389d91.
@@ -6,10 +6,14 @@
   (`mustafa-2026-11-10-answers.md`): FREEZE-FDN (a), SPLIT (a), SCOPE (a) (ADR 0002 part 1 accepted, recorded in 2.1b's
   docs pass), "Build 2.1a now: the dry run, the gate edits (each asks me) and the mutation proof"; merge order #46,
   STATUS-DIET and LANE-RULES, 2.1a, 2.1b, each on his go; 2.1a's PR stays a draft until its turn; both accounts count
-  the same.
-- **Branch:** `claude/advisor-fable-4hxq72` (this cloud session may push only there), standing in for
-  `cs/foundation-restructure`; Mustafa's personal account. **Base / OLD:** main 44446a5 (unchanged on 2026-11-10 10:15).
-- **Last update:** 2026-11-11 10:50 Amsterdam
+  the same. His messages of 2026-11-11 in this session (`mustafa-2026-11-11.md`, extracted by script from the
+  session's events): his two additions (kit and gate edits ask him in chat first, never the guard's prompt alone; his
+  lean for a replacement PR), BRANCH-47 (a) with its one-time exception, and his words on the advisor tool.
+- **Branch:** `claude/pensive-heisenberg-aazidf` since 2026-11-11 (this session may push only there; PR #50 replaces
+  #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
+  `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
+  **OLD** for the evidence: main 44446a5.
+- **Last update:** 2026-11-11 13:52 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -46,41 +50,56 @@
    proven (a repo-root read from `legacy/` fails 5a); CI also ran on the PR (run 42802055698, success); rebuild commands
    in `e3-summary.md`.
 
-## Current step
-It is #47's turn (Mustafa, 2026-11-11: "order: #49, then #47, then 2.1b, then #48"). This chat stopped at his step 1
-(context 748k of 1,000k, over half full) with this checkpoint and a resume card. Nothing done yet for his steps 2-4.
-Main is bb2d817: #46 (2d22b69, the guard fix with the PR Advisor's allow-list) and #49 (bb2d817, STATUS split into
-STATUS, DECISIONS and STATUS_ARCHIVE; LANE-RULES; CLAUDE.md "Lanes and accounts") merged since 44446a5; neither touches
-`tools/` or `.github/`, and no file is changed on both sides (`comm` of the two diffs: empty), so the merge is clean
-and OLD's gate files still equal 44446a5's.
+6. The replacement (his BRANCH-47 (a), 2026-11-11; this session, `claude/pensive-heisenberg-aazidf`): the merge
+   d6a3fee (parents bb2d817 and 26e0d82; tree 79baf3e, as git's dry run predicted), made in the worktree
+   `.gate/fdn-replace`. Proofs: its diff against main equals #47's diff against 44446a5 byte for byte (`cmp`); it
+   changes only the four tools files and 27 notes; the gate-file blobs equal 26e0d82's (gate.mjs 2bfab53, smoke.mjs
+   18058e4); the five game files equal dd12aeb's and main's, so E3 holds for this head; `.claude/` 66fa6ae, `.github/`
+   67ccb30 and `CLAUDE.md` 16f0853 equal main's. Full gate with smoke on d6a3fee against bb2d817: PASS, +0 -0 (index
+   8/8, editor 5/5; the Chromium-1243 alias rebuilt in this container). d6a3fee pushed alone; draft PR #50 opened on it;
+   #47 closed with a pointer comment. The three re-checked just before the fast-forward (main still bb2d817):
+   identical. The main folder fast-forwarded once to d6a3fee (the guard did not object); the worktree removed (its
+   symlink first, no `--force`). His words of the day captured by `capture-2026-11-11.py`.
+   - **Exception:** Mustafa's one-time exception to CLAUDE.md's Never rule (2026-11-11): the main folder fast-forwarded
+     once, bb2d817 to d6a3fee, because d6a3fee's `.claude/`, `CLAUDE.md` and `.github/` are byte-identical to main's
+     (re-checked just before); the same yes covered the merge's one gate-file write (dd12aeb's `tools/gate.mjs` and
+     `tools/smoke.mjs`, nothing new added).
 
-## Next steps (his steps 2-4, in a fresh chat on this account and this branch)
-1. Bring main in without switching the main folder (CLAUDE.md Never): `git fetch origin main`, then `git merge origin/main`
-   (it is not `--ff-only`, so the guard asks him; or do it in a worktree and push the merge). Re-read CLAUDE.md (new
-   "Lanes and accounts") and `docs/STATUS.md`, and how `docs/DECISIONS.md` and `docs/STATUS_ARCHIVE.md` are laid out
-   (and docs-keeper's agent file, which follows the split). Gate on the merged head: `PLAYWRIGHT_BROWSERS_PATH=$PWD/.gate/pw-browsers node tools/gate.mjs`
-   (rebuild the browser alias first if the container is new: `e3-summary.md`).
-2. The docs pass, by docs-keeper, in the new layout, text moved by script, never retyped (his rule):
-   - `docs/STATUS.md` "In flight": one row for #47 (2.1a), from the evidence below.
-   - `docs/DECISIONS.md`: his words of 2026-11-10 and 2026-11-11, word for word from `mustafa-2026-11-10.md` and
-     `mustafa-2026-11-10-answers.md` (the foundation decision; FREEZE-FDN (a), SPLIT (a), SCOPE (a); the build go;
-     the merge order; both accounts count the same; today's order); check DECISIONS.md's own entry format first.
+## Current step
+
+His step 1's tail: re-read `docs/STATUS.md`, `docs/DECISIONS.md`, `docs/STATUS_ARCHIVE.md` and docs-keeper's agent
+file; then the docs pass.
+
+## Next steps (on PR #50, this branch)
+
+1. Re-read `docs/STATUS.md`, `docs/DECISIONS.md` (its scope line and entry format), `docs/STATUS_ARCHIVE.md` and
+   `.claude/agents/docs-keeper.md`. Grep main's docs for `#47`: his quoted words stay as typed, with a pointer to #50
+   beside them, never an edit.
+2. The docs pass, by docs-keeper (Opus, effort high), text moved by script, never retyped:
+   - `docs/STATUS.md` "In flight": one row for #50 (2.1a, replaces #47), from the evidence.
+   - `docs/DECISIONS.md`: his words of 2026-11-10 and 2026-11-11 from `mustafa-2026-11-10.md`,
+     `mustafa-2026-11-10-answers.md` and `mustafa-2026-11-11.md`: the foundation decision, FREEZE-FDN, SPLIT, SCOPE, the
+     build go, the merge order, both accounts, today's order; the advisor-tool words (he named DECISIONS.md for them,
+     "unless they are already there"); the two additions and BRANCH-47 if the file's scope line takes them. Skip what is
+     already there; check the entry format first.
    - The overtaken lines get dated pointers to that entry (plan step 4): ADR 0002 migration step 1 (0002:1422-1425),
-     SLICE-ORDER condition 3 (now in DECISIONS or the archive: re-find "still runs before the foundation"), SPIKE_PLAN
-     :86-91, :115 and :429-432. Decision docs: his go.
-   - The deferred kit-v2-1 gate-globals Low (was STATUS:1009; re-find it in the archive): closed by dd12aeb.
-   - The rest (2.1a's done record) in `docs/STATUS_ARCHIVE.md` as docs-keeper's split rule says; ROADMAP's entry.
-   - `docs/REPO_MAP.md` needs no 2.1a change (no new top-level path); `node .claude/scripts/repo-map-check.mjs`.
+     SLICE-ORDER condition 3 (re-find "still runs before the foundation"), SPIKE_PLAN :86-91, :115 and :429-432.
+     Decision docs: his go.
+   - The deferred kit-v2-1 gate-globals Low (re-find it in the archive): closed by dd12aeb.
+   - 2.1a's done record in `docs/STATUS_ARCHIVE.md` as docs-keeper's split rule says; ROADMAP's entry; `docs/REPO_MAP.md`
+     unchanged (`node .claude/scripts/repo-map-check.mjs`).
 3. The review round on the final diff (3 agents at a time; Opus, effort high): security-auditor (tier 2: gate files),
    test-engineer (E3, the rows, the bases), infra-engineer (CI and the gate on old bases); then the verifier until PASS;
-   one fix pass at most (the review budget). The advisor agent checks plan conditions C1-C8 at the PR head.
-4. The report `docs/reports/2026-11-1x-foundation-2-1a.md` (`/advisor-report`): fold this checkpoint in (steps with
-   SHAs, E3 31/31, the rows, the bases, CI runs 42801926823 and 42802055698, the Chromium-1243 caveat, the marker
-   departure, his two approved gate prompts); remove the worktrees (`.gate/fdn-*`: delete each `tools/node_modules` link
-   first, then `git worktree remove`, never `--force`); delete `.checkpoints/foundation-restructure*` in the last commit
-   (no `[skip ci]`), but first copy `plan.md` and `prompt-2.2.md` somewhere 2.1b can read them: 2.1b reads the plan
-   at this branch's last checkpoint SHA (record it in the report). Mark #47 ready; stop for his go (needs-mustafa: gate
-   files; no Brave check for 2.1a).
+   one fix pass at most. The advisor agent checks the plan's conditions C1-C8 at #50's head: the numbered list was never
+   committed (only C7 is labelled, plan 1.5), so give it the plan's diff 8bbebfa..b03f4d8 and `advisor-plan-rev2.md`,
+   and say in the report what was done. E3's worktrees died with the old container: a rebuild (`e3-summary.md`) makes a
+   new move commit (not 9af08f7); move `e3-results.json` aside first.
+4. The report `docs/reports/2026-11-11-foundation-2-1a.md` (`/advisor-report`): fold this checkpoint in (steps with
+   SHAs, E3 31/31, the rows, the bases, CI runs, the Chromium-1243 caveat, the marker departure, his two approved gate
+   prompts, the exception line, the advisor-tool consultations counted); record this branch's last checkpoint SHA (2.1b
+   reads `plan.md` and `prompt-2.2.md` there); stop the saver; delete `.checkpoints/foundation-restructure*` in the last
+   commit (no `[skip ci]`); mark #50 ready; stop for his go (needs-mustafa: gate files; no Brave check for 2.1a). #50 is
+   not watched (his "do not watch" carried over from #47).
 
 ## Open findings
 - (none yet)
@@ -88,6 +107,7 @@ and OLD's gate files still equal 44446a5's.
 ## Key numbers
 - E3: 31 of 31 PASS (4 Phase 0 mutations, 22 check-5 mutations, 3 + 2 controls) × 3 gates = 93 full gate runs.
 - Folder-rule table: 8 + 2 rows PASS. Base checks: 7 edited-gate runs PASS over root, CS-1 and legacy/ bases; OLD dies on a legacy/ base.
+- This head d6a3fee: full gate with smoke PASS against bb2d817, +0 -0 (index 8/8, editor 5/5).
 
 ## Decisions taken
 - FREEZE-FDN (a), SPLIT (a), SCOPE (a) · Mustafa · 2026-11-10 (word for word in `mustafa-2026-11-10-answers.md`).
@@ -95,7 +115,22 @@ and OLD's gate files still equal 44446a5's.
   in, this branch is the session's own) · the session · 2026-11-10.
 - He approved both gate prompts (gate.mjs, smoke.mjs); PR #47 is not watched (he says when its turn comes); 2.2 is
   planned in a fresh session on this account, from a one-paragraph prompt given in this chat · Mustafa · 2026-11-10.
+- BRANCH-47 (a): replacement PR #50 from this session, #47 closed with a pointer; his yes covers the one fast-forward
+  of the main folder (a one-time exception to the Never rule) and the merge's one gate-file write · Mustafa ·
+  2026-11-11 (`mustafa-2026-11-11.md` section 2).
+- The advisor tool: "extra" means on top of the advisor agent's recorded plan review, never instead of it; consulted at
+  his five moments, one line each below, counted in the report; his words go into DECISIONS.md · Mustafa · 2026-11-11.
+- Every kit or gate edit asks him in chat first with the exact change, never the guard's prompt alone · Mustafa ·
+  2026-11-11.
+
+## Advisor-tool consultations (his words of 2026-11-11: when, the question, what changed)
+
+1. 2026-11-11 13:00 Amsterdam · before the merge (his moments 1 and 3): is step 1's approach sound and inside his two
+   exceptions? · changed: d6a3fee pushed alone and the fast-forward made to exactly it (clean at bb2d817 before, HEAD
+   equal after); no other merge construction if the guard refused; blob-level proofs incl. the five game files equal
+   dd12aeb's (E3 carries over); #50 opened while its head was d6a3fee, before any `[skip ci]` save; his words captured
+   by script; notes on C1-C8 and E3's worktrees for steps 3-4.
 
 ## Running work
-- E3 run: done (31 of 31). Worktrees `.gate/fdn-*` kept until 2.1a's turn (the verifier may re-run E3); remove then.
-- Saver: background task bod2js7dn, 10:44-12:34 Amsterdam, ended by time (last save d403bd3); not running.
+- Saver: not running (no agents yet). The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
+  container (step 3 note).
