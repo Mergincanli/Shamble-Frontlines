@@ -115,7 +115,8 @@ Proof: the mutation proof, 31 of 31 PASS on the edited gate and again on the fix
 planted fault fails the same checks on the old gate, the edited gate at the root and the edited gate on `legacy/`; every
 control passes on all three); the F1 rows red on the unfixed gate and green on the fixed one; the decoy stopped; both
 move directions and their bases recorded raw; gate PASS. PR #50 replaces #47 (his BRANCH-47 (a)); its docs pass records
-#49's merge and his words of 2026-11-10 and 2026-11-11 (`docs/DECISIONS.md`). Next: round 2, the verifier, the report,
+#49's merge and his words of 2026-11-10 and 2026-11-11 (`docs/DECISIONS.md`). Round 2: three APPROVE; the verifier PASS
+WITH NOTES; report `docs/reports/2026-11-11-foundation-2-1a.md`. Next:
 the advisor's review and his go.
 
 **STATUS-DIET with LANE-RULES [2026-11-10 to 11-11, MERGED]** — status-diet (Mustafa's queue of 2026-11-10, items 2

@@ -1,2 +1,0 @@
-gate: the build folder moved from the repo root (base) to legacy/ (head), but the repo root still holds editor.html, index.html: move or delete them
-exit 2

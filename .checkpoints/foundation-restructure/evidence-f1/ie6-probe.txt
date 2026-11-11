@@ -1,9 +1,0 @@
-IE-6 probe (revert direction; head at the root with a plain file named legacy; base 89286ed in legacy/):
-gate blob: tools/gate.mjs from .gate/fdn-scratch-head (7a8480c)
-exit: 0
-stdout (first lines):
-SHAMBLE FRONTLINES gate | base 89286ed2191438b58041640afddadf6b08a50149 = 89286ed (files in legacy/) | head = working tree (files at the root)
-[1]  syntax         PASS  5/5 sources parse (shamble-core.js, shamble-game.js, shamble-editor.js, index.html inline#1, editor.html inline#1)
-[2]  concatenation  PASS  index.html: shamble-core.js + shamble-game.js + inline#1 | editor.html: shamble-core.js + shamble-game.js + shamble-editor.js + inline#1 (external, skipped: three.min.js)
-stderr (first lines):
-(none)

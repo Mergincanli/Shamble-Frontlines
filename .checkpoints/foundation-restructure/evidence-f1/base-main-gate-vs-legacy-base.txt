@@ -1,2 +1,0 @@
-gate: shamble-core.js not found at base 7c22abf
-exit 2

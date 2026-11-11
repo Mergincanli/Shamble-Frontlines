@@ -1,2 +1,0 @@
-gate: shamble-core.js is missing from the working tree
-exit 2

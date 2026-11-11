@@ -27,7 +27,7 @@ _Last updated: 2026-11-11 (foundation 2.1a, PR #50, its docs pass; main bb2d817)
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done, U4 in build | its units, runs and report; his OK of each run's plan and cost cap |
-| #50 | the foundation, 2.1a: the legacy gate and tools read both layouts (no file moves); replaces #47 (his BRANCH-47 (a), 2026-11-11) | `claude/pensive-heisenberg-aazidf` (his personal account) | draft: the docs pass done; the review round and the report next | the review round and the report, then the advisor's review of its ready head and his go (risk tier 2: gate files; decision docs); 2.1b next |
+| #50 | the foundation, 2.1a: the legacy gate and tools read both layouts (no file moves); replaces #47 (his BRANCH-47 (a), 2026-11-11) | `claude/pensive-heisenberg-aazidf` (his personal account) | the report in (`docs/reports/2026-11-11-foundation-2-1a.md`); marked ready once CI's gate and smoke are green on its final head | the advisor's review of its final head and his go (risk tier 2: gate files; decision docs); 2.1b next |
 | #48 | the foundation, 2.2: the toolchain (pins, empty crates and packages, the offline CI job) | `claude/laughing-pasteur-fwya24` | draft | 2.1b's merge |
 
 ## Next
@@ -43,7 +43,8 @@ _Last updated: 2026-11-11 (foundation 2.1a, PR #50, its docs pass; main bb2d817)
 
 ## Waiting on Mustafa
 - His go for #50 (2.1a; risk tier 2: gate files; `docs/DECISIONS.md` and the decision docs' pointers), once the advisor
-  approves its final head; no Brave check for 2.1a. Then, in his order of 2026-11-11, 2.1b and #48 (2.2).
+  approves its final head; no Brave check for 2.1a; first, confirm the texts its report lists (A1.1-A1.3, A2.1, A2.2,
+  A4). Before 2.1b: one run of the new gate on Windows (the report's step). Then, in his order, 2.1b and #48 (2.2).
 - The netcode proof test's items (its plan in #40; the older list: the archive's "Phase", "Next (v2)"): OK each run's
   plan and cost cap; name the laptop and desktop; the Mac when one is available; the Safari workflow's own PR.
 - Legacy, frozen (the archive's "In flight" and "Phase"): his Windows run ("Check a new machine", `tools/README.md`);
@@ -99,7 +100,8 @@ A finding below the review budget's bar becomes a follow-up: its id goes here, i
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100
   files) and W1-W3; kit-v3-3's stated limits (L1-L18, R-PLAIN, D-ASK); kit-v3-2's items 1-5; kit-v3-1's items 1-2;
   kit-v2-2's finding 4 (Medium, open) and its Lows; kit-v2-1's night-rules note (issue #16's comments are trusted).
-- **CI:** the smoke job's Chromium step stalled once (PR #42) and failed twice on #50's 3f29cb8 (a runner DNS outage).
+- **CI:** the smoke job's Chromium step stalled once (PR #42); on #50 (3f29cb8, 8d8c422) its library install failed in 5
+  attempts and was cancelled in 1 (a runner DNS outage).
 - **v2:** the decision drafts' risks (the asset pipeline and several LOOK_V2 techniques not researched); R1-R6's
   (R3-R6 spot-checked; unread sources); R7's (its line numbers go stale when the legacy files move).
 - **Legacy (frozen):** 3a's ranked list; bot navigation; the editor and map bugs; the first-deploy tutorial; the
