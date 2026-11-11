@@ -177,9 +177,10 @@
 
 ## Current step
 
-The verifier on 0590d8c; then the last commit (the report above the Appendix A marker, the refusal table regenerated, the STATUS row, ROADMAP's Next, the checkpoint deleted), the PR body, the advisor agent's delta review of the final head (its notes in its answer), CI green on the final head, then ready.
+The last commit: the report (assembled from report-draft-top.md by assemble-report.mjs, LAST_CKPT_SHA = this checkpoint's final SHA), STATUS (#50 row, Waiting, CI line), ROADMAP Next, the checkpoint deleted; then the steps below.
 
 ## Next steps (on PR #50, this branch)
+AFTER THE LAST COMMIT (this folder is gone then; resume from the report and the PR): (a) the PR body updated with the final SHA and its CI runs; (b) the advisor agent's delta review of the final head (notes in its answer or the scratchpad, never .checkpoints/); (c) CI's four results (push and pull_request, gate and smoke) green on the final head, one re-run at most; (d) #50 marked ready; (e) stop for his go. Older steps below are done.
 
 1. (done) Re-read the docs layout; `#47` appears in docs/ only in STATUS (its row, Next, Waiting) and in the
    status-diet report; #49's merge (bb2d817, his go: "The next change-set records it") is this change-set's to record.
@@ -320,6 +321,8 @@ The verifier on 0590d8c; then the last commit (the report above the Appendix A m
 7. 2026-11-11 18:24 Amsterdam · the evidence step done; before launching round 2 (his moments 5 and 1) · changed: the cover claim backed (blob equality at 3f29cb8, 0607b45 and 76544aa; Smoke (check 5a) read as succeeded); main fetched (bb2d817); the briefs fixed (placeholders, 12 blocks, the writers not to run, the delta named, the refused forms, the unfinished items, a fresh rows folder, the verifier-owned worktrees, 89286ed rebuilt by the session); outcome rules set (Low/Medium: follow-ups riding the last commit; High: a fix and round 3 on that only, a gate file asks him first and E3 runs again); after the last commit nothing written inside the repo tree (the advisor agent returns its notes in its answer); the saver restarted if agents outlive it.
 
 8. 2026-11-11 18:33 Amsterdam · round 2 done (his moment 5); before the verifier · changed: round 2's follow-ups landed now (the Medium deferred in a file that survives), not in the last commit; IE-6 settled by one run; the verifier pinned to that head with the brief finished; for the last commit: the final head's CI runs in the PR body and the chat (the file gives 76544aa's), the body above the Appendix A marker and report-appendix.py re-run, the refusal table regenerated after the verifier (new agents named, re-scanned), the consultation count closed with the report written but uncommitted, the order (saver stopped, final save SHA noted, report, git rm, status empty), the stale STATUS row, ROADMAP Next and PR body, the 8d8c422 push run read, 89286ed cited for the base cases; the advisor agent's delta review before ready, its notes in its answer; ready only with both checks green.
+
+9. 2026-11-11 19:00 Amsterdam · the report written, uncommitted; before the last commit (his moment 5) · changed: CI on 0590d8c read and cited (push 43070000525, pull_request 43070010305, green); the chat measured (819,140 of 1,000,000 at 18:58 Amsterdam); the .gate scripts copied into the notes; the post-commit steps written in Next steps; #50's STATUS row worded true for draft or ready, the Windows run and the texts to confirm under Waiting; one refusal relabelled by its text (the permission system, no list named); the saver stopped first; worktrees checked before removal; ls-tree and status checks after git rm; the report says where the consultation lines live, lists the docs commits and why it is long; the advisor agent's delta review with the scratchpad as its notes path, the full SHAs and its conditions; on REVISE one docs commit then a delta review, a gate file asks him; ready only with all four CI results green on the final head.
 
 ## Running work
 - Saver: background task b8a5m7tp3, started 17:04 Amsterdam, stops by 18:54 (110 min); last check 17:25: ok.
