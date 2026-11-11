@@ -9,7 +9,7 @@
   **Base:** main 76b4f7a (PR #50 merged, 2.1a). **OLD** (the independent judge for E2 and E3): main 44446a5.
 - **Never:** push to `claude/netcode-proof-test-plan-hcky5g` (#40) or `claude/laughing-pasteur-fwya24` (#48); touch
   `spikes/`; touch a gate file; edit a settings file, hook or allow-list; write a kit line before his chat yes.
-- **Last update:** 2026-11-11 22:52 Amsterdam
+- **Last update:** 2026-11-11 22:49 Amsterdam
 
 ## Steps done
 0. Step 0 (this commit): model checked with get_session: `session_context.model` claude-opus-5-5,
@@ -97,7 +97,10 @@
    replaces D1 (a)'s "answered" wording and new count, the rest of D1 (a) stands); then "build: step 6, the move, and
    step 7". He asked again which model answers the advisor tool: the session record's `advisorModel` reads
    claude-opus-5-5 up to the /compact (21:36:59 UTC) and claude-fable-5-2 on every entry since: **Fable 5.2 now**.
-   origin/main re-fetched 21:47 UTC: still 76b4f7a (E8-RUN's `origin/main`).
+   origin/main re-fetched about 21:41 UTC: still 76b4f7a (E8-RUN's `origin/main`). Saved ded450d (21:43 UTC).
+   Checked for the advisor tool's item: the syntax hook (`.claude/hooks/syntax-gate.mjs`) picks files by extension
+   only, the `.claude/rules/*` globs are `**/shamble-*.js` and `**/index.html`/`**/editor.html`, and the guard, the
+   scripts and gate.yml name no legacy path: nothing is anchored at the root, so no fifth kit edit.
 
 ## Current step
 Step 6, the move, under C2.
@@ -144,6 +147,14 @@ Step 6, the move, under C2.
    hold); after his reply: capture it by script (C13), update plan-check §7 only if his REG-TRUE choice changes the docs
    list, re-fetch origin/main and record the SHA E8-RUN's `origin/main` means. C14's re-read done: #40 at a9b1344, the
    same six docs files outside `spikes/`.
+3. 2026-11-11 22:46 Amsterdam (Fable 5.2 from here on) · his answers in, before step 6 (his moments 1 and 3): is the
+   plan for steps 6 and 7 sound? · changed: checkpoint times corrected from `date -u`; before the push, the gate against
+   both CI bases (76b4f7a and the pushed tip), the kit tests and E1 on the local commit, with e1-e2.mjs :25 moved to
+   C3's `<move>^ <move>`; exactly five R lines staged, a plain `git commit -m`; the README paragraph keeps letter case as
+   two mechanisms (the move check: case-insensitive, every OS; findBuild: exact names, OS-dependent) and drops IE-3's
+   "Windows and macOS ... exit 2" sentence; the syntax hook and the rules' globs checked for a root anchor (none);
+   plan-check §3 and §7 updated for REG-TRUE (b) before step 10; next consultation when 6 and 7 are built and both runs
+   read.
 
 ## His mid-turn message (2026-11-11 21:10:58 UTC, event 7a094d1e-41ed-40b7-91f8-544d91e4b64f; captured: `mustafa-2026-11-11-permission.md`, 95 characters)
 "I give you permission to go on auto mode and accept yourself for the bash commands and what not". The chat is already
