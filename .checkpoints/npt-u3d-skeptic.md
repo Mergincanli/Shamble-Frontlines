@@ -14,7 +14,7 @@
 
 ## Steps done
 1. Branch set up (worktree reused from item 4); diff d012437..1ccff06 confirmed: 3 files, +1,227 −5; 78b0c07 adds
-   results/u3d-timing/selftest-20261109T035556Z.txt (+113) · (this commit) · ok
+   results/u3d-timing/selftest-20261109T035556Z.txt (+113) · a47de32 · ok
 
 ## Current step
 2. netcode-architect (`netcode-architect-u3d.md`: the measurement's validity) and test-engineer (`test-engineer-u3d.md`:
@@ -36,4 +36,9 @@
   shift · 2026-11-11 02:18
 
 ## Running work
-- none yet
+- netcode-architect (Opus 5.5, xhigh), the measurement's validity · `netcode-architect-u3d.md` · launched 03:31 ·
+  running
+- test-engineer (Opus 5.5, xhigh), the seven fast tests and their bites · `test-engineer-u3d.md` · launched 03:31 ·
+  running
+- saver: background task bqpwo2txe · output in the session's tasks folder (bqpwo2txe.output) · started 03:30 · stops
+  by 05:20 (110 minutes on) · last check 03:31: started
