@@ -5,7 +5,8 @@
 //   editor.html: menu -> Map editor (#mEditor; fills the prefab list) -> Maps (#edMaps; fills the map list) -> close -> Menu
 // Each step waits on game state with a generous timeout, never on exact timing, and checks that it did its job (the player
 // moved, both clicks reached the canvas, the lists filled). Network requests and WebSockets are blocked and FAIL (except the
-// three.js CDN URL, served locally), and so does reading a file outside the repo: the game must run offline from file://.
+// three.js CDN URL, served locally), and so does reading a file outside the build folder: the game must run offline from
+// file://. The build folder is legacy/ (foundation step 2.1) or, before the move, the repo root: findBuild below.
 // Not seen: errors more than ~1 s after the last step, and code the script never reaches (5b covers names there).
 // Usage (from anywhere): node tools/smoke.mjs [--json]   (gate.mjs runs it as check 5a)
 // Exit code: 0 PASS, 1 FAIL, 2 setup error. Setup: cd tools && npm ci && npx --no -- playwright install chromium
@@ -17,6 +18,20 @@ import { existsSync, realpathSync } from 'node:fs';
 const TOOLS = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(TOOLS, '..');
 const require = createRequire(import.meta.url);
+
+// The legacy build's folder, one rule for this file and gate.mjs: legacy/ when it holds a shamble-*.js file, else the repo
+// root (before foundation step 2.1 moved the files). Any of them in both places is an error: two copies are never judged by
+// guess. Only the three engine files count, so another index.html at the root never makes the root look like the build.
+// Returns { dir, prefix } (prefix '' or 'legacy/'), or { error } for the caller to report as a setup error (exit 2).
+const LEGACY_JS = ['shamble-core.js', 'shamble-game.js', 'shamble-editor.js'];
+export function findBuild(root = ROOT) {
+  const leg = join(root, 'legacy');
+  const inLeg = LEGACY_JS.filter(f => existsSync(join(leg, f))), inRoot = LEGACY_JS.filter(f => existsSync(join(root, f)));
+  if (inLeg.length && inRoot.length) {
+    return { error: `the legacy engine files are in two places, legacy/ (${inLeg.join(', ')}) and the repo root (${inRoot.join(', ')}): keep one copy` };
+  }
+  return inLeg.length ? { dir: leg, prefix: 'legacy/' } : { dir: root, prefix: '' };
+}
 const THREE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
 export const SMOKE_SETUP = 'cd tools && npm ci && npx --no -- playwright install chromium';
 const STEP_TIMEOUT = 30000;   // per wait; a healthy one takes under 3 s on SwiftShader, ~10 s under heavy CPU load
@@ -115,8 +130,13 @@ const SESSIONS = {
 
 // ---------- run ----------
 // Returns { pass, setup, summary, details, renderer, pages: [...] }. setup: true means Playwright or Chromium is missing.
-export async function runSmoke({ root = ROOT } = {}) {
+export async function runSmoke({ root } = {}) {
   const setupFail = why => ({ pass: false, setup: true, summary: why, details: ['set up the smoke test with: ' + SMOKE_SETUP], pages: [] });
+  if (root === undefined) {   // the CLI: the build folder by findBuild's rule (gate.mjs passes its own, found the same way)
+    const b = findBuild();
+    if (b.error) return { pass: false, setup: true, summary: b.error, details: [], pages: [] };
+    root = b.dir;
+  }
   let pw, threeMin;
   try { pw = require('playwright'); } catch { return setupFail('Playwright is not installed (an optional dependency of tools/)'); }
   try { threeMin = require.resolve('three/build/three.min.js'); } catch { return setupFail('three r128 is not installed in tools/node_modules'); }
@@ -146,7 +166,7 @@ export async function runSmoke({ root = ROOT } = {}) {
       page.on('dialog', d => d.dismiss().catch(() => {}));
       const inRepo = u => { try { const f = resolve(fileURLToPath(u.split(/[?#]/)[0])), r = resolve(root) + sep;
         return process.platform === 'win32' ? f.toLowerCase().startsWith(r.toLowerCase()) : f.startsWith(r); } catch { return false; } };
-      page.on('request', q => { if (/^file:/i.test(q.url()) && !inRepo(q.url())) err('read a file outside the repo: ' + q.url().slice(0, 120)); });
+      page.on('request', q => { if (/^file:/i.test(q.url()) && !inRepo(q.url())) err('read a file outside the build folder: ' + q.url().slice(0, 120)); });
       await page.routeWebSocket(/.*/, ws => { r.blocked.push(ws.url()); err('blocked a WebSocket: ' + ws.url().slice(0, 120)); ws.close(); });
       await page.route('**/*', route => {
         const u = route.request().url();
