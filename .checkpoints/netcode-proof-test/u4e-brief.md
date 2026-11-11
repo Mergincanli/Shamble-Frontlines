@@ -1,8 +1,14 @@
-# U4e builder brief: the room and the codec path (rev 3.1)
+# U4e builder brief: the room and the codec path (rev 3.2)
 
 **The main session's fold before the check (2026-11-11 about 17:50 UTC):** 3.1 re-copied by script from u4s-carries.md
 §U4e as it stands (carry 51's corrected span and the new carries 53-57, advisor-u4d-close.md B2); 3.2 rewritten to
 record the rulings (B1.2, B1.3, B2); 7.2 item 3 marked done. Everything else is rev 3 as drafted.
+
+**The main session's fold at U4j's merge (2026-11-11 about 20:40 UTC; rev 3.2):** U4j merged (4d2b0ef, d50396a), and its
+merge numbered round 1's and round 2's carries (advisor-u4j-r2.md B5, B7.2). So 3.1 is re-copied by script from
+u4s-carries.md §U4e (carry 61 added; carries :147-247), with a note for carry 61, carry 40's cite moved, and the count,
+the return list's item 6 and section 0's notes updated; the lines that called U4j unmerged now say what merged (carry
+54's note, the build rules, U4E-Q13's option (c)); R27, R28 and R38 are rechecked at d50396a. Nothing else changed.
 
 **Changes in rev 3.1** (test-engineer's check of rev 3, u4e-brief-r3-check.md: findings F1-F8 and its Lows; each
 finding's line, done or not, in netcode-architect's notes, u4e-brief-r3-notes.md, "Revision for the check"):
@@ -107,14 +113,19 @@ the brief before the build (advisor-u4.md:157; Q21 at :220).
 ## 0. How to read the citations
 - Every file:line is at the spike branch's head when rev 3 was written, 56214fa, whose spikes/ and docs/ are identical
   to 39f4290 (U4d's merge; `git diff --stat 39f4290 56214fa -- spikes/ docs/` is empty). Rev 3.1's new cites are at
-  a28c962, whose spikes/ and docs/ are also identical to 39f4290. Wave 1 merged at 952f734 (U4a), 411eeee (U4b),
-  f3f7c2f (U4c) and 39f4290 (U4d). U4j is in its fix pass and has not merged: this brief relies on nothing of U4j's.
-- `plan` is .checkpoints/netcode-proof-test/u4-build-plan.md (sha256 7375cdcf…, 1,070 lines); `carries` is
-  u4s-carries.md; `advisor` is advisor-u4.md; `wave1` is advisor-u4-wave1.md; `close` is advisor-u4d-close.md;
-  `plan.md` is plan.md (all in that folder); `catalogue` is docs/design/netcode-proof-messages.md; a crate path
-  (`room/src/lib.rs`, `seam.rs`) is under spikes/netcode-proof/crates/ (`seam.rs`, `grid.rs`, `ticks.rs`,
-  `history.rs`, `world.rs`, `scene.rs`, `greybox.rs` are sim/src/; `quant.rs`, `snapshot.rs`, `wrap.rs`, `hash.rs`,
-  `msg.rs`, `input.rs`, `error.rs`, `limits.rs` are proto/src/); `check.mjs` is spikes/netcode-proof/check.mjs.
+  a28c962, whose spikes/ and docs/ are also identical to 39f4290. Wave 1 merged at 952f734 (U4a), 411eeee (U4b), f3f7c2f
+  (U4c) and 39f4290 (U4d). U4j merged after rev 3.1 (4d2b0ef and d50396a; under spikes/ it changed only crates/judge,
+  crates/log and marks/): rev 3.2's new cites are at d50396a, and the brief relies on U4j through carry 61 and rows R27,
+  R28 and R38 only.
+- `plan` is .checkpoints/netcode-proof-test/u4-build-plan.md, its cites to the version of sha256 7375cdcf… (1,070 lines;
+  `git show 30528c7:.checkpoints/netcode-proof-test/u4-build-plan.md`): U4j's merge added a row after :199 (§4.1), three
+  lines to §10's preamble and two to §11, so in the current file (4b8eaab6…, 1,076 lines) a cite from :200 to :953 is
+  one line lower, and one from :964 on four lines lower; `carries` is u4s-carries.md; `advisor` is advisor-u4.md;
+  `wave1` is advisor-u4-wave1.md; `close` is advisor-u4d-close.md; `plan.md` is plan.md (all in that folder);
+  `catalogue` is docs/design/netcode-proof-messages.md; a crate path (`room/src/lib.rs`, `seam.rs`) is under
+  spikes/netcode-proof/crates/ (`seam.rs`, `grid.rs`, `ticks.rs`, `history.rs`, `world.rs`, `scene.rs`, `greybox.rs` are
+  sim/src/; `quant.rs`, `snapshot.rs`, `wrap.rs`, `hash.rs`, `msg.rs`, `input.rs`, `error.rs`, `limits.rs` are
+  proto/src/); `check.mjs` is spikes/netcode-proof/check.mjs.
 
 ---
 
@@ -518,10 +529,10 @@ on it.
 ## 3. The carries
 
 ### 3.1 Word for word
-Quoted from carries :147-228, the file's §U4e as it stands (the advisor's U4s ruling, condition 4: advisor :334-335).
-Checked: the fold re-copied this block by script, and rev 3.1 compared it with carries :147-228 by a `diff` of the two
-line ranges: equal. Your report says of each, by number, "met" (with the file:line and the test that shows it) or "not
-met" (with why).
+Quoted from carries :147-247, the file's §U4e as it stands (the advisor's U4s ruling, condition 4: advisor :334-335).
+Checked: the main session re-copied this block by script at U4j's merge (rev 3.2, carry 61 added) and compared it with
+carries :147-247 by a `diff` of the two line ranges: equal. Your report says of each, by number, "met" (with the
+file:line and the test that shows it) or "not met" (with why).
 
 ```
 ## U4e (the room, the server I/O step and the client)
@@ -606,9 +617,28 @@ met" (with why).
     the room's settings; U4f measures the rate and records §4.7's value before -22's runs. The room counts each
     overflow resync per client, with its tick, in its log, so that every judged -17 and -18 run can report them (carry
     58)."
+61. **U4j's hash rules, the room and the client (the advisor's U4j ruling, "Carries", U4e, in FX-12's words; its
+    round-2 ruling, B2.1: NC-U4J-R2-N1 and N6):** "U4e builds the room's and the client's side of marks/README.md
+    §1's `hs` rules as U4j merged them (its `server_hash` and `decoded_hash` items, with the round-2 words), and
+    exposes per client and tick what U4r's logs write (U4E-Q7): (a) the room's `server_hash` for each connected client
+    from its admission on, in every phase the clients log; none for a client not connected or for a tick whose
+    snapshot the room did not send that client; the room sends no snapshot of a tick it does not log, so its last
+    tick record covers every snapshot it sent; (b) the client's hash filed under the tick it rebuilt, at the room's
+    slot from `JoinAccepted`; two different hashes for one tick give the sentinel, one hash met twice (a duplicated
+    datagram) is filed once, and no hash is ever dropped; (c) a tick resolved lost (`tick.s.snap_incomplete` 1, no
+    hash) only once none of its groups can still decode: once it has left the client's frame ring (at
+    `npt_sim::ACK_RING_TICKS` ticks old), or at the stop; a tick none of whose groups arrived counts, known from a
+    later header's tick; (d) a group of a tick older than one the client has already decoded (L1's reorder step
+    delivers such groups) is decoded and hashed under its own tick like any other, or, if the client drops it as
+    stale, it is never acknowledged and that tick is lost, never the sentinel; the sentinel stays for §4.6's causes
+    (no baseline, a bad header, a size or decode error). The advisor's lean is the decode: it keeps -58's P3
+    comparing the late side of a reordered wrap (ADR 0001:1607). U4e's report says which its client does; a client
+    that drops counts each drop per client under a name with its SERIES.md row. A unit test feeds `ClientEndpoint`
+    tick t+1's snapshot before tick t's (as L1's reorder step delivers them) and shows t filed under t (its hash, or
+    lost if the client drops it; never the sentinel), and that one datagram received twice files one hash."
 ```
 
-Fifteen carries (21-27, 39, 50, 51 and 53-57). Notes for the builder, which change no word:
+Sixteen carries (21-27, 39, 50, 51, 53-57 and 61). Notes for the builder, which change no word:
 - carry 24: its tick16 part is met by the endpoint's and the encoder's `Quant` (2.6's tick16 row), its -45 and
   cues-from-replay parts are U4g's (U4E-Q10), so U4e reports carry 24 as met under these words (wave1 :466);
 - carry 25: a "why not" is reported, never assumed;
@@ -619,15 +649,21 @@ Fifteen carries (21-27, 39, 50, 51 and 53-57). Notes for the builder, which chan
   `<base>` holds it (2.7; R31; 7.2 item 2); if it does not, that part stops (2.7), never a local copy of the 8;
 - carry 53: its test (e12) must hold a generation change and asserts that one happened: a generation changes only when
   a dead soldier respawns (world.rs:1100-1101, :1712-1723), and SS's kills are rare (0.272 a second: close :221-223);
-- carry 54: U4e counts the refusal per client and exposes it under a proposed series name; your report names that
-  series and its proposed SERIES.md row for the main session (marks/ is U4j's lane, unmerged, and not U4e's: section
-  4; npt-room has no npt-log dependency, room/Cargo.toml:17-21; U4r's logs write it, as U4E-Q7's values: 2.1);
+- carry 54: U4e counts the refusal per client and exposes it under a proposed series name; your report names that series
+  and its proposed SERIES.md row for the main session (marks/ is not U4e's lane: section 4; npt-room has no npt-log
+  dependency, room/Cargo.toml:17-21; U4r's logs write it, as U4E-Q7's values: 2.1);
 - carry 56: if `<base>` lacks U4d-F (unmerged at rev 3.1: 4ad80a9 saved its partial edit as a patch), your report
   gives SS and marks ES "after U4d-F", measured once U4d-F merges (3.2); the measurement states its ticks, seed and
   client count;
 - carry 57: the room exposes each overflow resync per client with its tick, and U4r's logs write them (as U4E-Q7's
   values: 2.1); the cap's provisional mark is exposed for the run's header;
-- carry 40 (§U4r, carries :231-239) is U4r's; U4e feeds its last sentence with the `rewind_at` count (2.1).
+- carry 61: the room's `server_hash` and the client's `decoded_hash` follow marks/README.md §1 as U4j merged it
+  (d50396a: :50-71, with round 2's words); its unit test (tick t+1's snapshot fed to `ClientEndpoint` before tick t's,
+  and one datagram received twice) is one of your tests (2.4), named in the report; your report says whether your client
+  decodes a stale group or drops it (the advisor's lean is the decode: advisor-u4j-r2.md B2.1), and a client that drops
+  counts each drop per client under a proposed series name with its SERIES.md row for the main session, as carry 54's
+  refusal count does;
+- carry 40 (§U4r, carries :250-258) is U4r's; U4e feeds its last sentence with the `rewind_at` count (2.1).
 
 ### 3.2 U4d's round-2 carries: ruled (advisor-u4d-close.md, 2026-11-11)
 The advisor ruled on the items rev 3 held here as pending, and the main session folded the rulings in by script before
@@ -691,7 +727,8 @@ binding on every cargo, rustc and rustdoc call in your worktree, check.mjs's inc
   npt-client: server/Cargo.toml:32-35). A needed manifest change stops that part and goes in your report.
 - server/clippy.toml was U4b's in wave 1 (:843-844); the plan names no U4e change to it: leave it as merged.
 - Never crates/sim, crates/proto, crates/lab (U4d2's alone in wave 2: :861-862; advisor :145-146), crates/log,
-  crates/judge and marks/ (U4j's, unmerged), check.mjs (U4d2's in wave 2: :859-860), docs/.
+  crates/judge and marks/ (U4j's in wave 1, merged at 4d2b0ef; not U4e's), check.mjs (U4d2's in wave 2: :859-860),
+  docs/.
 - Files are written with the Write and Edit tools only, never shell redirects, heredocs or `python3 -c` (wave 1's words:
   u4j-brief.md:46-47). U4e's bites are compiled into the bites build and chosen per instance (plan :510-511; §4.11
   :398-400), so a bite needs no planted defect; its failure by name is shown by 2.6's part (ii) scratch switch. A
@@ -739,9 +776,9 @@ before each):
    the injected clock); the bite's none within 500 ms of the gap's end, on the injected clock; B's tick and age at the
    first tick after the gap (e5a); whether the bite's baseline was one the client still held (if so: not counted, to
    the advisor).
-6. Carries 21-27, 39, 50, 51 and 53-57, by number: met (file:line, test) or not met (why); carry 56 as its measurement
-   (ticks, seed, client count; ES "after U4d-F" if `<base>` lacks it); and, for 3.2, which scene each ES number came
-   from.
+6. Carries 21-27, 39, 50, 51, 53-57 and 61, by number: met (file:line, test) or not met (why); carry 56 as its
+   measurement (ticks, seed, client count; ES "after U4d-F" if `<base>` lacks it); carry 61 with its client's choice for
+   a stale group (decoded, or dropped and counted); and, for 3.2, which scene each ES number came from.
 7. Every pub item U4e adds, by crate, against §4.1 and plan.md §4.7 (2.8); any beyond them named as such (the bites-only
    `npt_room::BITES` under U4E-Q3).
 8. What stopped and goes to the main session: seam changes for the advisor (carry 26's route; carry 51's home only if
@@ -794,8 +831,8 @@ table missed.
 | R24 | the seam freeze (Lanes :846-858, with W1-S1's lift) | U4d | the whole brief (2.7) | holds, with the one lifted change: `git diff df8975b 39f4290 -- spikes/netcode-proof/crates/sim/src/seam.rs spikes/netcode-proof/crates/sim/src/grid.rs` (312 lines added, 31 removed) read line by line: `Command`'s fields unchanged (an `impl Command` block of constants added); `Rewind` and `CoverVariant` unchanged; `EntityRecord`'s fields unchanged, FIELDS 12; `EntityKind` gains `OwnState` last and `SOLDIER` loses velocity (W1-S1's lift, Lanes :853-858); `layout()`'s body completed (H1's part record, the projectile's type and fuse, the wall, the effect rows); `TickInput`'s three fields; `SimEvent`'s variants reformatted, fields unchanged; `InputReports` loses `non_finite` and gains `refusals`; grid.rs: four doc lines only |
 | R25 | check.mjs's steps | U4a, U4d2 | section 5's "every step passing" | holds: 10 steps at 39f4290 (check.mjs:1594-1631); U4d2 may add its `wasm` step in wave 2 (plan :674-675), so the count at U4e's merge is the main session's to state |
 | R26 | sim's and proto's bite ids | U4d, U4a | the one-crate id rule (2.6; carry 24) | holds: sim `OWN_COPY_SNAP_BITES` (lib.rs:47) and `World::BITES` (world.rs:563-568, :896-897: PM-0004-21's two, -41's two); proto's seven (quant.rs:35-41); server's PM-0004-67 three (schedule.rs:241-251); client's one (client/src/lib.rs:12). None is an id U4e plants |
-| R27 | marks.json's ids for -17, -18, -58, -62 and owner-to-all | marks.json at `<base>` (U4j edits it) | the ids U4e plants (2.6) | changed (one id): marks.json spells -18/no-fallback, -58/lt-ack, lt-cmd-seq, lt-event-seq, lt-press, lt-tick-offset and tick16, -62/server-echo, -17/tick16 and client-rounding; it has no owner-to-all id (catalogue item 5 is a catalogue test, no mark's: plan :731, :750 name it "owner-to-all" only). The brief now asks U4E-Q13. U4j's fix pass may edit marks.json; W1-N2 keeps lt-tick-offset's id (wave1 :341-342) |
-| R28 | npt-log's `TickRecord.hs`, `snap_incomplete`, `burst_eviction` (plan :645, :657-658) | U4j | U4e exposes the client hash and the two series (2.1; U4E-Q7) | changed: not at the head (U4j has not merged: marks/SERIES.md has neither row; crates/log's `TickRecord` has no `hs`). The brief relies on neither: U4e exposes the values under the plan's names (`event.burst_eviction`: §4.5 :298-299; `tick.s.snap_incomplete`: §4.6 :321), and U4r's logs write them. npt-room and npt-client have no npt-log dependency (room/Cargo.toml:17-21; client/Cargo.toml:17-22) |
+| R27 | marks.json's ids for -17, -18, -58, -62 and owner-to-all | marks.json at `<base>` | the ids U4e plants (2.6) | changed (one id): marks.json spells -18/no-fallback, -58/lt-ack, lt-cmd-seq, lt-event-seq, lt-press, lt-tick-offset and tick16, -62/server-echo, -17/tick16 and client-rounding; it has no owner-to-all id (catalogue item 5 is a catalogue test, no mark's: plan :731, :750 name it "owner-to-all" only). The brief now asks U4E-Q13. W1-N2 keeps lt-tick-offset's id (wave1 :341-342). Rechecked at d50396a (U4j's merge): U4j added one id, `PM-0001-18/ws-budget-x2` (marks.json:4431), the send budget's bite on the L2 B1 ws part; the send budget is npt-net's WsServer, wired in U6 (plan.md:217, :521), not U4e's, so the ids U4e plants are unchanged |
+| R28 | npt-log's `TickRecord.hs`, `snap_incomplete`, `burst_eviction` (plan :645, :657-658) | U4j | U4e exposes the client hash and the two series (2.1; U4E-Q7) | changed at d50396a (U4j's merge): crates/log's `TickRecord` has `hs` (log/src/lib.rs:121) with `set_hashes` and `hashes` (:158, :168); SERIES.md has the `tick.s.snap_incomplete` row (:319) and `event.burst_eviction.evicted`'s (:320); marks/README.md §1's `hs` rules bind U4e through carry 61. U4e still exposes the values under the plan's names (`event.burst_eviction`: §4.5 :298-299; `tick.s.snap_incomplete`: §4.6 :321) and U4r's logs write them; npt-room and npt-client still have no npt-log dependency (room/Cargo.toml:17-21; client/Cargo.toml:17-22). Recheck at launch |
 | R29 | npt-link's `Channel`-only rule (catalogue item 2; carry 3) | U4s, U4a | the endpoint's input (2.3) | new: npt-client's (and npt-proto's) sources may name nothing from `npt_link` but `Channel` (check.mjs:809, :821-837; client/Cargo.toml:18-20). So `ClientEndpoint::input` takes (Channel, bytes, arrival_ns), as plan.md:486 has it; npt-server's tests may name `Link` and `Loopback` |
 | R30 | check.mjs's bite-home rule | U4s, U4a | U4e's id lists (2.1, 2.2, 2.6) | new: it reads string literals in `crates/<crate>/src/` only; `tests/` and `#[cfg(test)]` modules are not read (check.mjs:697-758). U4e's sources never spell another crate's id; they pass the caller's id string to `Quant::with_bite`; tests may name any id |
 | R31 | carry 51's public home for an effect row's owner | the main session, at U4e's start (carry 51) | the own-state filter (2.1; carry 51) | new, missing at 39f4290: `Scene`'s public items (scene.rs:149-300) have no effect-rows accessor; `effect_rows` is `pub(crate)` (scene.rs:119); the World maps index / rows (world.rs:1879-1881); seam.rs:283 says "its owner is its index / 8". By carry 51 (close B2), the main session adds `Scene::effect_rows()` and its §4.1 line in its own commit when U4e's build starts, so `<base>` holds it (2.7; 7.2 item 2) |
@@ -805,10 +842,10 @@ table missed.
 | R35 | the records-to-volumes function and the static graph (W1-U4D A-M1; W1-PUB) | U4d | the ring and AreaFlood (2.1) | new: `World::hit_volumes_from` (world.rs:874-891) is the one function from records to volumes; the room pushes the world's own `hit_volumes()` (seam.rs:557) and rebuilds none. The static graph: `World::greybox()` (world.rs:967) or `Greybox::dm_tri()` (greybox.rs:83), with `areas()` and `portals()` (greybox.rs:166, :171) |
 | R36 | `Loopback` (U2) | U2 | e7, 2.5, the Loopback tests (2.4, 2.5) | new: no loss, no delay, one order for all channels (link/src/lib.rs:128-131); built on `Rc` in one thread (:132-135), so not `Send`, and nothing `Send` may hold one (§4.11 :401-402); `rtt_ns` is `Some(0)` (:203-205) |
 | R37 | the catalogue's rows as built | U4a, U4d (N8's edits) | the own-state section and the header (2.1, 2.3) | new: the own-state row now states the section as built, the owner's soldier record, its `OwnState` record and its effect rows (catalogue :136); the header row carries the 16-bit command sequences (catalogue :135) |
-| R38 | the base counts and check.mjs's steps at 39f4290 | the main session | section 4 rule 5; section 5 | new: measured 365, bites 412, self 52 of 52, 10 steps (u4d-report.md:68-70) |
+| R38 | the base counts and check.mjs's steps at 39f4290 | the main session | section 4 rule 5; section 5 | new: measured 365, bites 412, self 52 of 52, 10 steps (u4d-report.md:68-70); at d50396a (U4j's merge): measured 396, bites 443, self 52 of 52, 10 steps (u4j-build.md, "Merge into the spike branch", M5) |
 
 Rows changed: R4, R6, R11, R15, R19, R20, R27, R28 (8 of 28); the other 20 hold. Rev 3.1 rewrote R31's route by close
-B2.
+B2. Rev 3.2 rechecked R27, R28 and R38 at d50396a (U4j's merge).
 
 ### 7.2 Left for the main session at launch
 1. **`<base>`.** Fill it with the spike branch's head. If spikes/ at `<base>` differs from 39f4290
@@ -865,11 +902,11 @@ B2.
   needs an id that U4r's `--bite` dispatch selects per instance; but marks.json has none (catalogue item 5 is a
   catalogue test that no pass mark holds: the visibility classes are proven at slice 3, ADR 0001:1687-1688), and
   check.mjs's bite-home rule reads only ids of the form `PM-<ADR>-<row>/<name>` (check.mjs:689, :734-758).
-- Options: (a) an id outside the PM form (for example `catalogue-5/owner-to-all`) in `npt_room::BITES`; check.mjs's
-  rule does not read it, so a unit test holds that only npt-room lists it, and U4r selects it by that string; a room
-  pin that checks each id against marks.json, as server/tests/schedule.rs:345-353 does, exempts that one id by name;
-  (b) a PM-form id under no mark's row, which marks.json would not spell and check.test.mjs's pin of marks.json's ids
-  would not cover; (c) a marks.json entry for it, through U4j's lane (marks/ is U4j's, unmerged), for a bite no mark
+- Options: (a) an id outside the PM form (for example `catalogue-5/owner-to-all`) in `npt_room::BITES`; check.mjs's rule
+  does not read it, so a unit test holds that only npt-room lists it, and U4r selects it by that string; a room pin that
+  checks each id against marks.json, as server/tests/schedule.rs:345-353 does, exempts that one id by name; (b) a
+  PM-form id under no mark's row, which marks.json would not spell and check.test.mjs's pin of marks.json's ids would
+  not cover; (c) a marks.json entry for it, through the main session (marks/ is not U4e's lane), for a bite no mark
   judges.
 - Recommendation: (a): it claims no pass mark that does not exist, needs no other lane, and its one home is still
   tested.
