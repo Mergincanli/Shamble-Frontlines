@@ -8,7 +8,7 @@ ok   the italic paragraph is reworded (7 lines -> 11 lines)
 ok   no old line deleted or changed apart from the italic paragraph (0)
 ok   every other old line is unchanged and in order (492 of 492)
 ok   every inserted line is a quote, header, pointer or the italic line (unclassified: 0)
-     inserted lines by kind: {'quote': 63, 'header': 55, 'pointer': 8, 'italic': 11}
+     inserted lines by kind: {'quote': 63, 'header': 55, 'pointer': 9, 'italic': 11}
 ok   quote run (indent 4, 1 lines) equals one source block byte for byte: ['Queued: A3.2 sentence']
 ok   quote run (indent 0, 20 lines) equals one source block byte for byte: ['A3.2']
 ok   quote run (indent 0, 3 lines) equals one source block byte for byte: ['A3.1 (his labelled block)']

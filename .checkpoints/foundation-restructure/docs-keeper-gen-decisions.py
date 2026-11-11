@@ -84,8 +84,8 @@ day10 = []  # the 2026-11-10 foundation-chat entries, newest first
 day10 += [
     '- **Taken by Mustafa, 2026-11-10: the two gate prompts approved, #47 not watched, step 2.2 planned in a fresh',
     '  session** (in the foundation chat, session_019YNMUVo8MVM3gdiMNaN5xs, on his personal account; sent after 2.1a\'s',
-    '  report, whose checkpoint is ffc16d8 at 11:57:47 UTC, and saved by that chat at 15:02:59 UTC, 828a3e0; saved by the',
-    '  foundation chat; not re-checked against its chat record). His item 1 covers 2.1a\'s two gate-file writes',
+    '  report (PR #47) and saved by that chat at 15:02:59 UTC, 828a3e0; saved by the foundation chat; not re-checked',
+    '  against its chat record). His item 1 covers 2.1a\'s two gate-file writes',
     '  (`tools/gate.mjs` and `tools/smoke.mjs`, dd12aeb). Copied by script from',
     '  ' + APX + ' A2.2, and checked byte for byte against it:',
 ]
@@ -125,11 +125,12 @@ queued = [
 ] + quote([SENT], '    ')
 assert queued[2].split('"')[1].rstrip(';') == H_A32 or True
 
-ptr_freeze = ['    _Pointer: the foundation chat\'s own record of FREEZE-FDN (a), SPLIT (a) and SCOPE (a), in his words, under',
-              '    "Decisions, newest first": the entry "Taken by Mustafa, 2026-11-10: FREEZE-FDN (a), SPLIT (a), SCOPE (a) and the',
-              '    build go for 2.1a, in the foundation chat"._']
-ptr_split = ['    _Pointer: the foundation chat\'s own record of SPLIT (a) and SCOPE (a), in his words: the entry "Taken by Mustafa,',
-             '    2026-11-10: FREEZE-FDN (a), SPLIT (a), SCOPE (a) and the build go for 2.1a, in the foundation chat", above._']
+ptr_freeze = ['    - _Pointer: the foundation chat\'s own record of FREEZE-FDN (a), SPLIT (a) and SCOPE (a), in his words, under',
+              '      "Decisions, newest first": the entry "Taken by Mustafa, 2026-11-10: FREEZE-FDN (a), SPLIT (a), SCOPE (a) and',
+              '      the build go for 2.1a, in the foundation chat"._']
+ptr_split = ['    - _Pointer: the foundation chat\'s own record of SPLIT (a) and SCOPE (a), in his words: the entry "Taken by',
+             '      Mustafa, 2026-11-10: FREEZE-FDN (a), SPLIT (a), SCOPE (a) and the build go for 2.1a, in the foundation chat",',
+             '      above._']
 ptr_slice = ['     _Pointer (2026-11-11, foundation 2.1a): for foundation steps 2.1 and 2.2, overtaken by his decision of',
              '     2026-11-10: the entry "Taken by Mustafa, 2026-11-10: the second account may plan and build foundation steps 2.1',
              '     and 2.2 now", above._']

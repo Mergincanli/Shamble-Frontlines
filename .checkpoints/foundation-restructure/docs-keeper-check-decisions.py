@@ -76,7 +76,7 @@ for hunk in inserted:
         run = None
         s = l.lstrip()
         if s.startswith('_How it was made:'): mode = 'italic'
-        elif s.startswith('_Pointer'): mode = 'pointer'
+        elif s.startswith('_Pointer') or s.startswith('- _Pointer'): mode = 'pointer'
         elif l.startswith(HEAD_STARTS): mode = 'header'
         elif mode is None or (mode != 'italic' and not l.startswith(' ')):
             bad.append(l); continue
@@ -94,7 +94,7 @@ for ind, body in runs:
 check(sorted(used) == sorted(src) and all(v == 1 for v in used.values()), 'each source block inserted exactly once: ' + str(used))
 
 # 5. Pointers sit beside quotes, never inside: no pointer line starts with ">", and each is italic.
-ptr = [l for h in inserted for l in h if l.lstrip().startswith('_Pointer')]
+ptr = [l for h in inserted for l in h if l.lstrip().startswith(('_Pointer', '- _Pointer'))]
 check(len(ptr) == 3, 'three pointer lines in DECISIONS.md (%d)' % len(ptr))
 print('RESULT:', 'PASS' if not fails else 'FAIL (%d)' % len(fails))
 sys.exit(1 if fails else 0)
