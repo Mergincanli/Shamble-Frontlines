@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 18:38 Amsterdam
+- **Last update:** 2026-11-11 19:05 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -173,6 +173,8 @@
 
 20. Round 2 done (the last round): security-auditor APPROVE (F1 closed; R2-1 Low: a trailing dot or space passes the check, Git for Windows refuses such paths; its own byte check of A3.3-A3.5 against the session events: identical; notes N5-N7 accepted; it asked for its threat model in agent memory: not done here, out of scope, named in the report), test-engineer APPROVE, infra-engineer APPROVE. CI on 76544aa: gate and smoke green (pull_request 43067074308, push 43067068538). IE-6 settled by one run (.gate/foundation-restructure/ie6-probe.mjs; evidence-f1/ie6-probe.txt): a plain file named legacy in the revert direction: exit 0, no crash (join(ROOT, 'legacy/') keeps the slash, so existsSync is false for a file): not a follow-up. Round 2's follow-ups landed before the verifier (0590d8c): IE-5 (Medium), IE-7, TE-7, R2-1 in the archive group and STATUS's bullet (116 lines); gate with smoke PASS.
 
+21. The verifier on 0590d8c: PASS WITH NOTES (notes verifier-final.md): all nine blocks pass (the F1 write re-applied: 7a8480c; E3 compared 93 runs, 0 differences, and a 6-entry re-run 6 of 6; both move directions and main's gate re-run; the rows re-run ALL PASS; the gate with smoke PASS; his words 12 blocks byte-identical; docs and CI facts consistent; no Medium or above open: F1 and TE-1 closed, IE-5 deferred in writing). V-1 Low: STATUS's CI line undercounts (5 failed attempts and 1 cancelled across 3f29cb8 and 8d8c422): fix in the last commit. V-2 Low: BUILD_PREFIX is not in plan revision 3 (disclosed in dd12aeb and step 3): list it in the report's departures. The saver restarted (bg8guh6wh, 18:54 to 20:44).
+
 ## Current step
 
 The verifier on 0590d8c; then the last commit (the report above the Appendix A marker, the refusal table regenerated, the STATUS row, ROADMAP's Next, the checkpoint deleted), the PR body, the advisor agent's delta review of the final head (its notes in its answer), CI green on the final head, then ready.
@@ -323,7 +325,7 @@ The verifier on 0590d8c; then the last commit (the report above the Appendix A m
 - Saver: background task b8a5m7tp3, started 17:04 Amsterdam, stops by 18:54 (110 min); last check 17:25: ok.
 - The prompt-tally agent: done (29 refusals, 14 prompts answered by Mustafa).
 - E3 on the new gate: done 18:18 (31 of 31, identical).
-- Round 2: done, three APPROVE. The verifier: launching on 0590d8c.
+- Round 2: done, three APPROVE. The verifier: done (PASS WITH NOTES). Saver: bg8guh6wh, 18:54 to 20:44.
 - docs-keeper: done (1023870). infra-engineer and test-engineer: done (APPROVE). security-auditor done (REVISE, F1).
   The advisor agent done (REVISE, F1; then APPROVE with conditions for the F1 amendment). No agent running. The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
 - The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
