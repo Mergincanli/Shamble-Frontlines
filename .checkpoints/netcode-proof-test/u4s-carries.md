@@ -179,6 +179,14 @@ with the ruling. The file now holds 44 entries; the wave-1 briefs carry them wor
     be coded: the event section's age is 8 bits (snapshot.rs's wire text). The room's EventQueue never queues one past
     that age: the overflow resync (§4.7) ends it first, or the room drops it from the resend and counts it. A unit
     test."
+51. **SEC-U4d-R2-1, Low (u4d-round2-security.md; deferred to U4e by Mustafa, 2026-11-11: "The Low about the effect
+    row's owner: defer it to U4e in writing. A Low never triggers a push."):** "An effect row's owner has no public
+    home in npt-sim: the World finds it as the row's index / the scene's effect rows per soldier (world.rs:1879-1881),
+    that count is pub(crate) (scene.rs:119), and the public doc only says 'its owner is its index / 8' (seam.rs:283).
+    U4e's own-state filter never copies the 8. It reads the mapping from one public home (a pub accessor such as
+    `Scene::effect_rows()`, or a pub rows-per-soldier constant with a const assert on every scene); npt-sim is not
+    U4e's lane, so if no such home exists when U4e starts, U4e raises it to the main session (carry 26's route),
+    which adds it in its own commit. A test shows that slot k's client receives exactly slot k's effect rows."
 
 ## U4r (the L1 runner and its judged runs)
 40. **O1 (u4-conditions-check.md:42-45; advisor-u4.md:343-347; the advisor's U4s ruling, O1; its last sentence added
@@ -226,6 +234,14 @@ with the ruling. The file now holds 44 entries; the wave-1 briefs carry them wor
 42. **entry 34's second home (the advisor's U4s ruling, condition 2):** "If U4a's report does not list entry 34 as
     met, U4d2's brief carries entry 34's text word for word, U4d2 in place of U4a (U4d2 owns check.mjs in wave 2:
     u4-build-plan.md Lanes)."
+52. **N2-M1, Medium (u4d-round2-netcode.md; Mustafa, 2026-11-11: "The event-rate drift in the estimate scene: fix the
+    scene before U4d2 pins the recordings. The 9.5 floor (PM-0001-2) does not move."):** "Before U4d2 pins any
+    recording or hash, the estimate scene's event-rate drift is fixed: the recording's dead reckoning (replay.rs's
+    generator) ignores crouch, dropped commands, scripted move speeds, blocked moves and deaths, so the event rate
+    falls over a run (per 50 s window: 13.4, 11.0, 10.1, 9.4, 9.7, 8.7 a second at 1 in 10). The fix and the
+    re-calibration of `aim_one_in` are measured on the judged window (a 10-minute measured window after warm-up,
+    ADR 0001:1600; 3 seeds), not on T-M1's 300 s from tick 0. PM-0001-2's floor of 9.5 events a second does not
+    move. The advisor rules the fix's form; it lands in the main session's commit or U4d2's, before the pins."
 
 ## The main session (plan text, before the code merges: risk 11)
 30. **A19 (§4.1's table):** "npt-sim's rows gain `EntityKind::ALL` and `EntityKind::layout` (arch F2: one home for the

@@ -37,8 +37,9 @@ U4 wave 1", moved by card_refresh.py.
     "(9 fields)" is a slip; Weapon, Scene::weapon, Scene::health belong in §4.1's npt-sim row).
   - **Done:** security-auditor APPROVE WITH FINDINGS: **SEC-U4a-1 and SEC-U4a-2 CLOSED** in writing. One Low,
     SEC-U4d-R2-1 (an effect row's owner, index / 8, has no public home; U4e's filter would copy the 8): "it keeps the
-    PR needs-mustafa until it is fixed or explicitly deferred to U4e". Carries for U4e (the codec checks the kind per
-    section, not the slot per client).
+    PR needs-mustafa until it is fixed or explicitly deferred to U4e". **Deferred to U4e by Mustafa (2026-11-11), in
+    writing as carry 51.** Carries for U4e (the codec checks the kind per section, not the slot per client).
+  - N2-M1's fix: before U4d2 pins the recordings, the 9.5 floor unmoved (Mustafa, 2026-11-11): carry 52.
   - **Left:** rust-reviewer, engine-architect, test-engineer (cut; running again).
   - U4d's fix pass: done (wf_a8ff8550-67d, 10:14): every ruling item built, 29 plants failing by name, check.mjs
     twice in its copy: measured 314 = 304 + 10, bites 337 = 327 + 10. Its open points, for the advisor: (A) the
@@ -156,13 +157,15 @@ U4 wave 1", moved by card_refresh.py.
   and a U4d2 builder brief carrying N2-M1 and N2-M2 (both need U4d merged); a skeptic check of U4a and U4b's merged
   code; one of U4c's.
 
-**Open questions for Mustafa:**
-- **NIGHT-BUDGET (asked 2026-11-11 about 10:25 UTC):** the day session and the night shift share the university
-  account's usage. Last night this session's agents hit the limit at about 22:30 Amsterdam, and the night shift's 00:10
-  and 01:10 runs left nothing (likely the same limit; unproven: the routines API shows only the last run). Options:
-  (a) leave it (the queue still fit last night); (b) no new agent work in the day session after about 21:00
-  Amsterdam; (c) he checks the routine's run history in claude.ai first. Recommended: (a), and (b) once a night's
-  queue stops fitting.
+**Open questions for Mustafa:** none.
+- **Answered 2026-11-11 about 11:50 UTC** (history.md, "Decisions taken", verbatim):
+  - NIGHT-BUDGET (a): leave it; switch to (b) (no new agent work after about 21:00 Amsterdam) on the first night whose
+    queue does not fit, and tell him when.
+  - N2-M1: fix the estimate scene before U4d2 pins the recordings; the 9.5 floor does not move (carry 52).
+  - SEC-U4d-R2-1: deferred to U4e in writing (carry 51); no push for a Low.
+  - U4j's F1: the review budget as is; open after round 3, stop and bring it to him.
+  - Every report gives the session's context figure: 622,250 of 1,000,000 tokens (62 %) at 11:50 UTC, compacting at
+    about 901,600 (get_session, context_usage).
 - **Relayed 2026-11-11 about 10:45 UTC** (it had not been sent before: no earlier reply carries it): the advisor's
   answer to TCP-FREEZE's "Tell me if any later unit plans work on the model" (advisor-u4-wave1.md:546-554: none plans
   fidelity work; U6's send path and U8/R1's DelayStream self-test work on the wrapper's timing, outside the freeze),

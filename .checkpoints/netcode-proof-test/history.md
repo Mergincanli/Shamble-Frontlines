@@ -278,6 +278,24 @@ checkpoint's resume card is the handoff; open this file only when a step needs t
     R1 still waits for stop B.
 
 ## Decisions taken
+- **Mustafa, 2026-11-11 about 11:50 UTC (verbatim):** "NIGHT-BUDGET: (a). Leave it as it is. Switch to (b) on the
+  first night whose queue does not fit, and tell me when you do.
+  Three notes, no new work:
+  - The event-rate drift in the estimate scene: fix the scene before U4d2 pins the recordings. The 9.5 floor
+    (PM-0001-2) does not move.
+  - The Low about the effect row's owner: defer it to U4e in writing. A Low never triggers a push.
+  - U4j's High: carry on as the review budget says. If it is still open after round 3, stop and bring it to me.
+  In your next report, tell me how full this chat is (the session's own usage figure)."
+  - Read as:
+    - NIGHT-BUDGET (a): the day session keeps working into the evening. On the first night whose queue does not fit,
+      the day session switches to (b), starting no new agent work after about 21:00 Amsterdam, and tells him.
+    - N2-M1, the event-rate drift: fixed in the estimate scene before U4d2 pins any recording; the 9.5 floor stays.
+      Written as carry 52 (u4s-carries.md, §U4d2).
+    - SEC-U4d-R2-1, the effect row's owner: deferred to U4e, in writing as carry 51 (u4s-carries.md, §U4e). No push
+      for it.
+    - U4j's F1 (High): round 2 as planned, a round 3 for F1 alone if it stays open; still open after round 3, the
+      change-set stops for him.
+    - Each later report gives the session's context figure (get_session's context_usage).
 - **Mustafa, 2026-11-11 (verbatim):** "PR #49 is merged. STATUS is split (dashboard in docs/STATUS.md, my decisions in
   docs/DECISIONS.md, the rest in docs/STATUS_ARCHIVE.md). At your next natural stop, not in the middle of U4: update
   from main, move your block of my 2026-11-06 answers into docs/DECISIONS.md by script and line ranges, never by
