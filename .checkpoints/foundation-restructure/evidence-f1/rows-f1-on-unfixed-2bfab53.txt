@@ -1,0 +1,1 @@
+PASS a_root_only: exit 0; build .; base prefix ""; gate pass true; stderr: (none)
