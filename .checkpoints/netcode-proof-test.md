@@ -21,11 +21,11 @@ erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md.
   and d50396a (round 2's wording), pushed together** (u4j-build.md, "Merge into the spike branch"). At d50396a:
   check.mjs 10 steps, measured 396, bites 443, self 52: the base counts for the next lanes, U4e's `<base>` included.
 - **Running:**
-  - the advisor's check of the U4e brief rev 3.2 (a general-purpose agent, opus, xhigh, in the background, started
-    about 20:25 UTC; its brief advisor-u4e-brief-brief.md, its file advisor-u4e-brief.md; on its return read the file
-    in full: it rules on a brief's tests and bites). If it is cut, start it again from its brief file.
-  - U4d-F's run A, the build (task wmqlz92zb; run wf_3dbc5af1-0d4; script workflows/scripts/
-    npt-u4d-f-build-wf_3dbc5af1-0d4.js, started about 20:45 UTC): four fresh builders in turn in
+  - Done: the advisor's check of the U4e brief (advisor-u4e-brief.md, complete on disk: all seven blocks and the end
+    sections; the usage limit cut the agent after it wrote them, before its summary); folded as rev 3.3 (3088bb5).
+  - U4d-F's run A, the build (run wf_3dbc5af1-0d4; script workflows/scripts/npt-u4d-f-build-wf_3dbc5af1-0d4.js;
+    started about 20:45 UTC as task wmqlz92zb; the usage limit cut group 0-1's builder after 89 s, with no change to
+    the copy and no notes line; resumed at 21:12 UTC as task wcj2e504g): four fresh builders in turn in
     `.claude/worktrees/wf_9ce88fa3-452-1`, groups 0-1, 2-3, 4-5, 6-7 (with the End checks); logs under .gate/u4df/;
     notes u4df-build.md in that worktree. If cut: resume with `Workflow({scriptPath, resumeFromRunId})` (finished groups
     replay from cache; a cut group's fresh builder reads the notes and the diff first). On its return: read every group's
@@ -117,11 +117,17 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
    group check that cannot fail on the open route, so carry 53's per-record test is the proof), 5 Medium (F4 carry
    22's accepting edges; F5 e7's exercise counts; F6 the three room-side checks' rules and clean negatives; F7 e5a's
    gap alignment; F8 routes for carries 54 and 56) and 5 Low. The revision made rev 3.1 (893 lines): all 13 fixed,
-   none rejected; a new question U4E-Q14 (does a 1 s gap still evict B on Loopback; recommended (b)). Next, now that
-   U4j's merge added carry 61 to §U4e: re-copy §U4e into the brief's 3.1 by script and redo its R28 row ("U4j has not
-   merged") on the merged code (the advisor's conditions, advisor-u4j-r2.md B2.1 and B5); then the advisor's check of
-   the brief (U4E-Q12, Q13, Q14 and the High fixes); `<base>` (the head at launch, d50396a or later; base counts 396 /
-   443 / 52); U4e's build.
+   none rejected; a new question U4E-Q14 (does a 1 s gap still evict B on Loopback; recommended (b)). Rev 3.2: U4j's
+   merge folded (u4e_fold2.py: 3.1 with carry 61; R27, R28, R38 at d50396a). **The advisor's check of rev 3.2
+   (advisor-u4e-brief.md, read in full): APPROVE on L1 to L4**: four Mediums (A1 carry 61's test line; A2 e7's split
+   clause; A3 owner-to-all within the section's limits; A4 every encoder error kind) and three Lows (A5-A7), each with
+   words; U4E-Q12 (c) (U4e plants -22/unbounded; U4f runs it judged), U4E-Q13 (a) (`catalogue-5/owner-to-all`),
+   U4E-Q14 (b) (the Loopback gap is `npt_sim::ACK_RING_TICKS` tick periods); F2's route: carry 66 for U4d2. **L1 and
+   L2 done (3088bb5, u4e_fold3.py):** the brief is rev 3.3; the plan's four edits; carry 66. Next: **L3**, the
+   carry-51 commit (`Scene::effect_rows()` and its §4.1 line), after U4d-F's merge, since both touch scene.rs; then
+   7.2 item 1's counted run gives `<base>`'s counts; U4e's review reads its diff from the commit before the carry-51
+   commit; then **L4**, the launch as section 1 says (one builder, general-purpose, opus, xhigh, in a worktree, under
+   W1-TARGET's lock; at most three agents counting reviewers).
 3. Then U4d-F (workflow 3) as above; then U4d2's builder brief (carrying carry 52, N2-M2's ruling, W1-TARGET), with
    the advisor.
 4. U4r's brief: the night's rev 2 at `cs/npt-u4r-brief` ed973c9 goes to the advisor after U4c, U4d2, U4e and U4j merge.
