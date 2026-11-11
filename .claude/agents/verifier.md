@@ -25,7 +25,7 @@ Always:
 Then, by change type:
 - logic: run (or write in your notes folder) a minimal harness on the real code and assert the behaviour.
 - visual / UI: confirm the `/render-ab` set exists for the agreed views; list the paths.
-- gameplay / AI: `node tools/preview.js . eval tools/sim.js` three times on base and three times on head; report every
+- gameplay / AI: `node tools/preview.js legacy eval tools/sim.js` three times on base and three times on head; report every
   run. The AI is random: compare ranges, never single runs.
 - performance: before/after numbers with the exact method; say how noisy they are.
 - netcode: run the latency/jitter/loss tests (once they exist).
