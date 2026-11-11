@@ -278,6 +278,17 @@ checkpoint's resume card is the handoff; open this file only when a step needs t
     R1 still waits for stop B.
 
 ## Decisions taken
+- **Mustafa, 2026-11-11 (verbatim):** "PR #49 is merged. STATUS is split (dashboard in docs/STATUS.md, my decisions in
+  docs/DECISIONS.md, the rest in docs/STATUS_ARCHIVE.md). At your next natural stop, not in the middle of U4: update
+  from main, move your block of my 2026-11-06 answers into docs/DECISIONS.md by script and line ranges, never by
+  retyping, and keep one line for #40 in STATUS's "In flight" table."
+  - **Done at 5ca77eb, about 09:58 UTC.** The natural stop: no merge or unit step was in flight in the main folder;
+    the lanes worked in their own copies.
+  - The move: by merge_status_split.py, each block by line range, every moved line checked in its new home.
+    - DECISIONS.md: the 22-line answers block and MACHINES-TIMING's note.
+    - STATUS_ARCHIVE.md: the Phase list, the follow-ups line, the risks entry, a one-line fix and the two Health rows.
+    - STATUS.md: the one #40 line, updated.
+  - Checks: the repo map OK; marks, refs and redact PASS; gate PASS.
 - **Mustafa, 2026-11-10 about 20:40 UTC (verbatim):** "NETEM-BAR (may the WebSocket pass bar loosen when real Linux
   disagrees with the model): (a). The bar stays capped as WS-BAR says. If a WebSocket row fails because the kernel is
   slower than the model, report it to me as the kernel's, with the netem numbers, and I decide." And: "The night

@@ -54,12 +54,15 @@ def insert_after(doc, index, block):
 
 answers = ln(ours, 173, 194)
 assert answers[0].startswith("- **Asked of Mustafa, the netcode proof test; answered 2026-11-06**"), answers[0]
-assert ours[194].startswith("- "), "the answers block does not end at line 194"
+assert ours[193].rstrip().endswith("on his go.") and ours[194].startswith("_A3's notes"), \
+    "the answers block does not end at line 194 (line 195 should be the A3 entry's note)"
 
 # DECISIONS.md
 de = replace(de, ln(base, 345, 345), ln(ours, 373, 374), "MACHINES-TIMING's old line")
-a3 = [i for i, l in enumerate(de) if l.startswith("- **Asked of Mustafa, A3; answered 2026-11-05")]
+# before the A3 entry's note ("_A3's notes, cited in this file ..._"), which belongs to the A3 entry after it
+a3 = [i for i, l in enumerate(de) if l.startswith("_A3's notes, cited in this file")]
 assert len(a3) == 1, a3
+assert de[a3[0] + 2].startswith("- **Asked of Mustafa, A3; answered 2026-11-05"), de[a3[0] + 2]
 de = de[:a3[0]] + answers + de[a3[0]:]
 
 # STATUS_ARCHIVE.md

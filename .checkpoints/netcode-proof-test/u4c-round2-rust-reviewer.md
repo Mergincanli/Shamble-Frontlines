@@ -32,3 +32,35 @@ memory Low), u4c-review-netcode.md (F1-F7), u4c-review-test.md (M1, M2, L1-L4, N
   canonical byte offsets (b[16..24], b[36..40] resends meaning, b[5]/b[6]); Profile jitter semantics vs
   time_threshold's doc; burst membership by send time; woken() timers/declared not horizon-filtered; drive()'s 1 ns
   stepping on stuck.
+- Step 3 done (per claimed fix, on the final bytes; plant logs spot-checked in the worktree's u4c-fix/r2-*.log, the
+  failure lines = the fix notes word for word, "Compiling npt-l1 (this copy)" in each):
+  - M1 / my round-1 M (L-c5 blind to next_event_ns): CLOSED. drive() (tests.rs:854) calls only at next_event_ns and
+    the script's real sends; woken() (:889) asserts each hand-out at its due instant (Ready.arrival_ns = apply instant,
+    lib.rs:1356-1388; gate+1 per lib.rs:1005, :1672) and a call at every log arrival, PTO and declaration. Event kinds
+    all covered: HeldDue fires at the held datagram's logged arrival or is stale (lib.rs:1134-1168, :962-973). Plants
+    none/no-timers/no-acks fail L-c5 + host test; no-ready/skips/no-held fail the host test (r2-m1-*.log).
+  - M2 packet threshold: CLOSED (1.101/1.102/1.103 s acks, by count at 1.103 s exactly; 1M -> by time 1112.5, 2 ->
+    1102.0; r2-m2-*.log). L1 latest-RTT term: CLOSED (oracle computes 9/8 x max itself; uses Rtt::sample for the
+    smoothed value only; srtt-only fails trial 1). L2 acks only in bursts: CLOSED (in_burst on send time, lib.rs:1426,
+    = the test's [1 s, 2 s); counts (372, 222, 17383) vs floors 50/50/3000; plant 361 wrong). L3: CLOSED (fixed(0)
+    links, link 3 first, one call applies both 70 ms arrivals; link-first rank fails). L4: CLOSED (comment reworded;
+    offsets b[16..24] sent, b[36..40] resends = "its piece's earlier sends" per lib.rs:341-349, so the filter selects
+    resends only; bound 2.0 + 9/8 x 120 ms = 2.135 < 2.2 s). N1: CLOSED (lc + ": " prefix and check words). F1 doc
+    line: accurate (RFC 9002 §6.2.1 "MUST NOT set its PTO timer for the Application Data packet number space until the
+    handshake is confirmed", fetched 2026-11-11); its ruling is netcode's / the main session's.
+  - Not claimed, stay follow-ups (not reopened): my Lows lib.rs:12-13 independence (netcode F4), close() no time,
+    next_event_ns net-wide; nits; memory Low.
+- Step 4 (defects of the fix): lib.rs change is 4 doc lines only (:54-57): no model code, so no effect on determinism,
+  Wasm size or speed (by construction; not measured). New test code: no unsafe, no unchecked arithmetic that can
+  wrap (x - s with ack arrival >= s; debug overflow checks on in tests), no panics on the canonical bytes (len checked
+  before slicing; tag 19 B filtered).
+  - NEW Low A: time_threshold doc (tests.rs:1242-1243) says "±20 ms of jitter (50 ± 10 ms each way)", the profile is
+    jitter_ns 40 ms (:1256) = ±40 ms round trip, 50 ± 20 ms each way (Profile doc lib.rs:150, :156; Model::delay :789).
+    Doc only; no assertion depends on it.
+  - NEW Low B: drive() (tests.rs:874-877) steps 1 ns per call while next_event_ns names a past instant, up to the
+    horizon (5e9 / 1e10 steps): a model that keeps naming a past instant hangs the test instead of failing on its
+    stuck check. Same pattern as the pre-fix L-c5 loop (t += 1), new in the host test. Implausible from a real defect
+    (advance pops every event <= now, lib.rs:947-958). Follow-up.
+- Evidence note (test-engineer's to judge): r2-check-1/-2 10/10 (289/316) with foreign lanes in the shared target at
+  their edges; r2-check-3 log empty (15 B) at the time read.
+- Verdict: APPROVE WITH FINDINGS (all claimed fixes closed; 2 new Lows, follow-ups). DONE
