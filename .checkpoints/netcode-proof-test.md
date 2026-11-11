@@ -23,9 +23,23 @@ U4 wave 1", moved by card_refresh.py.
   deleted in that commit. SIZE-CHECK: about 3,130 lines for size M (lib.rs +1,180 −323, tests.rs 1,723, tests/l1.rs
   +230): not well past.
   - Housekeeping later (approved method): `.claude/worktrees/wf_f54246ff-e0d-2`, `.gate/u4c-prefix`.
-- **U4d, the stand-in sim (npt-sim), with W1-S1's npt-proto half:** **round 2 running** (workflow wf_4b5ee472-66b,
-  task wlwvn5tef): netcode-architect, security-auditor (W1-S1 only), rust-reviewer, engine-architect, then
-  test-engineer, one at a time; notes u4d-round2-{netcode,security,rust,arch,test}.md.
+- **U4d, the stand-in sim (npt-sim), with W1-S1's npt-proto half:** **round 2 running** (workflow wf_4b5ee472-66b;
+  cut by the spend limit about 10:55, resumed 11:11 as task wy6140mq8): netcode-architect, security-auditor (W1-S1
+  only), rust-reviewer, engine-architect, then test-engineer, one at a time; notes
+  u4d-round2-{netcode,security,rust,arch,test}.md.
+  - **Done:** netcode-architect APPROVE WITH FINDINGS: every round-1 item closed; both W1-S1 halves met. Two Mediums,
+    follow-ups (not before the merge): N2-M1, the estimate scene's event rate drifts down (a 10-minute measured
+    window would likely read 8.5-9.3 a second, below PM-0001-2's 9.5: PM-0001-12's ES runs at R2; fix before U4d2
+    pins the recordings); N2-M2, ES's 15 vehicles loop 40-82 m out, too far for "every vehicle in every client's
+    view" (fix before U4d2 pins ES's hashes, or U4e shows its region covers them). Merge condition from N2-M1: U4d's
+    report states T-M1's window, the per-window rates, and that a 10-minute window would likely read below 9.5; a
+    U4r carry: the contract test reports the SS spread and the everyone-in-view share. Lows N2-L1 to N2-L4 (N2-L4:
+    "(9 fields)" is a slip; Weapon, Scene::weapon, Scene::health belong in §4.1's npt-sim row).
+  - **Done:** security-auditor APPROVE WITH FINDINGS: **SEC-U4a-1 and SEC-U4a-2 CLOSED** in writing. One Low,
+    SEC-U4d-R2-1 (an effect row's owner, index / 8, has no public home; U4e's filter would copy the 8): "it keeps the
+    PR needs-mustafa until it is fixed or explicitly deferred to U4e". Carries for U4e (the codec checks the kind per
+    section, not the slot per client).
+  - **Left:** rust-reviewer, engine-architect, test-engineer (cut; running again).
   - U4d's fix pass: done (wf_a8ff8550-67d, 10:14): every ruling item built, 29 plants failing by name, check.mjs
     twice in its copy: measured 314 = 304 + 10, bites 337 = 327 + 10. Its open points, for the advisor: (A) the
     estimate scene's knobs `aim_one_in` 11 and `grenade_fuse_ms` 1,515; (B) the estimate scene's event rate drifts
@@ -61,8 +75,22 @@ U4 wave 1", moved by card_refresh.py.
   `.claude/worktrees/agent-a3b8dfeb01ed52b50` (base 411eeee); notes u4j-build.md; snapshot wip/u4j.patch (10:05).
   - SIZE-CHECK: about 2,860 lines added for its size M (code 1,330, tests 1,030, marks.json and docs 370, fixtures
     130): not well past its plan, so no stop.
-  - **Review round 1 running** (workflow wf_1ea8a0dd-fee, task wt62a1yrv): netcode-architect, security-auditor, then
-    test-engineer, one at a time; notes u4j-review-{netcode,security,test}.md.
+  - **Review round 1 running** (workflow wf_1ea8a0dd-fee; the test-engineer cut by the spend limit, resumed 11:11 as
+    task w4p9h5eio): netcode-architect, security-auditor, then test-engineer; notes
+    u4j-review-{netcode,security,test}.md.
+    - **netcode-architect: REVISE.** Before the merge: NC-U4J-1 (FAR BETTER uses f = max(1, s) with no band or
+      tolerance check: Mustafa's 1.10 cap can be exceeded), NC-U4J-2 (a practice run added after the counted run
+      turns its FAIL into INVALID), NC-U4J-3 (README never says whose slot indexes `hs`), NC-U4J-4 (the twin's role
+      is not checked), NC-U4J-5 (the `hs` writer rules' four gaps), NC-U4J-7 (the practice run's heal-record count is
+      never checked). Readings (a), (b), (d), (f) right; (e) partly (NC-U4J-6). Follow-ups NC-U4J-6, -8 to -14.
+    - **security-auditor: REVISE.** Before the merge: **F1 High** (the same FAR BETTER hole: a log can move X, Y and Z
+      past WS-BAR's cap), F2 (M_m, the band and the guard come from the log's copy of the bound line, never checked
+      against marks.json), F3 (one practice run per build checked only inside the counted run's set), F4 (any log
+      can supply any hash list; the Arm rule trusts the log's own aarch64 claim), F5 (the twin's identity unchecked),
+      F6 (parse_bound can panic on two 30-digit decimals: an i128 overflow), F9 (a ruling is any non-empty text).
+      Follow-ups: F7, F8 (Medium: no minimum coverage for the decoded-hash check), F10-F12.
+    - Next: the test-engineer's round 1, then one fix pass by U4j's builder on every before-merge finding (F1 first),
+      then round 2 on what changed.
   - Its fix pass, if any: by its builder (SendMessage to a3b8dfeb01ed52b50), in its copy.
   - At its merge, the main session's: u4-build-plan.md §4.1 gains U4j's public items (`TickRecord.hs`,
     `set_hashes`, `hashes`; `marks::BoundNumber`, `Check.ws_bound`, `Rule::WsPractice`; `Outcome::Empty`,

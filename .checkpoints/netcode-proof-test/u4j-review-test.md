@@ -79,3 +79,8 @@ base 411eeeed50d8c71e7e1f74366f0e1d5c27388444. Started 2026-11-11. No local memo
   judge (probe B) instead of INVALID. Fix: README §2.5 and parse_bound cap each fraction at 6 decimals (or the
   comparisons return Err). Proof: probe B as a unit test expecting Err. Before merge (nit f fixes this format now).
   (= security F6.)
+- (resume 2026-11-11, after a usage-limit cut: start hashes re-checked, 34/34 match; no probe file left in the copy.)
+- F9 MEDIUM tests/engine.rs (the -18 ws-practice tests): plant T (u4j-review-test/plant-t.txt; practice.rs :387-388
+  cap 1.10 -> 1.12 and band_low dropped, :436 Z' recheck dropped) SURVIVES all 65 committed judge tests; the probes
+  T1b (s = 1.1001), T2 (s below band_low) and T3 (over Z' only) each bite it. Mustafa's 10 % cap (WS-BAR) is not
+  pinned by any committed test. Fix: commit T1a/T1b/T2/T3. Before merge (the bar's own number; a loosened cap passes).
