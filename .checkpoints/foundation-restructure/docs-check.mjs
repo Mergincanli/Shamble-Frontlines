@@ -101,6 +101,10 @@ const mainLines = f => git('show', `${MAIN}:${f}`).split('\n');
   const head = readFileSync(join(REPO, F), 'utf8');
   const hrow = head.split('\n').find(l => l.startsWith('| [0002](0002-')) || '';
   check('the register: the ADR 0002 row still says "8 open" and carries the acceptance words', hrow.includes('8 open') && hrow.includes("not yet accepted except ADR 0002's part 1, accepted by Mustafa on 2026-11-10 (SCOPE (a)"));
+  // D1 (a) via plan-check §3 as sent (119b71d: "-2 answered by the restructure plan" in this cell), with REG-TRUE (b)'s
+  // two substitutions (the count stays 8; "answered" → "answered in part"), and the register's own rule ("marked")
+  check('the register: the ADR 0002 row marks -2 "answered in part" (the register\'s rule) and keeps the count at 8',
+    / 8 open: -8 answered at the stop \(2026-11-03\); -2 answered in part by the restructure plan \(2026-11-11\) \|$/.test(hrow));
   check('the register: the status sentence carries the acceptance words', fold(head).includes("not yet accepted except ADR 0002's part 1, accepted by Mustafa on 2026-11-10 (SCOPE (a)). His words"));
   check('the register: the Total line unchanged', head.includes(L[tot - 1]));
   const pm = head.split('\n').find(l => l.startsWith('| ') && l.includes('PM-0002-36')) || '';

@@ -9,7 +9,7 @@
   **Base:** main 76b4f7a (PR #50 merged, 2.1a). **OLD** (the independent judge for E2 and E3): main 44446a5.
 - **Never:** push to `claude/netcode-proof-test-plan-hcky5g` (#40) or `claude/laughing-pasteur-fwya24` (#48); touch
   `spikes/`; touch a gate file; edit a settings file, hook or allow-list; write a kit line before his chat yes.
-- **Last update:** 2026-11-12 00:12 Amsterdam
+- **Last update:** 2026-11-12 01:02 Amsterdam
 
 ## Steps done
 0. Step 0 (this commit): model checked with get_session: `session_context.model` claude-opus-5-5,
@@ -197,15 +197,32 @@
    time, now done with the Edit tool instead; 3 the kit edits; E8's merge; one worktree clean-up line; the first command
    of the session); 2 refused by the guard (`git -C`).
 
+11. Step 10, part 2: the workflow `fr-2-1b-docs` (wf_0f019ba7-441; 5 agents; 1,658 s): docs-keeper (xhigh) edited
+   REPO_MAP, START_HERE, MODULE_MAP, TECHNICAL, STATUS, STATUS_ARCHIVE, ROADMAP, ADR 0002 (:7, OQ-0002-2's answer, the
+   two rows) and the register (the ADR 0002 row's status, the status sentence, a Q-A1 row in the loose ends); committed
+   as snapshots 91b9a54 and ea775ce (pushed so the work was not only in the container, on the stop hook's request),
+   then d315853 and 2b80da8. `docs-check.mjs` (run by an agent): PASS, twice. The blind check: faithful to his words,
+   one Medium (the register's ADR 0002 row did not mark -2 "answered in part") and two Lows (the status sentence's
+   "His words:" now follows the SCOPE (a) clause; the ADR's pointer to E2-E4 in a report body not yet written).
+   docs-keeper's fix pass edited nothing (the brief's 9a held the cell; it recorded both readings) and consulted the
+   advisor tool once itself (its notes; counted apart from the session's). docs-keeper's stale list (outside the brief,
+   unedited) is in the report. Then, by the session (consultation 6): the cell as reading 1 (**2719b96**: "8 open: -8
+   answered at the stop (2026-11-03); -2 answered in part by the restructure plan (2026-11-11)", from plan-check §3 as
+   sent at 119b71d with REG-TRUE (b)'s two substitutions; a docs-check assertion added; REG-CELL in the report's
+   Decisions needed); the answer's counts exact and STATUS closing IE-2/-3/-4/-7 and SA-L1 for 2.1b (**688329c**); the
+   report's body (**bf41334**: Reviews open; the final head, CI and E1's final check go to the PR body). docs-check 20/20
+   PASS; repo-map-check OK (112 entries, 99 paths); report-appendix check PASS.
+
 ## Current step
-Step 10, part 2: the docs workflow running.
+Step 11: the reviews (round 1) on the final diff, then the verifier, then the advisor agent on the pushed head.
 
 ## Next steps
-1. The workflow's result: commit docs-keeper's files, the gate, push; `repo-map-check.mjs`; the advisor tool before
-   step 11 only if the docs need a decision; step 11 under C15-C17 (reviewers: security-auditor, test-engineer,
-   infra-engineer; the verifier; the advisor agent on the pushed head); the report (fold in plan 1.4's table, the prompt
-   tally as a 2.3 finding with a Decisions-needed entry); E1's final-head check (C3); repo-map-check after the checkpoint
-   deletion too; the advisor tool before ready.
+1. Step 11 under C15-C17: the review workflow (security-auditor, test-engineer, infra-engineer at their files' effort,
+   briefed by `review-brief-2-1b.md`; one skeptic per Medium-or-above finding, at most 3 agents at a time); one fix
+   pass; the verifier until PASS; the advisor agent (xhigh) on the pushed head; the report's Reviews and the consultation
+   count; the prompt tally re-run; the advisor tool before ready (consultation 7); stop the saver, delete
+   `.checkpoints/foundation-restructure*` in the last commit (no skip marker); E1's final check and repo-map-check on
+   that head; CI read; IE-7 (main still 76b4f7a?); the PR body; ready; stop for his go.
 
 ## Open findings
 - (none yet)
@@ -268,6 +285,15 @@ Step 10, part 2: the docs workflow running.
    refused forms; lenses 1 and 3 as a script (`docs-check.mjs`), lens 2 as one blind agent given his words and the
    diff, effort passed on every agent call, called a step 10 self-check; repo-map-check again after the checkpoint
    deletion; next consultation before ready.
+6. 2026-11-12 00:58 Amsterdam · the docs workflow's blind check gave two readings of the register cell, and step 10's
+   end (his moments 4 and 5): reading 1 or 2, and is step 10 done? · changed: reading 1, after checking plan-check §3 as
+   sent (119b71d) named -2 in the cell; one Edit, a docs-check assertion, committed alone (2719b96); a REG-CELL
+   Decisions-needed entry with both readings; the "His words:" Low to the report's stale list; the report's body moved
+   into the report file before the reviewers (bf41334); the answer's counts recounted (15 allow rules today, not 17) or
+   labelled as the plan's; no head SHA or final CI inside the report (the PR body); the render note's copies inside A2
+   named (C13); the prompt tally re-run before final; docs-keeper's own consultation counted apart; IE-2/-3/-4/-7 and
+   SA-L1 closed by name; the saver stopped and no agent writing before the deletion commit; next consultation before
+   ready.
 
 ## His mid-turn message (2026-11-11 21:10:58 UTC, event 7a094d1e-41ed-40b7-91f8-544d91e4b64f; captured: `mustafa-2026-11-11-permission.md`, 95 characters)
 "I give you permission to go on auto mode and accept yourself for the bash commands and what not". The chat is already

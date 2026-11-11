@@ -57,3 +57,18 @@ added line inside the loose-ends section; ADR 0002 hunks only on :7, the OQ-0002
   E5 SHARED, E6 14/14 pass, E8 GATE PASS (full and smoke-only). CI (GitHub API): c090843 runs #674/#675, 1e6f84e
   #676/#677, b6b3b81 #678/#679, all success.
 - Stale add: STATUS_ARCHIVE "Fixed in dd12aeb ... on main once #50 merges" (main :865) is now past tense.
+
+## Fix pass (blind check, Medium, docs/adr/README.md:17, the ADR 0002 row's Open questions cell)
+- Item: the cell names no "-2 answered in part", while the register's own rule (the Total paragraph) and the rows of
+  ADRs 0001, 0003 and 0006 mark answered-in-part questions in the cell. Reading 1: D1 (a) (DECISIONS.md, 20:44:29 UTC)
+  routes the row as plan-check section 3 proposed, so the cell would name -2. Reading 2: REG-TRUE (b) (21:39:44 UTC)
+  names only the count, so the cell stays.
+- Decision: no edit. Brief 9a says the column "stays exactly as it is"; plan-check section 3 (REG-TRUE bullet) and the
+  advisor's C11 say no other register edit. Outside the brief, so it goes to notDone for the session or Mustafa. The
+  status is carried by ADR 0002's OQ-0002-2 entry and its two R5 rows (R5-LAYOUT-OQ5, R5-GATE-OQ3).
+- Proposal, not applied (modelled on the 0001/0006 rows): "8 open: -8 answered at the stop (2026-11-03); -2 answered
+  in part (the phase 1 restructure plan, 2026-11-11)".
+- Advisor tool consulted once for this pass: agreed, no edit, notDone.
+- Fix pass checks: git status --porcelain docs/ empty (no docs edit in this pass; first pass committed in d315853 and
+  2b80da8); repo-map-check "repo map OK: 112 entries cover 99 required paths", exit 0; docs-check "docs check: PASS",
+  exit 0.
