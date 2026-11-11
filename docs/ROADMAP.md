@@ -106,13 +106,17 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 **The foundation, 2.1a: the legacy gate reads both layouts [2026-11-10 to 11-11, PR #50: in review]** —
 foundation-restructure, the first of step 2.1's two pull requests (Mustafa's decision of 2026-11-10: the second
 account plans and builds steps 2.1 and 2.2 now; his SPLIT (a)); gate files and tools only, no game file, no file
-moved, symbols +0 −0 (dd12aeb). `tools/smoke.mjs` finds the build folder (`legacy/` when it holds a `shamble-*.js`
-file, else the root; engine files in both is a setup error, exit 2); `tools/gate.mjs` reads the head there and each
-base from `legacy/`, the root or `shamble-frontlines-repo/`; `tools/village.py` defaults to `legacy/` when present;
-`gate-globals.json` is called a gate file. Proof: the mutation proof, 31 of 31 PASS (every planted fault fails the
-same checks on the old gate, the edited gate at the root and the edited gate on `legacy/`; every control passes on all
-three); base checks over root, CS-1 and `legacy/` bases; gate PASS and CI green. PR #50 replaces #47 (his BRANCH-47 (a)); its docs pass records #49's merge and his words of 2026-11-10
-and 2026-11-11 (`docs/DECISIONS.md`). Next: the review round, the report, the advisor's review and his go.
+moved, symbols +0 −0 (dd12aeb, 3f29cb8). `tools/smoke.mjs` finds the build folder (`legacy/` when it holds a
+`shamble-*.js` file, else the root; engine files in both is a setup error, exit 2); `tools/gate.mjs` reads the head there
+and each base from `legacy/`, the root or `shamble-frontlines-repo/`, and (3f29cb8, the security review's F1, on his yes
+of 2026-11-11) when the folder differs between base and head, the base's folder must keep no page or engine file in any
+letter case (exit 2); `tools/village.py` defaults to `legacy/` when present; `gate-globals.json` is called a gate file.
+Proof: the mutation proof, 31 of 31 PASS on the edited gate and again on the fixed gate, identical in every column (every
+planted fault fails the same checks on the old gate, the edited gate at the root and the edited gate on `legacy/`; every
+control passes on all three); the F1 rows red on the unfixed gate and green on the fixed one; the decoy stopped; both
+move directions and their bases recorded raw; gate PASS. PR #50 replaces #47 (his BRANCH-47 (a)); its docs pass records
+#49's merge and his words of 2026-11-10 and 2026-11-11 (`docs/DECISIONS.md`). Next: round 2, the verifier, the report,
+the advisor's review and his go.
 
 **STATUS-DIET with LANE-RULES [2026-11-10 to 11-11, MERGED]** — status-diet (Mustafa's queue of 2026-11-10, items 2
 and 3, with ACCOUNTS and his Models addition): STATUS (1233 lines) split by a line-range script into STATUS (109 lines:
