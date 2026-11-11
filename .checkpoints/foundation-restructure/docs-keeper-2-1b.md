@@ -16,3 +16,10 @@ line at main; START_HERE's added `legacy` commands must be E6's strings; the reg
 added line inside the loose-ends section; ADR 0002 hunks only on :7, the OQ-0002-2 entry and the two rows.
 
 ## Log
+- Read all targets. Verified: c090843 = five R100 renames, blobs equal at 76b4f7a, HEAD (legacy/) and 44446a5.
+  PR #50: merged_at 2026-11-11T18:38:28Z, merge commit 76b4f7a (parents bb2d817, f6becf5); main CI run 43079707687
+  (#671, gate workflow, success, push). PR #51: open, draft, head c5d4872 at read time.
+- ADR 0002 OQ-0002-2 mentions: :150, :563, :998 (entry), :1358, :1431, :1564, :1589, :1596 (row), :1626 (row).
+- Risk seen: docs-check check 6 matches placeholder commands (`... legacy eval <snippet.js>`, `... legacy <cmd>`,
+  `pageshot.js legacy index.html <prefix> [--headed]`, `perfbots.js --map=tri --pre=<file.js>`) against E6's literal
+  strings: likely false FAILs. ROADMAP Recent work would reach 13 (fold = history, on the Never list).
