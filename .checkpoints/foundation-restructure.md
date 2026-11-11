@@ -113,6 +113,7 @@ His step 2, the docs pass: docs-keeper (Opus, effort high) briefed with the fact
 ## Key numbers
 - E3: 31 of 31 PASS (4 Phase 0 mutations, 22 check-5 mutations, 3 + 2 controls) × 3 gates = 93 full gate runs.
 - Folder-rule table: 8 + 2 rows PASS. Base checks: 7 edited-gate runs PASS over root, CS-1 and legacy/ bases; OLD dies on a legacy/ base.
+- The rows re-run in this container (2026-11-11 14:3x Amsterdam): `.gate/fdn-scratch` rebuilt by `git archive HEAD` (gate files = dd12aeb's, `cmp`), `rows-test.mjs`: 8 + 2 rows ALL PASS.
 - This head d6a3fee: full gate with smoke PASS against bb2d817, +0 -0 (index 8/8, editor 5/5).
 
 ## Decisions taken
@@ -147,5 +148,7 @@ His step 2, the docs pass: docs-keeper (Opus, effort high) briefed with the fact
    step 4; F-L grows (a revert of #50 removes #49's record and today's words): say so in the report; #47 read back.
 
 ## Running work
-- Saver: not running (no agents yet). The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
+- Saver: background task bjteqwe4t, started 14:02 Amsterdam, stops by 15:52 (110 min); last check 14:35: ok (watching).
+- docs-keeper: the docs pass, running in the background (notes `docs-keeper-docs-pass.md`).
+- The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
   container (step 3 note).
