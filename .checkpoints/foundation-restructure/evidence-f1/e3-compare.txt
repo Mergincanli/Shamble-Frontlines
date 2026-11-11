@@ -1,4 +1,4 @@
-E3 on the new gate: 8 of 8 PASS (8 of 31 entries run); against 2026-11-10: identical failing checks and exit codes in every column
+E3 on the new gate: 9 of 9 PASS (9 of 31 entries run); against 2026-11-10: identical failing checks and exit codes in every column
 PASS  P1   old ["3","5a","5b"]/1 | new ["3","5a","5b"]/1 | newleg ["3","5a","5b"]/1
 PASS  P2   old ["4","5a"]/1 | new ["4","5a"]/1 | newleg ["4","5a"]/1
 PASS  P3   old ["1","2","3","4","5a","5b"]/1 | new ["1","2","3","4","5a","5b"]/1 | newleg ["1","2","3","4","5a","5b"]/1
@@ -7,7 +7,7 @@ PASS  M1   old ["5a"]/1 | new ["5a"]/1 | newleg ["5a"]/1
 PASS  M2   old ["5a"]/1 | new ["5a"]/1 | newleg ["5a"]/1
 PASS  M3   old ["5a"]/1 | new ["5a"]/1 | newleg ["5a"]/1
 PASS  M4   old ["5a"]/1 | new ["5a"]/1 | newleg ["5a"]/1
-M5: not run yet
+PASS  M5   old ["5a"]/1 | new ["5a"]/1 | newleg ["5a"]/1
 M6: not run yet
 M7: not run yet
 M8: not run yet

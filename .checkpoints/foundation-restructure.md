@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 17:50 Amsterdam
+- **Last update:** 2026-11-11 17:46 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -163,6 +163,8 @@
 
 15. The docs commit 8d8c422 (his words A3.3 and A3.4 in the appendix and DECISIONS, L-2, the follow-ups, the CI risk line): gate --no-smoke PASS; pushed after the pull-request re-run on 3f29cb8 ended (cancelled at 16:42 UTC by the job timeout, still in the library step). E3 on the new gate at 8 of 31: identical to 2026-11-10 in every column (.gate/foundation-restructure/e3-compare.mjs writes evidence-f1/e3-compare.txt).
 
+16. The prompt tally (the general-purpose agent; notes general-purpose-prompt-tally.md, prompt-tally.json): 19 pages, 09:59:00-16:37:55 UTC, no gap; 499 tool results, each with a decision: classifier 318, settings rule 99, permission mode 40, answered by Mustafa 14 (all main session: git worktree add in .gate/ x3, git switch --detach in a worktree x2, git merge --ff-only x1 (the one fast-forward); shell writes the guard cannot resolve x8, incl. the gate write cp at 16:01, answered after his chat yes), refused by the guard 27, by the deny list 1 (rm -rf). Unique refusals 29 (28 in the window + 1 by the tally agent): write target unresolvable 17, git -C 5, git checkout 2, git restore 2, worktree remove --force 1, rm -rf 1; by who: main 4, infra-engineer 8, security-auditor 6, test-engineer 4, advisor 3, docs-keeper 3. Subagents cannot raise a prompt (requestNonInteractive). The script double-counts refusals (57): use 29. After 16:37:55 not tallied.
+
 ## Current step
 
 The full E3 on the new gate runs in the background (task br8ig4sam, from 17:20 Amsterdam, about 100 min; resumable: a cut
@@ -308,7 +310,7 @@ the follow-ups (STATUS ids, archive text). Then round 2 pinned to a head holding
 
 ## Running work
 - Saver: background task b8a5m7tp3, started 17:04 Amsterdam, stops by 18:54 (110 min); last check 17:25: ok.
-- The prompt-tally agent (general-purpose, Opus, high): running in the background.
+- The prompt-tally agent: done (29 refusals, 14 prompts answered by Mustafa).
 - E3 on the new gate: background task br8ig4sam, started 17:20 Amsterdam (log `.gate/e3-run-f1.log`).
 - docs-keeper: done (1023870). infra-engineer and test-engineer: done (APPROVE). security-auditor done (REVISE, F1).
   The advisor agent done (REVISE, F1; then APPROVE with conditions for the F1 amendment). No agent running. The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
