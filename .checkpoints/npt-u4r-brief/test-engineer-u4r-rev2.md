@@ -10,3 +10,6 @@ B6+. Write each revised section to rev2-parts/<n>.md.
 Bn. Assemble rev 2 into u4r-brief-draft.md in one Write; recount; DONE.
 
 ## Notes
+- B1 done (check read whole: 16 findings; scope -30 pre-check, O1, RTT argument, -18 fresh-delta).
+- B2 rev 1 read whole (785 lines; sections 1-11; R1-R32; Q1-Q12; run items N1-N9). Drafter notes still to skim.
+- Extra defect seen: rev 1's §11 run items are named N1-N9, colliding with the check's finding ids N1-N16. Plan: rename the run items D1-Dn in rev 2 (list as extra change X1), update every cite (R2, R10-R12, R20, R29, U4R-Q3, rule 4, 7.3, 8.3).
