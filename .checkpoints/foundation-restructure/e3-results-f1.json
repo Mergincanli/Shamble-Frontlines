@@ -1823,5 +1823,125 @@
   },
   "verdict": "PASS",
   "reportChecksInOld": true
+ },
+ "PC1": {
+  "id": "PC1",
+  "what": "control: P1 (refreshRect deleted) with --allow-drop refreshRect",
+  "expected": [],
+  "flags": [
+   "--allow-drop",
+   "refreshRect"
+  ],
+  "old": {
+   "exit": 1,
+   "failing": [
+    "5a",
+    "5b"
+   ],
+   "lines": {
+    "1": "PASS 5/5 sources parse (shamble-core.js, shamble-game.js, shamble-editor.js, index.html inline#1, editor.html inline#1)",
+    "2": "PASS index.html: shamble-core.js + shamble-game.js + inline#1 | editor.html: shamble-core.js + shamble-game.js + shamble-editor.js + inline#1 (external, skipped: three.min.js)",
+    "3": "PASS core 138 / game 713 / editor 353 / indexInline 0 / editorInline 0 | +0 -1 | cross-file duplicates 0, within-file 0 || - dropped (allowed by --allow-drop): refreshRect",
+    "4": "PASS 51 refs to editor-only symbols: 51 guarded, 0 dead, 0 flagged",
+    "5a": "FAIL index.html 1/8 steps, 2 errors | editor.html 1/5 steps, 2 errors | 0 warnings | renderer ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) || index.html [load] page error: refreshRect is not defined at bootGame (shamble-game.js:3273:26) | index.html [click Deploy] step failed: timed out waiting for mode === 'game' after Deploy | editor.html [load] page error: refreshRect is not defined at bootGame (shamble-game.js:3273:26)",
+    "5b": "FAIL index.html: 3 scripts + 0 DOM handlers, 1 problems | editor.html: 4 scripts + 0 DOM handlers, 1 problems | allowed: 63 built-ins (Node v22.23.4) + 15 in gate-globals.json + 459 THREE members (r128) || index.html: refreshRect is not defined (shamble-game.js line 3274; +1 more) | editor.html: refreshRect is not defined (shamble-game.js line 3274; +1 more) | a browser API the code really needs: add its name to tools/gate-globals.json (reviewed data, not a gate-tool change)",
+    "5c": "PASS shamble-core.js uses 21 names it does not declare; 0 references into game/editor/inline symbols",
+    "5d": "PASS index.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> inline | editor.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> shamble-editor.js -> inline"
+   }
+  },
+  "new": {
+   "exit": 1,
+   "failing": [
+    "5a",
+    "5b"
+   ],
+   "lines": {
+    "1": "PASS 5/5 sources parse (shamble-core.js, shamble-game.js, shamble-editor.js, index.html inline#1, editor.html inline#1)",
+    "2": "PASS index.html: shamble-core.js + shamble-game.js + inline#1 | editor.html: shamble-core.js + shamble-game.js + shamble-editor.js + inline#1 (external, skipped: three.min.js)",
+    "3": "PASS core 138 / game 713 / editor 353 / indexInline 0 / editorInline 0 | +0 -1 | cross-file duplicates 0, within-file 0 || - dropped (allowed by --allow-drop): refreshRect",
+    "4": "PASS 51 refs to editor-only symbols: 51 guarded, 0 dead, 0 flagged",
+    "5a": "FAIL index.html 1/8 steps, 2 errors | editor.html 1/5 steps, 2 errors | 0 warnings | renderer ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) || index.html [load] page error: refreshRect is not defined at bootGame (shamble-game.js:3273:26) | index.html [click Deploy] step failed: timed out waiting for mode === 'game' after Deploy | editor.html [load] page error: refreshRect is not defined at bootGame (shamble-game.js:3273:26)",
+    "5b": "FAIL index.html: 3 scripts + 0 DOM handlers, 1 problems | editor.html: 4 scripts + 0 DOM handlers, 1 problems | allowed: 63 built-ins (Node v22.23.4) + 15 in gate-globals.json + 459 THREE members (r128) || index.html: refreshRect is not defined (shamble-game.js line 3274; +1 more) | editor.html: refreshRect is not defined (shamble-game.js line 3274; +1 more) | a browser API the code really needs: add its name to tools/gate-globals.json (a gate file: a change needs Mustafa's go)",
+    "5c": "PASS shamble-core.js uses 21 names it does not declare; 0 references into game/editor/inline symbols",
+    "5d": "PASS index.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> inline | editor.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> shamble-editor.js -> inline"
+   },
+   "build": ".",
+   "basePrefix": ""
+  },
+  "newleg": {
+   "exit": 1,
+   "failing": [
+    "5a",
+    "5b"
+   ],
+   "lines": {
+    "1": "PASS 5/5 sources parse (shamble-core.js, shamble-game.js, shamble-editor.js, index.html inline#1, editor.html inline#1)",
+    "2": "PASS index.html: shamble-core.js + shamble-game.js + inline#1 | editor.html: shamble-core.js + shamble-game.js + shamble-editor.js + inline#1 (external, skipped: three.min.js)",
+    "3": "PASS core 138 / game 713 / editor 353 / indexInline 0 / editorInline 0 | +0 -1 | cross-file duplicates 0, within-file 0 || - dropped (allowed by --allow-drop): refreshRect",
+    "4": "PASS 51 refs to editor-only symbols: 51 guarded, 0 dead, 0 flagged",
+    "5a": "FAIL index.html 1/8 steps, 2 errors | editor.html 1/5 steps, 2 errors | 0 warnings | renderer ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) || index.html [load] page error: refreshRect is not defined at bootGame (legacy/shamble-game.js:3273:26) | index.html [click Deploy] step failed: timed out waiting for mode === 'game' after Deploy | editor.html [load] page error: refreshRect is not defined at bootGame (legacy/shamble-game.js:3273:26)",
+    "5b": "FAIL index.html: 3 scripts + 0 DOM handlers, 1 problems | editor.html: 4 scripts + 0 DOM handlers, 1 problems | allowed: 63 built-ins (Node v22.23.4) + 15 in gate-globals.json + 459 THREE members (r128) || index.html: refreshRect is not defined (shamble-game.js line 3274; +1 more) | editor.html: refreshRect is not defined (shamble-game.js line 3274; +1 more) | a browser API the code really needs: add its name to tools/gate-globals.json (a gate file: a change needs Mustafa's go)",
+    "5c": "PASS shamble-core.js uses 21 names it does not declare; 0 references into game/editor/inline symbols",
+    "5d": "PASS index.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> inline | editor.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> shamble-editor.js -> inline"
+   },
+   "build": "legacy/",
+   "basePrefix": ""
+  },
+  "verdict": "PASS (judged on check 3, as the Phase 0 gate had checks 1-4 only)",
+  "reportChecksInOld": true
+ },
+ "PC2": {
+  "id": "PC2",
+  "what": "control: pure move of _aLerp from shamble-game.js to shamble-core.js (placed before hyp2)",
+  "expected": [],
+  "flags": [],
+  "old": {
+   "exit": 0,
+   "failing": [],
+   "lines": {
+    "1": "PASS 5/5 sources parse (shamble-core.js, shamble-game.js, shamble-editor.js, index.html inline#1, editor.html inline#1)",
+    "2": "PASS index.html: shamble-core.js + shamble-game.js + inline#1 | editor.html: shamble-core.js + shamble-game.js + shamble-editor.js + inline#1 (external, skipped: three.min.js)",
+    "3": "PASS core 139 / game 713 / editor 353 / indexInline 0 / editorInline 0 | +0 -0 | cross-file duplicates 0, within-file 0 || ~ moved: _aLerp (game -> core)",
+    "4": "PASS 51 refs to editor-only symbols: 51 guarded, 0 dead, 0 flagged",
+    "5a": "PASS index.html 8/8 steps, 0 errors (2/2 shots reached the canvas, moved 1.6 m) | editor.html 5/5 steps, 0 errors | 0 warnings | renderer ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "5b": "PASS index.html: 3 scripts + 0 DOM handlers, 0 problems | editor.html: 4 scripts + 0 DOM handlers, 0 problems | allowed: 63 built-ins (Node v22.23.4) + 15 in gate-globals.json + 459 THREE members (r128)",
+    "5c": "PASS shamble-core.js uses 21 names it does not declare; 0 references into game/editor/inline symbols",
+    "5d": "PASS index.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> inline | editor.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> shamble-editor.js -> inline"
+   }
+  },
+  "new": {
+   "exit": 0,
+   "failing": [],
+   "lines": {
+    "1": "PASS 5/5 sources parse (shamble-core.js, shamble-game.js, shamble-editor.js, index.html inline#1, editor.html inline#1)",
+    "2": "PASS index.html: shamble-core.js + shamble-game.js + inline#1 | editor.html: shamble-core.js + shamble-game.js + shamble-editor.js + inline#1 (external, skipped: three.min.js)",
+    "3": "PASS core 139 / game 713 / editor 353 / indexInline 0 / editorInline 0 | +0 -0 | cross-file duplicates 0, within-file 0 || ~ moved: _aLerp (game -> core)",
+    "4": "PASS 51 refs to editor-only symbols: 51 guarded, 0 dead, 0 flagged",
+    "5a": "PASS index.html 8/8 steps, 0 errors (2/2 shots reached the canvas, moved 1.5 m) | editor.html 5/5 steps, 0 errors | 0 warnings | renderer ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "5b": "PASS index.html: 3 scripts + 0 DOM handlers, 0 problems | editor.html: 4 scripts + 0 DOM handlers, 0 problems | allowed: 63 built-ins (Node v22.23.4) + 15 in gate-globals.json + 459 THREE members (r128)",
+    "5c": "PASS shamble-core.js uses 21 names it does not declare; 0 references into game/editor/inline symbols",
+    "5d": "PASS index.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> inline | editor.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> shamble-editor.js -> inline"
+   },
+   "build": ".",
+   "basePrefix": ""
+  },
+  "newleg": {
+   "exit": 0,
+   "failing": [],
+   "lines": {
+    "1": "PASS 5/5 sources parse (shamble-core.js, shamble-game.js, shamble-editor.js, index.html inline#1, editor.html inline#1)",
+    "2": "PASS index.html: shamble-core.js + shamble-game.js + inline#1 | editor.html: shamble-core.js + shamble-game.js + shamble-editor.js + inline#1 (external, skipped: three.min.js)",
+    "3": "PASS core 139 / game 713 / editor 353 / indexInline 0 / editorInline 0 | +0 -0 | cross-file duplicates 0, within-file 0 || ~ moved: _aLerp (game -> core)",
+    "4": "PASS 51 refs to editor-only symbols: 51 guarded, 0 dead, 0 flagged",
+    "5a": "PASS index.html 8/8 steps, 0 errors (2/2 shots reached the canvas, moved 1.5 m) | editor.html 5/5 steps, 0 errors | 0 warnings | renderer ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "5b": "PASS index.html: 3 scripts + 0 DOM handlers, 0 problems | editor.html: 4 scripts + 0 DOM handlers, 0 problems | allowed: 63 built-ins (Node v22.23.4) + 15 in gate-globals.json + 459 THREE members (r128)",
+    "5c": "PASS shamble-core.js uses 21 names it does not declare; 0 references into game/editor/inline symbols",
+    "5d": "PASS index.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> inline | editor.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> shamble-editor.js -> inline"
+   },
+   "build": "legacy/",
+   "basePrefix": ""
+  },
+  "verdict": "PASS",
+  "reportChecksInOld": true
  }
 }

@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 17:58 Amsterdam
+- **Last update:** 2026-11-11 18:22 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -167,6 +167,8 @@
 
 17. His correction (2026-11-11 16:54:54 UTC, event a10ee1d6; captured by .gate/foundation-restructure/capture-message.mjs, copy in the notes, into mustafa-2026-11-11-prompts-correction.md): the chat stays in Auto mode; a guard prompt counts as unseen until answered in chat only for a kit or gate edit and a move of the main folder; for every other guard question his answer on the prompt is his answer (no chat ask); round 2 and the verifier briefed on the forms the guard refused (scratchpad refused-forms.md); no further tally agent; the ready report gives CI gate and smoke for the final head with run numbers, and #50 stays a draft if smoke is not green; recorded next to the words it corrects. Done: Appendix A3.5 (12 blocks), the DECISIONS entry directly above the 16:32 entry (decisions-add-a35.mjs), the check at 12 blocks: PASS; commit 0607b45 (gate --no-smoke PASS). CI on 8d8c422: gate green; smoke failed again at the library step (pull_request run 43060970457, 16:43-16:53 UTC): the mirror outage persists; no re-run.
 
+18. E3 on the new gate (e3-run-f1.mjs; 17:20-18:18 Amsterdam; results e3-results-f1.json; comparison evidence-f1/e3-compare.txt by .gate/foundation-restructure/e3-compare.mjs): 31 of 31 PASS, failing check ids and exit codes identical to the 2026-11-10 record (e3-results.json, unchanged) in every column: 93 gate runs; the legacy/ column is a move (base 44446a5 at the root), so the new check ran on every one of its entries. The three worktrees restored clean. ROADMAP 2.1a entry updated for the fix and its proof. Gate with smoke on the working tree: PASS, +0 -0, 8/8, 5/5.
+
 ## Current step
 
 The full E3 on the new gate runs in the background (task br8ig4sam, from 17:20 Amsterdam, about 100 min; resumable: a cut
@@ -313,7 +315,7 @@ the follow-ups (STATUS ids, archive text). Then round 2 pinned to a head holding
 ## Running work
 - Saver: background task b8a5m7tp3, started 17:04 Amsterdam, stops by 18:54 (110 min); last check 17:25: ok.
 - The prompt-tally agent: done (29 refusals, 14 prompts answered by Mustafa).
-- E3 on the new gate: background task br8ig4sam, started 17:20 Amsterdam (log `.gate/e3-run-f1.log`).
+- E3 on the new gate: done 18:18 (31 of 31, identical).
 - docs-keeper: done (1023870). infra-engineer and test-engineer: done (APPROVE). security-auditor done (REVISE, F1).
   The advisor agent done (REVISE, F1; then APPROVE with conditions for the F1 amendment). No agent running. The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
 - The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
