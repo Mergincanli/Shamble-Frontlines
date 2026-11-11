@@ -181,7 +181,7 @@ the critics'.
 | npt-sim | `SimCore` (moved from npt-room) | U4-SEAM |
 | npt-sim | `TICK_HZ`, `LOOP_CATCHUP`, the tick-constant functions and their derived constants (§4.3) | plan.md:544-546; A4, A5: the Worker reaches npt-sim, never npt-server |
 | npt-sim | `grid` (the wire grid, each way, per field kind) | U4-OWNSNAP: the sim's own-copy snap and both codec ends need one function |
-| npt-sim | seam data: `Command`, `Rewind`, `TickInput`, `EntityRecord`, `HitVolumes`, `HitHistory` (moved from npt-room), `PortalStates`, `SimEvent`; `InputReports` and `SimCore::reports` (the clamp reports and the refusal counters, outside the hash: the advisor's condition 1) | §4.2; A1, A2; the advisor's condition 1 |
+| npt-sim | seam data: `Command`, `Rewind`, `TickInput`, `EntityRecord`, `HitVolumes`, `HitHistory` (moved from npt-room), `PortalStates`, `SimEvent`; `InputReports` and `SimCore::reports` (the clamp reports and the refusal counters, outside the hash: the advisor's condition 1); the owner-only own-state kind (W1-S1); the records-to-volumes function (W1-U4D A-M1); `InputReports`' refusal records (W1-U4D N-M2); the plain-data types `Placement`, `AttributeChange`, `Attribute`, `ClampReport`, `VolumeBox`, `FieldDiff`, `Ray`, `RayHit`, `replay::Step`; `Scene`'s and `World`'s accessors (`World::new`, `scene`, `greybox`, `next_tick`, `dump`; `Scene::by_id`, `id`, `name`, `slots`, `team`, `stand_ins`, `with_stand_ins`) | §4.2; A1, A2; the advisor's condition 1; the advisor's W1-S1, W1-U4D and W1-PUB rulings |
 | npt-sim | `Recording`, `StateDump`, `replay::Replayer` | RQ5's field diff; U4-REPLAY; A12's one driver |
 | npt-sim | `World::predict`, `World::load_movers`, `World::ray_cast`; `Scene::estimate`, `Scene::course`, `Scene::targets` beside `Scene::stress` | ADR 0004:166-178; ADR 0001:258-260; ADR 0001:1470-1482 |
 | npt-sim | `EntityKind::ALL` and `EntityKind::layout`; `grid::Field::integer`; `full_state_ack_ticks_at`; `HitHistory::for_ms` in place of `HitHistory::new`; bites builds only: `grid::Config::floor_rounding`, `OWN_COPY_SNAP_BITES` and `own_copy_snap_with_bite`. Removed: bites-only `grid::Config::BITES` and `grid::Config::with_bite` (the advisor's U4s ruling, condition 1 (a)) | u4s-carries.md carry 30: arch F2 (one home for the per-kind field order; one type for a layout's fields); rust 1 (each derived constant is `<name>_at(TICK_HZ)`); netcode F6, A5; arch F1 |
@@ -189,9 +189,10 @@ the critics'.
 | npt-proto | `Wrap` (one compare per width, called with its counter's name) | -58's per-counter bites (§4.14) |
 | npt-proto | `client_hash`; the `EntityRecord` ↔ wire mapping | -17 (§4.6); A18 |
 | npt-proto | dependencies on npt-sim (grid, seam types) and npt-link (`Channel`) | U4-OWNSNAP, A18; catalogue item 2 (arch F37); leaf to leaf |
+| npt-proto | `Message`, `Direction`, `DecodeError`, `EncodeError`; the message and control types' field types (`EndReason`, `ProfileId`, `StepResult`, `TokenKind`); `Limits`' constants and `TYPES`; `Quant`'s `encode` and `decode`; `Wrap`'s compares and `widen16`; `EntityDelta`; `Class` and the two `GROUPS` tables; the catalogue audit's name and variant helpers; bites builds only: `BITES`, `Quant::with_bite`, `Wrap::plain_lt` | the signatures and fields of §4.7's items; §5 U4a's layout table; catalogue items 2, 3 and 6 (the advisor's W1-PUB ruling) |
 | npt-client | a dependency on npt-link, for `Channel`; bites builds only, `BITES` and `grid_with_bite` (the advisor's U4s ruling, condition 1 (a)) | as above; u4s-carries.md carry 30: arch F1 |
-| npt-room | `Room<S: SimCore>`; `InputBuffer::CMD_CATCHUP` | U4-SEAM; RQ6 |
-| npt-server | `Decoder::pump` (the I/O step over `&mut dyn Link`, injected `now`, the ping sender, per-client RTT and bytes sent); `Schedule`, `Due` | U4-SERVER; §4.3; A6, A7 |
+| npt-room | `Room<S: SimCore>`; `InputBuffer::CMD_CATCHUP`; bites builds only: `BITES` | U4-SEAM; RQ6; U4E-Q3 (the advisor's W1-PUB ruling) |
+| npt-server | `Decoder::pump` (the I/O step over `&mut dyn Link`, injected `now`, the ping sender, per-client RTT and bytes sent); `Schedule`, `Due`; `Dropped`, `LoopCounters`, `next_due_ns`, `counters`, `tick_hz`, `catchup`; bites builds only: `Schedule::with_bite`, `BITES` | U4-SERVER; §4.3; A6, A7; the advisor's W1-PUB ruling |
 | npt-l1 | `L1Net::next_event_ns` | C1' makes L1 event-driven |
 | npt-bots (library) | `Behaviour` (the brawl, the open-loop scripts, the target-course shooter, the cheats, the never-acker), clock-injected | E12; U4-SERVER |
 | npt-lab | subcommands `scenario` (with `--record`), `replay` and `hash` | plan.md:590-591 |
@@ -237,9 +238,14 @@ the critics'.
 - **Refused input leaves no trace in the hash (the advisor's condition 1).** ADR 0004:544-556 hashes the tick's event
   list, so the clamp reports and every refusal counter (the cooldown, ammunition and reload edges, Rewinds outside the
   ring, a full pool) stay outside `state_hash` and outside that list (the advisor's U4s ruling, condition 1 (b)): they
-  live in `reports()`, and the room logs them. Any per-soldier input state the sim keeps holds what the server accepted,
-  never what the client claimed, so a refused part changes nothing on the ticks after it either (the press counters
-  are the case to watch: D-10 runs past the next accepted press).
+  live in `reports()`, and the room logs them. The sim's one piece of per-slot input bookkeeping is the press counters
+  of the last command it ran for that slot: a press edge is a counter that differs from them, and a refused press's
+  edge is consumed there and changes nothing hashed. They stay outside `state_hash` and `StateDump` (a twin's counters
+  differ by design); they are a function of the command stream alone, and the predicting World restores them from the
+  client's own command at the snapshot's last-run sequence (U4g). `reports()` also lists each refusal per command
+  (`{ slot, seq, kind }`, beside the clamp reports), so a twin removes exactly the refused parts. D-10 runs past the
+  next accepted press. (The advisor's W1-U4D ruling: it replaces condition 1's 'what the server accepted, never what
+  the client claimed' for the press counters.)
 
 ### 4.3 The tick constant, the derived constants and the loop policy
 - In npt-sim: `TICK_HZ = 30`; `LOOP_CATCHUP = TICK_HZ / 4` (7 at 30 Hz, 15 at 60 Hz); `const fn ticks_for_ms(ms)` =
@@ -270,8 +276,11 @@ the critics'.
 - The `Input` field table is stated by U4a and read by the limit test (net F116's proposal: about 23 B whole; a repeat
   as change mask + tick delta + changed fields, never larger than the whole command; 5 + 23 + 7 x 19 = 161 B at the
   redundancy cap, under 166 B; the aim at 1 cm in 44 bits, under ADR 0001:226-227's 80).
-- The snapshot header: the full 32-bit server tick, the 16-bit offsets (baseline, newest command received, last command
-  run), the group index **and the group count** (so the client knows when a tick is complete: §4.6).
+- The snapshot header: the full 32-bit server tick; the baseline as its 16-bit age in ticks (0: coded against the
+  per-type defaults); the newest command received and the last command run as 16-bit command sequences, each with a
+  known flag (ADR 0001:228-230 acknowledges two commands; a sequence names the command, while the tick it ran at can
+  differ from its stamp; net F112 proposed them; the advisor's W1-N2 ruling); the group index **and the group count**
+  (so the client knows when a tick is complete: §4.6).
 - `Wrap`: one wrap-aware compare per width, called with its counter's name; every counter takes an injectable start
   value (-58).
 - **Reading (A26):** plan §4.4's server column lists "trailing bytes and unknown fields; the wrong channel". Those
@@ -333,7 +342,8 @@ the critics'.
 ### 4.9 Lag compensation
 - `HitHistory` (§4.2) stores `HitVolumes` per tick: soldiers, vehicle parts, and R-10's cover items (doors, the wall
   stand-in, vehicle part transforms: net F105). Its capacity comes from the measured test cap plus a margin (U4h),
-  recorded, at most 1 MB (proposed 64 ticks, about 192 KB at about 3 KB a tick: net F106).
+  recorded, at most 1 MB (10^6 B, as PM-0001-7 judges it) (proposed 64 ticks, about 192 KB at about 3 KB a tick:
+  net F106).
 - `rewind_at` (npt-room) turns a command's accepted view time into a `Rewind` (tick_a, fraction, cover), or replaces the
   view time by the estimate and counts it, or clips to the cap and counts it. The sim blends linearly, as the client's
   Interp drew it (net F107).
@@ -355,7 +365,9 @@ the critics'.
   clamp-then-grid is idempotent.
 - **The twin's command for a kind the sim checks** (the cooldown, ammunition and reload edges; the clamp, whose twin
   sends the clamped point) is the forged command with only the refused part removed, everything else equal (the
-  advisor's condition 1).
+  advisor's condition 1). For a refused press the refused part is the press itself: the twin's counter for that button
+  is one lower from the refused command on, every other field equal, and the twin removes exactly the presses the
+  forged run's reports list (the advisor's W1-U4D ruling).
 - **`event.clamp_kind.counted_count` counts refusals only, never clamp reports** (SERIES.md:144; marks.json -21's
   "clamp: never refused or counted"): npt-lab writes it from the refusal counters, and a clamp report adds nothing to
   it (the advisor's condition 1).
@@ -416,8 +428,11 @@ the critics'.
   vehicles (the 4 of at least 20 parts in the fight); 300 live projectiles as trajectory records; 384 effect rows (8 per
   soldier) in the state and the hash; doors giving one portal change per second near the fight; one destructible-wall
   stand-in; the stand-in weapon's interval in integer sub-tick units for 700 shots per second with deaths counted;
-  DM_Tri's extent (LEGACY_INVENTORY.md:153). A soldier counts in `soldiers_count` whether alive or awaiting respawn
-  (one per slot), so deaths never drop it below 48.
+  DM_Tri's extent (LEGACY_INVENTORY.md:153); the 4 very large units loop inside the fight and the other 11 elsewhere,
+  and the stand-in projectiles start inside it; parts are recorded relative to their hull; effect rows record their
+  end tick; a hit takes 1 of 1,000 health and SS and ES script no reloads, with a magazine that covers an S30 plus 5
+  minutes at one soldier's rate (the advisor's W1-U4D ruling). A soldier counts in `soldiers_count` whether alive or
+  awaiting respawn (one per slot), so deaths never drop it below 48.
 - **The shot band under each precondition suite (arithmetic, before any run):** 700 / (48 x 30) = 0.486 shots per
   command-tick.
   - B1 under option A (nothing runs during a burst: OQ-0001-6 (a), ADR 0001:1156-1162): each 1 s burst loses about 22
@@ -451,7 +466,7 @@ sub-unit that moves its mark.
 | -48/no-buffer-wait | the estimate without the input-buffer wait | view-hit share | where the buffer settles at 2 ticks or more (P3, option B, read from -20's logged depth; below 2, the advisor is asked before a fixed minimum is set) | honest view times replaced |
 | -58/lt-cmd-seq | the room's sequence-forward compare | 0 commands refused | sequence 2 below its wrap | post-wrap commands refused |
 | -58/lt-press | the room's press-edge compare | 0 presses lost or doubled | presses scripted through the wrap | an edge lost |
-| -58/lt-tick-offset | the client's "last command run" compare, where its replay starts | 0 untraced corrections | offsets crossing the wrap | replay starts at the wrong command |
+| -58/lt-tick-offset | the client's rebuild of the header's 16-bit 'last command run' sequence, where its replay starts (a plain `<` in place of its wrap-aware compare): U4e builds the rebuild, U4g's Predictor starts its replay there (the advisor's W1-N2 ruling; U4E-Q2) | 0 untraced corrections | command sequences crossing the wrap (as -58/lt-cmd-seq: a few steps below it) | U4e: the rebuilt sequence names the wrong command; U4g: the replay starts at the wrong command |
 | -58/lt-event-seq | the client's event-number rebuild | decoded hash (event numbers are hashed: §4.6) | event numbers 3 below the wrap; SS's hits flow | a post-wrap event rebuilt wrong |
 | -58/lt-ack | the room's rebuild of the 16-bit ack: a wrong rebuild names a snapshot never sent, and the check "the acknowledgement names a sent snapshot" refuses that datagram's commands | 0 commands refused | acks crossing the wrap | a post-wrap ack refused |
 | -62/cues-from-replay | CueLog written from replays | plays at most once | suite `cues`: the replay skip off, a replay on every snapshot (as PM-0001-44: ADR 0001:1650) | a replayed shot plays twice |
@@ -475,8 +490,9 @@ sub-unit that moves its mark.
   own Rewinds.
 - **One driver:** `npt_sim::replay::Replayer` (feed words, step, per-tick hash and dump). npt-lab's `hash` subcommand
   runs it natively; npt-hash-wasm's exports wrap it; D-2 calls it in a test.
-- **Sources:** U4d's three synthetic recordings from a seeded generator in npt-sim's test support (open-loop commands,
-  Rewinds drawn inside the ring), needing no room; U4r's three runner recordings (`scenario --record`: SS P2 seed 1, ES
+- **Sources:** U4d's three synthetic recordings from a seeded generator in npt-sim's library (`Recording::synthetic`),
+  since U4d2's step regenerates the recordings from the manifest (open-loop commands, Rewinds drawn inside the ring),
+  needing no room; U4r's three runner recordings (`scenario --record`: SS P2 seed 1, ES
   P3 seed 2, TC B1 seed 3), which hold the room's real Rewinds; and a fourth runner recording, **SS P0 seed 4**
   (`scenario --record`), the -30 pre-check's source (the advisor's condition 3). Replayed at P0, the other three's view
   times sit about one RTT older than P0's estimate, so the room would replace them on both legs, each from its own RTT;
@@ -610,7 +626,8 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
     portal changes per second with a mean in 0.95-1.05 (marks.json PM-0001-2's bands).
   - D-7 the hash and dump vectors pinned (their cross-target half is U4d2's).
   - D-8 the clamp: a point beyond reach + 0.87 cm lands at the reach on the grid; a point within it is untouched; a
-    clamped point sent again is not moved.
+    clamped point sent again is not moved; all three for every fire origin below the bound World's doc states (no
+    scene places one above it); above it a reach point saturates in z and is not claimed to lie at the reach.
   - D-9 a `Rewind` blends tick_a and tick_a + 1 by its fraction against a reference; a Rewind outside the ring is
     refused and counted.
   - D-10 refused input leaves no trace (the advisor's condition 1): one unit test per kind the sim checks (the
@@ -689,7 +706,7 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
     filter, the mirror hash of §4.6); `EventQueue` (§4.7); `InterestGrid` (integer cm), `AreaFlood` (from
     `portal_states`), `Priority`; `InputBuffer` option B with `buffer_depth_ticks`; `rewind_at` (the integer half; the
     tolerance and cap rules land in U4h); the room-side checks -58's counters pass through; Resync one in flight.
-    room/clippy.toml gains the hash-map type bans.
+    room's and client's clippy.toml gain the hash-map type bans (§4.11; U4E-Q8).
   - npt-server's library: `Decoder::pump` (decode, socket checks, the ping sender and answers with their hold time,
     per-client RTT and bytes sent: §4.5, §4.9), `ConnLimits`, `Counters`, the rate buckets and the Join deadline on the
     injected now. No AddrTable and no handshake cap (U6).
@@ -709,7 +726,8 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
   the gap, so no fresh delta decodes within 500 ms; the clean build decodes one. If the bite's baseline turns out to be
   one the client still holds, the bite is not a defect on L1, and -18's L1 part comes to the advisor before it counts.
 - **Bites (unit-shown):** no-fallback (-18, shown end to end as above), tick16, client-rounding (the client's call
-  site), lt-ack, lt-tick-offset and lt-event-seq (§4.14), owner-to-all (catalogue item 5's), no-trailing and no-channel through the pump.
+  site), lt-ack, lt-tick-offset and lt-event-seq (§4.14), lt-cmd-seq and lt-press (the room's compares), server-echo
+  (-62, the room's routing), owner-to-all (catalogue item 5's), no-trailing and no-channel through the pump.
 - **Marks moved:** none judged (U4r runs them).
 - **Reviewers:** netcode-architect, security-auditor (the decode path, roster and token compare), engine-architect
   (crate boundaries), rust-reviewer, test-engineer.
@@ -734,7 +752,6 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
   - -17 at L1 P0, P2, P3 and B1 (10 min, 48 clients, SS); bites tick16 (runs starting at `tick_start` = 63,736) and
     client-rounding.
   - -57 on -17's runs; bites pos-4cm, yaw-12bit, pitch-8bit.
-  - -58 for 10 s at P0 and P3, every counter a few steps below its wrap; its six bites (§4.14).
   - -18 at L1 B1 (10 bursts, each offset 0 to 1 tick; the fresh-delta reading: advisor-u3q.md:180-186); bite
     no-fallback, with `burst_eviction` logged.
   - **-30's pre-check, a recorded npt-lab test, not a judged id (Q10; the advisor's conditions 2 and 3):**
@@ -772,8 +789,9 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
 
 ### U4f, clock and commands (depends on U4r; size M; its own brief)
 - **Builds:** `ClockSync` (§4.8); the client's tick-lead controller (net F104); `InputBuffer` option A; every other
-  room-side check with its -21 counter; the server-side checks (size, trailing bytes, wrong channel, the bucket); the
-  cheats' `Behaviour`s (the 11 forged kinds per §4.10, the clamp points, the 1.5x clock, the lag switch, the never-acker).
+  room-side check with its -21 counter; the server-side checks' -21 counters and judged runs on U4e's pump (U4e builds
+  and unit-tests the checks: U4E-Q11); the cheats' `Behaviour`s (the 11 forged kinds per §4.10, the clamp points, the
+  1.5x clock, the lag switch, the never-acker).
 - **Marks moved** (build, merge, then the judged runs): -47 (1,000 connects at P2; bites newest-raw-sample and
   tick-quantised receive times); -20 (P3, both options; bite redundancy-1); -21's 8 parts with their twins (§4.10) and
   13 bites, each bite run in the suite and option §4.14 or marks.json's notes name; -22 (one never-acker among 48 for
@@ -792,7 +810,10 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
   must pass, and runs.txt reports per option; bites §4.14); -42 (the P3 parts PASS **unbitten** at U4, smoothing-off
   being ML-only; the P2 and P4 parts have **no checks**, so they are recorded for -56 item (6), never claimed as
   passing); -60 (100 changes per kind; bite own-state-missing); -45's L1 parts (bite §4.14); -61 (bite release on
-  arrival); -62 (§4.14); -55 (bite a vehicle collision that snaps); -56 item (6)'s -42 share per option.
+  arrival); -62 (§4.14); -55 (bite a vehicle collision that snaps); -56 item (6)'s -42 share per option; -58 (10 s at
+  P0 and P3, every counter a few steps below its wrap, 3 seeds per part; its six bites, §4.14), judged after U4g
+  merges: its untraced-corrections check and lt-tick-offset's failing check read the Predictor (the advisor's W1-N2
+  ruling and U4E-Q2).
 - **Reviewers:** netcode-architect, test-engineer, rust-reviewer.
 
 ### U4h, lag compensation and aim (depends on U4g and on U4c's C2; size M; its own brief)
@@ -828,7 +849,12 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
     existing item waits for U4d's merge and goes to the main session, as carry 1 already says for the grid. Why: U4a
     builds its codec and field tables against these types at the same time, so a silent change breaks the second
     merge. The words are the ruling's condition 3; the carries are u4s-carries.md's
-    (the advisor's U4s ruling, condition 1 (d)).
+    (the advisor's U4s ruling, condition 1 (d)). **Lifted for one change (the advisor's W1-S1 ruling, 2026-11-10):**
+    U4d's fix pass appends one owner-only kind to `EntityKind` (last in `ALL`), holding velocity, the ammunition, the
+    fire timer, the reload left and the move-speed and fire-interval attributes, and takes velocity and the weapon
+    state out of SOLDIER's layout. `EntityRecord::FIELDS`, `Command`, `Rewind`, `CoverVariant` and the five grid fields
+    stay frozen. U4a's half (the kind in both GROUPS tables' own-state rows, the codec's refusal of a kind its section
+    does not list, and its test) is the main session's, in U4d's merge commit, after U4a has merged.
 - **Wave 2:** U4d2 (after U4d) and U4e (after U4a, U4b, U4d) in parallel: U4d2 owns check.mjs, Cargo.toml's members,
   Cargo.lock, crates/hash-wasm and npt-lab's `hash`; U4e owns crates/room, crates/server (beyond schedule.rs) and
   crates/client. In wave 2 only U4d2 edits crates/lab, its Cargo.toml included; U4e's tests live in its own crates
@@ -926,7 +952,12 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
 Plain words first, then the options, then my recommendation. None is Mustafa's to decide before U4 builds. Where an
 answer is a reading of an ADR row's words (Q11, Q16's clamp, Q17, Q22's -22 exception, Q24, and Q26, a reading of
 ADR 0001:1589's stand-in sentence; Q10 is off the list: the advisor's condition 11), the words go into the readings PR
-before R5 on his go (checkpoint :320-324). Changed in rev 2: Q2, Q3, Q4, Q5, Q9, Q10, Q11, Q13, Q15, Q16, Q21, Q22; new: Q23
+before R5 on his go (checkpoint :320-324). The advisor's wave-1 rulings add two readings, in their words: beside Q16's
+clamp, "PM-0001-21's 'a run with only their valid parts' (ADR 0001:1611), for a refused press, is the same stream with
+that press removed: the button's counter one lower from the refused command on (W1-U4D)"; and "PM-0001-58's 'the
+snapshot's tick offsets' (ADR 0001:1607) read as the snapshot header's two command acknowledgements (16-bit
+sequences); the remaining tick offsets, the baseline's age (at most 31: §4.5's ring) and the event age (8 bits), never
+cross a wrap, so they get no bite (W1-N2)". Changed in rev 2: Q2, Q3, Q4, Q5, Q9, Q10, Q11, Q13, Q15, Q16, Q21, Q22; new: Q23
 to Q26.
 
 - **U4-SEAM (Q1), where the sim trait lives.** (a) In npt-sim; npt-room generic over it, depending on npt-sim. (b) In
@@ -1025,9 +1056,14 @@ to Q26.
   `params.stand_ins`; the 384 effect rows stay, since they are state. (b) On everywhere. **Recommend (a).**
 
 ## 11. For Mustafa
-Nothing now. Later, your go on the readings PR before R5, which carries the words of the six readings the advisor
-ruled (the advisor's condition 11): what both sides of the client-held hash cover (Q11); the clamp twin's points at
-the weapon's reach (Q16's clamp); the course's targets as thin plates (Q17); -22 running without the stress-scene
-precondition (Q22's -22 exception); -41's "run speed" as the soldier's movement speed (Q24); and S1's stand-in CPU
-burn off on L1, a reading of ADR 0001:1589's stand-in sentence (Q26). Q10 is off the list. A third unsafe exception
+Nothing now. Later, your go on the readings PR before R5, which carries the words of the eight readings the advisor
+ruled (the advisor's condition 11; its W1-U4D and W1-N2 rulings): what both sides of the client-held hash cover (Q11);
+the clamp twin's points at the weapon's reach for fire origins inside the grid's range, as in every scene (Q16's
+clamp; W1-U4D TUNE-2); PM-0001-21's 'a run with only their valid parts' (ADR 0001:1611), for a refused press, is the
+same stream with that press removed: the button's counter one lower from the refused command on (W1-U4D); the
+course's targets as thin plates (Q17); -22 running without the stress-scene precondition (Q22's -22 exception); -41's
+"run speed" as the soldier's movement speed (Q24); S1's stand-in CPU burn off on L1, a reading of ADR 0001:1589's
+stand-in sentence (Q26); and PM-0001-58's 'the snapshot's tick offsets' (ADR 0001:1607) read as the snapshot header's
+two command acknowledgements (16-bit sequences); the remaining tick offsets, the baseline's age (at most 31: §4.5's
+ring) and the event age (8 bits), never cross a wrap, so they get no bite (W1-N2). Q10 is off the list. A third unsafe exception
 (Q3 B) is the advisor's call (plan.md:430-438).

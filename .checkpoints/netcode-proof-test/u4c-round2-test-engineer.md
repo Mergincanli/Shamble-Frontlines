@@ -11,11 +11,11 @@ place one at a time, restored, sha256-checked; git only inside the copy, no -C/-
 u4c-round2-test/ (runner script, logs, hash lists).
 DEVIATION (stated): this agent has no Edit tool (the call fails "No such tool available: Edit"), so plants cannot go
 through Edit, and rewriting lib.rs (68 KB) whole with Write twice per plant is not a sound method. Plants go through a
-scratch plant script written with Write (u4c-round2-test/r2-plant.py, loading round 1's u4c-test-plant.py by path):
-the method plan §7.2 names ("the bites planted by a scratch script under §7.1") and round 1 used. Exact-match edits with
-occurrence counts, in place, one at a time, original bytes restored, sha256 checked before and after each; backups in
-the session scratchpad (u4c-r2-backup-*). The script waits for quiet BEFORE planting and stops unplanted if none comes
-in 240 s. Notes rewritten whole with Write.
+scratch plant script written with Write (u4c-round2-test/r2-plant.py, loading round 1's u4c-test-plant.py by path;
+r2-plant2.py adds one plant): the method plan §7.2 names ("the bites planted by a scratch script under §7.1") and round
+1 used. Exact-match edits with occurrence counts, in place, one at a time, original bytes restored, sha256 checked
+before and after each; backups in the session scratchpad (u4c-r2-backup-*). The script waits for quiet BEFORE planting
+and stops unplanted if none comes in 240 s. Notes rewritten whole with Write.
 
 ## Plan
 1. sha256 of every file under spikes/netcode-proof in the copy (start state); the three files vs the fix notes and the
@@ -57,4 +57,65 @@ in 240 s. Notes rewritten whole with Write.
   cargo check of npt-sim writes no npt-l1 test binary, and the counts are the expected deltas: counted. Logs:
   u4c-round2-test/r2-check.log, r2-check.foreign.log. sha256 -c after: ALL 158 MATCH.
 - 10:07:51Z Plant run "clean": STOP before planting (no 10 s quiet in 240 s: e0d-1 `cargo test --workspace`); sha256 -c
-  ALL MATCH. Retrying.
+  ALL MATCH. Retried.
+- Step 5, plants (every run: 10 s quiet first, df 11 GB, marker lines present, "Compiling npt-l1 (this copy's path)",
+  no foreign cargo/rustc during it, restored: lib.rs d6e6e130, tests.rs e8014c67, l1.rs 9c23f9cc after each). Logs:
+  u4c-round2-test/<name>.log. Measured build unless said.
+  - 10:12Z clean (marker only): lib 16/16, tests/l1.rs 16/16 pass.
+  - M1, round 1's gaps (round 1: next-event-none passed L-c5; -no-timers and -no-ready passed all 28):
+    next-event-none: FAILS tests::a_host_called_only_at_next_event_ns_... ("link 0, end 1: 31 of 33 items handed out
+    when the host stopped at 3001.000 ms"), tests::lc5_... ("L-c5: link 0: an item that arrived at 51.757190 ms was
+    handed out at 67.000000 ms"), next_event_ns_names_... (tests/l1.rs). next-event-no-timers: FAILS host test ("32
+    of 33 ... 3101.000 ms") and lc5 ("never called at 23 instants with an internal event, the first 112.781568 ms").
+    next-event-no-ready: FAILS host test ("link 1: an item that arrived at 20.000000 ms was handed out at 30.000000
+    ms, not in its instant, 20.000001 ms").
+  - M1, new plants: m1-gate-blind (ready instant = arrival, no gate + 1): FAILS host test only ("it named an instant at
+    or before the call that asked it, 2 times"). m1-late-1ns (every instant 1 ns late): FAILS host test ("link 0: an
+    item that arrived at 51.000000 ms was handed out at 51.000001 ms"), lc5 ("... 51.757190 ms was handed out at
+    51.757191 ms"), next_event_ns_names_... ("nothing before it").
+  - M2: no-packet-threshold (1,000,000): FAILS tests::the_packet_threshold_... only ("declared at [1112.5] ms (by count
+    [false])"); packet-threshold-2: FAILS it only ("[1102.0] ms (by count [true])"); m2-off-by-one (`>` for `>=`):
+    FAILS it only ("[1104.0] ms (by count [true])"). Round 1: the first two passed all 28.
+  - L1: time-threshold-srtt-only: FAILS tests::the_time_threshold_... only ("trial 1: declared lost Some(110.514853) ms
+    after its send, not 9/8 x max(98.235, 100.619) = 113.196 ms"). l1-latest-only: FAILS it ("trial 0: ... 88.930971
+    ms ..., not 9/8 x max(96.363, 79.050) = 108.408 ms": a step-down trial), also lc1 and the estimator test.
+    l1-time-5-4: FAILS it ("trial 0: 120.453577 ms ... 108.408 ms"), also the host test (its path check: "time
+    threshold false"), lc7, the estimator test.
+  - L2: acks-lost-at-profile-rate: FAILS acknowledgements_are_lost_only_inside_bursts only ("361 acknowledgements with
+    the wrong fate, the first (kind, sent ns) Some((2, 69879691))"; round 1 passed all 28). l2-acks-never-lost (`let
+    lost = false`): FAILS it ("222 acknowledgements with the wrong fate, the first Some((0, 1000241224))") and lc3.
+  - L3: event-order-link-first: FAILS tests::lc6_... only ("the two arrivals at 70 ms were not acknowledged in
+    fate-log order, link 3's first (links 2 and 3 at Some(6), Some(7))"; round 1 passed all 28).
+  - L4: pto-from-oldest-unacked: FAILS streams_lose_nothing_... at tests/l1.rs:417 (the new assertion: "2 stream
+    packets resent inside the burst after 2.2 s, the first at 2415856348 ns: a PTO fired") and lc1. l4-send-no-restart
+    (a reliable send no longer re-arms the timer): FAILS it at :417 ("2 stream packets ... the first at 2396452694
+    ns"), also host test (path check "PTOs []"), lc2, lc3, lc6, lc9.
+  - 10:21Z N1, bites build, n1-acks-never-lost-bites (r2-plant2.py; `let lost = false` in send_ack under the bites):
+    tests::bites::bite_no_pto_doubling_fails_lc3 FAILS at tests.rs:1657 ("failed on another check than L-c3's \"doubles
+    at each expiry\": L-c3: link 0: no probe timeout fired") while bite_acks_in_bursts_fails_lc3 passes (its own
+    check) and the other 6 bite tests pass; also lc3, the two-thread test and the L2 test fail (expected). Lib 23/26,
+    tests/l1.rs 20/21.
+- 10:21:46Z Step 7: sha256 -c of all 158 spike files vs sha-before.txt: ALL MATCH (byte-identical to the start; only
+  mtimes moved by the touch loop). git status = the start's (lib.rs M, tests/l1.rs M, src/tests.rs ??, fixer notes);
+  HEAD 097f897; no target/ in the copy. Nothing committed.
+
+## Judgement
+- Closed (each by round 1's own gap plant now failing the new test by name, plus a new plant of mine): M1 (and rust
+  round-1 M, the same gap), M2, L1, L2, L3, L4 (comment reworded to claim no packet-threshold path; the PTO claim now
+  asserted), N1. F1: the doc line (lib.rs:54-57) is accurate; the Join-deadline question it raises stays netcode's /
+  the main session's ruling, not closed by a doc line, not reopened here. Not claimed, stay follow-ups: L1-L4's
+  siblings in rust/netcode round 1 (F2-F7, rust Lows), O1 (npt-net flake, unnamed), O2 (check.mjs tail hides names).
+- Tests that cannot fail: none found among the new ones (each failed under at least two plants). Timing dependence:
+  none (no wall clock; fixed seeds; the path checks in the host test and the trial counts in the time-threshold test
+  make a silent pass on an unexercised path fail instead).
+- New, of the fix: R2-1 Low (= rust Low A): tests.rs:1242-1243 doc says "±20 ms of jitter (50 ± 10 ms each way)"; the
+  profile (tests.rs jitter_ns 40 ms) is ±40 ms round trip, 50 ± 20 ms each way (lib.rs:149-150, :156). Doc only.
+  R2-2 Low (= rust Low B): drive() (tests.rs:873-877) steps 1 ns per call while next_event_ns names a past instant, up
+  to the horizon (5e9 / 1e10 steps): a model stuck on a past instant hangs the host test and L-c5 (check.mjs has no
+  step timeout) instead of failing on the stuck check. Fix: break after a small stuck count (e.g. 1,000) and return.
+  R2-3 Low (process): the fix notes end (:346) on "a third run follows", and the fixer's report says its watch is armed
+  on run 3's log; r2-check-3.log is 15 B, unchanged since 2026-11-10 21:04:46Z, with no process running: that run
+  never ran. This round's counted run (10:04:57-10:07:34Z, 289 / 316, test step free of foreign cargo) stands in its
+  place; the report should say so rather than wait for that watch.
+- Verdict: APPROVE WITH FINDINGS (all claimed fixes closed; 3 Lows, follow-ups; no Critical/High, so no round 3).
+DONE

@@ -274,3 +274,101 @@ by Edit, restored, sha256-checked. Reference sha256 at start = the builder's fin
   - Q28 a sixth RefusalKind: tests/world.rs FAILED to compile (E0004 at :359, the types test's match).
   - Q29 a clamp listed as a refusal: d10 clamp FAILED "rf.refusals.is_empty() && rt.refusals.is_empty()".
   - All restored: every file at its reference sha256 (`sha256sum -c` clean), no PLANT left (grep).
+- F7 RESUMED by a third fixer (2026-11-11 09:50 UTC; the second was cut after Q29's restore at 21:15:42, before
+  check.mjs). Checked: HEAD 097f897; `sha256sum -c` of scratchpad f-ref.sha256 (crates/sim's 15 files, its
+  Cargo.toml and clippy.toml, check.mjs, the workspace Cargo.toml and Cargo.lock) all OK; no PLANT or zz_probe left
+  (grep); df 11 GB free. Read the rulings whole again (W1-S1 :45-112, W1-U4D :113-304) and the four round-1 notes;
+  mapped every new or changed test to its plant (Q1-Q29 cover each; logs p-q*.log in the scratchpad). Next: one
+  npt-sim run per build for the counts, check.mjs twice, fmt check, the closing lists.
+- F8 npt-sim alone (u4d-fix1-run.sh: idle wait, 2 s touch loop, "Compiling npt-sim (this copy's path)" once in
+  each): measured 09:56:44-09:57:46 UTC, 47 pass (lib 3, replay 6, seam 8, world 30); bites 09:57:55-09:59:11, 55 pass
+  (lib 3, replay 7, seam 10, world 35), with --nocapture: T-M1 70.776 shots/s, 9.853 events/s, 21.120 spawns/s (1,062
+  thrown), 32.300 live; H1 over 600 SS ticks: part records changed 4.75 a tick, parts hit 2,850 = part records
+  changed 2,850, effect records 7.74 a tick (of 384); D-6 685.870 shots/s, portal 1.00/s, 28 kills in 100 s, large
+  hulls <= 1,400 cm out, others >= 5,199 cm, stand-ins start <= 1,200 cm; SS magazine lasts 2,194 s, ES's 21,333 s at
+  one soldier's rate; hash-map bite first seen at tick 1234 `bite[0].hash_map_order`.
+- F9 check.mjs RUN 1 (counted), 10:00:24-10:04:39 UTC, by absolute path, cwd this copy's spikes/netcode-proof, shared
+  target, offline, idle at start, 2 s touch loop, no other cargo at the end: all 10 steps pass; test: measured 314
+  (304 + 10), bites 337 (327 + 10), 0 failed, 0 skips; refs 562; marks 81; self 48 of 48; redact 10 of 10, 166 items,
+  0 findings. (An attempt at 10:00:12 ran nothing: `node spikes/netcode-proof/check.mjs` from the script's cwd named
+  a missing path; not a run.) check.mjs prints no cargo lines, so provenance after it (g-prov.sh, same set-up,
+  10:07:28-10:07:39): clippy -D warnings host all-targets and wasm32 lib, measured and bites ("Checking npt-sim (this
+  copy's path)" 4 times), rustdoc -D warnings both builds ("Documenting" 2), `--list` both builds ("Compiling" 2): 102
+  tests = 47 + 55.
+- F10 check.mjs RUN 2 (counted), 10:07:57-10:12:04 UTC, same set-up: all 10 steps pass, the same counts (314 / 337,
+  0 failed, 0 skips; refs 562; marks 81; self 48 of 48; redact 166 items, 0 findings). Provenance after it
+  (10:12:11-10:12:15): the same 8 calls pass, each with this copy's path (Checking 4, Documenting 2, Compiling 2), 102
+  tests listed. `cargo +1.99.1 fmt --all --check` (10:12:15-10:12:16): clean. Every file still at f-ref.sha256 (the
+  runs only touch mtimes). Nothing committed.
+
+### Files changed by the fix pass (against the builder's final state, .gate/u4d-prefix), sha256
+- src/history.rs f11e9b5909ea671974104b599e8382fa6cabbec15a1d37f996d16a85d66f66c6
+- src/lib.rs 396e663d4d851900237b1afa50ac6d9011088950662fdceccbf3e7986e626903
+- src/replay.rs 3b80b11ba83fe1cbc2d1855b0e8dee10af216293a948cc956ddb1fcc1dc1e3d0
+- src/scene.rs c452d329652dffdd3468b3e20e14d1df6876490978593c7ed325587ed10d11fa
+- src/seam.rs 0c41b4066eb4e47d1924b1e615ad591f8c87f6a85113987923fe6acf893d5ce3
+- src/world.rs 2f3cde3de7354b7a68ba14c014e9c7227fa004b515be445374643384dc16d080
+- tests/replay.rs e483603f44dadb683dc96274f98685c2f5c3aaa01121388e0a9f6b233ddac177
+- tests/seam.rs 4900af4e28fd62701d91195bc5ec9e7b17b7c6a0d0ce581d7fdc91ac190285c3
+- tests/world.rs 721c1c966f7ad603a0c1132e724389d41e07b06286bfd3d5fd18504ea46113e8
+- unchanged from the builder: greybox, grid, hash, rng, ticks, trajectory; crates/sim Cargo.toml fb98df48, clippy.toml
+  4fd9facc; check.mjs 6d1ed188, workspace Cargo.toml 75b6c160, Cargo.lock 3da1e15f (= base). No other crate touched.
+
+### Each ruling item: fix, test, evidence (plants: F6's Q-numbers)
+- H1: a part's record = offset x, y, z, yaw relative to its hull, health, parent; `part_center` composes hull ∘ part
+  from grid integers (the one home); offsets asserted in their fields (`World::new`). Tests h1 (hull moves and turns:
+  parts' records unchanged; part records changed ≤ parts whose health changed: 2,850 = 2,850 over 600 SS ticks, 4.75
+  a tick, was 123.5). Q6. D-1, D-2, D-3 pass.
+- A-M1: `pub World::hit_volumes_from(records, tick, into)`; phase 8 and `load_movers` call it; geometry private. Test
+  a_m1 (every SS tick: the authority's volumes = the function of its records; a client's after load_movers too). Q8, Q9.
+- R-M1 = T-M5: `load_movers` skips an unknown index, never grows a pool (movers sized at `new`). Tests r_m1 (probe C's
+  case) and the module test load_movers_never_grows_a_mover_from_decoded_records. Q10a, Q10a', Q10b.
+- N-M1: SS magazine 32,000 (2,194 s at one soldier's rate; 30,625 needed), ES's checked at its rate; a const assert
+  in scene.rs and a D-6 line. Q25 (10,000 fails the build).
+- N-M3 = T-M4: FLAG_FIRED dropped (flags dense: crouch, sprint, reloading, dead); D-3's catch-up tick. Q1 (P11's form
+  fails "CO step 4: record"), Q2.
+- N-M4: very large hulls loop 5, 8, 11, 14 m round the cluster's centre (parts within 3.71 m of the hull); the other 11
+  at 52-82 m; stand-ins start within ±12 m, ±3 m/s. D-6 re-measured: 685.870 shots/s, portal 1.00/s, large ≤ 1,400 cm,
+  others ≥ 5,199 cm, stand-ins ≤ 1,200 cm. Q4, Q5.
+- N-M5: an effect record holds its end tick (TICK field); per-tick expiry kept. Test n_m5; effect records changed 7.74
+  a tick of 384 (was 384). Q7.
+- T-M1: ES meets all four bands over seed 2's 9,000 ticks: 70.776 shots/s, 9.853 events/s, 32.300 live, 21.120
+  spawns/s (1,062 thrown); 48 soldiers and 15 vehicles every tick. Means: a throw takes a spawn from the
+  accumulator; `Scene::grenade_fuse_ms` (ES 1,515, ADR 0001:1478); `Scene::aim_one_in` (ES 11). Test t_m1. Q11a-c.
+- T-M2: cap 10^6 B: 220 ticks, 7,333 ms. carry14 and the replayer's span test moved. Q19.
+- T-M3: blend unit test in world.rs's module, fractions 0, 1, 127, 128, 255, independent reference. Q12 (E6's / 255
+  fails, 3.9 mm off).
+- The press-counter ruling's code half: `Refusal { slot, seq, kind }`, `RefusalKind` (Cooldown, Ammunition, Reload,
+  RewindOutside, PoolFull), `InputReports::refusals`, cleared each step, outside hash and dump. D-5, D-10 assert the
+  records. Q3, Q13, Q14, Q15, Q28, Q29.
+- TUNE-1: `Weapon` public, `Scene::weapon()`, `Scene::health()` (the facts a run header records); kill rate in D-6's
+  100 s: 28 kills, 0.28 a second (the test review's probe F: 0.42 over 13 min, before this pass).
+- TUNE-2: the bound (fire origin ≤ 40.95 m, feet ≤ 3,955 cm; break measured at about 40.57 m feet) in World's doc and
+  module doc and D-8; D-8 gains a half at the bound; the module test: every spawn point, plate, greybox surface and
+  scripted placement below 10 m. Q26, Q27.
+- W1-S1: `EntityKind::OwnState` last in ALL (8 kinds, 3 bits): velocity x, y, z (VELOCITY, raw pre-snap, grid of it),
+  ammunition, fire timer, reload left, move speed, fire interval, each ranged (attribute changes brought into range;
+  scene starts asserted); index = slot, generation = the soldier's. SOLDIER: x, y, z, yaw, pitch, flags, health,
+  weapon id (8). FIELDS 12. Tests s6, carry 12's pins, D-3 (own-state record), carry 9 (velocity in OwnState), w1_s1.
+  Q2, Q16, Q17, Q18, Q22, Q23.
+- Lows: rust N4 (record() debug-asserts each integer in range: Q18), rust L1 = test L5 (decode capped by bytes),
+  rust L2 = test L4 (Replayer fails a non-canonical tick: Q20), test L1 = rust L8 (D-4 reads `pre`: Q24); W1-PUB nit
+  (Recording only at npt_sim::replay::Recording).
+
+### Left for the main session or the advisor
+- SOLDIER has 8 fields, the 8 names the ruling lists; its "(9 fields)" read as a count slip (advisor to confirm).
+- ES's means (aim_one_in, grenade_fuse_ms) are new stand-in tuning, like TUNE-1: for the advisor's ruling. ES's event
+  rate drifts down over a run (F3: 13.4 to 8.7 a second per 50 s window at 1 in 10; the generator's reckoning ignores
+  crouch, sprint and scripted speeds): the 9,000-tick mean is in band, a longer or windowed ES run would read lower.
+  Not fixed.
+- Public items beyond W1-PUB's list: `Weapon`, `Scene::weapon`, `Scene::health` (TUNE-1), besides those W1-PUB
+  already names (OwnState, hit_volumes_from, Refusal/RefusalKind/refusals).
+- Carry 13: met in part (storage identity); the counting half to U5 (W1-U4D).
+- Lows not fixed (follow-ups): rust N5 = netcode clamp Low (clamp runs for non-firing commands); rust L3 (damage index
+  from a foreign ring); rust L6 (events/fired capacity growth on catch-up); rust L7 (Replayer drain and per-word dump
+  perf); rust L9 (write_records twice); rust N1 (Clone destructure), N2 (stream index const assert), N3 (trailing
+  bytes); test L2 (std-sin unit test cannot fail); test N1 (d10 clamp test does not assert its shots), N2 (D-2 pipes
+  without timeout); arch D (two tick owners), arch E (dump per call across Wasm: U4d2); netcode nits (PARENT
+  redundant, a held-back command's Rewind may leave the ring, a non-finite ray is a Miss: carry 45).
+- npt-proto's half (main session, U4d's merge commit): see the report.
+DONE (2026-11-11 10:14 UTC).

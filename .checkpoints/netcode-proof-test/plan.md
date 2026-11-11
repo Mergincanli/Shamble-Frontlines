@@ -582,7 +582,8 @@ PM-0002-* is judged here.
 - **npt-sim:** `SimCore` (the seam trait, with its plain-data input and output types; moved from npt-room: the
   advisor's Q1 ruling, 2026-11-09, advisor-u4.md), `World` (implements the seam), `HitHistory` (the ring of past hit
   volumes, owned by the room and lent to `step`; moved from npt-room: the advisor's Q2 ruling), `Scene::stress`,
-  `Greybox`, `Areas`, `Portals`, `SimRng`, `trajectory_at`, `StandIns`.
+  `Greybox`, `Areas`, `Portals`, `SimRng` (crate-private: no other crate draws from the sim's streams; the advisor's
+  W1-PUB ruling), `trajectory_at`, `StandIns`.
 - **npt-proto:**
   - the messages: `Input`, `Snapshot`, `FullState`, `Resync`, `Ping`, `Pong`, `Join`, `JoinAccepted`, `JoinRejected`,
     `ClientSettings`, `RoomEnded`, `Leave`, `Kick`, and `SessionStatus` (room → client, owner, to the capability

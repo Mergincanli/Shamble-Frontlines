@@ -149,9 +149,12 @@ with the ruling. The file now holds 44 entries; the wave-1 briefs carry them wor
     when `fraction > 0`."
 23. **netcode F12:** "The room stamps each `SimEvent` with the tick it ran (`TickInput::tick`) and its 32-bit event
     number when it queues it; the sim's events carry neither."
-24. **arch F1 (-17's half):** "`ClientEndpoint` takes the grid for every call it makes into `npt_sim::grid` from
-    `npt_client::grid_with_bite` (U4s) under `PM-0001-17/client-rounding`; `npt_client::BITES` grows with U4e's other
-    ids (-17/tick16's client half, -58's, -45's, -62's); no id appears in two crates' lists."
+24. **arch F1 (-17's half; reworded by the advisor's W1-U4E ruling, U4E-Q4 and U4E-Q10):** "`ClientEndpoint` takes
+    the grid for every call it makes into `npt_sim::grid` from `npt_client::grid_with_bite` (U4s) under
+    `PM-0001-17/client-rounding`; `npt_client::BITES` grows with U4e's other client-site ids (-58/lt-tick-offset and
+    -58/lt-event-seq, the client's rebuilds); -17/tick16 and -58/tick16 stay in `npt_proto::BITES`, the endpoint taking
+    its `Quant` from `npt_proto::Quant::with_bite` (U4E-Q4); -45's ids and -62/cues-from-replay join npt-client in U4g,
+    whose code holds their sites (U4E-Q10); no id appears in two crates' lists."
 25. **arch F8:** "npt-room adds `#![deny(clippy::float_arithmetic)]` at the top of crates/room/src/lib.rs beside
     check.mjs's float grep (the grep sees types and literals, not arithmetic on a value whose type it never names), or
     says why not."
@@ -172,14 +175,38 @@ with the ruling. The file now holds 44 entries; the wave-1 briefs carry them wor
     tick count or a named constant derived from the rate, it writes no local form and records the need in its report;
     the main session adds it by carry 18's route in its own commit once U4d2 has merged, and the site and U4e's merge
     follow it.)
+50. **the event age (advisor-u4-wave1.md:347-349; the advisor's W1-N2 ruling):** "An event older than 255 ticks cannot
+    be coded: the event section's age is 8 bits (snapshot.rs's wire text). The room's EventQueue never queues one past
+    that age: the overflow resync (§4.7) ends it first, or the room drops it from the resend and counts it. A unit
+    test."
 
 ## U4r (the L1 runner and its judged runs)
-40. **O1 (u4-conditions-check.md:42-45; advisor-u4.md:343-347; the advisor's U4s ruling, O1):** "U4r's brief, which
-    comes to the advisor, states that at U4r the room has neither the view-time tolerance nor the cap (both land in
-    U4h: u4-build-plan.md §5 U4e's `rewind_at` and §5 U4h), so the -30 pre-check's setup condition (0 view-time
-    replacements and 0 clipped shots on both legs: the advisor's condition 3) holds by construction at U4r, and its
-    RTT argument cannot be tested there; and it either re-runs the pre-check pair after U4h merges (6 runs) or says
-    why not (the advisor's lean is the re-run)."
+40. **O1 (u4-conditions-check.md:42-45; advisor-u4.md:343-347; the advisor's U4s ruling, O1; its last sentence added
+    by the advisor's W1-U4E ruling, U4E-Q5):** "U4r's brief, which comes to the advisor, states that at U4r the room
+    has neither the view-time tolerance nor the cap (both land in U4h: u4-build-plan.md §5 U4e's `rewind_at` and §5
+    U4h), so the -30 pre-check's setup condition (0 view-time replacements and 0 clipped shots on both legs: the
+    advisor's condition 3) holds by construction at U4r, and its RTT argument cannot be tested there; and it either
+    re-runs the pre-check pair after U4h merges (6 runs) or says why not (the advisor's lean is the re-run). The room's
+    count of commands that `rewind_at` gives no Rewind, because the ring does not hold their claimed view time's tick,
+    counts as a replacement in that setup condition: a pre-check leg with any is VOID (U4E-Q5)."
+49. **N-M4 and TUNE-2 (advisor-u4-wave1.md:291-294; the advisor's W1-U4D ruling):** "The contract test's report gives,
+    for each SS suite, the share of snapshots whose client set holds all 4 very large units, and the mean number of
+    projectiles per client set (reported, not judged: W1-U4D N-M4). The runner refuses a scripted spawn or teleport
+    above World's stated clamp bound (W1-U4D TUNE-2)."
+
+## U4f (clock and commands)
+46. **N-M2 = R-M2 = A-C, -21's press twins (advisor-u4-wave1.md:197-235; the advisor's W1-U4D ruling):** "-21's press
+    twins: the twin removes exactly the presses the forged run's `reports()` list as refused (slot, seq, kind) and
+    lowers that button's counter by one from the refused command on, every other field equal; a test shows a forged
+    press stream and its twin give equal state hashes on every tick (D-10's rule, at the room's level)."
+
+## U4g (prediction, interpolation and events)
+47. **A-M2, the predicting World's reset (advisor-u4-wave1.md:240-247; the advisor's W1-U4D ruling):** "The predicting
+    World's reset: an npt-sim entry that sets one slot's soldier from the decoded own-state records (its SOLDIER record
+    and its owner-only record: W1-S1) and the press counters of the client's own command at the snapshot's last-run
+    sequence, exactly as the authority held them after that command. A test: reset from the authority's records at
+    tick T, then predict N commands, equals the authority bit for bit (D-3's rule from a reset, not from a clone). U4g
+    edits crates/sim for it; no lane holds it then (the F2 ruling, point 6)."
 
 ## U4h (lag compensation and aim)
 28. **netcode F6 / rust 3:** "The ring's span is U4h's test cap plus its margin in ms, recorded; the room builds it with
@@ -222,6 +249,11 @@ with the ruling. The file now holds 44 entries; the wave-1 briefs carry them wor
     carry 30's list: it adds what the line leaves out, `OWN_COPY_SNAP_BITES`, `own_copy_snap_with_bite`,
     `Config::floor_rounding`, `Field::integer`, the five field constants, and `EntityKind::ALL` and
     `EntityKind::layout` (advisor-u4.md:268-270)."
+
+## U5 (fuzzing and the counting allocator)
+48. **C13, carry 13's second half (advisor-u4-wave1.md:269-277; the advisor's W1-U4D ruling):** "Carry 13's second
+    half: with PM-0001-34's counting allocator, a test that a push into a full `HitHistory` allocates nothing
+    (u4s-carries.md entry 13; W1-U4D)." (U5's plan states where its allocator's `unsafe` lives under ADR 0002:264-265.)
 
 ## For the advisor
 **NF-D4: drop `InputReports::non_finite` and reword D-4?**
