@@ -8,7 +8,7 @@
 - **Last update:** 2026-11-11 02:22 Amsterdam
 
 ## Steps done
-1. Branch and read-only worktree set up · (this commit) · ok
+1. Branch and read-only worktree set up · 4b8df30 · ok
 
 ## Current step
 2. test-engineer (Opus 5.5, xhigh) drafts rev 1: `.checkpoints/npt-u4r-brief/u4r-brief-draft.md`, notes
@@ -32,4 +32,7 @@
   shift · 2026-11-11 02:18
 
 ## Running work
-- none yet
+- test-engineer (Opus 5.5, xhigh), drafting rev 1 · notes `.checkpoints/npt-u4r-brief/test-engineer-u4r.md` ·
+  launched 02:19 · running
+- saver: background task bw73qu3vn · output in the session's tasks folder (bw73qu3vn.output) · started 02:18 · stops
+  by 04:08 (110 minutes on) · last check 02:20: ok (watching)
