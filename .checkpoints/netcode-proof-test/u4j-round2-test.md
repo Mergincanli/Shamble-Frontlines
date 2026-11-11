@@ -147,6 +147,9 @@ practice.rs to e074d58d and figures.rs to e9282de6, the start hashes): only the 
   params.started_utc turns it INVALID ("run ws-practice-x has no params.started_utc"). Fails safe (never a pass); Low,
   as netcode rates it. Netcode N3 and security N1 (the advisor's plant 3 stays INVALID through the guard) CONFIRMED by
   runs 3 and 4 above.
+- Reading: SERIES.md:294's twin_hash_mismatch_count row still says the twin may have "any role (-21's twins are role
+  twin, -30's each other's measured runs)", while figures.rs:198-203 now refuses any role but twin (FX-4). The fixer
+  flagged it (u4j-build.md, FX-4: "NOT EDITED ... flagged for the advisor"). Finding TE2-6 (Low).
 
 ## My round-1 findings: closed or not
 | Id (sev.) | Routed | Status | Proof |
@@ -193,6 +196,10 @@ practice.rs to e074d58d and figures.rs to e9282de6, the start hashes): only the 
   name and no cause (u4j-build.md:322-325); check.mjs's test summary does not name a failing test, so the first
   failure left no name. Root-cause it (a flake is a defect, never retried into green); have check.mjs print the
   failing test names. Not reproduced in my one counted run.
+- TE2-6 LOW (wording; rides any push, else follow-up with U6-a): SERIES.md:294 says the twin of
+  twin_hash_mismatch_count may have "any role (... -30's each other's measured runs)"; the judge now refuses any role
+  but twin (figures.rs:198-203, FX-4), so the formula row a writer follows contradicts the code until U6-a adds -30's
+  form. Fix: "role twin (-30's form, each other's measured runs, comes with U6)".
 
 ## Claim · proof · gap
 | Claim (the fix pass) | Proof | Gap |
@@ -200,7 +207,7 @@ practice.rs to e074d58d and figures.rs to e9282de6, the start hashes): only the 
 | FX-1: no path moves X, Y, Z past 1.10 | probe A, grid (737 ms max), plants T, BAND, 3, 3+GUARD | guard unreachable (by design); TE2-2 |
 | FX-2: a later practice run changes nothing | E0-E2 test; plant START | NC N2: a practice run with no start still flips FAIL to INVALID (Low, fails safe) |
 | FX-3: one per build over every run; bite at its counted run's numbers | over-every-set test; bite test (1)-(4); plants SET, SERVES | two-in-force bite reading untested (TE2-3) |
-| FX-4: twin role twin | twin-is-measured fixture; profile/bite cases | none |
+| FX-4: twin role twin | twin-is-measured fixture; profile/bite cases | SERIES row still says any role (TE2-6) |
 | FX-5: sources, LG + room x86_64, orphan everywhere, missing replay entry a gap | 8 fixtures, engine room case | LG conjunct unpinned (TE2-1) |
 | FX-6: bound line pinned, checked at load | H1 + commit; marks test; plants PIN, BAND | none |
 | FX-7: exactly 480 heals | 479, 481 cases | none |
@@ -218,4 +225,4 @@ APPROVE WITH FINDINGS. F1 (the High) CLOSED by run: probe A INVALID, a 200-path 
 advisor's plants caught by name (plant 3 through the guard and the pin's tests; its named test bites once the guard
 goes too). F2-F16, R1, R2 CLOSED (C3 deferred to FU-5 by the advisor). No new Critical or High: no round 3 from this
 seat. New: TE2-1 Medium (LG key unpinned; cheap, not before merge), TE2-5 Medium (npt-net flake retried into green;
-outside U4j), TE2-2 to TE2-4 Low. DONE (17:4x UTC).
+outside U4j), TE2-2, TE2-3, TE2-4, TE2-6 Low. DONE (17:4x UTC).

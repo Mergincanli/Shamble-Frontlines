@@ -1,5 +1,9 @@
 # U4e builder brief: the room and the codec path (rev 3)
 
+**The main session's fold before the check (2026-11-11 about 17:50 UTC):** 3.1 re-copied by script from u4s-carries.md
+§U4e as it stands (carry 51's corrected span and the new carries 53-57, advisor-u4d-close.md B2); 3.2 rewritten to
+record the rulings (B1.2, B1.3, B2); 7.2 item 3 marked done. Everything else is rev 3 as drafted.
+
 **Changes in rev 3** (rev 2 is the night draft at 0dccbf0, `.checkpoints/npt-u4e-brief/u4e-brief-draft.md`, written
 before wave 1 merged). Each change names its source: a W1-U4E answer by Q number (advisor-u4-wave1.md:437-497), a
 carry by number (u4s-carries.md), a recheck row by R number (section 7), a plan line (u4-build-plan.md as it stands).
@@ -452,9 +456,46 @@ report says of each, by number, "met" (with the file:line and the test that show
     home in npt-sim: the World finds it as the row's index / the scene's effect rows per soldier (world.rs:1879-1881),
     that count is pub(crate) (scene.rs:119), and the public doc only says 'its owner is its index / 8' (seam.rs:283).
     U4e's own-state filter never copies the 8. It reads the mapping from one public home (a pub accessor such as
-    `Scene::effect_rows()`, or a pub rows-per-soldier constant with a const assert on every scene); npt-sim is not
-    U4e's lane, so if no such home exists when U4e starts, U4e raises it to the main session (carry 26's route),
-    which adds it in its own commit. A test shows that slot k's client receives exactly slot k's effect rows."
+    `Scene::effect_rows()`, or a pub rows-per-soldier constant with a const assert on every scene); npt-sim is not U4e's
+    lane, and no such home exists today: the main session adds `Scene::effect_rows()` (pub, the rows per soldier, 8 or 0
+    in today's scenes; approved as that home by the advisor's U4d close ruling) in its own commit when U4e's build
+    starts, with its line in u4-build-plan.md §4.1's npt-sim row ("`Scene::effect_rows` (an effect row's owner, the one
+    public home: carry 51)"). Any other home U4e finds it needs is a seam change for the advisor (carry 26's route),
+    never a local copy of the 8. A test shows that slot k's client receives exactly slot k's effect rows."
+53. **N2-L1 and the security-auditor's own-state carry (u4d-round2-netcode.md, N2-L1; u4d-round2-security.md,
+    'Carries for U4e', first bullet; the advisor's U4d close ruling):** "The codec checks a record's kind against its
+    section, never its slot against the client: any slot's Soldier, OwnState or Effect record passes in the own-state
+    section. So the room's encoder fills client c's own-state section with c's slot's records only. In every
+    `Snapshot` and `FullState` sent to c, the own-state section's Soldier and OwnState records have index = c's slot
+    and that soldier's generation, and its Effect rows are exactly the rows whose owner is c's slot (carry 51's
+    mapping). A test shows it for every client of an SS room (48 clients) on each of at least 300 ticks, the ticks
+    around a respawn (a generation change) included. Catalogue item 5's L1 check reads each own-section record's
+    identity (kind, index, generation, an Effect row's owner) against the receiving client's slot, not only the
+    section the record sits in. Its owner-to-all bite takes the route the codec leaves open: other slots' own-state
+    records in every client's own-state section. Moving them into the entity section ends in `Err(OutOfRange)` at the
+    encoder; that proves the codec, not the class filter, so it does not count as that bite."
+54. **The encoder's refusals in the room (u4d-round2-security.md, 'Carries for U4e', second bullet; the advisor's U4d
+    close ruling):** "The room handles `Err(OutOfRange)` from the encoder (a section mix-up, or an integer outside its
+    field's range) without a panic, `unwrap` or `expect`: that client's snapshot for that tick is skipped, the error
+    is counted per client and logged (under a name with its SERIES.md row), and the next tick encodes afresh. A test
+    plants one out-of-range record for one client and shows every other client's snapshot for that tick unchanged."
+55. **Team and Public rows (u4d-round2-security.md, 'Carries for U4e', third bullet; the advisor's U4d close
+    ruling):** "npt-proto's `carries()` (snapshot.rs:173-179) counts Team and Public rows as the entity section; both
+    are empty today. A kind placed in a Team row needs the room's class filter (that team only), since the codec
+    cannot tell teams apart. Any Team or Public row added before U4's end comes to the advisor with its filter and a
+    test."
+56. **N2-L3 (c), the own-state section's size (u4d-round2-netcode.md; probe X1, u4d-round2-test.md; the advisor's U4d
+    close ruling):** "U4e's report states the measured own-state section per snapshot: bytes on the wire (mean, p99
+    and max per client), in SS and in ES, with the OwnState record's share of it and how often that record changes.
+    Over an S30 of SS, 47.49 of 48 OwnState records changed each tick (X1): the fire timer and the reload left count
+    down every tick. R2's estimate allows 16 B per snapshot for the local player's own state (r2-netcode.md:1756). A
+    mean above it is reported beside that figure, not judged: PM-0001-12 judges the downstream total."
+57. **U4E-Q6, the room's half (advisor-u4-wave1.md:473-479; the advisor's W1-U4E ruling; homed by the advisor's U4d
+    close ruling):** "The event queue's cap is data, with a provisional value from net F121's arithmetic (1,024 is
+    F121's example, above the about 400 a B1 burst adds), recorded as provisional wherever the run's header records
+    the room's settings; U4f measures the rate and records §4.7's value before -22's runs. The room counts each
+    overflow resync per client, with its tick, in its log, so that every judged -17 and -18 run can report them (carry
+    58)."
 ```
 
 Ten carries (21-27, 39, 50 and 51). Notes for the builder, which change no word:
@@ -468,34 +509,16 @@ Ten carries (21-27, 39, 50 and 51). Notes for the builder, which change no word:
   before launch (7.2 item 2);
 - carry 40 (§U4r, carries :192-199) is U4r's; U4e feeds its last sentence with the `rewind_at` count (2.1).
 
-### 3.2 Pending the advisor's ruling (advisor-u4d-close.md)
-U4d's round 2 proposed these for U4e; the advisor has not ruled on them (advisor-u4d-close.md held only its plan when
-rev 3 was written). They are not settled. If the ruling lands before launch, the main session folds it in here; if not,
-build to the code facts this brief states elsewhere and report what you did against each.
-- **netcode N2-L1, Low** (u4d-round2-netcode.md:78), pending the advisor's ruling (advisor-u4d-close.md): "owner
-  routing is the room's; U4e carry with a test (own section names only c's slot; effects index/8)."
-- **netcode N2-L3 (c), Low** (u4d-round2-netcode.md:81-82), pending the advisor's ruling (advisor-u4d-close.md): "U4e:
-  own-state record 160 bits, changes every tick in SS." (The own state goes in every snapshot: catalogue :130; so its
-  bits come out of each client's window first.)
-- **security's "Carries for U4e"** (u4d-round2-security.md:76-88), pending the advisor's ruling
-  (advisor-u4d-close.md):
-  - "The codec checks kind per section, not slot per client: any slot's Soldier, OwnState or Effect record passes in
-    the own-state section. U4e's encoder puts only the receiving slot's records there (Soldier and OwnState index ==
-    slot, generation the soldier's; Effect owner == slot), and catalogue item 5's L1 check reads record identity in the
-    own section, not just the section. Its owner-to-all bite must take the route the codec leaves open (other slots'
-    own records in every client's own section): the entity-section route now ends in Err(OutOfRange), which proves the
-    codec, not the class filter."
-  - "The room handles Err(OutOfRange) from encode (a section mix-up, an out-of-range integer) without panic or expect:
-    dropped and counted, the client's snapshot skipped for that tick."
-  - "Team and Public rows count as the entity section in carries(); they are empty today. A kind in a Team row later
-    needs U4e's class filter (team only): the codec cannot tell teams."
-  - "Merge-time items the ruling names (not in this copy, due at the merge): the catalogue's own-state row gains the
-    owner-only record (advisor-u4-wave1.md:107-108); U4e's brief rev 3 states the kind and the own-section-only rule
-    (:109)." (Both are done: catalogue :136; 2.1's own-state bullet.)
-- **netcode N2-M2, Medium** (u4d-round2-netcode.md:75-77; u4d-report.md:44-46), pending the advisor's ruling
-  (advisor-u4d-close.md), which may pick either route: ES's 15 vehicles loop 40-82 m out, against ES's "all 15 vehicles
-  in every client's set on ≥ 99 %"; "fix (a scene knob, ES's D-7 pin only) before U4d2 pins ES's hashes, or U4e's report
-  shows its region covers them."
+### 3.2 U4d's round-2 carries: ruled (advisor-u4d-close.md, 2026-11-11)
+The advisor ruled on the items rev 3 held here as pending, and the main session folded the rulings in by script before
+this brief's check:
+- N2-L1, joined with the security-auditor's first carry, is carry 53; the security-auditor's second and third carries
+are 54 and 55; N2-L3 (c) is 56; U4E-Q6's room half is 57. All five are in 3.1, word for word from u4s-carries.md §U4e as
+it stands (B2). The security-auditor's fourth bullet (the merge-time items) is no carry (B2).
+- Carry 51's route is corrected: the main session adds `Scene::effect_rows()` in its own commit when U4e's build starts
+(carry 51 in 3.1; B2).
+- N2-M2 (ES's vehicles) is fixed in the scene by the main session's change U4d-F, before any ES pin (B1.3); U4e edits no
+crates/sim file for it. Any ES number in U4e's report comes from U4d-F's scene (B1.2).
 
 ---
 
@@ -667,7 +690,7 @@ Rows changed: R4, R6, R11, R15, R19, R20, R27, R28 (8 of 28); the other 20 hold.
    are 365, 412 and 52 of 52, with 10 steps.
 2. **Carry 51's home** (R31): either add it before launch by carry 26's route, in a commit of its own (then `<base>`
    holds it, and item 1 applies), or launch as is and take U4e's report of it.
-3. **The pending items** (3.2): fold in advisor-u4d-close.md's rulings if they land before launch.
+3. **The pending items** (3.2): folded in before the check (2026-11-11), from advisor-u4d-close.md B1.2, B1.3, B2.
 4. **U4E-Q12 and U4E-Q13**: the advisor's answers, written into 2.6 and 2.1.
 5. **This brief's checks**: test-engineer's check of rev 3, then the advisor's check before the build (advisor :157).
 
