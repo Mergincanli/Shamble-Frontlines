@@ -114,6 +114,18 @@ pub struct TickRecord {
     /// The tick's state hash, 16 lowercase hex digits.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub h: Option<String>,
+    /// A list of hashes per name, one entry per client slot (index = slot): 16 lowercase hex digits, or `null` where
+    /// this log has no hash for that slot at this tick (`marks/README.md` §1). A 64-bit hash does not fit JSON's safe
+    /// integers, so it is a string, as `h` is.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub hs: BTreeMap<String, Vec<Option<String>>>,
+}
+
+/// True for a hash in the log's form: 16 lowercase hex digits.
+fn hash_form(h: &str) -> bool {
+    h.len() == 16
+        && h.bytes()
+            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
 }
 
 impl TickRecord {
@@ -124,6 +136,7 @@ impl TickRecord {
             v: BTreeMap::new(),
             s: BTreeMap::new(),
             h: None,
+            hs: BTreeMap::new(),
         }
     }
 
@@ -135,15 +148,47 @@ impl TickRecord {
     /// The state hash, if the record has one in the right form.
     pub fn hash(&self) -> Option<u64> {
         let h = self.h.as_deref()?;
-        if h.len() != 16
-            || !h
-                .bytes()
-                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
-        {
+        if !hash_form(h) {
             return None;
         }
         u64::from_str_radix(h, 16).ok()
     }
+
+    /// Stores one hash per client slot under `name`, each as 16 lowercase hex digits, `None` as `null`.
+    pub fn set_hashes(&mut self, name: &str, hashes: &[Option<u64>]) {
+        let list = hashes
+            .iter()
+            .map(|h| h.map(|h| format!("{h:016x}")))
+            .collect();
+        self.hs.insert(name.to_owned(), list);
+    }
+
+    /// The hashes under `name`, one per client slot (`None` for `null`); `None` if the record has no such list or an
+    /// entry is not in the right form.
+    pub fn hashes(&self, name: &str) -> Option<Vec<Option<u64>>> {
+        self.hs
+            .get(name)?
+            .iter()
+            .map(|h| match h.as_deref() {
+                None => Some(None),
+                Some(h) if hash_form(h) => u64::from_str_radix(h, 16).ok().map(Some),
+                Some(_) => None,
+            })
+            .collect()
+    }
+}
+
+/// Every `hs` list's entries are `null` or a hash in the log's form.
+fn check_hs(r: &TickRecord) -> Result<(), String> {
+    for (name, list) in &r.hs {
+        if let Some(bad) = list.iter().flatten().find(|h| !hash_form(h)) {
+            return Err(format!(
+                "tick {}: hs.{name} holds {bad:?}, not 16 lowercase hex digits or null",
+                r.t
+            ));
+        }
+    }
+    Ok(())
 }
 
 /// One second's measurements, per process.
@@ -320,7 +365,8 @@ impl<W: Write> Writer<W> {
                 self.last_tick.unwrap_or(0)
             )));
         }
-        check_names(r.v.keys().chain(r.s.keys()))?;
+        check_names(r.v.keys().chain(r.s.keys()).chain(r.hs.keys()))?;
+        check_hs(r).map_err(invalid)?;
         self.line(&Line::Tick(r))?;
         self.last_tick = Some(r.t);
         Ok(())
@@ -443,6 +489,7 @@ pub fn read_log<R: BufRead>(input: R) -> Result<Log, ReadError> {
             "tick" => {
                 let r: TickRecord =
                     serde_json::from_value(value).map_err(|e| err(format!("tick: {e}")))?;
+                check_hs(&r).map_err(err)?;
                 if last_tick.is_some_and(|last| r.t <= last) {
                     return Err(err(format!(
                         "tick {} after tick {}",
@@ -614,6 +661,71 @@ mod tests {
         assert_eq!(r.hash(), None, "uppercase is not the format");
         r.h = Some("ab".to_owned());
         assert_eq!(r.hash(), None, "short is not the format");
+    }
+
+    /// `hs` (marks/README.md §1, the advisor's nit c): one entry per client slot, a client with no hash at the tick
+    /// written as `null`, and nothing else accepted on either side.
+    #[test]
+    fn hs_holds_one_hash_or_null_per_slot() {
+        let mut r = TickRecord::new(4, Phase::Measured);
+        r.set_hashes("decoded_hash", &[Some(0xab), None, Some(0)]);
+        assert_eq!(
+            r.hs["decoded_hash"],
+            vec![
+                Some("00000000000000ab".to_owned()),
+                None,
+                Some("0000000000000000".to_owned())
+            ]
+        );
+        assert_eq!(
+            r.hashes("decoded_hash"),
+            Some(vec![Some(0xab), None, Some(0)])
+        );
+        assert_eq!(r.hashes("server_hash"), None, "no such list");
+        let mut w = Writer::new(Vec::new(), &header()).expect("header");
+        w.tick(&r).expect("tick");
+        w.tick(&TickRecord::new(5, Phase::Measured))
+            .expect("a tick with no hs");
+        let text = String::from_utf8(w.finish(Ended::Clean).expect("footer")).expect("utf-8");
+        let lines: Vec<&str> = text.lines().collect();
+        assert!(
+            lines[1]
+                .contains(r#""hs":{"decoded_hash":["00000000000000ab",null,"0000000000000000"]}"#),
+            "{}",
+            lines[1]
+        );
+        assert!(!lines[2].contains("hs"), "an empty hs is not written");
+        let log = read_log(text.as_bytes()).expect("reads back");
+        assert_eq!(log.ticks[0], r);
+        assert!(log.ticks[1].hs.is_empty());
+    }
+
+    #[test]
+    fn hs_refuses_a_bad_entry_or_name_when_writing_and_reading() {
+        let mut w = Writer::new(Vec::new(), &header()).expect("header");
+        for (t, name, entry) in [
+            (1, "decoded_hash", "00000000000000AB"),
+            (2, "decoded_hash", "ab"),
+            (3, "decoded_hash", "0x000000000000ab"),
+        ] {
+            let mut r = TickRecord::new(t, Phase::Measured);
+            r.hs.insert(name.to_owned(), vec![Some(entry.to_owned())]);
+            let e = w.tick(&r).expect_err(entry);
+            assert!(e.to_string().contains("16 lowercase hex digits"), "{e}");
+            assert_eq!(r.hashes(name), None, "{entry} is not in the form");
+        }
+        let mut bad_name = TickRecord::new(4, Phase::Measured);
+        bad_name.set_hashes("Decoded-Hash", &[None]);
+        assert!(w.tick(&bad_name).is_err(), "a bad list name");
+        assert_eq!(w.records(), 1, "only the header was written");
+        let text = String::from_utf8(sample_log()).expect("utf-8");
+        let header_line = text.lines().next().expect("header");
+        for entry in [r#""ABCDEF0123456789""#, r#""1""#, "1"] {
+            let line = format!(
+                "{header_line}\n{{\"k\":\"tick\",\"t\":1,\"ph\":\"measured\",\"hs\":{{\"decoded_hash\":[{entry}]}}}}\n"
+            );
+            assert!(read_log(line.as_bytes()).is_err(), "{entry} read back");
+        }
     }
 
     #[test]

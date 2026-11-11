@@ -3,8 +3,10 @@
 
 use crate::figures;
 use crate::marks::{
-    Against, Combine, Cond, Kind, Mark, Marks, Measure, Part, Rule, Source, Stat, Threshold, Window,
+    Against, BoundNumber, Combine, Cond, Kind, Mark, Marks, Measure, Part, Rule, Source, Stat,
+    Threshold, Window,
 };
+use crate::practice;
 use crate::ratio::Ratio;
 use npt_log::{Header, Log, Phase};
 use serde::Serialize;
@@ -72,11 +74,13 @@ pub fn runs(logs: &[Log]) -> Vec<Run<'_>> {
         .collect()
 }
 
-/// Why a value could not be had: a gap in the record (the run is invalid), or code not built yet (NOT-RUN).
+/// Why a value could not be had: a gap in the record (the run is invalid), code not built yet (NOT-RUN), or a
+/// comparison that compared nothing (its check fails: README §2.3).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum Missing {
     Gap(String),
     NotBuilt(String),
+    Empty(String),
 }
 
 fn header_value(h: &Header, key: &str) -> Option<Value> {
@@ -343,6 +347,16 @@ pub enum Outcome {
     Gap,
     /// Not decidable yet (code not built, a reference run missing): NOT-RUN.
     Cannot,
+    /// A comparison that compared nothing (a decoded or twin hash figure with 0 pairs): the run fails, as for `Fail`,
+    /// but no bite is shown by it (a bite run that compared nothing did not test its bite: README §5).
+    Empty,
+}
+
+impl Outcome {
+    /// The check failed the run: a plain failure, or an empty comparison.
+    pub fn fails(self) -> bool {
+        matches!(self, Outcome::Fail | Outcome::Empty)
+    }
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -377,7 +391,7 @@ fn reference(
         ));
     }
     let as_text = |e: Missing| match e {
-        Missing::Gap(s) | Missing::NotBuilt(s) => s,
+        Missing::Gap(s) | Missing::NotBuilt(s) | Missing::Empty(s) => s,
     };
     match against.combine {
         Combine::Pooled => measure(m, &refs, set, from).map_err(as_text),
@@ -402,7 +416,65 @@ fn reference(
     }
 }
 
-fn eval_check(check: &crate::marks::Check, runs: &[&Run<'_>], set: &[&Run<'_>]) -> CheckOut {
+/// The ws-practice rule's tolerance for a check's parts (the mark's rule, else its first part's).
+fn practice_tolerance(mark: &Mark, check: &crate::marks::Check) -> Option<Ratio> {
+    let tolerance = |r: &Rule| match r {
+        Rule::WsPractice { tolerance, .. } => Some(*tolerance),
+        _ => None,
+    };
+    mark.validity.iter().find_map(tolerance).or_else(|| {
+        mark.parts
+            .iter()
+            .filter(|p| check.parts.contains(&p.name))
+            .flat_map(|p| &p.validity)
+            .find_map(tolerance)
+    })
+}
+
+/// A `ws_bound` check with the numbers in force: the bound's number times the practice run's factor, rounded up to
+/// the millisecond (README §2.3); k stays. The ws-practice rule has already held, so a lookup failing here is a gap.
+fn in_force(
+    check: &crate::marks::Check,
+    n: BoundNumber,
+    run: &Run<'_>,
+    ctx: &Ctx<'_>,
+) -> Result<(crate::marks::Check, String), String> {
+    let tolerance = practice_tolerance(ctx.mark, check)
+        .ok_or_else(|| format!("{} holds no ws-practice rule", ctx.mark.id))?;
+    let p = practice::find(run, ctx.all, ctx.mark, tolerance)?;
+    let mut moved = check.clone();
+    match (n, &mut moved.measure) {
+        (BoundNumber::Y, Measure::Series { cond: Some(c), .. }) => c.value = p.moved(n),
+        _ => moved.threshold = Threshold::Value(p.moved(n)),
+    }
+    moved.ws_bound = None;
+    Ok((moved, p.describe(n)))
+}
+
+fn eval_check(
+    check: &crate::marks::Check,
+    runs: &[&Run<'_>],
+    set: &[&Run<'_>],
+    ctx: &Ctx<'_>,
+) -> CheckOut {
+    if let (Some(n), [run]) = (check.ws_bound, runs) {
+        return match in_force(check, n, run, ctx) {
+            Ok((moved, how)) => {
+                let mut o = eval_check(&moved, runs, set, ctx);
+                o.name = check.name.clone();
+                o.needs = format!("{} ({how})", o.needs);
+                o
+            }
+            Err(why) => CheckOut {
+                name: check.name.clone(),
+                outcome: Outcome::Gap,
+                value: None,
+                needs: String::new(),
+                note: Some(format!("ws-practice: {why}")),
+                setup: check.setup,
+            },
+        };
+    }
     let (op, needs_text) = (check.op, |t: &str| format!("{} {t}", check.op.text()));
     let out = |outcome, value: Option<Ratio>, needs: String, note: Option<String>| CheckOut {
         name: check.name.clone(),
@@ -416,6 +488,13 @@ fn eval_check(check: &crate::marks::Check, runs: &[&Run<'_>], set: &[&Run<'_>]) 
         Ok(v) => v,
         Err(Missing::Gap(why)) => return out(Outcome::Gap, None, String::new(), Some(why)),
         Err(Missing::NotBuilt(why)) => return out(Outcome::Cannot, None, String::new(), Some(why)),
+        Err(Missing::Empty(why)) => {
+            let needs = match &check.threshold {
+                Threshold::Value(t) => needs_text(&format!("{t} over at least 1 compared")),
+                Threshold::Against { .. } => String::new(),
+            };
+            return out(Outcome::Empty, None, needs, Some(why));
+        }
     };
     match &check.threshold {
         Threshold::Value(t) => {
@@ -456,7 +535,8 @@ fn field_bool(f: &BTreeMap<String, Value>, name: &str) -> Option<bool> {
     f.get(name).and_then(Value::as_bool)
 }
 
-/// The three rules that hold for every run: consistent headers, complete logs, the roster, and capabilities.
+/// The rules that hold for every run: consistent headers, complete logs, the roster, capabilities, and the build
+/// (the advisor's C4): a measured build never names a bite, and a bite never runs without the bites build.
 pub(crate) fn always_rules(run: &Run<'_>) -> Vec<String> {
     let mut why = Vec::new();
     if !run.inconsistent.is_empty() {
@@ -464,6 +544,34 @@ pub(crate) fn always_rules(run: &Run<'_>) -> Vec<String> {
             "the run's logs disagree on {}",
             run.inconsistent.join(", ")
         ));
+    }
+    let bites_build = run
+        .logs
+        .iter()
+        .any(|l| l.header.build.features.iter().any(|f| f == "bites"));
+    match run.bite {
+        Some(id) => {
+            if run.role != "bite" && run.role != "twin" {
+                why.push(format!(
+                    "build: a {} run names the bite {id}; only a bite run or a bite run's twin may",
+                    run.role
+                ));
+            }
+            if !bites_build {
+                why.push(format!(
+                    "build: the run names the bite {id}, but none of its logs comes from a bites build"
+                ));
+            }
+        }
+        None => {
+            if bites_build {
+                why.push(format!(
+                    "build: a {} run names no bite, but a log of it comes from a bites build (measured builds never \
+                     contain the bites)",
+                    run.role
+                ));
+            }
+        }
     }
     for log in &run.logs {
         let h = &log.header;
@@ -870,7 +978,7 @@ fn rule(
                 return;
             }
             for c in checks {
-                let o = eval_check(c, &[run], set);
+                let o = eval_check(c, &[run], set, ctx);
                 let note = o.note.clone().unwrap_or_default();
                 match o.outcome {
                     Outcome::Pass => {}
@@ -880,9 +988,15 @@ fn rule(
                         o.value.as_deref().unwrap_or("?"),
                         o.needs
                     )),
+                    Outcome::Empty => why.push(format!("pre:{id}: {}: {note}", c.name)),
                     Outcome::Gap => why.push(format!("pre:{id}: a gap in the record: {note}")),
                     Outcome::Cannot => undecided.push(format!("pre:{id}: {note}")),
                 }
+            }
+        }
+        Rule::WsPractice { tolerance, .. } => {
+            if let Err(e) = practice::find(run, ctx.all, ctx.mark, *tolerance) {
+                why.push(format!("ws-practice: {e}"));
             }
         }
     }
@@ -895,7 +1009,7 @@ struct Validity {
     undecided: Vec<String>,
 }
 
-/// The three rules that hold for every run, then each named rule.
+/// The four rules that hold for every run, then each named rule.
 fn validity<'r>(
     run: &Run<'_>,
     rules: impl IntoIterator<Item = &'r Rule>,
@@ -912,9 +1026,12 @@ fn validity<'r>(
     v
 }
 
-/// What every judgement may consult: the whole marks file (for preconditions).
+/// What every judgement may consult: the whole marks file (for preconditions), the mark being judged (whose practice
+/// run the ws-practice rule looks for), and every run the judge reads (where that practice run may be, in any set).
 pub(crate) struct Ctx<'m> {
     marks: &'m Marks,
+    mark: &'m Mark,
+    all: &'m [Run<'m>],
 }
 
 /// The parts of a mark whose `select` a run matches, its role aside.
@@ -1071,7 +1188,7 @@ fn judge_run<'c>(
     }
     let (setup, plain): (Vec<_>, Vec<_>) = checks.partition(|c| c.setup);
     for c in setup {
-        let o = eval_check(c, &[run], &set);
+        let o = eval_check(c, &[run], &set, ctx);
         let note = o.note.clone().unwrap_or_default();
         match o.outcome {
             Outcome::Pass => {}
@@ -1081,7 +1198,9 @@ fn judge_run<'c>(
                 o.value.as_deref().unwrap_or("?"),
                 o.needs
             )),
-            Outcome::Gap => out.invalid_why.push(format!("setup: {}: {note}", c.name)),
+            Outcome::Gap | Outcome::Empty => {
+                out.invalid_why.push(format!("setup: {}: {note}", c.name))
+            }
             Outcome::Cannot => out.undecided.push(note),
         }
         out.checks.push(o);
@@ -1091,7 +1210,7 @@ fn judge_run<'c>(
         return out;
     }
     for c in plain {
-        out.checks.push(eval_check(c, &[run], &set));
+        out.checks.push(eval_check(c, &[run], &set, ctx));
     }
     let gaps: Vec<String> = out
         .checks
@@ -1104,7 +1223,7 @@ fn judge_run<'c>(
             )
         })
         .collect();
-    if out.checks.iter().any(|c| c.outcome == Outcome::Fail) {
+    if out.checks.iter().any(|c| c.outcome.fails()) {
         out.gaps = gaps;
     } else if !gaps.is_empty() {
         out.invalid_why = gaps;
@@ -1127,7 +1246,17 @@ fn rules_of<'m>(mark: &'m Mark, parts: &[&'m Part]) -> Vec<&'m Rule> {
 }
 
 fn fail_lines(part: &str, r: &RunOut, out: &mut Vec<String>) {
-    for c in r.checks.iter().filter(|c| c.outcome == Outcome::Fail) {
+    for c in r.checks.iter().filter(|c| c.outcome.fails()) {
+        if c.outcome == Outcome::Empty {
+            out.push(format!(
+                "{part}: run {}: {}: {}; an empty comparison fails (needs {})",
+                r.run,
+                c.name,
+                c.note.as_deref().unwrap_or(""),
+                c.needs
+            ));
+            continue;
+        }
         out.push(format!(
             "{part}: run {}: {} = {}, needs {}",
             r.run,
@@ -1174,14 +1303,14 @@ fn eval_part(
             .iter()
             .filter(|c| c.pooled && applies(c, &part.name))
         {
-            pooled.push(eval_check(c, &valid_runs, &set));
+            pooled.push(eval_check(c, &valid_runs, &set, ctx));
         }
     }
     let mut why = Vec::new();
     let failed = runs
         .iter()
-        .any(|r| r.valid && r.checks.iter().any(|c| c.outcome == Outcome::Fail))
-        || pooled.iter().any(|c| c.outcome == Outcome::Fail);
+        .any(|r| r.valid && r.checks.iter().any(|c| c.outcome.fails()))
+        || pooled.iter().any(|c| c.outcome.fails());
     let invalid = runs.iter().any(|r| !r.valid) || pooled.iter().any(|c| c.outcome == Outcome::Gap);
     let cannot = runs.iter().any(|r| {
         r.valid
@@ -1194,7 +1323,7 @@ fn eval_part(
                 why.push(format!("{}: run {}: also {g}", part.name, r.run));
             }
         }
-        for c in pooled.iter().filter(|c| c.outcome == Outcome::Fail) {
+        for c in pooled.iter().filter(|c| c.outcome.fails()) {
             why.push(format!(
                 "{}: pooled: {} = {}, needs {}",
                 part.name,
@@ -1327,8 +1456,22 @@ fn eval_bite(
                 matched.iter().any(|p| applies(c, &p.name))
             }
         });
-        let o = judge_run(run, all, &rules, checks, ctx);
-        // Shown when a check fails on a run that held its validity rules and setup checks (C2: gaps aside).
+        let mut o = judge_run(run, all, &rules, checks, ctx);
+        // Shown when a check fails on a run that held its validity rules and setup checks (C2: gaps aside). A bite
+        // run whose only failure is an empty comparison compared nothing, so it did not test its bite: INVALID.
+        if o.valid
+            && !o.checks.iter().any(|c| c.outcome == Outcome::Fail)
+            && o.checks.iter().any(|c| c.outcome == Outcome::Empty)
+        {
+            o.valid = false;
+            for c in o.checks.iter().filter(|c| c.outcome == Outcome::Empty) {
+                o.invalid_why.push(format!(
+                    "{}: {}; an empty comparison shows no bite",
+                    c.name,
+                    c.note.as_deref().unwrap_or("")
+                ));
+            }
+        }
         statuses.push(if !o.valid {
             BiteStatus::Invalid
         } else if o.checks.iter().any(|c| c.outcome == Outcome::Fail) {
@@ -1366,7 +1509,9 @@ fn report_values(
 ) -> Vec<ReportOut> {
     let text = |v: Result<Ratio, Missing>| match v {
         Ok(v) => v.to_string(),
-        Err(Missing::Gap(why) | Missing::NotBuilt(why)) => format!("not available: {why}"),
+        Err(Missing::Gap(why) | Missing::NotBuilt(why) | Missing::Empty(why)) => {
+            format!("not available: {why}")
+        }
     };
     let mut out = Vec::new();
     for part in parts {
@@ -1567,7 +1712,7 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
         }
     }
     if mark.arm_rule && kind == VerdictKind::Fail {
-        why.push("the Arm rule (ADR 0001): an aarch64-only mismatch is a cross-architecture finding; this judge does not apply it yet (U4)".to_owned());
+        why.push("the Arm rule (ADR 0001): an aarch64-only mismatch is a cross-architecture finding; this judge applies it to the decoded hashes (decoded_hash_mismatch_count, against the x86-64 re-decode), and the shot view test's and throw landing's kinds with their figures (U4h)".to_owned());
     }
     v.report = report_values(mark, &v.parts, &members, all);
     v.verdict = kind;
@@ -1578,11 +1723,20 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
 /// One verdict per mark, in `marks.json`'s order.
 pub fn judge(marks: &Marks, logs: &[Log]) -> Vec<Verdict> {
     let all = runs(logs);
-    let ctx = Ctx { marks };
     marks
         .marks
         .iter()
-        .map(|m| judge_mark(m, &all, &ctx))
+        .map(|m| {
+            judge_mark(
+                m,
+                &all,
+                &Ctx {
+                    marks,
+                    mark: m,
+                    all: &all,
+                },
+            )
+        })
         .collect()
 }
 

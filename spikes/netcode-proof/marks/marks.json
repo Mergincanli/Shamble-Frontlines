@@ -3858,33 +3858,53 @@
           "name": "L1 P0",
           "select": {
             "layer": "L1",
-            "profile": "P0"
+            "scene": "SS",
+            "profile": "P0",
+            "clients": 48
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "L1 P2",
           "select": {
             "layer": "L1",
-            "profile": "P2"
+            "scene": "SS",
+            "profile": "P2",
+            "clients": 48
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "L1 P3",
           "select": {
             "layer": "L1",
-            "profile": "P3"
+            "scene": "SS",
+            "profile": "P3",
+            "clients": 48
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "L1 B1",
           "select": {
             "layer": "L1",
-            "profile": "B1"
+            "scene": "SS",
+            "profile": "B1",
+            "clients": 48
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "L2 P0",
@@ -3958,6 +3978,12 @@
         {
           "name": "decoded snapshots compared",
           "figure": "decoded_hash_compared_count"
+        },
+        {
+          "name": "client-ticks left incomplete (a group lost, none refused: not compared, u4-build-plan.md §4.6)",
+          "series": "tick.s.snap_incomplete",
+          "stat": "sum",
+          "window": "all"
         }
       ],
       "bites": [
@@ -3976,7 +4002,7 @@
         "R-5",
         "R-8"
       ],
-      "notes": "L1: 48 headless clients, 3 seeds per profile, 10 minutes each under P0, P2, P3 and B1; L2: LG's 48 clients, 1 run per profile (R3, VS4). The server logs each client's quantised hash per tick, the client logs its decoded hash; each LG client logs every datagram and stream byte it receives (kept on LG). Arm rule: an L2 mismatch counts only once those bytes, decoded again on x86-64 (npt-lab, in this container or on RS: R-8), miss the server's hash too; a mismatch only on aarch64 is reported. The figure fails, never passes, on 0 compared snapshots."
+      "notes": "L1: 48 headless clients, 3 seeds per profile, 10 minutes each under P0, P2, P3 and B1, in the stress scene (its L1 parts select scene SS and 48 clients and carry pre:PM-0001-2: u4-build-plan.md §4.12, the advisor's Q22 ruling); L2: LG's 48 clients, 1 run per profile (R3, VS4; their scene is the R run plans'). The server logs each client's quantised hash per tick (`hs.server_hash`), the client its decoded hash under the tick it rebuilt (`hs.decoded_hash`: the sentinel 0 for a tick with a group it refused, null for a tick it could not complete, counted in `tick.s.snap_incomplete`: §4.6, the advisor's Q11 ruling); each LG client logs every datagram and stream byte it receives (kept on LG). Arm rule: an L2 mismatch counts only once those bytes, decoded again on x86-64 (npt-lab, in this container or on RS: R-8; `hs.replay_hash`, process replay), miss the server's hash too; a mismatch only on aarch64 is reported. The figure fails, never passes, on 0 compared snapshots; a client hash at a tick the server never logged counts as a mismatch."
     },
     {
       "id": "PM-0001-57",
@@ -4176,7 +4202,7 @@
           "setup": true
         },
         {
-          "name": "every 16-bit or narrower counter wrapped in the run (server tick's low 16 bits, command sequence, press counters, tick offsets, event numbers, acknowledgement numbers)",
+          "name": "every 16-bit or narrower counter wrapped in the run (server tick's low 16 bits, command sequence, press counters, the header's command acknowledgements, event numbers, acknowledgement numbers)",
           "series": "event.counter_wrap.tick_count",
           "stat": "count",
           "window": "all",
@@ -4210,7 +4236,7 @@
         },
         {
           "id": "PM-0001-58/lt-tick-offset",
-          "what": "the snapshot's tick offsets compared with a plain <"
+          "what": "the snapshot header's command acknowledgements (16-bit sequences) compared with a plain <"
         },
         {
           "id": "PM-0001-58/lt-event-seq",
@@ -4249,28 +4275,51 @@
           "name": "L1 B1",
           "select": {
             "layer": "L1",
-            "profile": "B1"
+            "scene": "SS",
+            "profile": "B1",
+            "clients": 48
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
-          "name": "L2 B1",
+          "name": "L2 B1 wt",
           "select": {
             "layer": "L2",
             "profile": "B1",
-            "machine.role": "LG"
+            "machine.role": "LG",
+            "params.transport": "wt"
           },
           "min": 1
+        },
+        {
+          "name": "L2 B1 ws",
+          "select": {
+            "layer": "L2",
+            "profile": "B1",
+            "machine.role": "LG",
+            "params.transport": "ws"
+          },
+          "min": 1,
+          "validity": [
+            "ws-practice:1.10"
+          ]
         }
       ],
       "validity": [],
       "checks": [
         {
-          "name": "every client decodes deltas again within 500 ms of the link coming back",
+          "name": "WebTransport: every client decodes a fresh delta within 500 ms of the link coming back",
           "series": "event.burst_heal.after_link_ns",
           "stat": "max",
           "op": "<=",
-          "value": 500000000
+          "value": 500000000,
+          "parts": [
+            "L1 B1",
+            "L2 B1 wt"
+          ]
         },
         {
           "name": "every client after every burst: 48 x 10 heal records",
@@ -4278,6 +4327,43 @@
           "stat": "count",
           "op": ">=",
           "value": 480
+        },
+        {
+          "name": "WebSocket: half the client-bursts heal within X x f (X provisional: bf9d248's first bound, 0.67 s)",
+          "series": "event.burst_heal.after_link_ns",
+          "stat": "p50",
+          "op": "<=",
+          "value": 670000000,
+          "parts": [
+            "L2 B1 ws"
+          ],
+          "ws_bound": "x"
+        },
+        {
+          "name": "WebSocket: at most k client-bursts over Y x f (k and Y provisional: bf9d248's first bound, 5 over 2.5 s)",
+          "series": "event.burst_heal.after_link_ns",
+          "stat": "count",
+          "where": {
+            "op": ">",
+            "value": 2500000000
+          },
+          "op": "<=",
+          "value": 5,
+          "parts": [
+            "L2 B1 ws"
+          ],
+          "ws_bound": "y"
+        },
+        {
+          "name": "WebSocket: no client-burst over Z x f (Z provisional: bf9d248's first bound, 6.9 s)",
+          "series": "event.burst_heal.after_link_ns",
+          "stat": "max",
+          "op": "<=",
+          "value": 6900000000,
+          "parts": [
+            "L2 B1 ws"
+          ],
+          "ws_bound": "z"
         }
       ],
       "report": [
@@ -4290,21 +4376,70 @@
           "name": "heal time p99",
           "series": "event.burst_heal.after_link_ns",
           "stat": "p99"
+        },
+        {
+          "name": "WebSocket: heal time p99.9",
+          "series": "event.burst_heal.after_link_ns",
+          "stat": "p999",
+          "parts": [
+            "L2 B1 ws"
+          ]
+        },
+        {
+          "name": "WebSocket: client-bursts over 1 s",
+          "series": "event.burst_heal.after_link_ns",
+          "stat": "count",
+          "where": {
+            "op": ">",
+            "value": 1000000000
+          },
+          "parts": [
+            "L2 B1 ws"
+          ]
+        },
+        {
+          "name": "WebSocket: unsent plus unacknowledged bytes at a return, max (the server's per-return series)",
+          "series": "event.burst_return.outstanding_bytes",
+          "stat": "max",
+          "parts": [
+            "L2 B1 ws"
+          ]
+        },
+        {
+          "name": "WebSocket: the send budget at a return, max",
+          "series": "event.burst_return.budget_bytes",
+          "stat": "max",
+          "parts": [
+            "L2 B1 ws"
+          ]
+        },
+        {
+          "name": "WebSocket: smoothed RTT at a return, p50",
+          "series": "event.burst_return.srtt_ns",
+          "stat": "p50",
+          "parts": [
+            "L2 B1 ws"
+          ]
         }
       ],
       "bites": [
         {
           "id": "PM-0001-18/no-fallback",
-          "what": "a baseline that never falls back (deltas only against the last acknowledged snapshot)"
+          "what": "a baseline that never falls back (deltas only against the last acknowledged snapshot); WebTransport's parts only (L1 B1, L2 B1 wt)"
+        },
+        {
+          "id": "PM-0001-18/ws-budget-x2",
+          "what": "a send budget twice the formula's (budget_scale 2): fails the WebSocket median check on the L2 B1 ws part, at the measured build's numbers in force"
         }
       ],
       "stand_in": false,
       "arm_rule": false,
+      "ws_bound_line": "npt-ws-bound v1 {\"model\":\"provisional: the single-burst bound of bf9d248 (fixes.rs ws_bar_fix1), not the run-structured bound\",\"commit\":\"bf9d24807106c4524d1aa0849409d219259c3943\",\"runs_count\":2000,\"client_bursts_count\":480,\"x_ns\":670000000,\"y_ns\":2500000000,\"k_count\":5,\"z_ns\":6900000000,\"m_m_ns\":654000000,\"band_low\":\"0.965\",\"band_high\":\"1.035\",\"tolerance\":\"1.10\",\"guard_share\":\"0.0000\"}",
       "readings": [
         "R-5",
         "R-12"
       ],
-      "notes": "B1 with 48 clients, 10 bursts per run (proposed); L1 3 seeds, L2 1 run (R3, VS4). A plain limit per client and burst. Each client writes one `burst_heal` event per burst, when it first decodes a delta after the link returns; a client that never heals writes none, so the count catches it. On L2 the time uses the client's server-clock estimate, whose error bound is PM-0001-47's."
+      "notes": "B1 with 48 clients, 10 bursts per run (proposed), each burst's start moved by a random offset of 0 to one tick period against the room's tick (the advisor's reading, 2026-11-07); L1 3 seeds in the stress scene (scene SS, 48 clients, pre:PM-0001-2: u4-build-plan.md §4.12, the advisor's Q22 ruling); L2 1 run per transport (R3, VS4), the WebSocket one through the accept path's delay wrapper, whose clients run Linux's TCP as the model's do. Each client writes one `burst_heal` event per burst: from the link's return to the decode of the first snapshot the room writes at or after the return instant (a fresh delta; deltas queued during the burst do not count); a client that never heals writes none, so the count catches it. WebTransport keeps the plain 500 ms limit. WebSocket (Mustafa's WS-BAR, 2026-11-07): the median at most X, at most k over Y, none over Z, from the run-structured bound for a correct build with fix 1 and one unjudged practice run of the same build (role practice, listing this mark, earlier, the same scene, profile and burst spacing). The judge reads that run's `ws_practice` record (README §2.5), recomputes s = M_p / M_m and f = max(1, s), and applies X, Y and Z times f, each rounded up to the next millisecond, k unmoved; checks (c) to (e) print the numbers in force with M_p, M_m, s and f beside them. The `ws-practice` rule makes the counted run INVALID unless the record is IN TOLERANCE, or names the advisor's chance ruling (R8 (v)), and its numbers are the judge's; one practice run counts per build (a second needs a ruling naming a found and fixed cause). The tolerance is 1.10 (Mustafa's 10 %), lowered only before the practice run by the bound's guard, never raised. PROVISIONAL: X 0.67 s, k 5 over Y 2.5 s and Z 6.9 s are bf9d248's first, single-burst bound (spikes/netcode-proof/results/u3-ws-fallback/bar-fix1-bf9d248.txt); the run-structured bound (fixes.rs, its own unit after U4r) replaces them, and the tolerance if its guard lowers it, with its committed machine-readable line, named here by path and commit, before R3's run plan. The bound's line is held verbatim in `ws_bound_line`; until fixes.rs's run-structured bound replaces it, its model says provisional, so no counted run can match it. Bites: no-fallback on WebTransport's parts only; ws-budget-x2 on the WebSocket part, judged at the measured build's numbers in force (a bites build has no practice run of its own). On L2 the time uses the client's server-clock estimate, whose error bound is PM-0001-47's. The row's last reported item, the time until a decoded snapshot's extra delay is back under PM-0001-31's 250 ms, gets its series with its writer at U6; the client's fast reconnect over WebSocket is not measured here (OQ-0001-19)."
     },
     {
       "id": "PM-0001-19",
@@ -4482,19 +4617,29 @@
           "name": "L1 P3 option A",
           "select": {
             "layer": "L1",
+            "scene": "SS",
             "profile": "P3",
+            "clients": 48,
             "params.cmd_timing": "A"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "L1 P3 option B",
           "select": {
             "layer": "L1",
+            "scene": "SS",
             "profile": "P3",
+            "clients": 48,
             "params.cmd_timing": "B"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "L2 P3 option A",
@@ -4614,7 +4759,7 @@
       "readings": [
         "R-5"
       ],
-      "notes": "48 clients, 10 minutes under P3, under each of OQ-0001-6's two command-timing options (`params.cmd_timing`; PM-0001-56 records them); L1 3 seeds, L2 1 run (R3, VS4). The server logs each command's arrival against its tick, each press counter's edges and each client's buffer depth every second. The buffer depth feeds PM-0001-49 (each buffered tick adds 33.3 ms to every honest rewind). The reorder rule applies: the presses run 'with reordering'."
+      "notes": "L1's runs are in the stress scene (scene SS, 48 clients, pre:PM-0001-2: u4-build-plan.md §4.12, the advisor's Q22 ruling; redundancy repairs P3's losses, so the shots hold); L2's scene is the R run plans'. 48 clients, 10 minutes under P3, under each of OQ-0001-6's two command-timing options (`params.cmd_timing`; PM-0001-56 records them); L1 3 seeds, L2 1 run (R3, VS4). The server logs each command's arrival against its tick, each press counter's edges and each client's buffer depth every second. The buffer depth feeds PM-0001-49 (each buffered tick adds 33.3 ms to every honest rewind). The reorder rule applies: the presses run 'with reordering'."
     },
     {
       "id": "PM-0001-21",
@@ -4632,75 +4777,115 @@
           "name": "forged, option A",
           "select": {
             "layer": "L1",
+            "scene": "SS",
+            "clients": 48,
             "params.suite": "forged",
             "params.cmd_timing": "A"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "forged, option B",
           "select": {
             "layer": "L1",
+            "scene": "SS",
+            "clients": 48,
             "params.suite": "forged",
             "params.cmd_timing": "B"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "clamp, option A",
           "select": {
             "layer": "L1",
+            "scene": "SS",
+            "clients": 48,
             "params.suite": "clamp",
             "params.cmd_timing": "A"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "clamp, option B",
           "select": {
             "layer": "L1",
+            "scene": "SS",
+            "clients": 48,
             "params.suite": "clamp",
             "params.cmd_timing": "B"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "fast-clock, option A",
           "select": {
             "layer": "L1",
+            "scene": "SS",
+            "clients": 48,
             "params.suite": "fast-clock",
             "params.cmd_timing": "A"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "fast-clock, option B",
           "select": {
             "layer": "L1",
+            "scene": "SS",
+            "clients": 48,
             "params.suite": "fast-clock",
             "params.cmd_timing": "B"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "lag-switch, option A",
           "select": {
             "layer": "L1",
+            "scene": "SS",
+            "clients": 48,
             "params.suite": "lag-switch",
             "params.cmd_timing": "A",
             "profile": "P1"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         },
         {
           "name": "lag-switch, option B",
           "select": {
             "layer": "L1",
+            "scene": "SS",
+            "clients": 48,
             "params.suite": "lag-switch",
             "params.cmd_timing": "B",
             "profile": "P1"
           },
-          "min": 3
+          "min": 3,
+          "validity": [
+            "pre:PM-0001-2"
+          ]
         }
       ],
       "validity": [],
@@ -4915,7 +5100,7 @@
       "stand_in": false,
       "arm_rule": false,
       "readings": [],
-      "notes": "L1, 3 seeds, each suite under each OQ-0001-6 option. Kinds: part 5's checks (ADR 0001:231-239) plus the wrong channel (plan §4.4), 11 in all; the beyond-reach point leaves the set (clamped) and the equal-or-older tick joins it. npt-lab writes one `forged_kind` event per kind (sent, and sent minus rejected-and-counted) and one `clamp_kind` per weapon kind (hitscan; melee and throw where built). The fast clock (1.5x for 60 s) and lag switch write their excess over the bound as signed integers (0 or less passes), with the bound's inputs beside them. A twin is the run with only valid parts (or with points at the reach), named in `params.twin`, role `twin`. Each bite run matches its suite's part (the no-* bites the forged suite; not-older-than the fast clock under option A; refuse-not-clamp the clamp suite)."
+      "notes": "L1, 3 seeds, each suite under each OQ-0001-6 option, in the stress scene (scene SS, 48 clients, pre:PM-0001-2: u4-build-plan.md §4.12, the advisor's Q22 ruling; at most about 9 shots a second are lost to refusals, inside PM-0001-2's band: §4.13). Kinds: part 5's checks (ADR 0001:231-239) plus the wrong channel (plan §4.4), 11 in all; the beyond-reach point leaves the set (clamped) and the equal-or-older tick joins it. npt-lab writes one `forged_kind` event per kind (sent, and sent minus rejected-and-counted) and one `clamp_kind` per weapon kind (hitscan; melee and throw where built). The fast clock (1.5x for 60 s) and lag switch write their excess over the bound as signed integers (0 or less passes), with the bound's inputs beside them. A twin is the run with only valid parts (or with points at the reach), named in `params.twin`, role `twin`. Each bite run matches its suite's part (the no-* bites the forged suite; not-older-than the fast clock under option A; refuse-not-clamp the clamp suite)."
     },
     {
       "id": "PM-0001-22",
@@ -4933,6 +5118,8 @@
           "name": "L1, one never-acker among 48",
           "select": {
             "layer": "L1",
+            "scene": "SS",
+            "clients": 48,
             "params.suite": "never-ack"
           },
           "min": 3
@@ -4996,7 +5183,7 @@
       "stand_in": false,
       "arm_rule": false,
       "readings": [],
-      "notes": "L1, one non-acknowledging client among 48 for 10 minutes, 3 seeds. The room writes the never-acker's queue headroom (cap minus length) per tick, so an unbounded queue goes negative. The cap is a design constant written in `header.params.event_queue_cap_count` and reported."
+      "notes": "L1, one non-acknowledging client among 48 for 10 minutes, 3 seeds, in the stress scene (scene SS, 48 clients: u4-build-plan.md §4.12, the advisor's Q22 ruling) with no pre:PM-0001-2: the designed drop leaves 47 clients, which PM-0001-2's 'a client on every soldier' refuses, and changes the slot count everyone_in_view reads (README §4 states the exception: the advisor's condition 4; a reading of ADR 0001:1589 for the readings PR). Its runs still log PM-0001-2's series (shots, projectiles, vehicles, teams, portals), and U4f's report states the load each run carried. The room writes the never-acker's queue headroom (cap minus length) per tick, so an unbounded queue goes negative. The cap is a design constant written in `header.params.event_queue_cap_count` and reported."
     },
     {
       "id": "PM-0001-23",

@@ -12,16 +12,18 @@ header; tick, second and event records follow in time order. Every record has a 
 | `k` | Fields | Meaning |
 |---|---|---|
 | `header` | `schema` (1), `run`, `set`, `role`, `marks`, `machine`, `build`, `bite`, `layer`, `profile`, `seed`, `tick_hz`, `clients`, `scene`, `process`, `slot`, `date`, `params` | one per file, first; see below |
-| `tick` | `t` (tick number), `ph` (phase), `v` (name → integer), `s` (name → list of integers), `h` (state hash, 16 hex digits, optional) | one per simulated tick that the process measured |
+| `tick` | `t` (tick number), `ph` (phase), `v` (name → integer), `s` (name → list of integers), `h` (state hash, 16 hex digits, optional), `hs` (name → list of hashes, one per client slot, optional) | one per simulated tick that the process measured |
 | `second` | `sec` (seconds since the log's start), `ph`, `v`, `s` | one per second per process |
 | `event` | `ev` (name), `ph`, `t` (tick, optional), `ns` (monotonic ns since the log's start, optional), `f` (name → JSON value) | anything that happens once |
 | `footer` | `records` (the count of records before it), `ended` (`clean`, `crash` or `stopped`) | one per file, last; a file without it was cut short |
 
 - **`header`:**
   - `run` names the run; `set` names the run set that is judged together; `role` is the run's part in its set:
-    `measured` (the default), `bite` (the bites build, `bite` naming the planted defect), `clean` (a clean reference
-    run), `bracket-first` and `bracket-last` (PM-0006-13's lone room), or any role a mark's checks name (`n24`,
-    `logging-off`, `cubic`, …);
+    `measured` (the default), `bite` (the bites build, `bite` naming the planted defect), `twin` (a run's twin from
+    the same build, named in the other's `params.twin`: PM-0001-3, -21; a run and its twin log `h` over the same
+    ticks, since a tick hashed in one only counts as a mismatch), `clean` (a clean reference run),
+    `bracket-first` and `bracket-last` (PM-0006-13's lone room), `practice` (PM-0001-18's unjudged WebSocket
+    practice run, §2.5), or any role a mark's checks name (`n24`, `logging-off`, `cubic`, …);
   - `marks` lists the marks this run serves; the judge reads a run only for those marks;
   - `machine`: `role` (`RS`, `LG`, `MV`, `C`, `ML`, `MP`, `MAC`, `RD`), `name` (the instance: `RS`, `LG1`, `LG2`,
     …; `ML` the named laptop and `ML*` its stand-in, `MAC-r` the runner and `MAC-b` a borrowed Mac),
@@ -30,7 +32,8 @@ header; tick, second and event records follow in time order. Every record has a 
   - `build`: `commit`, `binary_sha256`, `features`, `profile`;
   - `bite`: the bite id, or `null` in every measured build (plan §4.7);
   - `layer` (`L1`, `L2`, `real`), `profile` (`P0` to `P4`, `B1`, `real-path`), `seed`, `tick_hz`, `clients`,
-    `scene` (`SS`, `ES`, `TC`, `CO`, …), `process` (`room`, `bots`, `load`, `lab`, `browser`, …), `slot`;
+    `scene` (`SS`, `ES`, `TC`, `CO`, …), `process` (`room`, `bots`, `load`, `lab`, `browser`, `replay`, …), `slot`;
+  - `layer` `loopback`: the -30 pre-check's Loopback leg, an npt-lab test whose headers list no mark (never judged);
   - `date`: the run's date (`YYYY-MM-DD`), passed in by the caller (npt-log reads no clock);
   - `params`: name → JSON value, every other setting a mark needs from the header (for example `sim`, which is
     `stress` or `stand-in`; `padding_target_ns`; the queue depths of PM-0001-23 and -24; `cmd_timing`, `A` or `B`).
@@ -38,6 +41,30 @@ header; tick, second and event records follow in time order. Every record has a 
 - **Names in `v` and `s`** are lowercase with underscores, and end in their unit: `_ns`, `_bytes`, `_bits`,
   `_permille`, `_count`, `_um` (micrometres) or `_microdeg` (millionths of a degree), or are a 0/1 flag with no unit
   suffix. `SERIES.md` lists every name a mark reads, with its unit and the crate that writes it.
+- **`hs`** in a tick record (U4j; PM-0001-17, -19, -58): name → one entry per client slot of the run: exactly the
+  header's `clients` entries in every record of every log of the run, at index = the room's slot for that client (the
+  slot the room's `tick.s` lists use; a client takes it from `JoinAccepted`), the same in every log, each 16
+  lowercase hex digits, or `null` where this log has no hash for that slot at that tick (a client not connected, a
+  tick it could not complete, a slot another log holds). Read only by figures; npt-log's writer and reader refuse any
+  other entry (a 64-bit hash does not fit JSON's safe integers, so it is a string, as `h` is). Its names:
+  - `server_hash` (the room's log, at tick t): the server's hash of what it meant that client to hold after decoding
+    tick t (`npt_proto::client_hash` over baseline plus delta, the own-state section and the events as sent), never 0;
+    written only in the room's log (process `room`), for each connected client from its admission on, in every phase
+    the clients log; `null` for a client not connected and for a tick whose snapshot the room did not send that
+    client (one the WebSocket send budget skipped);
+  - `decoded_hash` (only in the clients' logs, process `client` on L1 and `bots` on L2, at the tick t the client
+    rebuilt): its hash of the state it holds for t, or the sentinel `0000000000000000` for a tick with a received
+    group it could not decode; `null` for a tick with a group lost and none refused (counted in
+    `tick.s.snap_incomplete`). A client's rebuilt ticks can go back (a wrong 16-bit rebuild), and records are strictly
+    in tick order, so its writer files every hash under its rebuilt tick, buffering and sorting before it writes; a
+    client with two different hashes for one tick writes the sentinel there (one hash met twice, as a duplicated
+    datagram gives, is written once), and no hash is ever dropped: the writer buffers until every earlier tick is
+    written, or ends its log `crash`. Every tick from a client's first snapshot to the end of its log is resolved for
+    that client: a hash, or `null` with `tick.s.snap_incomplete` 1 (a tick none of whose groups arrived counts too,
+    known from the next header's tick); after the measured phase the clients keep logging until every measured tick
+    is resolved, and a tick still in flight at the stop is not written;
+  - `replay_hash` (only in a `replay` log on x86_64, the x86-64 re-decode of an L2 client's logged bytes, R-8): the
+    same as `decoded_hash`, decoded again natively, for the Arm rule.
 - **Events the judge reads for validity** (§4): `admit` (`session`, `in_roster`), `control` (`source`: `socket` or
   `session`; `kind`; `applied`; `rostered`; `cap_valid` for session controls; `peer_ok` for socket controls),
   `affinity` (`when`: `start` or `end`; `cpu`; `alone`; `sibling_free`), `person` (`who`, `mark`, `verdict`:
@@ -59,12 +86,13 @@ header; tick, second and event records follow in time order. Every record has a 
 | `verdict` | string | the mark's kind: `pass` (pass numbers, judged by script), `reported` (no pass number), `person` (judged by a person), `outside` (not in this change-set: always NOT-RUN with `notes`; it has no parts or checks, and may keep its `bites` as data for the change-set that runs it) |
 | `where` | list of strings | where and when it runs (plan §6.2's key: `C`, `R1` to `R7`, `ML*`, `MAC-r`, `MAC-b`, `MP`); informative |
 | `parts` | list of parts | the evidence the mark needs (2.2); empty for `outside` |
-| `validity` | list of strings | the validity rules of §4 that apply to its runs, beyond the three that apply to every run (a part may add its own: 2.2) |
+| `validity` | list of strings | the validity rules of §4 that apply to its runs, beyond the four that apply to every run (a part may add its own: 2.2) |
 | `checks` | list of checks | the pass numbers (2.3); empty for `reported`, `person` and `outside` |
 | `report` | list of statistics | what is reported beside the verdict (2.4) |
 | `bites` | list of objects | `id` and `what`: each planted defect that must fail the mark first; or, with `expect: "invalid"` and `rule`, one that must make its run INVALID by that rule alone (§5) |
 | `stand_in` | bool | true only for PM-0001-4: a pass on a lighter sim is STAND-IN (header `params.sim` = `stand-in`) |
 | `arm_rule` | bool | true for PM-0001-17, -19, -48 and -54 (ADR 0001's Arm rule) |
+| `ws_bound_line` | string | PM-0001-18 holds the WebSocket bound's line (§2.5) verbatim in its `ws_bound_line` (provisional until fixes.rs's bound lands: its `model` says so, so no counted run's header matches it), and `--check-marks` refuses the mark unless the line's X, k, Y and Z equal its `ws_bound` checks' and its `tolerance` the `ws-practice` rule's. A mark with `ws_bound` checks must have it, and only such a mark may |
 | `readings` | list of strings | the plan §15 readings that shaped the entry (`R-6`, …) |
 | `notes` | string | anything the data cannot say: the setup in short, a proposed reading, what is not yet built |
 
@@ -122,6 +150,15 @@ A part selects runs and says how many valid runs it needs:
 - **`setup`** (optional, `true`): a setup condition of the run (the S30 starts below the wrap, the queue holds 4
   datagrams, the cheat fired). Its failure or gap makes the run INVALID, never FAIL: the run did not test the mark.
   No bite is shown by a setup check. A setup check reads its own run only (no `pooled`, no `against`).
+- **`ws_bound`** (optional, `x`, `y` or `z`; PM-0001-18's WebSocket part): the check holds that number of the
+  WebSocket bound (§2.5): `x` and `z` as its `value` (a limit on a statistic), `y` as its `where` value with its
+  `value` the bound's k (a count over Y). The judge applies the number times the practice run's factor f, rounded up
+  to the next millisecond (k never moves), and prints the numbers in force with M_p, M_m, s and f beside the check.
+  Such a check names its parts, each judged by the `ws-practice` rule (§4); a mark has at most one check per letter,
+  and the rule makes a run INVALID unless these checks' numbers are the bound's.
+- **An empty comparison** (the advisor's Q11 ruling, u4-build-plan.md §4.6): a figure that compares pairs
+  (`decoded_hash_mismatch_count`, `twin_hash_mismatch_count`) fails, never passes, when it compared nothing. Its check
+  comes out `empty`: the run fails, as on a failure (its gaps listed beside it), and no bite is shown by it (§5).
 
 ### 2.4 Reported statistics
 `{ "name": "tick p50", "series": "tick.v.work_ns", "stat": "p50" }`, or `{ "name": …, "figure": … }`, with the
@@ -144,8 +181,37 @@ from the part's valid runs, never judged (B10).
 - `params.killed`: only on a room killed on purpose (PM-0001-27's SIGKILL, PM-0006-22's soak kill), and the exemption
   from `complete` holds only if npt-super's log records that kill of that slot (built at U6: C4). PM-0001-59's crashed
   rooms need none: their catch writes the `crash` footer.
-- `hs` in a tick record: name → list of 16-hex-digit hashes (one per client: the decoded or the server's quantised
-  state hash, PM-0001-17, -19, -58), read only by figures (B15; npt-log adds it with its first writer).
+- `hs` in a tick record: built at U4j, §1 (B15).
+- `params.burst_spacing_ns` (B1 runs of PM-0001-18): the scheduled interval between burst starts, before each burst's
+  random offset; the practice run and its counted run must share it. `params.config_hz` (L2): RS's kernel CONFIG_HZ,
+  beside `machine.kernel` (the ruling's `machine.config_hz`: a header param, since npt-log's `Machine` is built by
+  npt-lab's machine reader; the WebSocket practice record's header checks read it).
+- **The WebSocket bound's machine-readable line** (PM-0001-18; the advisor's nit (f) on U4; fixes.rs's
+  run-structured bound writes it, one line in its committed output under `results/u3-ws-fallback/`, in the form
+  npt-judge's own parser reads, `parse_bound` in crates/judge/src/practice.rs): the tag `npt-ws-bound v1 `, then
+  one JSON object with exactly these fields, no others:
+  `model` (the TCP model, `linux-6.8-tcp v3`), `commit` (the full 40-digit commit it ran at), `runs_count` (simulated
+  runs, at least 2,000), `client_bursts_count` (per run, 480 for 48 clients x 10 bursts), `x_ns` (X: the smallest
+  10 ms step with P(run median <= X) >= 0.99), `y_ns` and `k_count` (Y = 2.5 s and k: P(at most k over Y) >= 0.98),
+  `z_ns` (Z: the smallest 100 ms step with P(none over Z) >= 0.98), `m_m_ns` (M_m, the median of the run medians),
+  `band_low` and `band_high` (the 1st and 99th percentiles of a correct build's run median / M_m), `tolerance` (1.10,
+  or lower by the guard; never above 1.10) and `guard_share` (the share of budget-x2 runs whose run median / M_m is at
+  most `tolerance`, at most 0.01). Times are integer ns; the four fractions are decimal strings with at most 6 digits
+  after the point (`"0.965"`), read exactly; band_low <= 1 <= band_high. For example (bf9d248's first bound as numbers; its M_m, band and runs are placeholders):
+  `npt-ws-bound v1 {"model":"linux-6.8-tcp v3","commit":"<40 hex digits>","runs_count":2000,"client_bursts_count":480,"x_ns":670000000,"y_ns":2500000000,"k_count":5,"z_ns":6900000000,"m_m_ns":654000000,"band_low":"0.965","band_high":"1.035","tolerance":"1.10","guard_share":"0.0000"}`.
+  marks.json's PM-0001-18 holds this line verbatim in its `ws_bound_line` (provisional until fixes.rs's bound lands:
+  its `model` says so, so no counted run's header matches it), and `--check-marks` refuses the mark unless the line's
+  X, k, Y and Z equal its `ws_bound` checks' and its `tolerance` the `ws-practice` rule's.
+- **The WebSocket practice run's outcome record** (the run script writes it beside the run, from the run's series and
+  the bound's line): one event `ws_practice` (phase `after`) in a log of the practice run (role `practice`, listing
+  PM-0001-18), with fields `class` (`IN TOLERANCE`, `BEYOND`, `FAR BETTER` or `INVALID`, the advisor's R7), `m_p_ns`
+  (M_p: the run's nearest-rank median over its measured `burst_heal.after_link_ns`), `bound` (the bound's line,
+  byte for byte the mark's `ws_bound_line`), `bound_file` and `bound_sha256` (where that line is committed), `x_moved_ns`, `y_moved_ns`, `z_moved_ns`
+  and `k_count` (the numbers in force), and, only when they exist, `chance_ruling` (the advisor's ruling of chance,
+  R8 (v)) and `second_ruling` (a ruling naming a found and fixed cause, for a second practice run of one build). The
+  record's other fields are for people (`s`, `f`, the band, the record count, the mean message size), and the judge
+  reads none of them: it recomputes s = M_p / M_m and f = max(1, s) exactly, and each moved number as the bound's
+  times f rounded up to the next millisecond, from M_p and the bound's line.
 
 ## 3. How a verdict is reached
 1. The judge reads every results log under the given folder and keeps, per mark, the runs whose header lists it.
@@ -153,7 +219,8 @@ from the part's valid runs, never judged (B10).
    nor a fail (ADR 0001's V-S).
 3. Then its setup checks: a failure or a gap makes the run INVALID.
 4. Then every other check (pooled checks once per part). Any failing check fails the run, its gaps listed beside the
-   failure; with no failure, any gap makes the run INVALID (the advisor's C2 ruling: a gap never hides a failure).
+   failure; with no failure, any gap makes the run INVALID (the advisor's C2 ruling: a gap never hides a failure). An
+   empty comparison (§2.3) fails the run as a failure does.
 5. Per part: any valid run that failed makes the part FAIL; else any invalid run makes it INVALID; else anything not
    decidable yet (a figure not built, a precondition that cannot be checked) or fewer than `min` valid runs make it
    NOT-RUN; otherwise it passes.
@@ -165,9 +232,16 @@ from the part's valid runs, never judged (B10).
    always NOT-RUN.
 
 ## 4. Validity rules
-Three rules hold for every run of every mark (plan §6.1, security F1, F3, N11):
+Four rules hold for every run of every mark (plan §6.1, security F1, F3, N11; the advisor's C4), and for every run a
+figure compares with (a twin, a practice run):
 - **complete:** every log of the run ends with its `footer`, unless its header has `params.killed` true (a room the
   run kills on purpose, as PM-0001-27 does); a cut log makes the run INVALID;
+- **build** (C4: plan §4.7's "measured builds never contain them", checked by the judge, not by the run script alone):
+  a run that names a bite (header `bite`) must have role `bite` or `twin` (a bite run's twin runs the same bite) and
+  at least one log whose `build.features` lists `bites`; in a run that names none (measured, a measured run's twin,
+  clean, practice, …) no log may list `bites`. "At least one log": on L2 the bite lives in one binary (RS's room)
+  while LG's bots may run the measured build. Either way round, the run is INVALID (a `bite` run naming no bite is
+  never judged: it matches no bite and no part);
 - **roster:** any `admit` event with `in_roster` false makes the run INVALID;
 - **capability:** a `control` event that was `applied` with `cap_valid` false (session) or `peer_ok` false
   (socket), or one from a `rostered` session with `cap_valid` false, makes the run INVALID. A control-type message
@@ -194,8 +268,37 @@ The others apply where a mark lists them:
   parts the run matches (its role aside), else those naming no parts; a failure or gap makes the run INVALID (it did
   not run what the mark measures), and a check not computable yet makes it NOT-RUN. `pre:PM-0001-2` is on the SS and
   ES parts at N = 48 of PM-0001-4 to -27 that select on the scene, and on PM-0001-10's scale steps, whose N = 24 and
-  36 counts PM-0001-2 checks by GLOSSARY §3's scaling (soldiers, teams and clients with N; 15, 4 and 300 fixed). The
-  precondition must be a pass mark with no precondition of its own.
+  36 counts PM-0001-2 checks by GLOSSARY §3's scaling (soldiers, teams and clients with N; 15, 4 and 300 fixed);
+  except PM-0001-22's never-ack part, which selects scene SS and 48 clients yet carries no precondition: its designed
+  drop leaves 47 clients, which PM-0001-2's "a client on every soldier" refuses (and it changes the slot count
+  `everyone_in_view` reads), so the precondition could never hold. Its runs still log PM-0001-2's series (shots,
+  projectiles, vehicles, teams, portals), and U4f's report states the load each run carried (the advisor's
+  condition 4 on U4; a reading of ADR 0001:1589, for the readings PR). The precondition must be a pass mark with no
+  precondition of its own.
+- **`ws-practice:<tolerance>`** (PM-0001-18's WebSocket part; Mustafa's WS-BAR and the 10 % tolerance, 2026-11-07;
+  the advisor's rulings R4 to R8 on the docs PR): the run is INVALID unless the runs the judge reads hold its practice
+  run and that run's record (§2.5) puts the numbers in force. The practice run: role `practice`, listing the mark,
+  built from the same binaries (`build.binary_sha256` over its logs), with the same `scene`, `profile`,
+  `params.burst_spacing_ns`, `params.ws_tcp_model` (equal to the bound's `model`), `params.config_hz` and RS's
+  `machine.kernel` (each present in both runs), started (`params.started_utc`) before the run, holding the four rules
+  above, with exactly the bound's `client_bursts_count` measured heal records and exactly one `ws_practice` record. A
+  bite run takes the practice run of its set's measured runs that serve the mark with its layer, profile and
+  `params.transport` (one build among them, else INVALID), so it is judged at its counted run's numbers. One practice
+  run counts per build: of that build's practice runs started before the run (in any set, listing the mark or not),
+  the latest counts, and with more than one only if its record has a `second_ruling`; a practice run started after the
+  run never changes its verdict. The record: its `bound` is the mark's `ws_bound_line` byte for byte; `m_p_ns` is the
+  practice run's own median heal time; with s = M_p / M_m:
+  - `IN TOLERANCE` needs band_low <= s <= tolerance, and the practice run's heals at most k over Y' and none over Z'
+    (the moved numbers);
+  - `BEYOND` needs a `chance_ruling` and s <= tolerance (a lone count or maximum failure);
+  - `FAR BETTER` needs a `chance_ruling` and s < band_low;
+  - `INVALID` never counts.
+
+  f = max(1, s) for IN TOLERANCE and BEYOND, and f = 1 for FAR BETTER (the advisor's R8 (v): at the bound). The judge
+  refuses any f above the tolerance. The record's moved numbers equal the judge's: the bound's times f, rounded up to
+  the next millisecond, with k unmoved. Checks (c) to (e) print the class, M_p, M_m, s, the band, f, the tolerance,
+  the practice run and any ruling's text beside the numbers in force. So no number is set by hand, and nothing in
+  marks.json changes between the practice run and the counted run.
 
 ## 5. Bites first
 Each bite of a mark needs at least one run with role `bite` whose header names that bite and lists the mark. That run
@@ -204,7 +307,9 @@ if it matches none, the checks that name no `parts`. A bite run that passes ever
 ("the bite did not fail: the check cannot be shown to work"). A bite with no run makes the mark NOT-RUN, naming the
 bite. If no check applies to a bite run, the bite is undecided and the mark NOT-RUN. Bite runs follow the same
 validity rules, apart from `min`, with the rules of the parts they match; a bite run is shown when any applicable
-check fails on a run that holds its validity rules and setup checks, gaps notwithstanding.
+check fails on a run that holds its validity rules and setup checks, gaps notwithstanding. An empty comparison
+(§2.3) shows no bite: a bite run whose only failing checks compared nothing did not test its bite, and is INVALID.
+A bite run from a measured build is INVALID by the build rule (§4).
 
 A bite with `expect: "invalid"` and a `rule` (PM-0001-30's "the validity check itself") targets that validity rule:
 it is shown only when its run is INVALID by that rule alone, every other rule holding; a run that holds the rule makes

@@ -196,7 +196,8 @@ the critics'.
 | npt-l1 | `L1Net::next_event_ns` | C1' makes L1 event-driven |
 | npt-bots (library) | `Behaviour` (the brawl, the open-loop scripts, the target-course shooter, the cheats, the never-acker), clock-injected | E12; U4-SERVER |
 | npt-lab | subcommands `scenario` (with `--record`), `replay` and `hash` | plan.md:590-591 |
-| npt-log | `TickRecord.hs` | marks/README.md:147-148 |
+| npt-log | `TickRecord.hs`, with `TickRecord::set_hashes` and `TickRecord::hashes` | marks/README.md:147-148 (since U4j, README §1's `hs`) |
+| npt-judge | `marks::Mark::ws_bound_line`, `marks::Check::ws_bound` and `marks::BoundNumber` (PM-0001-18's WebSocket bound, its line held verbatim); `marks::Rule::WsPractice` (the `ws-practice` rule); `eval::Outcome::Empty`, `eval::Outcome::fails` and `figures::Lack::Empty` (0 compared fails, never passes) | Q20 and the advisor's ws-docs R3-R12 (-18's split, `ws-practice`); the advisor's U4j FX-6 (g) (A19); §4.6's "0 compared fails" |
 | npt-judge | nothing for -30's pre-check: the `PRE-` id, marks/prechecks.json and the `"kind": "precheck"` rule are dropped (the advisor's condition 2) | Q10 (T2); the advisor's condition 2 |
 | a new crate | `npt-hash-wasm` (cdylib; integer-only exports) | U4-WASM (B) |
 | not built at U4 | `BlockWriter` (U7); `TickLoop`, `PhaseTimers`, `ControlSocket`'s socket, `AddrTable`, the handshake cap (U6) | §6 |
@@ -951,15 +952,18 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
 
 ## 10. Questions for the advisor
 Plain words first, then the options, then my recommendation. None is Mustafa's to decide before U4 builds. Where an
-answer is a reading of an ADR row's words (Q11, Q16's clamp, Q17, Q22's -22 exception, Q24, and Q26, a reading of
-ADR 0001:1589's stand-in sentence; Q10 is off the list: the advisor's condition 11), the words go into the readings PR
+answer is a reading of an ADR row's words (Q11, Q16's clamp, Q17, Q22's -22 exception, Q24, and Q26, a reading of ADR
+0001:1589's stand-in sentence; Q10 is off the list: the advisor's condition 11), the words go into the readings PR
 before R5 on his go (checkpoint :320-324). The advisor's wave-1 rulings add two readings, in their words: beside Q16's
 clamp, "PM-0001-21's 'a run with only their valid parts' (ADR 0001:1611), for a refused press, is the same stream with
 that press removed: the button's counter one lower from the refused command on (W1-U4D)"; and "PM-0001-58's 'the
-snapshot's tick offsets' (ADR 0001:1607) read as the snapshot header's two command acknowledgements (16-bit
-sequences); the remaining tick offsets, the baseline's age (at most 31: §4.5's ring) and the event age (8 bits), never
-cross a wrap, so they get no bite (W1-N2)". Changed in rev 2: Q2, Q3, Q4, Q5, Q9, Q10, Q11, Q13, Q15, Q16, Q21, Q22;
-new: Q23 to Q26.
+snapshot's tick offsets' (ADR 0001:1607) read as the snapshot header's two command acknowledgements (16-bit sequences);
+the remaining tick offsets, the baseline's age (at most 31: §4.5's ring) and the event age (8 bits), never cross a wrap,
+so they get no bite (W1-N2)". The advisor's U4j ruling adds one, in its words (advisor-u4j.md, R5): "PM-0001-17's Arm
+rule key ('counts only once that client's logged bytes, decoded again ... on x86-64, miss the server's logged hash too':
+ADR 0001:1605) read as applying only where the server logged a hash: a client hash at a tick the server never logged
+counts on every machine (the U4j fix pass, the advisor's FX-5 (c)). Stricter." Changed in rev 2: Q2, Q3, Q4, Q5, Q9,
+Q10, Q11, Q13, Q15, Q16, Q21, Q22; new: Q23 to Q26.
 
 - **U4-SEAM (Q1), where the sim trait lives.** (a) In npt-sim; npt-room generic over it, depending on npt-sim. (b) In
   npt-room, so npt-sim depends on npt-room, against ADR 0002:186-189. (c) Trait and implementation in npt-room: the
@@ -1057,14 +1061,16 @@ new: Q23 to Q26.
   `params.stand_ins`; the 384 effect rows stay, since they are state. (b) On everywhere. **Recommend (a).**
 
 ## 11. For Mustafa
-Nothing now. Later, your go on the readings PR before R5, which carries the words of the eight readings the advisor
-ruled (the advisor's condition 11; its W1-U4D and W1-N2 rulings): what both sides of the client-held hash cover (Q11);
-the clamp twin's points at the weapon's reach for fire origins inside the grid's range, as in every scene (Q16's
-clamp; W1-U4D TUNE-2); PM-0001-21's 'a run with only their valid parts' (ADR 0001:1611), for a refused press, is the
-same stream with that press removed: the button's counter one lower from the refused command on (W1-U4D); the
-course's targets as thin plates (Q17); -22 running without the stress-scene precondition (Q22's -22 exception); -41's
-"run speed" as the soldier's movement speed (Q24); S1's stand-in CPU burn off on L1, a reading of ADR 0001:1589's
-stand-in sentence (Q26); and PM-0001-58's 'the snapshot's tick offsets' (ADR 0001:1607) read as the snapshot header's
-two command acknowledgements (16-bit sequences); the remaining tick offsets, the baseline's age (at most 31: §4.5's
-ring) and the event age (8 bits), never cross a wrap, so they get no bite (W1-N2). Q10 is off the list. A third
-unsafe exception (Q3 B) is the advisor's call (plan.md:430-438).
+Nothing now. Later, your go on the readings PR before R5, which carries the words of the nine readings the advisor ruled
+(the advisor's condition 11; its W1-U4D, W1-N2 and U4j rulings): what both sides of the client-held hash cover (Q11);
+the clamp twin's points at the weapon's reach for fire origins inside the grid's range, as in every scene (Q16's clamp;
+W1-U4D TUNE-2); PM-0001-21's 'a run with only their valid parts' (ADR 0001:1611), for a refused press, is the same
+stream with that press removed: the button's counter one lower from the refused command on (W1-U4D); the course's
+targets as thin plates (Q17); -22 running without the stress-scene precondition (Q22's -22 exception); -41's "run speed"
+as the soldier's movement speed (Q24); S1's stand-in CPU burn off on L1, a reading of ADR 0001:1589's stand-in sentence
+(Q26); PM-0001-58's 'the snapshot's tick offsets' (ADR 0001:1607) read as the snapshot header's two command
+acknowledgements (16-bit sequences); the remaining tick offsets, the baseline's age (at most 31: §4.5's ring) and the
+event age (8 bits), never cross a wrap, so they get no bite (W1-N2); and PM-0001-17's Arm rule key (ADR 0001:1605) read
+as applying only where the server logged a hash: a client hash at a tick the server never logged counts on every machine
+(stricter; the advisor's U4j ruling, FX-5 (c)). Q10 is off the list. A third unsafe exception (Q3 B) is the advisor's
+call (plan.md:430-438).

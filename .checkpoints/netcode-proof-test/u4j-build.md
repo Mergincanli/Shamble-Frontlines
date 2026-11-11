@@ -332,3 +332,124 @@ crates/log, marks/ only. For each FX: the test first, its failure on the unfixed
   pub(crate)); none removed. Hashes (sha256, first 8): eval.rs 09a17b8a, figures.rs e9282de6, marks.rs 294b9007,
   practice.rs e074d58d, engine.rs d3b437b8, fixtures.rs bb4fb3a5, fixtures/README.md 86836e17, marks.json baa69105,
   README.md 2e837f6f, SERIES.md fa03e6dc; fixtures in the report. DONE.
+
+## Merge into the spike branch (the main session, 2026-11-11, under advisor-u4j-r2.md B1's conditions M1 to M9)
+Round 2 approved (three APPROVE WITH FINDINGS; F1 closed by all three; no round 3); the advisor's round-2 ruling
+APPROVE, merge now. Each condition's result, in the main session's words:
+- **M1, the copy is the one reviewed:** the worktree's HEAD is 411eeeed50d8c71e7e1f74366f0e1d5c27388444, and
+  `sha256sum -c` of u4j-round2-test/hashes-start.sha256, from the worktree's root, gives 66 OK.
+- **M2, the base still fits:** `git diff --quiet 411eeee HEAD -- spikes/netcode-proof/crates/judge
+  spikes/netcode-proof/crates/log spikes/netcode-proof/marks` at the branch head 30528c7: true. Nothing under spikes/
+  changed since 39f4290.
+- **M3, the snapshot and the apply:** no saver running; `worktree_patch.py` listed 64 files, all under
+  spikes/netcode-proof/; the new wip/u4j.patch's sha256 (98ee1f63…) equals 4ad80a9's; `git apply --check`, then
+  `git apply`, on 30528c7.
+- **M4, the merged bytes are the reviewed bytes:** from the main folder's root, `sha256sum -c` of hashes-start.sha256's
+  64 `spikes/` lines gives 64 OK.
+- **M5, check.mjs counted on the merged tree:** through main-run.sh (new in this folder: the lane lock
+  `.gate/shared-target/.lane.lock` held exclusively for the whole sequence, idle at the start, 11 GB free, the 2 s
+  touch loop on crates/, the shared target, offline), 19:55:22-20:01:31 UTC, log .gate/u4j-merge/check1.log. The
+  pre-run builds `cargo test --locked --workspace --no-run`, and the same with `--all-features`, each show "Compiling
+  npt-judge" and "Compiling npt-log" from the main folder's path (every member compiled from it, once in each). Then
+  check.mjs, exit 0, "check: all 10 steps pass": test, measured build 396 passed, 0 failed, 0 reported a skip; bites
+  build 443 passed, 0 failed, 0 reported a skip; marks 81 read and checked, the ADR rows unchanged; self 52 of 52;
+  redact 10 of 10 tests, 236 items, 0 findings; refs 677 files. The counts the ruling expects (365 + 31, 412 + 31, 52).
+- **M6:** no test failed, so nothing was re-run.
+- **M7, the gate:** `node tools/gate.mjs`: checks 1 to 4 and 5b to 5d PASS; 5a (smoke) FAIL, because Chromium could not
+  start: tools/'s Playwright (playwright-core 1.56.1) looks for /opt/pw-browsers/chromium_headless_shell-1194, and this
+  container holds only the 1243 builds. That is the container's fault, not this change's (it touches none of the five
+  legacy files and nothing under tools/). `node tools/gate.mjs --no-smoke`: GATE PASS, as at U4d's merge; CI runs the
+  full gate, smoke included, on the push. Logs: .gate/u4j-merge/gate1.log and gate1-nosmoke.log.
+- **B7.3, U4j's public items, re-derived** by `git diff -U0 411eeee -- crates/judge/src crates/log/src` on the applied
+  tree (every added `pub` line, and every new variant of a `pub` enum): npt-judge `eval::Outcome::Empty` and
+  `Outcome::fails`, `figures::Lack::Empty`, `marks::BoundNumber`, `marks::Check::ws_bound`,
+  `marks::Mark::ws_bound_line`, `marks::Rule::WsPractice`; npt-log `TickRecord::hs`, `TickRecord::set_hashes`, `TickRecord::hashes`. Not public:
+  `eval::Missing::Empty` (pub(crate)) and practice.rs (`mod practice;`, judge/src/lib.rs:9). The ruling's list, so
+  §4.1's two rows are its words.
+- **The merge commit's text,** by u4j_merge_text.py (this folder; its dry run, then `--apply`; every block copied from
+  the rulings by line range, each anchor found once, every new text found in place after, no changed prose line over
+  120 characters, each refilled paragraph's words equal to the old ones with only the substitutions):
+  - u4s-carries.md: entries 61 (§U4e, after 57), 62 and 63 (§U4r, after 60), the new section "The next change to
+    crates/judge (whoever makes it; its first step)" with entry 64, and 65 (§U4d2, after 52), from advisor-u4j-r2.md
+    :447-536 (sha256 f18a0692 → 32acca91);
+  - u4-build-plan.md: §4.1's npt-log row and the new npt-judge row after it (B7.3); §10's preamble and §11 (B7.5, the
+    orphan reading, its quote copied from advisor-u4j.md :538-540 and checked equal to the ruling's block) (7375cdcf →
+    4b8eaab6);
+  - plan.md: the U6 row's C-U6-9 to C-U6-11, after C-U6-8's last words, inside the cell (B7.4) (4e74a152 → 2bef127b);
+  - this file: "Readings, as ruled" below (B5).
+- **M8:** this merge commit (the 64 spike files as applied, `git rm` of wip/u4j.patch, the text above), then the text
+  commit (T1 to T9 by u4j_t1t9.py, its diff holding nothing else; then check.mjs counted again and the gate), both in
+  one push. **M9**, after the push: the saver restarted, the card updated, then U4c's L-c8 judged re-run.
+
+## Readings, as ruled
+Copied by script (u4j_merge_text.py), by line range, as the advisor's U4j round-2 ruling asks (advisor-u4j-r2.md, B5;
+the main session's words in this paragraph only): advisor-u4j.md :472-506 (R3, whole; its heading one level down), then
+advisor-u4j-r2.md :207-218 (B4.2), :220-231 (B4.3) and :174-177 (B3's NC-U4J-R2-N2 line). Line numbers inside the copied
+text are the rulings' own.
+
+### R3. The builder's readings (a) to (f)
+Quoted from the builder's handback ("Readings for the advisor or reviewers"). They are not in u4j-build.md, so the
+main session should copy them into its notes at the merge.
+- **(a) "C4's 'at least one log' form", because -4's U1 fixture has RS's room on the bites build while LG's bots run
+  the measured build: ACCEPTED.**
+  - netcode: right. security F7: sound in the measured direction, and weaker in the bite direction, where it fails
+    safe.
+  - Recorded as a risk; tightened by FU-1.
+- **(b) "A bite run under ws-practice takes its set's measured-build practice run": CHANGED (FX-3 (c)).**
+  - netcode: right, under R11.
+  - Kept: the bite run is judged at the counted run's numbers.
+  - Changed:
+    - the practice run is the one in force for its set's measured runs on the same layer, profile and transport
+      (one build), found over every run the judge reads, with FX-2's start rule;
+    - so a practice run of an older build elsewhere cannot make it INVALID;
+    - and the bite run cannot take an f other than its counted run's.
+- **(c) "The ruling's `machine.config_hz` is written as `params.config_hz`", since a new Machine field would break
+  npt-lab's machine.rs: ACCEPTED.**
+  - No reviewer objected.
+  - My ruling's text (advisor-ws-docs-r2.md:377, SERIES (5)) reads as `params.config_hz` from now on.
+  - FX-13 compares it.
+- **(d) "A bite run that compared nothing is INVALID": ACCEPTED.** All three agree. It can only lower a verdict. It
+  follows README §2.3's rule for setup checks: a run that did not test the mark shows no bite.
+- **(e) "The Arm rule is keyed on the client log's `machine.arch` = aarch64, not on `mark.arm_rule`": CHANGED
+  (FX-5).**
+  - netcode F6 (partly), security F4, test F5 and F11 (wrong).
+  - The key is now:
+    - an LG log on aarch64, with the room on x86_64;
+    - each name from its own process;
+    - an orphan counts everywhere;
+    - a missing replay entry is a gap.
+  - The mark's flag is FU-5.
+- **(f) "The decoded-hash figures read every phase", because -58's wraps fall in its first seconds: ACCEPTED.**
+  netcode: right, and it makes NC-5 (ii) a writer rule. That rule is in FX-12's `server_hash` words (from admission,
+  in every phase the clients log).
+
+### B4.2 The stricter reading of FX-3 (c): two practice runs in force make a bite run INVALID (TE2-3): ACCEPTED
+- The case: a bite run's set holds measured runs of one build, but they have two different practice runs in force
+  (one measured run started after a second practice run of the build, which carries a `second_ruling`). The code
+  refuses it (practice.rs:458-470, in `find`); the test-engineer's probe BITE2 shows it on the head.
+- Why accepted: FX-3 (c) judges a bite run "at its counted run's numbers"; here there are two sets of numbers. A
+  smaller f could show the bite falsely, a larger one hide it, so any choice is a guess. INVALID never guesses and can
+  only lower a verdict (an INVALID bite run shows no bite, so the mark cannot pass on it). The same holds when one of
+  the set's measured runs has no practice run in force at all (`practice_of`'s error, which `find` passes on). The
+  cost: re-run the bite after the set's measured runs share one practice run.
+- README §4 says it (text commit, T4 (i)). Its case: entry 64 (c).
+- A reading of my ruling, not of an ADR row or of Mustafa's words, so it goes into the notes (B5), not the readings
+  PR.
+
+### B4.3 FX-10's malformed entries and its order of outcomes (TE2-4): ACCEPTED
+- A `tick.s.snap_incomplete` value other than 0 or 1 is a structural gap. README §1 names such a series "a 0/1 flag"
+  and SERIES's row says "flag", so this is FX-10 (f)'s "malformed entries", checked first. The fixer added two engine
+  cases for it (a list of 3 under `clients` 2; a value of 2).
+- The order count > empty > gap > waiting > 0 (figures.rs:538-560). FX-10 (f) fixed the first three and put the
+  waiting case after the counted mismatches; it left gap against waiting open. Gap first is right: a run with a
+  coverage gap or an incomplete re-decode cannot become valid when its replay log arrives, so NOT-RUN ("wait for the
+  re-decode") would send the operator after a log that cannot save the run. Both are non-pass, so the order can never
+  loosen a verdict.
+- `cross_arch_mismatch_count` NOT-RUN while a mismatch waits for its re-decode: accepted (it cannot be counted
+  before the re-decode exists).
+- Its case: entry 64 (d).
+
+- **NC-U4J-R2-N2** (a same-build practice run with no readable `params.started_utc` turns a FAIL into INVALID;
+  confirmed by the test-engineer's probe2): the behaviour stays, as the security-auditor argues (skipping such a run
+  would let a stripped timestamp hide a first practice run from the one-per-build count; it fails closed, never
+  looser); README §4 says so in the text commit (T4 (ii)). No code change.

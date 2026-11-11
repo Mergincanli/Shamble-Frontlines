@@ -41,6 +41,10 @@ struct RawMark {
     stand_in: bool,
     #[serde(default)]
     arm_rule: bool,
+    /// PM-0001-18's WebSocket bound line, verbatim (README §2.5): only on a mark with `ws_bound` checks, which must
+    /// hold it.
+    #[serde(default)]
+    ws_bound_line: Option<String>,
     #[serde(default)]
     readings: Vec<String>,
     #[serde(default)]
@@ -114,6 +118,10 @@ struct RawCheck {
     setup: bool,
     #[serde(default)]
     first: Option<u64>,
+    /// `x`, `y` or `z`: the check's number is that number of the WebSocket bound, applied times the practice run's
+    /// factor (README §2.3, the `ws-practice` rule).
+    #[serde(default)]
+    ws_bound: Option<String>,
 }
 
 /// A planted defect that must fail the mark first (plan §6.1, "Bites first"); or, with `expect: "invalid"`, one that
@@ -251,6 +259,17 @@ pub enum Threshold {
     Against { factor: Ratio, against: Against },
 }
 
+/// Which number of PM-0001-18's WebSocket bound a check holds (README §2.3, `ws_bound`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BoundNumber {
+    /// The median's limit: the check's `value`.
+    X,
+    /// The count's limit: the check's `where` value is Y and its `value` is k.
+    Y,
+    /// The maximum's limit: the check's `value`.
+    Z,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Check {
     pub name: String,
@@ -262,6 +281,8 @@ pub struct Check {
     pub pooled: bool,
     /// A setup condition: when it fails, the run did not test the mark, so it is INVALID, never FAIL.
     pub setup: bool,
+    /// The check holds a number of the WebSocket bound, which the judge applies times the practice run's factor.
+    pub ws_bound: Option<BoundNumber>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -284,7 +305,7 @@ pub struct Part {
     pub validity: Vec<Rule>,
 }
 
-/// A validity rule a mark or a part may name (README §4); the three that hold for every run are not listed.
+/// A validity rule a mark or a part may name (README §4); the four that hold for every run are not listed.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Rule {
     VS,
@@ -298,6 +319,14 @@ pub enum Rule {
     LoggingOff,
     /// The run must pass another mark's checks (`pre:PM-0001-2`: it carried the stress scene's load).
     Pre(String),
+    /// PM-0001-18's WebSocket part (`ws-practice:<tolerance>`): the run's set holds its practice run, whose record is
+    /// in tolerance, and the numbers in force are the bound's times its factor (README §4).
+    WsPractice {
+        /// The largest slowdown the numbers may move by (Mustafa's 10 %: 1.10, never raised).
+        tolerance: Ratio,
+        /// The tolerance as `marks.json` writes it.
+        text: String,
+    },
 }
 
 impl Rule {
@@ -311,10 +340,25 @@ impl Rule {
             "late-zero" => Rule::LateZero,
             "reorder" => Rule::Reorder,
             "clean-ref" => Rule::CleanRef,
-            other => match other.strip_prefix("pre:") {
-                Some(id) if id.starts_with("PM-000") => Rule::Pre(id.to_owned()),
-                _ => return Err(format!("validity rule {s:?} is not one of README §4's")),
-            },
+            other => {
+                if let Some(id) = other.strip_prefix("pre:") {
+                    if id.starts_with("PM-000") {
+                        return Ok(Rule::Pre(id.to_owned()));
+                    }
+                } else if let Some(text) = other.strip_prefix("ws-practice:") {
+                    let tolerance = Ratio::parse(text)?;
+                    if tolerance < Ratio::int(1) || tolerance > Ratio::new(11, 10) {
+                        return Err(format!(
+                            "{s:?}: the tolerance is at least 1 and at most 1.10 (Mustafa's 10 %, never raised)"
+                        ));
+                    }
+                    return Ok(Rule::WsPractice {
+                        tolerance,
+                        text: text.to_owned(),
+                    });
+                }
+                return Err(format!("validity rule {s:?} is not one of README §4's"));
+            }
         })
     }
 
@@ -330,6 +374,7 @@ impl Rule {
             Rule::Reorder => "reorder".to_owned(),
             Rule::CleanRef => "clean-ref".to_owned(),
             Rule::Pre(id) => format!("pre:{id}"),
+            Rule::WsPractice { text, .. } => format!("ws-practice:{text}"),
         }
     }
 }
@@ -348,6 +393,10 @@ pub struct Mark {
     pub bites: Vec<Bite>,
     pub stand_in: bool,
     pub arm_rule: bool,
+    /// The WebSocket bound's machine-readable line, verbatim (README §2.5; PM-0001-18): checked at load against the
+    /// mark's `ws_bound` checks and its `ws-practice` tolerance; a practice record's `bound` must equal it byte for
+    /// byte.
+    pub ws_bound_line: Option<String>,
     pub readings: Vec<String>,
     pub notes: String,
 }
@@ -543,6 +592,51 @@ fn compile_check(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Check, Str
     if c.setup && (c.pooled || matches!(threshold, Threshold::Against { .. })) {
         return Err("a setup check reads its own run only: no pooled or against".to_owned());
     }
+    let ws_bound = match c.ws_bound.as_deref() {
+        None => None,
+        Some(letter) => {
+            let n = match letter {
+                "x" => BoundNumber::X,
+                "y" => BoundNumber::Y,
+                "z" => BoundNumber::Z,
+                other => return Err(format!("ws_bound {other:?} is not x, y or z")),
+            };
+            let Measure::Series { stat, cond, .. } = &measure else {
+                return Err("ws_bound holds a series check's number, not a figure's".to_owned());
+            };
+            if c.pooled || c.setup || !matches!(threshold, Threshold::Value(_)) {
+                return Err(
+                    "a ws_bound check is a plain check: no pooled, setup or against".to_owned(),
+                );
+            }
+            if c.parts.is_empty() {
+                return Err("a ws_bound check names its parts (each with ws-practice)".to_owned());
+            }
+            // Each letter's shape is pinned (SEC-F11 on U4j): the judge moves exactly these limits by f.
+            let (shape, want) = match n {
+                BoundNumber::X => (
+                    matches!(stat, Stat::Pct(q) if *q == Ratio::new(1, 2))
+                        && cond.is_none()
+                        && op == Op::Le,
+                    "stat p50, op <= and no where (the median at most X)",
+                ),
+                BoundNumber::Y => (
+                    matches!(stat, Stat::Count)
+                        && matches!(cond, Some(w) if w.op == Op::Gt)
+                        && op == Op::Le,
+                    "stat count, a where with op > and op <= (at most k over Y)",
+                ),
+                BoundNumber::Z => (
+                    matches!(stat, Stat::Max) && cond.is_none() && op == Op::Le,
+                    "stat max, op <= and no where (none over Z)",
+                ),
+            };
+            if !shape {
+                return Err(format!("ws_bound {letter} is {want}; its shape is another"));
+            }
+            Some(n)
+        }
+    };
     Ok(Check {
         name: c.name.clone(),
         measure,
@@ -552,12 +646,15 @@ fn compile_check(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Check, Str
         parts: c.parts.clone(),
         pooled: c.pooled,
         setup: c.setup,
+        ws_bound,
     })
 }
 
 fn compile_report(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Report, String> {
-    if c.setup {
-        return Err("a reported statistic decides nothing, so it is no setup check".to_owned());
+    if c.setup || c.ws_bound.is_some() {
+        return Err(
+            "a reported statistic decides nothing, so it is no setup or ws_bound check".to_owned(),
+        );
     }
     if c.op.is_some() || c.value.is_some() || c.factor.is_some() || c.against.is_some() {
         return Err(
@@ -667,6 +764,64 @@ fn compile_mark(m: &RawMark) -> Result<Mark, Vec<String>> {
             Err(e) => errors.push(e),
         }
     }
+    // A ws_bound check sits only on parts the ws-practice rule judges, and each bound number has one check: the rule
+    // compares the bound's numbers with these checks'.
+    let practice = |r: &Rule| matches!(r, Rule::WsPractice { .. });
+    let mut letters = BTreeSet::new();
+    for c in checks.iter().filter(|c| c.ws_bound.is_some()) {
+        if !letters.insert(format!("{:?}", c.ws_bound)) {
+            errors.push(format!(
+                "check {:?}: a second check for ws_bound {:?}",
+                c.name, c.ws_bound
+            ));
+        }
+        for p in &c.parts {
+            let ruled = validity.iter().any(practice)
+                || parts
+                    .iter()
+                    .any(|q| &q.name == p && q.validity.iter().any(practice));
+            if !ruled {
+                errors.push(format!(
+                    "check {:?}: its part {p:?} is not judged by ws-practice",
+                    c.name
+                ));
+            }
+        }
+    }
+    // The bound's line (the advisor's FX-6): held by a mark with ws_bound checks, and only by one; its X, k, Y and Z are
+    // the checks' and its tolerance every ws-practice rule's, so M_m, the band, the guard, the model and the commit
+    // come from reviewed marks.json, never from a log.
+    let bound_checks = m.checks.iter().any(|c| c.ws_bound.is_some());
+    match (&m.ws_bound_line, bound_checks) {
+        (None, true) => errors.push(
+            "ws_bound_line: a mark with ws_bound checks holds the bound's line (README §2.5)"
+                .to_owned(),
+        ),
+        (Some(_), false) => errors
+            .push("ws_bound_line: only a mark with ws_bound checks holds a bound line".to_owned()),
+        (Some(line), true) => match crate::practice::parse_bound(line) {
+            Err(e) => errors.push(format!("ws_bound_line: {e}")),
+            Ok(bound) => {
+                if let Err(e) = crate::practice::checks_agree(&bound, &checks) {
+                    errors.push(format!("ws_bound_line: {e}"));
+                }
+                for r in validity
+                    .iter()
+                    .chain(parts.iter().flat_map(|p| &p.validity))
+                {
+                    if let Rule::WsPractice { tolerance, .. } = r
+                        && *tolerance != bound.tolerance
+                    {
+                        errors.push(format!(
+                            "ws_bound_line: its tolerance {} is not the ws-practice rule's {tolerance}",
+                            bound.tolerance
+                        ));
+                    }
+                }
+            }
+        },
+        (None, false) => {}
+    }
     // The shape is judged on the file's lists, so a check that failed to compile is reported once, not twice.
     match kind {
         Kind::Pass => {
@@ -744,6 +899,7 @@ fn compile_mark(m: &RawMark) -> Result<Mark, Vec<String>> {
             bites: m.bites.clone(),
             stand_in: m.stand_in,
             arm_rule: m.arm_rule,
+            ws_bound_line: m.ws_bound_line.clone(),
             readings: m.readings.clone(),
             notes: m.notes.clone(),
         })
@@ -913,5 +1069,195 @@ mod tests {
         assert!(parse(&pass_no_check).is_err());
         let unknown_field = file(&mark(r#""verdict":"outside","notes":"x","extra":1"#));
         assert!(parse(&unknown_field).is_err());
+    }
+
+    /// A WebSocket bound line (README §2.5) that agrees with the X, Y and Z checks below and the tolerance 1.10.
+    const LINE: &str = r#"npt-ws-bound v1 {"model":"linux-6.8-tcp v3","commit":"bf9d248000000000000000000000000000000000","runs_count":2000,"client_bursts_count":480,"x_ns":670000000,"y_ns":2500000000,"k_count":5,"z_ns":6900000000,"m_m_ns":654000000,"band_low":"0.965","band_high":"1.035","tolerance":"1.10","guard_share":"0.0000"}"#;
+    const X: &str = r#"{"name":"x","series":"event.burst_heal.after_link_ns","stat":"p50","op":"<=","value":670000000,"parts":["ws"],"ws_bound":"x"}"#;
+    const Y: &str = r#"{"name":"y","series":"event.burst_heal.after_link_ns","stat":"count","where":{"op":">","value":2500000000},"op":"<=","value":5,"parts":["ws"],"ws_bound":"y"}"#;
+    const Z: &str = r#"{"name":"z","series":"event.burst_heal.after_link_ns","stat":"max","op":"<=","value":6900000000,"parts":["ws"],"ws_bound":"z"}"#;
+
+    /// A mark with a WebSocket part judged by `rule`, these checks and, if given, this bound line.
+    fn ws_mark(rule: &str, line: Option<&str>, checks: &str) -> String {
+        let line = line.map_or(String::new(), |l| {
+            format!(
+                r#","ws_bound_line":{}"#,
+                serde_json::to_string(l).expect("a string")
+            )
+        });
+        file(&mark(&format!(
+            r#""verdict":"pass","parts":[{{"name":"ws","select":{{"layer":"L2"}},"min":1,"validity":["{rule}"]}},
+               {{"name":"wt","select":{{"layer":"L1"}},"min":1}}],"checks":[{checks}]{line}"#
+        )))
+    }
+
+    /// The bound's line held verbatim in `ws_bound_line` (the advisor's FX-6 on U4j): a mark with `ws_bound` checks
+    /// holds it and no other mark does, and the mark is refused unless the line's X, k, Y and Z equal its checks' and
+    /// its tolerance the `ws-practice` rule's.
+    #[test]
+    fn ws_bound_line_agrees_with_its_checks() {
+        let all = format!("{X},{Y},{Z}");
+        let good = parse(&ws_mark("ws-practice:1.10", Some(LINE), &all)).expect("compiles");
+        assert_eq!(good.marks[0].ws_bound_line.as_deref(), Some(LINE));
+        let other = |from: &str, to: &str| LINE.replacen(from, to, 1);
+        let plain =
+            r#"{"name":"p","series":"tick.v.w","stat":"max","op":"<=","value":1,"parts":["wt"]}"#;
+        for (text, why) in [
+            (
+                ws_mark(
+                    "ws-practice:1.10",
+                    Some(&other(r#""x_ns":670000000"#, r#""x_ns":680000000"#)),
+                    &all,
+                ),
+                "its X is 680000000, check \"x\" holds 670000000",
+            ),
+            (
+                ws_mark(
+                    "ws-practice:1.10",
+                    Some(&other(r#""tolerance":"1.10""#, r#""tolerance":"1.05""#)),
+                    &all,
+                ),
+                "its tolerance 1.05 is not the ws-practice rule's 1.1",
+            ),
+            (
+                ws_mark("ws-practice:1.10", None, &all),
+                "a mark with ws_bound checks holds the bound's line",
+            ),
+            (
+                ws_mark("ws-practice:1.10", Some(LINE), plain),
+                "only a mark with ws_bound checks holds a bound line",
+            ),
+            (
+                ws_mark(
+                    "ws-practice:1.10",
+                    Some(
+                        &other(r#""band_low":"0.965""#, r#""band_low":"2.0""#).replacen(
+                            r#""band_high":"1.035""#,
+                            r#""band_high":"2.0""#,
+                            1,
+                        ),
+                    ),
+                    &all,
+                ),
+                "a band that is not 0 < low <= 1 <= high",
+            ),
+        ] {
+            let errors = parse(&text).expect_err(why);
+            assert!(errors.iter().any(|e| e.contains(why)), "{why}: {errors:?}");
+        }
+    }
+
+    /// PM-0001-18's WebSocket checks (README §2.3 `ws_bound`, §4 `ws-practice`): only on parts the rule judges, one
+    /// per bound number, each in the shape its number needs (x a median at most X, y a count over Y at most k, z a
+    /// maximum at most Z: SEC-F11); the tolerance between 1 and 1.10.
+    #[test]
+    fn ws_bound_checks_keep_their_shape() {
+        let ws = |rule: &str, checks: &str| ws_mark(rule, Some(LINE), checks);
+        let good = parse(&ws("ws-practice:1.10", &format!("{X},{Y},{Z}"))).expect("compiles");
+        let m = &good.marks[0];
+        assert_eq!(
+            m.checks.iter().map(|c| c.ws_bound).collect::<Vec<_>>(),
+            [
+                Some(BoundNumber::X),
+                Some(BoundNumber::Y),
+                Some(BoundNumber::Z)
+            ]
+        );
+        assert_eq!(
+            m.parts[0].validity,
+            [Rule::WsPractice {
+                tolerance: Ratio::new(11, 10),
+                text: "1.10".to_owned()
+            }]
+        );
+        assert_eq!(m.parts[0].validity[0].name(), "ws-practice:1.10");
+        let bad = [
+            (ws("ws-practice:1.11", X), "a raised tolerance"),
+            (ws("ws-practice:0.99", X), "a tolerance below 1"),
+            (ws("ws-practice:ten", X), "a tolerance that is no number"),
+            (
+                ws("ws-practice:1.10", &X.replace(r#""x"}"#, r#""w"}"#)),
+                "no such number",
+            ),
+            (
+                ws("ws-practice:1.10", &X.replace(r#"["ws"]"#, r#"["wt"]"#)),
+                "a part the rule does not judge",
+            ),
+            (
+                ws("ws-practice:1.10", &X.replace(r#","parts":["ws"]"#, "")),
+                "no parts",
+            ),
+            (
+                ws(
+                    "ws-practice:1.10",
+                    &format!("{X},{}", X.replace(r#""name":"x""#, r#""name":"x2""#)),
+                ),
+                "two x checks",
+            ),
+            (
+                ws(
+                    "ws-practice:1.10",
+                    &Y.replace(r#""where":{"op":">","value":2500000000},"#, ""),
+                ),
+                "y with no where",
+            ),
+            (
+                ws(
+                    "ws-practice:1.10",
+                    &X.replace(r#""stat":"p50""#, r#""stat":"count""#),
+                ),
+                "x on a count",
+            ),
+            (
+                ws(
+                    "ws-practice:1.10",
+                    &X.replace(r#""ws_bound":"x""#, r#""ws_bound":"x","pooled":true"#),
+                ),
+                "pooled",
+            ),
+            (
+                ws(
+                    "ws-practice:1.10",
+                    &X.replace(r#""ws_bound":"x""#, r#""ws_bound":"x","setup":true"#),
+                ),
+                "a setup check",
+            ),
+            (
+                ws(
+                    "ws-practice:1.10",
+                    r#"{"name":"f","figure":"machine_named","op":"==","value":1,"parts":["ws"],"ws_bound":"x"}"#,
+                ),
+                "a figure",
+            ),
+        ];
+        for (text, why) in bad {
+            assert!(parse(&text).is_err(), "{why} must be refused");
+        }
+        // Each letter's shape (SEC-F11): another op or statistic is refused, by its own reason.
+        for (check, why) in [
+            (X.replace(r#""op":"<=""#, r#""op":">=""#), "x with op >="),
+            (
+                X.replace(r#""stat":"p50""#, r#""stat":"max""#),
+                "x with stat max",
+            ),
+            (
+                Z.replace(r#""stat":"max""#, r#""stat":"p50""#),
+                "z with stat p50",
+            ),
+            (
+                Y.replace(r#""where":{"op":">""#, r#""where":{"op":">=""#),
+                "y with a where op >=",
+            ),
+        ] {
+            let errors = parse(&ws("ws-practice:1.10", &check)).expect_err(why);
+            assert!(
+                errors.iter().any(|e| e.contains("its shape is")),
+                "{why}: {errors:?}"
+            );
+        }
+        let report = file(&mark(&format!(
+            r#""verdict":"reported",{PART},"report":[{{"name":"r","series":"tick.v.w","stat":"max","ws_bound":"x"}}]"#
+        )));
+        assert!(parse(&report).is_err(), "a report holds no bound number");
     }
 }

@@ -226,6 +226,25 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     the room's settings; U4f measures the rate and records §4.7's value before -22's runs. The room counts each
     overflow resync per client, with its tick, in its log, so that every judged -17 and -18 run can report them (carry
     58)."
+61. **U4j's hash rules, the room and the client (the advisor's U4j ruling, "Carries", U4e, in FX-12's words; its
+    round-2 ruling, B2.1: NC-U4J-R2-N1 and N6):** "U4e builds the room's and the client's side of marks/README.md
+    §1's `hs` rules as U4j merged them (its `server_hash` and `decoded_hash` items, with the round-2 words), and
+    exposes per client and tick what U4r's logs write (U4E-Q7): (a) the room's `server_hash` for each connected client
+    from its admission on, in every phase the clients log; none for a client not connected or for a tick whose
+    snapshot the room did not send that client; the room sends no snapshot of a tick it does not log, so its last
+    tick record covers every snapshot it sent; (b) the client's hash filed under the tick it rebuilt, at the room's
+    slot from `JoinAccepted`; two different hashes for one tick give the sentinel, one hash met twice (a duplicated
+    datagram) is filed once, and no hash is ever dropped; (c) a tick resolved lost (`tick.s.snap_incomplete` 1, no
+    hash) only once none of its groups can still decode: once it has left the client's frame ring (at
+    `npt_sim::ACK_RING_TICKS` ticks old), or at the stop; a tick none of whose groups arrived counts, known from a
+    later header's tick; (d) a group of a tick older than one the client has already decoded (L1's reorder step
+    delivers such groups) is decoded and hashed under its own tick like any other, or, if the client drops it as
+    stale, it is never acknowledged and that tick is lost, never the sentinel; the sentinel stays for §4.6's causes
+    (no baseline, a bad header, a size or decode error). The advisor's lean is the decode: it keeps -58's P3
+    comparing the late side of a reordered wrap (ADR 0001:1607). U4e's report says which its client does; a client
+    that drops counts each drop per client under a name with its SERIES.md row. A unit test feeds `ClientEndpoint`
+    tick t+1's snapshot before tick t's (as L1's reorder step delivers them) and shows t filed under t (its hash, or
+    lost if the client drops it; never the sentinel), and that one datagram received twice files one hash."
 
 ## U4r (the L1 runner and its judged runs)
 40. **O1 (u4-conditions-check.md:42-45; advisor-u4.md:343-347; the advisor's U4s ruling, O1; its last sentence the main
@@ -257,6 +276,62 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     its soldiers' health, read from `Scene::weapon()` and `Scene::health()`. U4r's runner writes them into npt-lab's
     L1 headers, and the contract test shows them in every header. U6's npt-server header does the same (plan.md's U6
     row)."
+62. **U4j's log rules, U4r's runner and logs (the advisor's U4j ruling, "Carries", U4r, with FX-5 (a), FX-10, FX-12
+    and R2.4; its round-2 ruling, B2.1: NC-U4J-R2-N1 and N6):** "U4r's logs meet marks/README.md §1's `hs` rules as
+    U4j merged them, and the judge's coverage rule (SERIES.md's `decoded_hash_mismatch_count` row): (a) each name
+    only in its own process's log: `server_hash` in the room's (process `room`), `decoded_hash` in the clients'
+    (`client` on L1, `bots` on L2), `replay_hash` only in a `replay` log on x86_64; (b) every `hs` list and every
+    `tick.s.snap_incomplete` list holds exactly the room header's `clients` entries, at the room's slot; (c) the
+    writer buffers each client's ticks until every earlier tick is resolved, and writes a tick lost only once none of
+    its groups can still decode (once it has left the client's frame ring, or at the stop: on L1 the runner may
+    decide it there); a hash is never dropped, else the log ends `crash`; (d) the head: every client is admitted,
+    and its first snapshot resolved, in the warm-up, before the room's first measured hash for its slot (a client
+    admitted later is -19's join: C-U6-11); (e) the tail: after the measured phase the clients keep logging until
+    every measured tick is resolved, a tick still in flight at the stop is not written, and the room's log covers
+    every snapshot the room sent (it sends none of a tick it does not log); (f) a run and its twin log `h` over the
+    same ticks; (g) the contract test shows `decoded_hash_mismatch_count` resolving with no gap on every -17 suite, a
+    short L1 P3 suite with the reorder step on among them (no `crash` footer, 0 mismatches, no gap), and, if U4e's
+    client drops stale groups (entry 61 (d)), reports its drop count beside `decoded_hash_compared_count` on -58's
+    P3 suite; (h) NC-10 (the advisor's U4j ruling, R2.4): the contract test reports `tick.s.snap_incomplete`'s sum on
+    each short L1 P0 run. If it is 0 on every one, U4r adds to -17's L1 P0 part, with a bite (a client that writes
+    null and incomplete 1 for a refused group), before -17's judged runs: `{"name": "setup: L1 P0 loses no group (no
+    client-tick left incomplete)", "series": "tick.s.snap_incomplete", "stat": "sum", "window": "all", "op": "==",
+    "value": 0, "parts": ["L1 P0"], "setup": true}`. If it is not 0, the cause goes to the advisor first. marks/ is
+    not U4r's lane unless its brief gives it this one check; else the main session adds it in its own commit."
+63. **FU-3 and FU-7's log half, the next change to npt-log (the advisor's U4j ruling, FU-3: SEC-F10; its round-2
+    ruling, B3: SEC-R2-N2):** "The next change to npt-log (U4r's, if its brief takes crates/log; else the unit that
+    next edits it) adds two refusals, each with a test that fails before it: `read_log` refuses a JSON object with a
+    duplicate key (today the last one wins, silently: FU-3); `check_header` refuses any header text field holding a
+    character for which Rust's `char::is_control` holds (today it refuses only an empty `run`, `set`, `role` or
+    `process`: log/src/lib.rs:305-321; FU-7). Until then both stay open security findings in PR #40's report."
+
+## The next change to crates/judge (whoever makes it; its first step)
+64. **Round 2's judge follow-ups (the advisor's U4j round-2 ruling, B2.2, B3, B4.2, B4.3):** "Before any other edit
+    to crates/judge/src, and at the latest before U6 builds -19's figure, the change adds these, each shown failing
+    under its plant (planted by Edit in place, restored and sha256-checked) and passing restored: (a) TE2-1, Medium:
+    in tests/engine.rs's Arm test
+    (`u4j_the_arm_rule_counts_an_aarch64_mismatch_only_when_the_x86_64_re_decode_misses_too`), a case for
+    `machine.role` C and one for ML: an aarch64 client log of process `client` with the test's `wrong` hashes, the
+    room on x86_64 and the x86-64 replay agreeing with the server: FAIL with 1 mismatch, and 'aarch64 only' 0.
+    Plant: figures.rs's `h.machine.role == "LG" &&` dropped. Then fixtures/README.md's l1-aarch64-claim row's 'this
+    row does not show the Arm rule's LG key (TE2-1: carry 64 (a))' becomes 'the Arm rule's LG key is shown by the
+    engine Arm test's role C and ML cases (TE2-1)'. (b) TE2-2 = NC-U4J-R2-N3 = SEC-R2-N1, Low:
+    `u4j_ws_far_better_past_the_cap_is_invalid` asserts the pin's own reason for probe A as committed ('its bound
+    line is not PM-0001-18's ws_bound_line, byte for byte'), and gains probe A-pinned (the record carries
+    marks.json's own line; FAR BETTER at s = 1.9 with a chance ruling): INVALID by the class rule ('is "FAR BETTER"
+    at s = 1.9'). Plants: the pin removed (the first case's reason changes); FAR BETTER's `s < bound.band_low`
+    removed (the second's). (c) TE2-3, Low: `u4j_ws_a_bite_run_takes_its_counted_runs_practice_run` gains a case
+    (5): the bite's set holds two measured runs of one build with different practice runs in force (the later one
+    started after a second practice run of the build, which has a `second_ruling`): INVALID ('have practice runs …
+    in force'). Plant: that refusal in `find` removed. (d) TE2-4, Low: a case where a coverage gap and an LG Arm
+    mismatch waiting for its re-decode meet in one run: INVALID, never NOT-RUN. Plant: the gap and waiting checks in
+    `decoded_hash_mismatch_count` swapped. (e) NC-U4J-R2-N4 and N5, the code's words, Low: eval.rs's Arm-rule FAIL
+    note reads 'an LG aarch64 mismatch (the room on x86_64) whose x86-64 re-decode agrees is a cross-architecture
+    finding' in place of 'an aarch64-only mismatch is a cross-architecture finding', and practice.rs's module doc
+    reads 'f = max(1, s), or 1 for FAR BETTER' in place of 'f = max(1, s)'; words only, no plant. (f) FU-7's judge
+    half, Low, security (SEC-R2-N2): `summary_line` (judge/src/lib.rs) escapes every control character in what it
+    prints, so no log text starts a line of its own on stdout; a test with a run id holding a newline and the word
+    PASS shows one line printed. Plant: the escape removed."
 
 ## U4f (clock and commands)
 46. **N-M2 = R-M2 = A-C, -21's press twins (advisor-u4-wave1.md:197-235; the advisor's W1-U4D ruling):** "-21's press
@@ -301,6 +376,13 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     advisor's U4d close ruling (advisor-u4d-close.md, B1.2 and B1.3): the main session's change U4d-F lands the fix,
     with ES's vehicles inside the fight (N2-M2), before U4d2's brief is final. U4d2 pins only recordings written by
     U4d-F's `Recording::GENERATOR` or later, and ES's hashes only from U4d-F's scene; its report names U4d-F's commit."
+65. **TE2-5's check.mjs half (the advisor's U4j round-2 ruling, B2.3):** "check.mjs's test step names every failing
+    test. When a cargo test run fails, the lines `main` prints under its FAIL hold each failing test's name from
+    libtest's `failures:` list (on the run's stdout) beside the summary line. Today `run` joins stdout before stderr
+    (check.mjs:1402) and `main` prints a failed step's last 40 lines (:1649), so the names never show (the U4j
+    fixer's check.mjs run 2: u4j-build.md:322-325). A check.test.mjs self-test feeds a recorded failing run and
+    asserts the name is printed. The main session may make this change sooner, in its own commit; U4d2's report then
+    lists entry 65 as met."
 
 ## The main session (plan text, before the code merges: risk 11)
 30. **A19 (§4.1's table):** "npt-sim's rows gain `EntityKind::ALL` and `EntityKind::layout` (arch F2: one home for the

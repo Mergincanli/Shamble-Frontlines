@@ -32,6 +32,12 @@ struct LogSpec {
     seconds: Vec<SecondSpec>,
     events: Vec<EventRecord>,
     footer: bool,
+    /// The build's features; `None` follows the bite (C4): the bites build exactly when the log names a bite.
+    features: Option<Vec<&'static str>>,
+    arch: &'static str,
+    binary: &'static str,
+    /// The header's `clients` (every `hs` list holds this many entries: README §1).
+    clients: u32,
 }
 
 impl LogSpec {
@@ -52,6 +58,10 @@ impl LogSpec {
             seconds: vec![],
             events: vec![],
             footer: true,
+            features: None,
+            arch: "x86_64",
+            binary: "0000000000000000000000000000000000000000000000000000000000000000",
+            clients: 48,
         }
     }
 
@@ -74,7 +84,7 @@ impl LogSpec {
                 role: self.machine_role.to_owned(),
                 name: format!("{}1", self.machine_role),
                 plan: "test".to_owned(),
-                arch: "x86_64".to_owned(),
+                arch: self.arch.to_owned(),
                 cpu: "test".to_owned(),
                 vcpus: 4,
                 mem_mb: 16_384,
@@ -87,8 +97,12 @@ impl LogSpec {
             },
             build: Build {
                 commit: "0".repeat(40),
-                binary_sha256: "0".repeat(64),
-                features: vec![],
+                binary_sha256: self.binary.to_owned(),
+                features: match &self.features {
+                    Some(f) => f.iter().map(|s| (*s).to_owned()).collect(),
+                    None if self.bite.is_some() => vec!["bites".to_owned()],
+                    None => vec![],
+                },
                 profile: "release".to_owned(),
             },
             bite: self.bite.map(str::to_owned),
@@ -96,7 +110,7 @@ impl LogSpec {
             profile: self.profile.to_owned(),
             seed: self.seed,
             tick_hz: 30,
-            clients: 48,
+            clients: self.clients,
             scene: "SS".to_owned(),
             process: self.process.to_owned(),
             slot: 0,
@@ -1185,4 +1199,1475 @@ fn u2_a_twin_record_that_cannot_be_compared_is_a_gap() {
             "{expected}: {why:?}"
         );
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// U4j: C4's build rule, the decoded and twin hash figures, machine_named, and -18's ws-practice rule.
+
+fn says(why: &[String], text: &str) -> bool {
+    why.iter().any(|w| w.contains(text))
+}
+
+/// C4 (the advisor's U2 ruling): a measured run built with the bites, a measured run naming a bite, and a bite run
+/// built without them are INVALID; so is a measured run's twin built with them (checked where the twin is read).
+#[test]
+fn c4_the_build_matches_the_bite() {
+    let bite_run = |features: Option<Vec<&'static str>>| {
+        let mut s = LogSpec::room("bite-1", "set-a", M).ticks("work_ns", &[150]);
+        s.role = "bite";
+        s.bite = Some("PM-0001-4/B-S");
+        s.features = features;
+        s.build()
+    };
+    let with = |i: usize, change: &dyn Fn(&mut LogSpec)| {
+        let mut logs = three_runs(M, [90, 95, 100]);
+        let mut s =
+            LogSpec::room(["run-1", "run-2", "run-3"][i], "set-a", M).ticks("work_ns", &[10, 95]);
+        change(&mut s);
+        logs[i] = s.build();
+        logs.push(bite_run(None));
+        verdict_of(&[tick_mark(M, json!({}))], &logs)
+    };
+    let (k, why) = with(1, &|_| {});
+    assert_eq!(k, VerdictKind::Pass, "the base: {why:?}");
+    let (k, why) = with(1, &|s| s.features = Some(vec!["bites"]));
+    assert_eq!(k, VerdictKind::Invalid, "{why:?}");
+    assert!(
+        says(
+            &why,
+            "run run-2: build: a measured run names no bite, but a log of it comes from a bites build"
+        ),
+        "{why:?}"
+    );
+    let (k, why) = with(2, &|s| s.bite = Some("PM-0001-4/B-S"));
+    assert_eq!(k, VerdictKind::Invalid, "{why:?}");
+    assert!(
+        says(
+            &why,
+            "run run-3: build: a measured run names the bite PM-0001-4/B-S"
+        ),
+        "{why:?}"
+    );
+    let mut logs = three_runs(M, [90, 95, 100]);
+    logs.push(bite_run(Some(vec![])));
+    let v = judge(&marks_file(&[tick_mark(M, json!({}))]), &logs);
+    assert_eq!(v[0].verdict, VerdictKind::Invalid, "{:?}", v[0].why);
+    assert_eq!(v[0].bites[0].status, BiteStatus::Invalid);
+    assert!(
+        says(
+            &v[0].bites[0].runs[0].invalid_why,
+            "build: the run names the bite PM-0001-4/B-S, but none of its logs comes from a bites build"
+        ),
+        "{:?}",
+        v[0].bites[0].runs
+    );
+    // On L2 the bite lives in one binary: RS's room from the bites build, LG's bots from the measured one, is right.
+    let mut lg = LogSpec::room("bite-1", "set-a", M);
+    lg.role = "bite";
+    lg.bite = Some("PM-0001-4/B-S");
+    lg.machine_role = "LG";
+    lg.process = "bots";
+    lg.features = Some(vec![]);
+    let mut logs = three_runs(M, [90, 95, 100]);
+    logs.extend([bite_run(None), lg.build()]);
+    assert_eq!(
+        verdict_of(&[tick_mark(M, json!({}))], &logs).0,
+        VerdictKind::Pass
+    );
+    // A measured run's twin from the bites build: the twin figure reads it, so the measured run is INVALID.
+    let mut twin = probe("b1-twin", "twin", 'a', None);
+    twin.features = Some(vec!["bites"]);
+    let mut logs = vec![
+        probe("b1", "measured", 'a', Some("b1-twin")).build(),
+        twin.build(),
+    ];
+    logs.extend(shown_clock_bite());
+    let (k, why) = verdict_of(&[twin_mark()], &logs);
+    assert_eq!(k, VerdictKind::Invalid, "{why:?}");
+    assert!(
+        says(
+            &why,
+            "run b1: its twin b1-twin is invalid: build: a twin run names no bite, but a log of it comes from a bites build"
+        ),
+        "{why:?}"
+    );
+}
+
+/// A decoded-hash mark like PM-0001-17: one L1 part, the figure, the compared count and the Arm rule's report.
+fn hash_mark() -> Value {
+    json!({
+        "id": "PM-0001-17", "title": "decoded", "draft": draft(), "verdict": "pass",
+        "parts": [{"name": "L1", "select": {"layer": "L1"}, "min": 1}],
+        "checks": [{"name": "0 mismatches", "figure": "decoded_hash_mismatch_count", "op": "==", "value": 0}],
+        "report": [{"name": "compared", "figure": "decoded_hash_compared_count"},
+                   {"name": "aarch64 only", "figure": "cross_arch_mismatch_count"}],
+        "bites": [{"id": "PM-0001-17/tick16", "what": "a 16-bit tick"}]
+    })
+}
+
+/// One log of a hashed run: `name`'s list on each tick 1, 2, ... (an empty list leaves that tick without it).
+fn hash_log(
+    run: &'static str,
+    process: &'static str,
+    name: &str,
+    per_tick: &[&[Option<u64>]],
+    edit: &dyn Fn(&mut LogSpec),
+) -> Log {
+    let mut s = LogSpec::room(run, "set-h", "PM-0001-17");
+    s.layer = "L1";
+    s.process = process;
+    s.clients = 2;
+    s.ticks = per_tick.iter().map(|_| (Phase::Measured, vec![])).collect();
+    edit(&mut s);
+    let mut log = s.build();
+    for (t, list) in log.ticks.iter_mut().zip(per_tick) {
+        if !list.is_empty() {
+            t.set_hashes(name, list);
+        }
+    }
+    log
+}
+
+const SERVER: [&[Option<u64>]; 3] = [
+    &[Some(11), Some(21)],
+    &[Some(12), Some(22)],
+    &[Some(13), Some(23)],
+];
+
+fn report<'v>(v: &'v npt_judge::Verdict, name: &str) -> Vec<&'v str> {
+    v.report
+        .iter()
+        .filter(|r| r.name == name)
+        .map(|r| r.value.as_str())
+        .collect()
+}
+
+#[test]
+fn u4j_the_decoded_hash_gaps_and_its_every_phase() {
+    let no = &|_: &mut LogSpec| {};
+    let room = hash_log("h1", "room", "server_hash", &SERVER, no);
+    let client = |lists: &[&[Option<u64>]]| hash_log("h1", "client", "decoded_hash", lists, no);
+    let equal = client(&SERVER);
+    let (k, why) = verdict_of(&[hash_mark()], &[room.clone(), equal.clone()]);
+    assert_eq!(k, VerdictKind::NotRun, "the bite has no run: {why:?}");
+    let incomplete = |list: Vec<i64>| {
+        let mut log = equal.clone();
+        log.ticks[0].s.insert("snap_incomplete".to_owned(), list);
+        log
+    };
+    let cases: Vec<(Vec<Log>, &str)> = vec![
+        (vec![equal.clone()], "no log gives hs.server_hash"),
+        (vec![room.clone()], "no log gives hs.decoded_hash"),
+        (
+            vec![
+                room.clone(),
+                client(&[&[Some(11), Some(21), None], &[], &[]]),
+            ],
+            "hs.decoded_hash lists hold 3 entries, not the run's 2 clients (the room log's header)",
+        ),
+        (
+            vec![
+                room.clone(),
+                equal.clone(),
+                hash_log("h1", "client", "decoded_hash", &[&[Some(11), None]], no),
+            ],
+            "two logs give slot 0 at tick 1 an hs.decoded_hash",
+        ),
+        (
+            vec![
+                room.clone(),
+                hash_log("h1", "lab", "decoded_hash", &SERVER, no),
+            ],
+            "hs.decoded_hash in the lab log on RS1 (x86_64): only process client (L1) or bots (L2) writes it",
+        ),
+        (
+            vec![
+                room.clone(),
+                equal.clone(),
+                hash_log("h1", "client", "server_hash", &SERVER, no),
+            ],
+            "hs.server_hash in the client log on RS1 (x86_64): only process room writes it",
+        ),
+        // FX-10 (a) and its malformed entries: a snap_incomplete list of the run's clients entries, each 0 or 1.
+        (
+            vec![room.clone(), incomplete(vec![0, 0, 0])],
+            "tick 1's tick.s.snap_incomplete in the client log on RS1 holds 3 entries, not the run's 2 clients",
+        ),
+        (
+            vec![room.clone(), incomplete(vec![2, 0])],
+            "tick 1's tick.s.snap_incomplete holds 2 for slot 0, not 0 or 1",
+        ),
+        (
+            vec![
+                hash_log("h1", "room", "server_hash", &[&[Some(0), Some(21)]], no),
+                client(&[&[Some(0), Some(21)]]),
+            ],
+            "the server logged 0 for slot 0 at tick 1; its hash is never 0",
+        ),
+    ];
+    for (logs, expected) in cases {
+        let v = judge(&marks_file(&[hash_mark()]), &logs);
+        assert_eq!(
+            v[0].verdict,
+            VerdictKind::Invalid,
+            "{expected}: {:?}",
+            v[0].why
+        );
+        assert!(says(&v[0].why, expected), "{expected}: {:?}", v[0].why);
+    }
+    // A warm-up tick is read too (-58's wraps fall in its first seconds): a mismatch there fails the run.
+    let warm = hash_log(
+        "h1",
+        "client",
+        "decoded_hash",
+        &[&[Some(11), Some(99)]],
+        &|s| {
+            s.ticks = vec![(Phase::Warmup, vec![])];
+        },
+    );
+    let (k, why) = verdict_of(&[hash_mark()], &[room, warm]);
+    assert_eq!(k, VerdictKind::Fail, "{why:?}");
+    assert!(says(&why, "0 mismatches = 1, needs == 0"), "{why:?}");
+}
+
+#[test]
+fn u4j_the_arm_rule_counts_an_aarch64_mismatch_only_when_the_x86_64_re_decode_misses_too() {
+    let no = &|_: &mut LogSpec| {};
+    let arm = &|s: &mut LogSpec| {
+        s.arch = "aarch64";
+        s.machine_role = "LG";
+    };
+    let room = hash_log("h1", "room", "server_hash", &SERVER, no);
+    let wrong: [&[Option<u64>]; 3] = [
+        &[Some(11), Some(21)],
+        &[Some(12), Some(99)],
+        &[Some(13), Some(23)],
+    ];
+    let client = hash_log("h1", "bots", "decoded_hash", &wrong, arm);
+    let replay = |lists: &[&[Option<u64>]]| hash_log("h1", "replay", "replay_hash", lists, no);
+    // The x86-64 re-decode agrees with the server: an aarch64-only finding, reported, deciding nothing.
+    let v = judge(
+        &marks_file(&[hash_mark()]),
+        &[room.clone(), client.clone(), replay(&SERVER)],
+    );
+    assert_eq!(
+        v[0].parts[0].verdict,
+        VerdictKind::Pass,
+        "{:?}",
+        v[0].parts[0].why
+    );
+    assert_eq!(report(&v[0], "aarch64 only"), ["1"]);
+    assert_eq!(report(&v[0], "compared"), ["6"]);
+    // It misses the server's hash too: a real mismatch.
+    let (k, why) = verdict_of(
+        &[hash_mark()],
+        &[room.clone(), client.clone(), replay(&wrong)],
+    );
+    assert_eq!(k, VerdictKind::Fail, "{why:?}");
+    // No re-decode yet: NOT-RUN, never a guess.
+    let v = judge(&marks_file(&[hash_mark()]), &[room.clone(), client]);
+    assert_eq!(
+        v[0].parts[0].verdict,
+        VerdictKind::NotRun,
+        "{:?}",
+        v[0].parts[0].why
+    );
+    assert!(
+        says(&v[0].parts[0].why, "the run has no x86-64 re-decode"),
+        "{:?}",
+        v[0].parts[0].why
+    );
+    // On x86-64 a mismatch counts as it stands, with or without a replay.
+    let x86 = hash_log("h1", "client", "decoded_hash", &wrong, no);
+    let (k, _) = verdict_of(&[hash_mark()], &[room, x86, replay(&SERVER)]);
+    assert_eq!(k, VerdictKind::Fail);
+    // The Arm rule needs the room on x86_64 (the advisor's FX-5 (b)): with an aarch64 room, the LG mismatch counts.
+    let arm_room = hash_log("h1", "room", "server_hash", &SERVER, &|s| {
+        s.arch = "aarch64"
+    });
+    let lg = hash_log("h1", "bots", "decoded_hash", &wrong, arm);
+    let (k, why) = verdict_of(&[hash_mark()], &[arm_room, lg, replay(&SERVER)]);
+    assert_eq!(k, VerdictKind::Fail, "{why:?}");
+}
+
+#[test]
+fn u4j_an_empty_comparison_fails_the_run_and_shows_no_bite() {
+    let no = &|_: &mut LogSpec| {};
+    let room = hash_log("h1", "room", "server_hash", &SERVER, no);
+    let none: [&[Option<u64>]; 3] = [&[None, None], &[None, None], &[None, None]];
+    let v = judge(
+        &marks_file(&[hash_mark()]),
+        &[
+            room.clone(),
+            hash_log("h1", "client", "decoded_hash", &none, no),
+        ],
+    );
+    assert_eq!(v[0].verdict, VerdictKind::Fail, "{:?}", v[0].why);
+    assert!(
+        says(
+            &v[0].why,
+            "L1: run h1: 0 mismatches: run h1: no client logged a hash (0 compared); an empty comparison fails"
+        ),
+        "{:?}",
+        v[0].why
+    );
+    assert_eq!(report(&v[0], "compared"), ["0"]);
+    let bite = |id: &'static str, lists: &[&[Option<u64>]]| {
+        let b = &|s: &mut LogSpec| {
+            s.role = "bite";
+            s.bite = Some("PM-0001-17/tick16");
+        };
+        let mut logs = vec![
+            hash_log(id, "room", "server_hash", &SERVER, b),
+            hash_log(id, "client", "decoded_hash", lists, b),
+        ];
+        for l in &mut logs {
+            l.header.run = id.to_owned();
+        }
+        logs
+    };
+    let equal = hash_log("h1", "client", "decoded_hash", &SERVER, no);
+    // A bite run that compared nothing did not test the bite: INVALID, never shown.
+    let mut logs = vec![room.clone(), equal.clone()];
+    logs.extend(bite("b1", &none));
+    let v = judge(&marks_file(&[hash_mark()]), &logs);
+    assert_eq!(v[0].verdict, VerdictKind::Invalid, "{:?}", v[0].why);
+    assert_eq!(v[0].bites[0].status, BiteStatus::Invalid);
+    assert!(
+        says(
+            &v[0].bites[0].runs[0].invalid_why,
+            "an empty comparison shows no bite"
+        ),
+        "{:?}",
+        v[0].bites[0].runs
+    );
+    // Post-wrap frames under the wrong tick: hashes at ticks the server never logged count, and show the bite.
+    let mut logs = vec![room, equal];
+    let mut wrapped = bite("b1", &[&[Some(11), Some(21)]]);
+    wrapped[1].ticks[0].t = 9;
+    logs.extend(wrapped);
+    let v = judge(&marks_file(&[hash_mark()]), &logs);
+    assert_eq!(v[0].verdict, VerdictKind::Pass, "{:?}", v[0].why);
+    assert_eq!(v[0].bites[0].status, BiteStatus::Shown);
+}
+
+/// A twin-hash mark like PM-0001-21's forged part.
+fn twin_hash_mark() -> Value {
+    json!({
+        "id": "PM-0001-21", "title": "forged", "draft": draft(), "verdict": "pass",
+        "parts": [{"name": "forged", "select": {"params.suite": "forged"}, "min": 1}],
+        "checks": [{"name": "state hash equals the twin's", "figure": "twin_hash_mismatch_count", "op": "==", "value": 0}]
+    })
+}
+
+/// A room log with one state hash per tick (`None`: no `h` on that tick), naming its twin.
+fn hashed(
+    run: &'static str,
+    role: &'static str,
+    twin: Option<&'static str>,
+    hashes: &[Option<u64>],
+) -> LogSpec {
+    let mut s = LogSpec::room(run, "set-w", "PM-0001-21");
+    s.role = role;
+    s.layer = "L1";
+    s.params = vec![("suite", json!("forged"))];
+    if let Some(t) = twin {
+        s.params.push(("twin", json!(t)));
+    }
+    s.ticks = hashes.iter().map(|_| (Phase::Measured, vec![])).collect();
+    s
+}
+
+fn with_hashes(s: LogSpec, hashes: &[Option<u64>]) -> Log {
+    let mut log = s.build();
+    for (t, h) in log.ticks.iter_mut().zip(hashes) {
+        if let Some(h) = h {
+            t.set_hash(*h);
+        }
+    }
+    log
+}
+
+#[test]
+fn u4j_the_twin_hash_compares_every_tick_and_its_twin_whole() {
+    let pair = |own: &[Option<u64>], other: &[Option<u64>]| {
+        vec![
+            with_hashes(hashed("f1", "measured", Some("f1-twin"), own), own),
+            with_hashes(hashed("f1-twin", "twin", None, other), other),
+        ]
+    };
+    let h = [Some(1), Some(2), Some(3)];
+    assert_eq!(
+        verdict_of(&[twin_hash_mark()], &pair(&h, &h)).0,
+        VerdictKind::Pass
+    );
+    let (k, why) = verdict_of(&[twin_hash_mark()], &pair(&h, &[Some(1), Some(9), Some(3)]));
+    assert_eq!(k, VerdictKind::Fail);
+    assert!(
+        says(&why, "state hash equals the twin's = 1, needs == 0"),
+        "{why:?}"
+    );
+    let (k, why) = verdict_of(&[twin_hash_mark()], &pair(&h, &[Some(1), Some(2), None]));
+    assert_eq!(
+        k,
+        VerdictKind::Fail,
+        "a tick hashed in one only counts: {why:?}"
+    );
+    let (k, why) = verdict_of(&[twin_hash_mark()], &pair(&[None], &[None]));
+    assert_eq!(k, VerdictKind::Fail, "{why:?}");
+    assert!(
+        says(&why, "hashed no tick; an empty comparison fails"),
+        "{why:?}"
+    );
+    let (k, why) = verdict_of(&[twin_hash_mark()], &pair(&h, &h)[..1]);
+    assert_eq!(k, VerdictKind::NotRun, "{why:?}");
+    assert!(
+        says(&why, "its twin f1-twin is not in set set-w yet"),
+        "{why:?}"
+    );
+    let mut seed = hashed("f1-twin", "twin", None, &h);
+    seed.seed = 2;
+    let mut bites = hashed("f1-twin", "twin", None, &h);
+    bites.features = Some(vec!["bites"]);
+    let mut cut = hashed("f1-twin", "twin", None, &h);
+    cut.footer = false;
+    let mut profile = hashed("f1-twin", "twin", None, &h);
+    profile.profile = "P3";
+    let mut other_bite = hashed("f1-twin", "twin", None, &h);
+    other_bite.bite = Some("PM-0001-21/other");
+    let measured = hashed("f1-twin", "measured", Some("f1"), &h);
+    let own = || with_hashes(hashed("f1", "measured", Some("f1-twin"), &h), &h);
+    let mut bad_h = own();
+    bad_h.ticks[1].h = Some("not-a-hash".to_owned());
+    let mut second = LogSpec::room("f1", "set-w", "PM-0001-21");
+    second.layer = "L1";
+    second.process = "lab";
+    second.params = vec![("suite", json!("forged"))];
+    second.ticks = vec![(Phase::Measured, vec![])];
+    let cases: Vec<(Vec<Log>, &str)> = vec![
+        (
+            vec![with_hashes(seed, &h), own()],
+            "its twin f1-twin has another seed",
+        ),
+        (
+            vec![with_hashes(bites, &h), own()],
+            "its twin f1-twin is invalid: build:",
+        ),
+        (
+            vec![with_hashes(cut, &h), own()],
+            "its twin f1-twin is invalid: complete:",
+        ),
+        (
+            vec![with_hashes(profile, &h), own()],
+            "its twin f1-twin has another profile",
+        ),
+        (
+            vec![with_hashes(other_bite, &h), own()],
+            "its twin f1-twin has another bite",
+        ),
+        (
+            vec![with_hashes(measured, &h), own()],
+            "run f1: f1-twin has role measured, not twin",
+        ),
+        (
+            vec![with_hashes(hashed("f1", "measured", Some("f1"), &h), &h)],
+            "params.twin names the run itself",
+        ),
+        (
+            vec![with_hashes(hashed("f1", "measured", None, &h), &h)],
+            "params.twin names no twin run",
+        ),
+        (
+            pair(&h, &h).into_iter().skip(1).chain([bad_h]).collect(),
+            "tick 2's h is not 16 lowercase hex digits",
+        ),
+        (
+            pair(&h, &h)
+                .into_iter()
+                .chain([with_hashes(second, &[Some(7)])])
+                .collect(),
+            "two logs give tick 1 two state hashes",
+        ),
+    ];
+    for (logs, expected) in cases {
+        let (k, why) = verdict_of(&[twin_hash_mark()], &logs);
+        assert_eq!(k, VerdictKind::Invalid, "{expected}: {why:?}");
+        assert!(says(&why, expected), "{expected}: {why:?}");
+    }
+}
+
+#[test]
+fn u4j_machine_named_needs_every_field_and_a_vm_its_address() {
+    let mark = json!({
+        "id": "PM-0006-11", "title": "RS named", "draft": draft(), "verdict": "pass",
+        "parts": [{"name": "RS", "select": {"process": "room"}, "min": 1}],
+        "checks": [{"name": "named", "figure": "machine_named", "op": "==", "value": 1}]
+    });
+    let run = |role: &'static str, edit: &dyn Fn(&mut npt_log::Machine)| {
+        let mut s = LogSpec::room("m1", "set-m", "PM-0006-11");
+        s.machine_role = role;
+        let mut log = s.build();
+        log.header.machine.address = "203.0.113.10".to_owned();
+        edit(&mut log.header.machine);
+        verdict_of(std::slice::from_ref(&mark), &[log]).0
+    };
+    assert_eq!(run("RS", &|_| {}), VerdictKind::Pass);
+    assert_eq!(
+        run("C", &|m| m.address.clear()),
+        VerdictKind::Pass,
+        "not a VM: no address"
+    );
+    type Edit<'a> = &'a dyn Fn(&mut npt_log::Machine);
+    let missing: [(&str, Edit<'_>); 14] = [
+        ("a VM with no address", &|m| m.address.clear()),
+        ("no kernel", &|m| m.kernel.clear()),
+        ("no CPU model", &|m| m.cpu.clear()),
+        ("no location", &|m| m.location.clear()),
+        ("no vCPU count", &|m| m.vcpus = 0),
+        ("no SMT map", &|m| m.smt.clear()),
+        ("an empty sibling list", &|m| m.smt.push(vec![])),
+        ("no clock resolution", &|m| m.clock_res_ns = 0),
+        // The advisor's FX-14 (TE-F13): every other condition, each alone.
+        ("no role", &|m| m.role.clear()),
+        ("no name", &|m| m.name.clear()),
+        ("no plan", &|m| m.plan.clear()),
+        ("no arch", &|m| m.arch.clear()),
+        ("no memory", &|m| m.mem_mb = 0),
+        ("no threads per core", &|m| m.threads_per_core = 0),
+    ];
+    for (why, edit) in missing {
+        assert_eq!(run("RS", edit), VerdictKind::Fail, "{why}");
+    }
+}
+
+// PM-0001-18's WebSocket part, judged with the real marks.json: the ws-practice rule and the numbers in force.
+
+fn real_marks() -> npt_judge::Marks {
+    let text = std::fs::read_to_string(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../marks/marks.json"
+    ))
+    .expect("marks");
+    parse_marks(&text).expect("marks.json compiles")
+}
+
+/// marks.json's PM-0001-18 `ws_bound_line`, the provisional line (the advisor's FX-6 (d)): a record carries it byte for
+/// byte.
+const WS_BOUND: &str = r#"npt-ws-bound v1 {"model":"provisional: the single-burst bound of bf9d248 (fixes.rs ws_bar_fix1), not the run-structured bound","commit":"bf9d24807106c4524d1aa0849409d219259c3943","runs_count":2000,"client_bursts_count":480,"x_ns":670000000,"y_ns":2500000000,"k_count":5,"z_ns":6900000000,"m_m_ns":654000000,"band_low":"0.965","band_high":"1.035","tolerance":"1.10","guard_share":"0.0000"}"#;
+
+/// One WebSocket B1 run of 480 client-bursts: `low` at 600 ms, the 240th (the median) at `median`, then `high` at
+/// 700 ms, and `slow` at `slow_ns`.
+fn heals(median: i64, slow: usize, slow_ns: i64) -> Vec<i64> {
+    let mut v = vec![600_000_000; 239];
+    v.push(median);
+    v.extend(std::iter::repeat_n(700_000_000, 240 - slow));
+    v.extend(std::iter::repeat_n(slow_ns, slow));
+    v
+}
+
+/// The bound's model, as marks.json's provisional `ws_bound_line` names it (FX-6 (d)).
+const WS_MODEL: &str = "provisional: the single-burst bound of bf9d248 (fixes.rs ws_bar_fix1), not the run-structured bound";
+
+/// A run's setup the ws-practice rule compares (the advisor's FX-13): RS's `machine.kernel` (`None`: no RS log in the
+/// run), `params.config_hz` and `params.ws_tcp_model` (`None`: left out).
+#[derive(Clone)]
+struct Setup {
+    kernel: Option<&'static str>,
+    config_hz: Option<i64>,
+    model: Option<&'static str>,
+}
+
+const SETUP: Setup = Setup {
+    kernel: Some("6.8.0-48-generic"),
+    config_hz: Some(250),
+    model: Some(WS_MODEL),
+};
+
+/// Everything a ws-practice scenario changes.
+#[derive(Clone)]
+struct Ws {
+    counted: Vec<i64>,
+    practice: Vec<i64>,
+    record: Vec<(&'static str, Value)>,
+    practice_started: &'static str,
+    practice_binary: &'static str,
+    practice_scene: &'static str,
+    practice_spacing: i64,
+    practice_footer: bool,
+    records: usize,
+    counted_started: Option<&'static str>,
+    second_practice: bool,
+    /// The counted run's setup (the bite run's too) and the practice run's.
+    counted_setup: Setup,
+    practice_setup: Setup,
+}
+
+/// The base: M_p 680 ms against M_m 654 ms, so s = f = 680/654; the numbers in force are 697 ms, 2.6 s and 7.175 s
+/// (the bound's 670 ms, 2.5 s and 6.9 s times f, rounded up to the ms); the counted run's median, 690 ms, and its 6
+/// heals at 2.55 s pass only at those numbers.
+fn ws_base() -> Ws {
+    Ws {
+        counted: heals(690_000_000, 6, 2_550_000_000),
+        practice: heals(680_000_000, 5, 2_590_000_000),
+        record: vec![
+            ("class", json!("IN TOLERANCE")),
+            ("m_p_ns", json!(680_000_000)),
+            ("bound", json!(WS_BOUND)),
+            (
+                "bound_file",
+                json!("spikes/netcode-proof/results/u3-ws-fallback/bound.txt"),
+            ),
+            ("bound_sha256", json!("0".repeat(64))),
+            ("x_moved_ns", json!(697_000_000)),
+            ("y_moved_ns", json!(2_600_000_000_i64)),
+            ("z_moved_ns", json!(7_175_000_000_i64)),
+            ("k_count", json!(5)),
+            ("s", json!("1.039755")),
+            ("f", json!("1.039755")),
+        ],
+        practice_started: "2026-11-20T18:00:00Z",
+        practice_binary: "a",
+        practice_scene: "SS",
+        practice_spacing: 30_000_000_000,
+        practice_footer: true,
+        records: 1,
+        counted_started: Some("2026-11-20T21:00:00Z"),
+        second_practice: false,
+        counted_setup: SETUP,
+        practice_setup: SETUP,
+    }
+}
+
+fn ws_log(
+    run: &'static str,
+    role: &'static str,
+    binary: &'static str,
+    started: Option<&'static str>,
+    heals: &[i64],
+) -> LogSpec {
+    let mut s = LogSpec::room(run, "set-ws", "PM-0001-18");
+    s.role = role;
+    s.machine_role = "LG";
+    s.process = "bots";
+    s.profile = "B1";
+    s.binary = binary;
+    s.params = vec![
+        ("transport", json!("ws")),
+        ("burst_spacing_ns", json!(30_000_000_000_i64)),
+    ];
+    if let Some(t) = started {
+        s.params.push(("started_utc", json!(t)));
+    }
+    s.events = heals
+        .iter()
+        .enumerate()
+        .map(|(i, h)| {
+            EventRecord::new("burst_heal", Phase::Measured)
+                .with("after_link_ns", *h)
+                .with("slot", i as i64 % 48)
+                .with("burst", i as i64 / 48)
+        })
+        .collect();
+    s
+}
+
+/// One WebSocket B1 run: LG's bots log (`edit` applied to it) with the setup's params, and RS's room log carrying the
+/// setup's kernel when it names one.
+fn ws_run(
+    run: &'static str,
+    role: &'static str,
+    binary: &'static str,
+    started: Option<&'static str>,
+    heals: &[i64],
+    setup: &Setup,
+    edit: &dyn Fn(&mut LogSpec),
+) -> Vec<Log> {
+    let mut bots = ws_log(run, role, binary, started, heals);
+    if let Some(m) = setup.model {
+        bots.params.push(("ws_tcp_model", json!(m)));
+    }
+    if let Some(hz) = setup.config_hz {
+        bots.params.push(("config_hz", json!(hz)));
+    }
+    edit(&mut bots);
+    let bite = bots.bite;
+    let mut logs = vec![bots.build()];
+    if let Some(k) = setup.kernel {
+        let mut rs = LogSpec::room(run, "set-ws", "PM-0001-18");
+        rs.role = role;
+        rs.profile = "B1";
+        rs.binary = binary;
+        rs.bite = bite;
+        rs.params = vec![("transport", json!("ws"))];
+        let mut log = rs.build();
+        log.header.machine.kernel = k.to_owned();
+        logs.push(log);
+    }
+    logs
+}
+
+/// Applies `edit` to every log of run `id`.
+fn edit_run(logs: &mut [Log], id: &str, edit: &dyn Fn(&mut Log)) {
+    for l in logs.iter_mut().filter(|l| l.header.run == id) {
+        edit(l);
+    }
+}
+
+fn ws_logs(w: &Ws) -> Vec<Log> {
+    let binary = |c: &str| -> &'static str { if c == "a" { "aa" } else { "bb" } };
+    let mut practice = ws_run(
+        "ws-practice",
+        "practice",
+        binary(w.practice_binary),
+        Some(w.practice_started),
+        &w.practice,
+        &w.practice_setup,
+        &|s| {
+            s.footer = w.practice_footer;
+            s.params[1] = ("burst_spacing_ns", json!(w.practice_spacing));
+            for _ in 0..w.records {
+                let mut e = EventRecord::new("ws_practice", Phase::After);
+                for (k, v) in &w.record {
+                    e = e.with(k, v.clone());
+                }
+                s.events.push(e);
+            }
+        },
+    );
+    edit_run(&mut practice, "ws-practice", &|l| {
+        l.header.scene = w.practice_scene.to_owned();
+    });
+    let mut logs = ws_run(
+        "ws-1",
+        "measured",
+        "aa",
+        w.counted_started,
+        &w.counted,
+        &w.counted_setup,
+        &|_| {},
+    );
+    logs.extend(practice.clone());
+    if w.second_practice {
+        logs.extend(another_practice(
+            &practice,
+            "ws-practice-0",
+            "2026-11-20T17:00:00Z",
+            &[],
+        ));
+    }
+    logs.extend(ws_run(
+        "ws-bite",
+        "bite",
+        "cc",
+        Some("2026-11-20T22:00:00Z"),
+        &heals(776_000_000, 0, 0),
+        &w.counted_setup,
+        &|s| s.bite = Some("PM-0001-18/ws-budget-x2"),
+    ));
+    logs
+}
+
+fn ws_part(w: &Ws) -> (npt_judge::eval::PartOut, npt_judge::Verdict) {
+    ws_judge(&ws_logs(w))
+}
+
+/// -18 judged on these logs with the real marks.json: the WebSocket part and the mark's verdict.
+fn ws_judge(logs: &[Log]) -> (npt_judge::eval::PartOut, npt_judge::Verdict) {
+    let marks = real_marks();
+    let i = marks
+        .marks
+        .iter()
+        .position(|m| m.id == "PM-0001-18")
+        .expect("-18");
+    let v = judge(&marks, logs).remove(i);
+    let part = v
+        .parts
+        .iter()
+        .find(|p| p.name == "L2 B1 ws")
+        .expect("the WebSocket part")
+        .clone();
+    (part, v)
+}
+
+#[test]
+fn u4j_ws_practice_puts_the_practice_runs_numbers_in_force() {
+    let (part, v) = ws_part(&ws_base());
+    assert_eq!(part.verdict, VerdictKind::Pass, "{:?}", part.why);
+    let checks = &part.runs[0].checks;
+    let median = checks
+        .iter()
+        .find(|c| c.name.starts_with("WebSocket: half"))
+        .expect("check c");
+    assert_eq!(median.value.as_deref(), Some("690000000"));
+    assert!(
+        median
+            .needs
+            .starts_with("<= 697000000 (X 670000000 x f 1.039755 = 697000000"),
+        "{}",
+        median.needs
+    );
+    assert!(
+        median.needs.contains("M_p 680000000 / M_m 654000000"),
+        "{}",
+        median.needs
+    );
+    // The practice outcome printed whole (the advisor's FX-11, R8 (v): "the ruling is in the run's report").
+    for text in [
+        "practice run ws-practice: IN TOLERANCE",
+        "band 0.965 to 1.035",
+        "tolerance 1.10",
+        "f = 1.039755 (max(1, s))",
+    ] {
+        assert!(median.needs.contains(text), "{text}: {}", median.needs);
+    }
+    let over = checks
+        .iter()
+        .find(|c| c.name.starts_with("WebSocket: at most"))
+        .expect("check d");
+    assert_eq!(
+        over.value.as_deref(),
+        Some("0"),
+        "none over Y' = 2.6 s (6 over the unmoved 2.5 s)"
+    );
+    let bite = v
+        .bites
+        .iter()
+        .find(|b| b.id == "PM-0001-18/ws-budget-x2")
+        .expect("the WebSocket bite");
+    assert_eq!(bite.status, BiteStatus::Shown, "{:?}", bite.runs);
+    // FAR BETTER, with the advisor's chance ruling: f = 1, so the bound itself is in force and 690 ms fails it.
+    let mut w = ws_base();
+    w.practice = heals(600_000_000, 5, 2_590_000_000);
+    w.record[0].1 = json!("FAR BETTER");
+    w.record[1].1 = json!(600_000_000);
+    w.record
+        .extend([("chance_ruling", json!("advisor-r3.md:12"))]);
+    w.record[5].1 = json!(670_000_000);
+    w.record[6].1 = json!(2_500_000_000_i64);
+    w.record[7].1 = json!(6_900_000_000_i64);
+    w.practice = heals(600_000_000, 0, 0);
+    let (part, _) = ws_part(&w);
+    assert_eq!(part.verdict, VerdictKind::Fail, "{:?}", part.why);
+    assert!(
+        says(
+            &part.why,
+            "WebSocket: half the client-bursts heal within X x f"
+        ),
+        "{:?}",
+        part.why
+    );
+    // A second practice run of one build counts only with its ruling; the latest is the one in force.
+    let mut w = ws_base();
+    w.second_practice = true;
+    let (part, _) = ws_part(&w);
+    assert_eq!(part.verdict, VerdictKind::Invalid, "{:?}", part.why);
+    assert!(
+        says(&part.why, "2 practice runs of one build"),
+        "{:?}",
+        part.why
+    );
+    w.record.push((
+        "second_ruling",
+        json!("advisor-r3.md:40: the cause found and fixed"),
+    ));
+    assert_eq!(ws_part(&w).0.verdict, VerdictKind::Pass);
+    // BEYOND under a chance ruling never reads as IN TOLERANCE: the class and the ruling's text are printed.
+    let mut w = ws_base();
+    w.record[0].1 = json!("BEYOND");
+    w.record
+        .push(("chance_ruling", json!("advisor-r3.md:20: a lone count")));
+    let (part, _) = ws_part(&w);
+    assert_eq!(part.verdict, VerdictKind::Pass, "{:?}", part.why);
+    let median = part.runs[0]
+        .checks
+        .iter()
+        .find(|c| c.name.starts_with("WebSocket: half"))
+        .expect("check c");
+    for text in [
+        "practice run ws-practice: BEYOND",
+        "chance ruling: \"advisor-r3.md:20: a lone count\"",
+    ] {
+        assert!(median.needs.contains(text), "{text}: {}", median.needs);
+    }
+}
+
+#[test]
+fn u4j_ws_practice_refuses_every_number_not_set_by_its_rules() {
+    let field = |name: &'static str, value: Value| {
+        move |w: &mut Ws| {
+            for f in &mut w.record {
+                if f.0 == name {
+                    f.1 = value.clone();
+                }
+            }
+        }
+    };
+    let bound = |from: &'static str, to: &'static str| {
+        field("bound", json!(WS_BOUND.replacen(from, to, 1)))
+    };
+    type Edit = Box<dyn Fn(&mut Ws)>;
+    let cases: Vec<(Edit, &str)> = vec![
+        (
+            Box::new(|w| w.practice_binary = "b"),
+            "run ws-1: no practice run of its build started before it",
+        ),
+        (
+            Box::new(|w| w.practice_started = "2026-11-20T22:00:00Z"),
+            "run ws-1: no practice run of its build started before it",
+        ),
+        (
+            Box::new(|w| w.counted_started = None),
+            "run ws-1 has no params.started_utc",
+        ),
+        (
+            Box::new(|w| w.counted_started = Some("20 Nov 2026 21:00")),
+            "is not YYYY-MM-DDTHH:MM:SSZ",
+        ),
+        (
+            Box::new(|w| w.practice_scene = "ES"),
+            "ran another scene or profile",
+        ),
+        (
+            Box::new(|w| w.practice_spacing = 20_000_000_000),
+            "ran another burst spacing",
+        ),
+        (
+            Box::new(|w| w.practice_footer = false),
+            "practice run ws-practice is invalid: complete:",
+        ),
+        (
+            Box::new(|w| w.records = 0),
+            "holds 0 ws_practice records, not 1",
+        ),
+        (
+            Box::new(|w| w.records = 2),
+            "holds 2 ws_practice records, not 1",
+        ),
+        (
+            Box::new(field("class", json!("BEYOND"))),
+            "is \"BEYOND\" at s = 1.039755",
+        ),
+        (Box::new(field("class", json!("INVALID"))), "is \"INVALID\""),
+        (
+            Box::new(field("m_p_ns", json!(681_000_000))),
+            "the record's m_p_ns is not practice run ws-practice's median",
+        ),
+        (
+            Box::new(field("x_moved_ns", json!(700_000_000))),
+            "the record's x_moved_ns is not the judge's X 670000000",
+        ),
+        (
+            Box::new(field("k_count", json!(6))),
+            "the record's k_count is not the bound's",
+        ),
+        // A record's bound line other than marks.json's, in any field (FX-6: these numbers' agreement with the
+        // checks and the rule is checked at load, marks.rs ws_bound_line_agrees_with_its_checks).
+        (
+            Box::new(bound(r#""tolerance":"1.10""#, r#""tolerance":"1.05""#)),
+            "its bound line is not PM-0001-18's ws_bound_line, byte for byte",
+        ),
+        (
+            Box::new(bound(r#""x_ns":670000000"#, r#""x_ns":680000000"#)),
+            "its bound line is not PM-0001-18's ws_bound_line, byte for byte",
+        ),
+        (
+            Box::new(bound(r#""k_count":5"#, r#""k_count":4"#)),
+            "its bound line is not PM-0001-18's ws_bound_line, byte for byte",
+        ),
+        (
+            Box::new(bound("npt-ws-bound v1 ", "npt-ws-bound ")),
+            "its bound line is not PM-0001-18's ws_bound_line, byte for byte",
+        ),
+        (
+            Box::new(|w| w.practice = heals(680_000_000, 6, 2_610_000_000)),
+            "but practice run ws-practice has 6 heals over 2600000000 ns",
+        ),
+        // FX-7 (the advisor's R7: "Valid only with 480 heal records"; probe G): one heal short or over, M_p unchanged.
+        (
+            Box::new(|w| {
+                let i = w
+                    .practice
+                    .iter()
+                    .position(|h| *h == 700_000_000)
+                    .expect("a 700 ms heal");
+                w.practice.remove(i);
+            }),
+            "practice run ws-practice has 479 heal records, not the bound's 480",
+        ),
+        (
+            Box::new(|w| w.practice.insert(0, 600_000_000)),
+            "practice run ws-practice has 481 heal records, not the bound's 480",
+        ),
+        // FX-13 (the advisor's R7: "a header naming the model, RS's kernel and CONFIG_HZ"): the practice run ran on
+        // the counted run's setup, its model the bound's.
+        (
+            Box::new(|w| w.practice_setup.kernel = Some("6.8.0-49-generic")),
+            "practice run ws-practice ran another RS's machine.kernel than run ws-1",
+        ),
+        (
+            Box::new(|w| w.practice_setup.config_hz = Some(1000)),
+            "practice run ws-practice ran another params.config_hz than run ws-1",
+        ),
+        (
+            Box::new(|w| w.practice_setup.model = Some("linux-6.8-tcp v3")),
+            "practice run ws-practice ran another params.ws_tcp_model than run ws-1",
+        ),
+        (
+            Box::new(|w| {
+                w.practice_setup.model = Some("linux-6.8-tcp v3");
+                w.counted_setup.model = Some("linux-6.8-tcp v3");
+            }),
+            "run ws-1's params.ws_tcp_model is not the bound's model",
+        ),
+        (
+            Box::new(|w| {
+                w.practice_setup.kernel = None;
+                w.counted_setup.kernel = None;
+            }),
+            "run ws-1 has no RS's machine.kernel",
+        ),
+        (
+            Box::new(|w| {
+                w.practice_setup.config_hz = None;
+                w.counted_setup.config_hz = None;
+            }),
+            "run ws-1 has no params.config_hz",
+        ),
+        (
+            Box::new(|w| {
+                w.practice_setup.model = None;
+                w.counted_setup.model = None;
+            }),
+            "run ws-1 has no params.ws_tcp_model",
+        ),
+        (
+            Box::new(|w| {
+                // M_p 740 ms: s = 740/654 = 1.1315, beyond the tolerance (the 240th of 480 heals, 750 ms above it).
+                let mut v = vec![600_000_000; 239];
+                v.push(740_000_000);
+                v.extend(std::iter::repeat_n(750_000_000, 235));
+                v.extend(std::iter::repeat_n(2_590_000_000, 5));
+                w.practice = v;
+                w.record[1].1 = json!(740_000_000);
+            }),
+            "is \"IN TOLERANCE\" at s = 1.131498",
+        ),
+    ];
+    for (edit, expected) in cases {
+        let mut w = ws_base();
+        edit(&mut w);
+        let (part, v) = ws_part(&w);
+        assert_eq!(
+            part.verdict,
+            VerdictKind::Invalid,
+            "{expected}: {:?}",
+            part.why
+        );
+        assert!(says(&part.why, expected), "{expected}: {:?}", part.why);
+        assert_eq!(v.verdict, VerdictKind::Invalid, "{expected}");
+    }
+    // BEYOND with the advisor's chance ruling (a lone count or maximum failure, s within the tolerance) counts.
+    let mut w = ws_base();
+    field("class", json!("BEYOND"))(&mut w);
+    w.record.push(("chance_ruling", json!("advisor-r3.md:20")));
+    assert_eq!(ws_part(&w).0.verdict, VerdictKind::Pass);
+}
+
+/// The record's field `name` set to `value`.
+fn set_field(w: &mut Ws, name: &str, value: Value) {
+    for f in &mut w.record {
+        if f.0 == name {
+            f.1 = value.clone();
+        }
+    }
+}
+
+/// The test-engineer's probe A (the advisor's FX-1, the High): a bound line whose band is 2.0 to 2.0 and a FAR BETTER
+/// record with a chance ruling at s = 1.9 would move X, Y and Z by 90 % (X' 1.273 s), past Mustafa's 10 %. The
+/// numbers never move past the tolerance: the run is INVALID, and its 1.2 s median never passes.
+#[test]
+fn u4j_ws_far_better_past_the_cap_is_invalid() {
+    let mut w = ws_base();
+    let mut counted = vec![600_000_000; 239];
+    counted.push(1_200_000_000);
+    counted.extend(std::iter::repeat_n(1_250_000_000, 240));
+    w.counted = counted;
+    let mut practice = vec![600_000_000; 239];
+    practice.push(1_242_600_000);
+    practice.extend(std::iter::repeat_n(1_300_000_000, 240));
+    w.practice = practice;
+    let line = WS_BOUND
+        .replacen(r#""band_low":"0.965""#, r#""band_low":"2.0""#, 1)
+        .replacen(r#""band_high":"1.035""#, r#""band_high":"2.0""#, 1);
+    for (name, value) in [
+        ("class", json!("FAR BETTER")),
+        ("m_p_ns", json!(1_242_600_000)),
+        ("bound", json!(line)),
+        ("x_moved_ns", json!(1_273_000_000)),
+        ("y_moved_ns", json!(4_750_000_000_i64)),
+        ("z_moved_ns", json!(13_110_000_000_i64)),
+    ] {
+        set_field(&mut w, name, value);
+    }
+    w.record.push(("chance_ruling", json!("x")));
+    let (part, v) = ws_part(&w);
+    assert_eq!(part.verdict, VerdictKind::Invalid, "{:?}", part.why);
+    assert!(says(&part.why, "ws-practice: "), "{:?}", part.why);
+    assert_eq!(v.verdict, VerdictKind::Invalid, "{:?}", v.why);
+}
+
+/// 480 practice heals with the median (the 240th) at `median`: 239 at 600 ms below it, then `rest` above it and
+/// `slow` at `slow_ns`.
+fn practice_heals(median: i64, rest: i64, slow: usize, slow_ns: i64) -> Vec<i64> {
+    let mut v = vec![600_000_000; 239];
+    v.push(median);
+    v.extend(std::iter::repeat_n(rest, 240 - slow));
+    v.extend(std::iter::repeat_n(slow_ns, slow));
+    v
+}
+
+/// The advisor's boundaries on the outcome record (advisor-ws-docs-r2.md:378: "s = 1.00, 1.10 and 1.1001"; FX-9 and
+/// the test-engineer's T1a, T1b, T2, T3): Mustafa's 10 % cap, band_low and the Z' recheck, each pinned.
+#[test]
+fn u4j_ws_the_tolerance_and_band_boundaries() {
+    let needs = |part: &npt_judge::eval::PartOut, prefix: &str| {
+        part.runs[0]
+            .checks
+            .iter()
+            .find(|c| c.name.starts_with(prefix))
+            .map(|c| c.needs.clone())
+            .unwrap_or_default()
+    };
+    let record = |w: &mut Ws, m_p: i64, moved: [i64; 3]| {
+        set_field(w, "m_p_ns", json!(m_p));
+        set_field(w, "x_moved_ns", json!(moved[0]));
+        set_field(w, "y_moved_ns", json!(moved[1]));
+        set_field(w, "z_moved_ns", json!(moved[2]));
+    };
+    // s = 1.00: the bound itself, f = 1.
+    let mut w = ws_base();
+    w.practice = practice_heals(654_000_000, 700_000_000, 5, 2_590_000_000);
+    w.counted = heals(660_000_000, 5, 2_550_000_000);
+    record(
+        &mut w,
+        654_000_000,
+        [670_000_000, 2_500_000_000, 6_900_000_000],
+    );
+    let (part, _) = ws_part(&w);
+    assert_eq!(part.verdict, VerdictKind::Pass, "s = 1.00: {:?}", part.why);
+    let c = needs(&part, "WebSocket: half");
+    assert!(
+        c.starts_with("<= 670000000 (X 670000000 x f 1 = 670000000"),
+        "s = 1.00: {c}"
+    );
+    // s = 1.10 (T1a): at the cap, 0.737 s, 2.75 s and 7.59 s.
+    let mut w = ws_base();
+    w.practice = practice_heals(719_400_000, 750_000_000, 5, 2_590_000_000);
+    record(
+        &mut w,
+        719_400_000,
+        [737_000_000, 2_750_000_000, 7_590_000_000],
+    );
+    let (part, _) = ws_part(&w);
+    assert_eq!(part.verdict, VerdictKind::Pass, "s = 1.10: {:?}", part.why);
+    for (prefix, start) in [
+        (
+            "WebSocket: half",
+            "<= 737000000 (X 670000000 x f 1.1 = 737000000",
+        ),
+        (
+            "WebSocket: at most",
+            "<= 5 (Y 2500000000 x f 1.1 = 2750000000",
+        ),
+        (
+            "WebSocket: no client-burst",
+            "<= 7590000000 (Z 6900000000 x f 1.1 = 7590000000",
+        ),
+    ] {
+        let c = needs(&part, prefix);
+        assert!(c.starts_with(start), "s = 1.10: {c}");
+    }
+    // The three refusals, each judged and collected, so a plant that loosens all three shows each by name.
+    // s = 1.1001 (T1b): just past the cap, its record's moved numbers the judge's at that f: INVALID.
+    let mut t1b = ws_base();
+    t1b.practice = practice_heals(719_465_400, 750_000_000, 5, 2_590_000_000);
+    record(
+        &mut t1b,
+        719_465_400,
+        [738_000_000, 2_751_000_000, 7_591_000_000],
+    );
+    // IN TOLERANCE at s = 0.95, below band_low 0.965 (T2): INVALID, though the counted run passes at the bound.
+    let mut t2 = ws_base();
+    t2.practice = practice_heals(621_300_000, 650_000_000, 0, 0);
+    t2.counted = heals(660_000_000, 5, 2_550_000_000);
+    record(
+        &mut t2,
+        621_300_000,
+        [670_000_000, 2_500_000_000, 6_900_000_000],
+    );
+    // One practice heal over Z' = 7.175 s only (T3; 1 over Y', within k): IN TOLERANCE does not hold.
+    let mut t3 = ws_base();
+    t3.practice = heals(680_000_000, 1, 7_200_000_000);
+    let mut wrong = Vec::new();
+    for (case, w, expected) in [
+        ("T1b", &t1b, "is \"IN TOLERANCE\" at s = 1.1001"),
+        ("T2", &t2, "is \"IN TOLERANCE\" at s = 0.95"),
+        (
+            "T3",
+            &t3,
+            "has 1 heals over 2600000000 ns and its slowest is 7200000000 ns",
+        ),
+    ] {
+        let (part, _) = ws_part(w);
+        if part.verdict != VerdictKind::Invalid || !says(&part.why, expected) {
+            wrong.push(format!("{case}: {:?} {:?}", part.verdict, part.why));
+        }
+    }
+    assert!(wrong.is_empty(), "{wrong:#?}");
+}
+
+/// A copy of the scenario's practice run (every log of run ws-practice) under another id, started at `started`, its
+/// record given `extra`.
+fn another_practice(logs: &[Log], id: &str, started: &str, extra: &[(&str, Value)]) -> Vec<Log> {
+    let mut out: Vec<Log> = logs
+        .iter()
+        .filter(|l| l.header.run == "ws-practice")
+        .cloned()
+        .collect();
+    for p in &mut out {
+        p.header.run = id.to_owned();
+        if p.header.params.contains_key("started_utc") {
+            p.header
+                .params
+                .insert("started_utc".to_owned(), json!(started));
+        }
+        for e in p.events.iter_mut().filter(|e| e.ev == "ws_practice") {
+            for (k, v) in extra {
+                e.f.insert((*k).to_owned(), v.clone());
+            }
+        }
+    }
+    out
+}
+
+/// The advisor's R9 ("a counted WebSocket run that fails stands as FAIL") and FX-2: a practice run started after the
+/// counted run (the test-engineer's probes E1 and E2) is no candidate, so it never turns the FAIL into INVALID.
+#[test]
+fn u4j_ws_a_practice_run_after_the_counted_run_changes_nothing() {
+    let mut w = ws_base();
+    w.counted = heals(700_000_000, 6, 2_550_000_000);
+    let logs = ws_logs(&w);
+    let (part, _) = ws_judge(&logs);
+    assert_eq!(part.verdict, VerdictKind::Fail, "E0: {:?}", part.why);
+    assert!(
+        says(
+            &part.why,
+            "WebSocket: half the client-bursts heal within X x f"
+        ),
+        "E0: {:?}",
+        part.why
+    );
+    for (case, extra) in [
+        (
+            "E1",
+            vec![(
+                "second_ruling",
+                json!("advisor-r3.md:40: the cause found and fixed"),
+            )],
+        ),
+        ("E2", vec![]),
+    ] {
+        let mut later = logs.clone();
+        later.extend(another_practice(
+            &logs,
+            "ws-practice-2",
+            "2026-11-20T23:00:00Z",
+            &extra,
+        ));
+        let (part, _) = ws_judge(&later);
+        assert_eq!(part.verdict, VerdictKind::Fail, "{case}: {:?}", part.why);
+        assert!(
+            says(
+                &part.why,
+                "WebSocket: half the client-bursts heal within X x f"
+            ),
+            "{case}: {:?}",
+            part.why
+        );
+    }
+}
+
+/// The advisor's R7 ("one practice run per build") over every run the judge reads (FX-3 (a), (b); the test-engineer's
+/// probe F): a second practice run of the build in another set counts, listing the mark or not, so with no
+/// second_ruling the run is INVALID; the latest must list the mark; a practice run in another set alone is in force.
+#[test]
+fn u4j_ws_one_practice_run_per_build_over_every_set() {
+    let logs = ws_logs(&ws_base());
+    let elsewhere = |listed: bool| {
+        let mut p = another_practice(
+            &logs,
+            "ws-practice-0",
+            "2026-11-20T17:00:00Z",
+            &[("class", json!("BEYOND"))],
+        );
+        edit_run(&mut p, "ws-practice-0", &|l| {
+            l.header.set = "set-ws-0".to_owned();
+            if !listed {
+                l.header.marks.clear();
+            }
+        });
+        p
+    };
+    for listed in [true, false] {
+        let mut with = logs.clone();
+        with.extend(elsewhere(listed));
+        let (part, _) = ws_judge(&with);
+        assert_eq!(
+            part.verdict,
+            VerdictKind::Invalid,
+            "listed {listed}: {:?}",
+            part.why
+        );
+        assert!(
+            says(&part.why, "2 practice runs of one build"),
+            "listed {listed}: {:?}",
+            part.why
+        );
+    }
+    // The practice run, in another set, is the only one of the build: it is in force.
+    let mut moved = logs.clone();
+    edit_run(&mut moved, "ws-practice", &|l| {
+        l.header.set = "set-ws-0".to_owned();
+    });
+    let (part, _) = ws_judge(&moved);
+    assert_eq!(part.verdict, VerdictKind::Pass, "{:?}", part.why);
+    // The latest practice run of the build does not list the mark: INVALID.
+    let mut unlisted = logs.clone();
+    edit_run(&mut unlisted, "ws-practice", &|l| l.header.marks.clear());
+    let (part, _) = ws_judge(&unlisted);
+    assert_eq!(part.verdict, VerdictKind::Invalid, "{:?}", part.why);
+    assert!(
+        says(&part.why, "does not list PM-0001-18"),
+        "{:?}",
+        part.why
+    );
+}
+
+/// The advisor's FX-6 (the test-engineer's probe H): M_m, the band, the guard, the model and the commit come from
+/// marks.json's `ws_bound_line`, never from a log. A record whose bound line says M_m 620 ms (its moved numbers
+/// recomputed to match) would let a 730 ms median pass at 735 ms; a record whose line differs only in its commit is
+/// refused too.
+#[test]
+fn u4j_ws_the_record_carries_the_marks_bound_line() {
+    let mut w = ws_base();
+    let mut counted = vec![600_000_000; 239];
+    counted.push(730_000_000);
+    counted.extend(std::iter::repeat_n(750_000_000, 234));
+    counted.extend(std::iter::repeat_n(2_550_000_000, 6));
+    w.counted = counted;
+    let (part, _) = ws_part(&w);
+    assert_eq!(part.verdict, VerdictKind::Fail, "H0: {:?}", part.why);
+    let mut h1 = w.clone();
+    for (name, value) in [
+        (
+            "bound",
+            json!(WS_BOUND.replacen(r#""m_m_ns":654000000"#, r#""m_m_ns":620000000"#, 1)),
+        ),
+        ("x_moved_ns", json!(735_000_000)),
+        ("y_moved_ns", json!(2_742_000_000_i64)),
+        ("z_moved_ns", json!(7_568_000_000_i64)),
+    ] {
+        set_field(&mut h1, name, value);
+    }
+    let (part, _) = ws_part(&h1);
+    assert_eq!(part.verdict, VerdictKind::Invalid, "H1: {:?}", part.why);
+    assert!(
+        says(&part.why, "is not PM-0001-18's ws_bound_line"),
+        "H1: {:?}",
+        part.why
+    );
+    let mut commit = ws_base();
+    set_field(
+        &mut commit,
+        "bound",
+        json!(WS_BOUND.replacen(r#""commit":"bf9d248"#, r#""commit":"ff9d248"#, 1)),
+    );
+    let (part, _) = ws_part(&commit);
+    assert_eq!(part.verdict, VerdictKind::Invalid, "commit: {:?}", part.why);
+    assert!(
+        says(&part.why, "is not PM-0001-18's ws_bound_line"),
+        "commit: {:?}",
+        part.why
+    );
+}
+
+/// The ws-budget-x2 bite run of -18's WebSocket part: its run outcome.
+fn ws_bite(v: &npt_judge::Verdict) -> &npt_judge::eval::BiteOut {
+    v.bites
+        .iter()
+        .find(|b| b.id == "PM-0001-18/ws-budget-x2")
+        .expect("the WebSocket bite")
+}
+
+/// FX-3 (c) and TE-F15: a bite run takes the practice run in force for its set's measured runs that serve the mark
+/// with its layer, profile and transport (one build among them), so it is judged at its counted run's f.
+#[test]
+fn u4j_ws_a_bite_run_takes_its_counted_runs_practice_run() {
+    let logs = ws_logs(&ws_base());
+    let check_c = |r: &npt_judge::eval::RunOut| {
+        r.checks
+            .iter()
+            .find(|c| c.name.starts_with("WebSocket: half"))
+            .map(|c| c.needs.clone())
+            .expect("check c")
+    };
+    // (1) The same f as the measured run's.
+    let (part, v) = ws_judge(&logs);
+    let bite = ws_bite(&v);
+    assert_eq!(bite.status, BiteStatus::Shown, "{:?}", bite.runs);
+    assert_eq!(check_c(&bite.runs[0]), check_c(&part.runs[0]));
+    assert!(check_c(&bite.runs[0]).contains("x f 1.039755 = 697000000"));
+    // (2) The set's measured runs come from two builds: the bite cannot tell whose numbers are in force.
+    let mut two = logs.clone();
+    let mut other: Vec<Log> = logs
+        .iter()
+        .filter(|l| l.header.run == "ws-1")
+        .cloned()
+        .collect();
+    edit_run(&mut other, "ws-1", &|l| {
+        l.header.run = "ws-2".to_owned();
+        l.header.build.binary_sha256 = "dd".to_owned();
+    });
+    two.extend(other);
+    let (_, v) = ws_judge(&two);
+    let bite = ws_bite(&v);
+    assert_eq!(bite.status, BiteStatus::Invalid, "{:?}", bite.runs);
+    assert!(
+        says(&bite.runs[0].invalid_why, "come from 2 builds"),
+        "{:?}",
+        bite.runs[0].invalid_why
+    );
+    // (3) Practice runs of two builds in the set, measured runs of one: the measured build's practice run.
+    let mut practices = logs.clone();
+    let mut p = another_practice(&logs, "ws-practice-dd", "2026-11-20T17:00:00Z", &[]);
+    edit_run(&mut p, "ws-practice-dd", &|l| {
+        l.header.build.binary_sha256 = "dd".to_owned();
+    });
+    practices.extend(p);
+    let (_, v) = ws_judge(&practices);
+    let bite = ws_bite(&v);
+    assert_eq!(bite.status, BiteStatus::Shown, "{:?}", bite.runs);
+    assert_eq!(check_c(&bite.runs[0]), check_c(&part.runs[0]));
+    // (4) A practice run of an older build in another set changes nothing.
+    let mut older = logs.clone();
+    let mut p = another_practice(&logs, "ws-practice-ee", "2026-11-19T17:00:00Z", &[]);
+    edit_run(&mut p, "ws-practice-ee", &|l| {
+        l.header.build.binary_sha256 = "ee".to_owned();
+        l.header.set = "set-old".to_owned();
+    });
+    older.extend(p);
+    let (_, v) = ws_judge(&older);
+    let bite = ws_bite(&v);
+    assert_eq!(bite.status, BiteStatus::Shown, "{:?}", bite.runs);
+    assert_eq!(check_c(&bite.runs[0]), check_c(&part.runs[0]));
 }

@@ -6,6 +6,7 @@
 pub mod eval;
 pub mod figures;
 pub mod marks;
+mod practice;
 pub mod ratio;
 
 pub use eval::{Verdict, VerdictKind, judge};
