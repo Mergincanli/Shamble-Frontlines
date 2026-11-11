@@ -53,3 +53,20 @@ the whole copy: wip/u4d-s1.patch (U4d plus this half; re-taken after each step).
   wire.rs 69ef15ec, bites.rs 96d07cc9; sim seam.rs 0c41b406 (= U4d's), quant.rs 0d41e906 (unchanged).
 
 ## Plants (each by Edit in place, the one test run alone, restored by Edit, then `sha256sum -c`)
+Logs: scratchpad s1-p1.log to s1-p8.log. After the last restore, all 7 reference files OK and no plant left (grep for
+`if false`, `VELOCITY => return`, `Field; 11]`: none).
+- P1, the snapshot decoder's section check off (`get_delta`): w1_s1 FAILED, "Vehicle moved out of the entity
+  section" (the moved record decoded as Ok instead of `Err(Malformed)`).
+- P2, the full-state decoder's check off (`get_record`): w1_s1 FAILED, the same message for the FullState bytes
+  (`17000000 03 …`).
+- P3, the delta encoder's check off (`put_delta`): w1_s1 FAILED, "Vehicle own true: Add(…)": `(Ok(()), [238, 2, …])`
+  against `(Err(OutOfRange), [238])`.
+- P4, the record encoder's check off (`put_record`): w1_s1 FAILED, "Vehicle own true: a full state".
+- P5, `OwnState` out of `Snapshot::GROUPS`'s own-state row: the GROUPS test FAILED, "OwnState has no group".
+- P6, `OwnState` also in the "remote soldiers" row: the GROUPS test FAILED, "OwnState: [("own state", Owner, …),
+  ("remote soldiers", Spatial, [Soldier, OwnState])]".
+- P7, velocity back in SOLDIER (npt-sim seam.rs: `[Field; 11]`, VELOCITY ×3 appended): the GROUPS test FAILED at the
+  widths, `[16, 16, 12, 16, 10, 8, 10, 4, 16, 16, 16]` against the row's `[16, 16, 12, 16, 10, 8, 10, 4]` (the
+  security review's 48 bits).
+- P8, pos-4cm also coarsening VELOCITY (quant.rs `step`): the -57 bites test FAILED, "PM-0001-57/pos-4cm half a step:
+  the owner-only record".

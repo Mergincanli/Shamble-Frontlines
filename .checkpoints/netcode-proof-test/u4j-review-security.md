@@ -22,3 +22,12 @@ Started 2026-11-11. No earlier notes file (fresh run). No agent memory folder fo
 5. Verdict and findings to StructuredOutput.
 
 ## Progress
+- Read: git diff (11 files + 22 untracked), log/src/lib.rs, judge marks.rs, eval.rs, figures.rs, practice.rs, ratio.rs;
+  u4j-build.md; u4j-brief.md; u4-build-plan §5 U4j, §2 C4 row, §4.6, §4.12; advisor-u2 C4 (:101-103);
+  advisor-ws-docs-r2 :375-378, R7 :397, R8 :398; ADR 0001 -18 row :1608; marks.json -18, -21, -30; README diff.
+- F1 HIGH practice.rs:386-406 + parse_bound :87-90: FAR BETTER branch caps nothing. class_ok "FAR BETTER" needs only a
+  chance_ruling and s < band_low; parse_bound accepts any band_low in (0, band_high] (no band_low <= 1 <= band_high),
+  then f = max(1, s). Bound line band_low "2.0"/band_high "2.0", class FAR BETTER, any non-empty chance_ruling, M_p =
+  1.9 x M_m -> f = 1.9: X/Y/Z moved 90 % past Mustafa's 10 % (R8 (v): "FAR BETTER: at the bound"). Fix: FAR BETTER
+  forces f = 1; parse_bound refuses band_low > 1 or band_high < 1; assert f <= tolerance before Ok. Proof: engine test
+  (the ws-practice PASS case with that bound line and class) must come out INVALID. Before merge.

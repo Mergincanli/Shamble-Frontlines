@@ -957,8 +957,8 @@ clamp, "PM-0001-21's 'a run with only their valid parts' (ADR 0001:1611), for a 
 that press removed: the button's counter one lower from the refused command on (W1-U4D)"; and "PM-0001-58's 'the
 snapshot's tick offsets' (ADR 0001:1607) read as the snapshot header's two command acknowledgements (16-bit
 sequences); the remaining tick offsets, the baseline's age (at most 31: §4.5's ring) and the event age (8 bits), never
-cross a wrap, so they get no bite (W1-N2)". Changed in rev 2: Q2, Q3, Q4, Q5, Q9, Q10, Q11, Q13, Q15, Q16, Q21, Q22; new: Q23
-to Q26.
+cross a wrap, so they get no bite (W1-N2)". Changed in rev 2: Q2, Q3, Q4, Q5, Q9, Q10, Q11, Q13, Q15, Q16, Q21, Q22;
+new: Q23 to Q26.
 
 - **U4-SEAM (Q1), where the sim trait lives.** (a) In npt-sim; npt-room generic over it, depending on npt-sim. (b) In
   npt-room, so npt-sim depends on npt-room, against ADR 0002:186-189. (c) Trait and implementation in npt-room: the
@@ -1065,5 +1065,5 @@ course's targets as thin plates (Q17); -22 running without the stress-scene prec
 "run speed" as the soldier's movement speed (Q24); S1's stand-in CPU burn off on L1, a reading of ADR 0001:1589's
 stand-in sentence (Q26); and PM-0001-58's 'the snapshot's tick offsets' (ADR 0001:1607) read as the snapshot header's
 two command acknowledgements (16-bit sequences); the remaining tick offsets, the baseline's age (at most 31: §4.5's
-ring) and the event age (8 bits), never cross a wrap, so they get no bite (W1-N2). Q10 is off the list. A third unsafe exception
-(Q3 B) is the advisor's call (plan.md:430-438).
+ring) and the event age (8 bits), never cross a wrap, so they get no bite (W1-N2). Q10 is off the list. A third
+unsafe exception (Q3 B) is the advisor's call (plan.md:430-438).

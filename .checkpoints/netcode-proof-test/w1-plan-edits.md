@@ -142,3 +142,51 @@ Not placed in these four files (others' or later, or no text ordered): see "Skip
   replacement in that setup condition: a pre-check leg with any is VOID (U4E-Q5)."; the label gains "; its last
   sentence added by the advisor's W1-U4E ruling, U4E-Q5". The rest of the quote is unchanged (its "holds by
   construction" is about the tolerance and the cap; the new sentence names the exception). Done.
+- E29 W1-PUB (:414-416): plan.md §4.7's npt-sim line (base :584-585; now :584-586): "`SimRng`," → "`SimRng`
+  (crate-private: no other crate draws from the sim's streams; the advisor's W1-PUB ruling),", rewrapped. Done, exact.
+- E30 W1-PLAN TCP-FREEZE (:521-527): plan.md the U8 row (:1248 now; base :1247), inserted after "since this container
+  has no tc" and before "; and DelayStream's self-test on RS". Done, the ruling's words exactly.
+- E31 NETEM-BAR (a) (history.md:292-296; the task's order): plan.md the U8 row, right after E30's "R1's report records
+  the comparison and the switch": "; Mustafa's NETEM-BAR (a), 2026-11-10: "The bar stays capped as WS-BAR says. If a
+  WebSocket row fails because the kernel is slower than the model, report it to me as the kernel's, with the netem
+  numbers, and I decide."". Done: his two sentences verbatim (checked by script against history.md :292-295 joined:
+  equal); words mine: only the lead-in "Mustafa's NETEM-BAR (a), 2026-11-10:" (the code, the option and the date).
+- E32 W1-PLAN (:528-529): plan.md §15's R-25 row (base :1417), "; if they disagree, netem wins and the model is not
+  repaired (TCP-FREEZE)" added after "against RS's at R1 (S14)". Done, exact.
+- E33 W1-PLAN SQUASH-CITES (a) (:505-512): plan.md §16, the PR #40 bullet (base :1436-1438; now :1437-1443) replaced
+  by the ruling's text, wrapped at 120. Done, exact.
+- Wrap fixes (no words changed): u4-build-plan.md §10's preamble tail ("Changed in rev 2 ... new: Q23 to Q26", 124
+  characters at the base, 125 after E19) and §11's tail ("Q10 is off the list. A third unsafe exception", 128 after
+  E20) rewrapped at 120. Every added non-table line in the four diffs is now at most 120 characters; table rows stay
+  one line each, as the files' tables do.
+
+## Checks
+- A script (the session scratchpad's w1check.py, whitespace-normalised) finds every ordered text exactly once in its
+  file (37 texts; the two W1-N2 and W1-U4D readings twice each in u4-build-plan.md, as §10 and §11 both carry them),
+  and none of the 9 replaced or deleted texts.
+- Mustafa's NETEM-BAR words checked against history.md :292-295 joined: equal.
+- The word diff against 20702fd shows no change outside E1-E33 and the two wraps.
+
+## Result: new sha256 (lines)
+- plan.md 4717029cf385738df2171c1b6c885afe1372542be7407e207a6f41f2dbb4eb79 (1,518 lines)
+- u4-build-plan.md f54125ec6a5af2d8de6446c9b830bc831aa1d2c6a8258314c3753830538817c6 (1,069 lines)
+- u4s-carries.md 19e7ca98ca17286dfdb8a92ad235f4f3ce505f6ae87c0f3ae7460cf68de59232 (272 lines)
+- advisor-u4.md 25d1846b897803222d97f5b35ab48ae0194896c9f801954dbf6e0b15811c9f0b (478 lines)
+
+## Skipped (ordered elsewhere, later, or no text for these four files)
+- W1-S1: the catalogue's own-state section (at U4d's merge: the main session's); U4e's brief rev 3; the npt-sim and
+  npt-proto code (U4d's fix pass; the main session's merge commit).
+- W1-U4D: every code fix (H1, N-M1, N-M3, N-M4, N-M5, R-M1, A-M1, T-M1, T-M2's history.rs and carry 14's test, T-M3,
+  the refusal records, the Lows); TUNE-1's conditions (run headers, U4d's report); TUNE-2's World doc and assert (code);
+  C13's report line (U4d's report). Carry 14's own text still says "1 MB" (no rewording ordered; T-M2 fixes it as
+  10^6 B in §4.9 only).
+- W1-N2: marks.json (U4j's builder made it), the catalogue :135, u4j-brief.md's two lines.
+- W1-PUB: the three nits (limits.rs rename, server lib.rs's two paths, `Recording`'s two paths: code); `SimRng` in
+  U4d's report; U4j's §4.1 items (in review) and U4d's Weapon, Scene::weapon, Scene::health (to the advisor).
+- W1-U4E: Q5's U4r brief (not yet written); Q6's two conditions (no text placed in these files: they go to the U4e and
+  U4r briefs); Q7 and Q9 (no ruling needed); "U4e then reports carry 24 as met" (U4e's report).
+- W1-PLAN: the TCP-FREEZE relay to Mustafa (the main session's); R1's and R3's run plans (later).
+- W1-TARGET: wave 2's briefs (no plan text).
+- Not ordered, noticed: §5 U4d's Builds still says "the synthetic recording generator (test support)" (u4-build-plan.md
+  :607), beside §4.15's new "npt-sim's library"; u4s-carries.md's header still says "44 entries" (45 at the base, 50
+  now). Both left for the advisor or the main session.
