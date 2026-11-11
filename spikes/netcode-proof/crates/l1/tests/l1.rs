@@ -48,9 +48,9 @@ struct Run {
 }
 
 /// `n` datagrams each way, one every `spacing_ns` from `spacing_ns` on, both ends polled before sending at every step,
-/// then steps until everything has arrived.
+/// then steps until everything has arrived (a datagram is never resent, so 4 s is ample).
 fn exchange(net: L1Net, profile: Profile, n: u64, spacing_ns: u64) -> Run {
-    let drain_until = n * spacing_ns + 4 * SEC + 8 * profile.rto_ns();
+    let drain_until = n * spacing_ns + 4 * SEC;
     let mut client = net.connect(profile, 1200, 0);
     let mut listener = net.listener();
     let mut server: Option<Box<dyn Link>> = None;
@@ -346,7 +346,6 @@ fn delivery_follows_arrival_order_and_stamps_the_arrival_never_the_poll() {
 #[test]
 fn streams_lose_nothing_keep_their_order_and_wait_out_a_burst() {
     let p = Profile::b1(&[2 * SEC]);
-    let rto = p.rto_ns();
     let net = L1Net::new(3);
     let mut c = net.connect(p, 1200, 0);
     let mut listener = net.listener();
@@ -355,7 +354,7 @@ fn streams_lose_nothing_keep_their_order_and_wait_out_a_burst() {
     let mut full = Vec::new();
     let mut t = MS;
     let mut k = 0u64;
-    while t <= 6 * SEC + 8 * rto {
+    while t <= 8 * SEC {
         if s.is_none() {
             s = listener.poll_accept(t).map(|(l, _)| l);
         }
@@ -382,24 +381,237 @@ fn streams_lose_nothing_keep_their_order_and_wait_out_a_burst() {
     for stream in [&control, &full] {
         assert!(stream.windows(2).all(|w| w[0].seq < w[1].seq), "in order");
     }
-    // A message sent inside the burst [2 s, 3 s) waits for the first retry outside it.
-    for g in control
-        .iter()
-        .filter(|g| (2 * SEC..3 * SEC).contains(&g.sent_ns))
-    {
-        assert!(
-            g.arrival_ns >= 3 * SEC + 40 * MS,
-            "seq {} arrived at {}",
-            g.seq,
-            g.arrival_ns
-        );
+    // A message sent inside the burst [2 s, 3 s) waits for its first resend outside it. With a packet sent every
+    // millisecond the PTO never fires (each send restarts it): the losses found before the burst are resent by about
+    // 2.1 s (the last acknowledgements sent before 2 s arrive by 2.06 s, and the time threshold is at most 9/8 x 120 ms
+    // after a send), and nothing is resent from 2.2 s until the burst ends. The first acknowledgements after it, from
+    // about 3.1 s, declare its packets lost by the loss rules (the unit tests pin the packet and the time threshold),
+    // and their resends arrive about 50 ms later.
+    for stream in [&control, &full] {
+        for g in stream
+            .iter()
+            .filter(|g| (2 * SEC..3 * SEC).contains(&g.sent_ns))
+        {
+            assert!(
+                (3 * SEC + 40 * MS..3 * SEC + 600 * MS).contains(&g.arrival_ns),
+                "seq {} arrived at {}",
+                g.seq,
+                g.arrival_ns
+            );
+        }
     }
-    // Outside the burst, about 2 % of messages wait one retransmission timeout, and hold back those behind them.
+    let inside = net.with_fate_log(|log| {
+        let mut sends = Vec::new();
+        log.for_each_canonical(|b| {
+            // A stream packet's entry (64 bytes): its resends field, then its send time.
+            let sent = || u64::from_le_bytes(b[16..24].try_into().unwrap());
+            if b.len() == 64
+                && u32::from_le_bytes(b[36..40].try_into().unwrap()) > 0
+                && (2_200 * MS..3 * SEC).contains(&sent())
+            {
+                sends.push(sent());
+            }
+        });
+        sends
+    });
+    assert!(
+        inside.is_empty(),
+        "{} stream packets resent inside the burst after 2.2 s, the first at {} ns: a PTO fired",
+        inside.len(),
+        inside.first().copied().unwrap_or(0)
+    );
+    // Outside the burst, P2's 2 % loss makes some messages wait for a resend, past the one-way ceiling of 60 ms, and
+    // hold back those behind them.
     let late = control
         .iter()
-        .filter(|g| g.sent_ns < 2 * SEC && g.delay() >= rto)
+        .filter(|g| g.sent_ns < 2 * SEC && g.delay() > 60 * MS)
         .count();
-    assert!(late > 0, "some messages were retransmitted");
+    assert!(late > 0, "some messages were resent");
+    let resent = net.with_fate_log(|log| {
+        let mut n = 0u64;
+        log.for_each_canonical(|b| {
+            // A stream packet's entry (64 bytes) whose resends field is above 0.
+            if b.len() == 64 && u32::from_le_bytes(b[36..40].try_into().unwrap()) > 0 {
+                n += 1;
+            }
+        });
+        n
+    });
+    assert!(
+        resent > 1_000,
+        "{resent} resends: the burst's packets and 2 % of the rest"
+    );
+}
+
+/// The mixed run of L-c8's unit half: 3,000 steps of 1 ms, a datagram each way per step, a control message up every
+/// 3rd step and a 1,500 B full state down every 5th, then 4 s of polls.
+fn mixed(profile: Profile, seed: u64) -> L1Net {
+    let net = L1Net::new(seed);
+    let mut c = net.connect(profile, 1200, 0);
+    let mut listener = net.listener();
+    let mut s: Option<Box<dyn Link>> = None;
+    let mut t = MS;
+    let mut k = 0u64;
+    let big = [7u8; 1500];
+    while t <= 3_000 * MS + 4 * SEC {
+        if s.is_none() {
+            s = listener.poll_accept(t).map(|(l, _)| l);
+        }
+        let srv = s.as_mut().expect("accepted at the first step");
+        while srv.poll_recv(t).is_some() {}
+        while c.poll_recv(t).is_some() {}
+        if k < 3_000 {
+            if k.is_multiple_of(3) {
+                c.send_reliable(Channel::Control, b"a control", t);
+            }
+            c.send_unreliable(&payload(k, t), t);
+            if k.is_multiple_of(5) {
+                srv.send_reliable(Channel::FullState, &big, t);
+            }
+            srv.send_unreliable(&payload(k, t), t);
+            k += 1;
+        }
+        t += MS;
+    }
+    net
+}
+
+/// FNV-1a-64 of v1's tag (`npt-l1 fate log v1` and a newline) followed by the log's datagram entries in its canonical
+/// form (each 40 bytes, flow code 0), and how many of each kind of entry the log holds: (datagram, stream, ack).
+fn v1_datagram_fnv(log: &FateLog) -> (u64, [u64; 3]) {
+    let mut h: u64 = 0xcbf2_9ce4_8422_2325;
+    let mut eat = |b: &[u8]| {
+        for &x in b {
+            h ^= u64::from(x);
+            h = h.wrapping_mul(0x0000_0100_0000_01b3);
+        }
+    };
+    eat(b"npt-l1 fate log v1\n");
+    let mut counts = [0u64; 3];
+    let mut tag = true;
+    log.for_each_canonical(|b| {
+        if tag {
+            assert_eq!(b, b"npt-l1 fate log v2\n");
+            tag = false;
+            return;
+        }
+        match (b.len(), b[5]) {
+            (40, 0) => {
+                counts[0] += 1;
+                eat(b);
+            }
+            (64, 1 | 2) => counts[1] += 1,
+            (56, 3) => counts[2] += 1,
+            other => panic!("an entry of {} bytes with flow code {}", other.0, other.1),
+        }
+    });
+    (h, counts)
+}
+
+/// L-c8's unit half (u4-build-plan.md §5 U4c; Q15's fate log v2): a datagram's entry keeps v1's 40-byte form, and its
+/// fate does not move with the stream packets and acknowledgements around it, so v1's tag followed by a v2 log's
+/// datagram entries are the bytes v1's tag and datagram entries were for the same run. For the probe, whose v1 log holds
+/// only datagrams, that is v1's whole log, the hash L-c8 compares. The pins are those bytes' FNV-1a-64 for this mixed
+/// run on the U2 code (097f897, before U4c), for P2, B1 with a burst at 1 s, and P4, seed 1. (The judged half, the
+/// probe's SHA-256 against U2's committed 913db8e9, feabf2f0 and b8a04f2f, runs with -3's re-run after U4j.)
+#[test]
+fn v1s_tag_and_the_v2_logs_datagram_entries_hash_as_v1s_log_did() {
+    for (p, pin) in [
+        (Profile::p2(), 0xadfb_ebe4_bb1a_bf64_u64),
+        (Profile::b1(&[SEC]), 0x4374_9a62_922e_9b35),
+        (Profile::p4(), 0x246e_7a24_1a2a_0a18),
+    ] {
+        let name = p.name;
+        let (h, [datagrams, stream, acks]) = mixed(p, 1).with_fate_log(v1_datagram_fnv);
+        assert_eq!(datagrams, 6_000, "{name}: every datagram has its entry");
+        assert!(
+            stream > 1_600 && acks > datagrams,
+            "{name}: {stream} stream packets and {acks} acknowledgements logged beside them"
+        );
+        assert_eq!(
+            h, pin,
+            "{name}: the datagram entries are not v1's ({h:#018x})"
+        );
+    }
+}
+
+/// Q15: an acknowledgement is lost only inside a burst. In the mixed run under B1 (its 2 % loss, and a burst at 1 s),
+/// the loss outside the burst takes packets of the other flows but no acknowledgement: in the v2 log no
+/// acknowledgement's entry is lost (kind 1), and one is lost in a burst (kind 2) exactly when it was sent inside
+/// [1 s, 2 s).
+#[test]
+fn acknowledgements_are_lost_only_inside_bursts() {
+    let net = mixed(Profile::b1(&[SEC]), 1);
+    // (packets lost outside the burst, acknowledgements lost in it, acknowledgements delivered)
+    let mut n = (0u64, 0u64, 0u64);
+    let mut wrong = Vec::new();
+    net.with_fate_log(|log| {
+        log.for_each_canonical(|b| {
+            if b.len() < 40 {
+                return;
+            }
+            let (code, kind) = (b[5], b[6]);
+            let sent = u64::from_le_bytes(b[16..24].try_into().unwrap());
+            let inside = (SEC..2 * SEC).contains(&sent);
+            if code == 3 {
+                match (kind, inside) {
+                    (0, false) => n.2 += 1,
+                    (2, true) => n.1 += 1,
+                    _ => wrong.push((kind, sent)),
+                }
+            } else if kind == 1 {
+                n.0 += 1;
+            }
+        });
+    });
+    assert!(
+        wrong.is_empty(),
+        "{} acknowledgements with the wrong fate, the first (kind, sent ns) {:?}",
+        wrong.len(),
+        wrong.first()
+    );
+    assert!(
+        n.0 > 50 && n.1 > 50 && n.2 > 3_000,
+        "the run did not lose packets outside the burst and acknowledgements in it: {n:?}"
+    );
+    println!("lost outside the burst, acknowledgements lost in it, delivered: {n:?}");
+}
+
+#[test]
+fn next_event_ns_names_the_next_arrival_then_its_acknowledgement_then_nothing() {
+    let net = L1Net::new(5);
+    assert_eq!(net.next_event_ns(), None, "nothing pending on a new net");
+    let mut c = net.connect(Profile::p2(), 1200, 0);
+    let mut listener = net.listener();
+    let (mut s, _) = listener.poll_accept(1).unwrap();
+    assert_eq!(net.next_event_ns(), None);
+    c.send_unreliable(b"one", 10 * MS);
+    let arrival = net.next_event_ns().expect("the datagram's arrival");
+    assert!((50 * MS..=70 * MS).contains(&arrival), "{arrival}");
+    assert!(s.poll_recv(arrival - 1).is_none(), "nothing before it");
+    let r = s.poll_recv(arrival).expect("handed out at its arrival");
+    assert_eq!(r.arrival_ns, arrival);
+    let ack = net.next_event_ns().expect("its acknowledgement's arrival");
+    assert!(
+        (arrival + 40 * MS..=arrival + 60 * MS).contains(&ack),
+        "{ack}"
+    );
+    assert_eq!(
+        c.rtt_ns(),
+        None,
+        "no sample before the acknowledgement arrives"
+    );
+    assert!(c.poll_recv(ack).is_none());
+    assert_eq!(
+        c.rtt_ns(),
+        Some(ack - 10 * MS),
+        "the first sample sets the estimate"
+    );
+    assert_eq!(
+        net.next_event_ns(),
+        None,
+        "a datagram arms no probe timer, so nothing is left"
+    );
 }
 
 #[test]
