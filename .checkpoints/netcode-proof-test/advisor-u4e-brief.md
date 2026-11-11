@@ -163,3 +163,149 @@ differs from 39f4290 under spikes/ whatever happens.
 - 7.2 item 1: replace "Otherwise the counts are 365, 412 and 52 of 52, with 10 steps." with "(`<base>` holds U4j's
   merge and the carry-51 commit, so this run is always needed; the last counts known are d50396a's: 396, 443, 52 of
   52, 10 steps.)"
+
+### Block 5. The brief's open questions (done)
+Plan cites inside the quoted brief words use the brief's numbering (the plan at 7375cdcf…, section 0).
+
+**U4E-Q14 (the 1 s gap on Loopback): (b), with the gap tied to the ring, not to 30 Hz.**
+- Why the 1 s gap cannot work on Loopback. Call L the last snapshot delivered before the gap and F the first tick
+  after it. B is never newer than L, so B's age at F is at least F − L, which is the number of snapshots lost plus 1.
+  The server's sends are ⌊k × 10⁹ / 30⌋ ns apart (U4b's `due_ticks`), so s(k + 30) − s(k) is exactly 10⁹ ns, and a
+  half-open 1 s gap holds exactly 30 sends: F − L = 31. If the client's first input after the gap (which acknowledges
+  L) arrives before F's encode, B = L at age 31, inside the ring (ages 0 to 31 kept: §4.5): no eviction. So e5a would
+  fail at one alignment or both, and the builder would stop. The brief's own reading (31 or 32) is right.
+- The fix. A gap of `npt_sim::ACK_RING_TICKS` tick periods holds 31 or 32 sends at 30 Hz, whatever the alignment and
+  whichever way the builder rounds the ns (32 × 10⁹ / 30 is not whole), so F − L ≥ 32 and B leaves the ring. Tying it
+  to the constant, not "1 s plus two tick periods", keeps it right at 60 Hz too (the ring is 64 ticks there, and
+  1 s + 2 periods would be 62 sends, B at 63, kept).
+- Not looser: -18's judged runs are L1 B1, whose 1 s bursts add the RTT to B's age (the brief's U4E-Q14 text); this
+  changes only the Loopback unit proof, which exists to show the bite can bite (§4.5 :298-299). No ADR or mark word
+  changes. The gap is a test's input, not a constant the build needs, so the F2 ruling's point (3) does not apply; it
+  stays a `let` computed from the constant by path and the rate the test passes in (carry 39: no const or static).
+- **Words, the brief:**
+  - e5's lead: replace "e5 a 1 s gap evicting B (:718; §4.14 :460's unit proof, the server half), as two tests," with
+    "e5 a gap evicting B (:718's "a 1 s gap evicting B": on Loopback the gap is `npt_sim::ACK_RING_TICKS` tick periods,
+    U4E-Q14 (b); §4.14 :460's unit proof, the server half), as two tests,".
+  - e5a: replace "The ring holds 32 ticks = 1.067 s at 30 Hz, so a 1 s gap (30 ticks) evicts B only with B's age at
+    the gap's start counted in." with "The gap lasts `npt_sim::ACK_RING_TICKS` tick periods (1.067 s at 30 Hz: 1 s plus
+    two tick periods; U4E-Q14 (b)), its length in ns on the injected clock computed in the test from that constant by
+    path and the rate the test passes in (a test's input, never a const or static: carry 39). Why: every snapshot whose
+    send falls in the gap is lost, at least 31 at 30 Hz, so B's age at the first tick after the gap is at least 32 at
+    either alignment, while a 1 s gap loses exactly 30 and leaves B at 31 or 32 on Loopback, at the ring's edge."
+  - e5a: replace "the precondition holds only if both give at least 32. If either leaves B at age 31 or less, report
+    both (§4.14 :460's "a 1 s gap evicts B" then does not hold on Loopback), and do not lengthen the gap or choose the
+    alignment on your own (U4E-Q14)." with "the precondition holds only if both give at least 32
+    (`npt_sim::ACK_RING_TICKS`); if either gives less, stop that part and report both, and change neither the gap nor
+    the alignment on your own. e5a also runs a 1 s gap at both alignments and reports B's tick and age there (reported,
+    not asserted)."
+  - 2.5: replace "through a 1 s gap in delivery:" with "through a gap in delivery (e5a's: `npt_sim::ACK_RING_TICKS`
+    tick periods, U4E-Q14 (b)):".
+  - 2.5's gap bullet: replace "that drops every datagram both ways for 1 s on the injected clock is inside the lane;
+    its length in ns, never a `*_TICKS` constant (carry 27)." with "that drops every datagram both ways for e5a's gap
+    on the injected clock is inside the lane; its length in ns, from `npt_sim::ACK_RING_TICKS` by path and the rate
+    passed in, never a const or static (carries 27 and 39)."
+- **Words, the plan** (the main session's commit; condition 12's list of allowed edits gains them by this ruling):
+  - §4.14's -18/no-fallback row: replace "a 1 s gap evicts B; `burst_eviction` = 1" with "a gap evicts B (on Loopback
+    `npt_sim::ACK_RING_TICKS` tick periods, 1 s plus two tick periods at 30 Hz, since there a 1 s gap leaves B at the
+    ring's edge: the advisor's U4E-Q14 ruling); `burst_eviction` = 1".
+  - §5 U4e, Tests: replace "a 1 s gap evicting B;" with "a gap evicting B (on Loopback `npt_sim::ACK_RING_TICKS` tick
+    periods: U4E-Q14);".
+  - §5 U4e, -18's bite end to end: replace "through a 1 s gap in delivery:" with "through a gap in delivery (on
+    Loopback `npt_sim::ACK_RING_TICKS` tick periods: U4E-Q14):".
+  Each phrase occurs once in the plan (checked).
+
+**U4E-Q12 (-22/unbounded's planting unit): (c).** U4e plants and unit-shows it; U4f runs it judged; the plan's Bites line
+gains it.
+- Why: §4.14's own rule is "planted where its code lives, shown to change state by a unit test in that sub-unit, and
+  run judged in the sub-unit that moves its mark" (:453-454 in the brief's numbering). U4e builds the queue and its cap
+  (:707; U4E-Q6); U4f builds no queue (:792-795) and moves -22 (:801). The Bites line missed it, as it missed lt-cmd-seq
+  and lt-press (U4E-Q1, the same slip). (b) would have U4f edit a site U4e wrote and unit-shows nothing of its own.
+- What the bite needs from the room: -22's first check reads `tick.v.ack_starved_headroom_count` (marks.json,
+  PM-0001-22: "it reaches the cap and never passes it", min == 0), whose writer SERIES.md:21 names as npt-room ("cap
+  minus queue length ... negative = over the cap"). So the room exposes each client's queue length beside the cap.
+- **Words, the brief:**
+  - 2.1's EventQueue bullet, after its last sentence (carry 50's), add: "By U4E-Q12 (c), the cap is also
+    PM-0001-22/unbounded's site (§4.14 :474; 2.6), so the room exposes, per client and tick, its queue's length beside
+    the cap (the headroom, cap less length, signed: below 0 only under the bite), which U4f's -22 runs write as
+    `tick.v.ack_starved_headroom_count` for the never-acking client (SERIES.md:21)."
+  - 2.1's `npt_room::BITES` bullet: replace "-62/server-echo, and owner-to-all's: U4E-Q13)" with "-62/server-echo,
+    -22/unbounded (U4E-Q12), and `catalogue-5/owner-to-all` (U4E-Q13))".
+  - 2.6's table: after the PM-0001-62/server-echo row, add: "| PM-0001-22/unbounded | the event queue's cap: under the
+    bite the queue keeps every event past its cap, with no overflow resync and no `Kick::Overflow` (§4.14 :474;
+    U4E-Q12 (c)) | a never-acking client: in the clean build its headroom (cap less queue length) falls to 0, never
+    below, and one resync follows (carry 57's test); under the bite it goes below 0 with no resync and no kick (§4.14
+    :474's "headroom below 0"); the test may give the room a smaller cap, as data, to stay short. U4f runs it judged
+    over a full S30 (plan :801) |".
+  - 2.6's bullet: replace "-22/unbounded's site is U4e's `EventQueue` cap, and the plan's U4e Bites line omits it:
+    U4E-Q12." with "-22/unbounded's site is U4e's `EventQueue` cap: U4e plants and unit-shows it, and U4f runs it judged
+    (U4E-Q12 (c); the plan's Bites line gains it)."
+- **Words, the plan** (the main session's commit): §5 U4e's Bites line: replace "server-echo (-62, the room's routing),
+  owner-to-all (catalogue item 5's)," with "server-echo (-62, the room's routing), unbounded (-22, the event queue's
+  cap; U4f runs it judged: U4E-Q12), owner-to-all (catalogue item 5's),".
+
+**U4E-Q13 (the owner-to-all bite's id): (a), the id `catalogue-5/owner-to-all`.**
+- Why: no mark holds catalogue item 5 (the visibility classes are proven at slice 3: ADR 0001:1687-1688, the brief's
+  cite), so (b) would invent a PM row that judges nothing and (c) would put a bite under a mark that does not judge
+  it; both misstate what a run proves. A name outside `PM-<ADR>-<row>/<name>` cannot be mistaken for a mark's bite:
+  check.mjs's `BITE_ID` (check.mjs:689) does not match it, and npt-log takes a header's bite as any string
+  (log/src/lib.rs:71-72). The cost is that check.mjs's one-home grep cannot see it, so a test holds its one home.
+- **Words, the brief:**
+  - 2.1: as under Q12 above (the `npt_room::BITES` bullet).
+  - 2.6's owner-to-all row: replace "Its id: U4E-Q13 |" with "Its id: `catalogue-5/owner-to-all` (U4E-Q13 (a)) |".
+  - 2.6's bullet: replace "Every id U4e plants is marks.json's spelling, but owner-to-all's, which marks.json does
+    not have (R27; U4E-Q13)." with "Every id U4e plants is marks.json's spelling but one: `catalogue-5/owner-to-all`
+    (U4E-Q13 (a)), which marks.json does not have and check.mjs's bite-home grep does not read (it reads only
+    `PM-<ADR>-<row>/<name>`: check.mjs:689). So npt-room's bites test pins `npt_room::BITES` and checks each of its
+    PM-form ids against marks.json, as server/tests/schedule.rs:345-353 does, exempting that one id by name; and a
+    bites-only test in npt-server's tests (which reach every crate's list under `--workspace --all-features`) asserts
+    that no other list holds it (`npt_proto::BITES`, npt-sim's `World::BITES` and `OWN_COPY_SNAP_BITES`,
+    `npt_server::BITES`, `npt_client::BITES`). U4r's `--bite` dispatch selects it by that string."
+- For U4r's brief, later: the class audit's runs (plan :750) select that id, and their headers list no mark, so the
+  judge never reads it.
+
+**Section 8 and 7.2, for all three:**
+- Section 8's ruled table: after the U4E-Q11 row add "| U4E-Q12 | (c): U4e plants and unit-shows -22/unbounded at the
+  event queue's cap; U4f runs it judged; the plan's Bites line gains it | 2.1, 2.6 |", "| U4E-Q13 | (a): the id
+  `catalogue-5/owner-to-all`, in `npt_room::BITES` only, its home held by tests | 2.1, 2.6 |" and "| U4E-Q14 | (b), the
+  gap tied to the ring: `npt_sim::ACK_RING_TICKS` tick periods on Loopback; the 1 s ages reported | 2.4 (e5), 2.5 |".
+- Section 8's "**Open**" heading: replace "**Open** (new in rev 3, and U4E-Q14 in rev 3.1; only where no ruling gives
+  the answer; each self-contained):" with "**Ruled at the advisor's check** (advisor-u4e-brief.md; the questions as
+  asked, kept for the record; the rulings are in the table above):".
+- 7.2 item 4: replace "the advisor's answers, written into 2.6, 2.1 and 2.4 (e5a)." with "answered by the advisor's
+  check (advisor-u4e-brief.md) and written into 2.1, 2.4 (e5), 2.5 and 2.6 (done)."
+
+### Block 6. F2-ROUTE: U4c's netcode F2 (Medium, open) (done)
+**Ruling: a carry for U4d2, the next free entry (66 at this writing), in u4s-carries.md's "U4d2 or the main session"
+section; U4r's brief takes it if U4d2's is final first. F2 keeps its Medium label and stays open until the carry is
+met. L-c8's judged half PASS stands, and its hash half holds today on the evidence below.**
+- What the evidence shows (u4c-lc8-rerun.md; u4c-build.md:79-84; u4c-review-test.md:95-99): the merged build's npt-lab
+  runs of P2, B1 and P4 seed 1 print whole-v2-log hashes (43745683ab36d67b, 722f20713e18352e, 432693efb9698c05) equal
+  to those of the builder's scratch logs of the same runs; on those logs' bytes the builder's scratch harness gave
+  SHA-256(v1 tag + datagram entries) equal to U2's 913db8e9…, feabf2f0… and b8a04f2f…, in the builder's build and
+  again in the test-engineer's own build. Equal whole-log hashes mean equal logs, so the merged build's datagram
+  entries are U2's.
+- What it lacks: the datagram-entry hash comes from an uncommitted scratch harness, so no later run of -3's set can show
+  it without rebuilding that scratch. That is F2's point, and it still holds. It is a reproducibility gap, not a doubt
+  about U4c: no Critical or High, no security finding.
+- Why U4d2: the change is in crates/lab (probe.rs and main.rs), which is U4d2's alone in wave 2 (u4-build-plan.md :842,
+  :862 as the file stands); U4d2 already edits npt-lab (its `hash` subcommand), so no new lane is opened. It needs no
+  npt-l1 change: `FateLog::for_each_canonical` is public (l1/src/lib.rs:351), and U4c's committed test reads the
+  same bytes through it (l1/tests/l1.rs:481-532). Not U4e: crates/lab is never U4e's (condition 10 (b)).
+- Not a "for later" feature: it is the evidence form an approved test (L-c8) names, for the set that re-runs whenever
+  npt-l1 changes.
+- **The carry's words** (copy as they are):
+```
+66. **U4c's netcode F2, Medium (u4c-review-netcode.md:53-54; L-c8's judged re-run, u4c-lc8-rerun.md; the advisor's U4e
+    brief ruling, F2-ROUTE):** "npt-lab's probe also writes the SHA-256 of (v1's tag + the v2 fate log's datagram
+    entries), the hash §5 U4c's L-c8 compares with U2's committed 913db8e9…, feabf2f0… and b8a04f2f… for P2, B1 and P4
+    seed 1, beside the whole log's SHA-256: in the run log's header and in its summary line, so that -3's script
+    (ops/runs/c-u2-pm-0001-3.mjs) records it unchanged. It reads the log through npt-l1's public
+    `FateLog::for_each_canonical` and edits no crates/l1 file; v1's tag and the datagram entry's form are those U4c's
+    test `v1s_tag_and_the_v2_logs_datagram_entries_hash_as_v1s_log_did` reads (l1/tests/l1.rs:481-532). U4d2's
+    report shows the three values from probe runs of those three runs (the -3 set's own arguments), each equal to
+    U2's, with the commands it ran. Until then L-c8's hash half rests on U4c's scratch harness through equal
+    whole-log hashes (u4c-lc8-rerun.md). If U4d2's brief is final without this entry, U4r's brief takes it word for
+    word, U4r in place of U4d2."
+```
+- PR #40's report lists F2 as open (Medium, netcode-architect's, U4c), with carry 66 as its route.
+

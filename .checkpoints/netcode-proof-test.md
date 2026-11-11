@@ -24,8 +24,14 @@ erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md.
   - the advisor's check of the U4e brief rev 3.2 (a general-purpose agent, opus, xhigh, in the background, started
     about 20:25 UTC; its brief advisor-u4e-brief-brief.md, its file advisor-u4e-brief.md; on its return read the file
     in full: it rules on a brief's tests and bites). If it is cut, start it again from its brief file.
-  - TE2-5 (b)'s ten runs (te2-5-runs.sh; logs .gate/te2-5/run1.log to run10.log; runs 1 and 2 exit 0 by 20:25 UTC).
-    If cut, run the missing ones; each run's result is its exit code and the "test result:" lines.
+  - U4d-F's run A, the build (task wmqlz92zb; run wf_3dbc5af1-0d4; script workflows/scripts/
+    npt-u4d-f-build-wf_3dbc5af1-0d4.js, started about 20:45 UTC): four fresh builders in turn in
+    `.claude/worktrees/wf_9ce88fa3-452-1`, groups 0-1, 2-3, 4-5, 6-7 (with the End checks); logs under .gate/u4df/;
+    notes u4df-build.md in that worktree. If cut: resume with `Workflow({scriptPath, resumeFromRunId})` (finished groups
+    replay from cache; a cut group's fresh builder reads the notes and the diff first). On its return: read every group's
+    result; then cut the packet (`python3 -I .checkpoints/netcode-proof-test/review_packet.py
+    .checkpoints/netcode-proof-test/u4df-packet.json`) and start run B, the review.
+  - Done meanwhile: TE2-5 (b), ten of ten runs exit 0, each 443 passed, 0 failed, 12 ignored (te2-5-record.md).
   - the saver, restarted after U4j's push (about 20:15 UTC, 110 minutes): `node .claude/scripts/checkpoint.mjs watch
     netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
     https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"`. Stop it before a merge's apply and restart it after the
@@ -101,11 +107,10 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
    u4c-lc8-rerun.md): U2's script at 6586991; the five L1 parts PASS with every check's outcome and value equal to
    U2's; the four bites fail exactly U2's checks; the hash half holds through U4c's scratch (equal whole-v2-log
    hashes), since npt-lab still records only the whole log's hash (U4c's netcode F2, Medium, open; a carry for U4d2,
-   crates/lab's lane in wave 2, goes to the advisor with the U4e brief's check). Next **TE2-5 (b)** (advisor-u4j-r2.md
-   B2.3), before the next merge into the spike branch: the bites build's workspace tests ten times (`cargo test
-   --locked --workspace --all-features --no-fail-fast` through main-run.sh, by te2-5-runs.sh), each run's whole output
-   under .gate/te2-5/; any failure's name and panic into the notes, tagged TE2-5; none in ten is recorded, and the
-   rule stays.
+   crates/lab's lane in wave 2, goes to the advisor with the U4e brief's check). **TE2-5 (b): done** (advisor-u4j-r2.md
+   B2.3; te2-5-record.md): the bites build's workspace tests ten times with `--no-fail-fast` (te2-5-runs.sh), 20:20 to
+   20:41 UTC: every run exit 0, 443 passed, 0 failed, 12 ignored. None failed in ten; the cause stays unknown, and
+   TE2-5's rule stays until carry 65 is met or a failure is caught by name.
 2. The U4e brief: **check and revision done (about 18:35 UTC; read in full).** The check said FAIL with 3 High (F1: the
    main session's fold reached 3.1 and 3.2 only, not e12, 2.6, the return list or carry 51's route; F2: the bite
    proofs as worded clash with a green check.mjs, so wave 1's two-part form is stated; F3: the owner-to-all proof was a
