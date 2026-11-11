@@ -55,15 +55,43 @@ guard test :207 → :219, STATUS :987 → the split files). Nothing new needs an
   ADR 0002). The register lists only questions routed to Mustafa or the Advisor ("Open questions decided by a spike
   alone, or by an agent, are in the drafts and in SPIKE_PLAN, not here", `docs/adr/README.md:41-43`), and OQ-0002-2's
   decider is "the phase 1 restructure plan (the main session with docs-keeper)" (0002:1003). So the plan's words are a
-  slip present since OLD, not drift from #49 or #50. Proposed: the register's ADR 0002 row (:17) records it in its
-  open-question count ("8 open" → "7 open: -8 answered at the stop, -2 answered by the restructure plan") and in its
-  status column (his SCOPE (a)); PM-0002-36's reading (Q-A1) as one row of the register's loose-ends tables; ADR 0002's
-  own rows that say "open: OQ-0002-2" (:1596, :1626) read "answered". **His rule for this check ("If the plan and today's
-  main disagree on more than a line number, stop and tell me in three lines") is met by D1's letter: decided below.**
+  slip present since OLD, not drift from #49 or #50. The session stopped on it (his rule: "If the plan and today's main
+  disagree on more than a line number, stop and tell me in three lines.") and asked him. **His answer, 2026-11-11 (his
+  message in this session, word for word):** "D1: (a). Record OQ-0002-2's answer as your plan check's section 3
+  proposes: the register's ADR 0002 row gets the new open-question count and my SCOPE (a) in its status column,
+  PM-0002-36's reading goes into the register's loose-ends tables as one row, and ADR 0002's two lines that say "open:
+  OQ-0002-2" read "answered". No new register row, and nothing wider." So, exactly: the register's ADR 0002 row (:17):
+  "8 open" → "7 open", with OQ-0002-2 named as answered by the restructure plan, and his SCOPE (a) in its status column;
+  PM-0002-36's reading (Q-A1) as one row of the register's loose-ends tables; ADR 0002 :1596 and :1626, "open:
+  OQ-0002-2" → "answered: OQ-0002-2". Plus what the plan already names in ADR 0002 itself: the OQ-0002-2 entry's answer
+  (:998-1007) and the Status line (his SCOPE (a)). No other register edit.
+
+## 3b. The open pull requests' files (plan Part 4: re-read before each build step; read 2026-11-11 21:45 Amsterdam)
+- **#40** (netcode proof test, `claude/netcode-proof-test-plan-hcky5g` at 8c681cf, merge-base bb2d817; 600 files):
+  outside `spikes/` and `.checkpoints/` it changes `docs/DECISIONS.md`, `docs/REPO_MAP.md`, `docs/STATUS.md`,
+  `docs/STATUS_ARCHIVE.md`, `docs/design/netcode-proof-messages.md` (new) and `docs/design/ws-reconnect.md`. 2.1b's
+  docs step edits the first four too. The plan routes this case itself (Part 4, #40, items 1, 2 and 6: either order;
+  whichever merges second merges main and keeps both sides; #40's `check.mjs` reads none of 2.1b's edits). Part 4's
+  general line "a file another open PR edits waits until that PR merges" was written for #46 and his queue (the guard,
+  CLAUDE.md); read here as not stopping 2.1b's docs step for #40, since the same plan sets #40's route. For the
+  advisor agent to confirm.
+- **#48** (the toolchain, `claude/laughing-pasteur-fwya24` at d8186fd, merge-base 2d22b69; 54 files): the root pins,
+  `crates/`, `packages/`, `.github/workflows/toolchain.yml`, `.gitignore`. No file in common with 2.1b. It waits for
+  2.1b's merge (his order).
+- No 2.1b edit touches `spikes/` (#40's `referenceProblems`) or a PM row of ADR 0001, 0004 or 0006 (#40's marks).
 - Foreseen by the plan, not differences: the STATUS split (Part 4); 2.1a's done parts (tools/README.md :35, village.py
   :10-11); the advisor.md citations (same content). New since the plan, from his task message: ADR 0002's Status line
   (SCOPE (a)), his render-budget note in DECISIONS.md "Queued" (no other file), the four kit lines asked in one
-  message.
+  message. From his D1 message: his Windows run of the new gate on main 76b4f7a (Windows PowerShell 5.1, Node
+  v24.17.0, base 44446a5, "files at the root" twice, every check PASS, smoke 8 of 8 and 5 of 5, GATE PASS) goes into the
+  report; his finding for 2.3 (the pinned Playwright's installer hangs after the download reaches 100% under Node
+  24.16.0 and later, Playwright before 1.60.0; finished under Node 24.15.0) becomes a 2.3 follow-up; if this session's
+  own browser install stops after 100%, it is recorded as that bug and told to him, not waited on.
+- His words of this session (the task message and the D1 message) are captured by script from the session's events
+  (`list_events`, byte for byte, as 2.1a's `capture-message.mjs` did) into this folder, then into the report's Appendix
+  A; DECISIONS.md gets his render-budget note under "Queued" word for word, and one entry per message at the top of
+  "Decisions, newest first", quoted whole, copied by script from the appendix and checked byte for byte (2.1a's A3.3 to
+  A3.5 precedent). The note's text goes in no other file (the report's appendix records his whole message).
 
 ## 4. The follow-ups from 2.1a, folded in
 - **IE-2** (all five in one pushed commit): step 6 is one commit holding only the five renames, pushed as the head of
@@ -123,12 +151,14 @@ does not read `git revert`. Run by the main session only; nothing leaves the wor
 - C7: every refusal recorded (checkpoint "Refusals"), never worked around silently.
 
 ## 7. Order, docs and reviews
-- Steps: 6 the move (alone, pushed, draft PR) → 7 the commands in text → 9 E1-E6 (E3 in the background) → 10 the docs
-  (docs-keeper: xhigh for ADR and register edits) → 8 the kit lines and E8 once he says yes → the final gate → 11 the
-  reviews on the final diff (security-auditor, test-engineer, infra-engineer; 3 at a time), the verifier until PASS,
-  the advisor agent on every pushed head, the report, the checkpoint deleted, ready, stop for his go. Step 8 moves after
-  7, 9 and 10 only in time (his yes), not in content: its four lines change no evidence (the gate reads neither file),
-  and E8 runs after them.
+- Steps, in the plan's order: after the advisor agent's APPROVE, the four kit lines and E8's ask go to him in one
+  message, before the build (his D1 message: "Then continue with your next steps: the advisor agent's review of the plan
+  check, then the four kit lines and E8's ask to me in one message."). Then 6 the move (alone, pushed, the draft PR
+  opened on it) → 7 the commands in text → 8 the kit lines (his yes) → 9 E1-E6 and E8 (E3 in the background) → 10 the
+  docs (docs-keeper; xhigh for the ADR and register edits) → 11 the reviews on the final diff (security-auditor,
+  test-engineer, infra-engineer; 3 at a time), the verifier until PASS, the advisor agent on every pushed head, the
+  report, the checkpoint deleted, ready, stop for his go. Only if his yes is late does step 8 wait while 9 and 10 run
+  (an order change in time only: the gate reads neither kit file; E8 always runs after step 8).
 - The docs (step 10, today's lines): REPO_MAP :14-18 and :6; START_HERE :12, :22-23, :105, :115-117; MODULE_MAP one line
   above the table (:17); TECHNICAL :238-239; STATUS (2.1b's row, #50 merged, the risk at :106) and STATUS_ARCHIVE (#50's
   row; the risk at :843); ROADMAP (2.1b's entry); ADR 0002 (Status line: his SCOPE (a) word for word; the OQ-0002-2
