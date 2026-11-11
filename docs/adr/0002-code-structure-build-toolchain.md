@@ -1,6 +1,6 @@
 # ADR-0002: Code structure, build and toolchain
 
-**Status:** Proposed
+**Status:** Proposed. Part 1 accepted by Mustafa on 2026-11-10, his SCOPE (a), word for word: "SCOPE: (a). I accept ADR 0002's part 1 alone: the repository after the restructure, with the legacy hard constraints applying to legacy/ only once the files have moved. Record it in the ADR's Status line in 2.1b's docs pass, on my go. Nothing else in ADR 0002 is accepted by this." (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-10: FREEZE-FDN (a), SPLIT (a), SCOPE (a) and the build go for 2.1a, in the foundation chat")
 **Date:** 2026-10-31
 **Author:** engine-architect (the "Pass marks" table: test-engineer, plan step 4) ·
 **Reviewed by:** (filled in at review) ·
