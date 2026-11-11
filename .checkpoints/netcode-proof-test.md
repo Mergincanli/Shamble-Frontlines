@@ -20,10 +20,10 @@ advisor-u4d-close.md.
 - **Merged into the spike branch:** U4s f080551, U4b 411eeee, U4a 952f734, U4c f3f7c2f, U4d with W1-S1's npt-proto half
   39f4290 (report u4d-report.md); CI green on each. Main merged in at 5ca77eb (PR #49). At 39f4290: check.mjs 10 steps,
   measured 365, bites 412, self 52.
-- **Running:** no agent (the advisor's U4j ruling and the U4e brief's check and revision are done); the
-  saver (task bwrkakopa, since about 16:55 UTC, 110 minutes; restart it when it ends: `node
+- **Running:** nothing. No agent (the advisor's U4j ruling and the U4e brief's check and revision are done); the
+  saver's 110 minutes ended at about 18:45 UTC with the tree clean. Restart it when work resumes: `node
   .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5
-  <noreply@anthropic.com>" --trailer "Claude-Session: https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"`).
+  <noreply@anthropic.com>" --trailer "Claude-Session: https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"`.
   U4d-F waits its turn.
 
 **The three cut workflows, and what to do with each when the hold lifts.** Scripts are under
