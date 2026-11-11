@@ -1,12 +1,168 @@
 {
  "results": [
   {
+   "id": "battery",
+   "where": "tools/README.md:33",
+   "command": "node tools/battery.js legacy",
+   "exit": 0,
+   "secs": 0.4,
+   "out": "{\"symbols\":{\"core\":[\"BK\",\"BODY\",\"BTN\",\"CHAR_DEFAULT\",\"CHAR_FEMALE\",\"CHAR_MALE\",\"CHAR_OUTLINE\",\"COMIC\",\"CPARTS\",\"DM_Cabana\",\"DM_Romania\",\"DM_Tri\",\"ENV_DEFAULT\",\"FACTION_PALETTES\",\"FIXED_DT\",\"GRID_SIZE\",\"GROUND_D\",\"GROUND_W\",\"GUN_KIT\",\"INK\",\"KVStore\",\"MELEE_IDLE\",\"NPR\",\"OUTLINE_GROUND_Y\",\"PART\",\"RIM_COL\",\"RIM_POW\",\"RIM_STR\",\"SIM\",\"SUN_R\",\"SUN_SD\",\"T\",\"TEAMS\",\"TUNE\",\"UNIT_TYPES\",\"VEHICLE_TYPES\",\"WEAP",
+   "err": "",
+   "pass": true
+  },
+  {
+   "id": "preview-menu",
+   "where": "tools/README.md:34, preview.js:2",
+   "command": "xvfb-run -a node tools/preview.js legacy menu .gate/foundation-restructure/e6/menu.png",
+   "exit": 0,
+   "secs": 2.6,
+   "out": "wrote .gate/foundation-restructure/e6/menu.png 1280x720 menu",
+   "err": "",
+   "pass": true,
+   "files": [
+    ".gate/foundation-restructure/e6/menu.png 1017260 bytes"
+   ]
+  },
+  {
+   "id": "preview-shot",
+   "where": "tools/README.md:34 (shot <out.png> <x> <z>)",
+   "command": "xvfb-run -a node tools/preview.js legacy shot .gate/foundation-restructure/e6/shot.png 0 0",
+   "exit": 0,
+   "secs": 1.7,
+   "out": "wrote .gate/foundation-restructure/e6/shot.png 1280x720 shot 0 0",
+   "err": "",
+   "pass": true,
+   "files": [
+    ".gate/foundation-restructure/e6/shot.png 607883 bytes"
+   ]
+  },
+  {
    "id": "sim",
    "where": "tools/README.md:35, sim.js:1, verifier.md:28 (kit line 4)",
    "command": "xvfb-run -a node tools/preview.js legacy eval tools/sim.js",
    "exit": 0,
-   "secs": 5.3,
-   "out": "{\"map\":\"Cabana Republic\",\"secs\":90,\"mode\":\"game\",\"enemies\":11,\"active\":7,\"samples\":180,\"windows\":1206,\"stallPct\":1.8,\"engagedStallPct\":0.3,\"engagedWindows\":647,\"freeStallPct\":3.6,\"stallsNearVillagePiece\":0,\"villagePieces\":127,\"stallSpots\":[\"-70,4\",\"7,14\",\"-48,98\"],\"navStarvedPct\":0.54,\"navDefinition\":\"share of update() steps that end with NAV.budget===0 (every route search of that step used)\",\"kil",
+   "secs": 2.1,
+   "out": "{\"map\":\"Cabana Republic\",\"secs\":90,\"mode\":\"game\",\"enemies\":11,\"active\":7,\"samples\":180,\"windows\":1218,\"stallPct\":0.1,\"engagedStallPct\":0.1,\"engagedWindows\":863,\"freeStallPct\":0,\"stallsNearVillagePiece\":0,\"villagePieces\":127,\"stallSpots\":[],\"navStarvedPct\":0.72,\"navDefinition\":\"share of update() steps that end with NAV.budget===0 (every route search of that step used)\",\"kills\":{\"allies\":{\"allies\":0",
+   "err": "",
+   "pass": true
+  },
+  {
+   "id": "reach",
+   "where": "tools/README.md:36, reach.js:1",
+   "command": "xvfb-run -a node tools/preview.js legacy eval tools/reach.js",
+   "exit": 0,
+   "secs": 1,
+   "out": "{\"map\":\"Cabana Republic\",\"teams\":[\"allies\",\"soviets\"],\"ejumpReach\":3.07,\"routePct\":100,\"routes\":72,\"climbObjectivesPct\":72.5,\"objectiveRoutes\":40,\"siegeChainPct\":75,\"siegeLegs\":32,\"directToEachStructurePct\":40.6,\"perTeam\":{\"allies\":{\"starts\":4,\"goals\":9,\"routeLenToStop\":{\"min\":94,\"p50\":204,\"max\":259}},\"soviets\":{\"starts\":4,\"goals\":9,\"routeLenToStop\":{\"min\":119,\"p50\":207,\"max\":260}}},\"minStructureG",
+   "err": "",
+   "pass": true
+  },
+  {
+   "id": "perfbots",
+   "where": "tools/README.md:37, perfbots.js:2",
+   "command": "xvfb-run -a node --expose-gc tools/preview.js legacy eval tools/perfbots.js --pre=.gate/foundation-restructure/e6/pre-teams4.js",
+   "exit": 0,
+   "secs": 4.9,
+   "out": "{\"map\":\"Cabana Republic\",\"soldiers\":8,\"teamsSize\":4,\"gc\":true,\"march\":[{\"mean\":0.318,\"p50\":0.277,\"p95\":0.499,\"max\":4.381,\"losPerSec\":22,\"heapMBs\":0.234},{\"mean\":0.151,\"p50\":0.123,\"p95\":0.289,\"max\":2.085,\"losPerSec\":24,\"heapMBs\":0.26},{\"mean\":0.127,\"p50\":0.115,\"p95\":0.185,\"max\":0.897,\"losPerSec\":22,\"heapMBs\":0.231}],\"combat\":[{\"mean\":0.264,\"p50\":0.224,\"p95\":0.567,\"max\":3.955,\"losPerSec\":107,\"heapMB",
+   "err": "",
+   "pass": true
+  },
+  {
+   "id": "aabbs",
+   "where": "tools/README.md:38, aabbs.js:1, village.py:2",
+   "command": "xvfb-run -a node tools/preview.js legacy eval tools/aabbs.js > .gate/aabbs.json",
+   "exit": 0,
+   "secs": 0.8,
+   "out": "{\"statics\":220,\"keys\":[\"kind\",\"id\",\"alive\",\"minx\",\"miny\",\"minz\",\"maxx\",\"maxy\",\"maxz\"],\"boxes\":[[\"building\",-163,77.5,-157,82.5,8],[\"building\",-105,77,-95,83,4],[\"building\",95,77,105,83,4],[\"building\",157,77.5,163,82.5,8],[\"building\",-164,106,-156,114,9],[\"building\",-133.5,106.5,-126.5,113.5,5],[\"building\",126.5,106.5,133.5,113.5,5],[\"building\",156,106,164,114,9],[\"block\",-151.3,-81.3,-148.7,-78.7,",
+   "err": "",
+   "pass": true
+  },
+  {
+   "id": "village",
+   "where": "tools/README.md:38 (python tools/village.py, no arguments)",
+   "command": "python tools/village.py",
+   "exit": 0,
+   "secs": 42.2,
+   "out": "",
+   "err": "  REJECT house:manor @(0,-104) -> collider 0.0 | wrote /home/user/Shamble-Frontlines/.gate/village.json",
+   "pass": true,
+   "files": [
+    ".gate/village.json 6170 bytes"
+   ]
+  },
+  {
+   "id": "pageshot",
+   "where": "tools/README.md:39",
+   "command": "node tools/pageshot.js legacy index.html .gate/foundation-restructure/e6/s wait:1500 shot:menu",
+   "exit": 0,
+   "secs": 8.3,
+   "out": "renderer ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) (headless) | shot .gate/foundation-restructure/e6/s_menu.png [ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)] | no page errors",
+   "err": "",
+   "pass": true,
+   "files": [
+    ".gate/foundation-restructure/e6/s_menu.png 1121843 bytes"
+   ]
+  },
+  {
+   "id": "pageshot-tri",
+   "where": "tools/README.md:39 (index.html?map=tri)",
+   "command": "node tools/pageshot.js legacy index.html?map=tri .gate/foundation-restructure/e6/tri wait:1500 shot:menu",
+   "exit": 0,
+   "secs": 8.5,
+   "out": "renderer ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) (headless) | shot .gate/foundation-restructure/e6/tri_menu.png [ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)] | no page errors",
+   "err": "",
+   "pass": true,
+   "files": [
+    ".gate/foundation-restructure/e6/tri_menu.png 1113958 bytes"
+   ]
+  },
+  {
+   "id": "pageshot-header",
+   "where": "pageshot.js:8",
+   "command": "node tools/pageshot.js legacy index.html .gate/s wait:1500 shot:menu eval:deploy() wait:900 eval:(closeTutorial(),setPause(true)) shot:pause",
+   "exit": 0,
+   "secs": 16,
+   "out": "shot .gate/s_menu.png [ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)] | shot .gate/s_pause.png [ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)] | no page errors",
+   "err": "",
+   "pass": true,
+   "files": [
+    ".gate/s_menu.png 1122914 bytes",
+    ".gate/s_pause.png 1200463 bytes"
+   ]
+  },
+  {
+   "id": "pageshot-headed",
+   "where": "tools/README.md:67 (Check a new machine)",
+   "command": "xvfb-run -a node tools/pageshot.js legacy index.html .gate/gpu --headed size:1600x900 wait:2500 shot:menu eval:(deploy(),0) wait:1500 eval:(closeTutorial(),setPause(true),0) wait:600 shot:pause",
+   "exit": 0,
+   "secs": 27.3,
+   "out": "eval> 0 | shot .gate/gpu_pause.png [ANGLE (Mesa, llvmpipe (LLVM 20.1.2 256 bits), OpenGL 4.5)] | no page errors",
+   "err": "",
+   "pass": true,
+   "files": [
+    ".gate/gpu_menu.png 1117962 bytes",
+    ".gate/gpu_pause.png 1249944 bytes"
+   ]
+  },
+  {
+   "id": "preview-menu-check",
+   "where": "tools/README.md:69",
+   "command": "xvfb-run -a node tools/preview.js legacy menu .gate/preview_menu.png",
+   "exit": 0,
+   "secs": 1.8,
+   "out": "wrote .gate/preview_menu.png 1280x720 menu",
+   "err": "",
+   "pass": true,
+   "files": [
+    ".gate/preview_menu.png 1017208 bytes"
+   ]
+  },
+  {
+   "id": "tuning-dump",
+   "where": "tuning-dump.js:3",
+   "command": "xvfb-run -a node tools/preview.js legacy eval tools/tuning-dump.js --pre=tools/tuning-dump.js > .gate/foundation-restructure/e6/tuning-cabana.json",
+   "exit": 0,
+   "secs": 1,
+   "out": "{\"map\":\"Cabana Republic\",\"names\":60,\"missing\":[],\"defaults\":{\"T\":{\"accel\":14,\"adsCam\":\"pitch\",\"adsMoveMult\":0.55,\"arenaX\":186,\"arenaZ\":126,\"barHealth\":1000,\"bodyMult\":1,\"camBack\":56.6,\"camDeadX\":0.6,\"camDeadY\":0.52,\"camHeight\":40,\"camKickDamping\":12,\"camKickImpulse\":24,\"camKickRange\":34,\"camKickStiffness\":110,\"camLerp\":7,\"camLookLean\":0.55,\"camPosLean\":0.18,\"camPushLerp\":9,\"camYawBase\":0.785398163",
    "err": "",
    "pass": true
   }
