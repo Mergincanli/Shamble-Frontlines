@@ -13,7 +13,8 @@
 Copies: pre-fix .gate/u4j-prefix; fixed .claude/worktrees/agent-a3b8dfeb01ed52b50 (never edited).
 
 (Process note: Block 1 below was first appended with a shell heredoc by mistake; this file is rewritten whole with the
-Write tool each time since, content kept. The Edit tool is not available in this run.)
+Write tool each time since, content kept. The Edit tool is not available in this run. Last rewrite: two marks.rs line
+ranges corrected after a re-check, 796-823 -> 791-824 and 619-640 -> 616-640.)
 
 ## Notes (a line after each finding)
 
@@ -21,7 +22,7 @@ Write tool each time since, content kept. The Edit tool is not available in this
 Callers of `practice::find`: eval.rs:444 (in_force, moves the check: :446-450) and eval.rs:998 (the ws-practice
 validity rule). Both pass the same (run, ctx.all, ctx.mark, tolerance); find is pure, so both see one result. A ws_bound
 check moves only when it judges exactly one run (eval.rs:460); otherwise it is judged unmoved (f = 1): stricter.
-Tolerance in: marks.rs:349-353 (ws-practice in [1, 1.10]); parse_bound practice.rs:112-115 (line's tolerance in
+Tolerance in: marks.rs:348-353 (ws-practice in [1, 1.10]); parse_bound practice.rs:112-115 (line's tolerance in
 [1, 1.10]); marks.rs:808-819 (each ws-practice rule's tolerance == the line's, at load); practice.rs:509 (again, run time).
 So tolerance <= 1.10 on every path, from marks.json only.
 
@@ -69,7 +70,7 @@ engine 43 passed, fixtures 19 passed, doc 0; 0 failed anywhere (17:05-17:06 UTC)
 ### Block 3: F2-F6, F8, F9 (first half), F11, read in the fixed copy
 - F2 (bound line pinned, FX-6): CLOSED. practice.rs:497-507 compares the record's `bound` with mark.ws_bound_line byte for
   byte (text() only filters blank, returns the raw str :333-337); :508 parses marks.json's line, never the log's.
-  marks.rs:796-823 requires the line on a mark with ws_bound checks and only there, parses it (band, tolerance, 6
+  marks.rs:791-824 requires the line on a mark with ws_bound checks and only there, parses it (band, tolerance, 6
   decimals at load), checks_agree, and each ws-practice tolerance == the line's. Test u4j_ws_the_record_carries_the_
   marks_bound_line (H1 M_m 620 ms -> INVALID; commit-only change -> INVALID). FX-6 (d): params.ws_tcp_model is written
   by npt-net's DelayStream from tcp_model.rs MODEL (SERIES.md:747), not copied from the line, so the provisional model
@@ -99,7 +100,7 @@ engine 43 passed, fixtures 19 passed, doc 0; 0 failed anywhere (17:05-17:06 UTC)
   why ("FAR BETTER: at the bound" | "max(1, s)"), then each ruling with {:?} (Debug-escaped: a ruling text cannot forge a
   line). Test asserts "practice run ws-practice: BEYOND" and the chance ruling's text. Second half FU-2 open (Medium):
   any non-empty text still passes as a ruling (:574, :394), so PR #40 stays needs-mustafa on it.
-- F11 (ws_bound shapes, FX-6 (f)): CLOSED. marks.rs:619-640 pins x p50/<=/no where, y count/where >/<=, z max/<=/no
+- F11 (ws_bound shapes, FX-6 (f)): CLOSED. marks.rs:616-640 pins x p50/<=/no where, y count/where >/<=, z max/<=/no
   where; test ws_bound_checks_keep_their_shape gains the four refusals.
 - Not claimed by a fix, still open as routed: F7 (FU-1), F9 later half (FU-2), F10 (FU-3), F12 (FU-4), F4 (ii) (FU-5).
 
@@ -130,3 +131,36 @@ engine 43 passed, fixtures 19 passed, doc 0; 0 failed anywhere (17:05-17:06 UTC)
   and the why lines carry run ids (eval.rs:1323, :1339, :1579). FX-11's describe goes only into the escaped JSON `needs`,
   so it adds no stdout path. A log could print a forged second summary line to a person reading stdout. Fix:
   check_header refuses control characters in those four fields; ride FU-3 (the next npt-log change). Not before merge.
+- Fixtures diff (u4j-round2-packet-fixtures.diff): no IPv4 address added, no token/secret/key-like text (grep counts 0).
+
+### Block 5: coverage table (judge input -> where the fixed judge validates it -> gap)
+| Input (log or record) | Validated at | Gap |
+|---|---|---|
+| bound line (M_m, band, guard, model, commit, X/Y/Z/k, tolerance) | marks.json only: marks.rs:791-824 at load; practice.rs:497-515 | none |
+| practice class and s -> f | practice.rs:572-607 | none (cap holds; N1 is about the tests only) |
+| practice run choice (one per build, before the run) | practice.rs:349-402 over every run read | none |
+| bite run's numbers | practice.rs:406-470 | none |
+| practice run's setup (model, CONFIG_HZ, RS kernel, heal count) | practice.rs:516-564 | none |
+| chance / second ruling | non-empty text, printed escaped (:204-233) | FU-2 (Medium, open) |
+| hs source per name | figures.rs:224-247 | none |
+| Arm rule key | figures.rs:248, :406, :423 | FU-5 (mark flag, Low, open) |
+| decoded coverage | figures.rs:345-391, :460-536 | R2.4 residual (all-but-one incomplete; U4r carry) |
+| twin identity (-21) | figures.rs:195-203 | -30's form: U6-a |
+| ws_bound check shape | marks.rs:616-640 | none |
+| C4 bite direction | eval.rs (reading (a)) | FU-1 (Low, open) |
+| duplicate JSON keys | none (last wins) | FU-3 (Low, open) |
+| transport label | none (select only) | FU-4 (Low, open) |
+| control characters in run/set/role/process | none (non-empty only) | N2 (Low, new note, pre-existing) |
+
+### Durable decisions (for my memory; no memory folder exists on disk, so they live here for the session to file)
+- Threat model for npt-judge: every results log is hostile input; marks.json is reviewed input. A number that moves a
+  pass bar must come from marks.json or be recomputed from the run's own series, never read from a log's claim.
+- A judge reading a folder cannot defend against deleted or planted logs turning a FAIL into INVALID; that direction
+  is accepted (fail-closed against PASS). What it must never do is turn a FAIL or INVALID into a PASS, or move a bar.
+- WS-BAR cap: f <= tolerance <= 1.10 on every path, held by four layers (the pinned line, band_low <= 1 at load,
+  FAR BETTER f = 1, the guard); rounding up to the next ms is the advisor's R6 and accepted.
+
+## Verdict
+APPROVE WITH FINDINGS. F1 CLOSED (Block 1 table). F2, F3, F4 (as routed), F5, F6, F8 (as ruled), F9 first half, F11
+CLOSED. New: N1 Low (test evidence for the plant), N2 Low (pre-existing). Neither opens a round 3. Still open security
+follow-ups FU-1 to FU-5 (F7, F9's later half, F10, F12, F4 (ii)) keep PR #40 needs-mustafa, as it already is. DONE.
