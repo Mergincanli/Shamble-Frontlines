@@ -1,0 +1,15 @@
+{
+ "results": [
+  {
+   "id": "sim",
+   "where": "tools/README.md:35, sim.js:1, verifier.md:28 (kit line 4)",
+   "command": "xvfb-run -a node tools/preview.js legacy eval tools/sim.js",
+   "exit": 0,
+   "secs": 5.3,
+   "out": "{\"map\":\"Cabana Republic\",\"secs\":90,\"mode\":\"game\",\"enemies\":11,\"active\":7,\"samples\":180,\"windows\":1206,\"stallPct\":1.8,\"engagedStallPct\":0.3,\"engagedWindows\":647,\"freeStallPct\":3.6,\"stallsNearVillagePiece\":0,\"villagePieces\":127,\"stallSpots\":[\"-70,4\",\"7,14\",\"-48,98\"],\"navStarvedPct\":0.54,\"navDefinition\":\"share of update() steps that end with NAV.budget===0 (every route search of that step used)\",\"kil",
+   "err": "",
+   "pass": true
+  }
+ ],
+ "verdict": "PASS"
+}
