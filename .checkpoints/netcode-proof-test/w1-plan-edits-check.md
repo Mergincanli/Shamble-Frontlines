@@ -73,3 +73,61 @@ U4E-Q6's two conditions (no file named); Q7, Q9 (no ruling); W1-TARGET (wave-2 b
 Open question to check: U4E-Q6's conditions and TUNE-2's/TUNE-1's conditions have no named home in the plan files.
 
 ## Comparison log (one line per item, appended as checked)
+Method: my script (scratchpad te_check.py) pulls each ordered text from advisor-u4-wave1.md by line range and anchors
+(never retyped), normalises whitespace, and counts it in the target file; plus junction checks (old text | new text) and
+a read of all four `git diff 20702fd` outputs hunk by hunk. sha256 of all four files equal the editor's; base sha256 equal
+the task's. (No Edit tool in this run: this notes file was rewritten whole by Write, its earlier lines unchanged.)
+- L1 = E1: present once, exact, after "(the advisor's U4s ruling, condition 1 (d))." (u4-build-plan.md:851-856). OK.
+- L2 = E2: :184 row; own-state kind, plain-data types exact; accessor list spelled from :399-401 (words theirs, marked). OK.
+- L3 = E3: new npt-proto row :192, both cells exact. OK. (F5: its "§4.7" reads as the build plan's own §4.7.)
+- L4 = E4, L5 = E5: exact (my first L5 anchor was wrong: the row reads `InputBuffer::CMD_CATCHUP`; rechecked: 1). OK.
+- L6 = E6: §4.2 :241-248, exact; old sentence gone. OK. (F10: the ruling's quote of condition 1 says "never"; :86 "not".)
+- L7 = E7: §4.4 :279-283, exact; old "16-bit offsets" gone; no other "offset" left that means the header. OK.
+- L8 = E8: §4.9 :345-346, exact. OK.
+- L9 = E9: §4.10 :368-370, exact, after "(the advisor's condition 1)." OK.
+- L10 = E10: §4.13 :431-435, exact, after the extent's cite. OK.
+- L11 = E11: §4.14 :469, exact table row. OK.
+- L12 = E12: §4.15 :493-495, exact; old "test support" gone from §4.15 but still at §5 U4d :607 (F2). Parenthetical
+  now trails "the manifest" (F9).
+- L13 = E13: D-8 :629-630, exact plus "all three" (theirs, marked; harmless: within-reach also holds below the bound).
+- L14 = E14, L15+L16 = E15, L17 = E17: exact, in place. OK.
+- L18 = E16: U4r's -58 bullet deleted; no other U4r text names -58 (run count :943 is a total). OK.
+- L19 = E18: U4g Marks moved :813-816, exact, last item. OK.
+- L20-L23 = E19/E20: both readings exact, twice each (§10 :955-961, §11 :1059-1069). "eight" count correct. OK.
+- L24 = E20: TUNE-2 clause in §11 only; right, since Q16's reading words live only in §11 (§10 lists codes). OK.
+- L25 = E21: exact; matches condition 1 at advisor-u4.md:86 ("not"). Placed :195-196 + blank: shifts :195-475 by 3 (F1).
+- L26-L30 = E22-E26: carries 46-50 exact; labels theirs; cites into advisor-u4-wave1.md checked. OK.
+- L31 = E27: carry 24 exact from "`npt_client::BITES` grows with". OK.
+- L32 = E28: carry 40, words theirs (ruling gives intent only). Conflicts with its kept "holds by construction" (F3).
+- L33 = E29: plan.md §4.7 :585-586, exact. OK.
+- L34 = E30: U8 row, exact, after "since this container has no tc". Its cite advisor-u3q.md:143-144 is :142-143 (F4).
+- L35 = E31: Mustafa's two sentences verbatim (history.md:292-295), code, option and date in the lead-in. OK.
+- L36 = E32, L37 = E33: exact; SQUASH-40's reason matches his words (history.md:319). OK.
+- Old texts: all 10 gone (4.2, 4.4, 4.9, 4.15, clippy, U4f, 4.14 row, carry 24, "never squashed", "six readings").
+- Unordered changes: none (every hunk maps to L1-L37; two rewraps change no word). Width: no added non-table line > 120.
+- Out of scope untouched since base: docs/, marks/, history.md, the checkpoint, u4j-brief.md, advisor-u4-wave1.md. The
+  only other change is uncommitted spikes/netcode-proof/crates/l1 (U4c's lane, not the editor's).
+- Editor's list vs mine: same 37 texts; E-numbers group some (E2, E15, E19, E20). Nothing missing.
+
+## Findings (severity; fix)
+- F1 Medium: E21's 3 lines at advisor-u4.md:195-197 shift every later line by 3; now wrong: u4s-carries.md:12-13
+  (":236-375", "(:313-327)", "(:343-347)"), :138 (":351-364"), :184 (":343-347"), :251 (":268-270"); out of scope,
+  u4j-brief.md:3 (":365-371", U4j in review). Fix: move the paragraph to the file's end (NF-D4's precedent, :398, is a
+  later main-session line naming the verdict "above"), label "**Main session, 2026-11-11 (the U4 verdict above,
+  condition 1 at :86):**", the ruling's line unchanged. Else +3 on each cite.
+- F2 Medium: §5 U4d Builds :607 "the synthetic recording generator (test support)" vs §4.15 :493 and W1-PUB :408-409.
+  Fix: "the synthetic recording generator (`Recording::synthetic`, in npt-sim's library: §4.15; the advisor's W1-PUB
+  ruling)".
+- F3 Low: carry 40 :184-191: kept "holds by construction at U4r" vs the new VOID sentence; label credits the words to
+  the ruling. Fix words in the result.
+- F4 Low: plan.md:1248 "advisor-u3q.md:143-144" -> ":142-143" (the ruling's own slip, W1-PLAN :525).
+- F5 Low: u4-build-plan.md:192 Why cell "§4.7's items" -> "plan §4.7's items" (bare §4.7 there is "Events", :329).
+- F6 Low: §4.10 :362-365 and §4.2 :226-230 still claim clamp idempotence unconditionally (TUNE-2 bounds it).
+- F7 Low: u4s-carries.md:14 "44 entries" (50 now); carry 13 not marked as split to entry 48.
+- F8 Low: U4E-Q6's two conditions (:476-479) have no home; suggest a U4r carry 51 in the ruling's words.
+- F9 Low: §4.15 :493-495 parenthetical trails "the manifest"; move it after "U4d's three synthetic recordings".
+- F10 Low: u4-build-plan.md:247 quotes condition 1 as "never what the client claimed"; :86 says "not" (ruling's words).
+- F11 Low (to the advisor): §4.1's npt-sim row lists none of W1-PUB's approved bites-only World items, carry 17's
+  constants or `Recording::synthetic`, while other crates' rows list their bites-only items; the ruling's list omitted
+  them, so the editor was right not to add them.
+Verdict: PASS WITH FINDINGS. Done 2026-11-11.

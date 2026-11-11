@@ -103,6 +103,10 @@ U4 wave 1", moved by card_refresh.py.
   (a) leave it (the queue still fit last night); (b) no new agent work in the day session after about 21:00
   Amsterdam; (c) he checks the routine's run history in claude.ai first. Recommended: (a), and (b) once a night's
   queue stops fitting.
+- **Relayed 2026-11-11 about 10:45 UTC** (it had not been sent before: no earlier reply carries it): the advisor's
+  answer to TCP-FREEZE's "Tell me if any later unit plans work on the model" (advisor-u4-wave1.md:546-554: none plans
+  fidelity work; U6's send path and U8/R1's DelayStream self-test work on the wrapper's timing, outside the freeze),
+  and its "For Mustafa" item 2 (the readings PR before R5 carries three more readings).
 - **Answered 2026-11-10 about 20:40 UTC** (history.md, "Decisions taken"):
   - NETEM-BAR (a): the bar stays capped as WS-BAR says; a WebSocket row that fails because the kernel is slower than
     the model is reported to him as the kernel's, with the netem numbers, and he decides.

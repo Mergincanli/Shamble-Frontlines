@@ -15,3 +15,6 @@ Rulings: advisor-u4-wave1.md W1-S1 (:45-111), W1-U4D (:113-304), W1-PUB (:353-43
 6. Findings with file:line, verdict.
 
 ## Progress
+- [1] Read u4d-build.md "Fix pass, round 1" (:135-374) and s1-proto.md whole. Sim diff saved (scratchpad simfix.diff,
+  3,103 lines); read src diff (history, lib, replay, scene, seam, world). Open checks: part damage at health 0 (churn
+  over an S30?), cluster centre = origin?, FLAG_DEAD vs alive, throw authority-only, wait's range, phase-1 records.
