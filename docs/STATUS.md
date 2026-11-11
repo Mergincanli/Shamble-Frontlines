@@ -90,12 +90,15 @@ A finding below the review budget's bar becomes a follow-up: its id goes here, i
 - **From status-diet (PR #49), after the gate step:** the STATUS citations left in advisor.md (:17, :286),
   netcode-architect.md (:24) and the decision docs (one hop through the table below until then); SD-N1, SD-N2, SD-N3
   and SD-N6 (security-auditor) and SD-L3 (the verifier): the archive's "Follow-ups", "From status-diet".
+- **From foundation 2.1a (PR #50):** for 2.1b's plan, IE-2, IE-3, IE-4 and SA-L1; for the gate step (2.3), IE-1, TE-2,
+  A-1, N2, L-4 and the v2 root page against pre-move bases; for the drafts' next revision, five "before the foundation"
+  lines left without a pointer; the archive's "Follow-ups", "From foundation 2.1a".
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100
   files) and W1-W3; kit-v3-3's stated limits (L1-L18, R-PLAIN, D-ASK); kit-v3-2's items 1-5; kit-v3-1's items 1-2;
   kit-v2-2's finding 4 (Medium, open) and its Lows; kit-v2-1's night-rules note (issue #16's comments are trusted).
-- **CI:** the smoke job's Chromium step stalled once (PR #42).
+- **CI:** the smoke job's Chromium step stalled once (PR #42) and failed twice on #50's 3f29cb8 (a runner DNS outage).
 - **v2:** the decision drafts' risks (the asset pipeline and several LOOK_V2 techniques not researched); R1-R6's
   (R3-R6 spot-checked; unread sources); R7's (its line numbers go stale when the legacy files move).
 - **Legacy (frozen):** 3a's ranked list; bot navigation; the editor and map bugs; the first-deploy tutorial; the

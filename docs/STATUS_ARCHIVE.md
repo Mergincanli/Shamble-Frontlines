@@ -503,6 +503,34 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   - **SD-L3, the index misses wrapped dated lines** (the verifier, Low): DECISIONS.md's "Also recorded elsewhere" finds
     "Mustafa" and a date only on one line, so it misses old lines 49, 526-527, 808-809 and 1017, and "XP-TERM: (a)" at
     597 and 613; each one's decision is in DECISIONS.md or indexed by its code (the verifier), so nothing is lost.
+- **From foundation 2.1a** (PR #50; the review round on 3c98ad5 and round 2 on the fix, `docs/reports/2026-11-11-foundation-2-1a.md`):
+  - **For 2.1b's plan:**
+    - **IE-2** (infra-engineer, Low): 2.1b moves all five files in one pushed commit; a half-moved commit turns its own
+      push run and the next push run red (pull-request runs compare against main and are not affected).
+    - **IE-3** (infra-engineer, Low) and **SA-L1** (security-auditor, Low): `tools/README.md` describes neither the
+      build-folder rule (only the comments in `tools/gate.mjs` and `tools/smoke.mjs` do) nor that letter-case variants
+      are judged differently on Linux CI (the root is judged) and on Windows or macOS (exit 2, by reading the code).
+    - **IE-4** (infra-engineer, Low): the pinned Chromium 1194 has never run the `legacy/` layout (locally, 1243 ran under
+      its name); 2.1b's proof that the smoke passes on `legacy/` comes from CI's run.
+  - **For the gate step (2.3), after KIT-FREEZE-2:**
+    - **IE-1** (infra-engineer, Low; Mustafa, 2026-11-11: "Its wording Low becomes a follow-up for 2.3"):
+      `tools/smoke.mjs:31` says "keep one copy" also when the files are split between the two places, not copied.
+    - **TE-2** (test-engineer, Low): a base with all five files in two folders resolves to `legacy/` silently (the order
+      of `BASE_PREFIXES`), where a working tree in that state exits 2; no commit in the history holds two full sets.
+    - **A-1** (the advisor agent, Low): with a base in the old `shamble-frontlines-repo/` folder and a head at the root,
+      the move check looks only in that old folder, so pages left in `legacy/` would go unchecked; old bases only.
+    - **N2** (security-auditor, note): both folder-containment checks compare paths as text and do not resolve symlinks,
+      as on main; `src="sub/%2e%2e/x.js"` stays inside the folder once decoded, so the smoke's outside check never sees
+      it, while the gate reads a literal folder named `%2e%2e`.
+    - **L-4** (the advisor agent, Low): CLAUDE.md's setup line `npx --no -- playwright install chromium` is refused in a
+      cloud day session by the settings' `npx` deny; 2.1a's local smoke ran on Chromium 1243 aliased as 1194 instead.
+    - **The v2 root page against pre-move bases** (a known limit): once v2 has a root `index.html`, any gate run against
+      a base from before the move stops on the move check, including the E3 and rows scripts with their base 44446a5.
+  - **For the drafts' next revision:** five "before the foundation" lines with no pointer to his decision of 2026-11-10
+    (docs-keeper's note; the brief named only the lines it pointed): ADR 0002 :38, :724, :1115; SPIKE_PLAN :100 (the
+    diagram's label) and :202.
+  - **Docs passes:** stale `tools/` citations in dated research docs, left as dated records: `docs/LEGACY_INVENTORY.md`
+    TL1, TL6 and TL9; `docs/research/r5-toolchain-quality.md` :925 and :1737.
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from

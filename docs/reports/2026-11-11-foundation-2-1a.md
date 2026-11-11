@@ -112,6 +112,40 @@ My words of 2026-11-11 on the advisor tool. They sharpen "it is an extra"; nothi
 - Record these words in docs/DECISIONS.md with your next docs pass, unless they are already there. CLAUDE.md keeps its wording until the kit unfreezes at the gate step (2.3); this clarification goes into it then.
 ```
 
+### A3.3. His message in this session, 2026-11-11 14:54:11 UTC: F1-FIX (a), FREEZE-FDN (a) for one check, and his yes to the exact change to `tools/gate.mjs` (extracted by script from the session's events, event 8e7ad9dc-cdf8-43a7-817b-ceaaba67081e: `mustafa-2026-11-11-f1.md`)
+
+```text
+My words of 2026-11-11, for the foundation chat (PR #50, foundation step 2.1a).
+
+F1-FIX: (a). Close the hole in #50 now, with this exact change, then re-run the proofs.
+
+FREEZE-FDN: (a). Inside my exception. The check exists only so that the foundation's own move (2.1b) and its revert are judged safely, and it asked me first. This reading covers this one check. Any other new check still asks me.
+
+Yes to the exact change to tools/gate.mjs, as in .checkpoints/foundation-restructure/f1-gate.patch at eaf5a4580e31920073d7270b4baafbbe63da3c5a.
+- My yes covers exactly one thing: writing this change into tools/gate.mjs on #50's branch. It does not cover any other kit or gate edit, and it does not cover the merge.
+- After the write, tools/gate.mjs must be byte-identical to what that patch file produces from the current file (git blob 7a8480c, as the patch's index line names). If it is not, or if the guard refuses the write, do not work around it: stop and tell me.
+- tools/smoke.mjs stays unchanged. Its wording Low becomes a follow-up for 2.3.
+
+Then continue as you listed: the full mutation proof on the new gate, both directions of the move test with raw output and exit codes, the decoy on main's gate and on the new one, round 2 on the change only, the verifier, the report. Then mark #50 ready.
+- Round 2 is the last round, as the review budget says. A third only for an open Critical or High.
+- The security-auditor asked for one run of the new gate on Windows before 2.1b. In the report, give me that step with the exact command.
+- In the report, say how full this chat is, so I can decide where 2.1b runs.
+- Record these words in docs/DECISIONS.md with this change-set's docs pass.
+```
+
+### A3.4. His message in this session, 2026-11-11 16:32:18 UTC: his words on permission prompts (extracted by script from the session's events, event 557d0202-6418-4c26-9d03-9b1ee13fd5bf: `mustafa-2026-11-11-prompts.md`)
+
+```text
+My words of 2026-11-11 on permission prompts, for the foundation chat (PR #50, foundation step 2.1a).
+- I am switching this chat to Auto mode, so routine commands stop asking me. Nothing else changes.
+- Any edit to a kit or gate file still asks me in chat first, with the exact change, and is written only after my yes. My yes of today covered one write, and that write is done.
+- A prompt from the guard counts as not seen by me until I have answered the same question in chat.
+- Do not edit any settings file, hook or allow-list to get fewer prompts.
+- Where you can, keep shell lines simple enough for the guard to read, and put multi-step work in a script under .gate/ that you run with node.
+- In the report, add two things: which kinds of command asked me most today, and every refusal by the guard, the deny list or the classifier with the route you took instead. Both are findings for 2.3.
+Carry on from where you are. The mutation proof keeps running.
+```
+
 ### A4. His go for #49, 2026-11-11, about 09:02 UTC, as the merge commit bb2d817's message records it (quoted there with "> "; the prefix is removed here). Not checked against the chat record: that day session (session_0173vVo6Vtm2C54toWvTt8sR) is not readable from this account
 
 ```text

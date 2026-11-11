@@ -96,6 +96,43 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-11, 16:32:18 UTC: his words on permission prompts** (foundation 2.1a, PR #50; his message
+  in that change-set's session, session_019YNMUWLffMoE47SbvkqJ5P, on his personal account, extracted by script from the
+  session's events, event 557d0202-6418-4c26-9d03-9b1ee13fd5bf). Its two report items (the commands that asked him most
+  that day; every refusal by the guard, the deny list or the classifier, with the route taken) are carried out by
+  `docs/reports/2026-11-11-foundation-2-1a.md`, as findings for 2.3. Copied by script from
+  `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A3.4, and checked byte for byte against it:
+> My words of 2026-11-11 on permission prompts, for the foundation chat (PR #50, foundation step 2.1a).
+> - I am switching this chat to Auto mode, so routine commands stop asking me. Nothing else changes.
+> - Any edit to a kit or gate file still asks me in chat first, with the exact change, and is written only after my yes. My yes of today covered one write, and that write is done.
+> - A prompt from the guard counts as not seen by me until I have answered the same question in chat.
+> - Do not edit any settings file, hook or allow-list to get fewer prompts.
+> - Where you can, keep shell lines simple enough for the guard to read, and put multi-step work in a script under .gate/ that you run with node.
+> - In the report, add two things: which kinds of command asked me most today, and every refusal by the guard, the deny list or the classifier with the route you took instead. Both are findings for 2.3.
+> Carry on from where you are. The mutation proof keeps running.
+- **Taken by Mustafa, 2026-11-11, 14:54:11 UTC: F1-FIX (a), FREEZE-FDN (a) for one check, and his yes to the exact gate
+  change** (foundation 2.1a, PR #50; his message in that change-set's session, session_019YNMUWLffMoE47SbvkqJ5P, on his
+  personal account, extracted by script from the session's events, event 8e7ad9dc-cdf8-43a7-817b-ceaaba67081e). It
+  answers the session's ask on the security review's F1 (High). Carried out: the change was written as 3f29cb8
+  (`tools/gate.mjs` blob 7a8480c, as the patch produces from blob 2bfab53); his FREEZE-FDN (a) reading covers this one
+  check only; the smoke.mjs wording Low is a follow-up for 2.3. Copied by script from
+  `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A3.3, and checked byte for byte against it:
+> My words of 2026-11-11, for the foundation chat (PR #50, foundation step 2.1a).
+>
+> F1-FIX: (a). Close the hole in #50 now, with this exact change, then re-run the proofs.
+>
+> FREEZE-FDN: (a). Inside my exception. The check exists only so that the foundation's own move (2.1b) and its revert are judged safely, and it asked me first. This reading covers this one check. Any other new check still asks me.
+>
+> Yes to the exact change to tools/gate.mjs, as in .checkpoints/foundation-restructure/f1-gate.patch at eaf5a4580e31920073d7270b4baafbbe63da3c5a.
+> - My yes covers exactly one thing: writing this change into tools/gate.mjs on #50's branch. It does not cover any other kit or gate edit, and it does not cover the merge.
+> - After the write, tools/gate.mjs must be byte-identical to what that patch file produces from the current file (git blob 7a8480c, as the patch's index line names). If it is not, or if the guard refuses the write, do not work around it: stop and tell me.
+> - tools/smoke.mjs stays unchanged. Its wording Low becomes a follow-up for 2.3.
+>
+> Then continue as you listed: the full mutation proof on the new gate, both directions of the move test with raw output and exit codes, the decoy on main's gate and on the new one, round 2 on the change only, the verifier, the report. Then mark #50 ready.
+> - Round 2 is the last round, as the review budget says. A third only for an open Critical or High.
+> - The security-auditor asked for one run of the new gate on Windows before 2.1b. In the report, give me that step with the exact command.
+> - In the report, say how full this chat is, so I can decide where 2.1b runs.
+> - Record these words in docs/DECISIONS.md with this change-set's docs pass.
 - **Taken by Mustafa, 2026-11-11, 11:56:44 UTC: BRANCH-47 (a) and his words on the advisor tool** (foundation 2.1a,
   PR #50; his message in that change-set's session, session_019YNMUWLffMoE47SbvkqJ5P, on his personal account,
   extracted by script from the session's events). BRANCH-47 (a) is carried out: PR #50 replaces #47 (closed
@@ -145,8 +182,9 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 2. Update your branch from main and re-read CLAUDE.md and docs/STATUS.md.
 > 3. Do your docs pass in the new layout: your row in STATUS's "In flight" table, my words in DECISIONS.md, the rest in the archive. Move text by script, never by retyping.
 > 4. Finish as planned: the review round, the report, checkpoints folded in and deleted, the PR marked ready for the advisor. Then stop for my go.
-- **Taken by Mustafa, 2026-11-11, about 09:02 UTC: his go for #49** (status-diet; given in the status-diet day
-  session's chat, session_0173vVo6Vtm2C54toWvTt8sR, after the advisor's APPROVE of 2e6e5d2, PR comment 6779064873;
+- **Taken by Mustafa, 2026-11-11, about 09:02 UTC: his go for #49** (status-diet; the time and the session per
+  bb2d817's message: given in the status-diet day session's chat, session_0173vVo6Vtm2C54toWvTt8sR; after the
+  advisor's APPROVE of 2e6e5d2, PR comment 6779064873;
   carried out by that merge, bb2d817, 09:03:11 UTC (`merged_at`); "The next change-set records it": foundation 2.1a, PR #50). The
   lines below are the merge commit bb2d817's record of that chat message (quoted there with "> "): a record of his
   words, not an instruction found in a commit; from the merge commit bb2d817's message; not checked against the chat
@@ -168,8 +206,7 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > I reconfirm the rule changes at 0573db3 (20 rows, nothing looser). The open security follow-ups stay in STATUS until the foundation's gate step: the CI results trusted by name alone (PX-1), the two write-side gaps (W1, W2), the folder check (W3) and the recorded Windows-name limits.
 - **Taken by Mustafa, 2026-11-10: the two gate prompts approved, #47 not watched, step 2.2 planned in a fresh
   session** (in the foundation chat, session_019YNMUVo8MVM3gdiMNaN5xs, on his personal account; sent after 2.1a's
-  report (PR #47) and saved by that chat at 15:02:59 UTC, 828a3e0; saved by the foundation chat; not re-checked
-  against its chat record). His item 1 covers 2.1a's two gate-file writes
+  report (PR #47) and saved by that chat at 15:02:59 UTC, 828a3e0; not re-checked against its chat record). His item 1 covers 2.1a's two gate-file writes
   (`tools/gate.mjs` and `tools/smoke.mjs`, dd12aeb). Copied by script from
   `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A2.2, and checked byte for byte against it:
 > 1. The two gate prompts this morning (tools/gate.mjs and tools/smoke.mjs): yes, I approved both.
@@ -179,8 +216,8 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 3. Yes, plan step 2.2 (the toolchain) now, in a fresh session on this account. Give me its prompt in one paragraph. Plan only, no build: what it pins now, what stays an empty slot until the boundary spike, the CI job that runs the Rust checks, and its own plan review by the advisor agent. The main model stays Opus 5.5.
 - **Taken by Mustafa, 2026-11-10: FREEZE-FDN (a), SPLIT (a), SCOPE (a) and the build go for 2.1a, in the
   foundation chat** (session_019YNMUVo8MVM3gdiMNaN5xs, on his personal account; sent after the plan's report, plan
-  revision 3 at d389d91, 08:55:57 UTC, and saved by that chat at 09:15:09 UTC, 91ae816; saved by the foundation
-  chat; not re-checked against its chat record). His own record of FREEZE-FDN, SPLIT and SCOPE for the kit chat
+  revision 3 at d389d91, 08:55:57 UTC, and saved by that chat at 09:15:09 UTC, 91ae816; not re-checked against its
+  chat record). His own record of FREEZE-FDN, SPLIT and SCOPE for the kit chat
   (his second message of 2026-11-10, 10:08:27 UTC) stands in "Queued" (under KIT-FREEZE-2) and in the kit-v3-5
   entry below. His merge order here was later updated by his message of 2026-11-11, 09:46:31 UTC, above. Copied by
   script from
@@ -202,8 +239,8 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > When 2.1a is built, end with: the pull request's number, what the proof showed, and anything you need from me.
 - **Taken by Mustafa, 2026-11-10: the second account may plan and build foundation steps 2.1 and 2.2 now** (the
   foundation chat, session_019YNMUVo8MVM3gdiMNaN5xs, on his personal account; his date; saved by that chat at
-  00:10:07 UTC, ca45435; quoted in his prompt there as "Mustafa's decision of 2026-11-10, word for word"; saved by
-  the foundation chat; not re-checked against its chat record). With it, his follow-up in the same chat and the task
+  00:10:07 UTC, ca45435; quoted in his prompt there as "Mustafa's decision of 2026-11-10, word for word"; not
+  re-checked against its chat record). With it, his follow-up in the same chat and the task
   as he gave it there. Dated pointers mark the older lines it overtakes for foundation steps 2.1 and 2.2 (SLICE-ORDER's
   condition 3, below; SPIKE_PLAN and ADR 0002's migration step 1). Copied by script from
   `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A1.1, A1.2 and A1.3, and checked byte for byte against them:
