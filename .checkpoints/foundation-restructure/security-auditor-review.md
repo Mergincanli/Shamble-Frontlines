@@ -30,3 +30,34 @@ Notes:
 - F1 evidence RUN (not by reading): decoy rebuilt in sa-probe; `PLAYWRIGHT_BROWSERS_PATH=.gate/pw-browsers node tools/gate.mjs --smoke-only` -> "head = working tree (files in legacy/)", [5a] PASS index 8/8, editor 5/5, GATE PASS exit 0 (= CI's smoke job command, gate.yml:92). Main's gate (bb2d817:tools/gate.mjs copied to sa-probe/tools/gate-main-probe.mjs) on the same tree, `bb2d817 --no-smoke` -> "gate: shamble-core.js is missing from the working tree", exit 2. So: main fails closed, the edited gate passes both CI jobs on a broken root page.
 - F1 fix collision: rows-test.mjs:25 row h_legacy_plus_stray_root_page (root: ['index.html'], legacy: FIVE, want exit 0) and e3-bases.md:31 encode the fail-open as intended; the fix must change that row to expect exit 2 (it is a flip vs base 44446a5) and add the decoy row. Timing: plan.md:184 "The gate files are not touched again" in 2.1b, and 2.1b is the flip PR -> fix in this fix pass (or a gate PR before 2.1b).
 - F1 severity reasoning: not Critical (the check is not bypassed or skipped: it runs and prints both folders on its base line; review and his go still gate the merge; needs a deliberate whole-folder diff). High fits: "evidence that does not hold" - on a flip PR (2.1b is one) a GATE PASS no longer proves the page outside the chosen folder works, where main's gate failed closed; reach is the very next change-set. Rated High.
+- Housekeeping: sa-probe cleaned (git status 0 lines), node_modules link removed, `git worktree remove` (no --force) succeeded; worktree list has no sa-probe. firstLine defined at gate.mjs:41, before the guarded import's catch (:70): fail path reaches die.
+
+## B8 write-up (final)
+Threat model: the gate is CI's required merge check; the attacker is a PR author (a prompt-injected or mistaken agent session, or anyone with push to a lane branch) who controls every byte of the working tree, gate files included (PX-1, open). The gate files run from the PR head, so the gate's own honesty rests on review + his go; within that, the question is whether repository CONTENT (not gate code) can steer the gate to judge something other than the build that is played, or to pass broken code. Fail closed = exit 2 or a failing check.
+
+Pinned lines (3c98ad5): smoke.mjs:27-33 findBuild; smoke.mjs:135-139 CLI default; smoke.mjs:167-169 inRepo + "outside the build folder"; gate.mjs:40 die exit 2; :41 firstLine; :65-70 guarded import (die on failure, no fallback); :77-80 tryGit execFileSync no shell; :104 BASE_PREFIXES literals; :105-109 basePrefix; :116 headFile join(BUILD,f); :170 classicParts containment; :209 runSmoke root BUILD; :241 base.prefix.
+
+Findings:
+F1 High - a folder flip makes the gate judge a decoy (fail open where main failed closed). Evidence run above. Fix: gate.mjs after :241, when base.prefix !== BUILD_PREFIX, fail (exit 2 or a check) if the folder not chosen still holds index.html, editor.html or any shamble-*.js; change rows-test.mjs:25 to expect exit 2, add the decoy row; land in this fix pass (2.1b is the flip and leaves the gate files alone, plan.md:184).
+L1 Low - Windows/macOS and Linux CI disagree on letter-case variants (Legacy/, SHAMBLE-core.js): Linux judges the root, a case-insensitive laptop exits 2 "two places". Both safe; worth one line in the README/known limits.
+L2 Low - DECISIONS #49 header states "about 09:02 UTC" and the session id as fact; both come only from bb2d817's message (its line 3). Comment 6779064873 and merged_at verified via gh api. Add "(per bb2d817's message)" to the header.
+Notes (no finding): N2 lexical containment (symlinks, literal %2e%2e dir inside the folder) same as main; follow-up at most. N3 dd12aeb's gate-write authority (A2.2) rests on a notes file not re-checked; his go at merge is the wall. N4 gate job now always loads smoke.mjs: same protection class.
+Conditions: item 6 "honest and sufficient" holds if the ready head's report asks him to confirm A4 and A1.1-A1.3, A2.1, A2.2 (not yet written at 3c98ad5). Report must state needs-mustafa (tier 2 + decision docs).
+
+Gate-integrity coverage (no player-facing code in this PR: the anti-cheat table does not apply):
+| case | behaviour at 3c98ad5 | gap |
+| engine files in both places (copy or legacy -> . symlink) | exit 2 (probe; e3-bases) | none |
+| partial / empty legacy/, neither place | exit 2 "is missing" (rows-test, e3-bases) | none |
+| stray legacy/shamble-foo.js | PASS, root judged; foo unloaded | none |
+| Legacy/, SHAMBLE-core.js (Linux) | PASS, root judged; Windows: exit 2 | L1 |
+| decoy: clean legacy/ + broken root page (flip) | PASS both CI jobs | F1 |
+| stray root index.html beside legacy/ (flip) | PASS by design (rows-test:25) | F1 |
+| base with files under two prefixes | first of legacy/, root, old prefix holding all five; never mixed | none |
+| base prefix from repo content | no: literals only (:104), execFileSync | none |
+| smoke.mjs import fails (--omit=optional) | import needs no optional dep; failure -> die exit 2 | none |
+| smoke outside-folder (legacy-x, .., %2e%2e, %2f, host, case) | all flagged (Node replay + e3-summary:45-49) | N2 (lexical) |
+| kit/rules/CI diff | 0 bytes (bb2d817...3c98ad5 and bb2d817..d6a3fee) | none |
+| one-time ff exception | kit byte-identical precondition met and re-checked; no settings swap | none |
+
+Verdict: REVISE for F1 (High, open security finding -> needs-mustafa regardless); L1/L2 at the fix pass's discretion; everything else holds.
+DONE

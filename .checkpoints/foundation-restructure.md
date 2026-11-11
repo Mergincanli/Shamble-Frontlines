@@ -130,6 +130,17 @@ His step 3: the three reviewers running on 3c98ad5; then the fix pass (gate-file
    not watched (his "do not watch" carried over from #47).
 
 ## Open findings
+- test-engineer on 3c98ad5: APPROVE, 1 Medium + 5 Lows (notes `test-engineer-review.md`; its rows re-run 8 + 2 ALL PASS;
+  the docs check catches 11 of 11 mutations on a copy; gap probes G1-G4 behave as intended): TE-1 Medium, the revert-case
+  row of `e3-bases.md` (root head vs the `legacy/` base 9af08f7) cannot be repeated (9af08f7 is gone) -> to close by the
+  verifier's item 1: both base directions on the local move commit 104d675 with raw `--json` (base.prefix) and exit
+  codes kept (infra-engineer re-proved it, but through a grep pipe, no raw output); TE-2 Low, a base with all five
+  files in two folders resolves to `legacy/` silently while a working tree exits 2 (no such commit in history:
+  infra-engineer's scan of 518 commits; a gate change: 2.1b/follow-up); TE-3 Low, rows-test gaps (row h no smoke,
+  smoke-CLI row c message, base.prefix never asserted): follow-up; TE-4 Low, a broken smoke.mjs stops the whole gate with
+  exit 2 even with `--no-smoke` (fails closed): say it in the report; TE-5 Low, the DECISIONS check compares against the
+  appendix (A2.3 was byte-compared in full against the chat record in step 7, not only by its count: answer in the
+  report); TE-6 Low, the text-mode header "files in legacy/" unrecorded (infra-engineer's run A shows it).
 - infra-engineer on 3c98ad5: APPROVE, 4 Lows (notes `infra-engineer-review.md`): IE-1 `tools/smoke.mjs:31` says "keep
   one copy" also when the files are split, not copied (wording; a gate file: deferred to 2.1b, no push for a Low);
   IE-2 2.1b must move all five files in one pushed commit, or two push runs go red (2.1b's plan); IE-3
@@ -188,7 +199,7 @@ His step 3: the three reviewers running on 3c98ad5; then the fix pass (gate-file
 
 ## Running work
 - Saver: background task bjteqwe4t, started 14:02 Amsterdam, stops by 15:52 (110 min); last check 14:40: ok (autosaves pushed).
-- docs-keeper: done (1023870). infra-engineer: done (APPROVE). Running (background): security-auditor and test-engineer
+- docs-keeper: done (1023870). infra-engineer and test-engineer: done (APPROVE). Running (background): security-auditor
   on 3c98ad5 (notes `<agent>-review.md`); the advisor agent on 3c98ad5 (C1-C8 reconstructed, rev 3, the departure,
   this session's deviations; notes `advisor-head-review.md`). The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
 - The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
