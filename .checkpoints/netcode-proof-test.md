@@ -4,8 +4,9 @@
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main, last merged in at 5ca77eb (main bb2d817, PR #49, the STATUS split)
-- **Last update:** 2026-11-11 about 17:10 UTC (the work folders saved at 4ad80a9 and the HOLD lifted; USAGE-SAVINGS
-  (a) in force; U4j's round 2 running with the first review packet; tonight's one night item posted)
+- **Last update:** 2026-11-11 about 18:10 UTC (U4j's round 2 done, F1 closed; the advisor's round-2 ruling and the
+  U4e brief's check running; the chat at 415,513 of 1,000,000 (42 %) at 18:05 UTC, so Mustafa is asked to /compact
+  after this card refresh)
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
@@ -101,8 +102,12 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
   as follow-ups for U3d's part of PR #40's report; B2's U4g and U4h notes stay follow-ups (named in u4d-report.md).
 
 **Next steps, in order (Mustafa: "follow the card's order: U4j's round 2, then the U4e brief's check, then U4d-F"):**
-1. U4j's round 2 (running); merge U4j after round 2 (or 3).
-2. Then resume the U4e brief's run (workflow 2); the advisor's check of the U4e brief; U4e's build.
+1. U4j: round 2 done, no round 3 (F1 closed). The advisor's ruling on round 2 is running (brief kept in
+   advisor-u4j-r2-brief.md; it writes advisor-u4j-r2.md). On its notice, read the ruling in full (it touches the judge),
+   then merge U4j as it rules, by workflow 1's merge steps. No notice after a restart: read advisor-u4j-r2.md; complete
+   → act on it; incomplete → start the advisor again with advisor-u4j-r2-brief.md (it continues the file).
+2. The U4e brief's check is running (workflow 2; its revision follows in the same run if the check finds a Medium or
+   more); then the advisor's check of the U4e brief (U4E-Q12, Q13); `<base>`; U4e's build.
 3. Then U4d-F (workflow 3) as above; then U4d2's builder brief (carrying carry 52, N2-M2's ruling, W1-TARGET), with
    the advisor.
 4. U4r's brief: the night's rev 2 at `cs/npt-u4r-brief` ed973c9 goes to the advisor after U4c, U4d2, U4e and U4j merge.
