@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 17:42 Amsterdam
+- **Last update:** 2026-11-11 17:50 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -160,6 +160,8 @@
    --force). Who answered each prompt: from the server events, a background agent pages them (notes
    `general-purpose-prompt-tally.md`). CI on 3f29cb8: the push run's re-run failed the same way (runner DNS), the second
    time; no third re-run (consultation 6); STATUS's CI risk line updated in place.
+
+15. The docs commit 8d8c422 (his words A3.3 and A3.4 in the appendix and DECISIONS, L-2, the follow-ups, the CI risk line): gate --no-smoke PASS; pushed after the pull-request re-run on 3f29cb8 ended (cancelled at 16:42 UTC by the job timeout, still in the library step). E3 on the new gate at 8 of 31: identical to 2026-11-10 in every column (.gate/foundation-restructure/e3-compare.mjs writes evidence-f1/e3-compare.txt).
 
 ## Current step
 
