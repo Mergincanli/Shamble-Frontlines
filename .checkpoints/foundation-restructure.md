@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 17:03 Amsterdam
+- **Last update:** 2026-11-11 17:25 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -126,15 +126,26 @@
    guard refusal; after it: blob 7a8480c, `cmp` equal, smoke.mjs 18058e4, only tools/gate.mjs changed; gate with smoke
    PASS (+0 -0, 8/8, 5/5); committed alone and pushed.
 
+12. The evidence on the new gate (files in `evidence-f1/`): rows-test-f1 on 3f29cb8's gate (scratch by `git archive`,
+   blob 7a8480c): 13 + 2 ALL PASS, exit 0; on the unfixed gate (2bfab53): 4 FAILED (h, i, j, l, each exit 0), exit 1.
+   Both base directions raw, exit codes without pipes (closes TE-1): worktrees `.gate/fdn-new` at 3f29cb8 and
+   `.gate/fdn-newleg` at 7c22abf (3f29cb8 + a local move commit, never pushed; `git switch --detach`, the guard refuses
+   `git checkout`): the revert (root head vs legacy/ base 7c22abf): exit 0, build ".", base prefix "legacy/", PASS, text
+   header "base ... (files in legacy/) | head = working tree (files at the root)"; 2.1b's PR (legacy/ head vs root base
+   3f29cb8): exit 0, build "legacy/", base prefix "", PASS; main's gate (44446a5) on the legacy/ base: "shamble-core.js
+   not found at base 7c22abf", exit 2. The decoy (security-auditor's recipe, worktree of 3f29cb8, removed after; the guard
+   refuses `git restore`: files restored by `git show HEAD:<f> > <f>`): main's gate 277eb96 exit 2 ("shamble-core.js is
+   missing from the working tree"); the unfixed gate 2bfab53 GATE PASS exit 0; the new gate 7a8480c exit 2 ("the build
+   folder moved from the repo root (base) to legacy/ (head), but the repo root still holds editor.html, index.html");
+   the new gate `--smoke-only` exit 0 (only CI's gate job catches a decoy). E3 on the new gate: running (`e3-run-f1.mjs`,
+   results `e3-results-f1.json`, log `.gate/e3-run-f1.log`).
+
 ## Current step
 
-The evidence on the new gate, smoke users first and E3 last and alone: rows-test-f1 against 3f29cb8's gate (fresh out
-folders) plus the red run on the unfixed gate; both base directions raw with exit codes (worktrees rebuilt at 3f29cb8
-with a new move commit); the decoy (from security-auditor's notes) on main's gate, the unfixed gate and the new gate,
-plus `--smoke-only` on the new gate; then the full E3 (`e3-run-f1.mjs`, a copy writing `e3-results-f1.json`; background,
-max timeout; compared per id and column with `e3-results.json` by script). During E3: his words (appendix A3.3,
-DECISIONS entry, the check script extended), L-2, the follow-ups. Then round 2 pinned to a head holding all of it (and
-infra-engineer's question on 2.1b's push runs), the verifier, the report, ready, the advisor's delta review.
+The full E3 on the new gate runs in the background (task br8ig4sam, from 17:20 Amsterdam, about 100 min; resumable: a cut
+mid-entry leaves a planted file, restore it with `git show HEAD:<path> > <path>` in that worktree, then re-run). Meanwhile,
+no smoke: his words (report appendix A3.3; the DECISIONS entry by script; docs-keeper's check script extended), L-2,
+the follow-ups (STATUS ids, archive text). Then round 2 pinned to a head holding all of it, the verifier, the report.
 
 ## Next steps (on PR #50, this branch)
 
@@ -266,7 +277,8 @@ infra-engineer's question on 2.1b's push runs), the verifier, the report, ready,
    104d675's mentions and F-L marked stale.
 
 ## Running work
-- Saver: background task bjteqwe4t, started 14:02 Amsterdam, stops by 15:52 (110 min); last check 14:40: ok (autosaves pushed).
+- Saver: background task b8a5m7tp3, started 17:04 Amsterdam, stops by 18:54 (110 min); last check 17:25: ok.
+- E3 on the new gate: background task br8ig4sam, started 17:20 Amsterdam (log `.gate/e3-run-f1.log`).
 - docs-keeper: done (1023870). infra-engineer and test-engineer: done (APPROVE). security-auditor done (REVISE, F1).
   The advisor agent done (REVISE, F1; then APPROVE with conditions for the F1 amendment). No agent running. The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
 - The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
