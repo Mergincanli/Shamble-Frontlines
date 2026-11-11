@@ -90,10 +90,10 @@ A finding below the review budget's bar becomes a follow-up: its id goes here, i
 - **From status-diet (PR #49), after the gate step:** the STATUS citations left in advisor.md (:17, :286),
   netcode-architect.md (:24) and the decision docs (one hop through the table below until then); SD-N1, SD-N2, SD-N3
   and SD-N6 (security-auditor) and SD-L3 (the verifier): the archive's "Follow-ups", "From status-diet".
-- **From foundation 2.1a (PR #50):** for 2.1b's plan, IE-2, IE-3, IE-4, IE-7 and SA-L1; for the gate step (2.3), IE-1,
-  IE-5 (Medium: CI's live mirrors), TE-2, TE-7, R2-1, A-1, N2, L-4 and the v2 root page against pre-move bases; for the
-  drafts' next revision, five "before the foundation" lines left without a pointer; the archive's "Follow-ups", "From
-  foundation 2.1a".
+- **From foundation 2.1a (PR #50):** IE-2, IE-3, IE-4, IE-7 and SA-L1 taken by 2.1b (#51; its report closes each);
+  for the gate step (2.3), IE-1, IE-5 (Medium: CI's live mirrors), TE-2, TE-7, R2-1, A-1, N2, L-4 and the v2 root page
+  against pre-move bases; for the drafts' next revision, five "before the foundation" lines left without a pointer; the
+  archive's "Follow-ups", "From foundation 2.1a".
 - **From foundation 2.1b (PR #51), for the gate step (2.3):** the Node 24 finding from his Windows run (the pinned
   Playwright's browser install hangs after 100 %): his words, `docs/DECISIONS.md`, 2026-11-11, 20:44:29 UTC.
 

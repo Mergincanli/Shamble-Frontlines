@@ -1008,13 +1008,14 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
   - Answered in part, 2026-11-11, by its decider, the phase 1 restructure plan (foundation step 2.1, plan revision 3;
     the main session with docs-keeper), with its reasons below; the evidence is in
     `docs/reports/2026-11-11-foundation-2-1b.md`.
-    - (1) The legacy gate and tools stay in `tools/`, option (a), learning the `legacy/` path (step 2.1a, PR #50): 2
-      gate files and 2 kit files edited, against option (b)'s cost (the guard's gate-file lists and its npm check, 17
-      `tools/` allow rules in `.claude/settings.json`, CI's `--prefix tools` and both gate steps, and kit lines in about
-      8 more files). R5-LAYOUT-REC6's marks hold (E2, E3 and E4 in the 2.1b report).
-    - (2) The legacy docs stay in `docs/`, marked legacy (row KT21): no path changes, against 27 lines in 12 files (8 of
-      them protected), 2 broken relative links and about 25 dangling references for `legacy/docs/`. START_HERE gets
-      rewritten for v2 later (KT21's mark "redesign"), not archived.
+    - (1) The legacy gate and tools stay in `tools/`, option (a), learning the `legacy/` path: 2 gate files edited in
+      step 2.1a (PR #50: `tools/gate.mjs`, `tools/smoke.mjs`) and 2 kit files in step 2.1b (CLAUDE.md,
+      `.claude/agents/verifier.md`), against option (b)'s cost (the guard's gate-file lists and its npm check, the 15
+      `tools/` allow rules in `.claude/settings.json` (counted 2026-11-12), CI's `--prefix tools` and both gate steps,
+      and kit lines in about 8 more files). R5-LAYOUT-REC6's marks hold (E2, E3 and E4 in the 2.1b report).
+    - (2) The legacy docs stay in `docs/`, marked legacy (row KT21): no path changes, against, by the plan's count of
+      2026-11-10, 27 lines in 12 files (8 of them protected), 2 broken relative links and about 25 dangling references
+      for `legacy/docs/`. START_HERE gets rewritten for v2 later (KT21's mark "redesign"), not archived.
     - (3) The gate v2's script path is left to step 2.3's plan, which edits the guard anyway; so the question stays
       open, marked "answered in part", by the register's own rule. That status is Mustafa's REG-TRUE (b) of 2026-11-11
       (`docs/DECISIONS.md`, the entry of 2026-11-11, 21:39:44 UTC); the answer itself is the plan's.
