@@ -28,3 +28,10 @@ added line inside the loose-ends section; ADR 0002 hunks only on :7, the OQ-0002
 - START_HERE: legacy banner (new first blockquote, one line); :12 double-click names legacy/index.html; :22-24 files in legacy/ [verified]; :105, :115-117 folder `.` → `legacy` (plain substitution: check 6 core rule passes; README's `index.html[?map=tri]` form would not); :113 folder-argument sentence with [verified] tag.
 - REPO_MAP: five root rows → one `legacy/` row (file descriptions kept, the file:line rule); :6 date 2026-11-11 only (:5 untouched). repo-map-check: OK 112 entries / 99 paths, exit 0.
 - MODULE_MAP: one line above the file table (all five in legacy/, [verified]). TECHNICAL §9: the two inventory lines name legacy/ [verified].
+- STATUS: Last updated (2.1b, main 76b4f7a); Phase SCOPE line "recorded in ADR 0002 by 2.1b (#51)"; Last merged → #50
+  (76b4f7a, 18:38:28 UTC, merge commit, his go quoted in its message, APPROVE of f6becf5); CI green on 76b4f7a (run
+  43079707687); In flight #50 row → #51 row; Next: #50 merged, #51 in flight; Waiting: his go for #51 + his report steps
+  (pointer to his task message); Follow-ups: From 2.1b, the Node 24 finding (pointer, no quote); risk: R7 line numbers
+  hold. 120 lines.
+- STATUS_ARCHIVE: #50 merged row at the top of "In flight" (facts: GitHub API merged_at, merge commit 76b4f7a message, main run 43079707687); risk R7 item 3 (:843) corrected, [verified] (R100 x5, blobs equal).
+- ROADMAP: 2.1b entry at the top of Recent work (#50 merge stated in it). Not done (brief Never: ROADMAP history / nothing wider): the 2.1a entry still reads "PR #50: in review"; Recent work now 13 entries, fold not done.
