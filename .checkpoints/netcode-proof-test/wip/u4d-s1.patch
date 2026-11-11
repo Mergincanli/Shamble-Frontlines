@@ -23,7 +23,7 @@ index 275f183..d8acfab 100644
      /// More items than the format holds: commands above the redundancy cap, a group count above 8, more entities or
      /// events than their counts carry, more than 16 peers.
 diff --git a/spikes/netcode-proof/crates/proto/src/snapshot.rs b/spikes/netcode-proof/crates/proto/src/snapshot.rs
-index 030e70e..6c00f77 100644
+index 030e70e..cfe5426 100644
 --- a/spikes/netcode-proof/crates/proto/src/snapshot.rs
 +++ b/spikes/netcode-proof/crates/proto/src/snapshot.rs
 @@ -12,6 +12,13 @@
@@ -270,7 +270,7 @@ index 030e70e..6c00f77 100644
 +    /// row (docs/design/netcode-proof-messages.md §3), the security review's proof form for SEC-U4a-1.
      #[test]
 -    fn every_kind_has_a_group_in_both_layout_tables_and_effect_rows_are_owner_only() {
-+    fn every_kind_has_a_home_owner_only_kinds_stay_in_owner_rows_and_a_remote_soldier_is_the_catalogue_row() {
++    fn groups_home_every_kind_keep_owner_only_kinds_to_owner_rows_and_send_the_remote_row() {
          for table in [&Snapshot::GROUPS[..], &FullState::GROUPS[..]] {
              for kind in EntityKind::ALL {
                  let homes: Vec<_> = table.iter().filter(|g| g.2.contains(&kind)).collect();
@@ -401,7 +401,7 @@ index 657a502..9c40ce0 100644
      }
      // VELOCITY shares POSITION_XY's range and is another kind of field: pos-4cm leaves it alone.
 diff --git a/spikes/netcode-proof/crates/proto/tests/common/mod.rs b/spikes/netcode-proof/crates/proto/tests/common/mod.rs
-index 6ef34ba..6ab5510 100644
+index 6ef34ba..fec3b41 100644
 --- a/spikes/netcode-proof/crates/proto/tests/common/mod.rs
 +++ b/spikes/netcode-proof/crates/proto/tests/common/mod.rs
 @@ -1,6 +1,7 @@
@@ -413,19 +413,16 @@ index 6ef34ba..6ab5510 100644
  
  #![allow(
      dead_code,
-@@ -11,15 +12,29 @@ use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+@@ -11,7 +12,7 @@ use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
  
  use npt_link::Channel;
  use npt_proto::{
 -    ClientSettings, Direction, EndReason, EntityDelta, FullState, Input, Join, JoinAccepted,
--    JoinRejected, Kick, Leave, Limits, Message, Ping, Pong, ProfileId, Resync, RoomControl,
--    RoomEnded, SessionControl, SessionStatus, Snapshot, StepResult, TokenKind, encode,
-+    Class, ClientSettings, Direction, EndReason, EntityDelta, FullState, Input, Join,
-+    JoinAccepted, JoinRejected, Kick, Leave, Limits, Message, Ping, Pong, ProfileId, Resync,
-+    RoomControl, RoomEnded, SessionControl, SessionStatus, Snapshot, StepResult, TokenKind, encode,
++    Class, ClientSettings, Direction, EndReason, EntityDelta, FullState, Input, Join, JoinAccepted,
+     JoinRejected, Kick, Leave, Limits, Message, Ping, Pong, ProfileId, Resync, RoomControl,
+     RoomEnded, SessionControl, SessionStatus, Snapshot, StepResult, TokenKind, encode,
  };
- use npt_sim::grid::Field;
- use npt_sim::{Command, EntityKind, EntityRecord, SimEvent};
+@@ -20,6 +21,20 @@ use npt_sim::{Command, EntityKind, EntityRecord, SimEvent};
  use rand_chacha::ChaCha8Rng;
  use rand_core::{Rng, SeedableRng};
  

@@ -11,10 +11,10 @@ this copy's path); df > 2 GB; plants one at a time, restore, sha256 check; commi
 Expected counts: measured 351, bites 388, self 52 of 52.
 DEVIATION (stated): this run has no Edit tool (the harness refused it: "No such tool available: Edit"), as in round 1.
 So: notes are rewritten whole with Write; plants are applied by a scratch script (scratchpad r2t-plant.py) that
-replaces exactly one unique match (asserts count == 1), saves a byte copy first, restores from it and checks sha256
-against r2t-ref.sha256 after each plant. Same method as round 1's u4d-test-bites.py. Runner: scratchpad r2t-run.sh
-(idle 8 s, df, touch, 2 s toucher inside the script, output to stdout only). Plants Q12 and X3 were added to the
-scratch script by a small python edit of that scratchpad file (outside the repo).
+replaces exactly one unique match per site (asserts count == 1), saves a byte copy first, restores from it and checks
+sha256 against r2t-ref.sha256 after each plant. Same method as round 1's u4d-test-bites.py. Runner: scratchpad
+r2t-run.sh (idle 8 s, df, touch, 2 s toucher inside the script, output to stdout only). Plants Q1, Q10a2, Q12 and X3
+were added to the scratch script by small python edits of that scratchpad file (outside the repo).
 MY SLIP: block [4] below was first appended to this file by a shell heredoc (`cat >> ... <<EOF`), not by Write; notes
 only, no other file; this whole file was then rewritten with Write.
 
@@ -68,6 +68,11 @@ only, no other file; this whole file was then rewritten with Write.
   - Q12 (my round-1 E6: blend by / 255), 11:52:45: the blend unit test FAILED at world.rs:2173 "the soldier, fraction
     1, axis 0: [-127.396, -126.596] against the reference centre -127 ± 0.4" (3.9 mm); both D-9 tests still pass
     (the hit-or-miss check is the second test, as ruled). = fixer.
+  - Q1 (my M4 = N-M3, P11's form: a fired flag bit 1 << 4 set on a shot, cleared per tick in step, per command in
+    predict; 3 sites), 12:00:39: d3 FAILED at :245 "CO step 4: record" (flags 0 vs 16; step 4 = the first catch-up
+    tick). = fixer.
+  - Q10a2 (my M5, probe C's form: load_movers grows doors_closed to a decoded index), 12:01:01: the module test FAILED
+    at world.rs:2322 "CO: no mover grew"; r_m1 passes (a grown door vector changes no volume or state). = fixer's Q10a'.
 - [5] My own plants (whole npt-sim measured suite, --no-fail-fast; restored, ALL-OK after each):
   - O1 (part_center rotates by -yaw: signs of the s terms flipped, world.rs:452-453), 11:39:46-11:40:34: ONLY d7
     FAILED, at tests/replay.rs:351 (SS's state after 1/30/300 ticks pin). lib 3, seam 8, world 30 pass: h1 x2, a_m1,
@@ -94,7 +99,6 @@ only, no other file; this whole file was then rewritten with Write.
     changes, 1.00 a second; 489 kills (0.272 a second; 100 s gives 28, 0.28); every per-tick minimum held (48
     soldiers, teams >= 16, >= 15 vehicles of which >= 4 large, >= 300 projectiles, 384 effect rows); large hulls <=
     1,400 cm out, others >= 5,199 cm, stand-ins start <= 1,200 cm. Magazine 32,000 lasts 2,194 s at one soldier's rate.
-  End of [4]-[6]: r2t-plant.py check ALL-OK (34 files); no r2t-backup left; grep PLANT in crates: none.
 - [7] Carries and reading: carry 9 (raw pre-snap, grid of it; now per field over Soldier and OwnState records,
   tests/world.rs:1741-1802; the fixer's Q16 fails it; -41 quant's unit proof unchanged, tests/world.rs:2219-2237):
   MET. Carry 12 (layouts within FIELDS; s6 pins all 8 kinds by Field identity, tests/seam.rs:477-557; the fixer's
@@ -105,3 +109,89 @@ only, no other file; this whole file was then rewritten with Write.
   RQ5 "3 recordings x 5 min"; tests/replay.rs:20-28); ES's judged runs are 10 min each, every ES run checked by
   PM-0001-2's counter script within ±5 % (ADR 0001:1474-1480, :1600), driven by U4r's runner (plan §5 U4r :742:
   npt-bots' brawl and open-loop scripts), not by this generator today.
+- [8] check.mjs, the one counted run, 11:54:59-11:59:37 UTC, by absolute path, cwd this copy's spikes/netcode-proof,
+  shared target, offline, idle 12 s before, 2 s toucher, no other cargo at the end: all 10 steps PASS. fmt 0.4 s;
+  clippy 8.8 s (measured and bites); clippy-wasm32 1.9 s (both); doc 33.4 s (both builds, host and wasm32, -D
+  warnings); test 227.7 s: measured 351 passed, 0 failed, 0 skips; bites 388 passed, 0 failed, 0 skips (= expected);
+  deps 0.7 s (108 crate files, 1 cargo config); refs 0.5 s (625 tracked files); marks 2.5 s (81 marks, drafts
+  626df678); self 1.5 s (52 of 52); redact 0.8 s (10 of 10; 182 items, 0 findings). df 11 GB after.
+- [9] Final: r2t-plant.py check ALL-OK (34 files = step 1's sha256, after Q1 and Q10a2 too); no r2t-backup left; no
+  PLANT text in crates (grep); git status the same 10 M + 9 ?? as at the start; HEAD 21a8597; check.mjs 7eddc285,
+  workspace Cargo.toml 75b6c160, Cargo.lock 3da1e15f unchanged. Nothing committed; nothing edited beyond restored
+  plants.
+
+## Round-1 findings (mine): CLOSED / NOT CLOSED
+- M1 (ES misses PM-0001-2 bands; no ES test): CLOSED as ruled, on ES's 9,000-tick synthetic recording: t_m1
+  (tests/world.rs:1005-1070) asserts the four bands and 48/15 every tick: 70.776 shots, 9.853 events, 21.120 spawns a
+  second, 32.300 live; Q11a fails it (and the fixer's Q11b, Q11c). But see T2-M1: the event band holds for that
+  window only.
+- M2 (1 MB = 2^20): CLOSED (history.rs:7, 10^6 B; carry14 220 / 7,333; replay span 7,333 / 7,334; Q19 fails both).
+- M3 (D-9 blind to a wrong blend): CLOSED (world.rs's blend unit test, fractions 0, 1, 127, 128, 255 against an f64
+  reference; Q12 fails it 3.9 mm off at fraction 1).
+- M4 (catch-up tick, FLAG_FIRED): CLOSED (FLAG_FIRED dropped, flags dense, world.rs:116-120; D-3 has a catch-up tick
+  every 9th step, catch_ups > 40 asserted, and compares the own-state record; Q1 fails "CO step 4: record").
+- M5 (load_movers grows pools): CLOSED (Movers sized at World::new, world.rs:782-795; load_movers_into guards every
+  index, :2031-2058; the module test and r_m1; Q10a2 fails the module test).
+- L1 (D-4 misses a NaN the snap launders): CLOSED (non_finite reads `pre`, world.rs:2005-2023; the fixer's Q24).
+- L2 (std-sin unit test cannot fail): NOT CLOSED, not claimed (u4d-build.md "Left for", test L2): follow-up.
+- L3 (clamp idempotence above about 40.57 m): CLOSED by the TUNE-2 ruling (bound in World's and the module's doc; D-8's
+  half at the bound; the in-module scene test; the fixer's Q26, Q27).
+- L4 (Replayer panics on a non-canonical recording): CLOSED (replay.rs:698-702; tests/replay.rs:608-637; the fixer's
+  Q20).
+- L5 (decode reserves 2^20 x 104 B from a 60 B header): CLOSED in code (replay.rs:320-323), NOT by any test: O4
+  passes all 47 tests (T2-L2).
+- L6 (SS magazine runs dry; D-6's 100 s cannot see it): CLOSED (32,000 rounds, const assert scene.rs:167-170; X3:
+  685.664 shots a second and every per-tick minimum over a whole S30).
+- N1 (d10 clamp shots not asserted), N2 (D-2 pipes without timeout): NOT CLOSED, not claimed, listed follow-ups.
+- N3 (carry 13 storage identity): ruled C13, met in part; O5 shows the test bites; counting half to U5.
+
+## New findings (round 2)
+- T2-M1 MEDIUM, not before merge (with netcode N2-M1 and arch A2-L3, now measured): ES's synthetic recording meets
+  PM-0001-2's 10 gameplay events a second only over the 300 s t_m1 reads. X2 (t_m1 at 18,000 ticks): 7.578 a second
+  over 600 s, so about 5.30 in the second 300 s; shots, spawns and live projectiles stay in band. Cause (the fixer's
+  point B): the generator's dead reckoning (replay.rs:431-432) ignores crouch, sprint and scripted speeds, so the aim
+  among the other teams (replay.rs:458-466, one command in 11) drifts off its targets. `aim_one_in` = 11
+  (scene.rs:80) was tuned on that same window, and scene.rs:114, :177 state "10 gameplay events a second" as a scene
+  property. Scenario: U4d2 or U4r lengthens or windows an ES recording from this generator (PM-0001-12 judges ES runs
+  of 10 minutes, each checked by PM-0001-2 within ±5 %: ADR 0001:1474-1480, :1600) and reads 7.6 events a second,
+  24 % low, so PM-0001-2 fails and PM-0001-12's ES part is invalid. Reach today: none judged (the plan pins the
+  synthetic ES recording at 9,000 ticks; judged ES runs come from U4r's runner). Cheapest proof: t_m1 at 18,000 ticks
+  (X2). Fix: either t_m1 asserts each 100 s window in band over the length any consumer uses, or the generator's
+  reckoning follows crouch, sprint and scripted speeds at the next GENERATOR bump (re-pinning D-7's ES); the doc
+  lines say "over its 9,000-tick recording"; a U4r carry: PM-0001-2's ES checks shown on a 10-minute ES run of
+  whatever drives ES before PM-0001-12's marks count.
+- T2-L1 LOW, not before merge: two new invariants are held only by D-7's after-tick pin (tests/replay.rs:351), which
+  this fix pass re-pinned after writing them: hull o part's frame convention (part_center, world.rs:446-458: O1 rotate
+  by -yaw and O2 ignore yaw pass every semantic test, h1, a_m1, r_m1, D-1, D-2, D-3, D-6 included) and phase 3's
+  refresh of the soldiers' records before the shots (present_volumes, world.rs:1475-1480: O3 passes the same). Both
+  are right by reading today. Scenario: a later edit (e.g. write_records' order, arch A2-L4) breaks one and re-pins D-7
+  with its own legitimate change; shots without a Rewind then meet last tick's boxes, or parts' boxes sit mirrored
+  about the hull, and every semantic test stays green. Cheapest proof: two unit tests in world.rs's module:
+  part_center at hull yaw 90 degrees maps offset (+120, 0, 100) to hull + (0, +120, 100) cm within 1 cm; and in one
+  step a soldier moved out of its old box is hit at its new place by a no-Rewind shot (or: phase 3's soldier boxes
+  equal hit_volumes_from of the post-move records).
+- T2-L2 LOW, not before merge: rust L1 = my L5 is closed in code only (replay.rs:320-323): O4 (the 2^20 reserve
+  restored) passes all 47 npt-sim tests; an allocation is unobservable without a counting allocator. Fix: one line in
+  U5's carry 48 (u4s-carries.md): decoding a 60 B header that claims 2^20 ticks allocates at most room x
+  size_of::<TickInput>().
+- T2-L3 LOW (the fixer's point A, for the advisor): `aim_one_in` = 11 and `grenade_fuse_ms` = 1,515 are new stand-in
+  tuning. aim_one_in is read only by the generator and its value is valid for the 300 s window (T2-M1);
+  grenade_fuse_ms is read by World (world.rs:1466), so it also changes every bot-driven ES run's grenades (46 ticks,
+  1.533 s, vs 2 s). Both need the advisor's nod as TUNE-1's did; the report states X2's number beside them.
+
+## Fixer's open points
+- (A): T2-L3. (B): T2-M1, Medium, measured. (C): SOLDIER's 8 fields are the ruling's 8 names (advisor-u4-wave1.md:79),
+  the catalogue's row (:137) and the GROUPS test's 92-bit row; "(9 fields)" is a count slip. Weapon, Scene::weapon,
+  Scene::health: public beyond W1-PUB's list, traced to TUNE-1's header condition, only caller D-6
+  (tests/world.rs:618-628): text for §4.1 (as arch A2-L2, rust R2-L4). Carry 13: met in part, ruled (C13); O5 bites.
+- For U4e's budget and TUNE-1's report: X1's 126.3 records changed a tick over an S30 (OwnState 47.49 of 48:
+  owner-only, one per client); SS's kill rate 0.272 a second over an S30 (X3), not probe F's 0.42 (before this pass).
+
+## Verdict
+APPROVE WITH FINDINGS. Every round-1 finding of mine that the fix claims is CLOSED: M1-M5 with a plant I re-ran here
+(Q11a, Q19, Q12, Q1, Q10a2); L1, L3, L4 by the fixer's plants (Q24, Q26-Q27, Q20), read, not re-run by me; L6 by
+measurement (X3); L5 in code only (T2-L2); N3 by the C13 ruling (O5 shows its test bites). W1-S1's both halves proven:
+Q2 (D-3's own-state record), P1, P3, P7 re-planted here; the fixer's Q16, Q17, Q18, Q22, Q23 read, not re-run; the
+GROUPS row's 129 bits on the wire. check.mjs in this copy: 351 / 388 / 52 of 52, all 10 steps. No Critical or High,
+so no round 3 from this lane. T2-M1 (Medium) and T2-L1 to T2-L3 (Low) are follow-ups.
+DONE (2026-11-11 12:04 UTC)
