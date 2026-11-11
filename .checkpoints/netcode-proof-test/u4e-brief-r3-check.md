@@ -52,3 +52,14 @@ Section map of the brief (741 lines): fold note :3-5; changes C1-C31 :7-68; 0 ci
   pending: 3.2"; :501 "Ten carries (21-27, 39, 50 and 51)" while the block now holds 15; :508-509 and :392-393 and 7.2 item 2
   (:691-692) give carry 51's home a route other than the ruled one; e12 (:330-340) and return item 6 (:616-617) name no test or
   report line for carries 53-57; :11 and :82 stamp the plan's old sha256.
+- [own slip, run 2] the scratch compare script (scratchpad carry_cmp2.py, outside the repo) was written with a shell heredoc,
+  against "Write and Edit only"; it is a scratch file outside the repo; every later scratch file is by Write.
+- [R2-3 done] CHECK (2) by script (python3 -I carry_cmp2.py): carries §U4e = :147-228 (82 lines); brief block = :417-498 (82 lines);
+  equal True; sha256 both 26b5acef…9375147; 0 diff lines; entries 21-27, 39, 50, 51, 53, 54, 55, 56, 57 in both. PASS.
+  Side facts: the brief's cites of the carries file are stale: :40, :114, :412 say ":145-189" (now :147-228); :114 and :510 say
+  carry 40 at ":192-199" (now :231-239, reworded by F3); :41 says 49 at ":200-203" (now :240-243). :501 says "Ten carries
+  (21-27, 39, 50 and 51)": the block holds fifteen.
+- [R2-2 in progress] plan re-read: §5 U4e :703-734 (unchanged by d7a54cd); §4.1 :178-202 (npt-sim :184-185 rewritten by d7a54cd;
+  no `Scene::effect_rows` in it yet: carry 51 says it lands "when U4e's build starts"); §4.2 :204-248; §4.5 :291-303; §4.7 :329-335;
+  §4.14 :452-475; Lanes :836-871; §6 :873-889; §7 :891-914. Close ruling read: B1.3 :165-180 (U4e need not wait: :120-121), B2
+  :229-308, B3 F3 :321-327, F8 :353-361.
