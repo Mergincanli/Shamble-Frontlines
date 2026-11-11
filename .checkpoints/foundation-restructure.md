@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 13:52 Amsterdam
+- **Last update:** 2026-11-11 14:20 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -65,16 +65,22 @@
      (re-checked just before); the same yes covered the merge's one gate-file write (dd12aeb's `tools/gate.mjs` and
      `tools/smoke.mjs`, nothing new added).
 
+7. Step 1 closed (his step 1): CI green on d6a3fee (push run 43023480099, pull_request run 43023620759); #47 read
+   back: closed 12:49:11 UTC, not merged, head 26e0d82. The report's Appendix A (2dd8827): his words for 2.1a in full,
+   9 blocks copied by `report-appendix.py` from the notes and from bb2d817's message, each checked byte for byte.
+   His #47's-turn message in `mustafa-2026-11-10-answers.md` is byte-identical to the old chat's record (event
+   c49a5660-c1d0-4c58-a54c-983fe54c4394, 2026-11-11 09:46:31 UTC, 848 characters); the 2026-11-10 notes are not
+   re-checked (labelled so). The status-diet session (where his #49 go was given) is not readable from this account; the
+   routines are not listed from this account (they live on the university account).
+
 ## Current step
 
-His step 1's tail: re-read `docs/STATUS.md`, `docs/DECISIONS.md`, `docs/STATUS_ARCHIVE.md` and docs-keeper's agent
-file; then the docs pass.
+His step 2, the docs pass: docs-keeper (Opus, effort high) briefed with the facts below; the saver running.
 
 ## Next steps (on PR #50, this branch)
 
-1. Re-read `docs/STATUS.md`, `docs/DECISIONS.md` (its scope line and entry format), `docs/STATUS_ARCHIVE.md` and
-   `.claude/agents/docs-keeper.md`. Grep main's docs for `#47`: his quoted words stay as typed, with a pointer to #50
-   beside them, never an edit.
+1. (done) Re-read the docs layout; `#47` appears in docs/ only in STATUS (its row, Next, Waiting) and in the
+   status-diet report; #49's merge (bb2d817, his go: "The next change-set records it") is this change-set's to record.
 2. The docs pass, by docs-keeper (Opus, effort high), text moved by script, never retyped:
    - `docs/STATUS.md` "In flight": one row for #50 (2.1a, replaces #47), from the evidence.
    - `docs/DECISIONS.md`: his words of 2026-11-10 and 2026-11-11 from `mustafa-2026-11-10.md`,
@@ -130,6 +136,15 @@ file; then the docs pass.
    equal after); no other merge construction if the guard refused; blob-level proofs incl. the five game files equal
    dd12aeb's (E3 carries over); #50 opened while its head was d6a3fee, before any `[skip ci]` save; his words captured
    by script; notes on C1-C8 and E3's worktrees for steps 3-4.
+
+2. 2026-11-11 14:05 Amsterdam · before closing step 1 and briefing the docs pass (his moments 4 and 5): what goes into
+   DECISIONS.md and how; #49's go; checking the old notes; where 2.1a's record goes · changed: whole messages, but only
+   his labelled "Two additions" from the opening prompt; no pointer into `.checkpoints/` (the report's Appendix A
+   instead, made by script); a byte-for-byte check script for the DECISIONS blocks; #49's go recorded from bb2d817's
+   message, labelled not checked against the chat record; the old chat checked only for the #47's-turn message; no
+   archive row for 2.1a until it merges (as #49 did); DECISIONS.md's header line reworded; a Queued entry for the
+   CLAUDE.md clarification at 2.3; SLICE-ORDER's pointer beside, never inside, the block; #50's STATUS row touched in
+   step 4; F-L grows (a revert of #50 removes #49's record and today's words): say so in the report; #47 read back.
 
 ## Running work
 - Saver: not running (no agents yet). The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
