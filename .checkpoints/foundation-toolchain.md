@@ -7,7 +7,7 @@
   APPROVE of revision 3, bf1737f).
 - **Branch:** `claude/laughing-pasteur-fwya24` (this cloud session's branch, standing in for `cs/foundation-toolchain`)
   · **Base:** main 2d22b69 (PR #46 merged)
-- **Last update:** 2026-11-11 10:48 Amsterdam
+- **Last update:** 2026-11-11 13:54 Amsterdam
 
 ## Steps done
 1. Model check: `get_session` shows `session_context.model` claude-opus-5-5 (Opus 5.5) · no commit · go.
@@ -96,7 +96,7 @@
 
 ## Current step
 Steps 1-4 done. Waiting for 2.1b only (LANE-RULES merged with PR #49, bb2d817; his word, 2026-11-11); PR #48 stays a
-draft. Plan revision 7 records the new STATUS layout for step 6.
+draft. Plan revision 8 records his advisor-tool words (the tool on since 2026-11-11) and "As built, steps 1 to 4".
 
 ## Next steps
 1. Step 5 (main merged in by the worktree path, condition 5's check, then K2a, K2b, K3, K4: each asked in chat with its
@@ -108,12 +108,20 @@ draft. Plan revision 7 records the new STATUS layout for step 6.
    REPO_MAP and the register's G0 reading;
    the review round 3 at a time; the verifier; the report; the checkpoint folded in and deleted; ready; the
    advisor's review of the head; his go).
-2. This checkpoint and the plan are folded into the build's report and deleted before its PR is marked ready
-   (CHECKPOINTS §9).
+2. Step 5's kit edits under his moment 3 (2026-11-11): draft the exact texts of K2a, K2b, K3 and K4, consult the
+   advisor tool once with all four, then ask him in chat; consult again if any text changes after his reply (this is
+   how the session reads "before any change to rules"; he can object). Check that the guard's ask fires for K4's
+   worktree path. The re-run sends E1's npm half to CI from the start (moment 2: refused twice locally).
+3. First runs still to do: E4b and E4d (offered to him now; they do not wait for 2.1b), E8, E9, E10 (step 5's re-run and
+   step 6). Step 6 also writes his advisor-tool words into docs/DECISIONS.md (unless already there).
+4. Before the PR is marked ready: consult the advisor tool (moment 5), fold this file's consultation log and its count
+   into the report, then delete this checkpoint and the notes (CHECKPOINTS §9); the advisor agent's final-head brief
+   names the method changes in the plan's "As built, steps 1 to 4".
 
 ## Open findings
-- The advisor tool (Fable 5.2) is not among this session's tools (ToolSearch "advisor": no match). Mustafa's words: it
-  "is an extra. The recorded plan review by the advisor agent stays required". The advisor agent review goes ahead.
+- The advisor tool (Fable 5.2) was off in this session until 2026-11-11 (ToolSearch "advisor": no match before then);
+  on since his `/advisor fable` of 2026-11-11. Steps 1 to 4 and K1's write were done while it was off; its first
+  consultation found nothing in E2's or the planted failures' logs to redo.
 - STATUS on main still calls kit-v3-5 in flight; PR #46 merged as 2d22b69 (docs drift for docs-keeper, not 2.2's).
 - The local `unshare` rehearsal was refused by the session's permission check; not retried (plan Appendix B).
 - K1's ask (the session's event log, list_events): the guard's PreToolUse ask fired for the workflow write at
@@ -134,6 +142,12 @@ draft. Plan revision 7 records the new STATUS layout for step 6.
   `rustup show active-toolchain` prints `1.99.1-x86_64-unknown-linux-gnu (overridden by '<repo>/rust-toolchain.toml')`.
 
 ## Decisions taken
+- Mustafa, 2026-11-11 (`mustafa-2026-11-11-advisor-tool.md`): "extra" means on top of the advisor agent's recorded plan
+  review, never instead, and not optional; with the tool on, consult it at five moments (before committing to a plan or
+  approach; when an error or failed approach comes back a second time; before any change to rules, the gate, CI or
+  security-relevant code; on a design call with more than one defensible answer; before declaring a step or the task
+  done); usage is no reason to skip; log each consultation here in one line and count them in the report; into
+  docs/DECISIONS.md with the next docs pass; into CLAUDE.md at the gate step.
 - Mustafa, 2026-11-11 (`mustafa-2026-11-11-pr49-merged.md`): PR #49 merged (bb2d817): STATUS split into STATUS.md
   (dashboard), DECISIONS.md (his decisions) and STATUS_ARCHIVE.md (the rest); LANE-RULES with ACCOUNTS in CLAUDE.md.
   Step 5 still waits for 2.1b; its LANE-RULES condition is met. The docs pass uses the new layout. Keep waiting.
@@ -154,6 +168,18 @@ draft. Plan revision 7 records the new STATUS layout for step 6.
 - Mustafa, 2026-11-10 (this session's prompt): FREEZE-FDN covers the toolchain's CI job (each such edit asks him and
   merges on his go); guard checks for the new pins are not covered and wait for the gate step (2.3); 2.2 merges after
   2.1b.
+
+## Advisor tool consultations (his words of 2026-11-11: one line each: when, the question, what changed)
+1. 2026-11-11 ~10:55 Amsterdam · before committing plan revision 8 (his advisor-tool words; the five moments mapped onto
+   steps 5-7): what is missing? · changed: his words kept out of DECISIONS.md and CLAUDE.md for now (step 6; 2.3) and
+   added as a third kit follow-up for 2.3; this log started; the stale "not among this session's tools" lines fixed;
+   steps 1-4 and K1 noted as done with the tool off (nothing to redo); moment 3 read as all four kit texts drafted, one
+   consultation, then his chat ask (again if a text changes); moment 2: the npm half of step 5's re-run goes to CI;
+   moment 5: consult before ready and fold this log and its count into the report before the checkpoint is deleted;
+   an "As built, steps 1 to 4" section added to the plan, its method changes to be named in the advisor agent's
+   final-head brief; E4b, E4d, E8, E9, E10 named as not yet run (E4b and E4d offered to him now); K4's worktree path
+   to be checked for the guard's ask at step 5.
+Count: 1.
 
 ## Running work
 - saver: background task b04hgafwt · output `/tmp/claude-0/-home-user-Shamble-Frontlines/29a42dc7-ecd4-506e-b90a-121dd5e50988/tasks/b04hgafwt.output`

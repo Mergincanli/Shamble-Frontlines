@@ -1,6 +1,11 @@
-# Plan: foundation step 2.2, the toolchain (revision 7)
+# Plan: foundation step 2.2, the toolchain (revision 8)
 
-Status: revision 7 records Mustafa's word of 2026-11-11 (`mustafa-2026-11-11-pr49-merged.md`): PR #49 merged (main
+Status: revision 8 records Mustafa's words of 2026-11-11 on the advisor tool (`mustafa-2026-11-11-advisor-tool.md`,
+word for word; the tool, Fable 5.2, has been on in this session since his `/advisor fable` that day): it is consulted at
+his five moments, each consultation logged in the checkpoint in one line and counted in the report; his words go into
+DECISIONS.md with step 6's docs pass and into CLAUDE.md at the gate step. Revision 8 also adds "As built, steps 1 to 4"
+(below "In one screen"), which says where the build differs from the text of the parts, and maps his five moments onto
+steps 5 to 7 (Part 8). Nothing else changed from revision 7. Revision 7 records Mustafa's word of 2026-11-11 (`mustafa-2026-11-11-pr49-merged.md`): PR #49 merged (main
 bb2d817), so step 5's LANE-RULES condition is met and step 5 waits for 2.1b alone; STATUS is split into the dashboard
 `docs/STATUS.md`, his decisions in `docs/DECISIONS.md` and the rest in `docs/STATUS_ARCHIVE.md`, and step 6's docs pass
 uses that layout (Part 8 step 6). The STATUS line numbers cited below are main 2d22b69's; his words now stand in
@@ -61,10 +66,36 @@ check's notes `fold-check-*.md` (this folder).
   2027-04-30, so a dated follow-up moves `tools/` and v2 to Node 26 together after 2.3, merged before 2027-03-31, with
   his ask, since the toolkit's files are gate files); the lint tools enter with 2.3; `.gitignore` takes two lines; the
   job has its own file; the planted failures are commits on the change-set's own branch.
-- **Order:** the build starts now in a fresh session (his word, 2026-11-10: "Steps 1 to 4 can run before 2.1b merges;
-  step 5 waits as your plan says"); the PR stays a draft until 2.1b has merged (his answer: "2.2 merges after 2.1b");
-  once main must be merged in, the work moves to a branch worktree under `.gate/`; risk tier 2; no Brave check
-  (nothing a player sees, hears or feels).
+- **Order:** the build runs in this session, on this branch (his change of plan, 2026-11-10: "build step 2.2 yourself,
+  in this chat, on this branch"), with steps 1 to 4 before 2.1b merges and step 5 waiting (his word: "Steps 1 to 4 can
+  run before 2.1b merges; step 5 waits as your plan says"); steps 1 to 4 are built (PR #48, a draft); the PR stays a
+  draft until 2.1b has merged (his answer: "2.2 merges after 2.1b"); once main must be merged in, the work moves to a
+  branch worktree under `.gate/`; risk tier 2; no Brave check (nothing a player sees, hears or feels).
+
+## As built, steps 1 to 4 (where the build differs from the parts' text)
+The parts below keep their approved text; this section is what step 6's report and step 7's reviewers read beside them.
+The advisor agent approved revision 3 and has not seen these changes of method: its final-head brief names them.
+- **Where:** built in this session, on `claude/laughing-pasteur-fwya24` (his change of plan, 2026-11-10), not in a fresh
+  session; commits d3a1e9c (step 1), 566363f (step 2), fb17451 (step 3, K1); draft PR #48.
+- **`Cargo.lock`** landed in step 2, not step 1: cargo cannot lock a workspace with no members.
+- **npm runs moved to CI:** the session's permission check refused running npm scripts locally, twice (`npm test`, also
+  in a scratch workspace); not retried. E1's npm half ran in CI (E2), L2 rests on npm's documented behaviour (the B3
+  quote: "If dependencies in the package lock do not match those in `package.json`, `npm ci` will exit with an error"),
+  and L3 became a fifth planted failure in CI, M4. E11's review ran before any npm package ran anywhere.
+- **The legacy gate's smoke test (5a)** cannot start in this container (the toolkit's Playwright 1.56.1 wants Chromium
+  build 1194, the container has 1243, and a second Playwright install is forbidden): local gates ran `--no-smoke`;
+  CI's smoke job was green on every push.
+- **Results:** E2 green on fb17451 (push run 42891450472: the cut held, curl exit 7; A1, A2, A3 proven; his fallback
+  rule not needed); M1a 42891819768, M1b 42892038296, M2 42892226674, M3 42893284193, M4 42893510607, each red at its
+  expected step and reverted by a new commit; the clean head 66d9888 green on every check (toolchain, gate, smoke).
+- **Evidence run:** E1 (cargo half, and the release-overflow control), L1, E2, M1a-M4, E4a, E4c, E5, E6, E7, E11.
+  **Not yet run:** E4b (`cargo metadata` from the spike's folder) and E4d (the spike's `check.mjs` on 2.2 merged with
+  PR #40's head), which do not wait for 2.1b; E8 (the repository map), E9 (the marks on the final file list) and E10
+  (the kit's tests), which run with step 5's re-run and step 6. Step 5's "re-run E1-E11" is their first run.
+- **The advisor tool** was off during steps 1 to 4 and K1's write; it has been on since 2026-11-11, and its
+  consultations from then on are logged in the checkpoint.
+- **K1's ask** (the guard's prompt for the workflow write) is treated as not seen (his KIT-ASK-SEEN (b)); step 5 asks
+  him in chat before each kit write.
 
 ## Part 1. Goal, scope, rules, risk tier
 
@@ -100,8 +131,10 @@ security: CI hygiene, the cut-off and the dependency review). Legacy symbols +0 
   check to step 2.3: I will give my go on it in the pull request."
 - LANE-RULES' Models line (`docs/STATUS.md:704-705`): "on my personal account, Fable 5.2 may be the session's advisor
   through Claude Code's advisor tool. The main model and every agent stay Opus 5.5."; with his addition
-  (`:709-710`): "it is an extra. The recorded plan review by the advisor agent stays required." (The advisor tool is
-  not among this session's tools; the advisor agent's review is recorded in Part 9.)
+  (`:709-710`): "it is an extra. The recorded plan review by the advisor agent stays required." (The advisor tool was
+  off in this session until 2026-11-11 and has been on since; his words of 2026-11-11 sharpen "extra": "on top of the
+  recorded plan review by the advisor agent, never instead of it. It does not mean optional." The advisor agent's
+  reviews are recorded in Part 9.)
 
 ### 1.3 Does any rule forbid 2.2 that his decisions do not cover? No (the advisor: "holds").
 | Rule (main 2d22b69) | What it says | What covers 2.2 |
@@ -444,7 +477,15 @@ procedure says; the saver while agents run):
    clause per line naming my 2026-11-10 decision as the exception"; one ask each). Each of the four is first asked of
    Mustafa in chat, with its exact text, and written only after his yes (his KIT-ASK-SEEN (b), 2026-11-11: "Before each
    step-5 kit edit, ask me in chat and write it only after my yes."); the guard's own ask still runs at the write.
-   Re-run E1-E11.
+   His five moments for the advisor tool (2026-11-11), read for step 5: moment 3 ("before any change to rules, the
+   gate, CI or security-relevant code"): the exact texts of all four kit edits are drafted first, the advisor tool is
+   consulted once with all four on the page, then he is asked in chat; if any text changes after his reply, the tool is
+   consulted again before the write (this reading is written in the checkpoint, so he can object). K4's write goes to
+   `.gate/foundation-toolchain-wt/.claude/agents/advisor.md`: check that the guard's ask fires for that worktree path
+   (`protectedRel` keys on a first segment `.claude`); his chat yes is the wall either way, and a silent guard there
+   joins the auto-mode finding. Moment 2 ("when an error or a failed approach comes back a second time"): the local npm
+   run was refused twice, so the re-run sends E1's npm half to CI from the start. Re-run E1-E11, the first run of E8, E9
+   and E10 (and of E4b and E4d if they have not run by then: As built).
 6. Docs, in the layout of PR #49 (his word, 2026-11-11: "use the new layout for your docs pass"): REPO_MAP (E8; its
    new top-level entries); the register (the G0 done-when reading, Q2.2-a; his go); the dashboard `docs/STATUS.md`
    (2.2's line in "in flight", within its line budget), his 2026-11-10 and 2026-11-11 words for 2.2 in
@@ -454,7 +495,9 @@ procedure says; the saver while agents run):
    follow-up for Node (Q2.2-c: one change-set moving `tools/` and v2 to Node 26 together,
    after 2.3, merged before 2027-03-31; Node 22's end of life is 2027-04-30; the toolkit's `package.json` and lockfile
    are gate files, so it asks Mustafa), and two kit follow-ups for 2.3 (Appendix B): "auto mode can pass the guard's
-   ask" (his KIT-ASK-SEEN (b)) and CHECKPOINTS.md §10's `git -C` line that the guard refuses.
+   ask" (his KIT-ASK-SEEN (b)) and CHECKPOINTS.md §10's `git -C` line that the guard refuses; and his words of
+   2026-11-11 on the advisor tool, word for word, in `docs/DECISIONS.md` unless they are already there (his words;
+   CLAUDE.md takes them at the gate step, a third kit follow-up for 2.3).
 7. The review round on the final diff, 3 at a time: security-auditor (tier 2: the workflow, sudo, the cut, CI hygiene,
    and E11's dependency review: CLAUDE.md's Never line on running unreviewed code from the internet is met the way
    `tools/` meets it today, by a pinned lockfile plus this review; the Rust toolchain comes from rustup's official
@@ -468,7 +511,10 @@ procedure says; the saver while agents run):
    Advisor's file); the checkpoint folded in and deleted; the worktree, if one was made, removed: leave it first (`cd`
    back to the main folder in its own call), run §10's checks after a `cd` into it rather than with `git -C`, which
    the guard refuses, then `git worktree remove .gate/foundation-toolchain-wt` (never `--force`) and `git worktree
-   prune` (the advisor's L-b); the PR ready; the advisor's review of that head; his go.
+   prune` (the advisor's L-b); before the PR is marked ready, the advisor tool is consulted (his moment 5, "before you
+   declare a step or the task done"), and the checkpoint's consultation log and its count are folded into the report
+   first, since the checkpoint is then deleted; the PR ready; the advisor agent's review of that head, its brief naming
+   the method changes of "As built, steps 1 to 4"; his go.
 Every agent runs Opus 5.5 (`model: opus`) at its file's effort: `high` for all but engine-architect, whose file says
 `xhigh` (the advisor's F-7). This plan's review ran at `xhigh` because his prompt asked for it ("have the advisor agent
 review it at effort xhigh", `mustafa-2026-11-10-session.md`). At most 3 agents at a time. Not night-queue work.
@@ -548,8 +594,11 @@ Outside this plan, it found: `.claude/CHECKPOINTS.md` §10 tells sessions to run
 guard refuses for every session (`routine-guard.mjs:1046`): a kit follow-up for STATUS (Appendix B); 2.2's step 7 runs
 §10's checks after a `cd`. Not checked by anyone: nothing has run on a real runner; E2 and M1a-M3 decide that.
 
-The advisor tool (Fable 5.2) is not among this session's tools, so it was not consulted before the plan was committed
-nor before it was called done; his words make it an extra, and the advisor agent's recorded review is the required one.
+The advisor tool (Fable 5.2) was off in this session until 2026-11-11, so it was not consulted for revisions 1 to 7 or
+for steps 1 to 4; the advisor agent's recorded reviews are the required ones. It has been on since 2026-11-11 (his
+`/advisor fable`), and his words of that day make it "on top of the recorded plan review by the advisor agent, never
+instead of it": each consultation from then on is logged in the checkpoint in one line and counted in the report
+(consultation 1: before revision 8 was committed).
 
 ## Part 10. Risks
 1. The runner refuses part of the cut (`sudo -n`, `ip link set lo up`, `setpriv`'s options, `nogroup`): E2 shows it on
@@ -611,7 +660,9 @@ Line numbers are main 2d22b69's; the build re-finds them after 2.1b and LANE-RUL
 
 ## For Mustafa
 No Brave check: 2.2 adds no page and nothing a player sees, hears or feels. Done: FDN-NOCODE (a) and FDN-HEADING (a);
-the build started in a fresh session (2026-11-10).
+the build runs in this session (his change of plan, 2026-11-10); steps 1 to 4 built; KIT-ASK-SEEN (b).
+0. Optional now, if you want it (it does not wait for 2.1b): E4b and E4d, the coexistence checks with PR #40's spike in
+   a worktree under `.gate/` (no push, no file of the branch changed).
 1. During the build, approve each kit ask as it comes: K1 (the new workflow, written 2026-11-10), and in step 5 K2a
    (the heading), K2b, K3 and K4 (the three clauses naming your decision), each asked in chat first with its exact text
    and written only after your yes (your KIT-ASK-SEEN (b)).
@@ -664,3 +715,6 @@ the build started in a fresh session (2026-11-10).
   Mustafa cannot say the prompt reached him, so it is treated as not seen. This session ran in auto mode. Step 6's docs
   pass records it in STATUS (or DECISIONS) as a follow-up for 2.3, and the report carries it; until then step 5 asks him
   in chat before each kit write.
+- A third kit follow-up for the gate step, 2.3 (Mustafa, 2026-11-11): CLAUDE.md takes his words on the advisor tool
+  ("CLAUDE.md keeps its wording until the kit unfreezes at the gate step (2.3); this clarification goes into it then");
+  until then they stand in `docs/DECISIONS.md` (step 6) and in this folder's `mustafa-2026-11-11-advisor-tool.md`.
