@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 17:32 Amsterdam
+- **Last update:** 2026-11-11 17:42 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -151,6 +151,16 @@
    "From foundation 2.1a" (115 lines) and the archive's "Follow-ups" group of the same name (IE-1..IE-4, SA-L1, TE-2,
    A-1, N2, L-4, the v2 root page, the five unpointed lines, the stale research citations); repo-map-check OK.
 
+14. His words on permission prompts (2026-11-11 16:32:18 UTC, event 557d0202): captured by
+   `.gate/foundation-restructure/capture-2026-11-11-prompts.mjs` (copy in the notes) into `mustafa-2026-11-11-prompts.md`;
+   the report's Appendix A3.4 (11 blocks, all byte-identical); the DECISIONS entry by `decisions-add-a34.mjs` (copy in
+   the notes); the check extended to 11 blocks: PASS. The refusals of the day, from the local transcripts
+   (`.gate/foundation-restructure/prompt-tally.mjs`): main session 4 (guard: git -C, git checkout, git restore; deny list:
+   rm -rf), the reviewers about two dozen (the guard's agent rules, git -C, git checkout, git restore, worktree remove
+   --force). Who answered each prompt: from the server events, a background agent pages them (notes
+   `general-purpose-prompt-tally.md`). CI on 3f29cb8: the push run's re-run failed the same way (runner DNS), the second
+   time; no third re-run (consultation 6); STATUS's CI risk line updated in place.
+
 ## Current step
 
 The full E3 on the new gate runs in the background (task br8ig4sam, from 17:20 Amsterdam, about 100 min; resumable: a cut
@@ -287,8 +297,16 @@ the follow-ups (STATUS ids, archive text). Then round 2 pinned to a head holding
    step built from "Check a new machine", saying what it exercises, plus 2.1b's branch command; the verifier brief,
    104d675's mentions and F-L marked stale.
 
+6. 2026-11-11 17:38 Amsterdam · the CI smoke failure came back a second time (his moment 2): what now? · changed: no
+   third re-run and no workflow workaround (a kit edit under the freeze; a 2.3 finding: every smoke run depends on a live
+   package mirror); the docs pushed once the pull-request re-run has ended, gated with --no-smoke while E3 owns the
+   smoke; a later head's smoke run covers the fix by blob equality (named in the report); STATUS's CI line updated in
+   place; the final head needs both checks green before ready, one re-run at most there, and if still red: stop and
+   tell him, never a commit to kick CI.
+
 ## Running work
 - Saver: background task b8a5m7tp3, started 17:04 Amsterdam, stops by 18:54 (110 min); last check 17:25: ok.
+- The prompt-tally agent (general-purpose, Opus, high): running in the background.
 - E3 on the new gate: background task br8ig4sam, started 17:20 Amsterdam (log `.gate/e3-run-f1.log`).
 - docs-keeper: done (1023870). infra-engineer and test-engineer: done (APPROVE). security-auditor done (REVISE, F1).
   The advisor agent done (REVISE, F1; then APPROVE with conditions for the F1 amendment). No agent running. The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
