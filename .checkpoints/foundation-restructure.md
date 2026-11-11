@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 18:45 Amsterdam
+- **Last update:** 2026-11-11 18:38 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -171,12 +171,11 @@
 
 19. Before round 2: CI on 0607b45 green, push 43063326391 and pull_request 43063335859 (the step Smoke (check 5a) succeeded; the library install 27 s): the mirror outage cleared; the tools tree f23190c and the five game blobs equal at 3f29cb8, 0607b45 and 76544aa, so that run covers the fix; origin/main still bb2d817; the legacy/ base rebuilt from the plumbing to the same SHA 89286ed (reproducible). Round 2 (the last) launched on 76544aa21bff9d7c4be5b5e6e51fb9ae59d586c4: security-auditor, test-engineer, infra-engineer (Opus, high; notes <agent>-round2.md), each brief with the refused forms, the 12 blocks, the writers not to run, the deliberately unfinished items, a fresh rows folder (.gate/rows-f1-te-r2), the verifier-owned worktrees.
 
+20. Round 2 done (the last round): security-auditor APPROVE (F1 closed; R2-1 Low: a trailing dot or space passes the check, Git for Windows refuses such paths; its own byte check of A3.3-A3.5 against the session events: identical; notes N5-N7 accepted; it asked for its threat model in agent memory: not done here, out of scope, named in the report), test-engineer APPROVE, infra-engineer APPROVE. CI on 76544aa: gate and smoke green (pull_request 43067074308, push 43067068538). IE-6 settled by one run (.gate/foundation-restructure/ie6-probe.mjs; evidence-f1/ie6-probe.txt): a plain file named legacy in the revert direction: exit 0, no crash (join(ROOT, 'legacy/') keeps the slash, so existsSync is false for a file): not a follow-up. Round 2's follow-ups landed before the verifier (0590d8c): IE-5 (Medium), IE-7, TE-7, R2-1 in the archive group and STATUS's bullet (116 lines); gate with smoke PASS.
+
 ## Current step
 
-The full E3 on the new gate runs in the background (task br8ig4sam, from 17:20 Amsterdam, about 100 min; resumable: a cut
-mid-entry leaves a planted file, restore it with `git show HEAD:<path> > <path>` in that worktree, then re-run). Meanwhile,
-no smoke: his words (report appendix A3.3; the DECISIONS entry by script; docs-keeper's check script extended), L-2,
-the follow-ups (STATUS ids, archive text). Then round 2 pinned to a head holding all of it, the verifier, the report.
+The verifier on 0590d8c; then the last commit (the report above the Appendix A marker, the refusal table regenerated, the STATUS row, ROADMAP's Next, the checkpoint deleted), the PR body, the advisor agent's delta review of the final head (its notes in its answer), CI green on the final head, then ready.
 
 ## Next steps (on PR #50, this branch)
 
@@ -318,11 +317,13 @@ the follow-ups (STATUS ids, archive text). Then round 2 pinned to a head holding
 
 7. 2026-11-11 18:24 Amsterdam · the evidence step done; before launching round 2 (his moments 5 and 1) · changed: the cover claim backed (blob equality at 3f29cb8, 0607b45 and 76544aa; Smoke (check 5a) read as succeeded); main fetched (bb2d817); the briefs fixed (placeholders, 12 blocks, the writers not to run, the delta named, the refused forms, the unfinished items, a fresh rows folder, the verifier-owned worktrees, 89286ed rebuilt by the session); outcome rules set (Low/Medium: follow-ups riding the last commit; High: a fix and round 3 on that only, a gate file asks him first and E3 runs again); after the last commit nothing written inside the repo tree (the advisor agent returns its notes in its answer); the saver restarted if agents outlive it.
 
+8. 2026-11-11 18:33 Amsterdam · round 2 done (his moment 5); before the verifier · changed: round 2's follow-ups landed now (the Medium deferred in a file that survives), not in the last commit; IE-6 settled by one run; the verifier pinned to that head with the brief finished; for the last commit: the final head's CI runs in the PR body and the chat (the file gives 76544aa's), the body above the Appendix A marker and report-appendix.py re-run, the refusal table regenerated after the verifier (new agents named, re-scanned), the consultation count closed with the report written but uncommitted, the order (saver stopped, final save SHA noted, report, git rm, status empty), the stale STATUS row, ROADMAP Next and PR body, the 8d8c422 push run read, 89286ed cited for the base cases; the advisor agent's delta review before ready, its notes in its answer; ready only with both checks green.
+
 ## Running work
 - Saver: background task b8a5m7tp3, started 17:04 Amsterdam, stops by 18:54 (110 min); last check 17:25: ok.
 - The prompt-tally agent: done (29 refusals, 14 prompts answered by Mustafa).
 - E3 on the new gate: done 18:18 (31 of 31, identical).
-- Round 2 running (background): security-auditor on 76544aa; infra-engineer and test-engineer done (APPROVE).
+- Round 2: done, three APPROVE. The verifier: launching on 0590d8c.
 - docs-keeper: done (1023870). infra-engineer and test-engineer: done (APPROVE). security-auditor done (REVISE, F1).
   The advisor agent done (REVISE, F1; then APPROVE with conditions for the F1 amendment). No agent running. The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
 - The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
