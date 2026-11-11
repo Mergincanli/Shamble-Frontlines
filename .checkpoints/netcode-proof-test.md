@@ -90,7 +90,13 @@ U4 wave 1", moved by card_refresh.py.
     `set_hashes`, `hashes`; `marks::BoundNumber`, `Check.ws_bound`, `Rule::WsPractice`; `Outcome::Empty`,
     `fails()`; `Lack::Empty`); the builder's readings (a)-(f) go to the advisor with the reviewers' views.
   - Then U4c's L-c8 judged re-run on U4j.
-- **Agents (3 at most):** U4j's reviewer, U4d's round-2 reviewer (one slot free since 10:44).
+- **Agents (3 at most), since about 12:20:**
+  - U4j's fix pass and round 2 (wf_0906017a-a9b, task wgj6zbosy);
+  - the advisor's Part B (agent a1424b7584259af65, writing advisor-u4d-close.md): U4d's open points, N2-M1's fix form,
+    N2-M2, the public items, the U4e carries, the plan batch's Lows (F10 first), NA1 and NA5;
+  - the U4e brief's rev 3 (wf_c92cd986-072, task wnwulchr5): netcode-architect drafts u4e-brief.md from the night's
+    rev 2 (0dccbf0) with W1-U4E's answers, the carries as they stand, W1-TARGET and the 28-row recheck against
+    39f4290; test-engineer checks (u4e-brief-r3-check.md); one revision. Then the advisor checks the brief.
 - **Night work (issue #16):** all four items done: 2 and 3 on the night of 2026-11-10; 4 and 5 last night, from 02:16
   Amsterdam. The queue is empty: post tonight's items this evening.
   - **4, the U4r brief:** rev 2 at `cs/npt-u4r-brief` ed973c9 (1,007 lines). netcode-architect's check: 8 Medium and 8
