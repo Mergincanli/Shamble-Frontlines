@@ -31,6 +31,11 @@ const gitLongOptions = (sub) => {
 // (fix pass 3, P3-6: --ignore-submodules=none added, a named scaffold edit)
 const NAMES_Z = '--name-only -z --no-renames --no-relative --ignore-submodules=none';
 const nul = (s) => s.split('\n').filter(Boolean).map((f) => `${f}\0`).join('');
+// kit-v3-5: the merge check counts one line per file (a final empty line dropped); docsLines makes n docs files
+const lineCount = (s) => { const l = s.split('\n'); if (l[l.length - 1] === '') l.pop(); return l.length; };
+const docsLines = (n) => Array.from({ length: n }, (_, i) => `docs/f${i}.md\t\n`).join('');
+// kit-v3-5 (TE1): the guard's file-list read; the fake answers only that exact read
+const TSV_FILTER = '.[] | [.filename, (.previous_filename // "")] | @tsv';
 // A fake io. Options change what git and gh answer.
 function fakeIo(o = {}) {
   const {
@@ -38,17 +43,21 @@ function fakeIo(o = {}) {
     tracked = ['tools/gate.mjs', '.claude/scripts/checkpoint.mjs', 'tools/village.py', 'tools/preview.js', 'docs/a.md', 'changed.mjs'],
     changed = ['changed.mjs'], manifestSame = true, npmrc = [],
     headSha = SHA, prHeadSha = headSha, fork = false, checks = [['gate', 'completed', 'success'], ['smoke', 'completed', 'success']],
-    prFiles = 'docs/a.md\n', ghFail = false,
+    prFiles = 'docs/a.md\t\n', ghFail = false,
+    // kit-v3-5: total_count and changed_files default to what is listed (noTotal, noChanged leave the field out)
+    totalCount = checks.length, noTotal = false, changedFiles = lineCount(prFiles), noChanged = false,
+    // kit-v3-5 (SA5-1): an untracked tools/npm-shrinkwrap.json, or a tracked one that differs from main's
+    untrackedShrinkwrap = false, shrinkwrapDiffers = false,
   } = o;
   // prHeadSha is what the PR object reports as its head; headSha is the SHA the check-runs are keyed by (= the expected
   // head in the green case). They differ only in the "head moved" case, to isolate the head-equality check.
-  const pr = (ref, n) => JSON.stringify({ number: n, head: { sha: prHeadSha, ref, repo: { full_name: fork ? 'someone/fork' : REPO } }, base: { repo: { full_name: REPO } } });
+  const pr = (ref, n) => JSON.stringify({ number: n, head: { sha: prHeadSha, ref, repo: { full_name: fork ? 'someone/fork' : REPO } }, base: { repo: { full_name: REPO } }, ...(noChanged ? {} : { changed_files: changedFiles }) });
   const ghAnswers = {
     [`repos/${REPO}/pulls/27`]: pr('cs/x', 27),
     [`repos/${REPO}/pulls/5`]: pr('cs/other', 5),
     [`repos/${REPO}/issues/comments/111`]: JSON.stringify({ issue_url: `https://api.github.com/repos/${REPO}/issues/16` }),
     [`repos/${REPO}/issues/comments/222`]: JSON.stringify({ issue_url: `https://api.github.com/repos/${REPO}/issues/27` }),
-    [`repos/${REPO}/commits/${headSha}/check-runs?per_page=100`]: JSON.stringify({ check_runs: checks.map(([name, status, conclusion]) => ({ name, status, conclusion })) }),
+    [`repos/${REPO}/commits/${headSha}/check-runs?per_page=100`]: JSON.stringify({ ...(noTotal ? {} : { total_count: totalCount }), check_runs: checks.map(([name, status, conclusion]) => ({ name, status, conclusion })) }),
     [`repos/${REPO}/pulls/27/files?per_page=100`]: prFiles,
   };
   return {
@@ -65,10 +74,11 @@ function fakeIo(o = {}) {
       if (/^rev-parse --verify --end-of-options (refs\/remotes\/)?origin\/main\^\{commit\}$/.test(a)) return { code: 0, out: `${SHA}\n` };
       if (a === `diff --cached ${NAMES_Z}`) return { code: 0, out: nul(staged) };
       if (a === `diff ${NAMES_Z}`) return { code: 0, out: nul(unstaged) };
+      if (args[0] === 'ls-files' && args[1] === '--others') return { code: 0, out: untrackedShrinkwrap ? 'tools/npm-shrinkwrap.json\n' : '' };
       if (args[0] === 'ls-files') return { code: tracked.includes(args.at(-1)) ? 0 : 1, out: '' };
       if (args[0] === 'diff' && args[1] === '--quiet') {
         const fs = args.slice(4);
-        if (fs[0] === 'tools/package.json') return { code: manifestSame ? 0 : 1, out: '' };
+        if (fs[0] === 'tools/package.json') return { code: manifestSame && !(shrinkwrapDiffers && fs.includes('tools/npm-shrinkwrap.json')) ? 0 : 1, out: '' };
         return { code: fs.some((f) => changed.includes(f)) ? 1 : 0, out: '' };
       }
       return { code: 0, out: '' };
@@ -76,6 +86,8 @@ function fakeIo(o = {}) {
     gh: (args) => {
       if (ghFail) return { code: 1, out: '' }; // every gh api fails -> ghJson throws inside mergeCheck
       const path = args.find((x) => x.startsWith('repos/'));
+      // kit-v3-5 (TE1): the file list answers only the guard's exact read (every page, the @tsv filter)
+      if (path?.includes('/files?') && !(args.includes('--paginate') && args[args.indexOf('--jq') + 1] === TSV_FILTER)) return { code: 1, out: '' };
       return path in ghAnswers ? { code: 0, out: ghAnswers[path] } : { code: 1, out: '' };
     },
     exists: (p) => (basename(p) === '.npmrc' ? npmrc.includes(p) : true),
@@ -230,6 +242,11 @@ export const CASES = [
   ['night: glob a credential dir', NIGHT, ev('Glob', { pattern: '**', path: '/home/u/.ssh' }), true],
   ['night: a < redirect from a credential', NIGHT, sh('node tools/gate.mjs < .git/config'), true],
   ['night: edit CLAUDE.md', NIGHT, ev('Edit', { file_path: `${P}/CLAUDE.md` }), true],
+  ['night: write CLAUDE.local.md (kit-v3-5)', NIGHT, ev('Write', { file_path: `${P}/CLAUDE.local.md` }), true],
+  ['night: edit docs/AGENTS.md (kit-v3-5)', NIGHT, ev('Edit', { file_path: `${P}/docs/AGENTS.md` }), true],
+  ['night: write tools/npm-shrinkwrap.json (kit-v3-5)', NIGHT, ev('Write', { file_path: `${P}/tools/npm-shrinkwrap.json` }), true],
+  ['night: npm ci, an untracked shrinkwrap (kit-v3-5)', NIGHT, sh('npm ci --prefix tools --ignore-scripts --no-audit --no-fund'), true, { untrackedShrinkwrap: true }],
+  ['night: npm ci, a shrinkwrap that differs from main (kit-v3-5)', NIGHT, sh('npm ci --prefix tools --ignore-scripts --no-audit --no-fund'), true, { shrinkwrapDiffers: true }],
   ['night: edit .claude', NIGHT, ev('Edit', { file_path: `${P}/.claude/settings.json` }), true],
   ['night: edit .github', NIGHT, ev('Write', { file_path: `${P}/.github/workflows/gate.yml` }), true],
   ['night: edit a gate file', NIGHT, ev('Edit', { file_path: `${P}/tools/gate.mjs` }), true],
@@ -279,6 +296,72 @@ export const CASES = [
   ['advisor: label a PR', PRA, gw('issue_write', { method: 'update', issue_number: 27, labels: ['ready-to-merge'] }), false],
   ['advisor: merge a green docs PR', PRA, merge(), false],
   ['advisor: merge a rules PR', PRA, merge(), true, { prFiles: 'docs/a.md\n.claude/settings.json\n' }],
+  // --- kit-v3-5 (F1): the allow-list (mergeAllowed), each rule with a row only it refuses (L1-L7), then the lists ---
+  ['advisor: merge, L1 plain names: a space', PRA, merge(), true, { prFiles: 'docs/a b.md\t\n' }],
+  ['advisor: merge, L2 no dot segment: nested .claude', PRA, merge(), true, { prFiles: 'docs/.claude/skills/x/SKILL.md\t\n' }],
+  ['advisor: merge, L3 no node_modules', PRA, merge(), true, { prFiles: 'tools/node_modules/acorn/dist/acorn.js\t\n' }],
+  ['advisor: merge, L4 places: dist/a.js', PRA, merge(), true, { prFiles: 'dist/a.js\t\n' }],
+  ['advisor: merge, L4 places: a game file', PRA, merge(), true, { prFiles: 'shamble-game.js\t\n' }],
+  ['advisor: merge, L5 rules names: docs/Claude.md', PRA, merge(), true, { prFiles: 'docs/Claude.md\t\n' }],
+  ['advisor: merge, L5 rules names: docs/CLAUDE.local.md', PRA, merge(), true, { prFiles: 'docs/CLAUDE.local.md\t\n' }],
+  ['advisor: merge, L5 rules names: tools/agents.md', PRA, merge(), true, { prFiles: 'tools/agents.md\t\n' }],
+  ['advisor: merge, L6 gate files: tools/Gate.mjs', PRA, merge(), true, { prFiles: 'tools/Gate.mjs\t\n' }],
+  ['advisor: merge, L6 a gate name deeper: tools/sub/package.json', PRA, merge(), true, { prFiles: 'tools/sub/package.json\t\n' }],
+  ['advisor: merge, L6 a gate name deeper: tools/ci/Gate.mjs', PRA, merge(), true, { prFiles: 'tools/ci/Gate.mjs\t\n' }],
+  ['advisor: merge, tools/npm-shrinkwrap.json (npm reads it first)', PRA, merge(), true, { prFiles: 'tools/npm-shrinkwrap.json\t\n' }],
+  ['advisor: merge, docs/package.json (not under tools)', PRA, merge(), false, { prFiles: 'docs/package.json\t\n' }],
+  ['advisor: merge, L7 decision docs: docs/Vision_V2.md', PRA, merge(), true, { prFiles: 'docs/Vision_V2.md\t\n' }],
+  ['advisor: merge, L7 decision docs: an ADR', PRA, merge(), true, { prFiles: 'docs/adr/0001-x.md\t\n' }],
+  ['advisor: merge, .Claude/rules/x.md', PRA, merge(), true, { prFiles: '.Claude/rules/x.md\t\n' }],
+  ['advisor: merge, .env', PRA, merge(), true, { prFiles: '.env\t\n' }],
+  ['advisor: merge, .gate/x.mjs', PRA, merge(), true, { prFiles: '.gate/x.mjs\t\n' }],
+  ['advisor: merge, .github/workflows/x.yml', PRA, merge(), true, { prFiles: '.github/workflows/x.yml\t\n' }],
+  ['advisor: merge, tools/Node_Modules', PRA, merge(), true, { prFiles: 'tools/Node_Modules/acorn/dist/acorn.js\t\n' }],
+  ['advisor: merge, pathspec magic in a name', PRA, merge(), true, { prFiles: ':(exclude)docs/a.md\t\n' }],
+  ['advisor: merge, a Windows short name', PRA, merge(), true, { prFiles: 'docs/CLAUDE~1.MD\t\n' }],
+  ['advisor: merge, an NTFS stream name', PRA, merge(), true, { prFiles: 'docs/a.md::$DATA\t\n' }],
+  ['advisor: merge, CLAUDE.local.md at the root', PRA, merge(), true, { prFiles: 'CLAUDE.local.md\t\n' }],
+  ['advisor: merge, AGENTS.md at the root', PRA, merge(), true, { prFiles: 'AGENTS.md\t\n' }],
+  ['advisor: merge, docs/DECISIONS.md', PRA, merge(), true, { prFiles: 'docs/DECISIONS.md\t\n' }],
+  ['advisor: merge, the register', PRA, merge(), true, { prFiles: 'docs/adr/README.md\t\n' }],
+  ['advisor: merge, Docs/x.md (places are exact)', PRA, merge(), true, { prFiles: 'Docs/x.md\t\n' }],
+  ['advisor: merge, an empty segment', PRA, merge(), true, { prFiles: 'docs//a.md\t\n' }],
+  ['advisor: merge, an escaped tab inside a name', PRA, merge(), true, { prFiles: 'docs/a\\tb.md\t\n' }],
+  ['advisor: merge, C5: a rules file renamed away', PRA, merge(), true, { prFiles: 'docs/settings.json\t.claude/settings.json\n' }],
+  // --- kit-v3-5 fix pass (round 1): the places' edges, every decision doc, agent memory, the lists' edges ---
+  ['advisor: merge, docsx/a.md (a place needs its slash)', PRA, merge(), true, { prFiles: 'docsx/a.md\t\n' }],
+  ['advisor: merge, tools.mjs (a place needs its slash)', PRA, merge(), true, { prFiles: 'tools.mjs\t\n' }],
+  ['advisor: merge, README.md.js (a file place is exact)', PRA, merge(), true, { prFiles: 'README.md.js\t\n' }],
+  ['advisor: merge, readme.md (a file place is exact case)', PRA, merge(), true, { prFiles: 'readme.md\t\n' }],
+  ['advisor: merge, docs/ADR/0001-x.md', PRA, merge(), true, { prFiles: 'docs/ADR/0001-x.md\t\n' }],
+  ['advisor: merge, docs/vision_v2.md', PRA, merge(), true, { prFiles: 'docs/vision_v2.md\t\n' }],
+  ['advisor: merge, docs/Loop_V2.md', PRA, merge(), true, { prFiles: 'docs/Loop_V2.md\t\n' }],
+  ['advisor: merge, docs/look_v2.MD', PRA, merge(), true, { prFiles: 'docs/look_v2.MD\t\n' }],
+  ['advisor: merge, docs/Editor_V2.md', PRA, merge(), true, { prFiles: 'docs/Editor_V2.md\t\n' }],
+  ['advisor: merge, docs/v2_phase0_brief.md', PRA, merge(), true, { prFiles: 'docs/v2_phase0_brief.md\t\n' }],
+  ['advisor: merge, docs/Design_Notes.md', PRA, merge(), true, { prFiles: 'docs/Design_Notes.md\t\n' }],
+  ['advisor: merge, docs/art_direction.md', PRA, merge(), true, { prFiles: 'docs/art_direction.md\t\n' }],
+  ['advisor: merge, docs/Game_Design.md', PRA, merge(), true, { prFiles: 'docs/Game_Design.md\t\n' }],
+  ['advisor: merge, docs/units.md', PRA, merge(), true, { prFiles: 'docs/units.md\t\n' }],
+  ['advisor: merge, docs/Decisions.md', PRA, merge(), true, { prFiles: 'docs/Decisions.md\t\n' }],
+  ['advisor: merge, agent memory', PRA, merge(), true, { prFiles: '.claude/agent-memory-local/advisor/MEMORY.md\t\n' }],
+  ['advisor: merge, a docs file then a rules file (@tsv shape)', PRA, merge(), true, { prFiles: 'docs/a.md\t\n.claude/settings.json\t\n' }],
+  ['advisor: merge, no changed file (an empty list)', PRA, merge(), true, { prFiles: '' }],
+  ['advisor: merge, a line without a name', PRA, merge(), true, { prFiles: 'docs/a.md\t\n\t\n' }],
+  ['advisor: merge, tools/x.mjs', PRA, merge(), false, { prFiles: 'tools/x.mjs\t\n' }],
+  ['advisor: merge, README.md and FIRST_PROMPTS.md', PRA, merge(), false, { prFiles: 'README.md\t\nFIRST_PROMPTS.md\t\n' }],
+  ['advisor: merge, docs/a-b_c.1.md', PRA, merge(), false, { prFiles: 'docs/a-b_c.1.md\t\n' }],
+  ['advisor: merge, a docs rename', PRA, merge(), false, { prFiles: 'docs/b.md\tdocs/a.md\n' }],
+  ['advisor: merge, 3000 files (the cap)', PRA, merge(), true, { prFiles: docsLines(3000) }],
+  ['advisor: merge, 2999 files', PRA, merge(), false, { prFiles: docsLines(2999) }],
+  ['advisor: merge, changed_files missing', PRA, merge(), true, { noChanged: true }],
+  ['advisor: merge, changed_files 2.5', PRA, merge(), true, { changedFiles: 2.5 }],
+  ['advisor: merge, more lines than changed_files', PRA, merge(), true, { prFiles: 'docs/a.md\t\ndocs/b.md\t\n', changedFiles: 1 }],
+  ['advisor: merge, fewer lines than changed_files', PRA, merge(), true, { changedFiles: 2 }],
+  ['merge, more check runs than read', DAY, merge(), true, { totalCount: 3 }],
+  ['merge, no total_count on the check list', DAY, merge(), true, { noTotal: true }],
+  // a stale status, as GitHub showed on #44's head (2026-11-09): in progress, yet its conclusion reads success
+  ['merge, gate still running', DAY, merge(), true, { checks: [['gate', 'in_progress', 'success'], ['smoke', 'completed', 'success']] }],
 
   // --- rev-list and --output (kit-v3-3): rev-list is a read; --output=<file> writes a file, refused in every session ---
   ['advisor: rev-list --count', PRA, sh('git rev-list --count origin/main..HEAD'), false],
@@ -491,6 +574,29 @@ const MUTANTS = [
   ['the merge checks', "if (rs.some((r) => !['success', 'skipped', 'neutral'].includes(r.conclusion)) || !rs.some((r) => r.conclusion === 'success')) return deny(", 'if (false) return deny('],
   ['merge fails closed', 'catch (e) { return deny(`merge: the check could not complete', 'catch (e) { return null && deny(`merge: the check could not complete'],
   ['protected files in a merge (PR Advisor)', 'if (hit) return deny(`routine (pr-advisor): the PR changes', 'if (false) return deny(`routine (pr-advisor): the PR changes'],
+  // kit-v3-5 (F1): each new check, switched off, lets one row through
+  ['CLAUDE.local.md is protected', "if (base === 'CLAUDE.local.md') return true;", 'if (false) return true;'],
+  ['AGENTS.md is protected', "if (base === 'AGENTS.md') return true;", 'if (false) return true;'],
+  ['L1 plain names', 'if (!/^[A-Za-z0-9_./-]+$/.test(rel)) return false;', 'if (false) return false;'],
+  ['L2 no dot or empty segment', "if (segs.some((s) => s === '' || s.startsWith('.'))) return false;", 'if (false) return false;'],
+  ['L3 no node_modules', "if (segs.some((s) => s.toLowerCase() === 'node_modules')) return false;", 'if (false) return false;'],
+  ['L4 the places', "if (!MERGE_PLACES.some((p) => (p.endsWith('/') ? rel.startsWith(p) : rel === p))) return false;", 'if (false) return false;'],
+  ['L5 the rules names', 'if (RULES_NAMES.has(segs[segs.length - 1].toLowerCase())) return false;', 'if (false) return false;'],
+  ['L6 the gate names under tools', "if (low.startsWith('tools/') && GATE_NAMES.has(segs[segs.length - 1].toLowerCase())) return false;", 'if (false) return false;'],
+  ['npm-shrinkwrap.json is a gate file', "'tools/package.json', 'tools/package-lock.json', 'tools/npm-shrinkwrap.json']);", "'tools/package.json', 'tools/package-lock.json']);"],
+  ['L7 the decision docs', "if (low.startsWith('docs/adr/') || DECISION_DOCS.has(low)) return false;", 'if (false) return false;'],
+  ['both names of a rename (C5)', "const names = lines.flatMap((l) => l.split('\\t')).filter(Boolean);", "const names = lines.flatMap((l) => l.split('\\t').slice(0, 1)).filter(Boolean);"],
+  ['the 3000-file cap', 'if (cf >= 3000) return deny(', 'if (cf > 3000) return deny('],
+  ['the whole file list', 'if (lines.length !== cf) return deny(', 'if (false) return deny('],
+  ['the whole check list', 'if (!Number.isInteger(cr.total_count) || cr.total_count > runs.length) return deny(', 'if (false) return deny('],
+  ['a check still running', "if (rs.some((r) => r.status !== 'completed')) return deny(", 'if (false) return deny('],
+  // kit-v3-5 fix pass (round 1)
+  ['the @tsv read (both names)', `'--jq', '.[] | [.filename, (.previous_filename // "")] | @tsv']`, `'--jq', '.[].filename']`],
+  ['empty fields dropped', "const names = lines.flatMap((l) => l.split('\\t')).filter(Boolean);", "const names = lines.flatMap((l) => l.split('\\t'));"],
+  ['no changed file', 'if (cf < 1) return deny(', 'if (false) return deny('],
+  ['a line without a name', "if (lines.some((l) => !l.split('\\t')[0])) return deny(", 'if (false) return deny('],
+  ['the shrinkwrap in the manifest check', "'tools/package-lock.json', 'tools/npm-shrinkwrap.json'], io.projectDir);", "'tools/package-lock.json'], io.projectDir);"],
+  ['an untracked shrinkwrap', 'return loose.code === 0 && !loose.out.trim() ? null : deny(', 'return true ? null : deny('],
   // fix pass 4: 'protected writes (Edit/Write tool)' moved to KIT_BEHIND_MUTANTS (kitPath refuses its rows too)
   ["the PR Advisor's notes-only writes", "if (role === 'pr-advisor' && !/^(\\.checkpoints|\\.gate|\\.claude\\/agent-memory-local)(\\/|$)/.test(rel)) {", 'if (false) {'],
   // fix pass 4: 'protected redirect targets' moved to KIT_BEHIND_MUTANTS (kitPath refuses its rows too)
@@ -774,6 +880,11 @@ export const DAY_CASES = [
   ['S-3 darwin: Edit claude.MD is CLAUDE.md', ded('Edit', '/p/claude.MD'), ASK, { platform: 'darwin' }],
   ['S-3 darwin: Edit .Claude/Settings.json', ded('Edit', '/p/.Claude/Settings.json'), ASK, { platform: 'darwin' }],
   ['S-3 darwin: echo > claude.MD', dsh('echo x > claude.MD'), ASK, { platform: 'darwin' }],
+  ['K5 Edit docs/CLAUDE.local.md asks (kit-v3-5)', ded('Edit', '/p/docs/CLAUDE.local.md'), ASK],
+  ['K5 Edit AGENTS.md asks (kit-v3-5)', ded('Edit', '/p/AGENTS.md'), ASK],
+  ['K5 win32: Edit docs/claude.local.md is CLAUDE.local.md', ded('Edit', '/p/docs/claude.local.md'), ASK, { platform: 'win32' }],
+  ['K5 win32: Edit agents.md is AGENTS.md', ded('Edit', '/p/agents.md'), ASK, { platform: 'win32' }],
+  ['K5 linux: Edit docs/claude.local.md is another file', ded('Edit', '/p/docs/claude.local.md'), null, { platform: 'linux' }],
   // step 4b, R2: a plain merge of origin/main only when the branch changed no kit file since it left main
   ['T5c git merge origin/main, the branch changed a kit file: ask', dsh('git merge origin/main'), ASK,
     { threeDot: '.claude/settings.json\n' }, /mix with main/],
@@ -1164,6 +1275,7 @@ const DAY_MUTANTS = [
   ['S-2 switch -c: the start point by name', 'if (pos[0] && !isOriginMain(pos[0], vcwd, io)) {', "if (pos[0] && pos[0] !== 'origin/main') {"],
   ['S-2 origin/main resolved by its short name', 'const o = commitOf(ORIGIN_MAIN, vcwd, io);', "const o = commitOf('origin/main', vcwd, io);"],
   ['S-3 darwin folds case', "['win32', 'darwin'].includes(io.platform ?? process.platform)", "['win32'].includes(io.platform ?? process.platform)"],
+  ['K5 CANON knows CLAUDE.local.md and AGENTS.md', "const CANON = new Map(['CLAUDE.md', 'CLAUDE.local.md', 'AGENTS.md', '.npmrc',", "const CANON = new Map(['CLAUDE.md', '.npmrc',"],
   // fix round R-a..R-e (replacing the S-4 and F5 rows whose code the ruling deleted or rewrote)
   ['S-4 pushd and popd are followed', "if (prog !== 'cd' && prog !== 'pushd' && prog !== 'popd') {", "if (prog !== 'cd') {"],
   ['S-4 the forks flag', "(c === '&' && s[i + 1] !== '>')) forks = true;", "(c === '&' && s[i + 1] !== '>')) forks = false;"],

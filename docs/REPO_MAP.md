@@ -3,7 +3,7 @@
 Read this instead of exploring. It says which file answers which question; `MODULE_MAP.md` maps the inside of the
 engine files, and `START_HERE.md` explains how they work and why. docs-keeper keeps this map current and checks it with
 `node .claude/scripts/repo-map-check.mjs`. `.checkpoints/` holds in-progress task checkpoints
-(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-11-08.
+(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-11-10.
 
 ## Top level
 | Path | What it is |
@@ -27,7 +27,9 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 ## docs/
 | Path | What it is · when to read it |
 |---|---|
-| `docs/STATUS.md` | Where things stand: read first |
+| `docs/STATUS.md` | Where things stand, at most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): read first |
+| `docs/DECISIONS.md` | Mustafa's decisions, word for word, newest first, and the Advisor's that he relayed; the queue of his words still to carry out; an index of his decisions recorded elsewhere |
+| `docs/STATUS_ARCHIVE.md` | The rest of STATUS, moved there by line ranges on 2026-11-10: the done change-sets, the old phase text, the routines' history, old measurements and the advisor agent's rulings; two live sections, "Follow-ups" and "Open bugs and risks" |
 | `docs/REPO_MAP.md` | This map |
 | `docs/START_HERE.md` | Legacy architecture, hard constraints with their WHY, the do-NOT list, lessons |
 | `docs/MODULE_MAP.md` | Who owns what inside the legacy engine files, load order, layering |
@@ -76,13 +78,13 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 |---|---|
 | `.claude/CHECKPOINTS.md` | The checkpoint system: never lose work to a usage limit. For every session: at most 3 agents at a time, workflow agents included (§4, §7); each agent writes its plan first and saves each block as it goes, and a restart trusts the blocks its notes mark done (§4); scratch text and small scripts in the notes folder, builds and binaries under `.gate/<task-slug>/` (§4); the background saver checked at every update while agents run, and restarted if it has stopped (§3, §5); disk hygiene (§10) |
 | `.claude/NIGHT_SHIFT.md` | The night shift's rules (window 00:10–07:30 Amsterdam) |
-| `.claude/settings.json` | Permissions (allow, deny, empty ask), `effortLevel: "high"` (the cloud routines run at the effort set on the routine instead: STATUS, Routines), the syntax hook and the routine guard (PreToolUse / PermissionRequest / ConfigChange; each of the three handlers starts `guard.mjs` through a one-line `node -e` bootstrap) |
+| `.claude/settings.json` | Permissions (allow, deny, empty ask), `effortLevel: "high"` (the cloud routines run at the effort set on the routine instead: STATUS_ARCHIVE, Routines), the syntax hook and the routine guard (PreToolUse / PermissionRequest / ConfigChange; each of the three handlers starts `guard.mjs` through a one-line `node -e` bootstrap) |
 | `.claude/claude-security-guidance.md` | Security guidance for the security plugin |
 | `.claude/security-patterns.json` | Security plugin patterns (server, shared sim, HTML sinks) |
 | `.claude/agents/` | The crew (one file each, below) |
 | `.claude/agents/advisor.md` | Plan and PR reviews (a plan's checkpoint, the 3-agent cap, models and effort), risk tiers with per-tier checklists, the review budget, the revert steps, merges by the PR Advisor routine, escalations to Mustafa |
 | `.claude/agents/verifier.md` | The gate plus change-type evidence; research claim spot-checks |
-| `.claude/agents/docs-keeper.md` | STATUS, ROADMAP, this map, doc drift |
+| `.claude/agents/docs-keeper.md` | STATUS (with DECISIONS and STATUS_ARCHIVE), ROADMAP, this map, doc drift |
 | `.claude/agents/art-director.md` | The legacy look (Living Comic) and UI; v2 rendering work against the look brief `docs/LOOK_V2.md`, never choosing the look |
 | `.claude/agents/perf-auditor.md` | Frame time, allocation, draw calls; v2 budgets |
 | `.claude/agents/security-auditor.md` | Security and anti-cheat; the security baseline (open in the ADR 0006 draft, researched before the first online playtest: BASELINE-WHEN (b)) |
