@@ -21,7 +21,7 @@ for k in keys:
         if ca is None and cb is None: continue
         if (ca is None) != (cb is None):
             print('DIFF', k, col, 'presence'); diffs += 1; continue
-        for f in ('exit', 'failing', 'basePrefix'):
+        for f in ('exit', 'failing', 'basePrefix', 'build'):
             if ca.get(f) != cb.get(f):
                 print('DIFF', k, col, f, ca.get(f), '->', cb.get(f)); diffs += 1
         # PASS/FAIL word per check line
@@ -29,4 +29,8 @@ for k in keys:
         lb = {c: (v.split(' ', 1)[0]) for c, v in (cb.get('lines') or {}).items()}
         if la != lb:
             print('DIFF', k, col, 'line verdicts', la, '->', lb); diffs += 1
+        fa = {c: v for c, v in (ca.get('lines') or {}).items() if c != '5a'}
+        fb = {c: v for c, v in (cb.get('lines') or {}).items() if c != '5a'}
+        if '--full' in sys.argv and fa != fb:
+            print('DIFF', k, col, 'non-5a line text', [c for c in set(fa) | set(fb) if fa.get(c) != fb.get(c)]); diffs += 1
 print('TOTAL DIFFS', diffs)
