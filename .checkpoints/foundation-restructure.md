@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 14:20 Amsterdam
+- **Last update:** 2026-11-11 14:45 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -73,9 +73,20 @@
    re-checked (labelled so). The status-diet session (where his #49 go was given) is not readable from this account; the
    routines are not listed from this account (they live on the university account).
 
+8. His step 2, the docs pass (1023870), by docs-keeper (Opus, high; notes `docs-keeper-docs-pass.md`, scripts
+   `docs-keeper-*.py`): DECISIONS.md nine blocks of his words + one Queued sentence, copied from the report's
+   Appendix A (check script PASS: nothing unclassified, every other old line unchanged and in order; re-run by the
+   main session: PASS); three pointers beside quoted blocks; the italic header line reworded; STATUS 112 lines (#50's
+   row, #49 merged, main bb2d817); the archive (#49's merged row; kit-v2-1 Low fixed in dd12aeb); ROADMAP (2.1a in
+   review, #49 MERGED, 12 entries); ADR 0002 and SPIKE_PLAN pointer lines (decision docs: his go). Gate with smoke
+   PASS; repo-map-check OK. Its notes for later: stale `tools/` citations in research docs (LEGACY_INVENTORY TL1, TL6,
+   TL9; r5 :925, :1737) left unedited (dated research); more "before the foundation" lines with no pointer (ADR 0002
+   :38, :724, :1115; SPIKE_PLAN :96, :194; the plan named only the ones done); ADR 0002 lines after 1425 shift +4,
+   SPIKE_PLAN after 92/130/440 shift +4/+8/+12.
+
 ## Current step
 
-His step 2, the docs pass: docs-keeper (Opus, effort high) briefed with the facts below; the saver running.
+His step 3, the review round: security-auditor, test-engineer and infra-engineer on 1023870 (or the next checkpoint-only head); then the verifier; the advisor agent's C1-C8 check.
 
 ## Next steps (on PR #50, this branch)
 
@@ -149,6 +160,6 @@ His step 2, the docs pass: docs-keeper (Opus, effort high) briefed with the fact
 
 ## Running work
 - Saver: background task bjteqwe4t, started 14:02 Amsterdam, stops by 15:52 (110 min); last check 14:35: ok (watching).
-- docs-keeper: the docs pass, running in the background (notes `docs-keeper-docs-pass.md`).
+- docs-keeper: done (1023870).
 - The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
   container (step 3 note).
