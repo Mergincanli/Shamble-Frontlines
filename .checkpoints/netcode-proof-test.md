@@ -4,7 +4,7 @@
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main, last merged in at 5ca77eb (main bb2d817, PR #49, the STATUS split)
-- **Last update:** 2026-11-11 about 17:20 UTC (the work folders saved at 4ad80a9 and the HOLD lifted; USAGE-SAVINGS
+- **Last update:** 2026-11-11 about 17:10 UTC (the work folders saved at 4ad80a9 and the HOLD lifted; USAGE-SAVINGS
   (a) in force; U4j's round 2 running with the first review packet; tonight's one night item posted)
 
 ## Resume card (read this first; open the rest only when a step needs it)
@@ -19,7 +19,7 @@ advisor-u4d-close.md.
 - **Merged into the spike branch:** U4s f080551, U4b 411eeee, U4a 952f734, U4c f3f7c2f, U4d with W1-S1's npt-proto half
   39f4290 (report u4d-report.md); CI green on each. Main merged in at 5ca77eb (PR #49). At 39f4290: check.mjs 10 steps,
   measured 365, bites 412, self 52.
-- **Running:** U4j's round 2 (task wqi5if4w4, run wf_0906017a-a9b, resumed about 17:05 UTC); the saver (task
+- **Running:** U4j's round 2 (task wqi5if4w4, run wf_0906017a-a9b, resumed about 17:00 UTC); the saver (task
   bwrkakopa, since about 16:55 UTC, 110 minutes; restart it when it ends: `node .claude/scripts/checkpoint.mjs watch
   netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
   https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"`). The U4e brief's check and U4d-F wait their turn.
@@ -34,7 +34,7 @@ ones run again.
      is uncommitted in `.claude/worktrees/agent-a3b8dfeb01ed52b50` (base 411eeee; 21 changed or new entries; notes
      there: .checkpoints/netcode-proof-test/u4j-build.md, "Fix pass, round 1"; runner u4j-fix/run.sh). Round 2 diffs
      against the pre-fix copy `.gate/u4j-prefix`.
-   - Round 2 (netcode-architect, security-auditor, test-engineer) **resumed about 17:05 UTC** under USAGE-SAVINGS:
+   - Round 2 (netcode-architect, security-auditor, test-engineer) **resumed about 17:00 UTC** under USAGE-SAVINGS:
      the reviewers start from the review packet u4j-round2-packet.md (cut by review_packet.py from
      u4j-round2-packet.json; the fixtures' diff in u4j-round2-packet-fixtures.diff); the fixer's report is out of the
      prompts (its notes stay readable); the two readers run in parallel, then the test-engineer; every test runs
