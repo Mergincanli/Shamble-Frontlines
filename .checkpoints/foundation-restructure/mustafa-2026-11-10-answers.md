@@ -30,3 +30,15 @@ His follow-up of 2026-11-10, after 2.1a's report (PR #47), word for word:
 
 3. Yes, plan step 2.2 (the toolchain) now, in a fresh session on this account. Give me its prompt in one paragraph. Plan only, no build: what it pins now, what stays an empty slot until the boundary spike, the CI job that runs the Rust checks, and its own plan review by the advisor agent. The main model stays Opus 5.5.
 ```
+
+His message of 2026-11-11 (#47's turn), word for word:
+
+```text
+PR #49 is merged. STATUS is split: docs/STATUS.md is a dashboard of at most 120 lines, my decisions are in docs/DECISIONS.md word for word, the rest is in docs/STATUS_ARCHIVE.md. CLAUDE.md has a new "Lanes and accounts" section and the docs-keeper agent follows the split.
+
+It is #47's turn (order: #49, then #47, then 2.1b, then #48).
+1. Run /context. If this chat is over about half full, save a checkpoint, give me a resume card and stop for a fresh chat.
+2. Update your branch from main and re-read CLAUDE.md and docs/STATUS.md.
+3. Do your docs pass in the new layout: your row in STATUS's "In flight" table, my words in DECISIONS.md, the rest in the archive. Move text by script, never by retyping.
+4. Finish as planned: the review round, the report, checkpoints folded in and deleted, the PR marked ready for the advisor. Then stop for my go.
+```

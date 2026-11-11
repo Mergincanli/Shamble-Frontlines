@@ -9,7 +9,7 @@
   the same.
 - **Branch:** `claude/advisor-fable-4hxq72` (this cloud session may push only there), standing in for
   `cs/foundation-restructure`; Mustafa's personal account. **Base / OLD:** main 44446a5 (unchanged on 2026-11-10 10:15).
-- **Last update:** 2026-11-10 14:05 Amsterdam
+- **Last update:** 2026-11-11 10:50 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -47,13 +47,40 @@
    in `e3-summary.md`.
 
 ## Current step
-Waiting for 2.1a's turn (after #46, STATUS-DIET, LANE-RULES), PR #47 a draft. Nothing runs.
+It is #47's turn (Mustafa, 2026-11-11: "order: #49, then #47, then 2.1b, then #48"). This chat stopped at his step 1
+(context 748k of 1,000k, over half full) with this checkpoint and a resume card. Nothing done yet for his steps 2-4.
+Main is bb2d817: #46 (2d22b69, the guard fix with the PR Advisor's allow-list) and #49 (bb2d817, STATUS split into
+STATUS, DECISIONS and STATUS_ARCHIVE; LANE-RULES; CLAUDE.md "Lanes and accounts") merged since 44446a5; neither touches
+`tools/` or `.github/`, and no file is changed on both sides (`comm` of the two diffs: empty), so the merge is clean
+and OLD's gate files still equal 44446a5's.
 
-## Next steps
-6. At 2.1a's turn (after #46, STATUS-DIET, LANE-RULES): merge main in; step 4 (his decision recorded, in
-   `docs/DECISIONS.md` if STATUS-DIET split STATUS); the plan updated for the marker departure; reviews
-   (security-auditor, test-engineer, infra-engineer), the verifier, the report; worktrees removed (links first, then
-   `git worktree remove`, never `--force`); checkpoint deleted in the last commit; PR ready; his go.
+## Next steps (his steps 2-4, in a fresh chat on this account and this branch)
+1. Bring main in without switching the main folder (CLAUDE.md Never): `git fetch origin main`, then `git merge origin/main`
+   (it is not `--ff-only`, so the guard asks him; or do it in a worktree and push the merge). Re-read CLAUDE.md (new
+   "Lanes and accounts") and `docs/STATUS.md`, and how `docs/DECISIONS.md` and `docs/STATUS_ARCHIVE.md` are laid out
+   (and docs-keeper's agent file, which follows the split). Gate on the merged head: `PLAYWRIGHT_BROWSERS_PATH=$PWD/.gate/pw-browsers node tools/gate.mjs`
+   (rebuild the browser alias first if the container is new: `e3-summary.md`).
+2. The docs pass, by docs-keeper, in the new layout, text moved by script, never retyped (his rule):
+   - `docs/STATUS.md` "In flight": one row for #47 (2.1a), from the evidence below.
+   - `docs/DECISIONS.md`: his words of 2026-11-10 and 2026-11-11, word for word from `mustafa-2026-11-10.md` and
+     `mustafa-2026-11-10-answers.md` (the foundation decision; FREEZE-FDN (a), SPLIT (a), SCOPE (a); the build go;
+     the merge order; both accounts count the same; today's order); check DECISIONS.md's own entry format first.
+   - The overtaken lines get dated pointers to that entry (plan step 4): ADR 0002 migration step 1 (0002:1422-1425),
+     SLICE-ORDER condition 3 (now in DECISIONS or the archive: re-find "still runs before the foundation"), SPIKE_PLAN
+     :86-91, :115 and :429-432. Decision docs: his go.
+   - The deferred kit-v2-1 gate-globals Low (was STATUS:1009; re-find it in the archive): closed by dd12aeb.
+   - The rest (2.1a's done record) in `docs/STATUS_ARCHIVE.md` as docs-keeper's split rule says; ROADMAP's entry.
+   - `docs/REPO_MAP.md` needs no 2.1a change (no new top-level path); `node .claude/scripts/repo-map-check.mjs`.
+3. The review round on the final diff (3 agents at a time; Opus, effort high): security-auditor (tier 2: gate files),
+   test-engineer (E3, the rows, the bases), infra-engineer (CI and the gate on old bases); then the verifier until PASS;
+   one fix pass at most (the review budget). The advisor agent checks plan conditions C1-C8 at the PR head.
+4. The report `docs/reports/2026-11-1x-foundation-2-1a.md` (`/advisor-report`): fold this checkpoint in (steps with
+   SHAs, E3 31/31, the rows, the bases, CI runs 42801926823 and 42802055698, the Chromium-1243 caveat, the marker
+   departure, his two approved gate prompts); remove the worktrees (`.gate/fdn-*`: delete each `tools/node_modules` link
+   first, then `git worktree remove`, never `--force`); delete `.checkpoints/foundation-restructure*` in the last commit
+   (no `[skip ci]`), but first copy `plan.md` and `prompt-2.2.md` somewhere 2.1b can read them: 2.1b reads the plan
+   at this branch's last checkpoint SHA (record it in the report). Mark #47 ready; stop for his go (needs-mustafa: gate
+   files; no Brave check for 2.1a).
 
 ## Open findings
 - (none yet)
