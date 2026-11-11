@@ -89,8 +89,15 @@ U4 wave 1", moved by card_refresh.py.
       can supply any hash list; the Arm rule trusts the log's own aarch64 claim), F5 (the twin's identity unchecked),
       F6 (parse_bound can panic on two 30-digit decimals: an i128 overflow), F9 (a ruling is any non-empty text).
       Follow-ups: F7, F8 (Medium: no minimum coverage for the decoded-hash check), F10-F12.
-    - Next: the test-engineer's round 1, then one fix pass by U4j's builder on every before-merge finding (F1 first),
-      then round 2 on what changed.
+    - **test-engineer: REVISE** (done about 11:25): F1 High confirmed by a probe run (band 2.0-2.0, s 1.9: X' 1.273
+      s, a 1.2 s median PASSES); F9 (the 1.10 cap unpinned: a plant raising it to 1.12 passes all 65 judge tests);
+      F2-F8, F10-F12 Medium before the merge, most shown by probes on the unchanged code; F13-F16 Low.
+    - **Round 1 complete: three REVISE.** The advisor rules on it now (agent aef3e07087d16c503, writing
+      advisor-u4j.md): the deduplicated fix list with the proofs; the calls (coverage floor F10, rulings as text F9,
+      pinning the bound line F2/F6, NC-U4J-10, F16, the `hs` writer rules, the Arm rule's key); the readings (a)-(f);
+      F1's severity; anything for Mustafa.
+    - Next: one fix pass on the advisor's list (a fixer agent in U4j's worktree; F1 first), then round 2 on what
+      changed (netcode, security, test).
   - Its fix pass, if any: by its builder (SendMessage to a3b8dfeb01ed52b50), in its copy.
   - At its merge, the main session's: u4-build-plan.md §4.1 gains U4j's public items (`TickRecord.hs`,
     `set_hashes`, `hashes`; `marks::BoundNumber`, `Check.ws_bound`, `Rule::WsPractice`; `Outcome::Empty`,

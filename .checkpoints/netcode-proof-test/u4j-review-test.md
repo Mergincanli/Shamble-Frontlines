@@ -110,3 +110,60 @@ base 411eeeed50d8c71e7e1f74366f0e1d5c27388444. Started 2026-11-11. No local memo
   The Arm rule excuses a hash the x86-64 re-decode reproduces as the server's; an orphan has no server hash to
   reproduce. Fix: an orphan always counts (or needs a replay entry equal to Some(server)); fold into F5. Proof: probe O
   committed, expected FAIL. Before merge with F5. (= security F4 (iii).)
+- F10 addendum: README:50-52 itself defines `null` as "a tick with a group lost and none refused (counted in
+  tick.s.snap_incomplete)", so the reconciliation check enforces the README's own writer rule, not a new one.
+- F9 addendum: advisor-ws-docs-r2.md:378 (the ruling on the outcome record) asks for "A unit test with a fixture for
+  each class and the boundaries s = 1.00, 1.10 and 1.1001": the classes are there (built in code), the boundaries are
+  not (engine.rs's nearest is s = 1.131498, :2017, which is why a 1.12 cap survives).
+- F12 MEDIUM fixtures/ (none for the Arm rule): §5 U4j builds cross_arch_mismatch_count "with fixtures only since no U4
+  run feeds them"; the builder's own plan (u4j-build.md:46) says "pm-0001-17 (six decoded-hash cases + two Arm-rule
+  cases)", but fixtures/pm-0001-17 holds the six only; the Arm rule is proven by engine.rs:1401-1448 alone, never
+  through the real marks.json's L2 parts (select machine.role LG) and the folder reader. Fix: two fixtures (LG aarch64
+  client + RS room + x86-64 replay agreeing: part PASS, "aarch64-only" 1; replay wrong: FAIL), plus C1/C2/O as
+  fixtures with F5's fix. Before merge with F5 (the same files prove it).
+- F13 LOW engine.rs:1661-1670 (machine_named): the FAIL list names 8 of the 14 conditions; role, name, plan, arch,
+  mem_mb and threads_per_core are never emptied (by reading: explicit list; no plant run), and PM-0001-1's five parts
+  (RS, LG, ML, RD, MAC selects, which §5 U4j names) have no fixture (only PM-0006-11's RS part). Fix: six more list
+  entries; one -1 fixture with an ML/MAC log (no address needed). Follow-up.
+- F14 LOW figures.rs:197 twin_hash_mismatch_count's "profile" and "bite" field checks: no test anywhere gives a twin
+  another profile or bite (grep "another profile|another bite": none); dropping either survives. Fix: two cases in
+  u4j_the_twin_hash_... . Follow-up (with F4's role check).
+- F15 LOW practice.rs:269-279: a bite run whose set holds practice runs of two builds ("cannot tell whose numbers are
+  in force") is never tested. Fix: one case in u4j_ws_practice_refuses_... . Follow-up.
+- F16 LOW practice.rs:316 (scene/profile only): the practice run is never compared with the counted run on RS's
+  machine.kernel, params.config_hz or params.ws_tcp_model, the "header checks" the ruling (advisor-ws-docs-r2.md:378)
+  lists in the record; README §2.5 leaves them "for people". A practice run on another RS kernel sets f for this one
+  (within the cap). Fix: compare the three (gap if absent). Advisor's call; follow-up.
+- Step 7 (u4j-review-test/check-final.txt): check.mjs 11:17:31-11:19:57 UTC, exit 0, all 10 steps pass; idle before
+  and after; touch + 2 s loop; Compiling npt-log and npt-judge from this copy's path; measured 304 = 286 + 18, bites
+  327 = 309 + 18, self 48 of 48; marks 81 read and checked, ADR rows unchanged (drift test); redact 10/10, 182 items, 0
+  findings; deps: npt-judge ships npt-log and serde only.
+- Step 8: after the run, 34 paths (same set), all 34 sha256 equal the start (marks.json 97c5cab5, README 71e4c637,
+  SERIES e95febab); Cargo.toml, Cargo.lock, check.mjs: no diff against the base. The copy is byte-identical.
+- Others' findings not settleable by run, weighed: netcode F3 (whose slot index) and F5 (ii)-(iv) (writer rules:
+  room logs server_hash in every phase; "two different hashes"; never drop a late hash) are README text U4r writes
+  to: agree, before merge. Security F9 / netcode F14 (describe() prints neither class, rulings, band nor tolerance):
+  agree; Medium, follow-up unless the advisor reads R8 (v) as the judge's report. Security F7, F10, F11, F12: agree,
+  follow-ups.
+
+## Claim · proof · gap
+| Claim | Proof | Gap |
+|---|---|---|
+| hs: 16 lowercase hex or null; anything else refused | log tests hs_holds_one_hash_or_null_per_slot, hs_refuses_a_bad_entry_or_name_... | none |
+| decoded hash, §4.6's six cases | fixtures pm-0001-17 x6 (2 tests); P1 bites | no coverage floor (F10); source per name (F5) |
+| decoded gaps (name missing, slot counts, two logs, server 0) | engine u4j_the_decoded_hash_gaps_and_its_every_phase | within-name uneven lengths untested (Low, in F13's spirit) |
+| every phase read | engine warm-up FAIL | none |
+| Arm rule | engine arm-rule test (PASS, FAIL, NOT-RUN, x86 FAIL) | no fixture (F12); log's own arch, replay from any log, orphan excused (F5, F11) |
+| Empty fails, shows no bite | engine empty test; P4 bites | none |
+| C4, four cases | engine c4 + fixtures pm-0001-4 x3, pm-0001-21/twin-bites-build; P2 bites | bite direction "at least one log" (security F7, Low) |
+| twin hash | engine twin test + fixtures pm-0001-21 x5 | twin role (F4); profile/bite untested (F14) |
+| machine_named | engine 8 FAIL + C PASS; fixtures pm-0006-11 x2 | 6 of 14 conditions, -1's parts (F13) |
+| ws-practice numbers in force | engine puts test; P3 bites | FAR BETTER f uncapped (F1); cap and band unpinned (F9) |
+| ws-practice refuses what its rules do not set | engine 20 INVALID cases | later practice (F2), other set (F3), record's M_m (F6), heal count (F7), panic (F8), two-build bite (F15), header checks (F16) |
+| marks.json compiles; drift | check.mjs marks: 81, rows unchanged | none |
+| +18 tests, both builds | check.mjs 304 / 327 / 48 | none |
+
+## Verdict
+REVISE (round 1). Before merge: F1 (High); F2, F3, F4, F5 (with F11, F12), F6, F7, F8, F9; F10 needs the advisor's
+ruling on the form (it is the README's own rule). Follow-ups: F13-F16, security F7/F10/F11/F12, netcode F6 (if not
+folded into F5), F8-F14. DONE.
