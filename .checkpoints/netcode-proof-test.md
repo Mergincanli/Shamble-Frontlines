@@ -93,9 +93,10 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
 3. Then U4d-F (workflow 3) as above; then U4d2's builder brief (carrying carry 52, N2-M2's ruling, W1-TARGET), with
    the advisor.
 4. U4r's brief: the night's rev 2 at `cs/npt-u4r-brief` ed973c9 goes to the advisor after U4c, U4d2, U4e and U4j merge.
-- **The next report** gives, from the notes and without agents, a table per reviewer role: how many findings rated
-  Medium or higher only that role found in wave 1's units (U4s, U4a, U4b, U4c, U4d, U4j). The panels stay as they are
-  until he decides. Every report also gives the chat's size.
+- **Done for the report of 2026-11-11 evening:** the table per reviewer role (review-roles-wave1.md: findings rated
+  Medium or higher only that role found in wave 1, from the notes, no agents): netcode 8, engine-architect 3,
+  test-engineer 7, rust 0, security 0 (U4j's round 2 not in it). The panels stay as they are until he decides. Every
+  report gives the chat's size.
 - **Tonight (NIGHT-TONIGHT (c)):** one item on issue #16, item 6 npt-text-batch-check (plan night-2026-11-12.md,
   brief text-batch-log.md): the test-engineer's check of the applied text batch, with one line each on R-31 and
   U3D-MISS's sampling case. Fold it in the morning. PR #40's report lists those two edits as readings for Mustafa to
