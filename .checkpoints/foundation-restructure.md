@@ -175,10 +175,6 @@ unchanged, with the one advisor-tool line. For C13: one DECISIONS.md entry for t
   route (denied by settings) and its alias were not needed.
 
 ## Running work
-- Saver: background task by9y0gd9z, started 21:47 Amsterdam, stops by 23:37 (110 min); output
-  /tmp/claude-0/-home-user-Shamble-Frontlines/c0e5589d-9610-5933-a695-61d4b8cf6d47/tasks/by9y0gd9z.output; last check
-  21:50: ok (watching).
-- The advisor agent: the plan-check review, launched 21:49 Amsterdam (effort xhigh: it rules on ADR 0002 edits), notes
-  `advisor-plan-check.md`.
-- The browser install (`node tools/node_modules/playwright/cli.js install chromium`): background task byqyxhjfk,
-  launched 21:50.
+- Saver: STOPPED 22:49 Amsterdam (C2: background task by9y0gd9z stopped before the move); restarted only after the
+  move's push run and pull-request run have finished.
+- No agents running.
