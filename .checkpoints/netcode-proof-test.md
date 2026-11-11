@@ -19,10 +19,12 @@ advisor-u4d-close.md.
 - **Merged into the spike branch:** U4s f080551, U4b 411eeee, U4a 952f734, U4c f3f7c2f, U4d with W1-S1's npt-proto half
   39f4290 (report u4d-report.md); CI green on each. Main merged in at 5ca77eb (PR #49). At 39f4290: check.mjs 10 steps,
   measured 365, bites 412, self 52.
-- **Running:** U4j's round 2 (task wqi5if4w4, run wf_0906017a-a9b, resumed about 17:00 UTC); the saver (task
-  bwrkakopa, since about 16:55 UTC, 110 minutes; restart it when it ends: `node .claude/scripts/checkpoint.mjs watch
-  netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
-  https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"`). The U4e brief's check and U4d-F wait their turn.
+- **Running:** the advisor's ruling on U4j's round 2 (a background agent since about 17:55 UTC, writing
+  advisor-u4j-r2.md); the U4e brief's check (task wwyzh9w7f, run wf_c92cd986-072, resumed about 17:55 UTC); the
+  saver (task bwrkakopa, since about 16:55 UTC, 110 minutes; restart it when it ends: `node
+  .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5
+  <noreply@anthropic.com>" --trailer "Claude-Session: https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"`).
+  U4d-F waits its turn.
 
 **The three cut workflows, and what to do with each when the hold lifts.** Scripts are under
 /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/. A resumed
@@ -42,6 +44,13 @@ ones run again.
      wip/u4j.patch (4ad80a9: 64 files on 411eeee, applies cleanly), with its notes and runner.
    - On its return: the main session reads every round-2 finding in full (U4j is the judge and marks change, so all of
      it touches the judge or the marks: his limit).
+   - **Round 2 done (about 17:45 UTC; read in full):** all three APPROVE WITH FINDINGS; F1 closed by each (the
+     test-engineer by runs and the advisor's three plants), so no round 3; the counted check.mjs run: all 10 steps,
+     measured 317 = 286 + 31, bites 340 = 309 + 31, self 48; the 66 files' hashes match. New Mediums: NC-U4J-R2-N1
+     (the writer rule for a tick written lost under L1's reorder: a carry sentence for U4e and U4r), TE2-1 (no test
+     pins the LG part of the Arm rule's key), TE2-5 (outside U4j: an npt-net test failed once on the bites build and
+     was retried until green; check.mjs hides failing names). Lows: NC N2-N6, SEC-R2-N1 and N2, TE2-2 to TE2-4, TE2-6.
+     The advisor rules on routing and the merge (advisor-u4j-r2.md); the merge follows its ruling.
    - The fixer's points for round 2 and the advisor: SERIES's twin_hash row still says "any role" (the advisor's
      words needed); FX-3 (c) read stricter (two practice runs in force make a bite run INVALID); FX-10's malformed
      entries and its order of outcomes; FX-9's plant T also raised FX-1's new guard to 1.12 (round 2 plants the same).
@@ -55,7 +64,11 @@ ones run again.
    - Done: the draft, u4e-brief.md (719 lines; notes u4e-brief-r3-notes.md): W1-U4E's answers, W1-S1, W1-N2, W1-TARGET's
      lock, the carries re-quoted by script, 8 of rev 2's 28 recheck rows changed and R29-R38 added, two new questions
      (U4E-Q12, who plants -22/unbounded; U4E-Q13, the owner-to-all bite's id).
-   - Cut: the test-engineer's check (u4e-brief-r3-check.md), then one revision. **Resume the run as it is.**
+   - Resumed about 17:55 UTC (task wwyzh9w7f) for the test-engineer's check (u4e-brief-r3-check.md), then one
+     revision. Before it, the main session folded the brief by script: 3.1 re-copied from u4s-carries.md §U4e (carry
+     51's corrected span, carries 53-57), 3.2 rewritten to record advisor-u4d-close.md's rulings, 7.2 item 3 done, a
+     note under the title. The check's prompt no longer carries the drafter's summary; a SINCE note lists what changed
+     after the draft (the draft call is unchanged, so it replayed from cache).
    - Then: fold advisor-u4d-close.md's U4e carries 53-57 (with the text batch) into the brief's carries section; the
      advisor checks the brief and answers Q12 and Q13; fill `<base>`; U4e's build. U4e need not wait for U4d-F.
 3. **U4d-F, the estimate scene fix** (task wg0l1ugq1; run wf_9ce88fa3-452; script npt-u4d-f-wf_9ce88fa3-452.js).
