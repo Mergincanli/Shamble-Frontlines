@@ -45,3 +45,20 @@ against r2t-ref.sha256 after each plant. Same method as round 1's u4d-test-bites
   refresh? O3; (c) rust L1 = my L5 (decode cap) has no test: O4; (d) h1's "changes only when health does" is measured
   over 600 ticks only, and its comparison includes the record's area (not on the wire: proto between() reads grid
   only, snapshot.rs:86-115): X1 over an S30; (e) fixer's point B: X2 over ES's 10-minute run length.
+- [3] Provenance pre-run 11:36:36-11:36:40 UTC: `cargo test --locked --no-run -p npt-sim -p npt-proto` printed
+  "Compiling npt-sim (.gate/u4d-s1/.../crates/sim)" and "Compiling npt-proto (.gate/u4d-s1/.../crates/proto)"; idle,
+  11 GB free.
+- [4] Re-plants (r2t-plant.py, one at a time, the named test run alone from this copy, restored, `check` ALL-OK (34
+  files) after each):
+  - Q2 (predict leaves the own-state record stale): d3 FAILED at tests/world.rs:246 "own-state record" (client grid
+    [0,0,0,30,0,...] vs authority [600,0,0,30,-999999,...]: velocity and fire timer stale). = fixer.
+  - Q6 (part x = hull's world x + offset): both h1 tests FAILED (:779 "tick 1: the parts' records"; :837). = fixer.
+  - Q11a (a throw takes no spawn): t_m1 FAILED at :1064, live 37,726 thousandths (spawns 24,660). = fixer.
+  - Q13 (refusals not cleared per step): d10 cooldown, ammunition, reload, rewind FAILED (:1499, :1521, :1547,
+    :1637); clamp passed (it has no refusals). = fixer.
+  - Q19 (cap back to 2^20): the replayer test FAILED "a span above 1 MB: Done" (tests/replay.rs:577); carry14 FAILED
+    "one ms past the edge" (:1964), run separately (cargo stops at the first failing binary). = fixer.
+  - P1 (get_delta's check off): w1_s1 FAILED "Vehicle moved out of the entity section" (tests/wire.rs:297). = s1.
+  - P3 (put_delta's check off): w1_s1 FAILED "Vehicle own true: Add(...)" (tests/wire.rs:225). = s1.
+  - P7 (SOLDIER [Field; 11] + 3 VELOCITY): the GROUPS unit test FAILED at snapshot.rs:747, widths [16,16,12,16,10,8,
+    10,4,16,16,16] vs the row's 8. = s1. (npt-sim, npt-link, npt-proto recompiled from this copy.)

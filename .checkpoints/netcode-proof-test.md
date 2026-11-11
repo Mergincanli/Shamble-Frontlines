@@ -96,9 +96,19 @@ U4 wave 1", moved by card_refresh.py.
       advisor-u4j.md): the deduplicated fix list with the proofs; the calls (coverage floor F10, rulings as text F9,
       pinning the bound line F2/F6, NC-U4J-10, F16, the `hs` writer rules, the Arm rule's key); the readings (a)-(f);
       F1's severity; anything for Mustafa.
-    - Next: one fix pass on the advisor's list (a fixer agent in U4j's worktree; F1 first), then round 2 on what
-      changed (netcode, security, test). Its pre-fix copy: `.gate/u4j-prefix` (411eeee plus wip/u4j.patch of 10:05;
-      crates/judge, crates/log and marks byte-identical to the reviewed worktree, checked 11:27).
+    - **The advisor's rulings: done** (advisor-u4j.md, about 11:45): REVISE; 14 fixes FX-1 to FX-14 in one pass
+      (FX-1, the High, first: the band must contain 1, FAR BETTER gives f = 1, no f above the tolerance), each with
+      its named test or fixture; follow-ups FU-1 to FU-6 (owners named); carries to U4e, U4r and U6. Readings (a),
+      (c), (d), (f) accepted; (b) changed by FX-3, (e) by FX-5. F1 stays High (a rule loosened beyond Mustafa's
+      words); a round 3 is open to F1 alone. Decisions for Mustafa: none.
+      - At the merge: copy the builder's readings (a)-(f) into the notes (R3 quotes them; they are not in
+        u4j-build.md); the readings list gains the orphan reading (R5's words); PR #40's report names FU-1 to FU-5 as
+        security findings left open.
+    - **The fix pass and round 2: running** (workflow wf_0906017a-a9b, task wgj6zbosy): the fixer in U4j's worktree
+      (each named test first, failing on the unfixed code), then netcode-architect and security-auditor (read only;
+      the security table of every path through `find`), then test-engineer (probe A and the advisor's three F1
+      plants on the new head; counted check.mjs). Notes u4j-round2-{netcode,security,test}.md. Pre-fix copy
+      `.gate/u4j-prefix` (411eeee plus wip/u4j.patch of 10:05; byte-identical to the reviewed build, checked 11:27).
   - Its fix pass, if any: by its builder (SendMessage to a3b8dfeb01ed52b50), in its copy.
   - At its merge, the main session's: u4-build-plan.md §4.1 gains U4j's public items (`TickRecord.hs`,
     `set_hashes`, `hashes`; `marks::BoundNumber`, `Check.ws_bound`, `Rule::WsPractice`; `Outcome::Empty`,
