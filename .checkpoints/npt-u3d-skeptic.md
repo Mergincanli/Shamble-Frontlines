@@ -7,7 +7,7 @@
   approved in issue #16's Queue under Mustafa's rule of 2026-11-09
 - **Branch:** cs/npt-u3d-skeptic · **Base:** origin/main 2d22b69
 - **Spike read in:** `.gate/npt-spike` (read-only worktree, detached at df8975b; never edited)
-- **Last update:** 2026-11-11 03:26 Amsterdam
+- **Last update:** 2026-11-11 03:41 Amsterdam
 
 ## Summary (findings by severity, each with its proof)
 - to follow
@@ -26,7 +26,15 @@
 2. Summary at the top of this checkpoint; commit and push; the night report's paragraph; tick item 5.
 
 ## Open findings
-- none yet
+- test-engineer (`test-engineer-u3d.md`, DONE, saved in 131f655): 0 Critical, 0 High, 2 Medium, 5 Low. All seven
+  tests hold for their planted defects. TE1 (Medium): R-31's "never the reverse" (plan.md:1423, advisor-u3d.md:216)
+  holds on average over the delay draws, not per run: at E = 10,000 ns (a PASS) -3's p99.9 fails about half the time
+  (expected count above T = n × E / 2a = 990.0 against 990 allowed at n = 990,012), and U3D-MISS has no route for "E
+  PASS, -3 FAIL". TE2 (Medium): socket.rs:726 changed from `sh.now_ns()` to the pop time `now` passes all seven (T7
+  pops after the lock is released; T1, T2 never read down's stamp), though T7's doc (:1263-1264) and SERIES.md claim
+  it. Lows: TE3 (swap socket.rs:501/:503 passes all seven), TE4 (`agree("MISS", true)` unasserted), TE5 (verdict
+  words pinned on one side only), TE6 (T2's 1,000 ns tolerance), TE7 (run.sh reads no UDP drop counters; R1 is
+  covered by C-U8-6). Status: follow-ups for U3d's report (review budget), each with its day command in the notes.
 
 ## Key numbers
 - none yet
@@ -39,6 +47,6 @@
 - netcode-architect (Opus 5.5, xhigh), the measurement's validity · `netcode-architect-u3d.md` · launched 03:25 ·
   running
 - test-engineer (Opus 5.5, xhigh), the seven fast tests and their bites · `test-engineer-u3d.md` · launched 03:25 ·
-  running
+  done 03:40
 - saver: background task bqpwo2txe · output in the session's tasks folder (bqpwo2txe.output) · started 03:24 · stops
-  by 05:14 (110 minutes on) · last check 03:26: started
+  by 05:14 (110 minutes on) · last check 03:41: ok (autosave 2aa8bac)
