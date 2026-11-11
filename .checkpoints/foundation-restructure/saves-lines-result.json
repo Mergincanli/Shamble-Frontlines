@@ -1,0 +1,41 @@
+{
+ "chromium": "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+ "checks": [
+  {
+   "name": "backup answers with the key count",
+   "pass": true,
+   "detail": "4 keys copied: paste them into a text file now"
+  },
+  {
+   "name": "backup text starts with {",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "backup holds every key, values byte for byte",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "restore answers with its counts",
+   "pass": true,
+   "detail": "1 keys restored, 3 already there (left as they are)"
+  },
+  {
+   "name": "the missing key is back, byte for byte",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "an existing key is never overwritten",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "nothing else changed",
+   "pass": true,
+   "detail": ""
+  }
+ ],
+ "verdict": "PASS"
+}
