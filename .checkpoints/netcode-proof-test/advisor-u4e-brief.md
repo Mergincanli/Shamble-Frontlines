@@ -21,7 +21,7 @@ no build, no run, no commit. Branch `claude/netcode-proof-test-plan-hcky5g` at c
 ## Blocks (written as each finishes)
 
 ### Block 1. What I read, and the state it rests on (done)
-- The brief whole (930 lines, rev 3.2); the check brief; plan §5 U4e (:704-736 as the file stands), §4.1-§4.15, Lanes,
+- The brief whole (930 lines, rev 3.2); the check brief; plan §5 U4e (:704-735 as the file stands), §4.1-§4.15, Lanes,
   §6, §7; W1-U4E, W1-S1, W1-N2, W1-PUB, W1-TARGET (advisor-u4-wave1.md); advisor-u4.md conditions 6, 10, 12 and the F2
   ruling (:436-466); advisor-u4d-close.md B2 and its U4d-F part; advisor-u4j-r2.md B2.1 and B5; u4s-carries.md §U4e
   and §U4r (58, 62) and 52, 65; the check (u4e-brief-r3-check.md); u4c-review-netcode.md; u4c-lc8-rerun.md;
@@ -33,7 +33,7 @@ no build, no run, no commit. Branch `claude/netcode-proof-test-plan-hcky5g` at c
   session adds it at launch (7.2 item 2).
 
 ### Block 2. Coverage of §5 U4e, testable as worded (done)
-| Plan item (u4-build-plan.md :704-736) | Brief | Verdict |
+| Plan item (u4-build-plan.md :704-735) | Brief | Verdict |
 |---|---|---|
 | Builds, npt-room (all 13 items and the clippy bans) | 2.1 | present, testable |
 | Builds, npt-server (pump, ConnLimits, Counters, buckets, deadline; no AddrTable) | 2.2 | present, testable |
@@ -291,8 +291,8 @@ met. L-c8's judged half PASS stands, and its hash half holds today on the eviden
   :862 as the file stands); U4d2 already edits npt-lab (its `hash` subcommand), so no new lane is opened. It needs no
   npt-l1 change: `FateLog::for_each_canonical` is public (l1/src/lib.rs:351), and U4c's committed test reads the
   same bytes through it (l1/tests/l1.rs:481-532). Not U4e: crates/lab is never U4e's (condition 10 (b)).
-- Not a "for later" feature: it is the evidence form an approved test (L-c8) names, for the set that re-runs whenever
-  npt-l1 changes.
+- Not a "for later" feature: it is the evidence form an approved test (L-c8) names; -3's L1 set was re-run because U4c
+  changed npt-l1's model, and the next model change would need the same re-run.
 - **The carry's words** (copy as they are):
 ```
 66. **U4c's netcode F2, Medium (u4c-review-netcode.md:53-54; L-c8's judged re-run, u4c-lc8-rerun.md; the advisor's U4e
@@ -308,4 +308,61 @@ met. L-c8's judged half PASS stands, and its hash half holds today on the eviden
     word, U4r in place of U4d2."
 ```
 - PR #40's report lists F2 as open (Medium, netcode-architect's, U4c), with carry 66 as its route.
+
+### Block 7. The verdict (done)
+**APPROVE, on conditions L1 to L4.** The build may start once `<base>` is filled and L1 to L3 are done.
+- Why not REVISE: rev 3.1 fixed the check's three Highs as claimed, rev 3.2's fold is right, every test, negative case,
+  bite and carry of §5 U4e is in the brief and testable, W1-TARGET's rule is in the build rules, and nothing goes
+  beyond the plan. My findings are four Mediums and three Lows, each with exact words a script can fold, and the three
+  open questions are ruled with exact words. Nothing needs a second check unless the fold goes beyond those words.
+- Risk tier 1 (spike code inside PR #40, when U4e builds); this ruling is a notes-folder text. Reviewers for U4e's build
+  stay the plan's (netcode-architect, security-auditor, engine-architect, rust-reviewer, test-engineer: plan :734-735
+  as the file stands), at xhigh, counted toward the three-agent limit (condition 10 (c)).
+
+**Conditions (the main session's):**
+- **L1. Fold this ruling into the brief by script** (rev 3.3): A1 to A7 (block 4) and the U4E-Q12, Q13 and Q14 words
+  (block 5), each old phrase matched with its line breaks read as spaces. I checked each against rev 3.2: each occurs
+  once, but "snapshot.rs:29-30" (three times, all replaced). 3.1 stays untouched (its `diff` against carries :147-247
+  still empty), and the fold is recorded under the brief's title. If a phrase fails to match, or the fold must change
+  any other word, it comes back to me; otherwise there is no second check.
+- **L2. The plan and carries text, in the main session's own commit:** u4-build-plan.md's four edits (U4E-Q12's Bites
+  line; U4E-Q14's §4.14 row, §5 U4e Tests and -18 lines; each phrase occurs once), allowed by condition 12 through this
+  ruling; u4s-carries.md gains entry 66 (block 6) in its "U4d2 or the main session" section, and U4d2's brief names it.
+- **L3. The carry-51 commit before launch** (7.2 item 2): `Scene::effect_rows()` and its §4.1 line, then 7.2 item 1's
+  counted run gives `<base>`'s counts, every check.mjs step passing. U4e's review round reads its diff from the commit
+  before the carry-51 commit, so engine-architect (a new pub item: A19) and rust-reviewer see the accessor with the
+  code that uses it.
+- **L4. Launch as section 1 says:** one builder (general-purpose, opus, xhigh) in a worktree, under W1-TARGET's lock,
+  beside U4d2's lane, with at most three agents at a time counting reviewers.
+
+**For later briefs (no action now):**
+- U4r: the class audit selects `catalogue-5/owner-to-all` by that string, and its runs' headers list no mark (U4E-Q13).
+- U4f: -22's judged runs write the room's per-client queue length and cap as `tick.v.ack_starved_headroom_count` for
+  the never-acker, and select -22/unbounded (U4E-Q12).
+- The main session, at U4e's report: if U4e's client drops stale groups, the readings list gains B5's entry
+  (advisor-u4j-r2.md:264-268), and carry 62 (g)'s drop count applies.
+
+## What I checked, and what I did not
+- **Checked, by reading:** the files in block 1; 3.1 against u4s-carries.md :147-247 by my own `diff` of the two line
+  ranges (no output); every phrase this ruling replaces, counted in the flattened brief or plan (each once, but the
+  three planned repeats); 14 plan cites (old numbering against today's file, by section 0's note), about 45 code cites
+  at the head (seam.rs, snapshot.rs, quant.rs, msg.rs, wrap.rs, hash.rs, input.rs, limits.rs, error.rs, ticks.rs,
+  history.rs, world.rs, scene.rs, greybox.rs, link/src/lib.rs, server and client manifests and lib.rs, check.mjs's
+  bite and test steps), and R27, R28 and R38 at d50396a; marks.json's -18 and -22 entries; SERIES.md :21, :128, :150,
+  :319-320; the catalogue's rows and §6 item 5; the ADR row the brief cites for Q13 (0001:1687-1688).
+- **Arithmetic I did:** Q14's send counts (s(k + 30) − s(k) = 10⁹ ns exactly; 32 × 10⁹ / 30 not whole, so 31 or 32
+  sends); A2's split gain (1,066.67 − 56 = about 1,010 B against 1,000 B); A3's own-state count (48 × 10 records
+  against 255).
+- **Not checked:** I built, ran and planted nothing (the main session holds the shared target's exclusive lock now).
+  Q14's arithmetic assumes the server sends at U4b's schedule on the injected clock and Loopback delivers at the send
+  instant (link/src/lib.rs:128-131), both as merged; the builder's e5a is what shows it. A2 rests on the catalogue's
+  budget and `Limits::SNAPSHOT`, not on a built encoder. Whether L1 B1's bursts evict B is U4r's (`burst_eviction`
+  logged). I did not re-derive U2's datagram hashes for F2: I read the builder's and the test-engineer's records.
+
+## Decisions needed (Mustafa)
+None. Every point here is a technical or test choice inside the documented vision, or a route between lanes: mine to
+decide. No word or decision of Mustafa's changes, and nothing he sees, hears or feels is touched.
+
+## For Mustafa
+Nothing. (PR #40 stays needs-mustafa for its existing reasons; this ruling adds no action for you.)
 
