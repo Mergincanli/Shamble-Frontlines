@@ -512,6 +512,9 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       are judged differently on Linux CI (the root is judged) and on Windows or macOS (exit 2, by reading the code).
     - **IE-4** (infra-engineer, Low): the pinned Chromium 1194 has never run the `legacy/` layout (locally, 1243 ran under
       its name); 2.1b's proof that the smoke passes on `legacy/` comes from CI's run.
+    - **IE-7** (infra-engineer, round 2, note): 2.1b merges with its pull-request run on the current main (pull-request
+      runs do not re-run when main moves; main's ruleset does not require the branch to be up to date); read that run's
+      gate header first: "(files at the root) | head = working tree (files in legacy/)".
   - **For the gate step (2.3), after KIT-FREEZE-2:**
     - **IE-1** (infra-engineer, Low; Mustafa, 2026-11-11: "Its wording Low becomes a follow-up for 2.3"):
       `tools/smoke.mjs:31` says "keep one copy" also when the files are split between the two places, not copied.
@@ -526,6 +529,17 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       cloud day session by the settings' `npx` deny; 2.1a's local smoke ran on Chromium 1243 aliased as 1194 instead.
     - **The v2 root page against pre-move bases** (a known limit): once v2 has a root `index.html`, any gate run against
       a base from before the move stops on the move check, including the E3 and rows scripts with their base 44446a5.
+    - **IE-5** (infra-engineer, round 2, Medium): every CI run depends on live mirrors: the apt mirror on every smoke run
+      (the step "Install Chromium's system libraries"), the npm registry on every run (`setup-node` without `cache:`),
+      Playwright's download server on a cache miss; a failed attempt costs 10 to 15 minutes (3f29cb8 and 8d8c422,
+      2026-11-11: the runner could not resolve the Ubuntu mirror). For 2.3: a short step timeout with one retry on the
+      library install, `cache: npm`, or an image with the libraries in it (kit edits: his ask first).
+    - **TE-7** (test-engineer, round 2, Low): the rows cannot fail if `editor\.html` or `shamble-.*\.js` were dropped from
+      the move check's pattern (`tools/gate.mjs:247`); add a row with `editor.html` alone and one with a letter-case
+      variant of an engine file (its own probes covered both names).
+    - **R2-1** (security-auditor, round 2, Low): a name with a trailing dot or space (`index.html.`) passes the move check;
+      Git for Windows refuses such paths at checkout (`core.protectNTFS`, on by default there); the suggested pattern:
+      `/^(index\.html|editor\.html|shamble-.*\.js)[. ]*$/i` (a gate file: his ask first).
   - **For the drafts' next revision:** five "before the foundation" lines with no pointer to his decision of 2026-11-10
     (docs-keeper's note; the brief named only the lines it pointed): ADR 0002 :38, :724, :1115; SPIKE_PLAN :100 (the
     diagram's label) and :202.
