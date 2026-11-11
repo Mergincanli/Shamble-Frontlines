@@ -13,7 +13,8 @@ DEVIATION (stated): this run has no Edit tool (the harness refused it: "No such 
 So: notes are rewritten whole with Write; plants are applied by a scratch script (scratchpad r2t-plant.py) that
 replaces exactly one unique match (asserts count == 1), saves a byte copy first, restores from it and checks sha256
 against r2t-ref.sha256 after each plant. Same method as round 1's u4d-test-bites.py. Runner: scratchpad r2t-run.sh
-(idle 8 s, df, touch, 2 s toucher inside the script, output to stdout only).
+(idle 8 s, df, touch, 2 s toucher inside the script, output to stdout only). Plants Q12 and X3 were added to the
+scratch script by a small python edit of that scratchpad file (outside the repo).
 MY SLIP: block [4] below was first appended to this file by a shell heredoc (`cat >> ... <<EOF`), not by Write; notes
 only, no other file; this whole file was then rewritten with Write.
 
@@ -64,6 +65,9 @@ only, no other file; this whole file was then rewritten with Write.
   - P3 (put_delta's check off): w1_s1 FAILED "Vehicle own true: Add(...)" (tests/wire.rs:225). = s1.
   - P7 (SOLDIER [Field; 11] + 3 VELOCITY): the GROUPS unit test FAILED at snapshot.rs:747, widths [16,16,12,16,10,8,
     10,4,16,16,16] vs the row's 8. = s1. (npt-sim, npt-link, npt-proto recompiled from this copy.)
+  - Q12 (my round-1 E6: blend by / 255), 11:52:45: the blend unit test FAILED at world.rs:2173 "the soldier, fraction
+    1, axis 0: [-127.396, -126.596] against the reference centre -127 ± 0.4" (3.9 mm); both D-9 tests still pass
+    (the hit-or-miss check is the second test, as ruled). = fixer.
 - [5] My own plants (whole npt-sim measured suite, --no-fail-fast; restored, ALL-OK after each):
   - O1 (part_center rotates by -yaw: signs of the s terms flipped, world.rs:452-453), 11:39:46-11:40:34: ONLY d7
     FAILED, at tests/replay.rs:351 (SS's state after 1/30/300 ticks pin). lib 3, seam 8, world 30 pass: h1 x2, a_m1,
@@ -76,6 +80,28 @@ only, no other file; this whole file was then rewritten with Write.
   Reading: D-7's pins were re-pinned by this same fix pass (u4d-build.md F4) after the composition and phase-3 code
   were written, so a pin is no evidence that the frame convention or the phase-3 refresh is right, only that nothing
   changed since F4. By reading, both are right now: part_center (world.rs:446-458) is the old place_vehicles formula
-  (x' = ox c - oy s, y' = ox s + oy c, prefix world.rs:1177-1190) on the hull record's grid yaw; present_volumes
+  (x' = ox c - oy s, y' = ox s + oy c; the prefix's place_vehicles) on the hull record's grid yaw; present_volumes
   refreshes records[slot] from soldier_record (pre-snap raw -> grid = the snapped position's grid, carry 9), which is
   the old build_volumes' to_grid(s.pos) for the snapped s.pos.
+- [6] Probes (a test's length raised, restored like a plant):
+  - X1 h1 count over 54,000 SS ticks (an S30), 11:45:27-11:48:29: PASS. Records changed a tick: Soldier 47.73, Vehicle
+    14.99, VehiclePart 5.62, Projectile 2.66, Door 0.03, Wall 0.40, Effect 7.40, OwnState 47.49 (126.3 a tick, was
+    574 in round 1's probe K); parts hit 303,949 = part records changed 303,949 (no area-driven change in 30 min).
+  - X2 t_m1 over 18,000 ES ticks (600 s, PM-0001-12's ES run length), 11:48:46-11:48:55: FAILED "gameplay events:
+    7578" (thousandths a second; band 9,500-10,500). shots 70.783, spawns 21.120 (2,167 thrown), live 32.342: in band.
+    Over the first 300 s the test's 9.853; so the second 300 s average (2 x 7.578 - 9.853) = 5.30 a second.
+  - X3 D-6 over 1,800 s of SS (an S30), 11:50:10-11:51:59: PASS. 1,234,196 shots, 685.664 a second; 1,800 portal
+    changes, 1.00 a second; 489 kills (0.272 a second; 100 s gives 28, 0.28); every per-tick minimum held (48
+    soldiers, teams >= 16, >= 15 vehicles of which >= 4 large, >= 300 projectiles, 384 effect rows); large hulls <=
+    1,400 cm out, others >= 5,199 cm, stand-ins start <= 1,200 cm. Magazine 32,000 lasts 2,194 s at one soldier's rate.
+  End of [4]-[6]: r2t-plant.py check ALL-OK (34 files); no r2t-backup left; grep PLANT in crates: none.
+- [7] Carries and reading: carry 9 (raw pre-snap, grid of it; now per field over Soldier and OwnState records,
+  tests/world.rs:1741-1802; the fixer's Q16 fails it; -41 quant's unit proof unchanged, tests/world.rs:2219-2237):
+  MET. Carry 12 (layouts within FIELDS; s6 pins all 8 kinds by Field identity, tests/seam.rs:477-557; the fixer's
+  Q22): MET, with W1-S1's change (velocity and weapon state out of SOLDIER, the ruling's lift); VELOCITY unchanged
+  (grid.rs: +4 doc lines only vs 21a8597). Carry 13: storage identity MET (O5 fails it), counting half to U5 (C13;
+  u4s-carries.md entry 48). Carry 14: MET at 10^6 B (220 ticks, 7,333 ms; Q19 fails both tests). Carry 36: MET
+  (exhaustive match, tests/seam.rs:70-80; the fixer's Q23). ES's synthetic recording is 9,000 ticks by plan (§4.15,
+  RQ5 "3 recordings x 5 min"; tests/replay.rs:20-28); ES's judged runs are 10 min each, every ES run checked by
+  PM-0001-2's counter script within ±5 % (ADR 0001:1474-1480, :1600), driven by U4r's runner (plan §5 U4r :742:
+  npt-bots' brawl and open-loop scripts), not by this generator today.
