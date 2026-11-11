@@ -9,7 +9,7 @@
   **Base:** main 76b4f7a (PR #50 merged, 2.1a). **OLD** (the independent judge for E2 and E3): main 44446a5.
 - **Never:** push to `claude/netcode-proof-test-plan-hcky5g` (#40) or `claude/laughing-pasteur-fwya24` (#48); touch
   `spikes/`; touch a gate file; edit a settings file, hook or allow-list; write a kit line before his chat yes.
-- **Last update:** 2026-11-11 22:30 Amsterdam
+- **Last update:** 2026-11-11 22:31 Amsterdam
 
 ## Steps done
 0. Step 0 (this commit): model checked with get_session: `session_context.model` claude-opus-5-5,
@@ -134,13 +134,18 @@ wait for his answer.
    list, re-fetch origin/main and record the SHA E8-RUN's `origin/main` means. C14's re-read done: #40 at a9b1344, the
    same six docs files outside `spikes/`.
 
-## His mid-turn message (2026-11-11, about 22:27 Amsterdam; to capture by script with his next answer, C13)
+## His mid-turn message (2026-11-11 21:10:58 UTC, event 7a094d1e-41ed-40b7-91f8-544d91e4b64f; captured: `mustafa-2026-11-11-permission.md`, 95 characters)
 "I give you permission to go on auto mode and accept yourself for the bash commands and what not". The chat is already
 in Auto mode (get_session: permission_mode auto), the most open mode a cloud session offers (the environment's
 documentation: Accept edits, Plan or Auto; no bypass in cloud sessions); the session cannot answer prompts itself; the
 only other lever, allow rules in `.claude/settings.json`, is closed by his rule "Do not edit any settings file, hook or
 allow-list to get fewer prompts". His kit rule is unchanged by it: the four kit lines and E8 still wait for his chat
 yes. Route: simple shell lines, multi-step work as node scripts under `.gate/` (his words of 2026-11-11).
+
+## His D1 message, sent a second time (2026-11-11 21:27:35 UTC, event 40ebaa1e-996c-42b2-b313-4198c6274017)
+Byte-identical to the first send (20:44:29 UTC; captured `mustafa-2026-11-11-d1-resent.md`, compared by script: equal,
+1359 characters). It arrived after the kit ask went out (21:16 UTC); everything in it is done; the ask is sent again,
+unchanged, with the one advisor-tool line. For C13: one DECISIONS.md entry for the D1 message, noting both sends.
 
 ## Refusals (guard, deny list, classifier: what, and the route taken)
 - None refused so far. The browser route (C9): `node tools/node_modules/playwright/cli.js install chromium` (allowed at
