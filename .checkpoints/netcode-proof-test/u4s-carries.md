@@ -383,6 +383,17 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     fixer's check.mjs run 2: u4j-build.md:322-325). A check.test.mjs self-test feeds a recorded failing run and
     asserts the name is printed. The main session may make this change sooner, in its own commit; U4d2's report then
     lists entry 65 as met."
+66. **U4c's netcode F2, Medium (u4c-review-netcode.md:53-54; L-c8's judged re-run, u4c-lc8-rerun.md; the advisor's U4e
+    brief ruling, F2-ROUTE):** "npt-lab's probe also writes the SHA-256 of (v1's tag + the v2 fate log's datagram
+    entries), the hash §5 U4c's L-c8 compares with U2's committed 913db8e9…, feabf2f0… and b8a04f2f… for P2, B1 and P4
+    seed 1, beside the whole log's SHA-256: in the run log's header and in its summary line, so that -3's script
+    (ops/runs/c-u2-pm-0001-3.mjs) records it unchanged. It reads the log through npt-l1's public
+    `FateLog::for_each_canonical` and edits no crates/l1 file; v1's tag and the datagram entry's form are those U4c's
+    test `v1s_tag_and_the_v2_logs_datagram_entries_hash_as_v1s_log_did` reads (l1/tests/l1.rs:481-532). U4d2's
+    report shows the three values from probe runs of those three runs (the -3 set's own arguments), each equal to
+    U2's, with the commands it ran. Until then L-c8's hash half rests on U4c's scratch harness through equal
+    whole-log hashes (u4c-lc8-rerun.md). If U4d2's brief is final without this entry, U4r's brief takes it word for
+    word, U4r in place of U4d2."
 
 ## The main session (plan text, before the code merges: risk 11)
 30. **A19 (§4.1's table):** "npt-sim's rows gain `EntityKind::ALL` and `EntityKind::layout` (arch F2: one home for the

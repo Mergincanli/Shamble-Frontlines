@@ -458,7 +458,7 @@ sub-unit that moves its mark.
 |---|---|---|---|---|
 | -17/tick16, -58/tick16 | proto's header writer and the client's tick rebuild (the 16-bit value taken as the tick) | decoded hash: post-wrap frames logged under the wrong tick (an orphan pair) or as the sentinel | -17: `tick_start` = 63,736; -58: `ticks_below_wrap` = 30 | a frame at tick 65,537 hashes differently or is refused |
 | -17/client-rounding | npt-client's call into `grid` (floor in place of nearest); the id lives in npt-client (`npt_client::BITES`, `grid_with_bite`), the grid holding only the defect (the advisor's U4s ruling, condition 1 (a)) | decoded hash | any -17 profile | the floor variant differs on about half of all position values |
-| -18/no-fallback | the encoder's baseline choice, never falling back to the defaults | `burst_heal` (the fresh delta) | B1, ring ages 0-31 | a 1 s gap evicts B; `burst_eviction` = 1 |
+| -18/no-fallback | the encoder's baseline choice, never falling back to the defaults | `burst_heal` (the fresh delta) | B1, ring ages 0-31 | a gap evicts B (on Loopback `npt_sim::ACK_RING_TICKS` tick periods, 1 s plus two tick periods at 30 Hz, since there a 1 s gap leaves B at the ring's edge: the advisor's U4E-Q14 ruling); `burst_eviction` = 1 |
 | -21/not-older-than | the room's tick check (≥ in place of >) | fast clock's excess commands | the fast-clock suite, option A (marks.json -21 notes) | an equal-tick command runs |
 | -21/no-catchup-cap | the room's per-tick command cap | forged: unrejected | the forged suite, option A, two datagrams in one tick | 16 commands run in one tick |
 | -41/server-speed-1pct | the authority step's run speed x 1.01, not `predict`'s (Q24) | untraced corrections | CO, every profile | one moving tick differs |
@@ -716,20 +716,23 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
     the group mask, a minimal `ClientEndpoint` (input, step, the next due time in ns).
 - **Tests:** catalogue item 4 (the layout table equals the Field-group rows; the authority-only groups absent); a forced
   group split, each group decoding alone; a lost group leaves its tick unlogged and counted, a refused one logs the
-  sentinel; the baseline rule and the ring's age edges; a 1 s gap evicting B; the window counting the pump's bytes;
-  the mirror equal to the client's hash over Loopback at P0 for 1,000 ticks; the Send asserts; **negative cases (T17,
-  A15):** each JoinRejected reason (bad token, bind mismatch, roster full, wrong version, wrong content hash); a
-  datagram before Join dropped and counted; a control message before Join closing the session as malformed, counted,
-  never INVALID; the Input bucket (8, refilled at 60 a second) and the Ping limit (10 a second) on a fake clock; the 2 s
-  Join deadline on a fake clock; a second Resync before the FullState's ack dropped and counted; npt-client drops and
-  counts a message on the wrong channel (catalogue item 2's "on both sides", plan E7; nit d).
+  sentinel; the baseline rule and the ring's age edges; a gap evicting B (on Loopback `npt_sim::ACK_RING_TICKS` tick
+  periods: U4E-Q14); the window counting the pump's bytes; the mirror equal to the client's hash over Loopback at P0 for
+  1,000 ticks; the Send asserts; **negative cases (T17, A15):** each JoinRejected reason (bad token, bind mismatch,
+  roster full, wrong version, wrong content hash); a datagram before Join dropped and counted; a control message before
+  Join closing the session as malformed, counted, never INVALID; the Input bucket (8, refilled at 60 a second) and the
+  Ping limit (10 a second) on a fake clock; the 2 s Join deadline on a fake clock; a second Resync before the
+  FullState's ack dropped and counted; npt-client drops and counts a message on the wrong channel (catalogue item 2's
+  "on both sides", plan E7; nit d).
 - **-18's bite end to end (the advisor's condition 6):** §4.14's unit proof is the server half only. U4e's proof runs
-  from the encoder to the client, through a 1 s gap in delivery: under no-fallback the client refuses every delta after
-  the gap, so no fresh delta decodes within 500 ms; the clean build decodes one. If the bite's baseline turns out to be
-  one the client still holds, the bite is not a defect on L1, and -18's L1 part comes to the advisor before it counts.
+  from the encoder to the client, through a gap in delivery (on Loopback `npt_sim::ACK_RING_TICKS` tick periods:
+  U4E-Q14): under no-fallback the client refuses every delta after the gap, so no fresh delta decodes within 500 ms; the
+  clean build decodes one. If the bite's baseline turns out to be one the client still holds, the bite is not a defect
+  on L1, and -18's L1 part comes to the advisor before it counts.
 - **Bites (unit-shown):** no-fallback (-18, shown end to end as above), tick16, client-rounding (the client's call
   site), lt-ack, lt-tick-offset and lt-event-seq (§4.14), lt-cmd-seq and lt-press (the room's compares), server-echo
-  (-62, the room's routing), owner-to-all (catalogue item 5's), no-trailing and no-channel through the pump.
+  (-62, the room's routing), unbounded (-22, the event queue's cap; U4f runs it judged: U4E-Q12), owner-to-all
+  (catalogue item 5's), no-trailing and no-channel through the pump.
 - **Marks moved:** none judged (U4r runs them).
 - **Reviewers:** netcode-architect, security-auditor (the decode path, roster and token compare), engine-architect
   (crate boundaries), rust-reviewer, test-engineer.
