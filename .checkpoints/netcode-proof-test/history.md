@@ -1712,3 +1712,48 @@ U4 wave 1", moved by card_refresh.py.
     notes file.
   - U4j's builder: SendMessage to a3b8dfeb01ed52b50.
   - If a worktree is gone: a new one at its base, with its wip patch applied first.
+
+## Running work, U4 wave 1 (3): the resume card's U4j blocks at U4j's merge (moved 2026-11-11 about 20:15 UTC, by card_refresh3.py)
+From "The three cut workflows", item 1 (card lines 33-62):
+
+1. **U4j, the judge and marks change** (task wgj6zbosy; run wf_0906017a-a9b; script npt-u4j-fix-round2-wf_0906017a-a9b.js).
+   - Done: round 1 (three REVISE; F1 High, the FAR BETTER cap hole); the advisor's rulings (advisor-u4j.md: FX-1 to
+     FX-14, FU-1 to FU-6, the carries); **the fix pass, all 14 fixes**, each test shown failing first. The fixed build
+     is uncommitted in `.claude/worktrees/agent-a3b8dfeb01ed52b50` (base 411eeee; 21 changed or new entries; notes
+     there: .checkpoints/netcode-proof-test/u4j-build.md, "Fix pass, round 1"; runner u4j-fix/run.sh). Round 2 diffs
+     against the pre-fix copy `.gate/u4j-prefix`.
+   - Round 2 (netcode-architect, security-auditor, test-engineer) **resumed about 17:00 UTC** under USAGE-SAVINGS:
+     the reviewers start from the review packet u4j-round2-packet.md (cut by review_packet.py from
+     u4j-round2-packet.json; the fixtures' diff in u4j-round2-packet-fixtures.diff); the fixer's report is out of the
+     prompts (its notes stay readable); the two readers run in parallel, then the test-engineer; every test runs
+     through u4j-fix/run.sh, pass or fail by its exit code and the runner's summary line. The fixed build is saved as
+     wip/u4j.patch (4ad80a9: 64 files on 411eeee, applies cleanly), with its notes and runner.
+   - On its return: the main session reads every round-2 finding in full (U4j is the judge and marks change, so all of
+     it touches the judge or the marks: his limit).
+   - **Round 2 done (about 17:45 UTC; read in full):** all three APPROVE WITH FINDINGS; F1 closed by each (the
+     test-engineer by runs and the advisor's three plants), so no round 3; the counted check.mjs run: all 10 steps,
+     measured 317 = 286 + 31, bites 340 = 309 + 31, self 48; the 66 files' hashes match. New Mediums: NC-U4J-R2-N1
+     (the writer rule for a tick written lost under L1's reorder: a carry sentence for U4e and U4r), TE2-1 (no test
+     pins the LG part of the Arm rule's key), TE2-5 (outside U4j: an npt-net test failed once on the bites build and
+     was retried until green; check.mjs hides failing names). Lows: NC N2-N6, SEC-R2-N1 and N2, TE2-2 to TE2-4, TE2-6.
+     The advisor rules on routing and the merge (advisor-u4j-r2.md); the merge follows its ruling.
+   - The fixer's points for round 2 and the advisor: SERIES's twin_hash row still says "any role" (the advisor's
+     words needed); FX-3 (c) read stricter (two practice runs in force make a bite run INVALID); FX-10's malformed
+     entries and its order of outcomes; FX-9's plant T also raised FX-1's new guard to 1.12 (round 2 plants the same).
+   - Then: F1 still open after round 2 → a round 3 for F1 alone; **open after round 3 → stop and bring it to
+     Mustafa** (his words). The merge: snapshot by `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py
+     .claude/worktrees/agent-a3b8dfeb01ed52b50 .checkpoints/netcode-proof-test/wip/u4j.patch u4j-`; stop the saver;
+     `git apply`; check.mjs counted and the gate; commit with `git rm` of wip/u4j.patch. With it: §4.1's U4j public
+     items; the builder's readings (a)-(f) from advisor-u4j.md R3 into the notes; the orphan reading (R5); PR #40's
+     report names FU-1 to FU-5 as open security findings. Then U4c's L-c8 judged re-run on U4j.
+
+From "Next steps, in order", item 1 (card lines 104-111):
+
+1. U4j: round 2 done, no round 3 (F1 closed). **The advisor's round-2 ruling is in (advisor-u4j-r2.md, about 18:15
+   UTC): APPROVE, U4j merges now, on its conditions M1-M9.** Next, after Mustafa's /compact: read the ruling in full (it
+   touches the judge), then merge as it rules: check the worktree against round 2's hashes and that the branch has not
+   touched judge, log or marks since 411eeee; apply; check the 64 files' hashes; check.mjs counted (it expects measured
+   396, bites 443, self 52) and the gate; a failing test is never retried into green without its name; two commits in
+   one push (the merge with the reviewed bytes, the notes and plan text, wip/u4j.patch removed; then its T1-T9 text
+   edits verbatim). With it: carries 61 (§U4e), 62 (§U4r), 63-65 and C-U6-9 to C-U6-11 as it words them; the readings
+   (a)-(f) and the orphan reading into u4j-build.md; PR #40's report names FU-1 to FU-5 and FU-7.

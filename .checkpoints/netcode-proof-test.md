@@ -4,9 +4,8 @@
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main, last merged in at 5ca77eb (main bb2d817, PR #49, the STATUS split)
-- **Last update:** 2026-11-11 about 18:10 UTC (U4j's round 2 done, F1 closed; the advisor's round-2 ruling and the
-  U4e brief's check running; the chat at 415,513 of 1,000,000 (42 %) at 18:05 UTC, so Mustafa is asked to /compact
-  after this card refresh)
+- **Last update:** 2026-11-11 about 20:15 UTC (U4j merged: 4d2b0ef and d50396a, pushed together; the chat at 96,748
+  of 1,000,000 (10 %) at 19:58 UTC, after Mustafa's /compact)
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
@@ -14,52 +13,33 @@ lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAG
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
 **The current step: U4 wave 1's close and wave 2's preparation.** Plan files, with the advisor's text batch of
-2026-11-11 applied: plan.md (rev 3.3, sha256 4e74a152…), u4-build-plan.md (rev 2, 7375cdcf…), u4s-carries.md (carries
-1-60, f18a0692…); the advisor's rulings: advisor-u4.md, advisor-u4-wave1.md (with B1.4's erratum), advisor-u4j.md,
-advisor-u4d-close.md.
+2026-11-11 and U4j's merge text applied: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2, 4b8eaab6…),
+u4s-carries.md (carries 1-65, 32acca91…); the advisor's rulings: advisor-u4.md, advisor-u4-wave1.md (with B1.4's
+erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md.
 - **Merged into the spike branch:** U4s f080551, U4b 411eeee, U4a 952f734, U4c f3f7c2f, U4d with W1-S1's npt-proto half
-  39f4290 (report u4d-report.md); CI green on each. Main merged in at 5ca77eb (PR #49). At 39f4290: check.mjs 10 steps,
-  measured 365, bites 412, self 52.
-- **Running:** nothing. No agent (the advisor's U4j ruling and the U4e brief's check and revision are done); the
-  saver's 110 minutes ended at about 18:45 UTC with the tree clean. Restart it when work resumes: `node
+  39f4290 (report u4d-report.md); CI green on each. Main merged in at 5ca77eb (PR #49). **U4j: 4d2b0ef (the merge)
+  and d50396a (round 2's wording), pushed together** (u4j-build.md, "Merge into the spike branch"). At d50396a:
+  check.mjs 10 steps, measured 396, bites 443, self 52: the base counts for the next lanes, U4e's `<base>` included.
+- **Running:** no agent. The saver, restarted after U4j's push (about 20:15 UTC, 110 minutes): `node
   .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5
-  <noreply@anthropic.com>" --trailer "Claude-Session: https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"`.
-  U4d-F waits its turn.
+  <noreply@anthropic.com>" --trailer "Claude-Session: https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"`. Stop it
+  before a merge's apply and restart it after the push, as at U4j's. U4d-F waits its turn.
 
 **The three cut workflows, and what to do with each when the hold lifts.** Scripts are under
 /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/. A resumed
 run (`Workflow({scriptPath, resumeFromRunId})`) keeps its run id; finished agents replay from cache, and only the cut
 ones run again.
-1. **U4j, the judge and marks change** (task wgj6zbosy; run wf_0906017a-a9b; script npt-u4j-fix-round2-wf_0906017a-a9b.js).
-   - Done: round 1 (three REVISE; F1 High, the FAR BETTER cap hole); the advisor's rulings (advisor-u4j.md: FX-1 to
-     FX-14, FU-1 to FU-6, the carries); **the fix pass, all 14 fixes**, each test shown failing first. The fixed build
-     is uncommitted in `.claude/worktrees/agent-a3b8dfeb01ed52b50` (base 411eeee; 21 changed or new entries; notes
-     there: .checkpoints/netcode-proof-test/u4j-build.md, "Fix pass, round 1"; runner u4j-fix/run.sh). Round 2 diffs
-     against the pre-fix copy `.gate/u4j-prefix`.
-   - Round 2 (netcode-architect, security-auditor, test-engineer) **resumed about 17:00 UTC** under USAGE-SAVINGS:
-     the reviewers start from the review packet u4j-round2-packet.md (cut by review_packet.py from
-     u4j-round2-packet.json; the fixtures' diff in u4j-round2-packet-fixtures.diff); the fixer's report is out of the
-     prompts (its notes stay readable); the two readers run in parallel, then the test-engineer; every test runs
-     through u4j-fix/run.sh, pass or fail by its exit code and the runner's summary line. The fixed build is saved as
-     wip/u4j.patch (4ad80a9: 64 files on 411eeee, applies cleanly), with its notes and runner.
-   - On its return: the main session reads every round-2 finding in full (U4j is the judge and marks change, so all of
-     it touches the judge or the marks: his limit).
-   - **Round 2 done (about 17:45 UTC; read in full):** all three APPROVE WITH FINDINGS; F1 closed by each (the
-     test-engineer by runs and the advisor's three plants), so no round 3; the counted check.mjs run: all 10 steps,
-     measured 317 = 286 + 31, bites 340 = 309 + 31, self 48; the 66 files' hashes match. New Mediums: NC-U4J-R2-N1
-     (the writer rule for a tick written lost under L1's reorder: a carry sentence for U4e and U4r), TE2-1 (no test
-     pins the LG part of the Arm rule's key), TE2-5 (outside U4j: an npt-net test failed once on the bites build and
-     was retried until green; check.mjs hides failing names). Lows: NC N2-N6, SEC-R2-N1 and N2, TE2-2 to TE2-4, TE2-6.
-     The advisor rules on routing and the merge (advisor-u4j-r2.md); the merge follows its ruling.
-   - The fixer's points for round 2 and the advisor: SERIES's twin_hash row still says "any role" (the advisor's
-     words needed); FX-3 (c) read stricter (two practice runs in force make a bite run INVALID); FX-10's malformed
-     entries and its order of outcomes; FX-9's plant T also raised FX-1's new guard to 1.12 (round 2 plants the same).
-   - Then: F1 still open after round 2 → a round 3 for F1 alone; **open after round 3 → stop and bring it to
-     Mustafa** (his words). The merge: snapshot by `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py
-     .claude/worktrees/agent-a3b8dfeb01ed52b50 .checkpoints/netcode-proof-test/wip/u4j.patch u4j-`; stop the saver;
-     `git apply`; check.mjs counted and the gate; commit with `git rm` of wip/u4j.patch. With it: §4.1's U4j public
-     items; the builder's readings (a)-(f) from advisor-u4j.md R3 into the notes; the orphan reading (R5); PR #40's
-     report names FU-1 to FU-5 as open security findings. Then U4c's L-c8 judged re-run on U4j.
+1. **U4j, the judge and marks change: MERGED** (4d2b0ef, the merge; d50396a, round 2's wording; pushed together;
+   run wf_0906017a-a9b finished). Round 1 (three REVISE; F1 High), the fix pass (FX-1 to FX-14), round 2 (three
+   APPROVE WITH FINDINGS; F1 closed by all three; no round 3), the advisor's round-2 ruling (advisor-u4j-r2.md:
+   APPROVE on M1-M9), then the merge: M1 66 OK, M2 true, M3 64 files (the snapshot equal to 4ad80a9's), M4 64 OK, M5
+   and M8.2 measured 396, bites 443, self 52, M6 no failure, M7 gate PASS with --no-smoke (this container's Chromium
+   does not match tools/'s Playwright). The record: u4j-build.md, "Merge into the spike branch" and "Readings, as
+   ruled". The old block: history.md, "Running work, U4 wave 1 (3)".
+   - Open from U4j, as routed: carries 61 (§U4e), 62 and 63 (§U4r), 64 (the next change to crates/judge), 65
+     (§U4d2, or the main session sooner); C-U6-9 to C-U6-11 (plan.md's U6 row); the FU list for PR #40's report (the
+     closing checklist); TE2-5 (b) and U4c's L-c8 judged re-run (next steps); one more reading only if U4e's client
+     drops stale groups (advisor-u4j-r2.md B5).
 2. **The U4e builder brief, rev 3** (task wnwulchr5; run wf_c92cd986-072; script npt-u4e-brief-r3-wf_c92cd986-072.js).
    - Done: the draft, u4e-brief.md (719 lines; notes u4e-brief-r3-notes.md): W1-U4E's answers, W1-S1, W1-N2, W1-TARGET's
      lock, the carries re-quoted by script, 8 of rev 2's 28 recheck rows changed and R29-R38 added, two new questions
@@ -101,23 +81,24 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
   as follow-ups for U3d's part of PR #40's report; B2's U4g and U4h notes stay follow-ups (named in u4d-report.md).
 
 **Next steps, in order (Mustafa: "follow the card's order: U4j's round 2, then the U4e brief's check, then U4d-F"):**
-1. U4j: round 2 done, no round 3 (F1 closed). **The advisor's round-2 ruling is in (advisor-u4j-r2.md, about 18:15
-   UTC): APPROVE, U4j merges now, on its conditions M1-M9.** Next, after Mustafa's /compact: read the ruling in full (it
-   touches the judge), then merge as it rules: check the worktree against round 2's hashes and that the branch has not
-   touched judge, log or marks since 411eeee; apply; check the 64 files' hashes; check.mjs counted (it expects measured
-   396, bites 443, self 52) and the gate; a failing test is never retried into green without its name; two commits in
-   one push (the merge with the reviewed bytes, the notes and plan text, wip/u4j.patch removed; then its T1-T9 text
-   edits verbatim). With it: carries 61 (§U4e), 62 (§U4r), 63-65 and C-U6-9 to C-U6-11 as it words them; the readings
-   (a)-(f) and the orphan reading into u4j-build.md; PR #40's report names FU-1 to FU-5 and FU-7.
+1. **U4j: MERGED** (4d2b0ef, d50396a; about 20:10 UTC), M1-M9 met. Next, M9's last part: **U4c's L-c8 judged re-run
+   on U4j** (u4-build-plan.md §5 U4c, :591-593: -3's five L1 parts re-run on the merged build and re-judged PASS, its
+   four bites failing as before, and for P2, B1 and P4 seed 1 the SHA-256 of the v1 tag plus the v2 log's datagram
+   entries equal to U2's 913db8e9, feabf2f0 and b8a04f2f). Then **TE2-5 (b)** (advisor-u4j-r2.md B2.3), before the
+   next merge into the spike branch: the bites build's workspace tests ten times (`cargo test --locked --workspace
+   --all-features --no-fail-fast` through main-run.sh), each run's whole output under .gate/te2-5/; any failure's
+   name and panic into the notes, tagged TE2-5; none in ten is recorded, and the rule stays.
 2. The U4e brief: **check and revision done (about 18:35 UTC; read in full).** The check said FAIL with 3 High (F1: the
    main session's fold reached 3.1 and 3.2 only, not e12, 2.6, the return list or carry 51's route; F2: the bite
    proofs as worded clash with a green check.mjs, so wave 1's two-part form is stated; F3: the owner-to-all proof was a
    group check that cannot fail on the open route, so carry 53's per-record test is the proof), 5 Medium (F4 carry
    22's accepting edges; F5 e7's exercise counts; F6 the three room-side checks' rules and clean negatives; F7 e5a's
    gap alignment; F8 routes for carries 54 and 56) and 5 Low. The revision made rev 3.1 (893 lines): all 13 fixed,
-   none rejected; a new question U4E-Q14 (does a 1 s gap still evict B on Loopback; recommended (b)). Next: after
-   U4j's merge adds carry 61 to §U4e, re-copy §U4e into the brief's 3.1 by script (the advisor's condition); then the
-   advisor's check of the brief (U4E-Q12, Q13, Q14 and the High fixes); `<base>`; U4e's build.
+   none rejected; a new question U4E-Q14 (does a 1 s gap still evict B on Loopback; recommended (b)). Next, now that
+   U4j's merge added carry 61 to §U4e: re-copy §U4e into the brief's 3.1 by script and redo its R28 row ("U4j has not
+   merged") on the merged code (the advisor's conditions, advisor-u4j-r2.md B2.1 and B5); then the advisor's check of
+   the brief (U4E-Q12, Q13, Q14 and the High fixes); `<base>` (the head at launch, d50396a or later; base counts 396 /
+   443 / 52); U4e's build.
 3. Then U4d-F (workflow 3) as above; then U4d2's builder brief (carrying carry 52, N2-M2's ruling, W1-TARGET), with
    the advisor.
 4. U4r's brief: the night's rev 2 at `cs/npt-u4r-brief` ed973c9 goes to the advisor after U4c, U4d2, U4e and U4j merge.
@@ -131,8 +112,9 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
   confirm (closing checklist). The 19:30 UTC check-in (trig_01W9mBGauhxrWnn1rSuweDic) is deleted: its question is
   answered.
 - **Housekeeping later** (approved method: leftovers to a local branch, then a plain `git worktree remove`):
-  `.gate/u4a-prefix`, `u4b-prefix`, `u4b-wt`, `u4c-prefix`, `u4d-prefix`, `u4d-s1`; `.claude/worktrees/`
-  agent-a9297644e7c0354f3 (U4a), wf_f54246ff-e0d-1 (U4d), wf_f54246ff-e0d-2 (U4c).
+  `.gate/u4a-prefix`, `u4b-prefix`, `u4b-wt`, `u4c-prefix`, `u4d-prefix`, `u4d-s1`, `u4j-prefix`; `.claude/worktrees/`
+  agent-a9297644e7c0354f3 (U4a), wf_f54246ff-e0d-1 (U4d), wf_f54246ff-e0d-2 (U4c), agent-a3b8dfeb01ed52b50 (U4j,
+  merged at 4d2b0ef).
 
 **Open questions for Mustafa:** none open.
 - Answered today (verbatim in history.md): NIGHT-BUDGET (a); the drift fix before U4d2's pins (carry 52); the effect
@@ -162,7 +144,14 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
   origin/main:.claude/agents/advisor.md`; commits end with the Co-Authored-By and Claude-Session lines.
 - **U4:** the five briefs (U4e, U4r, U4f, U4g, U4h) go to the advisor before their builds; carries word for word from
   u4s-carries.md, listed as met by number in each report; the wave-1 seam freeze (lifted for W1-S1 only); wave 2's
-  builds take W1-TARGET's flock lock.
+  builds take W1-TARGET's flock lock (the main session's counted runs too: main-run.sh holds it exclusively).
+- **The advisor's U4j round-2 ruling (advisor-u4j-r2.md), for the main session and every builder brief:**
+  - TE2-5's rule, until carry 65 is met (B2.3, its words): "a FAIL in check.mjs's test step is never retried into
+    green unnamed. The failing build's crate is re-run at once through the runner with `--no-fail-fast`, its whole
+    output saved under .gate/, and the failing test's name and panic go into the notes, tagged TE2-5. A failure in a
+    crate the unit changes, or in a test that reads its files, stops that unit's merge until it is explained."
+  - B6: plants by Edit in place, or the planted file's diff saved beside the run's output; the next review workflow's
+    agents get the Edit tool, or are told to rewrite their notes whole with Write from the start.
 
 **Pointers**
 - Plan: plan.md. U4: u4-build-plan.md, advisor-u4*.md, u4s-carries.md, the unit notes (u4*-build.md, u4*-review*.md,
@@ -213,6 +202,12 @@ free:
 - **Readings for Mustafa to confirm** (his NIGHT-TONIGHT (c), 2026-11-11: "PR #40's report lists those two edits as
   readings for me to confirm"): R-31's new wording (plan.md:1424, NA1) and U3D-MISS's sampling case (plan.md:1248, the
   U8 row), each with the night check's one-line reading on whether any pass bar's number or direction moved.
+- **U4j's part of the report** (advisor-u4j-r2.md B5, :269-275), by id, severity and owner: the open security
+  findings, which keep PR #40 needs-mustafa: FU-1 (SEC-F7, Low), FU-2 (SEC-F9's later half, Medium), FU-3 (SEC-F10,
+  Low), FU-4 (SEC-F12, Low), FU-5 (C3's flag, Low) and FU-7 (SEC-R2-N2, Low); FU-6 (the advisor's A-U4J-1, Medium:
+  the message-size condition), open; round 2's follow-ups and carries, entries 61 to 65 and C-U6-9 to C-U6-11; the
+  review count: two rounds, F1 (High) closed in round 2, no round 3. The readings PR before R5 carries the orphan
+  reading (u4-build-plan.md §10, §11: nine readings), plus one more only if U4e's client drops stale groups.
 **Older next steps** (U1 era, kept for the record):
 1. On Mustafa's "merge #41": check gate and smoke green on 1b4094a, merge with that SHA as the expected head; then
    `git merge origin/main` into this branch (only reviewed main comes in) so marks.json's row hashes match; remove

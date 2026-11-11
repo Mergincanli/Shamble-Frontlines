@@ -363,7 +363,8 @@ APPROVE, merge now. Each condition's result, in the main session's words:
 - **B7.3, U4j's public items, re-derived** by `git diff -U0 411eeee -- crates/judge/src crates/log/src` on the applied
   tree (every added `pub` line, and every new variant of a `pub` enum): npt-judge `eval::Outcome::Empty` and
   `Outcome::fails`, `figures::Lack::Empty`, `marks::BoundNumber`, `marks::Check::ws_bound`,
-  `marks::Mark::ws_bound_line`, `marks::Rule::WsPractice`; npt-log `TickRecord::hs`, `TickRecord::set_hashes`, `TickRecord::hashes`. Not public:
+  `marks::Mark::ws_bound_line`, `marks::Rule::WsPractice`; npt-log `TickRecord::hs`, `TickRecord::set_hashes`,
+  `TickRecord::hashes`. Not public:
   `eval::Missing::Empty` (pub(crate)) and practice.rs (`mod practice;`, judge/src/lib.rs:9). The ruling's list, so
   §4.1's two rows are its words.
 - **The merge commit's text,** by u4j_merge_text.py (this folder; its dry run, then `--apply`; every block copied from
@@ -380,6 +381,14 @@ APPROVE, merge now. Each condition's result, in the main session's words:
 - **M8:** this merge commit (the 64 spike files as applied, `git rm` of wip/u4j.patch, the text above), then the text
   commit (T1 to T9 by u4j_t1t9.py, its diff holding nothing else; then check.mjs counted again and the gate), both in
   one push. **M9**, after the push: the saver restarted, the card updated, then U4c's L-c8 judged re-run.
+- **Done:** the merge commit 4d2b0ef; the text commit d50396a (u4j_t1t9.py, its dry run, then `--apply`: T1 to T4 in
+  marks/README.md, each item refilled with its words otherwise unchanged; T5 in marks.json, which still parses with
+  only PM-0001-18's notes changed; T6 to T8 in SERIES.md; T9 in fixtures/README.md; the commit holds those 4 files
+  only). Before it, check.mjs counted again (main-run.sh, 20:04:03-20:08:44 UTC, log .gate/u4j-merge/check2.log; the
+  pre-run builds compiled npt-judge and npt-log from the main folder's path): all 10 steps pass, measured 396, bites
+  443, 0 failed, 0 skips, marks 81 with the ADR rows unchanged, self 52 of 52, redact 0 findings (refs 732 tracked
+  files, 677 before the merge commit added 56); `node tools/gate.mjs --no-smoke`: GATE PASS (gate2-nosmoke.log).
+  Pushed together, 30528c7..d50396a.
 
 ## Readings, as ruled
 Copied by script (u4j_merge_text.py), by line range, as the advisor's U4j round-2 ruling asks (advisor-u4j-r2.md, B5;
