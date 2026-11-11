@@ -106,3 +106,30 @@ check.mjs marks step (drift test, --check-marks) and check.test.mjs (every marks
   npt-log` (my crates only; rustfmt, not a shell write), `fmt --all --check` clean. clippy -D warnings host, default
   and --all-features, judge+log --all-targets: clean after one fix (engine.rs type alias Edit); log wasm32 clean.
   Next: (e) check.mjs twice (counted), then optional plants, then the report.
+- 10. check.mjs run A (2026-11-10 21:16-21:18 UTC; no other cargo or rustc running; 2 s touch loop; the pre-run
+  `cargo test --no-run` showed "Compiling npt-log (…agent-a3b8dfeb01ed52b50/spikes/netcode-proof/crates/log)" and
+  "Compiling npt-judge (…/crates/judge)"): all 10 steps pass; test measured 304 (= 286 + 18), bites 327 (= 309 + 18),
+  self 48 of 48; marks 81 read and checked, rows unchanged; redact 182 items, 0 findings. Expected delta +18 per
+  build (log +2, judge lib +3, engine +8, fixtures +5): matches. Cut by the spend limit before noting it; resumed
+  2026-11-11 09:50 UTC. Next: two fresh counted runs today (other lanes built in between), then plants, report.
+- 11. check.mjs run B (2026-11-11 09:50:29-09:56:57 UTC; idle before; touch loop; Compiling npt-log and npt-judge
+  from this worktree's path): all 10 steps pass; measured 304, bites 327, self 48, marks 81, redact 182/0. At its
+  end a U4d `cargo test -p npt-sim` (pid 11844) was running; counts equal run A's. Next: wait for idle, run C.
+- 12. check.mjs run C (09:57:54-10:00:07 UTC; idle before and after; touch loop; Compiling lines from this path): all
+  10 pass; measured 304, bites 327, self 48, marks 81, redact 182/0. Runs B and C are the two in a row.
+  `--list` (judge + log): 76 tests, the 18 new by name. Hashes before plants: figures.rs c034fc8f…, eval.rs
+  4549e885…, practice.rs 1e59bdea…. Next: plants P1 orphan uncounted (figures.rs), P2 C4 off (eval.rs), P3 ceil_ms
+  floors (practice.rs), P4 empty bite shown (eval.rs), each restored and sha256-checked.
+- 13. Plants, one at a time, in place, `cargo test --no-fail-fast -p npt-judge` after a touch (Compiling npt-judge
+  from this path each time): P1 orphans not counted (figures.rs decoded) -> FAILED
+  u4j_an_empty_comparison_fails_the_run_and_shows_no_bite, pm_0001_17_fails_on_a_difference_the_sentinel_an_orphan_
+  and_nothing_compared; P2 C4's bites-build check off (eval.rs) -> FAILED c4_the_build_matches_the_bite,
+  pm_0001_4_c4_the_build_must_match_the_bite; P3 ceil_ms floors (practice.rs) -> FAILED practice::tests::
+  moved_numbers_round_up_to_the_millisecond, u4j_ws_practice_puts_the_practice_runs_numbers_in_force,
+  u4j_ws_practice_refuses_every_number_not_set_by_its_rules; P4 an empty comparison counted as a failure for bites
+  (eval.rs) -> FAILED u4j_an_empty_comparison_fails_the_run_and_shows_no_bite. All restored: eval.rs 4549e885…,
+  figures.rs c034fc8f…, practice.rs 1e59bdea… (the hashes runs B and C ran on). After the last plant: touch,
+  rebuild, judge + log tests all pass (76), --check-marks 81, fmt clean. Next: the report (DONE after it).
+- 14. Final hashes: marks.json 97c5cab5…, README.md 71e4c637…, SERIES.md e95febab…. No Cargo.toml, Cargo.lock or
+  check.mjs change. 11 files modified, 1 new source file (practice.rs), 21 new fixture files. Report handed back.
+  DONE.
