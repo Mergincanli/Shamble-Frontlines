@@ -14,7 +14,8 @@ through Edit, and rewriting lib.rs (68 KB) whole with Write twice per plant is n
 scratch plant script written with Write (u4c-round2-test/r2-plant.py, loading round 1's u4c-test-plant.py by path):
 the method plan §7.2 names ("the bites planted by a scratch script under §7.1") and round 1 used. Exact-match edits with
 occurrence counts, in place, one at a time, original bytes restored, sha256 checked before and after each; backups in
-the session scratchpad (u4c-r2-backup-*). Notes rewritten whole with Write.
+the session scratchpad (u4c-r2-backup-*). The script waits for quiet BEFORE planting and stops unplanted if none comes
+in 240 s. Notes rewritten whole with Write.
 
 ## Plan
 1. sha256 of every file under spikes/netcode-proof in the copy (start state); the three files vs the fix notes and the
@@ -47,3 +48,13 @@ the session scratchpad (u4c-r2-backup-*). Notes rewritten whole with Write.
   no-packet-threshold, packet-threshold-2, time-threshold-srtt-only, acks-lost-at-profile-rate, event-order-link-first,
   pto-from-oldest-unacked; new: m1-gate-blind, m1-late-1ns, m2-off-by-one, l1-latest-only, l1-time-5-4,
   l2-acks-never-lost, l4-send-no-restart; control clean.
+- 10:02:46-10:07:34Z Step 4, check.mjs COUNTED (r2-plant.py check; 20 s quiet reached after 131 s; touch before and
+  every 2 s; df 12 GB; exit 0): all 10 PASS. fmt 0.4 s; clippy 7.7; clippy-wasm32 0.7; doc 23.9; test 118.4 s
+  measured 289 passed 0 failed 0 skip, bites 316 passed 0 failed 0 skip (= 285 + 4, 312 + 4: the deltas the fix notes
+  expect, :332-334); deps 0.5; refs 0.4 (562); marks 2.5 (81, drafts 626df678); self 1.3 (48/48); redact 0.8 (10/10,
+  158 items, 0 findings). Foreign: 3 samples from 10:07:29Z, wf_f54246ff-e0d-1's `cargo check -p npt-sim` (host, then
+  wasm32), at the test step's end / the last steps (the steps' durations sum to 10:07:28Z for the test step's end); a
+  cargo check of npt-sim writes no npt-l1 test binary, and the counts are the expected deltas: counted. Logs:
+  u4c-round2-test/r2-check.log, r2-check.foreign.log. sha256 -c after: ALL 158 MATCH.
+- 10:07:51Z Plant run "clean": STOP before planting (no 10 s quiet in 240 s: e0d-1 `cargo test --workspace`); sha256 -c
+  ALL MATCH. Retrying.
