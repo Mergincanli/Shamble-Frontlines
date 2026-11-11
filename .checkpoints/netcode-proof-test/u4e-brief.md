@@ -45,7 +45,7 @@ carry by number (u4s-carries.md), a recheck row by R number (section 7), a plan 
   u4j-brief.md:43; W1-TARGET item 3).
 - C21. The notes path confirmed against wave 1's builders (1.3; u4j-brief.md:18).
 - C22. Write and Edit only, in wave 1's words: no shell redirects, heredocs or `python3 -c`; scratch plants in place,
-  restored and sha256-checked; U4e's own bites are compiled in and need no planted copy (section 4; u4j-brief.md:45-48;
+  restored and sha256-checked; U4e's own bites are compiled in and need no planted copy (section 4; u4j-brief.md:46-48;
   plan :510-511).
 - C23. tick16's unit proof reworded: the header carries the full 32-bit tick and the client reads it whole; the bite is
   the writer's (2.6; R11; snapshot.rs:532, :558).
@@ -101,7 +101,7 @@ at :220).
    - plan §5 U4e (:703-734), the sections it builds to: §4.1 (:178-202), §4.2 (:204-248), §4.3 (:250-264), §4.4
      (:266-289), §4.5 (:291-303), §4.6 (:305-327), §4.7 (:329-335), §4.9 (:342-357, the integer half only), §4.11
      (:391-406), §4.14 (:452-475); Lanes (:836-871); §6 (:873-889); §7 (:891-914);
-   - plan.md §4.7 (:569-612): each crate's whole public surface (npt-room :596-598, npt-server :599-600, npt-client
+   - plan.md §4.7 (:568-612): each crate's whole public surface (npt-room :596-598, npt-server :599-600, npt-client
      :609); plan.md:454 (everything else `pub(crate)`); the endpoint's calls (plan.md:485-489);
    - advisor: the U4 verdict's conditions 6 (:125-129), 10 (:143-149) and 12 (:154-158) and nit (d) (:164-165);
      "Rulings (U4s)" (:349-375); "Ruling: F1 and F2" (:401-479), whose F2 part binds U4e (:436-465);
@@ -163,7 +163,7 @@ Each item from plan :705-710, built to the section named.
   a soldier's velocity, ammunition, fire timer, reload left, move speed and fire interval (`OWN_STATE`,
   seam.rs:252-261), index the slot, generation the soldier's. The room sends it only in its owner's own-state section,
   with that owner's `Soldier` record and its effect rows (catalogue :136; `Snapshot::GROUPS`' own-state row,
-  snapshot.rs:490-499). The codec refuses an `OwnState` or `Effect` record in the entity section
+  snapshot.rs:491-499). The codec refuses an `OwnState` or `Effect` record in the entity section
   (snapshot.rs:14-19, :175-180), but it cannot tell slots apart: which slot's records go into client c's own section
   is the room's choice alone (section 3.2, pending). Effect rows' owner: carry 51 (R31).
 - **The window's rate (the F2 ruling, advisor :442-449):** the window's per-tick budget takes the tick rate as an
@@ -367,7 +367,7 @@ passing in the clean build. Wave 1's form for a per-instance bite: proto/tests/b
 | PM-0001-58/lt-tick-offset | the client's rebuild of the header's 16-bit last-run sequence (a plain `<` in place of its wrap-aware compare: §4.14 :469; U4E-Q2 (c)) | the rebuilt sequence names the wrong command (U4g re-shows it as "the replay starts at the wrong command"; -58 is judged after U4g: plan :814-817) |
 | PM-0001-58/lt-event-seq | the client's event-number rebuild (§4.14 :470) | a post-wrap event rebuilt wrong |
 | PM-0001-62/server-echo | the room sending the owner its own cosmetic shot events (§4.14 :473; U4E-Q10 (a)) | one event sent |
-| owner-to-all (catalogue item 5's) | the encoder's class filter: one `owner` group sent to every client (catalogue :251-254) | a test that every own-state record a client receives is its own slot's fails; the L1 audit is U4r's (plan :750). Its id: U4E-Q13. The route the codec leaves open is other slots' own-state records in each client's own section: an owner-only kind in the entity section is refused by `encode` (snapshot.rs:14-19), which shows the codec, not the filter (security's carry, pending: 3.2) |
+| owner-to-all (catalogue item 5's) | the encoder's class filter: one `owner` group sent to every client (catalogue :251-254) | a test that every group a client receives is one its class lets it see fails; the L1 audit is U4r's (plan :750). Its id: U4E-Q13. A code fact for the route: `encode` refuses an owner-only kind in the entity section (snapshot.rs:14-19), so a bite on that route shows the codec, not the filter; for the own-state group the route the codec leaves open is other slots' own-state records in each client's own section (security's carry, pending: 3.2) |
 | PM-0001-21/no-trailing and PM-0001-21/no-channel, through the pump | npt-proto's decode (U4a's sites, quant.rs:40-41, chosen by `Quant::with_bite`, quant.rs:102-113; §4.4 :286-289) | with the bite, the pump's `TrailingBytes` or `WrongChannel` count stays 0, and the pump test fails |
 
 - Bite ids are `PM-<ADR>-<row>/<name>` (check.mjs:689); each id lives in one crate's sources, `crates/<crate>/src/`
@@ -463,15 +463,15 @@ Ten carries (21-27, 39, 50 and 51). Notes for the builder, which change no word:
 - carry 25: a "why not" is reported, never assumed;
 - carry 26: section 5 item 4 says what to report;
 - carry 39: its "check.mjs:627" was the line at U4s; at the head the pass that lets an initializer naming `TICK_HZ`
-  through is check.mjs:637-645;
+  through is check.mjs:637-644;
 - carry 51: at the head no such home exists (R31), so it is raised at your start unless the main session has added it
-  before launch (7.2 item 2).
+  before launch (7.2 item 2);
 - carry 40 (§U4r, carries :192-199) is U4r's; U4e feeds its last sentence with the `rewind_at` count (2.1).
 
 ### 3.2 Pending the advisor's ruling (advisor-u4d-close.md)
-U4d's round 2 proposed these for U4e; the advisor has not ruled on them (advisor-u4d-close.md holds its plan only).
-They are not settled. If the ruling lands before launch, the main session folds it in here; if not, build to the code
-facts this brief states elsewhere and report what you did against each.
+U4d's round 2 proposed these for U4e; the advisor has not ruled on them (advisor-u4d-close.md held only its plan when
+rev 3 was written). They are not settled. If the ruling lands before launch, the main session folds it in here; if not,
+build to the code facts this brief states elsewhere and report what you did against each.
 - **netcode N2-L1, Low** (u4d-round2-netcode.md:78), pending the advisor's ruling (advisor-u4d-close.md): "owner
   routing is the room's; U4e carry with a test (own section names only c's slot; effects index/8)."
 - **netcode N2-L3 (c), Low** (u4d-round2-netcode.md:81-82), pending the advisor's ruling (advisor-u4d-close.md): "U4e:
@@ -516,9 +516,9 @@ binding on every cargo, rustc and rustdoc call in your worktree, check.mjs's inc
      (with `T` and `W` written out in full).
 3. **Provenance** (W1-TARGET item 2, wave1 :574-575): a counted run's log shows "Compiling npt-room (<your
    worktree>/spikes/netcode-proof/crates/room)", and the same for npt-server and npt-client, in each cargo invocation
-   that builds them. check.mjs prints only each step's last line (check.mjs:1640-1646), so the two `--no-run` builds
-   inside the same exclusive lock carry those lines (wave 1's form: u4j-build.md:110-111; u4d-report.md:68-70). A
-   missing line means "not counted", whatever the count says.
+   that builds them. check.mjs prints a passing step's last line only (check.mjs:1646; a failing step's last 40 lines:
+   :1649), so the two `--no-run` builds inside the same exclusive lock carry those lines (wave 1's form:
+   u4j-build.md:110-111; u4d-report.md:68-70). A missing line means "not counted", whatever the count says.
 4. Touch before each build: `find <copy>/spikes/netcode-proof/crates -type f -exec touch {} +` (item 2, :895).
 5. **Counts are deltas** (item 3, :896-897; plan :866-867), on check.mjs's own measure: its test step runs
    `cargo test --locked --workspace` and then the same with `--all-features` (check.mjs:1493-1501), and its count
@@ -547,11 +547,11 @@ binding on every cargo, rustc and rustdoc call in your worktree, check.mjs's inc
 - Never crates/sim, crates/proto, crates/lab (U4d2's alone in wave 2: :861-862; advisor :145-146), crates/log,
   crates/judge and marks/ (U4j's, unmerged), check.mjs (U4d2's in wave 2: :859-860), docs/.
 - Files are written with the Write and Edit tools only, never shell redirects, heredocs or `python3 -c` (wave 1's words:
-  u4j-brief.md:45-46). U4e's bites are compiled into the bites build and chosen per instance (plan :510-511; §4.11
+  u4j-brief.md:46-47). U4e's bites are compiled into the bites build and chosen per instance (plan :510-511; §4.11
   :398-400), so a bite run needs no planted copy. A scratch plant (a defect that is not a bite, to show that a test can
   fail) is planted in place, one at a time, each file restored and its sha256 checked against the clean file
   (u4j-brief.md:47-48; plan §7.2 :908-909), and run under `flock -x`. Run git only in your worktree, never `git -C` or
-  `git -c` (u4j-brief.md:44-45). Commit nothing and push nothing; the main session merges (plan §7.2 :906-909).
+  `git -c` (u4j-brief.md:46). Commit nothing and push nothing; the main session merges (plan §7.2 :906-909).
 - .claude/rules/netcode.md binds proto, room, client and server code (plan :903-904): validate every inbound message
   before use (:10), no unbounded buffer, map or queue keyed by client data (:14-15), send each client only what it may
   know (:16), no clock in shared code (:12-13).
@@ -638,7 +638,7 @@ table missed.
 | R19 | `InputReports::non_finite` removed (NF-D4; advisor :351-364) | U4d | the room logs `reports()` (2.1) | changed: the field is gone (seam.rs:525-542), and `InputReports` also gained `refusals: Vec<Refusal { slot, seq, kind }>`, cleared each step (seam.rs:497-531; the advisor's W1-U4D N-M2); the brief now has the room log the clamp reports, the refusal records and the five counters (2.1) |
 | R20 | `EntityKind::layout()` completed within FIELDS (carry 12) | U4d | the layout table and e1 (2.1, 2.4) | changed: eight kinds, `OwnState` appended last (seam.rs:199-204, `ALL` :289-298; W1-S1); `SOLDIER` is 8 fields, the catalogue's remote row (seam.rs:249); `OWN_STATE` 8 (:252-261); a part's transform relative to its hull (:264-267); `PROJECTILE` 9, `WALL` 2, `EFFECT` 3 (:269-285); FIELDS still 12 (:360). The brief now states the kind and the own-section rule (2.1) |
 | R21 | `TickInput`'s new fields (Lanes :848) | U4d | the room fills them each tick (2.1) | holds: `spawns: Vec<Placement>`, `teleports: Vec<Placement>`, `attributes: Vec<AttributeChange>` (seam.rs:122-127); `Placement { slot: u8, position: [i32; 3] }` (:131-138); `AttributeChange { slot: u8, attribute, value: u32 }` (:142-151); integers only (:108-110) |
-| R22 | `HitVolumes` filled (plan :603) | U4d | the room copies them into `HitHistory` (2.1) | holds: `tick`, `soldiers`, `cover` (seam.rs:385-394); a hand-written `Clone` whose `clone_from` keeps the storage (:413-428), which `HitHistory::push` uses on a full ring (history.rs:59-74), so a push allocates nothing once full; at most 4,536 B a tick (`MAX_BYTES`, :405-406) |
+| R22 | `HitVolumes` filled (plan :602-603) | U4d | the room copies them into `HitHistory` (2.1) | holds: `tick`, `soldiers`, `cover` (seam.rs:385-394); a hand-written `Clone` whose `clone_from` keeps the storage (:413-428), which `HitHistory::push` uses on a full ring (history.rs:59-74), so a push allocates nothing once full; at most 4,536 B a tick (`MAX_BYTES`, :405-406) |
 | R23 | carry 17's button constants (Lanes :848) | U4d | the press-edge compare (2.1) | holds: `Command::FIRE`, `CROUCH`, `SPRINT`, `BUTTONS` (seam.rs:52-58); `PRESS_FIRE`, `PRESS_RELOAD`, `PRESS_THROW`, `PRESS_MELEE` (:62-71) |
 | R24 | the seam freeze (Lanes :846-858, with W1-S1's lift) | U4d | the whole brief (2.7) | holds, with the one lifted change: `git diff df8975b 39f4290 -- spikes/netcode-proof/crates/sim/src/seam.rs spikes/netcode-proof/crates/sim/src/grid.rs` (312 lines added, 31 removed) read line by line: `Command`'s fields unchanged (an `impl Command` block of constants added); `Rewind` and `CoverVariant` unchanged; `EntityRecord`'s fields unchanged, FIELDS 12; `EntityKind` gains `OwnState` last and `SOLDIER` loses velocity (W1-S1's lift, Lanes :853-858); `layout()`'s body completed (H1's part record, the projectile's type and fuse, the wall, the effect rows); `TickInput`'s three fields; `SimEvent`'s variants reformatted, fields unchanged; `InputReports` loses `non_finite` and gains `refusals`; grid.rs: four doc lines only |
 | R25 | check.mjs's steps | U4a, U4d2 | section 5's "every step passing" | holds: 10 steps at 39f4290 (check.mjs:1594-1631); U4d2 may add its `wasm` step in wave 2 (plan :674-675), so the count at U4e's merge is the main session's to state |
@@ -648,7 +648,7 @@ table missed.
 | R29 | npt-link's `Channel`-only rule (catalogue item 2; carry 3) | U4s, U4a | the endpoint's input (2.3) | new: npt-client's (and npt-proto's) sources may name nothing from `npt_link` but `Channel` (check.mjs:809, :821-837; client/Cargo.toml:18-20). So `ClientEndpoint::input` takes (Channel, bytes, arrival_ns), as plan.md:486 has it; npt-server's tests may name `Link` and `Loopback` |
 | R30 | check.mjs's bite-home rule | U4s, U4a | U4e's id lists (2.1, 2.2, 2.6) | new: it reads string literals in `crates/<crate>/src/` only; `tests/` and `#[cfg(test)]` modules are not read (check.mjs:697-758). U4e's sources never spell another crate's id; they pass the caller's id string to `Quant::with_bite`; tests may name any id |
 | R31 | carry 51's public home for an effect row's owner | U4d | the own-state filter (2.1; carry 51) | new, missing: `Scene`'s public items (scene.rs:149-300) have no effect-rows accessor; `effect_rows` is `pub(crate)` (scene.rs:119); the World maps index / rows (world.rs:1879-1881); seam.rs:283 says "its owner is its index / 8". By carry 51, U4e raises it at its start, unless the main session adds it first (7.2 item 2) |
-| R32 | W1-S1's codec half | the main session, in U4d's merge | the own-state section (2.1) | new: both own-state rows list `Soldier`, `Effect`, `OwnState` (snapshot.rs:490-499, :646-655); `encode` refuses a kind its section does not list (`EncodeError::OutOfRange`) and `decode` returns `Malformed` (snapshot.rs:14-19, :175-180); the codec checks the kind per section, never the slot |
+| R32 | W1-S1's codec half | the main session, in U4d's merge | the own-state section (2.1) | new: both own-state rows list `Soldier`, `Effect`, `OwnState` (snapshot.rs:491-499, :647-655); `encode` refuses a kind its section does not list (`EncodeError::OutOfRange`) and `decode` returns `Malformed` (snapshot.rs:14-19, :175-180); the codec checks the kind per section, never the slot |
 | R33 | the bite-list pins in tests | U4s, U4b | U4e's id lists (2.2, 2.3) | new: client/tests/bites.rs:10 pins `npt_client::BITES` at its one id, so U4e's two client ids change that pin (U4e's file); server/tests/schedule.rs:347 pins `npt_server::BITES` at PM-0004-67's three, which U4e leaves as they are (2.2) |
 | R34 | the header and the event section as built (W1-N2) | U4a | the encoder, the client's rebuilds, carry 50 (2.1, 2.3) | new: `Snapshot { tick: u32, baseline_age: u16, newest_received: Option<u16>, last_run: Option<u16>, group, groups, own, entities, events: Vec<(u16, u8, SimEvent)> }` (snapshot.rs:443-463); the wire text (snapshot.rs:21-35): an event's number is its low 16 bits and its age 8 bits; `FullState { tick, last_run, own, entities }`, no baseline and no events (:630-639) |
 | R35 | the records-to-volumes function and the static graph (W1-U4D A-M1; W1-PUB) | U4d | the ring and AreaFlood (2.1) | new: `World::hit_volumes_from` (world.rs:874-891) is the one function from records to volumes; the room pushes the world's own `hit_volumes()` (seam.rs:557) and rebuilds none. The static graph: `World::greybox()` (world.rs:967) or `Greybox::dm_tri()` (greybox.rs:83), with `areas()` and `portals()` (greybox.rs:166, :171) |
