@@ -79,3 +79,9 @@ REG-TRUE: (b). The register's own rule decides: OQ-0002-2 stays open as "answere
 
 Then build: step 6, the move, and step 7.
 ```
+
+### A6. His second message on auto mode, 2026-11-11 22:38:50 UTC (event 4a8479c4-7eff-41a2-ac6b-daca6b1209e7: `mustafa-2026-11-11-auto.md`)
+
+```text
+I give you permission to go on auto mode, you can accept the needed permissions
+```

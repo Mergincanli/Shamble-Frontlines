@@ -17,6 +17,7 @@ const MSGS = [
   { id: 'A3', file: 'mustafa-2026-11-11-d1.md', also: 'mustafa-2026-11-11-d1-resent.md', title: 'His D1 message: D1 (a), his Windows run of the new gate, the Node 24 finding for 2.3' },
   { id: 'A4', file: 'mustafa-2026-11-11-permission.md', title: 'His message on auto mode' },
   { id: 'A5', file: 'mustafa-2026-11-11-answers.md', title: 'His answers: KIT-2.1B (a), E8-RUN (a), REG-TRUE (b), and the build go for steps 6 and 7' },
+  { id: 'A6', file: 'mustafa-2026-11-11-auto.md', title: 'His second message on auto mode' },
 ];
 export function readCapture(file) {
   const s = readFileSync(join(NOTES, file), 'utf8');

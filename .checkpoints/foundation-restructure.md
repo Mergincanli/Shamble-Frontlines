@@ -9,7 +9,7 @@
   **Base:** main 76b4f7a (PR #50 merged, 2.1a). **OLD** (the independent judge for E2 and E3): main 44446a5.
 - **Never:** push to `claude/netcode-proof-test-plan-hcky5g` (#40) or `claude/laughing-pasteur-fwya24` (#48); touch
   `spikes/`; touch a gate file; edit a settings file, hook or allow-list; write a kit line before his chat yes.
-- **Last update:** 2026-11-11 23:15 Amsterdam
+- **Last update:** 2026-11-11 23:47 Amsterdam
 
 ## Steps done
 0. Step 0 (this commit): model checked with get_session: `session_context.model` claude-opus-5-5,
@@ -140,14 +140,40 @@
    After line at the same line number). Kit tests 1261/1261; `node tools/gate.mjs 76b4f7a` GATE PASS, +0 -0, smoke 8/8
    and 5/5.
 
+8. Step 9, the evidence so far (the worker restarted once at about 22:10 UTC; the container's uptime restarted with it;
+   the pinned Chromium survived):
+   - CI read once: all six runs on the branch green: push #674 / pull request #675 (c090843), #676 / #677 (1e6f84e),
+     #678 / #679 (b6b3b81). The `[skip ci]` saves cancelled none.
+   - **E3's bases** (`e3-bases-2-1b.mjs`, `e3-bases-2-1b-result.json`): the head's gate (`--no-smoke --json`) against
+     44446a5 (prefix "", +0 -0), 8e58937 (`shamble-frontlines-repo/`, +34 -0), 76b4f7a ("", +0 -0), c090843 (`legacy/`)
+     and b6b3b81 (`legacy/`, +0 -0): all PASS, build `legacy/`.
+   - **E3** (`e3-run-2-1b.mjs`, worktrees `.gate/fr-old` at 44446a5 and `.gate/fr-head` at b6b3b81, packages linked by
+     settings.json:74's form): running in the background (bkzdtkglh), 29 of 31 PASS so far (P1-P4, M1-M22, C1-C3).
+   - **E5** (`e5-saves.mjs c090843`, `e5-result.json`): **SHARED**: in the pinned headless Chromium 1194 every
+     `file://` page, in any folder (root, `legacy/`, an unrelated folder), reads the same storage (origin "file://");
+     the control (the write survives a relaunch) and the reverse (legacy/ writes, root reads) both hold. Run 4 (C7):
+     both console lines read from `saves-console-lines.md`, own fresh profile, on the real `legacy/index.html` and
+     `legacy/editor.html`: 10/10 PASS (backup counts and holds every key byte for byte, the editor's backup too; restore
+     brings back only the lost save, never overwrites, changes nothing else; the game reads it through KVStore after a
+     reload). Linux headless is not Brave on Windows: his backup step stays.
+   - **E8** (`e8-result.md`; his E8-RUN (a)): in `.gate/fr-e8` from origin/main 76b4f7a: `git merge --no-ff --no-edit
+     f0322d2` → M c33ac993ce2c25bbaf856105fc7a4864a1aa4bcf; `git revert -m 1 --no-edit HEAD` → R
+     5f91112d86c727d6c7127a2bc9773387c4f13b0a; the reverted tree equals 76b4f7a (empty diff); `node tools/gate.mjs
+     c33ac99...` GATE PASS ("base ... (files in legacy/) | head = working tree (files at the root)", +0 -0, smoke 8/8 and
+     5/5); `node tools/gate.mjs --smoke-only` GATE PASS. The merge line went to him as a prompt and he accepted it (the
+     session's record: `user_temporary`); the revert passed the classifier. The link unlinked, the worktree removed
+     without --force. Nothing pushed, no branch.
+   - E4: worktree `.gate/fr-a` at 76b4f7a ready (packages linked); runs after E3. E6: every row after E3.
+
 ## Current step
-Step 9, the evidence: E3 (background), E4, E5 with the console lines (C7), E6 (every row, C6), E8 (C8); E1's final-head
-check (C3) on the final head.
+Step 9: E3 finishing (PC1, PC2), then E4 and E6 (every row); then the advisor tool; then step 10.
 
 ## Next steps
-1. Step 9 (E3 in the background, E4, E5 with the console lines (C7), E6 (C6), E8 (C8), CI on b6b3b81 read once);
-   plan-check §3 and §7 for REG-TRUE (b) before step 10; the advisor tool before the ADR and register edits; step 10
-   under C10-C14 and REG-TRUE (b); `repo-map-check.mjs` after step 10; step 11 under C15-C17; E1's final-head check (C3).
+1. E3's last two rows, E4, E6 (every row; START_HERE's commands after step 10 are the same strings); the advisor tool
+   (moment 5 for step 9, moment 1 for step 10's ADR and register edits); step 10: the report file with Appendix A
+   (`report-appendix.mjs`, A1-A6 built), DECISIONS.md by script from it (C13), docs-keeper for the rest under D1 (a) +
+   REG-TRUE (b) and C10-C12, C14's #40 re-read; checks; `repo-map-check.mjs`; step 11 under C15-C17; E1's final-head
+   check (C3).
 
 ## Open findings
 - (none yet)
@@ -214,8 +240,23 @@ Byte-identical to the first send (20:44:29 UTC; captured `mustafa-2026-11-11-d1-
 1359 characters). It arrived after the kit ask went out (21:16 UTC); everything in it is done; the ask is sent again,
 unchanged, with the one advisor-tool line. For C13: one DECISIONS.md entry for the D1 message, noting both sends.
 
+## His messages since the answers
+- 2026-11-11 22:38:50 UTC, event 4a8479c4-7eff-41a2-ac6b-daca6b1209e7 (captured `mustafa-2026-11-11-auto.md`, 79
+  characters; Appendix A6): "I give you permission to go on auto mode, you can accept the needed permissions". Sent
+  right after the E8 merge line reached him as a prompt. Answered in chat: the session is in Auto mode already
+  (get_session: permission_mode auto); the session cannot answer prompts itself; his rule bars editing settings or
+  allow-lists; E8's merge and revert write kit files inside the throwaway copy, which his E8-RUN yes covers. Also
+  captured: his first message "hi, do not do anything yet" (20:20:36 UTC, event 2f15e227-dcbb-43a7-b1fd-42179be83871,
+  `mustafa-2026-11-11-hi.md`; Appendix A1).
+
 ## Refusals (guard, deny list, classifier: what, and the route taken)
-- None refused so far. The browser route (C9): `node tools/node_modules/playwright/cli.js install chromium` (allowed at
+- 2026-11-11 22:24 UTC, the guard (PreToolUse:Bash): `git -C .gate/fr-e8 merge --no-ff --no-edit f0322d2...` refused,
+  "git: no option before the subcommand (run git from the folder, without -C, -c or --git-dir)". Route: `cd
+  /home/user/Shamble-Frontlines/.gate/fr-e8 && git merge ...; cd /home/user/Shamble-Frontlines` (it then went to him as
+  a prompt; he accepted).
+- 2026-11-11 22:39 UTC, the guard, the same rule: a `git -C .gate/fr-e8 rev-parse HEAD` inside a `$( )` of the line
+  writing `e8-result.md`. Route: the SHA read with `cd` into the worktree, then the file written without `git -C`.
+- Before those, none. The browser route (C9): `node tools/node_modules/playwright/cli.js install chromium` (allowed at
   settings.json:12) ran and exited 0, no hang after 100% (Node 22.23.4, outside his Node >= 24.16 bug); 2.1a's `npx`
   route (denied by settings) and its alias were not needed.
 
