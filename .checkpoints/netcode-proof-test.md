@@ -20,10 +20,17 @@ erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md.
   39f4290 (report u4d-report.md); CI green on each. Main merged in at 5ca77eb (PR #49). **U4j: 4d2b0ef (the merge)
   and d50396a (round 2's wording), pushed together** (u4j-build.md, "Merge into the spike branch"). At d50396a:
   check.mjs 10 steps, measured 396, bites 443, self 52: the base counts for the next lanes, U4e's `<base>` included.
-- **Running:** no agent. The saver, restarted after U4j's push (about 20:15 UTC, 110 minutes): `node
-  .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5
-  <noreply@anthropic.com>" --trailer "Claude-Session: https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"`. Stop it
-  before a merge's apply and restart it after the push, as at U4j's. U4d-F waits its turn.
+- **Running:**
+  - the advisor's check of the U4e brief rev 3.2 (a general-purpose agent, opus, xhigh, in the background, started
+    about 20:25 UTC; its brief advisor-u4e-brief-brief.md, its file advisor-u4e-brief.md; on its return read the file
+    in full: it rules on a brief's tests and bites). If it is cut, start it again from its brief file.
+  - TE2-5 (b)'s ten runs (te2-5-runs.sh; logs .gate/te2-5/run1.log to run10.log; runs 1 and 2 exit 0 by 20:25 UTC).
+    If cut, run the missing ones; each run's result is its exit code and the "test result:" lines.
+  - the saver, restarted after U4j's push (about 20:15 UTC, 110 minutes): `node .claude/scripts/checkpoint.mjs watch
+    netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
+    https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"`. Stop it before a merge's apply and restart it after the
+    push, as at U4j's.
+  - U4d-F's run A starts when TE2-5's runs end (its route: the U4d-F block below).
 
 **The three cut workflows, and what to do with each when the hold lifts.** Scripts are under
 /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/. A resumed
@@ -66,6 +73,15 @@ ones run again.
      diff in the worktree before it changes anything; pass or fail by the exit code and the test runner's own summary
      line, never a grep; long output to files under .gate/. Its review starts from a packet cut by review_packet.py.
    - It merges before U4d2's brief is final; U4d2 pins only U4d-F's recordings (carry 52).
+   - **The new route (2026-11-11 about 20:30 UTC), in place of resuming wf_9ce88fa3-452:** run A, the build: a new
+     workflow, four fresh general-purpose builders (opus, xhigh) in turn in that worktree, no isolation, one per step
+     group (0-1, 2-3, 4-5, 6-7 with the End checks), each reading the notes and the diff first; every cargo and
+     check.mjs run through u4df-run.sh (the lane lock, shared, or `-x` for counted, check.mjs and bite runs; logs under
+     .gate/u4df/); TE2-5's rule and B6's plant rule in its brief. Then the main session cuts the review packet
+     (review_packet.py with a u4df-packet.json, diffs against the base copy .gate/u4df-prefix, a worktree at dad9566).
+     Run B, the review: netcode-architect read only, then test-engineer proves, from the packet; their agent types have
+     no Edit tool, so each rewrites its notes whole with Write and saves each planted file's diff beside its run (B6).
+     Run A starts when TE2-5's ten runs end (a builder waiting on their exclusive lock could hit its Bash timeout).
 
 **The advisor's text batch: APPLIED by the main session (2026-11-11 about 16:50 UTC, no agent, as Mustafa asked after
 his /compact).** `python3 -I .checkpoints/netcode-proof-test/text_batch.py` (its dry run first) copied every block and
