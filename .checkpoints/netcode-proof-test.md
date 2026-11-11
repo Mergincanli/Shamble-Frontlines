@@ -3,193 +3,104 @@
   (`.checkpoints/netcode-proof-test/plan.md`, revision 3.3; approved by the advisor and Mustafa, 2026-11-06) · verdict:
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
-  **Base:** main, last merged in at df8975b (main 44446a5, kit-v3-4)
-- **Last update:** 2026-11-10 about 07:55 Amsterdam (the resume card; U4a built and in review with U4b; U4d and U4c
-  building)
+  **Base:** main, last merged in at 5ca77eb (main bb2d817, PR #49, the STATUS split)
+- **Last update:** 2026-11-11 about 10:20 UTC (the card refreshed: U4j built and in review, U4c in round 2, U4d in its
+  fix pass; night items 4 and 5 folded)
 
 ## Resume card (read this first; open the rest only when a step needs it)
-**The current step: U4 wave 1** (u4-build-plan.md rev 2, sha256 0d69332c…, approved with conditions; advisor-u4.md).
-- **U4s:** merged (f080551). **Main:** merged in (df8975b).
-- **U4a, the wire (npt-proto):** built, not merged.
-  - all 10 steps pass twice: measured 296 = 275 + 21, bites 321 = 292 + 29, self 52 = 48 + 4;
-  - carries 1-5 and 34 met; no seam change;
-  - worktree `.claude/worktrees/agent-a9297644e7c0354f3` (base dffef0e); notes u4a-build.md; snapshot wip/u4a.patch.
-- **U4b, the loop policy (npt-server's schedule.rs):** built by the main session, not merged.
-  - all 10 steps pass twice: measured 285 = 275 + 10, bites 308 = 292 + 16; carries 6 and 35 met;
-  - worktree `.gate/u4b-wt` (base 4b5812a); record u4b-build.md; snapshot wip/u4b.patch.
-- **The U4a + U4b review, round 1 of 2:** workflow wf_4153791e-ba1, resumed 10:05 after the 07:3x spend-limit cut
-  (task wum1henzm). Notes u4ab-review-{netcode,security,rust,test}.md.
-  - **Done:** netcode-architect, APPROVE WITH FINDINGS for both; security-auditor, APPROVE WITH FINDINGS for U4a.
-    - **Before U4a merges:**
-      - N1, Medium: encode never applies Limits::SNAPSHOT (1,000 B); content_limit gives the 1,150 B receive cap to
-        both sides. Fix in msg.rs, with a 1,000/1,001 B test.
-      - N2, Medium: the snapshot header carries 16-bit command sequences where §4.4 and §4.14 say tick offsets. The
-        sequences are the better choice; record it in the catalogue and U4a's report; §4.14's -58 row changes. A
-        plan text edit: the advisor rules on it (condition 12).
-      - N8, Low: the catalogue edits the builder listed (item 3's note, the codec maxima, the header fields, the event
-        form, the proposals). The main session makes them at the merge.
-    - **After U4d merges, before U4e's brief goes out:** S1 holds, and SEC-U4a-1 is its security side. The fix: an
-      owner-only record kind in npt-sim (velocity, ammo, fire timer, reload, active reload; velocity leaves SOLDIER);
-      U4a's half is two lines (the kind joins the own-state rows of both GROUPS tables). It goes in the main session's
-      commit, with the advisor.
-    - **Lows:** N3-N7 and U4b-L1 (the time origin for U6), follow-ups.
-  - **Round 1 complete:**
-    - rust-reviewer and test-engineer: REVISE for U4a, for the send cap alone; APPROVE WITH FINDINGS for U4b (Lows).
-    - All four reviewers name the send cap as U4a's one blocking fix. Security marks S1 (SEC-U4a-1) as before the
-      merge; the other three say after U4d. It goes to the advisor with all four views.
-  - **The U4b fix pass:** done by the main session (u4b-build.md, "Round 1 and its fix pass"): T-B1's new test (its
-    plant fails it by name), T-B3, T-B2. 11 clean tests, 17 bites.
-  - **The U4a fix pass, then round 2 on what changed:** workflow wf_5a059972-5c8 (task w0yg500x5).
-    - The fixer works in U4a's worktree: the send cap, the single "no ack" encoding, Debug redaction, the never-0
-      guard's test, a nit, and the N2 record.
-    - Then rust-reviewer, test-engineer, netcode-architect and security-auditor, one at a time, on the diff against
-      the pre-fix copies `.gate/u4a-prefix` and `.gate/u4b-prefix` (remove both after the merge).
-- **U4d (the stand-in sim):** built and not merged.
-  - check.mjs twice: measured 304 = 275 + 29, bites 327 = 292 + 35.
-  - Carry 13 is partly met: a counting allocator is impossible under `unsafe_code = "forbid"`, so a storage-identity
-    test stands in. The freeze stopped nothing.
-  - **Its slip:** at 06:38 a backgrounded `cd` chain ran check.mjs in the main folder. It wrote only 408 build files
-    into the main folder's gitignored `.gate/netcode-proof-test/target`; `git status` is clean.
-  - **Its shared-target lesson:** cargo's build records do not tell copies apart, so keep touching the crate files
-    every 2 s during a run. The test-engineers' prompts now say so.
-  - **Round 1 complete** (u4d-review-{netcode,rust,arch,test}.md):
-    - netcode-architect: REVISE, one High (vehicle parts written as world transforms that change every tick, not
-      travelling with their parent) and five Mediums (the stress scene's magazine runs dry in an S30; press counters
-      against condition 1's wording; the fired flag; vehicles and stand-in projectiles not "in the fight"; effect rows
-      changing every tick).
-    - test-engineer: REVISE, five Mediums (ES out of two PM-0001-2 bands, untested; the 1 MB cap as 2^20 where
-      PM-0001-7 judges 10^6; D-9's "by its fraction"; prediction on a catch-up tick; load_movers).
-    - rust-reviewer: APPROVE WITH FINDINGS, 2 Medium and 9 Low. engine-architect: APPROVE WITH FINDINGS, 2 Medium,
-      the gaps U4g and U4h will hit, tied to S1.
-  - **U4d's fix pass is running** (workflow wf_a8ff8550-67d, task wihgj9fvm), to the advisor's W1-U4D and W1-S1's
-    npt-sim half. Its pre-fix copy is `.gate/u4d-prefix`.
-  - **U4d's round 2** waits for U4a's merge and the main session's npt-proto half of S1. It runs on the combined diff
-    in a scratch worktree, with the security-auditor added for S1's part.
-- **The advisor's wave-1 rulings: done** (advisor-u4-wave1.md, 626 lines, with the exact words for every text
-  change).
-  - **The order:** U4b merges as it is. U4a merges after its round 2, before the S1 fix. U4d merges after U4a.
-  - **W1-S1:** an owner-only record kind in npt-sim; the freeze is lifted for exactly this change, in U4d's fix pass.
-    - npt-proto's half belongs to the main session, in U4d's merge commit after U4a merges: the kind joins both GROUPS
-      tables' own-state rows; the codec refuses a kind its section's rows do not list (this closes SEC-U4a-2); the
-      GROUPS test is extended; the -57 bites test sends the new record.
-    - Lanes gets a "Lifted for one change" sentence.
-  - **W1-U4D:**
-    - Fix now: H1, N-M1, N-M3 = T-M4, N-M4, N-M5, R-M1 = T-M5, A-M1, T-M1, T-M2, T-M3.
-    - The press counters: the build is right. Condition 1's words are amended, §4.2's and §4.10's words change, and
-      InputReports gains per-command refusal records; there is a new U4f carry and a new reading.
-    - A-M2 is carried to U4g. The tuning is approved with conditions. Carry 13's counting-allocator half goes to U5.
-  - **W1-N2:** approved, with new words for §4.4 and §4.14. -58's whole judged set moves from U4r to U4g. marks.json's
-    lt-tick-offset text changes in U4j's brief. A reading, and a new U4e carry: no event ages past 255 ticks.
-  - **W1-PUB:** all approved; nits.
-  - **W1-U4E:** Q1-Q11 answered; the brief's rev 3 carries them with W1-S1, W1-N2 and the new U4e carries.
-  - **W1-PLAN:** SQUASH-CITES and TCP-FREEZE confirmed, with new words.
-    - plan.md:1436-1438 changes.
-    - ws-reconnect.md's `.checkpoints/` cites at 95a04a1 (:26, :74) must point at a kept copy: the closing report's
-      appendix.
-    - The U8 row and §15's R-25 row change for TCP-FREEZE.
-  - **W1-TARGET, for wave 2:**
-    - a `flock` lock on `.gate/shared-target/.lane.lock` (shared for builds, exclusive for counted and bite runs);
-    - a provenance check: the log shows "Compiling <crate> (<this copy's path>)";
-    - at least 4 GB free before a wasm32 or release build;
-    - `cargo clean --target-dir .gate/shared-target` between waves.
-  - **The plan text edits** (plan.md, u4-build-plan.md, u4s-carries.md, advisor-u4.md's amendment line) are the main
-    session's, with the advisor's words, at the next natural stop.
-- **U4c (the link model):** built and not merged.
-  - netcode-architect and rust-reviewer: both APPROVE WITH FINDINGS. The rust Medium: one test cannot catch a fault
-    in `next_event_ns`.
-  - Its test-engineer: re-running in the same workflow.
-  - Notes u4d-build.md, u4c-build.md and u4c-build/; snapshots wip/u4d.patch and wip/u4c.patch, refreshed 10:06.
-- **U4j (the judge and marks change):** not started. Its brief is ready (u4j-brief.md): the first free slot, or the
-  main session.
-- **Agents:** 3 at most, reviewers included. Now: 2 in wf_f54246ff-e0d and 1 in wf_4153791e-ba1.
-- **Night work (issue #16):**
-  - items 2 and 3 done: the U4e brief draft, rev 2, at `cs/npt-u4e-brief` 0dccbf0; the U4s skeptic check at
-    `cs/npt-u4s-skeptic` 6652be4, nothing Critical or High, S1 Medium, 11 Lows;
-  - items 4 (the U4r brief) and 5 (the U3d skeptic check) are queued for tonight.
-
-**NOW, 2026-11-10 about 20:40 UTC (after the container restart; the spend limit cut the fixers about 16:25 UTC and
-reset at 20:00):**
-- **U4b MERGED at 411eeee** (pushed): check.mjs all 10 steps, measured 286 = 275 + 11, bites 309 = 292 + 17, self 48;
-  gate PASS --no-smoke. wip/u4b.patch was deleted in that commit.
-- **U4a MERGED at 952f734** (pushed; about 20:45 UTC): check.mjs all 10 steps, measured 311, bites 342, self 52;
-  gate PASS. wip/u4a.patch was deleted in that commit. CI was green on 411eeee (U4b) and on 952f734 (U4a).
-  - The merge checks' output file mixed two overlapping runs; both exited 0.
-  - **The clean evidence:** a fresh run on 17a8b2c (952f734 plus checkpoint notes only) passed all 10 steps: measured
-    311, bites 342, self 52 (scratchpad post-u4a-check-952f734.txt).
-  - Housekeeping later, by the approved method (leftovers to a local branch, then a plain `git worktree remove`):
-    `.gate/u4a-prefix`, `.gate/u4b-prefix`, `.gate/u4b-wt`, `.claude/worktrees/agent-a9297644e7c0354f3`.
-  - **Next merges:** U4c after its round 2. U4d after its fix pass, then the main session's npt-proto half of S1 in
-    a scratch worktree, then round 2 on the combined diff (with the security-auditor for S1), then the merge.
-  - **The plan text edits** (W1 rulings with the advisor's words, plus NETEM-BAR (a) in the U8 row): give them to an
-    agent when a slot frees, then a test-engineer check, as with the U4 conditions.
-- **(Done) U4a's merge, as it stood at 20:40:**
-  - `wip/u4a.patch` (the fixed copy) is applied, with three catalogue edits: the Input row's codec maxima (5, 23, 19,
-    161 B); §3's header row as built, in W1-N2's words; §6 item 3's U5 note.
-  - check.mjs and the gate are re-running (task bdu2c9yb1; scratchpad merge-u4a-check.txt and merge-u4a-gate.txt).
-    The first run was killed by the restart. Expect measured 300 + 11 = 311, bites 325 + 17 = 342, self 52.
-  - Then commit with `git rm` of `wip/u4a.patch`, and push.
-  - N8's last items (the event wire form; the proposals for Leave, ClientSettings, the peer set and SessionStatus):
-    a follow-up, Low.
-- **SAVE at about 20:50 UTC (Mustafa at 91 % usage):** snapshots refreshed: wip/u4d.patch (14 files), wip/u4c.patch
-  (3 files), and **wip/u4j.patch** (29 files, base 411eeee). U4j's worktree is
-  `.claude/worktrees/agent-a3b8dfeb01ed52b50`, with notes u4j-build.md, copied to this folder.
-  - To resume U4j: SendMessage to its agent; or, if the worktree is gone, a fresh builder at 411eeee applies
-    wip/u4j.patch and continues from u4j-build.md.
-- **Resumed at 20:36:**
-  - U4d's fixer (wf_a8ff8550-67d, task wsnzz9qtq);
-  - U4c's fixer and its round 2 (wf_610486f7-cc1, task w11llknmp);
-  - **U4j's builder** (an Agent in its own worktree; brief u4j-brief.md, plus W1-N2's marks change and the
-    shared-target lessons; base 411eeee).
-- Their snapshots, taken at 20:35, are unchanged since 16:05.
-
-**SAVE POINT, 2026-11-10 about 16:05 UTC (Mustafa at 92 % usage):**
-- **U4b's merge is in progress in the main folder.** `wip/u4b.patch` (the fixed U4b, with tests/schedule.rs at
-  05e2068b) is applied, uncommitted: crates/server's lib.rs, clippy.toml, src/schedule.rs, tests/schedule.rs.
-  - check.mjs and the gate were running (task bvya54bq9; outputs in the scratchpad, merge-u4b-check.txt and
-    merge-u4b-gate.txt).
-  - On resume, if they are lost: re-run `node spikes/netcode-proof/check.mjs` (expect measured 286 = 275 + 11, bites
-    309 = 292 + 17) and `node tools/gate.mjs --no-smoke`.
-  - Then commit "U4b: the loop policy …" with `git rm .checkpoints/netcode-proof-test/wip/u4b.patch` in the same
-    commit (WIP-CLEAN), and push.
-- **U4a: round 2 complete, ready to merge after U4b** (wf_5a059972-5c8).
-  - All four reviewers APPROVE WITH FINDINGS, Lows only: R2-L1, R2-T1, R2-N2a; for U4b, R2-T2. Under the budget these
-    are follow-ups; there is no third round.
-  - The fixer's counts: measured 300, bites 325, self 52.
-  - The merge: apply `wip/u4a.patch` (the fixed copy), and in the same commit make the catalogue edits N8 lists (item
-    3's note, the codec maxima, the header's sequence fields per W1-N2, the event form, the proposals) and delete
-    `wip/u4a.patch`. Then check.mjs and the gate.
-- **U4c: fix pass, then round 2, running** (wf_610486f7-cc1). Pre-fix copy: `.gate/u4c-prefix`.
-- **U4d: fix pass running** (wf_a8ff8550-67d). Pre-fix copy: `.gate/u4d-prefix`. Its round 2 comes after U4a's
-  merge and the npt-proto half of S1.
-- **Resume the workflows:** `Workflow({scriptPath: <the run's script under /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/>, resumeFromRunId})`:
-  - npt-u4c-fix-round2-wf_610486f7-cc1.js;
-  - npt-u4d-fix-wf_a8ff8550-67d.js.
+**The current step: U4 wave 1** (u4-build-plan.md rev 2, sha256 0d69332c…, approved with conditions; advisor-u4.md;
+the advisor's wave-1 rulings, with the exact words for every text change: advisor-u4-wave1.md). The card's blocks of
+2026-11-10 (the wave-1 list, NOW, SAVE, SAVE POINT, the next three actions of then) are in history.md, "Running work,
+U4 wave 1", moved by card_refresh.py.
+- **Merged:** U4s (f080551), U4b (411eeee), U4a (952f734); CI green on 411eeee and 952f734. Main merged in: kit-v3-4
+  (df8975b) and PR #49, the STATUS split (5ca77eb, by merge_status_split.py, as Mustafa asked on 2026-11-11).
+- **U4c, the link model (npt-l1):** fix pass done (u4c-build.md, "Fix pass, round 1": 289/316). **Round 2 running**
+  (workflow wf_610486f7-cc1, task wnhyzoit8, resumed 09:49):
+  - rust-reviewer done: no Critical, High or Medium open; two Lows (R2-A, a jitter figure in time_threshold's doc;
+    R2-B, drive() hangs rather than failing by name if next_event_ns keeps naming a past instant), follow-ups;
+  - test-engineer running (u4c-round2-test-engineer.md); then netcode-architect.
+  - Copy `.claude/worktrees/wf_f54246ff-e0d-2` (base 097f897); pre-fix copy `.gate/u4c-prefix`; snapshot
+    wip/u4c.patch (09:48).
+  - Next: settle round 2 within the budget (a third round only for an open Critical or High); re-snapshot; merge
+    (apply the patch; check.mjs and the gate; `git rm` the patch in the same commit).
+- **U4d, the stand-in sim (npt-sim):** **fix pass running** (workflow wf_a8ff8550-67d, task w88v1bd02; its third
+  agent, a2d9a2fa43ad73d4e, since 09:49), to W1-U4D and W1-S1's npt-sim half.
+  - Done before the cut (u4d-build.md, "Fix pass, round 1"): F1-F6, measured npt-sim 47 and bites 55, 29 plants each
+    failing by name, all restored to their sha256.
+  - Copy `.claude/worktrees/wf_f54246ff-e0d-1` (base 097f897); pre-fix copy `.gate/u4d-prefix`; snapshot
+    wip/u4d.patch (09:48).
+  - Next: the main session's npt-proto half of S1, in a scratch worktree: the kind joins both GROUPS tables'
+    own-state rows; the codec refuses a kind its section's rows do not list (this closes SEC-U4a-2); the GROUPS test
+    is extended; the -57 bites test sends the new record. Then round 2 on the combined diff (with the
+    security-auditor for S1). Then the merge.
+- **U4j, the judge and marks change:** **built** (agent a3b8dfeb01ed52b50, done about 10:02): all 10 steps pass twice
+  (measured 304 = 286 + 18, bites 327 = 309 + 18, self 48 of 48); its four plants fail by name. Copy
+  `.claude/worktrees/agent-a3b8dfeb01ed52b50` (base 411eeee); notes u4j-build.md; snapshot wip/u4j.patch (10:05).
+  - SIZE-CHECK: about 2,860 lines added for its size M (code 1,330, tests 1,030, marks.json and docs 370, fixtures
+    130): not well past its plan, so no stop.
+  - **Review round 1 running** (workflow wf_1ea8a0dd-fee, task wt62a1yrv): netcode-architect, security-auditor, then
+    test-engineer, one at a time; notes u4j-review-{netcode,security,test}.md.
+  - Its fix pass, if any: by its builder (SendMessage to a3b8dfeb01ed52b50), in its copy.
+  - At its merge, the main session's: u4-build-plan.md §4.1 gains U4j's public items (`TickRecord.hs`,
+    `set_hashes`, `hashes`; `marks::BoundNumber`, `Check.ws_bound`, `Rule::WsPractice`; `Outcome::Empty`,
+    `fails()`; `Lack::Empty`); the builder's readings (a)-(f) go to the advisor with the reviewers' views.
+  - Then U4c's L-c8 judged re-run on U4j.
+- **Agents (3 at most):** U4c's reviewer, U4d's fixer, U4j's reviewer.
+- **Night work (issue #16):** all four items done: 2 and 3 on the night of 2026-11-10; 4 and 5 last night, from 02:16
+  Amsterdam. The queue is empty: post tonight's items this evening.
+  - **4, the U4r brief:** rev 2 at `cs/npt-u4r-brief` ed973c9 (1,007 lines). netcode-architect's check: 8 Medium and 8
+    Low, all fixed in rev 2.
+    - 12 open questions for the advisor; U4R-Q1 blocks the bots (npt-lab has no npt-bots dependency, and no unit owns
+      that manifest edit).
+    - 34 rows to recheck against U4c, U4d2, U4e and U4j; 12 day runs (D1-D12).
+    - It goes to the advisor once U4r's dependencies merge.
+  - **5, the U3d skeptic check:** `cs/npt-u3d-skeptic` 558fc0e. No Critical or High; 4 Mediums (NA1 = TE1, TE2, NA4,
+    NA5) and 8 Lows, follow-ups for U3d's report.
+    - NA1's proof, run here (na1-output-20261111.txt): at E 9,999 ns (a PASS), -3's p99.9 fails in 49.7 % of
+      2,000 seeds. The finding holds.
+    - NA1 (R-31's wording plus a U3D-MISS case) and NA5 (C-U8-6: read while the socket is bound; a missing row makes
+      the leg INVALID) change ruled text: to the advisor with the plan text edits.
+    - TE2-TE4's plants need a quiet shared target: after wave 1's merges.
+  - **NS-START, the evidence (b) asks for:** get_trigger at 10:00 UTC today.
+    - The routine reads `CRON_TZ=Europe/Amsterdam 10 0-7 * * *`, updated 2026-11-10 20:48 UTC.
+    - Last run 06:17 UTC, SUCCEEDED; next 23:10 UTC.
+    - Last night's 00:10 and 01:10 Amsterdam runs left no comment.
+    - A likely cause, unproven: this session's agents hit the account's spend limit at about 21:20-21:30 UTC, and the
+      night shift runs on the same (university) account; the first run that worked fired at 01:16 UTC.
+    - STATUS on main still says `10 0-6`, set 18:00 UTC: one change behind (docs-keeper's, on main).
 
 **The next three actions**
-1. **When the U4a + U4b review returns:** a fix pass within the budget (two rounds at most; Medium and Low become
-   follow-ups).
-   - Then merge U4b, then U4a, into the main folder: one at a time, on committed state, by
-     `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py` then `git apply`, check.mjs and the gate.
-   - Delete each one's wip patch in its merge commit (WIP-CLEAN). Give each unit's size in three lines if it ran well
-     past its plan (SIZE-CHECK; U4a: 5,500 lines for S-M).
-2. **When wf_f54246ff-e0d returns:** fold U4d's and U4c's reports, run their fix passes, and merge them one at a time.
-   - Then U4j (u4j-brief.md), then U4c's L-c8 judged re-run on U4j.
-   - Then wave 2: U4d2, and U4e once U4a, U4b and U4d are merged.
-3. **To the advisor** (a general-purpose agent reading `git show origin/main:.claude/agents/advisor.md`), in one
-   request:
-   - S1, with the review round's views: the soldier's layout serves two catalogue rows; the fix needs a per-group field
-     selection in U4a and an owner-only record from npt-sim, a seam change after U4d merges;
-   - U4a's supporting public items, beyond §4.1's list;
-   - the U4e brief's 9 questions (`git show 0dccbf0:.checkpoints/npt-u4e-brief/u4e-brief-draft.md`).
-   - The brief itself goes to the advisor after wave 1 merges, with its 28-row recheck done.
+1. **When U4c's round 2 returns:** settle it within the budget; re-snapshot; merge U4c into the main folder by
+   `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py`, then `git apply`, check.mjs and the gate, with
+   `git rm` of its wip patch in the same commit (WIP-CLEAN).
+2. **When U4d's fix pass returns:** the npt-proto half of S1 in a scratch worktree; then round 2 on the combined diff;
+   then the merge, the same way.
+3. **When U4j's review returns:** a fix pass within the budget, by its builder; round 2 on what changed if a finding
+   needs it; then the merge with §4.1's items; then U4c's L-c8 re-run.
+- **After wave 1:**
+  - The plan text edits: the W1 rulings in the advisor's words, NETEM-BAR (a) in the U8 row, U4j's items. Give them
+    to an agent when a slot frees, then a test-engineer check.
+  - One advisor request: U4j's readings (a)-(f), NA1 and NA5, and the U4e brief's rev 3 (W1-U4E's answers, W1-S1,
+    W1-N2, the new carries).
+  - Then wave 2 (U4d2, U4e), under W1-TARGET's lock.
+- **This evening:** post tonight's night items to issue #16 (candidates: the U4f and U4g brief drafts; a skeptic
+  check of U4a and U4b's merged code).
 
-**Open questions for Mustafa:** none.
+**Open questions for Mustafa:**
+- **NIGHT-BUDGET (asked 2026-11-11 about 10:25 UTC):** the day session and the night shift share the university
+  account's usage. Last night this session's agents hit the limit at about 22:30 Amsterdam, and the night shift's 00:10
+  and 01:10 runs left nothing (likely the same limit; unproven: the routines API shows only the last run). Options:
+  (a) leave it (the queue still fit last night); (b) no new agent work in the day session after about 21:00
+  Amsterdam; (c) he checks the routine's run history in claude.ai first. Recommended: (a), and (b) once a night's
+  queue stops fitting.
 - **Answered 2026-11-10 about 20:40 UTC** (history.md, "Decisions taken"):
   - NETEM-BAR (a): the bar stays capped as WS-BAR says; a WebSocket row that fails because the kernel is slower than
     the model is reported to him as the kernel's, with the netem numbers, and he decides.
   - NS-START: he sets the routine to `10 0-7 * * *` himself tonight.
 
 **Rules in force** (his words, verbatim, in history.md's "Decisions taken" unless marked)
+- **Mustafa, 2026-11-11** (history.md, "Decisions taken"): STATUS's "In flight" table keeps one line for #40; his
+  words move between docs by script and line ranges, never by retyping (done for PR #49 at 5ca77eb).
 - **Mustafa, 2026-11-10** (history.md, "Decisions taken": his seven points and his "A"):
   - RESUME-CARD; WIP-CLEAN; SIZE-CHECK;
   - TCP-FREEZE: no more model fidelity work; if U8's netem check disagrees, netem wins;
@@ -216,13 +127,20 @@ reset at 20:00):**
 **Pointers**
 - The plan: plan.md (rev 3.3).
 - U4: u4-build-plan.md, advisor-u4.md, u4s-carries.md, u4s-report.md, and Running work below (U4 era).
-- History: history.md (Steps done U0-U3d; the old Current step; Decisions taken; Running work up to U3c).
+- History: history.md (Steps done U0-U3d; the old Current step; Decisions taken; Running work up to U3c; "Running
+  work, U4 wave 1": the card's blocks of 2026-11-10).
 - The closing checklist for PR #40: under Next steps.
-- Resume commands:
-  - U4d and U4c: `Workflow({scriptPath: /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u4-wave1-cd-wf_f54246ff-e0d.js,
-    resumeFromRunId: "wf_f54246ff-e0d", args: {sha: "097f89704d9925dee0dc62f7d7373cb13fbbc9a0"}})`.
-  - The review: `Workflow({scriptPath: /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-u4ab-review-wf_4153791e-ba1.js,
-    resumeFromRunId: "wf_4153791e-ba1"})`.
+- Resume commands (scripts under /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/;
+  a resumed run keeps its run id, and finished agents replay from cache):
+  - U4c's round 2: `Workflow({scriptPath: <scripts>/npt-u4c-fix-round2-wf_610486f7-cc1.js, resumeFromRunId:
+    "wf_610486f7-cc1"})`.
+  - U4d's fix pass: `Workflow({scriptPath: <scripts>/npt-u4d-fix-wf_a8ff8550-67d.js, resumeFromRunId:
+    "wf_a8ff8550-67d"})`.
+  - U4j's review: `Workflow({scriptPath: <scripts>/npt-u4j-review-wf_1ea8a0dd-fee.js, resumeFromRunId:
+    "wf_1ea8a0dd-fee"})`.
+  - A cut agent runs again with its context only if its prompt changes: add a dated RESUME line that points at its
+    notes file.
+  - U4j's builder: SendMessage to a3b8dfeb01ed52b50.
   - If a worktree is gone: a new one at its base, with its wip patch applied first.
 
 ## Steps done
