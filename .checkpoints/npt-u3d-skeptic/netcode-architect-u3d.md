@@ -34,10 +34,13 @@ Task: npt-u3d-skeptic (night-shift item 5) - netcode-architect skeptic of U3d (c
   - Lost etc. logged at intake with due 0 out 0 (impair.rs:477-488, :573-583), not in E set. late = out.saturating_sub(due) :681.
   - E floor: excess() (socket_tests.rs:781) floors; would_one `<=` (:805) => a true E in (10,000, 10,001) prints PASS.
   - Fate pre-touch writes all-zero Fate values (socket_tests.rs:1388-1403).
+  - The reader (socket.rs:560-633) is its own OS thread with a current-thread runtime: the spawned poller task's stalls never touch t_in; they enter up's L (the hop), and via w.wake() before the sends (:712-714) down's L. Confirmed.
+  - pace() (socket_tests.rs:486-506) catches up in a burst after a late wake: an intake gap before the burst.
+- B5 done. Record checks: round 1 down E 11,540 -> uncapped expected count above 30.25 ms = 990,091 x 11,540 / 10,000,001 = 1,143 >= 991 -> FAIL, matches. Round 3 down: E 11,383, ramp of 34.2 ms at 9,900/s gives 5,762 ns uncapped, 2,895 ns capped (I re-derived the advisor's 5,760 / 2,900): capped total ~8,516 -> expected count ~843 -> PASS, consistent. Fail threshold: n - ceil(0.999 n) + 1 = 991 at n = 990,091. overtaken ~5,000 per direction (0.5 %), reordered 864k (jitter).
 - FINDING CANDIDATES (to finalise in B7):
   - NA1 (Medium?): "exactly"/"never the reverse" (R-31 plan.md:1423; advisor-u3d.md:216, :235-237; u3d-report.md:69, :99) hold only in expectation; -3's p99.9 is a count of ~990 above threshold out of 990k delivered, sd ~31 => E PASS with -3 FAIL ~49 % at E = 10,000, ~5 % at 9,500; E MISS with -3 PASS ~6 % at 10,500 with no lateness over 10.25 ms. Code prints "disagree" for these (:1593-1600), contradicting R-31.
-  - NA2 (Low): reorder-step coupling: intake gaps (reader stall up, caller stall down) enter -3's delay for overtaken held datagrams, never E => (h) "never enters ... -3's L2 delays" (u3d-report.md:96-98; advisor-u3d.md:231-233) false for 1 % held; also a reverse-direction mechanism; magnitude tiny.
+  - NA2 (Low): reorder-step coupling: intake gaps (reader stall up, caller stall down) enter -3's delay for overtaken held datagrams, never E => (h) "never enters ... -3's L2 delays" (u3d-report.md:96-98; advisor-u3d.md:231-233) false for 1 % held; also a reverse-direction mechanism; magnitude tiny (<= ~0.01 datagram per gap; needs G < D_held).
   - NA3 (Low): floor in excess() lenient by < 1 ns against an inclusive bar.
   - NA4 (Low/Med?): policy read only at the end (header) - a chrt switch mid-leg is undetectable; leg recorded as FIFO.
-  - NA5 (C-U8-6): per-socket drops row exists only while socket open; one socket per leg (C-U6-2) => after-read must precede the socket's drop; warm-up drops counted (strict); pre-socket drops (softnet/NIC) not covered; sk_drops counts checksum/filter drops too.
-- Next: B5 (dry-run record).
+  - NA5 (Medium?, C-U8-6): per-socket drops row exists only while socket open; one socket per leg (C-U6-2) => after-read must precede the socket's drop; §5.2 says "'unreadable' recorded counts as present" (u3d-plan.md:386) - if applied to the drops read, a closed socket's missing row reads "unreadable" and the drop condition is vacuous. Warm-up drops counted (strict); pre-socket drops (softnet/NIC) not covered; sk_drops counts checksum/filter drops too; 28 ms is this container's buffer/truesize.
+- Next: B6 (earlier reviews).
