@@ -1,0 +1,177 @@
+{
+ "move": "c090843",
+ "runs": [
+  {
+   "name": "a-cabana-1.json",
+   "folder": ".",
+   "map": "default",
+   "exit": 0,
+   "bytes": 35792,
+   "stderr": []
+  },
+  {
+   "name": "head-cabana-1.json",
+   "folder": "/home/user/Shamble-Frontlines/legacy",
+   "map": "default",
+   "exit": 0,
+   "bytes": 35792,
+   "stderr": []
+  },
+  {
+   "name": "a-cabana-2.json",
+   "folder": ".",
+   "map": "default",
+   "exit": 0,
+   "bytes": 35792,
+   "stderr": []
+  },
+  {
+   "name": "head-cabana-2.json",
+   "folder": "/home/user/Shamble-Frontlines/legacy",
+   "map": "default",
+   "exit": 0,
+   "bytes": 35792,
+   "stderr": []
+  },
+  {
+   "name": "a-tri-1.json",
+   "folder": ".",
+   "map": "tri",
+   "exit": 0,
+   "bytes": 37063,
+   "stderr": []
+  },
+  {
+   "name": "head-tri-1.json",
+   "folder": "/home/user/Shamble-Frontlines/legacy",
+   "map": "tri",
+   "exit": 0,
+   "bytes": 37063,
+   "stderr": []
+  },
+  {
+   "name": "a-tri-2.json",
+   "folder": ".",
+   "map": "tri",
+   "exit": 0,
+   "bytes": 37063,
+   "stderr": []
+  },
+  {
+   "name": "head-tri-2.json",
+   "folder": "/home/user/Shamble-Frontlines/legacy",
+   "map": "tri",
+   "exit": 0,
+   "bytes": 37063,
+   "stderr": []
+  }
+ ],
+ "checks": [
+  {
+   "name": "A worktree is 76b4f7a",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "head legacy/shamble-core.js equals the move commit's blob",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "head legacy/shamble-game.js equals the move commit's blob",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "head legacy/shamble-editor.js equals the move commit's blob",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "head legacy/index.html equals the move commit's blob",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "head legacy/editor.html equals the move commit's blob",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "cabana: A's two runs identical",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "cabana: head run 1 byte-identical to A's",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "cabana: head run 2 byte-identical to A's",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "cabana: the dump is not empty JSON",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "tri: A's two runs identical",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "tri: head run 1 byte-identical to A's",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "tri: head run 2 byte-identical to A's",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "tri: the dump is not empty JSON",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "builder path '.checkpoints/r7-legacy-inventory/tuning/cabana-1.json' found",
+   "pass": true,
+   "detail": "1 times"
+  },
+  {
+   "name": "builder path '.checkpoints/r7-legacy-inventory/tuning/tri-1.json' found",
+   "pass": true,
+   "detail": "1 times"
+  },
+  {
+   "name": "builder path 'docs/legacy-tuning.json' found",
+   "pass": true,
+   "detail": "2 times"
+  },
+  {
+   "name": "builder path 'docs/LEGACY_TUNING.md' found",
+   "pass": true,
+   "detail": "1 times"
+  },
+  {
+   "name": "the builder ran",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "docs/legacy-tuning.json reproduced byte for byte",
+   "pass": true,
+   "detail": "78862 bytes"
+  },
+  {
+   "name": "docs/LEGACY_TUNING.md reproduced byte for byte",
+   "pass": true,
+   "detail": "22018 bytes"
+  }
+ ],
+ "verdict": "PASS"
+}
