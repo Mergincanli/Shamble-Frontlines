@@ -97,7 +97,8 @@ U4 wave 1", moved by card_refresh.py.
       pinning the bound line F2/F6, NC-U4J-10, F16, the `hs` writer rules, the Arm rule's key); the readings (a)-(f);
       F1's severity; anything for Mustafa.
     - Next: one fix pass on the advisor's list (a fixer agent in U4j's worktree; F1 first), then round 2 on what
-      changed (netcode, security, test).
+      changed (netcode, security, test). Its pre-fix copy: `.gate/u4j-prefix` (411eeee plus wip/u4j.patch of 10:05;
+      crates/judge, crates/log and marks byte-identical to the reviewed worktree, checked 11:27).
   - Its fix pass, if any: by its builder (SendMessage to a3b8dfeb01ed52b50), in its copy.
   - At its merge, the main session's: u4-build-plan.md §4.1 gains U4j's public items (`TickRecord.hs`,
     `set_hashes`, `hashes`; `marks::BoundNumber`, `Check.ws_bound`, `Rule::WsPractice`; `Outcome::Empty`,
