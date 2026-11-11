@@ -1,0 +1,70 @@
+{
+ "pass": true,
+ "scope": "smoke skipped",
+ "base": {
+  "ref": "3f29cb8",
+  "sha": "3f29cb8dab5b869c74ff8c766a702ede252b36e4",
+  "prefix": ""
+ },
+ "head": "working tree",
+ "build": "legacy/",
+ "checks": [
+  {
+   "id": 1,
+   "name": "syntax",
+   "pass": true,
+   "summary": "5/5 sources parse (shamble-core.js, shamble-game.js, shamble-editor.js, index.html inline#1, editor.html inline#1)",
+   "details": []
+  },
+  {
+   "id": 2,
+   "name": "concatenation",
+   "pass": true,
+   "summary": "index.html: shamble-core.js + shamble-game.js + inline#1 | editor.html: shamble-core.js + shamble-game.js + shamble-editor.js + inline#1 (external, skipped: three.min.js)",
+   "details": []
+  },
+  {
+   "id": 3,
+   "name": "symbols",
+   "pass": true,
+   "summary": "core 138 / game 714 / editor 353 / indexInline 0 / editorInline 0 | +0 -0 | cross-file duplicates 0, within-file 0",
+   "details": []
+  },
+  {
+   "id": 4,
+   "name": "player build",
+   "pass": true,
+   "summary": "51 refs to editor-only symbols: 51 guarded, 0 dead, 0 flagged",
+   "details": []
+  },
+  {
+   "id": "5a",
+   "name": "smoke",
+   "pass": true,
+   "summary": "skipped (--no-smoke): the full gate or CI's smoke job runs it",
+   "details": [],
+   "skipped": true
+  },
+  {
+   "id": "5b",
+   "name": "names",
+   "pass": true,
+   "summary": "index.html: 3 scripts + 0 DOM handlers, 0 problems | editor.html: 4 scripts + 0 DOM handlers, 0 problems | allowed: 63 built-ins (Node v22.23.4) + 15 in gate-globals.json + 459 THREE members (r128)",
+   "details": []
+  },
+  {
+   "id": "5c",
+   "name": "layering",
+   "pass": true,
+   "summary": "shamble-core.js uses 21 names it does not declare; 0 references into game/editor/inline symbols",
+   "details": []
+  },
+  {
+   "id": "5d",
+   "name": "script order",
+   "pass": true,
+   "summary": "index.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> inline | editor.html: three r128 (cdnjs) -> shamble-core.js -> shamble-game.js -> shamble-editor.js -> inline",
+   "details": []
+  }
+ ]
+}

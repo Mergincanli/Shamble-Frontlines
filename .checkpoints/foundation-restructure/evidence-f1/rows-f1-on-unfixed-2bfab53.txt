@@ -1,1 +1,17 @@
 PASS a_root_only: exit 0; build .; base prefix ""; gate pass true; stderr: (none)
+PASS b_legacy_only: exit 0; build legacy/; base prefix ""; gate pass true; stderr: (none)
+PASS c_both_complete: exit 2; build null; base prefix null; gate pass null; stderr: gate: the legacy engine files are in two places, legacy/ (shamble-core.js, shamble-game.js, shamble-editor.js) and the repo root (shamble-core.js, shamble-game.js, shamble-editor.js): keep one copy
+PASS d_neither: exit 2; build null; base prefix null; gate pass null; stderr: gate: shamble-core.js is missing from the working tree
+PASS e_partial_legacy: exit 2; build null; base prefix null; gate pass null; stderr: gate: legacy/shamble-editor.js is missing from the working tree
+PASS f_root_plus_stray_legacy_js: exit 2; build null; base prefix null; gate pass null; stderr: gate: the legacy engine files are in two places, legacy/ (shamble-game.js) and the repo root (shamble-core.js, shamble-game.js, shamble-editor.js): keep one copy
+PASS g_partial_root: exit 2; build null; base prefix null; gate pass null; stderr: gate: shamble-editor.js is missing from the working tree
+FAIL h_legacy_plus_stray_root_page: exit 0; build legacy/; base prefix ""; gate pass true; stderr: (none)
+FAIL i_decoy: exit 0; build legacy/; base prefix ""; gate pass true; stderr: (none)
+FAIL j_letter_case: exit 0; build legacy/; base prefix ""; gate pass true; stderr: (none)
+PASS k_no_move_root_page: exit 0; build legacy/; base prefix "legacy/"; gate pass true; stderr: (none)
+FAIL l_revert_leftover_page: exit 0; build .; base prefix "legacy/"; gate pass true; stderr: (none)
+PASS m_revert_clean: exit 0; build .; base prefix "legacy/"; gate pass true; stderr: (none)
+PASS smoke CLI b_legacy_only: exit 0; index.html 8/8 steps, 0 errors (2/2 shots reached the canvas, moved 1.6 m) | editor.html 5/5 steps, 0 errors | 0 warnings | renderer ANGLE (Google, Vulkan 1.3.0
+PASS smoke CLI c_both_complete: exit 2; the legacy engine files are in two places, legacy/ (shamble-core.js, shamble-game.js, shamble-editor.js) and the repo root (shamble-core.js, shamble-game.js, sh
+ROWS (f1): 4 FAILED
+red run exit: 1
