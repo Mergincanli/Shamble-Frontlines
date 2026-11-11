@@ -9,7 +9,7 @@
   **Base:** main 76b4f7a (PR #50 merged, 2.1a). **OLD** (the independent judge for E2 and E3): main 44446a5.
 - **Never:** push to `claude/netcode-proof-test-plan-hcky5g` (#40) or `claude/laughing-pasteur-fwya24` (#48); touch
   `spikes/`; touch a gate file; edit a settings file, hook or allow-list; write a kit line before his chat yes.
-- **Last update:** 2026-11-11 21:51 Amsterdam
+- **Last update:** 2026-11-11 22:08 Amsterdam
 
 ## Steps done
 0. Step 0 (this commit): model checked with get_session: `session_context.model` claude-opus-5-5,
@@ -39,8 +39,8 @@
    xvfb-run, as documented).
 
 ## Current step
-The advisor agent reviews the plan check (background; notes `advisor-plan-check.md`). Meanwhile: the browser install by
-the settings' allowed command (background).
+The advisor agent reviews the plan check (background; notes `advisor-plan-check.md`). Done meanwhile (no tracked file
+changed): the toolkit, the pinned browser, the baseline gate and kit tests, the evidence scripts.
 
 ## Next steps
 1. On the advisor agent's verdict: APPROVE → the four kit lines and E8's ask to him in one message, with the exact text
@@ -55,7 +55,19 @@ the settings' allowed command (background).
 - (none yet)
 
 ## Key numbers
-- (none yet)
+- The pinned browser: `node tools/node_modules/playwright/cli.js install chromium` (allowed at settings.json:12) downloaded
+  Chromium 1194 and its headless shell to /opt/pw-browsers and exited 0, no hang after 100% (Node 22.23.4); the tools'
+  Playwright resolves `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`. No alias this time (2.1a's L-4 route not
+  needed): the local smoke runs the pinned build.
+- Baseline on main 76b4f7a (unchanged tree): `node tools/gate.mjs 76b4f7a` GATE PASS, +0 -0, smoke index 8/8, editor 5/5,
+  header "base 76b4f7a = 76b4f7a (files at the root) | head = working tree (files at the root)".
+- Kit tests on main: `node --test .claude/hooks/*.test.mjs .claude/scripts/checkpoint.test.mjs`: 1261 tests, 1261 pass,
+  0 fail (E6's comparison count).
+- His Windows run (his D1 message): the new gate on main 76b4f7a, PowerShell 5.1, Node v24.17.0, base 44446a5, "files at
+  the root" twice, every check PASS, smoke 8/8 and 5/5, GATE PASS.
+- Evidence scripts ready under `.gate/foundation-restructure/` (copies go to the notes when run): e1-e2.mjs, e3-run-2-1b.mjs
+  (with e3-mutations.json and the recorded e3-results-f1.json copied from c8f4bb3, blobs 21c043f and 72ff476),
+  e4-tuning.mjs, e5-saves.mjs, e6-commands.mjs.
 
 ## Decisions taken
 - Checkpoint slug `foundation-restructure` (the same task as 2.1a; plan 1.1 restarts the task from main) · the session
