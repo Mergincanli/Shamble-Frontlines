@@ -7,7 +7,7 @@
   approved in issue #16's Queue under Mustafa's rule of 2026-11-09
 - **Branch:** cs/npt-u3d-skeptic · **Base:** origin/main 2d22b69
 - **Spike read in:** `.gate/npt-spike` (read-only worktree, detached at df8975b; never edited)
-- **Last update:** 2026-11-11 03:29 Amsterdam
+- **Last update:** 2026-11-11 03:26 Amsterdam
 
 ## Summary (findings by severity, each with its proof)
 - to follow
@@ -36,9 +36,9 @@
   shift · 2026-11-11 02:18
 
 ## Running work
-- netcode-architect (Opus 5.5, xhigh), the measurement's validity · `netcode-architect-u3d.md` · launched 03:31 ·
+- netcode-architect (Opus 5.5, xhigh), the measurement's validity · `netcode-architect-u3d.md` · launched 03:25 ·
   running
-- test-engineer (Opus 5.5, xhigh), the seven fast tests and their bites · `test-engineer-u3d.md` · launched 03:31 ·
+- test-engineer (Opus 5.5, xhigh), the seven fast tests and their bites · `test-engineer-u3d.md` · launched 03:25 ·
   running
-- saver: background task bqpwo2txe · output in the session's tasks folder (bqpwo2txe.output) · started 03:30 · stops
-  by 05:20 (110 minutes on) · last check 03:31: started
+- saver: background task bqpwo2txe · output in the session's tasks folder (bqpwo2txe.output) · started 03:24 · stops
+  by 05:14 (110 minutes on) · last check 03:26: started
