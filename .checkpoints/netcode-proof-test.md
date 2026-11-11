@@ -23,20 +23,32 @@ erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md.
 - **Running:**
   - Done: the advisor's check of the U4e brief (advisor-u4e-brief.md, complete on disk: all seven blocks and the end
     sections; the usage limit cut the agent after it wrote them, before its summary); folded as rev 3.3 (3088bb5).
-  - U4d-F's run A, the build (run wf_3dbc5af1-0d4; script workflows/scripts/npt-u4d-f-build-wf_3dbc5af1-0d4.js;
-    started about 20:45 UTC as task wmqlz92zb; the usage limit cut group 0-1's builder after 89 s, with no change to
-    the copy and no notes line; resumed at 21:12 UTC as task wcj2e504g): four fresh builders in turn in
-    `.claude/worktrees/wf_9ce88fa3-452-1`, groups 0-1, 2-3, 4-5, 6-7 (with the End checks); logs under .gate/u4df/;
-    notes u4df-build.md in that worktree. If cut: resume with `Workflow({scriptPath, resumeFromRunId})` (finished groups
-    replay from cache; a cut group's fresh builder reads the notes and the diff first). On its return: read every group's
-    result; then cut the packet (`python3 -I .checkpoints/netcode-proof-test/review_packet.py
-    .checkpoints/netcode-proof-test/u4df-packet.json`) and start run B, the review.
+  - **U4d-F's run A, the build: DONE** (run wf_3dbc5af1-0d4, task wcj2e504g, 23:07 UTC; all four groups read in full;
+    none stopped). Snapshot 9dd037a: wip/u4df.patch (5 crates/sim files on dad9566; `git apply --check` clean on
+    .gate/u4df-prefix) and u4df-build.md. check.mjs twice, counted, all 10 steps PASS: measured 367, bites 414, self 52
+    (+2 / +2 / +0 on 365 / 412 / 52). `aim_one_in` 40, with 3b's re-home (the drift check failed after step 3).
+    t_m1's bands read against B1.2 step 4 by the main session: all equal (shots 68.4-75.6, events 9.5-10.5 over the
+    window and each half, live 30.4-33.6, spawns 20.064-22.176, at least 48 and 15; the hull bound 1,400 in D-6's
+    rounded-down form, the exact maximum 1,400.6 cm on the 1 cm grid).
+    - The main session's readings (not in the packet): **TE2-5:** t_m1 failed in steps 2-5 by the plan's own design
+      (B1.3: "both move the event rate"; steps 5 and 6 fix it), deterministically, named, re-run at once, recorded
+      tagged TE2-5; the build brief's stop clause was stricter than B2.3's merge stop; explained, and the final runs
+      pass, so no stop. **rust-reviewer:** not triggered (B1.2's "only if step 1 changes a World line beyond moving the
+      speed rule": run_command's lines moved into `move_velocity`; the bite's `speed *= 1.01` became `gain = 1.01` in
+      the same product, bit-identical; D-7 unchanged at step 1).
+  - **U4d-F's run B, the review** (round 1 of its own budget; run wf_8a12a843-56b, task wmoh0xxq9, started about
+    23:12 UTC; script workflows/scripts/npt-u4d-f-review-wf_8a12a843-56b.js; if cut, resume it with
+    `Workflow({scriptPath, resumeFromRunId})`, and a cut agent continues after its notes' last line): packet
+    u4df-packet.md (cut 23:12 UTC, sha256 85f8f86931b1, carries left out 65); netcode-architect (its type, read only;
+    notes u4df-review-netcode.md), then the
+    test-engineer (a general-purpose agent with the Edit tool, B6's first form, reading main's test-engineer.md; notes
+    u4df-review-test.md) proves: plants O1-O3, P1, P2 by Edit, the three-seed test, check.mjs once counted. On return:
+    read every Medium or higher in full; the fix pass; round 2 on what changed; then the merge (saver stopped first).
   - Done meanwhile: TE2-5 (b), ten of ten runs exit 0, each 443 passed, 0 failed, 12 ignored (te2-5-record.md).
   - the saver, restarted after U4j's push (about 20:15 UTC, 110 minutes): `node .claude/scripts/checkpoint.mjs watch
     netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
     https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"`. Stop it before a merge's apply and restart it after the
     push, as at U4j's.
-  - U4d-F's run A starts when TE2-5's runs end (its route: the U4d-F block below).
 
 **The three cut workflows, and what to do with each when the hold lifts.** Scripts are under
 /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/. A resumed
