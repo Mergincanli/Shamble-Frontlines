@@ -103,6 +103,15 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
+**The foundation, 2.1b: the move [2026-11-11, PR #51: draft]** — foundation-restructure, the second of step 2.1's two
+pull requests, after 2.1a (PR #50, merged as 76b4f7a on 2026-11-11, by merge commit, on Mustafa's go after the
+advisor's APPROVE of f6becf5). The five legacy files move into `legacy/` with `git mv`, bytes unchanged, in a commit of
+their own (c090843); the commands in text name the `legacy` folder (`tools/README.md` with the build-folder rule, the
+tool headers, `tools/village.py`, the root README: 1e6f84e); the four kit lines on his yes, KIT-2.1B (a) (CLAUDE.md
+:19, :43, :44 and `.claude/agents/verifier.md:28`: b6b3b81); the docs (his words of 2026-11-11 in `docs/DECISIONS.md`,
+his SCOPE (a) in ADR 0002 and the register, OQ-0002-2 answered in part, the maps, STATUS). Evidence E1-E6 and E8 PASS;
+CI's gate and smoke green on c090843, 1e6f84e and b6b3b81. Next: the reviews, the verifier, the report, his go.
+
 **The foundation, 2.1a: the legacy gate reads both layouts [2026-11-10 to 11-11, PR #50: in review]** —
 foundation-restructure, the first of step 2.1's two pull requests (Mustafa's decision of 2026-11-10: the second
 account plans and builds steps 2.1 and 2.2 now; his SPLIT (a)); gate files and tools only, no game file, no file

@@ -9,8 +9,7 @@ _Last updated: 2026-11-11 (foundation 2.1b, PR #51, its docs pass; main 76b4f7a)
   kit-v3-5), the research (R1-R7) and the decision drafts are merged. The six drafts (`docs/adr/0001`-`0006`, with
   `docs/ENGINE_OVERVIEW.md` and `docs/SPIKE_PLAN.md`) are the basis for the spikes and stay Proposed (the stop's
   answers, 2026-11-03: `docs/DECISIONS.md`), but for his SCOPE (a) of 2026-11-10: "I accept ADR 0002's part 1 alone
-  (the repository layout, with the legacy constraints applying to legacy/ only)", recorded in its Status line and the
-  register by 2.1b (#51).
+  (the repository layout, with the legacy constraints applying to legacy/ only)", recorded in ADR 0002 by 2.1b (#51).
 - **Last merged:** foundation 2.1a, the legacy gate and tools read both layouts (PR #50, 76b4f7a, 2026-11-11 18:38:28
   UTC, by merge commit, on Mustafa's go, quoted in the merge commit's message, after the advisor's APPROVE of f6becf5).
   Every merged change-set: `docs/STATUS_ARCHIVE.md`, "In flight"; `docs/ROADMAP.md`.
@@ -34,8 +33,8 @@ _Last updated: 2026-11-11 (foundation 2.1b, PR #51, its docs pass; main 76b4f7a)
 1. In his order (ORDER (b), 2026-11-10), after status-diet (merged, #49): his unit walk of 2026-11-09 (a docs
    change-set: UNITS.md §0 and LOOP_V2), then the Slice 1 note of 2026-11-10, each in a fresh chat. His words:
    `docs/DECISIONS.md`, "Queued".
-2. v2: the netcode proof test (#40); the foundation in his order of 2026-11-11 (#49 merged; 2.1a, #50 in #47's
-   place, merged; 2.1b, #51, in flight; then 2.2, #48). Wave 1 runs one heavy spike at a time (SPIKE_PLAN: the netcode proof test, the
+2. v2: the netcode proof test (#40); the foundation in his order of 2026-11-11 (#49 and 2.1a, #50, merged; 2.1b,
+   #51, in flight; then 2.2, #48). Wave 1 runs one heavy spike at a time (SPIKE_PLAN: the netcode proof test, the
    sim core spike and its 60 Hz run, the boundary spike, the look proof test once its models exist; the preview
    hosting check alongside any). _Pointer: his decision of 2026-11-10 lets the second account plan and build
    foundation steps 2.1 and 2.2 now (`docs/DECISIONS.md`, 2026-11-10)._ Then phase 1 and the playable slices
@@ -96,7 +95,7 @@ A finding below the review budget's bar becomes a follow-up: its id goes here, i
   drafts' next revision, five "before the foundation" lines left without a pointer; the archive's "Follow-ups", "From
   foundation 2.1a".
 - **From foundation 2.1b (PR #51), for the gate step (2.3):** the Node 24 finding from his Windows run (the pinned
-  Playwright's browser install hangs after 100 %); his words: `docs/DECISIONS.md`, the entry of 2026-11-11, 20:44:29 UTC.
+  Playwright's browser install hangs after 100 %): his words, `docs/DECISIONS.md`, 2026-11-11, 20:44:29 UTC.
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100
@@ -105,7 +104,8 @@ A finding below the review budget's bar becomes a follow-up: its id goes here, i
 - **CI:** the smoke job's Chromium step stalled once (PR #42); on #50 (3f29cb8, 8d8c422) its library install failed in 5
   attempts and was cancelled in 1 (a runner DNS outage).
 - **v2:** the decision drafts' risks (the asset pipeline and several LOOK_V2 techniques not researched); R1-R6's
-  (R3-R6 spot-checked; unread sources); R7's (its line numbers go stale when the legacy files move).
+  (R3-R6 spot-checked; unread sources); R7's line numbers hold after the move (`git mv` kept bytes and line numbers:
+  its citations read with the prefix `legacy/`; 2.1b's E1).
 - **Legacy (frozen):** 3a's ranked list; bot navigation; the editor and map bugs; the first-deploy tutorial; the
   wall-clock reads (an input for ADR 0004 part 4).
 
