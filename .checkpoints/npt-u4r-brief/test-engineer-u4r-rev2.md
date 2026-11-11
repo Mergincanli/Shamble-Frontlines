@@ -19,7 +19,7 @@ B12. Assemble rev 2 into u4r-brief-draft.md in one Write, order 01, 00, 02, 03, 
 - B2 done: rev 1 read whole (785 lines; sections 1-11; R1-R32; Q1-Q12; run items N1-N9). Drafter notes read.
 - X1: rename rev 1's run items N1-N9 to D1-D9 (+ new D10-D12); line 259's "arch N2" is carry 20's words: kept.
 - B3 done: plan item 4 = draft, check, test-engineer revises once (rev 2 + change list). No build/run/web.
-- B4 verified at df8975b (all 16 ACCEPTED):
+- B4 verified at df8975b (all 16 ACCEPTED, 0 rejected):
   - N1: l1/src/lib.rs:456-458, :784-785; plan :755-757.
   - N2 + X3: P0 ack sample applies at its packet's send instant (l1 :515, :418-420, :602, :686, :527, :582, :661, :714); link :79-80. Recommend (b') at U4r.
   - N3: plan :755-758; §4.9 :341-344. Receipt instant; U4h carry premises; Loopback class.
@@ -32,10 +32,8 @@ B12. Assemble rev 2 into u4r-brief-draft.md in one Write, order 01, 00, 02, 03, 
   - N10: §4.7 :321-324. N11: plan :753-755. N12 (a)-(d). N13 + X5. N14 + X6. N15. N16.
 - Q12 costs: (i) 6 runs 1,800 s; 9 runs 2,700 s. (ii) 10 runs + 2 rec 3,600 s; 12 runs + 3 rec 4,500 s. Q10 (a') +2 runs (600 s).
 - B4 done. B5 done (00-changes.md: N1-N16 accepted, X1-X7).
-- B6 done: 01-head.md, 02-s1-2.md.
-  AT ASSEMBLY apply to 02: section 2 intro's last sentence "Where this brief finds the plan silent it says so; it adds nothing." -> "Where this brief finds the plan silent it says so; it adds nothing it does not mark as its own (2.4 r6 and r7, 7.2's added records, 8.4's switch), each there for the advisor to keep or drop." And add that to 00's X7 line.
-- B7 done: 03-s3-6.md. B8 done: 04-s7.md. B9 done: 05-s8.md.
-- B10 done: 06-s9.md (R2, R4, R9-R12, R15, R17, R20, R26, R29, R30 updated; R33, R34 new; preamble).
-- B11 done: 07-s10-11.md (Q2 (i), Q3 D8, Q6 N8 line, Q10 and Q12 rewritten; §11 D1-D12).
-- Recount (from the parts): 7.1 table 12 rows (11 judged parts: -17 x4, -57 x4, -58 x2, -18 x1; plus the -30 pre-check row, not judged); carries quoted 4 (40; 6, 14, 20); recheck rows 34 (R1-R34; new R33, R34); advisor questions 12 (U4R-Q1..Q12), all open, 0 answered (Q10, Q12 rewritten); needs a run (day) 12 (D1-D12; new D10-D12).
-- Next B12 (assemble).
+- B6-B11 done (parts 01, 02, 03, 04, 05, 06, 07 in rev2-parts/).
+- B12 done: u4r-brief-draft.md rewritten as rev 2 (about 1,010 lines) from the parts, with the two at-assembly fixes (section 2 intro sentence; X7 line). Grep check: no stray run-item "N<k>" left (all "check Nk", carry 20's "arch N2", or the rename note).
+- Recount (grep on the draft): 7.1 table 12 rows (11 judged parts: -17 x4, -57 x4, -58 x2, -18 x1; plus the -30 pre-check row, not judged); carries quoted 4 (40; 6, 14, 20); recheck rows 34 (R1-R34; new R33, R34; R2, R4, R9-R12, R15, R17, R20, R26, R29, R30 changed); advisor questions 12 (U4R-Q1..Q12), all open, 0 answered (Q10, Q12 rewritten; Q2, Q3, Q6 touched); needs a run (day) 12 (D1-D12; new D10, D11, D12).
+- Not settled (needs <base>, day): R2/D2 (rtt_ns before first sample after U4c); R4/D12 (server-end first-sample instant at P0; whether Q10 (a') can fire); R15 (where pump reads rtt_ns; session kind for Loopback); R17 (option B lookahead; late counting); R30 (World hash name; recording start tick); R33/D10 (RTT readers, replace/clip paths); R34/D11 (client Resync; event cap).
+DONE
