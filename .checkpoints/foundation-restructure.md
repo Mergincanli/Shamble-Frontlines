@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 17:25 Amsterdam
+- **Last update:** 2026-11-11 17:32 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -139,6 +139,17 @@
    folder moved from the repo root (base) to legacy/ (head), but the repo root still holds editor.html, index.html");
    the new gate `--smoke-only` exit 0 (only CI's gate job catches a decoy). E3 on the new gate: running (`e3-run-f1.mjs`,
    results `e3-results-f1.json`, log `.gate/e3-run-f1.log`).
+
+13. CI on the fix commit 3f29cb8: the gate job green in both runs; the smoke job failed in both (push 43054418953,
+   pull_request 43054429019) at "Install Chromium's system libraries": the runner could not resolve
+   azure.archive.ubuntu.com (log read; the smoke step never ran): the known runner flake (STATUS "Open risks", #42).
+   Failed jobs re-run (attempt 2, 16:26 UTC); no docs push until they finish. Docs during E3 (uncommitted until then):
+   his 14:54 words as the report's Appendix A3.3 (`report-appendix.py`: 10 blocks, all byte-identical); DECISIONS.md:
+   the A3.3 entry by `decisions-add-a33.py` (header for this file, quote copied from the appendix), L-2 (the #49 header's
+   time and session "per bb2d817's message"; the doubled "saved by" removed in three 2026-11-10 headers);
+   `docs-keeper-check-decisions.py` extended to 10 blocks: PASS (11 runs, each block once); STATUS's follow-up bullet
+   "From foundation 2.1a" (115 lines) and the archive's "Follow-ups" group of the same name (IE-1..IE-4, SA-L1, TE-2,
+   A-1, N2, L-4, the v2 root page, the five unpointed lines, the stale research citations); repo-map-check OK.
 
 ## Current step
 

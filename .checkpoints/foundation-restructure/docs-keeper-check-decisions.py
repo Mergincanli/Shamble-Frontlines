@@ -25,7 +25,8 @@ for line in open(REPO + '/docs/reports/2026-11-11-foundation-2-1a.md', encoding=
     if inside and line == '```':
         src[cur] = buf; inside = False; cur = None; continue
     if inside: buf.append(line)
-check(sorted(src) == ['A1.1', 'A1.2', 'A1.3', 'A2.1', 'A2.2', 'A2.3', 'A3.1', 'A3.2', 'A4'], 'appendix: 9 blocks ' + ','.join(sorted(src)))
+check(sorted(src) == ['A1.1', 'A1.2', 'A1.3', 'A2.1', 'A2.2', 'A2.3', 'A3.1', 'A3.2', 'A3.3', 'A4'], 'appendix: 10 blocks ' + ','.join(sorted(src)))  # A3.3 added in the fix pass (his 14:54 message)
+check(src['A3.3'][0] == 'My words of 2026-11-11, for the foundation chat (PR #50, foundation step 2.1a).', 'A3.3 is his 14:54 message')
 k = src['A3.1'].index('Two additions, my words of 2026-11-11:')
 src['A3.1 (his labelled block)'] = src['A3.1'][k:]
 del src['A3.1']
