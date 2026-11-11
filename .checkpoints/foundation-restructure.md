@@ -9,7 +9,7 @@
   **Base:** main 76b4f7a (PR #50 merged, 2.1a). **OLD** (the independent judge for E2 and E3): main 44446a5.
 - **Never:** push to `claude/netcode-proof-test-plan-hcky5g` (#40) or `claude/laughing-pasteur-fwya24` (#48); touch
   `spikes/`; touch a gate file; edit a settings file, hook or allow-list; write a kit line before his chat yes.
-- **Last update:** 2026-11-11 21:37 Amsterdam
+- **Last update:** 2026-11-11 21:51 Amsterdam
 
 ## Steps done
 0. Step 0 (this commit): model checked with get_session: `session_context.model` claude-opus-5-5,
@@ -25,16 +25,28 @@
    the Advisor; OQ-0002-2's decider is the restructure plan). New hits since OLD: 64 files / 747 vs 63 / 728, all
    HISTORY, NAME or TESTDATA. IE-2, IE-3, IE-4, IE-7, SA-L1 folded in (plan-check §4).
 
+2. His D1 message (2026-11-11 20:44:29 UTC, event ce7f1f4b-08bc-476f-862e-3c1d9362c40b): D1 (a) exactly as plan-check
+   §3 proposed, nothing wider; his Windows run of the new gate on 76b4f7a PASSED (PowerShell 5.1, Node v24.17.0, base
+   44446a5, "files at the root" twice, smoke 8/8 and 5/5, GATE PASS: into the report); his 2.3 finding (Playwright <
+   1.60.0's installer hangs after 100% under Node >= 24.16.0; fine under 24.15.0; if ours stops after 100%: record it as
+   that bug, tell him); next: the advisor agent's review, then the four kit lines and E8's ask in one message.
+   plan-check.md updated (bbc43b5): D1 (a) quoted (checked equal to the capture), §3b the open PRs (#40 at 8c681cf
+   shares DECISIONS, REPO_MAP, STATUS, STATUS_ARCHIVE with the docs step: Part 4's #40 route; #48 at d8186fd: no common
+   file), the plan's order 6-11 with the kit ask before the build. His two messages captured by script from the
+   session's events: `mustafa-2026-11-11-task.md` (4424 characters, event e018683d-30d9-49a0-b19d-ab279e7d23a1,
+   20:21:02 UTC) and `mustafa-2026-11-11-d1.md` (1359 characters); `capture-message.mjs` (copy of
+   `.gate/foundation-restructure/capture-message.mjs`). Toolkit: `npm ci --prefix tools` (159 packages; gl needs
+   xvfb-run, as documented).
+
 ## Current step
-Stopped on D1 (his rule: "If the plan and today's main disagree on more than a line number, stop and tell me in three
-lines."), waiting for his answer. Nothing built.
+The advisor agent reviews the plan check (background; notes `advisor-plan-check.md`). Meanwhile: the browser install by
+the settings' allowed command (background).
 
 ## Next steps
-1. After his D1 answer: write his choice into plan-check.md exactly as he picks it, nothing wider; add #40's and #48's
-   current file lists (plan Part 4: re-read the open PRs' files before each build step); tell the advisor agent plainly
-   that step 8 now runs after 9 and 10, and why.
-2. The advisor agent reviews the plan check (APPROVE / REVISE / ESCALATE). The four kit lines and E8's ask go to him in
-   one message after its APPROVE, with the exact text it approved.
+1. On the advisor agent's verdict: APPROVE → the four kit lines and E8's ask to him in one message, with the exact text
+   it approved (and the one line on which model answers the advisor tool: Opus 5.5 per the /advisor note); REVISE → fix
+   the plan check, re-review.
+2. After his yes: build in the plan's order 6, 7, 8, 9, 10, 11 (plan-check §7).
 3. Step 6, the move (one commit, nothing else), gate with smoke, pushed alone; the draft PR opened on it.
 4. Step 7, the commands in text (one commit). Step 8 waits for his chat yes on the four kit lines (one message).
 5. Step 9, E1-E6 and E8; step 10, the docs; step 11, the reviews, the report, ready, stop for his go.
@@ -61,4 +73,10 @@ lines."), waiting for his answer. Nothing built.
 - (none yet)
 
 ## Running work
-- (none)
+- Saver: background task by9y0gd9z, started 21:47 Amsterdam, stops by 23:37 (110 min); output
+  /tmp/claude-0/-home-user-Shamble-Frontlines/c0e5589d-9610-5933-a695-61d4b8cf6d47/tasks/by9y0gd9z.output; last check
+  21:50: ok (watching).
+- The advisor agent: the plan-check review, launched 21:49 Amsterdam (effort xhigh: it rules on ADR 0002 edits), notes
+  `advisor-plan-check.md`.
+- The browser install (`node tools/node_modules/playwright/cli.js install chromium`): background task byqyxhjfk,
+  launched 21:50.
