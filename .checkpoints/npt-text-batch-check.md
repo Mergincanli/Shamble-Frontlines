@@ -6,7 +6,7 @@
   [`night-2026-11-12.md` at 21cc90f](https://github.com/Mergincanli/Shamble-Frontlines/blob/21cc90ff6a20356233a89dfc0d3373fc9fc491dc/.checkpoints/netcode-proof-test/night-2026-11-12.md),
   item 6, under Mustafa's NIGHT-TONIGHT (c) of 2026-11-11 (issue #16, item 6)
 - **Branch:** cs/npt-text-batch-check · **Base:** origin/main 76b4f7a
-- **Last update:** 2026-11-12 00:20 Amsterdam
+- **Last update:** 2026-11-12 00:14 Amsterdam
 
 ## Steps done
 1. Read the plan at 21cc90f; fetched `claude/netcode-proof-test-plan-hcky5g`; read-only worktree
@@ -15,16 +15,20 @@
    of them), so the plan's line numbers at 21cc90f are the batch's line numbers.
 
 ## Current step
-Start one test-engineer (Opus 5.5, `xhigh`) with the plan's item 6 as its brief; notes in
-`.checkpoints/npt-text-batch-check/test-engineer-check.md`.
+One test-engineer (Opus 5.5, `xhigh`) is running in the background with the plan's item 6 as its brief (started
+00:14); its notes and deliverable: `.checkpoints/npt-text-batch-check/test-engineer-check.md`. A restart re-runs it
+with the same brief: its notes file tells it where to go on.
 
 ## Next steps
-1. Start the background saver (`checkpoint.mjs watch npt-text-batch-check`), then the test-engineer.
-2. When it ends with DONE: read its check file, spot-check its key claims against the diff, commit and push it.
-3. Update the night report comment, tick item 6 in issue #16, set the status comment to done.
+1. When it ends with DONE: read its check file, spot-check its key claims against the diff, commit and push it.
+2. Update the night report comment, tick item 6 in issue #16, set the status comment to done.
 
 ## Open findings
-- none yet
+- GUARD-MONITOR (for the day session, not acted on): `routine-guard.mjs:410-427` judges only Bash, `mcp__` tools,
+  Edit/Write/NotebookEdit/MultiEdit, Read, Grep/Glob and the web tools; any other tool returns null, and the
+  PreToolUse matcher is `*` (`.claude/settings.json:269`). The Monitor tool runs a shell command, so in a routine its
+  command may not meet the shell rules. Not tested tonight, on purpose (testing it would use the gap). Status: open,
+  for a daytime kit change-set.
 
 ## Key numbers
 - the batch: 29 log lines, 5 files (`git diff 238145d d7a54cd -- <five files>`)
@@ -35,4 +39,9 @@ Start one test-engineer (Opus 5.5, `xhigh`) with the plan's item 6 as its brief;
   night shift · 2026-11-12
 
 ## Running work
-- none yet
+- test-engineer agent · background · notes `.checkpoints/npt-text-batch-check/test-engineer-check.md` · launched
+  00:14 · running
+- saver: background task bi6wk1c31 · output in the session's tasks folder (bi6wk1c31.output) · started 00:14 with
+  `--for 25`, so it stops (and wakes the run to refresh the status comment) by 00:39; restart it each time while the
+  agent runs · last check 00:14: started (the first saver, started 00:12 with the default 110 min, was stopped with
+  TaskStop and replaced by this one: one saver at a time)
