@@ -9,7 +9,7 @@
   **Base:** main 76b4f7a (PR #50 merged, 2.1a). **OLD** (the independent judge for E2 and E3): main 44446a5.
 - **Never:** push to `claude/netcode-proof-test-plan-hcky5g` (#40) or `claude/laughing-pasteur-fwya24` (#48); touch
   `spikes/`; touch a gate file; edit a settings file, hook or allow-list; write a kit line before his chat yes.
-- **Last update:** 2026-11-11 23:47 Amsterdam
+- **Last update:** 2026-11-11 23:50 Amsterdam
 
 ## Steps done
 0. Step 0 (this commit): model checked with get_session: `session_context.model` claude-opus-5-5,
@@ -163,17 +163,31 @@
      5/5); `node tools/gate.mjs --smoke-only` GATE PASS. The merge line went to him as a prompt and he accepted it (the
      session's record: `user_temporary`); the revert passed the classifier. The link unlinked, the worktree removed
      without --force. Nothing pushed, no branch.
-   - E4: worktree `.gate/fr-a` at 76b4f7a ready (packages linked); runs after E3. E6: every row after E3.
+   - **E3: 31 of 31 PASS** (`e3-results-2-1b.json`): for every mutation the failing check sets of OLD's gate (files at
+     the root) and the head's gate (files in `legacy/`, base prefix "") are equal and not empty; the controls C1-C3 and
+     PC2 pass in both; PC1 (`--allow-drop refreshRect`) judged on check 3, as the Phase 0 gate had checks 1-4 only. The
+     report's loose wording differs for M19 and M20 only (its "5b + 5d" pairs two mutations: a note, not a fail, plan
+     1.5), as in 2.1a's run. Both worktrees removed without --force.
+   - **E4 PASS** (`e4-tuning.mjs c090843`, `e4-result.json`): A's copies of preview.js and tuning-dump.js in `.gate/fr-a`
+     (76b4f7a); the dumps at A with folder `.` and at the head with folder `legacy`, both maps, twice each: every head run
+     byte-identical to A's (cabana 35792 bytes, tri 37063); R7's builder (a715be2, paths only) on the head dumps
+     reproduces `docs/legacy-tuning.json` (78862 bytes) and `docs/LEGACY_TUNING.md` (22018 bytes) byte for byte.
+     Worktree removed without --force.
+   - **E6: 14 of 14 PASS** (`e6-commands.mjs`, `e6-commands-result.json`): battery, preview menu and shot, sim, reach,
+     perfbots with --pre, aabbs then village.py, pageshot (index, ?map=tri, the header's line, the --headed check line),
+     README's preview check line, the tuning dump; plus the gate with smoke on the head and kit tests 1261/1261 (above).
+     `repo-map-check.mjs` after step 10.
+   - Not yet: E1's final-head check (C3), on the final head.
 
 ## Current step
-Step 9: E3 finishing (PC1, PC2), then E4 and E6 (every row); then the advisor tool; then step 10.
+Step 9 done. Next: the advisor tool (his moment 5 for step 9, moments 1 and 4 for step 10's ADR and register edits),
+then step 10.
 
 ## Next steps
-1. E3's last two rows, E4, E6 (every row; START_HERE's commands after step 10 are the same strings); the advisor tool
-   (moment 5 for step 9, moment 1 for step 10's ADR and register edits); step 10: the report file with Appendix A
-   (`report-appendix.mjs`, A1-A6 built), DECISIONS.md by script from it (C13), docs-keeper for the rest under D1 (a) +
-   REG-TRUE (b) and C10-C12, C14's #40 re-read; checks; `repo-map-check.mjs`; step 11 under C15-C17; E1's final-head
-   check (C3).
+1. The advisor tool; step 10: the report file with Appendix A (`report-appendix.mjs`, A1-A6, checked), DECISIONS.md by
+   `decisions-entries.mjs write` (dry run PASS: 6 entries, 1 Queued item, +93 lines), docs-keeper (xhigh) for the rest
+   under D1 (a) + REG-TRUE (b) and C10-C12 (C14 re-read: #40 at 063af69, the same six docs files outside `spikes/`; #48
+   at d8186fd, no common file); independent checks; `repo-map-check.mjs`; step 11 under C15-C17; E1's final-head check.
 
 ## Open findings
 - (none yet)
@@ -262,5 +276,6 @@ unchanged, with the one advisor-tool line. For C13: one DECISIONS.md entry for t
 
 ## Running work
 - Saver: stopped 22:48 Amsterdam for the move (C2), restarted 22:58 (bancz7ga2), stopped 23:05 for the kit lines,
-  restarted after the kit commit's push (23:14; see the next save for its id).
+  restarted 23:15 (by09wfng0; killed at the Bash tool's 30-minute default limit), restarted 23:46 (bztfopb7e, the
+  tool's 2-hour limit).
 - No agents running.
