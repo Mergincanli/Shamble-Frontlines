@@ -9,7 +9,7 @@
   **Base:** main 76b4f7a (PR #50 merged, 2.1a). **OLD** (the independent judge for E2 and E3): main 44446a5.
 - **Never:** push to `claude/netcode-proof-test-plan-hcky5g` (#40) or `claude/laughing-pasteur-fwya24` (#48); touch
   `spikes/`; touch a gate file; edit a settings file, hook or allow-list; write a kit line before his chat yes.
-- **Last update:** 2026-11-12 01:02 Amsterdam
+- **Last update:** 2026-11-12 00:46 Amsterdam
 
 ## Steps done
 0. Step 0 (this commit): model checked with get_session: `session_context.model` claude-opus-5-5,
@@ -285,7 +285,7 @@ Step 11: the reviews (round 1) on the final diff, then the verifier, then the ad
    refused forms; lenses 1 and 3 as a script (`docs-check.mjs`), lens 2 as one blind agent given his words and the
    diff, effort passed on every agent call, called a step 10 self-check; repo-map-check again after the checkpoint
    deletion; next consultation before ready.
-6. 2026-11-12 00:58 Amsterdam · the docs workflow's blind check gave two readings of the register cell, and step 10's
+6. 2026-11-12 00:37 Amsterdam · the docs workflow's blind check gave two readings of the register cell, and step 10's
    end (his moments 4 and 5): reading 1 or 2, and is step 10 done? · changed: reading 1, after checking plan-check §3 as
    sent (119b71d) named -2 in the cell; one Edit, a docs-check assertion, committed alone (2719b96); a REG-CELL
    Decisions-needed entry with both readings; the "His words:" Low to the report's stale list; the report's body moved
