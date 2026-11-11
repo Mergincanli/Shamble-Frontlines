@@ -4,19 +4,21 @@
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main, last merged in at 5ca77eb (main bb2d817, PR #49, the STATUS split)
-- **Last update:** 2026-11-11 about 16:20 UTC (Mustafa's HOLD: no new agent; the card rewritten so a compacted chat can
-  carry on from it alone; U4c and U4d merged; U4j's fix pass done, its round 2 cut; U4e's brief rev 3 drafted, its
-  check cut; U4d-F cut early)
+- **Last update:** 2026-11-11 about 16:55 UTC (after Mustafa's /compact: the usage split reported; the advisor's text
+  batch applied by the main session, no agent; the HOLD stands: U4j's round 2, the U4e brief's check and U4d-F stay
+  cut)
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **HOLD (Mustafa, 2026-11-11 about 16:15 UTC; verbatim in history.md "Decisions taken"): start no new agent until he
-says so.** Usage on the account is the bottleneck. The advisor's text batch is held for the main session itself (no
-agent slot). The three cut workflows below stay stopped until he lifts the hold; the main session may work without
-agents. The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
+says so.** Usage on the account is the bottleneck. The three cut workflows below stay stopped until he lifts the hold;
+the main session may work without agents. After his /compact (about 16:25 UTC) the main session reported the usage
+split (usage-20261111.md) and applied the advisor's text batch itself (below). The card's blocks of 2026-11-11 morning
+are in history.md, "Running work, U4 wave 1 (2)".
 
-**The current step: U4 wave 1's close and wave 2's preparation.** Plan files: plan.md (rev 3.3 with the W1 batch,
-sha256 4717029c…), u4-build-plan.md (rev 2 with the W1 amendments, a81b230f…), u4s-carries.md (19e7ca98… plus carries
-51 and 52 of 11:50); the advisor's rulings: advisor-u4.md, advisor-u4-wave1.md, advisor-u4j.md, advisor-u4d-close.md.
+**The current step: U4 wave 1's close and wave 2's preparation.** Plan files, with the advisor's text batch of
+2026-11-11 applied: plan.md (rev 3.3, sha256 4e74a152…), u4-build-plan.md (rev 2, 7375cdcf…), u4s-carries.md (carries
+1-60, f18a0692…); the advisor's rulings: advisor-u4.md, advisor-u4-wave1.md (with B1.4's erratum), advisor-u4j.md,
+advisor-u4d-close.md.
 - **Merged into the spike branch:** U4s f080551, U4b 411eeee, U4a 952f734, U4c f3f7c2f, U4d with W1-S1's npt-proto half
   39f4290 (report u4d-report.md); CI green on each. Main merged in at 5ca77eb (PR #49). At 39f4290: check.mjs 10 steps,
   measured 365, bites 412, self 52.
@@ -64,20 +66,23 @@ ones run again.
      (netcode-architect, test-engineer) as scripted.
    - It merges before U4d2's brief is final; U4d2 pins only U4d-F's recordings (carry 52).
 
-**Held for the main session (Mustafa, 2026-11-11): the advisor's text batch** (advisor-u4d-close.md; copy each block by
-line range, never retype; a test-engineer check once agents are allowed):
-- carries: carry 52's tail (B1.2); new carries 53-57 (§U4e, after 51) and 58-60 (§U4r, after 49); carry 51's span fix;
-- the erratum block appended to advisor-u4-wave1.md (B1.4: "(9 fields)" and three more slips);
-- u4-build-plan.md: §4.1's npt-sim rows gain Weapon, Scene::weapon, Scene::health (B1.5, :184-185); F10 ("never" to
-  "not", :247), F3-F7, F9 (B3);
-- u4d-report.md: TUNE-1's kill-rate bullet (B1.6: 0.272 a second over an S30);
-- plan.md (B4): NA1 (R-31, :1424); the U8 row's new case and NA4's run condition (:1248); NA5 (C-U8-6, C-U8-4); C-U6-8
-  and the U6 row's weapon and health (:1246).
+**The advisor's text batch: APPLIED by the main session (2026-11-11 about 16:50 UTC, no agent, as Mustafa asked after
+his /compact).** `python3 -I .checkpoints/netcode-proof-test/text_batch.py` (its dry run first) copied every block and
+every quoted string from advisor-u4d-close.md by line range: anchors checked unique, every new text found in place,
+changed prose lines within 120 characters. Its log lists the 29 edits: carries 52's tail, 51's span, 53-57 (§U4e),
+58-60 (§U4r), F3 (40), F7 (:14, 13); B1.4's erratum; B1.5 and F5, F6, F9-F11 in u4-build-plan.md; F4, NA1, NA4, NA5,
+C-U6-8 and TUNE-1's header in plan.md; B1.6 in u4d-report.md, beside the main session's own line on the answers.
+Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines untouched (52 once more by hand, so that
+"tick 0." stays on one line).
+- Still open from that ruling: a test-engineer check of the applied batch once agents are allowed (the script's log
+  is its brief); B4's TE2-TE4 plants, a day-session run on 1ccff06's code with the skeptic's cargo lines once the
+  shared target is quiet (a plant that already fails a test drops out of C-U6-8); B4's Lows (TE5-TE7, NA2, NA3, NA6)
+  as follow-ups for U3d's part of PR #40's report; B2's U4g and U4h notes stay follow-ups (named in u4d-report.md).
 
 **Next steps, in order, when the hold lifts:**
 1. Restart the saver. Resume U4j's run (workflow 1); merge U4j after round 2 (or 3).
-2. Resume the U4e brief's run (workflow 2). Apply the held text batch. Then the advisor's check of the U4e brief and
-   U4e's build.
+2. Resume the U4e brief's run (workflow 2). Then the test-engineer's check of the applied text batch, the advisor's
+   check of the U4e brief, and U4e's build.
 3. U4d-F (workflow 3) as above; then U4d2's builder brief (carrying carry 52, N2-M2's ruling, W1-TARGET), with the
    advisor.
 4. U4r's brief: the night's rev 2 at `cs/npt-u4r-brief` ed973c9 goes to the advisor after U4c, U4d2, U4e and U4j merge.
@@ -91,6 +96,9 @@ line range, never retype; a test-engineer check once agents are allowed):
 - **NIGHT-TONIGHT (asked 2026-11-11 about 16:20 UTC):** post tonight's night items to issue #16? The night shift's
   agents run on the same account. Options: (a) post as planned; (b) post none tonight; (c) post one small item.
   Recommended: (b) while the hold stands.
+- **USAGE-SAVINGS (asked 2026-11-11 about 16:55 UTC):** adopt the three savings in usage-20261111.md when the hold
+  lifts (builders restart fresh from their notes at each fix group; a lean main session, compacted at about 35-40 %;
+  one review packet per round)? Options: (a) all three; (b) the ones he names; (c) none. Recommended: (a).
 - Answered today (verbatim in history.md): NIGHT-BUDGET (a); the drift fix before U4d2's pins (carry 52); the effect
   row's owner deferred to U4e (carry 51); U4j's F1 by the review budget; the HOLD.
 
@@ -120,6 +128,8 @@ line range, never retype; a test-engineer check once agents are allowed):
 - History: history.md (Steps done U0-U3d; Decisions taken, newest first; Running work up to U3c; "Running work, U4 wave
   1" (the card's blocks of 2026-11-10) and "(2)" (2026-11-11's, moved at the HOLD)).
 - The closing checklist for PR #40: under Next steps.
+- Usage: usage-20261111.md (the 24-hour split and the three proposed savings; script usage24.py). The text batch:
+  text_batch.py.
 
 ## Steps done
 Moved to history.md (RESUME-CARD, 2026-11-10): every step from U0 to U3d, with its SHA.

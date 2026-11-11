@@ -11,7 +11,7 @@ plain parts, never the rule.
 
 Completed by the netcode-architect, 2026-11-09, under the advisor's U4s ruling (advisor-u4.md:236-375): its condition 2
 (:313-327) adds entries 34-39 and 41-44 and rewords carry 7; its open item O1 (:343-347) adds entry 40. Each is marked
-with the ruling. The file now holds 44 entries; the wave-1 briefs carry them word for word (its condition 4).
+with the ruling. Later rulings add entries 45 on, each marked; the briefs carry them word for word (its condition 4).
 
 ## What the fix pass fixed (for the record; not carried)
 - netcode F1 / arch N1: seam.rs:15-21, :26, :38-42 (the sim reads slot, seq, buttons, presses, move_xy, aim; tick and
@@ -111,6 +111,8 @@ with the ruling. The file now holds 44 entries; the wave-1 briefs carry them wor
 13. **netcode F9 / rust 2:** "`HitVolumes` gets a hand-written `Clone` whose `clone_from` copies field by field into the
     existing storage (rust 2's probe: the derived `clone_from` does not keep a `Vec`'s storage), and a counting-allocator
     test: a push into a full `HitHistory` allocates nothing."
+    (Split by the advisor's W1-U4D ruling, C13: the storage-identity half is met at U4d; the counting-allocator half is
+    entry 48, U5's.)
 14. **rust 3 (the 1 MB half):** "`HitHistory::for_ms` also returns `None` for a span whose ring would exceed 1 MB
     (capacity × one tick's `HitVolumes` bytes: u4-build-plan.md §4.9), tested at the edge, once `HitVolumes` holds its
     volumes. The recording header carries the ring's span in ms beside `TICK_HZ` (nit b's capacity), and the replayer
@@ -184,23 +186,77 @@ with the ruling. The file now holds 44 entries; the wave-1 briefs carry them wor
     home in npt-sim: the World finds it as the row's index / the scene's effect rows per soldier (world.rs:1879-1881),
     that count is pub(crate) (scene.rs:119), and the public doc only says 'its owner is its index / 8' (seam.rs:283).
     U4e's own-state filter never copies the 8. It reads the mapping from one public home (a pub accessor such as
-    `Scene::effect_rows()`, or a pub rows-per-soldier constant with a const assert on every scene); npt-sim is not
-    U4e's lane, so if no such home exists when U4e starts, U4e raises it to the main session (carry 26's route),
-    which adds it in its own commit. A test shows that slot k's client receives exactly slot k's effect rows."
+    `Scene::effect_rows()`, or a pub rows-per-soldier constant with a const assert on every scene); npt-sim is not U4e's
+    lane, and no such home exists today: the main session adds `Scene::effect_rows()` (pub, the rows per soldier, 8 or 0
+    in today's scenes; approved as that home by the advisor's U4d close ruling) in its own commit when U4e's build
+    starts, with its line in u4-build-plan.md §4.1's npt-sim row ("`Scene::effect_rows` (an effect row's owner, the one
+    public home: carry 51)"). Any other home U4e finds it needs is a seam change for the advisor (carry 26's route),
+    never a local copy of the 8. A test shows that slot k's client receives exactly slot k's effect rows."
+53. **N2-L1 and the security-auditor's own-state carry (u4d-round2-netcode.md, N2-L1; u4d-round2-security.md,
+    'Carries for U4e', first bullet; the advisor's U4d close ruling):** "The codec checks a record's kind against its
+    section, never its slot against the client: any slot's Soldier, OwnState or Effect record passes in the own-state
+    section. So the room's encoder fills client c's own-state section with c's slot's records only. In every
+    `Snapshot` and `FullState` sent to c, the own-state section's Soldier and OwnState records have index = c's slot
+    and that soldier's generation, and its Effect rows are exactly the rows whose owner is c's slot (carry 51's
+    mapping). A test shows it for every client of an SS room (48 clients) on each of at least 300 ticks, the ticks
+    around a respawn (a generation change) included. Catalogue item 5's L1 check reads each own-section record's
+    identity (kind, index, generation, an Effect row's owner) against the receiving client's slot, not only the
+    section the record sits in. Its owner-to-all bite takes the route the codec leaves open: other slots' own-state
+    records in every client's own-state section. Moving them into the entity section ends in `Err(OutOfRange)` at the
+    encoder; that proves the codec, not the class filter, so it does not count as that bite."
+54. **The encoder's refusals in the room (u4d-round2-security.md, 'Carries for U4e', second bullet; the advisor's U4d
+    close ruling):** "The room handles `Err(OutOfRange)` from the encoder (a section mix-up, or an integer outside its
+    field's range) without a panic, `unwrap` or `expect`: that client's snapshot for that tick is skipped, the error
+    is counted per client and logged (under a name with its SERIES.md row), and the next tick encodes afresh. A test
+    plants one out-of-range record for one client and shows every other client's snapshot for that tick unchanged."
+55. **Team and Public rows (u4d-round2-security.md, 'Carries for U4e', third bullet; the advisor's U4d close
+    ruling):** "npt-proto's `carries()` (snapshot.rs:173-179) counts Team and Public rows as the entity section; both
+    are empty today. A kind placed in a Team row needs the room's class filter (that team only), since the codec
+    cannot tell teams apart. Any Team or Public row added before U4's end comes to the advisor with its filter and a
+    test."
+56. **N2-L3 (c), the own-state section's size (u4d-round2-netcode.md; probe X1, u4d-round2-test.md; the advisor's U4d
+    close ruling):** "U4e's report states the measured own-state section per snapshot: bytes on the wire (mean, p99
+    and max per client), in SS and in ES, with the OwnState record's share of it and how often that record changes.
+    Over an S30 of SS, 47.49 of 48 OwnState records changed each tick (X1): the fire timer and the reload left count
+    down every tick. R2's estimate allows 16 B per snapshot for the local player's own state (r2-netcode.md:1756). A
+    mean above it is reported beside that figure, not judged: PM-0001-12 judges the downstream total."
+57. **U4E-Q6, the room's half (advisor-u4-wave1.md:473-479; the advisor's W1-U4E ruling; homed by the advisor's U4d
+    close ruling):** "The event queue's cap is data, with a provisional value from net F121's arithmetic (1,024 is
+    F121's example, above the about 400 a B1 burst adds), recorded as provisional wherever the run's header records
+    the room's settings; U4f measures the rate and records §4.7's value before -22's runs. The room counts each
+    overflow resync per client, with its tick, in its log, so that every judged -17 and -18 run can report them (carry
+    58)."
 
 ## U4r (the L1 runner and its judged runs)
-40. **O1 (u4-conditions-check.md:42-45; advisor-u4.md:343-347; the advisor's U4s ruling, O1; its last sentence added
-    by the advisor's W1-U4E ruling, U4E-Q5):** "U4r's brief, which comes to the advisor, states that at U4r the room
-    has neither the view-time tolerance nor the cap (both land in U4h: u4-build-plan.md §5 U4e's `rewind_at` and §5
-    U4h), so the -30 pre-check's setup condition (0 view-time replacements and 0 clipped shots on both legs: the
-    advisor's condition 3) holds by construction at U4r, and its RTT argument cannot be tested there; and it either
-    re-runs the pre-check pair after U4h merges (6 runs) or says why not (the advisor's lean is the re-run). The room's
-    count of commands that `rewind_at` gives no Rewind, because the ring does not hold their claimed view time's tick,
-    counts as a replacement in that setup condition: a pre-check leg with any is VOID (U4E-Q5)."
+40. **O1 (u4-conditions-check.md:42-45; advisor-u4.md:343-347; the advisor's U4s ruling, O1; its last sentence the main
+    session's words for the advisor's W1-U4E ruling, U4E-Q5, approved with the clause 'for the tolerance and the cap' by
+    the advisor's U4d close ruling):** "U4r's brief, which comes to the advisor, states that at U4r the room has neither
+    the view-time tolerance nor the cap (both land in U4h: u4-build-plan.md §5 U4e's `rewind_at` and §5 U4h), so the -30
+    pre-check's setup condition (0 view-time replacements and 0 clipped shots on both legs: the advisor's condition 3)
+    holds by construction at U4r for the tolerance and the cap, and its RTT argument cannot be tested there; and it
+    either re-runs the pre-check pair after U4h merges (6 runs) or says why not (the advisor's lean is the re-run). The
+    room's count of commands that `rewind_at` gives no Rewind, because the ring does not hold their claimed view time's
+    tick, counts as a replacement in that setup condition: a pre-check leg with any is VOID (U4E-Q5)."
 49. **N-M4 and TUNE-2 (advisor-u4-wave1.md:291-294; the advisor's W1-U4D ruling):** "The contract test's report gives,
     for each SS suite, the share of snapshots whose client set holds all 4 very large units, and the mean number of
     projectiles per client set (reported, not judged: W1-U4D N-M4). The runner refuses a scripted spawn or teleport
     above World's stated clamp bound (W1-U4D TUNE-2)."
+58. **U4E-Q6's two conditions (advisor-u4-wave1.md:476-479; the advisor's W1-U4E ruling; homed by the advisor's U4d
+    close ruling):** "U4r's contract test logs each client's relevant gameplay-event rate and its event queue's
+    high-water mark per burst. An overflow resync in any judged -17 or -18 run (U4r's, or a later unit's) is reported,
+    and those runs come to the advisor before they count: net F121 warns that a cap set too low resyncs every client
+    on every burst and changes -18's heal path."
+59. **A2-L3 and T2-M1, ES under the bots (u4d-round2-arch.md, u4d-round2-test.md; the advisor's U4d close ruling):**
+    "U4r's contract test also runs a short ES suite of the brawl `Behaviour` (48 clients) and resolves PM-0001-2's ES
+    checks on it: shots, gameplay events, live projectiles and spawns in their bands (W1-U4D T-M1's numbers) and the
+    share of snapshots whose client set holds all 47 other soldiers and all 15 vehicles. A band or share missed goes
+    to the advisor before any ES run of PM-0001-12 counts. The ES runs themselves stay under PM-0001-2's counter
+    script, run by run (ADR 0001:1480)."
+60. **TUNE-1's header (advisor-u4-wave1.md:252-253; the advisor's W1-U4D ruling; homed by the advisor's U4d close
+    ruling):** "Each run's header records the scene's weapon (interval, damage, reach, magazine, reload, spread) and
+    its soldiers' health, read from `Scene::weapon()` and `Scene::health()`. U4r's runner writes them into npt-lab's
+    L1 headers, and the contract test shows them in every header. U6's npt-server header does the same (plan.md's U6
+    row)."
 
 ## U4f (clock and commands)
 46. **N-M2 = R-M2 = A-C, -21's press twins (advisor-u4-wave1.md:197-235; the advisor's W1-U4D ruling):** "-21's press
@@ -238,10 +294,13 @@ with the ruling. The file now holds 44 entries; the wave-1 briefs carry them wor
     scene before U4d2 pins the recordings. The 9.5 floor (PM-0001-2) does not move."):** "Before U4d2 pins any
     recording or hash, the estimate scene's event-rate drift is fixed: the recording's dead reckoning (replay.rs's
     generator) ignores crouch, dropped commands, scripted move speeds, blocked moves and deaths, so the event rate
-    falls over a run (per 50 s window: 13.4, 11.0, 10.1, 9.4, 9.7, 8.7 a second at 1 in 10). The fix and the
-    re-calibration of `aim_one_in` are measured on the judged window (a 10-minute measured window after warm-up,
-    ADR 0001:1600; 3 seeds), not on T-M1's 300 s from tick 0. PM-0001-2's floor of 9.5 events a second does not
-    move. The advisor rules the fix's form; it lands in the main session's commit or U4d2's, before the pins."
+    falls over a run (per 50 s window: 13.4, 11.0, 10.1, 9.4, 9.7, 8.7 a second at 1 in 10; the test-engineer's probe
+    X2, seed 2 at 1 in 11: 7.578 a second over 600 s). The fix and the re-calibration of `aim_one_in` are measured on
+    the judged window (a 10-minute measured window after warm-up, ADR 0001:1600; 3 seeds), not on T-M1's 300 s from
+    tick 0. PM-0001-2's floor of 9.5 events a second does not move. The form, the measurement and the owner are the
+    advisor's U4d close ruling (advisor-u4d-close.md, B1.2 and B1.3): the main session's change U4d-F lands the fix,
+    with ES's vehicles inside the fight (N2-M2), before U4d2's brief is final. U4d2 pins only recordings written by
+    U4d-F's `Recording::GENERATOR` or later, and ES's hashes only from U4d-F's scene; its report names U4d-F's commit."
 
 ## The main session (plan text, before the code merges: risk 11)
 30. **A19 (§4.1's table):** "npt-sim's rows gain `EntityKind::ALL` and `EntityKind::layout` (arch F2: one home for the

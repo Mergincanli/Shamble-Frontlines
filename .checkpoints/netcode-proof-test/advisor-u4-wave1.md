@@ -624,3 +624,9 @@ W1-TARGET written 2026-11-10.
    - PM-0001-58's "tick offsets" (W1-N2);
    - PM-0001-21's press twin (W1-U4D);
    - the clamp reading's grid-range clause (TUNE-2).
+
+**Errata (the advisor, 2026-11-11; advisor-u4d-close.md, B1.4 and B3):** W1-S1's "(9 fields)" (:79) reads "(8
+fields)": the list it heads names 8, as do the catalogue's remote row and SOLDIER as built. W1-U4D's two quotes of
+condition 1 (:200 and :224) read "what the server accepted, not what the client claimed" (advisor-u4.md:86). W1-PLAN's
+cite "advisor-u3q.md:143-144" (:525) reads ":142-143". W1-PUB's "§4.7's items" (:422) reads "plan §4.7's items". No
+ruling changes.

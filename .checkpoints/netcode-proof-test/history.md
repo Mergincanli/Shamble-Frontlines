@@ -278,6 +278,16 @@ checkpoint's resume card is the handoff; open this file only when a step needs t
     R1 still waits for stop B.
 
 ## Decisions taken
+- **Mustafa, 2026-11-11 about 16:25 UTC, after his /compact (verbatim):** "You were just compacted to cut usage. Read
+  the resume card in .checkpoints/netcode-proof-test.md first and continue from it. Do not redo finished work.
+  Then, without agents and in ten minutes at most:
+  - a rough usage split for the last 24 hours from the session's own figures, in five lines: main-session turns,
+    builders, reviewers, advisor rulings, everything else;
+  - your three biggest savings that do not weaken the judge, the marks or any pass bar.
+  Apply the advisor's text batch yourself when the main session is free; no agent for it."
+  - Done: the split and the savings in usage-20261111.md (script usage24.py), reported in the chat; the text batch
+    applied by the main session with text_batch.py (every block and quoted string read from advisor-u4d-close.md by
+    line range), no agent. The HOLD stands.
 - **Mustafa, 2026-11-11 about 16:15 UTC (verbatim; the HOLD):** "Usage on this account is the bottleneck, and this chat
   is 70% full: every request re-sends the whole chat. Do this now and start no new agent until I say so:
   1. Update the resume card so a compacted chat can carry on from it alone: the current step, the three running agents

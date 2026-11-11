@@ -50,6 +50,11 @@ below 9.5."
   (new stand-in tuning; `grenade_fuse_ms` also changes every bot-driven ES run's grenades), and (C) W1-S1's "(9
   fields)" is a counting slip for 8 (the ruling's own list and catalogue :137 have 8); the new public items `Weapon`,
   `Scene::weapon` and `Scene::health` (TUNE-1's run-header facts) for §4.1's npt-sim row (R2-L4, A2-L2, N2-L4).
+- **The advisor's answers** (advisor-u4d-close.md, 2026-11-11): (A) the estimate scene's knobs are approved as stand-in
+  tuning, with conditions (B1.1); N2-M1's fix and N2-M2's scene fix land as the main session's change U4d-F, before U4d2
+  pins anything (B1.2, B1.3; carry 52); (C) was a slip, and its erratum is appended to advisor-u4-wave1.md (B1.4);
+  `Weapon`, `Scene::weapon` and `Scene::health` are approved for §4.1's npt-sim row (B1.5); TUNE-1's measured load has
+  its own bullet in this section (B1.6).
 - **Follow-ups (Lows, nits; no push on their own):** rust L3, L6, L7, L9, N1, N2, N3, N5, R2-L1 to R2-L3, R2-N1;
   arch D, E (to U4d2), A2-L1, A2-L3 to A2-L5; test L2, N1, N2, T2-L1 (two invariants held only by D-7's re-pinned
   hash), T2-L2 (the decode cap's test goes with U5's carry 48), T2-L3; netcode N2-L1 (a test-backed U4e carry: the
@@ -57,6 +62,10 @@ below 9.5."
   nits (PARENT redundant; a held-back command's Rewind may leave the ring; a non-finite ray is a Miss: carry 45);
   security's carries for U4e; round-1 SEC-U4a-4 and -5.
 - **Carry 13** is met in part (the storage-identity test); its counting-allocator half is U5's (carry 48).
+- **TUNE-1's measured load:** SS's kill rate is 0.272 a second over an S30 (the test-engineer's probe X3: 489 kills in
+  1,800 s; D-6's 100 s give 28, 0.28 a second; probe F's 0.42 was before the fix pass), so respawns, and with them
+  generation changes, are rare in SS. N-M1's magazine of 32,000 rounds lasts 2,194 s at one soldier's rate, so "no
+  reloads" holds for a whole S30 (X3).
 
 ## Size (SIZE-CHECK, reported to Mustafa 2026-11-11)
 About 7,250 lines for size M-L: code about 4,210 (world.rs 2,409, replay.rs 713, scene.rs 315, seam.rs +308, the

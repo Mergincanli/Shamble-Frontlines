@@ -181,15 +181,15 @@ the critics'.
 | npt-sim | `SimCore` (moved from npt-room) | U4-SEAM |
 | npt-sim | `TICK_HZ`, `LOOP_CATCHUP`, the tick-constant functions and their derived constants (§4.3) | plan.md:544-546; A4, A5: the Worker reaches npt-sim, never npt-server |
 | npt-sim | `grid` (the wire grid, each way, per field kind) | U4-OWNSNAP: the sim's own-copy snap and both codec ends need one function |
-| npt-sim | seam data: `Command`, `Rewind`, `TickInput`, `EntityRecord`, `HitVolumes`, `HitHistory` (moved from npt-room), `PortalStates`, `SimEvent`; `InputReports` and `SimCore::reports` (the clamp reports and the refusal counters, outside the hash: the advisor's condition 1); the owner-only own-state kind (W1-S1); the records-to-volumes function (W1-U4D A-M1); `InputReports`' refusal records (W1-U4D N-M2); the plain-data types `Placement`, `AttributeChange`, `Attribute`, `ClampReport`, `VolumeBox`, `FieldDiff`, `Ray`, `RayHit`, `replay::Step`; `Scene`'s and `World`'s accessors (`World::new`, `scene`, `greybox`, `next_tick`, `dump`; `Scene::by_id`, `id`, `name`, `slots`, `team`, `stand_ins`, `with_stand_ins`) | §4.2; A1, A2; the advisor's condition 1; the advisor's W1-S1, W1-U4D and W1-PUB rulings |
-| npt-sim | `Recording`, `StateDump`, `replay::Replayer` | RQ5's field diff; U4-REPLAY; A12's one driver |
+| npt-sim | seam data: `Command`, `Rewind`, `TickInput`, `EntityRecord`, `HitVolumes`, `HitHistory` (moved from npt-room), `PortalStates`, `SimEvent`; `InputReports` and `SimCore::reports` (the clamp reports and the refusal counters, outside the hash: the advisor's condition 1); the owner-only own-state kind (W1-S1); the records-to-volumes function (W1-U4D A-M1); `InputReports`' refusal records (W1-U4D N-M2); the plain-data types `Placement`, `AttributeChange`, `Attribute`, `ClampReport`, `VolumeBox`, `FieldDiff`, `Ray`, `RayHit`, `replay::Step`, `Weapon` (TUNE-1); `Scene`'s and `World`'s accessors (`World::new`, `scene`, `greybox`, `next_tick`, `dump`; `Scene::by_id`, `id`, `name`, `slots`, `team`, `stand_ins`, `with_stand_ins`, `weapon`, `health`); W1-PUB's other approved items: `StandIns::OFF` and `s1`, `HitVolumes::MAX_SOLDIERS`, `MAX_COVER` and `MAX_BYTES`, carry 17's button and press constants, `Greybox::dm_tri`, and, bites builds only, `World::BITES`, `World::with_bite` and `World::bite_order_digest` | §4.2; A1, A2; the advisor's condition 1; the advisor's W1-S1, W1-U4D and W1-PUB rulings; TUNE-1: `Weapon`, `Scene::weapon` and `Scene::health` are the facts each run's header records (U4r's npt-lab headers and U6's npt-server header: carry 60) |
+| npt-sim | `Recording` (with `GENERATOR`, `encode`, `decode` and `synthetic`), `StateDump`, `replay::Replayer` and its methods | RQ5's field diff; U4-REPLAY; A12's one driver; W1-PUB: `synthetic` is in the library because U4d2 regenerates the recordings (§4.15) |
 | npt-sim | `World::predict`, `World::load_movers`, `World::ray_cast`; `Scene::estimate`, `Scene::course`, `Scene::targets` beside `Scene::stress` | ADR 0004:166-178; ADR 0001:258-260; ADR 0001:1470-1482 |
 | npt-sim | `EntityKind::ALL` and `EntityKind::layout`; `grid::Field::integer`; `full_state_ack_ticks_at`; `HitHistory::for_ms` in place of `HitHistory::new`; bites builds only: `grid::Config::floor_rounding`, `OWN_COPY_SNAP_BITES` and `own_copy_snap_with_bite`. Removed: bites-only `grid::Config::BITES` and `grid::Config::with_bite` (the advisor's U4s ruling, condition 1 (a)) | u4s-carries.md carry 30: arch F2 (one home for the per-kind field order; one type for a layout's fields); rust 1 (each derived constant is `<name>_at(TICK_HZ)`); netcode F6, A5; arch F1 |
 | npt-proto | `RoomControl` (unfeatured; N5) | catalogue item 6 (:253); U5's fuzz target (catalogue :280) |
 | npt-proto | `Wrap` (one compare per width, called with its counter's name) | -58's per-counter bites (§4.14) |
 | npt-proto | `client_hash`; the `EntityRecord` ↔ wire mapping | -17 (§4.6); A18 |
 | npt-proto | dependencies on npt-sim (grid, seam types) and npt-link (`Channel`) | U4-OWNSNAP, A18; catalogue item 2 (arch F37); leaf to leaf |
-| npt-proto | `Message`, `Direction`, `DecodeError`, `EncodeError`; the message and control types' field types (`EndReason`, `ProfileId`, `StepResult`, `TokenKind`); `Limits`' constants and `TYPES`; `Quant`'s `encode` and `decode`; `Wrap`'s compares and `widen16`; `EntityDelta`; `Class` and the two `GROUPS` tables; the catalogue audit's name and variant helpers; bites builds only: `BITES`, `Quant::with_bite`, `Wrap::plain_lt` | the signatures and fields of §4.7's items; §5 U4a's layout table; catalogue items 2, 3 and 6 (the advisor's W1-PUB ruling) |
+| npt-proto | `Message`, `Direction`, `DecodeError`, `EncodeError`; the message and control types' field types (`EndReason`, `ProfileId`, `StepResult`, `TokenKind`); `Limits`' constants and `TYPES`; `Quant`'s `encode` and `decode`; `Wrap`'s compares and `widen16`; `EntityDelta`; `Class` and the two `GROUPS` tables; the catalogue audit's name and variant helpers; bites builds only: `BITES`, `Quant::with_bite`, `Wrap::plain_lt` | the signatures and fields of plan §4.7's items; §5 U4a's layout table; catalogue items 2, 3 and 6 (the advisor's W1-PUB ruling) |
 | npt-client | a dependency on npt-link, for `Channel`; bites builds only, `BITES` and `grid_with_bite` (the advisor's U4s ruling, condition 1 (a)) | as above; u4s-carries.md carry 30: arch F1 |
 | npt-room | `Room<S: SimCore>`; `InputBuffer::CMD_CATCHUP`; bites builds only: `BITES` | U4-SEAM; RQ6; U4E-Q3 (the advisor's W1-PUB ruling) |
 | npt-server | `Decoder::pump` (the I/O step over `&mut dyn Link`, injected `now`, the ping sender, per-client RTT and bytes sent); `Schedule`, `Due`; `Dropped`, `LoopCounters`, `next_due_ns`, `counters`, `tick_hz`, `catchup`; bites builds only: `Schedule::with_bite`, `BITES` | U4-SERVER; §4.3; A6, A7; the advisor's W1-PUB ruling |
@@ -227,7 +227,7 @@ the critics'.
   beyond the weapon's reach + 0.87 cm (one grid cell's half-diagonal) moves along its own ray to exactly the reach and
   is snapped to the grid; a clamp report `{ slot, seq, point }` in `reports()` records it, never a `SimEvent` and never
   in the hash (the advisor's condition 1). A point within reach + 0.87 cm is never clamped again, so a clamped point
-  sent back is stable (the twin's rule, §4.10).
+  sent back is stable (the twin's rule, §4.10), for every fire origin below the bound World's doc states (TUNE-2).
 - **Two entry points** over the same phase functions (ADR 0004:166-178): the authority `step` and `World::predict` (one
   slot and its vehicle, against the movers `World::load_movers` loaded from the last decoded snapshot, drawing from no
   random stream). Both end each tick with the own-copy snap through `grid` (Q23).
@@ -244,7 +244,7 @@ the critics'.
   differ by design); they are a function of the command stream alone, and the predicting World restores them from the
   client's own command at the snapshot's last-run sequence (U4g). `reports()` also lists each refusal per command
   (`{ slot, seq, kind }`, beside the clamp reports), so a twin removes exactly the refused parts. D-10 runs past the
-  next accepted press. (The advisor's W1-U4D ruling: it replaces condition 1's 'what the server accepted, never what
+  next accepted press. (The advisor's W1-U4D ruling: it replaces condition 1's 'what the server accepted, not what
   the client claimed' for the press counters.)
 
 ### 4.3 The tick constant, the derived constants and the loop policy
@@ -362,7 +362,7 @@ the critics'.
 - **The clamp twin:** the forged run's room logs each clamp report's point (read through `reports()`, never from the
   hashed event list: the advisor's condition 1); the twin run sends exactly those points at the same instants. Since a
   point within reach + 0.87 cm is never clamped again, the twin's shots use the same points, and a unit test shows
-  clamp-then-grid is idempotent.
+  clamp-then-grid is idempotent, for every fire origin below the bound World's doc states (TUNE-2).
 - **The twin's command for a kind the sim checks** (the cooldown, ammunition and reload edges; the clamp, whose twin
   sends the clamped point) is the forged command with only the refused part removed, everything else equal (the
   advisor's condition 1). For a refused press the refused part is the press itself: the twin's counter for that button
@@ -490,8 +490,8 @@ sub-unit that moves its mark.
   own Rewinds.
 - **One driver:** `npt_sim::replay::Replayer` (feed words, step, per-tick hash and dump). npt-lab's `hash` subcommand
   runs it natively; npt-hash-wasm's exports wrap it; D-2 calls it in a test.
-- **Sources:** U4d's three synthetic recordings from a seeded generator in npt-sim's library (`Recording::synthetic`),
-  since U4d2's step regenerates the recordings from the manifest (open-loop commands, Rewinds drawn inside the ring),
+- **Sources:** U4d's three synthetic recordings (open-loop commands, Rewinds drawn inside the ring) from a seeded
+  generator in npt-sim's library (`Recording::synthetic`), since U4d2's step regenerates them from the manifest,
   needing no room; U4r's three runner recordings (`scenario --record`: SS P2 seed 1, ES
   P3 seed 2, TC B1 seed 3), which hold the room's real Rewinds; and a fourth runner recording, **SS P0 seed 4**
   (`scenario --record`), the -30 pre-check's source (the advisor's condition 3). Replayed at P0, the other three's view
