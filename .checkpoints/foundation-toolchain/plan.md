@@ -1,6 +1,10 @@
-# Plan: foundation step 2.2, the toolchain (revision 6)
+# Plan: foundation step 2.2, the toolchain (revision 7)
 
-Status: revision 6 records Mustafa's KIT-ASK-SEEN (b) of 2026-11-11 (`mustafa-2026-11-11-kit-ask-seen.md`, word for
+Status: revision 7 records Mustafa's word of 2026-11-11 (`mustafa-2026-11-11-pr49-merged.md`): PR #49 merged (main
+bb2d817), so step 5's LANE-RULES condition is met and step 5 waits for 2.1b alone; STATUS is split into the dashboard
+`docs/STATUS.md`, his decisions in `docs/DECISIONS.md` and the rest in `docs/STATUS_ARCHIVE.md`, and step 6's docs pass
+uses that layout (Part 8 step 6). The STATUS line numbers cited below are main 2d22b69's; his words now stand in
+DECISIONS.md, and the build re-finds them there. Nothing else changed from revision 6. Revision 6 records Mustafa's KIT-ASK-SEEN (b) of 2026-11-11 (`mustafa-2026-11-11-kit-ask-seen.md`, word for
 word): before each step-5 kit edit the session asks him in chat and writes it only after his yes (Part 8 step 5), and
 "auto mode can pass the guard's ask" is a kit finding for the gate step, 2.3, with no guard change now (Appendix B,
 step 6). Nothing else changed from revision 5. Steps 1 to 4 are built (PR #48, a draft). Revision 5's own status
@@ -441,8 +445,13 @@ procedure says; the saver while agents run):
    Mustafa in chat, with its exact text, and written only after his yes (his KIT-ASK-SEEN (b), 2026-11-11: "Before each
    step-5 kit edit, ask me in chat and write it only after my yes."); the guard's own ask still runs at the write.
    Re-run E1-E11.
-6. Docs: REPO_MAP (E8); the register (the G0 done-when reading, Q2.2-a; his go); STATUS (or DECISIONS) and ROADMAP by
-   docs-keeper, with the dated follow-up for Node (Q2.2-c: one change-set moving `tools/` and v2 to Node 26 together,
+6. Docs, in the layout of PR #49 (his word, 2026-11-11: "use the new layout for your docs pass"): REPO_MAP (E8; its
+   new top-level entries); the register (the G0 done-when reading, Q2.2-a; his go); the dashboard `docs/STATUS.md`
+   (2.2's line in "in flight", within its line budget), his 2026-11-10 and 2026-11-11 words for 2.2 in
+   `docs/DECISIONS.md` (word for word, newest first), anything long in `docs/STATUS_ARCHIVE.md`, and ROADMAP, by
+   docs-keeper. docs-keeper's own file changed on main after this session started (PR #49), so it runs as a general
+   agent that reads `.claude/agents/docs-keeper.md` from main, as CLAUDE.md:59-61 has the advisor do. With the dated
+   follow-up for Node (Q2.2-c: one change-set moving `tools/` and v2 to Node 26 together,
    after 2.3, merged before 2027-03-31; Node 22's end of life is 2027-04-30; the toolkit's `package.json` and lockfile
    are gate files, so it asks Mustafa), and two kit follow-ups for 2.3 (Appendix B): "auto mode can pass the guard's
    ask" (his KIT-ASK-SEEN (b)) and CHECKPOINTS.md §10's `git -C` line that the guard refuses.

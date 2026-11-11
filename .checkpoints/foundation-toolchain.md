@@ -7,7 +7,7 @@
   APPROVE of revision 3, bf1737f).
 - **Branch:** `claude/laughing-pasteur-fwya24` (this cloud session's branch, standing in for `cs/foundation-toolchain`)
   · **Base:** main 2d22b69 (PR #46 merged)
-- **Last update:** 2026-11-11 10:00 Amsterdam
+- **Last update:** 2026-11-11 10:48 Amsterdam
 
 ## Steps done
 1. Model check: `get_session` shows `session_context.model` claude-opus-5-5 (Opus 5.5) · no commit · go.
@@ -95,14 +95,17 @@
     42893708791 and pull_request 42893718283 (gate and smoke jobs, 6 check runs, all success).
 
 ## Current step
-Steps 1-4 done. Waiting (his word, 2026-11-11): step 5 starts when he says 2.1b and LANE-RULES (PR #49) are in; PR #48
-stays a draft. Plan revision 6 records KIT-ASK-SEEN (b).
+Steps 1-4 done. Waiting for 2.1b only (LANE-RULES merged with PR #49, bb2d817; his word, 2026-11-11); PR #48 stays a
+draft. Plan revision 7 records the new STATUS layout for step 6.
 
 ## Next steps
 1. Step 5 (main merged in by the worktree path, condition 5's check, then K2a, K2b, K3, K4: each asked in chat with its
    exact text and written only after his yes, then the guard's ask at the write) after 2.1b and LANE-RULES
-   have merged (K4 in Accept edits or Manual mode, CLAUDE.md:67-68; after K4 the advisor runs as a general agent
-   reading main's advisor.md, CLAUDE.md:59-61); steps 6-7 after (docs incl. REPO_MAP and the register's G0 reading;
+   have merged (LANE-RULES is in: PR #49, bb2d817; 2.1b still to come) (K4 in Accept edits or Manual mode, CLAUDE.md:67-68; after K4 the advisor runs as a general agent
+   reading main's advisor.md, CLAUDE.md:59-61); steps 6-7 after (docs in the new layout: the dashboard docs/STATUS.md,
+   his decisions in docs/DECISIONS.md, the rest in docs/STATUS_ARCHIVE.md; docs-keeper's file changed on main after
+   this session started, so docs-keeper runs as a general agent that reads main's .claude/agents/docs-keeper.md; incl.
+   REPO_MAP and the register's G0 reading;
    the review round 3 at a time; the verifier; the report; the checkpoint folded in and deleted; ready; the
    advisor's review of the head; his go).
 2. This checkpoint and the plan are folded into the build's report and deleted before its PR is marked ready
@@ -131,6 +134,9 @@ stays a draft. Plan revision 6 records KIT-ASK-SEEN (b).
   `rustup show active-toolchain` prints `1.99.1-x86_64-unknown-linux-gnu (overridden by '<repo>/rust-toolchain.toml')`.
 
 ## Decisions taken
+- Mustafa, 2026-11-11 (`mustafa-2026-11-11-pr49-merged.md`): PR #49 merged (bb2d817): STATUS split into STATUS.md
+  (dashboard), DECISIONS.md (his decisions) and STATUS_ARCHIVE.md (the rest); LANE-RULES with ACCOUNTS in CLAUDE.md.
+  Step 5 still waits for 2.1b; its LANE-RULES condition is met. The docs pass uses the new layout. Keep waiting.
 - Mustafa, 2026-11-11 (KIT-ASK-SEEN (b), `mustafa-2026-11-11-kit-ask-seen.md`): before each step-5 kit edit, ask him in
   chat and write it only after his yes; "auto mode can pass the guard's ask" is a kit finding for the gate step (2.3), no
   guard change now. LANE-RULES comes with PR #49 (his go in the morning); he says when 2.1b and LANE-RULES are in; PR #48
