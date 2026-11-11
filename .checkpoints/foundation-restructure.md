@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 15:00 Amsterdam
+- **Last update:** 2026-11-11 14:40 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -169,7 +169,7 @@ His step 3: the three reviewers running on 3c98ad5; then the fix pass (gate-file
    CLAUDE.md clarification at 2.3; SLICE-ORDER's pointer beside, never inside, the block; #50's STATUS row touched in
    step 4; F-L grows (a revert of #50 removes #49's record and today's words): say so in the report; #47 read back.
 
-3. 2026-11-11 14:50 Amsterdam · before closing step 2 and launching the round (his moments 1 and 5): is the docs pass
+3. 2026-11-11 14:35 Amsterdam · before closing step 2 and launching the round (his moments 1 and 5): is the docs pass
    done, and is the round set up right? · changed: CI on 1023870 and #49's facts read back first (found: merged_at
    09:03:11, fixed in 3c98ad5); the diff pinned to a SHA, never HEAD; rows-test owned by test-engineer on a fresh folder;
    E3 judged as recorded, the verifier alone runs a bounded sample on worktrees the session builds, results under
@@ -180,7 +180,7 @@ His step 3: the three reviewers running on 3c98ad5; then the fix pass (gate-file
    for the report.
 
 ## Running work
-- Saver: background task bjteqwe4t, started 14:02 Amsterdam, stops by 15:52 (110 min); last check 15:00: ok (autosaves pushed).
+- Saver: background task bjteqwe4t, started 14:02 Amsterdam, stops by 15:52 (110 min); last check 14:40: ok (autosaves pushed).
 - docs-keeper: done (1023870). Reviewers running (background): security-auditor, test-engineer, infra-engineer on 3c98ad5;
   notes `<agent>-review.md`. The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
 - The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
