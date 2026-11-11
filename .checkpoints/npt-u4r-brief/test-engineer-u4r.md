@@ -20,25 +20,11 @@ W5. Write part s9 recheck table + s10 advisor questions + s11 needs-a-run list -
 W6. Assemble u4r-brief-draft.md from parts (one Write; no Edit tool and no cat available).
 END. DONE line + answer.
 
-Tool note: no Edit tool in this run; files are written whole with Write. Draft sections go to parts/ first, then one assembly. Per-block reading notes are in notes-b4.md ... notes-b11.md beside this file; B1-B3 and B5 notes are below.
+Tool note: no Edit tool in this run; files are written whole with Write. Per-block reading notes are in notes-b4.md ... notes-b11.md; write-block notes in notes-w.md.
 
 ## Notes
-- B1 done: night file read. Item 4 shape = item 2's shape for U4r's lane (crates/lab, crates/bots' library, ops/runs/c-u4r-*.mjs) + judged runs + wall time + evidence files + O1 + recheck table (U4c, U4d2, U4e, U4j) + advisor Qs.
-- B2 done: U4e rev 2 format; lessons L1-L7: (L1) every bite's proof must be able to fail under the bite; (L2) edge/alignment preconditions recorded and asserted; (L3) base counts on check.mjs's measure (cargoCounts check.mjs:1321-1331; :1378-1385), `--list` only names; (L4) recheck rows must state a check that settles the claim; (L5) do not forbid what the plan prescribes (scratch script for bites, §7.2 :881-882); (L6) drop questions the plan answers; (L7) "within X of Y, on which clock". U4e brief rev 2: U4E-Q5 (a) (no Rewind, counted, "so the U4r pre-check's setup reads it"); U4E-Q2 (c) (U4r's -58 judges five); U4E-Q7 (U4r writes per-process logs incl. hs, snap_incomplete, burst_eviction); U4E-Q1 (lt-cmd-seq, lt-press by U4e).
-- B3 done (U4r §5 :717-772): Builds :718-724; Tests :725-732; judged :733-764; fixes.rs sizes :765-767; Evidence :768-770; Reviewers :771.
-- finding: U4r's lane files not stated in Lanes (:837).
-- finding: 63,736 = 65,536 - 1,800 (60 s at 30 Hz).
-- B5 done: Lanes :814-845; §7.1 :865-877 (item 6 :873-874; item 8 :876-877); §7.2 :879-887.
-- B4 done (notes-b4.md).
-- B6 done (notes-b6.md).
-- B7 done (notes-b7.md): O1 cite drift (:678-679, :787 are pre-condition-1 lines; at df8975b :690-691 and :799-800); 6 runs reading.
-- B8 done (notes-b8.md): only carry 40 routed to U4r; carries 6, 14, 20 reach U4r's code by their words.
-- B9 done (notes-b9.md): -58's untraced_corrections_count (U4g); -21's option A suites (U4f); -17 clean tick_start open; -30 depth series name.
-- B10 done (notes-b10.md): npt-lab has no npt-bots dependency (manifest stop); no lab/bots clippy.toml; judge gap = INVALID.
-- B11 done (notes-b11.md).
-- extra reads done: §4.5-§4.9 (:282-347): -57 pairing :317-318; HitHistory capacity from U4h's test cap, proposed 64 ticks (:335-336); tolerance and RTT from the pump (:340-345). §2 :141-159: sizes for fixes.rs (:150: L1 B1 SS runs log per-tick snapshot payload + datagram count, each input's payload, Join/JoinAccepted/FullState sizes; series with SERIES.md rows); C4 (:147); -18 split (:149). §3 :162-170: U4-SEAM npt-lab names World once (:163); U4-SERVER npt-bots' U4 half transport-free, clock-injected (:169-170).
-- finding: wallclock bite's site is the pump (npt-server: U4e's crate, not in U4e's bite list :711-712, not in U4r's lane) -> question.
-- finding: twin test's HashMap bite: equal order digests mean "not exercised" (§4.14 :460's rule) -> apply.
-- finding: class audit's team and public rules cannot fire in the spike (catalogue :144-145, :153-154: empty sections) -> report not exercised.
-- finding: wallclock bite must show a mismatch on a valid (non-VOID) pair; late-command shown only when VOID by late_count alone (judge's expect-invalid rule eval.rs:1283).
-- Next: W1.
+- B1-B11 done (see notes-bN.md). Extra reads done: plan §4.5-§4.9, §2, §3; check.mjs steps and bite-home rule; judge eval.rs gap rule.
+- W1-W6 done (see notes-w.md). Deliverable: u4r-brief-draft.md (rev 1).
+- Findings recorded in the draft as questions (U4R-Q1..Q12): manifests npt-lab -> npt-bots (lab/Cargo.toml:23-34; bots/Cargo.toml:20-25); out-of-lane files (SERIES.md, recordings manifest, check.mjs/det-u4.mjs); clippy.toml clock bans (§4.11 :380-383) vs ticks/s; contract test scope vs option A suites (marks.json:4631-4704; plan :774, :776); -58's untraced corrections (marks.json:4162-4169; plan :786; judge eval.rs:310-323); wallclock bite's site in npt-server (plan :759; :711-712); -17 clean tick_start; -18 shared runs; TC B1 recording (plan :801); early-input bite for the RTT rule; contract test negative cases; the re-run's home.
+- O1 finding: advisor :344's cites :678-679 and :787 do not hold at df8975b (U4d2 bites; U4g Predictor); the words stand at :690-691 and :799-800. Advisor :343's "u4-conditions-check.md:39-42" is :42-45 at df8975b.
+DONE
