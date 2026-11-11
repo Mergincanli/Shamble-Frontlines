@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 // tools/gate.mjs: the SHAMBLE FRONTLINES verification gate. Checks the WORKING TREE against a base git ref.
+// The legacy build lives in legacy/ (foundation step 2.1) or, before the move, at the repo root: the head is read from the
+// folder smoke.mjs's findBuild names (both places at once: exit 2), and each base from the first of legacy/, the root and
+// shamble-frontlines-repo/ that holds all five files (BASE_PREFIXES), so a base from before or after the move still loads.
 //   [1] syntax         node --check on each engine file and on each page's inline <script>
 //   [2] concatenation  node --check on each page's scripts joined in load order (read from its <script src> tags)
 //   [3] symbols        top-level symbols (tools/battery.js), base vs head: nothing dropped, no duplicates; prints +added / -dropped
@@ -58,6 +61,14 @@ for (let i = 0; i < argv.length; i++) {
 if (noSmoke && smokeOnly) die('--no-smoke and --smoke-only exclude each other\n' + USAGE);
 if (smokeOnly && (baseArg !== null || allowDrop.size)) die('--smoke-only takes no baseRef or --allow-drop\n' + USAGE);
 
+// ---------- the build folder (one rule with smoke.mjs: its findBuild) ----------
+let BUILD, BUILD_PREFIX;
+try {
+  const b = (await import('./smoke.mjs')).findBuild(ROOT);
+  if (b.error) die(b.error);
+  BUILD = b.dir; BUILD_PREFIX = b.prefix;
+} catch (e) { die('cannot load tools/smoke.mjs to find the build folder: ' + firstLine(e.message)); }
+
 const require = createRequire(import.meta.url);
 let battery, acorn, walk, escope;
 try { battery = require('./battery.js'); acorn = require('acorn'); walk = require('acorn-walk'); escope = require('eslint-scope'); }
@@ -89,13 +100,21 @@ function resolveBase(arg) {
   die('no baseRef given and no merge-base with main or origin/main (a shallow clone needs full history)');
 }
 const lf = s => s.replace(/\r\n/g, '\n');
-function baseFile(sha, f) {
-  for (const p of [f, OLD_PREFIX + f]) { const s = tryGit('show', `${sha}:${p}`); if (s !== null) return lf(s); }
-  die(`${f} not found at base ${sha.slice(0, 7)}`);
+// One prefix per base, never mixed: the first that holds all five files (since foundation step 2.1, before it, before CS-1).
+const BASE_PREFIXES = ['legacy/', '', OLD_PREFIX];
+function basePrefix(sha) {
+  const p = BASE_PREFIXES.find(x => FILES.every(f => tryGit('cat-file', '-e', `${sha}:${x}${f}`) !== null));
+  if (p === undefined) die(`the five legacy files are not all at base ${sha.slice(0, 7)} under any of: ${BASE_PREFIXES.map(x => x || '(the root)').join(', ')}`);
+  return p;
+}
+function baseFile(b, f) {
+  const s = tryGit('show', `${b.sha}:${b.prefix}${f}`);
+  if (s === null) die(`${b.prefix}${f} not found at base ${b.sha.slice(0, 7)}`);
+  return lf(s);
 }
 const headFile = f => {
-  const p = join(ROOT, f);
-  if (!existsSync(p)) die(`${f} is missing from the working tree`);
+  const p = join(BUILD, f);
+  if (!existsSync(p)) die(`${BUILD_PREFIX}${f} is missing from the working tree`);
   return lf(readFileSync(p, 'utf8'));
 };
 const toBuild = get => ({ core: get('shamble-core.js'), game: get('shamble-game.js'), editor: get('shamble-editor.js'),
@@ -147,8 +166,8 @@ function classicParts(page, html, errs = [], external = new Set()) {
     if (s.module) continue;   // module scripts get their own scope: not part of the classic-script build
     if (s.code) { parts.push(s); continue; }
     if (/^([a-z]+:)?\/\//i.test(s.src)) { external.add(s.src.split('/').pop()); continue; }
-    const name = s.src.replace(/^\.\//, ''), abs = resolve(ROOT, name);
-    if (!abs.startsWith(ROOT + sep)) { errs.push(`${page}: <script src="${s.src}"> points outside the repo`); continue; }
+    const name = s.src.replace(/^\.\//, ''), abs = resolve(BUILD, name);
+    if (!abs.startsWith(BUILD + sep)) { errs.push(`${page}: <script src="${s.src}"> points outside ${BUILD_PREFIX || 'the repo'}`); continue; }
     const code = LOCAL[name] ?? (existsSync(abs) ? headFile(name) : null);
     if (code === null) { errs.push(`${page}: <script src="${s.src}"> does not exist`); continue; }
     parts.push({ label: name, code });
@@ -187,7 +206,7 @@ const scoped = code => { if (!scopeCache.has(code)) scopeCache.set(code, scopeOf
 async function smokeCheck() {
   try {
     const { runSmoke } = await import('./smoke.mjs');
-    const r = await runSmoke({ root: ROOT });
+    const r = await runSmoke({ root: BUILD });
     add('5a', 'smoke', r.pass, r.summary, r.details, { pages: r.pages, setup: r.setup });
   } catch (e) { add('5a', 'smoke', false, 'tools/smoke.mjs could not run', [firstLine(e.message)]); }
 }
@@ -198,10 +217,12 @@ function finish() {
   const scope = smokeOnly ? 'smoke only' : noSmoke ? 'smoke skipped' : 'full';
   const tail = smokeOnly ? ' (smoke only: checks 1-4 and 5b-5d not run)' : noSmoke ? ' (5a smoke skipped: --no-smoke)' : '';
   if (asJson) {
-    console.log(JSON.stringify({ pass, scope, base: base && { ref: base.ref, sha: base.sha, note: base.note }, head: 'working tree', checks }, null, 1));
+    console.log(JSON.stringify({ pass, scope, base: base && { ref: base.ref, sha: base.sha, note: base.note, prefix: base.prefix },
+      head: 'working tree', build: BUILD_PREFIX || '.', checks }, null, 1));
   } else {
-    console.log(base ? `SHAMBLE FRONTLINES gate | base ${base.ref} = ${base.sha.slice(0, 7)} | head = working tree`
-                     : 'SHAMBLE FRONTLINES gate | smoke only | head = working tree');
+    const at = p => p ? `files in ${p}` : 'files at the root';
+    console.log(base ? `SHAMBLE FRONTLINES gate | base ${base.ref} = ${base.sha.slice(0, 7)} (${at(base.prefix)}) | head = working tree (${at(BUILD_PREFIX)})`
+                     : `SHAMBLE FRONTLINES gate | smoke only | head = working tree (${at(BUILD_PREFIX)})`);
     if (base && base.note) console.log('note: ' + base.note);
     for (const c of checks) {
       console.log(`${`[${c.id}]`.padEnd(4)} ${c.name.padEnd(14)} ${c.skipped ? 'SKIP' : c.pass ? 'PASS' : 'FAIL'}  ${c.summary}`);
@@ -217,6 +238,7 @@ function finish() {
 const checks = [];
 const add = (id, name, pass, summary, details = [], extra = {}) => checks.push({ id, name, pass, summary, details, ...extra });
 const base = smokeOnly ? null : resolveBase(baseArg);
+if (base) base.prefix = basePrefix(base.sha);
 if (smokeOnly) { await smokeCheck(); finish(); }
 const head = toBuild(headFile);
 const LOCAL = { 'shamble-core.js': head.core, 'shamble-game.js': head.game, 'shamble-editor.js': head.editor };
@@ -249,7 +271,7 @@ const PAGES = [['index.html', head.indexHtml], ['editor.html', head.editorHtml]]
 // [3] symbols and [4] player build, both from battery.js
 let H = null, B = null;
 try { H = battery.analyze(head); } catch (e) { add(3, 'symbols', false, 'battery.js could not analyse the working tree', [String(e.message)]); }
-try { B = battery.analyze(toBuild(f => baseFile(base.sha, f))); } catch (e) { if (H) add(3, 'symbols', false, 'battery.js could not analyse the base', [String(e.message)]); }
+try { B = battery.analyze(toBuild(f => baseFile(base, f))); } catch (e) { if (H) add(3, 'symbols', false, 'battery.js could not analyse the base', [String(e.message)]); }
 if (H && B) {
   const KEYS = Object.keys(H.symbols);
   const where = syms => { const m = new Map(); for (const k of KEYS) for (const n of syms[k] || []) m.set(n, [...(m.get(n) || []), k]); return m; };
@@ -330,7 +352,7 @@ catch (e) { die('cannot load three r128 from tools/node_modules (cd tools && npm
     list(found.three, n => `THREE.${n} does not exist in three r128`);
     summ.push(`${page}: ${units.length - handlers.length} scripts + ${handlers.length} DOM handlers, ${found.undef.size + found.constw.size + found.three.size} problems`);
   }
-  if (anyUndefined) problems.push('a browser API the code really needs: add its name to tools/gate-globals.json (reviewed data, not a gate-tool change)');
+  if (anyUndefined) problems.push('a browser API the code really needs: add its name to tools/gate-globals.json (a gate file: a change needs Mustafa\'s go)');
   add('5b', 'names', !problems.length, summ.join(' | ') +
       ` | allowed: ${BUILTINS.size} built-ins (Node ${process.version}) + ${LISTED.size} in gate-globals.json + ${R128.length} THREE members (r128)`, problems);
 }

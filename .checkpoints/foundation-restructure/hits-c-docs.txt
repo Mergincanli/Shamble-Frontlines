@@ -1,0 +1,603 @@
+docs/ART_DIRECTION.md:4:**Source of truth:** the interactive `artstyle-preview.html` "Living Comic" style, as approved by Mustafa, translated onto the game's real NPR pipeline in `shamble-co
+docs/ART_DIRECTION.md:148:**Implemented in code, not spawned (D6, three-teams 3a, 2026-10-16):** the 200 HP Empire elite no longer spawns; regular Empire bots wear the standard soldier in th
+docs/EDITOR_V1_INVENTORY.md:9:**Date:** 2026-10-15. **Code:** main at 67cf55b (`shamble-editor.js`, `shamble-game.js`, `editor.html`). All line numbers are main's. In the tables, `editor.js`
+docs/EDITOR_V1_INVENTORY.md:24:**Old build vs main.** `shamble-editor.js` and `editor.html` are byte-identical in the older build (159bec4) and main. PR #8 changed 11 lines of `shamble-game.
+docs/EDITOR_V1_INVENTORY.md:29:| A1 | Open editor | Hides the HUD and bots, shows the editor, resets the camera position and height, clears the selection and undo history, turns the overlays
+docs/EDITOR_V1_INVENTORY.md:30:| A2 | Title + map name | Shows "SHAMBLE ▸ EDITOR ‹name›"; the name is set on Save or Load | — | editor.html:1053; editor.js:965, 1076 | partial [S]: s
+docs/EDITOR_V1_INVENTORY.md:32:| A5 | Inspector column toggle | Shows or hides the right column | Top-bar panel icon | editor.html:1079; editor.js:948, 1212 | works [S] | | **keep** — work
+docs/EDITOR_V1_INVENTORY.md:33:| A6 | Status bar | Cursor x,z (snapped), map size, selected count, tool, hint, zoom | Passive | editor.html:1221‑1227; editor.js:676, 236, 839 | partial [S]
+docs/EDITOR_V1_INVENTORY.md:34:| A7 | Tooltips | One floating tooltip for every `[data-tip]` (350 ms delay); fills in tips for cards that have none | Hover | editor.js:1197‑1208 | works [S
+docs/EDITOR_V1_INVENTORY.md:36:| A9 | Shortcut card | Static cheat-sheet under the library | — | editor.html:1208 | partial [C]: lists "⇧Drag marquee" (wrong); missing Q/E/R/T, O, Esc, a
+docs/EDITOR_V1_INVENTORY.md:37:| A10 | Card animation | Staggered fade-in when switching tabs | Tab click | editor.js:1193; editor.html:497 | works [C] | Cosmetic | **drop** — cosmetic onl
+docs/EDITOR_V1_INVENTORY.md:60:| C1 | Tabs | Recent / Terrain / Buildings / Vegetation / Props / Markers / Prefabs | Click a tab | editor.html:1096‑1104; editor.js:1191‑1193 | works [S] 
+docs/EDITOR_V1_INVENTORY.md:61:| C2 | Search | Filters cards across all tabs by card name or group name | Type in "Search library…" | editor.html:1105; editor.js:1181‑1190 | works [S] ("
+docs/EDITOR_V1_INVENTORY.md:65:| C6 | Path / Road | Drag an axis-aligned strip; a click makes 6×6 | Terrain tab, drag | editor.html:1114; editor.js:1033, 1045, 1055 | works [S] (12×6 drawn
+docs/EDITOR_V1_INVENTORY.md:66:| C7 | Platform | 10×10×2.5 | Click | editor.html:1115; editor.js:581 | works [S] | | **improve** — plateaus with saved elevation, any height (EDITOR_V2 §
+docs/EDITOR_V1_INVENTORY.md:67:| C8 | Ramp | 12×8, rising 0→2.5 | Click | editor.html:1116; editor.js:582 | works [S] | | **improve** — ramps snap to plateau heights (EDITOR_V2 §3); co
+docs/EDITOR_V1_INVENTORY.md:68:| C9 | Friendly HQ / Refinery / Barracks / Power Plant | Team building, team "friend" | Click | editor.html:1122‑1125; editor.js:588‑595 | works [S] | Two 
+docs/EDITOR_V1_INVENTORY.md:69:| C10 | Hostile HQ / Refinery / Barracks / Power Plant | Same, team "hostile" | Click | editor.html:1129‑1132 | works [S] | Same | **improve** — same set p
+docs/EDITOR_V1_INVENTORY.md:70:| C11 | Enterable Barracks | Walk-in barracks with the armory inside | Click | editor.html:1136; editor.js:610 | works [S]; placed as "neutral", and the Team b
+docs/EDITOR_V1_INVENTORY.md:71:| C12 | Half-Timbered House / Thatched Cottage / Brick & Flint Farm | Village houses | Click | editor.html:1140‑1142; editor.js:583‑585 | works [S]; no gho
+docs/EDITOR_V1_INVENTORY.md:72:| C13 | Norman Manor | Landmark building | Click | editor.html:1146; editor.js:586 | works [S] | | **keep** — landmark piece; its ⇧-wheel tip comes true on
+docs/EDITOR_V1_INVENTORY.md:73:| C14 | Bocage Hedgerow / Drystone Wall / Post & Rail Fence | Cover line at any angle; a click makes 4 m | Drag | editor.html:1150‑1152; editor.js:1046, 1056
+docs/EDITOR_V1_INVENTORY.md:74:| C15 | Apple Tree / Lombardy Poplar / Oak | One tree with a random seed | Click | editor.html:1158‑1160; editor.js:599‑601 | works [S]; see **BUG-1** (C4,
+docs/EDITOR_V1_INVENTORY.md:75:| C16 | Apple Orchard | Rectangle filled with a grid at about 4.5 m (at most 9×9); preview dots, corner posts, live tree count | Drag | editor.html:1164; edit
+docs/EDITOR_V1_INVENTORY.md:76:| C17 | Poplar Windbreak | Row of poplars every 3 m (at most 15) | Drag | editor.html:1165; editor.js:39‑44 | works [S] (9 trees) | | **improve** — mirror 
+docs/EDITOR_V1_INVENTORY.md:77:| C18 | Crate S / M / L | 2 / 3 / 4 m crates | Click | editor.html:1171‑1173; editor.js:578‑580 | works [S] | | **keep** — the basic cover block |
+docs/EDITOR_V1_INVENTORY.md:78:| C19 | 8 farm props | Haystack, Hay Bales, Cart, Well, Log Pile, Barrels, Trough, Veg Patch | Click | editor.html:1177‑1184; editor.js:602‑609 | works [S]
+docs/EDITOR_V1_INVENTORY.md:79:| C20 | Player Spawn | Moves the single spawn point | Click | editor.html:1190; editor.js:611 | works [S]; only one; Delete is ignored | Per-team spawns | **im
+docs/EDITOR_V1_INVENTORY.md:80:| C21 | Resupply | Moves the single terminal | Click | editor.html:1191; editor.js:612 | works [S] | | **improve** — one resupply point per team; LOOP_V2 §2
+docs/EDITOR_V1_INVENTORY.md:81:| C22 | Soviet / Allies / Empire spawn flags | Bot respawn points (game.js:700) | Click | editor.html:1195‑1197; editor.js:596‑598 | works [S] | Map factio
+docs/EDITOR_V1_INVENTORY.md:101:| E4 | Rotation step | 15 / 45 / 90, default 45 | Snap button | editor.html:1068; editor.js:574 | works [S] | | **keep** — matches EDITOR_V2 §3 (15° / 45�
+docs/EDITOR_V1_INVENTORY.md:102:| E5 | Grid snap | Off / 0.5 / 1 / 2 / 5 m for placement, drag and the cursor readout | Grid button / G | editor.html:1067; editor.js:458, 576 | works [S] ((3
+docs/EDITOR_V1_INVENTORY.md:107:| E10 | Mode switch (Q/E/R/T keys and the tool rail) | **Q and E are the same mode**: both set gizmo mode "move" and tool "select"; only the lit rail button d
+docs/EDITOR_V1_INVENTORY.md:137:| H1 | Live mirror X/Z | Click placements and prefab stamps also place a mirrored copy; swaps friend↔hostile; rotation becomes −rotation | Mirror button (
+docs/EDITOR_V1_INVENTORY.md:150:| J1 | Open / close, and the Generators panel | The top-bar Maker button and the Generators rail button only **open** the Maker (the Generators panel holds on
+docs/EDITOR_V1_INVENTORY.md:169:| L1 | World controls | 22 controls: Ground 9, Lighting 9, Sky & Fog 4; saved per map | Sliders / colour pickers | editor.js:703‑756; editor.html:1230 | wor
+docs/EDITOR_V1_INVENTORY.md:185:| O1 | Maps modal | Save by name: the field is prefilled with the title name, max 40 characters, click only (Enter does nothing); overwrites silently. List A�
+docs/EDITOR_V1_INVENTORY.md:197:| P4 | Esc with a modal open | Esc leaves the editor even while the Export or Maps modal is open (unless the cursor is in a text field). The modal is still op
+docs/EDITOR_V1_INVENTORY.md:204:2. **Close (✕) handlers** for World, Rules and Maker (editor.js:1082, 1087, 1097) are dead because CSS hides the buttons (editor.html:520, 528).
+docs/EDITOR_V1_INVENTORY.md:216:6. **index.html carries a full copy of the editor DOM** (0 lines differ) but never loads the editor script.
+docs/EDITOR_V1_INVENTORY.md:218:   Recommended: **drop** — v2 lives in editor.html; Mustafa must lift CLAUDE.md's shared-DOM rule (EDITOR_V2 §5: code only).
+docs/EDITOR_V2.md:94:- It still runs by double-clicking editor.html. The player build (index.html) must never load editor code.
+docs/LEGACY_INVENTORY.md:25:**Date:** 2026-10-27 (read from 2026-10-24). **Code:** main at f2ccc13. The engine files (`shamble-core.js`, `shamble-game.js`,
+docs/LEGACY_INVENTORY.md:26:`shamble-editor.js`), both pages and `tools/` are byte-identical to 48ffb51, where the reading started, so their line
+docs/LEGACY_INVENTORY.md:69:- **Core (`shamble-core.js`):** CD. Core data, tuning and persistence (21) · CL. Core look pipeline (14) · CC. Core characters, factions and guns (11) · CM. Co
+docs/LEGACY_INVENTORY.md:70:- **Game (`shamble-game.js`):** GW. Game world, map building and movement physics (21) · GA. Game animation (ANIM v2) (16) · GC. Game combat, teams and vehicles
+docs/LEGACY_INVENTORY.md:71:- **Editor, pages, tools and kit:** ED. Editor (`shamble-editor.js`) (16) · PG. Pages (`index.html`, `editor.html`) (20) · TL. Tools (the verification toolkit) 
+docs/LEGACY_INVENTORY.md:75:# Core (`shamble-core.js`)
+docs/LEGACY_INVENTORY.md:79:Scope: shamble-core.js:1-232.
+docs/LEGACY_INVENTORY.md:83:| CD1 | Core file manifest header | A block comment that lists what shamble-core.js provides, what it needs (THREE r128 global, DOM #app), the load order and its 
+docs/LEGACY_INVENTORY.md:84:| CD2 | KVStore persistence adapter (API, localStorage and memory backends) | The one storage layer for rank, tutorial flag, saved maps, prefabs and the Character
+docs/LEGACY_INVENTORY.md:85:| CD3 | KVStore window.storage backend (claude.ai artifact runtime) | The first-choice backend: if the page runs inside the claude.ai artifact runtime and window.
+docs/LEGACY_INVENTORY.md:86:| CD4 | T: player movement, health, regen and respawn values | Tuning numbers for the player body: walk speed 6.3, sprint, acceleration 14, gravity 24, jump 11, s
+docs/LEGACY_INVENTORY.md:87:| CD5 | T: camera framing values and the PerspectiveCamera | The Foxhole-style top-down camera: height 40, boom 56.6, fov 15 (ADS 15), yaw base 45 degrees, lerp r
+docs/LEGACY_INVENTORY.md:88:| CD6 | T: bot combat tuning | Numbers the bots use: sight range 44 m, bot HP 100 (elite 200), respawn 4 s, move speed 4.2, fire interval, burst pause 4.5 s, spre
+docs/LEGACY_INVENTORY.md:89:| CD7 | T: economy and structure health | Money and building numbers: start credits 1000, kill reward 25, resupply cost 50, two passive income values, and HP for 
+docs/LEGACY_INVENTORY.md:90:| CD8 | T: grenade, melee, shield and locational damage | Combat rules: 3 grenades, 140 damage in 6.5 m (240 against buildings), riot shield blocks 70 % in a fron
+docs/LEGACY_INVENTORY.md:91:| CD9 | T: grenade VFX and camera kick | Cosmetic numbers for an explosion: 60 bouncing shrapnel bits, shock ring 7.5 m, dust and scorch lifetimes, plus a spring 
+docs/LEGACY_INVENTORY.md:92:| CD10 | TEAMS table | The three teams as data: allies, soviets and empire, each with its faction, display name and short tag. The order matters: soviets is treat
+docs/LEGACY_INVENTORY.md:93:| CD11 | TUNE table (team play tuning) | One table for team play: team size 4, friendly fire off, the bots' shared line-of-sight budget (480 checks per second, re
+docs/LEGACY_INVENTORY.md:94:| CD12 | WEAPONS table | Seven weapons as data: AMK rifle, Bagpipe shotgun, Shabzon SMG, Molotov, Beam Katana, Retro Lancer burst rifle and Torque Bow. Every row 
+docs/LEGACY_INVENTORY.md:95:| CD13 | UNIT_TYPES table and unitOf() | The four infantry classes as data: Conscript, Peacekeeper, Imperial Warrior (tier 1, cost 0) and Officer (tier 2, cost 12
+docs/LEGACY_INVENTORY.md:96:| CD14 | VEHICLE_TYPES table | One vehicle as data: the Juggernaut walker, tier 2, cost 2500, 1500 HP, one seat, with a description string. | shamble-core.js:141-
+docs/LEGACY_INVENTORY.md:97:| CD15 | WebGL renderer setup | Creates the one three.js WebGLRenderer with antialiasing, full-window size, pixel ratio capped at 2, soft PCF shadows and LinearEn
+docs/LEGACY_INVENTORY.md:98:| CD16 | Halftone overlay | An optional full-screen CSS layer of radial-gradient dots blended over the game (multiply), sized by htSize; off by default (htOpacity
+docs/LEGACY_INVENTORY.md:99:| CD17 | Scene, fog, lights and the sun shadow | Creates the scene with a sky colour and distance fog, a hemisphere light, an ambient light, and the sun: a direct
+docs/LEGACY_INVENTORY.md:100:| CD18 | noRay helper | Replaces an object's raycast function with a no-op, so decorative meshes are skipped by three.js raycasts (cursor picking and legacy hit 
+docs/LEGACY_INVENTORY.md:101:| CD19 | Environment preset (ENV_DEFAULT, envMerge, applyEnv) | The per-map look settings as data: ground colours and grass pattern, sun colour, strength and ang
+docs/LEGACY_INVENTORY.md:102:| CD20 | Procedural grass texture and ground cel ramp | Paints a seamless 512 x 512 grass texture on a canvas from the env colours (tonal patches, clumps, speckl
+docs/LEGACY_INVENTORY.md:103:| CD21 | Ground, sea and beach meshes, and the arena size | Builds the island: a 372 x 252 m grass plane, a 404 x 284 m sand ring just below it, and a 2000 m fla
+docs/LEGACY_INVENTORY.md:107:Scope: shamble-core.js:233-559.
+docs/LEGACY_INVENTORY.md:111:| CL1 | NPR switches and ink constants | Global switches for the toon look (NPR) and the comic words (COMIC), plus the constants shared by every outline: the ink
+docs/LEGACY_INVENTORY.md:112:| CL2 | Cel ramps (gradient maps) | Tiny 1-pixel-high textures (2 or 4 hard bands, nearest-filtered) that MeshToonMaterial uses to step the lighting. There is a 
+docs/LEGACY_INVENTORY.md:113:| CL3 | Skin Fresnel rim (shader injection) | Adds a warm edge glow to skin materials, a fake subsurface warmth. It does this by text-replacing chunks of three.j
+docs/LEGACY_INVENTORY.md:114:| CL4 | toonify (standard to toon material conversion) | Turns an authored MeshStandardMaterial into a MeshToonMaterial. It copies the colour, texture map, emiss
+docs/LEGACY_INVENTORY.md:115:| CL5 | Empire elite villain pass (applyVillain) | A post-pass on a built character. It repaints role-tagged parts in near-black lacquer with the lacquer ramp, t
+docs/LEGACY_INVENTORY.md:116:| CL6 | Inverted-hull ink outlines (makeOutlineMat + addHull) | Every outlined mesh gets a child copy drawn back-face-only in flat ink. A small vertex shader pus
+docs/LEGACY_INVENTORY.md:117:| CL7 | Outline normals (ensureOutlineNormals, _outlineDirs, cache) | Precomputes, per geometry, a smoothed and mitred push direction for each vertex, so outline
+docs/LEGACY_INVENTORY.md:118:| CL8 | Scene stylize passes (stylizeScene, stylizeOne) | stylizeScene walks the whole scene once at boot. It swaps every standard material for a toon one and ad
+docs/LEGACY_INVENTORY.md:119:| CL9 | Static draw-call merge (mergeStaticGroup, _matSig) | After a static kit piece (house, cover, prop, tree) is inked, its meshes fold into one mesh per mate
+docs/LEGACY_INVENTORY.md:120:| CL10 | Character rig definitions (CHAR_DEFAULT, CHAR_MALE, CHAR_FEMALE) | Data recipes for the procedural soldier: a flat list of primitive parts (sphere, cyli
+docs/LEGACY_INVENTORY.md:121:| CL11 | Soldier hit shape (CHAR_DEFAULT.hit, _BODY_HIT) | The gameplay hitbox numbers: head sphere height and radius, torso and leg capsule bands and radii, and
+docs/LEGACY_INVENTORY.md:122:| CL12 | Comic onomatopoeia sprites | Canvas-drawn comic words (BLAM, POW, BOOM!...) in heavy outlined type, cached per word and colour and pre-warmed at load. T
+docs/LEGACY_INVENTORY.md:123:| CL13 | Procedural canvas textures (grass and building-kit surfaces) | Every surface texture is painted at load on a 2D canvas: the tiling painterly grass from 
+docs/LEGACY_INVENTORY.md:124:| CL14 | userData tag contract between builders and the look pipeline | The silent contract that decides how every mesh is styled and merged. Builders set mesh u
+docs/LEGACY_INVENTORY.md:128:Scope: shamble-core.js:560-845.
+docs/LEGACY_INVENTORY.md:132:| CC1 | Wardrobe parts registry (CPARTS) | A data table of clothing and grooming pieces by slot (headgear, torso, legs, feet, webbing, hair, face). Each entry is
+docs/LEGACY_INVENTORY.md:133:| CC2 | Character composer (assembleChar) | Builds a full character recipe from a compact selection. It deep-clones the male or female base body, hides the under
+docs/LEGACY_INVENTORY.md:134:| CC3 | Faction palettes and the role recolour (FACTION_PALETTES, applyFaction) | Three palettes (Soviets, Allies, Empire), each with five colour roles: BaseGear
+docs/LEGACY_INVENTORY.md:135:| CC4 | Universal entity builder (buildEntity) | Walks a flat def.parts list and builds the mesh hierarchy. It creates 12 per-entity materials keyed by role, mak
+docs/LEGACY_INVENTORY.md:136:| CC5 | Base bodies and the shared hit shape (CHAR_DEFAULT, CHAR_MALE, CHAR_FEMALE, _BODY_HIT) | Rig recipes: a legacy default soldier and two base bodies (male,
+docs/LEGACY_INVENTORY.md:137:| CC6 | Gameplay soldier kit (SOLDIER_KIT, ELITE_KIT, buildSoldier) | Dresses gameplay soldiers. buildSoldier composes a male body in SOLDIER_KIT (brodie helmet,
+docs/LEGACY_INVENTORY.md:138:| CC8 | Procedural gun models (makeAMKRifle, _gunParts, makeBagpipeGun, makeShabzonSMG, makeLancerRifle, makeTorqueBow) | Builds one primitive-mesh model per gun
+docs/LEGACY_INVENTORY.md:139:| CC9 | Gun kit sockets and model factory (GUN_KIT, buildGunModel) | Per-gun data: the maker plus sockets: grip (trigger hand), stock (butt end), rail [zMin, zMa
+docs/LEGACY_INVENTORY.md:140:| CC10 | Rest arm poses (_ARMP, poseArms) | Fixed shoulder and elbow rotations per arm mode (rifle, melee, shield, relaxed), applied once. poseArms also stores u
+docs/LEGACY_INVENTORY.md:141:| CC11 | Two-bone IK solver (solveArmIK) | A law-of-cosines two-bone solver: given a shoulder (or hip), a target, a pole direction and two bone lengths, it sets 
+docs/LEGACY_INVENTORY.md:142:| CC12 | Melee and shield props (makeSword, makeAxe, makeShield) | Primitive-mesh melee props: a sword (used as the Beam Katana), an axe and a round wooden shiel
+docs/LEGACY_INVENTORY.md:146:Scope: shamble-core.js:846-1473.
+docs/LEGACY_INVENTORY.md:150:| CM1 | ASCII grid map format and parser (Cabana Republic) | Cabana Republic is drawn as a 41 x 29 ASCII grid of 10 m cells, one character per cell for road, cra
+docs/LEGACY_INVENTORY.md:151:| CM2 | Cabana map content: spawn-side platforms and ramps, and the village pass | An inline function adds three stepped platforms (1.2, 2.5 and 4 m) beside the 
+docs/LEGACY_INVENTORY.md:152:| CM3 | DM_Romania map definition | An older hand-written two-team map: 13 crates, 4 buildings per team and one enterable barracks per team, with spawn and resup
+docs/LEGACY_INVENTORY.md:153:| CM4 | DM_Tri three-team greybox arena | A hand-made three-team test map: bases 120° apart, 92 m from a supply field at (0,-23) (the enemy-spawn markers sit at
+docs/LEGACY_INVENTORY.md:154:| CM5 | Procedural canvas skins and the BK texture cache | Ten functions each paint a 256 x 256 canvas texture (half-timber, terracotta tile, plaster, thatch, br
+docs/LEGACY_INVENTORY.md:155:| CM6 | Roof geometry generators | Five roof shapes built as non-indexed geometry, so every face gets a flat normal for crisp cel shading: gable (with a shifted 
+docs/LEGACY_INVENTORY.md:156:| CM7 | Legacy hand-built house makers (timber house, thatch cottage, brick-and-flint farmhouse) | Three functions each build one house type from boxes: walls, a
+docs/LEGACY_INVENTORY.md:157:| CM8 | Norman manor (landmark house) | Builds a two-storey plaster block with a hip slate roof, quoins, a string course, two chimneys and a round stone tower wi
+docs/LEGACY_INVENTORY.md:158:| CM9 | Building kit schema, presets and seeded roll | BK.PARTS lists the options per slot (footprint, roof, roof skin, wall skin, dormers), BK.DIMS gives slider
+docs/LEGACY_INVENTORY.md:159:| CM10 | Kit building builder (BK.build) | Turns a spec into a THREE group: a main block plus wings for the L, T, U (courtyard) and long-range footprints, roofs 
+docs/LEGACY_INVENTORY.md:160:| CM11 | Cover type rules (BK.COVER) | A table of the three linear cover types with gameplay meaning: bocage hedgerow (1.0 m thick, 1.6 m high, blocks sight), dr
+docs/LEGACY_INVENTORY.md:161:| CM12 | Cover mesh builder (BK.buildCover) | Builds the mesh for a cover run of any length centred on the origin: a fence of posts and two rails, a drystone wal
+docs/LEGACY_INVENTORY.md:162:| CM13 | Kit compound world boxes (_bkWorldBoxes) | Turns a building's local-space collider boxes into world-space axis-aligned boxes using the group's transform
+docs/LEGACY_INVENTORY.md:166:Scope: shamble-core.js:1474-1543.
+docs/LEGACY_INVENTORY.md:170:| CS1 | Fixed tick and input-command groundwork | Declares a 1/60 s fixed time step, a bitmask of input buttons (fire, aim, reload, melee, grenade, shield, sprin
+docs/LEGACY_INVENTORY.md:171:| CS2 | Soldier hit shape (BODY) | The hit volume of every soldier is one head sphere plus two vertical capsules (torso and legs). BODY copies the default charac
+docs/LEGACY_INVENTORY.md:172:| CS3 | Body-part damage multipliers in the SIM block (PART, res.mult) | A table of body-part multipliers (head 2.6, body 1.0, legs 0.65). resolveShot copies the
+docs/LEGACY_INVENTORY.md:173:| CS4 | Ray versus sphere and capsule primitives | Pure maths that returns the distance at which a ray first touches a sphere or a capsule, or -1 for a miss. A r
+docs/LEGACY_INVENTORY.md:174:| CS5 | Ray versus box: axis-aligned and rotated about Y (rayAabb, rayStatic) | The slab test returns the hit distance and face normal of a ray against an axis-a
+docs/LEGACY_INVENTORY.md:175:| CS6 | Batch ray versus all static colliders (rayStatics) | One loop tests a ray against every live static box (axis-aligned or rotated), with the slab test wri
+docs/LEGACY_INVENTORY.md:176:| CS7 | Hitscan shot resolution (resolveShot) | A pure query that never changes the world. It casts a shot ray against every live soldier (head, torso and legs),
+docs/LEGACY_INVENTORY.md:177:| CS8 | SIM world snapshot container | A single global object holds the hit world: a list of player records (id, position, alive, stance, team), a list of static
+docs/LEGACY_INVENTORY.md:178:| CS9 | Line of sight (hasLOS) | Answers whether two points can see each other. It casts a segment between them against the static colliders only (soldiers never
+docs/LEGACY_INVENTORY.md:179:| CS10 | hyp2 / hyp3 length helpers | Two one-line helpers that return the length of a 2D or 3D vector with a square root. They replaced Math.hypot, which alloca
+docs/LEGACY_INVENTORY.md:180:| CS11 | Headless SIM fence (the lift-out boundary) | A comment fence marks the bottom of core as a pure maths block with no THREE or DOM use, kept contiguous so
+docs/LEGACY_INVENTORY.md:182:# Game (`shamble-game.js`)
+docs/LEGACY_INVENTORY.md:186:Scope: shamble-game.js, several ranges.
+docs/LEGACY_INVENTORY.md:190:| GW1 | Game manifest and the player's fixed faction and team | The header comment lists what shamble-game.js provides and needs under the classic-script load or
+docs/LEGACY_INVENTORY.md:191:| GW2 | Per-map rules object (RULES_DEFAULT, rulesMerge, applyRules) | Holds the default objective and economy timings (silo capture, tech-box timings, resupply 
+docs/LEGACY_INVENTORY.md:192:| GW3 | Comic onomatopoeia words (gunshot and kill text pops) | Draws words like BLAM or KO! on a canvas, caches one texture per word and colour, and pops them a
+docs/LEGACY_INVENTORY.md:193:| GW4 | Shadow frustum that follows the player | Each frame it moves the sun light and its target to the player's position, snapped to whole shadow-map texels, s
+docs/LEGACY_INVENTORY.md:194:| GW5 | Ground grid, red arena border and world text labels | A faint ground grid; a red border of thin boxes rebuilt at the arena half-size, with a dev slider t
+docs/LEGACY_INVENTORY.md:195:| GW6 | World registries and primitive builders (crates, walls, roads) | Global arrays hold every map object by kind (obstacles, paths, covers, trees, props). Sm
+docs/LEGACY_INVENTORY.md:196:| GW7 | Walkable platforms and ramps (builders) | Platforms are solid boxes from the ground to a walkable top. Ramps are a custom 8-vertex wedge mesh that rises 
+docs/LEGACY_INVENTORY.md:197:| GW8 | Placement glue for houses, cover runs, trees and props | Each kit piece is built by the BK kit, added to the scene, given world colliders, tagged for the
+docs/LEGACY_INVENTORY.md:198:| GW9 | Collider derivation for kit pieces | Turns each piece into collision boxes. A cover run becomes a gap-free chain of small boxes along its length (at most
+docs/LEGACY_INVENTORY.md:199:| GW10 | Enemy spawn markers | Editor-placed spawn points per faction, each drawn as a coloured ring, disc, pole and flag on a layer that is visible only in the 
+docs/LEGACY_INVENTORY.md:200:| GW11 | Map lifecycle: buildMap, clearMap, curMap and the boot map pick | clearMap removes and disposes every map object but spares shared materials. buildMap r
+docs/LEGACY_INVENTORY.md:201:| GW12 | Map save format v1 and load-time dedupe | serializeMap writes the live world to plain JSON (version 1, name, spawn, terminal, crates, roads, platforms, 
+docs/LEGACY_INVENTORY.md:202:| GW13 | Movement collision push-out (resolveObstacles) | Pushes a circle of radius r out of every crate and wall box (barracks walls included, since they are ad
+docs/LEGACY_INVENTORY.md:203:| GW14 | Vertical surface query, step-up guard, gravity and jump | surfaceHeightAt returns the highest walkable top under a point: platforms, ramp slopes, live b
+docs/LEGACY_INVENTORY.md:204:| GW15 | Explosion line of sight (rebuildLOS, losMeshes, blastReaches) | Keeps a list of scene meshes that block blasts (crates and walls, buildings, house bodie
+docs/LEGACY_INVENTORY.md:205:| GW16 | Scene-to-SIM world mirror (syncSimWorld) | Once per frame, it copies every soldier's position, team and alive state, plus the sight-blocking collider bo
+docs/LEGACY_INVENTORY.md:206:| GW17 | Unified occlusion cutaway (Foxhole-style) | Each frame it tests five points across the player's silhouette against the box of every crate, wall, buildin
+docs/LEGACY_INVENTORY.md:207:| GW18 | Procedural tree builder (BK.TREES, BK.buildTree) | Builds apple, Lombardy poplar and oak from a trunk cylinder and icosahedron leaf blobs: clustered can
+docs/LEGACY_INVENTORY.md:208:| GW19 | Farmyard props (BK.PROPS, BK.buildProp) | A registry of eight farmyard props (haystack, hay bales, cart, well, log pile, barrels, vegetable patch, water
+docs/LEGACY_INVENTORY.md:209:| GW20 | Team structures, enterable barracks, the map resupply terminal and the map spawn | makeBuilding builds a destructible team building as a box body with a
+docs/LEGACY_INVENTORY.md:210:| GW21 | Dead movement-axis constants (WORLD_FWD, WORLD_RIGHT) | Two vectors declared as the movement axes with the comment 'camera never yaws'. Nothing reads th
+docs/LEGACY_INVENTORY.md:214:Scope: shamble-game.js:224-573 and the held melee and shield models.
+docs/LEGACY_INVENTORY.md:218:| GA1 | Animation tuning table and critically damped spring | One data object holds every animation knob: gait (duty, pelvis drop, lift, cadence bounds), spring 
+docs/LEGACY_INVENTORY.md:219:| GA2 | Two-bone IK solver (arms and legs) | Solves a shoulder-elbow (or hip-knee) chain so the end lands on a target, using the law of cosines and a pole vector
+docs/LEGACY_INVENTORY.md:220:| GA3 | Per-soldier animation state setup and rig fix-ups | Builds the soldier's animation state (springs, two foot records, limb lengths, saved hand rotations, 
+docs/LEGACY_INVENTORY.md:221:| GA4 | Locomotion core: velocity, hip yaw and gait cadence | Derives each soldier's velocity from its position change (teleports re-plant), computes walk/run/sp
+docs/LEGACY_INVENTORY.md:222:| GA5 | Planted-foot planner | Each foot is planted in the world, swinging along an arc to the next foothold, or doing a timed step. Swings move relative to the 
+docs/LEGACY_INVENTORY.md:223:| GA6 | Pelvis motion, leg IK and procedural ankle roll | Bobs, sways and rolls the pelvis, lowers it into a running crouch, and caps its height so both feet sta
+docs/LEGACY_INVENTORY.md:224:| GA7 | Upper-body layer | Counter-twists spine and chest toward the aim plus the shooter's blade, adds a speed lean, idle breathing, stride roll, recoil and rel
+docs/LEGACY_INVENTORY.md:225:| GA8 | Gun-first weapon stance and hand IK onto gun sockets | Places the gun's stock first, blending carry / ADS / sprint holds per GUN_KIT hold style. It then 
+docs/LEGACY_INVENTORY.md:226:| GA9 | Reload choreography | Over reload progress 0..1, adds a per-style pose to the gun and moves the support hand between the rail, a belt pouch or quiver, an
+docs/LEGACY_INVENTORY.md:227:| GA10 | Grenade and molotov throw pose | While a grenade is charging, the support hand winds back (gun lowered). On release a follow-through moves it from wind 
+docs/LEGACY_INVENTORY.md:228:| GA11 | Shield and katana holds, and the held melee and shield models | In shield mode the left hand is turned to face the shield toward the aim and the arm is 
+docs/LEGACY_INVENTORY.md:229:| GA12 | Hit flinch | On a hit, a spring impulse snaps the upper body (gun and hands with it) away from the shot's source and whips the head. Strength is damage/
+docs/LEGACY_INVENTORY.md:230:| GA13 | Greatcoat skirt panels | Four coat skirt panels (front/back, left/right) rotate with the thigh on their side and flare a little at speed, using springs.
+docs/LEGACY_INVENTORY.md:231:| GA14 | Toy-soldier death fall | On a kill the soldier falls away from the attacker. Knees buckle into a kneel with the feet tucked, then the upper body tips fr
+docs/LEGACY_INVENTORY.md:232:| GA15 | Per-frame animation driver and its input contract | Every frame, the player and every alive bot fill one shared state struct (aim yaw, clock, kick, relo
+docs/LEGACY_INVENTORY.md:233:| GA16 | Dead and legacy animation leftovers | Code that no longer drives gameplay animation: an unused blend-pose struct, the carry/ADS pose data the old aim la
+docs/LEGACY_INVENTORY.md:237:Scope: shamble-game.js, several ranges.
+docs/LEGACY_INVENTORY.md:241:| GC1 | Team identity and friendly-fire filter | Every team string goes through one function that maps canonical ids, faction names and the legacy 'friend'/'host
+docs/LEGACY_INVENTORY.md:242:| GC2 | Soldier slot table, team index and roster activation | A fixed table of soldier slots (slot 0 is you, each bot's slot is its SIM id) and a per-team index
+docs/LEGACY_INVENTORY.md:243:| GC3 | Cursor aim resolution and ADS sight line | Each frame a ray from the camera through the cursor is resolved against the headless SIM up to 400 m, falling 
+docs/LEGACY_INVENTORY.md:244:| GC4 | Player weapon state: loadout, switching, reload, spread | The player state object and the per-weapon loadout (ammo, reserve, owned), weapon switching wit
+docs/LEGACY_INVENTORY.md:245:| GC5 | Player firing: fire origin, pellets and spread, shot resolution | fireOnce checks cooldowns and ammo, fires from a fixed chest point ahead of the body (n
+docs/LEGACY_INVENTORY.md:246:| GC6 | Held gun models and weapon pitch | Each soldier builds a gun model the first time it holds that gun, keeps it hidden after, and moves its muzzle marker t
+docs/LEGACY_INVENTORY.md:247:| GC7 | Damage state: applyDamage, damageEnemy, damageBuilding | One damage path for every soldier: it drops hits after the round ends, while you pilot, and betw
+docs/LEGACY_INVENTORY.md:248:| GC8 | Damage presentation (onDamageEvent) | Turns each damage event into feedback: the victim's flinch and death fall for everyone; damage numbers and hit mark
+docs/LEGACY_INVENTORY.md:249:| GC9 | Player death and respawn (and bot respawn timer) | On death the player falls away from the killing blow, sees the death screen and respawns after T.respa
+docs/LEGACY_INVENTORY.md:250:| GC10 | Unit-type (class) system | Selecting a class sets its health, primary weapon and ability and resets ability state. Classes unlock in the armory by era a
+docs/LEGACY_INVENTORY.md:251:| GC11 | Class abilities: Molotov, Riot Shield, Banzai, Bayonet charge | F toggles the class ability. Molotov swaps to a thrown bottle; the Shield raises a front
+docs/LEGACY_INVENTORY.md:252:| GC12 | Melee swing and hit check | Melee weapons swing through windup, strike and recover; at the impact frame every enemy within range and the arc in front of
+docs/LEGACY_INVENTORY.md:253:| GC13 | Charged throw and ballistic arc preview | Holding G (grenade) or LMB (Torque Bow) charges a throw; launch speed scales with charge at a fixed pitch alon
+docs/LEGACY_INVENTORY.md:254:| GC14 | Frag grenades and blast damage | A charged throw spawns a grenade that falls under gravity, bounces on the ground and explodes after 1.5 s; the Molotov 
+docs/LEGACY_INVENTORY.md:255:| GC15 | Torque Bow bolts | The bought special weapon fires a bolt whose speed scales with charge; it flies under gravity, is ray-tested through the SIM each fra
+docs/LEGACY_INVENTORY.md:256:| GC16 | Juggernaut model builder and walk animation | Builds the tri-cannon walker from boxes and cylinders in the faction livery, with jointed hip-knee-ankle l
+docs/LEGACY_INVENTORY.md:257:| GC17 | Juggernaut piloting, cannon and deployment | Bought at era T2 for 2500 x the price multiplier and deployed 7 m behind you (opposite your facing). Press 
+docs/LEGACY_INVENTORY.md:258:| GC18 | Dead code and leftovers in combat | Code in this area that nothing calls or reads, plus write-only attacker and assist stubs: ps.lastAttackerId, the bot
+docs/LEGACY_INVENTORY.md:259:| GC19 | Player health regeneration | The time since your last hit counts up each frame; after T.regenDelay (3.5 s) without a hit, your health climbs at T.regenR
+docs/LEGACY_INVENTORY.md:263:Scope: shamble-game.js, about 1434-1653 and 2609-2965.
+docs/LEGACY_INVENTORY.md:267:| GN1 | Bot body, overhead health bar and hit flash | Builds each bot's soldier model for its faction and hangs a two-plane health bar over its head, coloured by
+docs/LEGACY_INVENTORY.md:268:| GN2 | Bot roster record and unit assignment | Keeps the bots in one array (enemies) and builds one record per bot slot (team-major in TEAMS order, TUNE.teams.s
+docs/LEGACY_INVENTORY.md:269:| GN3 | Bot spawn point and respawn timer | teamSpawnPoint picks a fixed spot per slot with no randomness: the team's own markers round-robin, else 4 m outside i
+docs/LEGACY_INVENTORY.md:270:| GN4 | Bot targeting and line-of-sight budget | Every 0.25 s (staggered by slot) each bot looks for the nearest visible soldier of another team within 44 m, and
+docs/LEGACY_INVENTORY.md:271:| GN5 | Bot combat movement and melee lunge | With a visible target, the bot turns to face it, closes in through navSteer when farther than preferRange + 3 m, ba
+docs/LEGACY_INVENTORY.md:272:| GN6 | Bot gunfire | A bot fires bursts (the unit's burst and fireInterval, then a 4.5 s pause plus up to 0.6 s) chest to chest at the target's SIM snapshot, wi
+docs/LEGACY_INVENTORY.md:273:| GN7 | _botFireWorld: the bot-fire hit world without ramps | A second view of the SIM world for bot shots: the same soldier list, but the statics leave out the 
+docs/LEGACY_INVENTORY.md:274:| GN8 | Bot-shot effects and sound cull | Bot shots always resolve hit and damage. Muzzle flash, tracer and impact are skipped when the shot passes farther than 
+docs/LEGACY_INVENTORY.md:275:| GN9 | Bot roles, siege and objective behaviour | With no visible target, a bot acts by role, cycled per team slot (push, objective, hunt). Objective bots walk 
+docs/LEGACY_INVENTORY.md:276:| GN10 | Bot verticality: climb steering, jumps and collision | In combat (only while a target is visible), when the target stands higher above the bot than EJUM
+docs/LEGACY_INVENTORY.md:277:| GN11 | Nav grid build | Builds a 2 m grid over the arena when a match deploys. A cell is blocked when a test circle at its centre (bot radius 0.7 m plus half a
+docs/LEGACY_INVENTORY.md:278:| GN12 | A* route search and string-pulling | Eight-neighbour A* with an octile heuristic and no corner cutting, on preallocated typed arrays with a search stamp
+docs/LEGACY_INVENTORY.md:279:| GN13 | Route following, replanning and route budget | navSteer walks a bot straight when the grid line to its goal is clear. Otherwise it follows a cached rout
+docs/LEGACY_INVENTORY.md:280:| GN14 | Dead bot code and unused bot tuning | Helpers and fields nothing reads: an old random spawn, a respawn wrapper, a friendly-building finder, a ramp low-e
+docs/LEGACY_INVENTORY.md:284:Scope: shamble-game.js, several ranges.
+docs/LEGACY_INVENTORY.md:288:| GE1 | Match rules table (tunable objective and economy timings) | A small per-map table of rule numbers (silo capture time, tech box active/capture/first/gap t
+docs/LEGACY_INVENTORY.md:289:| GE2 | Two-pool economy constants and per-team economy state | ECO holds the pay and tech numbers (trickle 1 cr/s, 0.25 with refinery dead, silo +1 cr/s, harves
+docs/LEGACY_INVENTORY.md:290:| GE3 | Personal credits: trickle, kill pay, resupply terminal and credit HUD | The player's own cash grows each frame from the refinery trickle plus held silos,
+docs/LEGACY_INVENTORY.md:291:| GE4 | Team tech meter and eras (addTech, era-up, era HUD) | addTech adds tech to a team (halved when its power plant is down) and rolls over the era thresholds
+docs/LEGACY_INVENTORY.md:292:| GE5 | Power-plant pricing (economy as a weapon) | If a team's power plant is destroyed, every price for that team doubles (priceMult) and its tech income halve
+docs/LEGACY_INVENTORY.md:293:| GE6 | Harvester / supply convoy simulation | One truck per team drives straight from its dock to a lane point at the supply field, loads 3.5 s, drives back, do
+docs/LEGACY_INVENTORY.md:294:| GE7 | Objective world builders and markers (truck, supply cache, tech points, tech box, silos, world bars) | Procedural meshes for the harvester truck, the sup
+docs/LEGACY_INVENTORY.md:295:| GE8 | Presence capture primitive (presentTeam) | Counts every team's live members inside a circle (the player only when they qualify); exactly one team present
+docs/LEGACY_INVENTORY.md:296:| GE9 | Tech Boxes (rotating capture objective) | One box at a time spawns at one of up to 3 tech points; a team captures it by channelling E (7 s) with no enemy
+docs/LEGACY_INVENTORY.md:297:| GE10 | Silos (presence-captured income points) | Up to 3 neutral silos captured by standing on the pad for 3.5 s with no enemy present; each silo a team holds 
+docs/LEGACY_INVENTORY.md:298:| GE11 | Objective placement from map data (placeObjectives) | Reads the map's harvest field, per-team truck lanes, up to 3 tech points and up to 3 silos; checks
+docs/LEGACY_INVENTORY.md:299:| GE12 | Win rule, end screen and round reset of the economy | checkEnd (run when a building dies) declares victory when every other active team that has HQs has
+docs/LEGACY_INVENTORY.md:300:| GE13 | Purchase gates: weapons, classes, vehicles, grenades | Status functions decide for each item whether it is owned, era-locked, level-locked, too expensiv
+docs/LEGACY_INVENTORY.md:301:| GE14 | Armory shop UI | A modal opened with E at your own team's barracks panel (within 2.6 m) that lists Squad classes, Vehicles, Special Weapons and the frag
+docs/LEGACY_INVENTORY.md:302:| GE15 | Career progression logic and storage (Prog, XP, levels, prestige) | A persistent player record (XP, level 1-100, prestige, kills, deaths, headshots, kil
+docs/LEGACY_INVENTORY.md:303:| GE16 | Career screen, rank insignia and prestige medal art | Builds US-Army-style rank insignia (18 tiers in RANK_TIERS :1959-1978: plain, chevrons, rockers, s
+docs/LEGACY_INVENTORY.md:304:| GE17 | Dead economy and career leftovers | Unused gun-game progression (rifleKills, rifleLevel, RIFLE_TIERS, tierBase, advanceAt) and its pip display, which is
+docs/LEGACY_INVENTORY.md:308:Scope: shamble-game.js, several ranges.
+docs/LEGACY_INVENTORY.md:312:| GP1 | FX pool and transient combat effects | Short-lived world effects: tracers, muzzle flashes, impact sparks by surface, shell casings, explosions, grenade b
+docs/LEGACY_INVENTORY.md:313:| GP2 | Input mapping and listeners | Keyboard and mouse listeners write a keys{} map plus mouse NDC and button flags, and they also run game actions directly at
+docs/LEGACY_INVENTORY.md:314:| GP3 | Player locomotion and sprint stamina | Turns WASD into a move vector relative to the camera yaw, applies sprint (drains stamina; when it runs out, sprint
+docs/LEGACY_INVENTORY.md:315:| GP4 | Gameplay camera rig | An isometric follow camera: a screen-space dead zone before the camera pans or looks ahead, smoothed middle-mouse yaw, ADS reaction
+docs/LEGACY_INVENTORY.md:316:| GP5 | Dev panel, camera style presets and perf overlay | A panel toggled with the backquote key. It holds cheats (god mode, infinite ammo, freeze AI, heal, +10
+docs/LEGACY_INVENTORY.md:317:| GP6 | Synthesized WebAudio SFX | All sound is generated at runtime from oscillators and noise buffers: shots per weapon, an AMK sniper report (saturated noise 
+docs/LEGACY_INVENTORY.md:318:| GP7 | Hit and kill confirmation feedback | Hitmarker (scale-pop, kill and head variants), floating damage numbers from a fixed pool of 40 DOM nodes, the headsh
+docs/LEGACY_INVENTORY.md:319:| GP8 | First-deploy onboarding overlay | A controls card shown on the first deploy. It is dismissed with Enter, Esc, Space or its button, and the dismissal is r
+docs/LEGACY_INVENTORY.md:320:| GP9 | Kill vignette and hit-stop | On headshot and melee kills, the whole game freezes for 0.12 s (hit-stop), three comic picture-in-picture shots of the victi
+docs/LEGACY_INVENTORY.md:321:| GP10 | HUD writers and per-frame DOM updates | Updates the HUD's DOM: weapon name and ammo, health bar, credits, ability and frag counts, hostile count, base h
+docs/LEGACY_INVENTORY.md:322:| GP11 | Scoreboard (Tab) | Held Tab shows your team (you plus allies) against hostiles. Every row shows kills and deaths; only your own row shows assists (ally 
+docs/LEGACY_INVENTORY.md:323:| GP12 | Main menu camera, war-room menu and pause flows | The main menu 'dossier': a fixed menu camera, a typewriter brief, pen marks on tabs, and a Deploy stam
+docs/LEGACY_INVENTORY.md:324:| GP13 | Frame loop and mode dispatch | One requestAnimationFrame loop dispatches on a global mode string (menu, game, editor, charlab). In game mode it runs upd
+docs/LEGACY_INVENTORY.md:325:| GP14 | update(dt): the per-step simulation order | The body of the game step: timers and cooldowns, the economy trickle and objectives, the aim cast, the playe
+docs/LEGACY_INVENTORY.md:326:| GP15 | bootGame boot sequence | The single entry point both pages call. It builds the world (border 3056, tree and prop kit builders 3059-3188, map choice and 
+docs/LEGACY_INVENTORY.md:327:| GP16 | V8 JIT warm-up workarounds | At load, a generated block reassigns 119 top-level lets once each, keeping their types, so V8 stops treating them as consta
+docs/LEGACY_INVENTORY.md:331:## ED. Editor (`shamble-editor.js`)
+docs/LEGACY_INVENTORY.md:333:Scope: shamble-editor.js; the map editor's features are listed row by row in `docs/EDITOR_V1_INVENTORY.md`.
+docs/LEGACY_INVENTORY.md:337:| ED1 | Map editor: placement library and scatter tools | Picks a tool or library item and places, removes or re-teams map pieces on the ground under the cursor,
+docs/LEGACY_INVENTORY.md:338:| ED2 | Map editor: selection, gizmo and transforms | Raycast picking of editable objects, single selection, marquee multi-selection, selection boxes, a move/rot
+docs/LEGACY_INVENTORY.md:339:| ED3 | Map editor: entity descriptors, copy, paste and duplicate | Turns a selected scene object into a small plain descriptor and spawns objects back from desc
+docs/LEGACY_INVENTORY.md:340:| ED4 | Map editor: session lifecycle, cameras and Test modes | Enters and leaves the editor, runs the per-frame editor update, a free top-down camera with zoom 
+docs/LEGACY_INVENTORY.md:341:| ED5 | Character Lab | A dev-only tool that builds one soldier with the real in-game builder and shows it alone on an orbiting camera. Sliders change body propo
+docs/LEGACY_INVENTORY.md:342:| ED6 | Character Lab rifle-hold pose tool | A Pose Mode inside the Character Lab. Sliders set the gun, hands and elbows for the carry and ADS holds, and the res
+docs/LEGACY_INVENTORY.md:343:| ED7 | Anim Lab (a Character Lab tab) | Loops any soldier action on the lab soldier with live sliders over the game's own ANIM knobs. Movement plays on a treadm
+docs/LEGACY_INVENTORY.md:344:| ED8 | Map editor: analysis overlays | An overlay framework (one group, projected HTML labels, reusable line segments, toggles and a reset) with four overlays: 
+docs/LEGACY_INVENTORY.md:345:| ED9 | Map editor: World panel and Match Rules panel | Schema-generated controls saved per map. World: 22 controls for ground, lighting, sky and fog. Rules: 9 s
+docs/LEGACY_INVENTORY.md:346:| ED10 | Map editor: Building Maker | A panel generated from the procedural building registry (BK.PARTS pickers, BK.DIMS sliders, region preset, seed and dice). 
+docs/LEGACY_INVENTORY.md:347:| ED11 | Map editor: snapshot undo and redo | Every edit pushes the whole map, serialized to JSON, onto an undo stack (at most 60 steps; edits with the same tag 
+docs/LEGACY_INVENTORY.md:348:| ED12 | Map editor: inspector and status bar | A per-selection panel with numeric position, rotation, HP, size and ramp-shape fields (plus team, scale, platform
+docs/LEGACY_INVENTORY.md:349:| ED13 | Map editor: map and prefab storage, save and load | Saved maps (vmap:) and prefabs (vprefab:) go through KVStore, with an in-memory fallback. A Maps mod
+docs/LEGACY_INVENTORY.md:350:| ED14 | bootEditor: editor event wiring and chrome | A one-time boot that wires the menu Editor button, every editor button, key and pointer handler, the Charac
+docs/LEGACY_INVENTORY.md:351:| ED15 | Editor-only hooks inside the game, behind mode and typeof guards | Game code calls into the editor only behind mode==='editor'/'charlab' branches or typ
+docs/LEGACY_INVENTORY.md:352:| ED16 | Map editor: core state, grid snap and rotation step | The editor's shared state (DOM roots, current tool, drag and ghost, selection, marquee, road start
+docs/LEGACY_INVENTORY.md:354:## PG. Pages (`index.html`, `editor.html`)
+docs/LEGACY_INVENTORY.md:360:| PG1 | Page shell and the two entry pages | Two near-identical HTML pages boot the game: index.html (player build) and editor.html (authoring build). They share
+docs/LEGACY_INVENTORY.md:361:| PG2 | Design tokens and the two UI families | CSS custom properties hold the palette and fonts. The page has three sets: the legacy tokens (paper, ink, olive, 
+docs/LEGACY_INVENTORY.md:362:| PG3 | Combat HUD and cursor layer | The in-fight readouts: vitals bar, weapon name with magazine and reserve, credits, ability and frag counts, a #slots contai
+docs/LEGACY_INVENTORY.md:363:| PG4 | Objective and economy HUD | The base health pips (HQ, refinery, barracks, supply, power) for 'friend' and 'hostile', two silo dots with a credits-per-sec
+docs/LEGACY_INVENTORY.md:364:| PG5 | Scoreboard (hold Tab) | A dark modal listing two team columns (you and your allies, then the hostiles) with K/D/A, team totals, tech tier, and your rank,
+docs/LEGACY_INVENTORY.md:365:| PG6 | Death and end-of-round screens | 'ELIMINATED' with a respawn countdown, and a VICTORY/DEFEAT card ('enemy HQ destroyed', click or press R to fight again)
+docs/LEGACY_INVENTORY.md:366:| PG7 | Main menu: war-room dossier | The title screen drawn as a manila folder on a desk: a dossier sheet with a stencil title, a 'Top secret' stamp and a typed
+docs/LEGACY_INVENTORY.md:367:| PG8 | Pause clipboard and field manual | One clipboard sheet with two modes. Pause has Resume, Service record, Restart round and Menu. The field manual opened 
+docs/LEGACY_INVENTORY.md:368:| PG9 | Map editor chrome (DOM and CSS) | The editor's own UI: a top bar, tool rail, library with tabs, search and card grid, recent items and prefabs, seed-base
+docs/LEGACY_INVENTORY.md:369:| PG10 | Feedback and celebration overlays | Short-lived pop-ups: a level-up toast, a multi-kill banner, a rank-up banner, a headshot skull, an XP-earned counter
+docs/LEGACY_INVENTORY.md:370:| PG11 | Armory shop modal | A dark modal at the team armory: a credits header, a list built by JS (a Squad section of the 4 unit classes with Buy / Equip / Acti
+docs/LEGACY_INVENTORY.md:371:| PG12 | Career: service record modal and HUD career chip | A career modal (rank icon, rank, level, XP bar, stats, medal, prestige button) and a small HUD chip w
+docs/LEGACY_INVENTORY.md:372:| PG13 | Dev panel (DOM and CSS) | A toggleable panel: live perf readouts (FPS, frame time, draw calls, triangles, geometries, textures, programs, JS heap), came
+docs/LEGACY_INVENTORY.md:373:| PG14 | Character Lab panel (DOM) | An authoring panel for soldier recipes: body, faction, gear slots, proportion and colour controls (filled by JS), a rifle po
+docs/LEGACY_INVENTORY.md:374:| PG15 | First-deploy tutorial card | A 'Field manual' card shown on a player's first deploy with a controls grid, an objective line and a DEPLOY button. A KVSto
+docs/LEGACY_INVENTORY.md:375:| PG16 | Overlay z-order and modal states | About 35 overlays stacked by hand-picked z-index values (HUD-internal panels 9, halftone 8, HUD 10, damage numbers 11
+docs/LEGACY_INVENTORY.md:376:| PG17 | Dead CSS and markup | Styles and elements nothing uses in the player build: #topbar and #hint rules with no element and no JS, id rules for #edGenHead/#
+docs/LEGACY_INVENTORY.md:377:| PG18 | Script tags, inline boot and menu tail | Fixed-order classic script tags (three, core, game, and editor on editor.html), then an inline script: bootGame
+docs/LEGACY_INVENTORY.md:378:| PG19 | three.js r128 CDN tag | Loads three.js r128 as a UMD global from cdnjs, with no integrity hash and no CSP. | index.html:1255 and editor.html:1256 (https
+docs/LEGACY_INVENTORY.md:390:| TL4 | Check 4: player build never reaches editor-only code | Finds every reference in the player build (core, game, index.html inline script and DOM handlers) 
+docs/LEGACY_INVENTORY.md:393:| TL7 | Check 5c: core layering | Fails if shamble-core.js references any name declared in game, editor or an inline page script, even behind typeof. This keeps 
+docs/LEGACY_INVENTORY.md:394:| TL8 | Check 5d: exact script order | Fails unless each page loads exactly three r128 from cdnjs, then core, then game (then editor, on editor.html), then one i
+docs/LEGACY_INVENTORY.md:395:| TL9 | Check 5a: smoke test of the real pages (Playwright) | Opens index.html and editor.html in headless Chromium (SwiftShader), serves three r128 locally and 
+docs/LEGACY_INVENTORY.md:396:| TL10 | Per-edit syntax hook | A Claude Code PostToolUse hook on Edit and Write. It runs node --check on a changed .js, .mjs or .cjs file, or on each inline scr
+docs/LEGACY_INVENTORY.md:397:| TL11 | preview.js: headless engine host and 3D renders | Loads three r128, shamble-core.js and shamble-game.js into Node with a stubbed DOM, headless-gl (WebGL
+docs/LEGACY_INVENTORY.md:402:| TL16 | aabbs.js + village.py: layout export and the Cabana village validator | aabbs.js exports the live SIM collision boxes and objective zones (silos, tech p
+docs/LEGACY_INVENTORY.md:419:| KT9 | Syntax hook (PostToolUse on Edit\|Write) | After every Edit or Write, runs node --check on the changed .js/.mjs/.cjs file, or on every inline <script> of
+docs/LEGACY_INVENTORY.md:422:| KT12 | Path-scoped rules for the legacy files (engine-core, engine-game, engine-editor, pages, tools) | Rules that load when Claude touches a legacy file: core
+docs/LEGACY_TUNING.md:32:| `FIRE_H` | 1.9 | shamble-game.js:1419 |
+docs/LEGACY_TUNING.md:33:| `EJUMP_REACH` | 3.0708333333333337 | shamble-game.js:1575 |
+docs/LEGACY_TUNING.md:34:| `AIM_ARC_N` | 48 | shamble-game.js:1701 |
+docs/LEGACY_TUNING.md:35:| `GROUND_W` | 372 | shamble-core.js:224 |
+docs/LEGACY_TUNING.md:36:| `GRID_SIZE` | 10 | shamble-core.js:850 |
+docs/LEGACY_TUNING.md:38:### `T` (shamble-core.js:66)
+docs/LEGACY_TUNING.md:142:### `TUNE` (shamble-core.js:101)
+docs/LEGACY_TUNING.md:158:### `TEAMS` (shamble-core.js:95)
+docs/LEGACY_TUNING.md:167:### `WEAPONS` (shamble-core.js:108)
+docs/LEGACY_TUNING.md:205:### `UNIT_TYPES` (shamble-core.js:126)
+docs/LEGACY_TUNING.md:232:### `VEHICLE_TYPES` (shamble-core.js:141)
+docs/LEGACY_TUNING.md:244:### `SOLDIER_KIT` (shamble-game.js:124)
+docs/LEGACY_TUNING.md:256:### `ELITE_KIT` (shamble-game.js:125)
+docs/LEGACY_TUNING.md:268:### `RIFLE_TIERS` (shamble-game.js:788)
+docs/LEGACY_TUNING.md:276:### `RULES_DEFAULT` (shamble-game.js:40)
+docs/LEGACY_TUNING.md:290:### `ECO` (shamble-game.js:689)
+docs/LEGACY_TUNING.md:305:### `SILO` (shamble-game.js:972)
+docs/LEGACY_TUNING.md:322:### `TBOX` (shamble-game.js:706)
+docs/LEGACY_TUNING.md:351:### `HARV` (shamble-game.js:704)
+docs/LEGACY_TUNING.md:365:### `JUG` (shamble-game.js:1188)
+docs/LEGACY_TUNING.md:376:### `JUG_PILOT` (shamble-game.js:1189)
+docs/LEGACY_TUNING.md:384:### `JUG_CANNON` (shamble-game.js:1190)
+docs/LEGACY_TUNING.md:393:### `T_CHARGE` (shamble-game.js:1696)
+docs/LEGACY_TUNING.md:419:### `STAM` (shamble-game.js:2216)
+docs/LEGACY_TUNING.md:431:| `FIXED_DT` | 0.016666666666666666 | shamble-core.js:1479 |
+docs/LEGACY_TUNING.md:433:### `BTN` (shamble-core.js:1480)
+docs/LEGACY_TUNING.md:445:### `BODY` (shamble-core.js:1482)
+docs/LEGACY_TUNING.md:459:### `PART` (shamble-core.js:1483)
+docs/LEGACY_TUNING.md:471:| `VIG_W` | 300 | shamble-game.js:2347 |
+docs/LEGACY_TUNING.md:472:| `WR_DEPLOY_MS` | 280 | shamble-game.js:2999 |
+docs/LEGACY_TUNING.md:473:| `RR_C` | 100.53096491487338 | shamble-game.js:1099 |
+docs/LEGACY_TUNING.md:474:| `OCC_FADE` | 0.24 | shamble-game.js:2555 |
+docs/LEGACY_TUNING.md:476:### `RANK_TIERS` (shamble-game.js:1959)
+docs/LEGACY_TUNING.md:499:### `PRESTIGE` (shamble-game.js:2050)
+docs/LEGACY_TUNING.md:514:### `ROMAN` (shamble-game.js:1860)
+docs/LEGACY_TUNING.md:518:### `GUN_WORDS` (shamble-game.js:45)
+docs/LEGACY_TUNING.md:522:### `KILL_WORDS` (shamble-game.js:46)
+docs/LEGACY_TUNING.md:526:### `CAM_STYLES` (shamble-game.js:2195)
+docs/LEGACY_TUNING.md:566:### `SFX` (shamble-game.js:2219)
+docs/LEGACY_TUNING.md:578:| `SUN_R` | 65.8 | shamble-core.js:167 |
+docs/LEGACY_TUNING.md:579:| `INK` | 1118746 | shamble-core.js:240 |
+docs/LEGACY_TUNING.md:580:| `WORLD_OUTLINE` | 0.09 | shamble-core.js:241 |
+docs/LEGACY_TUNING.md:581:| `CHAR_OUTLINE` | 0.8 | shamble-core.js:242 |
+docs/LEGACY_TUNING.md:582:| `RIM_COL` | 16742994 | shamble-core.js:254 |
+docs/LEGACY_TUNING.md:583:| `OUTLINE_GROUND_Y` | 0.02 | shamble-core.js:294 |
+docs/LEGACY_TUNING.md:584:| `ARM_L1` | 0.46 | shamble-game.js:209 |
+docs/LEGACY_TUNING.md:586:### `ENV_DEFAULT` (shamble-core.js:169)
+docs/LEGACY_TUNING.md:590:### `TEAM_COL` (shamble-game.js:709)
+docs/LEGACY_TUNING.md:594:### `TEAM_HEX` (shamble-game.js:710)
+docs/LEGACY_TUNING.md:598:### `FACTION_PALETTES` (shamble-core.js:635)
+docs/LEGACY_TUNING.md:602:### `CHAR_DEFAULT` (shamble-core.js:421)
+docs/LEGACY_TUNING.md:606:### `CHAR_MALE` (shamble-core.js:463)
+docs/LEGACY_TUNING.md:610:### `CHAR_FEMALE` (shamble-core.js:508)
+docs/LEGACY_TUNING.md:614:### `CPARTS` (shamble-core.js:567)
+docs/LEGACY_TUNING.md:618:### `GUN_KIT` (shamble-core.js:785)
+docs/LEGACY_TUNING.md:622:### `BK` (shamble-core.js:1296)
+docs/LEGACY_TUNING.md:626:### `MELEE_IDLE` (shamble-core.js:1434)
+docs/LEGACY_TUNING.md:630:### `ANIM` (shamble-game.js:132)
+docs/LEGACY_TUNING.md:636:### `NAV` (shamble-game.js:2617)
+docs/LEGACY_TUNING.md:640:### `AI_STATE` (shamble-game.js:1581)
+docs/MODULE_MAP.md:19:| **`shamble-core.js`** | **Shared truth / engine.** Config, arsenal, render globals, NPR pipeline, character builder, faction system, building kit, map schema, and the
+docs/MODULE_MAP.md:20:| **`shamble-game.js`** | **Gameplay + the shared dispatch/boot.** All combat/AI/economy/HUD/FX/audio/vehicles/progression/`update()`, the world-registry arrays, **and*
+docs/MODULE_MAP.md:21:| **`shamble-editor.js`** | **Authoring tools.** Map editor (gizmos/tools/inspector/panels), Character Lab, analysis overlays, scatter, prefabs, undo/redo, save-load, `
+docs/MODULE_MAP.md:22:| **`index.html`** | **Lean player build.** Loads THREE + core + game. Menu has **Play + Career** only. |
+docs/MODULE_MAP.md:23:| **`editor.html`** | **Authoring build.** Loads THREE + core + game + editor. Same head/DOM as `index.html` but keeps the **Map Editor** menu button. |
+docs/MODULE_MAP.md:33:shamble-editor.js  ── requires ──▶  shamble-game.js  ── requires ──▶  shamble-core.js
+docs/MODULE_MAP.md:40:  none execute in the editor-less `index.html`.
+docs/MODULE_MAP.md:43:**Hard rule:** any symbol reachable on `index.html`'s live path must live in **core or game,
+docs/MODULE_MAP.md:50:**`index.html`** (players):
+docs/MODULE_MAP.md:52:THREE (r128 UMD, cdnjs)  →  shamble-core.js  →  shamble-game.js
+docs/MODULE_MAP.md:56:**`editor.html`** (authoring):
+docs/MODULE_MAP.md:58:THREE  →  shamble-core.js  →  shamble-game.js  →  shamble-editor.js
+docs/MODULE_MAP.md:87:| Three-team arena map data (`DM_Tri`, opened by `index.html?map=tri`) | **core** [verified] |
+docs/MODULE_MAP.md:125:- **SIM ids — game.** `SIM.players[0]` is the player (id `SIM_PLAYER`=0, declared in `shamble-game.js`);
+docs/MODULE_MAP.md:138:**never loaded by either page**. They load the real `shamble-core.js` + `shamble-game.js` into
+docs/MODULE_MAP.md:150:into `shamble-editor.js`. But `loop()` (game) calls it **every frame, unconditionally**, so
+docs/MODULE_MAP.md:151:the editor-less `index.html` threw a `ReferenceError` on frame 1 and the render loop died. It
+docs/MODULE_MAP.md:152:was moved to `shamble-game.js` where it belongs. **When adding or moving code, follow the
+docs/MODULE_MAP.md:157:fourth check reconstructs `index.html`'s symbol set (core ∪ game ∪ index-inline), strips the
+docs/MODULE_MAP.md:159:`index.html`'s live paths (`loop`, `bootGame`, `deploy`, the tail) resolves within that set —
+docs/REPO_MAP.md:14:| `index.html` | Legacy player build: three.js r128 → core → game → `bootGame();` |
+docs/REPO_MAP.md:15:| `editor.html` | Legacy authoring build: adds the editor and `bootEditor();` |
+docs/REPO_MAP.md:16:| `shamble-core.js` | Legacy engine: tuning, arsenal, look pipeline, characters, kits, maps, KVStore, the SIM math |
+docs/REPO_MAP.md:17:| `shamble-game.js` | Legacy gameplay, AI, economy, HUD, menus, animation, the loop and `bootGame` |
+docs/REPO_MAP.md:18:| `shamble-editor.js` | Legacy map editor, Character Lab, Anim Lab (editor.html only) |
+docs/REPO_MAP.md:100:| `.claude/rules/engine-core.md` | Rules for `shamble-core.js` |
+docs/REPO_MAP.md:101:| `.claude/rules/engine-game.md` | Rules for `shamble-game.js` |
+docs/REPO_MAP.md:102:| `.claude/rules/engine-editor.md` | Rules for `shamble-editor.js` |
+docs/ROADMAP.md:3:> **Living plan + condensed history — kept deliberately lean.** The code — `shamble-core.js` → `shamble-game.js` → `shamble-editor.js`, loaded by `index.html` / `ed
+docs/START_HERE.md:12:sharing globals**, played by **double-clicking an HTML file off disk** (`file://`) in Brave. PvE: on Cabana you and 3 ally bots fight 4 Soviet bots (three teams of bots
+docs/START_HERE.md:21:2. **Work in the git repo.** The five code files sit at the repo root: `shamble-core.js`, `shamble-game.js`,
+docs/START_HERE.md:22:   `shamble-editor.js`, `index.html`, `editor.html`. One change-set per branch `cs/<slug>`, cut from `origin/main`
+docs/START_HERE.md:38:| `shamble-core.js` | Engine + shared truth: config `T`, arsenal (`WEAPONS`, `UNIT_TYPES`, `VEHICLE_TYPES`), render globals, NPR pipeline, character builder + factions,
+docs/START_HERE.md:39:| `shamble-game.js` | All gameplay + world registries + the shared dispatch (`loop`, `update`, `deploy`, `backToMenu`, input) + `bootGame`. Also: ANIM v2, NAV pathfindi
+docs/START_HERE.md:40:| `shamble-editor.js` | Map editor, Character Lab + **Anim Lab**, `bootEditor`. Loaded by `editor.html` only. |
+docs/START_HERE.md:41:| `index.html` | Player build: THREE → core → game → inline `bootGame();` + menu tail. |
+docs/START_HERE.md:42:| `editor.html` | Authoring build: + editor → inline `bootGame(); bootEditor();`. Same head/DOM plus the Map Editor entry. |
+docs/START_HERE.md:44:- **Layering (hard):** core ← game ← editor. Anything on `index.html`'s live path resolves in core ∪ game, never editor.
+docs/START_HERE.md:67:- Don't add a new top-level `let` without adding it to the **let warm-up block at the end of `shamble-game.js`** (or accept one deopt on its first reassignment, §7).
+docs/START_HERE.md:70:- Don't change the shared SIM ray API (`rayAabb` / `rayStatic` / `rayStatics` / `resolveShot` / `hasLOS`) casually — shots, line of sight, bot fire, the grenade-arc p
+docs/START_HERE.md:87:4. Player-build resolvability: every unguarded reference on `index.html`'s live paths resolves in core ∪ game (`battery.js`; mutation-tested against the `placeCursor`
+docs/START_HERE.md:95:   - **5c layering**: `shamble-core.js` references no game, editor or inline-script symbol, guarded or not.
+docs/START_HERE.md:115:- **`node tools/pageshot.js . index.html <prefix> [--headed] <steps…>`**: Playwright + Chromium renders the **real pages including DOM, HUD and CSS** (use it for UI 
+docs/START_HERE.md:116:- **`node tools/battery.js .`**: checks 3–4 as JSON (`gate.mjs` wraps it). **`sim.js`**: headless 90 s match (`node tools/preview.js . eval tools/sim.js [--map=tri]`
+docs/START_HERE.md:133:- **Mis-bucketing:** `placeCursor` once sat in the editor file while `loop()` called it every frame → `index.html` died on frame 1. Check 4 exists for this.
+docs/STATUS.md:145:| bot-poplar-wedge (`shamble-game.js` only: navBuild clearance 0.7 m + half a cell, navPath start from nearest open cell, 3-call warm-up at end of bootGame; symbols +0 -0)
+docs/STATUS.md:146:| editor-undo-ground (`shamble-game.js` only: `addBox`, `addPath`, `makeBuilding`, `makeBarracks` and the `buildMap` terminal now call `stylizeOne()`; `clearMap` now clear
+docs/STATUS.md:152:| editor-prefab-list | merged: PR #4, c458fe7, 2026-10-14 | done: Mustafa's Brave check of editor.html passed (no problems), Advisor APPROVE | none |
+docs/STATUS.md:705:  `docs/EDITOR_V2.md:94` (§5: "It still runs by double-clicking editor.html") and `docs/EDITOR_V2.md:95` (§5: "if
+docs/STATUS.md:759:- **ADR-001 Multiplayer architecture** (authority, tick, transport, hosting, offline play): not started. Inputs logged so far: the 11 wall-clock reads (performance.now / D
+docs/STATUS.md:997:- team-prep-fixes follow-ups (low): NC-7 the grenade-arc preview still loops `rayStatic` per static (about 77.7 KB per call while aiming; small perf change-set); PERF-1 `r
+docs/STATUS.md:1002:- Editor bugs reported by Mustafa (2026-10-15, editor.html on main): placed trees can't be deleted; rotation does nothing when the slider changes; the editor lags after a
+docs/TECHNICAL.md:3:> The **how**. Pair with `GAME_DESIGN.md` (the why), `ROADMAP.md` (history), and **`ART_DIRECTION.md`** (the locked *Living Comic* visual spec — authoritative for palet
+docs/TECHNICAL.md:9:- **Classic multi-`<script>` files sharing globals, loaded in a fixed order — NOT ES modules.** The former single file is split into `shamble-core.js` → `shamble-game
+docs/TECHNICAL.md:29:- **`shamble-core.js`** — engine / shared truth: config (`T`), arsenal, render globals, the NPR pipeline, the character builder + faction system, the building kit, the
+docs/TECHNICAL.md:30:- **`shamble-game.js`** — all gameplay **and** the shared dispatch (`loop` / `backToMenu` / `deploy` / `setMenuCam` / input listeners) + `bootGame()`; owns the world-r
+docs/TECHNICAL.md:31:- **`shamble-editor.js`** — authoring tools (map editor + Character Lab) + `bootEditor()` + `edLeaveToMenu()`. Requires game + core. **Loaded only by `editor.html`.**
+docs/TECHNICAL.md:32:- **`index.html`** — lean player build (THREE + core + game); menu = **Play + Career**.
+docs/TECHNICAL.md:33:- **`editor.html`** — authoring build (+ editor); identical head/DOM but keeps the **Map Editor** menu button.
+docs/TECHNICAL.md:35:Layering rule: **core references nothing above it; game references core (its few editor refs are dead-branch / `typeof`-guarded); editor references both.** Any symbol on
+docs/TECHNICAL.md:89:  - SIM id scheme: `SIM.players[0]` is the player (id `SIM_PLAYER`=0, declared in `shamble-game.js`); `SIM.players[s]` mirrors `SOLDIERS[s]` (= `enemies[s-1]`; `en.id` i
+docs/TECHNICAL.md:90:  - `resolveShot(world,shooterId,ox,oy,oz,dx,dy,dz,range,shooterTeam)`: soldiers of `shooterTeam` are skipped (null = hit everyone but the shooter). Callers pass `teamFi
+docs/TECHNICAL.md:91:  - `_botFireWorld` (game) is kept (K1): its `players` list IS `SIM.players`; its statics leave out ramp slots (their boxes stand in for slopes), filled by `syncSimWorld
+docs/TECHNICAL.md:92:- `syncSimWorld()` mirrors the THREE scene's colliders and soldiers into `SIM` before resolving a shot. Sync guard: at most once per sim step (unless called with `force`
+docs/TECHNICAL.md:96:Not yet phased (a phased `update()` is an ADR-001 input). Today, in order: [verified: shamble-game.js:2671-2947]
+docs/TECHNICAL.md:109:- **Teams as data (core):** `TEAMS` (ids `allies`, `soviets`, `empire`, each with `faction`, `name`, `short`) and `TUNE` (`teams.size` 4, `ff` false, `ai`, `spawn`, `fx
+docs/TECHNICAL.md:110:- **`teamOf(x)`** is the only reader of team strings: canonical ids and faction names map to the id; legacy `'friend'` / `'hostile'` map to `allies` / `soviets`; `'neut
+docs/TECHNICAL.md:111:- **`TEAM_INDEX`:** per team `{idx, active, blds, hqs, refinery, power, barracksB (building), barracksE (enterable), markers, harv, dockX/Z, laneX/Z}` plus `firstEnemy`
+docs/TECHNICAL.md:112:- **`SOLDIERS` / SIM ids / parking:** a fixed table, team-major in `TEAMS` order, `TUNE.teams.size` slots per team (your team gets size-1 bot slots). With size 4: slot 
+docs/TECHNICAL.md:113:- **`applyDamage(a,v,amount,part,kind,srcX,srcZ)` (state) and `onDamageEvent(E)` (presentation):** `a` and `v` are SIM ids (a = -1: no known attacker). `applyDamage` dr
+docs/TECHNICAL.md:114:- **`acquireTarget(en,dt)` + `AI_STATE`:** a line-of-sight budget (`TUNE.ai.losPerS` 480 checks per game second, banked up to `losCapS` 0.1 s) shared by all bots. Each 
+docs/TECHNICAL.md:115:- **`teamSpawnPoint(team,slotId,out)`** (deterministic by slot, no allocation), first option that yields finite numbers wins: the team's own `enemySpawns` markers round
+docs/TECHNICAL.md:116:- **`checkEnd()`** (interim, D11): you win when at least one other active team has HQs and every such team has lost all of them; you lose when your team has HQs and all
+docs/TECHNICAL.md:117:- **Bot-shot FX cull:** `enemyFire` and `siegeFire` always run the hit and damage; the looks are skipped when the shot passes farther than `TUNE.fx.botCullR` (50 m) fro
+docs/TECHNICAL.md:118:- **`placeObjectives(def)` and map keys:** reads `harvField {x,z}`, `harvLanes {<team id>: {dock:{x,z}, lane:{x,z}}}` (known team ids only; a team without a valid entry
+docs/TECHNICAL.md:119:- **DM_Tri and `?map=tri`:** a greybox three-team arena in core (`DM_Tri`, version 1): bases 120 degrees apart, 92 m from the supply field at (0,-23); one enemy-spawn m
+docs/TECHNICAL.md:204:- Under `file://`, Chromium/Brave give **all local files one shared storage area** — `index.html` and `editor.html` share one rank.
+docs/TECHNICAL.md:217:   4. **Player-build resolvability (the mis-bucket catcher)** — reconstruct `index.html`'s symbol set (**core ∪ game ∪ index-inline**), strip the dead `mode==='ed
+docs/TECHNICAL.md:222:5. **Identify the owning file first** (core / game / editor per `MODULE_MAP.md`), edit **that** file, and check **both HTML pages** (`index.html` + `editor.html`): a ch
+docs/TECHNICAL.md:228:- **`preview.js <buildDir> <cmd>`** — loads three r128 (headless WebGL1 via ANGLE, real 2D canvas for the procedural textures, stubbed DOM) + the real `shamble-core.j
+docs/TECHNICAL.md:232:- **3a additions [verified: file headers, 2026-10-16]:** `preview.js` takes `--map=<id>` (boots that map like `index.html?map=<id>`, e.g. `--map=tri`) and `--pre=<file.
+docs/TECHNICAL.md:238:- **`shamble-core.js` / `shamble-game.js` / `shamble-editor.js`** — the three shared-global source files (engine / gameplay + dispatch / authoring). See `MODULE_MAP.m
+docs/TECHNICAL.md:239:- **`index.html`** — the **player build** (core + game). **`editor.html`** — the **authoring build** (core + game + editor). Both hand-thin: manifest comment, scrip
+docs/TECHNICAL.md:266:**`shamble-core.js`** (engine / shared truth):
+docs/TECHNICAL.md:279:**`shamble-game.js`** (gameplay + shared dispatch):
+docs/TECHNICAL.md:293:**`shamble-editor.js`** (authoring — `editor.html` only):
+docs/adr/0001-multiplayer-netcode.md:1067:  - "the game runs by double-clicking index.html (file://)": WebTransport works only in secure contexts (HTTPS)
+docs/adr/0002-code-structure-build-toolchain.md:56:- **EDITOR_V2 §5:** "It still runs by double-clicking editor.html. The player build (index.html) must never load editor
+docs/adr/0002-code-structure-build-toolchain.md:138:   (`shamble-core.js`, `shamble-game.js`, `shamble-editor.js`, `index.html`, `editor.html`) move together into
+docs/adr/0002-code-structure-build-toolchain.md:139:   `legacy/`, which keeps their relative paths, so `legacy/index.html` still runs by double-click; the legacy hard
+docs/adr/0002-code-structure-build-toolchain.md:951:  - "the game runs by double-clicking index.html (file://)": the v2 player build is served, over HTTPS from the client
+docs/adr/0002-code-structure-build-toolchain.md:955:    `legacy/index.html` keeps it. Whether the v2 editor keeps double-click is OQ-0002-1.
+docs/adr/0002-code-structure-build-toolchain.md:956:  - "Layering is hard: core references nothing above it; anything on index.html's live path resolves in core ∪ game,
+docs/adr/0002-code-structure-build-toolchain.md:1405:1. After the restructure (phase 2.1): unzip a fresh copy of the branch and double-click `legacy/index.html`. Expected:
+docs/adr/0002-code-structure-build-toolchain.md:1431:      Mustafa starts a match from `legacy/index.html` by double-click in Brave.
+docs/adr/0003-rendering.md:180:     `LEGACY_INVENTORY.md` line 113; `_matSig`, `shamble-core.js` lines 356–359). Two slots share a material only
+docs/adr/0003-rendering.md:953:  honours the system's `prefers-reduced-motion` only in the war-room menus (`shamble-game.js` line 3039,
+docs/adr/0003-rendering.md:954:  `index.html` line 321), never for the camera shake. Options (not researched): (a) as legacy, menus only; (b) a
+docs/adr/0003-rendering.md:1221:| PM-0003-47 | The HUD touches the DOM only when a value changes (part 10, step 7; legacy's lesson) | reported: the HUD's DOM mutations per frame in BS (media
+docs/adr/0003-rendering.md:1263:is legacy itself opened in a second Brave window on his PC (it runs from `index.html`) at the same framing, because
+docs/adr/0003-rendering.md:1563:  `shamble-core.js` lines 356–359 (`_matSig`, the content signature) and `shamble-game.js` line 3039 with
+docs/adr/0003-rendering.md:1564:  `index.html` line 321 (reduced motion in the menus only).
+docs/adr/0004-simulation-core.md:840:  - "Classic scripts sharing globals in a fixed load order; the game runs by double-clicking index.html (file://)" does
+docs/adr/0005-content-abilities-assets.md:1007:  | The Banzai blade (Tech 1) | not stated | the frontal-arc stage and target-tag rules can carry any answer | a blocked hit keeps 30 %, so the
+docs/adr/0005-content-abilities-assets.md:1754:   `_matSig`, `shamble-core.js` lines 356–359); so an asset keeps its own colours and textures inside a class, and
+docs/adr/0006-infrastructure-operations.md:806:  - "the game runs by double-clicking index.html (file://)": the v2 player build is served over HTTPS from the client
+docs/legacy-tuning.json:12:   "where": "shamble-core.js:66",
+docs/legacy-tuning.json:118:   "where": "shamble-core.js:101",
+docs/legacy-tuning.json:148:   "where": "shamble-core.js:95",
+docs/legacy-tuning.json:173:   "where": "shamble-core.js:108",
+docs/legacy-tuning.json:351:   "where": "shamble-core.js:126",
+docs/legacy-tuning.json:435:   "where": "shamble-core.js:141",
+docs/legacy-tuning.json:451:   "where": "shamble-game.js:124",
+docs/legacy-tuning.json:465:   "where": "shamble-game.js:125",
+docs/legacy-tuning.json:479:   "where": "shamble-game.js:788",
+docs/legacy-tuning.json:501:   "where": "shamble-game.js:40",
+docs/legacy-tuning.json:525:   "where": "shamble-game.js:689",
+docs/legacy-tuning.json:551:   "where": "shamble-game.js:972",
+docs/legacy-tuning.json:584:   "where": "shamble-game.js:706",
+docs/legacy-tuning.json:635:   "where": "shamble-game.js:704",
+docs/legacy-tuning.json:651:   "where": "shamble-game.js:1188",
+docs/legacy-tuning.json:664:   "where": "shamble-game.js:1189",
+docs/legacy-tuning.json:674:   "where": "shamble-game.js:1190",
+docs/legacy-tuning.json:685:   "where": "shamble-game.js:1696",
+docs/legacy-tuning.json:719:   "where": "shamble-game.js:2216",
+docs/legacy-tuning.json:729:   "where": "shamble-game.js:1419",
+docs/legacy-tuning.json:735:   "where": "shamble-game.js:1575",
+docs/legacy-tuning.json:741:   "where": "shamble-game.js:1701",
+docs/legacy-tuning.json:747:   "where": "shamble-core.js:224",
+docs/legacy-tuning.json:753:   "where": "shamble-core.js:850",
+docs/legacy-tuning.json:759:   "where": "shamble-core.js:1479",
+docs/legacy-tuning.json:765:   "where": "shamble-core.js:1480",
+docs/legacy-tuning.json:779:   "where": "shamble-core.js:1482",
+docs/legacy-tuning.json:795:   "where": "shamble-core.js:1483",
+docs/legacy-tuning.json:805:   "where": "shamble-game.js:1959",
+docs/legacy-tuning.json:944:   "where": "shamble-game.js:2050",
+docs/legacy-tuning.json:1023:   "where": "shamble-game.js:1860",
+docs/legacy-tuning.json:1038:   "where": "shamble-game.js:45",
+docs/legacy-tuning.json:1054:   "where": "shamble-game.js:46",
+docs/legacy-tuning.json:1066:   "where": "shamble-game.js:2195",
+docs/legacy-tuning.json:1118:   "where": "shamble-game.js:2347",
+docs/legacy-tuning.json:1124:   "where": "shamble-game.js:2999",
+docs/legacy-tuning.json:1130:   "where": "shamble-game.js:1099",
+docs/legacy-tuning.json:1136:   "where": "shamble-game.js:2555",
+docs/legacy-tuning.json:1142:   "where": "shamble-game.js:2219",
+docs/legacy-tuning.json:1152:   "where": "shamble-core.js:169",
+docs/legacy-tuning.json:1196:   "where": "shamble-core.js:167",
+docs/legacy-tuning.json:1202:   "where": "shamble-core.js:240",
+docs/legacy-tuning.json:1208:   "where": "shamble-core.js:241",
+docs/legacy-tuning.json:1214:   "where": "shamble-core.js:242",
+docs/legacy-tuning.json:1220:   "where": "shamble-core.js:254",
+docs/legacy-tuning.json:1226:   "where": "shamble-core.js:294",
+docs/legacy-tuning.json:1232:   "where": "shamble-game.js:709",
+docs/legacy-tuning.json:1245:   "where": "shamble-game.js:710",
+docs/legacy-tuning.json:1258:   "where": "shamble-core.js:635",
+docs/legacy-tuning.json:1286:   "where": "shamble-core.js:421",
+docs/legacy-tuning.json:1745:   "where": "shamble-core.js:463",
+docs/legacy-tuning.json:2401:   "where": "shamble-core.js:508",
+docs/legacy-tuning.json:3108:   "where": "shamble-core.js:567",
+docs/legacy-tuning.json:3122:   "where": "shamble-core.js:785",
+docs/legacy-tuning.json:3289:   "where": "shamble-core.js:1296",
+docs/legacy-tuning.json:3536:   "where": "shamble-core.js:1434",
+docs/legacy-tuning.json:3545:   "where": "shamble-game.js:132",
+docs/legacy-tuning.json:4284:   "where": "shamble-game.js:209",
+docs/legacy-tuning.json:4290:   "where": "shamble-game.js:2617",
+docs/legacy-tuning.json:4314:   "where": "shamble-game.js:1581",
+docs/reports/2026-10-13-phase-0.md:29:- Syntax hook: an Edit that broke `shamble-game.js` got "SYNTAX GATE FAILED … Unexpected end of input"; reverted, file
+docs/reports/2026-10-13-repo-root.md:27:- History: `git log --follow` reaches 7374615 for README.md and shamble-core.js, 826b896 for `.claude/settings.json`.
+docs/reports/2026-10-13-repo-root.md:32:  9274bbce…): index.html and editor.html load `three.min.js, shamble-core.js, shamble-game.js, [shamble-editor.js,] inline`,
+docs/reports/2026-10-13-repo-root.md:58:After the merge and pull: open the root `index.html`; the game boots and rank, tutorial state and maps are still there.
+docs/reports/2026-10-14-bot-poplar-wedge.md:10:## What changed (shamble-game.js only; symbols +0 −0, matches the plan)
+docs/reports/2026-10-14-editor-prefab-list.md:8:DONE: all three errors gone in a headless run of editor.html. Waiting on the Advisor's APPROVE and Mustafa's Brave check.
+docs/reports/2026-10-14-editor-prefab-list.md:12:- `shamble-editor.js` only:
+docs/reports/2026-10-14-editor-prefab-list.md:37:- index.html: boots and deploys with no page errors (the file is unchanged).
+docs/reports/2026-10-14-editor-prefab-list.md:60:## For Mustafa in Brave (editor.html)
+docs/reports/2026-10-14-editor-undo-ground.md:11:## What changed (shamble-game.js only, 7 insertions / 4 deletions; symbols +0 −0, matches the plan)
+docs/reports/2026-10-14-editor-undo-ground.md:32:| Real editor.html page, 3D canvas pixels changed by one Ctrl+Z | 57,854 px | 124 px (noise ≈ 70 px) |
+docs/reports/2026-10-14-editor-undo-ground.md:66:## For Mustafa in Brave (editor.html)
+docs/reports/2026-10-14-gate-check-5.md:33:  - 5a + 5b: today's main `shamble-editor.js` (the real bug; 5b lists all three names with lines) · `refreshMapList` re-nested.
+docs/reports/2026-10-14-gate-check-5.md:35:  - 5b only: undefined name in an index.html handler · typo in an editor.html handler · typo in code the smoke never
+docs/reports/2026-10-14-gate-check-5.md:38:  - 5b + 5d: unquoted `onclick=noSuchFn()` and unquoted `<script src=shamble-editor.js>`. 5c: core calls game. 5d:
+docs/reports/2026-10-14-gate-check-5.md:39:    `<script type="text/ecmascript">` for the editor in index.html.
+docs/reports/2026-10-14-gate-check-5.md:54:  hooks belong in shamble-editor.js · Annex B block functions, direct `eval` and handler element scope FAIL 5b · errors
+docs/reports/2026-10-14-map-dedupe-on-load.md:13:- `shamble-game.js`: `dedupeMapDef(def)` above `serializeMap`.
+docs/reports/2026-10-14-map-dedupe-on-load.md:19:- `shamble-editor.js`, the Maps → Load handler:
+docs/reports/2026-10-14-map-dedupe-on-load.md:45:- **Real page (pageshot, editor.html, storage written through KVStore in the same run), head vs PR #8's code:**
+docs/reports/2026-10-14-map-dedupe-on-load.md:98:## For Mustafa in Brave (editor.html)
+docs/reports/2026-10-15-editor-v2-steps-0-1.md:24:- One agent per bug drove the real editor.html with real mouse and keyboard on three builds:
+docs/reports/2026-10-15-team-prep-fixes.md:28:- **shamble-core.js:**
+docs/reports/2026-10-15-team-prep-fixes.md:33:- **shamble-game.js:**
+docs/reports/2026-10-15-team-prep-fixes.md:47:- **shamble-editor.js:** Save stamps the save name into the stored map (one line in the Save handler).
+docs/reports/2026-10-15-team-prep-fixes.md:126:  - NC-7 (info): the grenade-arc preview (`shamble-game.js:1516`) still loops `rayStatic`, at 77.7 KB per call while
+docs/reports/2026-10-16-editor-hotfix.md:16:- **Evidence:** 42 base-vs-head checks on the real editor.html with real mouse and keyboard. All 42 PASS, with
+docs/reports/2026-10-16-editor-hotfix.md:26:## What changed (shamble-editor.js; shamble-game.js editor branch only; both pages identically)
+docs/reports/2026-10-16-editor-hotfix.md:44:## Evidence (base main → head; real editor.html, trusted Playwright input, headless SwiftShader)
+docs/reports/2026-10-16-editor-hotfix.md:115:- **index.html:** markup only, which is identical; no editor interaction there.
+docs/reports/2026-10-16-editor-hotfix.md:117:## For Mustafa in Brave (editor.html)
+docs/reports/2026-10-16-three-teams-core-steps-1-6.md:38:| 5b editor (real editor.html): palette, labels, mirror twin, symmetry overlay, legacy prefab stamp, inspector highlight, set team by
+docs/reports/2026-10-16-three-teams-core-steps-1-6.md:41:| 6 editor.html | the editor hides all bots; Play on a 3-HQ map shows 8, back on Cabana 4; 0 page errors |
+docs/reports/2026-10-16-three-teams-core.md:13:  Soviets outside theirs. `index.html?map=tri` opens the three-team arena (4 + 4 + 4 soldiers).
+docs/reports/2026-10-16-three-teams-core.md:133:1. **Cabana (index.html), Deploy:** your 3 allies come out of your barracks door with teal health bars, and the
+docs/reports/2026-10-16-three-teams-core.md:143:7. **index.html?map=tri:** take a screenshot of each of these:
+docs/reports/2026-10-16-three-teams-core.md:153:9. **editor.html:** check the Markers cards (Soviet / Allies / Empire Spawn). Turn on Spawn Distances: the hostile
+docs/reports/2026-10-17-kit-v1-4.md:10:Gate PASS on all checks, 1–4 and 5a–5d (smoke: index.html 8/8 steps and editor.html 5/5, 0 errors). The diff matches
+docs/reports/2026-10-24-kit-v3-0.md:20:## What changed (symbols +0 −0; no shamble-*.js, page or gate file touched)
+docs/research/UNREAD_SOURCES.md:64:| R5 | R5-RUSTLINT-REC2, REC3 (lint names and groups) |  | https://clippy.rust-lang.org/stable/index.html | outside the allow list (read in clippy's source
+docs/research/UNREAD_SOURCES.md:157:| https://docs.unrealengine.com/4.27/en-US/API/Plugins/ReplicationGraph/UBasicReplicationGraph/index.html | R2 (interest management for a top-down camera)
+docs/research/UNREAD_SOURCES.md:219:| https://clippy.rust-lang.org/stable/index.html (the clippy lint list; rust-lang.github.io/rust-clippy redirects here) | R5 (clippy and rustfmt) | a reco
+docs/research/r1-simulation-core.md:185:  applications, a custom approach may be preferable." Sources: https://docs.rs/hecs/latest/hecs/serialize/index.html
+docs/research/r1-simulation-core.md:186:  and https://docs.rs/hecs/latest/hecs/serialize/column/index.html, 0.11.2. Tier: official. Read 2026-10-27. Sure:
+docs/research/r1-simulation-core.md:543:- **CS1** (docs/LEGACY_INVENTORY.md:169): `FIXED_DT` = 1/60 s is declared (shamble-core.js:1479) but never read; the
+docs/research/r1-simulation-core.md:544:  live loop uses `clock.getDelta()` clamped to 0.05 s (shamble-game.js:3053). Mark: drop. Tells v2: a declared tick
+docs/research/r1-simulation-core.md:838:  shamble-core.js:1479): a fixed step and an input-command record are declared, nothing reads them, and the loop runs a
+docs/research/r1-simulation-core.md:839:  variable dt clamped to 0.05 s (shamble-game.js:3053). Tells v2: the legacy proves nothing about fixed-step
+docs/research/r1-simulation-core.md:1451:  https://docs.rs/serde_json/latest/serde_json/value/index.html (1.0.154) · official · read 2026-10-27 · confirmed in
+docs/research/r1-simulation-core.md:1543:  `rulesMerge` / `envMerge` mechanism is inferred (and matches shamble-game.js:41 and shamble-core.js:180, read here).
+docs/research/r1-simulation-core.md:1603:- **GW2 / GE1 (RULES_DEFAULT, rulesMerge, applyRules):** shamble-game.js:41 merges a map's rules with
+docs/research/r1-simulation-core.md:1605:  shamble-core.js:180 is the same). The editor's `RULES_SCHEMA` (shamble-editor.js:770) holds min, max, step, unit and a
+docs/research/r1-simulation-core.md:1608:- **GE1 and the editor Rules panel:** each slider change calls `applyRules(_rules)` at once (shamble-editor.js:796).
+docs/research/r1-simulation-core.md:1610:- **GW12 (serializeMap):** writes `version:1` (shamble-game.js:661) that no code reads; rounds most positions to 0.1 m;
+docs/research/r1-simulation-core.md:2817:- **R1-DATA-OQ11. The editor's double-click rule and Wasm.** EDITOR_V2 §5 keeps editor.html runnable by double-click;
+docs/research/r1-simulation-core.md:3332:| CS1 | legacy row CS1 | inventory :169, shamble-core.js:1479, shamble-game.js:3053 | verifier: confirmed; rust-reviewer: — | — | confirmed; no c
+docs/research/r1-simulation-core.md:3336:| GW14 | legacy row GW14 | inventory :202, shamble-core.js:82, shamble-game.js:1575; 11²/48 = 2.52 m, plus 0.55 = 3.0… | verifier: confirmed; rust
+docs/research/r1-simulation-core.md:3440:| CS1 | fixed step, button bitmask and input command declared but never wired | shamble-core.js:1479-1481 and the legacy inventory | verifier: confir
+docs/research/r1-simulation-core.md:3442:| GP13 | rAF loop with variable dt clamped to 0.05 s; the world freezes for pause, shop, tutorial and hit-stop | shamble-game.js:3053 | verifier: con
+docs/research/r1-simulation-core.md:3485:| R1-ABL-N4 | Shabzon 0.072 s, so 13.9 shots/s | shamble-core.js | verifier: confirmed; rust-reviewer: — | :114 (the 13.9 is in the GC5 row; REC2 c
+docs/research/r1-simulation-core.md:3488:| R1-ABL-N7 | Head 2.6, body 1.0, legs 0.65; Bagpipe head 1.2 | shamble-core.js | verifier: confirmed; rust-reviewer: — | :88, :112 | confirmed; no
+docs/research/r1-simulation-core.md:3490:| R1-ABL-N9 | Torque Bow fuse 0.55 s | shamble-game.js | verifier: confirmed; rust-reviewer: — | :1787 | confirmed; no change |
+docs/research/r1-simulation-core.md:3491:| R1-ABL-N10 | Shabzon damage 8 | shamble-core.js | verifier: confirmed; rust-reviewer: — | :114 | confirmed; no change |
+docs/research/r1-simulation-core.md:3534:| Legacy facts | legacy row Legacy facts | repo | verifier: confirmed; rust-reviewer: — | shamble-game.js:41 rulesMerge Object.assign; shamble-core
+docs/research/r1-simulation-core.md:3749:| 5 | https://docs.rs/bevy_ecs/latest/bevy_ecs/schedule/index.html | schedule module | 0.20.0 | official | ecs | 2026-10-27 |
+docs/research/r1-simulation-core.md:3762:| 18 | https://docs.rs/hecs/latest/hecs/serialize/index.html | hecs serialize | 0.11.2 | official | ecs | 2026-10-27 |
+docs/research/r1-simulation-core.md:3763:| 19 | https://docs.rs/hecs/latest/hecs/serialize/column/index.html | hecs serialize::column | 0.11.2 | official | ecs | 2026-10-27 |
+docs/research/r1-simulation-core.md:3878:| 134 | https://docs.rs/serde_json/latest/serde_json/value/index.html | serde_json `value` module | 1.0.154 | official | data-hotreload | 2026-10-27 
+docs/research/r2-netcode.md:699:| Inventory GP3; `shamble-game.js:2774-2775` | Player speed = 6.3 m/s × sprintMult (at most 1.62) × 1.3 in Banzai × 0.72 with the shield: at most about 13.
+docs/research/r2-netcode.md:878:| CD5, GP4, `CAM_STYLES` (LEGACY_TUNING) | Default style 3: camHeight 40, camBack 56.6 (horizontal boom, shamble-game.js:2819), fov 15, yaw 45° plus middle-m
+docs/research/r2-netcode.md:1172:Sources: https://docs.rs/quinn/latest/quinn/congestion/index.html; https://docs.rs/quinn/latest/quinn/struct.Connection.html;
+docs/research/r2-netcode.md:1254:https://docs.rs/axum/latest/axum/extract/ws/index.html (0.8.9). Tier: official. Read 2026-10-27. How sure: confirmed in the source;
+docs/research/r2-netcode.md:1361:- **CS1** (fixed tick and input-command groundwork, `shamble-core.js:1479-1481`; marked **drop**). The legacy build declares an
+docs/research/r2-netcode.md:1366:- **GP2** (input mapping and listeners; `shamble-game.js:3252-3294`). Many actions fire at event time (reload, ability, grenade
+docs/research/r2-netcode.md:1453:  aborted because they are not async." · https://docs.rs/tokio/latest/tokio/task/index.html and
+docs/research/r2-netcode.md:1464:  Currently, it is 2 MiB on all Tier-1 platforms." · https://doc.rust-lang.org/std/thread/index.html "Panics", "Stack
+docs/research/r2-netcode.md:3235:  - budgets (GP3 row, `shamble-game.js:2774-2775`): "at most about 13.3 m/s", with sprint, Banzai and shield factors.
+docs/research/r2-netcode.md:4007:| 38 | https://docs.rs/quinn/latest/quinn/congestion/index.html | docs.rs: quinn::congestion | 0.11.12 | 2026-10-27 | transport 29 (official) |
+docs/research/r2-netcode.md:4018:| 49 | https://docs.rs/axum/latest/axum/extract/ws/index.html | docs.rs: axum::extract::ws | 0.8.9 | 2026-10-27 | transport 40 (official) |
+docs/research/r2-netcode.md:4019:| 50 | https://docs.rs/tokio/latest/tokio/task/index.html | docs.rs: Module tokio::task | tokio 1.54.1 | 2026-10-27 | rooms 7 (official) |
+docs/research/r2-netcode.md:4021:| 52 | https://doc.rust-lang.org/std/thread/index.html | Module std::thread (Rust standard library) | Rust 1.99.1, 2026-10-13 | 2026-10-27 | rooms 9 (officia
+docs/research/r2-netcode.md:4101:Legacy inputs (repository, read 2026-10-27, as the units list them): rows of `docs/LEGACY_INVENTORY.md` and tables of `docs/LEGACY_TUNING.md` named in each u
+docs/research/r2-netcode.md:4141:| 19 | https://docs.unrealengine.com/4.27/en-US/API/Plugins/ReplicationGraph/UBasicReplicationGraph/index.html | Outside the allow list | interest |
+docs/research/r4-physics-navigation.md:183:  quoted by the verifier, 2026-10-28). Sources: https://docs.rs/parry3d/latest/parry3d/query/index.html and the
+docs/research/r4-physics-navigation.md:497:  ray-casting task to an external function." Sources: https://docs.rs/parry3d/latest/parry3d/partitioning/index.html and
+docs/research/r4-physics-navigation.md:697:     under banzai or in the bayonet charge, GP3, shamble-core.js:128-137, shamble-game.js:2756 and :2774; that is
+docs/research/r4-physics-navigation.md:1371:| 2 | R4-PHYS-REC1 mark 1 tests tunnelling at a dead tuning value (about 9.0 m/s) | Fixed: mark 1 uses the fastest soldier speed in the movement d
+docs/research/r4-physics-navigation.md:1466:| 15 | https://docs.rs/parry3d/latest/parry3d/partitioning/index.html | parry3d `partitioning` | parry3d 0.31.1 |
+docs/research/r4-physics-navigation.md:1468:| 17 | https://docs.rs/parry3d/latest/parry3d/query/index.html | parry3d `query` | parry3d 0.31.1 |
+docs/research/r5-toolchain-quality.md:437:  https://rustwasm.github.io/docs/wasm-bindgen/wasm-bindgen-test/index.html and .../browsers.html (no version shown; the
+docs/research/r5-toolchain-quality.md:923:  head, nothing dropped (unless `--allow-drop` names it), no duplicates; [4] no unguarded reference from index.html's
+docs/research/r5-toolchain-quality.md:926:  and every `THREE.<member>` exists in r128; [5c] `shamble-core.js` references nothing above it; [5d] the exact script
+docs/research/r5-toolchain-quality.md:956:  https://embarkstudios.github.io/cargo-deny/checks/advisories/index.html (no version shown) · official (the tool's docs)
+docs/research/r5-toolchain-quality.md:2047:| R5-RUSTLINT-REC2, REC3 (lint names and groups) | https://clippy.rust-lang.org/stable/index.html | outside the allow list (read in clippy's source
+docs/research/r5-toolchain-quality.md:2334:| 30 | https://embarkstudios.github.io/cargo-deny/checks/advisories/index.html | cargo-deny: advisories | no version | official (tool) | 2026-10-28
+docs/research/r5-toolchain-quality.md:2351:| 47 | https://rustwasm.github.io/docs/wasm-bindgen/wasm-bindgen-test/index.html | wasm-bindgen guide: wasm-bindgen-test | no version (may be older
+docs/research/r5-toolchain-quality.md:2440:| https://clippy.rust-lang.org/stable/index.html (the clippy lint list; rust-lang.github.io/rust-clippy redirects here) | outside the allow list (l
