@@ -49,20 +49,26 @@ header; tick, second and event records follow in time order. Every record has a 
   other entry (a 64-bit hash does not fit JSON's safe integers, so it is a string, as `h` is). Its names:
   - `server_hash` (the room's log, at tick t): the server's hash of what it meant that client to hold after decoding
     tick t (`npt_proto::client_hash` over baseline plus delta, the own-state section and the events as sent), never 0;
-    written only in the room's log (process `room`), for each connected client from its admission on, in every phase
-    the clients log; `null` for a client not connected and for a tick whose snapshot the room did not send that
-    client (one the WebSocket send budget skipped);
+    written only in the room's log (process `room`), for each connected client from its admission on, in every phase the
+    clients log; `null` for a client not connected and for a tick whose snapshot the room did not send that client (one
+    the WebSocket send budget skipped); the room sends no snapshot of a tick it does not log, so its last tick record
+    covers every snapshot it sent (else a client's hash at the stop is an orphan, which fails the run);
   - `decoded_hash` (only in the clients' logs, process `client` on L1 and `bots` on L2, at the tick t the client
-    rebuilt): its hash of the state it holds for t, or the sentinel `0000000000000000` for a tick with a received
-    group it could not decode; `null` for a tick with a group lost and none refused (counted in
-    `tick.s.snap_incomplete`). A client's rebuilt ticks can go back (a wrong 16-bit rebuild), and records are strictly
-    in tick order, so its writer files every hash under its rebuilt tick, buffering and sorting before it writes; a
-    client with two different hashes for one tick writes the sentinel there (one hash met twice, as a duplicated
-    datagram gives, is written once), and no hash is ever dropped: the writer buffers until every earlier tick is
-    written, or ends its log `crash`. Every tick from a client's first snapshot to the end of its log is resolved for
-    that client: a hash, or `null` with `tick.s.snap_incomplete` 1 (a tick none of whose groups arrived counts too,
-    known from the next header's tick); after the measured phase the clients keep logging until every measured tick
-    is resolved, and a tick still in flight at the stop is not written;
+    rebuilt): its hash of the state it holds for t, or the sentinel `0000000000000000` for a tick with a received group
+    it could not decode; `null` for a tick with a group lost and none refused (counted in `tick.s.snap_incomplete`). A
+    client's rebuilt ticks can go back (a wrong 16-bit rebuild), and records are strictly in tick order, so its writer
+    files every hash under its rebuilt tick, buffering and sorting before it writes; a client with two different hashes
+    for one tick writes the sentinel there (one hash met twice, as a duplicated datagram gives, is written once), and no
+    hash is ever dropped: the writer buffers until every earlier tick is written, or ends its log `crash`. A tick is
+    written lost only once none of its groups can still decode: once it has left the client's frame ring (at
+    `npt_sim::ACK_RING_TICKS` ticks old), or at the stop (on L1 the runner may decide it there). A group of a tick older
+    than one the client has already decoded (L1's reorder step delivers such groups) is decoded and hashed under its own
+    tick like any other, or, if the client drops it as stale, it is never acknowledged, the drop is counted, and that
+    tick is lost (`null`, `tick.s.snap_incomplete` 1), never the sentinel. Every tick from a client's first snapshot to
+    the end of its log is resolved for that client: a hash, or `null` with `tick.s.snap_incomplete` 1 (a tick none of
+    whose groups arrived counts too, known from a later header's tick); every client is admitted, and its first snapshot
+    resolved, in the warm-up (a client admitted later is -19's join, built with U6); after the measured phase the
+    clients keep logging until every measured tick is resolved, and a tick still in flight at the stop is not written;
   - `replay_hash` (only in a `replay` log on x86_64, the x86-64 re-decode of an L2 client's logged bytes, R-8): the
     same as `decoded_hash`, decoded again natively, for the Arm rule.
 - **Events the judge reads for validity** (§4): `admit` (`session`, `in_roster`), `control` (`source`: `socket` or
@@ -205,13 +211,14 @@ from the part's valid runs, never judged (B10).
 - **The WebSocket practice run's outcome record** (the run script writes it beside the run, from the run's series and
   the bound's line): one event `ws_practice` (phase `after`) in a log of the practice run (role `practice`, listing
   PM-0001-18), with fields `class` (`IN TOLERANCE`, `BEYOND`, `FAR BETTER` or `INVALID`, the advisor's R7), `m_p_ns`
-  (M_p: the run's nearest-rank median over its measured `burst_heal.after_link_ns`), `bound` (the bound's line,
-  byte for byte the mark's `ws_bound_line`), `bound_file` and `bound_sha256` (where that line is committed), `x_moved_ns`, `y_moved_ns`, `z_moved_ns`
-  and `k_count` (the numbers in force), and, only when they exist, `chance_ruling` (the advisor's ruling of chance,
-  R8 (v)) and `second_ruling` (a ruling naming a found and fixed cause, for a second practice run of one build). The
-  record's other fields are for people (`s`, `f`, the band, the record count, the mean message size), and the judge
-  reads none of them: it recomputes s = M_p / M_m and f = max(1, s) exactly, and each moved number as the bound's
-  times f rounded up to the next millisecond, from M_p and the bound's line.
+  (M_p: the run's nearest-rank median over its measured `burst_heal.after_link_ns`), `bound` (the bound's line, byte for
+  byte the mark's `ws_bound_line`), `bound_file` and `bound_sha256` (where that line is committed), `x_moved_ns`,
+  `y_moved_ns`, `z_moved_ns` and `k_count` (the numbers in force), and, only when they exist, `chance_ruling` (the
+  advisor's ruling of chance, R8 (v)) and `second_ruling` (a ruling naming a found and fixed cause, for a second
+  practice run of one build). The record's other fields are for people (`s`, `f`, the band, the record count, the mean
+  message size), and the judge reads none of them: it recomputes s = M_p / M_m and f exactly (max(1, s), or 1 for FAR
+  BETTER: §4), and each moved number as the bound's times f rounded up to the next millisecond, from M_p and the bound's
+  line.
 
 ## 3. How a verdict is reached
 1. The judge reads every results log under the given folder and keeps, per mark, the runs whose header lists it.
@@ -275,19 +282,20 @@ The others apply where a mark lists them:
   projectiles, vehicles, teams, portals), and U4f's report states the load each run carried (the advisor's
   condition 4 on U4; a reading of ADR 0001:1589, for the readings PR). The precondition must be a pass mark with no
   precondition of its own.
-- **`ws-practice:<tolerance>`** (PM-0001-18's WebSocket part; Mustafa's WS-BAR and the 10 % tolerance, 2026-11-07;
-  the advisor's rulings R4 to R8 on the docs PR): the run is INVALID unless the runs the judge reads hold its practice
-  run and that run's record (§2.5) puts the numbers in force. The practice run: role `practice`, listing the mark,
-  built from the same binaries (`build.binary_sha256` over its logs), with the same `scene`, `profile`,
+- **`ws-practice:<tolerance>`** (PM-0001-18's WebSocket part; Mustafa's WS-BAR and the 10 % tolerance, 2026-11-07; the
+  advisor's rulings R4 to R8 on the docs PR): the run is INVALID unless the runs the judge reads hold its practice run
+  and that run's record (§2.5) puts the numbers in force. The practice run: role `practice`, listing the mark, built
+  from the same binaries (`build.binary_sha256` over its logs), with the same `scene`, `profile`,
   `params.burst_spacing_ns`, `params.ws_tcp_model` (equal to the bound's `model`), `params.config_hz` and RS's
   `machine.kernel` (each present in both runs), started (`params.started_utc`) before the run, holding the four rules
   above, with exactly the bound's `client_bursts_count` measured heal records and exactly one `ws_practice` record. A
   bite run takes the practice run of its set's measured runs that serve the mark with its layer, profile and
-  `params.transport` (one build among them, else INVALID), so it is judged at its counted run's numbers. One practice
-  run counts per build: of that build's practice runs started before the run (in any set, listing the mark or not),
-  the latest counts, and with more than one only if its record has a `second_ruling`; a practice run started after the
-  run never changes its verdict. The record: its `bound` is the mark's `ws_bound_line` byte for byte; `m_p_ns` is the
-  practice run's own median heal time; with s = M_p / M_m:
+  `params.transport` (one build among them, and one practice run in force for them, else INVALID), so it is judged at
+  its counted run's numbers. One practice run counts per build: of that build's practice runs started before the run (in
+  any set, listing the mark or not), the latest counts, and with more than one only if its record has a `second_ruling`;
+  a practice run started after the run never changes its verdict, and one of the build with a missing or unreadable
+  `params.started_utc` makes the run INVALID (it might be the one in force). The record: its `bound` is the mark's
+  `ws_bound_line` byte for byte; `m_p_ns` is the practice run's own median heal time; with s = M_p / M_m:
   - `IN TOLERANCE` needs band_low <= s <= tolerance, and the practice run's heals at most k over Y' and none over Z'
     (the moved numbers);
   - `BEYOND` needs a `chance_ruling` and s <= tolerance (a lone count or maximum failure);

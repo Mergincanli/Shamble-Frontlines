@@ -31,7 +31,7 @@ each case with the real `marks/marks.json` and checks the verdict and its reason
 | PM-0001-17 | `slot-unlogged` | slot 1 `null` everywhere with `snap_incomplete` 0, while the room logged its hashes | INVALID |
 | PM-0001-17 | `hashed-and-incomplete` | slot 1's tick 2 has a hash and `snap_incomplete` 1 at once | INVALID |
 | PM-0001-17 | `short-lists` | 2-entry lists under the header's 48 clients | INVALID |
-| PM-0001-17 | `l1-aarch64-claim` | the L1 client (role C) says aarch64 and logs a hash at tick 9, which the server never logged; an x86-64 replay agrees elsewhere: the Arm rule is LG's only, and an orphan counts everywhere | FAIL |
+| PM-0001-17 | `l1-aarch64-claim` | the L1 client (role C) says aarch64 and logs a hash at tick 9, which the server never logged; an x86-64 replay agrees elsewhere: its only mismatch is that orphan, which counts on every machine (FX-5 (c)); this row does not show the Arm rule's LG key (TE2-1: carry 64 (a)) | FAIL |
 | PM-0001-17 | `lg-cross-arch` | an L2 P2 run (run `l2-p2-1`: RS's room on x86_64, LG's bots on aarch64, a `replay` log on x86_64; 2 clients): slot 1's tick 2 differs on LG and the x86-64 re-decode equals the server's | the L2 P2 part's run valid, 0 mismatches, aarch64-only 1 |
 | PM-0001-17 | `lg-replay-differs` | the same, the re-decode differing too | FAIL |
 | PM-0001-17 | `lg-replay-in-client-log` | LG's bots log carries its own `replay_hash` (no replay log) | INVALID (a name in another process's log) |
