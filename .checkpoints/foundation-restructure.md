@@ -9,7 +9,7 @@
   **Base:** main 76b4f7a (PR #50 merged, 2.1a). **OLD** (the independent judge for E2 and E3): main 44446a5.
 - **Never:** push to `claude/netcode-proof-test-plan-hcky5g` (#40) or `claude/laughing-pasteur-fwya24` (#48); touch
   `spikes/`; touch a gate file; edit a settings file, hook or allow-list; write a kit line before his chat yes.
-- **Last update:** 2026-11-11 23:50 Amsterdam
+- **Last update:** 2026-11-12 00:12 Amsterdam
 
 ## Steps done
 0. Step 0 (this commit): model checked with get_session: `session_context.model` claude-opus-5-5,
@@ -179,15 +179,33 @@
      `repo-map-check.mjs` after step 10.
    - Not yet: E1's final-head check (C3), on the final head.
 
+9. Step 9's two closers (the advisor tool): kit line 4's command as a plain shell line passed the classifier, no prompt
+   (`prompt-tally.json`, `kitLine4PlainRun`); E6's dump with the head's edited tools equals E4's with A's copies (`cmp`,
+   35794 bytes).
+
+10. Step 10, part 1 (**2a37121**, local until the next push), by the session's scripts, byte-checked: the report file
+   `docs/reports/2026-11-11-foundation-2-1b.md` with Appendix A (A1-A6: his six messages, `report-appendix.mjs check`
+   PASS); `docs/DECISIONS.md` (`decisions-entries.mjs write`: 6 entries, newest first, and his render-budget note under
+   "Queued", +89 lines; additive, a second run adds nothing; auto-mode entries carry the fact and a pointer only); ADR
+   0002's Status line (`adr-status.mjs write`: his SCOPE (a) line quoted whole from DECISIONS.md, "Proposed" first).
+   Part 2: workflow `fr-2-1b-docs` (run wf_0f019ba7-441, task w12dup5th): docs-keeper (xhigh) per
+   `docs-keeper-brief.md`, then `docs-check.mjs` (run by an agent) and a blind check of ADR 0002 and the register
+   against his words (xhigh), then at most one fix pass and the script again. C14's re-read: #40 at 063af69 (the same
+   six docs files outside `spikes/`), #48 at d8186fd (no common file).
+   The prompt tally (`prompt-tally.mjs`, from the session log, 383 tool results with a decision): 229 classifier, 129
+   allow rules, 9 config or mode; **14 reached him** (8 of them the session's own `sed -i` lines on the checkpoint's
+   time, now done with the Edit tool instead; 3 the kit edits; E8's merge; one worktree clean-up line; the first command
+   of the session); 2 refused by the guard (`git -C`).
+
 ## Current step
-Step 9 done. Next: the advisor tool (his moment 5 for step 9, moments 1 and 4 for step 10's ADR and register edits),
-then step 10.
+Step 10, part 2: the docs workflow running.
 
 ## Next steps
-1. The advisor tool; step 10: the report file with Appendix A (`report-appendix.mjs`, A1-A6, checked), DECISIONS.md by
-   `decisions-entries.mjs write` (dry run PASS: 6 entries, 1 Queued item, +93 lines), docs-keeper (xhigh) for the rest
-   under D1 (a) + REG-TRUE (b) and C10-C12 (C14 re-read: #40 at 063af69, the same six docs files outside `spikes/`; #48
-   at d8186fd, no common file); independent checks; `repo-map-check.mjs`; step 11 under C15-C17; E1's final-head check.
+1. The workflow's result: commit docs-keeper's files, the gate, push; `repo-map-check.mjs`; the advisor tool before
+   step 11 only if the docs need a decision; step 11 under C15-C17 (reviewers: security-auditor, test-engineer,
+   infra-engineer; the verifier; the advisor agent on the pushed head); the report (fold in plan 1.4's table, the prompt
+   tally as a 2.3 finding with a Decisions-needed entry); E1's final-head check (C3); repo-map-check after the checkpoint
+   deletion too; the advisor tool before ready.
 
 ## Open findings
 - (none yet)
@@ -240,6 +258,16 @@ then step 10.
    none if refused); the commit by pathspec; numstat and a by-script comparison against the approved text in the notes;
    kit tests and the gate before the push; `repo-map-check.mjs` queued for after step 10; next consultation when step
    9's evidence is in, before the ADR and register edits.
+5. 2026-11-12 00:02 Amsterdam · step 9's evidence in, before step 10's ADR and register edits (his moments 5, 1 and
+   4): does step 9 hold, and is the docs plan right? · changed: kit line 4's command run once as a plain shell line
+   (classifier, no prompt) and E6's dump compared with E4's (`cmp`); the SCOPE line matched by its start with its ending
+   asserted; `decisions-entries.mjs` made additive; the auto-mode entries trimmed to the fact and a pointer; a scripted
+   prompt tally for a 2.3 Decisions-needed entry; docs-keeper's brief: grep every OQ-0002-2 and stale status line first
+   (left unedited, listed), the answer is the plan's and only "answered in part" is his, no `.checkpoints/` pointers
+   (the report folds in plan 1.4's table), the rows found by text, the render note in no other file, the guard's
+   refused forms; lenses 1 and 3 as a script (`docs-check.mjs`), lens 2 as one blind agent given his words and the
+   diff, effort passed on every agent call, called a step 10 self-check; repo-map-check again after the checkpoint
+   deletion; next consultation before ready.
 
 ## His mid-turn message (2026-11-11 21:10:58 UTC, event 7a094d1e-41ed-40b7-91f8-544d91e4b64f; captured: `mustafa-2026-11-11-permission.md`, 95 characters)
 "I give you permission to go on auto mode and accept yourself for the bash commands and what not". The chat is already

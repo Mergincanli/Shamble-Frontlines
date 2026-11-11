@@ -1,0 +1,18 @@
+# docs-keeper, foundation 2.1b step 10 (the docs pass): notes
+
+Brief: `.checkpoints/foundation-restructure/docs-keeper-brief.md`. Edit only docs/ with the Edit tool; no commit, no push.
+
+## Plan
+1. Read the targets by text: REPO_MAP, START_HERE, MODULE_MAP, TECHNICAL, STATUS, STATUS_ARCHIVE, ROADMAP, ADR 0002
+   (:7, OQ-0002-2 entry, the two R5 rows), the register (ADR 0002 row, status sentence, loose-ends tables).
+2. Grep ADR 0002 for every OQ-0002-2; grep docs/ for lines misstating ADR 0002's status or where the legacy files live:
+   list as "stale, left for the report", unedited.
+3. Edits 1-9 of the brief, one note line each.
+4. Run `node .claude/scripts/repo-map-check.mjs` and `node .gate/foundation-restructure/docs-check.mjs`; fix within the list.
+5. Answer: files changed, stale lines, last lines of both checks, what was not done.
+
+Check constraints seen in docs-check.mjs: quoted spans of 20+ chars in "..." on added lines must be his words or a docs
+line at main; START_HERE's added `legacy` commands must be E6's strings; the register's PM-0002-36 row is one pure
+added line inside the loose-ends section; ADR 0002 hunks only on :7, the OQ-0002-2 entry and the two rows.
+
+## Log
