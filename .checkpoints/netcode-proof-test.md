@@ -133,8 +133,10 @@ U4 wave 1", moved by card_refresh.py.
     the plan text batch's open Lows (F10 first: its one-word change); and the U4e brief's rev 3 (W1-U4E's answers,
     W1-S1, W1-N2, the new carries).
   - Then wave 2 (U4d2, U4e), under W1-TARGET's lock.
-- **This evening:** post tonight's night items to issue #16 (candidates: the U4f and U4g brief drafts; a skeptic
-  check of U4a and U4b's merged code).
+- **This evening:** post tonight's night items to issue #16 (a check-in is scheduled for 19:30 UTC:
+  trig_01W9mBGauhxrWnn1rSuweDic). Candidates, by what merges today: the U4e brief's 28-row recheck and rev 3 draft
+  and a U4d2 builder brief carrying N2-M1 and N2-M2 (both need U4d merged); a skeptic check of U4a and U4b's merged
+  code; one of U4c's.
 
 **Open questions for Mustafa:**
 - **NIGHT-BUDGET (asked 2026-11-11 about 10:25 UTC):** the day session and the night shift share the university
