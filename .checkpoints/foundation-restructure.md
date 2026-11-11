@@ -38,18 +38,64 @@
    `.gate/foundation-restructure/capture-message.mjs`). Toolkit: `npm ci --prefix tools` (159 packages; gl needs
    xvfb-run, as documented).
 
+3. The advisor agent's plan-check review (Opus, xhigh; 16 min; notes `advisor-plan-check.md`, ends DONE): **APPROVE
+   WITH CONDITIONS** on plan check blob f79f5a2. 17 conditions (C1-C17, below), one High for him (REG-TRUE: his D1
+   edits would leave the register's Total line ":23, 98 of them open" with its "answered in part" rule, the "Status of
+   every draft ... not yet accepted" sentence :33-35 and ADR 0002 :7 contradicting them), Mediums and Lows all gated
+   by the conditions. Rulings: #40's overlap reading upheld (Part 4's #40 items set its route; precedent: 2.1a); the kit
+   lines approved only as exact before/after text (its approved message text is in its notes); the order right, with
+   step 11 never before step 8 and E8 after step 8 and his yes. The session checked its key claims on main: register
+   :23, :33-35, ADR 0002 :7, gate.yml `cancel-in-progress: true` (per workflow and ref), #40 moved to a9b1344 with the
+   same six docs files outside `spikes/`. Conditions, by step:
+   - C1 now: one message with KIT-2.1B, E8-RUN and REG-TRUE word for word as approved, plus the advisor-tool line.
+   - C2 step 6: stop the saver before `git mv` until the move's push run and pull-request run have finished; push
+     nothing else between; open the draft PR while the head is the move commit; read both gate headers back. The push
+     run's base is the previous pushed tip (root layout), not 5c35c29.
+   - C3 steps 6 and 9: E1 as `git diff --find-renames=100% --name-status <move>^ <move>` (five R100, nothing else) plus
+     the blob check; on the final head `git diff --find-renames=100% --name-status 76b4f7a <final> -- ':!.checkpoints'`.
+   - C4 step 7: the README paragraph as built (LEGACY_JS's three names; legacy/ when any is there; exit 2 when any is
+     in both places; base: first of legacy/, root, shamble-frontlines-repo/ holding all five, else exit 2; the move
+     check, any letter case, exit 2); letter case: what the code does; Windows/macOS "by reading the code, not run"; no
+     "both safe"; named in security-auditor's and test-engineer's briefs.
+   - C5 step 8: the kit commit only after his chat yes; exactly the four approved lines.
+   - C6 step 9: E6 runs every changed command line (battery; preview menu, shot, sim, reach; perfbots with --pre;
+     aabbs then village.py; pageshot; the dump by E4).
+   - C7 steps 9 and 11: E5 also runs both console lines in its own profile; both lines in security-auditor's brief and
+     the report before his Brave check.
+   - C8 step 9: E8 only after his yes and step 8; `.gate/fr-e8` (one level, so settings.json:74's link rule matches);
+     the main session only; again on the final head if a later commit changes a file the gate reads or a kit line;
+     removed without --force.
+   - C9 step 9: the browser route and result in the refusals list (done: no hang; Node 22.23.4 is outside his bug).
+   - C10 step 10: ADR 0002's Status line quotes his SCOPE (a) from DECISIONS.md:244 (A2.1), whole, by script,
+     "Nothing else in ADR 0002 is accepted by this." included; never the kit chat's shorter :346-348; the register's
+     status column holds the same quote or a pointer, never a paraphrase in quote marks.
+   - C11 step 10: OQ-0002-2's answer names all three parts (tools/, docs/, the gate v2's path in 2.3's plan); the open
+     count, ADR 0002 :1596 and :1626, the register's Total line and ADR 0002 :7 follow his REG-TRUE answer.
+   - C12 step 10: the PM-0002-36 loose-ends row says the reading is the advisor agent's (Q-A1, 2026-11-10), recorded on
+     his D1 (a); never his decision.
+   - C13 step 10: DECISIONS.md, one entry per message of his this session (task, D1, his answer to the ask, any later),
+     whole, by script, byte-checked; the render-budget note under "Queued"; elsewhere only inside those whole-message
+     records and the report's appendix (the report says so).
+   - C14 step 10 and before ready: re-read #40 at its tip; leave its lines alone; never push to #40's or #48's branch.
+   - C15 step 11: the reviewers and the verifier only after step 8, on the diff holding steps 6-10; docs-keeper at xhigh
+     passed explicitly; built-in agents `model: opus` with effort.
+   - C16 ready: the last commit without `[skip ci]`; gate and smoke green on that exact head, run numbers in the report;
+     IE-7: the pull-request run on the current main, header "(files at the root) | head = working tree (files in
+     legacy/)"; if main moves, merge it in a detached worktree and push; the main folder moves only on his chat yes.
+   - C17 report: the Windows command for this branch; the Brave checklist in advisor.md's format with both console
+     lines; plan 1.9's revert order (2.1b before 2.1a); the refusals and the consultation count; his Windows run; the
+     Node 24 finding as a 2.3 follow-up; if KIT-2.1B is (b): Q-A4's fallback (verifier.md:28 a known stale command in
+     STATUS; no fallback in preview.js).
+
 ## Current step
-The advisor agent reviews the plan check (background; notes `advisor-plan-check.md`). Done meanwhile (no tracked file
-changed): the toolkit, the pinned browser, the baseline gate and kit tests, the evidence scripts.
+The message to him: KIT-2.1B, E8-RUN and REG-TRUE as the advisor agent approved them, plus the advisor-tool line; then
+wait for his answer.
 
 ## Next steps
-1. On the advisor agent's verdict: APPROVE → the four kit lines and E8's ask to him in one message, with the exact text
-   it approved (and the one line on which model answers the advisor tool: Opus 5.5 per the /advisor note); REVISE → fix
-   the plan check, re-review.
-2. After his yes: build in the plan's order 6, 7, 8, 9, 10, 11 (plan-check §7).
-3. Step 6, the move (one commit, nothing else), gate with smoke, pushed alone; the draft PR opened on it.
-4. Step 7, the commands in text (one commit). Step 8 waits for his chat yes on the four kit lines (one message).
-5. Step 9, E1-E6 and E8; step 10, the docs; step 11, the reviews, the report, ready, stop for his go.
+1. After his answer: build in the plan's order. Step 6 under C2 (saver stopped, the move alone, pushed, draft PR on it,
+   both CI runs read back, saver restarted); step 7 under C4; step 8 under C5; step 9 (E1 under C3, E2, E3 in the
+   background, E4, E5 with the console lines (C7), E6 (C6), E8 (C8)); step 10 under C10-C14 and his REG-TRUE; step 11
+   under C15-C17.
 
 ## Open findings
 - (none yet)
