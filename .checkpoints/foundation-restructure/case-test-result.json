@@ -1,0 +1,78 @@
+{
+ "platform": "linux",
+ "node": "v22.23.4",
+ "caseSensitive": true,
+ "rows": [
+  {
+   "id": "r1_capital_folder",
+   "root": [
+    "shamble-core.js",
+    "shamble-game.js",
+    "shamble-editor.js",
+    "index.html",
+    "editor.html"
+   ],
+   "Legacy/": [
+    "shamble-core.js",
+    "shamble-game.js",
+    "shamble-editor.js"
+   ],
+   "result": {
+    "prefix": "(the root)"
+   },
+   "pass": true
+  },
+  {
+   "id": "r2_capital_files",
+   "root": [
+    "shamble-core.js",
+    "shamble-game.js",
+    "shamble-editor.js",
+    "index.html",
+    "editor.html"
+   ],
+   "legacy/": [
+    "SHAMBLE-core.js",
+    "SHAMBLE-game.js",
+    "SHAMBLE-editor.js"
+   ],
+   "result": {
+    "prefix": "(the root)"
+   },
+   "pass": true
+  },
+  {
+   "id": "r3_control_two",
+   "root": [
+    "shamble-core.js",
+    "shamble-game.js",
+    "shamble-editor.js",
+    "index.html",
+    "editor.html"
+   ],
+   "legacy/": [
+    "shamble-game.js"
+   ],
+   "result": {
+    "error": "the legacy engine files are in two places, legacy/ (shamble-game.js) and the repo root (shamble-core.js, shamble-game.js, shamble-editor.js): keep one copy"
+   },
+   "pass": true
+  },
+  {
+   "id": "r4_control_legacy",
+   "root": [],
+   "legacy/": [
+    "shamble-core.js",
+    "shamble-game.js",
+    "shamble-editor.js",
+    "index.html",
+    "editor.html"
+   ],
+   "result": {
+    "prefix": "legacy/"
+   },
+   "pass": true
+  }
+ ],
+ "verdict": "PASS"
+}

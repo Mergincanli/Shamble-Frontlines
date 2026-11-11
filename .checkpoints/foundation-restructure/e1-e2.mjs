@@ -1,6 +1,7 @@
 // e1-e2.mjs (foundation-restructure, step 2.1b): evidence E1 and E2 (plan revision 3, 1.5).
-// E1, the bytes did not change: `git diff --find-renames=100% --name-status A <move>` lists exactly five R100 rows and
-//   nothing else, and each moved blob equals A's and OLD's.
+// E1, the bytes did not change: `git diff --find-renames=100% --name-status <move>^ <move>` lists exactly five R100 rows
+//   and nothing else (the move commit against its own parent, so the checkpoint commits since A are not counted: the
+//   advisor agent's C3), and each moved blob equals A's and OLD's. The final head's check is a separate run (step 9).
 // E2, OLD's untouched gate passes on the moved bytes: in the throwaway worktree .gate/fr-e2 at <move>, OLD's five gate
 //   files (git show 44446a5:tools/<x>) are written into legacy/tools/, node_modules linked; that gate takes its root as
 //   the folder above its own (legacy/), so it reads the moved bytes as its head and OLD's root paths as its base:
@@ -22,7 +23,7 @@ let ok = true;
 const check = (k, name, pass, detail = '') => { (out[k].checks ||= []).push({ name, pass, detail }); if (!pass) ok = false; console.log(`${k.toUpperCase()} ${pass ? 'PASS' : 'FAIL'} ${name}${detail ? ' :: ' + detail : ''}`); };
 
 // ---------- E1 ----------
-const ns = git(REPO, 'diff', '--find-renames=100%', '--name-status', A, MOVE).trim().split('\n');
+const ns = git(REPO, 'diff', '--find-renames=100%', '--name-status', `${MOVE}^`, MOVE).trim().split('\n');
 out.e1.nameStatus = ns;
 check('e1', 'exactly five rows', ns.length === 5, `${ns.length} rows`);
 for (const f of FIVE) check('e1', `R100 ${f} -> legacy/${f}`, ns.includes(`R100\t${f}\tlegacy/${f}`));

@@ -9,7 +9,7 @@
   **Base:** main 76b4f7a (PR #50 merged, 2.1a). **OLD** (the independent judge for E2 and E3): main 44446a5.
 - **Never:** push to `claude/netcode-proof-test-plan-hcky5g` (#40) or `claude/laughing-pasteur-fwya24` (#48); touch
   `spikes/`; touch a gate file; edit a settings file, hook or allow-list; write a kit line before his chat yes.
-- **Last update:** 2026-11-11 22:49 Amsterdam
+- **Last update:** 2026-11-11 22:58 Amsterdam
 
 ## Steps done
 0. Step 0 (this commit): model checked with get_session: `session_context.model` claude-opus-5-5,
@@ -102,14 +102,37 @@
    only, the `.claude/rules/*` globs are `**/shamble-*.js` and `**/index.html`/`**/editor.html`, and the guard, the
    scripts and gate.yml name no legacy path: nothing is anchored at the root, so no fifth kit edit.
 
+5. Step 6, the move (**c090843**, five R100 renames, nothing else). Saver stopped first (C2). Before the push:
+   `node tools/gate.mjs 76b4f7a` and `node tools/gate.mjs 2f4b974` both GATE PASS with "(files at the root) | head =
+   working tree (files in legacy/)", +0 -0, smoke 8/8 and 5/5; kit tests 1261/1261; **E1** (C3: `c090843^ c090843`, five
+   R100 rows and nothing else; blobs equal at A, OLD and legacy/: e528dca, 24e86d5, fce6f37, 008c66f, 5ba72df) and **E2**
+   (OLD's untouched gate in `.gate/fr-e2` on the moved bytes: GATE PASS, +0 -0, smoke 8/8 and 5/5; worktree clean after,
+   removed) PASS: `e1-e2-result.json`. Pushed 21:51:20 UTC; **draft PR #51** opened at once with c090843 as head. CI on
+   c090843 (IE-2 and IE-4 done):
+   - push run **#674** (43106708676): gate "base 2f4b97496308e395d49f41f7aa613953195d396b = 2f4b974 (files at the root) |
+     head = working tree (files in legacy/)" GATE PASS; smoke "head = working tree (files in legacy/)" index 8/8, editor
+     5/5 (Playwright 1.56.1's Chromium from the cache: the pinned build ran `legacy/`).
+   - pull-request run **#675** (43106754058): gate "base origin/main = 76b4f7a (files at the root) | head = working tree
+     (files in legacy/)" GATE PASS; smoke index 8/8, editor 5/5.
+
+6. Step 7, the commands in text (**1e6f84e**): `step7-commands.mjs` (18 commands in 9 files, each file's count asserted
+   before writing: README 9, preview.js 2, pageshot, sim, reach, perfbots, tuning-dump, aabbs, village.py 1 each); the
+   README's build-folder paragraph (C4; letter case as two mechanisms); its smoke row "outside `legacy/`"; village.py :2
+   names the default core path as the code picks it; the root README :12-13 and :19-22. Checks: no `.` folder argument
+   left in `tools/` or README.md; `node --check` on the 7 tools; `py_compile` on village.py (its cache removed); the gate
+   vs 76b4f7a PASS. The README's Linux claim run: `case-test.mjs` (`case-test-result.json`): this file system is
+   case-sensitive; `Legacy/` and `legacy/SHAMBLE-*.js` are not counted (the root is the build), the two controls give
+   "two places" and `legacy/`: PASS. The move check's letter case: 2.1a's rows-test-f1 row `j_letter_case` (the real
+   gate, exit 2 on `Index.html`). No guard prompt on any step-7 file (none is protected: routine-guard.mjs:28's gate
+   files are gate.mjs, smoke.mjs, battery.js, gate-globals.json and the package files).
+
 ## Current step
-Step 6, the move, under C2.
+Step 8, the four kit lines (C5), after the advisor tool (his moments 3 and 5).
 
 ## Next steps
-1. Step 6 under C2 (saver stopped, the move alone, pushed, draft PR on it, both CI runs read back, saver restarted);
-   step 7 under C4 (built locally while CI runs, pushed after); step 8 under C5; step 9 (E1 under C3, E2, E3 in the
-   background, E4, E5 with the console lines (C7), E6 (C6), E8 (C8)); step 10 under C10-C14 and REG-TRUE (b); step 11
-   under C15-C17.
+1. Step 8 under C5 (exactly the four approved lines, one commit, nothing else); step 9 (E1's final-head check under C3,
+   E3 in the background, E4, E5 with the console lines (C7), E6 (C6), E8 (C8)); plan-check §3 and §7 for REG-TRUE (b)
+   before step 10; step 10 under C10-C14 and REG-TRUE (b); step 11 under C15-C17.
 
 ## Open findings
 - (none yet)
@@ -175,6 +198,6 @@ unchanged, with the one advisor-tool line. For C13: one DECISIONS.md entry for t
   route (denied by settings) and its alias were not needed.
 
 ## Running work
-- Saver: STOPPED 22:49 Amsterdam (C2: background task by9y0gd9z stopped before the move); restarted only after the
-  move's push run and pull-request run have finished.
+- Saver: stopped 22:48 Amsterdam for the move (C2); both runs finished 22:52; restarted after step 7's push (see the
+  next save).
 - No agents running.
