@@ -130,7 +130,14 @@ His step 3: the three reviewers running on 3c98ad5; then the fix pass (gate-file
    not watched (his "do not watch" carried over from #47).
 
 ## Open findings
-- (none yet)
+- infra-engineer on 3c98ad5: APPROVE, 4 Lows (notes `infra-engineer-review.md`): IE-1 `tools/smoke.mjs:31` says "keep
+  one copy" also when the files are split, not copied (wording; a gate file: deferred to 2.1b, no push for a Low);
+  IE-2 2.1b must move all five files in one pushed commit, or two push runs go red (2.1b's plan); IE-3
+  `tools/README.md` does not describe the build-folder rule (2.1b's docs); IE-4 the pinned Chromium 1194 has never run
+  the `legacy/` layout: 2.1b's smoke proof comes from CI's run. Re-proved by it: 2.1b's PR and its revert pass with the
+  edited gate; main's gate dies on the revert (exit 2); `--no-smoke` without optional packages keeps the folder rule;
+  smoke.mjs failing to load stops the gate (gate.mjs:64-70, exit 2). Not verified by it: a real `npm ci
+  --omit=optional`; E8 (`git revert -m 1`); the pinned 1194 on `legacy/`.
 
 ## Key numbers
 - E3: 31 of 31 PASS (4 Phase 0 mutations, 22 check-5 mutations, 3 + 2 controls) × 3 gates = 93 full gate runs.
@@ -181,7 +188,8 @@ His step 3: the three reviewers running on 3c98ad5; then the fix pass (gate-file
 
 ## Running work
 - Saver: background task bjteqwe4t, started 14:02 Amsterdam, stops by 15:52 (110 min); last check 14:40: ok (autosaves pushed).
-- docs-keeper: done (1023870). Reviewers running (background): security-auditor, test-engineer, infra-engineer on 3c98ad5;
-  notes `<agent>-review.md`. The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
+- docs-keeper: done (1023870). infra-engineer: done (APPROVE). Running (background): security-auditor and test-engineer
+  on 3c98ad5 (notes `<agent>-review.md`); the advisor agent on 3c98ad5 (C1-C8 reconstructed, rev 3, the departure,
+  this session's deviations; notes `advisor-head-review.md`). The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
 - The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
   container (step 3 note).
