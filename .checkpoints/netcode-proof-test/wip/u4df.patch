@@ -1,8 +1,425 @@
+diff --git a/spikes/netcode-proof/crates/sim/src/replay.rs b/spikes/netcode-proof/crates/sim/src/replay.rs
+index 3c6a293..b45d5c9 100644
+--- a/spikes/netcode-proof/crates/sim/src/replay.rs
++++ b/spikes/netcode-proof/crates/sim/src/replay.rs
+@@ -19,8 +19,10 @@ use rand_core::{Rng, SeedableRng};
+ 
+ use crate::scene::{LARGE_PARTS, SMALL_PARTS, Scene};
+ use crate::seam::{
+-    Attribute, AttributeChange, Command, CoverVariant, Placement, Rewind, SimCore, TickInput,
++    Attribute, AttributeChange, Command, CoverVariant, MOVE_SPEED_MAX_CM_S, Placement, Rewind,
++    SimCore, TickInput,
+ };
++use crate::world::move_velocity;
+ use crate::{HitHistory, StateDump, TICK_HZ, World, ticks_for_ms};
+ 
+ const MAGIC: u32 = u32::from_le_bytes(*b"NPTR");
+@@ -281,8 +283,9 @@ fn write_tick(out: &mut Vec<u8>, t: &TickInput) {
+ }
+ 
+ impl Recording {
+-    /// The synthetic generator's version: a recordings manifest names it beside each recording's seed (§4.15).
+-    pub const GENERATOR: u32 = 1;
++    /// The synthetic generator's version: a recordings manifest names it beside each recording's seed (§4.15). 2 from
++    /// U4d-F: the dead reckoning follows every input the generator emits (the advisor's U4d close ruling, B1.2 step 3).
++    pub const GENERATOR: u32 = 2;
+ 
+     /// The recording's bytes (the module's layout).
+     ///
+@@ -349,8 +352,18 @@ impl Recording {
+     /// and then, and reload on the courses; a rare aim point lies beyond the weapon's reach (the clamp) and a rare
+     /// Rewind outside the
+     /// ring (the refusal). Each firing command's Rewind names ticks the ring holds, and its view time is that Rewind's.
+-    /// Every few hundred ticks a soldier is spawned at its home, teleported there, or its move speed set. The commands
+-    /// are written in the canonical order (carry 8).
++    /// Every few hundred ticks a soldier is spawned at its home, teleported there, or its move speed set; in ES (its
++    /// `aim_one_in` above 1) each soldier is also teleported home once every 60 s. The commands are written in the
++    /// canonical order (carry 8).
++    ///
++    /// The dead reckoning follows every input the generator emits, as the World applies it (the advisor's U4d close
++    /// ruling, B1.2 step 3). A tick's spawn, teleport and move speed are drawn before its commands, since the World
++    /// applies them first: a spawn or teleport puts the estimate at home, and a move speed is held as the World's
++    /// `apply_inputs` brings it into range. Each command the World runs moves the estimate one tick by the World's own
++    /// move rule (`move_velocity`: crouch, sprint, the vector's scale) at that speed, in the order the World runs them,
++    /// so a held-back command moves it when it is sent, beside the next, and a lost one never does. What the World does
++    /// that no input says (a move blocked by a solid, a door, the wall or a vehicle part; a death and its respawn; the
++    /// position's snap to the wire grid) the reckoning cannot see: the recording stays open-loop (§4.15).
+     pub fn synthetic(
+         scene: &Scene,
+         seed: u64,
+@@ -374,6 +387,9 @@ impl Recording {
+             buttons: u16,
+             turn_at: u32,
+             est: [f32; 2],
++            /// The move speed the World holds for the slot, cm/s: the scene's, then each MoveSpeed the generator
++            /// emits for it, brought into range as `apply_inputs` brings it.
++            speed_cm: u32,
+             held_back: Option<(Command, Option<Rewind>)>,
+         }
+         let homes = scene.homes;
+@@ -382,10 +398,16 @@ impl Recording {
+         let mut clients: Vec<Client> = (0..slots)
+             .map(|s| Client {
+                 est: home_of(s).map(|k| k as f32 / 100.0),
++                speed_cm: scene.move_speed,
+                 ..Client::default()
+             })
+             .collect();
+-        let speed = scene.move_speed as f32 / 100.0;
++        // One tick's move of a command the World runs, before collision: the World's own rule at the speed it holds.
++        let dt = 1.0 / TICK_HZ as f32;
++        let one_tick = |speed_cm: u32, buttons: u16, move_xy: [i8; 2]| -> [f32; 2] {
++            let v = move_velocity(speed_cm, buttons, move_xy, 1.0).0;
++            [v[0] * dt, v[1] * dt]
++        };
+         let reach = scene.weapon.reach_cm as i32;
+         let mut out = Vec::with_capacity(ticks as usize);
+         for e in 0..ticks {
+@@ -394,11 +416,64 @@ impl Recording {
+                 tick,
+                 ..TickInput::default()
+             };
++            // Phase 0's inputs first: the World applies a tick's spawns, teleports and attribute changes before its
++            // commands, so the reckoning takes them before this tick's moves.
++            if e % 311 == 157 {
++                let slot = draw(u32::from(slots)) as u8;
++                if !scene.is_plate(slot) {
++                    let value = 400 + draw(400);
++                    input.attributes.push(AttributeChange {
++                        slot,
++                        attribute: Attribute::MoveSpeed,
++                        value,
++                    });
++                    clients[usize::from(slot)].speed_cm = value.min(MOVE_SPEED_MAX_CM_S);
++                }
++            }
++            if e % 457 == 300 || e % 997 == 500 {
++                let slot = draw(u32::from(slots)) as u8;
++                if !scene.is_plate(slot) {
++                    let home = home_of(slot);
++                    let p = Placement {
++                        slot,
++                        position: [home[0], home[1], 0],
++                    };
++                    clients[usize::from(slot)].est = home.map(|k| k as f32 / 100.0);
++                    if e % 457 == 300 {
++                        input.teleports.push(p);
++                    } else {
++                        input.spawns.push(p);
++                    }
++                }
++            }
++            // ES only (its `aim_one_in` above 1), the bounded re-home (the advisor's U4d close ruling, B1.2 step 4's
++            // 3b): once every 60 s each soldier is teleported to its home, slot k on the ticks where e mod 1,800 =
++            // floor(k × 1,800 / slots), and its estimate with it, so what the reckoning cannot see (a blocked move,
++            // above all) builds up for at most 60 s. It draws nothing.
++            if scene.aim_one_in > 1 {
++                let period = ticks_for_ms(60_000);
++                for slot in (0..slots).filter(|&k| !scene.is_plate(k)) {
++                    if u32::from(slot) * period / u32::from(slots) == e % period {
++                        let home = home_of(slot);
++                        input.teleports.push(Placement {
++                            slot,
++                            position: [home[0], home[1], 0],
++                        });
++                        clients[usize::from(slot)].est = home.map(|k| k as f32 / 100.0);
++                    }
++                }
++            }
+             for slot in 0..slots {
+                 if scene.is_plate(slot) {
+                     continue;
+                 }
+                 let c = &mut clients[usize::from(slot)];
++                // A command held back last tick runs first this tick, beside this tick's: its own buttons and vector
++                // at the speed the World holds now.
++                if let Some((back, _)) = &c.held_back {
++                    let d = one_tick(c.speed_cm, back.buttons, back.move_xy);
++                    c.est = [c.est[0] + d[0], c.est[1] + d[1]];
++                }
+                 // A new heading every 0.5 to 2 s: home when it has wandered more than 8 m, else at random.
+                 if e >= c.turn_at {
+                     c.turn_at = e + ticks_for_ms(500 + draw(1_500));
+@@ -428,8 +503,10 @@ impl Recording {
+                         _ => {}
+                     }
+                 }
+-                c.est[0] += f32::from(c.mv[0]) / 127.0 * speed / TICK_HZ as f32;
+-                c.est[1] += f32::from(c.mv[1]) / 127.0 * speed / TICK_HZ as f32;
++                // Where this command's move puts the soldier when the World runs it (the estimate moves there only
++                // when it is sent).
++                let d = one_tick(c.speed_cm, c.buttons, c.mv);
++                let after = [c.est[0] + d[0], c.est[1] + d[1]];
+                 if draw(40) == 0 {
+                     c.presses[Command::PRESS_FIRE] = c.presses[Command::PRESS_FIRE].wrapping_add(1);
+                 }
+@@ -455,12 +532,13 @@ impl Recording {
+                         50 + draw(150) as i32,
+                     ]
+                 };
+-                // ES only (its `aim_one_in` above 1; the other scenes draw nothing more, so their recordings are as
+-                // before): on all but one command in `aim_one_in`, none that throws, the aim is 40 m above the shooter's
+-                // own reckoning, so the shot rises almost straight up and meets only a soldier whose box holds the
+-                // shooter's chest (ES's 10 gameplay events a second: T-M1).
++                // ES only (its `aim_one_in` above 1; no other scene draws for it): on all but one command in
++                // `aim_one_in`, none that throws, the aim is 40 m above where this command's move puts the shooter by
++                // its own reckoning, so the shot rises almost straight up and meets only a soldier whose box holds the
++                // shooter's chest (ES's 10 gameplay events a second over the judged window and each half of it: T-M1,
++                // set on that window by the advisor's U4d close ruling, B1.2 step 5).
+                 let aim = if scene.aim_one_in > 1 && !throws && draw(scene.aim_one_in) != 0 {
+-                    [(c.est[0] * 100.0) as i32, (c.est[1] * 100.0) as i32, 4_000]
++                    [(after[0] * 100.0) as i32, (after[1] * 100.0) as i32, 4_000]
+                 } else {
+                     aim
+                 };
+@@ -498,40 +576,19 @@ impl Recording {
+                     view_tick: rewind.map_or(tick.wrapping_sub(3), |r| r.tick_a),
+                     view_fraction: rewind.map_or(0, |r| r.fraction),
+                 };
++                // Sent now (the estimate moves), held back (it moves when sent, next tick) or lost (it never moves).
+                 if let Some(back) = c.held_back.take() {
+                     input.commands.push(back);
+                     input.commands.push((cmd, rewind));
++                    c.est = after;
+                 } else {
+                     match draw(64) {
+                         0 => c.held_back = Some((cmd, rewind)),
+                         1 => {}
+-                        _ => input.commands.push((cmd, rewind)),
+-                    }
+-                }
+-            }
+-            if e % 311 == 157 {
+-                let slot = draw(u32::from(slots)) as u8;
+-                if !scene.is_plate(slot) {
+-                    input.attributes.push(AttributeChange {
+-                        slot,
+-                        attribute: Attribute::MoveSpeed,
+-                        value: 400 + draw(400),
+-                    });
+-                }
+-            }
+-            if e % 457 == 300 || e % 997 == 500 {
+-                let slot = draw(u32::from(slots)) as u8;
+-                if !scene.is_plate(slot) {
+-                    let home = home_of(slot);
+-                    let p = Placement {
+-                        slot,
+-                        position: [home[0], home[1], 0],
+-                    };
+-                    clients[usize::from(slot)].est = home.map(|k| k as f32 / 100.0);
+-                    if e % 457 == 300 {
+-                        input.teleports.push(p);
+-                    } else {
+-                        input.spawns.push(p);
++                        _ => {
++                            input.commands.push((cmd, rewind));
++                            c.est = after;
++                        }
+                     }
+                 }
+             }
+diff --git a/spikes/netcode-proof/crates/sim/src/scene.rs b/spikes/netcode-proof/crates/sim/src/scene.rs
+index 524d6b3..7481231 100644
+--- a/spikes/netcode-proof/crates/sim/src/scene.rs
++++ b/spikes/netcode-proof/crates/sim/src/scene.rs
+@@ -75,9 +75,13 @@ const ES_WEAPON: Weapon = Weapon {
+     ..SS_WEAPON
+ };
+ /// ES's recording aims among the other teams on one command in this many ([`Scene`]'s `aim_one_in`; the advisor's
+-/// W1-U4D T-M1). Measured over ES's 9,000-tick recording at 1 in 11: 9.85, 10.26 and 9.67 gameplay events a second for
+-/// seeds 2, 1 and 3 (shot hits about 4.4, blast hits about 5.3, kills about 0.2); 1 in 10 gives 10.39 for seed 2.
+-const ES_AIM_ONE_IN: u32 = 11;
++/// W1-U4D T-M1, set on the judged window by its U4d close ruling, B1.2 step 5). Measured over the window, the last
++/// 18,000 ticks (10 minutes) of a 21,600-tick ES recording from tick 1,000,000, after its 2-minute warm-up: 9.878,
++/// 9.743 and 10.098 gameplay events a second for seeds 1, 2 and 3 (shot hits about 2.7, blast hits about 6.8, kills
++/// about 0.35), each 300 s half between 9.580 and 10.220 (tests/world.rs, t_m1 and its three-seed form). Of the shares
++/// tried (11, 16, 26, 34, 36, 38, 40, 48), 40 and 48 put every window and half in 9.5-10.5, and 40 keeps the larger
++/// smallest margin to the band's edges (0.080 a second; 48's is 0.036).
++const ES_AIM_ONE_IN: u32 = 40;
+ /// An S30 (a 30-minute run) and 5 minutes more, µs.
+ const S30_PLUS_5_US: u64 = 35 * 60 * 1_000_000;
+ // SS and ES script no reloads (TUNE-1), so a soldier firing at its weapon's interval must not run dry inside an S30
+@@ -100,18 +104,26 @@ pub struct Scene {
+     /// Big vehicles, and how many of them are very large units of `LARGE_PARTS` parts (the rest have `SMALL_PARTS`).
+     pub(crate) vehicles: u8,
+     pub(crate) large_vehicles: u8,
++    /// How many big vehicles loop inside the fight, the first this many (the advisor's U4d close ruling, B1.3): round
++    /// the soldiers' cluster's centre, 5 to 14 m out, every hull within 1,400 cm of it on every tick; vehicle v of the
++    /// rest loops 40 + 3 v m out (SS's from 52 m). SS's 4 very large units; all 15 of ES's (ADR 0001:1475-1477: every
++    /// vehicle in view).
++    pub(crate) fight_vehicles: u8,
+     /// Stand-in projectiles the sim keeps live (the stress scene's 300).
+     pub(crate) live_projectiles: u16,
+     /// Stand-in projectiles spawned per second, in thousandths (ES's 0.44 per player per second: 21,120).
+     pub(crate) spawn_millihertz: u32,
+     /// The stand-in projectiles' fuse range, ms.
+     pub(crate) fuse_ms: [u32; 2],
+-    /// A thrown grenade's fuse, ms: 2 s, and ES's 1.515 s (every ES projectile fuses after 1.515 s: ADR 0001:1478).
++    /// A thrown grenade's fuse, ms: 2 s, and ES's 1.515 s (ADR 0001:1478-1479's 32 live projectiles at 21.12 spawns a
++    /// second give each a life of 32 / 21.12 = 1.515 s, so every ES projectile fuses after it).
+     pub(crate) grenade_fuse_ms: u32,
+     /// Its synthetic recordings aim among the other teams' soldiers on one command in this many (and on every command
+     /// that throws), and into the air above the shooter on the rest, so those shots rise almost straight up and meet
+     /// only a soldier whose box holds the shooter's chest (soldiers pass through each other): 1 in every scene but ES,
+-    /// where the share sets its 10 gameplay events a second (ADR 0001:1478; the advisor's W1-U4D T-M1).
++    /// where the share sets its 10 gameplay events a second over the judged window, the last 10 minutes of a 12-minute
++    /// recording, and over each 300 s half of it (ADR 0001:1478 and :1600; the advisor's W1-U4D T-M1 and U4d close
++    /// ruling, B1.2). Above 1 it also turns on the generator's re-home of each soldier every 60 s (B1.2 step 4's 3b).
+     pub(crate) aim_one_in: u32,
+     /// The projectile pool's fixed capacity (stand-ins and grenades).
+     pub(crate) projectile_capacity: u16,
+@@ -155,6 +167,7 @@ impl Scene {
+             plates_from: 48,
+             vehicles: 15,
+             large_vehicles: 4,
++            fight_vehicles: 4,
+             live_projectiles: 300,
+             spawn_millihertz: 0,
+             fuse_ms: [2_000, 6_000],
+@@ -171,16 +184,19 @@ impl Scene {
+         }
+     }
+ 
+-    /// ES, R2's estimate scene (ADR 0001:1474-1479): 48 soldiers and 15 big vehicles in view, 1.5 shots per player per
+-    /// second (the weapon's interval 666,667 µs), 32 live projectiles at 0.44 spawns per player per second (21.12 a
+-    /// second, each fusing after 1.515 s: 21.12 × 1.515 = 32.0; a thrown grenade is one of them, and the stand-ins
+-    /// fill the rest), 10 gameplay events (hits and kills) a second from its recording's aim (one command in 11 aims
+-    /// among the other teams), no effect rows (the advisor's W1-U4D T-M1).
++    /// ES, R2's estimate scene (ADR 0001:1474-1479): 48 soldiers and 15 big vehicles in view (all 15 loop inside the
++    /// fight: the advisor's U4d close ruling, B1.3), 1.5 shots per player per second (the weapon's interval 666,667
++    /// µs), 32 live projectiles at 0.44 spawns per player per second (21.12 a second, each fusing after 1.515 s: 21.12
++    /// × 1.515 = 32.0; a thrown grenade is one of them, and the stand-ins fill the rest), 10 gameplay events (hits and
++    /// kills) a second over the judged window (the last 10 minutes of a 12-minute recording, each 300 s half of it
++    /// too: B1.2) from its recording's aim (one command in 40 aims among the other teams) and its re-home of each
++    /// soldier every 60 s, no effect rows (the advisor's W1-U4D T-M1).
+     pub fn estimate() -> Scene {
+         Scene {
+             id: 2,
+             name: "ES",
+             large_vehicles: 0,
++            fight_vehicles: 15,
+             live_projectiles: 0,
+             spawn_millihertz: 21_120,
+             fuse_ms: [1_515, 1_515],
+@@ -204,6 +220,7 @@ impl Scene {
+             plates_from: 1,
+             vehicles: 0,
+             large_vehicles: 0,
++            fight_vehicles: 0,
+             live_projectiles: 0,
+             spawn_millihertz: 0,
+             fuse_ms: [2_000, 2_000],
 diff --git a/spikes/netcode-proof/crates/sim/src/world.rs b/spikes/netcode-proof/crates/sim/src/world.rs
-index 80900f9..77062ba 100644
+index 80900f9..d3bddd8 100644
 --- a/spikes/netcode-proof/crates/sim/src/world.rs
 +++ b/spikes/netcode-proof/crates/sim/src/world.rs
-@@ -2141,11 +2141,109 @@ impl SimCore for World {
+@@ -466,6 +466,44 @@ fn part_box(c: [i32; 3]) -> ([f32; 3], [f32; 3]) {
+     )
+ }
+ 
++/// One command's move before collision: the move rule's one home (the advisor's U4d close ruling, B1.2 step 1), read
++/// by [`World`]'s commands and by the synthetic generator's dead reckoning (`Recording::synthetic`, B1.2 step 3, with
++/// `gain` 1). From the soldier's move speed (cm/s), the command's buttons and its move vector: crouching
++/// halves the speed; sprinting takes it × 3 / 2, only when not crouching and not holding fire; a vector longer than 127
++/// is scaled to 127. `gain` scales the speed (m/s) before the vector does: 1, but 1.01 under
++/// PM-0001-41/server-speed-1pct's bite (the authority only, bites builds). Returns the velocity (m/s, x and y; one
++/// tick's move is it times one tick), then whether the soldier crouches and whether it sprints (its record's flags).
++pub(crate) fn move_velocity(
++    move_speed: u32,
++    buttons: u16,
++    move_xy: [i8; 2],
++    gain: f32,
++) -> ([f32; 2], bool, bool) {
++    let crouch = buttons & Command::CROUCH != 0;
++    let fire_held = buttons & Command::FIRE != 0;
++    let sprint = buttons & Command::SPRINT != 0 && !crouch && !fire_held;
++    let speed_cm = if sprint {
++        move_speed.saturating_mul(3) / 2
++    } else if crouch {
++        move_speed / 2
++    } else {
++        move_speed
++    };
++    let speed = speed_cm as f32 / 100.0 * gain;
++    let (mx, my) = (i32::from(move_xy[0]), i32::from(move_xy[1]));
++    let len2 = mx * mx + my * my;
++    let scale = if len2 > 127 * 127 {
++        127.0 / (len2 as f32).sqrt()
++    } else {
++        1.0
++    };
++    let v = [
++        mx as f32 / 127.0 * scale * speed,
++        my as f32 / 127.0 * scale * speed,
++    ];
++    (v, crouch, sprint)
++}
++
+ /// The parts of one scene's world that `records` names, for [`compose_volumes`]: how many soldiers, hulls and parts.
+ #[derive(Clone, Copy)]
+ struct Counts {
+@@ -754,11 +792,14 @@ impl World {
+                 });
+             }
+             let period = ticks_for_ms(60_000 + 5_000 * u32::from(v));
+-            // In the fight (the advisor's W1-U4D N-M4; §4.13, F113): the very large units loop round the soldiers'
+-            // cluster's centre, 5 to 14 m out, so their parts (within 3.71 m of the hull) stay inside the cluster and
+-            // its reach; the others loop elsewhere, 52 m out and beyond, past the buildings.
+-            let radius = if v < scene.large_vehicles {
+-                5.0 + 3.0 * f32::from(v)
++            // In the fight (the advisor's W1-U4D N-M4 and U4d close ruling B1.3; §4.13, F113): the scene's first
++            // `fight_vehicles` hulls loop round the soldiers' cluster's centre, 5 to 14 m out (5 + 9 v / (n - 1) m for
++            // n of them: SS's 4 very large units at 5, 8, 11 and 14 m, ES's 15 every 9 / 14 m), so their parts (within
++            // 3.71 m of the hull) stay inside the cluster and its reach; the others loop elsewhere, 40 + 3 v m out
++            // (SS's from 52 m), past the buildings.
++            let fight = scene.fight_vehicles;
++            let radius = if v < fight {
++                5.0 + 9.0 * f32::from(v) / f32::from(fight.saturating_sub(1).max(1))
+             } else {
+                 40.0 + 3.0 * f32::from(v)
+             };
+@@ -1290,36 +1331,17 @@ impl World {
+             return false;
+         }
+         // The move: one tick at the soldier's speed, the vector widened before any arithmetic (carry 15).
+-        let crouch = c.buttons & Command::CROUCH != 0;
+         let fire_held = c.buttons & Command::FIRE != 0;
+-        let sprint = c.buttons & Command::SPRINT != 0 && !crouch && !fire_held;
+-        let speed_cm = if sprint {
+-            s.move_speed.saturating_mul(3) / 2
+-        } else if crouch {
+-            s.move_speed / 2
+-        } else {
+-            s.move_speed
+-        };
+         #[allow(
+             unused_mut,
+             reason = "PM-0001-41/server-speed-1pct scales it in bites builds"
+         )]
+-        let mut speed = speed_cm as f32 / 100.0;
++        let mut gain = 1.0;
+         #[cfg(feature = "bites")]
+         if authority && self.bitten(Bite::Speed) {
+-            speed *= 1.01;
++            gain = 1.01;
+         }
+-        let (mx, my) = (i32::from(c.move_xy[0]), i32::from(c.move_xy[1]));
+-        let len2 = mx * mx + my * my;
+-        let scale = if len2 > 127 * 127 {
+-            127.0 / (len2 as f32).sqrt()
+-        } else {
+-            1.0
+-        };
+-        let v = [
+-            mx as f32 / 127.0 * scale * speed,
+-            my as f32 / 127.0 * scale * speed,
+-        ];
++        let (v, crouch, sprint) = move_velocity(s.move_speed, c.buttons, c.move_xy, gain);
+         let (pos, blocked) = self.collide(s.pos, [v[0] * DT, v[1] * DT]);
+         let vel = [
+             if blocked[0] { 0.0 } else { v[0] },
+@@ -2141,11 +2163,110 @@ impl SimCore for World {
  
  #[cfg(test)]
  mod tests {
@@ -44,7 +461,8 @@ index 80900f9..77062ba 100644
 +        // (slot 0) and the target (slot 1, 5 m north of it) are teleported into the open, the target's move speed set
 +        // to the most the attribute holds (100 m/s), and its command runs it 3.33 m east, out of its old box (80 cm
 +        // wide); the shooter, holding fire with no Rewind, hits it at its new chest and misses at its old one. Phase 3
-+        // left at the moves' start (plant O3) fails both.
++        // without the refresh (plant O3: the soldiers' records from before this tick's teleports and moves) misses it
++        // at its new chest.
 +        let scene = Scene::targets();
 +        let (shooter, target) = ([-6_000, -1_000, 0], [-6_000, -500, 0]);
 +        let shoot = |aim: [i32; 3]| {
@@ -114,3 +532,350 @@ index 80900f9..77062ba 100644
  
      /// A box's centre and half extents as the reference reads them, m, in f64 from its integer centimetres.
      fn metres(b: &VolumeBox) -> ([f64; 3], [f64; 3]) {
+diff --git a/spikes/netcode-proof/crates/sim/tests/replay.rs b/spikes/netcode-proof/crates/sim/tests/replay.rs
+index ca3beb6..6538019 100644
+--- a/spikes/netcode-proof/crates/sim/tests/replay.rs
++++ b/spikes/netcode-proof/crates/sim/tests/replay.rs
+@@ -319,7 +319,7 @@ fn d7_the_hash_and_dump_vectors_are_pinned() {
+     // here for this build; their cross-target half (x86-64 against wasm32) is U4d2's.
+     let pinned: [(Scene, usize, u64); 4] = [
+         (Scene::stress(), 6_488, 6_786_077_935_583_382_297),
+-        (Scene::estimate(), 1_944, 8_780_045_697_152_956_090),
++        (Scene::estimate(), 1_944, 8_237_017_275_248_454_161),
+         (Scene::course(), 260, 12_984_630_011_248_297_851),
+         (Scene::targets(), 340, 5_080_305_515_375_423_141),
+     ];
+@@ -353,7 +353,7 @@ fn d7_the_hash_and_dump_vectors_are_pinned() {
+         [
+             (1, 6_772, 10_412_709_864_748_183_085),
+             (30, 6_628, 8_845_330_375_396_163_272),
+-            (300, 6_612, 923_332_457_071_349_262),
++            (300, 6_612, 3_337_416_615_378_533_976),
+         ]
+     );
+     // The dump's first names: the world's tick, its 64-bit tick count (two words), then soldier 0's fields.
+@@ -369,7 +369,7 @@ fn d7_the_hash_and_dump_vectors_are_pinned() {
+             "soldier[0].generation"
+         ]
+     );
+-    // The three synthetic recordings' bytes (generator version 1): length and FNV-1a-64, for the recordings manifest
++    // The three synthetic recordings' bytes (generator version 2): length and FNV-1a-64, for the recordings manifest
+     // (u4-build-plan.md §4.15: regenerated at check time, each file's digest committed).
+     let digests: Vec<(usize, u64)> = recordings()
+         .iter()
+@@ -378,13 +378,13 @@ fn d7_the_hash_and_dump_vectors_are_pinned() {
+             (b.len(), fnv(&b))
+         })
+         .collect();
+-    assert_eq!(Recording::GENERATOR, 1);
++    assert_eq!(Recording::GENERATOR, 2);
+     assert_eq!(
+         digests,
+         [
+-            (16_697_066, 2_695_722_420_930_191_497),
+-            (16_697_144, 7_136_420_146_508_984_890),
+-            (798_759, 3_177_023_422_367_409_324),
++            (16_694_921, 35_974_458_070_191_737),
++            (16_700_849, 15_077_317_756_489_230_056),
++            (799_693, 9_126_256_229_328_065_459),
+         ]
+     );
+ }
+diff --git a/spikes/netcode-proof/crates/sim/tests/world.rs b/spikes/netcode-proof/crates/sim/tests/world.rs
+index 4a63ea1..4d8a0ce 100644
+--- a/spikes/netcode-proof/crates/sim/tests/world.rs
++++ b/spikes/netcode-proof/crates/sim/tests/world.rs
+@@ -1001,71 +1001,233 @@ fn r_m1_a_record_of_an_entity_the_world_has_not_changes_nothing() {
+     assert!(v.soldiers.iter().chain(&v.cover).all(|b| !b.live), "{v:?}");
+ }
+ 
+-#[test]
+-fn t_m1_the_estimate_scene_meets_pm_0001_2s_es_bands() {
+-    // The advisor's W1-U4D T-M1 (the test review's M1; PM-0001-2's ES checks, marks.json; ADR 0001:1474-1479): over
+-    // ES's synthetic recording (seed 2, 9,000 ticks: tests/replay.rs's), every tick has 48 soldiers and 15 vehicles,
+-    // and the run's means lie in PM-0001-2's bands exactly: 72 shots a second (68.4-75.6), 10 gameplay events (hits and
+-    // kills) a second (9.5-10.5), 32 live projectiles a tick (30.4-33.6) and 21.12 spawns a second (20.064-22.176).
+-    // Thrown grenades count toward both projectile bands; the stand-in spawner fills the rest, and every projectile
+-    // fuses after 1.515 s. The events come from the recording's aim (one command in 11 among the other teams, the rest
+-    // into the air) and from the blasts.
+-    let scene = Scene::estimate();
+-    let ticks = 9_000u32;
+-    let seconds = u64::from(ticks / TICK_HZ);
+-    let rec = Recording::synthetic(&scene, 2, 1_000_000, ticks, SPAN_MS);
+-    let mut world = World::new(&scene, 2, 1_000_000);
+-    let mut history = ring();
+-    let (mut shots, mut events, mut live, mut spawns, mut thrown) = (0u64, 0u64, 0u64, 0u64, 0u64);
+-    let (mut min_soldiers, mut min_vehicles) = (usize::MAX, usize::MAX);
+-    let mut before = std::collections::BTreeSet::new();
+-    for t in &rec.ticks {
+-        let e = room_tick(&mut world, &mut history, t);
+-        shots += e
+-            .iter()
+-            .filter(|e| matches!(e, SimEvent::Shot { .. }))
+-            .count() as u64;
+-        events += e
+-            .iter()
+-            .filter(|e| matches!(e, SimEvent::Hit { .. } | SimEvent::Kill { .. }))
+-            .count() as u64;
+-        let projectiles = records_of(&world, EntityKind::Projectile);
+-        live += projectiles.len() as u64;
+-        let now: std::collections::BTreeSet<(u16, u16)> = projectiles
+-            .iter()
+-            .map(|p| (p.index, p.generation))
+-            .collect();
+-        for p in &projectiles {
+-            if !before.contains(&(p.index, p.generation)) {
+-                spawns += 1;
+-                thrown += u64::from(p.grid[7] == 1);
++/// One judged ES run (the advisor's U4d close ruling, B1.2 steps 4 and 6; PM-0001-2's ES checks, marks.json; ADR
++/// 0001:1474-1479): `seed`'s synthetic ES recording, 21,600 ticks (12 minutes) from tick 1,000,000, counted per 60 s.
++/// The window PM-0001-2's bands judge is its last 18,000 ticks (`ES_WINDOW`): 10 minutes, PM-0001-12's ES run length
++/// (ADR 0001:1600), after a 2-minute warm-up (PM-0001-63's, :1634).
++struct EsRun {
++    seed: u64,
++    /// Each minute's counts: shots, gameplay events (hits and kills), live projectiles summed over its ticks, spawns,
++    /// and the spawns that were thrown grenades.
++    minutes: Vec<[u64; 5]>,
++    /// The fewest soldiers and the fewest vehicles on any tick.
++    min_soldiers: usize,
++    min_vehicles: usize,
++    /// The farthest any hull came from the cluster's centre on any tick, cm: in D-6's form (whole centimetres, rounded
++    /// down), and exactly.
++    hull_out: i64,
++    hull_out_exact: f64,
++}
++
++/// An [`EsRun`]'s judged window, minutes 2 to 11 (ticks 3,600-21,599), and its two 300 s halves.
++const ES_WINDOW: std::ops::Range<usize> = 2..12;
++const ES_HALVES: [std::ops::Range<usize>; 2] = [2..7, 7..12];
++
++/// Thousandths as a decimal.
++fn milli(n: u64) -> String {
++    format!("{}.{:03}", n / 1_000, n % 1_000)
++}
++
++impl EsRun {
++    fn new(seed: u64) -> EsRun {
++        let scene = Scene::estimate();
++        let minute = ticks_for_ms(60_000) as usize;
++        let rec = Recording::synthetic(&scene, seed, 1_000_000, 12 * minute as u32, SPAN_MS);
++        let mut world = World::new(&scene, seed, 1_000_000);
++        let mut history = ring();
++        let mut run = EsRun {
++            seed,
++            minutes: vec![[0; 5]; 12],
++            min_soldiers: usize::MAX,
++            min_vehicles: usize::MAX,
++            hull_out: 0,
++            hull_out_exact: 0.0,
++        };
++        let mut before = std::collections::BTreeSet::new();
++        let mut out2 = 0i64;
++        for (k, t) in rec.ticks.iter().enumerate() {
++            let e = room_tick(&mut world, &mut history, t);
++            let m = &mut run.minutes[k / minute];
++            m[0] += e
++                .iter()
++                .filter(|e| matches!(e, SimEvent::Shot { .. }))
++                .count() as u64;
++            m[1] += e
++                .iter()
++                .filter(|e| matches!(e, SimEvent::Hit { .. } | SimEvent::Kill { .. }))
++                .count() as u64;
++            let projectiles = records_of(&world, EntityKind::Projectile);
++            m[2] += projectiles.len() as u64;
++            let now: std::collections::BTreeSet<(u16, u16)> = projectiles
++                .iter()
++                .map(|p| (p.index, p.generation))
++                .collect();
++            for p in &projectiles {
++                if !before.contains(&(p.index, p.generation)) {
++                    m[3] += 1;
++                    m[4] += u64::from(p.grid[7] == 1);
++                }
++            }
++            before = now;
++            run.min_soldiers = run
++                .min_soldiers
++                .min(records_of(&world, EntityKind::Soldier).len());
++            let hulls = records_of(&world, EntityKind::Vehicle);
++            run.min_vehicles = run.min_vehicles.min(hulls.len());
++            for v in &hulls {
++                let (x, y) = (i64::from(v.grid[0]), i64::from(v.grid[1]));
++                out2 = out2.max(x * x + y * y);
+             }
+         }
+-        before = now;
+-        min_soldiers = min_soldiers.min(records_of(&world, EntityKind::Soldier).len());
+-        min_vehicles = min_vehicles.min(records_of(&world, EntityKind::Vehicle).len());
++        // The farthest squared distance, then its root: rounding down is monotonic, so this is D-6's form's maximum.
++        run.hull_out_exact = (out2 as f64).sqrt();
++        run.hull_out = run.hull_out_exact as i64;
++        run
++    }
++
++    /// Minutes `r`'s means, thousandths: shots, gameplay events and spawns a second, live projectiles a tick.
++    fn rates(&self, r: std::ops::Range<usize>) -> [u64; 4] {
++        let secs = r.len() as u64 * 60;
++        let mut s = [0u64; 5];
++        for m in &self.minutes[r] {
++            for (a, x) in s.iter_mut().zip(m) {
++                *a += x;
++            }
++        }
++        [
++            s[0] * 1_000 / secs,
++            s[1] * 1_000 / secs,
++            s[2] * 1_000 / (secs * u64::from(TICK_HZ)),
++            s[3] * 1_000 / secs,
++        ]
++    }
++
++    /// Minutes `r`'s four means as the report gives them.
++    fn line(&self, r: std::ops::Range<usize>) -> String {
++        let thrown: u64 = self.minutes[r.clone()].iter().map(|m| m[4]).sum();
++        let [shots, events, live, spawns] = self.rates(r);
++        format!(
++            "shots {} a second, gameplay events {} a second, live projectiles {} a tick, spawns {} a second ({thrown} \
++             thrown)",
++            milli(shots),
++            milli(events),
++            milli(live),
++            milli(spawns)
++        )
+     }
+-    let per_s = |n: u64| n * 1_000 / seconds;
+-    let (shots_m, events_m, spawns_m) = (per_s(shots), per_s(events), per_s(spawns));
+-    let live_m = live * 1_000 / u64::from(ticks);
++
++    /// PM-0001-2's ES checks over the window, with the ruling's two scene facts (48 soldiers and 15 vehicles on every
++    /// tick; every hull within 1,400 cm of the cluster's centre, B1.3, in D-6's form: the hulls' records lie on the
++    /// 1 cm wire grid, so a hull on the 14 m loop reads up to 1,400.6 cm exactly) and its drift check (each 300 s
++    /// half's gameplay events in band too); it panics at the first it misses, naming it.
++    fn check(&self) {
++        let seed = self.seed;
++        assert!(
++            self.min_soldiers >= 48 && self.min_vehicles >= 15,
++            "seed {seed}: {} soldiers and {} vehicles on the fewest tick",
++            self.min_soldiers,
++            self.min_vehicles
++        );
++        assert!(
++            self.hull_out <= 1_400,
++            "seed {seed}, the hull bound: a hull {} cm from the cluster's centre ({:.1} cm exactly)",
++            self.hull_out,
++            self.hull_out_exact
++        );
++        let [shots, events, live, spawns] = self.rates(ES_WINDOW);
++        assert!(
++            (68_400..=75_600).contains(&shots),
++            "seed {seed}: shots {shots} thousandths a second over the window"
++        );
++        assert!(
++            (30_400..=33_600).contains(&live),
++            "seed {seed}: live projectiles {live} thousandths a tick over the window"
++        );
++        assert!(
++            (20_064..=22_176).contains(&spawns),
++            "seed {seed}: spawns {spawns} thousandths a second over the window"
++        );
++        let halves = ES_HALVES.map(|h| self.rates(h)[1]);
++        assert!(
++            [events, halves[0], halves[1]]
++                .iter()
++                .all(|e| (9_500..=10_500).contains(e)),
++            "seed {seed}, gameplay events and the drift check: {events} thousandths a second over the window, {} \
++             and {} over its 300 s halves (each in 9,500-10,500)",
++            halves[0],
++            halves[1]
++        );
++    }
++}
++
++#[test]
++fn t_m1_the_estimate_scene_meets_pm_0001_2s_es_bands() {
++    // The advisor's W1-U4D T-M1 (the test review's M1), judged as the U4d close ruling sets it (B1.2 steps 4 and 6;
++    // N2-M1, N2-M2): over seed 2's window (`EsRun`: the last 10 minutes of 12), every tick has 48 soldiers and 15
++    // vehicles and every hull lies within 1,400 cm of the cluster's centre (B1.3), and the window's means lie in
++    // PM-0001-2's bands exactly: 72 shots a second (68.4-75.6), 10 gameplay events (hits and kills) a second
++    // (9.5-10.5), 32 live projectiles a tick (30.4-33.6) and 21.12 spawns a second (20.064-22.176); against drift, each
++    // 300 s half's gameplay events lie in 9.5-10.5 too. Thrown grenades count toward both projectile bands; the
++    // stand-in spawner fills the rest, and every projectile fuses after 1.515 s. The events come from the recording's
++    // aim (one command in 40 among the other teams, the rest into the air) and from the blasts. Seeds 1 and 3: the
++    // ignored test below.
++    let run = EsRun::new(2);
++    let halves = ES_HALVES.map(|h| milli(run.rates(h)[1]));
+     println!(
+-        "T-M1: ES over {seconds} s: shots {shots_m}, gameplay events {events_m}, spawns {spawns_m} ({thrown} \
+-         thrown) thousandths a second; live projectiles {live_m} thousandths a tick"
+-    );
+-    assert!(
+-        min_soldiers >= 48 && min_vehicles >= 15,
+-        "{min_soldiers} soldiers, {min_vehicles} vehicles"
+-    );
+-    assert!((68_400..=75_600).contains(&shots_m), "shots: {shots_m}");
+-    assert!(
+-        (9_500..=10_500).contains(&events_m),
+-        "gameplay events: {events_m}"
++        "T-M1: ES seed 2 over the window (600 s after 120 s): {}; gameplay events {} and {} a second over its halves; \
++         hulls at most {:.1} cm out",
++        run.line(ES_WINDOW),
++        halves[0],
++        halves[1],
++        run.hull_out_exact
+     );
+-    assert!(
+-        (30_400..=33_600).contains(&live_m),
+-        "live projectiles: {live_m}"
+-    );
+-    assert!((20_064..=22_176).contains(&spawns_m), "spawns: {spawns_m}");
++    run.check();
++}
++
++#[test]
++#[ignore = "T-M1's three-seed form (U4d-F, B1.2 step 6), run once by name for the report: about 30 s"]
++fn t_m1_seeds_1_2_and_3_meet_the_es_bands_and_report_them() {
++    // B1.2 step 4's measurement as a test: seeds 1, 2 and 3, each judged by t_m1's checks (`EsRun::check`), and per
++    // seed the report's lines: the window's four means, its two halves, the twelve 60 s gameplay-event rates over all
++    // 12 minutes, T-M1's 300 s from tick 0 and X2's form (ticks 0-17,999; X2 gave 7.578 for seed 2 at 1 in 11, before
++    // U4d-F), those two reported, never used to set anything. Every seed is reported before any is judged.
++    let runs = [1, 2, 3].map(EsRun::new);
++    for run in &runs {
++        let seed = run.seed;
++        println!(
++            "ES seed {seed}, the window (600 s after 120 s): {}",
++            run.line(ES_WINDOW)
++        );
++        for (k, h) in ES_HALVES.into_iter().enumerate() {
++            println!(
++                "ES seed {seed}, half {} ({} s): {}",
++                k + 1,
++                h.len() * 60,
++                run.line(h)
++            );
++        }
++        let minutes: Vec<String> = (0..12).map(|m| milli(run.rates(m..m + 1)[1])).collect();
++        println!(
++            "ES seed {seed}, gameplay events a second per 60 s, minutes 0-11: {}",
++            minutes.join(", ")
++        );
++        println!(
++            "ES seed {seed}, T-M1's 300 s from tick 0: {}",
++            run.line(0..5)
++        );
++        println!(
++            "ES seed {seed}, X2's form (600 s from tick 0): {}",
++            run.line(0..10)
++        );
++        println!(
++            "ES seed {seed}, every tick: at least {} soldiers and {} vehicles; hulls at most {} cm out in D-6's form \
++             ({:.1} cm exactly)",
++            run.min_soldiers, run.min_vehicles, run.hull_out, run.hull_out_exact
++        );
++    }
++    for run in &runs {
++        run.check();
++    }
+ }
+ 
+ /// The course's one soldier spawned at `feet` (cm), and the fire origin a still command fires from, m.
