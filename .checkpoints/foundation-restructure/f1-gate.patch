@@ -1,0 +1,35 @@
+diff --git tools/gate.mjs .gate/fdn-scratch-f1/tools/gate.mjs
+index 2bfab53..7a8480c 100644
+--- tools/gate.mjs
++++ .gate/fdn-scratch-f1/tools/gate.mjs
+@@ -3,6 +3,7 @@
+ // The legacy build lives in legacy/ (foundation step 2.1) or, before the move, at the repo root: the head is read from the
+ // folder smoke.mjs's findBuild names (both places at once: exit 2), and each base from the first of legacy/, the root and
+ // shamble-frontlines-repo/ that holds all five files (BASE_PREFIXES), so a base from before or after the move still loads.
++// When the folder differs between base and head (the move, or its revert), the base's folder must keep no page or engine file.
+ //   [1] syntax         node --check on each engine file and on each page's inline <script>
+ //   [2] concatenation  node --check on each page's scripts joined in load order (read from its <script src> tags)
+ //   [3] symbols        top-level symbols (tools/battery.js), base vs head: nothing dropped, no duplicates; prints +added / -dropped
+@@ -25,7 +26,7 @@
+ // Needs Node 22, git and tools/node_modules (cd tools && npm ci);
+ // 5a also needs Playwright's Chromium (npx --no -- playwright install chromium, inside tools/).
+ import { execFileSync, spawnSync } from 'node:child_process';
+-import { mkdtempSync, writeFileSync, rmSync, readFileSync, existsSync, realpathSync } from 'node:fs';
++import { mkdtempSync, writeFileSync, rmSync, readFileSync, existsSync, realpathSync, readdirSync } from 'node:fs';
+ import { tmpdir } from 'node:os';
+ import { join, resolve, dirname, sep } from 'node:path';
+ import { createRequire } from 'node:module';
+@@ -239,6 +240,13 @@ const checks = [];
+ const add = (id, name, pass, summary, details = [], extra = {}) => checks.push({ id, name, pass, summary, details, ...extra });
+ const base = smokeOnly ? null : resolveBase(baseArg);
+ if (base) base.prefix = basePrefix(base.sha);
++// A folder move between base and head (foundation step 2.1, or its revert): the base's folder must keep no page or engine
++// file, or a stray or decoy copy there would go unjudged (security review of 2.1a, F1). Any letter case, as Windows opens it.
++if (base && base.prefix !== BUILD_PREFIX) {
++  const was = join(ROOT, base.prefix), name = p => p || 'the repo root';
++  const left = existsSync(was) ? readdirSync(was).filter(n => /^(index\.html|editor\.html|shamble-.*\.js)$/i.test(n)) : [];
++  if (left.length) die(`the build folder moved from ${name(base.prefix)} (base) to ${name(BUILD_PREFIX)} (head), but ${name(base.prefix)} still holds ${left.join(', ')}: move or delete ${left.length > 1 ? 'them' : 'it'}`);
++}
+ if (smokeOnly) { await smokeCheck(); finish(); }
+ const head = toBuild(headFile);
+ const LOCAL = { 'shamble-core.js': head.core, 'shamble-game.js': head.game, 'shamble-editor.js': head.editor };

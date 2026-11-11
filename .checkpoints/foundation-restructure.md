@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 14:40 Amsterdam
+- **Last update:** 2026-11-11 15:05 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -95,9 +95,20 @@
    (3c98ad5 + local move commit 104d675, never pushed), each with a `tools/node_modules` link; the runner copy
    `.gate/foundation-restructure/e3-sample/e3-run-sample.mjs` (only the table filter and OUT differ; OUT under `.gate/`).
 
+10. Round 1 done: infra-engineer APPROVE, test-engineer APPROVE (TE-1 Medium), security-auditor REVISE (F1 High), the
+   advisor agent REVISE (F1). The F1 fix, built and proven in the plain folder `.gate/fdn-scratch-f1` (nothing written
+   to tools/): `tools/gate.mjs` only (smoke.mjs stays dd12aeb's blob); when base.prefix differs from BUILD_PREFIX, the
+   base's folder (`join(ROOT, base.prefix)`) must hold no `index.html`, `editor.html` or `shamble-*.js` (case-insensitive
+   listing), else exit 2; the exact change: `f1-gate.patch`. Red first: `rows-test-f1.mjs` on the unfixed gate
+   (`.gate/fdn-scratch`) judged by the fix's expectations: 4 FAILED (h, i decoy, j `Index.html`, l revert leftover; each
+   exit 0). Green on the fixed gate: 13 + 2 rows ALL PASS (h, i, j, l exit 2; k no move exit 0; m clean revert exit 0;
+   base.prefix asserted). The legacy/ base for the rows: 89286ed (plumbing from 44446a5, fixed dates, reproducible). The
+   fixed gate on a clean root tree with smoke: GATE PASS, +0 -0, 8/8, 5/5. The advisor agent asked to rule on the
+   amendment; then the ask to Mustafa (the exact change; FREEZE-FDN as its own question; the alternatives).
+
 ## Current step
 
-His step 3: the three reviewers running on 3c98ad5; then the fix pass (gate-file changes ask him in chat first and break the blob proofs: re-run E3 and the rows), the verifier (with the E3 sample) and the advisor agent's conditions check alongside it; a delta review after the last commit.
+The F1 fix: the advisor agent's ruling on the amendment, then his yes in chat for the exact change to tools/gate.mjs (`f1-gate.patch`). Nothing is written to tools/ before his yes.
 
 ## Next steps (on PR #50, this branch)
 
@@ -130,6 +141,18 @@ His step 3: the three reviewers running on 3c98ad5; then the fix pass (gate-file
    not watched (his "do not watch" carried over from #47).
 
 ## Open findings
+- security-auditor on 3c98ad5: REVISE, F1 High + 2 Lows (notes `security-auditor-review.md`): F1, on a folder move between
+  base and head the gate judges only the chosen folder: a clean `legacy/` copy plus root pages wired to broken scripts
+  passes both CI jobs, where main's gate stops (reproduced); also a stray root page left by 2.1b passes (row h was
+  "intended"). Fix: when base.prefix differs from BUILD_PREFIX, the other folder must hold no page or engine file, by a
+  case-insensitive listing. SA-L1 letter-case variants differ between Linux and Windows (both safe; a README known
+  limit); SA-L2 the #49 header's "about 09:02 UTC" and session id rest only on bb2d817's message (label them).
+- The advisor agent on 3c98ad5: REVISE (notes `advisor-head-review.md`): F1 High reproduced; F1-FIX (a) recommended (the
+  same rule); C1-C8 rebuilt from F-A..F-O and Q-A1..Q-A6 (no C list survives; only C7 = F-O): met or 2.1b's/2.2's, except
+  L-3 (docs-keeper edited ADR 0002 at `high`; CLAUDE.md and plan 1.7 say `xhigh`; no effect), L-4 (C7: `npx` refused by
+  settings, worked around by the browser alias, recorded as a caveat; CLAUDE.md's setup line is refused: a kit follow-up
+  for 2.3), L-1 (plan.md's smoke bullet still says "all five files": the report states the rule as built), L-2 (a
+  doubled "saved by"; SA-L2). Gate-file Lows cannot wait for 2.1b (plan.md:184): IE-1 becomes a follow-up for 2.3.
 - test-engineer on 3c98ad5: APPROVE, 1 Medium + 5 Lows (notes `test-engineer-review.md`; its rows re-run 8 + 2 ALL PASS;
   the docs check catches 11 of 11 mutations on a copy; gap probes G1-G4 behave as intended): TE-1 Medium, the revert-case
   row of `e3-bases.md` (root head vs the `legacy/` base 9af08f7) cannot be repeated (9af08f7 is gone) -> to close by the
@@ -197,10 +220,18 @@ His step 3: the three reviewers running on 3c98ad5; then the fix pass (gate-file
    docs fixes through the generators or by hand, never both; docs-keeper's effort (high) on an ADR pointer line noted
    for the report.
 
+4. 2026-11-11 14:55 Amsterdam · before building the F1 fix (his moments 3 and 4): is the transition-only stop in
+   gate.mjs the right shape? · changed: FREEZE-FDN put to him as its own question, quoting him; the advisor agent's
+   recorded ruling first; one expression for the base's folder (`join(ROOT, base.prefix)`); the v2 consequence named as
+   a 2.3 known limit and the PR body's "never makes the root look like the legacy build" to qualify; gate.mjs only
+   (smoke.mjs stays dd12aeb's blob; IE-1 out of the ask); red first on the unfixed scratch, the rows script taking the
+   scratch path; plumbing for the legacy/ base (a worktree commit if the guard refused); after his yes, the full E3 on
+   the new blob; one self-contained ask with the patch saved first; the verifier brief, #50's body, his new words, L2
+   and round 2 marked stale for after his yes.
+
 ## Running work
 - Saver: background task bjteqwe4t, started 14:02 Amsterdam, stops by 15:52 (110 min); last check 14:40: ok (autosaves pushed).
-- docs-keeper: done (1023870). infra-engineer and test-engineer: done (APPROVE). Running (background): security-auditor
-  on 3c98ad5 (notes `<agent>-review.md`); the advisor agent on 3c98ad5 (C1-C8 reconstructed, rev 3, the departure,
-  this session's deviations; notes `advisor-head-review.md`). The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
+- docs-keeper: done (1023870). infra-engineer and test-engineer: done (APPROVE). security-auditor done (REVISE, F1).
+  The advisor agent done (REVISE, F1), then asked to rule on the F1 amendment (running). The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
 - The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
   container (step 3 note).
