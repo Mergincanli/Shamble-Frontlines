@@ -9,7 +9,7 @@
   **Base:** main 76b4f7a (PR #50 merged, 2.1a). **OLD** (the independent judge for E2 and E3): main 44446a5.
 - **Never:** push to `claude/netcode-proof-test-plan-hcky5g` (#40) or `claude/laughing-pasteur-fwya24` (#48); touch
   `spikes/`; touch a gate file; edit a settings file, hook or allow-list; write a kit line before his chat yes.
-- **Last update:** 2026-11-11 22:31 Amsterdam
+- **Last update:** 2026-11-11 22:52 Amsterdam
 
 ## Steps done
 0. Step 0 (this commit): model checked with get_session: `session_context.model` claude-opus-5-5,
@@ -87,14 +87,25 @@
      Node 24 finding as a 2.3 follow-up; if KIT-2.1B is (b): Q-A4's fallback (verifier.md:28 a known stale command in
      STATUS; no fallback in preview.js).
 
+4. His answers (2026-11-11 21:39:44 UTC, event 45563b1b-718b-4683-9e4c-663daf9cff74; captured by script:
+   `mustafa-2026-11-11-answers.md`, 1301 characters): **KIT-2.1B (a)** (exactly the four lines, one commit holding
+   nothing else; his Advisor compared the four "before" lines with main 76b4f7a: identical; any other kit or gate edit:
+   its own ask); **E8-RUN (a)** (`.gate/fr-e8` only, the main session only, nothing pushed, no branch, the copy removed;
+   plus one re-run on a later head if a fix changes a file the gate reads or a kit line); **REG-TRUE (b)** (OQ-0002-2
+   stays open as "answered in part": 8 open, the Total line stays, ADR 0002 :1596 and :1626 read "answered in part", the
+   answer names all three parts, plus the two acceptance edits for SCOPE (a): register :33-35 and ADR 0002 :7; this
+   replaces D1 (a)'s "answered" wording and new count, the rest of D1 (a) stands); then "build: step 6, the move, and
+   step 7". He asked again which model answers the advisor tool: the session record's `advisorModel` reads
+   claude-opus-5-5 up to the /compact (21:36:59 UTC) and claude-fable-5-2 on every entry since: **Fable 5.2 now**.
+   origin/main re-fetched 21:47 UTC: still 76b4f7a (E8-RUN's `origin/main`).
+
 ## Current step
-The message to him: KIT-2.1B, E8-RUN and REG-TRUE as the advisor agent approved them, plus the advisor-tool line; then
-wait for his answer.
+Step 6, the move, under C2.
 
 ## Next steps
-1. After his answer: build in the plan's order. Step 6 under C2 (saver stopped, the move alone, pushed, draft PR on it,
-   both CI runs read back, saver restarted); step 7 under C4; step 8 under C5; step 9 (E1 under C3, E2, E3 in the
-   background, E4, E5 with the console lines (C7), E6 (C6), E8 (C8)); step 10 under C10-C14 and his REG-TRUE; step 11
+1. Step 6 under C2 (saver stopped, the move alone, pushed, draft PR on it, both CI runs read back, saver restarted);
+   step 7 under C4 (built locally while CI runs, pushed after); step 8 under C5; step 9 (E1 under C3, E2, E3 in the
+   background, E4, E5 with the console lines (C7), E6 (C6), E8 (C8)); step 10 under C10-C14 and REG-TRUE (b); step 11
    under C15-C17.
 
 ## Open findings
