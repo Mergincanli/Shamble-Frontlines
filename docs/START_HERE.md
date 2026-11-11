@@ -17,7 +17,8 @@ Gears of War (gun feel). Visual style: **"Living Comic"** (`ART_DIRECTION.md`). 
 
 ## 1. Onboarding sequence (do this in order)
 
-1. **`STATUS.md`** (where things stand), then **this file**, then **`MODULE_MAP.md`** (who owns what, load order).
+1. **`STATUS.md`** (where things stand; Mustafa's decisions, word for word: `DECISIONS.md`), then **this file**, then
+   **`MODULE_MAP.md`** (who owns what, load order).
 2. **Work in the git repo.** The five code files sit at the repo root: `shamble-core.js`, `shamble-game.js`,
    `shamble-editor.js`, `index.html`, `editor.html`. One change-set per branch `cs/<slug>`, cut from `origin/main`
    (`git fetch origin main` first; never move a session's main folder onto another branch: `CLAUDE.md`, Never;

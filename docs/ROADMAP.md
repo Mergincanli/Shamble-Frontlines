@@ -95,7 +95,15 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**Kit v3.5, the guard's rename gap [2026-11-09 to 11-10, PR #46: in progress]** — kit-v3-5 (F1 from kit-v3-4, agent
+**STATUS-DIET with LANE-RULES [2026-11-10, PR #49: in review]** — status-diet (Mustafa's queue of 2026-11-10, items 2
+and 3, with ACCOUNTS and his Models addition): STATUS (1233 lines) split by a line-range script into STATUS (109 lines:
+the phase, in flight, next, waiting on Mustafa, the routines, pointers), `docs/DECISIONS.md` (his decisions word for
+word, newest first, and the queue of his words) and `docs/STATUS_ARCHIVE.md` (the rest; Follow-ups and Open bugs and
+risks stay live); every moved line byte for byte, no decision id lost. CLAUDE.md: the read list, "Lanes and accounts"
+and the Fable 5.2 advisor-tool exception, his words quoted; docs-keeper.md follows the split; #46 recorded as merged.
+Report `docs/reports/2026-11-10-status-diet.md`. Next: the advisor's final-head review and his go.
+
+**Kit v3.5, the guard's rename gap [2026-11-09 to 11-10, MERGED]** — kit-v3-5 (F1 from kit-v3-4, agent
 memory included: Mustafa's GUARD-RENAME (c); rules and kit code, symbols +0 −0; plan revisions 1-3 with the advisor's
 REVISE, then APPROVE with D1-D6, then APPROVE with E1-E5; his ORDER (b), SA5-RIDE (a) and allow-list direction of
 2026-11-10): the PR Advisor merges only from an allow-list (`mergeAllowed`: plain names in `docs/`, `tools/`,
@@ -105,7 +113,8 @@ file (9bacf47). Tests red on main's guard (47 of 1086 fail), then green (1086/10
 PASS. Docs: #44 merged, his queue word for word (KIT-FREEZE-2, STATUS-DIET, LANE-RULES, the unit walk, the Slice 1
 note), the known limits, the kit-v3-4 report's correction. The review round (three PASS WITH NOTES, nothing Critical or
 High) and its fix pass (08423ce: routine-guard 1107/1107); the verifier's re-check (PASS WITH NOTES); the report
-`docs/reports/2026-11-10-kit-v3-5.md`. Next: the advisor's final-head review and his go.
+`docs/reports/2026-11-10-kit-v3-5.md`. Merged: PR #46, 2d22b69, 2026-11-10 16:05 UTC, by merge commit, on Mustafa's
+go after the advisor's APPROVE WITH NOTES of 0573db3; the PR Advisor routine re-enabled at 16:07 UTC.
 
 **Kit v3.4, the review policy [2026-11-07 to 11-09, MERGED]** — kit-v3-4 (PR #44, 44446a5, 2026-11-09 18:21 UTC, by
 merge commit, on Mustafa's go ("merge #44") after the advisor's APPROVE WITH NOTES of 7c36d5a; CI green on main after
