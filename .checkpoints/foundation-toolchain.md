@@ -170,7 +170,7 @@ draft. Plan revision 8 records his advisor-tool words (the tool on since 2026-11
   2.1b.
 
 ## Advisor tool consultations (his words of 2026-11-11: one line each: when, the question, what changed)
-1. 2026-11-11 ~10:55 Amsterdam · before committing plan revision 8 (his advisor-tool words; the five moments mapped onto
+1. 2026-11-11 ~13:45 Amsterdam (just before fd31ccc) · before committing plan revision 8 (his advisor-tool words; the five moments mapped onto
    steps 5-7): what is missing? · changed: his words kept out of DECISIONS.md and CLAUDE.md for now (step 6; 2.3) and
    added as a third kit follow-up for 2.3; this log started; the stale "not among this session's tools" lines fixed;
    steps 1-4 and K1 noted as done with the tool off (nothing to redo); moment 3 read as all four kit texts drafted, one
