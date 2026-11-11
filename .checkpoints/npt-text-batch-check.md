@@ -6,7 +6,7 @@
   [`night-2026-11-12.md` at 21cc90f](https://github.com/Mergincanli/Shamble-Frontlines/blob/21cc90ff6a20356233a89dfc0d3373fc9fc491dc/.checkpoints/netcode-proof-test/night-2026-11-12.md),
   item 6, under Mustafa's NIGHT-TONIGHT (c) of 2026-11-11 (issue #16, item 6)
 - **Branch:** cs/npt-text-batch-check · **Base:** origin/main 76b4f7a
-- **Last update:** 2026-11-12 00:24 Amsterdam
+- **Last update:** 2026-11-12 00:27 Amsterdam
 
 ## Steps done
 1. Set up: plan read at 21cc90f; `claude/netcode-proof-test-plan-hcky5g` fetched; read-only worktree
@@ -24,13 +24,15 @@
    plan.md:1246's table row; F-2 read at u4d-report.md:49 and :53 against advisor-u4d-close.md:35-37. All hold.
 
 5. The check file committed and pushed · d21a05f (the saver's last save) · done
+6. The night report posted on issue #16 (comment 6809628559); item 6 ticked; the status comment set to done ·
+   0a9f580 (the branch head the report links) · done
 
 ## Current step
-The night report.
+None: the night item is finished.
 
 ## Next steps
-1. Write the night report comment on issue #16, tick item 6, set the status comment to "Night shift done (HH:MM)".
-2. The day session folds the check in the morning (no pull request, as the plan says).
+1. The day session folds the check in the morning (no pull request, as the plan says), takes F-1 and F-2 to the
+   advisor, and decides GUARD-MONITOR (the report's "Decisions needed").
 
 ## Open findings
 - F-1, Low · plan.md:1246 (the U6 row, C-U6-8, log :35) · the ruling's own text puts `p999_pass || would == "MISS"`
