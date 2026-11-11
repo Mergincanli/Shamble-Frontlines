@@ -20,8 +20,7 @@ advisor-u4d-close.md.
 - **Merged into the spike branch:** U4s f080551, U4b 411eeee, U4a 952f734, U4c f3f7c2f, U4d with W1-S1's npt-proto half
   39f4290 (report u4d-report.md); CI green on each. Main merged in at 5ca77eb (PR #49). At 39f4290: check.mjs 10 steps,
   measured 365, bites 412, self 52.
-- **Running:** the advisor's ruling on U4j's round 2 (a background agent since about 17:55 UTC, writing
-  advisor-u4j-r2.md); the U4e brief's check (task wwyzh9w7f, run wf_c92cd986-072, resumed about 17:55 UTC); the
+- **Running:** no agent (the advisor's U4j ruling and the U4e brief's check and revision are done); the
   saver (task bwrkakopa, since about 16:55 UTC, 110 minutes; restart it when it ends: `node
   .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5
   <noreply@anthropic.com>" --trailer "Claude-Session: https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"`).
@@ -110,9 +109,15 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
    one push (the merge with the reviewed bytes, the notes and plan text, wip/u4j.patch removed; then its T1-T9 text
    edits verbatim). With it: carries 61 (§U4e), 62 (§U4r), 63-65 and C-U6-9 to C-U6-11 as it words them; the readings
    (a)-(f) and the orphan reading into u4j-build.md; PR #40's report names FU-1 to FU-5 and FU-7.
-2. The U4e brief's check is running (workflow 2; its revision follows in the same run if the check finds a Medium or
-   more); after U4j's merge adds carry 61 to §U4e, re-copy §U4e into the brief's 3.1 by script (the advisor's
-   condition); then the advisor's check of the U4e brief (U4E-Q12, Q13); `<base>`; U4e's build.
+2. The U4e brief: **check and revision done (about 18:35 UTC; read in full).** The check said FAIL with 3 High (F1: the
+   main session's fold reached 3.1 and 3.2 only, not e12, 2.6, the return list or carry 51's route; F2: the bite
+   proofs as worded clash with a green check.mjs, so wave 1's two-part form is stated; F3: the owner-to-all proof was a
+   group check that cannot fail on the open route, so carry 53's per-record test is the proof), 5 Medium (F4 carry
+   22's accepting edges; F5 e7's exercise counts; F6 the three room-side checks' rules and clean negatives; F7 e5a's
+   gap alignment; F8 routes for carries 54 and 56) and 5 Low. The revision made rev 3.1 (893 lines): all 13 fixed,
+   none rejected; a new question U4E-Q14 (does a 1 s gap still evict B on Loopback; recommended (b)). Next: after
+   U4j's merge adds carry 61 to §U4e, re-copy §U4e into the brief's 3.1 by script (the advisor's condition); then the
+   advisor's check of the brief (U4E-Q12, Q13, Q14 and the High fixes); `<base>`; U4e's build.
 3. Then U4d-F (workflow 3) as above; then U4d2's builder brief (carrying carry 52, N2-M2's ruling, W1-TARGET), with
    the advisor.
 4. U4r's brief: the night's rev 2 at `cs/npt-u4r-brief` ed973c9 goes to the advisor after U4c, U4d2, U4e and U4j merge.

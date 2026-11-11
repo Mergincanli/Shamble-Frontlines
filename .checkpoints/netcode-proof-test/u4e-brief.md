@@ -1,14 +1,41 @@
-# U4e builder brief: the room and the codec path (rev 3)
+# U4e builder brief: the room and the codec path (rev 3.1)
 
 **The main session's fold before the check (2026-11-11 about 17:50 UTC):** 3.1 re-copied by script from u4s-carries.md
 §U4e as it stands (carry 51's corrected span and the new carries 53-57, advisor-u4d-close.md B2); 3.2 rewritten to
 record the rulings (B1.2, B1.3, B2); 7.2 item 3 marked done. Everything else is rev 3 as drafted.
 
+**Changes in rev 3.1** (test-engineer's check of rev 3, u4e-brief-r3-check.md: findings F1-F8 and its Lows; each
+finding's line, done or not, in netcode-architect's notes, u4e-brief-r3-notes.md, "Revision for the check"):
+- D1. F1: the fold carried into the body. Carry 53 states the own-section rule (2.1); e12 gains tests for carries 53,
+  54 and 57, carry 56's measurement and carry 55's "met by adding no row"; the count is fifteen (3.1); the return
+  list names 53-57 (section 6). Carry 51's home follows advisor-u4d-close.md B2 (2.7, 3.1's notes, R31, 7.2 item 2,
+  section 6 item 8): the main session adds `Scene::effect_rows()` when U4e's build starts; "launch as is" is gone.
+  C17 and C29 are marked superseded.
+- D2. F2: every bite proof takes wave 1's two parts, a bites-only twin that passes and an in-place scratch switch that
+  shows the clean test failing by name, so check.mjs stays green in both builds (2.6, 2.5, e5b, section 4, section 6
+  item 4).
+- D3. F3: the owner-to-all bite's proof is carry 53's per-record test (2.6).
+- D4. F4: e12's carry-22 test gains the accepting edges.
+- D5. F5: e7 asserts that the parts the mirror models ran (splits, priority skips, events carried and resent, a
+  baseline other than the defaults).
+- D6. F6: the three room-side checks -58's counters pass through get their clean rules and clean negative tests (2.1,
+  e9).
+- D7. F7: the 1 s gap's start is stated against the tick, and both alignments are run and reported (e5a, e5b, 2.5).
+  One wording differs from the check's fix: neither alignment is named the worse in advance (the notes give the
+  arithmetic). New open question U4E-Q14 (section 8).
+- D8. F8: routes for carry 54's series row and carry 56's ES half (3.1's notes; 3.2).
+- D9. The check's Lows, each a one-line text fix: stale cites and the plan's stamp (C1, C16, section 0, 1.4, 3.1); the
+  build rules' provenance line, the ordinary build's touch and npt-server's bites feature (section 4 rules 2 and 3;
+  2.4); test wording in e6, e9, e10, e11 and e12 (carries 21 and 50); the token compare shown by review (2.1);
+  client-rounding's share (2.6); a `Pong` with an id not outstanding under "Plan silent" (2.4); Q13 (a)'s pin
+  (section 8).
+
 **Changes in rev 3** (rev 2 is the night draft at 0dccbf0, `.checkpoints/npt-u4e-brief/u4e-brief-draft.md`, written
 before wave 1 merged). Each change names its source: a W1-U4E answer by Q number (advisor-u4-wave1.md:437-497), a
 carry by number (u4s-carries.md), a recheck row by R number (section 7), a plan line (u4-build-plan.md as it stands).
 - C1. Every citation re-read and re-pointed at the branch head (section 0). The W1 text batch moved every plan line;
-  rev 2's df8975b cites are gone. Source: the plan file (1,070 lines, sha256 a81b230f…), the merged code.
+  rev 2's df8975b cites are gone. Source: the plan file (1,070 lines; sha256 7375cdcf… since d7a54cd's line-neutral
+  edits, which rev 3 stamped as a81b230f…), the merged code.
 - C2. U4E-Q1 (a) applied: U4e plants and unit-shows -58/lt-cmd-seq and -58/lt-press (2.1, 2.6); the plan's Bites line
   now lists them (plan :729-731). Off the open list.
 - C3. U4E-Q2 (c), widened, applied: U4e builds the client's rebuild of the header's 16-bit last-run sequence and shows
@@ -37,10 +64,12 @@ carry by number (u4s-carries.md), a recheck row by R number (section 7), a plan 
   build (section 4; advisor-u4-wave1.md:558-586).
 - C15. W1-PUB's two U4e nits: one path for U4b's items in server/src/lib.rs (2.2; advisor-u4-wave1.md:385-386); the
   room's report names its route to the static graph (2.1; :410-411).
-- C16. The carries re-quoted from u4s-carries.md §U4e as it stands (:145-189): 24 reworded; 50 and 51 new; checked by
-  script (section 3). 49 is not in §U4e (it sits in §U4r, :200-203); 40 is U4r's and is cited where U4e feeds it.
+- C16. The carries re-quoted from u4s-carries.md §U4e as it stands (now :147-228): 24 reworded; 50 and 51 new; checked
+  by script (section 3). 49 is not in §U4e (it sits in §U4r, now :240-243); 40 is U4r's and is cited where U4e feeds
+  it.
 - C17. U4d's round-2 U4e carries the advisor has not ruled on (netcode N2-L1, N2-L3 (c); security's "Carries for U4e";
   netcode N2-M2's U4e option) added as "pending the advisor's ruling (advisor-u4d-close.md)" (section 3.2).
+  (Superseded by the fold, lines 3-5.)
 - C18. The recheck table walked at the head: 8 of rev 2's 28 rows changed (R4, R6, R11, R15, R19, R20, R27, R28); 10
   rows added (R29-R38) for merged code the brief relies on (section 7.1).
 - C19. Base counts filled: measured 365, bites 412, self 52 of 52; check.mjs 10 steps (section 4 rule 5; R25, R38;
@@ -63,6 +92,7 @@ carry by number (u4s-carries.md), a recheck row by R number (section 7), a plan 
 - C28. e10 notes that 32,000 / 30 is not a whole number of bytes, so the window's pin sums one second (2.4; advisor
   :447's "32,000 B a second at both rates").
 - C29. e12 gains carry 50's and carry 51's tests; the return list covers carries 21-27, 39, 50 and 51 (2.4, section 6).
+  (Superseded by the fold, lines 3-5, and by D1.)
 - C30. Two new open questions where no ruling gives the answer: U4E-Q12 (-22/unbounded's planting unit) and U4E-Q13
   (the owner-to-all bite's id) (section 8; R27).
 - C31. Start aligned with wave 1's briefs: fast-forward to `<base>` in the worktree (1.1; u4j-brief.md:16-17).
@@ -70,21 +100,21 @@ carry by number (u4s-carries.md), a recheck row by R number (section 7), a plan 
 ---
 
 Drafted by netcode-architect on the night shift of 2026-11-10 (rev 1, ea2dd8a), checked by test-engineer and revised
-(rev 2, 0dccbf0); brought up to date by netcode-architect on 2026-11-11 after wave 1 merged (rev 3, this file). Next:
-test-engineer checks rev 3, one revision, then the advisor checks the brief before the build (advisor-u4.md:157; Q21
-at :220).
+(rev 2, 0dccbf0); brought up to date by netcode-architect on 2026-11-11 after wave 1 merged (rev 3); checked by
+test-engineer (u4e-brief-r3-check.md) and revised once for that check (rev 3.1, this file). Next: the advisor checks
+the brief before the build (advisor-u4.md:157; Q21 at :220).
 
 ## 0. How to read the citations
 - Every file:line is at the spike branch's head when rev 3 was written, 56214fa, whose spikes/ and docs/ are identical
-  to 39f4290 (U4d's merge; `git diff --stat 39f4290 56214fa -- spikes/ docs/` is empty). Wave 1 merged at 952f734
-  (U4a), 411eeee (U4b), f3f7c2f (U4c) and 39f4290 (U4d). U4j is in its fix pass and has not merged: this brief relies on
-  nothing of U4j's.
-- `plan` is .checkpoints/netcode-proof-test/u4-build-plan.md (sha256 a81b230f…, 1,070 lines); `carries` is
-  u4s-carries.md; `advisor` is advisor-u4.md; `wave1` is advisor-u4-wave1.md; `plan.md` is plan.md (all in that folder);
-  `catalogue` is docs/design/netcode-proof-messages.md; a crate path (`room/src/lib.rs`, `seam.rs`) is under
-  spikes/netcode-proof/crates/ (`seam.rs`, `grid.rs`, `ticks.rs`, `history.rs`, `world.rs`, `scene.rs`, `greybox.rs` are
-  sim/src/; `quant.rs`, `snapshot.rs`, `wrap.rs`, `hash.rs`, `msg.rs`, `input.rs`, `error.rs`, `limits.rs` are
-  proto/src/); `check.mjs` is spikes/netcode-proof/check.mjs.
+  to 39f4290 (U4d's merge; `git diff --stat 39f4290 56214fa -- spikes/ docs/` is empty). Rev 3.1's new cites are at
+  a28c962, whose spikes/ and docs/ are also identical to 39f4290. Wave 1 merged at 952f734 (U4a), 411eeee (U4b),
+  f3f7c2f (U4c) and 39f4290 (U4d). U4j is in its fix pass and has not merged: this brief relies on nothing of U4j's.
+- `plan` is .checkpoints/netcode-proof-test/u4-build-plan.md (sha256 7375cdcf…, 1,070 lines); `carries` is
+  u4s-carries.md; `advisor` is advisor-u4.md; `wave1` is advisor-u4-wave1.md; `close` is advisor-u4d-close.md;
+  `plan.md` is plan.md (all in that folder); `catalogue` is docs/design/netcode-proof-messages.md; a crate path
+  (`room/src/lib.rs`, `seam.rs`) is under spikes/netcode-proof/crates/ (`seam.rs`, `grid.rs`, `ticks.rs`,
+  `history.rs`, `world.rs`, `scene.rs`, `greybox.rs` are sim/src/; `quant.rs`, `snapshot.rs`, `wrap.rs`, `hash.rs`,
+  `msg.rs`, `input.rs`, `error.rs`, `limits.rs` are proto/src/); `check.mjs` is spikes/netcode-proof/check.mjs.
 
 ---
 
@@ -106,19 +136,22 @@ at :220).
      (:266-289), §4.5 (:291-303), §4.6 (:305-327), §4.7 (:329-335), §4.9 (:342-357, the integer half only), §4.11
      (:391-406), §4.14 (:452-475); Lanes (:836-871); §6 (:873-889); §7 (:891-914);
    - plan.md §4.7 (:568-612): each crate's whole public surface (npt-room :596-598, npt-server :599-600, npt-client
-     :609); plan.md:454 (everything else `pub(crate)`); the endpoint's calls (plan.md:485-489);
+     :609); plan.md:454 (everything else `pub(crate)`); the endpoint's calls (plan.md:485-489); plan.md:514 (the
+     room's checks);
    - advisor: the U4 verdict's conditions 6 (:125-129), 10 (:143-149) and 12 (:154-158) and nit (d) (:164-165);
      "Rulings (U4s)" (:349-375); "Ruling: F1 and F2" (:401-479), whose F2 part binds U4e (:436-465);
    - wave1: W1-S1 (:45-111), W1-N2 (:305-351), W1-PUB (:353-435, the U4b and U4d parts), W1-U4E (:437-497),
      W1-TARGET (:558-586); its W1-U4D (:113-303) only for the refusal records (:197-235);
-   - carries §U4e (:145-189), quoted in section 3; carry 40 (§U4r, :192-199), which U4e's `rewind_at` counter feeds;
+   - close: B2 (:229-308, the U4e carries and carry 51's route) and its U4d-F part for U4e (:120-121);
+   - carries §U4e (:147-228), quoted in section 3; carry 40 (§U4r, :231-239), which U4e's `rewind_at` counter feeds;
    - catalogue §1 (:52-78), the wire rows (:85-101), §3 Field groups (:125-157), §6 at U4 (:240-255);
    - .claude/rules/netcode.md: binding on all proto, room, client and server code (plan §7.1 item 8, :903-904);
    - the code as merged at `<base>`: sim/src/seam.rs, grid.rs, ticks.rs, history.rs, lib.rs, and World's and Scene's
-     public items; proto (U4a's, with W1-S1's half); server/src/lib.rs and schedule.rs (U4b's); link/src/lib.rs
-     (`Link`, `Loopback`); room, server and client as they stand (room/src/lib.rs:1-5 and server/src/lib.rs:1-14;
-     client/src/lib.rs:8-22 holds `BITES` and `grid_with_bite`); check.mjs's deps step (:1563-1591), whose tick,
-     float, bite-home and npt-link checks are :592-648, :668-682, :734-758 and :821-837.
+     public items, `Scene::effect_rows()` among them once the main session adds it (carry 51; 2.7); proto (U4a's, with
+     W1-S1's half); server/src/lib.rs and schedule.rs (U4b's); link/src/lib.rs (`Link`, `Loopback`); room, server and
+     client as they stand (room/src/lib.rs:1-5 and server/src/lib.rs:1-14; client/src/lib.rs:8-22 holds `BITES` and
+     `grid_with_bite`); check.mjs's deps step (:1563-1591), whose tick, float, bite-home and npt-link checks are
+     :592-648, :668-682, :734-758 and :821-837, and its test step (`testBothBuilds`, :1493-1501).
 
 ---
 
@@ -145,8 +178,9 @@ Each item from plan :705-710, built to the section named.
   the five running counters (seam.rs:532-541) (§4.2 :211-213, :238-248). Bites per instance through `Room::with_bite`
   or a config value passed in, never a static (§4.11 :398-400).
 - **`Roster`, the slot token compare, `ClientSlot`** (:705): tokens passed in by the caller (the lab at U4r; minting
-  is U6's); the compare in constant time (catalogue :93); `bind` bound at the slot's first accepted `Join` (catalogue
-  :93, :112-115); no join beyond the roster's N; the five JoinRejected reasons (msg.rs:112-118; catalogue :95).
+  is U6's); the compare in constant time (catalogue :93), shown by review (its file:line in your report), not by a
+  timing test; `bind` bound at the slot's first accepted `Join` (catalogue :93, :112-115); no join beyond the roster's
+  N; the five JoinRejected reasons (msg.rs:112-118; catalogue :95).
 - **`AckRing`** (§4.5 :292-297): ages 0 to 31 kept, 32 evicted, at 30 Hz; its length is `npt_sim::ACK_RING_TICKS` by
   path (ticks.rs:70); baseline B is the newest sent snapshot whose every group the client acknowledged (the `Input`'s
   `ack_tick`, its tick's low 16 bits, and `ack_groups`: input.rs:41-45, the tick rebuilt through `Wrap::widen16`); a
@@ -161,7 +195,9 @@ Each item from plan :705-710, built to the section named.
   `Quant` passed in (quant.rs:57-61; U4E-Q4), never a second mapping. Each burst yields `burst_eviction` (§4.5
   :298-299). U4e exposes `burst_eviction`, `snap_incomplete` and the client hash as counters and per-tick values, and
   U4r's per-process logs write them (§4.12 :409-410; U4r :739; npt-log's `hs` is U4j's: :645) (U4E-Q7, confirmed:
-  wave1 :480-481).
+  wave1 :480-481). An `Err(OutOfRange)` from the encoder is carry 54's: no panic, `unwrap` or `expect`; that client's
+  snapshot for that tick is skipped (and, never sent, never a baseline) and counted per client; the next tick encodes
+  afresh.
 - **The own-state section (the advisor's W1-S1, wave1 :109: "U4e's brief (rev 3) states the kind and that the room
   sends it only in its owner's own-state section").** The owner-only kind is `EntityKind::OwnState` (seam.rs:199-204):
   a soldier's velocity, ammunition, fire timer, reload left, move speed and fire interval (`OWN_STATE`,
@@ -169,7 +205,9 @@ Each item from plan :705-710, built to the section named.
   with that owner's `Soldier` record and its effect rows (catalogue :136; `Snapshot::GROUPS`' own-state row,
   snapshot.rs:491-499). The codec refuses an `OwnState` or `Effect` record in the entity section
   (snapshot.rs:14-19, :175-180), but it cannot tell slots apart: which slot's records go into client c's own section
-  is the room's choice alone (section 3.2, pending). Effect rows' owner: carry 51 (R31).
+  is the room's choice alone. Carry 53 rules it: the room's encoder fills client c's own-state section with c's
+  slot's records only (index = c's slot, that soldier's generation); its Effect rows by carry 51's mapping, read from
+  `Scene::effect_rows()` (R31; 2.7). Its test: e12.
 - **The window's rate (the F2 ruling, advisor :442-449):** the window's per-tick budget takes the tick rate as an
   argument; production callers pass `npt_sim::TICK_HZ` by path; a test pins it at 30 and 60 Hz (32,000 B a second at
   both); no const or static outside npt-sim is derived from TICK_HZ.
@@ -177,12 +215,13 @@ Each item from plan :705-710, built to the section named.
   cap as data, with a provisional value from net F121's arithmetic, recorded as provisional (1,024 is F121's example,
   above the about 400 a B1 burst adds). U4f measures the rate and records §4.7's value before -22's runs." Its two
   conditions bind U4r and the judged runs (wave1 :476-479), so the room exposes what they read: per client, the
-  relevant gameplay events it queued and the queue's high-water mark (condition 1), and every overflow resync as a
-  counted event (condition 2). An overflow forces one resync; a FullState not acknowledged within
-  `npt_sim::FULL_STATE_ACK_TICKS` (ticks.rs:56), or a second overflow inside it, sends `Kick::Overflow` (msg.rs:165)
-  and drops the client; event numbers are 16-bit on the wire (snapshot.rs:29-30), rebuilt to 32 bits by `Wrap`; each
-  `SimEvent` stamped with its tick and 32-bit number when queued (carry 23; the events at seam.rs:452-481 carry
-  neither); no event queued past age 255 (carry 50; the age is 8 bits: snapshot.rs:29-30, :388-390).
+  relevant gameplay events it queued and the queue's high-water mark (condition 1), and every overflow resync,
+  counted per client with its tick (condition 2; carry 57); the cap's value is exposed with its provisional mark, for
+  the run's header (carry 57; U4r's header writes it). An overflow forces one resync; a FullState not acknowledged
+  within `npt_sim::FULL_STATE_ACK_TICKS` (ticks.rs:56), or a second overflow inside it, sends `Kick::Overflow`
+  (msg.rs:165) and drops the client; event numbers are 16-bit on the wire (snapshot.rs:29-30), rebuilt to 32 bits by
+  `Wrap`; each `SimEvent` stamped with its tick and 32-bit number when queued (carry 23; the events at seam.rs:452-481
+  carry neither); no event queued past age 255 (carry 50; the age is 8 bits: snapshot.rs:29-30, :388-390).
 - **`InterestGrid`** (integer cm), **`AreaFlood`** (re-floods from `portal_states` when they change: §4.2 :215-216),
   **`Priority`** (catalogue :129-130: own state always, the nearest 8 enemies in every snapshot, every relevant entity
   at least every 4 snapshots). Float-free (§4.11 :396-397). The static graph: `World::greybox()` (world.rs:967) or
@@ -202,9 +241,15 @@ Each item from plan :705-710, built to the section named.
 - **The room-side checks -58's counters pass through** (:709): the sequence-forward compare, the press-edge compare
   and the ack rebuild (§4.14 :467, :468, :471), each through npt-proto's `Wrap` (§4.4 :284-285). `Wrap` takes each
   counter's name as a string and holds no list of names; the counters and their injectable start values are U4e's
-  (wrap.rs:1-13, :43-77; R4). Each counter's wrap (its tick and the counter's name) is exposed for -58's
-  `event.counter_wrap.tick_count` (marks/SERIES.md:150), which U4r's logs write. Their bites: lt-ack, and lt-cmd-seq and
-  lt-press by U4E-Q1 (a) (wave1 :441-442: "post-wrap commands refused, and an edge lost") (2.6).
+  (wrap.rs:1-13, :43-77; R4). Their rules (plan.md:514; catalogue :87): a command whose sequence is not after the
+  newest accepted one (`Wrap::after16`) is not run again; at most one press edge per button for each tick a command
+  covers, the counter compared by `Wrap::after8`; an acknowledgement whose rebuilt tick names no snapshot sent to that
+  client refuses that datagram's commands (§4.14 :471). U4e builds each with a clean negative unit test (a repeated
+  command not run twice; two press edges for one button inside one covered tick refused; an ack naming a never-sent
+  tick refusing its datagram's commands), and each counter accepted across its wrap in the clean build (e9); U4f adds
+  their -21 counters (U4E-Q11). Each counter's wrap (its tick and the counter's name) is exposed for -58's
+  `event.counter_wrap.tick_count` (marks/SERIES.md:150), which U4r's logs write. Their bites: lt-ack, and lt-cmd-seq
+  and lt-press by U4E-Q1 (a) (wave1 :441-442: "post-wrap commands refused, and an edge lost") (2.6).
 - **Resync, one in flight** (:709): a second `Resync` before the FullState's ack dropped and counted (catalogue :90).
 - **The hash-map type bans** (:710: "room's and client's clippy.toml gain the hash-map type bans (§4.11; U4E-Q8)"):
   crates/room/clippy.toml (beside its clock ban, clippy.toml:1-9) and crates/client/clippy.toml (2.3) gain the
@@ -304,74 +349,133 @@ From plan :714-715; §4.6 :312-321.
   - e5a: on the injected clock it records the gap's start and end, B's tick and B's age at the first tick after the
     gap, and asserts that age ≥ 32 (`npt_sim::ACK_RING_TICKS`; §4.3 :255; §4.5 :295-297) before it asserts
     `burst_eviction` = 1. The ring holds 32 ticks = 1.067 s at 30 Hz, so a 1 s gap (30 ticks) evicts B only with B's
-    age at the gap's start counted in; if a 1 s gap leaves B at age 31 or less, report it (§4.14 :460's "a 1 s gap
-    evicts B" then does not hold on Loopback) and do not lengthen the gap on your own. e5a passes in both builds
-    (`burst_eviction` says whether B left the ring, which the bite does not change: §4.5 :298-299).
-  - e5b, under e5a's precondition (B's age ≥ 32 at the first tick after the gap): the first snapshot after the gap is
-    coded against the per-type defaults (`baseline_age` 0: §4.5 :295-297; snapshot.rs:446-448). It passes in the clean
-    build and fails by name under no-fallback.
+    age at the gap's start counted in. **The gap's alignment** (Loopback neither delays nor loses: link/src/lib.rs:128-131,
+    so B's age at the gap's start is 1 or 2 ticks): the test states the gap's start against the tick and runs at two
+    alignments, (1) just after the server's send of tick T (T delivered, the client's ack of T the first datagram
+    lost) and (2) just before that send (T the first datagram lost), and states when the client's inputs go out
+    against the server's ticks. It reports B's tick and age at the first tick after the gap for both; the
+    precondition holds only if both give at least 32. If either leaves B at age 31 or less, report both (§4.14 :460's
+    "a 1 s gap evicts B" then does not hold on Loopback), and do not lengthen the gap or choose the alignment on your
+    own (U4E-Q14). e5a passes in both builds (`burst_eviction` says whether B left the ring, which the bite does not
+    change: §4.5 :298-299).
+  - e5b, under e5a's precondition (B's age ≥ 32 at the first tick after the gap, at both alignments): the first
+    snapshot after the gap is coded against the per-type defaults (`baseline_age` 0: §4.5 :295-297;
+    snapshot.rs:446-448). It passes in both builds; its bites-only twin asserts the defect on the bitten room (2.6's
+    part (i)); part (ii) shows e5b failing by name under no-fallback.
 - e6 the window counting the pump's bytes (:718-719; §4.5 :300-302): with the pump reporting k pings and pongs since
-  the last tick, the encoder's budget for that tick equals the per-tick budget minus the sum of (payload + 28 B) over
-  those k; the snapshot sent that tick stays within that remainder.
+  the last tick (k small enough that the remainder still holds the tick's own-state group; the plan is silent on a
+  smaller remainder), the encoder's budget for that tick equals the per-tick budget minus the sum of (payload + 28 B)
+  over those k; the snapshot sent that tick stays within that remainder.
 - e7 the mirror equal to the client's hash over Loopback at P0 for 1,000 ticks (:719): 1,000 compared ticks, every
-  pair equal, none the sentinel 0. The scene is not named by the plan: say which you used and why (R18).
+  pair equal, none the sentinel 0. The scene is not named by the plan: say which you used and why (R18). The test also
+  asserts, and your report states the counts, that over the 1,000 compared ticks at least one tick was sent as 2 or
+  more groups, at least one entity was skipped by the priority accumulator and hashed at B's value, at least one
+  gameplay event was carried and at least one resent, and at least one snapshot had `baseline_age` > 0 (the parts
+  §4.6 :309-311 makes the mirror model); all 48 clients are compared if SS is the scene.
 - e8 the Send asserts: compile-time asserts that `Room<World>`, `Decoder` and `ClientEndpoint` are `Send` (:719;
   §4.11 :401-402).
 - e9 the negative cases (T17, A15; :719-724), each its own named test (the five JoinRejected reasons may be one table
   test that names the failing reason): each JoinRejected reason (bad token, bind mismatch, roster full, wrong version,
   wrong content hash); a datagram before Join dropped and counted; a control message before Join closing the session
-  as malformed, counted, never INVALID; the Input bucket (8, refilled at 60 a second) and the Ping limit (10 a second)
-  on a fake clock; the 2 s Join deadline on a fake clock; a second Resync before the FullState's ack dropped and
-  counted; npt-client dropping and counting a message on the wrong channel.
+  as malformed, counted under its reason, never INVALID (the run verdict INVALID is the judge's, U4r's: the test
+  asserts the reason's count and that the roster admitted no session); the Input bucket (8, refilled at 60 a second)
+  and the Ping limit (10 a second) on a fake clock, each tested either side of a refill instant, never on it
+  (10^9 / 60 ns is not a whole number); the 2 s Join deadline on a fake clock; a second Resync before the FullState's
+  ack dropped and counted; npt-client dropping and counting a message on the wrong channel; the three room-side checks'
+  clean negatives (2.1: a repeated command not run twice; two press edges for one button inside one covered tick
+  refused; an ack naming a never-sent tick refusing its datagram's commands; each counter accepted across its wrap).
 - e10 the F2 pins: the Input bucket's refill at 30 and 60 Hz (60 and 120 a second); the window at 30 and 60 Hz
   (32,000 B a second at both: advisor :446-447; 32,000 / 30 is not a whole number of bytes, so the pin sums one
-  second's per-tick budgets at each rate); the Pong hold time's limit at 30 and 60 Hz (one tick period: 2.2).
-- e11 one bite instance and one clean instance on parallel threads in one process (§4.11 :398-400).
+  second's per-tick budgets at each rate, asserts the sum, and your report states it: 32,000 B if the per-tick
+  remainders carry, else the shortfall at each rate); the Pong hold time's limit at 30 and 60 Hz (one tick period:
+  2.2).
+- e11 one bite instance and one clean instance on parallel threads in one process (§4.11 :398-400): the bitten one
+  shows its defect and the clean one none, the clean one's result equal to the same run alone.
 - e12 a test per carry that names a behaviour:
-  - carry 21: commands received in two orders give one `TickInput`;
+  - carry 21: commands received in two orders give one `TickInput`, two of one slot whose ticks straddle the 32-bit
+    tick wrap among them (seam.rs:116-121);
   - carry 22: with N the newest tick pushed into the ring, a command whose view time gives `tick_a` = N and
     `fraction > 0`: `rewind_at` returns no `Rewind` naming N + 1; by U4E-Q5 it gives that command no Rewind and the
-    room's count of such commands rises by one;
+    room's count of such commands rises by one; and the accepting edges, each with the count unchanged: `tick_a` = N
+    with `fraction` 0 gives `Rewind { tick_a: N, fraction: 0, .. }`; `tick_a` = N - 1 with `fraction` > 0 gives a
+    Rewind; `tick_a` = the oldest tick the ring holds gives a Rewind; `tick_a` one below it gives none and the count
+    rises by one; for an accepted command, the Rewind's `tick_a` and `fraction` equal the command's `view_tick` and
+    `view_fraction` (seam.rs:39-43), its `cover` the room's setting;
   - carry 23: each queued event carries the `TickInput::tick` it ran and consecutive 32-bit numbers, across a 16-bit
     wrap, the counter started near the wrap by its injectable start value;
   - carry 27: the const assert;
   - carry 50: no event is queued past age 255 (the overflow resync ends it first, or it is dropped from the resend and
-    counted);
-  - carry 51: slot k's client receives exactly slot k's effect rows (with the public home R31 names).
-- Plan silent (not added): `Join` on a slot with a live session replacing it (`Kick(replaced)`, catalogue :93) has no
-  U4e test in the plan; say in your report whether it is built and tested.
+    counted); the edge: an event at age 255 is still sent, none at 256;
+  - carry 51: slot k's client receives exactly slot k's effect rows (the mapping read from `Scene::effect_rows()`:
+    R31);
+  - carry 53: for every client of an SS room (48 clients) on each of at least 300 ticks, in every `Snapshot` and
+    `FullState` sent to it, every own-section `Soldier` and `OwnState` record has index = the client's slot and that
+    soldier's generation, and its Effect rows are exactly the rows whose owner is that slot (`Scene::effect_rows()`);
+    the compared ticks include a generation change, and the test asserts that at least one happened, failing if none
+    (a generation changes only when a dead soldier respawns: world.rs:1100-1101, :1712-1723; SS's kills come at 0.272
+    a second: close :221-223); the window may run past 300 ticks to hold one, and your report gives its length and
+    seed;
+  - carry 54: one out-of-range record planted for one client on one tick (for example slot k's `OwnState` field
+    outside its range, through a test `SimCore` that wraps `World` and alters that record; only client k's own
+    section carries it): client k's snapshot for that tick skipped and its count up by one, no panic, every other
+    client's snapshot for that tick byte-equal to the same run without the plant, and client k's next tick encoded
+    afresh;
+  - carry 55: met by adding no Team or Public row (say so);
+  - carry 56: a measurement, not a pass/fail test: 48 clients, the own-state section's bytes per snapshot on the wire
+    (mean, p99 and max per client), the `OwnState` record's share of it and how often it changes, over a stated tick
+    count and seed, in SS, and in ES as 3.1's note on carry 56 says;
+  - carry 57: a never-acking client overflows its queue: one resync, counted for that client with its tick; then, as
+    two tests, a second overflow before the FullState's ack, and no ack within `npt_sim::FULL_STATE_ACK_TICKS`, each
+    sends `Kick::Overflow` and drops the client (both edges); the cap is read from the room's data, its provisional
+    mark exposed.
+- Plan silent (not added): `Join` on a slot with a live session replacing it (`Kick(replaced)`, catalogue :93), and a
+  `Pong` naming a ping id that is not outstanding (dropped and counted: catalogue :92), have no U4e test in the plan;
+  say in your report whether each is built and tested.
 - Where U4e's tests live (advisor condition 10 (b), :145-146; Lanes :861-863): in its own crates, never in crates/lab;
   the Loopback tests in npt-server's tests, through its npt-link and its dev dependency on npt-client
-  (server/Cargo.toml:32-35).
+  (server/Cargo.toml:32-35). npt-server's `bites` feature turns on npt-sim's, npt-proto's and npt-room's, not
+  npt-client's (server/Cargo.toml:22), so an npt-server test that needs a client bite builds only under `--workspace
+  --all-features` (check.mjs:1496), never `-p npt-server --features bites`; no manifest change (section 4).
 
 ### 2.5 -18's bite end to end (plan :725-728; the advisor's condition 6, advisor :125-129)
 §4.14's unit proof (e5) is the server half only. U4e's proof runs from the encoder to the client, through a 1 s gap in
 delivery: under no-fallback the client refuses every delta after the gap, so no fresh delta decodes within 500 ms of
-the gap's end, on the injected clock; the clean build decodes one. If the bite's baseline turns out to be one the
-client still holds, the bite is not a defect on L1, and -18's L1 part comes to the advisor before it counts (report
-it; do not count it).
+the gap's end, on the injected clock; the clean build decodes one. Its proof takes 2.6's two parts: the end-to-end test
+passes in both builds; its bites-only twin asserts that no fresh delta decodes within 500 ms under the bitten room
+(part (i)); part (ii) shows the end-to-end test failing by name. If the bite's baseline turns out to be one the client
+still holds, the bite is not a defect on L1, and -18's L1 part comes to the advisor before it counts (report it; do
+not count it).
 - The gap: Loopback neither loses nor delays (link/src/lib.rs:128-131), and the plan leaves the mechanism open. A
   test-only `Link` wrapper in npt-server's tests that drops every datagram both ways for 1 s on the injected clock is
-  inside the lane; its length in ns, never a `*_TICKS` constant (carry 27). Say in the report what you built.
+  inside the lane; its length in ns, never a `*_TICKS` constant (carry 27). It runs at e5a's two alignments, and your
+  report gives the clean build's first fresh delta and the bite's none for both. Say in the report what you built.
 
 ### 2.6 Bites (unit-shown; plan :729-731; sites from §4.14 :458-474)
 Each planted where its code lives, chosen per instance (§4.11 :398-400), compiled into the bites build only (plan
-:510-511), shown to change state by a unit test that fails by name in the bites build (§7.1 item 3, :896-897), and
-passing in the clean build. Wave 1's form for a per-instance bite: proto/tests/bites.rs and client/tests/bites.rs:7-36
-(each bitten instance shown changing what its test and its mark look at).
+:510-511), and shown to change state (§7.1 item 3, :896-897) in wave 1's two parts, so that check.mjs's test step,
+which fails on any failing bites-build test (`testBothBuilds`, check.mjs:1493-1501), stays green in both builds:
+- (i) a bites-only test (`#[cfg(feature = "bites")]`) that builds the bitten instance and asserts that the clean
+  test's check fails on it, so it passes (proto/tests/bites.rs; client/tests/bites.rs:7-36), beside the clean test,
+  which passes in both builds;
+- (ii) per bite, one at a time under `flock -x`, a scratch switch in place that points the clean test at the bitten
+  instance, run by name in the bites build to show it failing by name (the output line), then the file restored and
+  its sha256 checked against the clean file (u4c-build.md:28-31; u4d-report.md:19).
+
+The table's last column is what the bitten instance shows: part (i) asserts it, part (ii) shows the clean test failing
+on it.
 
 | Bite (plan :729-731) | Site | Unit proof |
 |---|---|---|
-| PM-0001-18/no-fallback | the encoder's baseline choice, never falling back to the defaults (§4.14 :460) | e5b (the server half) and 2.5's end-to-end test both fail by name in the bites build; e5a passes in both builds (it shows the bite could bite: §4.5 :298-299) |
+| PM-0001-18/no-fallback | the encoder's baseline choice, never falling back to the defaults (§4.14 :460) | e5b (the server half) and 2.5's end-to-end test pass in both builds; their bites-only twins assert the defect on the bitten room (part (i)); part (ii) shows each failing by name; e5a passes in both builds (it shows the bite could bite: §4.5 :298-299) |
 | PM-0001-17/tick16 and PM-0001-58/tick16 | npt-proto's header writer: under the bite it writes the tick's low 16 bits (quant.rs:133-140; snapshot.rs:532); the ids stay in `npt_proto::BITES` (quant.rs:38-39; U4E-Q4 (a)); the room's encoder takes its `Quant` from `Quant::with_bite` for the instance, and so does the endpoint (carry 24) | over Loopback with the room's tick past 65,535: in the clean build the client logs the frame at 65,537 (the header's 32-bit tick, read whole: snapshot.rs:558) with a hash equal to the mirror's; under the bite it logs it under 1 or as the sentinel, so the server's pair at 65,537 has no equal client hash (§4.14 :458: "a frame at tick 65,537 hashes differently or is refused"; §4.6 :322-325's orphan pair) |
-| PM-0001-17/client-rounding, the client's call site | `ClientEndpoint`'s calls into `grid` through `grid_with_bite` (§4.14 :459; carry 24) | over a sweep of position values including half-cm ties and negatives, the client's grid integers equal the server's; the floor bite breaks about half (§4.14 :459) |
+| PM-0001-17/client-rounding, the client's call site | `ClientEndpoint`'s calls into `grid` through `grid_with_bite` (§4.14 :459; carry 24) | over a sweep of position values including half-cm ties and negatives, the client's grid integers equal the server's; the floor bite breaks a share your report states (§4.14 :459's "about half" is over U4s's sweep of arbitrary values, client/tests/bites.rs:24-35; values decoded from the wire may give another share) |
 | PM-0001-58/lt-ack | the room's rebuild of the 16-bit ack (§4.14 :471) | a post-wrap ack refused |
 | PM-0001-58/lt-cmd-seq | the room's sequence-forward compare (§4.14 :467; U4E-Q1 (a)) | post-wrap commands refused |
 | PM-0001-58/lt-press | the room's press-edge compare (§4.14 :468; U4E-Q1 (a)) | an edge lost |
 | PM-0001-58/lt-tick-offset | the client's rebuild of the header's 16-bit last-run sequence (a plain `<` in place of its wrap-aware compare: §4.14 :469; U4E-Q2 (c)) | the rebuilt sequence names the wrong command (U4g re-shows it as "the replay starts at the wrong command"; -58 is judged after U4g: plan :814-817) |
 | PM-0001-58/lt-event-seq | the client's event-number rebuild (§4.14 :470) | a post-wrap event rebuilt wrong |
 | PM-0001-62/server-echo | the room sending the owner its own cosmetic shot events (§4.14 :473; U4E-Q10 (a)) | one event sent |
-| owner-to-all (catalogue item 5's) | the encoder's class filter: one `owner` group sent to every client (catalogue :251-254) | a test that every group a client receives is one its class lets it see fails; the L1 audit is U4r's (plan :750). Its id: U4E-Q13. A code fact for the route: `encode` refuses an owner-only kind in the entity section (snapshot.rs:14-19), so a bite on that route shows the codec, not the filter; for the own-state group the route the codec leaves open is other slots' own-state records in each client's own section (security's carry, pending: 3.2) |
+| owner-to-all (catalogue item 5's) | the encoder's class filter: one `owner` group sent to every client (catalogue :251-254) | carry 53's test (every own-section record's kind, index and generation, and an Effect row's owner, equal to the receiving client's slot, for each of 48 clients) fails under the bite, which writes other slots' own-state records into every client's own-state section (carry 53's route); a group-level class check is not the proof (it passes under this bite); moving the records into the entity section ends in `Err(OutOfRange)` and proves the codec (snapshot.rs:14-19), so it does not count (carry 53). The L1 audit is U4r's (plan :750). Its id: U4E-Q13 |
 | PM-0001-21/no-trailing and PM-0001-21/no-channel, through the pump | npt-proto's decode (U4a's sites, quant.rs:40-41, chosen by `Quant::with_bite`, quant.rs:102-113; §4.4 :286-289) | with the bite, the pump's `TrailingBytes` or `WrongChannel` count stays 0, and the pump test fails |
 
 - Bite ids are `PM-<ADR>-<row>/<name>` (check.mjs:689); each id lives in one crate's sources, `crates/<crate>/src/`
@@ -388,9 +492,14 @@ passing in the clean build. Wave 1's form for a per-instance bite: proto/tests/b
   (seam.rs:22-564), `HitHistory` (history.rs), `grid` (grid.rs), the tick constants (ticks.rs), `World`, `Scene`,
   `Greybox`, as U4d merged them; nor any npt-proto item (U4a's, with W1-S1's half) or `Schedule`, `Due`, `due_ticks`
   and the rest of schedule.rs (U4b's). crates/sim, crates/proto and server/src/schedule.rs are not U4e's files.
-- A needed change stops that part: write it in your notes and report (the item, the change, why, the site), build the
-  rest, and leave the change to the main session, which takes it to the advisor (carry 26's route). The one known
-  case: carry 51's public home for an effect row's owner, missing at the head (R31; section 7.2).
+- A needed change stops that part: write it in your notes and report (the item, the change, why, the site) and build
+  the rest. It is a seam change for the advisor (carry 26's route): your report reaches the advisor through the main
+  session; you never work around it.
+- Carry 51's home is not such a stop: the main session adds `Scene::effect_rows()` (pub, the rows per soldier) and its
+  §4.1 line in its own commit when U4e's build starts (carry 51; close B2, :237-241), so `<base>` holds it and 7.2
+  item 1 applies. Check that `<base>` holds it (`pub fn effect_rows` in scene.rs) before you build the own-state
+  filter; if it does not, stop that part (the filter's Effect rows, carry 51's and 53's tests) and report it, never a
+  local copy of the 8. Any other home U4e finds it needs is a seam change for the advisor (carry 26's route).
 - A tick count or a named constant derived from the rate: no local form; the need goes in your report (carry 39 and
   its route, quoted in section 3).
 
@@ -400,7 +509,7 @@ passing in the clean build. Wave 1's form for a per-instance bite: proto/tests/b
   `InputBuffer::CMD_CATCHUP` and, bites builds only, `BITES` (:194; U4E-Q3); npt-server's U4e part of plan.md:599-600
   (`Counters`, `ConnLimits`, `Decoder`, with §4.1's `Decoder::pump`, :195), beside U4b's items; npt-client's
   `ClientEndpoint` and `StepOut` (plan.md:609) beside U4s's `BITES` and `grid_with_bite` (§4.1 :193). Everything else
-  `pub(crate)` (plan.md:454).
+  `pub(crate)` (plan.md:454). `Scene::effect_rows()` is the main session's (carry 51), not an item U4e adds.
 - Your report lists every pub item U4e adds (types, functions, methods, fields, constants), by crate, against §4.1 and
   plan.md §4.7; engine-architect checks them (check.mjs does not: plan :912-913).
 
@@ -409,9 +518,10 @@ passing in the clean build. Wave 1's form for a per-instance bite: proto/tests/b
 ## 3. The carries
 
 ### 3.1 Word for word
-Quoted from carries :145-189, the file's §U4e as it stands (the advisor's U4s ruling, condition 4: advisor :334-335).
-Checked by script: a Python read of both files compared this block line for line with carries :145-189, equal. Your
-report says of each, by number, "met" (with the file:line and the test that shows it) or "not met" (with why).
+Quoted from carries :147-228, the file's §U4e as it stands (the advisor's U4s ruling, condition 4: advisor :334-335).
+Checked: the fold re-copied this block by script, and rev 3.1 compared it with carries :147-228 by a `diff` of the two
+line ranges: equal. Your report says of each, by number, "met" (with the file:line and the test that shows it) or "not
+met" (with why).
 
 ```
 ## U4e (the room, the server I/O step and the client)
@@ -498,16 +608,26 @@ report says of each, by number, "met" (with the file:line and the test that show
     58)."
 ```
 
-Ten carries (21-27, 39, 50 and 51). Notes for the builder, which change no word:
+Fifteen carries (21-27, 39, 50, 51 and 53-57). Notes for the builder, which change no word:
 - carry 24: its tick16 part is met by the endpoint's and the encoder's `Quant` (2.6's tick16 row), its -45 and
   cues-from-replay parts are U4g's (U4E-Q10), so U4e reports carry 24 as met under these words (wave1 :466);
 - carry 25: a "why not" is reported, never assumed;
 - carry 26: section 5 item 4 says what to report;
 - carry 39: its "check.mjs:627" was the line at U4s; at the head the pass that lets an initializer naming `TICK_HZ`
   through is check.mjs:637-644;
-- carry 51: at the head no such home exists (R31), so it is raised at your start unless the main session has added it
-  before launch (7.2 item 2);
-- carry 40 (§U4r, carries :192-199) is U4r's; U4e feeds its last sentence with the `rewind_at` count (2.1).
+- carry 51: the main session adds `Scene::effect_rows()` in its own commit when U4e's build starts (close B2), so
+  `<base>` holds it (2.7; R31; 7.2 item 2); if it does not, that part stops (2.7), never a local copy of the 8;
+- carry 53: its test (e12) must hold a generation change and asserts that one happened: a generation changes only when
+  a dead soldier respawns (world.rs:1100-1101, :1712-1723), and SS's kills are rare (0.272 a second: close :221-223);
+- carry 54: U4e counts the refusal per client and exposes it under a proposed series name; your report names that
+  series and its proposed SERIES.md row for the main session (marks/ is U4j's lane, unmerged, and not U4e's: section
+  4; npt-room has no npt-log dependency, room/Cargo.toml:17-21; U4r's logs write it, as U4E-Q7's values: 2.1);
+- carry 56: if `<base>` lacks U4d-F (unmerged at rev 3.1: 4ad80a9 saved its partial edit as a patch), your report
+  gives SS and marks ES "after U4d-F", measured once U4d-F merges (3.2); the measurement states its ticks, seed and
+  client count;
+- carry 57: the room exposes each overflow resync per client with its tick, and U4r's logs write them (as U4E-Q7's
+  values: 2.1); the cap's provisional mark is exposed for the run's header;
+- carry 40 (§U4r, carries :231-239) is U4r's; U4e feeds its last sentence with the `rewind_at` count (2.1).
 
 ### 3.2 U4d's round-2 carries: ruled (advisor-u4d-close.md, 2026-11-11)
 The advisor ruled on the items rev 3 held here as pending, and the main session folded the rulings in by script before
@@ -518,7 +638,8 @@ it stands (B2). The security-auditor's fourth bullet (the merge-time items) is n
 - Carry 51's route is corrected: the main session adds `Scene::effect_rows()` in its own commit when U4e's build starts
 (carry 51 in 3.1; B2).
 - N2-M2 (ES's vehicles) is fixed in the scene by the main session's change U4d-F, before any ES pin (B1.3); U4e edits no
-crates/sim file for it. Any ES number in U4e's report comes from U4d-F's scene (B1.2).
+crates/sim file for it. Any ES number in U4e's report comes from U4d-F's scene (B1.2), so without U4d-F at `<base>`,
+the ES numbers wait for it (3.1's note on carry 56).
 
 ---
 
@@ -534,14 +655,16 @@ binding on every cargo, rustc and rustdoc call in your worktree, check.mjs's inc
    `/home/user/Shamble-Frontlines/.gate/shared-target/.lane.lock`: shared (`flock -s`) for an ordinary build, exclusive
    (`flock -x`) for a counted run (the touch, check.mjs, the `--list` and clippy confirmations) and for each bite run.
    With `T=/home/user/Shamble-Frontlines/.gate/shared-target` and `W=<your worktree>`, from `$W/spikes/netcode-proof`:
-   - an ordinary build: `flock -s $T/.lane.lock env CARGO_TARGET_DIR=$T CARGO_NET_OFFLINE=true cargo test --locked -p npt-room`
+   - an ordinary build, after rule 4's touch: `flock -s $T/.lane.lock sh -c 'find $W/spikes/netcode-proof/crates -type f -exec touch {} + && CARGO_TARGET_DIR=$T CARGO_NET_OFFLINE=true cargo test --locked -p npt-room'`
    - a counted run: `flock -x $T/.lane.lock sh -c 'find $W/spikes/netcode-proof/crates -type f -exec touch {} + && CARGO_TARGET_DIR=$T CARGO_NET_OFFLINE=true cargo test --locked --workspace --no-run && CARGO_TARGET_DIR=$T CARGO_NET_OFFLINE=true cargo test --locked --workspace --all-features --no-run && CARGO_TARGET_DIR=$T CARGO_NET_OFFLINE=true node check.mjs'`
      (with `T` and `W` written out in full).
-3. **Provenance** (W1-TARGET item 2, wave1 :574-575): a counted run's log shows "Compiling npt-room (<your
-   worktree>/spikes/netcode-proof/crates/room)", and the same for npt-server and npt-client, in each cargo invocation
-   that builds them. check.mjs prints a passing step's last line only (check.mjs:1646; a failing step's last 40 lines:
-   :1649), so the two `--no-run` builds inside the same exclusive lock carry those lines (wave 1's form:
-   u4j-build.md:110-111; u4d-report.md:68-70). A missing line means "not counted", whatever the count says.
+3. **Provenance** (W1-TARGET item 2, wave1 :574-575): a counted run's log shows cargo's "Compiling" line for npt-room
+   with your copy's path in its brackets (cargo prints "Compiling npt-room v0.0.0 (<your
+   worktree>/spikes/netcode-proof/crates/room)": match on the path, not the version), and the same for npt-server and
+   npt-client, in each cargo invocation that builds them. check.mjs prints a passing step's last line only
+   (check.mjs:1646; a failing step's last 40 lines: :1649), so the two `--no-run` builds inside the same exclusive lock
+   carry those lines (wave 1's form: u4j-build.md:110-111; u4d-report.md:68-70). A missing line means "not counted",
+   whatever the count says.
 4. Touch before each build: `find <copy>/spikes/netcode-proof/crates -type f -exec touch {} +` (item 2, :895).
 5. **Counts are deltas** (item 3, :896-897; plan :866-867), on check.mjs's own measure: its test step runs
    `cargo test --locked --workspace` and then the same with `--all-features` (check.mjs:1493-1501), and its count
@@ -549,9 +672,9 @@ binding on every cargo, rustc and rustdoc call in your worktree, check.mjs's inc
    counts at 39f4290:** measured 365, bites 412; self 52 of 52 (the main session's counted run, 12:05-12:10 UTC:
    u4d-report.md:68-70). If `<base>` differs from 39f4290 under spikes/, the main session gives `<base>`'s counts at
    launch (7.2 item 1). Each run's count matches the base plus the tests you added; a bite run shows its own test
-   failing by name; a mismatch means another copy's artifact ran: touch, rebuild, never report that run. `--list` only
-   names the new tests (the flag before `--`: `cargo test --locked --workspace --all-features -- --list`); it is not a
-   count (it lists ignored tests too and runs nothing).
+   failing by name (2.6's part (ii)); a mismatch means another copy's artifact ran: touch, rebuild, never report that
+   run. `--list` only names the new tests (the flag before `--`: `cargo test --locked --workspace --all-features --
+   --list`); it is not a count (it lists ignored tests too and runs nothing).
 6. **Disk** (W1-TARGET item 3, wave1 :576-580; u4j-brief.md:43): `df -h /home/user` before each build, the reading in
    your notes. At least 4 GB free before a run that builds for wasm32 or in release (check.mjs is one: its
    clippy-wasm32 and doc steps build for wasm32, check.mjs:1438-1439, :1472-1490), at least 2 GB before every other
@@ -571,10 +694,11 @@ binding on every cargo, rustc and rustdoc call in your worktree, check.mjs's inc
   crates/judge and marks/ (U4j's, unmerged), check.mjs (U4d2's in wave 2: :859-860), docs/.
 - Files are written with the Write and Edit tools only, never shell redirects, heredocs or `python3 -c` (wave 1's words:
   u4j-brief.md:46-47). U4e's bites are compiled into the bites build and chosen per instance (plan :510-511; §4.11
-  :398-400), so a bite run needs no planted copy. A scratch plant (a defect that is not a bite, to show that a test can
-  fail) is planted in place, one at a time, each file restored and its sha256 checked against the clean file
-  (u4j-brief.md:47-48; plan §7.2 :908-909), and run under `flock -x`. Run git only in your worktree, never `git -C` or
-  `git -c` (u4j-brief.md:46). Commit nothing and push nothing; the main session merges (plan §7.2 :906-909).
+  :398-400), so a bite needs no planted defect; its failure by name is shown by 2.6's part (ii) scratch switch. A
+  scratch switch or plant (part (ii), or a defect that is not a bite, to show that a test can fail) is made in place,
+  one at a time, each file restored and its sha256 checked against the clean file (u4j-brief.md:47-48; plan §7.2
+  :908-909), and run under `flock -x`. Run git only in your worktree, never `git -C` or `git -c` (u4j-brief.md:46).
+  Commit nothing and push nothing; the main session merges (plan §7.2 :906-909).
 - .claude/rules/netcode.md binds proto, room, client and server code (plan :903-904): validate every inbound message
   before use (:10), no unbounded buffer, map or queue keyed by client data (:14-15), send each client only what it may
   know (:16), no clock in shared code (:12-13).
@@ -596,8 +720,8 @@ before each):
 3. fmt: check.mjs's fmt step (`cargo fmt --all --check`, :1595).
 4. Carry 26: report whether the room copies `step`'s events anywhere other than into the EventQueue's stamped entries
    (carry 23) before it reads `hit_volumes`, `reports` or `entity_records` (file:line); if it does, carry 26's seam
-   change goes to the main session (2.7). Whether `Room<World>`, `Decoder` and `ClientEndpoint` are `Send` is e8's
-   compile (World is: sim/tests/world.rs:158-160; Loopback is not, so nothing `Send` may hold one: R36).
+   change goes to the advisor through your report (2.7). Whether `Room<World>`, `Decoder` and `ClientEndpoint` are
+   `Send` is e8's compile (World is: sim/tests/world.rs:158-160; Loopback is not, so nothing `Send` may hold one: R36).
 
 ---
 
@@ -606,25 +730,29 @@ before each):
 1. `<base>` and your final diff's file list (`git status --porcelain` and `git diff --stat <base>`), each file inside
    section 4's lane.
 2. Each Build item of 2.1-2.3: built (file:line) or not (why).
-3. The tests e1-e12 (e5 as e5a and e5b) and any you added: name, file, what each shows; the counts in both builds as
-   deltas from `<base>`'s, on section 4 rule 5's measure, with the `--list` lines that name the new tests.
-4. Each bite of 2.6: its id, its site (file:line), the test that fails by name in the bites build (the output line),
-   and that test passing in the clean build; the parallel-instances test (e11).
-5. -18 end to end (2.5): the clean build's first fresh delta after the gap (its time on the injected clock); the
-   bite's none within 500 ms of the gap's end, on the injected clock; B's age at the first tick after the gap (e5a);
-   whether the bite's baseline was one the client still held (if so: not counted, to the advisor).
-6. Carries 21-27, 39, 50 and 51, by number: met (file:line, test) or not met (why); and what you did against each
-   item of 3.2.
+3. The tests e1-e12 (e5 as e5a and e5b) and any you added: name, file, what each shows (e7's counts of splits, priority
+   skips, events carried and resent, and non-default baselines); the counts in both builds as deltas from `<base>`'s,
+   on section 4 rule 5's measure, with the `--list` lines that name the new tests.
+4. Each bite of 2.6: its id, its site (file:line), its part (i) test (name, passing in the bites build) and part (ii)'s
+   output line showing the clean test failing by name, with the restore's sha256; the parallel-instances test (e11).
+5. -18 end to end (2.5), at both of e5a's alignments: the clean build's first fresh delta after the gap (its time on
+   the injected clock); the bite's none within 500 ms of the gap's end, on the injected clock; B's tick and age at the
+   first tick after the gap (e5a); whether the bite's baseline was one the client still held (if so: not counted, to
+   the advisor).
+6. Carries 21-27, 39, 50, 51 and 53-57, by number: met (file:line, test) or not met (why); carry 56 as its measurement
+   (ticks, seed, client count; ES "after U4d-F" if `<base>` lacks it); and, for 3.2, which scene each ES number came
+   from.
 7. Every pub item U4e adds, by crate, against §4.1 and plan.md §4.7 (2.8); any beyond them named as such (the bites-only
    `npt_room::BITES` under U4E-Q3).
-8. What stopped and goes to the main session: seam changes (carry 26's route, carry 51's home included), tick counts or
-   rate-derived constants (carry 39's route: name, definition, values at 30 and 60 Hz, site), manifest needs.
+8. What stopped and goes to the main session: seam changes for the advisor (carry 26's route; carry 51's home only if
+   `<base>` lacked it), tick counts or rate-derived constants (carry 39's route: name, definition, values at 30 and 60
+   Hz, site), manifest needs, and carry 54's proposed series name with its SERIES.md row.
 9. The end checks: check.mjs's two runs (each step's line), the clippy host and wasm32 lines in both builds, fmt;
    `CARGO_TARGET_DIR` checked after the first build; each `df` reading; each counted run's provenance lines and its
    `flock -x` use.
 10. How each ruling was applied: U4E-Q1 to Q11 (section 8's table), W1-S1's own-state rule, W1-N2's header and
     counter-wrap parts, W1-PUB's two nits (the server path you kept; the room's route to the static graph), and the
-    answers to U4E-Q12 and Q13.
+    answers to U4E-Q12, Q13 and Q14.
 11. What you did not verify, and what is left.
 12. Who built it (the advisor's U4S-BUILDER terms, advisor :365-371).
 
@@ -670,7 +798,7 @@ table missed.
 | R28 | npt-log's `TickRecord.hs`, `snap_incomplete`, `burst_eviction` (plan :645, :657-658) | U4j | U4e exposes the client hash and the two series (2.1; U4E-Q7) | changed: not at the head (U4j has not merged: marks/SERIES.md has neither row; crates/log's `TickRecord` has no `hs`). The brief relies on neither: U4e exposes the values under the plan's names (`event.burst_eviction`: §4.5 :298-299; `tick.s.snap_incomplete`: §4.6 :321), and U4r's logs write them. npt-room and npt-client have no npt-log dependency (room/Cargo.toml:17-21; client/Cargo.toml:17-22) |
 | R29 | npt-link's `Channel`-only rule (catalogue item 2; carry 3) | U4s, U4a | the endpoint's input (2.3) | new: npt-client's (and npt-proto's) sources may name nothing from `npt_link` but `Channel` (check.mjs:809, :821-837; client/Cargo.toml:18-20). So `ClientEndpoint::input` takes (Channel, bytes, arrival_ns), as plan.md:486 has it; npt-server's tests may name `Link` and `Loopback` |
 | R30 | check.mjs's bite-home rule | U4s, U4a | U4e's id lists (2.1, 2.2, 2.6) | new: it reads string literals in `crates/<crate>/src/` only; `tests/` and `#[cfg(test)]` modules are not read (check.mjs:697-758). U4e's sources never spell another crate's id; they pass the caller's id string to `Quant::with_bite`; tests may name any id |
-| R31 | carry 51's public home for an effect row's owner | U4d | the own-state filter (2.1; carry 51) | new, missing: `Scene`'s public items (scene.rs:149-300) have no effect-rows accessor; `effect_rows` is `pub(crate)` (scene.rs:119); the World maps index / rows (world.rs:1879-1881); seam.rs:283 says "its owner is its index / 8". By carry 51, U4e raises it at its start, unless the main session adds it first (7.2 item 2) |
+| R31 | carry 51's public home for an effect row's owner | the main session, at U4e's start (carry 51) | the own-state filter (2.1; carry 51) | new, missing at 39f4290: `Scene`'s public items (scene.rs:149-300) have no effect-rows accessor; `effect_rows` is `pub(crate)` (scene.rs:119); the World maps index / rows (world.rs:1879-1881); seam.rs:283 says "its owner is its index / 8". By carry 51 (close B2), the main session adds `Scene::effect_rows()` and its §4.1 line in its own commit when U4e's build starts, so `<base>` holds it (2.7; 7.2 item 2) |
 | R32 | W1-S1's codec half | the main session, in U4d's merge | the own-state section (2.1) | new: both own-state rows list `Soldier`, `Effect`, `OwnState` (snapshot.rs:491-499, :647-655); `encode` refuses a kind its section does not list (`EncodeError::OutOfRange`) and `decode` returns `Malformed` (snapshot.rs:14-19, :175-180); the codec checks the kind per section, never the slot |
 | R33 | the bite-list pins in tests | U4s, U4b | U4e's id lists (2.2, 2.3) | new: client/tests/bites.rs:10 pins `npt_client::BITES` at its one id, so U4e's two client ids change that pin (U4e's file); server/tests/schedule.rs:347 pins `npt_server::BITES` at PM-0004-67's three, which U4e leaves as they are (2.2) |
 | R34 | the header and the event section as built (W1-N2) | U4a | the encoder, the client's rebuilds, carry 50 (2.1, 2.3) | new: `Snapshot { tick: u32, baseline_age: u16, newest_received: Option<u16>, last_run: Option<u16>, group, groups, own, entities, events: Vec<(u16, u8, SimEvent)> }` (snapshot.rs:443-463); the wire text (snapshot.rs:21-35): an event's number is its low 16 bits and its age 8 bits; `FullState { tick, last_run, own, entities }`, no baseline and no events (:630-639) |
@@ -679,7 +807,8 @@ table missed.
 | R37 | the catalogue's rows as built | U4a, U4d (N8's edits) | the own-state section and the header (2.1, 2.3) | new: the own-state row now states the section as built, the owner's soldier record, its `OwnState` record and its effect rows (catalogue :136); the header row carries the 16-bit command sequences (catalogue :135) |
 | R38 | the base counts and check.mjs's steps at 39f4290 | the main session | section 4 rule 5; section 5 | new: measured 365, bites 412, self 52 of 52, 10 steps (u4d-report.md:68-70) |
 
-Rows changed: R4, R6, R11, R15, R19, R20, R27, R28 (8 of 28); the other 20 hold.
+Rows changed: R4, R6, R11, R15, R19, R20, R27, R28 (8 of 28); the other 20 hold. Rev 3.1 rewrote R31's route by close
+B2.
 
 ### 7.2 Left for the main session at launch
 1. **`<base>`.** Fill it with the spike branch's head. If spikes/ at `<base>` differs from 39f4290
@@ -688,11 +817,14 @@ Rows changed: R4, R6, R11, R15, R19, R20, R27, R28 (8 of 28); the other 20 hold.
    `cd /home/user/Shamble-Frontlines/spikes/netcode-proof && node check.mjs`, reading its test step's line
    ("measured build: N tests passed …; bites build: M …"), self's "K of K" and the step count. Otherwise the counts
    are 365, 412 and 52 of 52, with 10 steps.
-2. **Carry 51's home** (R31): either add it before launch by carry 26's route, in a commit of its own (then `<base>`
-   holds it, and item 1 applies), or launch as is and take U4e's report of it.
+2. **Carry 51's home** (R31; close B2): add `Scene::effect_rows()` (pub, the rows per soldier) and its §4.1 line
+   ("`Scene::effect_rows` (an effect row's owner, the one public home: carry 51)") in your own commit when U4e's build
+   starts, so `<base>` holds it and item 1 applies. Any other home U4e finds it needs is a seam change for the advisor
+   (carry 26's route).
 3. **The pending items** (3.2): folded in before the check (2026-11-11), from advisor-u4d-close.md B1.2, B1.3, B2.
-4. **U4E-Q12 and U4E-Q13**: the advisor's answers, written into 2.6 and 2.1.
-5. **This brief's checks**: test-engineer's check of rev 3, then the advisor's check before the build (advisor :157).
+4. **U4E-Q12, U4E-Q13 and U4E-Q14**: the advisor's answers, written into 2.6, 2.1 and 2.4 (e5a).
+5. **This brief's checks**: test-engineer's check of rev 3 (done: u4e-brief-r3-check.md; rev 3.1 answers it), then the
+   advisor's check before the build (advisor :157).
 
 ---
 
@@ -714,7 +846,7 @@ Rows changed: R4, R6, R11, R15, R19, R20, R27, R28 (8 of 28); the other 20 hold.
 | U4E-Q10 | (a): -62/server-echo in npt-room; -45's and cues-from-replay are U4g's | 2.1, 2.6, carry 24 |
 | U4E-Q11 | (a): U4e builds the server-side checks and their tests; U4f their -21 counters and runs | section 2, 2.2 |
 
-**Open** (new in rev 3; only where no ruling gives the answer; each self-contained):
+**Open** (new in rev 3, and U4E-Q14 in rev 3.1; only where no ruling gives the answer; each self-contained):
 
 **U4E-Q12 (-22/unbounded: which unit plants it?).** Does U4e plant PM-0001-22/unbounded at its `EventQueue`'s cap?
 - Why it matters: §4.14 :474 puts the bite's site at "the event queue's cap", with the unit proof "headroom below 0";
@@ -734,8 +866,28 @@ Rows changed: R4, R6, R11, R15, R19, R20, R27, R28 (8 of 28); the other 20 hold.
   catalogue test that no pass mark holds: the visibility classes are proven at slice 3, ADR 0001:1687-1688), and
   check.mjs's bite-home rule reads only ids of the form `PM-<ADR>-<row>/<name>` (check.mjs:689, :734-758).
 - Options: (a) an id outside the PM form (for example `catalogue-5/owner-to-all`) in `npt_room::BITES`; check.mjs's
-  rule does not read it, so a unit test holds that only npt-room lists it, and U4r selects it by that string; (b) a
-  PM-form id under no mark's row, which marks.json would not spell and check.test.mjs's pin of marks.json's ids would
-  not cover; (c) a marks.json entry for it, through U4j's lane (marks/ is U4j's, unmerged), for a bite no mark judges.
+  rule does not read it, so a unit test holds that only npt-room lists it, and U4r selects it by that string; a room
+  pin that checks each id against marks.json, as server/tests/schedule.rs:345-353 does, exempts that one id by name;
+  (b) a PM-form id under no mark's row, which marks.json would not spell and check.test.mjs's pin of marks.json's ids
+  would not cover; (c) a marks.json entry for it, through U4j's lane (marks/ is U4j's, unmerged), for a bite no mark
+  judges.
 - Recommendation: (a): it claims no pass mark that does not exist, needs no other lane, and its one home is still
   tested.
+
+**U4E-Q14 (the 1 s gap on Loopback: does it evict B?).** Does §4.14 :460's unit proof, "a 1 s gap evicts B;
+`burst_eviction` = 1", keep its 1 s on Loopback?
+- Why it matters: the ring keeps ages 0 to 31 (§4.5 :295-297), and a 1 s gap is 30 ticks at 30 Hz. Loopback neither
+  delays nor loses (link/src/lib.rs:128-131), so B's age at the gap's start is 1 or 2 ticks, and at the first tick
+  after the gap it is 31 or 32, by where the gap starts against the tick and when the client's inputs go out (e5a's
+  two alignments). On L1, B's age at a gap's start grows with the RTT, so -18's judged runs are not this edge. If
+  e5a's precondition fails at one alignment, e5b, 2.5's bite half and the no-fallback row are not shown, and U4e
+  stops there for a ruling.
+- Options: (a) as the brief now says: run both alignments, report both ages, bring a 31 to the advisor, and never
+  lengthen the gap; (b) rule now that U4e's Loopback tests use a gap of 1 s plus two tick periods (in ns, a local
+  value from the rate passed in, never a const or static: carry 39), which leaves B at age 32 or more at both
+  alignments with a tick to spare, with the 1 s ages reported beside it; §4.14 :460 gains "on Loopback, 1 s plus two
+  tick periods"; (c) align the gap so that it gives 32 (tuning the alignment is tuning the gap, so the brief does not
+  offer it to the builder).
+- Recommendation: (b): the unit proof exists to show a gap that evicts B, so that the bite can bite (§4.5 :298-299);
+  Loopback's zero delay puts a 1 s gap exactly at the edge, which says nothing about -18 on L1, and a ruling before
+  launch saves a stop. Until it is ruled, (a) applies.
