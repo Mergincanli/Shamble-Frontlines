@@ -79,8 +79,34 @@ base 411eeeed50d8c71e7e1f74366f0e1d5c27388444. Started 2026-11-11. No local memo
   judge (probe B) instead of INVALID. Fix: README §2.5 and parse_bound cap each fraction at 6 decimals (or the
   comparisons return Err). Proof: probe B as a unit test expecting Err. Before merge (nit f fixes this format now).
   (= security F6.)
-- (resume 2026-11-11, after a usage-limit cut: start hashes re-checked, 34/34 match; no probe file left in the copy.)
+- (resume 2026-11-11, after a usage-limit cut: start hashes re-checked, 34/34 match; no probe file left in the copy.
+  Process note: the F9 line was first appended with a shell heredoc by mistake; from here this file is rewritten whole
+  with Write, F9 kept word for word.)
 - F9 MEDIUM tests/engine.rs (the -18 ws-practice tests): plant T (u4j-review-test/plant-t.txt; practice.rs :387-388
   cap 1.10 -> 1.12 and band_low dropped, :436 Z' recheck dropped) SURVIVES all 65 committed judge tests; the probes
   T1b (s = 1.1001), T2 (s below band_low) and T3 (over Z' only) each bite it. Mustafa's 10 % cap (WS-BAR) is not
   pinned by any committed test. Fix: commit T1a/T1b/T2/T3. Before merge (the bar's own number; a loosened cap passes).
+- Step 6 (builder's claims): counts +18 = log 2 (hs_holds_one_hash_or_null_per_slot, hs_refuses_a_bad_entry_...) +
+  judge lib 3 (ws_bound_checks_keep_their_shape, the_bound_line_reads_as_readme_writes_it, moved_numbers_round_up_...)
+  + engine 8 (c4, decoded gaps, arm rule, empty, twin hash, machine_named, ws puts, ws refuses) + fixtures 5 (pm_0001_17
+  x2, pm_0001_4_c4, pm_0001_21, pm_0006_11): matches its notes :113. Public items added (diff grep): npt-log
+  TickRecord.hs, set_hashes, hashes; npt-judge marks::BoundNumber, Check.ws_bound, Rule::WsPractice (variant),
+  eval::Outcome::Empty (variant) + Outcome::fails, figures::Lack::Empty (variant); practice.rs is `mod practice`
+  (private, pub(crate) items). The builder's notes file lists none by crate (A19 asks the report to): engine-architect's
+  check, from this list. P1-P4: the named tests exist and each asserts the behaviour the plant breaks (read); not re-run.
+- Probe run 2 (u4j-review-test/probe-run2.txt; 2 probes pass = today's behaviour; provenance from this copy's path;
+  probe file removed, 34/34 hashes match): S (one client hash of six, null elsewhere, snap_incomplete 0: run valid,
+  value 0, compared 1) and O (aarch64 orphan at a tick the server never logged, replay without that tick: valid,
+  value 0, "aarch64-only" 1, on an L1 part).
+- F10 MEDIUM figures.rs:298-333 with marks.json -17 (compared and incomplete only reported): no coverage floor and nulls
+  never reconciled with tick.s.snap_incomplete: probe S passes "100 % of decoded snapshots rebuild" on 1 of 6 hashes
+  while the client's own count says 0 incomplete. A runner that samples (netcode F5 (i)) or a client that writes null
+  for a refused group passes. Fix (the advisor's call, beyond the plan's words): a check per run that compared +
+  incomplete = the server's (slot, tick) pairs, or at least a null on a tick whose snap_incomplete entry is 0 is a gap.
+  Proof: probe S committed as a fixture (pm-0001-17/sparse) expecting INVALID or FAIL. Before merge? Advisor's ruling
+  (a marks.json rule later units build on). (= security F8, netcode F5 (i), R2.)
+- F11 MEDIUM figures.rs:327: `at(rep, t, slot) == theirs` treats a replay with no entry at an orphan tick as agreeing
+  with a server that has none, so an aarch64 orphan is excused (probe O) where the x86-64 one FAILs (fixture orphan).
+  The Arm rule excuses a hash the x86-64 re-decode reproduces as the server's; an orphan has no server hash to
+  reproduce. Fix: an orphan always counts (or needs a replay entry equal to Some(server)); fold into F5. Proof: probe O
+  committed, expected FAIL. Before merge with F5. (= security F4 (iii).)
