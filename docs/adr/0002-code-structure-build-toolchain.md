@@ -1423,6 +1423,10 @@ stays playable throughout: frozen, critical fixes only, guarded by today's gate,
    Mustafa, 2026-11-03): the netcode proof test (ADR 0001) first, then the sim core spike and the 60 Hz run, then this
    record's boundary spike, which shares the proof test's client harness. *Done when:* the boundary spike's marks are
    recorded in this record, OQ-0002-3 is answered, and OQ-0002-1 and OQ-0002-4 have their spike results.
+   _Pointer (2026-11-11, foundation 2.1a): for foundation steps 2.1 and 2.2, overtaken by Mustafa's decision of
+   2026-11-10 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-10: the second account may plan and build
+   foundation steps 2.1 and 2.2 now"); for the rest, his words there: "Steps 2.3 to 2.6 keep their order and wait for
+   their results."_
 2. **The foundation** ([GLOSSARY §8](../research/GLOSSARY.md#the-foundation)), one change-set per step:
    1. *The restructure.* The five legacy files move to `legacy/` (OQ-0002-2 places the tools). *Done when:* today's
       gate passes on `legacy/`, the four Phase 0 mutation proofs (a deleted function, an unguarded editor call, a syntax

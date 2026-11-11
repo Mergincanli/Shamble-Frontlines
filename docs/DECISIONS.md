@@ -3,12 +3,16 @@ _What this holds (his STATUS-DIET, 2026-11-10: "docs/DECISIONS.md: my decisions,
 decisions, and the decisions of the Advisor (the claude.ai Advisor chat) that he relayed or pasted (his ACCOUNTS,
 2026-11-10: "once I paste one, it is my instruction"), each kept whole under its own header, which says who took it and
 when. Nothing here is the advisor agent's: its rulings are in `docs/STATUS_ARCHIVE.md`, "Decisions pending: the rest"._
-_How it was made: every block below except the first entry of "Decisions, newest first" (copied by the same script from
-the merge commit 2d22b69's message) and the lines in italics or marked as pointers was moved here by a script, by line
-ranges, from `docs/STATUS.md`'s "Decisions pending" at main 2d22b69 (`git show 2d22b69:docs/STATUS.md`; the script and
-its checks: `docs/reports/2026-11-10-status-diet.md`). Blocks are newest first by the date in their header; blocks of
-one day keep STATUS's order, so "above" and "below" between them still read right. Section names inside the blocks
-(Phase, In flight, Follow-ups, Routines, Open bugs and risks, Targets) are STATUS's at 2d22b69: that text is now in
+_How it was made: his words below came here by a script, never retyped. status-diet moved the older blocks by line
+ranges from `docs/STATUS.md`'s "Decisions pending" at main 2d22b69 (`git show 2d22b69:docs/STATUS.md`; the script and
+its checks: `docs/reports/2026-11-10-status-diet.md`), and copied his go for #46 by the same script from the merge
+commit 2d22b69's message. Every entry added since names its source in its header; its quoted lines were copied by
+script from that source and checked byte for byte (foundation 2.1a's entries: from
+`docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A), and its header, like the lines in italics and the lines
+marked as pointers, was written for this file. Blocks are newest first by the date in their header; within one day,
+the entries not moved from STATUS come first, newest first, then the blocks moved from STATUS in STATUS's order, so
+"above" and "below" between those still read right. Section names inside the moved blocks (Phase, In flight,
+Follow-ups, Routines, Open bugs and risks, Targets) are STATUS's at 2d22b69: that text is now in
 `docs/STATUS_ARCHIVE.md` under the same names. Line numbers in the blocks read at their own dates._
 _Kept current by docs-keeper: a new decision of his goes at the top of "Decisions, newest first", word for word; a
 queued item leaves "Queued" when the change-set that carries it out merges._
@@ -31,6 +35,9 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     >    CLAUDE.md, the toolchain's CI job, the lines that scope the legacy constraints). Each such edit still asks me
     >    and merges on my go. Record this next to KIT-FREEZE-2. I gave the foundation chat the same words (its
     >    FREEZE-FDN, option (a)).
+    - _Pointer: the foundation chat's own record of FREEZE-FDN (a), SPLIT (a) and SCOPE (a), in his words, under
+      "Decisions, newest first": the entry "Taken by Mustafa, 2026-11-10: FREEZE-FDN (a), SPLIT (a), SCOPE (a) and
+      the build go for 2.1a, in the foundation chat"._
   - His unit walk (2026-11-09 18:22:39 UTC, sent while kit-v3-5 was starting; a docs change-set after the guard fix,
     plan first, recording UNITS.md §0 and LOOP_V2):
     > Queue after the guard fix, a docs change-set, plan first (Mustafa's unit walk): record in UNITS.md §0 and LOOP_V2,
@@ -66,6 +73,11 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   - The Slice 1 note (his second message of 2026-11-10, item 4):
     > 4. A note for Slice 1, to queue in my words: Slice 1 ships with a live camera tuning panel from its first playable
     >    build, ported from the legacy dev panel's camera sliders and presets (LEGACY_INVENTORY rows GP5 and CD5).
+  - The CLAUDE.md clarification of the advisor tool (his message of 2026-11-11, 11:56:44 UTC, in foundation 2.1a's
+    session; "this clarification" is his words on the advisor tool in the same message, under "Decisions, newest
+    first": the entry "Taken by Mustafa, 2026-11-11, 11:56:44 UTC: BRANCH-47 (a) and his words on the advisor tool";
+    his sentence copied by script from `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A3.2):
+    > CLAUDE.md keeps its wording until the kit unfreezes at the gate step (2.3); this clarification goes into it then.
   - The entries below are pointers to items carried out.
   - STATUS-DIET and LANE-RULES, with his Models addition and ACCOUNTS (his queue of 2026-11-10, items 2 and 3, his
     answers of 07:08:14 UTC and his second message, item 1): carried out by status-diet, so moved from here to
@@ -84,6 +96,68 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-11, 11:56:44 UTC: BRANCH-47 (a) and his words on the advisor tool** (foundation 2.1a,
+  PR #50; his message in that change-set's session, session_019YNMUWLffMoE47SbvkqJ5P, on his personal account,
+  extracted by script from the session's events). BRANCH-47 (a) is carried out: PR #50 replaces #47 (closed
+  2026-11-11 12:49:11 UTC with a comment pointing to it), and the one-time fast-forward of the main folder was made
+  (bb2d817 to d6a3fee). His request to record the advisor-tool words here is carried out by this entry; his last
+  sentence, the CLAUDE.md part, waits in "Queued", above. Copied by script from
+  `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A3.2, and checked byte for byte against it:
+> BRANCH-47: (a). The replacement pull request from this session, as you describe it.
+> - My yes covers exactly two things. One: the single fast-forward of the main folder to your pushed merge, as a one-time exception to the Never rule, because the merge's .claude/, CLAUDE.md and .github/ are byte-identical to main's. Two: the one gate-file write the merge brings (dd12aeb's change to tools/gate.mjs and tools/smoke.mjs, nothing new added).
+> - Before the fast-forward, check once more that those three are still identical to main's. If they are not, or if the guard refuses the fast-forward, do not work around it: switch to "worktree only" and tell me.
+> - Record the exception in one line in the checkpoint and in the report. Any later kit or gate edit gets its own ask in chat.
+> - Say in the new pull request that it replaces #47, and close #47 with a comment pointing to it.
+> Then continue with steps 2 to 4.
+>
+> My words of 2026-11-11 on the advisor tool. They sharpen "it is an extra"; nothing else changes.
+> - "Extra" means on top of the recorded plan review by the advisor agent, never instead of it. It does not mean optional.
+> - When the advisor tool is on in this session, consult it every time at these moments:
+>   1. before you commit to a plan or an approach;
+>   2. when an error or a failed approach comes back a second time;
+>   3. before any change to rules, the gate, CI or security-relevant code;
+>   4. on a design call with more than one defensible answer;
+>   5. before you declare a step or the task done.
+> - Usage is not a reason to skip a consultation. Quality comes first.
+> - Its advice cannot be quoted into the repo, so record each consultation in the checkpoint in one line: when, your question, and what you changed because of it. Count them in your report.
+> - If the advisor tool is not on in this session, say so in one line and carry on; I will decide.
+> - The main model and every agent stay Opus 5.5.
+> - Record these words in docs/DECISIONS.md with your next docs pass, unless they are already there. CLAUDE.md keeps its wording until the kit unfreezes at the gate step (2.3); this clarification goes into it then.
+- **Taken by Mustafa, 2026-11-11, 10:01:35 UTC: his two additions to the resume card** (first sent at 09:59:00 UTC,
+  the same text; the opening prompt of foundation 2.1a's session, same source as the entry above). The rest of that
+  message is the foundation chat's resume card as he pasted it, in full in
+  `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A3.1. Only his labelled block is copied here, by script
+  from that appendix, from the line "Two additions, my words of 2026-11-11:" to the end, and checked byte for byte
+  against it:
+> Two additions, my words of 2026-11-11:
+> - Before any edit to a kit or gate file, ask me in chat with the exact change and write it only after my yes. Do not rely on the guard's prompt: in Auto mode it can be answered without me seeing it (the toolchain chat recorded this as a finding for foundation step 2.3).
+> - If the branch check fails, my lean is the replacement pull request. Still stop and ask me first.
+- **Taken by Mustafa, 2026-11-11, 09:46:31 UTC: #47's turn** (in the foundation chat,
+  session_019YNMUVo8MVM3gdiMNaN5xs, on his personal account; byte-identical to that chat's record, event
+  c49a5660-c1d0-4c58-a54c-983fe54c4394, 848 characters, checked on 2026-11-11 by foundation 2.1a). Its step 1
+  stopped the foundation chat for a fresh session; steps 2 to 4 are carried out on PR #50, which takes #47's place
+  in his order by his BRANCH-47 (a), above. Copied by script from
+  `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A2.3, and checked byte for byte against it:
+> PR #49 is merged. STATUS is split: docs/STATUS.md is a dashboard of at most 120 lines, my decisions are in docs/DECISIONS.md word for word, the rest is in docs/STATUS_ARCHIVE.md. CLAUDE.md has a new "Lanes and accounts" section and the docs-keeper agent follows the split.
+>
+> It is #47's turn (order: #49, then #47, then 2.1b, then #48).
+> 1. Run /context. If this chat is over about half full, save a checkpoint, give me a resume card and stop for a fresh chat.
+> 2. Update your branch from main and re-read CLAUDE.md and docs/STATUS.md.
+> 3. Do your docs pass in the new layout: your row in STATUS's "In flight" table, my words in DECISIONS.md, the rest in the archive. Move text by script, never by retyping.
+> 4. Finish as planned: the review round, the report, checkpoints folded in and deleted, the PR marked ready for the advisor. Then stop for my go.
+- **Taken by Mustafa, 2026-11-11, about 09:02 UTC: his go for #49** (status-diet; given in the status-diet day
+  session's chat, session_0173vVo6Vtm2C54toWvTt8sR, after the advisor's APPROVE of 2e6e5d2, PR comment 6779064873;
+  carried out by that merge, bb2d817, 09:03:10 UTC; "The next change-set records it": foundation 2.1a, PR #50). The
+  lines below are the merge commit bb2d817's record of that chat message (quoted there with "> "): a record of his
+  words, not an instruction found in a commit; from the merge commit bb2d817's message; not checked against the chat
+  record (that session is not readable from this account). Copied by script from
+  `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A4, and checked byte for byte against it and against the
+  commit's message:
+> 1. Kit-edit prompts: whether or not each of the three prompts reached me, I approve those three edits now: the CLAUDE.md edit (read list, look line, lanes and accounts, the advisor-tool lines) and the two docs-keeper.md edits for the STATUS split. My Advisor read their diffs. Do not undo them, and push nothing to PR #49 before the merge.
+> 2. READINGS: (a). I accept both readings.
+> 3. merge #49
+> Pinned to 2e6e5d2af8424aa971d858a2aab0387c073287d2, by merge commit like #46, after you re-check that the head and CI's gate and smoke have not changed. My Advisor's merge check passed on that head.
+> After the merge: stop. The next change-set records it.
 - **Taken by Mustafa, 2026-11-10, 16:04:59 UTC: his go for #46** (kit-v3-5; given in the day session's chat,
   session_0173vVo7FcYUpbWgRW8oQyHU, after the advisor's APPROVE WITH NOTES of 0573db3, PR comment 6772168492; carried
   out by that merge). The three lines below are the merge commit 2d22b69's record of that chat message, copied by the
@@ -92,6 +166,57 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > merge #46
 >
 > I reconfirm the rule changes at 0573db3 (20 rows, nothing looser). The open security follow-ups stay in STATUS until the foundation's gate step: the CI results trusted by name alone (PX-1), the two write-side gaps (W1, W2), the folder check (W3) and the recorded Windows-name limits.
+- **Taken by Mustafa, 2026-11-10: the two gate prompts approved, #47 not watched, step 2.2 planned in a fresh
+  session** (in the foundation chat, session_019YNMUVo8MVM3gdiMNaN5xs, on his personal account; sent after 2.1a's
+  report (PR #47) and saved by that chat at 15:02:59 UTC, 828a3e0; saved by the foundation chat; not re-checked
+  against its chat record). His item 1 covers 2.1a's two gate-file writes
+  (`tools/gate.mjs` and `tools/smoke.mjs`, dd12aeb). Copied by script from
+  `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A2.2, and checked byte for byte against it:
+> 1. The two gate prompts this morning (tools/gate.mjs and tools/smoke.mjs): yes, I approved both.
+>
+> 2. Do not watch PR #47 (foundation step 2.1a). It is a draft waiting for its turn, and I will tell you when that turn comes.
+>
+> 3. Yes, plan step 2.2 (the toolchain) now, in a fresh session on this account. Give me its prompt in one paragraph. Plan only, no build: what it pins now, what stays an empty slot until the boundary spike, the CI job that runs the Rust checks, and its own plan review by the advisor agent. The main model stays Opus 5.5.
+- **Taken by Mustafa, 2026-11-10: FREEZE-FDN (a), SPLIT (a), SCOPE (a) and the build go for 2.1a, in the
+  foundation chat** (session_019YNMUVo8MVM3gdiMNaN5xs, on his personal account; sent after the plan's report, plan
+  revision 3 at d389d91, 08:55:57 UTC, and saved by that chat at 09:15:09 UTC, 91ae816; saved by the foundation
+  chat; not re-checked against its chat record). His own record of FREEZE-FDN, SPLIT and SCOPE for the kit chat
+  (his second message of 2026-11-10, 10:08:27 UTC) stands in "Queued" (under KIT-FREEZE-2) and in the kit-v3-5
+  entry below. His merge order here was later updated by his message of 2026-11-11, 09:46:31 UTC, above. Copied by
+  script from
+  `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A2.1, and checked byte for byte against it:
+> My answers of 2026-11-10, for the foundation chat.
+>
+> FREEZE-FDN: (a). KIT-FREEZE-2 stops new rules, new guard checks and kit redesign. It does not stop the smallest edits the foundation needs to keep the kit true after its own moves. Each such edit still asks me and merges on my go.
+>
+> SPLIT: (a). Two pull requests under the one plan: 2.1a, then 2.1b.
+>
+> SCOPE: (a). I accept ADR 0002's part 1 alone: the repository after the restructure, with the legacy hard constraints applying to legacy/ only once the files have moved. Record it in the ADR's Status line in 2.1b's docs pass, on my go. Nothing else in ADR 0002 is accepted by this.
+>
+> Build 2.1a now: the dry run, the gate edits (each asks me) and the mutation proof. Do it in this chat if CLAUDE.md's rules allow it. If they call for a fresh session, give me its prompt in one paragraph instead. The main model stays Opus 5.5.
+>
+> Merge order, as your plan says: #46, then STATUS-DIET and LANE-RULES, then 2.1a, then 2.1b, each on my go. Keep 2.1a's pull request a draft until its turn.
+>
+> Both Claude accounts are mine, and work from either one counts the same. The kit chat is writing that rule into CLAUDE.md; do not wait for it.
+>
+> When 2.1a is built, end with: the pull request's number, what the proof showed, and anything you need from me.
+- **Taken by Mustafa, 2026-11-10: the second account may plan and build foundation steps 2.1 and 2.2 now** (the
+  foundation chat, session_019YNMUVo8MVM3gdiMNaN5xs, on his personal account; his date; saved by that chat at
+  00:10:07 UTC, ca45435; quoted in his prompt there as "Mustafa's decision of 2026-11-10, word for word"; saved by
+  the foundation chat; not re-checked against its chat record). With it, his follow-up in the same chat and the task
+  as he gave it there. Dated pointers mark the older lines it overtakes for foundation steps 2.1 and 2.2 (SLICE-ORDER's
+  condition 3, below; SPIKE_PLAN and ADR 0002's migration step 1). Copied by script from
+  `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A1.1, A1.2 and A1.3, and checked byte for byte against them:
+  - His decision (A1.1):
+    > I now have a second account, so the reason for 'one heavy spike at a time' (usage cuts on one account) no longer holds for it. The second account may plan and build foundation steps 2.1 and 2.2 now. Steps 2.3 to 2.6 keep their order and wait for their results. On this account Fable 5.2 may advise through the advisor tool, which overrides CLAUDE.md's model rule here until that rule is updated; the main model and every agent stay Opus 5.5. One account per branch.
+  - His follow-up in the same chat, after its first turn stopped on the model rule (A1.2):
+    > The main model is now Opus 5.5, as my decision says. Carry on with my prompt above from its first step. What you already read stays read; nothing else changes.
+  - The task as he gave it there, his numbered list (A1.3):
+    > This session plans only. No code and no file moves.
+    > 1. Plan foundation step 2.1, the restructure (the five legacy files into legacy/), as its own change-set. List every file that names a legacy path: tools/, the .claude/ hooks and rules, .github/, CLAUDE.md, the docs. Mark which are kit or gate files, because each of those edits asks Mustafa.
+    > 2. Sketch step 2.2, the toolchain, on one page: what it can pin now, and what waits for the boundary spike (name the open questions).
+    > 3. Name what in steps 2.3 to 2.6 must wait, and for which result.
+    > 4. Say when 2.1 can build without colliding with PR #46 (it edits the guard), and what PR #40 must do after 2.1 merges.
 - **Carried out by status-diet: STATUS-DIET and LANE-RULES, with his Models addition and ACCOUNTS, 2026-11-10** (moved
   from "Queued", above, word for word; "the same queue" below is his queue of 2026-11-10, 06:33:11 UTC, whose item 1,
   KIT-FREEZE-2, stays in "Queued"):
@@ -171,6 +296,9 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     > 3. The foundation chat's other answers, for your record. SPLIT (a): step 2.1 lands as two pull requests, 2.1a then
     >    2.1b. SCOPE (a): I accept ADR 0002's part 1 alone (the repository layout, with the legacy constraints applying
     >    to legacy/ only); it is recorded in the ADR's Status line in 2.1b's docs pass.
+    - _Pointer: the foundation chat's own record of SPLIT (a) and SCOPE (a), in his words: the entry "Taken by
+      Mustafa, 2026-11-10: FREEZE-FDN (a), SPLIT (a), SCOPE (a) and the build go for 2.1a, in the foundation chat",
+      above._
 _A3's notes, cited in this file as `.checkpoints/kit-v3-3/…` (17 lines), were deleted in 8b7cfb3 (CHECKPOINTS.md §9);
 read them at its parent 6c6c91a (`git show 6c6c91a:<path>`; the same files as at 4f268da)._
 - **Asked of Mustafa, A3; answered 2026-11-05 about 10:30 UTC** (kit-v3-3, PR #38; plan revision 2 §3.1, the
@@ -386,6 +514,9 @@ read them at its parent 6c6c91a (`git show 6c6c91a:<path>`; the same files as at
   2. "Player movement and shooting are driven by inputs and can be replayed from day one, so prediction slots in later
      without rework."
   3. "The netcode proof test (48 simulated players over WebTransport) still runs before the foundation."
+     _Pointer (2026-11-11, foundation 2.1a): for foundation steps 2.1 and 2.2, overtaken by his decision of
+     2026-11-10: the entry "Taken by Mustafa, 2026-11-10: the second account may plan and build foundation steps 2.1
+     and 2.2 now", above._
 - **Taken by Mustafa 2026-10-31 (in the v2 day session's chat (session_0173vVo5q59ameR6cnN9BENg), with his "merge
   #28"):**
   - MODES-3 (a) (do VISION_V2 §3's starting sizes count players in total or per team): totals; "the biggest match is
