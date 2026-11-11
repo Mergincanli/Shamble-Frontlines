@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 16:05 Amsterdam
+- **Last update:** 2026-11-11 17:03 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -255,7 +255,7 @@ infra-engineer's question on 2.1b's push runs), the verifier, the report, ready,
    the new blob; one self-contained ask with the patch saved first; the verifier brief, #50's body, his new words, L2
    and round 2 marked stale for after his yes.
 
-5. 2026-11-11 15:58 Amsterdam · after his yes, before the write (his moments 1 and 3): is the write and the rest of the
+5. 2026-11-11 about 16:55 Amsterdam · after his yes, before the write (his moments 1 and 3): is the write and the rest of the
    plan sound? · changed: three anchors before the `cp` (current blob 2bfab53; the notes patch equal to eaf5a45's; the
    patched copy hashing to 7a8480c), the patch applied to a copy, never edited; the write one plain `cp` alone in its
    call; status, smoke.mjs blob and the gate checked after it; the fix commit's CI let finish before the next non-[skip
