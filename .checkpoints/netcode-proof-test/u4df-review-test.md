@@ -6,6 +6,8 @@ u4df-packet.md (read whole). Plan: advisor-u4d-close.md B1.1-B1.3. Role: main's 
 Runner: u4df-run.sh, log prefix te- under .gate/u4df/. Rules: plants by Edit in place, restored by Edit, sha256 checked;
 TE2-5 for any failure I did not plant (re-run that crate with --no-fail-fast at once, name and panic here).
 Notes are rewritten whole each time (Write).
+MY SLIP: blocks [11] and [12] were first inserted into this file by a python one-off (a shell write), not by Write or
+Edit; notes only, no other file; this whole file was then rewritten with Write.
 
 ## Plan
 1. sha256 of every changed file (and every file under spikes/netcode-proof) first.
@@ -116,7 +118,6 @@ Notes are rewritten whole each time (Write).
     them); step 5 -> (16_700_849, 15_077_317_756_489_230_056) (s5-first-measured :382; length unchanged).
   - Nothing else in tests/ moved; s1-suites (step 1): every test passes with no test file touched. MET.
   (Process note, no finding: t_m1 stayed failing, named, from step 2 to step 5 by design; each re-run once, TE2-5.)
-
 - [11] P3, a partial regression (the reckoning ignores crouch only; replay.rs:408, old
   `let v = move_velocity(speed_cm, buttons, move_xy, 1.0).0;`, new
   `let v = move_velocity(speed_cm, buttons & !Command::CROUCH, move_xy, 1.0).0;`), the whole measured suite with
@@ -131,13 +132,63 @@ Notes are rewritten whole each time (Write).
   23:49:45-23:49:49, exit 101 as planted; restored by Edit, sha256 OK): "PROBE dead soldier-ticks 58" on the real
   code. SS respawns after 1,000 ms (30 ticks, scene.rs:181), so a_m1's non-vacuity rests on about two deaths in its
   1,200 ticks; P1 and P3 (generator-only plants) both took them away.
+- [13] check.mjs, the one counted run (te-check.log 23:50:19-23:55:12 UTC, -x, runner exit 0; first `cargo test --locked
+  --workspace --no-run` and `--all-features --no-run` in the same runner call for provenance: "Compiling npt-sim
+  (this copy's path)" x2; idle 0 s, 10 GB, HEAD dad9566; no other cargo at the end): PASS fmt 0.6 s; PASS clippy 3.5 s
+  (both builds); PASS clippy-wasm32 1.0 s (both); PASS doc 43.0 s (both builds, host and wasm32, warnings as errors);
+  PASS test 233.4 s "measured build: 367 tests passed, 0 failed, 0 reported a skip; bites build: 414 tests passed, 0
+  failed, 0 reported a skip"; PASS deps 0.7 s (109 crate files, 1 cargo config); PASS refs 0.0 s (656 tracked files);
+  PASS marks 0.6 s (81 marks, drafts 626df678, rows unchanged); PASS self 1.3 s "52 of 52"; PASS redact 0.8 s (10 of
+  10; 183 items, 0 findings); "check: all 10 steps pass". Deltas on the base: measured 365 -> 367 (+2), bites 412 ->
+  414 (+2), self 52 -> 52 (+0). The +2: the diff adds 4 #[test] and removes 1: step 0's two module tests (both builds,
+  lib 3 -> 5), t_m1 replaced under its name (net 0), the three-seed test #[ignore] (not counted as passed). = the
+  builder's end-check4/5.
+- [14] Final: `sha256sum -c te-ref.sha256` all 6 OK and `te-ref-all.sha256` all 183 OK (23:55:23 UTC); no PROBE or
+  PLANT text in crates/sim; git status the same 5 M + 1 ??; HEAD dad9566; diff stat 5 files, +503 / -146. The copy is
+  byte-identical to [1]. Nothing committed; nothing edited beyond restored plants and probes.
+- Other netcode findings by log or arithmetic: NF-L4's 7.250 is s2-suites.log's t_m1 line ("gameplay events: 7250"):
+  CONFIRMED. NF-L2's 51.9 teleports a minute = 3b's 48 + about 3.9 random: CONFIRMED by arithmetic. NF-L1's churn
+  shares and NF-L3: not run (reading only; no run of mine settles them).
 
-## Findings so far
-- TF-M1 MEDIUM (not before merge; the advisor's call): the counted suite's only guard of B1.2 step 3's reckoning is
-  t_m1 on seed 2, and it tells the old reckoning from the new by less than one half's noise. P1 fails it by 0.26 on
-  one half with the window in band (9.846); the three-seed test (ignored, not in check.mjs) fails P1 on all three.
-  D-7's digest is what holds the reckoning in the counted suite: T2-L1's lesson (an invariant held only by a pin that
-  a later legitimate change re-pins). Next: a partial regression (crouch ignored) to size it.
-- TF-L1 LOW (not before merge): a_m1's non-vacuity (tests/world.rs:940, a death within SS seed 5's 1,200 ticks) rests
-  on SS's recording draws: P1 (a generator-only plant) fails it. Any later generator change can fail a_m1 with no
-  defect. Pre-existing test, but U4d-F moved SS's recording (GENERATOR 2).
+## Findings
+- TF-M1 MEDIUM, not before merge (for the advisor; a new test is outside B1.2's symbols): the counted suite guards
+  B1.2 step 3's reckoning, N2-M1's fix, only by t_m1 on one seed, which tells a broken reckoning from the right one by
+  less than one 300 s half's noise. Where: tests/world.rs:1150-1160 (the events and drift assertion, t_m1 = seed 2
+  alone at :1174); replay.rs:405-410, :470-476, :506-507 (the reckoning). Evidence: P1 (the old reckoning) fails t_m1
+  by 0.260 on its first half, window in band (9.846); P3 (crouch ignored only) fails it by 0.130 on its second half,
+  window 9.866; a half's sd across seeds is about 0.19-0.26 and a last-ulp float change swings it by 1.1 ([5]). The
+  three-seed test fails P1 and P3 on every seed, but it is #[ignore] and check.mjs counts `passed` only. Under 3b the
+  reckoning is worth about 0.43 events a second (P1 mean 9.480 against 9.906, [6]). What holds the reckoning for
+  certain is D-7's recording digest: T2-L1's lesson again (an invariant held only by a pin that a later legitimate
+  change re-pins). Scenario: a later edit to `synthetic` (a GENERATOR 3, a new input kind) half-breaks the reckoning
+  and re-pins D-7 for its own named cause; t_m1 passes with a probability of roughly a quarter to a half and the
+  regression lands. Cheapest proof: te-plant-p1.log, te-plant-p3.log. Fix: one deterministic test of the reckoning,
+  independent of the World's chaos: over ES's synthetic recording, each sky aim's x, y equals the integration of the
+  commands the recording itself sends for that slot (move_velocity at the MoveSpeed it emitted, clamped; a held-back
+  command moved when sent; a lost one never; teleports and spawns resetting), truncated to cm, exactly; P1 and P3
+  each fail it on the first crouched or lost command.
+- TF-L1 LOW, not before merge: a_m1's non-vacuity (tests/world.rs:940) rests on about two deaths in SS seed 5's 1,200
+  ticks (58 dead soldier-ticks, [12]); both generator-only plants (P1, P3) remove them, so any later generator change
+  can fail a_m1 with no defect. Pre-existing test; U4d-F moved SS's recording (GENERATOR 2). Fix: a follow-up: a_m1
+  scripts its death (a kill by input) or runs long enough for several.
+- TF-L2 LOW, not before merge (report wording): B1.2 step 4 says "A stationary generator makes the warm-up's length
+  immaterial; that is what this step shows". Inside the window it is not shown: the second half is lower than the
+  first in 8 of 9 seeds, mean -0.404 a second ([9]), so the window's thin margin sits in its second half (mean 9.692,
+  0.19 over the floor). The netcode's 36-minute probe (its [10], not re-run by me) finds the level flat from about
+  minute 7 at about 9.85-9.9. The report should say so, beside NF-M1.
+- TF-L3 LOW, not before merge (the builder's record's reading): "P1 shows as a level (halves 0.12 apart), not a decay"
+  (u4df-build.md:403-406, :492-493) holds for its form only: the base's own lines give halves 9.240 / 10.453 (the
+  window in band), and the two forms differ only by x (1/30) against / 30. A plant's 300 s half is not a stable
+  property; the report should give P1's three-seed figures ([6]) rather than one form's one seed.
+
+## Netcode findings settled
+- NF-M1: CONFIRMED by run through the test's own EsRun (seed 6's second half 9.446; [9]); I agree Medium.
+- NF-L2 (teleports), NF-L4 (7.250): CONFIRMED (arithmetic, log). NF-L1, NF-L3: not settled by a run (reading).
+
+## Verdict
+APPROVE WITH FINDINGS. No Critical or High. Every claim proven by its own plant or run here: step 0's two tests catch
+O1, O2, O3 by name; step 6's P1 (in the base's own lines) fails t_m1's drift check and P2 (a different hull) the hull
+bound, by name; the three-seed test reproduces the acceptance table exactly; every re-pin has one named cause in its
+own step and every kept band and pin is unchanged; check.mjs 367 / 414 / 52 (+2 / +2 / +0); the copy byte-identical
+at the end. One Medium (TF-M1: the reckoning's counted guard is one noisy seed) and three Lows, all follow-ups.
+DONE (2026-11-11 23:56 UTC)

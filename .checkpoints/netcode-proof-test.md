@@ -51,6 +51,16 @@ erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md.
       NF-L1 to NF-L4, Low: carry lines (no ES byte figure from the synthetic recording; carry 59 names the -26 %),
       the report's numbers on 3b, and 3b's switch tied to `aim_one_in > 1` (a follow-up). Its slip: blocks [5]-[8] of
       its notes were first appended by a python one-off, then the file was rewritten whole with Write.
+    - **test-engineer: APPROVE WITH FINDINGS** (23:56 UTC; read in full): every claim proven by its own plant or run
+      (O1-O3 by name; P1 in the base's own lines fails t_m1's drift check, window 9.846 in band, halves 9.240 and
+      10.453; P2, a different hull, the bound; the three-seed table equal; one cause per re-pin; check.mjs 367 / 414 /
+      52; the copy byte-identical at the end). TF-M1 Medium, not before merge, for the advisor: the counted suite
+      guards the reckoning only by t_m1's one seed, inside one half's noise; D-7's digest holds it for certain; a
+      deterministic reckoning test is proposed (outside B1.2's symbols). TF-L1 to TF-L3 Low. NF-M1 confirmed by run.
+      Same slip as the netcode-architect's (two blocks first written by python, then the file rewritten whole).
+  - **Next: the advisor's ruling on round 1** (brief advisor-u4df-brief.md; ruling to advisor-u4df.md): NF-M1,
+    TF-M1, the seven Lows' routes, my two readings, the merge's conditions, the slip. Then the fix pass if it asks for
+    one (round 2 on what changed), then the merge.
   - Done meanwhile: TE2-5 (b), ten of ten runs exit 0, each 443 passed, 0 failed, 12 ignored (te2-5-record.md).
   - the saver, restarted after U4j's push (about 20:15 UTC, 110 minutes): `node .claude/scripts/checkpoint.mjs watch
     netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
