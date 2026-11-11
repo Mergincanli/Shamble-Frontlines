@@ -17,37 +17,38 @@ Tools: the Edit tool is not available in this run, so this file is rewritten who
 8. Pending-ruling carries (U4d round 2) marked pending, never settled.
 9. Findings with severity and exact fix; verdict.
 
-## Progress log
+## Progress log (run 1, cut about 12:46 UTC; against the brief as it then stood, 719 lines)
 - [start] plan written.
 - [block 1 done] brief read whole (719 lines). Plan 1,070 lines sha256 a81b230f (matches the brief's stamp). Plan §5 U4e :703-734; Lanes :836-871; §6 :873-889; §7 :891-914; §4.1-§4.15 :177-503.
 - [own slip] block 1's line was first appended with a shell heredoc, against the task's "Write and Edit tools only"; content unchanged; every later write is by Write.
 - [block 2 done] wave1 read: W1-S1 :45-111, W1-N2 :305-351, W1-PUB :353-435, W1-U4E :437-497, W1-TARGET :558-586.
-- [block 3 done] check (2) by script (scratchpad carry_cmp.py, python3 -I): carries §U4e = lines 145-189 (45 lines); brief block = 413-457 (45 lines); equal True; sha256 both b8399fbb…e89b1c; 0 diff lines; entries 21-27, 39, 50, 51 in both. 49 is §U4r (:200-203). CHECK (2): PASS against the file as it stands.
-- [block 4 done] every quoted phrase in the brief checked by script (scratchpad quote_cmp.py) against wave1, advisor-u4, plan, carries, catalogue, u4d-round2-{netcode,security}, plan.md, SERIES.md, u4d-report: 36 quotes of 18+ chars, 27 found verbatim; the 9 misses are templates (5), the brief's own words (1), bold/inner-quote formatting only (2: :161 W1-S1, :266 Q2), and one glyph: :495 "≥ 99 %" where u4d-round2-netcode.md:76 has ">= 99 %" (Low).
-- [block 5 done] advisor-u4d-close.md read (B1.3 :165-180, B2 :229-308, B3 F3/F8 :321-361). THE PENDING ITEMS ARE NOW RULED (file 12:36; commit dad9566 "the advisor's Part B done"): carry 51's body reworded (main session adds `Scene::effect_rows()` when U4e's build starts; :233-244); new §U4e carries 53 (N2-L1 + security bullet 1, test: every client of an SS room, 48 clients, >=300 ticks, a respawn included), 54 (OutOfRange: skip, count, log, test), 55 (Team/Public rows), 56 (N2-L3 (c): report the own-state section's bytes, SS and ES), 57 (U4E-Q6 room half: overflow resync counted per client with its tick); N2-M2's U4e option REJECTED (B1.3 :170: U4d-F fixes ES's scene; U4e need not wait, :120-121); carry 40 reworded (F3); carry 58 (U4r) homes Q6's conditions. u4s-carries.md not yet edited (main session's step). => brief 3.2, 7.2 items 2-3, 2.7, R31, e12, return list 6 must fold these in (finding F1).
-- [block 6 done] manifests read: room/Cargo.toml:15 bites = sim+proto; server/Cargo.toml:22 bites = sim+proto+room (NOT npt-client), deps link/proto/room/sim/net/log, dev npt-client :32-35; client/Cargo.toml:15 bites = sim+proto, deps link/proto/sim. So e7/2.5 in npt-server's tests can reach Room, Decoder, ClientEndpoint, Loopback, World with no manifest edit. Note: npt-client/bites only on under --workspace --all-features (finding, Low).
-- [block 7 done] the bite-proof form. check.mjs testBothBuilds (:1493-1501) fails the step if any bites-build test fails; brief 2.6 (:354-356), 2.5/e5b (:306-308, :361) and return item 4 (:588-589) ask for a test that "fails by name in the bites build" and passes in the clean build, while section 5 asks check.mjs twice, every step passing; section 4 (:549-551) says a bite run needs no planted copy. Wave 1's form is two parts: a bites-build test that PASSES by asserting the check fails on the bitten instance (proto/tests/bites.rs:1-3, client/tests/bites.rs:7-36), plus in-place scratch switches of the named test to the bite, sha256-restored, showing the test failing by name (u4c-build.md:28-32, :66; u4d-report.md:19). Finding F2 (High).
+- [block 3 done] check (2) by script: carries §U4e = lines 145-189 (45 lines); brief block = 413-457; equal True. (SUPERSEDED: both files changed since; redone in run 2.)
+- [block 4 done] quoted phrases checked by script: 36 quotes of 18+ chars, 27 verbatim; misses are templates (5), own words (1), formatting only (2), one glyph: "≥ 99 %" where u4d-round2-netcode.md:76 has ">= 99 %" (Low). (To recheck in run 2: the brief changed.)
+- [block 5 done] advisor-u4d-close.md read (B1.3 :165-180, B2 :229-308, B3 F3/F8 :321-361): pending items now ruled (carries 51 reworded, 53-57 new, 40 reworded, 58 U4r).
+- [block 6 done] manifests read: room/Cargo.toml:15 bites = sim+proto; server/Cargo.toml:22 bites = sim+proto+room (NOT npt-client), deps link/proto/room/sim/net/log, dev npt-client :32-35; client/Cargo.toml:15 bites = sim+proto, deps link/proto/sim. npt-client/bites only on under --workspace --all-features (Low).
+- [block 7 done] the bite-proof form: check.mjs testBothBuilds (:1493-1501) fails the step if any bites-build test fails; brief 2.6/2.5/e5b/return item 4 ask for a test that "fails by name in the bites build" and passes clean, while section 5 asks check.mjs twice with every step passing. Wave 1's form: a bites-build test that PASSES by asserting the check fails on the bitten instance (proto/tests/bites.rs, client/tests/bites.rs:7-36) plus in-place scratch switches showing the named test failing (u4c-build.md:28-32, :66; u4d-report.md:19). Finding F2 (High). (To re-verify in run 2 at the head.)
 
-## Check (1): §5 U4e (plan :703-734) against the brief
-| Plan item | Brief | Testable as worded? |
-|---|---|---|
-| catalogue item 4 | e1 (2.4) | yes |
-| forced group split | e2 | yes |
-| lost group unlogged+counted; refused -> sentinel | e3 | yes |
-| baseline rule; ring age edges | e4 | yes |
-| 1 s gap evicting B | e5a/e5b | e5a yes; e5b's "fails by name under no-fallback" clashes with check.mjs (F2) |
-| window counting the pump's bytes | e6 | yes |
-| mirror = client hash, Loopback P0, 1,000 ticks | e7 | weak: nothing requires the run to reach priority skips, group splits or events (finding) |
-| Send asserts | e8 | yes |
-| 5 JoinRejected reasons | e9 | yes |
-| datagram before Join dropped+counted | e9 | yes |
-| control before Join: malformed, counted, never INVALID | e9 | yes |
-| Input bucket 8 / 60 a second; Ping 10 a second, fake clock | e9 | yes |
-| 2 s Join deadline, fake clock | e9 | yes |
-| second Resync dropped+counted | e9 | yes |
-| client wrong channel dropped+counted | e9 | yes |
-| -18 end to end | 2.5 | yes for the clean half; the bite half as F2 |
-| Bites line (12 names) | 2.6 table, all 12 present (tick16 as both -17 and -58) | each row's proof as F2 |
-| Marks moved: none | 2 | n/a |
+## Run 2 (2026-11-11, from about 17:55 UTC), against the brief as it now stands
+State at run 2's start: HEAD 7c09df3 (autosave); `git diff --stat 39f4290 HEAD -- spikes/ docs/` empty. The brief is now
+741 lines (the main session's fold, its lines 3-5: 3.1 re-copied, 3.2 rewritten, 7.2 item 3 done). u4-build-plan.md
+1,070 lines sha256 7375cdcf… (changed by d7a54cd; the brief still stamps a81b230f…). u4s-carries.md 347 lines sha256 f18a0692….
+Run 1's blocks that read the brief, the plan or the carries are redone below; blocks 2, 5, 6 stand (files unchanged since,
+re-verified where cited).
 
-(working notes continue below as blocks finish)
+Plan for run 2 (same 9 checks as above), blocks:
+R2-1 brief read whole (done at start of run 2: section map below).
+R2-2 plan §5 U4e and §4.x, Lanes, §6, §7 re-read; check (1) table.
+R2-3 check (2) by script (carries).
+R2-4 check (3) W1-U4E Q1-Q11, W1-S1, W1-N2, W1-TARGET, plus the U4d close ruling's fold.
+R2-5 check (4) >=10 recheck rows of mine at the head.
+R2-6 check (5) and (6); findings; verdict.
+
+Section map of the brief (741 lines): fold note :3-5; changes C1-C31 :7-68; 0 citations :77-87; 1 Start :91-121;
+2 What to build :125-132; 2.1 room :134-218; 2.2 server :220-259; 2.3 client :261-290; 2.4 tests :292-345; 2.5 -18 :347-355;
+2.6 bites :357-382; 2.7 seam rule :384-395; 2.8 pub :397-405; 3.1 carries :411-510 (block :416-499); 3.2 :512-521;
+4 build rules :525-580; 5 end checks :584-600; 6 return list :604-629; 7.1 table :635-682; 7.2 :684-695; 8 :699-741.
+
+- [R2-1 done] brief read whole. First stale spots seen in reading (to confirm): :172 "(section 3.2, pending)"; :374 "security's carry,
+  pending: 3.2"; :501 "Ten carries (21-27, 39, 50 and 51)" while the block now holds 15; :508-509 and :392-393 and 7.2 item 2
+  (:691-692) give carry 51's home a route other than the ruled one; e12 (:330-340) and return item 6 (:616-617) name no test or
+  report line for carries 53-57; :11 and :82 stamp the plan's old sha256.
