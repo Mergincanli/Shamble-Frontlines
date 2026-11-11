@@ -4,16 +4,13 @@
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main, last merged in at 5ca77eb (main bb2d817, PR #49, the STATUS split)
-- **Last update:** 2026-11-11 about 16:55 UTC (after Mustafa's /compact: the usage split reported; the advisor's text
-  batch applied by the main session, no agent; the HOLD stands: U4j's round 2, the U4e brief's check and U4d-F stay
-  cut)
+- **Last update:** 2026-11-11 about 17:20 UTC (the work folders saved at 4ad80a9 and the HOLD lifted; USAGE-SAVINGS
+  (a) in force; U4j's round 2 running with the first review packet; tonight's one night item posted)
 
 ## Resume card (read this first; open the rest only when a step needs it)
-**HOLD (Mustafa, 2026-11-11 about 16:15 UTC; verbatim in history.md "Decisions taken"): start no new agent until he
-says so.** Usage on the account is the bottleneck. The three cut workflows below stay stopped until he lifts the hold;
-the main session may work without agents. After his /compact (about 16:25 UTC) the main session reported the usage
-split (usage-20261111.md) and applied the advisor's text batch itself (below). The card's blocks of 2026-11-11 morning
-are in history.md, "Running work, U4 wave 1 (2)".
+**The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
+lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
+limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
 **The current step: U4 wave 1's close and wave 2's preparation.** Plan files, with the advisor's text batch of
 2026-11-11 applied: plan.md (rev 3.3, sha256 4e74a152…), u4-build-plan.md (rev 2, 7375cdcf…), u4s-carries.md (carries
@@ -22,10 +19,10 @@ advisor-u4d-close.md.
 - **Merged into the spike branch:** U4s f080551, U4b 411eeee, U4a 952f734, U4c f3f7c2f, U4d with W1-S1's npt-proto half
   39f4290 (report u4d-report.md); CI green on each. Main merged in at 5ca77eb (PR #49). At 39f4290: check.mjs 10 steps,
   measured 365, bites 412, self 52.
-- **Nothing is running.** The spend limit cut all three workflows about 13:00-13:30 UTC, and the background saver
-  stopped with the worker restart. Restart it when work resumes (background, 2 h): `node
-  .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Claude-Session:
-  https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"`.
+- **Running:** U4j's round 2 (task wqi5if4w4, run wf_0906017a-a9b, resumed about 17:05 UTC); the saver (task
+  bwrkakopa, since about 16:55 UTC, 110 minutes; restart it when it ends: `node .claude/scripts/checkpoint.mjs watch
+  netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
+  https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"`). The U4e brief's check and U4d-F wait their turn.
 
 **The three cut workflows, and what to do with each when the hold lifts.** Scripts are under
 /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/. A resumed
@@ -37,7 +34,14 @@ ones run again.
      is uncommitted in `.claude/worktrees/agent-a3b8dfeb01ed52b50` (base 411eeee; 21 changed or new entries; notes
      there: .checkpoints/netcode-proof-test/u4j-build.md, "Fix pass, round 1"; runner u4j-fix/run.sh). Round 2 diffs
      against the pre-fix copy `.gate/u4j-prefix`.
-   - Cut: round 2 (netcode-architect, security-auditor, test-engineer). **Resume the run as it is.**
+   - Round 2 (netcode-architect, security-auditor, test-engineer) **resumed about 17:05 UTC** under USAGE-SAVINGS:
+     the reviewers start from the review packet u4j-round2-packet.md (cut by review_packet.py from
+     u4j-round2-packet.json; the fixtures' diff in u4j-round2-packet-fixtures.diff); the fixer's report is out of the
+     prompts (its notes stay readable); the two readers run in parallel, then the test-engineer; every test runs
+     through u4j-fix/run.sh, pass or fail by its exit code and the runner's summary line. The fixed build is saved as
+     wip/u4j.patch (4ad80a9: 64 files on 411eeee, applies cleanly), with its notes and runner.
+   - On its return: the main session reads every round-2 finding in full (U4j is the judge and marks change, so all of
+     it touches the judge or the marks: his limit).
    - The fixer's points for round 2 and the advisor: SERIES's twin_hash row still says "any role" (the advisor's
      words needed); FX-3 (c) read stricter (two practice runs in force make a bite run INVALID); FX-10's malformed
      entries and its order of outcomes; FX-9's plant T also raised FX-1's new guard to 1.12 (round 2 plants the same).
@@ -64,6 +68,10 @@ ones run again.
      copy. Edit the script: drop the isolation; the builder works in `.claude/worktrees/wf_9ce88fa3-452-1`, reads `git
      diff` there first, completes or undoes the partial edit by Edit, and continues from its notes. Then the review
      (netcode-architect, test-engineer) as scripted.
+   - Saved: wip/u4df.patch (4ad80a9: world.rs on dad9566, applies cleanly) and u4df-build.md. Under USAGE-SAVINGS the
+     builder runs as fresh copies, one per step group of B1.2 (0-1, 2-3, 4-5, 6-7), each reading its notes and the
+     diff in the worktree before it changes anything; pass or fail by the exit code and the test runner's own summary
+     line, never a grep; long output to files under .gate/. Its review starts from a packet cut by review_packet.py.
    - It merges before U4d2's brief is final; U4d2 pins only U4d-F's recordings (carry 52).
 
 **The advisor's text batch: APPLIED by the main session (2026-11-11 about 16:50 UTC, no agent, as Mustafa asked after
@@ -79,35 +87,40 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
   shared target is quiet (a plant that already fails a test drops out of C-U6-8); B4's Lows (TE5-TE7, NA2, NA3, NA6)
   as follow-ups for U3d's part of PR #40's report; B2's U4g and U4h notes stay follow-ups (named in u4d-report.md).
 
-**Next steps, in order, when the hold lifts:**
-1. Restart the saver. Resume U4j's run (workflow 1); merge U4j after round 2 (or 3).
-2. Resume the U4e brief's run (workflow 2). Then the test-engineer's check of the applied text batch, the advisor's
-   check of the U4e brief, and U4e's build.
-3. U4d-F (workflow 3) as above; then U4d2's builder brief (carrying carry 52, N2-M2's ruling, W1-TARGET), with the
-   advisor.
+**Next steps, in order (Mustafa: "follow the card's order: U4j's round 2, then the U4e brief's check, then U4d-F"):**
+1. U4j's round 2 (running); merge U4j after round 2 (or 3).
+2. Then resume the U4e brief's run (workflow 2); the advisor's check of the U4e brief; U4e's build.
+3. Then U4d-F (workflow 3) as above; then U4d2's builder brief (carrying carry 52, N2-M2's ruling, W1-TARGET), with
+   the advisor.
 4. U4r's brief: the night's rev 2 at `cs/npt-u4r-brief` ed973c9 goes to the advisor after U4c, U4d2, U4e and U4j merge.
-- **Tonight:** a check-in fires at 19:30 UTC (trig_01W9mBGauhxrWnn1rSuweDic). Post nothing to issue #16 unless Mustafa
-  answers NIGHT-TONIGHT; remind him instead.
+- **The next report** gives, from the notes and without agents, a table per reviewer role: how many findings rated
+  Medium or higher only that role found in wave 1's units (U4s, U4a, U4b, U4c, U4d, U4j). The panels stay as they are
+  until he decides. Every report also gives the chat's size.
+- **Tonight (NIGHT-TONIGHT (c)):** one item on issue #16, item 6 npt-text-batch-check (plan night-2026-11-12.md,
+  brief text-batch-log.md): the test-engineer's check of the applied text batch, with one line each on R-31 and
+  U3D-MISS's sampling case. Fold it in the morning. PR #40's report lists those two edits as readings for Mustafa to
+  confirm (closing checklist). The 19:30 UTC check-in (trig_01W9mBGauhxrWnn1rSuweDic) is deleted: its question is
+  answered.
 - **Housekeeping later** (approved method: leftovers to a local branch, then a plain `git worktree remove`):
   `.gate/u4a-prefix`, `u4b-prefix`, `u4b-wt`, `u4c-prefix`, `u4d-prefix`, `u4d-s1`; `.claude/worktrees/`
   agent-a9297644e7c0354f3 (U4a), wf_f54246ff-e0d-1 (U4d), wf_f54246ff-e0d-2 (U4c).
 
-**Open questions for Mustafa:**
-- **NIGHT-TONIGHT (asked 2026-11-11 about 16:20 UTC):** post tonight's night items to issue #16? The night shift's
-  agents run on the same account. Options: (a) post as planned; (b) post none tonight; (c) post one small item.
-  Recommended: (b) while the hold stands.
-- **USAGE-SAVINGS (asked 2026-11-11 about 16:55 UTC):** adopt the three savings in usage-20261111.md when the hold
-  lifts (builders restart fresh from their notes at each fix group; a lean main session, compacted at about 35-40 %;
-  one review packet per round)? Options: (a) all three; (b) the ones he names; (c) none. Recommended: (a).
+**Open questions for Mustafa:** none open.
 - Answered today (verbatim in history.md): NIGHT-BUDGET (a); the drift fix before U4d2's pins (carry 52); the effect
-  row's owner deferred to U4e (carry 51); U4j's F1 by the review budget; the HOLD.
+  row's owner deferred to U4e (carry 51); U4j's F1 by the review budget; the HOLD, lifted at the save (4ad80a9);
+  USAGE-SAVINGS (a) with his limits; NIGHT-TONIGHT (c), one item.
 
 **Rules in force** (his words verbatim in history.md "Decisions taken" unless marked)
-- **Mustafa, 2026-11-11:** the HOLD (no new agent until he says so; the text batch for the main session); NIGHT-BUDGET
-  (a) (switch to (b) on the first night whose queue does not fit, and tell him); the 9.5 floor does not move; a Low
-  never triggers a push; U4j's F1 open after round 3 → stop and bring it to him; STATUS keeps one #40 line; his words
-  move between docs by script and line ranges, never retyped; reports give the session's context figure (get_session,
-  context_usage: 702,677 of 1,000,000 at 12:36 UTC).
+- **Mustafa, 2026-11-11:** USAGE-SAVINGS (a), all three, with his limits: builders' pass or fail from the exit code
+  and the test runner's own summary line, never a grep, and a fresh copy reads its notes and the diff in its worktree
+  before it changes anything; the main session reads in full every finding rated Medium or higher and everything that
+  touches the judge, the marks or a pass bar; the review packet is cut by script, holds no conclusion of the builder or
+  the main session, ends with the ids of the carries it left out, and reviewers stay free to read any file and run
+  any test; the chat's size in every report (get_session, context_usage), and he types /compact when told it is at
+  35-40 %, after the card is refreshed. NIGHT-BUDGET (a) (switch to (b) on the first night whose queue does not fit,
+  and tell him); the 9.5 floor does not move; a Low never triggers a push; U4j's F1 open after round 3 → stop and
+  bring it to him; STATUS keeps one #40 line; his words move between docs by script and line ranges, never retyped;
+  the review panels stay as they are until he decides.
 - **Mustafa, 2026-11-10:** RESUME-CARD; WIP-CLEAN; SIZE-CHECK (three lines when a unit grows well past its plan);
   TCP-FREEZE; NETEM-BAR (a); SQUASH-40 with SQUASH-CITES (a) (the closing checklist under Next steps); PROMOTE at
   U4's close; the second lane: merge main as usual, by the plain merge the guard allows.
@@ -128,8 +141,9 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
 - History: history.md (Steps done U0-U3d; Decisions taken, newest first; Running work up to U3c; "Running work, U4 wave
   1" (the card's blocks of 2026-11-10) and "(2)" (2026-11-11's, moved at the HOLD)).
 - The closing checklist for PR #40: under Next steps.
-- Usage: usage-20261111.md (the 24-hour split and the three proposed savings; script usage24.py). The text batch:
-  text_batch.py.
+- Usage: usage-20261111.md (the 24-hour split and the three savings; script usage24.py). The text batch:
+  text_batch.py, its log text-batch-log.md. Review packets: review_packet.py with one JSON config per round
+  (u4j-round2-packet.json). Tonight's night plan: night-2026-11-12.md.
 
 ## Steps done
 Moved to history.md (RESUME-CARD, 2026-11-10): every step from U0 to U3d, with its SHA.
@@ -167,6 +181,9 @@ free:
 - **PROMOTE's one-pager** (engine-architect) at U4's close, not before. Moving crates "as they are" would reverse
   SPIKE-SCOPE (a) (plan.md:347; §4.9 :653-662, "the foundation writes its crates fresh"), so that decision is
   Mustafa's, with the advisor's view.
+- **Readings for Mustafa to confirm** (his NIGHT-TONIGHT (c), 2026-11-11: "PR #40's report lists those two edits as
+  readings for me to confirm"): R-31's new wording (plan.md:1424, NA1) and U3D-MISS's sampling case (plan.md:1248, the
+  U8 row), each with the night check's one-line reading on whether any pass bar's number or direction moved.
 **Older next steps** (U1 era, kept for the record):
 1. On Mustafa's "merge #41": check gate and smoke green on 1b4094a, merge with that SHA as the expected head; then
    `git merge origin/main` into this branch (only reviewed main comes in) so marks.json's row hashes match; remove

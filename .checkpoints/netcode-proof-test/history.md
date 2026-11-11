@@ -278,6 +278,40 @@ checkpoint's resume card is the handoff; open this file only when a step needs t
     R1 still waits for stop B.
 
 ## Decisions taken
+- **Mustafa, 2026-11-11 about 16:45 UTC (verbatim):** "My words of 2026-11-11, for the netcode chat (PR #40, the
+  netcode proof test).
+  First, before anything else and without agents: save what exists only in a work folder.
+  - U4j's fix pass is not on the branch. wip/u4j.patch was saved at 09:54 UTC, before the fix pass began, and
+    u4j-build.md on the branch has no "Fix pass" section.
+  - Put the fixed code, the builder's notes with "Fix pass, round 1" and its runner on the branch: snapshot U4j's
+    worktree again with worktree_patch.py and copy the notes into the checkpoint folder. Do the same for U4d-F's
+    worktree with its partial edit.
+  - Commit, push, and tell me the SHA.
+  - If a worktree is gone or differs from what the card says, stop there and tell me.
+  USAGE-SAVINGS: (a), all three, with these limits.
+  - Builders: pass or fail comes from the exit code and the test runner's own summary line, never from a grep. A
+    fresh copy reads its notes and the diff in its worktree before it changes anything.
+  - The main session still reads in full every finding rated Medium or higher, and everything that touches the
+    judge, the marks or a pass bar.
+  - The review packet is cut by script and holds no conclusion of the builder or the main session. It ends with the
+    ids of the carries it left out. Reviewers stay free to read any file and run any test.
+  - Give me the chat's size in every report. I type /compact when you tell me it is at 35 to 40 %, after you have
+    refreshed the card.
+  NIGHT-TONIGHT: (c). One item: the test-engineer's check of the applied text batch, with the script's log as its
+  brief.
+  - It says in one line each, for R-31 and for U3D-MISS's sampling case, whether any pass bar's number or direction
+    moved.
+  - If this item does not fit the night shift's rules, post none tonight and tell me.
+  - PR #40's report lists those two edits as readings for me to confirm.
+  The hold lifts when the save is pushed. Restart the saver, then follow the card's order: U4j's round 2, then the
+  U4e brief's check, then U4d-F.
+  In your next report, from your notes and without agents: a small table with, for each reviewer role, how many
+  findings rated Medium or higher only that role found in wave 1's units (U4s, U4a, U4b, U4c, U4d, U4j). The review
+  panels stay as they are until I decide."
+  - Done: the save, 4ad80a9 (both worktrees matched the card): wip/u4j.patch (U4j's fixed build on 411eeee, 64
+    files, applies cleanly), u4j-build.md with "Fix pass, round 1" (the branch's 135 lines plus 199 added),
+    u4j-fix/run.sh; wip/u4df.patch (U4d-F's world.rs edit on dad9566, applies cleanly) and u4df-build.md. The hold
+    lifted with that push.
 - **Mustafa, 2026-11-11 about 16:25 UTC, after his /compact (verbatim):** "You were just compacted to cut usage. Read
   the resume card in .checkpoints/netcode-proof-test.md first and continue from it. Do not redo finished work.
   Then, without agents and in ten minutes at most:
