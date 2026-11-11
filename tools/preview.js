@@ -1,5 +1,5 @@
 // SETUP: cd tools && npm ci   (three, pngjs, and the optional native gl + @napi-rs/canvas resolve from tools/node_modules)
-// RUN from the repo root. Windows: node tools/preview.js . <cmd> ...   Linux: xvfb-run -a node tools/preview.js . <cmd> ...
+// RUN from the repo root. Windows: node tools/preview.js legacy <cmd> ...   Linux: xvfb-run -a node tools/preview.js legacy <cmd> ...
 //   cmds: list | measure | time | menu <out.png> | top <out.png> [x] [z] [span] | shot <out.png> <x> <z> [fov=15] [W] [H]
 //         eval <snippet.js> | evalshot <snippet.js> <out.png>
 // Headless preview of the REAL build: three r128 + shamble-core.js + shamble-game.js, bootGame(), gameplay camera.
