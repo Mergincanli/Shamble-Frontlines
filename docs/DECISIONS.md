@@ -96,6 +96,19 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-11, 16:54:54 UTC: a correction to his words on permission prompts (the entry directly
+  below)** (foundation 2.1a, PR #50; his message in that change-set's session, session_019YNMUWLffMoE47SbvkqJ5P, on his
+  personal account, extracted by script from the session's events, event a10ee1d6-3120-4eb1-b83a-4e84afe50a94). Placed
+  next to the words it corrects, as he asked. Copied by script from `docs/reports/2026-11-11-foundation-2-1a.md`,
+  Appendix A3.5, and checked byte for byte against it:
+> My words of 2026-11-11, a correction to my words on permission prompts of 16:32 UTC, for the foundation chat (PR #50, foundation step 2.1a).
+> - Your tally shows this chat was already in Auto mode. Nothing was switched. Read that line as "this chat stays in Auto mode".
+> - The line "A prompt from the guard counts as not seen by me until I have answered the same question in chat" covers two things only: an edit to a kit or gate file, and a move of the main folder.
+> - For every other question from the guard, my answer on the prompt is my answer. Do not ask me in chat as well. Examples: a worktree under .gate/, a switch inside such a worktree, a shell line the guard cannot read that touches no kit or gate file.
+> - In round 2's and the verifier's briefs, tell the agents which forms the guard refused today, so they write with the file tools or with one plain command and a literal path. An agent cannot be asked, so those writes are refused.
+> - The tally is enough as it is. No further agent for it.
+> - In the ready report, give me CI's gate and smoke results for the final head, with the run numbers. If smoke is not green on the final head, say why and leave #50 a draft.
+> - Record these words in docs/DECISIONS.md next to the words they correct.
 - **Taken by Mustafa, 2026-11-11, 16:32:18 UTC: his words on permission prompts** (foundation 2.1a, PR #50; his message
   in that change-set's session, session_019YNMUWLffMoE47SbvkqJ5P, on his personal account, extracted by script from the
   session's events, event 557d0202-6418-4c26-9d03-9b1ee13fd5bf). Its two report items (the commands that asked him most

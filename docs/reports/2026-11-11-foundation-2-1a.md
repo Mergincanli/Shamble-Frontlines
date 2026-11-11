@@ -146,6 +146,19 @@ My words of 2026-11-11 on permission prompts, for the foundation chat (PR #50, f
 Carry on from where you are. The mutation proof keeps running.
 ```
 
+### A3.5. His message in this session, 2026-11-11 16:54:54 UTC: a correction to his words on permission prompts (A3.4) (extracted by script from the session's events, event a10ee1d6-3120-4eb1-b83a-4e84afe50a94: `mustafa-2026-11-11-prompts-correction.md`)
+
+```text
+My words of 2026-11-11, a correction to my words on permission prompts of 16:32 UTC, for the foundation chat (PR #50, foundation step 2.1a).
+- Your tally shows this chat was already in Auto mode. Nothing was switched. Read that line as "this chat stays in Auto mode".
+- The line "A prompt from the guard counts as not seen by me until I have answered the same question in chat" covers two things only: an edit to a kit or gate file, and a move of the main folder.
+- For every other question from the guard, my answer on the prompt is my answer. Do not ask me in chat as well. Examples: a worktree under .gate/, a switch inside such a worktree, a shell line the guard cannot read that touches no kit or gate file.
+- In round 2's and the verifier's briefs, tell the agents which forms the guard refused today, so they write with the file tools or with one plain command and a literal path. An agent cannot be asked, so those writes are refused.
+- The tally is enough as it is. No further agent for it.
+- In the ready report, give me CI's gate and smoke results for the final head, with the run numbers. If smoke is not green on the final head, say why and leave #50 a draft.
+- Record these words in docs/DECISIONS.md next to the words they correct.
+```
+
 ### A4. His go for #49, 2026-11-11, about 09:02 UTC, as the merge commit bb2d817's message records it (quoted there with "> "; the prefix is removed here). Not checked against the chat record: that day session (session_0173vVo6Vtm2C54toWvTt8sR) is not readable from this account
 
 ```text
