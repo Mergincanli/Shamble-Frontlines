@@ -51,3 +51,9 @@ added line inside the loose-ends section; ADR 0002 hunks only on :7, the OQ-0002
   and the five follow-ups he accepted). Script-only file.
 - CLAUDE.md (outside scope): :47-:52 hard constraints (scope to legacy/ only; :48 names index.html), :53-:55 (the
   "Decisions pending" paragraph: ADR 0002 part 1 now accepted); :45 "index.html's live path"; :242 `<dir>` form (fine).
+- START_HERE banner reworded: the docs-stay-in-docs/ decision now points at ADR 0002's OQ-0002-2 answer; KT21 cited for
+  the redesign mark only (KT21's row holds START_HERE's own mark, not the docs location).
+- Evidence read back: E1-E2 PASS, E3 bases PASS, E3 31/31 entries fail the same checks in old and head, E4 PASS (21/21),
+  E5 SHARED, E6 14/14 pass, E8 GATE PASS (full and smoke-only). CI (GitHub API): c090843 runs #674/#675, 1e6f84e
+  #676/#677, b6b3b81 #678/#679, all success.
+- Stale add: STATUS_ARCHIVE "Fixed in dd12aeb ... on main once #50 merges" (main :865) is now past tense.
