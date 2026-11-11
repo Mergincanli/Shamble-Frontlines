@@ -14,6 +14,8 @@ So: notes are rewritten whole with Write; plants are applied by a scratch script
 replaces exactly one unique match (asserts count == 1), saves a byte copy first, restores from it and checks sha256
 against r2t-ref.sha256 after each plant. Same method as round 1's u4d-test-bites.py. Runner: scratchpad r2t-run.sh
 (idle 8 s, df, touch, 2 s toucher inside the script, output to stdout only).
+MY SLIP: block [4] below was first appended to this file by a shell heredoc (`cat >> ... <<EOF`), not by Write; notes
+only, no other file; this whole file was then rewritten with Write.
 
 ## Plan
 1. sha256 of every file in crates/sim and crates/proto; compare with u4d-build.md's list and s1-ref.sha256.
@@ -62,3 +64,18 @@ against r2t-ref.sha256 after each plant. Same method as round 1's u4d-test-bites
   - P3 (put_delta's check off): w1_s1 FAILED "Vehicle own true: Add(...)" (tests/wire.rs:225). = s1.
   - P7 (SOLDIER [Field; 11] + 3 VELOCITY): the GROUPS unit test FAILED at snapshot.rs:747, widths [16,16,12,16,10,8,
     10,4,16,16,16] vs the row's 8. = s1. (npt-sim, npt-link, npt-proto recompiled from this copy.)
+- [5] My own plants (whole npt-sim measured suite, --no-fail-fast; restored, ALL-OK after each):
+  - O1 (part_center rotates by -yaw: signs of the s terms flipped, world.rs:452-453), 11:39:46-11:40:34: ONLY d7
+    FAILED, at tests/replay.rs:351 (SS's state after 1/30/300 ticks pin). lib 3, seam 8, world 30 pass: h1 x2, a_m1,
+    r_m1, D-1, D-3, D-6 all pass. D-2 (in replay) passes too (5 of 6 passed).
+  - O2 (part_center ignores the hull's yaw, c = 1, s = 0), 11:41:01-11:41:50: ONLY d7 FAILED (:351), the rest pass.
+  - O3 (phase 3 does not refresh the soldiers' records: the present volumes are the soldiers' boxes before this
+    tick's moves, world.rs:1476-1478), 11:42:06-11:42:56: ONLY d7 FAILED (:351), the rest pass.
+  - O4 (decode reserves by the header's count again, replay.rs:323), 11:43:27-11:44:18: NOTHING fails (47 pass).
+  - O5 (carry 13, `*self = source.clone()`): carry13 FAILED "tick 2: soldiers' buffer" (:1927). = builder's P2.
+  Reading: D-7's pins were re-pinned by this same fix pass (u4d-build.md F4) after the composition and phase-3 code
+  were written, so a pin is no evidence that the frame convention or the phase-3 refresh is right, only that nothing
+  changed since F4. By reading, both are right now: part_center (world.rs:446-458) is the old place_vehicles formula
+  (x' = ox c - oy s, y' = ox s + oy c, prefix world.rs:1177-1190) on the hull record's grid yaw; present_volumes
+  refreshes records[slot] from soldier_record (pre-snap raw -> grid = the snapped position's grid, carry 9), which is
+  the old build_volumes' to_grid(s.pos) for the snapped s.pos.
