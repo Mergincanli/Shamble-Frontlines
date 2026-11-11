@@ -44,6 +44,13 @@ erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md.
     test-engineer (a general-purpose agent with the Edit tool, B6's first form, reading main's test-engineer.md; notes
     u4df-review-test.md) proves: plants O1-O3, P1, P2 by Edit, the three-seed test, check.mjs once counted. On return:
     read every Medium or higher in full; the fix pass; round 2 on what changed; then the merge (saver stopped first).
+    - **netcode-architect: APPROVE WITH FINDINGS** (23:31 UTC; read in full by the main session): no Critical or High.
+      NF-M1 Medium, not before merge, for the advisor: the drift check (each 300 s half in 9.5-10.5) fires on noise
+      at ES's stationary level, 9.88 over 36 min and 9 seeds; out of sample, seed 6's second half is 9.446; so the
+      advisor rules on the report's wording and on how a later re-measure judges drift (the band does not move).
+      NF-L1 to NF-L4, Low: carry lines (no ES byte figure from the synthetic recording; carry 59 names the -26 %),
+      the report's numbers on 3b, and 3b's switch tied to `aim_one_in > 1` (a follow-up). Its slip: blocks [5]-[8] of
+      its notes were first appended by a python one-off, then the file was rewritten whole with Write.
   - Done meanwhile: TE2-5 (b), ten of ten runs exit 0, each 443 passed, 0 failed, 12 ignored (te2-5-record.md).
   - the saver, restarted after U4j's push (about 20:15 UTC, 110 minutes): `node .claude/scripts/checkpoint.mjs watch
     netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
