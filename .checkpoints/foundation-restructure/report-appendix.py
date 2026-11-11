@@ -17,7 +17,8 @@ a10 = fenced('mustafa-2026-11-10-answers.md')    # answers, follow-up, #47's tur
 s11 = fenced('mustafa-2026-11-11.md')            # prompt, BRANCH-47 + advisor tool
 f11 = fenced('mustafa-2026-11-11-f1.md')         # F1-FIX, FREEZE-FDN, his yes to the exact gate change
 p11 = fenced('mustafa-2026-11-11-prompts.md')    # his words on permission prompts
-assert (len(d10), len(a10), len(s11), len(f11), len(p11)) == (3, 3, 2, 1, 1), (len(d10), len(a10), len(s11), len(f11), len(p11))
+c11 = fenced('mustafa-2026-11-11-prompts-correction.md')  # his correction to them
+assert (len(d10), len(a10), len(s11), len(f11), len(p11), len(c11)) == (3, 3, 2, 1, 1, 1), (len(d10), len(a10), len(s11), len(f11), len(p11), len(c11))
 msg = subprocess.run(['git', 'show', '-s', '--format=%B', 'bb2d817'], capture_output=True, text=True, check=True).stdout
 q = [l for l in msg.split('\n') if l.startswith('> ') or l == '>']
 go49 = '\n'.join(l[2:] if l.startswith('> ') else '' for l in q)
@@ -34,6 +35,7 @@ BLOCKS = [
     ('A3.2', 'His message in this session, 2026-11-11 11:56:44 UTC: BRANCH-47 (a) and his words on the advisor tool (same source)', s11[1]),
     ('A3.3', 'His message in this session, 2026-11-11 14:54:11 UTC: F1-FIX (a), FREEZE-FDN (a) for one check, and his yes to the exact change to `tools/gate.mjs` (extracted by script from the session\'s events, event 8e7ad9dc-cdf8-43a7-817b-ceaaba67081e: `mustafa-2026-11-11-f1.md`)', f11[0]),
     ('A3.4', 'His message in this session, 2026-11-11 16:32:18 UTC: his words on permission prompts (extracted by script from the session\'s events, event 557d0202-6418-4c26-9d03-9b1ee13fd5bf: `mustafa-2026-11-11-prompts.md`)', p11[0]),
+    ('A3.5', 'His message in this session, 2026-11-11 16:54:54 UTC: a correction to his words on permission prompts (A3.4) (extracted by script from the session\'s events, event a10ee1d6-3120-4eb1-b83a-4e84afe50a94: `mustafa-2026-11-11-prompts-correction.md`)', c11[0]),
     ('A4', 'His go for #49, 2026-11-11, about 09:02 UTC, as the merge commit bb2d817\'s message records it (quoted there with "> "; the prefix is removed here). Not checked against the chat record: that day session (session_0173vVo6Vtm2C54toWvTt8sR) is not readable from this account', go49),
 ]
 for _, _, t in BLOCKS:
