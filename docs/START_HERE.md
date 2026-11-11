@@ -1,6 +1,6 @@
 # Shamble Frontlines — START HERE (engineer onboarding)
 
-> **Legacy doc** (row KT21 of `LEGACY_INVENTORY.md`: the legacy docs stay in `docs/`, marked legacy): it describes the legacy build in `legacy/`, and is rewritten for v2 later (KT21's mark: redesign).
+> **Legacy doc:** it describes the legacy build in `legacy/`. The legacy docs stay in `docs/`, marked legacy (ADR 0002, OQ-0002-2's answer, 2026-11-11); this one is rewritten for v2 later (row KT21 of `LEGACY_INVENTORY.md`, mark: redesign).
 
 > **Read this first in every chat.** Written 2026-10-02 from the live build, at the end of the animation-overhaul +
 > bug/optimization-audit chat. **[verified]** = confirmed against the code or measured; **[assumed]** = carried over,
@@ -114,8 +114,8 @@ npm ci                                    # the pinned versions in tools/package
 npx --no -- playwright install chromium   # for the gate's smoke test (5a) and pageshot.js; --no never downloads another playwright
 ```
 Run every tool from the repo root, with the build folder `legacy` as its folder argument (`tools/README.md`, "The build
-folder") [verified 2026-11-11: 2.1b's E6 ran `battery.js`, `preview.js` and `pageshot.js` with it]. On Linux, prefix `preview.js` (and `pageshot.js --headed`) with `xvfb-run -a`;
-Windows needs no prefix. Generated output (renders, exports, builds) goes under `.gate/` (gitignored).
+folder") [verified 2026-11-11: 2.1b's E6 ran `battery.js`, `preview.js` and `pageshot.js` with it]. On Linux, prefix
+`preview.js` (and `pageshot.js --headed`) with `xvfb-run -a`; Windows needs no prefix. Generated output (renders, exports, builds) goes under `.gate/` (gitignored).
 - **`node tools/preview.js legacy <cmd>`**: renders the real **3D scene** headless (WebGL1): `shot`, `menu`, `top`, `eval <snippet>`, `evalshot <snippet> <out.png>`, `measure`, `time`. It **cannot draw the HUD/DOM/CSS**. Needs the optional native `gl` package.
 - **`node tools/pageshot.js legacy index.html <prefix> [--headed] <steps…>`**: Playwright + Chromium renders the **real pages including DOM, HUD and CSS** (use it for UI work). Headless = SwiftShader (CPU); `--headed` = the real GPU. Every shot prints the WebGL renderer it came from. The Linux container lacks Arial Black / Courier New / Segoe Print, so fonts differ from Brave there.
 - **`node tools/battery.js legacy`**: checks 3–4 as JSON (`gate.mjs` wraps it). **`sim.js`**: headless 90 s match (`node tools/preview.js legacy eval tools/sim.js [--map=tri]`; kill matrix included). **`reach.js`**: spawn-to-goal reachability on the NAV grid (`eval tools/reach.js [--map=tri]`). **`perfbots.js`**: bot scaling at 12 / 24 / 48 soldiers (`node --expose-gc tools/preview.js legacy eval tools/perfbots.js --map=tri --pre=<file.js>`). `preview.js --map=<id>` boots a map like `index.html?map=<id>`; `--pre=<file.js>` runs a file after the engine scripts load and before `bootGame()`; `pageshot.js` takes a query (`index.html?map=tri`). **`aabbs.js`** now also exports the live map's silo and tech points. **`aabbs.js` + `village.py`**: map layout export + validation (`python tools/village.py`, paths in its header).
