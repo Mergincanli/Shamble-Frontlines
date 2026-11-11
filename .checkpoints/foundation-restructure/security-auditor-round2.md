@@ -9,3 +9,5 @@ B5. Weakening of guard/rules/merge route in the delta (kit/gate files touched?).
 B6. Verdict section. DONE.
 
 ## Notes
+- B1 done: delta outside .checkpoints = tools/gate.mjs (+10/-1), docs/DECISIONS.md, ROADMAP, STATUS, STATUS_ARCHIVE, the report. My round-1 F1: flip -> decoy (clean legacy/ + broken root page) passes both CI jobs; fix asked = case-insensitive listing of the not-chosen folder when base.prefix !== BUILD_PREFIX.
+- B2 reading: new block gate.mjs:243-249 (76544aa): if base && base.prefix !== BUILD_PREFIX, readdirSync(join(ROOT, base.prefix)) filtered /^(index\.html|editor\.html|shamble-.*\.js)$/i, any hit -> die (exit 2). Exactly the fix I asked. Skipped when --smoke-only (base null): the decoy is caught only by the gate job -> needs gate job required + base resolved (check gate.yml). Candidates to probe: trailing dot/space names ("index.html." not matched by the regex); `legacy` as a regular file in the revert direction (readdirSync ENOTDIR -> uncaught -> exit 1, not 2: still fail closed); dir named index.html (matched -> exit 2, false positive, fine); post-2.1b root page with no flip (v2 limit, by design).
