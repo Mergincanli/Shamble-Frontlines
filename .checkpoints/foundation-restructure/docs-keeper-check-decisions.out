@@ -1,0 +1,24 @@
+ok   appendix: 9 blocks A1.1,A1.2,A1.3,A2.1,A2.2,A2.3,A3.1,A3.2,A4
+ok   Queued sentence is the end of A3.2's last line, byte for byte
+ok   A2.3 is 848 characters (the chat record's count), got 848
+ok   A4 equals bb2d817's message's quoted lines, byte for byte
+ok   bb2d817: one italic "How it was made" paragraph (lines 6-12)
+ok   this head: one italic "How it was made" paragraph (lines 6-16)
+ok   the italic paragraph is reworded (7 lines -> 11 lines)
+ok   no old line deleted or changed apart from the italic paragraph (0)
+ok   every other old line is unchanged and in order (492 of 492)
+ok   every inserted line is a quote, header, pointer or the italic line (unclassified: 0)
+     inserted lines by kind: {'quote': 63, 'header': 55, 'pointer': 8, 'italic': 11}
+ok   quote run (indent 4, 1 lines) equals one source block byte for byte: ['Queued: A3.2 sentence']
+ok   quote run (indent 0, 20 lines) equals one source block byte for byte: ['A3.2']
+ok   quote run (indent 0, 3 lines) equals one source block byte for byte: ['A3.1 (his labelled block)']
+ok   quote run (indent 0, 7 lines) equals one source block byte for byte: ['A2.3']
+ok   quote run (indent 0, 5 lines) equals one source block byte for byte: ['A4']
+ok   quote run (indent 0, 5 lines) equals one source block byte for byte: ['A2.2']
+ok   quote run (indent 0, 15 lines) equals one source block byte for byte: ['A2.1']
+ok   quote run (indent 4, 1 lines) equals one source block byte for byte: ['A1.1']
+ok   quote run (indent 4, 1 lines) equals one source block byte for byte: ['A1.2']
+ok   quote run (indent 4, 5 lines) equals one source block byte for byte: ['A1.3']
+ok   each source block inserted exactly once: {'Queued: A3.2 sentence': 1, 'A3.2': 1, 'A3.1 (his labelled block)': 1, 'A2.3': 1, 'A4': 1, 'A2.2': 1, 'A2.1': 1, 'A1.1': 1, 'A1.2': 1, 'A1.3': 1}
+ok   three pointer lines in DECISIONS.md (3)
+RESULT: PASS
