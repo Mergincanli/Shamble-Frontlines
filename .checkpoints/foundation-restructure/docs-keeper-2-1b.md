@@ -35,3 +35,19 @@ added line inside the loose-ends section; ADR 0002 hunks only on :7, the OQ-0002
   hold. 120 lines.
 - STATUS_ARCHIVE: #50 merged row at the top of "In flight" (facts: GitHub API merged_at, merge commit 76b4f7a message, main run 43079707687); risk R7 item 3 (:843) corrected, [verified] (R100 x5, blobs equal).
 - ROADMAP: 2.1b entry at the top of Recent work (#50 merge stated in it). Not done (brief Never: ROADMAP history / nothing wider): the 2.1a entry still reads "PR #50: in review"; Recent work now 13 entries, fold not done.
+- START_HERE :116-118 rewrapped (the folder-argument sentence). Both checks: repo-map OK (112/99, exit 0); docs check PASS (exit 0).
+
+## Stale, left for the report (unedited)
+- docs/LEGACY_TUNING.md:9 `preview.js . eval tools/tuning-dump.js` (oracle file, Never list; regenerate via R7's builder).
+- docs/ENGINE_OVERVIEW.md:4 and docs/SPIKE_PLAN.md:5 "not yet accepted" with no ADR 0002 part 1 exception.
+- docs/V2_PHASE0_BRIEF.md:10 "It moves to `legacy/` in phase 1"; ADR 0001:1769 (same future tense).
+- ADR 0002 :150 "is the phase 1 restructure plan's call (OQ-0002-2)" reads as pending (now answered in part).
+- Register ADR 0002 row: open-question column lists no "-2 answered in part" (kept exactly: REG-TRUE (b), brief 9a).
+- Register status sentence: after the inserted SCOPE (a) clause, "His words:" (SPIKE-ORDER (b)'s) may read as SCOPE (a)'s.
+- ROADMAP: the 2.1a entry still "PR #50: in review" / "Next: the advisor's review and his go"; Recent work at 13 (fold
+  into Build history not done); :3 banner names root-less file names.
+- STATUS "From foundation 2.1a": "for 2.1b's plan, IE-2 ... SA-L1" (taken into 2.1b's plan check; state for the report).
+- DECISIONS.md: no entry for his go for #50 (merge commit 76b4f7a's message: also his approval of dd12aeb's two gate edits
+  and the five follow-ups he accepted). Script-only file.
+- CLAUDE.md (outside scope): :47-:52 hard constraints (scope to legacy/ only; :48 names index.html), :53-:55 (the
+  "Decisions pending" paragraph: ADR 0002 part 1 now accepted); :45 "index.html's live path"; :242 `<dir>` form (fine).
