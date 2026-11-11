@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 14:45 Amsterdam
+- **Last update:** 2026-11-11 15:00 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -84,9 +84,20 @@
    :38, :724, :1115; SPIKE_PLAN :96, :194; the plan named only the ones done); ADR 0002 lines after 1425 shift +4,
    SPIKE_PLAN after 92/130/440 shift +4/+8/+12.
 
+9. Before the round: CI green on 1023870 (push 43028828063, pull_request 43028839082); #49 read back (merged_at
+   09:03:11 UTC, head 2e6e5d2; comment 6779064873 approves 2e6e5d2 by full SHA). Touch-ups by hand (3c98ad5): #49's
+   time is merged_at (09:03:11; the commit is dated 09:03:10) in STATUS, the archive row and the DECISIONS header; the
+   archive's intro line names what docs-keeper adds since (the advisor's Low 4 on #49, "Fix in the next docs pass").
+   docs-keeper's generators are not re-run after these hand edits. Decisions check PASS; gate PASS. The review round
+   launched on 3c98ad5 (pinned): security-auditor, test-engineer (owns rows-test.mjs; `.gate/fdn-rows` moved aside to
+   `.gate/fdn-rows-main-1435`), infra-engineer; the reviewers judge the recorded E3. For the verifier's bounded E3 sample
+   (P1-P4, M5, C1 on three gates): worktrees `.gate/fdn-old` (44446a5), `.gate/fdn-new` (3c98ad5), `.gate/fdn-newleg`
+   (3c98ad5 + local move commit 104d675, never pushed), each with a `tools/node_modules` link; the runner copy
+   `.gate/foundation-restructure/e3-sample/e3-run-sample.mjs` (only the table filter and OUT differ; OUT under `.gate/`).
+
 ## Current step
 
-His step 3, the review round: security-auditor, test-engineer and infra-engineer on 1023870 (or the next checkpoint-only head); then the verifier; the advisor agent's C1-C8 check.
+His step 3: the three reviewers running on 3c98ad5; then the fix pass (gate-file changes ask him in chat first and break the blob proofs: re-run E3 and the rows), the verifier (with the E3 sample) and the advisor agent's conditions check alongside it; a delta review after the last commit.
 
 ## Next steps (on PR #50, this branch)
 
@@ -158,8 +169,19 @@ His step 3, the review round: security-auditor, test-engineer and infra-engineer
    CLAUDE.md clarification at 2.3; SLICE-ORDER's pointer beside, never inside, the block; #50's STATUS row touched in
    step 4; F-L grows (a revert of #50 removes #49's record and today's words): say so in the report; #47 read back.
 
+3. 2026-11-11 14:50 Amsterdam · before closing step 2 and launching the round (his moments 1 and 5): is the docs pass
+   done, and is the round set up right? · changed: CI on 1023870 and #49's facts read back first (found: merged_at
+   09:03:11, fixed in 3c98ad5); the diff pinned to a SHA, never HEAD; rows-test owned by test-engineer on a fresh folder;
+   E3 judged as recorded, the verifier alone runs a bounded sample on worktrees the session builds, results under
+   `.gate/`; a smoke failure under parallel load re-run once; known limits named up front; #49's go flagged to the
+   security-auditor and a "For Mustafa" line asking him to confirm that text; the advisor agent briefed on rev 3, the
+   marker departure and this session's deviations, run alongside the verifier, then a delta review of the final head;
+   docs fixes through the generators or by hand, never both; docs-keeper's effort (high) on an ADR pointer line noted
+   for the report.
+
 ## Running work
-- Saver: background task bjteqwe4t, started 14:02 Amsterdam, stops by 15:52 (110 min); last check 14:35: ok (watching).
-- docs-keeper: done (1023870).
+- Saver: background task bjteqwe4t, started 14:02 Amsterdam, stops by 15:52 (110 min); last check 15:00: ok (autosaves pushed).
+- docs-keeper: done (1023870). Reviewers running (background): security-auditor, test-engineer, infra-engineer on 3c98ad5;
+  notes `<agent>-review.md`. The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
 - The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
   container (step 3 note).
