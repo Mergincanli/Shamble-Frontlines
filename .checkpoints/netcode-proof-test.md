@@ -14,7 +14,7 @@ the advisor's wave-1 rulings, with the exact words for every text change: adviso
 2026-11-10 (the wave-1 list, NOW, SAVE, SAVE POINT, the next three actions of then) are in history.md, "Running work,
 U4 wave 1", moved by card_refresh.py.
 - **Merged:** U4s (f080551), U4b (411eeee), U4a (952f734), **U4c (f3f7c2f, 10:38 UTC)**, **U4d with W1-S1's npt-proto
-  half (39f4290, about 12:15 UTC)**; CI green on 411eeee, 952f734 and f3f7c2f. Main merged in: kit-v3-4 (df8975b) and
+  half (39f4290, about 12:15 UTC)**; CI green on 411eeee, 952f734, f3f7c2f and 39f4290. Main merged in: kit-v3-4 (df8975b) and
   PR #49, the STATUS split (5ca77eb, by merge_status_split.py, as Mustafa asked on 2026-11-11; CI green on 5ca77eb).
 - **U4d's merge (39f4290):** round 2 (wf_4b5ee472-66b) all five APPROVE WITH FINDINGS, no Critical or High;
   SEC-U4a-1 and SEC-U4a-2 closed in writing. check.mjs on the merged tree: measured 365 = 325 + 39 + 1, bites 412 =
