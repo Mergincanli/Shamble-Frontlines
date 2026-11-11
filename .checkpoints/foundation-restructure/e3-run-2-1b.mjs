@@ -3,7 +3,8 @@
 // Plants each entry of e3-mutations.json in two throwaway worktrees built from commits, runs the full gate (smoke
 // included) against the base 44446a5, records the failing check ids and the exit code, and restores the file.
 //   old  = .gate/fr-old   at 44446a5 (OLD's own gate; files at the root): the independent judge
-//   head = .gate/fr-head  at 2.1b's move commit (main's gate, unchanged by 2.1b; files in legacy/)
+//   head = .gate/fr-head  at 2.1b's pushed head when run (b6b3b81: the move, the commands, the kit lines; main's gate,
+//          unchanged by 2.1b; files in legacy/, the same blobs as the move commit c090843)
 // Run from the repo root (resumable: entries already in the results file are skipped):
 //   node .gate/foundation-restructure/e3-run-2-1b.mjs
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';

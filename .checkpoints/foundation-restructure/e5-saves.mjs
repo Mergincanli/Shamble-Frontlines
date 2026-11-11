@@ -8,7 +8,7 @@
 // Headless Chromium on Linux is not Brave on Windows: Mustafa's backup step stays whatever this says.
 // Run from the repo root: node .gate/foundation-restructure/e5-saves.mjs <move-commit>
 import { createRequire } from 'node:module';
-import { mkdirSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -86,6 +86,63 @@ page = await open(ctx, join(SITE, 'index.html'));
 await page.waitForFunction(() => typeof KVStore !== 'undefined', null, { timeout: 30000 });
 log({ run: 3, page: 'index.html after relaunch', read: await page.evaluate(async () => ((await KVStore.get('e5_probe2')) || {}).value || null) });
 await ctx.close();
+
+// run 4 (the advisor agent's C7): both console lines of saves-console-lines.md (read from that file, never retyped), in
+// their own fresh profile, on the real legacy/index.html and legacy/editor.html, the pages Mustafa will paste them on.
+// DevTools' copy() does not exist in a page, so a stub records what it was given. The game's own keys count too.
+{
+  const md = readFileSync(join(REPO, '.checkpoints/foundation-restructure/saves-console-lines.md'), 'utf8');
+  const lines = [...md.matchAll(/```js\n(.*)\n```/g)].map(m => m[1]);
+  if (lines.length !== 2) throw new Error(`expected 2 console lines in saves-console-lines.md, found ${lines.length}`);
+  const [BACKUP, RESTORE] = lines;
+  const PROFILE2 = join(W, 'profile-lines');
+  mkdirSync(PROFILE2, { recursive: true });
+  const SAVES = { shamble_prog: JSON.stringify({ xp: 1234, rank: 3, name: 'Müstafa "the" tester' }),
+    'vmap:Cabana copy': JSON.stringify({ boxes: [[1, 2, 3]], note: 'line1\nline2\ttab   sep' }), 'vmap:big': 'x'.repeat(300000) };
+  const cl = out.consoleLines = { profile: PROFILE2, checks: [] };
+  const ck = (name, pass, detail = '') => { cl.checks.push({ name, pass: !!pass, detail }); console.log(`${pass ? 'PASS' : 'FAIL'} console lines: ${name}${detail ? ' :: ' + detail : ''}`); };
+  const snap = p => p.evaluate(() => Object.fromEntries(Object.keys(localStorage).map(k => [k, localStorage.getItem(k)])));
+  const stub = p => p.evaluate(() => { window.copy = t => { window.__copied = t; }; });
+  const parse = t => { try { return JSON.parse(t); } catch { return null; } };
+  ctx = await chromium.launchPersistentContext(PROFILE2, { headless: true, args: ARGS });
+  page = await open(ctx, join(SITE, 'legacy', 'index.html'));
+  await page.waitForFunction(() => typeof KVStore !== 'undefined', null, { timeout: 30000 });
+  await page.evaluate(async (s) => { for (const [k, v] of Object.entries(s)) await KVStore.set(k, v); }, SAVES);
+  await stub(page);
+  const s1 = await snap(page);
+  const said1 = await page.evaluate(BACKUP);
+  const b1 = parse(await page.evaluate(() => window.__copied));
+  ck('backup on legacy/index.html answers with the key count', said1 === `${Object.keys(s1).length} keys copied: paste them into a text file now`, said1);
+  ck('its text holds every key, values byte for byte', b1 && JSON.stringify(Object.keys(b1).sort()) === JSON.stringify(Object.keys(s1).sort()) && Object.entries(s1).every(([k, v]) => b1[k] === v), `${Object.keys(s1).length} keys: ${Object.keys(s1).sort().join(', ').slice(0, 160)}`);
+  ck('the seeded saves are in it (quotes, newlines, non-ASCII, 300 KB)', b1 && Object.entries(SAVES).every(([k, v]) => b1[k] === v));
+  await page.close();
+  page = await open(ctx, join(SITE, 'legacy', 'editor.html'));
+  await page.waitForFunction(() => typeof KVStore !== 'undefined', null, { timeout: 30000 });
+  await stub(page);
+  const said2 = await page.evaluate(BACKUP);
+  const b2 = parse(await page.evaluate(() => window.__copied));
+  ck('backup on legacy/editor.html holds the same saves', b2 && Object.entries(SAVES).every(([k, v]) => b2[k] === v), said2);
+  // one save lost and one changed since the backup; restore on legacy/index.html must bring back the lost one only
+  await page.evaluate(() => { localStorage.removeItem('vmap:Cabana copy'); localStorage.setItem('shamble_prog', 'NEWER'); });
+  await page.close();
+  page = await open(ctx, join(SITE, 'legacy', 'index.html'));
+  await page.waitForFunction(() => typeof KVStore !== 'undefined', null, { timeout: 30000 });
+  const pre = await snap(page);
+  ck('before the restore the lost save is missing', !('vmap:Cabana copy' in pre));
+  const said3 = await page.evaluate(RESTORE.replace('PASTE_HERE', () => JSON.stringify(b1)));
+  const missing = Object.keys(b1).filter(k => !(k in pre)).length;
+  ck('restore answers with its counts', said3 === `${missing} keys restored, ${Object.keys(b1).length - missing} already there (left as they are)`, said3);
+  const post = await snap(page);
+  ck('the lost save is back, byte for byte', post['vmap:Cabana copy'] === SAVES['vmap:Cabana copy']);
+  ck('an existing save is never overwritten', post.shamble_prog === pre.shamble_prog, `shamble_prog: ${String(pre.shamble_prog).slice(0, 20)}`);
+  ck('nothing else changed', Object.entries(pre).every(([k, v]) => post[k] === v) && Object.keys(post).every(k => k in pre || k in b1));
+  await page.reload({ waitUntil: 'load' });
+  await page.waitForFunction(() => typeof KVStore !== 'undefined', null, { timeout: 30000 });
+  ck('after a reload the game reads the restored save through KVStore', ((await page.evaluate(async () => KVStore.get('vmap:Cabana copy'))) || {}).value === SAVES['vmap:Cabana copy']);
+  await ctx.close();
+  cl.verdict = cl.checks.every(c => c.pass) ? 'PASS' : 'FAIL';
+  console.log('E5 console lines: ' + cl.verdict);
+}
 
 const r2 = out.runs.filter(r => r.run === 2);
 const control = r2[0].read === 'written-by-root-index';

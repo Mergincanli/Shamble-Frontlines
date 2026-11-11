@@ -1,0 +1,62 @@
+{
+ "head": "f0322d2f810d7803ad608ec70033e589d6bf7290",
+ "legacyAndToolsClean": true,
+ "rows": [
+  {
+   "base": "44446a5",
+   "what": "OLD (root layout)",
+   "exit": 0,
+   "pass": true,
+   "build": "legacy/",
+   "basePrefix": "",
+   "check3": "core 138 / game 714 / editor 353 / indexInline 0 / editorInline 0 | +0 -0 | cross-file duplicates 0, within-file 0",
+   "err": "",
+   "ok": true
+  },
+  {
+   "base": "8e58937",
+   "what": "CS-1's shamble-frontlines-repo/ layout",
+   "exit": 0,
+   "pass": true,
+   "build": "legacy/",
+   "basePrefix": "shamble-frontlines-repo/",
+   "check3": "core 138 / game 714 / editor 353 / indexInline 0 / editorInline 0 | +34 -0 | cross-file duplicates 0, within-file 0",
+   "err": "",
+   "ok": true
+  },
+  {
+   "base": "76b4f7a",
+   "what": "A, main with 2.1a (root layout)",
+   "exit": 0,
+   "pass": true,
+   "build": "legacy/",
+   "basePrefix": "",
+   "check3": "core 138 / game 714 / editor 353 / indexInline 0 / editorInline 0 | +0 -0 | cross-file duplicates 0, within-file 0",
+   "err": "",
+   "ok": true
+  },
+  {
+   "base": "c090843",
+   "what": "2.1b's move commit (legacy/)",
+   "exit": 0,
+   "pass": true,
+   "build": "legacy/",
+   "basePrefix": "legacy/",
+   "check3": "core 138 / game 714 / editor 353 / indexInline 0 / editorInline 0 | +0 -0 | cross-file duplicates 0, within-file 0",
+   "err": "",
+   "ok": true
+  },
+  {
+   "base": "b6b3b81",
+   "what": "2.1b's head when run (legacy/)",
+   "exit": 0,
+   "pass": true,
+   "build": "legacy/",
+   "basePrefix": "legacy/",
+   "check3": "core 138 / game 714 / editor 353 / indexInline 0 / editorInline 0 | +0 -0 | cross-file duplicates 0, within-file 0",
+   "err": "",
+   "ok": true
+  }
+ ],
+ "verdict": "PASS"
+}

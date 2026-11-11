@@ -65,6 +65,26 @@ guard test :207 → :219, STATUS :987 → the split files). Nothing new needs an
   PM-0002-36's reading (Q-A1) as one row of the register's loose-ends tables; ADR 0002 :1596 and :1626, "open:
   OQ-0002-2" → "answered: OQ-0002-2". Plus what the plan already names in ADR 0002 itself: the OQ-0002-2 entry's answer
   (:998-1007) and the Status line (his SCOPE (a)). No other register edit.
+- **REG-TRUE (b), his answer of 2026-11-11 21:39:44 UTC (event 45563b1b-718b-4683-9e4c-663daf9cff74, captured
+  `mustafa-2026-11-11-answers.md`), replaces D1 (a)'s "answered" wording and new count; the rest of D1 (a) stands.** His
+  words: "REG-TRUE: (b). The register's own rule decides: OQ-0002-2 stays open as "answered in part", because the gate
+  v2's path waits for step 2.3's plan. So 8 open, the Total line stays, and ADR 0002's lines 1596 and 1626 read
+  "answered in part". The answer names all three parts. Add the two acceptance edits for my SCOPE (a). This replaces the
+  "answered" wording and the new count in my D1 (a); the rest of D1 (a) stands." So, exactly (superseding the "7 open"
+  and "answered: OQ-0002-2" above):
+  - the register's ADR 0002 row (:17) keeps "8 open" and gets his SCOPE (a) in its status column (C10: the quote or a
+    pointer to it, never a paraphrase in quote marks); its count text otherwise unchanged;
+  - the register's Total line (:23) stays as it is ("119 numbered open questions, 98 of them open");
+  - ADR 0002 :1596 and :1626: "open: OQ-0002-2" → "answered in part: OQ-0002-2";
+  - ADR 0002's OQ-0002-2 entry (:998-1007) gets its answer naming all three parts (C11): the legacy gate and tools stay
+    in `tools/` (option (a), learning the `legacy/` path: 2.1a); the legacy docs stay in `docs/` (row KT21's question);
+    the gate v2's script path waits for step 2.3's plan, so the question stays open, "answered in part";
+  - the two acceptance edits for his SCOPE (a), the words of REG-TRUE's option (a) that his (b) adds: after "not yet
+    accepted" in the register's status sentence (:33-35, "Status of every draft: Proposed. ... not yet accepted") and in
+    ADR 0002 :7 ("**Signed off by Mustafa:** as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet
+    accepted"), the words "except ADR 0002's part 1, accepted by Mustafa on 2026-11-10 (SCOPE (a))";
+  - unchanged from D1 (a): PM-0002-36's reading as one row of the register's loose-ends tables (C12: the reading is the
+    advisor agent's, Q-A1, 2026-11-10, recorded on his D1 (a), never his decision); no new register row; nothing wider.
 
 ## 3b. The open pull requests' files (plan Part 4: re-read before each build step; read 2026-11-11 21:45 Amsterdam)
 - **#40** (netcode proof test, `claude/netcode-proof-test-plan-hcky5g` at 8c681cf, merge-base bb2d817; 600 files):
@@ -162,6 +182,9 @@ does not read `git revert`. Run by the main session only; nothing leaves the wor
 - The docs (step 10, today's lines): REPO_MAP :14-18 and :6; START_HERE :12, :22-23, :105, :115-117; MODULE_MAP one line
   above the table (:17); TECHNICAL :238-239; STATUS (2.1b's row, #50 merged, the risk at :106) and STATUS_ARCHIVE (#50's
   row; the risk at :843); ROADMAP (2.1b's entry); ADR 0002 (Status line: his SCOPE (a) word for word; the OQ-0002-2
-  answer; :1596, :1626); the register (D1); DECISIONS.md "Queued": his render-budget note word for word, no other file.
+  answer naming all three parts; :1596, :1626 "answered in part"; :7 the acceptance edit); the register (D1 (a) with
+  REG-TRUE (b), §3: the ADR 0002 row's status column, "8 open" kept, the Total line kept, the status sentence's
+  acceptance edit, the PM-0002-36 row); DECISIONS.md: one entry per message of his (C13, copied by script from the
+  report's Appendix A) and, under "Queued", his render-budget note word for word, no other file for it.
 - Not touched: gate files, settings, hooks, allow-lists, `spikes/`, `docs/legacy-tuning.json`, `docs/LEGACY_TUNING.md`,
   any PM row, reports, research files, the inventories.
