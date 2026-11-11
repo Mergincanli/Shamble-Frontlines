@@ -278,6 +278,16 @@ checkpoint's resume card is the handoff; open this file only when a step needs t
     R1 still waits for stop B.
 
 ## Decisions taken
+- **Mustafa, 2026-11-11 about 16:15 UTC (verbatim; the HOLD):** "Usage on this account is the bottleneck, and this chat
+  is 70% full: every request re-sends the whole chat. Do this now and start no new agent until I say so:
+  1. Update the resume card so a compacted chat can carry on from it alone: the current step, the three running agents
+     (task ids, worktrees, what to do with each result), my open decisions and the next steps. Push it and give me the
+     commit.
+  2. Hold the advisor's text batch. Do not give it an agent slot; the main session applies those edits later.
+  3. Then stop and tell me. I will run /compact."
+  - Done: the card rewritten (the old body moved to "Running work, U4 wave 1 (2)" by card_refresh2.py), pushed; no
+    agent started; the text batch held for the main session. The three workflows had already been cut by the spend
+    limit (about 13:00-13:30 UTC), so none was running at the hold.
 - **Mustafa, 2026-11-11 about 11:50 UTC (verbatim):** "NIGHT-BUDGET: (a). Leave it as it is. Switch to (b) on the
   first night whose queue does not fit, and tell me when you do.
   Three notes, no new work:
@@ -1448,3 +1458,213 @@ reset at 20:00):**
    - U4a's supporting public items, beyond §4.1's list;
    - the U4e brief's 9 questions (`git show 0dccbf0:.checkpoints/npt-u4e-brief/u4e-brief-draft.md`).
    - The brief itself goes to the advisor after wave 1 merges, with its 28-row recheck done.
+
+## Running work, U4 wave 1 (2): the resume card of 2026-11-11 morning (moved at Mustafa's HOLD, about 16:20 UTC, by card_refresh2.py)
+_The card's body as it stood at that moment, verbatim._
+
+**The current step: U4 wave 1** (u4-build-plan.md rev 2, approved with conditions, sha256 0d69332c… until the W1 text
+batch of 2026-11-11, a81b230f… since; advisor-u4.md;
+the advisor's wave-1 rulings, with the exact words for every text change: advisor-u4-wave1.md). The card's blocks of
+2026-11-10 (the wave-1 list, NOW, SAVE, SAVE POINT, the next three actions of then) are in history.md, "Running work,
+U4 wave 1", moved by card_refresh.py.
+- **Merged:** U4s (f080551), U4b (411eeee), U4a (952f734), **U4c (f3f7c2f, 10:38 UTC)**, **U4d with W1-S1's npt-proto
+  half (39f4290, about 12:15 UTC)**; CI green on 411eeee, 952f734, f3f7c2f and 39f4290. Main merged in: kit-v3-4 (df8975b) and
+  PR #49, the STATUS split (5ca77eb, by merge_status_split.py, as Mustafa asked on 2026-11-11; CI green on 5ca77eb).
+- **U4d's merge (39f4290):** round 2 (wf_4b5ee472-66b) all five APPROVE WITH FINDINGS, no Critical or High;
+  SEC-U4a-1 and SEC-U4a-2 closed in writing. check.mjs on the merged tree: measured 365 = 325 + 39 + 1, bites 412 =
+  366 + 45 + 1, self 52; gate PASS. The catalogue's own-state row records the section as built (W1-S1). Report:
+  u4d-report.md (the N2-M1 merge condition met: T-M1's window, the per-window rates, the test-engineer's probe X2 at
+  7.578 a second over 600 s). wip/u4d.patch and wip/u4d-s1.patch deleted in that commit.
+  - Open for the advisor (Part B): (A) the ES knobs; N2-M1's fix form (carry 52); N2-M2 (ES's vehicles); (C) the
+    "(9 fields)" slip; Weapon, Scene::weapon, Scene::health for §4.1; the U4e carries from round 2 (N2-L1, the
+    security auditor's 1-2, N2-L3 (c)).
+  - Housekeeping later (approved method): `.claude/worktrees/wf_f54246ff-e0d-1`, `.gate/u4d-prefix`, `.gate/u4d-s1`.
+- **U4c's merge (f3f7c2f):** round 2 (wf_610486f7-cc1): rust-reviewer, test-engineer and netcode-architect APPROVE WITH
+  FINDINGS, Lows only (R2-A = R2-1 = R2-N1, the jitter figure in time_threshold's doc; R2-B = R2-2, drive() hangs
+  rather than fails on a model that keeps naming a past instant; R2-3, the fixer's third run never ran): follow-ups.
+  check.mjs on the merged tree: measured 325 = 311 + 14, bites 366 = 342 + 24, self 52; gate PASS. wip/u4c.patch
+  deleted in that commit. SIZE-CHECK: about 3,130 lines for size M (lib.rs +1,180 −323, tests.rs 1,723, tests/l1.rs
+  +230): not well past.
+  - Housekeeping later (approved method): `.claude/worktrees/wf_f54246ff-e0d-2`, `.gate/u4c-prefix`.
+- **The plan text edits: done** (workflow wf_e1058c57-961, about 10:44 UTC; notes w1-plan-edits.md and
+  w1-plan-edits-check.md; base 20702fd; +125 −47 lines in the four files). All 37 ordered texts are in, word for
+  word (the checker's script took each from advisor-u4-wave1.md by line range); Mustafa's NETEM-BAR (a) is quoted
+  exactly in the U8 row (plan.md). The check's two Mediums are fixed and re-checked: F1 (the W1-U4D amendment line
+  moved to advisor-u4.md's end, so lines 1-475 match the base and every cite into it holds) and F2 (§5 U4d's
+  generator words, "words mine"). New sha256: plan.md 4717029c… (1,518 lines), u4-build-plan.md a81b230f… (1,070),
+  u4s-carries.md 19e7ca98… (272), advisor-u4.md 7b3e76ca… (479).
+  - Open Lows, for the advisor request after wave 1: F10 (the ruling's §4.2 sentence quotes condition 1 as "never"
+    where it says "not": a one-word change on the advisor's nod); F3 (carry 40's added sentence and its label); F5
+    (a bare "§4.7" in §4.1's Why cell means plan.md §4.7); F6 (two clamp-idempotence claims left unbounded beside
+    TUNE-2's bound); F7 (u4s-carries.md's header "44 entries", now 50; carry 13's moved half); F8 (U4E-Q6's two
+    conditions go to the U4e and U4r briefs); F9 (a sentence the swap left reading as the manifest's); F11 (W1-PUB's
+    approved public items its §4.1 list leaves out); F4 (a cite off by one line: advisor-u3q.md:142-143, not
+    :143-144).
+- **U4j, the judge and marks change:** **built** (agent a3b8dfeb01ed52b50, done about 10:02): all 10 steps pass twice
+  (measured 304 = 286 + 18, bites 327 = 309 + 18, self 48 of 48); its four plants fail by name. Copy
+  `.claude/worktrees/agent-a3b8dfeb01ed52b50` (base 411eeee); notes u4j-build.md; snapshot wip/u4j.patch (10:05).
+  - SIZE-CHECK: about 2,860 lines added for its size M (code 1,330, tests 1,030, marks.json and docs 370, fixtures
+    130): not well past its plan, so no stop.
+  - **Review round 1 running** (workflow wf_1ea8a0dd-fee; the test-engineer cut by the spend limit, resumed 11:11 as
+    task w4p9h5eio): netcode-architect, security-auditor, then test-engineer; notes
+    u4j-review-{netcode,security,test}.md.
+    - **netcode-architect: REVISE.** Before the merge: NC-U4J-1 (FAR BETTER uses f = max(1, s) with no band or
+      tolerance check: Mustafa's 1.10 cap can be exceeded), NC-U4J-2 (a practice run added after the counted run
+      turns its FAIL into INVALID), NC-U4J-3 (README never says whose slot indexes `hs`), NC-U4J-4 (the twin's role
+      is not checked), NC-U4J-5 (the `hs` writer rules' four gaps), NC-U4J-7 (the practice run's heal-record count is
+      never checked). Readings (a), (b), (d), (f) right; (e) partly (NC-U4J-6). Follow-ups NC-U4J-6, -8 to -14.
+    - **security-auditor: REVISE.** Before the merge: **F1 High** (the same FAR BETTER hole: a log can move X, Y and Z
+      past WS-BAR's cap), F2 (M_m, the band and the guard come from the log's copy of the bound line, never checked
+      against marks.json), F3 (one practice run per build checked only inside the counted run's set), F4 (any log
+      can supply any hash list; the Arm rule trusts the log's own aarch64 claim), F5 (the twin's identity unchecked),
+      F6 (parse_bound can panic on two 30-digit decimals: an i128 overflow), F9 (a ruling is any non-empty text).
+      Follow-ups: F7, F8 (Medium: no minimum coverage for the decoded-hash check), F10-F12.
+    - **test-engineer: REVISE** (done about 11:25): F1 High confirmed by a probe run (band 2.0-2.0, s 1.9: X' 1.273
+      s, a 1.2 s median PASSES); F9 (the 1.10 cap unpinned: a plant raising it to 1.12 passes all 65 judge tests);
+      F2-F8, F10-F12 Medium before the merge, most shown by probes on the unchanged code; F13-F16 Low.
+    - **Round 1 complete: three REVISE.** The advisor rules on it now (agent aef3e07087d16c503, writing
+      advisor-u4j.md): the deduplicated fix list with the proofs; the calls (coverage floor F10, rulings as text F9,
+      pinning the bound line F2/F6, NC-U4J-10, F16, the `hs` writer rules, the Arm rule's key); the readings (a)-(f);
+      F1's severity; anything for Mustafa.
+    - **The advisor's rulings: done** (advisor-u4j.md, about 11:45): REVISE; 14 fixes FX-1 to FX-14 in one pass
+      (FX-1, the High, first: the band must contain 1, FAR BETTER gives f = 1, no f above the tolerance), each with
+      its named test or fixture; follow-ups FU-1 to FU-6 (owners named); carries to U4e, U4r and U6. Readings (a),
+      (c), (d), (f) accepted; (b) changed by FX-3, (e) by FX-5. F1 stays High (a rule loosened beyond Mustafa's
+      words); a round 3 is open to F1 alone. Decisions for Mustafa: none.
+      - At the merge: copy the builder's readings (a)-(f) into the notes (R3 quotes them; they are not in
+        u4j-build.md); the readings list gains the orphan reading (R5's words); PR #40's report names FU-1 to FU-5 as
+        security findings left open.
+    - **The fix pass and round 2: running** (workflow wf_0906017a-a9b, task wgj6zbosy): the fixer in U4j's worktree
+      (each named test first, failing on the unfixed code), then netcode-architect and security-auditor (read only;
+      the security table of every path through `find`), then test-engineer (probe A and the advisor's three F1
+      plants on the new head; counted check.mjs). Notes u4j-round2-{netcode,security,test}.md. Pre-fix copy
+      `.gate/u4j-prefix` (411eeee plus wip/u4j.patch of 10:05; byte-identical to the reviewed build, checked 11:27).
+  - Its fix pass, if any: by its builder (SendMessage to a3b8dfeb01ed52b50), in its copy.
+  - At its merge, the main session's: u4-build-plan.md §4.1 gains U4j's public items (`TickRecord.hs`,
+    `set_hashes`, `hashes`; `marks::BoundNumber`, `Check.ws_bound`, `Rule::WsPractice`; `Outcome::Empty`,
+    `fails()`; `Lack::Empty`); the builder's readings (a)-(f) go to the advisor with the reviewers' views.
+  - Then U4c's L-c8 judged re-run on U4j.
+- **The advisor's Part B: done** (advisor-u4d-close.md, 521 lines, about 12:40): no escalation.
+  - **U4d-F** (B1.2 and B1.3 are its approved plan, with its files and symbols): one move rule shared by the World and
+    the generator; the generator reckons what it emits (crouch, its own MoveSpeed, dropped commands), still
+    open-loop; ES's 15 hulls loop within 1,400 cm (a scene knob); `Recording::GENERATOR` 1 to 2; the measurement on 3
+    seeds (12 minutes, the last 10, all four bands and both halves in 9.5-10.5); `aim_one_in` set from it; T2-L1's
+    two tests first. No setting works: stop and bring the numbers to the advisor; the floor never moves. Its own
+    review budget: netcode-architect and test-engineer. It merges before U4d2's brief is final; U4e need not wait.
+  - **The text batch (for the main session, when a slot frees; copied from the file's code blocks by line range,
+    never retyped):** carry 52's tail (B1.2) and new carries 59 (U4r), 53-57 (U4e) and 58, 60 (U4r); carry 51's span
+    fix; the erratum block appended to advisor-u4-wave1.md (B1.4: "(9 fields)" and three more slips); §4.1's npt-sim
+    rows gain Weapon, Scene::weapon, Scene::health (B1.5, u4-build-plan.md:184-185); u4d-report.md's TUNE-1 kill-rate
+    bullet (B1.6: 0.272 a second over an S30); F10 ("never" to "not", u4-build-plan.md:247), F3, F4, F5, F6, F7, F9
+    (B3); plan.md's NA1 (R-31 at :1424), the U8 row's new case and NA4's run condition (:1248), NA5 (C-U8-6, C-U8-4),
+    C-U6-8 and the U6 row's weapon and health (:1246) (B4). Then a test-engineer check, as for the W1 batch.
+- **Agents (3 at most), since about 12:45:**
+  - U4j's fix pass and round 2 (wf_0906017a-a9b, task wgj6zbosy);
+  - **U4d-F's build and review** (wf_9ce88fa3-452, task wg0l1ugq1): one builder in a fresh worktree from the spike
+    head (notes u4df-build.md there), then netcode-architect and test-engineer (u4df-review-{netcode,test}.md);
+  - the U4e brief's rev 3 (wf_c92cd986-072, task wnwulchr5): netcode-architect drafts u4e-brief.md from the night's
+    rev 2 (0dccbf0) with W1-U4E's answers, the carries as they stand, W1-TARGET and the 28-row recheck against
+    39f4290; test-engineer checks (u4e-brief-r3-check.md); one revision. Then the advisor checks the brief.
+- **Night work (issue #16):** all four items done: 2 and 3 on the night of 2026-11-10; 4 and 5 last night, from 02:16
+  Amsterdam. The queue is empty: post tonight's items this evening.
+  - **4, the U4r brief:** rev 2 at `cs/npt-u4r-brief` ed973c9 (1,007 lines). netcode-architect's check: 8 Medium and 8
+    Low, all fixed in rev 2.
+    - 12 open questions for the advisor; U4R-Q1 blocks the bots (npt-lab has no npt-bots dependency, and no unit owns
+      that manifest edit).
+    - 34 rows to recheck against U4c, U4d2, U4e and U4j; 12 day runs (D1-D12).
+    - It goes to the advisor once U4r's dependencies merge.
+  - **5, the U3d skeptic check:** `cs/npt-u3d-skeptic` 558fc0e. No Critical or High; 4 Mediums (NA1 = TE1, TE2, NA4,
+    NA5) and 8 Lows, follow-ups for U3d's report.
+    - NA1's proof, run here (na1-output-20261111.txt): at E 9,999 ns (a PASS), -3's p99.9 fails in 49.7 % of
+      2,000 seeds. The finding holds.
+    - NA1 (R-31's wording plus a U3D-MISS case) and NA5 (C-U8-6: read while the socket is bound; a missing row makes
+      the leg INVALID) change ruled text: to the advisor with the plan text edits.
+    - TE2-TE4's plants need a quiet shared target: after wave 1's merges.
+  - **NS-START, the evidence (b) asks for:** get_trigger at 10:00 UTC today.
+    - The routine reads `CRON_TZ=Europe/Amsterdam 10 0-7 * * *`, updated 2026-11-10 20:48 UTC.
+    - Last run 06:17 UTC, SUCCEEDED; next 23:10 UTC.
+    - Last night's 00:10 and 01:10 Amsterdam runs left no comment.
+    - A likely cause, unproven: this session's agents hit the account's spend limit at about 21:20-21:30 UTC, and the
+      night shift runs on the same (university) account; the first run that worked fired at 01:16 UTC.
+    - STATUS on main still says `10 0-6`, set 18:00 UTC: one change behind (docs-keeper's, on main).
+
+**The next three actions**
+1. **(Done 12:15)** U4d merged at 39f4290. **Now: wave 2's preparation**, since U4e's dependencies (U4a, U4b, U4d)
+   have merged: the advisor's Part B (U4d's open points, N2-M1's fix form, N2-M2, the public items, the U4e carries,
+   the plan batch's Lows, NA1 and NA5); the U4e brief's rev 3 with the 28-row recheck against the merged code; then
+   U4d2's builder brief (carrying carries 52 and N2-M2's ruling, and W1-TARGET's lock).
+2. **When U4j's review returns:** a fix pass within the budget, by its builder (SendMessage); round 2 on what changed
+   if a finding needs it; then the merge, the same way, with §4.1's items; then U4c's L-c8 re-run on U4j.
+3. **(Done 10:44)** The plan text edits; their open Lows join the advisor request below.
+- **After wave 1:**
+  - One advisor request: U4j's readings (a)-(f); U4d's points (A), (B), (C) and its new public items; NA1 and NA5;
+    the plan text batch's open Lows (F10 first: its one-word change); and the U4e brief's rev 3 (W1-U4E's answers,
+    W1-S1, W1-N2, the new carries).
+  - Then wave 2 (U4d2, U4e), under W1-TARGET's lock.
+- **This evening:** post tonight's night items to issue #16 (a check-in is scheduled for 19:30 UTC:
+  trig_01W9mBGauhxrWnn1rSuweDic). Candidates, by what merges today: the U4e brief's 28-row recheck and rev 3 draft
+  and a U4d2 builder brief carrying N2-M1 and N2-M2 (both need U4d merged); a skeptic check of U4a and U4b's merged
+  code; one of U4c's.
+
+**Open questions for Mustafa:** none.
+- **Answered 2026-11-11 about 11:50 UTC** (history.md, "Decisions taken", verbatim):
+  - NIGHT-BUDGET (a): leave it; switch to (b) (no new agent work after about 21:00 Amsterdam) on the first night whose
+    queue does not fit, and tell him when.
+  - N2-M1: fix the estimate scene before U4d2 pins the recordings; the 9.5 floor does not move (carry 52).
+  - SEC-U4d-R2-1: deferred to U4e in writing (carry 51); no push for a Low.
+  - U4j's F1: the review budget as is; open after round 3, stop and bring it to him.
+  - Every report gives the session's context figure: 622,250 of 1,000,000 tokens (62 %) at 11:50 UTC, compacting at
+    about 901,600 (get_session, context_usage).
+- **Relayed 2026-11-11 about 10:45 UTC** (it had not been sent before: no earlier reply carries it): the advisor's
+  answer to TCP-FREEZE's "Tell me if any later unit plans work on the model" (advisor-u4-wave1.md:546-554: none plans
+  fidelity work; U6's send path and U8/R1's DelayStream self-test work on the wrapper's timing, outside the freeze),
+  and its "For Mustafa" item 2 (the readings PR before R5 carries three more readings).
+- **Answered 2026-11-10 about 20:40 UTC** (history.md, "Decisions taken"):
+  - NETEM-BAR (a): the bar stays capped as WS-BAR says; a WebSocket row that fails because the kernel is slower than
+    the model is reported to him as the kernel's, with the netem numbers, and he decides.
+  - NS-START: he sets the routine to `10 0-7 * * *` himself tonight.
+
+**Rules in force** (his words, verbatim, in history.md's "Decisions taken" unless marked)
+- **Mustafa, 2026-11-11** (history.md, "Decisions taken"): STATUS's "In flight" table keeps one line for #40; his
+  words move between docs by script and line ranges, never by retyping (done for PR #49 at 5ca77eb).
+- **Mustafa, 2026-11-10** (history.md, "Decisions taken": his seven points and his "A"):
+  - RESUME-CARD; WIP-CLEAN; SIZE-CHECK;
+  - TCP-FREEZE: no more model fidelity work; if U8's netem check disagrees, netem wins;
+  - SQUASH-40 with SQUASH-CITES (a): the closing checklist under Next steps;
+  - PROMOTE: at U4's close; against SPIKE-SCOPE (a);
+  - the second lane: merge main as usual, by the plain merge the guard allows, as at df8975b.
+- **Mustafa, 2026-11-09:**
+  - the night shift's role: post the next night items to issue #16 each evening and fold them in the morning;
+    building and testing stay by day;
+  - one shared Cargo target for every copy, `.gate/shared-target` (touch before builds, check the counts);
+  - LEFTOVER-DELETE: "leave them"; no delete past the deny list.
+- **Standing:**
+  - write files with Write and Edit, never cd plus a redirect;
+  - never switch the main folder; the guard merges only origin/main into it;
+  - CHECKPOINTS.md;
+  - the review budget and one severity scale (kit-v3-4);
+  - Opus at xhigh for netcode;
+  - the advisor reads main's advisor.md.
+- **U4:**
+  - the five briefs (U4e, U4r, U4f, U4g, U4h) go to the advisor before their builds;
+  - carries word for word from u4s-carries.md, listed as met by number in each report;
+  - the wave-1 seam freeze (u4-build-plan.md, Lanes).
+
+**Pointers**
+- The plan: plan.md (rev 3.3).
+- U4: u4-build-plan.md, advisor-u4.md, u4s-carries.md, u4s-report.md, and Running work below (U4 era).
+- History: history.md (Steps done U0-U3d; the old Current step; Decisions taken; Running work up to U3c; "Running
+  work, U4 wave 1": the card's blocks of 2026-11-10).
+- The closing checklist for PR #40: under Next steps.
+- Resume commands (scripts under /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/;
+  a resumed run keeps its run id, and finished agents replay from cache):
+  - U4c's round 2: `Workflow({scriptPath: <scripts>/npt-u4c-fix-round2-wf_610486f7-cc1.js, resumeFromRunId:
+    "wf_610486f7-cc1"})`.
+  - U4d's fix pass: `Workflow({scriptPath: <scripts>/npt-u4d-fix-wf_a8ff8550-67d.js, resumeFromRunId:
+    "wf_a8ff8550-67d"})`.
+  - U4j's review: `Workflow({scriptPath: <scripts>/npt-u4j-review-wf_1ea8a0dd-fee.js, resumeFromRunId:
+    "wf_1ea8a0dd-fee"})`.
+  - A cut agent runs again with its context only if its prompt changes: add a dated RESUME line that points at its
+    notes file.
+  - U4j's builder: SendMessage to a3b8dfeb01ed52b50.
+  - If a worktree is gone: a new one at its base, with its wip patch applied first.
