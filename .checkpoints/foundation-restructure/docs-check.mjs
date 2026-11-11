@@ -125,8 +125,16 @@ const mainLines = f => git('show', `${MAIN}:${f}`).split('\n');
   const cmds = [];
   for (const l of git('diff', '-U0', MAIN, '--', 'docs/START_HERE.md').split('\n').filter(l => l.startsWith('+') && !l.startsWith('+++')))
     for (const m of l.matchAll(/`((?:node|python)[^`]*\blegacy\b[^`]*)`/g)) cmds.push(m[1]);
-  const notRun = cmds.filter(c => !ran.some(r => r === c || r.startsWith(c.replace(/\s*\[.*$/, ''))));
-  check("START_HERE: every added `legacy` command is one E6 ran", notRun.length === 0, notRun.join(' | ') || `${cmds.length} commands`);
+  // a command's core: the program and its flags up to the folder `legacy`, then the subcommand (and, after `eval`, the
+  // script); placeholders (<...>) and optional parts ([...]) and later flags may differ from E6's literal runs
+  const core = c => {
+    const t = c.trim().split(/\s+/), i = t.indexOf('legacy');
+    if (i < 0) return c.trim();
+    const end = t[i + 1] === 'eval' ? i + 3 : i + 2;
+    return t.slice(0, end).filter(x => !/^[<\[]/.test(x)).join(' ');
+  };
+  const notRun = cmds.filter(c => !ran.some(r => r.startsWith(core(c))));
+  check("START_HERE: every added `legacy` command's core is one E6 ran", notRun.length === 0, notRun.join(' | ') || `${cmds.length} commands`);
 }
 
 // ---------- 7. the render-budget note ----------
