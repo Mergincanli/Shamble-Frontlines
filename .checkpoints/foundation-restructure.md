@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 15:05 Amsterdam
+- **Last update:** 2026-11-11 14:56 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -105,10 +105,26 @@
    base.prefix asserted). The legacy/ base for the rows: 89286ed (plumbing from 44446a5, fixed dates, reproducible). The
    fixed gate on a clean root tree with smoke: GATE PASS, +0 -0, 8/8, 5/5. The advisor agent asked to rule on the
    amendment; then the ask to Mustafa (the exact change; FREEZE-FDN as its own question; the alternatives).
+   The advisor agent's ruling on the amendment (its notes' addendum): APPROVE with conditions: (1) his yes in chat for the
+   exact patch first; FREEZE-FDN asked as its own question, quoting him, no recommendation; (2) after the write: `cmp`
+   with the scratch copy; the full E3 on the new gate (a new results file); rows-test-f1 against the written file plus
+   the red run on the unfixed gate; both base directions raw with exit codes (TE-1); main's gate and the new gate on the
+   decoy (the gate job's exit); the full gate with smoke on the fix commit; (3) round 2 on the change only
+   (security-auditor, test-engineer, infra-engineer), then the verifier's sample on the final gate code; (4) the report
+   and PR body: the as-built rule, only CI's gate job (not `--smoke-only`) catches a decoy, the v2 consequence (a 2.3
+   known limit; qualify "never makes the root look like the legacy build"), new Low A-1 (a `shamble-frontlines-repo/`
+   base with a root head: the check looks only in that old folder; old bases only; no code change); (5) IE-1 a STATUS
+   follow-up for 2.3, L-2 by hand in the fix pass; L-1, L-3, L-4, F-L, the C1-C8 rebuild and the exception line in the
+   report.
 
 ## Current step
 
-The F1 fix: the advisor agent's ruling on the amendment, then his yes in chat for the exact change to tools/gate.mjs (`f1-gate.patch`). Nothing is written to tools/ before his yes.
+Stopped for Mustafa (2026-11-11 15:00 Amsterdam): F1-FIX (a)/(b)/(c), FREEZE-FDN (a)/(b), and his yes or no for the exact
+change in `f1-gate.patch`. On (a)+(a)+yes: `cp .gate/fdn-scratch-f1/tools/gate.mjs tools/gate.mjs`, `cmp`, commit, push;
+then the advisor agent's conditions (2)-(5) above, his words captured by script, L-2, round 2, the verifier (its brief in
+the session's scratchpad needs the fix commit and fresh worktrees: `.gate/fdn-new` and `.gate/fdn-newleg` at the fix
+commit, a new move commit), the report, the PR body, the STATUS row, the checkpoint deleted, #50 ready, the advisor's
+delta review of the final head. On (b) or (c): no gate write; the follow-up recorded; continue to the verifier and report.
 
 ## Next steps (on PR #50, this branch)
 
@@ -232,6 +248,6 @@ The F1 fix: the advisor agent's ruling on the amendment, then his yes in chat fo
 ## Running work
 - Saver: background task bjteqwe4t, started 14:02 Amsterdam, stops by 15:52 (110 min); last check 14:40: ok (autosaves pushed).
 - docs-keeper: done (1023870). infra-engineer and test-engineer: done (APPROVE). security-auditor done (REVISE, F1).
-  The advisor agent done (REVISE, F1), then asked to rule on the F1 amendment (running). The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
+  The advisor agent done (REVISE, F1; then APPROVE with conditions for the F1 amendment). No agent running. The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
 - The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
   container (step 3 note).

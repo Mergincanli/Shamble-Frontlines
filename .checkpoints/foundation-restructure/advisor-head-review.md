@@ -46,3 +46,10 @@ F-A freeze: met (FREEZE-FDN (a); both gate writes approved, A2.2 item 1). F-B mo
 Findings: High F1 (SA, reproduced). Medium TE-1 (revert-case base evidence not reproducible raw). Low L-1 plan smoke bullet stale; L-2 DECISIONS header wording (doubled "saved by"; SA L2 #49 time/session as fact); L-3 effort rule miss; L-4 C7 npx; infra L1-L4; TE Lows 2-6; SA L1.
 Before the final head: F1 fix with his ask + E3 full re-run on the new blob + rows h/decoy/non-flip + raw both directions with exit codes (closes TE-1) + round 2 on the delta + verifier sample on the final blob + report body items + .checkpoints deleted.
 DONE
+
+## Addendum: F1 amendment ruling (coordinator's f1-gate.patch, rows-test-f1.mjs), read-only
+- Read the patch (tools/gate.mjs only: header line, readdirSync import, 7-line check after basePrefix). Logic: only on base.prefix !== BUILD_PREFIX; lists join(ROOT, base.prefix) case-insensitively for index.html|editor.html|shamble-*.js; die exit 2 naming both folders and files. Smoke-only path untouched (no base). No-move runs unchanged -> E3's root column and non-flip PRs unaffected; E3's legacy column (root base 44446a5, clean root) still passes.
+- Rows: red first on unfixed gate (h, i, j, l exit 0), green on fixed (13+2), k (no move, root index.html) exit 0 keeps the v2 case; m clean revert exit 0. Legacy base 89286ed reproducible by plumbing (fixed dates).
+- Low A-1: a CS-1-prefix base (shamble-frontlines-repo/) with a root head checks only that old folder, not legacy/: pages-only leftovers in legacy/ would go unjudged there. Historic bases only; note in report, no change.
+- Note: exit 2 (setup-style) rather than a failing check: acceptable, CI red either way and message is explicit.
+- Ruling: APPROVE with conditions (see handback). DONE
