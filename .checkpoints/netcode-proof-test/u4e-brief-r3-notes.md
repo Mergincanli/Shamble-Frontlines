@@ -28,3 +28,14 @@ B10. Script check carries word for word; final pass; handback.
 - B9 done: u4e-brief.md written (719 lines): 31 changes (C1-C31); sections 0-8; Q1-Q11 ruled table; open: U4E-Q12 (-22/unbounded's planting unit), U4E-Q13 (owner-to-all's id).
 - B10 done: carries block checked by script (python -I read of both files): lines 413-457 of the brief equal carries :145-189, EQUAL. Cite fixes verified (u4j-brief :46-48, check.mjs :1646/:1649, :637-644, plan.md :568-612, snapshot.rs :491-499 / :647-655). `<base>` kept as a placeholder (18 uses).
 - DONE.
+
+## Revision for the check (rev 3.1, 2026-11-11)
+Task: one revision of the brief (742 lines, with the main session's fold at :3-5) against test-engineer's check (u4e-brief-r3-check.md: F1-F8, Lows L1-L5). Edit in place, add "rev 3.1" changes. Rules: Write/Edit only (no Edit tool in this run either: the brief is rewritten whole with Write, and its carries block is checked against u4s-carries.md by a read-only `diff` of `sed -n` ranges after the write); git only as `cd /home/user/Shamble-Frontlines && git ...`; build and run nothing; never touch U4j's worktree or advisor-u4d-close.md.
+
+Plan (blocks):
+- B11. Read the sources each finding needs: advisor-u4d-close.md B1.2/B1.3/B2 (and B3 if it bears on U4e); u4s-carries.md §U4e lines now and carry 40/49 lines; the plan's sha256; check.mjs:1493-1501; proto/tests/bites.rs, client/tests/bites.rs:7-36; u4c-build.md:28-32; u4d-report.md:19; world.rs:1095-1102; seam.rs:39-43, :87-89; plan.md:514; catalogue :87, :91-93; plan §4.14 :467-471; link/src/lib.rs:128-131; room/Cargo.toml; U4d-F's state (4ad80a9).
+- B12. Decide each finding (done / rejected with the ruling quoted) and each Low (applied if one line, else listed).
+- B13. Write the brief (rev 3.1) with Write.
+- B14. Check: carries block equal by `diff`; every new cite re-read; notes; handback.
+
+Findings log (one line each, filled as decided):
