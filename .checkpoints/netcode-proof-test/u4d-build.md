@@ -259,3 +259,18 @@ by Edit, restored, sha256-checked. Reference sha256 at start = the builder's fin
   - Q17 W1-S1, the own-state ammunition one low: w1_s1 FAILED "CO tick 0 slot 0: ammunition".
   - Q18 rust N4 + W1-S1, a scripted move speed not brought into range: w1_s1 FAILED in record()'s debug_assert
     "OwnState field 6: -1 outside 0..=10000".
+  - Q19 T-M2, the cap back to 2^20 B: carry14 FAILED "one ms past the edge"; the replayer test FAILED "a span above
+    1 MB: Done".
+  - Q20 rust L2, the Replayer's order check off: the replayer test FAILED (World's order assert panics).
+  - Q21 D-7, a part's starting health 199: d7 FAILED "SS" (hash 17,123,243,393,288,450,937 vs the pin).
+  - Q22 s6, the own-state ammunition range 0..=60,000: s6 FAILED (the OwnState layout pin, tests/seam.rs:503).
+  - Q23 carry 36, OwnState left out of ALL: s6 FAILED (the walk has 8 kinds, ALL 7).
+  - Q24 test L1 (the test review's E13: a NaN yaw before the own-copy snap at elapsed 150, which D-4 passed before):
+    d4 FAILED "a non-finite value in the state after tick 1150: pre[0].yaw".
+  - Q25 N-M1, SS's magazine 10,000: the build FAILED (E0080, scene.rs's const assert).
+  - Q26 TUNE-2, the recording places soldiers 12 m up: the scene test FAILED "SS: a scripted placement ... 1200".
+  - Q27 TUNE-2, a clamp 3 cm off only for fire origins above 39 m: d8 FAILED in its new half, "at the bound, case 1:
+    [3808, 1992, 1041] at 60.018 m" (the ground half is untouched by it).
+  - Q28 a sixth RefusalKind: tests/world.rs FAILED to compile (E0004 at :359, the types test's match).
+  - Q29 a clamp listed as a refusal: d10 clamp FAILED "rf.refusals.is_empty() && rt.refusals.is_empty()".
+  - All restored: every file at its reference sha256 (`sha256sum -c` clean), no PLANT left (grep).

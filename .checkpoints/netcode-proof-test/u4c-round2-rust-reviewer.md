@@ -25,3 +25,10 @@ memory Low), u4c-review-netcode.md (F1-F7), u4c-review-test.md (M1, M2, L1-L4, N
 - Candidate (new code): drive() on a stuck next_event_ns steps t by 1 ns to the horizon (5 s / 10 s = 5e9/1e10
   iterations): a plant that names a past instant forever hangs instead of failing by name. Same in old L-c5 (t += 1),
   new for host_at_next_event. Low.
+- (resumed 2026-11-11, new rust-reviewer run; the lines above are the cut run's.) Hashes re-checked: = above. Whole diff
+  (771 lines) re-read. Fixer's section read (u4c-build.md:163-end of the worktree copy): r2-* plant logs on the final
+  bytes, check.mjs r2-check-1/-2 10/10 (289/316) with foreign lanes in the shared target at their edges (a third run
+  pending). Step 3 open items: Recv.arrival_ns meaning vs woken()'s `a == due` (stream HOL, reorder holds, P0 gate+1);
+  canonical byte offsets (b[16..24], b[36..40] resends meaning, b[5]/b[6]); Profile jitter semantics vs
+  time_threshold's doc; burst membership by send time; woken() timers/declared not horizon-filtered; drive()'s 1 ns
+  stepping on stuck.

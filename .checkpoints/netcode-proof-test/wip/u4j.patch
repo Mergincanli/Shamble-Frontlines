@@ -1,3 +1,34 @@
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/README.md b/spikes/netcode-proof/crates/judge/fixtures/README.md
+index a6d3bd9..cb7e33f 100644
+--- a/spikes/netcode-proof/crates/judge/fixtures/README.md
++++ b/spikes/netcode-proof/crates/judge/fixtures/README.md
+@@ -16,6 +16,26 @@ each case with the real `marks/marks.json` and checks the verdict and its reason
+ | PM-0001-30 | `missed` | the same bite run with no late command counted: the validity check let it through | FAIL |
+ | PM-0006-14 | `base` | the N = 48 session: both bracket runs and one count run padded to 8.33 ms on every tick; N = 36 and 18 not run | NOT-RUN |
+ | PM-0006-14 | `short` | one measured tick of the count run padded to 8.329 ms, short of 8.33 ms | INVALID |
++| PM-0001-4 | `measured-bites-build` | C4: run 1's room log comes from a bites build, naming no bite | INVALID |
++| PM-0001-4 | `measured-names-bite` | C4: run 2 is a measured run that names the B-S bite | INVALID |
++| PM-0001-4 | `bite-measured-build` | C4: the B-S bite run's room comes from the measured build (no log of it lists `bites`) | INVALID |
++| PM-0001-17 | `base` | one L1 P2 run in the stress scene (its precondition held): every client hash equals the server's at its tick (6 compared); the other parts and the bites not run | NOT-RUN, the part's run valid, 0 mismatches |
++| PM-0001-17 | `lost-group` | slot 1's tick 2 incomplete (`null`, `snap_incomplete` 1): not compared, not a mismatch (5 compared) | NOT-RUN, the part's run valid, 0 mismatches |
++| PM-0001-17 | `differ` | slot 1's tick 2 hash differs from the server's | FAIL |
++| PM-0001-17 | `refused-group` | slot 1's tick 2 is the sentinel 0 (a refused group) | FAIL |
++| PM-0001-17 | `orphan` | slot 0 logs a hash at tick 65,539, which the server never logged (a wrong tick rebuild) | FAIL |
++| PM-0001-17 | `none-compared` | every client entry `null`: 0 compared, an empty comparison | FAIL |
++| PM-0001-21 | `base` | one forged run (option A, the stress scene's load, 11 kinds x 1,000 commands, all rejected) and its valid-parts twin with equal state hashes | NOT-RUN, the part's run valid, twin check 0 |
++| PM-0001-21 | `twin-differs` | the twin's tick 2 hash differs | FAIL |
++| PM-0001-21 | `twin-bites-build` | C4's fourth case: the measured run's twin comes from a bites build | INVALID |
++| PM-0001-21 | `twin-unnamed` | the forged run names no twin (`params.twin` missing): a gap | INVALID |
++| PM-0001-21 | `twin-missing` | the named twin is not in the set (another run's twin is) | NOT-RUN |
++| PM-0006-11 | `base` | RS fully named (with its day address and SMT map); the no-smt-map bite run's header has an empty SMT map and fails `machine_named` | PASS, bite shown |
++| PM-0006-11 | `unnamed` | RS's header has no kernel | FAIL |
++
++PM-0001-18's `ws-practice` rule needs 480 heal records per run, too long to write by hand, so its PASS and INVALID cases
++are built in code and judged with the real `marks/marks.json` in `tests/engine.rs`
++(`u4j_ws_practice_puts_the_practice_runs_numbers_in_force`, `u4j_ws_practice_refuses_every_number_not_set_by_its_rules`).
+ 
+ PM-0006-14 has no pass number, so it is never PASS or FAIL: with all three N run and padded right it is REPORTED
+ (the engine tests cover that path); its fixture proves that short padding comes out INVALID (ADR 0006's PM-0006-14 row:
 diff --git a/spikes/netcode-proof/crates/judge/src/eval.rs b/spikes/netcode-proof/crates/judge/src/eval.rs
 index 8ba877e..afef95a 100644
 --- a/spikes/netcode-proof/crates/judge/src/eval.rs
@@ -374,7 +405,7 @@ index 8ba877e..afef95a 100644
  }
  
 diff --git a/spikes/netcode-proof/crates/judge/src/figures.rs b/spikes/netcode-proof/crates/judge/src/figures.rs
-index 9686222..4fb7525 100644
+index 9686222..0e98c15 100644
 --- a/spikes/netcode-proof/crates/judge/src/figures.rs
 +++ b/spikes/netcode-proof/crates/judge/src/figures.rs
 @@ -2,10 +2,11 @@
@@ -469,7 +500,7 @@ index 9686222..4fb7525 100644
          if !same {
              return Err(Lack::Gap(format!(
                  "run {}: its twin {name} has another {field}",
-@@ -131,9 +145,250 @@ fn fate_log_twin_equal(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, Lack> {
+@@ -131,9 +145,248 @@ fn fate_log_twin_equal(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, Lack> {
              )));
          }
      }
@@ -531,10 +562,7 @@ index 9686222..4fb7525 100644
 +            run.id, twin.id
 +        )));
 +    }
-+    let differ = ticks
-+        .iter()
-+        .filter(|t| own.get(t) != other.get(t))
-+        .count();
++    let differ = ticks.iter().filter(|t| own.get(t) != other.get(t)).count();
 +    Ok(Ratio::int(differ as i128))
 +}
 +
@@ -606,7 +634,8 @@ index 9686222..4fb7525 100644
 +            run.id
 +        ))
 +    };
-+    let (n_server, server) = slot_hashes(run, "server_hash")?.ok_or_else(|| missing("server_hash"))?;
++    let (n_server, server) =
++        slot_hashes(run, "server_hash")?.ok_or_else(|| missing("server_hash"))?;
 +    let (n_client, client) =
 +        slot_hashes(run, "decoded_hash")?.ok_or_else(|| missing("decoded_hash"))?;
 +    let replay = slot_hashes(run, "replay_hash")?;
@@ -720,7 +749,7 @@ index 9686222..4fb7525 100644
  /// A figure's computation: the run under judgement and every run of its set.
  pub type Compute = fn(run: &Run<'_>, set: &[&Run<'_>]) -> Result<Ratio, Lack>;
  
-@@ -172,26 +427,30 @@ pub const FIGURES: &[Figure] = &[
+@@ -172,26 +425,30 @@ pub const FIGURES: &[Figure] = &[
          unit: "U1",
          what: "the least share of a slot's snapshots with all 47 others in its set (-2)",
      },
@@ -771,7 +800,7 @@ index 9686222..4fb7525 100644
      planned(
          "view_hit_registered_share",
          "U4",
-@@ -212,11 +471,12 @@ pub const FIGURES: &[Figure] = &[
+@@ -212,11 +469,12 @@ pub const FIGURES: &[Figure] = &[
          "U4",
          "throws that desync, the x86-64 replay agreeing (-54)",
      ),
@@ -789,7 +818,7 @@ index 9686222..4fb7525 100644
      planned(
          "sync_unit_cost",
          "U6",
-@@ -361,6 +621,7 @@ pub(crate) fn compute(name: &str, run: &Run<'_>, set: &[&Run<'_>]) -> Result<Rat
+@@ -361,6 +619,7 @@ pub(crate) fn compute(name: &str, run: &Run<'_>, set: &[&Run<'_>]) -> Result<Rat
          }) => f(run, set).map_err(|lack| match lack {
              Lack::Gap(why) => Missing::Gap(why),
              Lack::Waiting(why) => Missing::NotBuilt(why),
@@ -810,7 +839,7 @@ index 1fab867..20c6c2e 100644
  
  pub use eval::{Verdict, VerdictKind, judge};
 diff --git a/spikes/netcode-proof/crates/judge/src/marks.rs b/spikes/netcode-proof/crates/judge/src/marks.rs
-index 36bf953..87fb770 100644
+index 36bf953..d2ba270 100644
 --- a/spikes/netcode-proof/crates/judge/src/marks.rs
 +++ b/spikes/netcode-proof/crates/judge/src/marks.rs
 @@ -114,6 +114,10 @@ struct RawCheck {
@@ -913,7 +942,7 @@ index 36bf953..87fb770 100644
          }
      }
  }
-@@ -543,6 +584,37 @@ fn compile_check(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Check, Str
+@@ -543,6 +584,41 @@ fn compile_check(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Check, Str
      if c.setup && (c.pooled || matches!(threshold, Threshold::Against { .. })) {
          return Err("a setup check reads its own run only: no pooled or against".to_owned());
      }
@@ -930,7 +959,9 @@ index 36bf953..87fb770 100644
 +                return Err("ws_bound holds a series check's number, not a figure's".to_owned());
 +            };
 +            if c.pooled || c.setup || !matches!(threshold, Threshold::Value(_)) {
-+                return Err("a ws_bound check is a plain check: no pooled, setup or against".to_owned());
++                return Err(
++                    "a ws_bound check is a plain check: no pooled, setup or against".to_owned(),
++                );
 +            }
 +            if c.parts.is_empty() {
 +                return Err("a ws_bound check names its parts (each with ws-practice)".to_owned());
@@ -941,7 +972,9 @@ index 36bf953..87fb770 100644
 +                    return Err("ws_bound y is a count with a where (over Y, at most k)".to_owned());
 +                }
 +                (_, Stat::Count | Stat::Share, _) | (_, _, Some(_)) => {
-+                    return Err("ws_bound x or z is a limit on a statistic, with no where".to_owned());
++                    return Err(
++                        "ws_bound x or z is a limit on a statistic, with no where".to_owned()
++                    );
 +                }
 +                _ => {}
 +            }
@@ -951,7 +984,7 @@ index 36bf953..87fb770 100644
      Ok(Check {
          name: c.name.clone(),
          measure,
-@@ -552,12 +624,15 @@ fn compile_check(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Check, Str
+@@ -552,12 +628,15 @@ fn compile_check(c: &RawCheck, part_names: &BTreeSet<&str>) -> Result<Check, Str
          parts: c.parts.clone(),
          pooled: c.pooled,
          setup: c.setup,
@@ -969,7 +1002,7 @@ index 36bf953..87fb770 100644
      }
      if c.op.is_some() || c.value.is_some() || c.factor.is_some() || c.against.is_some() {
          return Err(
-@@ -667,6 +742,30 @@ fn compile_mark(m: &RawMark) -> Result<Mark, Vec<String>> {
+@@ -667,6 +746,30 @@ fn compile_mark(m: &RawMark) -> Result<Mark, Vec<String>> {
              Err(e) => errors.push(e),
          }
      }
@@ -1000,7 +1033,7 @@ index 36bf953..87fb770 100644
      // The shape is judged on the file's lists, so a check that failed to compile is reported once, not twice.
      match kind {
          Kind::Pass => {
-@@ -914,4 +1013,58 @@ mod tests {
+@@ -914,4 +1017,103 @@ mod tests {
          let unknown_field = file(&mark(r#""verdict":"outside","notes":"x","extra":1"#));
          assert!(parse(&unknown_field).is_err());
      }
@@ -1040,15 +1073,60 @@ index 36bf953..87fb770 100644
 +            (ws("ws-practice:1.11", X), "a raised tolerance"),
 +            (ws("ws-practice:0.99", X), "a tolerance below 1"),
 +            (ws("ws-practice:ten", X), "a tolerance that is no number"),
-+            (ws("ws-practice:1.10", &X.replace(r#""x"}"#, r#""w"}"#)), "no such number"),
-+            (ws("ws-practice:1.10", &X.replace(r#"["ws"]"#, r#"["wt"]"#)), "a part the rule does not judge"),
-+            (ws("ws-practice:1.10", &X.replace(r#","parts":["ws"]"#, "")), "no parts"),
-+            (ws("ws-practice:1.10", &format!("{X},{}", X.replace(r#""name":"x""#, r#""name":"x2""#))), "two x checks"),
-+            (ws("ws-practice:1.10", &Y.replace(r#""where":{"op":">","value":2500000000},"#, "")), "y with no where"),
-+            (ws("ws-practice:1.10", &X.replace(r#""stat":"p50""#, r#""stat":"count""#)), "x on a count"),
-+            (ws("ws-practice:1.10", &X.replace(r#""ws_bound":"x""#, r#""ws_bound":"x","pooled":true"#)), "pooled"),
-+            (ws("ws-practice:1.10", &X.replace(r#""ws_bound":"x""#, r#""ws_bound":"x","setup":true"#)), "a setup check"),
-+            (ws("ws-practice:1.10", r#"{"name":"f","figure":"machine_named","op":"==","value":1,"parts":["ws"],"ws_bound":"x"}"#), "a figure"),
++            (
++                ws("ws-practice:1.10", &X.replace(r#""x"}"#, r#""w"}"#)),
++                "no such number",
++            ),
++            (
++                ws("ws-practice:1.10", &X.replace(r#"["ws"]"#, r#"["wt"]"#)),
++                "a part the rule does not judge",
++            ),
++            (
++                ws("ws-practice:1.10", &X.replace(r#","parts":["ws"]"#, "")),
++                "no parts",
++            ),
++            (
++                ws(
++                    "ws-practice:1.10",
++                    &format!("{X},{}", X.replace(r#""name":"x""#, r#""name":"x2""#)),
++                ),
++                "two x checks",
++            ),
++            (
++                ws(
++                    "ws-practice:1.10",
++                    &Y.replace(r#""where":{"op":">","value":2500000000},"#, ""),
++                ),
++                "y with no where",
++            ),
++            (
++                ws(
++                    "ws-practice:1.10",
++                    &X.replace(r#""stat":"p50""#, r#""stat":"count""#),
++                ),
++                "x on a count",
++            ),
++            (
++                ws(
++                    "ws-practice:1.10",
++                    &X.replace(r#""ws_bound":"x""#, r#""ws_bound":"x","pooled":true"#),
++                ),
++                "pooled",
++            ),
++            (
++                ws(
++                    "ws-practice:1.10",
++                    &X.replace(r#""ws_bound":"x""#, r#""ws_bound":"x","setup":true"#),
++                ),
++                "a setup check",
++            ),
++            (
++                ws(
++                    "ws-practice:1.10",
++                    r#"{"name":"f","figure":"machine_named","op":"==","value":1,"parts":["ws"],"ws_bound":"x"}"#,
++                ),
++                "a figure",
++            ),
 +        ];
 +        for (text, why) in bad {
 +            assert!(parse(&text).is_err(), "{why} must be refused");
@@ -1060,7 +1138,7 @@ index 36bf953..87fb770 100644
 +    }
  }
 diff --git a/spikes/netcode-proof/crates/judge/tests/engine.rs b/spikes/netcode-proof/crates/judge/tests/engine.rs
-index eeccdf3..9e1b1f5 100644
+index eeccdf3..df1a9a7 100644
 --- a/spikes/netcode-proof/crates/judge/tests/engine.rs
 +++ b/spikes/netcode-proof/crates/judge/tests/engine.rs
 @@ -32,6 +32,10 @@ struct LogSpec {
@@ -1108,7 +1186,7 @@ index eeccdf3..9e1b1f5 100644
                  profile: "release".to_owned(),
              },
              bite: self.bite.map(str::to_owned),
-@@ -1186,3 +1197,566 @@ fn u2_a_twin_record_that_cannot_be_compared_is_a_gap() {
+@@ -1186,3 +1197,842 @@ fn u2_a_twin_record_that_cannot_be_compared_is_a_gap() {
          );
      }
  }
@@ -1133,7 +1211,8 @@ index eeccdf3..9e1b1f5 100644
 +    };
 +    let with = |i: usize, change: &dyn Fn(&mut LogSpec)| {
 +        let mut logs = three_runs(M, [90, 95, 100]);
-+        let mut s = LogSpec::room(["run-1", "run-2", "run-3"][i], "set-a", M).ticks("work_ns", &[10, 95]);
++        let mut s =
++            LogSpec::room(["run-1", "run-2", "run-3"][i], "set-a", M).ticks("work_ns", &[10, 95]);
 +        change(&mut s);
 +        logs[i] = s.build();
 +        logs.push(bite_run(None));
@@ -1144,13 +1223,19 @@ index eeccdf3..9e1b1f5 100644
 +    let (k, why) = with(1, &|s| s.features = Some(vec!["bites"]));
 +    assert_eq!(k, VerdictKind::Invalid, "{why:?}");
 +    assert!(
-+        says(&why, "run run-2: build: a measured run names no bite, but a log of it comes from a bites build"),
++        says(
++            &why,
++            "run run-2: build: a measured run names no bite, but a log of it comes from a bites build"
++        ),
 +        "{why:?}"
 +    );
 +    let (k, why) = with(2, &|s| s.bite = Some("PM-0001-4/B-S"));
 +    assert_eq!(k, VerdictKind::Invalid, "{why:?}");
 +    assert!(
-+        says(&why, "run run-3: build: a measured run names the bite PM-0001-4/B-S"),
++        says(
++            &why,
++            "run run-3: build: a measured run names the bite PM-0001-4/B-S"
++        ),
 +        "{why:?}"
 +    );
 +    let mut logs = three_runs(M, [90, 95, 100]);
@@ -1175,16 +1260,25 @@ index eeccdf3..9e1b1f5 100644
 +    lg.features = Some(vec![]);
 +    let mut logs = three_runs(M, [90, 95, 100]);
 +    logs.extend([bite_run(None), lg.build()]);
-+    assert_eq!(verdict_of(&[tick_mark(M, json!({}))], &logs).0, VerdictKind::Pass);
++    assert_eq!(
++        verdict_of(&[tick_mark(M, json!({}))], &logs).0,
++        VerdictKind::Pass
++    );
 +    // A measured run's twin from the bites build: the twin figure reads it, so the measured run is INVALID.
 +    let mut twin = probe("b1-twin", "twin", 'a', None);
 +    twin.features = Some(vec!["bites"]);
-+    let mut logs = vec![probe("b1", "measured", 'a', Some("b1-twin")).build(), twin.build()];
++    let mut logs = vec![
++        probe("b1", "measured", 'a', Some("b1-twin")).build(),
++        twin.build(),
++    ];
 +    logs.extend(shown_clock_bite());
 +    let (k, why) = verdict_of(&[twin_mark()], &logs);
 +    assert_eq!(k, VerdictKind::Invalid, "{why:?}");
 +    assert!(
-+        says(&why, "run b1: its twin b1-twin is invalid: build: a twin run names no bite, but a log of it comes from a bites build"),
++        says(
++            &why,
++            "run b1: its twin b1-twin is invalid: build: a twin run names no bite, but a log of it comes from a bites build"
++        ),
 +        "{why:?}"
 +    );
 +}
@@ -1202,7 +1296,13 @@ index eeccdf3..9e1b1f5 100644
 +}
 +
 +/// One log of a hashed run: `name`'s list on each tick 1, 2, ... (an empty list leaves that tick without it).
-+fn hash_log(run: &'static str, process: &'static str, name: &str, per_tick: &[&[Option<u64>]], edit: &dyn Fn(&mut LogSpec)) -> Log {
++fn hash_log(
++    run: &'static str,
++    process: &'static str,
++    name: &str,
++    per_tick: &[&[Option<u64>]],
++    edit: &dyn Fn(&mut LogSpec),
++) -> Log {
 +    let mut s = LogSpec::room(run, "set-h", "PM-0001-17");
 +    s.layer = "L1";
 +    s.process = process;
@@ -1217,10 +1317,18 @@ index eeccdf3..9e1b1f5 100644
 +    log
 +}
 +
-+const SERVER: [&[Option<u64>]; 3] = [&[Some(11), Some(21)], &[Some(12), Some(22)], &[Some(13), Some(23)]];
++const SERVER: [&[Option<u64>]; 3] = [
++    &[Some(11), Some(21)],
++    &[Some(12), Some(22)],
++    &[Some(13), Some(23)],
++];
 +
 +fn report<'v>(v: &'v npt_judge::Verdict, name: &str) -> Vec<&'v str> {
-+    v.report.iter().filter(|r| r.name == name).map(|r| r.value.as_str()).collect()
++    v.report
++        .iter()
++        .filter(|r| r.name == name)
++        .map(|r| r.value.as_str())
++        .collect()
 +}
 +
 +#[test]
@@ -1235,27 +1343,48 @@ index eeccdf3..9e1b1f5 100644
 +        (vec![equal.clone()], "no log gives hs.server_hash"),
 +        (vec![room.clone()], "no log gives hs.decoded_hash"),
 +        (
-+            vec![room.clone(), client(&[&[Some(11), Some(21), None], &[], &[]])],
++            vec![
++                room.clone(),
++                client(&[&[Some(11), Some(21), None], &[], &[]]),
++            ],
 +            "the hash lists' slot counts differ (server 2, decoded 3, replay 3)",
 +        ),
 +        (
-+            vec![room.clone(), equal.clone(), hash_log("h1", "lab", "decoded_hash", &[&[Some(11), None]], no)],
++            vec![
++                room.clone(),
++                equal.clone(),
++                hash_log("h1", "lab", "decoded_hash", &[&[Some(11), None]], no),
++            ],
 +            "two logs give slot 0 at tick 1 an hs.decoded_hash",
 +        ),
 +        (
-+            vec![hash_log("h1", "room", "server_hash", &[&[Some(0), Some(21)]], no), client(&[&[Some(0), Some(21)]])],
++            vec![
++                hash_log("h1", "room", "server_hash", &[&[Some(0), Some(21)]], no),
++                client(&[&[Some(0), Some(21)]]),
++            ],
 +            "the server logged 0 for slot 0 at tick 1; its hash is never 0",
 +        ),
 +    ];
 +    for (logs, expected) in cases {
 +        let v = judge(&marks_file(&[hash_mark()]), &logs);
-+        assert_eq!(v[0].verdict, VerdictKind::Invalid, "{expected}: {:?}", v[0].why);
++        assert_eq!(
++            v[0].verdict,
++            VerdictKind::Invalid,
++            "{expected}: {:?}",
++            v[0].why
++        );
 +        assert!(says(&v[0].why, expected), "{expected}: {:?}", v[0].why);
 +    }
 +    // A warm-up tick is read too (-58's wraps fall in its first seconds): a mismatch there fails the run.
-+    let warm = hash_log("h1", "client", "decoded_hash", &[&[Some(11), Some(99)]], &|s| {
-+        s.ticks = vec![(Phase::Warmup, vec![])];
-+    });
++    let warm = hash_log(
++        "h1",
++        "client",
++        "decoded_hash",
++        &[&[Some(11), Some(99)]],
++        &|s| {
++            s.ticks = vec![(Phase::Warmup, vec![])];
++        },
++    );
 +    let (k, why) = verdict_of(&[hash_mark()], &[room, warm]);
 +    assert_eq!(k, VerdictKind::Fail, "{why:?}");
 +    assert!(says(&why, "0 mismatches = 1, needs == 0"), "{why:?}");
@@ -1266,21 +1395,45 @@ index eeccdf3..9e1b1f5 100644
 +    let no = &|_: &mut LogSpec| {};
 +    let arm = &|s: &mut LogSpec| s.arch = "aarch64";
 +    let room = hash_log("h1", "room", "server_hash", &SERVER, no);
-+    let wrong: [&[Option<u64>]; 3] = [&[Some(11), Some(21)], &[Some(12), Some(99)], &[Some(13), Some(23)]];
++    let wrong: [&[Option<u64>]; 3] = [
++        &[Some(11), Some(21)],
++        &[Some(12), Some(99)],
++        &[Some(13), Some(23)],
++    ];
 +    let client = hash_log("h1", "bots", "decoded_hash", &wrong, arm);
 +    let replay = |lists: &[&[Option<u64>]]| hash_log("h1", "replay", "replay_hash", lists, no);
 +    // The x86-64 re-decode agrees with the server: an aarch64-only finding, reported, deciding nothing.
-+    let v = judge(&marks_file(&[hash_mark()]), &[room.clone(), client.clone(), replay(&SERVER)]);
-+    assert_eq!(v[0].parts[0].verdict, VerdictKind::Pass, "{:?}", v[0].parts[0].why);
++    let v = judge(
++        &marks_file(&[hash_mark()]),
++        &[room.clone(), client.clone(), replay(&SERVER)],
++    );
++    assert_eq!(
++        v[0].parts[0].verdict,
++        VerdictKind::Pass,
++        "{:?}",
++        v[0].parts[0].why
++    );
 +    assert_eq!(report(&v[0], "aarch64 only"), ["1"]);
 +    assert_eq!(report(&v[0], "compared"), ["6"]);
 +    // It misses the server's hash too: a real mismatch.
-+    let (k, why) = verdict_of(&[hash_mark()], &[room.clone(), client.clone(), replay(&wrong)]);
++    let (k, why) = verdict_of(
++        &[hash_mark()],
++        &[room.clone(), client.clone(), replay(&wrong)],
++    );
 +    assert_eq!(k, VerdictKind::Fail, "{why:?}");
 +    // No re-decode yet: NOT-RUN, never a guess.
 +    let v = judge(&marks_file(&[hash_mark()]), &[room.clone(), client]);
-+    assert_eq!(v[0].parts[0].verdict, VerdictKind::NotRun, "{:?}", v[0].parts[0].why);
-+    assert!(says(&v[0].parts[0].why, "the run has no x86-64 re-decode"), "{:?}", v[0].parts[0].why);
++    assert_eq!(
++        v[0].parts[0].verdict,
++        VerdictKind::NotRun,
++        "{:?}",
++        v[0].parts[0].why
++    );
++    assert!(
++        says(&v[0].parts[0].why, "the run has no x86-64 re-decode"),
++        "{:?}",
++        v[0].parts[0].why
++    );
 +    // On x86-64 a mismatch counts as it stands, with or without a replay.
 +    let x86 = hash_log("h1", "client", "decoded_hash", &wrong, no);
 +    let (k, _) = verdict_of(&[hash_mark()], &[room, x86, replay(&SERVER)]);
@@ -1292,10 +1445,19 @@ index eeccdf3..9e1b1f5 100644
 +    let no = &|_: &mut LogSpec| {};
 +    let room = hash_log("h1", "room", "server_hash", &SERVER, no);
 +    let none: [&[Option<u64>]; 3] = [&[None, None], &[None, None], &[None, None]];
-+    let v = judge(&marks_file(&[hash_mark()]), &[room.clone(), hash_log("h1", "client", "decoded_hash", &none, no)]);
++    let v = judge(
++        &marks_file(&[hash_mark()]),
++        &[
++            room.clone(),
++            hash_log("h1", "client", "decoded_hash", &none, no),
++        ],
++    );
 +    assert_eq!(v[0].verdict, VerdictKind::Fail, "{:?}", v[0].why);
 +    assert!(
-+        says(&v[0].why, "L1: run h1: 0 mismatches: run h1: no client logged a hash (0 compared); an empty comparison fails"),
++        says(
++            &v[0].why,
++            "L1: run h1: 0 mismatches: run h1: no client logged a hash (0 compared); an empty comparison fails"
++        ),
 +        "{:?}",
 +        v[0].why
 +    );
@@ -1322,7 +1484,10 @@ index eeccdf3..9e1b1f5 100644
 +    assert_eq!(v[0].verdict, VerdictKind::Invalid, "{:?}", v[0].why);
 +    assert_eq!(v[0].bites[0].status, BiteStatus::Invalid);
 +    assert!(
-+        says(&v[0].bites[0].runs[0].invalid_why, "an empty comparison shows no bite"),
++        says(
++            &v[0].bites[0].runs[0].invalid_why,
++            "an empty comparison shows no bite"
++        ),
 +        "{:?}",
 +        v[0].bites[0].runs
 +    );
@@ -1346,7 +1511,12 @@ index eeccdf3..9e1b1f5 100644
 +}
 +
 +/// A room log with one state hash per tick (`None`: no `h` on that tick), naming its twin.
-+fn hashed(run: &'static str, role: &'static str, twin: Option<&'static str>, hashes: &[Option<u64>]) -> LogSpec {
++fn hashed(
++    run: &'static str,
++    role: &'static str,
++    twin: Option<&'static str>,
++    hashes: &[Option<u64>],
++) -> LogSpec {
 +    let mut s = LogSpec::room(run, "set-w", "PM-0001-21");
 +    s.role = role;
 +    s.layer = "L1";
@@ -1377,18 +1547,34 @@ index eeccdf3..9e1b1f5 100644
 +        ]
 +    };
 +    let h = [Some(1), Some(2), Some(3)];
-+    assert_eq!(verdict_of(&[twin_hash_mark()], &pair(&h, &h)).0, VerdictKind::Pass);
++    assert_eq!(
++        verdict_of(&[twin_hash_mark()], &pair(&h, &h)).0,
++        VerdictKind::Pass
++    );
 +    let (k, why) = verdict_of(&[twin_hash_mark()], &pair(&h, &[Some(1), Some(9), Some(3)]));
 +    assert_eq!(k, VerdictKind::Fail);
-+    assert!(says(&why, "state hash equals the twin's = 1, needs == 0"), "{why:?}");
++    assert!(
++        says(&why, "state hash equals the twin's = 1, needs == 0"),
++        "{why:?}"
++    );
 +    let (k, why) = verdict_of(&[twin_hash_mark()], &pair(&h, &[Some(1), Some(2), None]));
-+    assert_eq!(k, VerdictKind::Fail, "a tick hashed in one only counts: {why:?}");
++    assert_eq!(
++        k,
++        VerdictKind::Fail,
++        "a tick hashed in one only counts: {why:?}"
++    );
 +    let (k, why) = verdict_of(&[twin_hash_mark()], &pair(&[None], &[None]));
 +    assert_eq!(k, VerdictKind::Fail, "{why:?}");
-+    assert!(says(&why, "hashed no tick; an empty comparison fails"), "{why:?}");
++    assert!(
++        says(&why, "hashed no tick; an empty comparison fails"),
++        "{why:?}"
++    );
 +    let (k, why) = verdict_of(&[twin_hash_mark()], &pair(&h, &h)[..1]);
 +    assert_eq!(k, VerdictKind::NotRun, "{why:?}");
-+    assert!(says(&why, "its twin f1-twin is not in set set-w yet"), "{why:?}");
++    assert!(
++        says(&why, "its twin f1-twin is not in set set-w yet"),
++        "{why:?}"
++    );
 +    let mut seed = hashed("f1-twin", "twin", None, &h);
 +    seed.seed = 2;
 +    let mut bites = hashed("f1-twin", "twin", None, &h);
@@ -1404,14 +1590,35 @@ index eeccdf3..9e1b1f5 100644
 +    second.params = vec![("suite", json!("forged"))];
 +    second.ticks = vec![(Phase::Measured, vec![])];
 +    let cases: Vec<(Vec<Log>, &str)> = vec![
-+        (vec![with_hashes(seed, &h), own()], "its twin f1-twin has another seed"),
-+        (vec![with_hashes(bites, &h), own()], "its twin f1-twin is invalid: build:"),
-+        (vec![with_hashes(cut, &h), own()], "its twin f1-twin is invalid: complete:"),
-+        (vec![with_hashes(hashed("f1", "measured", Some("f1"), &h), &h)], "params.twin names the run itself"),
-+        (vec![with_hashes(hashed("f1", "measured", None, &h), &h)], "params.twin names no twin run"),
-+        (pair(&h, &h).into_iter().skip(1).chain([bad_h]).collect(), "tick 2's h is not 16 lowercase hex digits"),
 +        (
-+            pair(&h, &h).into_iter().chain([with_hashes(second, &[Some(7)])]).collect(),
++            vec![with_hashes(seed, &h), own()],
++            "its twin f1-twin has another seed",
++        ),
++        (
++            vec![with_hashes(bites, &h), own()],
++            "its twin f1-twin is invalid: build:",
++        ),
++        (
++            vec![with_hashes(cut, &h), own()],
++            "its twin f1-twin is invalid: complete:",
++        ),
++        (
++            vec![with_hashes(hashed("f1", "measured", Some("f1"), &h), &h)],
++            "params.twin names the run itself",
++        ),
++        (
++            vec![with_hashes(hashed("f1", "measured", None, &h), &h)],
++            "params.twin names no twin run",
++        ),
++        (
++            pair(&h, &h).into_iter().skip(1).chain([bad_h]).collect(),
++            "tick 2's h is not 16 lowercase hex digits",
++        ),
++        (
++            pair(&h, &h)
++                .into_iter()
++                .chain([with_hashes(second, &[Some(7)])])
++                .collect(),
 +            "two logs give tick 1 two state hashes",
 +        ),
 +    ];
@@ -1438,8 +1645,13 @@ index eeccdf3..9e1b1f5 100644
 +        verdict_of(std::slice::from_ref(&mark), &[log]).0
 +    };
 +    assert_eq!(run("RS", &|_| {}), VerdictKind::Pass);
-+    assert_eq!(run("C", &|m| m.address.clear()), VerdictKind::Pass, "not a VM: no address");
-+    let missing: [(&str, &dyn Fn(&mut npt_log::Machine)); 8] = [
++    assert_eq!(
++        run("C", &|m| m.address.clear()),
++        VerdictKind::Pass,
++        "not a VM: no address"
++    );
++    type Edit<'a> = &'a dyn Fn(&mut npt_log::Machine);
++    let missing: [(&str, Edit<'_>); 8] = [
 +        ("a VM with no address", &|m| m.address.clear()),
 +        ("no kernel", &|m| m.kernel.clear()),
 +        ("no CPU model", &|m| m.cpu.clear()),
@@ -1457,7 +1669,11 @@ index eeccdf3..9e1b1f5 100644
 +// PM-0001-18's WebSocket part, judged with the real marks.json: the ws-practice rule and the numbers in force.
 +
 +fn real_marks() -> npt_judge::Marks {
-+    let text = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../../marks/marks.json")).expect("marks");
++    let text = std::fs::read_to_string(concat!(
++        env!("CARGO_MANIFEST_DIR"),
++        "/../../marks/marks.json"
++    ))
++    .expect("marks");
 +    parse_marks(&text).expect("marks.json compiles")
 +}
 +
@@ -1500,7 +1716,10 @@ index eeccdf3..9e1b1f5 100644
 +            ("class", json!("IN TOLERANCE")),
 +            ("m_p_ns", json!(680_000_000)),
 +            ("bound", json!(WS_BOUND)),
-+            ("bound_file", json!("spikes/netcode-proof/results/u3-ws-fallback/bound.txt")),
++            (
++                "bound_file",
++                json!("spikes/netcode-proof/results/u3-ws-fallback/bound.txt"),
++            ),
 +            ("bound_sha256", json!("0".repeat(64))),
 +            ("x_moved_ns", json!(697_000_000)),
 +            ("y_moved_ns", json!(2_600_000_000_i64)),
@@ -1520,14 +1739,23 @@ index eeccdf3..9e1b1f5 100644
 +    }
 +}
 +
-+fn ws_log(run: &'static str, role: &'static str, binary: &'static str, started: Option<&'static str>, heals: &[i64]) -> LogSpec {
++fn ws_log(
++    run: &'static str,
++    role: &'static str,
++    binary: &'static str,
++    started: Option<&'static str>,
++    heals: &[i64],
++) -> LogSpec {
 +    let mut s = LogSpec::room(run, "set-ws", "PM-0001-18");
 +    s.role = role;
 +    s.machine_role = "LG";
 +    s.process = "bots";
 +    s.profile = "B1";
 +    s.binary = binary;
-+    s.params = vec![("transport", json!("ws")), ("burst_spacing_ns", json!(30_000_000_000_i64))];
++    s.params = vec![
++        ("transport", json!("ws")),
++        ("burst_spacing_ns", json!(30_000_000_000_i64)),
++    ];
 +    if let Some(t) = started {
 +        s.params.push(("started_utc", json!(t)));
 +    }
@@ -1546,7 +1774,13 @@ index eeccdf3..9e1b1f5 100644
 +
 +fn ws_logs(w: &Ws) -> Vec<Log> {
 +    let binary = |c: &str| -> &'static str { if c == "a" { "aa" } else { "bb" } };
-+    let mut practice = ws_log("ws-practice", "practice", binary(w.practice_binary), Some(w.practice_started), &w.practice);
++    let mut practice = ws_log(
++        "ws-practice",
++        "practice",
++        binary(w.practice_binary),
++        Some(w.practice_started),
++        &w.practice,
++    );
 +    practice.footer = w.practice_footer;
 +    practice.params[1] = ("burst_spacing_ns", json!(w.practice_spacing));
 +    for _ in 0..w.records {
@@ -1558,14 +1792,25 @@ index eeccdf3..9e1b1f5 100644
 +    }
 +    let mut practice = practice.build();
 +    practice.header.scene = w.practice_scene.to_owned();
-+    let mut logs = vec![ws_log("ws-1", "measured", "aa", w.counted_started, &w.counted).build(), practice];
++    let mut logs = vec![
++        ws_log("ws-1", "measured", "aa", w.counted_started, &w.counted).build(),
++        practice,
++    ];
 +    if w.second_practice {
 +        let mut p = logs[1].clone();
 +        p.header.run = "ws-practice-0".to_owned();
-+        p.header.params.insert("started_utc".to_owned(), json!("2026-11-20T17:00:00Z"));
++        p.header
++            .params
++            .insert("started_utc".to_owned(), json!("2026-11-20T17:00:00Z"));
 +        logs.push(p);
 +    }
-+    let mut bite = ws_log("ws-bite", "bite", "cc", Some("2026-11-20T22:00:00Z"), &heals(776_000_000, 0, 0));
++    let mut bite = ws_log(
++        "ws-bite",
++        "bite",
++        "cc",
++        Some("2026-11-20T22:00:00Z"),
++        &heals(776_000_000, 0, 0),
++    );
 +    bite.bite = Some("PM-0001-18/ws-budget-x2");
 +    logs.push(bite.build());
 +    logs
@@ -1573,9 +1818,18 @@ index eeccdf3..9e1b1f5 100644
 +
 +fn ws_part(w: &Ws) -> (npt_judge::eval::PartOut, npt_judge::Verdict) {
 +    let marks = real_marks();
-+    let i = marks.marks.iter().position(|m| m.id == "PM-0001-18").expect("-18");
++    let i = marks
++        .marks
++        .iter()
++        .position(|m| m.id == "PM-0001-18")
++        .expect("-18");
 +    let v = judge(&marks, &ws_logs(w)).remove(i);
-+    let part = v.parts.iter().find(|p| p.name == "L2 B1 ws").expect("the WebSocket part").clone();
++    let part = v
++        .parts
++        .iter()
++        .find(|p| p.name == "L2 B1 ws")
++        .expect("the WebSocket part")
++        .clone();
 +    (part, v)
 +}
 +
@@ -1584,34 +1838,73 @@ index eeccdf3..9e1b1f5 100644
 +    let (part, v) = ws_part(&ws_base());
 +    assert_eq!(part.verdict, VerdictKind::Pass, "{:?}", part.why);
 +    let checks = &part.runs[0].checks;
-+    let median = checks.iter().find(|c| c.name.starts_with("WebSocket: half")).expect("check c");
++    let median = checks
++        .iter()
++        .find(|c| c.name.starts_with("WebSocket: half"))
++        .expect("check c");
 +    assert_eq!(median.value.as_deref(), Some("690000000"));
-+    assert!(median.needs.starts_with("<= 697000000 (X 670000000 x f 1.039755 = 697000000"), "{}", median.needs);
-+    assert!(median.needs.contains("M_p 680000000 / M_m 654000000"), "{}", median.needs);
-+    let over = checks.iter().find(|c| c.name.starts_with("WebSocket: at most")).expect("check d");
-+    assert_eq!(over.value.as_deref(), Some("0"), "none over Y' = 2.6 s (6 over the unmoved 2.5 s)");
-+    let bite = v.bites.iter().find(|b| b.id == "PM-0001-18/ws-budget-x2").expect("the WebSocket bite");
++    assert!(
++        median
++            .needs
++            .starts_with("<= 697000000 (X 670000000 x f 1.039755 = 697000000"),
++        "{}",
++        median.needs
++    );
++    assert!(
++        median.needs.contains("M_p 680000000 / M_m 654000000"),
++        "{}",
++        median.needs
++    );
++    let over = checks
++        .iter()
++        .find(|c| c.name.starts_with("WebSocket: at most"))
++        .expect("check d");
++    assert_eq!(
++        over.value.as_deref(),
++        Some("0"),
++        "none over Y' = 2.6 s (6 over the unmoved 2.5 s)"
++    );
++    let bite = v
++        .bites
++        .iter()
++        .find(|b| b.id == "PM-0001-18/ws-budget-x2")
++        .expect("the WebSocket bite");
 +    assert_eq!(bite.status, BiteStatus::Shown, "{:?}", bite.runs);
 +    // FAR BETTER, with the advisor's chance ruling: f = 1, so the bound itself is in force and 690 ms fails it.
 +    let mut w = ws_base();
 +    w.practice = heals(600_000_000, 5, 2_590_000_000);
 +    w.record[0].1 = json!("FAR BETTER");
 +    w.record[1].1 = json!(600_000_000);
-+    w.record.extend([("chance_ruling", json!("advisor-r3.md:12"))]);
++    w.record
++        .extend([("chance_ruling", json!("advisor-r3.md:12"))]);
 +    w.record[5].1 = json!(670_000_000);
 +    w.record[6].1 = json!(2_500_000_000_i64);
 +    w.record[7].1 = json!(6_900_000_000_i64);
 +    w.practice = heals(600_000_000, 0, 0);
 +    let (part, _) = ws_part(&w);
 +    assert_eq!(part.verdict, VerdictKind::Fail, "{:?}", part.why);
-+    assert!(says(&part.why, "WebSocket: half the client-bursts heal within X x f"), "{:?}", part.why);
++    assert!(
++        says(
++            &part.why,
++            "WebSocket: half the client-bursts heal within X x f"
++        ),
++        "{:?}",
++        part.why
++    );
 +    // A second practice run of one build counts only with its ruling; the latest is the one in force.
 +    let mut w = ws_base();
 +    w.second_practice = true;
 +    let (part, _) = ws_part(&w);
 +    assert_eq!(part.verdict, VerdictKind::Invalid, "{:?}", part.why);
-+    assert!(says(&part.why, "2 practice runs of one build"), "{:?}", part.why);
-+    w.record.push(("second_ruling", json!("advisor-r3.md:40: the cause found and fixed")));
++    assert!(
++        says(&part.why, "2 practice runs of one build"),
++        "{:?}",
++        part.why
++    );
++    w.record.push((
++        "second_ruling",
++        json!("advisor-r3.md:40: the cause found and fixed"),
++    ));
 +    assert_eq!(ws_part(&w).0.verdict, VerdictKind::Pass);
 +}
 +
@@ -1626,28 +1919,84 @@ index eeccdf3..9e1b1f5 100644
 +            }
 +        }
 +    };
-+    let bound = |from: &'static str, to: &'static str| field("bound", json!(WS_BOUND.replacen(from, to, 1)));
++    let bound = |from: &'static str, to: &'static str| {
++        field("bound", json!(WS_BOUND.replacen(from, to, 1)))
++    };
 +    type Edit = Box<dyn Fn(&mut Ws)>;
 +    let cases: Vec<(Edit, &str)> = vec![
-+        (Box::new(|w| w.practice_binary = "b"), "holds no practice run of run ws-1's build"),
-+        (Box::new(|w| w.practice_started = "2026-11-20T22:00:00Z"), "did not start before run ws-1"),
-+        (Box::new(|w| w.counted_started = None), "run ws-1 has no params.started_utc"),
-+        (Box::new(|w| w.counted_started = Some("20 Nov 2026 21:00")), "is not YYYY-MM-DDTHH:MM:SSZ"),
-+        (Box::new(|w| w.practice_scene = "ES"), "ran another scene or profile"),
-+        (Box::new(|w| w.practice_spacing = 20_000_000_000), "ran another burst spacing"),
-+        (Box::new(|w| w.practice_footer = false), "practice run ws-practice is invalid: complete:"),
-+        (Box::new(|w| w.records = 0), "holds 0 ws_practice records, not 1"),
-+        (Box::new(|w| w.records = 2), "holds 2 ws_practice records, not 1"),
-+        (Box::new(field("class", json!("BEYOND"))), "is \"BEYOND\" at s = 1.039755"),
++        (
++            Box::new(|w| w.practice_binary = "b"),
++            "holds no practice run of run ws-1's build",
++        ),
++        (
++            Box::new(|w| w.practice_started = "2026-11-20T22:00:00Z"),
++            "did not start before run ws-1",
++        ),
++        (
++            Box::new(|w| w.counted_started = None),
++            "run ws-1 has no params.started_utc",
++        ),
++        (
++            Box::new(|w| w.counted_started = Some("20 Nov 2026 21:00")),
++            "is not YYYY-MM-DDTHH:MM:SSZ",
++        ),
++        (
++            Box::new(|w| w.practice_scene = "ES"),
++            "ran another scene or profile",
++        ),
++        (
++            Box::new(|w| w.practice_spacing = 20_000_000_000),
++            "ran another burst spacing",
++        ),
++        (
++            Box::new(|w| w.practice_footer = false),
++            "practice run ws-practice is invalid: complete:",
++        ),
++        (
++            Box::new(|w| w.records = 0),
++            "holds 0 ws_practice records, not 1",
++        ),
++        (
++            Box::new(|w| w.records = 2),
++            "holds 2 ws_practice records, not 1",
++        ),
++        (
++            Box::new(field("class", json!("BEYOND"))),
++            "is \"BEYOND\" at s = 1.039755",
++        ),
 +        (Box::new(field("class", json!("INVALID"))), "is \"INVALID\""),
-+        (Box::new(field("m_p_ns", json!(681_000_000))), "the record's m_p_ns is not practice run ws-practice's median"),
-+        (Box::new(field("x_moved_ns", json!(700_000_000))), "the record's x_moved_ns is not the judge's X 670000000"),
-+        (Box::new(field("k_count", json!(6))), "the record's k_count is not the bound's"),
-+        (Box::new(bound(r#""tolerance":"1.10""#, r#""tolerance":"1.05""#)), "the bound's tolerance 1.05 is not marks.json's 1.1"),
-+        (Box::new(bound(r#""x_ns":670000000"#, r#""x_ns":680000000"#)), "holds 670000000 as the bound's X, the bound line says 680000000"),
-+        (Box::new(bound(r#""k_count":5"#, r#""k_count":4"#)), "allows 5 over Y, the bound's k is 4"),
-+        (Box::new(bound("npt-ws-bound v1 ", "npt-ws-bound ")), "the bound line does not start with"),
-+        (Box::new(|w| w.practice = heals(680_000_000, 6, 2_610_000_000)), "but practice run ws-practice has 6 heals over 2600000000 ns"),
++        (
++            Box::new(field("m_p_ns", json!(681_000_000))),
++            "the record's m_p_ns is not practice run ws-practice's median",
++        ),
++        (
++            Box::new(field("x_moved_ns", json!(700_000_000))),
++            "the record's x_moved_ns is not the judge's X 670000000",
++        ),
++        (
++            Box::new(field("k_count", json!(6))),
++            "the record's k_count is not the bound's",
++        ),
++        (
++            Box::new(bound(r#""tolerance":"1.10""#, r#""tolerance":"1.05""#)),
++            "the bound's tolerance 1.05 is not marks.json's 1.1",
++        ),
++        (
++            Box::new(bound(r#""x_ns":670000000"#, r#""x_ns":680000000"#)),
++            "holds 670000000 as the bound's X, the bound line says 680000000",
++        ),
++        (
++            Box::new(bound(r#""k_count":5"#, r#""k_count":4"#)),
++            "allows 5 over Y, the bound's k is 4",
++        ),
++        (
++            Box::new(bound("npt-ws-bound v1 ", "npt-ws-bound ")),
++            "the bound line does not start with",
++        ),
++        (
++            Box::new(|w| w.practice = heals(680_000_000, 6, 2_610_000_000)),
++            "but practice run ws-practice has 6 heals over 2600000000 ns",
++        ),
 +        (
 +            Box::new(|w| {
 +                // M_p 740 ms: s = 740/654 = 1.1315, beyond the tolerance (the 240th of 480 heals, 750 ms above it).
@@ -1665,7 +2014,12 @@ index eeccdf3..9e1b1f5 100644
 +        let mut w = ws_base();
 +        edit(&mut w);
 +        let (part, v) = ws_part(&w);
-+        assert_eq!(part.verdict, VerdictKind::Invalid, "{expected}: {:?}", part.why);
++        assert_eq!(
++            part.verdict,
++            VerdictKind::Invalid,
++            "{expected}: {:?}",
++            part.why
++        );
 +        assert!(says(&part.why, expected), "{expected}: {:?}", part.why);
 +        assert_eq!(v.verdict, VerdictKind::Invalid, "{expected}");
 +    }
@@ -1675,8 +2029,202 @@ index eeccdf3..9e1b1f5 100644
 +    w.record.push(("chance_ruling", json!("advisor-r3.md:20")));
 +    assert_eq!(ws_part(&w).0.verdict, VerdictKind::Pass);
 +}
+diff --git a/spikes/netcode-proof/crates/judge/tests/fixtures.rs b/spikes/netcode-proof/crates/judge/tests/fixtures.rs
+index be01aa7..1e577f5 100644
+--- a/spikes/netcode-proof/crates/judge/tests/fixtures.rs
++++ b/spikes/netcode-proof/crates/judge/tests/fixtures.rs
+@@ -196,10 +196,188 @@ fn pm_0001_30_fails_when_the_validity_check_lets_a_late_command_through() {
+     );
+ }
+ 
++/// One part's run: its outcome and its first check's value.
++fn part_run<'v>(v: &'v Verdict, part: &str) -> &'v npt_judge::eval::RunOut {
++    let p = v
++        .parts
++        .iter()
++        .find(|p| p.name == part)
++        .unwrap_or_else(|| panic!("{part}"));
++    assert_eq!(p.runs.len(), 1, "{part}: {:?}", p.runs);
++    &p.runs[0]
++}
++
++fn reported<'v>(v: &'v Verdict, name: &str) -> Vec<&'v str> {
++    v.report
++        .iter()
++        .filter(|r| r.name.starts_with(name))
++        .map(|r| r.value.as_str())
++        .collect()
++}
++
++/// u4-build-plan.md §4.6's six decoded-hash cases, on PM-0001-17's L1 P2 part (the stress scene's load as its
++/// precondition): equal; differing; a lost group (not compared); a refused group (the sentinel); a client hash at a
++/// tick the server never logged; 0 compared.
++#[test]
++fn pm_0001_17_equal_hashes_pass_and_the_lost_group_is_not_compared() {
++    for (case, compared, incomplete) in [("base", "6", "0"), ("lost-group", "5", "1")] {
++        let v = verdict("PM-0001-17", case);
++        assert_eq!(
++            v.verdict,
++            VerdictKind::NotRun,
++            "{case}: the other parts wait: {:?}",
++            v.why
++        );
++        let run = part_run(&v, "L1 P2");
++        assert!(run.valid, "{case}: {:?}", run.invalid_why);
++        assert_eq!(run.checks[0].value.as_deref(), Some("0"), "{case}");
++        assert_eq!(
++            reported(&v, "decoded snapshots compared"),
++            [compared],
++            "{case}"
++        );
++        assert_eq!(
++            reported(&v, "client-ticks left incomplete"),
++            [incomplete],
++            "{case}"
++        );
++    }
++}
++
++#[test]
++fn pm_0001_17_fails_on_a_difference_the_sentinel_an_orphan_and_nothing_compared() {
++    for (case, expected) in [
++        (
++            "differ",
++            "rebuild the server's quantised state (0 mismatches; on L2 under the Arm rule) = 1, needs == 0",
++        ),
++        (
++            "refused-group",
++            "(0 mismatches; on L2 under the Arm rule) = 1, needs == 0",
++        ),
++        (
++            "orphan",
++            "(0 mismatches; on L2 under the Arm rule) = 1, needs == 0",
++        ),
++        (
++            "none-compared",
++            "no client logged a hash (0 compared); an empty comparison fails",
++        ),
++    ] {
++        let v = verdict("PM-0001-17", case);
++        assert_eq!(v.verdict, VerdictKind::Fail, "{case}: {:?}", v.why);
++        assert!(says(&v, "L1 P2: run p2-1: "), "{case}: {:?}", v.why);
++        assert!(says(&v, expected), "{case}: {:?}", v.why);
++    }
++}
++
++/// C4's cases (the advisor's U2 ruling): a measured run built with the bites, a measured run naming a bite, and a bite
++/// run from a measured build are INVALID; the fourth, a twin from the wrong build, is PM-0001-21's `twin-bites-build`.
++#[test]
++fn pm_0001_4_c4_the_build_must_match_the_bite() {
++    for (case, expected) in [
++        (
++            "measured-bites-build",
++            "run s30-1: build: a measured run names no bite, but a log of it comes from a bites build",
++        ),
++        (
++            "measured-names-bite",
++            "run s30-2: build: a measured run names the bite PM-0001-4/B-S",
++        ),
++        (
++            "bite-measured-build",
++            "bite PM-0001-4/B-S: its run is invalid",
++        ),
++    ] {
++        let v = verdict("PM-0001-4", case);
++        assert_eq!(v.verdict, VerdictKind::Invalid, "{case}: {:?}", v.why);
++        assert!(says(&v, expected), "{case}: {:?}", v.why);
++    }
++    let v = verdict("PM-0001-4", "bite-measured-build");
++    assert!(
++        v.bites[0].runs[0]
++            .invalid_why
++            .iter()
++            .any(|w| w.contains("none of its logs comes from a bites build")),
++        "{:?}",
++        v.bites[0].runs
++    );
++}
++
++/// twin_hash_mismatch_count on PM-0001-21's forged part: equal hashes pass, a differing tick fails, a twin from a
++/// bites build (C4's fourth case) or no twin named is INVALID, a twin not in the set yet is NOT-RUN.
++#[test]
++fn pm_0001_21_the_forged_run_against_its_valid_parts_twin() {
++    let v = verdict("PM-0001-21", "base");
++    assert_eq!(v.verdict, VerdictKind::NotRun, "{:?}", v.why);
++    let run = part_run(&v, "forged, option A");
++    assert!(run.valid, "{:?}", run.invalid_why);
++    let twin = run
++        .checks
++        .iter()
++        .find(|c| c.name.starts_with("forged: 0 effect"))
++        .expect("the twin check");
++    assert_eq!(twin.value.as_deref(), Some("0"));
++    for (case, kind, expected) in [
++        (
++            "twin-differs",
++            VerdictKind::Fail,
++            "forged: 0 effect beyond the valid part (state hash equals the valid-parts twin's on every tick) = 1, needs == 0",
++        ),
++        (
++            "twin-bites-build",
++            VerdictKind::Invalid,
++            "its twin forged-a-1-twin is invalid: build: a twin run names no bite, but a log of it comes from a bites build",
++        ),
++        (
++            "twin-unnamed",
++            VerdictKind::Invalid,
++            "params.twin names no twin run",
++        ),
++        (
++            "twin-missing",
++            VerdictKind::NotRun,
++            "its twin forged-a-1-twin is not in set u4f-21 yet",
++        ),
++    ] {
++        let v = verdict("PM-0001-21", case);
++        assert_eq!(v.verdict, kind, "{case}: {:?}", v.why);
++        assert!(says(&v, expected), "{case}: {:?}", v.why);
++    }
++}
++
++/// machine_named on PM-0006-11: a fully named RS passes and the no-SMT-map bite fails it; a header with no kernel
++/// fails.
++#[test]
++fn pm_0006_11_every_machine_named_and_its_bite_shown() {
++    let v = verdict("PM-0006-11", "base");
++    assert_eq!(v.verdict, VerdictKind::Pass, "{:?}", v.why);
++    assert_eq!(
++        v.bites[0].status,
++        BiteStatus::Shown,
++        "{:?}",
++        v.bites[0].runs
++    );
++    let v = verdict("PM-0006-11", "unnamed");
++    assert_eq!(v.verdict, VerdictKind::Fail, "{:?}", v.why);
++    assert!(
++        says(&v, "machine_named") || says(&v, "RS named"),
++        "{:?}",
++        v.why
++    );
++}
++
+ #[test]
+ fn the_fixtures_read_through_the_command_line_folder_reader_too() {
+     // read_logs walks a folder the way the binary does; every base folder reads clean.
+-    for mark in ["pm-0001-4", "pm-0001-30", "pm-0006-14"] {
++    for mark in [
++        "pm-0001-4",
++        "pm-0001-17",
++        "pm-0001-21",
++        "pm-0001-30",
++        "pm-0006-11",
++        "pm-0006-14",
++    ] {
+         let logs = read_logs(&root().join("fixtures").join(mark).join("base")).expect("reads");
+         assert!(!logs.is_empty());
+         assert!(
 diff --git a/spikes/netcode-proof/crates/log/src/lib.rs b/spikes/netcode-proof/crates/log/src/lib.rs
-index bca48d6..b480b0c 100644
+index bca48d6..11d395d 100644
 --- a/spikes/netcode-proof/crates/log/src/lib.rs
 +++ b/spikes/netcode-proof/crates/log/src/lib.rs
 @@ -114,6 +114,18 @@ pub struct TickRecord {
@@ -1777,7 +2325,7 @@ index bca48d6..b480b0c 100644
                  if last_tick.is_some_and(|last| r.t <= last) {
                      return Err(err(format!(
                          "tick {} after tick {}",
-@@ -616,6 +663,72 @@ mod tests {
+@@ -616,6 +663,71 @@ mod tests {
          assert_eq!(r.hash(), None, "short is not the format");
      }
  
@@ -1807,9 +2355,8 @@ index bca48d6..b480b0c 100644
 +        let text = String::from_utf8(w.finish(Ended::Clean).expect("footer")).expect("utf-8");
 +        let lines: Vec<&str> = text.lines().collect();
 +        assert!(
-+            lines[1].contains(
-+                r#""hs":{"decoded_hash":["00000000000000ab",null,"0000000000000000"]}"#
-+            ),
++            lines[1]
++                .contains(r#""hs":{"decoded_hash":["00000000000000ab",null,"0000000000000000"]}"#),
 +            "{}",
 +            lines[1]
 +        );
@@ -2852,23 +3399,45 @@ index 0000000..c906573
 +{"k":"second","sec":1,"ph":"measured","v":{"steal_permille":4,"shots_count":710,"portal_changes_count":1}}
 +{"k":"event","ev":"affinity","ph":"after","f":{"when":"end","cpu":3,"alone":true,"sibling_free":true}}
 +{"k":"footer","records":9,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0006-11/base/bite-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0006-11/base/bite-room.jsonl
+new file mode 100644
+index 0000000..1d28126
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0006-11/base/bite-room.jsonl
+@@ -0,0 +1,5 @@
++{"k":"header","schema":1,"run":"rs-bite","set":"r1-rs","role":"bite","marks":["PM-0006-11"],"machine":{"role":"RS","name":"RS","plan":"CCX23","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fsn1","kernel":"fixture","address":"203.0.113.10","threads_per_core":2,"smt":[],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"1111111111111111111111111111111111111111111111111111111111111111","features":["bites"],"profile":"release"},"bite":"PM-0006-11/no-smt-map","layer":"L2","profile":"P2","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":1,"date":"2026-11-20","params":{}}
++{"k":"event","ev":"cpu_read","ph":"measured","f":{"changed":0}}
++{"k":"event","ev":"affinity","ph":"measured","f":{"when":"start","cpu":3,"alone":true,"sibling_free":true}}
++{"k":"event","ev":"affinity","ph":"measured","f":{"when":"end","cpu":3,"alone":true,"sibling_free":true}}
++{"k":"footer","records":4,"ended":"clean"}
 diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0006-11/base/rs-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0006-11/base/rs-room.jsonl
 new file mode 100644
-index 0000000..ab40bd1
+index 0000000..cabda2e
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0006-11/base/rs-room.jsonl
 @@ -0,0 +1,5 @@
 +{"k":"header","schema":1,"run":"rs-1","set":"r1-rs","role":"measured","marks":["PM-0006-11"],"machine":{"role":"RS","name":"RS","plan":"CCX23","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fsn1","kernel":"fixture","address":"203.0.113.10","threads_per_core":2,"smt":[[0,2],[1,3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L2","profile":"P2","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":1,"date":"2026-11-20","params":{}}
-+{"k":"event","ev":"cpu_read","ph":"warmup","f":{"changed":0}}
++{"k":"event","ev":"cpu_read","ph":"measured","f":{"changed":0}}
++{"k":"event","ev":"affinity","ph":"measured","f":{"when":"start","cpu":3,"alone":true,"sibling_free":true}}
++{"k":"event","ev":"affinity","ph":"measured","f":{"when":"end","cpu":3,"alone":true,"sibling_free":true}}
++{"k":"footer","records":4,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0006-11/unnamed/rs-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0006-11/unnamed/rs-room.jsonl
+new file mode 100644
+index 0000000..d709320
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0006-11/unnamed/rs-room.jsonl
+@@ -0,0 +1,5 @@
++{"k":"header","schema":1,"run":"rs-1","set":"r1-rs","role":"measured","marks":["PM-0006-11"],"machine":{"role":"RS","name":"RS","plan":"CCX23","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fsn1","kernel":"","address":"203.0.113.10","threads_per_core":2,"smt":[[0,2],[1,3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L2","profile":"P2","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":1,"date":"2026-11-20","params":{}}
++{"k":"event","ev":"cpu_read","ph":"measured","f":{"changed":0}}
 +{"k":"event","ev":"affinity","ph":"measured","f":{"when":"start","cpu":3,"alone":true,"sibling_free":true}}
 +{"k":"event","ev":"affinity","ph":"measured","f":{"when":"end","cpu":3,"alone":true,"sibling_free":true}}
 +{"k":"footer","records":4,"ended":"clean"}
 diff --git a/spikes/netcode-proof/crates/judge/src/practice.rs b/spikes/netcode-proof/crates/judge/src/practice.rs
 new file mode 100644
-index 0000000..af1605a
+index 0000000..6b1bb4f
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/judge/src/practice.rs
-@@ -0,0 +1,484 @@
+@@ -0,0 +1,537 @@
 +//! PM-0001-18's WebSocket part (`marks/README.md` §2.5 and §4, the `ws-practice` rule): the run-structured bound's
 +//! machine-readable line, the practice run's outcome record, and the factor the judge applies to the bound. The rules
 +//! are the advisor's on Mustafa's WS-BAR (2026-11-07): one unjudged practice run per build, its slowdown s = M_p / M_m,
@@ -2924,9 +3493,8 @@ index 0000000..af1605a
 +        .ok_or_else(|| format!("the bound line does not start with {BOUND_TAG:?}"))?;
 +    let raw: RawBound =
 +        serde_json::from_str(json).map_err(|e| format!("the bound line's object: {e}"))?;
-+    let decimal = |name: &str, s: &str| {
-+        Ratio::parse(s).map_err(|e| format!("the bound line's {name}: {e}"))
-+    };
++    let decimal =
++        |name: &str, s: &str| Ratio::parse(s).map_err(|e| format!("the bound line's {name}: {e}"));
 +    let b = Bound {
 +        x_ns: raw.x_ns,
 +        y_ns: raw.y_ns,
@@ -2945,7 +3513,10 @@ index 0000000..af1605a
 +    };
 +    let problems = [
 +        (raw.model.is_empty(), "no model"),
-+        (!hex(&raw.commit), "a commit that is not 40 lowercase hex digits"),
++        (
++            !hex(&raw.commit),
++            "a commit that is not 40 lowercase hex digits",
++        ),
 +        (raw.runs_count < 2_000, "fewer than 2,000 simulated runs"),
 +        (raw.client_bursts_count == 0, "no client-bursts per run"),
 +        (
@@ -3030,7 +3601,10 @@ index 0000000..af1605a
 +    for log in &run.logs {
 +        if let Some(v) = log.header.params.get(name) {
 +            if found.is_some_and(|f| f != v) {
-+                return Err(format!("run {}: its logs disagree on params.{name}", run.id));
++                return Err(format!(
++                    "run {}: its logs disagree on params.{name}",
++                    run.id
++                ));
 +            }
 +            found = Some(v);
 +        }
@@ -3186,10 +3760,7 @@ index 0000000..af1605a
 +        ));
 +    }
 +    if spacing(p)? != gap {
-+        return Err(format!(
-+            "practice run {} ran another burst spacing",
-+            p.id
-+        ));
++        return Err(format!("practice run {} ran another burst spacing", p.id));
 +    }
 +    if *p_when >= when {
 +        return Err(format!(
@@ -3265,7 +3836,11 @@ index 0000000..af1605a
 +            p.id,
 +            bound.band_low,
 +            bound.band_high,
-+            if chance { "" } else { ", with no chance ruling" }
++            if chance {
++                ""
++            } else {
++                ", with no chance ruling"
++            }
 +        ));
 +    }
 +    let f = if s > Ratio::int(1) { s } else { Ratio::int(1) };
@@ -3313,27 +3888,62 @@ index 0000000..af1605a
 +mod tests {
 +    use super::*;
 +
-+    const LINE: &str =r#"npt-ws-bound v1 {"model":"linux-6.8-tcp v3","commit":"bf9d248000000000000000000000000000000000","runs_count":2000,"client_bursts_count":480,"x_ns":670000000,"y_ns":2500000000,"k_count":5,"z_ns":6900000000,"m_m_ns":654000000,"band_low":"0.965","band_high":"1.035","tolerance":"1.10","guard_share":"0.0000"}"#;
++    const LINE: &str = r#"npt-ws-bound v1 {"model":"linux-6.8-tcp v3","commit":"bf9d248000000000000000000000000000000000","runs_count":2000,"client_bursts_count":480,"x_ns":670000000,"y_ns":2500000000,"k_count":5,"z_ns":6900000000,"m_m_ns":654000000,"band_low":"0.965","band_high":"1.035","tolerance":"1.10","guard_share":"0.0000"}"#;
 +
 +    #[test]
 +    fn the_bound_line_reads_as_readme_writes_it() {
 +        let b = parse_bound(LINE).expect("README §2.5's example");
-+        assert_eq!((b.x_ns, b.y_ns, b.k_count, b.z_ns), (670_000_000, 2_500_000_000, 5, 6_900_000_000));
++        assert_eq!(
++            (b.x_ns, b.y_ns, b.k_count, b.z_ns),
++            (670_000_000, 2_500_000_000, 5, 6_900_000_000)
++        );
 +        assert_eq!(b.m_m_ns, 654_000_000);
 +        assert_eq!(b.tolerance, Ratio::new(11, 10));
 +        for (from, to, why) in [
 +            ("npt-ws-bound v1 ", "npt-ws-bound v2 ", "another tag"),
-+            (r#""runs_count":2000"#, r#""runs_count":1999"#, "too few runs"),
-+            (r#""tolerance":"1.10""#, r#""tolerance":"1.11""#, "a raised tolerance"),
-+            (r#""tolerance":"1.10""#, r#""tolerance":"0.99""#, "a tolerance below 1"),
-+            (r#""guard_share":"0.0000""#, r#""guard_share":"0.0101""#, "a failed guard"),
-+            (r#""band_low":"0.965""#, r#""band_low":"1.04""#, "a band upside down"),
++            (
++                r#""runs_count":2000"#,
++                r#""runs_count":1999"#,
++                "too few runs",
++            ),
++            (
++                r#""tolerance":"1.10""#,
++                r#""tolerance":"1.11""#,
++                "a raised tolerance",
++            ),
++            (
++                r#""tolerance":"1.10""#,
++                r#""tolerance":"0.99""#,
++                "a tolerance below 1",
++            ),
++            (
++                r#""guard_share":"0.0000""#,
++                r#""guard_share":"0.0101""#,
++                "a failed guard",
++            ),
++            (
++                r#""band_low":"0.965""#,
++                r#""band_low":"1.04""#,
++                "a band upside down",
++            ),
 +            (r#""k_count":5"#, r#""k_count":-1"#, "a negative k"),
 +            (r#""x_ns":670000000"#, r#""x_ns":0"#, "a zero time"),
-+            (r#""commit":"bf9d248"#, r#""commit":"BF9D248"#, "an upper-case commit"),
-+            (r#""model":"linux-6.8-tcp v3","#, r#""model":"","#, "no model"),
++            (
++                r#""commit":"bf9d248"#,
++                r#""commit":"BF9D248"#,
++                "an upper-case commit",
++            ),
++            (
++                r#""model":"linux-6.8-tcp v3","#,
++                r#""model":"","#,
++                "no model",
++            ),
 +            (r#","guard_share":"0.0000""#, "", "a missing field"),
-+            (r#""guard_share":"0.0000""#, r#""guard_share":"0.0000","x":1"#, "an unknown field"),
++            (
++                r#""guard_share":"0.0000""#,
++                r#""guard_share":"0.0000","x":1"#,
++                "an unknown field",
++            ),
 +            (r#""x_ns":670000000"#, r#""x_ns":670000000.5"#, "a float"),
 +        ] {
 +            assert!(LINE.contains(from), "{why}: {from}");
@@ -3345,11 +3955,23 @@ index 0000000..af1605a
 +    fn moved_numbers_round_up_to_the_millisecond() {
 +        assert_eq!(ceil_ms(Ratio::int(704_000_000)), Ratio::int(704_000_000));
 +        assert_eq!(ceil_ms(Ratio::int(704_000_001)), Ratio::int(705_000_000));
-+        assert_eq!(ceil_ms(Ratio::new(1_407_000_001, 2)), Ratio::int(704_000_000));
++        assert_eq!(
++            ceil_ms(Ratio::new(1_407_000_001, 2)),
++            Ratio::int(704_000_000)
++        );
 +        // The advisor's R6 example: the provisional bound at f = 1.10 gives 0.737 s, 2.75 s and 7.59 s.
 +        let f = Ratio::new(11, 10);
-+        assert_eq!(ceil_ms(Ratio::int(670_000_000) * f), Ratio::int(737_000_000));
-+        assert_eq!(ceil_ms(Ratio::int(2_500_000_000) * f), Ratio::int(2_750_000_000));
-+        assert_eq!(ceil_ms(Ratio::int(6_900_000_000) * f), Ratio::int(7_590_000_000));
++        assert_eq!(
++            ceil_ms(Ratio::int(670_000_000) * f),
++            Ratio::int(737_000_000)
++        );
++        assert_eq!(
++            ceil_ms(Ratio::int(2_500_000_000) * f),
++            Ratio::int(2_750_000_000)
++        );
++        assert_eq!(
++            ceil_ms(Ratio::int(6_900_000_000) * f),
++            Ratio::int(7_590_000_000)
++        );
 +    }
 +}

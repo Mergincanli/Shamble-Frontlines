@@ -86,3 +86,23 @@ check.mjs marks step (drift test, --check-marks) and check.test.mjs (every marks
   u4j_ws_practice_puts_the_practice_runs_numbers_in_force, u4j_ws_practice_refuses_every_number_not_set_by_its_rules
   (20 INVALID cases + BEYOND with a chance ruling). engine 37/37. Removed the untestable "bite run naming no bite"
   sub-rule (such a run is never judged). Next: committed fixtures (pm-0001-17, -4 C4, -21, PM-0006-11).
+- 8. Fixture FILES written (not yet run, no test functions yet): fixtures/pm-0001-17/{base (p2-room, p2-client),
+  differ, lost-group, refused-group, orphan, none-compared}/p2-client.jsonl; fixtures/pm-0001-4/{measured-bites-build/
+  s30-1-room, measured-names-bite/s30-2-room + s30-2-lg, bite-measured-build/bite-room}.jsonl;
+  fixtures/pm-0001-21/{base (forged-room, forged-lab, twin-room), twin-differs/twin-room, twin-bites-build/twin-room,
+  twin-missing/twin-room, twin-unnamed/forged-room}.jsonl; fixtures/pm-0006-11/{base (rs-room, bite-room),
+  unnamed/rs-room}.jsonl.
+  HALF-DONE / EXACT NEXT STEPS: (a) add test fns to tests/fixtures.rs for these cases (expected: -17 base NOT-RUN with
+  part "L1 P2" run valid, figure value "0", compared report "6"; differ/refused-group/orphan/none-compared FAIL;
+  lost-group part run valid, value 0, compared 5, incomplete report 1; -4 the three C4 cases INVALID; -21 base part
+  "forged, option A" run valid, twin check value 0; twin-differs FAIL; twin-bites-build INVALID ("its twin
+  forged-a-1-twin is invalid: build:"); twin-unnamed INVALID ("names no twin run"); twin-missing NOT-RUN; PM-0006-11
+  base PASS with bite shown, unnamed FAIL), and extend the folder-reader test's list with the new marks; (b) update
+  fixtures/README.md's table; (c) run judge tests; (d) clippy host + wasm32 both builds, fmt check (cargo +1.99.1 fmt
+  --all --check; fix with fmt if needed: Edit-tool rule — rustfmt writes are cargo's, allowed?: prefer fixing by
+  hand where few); (e) check.mjs twice with the touch loop and counts; (f) final notes and report.
+- 9. Done (a)-(d): tests/fixtures.rs +5 tests (pm_0001_17 x2, pm_0001_4_c4, pm_0001_21, pm_0006_11; folder-reader
+  list extended): fixtures 15/15 pass. fixtures/README.md table extended. fmt: ran `cargo +1.99.1 fmt -p npt-judge -p
+  npt-log` (my crates only; rustfmt, not a shell write), `fmt --all --check` clean. clippy -D warnings host, default
+  and --all-features, judge+log --all-targets: clean after one fix (engine.rs type alias Edit); log wasm32 clean.
+  Next: (e) check.mjs twice (counted), then optional plants, then the report.
