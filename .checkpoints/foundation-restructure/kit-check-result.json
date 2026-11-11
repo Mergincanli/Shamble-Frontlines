@@ -1,0 +1,107 @@
+{
+ "kit": "b6b3b81ac58af3b64379234f82d95861a9789821",
+ "notesLine": 74,
+ "pairs": [
+  {
+   "n": 1,
+   "file": "CLAUDE.md",
+   "line": 19,
+   "before": "- **The legacy game** (the five files below) is frozen: critical fixes only. It moves to `legacy/` in phase 1.",
+   "after": "- **The legacy game** (the five files below) is frozen: critical fixes only. It lives in `legacy/`."
+  },
+  {
+   "n": 2,
+   "file": "CLAUDE.md",
+   "line": 43,
+   "before": "`shamble-core.js` (engine) ← `shamble-game.js` (gameplay + dispatch + `bootGame`) ← `shamble-editor.js` (authoring, editor.html only)",
+   "after": "`legacy/`: `shamble-core.js` (engine) ← `shamble-game.js` (gameplay + dispatch + `bootGame`) ← `shamble-editor.js` (authoring, editor.html only)"
+  },
+  {
+   "n": 3,
+   "file": "CLAUDE.md",
+   "line": 44,
+   "before": "`index.html` (player build) · `editor.html` (authoring build) · `docs/` · `tools/` (verification toolkit, never shipped) · `.claude/`",
+   "after": "`legacy/index.html` (player build) · `legacy/editor.html` (authoring build) · `docs/` · `tools/` (verification toolkit, never shipped) · `.claude/`"
+  },
+  {
+   "n": 4,
+   "file": ".claude/agents/verifier.md",
+   "line": 28,
+   "before": "- gameplay / AI: `node tools/preview.js . eval tools/sim.js` three times on base and three times on head; report every",
+   "after": "- gameplay / AI: `node tools/preview.js legacy eval tools/sim.js` three times on base and three times on head; report every"
+  }
+ ],
+ "checks": [
+  {
+   "name": "four approved pairs read from the notes",
+   "pass": true,
+   "detail": "4 pairs"
+  },
+  {
+   "name": "the kit commit touches exactly CLAUDE.md and .claude/agents/verifier.md",
+   "pass": true,
+   "detail": ".claude/agents/verifier.md, CLAUDE.md"
+  },
+  {
+   "name": "CLAUDE.md: removed lines equal the approved Before lines",
+   "pass": true,
+   "detail": "3 removed"
+  },
+  {
+   "name": "CLAUDE.md: added lines equal the approved After lines",
+   "pass": true,
+   "detail": "3 added"
+  },
+  {
+   "name": ".claude/agents/verifier.md: removed lines equal the approved Before lines",
+   "pass": true,
+   "detail": "1 removed"
+  },
+  {
+   "name": ".claude/agents/verifier.md: added lines equal the approved After lines",
+   "pass": true,
+   "detail": "1 added"
+  },
+  {
+   "name": "kit line 1: Before equals main 76b4f7a's CLAUDE.md:19",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "kit line 1: After sits at CLAUDE.md:19 in the kit commit",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "kit line 2: Before equals main 76b4f7a's CLAUDE.md:43",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "kit line 2: After sits at CLAUDE.md:43 in the kit commit",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "kit line 3: Before equals main 76b4f7a's CLAUDE.md:44",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "kit line 3: After sits at CLAUDE.md:44 in the kit commit",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "kit line 4: Before equals main 76b4f7a's .claude/agents/verifier.md:28",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "name": "kit line 4: After sits at .claude/agents/verifier.md:28 in the kit commit",
+   "pass": true,
+   "detail": ""
+  }
+ ],
+ "verdict": "PASS"
+}

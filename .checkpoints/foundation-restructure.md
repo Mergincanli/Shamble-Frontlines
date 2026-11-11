@@ -9,7 +9,7 @@
   **Base:** main 76b4f7a (PR #50 merged, 2.1a). **OLD** (the independent judge for E2 and E3): main 44446a5.
 - **Never:** push to `claude/netcode-proof-test-plan-hcky5g` (#40) or `claude/laughing-pasteur-fwya24` (#48); touch
   `spikes/`; touch a gate file; edit a settings file, hook or allow-list; write a kit line before his chat yes.
-- **Last update:** 2026-11-11 22:58 Amsterdam
+- **Last update:** 2026-11-11 23:15 Amsterdam
 
 ## Steps done
 0. Step 0 (this commit): model checked with get_session: `session_context.model` claude-opus-5-5,
@@ -126,13 +126,28 @@
    gate, exit 2 on `Index.html`). No guard prompt on any step-7 file (none is protected: routine-guard.mjs:28's gate
    files are gate.mjs, smoke.mjs, battery.js, gate-globals.json and the package files).
 
+7. Step 8, the four kit lines (**b6b3b81**, pushed 22:13:49 UTC; C5). Before it, on the advisor tool's advice: E6's
+   `sim` row (kit line 4's exact command, `xvfb-run -a node tools/preview.js legacy eval tools/sim.js`) PASS, exit 0,
+   5.3 s, a full match JSON; E6's `where` labels moved to the head's README lines (+11: :33-:39, :67, :69; the id
+   `preview-menu-readme58` renamed `preview-menu-check`); the leftover grep without the `tools/` prefix: none; `python`
+   is 3.13.18 (no caveat). The saver stopped before the first edit (its terminate-autosave 13a9a81 holds only
+   `e6-commands-result.json`, pushed before the kit commit). Edits with the Edit tool only, whole Before lines as
+   `old_string`, verifier.md first (no classifier refusal, no denied prompt). The worker process restarted after the
+   first two edits (verifier.md:28, CLAUDE.md:19); `git diff` showed :43 and :44 not yet made, so they were made then.
+   Commit by pathspec (`-- CLAUDE.md .claude/agents/verifier.md`, no skip marker): numstat 3/3 and 1/1. `kit-check.mjs`
+   (`kit-check-result.json`): 14/14 PASS (the commit's removed and added lines equal the approved text in
+   `advisor-plan-check.md` "### Approved message text", file by file; each Before line equals main 76b4f7a's; each
+   After line at the same line number). Kit tests 1261/1261; `node tools/gate.mjs 76b4f7a` GATE PASS, +0 -0, smoke 8/8
+   and 5/5.
+
 ## Current step
-Step 8, the four kit lines (C5), after the advisor tool (his moments 3 and 5).
+Step 9, the evidence: E3 (background), E4, E5 with the console lines (C7), E6 (every row, C6), E8 (C8); E1's final-head
+check (C3) on the final head.
 
 ## Next steps
-1. Step 8 under C5 (exactly the four approved lines, one commit, nothing else); step 9 (E1's final-head check under C3,
-   E3 in the background, E4, E5 with the console lines (C7), E6 (C6), E8 (C8)); plan-check §3 and §7 for REG-TRUE (b)
-   before step 10; step 10 under C10-C14 and REG-TRUE (b); step 11 under C15-C17.
+1. Step 9 (E3 in the background, E4, E5 with the console lines (C7), E6 (C6), E8 (C8), CI on b6b3b81 read once);
+   plan-check §3 and §7 for REG-TRUE (b) before step 10; the advisor tool before the ADR and register edits; step 10
+   under C10-C14 and REG-TRUE (b); `repo-map-check.mjs` after step 10; step 11 under C15-C17; E1's final-head check (C3).
 
 ## Open findings
 - (none yet)
@@ -178,6 +193,13 @@ Step 8, the four kit lines (C5), after the advisor tool (his moments 3 and 5).
    "Windows and macOS ... exit 2" sentence; the syntax hook and the rules' globs checked for a root anchor (none);
    plan-check §3 and §7 updated for REG-TRUE (b) before step 10; next consultation when 6 and 7 are built and both runs
    read.
+4. 2026-11-11 23:00 Amsterdam · steps 6 and 7 built and both runs read, before the kit lines (his moments 3 and 5): is
+   step 7 proven and is the kit commit ready? · changed: E6's `sim` row run before the kit commit (kit line 4's exact
+   command); E6's line labels moved to the head's README lines; the leftover grep widened (no `tools/` prefix); the saver
+   stopped from the first kit edit to the push; the Edit tool only, whole Before lines, verifier.md first (all four or
+   none if refused); the commit by pathspec; numstat and a by-script comparison against the approved text in the notes;
+   kit tests and the gate before the push; `repo-map-check.mjs` queued for after step 10; next consultation when step
+   9's evidence is in, before the ADR and register edits.
 
 ## His mid-turn message (2026-11-11 21:10:58 UTC, event 7a094d1e-41ed-40b7-91f8-544d91e4b64f; captured: `mustafa-2026-11-11-permission.md`, 95 characters)
 "I give you permission to go on auto mode and accept yourself for the bash commands and what not". The chat is already
@@ -198,6 +220,6 @@ unchanged, with the one advisor-tool line. For C13: one DECISIONS.md entry for t
   route (denied by settings) and its alias were not needed.
 
 ## Running work
-- Saver: stopped 22:48 Amsterdam for the move (C2); both runs finished 22:52; restarted after step 7's push (see the
-  next save).
+- Saver: stopped 22:48 Amsterdam for the move (C2), restarted 22:58 (bancz7ga2), stopped 23:05 for the kit lines,
+  restarted after the kit commit's push (23:14; see the next save for its id).
 - No agents running.

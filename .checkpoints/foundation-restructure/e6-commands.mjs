@@ -14,19 +14,19 @@ writeFileSync(join(REPO, E6, 'pre-teams4.js'), 'TUNE.teams.size = 4;\n');
 const X = ['xvfb-run', '-a'];
 const N = process.execPath;
 const CMDS = [
-  { id: 'battery', where: 'tools/README.md:22, START_HERE :117', argv: [N, 'tools/battery.js', 'legacy'], ok: r => r.exit === 0 && /"core"/.test(r.out) },
-  { id: 'preview-menu', where: 'tools/README.md:23, preview.js:2', argv: [...X, N, 'tools/preview.js', 'legacy', 'menu', `${E6}/menu.png`], files: [`${E6}/menu.png`] },
-  { id: 'preview-shot', where: 'tools/README.md:23 (shot <out.png> <x> <z>)', argv: [...X, N, 'tools/preview.js', 'legacy', 'shot', `${E6}/shot.png`, '0', '0'], files: [`${E6}/shot.png`] },
-  { id: 'sim', where: 'tools/README.md:24, sim.js:1, verifier.md:28, START_HERE :117', argv: [...X, N, 'tools/preview.js', 'legacy', 'eval', 'tools/sim.js'] },
-  { id: 'reach', where: 'tools/README.md:25, reach.js:1', argv: [...X, N, 'tools/preview.js', 'legacy', 'eval', 'tools/reach.js'] },
-  { id: 'perfbots', where: 'tools/README.md:26, perfbots.js:2', argv: [...X, N, '--expose-gc', 'tools/preview.js', 'legacy', 'eval', 'tools/perfbots.js', `--pre=${E6}/pre-teams4.js`] },
-  { id: 'aabbs', where: 'tools/README.md:27, aabbs.js:1, village.py:2', argv: [...X, N, 'tools/preview.js', 'legacy', 'eval', 'tools/aabbs.js'], stdoutTo: '.gate/aabbs.json', ok: r => r.exit === 0 && (() => { try { JSON.parse(readFileSync(join(REPO, '.gate/aabbs.json'), 'utf8')); return true; } catch { return false; } })() },
-  { id: 'village', where: 'tools/README.md:27 (python tools/village.py, no arguments)', argv: ['python', 'tools/village.py'], files: ['.gate/village.json'] },
-  { id: 'pageshot', where: 'tools/README.md:28', argv: [N, 'tools/pageshot.js', 'legacy', 'index.html', `${E6}/s`, 'wait:1500', 'shot:menu'], files: [`${E6}/s_menu.png`] },
-  { id: 'pageshot-tri', where: 'tools/README.md:28 (index.html?map=tri)', argv: [N, 'tools/pageshot.js', 'legacy', 'index.html?map=tri', `${E6}/tri`, 'wait:1500', 'shot:menu'], files: [`${E6}/tri_menu.png`] },
+  { id: 'battery', where: 'tools/README.md:33', argv: [N, 'tools/battery.js', 'legacy'], ok: r => r.exit === 0 && /"core"/.test(r.out) },
+  { id: 'preview-menu', where: 'tools/README.md:34, preview.js:2', argv: [...X, N, 'tools/preview.js', 'legacy', 'menu', `${E6}/menu.png`], files: [`${E6}/menu.png`] },
+  { id: 'preview-shot', where: 'tools/README.md:34 (shot <out.png> <x> <z>)', argv: [...X, N, 'tools/preview.js', 'legacy', 'shot', `${E6}/shot.png`, '0', '0'], files: [`${E6}/shot.png`] },
+  { id: 'sim', where: 'tools/README.md:35, sim.js:1, verifier.md:28 (kit line 4)', argv: [...X, N, 'tools/preview.js', 'legacy', 'eval', 'tools/sim.js'] },
+  { id: 'reach', where: 'tools/README.md:36, reach.js:1', argv: [...X, N, 'tools/preview.js', 'legacy', 'eval', 'tools/reach.js'] },
+  { id: 'perfbots', where: 'tools/README.md:37, perfbots.js:2', argv: [...X, N, '--expose-gc', 'tools/preview.js', 'legacy', 'eval', 'tools/perfbots.js', `--pre=${E6}/pre-teams4.js`] },
+  { id: 'aabbs', where: 'tools/README.md:38, aabbs.js:1, village.py:2', argv: [...X, N, 'tools/preview.js', 'legacy', 'eval', 'tools/aabbs.js'], stdoutTo: '.gate/aabbs.json', ok: r => r.exit === 0 && (() => { try { JSON.parse(readFileSync(join(REPO, '.gate/aabbs.json'), 'utf8')); return true; } catch { return false; } })() },
+  { id: 'village', where: 'tools/README.md:38 (python tools/village.py, no arguments)', argv: ['python', 'tools/village.py'], files: ['.gate/village.json'] },
+  { id: 'pageshot', where: 'tools/README.md:39', argv: [N, 'tools/pageshot.js', 'legacy', 'index.html', `${E6}/s`, 'wait:1500', 'shot:menu'], files: [`${E6}/s_menu.png`] },
+  { id: 'pageshot-tri', where: 'tools/README.md:39 (index.html?map=tri)', argv: [N, 'tools/pageshot.js', 'legacy', 'index.html?map=tri', `${E6}/tri`, 'wait:1500', 'shot:menu'], files: [`${E6}/tri_menu.png`] },
   { id: 'pageshot-header', where: 'pageshot.js:8', argv: [N, 'tools/pageshot.js', 'legacy', 'index.html', '.gate/s', 'wait:1500', 'shot:menu', 'eval:deploy()', 'wait:900', 'eval:(closeTutorial(),setPause(true))', 'shot:pause'], files: ['.gate/s_menu.png', '.gate/s_pause.png'] },
-  { id: 'pageshot-headed', where: 'tools/README.md:56 (Check a new machine)', argv: [...X, N, 'tools/pageshot.js', 'legacy', 'index.html', '.gate/gpu', '--headed', 'size:1600x900', 'wait:2500', 'shot:menu', 'eval:(deploy(),0)', 'wait:1500', 'eval:(closeTutorial(),setPause(true),0)', 'wait:600', 'shot:pause'], files: ['.gate/gpu_menu.png', '.gate/gpu_pause.png'] },
-  { id: 'preview-menu-readme58', where: 'tools/README.md:58', argv: [...X, N, 'tools/preview.js', 'legacy', 'menu', '.gate/preview_menu.png'], files: ['.gate/preview_menu.png'] },
+  { id: 'pageshot-headed', where: 'tools/README.md:67 (Check a new machine)', argv: [...X, N, 'tools/pageshot.js', 'legacy', 'index.html', '.gate/gpu', '--headed', 'size:1600x900', 'wait:2500', 'shot:menu', 'eval:(deploy(),0)', 'wait:1500', 'eval:(closeTutorial(),setPause(true),0)', 'wait:600', 'shot:pause'], files: ['.gate/gpu_menu.png', '.gate/gpu_pause.png'] },
+  { id: 'preview-menu-check', where: 'tools/README.md:69', argv: [...X, N, 'tools/preview.js', 'legacy', 'menu', '.gate/preview_menu.png'], files: ['.gate/preview_menu.png'] },
   { id: 'tuning-dump', where: 'tuning-dump.js:3', argv: [...X, N, 'tools/preview.js', 'legacy', 'eval', 'tools/tuning-dump.js', '--pre=tools/tuning-dump.js'], stdoutTo: `${E6}/tuning-cabana.json` },
 ];
 const only = process.argv.slice(2);
