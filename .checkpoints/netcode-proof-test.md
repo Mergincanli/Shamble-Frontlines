@@ -58,7 +58,9 @@ erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md.
       guards the reckoning only by t_m1's one seed, inside one half's noise; D-7's digest holds it for certain; a
       deterministic reckoning test is proposed (outside B1.2's symbols). TF-L1 to TF-L3 Low. NF-M1 confirmed by run.
       Same slip as the netcode-architect's (two blocks first written by python, then the file rewritten whole).
-  - **Next: the advisor's ruling on round 1** (brief advisor-u4df-brief.md; ruling to advisor-u4df.md): NF-M1,
+  - **Running: the advisor's ruling on round 1** (run wf_5b2fb216-9fa, task w26tvllnl, started 00:00 UTC 2026-11-12;
+    script workflows/scripts/npt-u4d-f-advisor-r1-wf_5b2fb216-9fa.js; if cut, resume it, and its file keeps the
+    finished blocks; brief advisor-u4df-brief.md; ruling to advisor-u4df.md): NF-M1,
     TF-M1, the seven Lows' routes, my two readings, the merge's conditions, the slip. Then the fix pass if it asks for
     one (round 2 on what changed), then the merge.
   - Done meanwhile: TE2-5 (b), ten of ten runs exit 0, each 443 passed, 0 failed, 12 ignored (te2-5-record.md).
