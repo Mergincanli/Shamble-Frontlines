@@ -1,6 +1,10 @@
-# Plan: foundation step 2.2, the toolchain (revision 5)
+# Plan: foundation step 2.2, the toolchain (revision 6)
 
-Status: revision 5 records Mustafa's answers of 2026-11-10 (`mustafa-2026-11-10-answers-2-2.md`, word for word):
+Status: revision 6 records Mustafa's KIT-ASK-SEEN (b) of 2026-11-11 (`mustafa-2026-11-11-kit-ask-seen.md`, word for
+word): before each step-5 kit edit the session asks him in chat and writes it only after his yes (Part 8 step 5), and
+"auto mode can pass the guard's ask" is a kit finding for the gate step, 2.3, with no guard change now (Appendix B,
+step 6). Nothing else changed from revision 5. Steps 1 to 4 are built (PR #48, a draft). Revision 5's own status
+follows. Revision 5 records Mustafa's answers of 2026-11-10 (`mustafa-2026-11-10-answers-2-2.md`, word for word):
 FDN-NOCODE (a) and FDN-HEADING (a); the build starts now in a fresh session, steps 1 to 4 before 2.1b merges and step 5
 waiting as Part 8 says; his rule for the network cut (4.4); and his go on the ADR index entry given in the pull
 request. Nothing else changed from revision 4. Revision 4's own status follows. The advisor agent reviewed revision 1 (f5357520329a1ce76b7bf3ec3a873ea86f378cbc) at effort xhigh:
@@ -433,11 +437,15 @@ procedure says; the saver while agents run):
    0002's Status line on main records part 1 as accepted (2.1b's docs pass), since `advisor.md:323` forbids merging a
    hard-constraint change before its accepted ADR is on main (condition 5); if it does not, stop and ask the advisor,
    and write no K2a or K2b. Only then K2a (his FDN-HEADING (a); one ask), and K2b, K3 and K4 (his FDN-NOCODE (a): "One
-   clause per line naming my 2026-11-10 decision as the exception"; one ask each). Re-run E1-E11.
+   clause per line naming my 2026-11-10 decision as the exception"; one ask each). Each of the four is first asked of
+   Mustafa in chat, with its exact text, and written only after his yes (his KIT-ASK-SEEN (b), 2026-11-11: "Before each
+   step-5 kit edit, ask me in chat and write it only after my yes."); the guard's own ask still runs at the write.
+   Re-run E1-E11.
 6. Docs: REPO_MAP (E8); the register (the G0 done-when reading, Q2.2-a; his go); STATUS (or DECISIONS) and ROADMAP by
    docs-keeper, with the dated follow-up for Node (Q2.2-c: one change-set moving `tools/` and v2 to Node 26 together,
    after 2.3, merged before 2027-03-31; Node 22's end of life is 2027-04-30; the toolkit's `package.json` and lockfile
-   are gate files, so it asks Mustafa).
+   are gate files, so it asks Mustafa), and two kit follow-ups for 2.3 (Appendix B): "auto mode can pass the guard's
+   ask" (his KIT-ASK-SEEN (b)) and CHECKPOINTS.md §10's `git -C` line that the guard refuses.
 7. The review round on the final diff, 3 at a time: security-auditor (tier 2: the workflow, sudo, the cut, CI hygiene,
    and E11's dependency review: CLAUDE.md's Never line on running unreviewed code from the internet is met the way
    `tools/` meets it today, by a pinned lockfile plus this review; the Rust toolchain comes from rustup's official
@@ -595,8 +603,9 @@ Line numbers are main 2d22b69's; the build re-finds them after 2.1b and LANE-RUL
 ## For Mustafa
 No Brave check: 2.2 adds no page and nothing a player sees, hears or feels. Done: FDN-NOCODE (a) and FDN-HEADING (a);
 the build started in a fresh session (2026-11-10).
-1. During the build, approve each kit ask as it comes: K1 (the new workflow), K2a (the heading), K2b, K3 and K4 (the
-   three clauses naming your decision), and a fix-round edit of K1 if the network cut needs one.
+1. During the build, approve each kit ask as it comes: K1 (the new workflow, written 2026-11-10), and in step 5 K2a
+   (the heading), K2b, K3 and K4 (the three clauses naming your decision), each asked in chat first with its exact text
+   and written only after your yes (your KIT-ASK-SEEN (b)).
 2. If the session reports that the cut fell back to the offline flags (PM-0002-37 partly proven), nothing to decide:
    your rule already covers it.
 3. Give your go on the register entry that moves G0's exit-2 mark to 2.3 (Q2.2-a), in the pull request.
@@ -638,3 +647,11 @@ the build started in a fresh session (2026-11-10).
 - A kit follow-up for STATUS, outside this plan (the advisor's check of revision 3): `.claude/CHECKPOINTS.md` §10 tells
   sessions to run `git -C <path> status`, which the guard refuses for every session (`routine-guard.mjs:1046`); a kit
   change, so it waits for the kit to unfreeze; 2.2's step 7 runs §10's checks after a `cd`.
+- A kit finding for the gate step, 2.3 (Mustafa, KIT-ASK-SEEN (b), 2026-11-11: "Record "auto mode can pass the guard's
+  ask" as a kit finding for the gate step (2.3). No guard change now; the kit is frozen until then."): **auto mode can
+  pass the guard's ask.** Evidence, this session's event log: the guard's PreToolUse ask for the K1 write fired at
+  2026-11-10 20:02:42 UTC (a `can_use_tool` request, reason "kit and gate files ask first in a day session:
+  .github/workflows/toolchain.yml") and came back "allow" at 20:02:48 UTC; the log does not say who allowed it, and
+  Mustafa cannot say the prompt reached him, so it is treated as not seen. This session ran in auto mode. Step 6's docs
+  pass records it in STATUS (or DECISIONS) as a follow-up for 2.3, and the report carries it; until then step 5 asks him
+  in chat before each kit write.

@@ -7,7 +7,7 @@
   APPROVE of revision 3, bf1737f).
 - **Branch:** `claude/laughing-pasteur-fwya24` (this cloud session's branch, standing in for `cs/foundation-toolchain`)
   · **Base:** main 2d22b69 (PR #46 merged)
-- **Last update:** 2026-11-10 20:50 Amsterdam
+- **Last update:** 2026-11-11 10:00 Amsterdam
 
 ## Steps done
 1. Model check: `get_session` shows `session_context.model` claude-opus-5-5 (Opus 5.5) · no commit · go.
@@ -95,10 +95,12 @@
     42893708791 and pull_request 42893718283 (gate and smoke jobs, 6 check runs, all success).
 
 ## Current step
-Steps 1-4 done. Step 5 waits for 2.1b and LANE-RULES to merge (his word); the PR stays a draft.
+Steps 1-4 done. Waiting (his word, 2026-11-11): step 5 starts when he says 2.1b and LANE-RULES (PR #49) are in; PR #48
+stays a draft. Plan revision 6 records KIT-ASK-SEEN (b).
 
 ## Next steps
-1. Step 5 (main merged in by the worktree path, condition 5's check, K2a-K4 with his asks) after 2.1b and LANE-RULES
+1. Step 5 (main merged in by the worktree path, condition 5's check, then K2a, K2b, K3, K4: each asked in chat with its
+   exact text and written only after his yes, then the guard's ask at the write) after 2.1b and LANE-RULES
    have merged (K4 in Accept edits or Manual mode, CLAUDE.md:67-68; after K4 the advisor runs as a general agent
    reading main's advisor.md, CLAUDE.md:59-61); steps 6-7 after (docs incl. REPO_MAP and the register's G0 reading;
    the review round 3 at a time; the verifier; the report; the checkpoint folded in and deleted; ready; the
@@ -112,11 +114,10 @@ Steps 1-4 done. Step 5 waits for 2.1b and LANE-RULES to merge (his word); the PR
 - STATUS on main still calls kit-v3-5 in flight; PR #46 merged as 2d22b69 (docs drift for docs-keeper, not 2.2's).
 - The local `unshare` rehearsal was refused by the session's permission check; not retried (plan Appendix B).
 - K1's ask (the session's event log, list_events): the guard's PreToolUse ask fired for the workflow write at
-  20:02:42 UTC ("kit and gate files ask first in a day session: .github/workflows/toolchain.yml", a can_use_tool
-  request) and was answered "allow" at 20:02:48 UTC; the log does not say whether Mustafa or the session's auto mode
-  allowed it. His reply of 2026-11-10 carried both template options ("I saw it and approved it. / no prompt reached
-  me."); asked him which. If no prompt reached him, step 5's kit writes are asked in chat first, and the auto-mode path
-  past the guard's ask becomes a kit finding for the gate step.
+  2026-11-10 20:02:42 UTC ("kit and gate files ask first in a day session: .github/workflows/toolchain.yml", a
+  can_use_tool request) and was answered "allow" at 20:02:48 UTC; the log does not say who allowed it. Mustafa,
+  KIT-ASK-SEEN (b), 2026-11-11: treated as not seen. Recorded as a kit finding for 2.3, "auto mode can pass the
+  guard's ask" (plan Appendix B; step 6 carries it into STATUS and the report); no guard change now (kit frozen).
 - Kit follow-up for STATUS (the advisor, outside this plan): CHECKPOINTS.md §10's `git -C <path> status` is refused by
   the guard (`routine-guard.mjs:1046`); waits for the kit to unfreeze; docs-keeper records it in the build's docs pass.
 
@@ -130,6 +131,10 @@ Steps 1-4 done. Step 5 waits for 2.1b and LANE-RULES to merge (his word); the PR
   `rustup show active-toolchain` prints `1.99.1-x86_64-unknown-linux-gnu (overridden by '<repo>/rust-toolchain.toml')`.
 
 ## Decisions taken
+- Mustafa, 2026-11-11 (KIT-ASK-SEEN (b), `mustafa-2026-11-11-kit-ask-seen.md`): before each step-5 kit edit, ask him in
+  chat and write it only after his yes; "auto mode can pass the guard's ask" is a kit finding for the gate step (2.3), no
+  guard change now. LANE-RULES comes with PR #49 (his go in the morning); he says when 2.1b and LANE-RULES are in; PR #48
+  stays a draft.
 - The session, 2026-11-10 (method, not design): the npm test runs move from local (E1's npm half, L3) to CI (E2, a
   fifth planted failure M4: a package without a test script), because the session's permission check refused npm
   script runs; L2 rests on npm's documented behaviour. To fold into the report.
