@@ -131,3 +131,32 @@ the task's. (No Edit tool in this run: this notes file was rewritten whole by Wr
   constants or `Recording::synthetic`, while other crates' rows list their bites-only items; the ruling's list omitted
   them, so the editor was right not to add them.
 Verdict: PASS WITH FINDINGS. Done 2026-11-11.
+
+## Re-check after the editor's fix pass (2026-11-11; F1, F2, F10 and what the pass changed)
+Method: the four files' sha256 equal the fix pass's table (plan.md 4717029c…, u4-build-plan.md a81b230f…, u4s-carries.md
+19e7ca98…, advisor-u4.md 7b3e76ca…). HEAD (cc6019b) holds the first-pass state (u4-build-plan.md f54125ec…,
+advisor-u4.md 25d1846b…), so `git diff HEAD` isolates the pass: one hunk in each of the two files, nothing else;
+plan.md and u4s-carries.md equal HEAD.
+- F1: closed. advisor-u4.md :1-475 equal the base byte for byte (cmp against `git show 20702fd:`). The paragraph sits
+  at :477-479 after a blank line, after the "Recorded by the main session (about 18:15 UTC)" paragraph (same bold-label
+  pattern). The ruling's quoted line (advisor-u4-wave1.md:229-231) is found exactly once, whitespace-normalised. The
+  label's ":86" is condition 1's amended sentence. Every advisor-u4.md line cite in the notes folder and the checkpoint
+  points at :475 or earlier (u4s-carries.md:12, :13, :138, :142, :184, :251; u4j-brief.md:3's :365-371, U4S-BUILDER;
+  u4s-cond-* and u4c-* notes), so all of them hold. The three new lines are each 120 characters or fewer (the base's
+  longer lines, :276, :340, :422, :437-438 and :461, are untouched).
+- F2: closed. u4-build-plan.md:607-608 reads exactly my fix's words. The editor's notes mark them "words mine". §4.15 is
+  right (heading :477, "npt-sim's library (`Recording::synthetic`)" at :493; W1-PUB :408-409). The wrap is 115 and 39
+  characters, with the list's two-space continuation indent. The one added line does no harm: u4-build-plan.md has no
+  self-cite past :607 (only :507's "checkpoint :620-621", another file). plan.md, u4s-carries.md, the checkpoint and
+  history.md have no cite into u4-build-plan.md past :607. advisor-u4.md's cites into it (:246, :295, :344, :428) record
+  older numberings, as returned. No file records the first-pass hashes. My own line numbers above for u4-build-plan.md
+  past :607 (L1's :851-856; L13 on: :629-630, :813-816, :955-961, :1059-1069) now read one line early. That affects
+  these notes only.
+- F10: I accept the rejection. The ruling orders that sentence word for word (advisor-u4-wave1.md:223-225), and my fix
+  needed the advisor's nod. u4-build-plan.md:247-248 is unchanged since the first pass. It stays open as a Low for the
+  advisor: one word, "never" to "not". It is not a defect in the batch.
+- Out of scope: since the base, only the main session's commits changed the checkpoint and spikes/netcode-proof/crates/l1
+  (f3f7c2f, fc8a9ec, cc6019b). The working tree changes only advisor-u4.md, u4-build-plan.md and w1-plan-edits.md.
+  docs/, marks/, history.md, u4j-brief.md and advisor-u4-wave1.md are untouched.
+- New findings: none. Not in this pass and unchanged: F3-F9 and F11 (all Low).
+Re-check verdict: PASS WITH FINDINGS (only Lows open: F10 for the advisor; F3-F9 and F11 from the first check).

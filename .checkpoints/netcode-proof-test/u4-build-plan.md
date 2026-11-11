@@ -604,7 +604,8 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
   (closed form, libm only); the greybox with areas, portals, doors at 1/s and the wall stand-in; vehicles and parts;
   S1's stand-ins as data (the burn and top-up switchable off: §4.13); `SimRng` (ChaCha8, one stream per purpose, the
   authority-only spread stream); the event list; the canonical hash (FNV-1a-64, spike-local); `StateDump`;
-  `Recording`; `replay::Replayer`; the synthetic recording generator (test support).
+  `Recording`; `replay::Replayer`; the synthetic recording generator (`Recording::synthetic`, in npt-sim's library:
+  §4.15; the advisor's W1-PUB ruling).
 - **Tests:**
   - D-1 two Worlds on one recording agree every tick.
   - D-2 two processes (the test re-runs itself through `std::env::current_exe()`): equal per-tick hashes over the 3

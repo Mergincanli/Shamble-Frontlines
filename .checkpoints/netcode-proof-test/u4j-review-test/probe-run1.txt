@@ -1,0 +1,34 @@
+U4j review probes, run 1 (test-engineer), 2026-11-11 10:46:42-10:46:46 UTC.
+Copy: /home/user/Shamble-Frontlines/.claude/worktrees/agent-a3b8dfeb01ed52b50 (a TEMPORARY file
+spikes/netcode-proof/crates/judge/tests/zz_review_probe.rs, removed after the plant run; no other file changed).
+Idle before (pgrep cargo/rustc empty); touch of crates/ then a 2 s touch loop; CARGO_TARGET_DIR shared-target, offline.
+Provenance: "Compiling npt-log v0.0.0 (/home/user/Shamble-Frontlines/.claude/worktrees/agent-a3b8dfeb01ed52b50/spikes/netcode-proof/crates/log)"
+and "Compiling npt-judge v0.0.0 (.../agent-a3b8dfeb01ed52b50/spikes/netcode-proof/crates/judge)".
+Command: cargo test --locked -p npt-judge --test zz_review_probe -- --nocapture --test-threads=1
+Result: test result: ok. 11 passed; 0 failed. Each probe asserts TODAY's behaviour:
+
+A  FAR BETTER, bound band 2.0 to 2.0, chance_ruling "x", M_p 1242600000 / M_m 654000000 = 1.9:
+   part L2 B1 ws PASS; check (c) value 1200000000 needs <= 1273000000 (X 670000000 x f 1.9);
+   (d) Y' 4750000000; (e) Z' 13110000000. f = 1.9 > the tolerance 1.10 (R6, R8 (v): FAR BETTER "at the bound").
+B  bound line band_low "0.12345678901234567890123456789", band_high "0.99999999999999999999999999999":
+   panicked at crates/judge/src/ratio.rs:27:7 "npt-judge: a fraction overflowed i128" (inside parse_bound).
+C1 client log (process bots, aarch64) carrying decoded_hash WRONG and replay_hash = SERVER in the same log:
+   part PASS, "compared = 6", "aarch64 only = 1".
+C2 replay log on aarch64 (process replay) agreeing with the server: part PASS, aarch64 only = 1.
+C3 mark arm_rule false, aarch64 client mismatch, x86-64 replay agreeing: part PASS, aarch64 only = 1.
+D  two forged runs, both role measured, naming each other in params.twin, equal h: part PASS, both runs valid,
+   twin check value 0.
+E0 counted run median 700000000 > 697000000: part FAIL.
+E1 + a practice run of the same build started 23:00 (after the counted run's 21:00) with second_ruling: part INVALID
+   "practice run ws-practice-2 did not start before run ws-1".
+E2 + the same later practice run without a ruling: part INVALID "2 practice runs of one build ...".
+F  a second practice run of the same build (class BEYOND) in another set set-ws-0: part PASS (never seen).
+G  practice run with 479 heal records: part PASS.
+H0 honest bound (M_m 654 ms), counted median 730 ms: FAIL (needs <= 697000000).
+H1 the record's bound line says M_m 620 ms (moved numbers recomputed to match): PASS (needs <= 735000000,
+   f 1.096774 instead of 1.039755).
+T1a s = 1.10 exactly (M_p 719400000): PASS at 737 ms / 2.75 s / 7.59 s.
+T1b s = 1.1001: INVALID ("IN TOLERANCE at s = 1.1001 ... with no chance ruling").
+T2 IN TOLERANCE at s = 0.95 (below band_low 0.965): INVALID.
+T3 IN TOLERANCE, one practice heal at 7.2 s over Z' 7.175 s only: INVALID ("1 heals over 2600000000 ns and its
+   slowest is 7200000000 ns").

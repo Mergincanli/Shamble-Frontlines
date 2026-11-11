@@ -192,9 +192,6 @@ readings of ADR rows and reach him through the readings PR before R5.
 - **The rules file:** widening .claude/rules/netcode.md's paths is a kit edit, and only Mustafa can make it. Naming the
   file in every brief covers U4 without it.
 
-**Main session, 2026-11-11:** Condition 1's 'Any per-soldier input state the sim keeps holds what the server accepted,
-not what the client claimed' is amended by the W1-U4D ruling (advisor-u4-wave1.md) for the press counters.
-
 ## Rulings on the plan's questions
 - **Q1 U4-SEAM:** (a).
 - **Q2 U4-HIT:** (a).
@@ -476,3 +473,7 @@ F2's two parentheticals (entries 35 and 39, each "(Route, the advisor's F2 rulin
 505e54d6c0259092f08767a4052648898040437b4f2f01a8c47877adadff9c29. The wave-1 builders already running (U4d, U4c) were
 briefed before these edits: F1 changes only §4.15's derived sizes (U4d states the measured size anyway) and F2 only
 U4b's and U4e's entries, so neither running brief is affected.
+
+**Main session, 2026-11-11 (the U4 verdict above, condition 1 at :86):** Condition 1's 'Any per-soldier input state
+the sim keeps holds what the server accepted, not what the client claimed' is amended by the W1-U4D ruling
+(advisor-u4-wave1.md) for the press counters.

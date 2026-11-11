@@ -190,3 +190,30 @@ Not placed in these four files (others' or later, or no text ordered): see "Skip
 - Not ordered, noticed: §5 U4d's Builds still says "the synthetic recording generator (test support)" (u4-build-plan.md
   :607), beside §4.15's new "npt-sim's library"; u4s-carries.md's header still says "44 entries" (45 at the base, 50
   now). Both left for the advisor or the main session.
+
+## Fix pass (2026-11-11): the check's findings F1, F2 and F10 (w1-plan-edits-check.md)
+Start: the four files' sha256 equal the Result above (checked). One line per finding, done or rejected with the reason.
+- F1 (Medium; W1-U4D N-M2, advisor-u4-wave1.md:229-231): advisor-u4.md, the preferred fix. The paragraph and its blank
+  line at :195-197 deleted; appended as the file's last paragraph after a blank line (now :476-479): "**Main session,
+  2026-11-11 (the U4 verdict above, condition 1 at :86):**" + the ruling's line, word for word (checked by script:
+  once). Not against the ruling: it says "under my U4 verdict, as it did for NF-D4", and NF-D4's line (:398) is a later
+  main-session line naming the verdict "above". Words mine: only the label's bracket (the checker's words). Now
+  :1-475 equal the base, so u4s-carries.md's cites (:12 "236-375", :13 "313-327" and "343-347", :138 "351-364", :184
+  "343-347", :251 "268-270") and u4j-brief.md:3's "365-371" hold again (spot-checked). Done.
+- F2 (Medium; W1-PUB, advisor-u4-wave1.md:408-409, and E12): u4-build-plan.md §5 U4d's Builds (:607): "the synthetic
+  recording generator (test support)" → "the synthetic recording generator (`Recording::synthetic`, in npt-sim's
+  library: §4.15; the advisor's W1-PUB ruling)", wrapped at 120 (now :607-608, 115 and 39 characters). Words mine (the
+  checker's words carrying W1-PUB's "`Recording::synthetic` belongs in the library"; no ruling gives this line's
+  words). It adds one line: every u4-build-plan.md line after :607 moves down by 1, so this notes file's earlier "now"
+  numbers after :607 (E13 on) read one line early. No live cite in the four files points there in today's numbering.
+  Done.
+- F10 (Low; W1-U4D N-M2, advisor-u4-wave1.md:223-225; E6): u4-build-plan.md §4.2 :247-248, "never what the client
+  claimed" → "not". Rejected (not changed): the rulings' words say otherwise. The ruling orders that sentence's text
+  word for word: "(The advisor's W1-U4D ruling: it replaces condition 1's 'what the server accepted, never what the
+  client claimed' for the press counters.)", and the finding's own fix is "With the advisor's nod", which this pass
+  does not have. The misquote is real (condition 1 at advisor-u4.md:86 says "not"); it goes to the advisor: one word,
+  his to approve, then the main session makes it.
+- After the pass: every added non-table line in the two files changed here is at most 120 characters; plan.md and
+  u4s-carries.md unchanged by this pass. New sha256 (lines): plan.md 4717029c… (1,518, as before); u4-build-plan.md
+  a81b230fea68497d04fe2a1a08622d4df3fcac1364b9ddaef2c74a3d6caac3cf (1,070); u4s-carries.md 19e7ca98… (272, as
+  before); advisor-u4.md 7b3e76ca09f3781ba799cc9c0d44885cc7c2f1d6eca2aaa116184246cfab78ff (479).
