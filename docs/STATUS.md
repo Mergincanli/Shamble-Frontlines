@@ -10,7 +10,7 @@ _Last updated: 2026-11-11 (foundation 2.1a, PR #50, its docs pass; main bb2d817)
   `docs/ENGINE_OVERVIEW.md` and `docs/SPIKE_PLAN.md`) are the basis for the spikes and stay Proposed (the stop's
   answers, 2026-11-03: `docs/DECISIONS.md`), but for his SCOPE (a) of 2026-11-10: "I accept ADR 0002's part 1 alone
   (the repository layout, with the legacy constraints applying to legacy/ only)", recorded in its Status line by 2.1b.
-- **Last merged:** status-diet, STATUS-DIET with LANE-RULES (PR #49, bb2d817, 2026-11-11 09:03:10 UTC, by merge
+- **Last merged:** status-diet, STATUS-DIET with LANE-RULES (PR #49, bb2d817, 2026-11-11 09:03:11 UTC, by merge
   commit, on Mustafa's go after the advisor's APPROVE of 2e6e5d2, PR comment 6779064873): STATUS split into this
   dashboard, `docs/DECISIONS.md` and `docs/STATUS_ARCHIVE.md`; CLAUDE.md's "Lanes and accounts" and the advisor-tool
   lines. Every merged change-set: `docs/STATUS_ARCHIVE.md`, "In flight"; `docs/ROADMAP.md`.

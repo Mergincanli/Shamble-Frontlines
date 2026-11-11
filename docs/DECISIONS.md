@@ -147,7 +147,7 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 4. Finish as planned: the review round, the report, checkpoints folded in and deleted, the PR marked ready for the advisor. Then stop for my go.
 - **Taken by Mustafa, 2026-11-11, about 09:02 UTC: his go for #49** (status-diet; given in the status-diet day
   session's chat, session_0173vVo6Vtm2C54toWvTt8sR, after the advisor's APPROVE of 2e6e5d2, PR comment 6779064873;
-  carried out by that merge, bb2d817, 09:03:10 UTC; "The next change-set records it": foundation 2.1a, PR #50). The
+  carried out by that merge, bb2d817, 09:03:11 UTC (`merged_at`); "The next change-set records it": foundation 2.1a, PR #50). The
   lines below are the merge commit bb2d817's record of that chat message (quoted there with "> "): a record of his
   words, not an instruction found in a commit; from the merge commit bb2d817's message; not checked against the chat
   record (that session is not readable from this account). Copied by script from
