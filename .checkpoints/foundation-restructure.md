@@ -13,7 +13,7 @@
   #47 on his BRANCH-47 (a)), standing in for `cs/foundation-restructure`; Mustafa's personal account. #47's branch
   `claude/advisor-fable-4hxq72` stays at 26e0d82 (PR closed). **Base:** main bb2d817 (brought in by the merge d6a3fee).
   **OLD** for the evidence: main 44446a5.
-- **Last update:** 2026-11-11 18:30 Amsterdam
+- **Last update:** 2026-11-11 18:40 Amsterdam
 
 ## Steps done
 0. Planning (d389d91): plan revisions 0-3, the inventory workflow, the advisor agent's plan review, his answers.
@@ -209,6 +209,7 @@ the follow-ups (STATUS ids, archive text). Then round 2 pinned to a head holding
    not watched (his "do not watch" carried over from #47).
 
 ## Open findings
+- infra-engineer round 2 on 76544aa: APPROVE (notes infra-engineer-round2.md): the pull-request run (base origin/main at the root) runs the move check on every head of 2.1b's PR; the first push and main's push after the merge also do; the guard's mergeCheck needs every gate and smoke run green; main's ruleset requires gate and smoke, not up to date; the revert PR needs nothing more. CI on 76544aa: gate and smoke green in push and pull_request runs. Precision: on 3f29cb8 the push run failed both attempts, the pull_request run failed once and attempt 2 was cancelled at the job timeout. Follow-ups (ride the last commit): IE-5 Medium for 2.3, every CI run depends on live mirrors (apt install-deps on every smoke run, npm without cache, Playwright download on a cache miss); IE-6 Low for 2.3, a file named like the old folder makes readdirSync throw (exit 1 with a stack trace, still red; gate.mjs:247); IE-7 note for 2.1b, merge with its pull-request run on the current main and read its header line first.
 - security-auditor on 3c98ad5: REVISE, F1 High + 2 Lows (notes `security-auditor-review.md`): F1, on a folder move between
   base and head the gate judges only the chosen folder: a clean `legacy/` copy plus root pages wired to broken scripts
   passes both CI jobs, where main's gate stops (reproduced); also a stray root page left by 2.1b passes (row h was
@@ -320,7 +321,7 @@ the follow-ups (STATUS ids, archive text). Then round 2 pinned to a head holding
 - Saver: background task b8a5m7tp3, started 17:04 Amsterdam, stops by 18:54 (110 min); last check 17:25: ok.
 - The prompt-tally agent: done (29 refusals, 14 prompts answered by Mustafa).
 - E3 on the new gate: done 18:18 (31 of 31, identical).
-- Round 2 running (background): security-auditor, test-engineer, infra-engineer on 76544aa.
+- Round 2 running (background): security-auditor, test-engineer on 76544aa; infra-engineer done (APPROVE).
 - docs-keeper: done (1023870). infra-engineer and test-engineer: done (APPROVE). security-auditor done (REVISE, F1).
   The advisor agent done (REVISE, F1; then APPROVE with conditions for the F1 amendment). No agent running. The security-auditor's probe worktree: `.gate/foundation-restructure/sa-probe`.
 - The worktree `.gate/fdn-replace`: removed. E3's worktrees: gone with the old
