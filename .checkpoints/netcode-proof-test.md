@@ -13,9 +13,18 @@ batch of 2026-11-11, a81b230f… since; advisor-u4.md;
 the advisor's wave-1 rulings, with the exact words for every text change: advisor-u4-wave1.md). The card's blocks of
 2026-11-10 (the wave-1 list, NOW, SAVE, SAVE POINT, the next three actions of then) are in history.md, "Running work,
 U4 wave 1", moved by card_refresh.py.
-- **Merged:** U4s (f080551), U4b (411eeee), U4a (952f734), **U4c (f3f7c2f, 10:38 UTC)**; CI green on 411eeee and
-  952f734. Main merged in: kit-v3-4 (df8975b) and PR #49, the STATUS split (5ca77eb, by merge_status_split.py, as
-  Mustafa asked on 2026-11-11; CI green on 5ca77eb).
+- **Merged:** U4s (f080551), U4b (411eeee), U4a (952f734), **U4c (f3f7c2f, 10:38 UTC)**, **U4d with W1-S1's npt-proto
+  half (39f4290, about 12:15 UTC)**; CI green on 411eeee, 952f734 and f3f7c2f. Main merged in: kit-v3-4 (df8975b) and
+  PR #49, the STATUS split (5ca77eb, by merge_status_split.py, as Mustafa asked on 2026-11-11; CI green on 5ca77eb).
+- **U4d's merge (39f4290):** round 2 (wf_4b5ee472-66b) all five APPROVE WITH FINDINGS, no Critical or High;
+  SEC-U4a-1 and SEC-U4a-2 closed in writing. check.mjs on the merged tree: measured 365 = 325 + 39 + 1, bites 412 =
+  366 + 45 + 1, self 52; gate PASS. The catalogue's own-state row records the section as built (W1-S1). Report:
+  u4d-report.md (the N2-M1 merge condition met: T-M1's window, the per-window rates, the test-engineer's probe X2 at
+  7.578 a second over 600 s). wip/u4d.patch and wip/u4d-s1.patch deleted in that commit.
+  - Open for the advisor (Part B): (A) the ES knobs; N2-M1's fix form (carry 52); N2-M2 (ES's vehicles); (C) the
+    "(9 fields)" slip; Weapon, Scene::weapon, Scene::health for §4.1; the U4e carries from round 2 (N2-L1, the
+    security auditor's 1-2, N2-L3 (c)).
+  - Housekeeping later (approved method): `.claude/worktrees/wf_f54246ff-e0d-1`, `.gate/u4d-prefix`, `.gate/u4d-s1`.
 - **U4c's merge (f3f7c2f):** round 2 (wf_610486f7-cc1): rust-reviewer, test-engineer and netcode-architect APPROVE WITH
   FINDINGS, Lows only (R2-A = R2-1 = R2-N1, the jitter figure in time_threshold's doc; R2-B = R2-2, drive() hangs
   rather than fails on a model that keeps naming a past instant; R2-3, the fixer's third run never ran): follow-ups.
@@ -23,40 +32,6 @@ U4 wave 1", moved by card_refresh.py.
   deleted in that commit. SIZE-CHECK: about 3,130 lines for size M (lib.rs +1,180 −323, tests.rs 1,723, tests/l1.rs
   +230): not well past.
   - Housekeeping later (approved method): `.claude/worktrees/wf_f54246ff-e0d-2`, `.gate/u4c-prefix`.
-- **U4d, the stand-in sim (npt-sim), with W1-S1's npt-proto half:** **round 2 running** (workflow wf_4b5ee472-66b;
-  cut by the spend limit about 10:55, resumed 11:11 as task wy6140mq8): netcode-architect, security-auditor (W1-S1
-  only), rust-reviewer, engine-architect, then test-engineer, one at a time; notes
-  u4d-round2-{netcode,security,rust,arch,test}.md.
-  - **Done:** netcode-architect APPROVE WITH FINDINGS: every round-1 item closed; both W1-S1 halves met. Two Mediums,
-    follow-ups (not before the merge): N2-M1, the estimate scene's event rate drifts down (a 10-minute measured
-    window would likely read 8.5-9.3 a second, below PM-0001-2's 9.5: PM-0001-12's ES runs at R2; fix before U4d2
-    pins the recordings); N2-M2, ES's 15 vehicles loop 40-82 m out, too far for "every vehicle in every client's
-    view" (fix before U4d2 pins ES's hashes, or U4e shows its region covers them). Merge condition from N2-M1: U4d's
-    report states T-M1's window, the per-window rates, and that a 10-minute window would likely read below 9.5; a
-    U4r carry: the contract test reports the SS spread and the everyone-in-view share. Lows N2-L1 to N2-L4 (N2-L4:
-    "(9 fields)" is a slip; Weapon, Scene::weapon, Scene::health belong in §4.1's npt-sim row).
-  - **Done:** security-auditor APPROVE WITH FINDINGS: **SEC-U4a-1 and SEC-U4a-2 CLOSED** in writing. One Low,
-    SEC-U4d-R2-1 (an effect row's owner, index / 8, has no public home; U4e's filter would copy the 8): "it keeps the
-    PR needs-mustafa until it is fixed or explicitly deferred to U4e". **Deferred to U4e by Mustafa (2026-11-11), in
-    writing as carry 51.** Carries for U4e (the codec checks the kind per section, not the slot per client).
-  - N2-M1's fix: before U4d2 pins the recordings, the 9.5 floor unmoved (Mustafa, 2026-11-11): carry 52.
-  - **Left:** rust-reviewer, engine-architect, test-engineer (cut; running again).
-  - U4d's fix pass: done (wf_a8ff8550-67d, 10:14): every ruling item built, 29 plants failing by name, check.mjs
-    twice in its copy: measured 314 = 304 + 10, bites 337 = 327 + 10. Its open points, for the advisor: (A) the
-    estimate scene's knobs `aim_one_in` 11 and `grenade_fuse_ms` 1,515; (B) the estimate scene's event rate drifts
-    down over a run (mean in band); (C) SOLDIER has 8 fields where the ruling says 9; new public items `Weapon`,
-    `Scene::weapon`, `Scene::health`.
-  - **The npt-proto half: built by the main session** in the scratch copy `.gate/u4d-s1` (detached at 21a8597, with
-    U4d's final crates/sim): record s1-proto.md. Both GROUPS own-state rows gain OwnState; the codec refuses a record
-    whose kind its section does not list (OutOfRange / Malformed); the GROUPS test's three checks; the -57 test sends
-    the owner-only record; the generators and a1 follow the sections; one new refusal test. Eight plants, each
-    failing by name. check.mjs on the combined copy: measured 351 = 311 + 39 + 1, bites 388 = 342 + 45 + 1, self 52.
-    Snapshot wip/u4d-s1.patch (the whole copy).
-  - SIZE-CHECK: about 7,250 lines for size M-L (code about 4,210: world.rs 2,409, replay.rs 713, scene.rs 315, seam.rs
-    +308; tests about 3,030) plus the proto half's +407 −56: past its plan; three lines to Mustafa.
-  - Next: settle round 2; then the merge on the main folder's HEAD (U4c merged since; expect 365 / 412 / 52): apply
-    wip/u4d-s1.patch; the catalogue edit W1-S1 names (the own-state section's records); `git rm` wip/u4d.patch and
-    wip/u4d-s1.patch. Housekeeping later: `.claude/worktrees/wf_f54246ff-e0d-1`, `.gate/u4d-prefix`, `.gate/u4d-s1`.
 - **The plan text edits: done** (workflow wf_e1058c57-961, about 10:44 UTC; notes w1-plan-edits.md and
   w1-plan-edits-check.md; base 20702fd; +125 −47 lines in the four files). All 37 ordered texts are in, word for
   word (the checker's script took each from advisor-u4-wave1.md by line range); Mustafa's NETEM-BAR (a) is quoted
@@ -140,10 +115,10 @@ U4 wave 1", moved by card_refresh.py.
     - STATUS on main still says `10 0-6`, set 18:00 UTC: one change behind (docs-keeper's, on main).
 
 **The next three actions**
-1. **When U4d's round 2 returns:** settle it within the budget; then merge the combined copy into the main folder:
-   `git apply` wip/u4d-s1.patch (re-taken from `.gate/u4d-s1` first), the catalogue's own-state edit (W1-S1),
-   check.mjs (expect 365 / 412 / 52) and the gate, with `git rm` of wip/u4d.patch and wip/u4d-s1.patch in the same
-   commit (WIP-CLEAN). Stop the saver during the merge and restart it after.
+1. **(Done 12:15)** U4d merged at 39f4290. **Now: wave 2's preparation**, since U4e's dependencies (U4a, U4b, U4d)
+   have merged: the advisor's Part B (U4d's open points, N2-M1's fix form, N2-M2, the public items, the U4e carries,
+   the plan batch's Lows, NA1 and NA5); the U4e brief's rev 3 with the 28-row recheck against the merged code; then
+   U4d2's builder brief (carrying carries 52 and N2-M2's ruling, and W1-TARGET's lock).
 2. **When U4j's review returns:** a fix pass within the budget, by its builder (SendMessage); round 2 on what changed
    if a finding needs it; then the merge, the same way, with §4.1's items; then U4c's L-c8 re-run on U4j.
 3. **(Done 10:44)** The plan text edits; their open Lows join the advisor request below.
