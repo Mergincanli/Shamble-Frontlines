@@ -1,0 +1,116 @@
+diff --git a/spikes/netcode-proof/crates/sim/src/world.rs b/spikes/netcode-proof/crates/sim/src/world.rs
+index 80900f9..77062ba 100644
+--- a/spikes/netcode-proof/crates/sim/src/world.rs
++++ b/spikes/netcode-proof/crates/sim/src/world.rs
+@@ -2141,11 +2141,109 @@ impl SimCore for World {
+ 
+ #[cfg(test)]
+ mod tests {
+-    //! The tests that read `World`'s private parts: the blend's boxes (T-M3), the movers' sizes (R-M1) and the clamp's
+-    //! bound (TUNE-2).
++    //! The tests that read `World`'s private parts: the blend's boxes (T-M3), the movers' sizes (R-M1), the clamp's
++    //! bound (TUNE-2), and T2-L1's two invariants (hull ∘ part's frame, and phase 3's boxes after the moves).
+ 
+     use super::*;
+     use crate::replay::Recording;
++    use crate::seam::{AttributeChange, Placement};
++
++    #[test]
++    fn part_center_turns_a_parts_offset_by_its_hulls_yaw() {
++        // T2-L1 (the test review's round 2; the advisor's U4d close ruling, B1.2 step 0): hull ∘ part's frame
++        // convention on its own, not only through D-7's pin. At hull yaw 90 degrees a part 120 cm along the hull's own
++        // +x sits 120 cm to the world's +y of the hull, and one 120 cm along its +y sits 120 cm to the world's -x, 100
++        // cm up in both, within 1 cm: x' = x cos - y sin, y' = x sin + y cos (the old place_vehicles formula). A
++        // rotation by -yaw (plant O1) or none (O2) fails it.
++        let wire = Config::default();
++        let (hx, hy) = (1_000, -500);
++        let hull = [hx, hy, 0, wire.to_grid(YAW, FRAC_PI_2)];
++        for (offset, want) in [
++            ([120, 0, 100], [hx, hy + 120, 100]),
++            ([0, 120, 100], [hx - 120, hy, 100]),
++        ] {
++            let got = part_center(hull, offset);
++            assert!(
++                (0..3).all(|k| (got[k] - want[k]).abs() <= 1),
++                "offset {offset:?} at yaw 90 degrees: {got:?}, not {want:?}"
++            );
++        }
++    }
++
++    #[test]
++    fn a_shot_with_no_rewind_meets_a_soldier_where_this_ticks_move_put_it() {
++        // T2-L1 (the advisor's U4d close ruling, B1.2 step 0): phase 3 refreshes the soldiers' records after the moves,
++        // so a shot with no Rewind meets each soldier where this tick's command moved it. In TC, one tick: the shooter
++        // (slot 0) and the target (slot 1, 5 m north of it) are teleported into the open, the target's move speed set
++        // to the most the attribute holds (100 m/s), and its command runs it 3.33 m east, out of its old box (80 cm
++        // wide); the shooter, holding fire with no Rewind, hits it at its new chest and misses at its old one. Phase 3
++        // left at the moves' start (plant O3) fails both.
++        let scene = Scene::targets();
++        let (shooter, target) = ([-6_000, -1_000, 0], [-6_000, -500, 0]);
++        let shoot = |aim: [i32; 3]| {
++            let mut world = World::new(&scene, 1, 0);
++            let history = HitHistory::for_ms(1_000).expect("1 s of ticks");
++            let tick = world.next_tick();
++            let command = |slot: u8, buttons: u16, move_xy: [i8; 2], aim: [i32; 3]| {
++                let c = Command {
++                    slot,
++                    tick,
++                    seq: 1,
++                    buttons,
++                    presses: [0; 4],
++                    move_xy,
++                    aim,
++                    view_tick: tick,
++                    view_fraction: 0,
++                };
++                (c, None)
++            };
++            let input = TickInput {
++                tick,
++                commands: vec![
++                    command(0, Command::FIRE, [0, 0], aim),
++                    command(1, 0, [127, 0], [-6_000, 2_000, 140]),
++                ],
++                teleports: vec![
++                    Placement {
++                        slot: 0,
++                        position: shooter,
++                    },
++                    Placement {
++                        slot: 1,
++                        position: target,
++                    },
++                ],
++                attributes: vec![AttributeChange {
++                    slot: 1,
++                    attribute: Attribute::MoveSpeed,
++                    value: MOVE_SPEED_MAX_CM_S,
++                }],
++                ..TickInput::default()
++            };
++            let events = world.step(&input, &history);
++            let hit = events
++                .iter()
++                .any(|e| matches!(e, SimEvent::Hit { victim: 1, .. }));
++            let shots = events
++                .iter()
++                .filter(|e| matches!(e, SimEvent::Shot { slot: 0, .. }))
++                .count();
++            (hit, shots, world.soldiers[1].pos)
++        };
++        let old = [target[0], target[1], 140];
++        let (hit_old, shots, at) = shoot(old);
++        assert_eq!(shots, 1, "the shooter fires once");
++        assert!(
++            at[0] - cm(target[0]) > 3.3 && (at[1] - cm(target[1])).abs() < 0.01,
++            "the target ran 3.33 m east: {at:?}"
++        );
++        let new = [libm::roundf(at[0] * 100.0) as i32, target[1], 140];
++        let (hit_new, shots, _) = shoot(new);
++        assert_eq!(shots, 1, "the shooter fires once");
++        assert!(hit_new, "a shot at the target's new chest {new:?} hits it");
++        assert!(!hit_old, "a shot at its old chest {old:?} misses it");
++    }
+ 
+     /// A box's centre and half extents as the reference reads them, m, in f64 from its integer centimetres.
+     fn metres(b: &VolumeBox) -> ([f64; 3], [f64; 3]) {
