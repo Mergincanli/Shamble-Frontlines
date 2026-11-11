@@ -8,7 +8,8 @@
   fix pass; night items 4 and 5 folded)
 
 ## Resume card (read this first; open the rest only when a step needs it)
-**The current step: U4 wave 1** (u4-build-plan.md rev 2, sha256 0d69332c…, approved with conditions; advisor-u4.md;
+**The current step: U4 wave 1** (u4-build-plan.md rev 2, approved with conditions, sha256 0d69332c… until the W1 text
+batch of 2026-11-11, a81b230f… since; advisor-u4.md;
 the advisor's wave-1 rulings, with the exact words for every text change: advisor-u4-wave1.md). The card's blocks of
 2026-11-10 (the wave-1 list, NOW, SAVE, SAVE POINT, the next three actions of then) are in history.md, "Running work,
 U4 wave 1", moved by card_refresh.py.
@@ -41,9 +42,20 @@ U4 wave 1", moved by card_refresh.py.
   - Next: settle round 2; then the merge on the main folder's HEAD (U4c merged since; expect 365 / 412 / 52): apply
     wip/u4d-s1.patch; the catalogue edit W1-S1 names (the own-state section's records); `git rm` wip/u4d.patch and
     wip/u4d-s1.patch. Housekeeping later: `.claude/worktrees/wf_f54246ff-e0d-1`, `.gate/u4d-prefix`, `.gate/u4d-s1`.
-- **The plan text edits: running** (workflow wf_e1058c57-961, task wf52zmmex): an editor applies every change the
-  wave-1 rulings order, word for word, plus NETEM-BAR (a) in the U8 row; then test-engineer's independent check; then
-  a fix pass and re-check if needed. Notes w1-plan-edits.md and w1-plan-edits-check.md. Base for its diffs: 20702fd.
+- **The plan text edits: done** (workflow wf_e1058c57-961, about 10:44 UTC; notes w1-plan-edits.md and
+  w1-plan-edits-check.md; base 20702fd; +125 −47 lines in the four files). All 37 ordered texts are in, word for
+  word (the checker's script took each from advisor-u4-wave1.md by line range); Mustafa's NETEM-BAR (a) is quoted
+  exactly in the U8 row (plan.md). The check's two Mediums are fixed and re-checked: F1 (the W1-U4D amendment line
+  moved to advisor-u4.md's end, so lines 1-475 match the base and every cite into it holds) and F2 (§5 U4d's
+  generator words, "words mine"). New sha256: plan.md 4717029c… (1,518 lines), u4-build-plan.md a81b230f… (1,070),
+  u4s-carries.md 19e7ca98… (272), advisor-u4.md 7b3e76ca… (479).
+  - Open Lows, for the advisor request after wave 1: F10 (the ruling's §4.2 sentence quotes condition 1 as "never"
+    where it says "not": a one-word change on the advisor's nod); F3 (carry 40's added sentence and its label); F5
+    (a bare "§4.7" in §4.1's Why cell means plan.md §4.7); F6 (two clamp-idempotence claims left unbounded beside
+    TUNE-2's bound); F7 (u4s-carries.md's header "44 entries", now 50; carry 13's moved half); F8 (U4E-Q6's two
+    conditions go to the U4e and U4r briefs); F9 (a sentence the swap left reading as the manifest's); F11 (W1-PUB's
+    approved public items its §4.1 list leaves out); F4 (a cite off by one line: advisor-u3q.md:142-143, not
+    :143-144).
 - **U4j, the judge and marks change:** **built** (agent a3b8dfeb01ed52b50, done about 10:02): all 10 steps pass twice
   (measured 304 = 286 + 18, bites 327 = 309 + 18, self 48 of 48); its four plants fail by name. Copy
   `.claude/worktrees/agent-a3b8dfeb01ed52b50` (base 411eeee); notes u4j-build.md; snapshot wip/u4j.patch (10:05).
@@ -56,7 +68,7 @@ U4 wave 1", moved by card_refresh.py.
     `set_hashes`, `hashes`; `marks::BoundNumber`, `Check.ws_bound`, `Rule::WsPractice`; `Outcome::Empty`,
     `fails()`; `Lack::Empty`); the builder's readings (a)-(f) go to the advisor with the reviewers' views.
   - Then U4c's L-c8 judged re-run on U4j.
-- **Agents (3 at most):** U4j's reviewer, the plan-text editor or checker, U4d's round-2 reviewer.
+- **Agents (3 at most):** U4j's reviewer, U4d's round-2 reviewer (one slot free since 10:44).
 - **Night work (issue #16):** all four items done: 2 and 3 on the night of 2026-11-10; 4 and 5 last night, from 02:16
   Amsterdam. The queue is empty: post tonight's items this evening.
   - **4, the U4r brief:** rev 2 at `cs/npt-u4r-brief` ed973c9 (1,007 lines). netcode-architect's check: 8 Medium and 8
@@ -87,11 +99,11 @@ U4 wave 1", moved by card_refresh.py.
    commit (WIP-CLEAN). Stop the saver during the merge and restart it after.
 2. **When U4j's review returns:** a fix pass within the budget, by its builder (SendMessage); round 2 on what changed
    if a finding needs it; then the merge, the same way, with §4.1's items; then U4c's L-c8 re-run on U4j.
-3. **When the plan text edits return:** read the check and the re-check; record the new sha256 of u4-build-plan.md
-   and plan.md here.
+3. **(Done 10:44)** The plan text edits; their open Lows join the advisor request below.
 - **After wave 1:**
   - One advisor request: U4j's readings (a)-(f); U4d's points (A), (B), (C) and its new public items; NA1 and NA5;
-    and the U4e brief's rev 3 (W1-U4E's answers, W1-S1, W1-N2, the new carries).
+    the plan text batch's open Lows (F10 first: its one-word change); and the U4e brief's rev 3 (W1-U4E's answers,
+    W1-S1, W1-N2, the new carries).
   - Then wave 2 (U4d2, U4e), under W1-TARGET's lock.
 - **This evening:** post tonight's night items to issue #16 (candidates: the U4f and U4g brief drafts; a skeptic
   check of U4a and U4b's merged code).
