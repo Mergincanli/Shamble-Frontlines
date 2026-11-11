@@ -23,3 +23,8 @@ added line inside the loose-ends section; ADR 0002 hunks only on :7, the OQ-0002
 - Risk seen: docs-check check 6 matches placeholder commands (`... legacy eval <snippet.js>`, `... legacy <cmd>`,
   `pageshot.js legacy index.html <prefix> [--headed]`, `perfbots.js --map=tri --pre=<file.js>`) against E6's literal
   strings: likely false FAILs. ROADMAP Recent work would reach 13 (fold = history, on the Never list).
+- Register: ADR 0002 row status column (+ the SCOPE (a) words, "8 open" kept); status sentence (main :33 → two lines, :34 byte-same); one row "Q-A1: how PM-0002-36's mark is read" appended to "The critic's remaining items" (Code cell avoids a leading PM- for check 1).
+- ADR 0002: :7 acceptance words (exact brief string); OQ-0002-2 answer appended after its Research ids line (three sub-bullets, pointer to the 2.1b report and DECISIONS 21:39:44 UTC); rows R5-LAYOUT-OQ5 and R5-GATE-OQ3 → "answered in part: OQ-0002-2". Line 3 untouched.
+- START_HERE: legacy banner (new first blockquote, one line); :12 double-click names legacy/index.html; :22-24 files in legacy/ [verified]; :105, :115-117 folder `.` → `legacy` (plain substitution: check 6 core rule passes; README's `index.html[?map=tri]` form would not); :113 folder-argument sentence with [verified] tag.
+- REPO_MAP: five root rows → one `legacy/` row (file descriptions kept, the file:line rule); :6 date 2026-11-11 only (:5 untouched). repo-map-check: OK 112 entries / 99 paths, exit 0.
+- MODULE_MAP: one line above the file table (all five in legacy/, [verified]). TECHNICAL §9: the two inventory lines name legacy/ [verified].

@@ -71,14 +71,59 @@ TBD-REVIEWS
 Step 2.2, the toolchain (PR #48's lane), then 2.3, the gate step, with the findings for 2.3 below.
 
 ## Decisions needed
-TBD-DECISIONS (PROMPTS-2.3)
+- **PROMPTS-2.3 · Should step 2.3's plan take this session's prompt findings?** Why it matters: you asked twice (A4,
+  A6) for the session to accept prompts itself; a session cannot answer a prompt, and your rule bars it from editing
+  settings or allow-lists to get fewer. From the session's own log (`prompt-tally.mjs`, 388 tool calls with a recorded
+  decision): 14 reached you as prompts: 8 were the session's own `sed -i` lines on its checkpoint (stopped mid-session:
+  the Edit tool asks nothing), 3 the kit edits (by design: your yes in chat came first), 1 E8's merge inside its
+  throwaway worktree, 1 a worktree clean-up line, 1 the session's first command; the guard refused 2 lines (`git -C`).
+  Options: (a) 2.3's plan weighs allow rules or guard readings for the safe forms (git merge, revert and worktree
+  removal inside a `.gate/` worktree; a scripted edit of the session's own checkpoint), each asked of you as a kit edit;
+  (b) no rule change: sessions avoid those forms. Recommendation: (a), as findings for 2.3's plan (the kit stays frozen
+  until 2.3).
 
 ## For Mustafa
-TBD-FOR-MUSTAFA (backup with both console lines; Brave check of legacy/index.html and legacy/editor.html; the Windows
-command; his go)
+1. Confirm you have this version: download https://github.com/Mergincanli/Shamble-Frontlines/archive/refs/heads/claude/clever-fermi-oudsfq.zip and unzip it into a new folder · on screen, the folder holds
+   `legacy/` with the game in it, and no `index.html` at its top.
+2. Back up your saves first (nothing deletes them; this is the safety copy). In Brave, open your current
+   `index.html` (your usual copy, not the new folder), press F12, open Console (type `allow pasting` if Brave asks),
+   paste this line and press Enter:
+   ```js
+   (()=>{const o={};for(const k of Object.keys(localStorage).sort())o[k]=localStorage.getItem(k);copy(JSON.stringify(o));return Object.keys(o).length+' keys copied: paste them into a text file now'})()
+   ```
+   Expected: the console answers "<n> keys copied: paste them into a text file now". Paste into a new text file outside
+   the repository and save it. Do the same on your current `editor.html`. Each file starts with `{` and holds your
+   keys (`shamble_prog`, `vmap:…` for each map).
+3. Double-click `legacy/index.html` in the new folder. Expected: the menu opens; Deploy starts a match; you can move,
+   shoot and pause as before; your rank and progress show as before (in Chromium every `file://` page shares one
+   storage, E5; Brave on Windows was not tested).
+4. Double-click `legacy/editor.html`. Expected: the editor's menu opens; Map editor and Maps open; your saved maps are
+   listed.
+5. Only if a save is missing: on that page, F12, Console, type this line without pressing Enter, replace `PASTE_HERE`
+   with the whole text of your backup file, then press Enter:
+   ```js
+   ((o)=>{let n=0,s=0;for(const k of Object.keys(o)){if(localStorage.getItem(k)===null){localStorage.setItem(k,String(o[k]));n++}else s++}return n+' keys restored, '+s+' already there (left as they are)'})(PASTE_HERE)
+   ```
+   Expected: "<n> keys restored, <m> already there (left as they are)"; reload the page and the saves are back. It
+   only adds missing keys and never overwrites one.
+6. On Windows, the gate on this branch (PowerShell, in your repository folder; a separate folder, your own is not
+   changed): `git fetch origin`, then `git worktree add ..\shamble-2-1b origin/claude/clever-fermi-oudsfq`, then
+   `cd ..\shamble-2-1b\tools`, `npm ci`, `cd ..`, `node tools/gate.mjs origin/main`. Expected: the header
+   "base origin/main = 76b4f7a (files at the root) | head = working tree (files in legacy/)", every check PASS, smoke
+   8/8 and 5/5, GATE PASS. Afterwards delete the folder `..\shamble-2-1b` and run `git worktree prune`.
+7. If every step passes, say "merge #51" in a session's chat (risk tier 2, needs your go; the advisor approves the final
+   head first).
 
 ## Findings for 2.3
-- TBD: the prompt tally; the two guard refusals (`git -C`) with routes; his Node 24 finding.
+- The prompt tally above (PROMPTS-2.3), with every prompt and refusal listed in `prompt-tally.json` at this branch's
+  last checkpoint commit.
+- The guard refused `git -C <folder> <command>` twice ("git: no option before the subcommand (run git from the folder,
+  without -C, -c or --git-dir)"); the route both times: `cd` into the worktree, run git there, `cd` back.
+- Your finding from the Windows run (A3): the pinned Playwright's installer (before 1.60.0) hangs after the download
+  reaches 100% under Node 24.16.0 and later; it finished under 24.15.0. This container's install (Node 22.23.4) did not
+  hang. For 2.3's toolchain pins.
+- The Bash tool's background limit (30 minutes by default) stopped the checkpoint saver once; restarted with the
+  2-hour limit.
 
 ## The advisor tool
 Fable 5.2 since his /compact at 21:36:59 UTC (the session log's `advisorModel`); Opus 5.5 before. Consultations: TBD.
