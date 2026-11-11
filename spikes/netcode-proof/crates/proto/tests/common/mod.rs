@@ -1,6 +1,7 @@
 //! Fixed-seed generators of valid messages for npt-proto's tests (u4-build-plan.md §5 U4a: a1, a2, a3), from
 //! ChaCha8Rng, the workspace's pinned generator. Every value is one the wire carries; entity fields are read from
-//! `EntityKind::layout()`, so U4d's completed lists need no edit here.
+//! `EntityKind::layout()`, so U4d's completed lists need no edit here, and each section's kinds from its message's
+//! field groups (the advisor's W1-S1: the codec refuses a kind its section does not list).
 
 #![allow(
     dead_code,
@@ -11,7 +12,7 @@ use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use npt_link::Channel;
 use npt_proto::{
-    ClientSettings, Direction, EndReason, EntityDelta, FullState, Input, Join, JoinAccepted,
+    Class, ClientSettings, Direction, EndReason, EntityDelta, FullState, Input, Join, JoinAccepted,
     JoinRejected, Kick, Leave, Limits, Message, Ping, Pong, ProfileId, Resync, RoomControl,
     RoomEnded, SessionControl, SessionStatus, Snapshot, StepResult, TokenKind, encode,
 };
@@ -19,6 +20,20 @@ use npt_sim::grid::Field;
 use npt_sim::{Command, EntityKind, EntityRecord, SimEvent};
 use rand_chacha::ChaCha8Rng;
 use rand_core::{Rng, SeedableRng};
+
+/// The kinds a section of a message with field groups `groups` carries, in `EntityKind::ALL`'s order: the own-state
+/// section's (`own`) are its owner rows' kinds, the entity section's every other row's (snapshot.rs's rule, read from
+/// the same tables).
+pub fn section_kinds(groups: &[(&str, Class, &[EntityKind])], own: bool) -> Vec<EntityKind> {
+    EntityKind::ALL
+        .into_iter()
+        .filter(|k| {
+            groups
+                .iter()
+                .any(|&(_, class, kinds)| (class == Class::Owner) == own && kinds.contains(k))
+        })
+        .collect()
+}
 
 pub struct Gen(pub ChaCha8Rng);
 
@@ -76,6 +91,11 @@ impl Gen {
         EntityKind::ALL[self.below(EntityKind::ALL.len() as u64) as usize]
     }
 
+    /// One of `kinds`.
+    pub fn kind_of(&mut self, kinds: &[EntityKind]) -> EntityKind {
+        kinds[self.below(kinds.len() as u64) as usize]
+    }
+
     /// A record as the wire carries it: every layout field in range, every entry past the layout, `area` and `raw` 0.
     pub fn record(&mut self, kind: EntityKind) -> EntityRecord {
         let mut grid = [0; EntityRecord::FIELDS];
@@ -92,9 +112,9 @@ impl Gen {
         }
     }
 
-    /// A delta; against the defaults (`from_defaults`) always an add.
-    pub fn delta(&mut self, from_defaults: bool) -> EntityDelta {
-        let kind = self.kind();
+    /// A delta of one of `kinds`; against the defaults (`from_defaults`) always an add.
+    pub fn delta(&mut self, kinds: &[EntityKind], from_defaults: bool) -> EntityDelta {
+        let kind = self.kind_of(kinds);
         let n = kind.layout().len();
         match if from_defaults { 0 } else { self.below(3) } {
             1 if n > 0 => {
@@ -223,9 +243,14 @@ impl Gen {
     }
 
     /// A snapshot group that fits its datagram: entities are dropped until it does (U4d's wider layouts included).
+    /// Each section holds only the kinds its rows list.
     pub fn snapshot(&mut self) -> Snapshot {
         let baseline_age = if self.below(4) == 0 { 0 } else { self.u16() };
         let from_defaults = baseline_age == 0;
+        let (own, spatial) = (
+            section_kinds(&Snapshot::GROUPS, true),
+            section_kinds(&Snapshot::GROUPS, false),
+        );
         let groups = 1 + self.below(Limits::GROUPS as u64) as u8;
         let mut s = Snapshot {
             tick: self.u32(),
@@ -235,10 +260,10 @@ impl Gen {
             group: self.below(u64::from(groups)) as u8,
             groups,
             own: (0..self.below(5))
-                .map(|_| self.delta(from_defaults))
+                .map(|_| self.delta(&own, from_defaults))
                 .collect(),
             entities: (0..self.below(25))
-                .map(|_| self.delta(from_defaults))
+                .map(|_| self.delta(&spatial, from_defaults))
                 .collect(),
             events: (0..self.below(13))
                 .map(|_| (self.u16(), self.u8(), self.event()))
@@ -252,16 +277,24 @@ impl Gen {
         s
     }
 
+    /// A full state whose sections hold only the kinds their rows list.
     pub fn full_state(&mut self) -> FullState {
+        let (own, spatial) = (
+            section_kinds(&FullState::GROUPS, true),
+            section_kinds(&FullState::GROUPS, false),
+        );
         FullState {
             tick: self.u32(),
             last_run: self.coin().then(|| self.u16()),
             own: (0..self.below(10))
-                .map(|_| self.record(EntityKind::ALL[0]))
+                .map(|_| {
+                    let k = self.kind_of(&own);
+                    self.record(k)
+                })
                 .collect(),
             entities: (0..self.below(60))
                 .map(|_| {
-                    let k = self.kind();
+                    let k = self.kind_of(&spatial);
                     self.record(k)
                 })
                 .collect(),

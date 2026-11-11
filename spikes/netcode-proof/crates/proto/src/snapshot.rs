@@ -12,6 +12,13 @@
 //! the group count, so the client knows when a tick is complete (§4.5, §4.6). The body holds the group's own-state
 //! records, its spatial records and its events.
 //!
+//! **Each section carries only the kinds its field groups list** (the advisor's W1-S1; SEC-U4a-2): the own-state
+//! section the kinds of its message's owner rows in [`Snapshot::GROUPS`] or [`FullState::GROUPS`] (the client's own
+//! soldier, its owner-only record `EntityKind::OwnState` and its effect rows), the entity section the kinds of every
+//! other row. The encoder refuses a record in a section that does not list its kind ([`EncodeError::OutOfRange`]),
+//! and the decoder refuses one as soon as its kind is read ([`DecodeError::Malformed`]), so an owner-only record never
+//! travels among the spatial ones, either way.
+//!
 //! **The wire, in bits** (least significant first; every pad and reserved bit zero):
 //! - header (bytes, after the type): tick 32, baseline age 16, newest command received 16, last command run 16,
 //!   flags 8 (bit 0: the newest command is known; bit 1: the last command run is known), group 8 (bits 0-2 the
@@ -153,6 +160,24 @@ fn wire_record(r: &EntityRecord) -> EntityRecord {
     out
 }
 
+/// A message's section: the own-state section, or the entity section, which holds every other record.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Section {
+    Own,
+    Entities,
+}
+
+/// A message's field-group table ([`Snapshot::GROUPS`], [`FullState::GROUPS`]).
+type Groups = [(&'static str, Class, &'static [EntityKind])];
+
+/// Whether `section` carries records of `kind`: one of the message's rows for that section lists it, its owner rows
+/// for the own-state section and every other row for the entity section (the module text).
+fn carries(groups: &Groups, section: Section, kind: EntityKind) -> bool {
+    groups.iter().any(|&(_, class, kinds)| {
+        (class == Class::Owner) == (section == Section::Own) && kinds.contains(&kind)
+    })
+}
+
 /// Bits of an entity's kind on the wire: enough for every position in `EntityKind::ALL`.
 const KIND_BITS: u32 = usize::BITS - (EntityKind::ALL.len() - 1).leading_zeros();
 
@@ -193,16 +218,33 @@ fn get_fields(
     Ok(grid)
 }
 
-/// A whole record: kind, index, generation, every layout field.
-fn put_record(q: Quant, w: &mut BitWriter<'_>, r: &EntityRecord) -> Result<(), EncodeError> {
+/// A whole record: kind, index, generation, every layout field; refused in a section that does not carry its kind.
+fn put_record(
+    q: Quant,
+    w: &mut BitWriter<'_>,
+    r: &EntityRecord,
+    groups: &Groups,
+    section: Section,
+) -> Result<(), EncodeError> {
+    if !carries(groups, section, r.kind) {
+        return Err(EncodeError::OutOfRange);
+    }
     put_kind(w, r.kind);
     w.put(u64::from(r.index), 16);
     w.put(u64::from(r.generation), 16);
     put_fields(q, w, r)
 }
 
-fn get_record(q: Quant, r: &mut BitReader<'_>) -> Result<EntityRecord, DecodeError> {
+fn get_record(
+    q: Quant,
+    r: &mut BitReader<'_>,
+    groups: &Groups,
+    section: Section,
+) -> Result<EntityRecord, DecodeError> {
     let kind = get_kind(r)?;
+    if !carries(groups, section, kind) {
+        return Err(DecodeError::Malformed);
+    }
     let index = r.u16()?;
     let generation = r.u16()?;
     let grid = get_fields(q, r, kind)?;
@@ -220,12 +262,22 @@ const ADD: u64 = 0;
 const UPDATE: u64 = 1;
 const REMOVE: u64 = 2;
 
+/// One delta; refused in a section that does not carry its kind.
 fn put_delta(
     q: Quant,
     w: &mut BitWriter<'_>,
     d: &EntityDelta,
     coded_from_defaults: bool,
+    groups: &Groups,
+    section: Section,
 ) -> Result<(), EncodeError> {
+    let kind = match d {
+        EntityDelta::Add(rec) => rec.kind,
+        EntityDelta::Update { kind, .. } | EntityDelta::Remove { kind, .. } => *kind,
+    };
+    if !carries(groups, section, kind) {
+        return Err(EncodeError::OutOfRange);
+    }
     match d {
         EntityDelta::Add(rec) => {
             put_kind(w, rec.kind);
@@ -279,8 +331,13 @@ fn get_delta(
     q: Quant,
     r: &mut BitReader<'_>,
     coded_from_defaults: bool,
+    groups: &Groups,
+    section: Section,
 ) -> Result<EntityDelta, DecodeError> {
     let kind = get_kind(r)?;
+    if !carries(groups, section, kind) {
+        return Err(DecodeError::Malformed);
+    }
     let index = r.u16()?;
     let op = r.get(2)?;
     let d = match op {
@@ -397,7 +454,7 @@ pub struct Snapshot {
     pub group: u8,
     /// How many groups this tick's snapshot has, 1 to [`Limits::GROUPS`].
     pub groups: u8,
-    /// The own-state section's deltas: the client's own soldier and its effect rows.
+    /// The own-state section's deltas: the client's own soldier, its owner-only record and its effect rows.
     pub own: Vec<EntityDelta>,
     /// The spatial records' deltas.
     pub entities: Vec<EntityDelta>,
@@ -425,14 +482,20 @@ impl Snapshot {
     /// The field groups a snapshot's encoder writes, in the catalogue's order (§3's `Snapshot` rows less the
     /// authority-only three, which have no entry): each group's name as the catalogue gives it, its class, and the
     /// entity kinds whose records it carries (each kind's fields are its `EntityKind::layout()`). The own-state group
-    /// carries the client's own soldier and its effect rows.
+    /// carries the client's own soldier, its owner-only record (`EntityKind::OwnState`: its velocity and its weapon's
+    /// state, the advisor's W1-S1) and its effect rows. Each section carries only the kinds its rows list (the module
+    /// text).
     pub const GROUPS: [(&'static str, Class, &'static [EntityKind]); 12] = [
         ("header: server tick", Class::Public, &[]),
         ("header: baseline and acknowledgements", Class::Owner, &[]),
         (
             "own state",
             Class::Owner,
-            &[EntityKind::Soldier, EntityKind::Effect],
+            &[
+                EntityKind::Soldier,
+                EntityKind::Effect,
+                EntityKind::OwnState,
+            ],
         ),
         ("remote soldiers", Class::Spatial, &[EntityKind::Soldier]),
         (
@@ -478,8 +541,11 @@ impl Snapshot {
         w.put(self.entities.len() as u64, 16);
         w.put(self.events.len() as u64, 8);
         let from_defaults = self.baseline_age == 0;
-        for d in self.own.iter().chain(&self.entities) {
-            put_delta(q, w, d, from_defaults)?;
+        for d in &self.own {
+            put_delta(q, w, d, from_defaults, &Snapshot::GROUPS, Section::Own)?;
+        }
+        for d in &self.entities {
+            put_delta(q, w, d, from_defaults, &Snapshot::GROUPS, Section::Entities)?;
         }
         for e in &self.events {
             put_event(w, e);
@@ -522,11 +588,23 @@ impl Snapshot {
         // what is read; the vectors grow with what decodes.
         let mut own = Vec::new();
         for _ in 0..n_own {
-            own.push(get_delta(q, r, from_defaults)?);
+            own.push(get_delta(
+                q,
+                r,
+                from_defaults,
+                &Snapshot::GROUPS,
+                Section::Own,
+            )?);
         }
         let mut entities = Vec::new();
         for _ in 0..n_entities {
-            entities.push(get_delta(q, r, from_defaults)?);
+            entities.push(get_delta(
+                q,
+                r,
+                from_defaults,
+                &Snapshot::GROUPS,
+                Section::Entities,
+            )?);
         }
         let mut events = Vec::new();
         for _ in 0..n_events {
@@ -554,7 +632,7 @@ pub struct FullState {
     pub tick: u32,
     /// The last command run, where the client's prediction starts (`None` before the first).
     pub last_run: Option<u16>,
-    /// The own-state section: the client's own soldier and its effect rows, whole.
+    /// The own-state section: the client's own soldier, its owner-only record and its effect rows, whole.
     pub own: Vec<EntityRecord>,
     /// Every entity of the client's interest set at that tick, whole.
     pub entities: Vec<EntityRecord>,
@@ -569,7 +647,11 @@ impl FullState {
         (
             "own state",
             Class::Owner,
-            &[EntityKind::Soldier, EntityKind::Effect],
+            &[
+                EntityKind::Soldier,
+                EntityKind::Effect,
+                EntityKind::OwnState,
+            ],
         ),
         (
             "spatial world",
@@ -596,8 +678,11 @@ impl FullState {
         w.put(u64::from(self.last_run.is_some()), 8);
         w.put(self.own.len() as u64, 8);
         w.put(self.entities.len() as u64, 16);
-        for rec in self.own.iter().chain(&self.entities) {
-            put_record(q, w, rec)?;
+        for rec in &self.own {
+            put_record(q, w, rec, &FullState::GROUPS, Section::Own)?;
+        }
+        for rec in &self.entities {
+            put_record(q, w, rec, &FullState::GROUPS, Section::Entities)?;
         }
         Ok(())
     }
@@ -615,11 +700,11 @@ impl FullState {
         let n_entities = usize::from(r.u16()?);
         let mut own = Vec::new();
         for _ in 0..n_own {
-            own.push(get_record(q, r)?);
+            own.push(get_record(q, r, &FullState::GROUPS, Section::Own)?);
         }
         let mut entities = Vec::new();
         for _ in 0..n_entities {
-            entities.push(get_record(q, r)?);
+            entities.push(get_record(q, r, &FullState::GROUPS, Section::Entities)?);
         }
         Ok(FullState {
             tick,
@@ -634,13 +719,16 @@ impl FullState {
 mod tests {
     use super::*;
 
+    /// The advisor's W1-S1, three checks: every kind has a home in both tables; the owner-only kinds (effect rows and
+    /// the owner-only record) sit in owner rows only; and a remote soldier's add carries exactly the catalogue's remote
+    /// row (docs/design/netcode-proof-messages.md §3), the security review's proof form for SEC-U4a-1.
     #[test]
-    fn every_kind_has_a_group_in_both_layout_tables_and_effect_rows_are_owner_only() {
+    fn groups_home_every_kind_keep_owner_only_kinds_to_owner_rows_and_send_the_remote_row() {
         for table in [&Snapshot::GROUPS[..], &FullState::GROUPS[..]] {
             for kind in EntityKind::ALL {
                 let homes: Vec<_> = table.iter().filter(|g| g.2.contains(&kind)).collect();
                 assert!(!homes.is_empty(), "{kind:?} has no group");
-                if kind == EntityKind::Effect {
+                if matches!(kind, EntityKind::Effect | EntityKind::OwnState) {
                     assert!(
                         homes.iter().all(|g| g.1 == Class::Owner),
                         "{kind:?}: {homes:?}"
@@ -649,5 +737,37 @@ mod tests {
             }
         }
         assert_eq!(KIND_BITS, 3);
+        // The remote row: position in 16, 16 and 12 bits, yaw 16, pitch 10, 8 flag bits, then health (0 to 1,023)
+        // and weapon id (0 to 15) in the sim's ranges; nothing of its owner's (velocity, the weapon's state).
+        let widths: Vec<u32> = EntityKind::Soldier
+            .layout()
+            .iter()
+            .map(|f| f.bits())
+            .collect();
+        assert_eq!(widths, [16, 16, 12, 16, 10, 8, 10, 4]);
+        // On the wire, a remote soldier's add is its kind (3 bits), index 16, operation 2, generation 16 and the row's
+        // 92 bits: a marker bit written right after it is the buffer's highest set bit.
+        let soldier = EntityRecord {
+            kind: EntityKind::Soldier,
+            index: 4,
+            generation: 1,
+            area: 0,
+            grid: [0; EntityRecord::FIELDS],
+            raw: [0; EntityRecord::FIELDS],
+        };
+        let mut bytes = Vec::new();
+        let mut w = BitWriter::new(&mut bytes);
+        put_delta(
+            Quant::default(),
+            &mut w,
+            &EntityDelta::Add(soldier),
+            false,
+            &Snapshot::GROUPS,
+            Section::Entities,
+        )
+        .expect("a remote soldier");
+        w.put(1, 1);
+        let top = bytes.last().expect("bytes").leading_zeros() as usize;
+        assert_eq!(bytes.len() * 8 - 1 - top, 3 + 16 + 2 + 16 + 92);
     }
 }

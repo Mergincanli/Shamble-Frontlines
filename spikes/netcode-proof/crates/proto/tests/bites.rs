@@ -60,17 +60,41 @@ fn soldier(pick: impl Fn(npt_sim::grid::Field) -> i32) -> EntityRecord {
     }
 }
 
+/// A soldier's owner-only record (the advisor's W1-S1: its velocity and its weapon's state), every field at its value
+/// from `pick`.
+fn own_state(pick: impl Fn(npt_sim::grid::Field) -> i32) -> EntityRecord {
+    let mut grid = [0; EntityRecord::FIELDS];
+    for (g, f) in grid.iter_mut().zip(EntityKind::OwnState.layout()) {
+        *g = pick(*f);
+    }
+    EntityRecord {
+        kind: EntityKind::OwnState,
+        index: 4,
+        generation: 1,
+        area: 0,
+        grid,
+        raw: [0; EntityRecord::FIELDS],
+    }
+}
+
+/// `r` sent in the section that carries it (the own-state section for the owner-only record, the entity section for a
+/// soldier) and decoded.
 fn sent_and_decoded(q: Quant, r: EntityRecord) -> EntityRecord {
-    let s = Snapshot {
+    let own = r.kind == EntityKind::OwnState;
+    let mut s = Snapshot {
         tick: 100,
-        entities: vec![EntityDelta::Add(r)],
         ..Snapshot::default()
     };
+    if own {
+        s.own = vec![EntityDelta::Add(r)];
+    } else {
+        s.entities = vec![EntityDelta::Add(r)];
+    }
     let b = bytes_with(q, &Message::Snapshot(s));
     let Ok(Message::Snapshot(back)) = decode(Direction::RoomToClient, Channel::Datagram, &b) else {
         panic!("decodes")
     };
-    let EntityDelta::Add(got) = back.entities[0] else {
+    let EntityDelta::Add(got) = (if own { back.own[0] } else { back.entities[0] }) else {
         panic!("an add")
     };
     got
@@ -86,7 +110,8 @@ fn pm_0001_57s_bites_send_coarse_integers_the_client_decodes_as_they_are() {
     ] {
         let q = bitten(id);
         // An interior tie (half a coarse step off a multiple) is off by half the step; the top end by the nearest
-        // multiple inside (for yaw, around the turn); every other field, velocity included, arrives as sent.
+        // multiple inside (for yaw, around the turn); every other field arrives as sent, and so does the owner-only
+        // record, velocity included (the advisor's W1-S1 moved velocity out of the soldier's record into it).
         for what in ["half a step", "the top end"] {
             let r = soldier(|f| match what {
                 "the top end" => f.max(),
@@ -114,6 +139,22 @@ fn pm_0001_57s_bites_send_coarse_integers_the_client_decodes_as_they_are() {
                     got.grid[i]
                 );
             }
+            // The owner-only record in its own section: velocity at half the coarse step or its top end, the rest at
+            // 3 or theirs; nothing is touched.
+            let o = own_state(|f| match what {
+                "the top end" => f.max(),
+                _ if f == VELOCITY => step / 2,
+                _ => 3,
+            });
+            assert_eq!(
+                sent_and_decoded(q, o),
+                o,
+                "{id} {what}: the owner-only record"
+            );
+            assert!(
+                EntityKind::OwnState.layout().contains(&VELOCITY),
+                "velocity is in the owner-only record"
+            );
         }
     }
     // VELOCITY shares POSITION_XY's range and is another kind of field: pos-4cm leaves it alone.

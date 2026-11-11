@@ -31,7 +31,8 @@ pub enum DecodeError {
     /// code no variant has, a count above its cap, a step outside 1 to 14.
     OutOfRange,
     /// Well framed, but not a message: a group index not below its count, an entity update that changes nothing, a
-    /// note that is not UTF-8 or holds a control or format character, a delta whose baseline entity is missing.
+    /// note that is not UTF-8 or holds a control or format character, a delta whose baseline entity is missing, a
+    /// record in a section whose field groups do not list its kind (an owner-only record among the spatial ones).
     Malformed,
 }
 
@@ -41,7 +42,8 @@ pub enum DecodeError {
 pub enum EncodeError {
     /// A value outside what its field carries: an integer outside its grid field's range, a view time more than
     /// 65,535 ticks before its command, a repeat more than 255 ticks before the command beside it, a group index not
-    /// below the group count, a note above 480 B, a step outside 1 to 14.
+    /// below the group count, a note above 480 B, a step outside 1 to 14, a record in a section whose field groups do
+    /// not list its kind.
     OutOfRange,
     /// More items than the format holds: commands above the redundancy cap, a group count above 8, more entities or
     /// events than their counts carry, more than 16 peers.

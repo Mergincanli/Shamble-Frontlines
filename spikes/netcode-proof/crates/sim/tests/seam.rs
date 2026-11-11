@@ -57,9 +57,27 @@ fn scale(f: Field) -> f64 {
     }
 }
 
-/// One tick's hit volumes, as the tests push them (U4d's World gives them their volumes).
+/// One tick's hit volumes, as the tests push them: the tick alone (U4d's World fills the boxes; tests/world.rs).
 fn volumes(tick: u32) -> HitVolumes {
-    HitVolumes { tick }
+    HitVolumes {
+        tick,
+        ..HitVolumes::default()
+    }
+}
+
+/// The kind declared after `kind`, by an exhaustive match (the rust fix review's nit; carry 36): a new variant fails to
+/// compile here until it takes its place in the walk, and s6 holds `EntityKind::ALL` equal to the walk.
+fn next_kind(kind: EntityKind) -> Option<EntityKind> {
+    match kind {
+        EntityKind::Soldier => Some(EntityKind::Vehicle),
+        EntityKind::Vehicle => Some(EntityKind::VehiclePart),
+        EntityKind::VehiclePart => Some(EntityKind::Projectile),
+        EntityKind::Projectile => Some(EntityKind::Door),
+        EntityKind::Door => Some(EntityKind::Wall),
+        EntityKind::Wall => Some(EntityKind::Effect),
+        EntityKind::Effect => Some(EntityKind::OwnState),
+        EntityKind::OwnState => None,
+    }
 }
 
 /// One unit in the last place of a finite f64, by its bits (std's next_up is outside the sim's float allow-list).
@@ -426,6 +444,7 @@ fn s5_the_seam_types_are_send() {
                 Some(fire(0, 128)),
             ),
         ],
+        ..TickInput::default()
     };
     assert_eq!(room_tick(&mut sim, &mut history, &input), 1);
     assert_eq!(sim.events, [SimEvent::Shot { slot: 1, seq: 7 }]);
@@ -437,7 +456,12 @@ fn s5_the_seam_types_are_send() {
 
 #[test]
 fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
-    assert_eq!(EntityKind::ALL.len(), 7);
+    // ALL is the enum's every variant in declaration order: the exhaustive match's walk from the first (carry 36).
+    let mut walk = vec![EntityKind::Soldier];
+    while let Some(k) = walk.last().copied().and_then(next_kind) {
+        walk.push(k);
+    }
+    assert_eq!(walk, EntityKind::ALL);
     for (i, kind) in EntityKind::ALL.into_iter().enumerate() {
         // In declaration order, each kind once.
         assert!(EntityKind::ALL[..i].iter().all(|k| *k < kind), "{kind:?}");
@@ -452,9 +476,12 @@ fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
             );
         }
     }
-    // The catalogue's rows (docs/design/netcode-proof-messages.md §3), U4d to complete: a soldier's position, yaw,
-    // pitch, velocity and 8 flag bits; a projectile's start tick (32 bits), start position and velocity.
+    // The catalogue's rows (docs/design/netcode-proof-messages.md §3), U4s's fields first and U4d's after them (carry
+    // 12): a soldier's record is the remote row (the advisor's W1-S1: position, yaw, pitch and 8 flag bits, then its
+    // health and weapon id: what every client in view gets, so no velocity and no weapon state); a projectile's start
+    // tick (32 bits), start position and velocity, then its type and fuse.
     let flags = Field::integer(0, 255);
+    let health = Field::integer(0, 1_023);
     assert_eq!(
         EntityKind::Soldier.layout(),
         [
@@ -463,10 +490,27 @@ fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
             POSITION_Z,
             YAW,
             PITCH,
+            flags,
+            health,
+            Field::integer(0, 15),
+        ]
+    );
+    // W1-S1's owner-only kind, last in ALL: the soldier's velocity, then its ammunition (u16), fire timer and reload
+    // left (weapon clock units: 1,000,000 a tick, one µs being TICK_HZ units; the fire timer from one tick's carry below
+    // 0 to a whole 10 s interval, the reload to 10 s), move speed (to 100 m/s) and fire interval (1 µs to 10 s).
+    assert_eq!(EntityKind::ALL.last(), Some(&EntityKind::OwnState));
+    let units = |us: i64| (us * i64::from(TICK_HZ)) as i32;
+    assert_eq!(
+        EntityKind::OwnState.layout(),
+        [
             VELOCITY,
             VELOCITY,
             VELOCITY,
-            flags
+            Field::integer(0, 65_535),
+            Field::integer(1 - 1_000_000, units(10_000_000)),
+            Field::integer(0, units(10_000_000)),
+            Field::integer(0, 10_000),
+            Field::integer(1, 10_000_000),
         ]
     );
     let tick = Field::integer(i32::MIN, i32::MAX);
@@ -479,9 +523,38 @@ fn s6_every_kinds_layout_fits_a_record_and_each_field_fits_its_bits() {
             POSITION_Z,
             VELOCITY,
             VELOCITY,
-            VELOCITY
+            VELOCITY,
+            Field::integer(0, 3),
+            Field::integer(0, 65_535),
         ]
     );
+    // U4d's other kinds: a hull's transform; a part's transform relative to its hull, its health and its hull; a door's
+    // state; the wall's health and standing; an effect row's kind, the tick it ends (32 bits) and its magnitude.
+    assert_eq!(
+        EntityKind::Vehicle.layout(),
+        [POSITION_XY, POSITION_XY, POSITION_Z, YAW]
+    );
+    assert_eq!(
+        EntityKind::VehiclePart.layout(),
+        [
+            POSITION_XY,
+            POSITION_XY,
+            POSITION_Z,
+            YAW,
+            health,
+            Field::integer(0, 63)
+        ]
+    );
+    assert_eq!(EntityKind::Door.layout(), [Field::integer(0, 1)]);
+    assert_eq!(EntityKind::Wall.layout(), [health, Field::integer(0, 1)]);
+    assert_eq!(
+        EntityKind::Effect.layout(),
+        [Field::integer(0, 7), tick, Field::integer(0, 255)]
+    );
+    // EntityRecord::FIELDS stays 12 (the W1-S1 ruling); the longest layout, a projectile's, has 9.
+    assert_eq!(EntityRecord::FIELDS, 12);
+    let longest = EntityKind::ALL.iter().map(|k| k.layout().len()).max();
+    assert_eq!(longest, Some(9));
     // An integer field takes the fewest bits that hold its range, never wraps, and is its own kind: never equal to a
     // grid field of the same integers.
     for (min, max, bits) in [

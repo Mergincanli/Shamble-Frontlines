@@ -6,7 +6,7 @@ mod common;
 
 use std::panic::{AssertUnwindSafe, catch_unwind};
 
-use common::{Gen, encoded, framed_limit, framing, hex, row};
+use common::{Gen, encoded, framed_limit, framing, hex, row, section_kinds};
 use npt_link::Channel;
 use npt_proto::{
     DecodeError, Direction, EncodeError, EntityDelta, FullState, Input, Join, Limits, Message,
@@ -113,33 +113,49 @@ fn a1_the_entity_record_mapping_round_trips_for_every_kind() {
                     };
                     assert_eq!(id, (kind, now.index), "{what}");
                     assert_eq!(d.apply(base.as_ref()), Ok(Some(now)), "{what}: {d:?}");
-                    // Through the wire: a snapshot against a baseline (age 1), or against the defaults for an add.
-                    let s = Snapshot {
-                        baseline_age: if matches!(d, EntityDelta::Add(_)) {
-                            0
+                    // Through the wire: a snapshot against a baseline (age 1), or against the defaults for an add, in
+                    // each section that carries the kind (the advisor's W1-S1).
+                    for own in [true, false] {
+                        if !section_kinds(&Snapshot::GROUPS, own).contains(&kind) {
+                            continue;
+                        }
+                        let mut s = Snapshot {
+                            baseline_age: if matches!(d, EntityDelta::Add(_)) {
+                                0
+                            } else {
+                                1
+                            },
+                            ..Snapshot::default()
+                        };
+                        if own {
+                            s.own = vec![d];
                         } else {
-                            1
-                        },
-                        entities: vec![d],
-                        ..Snapshot::default()
-                    };
-                    let bytes = encoded(&Message::Snapshot(s.clone())).expect("one entity fits");
-                    let Ok(Message::Snapshot(back)) = decode_at(2, &bytes) else {
-                        panic!("{what}: {}", hex(&bytes));
-                    };
-                    assert_eq!(back, s, "{what}");
-                    assert_eq!(
-                        back.entities[0].apply(base.as_ref()),
-                        Ok(Some(now)),
-                        "{what}"
-                    );
+                            s.entities = vec![d];
+                        }
+                        let bytes =
+                            encoded(&Message::Snapshot(s.clone())).expect("one entity fits");
+                        let Ok(Message::Snapshot(back)) = decode_at(2, &bytes) else {
+                            panic!("{what}: {}", hex(&bytes));
+                        };
+                        assert_eq!(back, s, "{what}");
+                        let got = if own { back.own[0] } else { back.entities[0] };
+                        assert_eq!(got.apply(base.as_ref()), Ok(Some(now)), "{what}");
+                    }
                 }
             }
         }
-        // Whole records, as a full state carries them.
+        // Whole records, as a full state carries them, in each section that carries the kind.
         let f = FullState {
-            own: (0..3).map(|_| g.record(kind)).collect(),
-            entities: (0..50).map(|_| g.record(kind)).collect(),
+            own: if section_kinds(&FullState::GROUPS, true).contains(&kind) {
+                (0..3).map(|_| g.record(kind)).collect()
+            } else {
+                Vec::new()
+            },
+            entities: if section_kinds(&FullState::GROUPS, false).contains(&kind) {
+                (0..50).map(|_| g.record(kind)).collect()
+            } else {
+                Vec::new()
+            },
             ..FullState::default()
         };
         let bytes = encoded(&Message::FullState(f.clone())).expect("fits");
@@ -162,6 +178,145 @@ fn a1_the_entity_record_mapping_round_trips_for_every_kind() {
         .apply(Some(&r)),
         Ok(None)
     );
+}
+
+/// The advisor's W1-S1 (SEC-U4a-2): a record in a section whose field groups do not list its kind is refused both
+/// ways. The encoder returns `OutOfRange` and writes nothing, for an add, an update and a removal; the decoder returns
+/// `Malformed` for a valid encoding whose record is moved to the other section by rewriting the two section counts (an
+/// owner-only record among the spatial ones, a spatial one in the own-state section).
+#[test]
+fn w1_s1_a_record_in_a_section_that_does_not_list_its_kind_is_refused_both_ways() {
+    let mut g = Gen::new(0xa1f0);
+    // The own-state count (one byte) and the entity count (two, little-endian) follow the header: Snapshot's is 12
+    // bytes after the type byte, FullState's 7 (snapshot.rs's module text).
+    let (snap_at, full_at) = (framing(row(2).1) + 1 + 12, framing(row(3).1) + 1 + 7);
+    let (mut encodes_refused, mut decodes_refused) = (0, 0);
+    for kind in EntityKind::ALL {
+        let r = g.record(kind);
+        let mut moved = r;
+        let first = kind.layout()[0];
+        moved.grid[0] = if r.grid[0] == first.min() {
+            first.max()
+        } else {
+            first.min()
+        };
+        let update = EntityDelta::between(&moved, Some(&r)).expect("field 0 changed");
+        let remove = EntityDelta::Remove {
+            kind,
+            index: r.index,
+        };
+        for own in [true, false] {
+            let snapshot_lists = section_kinds(&Snapshot::GROUPS, own).contains(&kind);
+            for (d, age) in [(EntityDelta::Add(r), 0), (update, 1), (remove, 1)] {
+                let mut s = Snapshot {
+                    baseline_age: age,
+                    ..Snapshot::default()
+                };
+                if own {
+                    s.own = vec![d];
+                } else {
+                    s.entities = vec![d];
+                }
+                let mut out = vec![0xee];
+                let got = encode(&Message::Snapshot(s), &mut out);
+                if snapshot_lists {
+                    assert_eq!(got, Ok(()), "{kind:?} own {own}: {d:?}");
+                } else {
+                    assert_eq!(
+                        (got, out.as_slice()),
+                        (Err(EncodeError::OutOfRange), &[0xee][..]),
+                        "{kind:?} own {own}: {d:?}"
+                    );
+                    encodes_refused += 1;
+                }
+            }
+            let full_lists = section_kinds(&FullState::GROUPS, own).contains(&kind);
+            let mut f = FullState::default();
+            if own {
+                f.own = vec![r];
+            } else {
+                f.entities = vec![r];
+            }
+            let mut out = vec![0xee];
+            let got = encode(&Message::FullState(f), &mut out);
+            if full_lists {
+                assert_eq!(got, Ok(()), "{kind:?} own {own}: a full state");
+            } else {
+                assert_eq!(
+                    (got, out.as_slice()),
+                    (Err(EncodeError::OutOfRange), &[0xee][..]),
+                    "{kind:?} own {own}: a full state"
+                );
+                encodes_refused += 1;
+            }
+        }
+        // The decoder: a kind one section alone carries, moved to the other.
+        for (t, at, own, other) in [
+            (
+                2,
+                snap_at,
+                section_kinds(&Snapshot::GROUPS, true).contains(&kind),
+                section_kinds(&Snapshot::GROUPS, false).contains(&kind),
+            ),
+            (
+                3,
+                full_at,
+                section_kinds(&FullState::GROUPS, true).contains(&kind),
+                section_kinds(&FullState::GROUPS, false).contains(&kind),
+            ),
+        ] {
+            if own == other {
+                continue;
+            }
+            let m = if t == 2 {
+                let mut s = Snapshot::default();
+                if own {
+                    s.own = vec![EntityDelta::Add(r)];
+                } else {
+                    s.entities = vec![EntityDelta::Add(r)];
+                }
+                Message::Snapshot(s)
+            } else {
+                let mut f = FullState::default();
+                if own {
+                    f.own = vec![r];
+                } else {
+                    f.entities = vec![r];
+                }
+                Message::FullState(f)
+            };
+            let mut bytes = encoded(&m).expect("one record fits");
+            assert_eq!(decode_at(t, &bytes).as_ref(), Ok(&m), "{kind:?}");
+            let (counts, swapped): ([u8; 3], [u8; 3]) = if own {
+                ([1, 0, 0], [0, 1, 0])
+            } else {
+                ([0, 1, 0], [1, 0, 0])
+            };
+            assert_eq!(bytes[at..at + 3], counts, "{kind:?}: the counts' offset");
+            bytes[at..at + 3].copy_from_slice(&swapped);
+            assert_eq!(
+                decode_at(t, &bytes),
+                Err(DecodeError::Malformed),
+                "{kind:?} moved out of the {} section: {}",
+                if own { "own-state" } else { "entity" },
+                hex(&bytes)
+            );
+            decodes_refused += 1;
+        }
+    }
+    // Every pair the tables leave out was tried: today 21 snapshot deltas and 7 full-state records (encoder), and the
+    // 7 kinds one section alone carries, in both messages (decoder).
+    let left_out = |groups: &[(&str, npt_proto::Class, &[EntityKind])]| {
+        [true, false]
+            .iter()
+            .map(|&own| EntityKind::ALL.len() - section_kinds(groups, own).len())
+            .sum::<usize>()
+    };
+    assert_eq!(
+        encodes_refused,
+        3 * left_out(&Snapshot::GROUPS[..]) + left_out(&FullState::GROUPS[..])
+    );
+    assert_eq!((encodes_refused, decodes_refused), (28, 14));
 }
 
 /// How many valid encodings per type a2 cuts at every byte.

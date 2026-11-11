@@ -159,6 +159,10 @@ pub const VELOCITY: Field = Field {
 
 /// The grid a caller uses: in a measured build always the wire grid; in a bites build it may hold the grid's one
 /// planted defect, `Config::floor_rounding`, for that caller alone.
+///
+/// **Its shape differs by build** (the arch review's N2): the field it holds exists in bites builds only. So it is
+/// never hashed, recorded or compared across builds (npt-sim's state hash, its dump and its recordings hold no
+/// `Config`), and it is passed by value.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Config {
     /// Rounds down in place of to the nearest (bites builds only).
