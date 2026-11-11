@@ -3,7 +3,7 @@
 Read this instead of exploring. It says which file answers which question; `MODULE_MAP.md` maps the inside of the
 engine files, and `START_HERE.md` explains how they work and why. docs-keeper keeps this map current and checks it with
 `node .claude/scripts/repo-map-check.mjs`. `.checkpoints/` holds in-progress task checkpoints
-(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-11-10.
+(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-11-11.
 
 ## Top level
 | Path | What it is |
@@ -11,11 +11,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `CLAUDE.md` | The rules for Claude Code: v2 phase 0 (the look brief is `docs/LOOK_V2.md`), protocol (risk tiers, the review budget, the severity scale, rollback), models, checkpoints (at most 3 agents at a time), reporting, agents, never-list |
 | `README.md` | The project in one page, for people |
 | `FIRST_PROMPTS.md` | The first prompts Mustafa used (Phase 0, scale test, build spike, ADR run): history |
-| `index.html` | Legacy player build: three.js r128 → core → game → `bootGame();` |
-| `editor.html` | Legacy authoring build: adds the editor and `bootEditor();` |
-| `shamble-core.js` | Legacy engine: tuning, arsenal, look pipeline, characters, kits, maps, KVStore, the SIM math |
-| `shamble-game.js` | Legacy gameplay, AI, economy, HUD, menus, animation, the loop and `bootGame` |
-| `shamble-editor.js` | Legacy map editor, Character Lab, Anim Lab (editor.html only) |
+| `legacy/` | The legacy build, frozen (critical fixes only): the three engine files and the two pages. `shamble-core.js`: engine (tuning, arsenal, look pipeline, characters, kits, maps, KVStore, the SIM math); `shamble-game.js`: gameplay, AI, economy, HUD, menus, animation, the loop and `bootGame`; `shamble-editor.js`: map editor, Character Lab, Anim Lab (`editor.html` only); `index.html`: the player build (three.js r128 → core → game → `bootGame();`); `editor.html`: the authoring build (adds the editor and `bootEditor();`). Moved from the root with `git mv` in foundation step 2.1b (PR #51), bytes unchanged, so `file:line` citations keep their numbers: `shamble-game.js:N` means `legacy/shamble-game.js:N` |
 | `docs/` | Status, design, vision, research, decisions, reports (below) |
 | `tools/` | The legacy verification toolkit: never shipped (below) |
 | `.claude/` | Agents, skills, rules, hooks, scripts and settings for Claude Code (below) |
