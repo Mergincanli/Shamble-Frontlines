@@ -37,22 +37,38 @@ pull-request run on the current main (C16); this report's items (C17).
 ## Evidence (notes, scripts and outputs: this branch's last checkpoint commit, named in the PR body)
 | Check | Result |
 |---|---|
-| Gate, move commit, local | vs 76b4f7a and vs 2f4b974: PASS, "(files at the root) \| head = working tree (files in legacy/)", +0 -0, smoke 8/8 and 5/5 |
+| Gate, move commit, local | vs 76b4f7a and vs 2f4b974 (`move-gate-*.txt`): PASS, "(files at the root) \| head = working tree (files in legacy/)", +0 -0, smoke 8/8 and 5/5 |
 | CI, move commit c090843 | push #674 (base 2f4b974) and pull request #675 (base origin/main = 76b4f7a): gate PASS with that header; smoke 8/8 and 5/5 on the pinned Chromium |
 | E1, the bytes | `git diff --find-renames=100% --name-status c090843^ c090843`: five R100 rows, nothing else; blobs equal at 76b4f7a, 44446a5 and `legacy/` (e528dca, 24e86d5, fce6f37, 008c66f, 5ba72df); final head: in the PR body |
 | E2, OLD's gate | 44446a5's untouched gate files run on the moved bytes: GATE PASS, +0 -0, smoke 8/8 and 5/5 |
 | E3, the gate bites | 31 of 31: each of the 26 mutations fails the same checks in OLD's gate (files at the root) and the head's gate (files in `legacy/`); the controls C1-C3 and PC2 pass in both (exit 0); PC1 (P1 with `--allow-drop refreshRect`) fails 5a and 5b in both, against P1's 3, 5a and 5b: the flag removes exactly check 3, as designed (`refreshRect` is still called at boot), so PC1 is judged on check 3; M19 and M20 differ from the 2026-10-14 report's loose "5b + 5d" wording only (as in 2.1a). The head's gate vs 44446a5, 8e58937 (+34 -0), 76b4f7a, c090843, b6b3b81: PASS |
-| E4, the oracle | tuning dumps at A (`.`) and head (`legacy`), both maps, twice: byte-identical (35792 and 37063 characters); R7's builder reproduces `legacy-tuning.json` (78862 bytes) and `LEGACY_TUNING.md` (22018 bytes); the head's edited tools give the same default-map dump (`cmp`; their edits are header comments only) |
+| E4, the oracle | tuning dumps at A (`.`) and head (`legacy`), both maps, twice: byte-identical (35792 and 37063 characters); R7's builder reproduces `legacy-tuning.json` (78862 bytes) and `LEGACY_TUNING.md` (22018 bytes); the head's edited tools give the same default-map dump (`cmp`, `e4-edited-tools-cmp.md`; their edits are header comments only) |
 | E5, the saves | headless Chromium 1194 on Linux: SHARED (every `file://` page, any folder, one storage); control and reverse hold; KVStore's backend read `localStorage` (recorded in run 1, not asserted by the verdict). Both console lines on the real `legacy/` pages: 10/10, with DevTools' `copy()` stubbed (the real clipboard step is his step 2). Brave on Windows: not verified |
 | E6, the commands | 14 of 14 changed command lines run as written; kit tests 1261/1261; `repo-map-check.mjs` exit 0 after the docs pass (112 entries, 99 paths) and on the final head (PR body) |
-| E8, the revert | main + `git merge --no-ff` of the PR head (c33ac99) + `git revert -m 1` (5f91112): tree = 76b4f7a; `node tools/gate.mjs c33ac99` PASS ("(files in legacy/) \| head = working tree (files at the root)"), `--smoke-only` PASS |
+| E8, the revert | main + `git merge --no-ff` of the PR head f0322d2 (merge commit M, c33ac99) + `git revert -m 1` (5f91112): tree = 76b4f7a; `node tools/gate.mjs c33ac99` PASS ("(files in legacy/) \| head = working tree (files at the root)"), `--smoke-only` PASS |
 | Kit lines | b6b3b81: the four removed and added lines equal the approved text and main's before lines, by script (14/14) |
 | Letter case | Linux: `Legacy/` and `legacy/SHAMBLE-*.js` are not counted by `findBuild` (`case-test.mjs`); the move check catches `Index.html` (2.1a's row j). Windows and macOS: by reading the code, not run |
 | CI, final head | in the PR body: the push and pull-request runs, gate and smoke |
 
 ## Reviews
-Round 1 on the final diff (security-auditor, test-engineer, infra-engineer), the verifier and the advisor agent's
-review of the pushed head: filled in before the PR is marked ready.
+Round 1 on the final diff (head dc8582a, the same content as bf41334 outside the notes), one fix pass (43733e5); no
+Critical or High, so no round 2 (the review budget).
+- security-auditor: APPROVE WITH LOWS. Six Lows, each fixed or recorded: the restore line runs what is pasted (a warning
+  in step 5); the README's letter-case sentence and base reads; his steps follow the branch tip (the final head's SHA
+  is in the PR body); the stray-page check stops after the merge (a finding for 2.3); PROMPTS-2.3's option (a)
+  narrowed; 2.1a's follow-ups named. Holding: the kit lines, the guard (its tests 1234/1234), the move check, the README
+  paragraph, both console lines, DECISIONS.md (additions only).
+- test-engineer: APPROVE. One Medium, confirmed by an independent skeptic: the E3 row said "controls pass in both"
+  while PC1 fails by design (fixed). Five Lows fixed or noted (the E4 and E5 rows' limits, `tools/README.md`:72, this
+  count). It re-ran E1, the gate, the kit tests and repo-map-check itself.
+- infra-engineer: APPROVE. Three Lows fixed: the revert after #40 and the merge order (Risk 3), the merge method (step
+  7), the Windows step's base SHA. It read CI's base logic on #674, #675, #693 and #694, and the Playwright cache.
+- The verifier: PASS on 43733e5: the full gate (8/8, 5/5, +0 -0), kit tests 1261/1261, repo-map-check, docs-check
+  20/20, the appendix and kit checks, E1 on the head (all but the notes-folder line, which passes once the notes are
+  deleted), kit line 4's command as a plain shell line, and every row of the evidence table against its result file.
+  Three Lows: two claims sat only in the checkpoint (now `move-gate-*.txt` and `e4-edited-tools-cmp.md` in the notes),
+  the E8 row's wording (fixed), what is not verified (as stated). CI on 43733e5: push #695, pull request #696, green.
+- The advisor agent's review of the final head: in the PR body (its verdict names the full SHA).
 
 ## Decisions and deviations
 - His answers: D1 (a); KIT-2.1B (a); E8-RUN (a); REG-TRUE (b): OQ-0002-2 stays open, "answered in part"; 8 open; the
@@ -94,9 +110,9 @@ Step 2.2, the toolchain (PR #48's lane), then 2.3, the gate step, with the findi
   Recommendation: (a).
 - **PROMPTS-2.3 · Should step 2.3's plan take this session's prompt findings?** Why it matters: you asked twice (A4,
   A6) for the session to accept prompts itself; a session cannot answer a prompt, and your rule bars it from editing
-  settings or allow-lists to get fewer. From the session's own log (`prompt-tally.mjs`, 388 tool calls with a recorded
+  settings or allow-lists to get fewer. From the session's own log (`prompt-tally.mjs`, 494 tool calls with a recorded
   decision): 14 reached you as prompts: 8 were the session's own `sed -i` lines on its checkpoint (stopped mid-session:
-  the Edit tool asks nothing), 3 the kit edits (by design: your yes in chat came first), 1 E8's merge inside its
+  the Edit tool asks nothing; no prompt after 22:58 UTC), 3 the kit edits (by design: your yes in chat came first), 1 E8's merge inside its
   throwaway worktree, 1 a worktree clean-up line, 1 the session's first command; the guard refused 2 lines (`git -C`).
   Options: (a) 2.3's plan weighs guard readings that check where such a command runs (a `.gate/` worktree: git merge,
   revert, worktree removal) or what it writes (the session's own checkpoint), never a plain settings allow rule, which
@@ -170,7 +186,7 @@ Step 2.2, the toolchain (PR #48's lane), then 2.3, the gate step, with the findi
 - CLAUDE.md:47-52, the hard constraints' scope to `legacy/` under SCOPE (a): step 2.2's kit line, not 2.1b's.
 
 ## The advisor tool
-Fable 5.2 since his /compact at 21:36:59 UTC (the session log's `advisorModel`); Opus 5.5 before. The session's consultations: TBD-COUNT, each in the checkpoint (when, the question, what changed). docs-keeper's own
+Fable 5.2 since his /compact at 21:36:59 UTC (the session log's `advisorModel`); Opus 5.5 before. The session's consultations: 7, each in the checkpoint (when, the question, what changed). docs-keeper's own
 agent consulted it once in its fix pass (its notes).
 
 ## Appendix B. OQ-0002-2's three parts (plan revision 3, 1.4; the reasons ADR 0002's answer points to)
