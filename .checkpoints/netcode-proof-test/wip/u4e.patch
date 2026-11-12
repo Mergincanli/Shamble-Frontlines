@@ -16,10 +16,10 @@ index 5f2b674..520ce6d 100644
  disallowed-methods = [
      { path = "std::time::Instant::now", reason = "the clock ban" },
 diff --git a/spikes/netcode-proof/crates/client/src/lib.rs b/spikes/netcode-proof/crates/client/src/lib.rs
-index e59d87d..cc67c02 100644
+index e59d87d..882f93d 100644
 --- a/spikes/netcode-proof/crates/client/src/lib.rs
 +++ b/spikes/netcode-proof/crates/client/src/lib.rs
-@@ -4,19 +4,798 @@
+@@ -4,19 +4,858 @@
  //! stamp, and `step` returns the datagrams and reliable messages to send, the block for the page, and when the next
  //! tick is due. Prediction and reconciliation, interpolation, clock sync, the aim cast and the block writer live here.
  //! No bindings, no transport, no clock; native for the bots and wasm32 for the Worker. Built in units U4 and U7.
@@ -189,6 +189,13 @@ index e59d87d..cc67c02 100644
 +    }
 +}
 +
++// The group masks (`Tick::got`, the acknowledgement's) are a u8 and `Tick::sigs` holds one entry per group: they rely
++// on at most 8 groups a tick (RR-3; the wire's 3-bit group).
++const _: () = assert!(
++    Limits::GROUPS <= 8,
++    "a u8 group mask holds at most 8 groups"
++);
++
 +/// FNV-1a 64 of a datagram's bytes: a duplicated datagram is the same bytes (carry 61 (b): filed once).
 +fn signature(bytes: &[u8]) -> u64 {
 +    let mut h: u64 = 0xcbf2_9ce4_8422_2325;
@@ -235,6 +242,11 @@ index e59d87d..cc67c02 100644
 +    wrap: Wrap,
 +    ring: Vec<Tick>,
 +    newest: Option<u32>,
++    /// The tick of the first header taken (its first group's, full state's or refused datagram's): a header before it
++    /// and at least the ring behind the newest names a tick the client was never sent (advisor-u4e-r1 R1, case 3).
++    first: Option<u32>,
++    /// The bad headers' ticks already given the sentinel (case 3), at most `BAD_HEADERS_HELD`, oldest first.
++    bad_headers: VecDeque<u32>,
 +    low: u32,
 +    ack: Option<(u32, u8)>,
 +    next_cmd: u32,
@@ -257,6 +269,8 @@ index e59d87d..cc67c02 100644
 +
 +/// Pings the endpoint holds to answer at its next step, at most (the room sends a few a second).
 +const PINGS_HELD: usize = 8;
++/// Bad headers' ticks the endpoint remembers, so each gets the sentinel once (the groups of one tick arrive together).
++const BAD_HEADERS_HELD: usize = npt_sim::ACK_RING_TICKS as usize;
 +
 +impl ClientEndpoint {
 +    /// An endpoint that joins with `join` (its first step sends it), stepping at `tick_hz` (production callers pass
@@ -274,6 +288,8 @@ index e59d87d..cc67c02 100644
 +            wrap: Wrap::default(),
 +            ring: vec![Tick::default(); npt_sim::ACK_RING_TICKS as usize],
 +            newest: None,
++            first: None,
++            bad_headers: VecDeque::new(),
 +            low: 0,
 +            ack: None,
 +            next_cmd: 0,
@@ -333,7 +349,11 @@ index e59d87d..cc67c02 100644
 +    }
 +
 +    /// Whether the room ended the session (`JoinRejected`, `Kick` or `RoomEnded`).
-+    pub fn closed(&self) -> bool {
++    #[allow(
++        dead_code,
++        reason = "no consumer yet (advisor-u4e-r1 R2, A5): crate-private until a unit needs it public"
++    )]
++    pub(crate) fn closed(&self) -> bool {
 +        self.closed
 +    }
 +
@@ -353,12 +373,14 @@ index e59d87d..cc67c02 100644
 +        self.wrong_channel
 +    }
 +
-+    /// Received messages refused by the decoder or by the baseline rule (a snapshot's tick then gets the sentinel).
++    /// Received messages refused by the decoder, by the baseline rule, or as a bad header (a tick before the first
++    /// header taken, at least the ring behind the newest); a snapshot's tick then gets the sentinel.
 +    pub fn refused(&self) -> u64 {
 +        self.refused
 +    }
 +
-+    /// Snapshot groups too old for the frame ring, dropped.
++    /// Snapshot groups and full states of a tick at least the ring behind the newest, from the first header taken on
++    /// (a tick resolved when it left the ring), dropped.
 +    pub fn stale(&self) -> u64 {
 +        self.stale
 +    }
@@ -369,7 +391,11 @@ index e59d87d..cc67c02 100644
 +    }
 +
 +    /// `Pong`s whose ping id is not one of the client's own (it sends none at U4e), dropped.
-+    pub fn unknown_pongs(&self) -> u64 {
++    #[allow(
++        dead_code,
++        reason = "no consumer yet (advisor-u4e-r1 R2, A5): crate-private until a unit needs it public"
++    )]
++    pub(crate) fn unknown_pongs(&self) -> u64 {
 +        self.unknown_pongs
 +    }
 +
@@ -495,6 +521,39 @@ index e59d87d..cc67c02 100644
 +        })
 +    }
 +
++    /// Whether a header naming tick `t` is too old for the ring, so nothing is decoded from it (advisor-u4e-r1 R1). A
++    /// tick from the first header taken on was resolved when it left the ring: dropped and counted `stale` (case 2).
++    /// A tick before the first header taken was never sent to the client: a bad header (§4.6), the sentinel under the
++    /// tick it names (case 3), counted in `refused` when `count` (a decoder refusal is counted already).
++    fn old_header(&mut self, t: u32, count: bool) -> bool {
++        if !self.too_old(t) {
++            return false;
++        }
++        if self
++            .first
++            .is_some_and(|f| Wrap::default().after32("tick", t, f))
++        {
++            self.refused += u64::from(count);
++            self.bad_header(t);
++        } else {
++            self.stale += 1;
++        }
++        true
++    }
++
++    /// The sentinel for a bad header's tick `t` (case 3), once while `BAD_HEADERS_HELD` such ticks are remembered: no
++    /// frame and no ring slot (slot `t % 32` may hold a live tick), never acknowledged, the newest tick unmoved.
++    fn bad_header(&mut self, t: u32) {
++        if self.bad_headers.contains(&t) {
++            return;
++        }
++        if self.bad_headers.len() >= BAD_HEADERS_HELD {
++            self.bad_headers.pop_front();
++        }
++        self.bad_headers.push_back(t);
++        self.out.hashes.push((t, 0));
++    }
++
 +    /// The ring slot for `t`, reset for it if it held another tick.
 +    fn slot_for(&mut self, t: u32) -> usize {
 +        let i = (t % npt_sim::ACK_RING_TICKS) as usize;
@@ -516,6 +575,7 @@ index e59d87d..cc67c02 100644
 +        let w = Wrap::default();
 +        let Some(n) = self.newest else {
 +            self.newest = Some(t);
++            self.first = Some(t);
 +            self.low = t;
 +            return;
 +        };
@@ -544,11 +604,14 @@ index e59d87d..cc67c02 100644
 +        }
 +    }
 +
++    /// A run of `count` ticks resolved lost from `first`: merged into the last run when it continues it and the sum
++    /// fits a u32, else a new run (SEC-U4E-7: never an overflow, whatever the header ticks).
 +    fn lost(&mut self, first: u32, count: u32) {
 +        if let Some(last) = self.out.lost.last_mut()
 +            && last.0.wrapping_add(last.1) == first
++            && let Some(sum) = last.1.checked_add(count)
 +        {
-+            last.1 += count;
++            last.1 = sum;
 +            return;
 +        }
 +        self.out.lost.push((first, count));
@@ -556,8 +619,7 @@ index e59d87d..cc67c02 100644
 +
 +    /// The sentinel for tick `t` (a received group it could not decode: §4.6), once.
 +    fn sentinel(&mut self, t: u32) {
-+        if self.too_old(t) {
-+            self.stale += 1;
++        if self.old_header(t, false) {
 +            return;
 +        }
 +        self.see(t);
@@ -644,8 +706,7 @@ index e59d87d..cc67c02 100644
 +    /// tick complete once every group has; a group it cannot decode gives the tick the sentinel.
 +    fn group(&mut self, s: Snapshot, bytes: &[u8]) {
 +        let t = s.tick;
-+        if self.too_old(t) {
-+            self.stale += 1;
++        if self.old_header(t, true) {
 +            return;
 +        }
 +        self.see(t);
@@ -738,8 +799,7 @@ index e59d87d..cc67c02 100644
 +    /// A full state: the client's whole view at its tick, a complete frame, acknowledged as group 0 of that tick.
 +    fn full_state(&mut self, f: FullState) {
 +        let t = f.tick;
-+        if self.too_old(t) {
-+            self.stale += 1;
++        if self.old_header(t, true) {
 +            return;
 +        }
 +        self.see(t);
@@ -908,7 +968,7 @@ index c6f2373..f66dce9 100644
 +    "catalogue-5/owner-to-all",
 +];
 diff --git a/spikes/netcode-proof/crates/server/src/lib.rs b/spikes/netcode-proof/crates/server/src/lib.rs
-index b394380..1e0d231 100644
+index b394380..eef3695 100644
 --- a/spikes/netcode-proof/crates/server/src/lib.rs
 +++ b/spikes/netcode-proof/crates/server/src/lib.rs
 @@ -4,11 +4,14 @@
@@ -925,23 +985,24 @@ index b394380..1e0d231 100644
 +mod pump;
 +mod schedule;
  
-+pub use pump::{ConnLimits, Counters, Decoder};
++pub use pump::{ConnLimits, Counters, Decoder, RttSource};
  #[cfg(feature = "bites")]
  pub use schedule::BITES;
  pub use schedule::{Dropped, Due, LoopCounters, Schedule, due_ticks};
 diff --git a/spikes/netcode-proof/crates/client/tests/endpoint.rs b/spikes/netcode-proof/crates/client/tests/endpoint.rs
 new file mode 100644
-index 0000000..60b5b21
+index 0000000..137d655
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/client/tests/endpoint.rs
-@@ -0,0 +1,314 @@
+@@ -0,0 +1,443 @@
 +//! U4e's endpoint tests (u4-build-plan.md §5 U4e; u4e-brief.md 2.3, 2.4): crafted room messages fed to a real
 +//! `ClientEndpoint`, each encoded with npt-proto as the room sends it, and what the endpoint files read back.
 +
 +use npt_client::{ClientEndpoint, StepOut};
 +use npt_link::Channel;
 +use npt_proto::{
-+    EntityDelta, FullState, Join, JoinAccepted, Limits, Message, Snapshot, client_hash, encode,
++    Direction, EntityDelta, FullState, Join, JoinAccepted, Limits, Message, Snapshot, client_hash,
++    decode, encode,
 +};
 +use npt_sim::{Command, EntityKind, EntityRecord, SimEvent};
 +
@@ -1084,6 +1145,105 @@ index 0000000..60b5b21
 +        out.lost
 +    );
 +    assert!(!out.hashes.iter().any(|h| h.0 == 101));
++}
++
++/// The acknowledgements (tick, group mask) in the datagrams one step sent.
++fn acks(out: &StepOut) -> Vec<(u16, u8)> {
++    out.datagrams
++        .iter()
++        .filter_map(
++            |d| match decode(Direction::ClientToRoom, Channel::Datagram, d) {
++                Ok(Message::Input(i)) => Some((i.ack_tick, i.ack_groups)),
++                _ => None,
++            },
++        )
++        .collect()
++}
++
++/// TE-4 (advisor-u4e-r1 R6; plan :716-717's "each group decoding alone"): group 1 of a split tick arrives and group 0
++/// never does. Group 1 decodes alone against the baseline and is acknowledged (the mask without bit 0), nothing is
++/// filed for the tick, and it is resolved lost once it has left the frame ring, never the sentinel.
++#[test]
++fn e3_a_split_tick_without_group_0_acknowledges_its_other_group_and_is_resolved_lost() {
++    let mut e = joined(endpoint(), 100);
++    let out = feed(&mut e, vec![datagram(moved(101, 1, 1, 2, 150))]);
++    assert!(out.hashes.is_empty(), "one group of two: nothing filed");
++    assert_eq!(acks(&out), [(101, 0b10)], "group 1 acknowledged alone");
++    assert_eq!(e.refused(), 0);
++    let fresh = Snapshot {
++        tick: 101 + npt_sim::ACK_RING_TICKS,
++        entities: vec![EntityDelta::Add(soldier(1, 100))],
++        ..Snapshot::default()
++    };
++    let out = feed(&mut e, vec![datagram(fresh)]);
++    assert!(
++        out.lost.iter().any(|&(a, n)| a <= 101 && 101 < a + n),
++        "{:?}",
++        out.lost
++    );
++    assert!(
++        !out.hashes.iter().any(|h| h.0 == 101),
++        "lost, never the sentinel"
++    );
++}
++
++/// TE-7 (carry 61 (b): "two different hashes for one tick give the sentinel"): one group received again with other
++/// bytes, and a tick completed by its full state and then sent again as a snapshot of other content: each files the
++/// sentinel after the tick's first hash.
++#[test]
++fn carry_61_b_a_second_different_hash_for_one_tick_gives_the_sentinel() {
++    let mut e = joined(endpoint(), 100);
++    let out = feed(&mut e, vec![datagram(moved(101, 1, 0, 1, 150))]);
++    assert_eq!(
++        out.hashes,
++        [(101, hash_of(101, &[soldier(1, 150), soldier(2, 200)]))]
++    );
++    let out = feed(&mut e, vec![datagram(moved(101, 1, 0, 1, 151))]);
++    assert_eq!(out.hashes, [(101, 0)], "the same group with other bytes");
++    let full = bytes(&Message::FullState(FullState {
++        tick: 102,
++        last_run: None,
++        own: vec![soldier(0, 0)],
++        entities: vec![soldier(1, 100)],
++    }));
++    let out = feed(&mut e, vec![(Channel::FullState, full, 0)]);
++    assert_eq!(out.hashes, [(102, hash_of(102, &[soldier(1, 100)]))]);
++    let other = Snapshot {
++        tick: 102,
++        entities: vec![EntityDelta::Add(soldier(1, 300))],
++        ..Snapshot::default()
++    };
++    let out = feed(&mut e, vec![datagram(other)]);
++    assert_eq!(out.hashes, [(102, 0)], "tick 102 again, with another hash");
++}
++
++/// SEC-U4E-7 (advisor-u4e-r1 R5): four incomplete groups 2^31 - 1 ticks apart in one input (a hostile server's) never
++/// overflow a lost run's count: a sum past `u32::MAX` starts a new run, and the runs, each continuing the one before,
++/// cover every tick resolved (from 101, the tick after the full state, to the last header's ring cutoff).
++#[test]
++fn sec_u4e_7_lost_runs_2_pow_31_apart_never_overflow_and_cover_the_ticks() {
++    let mut e = joined(endpoint(), 100);
++    let apart = (1u32 << 31) - 1;
++    let groups = (0..4u32)
++        .map(|k| {
++            datagram(Snapshot {
++                tick: 101u32.wrapping_add(k.wrapping_mul(apart)),
++                groups: 2,
++                ..Snapshot::default()
++            })
++        })
++        .collect();
++    let out = feed(&mut e, groups);
++    let runs = &out.lost;
++    println!("SEC-U4E-7: lost runs {runs:?}");
++    assert!(runs.len() >= 2, "{runs:?}");
++    assert_eq!(runs.first().map(|r| r.0), Some(101));
++    for w in runs.windows(2) {
++        assert_eq!(w[0].0.wrapping_add(w[0].1), w[1].0, "{runs:?}");
++    }
++    let covered: u64 = runs.iter().map(|r| u64::from(r.1)).sum();
++    let want = 3 * u64::from(apart) - u64::from(npt_sim::ACK_RING_TICKS - 1);
++    assert_eq!(covered, want);
 +}
 +
 +/// Carry 61: tick t + 1's snapshot fed before tick t's (as L1's reorder step delivers them) files t under t with its
@@ -1243,6 +1403,35 @@ index 0000000..60b5b21
 +        assert_ne!(got, want);
 +    }
 +
++    /// TE-3 (advisor-u4e-r1 R6; §5 U4e's "client-rounding (the client's call site)", carry 24's first clause): one
++    /// decoded snapshot fed to a clean endpoint and to one built with PM-0001-17/client-rounding: the clean one files
++    /// the mirror's hash, the bitten one another hash.
++    #[test]
++    fn pm_0001_17_client_rounding_at_the_endpoints_call_site_files_another_hash() {
++        let entities: Vec<EntityRecord> = (1..=16u16)
++            .map(|i| soldier(i, i32::from(i) * 37 + 11))
++            .collect();
++        let snap = Snapshot {
++            tick: 101,
++            entities: entities.iter().map(|r| EntityDelta::Add(*r)).collect(),
++            ..Snapshot::default()
++        };
++        let mirror = client_hash(101, &entities, &[], &[]);
++        let filed = |e: ClientEndpoint| {
++            let mut e = joined(e, 100);
++            feed(&mut e, vec![datagram(snap.clone())]).hashes
++        };
++        assert_eq!(filed(endpoint()), [(101, mirror)]);
++        let got = filed(bitten("PM-0001-17/client-rounding"));
++        println!(
++            "client-rounding at the endpoint: the mirror's {mirror}, the bitten endpoint's {got:?}"
++        );
++        assert!(
++            got.len() == 1 && got[0].0 == 101 && got[0].1 != mirror && got[0].1 != 0,
++            "{got:?}"
++        );
++    }
++
 +    #[test]
 +    fn the_endpoint_takes_npt_protos_ids_through_quant_and_no_other() {
 +        assert!(endpoint().with_bite("PM-0001-17/tick16").is_some());
@@ -1251,10 +1440,10 @@ index 0000000..60b5b21
 +}
 diff --git a/spikes/netcode-proof/crates/room/src/ack.rs b/spikes/netcode-proof/crates/room/src/ack.rs
 new file mode 100644
-index 0000000..b93e400
+index 0000000..e10b18b
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/room/src/ack.rs
-@@ -0,0 +1,292 @@
+@@ -0,0 +1,299 @@
 +//! The AckRing (u4-build-plan.md §4.5; plan §4.7): per client, every snapshot sent in the last
 +//! `npt_sim::ACK_RING_TICKS` ticks with what its groups acknowledged, and the client's view after each, the baseline a
 +//! later snapshot is coded against.
@@ -1301,6 +1490,13 @@ index 0000000..b93e400
 +        self.valid && self.groups > 0 && self.acked == self.full_mask()
 +    }
 +}
++
++// The group masks (`Sent::acked`, an acknowledgement's, `full_mask`) are a u8: they rely on at most 8 groups a tick
++// (RR-3; the wire's 3-bit group).
++const _: () = assert!(
++    npt_proto::Limits::GROUPS <= 8,
++    "a u8 group mask holds at most 8 groups"
++);
 +
 +/// What an acknowledgement named (the room's check "the acknowledgement names a sent snapshot": catalogue :87).
 +#[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -2633,10 +2829,10 @@ index 0000000..9a561d6
 +}
 diff --git a/spikes/netcode-proof/crates/room/src/room.rs b/spikes/netcode-proof/crates/room/src/room.rs
 new file mode 100644
-index 0000000..3075ceb
+index 0000000..83118b2
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/room/src/room.rs
-@@ -0,0 +1,1413 @@
+@@ -0,0 +1,1471 @@
 +//! `Room<S: SimCore>` (u4-build-plan.md §4.1, §4.2; plan.md:596-598): the sim driven through the seam alone, its hit
 +//! history, the roster, and per client its [`ClientSlot`]. Each tick it fills one `TickInput` (the commands in the
 +//! canonical order, each with its Rewind, and the tick's scripted spawns, teleports and attribute changes), steps,
@@ -2744,6 +2940,9 @@ index 0000000..3075ceb
 +    pub resyncs: u64,
 +    /// A second `Resync` before the full state's acknowledgement: dropped (catalogue :90).
 +    pub resyncs_dropped: u64,
++    /// A `Resync` whose answer would come sooner than `npt_sim::FULL_STATE_ACK_TICKS` ticks after the last full state
++    /// sent the client: dropped (SEC-U4E-4: an acknowledgement, the client's own claim, never gates one by itself).
++    pub resyncs_limited: u64,
 +    /// `Kick(overflow)`s sent: the client was dropped (§4.7).
 +    pub kicked: u64,
 +    /// Commands accepted into the input buffer.
@@ -2806,11 +3005,14 @@ index 0000000..3075ceb
 +    full_state_due: Option<bool>,
 +    /// The full state sent and not yet acknowledged: its tick, and whether an overflow forced it.
 +    in_flight: Option<(u32, bool)>,
++    /// The tick of the last full state sent (the join's, a forced one or an answered one): the `Resync` limit's.
++    last_full_state: Option<u32>,
 +    kicked: bool,
 +    server_bytes: u32,
 +    max_datagram: usize,
 +    datagrams: Vec<Vec<u8>>,
-+    control: Vec<Message>,
++    /// The reliable messages, each encoded once with the room's `Quant` (plan.md:508-509).
++    control: Vec<Vec<u8>>,
 +    counters: ClientCounters,
 +    last_ack_hi: Option<u16>,
 +    pending_wraps: Vec<&'static str>,
@@ -2899,7 +3101,11 @@ index 0000000..3075ceb
 +    }
 +
 +    /// The changed entities the last tick's snapshot held at the baseline's value.
-+    pub fn skipped(&self) -> u32 {
++    #[allow(
++        dead_code,
++        reason = "no consumer yet (advisor-u4e-r1 R2, A5): crate-private until a unit needs it public"
++    )]
++    pub(crate) fn skipped(&self) -> u32 {
 +        self.t.skipped
 +    }
 +
@@ -2945,10 +3151,19 @@ index 0000000..3075ceb
 +    }
 +
 +    fn kick(&mut self, roster: &mut Roster) {
-+        self.control.push(Message::Kick(Kick::Overflow));
++        self.send_control(&Message::Kick(Kick::Overflow));
 +        self.kicked = true;
 +        self.counters.kicked += 1;
 +        roster.leave(self.slot);
++    }
++
++    /// Queues `msg` for the control outbox, encoded here, once, with the room's `Quant` (plan.md:508-509: "Encoding
++    /// stays on the tick"; the advisor-u4e-r1 R2, A1).
++    fn send_control(&mut self, msg: &Message) {
++        let mut out = Vec::new();
++        if self.encoder.quant.encode(msg, &mut out).is_ok() {
++            self.control.push(out);
++        }
 +    }
 +}
 +
@@ -3030,6 +3245,10 @@ index 0000000..3075ceb
 +    #[cfg(feature = "bites")]
 +    bite: Option<RoomBite>,
 +    input: TickInput,
++    /// The next tick's scripted spawns, teleports and attribute changes, until `fill_input` moves them into `input`.
++    scripted_spawns: Vec<Placement>,
++    scripted_teleports: Vec<Placement>,
++    scripted_attributes: Vec<AttributeChange>,
 +    stamped: Vec<(u32, u32, SimEvent)>,
 +    reports: InputReports,
 +    index: Index,
@@ -3082,6 +3301,9 @@ index 0000000..3075ceb
 +            #[cfg(feature = "bites")]
 +            bite: None,
 +            input: TickInput::default(),
++            scripted_spawns: Vec::new(),
++            scripted_teleports: Vec::new(),
++            scripted_attributes: Vec::new(),
 +            stamped: Vec::new(),
 +            reports: InputReports::default(),
 +            index: Index::default(),
@@ -3187,7 +3409,8 @@ index 0000000..3075ceb
 +        self.next_tick.wrapping_sub(1)
 +    }
 +
-+    /// The last tick's `TickInput` (what a recording holds: the commands in the canonical order with their Rewinds).
++    /// The last tick's `TickInput`, whole (what a recording holds: the commands in the canonical order with their
++    /// Rewinds, and the tick's scripted spawns, teleports and attribute changes).
 +    pub fn tick_input(&self) -> &TickInput {
 +        &self.input
 +    }
@@ -3212,9 +3435,11 @@ index 0000000..3075ceb
 +            .unwrap_or_default()
 +    }
 +
-+    /// The reliable messages for `slot` (`JoinAccepted`, `FullState`, `Kick`), each for the channel its row in
-+    /// `Limits::TYPES` names.
-+    pub fn take_control(&mut self, slot: u8) -> Vec<Message> {
++    /// The reliable messages for `slot` (`JoinAccepted`, `FullState`, `Kick`), each encoded once, when the room queued
++    /// it, with the room's `Quant` (plan.md:508-509: "Encoding stays on the tick"). The caller sends each on the
++    /// channel its type byte's row of `Limits::TYPES` names (npt-proto's rule; the type byte follows the stream's
++    /// length prefix).
++    pub fn take_control(&mut self, slot: u8) -> Vec<Vec<u8>> {
 +        self.clients
 +            .get_mut(usize::from(slot))
 +            .and_then(Option::as_mut)
@@ -3222,19 +3447,20 @@ index 0000000..3075ceb
 +            .unwrap_or_default()
 +    }
 +
-+    /// The tick's scripted spawns, teleports and attribute changes (integers only: seam.rs), for the next step.
++    /// The next tick's scripted spawns, teleports and attribute changes (integers only: seam.rs): they wait here and
++    /// go into that tick's `TickInput` (so [`Room::tick_input`] after the tick holds them).
 +    pub fn script(
 +        &mut self,
 +        spawns: &[Placement],
 +        teleports: &[Placement],
 +        attributes: &[AttributeChange],
 +    ) {
-+        self.input.spawns.clear();
-+        self.input.spawns.extend_from_slice(spawns);
-+        self.input.teleports.clear();
-+        self.input.teleports.extend_from_slice(teleports);
-+        self.input.attributes.clear();
-+        self.input.attributes.extend_from_slice(attributes);
++        self.scripted_spawns.clear();
++        self.scripted_spawns.extend_from_slice(spawns);
++        self.scripted_teleports.clear();
++        self.scripted_teleports.extend_from_slice(teleports);
++        self.scripted_attributes.clear();
++        self.scripted_attributes.extend_from_slice(attributes);
 +    }
 +
 +    /// A `Join` the pump passed (its version and content hash already checked there): the roster's checks, then a
@@ -3264,6 +3490,7 @@ index 0000000..3075ceb
 +            priority: Priority::default(),
 +            full_state_due: Some(false),
 +            in_flight: None,
++            last_full_state: None,
 +            kicked: false,
 +            server_bytes: 0,
 +            max_datagram: Limits::SNAPSHOT,
@@ -3279,7 +3506,7 @@ index 0000000..3075ceb
 +            nearest: Vec::new(),
 +            cosmetic: Vec::new(),
 +        };
-+        c.control.push(Message::JoinAccepted(JoinAccepted {
++        c.send_control(&Message::JoinAccepted(JoinAccepted {
 +            slot: a.slot,
 +            team: c.team,
 +            squad: 0,
@@ -3322,6 +3549,7 @@ index 0000000..3075ceb
 +        match msg {
 +            Message::Input(input) => self.receive_input(slot, input),
 +            Message::Resync(_) => {
++                let next = self.next_tick;
 +                if let Some(c) = self
 +                    .clients
 +                    .get_mut(usize::from(slot))
@@ -3330,6 +3558,13 @@ index 0000000..3075ceb
 +                {
 +                    if c.in_flight.is_some() || c.full_state_due.is_some() {
 +                        c.counters.resyncs_dropped += 1;
++                    } else if c
++                        .last_full_state
++                        .is_some_and(|f| next.wrapping_sub(f) < npt_sim::FULL_STATE_ACK_TICKS)
++                    {
++                        // SEC-U4E-4's room half (advisor-u4e-r1 R3): the answer, at the next tick, would come sooner
++                        // than FULL_STATE_ACK_TICKS ticks after the last full state: at most one in that span.
++                        c.counters.resyncs_limited += 1;
 +                    } else {
 +                        c.full_state_due = Some(false);
 +                        c.counters.resyncs += 1;
@@ -3416,9 +3651,6 @@ index 0000000..3075ceb
 +            self.stamped.push((self.next_event, t, *e));
 +            self.next_event = self.next_event.wrapping_add(1);
 +        }
-+        self.input.spawns.clear();
-+        self.input.teleports.clear();
-+        self.input.attributes.clear();
 +        self.history.push(self.sim.hit_volumes());
 +        self.flood.update(&self.sim.portal_states().open);
 +        self.reports.clone_from(self.sim.reports());
@@ -3429,10 +3661,16 @@ index 0000000..3075ceb
 +        self.next_tick = t.wrapping_add(1);
 +    }
 +
-+    /// The tick's `TickInput`: per joined client the command option B runs (its slot the session's), with its Rewind
-+    /// when it holds or presses fire, in the canonical order.
++    /// The tick's `TickInput`: the script waiting for it, and per joined client the command option B runs (its slot
++    /// the session's), with its Rewind when it holds or presses fire, in the canonical order.
 +    fn fill_input(&mut self, t: u32) {
 +        self.input.tick = t;
++        self.input.spawns.clear();
++        self.input.spawns.append(&mut self.scripted_spawns);
++        self.input.teleports.clear();
++        self.input.teleports.append(&mut self.scripted_teleports);
++        self.input.attributes.clear();
++        self.input.attributes.append(&mut self.scripted_attributes);
 +        self.input.commands.clear();
 +        let fire = Command::FIRE;
 +        for c in self.clients.iter_mut().flatten() {
@@ -3711,18 +3949,20 @@ index 0000000..3075ceb
 +        entities: frame.entities.clone(),
 +    };
 +    let msg = Message::FullState(fs);
-+    let mut probe = Vec::new();
-+    if let Err(e) = c.encoder.quant.encode(&msg, &mut probe) {
++    // Encoded once, here, with the room's `Quant`: the bytes the client gets (A1), and a refusal counted (carry 54).
++    let mut bytes = Vec::new();
++    if let Err(e) = c.encoder.quant.encode(&msg, &mut bytes) {
 +        count_refusal(&mut c.counters, e);
 +        return;
 +    }
 +    c.full_state_due = None;
 +    c.in_flight = Some((t, forced));
++    c.last_full_state = Some(t);
 +    c.queue.clear();
 +    c.counters.full_states += 1;
 +    c.t.server_hash = Some(client_hash(t, &frame.entities, &frame.own, &[]));
 +    c.ack.record(t, 1, frame, Vec::new());
-+    c.control.push(msg);
++    c.control.push(bytes);
 +}
 +
 +fn count_refusal(counters: &mut ClientCounters, e: EncodeError) {
@@ -3803,11 +4043,22 @@ index 0000000..3075ceb
 +    // Gameplay events, oldest first, resent until acknowledged.
 +    let (mut sent, mut resent) = (0, 0);
 +    for q in c.queue.iter_mut() {
++        // Carry 50 (RR-2): `route_events` dropped every event older than 255 ticks this tick, so the age fits the
++        // wire's 8 bits; one that does not is never coded.
++        let event_age = u8::try_from(t.wrapping_sub(q.tick));
++        debug_assert!(
++            event_age.is_ok(),
++            "an event older than 255 ticks reached the encoder (carry 50)"
++        );
++        let Ok(event_age) = event_age else {
++            continue;
++        };
 +        let Some(g) = p.place(event_bits(&q.event), Section::Events) else {
 +            break;
 +        };
-+        let age = t.wrapping_sub(q.tick) as u8;
-+        p.groups[g].events.push((q.number as u16, age, q.event));
++        p.groups[g]
++            .events
++            .push((q.number as u16, event_age, q.event));
 +        p.groups[g].numbers.push(q.number);
 +        p.groups[g].gameplay.push(q.number);
 +        q.sent += 1;
@@ -4016,6 +4267,7 @@ index 0000000..3075ceb
 +        let rec = npt_sim::replay::Recording::synthetic(&scene, 7, 900, 100, 2_000);
 +        let mut next = start;
 +        let mut stamps: Vec<(u32, u32)> = Vec::new();
++        let mut checked = 0u32;
 +        for _ in 0..60 {
 +            let t = room.last_tick().wrapping_add(1);
 +            for input in rec.ticks.iter().filter(|i| i.tick == t) {
@@ -4041,6 +4293,7 @@ index 0000000..3075ceb
 +            if let Some(c) = room.clients[0].as_mut() {
 +                for q in c.queue.iter_mut() {
 +                    assert!(stamps.contains(&(q.number, q.tick)), "{q:?}");
++                    checked += 1;
 +                }
 +            }
 +        }
@@ -4048,14 +4301,15 @@ index 0000000..3075ceb
 +            next > u32::from(u16::MAX) + 1,
 +            "the numbers crossed the 16-bit wrap: {next}"
 +        );
++        assert!(checked > 0, "the queue half checked a queued event (RR-10)");
 +    }
 +}
 diff --git a/spikes/netcode-proof/crates/room/src/roster.rs b/spikes/netcode-proof/crates/room/src/roster.rs
 new file mode 100644
-index 0000000..fbcd89a
+index 0000000..197c1d9
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/room/src/roster.rs
-@@ -0,0 +1,187 @@
+@@ -0,0 +1,188 @@
 +//! The roster (catalogue §2, `Join`'s row and its notes on `bind`; plan §10.3): per slot its test token, the bind value
 +//! it took at its first accepted `Join`, and whether a session holds it. The caller passes the tokens in (the lab at
 +//! U4r; minting is U6's).
@@ -4114,7 +4368,7 @@ index 0000000..fbcd89a
 +impl Roster {
 +    /// A roster of one slot per token, slot `i` holding `tokens[i]`, admitting at most `n` sessions at once. At most 256
 +    /// slots are kept (a slot is a `u8`).
-+    pub fn new(mut tokens: Vec<[u8; 16]>, n: usize) -> Roster {
++    pub(crate) fn new(mut tokens: Vec<[u8; 16]>, n: usize) -> Roster {
 +        tokens.truncate(usize::from(u8::MAX) + 1);
 +        Roster {
 +            slots: tokens
@@ -4140,7 +4394,8 @@ index 0000000..fbcd89a
 +    }
 +
 +    /// Whether `slot`'s token is bound to a client's bind value (at its first accepted `Join`).
-+    pub fn is_bound(&self, slot: u8) -> bool {
++    #[cfg_attr(not(test), allow(dead_code))]
++    pub(crate) fn is_bound(&self, slot: u8) -> bool {
 +        self.slots
 +            .get(usize::from(slot))
 +            .is_some_and(|s| s.bind.is_some())
@@ -4370,10 +4625,10 @@ index 0000000..3b5898f
 +}
 diff --git a/spikes/netcode-proof/crates/room/tests/room.rs b/spikes/netcode-proof/crates/room/tests/room.rs
 new file mode 100644
-index 0000000..da62ecb
+index 0000000..2161be2
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/room/tests/room.rs
-@@ -0,0 +1,1153 @@
+@@ -0,0 +1,1452 @@
 +//! U4e's room tests (u4-build-plan.md §5 U4e; u4e-brief.md 2.4): `Room<World>` driven through its own API by fake
 +//! clients that acknowledge what they are sent (each tick's snapshot decoded with npt-proto, as a client would), with
 +//! npt-sim's synthetic recording's commands. The Loopback tests with the real client endpoint are npt-server's.
@@ -4387,7 +4642,7 @@ index 0000000..da62ecb
 +use npt_sim::replay::Recording;
 +use npt_sim::{
 +    Command, CoverVariant, EntityKind, EntityRecord, HitHistory, HitVolumes, InputReports,
-+    PortalStates, Scene, SimCore, SimEvent, TickInput, World,
++    Placement, PortalStates, Scene, SimCore, SimEvent, TickInput, World,
 +};
 +
 +fn token(slot: u8) -> [u8; 16] {
@@ -4466,6 +4721,17 @@ index 0000000..da62ecb
 +    }
 +}
 +
++/// A reliable message the room encoded, decoded on the stream its type travels on (the control stream or the
++/// full-state stream, each read from a row of `Limits::TYPES`: npt-room's tests name no npt-link type); `decode`
++/// refuses it on the other (its length prefix and its type byte's row disagree).
++fn control_of(bytes: &[u8]) -> Message {
++    ["JoinAccepted", "FullState"]
++        .iter()
++        .filter_map(|name| Limits::TYPES.iter().find(|r| r.0 == *name))
++        .find_map(|r| npt_proto::decode(Direction::RoomToClient, r.1, bytes).ok())
++        .unwrap_or_else(|| panic!("a control message no stream decodes: {bytes:?}"))
++}
++
 +fn collect<S: SimCore>(room: &mut Room<S>, slot: u8) -> Out {
 +    let mut out = Out {
 +        tick: room.last_tick(),
@@ -4475,7 +4741,8 @@ index 0000000..da62ecb
 +        out.snapshots.push(snapshot_of(&d));
 +        out.bytes.push(d);
 +    }
-+    for m in room.take_control(slot) {
++    for b in room.take_control(slot) {
++        let m = control_of(&b);
 +        if let Message::FullState(f) = &m {
 +            out.full = Some(f.clone());
 +        }
@@ -4720,13 +4987,15 @@ index 0000000..da62ecb
 +    assert_eq!(held_again, 1);
 +}
 +
-+/// e9: a second `Resync` before the full state's acknowledgement is dropped and counted (catalogue :90).
++/// e9: a second `Resync` before the full state's acknowledgement is dropped and counted (catalogue :90); once it is
++/// acknowledged, a new one is limited until `npt_sim::FULL_STATE_ACK_TICKS` ticks after that full state, then taken
++/// (SEC-U4E-4). The first `Resync`s come that many ticks after the join's full state.
 +#[test]
 +fn e9_a_second_resync_before_the_full_states_ack_is_dropped_and_counted() {
 +    let scene = Scene::course();
 +    let mut room = world_room(&scene, 1, 100, 1);
 +    let mut ack = Ack::default();
-+    for _ in 0..3 {
++    for _ in 0..npt_sim::FULL_STATE_ACK_TICKS {
 +        room.receive(0, &Message::Input(ack.input(Vec::new())));
 +        room.tick();
 +        ack.take(&collect(&mut room, 0));
@@ -4748,11 +5017,246 @@ index 0000000..da62ecb
 +    ack.take(&out);
 +    room.receive(0, &Message::Input(ack.input(Vec::new())));
 +    room.receive(0, &Message::Resync(Resync));
++    let counts = |room: &Room<World>| {
++        let k = c(room);
++        (k.resyncs, k.resyncs_dropped, k.resyncs_limited)
++    };
 +    assert_eq!(
-+        (c(&room).resyncs, c(&room).resyncs_dropped),
-+        (2, 2),
-+        "acknowledged: a new one is taken"
++        counts(&room),
++        (1, 2, 1),
++        "acknowledged, but sooner than the window after that full state: limited"
 +    );
++    let f = out.tick;
++    while room.last_tick().wrapping_add(1).wrapping_sub(f) < npt_sim::FULL_STATE_ACK_TICKS {
++        room.tick();
++        ack.take(&collect(&mut room, 0));
++        room.receive(0, &Message::Input(ack.input(Vec::new())));
++    }
++    room.receive(0, &Message::Resync(Resync));
++    assert_eq!(
++        counts(&room),
++        (2, 2, 1),
++        "acknowledged and the window past: a new one is taken"
++    );
++}
++
++/// SEC-U4E-4's room half (advisor-u4e-r1 R3; the test seat's Q-6): a client that acknowledges each full state and asks
++/// again gets no `Resync` answered sooner than `npt_sim::FULL_STATE_ACK_TICKS` ticks after the last full state it was
++/// sent (here its join's): each such `Resync` is dropped and counted `resyncs_limited`; the first whose answer falls
++/// that many ticks after it is answered.
++#[test]
++fn sec_u4e_4_a_resync_sooner_than_full_state_ack_ticks_after_the_last_full_state_is_limited() {
++    let scene = Scene::stress();
++    let mut room = world_room(&scene, 1, 100, 1);
++    let mut ack = Ack::default();
++    room.tick();
++    let out = collect(&mut room, 0);
++    assert!(out.full.is_some(), "the join's full state");
++    let joined_at = out.tick;
++    ack.take(&out);
++    room.receive(0, &Message::Input(ack.input(Vec::new())));
++    let counters = |room: &Room<World>| {
++        room.client(0)
++            .map(|c| c.counters().clone())
++            .unwrap_or_default()
++    };
++    let window = npt_sim::FULL_STATE_ACK_TICKS;
++    let (mut asked, mut answered) = (0, 0);
++    while room.last_tick().wrapping_add(1).wrapping_sub(joined_at) < window {
++        room.receive(0, &Message::Resync(Resync));
++        asked += 1;
++        room.tick();
++        let out = collect(&mut room, 0);
++        answered += u64::from(out.full.is_some());
++        ack.take(&out);
++        room.receive(0, &Message::Input(ack.input(Vec::new())));
++    }
++    let k = counters(&room);
++    println!(
++        "SEC-U4E-4: {asked} Resyncs within {window} ticks of the join's full state, {answered} answered; resyncs {}, \
++         limited {}, dropped {}, full states {}",
++        k.resyncs, k.resyncs_limited, k.resyncs_dropped, k.full_states
++    );
++    assert!(asked >= 30, "{asked}");
++    assert_eq!(
++        (
++            answered,
++            k.resyncs,
++            k.resyncs_limited,
++            k.resyncs_dropped,
++            k.full_states
++        ),
++        (0, 0, asked, 0, 1)
++    );
++    room.receive(0, &Message::Resync(Resync));
++    room.tick();
++    let out = collect(&mut room, 0);
++    assert_eq!(out.tick.wrapping_sub(joined_at), window);
++    assert!(out.full.is_some(), "answered at the window's end");
++    let k = counters(&room);
++    assert_eq!((k.resyncs, k.resyncs_limited, k.full_states), (1, asked, 2));
++}
++
++/// A4 (advisor-u4e-r1 R2): `tick_input()` after `tick()` is that tick's whole input ("what a recording holds"): a
++/// teleport scripted for the next tick is in it, and the tick after, with nothing scripted, holds none.
++#[test]
++fn a4_tick_input_after_a_tick_is_that_ticks_whole_input() {
++    let scene = Scene::course();
++    let mut room = world_room(&scene, 1, 100, 1);
++    room.tick();
++    let teleport = Placement {
++        slot: 0,
++        position: [100, 200, 0],
++    };
++    room.script(&[], &[teleport], &[]);
++    room.tick();
++    assert_eq!(room.tick_input().tick, room.last_tick());
++    assert_eq!(room.tick_input().teleports, [teleport]);
++    room.tick();
++    assert!(room.tick_input().teleports.is_empty(), "nothing scripted");
++}
++
++/// A `SimCore` over `World` that keeps the cover of every Rewind it is handed (A5's `with_cover` test).
++struct Covers {
++    world: World,
++    seen: Vec<CoverVariant>,
++}
++
++impl SimCore for Covers {
++    fn step(&mut self, input: &TickInput, history: &HitHistory) -> &[SimEvent] {
++        self.seen.extend(
++            input
++                .commands
++                .iter()
++                .filter_map(|(_, r)| r.map(|r| r.cover)),
++        );
++        self.world.step(input, history)
++    }
++    fn state_hash(&self) -> u64 {
++        self.world.state_hash()
++    }
++    fn entity_records(&self) -> &[EntityRecord] {
++        self.world.entity_records()
++    }
++    fn hit_volumes(&self) -> &HitVolumes {
++        self.world.hit_volumes()
++    }
++    fn portal_states(&self) -> &PortalStates {
++        self.world.portal_states()
++    }
++    fn reports(&self) -> &InputReports {
++        self.world.reports()
++    }
++}
++
++/// A5 (advisor-u4e-r1 R2; u4-build-plan.md §4.9's two cover variants, §4.11's rule): a room built
++/// `with_cover(CoverVariant::Present)` hands the sim each Rewind with `cover` Present; a room left at its default,
++/// Rewound.
++#[test]
++fn a5_a_room_with_cover_present_hands_the_sim_each_rewind_with_cover_present() {
++    let scene = Scene::course();
++    let covers = |prep: fn(Room<Covers>) -> Room<Covers>| {
++        let sim = Covers {
++            world: World::new(&scene, 1, 100),
++            seen: Vec::new(),
++        };
++        let mut room = room_with(sim, &scene, 1, prep);
++        for _ in 0..5 {
++            room.tick();
++        }
++        for seq in 1..=3u16 {
++            let next = room.last_tick() + 1;
++            let fire = Command {
++                tick: next,
++                seq,
++                buttons: Command::FIRE,
++                view_tick: next - 1,
++                ..Command::default()
++            };
++            room.receive(
++                0,
++                &Message::Input(Input {
++                    commands: vec![fire],
++                    ..Input::default()
++                }),
++            );
++            room.tick();
++        }
++        room.sim().seen.clone()
++    };
++    let present = covers(|r| r.with_cover(CoverVariant::Present));
++    assert!(
++        present.len() >= 3 && present.iter().all(|c| *c == CoverVariant::Present),
++        "{present:?}"
++    );
++    let default = covers(|r| r);
++    assert!(
++        !default.is_empty() && default.iter().all(|c| *c == CoverVariant::Rewound),
++        "{default:?}"
++    );
++}
++
++/// TE-8 with RR-2 (advisor-u4e-r1 R5; carry 50, brief e12's "an event at age 255 is still sent, none at 256", for
++/// what the room sends): a client that acknowledges its join's full state and nothing after keeps its gameplay events
++/// queued and resent; the first is carried at age 255 and by no snapshot from age 256 on, when the room drops it from
++/// the resend and counts it expired.
++#[test]
++fn carry_50_the_room_sends_an_event_at_age_255_and_none_at_256() {
++    let scene = Scene::stress();
++    let (seed, first) = (4, 400);
++    let script = recorded(&scene, seed, first, 320);
++    let mut room = room_with(World::new(&scene, seed, first), &scene, 8, |r| {
++        r.with_event_cap(1 << 16)
++    });
++    let mut oldest: Option<(u16, u32)> = None;
++    let mut ages: Vec<u32> = Vec::new();
++    let mut last = 0;
++    drive(
++        &mut room,
++        8,
++        300,
++        |s, next| s != 0 || next == first + 1,
++        |s, t| script.get(&(s, t)).copied(),
++        |_, s, out| {
++            if s != 0 {
++                return;
++            }
++            last = out.tick;
++            for snap in &out.snapshots {
++                for &(n, age, e) in &snap.events {
++                    if !matches!(e, SimEvent::Hit { .. } | SimEvent::Kill { .. }) {
++                        continue;
++                    }
++                    let at = out.tick.wrapping_sub(u32::from(age));
++                    if oldest.is_none() {
++                        oldest = Some((n, at));
++                    }
++                    if oldest == Some((n, at)) {
++                        ages.push(u32::from(age));
++                    }
++                }
++            }
++        },
++    );
++    let (n, at) = oldest.expect("a gameplay event for slot 0");
++    let k = room
++        .client(0)
++        .map(|c| c.counters().clone())
++        .unwrap_or_default();
++    println!(
++        "carry 50: event {n} of tick {at} carried {} times, at ages {:?} to {:?}; last tick {last}; events expired {}, \
++         overflow resyncs {}",
++        ages.len(),
++        ages.first(),
++        ages.last(),
++        k.events_expired,
++        k.overflow_resyncs
++    );
++    assert!(last >= at + 260, "the run reaches past age 256: {last}");
++    assert_eq!(k.overflow_resyncs, 0, "no resync cleared the queue");
++    assert!(ages.contains(&255), "carried at age 255: {ages:?}");
++    assert_eq!(ages.iter().max(), Some(&255), "none at 256 or older");
++    assert!(k.events_expired >= 1);
 +}
 +
 +/// e9: an acknowledgement naming a tick never sent refuses its datagram's commands (§4.14 :471).
@@ -5207,15 +5711,16 @@ index 0000000..da62ecb
 +
 +/// Carry 57, first part (and -22's clean half): a never-acking client overflows its queue: one resync, counted with
 +/// its tick; its headroom falls to 0 and never below; the cap is the room's data, its provisional mark exposed.
-+/// Then a second overflow before the full state's acknowledgement sends `Kick(overflow)` and drops the client.
++/// Then a second overflow before the full state's acknowledgement sends `Kick(overflow)` and drops the client. Returns
++/// the overflow resyncs' ticks, the lowest headroom, and the tick of the first `Kick(overflow)`.
 +fn never_acker(
 +    room: &mut Room<World>,
 +    script: &BTreeMap<(u8, u32), Command>,
 +    ticks: u32,
-+) -> (Vec<u32>, i64, bool) {
++) -> (Vec<u32>, i64, Option<u32>) {
 +    let mut resyncs = Vec::new();
 +    let mut min_headroom = i64::MAX;
-+    let mut kicked = false;
++    let mut kicked = None;
 +    drive(
 +        room,
 +        8,
@@ -5232,10 +5737,14 @@ index 0000000..da62ecb
 +                }
 +                min_headroom = min_headroom.min(c.headroom());
 +            }
-+            kicked |= out
-+                .control
-+                .iter()
-+                .any(|m| matches!(m, Message::Kick(npt_proto::Kick::Overflow)));
++            if kicked.is_none()
++                && out
++                    .control
++                    .iter()
++                    .any(|m| matches!(m, Message::Kick(npt_proto::Kick::Overflow)))
++            {
++                kicked = Some(out.tick);
++            }
 +        },
 +    );
 +    (resyncs, min_headroom, kicked)
@@ -5262,7 +5771,15 @@ index 0000000..da62ecb
 +        min_headroom, 0,
 +        "the headroom reaches 0 and never goes below"
 +    );
-+    assert!(kicked && c.kicked() && c.counters().kicked == 1);
++    // TE-6 (advisor-u4e-r1 R6): the second overflow kicks, before the full state's timeout would (its first tick past
++    // the window), so the timeout cannot stand in for this edge.
++    let timeout = resyncs[0] + npt_sim::FULL_STATE_ACK_TICKS + 1;
++    println!(
++        "carry 57: first overflow resync at {}, Kick(overflow) at {kicked:?}, the timeout's tick {timeout}",
++        resyncs[0]
++    );
++    assert!(kicked.is_some_and(|k| k < timeout), "{kicked:?}");
++    assert!(c.kicked() && c.counters().kicked == 1);
 +    assert!(!room.roster().is_live(0), "the client is dropped");
 +    assert!(
 +        room.client(1).is_some_and(|c| !c.kicked()),
@@ -5414,7 +5931,7 @@ index 0000000..da62ecb
 +}
 +
 +/// PM-0001-22/unbounded's clean half and its headroom (U4E-Q12 (c)): the never-acker's headroom never goes below 0.
-+fn unbounded_case(mut room: Room<World>, scene: &Scene) -> (Vec<u32>, i64, bool) {
++fn unbounded_case(mut room: Room<World>, scene: &Scene) -> (Vec<u32>, i64, Option<u32>) {
 +    let script = recorded(scene, 4, 400, 400);
 +    never_acker(&mut room, &script, 150)
 +}
@@ -5483,7 +6000,44 @@ index 0000000..da62ecb
 +        });
 +        let (resyncs, min_headroom, kicked) = unbounded_case(room, &scene);
 +        assert!(min_headroom < 0, "headroom below 0: {min_headroom}");
-+        assert!(resyncs.is_empty() && !kicked, "no resync and no kick");
++        assert!(
++            resyncs.is_empty() && kicked.is_none(),
++            "no resync and no kick"
++        );
++    }
++
++    /// A1 (advisor-u4e-r1 R2; plan.md:508-509, "Encoding stays on the tick"): `take_control` hands out the full state
++    /// the room encoded with its own `Quant`. Under PM-0001-57/pos-4cm (npt-proto's, forwarded by `Room::with_bite`)
++    /// its bytes are that `Quant`'s encoding of the message they decode to, and differ from the clean twin room's,
++    /// which are `npt_proto::encode`'s (a re-encoding of the decoded bitten message with `npt_proto::encode` would equal
++    /// them: -57 coarsens the integers before packing, and coarse integers pack unchanged).
++    #[test]
++    fn a1_take_control_hands_out_the_full_state_encoded_with_the_rooms_quant() {
++        let id = "PM-0001-57/pos-4cm";
++        let scene = Scene::stress();
++        let full = |prep: &dyn Fn(Room<World>) -> Room<World>| {
++            let mut room = room_with(warmed(&scene, 1, 200, 30), &scene, 1, prep);
++            room.tick();
++            room.take_control(0)
++                .into_iter()
++                .find(|b| matches!(control_of(b), Message::FullState(_)))
++                .expect("the join's full state")
++        };
++        let bitten = full(&|r| r.with_bite(id).expect("npt-proto plants it"));
++        let clean = full(&|r| r);
++        let mut again = Vec::new();
++        npt_proto::Quant::with_bite(id)
++            .expect("npt-proto plants it")
++            .encode(&control_of(&bitten), &mut again)
++            .expect("it encodes");
++        assert_eq!(again, bitten, "the room's Quant's encoding");
++        let mut wire = Vec::new();
++        npt_proto::encode(&control_of(&clean), &mut wire).expect("it encodes");
++        assert_eq!(
++            wire, clean,
++            "the clean room's bytes are npt_proto::encode's"
++        );
++        assert_ne!(bitten, clean, "the bite reached the full state");
 +    }
 +
 +    #[test]
@@ -5529,10 +6083,10 @@ index 0000000..da62ecb
 +}
 diff --git a/spikes/netcode-proof/crates/server/src/pump.rs b/spikes/netcode-proof/crates/server/src/pump.rs
 new file mode 100644
-index 0000000..9cb3e5a
+index 0000000..f558d7a
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/server/src/pump.rs
-@@ -0,0 +1,430 @@
+@@ -0,0 +1,474 @@
 +//! The I/O step (u4-build-plan.md §4.1, §4.4 A26, §4.5, §4.9; catalogue §1 and §2): [`Decoder::pump`] decodes every
 +//! inbound message of one session through npt-proto's `Quant::decode` with the `Quant` it was given, counts each
 +//! refusal by kind, applies the size and channel checks at the socket ([`DecodeError`]'s socket kinds), the Input
@@ -5633,7 +6187,11 @@ index 0000000..9cb3e5a
 +    }
 +
 +    /// When a connection with no `Join` is closed, ns.
-+    pub fn join_deadline_ns(&self) -> u64 {
++    #[allow(
++        dead_code,
++        reason = "no consumer yet (advisor-u4e-r1 R2, A5): crate-private until a unit needs it public"
++    )]
++    pub(crate) fn join_deadline_ns(&self) -> u64 {
 +        self.deadline_ns
 +    }
 +}
@@ -5669,9 +6227,12 @@ index 0000000..9cb3e5a
 +    pub ping_limited: u64,
 +    /// `Pong`s naming no outstanding ping of this session: dropped.
 +    pub pong_unknown: u64,
-+    /// Sessions closed as malformed because their first stream message was not a `Join` (never INVALID: the run
-+    /// verdict is the judge's).
++    /// Sessions closed as malformed because their first stream message was not a `Join` (a decodable other type, or
++    /// a known type on the wrong channel or from the wrong direction: catalogue :93), never INVALID (the run verdict
++    /// is the judge's).
 +    pub first_not_join: u64,
++    /// Stream messages received while the session's `Join` waited for the room's answer: dropped (SEC-U4E-3).
++    pub joining_dropped: u64,
 +    /// Sessions closed as malformed for a stream message that failed its framing, size or type checks.
 +    pub stream_malformed: u64,
 +    /// Sessions closed for no `Join` within 2 s of the accept.
@@ -5705,6 +6266,18 @@ index 0000000..9cb3e5a
 +    }
 +}
 +
++/// Where a session's RTT comes from (u4-build-plan.md §4.9 :352-354): by the session's kind, which the pump's caller
++/// learns from the listener that accepted it.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum RttSource {
++    /// A `wt` or L1 session: the link's smoothed estimate (`Link::rtt_ns`), `None` until it has one; never the room's
++    /// ping samples.
++    Link,
++    /// A `ws` session: the lowest of the last 8 samples of the room's own pings, each less the client's hold time up
++    /// to one tick period; never the link's estimate.
++    Pings,
++}
++
 +/// Where a session is in its life.
 +#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 +enum State {
@@ -5723,6 +6296,7 @@ index 0000000..9cb3e5a
 +    counters: Counters,
 +    version: u16,
 +    content_hash: [u8; 32],
++    rtt: RttSource,
 +    state: State,
 +    next_ping_ns: u64,
 +    ping_id: u8,
@@ -5734,13 +6308,15 @@ index 0000000..9cb3e5a
 +impl Decoder {
 +    /// The decoder of a session accepted at `accept_ns`, decoding with `quant` (the wire's, `Quant::default()`; in a
 +    /// bites build one of npt-proto's planted defects through `Quant::with_bite`), at `tick_hz` ticks a second
-+    /// (production callers pass `npt_sim::TICK_HZ`), taking `Join`s of protocol `version` and `content_hash` only.
++    /// (production callers pass `npt_sim::TICK_HZ`), taking `Join`s of protocol `version` and `content_hash` only, its
++    /// RTT from `rtt` (the session's kind).
 +    pub fn new(
 +        quant: Quant,
 +        tick_hz: u32,
 +        accept_ns: u64,
 +        version: u16,
 +        content_hash: [u8; 32],
++        rtt: RttSource,
 +    ) -> Decoder {
 +        Decoder {
 +            quant,
@@ -5748,6 +6324,7 @@ index 0000000..9cb3e5a
 +            counters: Counters::default(),
 +            version,
 +            content_hash,
++            rtt,
 +            state: State::AwaitJoin,
 +            next_ping_ns: accept_ns,
 +            ping_id: 0,
@@ -5763,7 +6340,11 @@ index 0000000..9cb3e5a
 +    }
 +
 +    /// The session's limits.
-+    pub fn limits(&self) -> &ConnLimits {
++    #[allow(
++        dead_code,
++        reason = "no consumer yet (advisor-u4e-r1 R2, A5): crate-private until a unit needs it public"
++    )]
++    pub(crate) fn limits(&self) -> &ConnLimits {
 +        &self.limits
 +    }
 +
@@ -5773,7 +6354,11 @@ index 0000000..9cb3e5a
 +    }
 +
 +    /// Whether the room accepted the session's `Join`.
-+    pub fn is_joined(&self) -> bool {
++    #[allow(
++        dead_code,
++        reason = "no consumer yet (advisor-u4e-r1 R2, A5): crate-private until a unit needs it public"
++    )]
++    pub(crate) fn is_joined(&self) -> bool {
 +        self.state == State::Joined
 +    }
 +
@@ -5796,11 +6381,14 @@ index 0000000..9cb3e5a
 +        core::mem::take(&mut self.sent_bytes)
 +    }
 +
-+    /// The session's RTT (u4-build-plan.md §4.9 :352-353): the link's smoothed estimate for an L1 or `wt` session
-+    /// (Loopback's is 0), else the lowest recent sample of the room's own pings, each less the client's hold time up
-+    /// to one tick period.
++    /// The session's RTT (u4-build-plan.md §4.9 :352-354), from its [`RttSource`]: for an L1 or `wt` session the link's
++    /// smoothed estimate (Loopback's is 0), for a `ws` session the lowest recent sample of the room's own pings, each
++    /// less the client's hold time up to one tick period. One session never mixes the two.
 +    pub fn rtt_ns(&self, link: &dyn Link) -> Option<u64> {
-+        link.rtt_ns().or_else(|| self.samples.iter().copied().min())
++        match self.rtt {
++            RttSource::Link => link.rtt_ns(),
++            RttSource::Pings => self.samples.iter().copied().min(),
++        }
 +    }
 +
 +    fn send_control(&mut self, link: &mut dyn Link, msg: &Message, now_ns: u64) {
@@ -5871,12 +6459,19 @@ index 0000000..9cb3e5a
 +                Ok(m) => m,
 +                Err(e) => {
 +                    self.counters.refused(e);
-+                    // A forged kind of a known type within its limits is refused and counted, never kicked
-+                    // (u4-build-plan.md §4.10); any other bad stream message closes the session.
++                    // A forged kind of a known type within its limits is refused and counted, never kicked, on a
++                    // joined session (u4-build-plan.md §4.10); any other bad stream message closes the session.
 +                    if stream
 +                        && !matches!(e, DecodeError::WrongChannel | DecodeError::WrongDirection)
 +                    {
 +                        self.counters.stream_malformed += 1;
++                        self.close_malformed(link, now_ns);
++                        return;
++                    }
++                    // Before the `Join`, a forged kind first on the stream is "any other type first on the stream"
++                    // (catalogue :93; advisor-u4e-r1 R5, SEC-U4E-1): the session closes as malformed.
++                    if stream && self.state == State::AwaitJoin {
++                        self.counters.first_not_join += 1;
 +                        self.close_malformed(link, now_ns);
 +                        return;
 +                    }
@@ -5921,9 +6516,11 @@ index 0000000..9cb3e5a
 +                        self.counters.ping_limited += 1;
 +                    }
 +                }
-+                (State::Joined, Message::Pong(p)) => self.pong(&p, now_ns),
++                (State::Joined, Message::Pong(p)) => self.pong(&p, r.arrival_ns),
 +                (State::Joined, m) => out.push((m, r.arrival_ns)),
-+                _ => {}
++                // Only a stream message other than `Join` in the Joining state is left (a closed session returns
++                // before the loop, and every close returns): dropped and counted (SEC-U4E-3).
++                _ => self.counters.joining_dropped += 1,
 +            }
 +        }
 +    }
@@ -5943,9 +6540,10 @@ index 0000000..9cb3e5a
 +        false
 +    }
 +
-+    /// A `Pong` of one of the room's outstanding pings: one RTT sample, the hold time subtracted up to one tick
-+    /// period (catalogue :92); any other id is dropped and counted.
-+    fn pong(&mut self, p: &Pong, now_ns: u64) {
++    /// A `Pong` of one of the room's outstanding pings, arrived at `arrival_ns`: one RTT sample, from its arrival (not
++    /// the pump's later run: NC-M3), the hold time subtracted up to one tick period (catalogue :92); any other id is
++    /// dropped and counted.
++    fn pong(&mut self, p: &Pong, arrival_ns: u64) {
 +        let Some(at) = self
 +            .outstanding
 +            .iter()
@@ -5956,7 +6554,7 @@ index 0000000..9cb3e5a
 +        };
 +        self.outstanding.remove(at);
 +        let hold = (u64::from(p.hold_us) * 1_000).min(self.limits.hold_cap_ns());
-+        let sample = now_ns.saturating_sub(p.echo_ns).saturating_sub(hold);
++        let sample = arrival_ns.saturating_sub(p.echo_ns).saturating_sub(hold);
 +        self.samples.push_back(sample);
 +        if self.samples.len() > SAMPLES {
 +            self.samples.pop_front();
@@ -5965,10 +6563,10 @@ index 0000000..9cb3e5a
 +}
 diff --git a/spikes/netcode-proof/crates/server/tests/common/mod.rs b/spikes/netcode-proof/crates/server/tests/common/mod.rs
 new file mode 100644
-index 0000000..59820ca
+index 0000000..5bfda1b
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/server/tests/common/mod.rs
-@@ -0,0 +1,378 @@
+@@ -0,0 +1,403 @@
 +//! The Loopback lab for U4e's tests (u4-build-plan.md §5 Lanes: in npt-server's own tests, through its npt-link and its
 +//! dev dependency on npt-client; never in crates/lab): a `Room<World>` behind one `Decoder` per session, each session a
 +//! Loopback pair to a real `ClientEndpoint`, on an injected clock. The server ticks at U4b's schedule
@@ -5984,7 +6582,7 @@ index 0000000..59820ca
 +use npt_link::{Channel, Link, LinkState, Loopback, Recv, SendResult};
 +use npt_proto::{Join, Limits, Message, Quant};
 +use npt_room::Room;
-+use npt_server::Decoder;
++use npt_server::{Decoder, RttSource};
 +use npt_sim::replay::Recording;
 +use npt_sim::{Command, Scene, World};
 +
@@ -6010,6 +6608,22 @@ index 0000000..59820ca
 +        version: VERSION,
 +        content_hash: CONTENT,
 +    }
++}
++
++/// The stream a reliable message the room encoded travels on: its type byte's row of `Limits::TYPES` (npt-proto's rule,
++/// limits.rs:55), the type byte read after the stream's length prefix (2 B on the control stream, 4 B on the
++/// full-state stream: the catalogue's §1).
++pub fn stream_of(bytes: &[u8]) -> Channel {
++    [(Channel::Control, 2), (Channel::FullState, 4)]
++        .into_iter()
++        .find(|&(channel, at)| {
++            bytes
++                .get(at)
++                .and_then(|&t| usize::from(t).checked_sub(1))
++                .and_then(|i| Limits::TYPES.get(i))
++                .is_some_and(|r| r.1 == channel)
++        })
++        .map_or(Channel::Control, |(channel, _)| channel)
 +}
 +
 +/// A window of ns in which a [`Gate`] drops every datagram it is asked to send.
@@ -6158,7 +6772,14 @@ index 0000000..59820ca
 +                        window: window.clone(),
 +                        dropped: Rc::default(),
 +                    },
-+                    decoder: Decoder::new(Quant::default(), hz, base_ns, VERSION, CONTENT),
++                    decoder: Decoder::new(
++                        Quant::default(),
++                        hz,
++                        base_ns,
++                        VERSION,
++                        CONTENT,
++                        RttSource::Link,
++                    ),
 +                    endpoint,
 +                    slot: None,
 +                    offset_ns: offsets.get(i).copied().unwrap_or(1_000_000),
@@ -6188,7 +6809,14 @@ index 0000000..59820ca
 +
 +    /// The same lab with session `i`'s pump decoding with `quant`.
 +    pub fn with_decoder(mut self, i: usize, quant: Quant) -> Lab {
-+        self.conns[i].decoder = Decoder::new(quant, self.hz, self.base_ns, VERSION, CONTENT);
++        self.conns[i].decoder = Decoder::new(
++            quant,
++            self.hz,
++            self.base_ns,
++            VERSION,
++            CONTENT,
++            RttSource::Link,
++        );
 +        self
 +    }
 +
@@ -6242,14 +6870,9 @@ index 0000000..59820ca
 +                }
 +                conn.server.send_unreliable(&d, now);
 +            }
-+            for m in self.room.take_control(slot) {
-+                let channel = Limits::TYPES
-+                    .iter()
-+                    .find(|r| r.0 == m.name())
-+                    .map_or(Channel::Control, |r| r.1);
-+                let mut out = Vec::new();
-+                npt_proto::encode(&m, &mut out).expect("the room's control messages encode");
-+                conn.server.send_reliable(channel, &out, now);
++            // The room encoded each once (A1); the lab sends the bytes as they are, on their type's stream.
++            for b in self.room.take_control(slot) {
++                conn.server.send_reliable(stream_of(&b), &b, now);
 +            }
 +            if let Some(h) = self.room.client(slot).and_then(|c| c.server_hash()) {
 +                self.server.insert((slot, t), h);
@@ -6618,10 +7241,10 @@ index 0000000..d5eecb4
 +}
 diff --git a/spikes/netcode-proof/crates/server/tests/loopback.rs b/spikes/netcode-proof/crates/server/tests/loopback.rs
 new file mode 100644
-index 0000000..ef6267a
+index 0000000..e0ab2fd
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/server/tests/loopback.rs
-@@ -0,0 +1,292 @@
+@@ -0,0 +1,372 @@
 +//! U4e's Loopback tests (u4-build-plan.md §5 U4e): the room, the pump and the real client endpoint end to end on an
 +//! injected clock, in npt-server's own tests (the advisor's condition 10 (b)).
 +
@@ -6822,6 +7445,44 @@ index 0000000..ef6267a
 +    );
 +}
 +
++/// TE-2 (advisor-u4e-r1 R6; e6's binding case, §4.5 :300-302): on one tick, the same room state with the pump's report
++/// raised by `P` bytes sends at most the remainder (the per-tick budget less every pump byte), while its twin with
++/// nothing added sends more than that remainder: the remainder, not the whole budget, bounds what the encoder packs.
++#[test]
++fn e6_the_pumps_bytes_shrink_the_snapshot_to_the_remainder() {
++    const P: u32 = 600;
++    let scene = Scene::stress();
++    let run = |p: u32| {
++        let script = recorded(&scene, 3, 300, 40);
++        let offsets: Vec<u64> = (0..48u64).map(|s| 1_000_000 + s * 500_000).collect();
++        let mut lab = Lab::new(room(&scene, 3, 300, 48), endpoints(48), &offsets, script);
++        lab.run(20, |_| {});
++        lab.room.pump_report(0, p, common::MAX_DATAGRAM);
++        let mut at = (0, 0, 0, 0);
++        lab.run(1, |lab| {
++            if let Some(c) = lab.room.client(0) {
++                let (budget, left) = c.budget();
++                at = (budget, left, c.bytes(), c.groups());
++            }
++        });
++        (at, lab.compare())
++    };
++    let ((budget, left, bytes, groups), (compared, bad)) = run(P);
++    let ((twin_budget, _, twin_bytes, _), _) = run(0);
++    println!(
++        "e6 (binding): budget {budget} B, remainder {left} B after {P} B more of the pump's; sent {bytes} B in \
++         {groups} groups; the twin with none added sent {twin_bytes} B; {compared} pairs compared, {bad} bad"
++    );
++    assert_eq!(budget, twin_budget, "the same tick of the window");
++    assert!(left + P <= budget, "the remainder counts the added bytes");
++    assert!(groups >= 1 && bytes <= left, "{bytes} B sent of {left}");
++    assert!(twin_bytes > left, "the twin's snapshot would not fit it");
++    assert_eq!(bad, 0, "the shrunk snapshot decodes to the mirror's hash");
++}
++
++/// The first tick `tick16_lab`'s room runs.
++const TICK16_FIRST: u32 = 65_520;
++
 +/// -17/tick16 and -58/tick16's unit proof through the room's encoder and the endpoint (U4E-Q4 (a); §4.14 :459): over
 +/// Loopback with the room's tick past 65,535, the client files tick 65,537 under itself with the mirror's hash.
 +fn tick16_case(lab: &mut Lab) -> (Option<u64>, Option<u64>) {
@@ -6832,8 +7493,8 @@ index 0000000..ef6267a
 +
 +fn tick16_lab(bite: Option<&str>) -> Lab {
 +    let scene = Scene::stress();
-+    let script = recorded(&scene, 1, 65_520, 40);
-+    let mut r = room(&scene, 1, 65_520, 2);
++    let script = recorded(&scene, 1, TICK16_FIRST, 40);
++    let mut r = room(&scene, 1, TICK16_FIRST, 2);
 +    let mut e = endpoints(2);
 +    #[cfg(feature = "bites")]
 +    if let Some(id) = bite {
@@ -6847,13 +7508,30 @@ index 0000000..ef6267a
 +    Lab::new(r, e, &[3_000_000; 2], script)
 +}
 +
++/// The clean half (advisor-u4e-r1 R1, what the judge counts): every pair compared equal (at least 30), tick 65,537's
++/// pair among them, and no client hash outside the ticks the room ran (65,520 on).
 +#[test]
 +fn pm_0001_17_and_58_tick16_the_client_files_tick_65_537_under_itself() {
-+    let (server, client) = tick16_case(&mut tick16_lab(None));
++    let mut lab = tick16_lab(None);
++    let (server, client) = tick16_case(&mut lab);
++    let (compared, bad) = lab.compare();
++    let below: Vec<(u8, u32)> = lab
++        .client
++        .keys()
++        .filter(|k| k.1 < TICK16_FIRST)
++        .copied()
++        .collect();
++    println!(
++        "tick16 clean: the server's hash at 65,537 {server:?}, the client's {client:?}; {compared} pairs compared, \
++         {bad} bad; client keys below 65,520 {below:?}; client 0 stale {}",
++        lab.conns[0].endpoint.stale()
++    );
 +    assert!(
 +        server.is_some() && server == client,
 +        "{server:?} {client:?}"
 +    );
++    assert!(compared >= 30 && bad == 0, "{compared} compared, {bad} bad");
++    assert!(below.is_empty(), "{below:?}");
 +}
 +
 +/// The bites that need every crate's list (bites builds only, under `--workspace --all-features`: npt-server's
@@ -6862,15 +7540,40 @@ index 0000000..ef6267a
 +mod bites {
 +    use super::*;
 +
++    /// Part (i) (advisor-u4e-r1 R1: what the judge counts): under either bite the header names the tick's low 16 bits,
++    /// so after 65,535 the client reads 0, 1, 2 ..., ticks before its first header and at least the ring behind its
++    /// newest: bad headers, each filed as the sentinel under the tick it names, a client hash the server never logged
++    /// (an orphan). The figure fails (a bad pair), slot 0 holds an orphan below 65,520, and nothing is filed at or
++    /// past 65,536.
 +    #[test]
-+    fn pm_0001_17_and_58_tick16_post_wrap_frames_have_no_equal_client_hash() {
++    fn pm_0001_17_and_58_tick16_post_wrap_frames_are_filed_as_orphan_sentinels() {
 +        for id in ["PM-0001-17/tick16", "PM-0001-58/tick16"] {
 +            let mut lab = tick16_lab(Some(id));
 +            let (server, client) = tick16_case(&mut lab);
++            let (compared, bad) = lab.compare();
++            let slot0: Vec<(u32, u64)> = lab
++                .client
++                .iter()
++                .filter(|(k, _)| k.0 == 0)
++                .map(|(k, h)| (k.1, *h))
++                .collect();
++            let orphans: Vec<u32> = slot0
++                .iter()
++                .filter(|(t, _)| *t < TICK16_FIRST && !lab.server.contains_key(&(0, *t)))
++                .map(|(t, _)| *t)
++                .collect();
++            let post: Vec<u32> = slot0
++                .iter()
++                .filter(|(t, _)| *t >= 65_536)
++                .map(|(t, _)| *t)
++                .collect();
 +            println!(
-+                "{id}: the server's hash at 65,537 {server:?}, the client's {client:?}; client 0 dropped {} stale",
++                "{id}: the server's hash at 65,537 {server:?}, the client's {client:?}; {compared} pairs compared, \
++                 {bad} bad; client 0's orphans {orphans:?}; at or past 65,536 {post:?}; client 0 stale {}",
 +                lab.conns[0].endpoint.stale()
 +            );
++            assert!(bad >= 1, "{id}: the figure fails");
++            assert!(!orphans.is_empty() && post.is_empty(), "{id}");
 +            assert!(server.is_some() && server != client, "{id}");
 +        }
 +    }
@@ -6916,10 +7619,10 @@ index 0000000..ef6267a
 +}
 diff --git a/spikes/netcode-proof/crates/server/tests/pump.rs b/spikes/netcode-proof/crates/server/tests/pump.rs
 new file mode 100644
-index 0000000..295ad2b
+index 0000000..d0804ea
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/server/tests/pump.rs
-@@ -0,0 +1,340 @@
+@@ -0,0 +1,486 @@
 +//! U4e's pump tests (u4-build-plan.md §5 U4e; u4e-brief.md 2.2, e9, e10): `Decoder::pump` over a Loopback session on a
 +//! fake clock, every time in ns; the room joins where a test needs its half of the `Join` checks.
 +
@@ -6928,9 +7631,10 @@ index 0000000..295ad2b
 +use common::{CONTENT, VERSION, bind, join, token};
 +use npt_link::{Channel, Link, LinkState, Loopback, Recv, SendResult};
 +use npt_proto::{
-+    Direction, Input, Join, JoinRejected, Kick, Message, Ping, Pong, Quant, Resync, decode, encode,
++    Direction, Input, Join, JoinRejected, Kick, Limits, Message, Ping, Pong, Quant, Resync, decode,
++    encode,
 +};
-+use npt_server::{ConnLimits, Decoder};
++use npt_server::{ConnLimits, Decoder, RttSource};
 +use npt_sim::{Scene, World};
 +
 +fn bytes(m: &Message) -> Vec<u8> {
@@ -6939,8 +7643,9 @@ index 0000000..295ad2b
 +    out
 +}
 +
++/// A `wt` or L1 session's decoder (its RTT the link's), accepted at 0 at 30 Hz.
 +fn decoder(quant: Quant) -> Decoder {
-+    Decoder::new(quant, 30, 0, VERSION, CONTENT)
++    Decoder::new(quant, 30, 0, VERSION, CONTENT, RttSource::Link)
 +}
 +
 +/// Everything the client end has received by `now`, decoded.
@@ -7173,14 +7878,14 @@ index 0000000..295ad2b
 +
 +/// e10 and 2.2: the `Pong`'s hold time counts up to one tick period (pinned at 30 and 60 Hz), the pump sends a few
 +/// pings a second and counts their bytes, a `Pong` naming no outstanding ping is dropped and counted (plan silent:
-+/// built and tested here), and the RTT is the link's, else the lowest ping sample.
++/// built and tested here), and a `ws` session's RTT is the lowest ping sample; a `wt` or L1 session's is the link's.
 +#[test]
 +fn e10_the_hold_time_counts_one_tick_period_and_unknown_pongs_are_dropped() {
 +    assert_eq!(ConnLimits::new(30, 0).hold_cap_ns(), 33_333_333);
 +    assert_eq!(ConnLimits::new(60, 0).hold_cap_ns(), 16_666_666);
 +    let (s, mut c) = Loopback::pair(1_200);
 +    let mut s = NoRtt(s);
-+    let mut d = decoder(Quant::default());
++    let mut d = Decoder::new(Quant::default(), 30, 0, VERSION, CONTENT, RttSource::Pings);
 +    c.send_reliable(Channel::Control, &bytes(&Message::Join(join(0))), 0);
 +    let mut out = Vec::new();
 +    d.pump(&mut s, 0, 0, &mut out);
@@ -7208,10 +7913,154 @@ index 0000000..295ad2b
 +    assert_eq!(d.rtt_ns(&s), Some(100_000_000 - 33_333_333));
 +    let (s2, _c2) = Loopback::pair(1_200);
 +    assert_eq!(
-+        d.rtt_ns(&s2),
++        decoder(Quant::default()).rtt_ns(&s2),
 +        Some(0),
 +        "Loopback's own RTT for an L1 or wt session"
 +    );
++}
++
++/// One RTT sample on a session of kind `rtt` over `s` (its client end `c`): joined at 0, the room's ping sent at
++/// 1,000 ns, the client's `Pong` (hold 0) sent at 1,000 ns + 100 ms, the pump run `wait_ns` after it arrived.
++fn one_sample<L: Link>(mut s: L, c: &mut Loopback, rtt: RttSource, wait_ns: u64) -> (Decoder, L) {
++    let mut d = Decoder::new(Quant::default(), 30, 0, VERSION, CONTENT, rtt);
++    c.send_reliable(Channel::Control, &bytes(&Message::Join(join(0))), 0);
++    let mut out = Vec::new();
++    d.pump(&mut s, 0, 0, &mut out);
++    d.accept();
++    d.pump(&mut s, 1_000, 7, &mut out);
++    let Some(Message::Ping(p)) = received(c, 1_000).pop() else {
++        panic!("a ping");
++    };
++    let at = 1_000 + 100_000_000;
++    let pong = Pong {
++        id: p.id,
++        echo_ns: p.sent_ns,
++        tick: 0,
++        hold_us: 0,
++    };
++    c.send_unreliable(&bytes(&Message::Pong(pong)), at);
++    d.pump(&mut s, at + wait_ns, 7, &mut out);
++    assert_eq!(
++        (d.counters().pings_sent, d.counters().pong_unknown),
++        (1, 0),
++        "the Pong is the ping's: one sample"
++    );
++    (d, s)
++}
++
++/// NC-M3 (advisor-u4e-r1 R2): the RTT sample is taken at the `Pong`'s arrival, not when the pump runs: a `Pong` sent
++/// 100 ms after its ping (hold 0) and pumped 20 ms after it arrived gives 100 ms, not 120 ms.
++#[test]
++fn e10_the_rtt_sample_is_taken_at_the_pongs_arrival_not_at_the_pump() {
++    let (s, mut c) = Loopback::pair(1_200);
++    let (d, s) = one_sample(NoRtt(s), &mut c, RttSource::Pings, 20_000_000);
++    assert_eq!(d.rtt_ns(&s), Some(100_000_000));
++}
++
++/// A2 (advisor-u4e-r1 R2; u4-build-plan.md §4.9 :352-354): a `ws` session's RTT is its ping samples', never the
++/// link's, even over a link that answers one (Loopback's 0).
++#[test]
++fn a2_a_pings_session_takes_its_ping_sample_never_the_links_rtt() {
++    let (s, mut c) = Loopback::pair(1_200);
++    assert_eq!(s.rtt_ns(), Some(0), "the link answers");
++    let (d, s) = one_sample(s, &mut c, RttSource::Pings, 0);
++    assert_eq!(d.rtt_ns(&s), Some(100_000_000));
++}
++
++/// A2: a `wt` or L1 session's RTT is the link's, `None` while the link has none though a ping sample is held, never
++/// the sample.
++#[test]
++fn a2_a_link_session_takes_the_links_rtt_never_a_ping_sample() {
++    let (s, mut c) = Loopback::pair(1_200);
++    let (d, s) = one_sample(NoRtt(s), &mut c, RttSource::Link, 0);
++    assert_eq!(d.rtt_ns(&s), None);
++    let (s2, _c2) = Loopback::pair(1_200);
++    assert_eq!(d.rtt_ns(&s2), Some(0), "a link with an estimate: its own");
++}
++
++/// TE-5 (advisor-u4e-r1 R6; U4E-Q11 (a)'s size check): an `Input` datagram one byte over `Limits::INPUT` is refused
++/// and counted as too large; the room gets nothing and the session stays open.
++#[test]
++fn e9_an_input_one_byte_over_its_limit_is_counted_too_large() {
++    let (mut s, mut c, mut d) = joined(Quant::default());
++    let mut big = input();
++    big.resize(Limits::INPUT + 1, 0);
++    c.send_unreliable(&big, 1);
++    let mut out = Vec::new();
++    d.pump(&mut s, 1, 0, &mut out);
++    assert_eq!(
++        (d.counters().too_large, out.len(), d.is_closed()),
++        (1, 0, false)
++    );
++}
++
++/// TE-5: a control-stream message one byte over the stream's cap (the largest client-to-room control type's limit,
++/// its 2 B length included) is refused as too large and closes the session as malformed, with `Kick(malformed)`.
++#[test]
++fn e9_a_control_message_one_byte_over_the_streams_cap_is_too_large_and_closes_the_session() {
++    let cap = Limits::TYPES
++        .iter()
++        .filter(|r| r.1 == Channel::Control && r.2 != Direction::RoomToClient)
++        .map(|r| r.3)
++        .max()
++        .expect("client-to-room control types");
++    let (mut s, mut c, mut d) = joined(Quant::default());
++    let mut big = bytes(&Message::Join(join(0)));
++    big.resize(cap + 1, 0);
++    let length = u16::try_from(big.len() - 2).expect("a 2 B length");
++    big[..2].copy_from_slice(&length.to_le_bytes());
++    c.send_reliable(Channel::Control, &big, 1);
++    let mut out = Vec::new();
++    d.pump(&mut s, 1, 0, &mut out);
++    assert!(out.is_empty() && d.is_closed());
++    assert_eq!(
++        (d.counters().too_large, d.counters().stream_malformed),
++        (1, 1)
++    );
++    // The joined session's first pump sent its first ping before it read; the close's Kick comes last.
++    assert_eq!(
++        received(&mut c, 1).last(),
++        Some(&Message::Kick(Kick::Malformed))
++    );
++}
++
++/// SEC-U4E-1 (advisor-u4e-r1 R5; catalogue :93, "any other type first on the stream closes the session as
++/// malformed"): before the `Join`, a known type on the wrong channel first on the stream (an `Input` framed on the
++/// control stream) closes the session as malformed; the `Join` after it is never taken.
++#[test]
++fn sec_u4e_1_a_forged_kind_first_on_the_stream_closes_the_session() {
++    let (mut s, mut c) = Loopback::pair(1_200);
++    let mut d = decoder(Quant::default());
++    let body = input();
++    let mut framed = (body.len() as u16).to_le_bytes().to_vec();
++    framed.extend_from_slice(&body);
++    c.send_reliable(Channel::Control, &framed, 0);
++    c.send_reliable(Channel::Control, &bytes(&Message::Join(join(0))), 0);
++    let mut out = Vec::new();
++    d.pump(&mut s, 0, 0, &mut out);
++    assert!(out.is_empty() && d.is_closed());
++    assert_eq!(
++        (d.counters().first_not_join, d.counters().wrong_channel),
++        (1, 1)
++    );
++    assert_eq!(received(&mut c, 0), [Message::Kick(Kick::Malformed)]);
++}
++
++/// SEC-U4E-3 (advisor-u4e-r1 R5): a stream message while the session's `Join` waits for the room's answer is dropped
++/// and counted under its own name; the session stays open.
++#[test]
++fn sec_u4e_3_a_stream_message_while_joining_is_counted() {
++    let (mut s, mut c) = Loopback::pair(1_200);
++    let mut d = decoder(Quant::default());
++    c.send_reliable(Channel::Control, &bytes(&Message::Join(join(0))), 0);
++    let mut out = Vec::new();
++    d.pump(&mut s, 0, 0, &mut out);
++    assert!(matches!(out.as_slice(), [(Message::Join(_), 0)]));
++    out.clear();
++    c.send_reliable(Channel::Control, &bytes(&Message::Resync(Resync)), 1);
++    d.pump(&mut s, 1, 0, &mut out);
++    assert!(out.is_empty() && !d.is_closed());
++    assert_eq!(d.counters().joining_dropped, 1);
 +}
 +
 +/// The socket checks through the pump (A26; -21's two decode sites): an `Input` with a byte after its last field is
