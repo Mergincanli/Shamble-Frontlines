@@ -10,8 +10,9 @@ rests on them, it names the report's Appendix A item (`docs/reports/2026-11-12-f
 2. **MANUAL-MODE**: CLAUDE.md (the change-set protocol, step 3) says to make a `.claude/` edit "in Accept edits or Manual
    mode", but the cloud app offers Accept edits, Plan or Auto, with no Manual mode (the environment's documentation page
    on permissions, read 2026-11-12), and the session record called the mode he chose "default".
-3. **GIT-C**: `.claude/CHECKPOINTS.md` §10 tells a session to run `git -C <path> status`, which the guard refuses ("no
-   option before the subcommand"); sessions `cd` into the folder instead.
+3. **GIT-C**: `.claude/CHECKPOINTS.md` §10 (:221) tells a session to check `git -C <path> status --short --ignored`,
+   which the guard refuses ("no option before the subcommand", `routine-guard.mjs:1046`); sessions `cd` into the folder
+   instead.
 4. **ADVISOR-TOOL-WORDS**: CLAUDE.md takes his words of 2026-11-11 on the advisor tool at 2.3 (queued in DECISIONS.md).
 5. **MODELS-2026-11-12** (A9, item 3): CLAUDE.md's "Models and effort" section and the agent files change to match his
    words of 2026-11-12, 16:25, each edit asked of him in chat with its exact text (queued in DECISIONS.md).
@@ -21,16 +22,17 @@ rests on them, it names the report's Appendix A item (`docs/reports/2026-11-12-f
 7. **PIN-GUARD** (his answer, A1): the guard does not protect the new pins (`rust-toolchain.toml`, `Cargo.toml`,
    `Cargo.lock`, `package.json`, `package-lock.json`): `protectedRel` false, so routines may write them on a branch and
    day sessions get no ask.
-8. **G0** (the register row Q2.2-a): step 2.2's "deleting the toolchain file fails G0 with exit 2" is proven by 2.3's
-   G0 under `--prove` (PM-0002-39); until then the toolchain job fails closed (M2).
+8. **G0** (the register row Q2.2-a: the advisor agent's ruling, final; his go for the row: PR #48's merge): G0's
+   exit-2 mark moves to step 2.3, where 2.3's G0 is to prove "deleting the toolchain file fails G0 with exit 2" under
+   `--prove` (PM-0002-39); until then the toolchain job fails closed without the file (M2).
 9. **OVERFLOW-WASM** (S1's remainder): PM-0002-53 wants the overflow rule in four builds (dev and release, native and
    Wasm) with a committed counter test; 2.2's CI proves the native release build for `protocol` (M5; `sim` locally).
 10. **TSCONFIG** (S2): TypeScript is pinned but never type-checked: no `tsconfig`, CI prints `tsc --version` only. ADR
     0002 part 7 gives the shared strict base tsconfig and `tsc -b` to the lint step (G3). The stubs import `./index.ts`,
     a convention `tsc -b` would need `allowImportingTsExtensions` (with no emit) or `rewriteRelativeImportExtensions`
     for: 2.3 decides it.
-11. **REQUIRED-CHECK**: whether `toolchain` is a required check on main (step 7's infra-engineer answers); 2.3's
-    aggregate required check and its workflow replace `toolchain.yml`, as the file's header says.
+11. **REQUIRED-CHECK**: whether `toolchain` is a required check on main (step 7's infra-engineer answers); the file's
+    header says 2.3 replaces it, and ADR 0002 gives 2.3 one aggregate required check (:642, PM-0002-57).
 12. **SETUP-NODE-CACHE** (S4): setup-node v7.0.0 runs with `package-manager-cache: true` (the job log); what it caches
     if a `packageManager` field is added to the unprotected root `package.json` is unverified (step 7's
     security-auditor).
@@ -40,6 +42,10 @@ rests on them, it names the report's Appendix A item (`docs/reports/2026-11-12-f
     2.3, merged before 2027-03-31 (Node 22's end of life is 2027-04-30); the toolkit's `package.json` and lockfile are
     gate files, so it asks him.
 
+15. From consultation 4 (`findings-2-3-c4.md`, merged into the archive): **CRATE-NAMES**, **CI-ENFORCED-LATER**,
+    **WASM-ARTIFACT**, **TWO-PLAYWRIGHTS**, **TOOLKIT-RESOLVES-UP** (also a Risk), **CARGO-NET-OFFLINE**,
+    **CRATE-LICENCE**: their text is in `findings-2-3-c4.md` and the archive's "From foundation 2.2".
+
 ## Follow-ups for later steps
 - **OVERFLOW-PER-CRATE** (S3): the release overflow setting is per package; a crate with simulation arithmetic that
   enters later (`content`, a maths crate) needs the same block (the first slice).
@@ -47,5 +53,6 @@ rests on them, it names the report's Appendix A item (`docs/reports/2026-11-12-f
 - **EMPTY-SLOTS** (plan Part 3): OQ-0002-7 and the wasm-bindgen pin; OQ-0002-3 (one Wasm instance or two); OQ-0002-4
   (isolation); OQ-0002-1 (the editor from `file://`); the boundary spike's items 4 (generated types) and 8 (sizes,
   wasm-opt, `skipLibCheck`, the three.js casts, Playwright's clock): each waits for the boundary spike.
-- **BRIEF-STALE**: `docs/V2_PHASE0_BRIEF.md:20-21` and `:144` still say "No engine code" for phase 0; it is the claude.ai
-  Advisor's file, so no session edits it.
+- **BRIEF-STALE**: `docs/V2_PHASE0_BRIEF.md:20-21` (no engine code in phase 0 but throwaway spikes) and `:144` (its
+  "Don't" list) still forbid engine code in phase 0, with no word of the exception for steps 2.1 and 2.2; it is
+  Mustafa's and the Advisor's brief (its line 3), one of DOCS-ALIGN's documents, so no session edits it.

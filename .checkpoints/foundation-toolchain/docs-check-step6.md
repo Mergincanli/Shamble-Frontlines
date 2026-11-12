@@ -43,3 +43,9 @@ to anything but this file.
 - FINDING (Low) archive:618 BRIEF-STALE "the claude.ai Advisor's file" vs brief:3 "From Mustafa and the Advisor."
 - FINDING (Low) archive:556-557 "GIT-C, ADVISOR-TOOL-WORDS and MODELS-2026-11-12 (their "Queued" items)": GIT-C has no Queued item (checked against CHECKPOINTS.md:221).
 - No High found. Next: advisor consult, then the StructuredOutput.
+- [sweep] Every backticked path-like token in the added lines exists (non-paths: gitignore patterns, globs, branch and package names, file://, ./index.ts, short names gate.yml/toolchain.yml). Every file:line cite verified (:221, :642, checkpoint.mjs:168, brief :20-21 and :144); other ":NN" hits are clock times. PASS.
+- [sweep] Follow-up names: archive :551-618, STATUS :96-99 and findings-2-3.md each hold the same 18 (14 for 2.3 + 4 later). PASS.
+- [add to Medium 1] consultation 4 (checkpoint :333-342) schedules after this docs commit a code change (`expected` on both overflow tests) and planted failure M6 (L2); neither STATUS:29's Waiting-on nor ROADMAP:123's Next names them.
+- [add to Medium 3] findings-2-3.md item 8 has the same "is proven by" wording; step 7's report list is built from it.
+- [context, not judged] report's risks (sudo on the runner; TOOLKIT-RESOLVES-UP) absent from STATUS "Open risks" (docs-keeper disclosed). STATUS:21 and :47 (his Windows run) unchanged lines, not judged.
+- DONE: 3 Medium, 3 Low, no Critical or High. repoMapExit 0, statusLines 120.
