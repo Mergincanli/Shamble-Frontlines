@@ -225,10 +225,12 @@ data.
 
 Input: u4d2-brief-check.md (test-engineer, verdict REVISE: TB-1, TB-2, TB-3 High; TB-4 to TB-11 Medium; TB-12 to TB-20
 Low). Head at start: fa91186; spikes/ and docs/ equal 28a85e7 (`git diff --stat 28a85e7 HEAD -- spikes/ docs/`
-empty); stamps: plan 686a583c…, plan.md 2bef127b…, carries cdab0240…, card 6b36da10…, brief rev 1 e5869dbf….
-**Own slip:** at the start two `cp` calls copied rev 1 of the brief and of these notes into the session scratchpad
-(brief-rev1.md, notes-rev1.md: outside the repo, used only to compare); a shell write against "Write and Edit tools
-only". No repo file was written but this one and the brief, always by Write.
+empty); stamps: plan 686a583c…, plan.md 2bef127b…, carries cdab0240…, card 6b36da10… (602 lines), brief rev 1
+e5869dbf….
+**Own slips:** (1) at the start two `cp` calls copied rev 1 of the brief and of these notes into the session scratchpad
+(brief-rev1.md, notes-rev1.md); (2) one `rustc --print cfg ... 2>` redirect wrote rustc's warning to a scratch file
+(x.err) in the session scratchpad. Both are shell writes against "Write and Edit tools only"; both outside the repo,
+used only to read; no repo file was written but this one and the brief, always by Write.
 
 ### Plan
 1. Verify each finding against its source (code at the head, the card, the rulings): one block per group
@@ -241,3 +243,90 @@ only". No repo file was written but this one and the brief, always by Write.
 
 ### Progress
 - [x] plan written
+- [x] block 1: every finding verified (below); new facts F17-F24 measured or read.
+- [ ] block 2: brief rewritten as rev 1.1 (whole, by Write)
+- [ ] block 3: cite pass, stamps, return
+
+### New facts (rev 1.1)
+- F17. The card moves: at fa91186 "Rules in force" starts at card :164; TE2-5's rule :189-192, B6 :193-195, T4 item 1
+  :196-198, item 2 :199-202, RM :203; "carries word for word" in the U4 bullet :185-186; next step 3 (U4d2's brief,
+  "with the advisor") :140. The check saw them 7 lines higher at a7f3906; rev 1 cited cea8209's.
+- F18. Closed sources for the placeholders (stamps at fa91186): advisor-u4df.md (531 lines, sha256 842ec092…) T4
+  item 1 :462-464, item 2 :465-468; advisor-u4j-r2.md (657 lines, sha256 7efa9410…) the rule :167-171 (the quoted
+  words from :168 "a FAIL in check.mjs's test step" to :171 "until it is explained."), B6's sentence :298 ("From now
+  on: plants by Edit in place, or the planted file's diff saved beside the run's output."); history.md (1,925 lines,
+  sha256 c62ac831…, "Decisions taken" newest first): "  USAGE-SAVINGS: (a), all three, with these limits." :291, the
+  builders' bullet :292-293 (its first words found once: grep). u4s-carries.md headings: §U4d2 :407, next "## " :448;
+  entries at line start 29 :408, 41 :412, 42 :415, 52 :418, 65 :429, 66 :436.
+- F19. advisor-u4e-r1.md (sha256 7c129309…) T2 inserts carries 73-81 into §U4r (after 69), §U4f (after 46), §U4g
+  (after 70), §U4h (after 45), all above :407 (:504-600); T6 edits plan §4.1's npt-room, npt-server and npt-client
+  rows (:681); R9 M2 and M5 (:446-466) recompute U4e's counts if U4d2 merges first; R6 (:349): check.mjs keeps
+  cargo's Compiling lines out of its output.
+- F20. std 1.99.1 (https://raw.githubusercontent.com/rust-lang/rust/1.99.1/library/std/src/sys/random/mod.rs): the
+  `cfg_select!` arm `all(target_family = "wasm", target_os = "unknown")` routes to `unsupported`, whose
+  `hashmap_random_keys` (…/sys/random/unsupported.rs) returns the addresses of a stack local and of a `Box<u8>`
+  ("a bit of randomness"); no rust-src component is installed here, so read on GitHub at the toolchain's tag.
+- F21. `rustc --print cfg` (1.99.1, read only): `-C target-cpu=haswell` on x86-64 lists `fma` (with avx, avx2, …);
+  `-C target-cpu=bleeding-edge` on wasm32 lists `simd128` and `relaxed-simd`; `-C target-feature=-fma`, `+sse2` and
+  `-C target-cpu=x86-64` list fxsr, sse, sse2 only; a flag meant for the other target only warns ("not a recognized
+  processor for this target (ignoring processor)") and exits 0, so giving every flag to both read-backs adds no false
+  failure.
+- F22. world.rs: `dump` (:1018-1022) and `state_hash` (:2141-2145) both call `write_state` (:1926); the hash-map fold
+  is written by `wide` (two words, one name: hash.rs:21-24) at :2017-2019; std-sin feeds only `vehicle[v].pos.y`
+  (place_vehicles :1225; written at :1959). `Fnv` is pub(crate) (hash.rs:33); `StateDump::hash` (:98) is the public
+  route to the hash.
+- F23. check.test.mjs: the pins quoting "only npt-client-wasm and npt-tcpinfo may" are :288, :486, :508, :1141 (the
+  message is built from `UNSAFE_EXCEPTIONS`: check.mjs:493); the deps fixture's summary pin :1099 is a regex
+  `^held: .* \(6 crate files and 1 cargo config file\(s\) read\)$` (fails only if DEPS_CHECKED stops starting "held:"
+  or the fixture's file counts change); the steps pin (:1617-1658) builds its wasm32 line from `WASM_CRATES` and
+  pins no step list; 52 tests.
+- F24. npt-lab's probe runs on simulated time (main.rs:1), 1,000,000 packets at 10,000 a second by default
+  (probe.rs:20-22); `probe::run(&Setup)` (:116) is callable from a test; the workspace's run-by-name precedent is
+  sim/tests/world.rs:1188 (`#[ignore = "... run once by name for the report: about 30 s"]`). u4e-run.sh is 98 lines
+  now: exports :16-17, lock :38-39, log check :30-33, touch first and every 2 s :58-62, provenance :91-97. main-run.sh
+  runs on the shared target (:14). npt-sim's manifest names libm, rand_chacha and rand_core (crates/sim/Cargo.toml).
+
+### Each finding's outcome
+- TB-1 High: APPLIED. P1 by heading (copied from "## U4d2 or the main session" to the line before the next "## "),
+  with the entry set asserted; P2 by its first words in history.md, with the line before asserted; P3, P4, P5 and the
+  new P8 (B6) from the closed rulings by line range, each file's sha256 asserted against section 0's stamp and the
+  copy's first and last words asserted; `<crate>` replaced in P4 by the script (TB-7); every card line number dropped
+  (the card is cited by section and item); 7.2 gains the re-stamp at launch and the re-check of plan cites.
+- TB-2 High: APPLIED. 2.4 (a) item 6 and 2.7 give the bites half's verdict rules (hash-map: D-2's rule per pair,
+  sim/tests/replay.rs:300-308, and a FAIL if no pair was exercised; std-sin: the scan's result committed as data in
+  crates/lab/ and the step's (recording, T', field) rule, or the data's "not catchable" line printed); the self-test
+  gains the four recorded outcomes per bite. Added (plan silent): the scan data names the libc it was scanned on, and
+  a moved T' FAILs naming the libc the step runs on (CI's glibc may differ). Q5's options re-worded to say what the
+  committed step holds under each.
+- TB-3 High: APPLIED. Two live runs (`node check.mjs --only deps` under the runner, -x; no build: the deps step
+  compiles nothing) with RUSTFLAGS="-C target-cpu=haswell" and
+  CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS="-C target-cpu=bleeding-edge", each FAIL by name on the read-back; the
+  +fma run stays the name scan's; the argv recorder pin per source; the clean read-back must list sse2 / sign-ext.
+- TB-4 Medium: APPLIED. Plant site `write_state` (world.rs:1926); expected outcome split by pair.
+- TB-5 Medium: APPLIED. Two Wasm hash-map legs in two Node processes; the URL at tag 1.99.1 cited (F20).
+- TB-6 Medium: APPLIED. Exact counts (the manifest's 9,000 per recording, 27,000 per pair); six more self-test cases.
+- TB-7 Medium: APPLIED WITH A CHANGE (U4D2-Q12 (a)). The expected failures named are the four pins that quote the
+  exception list (F23); :1099 is named as failing only if the fixture's file counts or DEPS_CHECKED's "held:" start
+  change; the steps pin is named as one U4d2 extends (2.4 (g)), not one the edit breaks. `<crate>` replaced in the
+  copy by the check's string; the wasm step's no-retry sentence added (outside the copy).
+- TB-8 Medium: APPLIED. The four release builds before check.mjs inside the same -x runner call are the release
+  provenance.
+- TB-9 Medium: APPLIED. check.mjs times what it calls (npt-lab hash as one call); lane timings labelled "under the
+  runner's touch loop"; CI's figure is the infra-engineer's from CI's run.
+- TB-10 Medium: APPLIED. An `#[ignore]` test in npt-lab, run by name on the release build, asserts U2's three full
+  values through `probe::run`; the three binary runs with -3's arguments stay for the carry's "the commands it ran".
+- TB-11 Medium: APPLIED WITH A CHANGE (U4D2-Q12 (b)). The live plant in hash-wasm's own manifest, -x, restored; the
+  non-vacuity check reads npt-sim's normal dependencies from cargo metadata (libm, rand_chacha, rand_core at the head)
+  and fails unless each list holds npt-sim and each of them, rather than a fixed list of the five packages (a pinned
+  list would fail the deps step on any lawful dependency change; equality across the builds already catches a
+  differing set).
+- TB-12 Low: APPLIED (check.mjs names the two ids it arms; no copy of World::BITES in JS or hash-wasm; no id literal
+  in a crate's src outside npt-sim, which the bite-home rule refuses: check.mjs:734-758).
+- TB-13 Low: APPLIED (the panel in 7.2; :7 cites the card's next step 3).
+- TB-14 Low: APPLIED.
+- TB-15 Low: APPLIED.
+- TB-16 Low: APPLIED (the three controls measured: F21).
+- TB-17 Low: APPLIED.
+- TB-18 Low: APPLIED.
+- TB-19 Low: APPLIED.
+- TB-20 Low: APPLIED.
