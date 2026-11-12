@@ -192,25 +192,9 @@
     ROADMAP (seven planted failures) and STATUS (#48's row) · 03b5a54 · pushed. The saver restarted.
 
 ## Current step
-Step 6 done but its moment-5 consultation; then step 7: the review round (workflow, 5 reviewers at max in batches of
-3 then 2, a skeptic per finding), the fix pass, the verifier, the Fable read again (whole) before ready, the report
-final, the checkpoint folded and deleted by hand, ready, the advisor agent's review, his go.
-the STATUS dashboard, the archive and ROADMAP, then a fact check of its edits, in one workflow; then E8 and E9 re-run.
-Earlier: Step 5 done (consultation 3, 2026-11-12 ~19:58 Amsterdam).
-Earlier: Step 5 (superseded by steps 18-20 above): waiting for his chat yes on the exact texts of K2a, K2b, K3, K4 and the offered K1b (sent to him at the end of
-the turn after consultation 2), with the chat switched to Accept edits. On his yes: `get_session` (write nothing while
-`permission_mode` is still auto), Read the three files, the Edits only (each guard prompt counted), then commit and
-push (both on the allow list), then ask him to switch back to Auto and how many guard prompts he saw. Then, if K1b:
-M5 by Part 7's procedure. Then the re-run of E1-E11 (E8, E9, E10 first runs; E4b, E4d).
-Earlier notes on this step:
-Step 5 started, 2026-11-12 (his words of that day, item 1: "Step 5 no longer waits: start it as your card says";
-`mustafa-2026-11-12-step5-models.md`). 2.1b merged as 2aa5e9c (PR #51). Read on main 2aa5e9c: condition 5 holds (ADR
-0002's Status line: "Proposed. Part 1 accepted by Mustafa on 2026-11-10, his SCOPE (a) ..."); the four kit lines are
-unchanged and re-found at CLAUDE.md:20-22 (K3), :47 (K2a), :53-55 (K2b) and advisor.md:107 (K4); main changed none of
-this branch's files (no conflict expected). The guard (main's, unchanged since 2d22b69) lets `git switch -c <new>
-origin/main` in the main folder pass without asking (`mainFolderMove`, `routine-guard.mjs:1307-1318`), so no guard
-prompt for the main folder's move arises. Next: the move into `.gate/foundation-toolchain-wt`, the merge of origin/main
-there, then the four texts, the advisor tool, his chat ask.
+Step 6 done (4d78ad6; consultation 5). Step 7: review round 1, run 1 running (wf_d3a5ca64-901). Then: check `git status`
+outside .checkpoints/, dedupe the findings, run 2 (skeptics), the fix pass, the verifier, the Fable read (whole) before
+ready, the report final, the checkpoint folded and deleted by hand, ready, the advisor agent's review, his go.
 
 ## Next steps
 1. Step 5, now (both conditions met: LANE-RULES with PR #49, bb2d817; 2.1b with PR #51, 2aa5e9c): main merged in by
@@ -371,12 +355,28 @@ there, then the four texts, the advisor tool, his chat ask.
    taken on crates.io, what CI does not yet enforce, no .wasm artifact, two Playwrights, CARGO_NET_OFFLINE, no licence
    field); security-auditor's brief: the cut is hermetic tests, not a sandbox, and capability sets after setpriv; the
    report's kit table to name the tree of each line number. The read before ready re-checks only files that changed.
-Count: 4.
+5. 2026-11-12 ~22:35 Amsterdam (after cb1f4bc) · moment 5 for step 6 and moment 1 for the review round: is step 6 done,
+   and is the review workflow right? · changed: three report lines 70f1c31 made stale fixed (the "unchanged since step 2"
+   sentence, E1 re-run on the head: 6 of 6, wasm32, release; E2 with the runs on 70f1c31, d5316d6 and 03b5a54); CI on
+   03b5a54 read (all green: 43310933872, 43310945546, 43310933599, 43310944794); the worktree's root node_modules and the
+   control copy: `rm -rf` of each refused by the permission check (left in place, named in every brief); the four
+   DECISIONS.md entries that state "The main model and every agent stay Opus 5.5" get a pointer to his words of
+   2026-11-12, 16:25 (quotes unchanged); the review workflow reshaped: each reviewer's status returned and no going on
+   with fewer than five, the reviewers and the skeptics as two runs with the session's dedupe between, the skeptics
+   with their own block, a skeptic's verdict input never a filter, mutations only in a copy under .gate/, `git status`
+   checked after each run; the saver's id and the finished docs workflow in Running work; the Fable read before ready
+   is whole.
+Count: 5.
 
 ## Running work
-- workflow wf_29ac478b-0a7 (task wcodvxshj), step 6's docs: docs-keeper (general agent reading main's docs-keeper.md,
-  Opus 5.5 at max) then one fact checker; script `/root/.claude/projects/-home-user-Shamble-Frontlines/29a42dc7-ecd4-506e-b90a-121dd5e50988/workflows/scripts/foundation-2-2-docs-wf_29ac478b-0a7.js`;
-  notes `docs-keeper-step6.md`, `docs-check-step6.md`; launched ~20:27 Amsterdam; resume with resumeFromRunId.
+- workflow wf_d3a5ca64-901 (task w6wikh9i8): review round 1, run 1, five reviewers on head 4d78ad61e652f2e35ddf51c49557e725420248c8
+  (security-auditor, infra-engineer, rust-reviewer; then test-engineer, engine-architect; Opus 5.5 at max); script
+  `/root/.claude/projects/-home-user-Shamble-Frontlines/29a42dc7-ecd4-506e-b90a-121dd5e50988/workflows/scripts/foundation-2-2-review-round-1-wf_d3a5ca64-901.js`,
+  args {"head": "4d78ad61e652f2e35ddf51c49557e725420248c8"}; notes `<reviewer>-review-r1.md`; launched ~22:45 Amsterdam;
+  resume with resumeFromRunId. Run 2 (the skeptics, one per deduped finding, 3 at a time) follows.
+- saver: background task b52patinz (restarted 2026-11-12 ~22:30 Amsterdam after M6's revert; the worker restarted three
+  times that evening and ended the earlier savers bg5v6agjr and b3kk7q32m).
+- workflow wf_29ac478b-0a7 (step 6's docs: docs-keeper and one fact checker): done, 2 of 2; its findings fixed in 13feadc.
 - **Where the work lives since 2026-11-12 16:33 Amsterdam:** the branch worktree
   `/home/user/Shamble-Frontlines/.gate/foundation-toolchain-wt` (branch `claude/laughing-pasteur-fwya24`). The main
   folder sits on the local branch `main-folder`, made at origin/main 2aa5e9c (`git switch -c main-folder origin/main`,
