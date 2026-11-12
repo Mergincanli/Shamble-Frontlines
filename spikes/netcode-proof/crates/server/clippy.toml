@@ -1,10 +1,14 @@
 # npt-server's clock ban (u4-build-plan.md §4.11; A14): the loop policy reads no clock (N4), and every other wall-time
 # limit runs on an injected `now`. U6's tick loop and I/O runtime, the only readers of the monotonic clock, carry
-# reviewed per-item allows, listed in U6's plan. The workspace sets disallowed_types and disallowed_methods to deny.
+# reviewed per-item allows, listed in U6's plan. The hash-map type bans (Q9 (a); u4-build-plan.md §4.11; the advisor's
+# U4d2 brief check, A13): no iteration order in the server depends on a hasher's seed. The workspace sets
+# disallowed_types and disallowed_methods to deny.
 disallowed-types = [
     { path = "std::time::Instant", reason = "the clock ban: time is passed in" },
     { path = "std::time::SystemTime", reason = "the clock ban: time is passed in" },
     { path = "tokio::time::Instant", reason = "the clock ban: time is passed in", allow-invalid = true },
+    { path = "std::collections::HashMap", reason = "the hash-map ban: iteration order must not depend on a seed" },
+    { path = "std::collections::HashSet", reason = "the hash-map ban: iteration order must not depend on a seed" },
 ]
 disallowed-methods = [
     { path = "std::time::Instant::now", reason = "the clock ban" },
