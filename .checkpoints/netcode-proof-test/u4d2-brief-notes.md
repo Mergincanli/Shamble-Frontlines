@@ -218,3 +218,26 @@ data.
 - P1 carries :407-446; P2 history.md:291-293; P3 card :169-171 (df-ruling :462-464); P4 card :172-175 (df-ruling
   :465-468) with `<crate>` read per C16; P5 card :162-165 (j-r2 :167-171); P6 `<base>` and its counts; P7 the runner
   (u4d2-run.sh).
+
+---
+
+## Revision for the check (rev 1.1; a fresh copy of the drafter, 2026-11-12)
+
+Input: u4d2-brief-check.md (test-engineer, verdict REVISE: TB-1, TB-2, TB-3 High; TB-4 to TB-11 Medium; TB-12 to TB-20
+Low). Head at start: fa91186; spikes/ and docs/ equal 28a85e7 (`git diff --stat 28a85e7 HEAD -- spikes/ docs/`
+empty); stamps: plan 686a583c…, plan.md 2bef127b…, carries cdab0240…, card 6b36da10…, brief rev 1 e5869dbf….
+**Own slip:** at the start two `cp` calls copied rev 1 of the brief and of these notes into the session scratchpad
+(brief-rev1.md, notes-rev1.md: outside the repo, used only to compare); a shell write against "Write and Edit tools
+only". No repo file was written but this one and the brief, always by Write.
+
+### Plan
+1. Verify each finding against its source (code at the head, the card, the rulings): one block per group
+   (TB-1 placeholders; TB-2/TB-5/TB-15 hash-map and std-sin; TB-3/TB-16 flags; TB-4/TB-18 word size; TB-6/TB-9/TB-8
+   step; TB-7 stop clause; TB-10/TB-11/TB-12/TB-13/TB-14/TB-17/TB-19/TB-20).
+2. Record each finding's outcome below (applied as the check says, applied with a change, or kept with a
+   question for the advisor), with the source lines read.
+3. Rewrite the brief whole as rev 1.1 (title, "Changes in rev 1.1"), section by section, saving after each.
+4. A cite pass over the changed text; final stamps; the return.
+
+### Progress
+- [x] plan written

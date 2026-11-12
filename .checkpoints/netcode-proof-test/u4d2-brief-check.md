@@ -11,6 +11,9 @@ Form: as u4e-brief-r3-check.md (plan, progress log, check tables, recheck rows, 
 Runs: no cargo build, test, clippy, doc or check.mjs (W1-TARGET). Read-only commands only: git log/diff/show, sha256sum,
 grep/sed reads, `rustc --print cfg` (three forms, below), `nm -D` on glibc, `node --version`. Web: two std source files
 on raw.githubusercontent.com (rust-lang/rust master), read as data.
+**Own slip:** one `head -116 <this file> > <scratchpad>/head116.txt` wrote a scratch copy with a shell redirect, against
+"Write and Edit tools only"; the file is in the session scratchpad, outside the repo, and is not used; no repo file was
+written but this one, always by Write.
 
 ## Plan
 1. Read the brief whole; section map; first stale spots.
@@ -115,16 +118,148 @@ on raw.githubusercontent.com (rust-lang/rust master), read as data.
 - [R done] 20 rows; code cites in the brief hold; the drift is in the living notes files (card; carries at U4e's merge).
 
 ## Findings (severity on the one scale; brief line; fix)
-High: TB-1 placeholders by line range in living files (drifted now; carries will drift at U4e's merge); TB-2 the
-bites half has no verdict rule for std-sin and no home for the scan's result; TB-3 the read-back's Q4 (a) property has
-no test that can fail.
-Medium: TB-4 the usize plant's site; TB-5 hash-map "not catchable on wasm32" undecidable with one Wasm leg; TB-6 the
-step's self-test negatives; TB-7 TE2-5's "expected failures: none" and the wasm step; TB-8 release-build provenance;
-TB-9 timing method; TB-10 h7 has no exit code; TB-11 features: no non-vacuity, live plant possible.
-Low: TB-12 ids in JS; TB-13 reviewers and condition 12's cite; TB-14 main-run.sh "own cache"; TB-15 h3's bites case;
-TB-16 scan control; TB-17 the lock command; TB-18 one-vector reason and a text vector file; TB-19 carry 65's cases;
-TB-20 lock wording.
-(Full text of each in the return to the workflow.)
+
+**TB-1 High (placeholders by line range in living files).** Brief :391-399 (P1), :475-485 (P3, B6, P4, P5, P2), :392
+(card :158-160), 7.2 item 3 :577-581. The card has already moved 9 lines since cea8209: card :169-171 now holds the end of
+the "U4" bullet, the U4j ruling's heading and TE2-5's first line; T4 item 1 is at :178-180, item 2 at :181-184, TE2-5 at
+:171-174, B6 at :175-176, "carries word for word" at :167-168. carries :407-446 holds today, but advisor-u4e-r1.md T2 (1),
+(3), (4), (5) insert carries 73-81 above :407 in U4e's merge commit (7.2 item 5 expects U4e may merge first). history.md
+"Decisions taken" is newest first (card :190), so :291-293 moves with his next decision. 7.2 item 3's check (old text
+found once, new text in place, a diff of the two ranges) compares the copy with the same wrong range, so nothing catches
+it. Fix: cite the closed rulings as sources: P3 = advisor-u4df.md:462-464 (the quoted sentence only); P4 =
+advisor-u4df.md:465-468, `<crate>` replaced in the copy (TB-7); P5 = advisor-u4j-r2.md:168-171 (from "a FAIL in
+check.mjs's test step" to "until it is explained."); B6 from advisor-u4j-r2.md's B6 block. P1 = u4s-carries.md from the
+line "## U4d2 or the main session" to the line before the next "## " heading, the script asserting the heading occurs
+once and the block holds entries 29, 41, 42, 52, 65, 66 and no other. P2 = history.md's line beginning "  - Builders:
+pass or fail comes from the exit code" and its continuation line, found once by that text. 7.2 gains: "at launch,
+re-stamp section 0's sha256 of u4-build-plan.md, u4s-carries.md and the card, and re-check every plan cite if the plan
+changed (U4e's merge applies T6 to §4.1)". Replace or drop the card line numbers at :392, :476, :480-482.
+
+**TB-2 High (the bites half has no verdict rule a reviewer can check).** Brief 2.4 (a) :222-223 ("each bite reported as
+2.7 says"); 2.7 :357-358; Q5 :641-651. Hash-map's D-2 rule appears as an expectation, not as the step's fail rule.
+Std-sin: the scan is a one-off whose result (recording, first differing tick, field) has no committed home; the step
+"reports the first differing tick" with no expected value; and under Q5 (a) with no difference the committed step holds
+no std-sin bite at all (the stand-in is one scratch plant). So plan.md:551 ("bites: one std sin and one hash-map
+iteration, each caught at the first tick it changes") is not held by the step, nor ADR 0004:1142's "armed at a known
+tick T with a value that differs". Fix (2.4 (a), 2.7, Q5 (a)'s text): "The bites half's verdict, written in check.mjs and
+pinned by its self-test. Hash-map, per pair (D-2's rule, sim/tests/replay.rs:296-308): digests differ → the first
+mismatch must be (recording 0, tick 1,234, `bite[0].hash_map_order`), anything else FAILs the step; digests equal → no
+tick may differ, and the line says 'not exercised'; the step FAILs if neither pair was exercised. Std-sin: the scan's
+result is committed as data beside the recordings manifest (the recording, the first tick T' at which the bitten legs
+differ between x86-64 and wasm32, the field `vehicle[v].pos.y`); the step arms std-sin at T' on that recording and
+FAILs unless the first native-against-Wasm mismatch is (that recording, T', that field). If the scan finds none, the
+data says 'not catchable at this site on x86-64 and wasm32 (scan at <commit>)', the step prints it, and Q5's ruling says
+whether a committed stand-in replaces it." Self-test: recorded outcomes caught at T (pass), at another tick, at another
+field, or missed (each FAIL).
+
+**TB-3 High (Q4 (a)'s property has no test that can fail).** Brief 2.4 (c) :244-259; 2.7 flag row :360; Q4 :622-632. Q4
+(a) is chosen so the read-back sees flags from the environment and configs, yet every listed test passes if the
+read-back is given none: the self-tests feed recorded read-back outputs, and the one live plant (RUSTFLAGS "-C
+target-feature=+fma") is refused first by the name scan. A read-back that parses nothing also passes the real tree.
+Measured here (rustc 1.99.1, read only): `-C target-cpu=haswell` on x86-64 lists target_feature="fma";
+`-C target-cpu=bleeding-edge` on wasm32 lists simd128 and relaxed-simd; the name scan refuses neither. Fix: "2.7's flag
+row adds two live runs, no file changed, each -x, each FAIL by name on the read-back: RUSTFLAGS="-C target-cpu=haswell"
+(x86-64, fma) and CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS="-C target-cpu=bleeding-edge" (wasm32, simd128 and
+relaxed-simd); the +fma run stays as the name scan's. 2.4 (c)'s self-tests add a recorder pin of the read-back's argv
+(with RUSTFLAGS, CARGO_ENCODED_RUSTFLAGS, CARGO_TARGET_<triple>_RUSTFLAGS and a config's rustflags set, each flag is in
+the rustc call), and the clean read-back must list target_feature="sse2" (x86-64) and "sign-ext" (wasm32), else FAIL."
+
+**TB-4 Medium (the word-size plant's site).** Brief 2.7 h2 row :364; Q11 (b) :715-717. The plant is sited in world.rs's
+`dump` (:1018), but `dump` and `state_hash` both call the walk `write_state` (world.rs:1020, :2143; walk :1926); a length
+written in `dump` alone moves the dump, not the hash, so "the 27,000-tick comparison fail[s] at their first tick" does
+not happen; and the expected outcome is not split by pair. Fix: "Site: write_state (world.rs:1926): one length written as
+usize's little-endian bytes in 32-bit words (two on x86-64, one on wasm32) through the Sink (hash.rs:14). Expected, each
+by name: h2 (i) fails natively (the dump is longer than the committed file); h2 (ii) and the native-against-Wasm
+comparison fail at each recording's first tick; leg 1 against leg 2 stays at 0 over 27,000 ticks (same target), which is
+what shows a word-size catch. Run `node check.mjs --only wasm` and the h2 test by name, -x; restore; sha256."
+
+**TB-5 Medium (hash-map: "not catchable on wasm32" is undecidable with one Wasm leg).** Brief 2.7 :357; return item 6
+:522-523. std on wasm32-unknown-unknown takes HashMap keys from a stack and a heap address (rust-lang/rust
+library/std/src/sys/random/unsupported.rs, hashmap_random_keys; routed for target_family wasm + target_os unknown in
+sys/random/mod.rs), so two Wasm runs of one module are expected to iterate alike while native against Wasm differs. Fix:
+"the bites half runs the hash-map Wasm leg twice, in two Node processes, and prints both Wasm digests beside the native
+ones; the report says 'not catchable on wasm32' when the two Wasm digests are equal, and gives the native-against-Wasm
+catch separately (source cited by URL)."
+
+**TB-6 Medium (the wasm step's self-test misses negative cases).** Brief 2.4 (a) :222-229. Listed: native-against-Wasm
+mismatch, SHA-256 mismatch, trap, 0 ticks. Missing: a leg 1 / leg 2 mismatch; a short leg; an h2 vector word that
+differs; a bites-half miss; the loader's refusal of an extra export; a recorded bitten pair given to the clean half;
+and "over 27,000 ticks" is not stated as exact. Fix: "pass only with exactly 9,000 ticks compared per recording and
+27,000 per pair, 0 mismatching; the self-test adds each of the six cases above, each failing the step by name."
+
+**TB-7 Medium (the TE2-5 stop clause as written).** Brief section 4 :480-484; 1.5 :70; 7.2 item 3 :579-580. (a) "Expected
+failures you can name in advance: none" is wrong: unsafeProblems builds its message from UNSAFE_EXCEPTIONS
+(check.mjs:493), so when hash-wasm joins, check.test.mjs:288, :486, :508 and :1141 fail until re-pinned, as do the steps
+pin (:1617-1658) and the deps summary pin (:1099) when STEPS and DEPS_CHECKED change; R4.1 (advisor-u4df.md:228-231) is
+why the clause has its "expected" branch. (b) `<crate>` is a note beside the copy; T4 item 2 says the clause "reads,
+with the unit's crate named". (c) The wasm step is outside the reading, yet a once-only determinism mismatch is the
+flake the rules forbid retrying. Fix: "Expected failures: the check.test.mjs pins that name the two exceptions, the step
+list or DEPS_CHECKED (check.test.mjs:288, :486, :508, :1099, :1141, :1617-1658) fail from the check.mjs edit to their
+re-pin; plan both in one step, or record each under TE2-5 with the step that re-pins it. The copy of P4 has `<crate>`
+replaced by 'npt-hash-wasm, npt-lab, check.mjs's wasm and deps steps or check.test.mjs'. A wasm run that mismatches,
+traps or fails a SHA-256 is never re-run into green: its first tick, field diff and digests go into the notes, tagged
+TE2-5, and it stops the step group until explained."
+
+**TB-8 Medium (release-build provenance cannot come from check.mjs).** Brief section 4 rule 3 :448-452. main prints a
+passing step's last line only (check.mjs:1646) and keeps cargo's Compiling lines out (advisor-u4e-r1.md R6); the
+`--no-run` builds are debug, not the release artifacts the step runs. Fix: "inside the same -x runner call, before
+check.mjs: cargo build --locked --release -p npt-lab, the same with --features bites, cargo build --locked --release
+--target wasm32-unknown-unknown -p npt-hash-wasm, and the same with --features bites; their Compiling lines with this
+copy's path are the release provenance (or the step writes its whole output to a file under .gate/ that its last line
+names)."
+
+**TB-9 Medium (the timing method).** Brief 2.4 (a) :224-226; section 5 item 4 :501-502; 2.3 item 6 :193. "each part's
+wall time … each leg" conflicts with npt-lab hash running both native legs in one call and reading no clock (and Q10's
+ban); check.mjs can time only what it calls. Every lane run touches all of crates/ every 2 s (u4e-run.sh:58-62), so each
+cargo call rebuilds the workspace crates and "warm" under the runner is not CI's warm, while the 5-minute budget and the
+det-u4.mjs decision (plan :790-792) read this number. Fix: "time what check.mjs calls (each release build; npt-lab hash
+as one; each Node run; the comparison; the bites half), or split hash into calls check.mjs times one by one; label every
+lane timing 'under the runner's touch loop'; the CI figure is the infra-engineer's, from CI's run of the merged tree."
+
+**TB-10 Medium (h7 has no exit code).** Brief h7 :336-340; 3.1's carry 66 note :415-423. The three probe values are
+compared with U2's by reading; the builders' limits (P2) say pass or fail comes from the exit code and the test
+runner's own summary line, never a grep. Fix: "h7's second half is an #[ignore] test in npt-lab, run by name on the
+release build, that runs the probe for P2, B1 and P4 seed 1 with -3's arguments and asserts the three full SHA-256s of
+3.1's note; its pass is libtest's summary line; the report gives that line and the commands."
+
+**TB-11 Medium (features comparison: no non-vacuity; the live plant is possible).** Brief 2.4 (b) :230-243; 2.7 :359.
+"a live plant needs a manifest and lock change outside your lane" is wrong: npt-sim's feature set through hash-wasm's own
+manifest is in lane and changes no lock (Cargo.lock records no features: tcpinfo/Cargo.toml:31-32); and a parser that
+finds no npt-sim subtree reports 0 differences on the real tree. Fix: "planted live once: hash-wasm's dependency made
+`npt-sim = { workspace = true, features = ["bites"] }`, -x; the deps step FAILs naming npt-sim, bites, the measured
+hash-wasm build and the server build; restored, sha256-checked. The comparison FAILs unless each list holds npt-sim and
+the five packages of notes F4."
+
+**TB-12 Low.** Brief 2.1 :129-130: "never from a copy of the ids … in JS" cannot hold: check.mjs must name the two ids it
+arms (ops/runs/c-u2-pm-0001-3.mjs:24-29 names PM-0001-3's in JS). Fix: "check.mjs names the two ids it arms and reads
+each one's index from the list npt-lab's bites build prints; no copy of that list in JS or in hash-wasm's sources."
+
+**TB-13 Low.** Brief :7 and 7.2: the reviewers (plan :701-702: rust-reviewer, engine-architect, test-engineer,
+infra-engineer) are not named, and :7 cites condition 12, whose "five briefs (Q21)" exclude U4d2 (card :167). Fix: 7.2
+gains the panel (xhigh, counting toward three: plan :872-873); :7 cites the card's next step 3.
+
+**TB-14 Low.** Brief 7.2 item 1 :572-574: main-run.sh runs on the shared target (main-run.sh:14), not the main folder's
+own cache. Fix: "a counted run in the main folder through main-run.sh (the shared target, the lane lock exclusive)".
+
+**TB-15 Low.** Brief h3 :325-326: RandomState differs per instance in one process, so two bitten worlds iterate
+differently. Fix: "compare the dumps less the two `bite[0].hash_map_order` words; assert bite_order_digest None before the
+arming tick and Some from it, on both".
+
+**TB-16 Low.** Brief 2.4 (c) :257-259: no control for the name scan. Fix: add "-C target-feature=-fma, -C
+target-feature=+sse2 and -C target-cpu=x86-64 pass the name scan".
+
+**TB-17 Low.** Brief 2.5 :300-302: name the lock-adding call: "cargo metadata --offline --format-version 1 through the
+runner, never cargo update or generate-lockfile; the diff is npt-hash-wasm's [[package]] entry alone".
+
+**TB-18 Low.** Brief h2 :312-321: give the one-vector reading's reason: `Fnv` is pub(crate) (hash.rs:33) and the only
+public route to the hash is `StateDump::hash` over words (hash.rs:98); commit the vector as text (hex words, one a line).
+
+**TB-19 Low.** Brief 2.4 (f) :288-291: carry 65's self-test adds two failing tests in one binary (both named) and a
+failure in the bites build only.
+
+**TB-20 Low.** Brief section 4 rule 2 :443-447: W1-TARGET item 1 lists "the touch" among the -x calls; "no other lane may
+build while it is in place" is not what the runner enforces (the lock is per call). Fix: "every run with a plant in
+place is -x through the runner, which touches first; the plant is restored before the next call".
 
 ## Check (5): what is left to the main session and the advisor
 - Q1-Q11 are all real and well posed, each with why, options and a recommendation. Q5 (a) needs the step's verdict and
@@ -135,5 +270,7 @@ TB-20 lock wording.
   launch (TB-1).
 
 ## Verdict
-REVISE: three Highs, each fixed by text; no ruling needs to change. Scope creep: none found.
+REVISE: three Highs (TB-1 to TB-3), each fixed by text; eight Mediums; nine Lows. No ruling needs to change. Scope
+creep: none found. What holds: coverage of §5 U4d2's Builds, check.mjs rules and Tests; carries 29, 41, 52, 65, 66 placed;
+carry 42 rightly not applicable (entry 34 met at U4a); 67, 71, 72 rightly not binding; every code cite at the head.
 - [done] verdict written.
