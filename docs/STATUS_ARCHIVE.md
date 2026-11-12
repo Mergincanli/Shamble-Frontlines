@@ -156,6 +156,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
 ## In flight
 | Work | Branch | State | Waiting on |
 |---|---|---|---|
+| **foundation 2.1b: the move** (foundation-restructure, the second of step 2.1's two pull requests, his SPLIT (a): the five legacy files into `legacy/` with `git mv`, bytes unchanged, in a commit of their own (c090843); the commands in text name the `legacy` folder (1e6f84e); the four kit lines on his yes, KIT-2.1B (a) (b6b3b81); the docs: his words in `docs/DECISIONS.md`, his SCOPE (a) in ADR 0002 and the register, OQ-0002-2 answered in part (REG-TRUE (b)); game symbols +0 −0) | merged: PR #51 (`claude/clever-fermi-oudsfq` (for `cs/foundation-restructure`)), 2aa5e9c, 2026-11-12 13:22:32 UTC (`merged_at`; the merge commit is dated 13:22:31), by merge commit (parents 76b4f7a and 5d50bf2), on Mustafa's go, given in foundation 2.1b's day session's chat (session_019YNMUWdGJZoQFUuuvvBP1Y) at 13:18:42 UTC and quoted whole in the merge commit's message (his words: `docs/DECISIONS.md`, 2026-11-12, 13:18:42 UTC), after the advisor agent's APPROVE of 5d50bf2 (its day-session review); CI green on the head (push run 43130543086 and pull-request run 43130550831) and on main (push run 43226692719, on 2aa5e9c); report `docs/reports/2026-11-11-foundation-2-1b.md` | done: evidence E1-E6 and E8 PASS; review round 1 on the final diff (security-auditor APPROVE WITH LOWS, test-engineer and infra-engineer APPROVE; no Critical or High, so no round 2) and its fix pass (43733e5); the verifier PASS on 43733e5; the advisor agent's REVISE on 3860e3f (two Mediums: two earlier sends of his traced nowhere, and no `docs/DECISIONS.md` entry for his go for #50), fixed in 3828e6a; its APPROVE of the final head 5d50bf2; his REG-CELL (a) and PROMPTS-2.3 (a), his checks on 5d50bf2 on his Windows laptop (the saves backup, the Brave check of both pages, the gate) and his go; 2.1a's IE-2, IE-3, IE-4, IE-7 and SA-L1 closed (its report, "Decisions and deviations"); its merge recorded by foundation 2.2 (PR #48) | none |
 | **foundation 2.1a: the legacy gate and tools read both layouts** (foundation-restructure, the first of step 2.1's two pull requests, his SPLIT (a); replaces #47, his BRANCH-47 (a); gate files and tools only, no game file, no file moved, symbols +0 −0) | merged: PR #50 (`claude/pensive-heisenberg-aazidf` (for `cs/foundation-restructure`)), 76b4f7a, 2026-11-11 18:38:28 UTC (`merged_at`), by merge commit (parents bb2d817 and f6becf5), on Mustafa's go, given in foundation 2.1a's day session's chat (session_019YNMUWLffMoE47SbvkqJ5P) and quoted word for word in the merge commit's message (with his approval of the two gate edits in dd12aeb and the five follow-ups he accepted), after the advisor agent's APPROVE of f6becf5 (its day-session review); CI green on the head (runs 43074627548 and 43074640388) and on main (push run 43079707687, on 76b4f7a); report `docs/reports/2026-11-11-foundation-2-1a.md` | done: the review rounds, the verifier and the report; then the advisor's APPROVE of the final head f6becf5 and his go; its merge recorded by foundation 2.1b (PR #51) | none |
 | **status-diet: STATUS-DIET with LANE-RULES (ACCOUNTS, the Models addition)** (Mustafa's queue of 2026-11-10, items 2 and 3, with ACCOUNTS and his Models addition; docs and rules, no game code, symbols +0 −0) | merged: PR #49 (`claude/busy-turing-48e4i9` (for `cs/status-diet`)), bb2d817, 2026-11-11 09:03:11 UTC (`merged_at`; the merge commit is dated 09:03:10), by merge commit (parents 2d22b69 and 2e6e5d2), on Mustafa's go, given in the status-diet day session's chat (session_0173vVo6Vtm2C54toWvTt8sR) at about 09:02 UTC (his words, from the merge commit's message: `docs/DECISIONS.md`, 2026-11-11), after the advisor's APPROVE of 2e6e5d2 (PR comment 6779064873); CI green on main (push run 42991918886, on bb2d817); report `docs/reports/2026-11-10-status-diet.md` | done: the review round (two PASS WITH NOTES), the fix pass and the report done (its row in STATUS until the merge); then the advisor's APPROVE of the final head 2e6e5d2 and his go; its merge recorded by foundation 2.1a (PR #50), as his go says ("The next change-set records it") | none |
 | **kit-v3-5, the guard's rename gap** (F1 from kit-v3-4, agent memory included: Mustafa's GUARD-RENAME (c) of 2026-11-09; his allow-list direction and SA5-RIDE (a) of 2026-11-10; rules and kit code, no game code, symbols +0 −0. The kit (9bacf47): the PR Advisor's merge check takes an allow-list, `mergeAllowed`: plain names only (letters, digits, `_`, `-`, `.`, `/`; no empty segment and none that starts with a dot; no `node_modules`), only `docs/`, `tools/`, `README.md` and `FIRST_PROMPTS.md`, and no rules name (`CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`), no gate file's name under `tools/` and no decision doc (`docs/adr/**` and SA5's fixed list) in any letter case; it reads both names of a renamed or copied file, the whole file list (refused at 3000 files or more, counted against `changed_files`) and the whole check list (`total_count`). Part A: `protectedRel` and `CANON` gain `CLAUDE.local.md` and `AGENTS.md`, so writes and day-session asks cover them; `GATE_FILES` gains `tools/npm-shrinkwrap.json` (the advisor's E1). advisor.md's tier texts and gate-file lists, and CLAUDE.md's step 3, rows 0 and 1 and the line under the table, match the new checks (F4 folded in). Known limits: Open bugs and risks) | merged: PR #46 (`claude/sleepy-tesla-ofsxsr`, standing in for `cs/kit-v3-5`; local branch `kit-v3-5` from main 44446a5), 2d22b69, 2026-11-10 16:05:52 UTC (`merged_at`; the merge commit is dated 16:05:51), by merge commit (parents 44446a5 and 0573db3), on Mustafa's go ("merge #46", reconfirming the rule changes at 0573db3; his words: `docs/DECISIONS.md`, 2026-11-10) after the advisor's APPROVE WITH NOTES of 0573db3 (comment 6772168492); CI green on main (the gate workflow, run 42851159265, on 2d22b69); report `docs/reports/2026-11-10-kit-v3-5.md` | done: the facts; plan revision 1 and the advisor's REVISE (R1-R14, conditions 1-14; its rulings: F4-RIDE fold in, MERGE-ONLY approved); revision 2 and its APPROVE with D1-D6; his answers of 2026-11-10 (ORDER (b), SA5-RIDE (a), the allow-list direction, the known limits) and his second message (ACCOUNTS, FREEZE-FDN, SPLIT (a), SCOPE (a), the Slice 1 note); revision 3, the allow-list, and the advisor's APPROVE with E1-E5; the four kit writes, one ask each, approved by Mustafa: the tests (red on main's guard: 47 of 1086 fail), the guard (green: routine-guard 1086/1086, main 1034; settings 127/127; checkpoint 27/27), advisor.md, CLAUDE.md (9bacf47); gate PASS, symbols +0 −0; repo map OK; docs-keeper's pass (STATUS, ROADMAP, his queue word for word, the known limits, the kit-v3-4 report's correction); the review round on f9728c9: security-auditor, test-engineer and the verifier, each PASS WITH NOTES, nothing Critical or High (test-engineer's four Medium test gaps; Lows); the advisor's fix-pass ruling, no second round; the fix pass on his approval (08423ce: the test gaps closed, the empty-list and nameless-line refusals, the shrinkwrap in the night install check, advisor.md's tier-2 bracket; routine-guard 1107/1107, settings 127/127, checkpoint 27/27; gate PASS); the verifier's re-check of the fix pass, PASS WITH NOTES (three Lows: two test gaps, follow-ups that ride PX-1's change-set; one wording point the report explains); his PX1-ROUTE (a); the report `docs/reports/2026-11-10-kit-v3-5.md`; the notes deleted in the last commit (readable at 501c446); the advisor's APPROVE WITH NOTES of the final head 0573db3 (comment 6772168492), its Low notes: merge by merge commit so the 501c446 pointers stay in main's history, the verifier's two test gaps ride PX-1's change-set, the Windows reserved-name line right as written; his go of 2026-11-10 16:04:59 UTC | none (he re-enabled the PR Advisor routine at 16:07:30 UTC, after the merge; recorded by status-diet) |
@@ -505,7 +506,8 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     "Mustafa" and a date only on one line, so it misses old lines 49, 526-527, 808-809 and 1017, and "XP-TERM: (a)" at
     597 and 613; each one's decision is in DECISIONS.md or indexed by its code (the verifier), so nothing is lost.
 - **From foundation 2.1a** (PR #50; the review round on 3c98ad5 and round 2 on the fix, `docs/reports/2026-11-11-foundation-2-1a.md`):
-  - **For 2.1b's plan:**
+  - **For 2.1b's plan** (all five closed by foundation 2.1b, PR #51, merged as 2aa5e9c on 2026-11-12: its report,
+    "Decisions and deviations"):
     - **IE-2** (infra-engineer, Low): 2.1b moves all five files in one pushed commit; a half-moved commit turns its own
       push run and the next push run red (pull-request runs compare against main and are not affected).
     - **IE-3** (infra-engineer, Low) and **SA-L1** (security-auditor, Low): `tools/README.md` describes neither the
@@ -546,6 +548,97 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     diagram's label) and :202.
   - **Docs passes:** stale `tools/` citations in dated research docs, left as dated records: `docs/LEGACY_INVENTORY.md`
     TL1, TL6 and TL9; `docs/research/r5-toolchain-quality.md` :925 and :1737.
+- **From foundation 2.2** (PR #48, in flight: the session's list of 2026-11-12, which the report
+  `docs/reports/2026-11-12-foundation-2-2.md` is to take into its "Findings for 2.3" at step 7; his words: the report's
+  Appendix A and `docs/DECISIONS.md`. The codes: S1 to S5 are the checks of the Fable advisor's early read of the built
+  skeleton (through the advisor tool, 2026-11-12); K1 is the write of the new CI job; M2 and M5 are planted failures in
+  the report's evidence; PM-0002-* are ADR 0002's pass marks, OQ-0002-* its open questions, G0 and G3 checks of its
+  gate v2. Checked against the repository by docs-keeper on 2026-11-12 [verified]: GIT-C (`.claude/CHECKPOINTS.md:221`),
+  ADVISOR-TOOL-WORDS and MODELS-2026-11-12 (their "Queued" items), G0 (PM-0002-39 and the register row), OVERFLOW-WASM's PM-0002-53,
+  TSCONFIG's stubs and CI line, REQUIRED-CHECK, SAVER-SKIP-CI, OVERFLOW-PER-CRATE, PACKAGE-ENTRIES and BRIEF-STALE;
+  carried from the session's list and the report [assumed]: AUTO-ASK's times, MANUAL-MODE's documentation page and mode
+  name, REFUSED-PUSH, PIN-GUARD's marks, SETUP-NODE-CACHE's job log, M2's and M5's runs, NODE-26's dates, EMPTY-SLOTS):
+  - **For the gate step (2.3), when the kit unfreezes:**
+    - **AUTO-ASK** (his KIT-ASK-SEEN (b): `docs/DECISIONS.md`, 2026-11-11, 00:07:48 UTC; the report's Appendix A5):
+      auto mode can pass the guard's ask. K1 (2026-11-10 20:02:42 UTC): the guard's ask was answered "allow" six
+      seconds later, the session log not saying by whom. Step 5's five kit writes (2026-11-12), made in the mode he
+      chose as Accept edits: his count, five prompts of five (`docs/DECISIONS.md`, 2026-11-12, 16:31:45 UTC; Appendix
+      A11).
+    - **MANUAL-MODE**: CLAUDE.md's change-set protocol, step 3, says to make a `.claude/` edit "in Accept edits or
+      Manual mode", but the cloud app offers Accept edits, Plan or Auto, with no Manual mode (the environment's
+      documentation page on permissions, read 2026-11-12), and the session record called the mode he chose "default".
+    - **GIT-C**: `.claude/CHECKPOINTS.md` §10 (:221) tells a session to run `git -C <path> status --short --ignored`,
+      which the guard refuses ("no option before the subcommand"); sessions `cd` into the folder instead. The 2.1b
+      report lists the same refusal in its "Findings for 2.3" [verified 2026-11-12].
+    - **ADVISOR-TOOL-WORDS**: CLAUDE.md takes his words of 2026-11-11 on the advisor tool at 2.3 (`docs/DECISIONS.md`,
+      "Queued": the CLAUDE.md clarification of the advisor tool).
+    - **MODELS-2026-11-12**: CLAUDE.md's "Models and effort" section and the agent files change to match his words of
+      2026-11-12, 16:25, on models, each edit asked of him in chat with its exact text (`docs/DECISIONS.md`, 2026-11-12,
+      15:35:17 UTC, item 3, and its "Queued" item; Appendix A9).
+    - **REFUSED-PUSH** (`docs/DECISIONS.md`, 2026-11-12, 16:28:28 UTC, item 4; Appendix A10): the first push of step 5's
+      merge, written as a compound line (`git push -u origin <branch> 2>&1 | tail -4 && date ...`), was refused by the
+      session's permission check with no reason given; the guard's own push rule allows that push; the plain `git push
+      origin <branch>` then passed.
+    - **PIN-GUARD** (his answer of 2026-11-10: `docs/DECISIONS.md`, 2026-11-10, 17:23:21 UTC; Appendix A1): the guard
+      does not protect the new pins (`rust-toolchain.toml`, `Cargo.toml`, `Cargo.lock`, `package.json`,
+      `package-lock.json`): `protectedRel` is false for them, so routines may write them on a branch and day sessions
+      get no ask.
+    - **G0** (the register row Q2.2-a in `docs/adr/README.md`: the advisor agent's ruling, final; his go for the row:
+      PR #48's merge): G0's exit-2 mark moves to step 2.3, where 2.3's G0 is to prove "deleting the toolchain file fails
+      G0 with exit 2" under `--prove` (PM-0002-39); until then the toolchain job fails closed without the file (M2: red
+      at the pin check with exit 2, no cargo step run).
+    - **OVERFLOW-WASM** (what S1 left open): PM-0002-53 wants the overflow rule in four builds (dev and release, native
+      and Wasm) with a committed counter test; 2.2's CI proves the native release build for `protocol` (M5: the release
+      overflow setting removed, red at `cargo test --release`), and `sim`'s rests on step 2's local control.
+    - **TSCONFIG** (S2): TypeScript is pinned but never type-checked: no `tsconfig`, and CI prints `tsc --version` only.
+      ADR 0002 part 7 gives the shared strict base tsconfig and `tsc -b` to the lint step (G3). The stubs import
+      `./index.ts`, a convention `tsc -b` would need `allowImportingTsExtensions` (with no emit) or
+      `rewriteRelativeImportExtensions` for: 2.3 decides it.
+    - **REQUIRED-CHECK**: whether `toolchain` is a required check on main (step 7's infra-engineer answers); step 2.3
+      replaces `toolchain.yml` with the gate v2's workflow (the file's header says so), and ADR 0002 gives that workflow
+      one aggregate required check (:642, PM-0002-57).
+    - **SETUP-NODE-CACHE** (S4): setup-node v7.0.0 runs with `package-manager-cache: true` (the job log); what it caches
+      if a `packageManager` field is added to the unprotected root `package.json` is unverified (step 7's
+      security-auditor).
+    - **SAVER-SKIP-CI**: the checkpoint saver marks a push of `.checkpoints/` alone `[skip ci]`
+      (`.claude/scripts/checkpoint.mjs:168`), so a ready head made by the saver would carry no checks; the last commit
+      before ready (the notes' deletion) is made by hand.
+    - **NODE-26** (the advisor agent's ruling on Q2.2-c, Node 22 for 2.2, 2026-11-10): `tools/` and v2 move to Node 26
+      together in one change-set after 2.3, merged before 2027-03-31 (Node 22's end of life is 2027-04-30); the
+      toolkit's `package.json` and lockfile are gate files, so it asks him.
+    - From the Fable advisor's full read of the built skeleton (consultation 4, 2026-11-12, before the review round;
+      the session's checks of that day, by its own commands [verified]):
+    - **CRATE-NAMES**: four workspace crate names are taken on crates.io by other crates (`sim`, `protocol`, `room`,
+      `devtools`; `client-endpoint` and `sim-wasm` are free): a dependency written without its `path`, or `cargo add
+      sim`, would pull a stranger's crate; G5 (cargo-deny) can keep those names off the registry.
+    - **CI-ENFORCED-LATER**: nothing in CI yet checks that a new crate opts into the workspace lint table, that a new
+      crate has a test (cargo passes with no test, where npm fails a package without a test script), or that npm
+      versions stay exact (2.2 checked that by a script in its notes).
+    - **WASM-ARTIFACT**: `sim-wasm` is a plain library, so the wasm32 step compiles the crates but emits no `.wasm`
+      file; its crate type and its `unsafe_code` exception come with the bindings; the wasm32 build is dev-profile only
+      (it joins OVERFLOW-WASM).
+    - **TWO-PLAYWRIGHTS**: two Playwright versions now live in the repository (the toolkit's 1.56.1, the root's
+      1.65.0), so 2.3's browser cache needs a key per version; no real browser has run inside the cut's privilege drop.
+    - **TOOLKIT-RESOLVES-UP**: with the root installed and `tools/` installed without its optional packages (the gate
+      job's form), `require('playwright')` from `tools/smoke.mjs` loads the root's Playwright 1.65.0 instead of
+      reporting the toolkit's 1.56.1 missing; CI's smoke job installs `tools/` in full and never installs the root, and a
+      machine set up per CLAUDE.md (`cd tools && npm ci`) finds the toolkit's own copy first. `tools/smoke.mjs` is a gate
+      file, so a fix (for example checking that the resolved Playwright lies inside `tools/`) is 2.3's.
+    - **CARGO-NET-OFFLINE**: `CARGO_NET_OFFLINE=true` inside the cut would give fast, clear failures once third-party
+      crates exist (a CI-job edit, so it asks him).
+    - **CRATE-LICENCE**: the crates carry no `license` field, which cargo-deny's licence check reads.
+  - **For later steps:**
+    - **OVERFLOW-PER-CRATE** (S3): the release overflow setting is per package; a crate with simulation arithmetic that
+      enters later (`content`, a maths crate) needs the same block (the first slice).
+    - **PACKAGE-ENTRIES** (S5): the packages have no `exports` or entry fields (the step that gives them code).
+    - **EMPTY-SLOTS** (2.2's plan, Part 3, readable at the branch's last checkpoint commit): OQ-0002-7 and the
+      wasm-bindgen pin; OQ-0002-3 (one Wasm instance or two); OQ-0002-4 (isolation); OQ-0002-1 (the editor from
+      `file://`); the boundary spike's items 4 (generated types) and 8 (sizes, wasm-opt, `skipLibCheck`, the three.js
+      casts, Playwright's clock): each waits for the boundary spike.
+    - **BRIEF-STALE**: `docs/V2_PHASE0_BRIEF.md:20-21` (phase 0: no engine code but throwaway spikes) and `:144` (its
+      "Don't" list: no engine code in phase 0) still forbid engine code in phase 0, with no word of the exception for
+      foundation steps 2.1 and 2.2; it is Mustafa's and the Advisor's brief (its line 3), one of DOCS-ALIGN's documents, so
+      no session edits it [verified 2026-11-12].
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
