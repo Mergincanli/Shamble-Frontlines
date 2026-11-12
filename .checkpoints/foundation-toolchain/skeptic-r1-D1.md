@@ -27,8 +27,9 @@ leaves open; (5) judge holds and severity on CLAUDE.md's scale. Nothing in the w
   run in Node 22): dev build (the debug client) traps (RuntimeError: unreachable) on all four overflows; release build
   (20,548 bytes raw) returns 0 for counter_step(65535), 0 for the generic sum, -2 for the Fx Mul, and traps only for
   with_call (code-generated in sim). Its file keeps "attempt to add with overflow" (with_call's) but has no "attempt to
-  multiply with overflow". So a debug client and a release client disagree today on the bug path, and a debug client and
-  a release server (room, C3) too: ADR 0002 part 4's "never disagree on overflow" does not hold with part 4's mechanism.
+  multiply with overflow". So, shown in scratch (reach at 4d78ad6 is zero), a debug client and a release client would
+  disagree on the bug path, and a debug client and a release server (room, C3) too: ADR 0002 part 4's "never disagree on
+  overflow" does not hold with part 4's mechanism.
 - C6 fix A on my variant (own): release, room 8 of 8 panic and sim's integration test 8 of 8; `cargo test --profile
   bench -p room -p sim -p protocol`: room 8 of 8, sim's and protocol's overflow tests pass; a custom profile with
   inherits = "release": room 8 of 8. Release wasm32 under fix A (20,825 bytes raw): all four exports trap. Flags under
@@ -59,5 +60,50 @@ leaves open; (5) judge holds and severity on CLAUDE.md's scale. Nothing in the w
   build depends on optimizer heuristics, not on anything visible in the source: the finding's opening phrase ("where the
   sim actually runs") is loose (large sim functions with real calls keep their checks), but its body is precise, and the
   hole's reach once code exists is wide (operators on sim types, accessors, counters, short loops, generics).
+  Mechanism checked (C14 below): nm -C on own2's release libsim rlib shows code only for sim::with_call (T) and
+  sim::helper (t); tick_all, counter_step, the operators and <Fx as Mul>::mul have no code in sim at all.
 - C11 timing: reach is zero at 4d78ad6 (no crate depends on sim, sim has no public item); the first cross-crate sim call
   comes with the engine code Fable 5.2 builds after 2.2 (checkpoint, decisions of 2026-11-12). Holds.
+- C12 wording in the PR's own files: the only broad claim is Cargo.toml:21 ("Overflow checks in every profile for the
+  simulation and the protocol"). The report's Outcome (line 19, "overflow checks in the release profile for sim and
+  protocol") and E1 are accurate as worded; OVERFLOW-WASM's "CI proves native release for protocol (M5)" frames native
+  release as done, and OVERFLOW-PER-CRATE's remedy (crates with sim arithmetic) does not close the hole. The PR does
+  not change ADR 0002's text (git diff origin/main...4d78ad6: docs/adr/README.md only): part 4's "never disagree"
+  sentence predates the PR, which implements part 4's named mechanism verbatim.
+- C13 an unfiltered `cargo build --release --locked` and `cargo test --release -p sim -p protocol --locked` with fix A
+  on the pristine head: no Cargo warning, although "*" matches no package today; 2 of 2 pass.
+- C14 nm -C on own2's release libsim rlib: see C10 (code only for with_call and helper).
+- C15 docs that describe the two blocks and go stale under fix A: REPO_MAP.md:16 and ROADMAP.md:116 ("overflow checks
+  in the release profile for sim and protocol"), STATUS_ARCHIVE.md:590-592 (OVERFLOW-WASM) and :631 (OVERFLOW-PER-CRATE,
+  moot under fix A), the report's OVERFLOW-WASM and OVERFLOW-PER-CRATE rows, ADR 0002:247-248 and PM-0002-53 (:1319).
+- Folders: .gate/skeptic-D1/repro and own2 show the head's blocks; own ended in fix-A state with extdep and a custom
+  profile added; pristineA ended in fix-A state. Nothing in the worktree changed but this file.
+- Not verified: protocol in the cross-crate experiment (same mechanism, not run); wasm32 at opt-level "s" or "z" (where
+  rustc shares generics), LTO, or wasm-opt; fix A in CI; a `server` crate (room stands in); a Windows host.
+
+## Verdict
+- Holds: yes, as stated in its body (C2-C5, C9, C10, C14). Its opening phrase "where the sim actually runs" is loose:
+  sim functions with a call that survives optimization stay in sim and keep their checks (with_call). That changes
+  nothing in the verdict.
+- Severity: High. A wrong rule a session would hit: Cargo.toml:21 says "every profile", but the checks are missing in
+  every release build of a crate that calls sim, and part 4's guarantee fails with them. The next code (Fable's) hits
+  this at its first cross-crate call; the planned proof (PM-0002-53, a test in sim) cannot see it (C3); and which code
+  keeps its checks is decided by optimizer heuristics (C10, C14). Zero reach today and a cheap fix argue for allowing an
+  explicit deferral by the advisor, not for a lower severity: the configuration's only job is to govern code that does
+  not exist yet.
+- Fix A: right and complete for D1 (C6, C7, C13). What it costs or breaks:
+  (1) the evidence: M5's red CI run and E1's local control prove the per-package blocks that fix A deletes; the new line
+      has only C7's local control, so it needs a fresh M5-style planted run in CI (no workflow edit);
+  (2) Cargo.toml would contradict ADR 0002:247-248's named mechanism and PM-0002-53: part 4 is Proposed, so the ADR's
+      owner rewords it and the advisor rules, and decision docs need Mustafa's go; C15's doc lines go stale, and
+      OVERFLOW-PER-CRATE becomes moot;
+  (3) checks turn on for the own arithmetic of room, client-endpoint, devtools and later server and navbake: an
+      overflow panics instead of wrapping (by part 4's panic model, inferred, not run: an overflow in the room's tick
+      would end that match, as a sim overflow already would), with a run-time and Wasm-size cost that nobody has
+      measured; the planned cost measurement covers sim step time only;
+  (4) K1b cannot tell fix A from the head's blocks, so the regression proof needs a cross-crate release test, native
+      and wasm32 (a .github edit, his yes): 2.3 or the first sim code, as RR-1 says.
+  Not covered (outside D1): third-party integer arithmetic stays checked in dev and unchecked in release (C8), so a
+  reworded part 4 should claim "every workspace crate", not an unqualified "never disagree". Option B is worse. If the
+  advisor defers instead, narrow Cargo.toml:21, OVERFLOW-WASM's framing ("CI proves native release") and
+  OVERFLOW-PER-CRATE's remedy; leave the Outcome and E1 alone, since they are accurate as worded (C12).
