@@ -73,7 +73,10 @@ for d in cfg["diffs"]:
                 full.stdout.rstrip("\n"), "````", ""]
 out += ["## What it is judged against", ""]
 for doc in cfg["docs"]:
-    assert not FORBIDDEN.search(doc["path"]) or doc.get("words_of_mustafa"), doc["path"]
+    # An advisor's ruling is a source even when its name holds "-brief" (advisor-u4e-brief.md is the advisor's check
+    # of a brief, not a brief).
+    assert (not FORBIDDEN.search(doc["path"]) or doc.get("words_of_mustafa")
+            or os.path.basename(doc["path"]).startswith("advisor-")), doc["path"]
     ls = lines_of(doc["path"])
     if "lines" in doc:
         first, last = doc["lines"]

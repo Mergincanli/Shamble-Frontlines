@@ -23,21 +23,32 @@ advisor-u4e-brief.md, advisor-u4df.md.
   CI green on each (U4d-F's: run 43137225827). Main merged in at 5ca77eb (PR #49). At U4d-F's merge: check.mjs 10
   steps, measured 399, bites 446, self 52: the base counts for the next lanes. U4e's `<base>` is L3's commit 28a85e7,
   with the same counts (its counted run, .gate/u4e-l3/l3-check.log; the accessor adds no test).
-- **Running: U4e's build (L4),** one builder (general-purpose, opus, xhigh) in an isolated worktree from the head after
-  28a85e7 (`<base>` 28a85e7: its counts 399 / 446 / 52); brief u4e-brief.md rev 3.3 with 7.2's fill; every cargo and
-  check.mjs run through u4e-run.sh (W1-TARGET's lock; logs under .gate/u4e/); notes u4e-build.md in its worktree; T4's
-  two sentences, TE2-5's rule and USAGE-SAVINGS' builder limits in its prompt. **Launched 02:02 UTC: run
-  wf_0fa6595a-3e2, task wkl1a75yr; script workflows/scripts/npt-u4e-build-wf_0fa6595a-3e2.js; worktree
-  `.claude/worktrees/wf_0fa6595a-3e2-1` (branch worktree-wf_0fa6595a-3e2-1 at 97bb9d3).** If cut, do not resume the
-  run as it is (its `isolation: 'worktree'` would start a fresh copy): edit the script to drop the isolation and name
-  that worktree; the fresh builder reads its notes and `git diff` there first. Snapshot the worktree to the branch at
-  each check-in (worktree_patch.py ... wip/u4e.patch u4e-). On return: read its section-6 list in full (everything
-  that touches the marks: its bites and their proofs); then the review packet by script and the review.
-  - **Cut at 02:03 UTC** by the usage limit after 49 s (its notes' start block only: the worktree came up at main's
-    bb2d817 and was fast-forwarded to 97bb9d3; no code). **Relaunched 03:54 UTC as run wf_1e3b5232-26a, task
-    wvemlyc6h** (script workflows/scripts/npt-u4e-build-2-wf_1e3b5232-26a.js): one fresh builder, no isolation, in
-    that same worktree, reading its notes and the diff first. If cut again, resume this run with
-    `Workflow({scriptPath, resumeFromRunId})`: it has no isolation, so the builder re-runs in the same worktree.
+- **U4e's build (L4): DONE** (05:41 UTC; first run wf_0fa6595a-3e2 cut by the usage limit at 02:03 after 49 s, no
+  code; relaunched as wf_1e3b5232-26a, one fresh builder, no isolation, in the worktree
+  `.claude/worktrees/wf_0fa6595a-3e2-1`, branch worktree-wf_0fa6595a-3e2-1 at 97bb9d3, uncommitted). Nothing stopped.
+  check.mjs twice (.gate/u4e/b11-counted1.log, b11-counted2.log): all 10 steps PASS, measured 458 (+59), bites 524
+  (+78), self 52 of 52. Snapshot wip/u4e.patch (23 files on 97bb9d3, applies cleanly) and its record u4e-build.md:
+  db49108. Its return list (section 6) read in full by the main session. Its points for the advisor: e7's "at least
+  one split and one resent" not met at P0 on Loopback (split shown by e2, resends by the gap test); under -18's bite
+  the baseline (tick 329's frame) is still in the client's memory and only the ring's age rule refuses it (§5 U4e's
+  condition 6: the advisor confirms); owner-to-all gives each client the next slot's records; carry 26 one copy per
+  tick; proposed series for carries 54 (`event.snap_refused.tick_count`) and 61 (`tick.s.snap_too_old_count`);
+  Kick(replaced) left to the caller. **The main session's own points for the ruling** (not in any packet): carry 68
+  (any ES byte figure from the synthetic recording states the two shares beside R2's) is not in its carries list,
+  though carry 56's ES figure is reported; carry 61's choice: decode within the ring, drop and count beyond it (does
+  B5's extra reading apply?).
+- **Running: U4e's review round 1,** workflow wf_ed170231-913 (task wfdlzh70j; script
+  workflows/scripts/npt-u4e-review-r1-wf_ed170231-913.js), launched about 05:55 UTC. Packet u4e-packet.md (sha256
+  89426183…) and its side file u4e-packet-tests.md, cut by review_packet.py from u4e-packet.json (the script now
+  takes an `advisor-` file whose name holds "-brief"). Base copy `.gate/u4e-prefix` (1e8c188, as L3 says); read copy
+  `.gate/u4e-r1` (97bb9d3 plus the patch, byte-equal to the builder's crates). Batch 1 (Read): netcode-architect,
+  security-auditor, rust-reviewer, read only. Batch 2 (Prove): engine-architect (the read copy, no runs) beside the
+  test-engineer (general-purpose with Edit: plants by Edit in the builder's copy, every bite's part (ii), the other
+  seats' findings settled by run, one counted check.mjs). Notes u4e-review-{netcode,security,rust,arch,test}.md; logs
+  .gate/u4e/r1-*. If cut: first check every file's sha256 against the test-engineer's step (1) (a plant may be in
+  place), then resume with `Workflow({scriptPath, resumeFromRunId})`. On return: read every finding rated Medium or
+  higher in full, and everything touching the judge, the marks or a pass bar; then the advisor's ruling on round 1
+  (with the points above), the fix pass, round 2 on what changed.
 - The saver: `node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer
   "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
   https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"` (background, 120 minutes; restart it when it stops). Stop
@@ -95,7 +106,7 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
   answered.
 - **Housekeeping later** (approved method: leftovers to a local branch, then a plain `git worktree remove`):
   `.gate/u4a-prefix`, `u4b-prefix`, `u4b-wt`, `u4c-prefix`, `u4d-prefix`, `u4d-s1`, `u4j-prefix`, `u4df-prefix`,
-  `u4df-r1` (after U4d-F's merge); `.claude/worktrees/`
+  `u4df-r1` (after U4d-F's merge), `u4e-prefix`, `u4e-r1`, `u4e-empty` (after U4e's merge); `.claude/worktrees/`
   agent-a9297644e7c0354f3 (U4a), wf_f54246ff-e0d-1 (U4d), wf_f54246ff-e0d-2 (U4c), agent-a3b8dfeb01ed52b50 (U4j,
   merged at 4d2b0ef), wf_9ce88fa3-452-1 (U4d-F, merged 2026-11-12).
 

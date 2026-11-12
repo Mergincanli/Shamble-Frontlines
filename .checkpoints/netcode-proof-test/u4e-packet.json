@@ -1,0 +1,41 @@
+{
+  "title": "U4e round 1 (the room and the codec path: npt-room, npt-server's library, npt-client; with L3's `Scene::effect_rows`)",
+  "out": ".checkpoints/netcode-proof-test/u4e-packet.md",
+  "side_out": ".checkpoints/netcode-proof-test/u4e-packet-tests.md",
+  "heads": [
+    "Base: 1e8c188 on the spike branch, the commit before L3's carry-51 commit 28a85e7 (the advisor's U4e brief ruling, L3: the review reads its diff from the commit before the carry-51 commit). The build's `<base>` is 28a85e7; the worktree's HEAD is 97bb9d3, whose spikes/ equals 28a85e7's.",
+    "U4e's copy: `.claude/worktrees/wf_0fa6595a-3e2-1` (branch worktree-wf_0fa6595a-3e2-1 at 97bb9d3; the change is uncommitted there). The same change as a patch: `.checkpoints/netcode-proof-test/wip/u4e.patch` (committed at db49108).",
+    "The diffs below compare the base copy `.gate/u4e-prefix` (a worktree at 1e8c188) with U4e's copy; new test folders are compared with the empty folder `.gate/u4e-empty`. The tests' diffs are in the side file `.checkpoints/netcode-proof-test/u4e-packet-tests.md`.",
+    "The build's runs are under `.gate/u4e/` (logs written by the runner `.checkpoints/netcode-proof-test/u4e-run.sh`): the two counted check.mjs runs b11-counted1.log and b11-counted2.log, the `--list` b11-list.log, and the scratch-switch runs s01 to s15."
+  ],
+  "diffs": [
+    {"label": "npt-sim's scene.rs (L3's commit: `Scene::effect_rows`)", "a": ".gate/u4e-prefix/spikes/netcode-proof/crates/sim/src/scene.rs", "b": ".claude/worktrees/wf_0fa6595a-3e2-1/spikes/netcode-proof/crates/sim/src/scene.rs"},
+    {"label": "npt-room's sources (crates/room/src)", "a": ".gate/u4e-prefix/spikes/netcode-proof/crates/room/src", "b": ".claude/worktrees/wf_0fa6595a-3e2-1/spikes/netcode-proof/crates/room/src"},
+    {"label": "npt-room's clippy.toml", "a": ".gate/u4e-prefix/spikes/netcode-proof/crates/room/clippy.toml", "b": ".claude/worktrees/wf_0fa6595a-3e2-1/spikes/netcode-proof/crates/room/clippy.toml"},
+    {"label": "npt-server's library (crates/server/src)", "a": ".gate/u4e-prefix/spikes/netcode-proof/crates/server/src", "b": ".claude/worktrees/wf_0fa6595a-3e2-1/spikes/netcode-proof/crates/server/src"},
+    {"label": "npt-client's sources (crates/client/src)", "a": ".gate/u4e-prefix/spikes/netcode-proof/crates/client/src", "b": ".claude/worktrees/wf_0fa6595a-3e2-1/spikes/netcode-proof/crates/client/src"},
+    {"label": "npt-client's clippy.toml", "a": ".gate/u4e-prefix/spikes/netcode-proof/crates/client/clippy.toml", "b": ".claude/worktrees/wf_0fa6595a-3e2-1/spikes/netcode-proof/crates/client/clippy.toml"},
+    {"label": "npt-room's tests (crates/room/tests, new)", "a": ".gate/u4e-empty", "b": ".claude/worktrees/wf_0fa6595a-3e2-1/spikes/netcode-proof/crates/room/tests", "side": true},
+    {"label": "npt-server's tests (crates/server/tests)", "a": ".gate/u4e-prefix/spikes/netcode-proof/crates/server/tests", "b": ".claude/worktrees/wf_0fa6595a-3e2-1/spikes/netcode-proof/crates/server/tests", "side": true},
+    {"label": "npt-client's tests (crates/client/tests)", "a": ".gate/u4e-prefix/spikes/netcode-proof/crates/client/tests", "b": ".claude/worktrees/wf_0fa6595a-3e2-1/spikes/netcode-proof/crates/client/tests", "side": true}
+  ],
+  "docs": [
+    {"label": "The approved plan: §5 U4e (u4-build-plan.md)", "path": ".checkpoints/netcode-proof-test/u4-build-plan.md", "heading": "^### U4e, the room and the codec path"},
+    {"label": "The approved plan: §4.1, the public items (u4-build-plan.md)", "path": ".checkpoints/netcode-proof-test/u4-build-plan.md", "heading": "^### 4\\.1 Public items"},
+    {"label": "The approved plan: §4.2, the seam (u4-build-plan.md)", "path": ".checkpoints/netcode-proof-test/u4-build-plan.md", "heading": "^### 4\\.2 The seam"},
+    {"label": "The approved plan: §4.10, hostile input (u4-build-plan.md)", "path": ".checkpoints/netcode-proof-test/u4-build-plan.md", "heading": "^### 4\\.10 Hostile input"},
+    {"label": "The advisor's wave-1 ruling W1-S1, the soldier's layout (advisor-u4-wave1.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4-wave1.md", "heading": "^### W1-S1: "},
+    {"label": "The advisor's wave-1 ruling W1-N2, the header's command sequences (advisor-u4-wave1.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4-wave1.md", "heading": "^### W1-N2: "},
+    {"label": "The advisor's wave-1 ruling W1-PUB, the public items beyond §4.1 (advisor-u4-wave1.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4-wave1.md", "heading": "^### W1-PUB: "},
+    {"label": "The advisor's wave-1 ruling W1-U4E, U4e's questions U4E-Q1 to Q11 (advisor-u4-wave1.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4-wave1.md", "heading": "^### W1-U4E: "},
+    {"label": "The advisor's wave-1 note W1-TARGET, the shared Cargo target (advisor-u4-wave1.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4-wave1.md", "heading": "^### W1-TARGET: "},
+    {"label": "The advisor's check of the U4e brief: A1 to A7, U4E-Q12 to Q14, F2-ROUTE, conditions L1 to L4 (advisor-u4e-brief.md, whole)", "path": ".checkpoints/netcode-proof-test/advisor-u4e-brief.md"},
+    {"label": "The advisor's U4j round-2 ruling B2.1: when a tick is written lost, and a stale group (advisor-u4j-r2.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4j-r2.md", "heading": "^### B2\\.1 "},
+    {"label": "The advisor's U4j round-2 ruling B5: the readings, including the one for a client that drops stale groups (advisor-u4j-r2.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4j-r2.md", "heading": "^## B5\\. "},
+    {"label": "Mustafa's words on the effect row's owner, 2026-11-11 (his words)", "path": ".checkpoints/netcode-proof-test/history.md", "lines": [340, 340], "words_of_mustafa": true}
+  ],
+  "cited": [
+    {"label": "§5 U4e", "path": ".checkpoints/netcode-proof-test/u4-build-plan.md", "heading": "^### U4e, the room and the codec path", "ref": "§4\\.\\d+", "section": "^### {num} "}
+  ],
+  "carries": {"path": ".checkpoints/netcode-proof-test/u4s-carries.md", "include": "^(21|22|23|24|25|26|27|39|50|51|53|54|55|56|57|61|68)\\. \\*\\*|U4e"}
+}
