@@ -21,3 +21,12 @@ Seat: the advisor agent, run by the main session's workflow, working from main's
   "fail-closed"; A15 found the superset's first cost; block 7 set U4d2's review in batches).
 - Read the form: advisor-u4e-r1.md R8 (fix pass, its builder, round 2's seats, the outcome rule) and R9 (M1-M9);
   advisor-u4e-r2.md Q3 (M1-M9 as amended), Q4 (background run, >= 1,500,000 ms), "Before the merge".
+- The rules by place: u4-build-plan.md (now 52dd3186…) §5 U4d2 :666-712, Lanes :850-888, §6 :890-907, §7.1 :909-921;
+  Mustafa's words behind §7.1 (history.md:411-412, 2026-11-09: "point all copies at one shared Cargo target folder
+  (CARGO_TARGET_DIR), so each unit doesn't leave a 4–6 GB cache behind"); W1-TARGET item 3 (advisor-u4-wave1.md:576-580:
+  "Between waves, with no lane running, the main session may empty the shared folder by `cargo clean --target-dir
+  .gate/shared-target` ... §7.1 item 7 ... binds the copies, not the main session"); B2.3 (advisor-u4j-r2.md:146-171).
+- TE-M3's test read: delay_tests.rs:2551-2603, `#[tokio::test(flavor = "multi_thread", worker_threads = 2)]`, counted
+  asserts (`polls_after_deadline == 1`, `polls <= 3`, `s_calls <= polls`) after a 300 ms wait; U3c's failure
+  (u3c-fix2-c2b.md:74-76: "panicked at delay_tests.rs:2002 ... once, under C1b's parallel load"). Which assert fails is
+  unknown both times (no panic text kept).
