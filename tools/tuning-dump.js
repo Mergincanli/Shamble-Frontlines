@@ -1,6 +1,6 @@
 // Tuning dump (R7, read-only): every tuning table and constant of the live legacy build as JSON.
 // RUN from the repo root (Linux: prefix xvfb-run -a), the same file twice in one command:
-//   node tools/preview.js . eval tools/tuning-dump.js --pre=tools/tuning-dump.js [--map=tri] > <out.json>
+//   node tools/preview.js legacy eval tools/tuning-dump.js --pre=tools/tuning-dump.js [--map=tri] > <out.json>
 // As --pre (engine scripts loaded, bootGame not yet run) it snapshots the source defaults. As eval (after bootGame) it
 // prints { defaults, bootChanges, skipped }: bootChanges lists only the values boot changed, per path, old -> new.
 // Serialisation rule: numbers, strings, booleans, null, arrays and plain objects are kept; THREE.Color -> "#rrggbb";

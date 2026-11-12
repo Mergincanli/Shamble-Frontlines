@@ -90,6 +90,10 @@ netcode proof test first, then the sim core spike (then the 60 Hz run), then the
 test once its models exist. The preview hosting check may run alongside any of them. Reason: seven usage-limit cuts in
 three days."
 
+_Pointer (2026-11-11, foundation 2.1a): for foundation steps 2.1 and 2.2, overtaken by Mustafa's decision of 2026-11-10
+(`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-10: the second account may plan and build foundation steps
+2.1 and 2.2 now"); for the rest, his words there: "Steps 2.3 to 2.6 keep their order and wait for their results."_
+
 ```mermaid
 flowchart LR
   A["Drafts signed off as the basis for the spikes<br/>(Mustafa, 2026-11-03)"] --> W1
@@ -123,6 +127,10 @@ but between two of them, early enough that its export and slot rules reach Musta
 (3) the content and ability spike and the render budget bench, before slice 1; (4) slices 1–6, with the rest of the
 asset-pipeline research and the asset spike before the first authored model, the Feel Lab test once abilities are
 playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 60 Hz call (TICK-60-SETUP).
+
+_Pointer (2026-11-11, foundation 2.1a): for foundation steps 2.1 and 2.2, overtaken by Mustafa's decision of 2026-11-10
+(`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-10: the second account may plan and build foundation steps
+2.1 and 2.2 now"); for the rest, his words there: "Steps 2.3 to 2.6 keep their order and wait for their results."_
 
 | # | Spike | Size | Place | Pass marks |
 |---|---|---|---|---|
@@ -430,6 +438,10 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
   check before the preview step; Mustafa's client-host deploy token in the `preview` environment (ADR 0006 part 13,
   item B9; how production stays out of that token's reach is OQ-0006-13, answered before the first client-host token
   is added) and branch-protection setting.
+  _Pointer (2026-11-11, foundation 2.1a): for foundation steps 2.1 and 2.2, overtaken by Mustafa's decision of
+  2026-11-10 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-10: the second account may plan and build
+  foundation steps 2.1 and 2.2 now"); for the rest, his words there: "Steps 2.3 to 2.6 keep their order and wait for
+  their results."_
 - **Size:** L (six change-sets: restructure, toolchain, gate and CI, generated types, skeleton, previews).
 - **Research it carries:** R5-LAYOUT-REC1, REC2, REC6; R5-TSLINT-REC1–REC4; R5-RUSTLINT-REC1–REC6; R5-TEST-REC1,
   REC6; R5-CI-REC1–REC5; R5-PREV-REC1, REC4 (mark 1); R5-GATE-REC1–REC4; R1-BND-REC4's CI checks. It re-proves as gate

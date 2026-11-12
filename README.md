@@ -9,17 +9,17 @@ in the locked "Living Comic" style: flat two-band cel shading with bold ink outl
 (12v12v12 to 16v16v16, designed for 48+ players); bots fill empty slots.
 
 ## Play
-- Double-click `index.html`. It needs an internet connection for now: three.js loads from a CDN.
-- `editor.html` is the authoring build: Map Editor, Character Lab, Anim Lab.
+- Double-click `legacy/index.html`. It needs an internet connection for now: three.js loads from a CDN.
+- `legacy/editor.html` is the authoring build: Map Editor, Character Lab, Anim Lab.
 - Controls: open the main menu's **Field manual** tab, or press Esc in game.
 
 ## Repository layout
 | Path | What it is |
 |---|---|
-| `shamble-core.js` | Engine: render pipeline (NPR), characters and factions, gun and building kits, map data, simulation math |
-| `shamble-game.js` | Gameplay, AI, economy, HUD, menus, animation, the main loop and `bootGame` |
-| `shamble-editor.js` | Authoring tools (loaded by editor.html only) |
-| `index.html` / `editor.html` | Player build / authoring build |
+| `legacy/shamble-core.js` | Engine: render pipeline (NPR), characters and factions, gun and building kits, map data, simulation math |
+| `legacy/shamble-game.js` | Gameplay, AI, economy, HUD, menus, animation, the main loop and `bootGame` |
+| `legacy/shamble-editor.js` | Authoring tools (loaded by editor.html only) |
+| `legacy/index.html` / `legacy/editor.html` | Player build / authoring build |
 | `docs/` | Status, design, art direction, architecture, roadmap, decisions (ADRs), reports, reference material |
 | `tools/` | Verification toolkit (headless renderer, verify battery, match simulator): never shipped |
 | `CLAUDE.md`, `.claude/` | Instructions, agents, skills, rules and hooks for Claude Code |

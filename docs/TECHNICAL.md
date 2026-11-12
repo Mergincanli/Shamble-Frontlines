@@ -235,9 +235,9 @@ Setup: `cd tools && npm ci` (versions pinned in `tools/package-lock.json`; notes
 
 ## 9. File inventory
 
-- **`shamble-core.js` / `shamble-game.js` / `shamble-editor.js`** — the three shared-global source files (engine / gameplay + dispatch / authoring). See `MODULE_MAP.md` + §1a.
-- **`index.html`** — the **player build** (core + game). **`editor.html`** — the **authoring build** (core + game + editor). Both hand-thin: manifest comment, script tags, `bootGame()` [`bootEditor()`] + menu tail.
-- **Docs (`docs/`, synced into the Advisor's Project Knowledge):** `STATUS.md`, `START_HERE.md` (read first), `MODULE_MAP.md` (read second), `TECHNICAL.md` (this), `GAME_DESIGN.md`, `ART_DIRECTION.md`, `ROADMAP.md`, `UNITS.md`, `DESIGN_NOTES.md`, `adr/`, `reports/`.
+- **`legacy/shamble-core.js` / `legacy/shamble-game.js` / `legacy/shamble-editor.js`** — the three shared-global source files (engine / gameplay + dispatch / authoring). See `MODULE_MAP.md` + §1a.
+- **`legacy/index.html`** — the **player build** (core + game). **`legacy/editor.html`** — the **authoring build** (core + game + editor). Both hand-thin: manifest comment, script tags, `bootGame()` [`bootEditor()`] + menu tail. All five moved from the repo root to `legacy/` with `git mv` in foundation step 2.1b, bytes unchanged [verified 2026-11-11].
+- **Docs (`docs/`, synced into the Advisor's Project Knowledge):** `STATUS.md`, `DECISIONS.md`, `STATUS_ARCHIVE.md`, `START_HERE.md` (read first), `MODULE_MAP.md` (read second), `TECHNICAL.md` (this), `GAME_DESIGN.md`, `ART_DIRECTION.md`, `ROADMAP.md`, `UNITS.md`, `DESIGN_NOTES.md`, `adr/`, `reports/`.
 - **Tools (`tools/`, never shipped):** `gate.mjs`, `battery.js`, `preview.js`, `pageshot.js`, `sim.js`, `reach.js`, `perfbots.js`, `aabbs.js`, `village.py`, `smoke.mjs` (§8b, `tools/README.md`).
 - **Retired:** `shamble-frontlines.html` (pre-split single file; removed from Project Knowledge). The title was once `VANGUARD` — it survives only in legacy persistence-key fallbacks. Also outdated: `echelon.html`, old prototypes, `sim-core.js`, any `journal.txt` catalogue.
 

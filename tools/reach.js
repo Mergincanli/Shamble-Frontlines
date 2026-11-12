@@ -1,4 +1,4 @@
-// Spawn-to-goal reachability on the NAV grid: node tools/preview.js . eval tools/reach.js [--map=tri] (Linux: prefix xvfb-run -a).
+// Spawn-to-goal reachability on the NAV grid: node tools/preview.js legacy eval tools/reach.js [--map=tri] (Linux: prefix xvfb-run -a).
 // Starts: every bot spawn point (teamSpawnPoint per active slot) plus your mapSpawn. Goals per team: other teams' structures
 // (push), the tech points (objective), other teams' truck dock and lane points (hunt). Measures (each must be 100 % on DM_Tri):
 //   route  the real navPath (8000-expansion cap) finds a route to every goal. A flood fill over the same grid is the ground
