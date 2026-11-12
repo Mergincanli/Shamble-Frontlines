@@ -4,8 +4,8 @@
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main, last merged in at 5ca77eb (main bb2d817, PR #49, the STATUS split)
-- **Last update:** 2026-11-12 about 01:55 UTC (U4d-F merged into the spike branch: the commit "U4d-F: the estimate
-  scene fix (npt-sim), merged after review round 2")
+- **Last update:** 2026-11-12 about 01:55 UTC (U4d-F merged into the spike branch at adb1bab, CI green; next, U4e's
+  L3)
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
@@ -19,9 +19,10 @@ advisor-u4-wave1.md (with B1.4's erratum), advisor-u4j.md, advisor-u4d-close.md,
 advisor-u4e-brief.md, advisor-u4df.md.
 - **Merged into the spike branch:** U4s f080551, U4b 411eeee, U4a 952f734, U4c f3f7c2f, U4d with W1-S1's npt-proto half
   39f4290 (report u4d-report.md), U4j 4d2b0ef and d50396a (u4j-build.md), and **U4d-F** (the commit "U4d-F: the
-  estimate scene fix (npt-sim), merged after review round 2"; report u4df-report.md; record u4df-build.md); CI green
-  on each through U4j. Main merged in at 5ca77eb (PR #49). At U4d-F's merge: check.mjs 10 steps, measured 399, bites
-  446, self 52: the base counts for the next lanes (U4e's `<base>` comes from L3's counted run).
+  estimate scene fix (npt-sim), merged after review round 2", adb1bab; report u4df-report.md; record u4df-build.md);
+  CI green on each (U4d-F's: run 43137225827). Main merged in at 5ca77eb (PR #49). At U4d-F's merge: check.mjs 10
+  steps, measured 399, bites 446, self 52: the base counts for the next lanes (U4e's `<base>` comes from L3's counted
+  run).
 - **Running:** no agent. The saver: `node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer
   "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
   https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"` (background, 120 minutes; restart it when it stops). Stop
@@ -33,7 +34,7 @@ U4j, and "Running work, U4d-F" for U4d-F and the U4e brief's drafting):
    crates/judge), 65 (§U4d2, or the main session sooner); C-U6-9 to C-U6-11 (plan.md's U6 row); the FU list for PR
    #40's report (the closing checklist); one more reading only if U4e's client drops stale groups (advisor-u4j-r2.md
    B5).
-2. **U4d-F, the estimate scene fix: MERGED** (2026-11-12 about 01:55 UTC). Run A (four builders; 3b's re-home;
+2. **U4d-F, the estimate scene fix: MERGED at adb1bab** (01:50 UTC; CI green). Run A (four builders; 3b's re-home;
    `aim_one_in` 40), round 1 (both seats APPROVE WITH FINDINGS: NF-M1 and TF-M1 Medium), the advisor's ruling
    (advisor-u4df.md: APPROVE WITH CONDITIONS; RM, carry 67; FX-1 and FX-2 before the merge), the fix pass (FX-1 exact
    on 954,628 sky aims; Q1-Q5 each fail it by name), round 2 (both seats APPROVE WITH FINDINGS; one Low, NC2-L1), the
