@@ -894,10 +894,17 @@ B2. Rev 3.2 rechecked R27, R28 and R38 at d50396a (U4j's merge).
    /home/user/Shamble-Frontlines/spikes/netcode-proof && node check.mjs`, reading its test step's line ("measured build:
    N tests passed …; bites build: M …"), self's "K of K" and the step count. (`<base>` holds U4j's merge and the
    carry-51 commit, so this run is always needed; the last counts known are d50396a's: 396, 443, 52 of 52, 10 steps.)
+   **Filled at launch (the main session, 2026-11-12 about 02:05 UTC):** `<base>` is
+   28a85e773e665f9944c3ab8bd606337298bd3273, the carry-51 commit (L3), on U4d-F's merge (adb1bab) and U4j's
+   (d50396a). Its counts, from a counted run in the main folder (main-run.sh, the lane lock held exclusively;
+   .gate/u4e-l3/l3-check.log; npt-sim compiled from the main folder's path): check.mjs 10 steps, all PASS; measured
+   399, bites 446, self 52 of 52. `<base>` differs from 39f4290 under spikes/ (U4j's crates/judge, crates/log and
+   marks/; U4d-F's and L3's crates/sim; L-c8's results).
 2. **Carry 51's home** (R31; close B2): add `Scene::effect_rows()` (pub, the rows per soldier) and its §4.1 line
    ("`Scene::effect_rows` (an effect row's owner, the one public home: carry 51)") in your own commit when U4e's build
    starts, so `<base>` holds it and item 1 applies. Any other home U4e finds it needs is a seam change for the advisor
-   (carry 26's route).
+   (carry 26's route). **Done:** 28a85e7 (`pub fn effect_rows(&self) -> u8` in scene.rs); its §4.1 line went in at
+   1e8c188, one commit earlier.
 3. **The pending items** (3.2): folded in before the check (2026-11-11), from advisor-u4d-close.md B1.2, B1.3, B2.
 4. **U4E-Q12, U4E-Q13 and U4E-Q14**: answered by the advisor's check (advisor-u4e-brief.md) and written into 2.1, 2.4
    (e5), 2.5 and 2.6 (done).

@@ -4,16 +4,16 @@
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main, last merged in at 5ca77eb (main bb2d817, PR #49, the STATUS split)
-- **Last update:** 2026-11-12 about 01:55 UTC (U4d-F merged into the spike branch at adb1bab, CI green; next, U4e's
-  L3)
+- **Last update:** 2026-11-12 about 02:05 UTC (U4d-F merged at adb1bab, CI green; U4e's L3 at 28a85e7; next, U4e's
+  launch)
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**The current step: U4 wave 2's start.** U4e's L3 (the carry-51 commit), then U4e's launch (L4); U4d2's brief with the
-advisor. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
+**The current step: U4 wave 2's start.** U4e's launch (L4; L3, the carry-51 commit, done at 28a85e7); U4d2's brief with
+the advisor. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, d928358b…), u4s-carries.md (carries 1-72, cdab0240…); the advisor's rulings: advisor-u4.md,
 advisor-u4-wave1.md (with B1.4's erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md,
 advisor-u4e-brief.md, advisor-u4df.md.
@@ -21,9 +21,15 @@ advisor-u4e-brief.md, advisor-u4df.md.
   39f4290 (report u4d-report.md), U4j 4d2b0ef and d50396a (u4j-build.md), and **U4d-F** (the commit "U4d-F: the
   estimate scene fix (npt-sim), merged after review round 2", adb1bab; report u4df-report.md; record u4df-build.md);
   CI green on each (U4d-F's: run 43137225827). Main merged in at 5ca77eb (PR #49). At U4d-F's merge: check.mjs 10
-  steps, measured 399, bites 446, self 52: the base counts for the next lanes (U4e's `<base>` comes from L3's counted
-  run).
-- **Running:** no agent. The saver: `node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer
+  steps, measured 399, bites 446, self 52: the base counts for the next lanes. U4e's `<base>` is L3's commit 28a85e7,
+  with the same counts (its counted run, .gate/u4e-l3/l3-check.log; the accessor adds no test).
+- **Running: U4e's build (L4),** one builder (general-purpose, opus, xhigh) in an isolated worktree from the head after
+  28a85e7 (`<base>` 28a85e7: its counts 399 / 446 / 52); brief u4e-brief.md rev 3.3 with 7.2's fill; every cargo and
+  check.mjs run through u4e-run.sh (W1-TARGET's lock; logs under .gate/u4e/); notes u4e-build.md in its worktree; T4's
+  two sentences, TE2-5's rule and USAGE-SAVINGS' builder limits in its prompt. Its run id and worktree: below, once
+  launched. On return: read its section-6 list in full (everything that touches the marks: its bites and their
+  proofs); then the review packet by script and the review (the brief's reviewers).
+- The saver: `node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer
   "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
   https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"` (background, 120 minutes; restart it when it stops). Stop
   it before a merge's apply and restart it after the push.
@@ -58,11 +64,11 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
   as follow-ups for U3d's part of PR #40's report; B2's U4g and U4h notes stay follow-ups (named in u4d-report.md).
 
 **Next steps, in order:**
-1. **U4e's L3** (advisor-u4e-brief.md; carry 51's words): the main session's own commit on the merged head:
-   `Scene::effect_rows()` (pub, the rows per soldier, 8 or 0 in today's scenes) and its line in u4-build-plan.md §4.1's
-   npt-sim row ("`Scene::effect_rows` (an effect row's owner, the one public home: carry 51)"); then the brief's 7.2
-   item 1 counted run gives `<base>`'s counts (every check.mjs step passing), filled into the brief. U4e's review reads
-   its diff from the commit before the carry-51 commit (engine-architect: a new pub item, A19; rust-reviewer).
+1. **U4e's L3: DONE** (advisor-u4e-brief.md; carry 51's words): `Scene::effect_rows()` at 28a85e7 (its own commit;
+   CI green, run 43138206491), its §4.1 line at 1e8c188 (the saver's last autosave caught the plan edit when it
+   stopped: stop the saver before editing toward a commit that must hold both). The counted run at 28a85e7: 10 steps
+   PASS, 399 / 446 / 52 (.gate/u4e-l3/l3-check.log), filled into the brief's 7.2 item 1; gate PASS (--no-smoke).
+   U4e's review reads its diff from 1e8c188 (engine-architect: a new pub item, A19; rust-reviewer).
 2. **L4, U4e's launch,** as the brief's section 1 says: one builder (general-purpose, opus, xhigh) in a worktree, under
    W1-TARGET's lock; at most three agents at a time, reviewers included.
 3. **U4d2's builder brief,** with the advisor: carries 52, 65 and 66, N2-M2's ruling and W1-TARGET; it bases on U4d-F's
