@@ -7,17 +7,30 @@ import { readFileSync, writeFileSync } from 'node:fs';
 
 const [jsonl, uuid, out, headerFile] = process.argv.slice(2);
 if (!jsonl || !uuid || !out || !headerFile) { console.error('usage: node save-words.mjs <jsonl> <uuid> <out.md> <header>'); process.exit(2); }
-let text = null, ts = null;
-for (const line of readFileSync(jsonl, 'utf8').split('\n')) {
+// A message he sends while a turn runs is kept as an attachment of type queued_command (origin.kind "human"), its text
+// in attachment.prompt; the queue's own "enqueue" line (same text) is checked against it.
+let text = null, ts = null, cmd = null;
+const all = readFileSync(jsonl, 'utf8').split('\n');
+for (const line of all) {
   if (!line) continue;
   let o; try { o = JSON.parse(line); } catch { continue; }
-  if (o.type !== 'user' || o.uuid !== uuid) continue;
-  const c = o.message?.content;
-  const texts = typeof c === 'string' ? [c] : Array.isArray(c) ? c.filter((b) => b.type === 'text').map((b) => b.text) : [];
-  if (texts.length !== 1) { console.error(`message ${uuid} has ${texts.length} text blocks; expected 1`); process.exit(1); }
-  text = texts[0]; ts = o.timestamp;
+  if (o.uuid !== uuid) continue;
+  if (o.type === 'user') {
+    const c = o.message?.content;
+    const texts = typeof c === 'string' ? [c] : Array.isArray(c) ? c.filter((b) => b.type === 'text').map((b) => b.text) : [];
+    if (texts.length !== 1) { console.error(`message ${uuid} has ${texts.length} text blocks; expected 1`); process.exit(1); }
+    text = texts[0]; ts = o.timestamp;
+  } else if (o.type === 'attachment' && o.attachment?.type === 'queued_command' && o.attachment?.origin?.kind === 'human') {
+    text = o.attachment.prompt; ts = o.attachment.timestamp; cmd = o.attachment.source_uuid;
+  }
 }
-if (text === null) { console.error(`no user message ${uuid} in ${jsonl}`); process.exit(1); }
+if (text === null) { console.error(`no message ${uuid} from him in ${jsonl}`); process.exit(1); }
+if (cmd !== null) {
+  const q = all.filter(Boolean).map((l) => { try { return JSON.parse(l); } catch { return null; } })
+    .filter((o) => o?.type === 'queue-operation' && o.operation === 'enqueue' && o.content === text);
+  if (q.length !== 1) { console.error(`the queued message ${uuid} has ${q.length} matching enqueue lines; expected 1`); process.exit(1); }
+  console.log(`queued message: command ${cmd}, enqueued ${q[0].timestamp}, the same text`);
+}
 if (text.includes('```')) { console.error('the message holds a ``` fence; this script cannot fence it safely'); process.exit(1); }
 const header = readFileSync(headerFile, 'utf8').replace(/\s+$/, '');
 writeFileSync(out, `${header}\n\n\`\`\`text\n${text}\n\`\`\`\n`);

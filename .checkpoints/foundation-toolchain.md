@@ -94,6 +94,21 @@
     Final head 66d9888 all green: toolchain push 42893708734 and pull_request 42893718519; gate workflow push
     42893708791 and pull_request 42893718283 (gate and smoke jobs, 6 check runs, all success).
 
+17. Step 5, part 1, 2026-11-12: the main folder moved to `main-folder` at origin/main (no guard prompt; the guard's
+    `mainFolderMove` lets `git switch -c <new> origin/main` pass), the branch checked out in
+    `.gate/foundation-toolchain-wt`, origin/main merged there · merge c901187 (clean; main changed none of 2.2's files;
+    the branch's kit and gate files byte-identical to main's) · pushed from the worktree. A first push in a compound
+    line (`git push -u origin <branch> 2>&1 | tail -4 && date ...`) was refused by the session's permission check with
+    no reason given (the guard's push rule allows that push, so likely auto mode's classifier); the plain `git push
+    origin claude/laughing-pasteur-fwya24` then passed (a refusal for the report's list). E2 re-run on c901187, all
+    green: toolchain push 43249204290 (job 131290067542: rustup installed 1.99.1 "overridden by .../rust-toolchain.toml",
+    "rustc equals the pin 1.99.1", control "connected to 140.82.114.3:443 before the cut", inside uid=1001(runner)
+    gid=65534(nogroup), only `lo` UP, `curl: (7)`, "the network is cut ... (curl exit 7)", cargo test 6/6, the wasm32
+    build, `npm ci --offline` 46 packages, `npm test --workspaces` 5/5, tsc 6.0.3; job 20 s) and pull_request
+    43249208734; gate push 43249204350 and pull_request 43249208725. Local gate `--no-smoke` on the merged tree: PASS,
+    symbols +0 -0, base "origin/main = 2aa5e9c (files in legacy/)". The four kit texts drafted by script
+    (`k-texts.mjs`: each old text found once; longest new lines 133 (K2a, a heading), 114, 109, 117 chars).
+
 ## Current step
 Step 5 started, 2026-11-12 (his words of that day, item 1: "Step 5 no longer waits: start it as your card says";
 `mustafa-2026-11-12-step5-models.md`). 2.1b merged as 2aa5e9c (PR #51). Read on main 2aa5e9c: condition 5 holds (ADR
@@ -153,6 +168,20 @@ there, then the four texts, the advisor tool, his chat ask.
   `rustup show active-toolchain` prints `1.99.1-x86_64-unknown-linux-gnu (overridden by '<repo>/rust-toolchain.toml')`.
 
 ## Decisions taken
+- Mustafa, 2026-11-12, 15:35:17 UTC, his second message that day (`mustafa-2026-11-12-models-skeleton.md`, saved by
+  `save-words.mjs` from the transcript's queued message, byte for byte): it re-sends the first with item 3 changed and
+  item 4 new, and governs. Item 3, his words on models "of 2026-11-12, 16:25", to record in DECISIONS.md word for word:
+  "I want the game to be build in Fable, because I Want to ensure highest possible quality. The agents however can run
+  on Opus 5.5 max. If the rules need to be changed for this, change it." with "What I mean by it" (Fable 5.2 the main
+  model of every chat that writes game or engine code on his personal account, and of its builder agents; every other
+  agent Opus 5.5, may run at max, and the agents that review, verify or design game and engine code always at max; the
+  guard, gate and CI work stays Opus 5.5; the university account's netcode chat unchanged; it replaces LANE-RULES' "The
+  main model and every agent stay Opus 5.5" from the moment it is in DECISIONS.md; he allows the kit rule change, made
+  at 2.3 with each edit asked in chat: a finding for 2.3, no kit edit for it in this PR). Item 4: this chat finishes 2.2
+  on Opus 5.5 on its approved plan; at moment 5, before the PR is marked ready, the Fable advisor reads the built
+  skeleton as a whole (the Cargo workspace and the crates' settings, the pins, the package layout, the CI job); fix what
+  it finds within the review budget, or record it in the report. Item 5: the PR a draft until its report is done; tell
+  him when he is needed for the kit edits, and in which mode.
 - Mustafa, 2026-11-12, 15:26:57 UTC (`mustafa-2026-11-12-step5-models.md`, saved by `save-words.mjs` from the
   transcript, byte for byte): 2.1b merged (2aa5e9c, CI run #705 green), step 5 starts as the card says, each kit edit
   (K2a, K2b, K3, K4) asked in chat with its exact text and written after his yes; the docs pass records his merge words
@@ -200,6 +229,14 @@ there, then the four texts, the advisor tool, his chat ask.
 Count: 1.
 
 ## Running work
+- **Where the work lives since 2026-11-12 16:33 Amsterdam:** the branch worktree
+  `/home/user/Shamble-Frontlines/.gate/foundation-toolchain-wt` (branch `claude/laughing-pasteur-fwya24`). The main
+  folder sits on the local branch `main-folder`, made at origin/main 2aa5e9c (`git switch -c main-folder origin/main`,
+  never pushed). A session resuming in this container moves into the worktree (`cd` in its own call) rather than
+  running `git worktree add`, which fails while the branch is checked out there (the advisor's L-b).
+- saver (step 5, from the worktree): background task b3kk7q32m · output
+  `/tmp/claude-0/-home-user-Shamble-Frontlines/29a42dc7-ecd4-506e-b90a-121dd5e50988/tasks/b3kk7q32m.output` · started
+  16:34 Amsterdam.
 - saver: background task b04hgafwt · output `/tmp/claude-0/-home-user-Shamble-Frontlines/29a42dc7-ecd4-506e-b90a-121dd5e50988/tasks/b04hgafwt.output`
   · started 18:35 Amsterdam · stopped by the session at 19:41 after the last save.
 - saver (restarted for the build, his word): background task bz6ds367a · started 20:55 Amsterdam · ended 22:45
