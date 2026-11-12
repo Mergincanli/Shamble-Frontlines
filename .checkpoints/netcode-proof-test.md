@@ -68,7 +68,7 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
    **(j) Running: U4d2's fix pass,** workflow wf_bb054eb3-70b (task wy27y3276; script
-   workflows/scripts/npt-u4d2-fixpass-r1-wf_bb054eb3-70b.js), launched about 23:58 UTC: one builder (general-purpose,
+   workflows/scripts/npt-u4d2-fixpass-r1-wf_bb054eb3-70b.js), launched about 23:45 UTC: one builder (general-purpose,
    opus, xhigh), no isolation, in `.claude/worktrees/u4d2-build`; FX-1 to FX-12 as the ruling's Block 8 says; the
    prompt points at u4d2-brief.md section 4's binding lines (650-690, 698-714, 724-730; Mustafa's words there by
    script) and quotes only T4 item 1; logs .gate/u4d2/fx-*; its record: the worktree's u4d2-build.md, new section "Fix
