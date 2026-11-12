@@ -24,16 +24,19 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    (phase A, then check.mjs counted through main-run.sh in the background with a limit of at least 1,500,000 ms:
    473 / 541 / 52, marks 81, redact 0, the by-name lines), M6-M7 (gate), M8 (phase B with u4e-report.md written first,
    its anchor in place; one commit; `git rm` wip/u4e.patch), push, M9.
-   **The merge is under way (since about 17:58 UTC; the saver STOPPED until after the push):** u4e_merge_text.py
-   committed at 60e77a1, both dry runs read in full by the main session (T1, T4, T7, the carries, T3, T6, T5). M3:
-   worktree_patch.py's snapshot = 4300944's wip/u4e.patch (cmp; sha256 1c31eeee…); `git apply --check` clean;
-   applied in the main folder (uncommitted). M4: r2-hashes-start.sha256 23 of 23 OK from the main folder. M5: phase A
-   applied (README.md b49f3441, SERIES.md f118a8de, the catalogue 0de1e590); **the counted run running**:
-   main-run.sh, task be275bbxy, log .gate/u4e-merge/m5-counted.log (the two `--no-run` builds, check.mjs, then
-   loopback's e7_, e2_ and tick16, gap.rs whole, room's carry_56 and carries_51_53_and_56, all `--nocapture`).
-   SERIES.md's heading still says "(235)" over 236 rows: M8 allows only T1 and T4 in spikes/, so it is a follow-up
-   (the report). If cut here: the working tree holds the apply and phase A; check r2-hashes-start and the three
-   sha256s above, then re-run the counted run.
+   **U4e MERGED** in the commit "U4e: the room and the codec path (npt-room, npt-server's library, npt-client),
+   merged after review round 2" (its SHA goes here in M9, after the push): M1-M8 met (u4e-build.md, "Merge into the
+   spike branch"; u4e-report.md). M3 the snapshot = 4300944's wip/u4e.patch (cmp; 1c31eeee…), applied; M4 23 of 23
+   OK; M5 phase A, then check.mjs all 10 steps PASS: 473 / 541 / 52 of 52, marks 81 (ADR rows unchanged), redact 0;
+   the by-name lines (e7's = the fix pass's); M6 no failure; M7 gate PASS with `--no-smoke` (5a cannot start this
+   container's Chromium; both logs in .gate/u4e-merge/); M8 phase B, T5's 27 places filled by u4e_t5_fill.py, T6
+   checked by u4e_pub_items.py. The base counts for U4r and U4d2's merge: 473 / 541 / 52 of 52, 10 steps. **Next,
+   M9:** push; CI's gate and smoke green; the SHA here; carries 73-81 and C-U6-12 to C-U6-16 listed; the open security
+   findings (SEC-U4E-2, -4's transport half, -5, -6, -8, -9, SEC-U4E-R2-1, -3, -4); the card's follow-ups A-R2-2
+   (room.rs:327-332), RR2-1 (room/tests/room.rs:627), RR-6's with room.rs:728, A9's with SEC-U4E-R2-4 and A-R2-1;
+   the saver restarted; the copies to the housekeeping list; then A13's server clippy item (Next steps 4).
+   (Before the merge, if cut: the working tree held the apply and phase A; check r2-hashes-start and the three
+   sha256s above, then re-run the counted run.)
 1. **U4e's review round 2: DONE** (wf_e623d489-17e, about 16:35 UTC): all five seats APPROVE WITH FINDINGS; one
    Medium, NC2-M1 (the Resync limit drops a correct client's Resync within 2 s of its last full state: a false FAIL
    for PM-0004-61's random traps and -19's trap checks at U6/U7; not before the merge), the rest Low (NC2-L1;

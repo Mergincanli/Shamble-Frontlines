@@ -215,6 +215,7 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
 | `event.shot.rtt_ns` | ns | npt-room | per shot: its part, the RTT | -49 |
 | `event.shot.view_time_replaced` | flag | npt-room | per shot: 1 when the server replaced the view time by its estimate | -48 |
 | `event.slow_loris_close.age_ns` | ns | npt-server | per slow-loris client closed: age at close | -25 |
+| `event.snap_refused.tick_count` | count (a tick number) | npt-lab (from npt-room's per-client refusal counters) | per snapshot the room's encoder refused for a client (carry 54: that client's snapshot for that tick is skipped; `slot` names the client, `kind` the refusal: `out_of_range`, `too_many`, `too_large` or `not_canonical`): the tick it skipped | -17, -18 (reported) |
 | `event.soak_trigger.bad_token_refusals_count` | count | npt-load | bad-token joins refused in the soak | 0006-22 |
 | `event.soak_trigger.rooms_killed_count` | count | npt-load | room processes killed in the soak | 0006-22 |
 | `event.stall_1s.dropped_ns` | ns | npt-server | per 1 s stall: the dropped-time counter's increase | 0004-67 |

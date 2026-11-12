@@ -1,7 +1,11 @@
-# The clock ban (plan §4.5): the client endpoint reads no clock; the Worker host passes arrival stamps and `now` in.
+# The clock ban (plan §4.5): the client endpoint reads no clock; the Worker host passes arrival stamps and `now` in. The
+# hash-map type bans (u4-build-plan.md §4.11; U4E-Q8 (a)): the endpoint's maps and sets are ordered or indexed, so no
+# iteration order depends on a hasher's seed.
 disallowed-types = [
     { path = "std::time::Instant", reason = "the clock ban: time is passed in (and std's clock traps on wasm32)" },
     { path = "std::time::SystemTime", reason = "the clock ban: time is passed in (and std's clock traps on wasm32)" },
+    { path = "std::collections::HashMap", reason = "the hash-map ban: iteration order must not depend on a seed" },
+    { path = "std::collections::HashSet", reason = "the hash-map ban: iteration order must not depend on a seed" },
 ]
 disallowed-methods = [
     { path = "std::time::Instant::now", reason = "the clock ban" },

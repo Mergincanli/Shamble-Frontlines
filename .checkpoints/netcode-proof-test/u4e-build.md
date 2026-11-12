@@ -382,3 +382,31 @@ check.mjs's own lines:
   both runs passed. `sha256sum -c` of this builder's .gate/u4e/fx-hashes-fixed.sha256 (written 09:01:37): 23 of 23
   OK. The end hashes, from `sha256sum` of the 23 changed and new files (paths from the copy's root), saved with the
   Write tool as .gate/u4e/fx-hashes-end.sha256: equal to fx-hashes-fixed.sha256 line for line.
+
+## Merge into the spike branch (the main session, 2026-11-12; advisor-u4e-r1.md R9 as amended by advisor-u4e-r2.md Q3)
+- After review round 2 (five seats, APPROVE WITH FINDINGS) and the advisor's round-2 ruling (APPROVE on Q1 to Q4),
+  in the order of advisor-u4e-r2.md's "Before the merge". The saver stopped before M3 and restarted after the push.
+- M1: the copy's HEAD 97bb9d32aa7bd96d45ee0ac5c48a35e9dfeb0864; `git status --untracked-files=all` lists the 23 files
+  (crates/client 4, crates/room 13, crates/server 6) and this record only; `sha256sum -c .gate/u4e/r2-hashes-start.sha256`
+  from the copy's root: 23 of 23 OK; r2-hashes-start.sha256 equals fx-hashes-end.sha256 (cmp).
+- M2: `git diff --quiet 97bb9d3 HEAD -- ` the crates room, server, client, sim, proto and link: true at 2521d67.
+  Main's merge bfda3cd (PRs #50 and #51) moved nothing under spikes/; U4d2 has not merged.
+- M3: worktree_patch.py on the copy wrote .gate/u4e-merge/snapshot.patch (23 files, 318,633 B), equal (cmp) to the
+  committed wip/u4e.patch of 4300944 (sha256 1c31eeeea4ee…); `git apply --check` clean; `git apply` in the main folder.
+- M4: `sha256sum -c .gate/u4e/r2-hashes-start.sha256` from the main folder's root: 23 of 23 OK.
+- M5: T1, T4 and T7 applied first by u4e_merge_text.py --phase A (marks/README.md 0ad7a80f -> b49f3441, SERIES.md
+  881d7fde -> f118a8de, the catalogue 35a27979 -> 0de1e590; the same sha256s as its dry run). SERIES.md's heading
+  still says 235 over 236 rows: not T4's words, so left (the report's follow-ups). Then the counted run, main-run.sh
+  (the lane lock exclusive, the touch loop, the shared target, offline; .gate/u4e-merge/m5-counted.log, 17:55-18:07
+  UTC): both `--no-run` builds exit 0, the Compiling lines naming the main folder's crates; check.mjs "check: all 10
+  steps pass": test measured 473 and bites 541 passed, 0 failed; self 52 of 52; marks 81 read and checked, the ADR rows
+  unchanged; redact 255 items, 0 findings; then, in the same call, by name with `--nocapture`: loopback's e7_, e2_ and
+  tick16 (exit 0), gap.rs whole (exit 0), room's carry_56 and carries_51_53_and_56 (exit 0). e7's print line equals
+  .gate/u4e/fx-t5print.log's (diff). T6's precondition: u4e_pub_items.py re-derived the added pub items from the
+  merged tree (.gate/u4e-merge/pub-items.log): each is plan.md §4.7's own or in T6's rows, so T6 stands.
+- M6: no failure in any run; nothing under TE2-5.
+- M7: `node tools/gate.mjs`: all checks PASS but 5a smoke, which could not start this container's Chromium
+  (.gate/u4e-merge/gate-full.log); `--no-smoke`: GATE PASS (gate-nosmoke.log). CI's gate and smoke on the pushed head.
+- M8: phase B by u4e_merge_text.py (u4s-carries.md cdab0240 -> efdd7b6b, plan.md 2bef127b -> aac32c3d,
+  u4-build-plan.md 3f58ff0d -> 52dd3186, T5 into u4e-report.md at its anchor); T5's 27 places filled by u4e_t5_fill.py
+  from M5's lines, each with its log line (.gate/u4e-merge/t5-fill.log); `git rm` of wip/u4e.patch; one commit.

@@ -305,9 +305,12 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     P3 suite; (h) NC-10 (the advisor's U4j ruling, R2.4): the contract test reports `tick.s.snap_incomplete`'s sum on
     each short L1 P0 run. If it is 0 on every one, U4r adds to -17's L1 P0 part, with a bite (a client that writes
     null and incomplete 1 for a refused group), before -17's judged runs: `{"name": "setup: L1 P0 loses no group (no
-    client-tick left incomplete)", "series": "tick.s.snap_incomplete", "stat": "sum", "window": "all", "op": "==",
-    "value": 0, "parts": ["L1 P0"], "setup": true}`. If it is not 0, the cause goes to the advisor first. marks/ is
-    not U4r's lane unless its brief gives it this one check; else the main session adds it in its own commit."
+    client-tick left incomplete)", "series": "tick.s.snap_incomplete", "stat": "sum", "window": "measured", "op": "==",
+    "value": 0, "parts": ["L1 P0"], "setup": true}`. If it is not 0, the cause goes to the advisor first. (Both the
+    reported sum and the check read the measured phase: each join's ticks between its full state and that full state's
+    acknowledgement carry no snapshot, so the client resolves them lost by design in the warm-up: the advisor's U4e
+    round-1 ruling, R5, NC-L10.) marks/ is not U4r's lane unless its brief gives it this one check; else the main
+    session adds it in its own commit."
 63. **FU-3 and FU-7's log half, the next change to npt-log (the advisor's U4j ruling, FU-3: SEC-F10; its round-2
     ruling, B3: SEC-R2-N2):** "The next change to npt-log (U4r's, if its brief takes crates/log; else the unit that
     next edits it) adds two refusals, each with a test that fails before it: `read_log` refuses a JSON object with a
@@ -319,6 +322,52 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     byte figure it reports from that recording states the recording's churn beside R2's moving-delta assumption: yaw
     changing on about 48 % of alive soldier-ticks and pitch on about 18 % (U4d-F's scene), against yaw in every moving
     update and pitch half the time (docs/research/r2-netcode.md:1751)."
+73. **NC-H1 and TE-1, tick16's judged half (u4e-review-netcode.md, Block h; u4e-review-test.md, TE-1 and probe Q-1;
+    the advisor's U4e round-1 ruling, R1):** "Since U4e, under PM-0001-17/tick16 and PM-0001-58/tick16 the client
+    files the sentinel for each post-wrap group under the tick its 16-bit header names (0, 1, 2 …): ticks before the
+    client's first snapshot, which the room never logged for that slot (marks/README.md §1's bad-header sentence), so
+    `decoded_hash_mismatch_count` counts each one, while the post-wrap ticks the room did log stay unresolved for that
+    client. U4r's client writer places those hashes in its log (README §1: it files every hash under its rebuilt tick,
+    buffering and sorting before it writes, so that records stay in tick order) and never ends the log `crash` for
+    them. Its contract test runs one short tick16 bite run past the wrap (-58/tick16's `ticks_below_wrap` = 30 keeps it
+    short) and shows the judge's outcome: the mismatch figure FAIL with at least one mismatch, never INVALID (the judge
+    returns a mismatch count before it reads a coverage gap: judge/src/figures.rs:542-554)."
+74. **NC-M6, the endpoint's lead (u4e-review-netcode.md, Block h; the advisor's U4e round-1 ruling, R3):** "U4e's
+    `ClientEndpoint` stamps each command `newest + lead`, with a lead of 1 by default (crates/client/src/lib.rs), and
+    U4f's lead controller comes after U4r's runs. On a link whose one-way delay is above about half a tick period every
+    command would reach the room after its tick and be dropped as late, `last_run` would stay `None`, and option B
+    would have nothing to repeat: -17 would compare a world of soldiers standing still. U4r sets each endpoint's lead
+    with `ClientEndpoint::with_lead` from the run's profile (its largest one-way delay, half the round trip plus half
+    the jitter, in ticks rounded up, plus 1), records it with `cmd_timing` in the header, and its contract test reports
+    on each short run the commands that arrived late (the room's `late` count) beside the commands sent; a run with more
+    than 1 % of its commands late comes to the advisor before its marks count."
+75. **NC-M5 and A3, the client's event-number base (u4e-review-netcode.md, Block h; u4e-review-arch.md, A3; the test
+    seat's probe Q-10; the advisor's U4e round-1 ruling, R3):** "U4e's client rebuilds each event's 16-bit number near
+    its own start (`ClientEndpoint::with_starts`, 0 by default), and the wire carries no event base (`JoinAccepted` and
+    `FullState` have none), so a client whose start is 32,768 or more from the room's counter rebuilds every event
+    number wrong, and the hash reads them (Q-10). U4r's lab gives each endpoint, through `with_starts`, the event start
+    it gave the room (`Room::with_event_start`) and its command start, and admits every client before the room has
+    stamped 32,768 events past that start (about 30 s of SS's events); a later admission comes to the advisor first
+    (the room exposes no event counter). The contract test shows `decoded_hash_mismatch_count` 0 on a run whose event
+    start is far from 0 (-58/lt-event-seq's, 3 below the wrap, among them). The wire field is U6's (C-U6-13)."
+76. **A6 and SEC-U4E-5, ending a session (u4e-review-arch.md, A6; u4e-review-security.md, SEC-U4E-5; the advisor's U4e
+    round-1 ruling, R3):** "npt-room decides a replacement and a `Kick(overflow)` but sends the old connection nothing,
+    npt-server's `Decoder` has no call that ends a session, and `Room::receive` takes any message by slot alone, so the
+    caller's session handling is a security boundary. U4r's lab, when `Room::join` reports a replacement, sends the old
+    session `Kick(replaced)` and drops its `Decoder` and link before it routes anything else; when the room kicks a
+    client or takes its `Leave`, it drops that session. Two tests: a second endpoint joining with slot 0's token and
+    bind while the first is live, after which the first's Inputs and `Leave` reach no room call and the second keeps
+    the slot; and a kicked session whose later datagrams reach no room call."
+77. **U4r's readings of U4e's room and client (u4e-review-netcode.md, NC-L2, NC-L4, NC-L9 and NC-L10; the advisor's U4e
+    round-1 ruling, R4 and R5):** "(a) -58's wrap check counts `event.counter_wrap` records (marks.json -58), and the
+    room and the client report wraps per client slot (`ClientSlot::wraps`, `StepOut::wraps`): U4r writes one record per
+    counter name that wrapped (SERIES.md's row: 'per counter that wrapped'), never one per client, so one counter's 48
+    per-client wraps cannot pass the check. (b) Under PM-0001-18/no-fallback, a burst whose last acknowledged baseline
+    is exactly 32 ticks old at the first tick after it logs `event.burst_eviction` 1, yet the bitten room codes that
+    tick from the defaults (its stale copy is taken only once B's ring slot is overwritten) and heals: U4r's report
+    counts the bitten runs' bursts at that age apart. (c) The contract test reports each client's
+    `ClientEndpoint::stale()` sum on each short L1 run (groups of ticks already resolved when they left the frame ring;
+    no SERIES.md row); a sum above 0 on L1 comes to the advisor."
 
 ## The next change to crates/judge (whoever makes it; its first step)
 64. **Round 2's judge follow-ups (the advisor's U4j round-2 ruling, B2.2, B3, B4.2, B4.3):** "Before any other edit
@@ -383,6 +432,31 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     twins: the twin removes exactly the presses the forged run's `reports()` list as refused (slot, seq, kind) and
     lowers that button's counter by one from the refused command on, every other field equal; a test shows a forged
     press stream and its twin give equal state hashes on every tick (D-10's rule, at the room's level)."
+80. **U4e's notes for option A and the client (round 1: u4e-review-rust.md, RR-7; u4e-review-security.md, SEC-U4E-9;
+    u4e-review-test.md, TE-9; u4e-review-netcode.md, NC-L7 and NC-L8; the advisor's U4e round-1 ruling, R5; round 2:
+    u4e-review-r2-netcode.md, NC2-L1; u4e-review-r2-test.md, TE2-L1; u4e-review-r2-rust.md, RR2-2; the advisor's U4e
+    round-2 ruling, Q2):** "(a) The room's canonical order (`canonical`, crates/room/src/room.rs) compares one slot's
+    ticks wrap-aware, which is no total order for ticks 2^31 or more apart, and Rust's sorts may panic on a non-total
+    order; under option B one command per slot per tick makes it unreachable, and carry 21's room test passes with no
+    sort at all (TE-9). Before option A runs several commands of one slot in a tick, U4f's lead bound refuses such a
+    command first, or the sort takes a total key, with a test of one slot's commands 2^31 ticks apart, and carry 21's
+    room test is made to fail without the sort. (b) A refused snapshot datagram whose header tick reads far ahead moves
+    the client's newest tick and resolves the whole span lost (crates/client/src/lib.rs, `receive` and `see`): the
+    client files its sentinel without moving its newest tick past a bound, with a test. (c) `ClientEndpoint::step`
+    drops a whole `Input`, acks included and uncounted, when one command fails to encode: it drops that command,
+    counts it and keeps the acks, with a test. (d) The client's two too-old cases (marks/README.md §1's bad-header
+    sentence; the advisor's U4e round-1 ruling, R1) are pinned by no test beyond what the judge counts: the round-2
+    test seat's plant P-form (a too-old tick from the first snapshot on given the sentinel too, a ring slot taken, the
+    bad tick acknowledged) passed every test. U4f adds one endpoint test: joined at tick 100 and fed to about 140, a
+    group of tick 60 (before the first snapshot: a bad header) fed twice files `(60, 0)` once, the next `Input`
+    acknowledges no tick 60, `newest_tick()` is unchanged, `refused()` rose by 2 and a delta on a live baseline still
+    decodes; then a group of tick 105 (from the first snapshot on, already out of the ring) files nothing and adds 1 to
+    `stale()`, never the sentinel; each half fails under its own plant. (e) Carry 61 (b)'s 'two different hashes for
+    one tick give the sentinel' fails in one order: a tick completed by a snapshot and then sent as a full state of
+    another hash files nothing (`full_state` counts it a duplicate), and `file`'s different-hash arm has no route from
+    the endpoint's input; U4e's room sends a client a full state or a snapshot for a tick, never both, so no U4 run
+    meets it. For a tick already received, `full_state` compares the frame's hash with the one filed and files the
+    sentinel when they differ, with a test of that order that fails under its plant."
 
 ## U4g (prediction, interpolation and events)
 47. **A-M2, the predicting World's reset (advisor-u4-wave1.md:240-247; the advisor's W1-U4D ruling):** "The predicting
@@ -396,6 +470,19 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     minute with the random ones, against about 4 before). A predicting client fed that recording meets each one as a
     forced correction that no network caused, about 52 a minute. Any U4g test or figure that predicts on it counts
     teleport corrections apart from the others and reports both."
+78. **NC-M4, the nearest 8 before the events (u4e-review-netcode.md, Block b; the test seat's probe Q-11; the advisor's
+    U4e round-1 ruling, R3):** "U4e's encoder packs a snapshot's events before any entity change (crates/room/src/
+    room.rs, `snapshot`), so an event backlog larger than a snapshot's remainder sends snapshots with no entity change,
+    against `Priority`'s rule 'the nearest 8 enemies in every snapshot' (catalogue :129-130; ADR 0001 part 9 (d); the
+    U4e brief, 2.1). After U4e's gap of `ACK_RING_TICKS` tick periods the backlog went out at about 23 events a
+    snapshot and every snapshot still carried entity changes (Q-11), so no U4e or U4r run meets it; a backlog near the
+    event cap would. U4g packs the nearest 8 enemies' changes first, then the events, then the rest, with a test in
+    which a backlog larger than one snapshot's remainder still sends the nearest 8's changes in every snapshot."
+79. **NC-L12, -62's own cosmetic count (u4e-review-netcode.md, NC-L12; the advisor's U4e round-1 ruling, R5):**
+    "SERIES.md's `second.v.own_cosmetic_sent_count` names npt-room as its writer, and U4e's room counts every cosmetic
+    event it sends (`cosmetic_sent`), not those sent to a shooter for its own shots. Before -62's judged runs U4g has
+    the room count, per client, the cosmetic events sent for that client's own shots (0 in a correct build; above 0
+    under PM-0001-62/server-echo), with a test under the bite."
 
 ## U4h (lag compensation and aim)
 28. **netcode F6 / rust 3:** "The ring's span is U4h's test cap plus its margin in ms, recorded; the room builds it with
@@ -403,6 +490,12 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
 45. **NF-D4's U4h line (the advisor's U4s ruling, "Rulings (U4s)", NF-D4; added by the main session, the conditions
     check's F3):** "`World::ray_cast`'s ray is the only float that reaches npt-sim code from outside; it takes `&self`
     and changes no state; U4h's AimCast states what a non-finite ray does."
+81. **SEC-U4E-8, option B's reruns and the view time (u4e-review-security.md; the advisor's U4e round-1 ruling, R5):**
+    "Under option B the room reruns a client's last command on a miss with its original view time (crates/room/src/
+    room.rs, `fill_input`), so a client that holds fire and stops sending gets each rerun shot rewound to an ever older
+    view tick, up to the history's span, and `rewinds_refused` also counts reruns whose view tick has left the ring.
+    U4h's tolerance judges each run of a command, reruns included, against the estimate at the tick it runs (or runs a
+    rerun with fire released), counts reruns apart from claims, and shows by test that a starved uplink buys no rewind."
 
 ## U4d2 or the main session (the workspace Cargo.toml, crates/proto/Cargo.toml and check.mjs; wave 2 or later)
 29. **rust 5 (nit):** "The workspace Cargo.toml's libm comment says `arch` gives 'hardware sqrt, floor, ceil, trunc and
