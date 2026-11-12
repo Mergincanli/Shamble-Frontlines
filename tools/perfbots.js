@@ -1,5 +1,5 @@
 // Bot-count scaling: the cost of one update() step with N soldiers, march and combat, plus one render pass's draw calls.
-// node --expose-gc tools/preview.js . eval tools/perfbots.js [--map=tri] [--pre=<file.js>]   (Linux: prefix xvfb-run -a)
+// node --expose-gc tools/preview.js legacy eval tools/perfbots.js [--map=tri] [--pre=<file.js>]   (Linux: prefix xvfb-run -a)
 // --pre sets the soldier count before boot: three-teams builds TUNE.teams.size=4|8|16 (12, 24, 48 soldiers on three teams);
 // older builds T.enemyCount=11|23|47 (and T.eliteCount). Each phase: deploy, 600 warm-up steps, 1200 measured steps at 1/60 s,
 // repeated 3 times in this process; you stay alive (DEV.god).

@@ -5,7 +5,7 @@
 // USAGE (from the repo root): node tools/pageshot.js <buildDir> <index.html|editor.html>[?query] <outPrefix> [--headed] [steps...]
 //   wait:<ms>  shot:<name>  eval:<js expr | Promise>  click:<css>  hover:<css>  key:<Key>  mouse:<x>,<y>
 //   size:<w>x<h> (default 1600x900)   motion:reduce
-//   e.g. node tools/pageshot.js . index.html .gate/s wait:1500 shot:menu "eval:deploy()" wait:900 "eval:(closeTutorial(),setPause(true))" shot:pause
+//   e.g. node tools/pageshot.js legacy index.html .gate/s wait:1500 shot:menu "eval:deploy()" wait:900 "eval:(closeTutorial(),setPause(true))" shot:pause
 // --headed: a visible browser window on the real GPU (Linux needs a display: xvfb-run -a). Default: headless SwiftShader (CPU).
 // Every run prints the WebGL renderer string, and every shot line repeats it, so each screenshot says which GPU drew it.
 // Prints every page error / console error. CAVEATS: no Arial Black / Courier New / Segoe Print in the Linux container (substitutes);

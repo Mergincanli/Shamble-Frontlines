@@ -1,4 +1,4 @@
-// Headless 90 s match (globalThis.__simSecs overrides): node tools/preview.js . eval tools/sim.js [--map=tri] (Linux: prefix xvfb-run -a) -> bot stall %, stalls near
+// Headless 90 s match (globalThis.__simSecs overrides): node tools/preview.js legacy eval tools/sim.js [--map=tri] (Linux: prefix xvfb-run -a) -> bot stall %, stalls near
 // village pieces, harvesters, and (three-teams builds) a kill matrix, deaths, deliveries, trucks and buildings lost, captures, era
 // per team, engaged-bot stalls and the NAV starvation share. Guards keep it running on pre-three-teams builds (fields read null).
 // Bot behaviour is random: compare 3+ runs per build, not single runs.
