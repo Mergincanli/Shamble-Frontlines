@@ -391,9 +391,9 @@ the critics'.
 
 ### 4.11 Determinism and hygiene outside npt-sim (Q9)
 - The HashMap and HashSet type bans join room's and client's clippy.toml; new clippy.toml files for npt-server and
-  npt-lab, and for npt-bots (all three with the clock ban, naming `std::time::Instant`, `std::time::SystemTime`,
-  `tokio::time::Instant` and their `now`: A14). npt-bots' file is crate-wide; U6's runtime half and its npt-net glue
-  then carry reviewed per-item allows, listed in U6's plan.
+  npt-lab, and for npt-bots (all three with the same HashMap and HashSet type bans, by Q9 (a), and with the clock ban,
+  naming `std::time::Instant`, `std::time::SystemTime`, `tokio::time::Instant` and their `now`: A14). npt-bots' file is
+  crate-wide; U6's runtime half and its npt-net glue then carry reviewed per-item allows, listed in U6's plan.
 - **npt-room is float-free (A3):** interest, priority and the window work on grid integers; a check.mjs grep refuses
   `f32` and `f64` in crates/room/src (U4s, with its self-test bite).
 - **Bites per instance (T10):** every bite is chosen by a constructor argument or a config value the caller passes
@@ -665,17 +665,22 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
 
 ### U4d2, the Wasm-in-Node hash and the determinism step (depends on U4d and Q3; size S-M)
 - **Builds (option B):** crates/hash-wasm, a cdylib depending on npt-sim only, its exports thin wrappers over
-  `Replayer`: `begin(seed_lo, seed_hi, scene, bite, arm_tick)`, `feed(word)`, `step() -> status`, `hash_lo`,
-  `hash_hi`, `dump_len`, `dump_word(i)`, each `#[unsafe(no_mangle)] extern "C"`, integers only; its `bites` feature
-  forwards to npt-sim's. A Node script loads it with `WebAssembly.instantiate` and streams a recording in; npt-lab's
-  `hash` subcommand, on the release build, runs the two native legs in two processes and `HashCompare` prints the first
-  mismatching tick and the field diff. `HashCompare` takes two per-tick hash lists, so U4r's -30 pre-check reuses it
-  on the two legs' per-tick server hashes (the advisor's condition 2).
+  `Replayer`: `begin(bite, arm_tick)` (the recording's header carries the scene and the seed, and the manifest's SHA-256
+  binds each file to its entry: the advisor's U4D2-Q3 ruling), `feed(word)`, `step() -> status`, `hash_lo`, `hash_hi`,
+  `dump_len`, `dump_word(i)`, each `#[unsafe(no_mangle)] extern "C"`, integers only; its `bites` feature forwards to
+  npt-sim's. A Node script loads it with `WebAssembly.instantiate` and streams a recording in; npt-lab's `hash`
+  subcommand, on the release build, runs the two native legs in two processes and `HashCompare` prints the first
+  mismatching tick and the field diff. `HashCompare` takes two per-tick hash lists, so U4r's -30 pre-check reuses it on
+  the two legs' per-tick server hashes (the advisor's condition 2). npt-lab gains its clippy.toml: §4.11's clock ban and
+  Q9 (a)'s HashMap and HashSet type bans (the advisor's U4D2-Q10 ruling).
 - **check.mjs** (U4d2 is its only editor in its wave), each with a self-test bite in check.test.mjs:
-  - a `wasm` step: the release build with §4.5's flags, the Node run (a script, so the runner refusal at
-    check.mjs:1156-1158 stands, its note updated), the comparison; its wall time printed, budget 5 minutes;
-  - the features comparison, like for like: npt-sim's resolved features under the server build against the hash-wasm
-    build, measured builds together and bites builds together (A12);
+  - a `wasm` step: the release build with plan.md §4.5's flags (baseline x86-64, no `+fma` or `target-cpu=native`,
+    simd128 and relaxed-simd off; wasm-opt is U7's: C-U7-1; the advisor's U4D2-Q2 ruling), the Node run (a script, so
+    the runner refusal at check.mjs:1156-1158 stands, its note updated), the comparison; its wall time printed, budget 5
+    minutes;
+  - the features comparison, like for like: npt-sim's resolved features under the server build and under npt-lab's (the
+    native legs' build) against the hash-wasm build (the advisor's U4D2-Q6 ruling), measured builds together and bites
+    builds together (A12);
   - **the build-flag check (A8):** `+fma`, `target-cpu=native`, `+simd128` and `+relaxed-simd` refused in the sources
     the deps step already reads (environment rustflags and cargo configs: check.mjs:903-942), and the effective
     target features read back with `rustc --print cfg` per target: the step fails on `fma` (x86-64) and on `simd128`
@@ -688,18 +693,23 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
   - **the third exception follows ADR 0002:264-265** ("an exception needs a written invariant, a test and an
     `#[allow]` with its reason"; the advisor's condition 7 (b), (c)): the written invariant, in the crate doc and beside
     each allow: no exported name collides with another symbol, and every export has integer signatures only; the
-    test: the Node loader lists the module's exports and refuses any not on the list (its bite below); check.mjs's
-    `UNSAFE_EXCEPTIONS` (check.mjs:135) gains `crates/hash-wasm/`; and before the code merges, plan.md §4.2's "two
-    named exceptions" becomes three, hash-wasm named (the main session's plan.md edit, u4-plan-md-edits.md).
+    test: the Node loader lists the module's exports and refuses any not on the list (its bite below), and the deps scan
+    refuses a listed export whose parameters or result are not u32 or i32 (its bite: an export taking an f64; the
+    advisor's U4D2-Q7 ruling); check.mjs's `UNSAFE_EXCEPTIONS` (check.mjs:135) gains `crates/hash-wasm/`; and before the
+    code merges, plan.md §4.2's "two named exceptions" becomes three, hash-wasm named (the main session's plan.md edit,
+    u4-plan-md-edits.md).
 - **Tests:** 0 mismatching ticks over the 27,000 synthetic ticks, native twice and Wasm once; PM-0004-21's cross-target
   vectors: one committed byte string's digest and one committed state's bytes equal on x86-64 and wasm32 (T22).
 - **Bites:** the std `sin` (input from a scan for inputs where glibc's `sinf` and the wasm32 builtin differ; if none
   differs, recorded as not catchable on these targets and a 1-ulp planted change stands in: ADR 0004:1142); the hash-map
   (caught, or recorded as not catchable on wasm32, where std documents no seeding: marks S-HashMap); an extra feature on
   a shared dependency (PM-0004-74); each flag; a stray `unsafe` block in hash-wasm; an export not on the loader's list
-  (the advisor's condition 7 (b)).
+  (the advisor's condition 7 (b)); and the vectors' shown failures: a word of the committed vector file changed, and a
+  length written as `usize`'s bytes in npt-sim's walk `write_state` (ADR 0004:1142's word-size bite), both scratch
+  plants, restored (the advisor's U4D2-Q11 ruling).
 - **Reviewers:** rust-reviewer (the exception, Wasm), engine-architect (the boundary), test-engineer, infra-engineer
-  (the step's time in CI).
+  (the step's time against its budget; no CI job runs spikes/: plan.md R-8; the advisor's U4d2 brief check, A1),
+  security-auditor (the third `unsafe` exception and check.mjs's unsafe and rustflags scans: the same check, A12).
 
 ### U4e, the room and the codec path (depends on U4a, U4b, U4d; size M-L; its own brief)
 - **Builds:**
@@ -860,11 +870,14 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
     state out of SOLDIER's layout. `EntityRecord::FIELDS`, `Command`, `Rewind`, `CoverVariant` and the five grid fields
     stay frozen. U4a's half (the kind in both GROUPS tables' own-state rows, the codec's refusal of a kind its section
     does not list, and its test) is the main session's, in U4d's merge commit, after U4a has merged.
-- **Wave 2:** U4d2 (after U4d) and U4e (after U4a, U4b, U4d) in parallel: U4d2 owns check.mjs, Cargo.toml's members,
-  Cargo.lock, crates/hash-wasm and npt-lab's `hash`; U4e owns crates/room, crates/server (beyond schedule.rs) and
-  crates/client. In wave 2 only U4d2 edits crates/lab, its Cargo.toml included; U4e's tests live in its own crates
-  (Loopback as a dev dependency: npt-server's tests, through its npt-link and the dev dependency on npt-client U4s
-  adds), never in crates/lab (the advisor's condition 10 (b)).
+- **Wave 2:** U4d2 (after U4d) and U4e (after U4a, U4b, U4d) in parallel: U4d2 owns check.mjs and check.test.mjs,
+  Cargo.toml's members and its lints and libm comments (carry 29), Cargo.lock, crates/hash-wasm, crates/lab (npt-lab's
+  `hash`, carry 66's probe change and its clippy.toml), and two manifests' comment lines only: crates/proto/Cargo.toml's
+  bites comment (carry 41) and crates/client-wasm/Cargo.toml's lints comment (the exceptions now three) (the advisor's
+  U4D2-Q9 ruling); U4e owns crates/room, crates/server (beyond schedule.rs) and crates/client. In wave 2 only U4d2 edits
+  crates/lab, its Cargo.toml included; U4e's tests live in its own crates (Loopback as a dev dependency: npt-server's
+  tests, through its npt-link and the dev dependency on npt-client U4s adds), never in crates/lab (the advisor's
+  condition 10 (b)).
 - **Then** U4r (after U4c, U4d2, U4e, U4j) and its runs; then U4f, U4g and U4h in order (they share the room's and the
   client's files: never two at once).
 - After each merge the next lane's base moves: its brief's counts are deltas, and the merge step recomputes the
