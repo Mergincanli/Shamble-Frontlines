@@ -69,6 +69,24 @@ advisor-u4e-brief.md, advisor-u4df.md.
   reading main's advisor.md; brief advisor-u4e-r1-brief.md (items 1-9, with the main session's points in item 7);
   ruling to advisor-u4e-r1.md, block by block. If cut: resume with `Workflow({scriptPath, resumeFromRunId})`. Then:
   the fix pass in the same worktree on the ruling's scope, round 2 on what changed, the merge on its conditions.
+  - **The ruling: REVISE** (advisor-u4e-r1.md, 08:34 UTC; R1-R9, texts T1-T6). Round 1 counts as one round. R1: the
+    High holds; the client's three cases for a header tick (inside the ring: decode; from the first snapshot on and
+    the ring behind: drop and count, `stale`; before the first snapshot and the ring behind: a bad header, the
+    sentinel filed under that tick, which the judge counts as an orphan); the tick16 twin asserts what the judge counts.
+    Fix pass FX-1 to FX-13 (R8: one builder in the same worktree; bounds crates/room, crates/server but schedule.rs,
+    crates/client; one new pub item `RttSource`; evidence per FX: plant, FAILED by name, restore, sha256). Carries
+    73-81 and 62 (h) (T2), C-U6-12 to C-U6-15 (T3), marks/README.md §1's case-3 sentence (T1), SERIES.md's
+    `event.snap_refused.tick_count` (T4), the report's T5, §4.1's rows (T6): all by script in the merge commit (M8).
+    Round 2: five seats in two batches (R8). Merge on M1-M9 (R9). Nothing to Mustafa. Read in full by the main
+    session: R1, R8, T1-T4 (the marks texts: no pass bar's number or direction moves; T1 is stricter).
+- **Running: U4e's fix pass,** workflow wf_4c29cbe6-2fd (task wsgylkqit; script
+  workflows/scripts/npt-u4e-fixpass-r1-wf_4c29cbe6-2fd.js), launched about 08:37 UTC: one builder (general-purpose,
+  opus, xhigh), no isolation, in `.claude/worktrees/wf_0fa6595a-3e2-1`; its record's new section "Fix pass, round 1"
+  in the worktree's u4e-build.md; logs .gate/u4e/fx-*; end hashes .gate/u4e/fx-hashes-end.sha256. If cut: check the
+  copy for a plant in place (its record's last plant line; restore by Edit), then resume with `Workflow({scriptPath,
+  resumeFromRunId})`. On return: read its stops and TE2-5 lines in full; check the copy against fx-hashes-end.sha256;
+  re-cut wip/u4e.patch and commit it; cut round 2's packet (u4e-r2-packet.json: db49108's patch against the new one,
+  this ruling as the "judged against" half); round 2 (R8's seats).
 - **Running: U4d2's builder brief** (next step 3), workflow wf_ec1d2b01-aab (task wgkj3qotm; script
   workflows/scripts/npt-u4d2-brief-wf_ec1d2b01-aab.js), launched 06:45 UTC in the slot round 1's batch 2 left free,
   one agent at a time: the rust-reviewer drafts rev 1 (u4d2-brief.md; notes u4d2-brief-notes.md), the test-engineer

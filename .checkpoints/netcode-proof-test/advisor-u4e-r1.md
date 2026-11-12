@@ -1,9 +1,18 @@
 # Advisor: U4e round 1 (the room and the codec path), 2026-11-12
 
-Seat: the advisor agent, called from the day session's workflow (branch claude/netcode-proof-test-plan-hcky5g; PR #40).
-Role read whole from main (`git show origin/main:.claude/agents/advisor.md`). I rule; the main session applies every text
-change and builds nothing itself in the copy; one builder runs the fix pass. I write only this file, with Write and
-Edit, block by block. Read only: no build, no run, no plant; reading, git and sha256 only.
+Seat: the advisor agent, called from the day session's workflow (branch claude/netcode-proof-test-plan-hcky5g; PR
+#40). Role read whole from main (`git show origin/main:.claude/agents/advisor.md`). I rule; the main session applies
+every text change, and one builder runs the fix pass in the copy. I write only this file, with Write and Edit, block by
+block. Read only: no build, no run, no plant; reading, git and sha256 only.
+
+**Verdict: REVISE, then merge on conditions.** Round 1 stands as one round. The High (NC-H1 = TE-1) is real by reading
+and by run: the tick16 bites' unit proof passes on a silent drop, and a judged run would read 0 mismatches. R1 rules the
+client's reading (a header naming a tick before the client's first snapshot, at least the ring behind its newest, is a
+bad header: the sentinel under that tick) and what the proof asserts (what the judge counts). The six Mediums marked
+before the merge and the test seat's five Mediums go into one fix pass, with SEC-U4E-4's room half moved in; seven
+Lows ride it; every other finding is routed (carries 73-81, C-U6-12 to C-U6-15, report words, card follow-ups). Round 2
+on what changed, five seats in two batches; the merge after it on M1-M9. Nothing goes to Mustafa: no word or decision
+of his changes, and nothing a player sees, hears or feels is touched.
 
 ## Plan
 1. Read the brief (advisor-u4e-r1-brief.md), the five seats' notes, the builder's record, my brief check
@@ -15,8 +24,8 @@ Edit, block by block. Read only: no build, no run, no plant; reading, git and sh
 3. Rule items 1-9 in order, one block each (R1 ... R9), then the texts, the two lists, and what I checked.
 
 ## Progress
-- [x] 1 read  - [x] 2 spot-checks  - [x] R1  - [x] R2  - [x] R3  - [x] R4  - [x] R5  - [ ] R6  - [ ] R7  - [ ] R8
-- [ ] R9  - [ ] texts  - [ ] end sections
+- [x] 1 read  - [x] 2 spot-checks  - [x] R1  - [x] R2  - [x] R3  - [x] R4  - [x] R5  - [x] R6  - [x] R7  - [x] R8
+- [x] R9  - [x] texts (T1-T6)  - [x] end sections. DONE.
 
 ## Spot-checks (reading, git and sha256 only)
 - Both copies equal the test seat's start list: `sha256sum -c` of u4e-review-test/hashes-start.sha256 run in the
@@ -59,8 +68,7 @@ mismatches: a bite never caught. Evidence that does not hold: High, as both seat
 **The reading (mine to rule: it reads my own text, B2.1 and carry 61, not an ADR row or a word of Mustafa's).** Carry
 61 (d) ("a group of a tick older than one the client has already decoded … is decoded … or, if the client drops it as
 stale, it is never acknowledged and that tick is lost, never the sentinel") was written for L1's reorder step: a tick
-the client was sent and can still place. A tick from the client's first snapshot on is one of three kinds, and a tick
-before it is a fourth:
+the client was sent and can still place. A header tick falls in one of three cases:
 1. **Inside the ring** (less than `npt_sim::ACK_RING_TICKS` ticks behind the newest tick the client holds): decoded and
    hashed under its own tick, as built. This is (d)'s decode, my B2.1 lean; NC-L4 and A's "decodes" are right.
 2. **From the first snapshot on, at least the ring behind the newest:** that tick was resolved when it left the ring
@@ -92,7 +100,7 @@ before it is a fourth:
   follow-up (R5).
 
 **What the unit proof asserts (what the judge counts),** in `pm_0001_17_and_58_tick16_post_wrap_frames_have_no_equal_
-client_hash` (renamed to say it, e.g. `..._are_counted_as_mismatches`) and its clean twin, over `tick16_lab`'s 30 ticks:
+client_hash` (its name may change to say what it now shows) and its clean twin, over `tick16_lab`'s 30 ticks:
 - clean build: `lab.compare()` gives (n, 0) with n ≥ 30, the client's hash at (0, 65,537) equal to the server's, and no
   client key outside the ticks the room ran (65,520 on);
 - under each of PM-0001-17/tick16 and PM-0001-58/tick16: `lab.compare().1` ≥ 1 (the figure fails); slot 0 has at least
@@ -105,8 +113,8 @@ client_hash` (renamed to say it, e.g. `..._are_counted_as_mismatches`) and its c
 
 **The judged half is U4r's** (carry 73, T2): its client writer must place hashes filed at ticks before the run's first
 tick (README §1 already asks it to buffer and sort, since "a client's rebuilt ticks can go back"), and its contract
-test runs one short -17/tick16 bite run past the wrap and shows the figure FAIL with mismatches ≥ 1, never INVALID
-through a `crash` footer.
+test runs one short tick16 bite run past the wrap and shows the figure FAIL with mismatches ≥ 1, never INVALID through
+a `crash` footer.
 
 **The contract text** (marks/README.md §1, in the merge commit: T1) gains case 3 in one sentence, so the rule both
 sides read holds it. No judge code changes. Severity of NC-H1 and TE-1 stays High until round 2 sees the fix.
@@ -346,7 +354,7 @@ R6 written 2026-11-12.
 
 ### R7. The main session's points (the card, "Running")
 - **Carry 68 missing from the builder's carries met, though carry 56's ES figure is reported: CONFIRMED** (NC-M2 is the
-  same point). Route: R2, the report's line T5 (c); carry 68 then counts as met.
+  same point). Route: R2, T5's own-state bullet; carry 68 then counts as met.
 - **Carry 61's stale-group choice ("decode within the ring, drop and count beyond it"): CONFIRMED, with R1's
   correction.** Within the ring: decode (NC-L4). Beyond it, two cases: a tick from the client's first snapshot on was
   already resolved when it left the ring, so its group is dropped and counted (`stale`); a tick before the first
@@ -374,4 +382,394 @@ R6 written 2026-11-12.
   or High still open after it.
 
 R7 written 2026-11-12.
+
+### R8. The fix pass: its scope, its builder, and round 2's seats. APPROVE on these terms.
+**Scope (each item with its test and its named plant; nothing else):**
+- FX-1 R1 (NC-H1, TE-1): the client's case 3 and the tick16 twin's assertions; plants (a) and (b).
+- FX-2 NC-M3; FX-3 A1 (with the lab's send in server/tests/common/mod.rs); FX-4 A2 (`RttSource`); FX-5 A4; FX-6 A5 (the
+  eight items pub(crate), `with_cover`'s test); FX-7 SEC-U4E-4's room half (the Resync limit). All as R2 and R3 say.
+- FX-8 TE-2, FX-9 TE-3, FX-10 TE-4, FX-11 TE-5, FX-12 TE-6, as R6 says.
+- FX-13 the riders: SEC-U4E-1, SEC-U4E-3, SEC-U4E-7, TE-7, TE-8 with RR-2, RR-3, RR-10, as R5 says.
+- Not the builder's: the report, marks/, the plan files and the carries (the main session's, from T1-T6).
+- **Bounds:** files only under crates/room, crates/server (not schedule.rs) and crates/client; no manifest, no
+  Cargo.lock, no npt-proto, npt-sim, npt-link or npt-lab file. One new public item, `RttSource`, and `take_control`'s
+  changed type; any other public item, any change to the window's arithmetic, or a test that cannot be made to fail
+  under its plant stops that item: the builder reports it, and it comes to me.
+
+**Who builds:** one builder (general-purpose, Opus, effort xhigh), in the same worktree
+(`.claude/worktrees/wf_0fa6595a-3e2-1`, uncommitted on 97bb9d3), reading its record (u4e-build.md), this ruling's R1-R6
+and the copy's diff first, as U4d-F's fix pass did; under W1-TARGET's lock (the lane lock held for each cargo run, the
+shared target, offline), counted in the three-agent limit. Its brief carries, word for word, my U4d-F ruling's T4:
+item 1 (the write rule: "Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes;
+never `cargo fmt` writing files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole
+with Write.") and item 2 with the crates named (npt-room, npt-server and npt-client: "a failure in npt-room,
+npt-server or npt-client, or in a test that reads their files, stops your step group (report it), unless your step's
+plan names it as expected …"). Its plan is written first into the record's new section "Fix pass, round 1", then a
+notes line after each FX.
+
+**Its evidence** (in the record): for each FX the plant's diff, the run (`-x`, by name), the test FAILED by name, the
+restore by Edit and the file's sha256 equal to its fixed form; s03/s04 re-run once (R1 plant (b)); fmt (rustfmt's diff
+applied by Edit), clippy in both builds and for wasm32, doc; check.mjs twice counted in the copy, all 10 steps, with
+the counts as deltas on 458 / 524 / 52 and each new test named; the printed lines of e7, the tick16 twin and its clean
+test, and carry 56's test (for T5); and at the end the sha256 of every changed or new file under crates/, in
+`sha256sum` form with paths from the copy's root, saved as .gate/u4e/fx-hashes-end.sha256.
+
+**Then the main session:** re-cuts the snapshot by worktree_patch.py (wip/u4e.patch replaced, committed), checks that
+the copy's files equal fx-hashes-end.sha256, and cuts round 2's packet by review_packet.py on what changed (round 1's
+snapshot at db49108 against the new one), with this ruling as the "judged against" half.
+
+**Round 2's seats, on what changed** (Opus at xhigh; condition 10 (c)'s limit: two batches; each brief carries T4
+item 1):
+- Batch 1, read only: **netcode-architect** (R1's cases and the twin; NC-M3; A2; the Resync limit; SEC-U4E-1),
+  **security-auditor** (the pump's changes: NC-M3, A2, SEC-U4E-1 and -3, TE-5; the client's decode path: R1's case 3
+  and SEC-U4E-7; the Resync limit; A1's bytes), **engine-architect** (A1, A2, A4, A5, and T6's §4.1 rows against the
+  final diff).
+- Batch 2: **test-engineer** (with Edit, in the copy: each FX's test fails under its plant, its own form where it doubts
+  the builder's; its start hashes first, as .gate/u4e/r2-hashes-start.sha256, then one counted check.mjs), beside the
+  **rust-reviewer** (read only, no bench: panics, casts and overflow in the changed code, R1's bounded memory, RR-2 and
+  RR-3).
+- **Round 2's outcome:** APPROVE, or APPROVE WITH FINDINGS with Lows only, lets the merge go ahead on M1-M9 (its Lows
+  become follow-ups the main session records). A Medium comes to me first and becomes a follow-up or a carry, never a
+  third round. A High or a Critical comes to me for a third round on it alone (the review budget's one exception); one
+  still open after that stops U4e for Mustafa.
+
+R8 written 2026-11-12.
+
+### R9. The merge into the spike branch: after round 2, on conditions M1 to M9 (U4d-F's form)
+Checked now: the spike branch's spikes/ equals 97bb9d3's (`git diff --quiet 97bb9d3 HEAD -- spikes/`: true, at
+3032b88), and 97bb9d3's spikes/ equals `<base>` 28a85e7's; worktree_patch.py and main-run.sh are in the notes folder.
+U4d2's lane (check.mjs, Cargo.toml's members, Cargo.lock, crates/hash-wasm, npt-lab's `hash`) touches no U4e file, but
+if it merges first the base counts move.
+
+The conditions (the main session; each result in u4e-build.md's new section "Merge into the spike branch"):
+- **M1, the copy is the one reviewed.** Before the snapshot: the copy's HEAD is still 97bb9d32aa7b…; `git status
+  --untracked-files=all` shows only round 2's files under crates/room, crates/server and crates/client and the record;
+  `sha256sum -c .gate/u4e/r2-hashes-start.sha256` from the copy's root gives all OK. Anything else stops the merge and
+  comes to me.
+- **M2, the base still fits.** On the spike branch's head, `git diff --quiet 97bb9d3 HEAD --
+  spikes/netcode-proof/crates/room spikes/netcode-proof/crates/server spikes/netcode-proof/crates/client
+  spikes/netcode-proof/crates/sim spikes/netcode-proof/crates/proto spikes/netcode-proof/crates/link` is true. Any other
+  spikes/ change since 97bb9d3 is a named lane's merge (U4d2's), listed in the notes with its counts; anything else
+  stops the merge.
+- **M3, the snapshot and the apply.** The saver stopped first. worktree_patch.py on the copy gives a patch equal (cmp)
+  to the committed wip/u4e.patch that round 2 reviewed, listing exactly round 2's files; then `git apply --check`, then
+  `git apply`, in the main folder.
+- **M4, the merged bytes are the reviewed bytes.** From the main folder's root, `sha256sum -c` of round 2's start
+  hashes gives all OK. A patch that applies but differs stops the merge.
+- **M5, the texts, then check.mjs counted on the merged tree.** First T1 (marks/README.md §1) and T4 (SERIES.md),
+  applied by script as M8 says, since check.mjs's marks step reads them. Then check.mjs through main-run.sh (the lane
+  lock held exclusively and idle at the start, the 2 s touch loop, the shared target, offline), its log under
+  .gate/u4e-merge/, after the pre-run builds `cargo test --locked --workspace --no-run` and the same with
+  `--all-features`, whose "Compiling npt-room", "npt-server" and "npt-client" lines name the main folder's path. All 10
+  steps pass, with measured and bites counts equal to round 2's counted run in the copy (458 and 524 plus the fix
+  pass's new tests; plus U4d2's deltas if it merged first, the sum shown), self 52 of 52 (or U4d2's), marks 81 read and
+  checked with the ADR rows unchanged, redact 0 findings. In the same main-run.sh call, by name with `--nocapture`: e7
+  (its print line equal to round 2's), e2, e5a and 2.5's clean test, the tick16 twin and its clean test (the twin's
+  orphan count at least 1 for each id, the clean compare 0 bad), and carry 56's test (its SS and ES figures): T5's
+  numbers come from these lines. Any other count or line is explained in the notes before the commit.
+- **M6, a failing test is never retried into green unnamed** (TE2-5's rule): a failing build's crate is re-run at once
+  through main-run.sh with `--no-fail-fast`, its whole output under .gate/u4e-merge/, the failing test's name and panic
+  in the notes. A failure in npt-room, npt-server or npt-client, or in a crate that links them, stops the merge and
+  comes to me; any other failure is recorded under TE2-5, and the merge goes ahead only on a clean counted run, the
+  earlier failure named.
+- **M7, the gate:** `node tools/gate.mjs` before the commit; if smoke (5a) cannot start this container's Chromium,
+  `--no-smoke` with both logs kept and the reason in the notes. CI's gate and smoke green on the pushed head.
+- **M8, one commit,** "U4e: the room and the codec path (npt-room, npt-server's library, npt-client), merged after review
+  round 2": the spikes/ files exactly as applied, with T1 and T4 in marks/; `git rm` of wip/u4e.patch; and under
+  .checkpoints/ only: u4e-build.md (with "Fix pass, round 1" and "Merge into the spike branch"), u4e-report.md (new; T5
+  is its rulings section, the rest in u4df-report.md's form: who built it, the rounds, the checks on the merged tree,
+  the carries met and added by number, the public items beyond §4.1 with reasons, the follow-ups, Decisions needed, For
+  Mustafa), u4-build-plan.md's §4.1 rows (T6), u4s-carries.md (T2), plan.md's U6 row (T3), and the card. Every text is
+  copied by script from this file's code blocks, never retyped: each old text found exactly once (line breaks read as
+  spaces), each new text found in place after, no changed prose line over 120 characters. The commit's spikes/ part is
+  the reviewed bytes plus T1 and T4 and nothing else.
+- **M9, after the push:** the saver restarted; the card updated (U4e merged at <sha>; the base counts for U4r and for
+  U4d2's merge; carries 73-81 and C-U6-12 to C-U6-15 listed; U4e's open security findings for PR #40's report:
+  SEC-U4E-2, SEC-U4E-4's transport half, SEC-U4E-5, SEC-U4E-6, SEC-U4E-8 and SEC-U4E-9, each Low but SEC-U4E-4
+  (Medium), each with its carry); the copies U4e used (.claude/worktrees/wf_0fa6595a-3e2-1, .gate/u4e-r1,
+  .gate/u4e-prefix) removed per CHECKPOINTS.md §10 once CI is green; U4r's brief names carries 73-77 and 62 (h)'s new
+  window.
+
+R9 written 2026-11-12.
+
+## The texts (each copied by script from its code block; never retyped)
+
+### T1. marks/README.md §1, the `decoded_hash` item (the merge commit)
+The old text `that tick is lost (`null`, `tick.s.snap_incomplete` 1), never the sentinel.` (found once, line breaks
+read as spaces; checked at the branch head) becomes the text below, rewrapped to the item's indent within 120:
+```
+that tick is lost (`null`, `tick.s.snap_incomplete` 1), never the sentinel. That covers the ticks from the client's first snapshot on: a snapshot group or full state whose header names a tick before the client's first snapshot and at least `npt_sim::ACK_RING_TICKS` ticks behind the newest tick it holds names a tick it was never sent (a bad header), so the client files the sentinel under that tick, once, never acknowledged, and `decoded_hash_mismatch_count` counts it as a client hash at a tick the server never logged (the advisor's U4e round-1 ruling, R1).
+```
+
+### T2. u4s-carries.md (the merge commit)
+**(1) §U4r, after entry 69 (its last):**
+```
+73. **NC-H1 and TE-1, tick16's judged half (u4e-review-netcode.md, Block h; u4e-review-test.md, TE-1 and probe Q-1;
+    the advisor's U4e round-1 ruling, R1):** "Since U4e, under PM-0001-17/tick16 and PM-0001-58/tick16 the client
+    files the sentinel for each post-wrap group under the tick its 16-bit header names (0, 1, 2 …): ticks before the
+    client's first snapshot, which the room never logged for that slot (marks/README.md §1's bad-header sentence), so
+    `decoded_hash_mismatch_count` counts each one, while the post-wrap ticks the room did log stay unresolved for that
+    client. U4r's client writer places those hashes in its log (README §1: it files every hash under its rebuilt tick,
+    buffering and sorting before it writes, so that records stay in tick order) and never ends the log `crash` for
+    them. Its contract test runs one short tick16 bite run past the wrap (-58/tick16's `ticks_below_wrap` = 30 keeps it
+    short) and shows the judge's outcome: the mismatch figure FAIL with at least one mismatch, never INVALID (the judge
+    returns a mismatch count before it reads a coverage gap: judge/src/figures.rs:542-554)."
+74. **NC-M6, the endpoint's lead (u4e-review-netcode.md, Block h; the advisor's U4e round-1 ruling, R3):** "U4e's
+    `ClientEndpoint` stamps each command `newest + lead`, with a lead of 1 by default (crates/client/src/lib.rs), and
+    U4f's lead controller comes after U4r's runs. On a link whose one-way delay is above about half a tick period every
+    command would reach the room after its tick and be dropped as late, `last_run` would stay `None`, and option B
+    would have nothing to repeat: -17 would compare a world of soldiers standing still. U4r sets each endpoint's lead
+    with `ClientEndpoint::with_lead` from the run's profile (its largest one-way delay, half the round trip plus half
+    the jitter, in ticks rounded up, plus 1), records it with `cmd_timing` in the header, and its contract test reports
+    on each short run the commands that arrived late (the room's `late` count) beside the commands sent; a run with more
+    than 1 % of its commands late comes to the advisor before its marks count."
+75. **NC-M5 and A3, the client's event-number base (u4e-review-netcode.md, Block h; u4e-review-arch.md, A3; the test
+    seat's probe Q-10; the advisor's U4e round-1 ruling, R3):** "U4e's client rebuilds each event's 16-bit number near
+    its own start (`ClientEndpoint::with_starts`, 0 by default), and the wire carries no event base (`JoinAccepted` and
+    `FullState` have none), so a client whose start is 32,768 or more from the room's counter rebuilds every event
+    number wrong, and the hash reads them (Q-10). U4r's lab gives each endpoint, through `with_starts`, the event start
+    it gave the room (`Room::with_event_start`) and its command start, and admits every client before the room has
+    stamped 32,768 events past that start (about 30 s of SS's events); a later admission comes to the advisor first
+    (the room exposes no event counter). The contract test shows `decoded_hash_mismatch_count` 0 on a run whose event
+    start is far from 0 (-58/lt-event-seq's, 3 below the wrap, among them). The wire field is U6's (C-U6-13)."
+76. **A6 and SEC-U4E-5, ending a session (u4e-review-arch.md, A6; u4e-review-security.md, SEC-U4E-5; the advisor's U4e
+    round-1 ruling, R3):** "npt-room decides a replacement and a `Kick(overflow)` but sends the old connection nothing,
+    npt-server's `Decoder` has no call that ends a session, and `Room::receive` takes any message by slot alone, so the
+    caller's session handling is a security boundary. U4r's lab, when `Room::join` reports a replacement, sends the old
+    session `Kick(replaced)` and drops its `Decoder` and link before it routes anything else; when the room kicks a
+    client or takes its `Leave`, it drops that session. Two tests: a second endpoint joining with slot 0's token and
+    bind while the first is live, after which the first's Inputs and `Leave` reach no room call and the second keeps
+    the slot; and a kicked session whose later datagrams reach no room call."
+77. **U4r's readings of U4e's room and client (u4e-review-netcode.md, NC-L2, NC-L4, NC-L9 and NC-L10; the advisor's U4e
+    round-1 ruling, R4 and R5):** "(a) -58's wrap check counts `event.counter_wrap` records (marks.json -58), and the
+    room and the client report wraps per client slot (`ClientSlot::wraps`, `StepOut::wraps`): U4r writes one record per
+    counter name that wrapped (SERIES.md's row: 'per counter that wrapped'), never one per client, so one counter's 48
+    per-client wraps cannot pass the check. (b) Under PM-0001-18/no-fallback, a burst whose last acknowledged baseline
+    is exactly 32 ticks old at the first tick after it logs `event.burst_eviction` 1, yet the bitten room codes that
+    tick from the defaults (its stale copy is taken only once B's ring slot is overwritten) and heals: U4r's report
+    counts the bitten runs' bursts at that age apart. (c) The contract test reports each client's
+    `ClientEndpoint::stale()` sum on each short L1 run (groups of ticks already resolved when they left the frame ring;
+    no SERIES.md row); a sum above 0 on L1 comes to the advisor."
+```
+**(2) §U4r, entry 62 (h):** the old text `"window": "all", "op": "==", "value": 0, "parts": ["L1 P0"], "setup": true}`
+(found once) becomes `"window": "measured", "op": "==", "value": 0, "parts": ["L1 P0"], "setup": true}`; and after the old
+text `If it is not 0, the cause goes to the advisor first.` (found once) this is inserted, before the rest of the entry:
+```
+(Both the reported sum and the check read the measured phase: each join's ticks between its full state and that full state's acknowledgement carry no snapshot, so the client resolves them lost by design in the warm-up: the advisor's U4e round-1 ruling, R5, NC-L10.)
+```
+**(3) §U4f, after entry 46 (its last):**
+```
+80. **U4e's round-1 notes for option A and the client (u4e-review-rust.md, RR-7; u4e-review-security.md, SEC-U4E-9;
+    u4e-review-test.md, TE-9; u4e-review-netcode.md, NC-L7 and NC-L8; the advisor's U4e round-1 ruling, R5):** "(a) The
+    room's canonical order (`canonical`, crates/room/src/room.rs) compares one slot's ticks wrap-aware, which is no
+    total order for ticks 2^31 or more apart, and Rust's sorts may panic on a non-total order; under option B one
+    command per slot per tick makes it unreachable, and carry 21's room test passes with no sort at all (TE-9). Before
+    option A runs several commands of one slot in a tick, U4f's lead bound refuses such a command first, or the sort
+    takes a total key, with a test of one slot's commands 2^31 ticks apart, and carry 21's room test is made to fail
+    without the sort. (b) A refused snapshot datagram whose header tick reads far ahead moves the client's newest tick
+    and resolves the whole span lost (crates/client/src/lib.rs, `receive` and `see`): the client files its sentinel
+    without moving its newest tick past a bound, with a test. (c) `ClientEndpoint::step` drops a whole `Input`, acks
+    included and uncounted, when one command fails to encode: it drops that command, counts it and keeps the acks,
+    with a test."
+```
+**(4) §U4g, after entry 70 (its last):**
+```
+78. **NC-M4, the nearest 8 before the events (u4e-review-netcode.md, Block b; the test seat's probe Q-11; the advisor's
+    U4e round-1 ruling, R3):** "U4e's encoder packs a snapshot's events before any entity change (crates/room/src/
+    room.rs, `snapshot`), so an event backlog larger than a snapshot's remainder sends snapshots with no entity change,
+    against `Priority`'s rule 'the nearest 8 enemies in every snapshot' (catalogue :129-130; ADR 0001 part 9 (d); the
+    U4e brief, 2.1). After U4e's gap of `ACK_RING_TICKS` tick periods the backlog went out at about 23 events a
+    snapshot and every snapshot still carried entity changes (Q-11), so no U4e or U4r run meets it; a backlog near the
+    event cap would. U4g packs the nearest 8 enemies' changes first, then the events, then the rest, with a test in
+    which a backlog larger than one snapshot's remainder still sends the nearest 8's changes in every snapshot."
+79. **NC-L12, -62's own cosmetic count (u4e-review-netcode.md, NC-L12; the advisor's U4e round-1 ruling, R5):**
+    "SERIES.md's `second.v.own_cosmetic_sent_count` names npt-room as its writer, and U4e's room counts every cosmetic
+    event it sends (`cosmetic_sent`), not those sent to a shooter for its own shots. Before -62's judged runs U4g has
+    the room count, per client, the cosmetic events sent for that client's own shots (0 in a correct build; above 0
+    under PM-0001-62/server-echo), with a test under the bite."
+```
+**(5) §U4h, after entry 45 (its last):**
+```
+81. **SEC-U4E-8, option B's reruns and the view time (u4e-review-security.md; the advisor's U4e round-1 ruling, R5):**
+    "Under option B the room reruns a client's last command on a miss with its original view time (crates/room/src/
+    room.rs, `fill_input`), so a client that holds fire and stops sending gets each rerun shot rewound to an ever older
+    view tick, up to the history's span, and `rewinds_refused` also counts reruns whose view tick has left the ring.
+    U4h's tolerance judges each run of a command, reruns included, against the estimate at the tick it runs (or runs a
+    rerun with fire released), counts reruns apart from claims, and shows by test that a starved uplink buys no rewind."
+```
+The file holds no count of its own; the card's line follows ("carries 1-81").
+
+### T3. plan.md's U6 row: U4e's U6 carries (the merge commit)
+The old text `since -19 judges ML's Chrome "as it stands" (ADR 0001:1609) |` (found once: the row's end) becomes the
+text below (one table line; `<br>•` as the row's other entries):
+```
+since -19 judges ML's Chrome "as it stands" (ADR 0001:1609);<br>**U4e's carries (the advisor's U4e round-1 ruling, 2026-11-12):**<br>• **C-U6-12 the full-state stream and the control stream (R3 and R5: SEC-U4E-4's transport half, SEC-U4E-2):** at most one open full-state stream per session (the catalogue's FullState row, proposed there), npt-server refusing a client-opened one beyond it; and a per-connection limit on control-stream messages (`ClientSettings`, `Resync`, `SessionControl`), counted, a message over it dropped or the session closed as malformed, with the catalogue's rows gaining the limit; the room's half of SEC-U4E-4 is U4e's (a client's Resync answered at most once per `FULL_STATE_ACK_TICKS` ticks);<br>• **C-U6-13 the event base on the wire (R3: NC-M5, A3):** a join or rejoin starts the client's 32-bit event numbers from the room's: `JoinAccepted` or `FullState` carries the room's next event number (npt-proto and the catalogue), the client rebuilding from it; -19's join hash (C-U6-11) is the first judged case, since today a client admitted after the room has stamped 32,768 or more events past its start rebuilds every event number wrong (U4e's probe Q-10; u4s-carries.md entry 75 is U4r's stopgap);<br>• **C-U6-14 ending a session (R3: A6, SEC-U4E-5):** TickLoop, when `Room::join` reports a replacement, sends the old connection `Kick(replaced)` and closes it before routing anything else, and closes a kicked or left session; either the room checks a session generation on `receive` and `leave` (returned by `Room::join`, a stale one dropped and counted) or U6's report shows by test that no message of a closed session reaches the room; npt-server's library gains a call that ends a session only if TickLoop needs one, with its reason;<br>• **C-U6-15 the room's tick before -4 (R3: RR-5, with RR-4, A10 and A12):** before PM-0001-4's judged runs, the room's own tick at SS with 48 clients is measured on R2 by the rust-reviewer's U4e method (a counting allocator around `Room::tick` only; a twin World stepped on `tick_input()` with its state hash asserted equal; 100 warm and 600 measured ticks; release; three runs) and set beside -4's 16.67 ms p99 with the pump and the logs; U4e's cheap wins are made first, each with that bench before and after: the relevant set emitted in the index's key order instead of a sort by key through the records, no clone of the Packer's vectors per group, no fresh baseline-frame clone per client per tick, no per-client vectors built each tick, no double clone of a tick's baseline frame in the client, a linear acknowledgement pass over the event queue, and no per-tick copy of the sim's reports (`Room::reports`); at U4e, on a 4-vCPU VM, the room's own work was 5.4-5.9 ms mean and 9.5-11.2 ms p99, with 2,838 allocations and 6.2 MB requested a tick, linear in clients (u4e-review-rust.md, block 2) |
+```
+
+### T4. marks/SERIES.md, carry 54's row (the merge commit)
+In the table that holds `event.counter_wrap.tick_count`, as a new line right before the row named
+`event.soak_trigger.bad_token_refusals_count` (one such row, SERIES.md:218 at the branch head; the rows run in name
+order, and `event.slow_loris_close.age_ns` is the row above):
+```
+| `event.snap_refused.tick_count` | count (a tick number) | npt-lab (from npt-room's per-client refusal counters) | per snapshot the room's encoder refused for a client (carry 54: that client's snapshot for that tick is skipped; `slot` names the client, `kind` the refusal: `out_of_range`, `too_many`, `too_large` or `not_canonical`): the tick it skipped | -17, -18 (reported) |
+```
+
+### T5. u4e-report.md's section on the review's rulings (new file, beside u4df-report.md)
+Copied by script as it is. Each `<…>` is a number the main session fills from the merged tree's M5 lines (or, where it
+says so, from round 2's notes), and the notes name the log and line of each fill; no other word changes.
+```
+## What U4e's review settled (the advisor's U4e round-1 ruling, advisor-u4e-r1.md)
+- **Round 1** (five seats on one head, 97bb9d3 plus the snapshot of db49108; the test seat was cut by the spend limit
+  at about 06:42 UTC and resumed at about 07:36 on the same bytes, so one round): netcode-architect and
+  engine-architect REVISE, test-engineer REVISE, security-auditor and rust-reviewer APPROVE WITH FINDINGS; two Highs
+  (NC-H1 and TE-1, one defect). One fix pass, then round 2 on what changed: <round 2's verdicts, from its notes>.
+- **tick16's proof (NC-H1, TE-1; High; fixed).** Under PM-0001-17/tick16 and PM-0001-58/tick16 the client dropped
+  every post-wrap group as too old and filed nothing, so the twin passed on a silent drop and a judged run would have
+  read 0 mismatches. Since the fix the client files the sentinel when a header names a tick before its first snapshot
+  and at least `npt_sim::ACK_RING_TICKS` ticks behind its newest (a bad header: marks/README.md §1), and the twin
+  asserts what the judge counts: under each bite <n> client hashes at ticks the room never logged for that slot and
+  none at or past 65,536; in the clean build 0 bad of <n> compared, the hash at 65,537 equal to the mirror's. U4r's
+  judged half: carry 73.
+- **The client's late groups (carry 61 (d); B2.1): "decode".** A group of a tick still in the client's frame ring is
+  decoded and hashed under its tick. A group of a tick from the client's first snapshot on that has left the ring
+  (already resolved) is dropped, never acknowledged, and counted in `ClientEndpoint::stale()`, which is not carry 61
+  (d)'s drop and has no SERIES.md row (U4r reports its sum: carry 77). The readings list gains no entry, and carry 62
+  (g)'s drop count does not apply.
+- **-18's condition 6 (§5 U4e; NC-L1): not triggered.** Under no-fallback the room codes F = <363> against B = <329> at
+  age <34> (AfterSend) and F = <362> at age <33> (BeforeSend). B's bytes are still in the client's ring slot <9> (F uses
+  slot <11> or <10>), but the client refuses a baseline age of `ACK_RING_TICKS` or more before it looks at the frame:
+  §4.5's "the client keeps its complete frames for the same ages". B is not held, so the bite is a defect on L1, and
+  -18's L1 part counts at U4r.
+- **The own-state section (carry 56, with carry 68).** SS: <mean> B mean, <p99> B p99, <max> B max per snapshot, the
+  OwnState record <mean> B, changed in <share> of snapshots; ES: <mean> B, <p99> B, <max> B, OwnState <mean> B, changed
+  in <share>. The SS mean is above R2's 16 B a snapshot for the local player's own state (r2-netcode.md:1756): reported
+  beside it, not judged (PM-0001-12 judges the downstream total). ES's figure comes from `Recording::synthetic`'s ES
+  recording, whose alive soldiers change yaw on about 48 % of soldier-ticks and pitch on about 18 %, against R2's
+  moving-delta assumption of yaw in every moving update and pitch half the time (docs/research/r2-netcode.md:1751);
+  the own Soldier record carries both, so ES's figure reads lighter than R2's estimate and is no measure of ES's load
+  (carry 68).
+- **e7's clauses (NC-L3).** On zero-delay Loopback no tick splits and no event is resent (e7: <its print line>). The
+  split clause is carried by e2 (300 B links: <n> split ticks, <n> compared equal) and the resend clause by gap.rs's
+  clean run (<n> pairs, 0 differ, <n> and <n> events resent).
+- **Carry 26 (A7).** The room copies each step's events once a tick into its stamp list (carry 23's tick and 32-bit
+  number), a reused vector of `Copy` events; raised with the advisor, who keeps the seam as it stands.
+- **Carry 54's series (A14):** `event.snap_refused.tick_count`, its row added to SERIES.md in the merge commit.
+- **§4.2's rewind assert (NC-L5, RR-1):** met by construction: `rewind_at` returns `None` before it builds a Rewind
+  that names an unheld tick, so its debug assert cannot fire.
+- **Values the plan leaves open (NC-L11, A11):** the interest radius (64 m) and its cell, on which the plan is silent,
+  and the hit history's 2 s (provisional until U4h: carry 28) are module constants, U4e's choices; a setter or getter
+  comes with the unit that first needs one.
+- **The RTT (A2).** The pump takes each session's RTT from its `RttSource` (§4.9). The room's per-tick report from the
+  pump (`pump_report`) carries the bytes sent and the link's largest datagram, not the RTT, which U4h's tolerance will
+  read; the builder's record (u4e-build.md, design decisions) says otherwise.
+- **A known deviation (SEC-U4E-6, A13).** A Hit or Kill reaches a client that sees only the victim with the shooter's
+  slot, against ADR 0001 part 9 (f) ("no shooter id when the shooter is not relevant to the viewer"); the wire has no
+  form without it, and part 9 is proven at slice 3 (ADR 0001:1687-1688).
+- **The 1,150 B case (TE-10).** The endpoint's test datagram is refused by its trailing bytes too; the size check's own
+  proof is npt-proto's a3 test (1,151 B refused by its size).
+- **Public items beyond §4.1's rows** (A5, RR-8): <the list re-derived from the merged tree for T6, each with its
+  reason>. Made pub(crate) in the fix pass: `Roster::new`, `Roster::is_bound`, `Decoder::limits`, `Decoder::is_joined`,
+  `ConnLimits::join_deadline_ns`, `ClientEndpoint::closed`, `ClientEndpoint::unknown_pongs`, `ClientSlot::skipped`.
+  `ClientEndpoint::with_lead` stays public for U4r (carry 74). The six types plan §4.7 lists whose methods are all
+  pub(crate) (`AckRing`, `Encoder`, `EventQueue`, `InterestGrid`, `AreaFlood`, `Priority`) are public in name only.
+- **Open security findings, for PR #40's report** (each left open keeps it needs-mustafa): SEC-U4E-4's transport half
+  (Medium; C-U6-12), SEC-U4E-2 (Low; C-U6-12), SEC-U4E-5 (Low; carry 76 and C-U6-14), SEC-U4E-6 (Low; slice 3),
+  SEC-U4E-8 (Low; carry 81), SEC-U4E-9 (Low; carry 80). Fixed in U4e: SEC-U4E-4's room half, SEC-U4E-1, SEC-U4E-3 and
+  SEC-U4E-7.
+```
+
+### T6. u4-build-plan.md §4.1: npt-room's, npt-server's and npt-client's rows (the merge commit)
+First the main session re-derives the list from the merged tree: `git diff 28a85e7 HEAD -- spikes/netcode-proof/crates/
+room/src spikes/netcode-proof/crates/server/src spikes/netcode-proof/crates/client/src`, every added `pub` item and every
+public method of a public type, less plan.md §4.7's own items (npt-room's eleven; npt-server's `Counters`,
+`ConnLimits`, `Decoder`; npt-client's `ClientEndpoint`, `StepOut`). The rows below are written from the
+engine-architect's list (u4e-review-arch.md:57-66) with this ruling's changes; if the merged list differs, the rows
+follow the merged list and the notes say why, and round 2's engine-architect checks them against the final diff.
+- The npt-room row, old (one line):
+```text
+| npt-room | `Room<S: SimCore>`; `InputBuffer::CMD_CATCHUP`; bites builds only: `BITES` | U4-SEAM; RQ6; U4E-Q3 (the advisor's W1-PUB ruling) |
+```
+- New:
+```text
+| npt-room | `Room<S: SimCore>`; `InputBuffer::CMD_CATCHUP` and `buffer_depth_ticks`; `ClientCounters` (the type `ClientSlot::counters` returns, its fields the per-client counts); `Room`'s methods (`new`, `join`, `leave`, `receive`, `pump_report`, `tick`, `take_datagrams`, `take_control` handing out each reliable message's bytes, `client`, `last_tick`, `sim`, `roster`, `script`, `tick_input`, `reports`, `event_cap`, `with_event_cap`, `with_event_start`, `with_hashes`, `with_cover`); `ClientSlot`'s getters (`slot`, `counters`, `server_hash`, `burst_eviction`, `baseline_age`, `groups`, `bytes`, `budget`, `last_acked`, `own_section`, `overflow_resync`, `wraps`, `rewinds_refused`, `queue`, `headroom`, `buffer_depth_ticks`, `kicked`); `Roster::live` and `is_live`; bites builds only: `BITES` and `Room::with_bite` | U4-SEAM; RQ6; U4E-Q3 (the advisor's W1-PUB ruling); §4.2 (`script`, `reports`), §4.5 (`burst_eviction`, the window's pair), §4.9 (`with_cover`), §4.11 (`with_bite`); U4E-Q6, U4E-Q7, U4E-Q11, U4E-Q12; carries 23, 40, 54, 56, 57 and 61 (a); plan.md:508-509 (`take_control`: encoding stays on the tick); the advisor's U4e round-1 ruling, R2 (A1, A4, A5) |
+```
+- The npt-server row keeps its start; its end, from the words "bites builds only:" (once in that row) to the row's
+  closing bar, old:
+```text
+bites builds only: `Schedule::with_bite`, `BITES` | U4-SERVER; §4.3; A6, A7; the advisor's W1-PUB ruling |
+```
+- New (so the row reads its old items, then these):
+```text
+`Decoder`'s methods (`new` taking an `RttSource`, `counters`, `is_closed`, `accept`, `reject`, `take_sent_bytes`, `rtt_ns`); `RttSource` (`Link`, `Pings`); `ConnLimits::new`, `input_refill_per_second`, `hold_cap_ns`; `Counters`' fields; the modules private, each item at the crate root; bites builds only: `Schedule::with_bite`, `BITES` | U4-SERVER; §4.3; A6, A7; the advisor's W1-PUB ruling; §4.9 (`RttSource`: the RTT by the session's kind), §4.10 (`Counters`, U4f's -21 series); carry 39's 30 and 60 Hz pins; the advisor's U4e round-1 ruling, R2 (A2, A5) |
+```
+- The npt-client row, old (one line):
+```text
+| npt-client | a dependency on npt-link, for `Channel`; bites builds only, `BITES` and `grid_with_bite` (the advisor's U4s ruling, condition 1 (a)) | as above; u4s-carries.md carry 30: arch F1 |
+```
+- New:
+```text
+| npt-client | a dependency on npt-link, for `Channel`; `StepOut`'s fields (`datagrams`, `reliable`, `next_due_ns`, `hashes`, `lost`, `wraps`); `ClientEndpoint`'s methods (`new`, `input`, `step`, `with_starts`, `with_lead`, `slot`, `newest_tick`, `last_run_command`, `wrong_channel`, `refused`, `stale`, `duplicates`); bites builds only, `BITES` (3 ids), `grid_with_bite` and `ClientEndpoint::with_bite` | as above; u4s-carries.md carry 30: arch F1; plan.md:486 (`StepOut`); carries 24, 61 (b) and (c); U4E-Q2, U4E-Q7; -58's counter wraps; carry 74 (`with_lead`, set by U4r's lab); the advisor's U4e brief ruling, A5 (the bites-only constructor); the advisor's U4e round-1 ruling, R2 (A5) |
+```
+
+## Before the merge (in this order)
+1. **The fix pass** (R8): FX-1 to FX-13, each with its test failing under its named plant, restored and
+   sha256-checked; lint, doc and fmt clean; check.mjs twice counted in the copy (all 10 steps, counts as deltas on 458 /
+   524 / 52); the record's "Fix pass, round 1"; .gate/u4e/fx-hashes-end.sha256. The builder's brief carries my U4d-F
+   ruling's T4, items 1 and 2.
+2. **The main session:** the copy's files equal fx-hashes-end.sha256; the snapshot re-cut (wip/u4e.patch) and
+   committed; round 2's packet cut by review_packet.py on what changed, this ruling as its "judged against" half.
+3. **Round 2, on what changed** (R8): netcode-architect, security-auditor and engine-architect (read only), then the
+   test-engineer (plants, its start hashes as .gate/u4e/r2-hashes-start.sha256, one counted check.mjs) beside the
+   rust-reviewer (read only). APPROVE, or APPROVE WITH FINDINGS with Lows only, lets the merge go ahead; a Medium comes
+   to me first and becomes a follow-up or a carry; a High or Critical comes to me for a third round on it alone.
+4. **M1-M8** (R9): the copy is the one reviewed; the base still fits; the snapshot and the apply; the merged bytes are
+   the reviewed bytes; T1 and T4 applied, then check.mjs counted on the merged tree with the by-name lines for T5; TE2-5's
+   rule; the gate; one commit carrying T1-T6, the record and the report.
+5. **M9 after the push:** the saver restarted; the card (U4e's merge, the base counts, carries 73-81 and C-U6-12 to
+   C-U6-15, U4e's open security findings); the copies removed per CHECKPOINTS.md §10 once CI is green; U4r's brief
+   names carries 73-77 and carry 62 (h)'s measured window.
+
+## Decisions needed
+None. Every point here is a technical or test choice inside the documented vision, or a route between lanes, which is
+mine to decide. R1 reads my own text (B2.1, carry 61) and makes the tick16 proof stricter; it reads no ADR row and no
+word of Mustafa's, and changes no pass bar. Mustafa's words on the Low ("A Low never triggers a push") hold: every Low
+here rides the push the High needs anyway, or becomes a carry, a report line or a follow-up.
+
+## For Mustafa
+Nothing. PR #40 stays needs-mustafa for its existing reasons; U4e adds to its report's list of open security findings
+(SEC-U4E-4's transport half, Medium; SEC-U4E-2, -5, -6, -8 and -9, Low), with no action for you now.
+
+## What I checked, and what I did not
+**Checked myself (reading, git and sha256; no build, run or plant):**
+- My role file from main, whole; the brief; the five seats' notes, whole; the builder's record; my U4e brief check; my
+  U4d-F ruling (R5's M1-M9 and T4); my U4j round-2 ruling's B2.1, B5 and B7.2 (carries 61 and 62); the card's
+  "Running".
+- The plan: u4-build-plan.md §4.1, §4.5, §4.6, §4.9, §4.12-§4.14, §5 U4e, U4r, U4f-U4h and the lanes; plan.md:508-509
+  (verified word for word) and §4.7's lists; u4s-carries.md §U4e (21-27, 39, 50, 51, 53-57, 61, 68) and the other
+  sections' last entries (the highest number 72); plan.md's U6 row (the last C-U6-11).
+- The contract: marks/README.md §1 (:44-73) and its window default (:134); SERIES.md:150, :218, :266, :319; marks.json's
+  PM-0001-4, -18 and -34 entries.
+- The code in .gate/u4e-r1: client/src/lib.rs (`receive`, `too_old`, `see`, `lost`, `sentinel`, `file`, `group`, the
+  start of `full_state`: :431-720), pump.rs (:196-275, :366-430), room.rs (:545-606, :682-800, :1038-1100), the tick16
+  tests (server/tests/loopback.rs:195-252; proto/tests/bites.rs:166-190), proto/src/quant.rs's bite (:133-139),
+  judge/src/figures.rs:542-554 and the lab's `compare` (server/tests/common/mod.rs:345-355), l1/src/lib.rs's datagram
+  model (:13-24, :75, :179-199), proto/src/msg.rs's a3 test (:587-623), and greps for A5's nine items and `with_cover`.
+- Both copies against the test seat's start hashes (23 of 23 OK each); the builder's copy's HEAD and status; the
+  snapshot's sha256 against db49108's; the branch's spikes/ unchanged since 97bb9d3.
+- The test seat's logs behind each settled finding (Q-1, Q-2, Q-6, Q-7, Q-9, Q-10; P-A, P-B2, P-C, P-D3, P-21/22/57;
+  the counted run).
+- Each old text that T1-T4 replace or anchor on: found once at the branch head (line breaks read as spaces).
+
+**Not checked:**
+- I built, ran and planted nothing. R1's form is reasoned, not built: whether the first-tick memory and the bounded
+  once-per-tick filing fit cleanly is the builder's to show and round 2's to check.
+- That no honest L1 group names a tick before the client's first snapshot at least the ring behind its newest rests on
+  L1's documented model and the room's full-state gate, not on a run; round 2's netcode-architect checks it.
+- RR-5's figures are the rust-reviewer's on this 4-vCPU VM; I did not re-run its bench. NC-L2's age-32 edge and
+  SEC-U4E-5 were not run by anyone (by reading only).
+- T6's rows follow the fix pass's final public items, which the main session re-derives at the merge; T5's numbers are
+  filled from M5's lines.
+- The rust-reviewer's cites for RR-1, RR-2 and RR-4 point past the end of rewind.rs and events.rs (the test seat noticed
+  it); I read their claims against room.rs and rewind.rs's actual lines.
+
 
