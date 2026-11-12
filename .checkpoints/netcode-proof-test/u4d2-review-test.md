@@ -168,6 +168,43 @@ d3aef8209bbec3beeca3d02bb2cdd151b205f26e7496af2dc7f27f9c728b57a4 crates/hash-was
   std-sin's one-ulp change at its first tick and P6's word-size change at tick 0, and the hashes are npt-sim's state hash
   (h3: the exports equal Replayer's own per tick). No path found.
 
+## Step 6: the counted check.mjs (r1-te-final-check.log, -x, runner exit 1)
+- Before: every file = step 1's hashes (plus crates/sim/Cargo.toml fb98df48 and .cargo/config.toml 9ff1aa86 = HEAD's);
+  git status 18 lines (9 M, 8 new, the builder's notes file); df 7.3G free; shared target 6.9G.
+- Six pre-builds 23:07:47-23:09:44, each exit 0; `node check.mjs` 23:09:44-23:15:05. Step lines: fmt PASS 0.8 s;
+  clippy PASS 21.3 s; clippy-wasm32 PASS 4.3 s; doc PASS 70.9 s; **test FAIL 174.9 s** "the bites build's tests
+  (measured build: 416 tests passed, 0 failed, 0 reported a skip; bites build: 342 tests passed, 1 failed, 0 reported a
+  skip) failed: error: test failed, to rerun pass `-p npt-net --lib`", with carry 65's line "the bites build's failing
+  tests (libtest's failures: list): l2::delay::tests::a_shutdown_s_never_completes_ends_at_its_deadline_without_spinning";
+  deps PASS 1.3 s; wasm PASS 40.0 s (27000/0 both pairs, h2 equal, hash-map caught natively and native-Wasm, Wasm 1-2
+  not exercised, std-sin caught at SS-s1 2); refs PASS 0.3 s; marks PASS 5.8 s; self PASS 1.5 s "63 of 63"; redact
+  PASS 0.8 s; "check: 1 step(s) failed".
+- **TE2-5** (not planted; not U4d2's crate): npt-net's
+  `l2::delay::tests::a_shutdown_s_never_completes_ends_at_its_deadline_without_spinning` (crates/net/src/l2/delay_tests.rs:
+  2552, a multi-thread tokio test that counts pump runs, at most 3) failed once in the bites build of the full test
+  step. Its panic text is not recoverable: check.mjs keeps cargo's output in memory and prints the last 40 lines, and
+  carry 65's line kept the name but the panic block was above them. Re-run at once through the runner,
+  r1-te-te25-npt-net.log (`cargo test --locked -p npt-net --all-features --lib --no-fail-fast`, -x): "test result: ok.
+  169 passed; 0 failed; 12 ignored", the test "... ok". The same test failed once under parallel load in U3c
+  (u3c-fix2-c2b.md:74, delay_tests.rs:2002 then). Not in a crate U4d2 changes and reads none of its files, so by B2.3 it
+  does not stop U4d2's merge; it is a recurring flake in U3's code to root-cause (the main session's, as a STATUS
+  follow-up). Carry 65's naming worked live here (a positive check of the carry); its panic did not survive the 40 lines.
+- For the counts, after the TE2-5 record: r1-te-final-test2.log (-x; `cargo test --no-run` both builds, every npt-*
+  crate "Compiling" twice from the worktree path, then `node check.mjs --only test`): "PASS test 251.5 s measured build:
+  416 tests passed, 0 failed, 0 reported a skip; bites build: 465 tests passed, 0 failed, 0 reported a skip".
+- Counts as deltas on <base> (399 / 446 / 52 of 52 / 10 steps): measured 416 (+17: hash-wasm 5, lab lib 5, lab bin 7),
+  bites 465 (+19: 7, 5, 7), self 63 of 63 (+11), steps 11 (+1, `wasm` after `deps`). Each equals the builder's e1/e2.
+  The counted run's provenance: 5 x "Compiling npt-hash-wasm ... (<worktree>/spikes/netcode-proof/crates/hash-wasm)",
+  5 x npt-lab's, 6 x npt-sim's (4 pre-build lines each for hash-wasm and lab, plus one inside the test step's printed
+  tail). wasm step seconds: builds 5.7, 6.0, 1.3, 1.4; npt-lab hash 4.0; Wasm 3.5, 1.2, 0.1; hash-map 2.8, 3.1, 3.2, 0.6,
+  0.3; std-sin 3.0, 3.4, 0.1; step 40.0 s.
+
+## Step 7: the end state
+- All 17 files' sha256 equal step 1's and the read copy's (.gate/u4d2-r1); `diff -rq spikes/` against the read copy
+  empty; crates/sim/Cargo.toml fb98df48 and .cargo/config.toml 9ff1aa86 (HEAD's); `git diff --stat --
+  spikes/netcode-proof/crates/sim` empty; git status 18 lines, its md5 as before my runs. df 7.2G free; shared target
+  7.0G. Nothing committed; no copy cleaned.
+
 ## Findings (ranked)
 - TE-M1 Medium, before merge (= RR-M2, settled by my run as well): check.mjs readBackCheck (:1522-1553) is given every
   rustflags source at once and DEPS_CHECKED's limits text says that "fails closed"; cargo uses only the first non-empty
@@ -193,5 +230,37 @@ d3aef8209bbec3beeca3d02bb2cdd151b205f26e7496af2dc7f27f9c728b57a4 crates/hash-was
   bitten native leg with the clean one at T' (the clean half's native-1.lines already holds R's clean hashes), and the
   `std-sin native legs` call's own result is unread. Sound for the committed catch (SS-s1, tick 2, inside the hash-map
   pair's equal prefix); unguarded if the first catch moves to another recording or past tick 1,234. Fix: require the
-  bitten native leg's first difference from the clean native lines to be (R, T'), or assert the catch lies on rec0 before
-  HASH_MAP_ARM.
+  bitten native leg's first difference from a clean bites-build native leg to be (R, T'), or assert the catch lies on
+  rec0 before HASH_MAP_ARM.
+- TE-M3 Medium, not before U4d2's merge (the main session's follow-up): npt-net's
+  `l2::delay::tests::a_shutdown_s_never_completes_ends_at_its_deadline_without_spinning` (delay_tests.rs:2552) failed once
+  in my counted check.mjs (bites build, under the full workspace's parallel load) and passed on the TE2-5 re-run and the
+  second test-step run; it failed the same way in U3c (u3c-fix2-c2b.md:74). A recurring flake in U3's code that can fail
+  a merge's counted run. Not U4d2's crate; to root-cause (its pump-run count under load), never retried into green.
+- TE-L4 Low, follow-up: carry 65 names the failing test (worked live above) but its panic is lost: check.mjs keeps the
+  test output in memory and prints 40 lines, so when the TE2-5 re-run passes, B2.3's "name and panic" cannot be met.
+  Fix: save a failed cargo step's whole output under .gate/ and print its path, or print each failing test's panic line
+  beside its name.
+
+## Claim, proof, gap (role output)
+| Claim | Proof | Gap |
+|---|---|---|
+| 0 mismatches native x2 and Wasm over 27,000 ticks (h1) | final run's wasm line; e1/e2; per-recording counts judged | none |
+| cross-target vectors (h2) | h2 (i) unit; P5, P6 plants | none |
+| exports = Replayer (h3) | unit tests; --test-threads=1 (TE-R0) | none |
+| HashCompare (h4) | 5 unit tests | none |
+| manifest + carry 52 (h5) | unit tests; TP6 | none |
+| hash args (h6) | unit tests | exit codes by mapping, not asserted (fine) |
+| carry 66 (h7) | h7 (i), (ii) by name; TP8 | none |
+| features like for like | self-test; P1; TP1 (per-target libm) | none |
+| build flags refused, read-back fails closed | self-tests; P2; TP2, TP3 | superset fails open (TE-M1) |
+| hash-wasm unsafe only in no_mangle | self-tests; P3, P4; TP4 | export-body case untested (TE-M2) |
+| integer-only exports | self-test; TP5 | source scan only (TE-L2) |
+| loader refuses extra or wrong-kind exports, imports | self-test; P4 | kind untested (TE-L1); Object.prototype imports (SEC-U4D2-1) |
+| PM-0004-21 bites verdicts | step runs; self-tests | std-sin causality not re-shown (TE-L3) |
+| carry 65 | self-test; TP7; live in the counted run | panic lost (TE-L4) |
+
+## Verdict
+REVISE: two Mediums before the merge, both found by the rust and security seats and settled here by run (TE-M1 = RR-M2,
+TE-M2 = RR-M1 / SEC-U4D2-2), each a few lines and one self-test; TE-M3 (npt-net flake) not before U4d2's merge; Lows
+TE-L1 to TE-L4 as follow-ups. Every other bite named in §5 U4d2 bites by name; counts +17 / +19 / +11 / +1 step.
