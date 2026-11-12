@@ -39,4 +39,21 @@ No commit, no push. His words: not quoted (pointers to DECISIONS.md entries and 
 5. Re-run repo-map-check; wc -l STATUS.md; grep for stale lines elsewhere (left, reported).
 
 ## Progress
-- plan written (this file).
+- plan written (this file). Advisor tool consulted once before the edits: fold ROADMAP's two oldest from their own
+  phrases; mark 2.1a/2.1b merged (tag and closing sentence only); STATUS cuts as planned, spare cut :72; no new Open
+  risks (PIN-GUARD carries the pins risk; the sudo risk stays in the report: named in the return); nothing open may
+  read as decided; archive items self-contained; S1-S5 defined; no lockfile counts in the map; drift grep, report only.
+  #51's head runs verified: 43130543086 (push #701) and 43130550831 (pull_request #702), success.
+- DONE docs/REPO_MAP.md: "Last checked" 2026-11-12; seven top-level entries after `legacy/` (rust-toolchain.toml,
+  Cargo.toml, Cargo.lock, crates/, package.json, package-lock.json, packages/); `.gitignore` line + `/target/` and
+  `test-results/`; `.github/workflows/toolchain.yml`. repo-map-check: "repo map OK: 120 entries cover 107 required
+  paths", exit 0.
+- DONE docs/STATUS_ARCHIVE.md: "In flight" #51's merged row at the top (:159); 2.1a's "For 2.1b's plan" marked closed
+  by #51 (:509-510); live "Follow-ups" gains "From foundation 2.2" (:551-614): 14 items for 2.3 and 4 for later steps,
+  each self-contained, codes defined, his words only pointed at (DECISIONS.md entries by time, Appendix items).
+- DONE docs/STATUS.md: Last updated 2026-11-12 (main 2aa5e9c); Last merged = #51 (13:22:32 UTC, APPROVE of 5d50bf2);
+  CI on main 2aa5e9c run 43226692719; In flight: #51 out, #48 updated (steps 1-5, docs pass done; next Fable read,
+  review round and verifier, report, advisor's review, his go; tier 2); Next item 2; Waiting: his go for #48 with K1 as
+  written and Q2.2-a (waiting, not decided); Follow-ups: 2.1a's five closed items dropped, the 2.2 block by short name;
+  Open risks: R7's closed line-number note dropped (its text stays in the archive). 120 lines; lines 11-12 and 18-19
+  (his quotes) untouched.
