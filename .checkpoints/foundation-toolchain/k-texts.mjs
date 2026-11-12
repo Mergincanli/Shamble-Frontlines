@@ -21,6 +21,11 @@ export const EDITS = [
     old: '  Mustafa and the Advisor have approved the drafts; until then, stop.\n',
     new: '  Mustafa and the Advisor have approved the drafts; until then, stop. Exception: foundation steps 2.1 and 2.2\n' +
          `  ${PAREN}.\n` },
+  // K1b, only on his yes (S1 of the Fable advisor's early skeleton read): CI proves the release overflow setting.
+  { id: 'K1b', file: '.github/workflows/toolchain.yml',
+    old: '              cargo test --workspace --locked\n',
+    new: '              cargo test --workspace --locked\n' +
+         '              cargo test --release -p sim -p protocol --locked\n' },
   { id: 'K4', file: '.claude/agents/advisor.md',
     old: '- No engine code. Throwaway spikes only, and only after Mustafa and you have approved the decision drafts.\n',
     new: '- No engine code. Throwaway spikes only, and only after Mustafa and you have approved the decision drafts. Exception:\n' +

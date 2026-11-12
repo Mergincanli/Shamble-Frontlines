@@ -1,6 +1,16 @@
-# Plan: foundation step 2.2, the toolchain (revision 8)
+# Plan: foundation step 2.2, the toolchain (revision 9)
 
-Status: revision 8 records Mustafa's words of 2026-11-11 on the advisor tool (`mustafa-2026-11-11-advisor-tool.md`,
+Status: revision 9 records Mustafa's two messages of 2026-11-12 (`mustafa-2026-11-12-step5-models.md` and
+`mustafa-2026-11-12-models-skeleton.md`, word for word; the second re-sends the first with item 3 changed and item 4
+new, and governs). Step 5 started on his word (2.1b merged as 2aa5e9c): main was merged in from the branch worktree
+(As built, step 5). His models words of 2026-11-12, 16:25 go into DECISIONS.md word for word in step 6, with "What I
+mean by it"; the kit's model rules change at 2.3 (a finding for 2.3, no kit edit here); by those words step 7's
+reviewers and the verifier run on Opus 5.5 at effort max (stated to him; he may object). His item 4: the Fable advisor
+reads the built skeleton as a whole at moment 5, before the PR is marked ready; an early, partial read ran at
+consultation 2 (findings S1-S5, Appendix B), and the formal read runs before ready with every skeleton file and ADR
+0002 parts 2-4 and 7 printed. S1 (no CI step proves the release overflow setting) is offered to him as K1b, one more
+line in the CI job, asked with the four kit texts. Nothing else changed from revision 8.
+Revision 8 records Mustafa's words of 2026-11-11 on the advisor tool (`mustafa-2026-11-11-advisor-tool.md`,
 word for word; the tool, Fable 5.2, has been on in this session since his `/advisor fable` that day): it is consulted at
 his five moments, each consultation logged in the checkpoint in one line and counted in the report; his words go into
 DECISIONS.md with step 6's docs pass and into CLAUDE.md at the gate step. Revision 8 also adds "As built, steps 1 to 4"
@@ -96,6 +106,26 @@ The advisor agent approved revision 3 and has not seen these changes of method: 
   consultations from then on are logged in the checkpoint.
 - **K1's ask** (the guard's prompt for the workflow write) is treated as not seen (his KIT-ASK-SEEN (b)); step 5 asks
   him in chat before each kit write.
+
+### As built, step 5 (2026-11-12)
+- **The move:** the main folder went to the local branch `main-folder` at origin/main 2aa5e9c (`git switch -c`, no
+  guard prompt: `mainFolderMove` passes a new branch started at origin/main); the branch is checked out in
+  `.gate/foundation-toolchain-wt`; origin/main merged there as c901187 (clean: main changed none of 2.2's files; the
+  branch's kit and gate files are byte-identical to main's); pushed from the worktree. A first push written as a
+  compound line was refused by the session's permission check with no reason; the plain `git push origin <branch>`
+  passed (for the report's list of refusals).
+- **E2 on the merged head c901187:** green (toolchain push 43249204290 and pull_request 43249208734; gate push
+  43249204350 and pull_request 43249208725); the cut held (curl exit 7), cargo test 6/6, the wasm32 build, npm 5/5,
+  tsc 6.0.3. The local gate `--no-smoke`: PASS, symbols +0 -0.
+- **Condition 5** holds on main 2aa5e9c (ADR 0002's Status line records part 1 as accepted). The kit inventory on the
+  merged tree: the four lines and the two agents' own Never lines (`engine-architect.md:52`, `graphics-engineer.md:41`,
+  left alone as 1.3 says); no fifth line; no test, hook or script pins the old texts.
+- **The four texts** (`k-texts.mjs`, this folder; each old text found once on the merged tree): the plan's draft
+  wording, except that each exception names his decision with a pointer, "(Mustafa's decision of 2026-11-10 in
+  `docs/DECISIONS.md`)", and K4's exception goes at the end of its line, after both sentences, as K3's does.
+- **Effort:** step 7's reviewers and the verifier run on Opus 5.5 at effort max (his words of 2026-11-12, item 3: "The
+  agents that review, verify or design game and engine code always run at max"; the crates are the engine skeleton),
+  passed as `model: "opus"`, `effort: "max"`; the approved plan said each file's effort (high; engine-architect xhigh).
 
 ## Part 1. Goal, scope, rules, risk tier
 

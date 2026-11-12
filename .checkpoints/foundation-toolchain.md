@@ -110,6 +110,12 @@
     (`k-texts.mjs`: each old text found once; longest new lines 133 (K2a, a heading), 114, 109, 117 chars).
 
 ## Current step
+Step 5, waiting for his chat yes on the exact texts of K2a, K2b, K3, K4 and the offered K1b (sent to him at the end of
+the turn after consultation 2), with the chat switched to Accept edits. On his yes: `get_session` (write nothing while
+`permission_mode` is still auto), Read the three files, the Edits only (each guard prompt counted), then commit and
+push (both on the allow list), then ask him to switch back to Auto and how many guard prompts he saw. Then, if K1b:
+M5 by Part 7's procedure. Then the re-run of E1-E11 (E8, E9, E10 first runs; E4b, E4d).
+Earlier notes on this step:
 Step 5 started, 2026-11-12 (his words of that day, item 1: "Step 5 no longer waits: start it as your card says";
 `mustafa-2026-11-12-step5-models.md`). 2.1b merged as 2aa5e9c (PR #51). Read on main 2aa5e9c: condition 5 holds (ADR
 0002's Status line: "Proposed. Part 1 accepted by Mustafa on 2026-11-10, his SCOPE (a) ..."); the four kit lines are
@@ -142,6 +148,21 @@ there, then the four texts, the advisor tool, his chat ask.
    names the method changes in the plan's "As built, steps 1 to 4".
 
 ## Open findings
+- The Fable advisor's early skeleton read (consultation 2; each a check, not a verdict):
+  - S1: CI runs only dev-profile cargo commands, where overflow checks are on by default, so deleting both
+    `[profile.release.package.*]` blocks stays green; ADR 0002's PM-0002-53 (dev and release, native and Wasm, a
+    committed test in `sim`) names no step. Offered to him as K1b: `cargo test --release -p sim -p protocol --locked`
+    inside the cut, with a planted failure M5 (sim's release block deleted, red at that step, reverted). If he says no:
+    a 2.3 finding, and the report says the release setting is proven locally only (E1 with its control).
+  - S2: TypeScript is pinned but never type-checked (no `tsconfig`; CI prints `tsc --version` only), and the stubs
+    import `./index.ts`, an import-extension convention that `tsc -b` would need `allowImportingTsExtensions` or
+    `rewriteRelativeImportExtensions` for: ADR 0002 part 7 gives the shared strict base tsconfig to the lint step
+    (2.3's G3): a 2.3 finding.
+  - S3: the overflow override is per package: a crate that enters later with simulation arithmetic (`content`, a maths
+    crate) is unchecked in release unless it gets the same block: a finding for the first slice.
+  - S4: setup-node v7.0.0 runs with `package-manager-cache: true` (the job log); what it caches if a `packageManager`
+    field is added to the unprotected root `package.json` is unverified: security-auditor's brief.
+  - S5: the packages have no `exports` or entry fields: a finding for the step that gives them code.
 - The advisor tool (Fable 5.2) was off in this session until 2026-11-11 (ToolSearch "advisor": no match before then);
   on since his `/advisor fable` of 2026-11-11. Steps 1 to 4 and K1's write were done while it was off; its first
   consultation found nothing in E2's or the planted failures' logs to redo.
@@ -182,8 +203,9 @@ there, then the four texts, the advisor tool, his chat ask.
   skeleton as a whole (the Cargo workspace and the crates' settings, the pins, the package layout, the CI job); fix what
   it finds within the review budget, or record it in the report. Item 5: the PR a draft until its report is done; tell
   him when he is needed for the kit edits, and in which mode.
-- Mustafa, 2026-11-12, 15:26:57 UTC (`mustafa-2026-11-12-step5-models.md`, saved by `save-words.mjs` from the
-  transcript, byte for byte): 2.1b merged (2aa5e9c, CI run #705 green), step 5 starts as the card says, each kit edit
+- **Replaced** in its item 3 by his second message of the same day (15:35:17 UTC, above), which re-sends it; its item 3
+  ("Until then these words are the rule.") is no longer the rule. Mustafa, 2026-11-12, 15:26:57 UTC
+  (`mustafa-2026-11-12-step5-models.md`, saved by `save-words.mjs` from the transcript, byte for byte): 2.1b merged (2aa5e9c, CI run #705 green), step 5 starts as the card says, each kit edit
   (K2a, K2b, K3, K4) asked in chat with its exact text and written after his yes; the docs pass records his merge words
   for #51 in DECISIONS.md, captured by script from 2aa5e9c's message, as 2.1b did for #50; his decision on models word
   for word in DECISIONS.md ("Fable 5.2 builds the game and engine code on my personal account. ... Step 2.2 stays on
@@ -226,7 +248,17 @@ there, then the four texts, the advisor tool, his chat ask.
    an "As built, steps 1 to 4" section added to the plan, its method changes to be named in the advisor agent's
    final-head brief; E4b, E4d, E8, E9, E10 named as not yet run (E4b and E4d offered to him now); K4's worktree path
    to be checked for the guard's ask at step 5.
-Count: 1.
+2. 2026-11-12 ~16:40 Amsterdam (after 822f9fb) · moment 3 (before the four kit edits), moment 4 (the mode, the review
+   effort, the DECISIONS.md form) and an early read of the skeleton (his item 4): are the four texts sound, which mode,
+   which effort, read the skeleton now? · changed: two greps run before the ask (no fifth "no engine code" line; no
+   test pins the old texts); Accept edits for the writes, with the files read first, `permission_mode` checked right
+   before writing, only the edits in that window, and his count of the guard prompts he saw asked for (evidence for the
+   2.3 auto-mode finding); step 7's agents at Opus 5.5 effort max, stated to him; both of his 2026-11-12 messages go
+   into DECISIONS.md, the first under a header starting "Replaced", and both into the report's appendix; the skeleton
+   read was early and partial (2 of 6 lib.rs, 2 of 5 package manifests, no npm lock, no gate.yml, no ADR text): S1 (no
+   CI step proves the release overflow setting) offered to him as K1b, S2 to S5 recorded (Open findings); the formal
+   read at moment 5 prints every skeleton file plus ADR 0002 parts 2-4 and 7.
+Count: 2.
 
 ## Running work
 - **Where the work lives since 2026-11-12 16:33 Amsterdam:** the branch worktree
