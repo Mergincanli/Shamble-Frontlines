@@ -119,8 +119,15 @@
     request, totaling 5": the guard's prompt reached him for each of the five kit writes in this mode (evidence for
     the 2.3 auto-mode finding).
 
+19. Step 5, part 3, 2026-11-12 (back in Auto at 18:33:35 UTC, his word): his yes, his count of the prompts and his
+    word on Auto saved by script (`mustafa-2026-11-12-kit-yes.md`, `-prompt-count.md`, `-back-in-auto.md`, byte for
+    byte). CI on fd14855 all green: toolchain push 43259689336 (job 131327320460: the cut held, curl exit 7; the new
+    line ran: "Finished `release` profile [optimized]", then `protocol` and `sim` each "overflow_checks_are_on - should
+    panic ... ok" from target/release) and pull_request 43259708110; gate push 43259689239 and pull_request
+    43259708266. (The job log downloads from the public API with curl, status 200.) Next: M5.
+
 ## Current step
-Step 5 (superseded by step 18 above): waiting for his chat yes on the exact texts of K2a, K2b, K3, K4 and the offered K1b (sent to him at the end of
+Step 5 (superseded by steps 18-19 above): waiting for his chat yes on the exact texts of K2a, K2b, K3, K4 and the offered K1b (sent to him at the end of
 the turn after consultation 2), with the chat switched to Accept edits. On his yes: `get_session` (write nothing while
 `permission_mode` is still auto), Read the three files, the Edits only (each guard prompt counted), then commit and
 push (both on the allow list), then ask him to switch back to Auto and how many guard prompts he saw. Then, if K1b:
