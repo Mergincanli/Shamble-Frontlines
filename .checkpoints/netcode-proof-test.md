@@ -72,7 +72,11 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    (complete: item 5 filled with batch 2's findings); its ruling goes to advisor-u4d2-r1.md block by block. If cut:
    resume with `Workflow({scriptPath, resumeFromRunId})` (script workflows/scripts/npt-u4d2-r1-advisor-wf_ff32624e-10a.js).
    On return: read it whole; then the fix pass as it rules. Meanwhile, A13's server item (Next steps 4), unless the
-   ruling says to wait. **A13 in progress (main folder, uncommitted):** crates/server/clippy.toml gains the HashMap and
+   ruling says to wait. **A13 DONE at 1b4a3c8** ("A13: npt-server's clippy.toml gains the HashMap and HashSet type
+   bans", pushed about 23:36 UTC, its own commit, the saver stopped for it; CI on it pending): the counted run
+   (a13-check-counted.log, 23:25:24 to 23:34:59 UTC) all 10 steps PASS, measured 473, bites 541, self 52 of 52, marks
+   81 (ADR rows unchanged), redact 0 findings: the counts unchanged. The advisor's next ruling on the spike branch
+   checks it. The record of the work: crates/server/clippy.toml gains the HashMap and
    HashSet type bans in the room file's form, its header naming them (5 lines in, 1 out; sha256 before 5a363a03…).
    Proof (.gate/a13/): a scratch `pub fn a13_scratch() -> std::collections::HashMap<u32, u32>` in
    crates/server/src/lib.rs, by Edit: under the old file clippy exits 0 (a13-control.log); under the new one it exits
@@ -122,7 +126,8 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    with `Workflow({scriptPath, resumeFromRunId})`. On return: read its section 6 list and every stop in full; snapshot
    the worktree (worktree_patch.py) and commit it; then the review per 7.2 item 7's panel (rust-reviewer,
    engine-architect, test-engineer, infra-engineer, security-auditor), with U4e's seats counted in the three.
-- The saver runs as b41pzpnmb (since 22:52 UTC; restart it when it stops, with run_in_background and timeout
+- The saver runs as bht12f61p (since 23:36 UTC, after A13's commit; restart it when it stops, with run_in_background
+  and timeout
   7200000: without the timeout the harness stops it at 30 minutes, as it stopped bg29bb0pt at 16:42 UTC). The chat's size goes in every
   report.
 
