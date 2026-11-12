@@ -11,26 +11,35 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-12 about 16:30 UTC; read this first after a compact or a cut).**
+**NOW (2026-11-12 about 17:45 UTC; read this first after a compact or a cut).**
+0. **U4e's merge is next** (the advisor's round-2 ruling, advisor-u4e-r2.md: APPROVE on Q1-Q4; NC2-M1 a carry,
+   C-U6-16 (a); the merge goes ahead on R9's M1-M9 with Q3's amendments to M5, M8 and M9; T1, T2 (3), T3, T5 and the
+   new T7 from advisor-u4e-r2.md, T2 (1), (2), (4), (5), T4 and T6 from advisor-u4e-r1.md; nothing to Mustafa). M1 and
+   M2 checked at 2521d67 (HEAD 97bb9d3; the 23 files and the record only; r2-hashes-start 23 of 23 OK, equal to
+   fx-hashes-end; the base fits). **Running: the merge-text script's writer,** workflow wf_2b5fc39f-6a6 (task
+   w6vtwy7bs, resumed after the 16:50 cut; notes u4e-merge-text-notes.md): `u4e_merge_text.py --phase A|B`, dry run
+   only. On return: commit it, run both dry runs and read the diffs (T1, T4, T7 in full: the marks and the catalogue);
+   then stop the saver and do "Before the merge (in this order)" (advisor-u4e-r2.md:367-386): M3 (worktree_patch.py to
+   .gate/u4e-merge/, cmp with 4300944's wip/u4e.patch, sha256 1c31eeee…; `git apply --check`, `git apply`), M4, M5
+   (phase A, then check.mjs counted through main-run.sh in the background with a limit of at least 1,500,000 ms:
+   473 / 541 / 52, marks 81, redact 0, the by-name lines), M6-M7 (gate), M8 (phase B with u4e-report.md written first,
+   its anchor in place; one commit; `git rm` wip/u4e.patch), push, M9.
 1. **U4e's review round 2: DONE** (wf_e623d489-17e, about 16:35 UTC): all five seats APPROVE WITH FINDINGS; one
    Medium, NC2-M1 (the Resync limit drops a correct client's Resync within 2 s of its last full state: a false FAIL
    for PM-0004-61's random traps and -19's trap checks at U6/U7; not before the merge), the rest Low (NC2-L1;
    SEC-U4E-R2-1 to -4; A-R2-1, -2; RR2-1 to -3; TE2-L1, -L2), none before the merge. The test seat: every FX plant fails
    by name; counted check.mjs all 10 steps PASS, 473 / 541 / 52 (r2-te-check-counted.log). The copy after round 2:
    23 of 23 OK against fx-hashes-end.sha256. Read in full by the main session: NC2-M1, and the Lows touching the judge
-   or the marks (NC2-L1, RR2-3, TE2-L1), and TE2-L2. **Running: the advisor's ruling on round 2** (R8: "A Medium comes
-   to me first and becomes a follow-up or a carry, never a third round"), workflow wf_124afafb-818 (task w72w3qd9w;
-   brief advisor-u4e-r2-brief.md, items 1-4; ruling to advisor-u4e-r2.md). If cut: resume with `Workflow({scriptPath,
-   resumeFromRunId})`. On return: read it in full (it touches T1, the marks text); then the merge on R9's M1-M9 with
-   T1-T6 as the ruling leaves them (stop the saver first; one commit; the Lows recorded as follow-ups).
+   or the marks (NC2-L1, RR2-3, TE2-L1), and TE2-L2. The advisor's ruling on round 2: DONE (wf_124afafb-818; item 0).
 2. **U4d2's launch** (the advisor's check, L1-L5): L1 DONE at 172c92d (rev 1.2 by u4d2_fold.py, its dry run read in
    full; nothing left for the advisor); L2 DONE at 85c08df; P7 DONE (u4d2-run.sh). Main merged in at bfda3cd. Done:
    (a) u4d2_restamp.py applied at 51520b4 (P6 = bfda3cd with 399 / 446 / 52 / 10, P7, the plan cites of sections 0-7
    re-pointed to 3f58ff0d, section 0 re-stamped; brief sha256 146acf18); (b) the worktree
    `.claude/worktrees/u4d2-build` (branch u4d2-build at 51520b4); (c) the `-k` demo there, shared mode, 16:27 UTC:
    with `-k` exit 1 and both exit codes logged, without `-k` exit 1 and the first only (.gate/u4d2/k-demo-with.log,
-   k-demo-without.log). **(d) Running: U4d2's build,** workflow wf_e3cb6af2-079 (task wikkkfjvv; script
-   workflows/scripts/npt-u4d2-build-wf_e3cb6af2-079.js), launched about 16:28 UTC: one builder (general-purpose, opus,
+   k-demo-without.log). **(d) Running: U4d2's build,** workflow wf_e3cb6af2-079 (task w0yn65lgt since its resume at
+   17:42 after the 16:50 cut, blocks 0-2 done; script workflows/scripts/npt-u4d2-build-wf_e3cb6af2-079.js), launched
+   about 16:28 UTC: one builder (general-purpose, opus,
    xhigh), no isolation, in that worktree; the prompt replaces 1.1's fast-forward as U4e's did, points at section 4
    for the rules (his words and the advisor's are there by script; it quotes only T4 item 1, as every agent brief
    does) and names the runner; logs .gate/u4d2/; notes the worktree's u4d2-build.md. If cut: read its notes' last
@@ -54,6 +63,11 @@ the cut and the time of the resume; UTC, read from the session's transcript):
   resets 12:30pm (UTC)". Cut: the advisor's check of U4d2's brief (09:24) and U4e's fix builder (09:29, after its two
   counted runs). Resumed 13:13, on Mustafa's message: the builder's copy checked against its hashes and its runs
   recorded by the main session; the advisor's check resumed.
+- 2026-11-12 16:50: "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit
+  resets 5:40pm (UTC)". Cut: U4d2's builder (16:50, in block 3, npt-lab; blocks 0-2 done) and the U4e merge-text
+  script writer (16:50, its plan written, no script yet). Resumed 17:41, on Mustafa's message: U4d2's worktree checked
+  first (no plant in place: crates/sim untouched, no cargo running; block 3's edits in crates/lab kept for the fresh
+  copy, which reads its notes and the diff first); both runs resumed (`resumeFromRunId`).
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188
