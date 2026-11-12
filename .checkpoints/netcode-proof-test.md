@@ -65,14 +65,19 @@ erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md.
     module, plants Q1-Q5), with FX-2 (scene.rs docs, T3's words). R3: the Lows routed (carries 68-72, carry 59's
     sentence, T1's report words). R4: both readings confirmed, two corrections of fact (t_m1 failed in steps 2-4; the
     re-runs were in steps 2, 4 and 5). R5: the merge on M1-M9 after round 2. R6: T4 (now in Rules in force).
-  - **Running: the fix pass** (run wf_6d45d257-7c0, task we0n7sjzo, started 00:27 UTC; script
-    workflows/scripts/npt-u4d-f-fixpass-wf_6d45d257-7c0.js; one fresh builder in the copy; logs .gate/u4df/fx-*; notes
-    u4df-build.md "Fix pass, round 1" there). Expected: check.mjs twice 368 / 415 / 52; the three-seed test's 21
-    lines equal to end-three-seeds.log's. On return: read the result in full; then cut round 2's packet by script
-    (the diff from `.gate/u4df-r1`, a worktree at dad9566 with wip/u4df.patch applied, hashes equal to round 1's, to
-    the copy; R2's block; T3; no conclusion), then round 2 (netcode-architect read only; then the test-engineer,
-    general-purpose with Edit, its start hashes under .gate/u4df/; both briefs carry T4 item 1). APPROVE or Lows only:
-    merge on M1-M9 with no further ruling; a Medium or above: the advisor first.
+  - **The fix pass: DONE** (run wf_6d45d257-7c0, 00:57 UTC; read in full; not stopped). FX-1
+    (`replay::tests::the_sky_aims_reckon_every_input_the_recording_emits`) passed on the real code at its first run
+    in both builds (1.75 s), all 954,628 sky aims of seed 2 exact, its six counts above 0 (the rarest 11); Q1-Q5 each
+    fail it by name; FX-2 is T3's words; check.mjs twice 368 / 415 / 52; the three-seed lines identical; world.rs and
+    both test files equal to round 1's. Snapshot 9bf615c (wip/u4df.patch, applies on dad9566). Final sha256:
+    replay.rs 802842b0…, scene.rs a5ce8ac2…, the other three as round 1's.
+  - **Running: round 2** (run wf_18a25138-5d9, task wdzysc1jw, started 00:58 UTC; script
+    workflows/scripts/npt-u4d-f-review-r2-wf_18a25138-5d9.js; packet u4df-r2-packet.md, cut by script, sha256
+    7d8a4113f71b, 65 carries left out): the netcode-architect (read only; notes u4df-r2-netcode.md), then the
+    test-engineer (general-purpose with Edit; notes u4df-r2-test.md; start hashes .gate/u4df/r2-start.sha256 for M1
+    and M4; check.mjs once counted). APPROVE or Lows only: merge on M1-M9 with no further ruling; a Medium or above,
+    or a REVISE: the advisor first. The merge's texts: u4df_merge_text.py (T1 and T2 by script; dry run clean), run
+    with --apply after u4df-report.md is written with its anchor line.
   - Done meanwhile: TE2-5 (b), ten of ten runs exit 0, each 443 passed, 0 failed, 12 ignored (te2-5-record.md).
   - the saver, restarted after U4j's push (about 20:15 UTC, 110 minutes): `node .claude/scripts/checkpoint.mjs watch
     netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
