@@ -83,6 +83,12 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     to be queued "in my words in docs/DECISIONS.md under "Queued""; copied by script from
     `docs/reports/2026-11-11-foundation-2-1b.md`, Appendix A2, from inside its quote marks):
     > A note for the render budget bench (ADR 0003), 2026-11-11. The stack stays as decided: Rust decides and computes, TypeScript on three.js draws. The bench reports three times per frame: the page's JavaScript, the Rust side, and the graphics card. If the page's JavaScript is the part over budget, that work moves to the Rust side before the JavaScript is tuned. Candidates I like for more Rust later: crowd and animation math for hundreds of soldiers, offline tools that prepare models, textures and maps, and heavy effects where they do not belong on the graphics card.
+  - The CLAUDE.md and agent-file change for models (his message of 2026-11-12, 15:35:17 UTC, in foundation 2.2's
+    session, item 3, under "Decisions, newest first": the entry "Taken by Mustafa, 2026-11-12, 15:35:17 UTC: his words
+    of 2026-11-12, 16:25, on models, and the Fable advisor's read of the built skeleton"; his two bullets copied by
+    script from `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A9):
+    > - This replaces the sentence "The main model and every agent stay Opus 5.5" in my LANE-RULES of 2026-11-10. From the moment these words are in docs/DECISIONS.md they are the rule, also where CLAUDE.md still says otherwise.
+    > - I allow the rule change in the kit for this. Step 2.3 changes CLAUDE.md's "Models and effort" section and the agent files to match, each edit asked of me in chat with its exact text. List it as a finding for 2.3. Do not edit the kit for it in this PR.
   - The entries below are pointers to items carried out.
   - STATUS-DIET and LANE-RULES, with his Models addition and ACCOUNTS (his queue of 2026-11-10, items 2 and 3, his
     answers of 07:08:14 UTC and his second message, item 1): carried out by status-diet, so moved from here to
@@ -101,6 +107,105 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-12, 18:33:35 UTC: the chat back in Auto** (foundation 2.2, PR #48; his message in that
+  change-set's session, session_019YNMUSc7FA68ujhLgXfEJA, on his personal account, extracted by script from the
+  session's transcript, message d69572b3-3c05-4ec9-b33d-c320c006951a). Copied by script from
+  `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A12, and checked byte for byte against it:
+> This chat is back in Auto. Carry on in the order you gave.
+- **Taken by Mustafa, 2026-11-12, 16:31:45 UTC: his count of the guard's prompts for step 5's kit writes** (foundation
+  2.2, PR #48; his message in that change-set's session, session_019YNMUSc7FA68ujhLgXfEJA, on his personal account,
+  extracted by script from the session's transcript, message 8be9f140-6fad-4974-ad46-f82ec8a37db6); sent while the
+  session's turn was running. The five writes (K2a, K2b and K3 in CLAUDE.md, K4 in `.claude/agents/advisor.md`, K1b in
+  the CI job) were made with the chat in the mode he chose as Accept edits; evidence for step 2.3's finding on the
+  guard's prompt in auto mode. Copied by script from `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A11, and
+  checked byte for byte against it:
+> I saw 3 and then 2 more edit request, totaling 5
+- **Taken by Mustafa, 2026-11-12, 16:28:28 UTC: KIT-5 yes, K1b (a), step 7 at effort max** (foundation 2.2, PR #48; his
+  message in that change-set's session, session_019YNMUSc7FA68ujhLgXfEJA, on his personal account, extracted by script
+  from the session's transcript, message 6a69b2b2-44d0-413e-9267-7846396bae82). KIT-5 and K1b are the session's two asks
+  of that afternoon, in the report with the exact texts asked. Carried out: the five texts written from the session's
+  record of them (c9bd268, fd14855), the planted failure for K1b run and reverted; S2 to S5 and the refused first push
+  of the merge are in the report's lists for later steps and for 2.3. Copied by script from
+  `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A10, and checked byte for byte against it:
+> My words of 2026-11-12 for step 5's kit edits (PR #48). I have switched this chat to Accept edits.
+>
+> 1. KIT-5: yes to all four, exactly as you showed them in your message of today: K2a, K2b and K3 in CLAUDE.md and K4 in .claude/agents/advisor.md. Write them from your script's record. If a text you are about to write differs from that record by one character, stop and show me first.
+>
+> 2. K1b (a). Add the one line to the toolchain's CI job, inside the network cut: cargo test --release -p sim -p protocol --locked. Prove it with the planted failure as you described: remove the release overflow setting, wait for the red run, then revert exactly. Any other change to the CI job asks me again.
+>
+> 3. No objection to the step-7 reviewers and the verifier on Opus 5.5 at effort max.
+>
+> 4. S2 to S5 stay recorded for later steps, as you wrote. Put the refused first push of the merge on the list for step 2.3 as well.
+>
+> When the writes are committed and pushed, tell me, so I can switch back to Auto. I will tell you how many guard prompts I saw.
+- **Taken by Mustafa, 2026-11-12, 15:35:17 UTC: his words of 2026-11-12, 16:25, on models, and the Fable advisor's read
+  of the built skeleton** (foundation 2.2, PR #48; his message in that change-set's session,
+  session_019YNMUSc7FA68ujhLgXfEJA, on his personal account, extracted by script from the session's transcript, message
+  adb00970-7927-49f7-bfa5-5095981ab169); sent while the session's turn was running. It re-sends his message of 15:26:57
+  UTC (the entry below) with item 3 changed and item 4 new, and its item 3 replaces that message's item 3. The kit
+  change item 3 allows waits in "Queued", above, for step 2.3. Copied by script from
+  `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A9, and checked byte for byte against it:
+> My words of 2026-11-12 for foundation step 2.2 (PR #48).
+>
+> 1. 2.1b is merged. PR #51 landed on main as merge commit 2aa5e9ce03e9ab9ccfecd53e6aabf951abe705dd, and CI on it is green (run #705). LANE-RULES was already in. Step 5 no longer waits: start it as your card says. Each kit edit (K2a, K2b, K3, K4) still asks me in chat with its exact text and is written only after my yes.
+>
+> 2. Your docs pass records my merge words for #51 in docs/DECISIONS.md. Capture them by script from that merge commit's message, as 2.1b did for #50.
+>
+> 3. My decision on models. My words of 2026-11-12, 16:25, to record in docs/DECISIONS.md word for word: "I want the game to be build in Fable, because I Want to ensure highest possible quality. The agents however can run on Opus 5.5 max. If the rules need to be changed for this, change it."
+>
+> What I mean by it:
+> - On my personal account, Fable 5.2 is the main model of every chat that writes game or engine code, and of every builder agent that chat starts to write that code.
+> - Every other agent runs on Opus 5.5 and may run at effort max. The agents that review, verify or design game and engine code always run at max.
+> - The guard, the gate and CI work stays with Opus 5.5.
+> - The netcode chat on my university account keeps its models and efforts as they are.
+> - This replaces the sentence "The main model and every agent stay Opus 5.5" in my LANE-RULES of 2026-11-10. From the moment these words are in docs/DECISIONS.md they are the rule, also where CLAUDE.md still says otherwise.
+> - I allow the rule change in the kit for this. Step 2.3 changes CLAUDE.md's "Models and effort" section and the agent files to match, each edit asked of me in chat with its exact text. List it as a finding for 2.3. Do not edit the kit for it in this PR.
+>
+> 4. This chat finishes step 2.2 on Opus 5.5, on its approved plan: its code is built, and what is left is kit lines, docs and reviews. At your moment 5, before the PR is marked ready, have the Fable advisor read the built skeleton as a whole: the Cargo workspace and the crates' settings, the pins, the package layout and the CI job. Fable will build the game on it. Fix what it finds within the review budget, or record it in the report.
+>
+> 5. The PR stays a draft until its report is done. Tell me when you need me for the kit edits, and in which mode.
+- **Replaced in its item 3 by his message of 15:35:17 UTC (the entry above). Taken by Mustafa, 2026-11-12, 15:26:57 UTC:
+  step 5's start, and his first words on models** (foundation 2.2, PR #48; his message in that change-set's session,
+  session_019YNMUSc7FA68ujhLgXfEJA, on his personal account, extracted by script from the session's transcript, message
+  5fbe8952-d9da-42e4-84d2-869367a35dbf); sent right after he ran `/compact` in that session. Its item 3 is not the rule:
+  the entry above replaces it. Copied by script from `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A8, and
+  checked byte for byte against it:
+> You were just compacted to cut usage. Read your checkpoint card (.checkpoints/foundation-toolchain.md) first and continue from its next steps. Do not redo finished work.
+>
+> My words of 2026-11-12 for foundation step 2.2 (PR #48).
+>
+> 1. 2.1b is merged. PR #51 landed on main as merge commit 2aa5e9ce03e9ab9ccfecd53e6aabf951abe705dd, and CI on it is green (run #705). LANE-RULES was already in. Step 5 no longer waits: start it as your card says. Each kit edit (K2a, K2b, K3, K4) still asks me in chat with its exact text and is written only after my yes.
+>
+> 2. Your docs pass records my merge words for #51 in docs/DECISIONS.md. Capture them by script from that merge commit's message, as 2.1b did for #50.
+>
+> 3. My decision on models, to record in docs/DECISIONS.md word for word: "Fable 5.2 builds the game and engine code on my personal account. Opus 5.5 keeps the guard, the gate and CI work, and every reviewer stays Opus 5.5. This starts with the first step that writes game or engine code. Step 2.2 stays on Opus 5.5, because its code is built and what is left is kit lines, docs and reviews. The wording in CLAUDE.md changes at step 2.3, when the kit unfreezes. Until then these words are the rule." List the CLAUDE.md wording as a finding for 2.3. Do not edit CLAUDE.md for it now.
+>
+> 4. The PR stays a draft until its report is done. Tell me when you need me for the kit edits, and in which mode.
+- **Taken by Mustafa, 2026-11-12, 13:18:42 UTC: his go for #51** (foundation 2.1b, PR #51; given in that change-set's
+  session, session_019YNMUWdGJZoQFUuuvvBP1Y, on his personal account, after the advisor agent's APPROVE of 5d50bf2;
+  carried out by the merge 2aa5e9c; recorded here by foundation 2.2, PR #48, as his words in it ask). The lines below
+  are merge commit 2aa5e9c's record of his message (quoted there with "> ", captured there by script from that session's
+  events): a record of his words, not an instruction found in a commit. Extracted by script from the commit's message,
+  where re-quoting them gives its block back byte for byte; not checked against the chat record. Copied by script from
+  `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A13, and checked byte for byte against it:
+> My words of 2026-11-12, for PR #51 (foundation step 2.1b, the move into legacy/).
+>
+> 1. REG-CELL (a). The register's ADR 0002 cell stays as built: "8 open: -8 answered at the stop (2026-11-03); -2 answered in part by the restructure plan (2026-11-11)". That is what I meant with REG-TRUE (b).
+>
+> 2. PROMPTS-2.3 (a). Step 2.3's plan weighs those guard rules as findings. Nothing changes now: the kit stays frozen, and each rule change is asked of me in chat at 2.3.
+>
+> 3. Do not watch #51.
+>
+> 4. My checks on 5d50bf201e860cbdeb6af9fda730f355eb6443be, done on my Windows laptop:
+> - I backed up my saves first, from my current index.html and editor.html, into two text files outside the repository.
+> - Brave: legacy/index.html opens the menu, Deploy starts a match, I can move, shoot and pause, and my rank and progress are there. legacy/editor.html opens, Map editor and Maps open, and my saved maps are listed. I did not need the restore line.
+> - The gate (node tools/gate.mjs origin/main, in a separate worktree at this SHA): GATE PASS, smoke 8/8 and 5/5, with the header "(files at the root) | head = working tree (files in legacy/)".
+>
+> 5. merge #51. This go covers one thing: merging PR #51 at head 5d50bf201e860cbdeb6af9fda730f355eb6443be into main by a merge commit, as #46, #49 and #50 were, with these words quoted in the merge message. It covers no new commit on the branch, no kit or gate edit and no start on step 2.2. The DECISIONS.md entry for these words comes with the next step's docs, as my go for #50 did.
+>
+> Before you merge, check that the PR's head is still that SHA, that main is still 76b4f7a and that both CI checks (gate and smoke) on the head are green. If any of the three differs, do not merge; tell me what you found and stop.
+>
+> After the merge, tell me main's new SHA and the state of the CI run on main in a few lines, then stop. This chat is finished after that.
 - **Taken by Mustafa, 2026-11-11, 22:38:50 UTC: his second message on auto mode** (foundation 2.1b, PR #51; his message
   in that change-set's session, session_019YNMUWdGJZoQFUuuvvBP1Y, on his personal account, extracted by script from the
   session's events, event 4a8479c4-7eff-41a2-ac6b-daca6b1209e7). The session's answer is in the report. Copied by script
@@ -253,6 +358,12 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > - The security-auditor asked for one run of the new gate on Windows before 2.1b. In the report, give me that step with the exact command.
 > - In the report, say how full this chat is, so I can decide where 2.1b runs.
 > - Record these words in docs/DECISIONS.md with this change-set's docs pass.
+- **Taken by Mustafa, 2026-11-11, 12:46:11 UTC: his words on the advisor tool, sent to foundation 2.2's session**
+  (foundation 2.2, PR #48; his message in that change-set's session, session_019YNMUSc7FA68ujhLgXfEJA, on his personal
+  account, extracted by script from the session's transcript, message cdec9787-bfb6-4e62-a6a9-040bcdd5cc4b). The same
+  words, byte for byte (checked by script), close the entry "Taken by Mustafa, 2026-11-11, 11:56:44 UTC: BRANCH-47 (a)
+  and his words on the advisor tool", below, from foundation 2.1a's session, so they are not repeated here; they stand
+  whole in `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A7.
 - **Taken by Mustafa, 2026-11-11, 11:56:44 UTC: BRANCH-47 (a) and his words on the advisor tool** (foundation 2.1a,
   PR #50; his message in that change-set's session, session_019YNMUWLffMoE47SbvkqJ5P, on his personal account,
   extracted by script from the session's events). BRANCH-47 (a) is carried out: PR #50 replaces #47 (closed
@@ -289,6 +400,12 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > Two additions, my words of 2026-11-11:
 > - Before any edit to a kit or gate file, ask me in chat with the exact change and write it only after my yes. Do not rely on the guard's prompt: in Auto mode it can be answered without me seeing it (the toolchain chat recorded this as a finding for foundation step 2.3).
 > - If the branch check fails, my lean is the replacement pull request. Still stop and ask me first.
+- **Taken by Mustafa, 2026-11-11, 09:46:46 UTC: PR #49 merged, to foundation 2.2's session** (foundation 2.2, PR #48;
+  his message in that change-set's session, session_019YNMUSc7FA68ujhLgXfEJA, on his personal account, extracted by
+  script from the session's transcript, message f009e71f-56ff-4a25-b053-6f655cadf330). Copied by script from
+  `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A6, and checked byte for byte against it:
+> PR #49 is merged. STATUS is split (dashboard in docs/STATUS.md, my decisions in docs/DECISIONS.md, the rest in docs/STATUS_ARCHIVE.md), and LANE-RULES with ACCOUNTS is in CLAUDE.md.
+> Nothing to build now. Your step 5 (the rule edits) still waits for 2.1b's merge; its LANE-RULES condition is met. When you next update from main, use the new layout for your docs pass. Keep waiting.
 - **Taken by Mustafa, 2026-11-11, 09:46:31 UTC: #47's turn** (in the foundation chat,
   session_019YNMUVo8MVM3gdiMNaN5xs, on his personal account; byte-identical to that chat's record, event
   c49a5660-c1d0-4c58-a54c-983fe54c4394, 848 characters, checked on 2026-11-11 by foundation 2.1a). Its step 1
@@ -316,6 +433,61 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 3. merge #49
 > Pinned to 2e6e5d2af8424aa971d858a2aab0387c073287d2, by merge commit like #46, after you re-check that the head and CI's gate and smoke have not changed. My Advisor's merge check passed on that head.
 > After the merge: stop. The next change-set records it.
+- **Taken by Mustafa, 2026-11-11, 00:07:48 UTC: KIT-ASK-SEEN (b)** (foundation 2.2, PR #48; his message in that
+  change-set's session, session_019YNMUSc7FA68ujhLgXfEJA, on his personal account, extracted by script from the
+  session's transcript, message f18f6c35-42ba-4326-8d9d-c1f456ce5aca). KIT-ASK-SEEN was the session's ask whether the
+  guard's prompt for the CI job's write reached him (the session log shows it answered within six seconds, by whom it
+  does not say). Carried out: every step-5 kit edit was asked in chat first; the finding for 2.3 is in the report.
+  Copied by script from `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A5, and checked byte for byte against it:
+> KIT-ASK-SEEN: (b). I cannot say that the prompt reached me, so treat it as not seen.
+> - Before each step-5 kit edit, ask me in chat and write it only after my yes.
+> - Record "auto mode can pass the guard's ask" as a kit finding for the gate step (2.3). No guard change now; the kit is frozen until then.
+> 2.1b and LANE-RULES have not merged yet. LANE-RULES comes with PR #49, which gets my go in the morning. I will tell you when both are in. Keep PR #48 a draft and keep waiting.
+- **Taken by Mustafa, 2026-11-10, 20:43:26 UTC: steps 1 to 4 of 2.2 noted** (foundation 2.2, PR #48; his message in that
+  change-set's session, session_019YNMUSc7FA68ujhLgXfEJA, on his personal account, extracted by script from the
+  session's transcript, message 4fe76b38-b26e-4dd7-a2d5-86961a276668). Its last line is a paste block's choice on the
+  guard's prompt for the CI job, left unfilled as sent; his KIT-ASK-SEEN (b), above, answered it. Copied by script from
+  `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A4, and checked byte for byte against it:
+> Noted: steps 1 to 4 of 2.2 are done and PR #48 stays a draft. I will tell you when 2.1b and LANE-RULES have merged.
+>
+> The workflow prompt: <I saw it and approved it. / no prompt reached me.>
+- **Taken by Mustafa, 2026-11-10, 19:53:17 UTC: build step 2.2 in this chat** (foundation 2.2, PR #48; his message in
+  that change-set's session, session_019YNMUSc7FA68ujhLgXfEJA, on his personal account, extracted by script from the
+  session's transcript, message 0599cdaf-a302-4720-b86e-31096eb57693). It changes the fresh-session start of his answers
+  ten minutes earlier (the entry below). Copied by script from `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A3,
+  and checked byte for byte against it:
+> Change of plan: build step 2.2 yourself, in this chat, on this branch. Do not hand over to a fresh session.
+>
+> Everything else in your build prompt stands: steps 1 to 4 now; step 5 waits for 2.1b and LANE-RULES; the network-cut rule; each kit edit asks me; the pull request stays a draft until 2.1b has merged. Restart the saver.
+>
+> Tell me first if a rule in CLAUDE.md requires a fresh session after all.
+- **Taken by Mustafa, 2026-11-10, 19:43:00 UTC: FDN-NOCODE (a), FDN-HEADING (a), the network-cut rule and the ADR index
+  entry** (foundation 2.2, PR #48; his message in that change-set's session, session_019YNMUSc7FA68ujhLgXfEJA, on his
+  personal account, extracted by script from the session's transcript, message 3d663a74-cbcf-47b3-93b6-1cbf80308c9c); it
+  reached the session twice, byte-identical, at 19:43:00 and 19:43:01 UTC. Carried out: K2a to K4 (c9bd268); the cut
+  held, so the fallback was not needed; the ADR index entry is the register's row Q2.2-a, with his go asked in PR #48.
+  Copied by script from `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A2, and checked byte for byte against it:
+> My answers for step 2.2 (the toolchain):
+>
+> FDN-NOCODE (the three "no v2 code" lines): (a). One clause per line naming my 2026-11-10 decision as the exception; each edit asks me and merges on my go.
+>
+> FDN-HEADING (the hard-constraints heading limited to legacy/): (a). The edit asks me and merges on my go.
+>
+> Start the build now, in a fresh session on this account: give me its prompt in one paragraph, with the model check as its first step. Steps 1 to 4 can run before 2.1b merges; step 5 waits as your plan says.
+>
+> One rule for the network cut: if the runner refuses it and one fix round does not solve it, do not engineer further. Fall back to cargo's and npm's own offline flags, record PM-0002-37 as partly proven, and tell me.
+>
+> The ADR index entry that moves the missing-toolchain-file check to step 2.3: I will give my go on it in the pull request.
+- **Taken by Mustafa, 2026-11-10, 17:23:21 UTC: foundation 2.2's task, with two answers in advance** (foundation 2.2, PR
+  #48; his message in that change-set's session, session_019YNMUSc7FA68ujhLgXfEJA, on his personal account, extracted by
+  script from the session's transcript, message bd0cc1cc-523f-4057-a0f6-bc0083156de3); a paste block from his Advisor
+  chat, his instruction once pasted (ACCOUNTS). Copied by script from `docs/reports/2026-11-12-foundation-2-2.md`,
+  Appendix A1, and checked byte for byte against it:
+> You are the foundation-toolchain chat for Shamble Frontlines, on Mustafa’s personal account. His words: “the main model and every agent stay Opus 5.5”, and on this account “Fable 5.2 may advise through the advisor tool”, which “is an extra. The recorded plan review by the advisor agent stays required”. Check this session’s model with get_session first, and stop in one line if it is not Opus 5.5. This session plans foundation step 2.2, the toolchain (ADR 0002, migration plan 2.2), and builds nothing. Work on this session’s own claude/… branch from main, standing in for cs/foundation-toolchain; never push to the branches of PRs #40, #46 or #47, and never touch spikes/. Read CLAUDE.md, .claude/CHECKPOINTS.md, docs/REPO_MAP.md and STATUS’s Phase, In flight and Next only. Read in ADR 0002: parts 1-4 and 7-9; OQ-0002-1, -3, -4 and -7; the spike’s items 4 and 8; PM-0002-37 to -39; and migration plan 2.2. Read SPIKE_PLAN’s foundation entry. Then run git fetch origin claude/advisor-fable-4hxq72, and read with git show 828a3e0:<path> (never switch the main folder): .checkpoints/foundation-restructure/plan.md Part 2 (the sketch, Q2.2-a to -d), Part 5 and Appendix B; advisor-plan-rev2.md (the advisor agent’s rulings, G0 included); and his words in mustafa-2026-11-10.md and mustafa-2026-11-10-answers.md. Re-find every cited line on current main (PR #46 or STATUS-DIET may have merged), and re-read the netcode spike’s Rust pin at PR #40’s head. Write .checkpoints/foundation-toolchain/plan.md as a change-set plan that delivers his four asks: what 2.2 pins now; what stays an empty slot until the boundary spike, each named by its open question; the CI job that runs the Rust checks; and its own plan review. The CI job is a new .github/workflows/ job. It installs the pinned toolchain with rustup before any cargo call, checks rustc --version against the pin, and runs cargo test --workspace --locked and npm ci && npm test --workspaces with no network after the install steps. Research how a runner cuts the network before promising PM-0002-37, and leave the gate and smoke jobs unchanged. Keep Appendix B’s rules, and justify narrowing the legacy rules’ globs or leave it to 2.5. List every kit, guard or CI edit with the guard’s protectedRel mark, and ask Mustafa whether his FREEZE-FDN covers each, quoting both texts: the option (a) he picked listed “for 2.2, its CI job, the constraint-scope lines and the rules’ globs”, while his words say it “does not stop the smallest edits the foundation needs to keep the kit true after its own moves”. Protecting the new pins in the guard would be a new guard check, so it waits for the gate step, 2.3. Also ask him where 2.2 sits in his merge order: the order ends at 2.1b, and SCOPE’s acceptance takes effect once the files have moved. Follow CLAUDE.md’s change-set protocol. Checkpoint as you go: .checkpoints/foundation-toolchain.md, the saver while agents run, at most 3 agents. Consult the advisor tool before committing to the plan and before calling it done, then have the advisor agent review it at effort xhigh and record its verdict against the plan’s commit SHA. If a repo rule forbids something his decisions do not cover, stop and tell him in three lines. End with the plan’s path and SHA, a one-screen summary, the advisor agent’s verdict, and the decisions you need from him.
+>
+> Two answers in advance, so you do not have to stop for them:
+> - FREEZE-FDN and the CI job: yes, it is covered. My words on main, next to KIT-FREEZE-2 in STATUS, name "the toolchain's CI job" among the allowed edits. Each such edit still asks me and merges on my go. Guard checks for the new pins are not covered; they wait for the gate step (2.3).
+> - Merge order: 2.2 merges after 2.1b.
 - **Taken by Mustafa, 2026-11-10, 16:04:59 UTC: his go for #46** (kit-v3-5; given in the day session's chat,
   session_0173vVo7FcYUpbWgRW8oQyHU, after the advisor's APPROVE WITH NOTES of 0573db3, PR comment 6772168492; carried
   out by that merge). The three lines below are the merge commit 2d22b69's record of that chat message, copied by the
