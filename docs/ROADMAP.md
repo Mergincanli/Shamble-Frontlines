@@ -117,10 +117,10 @@ The pins: Rust 1.99.1 (`rust-toolchain.toml`); a virtual Cargo workspace and its
 one lock, five empty packages in `packages/` (TypeScript 6.0.3, Vitest 5.1.0, @playwright/test 1.65.0, Node 22). The
 CI job `toolchain` (`.github/workflows/toolchain.yml`; `gate.yml` unchanged) installs the pinned toolchain, checks
 rustc against the pin, then builds and tests with the network cut off (a TCP probe must fail inside); it is green on
-the build's heads, and six planted failures each went red at the expected step and were reverted. On his yes: the four
+the build's heads, and seven planted failures each went red at the expected step and were reverted. On his yes: the four
 kit lines (the hard constraints bind `legacy/` only; his 2026-11-10 decision is the exception in the three lines that
-forbid v2 code) and the CI job's release-test line; main merged in (c901187). Next: the overflow tests' `expected` fix
-and planted failure M6, the review round, the verifier, the report, the Fable advisor's re-check before ready, the
+forbid v2 code) and the CI job's release-test line; main merged in (c901187); the overflow tests expect their panic's
+message. Next: the review round, the verifier, the report, the Fable advisor's re-check before ready, the
 advisor's review and his go.
 
 **The foundation, 2.1b: the move [2026-11-11 to 11-12, MERGED]** — foundation-restructure, the second of step 2.1's two
