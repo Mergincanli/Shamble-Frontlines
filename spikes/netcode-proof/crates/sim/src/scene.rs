@@ -318,6 +318,13 @@ impl Scene {
         self.health
     }
 
+    /// Effect rows per soldier: 8 in the stress scene, 0 in the others. The World holds `slots() * effect_rows()` of
+    /// them, and effect row `i` belongs to soldier slot `i / effect_rows()`. This is that mapping's one public home
+    /// (carry 51): a crate that needs an effect row's owner reads it here and never copies the 8.
+    pub fn effect_rows(&self) -> u8 {
+        self.effect_rows
+    }
+
     /// The same scene with other CPU stand-ins (`StandIns::OFF` on L1: §4.13). The state is the same either way.
     pub fn with_stand_ins(self, stand_ins: StandIns) -> Scene {
         Scene { stand_ins, ..self }
