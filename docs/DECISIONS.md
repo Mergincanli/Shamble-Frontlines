@@ -148,8 +148,10 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > Then continue with your next steps: the advisor agent's review of the plan check, then the four kit lines and E8's ask to me in one message.
 - **Taken by Mustafa, 2026-11-11, 20:21:02 UTC: step 2.1b's task** (foundation 2.1b, PR #51; his message in that
   change-set's session, session_019YNMUWdGJZoQFUuuvvBP1Y, on his personal account, extracted by script from the
-  session's events, event e018683d-30d9-49a0-b19d-ab279e7d23a1). Its render-budget note waits in "Queued", above. Copied
-  by script from `docs/reports/2026-11-11-foundation-2-1b.md`, Appendix A2, and checked byte for byte against it:
+  session's events, event e018683d-30d9-49a0-b19d-ab279e7d23a1; first sent at 20:18:13 UTC, event
+  6743399f-9d86-4e25-8c08-aee3542d31dc, byte-identical, and interrupted by him at 20:19:40 UTC). Its render-budget note
+  waits in "Queued", above. Copied by script from `docs/reports/2026-11-11-foundation-2-1b.md`, Appendix A2, and checked
+  byte for byte against it:
 > My words of 2026-11-11, for a fresh foundation chat on my personal account. Step 2.1b: the move.
 >
 > Who you are. You are the foundation lane, step 2.1b. Step 2.1a is merged: main is 76b4f7a (PR #50). The old foundation chat is full and has stopped. Two other chats work on this repo: the netcode proof test (PR #40, branch claude/netcode-proof-test-plan-hcky5g, my university account) and the toolchain (PR #48, branch claude/laughing-pasteur-fwya24, my personal account). Never push to their branches and never touch spikes/.
@@ -179,12 +181,28 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > "A note for the render budget bench (ADR 0003), 2026-11-11. The stack stays as decided: Rust decides and computes, TypeScript on three.js draws. The bench reports three times per frame: the page's JavaScript, the Rust side, and the graphics card. If the page's JavaScript is the part over budget, that work moves to the Rust side before the JavaScript is tuned. Candidates I like for more Rust later: crowd and animation math for hundreds of soldiers, offline tools that prepare models, textures and maps, and heavy effects where they do not belong on the graphics card."
 >
 > End with: the pull request's number and head SHA, what the proof showed, CI's gate and smoke on the final head with run numbers, how full this chat is, and what you need from me. For my part, give me exact steps in plain words: the saves backup with both console lines, the Brave check of legacy/index.html and legacy/editor.html, and the Windows command for your branch. Keep the pull request a draft until its report is in, then mark it ready and stop for my go.
-- **Taken by Mustafa, 2026-11-11, 20:20:36 UTC: his first message in foundation 2.1b's session** (foundation 2.1b, PR
-  #51; his message in that change-set's session, session_019YNMUWdGJZoQFUuuvvBP1Y, on his personal account, extracted by
-  script from the session's events, event 2f15e227-dcbb-43a7-b1fd-42179be83871). His task message, the entry above,
-  followed 26 seconds later. Copied by script from `docs/reports/2026-11-11-foundation-2-1b.md`, Appendix A1, and
-  checked byte for byte against it:
+- **Taken by Mustafa, 2026-11-11, 20:20:36 UTC: his message before the task, in foundation 2.1b's session** (foundation
+  2.1b, PR #51; his message in that change-set's session, session_019YNMUWdGJZoQFUuuvvBP1Y, on his personal account,
+  extracted by script from the session's events, event 2f15e227-dcbb-43a7-b1fd-42179be83871). Before it, at 20:19:47
+  UTC, he sent "hi", event 844bb920-ac8e-4c79-bc10-5682fbd74f53, and interrupted it at 20:20:24 UTC (Appendix A1). His
+  task message, the entry above, followed 26 seconds later. Copied by script from
+  `docs/reports/2026-11-11-foundation-2-1b.md`, Appendix A1, and checked byte for byte against it:
 > hi, do not do anything yet
+- **Taken by Mustafa, 2026-11-11, 18:37:21 UTC: his go for #50** (foundation 2.1a, PR #50; his message in that
+  change-set's session, session_019YNMUWLffMoE47SbvkqJ5P, on his personal account, extracted by script from that
+  session's events, event f7945179-5b39-4984-9f26-330504b37386; merge commit 76b4f7a's message quotes it byte for byte,
+  checked by script; recorded here by foundation 2.1b, PR #51, after the advisor agent's review). Copied by script from
+  `docs/reports/2026-11-11-foundation-2-1b.md`, Appendix A7, and checked byte for byte against it:
+> merge #50
+>
+> My words of 2026-11-11, for the foundation chat (PR #50, foundation step 2.1a).
+> - Pinned to f6becf58a90059037e2f168867d12cb61eb0bbc9, by merge commit like #46 and #49, with this message quoted in it.
+> - Right before merging, re-check that the head has not moved and that CI's gate and smoke are green on it. If either differs, do not merge: stop and tell me.
+> - The texts in Appendix A are my words. My Advisor compared A1.1 to A1.3, A2.1, A2.2, A3.3 to A3.5 and A4 with the blocks as they were written for me: identical.
+> - The two gate edits of 2026-11-10 (tools/gate.mjs and tools/smoke.mjs in dd12aeb): whether or not each prompt reached me that morning, I approve both edits now. My Advisor read their diffs.
+> - I accept the follow-ups your message lists: IE-5, R2-1, SA-L1, A-1 and N2, each at the step the report names.
+> - No Brave check for 2.1a: no game file changes.
+> After the merge: tell me main's new head in one line, then stop. Do not start 2.1b here; this chat is 86% full. 2.1b runs in a fresh chat.
 - **Taken by Mustafa, 2026-11-11, 16:54:54 UTC: a correction to his words on permission prompts (the entry directly
   below)** (foundation 2.1a, PR #50; his message in that change-set's session, session_019YNMUWLffMoE47SbvkqJ5P, on his
   personal account, extracted by script from the session's events, event a10ee1d6-3120-4eb1-b83a-4e84afe50a94). Placed

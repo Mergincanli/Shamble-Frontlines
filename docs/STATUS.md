@@ -26,7 +26,7 @@ _Last updated: 2026-11-11 (foundation 2.1b, PR #51, its docs pass; main 76b4f7a)
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done, U4 in build | its units, runs and report; his OK of each run's plan and cost cap |
-| #51 | the foundation, 2.1b: the move (the five legacy files into `legacy/` with `git mv`, bytes unchanged), the commands in text, the four kit lines (his KIT-2.1B (a)), the docs | `claude/clever-fermi-oudsfq` (his personal account; for `cs/foundation-restructure`) | a draft until its report; evidence E1-E6 and E8 PASS; next the reviews, the verifier and the report (`docs/reports/2026-11-11-foundation-2-1b.md`) | the advisor's review of its final head and his go (risk tier 2: kit lines; decision docs) |
+| #51 | the foundation, 2.1b: the move (the five legacy files into `legacy/` with `git mv`, bytes unchanged), the commands in text, the four kit lines (his KIT-2.1B (a)), the docs | `claude/clever-fermi-oudsfq` (his personal account; for `cs/foundation-restructure`) | evidence E1-E6 and E8 PASS; review round 1 and the verifier passed; the report `docs/reports/2026-11-11-foundation-2-1b.md` | his go, after the advisor's review of its final head and his answer to REG-CELL (risk tier 2: kit lines; decision docs) |
 | #48 | the foundation, 2.2: the toolchain (pins, empty crates and packages, the offline CI job) | `claude/laughing-pasteur-fwya24` | draft | 2.1b's merge |
 
 ## Next
@@ -82,9 +82,8 @@ A finding below the review budget's bar becomes a follow-up: its id goes here, i
   the STATUS citations in the ADRs, the register, LOOP_V2 (:202, :214, :227) and ENGINE_OVERVIEW (:140).
 - **For design sessions:** LATER's design session after the netcode proof test; what the note leaves open for rented
   servers; "the war around the matches" for VISION_V2 §7; the VFX style guide (LOOK (a)'s note) and the VFX tool's
-  design session; and for the editor's
-  architecture plan, B1-MODES, B1-LEAP, the objectives list, the fairness panel's pass rule, heatmaps and sightlines,
-  and quality bars.
+  design session; and for the editor's architecture plan, B1-MODES, B1-LEAP, the objectives list, the fairness
+  panel's pass rule, heatmaps and sightlines, and quality bars.
 - **Docs passes:** the B3 report's and the kit-v3-2 report's edits (R-1, R-2); the toy-box tone; DOCS-ALIGN (the
   Advisor's documents); routine proofs to record; local smoke's Chromium build; the stale citations left unedited.
 - **From status-diet (PR #49), after the gate step:** the STATUS citations left in advisor.md (:17, :286),
@@ -94,8 +93,9 @@ A finding below the review budget's bar becomes a follow-up: its id goes here, i
   for the gate step (2.3), IE-1, IE-5 (Medium: CI's live mirrors), TE-2, TE-7, R2-1, A-1, N2, L-4 and the v2 root page
   against pre-move bases; for the drafts' next revision, five "before the foundation" lines left without a pointer; the
   archive's "Follow-ups", "From foundation 2.1a".
-- **From foundation 2.1b (PR #51), for the gate step (2.3):** the Node 24 finding from his Windows run (the pinned
-  Playwright's browser install hangs after 100 %): his words, `docs/DECISIONS.md`, 2026-11-11, 20:44:29 UTC.
+- **From foundation 2.1b (PR #51), for the gate step (2.3):** the Node 24 installer hang (his words: DECISIONS.md,
+  2026-11-11, 20:44:29 UTC); the gate's stray-page check stops after the merge (security-auditor's F4, Low, open);
+  PROMPTS-2.3 and the guard's `git -C` refusals (the 2.1b report, "Findings for 2.3").
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100
