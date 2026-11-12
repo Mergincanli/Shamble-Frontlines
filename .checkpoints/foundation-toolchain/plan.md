@@ -123,6 +123,23 @@ The advisor agent approved revision 3 and has not seen these changes of method: 
 - **The four texts** (`k-texts.mjs`, this folder; each old text found once on the merged tree): the plan's draft
   wording, except that each exception names his decision with a pointer, "(Mustafa's decision of 2026-11-10 in
   `docs/DECISIONS.md`)", and K4's exception goes at the end of its line, after both sentences, as K3's does.
+- **The writes** (his yes of 2026-11-12, 16:28:28 UTC: KIT-5, K1b (a)): with the chat in the mode he chose as Accept
+  edits (`get_session` read `permission_mode` "default" just before; not auto), the saver stopped, each old text
+  checked once, the five Edits written from `k-texts.mjs`'s record, the three files then byte-identical to the
+  record's copies (sha256) · c9bd268 (K2a, K2b, K3, K4) · fd14855 (K1b). His count: "I saw 3 and then 2 more edit
+  request, totaling 5": the guard's prompt reached him for each write, K4's in the worktree path
+  `.gate/foundation-toolchain-wt/.claude/agents/advisor.md` included (the 2.3 auto-mode finding's evidence).
+- **K1b proven:** CI on fd14855 ran the new line inside the cut, both release overflow tests passing. M5 (45f1bb5, the
+  setting's comment and both blocks removed) went red at that line: protocol's test "did not panic as expected", exit
+  101 (runs 43281730739, 43281743102). Cargo stops at the first failing test binary, so CI proved protocol's block;
+  sim's block rests on step 2's local control (its override removed, "did not panic as expected"); the Wasm half of
+  PM-0002-53 stays a 2.3 finding. The exact revert a5823cf went green (43282089237, 43282101125).
+- **M1a to M4 still hold:** they ran on K1's job (fb17451) before the merge; since then the job changed by exactly the
+  one K1b line (`git diff fb17451 HEAD -- .github/workflows/toolchain.yml`), and the pins, lockfiles, crates,
+  packages and `.gitignore` are unchanged since step 2 (`git diff 566363f HEAD` on them: empty).
+- **The evidence re-run on a5823cf:** E1 (cargo locally, npm in CI), E4a-d, E5, E6, E7, E9 (35 files, 3 protected,
+  each in Part 5, none mergeAllowed), E10 (main's counts: 1107, 127, 27) and E11 pass; E8 waits for step 6's map
+  entry. E4b and E4d ran on a local merge with PR #40's head 1efd46f.
 - **Effort:** step 7's reviewers and the verifier run on Opus 5.5 at effort max (his words of 2026-11-12, item 3: "The
   agents that review, verify or design game and engine code always run at max"; the crates are the engine skeleton),
   passed as `model: "opus"`, `effort: "max"`; the approved plan said each file's effort (high; engine-architect xhigh).

@@ -153,7 +153,7 @@
     worktree removed (no force) and pruned.
 
 ## Current step
-Step 5's evidence is in (step 20). Next: the advisor tool at moment 5 for step 5, then step 6 (docs).
+Step 5 done (consultation 3, 2026-11-12 ~19:58 Amsterdam). Now step 6, the docs pass: his message inventory by script, the report with Appendix A, DECISIONS.md by script, docs-keeper, the register entry.
 Earlier: Step 5 (superseded by steps 18-20 above): waiting for his chat yes on the exact texts of K2a, K2b, K3, K4 and the offered K1b (sent to him at the end of
 the turn after consultation 2), with the chat switched to Accept edits. On his yes: `get_session` (write nothing while
 `permission_mode` is still auto), Read the three files, the Edits only (each guard prompt counted), then commit and
@@ -302,7 +302,23 @@ there, then the four texts, the advisor tool, his chat ask.
    read was early and partial (2 of 6 lib.rs, 2 of 5 package manifests, no npm lock, no gate.yml, no ADR text): S1 (no
    CI step proves the release overflow setting) offered to him as K1b, S2 to S5 recorded (Open findings); the formal
    read at moment 5 prints every skeleton file plus ADR 0002 parts 2-4 and 7.
-Count: 2.
+3. 2026-11-12 ~19:58 Amsterdam (after 0f851b3) · moment 5 for step 5 and moment 1 for steps 6-7: is step 5 done, and
+   are the docs pass and the review round planned right? · changed: step 5 called done; the plan's As built brought up
+   to date (the writes, K1b and M5 worded precisely: CI proved protocol's block, sim's rests on step 2's local control,
+   the Wasm half of PM-0002-53 a 2.3 finding; M1a-M4 still hold: the job changed by the one K1b line since fb17451 and
+   the code and lockfiles not since 566363f); step 6: his message inventory counted a second way (interrupted sends,
+   non-text blocks, his commands listed as 2.1b did), the transcript as the source (a mismatch with the 2026-11-10/11
+   notes is a notes defect), the 20:43 message's unfilled choice said in its header, #51's quote round-tripped against
+   the commit, "Queued" read for the models change's form, the DECISIONS.md script and docs-keeper one after the other
+   with the absolute worktree path, and the report gets a before/after table of each changed rule sentence with his
+   words, a line asking him to approve K1 as written (its prompt counts as unseen), and a 2.3 finding that CLAUDE.md
+   says "Manual mode" while the cloud app offers none; step 7: the full Fable skeleton read (every skeleton file, ADR
+   0002 parts 2-4 and 7) before the reviewers start, so its findings ride round 1's fix pass, and again at moment 5;
+   the workflow in parallel() batches of 3 then 2 (the tool does not cap at 3), skeptics batched the same way; every
+   brief names the worktree's absolute path, the code SHA and an absolute notes path; infra-engineer asked whether
+   `toolchain` is a required check on main; the advisor agent's brief: it runs the gate itself, the smoke cannot start
+   here, CI's smoke on the exact head; the saver stopped before the checkpoint-deletion commit, made by hand.
+Count: 3.
 
 ## Running work
 - **Where the work lives since 2026-11-12 16:33 Amsterdam:** the branch worktree
