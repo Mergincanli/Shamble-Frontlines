@@ -49,6 +49,16 @@ advisor-u4e-brief.md, advisor-u4df.md.
   place), then resume with `Workflow({scriptPath, resumeFromRunId})`. On return: read every finding rated Medium or
   higher in full, and everything touching the judge, the marks or a pass bar; then the advisor's ruling on round 1
   (with the points above), the fix pass, round 2 on what changed.
+  - **By 06:40 UTC four seats are done** (journal of wf_ed170231-913): netcode REVISE (1 High, 5 Medium, 5 Low; 6
+    before the merge), security APPROVE WITH FINDINGS (1 Medium, 8 Low), rust APPROVE WITH FINDINGS (1 Medium, 9 Low),
+    arch REVISE (6 Medium, 8 Low; 6 before the merge). The test-engineer is still running (logs .gate/u4e/r1-te-*).
+- **Running: U4d2's builder brief** (next step 3), workflow wf_ec1d2b01-aab (task wgkj3qotm; script
+  workflows/scripts/npt-u4d2-brief-wf_ec1d2b01-aab.js), launched 06:45 UTC in the slot round 1's batch 2 left free,
+  one agent at a time: the rust-reviewer drafts rev 1 (u4d2-brief.md; notes u4d2-brief-notes.md), the test-engineer
+  checks it (u4d2-brief-check.md, in the form of u4e-brief-r3-check.md), the drafter revises (rev 1.1). No cargo
+  runs; the carries' words and Mustafa's words are left as placeholders, for the main session to copy by script.
+  Then: the main session's fold, and the advisor's check before the build. If cut: resume with
+  `Workflow({scriptPath, resumeFromRunId})`.
 - The saver: `node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer
   "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
   https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"` (background, 120 minutes; restart it when it stops). Stop
