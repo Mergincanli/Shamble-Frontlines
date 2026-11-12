@@ -19,6 +19,12 @@ ROOT = "/home/user/Shamble-Frontlines"
 with open(sys.argv[1], encoding="utf-8") as fh:
     cfg = json.load(fh)
 FORBIDDEN = re.compile(r"(-build\.md|-brief[^/]*\.md|netcode-proof-test\.md|-report\.md|/history\.md)$")
+# The exact paths that pass although FORBIDDEN matches them (Mustafa, 2026-11-12, verbatim in history.md): only files
+# the advisor agent wrote as its ruling, added one at a time when a packet needs one, each addition noted in
+# history.md. A file written by the main session or a builder never goes on this list.
+ALLOWED = (".checkpoints/netcode-proof-test/advisor-u4e-brief.md",)
+# Mustafa's own words reach a packet only from history.md, by line range, with "words_of_mustafa" set.
+WORDS_OF_MUSTAFA = ".checkpoints/netcode-proof-test/history.md"
 
 
 def lines_of(path):
@@ -73,10 +79,8 @@ for d in cfg["diffs"]:
                 full.stdout.rstrip("\n"), "````", ""]
 out += ["## What it is judged against", ""]
 for doc in cfg["docs"]:
-    # An advisor's ruling is a source even when its name holds "-brief" (advisor-u4e-brief.md is the advisor's check
-    # of a brief, not a brief).
-    assert (not FORBIDDEN.search(doc["path"]) or doc.get("words_of_mustafa")
-            or os.path.basename(doc["path"]).startswith("advisor-")), doc["path"]
+    assert (not FORBIDDEN.search(doc["path"]) or doc["path"] in ALLOWED
+            or (doc.get("words_of_mustafa") and doc["path"] == WORDS_OF_MUSTAFA)), doc["path"]
     ls = lines_of(doc["path"])
     if "lines" in doc:
         first, last = doc["lines"]
