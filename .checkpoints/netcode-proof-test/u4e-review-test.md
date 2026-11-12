@@ -343,6 +343,24 @@ r1-te-q11-nearest8.log. (Probe in place before the run.)
 
 **Step 5: the counted check.mjs run (-x).** Command `node <copy>/spikes/netcode-proof/check.mjs`; log
 r1-te-check-counted.log.
+- Lock held -x at 07:56:02 UTC, idle after 0 s; pwd the copy's spikes/netcode-proof; HEAD 97bb9d3; free 8 GB; exit 0
+  at 08:05:52 UTC. Step lines: fmt PASS 0.9 s; clippy PASS 16.3 s; clippy-wasm32 PASS 4.0 s; doc PASS 57.3 s; test
+  PASS 505.4 s "measured build: 458 tests passed, 0 failed, 0 reported a skip; bites build: 524 tests passed, 0
+  failed, 0 reported a skip"; deps PASS 0.9 s; refs PASS 0.2 s (757 tracked files); marks PASS 2.5 s (81 marks); self
+  PASS 1.3 s "52 of 52 tests passed"; redact PASS 0.9 s (10 of 10; 255 items, 0 findings); "check: all 10 steps pass".
+- Deltas on `<base>` 28a85e7 (399 / 446 / 52): measured +59 (458), bites +78 (524), self +0 (52); equal to the
+  builder's two counted runs (b11-counted1/2).
+- The runner's provenance block is empty: check.mjs keeps cargo's Compiling lines out of its output (the builder's
+  counted runs printed them from separate `--no-run` builds). The run's source is the pwd line (this copy) and the
+  runner's touch of every file under crates/ before it.
+
+**Verdict: REVISE.** One High (TE-1, with NC-H1) and five Mediums (TE-2 to TE-6), each a plan-listed test or a
+ruled check that a plant shows cannot fail, each cheap to fix in round 1's fix pass; four Lows (TE-7 to TE-10) as
+follow-ups. Every other bite is shown in both parts, and check.mjs passes all 10 steps at 458 / 524 / 52.
+
+**Step 6: the end state.** Builder copy: `sha256sum -c hashes-start.sha256` 23 of 23 OK; `git status
+--untracked-files=all --short` 24 lines (the 23 files and the builder's record), HEAD 97bb9d3. Read copy .gate/u4e-r1:
+23 of 23 OK. `diff -rq` of the two copies' crates/: no difference. Every plant and probe restored; nothing committed.
 
 ### Block 5. Findings, ranked (each with its proof run above)
 These numbers supersede the ids written inline in Block 4: P-H's "TE-6" is TE-7, P-G's "TE-5" is TE-8, P-21's "TE-8"

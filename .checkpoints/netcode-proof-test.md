@@ -60,6 +60,15 @@ advisor-u4e-brief.md, advisor-u4df.md.
     **Resumed about 07:36 UTC** (`resumeFromRunId` wf_ed170231-913, task wwogpkxp1): the four done seats replay from cache,
     the test-engineer runs live (agent ae67a5f5…). Read in full by the main session: every Medium and High of the four
     seats, and the Lows touching a mark, a bite or the judge (NC-L1 to NC-L4, NC-L5-L12, A7, A13, A14, SEC-U4E-6).
+  - **Round 1 DONE at about 08:07 UTC.** The test seat: REVISE (TE-1 High, settling NC-H1 by run; TE-2 to TE-6
+    Medium, all before the merge: plants that pass every test; TE-7 to TE-10 Low); its counted check.mjs run
+    (.gate/u4e/r1-te-check-counted.log) all 10 steps PASS, 458 / 524 / 52, as the builder's. The copy is clean at the
+    end (`diff -rq` against .gate/u4e-r1: none). Read in full by the main session: its High and Mediums, TE-7, TE-8.
+- **Running: the advisor's ruling on U4e's round 1,** workflow wf_9da34c56-a1a (task w77dvfluc; script
+  workflows/scripts/npt-u4e-advisor-r1-wf_9da34c56-a1a.js), launched about 08:08 UTC: general-purpose, opus, xhigh,
+  reading main's advisor.md; brief advisor-u4e-r1-brief.md (items 1-9, with the main session's points in item 7);
+  ruling to advisor-u4e-r1.md, block by block. If cut: resume with `Workflow({scriptPath, resumeFromRunId})`. Then:
+  the fix pass in the same worktree on the ruling's scope, round 2 on what changed, the merge on its conditions.
 - **Running: U4d2's builder brief** (next step 3), workflow wf_ec1d2b01-aab (task wgkj3qotm; script
   workflows/scripts/npt-u4d2-brief-wf_ec1d2b01-aab.js), launched 06:45 UTC in the slot round 1's batch 2 left free,
   one agent at a time: the rust-reviewer drafts rev 1 (u4d2-brief.md; notes u4d2-brief-notes.md), the test-engineer

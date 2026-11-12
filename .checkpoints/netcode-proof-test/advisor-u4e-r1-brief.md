@@ -68,7 +68,20 @@ its own.
    each one's route (a carry for U4f, U4g, U4h, U4r or U6, a follow-up, or the report's wording), with words where a
    carry is to be written. SEC-U4E-6, A13 and NC-L11 are one point (the shooter's slot sent to a client that sees
    only the victim, against ADR 0001 part 9 (f)).
-6. **The test-engineer's findings:** (filled when its seat returns).
+6. **The test-engineer's findings** (`u4e-review-test.md`: REVISE; resumed after the cut, it redid its two unrecorded
+   plants in its own form): TE-1 High (it settles NC-H1 by run, probe Q-1: under either tick16 bite the client files
+   nothing after the wrap, and the part (i) twin's assertion is met by a silent drop); TE-2 to TE-6 Medium, all marked
+   before the merge, each a plan-listed test or ruled check that a plant shows cannot fail: TE-2 (e6: the window's
+   remainder never binds), TE-3 (client-rounding's call site in the endpoint has no test; carry 24's first clause),
+   TE-4 (each group decoding alone: group 1 without group 0 not shown), TE-5 (the pump's size check has no test;
+   U4E-Q11 (a)), TE-6 (carry 57's second-overflow kick: its test cannot fail); TE-7 to TE-10 Low (carry 61 (b)'s
+   two-hash sentinel untested; carry 50's room call unpinned, with RR-2; carry 21's sort cannot bite under option B;
+   the 1,150 B case refused by its trailing bytes). Its settling runs: NC-H1, NC-M3, NC-M5, SEC-U4E-1, SEC-U4E-3,
+   SEC-U4E-4 (29 full states in 30 ticks, 256,418 B) and SEC-U4E-7 (an add overflow at client/src/lib.rs:526, from
+   server bytes) hold; NC-M4 holds in part (Q-11). Its counted check.mjs run (.gate/u4e/r1-te-check-counted.log): all
+   10 steps PASS, measured 458, bites 524, self 52, equal to the builder's two runs; its provenance block is empty,
+   because check.mjs keeps cargo's Compiling lines out of its output (the runner's pwd line names the copy). Rule
+   each, with the High under item 1.
 7. **Points of the main session's, not in the packet** (the card, `.checkpoints/netcode-proof-test.md`, "Running").
    Confirm or correct each:
    - Carry 68 is not in the builder's list of carries met, though it reports carry 56's ES figure; NC-M2 found the
