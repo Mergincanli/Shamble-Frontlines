@@ -67,7 +67,8 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    packet_name_check.py 12 of 12); u4d2-packet.md cut from u4d2-packet.json (sha256 9b670276…, 373 KB; its side file
    u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
-   **(h) Running: U4d2's review round 1,** workflow wf_9294c443-01a (task wshmxx2ps; script
+   **(h) Running: U4d2's review round 1,** workflow wf_9294c443-01a (task wshmxx2ps; cut at 20:52 in batch 2, after
+   batch 1 had returned; resumed 22:53 as task w6sp1gn2w; script
    workflows/scripts/npt-u4d2-review-r1-wf_9294c443-01a.js), launched 20:19 UTC. Batch 1 (Read):
    rust-reviewer, security-auditor, infra-engineer (runs in the builder's copy through u4d2-run.sh while nobody
    plants; the infra seat times `--only wasm` with `-x`). Batch 2 (Prove): engine-architect (the read copy, no runs)
@@ -94,7 +95,7 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    with `Workflow({scriptPath, resumeFromRunId})`. On return: read its section 6 list and every stop in full; snapshot
    the worktree (worktree_patch.py) and commit it; then the review per 7.2 item 7's panel (rust-reviewer,
    engine-architect, test-engineer, infra-engineer, security-auditor), with U4e's seats counted in the three.
-- The saver runs as bl8bwppxu (since 20:11 UTC; restart it when it stops, with run_in_background and timeout
+- The saver runs as b41pzpnmb (since 22:52 UTC; restart it when it stops, with run_in_background and timeout
   7200000: without the timeout the harness stops it at 30 minutes, as it stopped bg29bb0pt at 16:42 UTC). The chat's size goes in every
   report.
 
@@ -115,6 +116,13 @@ the cut and the time of the resume; UTC, read from the session's transcript):
   script writer (16:50, its plan written, no script yet). Resumed 17:41, on Mustafa's message: U4d2's worktree checked
   first (no plant in place: crates/sim untouched, no cargo running; block 3's edits in crates/lab kept for the fresh
   copy, which reads its notes and the diff first); both runs resumed (`resumeFromRunId`).
+- 2026-11-12 20:52: "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit
+  resets 10:40pm (UTC)". Cut: U4d2's review round 1, batch 2: the architect seat (20:52:01) and the test seat
+  (20:52:03), each just after writing its plan (notes 20:51); batch 1's three seats had returned (rust 20:36, security
+  20:39, infra 20:50). The saver ran to its end at 22:01. Resumed 22:52, on Mustafa's message ("Usage was hit,
+  continue where you left off"): the builder's copy checked first (its spikes/ equal to the read copy's by `diff -rq`:
+  no plant in place; crates/sim untouched); the saver restarted (b41pzpnmb); the run resumed (`resumeFromRunId`, task
+  w6sp1gn2w: batch 1 from its cache, batch 2's two seats fresh, each continuing after its notes' last line).
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188
