@@ -1967,3 +1967,8 @@ From "Next steps, in order" (as it was):
     spend limit" holds today's three cuts (02:02, 06:41 and 09:24 UTC), read from the session's transcript. This entry
     is appended at the end of history.md under its own heading, and "Decisions taken" points here from its heading line,
     so no cited line of history.md moves.
+  - Done (item 3, the main session): main (2aa5e9c, PRs #50 and #51) merged into the branch at bfda3cd, no agent
+    stopped; the two conflicts kept both sides by merge_main_51.py (DECISIONS.md: main's 3-line pointer, then this
+    branch's 22-line block of the 2026-11-06 answers; STATUS.md: this branch's #40 row, its state brought up to date,
+    then main's #51 row). Checks: rules, CI and gate files equal main's; repo-map check OK; check.mjs --only
+    marks,refs,redact all pass; gate PASS --no-smoke.

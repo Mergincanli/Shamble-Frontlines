@@ -3,36 +3,34 @@
   (`.checkpoints/netcode-proof-test/plan.md`, revision 3.3; approved by the advisor and Mustafa, 2026-11-06) · verdict:
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
-  **Base:** main, last merged in at 5ca77eb (main bb2d817, PR #49, the STATUS split)
-- **Last update:** 2026-11-12 about 02:05 UTC (U4d-F merged at adb1bab, CI green; U4e's L3 at 28a85e7; next, U4e's
-  launch)
+  **Base:** main, last merged in at bfda3cd (main 2aa5e9c, PRs #50 and #51, the legacy game into legacy/)
+- **Last update:** 2026-11-12 about 16:30 UTC (main merged in; U4d2's brief rev 1.2; U4e's round 2 in its last seat)
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**AFTER /COMPACT, START HERE (written 2026-11-12 about 15:35 UTC, before Mustafa's /compact).** Two runs in the
-background; their notifications arrive after the compact:
-1. **U4e's review round 2:** workflow wf_e623d489-17e (task wh159bx8v), batches of at most two (netcode+security, then
-   arch+rust read only, then the test-engineer alone). On return: read every finding rated Medium or higher in full
-   and everything touching the judge, the marks or a pass bar (USAGE-SAVINGS); apply R8's outcome rule
-   (advisor-u4e-r1.md:431-434): APPROVE or Lows only → the merge on R9's M1-M9 (advisor-u4e-r1.md:438-494; texts T1-T6
-   copied by script in the merge commit, each old text found once; stop the saver first); a Medium → the advisor; a
-   High → the advisor for a third round on it alone. If cut: check the copy against .gate/u4e/fx-hashes-end.sha256
-   first (a plant may be in place), then resume with `Workflow({scriptPath, resumeFromRunId})`.
-2. **U4d2's fold script:** workflow wf_ec856301-902 (task wgr64i526): one agent writes `u4d2_fold.py` (notes
-   u4d2-fold-notes.md), dry-run only. On return: run its dry run yourself, read the diff, then `--apply` (rev 1.2; the
-   brief's sha256 was e6bcefc8…); anything it lists under not_by_script goes to the advisor (L1). Then the rest of the
-   U4d2 launch (card's Next steps item 3): P6 (`<base>` = the head at launch; `git merge-base --is-ancestor adb1bab
-   <base>` exit 0; counts 399 / 446 / 52 / 10 if `git diff --stat 28a85e7 <base> -- spikes/netcode-proof` is empty,
-   else a counted run through main-run.sh); P7 is DONE: u4d2-run.sh (sha256 d1fd0e7e…, `-k` added; its diff against
-   u4e-run.sh 669f7c65… saved as u4d2-run.sh.diff and checked equal to the live diff); show `-k` once in U4d2's
-   worktree, shared mode: `false :: true` with -k exits 1 with both exit codes logged, without -k only the first; then
-   launch one builder (general-purpose, opus, xhigh) in its own worktree under W1-TARGET's lock (L5: at most three
-   agents, round 2's at most two). The prompt carries T4 items 1-2 (crates named per the brief), TE2-5, the builders'
-   limits (history.md:291-293) and L4's sentence on U4e's order.
-- The saver runs as brww4gof7 (restart it when it stops). The chat's size goes in every report.
+**NOW (2026-11-12 about 16:30 UTC; read this first after a compact or a cut).**
+1. **U4e's review round 2:** workflow wf_e623d489-17e (task wh159bx8v). Batches 1 and 2 done: netcode APPROVE WITH
+   FINDINGS with NC2-M1 (Medium); security, arch and rust APPROVE WITH FINDINGS, Lows only. The test-engineer seat
+   runs alone (agent a4248695…; start hashes r2-hashes-start.sha256, every FX plant re-proved by Edit, one counted
+   check.mjs). On return: read every Medium or higher in full (NC2-M1 at least) and everything touching the judge, the
+   marks or a pass bar; R8's outcome rule (advisor-u4e-r1.md:431-434): a Medium → the advisor (follow-up or carry); a
+   High → the advisor for a third round on it alone; Lows only → the merge on R9's M1-M9 (advisor-u4e-r1.md:438-494;
+   T1-T6 by script in the merge commit; stop the saver first). If cut: check the copy against
+   .gate/u4e/fx-hashes-end.sha256 first (a plant may be in place), then resume with `Workflow({scriptPath,
+   resumeFromRunId})`.
+2. **U4d2's launch** (the advisor's check, L1-L5): L1 DONE at 172c92d (rev 1.2 by u4d2_fold.py, its dry run read in
+   full; nothing left for the advisor); L2 DONE at 85c08df; P7 DONE (u4d2-run.sh). Main merged in at bfda3cd. In order:
+   (a) `u4d2_restamp.py --apply` (7.2 items 1, 2 and 8: P6 = bfda3cd with 399 / 446 / 52 / 10, P7, the plan cites of
+   sections 0-7 re-pointed to 3f58ff0d, section 0 re-stamped with the card's stamp read at that moment) and commit it
+   with this card (the launch-prep commit); (b) `git worktree add .claude/worktrees/u4d2-build -b u4d2-build <that
+   commit>`; (c) the `-k` demo there in shared mode (logs .gate/u4d2/k-demo-with.log and k-demo-without.log); (d) one
+   builder (general-purpose, opus, xhigh), no isolation, in that worktree: its prompt replaces 1.1's fast-forward as
+   U4e's did (record HEAD and `<base>`; `git diff --stat bfda3cd HEAD -- spikes/` empty), points at section 4 for the
+   rules (his words and the advisor's are there by script, so the prompt retypes none) and names the runner.
+- The saver runs as bg29bb0pt (restart it when it stops). The chat's size goes in every report.
 
 **Cuts by the spend limit** (SPEND-LIMIT (a), Mustafa 2026-11-12: at every cut, the notice's exact text, the time of
 the cut and the time of the resume; UTC, read from the session's transcript):
@@ -198,8 +196,9 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
    PASS, 399 / 446 / 52 (.gate/u4e-l3/l3-check.log), filled into the brief's 7.2 item 1; gate PASS (--no-smoke).
    U4e's review reads its diff from 1e8c188 (engine-architect: a new pub item, A19; rust-reviewer).
 2. **U4e: built, round 1, fix pass DONE; round 2 running** (see Running): then the merge on R9's M1-M9.
-3. **U4d2's builder brief: rev 1.1, the advisor's check APPROVE WITH CONDITIONS** (advisor-u4d2-brief.md, L1-L5). L2
-   DONE at 85c08df (the plan's text, by u4d2_plan_edits.py). Next, by script, in the main session: L1 (the fold into
+3. **U4d2's builder brief: rev 1.2, the advisor's check APPROVE WITH CONDITIONS** (advisor-u4d2-brief.md, L1-L5). L2
+   DONE at 85c08df (the plan's text, by u4d2_plan_edits.py); L1 DONE at 172c92d; the launch: NOW item 2. As planned
+   before L1 (kept for the record): by script, in the main session: L1 (the fold into
    rev 1.2: blocks 4, 5, 6, 8, 9, 10's words, each old phrase found once), L3 (P1-P5 and P8 by anchor and sha256; P6
    `<base>` = the head at launch, `git merge-base --is-ancestor adb1bab <base>` exit 0, counts 399 / 446 / 52 / 10 if
    `git diff --stat 28a85e7 <base> -- spikes/netcode-proof` is empty; P7 u4d2-run.sh = u4e-run.sh plus `-k`, its diff

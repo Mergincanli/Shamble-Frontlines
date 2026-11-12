@@ -3,6 +3,8 @@ Changes in rev 1.2 (the main session's fold of advisor-u4d2-brief.md, condition 
 A1.4, A2.1, A2.2, A2.3, A2.4, A2.5, A2.6, A2.7, A3, A4.1, A4.2, A4.3, A4.4, A4.5, A4.6, A5, A6.1, A6.2, A7, A8, A9, A10,
 Q1, Q3, Q4, Q5.1, Q5.2, Q9.1, Q9.2, Q9.3, Q9.4, Q9.5, S8, 7.2.4, 7.2.9, header, A11, 1.2, A14, A15.1, A15.2, A15.3,
 A15.4, L1-7.2.8, P1, P2, P3, P4, P5, P8; not used: block 6's 1.2 replacement (U4e has not merged).
+At launch (7.2 items 1, 2 and 8, by u4d2_restamp.py): P6 and P7 filled, the plan cites of sections 0 to 7 re-pointed,
+section 0 re-stamped (its new first bullet says how).
 
 Drafted by rust-reviewer on 2026-11-12 (U4 wave 2), in the form of the approved U4e brief (u4e-brief.md rev 3.3;
 advisor-u4e-brief.md). The drafter ran no cargo build, test, clippy, doc or check.mjs (the shared target is in use:
@@ -54,13 +56,24 @@ script at launch (section 7.2 item 3). Every `<base>` and count is filled then t
   code line moved between them), whose spikes/ and docs/ are identical to 28a85e7 (U4e's L3, the carry-51 commit;
   `git diff --stat 28a85e7 HEAD -- spikes/ docs/` is empty), which sits on U4d-F's merge adb1bab and U4j's d50396a.
   U4e (wip/u4e.patch, in its round-1 fix pass under e-r1) is not in it.
-- `plan` is .checkpoints/netcode-proof-test/u4-build-plan.md (1,079 lines, sha256 686a583c…); `plan.md` is the proof
+- **Re-stamped at launch** (7.2 items 1, 2 and 8; the main session, u4d2_restamp.py, 2026-11-12): the plan cites of
+  sections 0 to 7 read the plan as it is now (its stamp below). The advisor's U4d2 brief check's plan edits (L2,
+  85c08df) moved its lines below §4.11 and rewrote parts of §5 U4d2 and of the Lanes; each cite was re-pointed to the
+  lines that now hold its text, and the one that quotes old words says so (2.4 (a)). Section 8 keeps its questions'
+  cites as asked, at the plan's 686a583c (`git show 1e8c188:.checkpoints/netcode-proof-test/u4-build-plan.md`). `<base>`
+  is bfda3cd (main's PRs #50 and #51 merged in): its spikes/ is 28a85e7's (`git diff --stat 28a85e7 bfda3cd -- spikes/`
+  is empty), and its docs/ differs only by that merge, which moves no docs line this brief cites (ADR 0002's changes lie
+  outside :256-266; ADR 0001 and 0004 are unchanged). history.md gained an entry at its end and new heading text at
+  :280; no line this brief cites moved. carries, plan.md, df-ruling, j-r2 and e-r1 are unchanged. 7.1's rows marked
+  "yes" hold at `<base>`: R2, R11, R14 and R19 read spikes/; R17 reads wip/u4e.patch as re-cut at 4300944 (crates/room,
+  crates/server and crates/client only); R20 is P6.
+- `plan` is .checkpoints/netcode-proof-test/u4-build-plan.md (1,092 lines, sha256 3f58ff0d…); `plan.md` is the proof
   test's plan (rev 3.3, 1,518 lines, sha256 2bef127b…); `carries` is u4s-carries.md (490 lines, sha256 cdab0240…);
   `advisor` is advisor-u4.md; `wave1` is advisor-u4-wave1.md; `close` is advisor-u4d-close.md; `df-ruling` is
   advisor-u4df.md (531 lines, sha256 842ec092…); `j-r2` is advisor-u4j-r2.md (657 lines, sha256 7efa9410…);
   `e-ruling` is advisor-u4e-brief.md; `e-r1` is advisor-u4e-r1.md (U4e's round-1 ruling, sha256 7c129309…); `history`
-  is history.md (1,925 lines, sha256 c62ac831…); `card` is .checkpoints/netcode-proof-test.md (602 lines, sha256
-  6b36da10…); all but the card in .checkpoints/netcode-proof-test/.
+  is history.md (1,974 lines, sha256 a9f80703…); `card` is .checkpoints/netcode-proof-test.md (681 lines, sha256
+  685de852…); all but the card in .checkpoints/netcode-proof-test/.
 - **Living and closed files.** The card is rewritten as work moves, so it is cited by section and item, never by
   line. carries, history and plan are living too: U4e's merge commit inserts carries 73-81 above carries' §U4d2 (e-r1
   T2, :504-600) and edits plan §4.1's npt-room, npt-server and npt-client rows (e-r1 T6, :681), and history's
@@ -81,7 +94,7 @@ script at launch (section 7.2 item 3). Every `<base>` and count is filled then t
 | check.mjs:903-942 | the environment's rustflags and the cargo configs | check.mjs:1196-1284 (`LINT_LOWERING` :1202, `cargoConfigProblems` :1250-1284) |
 | check.mjs:1156-1158 | the runner refusal's note ("no wasm test is planned") | check.mjs:1527-1529 (the refusal itself: :1263, :1281) |
 
-- "marks S-HashMap" (plan :698) is the marks scout's finding S-HashMap (u4-scout-marks.md:18: std documents per-instance
+- "marks S-HashMap" (plan :705) is the marks scout's finding S-HashMap (u4-scout-marks.md:18: std documents per-instance
   random seeding and nothing for wasm32-unknown-unknown), in the plan's naming of the scouts' findings (plan :12-15).
   PM-0004-21 and PM-0004-74 are ADR 0004's rows (docs/adr/0004-simulation-core.md:1142, :1184). None of the three is
   in marks/marks.json, whose marks are ADR 0001's PM-0001 rows, PM-0004-67 and PM-0006-11 to -27 (check.mjs:1355-1361):
@@ -91,14 +104,14 @@ script at launch (section 7.2 item 3). Every `<base>` and count is filled then t
 
 ## 1. Start
 
-1. **Base:** `<base>` (placeholder `<<P6>>`, filled by the main session at launch: the spike branch's head, which holds
-   U4d's merge 39f4290 and U4d-F's adb1bab, U4d2's dependency (plan :666) and the commit carry 52 makes it name). In
-   your worktree: `git merge --ff-only <base>`; if that cannot fast-forward, `git switch -c u4d2-build <base>`; then
-   `git log -1 --format=%H` shows `<base>` and `git merge-base --is-ancestor adb1bab HEAD` exits 0. Record both in your
-   notes before anything else.
+1. **Base:** `<base>` (P6, filled by the main session at launch: bfda3cd2e4733efc3d3ec9f7c6c3c99bc6c2e8c4, the spike
+   branch's head with main's PRs #50 and #51 merged in, which holds U4d's merge 39f4290 and U4d-F's adb1bab, U4d2's
+   dependency (plan :666) and the commit carry 52 makes it name). In your worktree: `git merge --ff-only <base>`; if
+   that cannot fast-forward, `git switch -c u4d2-build <base>`; then `git log -1 --format=%H` shows `<base>` and `git
+   merge-base --is-ancestor adb1bab HEAD` exits 0. Record both in your notes before anything else.
 2. **Who and where:** one builder, general-purpose, opus, effort xhigh, in an isolated worktree under
    `/home/user/Shamble-Frontlines/.claude/worktrees/` (`isolation: worktree`), under plan §7.1's shared-target rule and
-   W1-TARGET's lock (section 4; plan :896-908; wave1 :558-586). U4d2 runs in wave 2 beside U4e's lane (plan :863-867;
+   W1-TARGET's lock (section 4; plan :909-921; wave1 :558-586). U4d2 runs in wave 2 beside U4e's lane (plan :873-880;
    e-ruling L4, :335-336): two lanes, no shared file (U4e's patch touches crates/room, crates/client and crates/server
    only: wip/u4e.patch's file list; e-r1 R9 M1, :445-448). Reviewers count toward the three-agent limit (plan
    :872-873). If U4e merges while you build, your worktree does not change: never merge, pull or rebase; your counts
@@ -109,8 +122,9 @@ script at launch (section 7.2 item 3). Every `<base>` and count is filled then t
    proof, one run); each finished block written at once, a notes line per finding, one line after each block (done,
    what next). On a restart, read your notes and `git diff` in the worktree first, then continue after the last block
    marked done (the builders' limits: section 4).
-4. **The runner:** `<<P7>>` (the main session writes it at launch: u4e-run.sh with the worktree's path and the log
-   folder `/home/user/Shamble-Frontlines/.gate/u4d2/`). `bash <runner> [-x] [-k] <worktree> <log> <command...> [::
+4. **The runner:** `/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u4d2-run.sh` (P7, sha256 d1fd0e7e…,
+   written by the main session at launch: u4e-run.sh with the worktree's path and the log folder
+   `/home/user/Shamble-Frontlines/.gate/u4d2/`). `bash <runner> [-x] [-k] <worktree> <log> <command...> [::
    <command...>]` takes the lane lock for that one call (`-x` exclusive, else shared), waits until no other cargo or
    rustc runs, checks 4 GB free, touches every file under your copy's crates/ first and every 2 s while the commands
    run, runs each command from your copy's spikes/netcode-proof with the shared target and `CARGO_NET_OFFLINE=true`, and
@@ -150,7 +164,7 @@ script at launch (section 7.2 item 3). Every `<base>` and count is filled then t
      :311-390); crates/lab (all four src files and Cargo.toml); crates/tcpinfo (Cargo.toml, src/lib.rs:1-40, the two
      allows in src/linux.rs); l1's `FateLog` (l1/src/lib.rs:325-352) and l1/tests/l1.rs:478-532;
      ops/runs/c-u2-pm-0001-3.mjs; sim/tests/world.rs:1188 (the run-by-name `#[ignore]` precedent); Cargo.toml; and
-     check.mjs and check.test.mjs whole (you are their only editor in wave 2: plan :863-864).
+     check.mjs and check.test.mjs whole (you are their only editor in wave 2: plan :873).
 
 ---
 
@@ -158,19 +172,19 @@ script at launch (section 7.2 item 3). Every `<base>` and count is filled then t
 
 U4d2 builds plan §5 U4d2 (:666-702) exactly: its Builds (option B), its check.mjs steps and rules, its Tests and its
 Bites, plus the carries of section 3. It moves no mark (none is named; section 0's last bullet). Out of scope, by the
-plan: wasm-opt and its flags (C-U7-1: plan :159, :885-887; advisor :137-139), the Chromium run (plan.md §4.5:548's
-"once in local Chromium" is U7's: plan :885-886), npt-client-wasm and wasm-bindgen (U7), U4r's runner recordings
-(`scenario --record`) and -30's pre-check (U4r, plan :762-786, which reuses `HashCompare`), the counting allocator (U5).
+plan: wasm-opt and its flags (C-U7-1: plan :159, :898-900; advisor :137-139), the Chromium run (plan.md §4.5:548's
+"once in local Chromium" is U7's: plan :898-899), npt-client-wasm and wasm-bindgen (U7), U4r's runner recordings
+(`scenario --record`) and -30's pre-check (U4r, plan :772-796, which reuses `HashCompare`), the counting allocator (U5).
 Where this brief finds the plan silent it says "plan silent" and keeps to the least that makes the item testable
 (u4d2-brief-notes.md, "Choices"); it adds no feature.
 
 ### 2.1 npt-hash-wasm (crates/hash-wasm/: Cargo.toml, src/, the loader of 2.2, the vector file of h2)
-- **The manifest** (plan :667, :670, :684-686; plan.md:392-393, :442-446): package `npt-hash-wasm`, the workspace's
+- **The manifest** (plan :667, :670-671, :689-691; plan.md:392-393, :442-446): package `npt-hash-wasm`, the workspace's
   package fields; `[lib] crate-type = ["cdylib"]`; `[features] bites = ["npt-sim/bites"]`; `[dependencies]
   npt-sim.workspace = true` and nothing else, no dev dependency; its own `[lints.rust] unsafe_code = "deny"` and
   `[lints.clippy]` equal to the workspace's key for key (Cargo.toml:93-99), in npt-tcpinfo's form, with its comment
   saying why it leaves the workspace's lints (tcpinfo/Cargo.toml's `[lints]` comment and tables).
-- **The exports** (plan :667-669): thin wrappers over `npt_sim::replay::Replayer` (replay.rs:621-770), each
+- **The exports** (plan :667-670): thin wrappers over `npt_sim::replay::Replayer` (replay.rs:621-770), each
   `#[allow(unsafe_code, reason = "...")]` (a reason with words: check.mjs:209-216) directly on
   `#[unsafe(no_mangle)] pub extern "C" fn`. In edition 2024 `no_mangle` takes the `unsafe(...)` form and the
   unsafe_code lint fires on it (check.mjs:199-207), so the allow is what compiles it under the crate's deny. No
@@ -196,7 +210,7 @@ Where this brief finds the plan silent it says "plan silent" and keeps to the le
     sim/tests/replay.rs:321).
   - What each call does before `begin`, at NeedMore, after Done and after Failed, and past the dump's end, is written
     in the crate doc and unit-tested (h3).
-- **The third exception** (advisor cond 7 (b), :133-134; plan :688-693; plan.md:442-446; ADR 0002:264-265: "an
+- **The third exception** (advisor cond 7 (b), :133-134; plan :693-700; plan.md:442-446; ADR 0002:264-265: "an
   exception needs a written invariant, a test and an `#[allow]` with its reason"): the crate doc names it the spike's
   third `unsafe` exception (tcpinfo/src/lib.rs:11-23's form) and states the written invariant, which each allow's
   reason repeats in short: no exported name collides with another symbol, and every export has integer signatures
@@ -206,15 +220,15 @@ Where this brief finds the plan silent it says "plan silent" and keeps to the le
 - **Not built:** a seed or scene parameter that the header already carries (U4D2-Q3), an export for an order digest
   or for sin (the hash-map digest is read from the dump: 2.4 (a) item 6), any other export.
 
-### 2.2 The Node loader (a script in crates/hash-wasm/; plan :670-671, :690-691)
+### 2.2 The Node loader (a script in crates/hash-wasm/; plan :671, :695-696)
 - Reads the `.wasm` file it is given; builds a `WebAssembly.Module`; lists every export with
   `WebAssembly.Module.exports` and refuses, before instantiating, any name not on its list, naming it and exiting
-  non-zero (the third exception's test: advisor cond 7 (b); plan :690-691). The list: the seven names of 2.1 and the
+  non-zero (the third exception's test: advisor cond 7 (b); plan :695-696). The list: the seven names of 2.1 and the
   linker's own exports of a wasm32-unknown-unknown cdylib (`memory`, and any other the release build emits, each named
   in your report with what emits it); nothing else.
 - Instantiates with an empty import object, so a module that imports anything fails to instantiate (plan silent; a
   LinkError is a refusal): no host clock or random source can reach the Wasm leg.
-- Streams a recording in (plan :670-671): the file's bytes as little-endian 32-bit words, the last zero-padded
+- Streams a recording in (plan :671): the file's bytes as little-endian 32-bit words, the last zero-padded
   (sim/tests/replay.rs:31-43's `words`), fed in chunks with `step` called until NeedMore between them, never the whole
   file before the first step (the driver drains past 64 KiB: replay.rs:701-704). Per tick it writes the recording's
   name, the tick and the 64-bit hash (from `hash_hi` and `hash_lo`) in the line form npt-lab's legs write (2.3), so
@@ -228,11 +242,11 @@ Where this brief finds the plan silent it says "plan silent" and keeps to the le
   check.test.mjs pins it (2.4 (d)). Its refusal is a function check.test.mjs can call on a module's bytes (2.4 (d)).
 
 ### 2.3 npt-lab: `HashCompare`, the recordings manifest, the scan data, the `hash` subcommand, carry 66 (crates/lab/)
-- **`HashCompare`** (lib.rs; plan.md:617; plan :672-673): takes two per-tick hash lists (each entry a recording, a tick
+- **`HashCompare`** (lib.rs; plan.md:617; plan :673-674): takes two per-tick hash lists (each entry a recording, a tick
   and a hash) and returns either "equal over N entries" or the first mismatch (its index, recording, tick and both
   hashes). Lists of different lengths, or an entry whose recording or tick differs from its partner's, are a mismatch
   at the first such index; 0 entries compared is its own result, which no caller passes. It reads no file and knows no
-  recording, so U4r's -30 pre-check feeds it two legs' per-tick server hashes (plan :766-767; advisor cond 2, :93-94).
+  recording, so U4r's -30 pre-check feeds it two legs' per-tick server hashes (plan :776-777; advisor cond 2, :93-94).
 - **The recordings manifest** (plan §4.15 :502-504; carry 52): a committed file in crates/lab/ (plan silent on its home;
   npt-lab regenerates), one entry per recording: its name, scene id, seed, first tick, tick count, span (ms), generator
   version, byte length and SHA-256 (the "script" of :502 is, for a synthetic entry, the generator's other arguments:
@@ -245,7 +259,7 @@ Where this brief finds the plan silent it says "plan silent" and keeps to the le
   (the recording, the first tick T' at which the bitten native and Wasm legs differ, the field) or "not catchable at
   this site on x86-64 and wasm32"; and with it what it was scanned on: `<base>` with this unit's code, rustc's version
   (`rustc --version`), the libc's version (`ldd --version`'s first line), and the commands run.
-- **The `hash` subcommand** (release build; plan :670-672; main.rs:186-213 dispatches `probe` alone today):
+- **The `hash` subcommand** (release build; plan :671-673; main.rs:186-213 dispatches `probe` alone today):
   1. regenerates each manifest entry with `Recording::synthetic` into a folder under the checkout's .gate/ (never
      committed: §4.15 :502-504), and fails, naming the recording, on any SHA-256 or length that differs;
   2. runs two native legs in two processes (itself re-run through `std::env::current_exe()`, D-2's form:
@@ -270,10 +284,10 @@ Where this brief finds the plan silent it says "plan silent" and keeps to the le
   is not your lane. Its proof is h7.
 - The command's docs follow (main.rs:1-12; lib.rs:1-6 already names `HashCompare`).
 
-### 2.4 check.mjs and check.test.mjs (plan :674-693; you are their only editor in wave 2: plan :863-864)
-Each item has its self-test bite in check.test.mjs (plan :674), and every new deps-step check gets its plant in the deps
+### 2.4 check.mjs and check.test.mjs (plan :676-700; you are their only editor in wave 2: plan :873)
+Each item has its self-test bite in check.test.mjs (plan :676), and every new deps-step check gets its plant in the deps
 fixture test, which fails if a check is unhooked from `depsStep` (check.test.mjs:1094-1165; review C2R-5).
-- **(a) The `wasm` step** (plan :675-676), after `deps` in `STEPS` (:1594-1627; plan silent on the place: the flags it
+- **(a) The `wasm` step** (plan :677-680), after `deps` in `STEPS` (:1594-1627; plan silent on the place: the flags it
   builds with are checked first), so check.mjs has 11 steps:
   1. the release builds, with no flag added (the build flags are plan.md §4.5:533-535's: baseline x86-64, simd128 and
      relaxed-simd off; wasm-opt is not run here: C-U7-1; by U4D2-Q2), overflow checks staying on for npt-sim in release
@@ -284,7 +298,7 @@ fixture test, which fails if a check is unhooked from `depsStep` (check.test.mjs
      .cargo/config.toml);
   2. `npt-lab hash`: the manifest's recordings regenerated and checked, the two native legs (one call);
   3. the loader under Node (`process.execPath`), once per recording: a script, so the runner refusal stands
-     (check.mjs:1263, :1281) and its note at :1527-1529 is updated to say so (plan :675-676);
+     (check.mjs:1263, :1281) and its note at :1527-1529 is updated to say so (plan :678-679);
   4. the comparison, native against Wasm, and at a mismatch the field diff;
   5. h2's vectors on wasm32;
   6. **the bites half**, in the bites builds (plan.md §4.5:551: "bites: one std `sin` and one hash-map iteration, each
@@ -302,7 +316,7 @@ fixture test, which fails if a check is unhooked from `depsStep` (check.test.mjs
        field `bite[0].hash_map_order`), and anything else (another tick, another field, no mismatch) FAILs the step.
        Digests equal: no tick may differ (else FAIL), and the line says "not exercised" for that pair. The step FAILs
        if no pair was exercised. The line says "not catchable on wasm32" when the two Wasm digests are equal, and
-       gives the native-against-Wasm outcome beside it (plan :697-698: "caught, or recorded as not catchable on
+       gives the native-against-Wasm outcome beside it (plan :704-705: "caught, or recorded as not catchable on
        wasm32").
      - **std-sin** (PM-0004-21/std-sin): the step reads the scan data (2.3, 2.7). If it records a catch (recording R,
        tick T', field F; with catches on more than one recording, the first in the manifest's order, the others recorded
@@ -312,23 +326,24 @@ fixture test, which fails if a check is unhooked from `depsStep` (check.test.mjs
        2.39). If the data records "not catchable at this site on x86-64 and wasm32", the step prints that line, with the
        data's scan record, and runs no std-sin leg; the stand-in is 2.7's scratch plant, shown once (U4D2-Q5 (a)).
   It passes only with exactly the manifest's tick count compared per recording (9,000 each) and 27,000 per pair (leg 1
-  with leg 2; leg 1 with Wasm: plan :694; plan.md §4.5:546-550), 0 mismatching, h2's vectors equal, and each bite's
+  with leg 2; leg 1 with Wasm: plan :701; plan.md §4.5:546-550), 0 mismatching, h2's vectors equal, and each bite's
   verdict as item 6 says. Its last line (the line main prints: :1646) gives the ticks compared per pair, the
   mismatches, each bite's outcome and each timed call's seconds. On a FAIL the step still runs every comparison it has
   the legs for, and prints one line for each (its pair, the ticks compared, the mismatches, the first mismatch with its
   field) and for h2's vectors and each bite, within the last 40 lines main prints under a FAIL (:1649), so one run shows
   which pairs agree (2.7's h2 row reads leg 1 with leg 2 beside leg 1 with Wasm); a trap or a failed regeneration ends
   only the legs that need it.
-  **Timing** (plan :676: "its wall time printed, budget 5 minutes"): check.mjs times each call it makes (each release
-  build; `npt-lab hash`, one call for the regeneration and both native legs; each Node run; the comparison call; h2's
-  run; the bites half's calls) with the clock main already reads (`Date.now()`: :1643-1645); npt-lab reads none (2.3
-  item 6). Every lane timing is labelled "under the runner's touch loop": the runner touches every file under crates/
-  every 2 s (u4e-run.sh:58-62), so each cargo call rebuilds the workspace's crates, and a lane's "warm" is not CI's.
-  No CI job runs check.mjs (.github/workflows/gate.yml runs tools/gate.mjs only, and a CI job for spikes/ is out of
-  scope: plan.md:328 and R-8), so plan :702's "the step's time in CI" is read as the step's time as a fresh build meets
-  it: the infra-engineer reviews your cold and warm figures against the 5-minute budget, and says what a CI job would
-  change (the advisor's U4d2 brief check, A1). Over 5 minutes: your report gives the split, cold and warm, and the step
-  stays in check.mjs (moving it to ops/runs/det-u4.mjs is U4r's, on the advisor's ok: plan :790-792).
+  **Timing** (plan :679-680: "its wall time printed, budget 5 minutes"): check.mjs times each call it makes (each
+  release build; `npt-lab hash`, one call for the regeneration and both native legs; each Node run; the comparison call;
+  h2's run; the bites half's calls) with the clock main already reads (`Date.now()`: :1643-1645); npt-lab reads none
+  (2.3 item 6). Every lane timing is labelled "under the runner's touch loop": the runner touches every file under
+  crates/ every 2 s (u4e-run.sh:58-62), so each cargo call rebuilds the workspace's crates, and a lane's "warm" is not
+  CI's. No CI job runs check.mjs (.github/workflows/gate.yml runs tools/gate.mjs only, and a CI job for spikes/ is out
+  of scope: plan.md:328 and R-8), so plan :702's "the step's time in CI" (the plan at 686a583c; its :711 now reads "the
+  step's time against its budget") is read as the step's time as a fresh build meets it: the infra-engineer reviews your
+  cold and warm figures against the 5-minute budget, and says what a CI job would change (the advisor's U4d2 brief
+  check, A1). Over 5 minutes: your report gives the split, cold and warm, and the step stays in check.mjs (moving it to
+  ops/runs/det-u4.mjs is U4r's, on the advisor's ok: plan :800-802).
   **Self-test bite:** through a recorder runner, as the steps pin does (check.test.mjs:1617-1622): the commands it
   runs, in order; then each recorded outcome below FAILs the step, its message naming what is listed: a
   native-against-Wasm mismatch (the recording, the tick, the field); a leg 1 against leg 2 mismatch (the same); a
@@ -338,7 +353,7 @@ fixture test, which fails if a check is unhooked from `depsStep` (check.test.mjs
   leg whose lines carry an order digest or a bite (a bites build's output given to the measured half); for each bite,
   a catch at another tick, a catch at another field, and a miss (each FAIL), and its catch at the expected tick and
   field (passes); hash-map with no pair exercised (FAIL); std-sin's data line "not catchable" (passes, printed).
-- **(b) The features comparison, like for like** (plan :677-678, §2 :157: "a deps-step line and its bite"; A12;
+- **(b) The features comparison, like for like** (plan :681-683, §2 :157: "a deps-step line and its bite"; A12;
   plan.md:536; ADR 0004:1184): a deps-step line. npt-sim's resolved features (npt-sim's own, and each package in
   npt-sim's normal-dependency subtree with its enabled features, from `cargo tree --locked -e normal,features` or its
   `--format "{p} [{f}]"`) under the server build (`-p npt-server --target x86_64-unknown-linux-gnu`) against the
@@ -358,7 +373,7 @@ fixture test, which fails if a check is unhooked from `depsStep` (check.test.mjs
   a package outside npt-sim's subtree); a measured list is never paired with a bites list (the pairing pinned); and a
   recorded tree with no npt-sim subtree, or one missing one of npt-sim's direct dependencies, fails. Planted live once
   (2.7).
-- **(c) The build-flag check** (A8; advisor cond 7 (a), :131-132; plan :679-683; ADR 0002:256-258), a deps-step line:
+- **(c) The build-flag check** (A8; advisor cond 7 (a), :131-132; plan :684-688; ADR 0002:256-258), a deps-step line:
   - (i) in the sources the deps step already reads (the environment's `RUSTFLAGS`, `CARGO_ENCODED_RUSTFLAGS`,
     `CARGO_BUILD_RUSTFLAGS`, `CARGO_TARGET_<triple>_RUSTFLAGS`, and every cargo config's `rustflags`:
     check.mjs:1228-1284), `+fma`, `target-cpu=native`, `+simd128` and `+relaxed-simd` are refused in every form rustc
@@ -392,7 +407,7 @@ fixture test, which fails if a check is unhooked from `depsStep` (check.test.mjs
   `RUSTFLAGS`, `CARGO_ENCODED_RUSTFLAGS`, `CARGO_TARGET_<triple>_RUSTFLAGS` and a config's `rustflags` each set to a
   distinct harmless flag, every one of them is in each rustc call. Planted live (2.7): the two read-back runs and the
   name scan's run.
-- **(d) hash-wasm's rules** (A13; plan :684-687), deps-step lines:
+- **(d) hash-wasm's rules** (A13; plan :689-692), deps-step lines:
   - its manifest: its own `[lints]` tables, unsafe_code `"deny"`, the rest the workspace's key for key
     (`exceptionLintProblems` through `EXCEPTION_LEVELS`: check.mjs:1023-1052, :171);
   - its sources (`unsafeProblems`, :489-526, gains hash-wasm's rules in npt-tcpinfo's pattern, :382-452): each listed
@@ -406,21 +421,21 @@ fixture test, which fails if a check is unhooked from `depsStep` (check.test.mjs
     result if it has one, are u32 or i32 only (`feed` returns nothing, which Wasm lowers to no result);
   - its dependencies: npt-sim its only shipped one, and nothing depends on it in any kind (npt-tcpinfo's rule,
     :107-121; npt-lab's, :152-157);
-  - it joins `LEAF` (:31), so `WASM_CRATES` (:1438) and the clippy-wasm32 and wasm32 doc steps take it (plan :686).
-  Self-test bites: a stray `unsafe {}` block in hash-wasm (plan :699); an `#[unsafe(no_mangle)]` export not on the list,
+  - it joins `LEAF` (:31), so `WASM_CRATES` (:1438) and the clippy-wasm32 and wasm32 doc steps take it (plan :691).
+  Self-test bites: a stray `unsafe {}` block in hash-wasm (plan :706); an `#[unsafe(no_mangle)]` export not on the list,
   or a listed one with no allow; an allow on a helper; a second allow; by Q7 (a), an export taking an f64; hash-wasm
   depending on another crate; another crate depending on hash-wasm; its manifest at `"allow"` or `"forbid"`: each
   refused by name, the clean fixture passing. And the loader: its list pinned to the seven names and the linker's;
-  a hand-assembled module (a few dozen bytes, built in the test) with one export more is refused by name (plan :699:
+  a hand-assembled module (a few dozen bytes, built in the test) with one export more is refused by name (plan :706:
   "an export not on the loader's list"), and one that imports a function fails to instantiate.
-- **(e) The third exception** (advisor cond 7 (c), :135-136; plan :688-693): `UNSAFE_EXCEPTIONS` (:169) gains
+- **(e) The third exception** (advisor cond 7 (c), :135-136; plan :693-700): `UNSAFE_EXCEPTIONS` (:169) gains
   `"crates/hash-wasm/": "npt-hash-wasm"` and `EXCEPTION_LEVELS` (:171) `"deny"`. The texts that say two become three
   (:161-168; :204-206; :1509-1510; `DEPS_CHECKED`, :1531-1550, which also names every new check; the header, :1-18;
   Cargo.toml:73-92 and crates/client-wasm/Cargo.toml:9-13, in 2.5), and the tests that pin two follow: the four pins
   that quote "only npt-client-wasm and npt-tcpinfo may" (check.test.mjs:288, :486, :508, :1141), whose message
   `unsafeProblems` builds from `UNSAFE_EXCEPTIONS` (check.mjs:493), are re-pinned in the same step as the edit (section
   4's stop clause). plan.md §4.2 already says three, hash-wasm named (plan.md:435-447), and plan.md §4.1 has its layout
-  line (:392-393): those two plan.md edits (plan :687, :692-693) are done.
+  line (:392-393): those two plan.md edits (plan :692, :699-700) are done.
 - **(f) Carry 65** (section 3; j-r2 B2.3, :158-160): the test step names every failing test, from libtest's `failures:`
   list, beside the summary, in the lines main prints under a FAIL (today `run` joins stdout before stderr, :1402, and
   main prints the last 40 lines, :1649). Its self-test feeds recorded failing runs and asserts the names are printed:
@@ -449,12 +464,12 @@ fixture test, which fails if a check is unhooked from `depsStep` (check.test.mjs
 - Any other manifest change stops that part (1.5). The live plant of 2.7's PM-0004-74 row is made and restored in
   hash-wasm's own manifest, and moves no lock byte (a feature is not recorded in Cargo.lock: tcpinfo/Cargo.toml:31-32).
 
-### 2.6 Tests (plan :694-695), each named in your report with its file
-- **h1, the determinism check** (plan :694; plan.md §4.5:546-550): the `wasm` step on the measured builds: exactly
+### 2.6 Tests (plan :701-702), each named in your report with its file
+- **h1, the determinism check** (plan :701; plan.md §4.5:546-550): the `wasm` step on the measured builds: exactly
   9,000 ticks per recording and 27,000 per pair (3 × 9,000), leg 1 with leg 2 and leg 1 with Wasm, 0 mismatching, the
   counts printed. It is the judged release-build check D-2 stands in for in the debug suite (plan :612-614); D-2 stays
   as merged.
-- **h2, PM-0004-21's cross-target vectors** (T22; plan :694-695; ADR 0004:1142: "the picked function gives the same
+- **h2, PM-0004-21's cross-target vectors** (T22; plan :701-702; ADR 0004:1142: "the picked function gives the same
   digest for a committed byte string on native x86-64 and on wasm32, and one committed state serializes to the same
   bytes on both"). Plan silent on which: one state's dump is both the byte string and the state, its digest the state
   hash (`StateDump::hash`, hash.rs:98, as D-7 asserts: sim/tests/replay.rs:329-330), because `Fnv` is `pub(crate)`
@@ -499,9 +514,9 @@ fixture test, which fails if a check is unhooked from `depsStep` (check.test.mjs
   sim"; plan.md §4.5:551 names two); PM-0004-17's two-instances check (ADR 0004:1138); a Chromium run; wasm-opt. Say
   in your report that each is not built, and why (the plan's line).
 
-### 2.7 Bites (plan :696-700): which are unit-shown here, which are shown by a run, which are only planted
+### 2.7 Bites (plan :703-709): which are unit-shown here, which are shown by a run, which are only planted
 U4d2 plants no new compiled-in bite: its crates spell no bite id, and hash-wasm's `bites` feature forwards to npt-sim's
-(plan :670). PM-0004-21's two bites are U4d's, compiled into npt-sim's bites build and chosen per instance through
+(plan :670-671). PM-0004-21's two bites are U4d's, compiled into npt-sim's bites build and chosen per instance through
 `Replayer::with_bite` (world.rs:585-606, :934-966); a cross-target catch cannot be a cargo test, so they are shown by
 the `wasm` step's runs. The rest are check.mjs's rules, unit-shown by check.test.mjs's self-tests, some also planted
 live once to show the real tree is caught. A scratch plant is made in place by Edit, or its diff saved beside the
@@ -538,7 +553,7 @@ your next runner call; the run's output line goes in your report (section 4).
   npt-lab row (:198, which names the subcommands), for engine-architect; the `hash` subcommand (:198).
 - Everything else `pub(crate)` (plan.md:454). Your report lists every pub item you add, by crate, and the loader's
   exported names (its list and its refusal function) and check.mjs's new exports; engine-architect checks them
-  (check.mjs does not: :1502-1506, plan :916-917).
+  (check.mjs does not: :1502-1506, plan :929-930).
 
 ---
 
@@ -654,25 +669,25 @@ binding on every cargo, rustc and rustdoc call in your worktree, check.mjs's and
    npt-hash-wasm v… (<your worktree>/spikes/netcode-proof/crates/hash-wasm)" and npt-lab lines, which the runner
    appends (u4e-run.sh:91-97), are the provenance. Match on the path, not the version. A missing line means "not
    counted", whatever the count says.
-4. Touch before each build: `find <copy>/spikes/netcode-proof/crates -type f -exec touch {} +` (plan :899; the runner
+4. Touch before each build: `find <copy>/spikes/netcode-proof/crates -type f -exec touch {} +` (plan :912; the runner
    does it).
-5. **Counts are deltas** (plan :900-901, :870-871), on check.mjs's measure (`testBothBuilds`, :1493-1500;
-   `cargoCounts`, :1411-1421). The base: `<<P6>>` (measured, bites, self and the step count at `<base>`; at 28a85e7
-   they were measured 399, bites 446, self 52 of 52, 10 steps: the card's resume card, its "Merged into the spike
-   branch" bullet). Each run's count is the base plus the tests you added; check.mjs's step count is the base's plus 1
-   (`wasm`); the self count is the base's plus your new check.test.mjs tests. A mismatch means another copy's artifact
-   ran: touch, rebuild, never report that run. `--list` (`cargo test --locked --workspace --all-features -- --list`)
-   only names the new tests; it is not a count. h7 (ii)'s `#[ignore]` test is not in check.mjs's count
-   (`cargoCounts` reads libtest's "passed" and "failed" only: :1411-1421; libtest counts it as ignored), so the deltas
-   exclude it; it is run by name only (h7).
+5. **Counts are deltas** (plan :913-914, :883-884), on check.mjs's measure (`testBothBuilds`, :1493-1500;
+   `cargoCounts`, :1411-1421). The base: measured 399, bites 446, self 52 of 52, 10 steps (P6: the counts at `<base>`,
+   bfda3cd, whose spikes/ is 28a85e7's; at 28a85e7 they were measured 399, bites 446, self 52 of 52, 10 steps: the
+   card's resume card, its "Merged into the spike branch" bullet). Each run's count is the base plus the tests you
+   added; check.mjs's step count is the base's plus 1 (`wasm`); the self count is the base's plus your new
+   check.test.mjs tests. A mismatch means another copy's artifact ran: touch, rebuild, never report that run. `--list`
+   (`cargo test --locked --workspace --all-features -- --list`) only names the new tests; it is not a count. h7 (ii)'s
+   `#[ignore]` test is not in check.mjs's count (`cargoCounts` reads libtest's "passed" and "failed" only: :1411-1421;
+   libtest counts it as ignored), so the deltas exclude it; it is run by name only (h7).
 6. **Disk** (wave1 :576-580): `df -h /home/user` before each build, the reading in your notes. At least 4 GB free before
    any wasm32 or release build, which every check.mjs run now is (clippy-wasm32 and doc build wasm32: :1438-1439,
    :1472-1489; the `wasm` step builds release for both targets); at least 2 GB before every other build; below that,
-   stop and report; never clean anything (plan :906; the between-waves clean is the main session's: wave1 :578-580).
+   stop and report; never clean anything (plan :919; the between-waves clean is the main session's: wave1 :578-580).
    Report the shared target's size (`du -sh`) before and after your first `wasm` step run (U4d2's release triples add
    to it: wave1 :576).
-7. After the last bite or plant, touch and rebuild before any further claim (plan :902).
-8. Cargo's own lock still serializes builds: expected (plan :903). The main folder's cache is not yours (plan :904-905).
+7. After the last bite or plant, touch and rebuild before any further claim (plan :915).
+8. Cargo's own lock still serializes builds: expected (plan :916). The main folder's cache is not yours (plan :917-918).
 
 **Your files, and only these** (Lanes :863-865; advisor cond 10 (b), :145-146): check.mjs and check.test.mjs;
 Cargo.toml (2.5's lines) and Cargo.lock (2.5); crates/hash-wasm/ (new); crates/lab/ (src/, the recordings manifest,
@@ -688,7 +703,7 @@ crates/judge, marks/, docs/, the ops/ scripts or results/.
   in any folder, the session scratchpad included (this brief's drafter slipped so: u4d2-brief-notes.md, "Own slips"):
   read an older revision with `git show <sha>:<path>`, and let the runner's log hold a command's output.
 - Git only in your worktree (`cd <worktree> && git ...`), never `git -C` or `git -c`; commit nothing and push nothing;
-  the main session merges, one lane at a time (plan :910-913).
+  the main session merges, one lane at a time (plan :923-926).
 - **The stop clause:** "a failure in npt-hash-wasm or npt-lab, in check.mjs's deps or wasm step, or in check.test.mjs,
   or in a test that reads their files, stops your step group (report it), unless your step's plan names it as expected
   (a pin your step re-pins, or a test a later step rebuilds): then record it under TE2-5 with its cause and the step
@@ -731,8 +746,8 @@ Run from spikes/netcode-proof/ in your worktree, each as a counted run under sec
 3. fmt: check.mjs's fmt step (`cargo fmt --all --check`, :1595); a diff is applied by Edit (section 4's write rule).
 4. The `wasm` step's wall time: each timed call of 2.4 (a), cold (its first run: the release builds not yet in the
    shared target) and warm (a second run), each labelled "under the runner's touch loop" (each cargo call rebuilds the
-   workspace's crates), against the 5-minute budget (plan :676); the infra-engineer reviews these figures (2.4 (a): no
-   CI job runs check.mjs).
+   workspace's crates), against the 5-minute budget (plan :679-680); the infra-engineer reviews these figures (2.4 (a):
+   no CI job runs check.mjs).
 5. The Wasm file's size: the release `.wasm` of npt-hash-wasm, raw bytes and gzip -9 bytes, measured and bites builds
    (reported, not judged: ADR 0002:264-266 leaves the budget to the spikes; wasm-opt is U7's).
 6. h7 (ii) by name on the release build, its libtest summary line; h7 (iii)'s three probe runs.
@@ -801,7 +816,7 @@ Run from spikes/netcode-proof/ in your worktree, each as a counted run under sec
 | R17 | U4e's patch touches crates/room, crates/client, crates/server only | wip/u4e.patch; e-r1 R9 M1 | 1.2 | yes (merged or not) |
 | R18 | U2's full v1 fate-log SHA-256s and their committed prefixes | 3.1's note on carry 66 | h7 | no |
 | R19 | Carry 65 not yet made: `run` joins stdout before stderr, main prints 40 lines | check.mjs:1402, :1649 | 2.4 (f) | yes |
-| R20 | The base counts at 28a85e7: measured 399, bites 446, self 52 of 52, 10 steps | the card's resume card, its "Merged into the spike branch" bullet | section 4 rule 5 | yes (`<<P6>>`) |
+| R20 | The base counts at 28a85e7: measured 399, bites 446, self 52 of 52, 10 steps | the card's resume card, its "Merged into the spike branch" bullet | section 4 rule 5 | yes (P6: re-checked at launch; the same at bfda3cd) |
 | R21 | npt-lab has serde_json and sha2; it dispatches `probe` alone | lab/Cargo.toml; main.rs:186-213 | 2.3, 2.5 | no |
 | R22 | The -3 script records each probe line as printed and reads its binary from the main folder's target | ops/runs/c-u2-pm-0001-3.mjs:43-45, :52-59, :65-72 | carry 66, h7 | no |
 | R23 | std 1.99.1 keys wasm32-unknown-unknown's `HashMap` from a stack and a heap address | the URL in 2.4 (a) item 6 (notes F20) | 2.4 (a), 2.7 | no |
@@ -810,15 +825,16 @@ Run from spikes/netcode-proof/ in your worktree, each as a counted run under sec
 | R26 | The probe runs on simulated time, 1,000,000 packets by default; `probe::run` is callable from a test; the `#[ignore]` run-by-name precedent | lab/src/main.rs:1; probe.rs:20-22, :116; sim/tests/world.rs:1188 | h7 | no |
 
 ### 7.2 Left for the main session at launch
-1. **`<base>` and its counts (`<<P6>>`).** The spike branch's head. If spikes/ at `<base>` differs from 28a85e7
-   (`cd /home/user/Shamble-Frontlines && git diff --stat 28a85e7 <base> -- spikes/netcode-proof`), give its counts from
-   a counted run in the main folder through main-run.sh (the shared target, the lane lock held exclusively:
-   main-run.sh:1-20), as U4e's 7.2 item 1: the test step's two counts, self's "K of K", the step count; if not, they
-   are 399, 446, 52 of 52 and 10 steps (R20).
-2. **The runner (`<<P7>>`).** u4d2-run.sh: u4e-run.sh with the log check's folder `.gate/u4d2/` (u4e-run.sh:30-33), its
-   header naming U4d2, and one option more, `-k`, given after `-x` when both are: every command of the call runs even
-   after one fails, each exit code logged as now, and the call exits with the first non-zero code; without `-k` it stops
-   at the first failing command, as u4e-run.sh:74-88 does. Nothing else changes (the advisor's U4d2 brief check, A2).
+1. **`<base>` and its counts (P6: bfda3cd; 399, 446, 52 of 52 and 10 steps, its spikes/ being 28a85e7's; done at
+   launch).** The spike branch's head. If spikes/ at `<base>` differs from 28a85e7 (`cd /home/user/Shamble-Frontlines &&
+   git diff --stat 28a85e7 <base> -- spikes/netcode-proof`), give its counts from a counted run in the main folder
+   through main-run.sh (the shared target, the lane lock held exclusively: main-run.sh:1-20), as U4e's 7.2 item 1: the
+   test step's two counts, self's "K of K", the step count; if not, they are 399, 446, 52 of 52 and 10 steps (R20).
+2. **The runner (P7: u4d2-run.sh, sha256 d1fd0e7e…; done at launch).** u4d2-run.sh: u4e-run.sh with the log check's
+   folder `.gate/u4d2/` (u4e-run.sh:30-33), its header naming U4d2, and one option more, `-k`, given after `-x` when
+   both are: every command of the call runs even after one fails, each exit code logged as now, and the call exits with
+   the first non-zero code; without `-k` it stops at the first failing command, as u4e-run.sh:74-88 does. Nothing else
+   changes (the advisor's U4d2 brief check, A2).
 3. **The placeholders, by script, each checked after the copy** (the anchor found once, the copy's first and last
    words as named, the placeholder gone from its one home outside this list, no other byte of the brief changed; this
    list keeps the names as the record; P6 and P7 are values, filled wherever they stand outside this list; a source span
@@ -844,13 +860,13 @@ Run from spikes/netcode-proof/ in your worktree, each as a counted run under sec
    Q10, Q11, A1 and A13) is in the main session's own commit, as the U4e brief ruling's L2 did.
 5. **U4e.** If it merged before launch, `<base>` holds it and item 1's counts include it, and its merge commit's T2
    (carries 73-81 above §U4d2) and T6 (plan §4.1's rows) have moved lines: item 8 applies. Else the two lanes run side
-   by side (e-ruling L4) and merge one at a time, the second merge recomputing the counts (plan :870-871; e-r1 R9 M2,
+   by side (e-ruling L4) and merge one at a time, the second merge recomputing the counts (plan :883-884; e-r1 R9 M2,
    M5).
 6. **Carry 65.** If the main session makes it before launch (j-r2 :158-160), name its commit here and in 2.4 (f).
-7. **The review panel** (plan :701-702): rust-reviewer (the exception, Wasm), engine-architect (the boundary),
+7. **The review panel** (plan :710-712): rust-reviewer (the exception, Wasm), engine-architect (the boundary),
    test-engineer, infra-engineer (the step's time against its budget, from your cold and warm figures: no CI job runs
    check.mjs, A1); security-auditor (the third `unsafe` exception, and check.mjs's unsafe and rustflags scans: A12); at
-   effort xhigh, counting toward the three-agent limit (plan :872-873).
+   effort xhigh, counting toward the three-agent limit (plan :885-886).
 8. **Re-stamp and re-check at launch.** Re-stamp section 0's sha256 of plan, carries, history and the card; if the
    plan's moved (the advisor's U4d2 brief check's plan edits, L2, move lines below §4.11; U4e's merge applies T6 to §4.1
    in place), re-check every plan cite and every u4s-carries.md cite of this brief (T2 inserts carries 73-81 above
