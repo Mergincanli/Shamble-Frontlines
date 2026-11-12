@@ -38,3 +38,17 @@ rule them. I write only this file and the script.
     neither ruling changes it: not by script, for the main session / the advisor.
   - T7 (r2 :364; old text :360-362) -> catalogue :90, the `Resync` row's Authority cell, in its line; cell still starts
     "Sender:"; bar count unchanged.
+- Phase B dry run: exit 0, every assert passed, 10 edits (carries 73-81 and C-U6-12..16 asserted absent first).
+  - T2 (1) (r1 :507-552; place :505) -> carries 73-77 after entry 69, the last of §U4r (:322).
+  - T2 (2) (r1 :558; spans :554-556) -> entry 62 (h): "all" -> "measured", the sentence after "If it is not 0, ...";
+    :308-310 refilled to 6 lines at indent 4.
+  - T2 (3) (r2 :232-256, replacing r1 :562-573) -> carry 80 after entry 46, the last of §U4f.
+  - T2 (4) (r1 :577-589; place :575) -> carries 78, 79 after entry 70, the last of §U4g.
+  - T2 (5) (r1 :593-598; place :591) -> carry 81 after entry 45, the last of §U4h.
+  - T3 (r2 :265; old text :260-263) -> plan.md:1246, the U6 row's end, in its line.
+  - T6 (r1 :690/:694, :699/:703, :707/:711) -> u4-build-plan.md §4.1 :194 (room, whole), :195 (server, end from
+    "bites builds only:"), :193 (client, whole).
+  - T5 (r2 :275-356) -> u4e-report.md at ANCHOR (simulated: the report does not exist yet); 26 `<...>` places left for
+    the main session's fills from M5's lines.
+- Re-run after moving the C-U6 check to phase B's start: both outputs byte-equal to the first runs; the usage guard
+  refuses no or a wrong --phase; every target's sha256 unchanged; no u4e-report.md written. DONE.
