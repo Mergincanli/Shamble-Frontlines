@@ -60,7 +60,7 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    with `Workflow({scriptPath, resumeFromRunId})`. On return: read its section 6 list and every stop in full; snapshot
    the worktree (worktree_patch.py) and commit it; then the review per 7.2 item 7's panel (rust-reviewer,
    engine-architect, test-engineer, infra-engineer, security-auditor), with U4e's seats counted in the three.
-- The saver runs as bqfxl74jk (restart it when it stops, with run_in_background and timeout 7200000: without the
+- The saver runs as bgh9k5ryb (restart it when it stops, with run_in_background and timeout 7200000: without the
   timeout the harness stops it at 30 minutes, as it stopped bg29bb0pt at 16:42 UTC). The chat's size goes in every
   report.
 
@@ -89,7 +89,9 @@ advisor-u4-wave1.md (with B1.4's erratum), advisor-u4j.md, advisor-u4d-close.md,
 advisor-u4e-brief.md, advisor-u4df.md.
 - **Merged into the spike branch:** U4s f080551, U4b 411eeee, U4a 952f734, U4c f3f7c2f, U4d with W1-S1's npt-proto half
   39f4290 (report u4d-report.md), U4j 4d2b0ef and d50396a (u4j-build.md), and **U4d-F** (the commit "U4d-F: the
-  estimate scene fix (npt-sim), merged after review round 2", adb1bab; report u4df-report.md; record u4df-build.md);
+  estimate scene fix (npt-sim), merged after review round 2", adb1bab; report u4df-report.md; record u4df-build.md),
+  and **U4e** (c88eb31, "U4e: the room and the codec path (npt-room, npt-server's library, npt-client), merged after
+  review round 2"; report u4e-report.md; record u4e-build.md; counts at its merge 473 / 541 / 52 of 52, 10 steps);
   CI green on each (U4d-F's: run 43137225827). Main merged in at 5ca77eb (PR #49). At U4d-F's merge: check.mjs 10
   steps, measured 399, bites 446, self 52: the base counts for the next lanes. U4e's `<base>` is L3's commit 28a85e7,
   with the same counts (its counted run, .gate/u4e-l3/l3-check.log; the accessor adds no test).
@@ -262,7 +264,8 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
   `.gate/u4a-prefix`, `u4b-prefix`, `u4b-wt`, `u4c-prefix`, `u4d-prefix`, `u4d-s1`, `u4j-prefix`, `u4df-prefix`,
   `u4df-r1` (after U4d-F's merge), `u4e-prefix`, `u4e-r1`, `u4e-empty` (after U4e's merge); `.claude/worktrees/`
   agent-a9297644e7c0354f3 (U4a), wf_f54246ff-e0d-1 (U4d), wf_f54246ff-e0d-2 (U4c), agent-a3b8dfeb01ed52b50 (U4j,
-  merged at 4d2b0ef), wf_9ce88fa3-452-1 (U4d-F, merged 2026-11-12).
+  merged at 4d2b0ef), wf_9ce88fa3-452-1 (U4d-F, merged 2026-11-12), wf_0fa6595a-3e2-1 (U4e, merged at c88eb31; its
+  untracked notes are on the branch) and `.gate/u4e-merge/` (logs only; keep for the report).
 
 **Open questions for Mustafa:** none open.
 - Answered today (verbatim in history.md): NIGHT-BUDGET (a); the drift fix before U4d2's pins (carry 52); the effect
