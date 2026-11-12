@@ -25,7 +25,8 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    473 / 541 / 52, marks 81, redact 0, the by-name lines), M6-M7 (gate), M8 (phase B with u4e-report.md written first,
    its anchor in place; one commit; `git rm` wip/u4e.patch), push, M9.
    **U4e MERGED at c88eb31** ("U4e: the room and the codec path (npt-room, npt-server's library, npt-client),
-   merged after review round 2", pushed about 18:20 UTC; CI pending): M1-M8 met (u4e-build.md, "Merge into the
+   merged after review round 2", pushed about 18:20 UTC; CI green: gate runs 43278864804 push and 43278878105
+   pull_request): M1-M8 met (u4e-build.md, "Merge into the
    spike branch"; u4e-report.md). M3 the snapshot = 4300944's wip/u4e.patch (cmp; 1c31eeee…), applied; M4 23 of 23
    OK; M5 phase A, then check.mjs all 10 steps PASS: 473 / 541 / 52 of 52, marks 81 (ADR rows unchanged), redact 0;
    the by-name lines (e7's = the fix pass's); M6 no failure; M7 gate PASS with `--no-smoke` (5a cannot start this
