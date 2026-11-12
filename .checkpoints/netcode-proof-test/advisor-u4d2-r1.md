@@ -314,3 +314,66 @@ I re-checked the 17 hashes myself (Notes).
   contradicts the seat.
 
 Block 5 written 2026-11-12.
+
+### Block 6. Item 6: the builder's points (done)
+- **TE2-5 mid-build (62 of 63 in check.test.mjs, a failure its step plan did not name): outside the stop clause's
+  letter. The outcome stands; it is recorded as a process slip (Low) and nothing is redone.** The clause (u4d2-brief.md
+  :707-710) says "a failure ... in check.test.mjs ... stops your step group (report it), unless your step's plan names
+  it as expected (a pin your step re-pins, or a test a later step rebuilds)". The failing test (check.test.mjs:205-222)
+  was neither of those, so the step group should have stopped and reported. "My own unfinished code" is not one of the
+  clause's exceptions, and it should not become one: the clause exists for the moment a builder judges its own failure.
+  The judgement was right here, and that is proven, not assumed. The test is byte-identical to `<base>`'s (the test
+  seat's sed diff). The fix was in the builder's new rule (check.mjs:138's `&& all.has("npt-sim")`). TP9 (r1-te-tp9-te25.log)
+  shows that undoing the fix makes the unchanged test fail by name, so the test still pins what it pinned. The
+  fix-pass brief carries the clause as written, and the report records the slip in T5. The builder's other TE2-5
+  entries (h2's placeholder vector, the manifest's zero hashes, its own test errors) were named in advance by design or
+  were failures in its own new tests: within the clause.
+- **The three early `npt-lab hash` runs under the shared lock (b3-lab1 to b3-lab3; rule 2 asks `-x`): a process slip
+  (Low), recorded, no redo.** None is a reported result. Each printed a placeholder's expected failure, and the three
+  SHA-256 values it supplied were checked under `-x` by b3-lab4 ("as the manifest's") and by every counted run since
+  (manifest `check()` binds length and SHA-256). A run from another copy's artifact could only have printed a value
+  that those `-x` runs would then refuse.
+- **rustfmt's diffs applied by Edit after the cut: within the write rule** ("never `cargo fmt` writing files: apply
+  rustfmt's diff by Edit"); b8-rust2 shows fmt clean. Nothing to rule.
+- **Its open choices:** the cold run is INF-1 (Block 1: report text now, the cold figure after the between-waves clean,
+  no exception). `--digest-field` at the native layout's indexes is RR-L3 (Block 3: FX-8).
+
+Block 6 written 2026-11-12.
+
+### Block 7. Item 7: the main session's points (done)
+1. **The restamp's stale plan cites: confirmed, with one addition.** At 3f58ff0d (the plan at 51520b4) the brief's
+   section 1 item 6 (:141-143) and its :173 read §5 U4d2 at :666-712, Lanes at :850-888, §6's U7 line at :898-900 and
+   §7 at :908-931 (headings read: 666/714, 850/890, 898, 908/933). **Also stale in the same item (:143):** "U4r's lines
+   that reuse your work (:766-767, :790-792)", which read :776-777 and :800-802 at 3f58ff0d (the same text, read at
+   both stamps). §4.1, §4.11, §4.14, §4.15, U4d's lines and §2's rows did not move. Nothing was built short because of
+   it. The builder built §5 U4d2 to its end, Q11's two plants included (P5, P6). The seats judged against the whole
+   section, and the arch seat found every path inside the Lanes line's U4d2 list. The brief is a closed record of what
+   was built, so no re-fold is needed: T5 says it in one line. For the fix pass's brief, cite the plan by section
+   heading, not by line.
+2. **Carry 66's header param row: the main session writes it, in U4d2's merge commit, by script from T4 below, applied
+   before M5's counted run.** The marks step and npt-net's name tests read SERIES.md. marks/ is in no wave-2 lane
+   (Lanes), and U4e's merge carried its own SERIES.md row the same way (advisor-u4e-r1.md T4). The builder's proposed
+   words are kept, with the Values cell saying what the hash is. The Used-by cell is "-3 (recorded)", the form the
+   table's other recorded params use.
+3. **A13: right not to wait; it is now committed, and I checked the commit.** 1b4a3c8 changes one file,
+   crates/server/clippy.toml (`git show --stat`: 5 in, 1 out). Its blob equals the working tree's (a82dd3e7…). spikes/
+   is otherwise unchanged since c88eb31 (`git diff --quiet`, exit 0). The diff is the room file's two type entries
+   plus a header naming Q9 (a), §4.11 and A13 (read). The plant log shows clippy on the main folder's npt-server
+   refusing a scratch HashMap at lib.rs:20 and :21, exit 101 (a13-plant.log:13-36). The control exits 0. check.mjs
+   counted passed all 10 steps, 473 / 541 / 52 of 52, marks 81 (a13-check-counted.log). Its log has no provenance lines
+   because no pre-build ran; for a clippy.toml-only change the plant log's "Checking npt-server (<main folder>)" line is
+   the provenance that matters. Why no wait: crates/server is in no open lane (U4e merged), U4d2 changes no server
+   file, and check.mjs reads no server/clippy.toml (CLIPPY_TWINS is sim and proto only). Left: CI's gate and smoke on
+   the pushed head, which M2 checks. U4d2's merge then applies on a head that holds it (M2 names it).
+4. **The "two exceptions" text: confirmed, with one more place.** None outside U4d2's lane. Inside it there are three,
+   all in check.test.mjs: :328 (a test name), :364 (a comment) and **:529** ("unsafe code outside the two exception
+   crates fails however the lint was relaxed (review S1)", a test name). Each says "three", or names what it means, in
+   FX-11. Renaming a test changes no count.
+5. **The merge's counts: confirmed as the method, with the fix pass's deltas added.** On c88eb31 (473 / 541 / 52 of 52,
+   10 steps; A13 left them unchanged), U4d2's round-1 deltas (+17, +19, +11, +1 step) give 490 / 560 / 63 of 63 and 11
+   steps. The fix pass adds its own (FX-8's unit test, +1 in each build; its new self-tests). M5 expects 490, 560 and
+   63 plus the fix pass's deltas, each named, the sums shown. Interactions only the merged run can show are named in M5:
+   the features comparison now walks U4e's npt-server library, and the wasm step's npt-lab release build carries U4e's
+   crates. The counted run goes in the background with a limit of at least 1,500,000 ms (INF-5; U4e round 2's Q4).
+
+Block 7 written 2026-11-12.
