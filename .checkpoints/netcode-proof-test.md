@@ -4,7 +4,7 @@
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main, last merged in at bfda3cd (main 2aa5e9c, PRs #50 and #51, the legacy game into legacy/)
-- **Last update:** 2026-11-12 about 16:30 UTC (main merged in; U4d2's brief rev 1.2; U4e's round 2 in its last seat)
+- **Last update:** 2026-11-12 about 20:55 UTC (U4e merged at c88eb31; U4d2 built; U4d2's review round 1 running)
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
@@ -61,11 +61,27 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    to rule); three early `npt-lab hash` runs took the shared lock (none a reported result); rustfmt's diff applied by
    Edit after the cut. Left for the main session: the review panel, carry 66's SERIES.md row, server/clippy.toml's
    type bans (Next steps 4), the counts on the merged U4e head. **Snapshot:** wip/u4d2.patch (17 files on 51520b4,
-   sha256 a526ef8e…; `git apply --check` clean on c88eb31), notes u4d2-build.md copied. **Next (after Mustafa's
-   compact):** read its section 6 list in full (journal of wf_e3cb6af2-079, the result's `section6`), cut the review
-   packet by review_packet.py (ALLOWED: advisor-u4e-brief.md alone; advisor-u4d2-brief.md would need its addition
-   noted in history.md), then 7.2 item 7's panel (rust-reviewer, engine-architect, test-engineer, infra-engineer,
-   security-auditor; at most three agents at a time), then the advisor's ruling with the builder's points.
+   sha256 a526ef8e…; `git apply --check` clean on c88eb31), notes u4d2-build.md copied. **(f) Its section 6 list
+   read in full** (the result's `section6`, 14 items; nothing in it stops the review). **(g) The packet:**
+   advisor-u4d2-brief.md added to ALLOWED (addition 1; history.md's note at its end; review_packet.py 7d887492…;
+   packet_name_check.py 12 of 12); u4d2-packet.md cut from u4d2-packet.json (sha256 9b670276…, 373 KB; its side file
+   u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
+   `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
+   **(h) Running: U4d2's review round 1,** workflow wf_9294c443-01a (task wshmxx2ps; script
+   workflows/scripts/npt-u4d2-review-r1-wf_9294c443-01a.js), launched about 20:50 UTC. Batch 1 (Read):
+   rust-reviewer, security-auditor, infra-engineer (runs in the builder's copy through u4d2-run.sh while nobody
+   plants; the infra seat times `--only wasm` with `-x`). Batch 2 (Prove): engine-architect (the read copy, no runs)
+   beside the test-engineer (general-purpose with Edit; plants by Edit in the builder's copy; one counted check.mjs).
+   Notes u4d2-review-{rust,security,infra,arch,test}.md; logs .gate/u4d2/r1-*. If cut: check every file's sha256 in
+   the builder's copy against the test seat's step (1) (a plant may be in place, P6's in crates/sim/src/world.rs),
+   then resume with `Workflow({scriptPath, resumeFromRunId})`. On return: read every finding rated Medium or higher
+   in full, and everything touching the judge, the marks or a pass bar; then the advisor's ruling, with the
+   builder's points (TE2-5's unnamed check.test.mjs failure; the three `-s` runs b3-lab1..3; rustfmt's diff by Edit
+   after the cut; its open choices: the cold time, `--digest-field` at the native layout's indexes) and the main
+   session's own: (1) u4d2_restamp.py left the bare-colon plan cites of section 1 item 6 and of line 173 at
+   686a583c: at 3f58ff0d they read §5 U4d2 :666-712 (not :666-702), Lanes :850-888 (not :840-875), §6's U7 line
+   :898-900 (not :885-887), §7 :908-931 (not :895-918); (2) carry 66's SERIES.md row; (3) A13's server clippy item
+   (Next steps 4); (4) the "two exceptions" text outside U4d2's lane; (5) the counts on c88eb31 at the merge.
    (d) U4d2's build ran as workflow wf_e3cb6af2-079 (task w0yn65lgt since its resume at
    17:42 after the 16:50 cut, blocks 0-2 done; script workflows/scripts/npt-u4d2-build-wf_e3cb6af2-079.js), launched
    about 16:28 UTC: one builder (general-purpose, opus,
@@ -76,8 +92,8 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    with `Workflow({scriptPath, resumeFromRunId})`. On return: read its section 6 list and every stop in full; snapshot
    the worktree (worktree_patch.py) and commit it; then the review per 7.2 item 7's panel (rust-reviewer,
    engine-architect, test-engineer, infra-engineer, security-auditor), with U4e's seats counted in the three.
-- The saver runs as bgh9k5ryb (restart it when it stops, with run_in_background and timeout 7200000: without the
-  timeout the harness stops it at 30 minutes, as it stopped bg29bb0pt at 16:42 UTC). The chat's size goes in every
+- The saver runs as bl8bwppxu (since 20:11 UTC; restart it when it stops, with run_in_background and timeout
+  7200000: without the timeout the harness stops it at 30 minutes, as it stopped bg29bb0pt at 16:42 UTC). The chat's size goes in every
   report.
 
 **Cuts by the spend limit** (SPEND-LIMIT (a), Mustafa 2026-11-12: at every cut, the notice's exact text, the time of

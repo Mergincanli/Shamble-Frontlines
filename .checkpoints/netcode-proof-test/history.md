@@ -1972,3 +1972,17 @@ From "Next steps, in order" (as it was):
     branch's 22-line block of the 2026-11-06 answers; STATUS.md: this branch's #40 row, its state brought up to date,
     then main's #51 row). Checks: rules, CI and gate files equal main's; repo-map check OK; check.mjs --only
     marks,refs,redact all pass; gate PASS --no-smoke.
+
+## Note: an addition to review_packet.py's ALLOWED (Mustafa's words of 2026-11-12, item 2), 2026-11-12 about 20:40 UTC
+- Addition 1: `.checkpoints/netcode-proof-test/advisor-u4d2-brief.md`, the exact path.
+  - Written by the advisor agent as its ruling: its title "The advisor's check of the U4d2 builder brief (rev 1.1),
+    2026-11-12"; its seat line "a day session's advisor (workflow agent, opus), on main's `.claude/agents/advisor.md`".
+    The run: workflow wf_6f64e718-539 (npt-u4d2-brief-advisor), one agent, "advisor:u4d2-brief", general-purpose,
+    opus, reading `git show origin/main:.claude/agents/advisor.md`; completed 13:29:54 UTC. The file's last commit is
+    the saver's 90f2bfd (13:34:18 UTC); `git diff --stat 90f2bfd HEAD` on it is empty, so nobody changed it since.
+  - The packet that needs it: U4d2's review round 1 (u4d2-packet.json). The build is judged against this ruling:
+    U4D2-Q1 to Q12, findings A1 to A15 and conditions L1 to L5.
+  - Not added: any brief of the main session's or a builder's. Every other name the pattern forbids stays refused.
+- review_packet.py after the addition: sha256 7d887492…. packet_name_check.py now has 12 cases: case 6 wants "pass"
+  for this file, and a new case 7 wants "refused" for advisor-u4e-r2-brief.md, the main session's fifth brief to the
+  advisor. Result: 12 of 12 as wanted (.gate/packet-name-check/).

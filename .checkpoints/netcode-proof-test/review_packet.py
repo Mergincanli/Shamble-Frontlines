@@ -22,7 +22,8 @@ FORBIDDEN = re.compile(r"(-build\.md|-brief[^/]*\.md|netcode-proof-test\.md|-rep
 # The exact paths that pass although FORBIDDEN matches them (Mustafa, 2026-11-12, verbatim in history.md): only files
 # the advisor agent wrote as its ruling, added one at a time when a packet needs one, each addition noted in
 # history.md. A file written by the main session or a builder never goes on this list.
-ALLOWED = (".checkpoints/netcode-proof-test/advisor-u4e-brief.md",)
+ALLOWED = (".checkpoints/netcode-proof-test/advisor-u4e-brief.md",
+           ".checkpoints/netcode-proof-test/advisor-u4d2-brief.md")  # addition 1 (history.md's note at its end)
 # Mustafa's own words reach a packet only from history.md, by line range, with "words_of_mustafa" set.
 WORDS_OF_MUSTAFA = ".checkpoints/netcode-proof-test/history.md"
 
