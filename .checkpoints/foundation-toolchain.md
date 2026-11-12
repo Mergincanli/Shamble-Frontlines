@@ -376,14 +376,26 @@ ready, the report final, the checkpoint folded and deleted by hand, ready, the a
    with their own block, a skeptic's verdict input never a filter, mutations only in a copy under .gate/, `git status`
    checked after each run; the saver's id and the finished docs workflow in Running work; the Fable read before ready
    is whole.
-Count: 5.
+6. 2026-11-13 ~00:20 Amsterdam (5 of 17 skeptics in) · moment 4, D1 = RR-1 (High, confirmed by its skeptic, fix A
+   tested): fix now or ask him to defer? · changed: no Cargo.toml edit until the advisor agent rules (after the
+   skeptics finish, so it is not a fourth agent), as a general agent reading main's advisor.md, given RR-1, the D1
+   skeptic's notes and three routes (fix A, fix B, defer), and asked to settle the "*" override (dependencies unchecked
+   in release) and whether ADR part 4 and PM-0002-53 get a dated pointer in this PR (a decision-doc line, his go); if
+   fix A: one commit with a comment that claims only what holds (D13 rides it), Cargo.lock unchanged, the cross-crate
+   script re-run locally, M7 planted (the new line removed) with no push until its revert is green, M5 and step 2's
+   control labelled historical, the stale lines fixed, OVERFLOW-PER-CRATE dropped as moot, two 2.3 items (the
+   cross-crate release test, native and wasm32, a CI edit; a cost measurement over every workspace crate), a third
+   decision for him (workspace-wide checks, or back to the ADR's blocks with narrowed wording; room's and the server's
+   own overflows then panic), and round 2 on what changed with rust-reviewer and test-engineer at least. The advisor
+   tool's own earlier S3 and "matches ADR parts 2 to 4" compared wording, not the goal.
+Count: 6.
 
 ## Running work
 - workflow wf_b82244e7-a22 (review round 1, run 1): done, 5 of 5 (step 26).
 - workflow wf_fcb65072-3e7 (task wlv2eos3o): review round 1, run 2, the skeptics; script `.checkpoints/foundation-toolchain/skeptics-r1.js`
   (copy of the scratchpad's); launched ~23:55 Amsterdam; resume with resumeFromRunId wf_fcb65072-3e7 and the same args
   (the head 4d78ad61e652f2e35ddf51c49557e725420248c8 and the 17 ids, gists and merges).
-- saver: background task bgb28hxv6 (restarted after the container restart, which ended b52patinz).
+- saver: background task bw54oxpqz (bgb28hxv6 ended at its time limit, 23:39 UTC; b52patinz by the container restart).
 - saver: background task b52patinz (restarted 2026-11-12 ~22:30 Amsterdam after M6's revert; the worker restarted three
   times that evening and ended the earlier savers bg5v6agjr and b3kk7q32m).
 - workflow wf_29ac478b-0a7 (step 6's docs: docs-keeper and one fact checker): done, 2 of 2; its findings fixed in 13feadc.

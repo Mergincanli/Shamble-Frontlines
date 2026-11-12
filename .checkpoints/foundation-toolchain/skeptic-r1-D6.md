@@ -30,3 +30,39 @@ and the fix. Nothing in the worktree changes but this file.
   key (no restore-keys for npm); cache-save.ts:57-73 save unless the primary key was hit. Every citation in SA-3
   holds (line ranges off by one or two at the edges only). The log line says "packageManager field" even when
   devEngines triggered it (main.ts:81-83).
+- C4 behaviour, not reading (.gate/skeptic-D6/scripts/detect.mjs: the shipped dist's getNameFromPackageManagerField,
+  23 lines extracted by brace matching, run with GITHUB_WORKSPACE on eight folders built from the head's root
+  package.json): head as-is -> undefined (no auto-cache); + packageManager "npm@10.9.9" -> "npm"; + devEngines.
+  packageManager {name: npm} -> "npm"; + the array form [pnpm, npm] -> "npm"; + {name: npm, onFail: warn} -> "npm";
+  + devEngines.runtime only -> undefined; + packageManager "pnpm@9.0.0" -> undefined; no package.json (main today, no
+  root package.json at 2aa5e9c) -> undefined. So the devEngines trigger is real and the recorded text misses it.
+- C5 CI logs of the head's pull_request runs (toolchain job 131510257155, gate 131510254606, smoke 131510255220; all
+  head_sha 4d78ad6, success): each shows `package-manager-cache: true` in setup-node's inputs, then "Found in cache"
+  and "Environment details" only: no "Detected npm" line, no npm cache restore, and the post step prints nothing (no
+  saved state). The only cache in any job is smoke's Playwright cache (actions/cache, hit, not saved). Today nothing
+  is cached by setup-node, on main or here: SA-3's "no restore line" holds.
+- C6 the steps and the path: gate.yml is identical on main (2aa5e9c) and the head; its setup-node steps (:29-31,
+  :60-62) and toolchain.yml:37-39 pass node-version only (no cache, no package-manager-cache, no
+  cache-dependency-path); no `.npmrc` anywhere in the head's tree, so the cached path would be npm's default ~/.npm
+  (`npm config get cache`), the whole folder (_cacache, _logs, _npx, ...). With no cache-dependency-path all three jobs
+  hash the ROOT package-lock.json (findLockFile), though gate and smoke install from tools/package-lock.json: one key,
+  different contents.
+- C7 the cut can write ~/.npm: toolchain.yml:68-73 runs it as `setpriv --reuid="$(id -u)"` with `env -i HOME="$HOME"`;
+  the log (job 131510257155:254) prints uid=1001(runner) inside, and the cut's own `npm ci --offline` reads ~/.npm
+  (log :381 "added 46 packages in 1s"). setup-node's post step (action.yml:46-47) runs after the cut step (log :447,
+  21:37:37.17, after tsc's "Version 6.0.3" at :37.14), only on success. SA-3's "save after the cut" holds.
+- C8 which job's folder would be saved (job times, API): push runs: gate 9 s, toolchain 26 s, smoke 36 s; PR runs:
+  gate 9 s, toolchain 30 s, smoke 48 s. On a key miss all three save under the same key and the first wins (the
+  others hit a reserve collision, cache-save.ts:64-70); with today's times that is the gate job's ~/.npm (tools'
+  packages only), and later runs hit and never save. The toolchain job's folder (the one exposed to code inside the
+  cut) is saved only when gate does not save first (gate red or cancelled: post-if success()), which a PR's own code
+  can arrange. So the sketch is reachable but not the default path; SA-3 says "restore and save" for all three, which
+  is loose (one save lands per key), not wrong in substance.
+- C9 the reach (npm 10.9.9, the runner's version per the log; .gate/skeptic-D6/scripts/poison.mjs, scratch cache):
+  both lockfiles at the head carry sha512 for every registry entry (root 64 of 64, tools 169 of 169; the root's 5
+  others are workspace links). A: the genuine tarball's content file overwritten with junk: `npm ci --offline` exit 1
+  ENOTCACHED, nothing installed; `npm ci` online exit 0, genuine refetched. B: the registry URL's index key repointed at
+  a self-consistent malicious is-number 7.0.0 (its own correct sha512), genuine content deleted: offline exit 1
+  ENOTCACHED, nothing installed; online exit 0, genuine installed, never the malicious one. SA-3's "a failed or slow
+  install, not swapped code" holds. (npx: both jobs' npx calls use `--no` after `npm ci`, so the local bin wins and
+  ~/.npm/_npx is not consulted; not a code route today.)
