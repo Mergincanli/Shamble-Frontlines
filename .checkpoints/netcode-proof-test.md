@@ -38,7 +38,7 @@ advisor-u4e-brief.md, advisor-u4df.md.
   though carry 56's ES figure is reported; carry 61's choice: decode within the ring, drop and count beyond it (does
   B5's extra reading apply?).
 - **Running: U4e's review round 1,** workflow wf_ed170231-913 (task wfdlzh70j; script
-  workflows/scripts/npt-u4e-review-r1-wf_ed170231-913.js), launched about 05:55 UTC. Packet u4e-packet.md (sha256
+  workflows/scripts/npt-u4e-review-r1-wf_ed170231-913.js), launched about 05:50 UTC. Packet u4e-packet.md (sha256
   89426183…) and its side file u4e-packet-tests.md, cut by review_packet.py from u4e-packet.json (the script now
   takes an `advisor-` file whose name holds "-brief"). Base copy `.gate/u4e-prefix` (1e8c188, as L3 says); read copy
   `.gate/u4e-r1` (97bb9d3 plus the patch, byte-equal to the builder's crates). Batch 1 (Read): netcode-architect,
