@@ -130,3 +130,19 @@ line `    let empty = Frame::default();` as anchor). New: `    let left = c.t.bu
   confirmed.
 - Restored by the reverse Edit; room.rs 8c6ec6ca...4848 = start; all 23 OK.
 
+**The main session, 2026-11-12 07:35 UTC (not the test-engineer's text):** this agent was cut at about 06:42 UTC by
+the org's spend limit, after two runs with no notes line here: r1-te-pb-rounding.log (P-B, 06:38:50-06:40:19, exit
+0) and r1-te-pd-group-alone.log (P-D, 06:40:35-06:41:50, exit 0). P-B's plant was no longer in place at 07:35. P-D's
+plant was found in place, client/src/lib.rs:670-674, these five lines after the `let Some(base) = base else { ... };`
+block: `if g > 0 && self.ring[i].got & 1 == 0 {` / `self.refused += 1;` / `self.sentinel(t);` / `return;` / `}`.
+The main session removed them by Edit: client/src/lib.rs sha256 bd83870c...d9cfd9 = start; `diff -rq` of the
+copy's crates/ against .gate/u4e-r1's: no difference; the copy's patch re-cut by worktree_patch.py equals
+wip/u4e.patch byte for byte (cmp). A resumed copy reads both logs for P-B's and P-D's results and records them here.
+
+**Resumed (test-engineer, 2026-11-12, after the cut).** At resume: both copies `sha256sum -c hashes-start.sha256`
+23 of 23 OK; builder copy HEAD 97bb9d3, `git status` the same 6 M and 17 ?? under crates/ (plus the builder's record).
+P-B's log (r1-te-pb-rounding.log): exit 0, every binary ok, but its planted diff is not in these notes, so it proves
+nothing on its own; P-D's log (r1-te-pd-group-alone.log): exit 0, every binary ok (client lib 2, bites 1, endpoint 9,
+gap 6, loopback 6, pump 11, schedule 17), with the plant the main session found (above). I redo both in my own form
+below, with the planted diff recorded, so each result rests on a diff in these notes.
+

@@ -52,13 +52,22 @@ advisor-u4e-brief.md, advisor-u4df.md.
   - **By 06:40 UTC four seats are done** (journal of wf_ed170231-913): netcode REVISE (1 High, 5 Medium, 5 Low; 6
     before the merge), security APPROVE WITH FINDINGS (1 Medium, 8 Low), rust APPROVE WITH FINDINGS (1 Medium, 9 Low),
     arch REVISE (6 Medium, 8 Low; 6 before the merge). The test-engineer is still running (logs .gate/u4e/r1-te-*).
+  - **Cut at about 06:42 UTC by the org's spend limit** ("You've hit your org's monthly spend limit ... your 5-hour
+    limit resets 7:10am (UTC)"): the test-engineer's seat failed mid-run, with plant P-D left in place in the builder's
+    copy (client/src/lib.rs:670-674). **Restored by the main session at 07:35 UTC** by Edit: sha256 bd83870c… =
+    start; the copy's crates/ equal .gate/u4e-r1's (`diff -rq`); its re-cut patch equals wip/u4e.patch (cmp); a
+    labelled main-session block at the end of u4e-review-test.md says so (P-B's and P-D's logs have no notes line).
+    **Resumed 07:38 UTC** (`resumeFromRunId` wf_ed170231-913, task wwogpkxp1): the four done seats replay from cache,
+    the test-engineer runs live (agent ae67a5f5…). Read in full by the main session: every Medium and High of the four
+    seats, and the Lows touching a mark, a bite or the judge (NC-L1 to NC-L4, NC-L5-L12, A7, A13, A14, SEC-U4E-6).
 - **Running: U4d2's builder brief** (next step 3), workflow wf_ec1d2b01-aab (task wgkj3qotm; script
   workflows/scripts/npt-u4d2-brief-wf_ec1d2b01-aab.js), launched 06:45 UTC in the slot round 1's batch 2 left free,
   one agent at a time: the rust-reviewer drafts rev 1 (u4d2-brief.md; notes u4d2-brief-notes.md), the test-engineer
   checks it (u4d2-brief-check.md, in the form of u4e-brief-r3-check.md), the drafter revises (rev 1.1). No cargo
   runs; the carries' words and Mustafa's words are left as placeholders, for the main session to copy by script.
   Then: the main session's fold, and the advisor's check before the build. If cut: resume with
-  `Workflow({scriptPath, resumeFromRunId})`.
+  `Workflow({scriptPath, resumeFromRunId})`. **Its first launch failed in 5 s** (all three agents: the spend limit,
+  06:45 UTC; nothing written); **resumed 07:39 UTC** (task wp2rtgeks).
 - The saver: `node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer
   "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
   https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"` (background, 120 minutes; restart it when it stops). Stop
