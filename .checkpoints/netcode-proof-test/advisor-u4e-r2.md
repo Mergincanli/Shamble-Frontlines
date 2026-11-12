@@ -16,4 +16,6 @@ and sha256 only.
 3. Rule items 1-4, one block each (Q1 ... Q4), then any text, the two lists, and what I checked.
 
 ## Progress
-- [ ] 1 read  - [ ] 2 spot-checks  - [ ] Q1  - [ ] Q2  - [ ] Q3  - [ ] Q4  - [ ] texts  - [ ] end sections
+- [x] 1 read (the brief; advisor.md from main; R1-R9 and T1-T6; the packet whole, sha256 ecf4394a… as the brief says;
+  the five seats' notes whole; the builder's "Fix pass, round 1"; history.md's 15:32 UTC entry)
+- [ ] 2 spot-checks  - [ ] Q1  - [ ] Q2  - [ ] Q3  - [ ] Q4  - [ ] texts  - [ ] end sections
