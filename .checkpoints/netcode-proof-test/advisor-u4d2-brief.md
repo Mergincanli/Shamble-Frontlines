@@ -548,3 +548,208 @@ security-auditor for "deps" changes, and U3c's precedent is exact: the security 
 and check.mjs's scan and found that the scan missed relaxations rustc accepts (u3c-review-security.md S1). The plan's
 U4d2 panel (:701-702) omits it. Fix: security-auditor joins U4d2's review round (read only, xhigh, counted toward the
 limit). Its words are folded into A1's two Reviewers replacements (block 4, edited to carry them).
+
+### Block 8. The main session's points (task item 6) (done)
+Resumed after a usage cut: blocks 1-7 stand as written; the head is d526f91 (autosaves and notes since f94b078; the
+brief, plan, plan.md, carries, df-ruling, j-r2 and e-r1 stamps re-hashed: all as block 1 gives them; spikes/netcode-proof
+still equals 28a85e7).
+
+**(a) The card's stamp of the plan: confirmed, and already corrected.** `git show 1e8c188^:` of u4-build-plan.md hashes
+to d928358b…, the head's to 686a583c…; 1e8c188 (an autosave, "terminated") holds one changed line, L3's §4.1 row
+(`git show --stat`: one file, 1+ 1-). The card's resume line (:16-17) now reads "686a583c…; it read d928358b… before
+1e8c188", and the brief's section 0 stamps 686a583c… (:53). Nothing in the brief rested on the old stamp. The two other
+files that name d928358b (u4d2-brief-notes.md, u4df-packet.md) are records of their day: no change. The lesson is in
+the card already (next step 1: stop the saver before an edit toward a commit that must hold both).
+
+**A13, Medium: npt-server's clippy.toml lacks the type bans my Q9 (a) ruling gave it; the gap is the plan's text.**
+- What: the plan's Q9 (a) (:1002-1005), which I ruled (advisor-u4.md:207), reads "The HashMap and HashSet type bans in
+  room, client, server, lab and bots; the clock bans in server, lab and bots". §4.11 (:393-395) wrote it narrower: the
+  type bans join room's and client's files, and the three new files (server, lab, bots) get "the clock ban". U4b's
+  Builds (:560: "crates/server/clippy.toml with the std and tokio clock bans (§4.11)") and U4b's file followed §4.11:
+  crates/server/clippy.toml (read) bans the clocks only and cites §4.11 in its header. U4b did what the plan said.
+- Reach: small. The workspace denies `iter_over_hash_type` for every crate (Cargo.toml's [workspace.lints.clippy],
+  read), which refuses the order hazard itself; crates/server holds no HashMap or HashSet (src and tests: grep, none),
+  nor do U4e's patch's added lines outside the room's and client's new bans (grep). The type ban is the stricter half
+  Q9 (a) chose. npt-lab gets both bans by U4D2-Q10; npt-bots has no clippy.toml yet (a three-line library stub; its U4
+  half, `Behaviour`, is U4r's: plan :746).
+- Why neither U4d2 nor U4e: crates/server is U4e's lane until U4e merges (Lanes; e-r1 R8's bounds), its fix pass runs
+  on fixed bounds, and its round 2 reviews what changed, which these two lines are not. check.mjs reads no
+  server/clippy.toml (`CLIPPY_TWINS` holds only the sim and proto pair: check.mjs:765), so the change touches no file of
+  U4d2's.
+- Plan §4.11 (the main session's commit before U4d2's launch, with the other plan edits): replace "new clippy.toml files
+  for npt-server and npt-lab, and for npt-bots (all three with the clock ban," with "new clippy.toml files for npt-server
+  and npt-lab, and for npt-bots (all three with the same HashMap and HashSet type bans, by Q9 (a), and with the clock
+  ban," (found once in the flattened plan). U4b's Builds line stays: it records what U4b built.
+- The card's "Next steps", a new item that follows U4e's merge (the main session writes it): "**After U4e's merge,
+  before U4r's brief (the advisor's U4d2 brief check, A13):** crates/server/clippy.toml gains the HashMap and HashSet
+  type bans in the form U4e's room and client files use, and its header names them (Q9 (a); plan §4.11); proof: a
+  scratch `std::collections::HashMap` in crates/server/src refused by clippy by name under the runner (-x), restored by
+  Edit and its sha256 checked; then check.mjs counted, every step PASS and the counts unchanged; its own commit, which
+  the advisor's next ruling on the spike branch checks. U4r's brief gives npt-bots its clippy.toml with both bans
+  (§4.11)."
+- The brief: nothing more. U4D2-Q10's row in section 8's table (block 5) already says the server's bans are the main
+  session's, after U4e's merge.
+
+**(c) crates/client-wasm/Cargo.toml:9-13 still says "two": settled by U4D2-Q9 (block 5).** Read now: "(one of the
+workspace's two unsafe_code exceptions, with npt-tcpinfo's two functions; …)". The comment joins U4d2's lane, comment
+lines only, so the third exception and every text that counts the exceptions change in one commit; the brief's return
+item 9 is reworded to match (block 5).
+
+**A14, Low: the drafter's process slips; recorded, nothing redone.**
+- What: two `cp` copies of rev 1 (the brief and the notes) into the session scratchpad, and one `rustc --print cfg …
+  2>` redirect into a scratch file there (notes :243-246). The sentence the drafter worked under (T4 item 1:
+  "Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; …)") is broken by both:
+  the redirect by its words, the copies by its first clause.
+- Why no redo: neither wrote in the repo or in .gate/ (the working tree was clean at my start; git shows only the
+  brief, the notes, the card and this file changing since f94b078); the brief I checked is the file whose sha256 the
+  task names, read whole; and the one fact the redirect carried (rustc's warning for a cross-target flag, notes F21) I
+  re-ran myself (block 10, where it proves incomplete: A15; the slip did not cause that, the reading did). Rev 1 was in
+  git (3032b88 holds e5869dbf…, the notes' own stamp), so `git show` would have served.
+- Brief, section 4's files bullet: after "then restored and the sha256 checked against the clean file." insert " A
+  `cp`, `mv` or `tee`, and a `>` or `2>` into a file, are shell writes too, in any folder, the session scratchpad
+  included (this brief's drafter slipped so: u4d2-brief-notes.md, "Own slips"): read an older revision with `git show
+  <sha>:<path>`, and let the runner's log hold a command's output." (The anchor occurs once.)
+
+### Block 9. An erratum to my block 4 (done)
+**A7 undercounts T2's carries.** Read again (advisor-u4e-r1.md :504-597): T2 inserts carries 73-81, not 73-77: 73-77
+after entry 69 at §U4r's end (above :323, so above the recordings section), 78 and 79 in §U4g, 80 in §U4f, 81 in §U4h,
+every one above §U4d2 (:407). The drafter's notes F19 had it right. A7's point holds (both sections the brief cites
+move; P1, found by its heading, does not break), but its words change, and they are the ones the fold uses:
+- In A7's replacement for 7.2 item 8, read "(T2 inserts carries 73-81 above §U4d2, 73-77 of them above the recordings
+  section; T6 moves no plan line)" in place of "(T2 inserts carries 73-77 above the recordings section and §U4d2; T6
+  moves no plan line)". Everything else in A7 stands.
+- So the next free carry number once T2 has landed is 82 (block 8's A13 uses none: its item lives in the card).
+
+### Block 10. The read-back's facts, re-run (`rustc --print`, allowed in this run) (done)
+Block 3 left TB-3's facts (R24, notes F21) as the drafter's and the test-engineer's runs. This run allows `rustc
+--print`, so I ran them from spikes/netcode-proof (rust-toolchain.toml pins 1.99.1; `rustc --version`: "rustc 1.99.1
+(58cf8f9c3 2026-10-13)"), output to the terminal only, nothing built:
+| Given | x86_64-unknown-linux-gnu lists | wasm32-unknown-unknown lists | exit |
+|---|---|---|---|
+| nothing | fxsr, sse, sse2 | bulk-memory, multivalue, mutable-globals, nontrapping-fptoint, reference-types, sign-ext | 0 |
+| `-C target-cpu=haswell` | `fma` among them | **no target_feature at all**, warning "not a recognized processor" | 0 |
+| `-C target-cpu=x86-64` / `native` | not run here (F21: x86-64 lists fxsr, sse, sse2) | **none at all**, the same warning (native: one warning per host feature) | 0 |
+| `-C target-feature=-fma` / `+sse2` | fxsr, sse, sse2 | unchanged, warning "unknown and unstable feature" | 0 |
+| `-C target-cpu=bleeding-edge` / `mvp` | **sse, sse2 only** (fxsr gone), warning "target feature `x87` must be enabled …" | bleeding-edge: adds extended-const, relaxed-simd, simd128, tail-call | 0 |
+| `-C target-feature=+simd128` | unchanged, warning "unknown and unstable feature" | not run (the name scan's case) | 0 |
+- TB-3's answer holds: `haswell` lists fma on x86-64 and `bleeding-edge` lists simd128 and relaxed-simd on wasm32, and
+  the name scan passes both, so each live run can fail only by the read-back. The clean lists are F1's.
+- **A15, Medium: a CPU name of the other target's does not "only warn"; it empties wasm32's list.** The brief says "A
+  flag meant for the other target only warns and exits 0 … so giving every flag to both read-backs adds no false
+  failure" (2.4 (c) (ii)), and R24 "a cross-target flag only warns, exit 0". True for target features; false for CPU
+  names. With the brief's own non-vacuity rule (the wasm32 read-back must list `sign-ext`), an x86-64 CPU name in any
+  source fails the step on wasm32, even in `CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS`, which cargo gives to
+  x86-64 builds alone; and TB-3's haswell run, through `RUSTFLAGS`, fails the wasm32 read-back too, a second FAIL line
+  the brief does not expect. Medium, not High: no wrong pass (it fails closed), and the only flags it refuses are CPU
+  names a lawful build never needs (plan.md §4.5's baseline x86-64 is the default CPU; wasm32's is the default too);
+  but a builder meeting an unexplained wasm32 FAIL could loosen the non-vacuity rule to pass it, and the controls'
+  "(whose read-backs list no fma)" invites a whole-step pass the step will not give. My Q4 (a) ruling stands: this is
+  the superset's cost, it refuses no needed flag, and (b) would still be cargo's rules re-implemented.
+- Brief, 2.4 (c) (ii): replace "A flag meant for the other target only warns and exits 0 (measured: `-C
+  target-cpu=bleeding-edge` on x86-64 and `-C target-cpu=haswell` on wasm32; notes F21), so giving every flag to both
+  read-backs adds no false failure." with "A flag meant for the other target warns and exits 0, and a target feature of
+  the other target's (`-C target-feature=-fma` or `+sse2` on wasm32, `+simd128` on x86-64) leaves the list as it is;
+  but a CPU name of the other target's changes it: given `-C target-cpu=haswell`, `x86-64` or `native`, the wasm32
+  read-back lists no target_feature at all, and given `-C target-cpu=bleeding-edge` or `mvp`, the x86-64 one lists sse
+  and sse2 only, warning that x87 must be enabled (rustc 1.99.1, run by the advisor's U4d2 brief check, A15; notes F21
+  saw the warning and the exit code). So an x86-64 CPU name in any source fails the step on the wasm32 read-back's
+  non-vacuity below, even in `CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS`, which cargo gives to x86-64 builds
+  alone: the superset's cost under U4D2-Q4 (a), fail-closed, and it refuses no flag a lawful build needs (plan.md
+  §4.5's baseline x86-64 is the default CPU, so a CPU name adds nothing). That FAIL names the flags the empty read-back
+  was given."
+- Brief, 2.4 (c)'s self-test controls: replace "`-C target-cpu=x86-64` (whose read-backs list no fma: notes F21);" with
+  "`-C target-cpu=x86-64` (whose x86-64 read-backs list no fma: notes F21; the name scan passes all three, and the whole
+  step passes the first two and FAILs the third on the wasm32 read-back's non-vacuity, as A15's sentence above says);".
+- Brief, 2.7's flags row: replace "`RUSTFLAGS="-C target-cpu=haswell"` (the read-back: x86-64 lists `fma`, notes F21;
+  the name scan passes it);" with "`RUSTFLAGS="-C target-cpu=haswell"` (the read-back: x86-64 lists `fma`, notes F21,
+  and the wasm32 read-back lists nothing, so it fails its non-vacuity too: A15; the name scan passes it);".
+- Brief, R24: replace "a cross-target flag only warns, exit 0 | notes F21 |" with "a cross-target flag warns, exit 0; a
+  cross-target CPU name empties wasm32's list and cuts x86-64's to sse, sse2 | notes F21; the advisor's U4d2 brief
+  check, A15 |".
+- Each old phrase occurs once in the flattened brief (counted, read only). Section 8's U4D2-Q4 text stays as asked
+  (block 5's table is the ruling).
+
+### Block 11. The verdict (done)
+**APPROVE for launch, on conditions L1 to L5.** The build may start once L1 to L4 are done; L5 is the launch.
+- Why not REVISE: rev 1.1 answers all twenty findings of the test-engineer's check, the three Highs as asked and TB-7
+  and TB-11 with changes that hold (block 3; U4D2-Q12, block 5); every item of §5 U4d2 and of my conditions 2, 7, 8
+  and 10 (b) is in the brief and ends in an exit code and a runner's own summary line (block 2); the carries routed to
+  U4d2 each have a home, and 67, 71 and 72 rightly stay out (blocks 2 and 6); nothing goes beyond the plan. My
+  findings are five Mediums (A1, A2, A12, A13, A15) and ten Lows (A3 to A11, A14), none High and no security defect
+  (A12 adds a seat; it finds no defect), each with exact words a script can fold; A13 lies outside the brief (plan text,
+  and a main-session item after U4e's merge). The twelve questions are ruled with exact words (block 5). Nothing needs
+  a second check unless the fold goes beyond those words.
+- Risk tier 1 (spike code on PR #40's branch; check.mjs is the spike's own check, not one of tools/' gate files); this
+  ruling is a notes-folder text. U4d2's panel: rust-reviewer, engine-architect, test-engineer and infra-engineer (the
+  plan's) and security-auditor (A12), at xhigh, counted toward the three-agent limit (condition 10 (c)): five seats in
+  batches of at most three, two while U4e's round 2 runs (block 7), one round.
+
+**Conditions (the main session's):**
+- **L1. Fold this ruling into the brief by script (rev 1.2):** block 4's A1 to A10 (A7 as block 9 corrects it; A1
+  carrying A12's seat), block 5's words for U4D2-Q1 to Q12 with section 8's table, the header and 7.2 items 4 and 9,
+  block 6's A11 and its 1.2 sentence for the builder (1.2's replacement only if U4e merged before launch), block 8's
+  A14 and block 10's A15; and, in block 5's replacement for 7.2 item 4, "(advisor-u4d2-brief.md, blocks 4, 5, 8, 9 and
+  10)" for "(advisor-u4d2-brief.md, blocks 4 and 5)" and "(Q2, Q3, Q6, Q7, Q9, Q10, Q11, A1 and A13)" for "(Q2, Q3, Q6,
+  Q7, Q9, Q10, Q11 and A1)"; and, in 7.2 item 8, "if the plan's moved (the advisor's U4d2 brief check's plan edits, L2,
+  move lines below §4.11; U4e's merge applies T6 to §4.1 in place)," for "if the plan's moved (U4e's merge applies T6
+  to §4.1),". Each old phrase is matched with its line breaks and the next line's indent read as one space; I counted
+  each in rev 1.1: once each (A1's ordered pair aside: block 4), and no two replacements share a sentence's anchor. The
+  fold is recorded under the brief's title. If a phrase fails to match, or the fold must change any other word, it
+  comes back to me; otherwise there is no second check.
+- **L2. The plan text, in the main session's own commit, after U4e's fix pass returns and before U4d2's launch:**
+  u4-build-plan.md's edits for U4D2-Q2, Q3, Q6, Q7, Q9 (the Lanes line), Q10 and Q11 (block 5), A1 with A12's seat
+  (block 4) and A13's §4.11 (block 8), each old phrase found once (counted), allowed by my condition 12 through this
+  ruling. They lengthen §4.11 and §5 U4d2 and so move every later plan line, §5 U4e's included: none lands while an
+  agent that reads the plan by line is running (U4e's fix pass works from u4e-brief.md's 41 plan cites). From that
+  commit on, u4e-brief.md's, e-r1's and every earlier ruling's plan cites read at 686a583c (`git show
+  1e8c188:.checkpoints/netcode-proof-test/u4-build-plan.md`), and U4e's round-2 briefs say so. Then 7.2 item 8 runs on
+  the brief: section 0's plan stamp re-set, and every `plan :N` cite whose line moved re-pointed by script (the cited
+  line's text found at its new number; a cite inside an edited paragraph takes that paragraph's new span), each
+  asserted. 7.2 item 6 (carry 65) as the brief says.
+- **L3. The placeholders and the runner (7.2 items 1 to 3, as L1 leaves them):** P1 to P5 and P8 by their anchors and
+  sha256 asserts (block 6: each holds now); P6, `<base>`: the spike branch's head at launch, with `git merge-base
+  --is-ancestor adb1bab <base>` exit 0 recorded, and its counts 399 / 446 / 52 of 52 / 10 steps if `git diff --stat
+  28a85e7 <base> -- spikes/netcode-proof` is empty, else from a counted run through main-run.sh; P7, u4d2-run.sh per
+  A2: its diff against u4e-run.sh (669f7c65…) saved beside it, showing only the log folder, the header and `-k`; and
+  `-k` shown once before launch in U4d2's worktree, in the runner's shared mode (no `-x`): `false :: true` with `-k`
+  exits 1 with both exit codes in its log, and without `-k` its log holds the first only (both logs under
+  .gate/u4d2/).
+- **L4. U4e's order, said to the builder (block 6):** 1.2's added sentence ("If U4e merges while you build, your
+  worktree does not change: …"); if U4e merged before launch, 1.2's replacement with its merge sha, `<base>` holding
+  it, the counts from a counted run, and 7.2 item 8 run for T2's carries 73-81 (block 9) and T6.
+- **L5. Launch as section 1 says:** one builder (general-purpose, opus, xhigh) in its own worktree from `<base>`, under
+  W1-TARGET's lock; at most three agents at a time counting reviewers, so U4e's round-2 seats run at most two at a time
+  while it builds (block 7). A13's server item waits for U4e's merge and is not U4d2's.
+
+**For later briefs and rulings (no action now):**
+- U4r's brief: npt-bots' clippy.toml with both bans (A13; §4.11 as L2 leaves it).
+- U4d2's review round: the infra-engineer judges the step's cold and warm times against 5 minutes, with no CI figure
+  (A1); the security seat reads the third exception and the scans (A12); my merge conditions will follow U4e's M1 to
+  M9 form, with 11 steps.
+- U4e's merge: if U4d2 merges first, e-r1's M5 reads "all 11 steps pass", and its pre-run builds hold section 4 rule
+  3's four release builds (block 6).
+
+## What I checked, and what I did not
+- **Checked, by reading:** block 1's files and code cites; every old phrase this ruling replaces, counted in the
+  flattened brief (blocks 4, 5, 6, 8, 10 and L1: once each, A1's ordered pair aside) or plan (once each), and the
+  anchors that share an item checked for overlap (none); P1 to P5 and P8's anchors and the two closed rulings' sha256
+  (block 6); the plan's stamp history by git (block 8); every crate's clippy.toml, crates/server and crates/lab for
+  HashMap and HashSet, wip/u4e.patch's added lines and `CLIPPY_TWINS` (block 8); T2's carry numbers (block 9).
+- **Checked, by running (read only, nothing written):** `rustc --print cfg` for both targets, clean and with nine
+  flags (block 10); the sha256 of every stamped file; git ancestry and diffs.
+- **Not checked:** I built, tested, planted and timed nothing (the shared target is U4e's fix pass's, and this run
+  allows no build). So the 27,000-tick equality, the Wasm legs, the hash-map bite's outcome on wasm32, the std-sin
+  scan's result, the cold and warm times, the Wasm size and notes F4's `cargo tree` output (the features comparison's
+  inputs) are the builder's to show, each by an exit code. I fetched no web page (F20's std 1.99.1 source: the step
+  decides from the digests it prints, block 3), did not re-run notes F5's `nm -D` (Q8 rests first on the native build
+  never being loaded as a library), and ran neither `-C target-cpu=x86-64` nor `native` on x86-64 (block 10's table
+  says so). U4e's fix pass may still change wip/u4e.patch within e-r1 R8's bounds; block 7's lane reading assumes it
+  keeps them.
+
+## Decisions needed (Mustafa)
+None. Every point here is a technical or test choice inside the documented vision, a route between lanes, or the text
+of my own ruling (Q9 (a)'s type bans put back into the plan's §4.11): mine to decide. No word or decision of
+Mustafa's changes, and nothing he sees, hears or feels is touched.
+
+## For Mustafa
+Nothing. (PR #40 stays needs-mustafa for its existing reasons; this ruling adds no action for you.)
