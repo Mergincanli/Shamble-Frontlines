@@ -38,7 +38,9 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    with `Workflow({scriptPath, resumeFromRunId})`. On return: read its section 6 list and every stop in full; snapshot
    the worktree (worktree_patch.py) and commit it; then the review per 7.2 item 7's panel (rust-reviewer,
    engine-architect, test-engineer, infra-engineer, security-auditor), with U4e's seats counted in the three.
-- The saver runs as bg29bb0pt (restart it when it stops). The chat's size goes in every report.
+- The saver runs as bqfxl74jk (restart it when it stops, with run_in_background and timeout 7200000: without the
+  timeout the harness stops it at 30 minutes, as it stopped bg29bb0pt at 16:42 UTC). The chat's size goes in every
+  report.
 
 **Cuts by the spend limit** (SPEND-LIMIT (a), Mustafa 2026-11-12: at every cut, the notice's exact text, the time of
 the cut and the time of the resume; UTC, read from the session's transcript):
