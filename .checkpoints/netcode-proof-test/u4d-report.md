@@ -39,6 +39,9 @@ below 9.5."
 - **Routing:** Mustafa, 2026-11-11: "The event-rate drift in the estimate scene: fix the scene before U4d2 pins the
   recordings. The 9.5 floor (PM-0001-2) does not move." Written as carry 52 (u4s-carries.md, §U4d2). No U4 run judges
   ES's event band, and the judge fails safe (INVALID, never a false pass).
+- **Fixed by U4d-F** (the commit "U4d-F: the estimate scene fix …"; u4df-report.md): N2-M1's drift and N2-M2's
+  vehicles. Over the judged window (the last 10 minutes of 12), seeds 1-3 give 9.878, 9.743 and 10.098 gameplay
+  events a second at `aim_one_in` 40, and the rate is flat over 36 minutes on nine seeds.
 
 ## Other findings, by route
 - **N2-M2, Medium** (netcode round 2): ES's 15 vehicles loop 40-82 m from the centre while ES needs every vehicle in

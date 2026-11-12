@@ -245,6 +245,12 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     that drops counts each drop per client under a name with its SERIES.md row. A unit test feeds `ClientEndpoint`
     tick t+1's snapshot before tick t's (as L1's reorder step delivers them) and shows t filed under t (its hash, or
     lost if the client drops it; never the sentinel), and that one datagram received twice files one hash."
+68. **NF-L1, ES's bytes and the synthetic recording (u4df-review-netcode.md; the advisor's U4d-F ruling, R3):** "U4e
+    takes no ES snapshot byte or bandwidth figure from `Recording::synthetic`'s ES recording as a measure of ES's load.
+    Since U4d-F that recording's alive soldiers change yaw on about 48 % of soldier-ticks and pitch on about 18 % (its
+    sky aims sit nearly still while the soldier moves), against R2's moving-delta assumption of yaw in every moving
+    update and pitch half the time (docs/research/r2-netcode.md:1751), so its bytes read lighter than R2's estimate.
+    Any ES byte figure U4e reports from that recording states those two shares beside R2's."
 
 ## U4r (the L1 runner and its judged runs)
 40. **O1 (u4-conditions-check.md:42-45; advisor-u4.md:343-347; the advisor's U4s ruling, O1; its last sentence the main
@@ -270,7 +276,11 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     checks on it: shots, gameplay events, live projectiles and spawns in their bands (W1-U4D T-M1's numbers) and the
     share of snapshots whose client set holds all 47 other soldiers and all 15 vehicles. A band or share missed goes
     to the advisor before any ES run of PM-0001-12 counts. The ES runs themselves stay under PM-0001-2's counter
-    script, run by run (ADR 0001:1480)."
+    script, run by run (ADR 0001:1480). Since U4d-F all 15 of ES's hulls loop inside the fight (the advisor's U4d close
+    ruling, B1.3), where they are cover and block moves: on the synthetic recording, at its old reckoning and share,
+    they cut ES's gameplay events from 9.853 to 7.250 a second over 300 s (U4d-F's step 2). The brawl meets the same
+    hulls. U4r's report gives that figure beside its ES suite's event rate, and a missed event band is not read as a
+    bot defect before the advisor has seen both."
 60. **TUNE-1's header (advisor-u4-wave1.md:252-253; the advisor's W1-U4D ruling; homed by the advisor's U4d close
     ruling):** "Each run's header records the scene's weapon (interval, damage, reach, magazine, reload, spread) and
     its soldiers' health, read from `Scene::weapon()` and `Scene::health()`. U4r's runner writes them into npt-lab's
@@ -304,6 +314,11 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     duplicate key (today the last one wins, silently: FU-3); `check_header` refuses any header text field holding a
     character for which Rust's `char::is_control` holds (today it refuses only an empty `run`, `set`, `role` or
     `process`: log/src/lib.rs:305-321; FU-7). Until then both stay open security findings in PR #40's report."
+69. **NF-L1's U4r half (u4df-review-netcode.md; the advisor's U4d-F ruling, R3):** "U4r takes no ES byte or bandwidth
+    figure from `Recording::synthetic`'s ES recording as ES's load: its judged ES runs are the bots' (carry 59). Any ES
+    byte figure it reports from that recording states the recording's churn beside R2's moving-delta assumption: yaw
+    changing on about 48 % of alive soldier-ticks and pitch on about 18 % (U4d-F's scene), against yaw in every moving
+    update and pitch half the time (docs/research/r2-netcode.md:1751)."
 
 ## The next change to crates/judge (whoever makes it; its first step)
 64. **Round 2's judge follow-ups (the advisor's U4j round-2 ruling, B2.2, B3, B4.2, B4.3):** "Before any other edit
@@ -333,6 +348,36 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     prints, so no log text starts a line of its own on stdout; a test with a run id holding a newline and the word
     PASS shows one line printed. Plant: the escape removed."
 
+## Any later change to npt-sim's synthetic recordings, or to the World's outcome on them (whoever makes it)
+67. **NF-M1 and TF-L2, the ES re-measure RM (u4df-review-netcode.md, u4df-review-test.md; the advisor's U4d-F
+    ruling, R1):** "Before the merge of any change that moves the estimate scene's synthetic recording (D-7's ES
+    digest) or the World's outcome on it (t_m1's printed line differs from the base's), and at once whenever t_m1
+    fails, the change's owner runs RM and its report gives the numbers. (1) Runs: seeds 1 to 9, each a 36-minute ES
+    recording (64,800 ticks from tick 1,000,000), replayed and counted as tests/world.rs's `EsRun` counts (an
+    `#[ignore]` test run by name, or a scratch crate on npt-sim's public API outside every copy). (2) The floor, run by
+    run: each seed's window (minutes 2-11) meets PM-0001-2's four ES bands (shots 68.4-75.6 a second, gameplay events
+    9.5-10.5, live projectiles 30.4-33.6 a tick, spawns 20.064-22.176 a second), with 48 soldiers and 15 vehicles on
+    every tick and every hull within 1,400 cm of the cluster's centre. (3) Drift: the nine seeds' mean gameplay-event
+    rate over each 300 s block from minute 2 to minute 31 (six blocks) lies in 9.5-10.5; the least-squares slope of the
+    nine seeds' mean per-minute rate over minutes 2-35 is reported beside it. (4) Every seed's two 300 s halves of its
+    window are reported, not judged: a single half's noise is 0.2-0.36 a second at ES's level. (5) `aim_one_in` is
+    re-set only if (2) or (3) fails at the current value, then to the value whose nine-seed mean window lies nearest
+    10.0 with (2) and (3) passing at it, never on three seeds' in-sample margins; the numbers come to the advisor
+    before D-7 or t_m1 is re-pinned for it. (6) If t_m1 fails while (2) and (3) pass, neither the share nor t_m1
+    changes: the numbers come to the advisor, who rules on t_m1's form. The band and its 9.5 floor do not move
+    (Mustafa, 2026-11-11; carry 52 quotes him). At U4d-F's merge the scene passes RM: windows 9.693-10.171 on seeds
+    1-9; blocks 10.096, 9.692, 9.941, 9.901, 9.799 and 9.857 (u4df-review-netcode.md [10]; .gate/u4df/nc-long.log)."
+71. **NF-L3, 3b's switch (u4df-review-netcode.md; the advisor's U4d-F ruling, R3):** "The generator's re-home (3b) is
+    switched on by a scene's `aim_one_in` above 1 (replay.rs's `synthetic`; scene.rs's `aim_one_in` doc says so), and
+    only ES sets it above 1. A change that would let another scene set `aim_one_in` above 1, or set ES's to 1, first
+    gives the re-home its own pub(crate) scene knob (its period, 0 for none), in that same change and with the
+    advisor's approval of its symbols. Until then no knob is added."
+72. **TF-L1, a_m1's non-vacuity (u4df-review-test.md; the advisor's U4d-F ruling, R3):** "a_m1
+    (tests/world.rs:940) is not vacuous only because SS seed 5's 1,200 ticks hold about two deaths (58 dead
+    soldier-ticks: the test-engineer's U4d-F probe), and two generator-only plants took them away. Before the merge of
+    any change that moves SS's synthetic recording, a_m1 is made independent of the recording's draws: it scripts its
+    deaths through its own inputs, or runs long enough for at least 10, and asserts that count by name."
+
 ## U4f (clock and commands)
 46. **N-M2 = R-M2 = A-C, -21's press twins (advisor-u4-wave1.md:197-235; the advisor's W1-U4D ruling):** "-21's press
     twins: the twin removes exactly the presses the forged run's `reports()` list as refused (slot, seq, kind) and
@@ -346,6 +391,11 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     sequence, exactly as the authority held them after that command. A test: reset from the authority's records at
     tick T, then predict N commands, equals the authority bit for bit (D-3's rule from a reset, not from a clone). U4g
     edits crates/sim for it; no lane holds it then (the F2 ruling, point 6)."
+70. **NF-L2, the synthetic ES recording's teleports (u4df-review-netcode.md; the advisor's U4d-F ruling, R3):** "Since
+    U4d-F, ES's synthetic recording teleports every soldier home once a minute (3b's re-home: about 52 teleports a
+    minute with the random ones, against about 4 before). A predicting client fed that recording meets each one as a
+    forced correction that no network caused, about 52 a minute. Any U4g test or figure that predicts on it counts
+    teleport corrections apart from the others and reports both."
 
 ## U4h (lag compensation and aim)
 28. **netcode F6 / rust 3:** "The ring's span is U4h's test cap plus its margin in ms, recorded; the room builds it with

@@ -704,3 +704,44 @@ a5f123b8a2ddde1deb26437cb981f714d891dbf35fca1fe5daaee536c3799bdd  spikes/netcode
   - What FX-1 adds to the counted suite, by the plants: under Q4 and Q5, t_m1 and a_m1 pass and only D-7's pin failed
     beside FX-1; under Q1, Q2 and Q3, t_m1 failed too (by its events assertion).
   - No public item added; world.rs, tests/ and every pin untouched; no TE2-5 entry (the real code never failed).
+
+## Merge into the spike branch (the advisor's U4d-F ruling, R5: M1 to M9; the main session, 2026-11-12)
+Round 2 (u4df-r2-netcode.md, u4df-r2-test.md): both seats APPROVE WITH FINDINGS, one Low (NC2-L1), so the merge went
+ahead on M1-M9 with no further ruling (R2, "After round 2").
+- **M1, the copy is the one reviewed (01:38 UTC):** its HEAD dad9566bdb9095f9add8da85decdb0d40885218e; `git status`:
+  the five crates/sim files modified and this record untracked, nothing else; `sha256sum -c
+  .gate/u4df/r2-start.sha256` (round 2's start hashes, every file under crates/sim) from the copy's root: 17 OK.
+- **M2, the base still fits:** `git diff --quiet dad9566 HEAD -- spikes/netcode-proof/crates/sim` at the spike head
+  ebbb87c: true.
+- **M3, the snapshot and the apply (01:39 UTC):** the saver stopped first (its last commit a75129e).
+  worktree_patch.py listed exactly the five files, all under spikes/netcode-proof/crates/sim/, and wrote a patch
+  equal to the fix pass's snapshot committed at 9bf615c (no change since); `git apply --check` clean, then `git
+  apply` in the main folder.
+- **M4, the merged bytes are the reviewed bytes:** `sha256sum -c .gate/u4df/r2-start.sha256` from the main folder's
+  root: 17 OK, the five changed files among them (src/replay.rs 802842b0…, src/scene.rs a5ce8ac2…, src/world.rs
+  6e011013…, tests/replay.rs a5f123b8…, tests/world.rs 0a340fb5…).
+- **M5, check.mjs counted on the merged tree:** one main-run.sh call (.gate/u4df-merge/m5-check.log, 01:39:33-01:46:03
+  UTC): the two `--no-run` builds, each "Compiling npt-sim", npt-proto, npt-room and npt-lab from the main folder's
+  path; check.mjs, all 10 steps PASS: measured 399 (396 + 3), bites 446 (443 + 3), self 52 of 52, marks 81 read and
+  checked with the ADR rows unchanged, redact 238 items and 0 findings, refs 755 tracked files; the three-seed test by
+  name, 1 passed in 32.4 s, its 21 "ES seed" lines identical to end-three-seeds.log's; FX-1 by name, measured and
+  `--all-features`, passed in 1.8 s each, its six counts equal to the fix pass's (954,628 / 97,974 / 14,860 / 465,658 /
+  14,996 / 11).
+- **M6:** no test failed; no TE2-5 entry.
+- **M7, the gate:** `node tools/gate.mjs` (.gate/u4df-merge/gate-full.log): every check PASS but smoke 5a, which
+  cannot start Chromium here (the container has chromium_headless_shell-1243; tools/'s Playwright wants 1194), as at
+  U4j's merge; `--no-smoke` (gate-nosmoke.log): GATE PASS. CI's gate and smoke are to be green on the pushed head.
+- **M8, one commit,** "U4d-F: the estimate scene fix (npt-sim), merged after review round 2": the five spikes/ files
+  exactly as applied; `git rm` of wip/u4df.patch; this record; u4df-report.md (new; T1 (1) its measurement section);
+  u4d-report.md's pointer (T1 (2)); u4s-carries.md's carries 67-72 and carry 59's sentence (T2); the card. T1 and T2
+  were copied from the ruling's code blocks by u4df_merge_text.py (each anchor found once, each new text found in
+  place after, no inserted line over 120 characters).
+- **M9, after the push:** the saver restarted; the card names the commit; base counts 399 / 446 / 52 for the next
+  lanes (U4e's `<base>` and U4d2's included); then U4e's L3 (the carry-51 commit to scene.rs) on the merged head, in
+  its own commit; U4d2's brief bases on this commit and names it (carry 52).
+- **Readings, as ruled (R4.1's two corrections of fact, of the main session's TE2-5 reading):** t_m1 failed in steps
+  2 to 4, not 2 to 5: at step 5's first run it passed (seed 2's 300 s at 40: 10.440), and step 5's only failure was
+  D-7's named re-pin (s5-first-measured.log). The separate "re-run at once" happened in steps 2, 4 and 5 (s2-rerun-*,
+  s4-3b-rerun-*, s5-rerun-*); in step 3 the first runs were already the whole crate with `--no-fail-fast` in each
+  build, their output saved and both failures named in the notes (s3-first-measured.log, s3-first-bites.log), but
+  with no separate re-run and no TE2-5 tag.

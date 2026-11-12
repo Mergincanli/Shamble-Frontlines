@@ -4,136 +4,44 @@
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main, last merged in at 5ca77eb (main bb2d817, PR #49, the STATUS split)
-- **Last update:** 2026-11-11 about 20:15 UTC (U4j merged: 4d2b0ef and d50396a, pushed together; the chat at 96,748
-  of 1,000,000 (10 %) at 19:58 UTC, after Mustafa's /compact)
+- **Last update:** 2026-11-12 about 01:55 UTC (U4d-F merged into the spike branch: the commit "U4d-F: the estimate
+  scene fix (npt-sim), merged after review round 2")
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**The current step: U4 wave 1's close and wave 2's preparation.** Plan files, with the advisor's text batch of
-2026-11-11 and U4j's merge text applied: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2, 4b8eaab6…),
-u4s-carries.md (carries 1-65, 32acca91…); the advisor's rulings: advisor-u4.md, advisor-u4-wave1.md (with B1.4's
-erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md.
+**The current step: U4 wave 2's start.** U4e's L3 (the carry-51 commit), then U4e's launch (L4); U4d2's brief with the
+advisor. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
+L2 edits, d928358b…), u4s-carries.md (carries 1-72, cdab0240…); the advisor's rulings: advisor-u4.md,
+advisor-u4-wave1.md (with B1.4's erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md,
+advisor-u4e-brief.md, advisor-u4df.md.
 - **Merged into the spike branch:** U4s f080551, U4b 411eeee, U4a 952f734, U4c f3f7c2f, U4d with W1-S1's npt-proto half
-  39f4290 (report u4d-report.md); CI green on each. Main merged in at 5ca77eb (PR #49). **U4j: 4d2b0ef (the merge)
-  and d50396a (round 2's wording), pushed together** (u4j-build.md, "Merge into the spike branch"). At d50396a:
-  check.mjs 10 steps, measured 396, bites 443, self 52: the base counts for the next lanes, U4e's `<base>` included.
-- **Running:**
-  - Done: the advisor's check of the U4e brief (advisor-u4e-brief.md, complete on disk: all seven blocks and the end
-    sections; the usage limit cut the agent after it wrote them, before its summary); folded as rev 3.3 (3088bb5).
-  - **U4d-F's run A, the build: DONE** (run wf_3dbc5af1-0d4, task wcj2e504g, 23:07 UTC; all four groups read in full;
-    none stopped). Snapshot 9dd037a: wip/u4df.patch (5 crates/sim files on dad9566; `git apply --check` clean on
-    .gate/u4df-prefix) and u4df-build.md. check.mjs twice, counted, all 10 steps PASS: measured 367, bites 414, self 52
-    (+2 / +2 / +0 on 365 / 412 / 52). `aim_one_in` 40, with 3b's re-home (the drift check failed after step 3).
-    t_m1's bands read against B1.2 step 4 by the main session: all equal (shots 68.4-75.6, events 9.5-10.5 over the
-    window and each half, live 30.4-33.6, spawns 20.064-22.176, at least 48 and 15; the hull bound 1,400 in D-6's
-    rounded-down form, the exact maximum 1,400.6 cm on the 1 cm grid).
-    - The main session's readings (not in the packet): **TE2-5:** t_m1 failed in steps 2-5 by the plan's own design
-      (B1.3: "both move the event rate"; steps 5 and 6 fix it), deterministically, named, re-run at once, recorded
-      tagged TE2-5; the build brief's stop clause was stricter than B2.3's merge stop; explained, and the final runs
-      pass, so no stop. **rust-reviewer:** not triggered (B1.2's "only if step 1 changes a World line beyond moving the
-      speed rule": run_command's lines moved into `move_velocity`; the bite's `speed *= 1.01` became `gain = 1.01` in
-      the same product, bit-identical; D-7 unchanged at step 1).
-  - **U4d-F's run B, the review** (round 1 of its own budget; run wf_8a12a843-56b, task wmoh0xxq9, started about
-    23:12 UTC; script workflows/scripts/npt-u4d-f-review-wf_8a12a843-56b.js; if cut, resume it with
-    `Workflow({scriptPath, resumeFromRunId})`, and a cut agent continues after its notes' last line): packet
-    u4df-packet.md (cut 23:12 UTC, sha256 85f8f86931b1, carries left out 65); netcode-architect (its type, read only;
-    notes u4df-review-netcode.md), then the
-    test-engineer (a general-purpose agent with the Edit tool, B6's first form, reading main's test-engineer.md; notes
-    u4df-review-test.md) proves: plants O1-O3, P1, P2 by Edit, the three-seed test, check.mjs once counted. On return:
-    read every Medium or higher in full; the fix pass; round 2 on what changed; then the merge (saver stopped first).
-    - **netcode-architect: APPROVE WITH FINDINGS** (23:31 UTC; read in full by the main session): no Critical or High.
-      NF-M1 Medium, not before merge, for the advisor: the drift check (each 300 s half in 9.5-10.5) fires on noise
-      at ES's stationary level, 9.88 over 36 min and 9 seeds; out of sample, seed 6's second half is 9.446; so the
-      advisor rules on the report's wording and on how a later re-measure judges drift (the band does not move).
-      NF-L1 to NF-L4, Low: carry lines (no ES byte figure from the synthetic recording; carry 59 names the -26 %),
-      the report's numbers on 3b, and 3b's switch tied to `aim_one_in > 1` (a follow-up). Its slip: blocks [5]-[8] of
-      its notes were first appended by a python one-off, then the file was rewritten whole with Write.
-    - **test-engineer: APPROVE WITH FINDINGS** (23:56 UTC; read in full): every claim proven by its own plant or run
-      (O1-O3 by name; P1 in the base's own lines fails t_m1's drift check, window 9.846 in band, halves 9.240 and
-      10.453; P2, a different hull, the bound; the three-seed table equal; one cause per re-pin; check.mjs 367 / 414 /
-      52; the copy byte-identical at the end). TF-M1 Medium, not before merge, for the advisor: the counted suite
-      guards the reckoning only by t_m1's one seed, inside one half's noise; D-7's digest holds it for certain; a
-      deterministic reckoning test is proposed (outside B1.2's symbols). TF-L1 to TF-L3 Low. NF-M1 confirmed by run.
-      Same slip as the netcode-architect's (two blocks first written by python, then the file rewritten whole).
-  - **The advisor's ruling on round 1: APPROVE WITH CONDITIONS** (advisor-u4df.md, 00:24 UTC 2026-11-12; read in full
-    by the main session; brief advisor-u4df-brief.md). Nothing for Mustafa. R1: 40 stays; RM (carry 67) for later
-    re-measures (9 seeds, 36-minute runs, every window in band, drift on the nine seeds' mean per 300 s block); its
-    erratum on B1.2 step 4's "stationary". R2: TF-M1's test lands before the merge as FX-1 (replay.rs's new test
-    module, plants Q1-Q5), with FX-2 (scene.rs docs, T3's words). R3: the Lows routed (carries 68-72, carry 59's
-    sentence, T1's report words). R4: both readings confirmed, two corrections of fact (t_m1 failed in steps 2-4; the
-    re-runs were in steps 2, 4 and 5). R5: the merge on M1-M9 after round 2. R6: T4 (now in Rules in force).
-  - **The fix pass: DONE** (run wf_6d45d257-7c0, 00:57 UTC; read in full; not stopped). FX-1
-    (`replay::tests::the_sky_aims_reckon_every_input_the_recording_emits`) passed on the real code at its first run
-    in both builds (1.75 s), all 954,628 sky aims of seed 2 exact, its six counts above 0 (the rarest 11); Q1-Q5 each
-    fail it by name; FX-2 is T3's words; check.mjs twice 368 / 415 / 52; the three-seed lines identical; world.rs and
-    both test files equal to round 1's. Snapshot 9bf615c (wip/u4df.patch, applies on dad9566). Final sha256:
-    replay.rs 802842b0…, scene.rs a5ce8ac2…, the other three as round 1's.
-  - **Running: round 2** (run wf_18a25138-5d9, task wdzysc1jw, started 00:58 UTC; script
-    workflows/scripts/npt-u4d-f-review-r2-wf_18a25138-5d9.js; packet u4df-r2-packet.md, cut by script, sha256
-    7d8a4113f71b, 65 carries left out): the netcode-architect (read only; notes u4df-r2-netcode.md), then the
-    test-engineer (general-purpose with Edit; notes u4df-r2-test.md; start hashes .gate/u4df/r2-start.sha256 for M1
-    and M4; check.mjs once counted). APPROVE or Lows only: merge on M1-M9 with no further ruling; a Medium or above,
-    or a REVISE: the advisor first. The merge's texts: u4df_merge_text.py (T1 and T2 by script; dry run clean), run
-    with --apply after u4df-report.md is written with its anchor line.
-  - Done meanwhile: TE2-5 (b), ten of ten runs exit 0, each 443 passed, 0 failed, 12 ignored (te2-5-record.md).
-  - the saver, restarted after U4j's push (about 20:15 UTC, 110 minutes): `node .claude/scripts/checkpoint.mjs watch
-    netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
-    https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"`. Stop it before a merge's apply and restart it after the
-    push, as at U4j's.
+  39f4290 (report u4d-report.md), U4j 4d2b0ef and d50396a (u4j-build.md), and **U4d-F** (the commit "U4d-F: the
+  estimate scene fix (npt-sim), merged after review round 2"; report u4df-report.md; record u4df-build.md); CI green
+  on each through U4j. Main merged in at 5ca77eb (PR #49). At U4d-F's merge: check.mjs 10 steps, measured 399, bites
+  446, self 52: the base counts for the next lanes (U4e's `<base>` comes from L3's counted run).
+- **Running:** no agent. The saver: `node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer
+  "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
+  https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"` (background, 120 minutes; restart it when it stops). Stop
+  it before a merge's apply and restart it after the push.
 
-**The three cut workflows, and what to do with each when the hold lifts.** Scripts are under
-/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/. A resumed
-run (`Workflow({scriptPath, resumeFromRunId})`) keeps its run id; finished agents replay from cache, and only the cut
-ones run again.
-1. **U4j, the judge and marks change: MERGED** (4d2b0ef, the merge; d50396a, round 2's wording; pushed together;
-   run wf_0906017a-a9b finished). Round 1 (three REVISE; F1 High), the fix pass (FX-1 to FX-14), round 2 (three
-   APPROVE WITH FINDINGS; F1 closed by all three; no round 3), the advisor's round-2 ruling (advisor-u4j-r2.md:
-   APPROVE on M1-M9), then the merge: M1 66 OK, M2 true, M3 64 files (the snapshot equal to 4ad80a9's), M4 64 OK, M5
-   and M8.2 measured 396, bites 443, self 52, M6 no failure, M7 gate PASS with --no-smoke (this container's Chromium
-   does not match tools/'s Playwright). The record: u4j-build.md, "Merge into the spike branch" and "Readings, as
-   ruled". The old block: history.md, "Running work, U4 wave 1 (3)".
-   - Open from U4j, as routed: carries 61 (§U4e), 62 and 63 (§U4r), 64 (the next change to crates/judge), 65
-     (§U4d2, or the main session sooner); C-U6-9 to C-U6-11 (plan.md's U6 row); the FU list for PR #40's report (the
-     closing checklist); TE2-5 (b) (next steps; L-c8's re-run done, 9cd7c39); one more reading only if U4e's client
-     drops stale groups (advisor-u4j-r2.md B5).
-2. **The U4e builder brief, rev 3** (task wnwulchr5; run wf_c92cd986-072; script npt-u4e-brief-r3-wf_c92cd986-072.js).
-   - Done: the draft, u4e-brief.md (719 lines; notes u4e-brief-r3-notes.md): W1-U4E's answers, W1-S1, W1-N2, W1-TARGET's
-     lock, the carries re-quoted by script, 8 of rev 2's 28 recheck rows changed and R29-R38 added, two new questions
-     (U4E-Q12, who plants -22/unbounded; U4E-Q13, the owner-to-all bite's id).
-   - Resumed about 17:55 UTC (task wwyzh9w7f) for the test-engineer's check (u4e-brief-r3-check.md), then one
-     revision. Before it, the main session folded the brief by script: 3.1 re-copied from u4s-carries.md §U4e (carry
-     51's corrected span, carries 53-57), 3.2 rewritten to record advisor-u4d-close.md's rulings, 7.2 item 3 done, a
-     note under the title. The check's prompt no longer carries the drafter's summary; a SINCE note lists what changed
-     after the draft (the draft call is unchanged, so it replayed from cache).
-   - Then: fold advisor-u4d-close.md's U4e carries 53-57 (with the text batch) into the brief's carries section; the
-     advisor checks the brief and answers Q12 and Q13; fill `<base>`; U4e's build. U4e need not wait for U4d-F.
-3. **U4d-F, the estimate scene fix** (task wg0l1ugq1; run wf_9ce88fa3-452; script npt-u4d-f-wf_9ce88fa3-452.js).
-   - The approved plan: advisor-u4d-close.md B1.1-B1.3 (steps 0-7; the files and symbols allowed; the measurement on 3
-     seeds as the acceptance). No setting works → stop and bring the numbers to the advisor; the 9.5 floor never moves.
-   - Cut early: its builder ran about 9 minutes in `.claude/worktrees/wf_9ce88fa3-452-1` (branch u4df-build at
-     dad9566). Its notes (.checkpoints/netcode-proof-test/u4df-build.md there) hold the plan and an empty Progress;
-     world.rs has an uncommitted partial edit.
-   - **Do not resume the run as it is:** its builder uses `isolation: 'worktree'` and would start again in a fresh
-     copy. Edit the script: drop the isolation; the builder works in `.claude/worktrees/wf_9ce88fa3-452-1`, reads `git
-     diff` there first, completes or undoes the partial edit by Edit, and continues from its notes. Then the review
-     (netcode-architect, test-engineer) as scripted.
-   - Saved: wip/u4df.patch (4ad80a9: world.rs on dad9566, applies cleanly) and u4df-build.md. Under USAGE-SAVINGS the
-     builder runs as fresh copies, one per step group of B1.2 (0-1, 2-3, 4-5, 6-7), each reading its notes and the
-     diff in the worktree before it changes anything; pass or fail by the exit code and the test runner's own summary
-     line, never a grep; long output to files under .gate/. Its review starts from a packet cut by review_packet.py.
-   - It merges before U4d2's brief is final; U4d2 pins only U4d-F's recordings (carry 52).
-   - **The new route (2026-11-11 about 20:30 UTC), in place of resuming wf_9ce88fa3-452:** run A, the build: a new
-     workflow, four fresh general-purpose builders (opus, xhigh) in turn in that worktree, no isolation, one per step
-     group (0-1, 2-3, 4-5, 6-7 with the End checks), each reading the notes and the diff first; every cargo and
-     check.mjs run through u4df-run.sh (the lane lock, shared, or `-x` for counted, check.mjs and bite runs; logs under
-     .gate/u4df/); TE2-5's rule and B6's plant rule in its brief. Then the main session cuts the review packet
-     (review_packet.py with a u4df-packet.json, diffs against the base copy .gate/u4df-prefix, a worktree at dad9566).
-     Run B, the review: netcode-architect read only, then test-engineer proves, from the packet; their agent types have
-     no Edit tool, so each rewrites its notes whole with Write and saves each planted file's diff beside its run (B6).
-     Run A starts when TE2-5's ten runs end (a builder waiting on their exclusive lock could hit its Bash timeout).
+**Finished units, and what stays open from each** (their old blocks: history.md, "Running work, U4 wave 1 (3)" for
+U4j, and "Running work, U4d-F" for U4d-F and the U4e brief's drafting):
+1. **U4j: MERGED** (4d2b0ef, d50396a). Open, as routed: carries 61 (§U4e), 62 and 63 (§U4r), 64 (the next change to
+   crates/judge), 65 (§U4d2, or the main session sooner); C-U6-9 to C-U6-11 (plan.md's U6 row); the FU list for PR
+   #40's report (the closing checklist); one more reading only if U4e's client drops stale groups (advisor-u4j-r2.md
+   B5).
+2. **U4d-F, the estimate scene fix: MERGED** (2026-11-12 about 01:55 UTC). Run A (four builders; 3b's re-home;
+   `aim_one_in` 40), round 1 (both seats APPROVE WITH FINDINGS: NF-M1 and TF-M1 Medium), the advisor's ruling
+   (advisor-u4df.md: APPROVE WITH CONDITIONS; RM, carry 67; FX-1 and FX-2 before the merge), the fix pass (FX-1 exact
+   on 954,628 sky aims; Q1-Q5 each fail it by name), round 2 (both seats APPROVE WITH FINDINGS; one Low, NC2-L1), the
+   merge on M1-M9 (u4df-build.md, "Merge into the spike branch": M4 17 OK; M5 399 / 446 / 52; M7 gate PASS with
+   --no-smoke). Open, as routed: carries 67 (RM), 68 (§U4e), 69 (§U4r), 70 (§U4g), 71 and 72; carry 52's last part
+   (U4d2 pins only `Recording::GENERATOR` 2's recordings and names U4d-F's commit); NC2-L1 (u4df-report.md,
+   follow-ups).
+3. **The U4e brief: rev 3.3, approved** (advisor-u4e-brief.md: APPROVE on L1 to L4; L1 and L2 done at 3088bb5).
 
 **The advisor's text batch: APPLIED by the main session (2026-11-11 about 16:50 UTC, no agent, as Mustafa asked after
 his /compact).** `python3 -I .checkpoints/netcode-proof-test/text_batch.py` (its dry run first) copied every block and
@@ -148,35 +56,18 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
   shared target is quiet (a plant that already fails a test drops out of C-U6-8); B4's Lows (TE5-TE7, NA2, NA3, NA6)
   as follow-ups for U3d's part of PR #40's report; B2's U4g and U4h notes stay follow-ups (named in u4d-report.md).
 
-**Next steps, in order (Mustafa: "follow the card's order: U4j's round 2, then the U4e brief's check, then U4d-F"):**
-1. **U4j: MERGED** (4d2b0ef, d50396a; about 20:10 UTC), M1-M9 met. **U4c's L-c8 judged re-run: done** (9cd7c39;
-   u4c-lc8-rerun.md): U2's script at 6586991; the five L1 parts PASS with every check's outcome and value equal to
-   U2's; the four bites fail exactly U2's checks; the hash half holds through U4c's scratch (equal whole-v2-log
-   hashes), since npt-lab still records only the whole log's hash (U4c's netcode F2, Medium, open; a carry for U4d2,
-   crates/lab's lane in wave 2, goes to the advisor with the U4e brief's check). **TE2-5 (b): done** (advisor-u4j-r2.md
-   B2.3; te2-5-record.md): the bites build's workspace tests ten times with `--no-fail-fast` (te2-5-runs.sh), 20:20 to
-   20:41 UTC: every run exit 0, 443 passed, 0 failed, 12 ignored. None failed in ten; the cause stays unknown, and
-   TE2-5's rule stays until carry 65 is met or a failure is caught by name.
-2. The U4e brief: **check and revision done (about 18:35 UTC; read in full).** The check said FAIL with 3 High (F1: the
-   main session's fold reached 3.1 and 3.2 only, not e12, 2.6, the return list or carry 51's route; F2: the bite
-   proofs as worded clash with a green check.mjs, so wave 1's two-part form is stated; F3: the owner-to-all proof was a
-   group check that cannot fail on the open route, so carry 53's per-record test is the proof), 5 Medium (F4 carry
-   22's accepting edges; F5 e7's exercise counts; F6 the three room-side checks' rules and clean negatives; F7 e5a's
-   gap alignment; F8 routes for carries 54 and 56) and 5 Low. The revision made rev 3.1 (893 lines): all 13 fixed,
-   none rejected; a new question U4E-Q14 (does a 1 s gap still evict B on Loopback; recommended (b)). Rev 3.2: U4j's
-   merge folded (u4e_fold2.py: 3.1 with carry 61; R27, R28, R38 at d50396a). **The advisor's check of rev 3.2
-   (advisor-u4e-brief.md, read in full): APPROVE on L1 to L4**: four Mediums (A1 carry 61's test line; A2 e7's split
-   clause; A3 owner-to-all within the section's limits; A4 every encoder error kind) and three Lows (A5-A7), each with
-   words; U4E-Q12 (c) (U4e plants -22/unbounded; U4f runs it judged), U4E-Q13 (a) (`catalogue-5/owner-to-all`),
-   U4E-Q14 (b) (the Loopback gap is `npt_sim::ACK_RING_TICKS` tick periods); F2's route: carry 66 for U4d2. **L1 and
-   L2 done (3088bb5, u4e_fold3.py):** the brief is rev 3.3; the plan's four edits; carry 66. Next: **L3**, the
-   carry-51 commit (`Scene::effect_rows()` and its §4.1 line), after U4d-F's merge, since both touch scene.rs; then
-   7.2 item 1's counted run gives `<base>`'s counts; U4e's review reads its diff from the commit before the carry-51
-   commit; then **L4**, the launch as section 1 says (one builder, general-purpose, opus, xhigh, in a worktree, under
-   W1-TARGET's lock; at most three agents counting reviewers).
-3. Then U4d-F (workflow 3) as above; then U4d2's builder brief (carrying carry 52, N2-M2's ruling, W1-TARGET), with
-   the advisor.
-4. U4r's brief: the night's rev 2 at `cs/npt-u4r-brief` ed973c9 goes to the advisor after U4c, U4d2, U4e and U4j merge.
+**Next steps, in order:**
+1. **U4e's L3** (advisor-u4e-brief.md; carry 51's words): the main session's own commit on the merged head:
+   `Scene::effect_rows()` (pub, the rows per soldier, 8 or 0 in today's scenes) and its line in u4-build-plan.md §4.1's
+   npt-sim row ("`Scene::effect_rows` (an effect row's owner, the one public home: carry 51)"); then the brief's 7.2
+   item 1 counted run gives `<base>`'s counts (every check.mjs step passing), filled into the brief. U4e's review reads
+   its diff from the commit before the carry-51 commit (engine-architect: a new pub item, A19; rust-reviewer).
+2. **L4, U4e's launch,** as the brief's section 1 says: one builder (general-purpose, opus, xhigh) in a worktree, under
+   W1-TARGET's lock; at most three agents at a time, reviewers included.
+3. **U4d2's builder brief,** with the advisor: carries 52, 65 and 66, N2-M2's ruling and W1-TARGET; it bases on U4d-F's
+   commit and names it.
+4. **U4r's brief:** the night's rev 2 at `cs/npt-u4r-brief` ed973c9 goes to the advisor after U4c, U4d2, U4e and U4j
+   merge (carry 59's new sentence and carries 62, 63 and 69 to fold).
 - **Done for the report of 2026-11-11 evening:** the table per reviewer role (review-roles-wave1.md: findings rated
   Medium or higher only that role found in wave 1, from the notes, no agents): netcode 8, engine-architect 3,
   test-engineer 7, rust 0, security 0 (U4j's round 2 not in it). The panels stay as they are until he decides. Every
@@ -190,7 +81,7 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
   `.gate/u4a-prefix`, `u4b-prefix`, `u4b-wt`, `u4c-prefix`, `u4d-prefix`, `u4d-s1`, `u4j-prefix`, `u4df-prefix`,
   `u4df-r1` (after U4d-F's merge); `.claude/worktrees/`
   agent-a9297644e7c0354f3 (U4a), wf_f54246ff-e0d-1 (U4d), wf_f54246ff-e0d-2 (U4c), agent-a3b8dfeb01ed52b50 (U4j,
-  merged at 4d2b0ef).
+  merged at 4d2b0ef), wf_9ce88fa3-452-1 (U4d-F, merged 2026-11-12).
 
 **Open questions for Mustafa:** none open.
 - Answered today (verbatim in history.md): NIGHT-BUDGET (a); the drift fix before U4d2's pins (carry 52); the effect

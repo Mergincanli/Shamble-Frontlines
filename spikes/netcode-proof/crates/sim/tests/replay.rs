@@ -319,7 +319,7 @@ fn d7_the_hash_and_dump_vectors_are_pinned() {
     // here for this build; their cross-target half (x86-64 against wasm32) is U4d2's.
     let pinned: [(Scene, usize, u64); 4] = [
         (Scene::stress(), 6_488, 6_786_077_935_583_382_297),
-        (Scene::estimate(), 1_944, 8_780_045_697_152_956_090),
+        (Scene::estimate(), 1_944, 8_237_017_275_248_454_161),
         (Scene::course(), 260, 12_984_630_011_248_297_851),
         (Scene::targets(), 340, 5_080_305_515_375_423_141),
     ];
@@ -353,7 +353,7 @@ fn d7_the_hash_and_dump_vectors_are_pinned() {
         [
             (1, 6_772, 10_412_709_864_748_183_085),
             (30, 6_628, 8_845_330_375_396_163_272),
-            (300, 6_612, 923_332_457_071_349_262),
+            (300, 6_612, 3_337_416_615_378_533_976),
         ]
     );
     // The dump's first names: the world's tick, its 64-bit tick count (two words), then soldier 0's fields.
@@ -369,7 +369,7 @@ fn d7_the_hash_and_dump_vectors_are_pinned() {
             "soldier[0].generation"
         ]
     );
-    // The three synthetic recordings' bytes (generator version 1): length and FNV-1a-64, for the recordings manifest
+    // The three synthetic recordings' bytes (generator version 2): length and FNV-1a-64, for the recordings manifest
     // (u4-build-plan.md §4.15: regenerated at check time, each file's digest committed).
     let digests: Vec<(usize, u64)> = recordings()
         .iter()
@@ -378,13 +378,13 @@ fn d7_the_hash_and_dump_vectors_are_pinned() {
             (b.len(), fnv(&b))
         })
         .collect();
-    assert_eq!(Recording::GENERATOR, 1);
+    assert_eq!(Recording::GENERATOR, 2);
     assert_eq!(
         digests,
         [
-            (16_697_066, 2_695_722_420_930_191_497),
-            (16_697_144, 7_136_420_146_508_984_890),
-            (798_759, 3_177_023_422_367_409_324),
+            (16_694_921, 35_974_458_070_191_737),
+            (16_700_849, 15_077_317_756_489_230_056),
+            (799_693, 9_126_256_229_328_065_459),
         ]
     );
 }

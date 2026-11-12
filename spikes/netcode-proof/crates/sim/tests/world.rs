@@ -1001,71 +1001,233 @@ fn r_m1_a_record_of_an_entity_the_world_has_not_changes_nothing() {
     assert!(v.soldiers.iter().chain(&v.cover).all(|b| !b.live), "{v:?}");
 }
 
-#[test]
-fn t_m1_the_estimate_scene_meets_pm_0001_2s_es_bands() {
-    // The advisor's W1-U4D T-M1 (the test review's M1; PM-0001-2's ES checks, marks.json; ADR 0001:1474-1479): over
-    // ES's synthetic recording (seed 2, 9,000 ticks: tests/replay.rs's), every tick has 48 soldiers and 15 vehicles,
-    // and the run's means lie in PM-0001-2's bands exactly: 72 shots a second (68.4-75.6), 10 gameplay events (hits and
-    // kills) a second (9.5-10.5), 32 live projectiles a tick (30.4-33.6) and 21.12 spawns a second (20.064-22.176).
-    // Thrown grenades count toward both projectile bands; the stand-in spawner fills the rest, and every projectile
-    // fuses after 1.515 s. The events come from the recording's aim (one command in 11 among the other teams, the rest
-    // into the air) and from the blasts.
-    let scene = Scene::estimate();
-    let ticks = 9_000u32;
-    let seconds = u64::from(ticks / TICK_HZ);
-    let rec = Recording::synthetic(&scene, 2, 1_000_000, ticks, SPAN_MS);
-    let mut world = World::new(&scene, 2, 1_000_000);
-    let mut history = ring();
-    let (mut shots, mut events, mut live, mut spawns, mut thrown) = (0u64, 0u64, 0u64, 0u64, 0u64);
-    let (mut min_soldiers, mut min_vehicles) = (usize::MAX, usize::MAX);
-    let mut before = std::collections::BTreeSet::new();
-    for t in &rec.ticks {
-        let e = room_tick(&mut world, &mut history, t);
-        shots += e
-            .iter()
-            .filter(|e| matches!(e, SimEvent::Shot { .. }))
-            .count() as u64;
-        events += e
-            .iter()
-            .filter(|e| matches!(e, SimEvent::Hit { .. } | SimEvent::Kill { .. }))
-            .count() as u64;
-        let projectiles = records_of(&world, EntityKind::Projectile);
-        live += projectiles.len() as u64;
-        let now: std::collections::BTreeSet<(u16, u16)> = projectiles
-            .iter()
-            .map(|p| (p.index, p.generation))
-            .collect();
-        for p in &projectiles {
-            if !before.contains(&(p.index, p.generation)) {
-                spawns += 1;
-                thrown += u64::from(p.grid[7] == 1);
+/// One judged ES run (the advisor's U4d close ruling, B1.2 steps 4 and 6; PM-0001-2's ES checks, marks.json; ADR
+/// 0001:1474-1479): `seed`'s synthetic ES recording, 21,600 ticks (12 minutes) from tick 1,000,000, counted per 60 s.
+/// The window PM-0001-2's bands judge is its last 18,000 ticks (`ES_WINDOW`): 10 minutes, PM-0001-12's ES run length
+/// (ADR 0001:1600), after a 2-minute warm-up (PM-0001-63's, :1634).
+struct EsRun {
+    seed: u64,
+    /// Each minute's counts: shots, gameplay events (hits and kills), live projectiles summed over its ticks, spawns,
+    /// and the spawns that were thrown grenades.
+    minutes: Vec<[u64; 5]>,
+    /// The fewest soldiers and the fewest vehicles on any tick.
+    min_soldiers: usize,
+    min_vehicles: usize,
+    /// The farthest any hull came from the cluster's centre on any tick, cm: in D-6's form (whole centimetres, rounded
+    /// down), and exactly.
+    hull_out: i64,
+    hull_out_exact: f64,
+}
+
+/// An [`EsRun`]'s judged window, minutes 2 to 11 (ticks 3,600-21,599), and its two 300 s halves.
+const ES_WINDOW: std::ops::Range<usize> = 2..12;
+const ES_HALVES: [std::ops::Range<usize>; 2] = [2..7, 7..12];
+
+/// Thousandths as a decimal.
+fn milli(n: u64) -> String {
+    format!("{}.{:03}", n / 1_000, n % 1_000)
+}
+
+impl EsRun {
+    fn new(seed: u64) -> EsRun {
+        let scene = Scene::estimate();
+        let minute = ticks_for_ms(60_000) as usize;
+        let rec = Recording::synthetic(&scene, seed, 1_000_000, 12 * minute as u32, SPAN_MS);
+        let mut world = World::new(&scene, seed, 1_000_000);
+        let mut history = ring();
+        let mut run = EsRun {
+            seed,
+            minutes: vec![[0; 5]; 12],
+            min_soldiers: usize::MAX,
+            min_vehicles: usize::MAX,
+            hull_out: 0,
+            hull_out_exact: 0.0,
+        };
+        let mut before = std::collections::BTreeSet::new();
+        let mut out2 = 0i64;
+        for (k, t) in rec.ticks.iter().enumerate() {
+            let e = room_tick(&mut world, &mut history, t);
+            let m = &mut run.minutes[k / minute];
+            m[0] += e
+                .iter()
+                .filter(|e| matches!(e, SimEvent::Shot { .. }))
+                .count() as u64;
+            m[1] += e
+                .iter()
+                .filter(|e| matches!(e, SimEvent::Hit { .. } | SimEvent::Kill { .. }))
+                .count() as u64;
+            let projectiles = records_of(&world, EntityKind::Projectile);
+            m[2] += projectiles.len() as u64;
+            let now: std::collections::BTreeSet<(u16, u16)> = projectiles
+                .iter()
+                .map(|p| (p.index, p.generation))
+                .collect();
+            for p in &projectiles {
+                if !before.contains(&(p.index, p.generation)) {
+                    m[3] += 1;
+                    m[4] += u64::from(p.grid[7] == 1);
+                }
+            }
+            before = now;
+            run.min_soldiers = run
+                .min_soldiers
+                .min(records_of(&world, EntityKind::Soldier).len());
+            let hulls = records_of(&world, EntityKind::Vehicle);
+            run.min_vehicles = run.min_vehicles.min(hulls.len());
+            for v in &hulls {
+                let (x, y) = (i64::from(v.grid[0]), i64::from(v.grid[1]));
+                out2 = out2.max(x * x + y * y);
             }
         }
-        before = now;
-        min_soldiers = min_soldiers.min(records_of(&world, EntityKind::Soldier).len());
-        min_vehicles = min_vehicles.min(records_of(&world, EntityKind::Vehicle).len());
+        // The farthest squared distance, then its root: rounding down is monotonic, so this is D-6's form's maximum.
+        run.hull_out_exact = (out2 as f64).sqrt();
+        run.hull_out = run.hull_out_exact as i64;
+        run
     }
-    let per_s = |n: u64| n * 1_000 / seconds;
-    let (shots_m, events_m, spawns_m) = (per_s(shots), per_s(events), per_s(spawns));
-    let live_m = live * 1_000 / u64::from(ticks);
+
+    /// Minutes `r`'s means, thousandths: shots, gameplay events and spawns a second, live projectiles a tick.
+    fn rates(&self, r: std::ops::Range<usize>) -> [u64; 4] {
+        let secs = r.len() as u64 * 60;
+        let mut s = [0u64; 5];
+        for m in &self.minutes[r] {
+            for (a, x) in s.iter_mut().zip(m) {
+                *a += x;
+            }
+        }
+        [
+            s[0] * 1_000 / secs,
+            s[1] * 1_000 / secs,
+            s[2] * 1_000 / (secs * u64::from(TICK_HZ)),
+            s[3] * 1_000 / secs,
+        ]
+    }
+
+    /// Minutes `r`'s four means as the report gives them.
+    fn line(&self, r: std::ops::Range<usize>) -> String {
+        let thrown: u64 = self.minutes[r.clone()].iter().map(|m| m[4]).sum();
+        let [shots, events, live, spawns] = self.rates(r);
+        format!(
+            "shots {} a second, gameplay events {} a second, live projectiles {} a tick, spawns {} a second ({thrown} \
+             thrown)",
+            milli(shots),
+            milli(events),
+            milli(live),
+            milli(spawns)
+        )
+    }
+
+    /// PM-0001-2's ES checks over the window, with the ruling's two scene facts (48 soldiers and 15 vehicles on every
+    /// tick; every hull within 1,400 cm of the cluster's centre, B1.3, in D-6's form: the hulls' records lie on the
+    /// 1 cm wire grid, so a hull on the 14 m loop reads up to 1,400.6 cm exactly) and its drift check (each 300 s
+    /// half's gameplay events in band too); it panics at the first it misses, naming it.
+    fn check(&self) {
+        let seed = self.seed;
+        assert!(
+            self.min_soldiers >= 48 && self.min_vehicles >= 15,
+            "seed {seed}: {} soldiers and {} vehicles on the fewest tick",
+            self.min_soldiers,
+            self.min_vehicles
+        );
+        assert!(
+            self.hull_out <= 1_400,
+            "seed {seed}, the hull bound: a hull {} cm from the cluster's centre ({:.1} cm exactly)",
+            self.hull_out,
+            self.hull_out_exact
+        );
+        let [shots, events, live, spawns] = self.rates(ES_WINDOW);
+        assert!(
+            (68_400..=75_600).contains(&shots),
+            "seed {seed}: shots {shots} thousandths a second over the window"
+        );
+        assert!(
+            (30_400..=33_600).contains(&live),
+            "seed {seed}: live projectiles {live} thousandths a tick over the window"
+        );
+        assert!(
+            (20_064..=22_176).contains(&spawns),
+            "seed {seed}: spawns {spawns} thousandths a second over the window"
+        );
+        let halves = ES_HALVES.map(|h| self.rates(h)[1]);
+        assert!(
+            [events, halves[0], halves[1]]
+                .iter()
+                .all(|e| (9_500..=10_500).contains(e)),
+            "seed {seed}, gameplay events and the drift check: {events} thousandths a second over the window, {} \
+             and {} over its 300 s halves (each in 9,500-10,500)",
+            halves[0],
+            halves[1]
+        );
+    }
+}
+
+#[test]
+fn t_m1_the_estimate_scene_meets_pm_0001_2s_es_bands() {
+    // The advisor's W1-U4D T-M1 (the test review's M1), judged as the U4d close ruling sets it (B1.2 steps 4 and 6;
+    // N2-M1, N2-M2): over seed 2's window (`EsRun`: the last 10 minutes of 12), every tick has 48 soldiers and 15
+    // vehicles and every hull lies within 1,400 cm of the cluster's centre (B1.3), and the window's means lie in
+    // PM-0001-2's bands exactly: 72 shots a second (68.4-75.6), 10 gameplay events (hits and kills) a second
+    // (9.5-10.5), 32 live projectiles a tick (30.4-33.6) and 21.12 spawns a second (20.064-22.176); against drift, each
+    // 300 s half's gameplay events lie in 9.5-10.5 too. Thrown grenades count toward both projectile bands; the
+    // stand-in spawner fills the rest, and every projectile fuses after 1.515 s. The events come from the recording's
+    // aim (one command in 40 among the other teams, the rest into the air) and from the blasts. Seeds 1 and 3: the
+    // ignored test below.
+    let run = EsRun::new(2);
+    let halves = ES_HALVES.map(|h| milli(run.rates(h)[1]));
     println!(
-        "T-M1: ES over {seconds} s: shots {shots_m}, gameplay events {events_m}, spawns {spawns_m} ({thrown} \
-         thrown) thousandths a second; live projectiles {live_m} thousandths a tick"
+        "T-M1: ES seed 2 over the window (600 s after 120 s): {}; gameplay events {} and {} a second over its halves; \
+         hulls at most {:.1} cm out",
+        run.line(ES_WINDOW),
+        halves[0],
+        halves[1],
+        run.hull_out_exact
     );
-    assert!(
-        min_soldiers >= 48 && min_vehicles >= 15,
-        "{min_soldiers} soldiers, {min_vehicles} vehicles"
-    );
-    assert!((68_400..=75_600).contains(&shots_m), "shots: {shots_m}");
-    assert!(
-        (9_500..=10_500).contains(&events_m),
-        "gameplay events: {events_m}"
-    );
-    assert!(
-        (30_400..=33_600).contains(&live_m),
-        "live projectiles: {live_m}"
-    );
-    assert!((20_064..=22_176).contains(&spawns_m), "spawns: {spawns_m}");
+    run.check();
+}
+
+#[test]
+#[ignore = "T-M1's three-seed form (U4d-F, B1.2 step 6), run once by name for the report: about 30 s"]
+fn t_m1_seeds_1_2_and_3_meet_the_es_bands_and_report_them() {
+    // B1.2 step 4's measurement as a test: seeds 1, 2 and 3, each judged by t_m1's checks (`EsRun::check`), and per
+    // seed the report's lines: the window's four means, its two halves, the twelve 60 s gameplay-event rates over all
+    // 12 minutes, T-M1's 300 s from tick 0 and X2's form (ticks 0-17,999; X2 gave 7.578 for seed 2 at 1 in 11, before
+    // U4d-F), those two reported, never used to set anything. Every seed is reported before any is judged.
+    let runs = [1, 2, 3].map(EsRun::new);
+    for run in &runs {
+        let seed = run.seed;
+        println!(
+            "ES seed {seed}, the window (600 s after 120 s): {}",
+            run.line(ES_WINDOW)
+        );
+        for (k, h) in ES_HALVES.into_iter().enumerate() {
+            println!(
+                "ES seed {seed}, half {} ({} s): {}",
+                k + 1,
+                h.len() * 60,
+                run.line(h)
+            );
+        }
+        let minutes: Vec<String> = (0..12).map(|m| milli(run.rates(m..m + 1)[1])).collect();
+        println!(
+            "ES seed {seed}, gameplay events a second per 60 s, minutes 0-11: {}",
+            minutes.join(", ")
+        );
+        println!(
+            "ES seed {seed}, T-M1's 300 s from tick 0: {}",
+            run.line(0..5)
+        );
+        println!(
+            "ES seed {seed}, X2's form (600 s from tick 0): {}",
+            run.line(0..10)
+        );
+        println!(
+            "ES seed {seed}, every tick: at least {} soldiers and {} vehicles; hulls at most {} cm out in D-6's form \
+             ({:.1} cm exactly)",
+            run.min_soldiers, run.min_vehicles, run.hull_out, run.hull_out_exact
+        );
+    }
+    for run in &runs {
+        run.check();
+    }
 }
 
 /// The course's one soldier spawned at `feet` (cm), and the fire origin a still command fires from, m.

@@ -75,9 +75,16 @@ const ES_WEAPON: Weapon = Weapon {
     ..SS_WEAPON
 };
 /// ES's recording aims among the other teams on one command in this many ([`Scene`]'s `aim_one_in`; the advisor's
-/// W1-U4D T-M1). Measured over ES's 9,000-tick recording at 1 in 11: 9.85, 10.26 and 9.67 gameplay events a second for
-/// seeds 2, 1 and 3 (shot hits about 4.4, blast hits about 5.3, kills about 0.2); 1 in 10 gives 10.39 for seed 2.
-const ES_AIM_ONE_IN: u32 = 11;
+/// W1-U4D T-M1, set on the judged window by its U4d close ruling, B1.2 step 5). Measured over the window, the last
+/// 18,000 ticks (10 minutes) of a 21,600-tick ES recording from tick 1,000,000, after its 2-minute warm-up: 9.878,
+/// 9.743 and 10.098 gameplay events a second for seeds 1, 2 and 3 (shot hits about 2.7, blast hits about 6.8, kills
+/// about 0.35), each 300 s half between 9.580 and 10.220 (tests/world.rs, t_m1 and its three-seed form). Of the shares
+/// tried (11, 16, 26, 34, 36, 38, 40, 48), 40 and 48 put every window and half in 9.5-10.5, and 40 keeps the larger
+/// smallest margin to the band's edges (0.080 a second; 48's is 0.036). Over seeds 1-9 and 36 minutes the rate is flat
+/// at about 9.88 a second, and a 300 s half's noise is 0.2-0.36 a second (U4d-F's review), so 40 is one passing set of
+/// halves, not a margin: a later change that moves ES is re-measured by the advisor's U4d-F ruling (RM), never re-tuned
+/// on three seeds.
+const ES_AIM_ONE_IN: u32 = 40;
 /// An S30 (a 30-minute run) and 5 minutes more, µs.
 const S30_PLUS_5_US: u64 = 35 * 60 * 1_000_000;
 // SS and ES script no reloads (TUNE-1), so a soldier firing at its weapon's interval must not run dry inside an S30
@@ -100,18 +107,28 @@ pub struct Scene {
     /// Big vehicles, and how many of them are very large units of `LARGE_PARTS` parts (the rest have `SMALL_PARTS`).
     pub(crate) vehicles: u8,
     pub(crate) large_vehicles: u8,
+    /// How many big vehicles loop inside the fight, the first this many (the advisor's U4d close ruling, B1.3): round
+    /// the soldiers' cluster's centre, 5 to 14 m out, every hull within 1,400 cm of it on every tick; vehicle v of the
+    /// rest loops 40 + 3 v m out (SS's from 52 m). SS's 4 very large units; all 15 of ES's (ADR 0001:1475-1477: every
+    /// vehicle in view).
+    pub(crate) fight_vehicles: u8,
     /// Stand-in projectiles the sim keeps live (the stress scene's 300).
     pub(crate) live_projectiles: u16,
     /// Stand-in projectiles spawned per second, in thousandths (ES's 0.44 per player per second: 21,120).
     pub(crate) spawn_millihertz: u32,
     /// The stand-in projectiles' fuse range, ms.
     pub(crate) fuse_ms: [u32; 2],
-    /// A thrown grenade's fuse, ms: 2 s, and ES's 1.515 s (every ES projectile fuses after 1.515 s: ADR 0001:1478).
+    /// A thrown grenade's fuse, ms: 2 s, and ES's 1.515 s (ADR 0001:1478-1479's 32 live projectiles at 21.12 spawns a
+    /// second give each a life of 32 / 21.12 = 1.515 s, so every ES projectile fuses after it).
     pub(crate) grenade_fuse_ms: u32,
     /// Its synthetic recordings aim among the other teams' soldiers on one command in this many (and on every command
     /// that throws), and into the air above the shooter on the rest, so those shots rise almost straight up and meet
     /// only a soldier whose box holds the shooter's chest (soldiers pass through each other): 1 in every scene but ES,
-    /// where the share sets its 10 gameplay events a second (ADR 0001:1478; the advisor's W1-U4D T-M1).
+    /// where the share tunes its gameplay events toward 10 a second over the judged window, the last 10 minutes of a
+    /// 12-minute recording, and over each 300 s half of it (ADR 0001:1478 and :1600; the advisor's W1-U4D T-M1 and U4d
+    /// close ruling, B1.2); it moves only the aimed hits, about 0.7 of ES's 9.9 a second at 40 (grenade blasts and sky
+    /// shots meeting a soldier on the shooter's chest make the rest). Above 1 it also turns on the generator's re-home
+    /// of each soldier every 60 s (B1.2 step 4's 3b).
     pub(crate) aim_one_in: u32,
     /// The projectile pool's fixed capacity (stand-ins and grenades).
     pub(crate) projectile_capacity: u16,
@@ -155,6 +172,7 @@ impl Scene {
             plates_from: 48,
             vehicles: 15,
             large_vehicles: 4,
+            fight_vehicles: 4,
             live_projectiles: 300,
             spawn_millihertz: 0,
             fuse_ms: [2_000, 6_000],
@@ -171,16 +189,19 @@ impl Scene {
         }
     }
 
-    /// ES, R2's estimate scene (ADR 0001:1474-1479): 48 soldiers and 15 big vehicles in view, 1.5 shots per player per
-    /// second (the weapon's interval 666,667 µs), 32 live projectiles at 0.44 spawns per player per second (21.12 a
-    /// second, each fusing after 1.515 s: 21.12 × 1.515 = 32.0; a thrown grenade is one of them, and the stand-ins
-    /// fill the rest), 10 gameplay events (hits and kills) a second from its recording's aim (one command in 11 aims
-    /// among the other teams), no effect rows (the advisor's W1-U4D T-M1).
+    /// ES, R2's estimate scene (ADR 0001:1474-1479): 48 soldiers and 15 big vehicles in view (all 15 loop inside the
+    /// fight: the advisor's U4d close ruling, B1.3), 1.5 shots per player per second (the weapon's interval 666,667
+    /// µs), 32 live projectiles at 0.44 spawns per player per second (21.12 a second, each fusing after 1.515 s: 21.12
+    /// × 1.515 = 32.0; a thrown grenade is one of them, and the stand-ins fill the rest), 10 gameplay events (hits and
+    /// kills) a second over the judged window (the last 10 minutes of a 12-minute recording, each 300 s half of it
+    /// too: B1.2) from its recording's aim (one command in 40 aims among the other teams) and its re-home of each
+    /// soldier every 60 s, no effect rows (the advisor's W1-U4D T-M1).
     pub fn estimate() -> Scene {
         Scene {
             id: 2,
             name: "ES",
             large_vehicles: 0,
+            fight_vehicles: 15,
             live_projectiles: 0,
             spawn_millihertz: 21_120,
             fuse_ms: [1_515, 1_515],
@@ -204,6 +225,7 @@ impl Scene {
             plates_from: 1,
             vehicles: 0,
             large_vehicles: 0,
+            fight_vehicles: 0,
             live_projectiles: 0,
             spawn_millihertz: 0,
             fuse_ms: [2_000, 2_000],

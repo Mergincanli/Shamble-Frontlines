@@ -466,6 +466,44 @@ fn part_box(c: [i32; 3]) -> ([f32; 3], [f32; 3]) {
     )
 }
 
+/// One command's move before collision: the move rule's one home (the advisor's U4d close ruling, B1.2 step 1), read
+/// by [`World`]'s commands and by the synthetic generator's dead reckoning (`Recording::synthetic`, B1.2 step 3, with
+/// `gain` 1). From the soldier's move speed (cm/s), the command's buttons and its move vector: crouching
+/// halves the speed; sprinting takes it × 3 / 2, only when not crouching and not holding fire; a vector longer than 127
+/// is scaled to 127. `gain` scales the speed (m/s) before the vector does: 1, but 1.01 under
+/// PM-0001-41/server-speed-1pct's bite (the authority only, bites builds). Returns the velocity (m/s, x and y; one
+/// tick's move is it times one tick), then whether the soldier crouches and whether it sprints (its record's flags).
+pub(crate) fn move_velocity(
+    move_speed: u32,
+    buttons: u16,
+    move_xy: [i8; 2],
+    gain: f32,
+) -> ([f32; 2], bool, bool) {
+    let crouch = buttons & Command::CROUCH != 0;
+    let fire_held = buttons & Command::FIRE != 0;
+    let sprint = buttons & Command::SPRINT != 0 && !crouch && !fire_held;
+    let speed_cm = if sprint {
+        move_speed.saturating_mul(3) / 2
+    } else if crouch {
+        move_speed / 2
+    } else {
+        move_speed
+    };
+    let speed = speed_cm as f32 / 100.0 * gain;
+    let (mx, my) = (i32::from(move_xy[0]), i32::from(move_xy[1]));
+    let len2 = mx * mx + my * my;
+    let scale = if len2 > 127 * 127 {
+        127.0 / (len2 as f32).sqrt()
+    } else {
+        1.0
+    };
+    let v = [
+        mx as f32 / 127.0 * scale * speed,
+        my as f32 / 127.0 * scale * speed,
+    ];
+    (v, crouch, sprint)
+}
+
 /// The parts of one scene's world that `records` names, for [`compose_volumes`]: how many soldiers, hulls and parts.
 #[derive(Clone, Copy)]
 struct Counts {
@@ -754,11 +792,14 @@ impl World {
                 });
             }
             let period = ticks_for_ms(60_000 + 5_000 * u32::from(v));
-            // In the fight (the advisor's W1-U4D N-M4; §4.13, F113): the very large units loop round the soldiers'
-            // cluster's centre, 5 to 14 m out, so their parts (within 3.71 m of the hull) stay inside the cluster and
-            // its reach; the others loop elsewhere, 52 m out and beyond, past the buildings.
-            let radius = if v < scene.large_vehicles {
-                5.0 + 3.0 * f32::from(v)
+            // In the fight (the advisor's W1-U4D N-M4 and U4d close ruling B1.3; §4.13, F113): the scene's first
+            // `fight_vehicles` hulls loop round the soldiers' cluster's centre, 5 to 14 m out (5 + 9 v / (n - 1) m for
+            // n of them: SS's 4 very large units at 5, 8, 11 and 14 m, ES's 15 every 9 / 14 m), so their parts (within
+            // 3.71 m of the hull) stay inside the cluster and its reach; the others loop elsewhere, 40 + 3 v m out
+            // (SS's from 52 m), past the buildings.
+            let fight = scene.fight_vehicles;
+            let radius = if v < fight {
+                5.0 + 9.0 * f32::from(v) / f32::from(fight.saturating_sub(1).max(1))
             } else {
                 40.0 + 3.0 * f32::from(v)
             };
@@ -1290,36 +1331,17 @@ impl World {
             return false;
         }
         // The move: one tick at the soldier's speed, the vector widened before any arithmetic (carry 15).
-        let crouch = c.buttons & Command::CROUCH != 0;
         let fire_held = c.buttons & Command::FIRE != 0;
-        let sprint = c.buttons & Command::SPRINT != 0 && !crouch && !fire_held;
-        let speed_cm = if sprint {
-            s.move_speed.saturating_mul(3) / 2
-        } else if crouch {
-            s.move_speed / 2
-        } else {
-            s.move_speed
-        };
         #[allow(
             unused_mut,
             reason = "PM-0001-41/server-speed-1pct scales it in bites builds"
         )]
-        let mut speed = speed_cm as f32 / 100.0;
+        let mut gain = 1.0;
         #[cfg(feature = "bites")]
         if authority && self.bitten(Bite::Speed) {
-            speed *= 1.01;
+            gain = 1.01;
         }
-        let (mx, my) = (i32::from(c.move_xy[0]), i32::from(c.move_xy[1]));
-        let len2 = mx * mx + my * my;
-        let scale = if len2 > 127 * 127 {
-            127.0 / (len2 as f32).sqrt()
-        } else {
-            1.0
-        };
-        let v = [
-            mx as f32 / 127.0 * scale * speed,
-            my as f32 / 127.0 * scale * speed,
-        ];
+        let (v, crouch, sprint) = move_velocity(s.move_speed, c.buttons, c.move_xy, gain);
         let (pos, blocked) = self.collide(s.pos, [v[0] * DT, v[1] * DT]);
         let vel = [
             if blocked[0] { 0.0 } else { v[0] },
@@ -2141,11 +2163,110 @@ impl SimCore for World {
 
 #[cfg(test)]
 mod tests {
-    //! The tests that read `World`'s private parts: the blend's boxes (T-M3), the movers' sizes (R-M1) and the clamp's
-    //! bound (TUNE-2).
+    //! The tests that read `World`'s private parts: the blend's boxes (T-M3), the movers' sizes (R-M1), the clamp's
+    //! bound (TUNE-2), and T2-L1's two invariants (hull ∘ part's frame, and phase 3's boxes after the moves).
 
     use super::*;
     use crate::replay::Recording;
+    use crate::seam::{AttributeChange, Placement};
+
+    #[test]
+    fn part_center_turns_a_parts_offset_by_its_hulls_yaw() {
+        // T2-L1 (the test review's round 2; the advisor's U4d close ruling, B1.2 step 0): hull ∘ part's frame
+        // convention on its own, not only through D-7's pin. At hull yaw 90 degrees a part 120 cm along the hull's own
+        // +x sits 120 cm to the world's +y of the hull, and one 120 cm along its +y sits 120 cm to the world's -x, 100
+        // cm up in both, within 1 cm: x' = x cos - y sin, y' = x sin + y cos (the old place_vehicles formula). A
+        // rotation by -yaw (plant O1) or none (O2) fails it.
+        let wire = Config::default();
+        let (hx, hy) = (1_000, -500);
+        let hull = [hx, hy, 0, wire.to_grid(YAW, FRAC_PI_2)];
+        for (offset, want) in [
+            ([120, 0, 100], [hx, hy + 120, 100]),
+            ([0, 120, 100], [hx - 120, hy, 100]),
+        ] {
+            let got = part_center(hull, offset);
+            assert!(
+                (0..3).all(|k| (got[k] - want[k]).abs() <= 1),
+                "offset {offset:?} at yaw 90 degrees: {got:?}, not {want:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_shot_with_no_rewind_meets_a_soldier_where_this_ticks_move_put_it() {
+        // T2-L1 (the advisor's U4d close ruling, B1.2 step 0): phase 3 refreshes the soldiers' records after the moves,
+        // so a shot with no Rewind meets each soldier where this tick's command moved it. In TC, one tick: the shooter
+        // (slot 0) and the target (slot 1, 5 m north of it) are teleported into the open, the target's move speed set
+        // to the most the attribute holds (100 m/s), and its command runs it 3.33 m east, out of its old box (80 cm
+        // wide); the shooter, holding fire with no Rewind, hits it at its new chest and misses at its old one. Phase 3
+        // without the refresh (plant O3: the soldiers' records from before this tick's teleports and moves) misses it
+        // at its new chest.
+        let scene = Scene::targets();
+        let (shooter, target) = ([-6_000, -1_000, 0], [-6_000, -500, 0]);
+        let shoot = |aim: [i32; 3]| {
+            let mut world = World::new(&scene, 1, 0);
+            let history = HitHistory::for_ms(1_000).expect("1 s of ticks");
+            let tick = world.next_tick();
+            let command = |slot: u8, buttons: u16, move_xy: [i8; 2], aim: [i32; 3]| {
+                let c = Command {
+                    slot,
+                    tick,
+                    seq: 1,
+                    buttons,
+                    presses: [0; 4],
+                    move_xy,
+                    aim,
+                    view_tick: tick,
+                    view_fraction: 0,
+                };
+                (c, None)
+            };
+            let input = TickInput {
+                tick,
+                commands: vec![
+                    command(0, Command::FIRE, [0, 0], aim),
+                    command(1, 0, [127, 0], [-6_000, 2_000, 140]),
+                ],
+                teleports: vec![
+                    Placement {
+                        slot: 0,
+                        position: shooter,
+                    },
+                    Placement {
+                        slot: 1,
+                        position: target,
+                    },
+                ],
+                attributes: vec![AttributeChange {
+                    slot: 1,
+                    attribute: Attribute::MoveSpeed,
+                    value: MOVE_SPEED_MAX_CM_S,
+                }],
+                ..TickInput::default()
+            };
+            let events = world.step(&input, &history);
+            let hit = events
+                .iter()
+                .any(|e| matches!(e, SimEvent::Hit { victim: 1, .. }));
+            let shots = events
+                .iter()
+                .filter(|e| matches!(e, SimEvent::Shot { slot: 0, .. }))
+                .count();
+            (hit, shots, world.soldiers[1].pos)
+        };
+        let old = [target[0], target[1], 140];
+        let (hit_old, shots, at) = shoot(old);
+        assert_eq!(shots, 1, "the shooter fires once");
+        assert!(
+            at[0] - cm(target[0]) > 3.3 && (at[1] - cm(target[1])).abs() < 0.01,
+            "the target ran 3.33 m east: {at:?}"
+        );
+        let new = [libm::roundf(at[0] * 100.0) as i32, target[1], 140];
+        let (hit_new, shots, _) = shoot(new);
+        assert_eq!(shots, 1, "the shooter fires once");
+        assert!(hit_new, "a shot at the target's new chest {new:?} hits it");
+        assert!(!hit_old, "a shot at its old chest {old:?} misses it");
+    }
 
     /// A box's centre and half extents as the reference reads them, m, in f64 from its integer centimetres.
     fn metres(b: &VolumeBox) -> ([f64; 3], [f64; 3]) {
