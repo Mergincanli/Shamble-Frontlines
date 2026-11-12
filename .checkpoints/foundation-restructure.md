@@ -213,16 +213,27 @@
    report's body (**bf41334**: Reviews open; the final head, CI and E1's final check go to the PR body). docs-check 20/20
    PASS; repo-map-check OK (112 entries, 99 paths); report-appendix check PASS.
 
+12. Step 11, review round 1 (workflow `fr-2-1b-review`, wf_78495bb7-6ab, 4 agents, 1,070 s; head dc8582a, content
+   equal to bf41334's outside the notes; CI on bf41334: push #693, pull request #694, green): **security-auditor**
+   APPROVE WITH LOWS (6 Lows: F1 the restore line runs the pasted text, F2 the README letter-case sentence and base
+   reads, F3 his steps follow the branch tip, F4 for 2.3: the stray-page check stops after the merge, F5 PROMPTS-2.3's
+   option (a), F6 2.1a's follow-ups not named; guard and settings tests 1234/1234; the console lines byte-identical);
+   **test-engineer** APPROVE (F1 Medium: the E3 row's "controls pass in both" while PC1 exits 1 by design, confirmed
+   by a skeptic, real, Medium; Lows F2 the E4 edited-tools cmp, F3 E5's backend not asserted, F4 copy() stubbed, F5
+   tools/README.md:72, F6 the count placeholder); **infra-engineer** APPROVE (3 Lows: the revert after #40, the merge
+   method, the Windows step's literal SHA). The one fix pass (**43733e5**): every Medium and Low addressed in the report
+   and tools/README.md (F6's count filled at the end; SA F4 recorded as a 2.3 finding); docs-check PASS, appendix PASS.
+   No Critical or High, so no round 2.
+
 ## Current step
-Step 11: the reviews (round 1) on the final diff, then the verifier, then the advisor agent on the pushed head.
+Step 11: the verifier (workflow `fr-2-1b-verify`, wf_761376e1-e60) on 43733e5.
 
 ## Next steps
-1. Step 11 under C15-C17: the review workflow (security-auditor, test-engineer, infra-engineer at their files' effort,
-   briefed by `review-brief-2-1b.md`; one skeptic per Medium-or-above finding, at most 3 agents at a time); one fix
-   pass; the verifier until PASS; the advisor agent (xhigh) on the pushed head; the report's Reviews and the consultation
-   count; the prompt tally re-run; the advisor tool before ready (consultation 7); stop the saver, delete
-   `.checkpoints/foundation-restructure*` in the last commit (no skip marker); E1's final check and repo-map-check on
-   that head; CI read; IE-7 (main still 76b4f7a?); the PR body; ready; stop for his go.
+1. The verifier until PASS; the report's Reviews (round 1, the skeptic, the fix pass, the verifier) and the
+   consultation count; the prompt tally re-run into the report; the advisor tool before ready (consultation 7); stop
+   the saver and confirm no agent writing; delete `.checkpoints/foundation-restructure*` in the last commit (no skip
+   marker); E1's final check and repo-map-check on that head; CI read; IE-7 (main still 76b4f7a?); the advisor agent
+   (xhigh) on the pushed head; the PR body (final head, CI runs, E1, the zip URL with the SHA); ready; stop for his go.
 
 ## Open findings
 - (none yet)
