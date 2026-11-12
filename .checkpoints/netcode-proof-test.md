@@ -77,8 +77,10 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    Proof (.gate/a13/): a scratch `pub fn a13_scratch() -> std::collections::HashMap<u32, u32>` in
    crates/server/src/lib.rs, by Edit: under the old file clippy exits 0 (a13-control.log); under the new one it exits
    101, "use of a disallowed type `std::collections::HashMap`" at lib.rs:20 and :21 (a13-plant.log); restored by Edit,
-   sha256 b31ffb77… as before. Running: check.mjs counted through main-run.sh in the background (a13-check-counted.log,
-   limit 1,800,000 ms), expected all 10 steps PASS at 473 / 541 / 52 of 52. Then stop the saver, commit
+   sha256 b31ffb77… as before. Running: check.mjs counted through main-run.sh in the background (task b79dl2epv,
+   started 23:25 UTC; a13-check-counted.log, limit 1,800,000 ms), expected all 10 steps PASS at 473 / 541 / 52 of 52
+   (if the test step fails on an unplanted test, TE2-5: re-run that crate at once with `--no-fail-fast` through
+   main-run.sh, name the test and its panic; TE-M3's npt-net flake is known). Then stop the saver, commit
    clippy.toml alone ("A13: …"), push, CI, restart the saver.
    **(h) U4d2's review round 1: DONE** (23:22 UTC): rust REVISE, security REVISE, infra APPROVE WITH FINDINGS, arch
    APPROVE WITH FINDINGS (EA-1-9, all Low), test REVISE (TE-M1 = RR-M2 and TE-M2 = RR-M1 = SEC-U4D2-2, proved by run;
