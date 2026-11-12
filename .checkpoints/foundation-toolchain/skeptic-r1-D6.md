@@ -66,3 +66,43 @@ and the fix. Nothing in the worktree changes but this file.
   ENOTCACHED, nothing installed; online exit 0, genuine installed, never the malicious one. SA-3's "a failed or slow
   install, not swapped code" holds. (npx: both jobs' npx calls use `--no` after `npm ci`, so the local bin wins and
   ~/.npm/_npx is not consulted; not a code route today.)
+- C9b the npx aside, verified rather than recalled: npm 10.9.9's libnpmexec/lib/index.js:128-160 runs a command from
+  the nearest node_modules/.bin (localFileExists) before it ever reaches the npx cache, unless the project's own
+  manifest declares a bin of that name; no manifest at the head (root, tools, the five packages) has a `bin`. Both
+  `npx --no` calls (smoke in tools/, the cut's tsc) run after `npm ci`, so ~/.npm/_npx is never consulted today.
+- C10 scope (GitHub's dependency-caching reference, fetched 2026-11-12 via docs.github.com's article API, lines
+  211-215 and 233-235): a pull_request run's cache is created for refs/pull/N/merge and "can only be restored by
+  re-runs of the pull request"; push runs write their branch's scope; only push, workflow_dispatch, schedule and a few
+  others may write main's scope, and "The `pull_request` event is not affected". So a cache a pull_request run writes after
+  the cut reaches only that PR's re-runs and cannot reach main's scope; a push run's cache sits in its branch's scope,
+  which PRs based on that branch may also restore (line 211). SA-3's "same branch scope" holds. (Corrected after the
+  advisor tool: an earlier line here said "never other PRs" and "no untrusted-to-trusted path", more than the docs say.)
+- C11 the fix. (a) `package-manager-cache: false` on every setup-node step: right (main.ts:25-27 and :78 skip the auto
+  branch; `cache` is unset, so nothing is cached) and complete for the trigger; it keeps today's behaviour exactly
+  (C5: nothing is cached now), so it costs nothing and breaks nothing. At 2.3 toolchain.yml is replaced, so it belongs
+  on every setup-node step of the workflows 2.3 leaves, not on "three" as such. (b) "or design caching deliberately
+  with `cache-dependency-path` per job": per-job lockfiles give the toolchain job (root lockfile) and gate/smoke
+  (tools/package-lock.json) different keys, so it fixes the shared key and the mixed contents (C6, C8) and closes the
+  cross-job restore SA-3 sketches; what stays is setup-node saving the whole ~/.npm in its post step after the cut,
+  which later toolchain runs in the same scope restore. A deliberate design would save before the cut
+  (actions/cache/restore and /save around the online `npm ci`). (a) does not block deliberate caching later: an
+  explicit `cache` input is checked first (main.ts:74). (c) the reword (devEngines.packageManager, the whole ~/.npm, the one root-lockfile key, the save
+  after the cut): right; it can also drop "unverified" and state the reach (C9, C10). R5-CI-F16 (r5:672) carries the
+  same one-field reading but already marks it "inferred": optional pointer. The reword should cite its source
+  (setup-node@8207627 action.yml:24, main.ts:144-173) and move SETUP-NODE-CACHE out of the archive's [assumed]
+  provenance list (docs/STATUS_ARCHIVE.md:556-560 lists "SETUP-NODE-CACHE's job log" there; C5 verifies it). It is a
+  Low: it rides the push D1 needs and would not justify a push on its own (CLAUDE.md, review budget).
+- C12 isCacheFeatureAvailable (cache-utils.ts:305-320), called at main.ts:72 before the field check, warns when the
+  cache service is missing; none of the three logs carries that warning (0 matches each), and smoke restored its
+  Playwright cache in the same run: the service is there, so the field alone decides.
+
+## Verdict
+Holds, Low. Every factual claim re-checked against setup-node v7.0.0's shipped code and its behaviour (C2-C4), the
+head's workflows and CI logs (C5-C7), and npm's own behaviour on a poisoned cache (C9): the recorded SETUP-NODE-CACHE
+names one of the two triggers and leaves "what it caches" open. The trigger is off today on main and here, and the
+worst reach once on is a failed or slow install in the writing PR's re-runs, or in a branch's scope and the PRs based
+on that branch, never main's scope from a pull_request run (C9, C10). Low (wording and
+completeness of a follow-up), not Medium. Nuance: "all three jobs restore and save" is loose: one save lands per key,
+today usually the gate job's (C8). Fix (a) and (c) are right; (b) closes the cross-job restore
+but leaves the post-cut save for later toolchain runs. Ran: C4, C9, the lockfile counts. Read: C2, C3, C5-C7, C9b,
+C10, C12. Inferred, not run: which job's save wins (C8: job times plus cache-save.ts's reserve-collision comment).
