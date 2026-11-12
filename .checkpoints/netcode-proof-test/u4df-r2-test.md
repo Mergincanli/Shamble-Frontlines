@@ -106,3 +106,57 @@ once, name and panic here). Notes kept by Write/Edit only.
   crouched 191643; held back 29743; ... re-sped 918773; ... lost 30111; ... carried ... 24", ok in 3.09 s (measured)
   and 3.59 s (bites), under R2's 5 s: NC2-L1's fix (add seed 1) is affordable. All restored by Edit (R-A's three
   back, SEEDS back to `const SEEDS: [u64; 1] = [2];`); sha256 all 17 OK.
+- [10] Own plant R-B: a MoveSpeed taken one tick late (after the tick's commands, not in phase 0). Planted diff, two
+  Edits: (1) the line `clients[usize::from(slot)].speed_cm = value.min(MOVE_SPEED_MAX_CM_S);` removed from the
+  MoveSpeed block; (2) old `out.push(input);`, new `for a in &input.attributes {` / `clients[usize::from(a.slot)]
+  .speed_cm = a.value.min(MOVE_SPEED_MAX_CM_S);` / `}` / `out.push(input);`. te2-plant-rb.log 01:22:16-01:23:11 UTC,
+  -x, --no-fail-fast, exit 101: FAILED by name FX-1's test (replay.rs:886, "seed 2, slot 1, tick 1000157 (carried on
+  1000157), seq 158", left [584, 166], right [588, 165]); lib 5 + 1 failed. Beside it: d7 at :382 only (the recording
+  digests: SS (16694141, ..) not (16694921, ..), TC (799601, ..) not (799693, ..), ES's length 16700849 equal and its
+  hash moved); world "30 passed; 0 failed"; t_m1 and a_m1 pass. FX-1 catches a one-tick phase-0 ordering error that
+  the counted suite held only by D-7's digest before. Restored by two Edits; sha256 all 17 OK.
+- [11] Own plant R-C: the move rule off by a last ulp (the generator's `one_tick` divides by the tick rate in place
+  of the World's `* DT`, world.rs:73, :1345; the same difference as round 1's two P1 forms). Planted diff
+  (replay.rs:409): old `[v[0] * dt, v[1] * dt]`, new `[v[0] / TICK_HZ as f32, v[1] / TICK_HZ as f32]`.
+  te2-plant-rc.log 01:23:31-01:24:25 UTC, -x, --no-fail-fast, exit 101 (warning: unused `dt`): FAILED by name FX-1's
+  test (replay.rs:884, "seed 2, slot 8, tick 1000330 (carried on 1000330), seq 331", left [576, -419], right [576,
+  -420]: 1 cm on one axis); lib 5 + 1 failed. Beside it: d7 at :382, ES's digest only (SS's and TC's digests equal);
+  world 30 + 1 ignored, t_m1 passes. FX-1 is exact to the float: it holds the reckoning at the last ulp, where t_m1's
+  window can move by 1.1 a second either way (round 1 [5]). Restored by Edit; sha256 all 17 OK.
+- [12] Own plant R-E: 3b's re-home does not reset the estimate (the teleport still emitted). Planted diff
+  (replay.rs:462): the line `clients[usize::from(slot)].est = home.map(|k| k as f32 / 100.0);` (24-space indent,
+  inside the 3b loop) removed. te2-plant-re.log 01:24:47-01:25:42 UTC, -x, --no-fail-fast, exit 101: FAILED by name
+  FX-1's test (replay.rs:883, "seed 2, slot 1, tick 1000037 (carried on 1000037), seq 38", left [1074, -419], right
+  [989, 17]: slot 1's first 3b re-home is e = 37); lib 5 + 1 failed. Beside it: d7 at :382 (ES's digest, length
+  16698392 not 16700849), t_m1 (:1151, "9193 ... window, 9396 and 8990 ... halves"). Restored by Edit; sha256 all 17
+  OK.
+- [13] Own plant R-G: the held-back command's move taken BEFORE the tick's phase 0 (so a re-home wipes it, and a
+  MoveSpeed of that tick does not reach it). Planted diff, two Edits: (1) in the slot loop, the block `if let
+  Some((back, _)) = &c.held_back {` / `let d = one_tick(c.speed_cm, back.buttons, back.move_xy);` / `c.est = [c.est[0]
+  + d[0], c.est[1] + d[1]];` / `}` removed (its two comment lines kept); (2) old `// Phase 0's inputs first: the World
+  applies`, new `for c in clients.iter_mut() {` / the same block / `}` / that comment. te2-plant-rg.log
+  01:26:09-01:27:04 UTC, -x, --no-fail-fast, exit 101: FAILED by name FX-1's test (replay.rs:886, "seed 2, slot 6,
+  tick 1000225 (carried on 1000225), seq 226", left [1019, 0], right [1039, 0]: e = 225 = slot 6's 3b re-home, 6 x
+  1,800 / 48); lib 5 + 1 failed. Beside it: d7 at :382 (ES's digest) only; world 30 + 1 ignored (t_m1 passes). This is
+  the case count 6 stands for (11 on seed 2), and FX-1 bites on it. Restored by two Edits; sha256 all 17 OK.
+- [14] Own plant R-D (FX-1's non-vacuity): no command is ever held back (the hold arm sends it). Planted diff
+  (replay.rs:586): old `0 => c.held_back = Some((cmd, rewind)),`, new `0 => {` / `input.commands.push((cmd,
+  rewind));` / `c.est = after;` / `}`. te2-plant-rd.log 01:27:23-01:28:17 UTC, -x, --no-fail-fast, exit 101: FAILED
+  by name FX-1's test at its count assertion (replay.rs:925, "not vacuous: held back: 0"; its line "sky aims checked
+  953622; crouched 94085; held back 0; ... re-sped 510227; ... lost 15327; ... carried ... 0": every aim checked
+  still matched, as it should); lib 5 + 1 failed. Beside it: d7 (:351), the canonical-order test (tests/replay.rs:510,
+  "0 ticks with a slot's two commands"), a_m1 (:940). FX-1's count asserts bite. Restored by Edit; sha256 all 17 OK.
+- [15] Boundary probe R-F (what FX-1 does not hold, by R2's design): the generator's estimate before a slot's first
+  placement wrong (old `est: home_of(s).map(|k| k as f32 / 100.0),`, new `est: [0.0, 0.0],`, replay.rs:400).
+  te2-plant-rf.log 01:28:35-01:29:29 UTC, -x, --no-fail-fast, exit 101 (warning: unused `s`): FX-1 PASSES (lib "6
+  passed; 0 failed"); t_m1 passes; d7 fails (:351, SS's after-tick pins) and a_m1 (:940). As R2 rules ("the slot's
+  checks start at its first spawn or teleport"): before it the recording says nothing of where the soldier is, and
+  the World starts each soldier on its team's spawn points (world.rs:737-749), not at home, so the generator's
+  starting estimate is already open-loop; 3b places every ES slot within the first 60 s (slot 47 at e = 1,762), all
+  inside the warm-up the judged window skips. Not a finding. Restored by Edit; sha256 all 17 OK.
+- [16] The three-seed test once by name (te2-three-seeds.log 01:29:59-01:30:29 UTC, -x, `--ignored --exact
+  --nocapture`, runner exit 0; "Compiling npt-sim (this copy)" x1): "test result: ok. 1 passed; 0 failed; 0 ignored; 0
+  measured; 30 filtered out; finished in 29.42s". Its "ES seed" lines: 21; end-three-seeds.log's: 21; `diff` of the
+  two (process substitution, no file written): none. FX-1 and FX-2 change no recording. MET. (Process note: my first
+  try put the grep output into scratch files by shell redirect; the guard refused the whole command before it ran,
+  nothing written; re-run without redirects.)
