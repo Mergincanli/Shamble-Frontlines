@@ -1,5 +1,5 @@
 diff --git a/spikes/netcode-proof/crates/sim/src/replay.rs b/spikes/netcode-proof/crates/sim/src/replay.rs
-index 3c6a293..b45d5c9 100644
+index 3c6a293..660ee18 100644
 --- a/spikes/netcode-proof/crates/sim/src/replay.rs
 +++ b/spikes/netcode-proof/crates/sim/src/replay.rs
 @@ -19,8 +19,10 @@ use rand_core::{Rng, SeedableRng};
@@ -219,11 +219,170 @@ index 3c6a293..b45d5c9 100644
                      }
                  }
              }
+@@ -711,3 +768,158 @@ impl Replayer {
+         Step::Stepped(tick)
+     }
+ }
++
++#[cfg(test)]
++mod tests {
++    //! The reckoning's exact guard (the advisor's U4d-F ruling, R2's FX-1; the test review's TF-M1): ES's sky aims
++    //! against the integration of the recording's own inputs by the World's own move rule. It steps no World.
++
++    use super::*;
++
++    /// The seeds whose ES recordings the test reads: seed 2 alone puts each of its six counts above 0.
++    const SEEDS: [u64; 1] = [2];
++
++    /// What each count of checked sky aims holds (the ruling's six; each must be above 0).
++    const COUNTS: [&str; 6] = [
++        "sky aims checked",
++        "crouched",
++        "held back",
++        "of a slot a MoveSpeed re-sped",
++        "the first after a lost command",
++        "the first after a held-back command carried on a tick that re-homed or re-sped its slot",
++    ];
++
++    /// One slot's reckoning from the recording alone: where its inputs put the soldier (m; `None` before the slot's
++    /// first spawn or teleport), the move speed the World holds (cm/s), and whether a MoveSpeed has set it.
++    #[derive(Clone, Copy)]
++    struct Reckoned {
++        est: Option<[f32; 2]>,
++        speed_cm: u32,
++        re_sped: bool,
++    }
++
++    /// One tick's move of `c` at `speed_cm`, m: the World's own rule (`crate::world::move_velocity`) times a tick.
++    fn one_tick(speed_cm: u32, c: &Command) -> [f32; 2] {
++        let v = crate::world::move_velocity(speed_cm, c.buttons, c.move_xy, 1.0).0;
++        let dt = 1.0 / TICK_HZ as f32;
++        [v[0] * dt, v[1] * dt]
++    }
++
++    #[test]
++    fn the_sky_aims_reckon_every_input_the_recording_emits() {
++        // TF-M1 (the test review's round 1; the advisor's U4d-F ruling, R2, FX-1): B1.2 step 3's reckoning, exact and
++        // apart from the World's chaos. Over the ES recording t_m1 replays (seed 2, 21,600 ticks from tick 1,000,000,
++        // a 2,000 ms ring), every sky aim (height 4,000 cm) equals, to the centimetre, where the slot's own recorded
++        // inputs put the shooter after that command's move, integrated from the recording alone, never from the
++        // generator's state. Per slot: the speed is the scene's, then each MoveSpeed brought into range as
++        // `apply_inputs` brings it; the estimate is each spawn's or teleport's own position, and the slot's checks
++        // start at its first (3b re-homes every slot within the first 60 s); each tick, phase 0 first, then the
++        // slot's commands in their recorded order, each moving the estimate one tick by the World's own move rule at
++        // that tick's speed. A held-back command (its tick one less than the tick that carries it) aims from its own
++        // tick's state after phase 0 and moves on the tick that carries it; a lost one is not in the recording, so it
++        // never moves the estimate, and the slot's next command shows it as a gap in `seq`. Plants Q1 (the old
++        // reckoning), Q2 (crouch ignored), Q3 (a held-back command's move dropped), Q4 (a MoveSpeed not held) and Q5
++        // (a lost command moving the estimate) each fail it.
++        let scene = Scene::estimate();
++        let ticks = 21_600;
++        let n = usize::from(scene.slots);
++        let mut counts = [0u32; 6];
++        for seed in SEEDS {
++            let rec = Recording::synthetic(&scene, seed, 1_000_000, ticks, 2_000);
++            let start = Reckoned {
++                est: None,
++                speed_cm: scene.move_speed,
++                re_sped: false,
++            };
++            let mut now = vec![start; n];
++            // Each slot's state after this tick's phase 0, kept for the next tick: a held-back command's own tick.
++            let mut own = vec![start; n];
++            let mut seqs: Vec<Option<u16>> = vec![None; n];
++            // Since the slot's last checked sky aim and its last re-home: a lost command; a held-back command carried
++            // on a tick whose phase 0 re-homed or re-sped the slot.
++            let mut lost = vec![false; n];
++            let mut carried = vec![false; n];
++            let mut touched = vec![false; n];
++            for t in &rec.ticks {
++                touched.fill(false);
++                for a in &t.attributes {
++                    if a.attribute == Attribute::MoveSpeed {
++                        let k = usize::from(a.slot);
++                        now[k].speed_cm = a.value.min(MOVE_SPEED_MAX_CM_S);
++                        now[k].re_sped = true;
++                        touched[k] = true;
++                    }
++                }
++                for p in t.spawns.iter().chain(&t.teleports) {
++                    let k = usize::from(p.slot);
++                    let [x, y, _] = p.position;
++                    now[k].est = Some([x as f32 / 100.0, y as f32 / 100.0]);
++                    touched[k] = true;
++                    lost[k] = false;
++                    carried[k] = false;
++                }
++                let before = std::mem::replace(&mut own, now.clone());
++                for (c, _) in &t.commands {
++                    let k = usize::from(c.slot);
++                    if seqs[k].is_some_and(|q| c.seq != q.wrapping_add(1)) {
++                        lost[k] = true;
++                    }
++                    seqs[k] = Some(c.seq);
++                    let held = c.tick == t.tick.wrapping_sub(1);
++                    assert!(
++                        held || c.tick == t.tick,
++                        "seed {seed}, slot {}, tick {}: a command of tick {}",
++                        c.slot,
++                        t.tick,
++                        c.tick
++                    );
++                    // The aim: from its own tick's state after phase 0 (the last tick's, for a held-back command).
++                    let from = if held { before[k] } else { now[k] };
++                    if c.aim[2] == 4_000
++                        && let Some(e) = from.est
++                    {
++                        let d = one_tick(from.speed_cm, c);
++                        let after = [e[0] + d[0], e[1] + d[1]];
++                        let want = [(after[0] * 100.0) as i32, (after[1] * 100.0) as i32];
++                        assert_eq!(
++                            [c.aim[0], c.aim[1]],
++                            want,
++                            "seed {seed}, slot {}, tick {} (carried on {}), seq {}: the sky aim (left) against the \
++                             recording's own inputs' reckoning (right)",
++                            c.slot,
++                            c.tick,
++                            t.tick,
++                            c.seq
++                        );
++                        counts[0] += 1;
++                        counts[1] += u32::from(c.buttons & Command::CROUCH != 0);
++                        counts[2] += u32::from(held);
++                        counts[3] += u32::from(from.re_sped);
++                        counts[4] += u32::from(std::mem::take(&mut lost[k]));
++                        counts[5] += u32::from(std::mem::take(&mut carried[k]));
++                    }
++                    // The move: on the tick that carries the command, at this tick's speed.
++                    let d = one_tick(now[k].speed_cm, c);
++                    if let Some(e) = &mut now[k].est {
++                        *e = [e[0] + d[0], e[1] + d[1]];
++                    }
++                    if held && touched[k] && now[k].est.is_some() {
++                        carried[k] = true;
++                    }
++                }
++            }
++        }
++        let line: Vec<String> = COUNTS
++            .iter()
++            .zip(counts)
++            .map(|(what, n)| format!("{what} {n}"))
++            .collect();
++        println!(
++            "FX-1: ES seeds {SEEDS:?}, {ticks} ticks each from tick 1000000: {}",
++            line.join("; ")
++        );
++        for (what, n) in COUNTS.iter().zip(counts) {
++            assert!(n > 0, "not vacuous: {what}: 0");
++        }
++    }
++}
 diff --git a/spikes/netcode-proof/crates/sim/src/scene.rs b/spikes/netcode-proof/crates/sim/src/scene.rs
-index 524d6b3..7481231 100644
+index 524d6b3..4ed34ba 100644
 --- a/spikes/netcode-proof/crates/sim/src/scene.rs
 +++ b/spikes/netcode-proof/crates/sim/src/scene.rs
-@@ -75,9 +75,13 @@ const ES_WEAPON: Weapon = Weapon {
+@@ -75,9 +75,16 @@ const ES_WEAPON: Weapon = Weapon {
      ..SS_WEAPON
  };
  /// ES's recording aims among the other teams on one command in this many ([`Scene`]'s `aim_one_in`; the advisor's
@@ -235,12 +394,15 @@ index 524d6b3..7481231 100644
 +/// 9.743 and 10.098 gameplay events a second for seeds 1, 2 and 3 (shot hits about 2.7, blast hits about 6.8, kills
 +/// about 0.35), each 300 s half between 9.580 and 10.220 (tests/world.rs, t_m1 and its three-seed form). Of the shares
 +/// tried (11, 16, 26, 34, 36, 38, 40, 48), 40 and 48 put every window and half in 9.5-10.5, and 40 keeps the larger
-+/// smallest margin to the band's edges (0.080 a second; 48's is 0.036).
++/// smallest margin to the band's edges (0.080 a second; 48's is 0.036). Over seeds 1-9 and 36 minutes the rate is flat
++/// at about 9.88 a second, and a 300 s half's noise is 0.2-0.36 a second (U4d-F's review), so 40 is one passing set of
++/// halves, not a margin: a later change that moves ES is re-measured by the advisor's U4d-F ruling (RM), never re-tuned
++/// on three seeds.
 +const ES_AIM_ONE_IN: u32 = 40;
  /// An S30 (a 30-minute run) and 5 minutes more, µs.
  const S30_PLUS_5_US: u64 = 35 * 60 * 1_000_000;
  // SS and ES script no reloads (TUNE-1), so a soldier firing at its weapon's interval must not run dry inside an S30
-@@ -100,18 +104,26 @@ pub struct Scene {
+@@ -100,18 +107,28 @@ pub struct Scene {
      /// Big vehicles, and how many of them are very large units of `LARGE_PARTS` parts (the rest have `SMALL_PARTS`).
      pub(crate) vehicles: u8,
      pub(crate) large_vehicles: u8,
@@ -263,13 +425,15 @@ index 524d6b3..7481231 100644
      /// that throws), and into the air above the shooter on the rest, so those shots rise almost straight up and meet
      /// only a soldier whose box holds the shooter's chest (soldiers pass through each other): 1 in every scene but ES,
 -    /// where the share sets its 10 gameplay events a second (ADR 0001:1478; the advisor's W1-U4D T-M1).
-+    /// where the share sets its 10 gameplay events a second over the judged window, the last 10 minutes of a 12-minute
-+    /// recording, and over each 300 s half of it (ADR 0001:1478 and :1600; the advisor's W1-U4D T-M1 and U4d close
-+    /// ruling, B1.2). Above 1 it also turns on the generator's re-home of each soldier every 60 s (B1.2 step 4's 3b).
++    /// where the share tunes its gameplay events toward 10 a second over the judged window, the last 10 minutes of a
++    /// 12-minute recording, and over each 300 s half of it (ADR 0001:1478 and :1600; the advisor's W1-U4D T-M1 and U4d
++    /// close ruling, B1.2); it moves only the aimed hits, about 0.7 of ES's 9.9 a second at 40 (grenade blasts and sky
++    /// shots meeting a soldier on the shooter's chest make the rest). Above 1 it also turns on the generator's re-home
++    /// of each soldier every 60 s (B1.2 step 4's 3b).
      pub(crate) aim_one_in: u32,
      /// The projectile pool's fixed capacity (stand-ins and grenades).
      pub(crate) projectile_capacity: u16,
-@@ -155,6 +167,7 @@ impl Scene {
+@@ -155,6 +172,7 @@ impl Scene {
              plates_from: 48,
              vehicles: 15,
              large_vehicles: 4,
@@ -277,7 +441,7 @@ index 524d6b3..7481231 100644
              live_projectiles: 300,
              spawn_millihertz: 0,
              fuse_ms: [2_000, 6_000],
-@@ -171,16 +184,19 @@ impl Scene {
+@@ -171,16 +189,19 @@ impl Scene {
          }
      }
  
@@ -302,7 +466,7 @@ index 524d6b3..7481231 100644
              live_projectiles: 0,
              spawn_millihertz: 21_120,
              fuse_ms: [1_515, 1_515],
-@@ -204,6 +220,7 @@ impl Scene {
+@@ -204,6 +225,7 @@ impl Scene {
              plates_from: 1,
              vehicles: 0,
              large_vehicles: 0,

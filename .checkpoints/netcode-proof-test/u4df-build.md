@@ -496,3 +496,211 @@ a5f123b8a2ddde1deb26437cb981f714d891dbf35fca1fe5daaee536c3799bdd  spikes/netcode
   - The hull bound reads D-6's form (rounded down) against B1.3's 1,400; the exact maximum is 1,400.6 cm (the 1 cm grid).
   - The margins at 40 stay thin (seed 2's window test: 2nd half 9.606, 0.106 over the floor), as the step 4-5 builder
     noted; any later change to ES's draw stream re-runs this measurement.
+
+## Fix pass, round 1
+Builder: a fresh one (general-purpose, opus, xhigh), the main session's fix pass of U4d-F round 1, in this copy. Plan:
+the advisor's U4d-F ruling (/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-u4df.md), R2 whole
+(FX-1, FX-2, "Who and how", the evidence), T3 and "Before the merge" item 1, R1 and R4 read for context; the test
+review's [5] and [11] (u4df-review-test.md) for Q1 and Q2. Two files change: src/replay.rs (FX-1) and src/scene.rs
+(FX-2). world.rs, tests/world.rs and tests/replay.rs stay byte-identical to round 1's. Rules: Write/Edit only; every
+cargo and check.mjs run through u4df-run.sh (`-x` for counted, check.mjs, and planted runs), logs
+/home/user/Shamble-Frontlines/.gate/u4df/fx-<name>.log; TE2-5 as the brief states it (this pass re-pins nothing and
+expects no failure on the real code; a plant's failures are the plant's); commit nothing.
+
+### Plan
+0. Start check: these notes read whole; `git status`, `git diff --stat`; the five files' sha256 = round 1's.
+1. FX-1 in src/replay.rs: `#[cfg(test)] mod tests` at the end of the file, one private `#[test]`
+   `the_sky_aims_reckon_every_input_the_recording_emits` and private helpers, built as R2's "FX-1, the test":
+   - the recording: `Recording::synthetic(&Scene::estimate(), 2, 1_000_000, 21_600, 2_000)` (t_m1's);
+   - per slot, from the recording's own inputs alone: the speed (the scene's `move_speed`, then each MoveSpeed for the
+     slot, `.min(MOVE_SPEED_MAX_CM_S)`), the estimate (none until the slot's first spawn or teleport, then each
+     Placement's own position / 100 as f32); each tick phase 0 first (attributes, spawns, teleports), the state after
+     it kept for the next tick (a held-back command's own tick), then the slot's commands in recorded order;
+   - each command: its aim's reckoning `after` = the estimate + `crate::world::move_velocity(speed, buttons, move_xy,
+     1.0).0` x `1.0 / TICK_HZ as f32`, per axis, from its own tick's state after phase 0 (the previous tick's for a
+     held-back one, `tick` = carrying tick - 1); then the move, on the tick that carries it, at that tick's speed, from
+     the estimate as it stands; a command of neither tick panics (the generator emits none);
+   - the check: every aim of height 4,000 has x, y = `(after * 100.0) as i32` exactly; the first mismatch panics with
+     slot, tick (and the carrying tick), seq and both values;
+   - six counts, each printed and asserted above 0, each a count of checked sky aims: all; crouched; held back; of a
+     slot whose speed a MoveSpeed set; the first after a lost command (a gap in the slot's seq, with no re-home of the
+     slot between); the first after a held-back command carried on a tick whose phase 0 re-homed or re-sped its slot
+     (no re-home between). Fall-back: seeds 1, then 3 added (counts summed) until each is above 0; the comment names
+     the seeds. Run time: if more than 5 s in either build, the first 7,200 ticks, said in its comment.
+   - Runs: the test by name, `--exact --nocapture`, measured and `--all-features` (fx-1-measured.log, fx-1-bites.log):
+     its line (counts, seeds, ticks) and the binary's "finished in" time.
+   - Plants Q1-Q5, each by Edit in `synthetic` over FX-1's replay.rs, the whole measured suite `--no-fail-fast`, `-x`
+     (fx-plant-q<N>.log), FX-1's test failing by name (every other failure recorded beside it), restored by Edit,
+     replay.rs's sha256 checked against FX-1's:
+     Q1 the test review's [5] form (its two Edits); Q2 [11]'s form (crouch masked out of `one_tick`'s buttons); Q3 the
+     held-back block's two lines removed; Q4 the line setting `speed_cm` from the emitted MoveSpeed removed; Q5
+     `c.est = after;` added in the lost arm (`1 => {}`).
+2. FX-2 in src/scene.rs: T3 (a) appended to `ES_AIM_ONE_IN`'s doc after "(0.080 a second; 48's is 0.036)."; in
+   `aim_one_in`'s doc "sets its 10 gameplay events a second" -> "tunes its gameplay events toward 10 a second" and T3
+   (b) inserted after "U4d close ruling, B1.2)", before the full stop; T3's words copied exactly, rewrapped to at most
+   120 characters at the doc's indent, no other word changed.
+3. Evidence on the final files: fmt --check; clippy -D warnings npt-sim host --all-targets and wasm32, measured and
+   --all-features; rustdoc -Dwarnings both builds (fx-lint.log); npt-sim's suites both builds, -x (fx-suites-
+   measured.log, fx-suites-bites.log: 50 and 58, one more than round 1's 49 and 57; D-7 and every pin unchanged); the
+   three-seed test by name `--ignored --exact --nocapture` (fx-three-seeds.log), its 21 "ES seed" lines diffed with
+   end-three-seeds.log's; check.mjs twice, counted, each after the two `--no-run` provenance builds in the same runner
+   call (fx-check1.log, fx-check2.log): 368 / 415 / 52.
+4. End: the five files' sha256 in sha256sum form; world.rs, tests/world.rs, tests/replay.rs = round 1's.
+
+### Progress
+- **Step 0 DONE** (start check). Branch u4df-build at dad9566; `git status`: the five crates/sim files modified, this
+  file untracked, nothing else; `git diff --stat`: 5 files, +503 / -146 (= the End record above). sha256 = round 1's
+  for all five (replay 30a17b58d365baea, scene 1d42cd960701f764, world 6e01101323ce57a1, tests/replay
+  a5f123b8a2ddde1d, tests/world 0a340fb5db383d05). 10 GB free; no cargo or rustc running. Read: `synthetic` whole
+  (replay.rs:367-605), `move_velocity` (world.rs:476-505), `apply_inputs` (:1134-1164; the clamp :1157), `canonical`
+  (:257-262: slot ascending, then tick, so a held-back command comes before its slot's current one).
+- FX-1, the edit (src/replay.rs only; +155 lines at the end, nothing above them changed): `#[cfg(test)] mod tests`
+  (`use super::*`), with private `SEEDS` ([2]), `COUNTS` (the six names), `struct Reckoned` (est, speed_cm, re_sped)
+  and `fn one_tick(speed_cm, &Command)` (`crate::world::move_velocity(.., 1.0).0` x `1.0 / TICK_HZ as f32`), and the
+  test. It reads `Recording::synthetic(&Scene::estimate(), seed, 1_000_000, 21_600, 2_000)`'s ticks only, and
+  `scene.slots` and `scene.move_speed`. Per tick: MoveSpeed attributes (`.min(MOVE_SPEED_MAX_CM_S)`), then spawns and
+  teleports (each its Placement's position / 100 as f32; clears the slot's two pending flags), then the post-phase-0
+  state kept (`std::mem::replace`), the last tick's handed to the held-back commands; then the commands in recorded
+  order: a seq gap sets the slot's "lost" flag; a command whose tick is neither this tick nor the last panics; a sky
+  aim (z 4,000) is checked by `assert_eq!` against `(after * 100.0) as i32` from its own tick's state, naming seed,
+  slot, tick, carrying tick and seq; then the command moves the estimate at this tick's speed; a held-back command
+  carried on a re-homed or re-sped tick (with an estimate) sets the slot's "carried" flag. Counts 5 and 6 are the
+  first checked sky aim after their flag, cleared by a re-home of the slot (a re-home wipes what the flag stands for):
+  my reading of R2's "the first sky aim after", stated in the code's comment.
+  - First lint (fx-1-lint0.log 00:32:08-00:32:12 UTC, shared lock, not counted): fmt --check; clippy -D warnings
+    npt-sim host --all-targets, measured and --all-features: all exit 0.
+  - By name, `--exact --nocapture`, -x: measured (fx-1-measured.log 00:32:18-00:32:21 UTC; runner exit 0; "Compiling
+    npt-sim (this copy's path)" once) and --all-features (fx-1-bites.log 00:32:27-00:32:30; the same): "test result:
+    ok. 1 passed; 0 failed; ... 5 filtered out; finished in 1.75s" (measured), "1.82s" (bites). Its line, equal in
+    both: "FX-1: ES seeds [2], 21600 ticks each from tick 1000000: sky aims checked 954628; crouched 97974; held back
+    14860; of a slot a MoveSpeed re-sped 465658; the first after a lost command 14996; the first after a held-back
+    command carried on a tick that re-homed or re-sped its slot 11". Seed 2 alone puts all six above 0 (no seed
+    added); under 5 s in both (no 7,200-tick fall-back). The real code passes at the first run: no TE2-5 entry.
+  - replay.rs with FX-1: 802842b04e996419df209129099b8d413af35b43f6b011cefbd5400d5233ef56 (each plant's restore target).
+- Plants, each by Edit in `synthetic` over that file, the whole measured suite `cargo test --locked -p npt-sim
+  --no-fail-fast`, -x, then restored by Edit and `sha256sum -c` of the line above: OK. Each log's provenance shows
+  "Compiling npt-sim (this copy's path)" (the lib and the bin built from the planted file).
+  - **Q1, the old reckoning** (the test review's [5], its two Edits), fx-plant-q1.log 00:33:05-00:34:04 UTC, runner
+    exit 101 (one compiler warning, unused `one_tick`, as [5] saw).
+    - Edit (i), replay.rs:473-476: old `if let Some((back, _)) = &c.held_back {` / `let d = one_tick(c.speed_cm,
+      back.buttons, back.move_xy);` / `c.est = [c.est[0] + d[0], c.est[1] + d[1]];` / `}`; new `if let Some((back, _))
+      = &c.held_back {` / `let _ = back;` / `}`.
+    - Edit (ii), replay.rs:508-509: old `let d = one_tick(c.speed_cm, c.buttons, c.mv);` / `let after = [c.est[0] +
+      d[0], c.est[1] + d[1]];`; new `let speed = scene.move_speed as f32 / 100.0;` / `c.est[0] += f32::from(c.mv[0]) /
+      127.0 * speed / TICK_HZ as f32;` / `c.est[1] += f32::from(c.mv[1]) / 127.0 * speed / TICK_HZ as f32;` / `let
+      after = c.est;`.
+    - FAILED `replay::tests::the_sky_aims_reckon_every_input_the_recording_emits` (replay.rs:885, "seed 2, slot 1,
+      tick 1000057 (carried on 1000057), seq 58: the sky aim (left) against the recording's own inputs' reckoning
+      (right)", left [788, 360], right [798, 343]). Beside it: d7 (tests/replay.rs:351, SS after 300 ticks (300, 6624,
+      8955962681012353194)), a_m1 (tests/world.rs:940, "not vacuous: dead soldiers' boxes are not live") and t_m1
+      (tests/world.rs:1151, "9846 ... over the window, 9240 and 10453 over its 300 s halves": te-plant-p1.log's
+      figures exactly, so this is [5]'s plant). The rest pass: lib 5 + 1 failed, replay 5 + 1, seam 8, world 28 + 2 +
+      1 ignored. Restored by two Edits (the old texts back); sha256 OK.
+  - **Q2, crouch ignored** ([11]'s form), fx-plant-q2.log 00:34:41-00:35:37 UTC, runner exit 101. Edit, replay.rs:408
+    (the generator's `one_tick` closure): old `let v = move_velocity(speed_cm, buttons, move_xy, 1.0).0;`; new `let v
+    = move_velocity(speed_cm, buttons & !Command::CROUCH, move_xy, 1.0).0;`. FAILED `replay::tests::the_sky_aims_
+    reckon_every_input_the_recording_emits` (replay.rs:884, "seed 2, slot 2, tick 1000075 (carried on 1000075), seq
+    76: ...", left [1014, -13], right [1007, -6]). Beside it: d7 (:351, SS after 300 (300, 6620,
+    4722149015725882838)), a_m1 (:940, "not vacuous") and t_m1 (:1151, "9866 ... over the window, 10363 and 9370 over
+    its 300 s halves": te-plant-p3.log's figures). The rest pass: lib 5 + 1, replay 5 + 1, seam 8, world 28 + 2 + 1
+    ignored. Restored by Edit; sha256 OK.
+  - **Q3, a held-back command's move dropped**, fx-plant-q3.log 00:35:52-00:36:49 UTC, runner exit 101 (warning:
+    unused variable `back`). Edit, replay.rs:473-476: the held-back block's two lines `let d = one_tick(c.speed_cm,
+    back.buttons, back.move_xy);` and `c.est = [c.est[0] + d[0], c.est[1] + d[1]];` removed (old: the block with
+    them; new: `if let Some((back, _)) = &c.held_back {` / `}`). FAILED `replay::tests::the_sky_aims_reckon_every_
+    input_the_recording_emits` (replay.rs:882, "seed 2, slot 0, tick 1000004 (carried on 1000004), seq 5: ...", left
+    [1028, -74], right [1036, -92]: the command carried beside slot 0's first held-back one). Beside it: d7 (:351, SS
+    after 300 (300, 6672, 9991609429507691685)) and t_m1 (:1151, "9605 ... over the window, 10103 and 9106 over its
+    300 s halves"); a_m1 passes. The rest pass: lib 5 + 1, replay 5 + 1, seam 8, world 29 + 1 + 1 ignored. Restored
+    by Edit; sha256 OK.
+  - **Q4, a MoveSpeed not held**, fx-plant-q4.log 00:37:15-00:38:12 UTC, runner exit 101 (warning: unused import
+    `MOVE_SPEED_MAX_CM_S`, in the lib build, where the test module is not compiled). Edit, replay.rs:430: the line
+    `clients[usize::from(slot)].speed_cm = value.min(MOVE_SPEED_MAX_CM_S);` removed (the MoveSpeed is still pushed to
+    `input.attributes`). FAILED `replay::tests::the_sky_aims_reckon_every_input_the_recording_emits` (replay.rs:883,
+    "seed 2, slot 1, tick 1000157 (carried on 1000157), seq 158: ...", left [584, 166], right [588, 165]: tick
+    1000157 is e = 157, the first MoveSpeed draw). Beside it: d7 only (:351, SS after 300 (300, 6612,
+    3564984947766812572)). t_m1 and a_m1 pass: lib 5 + 1, replay 5 + 1, seam 8, world 30 + 1 ignored. So under Q4
+    the counted suite had only D-7's pin before FX-1. Restored by Edit; sha256 OK.
+  - **Q5, a lost command moving the estimate**, fx-plant-q5.log 00:38:26-00:39:22 UTC, runner exit 101. Edit,
+    replay.rs:587: old `1 => {}`; new `1 => {` / `c.est = after;` / `}`. FAILED `replay::tests::the_sky_aims_reckon_
+    every_input_the_recording_emits` (replay.rs:886, "seed 2, slot 1, tick 1000057 (carried on 1000057), seq 58:
+    ...", left [788, 360], right [798, 343]). Beside it: d7 only (:351, SS after 300 (300, 6652,
+    6629039644418743120)); t_m1 and a_m1 pass: lib 5 + 1, replay 5 + 1, seam 8, world 30 + 1 ignored. Restored by
+    Edit; sha256 OK. Reading (not checked by a probe): Q1's first mismatch is this one, slot 1 at seq 58 with the
+    same values, which fits a lost command of slot 1 just before it: Q1 too moves the estimate on every command, lost
+    ones included, and that is where its estimate first differs in seed 2.
+- **Step 1 DONE** (FX-1 built; passes in both builds; Q1-Q5 each fail it by name). replay.rs back to FX-1's
+  802842b04e996419 after the last plant; `git diff --stat` 5 files, +658 / -146 (replay.rs 292 lines, round 1's 137 +
+  155). No other file touched. Q4 and Q5 show what FX-1 adds: t_m1 passes under both, and only D-7's pin failed
+  beside FX-1.
+- **Step 2 DONE** (FX-2, scene.rs, doc comments only; two Edits). T3's two lines were taken from advisor-u4df.md
+  (:452 and :456) by a read-only script that printed the greedy rewrap (width 120, the doc's indent, no break at a
+  hyphen); the printed lines were applied by Edit:
+  - (a) `ES_AIM_ONE_IN`'s doc: old line 83 `/// smallest margin to the band's edges (0.080 a second; 48's is 0.036).`;
+    new lines 83-86, the same line's words then T3 (a): "... 48's is 0.036). Over seeds 1-9 and 36 minutes the rate
+    is flat" / "at about 9.88 a second, ... so 40 is one passing set of" / "halves, not a margin: ... never re-tuned" /
+    "on three seeds." (lines 77-82 unchanged).
+  - (b) `aim_one_in`'s doc: old lines 124-126 ("where the share sets its 10 gameplay events a second ... ruling, B1.2).
+    Above 1 ... (B1.2 step 4's 3b)."); new lines 127-131: "where the share tunes its gameplay events toward 10 a
+    second over the judged window, ... U4d" / "close ruling, B1.2); it moves only the aimed hits, about 0.7 of ES's
+    9.9 a second at 40 (grenade blasts and sky" / "shots meeting a soldier on the shooter's chest make the rest). Above
+    1 it also turns on the generator's re-home" / "of each soldier every 60 s (B1.2 step 4's 3b)." (lines 121-123
+    unchanged).
+  - Check (read-only script): undoing both edits in memory gives round 1's sha256 1d42cd960701f764... exactly; each new
+    doc's words equal the old words with T3 (a) appended, and with the one replacement and T3 (b) inserted before the
+    full stop; the changed lines' widest is 120 (the file's widest is 120). scene.rs now
+    a5ce8ac2e9a37f0af9cadb7ee9ceeb514ea1a34e2830e4f7754d51f41afa8655.
+- Step 3, evidence on the final files (replay.rs 802842b0..., scene.rs a5ce8ac2...; the other three = round 1's):
+  - Lint (fx-lint.log 00:41:11-00:41:18 UTC, shared lock): `cargo fmt --all --check`; clippy -D warnings npt-sim host
+    --all-targets, measured and --all-features; clippy -D warnings npt-sim wasm32-unknown-unknown, measured and
+    --all-features; `env RUSTDOCFLAGS=-Dwarnings cargo doc --locked --no-deps -p npt-sim`, measured and
+    --all-features: all 7 exit 0; "Checking npt-sim (this copy's path)" x4, "Documenting" x2.
+  - Suites, -x, each build in its own runner call: measured (fx-suites-measured.log 00:41:23-00:42:20 UTC, exit 0):
+    lib 6, replay 6, seam 8, world 30 passed + 1 ignored, 0 failed = 50 (round 1: 49); bites, `--all-features`
+    (fx-suites-bites.log 00:42:25-00:43:26, exit 0): lib 6, replay 7, seam 10, world 35 + 1 ignored, 0 failed = 58
+    (round 1: 57). "Compiling npt-sim (this copy's path)" once each. FX-1's test and d7 "ok" in both: D-7 and every
+    pin unchanged (tests/replay.rs untouched); the +1 is FX-1's test in the lib binary (5 -> 6).
+  - The three-seed test by name, `--ignored --exact --nocapture`, -x (fx-three-seeds.log 00:43:33-00:44:05 UTC,
+    exit 0): "test result: ok. 1 passed; ... 30 filtered out; finished in 31.48s"; its 21 "ES seed" lines against
+    end-three-seeds.log's 21: `diff` none. FX-1 and FX-2 change no recording.
+  - check.mjs run 1, counted (-x; fx-check1.log 00:44:17-00:49:47 UTC; runner exit 0; `cargo test --locked
+    --workspace --no-run` and the same `--all-features` first in the same call: "Compiling npt-sim v0.0.0
+    (/home/user/Shamble-Frontlines/.claude/worktrees/wf_9ce88fa3-452-1/spikes/netcode-proof/crates/sim)" x2): PASS fmt
+    0.6 s; PASS clippy 6.9 s; PASS clippy-wasm32 1.5 s; PASS doc 45.0 s; PASS test 231.9 s "measured build: 368 tests
+    passed, 0 failed, 0 reported a skip; bites build: 415 tests passed, 0 failed, 0 reported a skip"; PASS deps 0.7 s
+    (109 crate files, 1 cargo config); PASS refs 0.0 s (656 tracked files); PASS marks 1.9 s (81 marks, drafts
+    626df678, rows all unchanged); PASS self 1.2 s "52 of 52 tests passed"; PASS redact 0.7 s (10 of 10; 183 items, 0
+    findings); "check: all 10 steps pass".
+  - check.mjs run 2, counted (-x; fx-check2.log 00:49:53-00:54:38 UTC; runner exit 0; the same provenance x2): PASS
+    fmt 0.5 s; PASS clippy 3.1 s; PASS clippy-wasm32 0.8 s; PASS doc 43.8 s; PASS test 228.2 s, measured 368 / 0 / 0,
+    bites 415 / 0 / 0; PASS deps 0.7 s; PASS refs 0.0 s; PASS marks 0.6 s; PASS self 1.1 s, 52 of 52; PASS redact 0.7
+    s; "check: all 10 steps pass".
+  - Counts as deltas on round 1's 367 / 414 / 52: measured 368 (+1), bites 415 (+1), self 52 (+0). The +1 is FX-1's
+    test, in the lib binary of both builds.
+- **Step 3 DONE.**
+- **End DONE** (step 4). `git status`: the same five crates/sim files modified, this file untracked, nothing else;
+  HEAD dad9566; diff stat 5 files, +663 / -146 (round 1's +503 / -146, plus FX-1's 155 lines and FX-2's net 5);
+  nothing committed. No PLANT or PROBE text under crates/sim (grep: none). Every other file in the base list unchanged
+  (greybox 2d75cb0b, grid a0e24c08, hash 4663b2a8, history f11e9b59, lib 396e663d, rng d6b61bbe, seam 0c41b406, ticks
+  5d852f1a, trajectory 2c0968b3, tests/seam 4900af4e, sim Cargo.toml fb98df48, check.mjs 7eddc285, workspace
+  Cargo.toml 75b6c160, Cargo.lock 3da1e15f). world.rs, tests/replay.rs and tests/world.rs: `sha256sum -c` of round
+  1's lines, 3 OK. Final sha256 (`sha256sum` form, paths from the copy's root; this notes file left out, as before):
+
+```
+802842b04e996419df209129099b8d413af35b43f6b011cefbd5400d5233ef56  spikes/netcode-proof/crates/sim/src/replay.rs
+a5ce8ac2e9a37f0af9cadb7ee9ceeb514ea1a34e2830e4f7754d51f41afa8655  spikes/netcode-proof/crates/sim/src/scene.rs
+6e01101323ce57a14f3978014d98a2d07d5e37fcaa1c8e503c6cf76ed0dfcb4e  spikes/netcode-proof/crates/sim/src/world.rs
+a5f123b8a2ddde1deb26437cb981f714d891dbf35fca1fe5daaee536c3799bdd  spikes/netcode-proof/crates/sim/tests/replay.rs
+0a340fb5db383d056e9768f7263f58fe6ff4e5009b03ba6b391f15e55bb28c87  spikes/netcode-proof/crates/sim/tests/world.rs
+```
+- For round 2 and the main session (end of the fix-pass builder):
+  - FX-1's counts 5 and 6 count the first checked sky aim after their event with no re-home of the slot between: a
+    re-home puts the estimate on a Placement, which wipes what a lost or carried command could have changed. That is
+    my reading of R2's "the first sky aim after a lost command"; the code's comment states it. Count 6 is 11 on seed 2
+    (the ruling's estimate: about ten).
+  - FX-1 also asserts that every recorded command's tick is its carrying tick or the one before, which the generator
+    always meets (not among R2's checks; it fails loudly rather than mis-reckoning if a later generator holds a command
+    back for longer).
+  - What FX-1 adds to the counted suite, by the plants: under Q4 and Q5, t_m1 and a_m1 pass and only D-7's pin failed
+    beside FX-1; under Q1, Q2 and Q3, t_m1 failed too (by its events assertion).
+  - No public item added; world.rs, tests/ and every pin untouched; no TE2-5 entry (the real code never failed).
