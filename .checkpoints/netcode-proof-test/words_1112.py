@@ -94,6 +94,21 @@ HEAD = "## Decision: Mustafa, 2026-11-12 about 15:32 UTC, after his /compact (SP
 assert len(NEW_HEAD) <= 120 and len(HEAD) <= 120
 with open(H, encoding="utf-8") as fh:
     hist = fh.read().split("\n")
+if "--undo" in sys.argv:
+    # Take the appended entry out again and give the heading its old text: history.md returns to the version the
+    # entry was added to (checked by sha256), so a script pinned to that version (u4d2_fold.py) can run on it.
+    hs = [i for i, l in enumerate(hist) if l == NEW_HEAD]
+    assert len(hs) == 1 and hist.count(HEAD) == 1, (hs, hist.count(HEAD))
+    k = hist.index(HEAD)
+    assert hist[k - 1] == "" and hist[k + 1:] == entry + [""], "the appended entry is not as this script writes it"
+    back = hist[:k - 1] + [""]
+    back[hs[0]] = OLD_HEAD
+    data = "\n".join(back)
+    assert hashlib.sha256(data.encode("utf-8")).hexdigest().startswith("c62ac831"), "not the old version"
+    with open(H, "w", encoding="utf-8") as fh:
+        fh.write(data)
+    print("undone: history.md is c62ac831… again")
+    sys.exit(0)
 heads = [i for i, l in enumerate(hist) if l == OLD_HEAD]
 assert len(heads) == 1, heads
 i = heads[0] + 1
