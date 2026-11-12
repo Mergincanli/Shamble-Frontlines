@@ -28,5 +28,25 @@ Memory: none found (no agent-memory folder anywhere on disk); started fresh.
 - C5 experiment: [lints] workspace = true plus [lints.clippy] pedantic in sim: cargo 1.99.1 refuses: "cannot override workspace.lints in lints, either remove the overrides or lints.workspace = true and manually specify the lints". Restored; scratch manifest identical to head.
 - C6 ADR 0004 migration step 2 (0004:1252): the foundation gives sim code (hash-map ban, replay runner, first recording); ADR 0002 migration 2.5 gives protocol/room/client-endpoint code (Join..Snapshot over the loopback).
 
-## Findings
-(none yet)
+- C7 CI on the head 4d78ad6: toolchain push 43312017234 (job 131510223737) and pull_request 43312027194, gate 43312016939 and 43312026745: all success. Job log: uid 1001 group nogroup, curl exit 7 "the network is cut", 6 unit tests ok, release sim + protocol ok, wasm32 dev build of 5 crates, vitest 4x1 + playwright 1, tsc 6.0.3.
+- C8 local gate in the worktree: node tools/gate.mjs origin/main --no-smoke: GATE PASS, symbols +0 -0 (working tree = head outside .checkpoints).
+- C9 lone crate under a nested .gate/ fails the same way; with exclude = [".gate", ".checkpoints"] in the copy root: the lone crate builds, members stay 6, cargo test --workspace --locked passes (lock unchanged). Copy restored, identical to head.
+- C10 other reviewers notes skimmed for overlap: RR-2 (rust-reviewer) already has the lints + pedantic refusal (my C5): not re-reported. RR-1 (overflow in callers) not duplicated.
+- C11 ADR 0002 static import rules (0002:207-209, :424, PM-0002-42, -46): no rule that client never imports net or the Wasm glue; page-side bans are runtime only (spike item 1, PM-0002-22).
+- C12 OQ-0002-8 (a) (register :74, 0002:1100-1102): "the first foundation milestone that builds them is their test"; the report and docs are silent on whether 2.2 counts.
+
+- C13 package-lock.json (node): 5 workspace links; every workspace dependency list empty; root devDependencies exactly typescript 6.0.3, vitest 5.1.0, @playwright/test 1.65.0; 64 registry packages; no three.js, no direct vite, no eslint/prettier/typescript-eslint, no wasm tooling. vite 8.3.7 + rolldown only as vitest peer (^6.4.0||^7.0.0||^8.0.0).
+- C14 upward-edge mutation sim -> room in the copy: --locked fails on the old lock; lock regenerated: cargo test --workspace --locked 12 ok lines, wasm32 build ok, release tests ok. Nothing in 2.2 enforces part 3 direction (G5 at 2.3, as planned). Restored identical.
+- C15 root .cargo/config.toml leak test in the copy: [build] target-dir and [env] TS_RS_EXPORT_DIR reach a nested spikes/ws-spike with its own [workspace]: metadata target_directory = leak-target; test sees TS_RS_EXPORT_DIR=.../packages/types/src/generated. Config moved aside (cargo-config-leaktest).
+- C16 PR #40 compare 1efd46f...8eb5d09: ahead 8, 23 files, all under .checkpoints/: E4b/E4d inputs outside .checkpoints unchanged; spike .cargo/config.toml is target-dir only. check.mjs not run (unreviewed code). infra-engineer noted the same as "not verified".
+- C17 register (docs/adr/README.md) lists OQ-0002-1, -4, -5, -6, -8, -9; no OQ-0002-7 row: its by-day decider lives only in ADR 0002:1082-1084.
+- C18 advisor consultation 1 (after orientation): tightened EA-3 to an omission (only sim-wasm lib.rs:2 misattributes), EA-4 as my reading, EA-5 as proposed for 2.3 without the Vite mechanism; added C13-C16; fixes mind report :116-119 (unchanged since 566363f) and plan Part 6 "no exclude".
+
+## Findings (final texts)
+- EA-1 Low Cargo.toml:2-4: root [workspace] reaches every Cargo package below the root, unrecorded. (a) now: lone packages (future spikes before 2.3; .gate/ and .checkpoints/ scratch crates) fail without their own [workspace] (C4, C9). (b) for 2.4: ADR 0002:345-346 puts TS_RS_EXPORT_DIR in .cargo/config.toml; a root one reaches nested workspaces (C15) and fails the spike cargoConfigFiles check plan Part 6 cites; no follow-up carries it. Fix: follow-up lines now (report :181-191, archive From foundation 2.2); exclude [".gate", ".checkpoints"] as a 2.3 option (tested C9) or now with CI and :116-119 reworded.
+- EA-2 Low crates/room/src/lib.rs:2 (+ sim:2, client-endpoint:1-2, REPO_MAP:18): "Empty until its first slice" vs ADR 0002:1467-1472 and ADR 0004:1252 (foundation); client-endpoint doc and REPO_MAP omit part 3 constraints (0002:190) and the block layout table (0002:304-305). Fix comment-only with RR-1 fix pass; :116-119 names the commit.
+- EA-3 Low crates/sim-wasm/src/lib.rs:2 (+ report :185-186, archive :634-637): OQ-0002-7 by-day decider (0002:1082-1084) dropped (omission in EMPTY-SLOTS; lib.rs ties it to the spike); register has no row (C17). Fix: wording in both EMPTY-SLOTS and the doc line.
+- EA-4 Low report :185: OQ-0002-8 (a) (0002:1100-1102; register :74) "the first foundation milestone that builds them is their test": 2.2 builds room and client-endpoint empty; report silent; my reading. Fix: one sentence: their test is 2.5 under G5.
+- EA-5 Low docs/adr/0002:207-209 (proposed, for 2.3): no static rule that client never imports net or the Wasm glue; page-side bans runtime only (spike item 1, PM-0002-22). Fix: 2.3 plan weighs a no-restricted-imports entry + PM-0002-42 mutation; ADR owner words part 3 when the Advisor agrees.
+
+VERDICT: APPROVE (five Lows).
