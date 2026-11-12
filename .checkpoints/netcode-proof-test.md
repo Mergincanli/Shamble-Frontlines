@@ -33,6 +33,11 @@ advisor-u4e-brief.md, advisor-u4df.md.
   that worktree; the fresh builder reads its notes and `git diff` there first. Snapshot the worktree to the branch at
   each check-in (worktree_patch.py ... wip/u4e.patch u4e-). On return: read its section-6 list in full (everything
   that touches the marks: its bites and their proofs); then the review packet by script and the review.
+  - **Cut at 02:03 UTC** by the usage limit after 49 s (its notes' start block only: the worktree came up at main's
+    bb2d817 and was fast-forwarded to 97bb9d3; no code). **Relaunched 03:54 UTC as run wf_1e3b5232-26a, task
+    wvemlyc6h** (script workflows/scripts/npt-u4e-build-2-wf_1e3b5232-26a.js): one fresh builder, no isolation, in
+    that same worktree, reading its notes and the diff first. If cut again, resume this run with
+    `Workflow({scriptPath, resumeFromRunId})`: it has no isolation, so the builder re-runs in the same worktree.
 - The saver: `node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer
   "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
   https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"` (background, 120 minutes; restart it when it stops). Stop
