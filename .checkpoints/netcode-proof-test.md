@@ -12,8 +12,29 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**The current step: U4 wave 2's start.** U4e's launch (L4; L3, the carry-51 commit, done at 28a85e7); U4d2's brief with
-the advisor. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
+**AFTER /COMPACT, START HERE (written 2026-11-12 about 15:35 UTC, before Mustafa's /compact).** Two runs in the
+background; their notifications arrive after the compact:
+1. **U4e's review round 2:** workflow wf_e623d489-17e (task wh159bx8v), batches of at most two (netcode+security, then
+   arch+rust read only, then the test-engineer alone). On return: read every finding rated Medium or higher in full
+   and everything touching the judge, the marks or a pass bar (USAGE-SAVINGS); apply R8's outcome rule
+   (advisor-u4e-r1.md:431-434): APPROVE or Lows only → the merge on R9's M1-M9 (advisor-u4e-r1.md:438-494; texts T1-T6
+   copied by script in the merge commit, each old text found once; stop the saver first); a Medium → the advisor; a
+   High → the advisor for a third round on it alone. If cut: check the copy against .gate/u4e/fx-hashes-end.sha256
+   first (a plant may be in place), then resume with `Workflow({scriptPath, resumeFromRunId})`.
+2. **U4d2's fold script:** workflow wf_ec856301-902 (task wgr64i526): one agent writes `u4d2_fold.py` (notes
+   u4d2-fold-notes.md), dry-run only. On return: run its dry run yourself, read the diff, then `--apply` (rev 1.2; the
+   brief's sha256 was e6bcefc8…); anything it lists under not_by_script goes to the advisor (L1). Then the rest of the
+   U4d2 launch (card's Next steps item 3): P6 (`<base>` = the head at launch; `git merge-base --is-ancestor adb1bab
+   <base>` exit 0; counts 399 / 446 / 52 / 10 if `git diff --stat 28a85e7 <base> -- spikes/netcode-proof` is empty,
+   else a counted run through main-run.sh); P7 is DONE: u4d2-run.sh (sha256 d1fd0e7e…, `-k` added; its diff against
+   u4e-run.sh 669f7c65… saved as u4d2-run.sh.diff and checked equal to the live diff); show `-k` once in U4d2's
+   worktree, shared mode: `false :: true` with -k exits 1 with both exit codes logged, without -k only the first; then
+   launch one builder (general-purpose, opus, xhigh) in its own worktree under W1-TARGET's lock (L5: at most three
+   agents, round 2's at most two). The prompt carries T4 items 1-2 (crates named per the brief), TE2-5, the builders'
+   limits (history.md:291-293) and L4's sentence on U4e's order.
+- The saver runs as brww4gof7 (restart it when it stops). The chat's size goes in every report.
+
+**The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188
 to 85c08df, the version earlier rulings' and u4e-brief.md's plan cites read; d928358b… before 1e8c188), u4s-carries.md (carries 1-72, cdab0240…); the advisor's rulings: advisor-u4.md,
 advisor-u4-wave1.md (with B1.4's erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md,
@@ -96,7 +117,7 @@ advisor-u4e-brief.md, advisor-u4df.md.
     4300944 (round 1's kept as .gate/u4e/u4e-r1-snapshot.patch). Its slip: two scratch lists by shell redirect in the
     session scratchpad (recorded in its record).
 - **Running: U4e's review round 2,** workflow wf_e623d489-17e (task wh159bx8v; script
-  workflows/scripts/npt-u4e-review-r2-wf_e623d489-17e.js), launched about 15:30 UTC. Packet u4e-r2-packet.md
+  workflows/scripts/npt-u4e-review-r2-wf_e623d489-17e.js), launched about 15:25 UTC. Packet u4e-r2-packet.md
   (ecf4394a…; round 1's tree `.gate/u4e-r1` against the fixed copy; R1-R8 and T1). Seats per R8 in batches of at
   most two (the U4d2 brief check's L5): netcode-architect and security-auditor, then engine-architect and
   rust-reviewer (all read only), then the test-engineer alone (start hashes r2-hashes-start.sha256, every FX plant

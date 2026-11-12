@@ -1,0 +1,69 @@
+--- u4e-run.sh
++++ u4d2-run.sh
+@@ -1,15 +1,17 @@
+ #!/usr/bin/env bash
+-# U4e's runner (u4e-brief.md section 4, rules 1-8; W1-TARGET, advisor-u4-wave1.md): one command, or a sequence, in the
+-# U4e builder's worktree, with the shared target. It takes the shared target's lane lock (`-x`: exclusive, for a
+-# counted run, a check.mjs run, a `--list` or clippy confirmation, each bite run and each scratch switch or plant;
+-# otherwise shared), waits until no other cargo or rustc runs, checks 4 GB free, touches every file under the copy's
+-# crates/ first and every 2 s while the commands run (the loop starts and stops here), and runs each command from the
+-# copy's spikes/netcode-proof with CARGO_TARGET_DIR on the shared target and CARGO_NET_OFFLINE=true. Everything goes to
+-# the log file, which must be under /home/user/Shamble-Frontlines/.gate/u4e/; each command's exit code and, at the
+-# end, the provenance lines (Compiling/Checking/Documenting npt-*) are appended. The sequence stops at the first command
+-# that fails, and the script exits with that command's code. A run's result is that exit code and the test runner's own
+-# summary lines, read from the log.
+-# Usage: bash u4e-run.sh [-x] <worktree> <log file> <command...> [:: <command...>]...
++# U4d2's runner (u4d2-brief.md section 4; W1-TARGET, advisor-u4-wave1.md; the advisor's U4d2 brief check, A2): one
++# command, or a sequence, in the U4d2 builder's worktree, with the shared target. It takes the shared target's lane lock
++# (`-x`: exclusive, for a counted run, a check.mjs run, a `--list` or clippy confirmation, each bite run and each
++# scratch switch or plant; otherwise shared), waits until no other cargo or rustc runs, checks 4 GB free, touches every
++# file under the copy's crates/ first and every 2 s while the commands run (the loop starts and stops here), and runs
++# each command from the copy's spikes/netcode-proof with CARGO_TARGET_DIR on the shared target and
++# CARGO_NET_OFFLINE=true. Everything goes to the log file, which must be under
++# /home/user/Shamble-Frontlines/.gate/u4d2/; each command's exit code and, at the end, the provenance lines
++# (Compiling/Checking/Documenting npt-*) are appended. The sequence stops at the first command that fails, and the
++# script exits with that command's code; with `-k` (given after `-x` when both are) every command runs even after one
++# fails, each exit code logged, and the script exits with the first non-zero code. A run's result is that exit code and
++# the test runner's own summary lines, read from the log.
++# Usage: bash u4d2-run.sh [-x] [-k] <worktree> <log file> <command...> [:: <command...>]...
+ set -u
+ M=/home/user/Shamble-Frontlines
+ LOCK=$M/.gate/shared-target/.lane.lock
+@@ -20,6 +22,11 @@
+   mode=-x
+   shift
+ fi
++keep=0
++if [ "${1:-}" = "-k" ]; then
++  keep=1
++  shift
++fi
+ W="${1:-}"
+ log="${2:-}"
+ shift 2 || exit 2
+@@ -28,8 +35,8 @@
+   *) echo "STOP: the worktree must be under $M/.claude/worktrees/ (got: $W)"; exit 2 ;;
+ esac
+ case "$log" in
+-  "$M"/.gate/u4e/*) ;;
+-  *) echo "STOP: the log must be under $M/.gate/u4e/ (got: $log)"; exit 2 ;;
++  "$M"/.gate/u4d2/*) ;;
++  *) echo "STOP: the log must be under $M/.gate/u4d2/ (got: $log)"; exit 2 ;;
+ esac
+ S=$W/spikes/netcode-proof
+ [ -d "$S/crates" ] || { echo "STOP: no $S/crates"; exit 2; }
+@@ -77,8 +84,12 @@
+       run_one "${cmd[@]}"
+       rc=$?
+       if [ $rc -ne 0 ]; then
+-        status=$rc
+-        break
++        if [ $status -eq 0 ]; then
++          status=$rc
++        fi
++        if [ $keep -eq 0 ]; then
++          break
++        fi
+       fi
+     fi
+     cmd=()
