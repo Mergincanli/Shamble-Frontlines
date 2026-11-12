@@ -6,7 +6,7 @@ mod tests {
     /// Passes only while overflow checks are on, so `cargo test --release` proves the release profile's setting
     /// (ADR 0002 part 4).
     #[test]
-    #[should_panic]
+    #[should_panic(expected = "attempt to add with overflow")]
     fn overflow_checks_are_on() {
         let max = std::hint::black_box(u8::MAX);
         let _ = max + 1;
