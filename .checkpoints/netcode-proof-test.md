@@ -26,9 +26,13 @@ advisor-u4e-brief.md, advisor-u4df.md.
 - **Running: U4e's build (L4),** one builder (general-purpose, opus, xhigh) in an isolated worktree from the head after
   28a85e7 (`<base>` 28a85e7: its counts 399 / 446 / 52); brief u4e-brief.md rev 3.3 with 7.2's fill; every cargo and
   check.mjs run through u4e-run.sh (W1-TARGET's lock; logs under .gate/u4e/); notes u4e-build.md in its worktree; T4's
-  two sentences, TE2-5's rule and USAGE-SAVINGS' builder limits in its prompt. Its run id and worktree: below, once
-  launched. On return: read its section-6 list in full (everything that touches the marks: its bites and their
-  proofs); then the review packet by script and the review (the brief's reviewers).
+  two sentences, TE2-5's rule and USAGE-SAVINGS' builder limits in its prompt. **Launched 02:02 UTC: run
+  wf_0fa6595a-3e2, task wkl1a75yr; script workflows/scripts/npt-u4e-build-wf_0fa6595a-3e2.js; worktree
+  `.claude/worktrees/wf_0fa6595a-3e2-1` (branch worktree-wf_0fa6595a-3e2-1 at 97bb9d3).** If cut, do not resume the
+  run as it is (its `isolation: 'worktree'` would start a fresh copy): edit the script to drop the isolation and name
+  that worktree; the fresh builder reads its notes and `git diff` there first. Snapshot the worktree to the branch at
+  each check-in (worktree_patch.py ... wip/u4e.patch u4e-). On return: read its section-6 list in full (everything
+  that touches the marks: its bites and their proofs); then the review packet by script and the review.
 - The saver: `node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer
   "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
   https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"` (background, 120 minutes; restart it when it stops). Stop
