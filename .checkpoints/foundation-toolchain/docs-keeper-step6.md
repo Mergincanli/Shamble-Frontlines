@@ -57,3 +57,21 @@ No commit, no push. His words: not quoted (pointers to DECISIONS.md entries and 
   written and Q2.2-a (waiting, not decided); Follow-ups: 2.1a's five closed items dropped, the 2.2 block by short name;
   Open risks: R7's closed line-number note dropped (its text stays in the archive). 120 lines; lines 11-12 and 18-19
   (his quotes) untouched.
+- DONE docs/ROADMAP.md: 2.2's entry at the top of Recent work (:113-123); 2.1b and 2.1a retagged MERGED with a closing
+  "Merged:" sentence (verified facts: 2aa5e9c 13:22 UTC, APPROVE of 5d50bf2, run 43226692719; 76b4f7a 18:38 UTC,
+  APPROVE of f6becf5, run 43079707687); the two oldest entries (TEST-RUN part B, docs after kit v3.1) deleted by line
+  range (sed 195,198d) and folded into one Build history line made of their own phrases (:74-80). Recent work: 12.
+- DONE final checks: repo-map-check "repo map OK: 120 entries cover 107 required paths", exit 0; STATUS.md 120 lines;
+  `git status`: only the four docs and this notes file changed (no commit by me; the saver's autosaves cover
+  .checkpoints/ only). Drift grep (START_HERE, TECHNICAL, MODULE_MAP, README.md, tools/README.md, SPIKE_PLAN): no claim
+  2.2 made untrue in docs/ (START_HERE has its "Legacy doc" banner; TECHNICAL:9-12 and MODULE_MAP:11 describe legacy;
+  tools/README.md:32 and START_HERE:87 describe gate.yml's two jobs, still true). Left, for the caller: README.md:16-26
+  (its layout table has no v2 workspace paths; outside docs/), STATUS:21 and :47 (his Windows run, possibly done in
+  2.1b's A3, unverified), STATUS:57-67 (Routines read 2026-11-10), STATUS:93-95 (2.1b's follow-ups have no archive
+  block), ROADMAP:3 (banner without `legacy/`).
+- DONE after the second advisor consultation: the checkpoint at HEAD gained consultation 4 (the Fable advisor's full
+  skeleton read done; a re-check of changed files before ready), so STATUS's #48 row and ROADMAP's 2.2 "Next" now name
+  the re-check, not the read; findings-2-3.md unchanged (autosave 8b33e3e, same text); `findings-2-3-c4.md` exists
+  (not in the brief: not taken, named in the return); the archive block's intro says "is to take ... at step 7" and
+  gives the [verified]/[assumed] split. Re-checked: no new line over 120; STATUS 120 lines; repo-map-check exit 0.
+  Ready to hand back.
