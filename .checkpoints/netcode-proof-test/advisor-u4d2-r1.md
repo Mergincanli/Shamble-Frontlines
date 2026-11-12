@@ -15,3 +15,9 @@ Seat: the advisor agent, run by the main session's workflow, working from main's
 6. End with the two lists (before the merge; for Mustafa) and the summary for the caller.
 
 ## Notes (one line per check, as done)
+- Read whole: advisor.md (origin/main, 334 lines); the five seats' notes (rust 124, security 172, infra 150, arch 112,
+  test 266 lines); the builder's record u4d2-build.md (256 lines, its claims).
+- Read whole: my brief check advisor-u4d2-brief.md (756 lines: A1-A15, Q1-Q12, L1-L5; Q4 (a) chose the superset,
+  "fail-closed"; A15 found the superset's first cost; block 7 set U4d2's review in batches).
+- Read the form: advisor-u4e-r1.md R8 (fix pass, its builder, round 2's seats, the outcome rule) and R9 (M1-M9);
+  advisor-u4e-r2.md Q3 (M1-M9 as amended), Q4 (background run, >= 1,500,000 ms), "Before the merge".

@@ -68,11 +68,18 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
    **(i) Running: the advisor's ruling on round 1,** workflow wf_ff32624e-10a (task w0q05gown; one seat,
-   general-purpose, opus, xhigh, on main's advisor.md; read only), launched 23:27 UTC, from advisor-u4d2-r1-brief.md
+   general-purpose, opus, xhigh, on main's advisor.md; read only), launched 23:23 UTC, from advisor-u4d2-r1-brief.md
    (complete: item 5 filled with batch 2's findings); its ruling goes to advisor-u4d2-r1.md block by block. If cut:
    resume with `Workflow({scriptPath, resumeFromRunId})` (script workflows/scripts/npt-u4d2-r1-advisor-wf_ff32624e-10a.js).
    On return: read it whole; then the fix pass as it rules. Meanwhile, A13's server item (Next steps 4), unless the
-   ruling says to wait.
+   ruling says to wait. **A13 in progress (main folder, uncommitted):** crates/server/clippy.toml gains the HashMap and
+   HashSet type bans in the room file's form, its header naming them (5 lines in, 1 out; sha256 before 5a363a03…).
+   Proof (.gate/a13/): a scratch `pub fn a13_scratch() -> std::collections::HashMap<u32, u32>` in
+   crates/server/src/lib.rs, by Edit: under the old file clippy exits 0 (a13-control.log); under the new one it exits
+   101, "use of a disallowed type `std::collections::HashMap`" at lib.rs:20 and :21 (a13-plant.log); restored by Edit,
+   sha256 b31ffb77… as before. Running: check.mjs counted through main-run.sh in the background (a13-check-counted.log,
+   limit 1,800,000 ms), expected all 10 steps PASS at 473 / 541 / 52 of 52. Then stop the saver, commit
+   clippy.toml alone ("A13: …"), push, CI, restart the saver.
    **(h) U4d2's review round 1: DONE** (23:22 UTC): rust REVISE, security REVISE, infra APPROVE WITH FINDINGS, arch
    APPROVE WITH FINDINGS (EA-1-9, all Low), test REVISE (TE-M1 = RR-M2 and TE-M2 = RR-M1 = SEC-U4D2-2, proved by run;
    TE-M3, an npt-net flake under TE2-5, `l2::delay::tests::a_shutdown_s_never_completes_ends_at_its_deadline_without_
