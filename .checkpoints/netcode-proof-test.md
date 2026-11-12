@@ -81,7 +81,9 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    session's own: (1) u4d2_restamp.py left the bare-colon plan cites of section 1 item 6 and of line 173 at
    686a583c: at 3f58ff0d they read §5 U4d2 :666-712 (not :666-702), Lanes :850-888 (not :840-875), §6's U7 line
    :898-900 (not :885-887), §7 :908-931 (not :895-918); (2) carry 66's SERIES.md row; (3) A13's server clippy item
-   (Next steps 4); (4) the "two exceptions" text outside U4d2's lane; (5) the counts on c88eb31 at the merge.
+   (Next steps 4); (4) the "two exceptions" text: none outside U4d2's lane (a grep of docs/, plan.md and the notes:
+   only records and the plan's own instruction quote the old phrase); inside it, the copy's check.test.mjs:328 (a
+   test name) and :364 (a comment) still say "two"; (5) the counts on c88eb31 at the merge.
    (d) U4d2's build ran as workflow wf_e3cb6af2-079 (task w0yn65lgt since its resume at
    17:42 after the 16:50 cut, blocks 0-2 done; script workflows/scripts/npt-u4d2-build-wf_e3cb6af2-079.js), launched
    about 16:28 UTC: one builder (general-purpose, opus,
