@@ -191,6 +191,16 @@
     of him on its timing; two more risks; the 21 findings for 2.3 and the follow-ups; ADR-INDEX and K1-GO drafted);
     ROADMAP (seven planted failures) and STATUS (#48's row) · 03b5a54 · pushed. The saver restarted.
 
+26. Step 7, review round 1, run 1 (wf_b82244e7-a22, relaunched after the container restart): all five reviewers returned
+    on head 4d78ad6 (security-auditor 4 Low; infra-engineer 1 Medium, 4 Low; rust-reviewer 1 High, 2 Low; test-engineer
+    3 Low; engine-architect 5 Low): 20 findings, saved whole in `review-r1-findings.json`, deduped into 17
+    (`review-r1-deduped.md`): D1 = RR-1 High (the release overflow setting does not reach sim's inline and generic code
+    compiled in other crates; reproduced by rust-reviewer), D2 = IE-1 + SA-4 Medium (`toolchain` is not a required
+    check: ruleset 25069670 requires gate and smoke only), D3 to D17 Low. The worktree stayed clean outside .checkpoints/.
+    Run 2, the skeptics (one per deduped finding, 3 at a time): wf_fcb65072-3e7, script `skeptics-r1.js` (this folder),
+    args: the head and the 17 ids with their merges (`skeptic-args.json` holds the full items); notes
+    `skeptic-r1-<id>.md`.
+
 ## Current step
 Step 6 done (4d78ad6; consultation 5). Step 7: review round 1, run 1 running (wf_d3a5ca64-901). Then: check `git status`
 outside .checkpoints/, dedupe the findings, run 2 (skeptics), the fix pass, the verifier, the Fable read (whole) before
@@ -369,11 +379,10 @@ ready, the report final, the checkpoint folded and deleted by hand, ready, the a
 Count: 5.
 
 ## Running work
-- workflow wf_b82244e7-a22 (task wk7mtwars): review round 1, run 1, relaunched 2026-11-12 ~23:05 Amsterdam after the
-  container restart stopped wf_d3a5ca64-901 (security-auditor and infra-engineer had started, with notes; none had
-  returned; rust-reviewer had not started); the same script, `.../workflows/scripts/foundation-2-2-review-round-1-wf_d3a5ca64-901.js`,
-  plus "continue after the last complete block of your notes"; args {"head": "4d78ad61e652f2e35ddf51c49557e725420248c8"};
-  resume with resumeFromRunId wf_b82244e7-a22.
+- workflow wf_b82244e7-a22 (review round 1, run 1): done, 5 of 5 (step 26).
+- workflow wf_fcb65072-3e7 (task wlv2eos3o): review round 1, run 2, the skeptics; script `.checkpoints/foundation-toolchain/skeptics-r1.js`
+  (copy of the scratchpad's); launched ~23:55 Amsterdam; resume with resumeFromRunId wf_fcb65072-3e7 and the same args
+  (the head 4d78ad61e652f2e35ddf51c49557e725420248c8 and the 17 ids, gists and merges).
 - saver: background task bgb28hxv6 (restarted after the container restart, which ended b52patinz).
 - saver: background task b52patinz (restarted 2026-11-12 ~22:30 Amsterdam after M6's revert; the worker restarted three
   times that evening and ended the earlier savers bg5v6agjr and b3kk7q32m).

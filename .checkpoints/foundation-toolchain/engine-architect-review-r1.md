@@ -49,4 +49,7 @@ Memory: none found (no agent-memory folder anywhere on disk); started fresh.
 - EA-4 Low report :185: OQ-0002-8 (a) (0002:1100-1102; register :74) "the first foundation milestone that builds them is their test": 2.2 builds room and client-endpoint empty; report silent; my reading. Fix: one sentence: their test is 2.5 under G5.
 - EA-5 Low docs/adr/0002:207-209 (proposed, for 2.3): no static rule that client never imports net or the Wasm glue; page-side bans runtime only (spike item 1, PM-0002-22). Fix: 2.3 plan weighs a no-restricted-imports entry + PM-0002-42 mutation; ADR owner words part 3 when the Advisor agrees.
 
-VERDICT: APPROVE (five Lows).
+- C19 git status --short in the worktree after the gate run: only " M .checkpoints/foundation-toolchain/engine-architect-review-r1.md" and the test-engineer notes; ignored: node_modules/ and tools/node_modules/ (pre-existing); no .gate/ folder; HEAD 26f4867 (saver), 0 files outside .checkpoints differ from 4d78ad6.
+- C20 advisor consultation 2 (before done): EA-1 (b) "if 2.4 places it at the root", "per plan Part 6" (check.mjs not read), grep scope named; EA-2/EA-3 fixes ride any fix-pass push touching crates/, else a STATUS follow-up; RR-1 note: callers per part 3 once code arrives, fix behaviour per rust-reviewer C6/C7; verdict from my angle, concurring RR-1 stands.
+
+VERDICT (my angle): APPROVE with five Lows; I concur that rust-reviewer RR-1 (High) stands (read against part 3, not re-run by me).

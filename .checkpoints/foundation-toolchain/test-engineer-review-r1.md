@@ -94,3 +94,47 @@ Worktree HEAD 4c0dfd5 differs from 4d78ad6 only in .checkpoints/ (checked: git d
   or 2.3's --prove closes it; the report states the gap honestly.
 - TE-4 Low: four checks never seen red in CI (list above); locally simulated, each bites; carry one mutation each
   into 2.3's --prove (PM-0002-52 needs one mutation per check id).
+
+### Block 7 DONE (advisor tool consulted before finalising; its points applied)
+- E2 "Each log" items over the 14 cited job logs + the head's 2 (e2items.py): every log has `added 46 packages` x2,
+  `Version 6.0.3`, Playwright `1 passed (…ms)`, 4 Vitest files passed, the pin line, the override line, curl exit 7,
+  the wasm32 dev build; unit results `1 passed; 0 failed` x6 on fb17451/c901187 and x8 from fd14855 on (the release
+  profile line absent before fd14855, present from it on). E2 holds in full.
+- M5 PR twin (job 131404506899): "did not panic as expected at crates/protocol/src/lib.rs:10:8", exit 101.
+  M6 PR twin (job 131504252712): EUSAGE, "Missing: is-number@7.0.0 from lock file", exit 1.
+- Register row Q2.2-a (docs/adr/README.md, +1 line): moves G0's exit-2 mark to 2.3 (--prove, PM-0002-39), says
+  2.2's job fails closed via M2, and that his go comes with PR #48's merge. "G0 moved, and says so" holds.
+- Draft TE-3 (sim's release block) DROPPED: already carried in OVERFLOW-WASM (STATUS_ARCHIVE.md:590-592: "`sim`'s
+  rests on step 2's local control"); my local sim-only control goes into `covered` as confirmation.
+- Draft TE-2's lockfile half DROPPED: the plan's E11 (plan.md Part 7) counts node_modules/ entries and leaves the
+  root and packages/<name> entries unjudged: 64 + 5 = 69 is right.
+- M2's "exit 2" is sed's status under `set -e` (drive.py S10); the check's own message never prints. Accurate as
+  written in the report; noted for 2.3's G0 design, not a finding.
+
+## Final findings (Low only; verdict APPROVE)
+- TE-1 Low, report :206 (also :60, :106, :108): "green on every head/push" is a wrong quantifier: 4 revert pushes
+  (2ee2bff, 5c64404, b60a996, 00cee0b) have no completed toolchain, gate or smoke run (cancelled by the next push,
+  concurrency cancel-in-progress); M4's gate push run cancelled (PR twin 42893520512 green). Substance holds: 82 runs,
+  every red a planted commit, run_attempt 1 for all, revert trees equal green fb17451/66d9888. Fix: "green on every
+  head whose run completed; the four quick reverts' runs were cancelled by the next push, and their trees equal green
+  ones".
+- TE-2 Low, report :96: "The job takes about 20 seconds": 16 green jobs 19-45 s, median about 24 s (jobdur.py). Fix:
+  "19 to 45 seconds a job, median about 24 (16 green runs)".
+- TE-3 Low, .github/workflows/toolchain.yml:78 (and :47-52): two checks with their own branches never seen red in CI:
+  the probe's "still reachable" branch (no run without --net; plan Part 7 relies on the control) and the pin check's
+  branches other than a missing file. Verbatim local branch test (drive.py): 11/11 pin cases and 6/6 probe cases as
+  designed. Fix: list both as 2.3 --prove mutations (PM-0002-52: one mutation and one control per check id) in the
+  report's "Findings for 2.3".
+
+## Claim / proof / gap (final)
+- Pins, workspace, lock: proven (files; E7/E11 recount; Cargo.lock v4, 6 crates, 0 third-party). Gap: none.
+- CI job shape: proven (workflow == fb17451 + K1b; 30 cut logs). Gap: none.
+- PM-0002-37 offline: proven (30/30 curl exit 7, uid/groups nogroup, only lo; M1a, M1b red inside). Gap: the probe's
+  red branch never observed in CI (TE-3).
+- rustc == pin: proven green (16 logs). Gap: mismatch branches never red in CI (TE-3); local branch test bites.
+- Cargo.toml without lock fails at first cargo step: proven (M3 push + PR). npm lock: proven (M6 push + PR).
+- Missing test script fails: proven (M4). Lint table: proven locally on 6/6 crates (L1; not in CI, cargo test compiles it).
+- Release overflow: protocol proven in CI (M5 push + PR); sim local only (known OVERFLOW-WASM; my control: exit 101).
+- Wasm half of the overflow rule: not proven, says so (OVERFLOW-WASM). G0: moved to 2.3, says so (register row, G0).
+- Legacy side: proven (gate PASS +0 -0 here; smoke 8/8 5/5 on the head in CI). Kit edits: byte-equal (kcheck.mjs).
+- Flakes: none (82 runs, 0 unplanned red, 0 re-runs).
