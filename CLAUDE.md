@@ -19,7 +19,8 @@ Write every plan and report so both can judge it from evidence alone.
 - **The legacy game** (the five files below) is frozen: critical fixes only. It lives in `legacy/`.
 - **Phase 0** (`docs/V2_PHASE0_BRIEF.md`): process upgrades (kit-v3-0), then research (`docs/research/`), then decision
   drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`). No engine code: throwaway spikes only, and only after
-  Mustafa and the Advisor have approved the drafts; until then, stop.
+  Mustafa and the Advisor have approved the drafts; until then, stop. Exception: foundation steps 2.1 and 2.2
+  (Mustafa's decision of 2026-11-10 in `docs/DECISIONS.md`).
 - **Design inputs:** `docs/LOOP_V2.md`, `docs/EDITOR_V2.md`, `docs/VISION_V2.md`, and the look brief `docs/LOOK_V2.md`
   (Mustafa's and the Advisor's): research the technical options for it, never decide the look.
 
@@ -44,15 +45,16 @@ Write every plan and report so both can judge it from evidence alone.
 `legacy/index.html` (player build) · `legacy/editor.html` (authoring build) · `docs/` · `tools/` (verification toolkit, never shipped) · `.claude/`
 Layering is hard: core references nothing above it; anything on index.html's live path resolves in core ∪ game, never editor.
 
-## Hard constraints (change ONLY through an accepted ADR signed off by Mustafa, never on your own)
+## Hard constraints of the legacy game, `legacy/` only (change ONLY through an accepted ADR signed off by Mustafa, never on your own)
 - Classic scripts sharing globals in a fixed load order; the game runs by double-clicking index.html (file://).
 - Three.js r128 UMD (no CapsuleGeometry). No addons, no post-processing (under review).
 - `LinearEncoding` output: authored hex = on-screen colour. No external assets (procedural textures, synthesized audio).
 - Persistence only through `KVStore`. `stylizeScene()` runs once; runtime builders call `stylizeOne()` themselves.
 - Animation is cosmetic: shots come from `playerFireOrigin()` / fixed chest points. Nothing animated decides a hit.
 Decisions pending that may change these: the v2 decision drafts `docs/adr/0001`–`0006` (V2_PHASE0_BRIEF §4; they
-replace ADR-001..003). Phase 0 writes no v2 code. Constraints for v2 code come only from those drafts once Mustafa
-accepts them. Until then, the constraints above stand.
+replace ADR-001..003). Phase 0 writes no v2 code, except foundation steps 2.1 and 2.2 (Mustafa's decision of
+2026-11-10 in `docs/DECISIONS.md`). Constraints for v2 code come only from those drafts once Mustafa accepts them.
+Until then, the constraints above stand.
 
 ## The change-set protocol (non-negotiable)
 1. One change-set at a time, on its own branch `cs/<slug>`. Fix bugs before features.
