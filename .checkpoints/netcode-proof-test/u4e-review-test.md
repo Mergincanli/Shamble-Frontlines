@@ -146,3 +146,10 @@ nothing on its own; P-D's log (r1-te-pd-group-alone.log): exit 0, every binary o
 gap 6, loopback 6, pump 11, schedule 17), with the plant the main session found (above). I redo both in my own form
 below, with the planted diff recorded, so each result rests on a diff in these notes.
 
+**P-B (TE-c2: the endpoint's client-rounding wiring)**, client/src/lib.rs:293-294 (`with_bite`). Old:
+`        if let Some(grid) = grid_with_bite(bite) {` / `            self.grid = grid;`. New: the same first line, then
+`            let _ = grid;` (the endpoint built with PM-0001-17/client-rounding keeps the wire's grid: the bite silently off).
+Command: `cargo test --locked --all-features --no-fail-fast -p npt-server -p npt-client` (every test that builds an
+endpoint). Log r1-te-pb2-rounding.log. (Planted before the run; if this line has no result after it, the plant may
+still be in place: check client/src/lib.rs's sha256 against the start list.)
+

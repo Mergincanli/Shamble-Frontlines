@@ -57,7 +57,7 @@ advisor-u4e-brief.md, advisor-u4df.md.
     copy (client/src/lib.rs:670-674). **Restored by the main session at 07:35 UTC** by Edit: sha256 bd83870c… =
     start; the copy's crates/ equal .gate/u4e-r1's (`diff -rq`); its re-cut patch equals wip/u4e.patch (cmp); a
     labelled main-session block at the end of u4e-review-test.md says so (P-B's and P-D's logs have no notes line).
-    **Resumed 07:38 UTC** (`resumeFromRunId` wf_ed170231-913, task wwogpkxp1): the four done seats replay from cache,
+    **Resumed about 07:36 UTC** (`resumeFromRunId` wf_ed170231-913, task wwogpkxp1): the four done seats replay from cache,
     the test-engineer runs live (agent ae67a5f5…). Read in full by the main session: every Medium and High of the four
     seats, and the Lows touching a mark, a bite or the judge (NC-L1 to NC-L4, NC-L5-L12, A7, A13, A14, SEC-U4E-6).
 - **Running: U4d2's builder brief** (next step 3), workflow wf_ec1d2b01-aab (task wgkj3qotm; script
@@ -67,7 +67,7 @@ advisor-u4e-brief.md, advisor-u4df.md.
   runs; the carries' words and Mustafa's words are left as placeholders, for the main session to copy by script.
   Then: the main session's fold, and the advisor's check before the build. If cut: resume with
   `Workflow({scriptPath, resumeFromRunId})`. **Its first launch failed in 5 s** (all three agents: the spend limit,
-  06:45 UTC; nothing written); **resumed 07:39 UTC** (task wp2rtgeks).
+  06:45 UTC; nothing written); **resumed about 07:36 UTC** (task wp2rtgeks).
 - The saver: `node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer
   "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
   https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"` (background, 120 minutes; restart it when it stops). Stop
