@@ -51,7 +51,22 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    re-pointed to 3f58ff0d, section 0 re-stamped; brief sha256 146acf18); (b) the worktree
    `.claude/worktrees/u4d2-build` (branch u4d2-build at 51520b4); (c) the `-k` demo there, shared mode, 16:27 UTC:
    with `-k` exit 1 and both exit codes logged, without `-k` exit 1 and the first only (.gate/u4d2/k-demo-with.log,
-   k-demo-without.log). **(d) Running: U4d2's build,** workflow wf_e3cb6af2-079 (task w0yn65lgt since its resume at
+   k-demo-without.log). **(e) U4d2's build: DONE** (about 18:45 UTC; not stopped): check.mjs twice (e1-check.log,
+   e2-check.log), all 11 steps PASS, measured 416, bites 465, self 63 of 63 (+17, +19, +11 and the `wasm` step on
+   `<base>`'s 399 / 446 / 52 / 10); the wasm step about 46 s; hash-map caught natively, "not catchable on wasm32";
+   std-sin caught at SS-s1 tick 2 (`vehicle[8].pos.y`, glibc's sinf against libm's, one ulp; the scan committed as
+   crates/lab/std-sin-scan.txt); carry 66's three hashes equal U2's; six live plants each caught, restored and
+   sha256-checked. Its points for the advisor: one existing check.test.mjs test failed unnamed mid-build (its new
+   rule repeated a sentence the test pins once; it fixed its rule, not the test, as part of the step: TE2-5's rule,
+   to rule); three early `npt-lab hash` runs took the shared lock (none a reported result); rustfmt's diff applied by
+   Edit after the cut. Left for the main session: the review panel, carry 66's SERIES.md row, server/clippy.toml's
+   type bans (Next steps 4), the counts on the merged U4e head. **Snapshot:** wip/u4d2.patch (17 files on 51520b4,
+   sha256 a526ef8e…; `git apply --check` clean on c88eb31), notes u4d2-build.md copied. **Next (after Mustafa's
+   compact):** read its section 6 list in full (journal of wf_e3cb6af2-079, the result's `section6`), cut the review
+   packet by review_packet.py (ALLOWED: advisor-u4e-brief.md alone; advisor-u4d2-brief.md would need its addition
+   noted in history.md), then 7.2 item 7's panel (rust-reviewer, engine-architect, test-engineer, infra-engineer,
+   security-auditor; at most three agents at a time), then the advisor's ruling with the builder's points.
+   (d) U4d2's build ran as workflow wf_e3cb6af2-079 (task w0yn65lgt since its resume at
    17:42 after the 16:50 cut, blocks 0-2 done; script workflows/scripts/npt-u4d2-build-wf_e3cb6af2-079.js), launched
    about 16:28 UTC: one builder (general-purpose, opus,
    xhigh), no isolation, in that worktree; the prompt replaces 1.1's fast-forward as U4e's did, points at section 4
