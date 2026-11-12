@@ -177,8 +177,24 @@
     scratch folder was refused by the permission check (no reason given); the same steps as plain commands passed. The
     worker restarted twice (2026-11-12 evening); the saver did not survive (restart it after M6's revert).
 
+24. Step 6, part 4, 2026-11-12: CI on 70f1c31 green (toolchain push 43310031793, pull_request 43310041807; gate push
+    43310031923, pull_request 43310041820); then M6 by Part 7's procedure (no saver running: the worker restart had
+    ended it): b764298 adds "is-number": "7.0.0" to the root package.json without the lock · pushed alone · red at the
+    expected step: toolchain push 43310269682 (job 131504204735) and pull_request 43310283647 failed at "Fetch every
+    dependency": "npm error code EUSAGE", "`npm ci` can only install packages when your package.json and
+    package-lock.json or npm-shrinkwrap.json are in sync", "Missing: is-number@7.0.0 from lock file"; the cut step
+    skipped; gate push 43310269827 and pull_request 43310283637 green · revert d5316d6 (`git diff b764298^ d5316d6`
+    empty) · pushed alone · all green: toolchain push 43310606920, pull_request 43310617930; gate push 43310607397,
+    pull_request 43310617792.
+25. Step 6, part 5: the report draft up to date before the review round (M6; E1 with the expected message; E8 and E9
+    final; the kit table's line numbers by tree; the Fable read runs again, whole, before ready, so no decision is asked
+    of him on its timing; two more risks; the 21 findings for 2.3 and the follow-ups; ADR-INDEX and K1-GO drafted);
+    ROADMAP (seven planted failures) and STATUS (#48's row) · 03b5a54 · pushed. The saver restarted.
+
 ## Current step
-Step 6, part 2: docs-keeper (a general agent reading main's docs-keeper.md, Opus 5.5 at max) for REPO_MAP (E8),
+Step 6 done but its moment-5 consultation; then step 7: the review round (workflow, 5 reviewers at max in batches of
+3 then 2, a skeptic per finding), the fix pass, the verifier, the Fable read again (whole) before ready, the report
+final, the checkpoint folded and deleted by hand, ready, the advisor agent's review, his go.
 the STATUS dashboard, the archive and ROADMAP, then a fact check of its edits, in one workflow; then E8 and E9 re-run.
 Earlier: Step 5 done (consultation 3, 2026-11-12 ~19:58 Amsterdam).
 Earlier: Step 5 (superseded by steps 18-20 above): waiting for his chat yes on the exact texts of K2a, K2b, K3, K4 and the offered K1b (sent to him at the end of
