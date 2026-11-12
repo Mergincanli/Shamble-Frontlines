@@ -364,12 +364,13 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   words, byte for byte (checked by script), close the entry "Taken by Mustafa, 2026-11-11, 11:56:44 UTC: BRANCH-47 (a)
   and his words on the advisor tool", below, from foundation 2.1a's session, so they are not repeated here; they stand
   whole in `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A7.
-- **Taken by Mustafa, 2026-11-11, 11:56:44 UTC: BRANCH-47 (a) and his words on the advisor tool** (foundation 2.1a,
-  PR #50; his message in that change-set's session, session_019YNMUWLffMoE47SbvkqJ5P, on his personal account,
-  extracted by script from the session's events). BRANCH-47 (a) is carried out: PR #50 replaces #47 (closed
-  2026-11-11 12:49:11 UTC with a comment pointing to it), and the one-time fast-forward of the main folder was made
-  (bb2d817 to d6a3fee). His request to record the advisor-tool words here is carried out by this entry; his last
-  sentence, the CLAUDE.md part, waits in "Queued", above. Copied by script from
+- **Taken by Mustafa, 2026-11-11, 11:56:44 UTC: BRANCH-47 (a) and his words on the advisor tool** (foundation 2.1a, PR
+  #50; his message in that change-set's session, session_019YNMUWLffMoE47SbvkqJ5P, on his personal account, extracted by
+  script from the session's events). BRANCH-47 (a) is carried out: PR #50 replaces #47 (closed 2026-11-11 12:49:11 UTC
+  with a comment pointing to it), and the one-time fast-forward of the main folder was made (bb2d817 to d6a3fee). His
+  request to record the advisor-tool words here is carried out by this entry; his last sentence, the CLAUDE.md part,
+  waits in "Queued", above. Its sentence "The main model and every agent stay Opus 5.5." is replaced by his words of
+  2026-11-12, 16:25 (the entry "Taken by Mustafa, 2026-11-12, 15:35:17 UTC", above). Copied by script from
   `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A3.2, and checked byte for byte against it:
 > BRANCH-47: (a). The replacement pull request from this session, as you describe it.
 > - My yes covers exactly two things. One: the single fast-forward of the main folder to your pushed merge, as a one-time exception to the Never rule, because the merge's .claude/, CLAUDE.md and .github/ are byte-identical to main's. Two: the one gate-file write the merge brings (dd12aeb's change to tools/gate.mjs and tools/smoke.mjs, nothing new added).
@@ -481,8 +482,9 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 - **Taken by Mustafa, 2026-11-10, 17:23:21 UTC: foundation 2.2's task, with two answers in advance** (foundation 2.2, PR
   #48; his message in that change-set's session, session_019YNMUSc7FA68ujhLgXfEJA, on his personal account, extracted by
   script from the session's transcript, message bd0cc1cc-523f-4057-a0f6-bc0083156de3); a paste block from his Advisor
-  chat, his instruction once pasted (ACCOUNTS). Copied by script from `docs/reports/2026-11-12-foundation-2-2.md`,
-  Appendix A1, and checked byte for byte against it:
+  chat, his instruction once pasted (ACCOUNTS). Its model sentence is replaced by his words of 2026-11-12, 16:25 (the
+  entry of 2026-11-12, 15:35:17 UTC, above). Copied by script from `docs/reports/2026-11-12-foundation-2-2.md`, Appendix
+  A1, and checked byte for byte against it:
 > You are the foundation-toolchain chat for Shamble Frontlines, on Mustafa’s personal account. His words: “the main model and every agent stay Opus 5.5”, and on this account “Fable 5.2 may advise through the advisor tool”, which “is an extra. The recorded plan review by the advisor agent stays required”. Check this session’s model with get_session first, and stop in one line if it is not Opus 5.5. This session plans foundation step 2.2, the toolchain (ADR 0002, migration plan 2.2), and builds nothing. Work on this session’s own claude/… branch from main, standing in for cs/foundation-toolchain; never push to the branches of PRs #40, #46 or #47, and never touch spikes/. Read CLAUDE.md, .claude/CHECKPOINTS.md, docs/REPO_MAP.md and STATUS’s Phase, In flight and Next only. Read in ADR 0002: parts 1-4 and 7-9; OQ-0002-1, -3, -4 and -7; the spike’s items 4 and 8; PM-0002-37 to -39; and migration plan 2.2. Read SPIKE_PLAN’s foundation entry. Then run git fetch origin claude/advisor-fable-4hxq72, and read with git show 828a3e0:<path> (never switch the main folder): .checkpoints/foundation-restructure/plan.md Part 2 (the sketch, Q2.2-a to -d), Part 5 and Appendix B; advisor-plan-rev2.md (the advisor agent’s rulings, G0 included); and his words in mustafa-2026-11-10.md and mustafa-2026-11-10-answers.md. Re-find every cited line on current main (PR #46 or STATUS-DIET may have merged), and re-read the netcode spike’s Rust pin at PR #40’s head. Write .checkpoints/foundation-toolchain/plan.md as a change-set plan that delivers his four asks: what 2.2 pins now; what stays an empty slot until the boundary spike, each named by its open question; the CI job that runs the Rust checks; and its own plan review. The CI job is a new .github/workflows/ job. It installs the pinned toolchain with rustup before any cargo call, checks rustc --version against the pin, and runs cargo test --workspace --locked and npm ci && npm test --workspaces with no network after the install steps. Research how a runner cuts the network before promising PM-0002-37, and leave the gate and smoke jobs unchanged. Keep Appendix B’s rules, and justify narrowing the legacy rules’ globs or leave it to 2.5. List every kit, guard or CI edit with the guard’s protectedRel mark, and ask Mustafa whether his FREEZE-FDN covers each, quoting both texts: the option (a) he picked listed “for 2.2, its CI job, the constraint-scope lines and the rules’ globs”, while his words say it “does not stop the smallest edits the foundation needs to keep the kit true after its own moves”. Protecting the new pins in the guard would be a new guard check, so it waits for the gate step, 2.3. Also ask him where 2.2 sits in his merge order: the order ends at 2.1b, and SCOPE’s acceptance takes effect once the files have moved. Follow CLAUDE.md’s change-set protocol. Checkpoint as you go: .checkpoints/foundation-toolchain.md, the saver while agents run, at most 3 agents. Consult the advisor tool before committing to the plan and before calling it done, then have the advisor agent review it at effort xhigh and record its verdict against the plan’s commit SHA. If a repo rule forbids something his decisions do not cover, stop and tell him in three lines. End with the plan’s path and SHA, a one-screen summary, the advisor agent’s verdict, and the decisions you need from him.
 >
 > Two answers in advance, so you do not have to stop for them:
@@ -530,11 +532,12 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 >
 > When 2.1a is built, end with: the pull request's number, what the proof showed, and anything you need from me.
 - **Taken by Mustafa, 2026-11-10: the second account may plan and build foundation steps 2.1 and 2.2 now** (the
-  foundation chat, session_019YNMUVo8MVM3gdiMNaN5xs, on his personal account; his date; saved by that chat at
-  00:10:07 UTC, ca45435; quoted in his prompt there as "Mustafa's decision of 2026-11-10, word for word"; not
-  re-checked against its chat record). With it, his follow-up in the same chat and the task
-  as he gave it there. Dated pointers mark the older lines it overtakes for foundation steps 2.1 and 2.2 (SLICE-ORDER's
-  condition 3, below; SPIKE_PLAN and ADR 0002's migration step 1). Copied by script from
+  foundation chat, session_019YNMUVo8MVM3gdiMNaN5xs, on his personal account; his date; saved by that chat at 00:10:07
+  UTC, ca45435; quoted in his prompt there as "Mustafa's decision of 2026-11-10, word for word"; not re-checked against
+  its chat record). With it, his follow-up in the same chat and the task as he gave it there. Dated pointers mark the
+  older lines it overtakes for foundation steps 2.1 and 2.2 (SLICE-ORDER's condition 3, below; SPIKE_PLAN and ADR 0002's
+  migration step 1). Its sentence "the main model and every agent stay Opus 5.5" is replaced by his words of 2026-11-12,
+  16:25 (the entry "Taken by Mustafa, 2026-11-12, 15:35:17 UTC", above). Copied by script from
   `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A1.1, A1.2 and A1.3, and checked byte for byte against them:
   - His decision (A1.1):
     > I now have a second account, so the reason for 'one heavy spike at a time' (usage cuts on one account) no longer holds for it. The second account may plan and build foundation steps 2.1 and 2.2 now. Steps 2.3 to 2.6 keep their order and wait for their results. On this account Fable 5.2 may advise through the advisor tool, which overrides CLAUDE.md's model rule here until that rule is updated; the main model and every agent stay Opus 5.5. One account per branch.
@@ -559,7 +562,8 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     >    Move text with a script by line ranges, never by retyping. No sentence of mine is reworded or dropped; the
     >    report shows the count of decision ids before and after. Update REPO_MAP and CLAUDE.md's read list to match.
   - LANE-RULES (the same queue, item 3), with his Models addition (his answers of 2026-11-10, 07:08:14 UTC) and ACCOUNTS
-    (his second message, item 1, which joins LANE-RULES):
+    (his second message, item 1, which joins LANE-RULES); its sentence "The main model and every agent stay Opus 5.5" is
+    replaced by his words of 2026-11-12, 16:25 (the entry "Taken by Mustafa, 2026-11-12, 15:35:17 UTC", above):
     > 3. LANE-RULES (rules, with item 2 or right after). Three small edits to CLAUDE.md:
     >    - Lanes: two accounts work on this repo. One account per branch; a lane never pushes to another lane's branch.
     >    - Models: on my personal account, Fable 5.2 may be the session's advisor through Claude Code's advisor tool.
