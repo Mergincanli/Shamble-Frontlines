@@ -90,3 +90,67 @@ No memory folder exists for infra-engineer (checked .claude/agent-memory* in bot
   completed gate/smoke run green, the head green) holds. Candidate Low.
 - ADR part 4 vs Cargo.toml: release overrides for sim + protocol present (the CI release test covers them); part 2 pins
   as built (channel 1.99.1, minimal, clippy, rustfmt, wasm32 target; engines node 22.x; exact devDependencies).
+- Pins: `git ls-remote` (2026-11-12): actions/checkout refs/tags/v7.0.1 = 3d3c42e5aac5ba805825da76410c181273ba90b1,
+  actions/setup-node refs/tags/v7.0.0 = 820762786026740c76f36085b0efc47a31fe5020: the comments match the SHAs (the proxy
+  refuses api.github.com for other repositories; ls-remote worked).
+- Head 4d78ad6 check runs (API): 6 of 6 success (toolchain 131510223737 + 131510257155, gate 131510223092 +
+  131510254606, smoke 131510222694 + 131510255220).
+- Plan Part 10 risk 2 (plan.md:653-657) already says a red `toolchain` blocks merges "by the rules, though not by branch
+  protection or the guard"; the report's Risks section does not carry it, and its REQUIRED-CHECK row leaves the
+  question open. advisor.md:157/:163 tell the PR Advisor to read `gate` and `smoke`; :323 forbids "failing or pending
+  checks". The plan's planted-failure rule (plan.md:486-492) waits for the red before the revert: followed; nothing says
+  to wait for the revert's run, so the next plant (2 s later) cancelled it.
+- Source (read 2026-11-12): rustup book "Basics": auto-self-update `enable` "will mean that `rustup update` and similar
+  commands will also check for, and install, any update to Rustup"; "Self updates can also be suppressed on individual
+  invocations" with `--no-self-update` on `rustup update` or `rustup toolchain install`; the default is not stated there.
+  Whether the job's install step self-updates: unverified (no self-update line in the head log). Confidence low-medium.
+- Main's push runs (API, 2026-11-12): 46, gate 45 success + 1 cancelled (04c086c, run 39046286643, 2026-10-17): main
+  runs do get cancelled by cancel-in-progress (both workflows cancel on every ref).
+- Source (read 2026-11-12): docs.github.com "Control the concurrency of workflows and jobs": `cancel-in-progress: true`
+  cancels "any currently running job or workflow in the same concurrency group"; example of an expression:
+  `cancel-in-progress: ${{ !contains(github.ref, 'release/')}}`.
+
+## Candidate findings (before the advisor consultation)
+- C1 Medium: REQUIRED-CHECK answered (not required; ruleset gate+smoke only; guard mergeCheck gate+smoke only); the
+  report drops the plan's Part 10 risk 2; fix: answer + risk in the report; decision for him (make it required after
+  merge, or accept until 2.3), with 2.3's sequencing (ruleset updated before toolchain.yml goes).
+- C2 Low: E4c/E5 "green on every push" not literal (4 revert pushes cancelled, no PR run); E2 "about 20 seconds" is the
+  minimum (19-45 s, median 25 s).
+- C3 Low: no 2.3 carrier for the network cut (ADR part 9 table none; PM-0002-37 "1 run"; findings list none).
+- C4 Low: G0 must keep the source check (:48-50) and RUSTUP_AUTO_INSTALL=0: image stable = pin; maybe --no-self-update.
+- C5 Low: cancel-in-progress on main (1 of 46 main runs cancelled) — pre-existing pattern; for 2.3.
+
+## After the advisor consultation (2026-11-12): checks it asked for
+- 04c086c: its gate run 39046286643 created 15:43:17Z; df1e6d3's run 39046292180 created 15:43:22Z on main (same
+  group): cancelled by the next push, inferred from timing (the API gives no cancel reason).
+- rustup's current stable (static.rust-lang.org/rustup/release-stable.toml, 2026-11-12): 1.29.3 = the image's, so the
+  missing self-update line shows nothing; self-update stays unverified (a clause in IE-4, not its own finding).
+- advisor.md:273 re-found at the head: the Revert section's "Main breaks" trigger (`gate` or `smoke` red): cite holds.
+- Open PRs (API): #48 (head on GitHub ef33a3b: 5 saver commits after 4d78ad6, .checkpoints only, [skip ci]) and #40
+  (head 8eb5d09). The job never ran on a tree merged with #40 (E4b: cargo metadata on 1efd46f only): not verified.
+
+## Final findings (submitted)
+VERDICT: REVISE (report text only; no CI or code change asked in this PR).
+- IE-1 Medium: report :169 / :140-151 / :201-206: REQUIRED-CHECK answered: not required (ruleset 25069670: gate +
+  smoke only); guard mergeCheck :1486 gate + smoke only; the report omits plan Part 10 risk 2; K1-GO silent on it.
+  Fix: report text; his optional ruleset change with its two costs; 2.3's kit lines.
+- IE-2 Low: report :106, :108, :96: "green on every push" (4 revert pushes cancelled, no PR run) and "about 20 seconds"
+  (19-45 s, median 25). Low because only the quantifier fails.
+- IE-3 Low: toolchain.yml:3 + report :156-179: no 2.3 carrier for the network cut (CUT-CARRY).
+- IE-4 Low: toolchain.yml:21-22, :48-50 + report :166: G0 must keep the source check (image stable = pin 1.99.1) and
+  RUSTUP_AUTO_INSTALL=0 (effect never seen in a run); --prove mutations; --no-self-update unverified.
+- IE-5 Low: toolchain.yml:16-18 (gate.yml:15-17): cancel-in-progress on main (1 of 46 main runs cancelled); for 2.3.
+
+## Corrections after the second consultation (2026-11-12)
+- Plants and reverts: 7 pairs, not 8 (M1a 1bee16c/2ee2bff, M1b 363c455/5c64404, M2 0d3ec36/b60a996, M3 af65262/00cee0b,
+  M4 2d9766f/66d9888, M5 45f1bb5/a5823cf, M6 b764298/d5316d6); re-run: `git diff <plant>^ <revert> -- . ':!.checkpoints'`
+  0 lines for all 7; 14 red runs = 7 x (push + pull_request). The earlier "all 8 reverts" line above is wrong.
+- Plan Part 10 risk 2 is plan.md:654-657 (653 is risk 1's tail).
+- IE-3 wording: ADR part 9's G12 fails every outbound request except to the local test server (end-to-end only); there
+  is no cut around G9's cargo and npm tests.
+- IE-5: Source (read 2026-11-12): docs.github.com "Workflow cancellation reference": running jobs are re-evaluated, an
+  `if: always()` job "continues to run"; silent on a job not yet started. So with ADR part 9's `if: always()` aggregate
+  job, a cancelled main run gives either no verdict or a red one; either costs a re-run (with an ask) or a worktree gate
+  run when advisor.md:273-276 needs the red commit's first parent green.
+- IE-1: that a pull_request run uses the test-merge commit's workflow files is inferred (the events page gives
+  GITHUB_SHA = the merge commit, not which file runs); the #40 clause and the "open PRs wait" cost rest on it.
