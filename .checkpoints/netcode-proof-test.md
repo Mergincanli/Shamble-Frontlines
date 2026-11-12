@@ -12,15 +12,17 @@ lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAG
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
 **NOW (2026-11-12 about 16:30 UTC; read this first after a compact or a cut).**
-1. **U4e's review round 2:** workflow wf_e623d489-17e (task wh159bx8v). Batches 1 and 2 done: netcode APPROVE WITH
-   FINDINGS with NC2-M1 (Medium); security, arch and rust APPROVE WITH FINDINGS, Lows only. The test-engineer seat
-   runs alone (agent a4248695…; start hashes r2-hashes-start.sha256, every FX plant re-proved by Edit, one counted
-   check.mjs). On return: read every Medium or higher in full (NC2-M1 at least) and everything touching the judge, the
-   marks or a pass bar; R8's outcome rule (advisor-u4e-r1.md:431-434): a Medium → the advisor (follow-up or carry); a
-   High → the advisor for a third round on it alone; Lows only → the merge on R9's M1-M9 (advisor-u4e-r1.md:438-494;
-   T1-T6 by script in the merge commit; stop the saver first). If cut: check the copy against
-   .gate/u4e/fx-hashes-end.sha256 first (a plant may be in place), then resume with `Workflow({scriptPath,
-   resumeFromRunId})`.
+1. **U4e's review round 2: DONE** (wf_e623d489-17e, about 16:35 UTC): all five seats APPROVE WITH FINDINGS; one
+   Medium, NC2-M1 (the Resync limit drops a correct client's Resync within 2 s of its last full state: a false FAIL
+   for PM-0004-61's random traps and -19's trap checks at U6/U7; not before the merge), the rest Low (NC2-L1;
+   SEC-U4E-R2-1 to -4; A-R2-1, -2; RR2-1 to -3; TE2-L1, -L2), none before the merge. The test seat: every FX plant fails
+   by name; counted check.mjs all 10 steps PASS, 473 / 541 / 52 (r2-te-check-counted.log). The copy after round 2:
+   23 of 23 OK against fx-hashes-end.sha256. Read in full by the main session: NC2-M1, and the Lows touching the judge
+   or the marks (NC2-L1, RR2-3, TE2-L1), and TE2-L2. **Running: the advisor's ruling on round 2** (R8: "A Medium comes
+   to me first and becomes a follow-up or a carry, never a third round"), workflow wf_124afafb-818 (task w72w3qd9w;
+   brief advisor-u4e-r2-brief.md, items 1-4; ruling to advisor-u4e-r2.md). If cut: resume with `Workflow({scriptPath,
+   resumeFromRunId})`. On return: read it in full (it touches T1, the marks text); then the merge on R9's M1-M9 with
+   T1-T6 as the ruling leaves them (stop the saver first; one commit; the Lows recorded as follow-ups).
 2. **U4d2's launch** (the advisor's check, L1-L5): L1 DONE at 172c92d (rev 1.2 by u4d2_fold.py, its dry run read in
    full; nothing left for the advisor); L2 DONE at 85c08df; P7 DONE (u4d2-run.sh). Main merged in at bfda3cd. Done:
    (a) u4d2_restamp.py applied at 51520b4 (P6 = bfda3cd with 399 / 446 / 52 / 10, P7, the plan cites of sections 0-7
