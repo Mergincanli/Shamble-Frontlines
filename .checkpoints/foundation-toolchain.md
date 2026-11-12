@@ -162,6 +162,21 @@
     the Queued item for the models change, all checked byte for byte; `register-row.mjs` added the register row Q2.2-a
     with his sentence from A2 · 6135579 · pushed.
 
+22. Step 6, part 2, 2026-11-12: the docs workflow wf_29ac478b-0a7 (docs-keeper, then one fact checker, each Opus 5.5 at
+    max; 2 agents) · docs-keeper: REPO_MAP (8 paths; E8 "repo map OK: 120 entries cover 107 required paths", exit 0),
+    STATUS (#51 merged, #48's row, the follow-ups; 120 lines), the archive ("From foundation 2.2"), ROADMAP · the fact
+    checker: 3 Medium (#48's row said the docs pass done while consultation 4's items and the next code steps were
+    missing; it called his item 4 met; the G0 item read as decided while his go is pending) and 3 Low (REPO_MAP's
+    `[workspace.dependencies]` wording; BRIEF-STALE's owner; GIT-C's source): all six fixed, consultation 4's seven items
+    merged into the archive and STATUS, STATUS kept at 120 lines · 13feadc · pushed. E9 on the 42 files: 3 protected
+    (CLAUDE.md, advisor.md, toolchain.yml), M: REPO_MAP, ROADMAP, STATUS, STATUS_ARCHIVE and the report; not M:
+    DECISIONS.md, the register and the code.
+23. Step 6, part 3: the overflow tests' `#[should_panic(expected = "attempt to add with overflow")]` (consultation 4):
+    pedantic clippy and fmt clean; dev and release pass; the control in a scratch copy (`.gate/control-m5b`, sim's
+    release block removed) fails "test did not panic as expected" · 70f1c31 · pushed. A compound line with `rm -rf` of a
+    scratch folder was refused by the permission check (no reason given); the same steps as plain commands passed. The
+    worker restarted twice (2026-11-12 evening); the saver did not survive (restart it after M6's revert).
+
 ## Current step
 Step 6, part 2: docs-keeper (a general agent reading main's docs-keeper.md, Opus 5.5 at max) for REPO_MAP (E8),
 the STATUS dashboard, the archive and ROADMAP, then a fact check of its edits, in one workflow; then E8 and E9 re-run.
