@@ -109,8 +109,18 @@
     symbols +0 -0, base "origin/main = 2aa5e9c (files in legacy/)". The four kit texts drafted by script
     (`k-texts.mjs`: each old text found once; longest new lines 133 (K2a, a heading), 114, 109, 117 chars).
 
+18. Step 5, part 2, 2026-11-12: his yes (his message after consultation 2: "KIT-5: yes to all four", "K1b (a)", no
+    objection to step 7 at max, S2-S5 recorded, the refused first push on the list for 2.3; to save by script once
+    he is back in Auto). `get_session` before writing: `permission_mode` "default" (he had chosen Accept edits; not
+    auto). The saver stopped first (no checkpoint commit between the code commits and their push). Each old text
+    checked once (`git grep -F`), the five Edits written from `k-texts.mjs`'s record, the three files then equal to the
+    record's scratch copies byte for byte (sha256 d883029c... CLAUDE.md, 372b670f... advisor.md, 6171eb17...
+    toolchain.yml) · c9bd268 (K2a, K2b, K3, K4) · fd14855 (K1b) · pushed. His count: "I saw 3 and then 2 more edit
+    request, totaling 5": the guard's prompt reached him for each of the five kit writes in this mode (evidence for
+    the 2.3 auto-mode finding).
+
 ## Current step
-Step 5, waiting for his chat yes on the exact texts of K2a, K2b, K3, K4 and the offered K1b (sent to him at the end of
+Step 5 (superseded by step 18 above): waiting for his chat yes on the exact texts of K2a, K2b, K3, K4 and the offered K1b (sent to him at the end of
 the turn after consultation 2), with the chat switched to Accept edits. On his yes: `get_session` (write nothing while
 `permission_mode` is still auto), Read the three files, the Edits only (each guard prompt counted), then commit and
 push (both on the allow list), then ask him to switch back to Auto and how many guard prompts he saw. Then, if K1b:
