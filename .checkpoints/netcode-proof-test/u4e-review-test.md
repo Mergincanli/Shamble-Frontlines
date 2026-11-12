@@ -328,4 +328,104 @@ with `te_probe_q11_snapshots_after_the_gap_carry_events_before_entities`: gap_ca
 events_resent, baseline_age); prints ticks F-2..F+7; asserts F was recorded. Command `cargo test --locked
 --all-features --no-fail-fast -p npt-server -p npt-client --test gap -- --nocapture te_probe`; log
 r1-te-q11-nearest8.log. (Probe in place before the run.)
+- Run: exit 0, "test result: ok. 1 passed; 0 failed; ... 6 filtered out". Printed, (skipped, bytes, groups, sent,
+  resent, age): 361 (401, 1026, 1, 40, 416, 0); 362 (401, 1026, 1, 40, 439, 0); 363 F (408, 1026, 1, 42, 462, 0); 364
+  (362, 1027, 1, 42, 462, 1); 365 (320, ...); 366 (280); 367 (239); 368 (199); 369 (157); 370 (114), resent 462 from F
+  on.
+- So NC-M4's scenario does not occur in the gap run: the 462 resent events are cumulative over the gap's dropped
+  snapshots (416 already at 361, about 23 a snapshot), F resends 23 and none are resent after it, and every snapshot
+  from F on still carries entity changes (held count 408 -> 362 -> 320 ..., about 42 a tick, at the full 1,026 B).
+  What holds by reading: events are packed before entities (room.rs:1164-1180), so a backlog larger than a
+  snapshot's remainder would still starve entity changes, and no U4e test asserts the nearest-8 rule. NC-M4 partly
+  settled (its figures, no; its order, yes; for the advisor with NC-M4).
+- Restored by removing `mod te_probes`; all 23 OK; `git status --short` 24 lines (the 23 files and the builder's
+  record), as at the start.
+
+**Step 5: the counted check.mjs run (-x).** Command `node <copy>/spikes/netcode-proof/check.mjs`; log
+r1-te-check-counted.log.
+
+### Block 5. Findings, ranked (each with its proof run above)
+These numbers supersede the ids written inline in Block 4: P-H's "TE-6" is TE-7, P-G's "TE-5" is TE-8, P-21's "TE-8"
+is TE-9, Q-9's "TE-7" is TE-6; P-B's TE-3 and P-D''s TE-4 stand.
+- **TE-1, High, before merge** (with NC-H1; settled by Q-1). server/tests/loopback.rs:241-252 (the tick16 twin),
+  client/src/lib.rs:466-471 and :620-625 (`too_old`, the stale drop before `see`). Under PM-0001-17/tick16 or
+  PM-0001-58/tick16 the client files no hash, no sentinel and no lost record for any post-wrap tick (Q-1: "client 0
+  post-wrap keys []; server post-wrap hashes 14; compared 30, bad 0; sentinels 0; stale 14; lost []"). The twin
+  asserts `server.is_some() && server != client` with client None, which a silent drop meets; brief 2.6's row asks
+  that the bitten client log the frame "under 1 or as the sentinel" and §4.14 "hashes differently or is refused".
+  So the part (i) proof does not show what the judged check counts: its figure reads 0. Evidence that does not hold.
+  Fix: NC-H1's (the advisor rules the client's form); the twin then asserts an orphan client hash or the sentinel.
+- **TE-2, Medium, before merge** (P-A). server/tests/loopback.rs:161-199 (e6); room/src/room.rs:1117. An encoder
+  that packs against the whole per-tick budget, ignoring the pump's bytes, passes every test: e6's `left == budget -
+  p` reads the room's own pair and `bytes <= left` never binds (4-client SS snapshots of about 147 B against about
+  1,029 B). The plan's "the window counting the pump's bytes" is not proven. Fix: run e6 where the remainder binds
+  (48 clients, or a pump report large enough), and assert at least one snapshot that would have exceeded `left` with
+  the pump's bytes ignored.
+- **TE-3, Medium, before merge** (P-B). client/src/lib.rs:292-294 (`with_bite`), :753-799 (the tests). An endpoint
+  built with `with_bite("PM-0001-17/client-rounding")` that keeps the wire's grid passes every test: the clean test
+  and the twin call `Held::hashed` with a grid passed in, never an endpoint; s07 shows the floor grid, not the
+  endpoint's wiring. §5 U4e's Bites line "client-rounding (the client's call site)" and carry 24's first clause have
+  no test. Fix: a bites-only twin that feeds one decoded snapshot to a clean and a bitten endpoint and shows the
+  filed hashes differ.
+- **TE-4, Medium, before merge** (P-D', with P-D as its control). server/tests/loopback.rs:102-156 (e2),
+  client/tests/endpoint.rs:120-150 (e3). A client that refuses a group above 0 while group 0 of its tick is missing
+  (filing the sentinel where the tick should stay pending, then lost) passes every test; e2 drops group 1 only. P-D
+  (in-order decoding) is caught by e2 at loopback.rs:145. The plan's "each group decoding alone" holds for "group 2
+  without group 1", not "group 1 without group 0". Fix: e2 (or e3) also drops group 0 of a split tick and asserts the
+  other groups are acknowledged and the tick is lost, never the sentinel.
+- **TE-5, Medium, before merge** (P-C). server/src/pump.rs:159; server/tests/pump.rs. With the pump's `TooLarge`
+  counted as `truncated`, every U4e test passes; no pump test sends an oversized datagram or stream message. The
+  advisor's U4E-Q11 (a): "U4e builds the server-side checks (size, trailing bytes, wrong channel, the bucket) and
+  their unit tests". Fix: Q-5's test (an Input of `Limits::INPUT + 1` B: too_large 1, nothing out).
+- **TE-6, Medium, before merge** (P-57, Q-9). room/tests/room.rs:868-895. In the clean build the second overflow
+  kicks (tick 459; the timeout would at 495); with that route off the timeout kicks at 495 inside the test's 300
+  ticks and the test passes: brief e12's carry 57 edge "a second overflow before the FullState's ack ... sends
+  Kick::Overflow" cannot fail. Fix: assert the kick's tick is below the first resync's tick + FULL_STATE_ACK_TICKS + 1.
+- **TE-7, Low** (P-H). client/src/lib.rs:548-561, :633-640. Carry 61 (b)'s "two different hashes for one tick give
+  the sentinel" has no test: a client keeping the first hash passes. The carry's named unit test (reorder, duplicate)
+  is there. Fix: feed one group twice with different bytes; assert the sentinel.
+- **TE-8, Low** (P-G; RR-2). room/src/room.rs:943, :1170. The room's `expire` call is pinned by no test (the queue's
+  unit test calls `expire` itself); with it gone the encoder's `as u8` codes a 256-tick-old event as age 0 and every
+  test passes. Carry 50 asks "A unit test", which is there.
+- **TE-9, Low, a carry for U4f** (P-21). room/tests/room.rs:222-268; room.rs:796-835. Carry 21's room test passes
+  with no sort: under option B the list is built in slot order. The sort's own case comes with option A.
+- **TE-10, Low.** client/tests/endpoint.rs:109-114: the 1,150 B case pads a valid snapshot with zero bytes, so the
+  trailing-bytes refusal refuses it too and the test passes with no size check. Fix: a datagram whose declared
+  content fills 1,151 B, or assert the refusal's kind.
+- **RR-10 (the rust-reviewer's), settled:** real, not biting today (P-23 is caught by the queue half).
+
+### Block 5b. Claim, proof, gap (§5 U4e's Tests, negative cases, -18 end to end, bites; brief e1..e12)
+| Claim | Proof (test; plant that it catches) | Gap |
+|---|---|---|
+| e1 layout = Field-group rows, no authority-only group | room/tests/catalogue.rs | none found |
+| e2 forced split, each group alone | loopback.rs e2 (catches P-D) | group 1 without group 0 (P-D' passes): TE-4 |
+| e3 lost group unlogged and counted; refused one the sentinel | endpoint.rs e3 | none found |
+| e4 baseline rule, age 31 kept / 32 evicted, partial ack never a baseline | ack.rs e4 (:226-241) | none found |
+| e5a/e5b gap evicts B; first snapshot after it from defaults | gap.rs (s01 catches -18) | NC-L2's age-32 edge not met (not run) |
+| -18 end to end | gap.rs pm_0001_18_a_fresh... (s02) | none found |
+| e6 window counts the pump's bytes | loopback.rs e6 | cannot fail (P-A passes): TE-2 |
+| e7 mirror = client hash, P0, 1,000 ticks | loopback.rs e7 | resent clause moved to the gap test (stated) |
+| e8 Send asserts | room.rs, pump.rs, endpoint.rs | none (compile-time) |
+| e9 negatives (Join reasons, pre-Join, bucket, Ping, deadline, Resync, wrong channel, room checks) | pump.rs, roster.rs, input.rs, room.rs, endpoint.rs | size check through the pump untested (P-C): TE-5; 1,150 B case not size-specific: TE-10 |
+| e10 F2 pins at 30 and 60 Hz | encoder.rs, pump.rs | RTT counts the pump's wait (NC-M3, Q-2) |
+| e11 bitten and clean on two threads | gap.rs bites::e11 | none found |
+| carry 21 | room.rs unit + room test | room test cannot fail at option B (P-21): TE-9 |
+| carry 22 | room tests (catch P-22 twice) | none |
+| carry 23 | room.rs unit (catches P-23) | vacuity guard missing (RR-10, not biting) |
+| carry 24 (endpoint takes the grid from grid_with_bite) | none at the endpoint | P-B passes: TE-3 |
+| carry 50 | events.rs unit | room's `expire` call unpinned (P-G): TE-8 |
+| carries 51, 53, 56 | room test (s15 catches owner-to-all) | none found |
+| carry 54 (and 61 (a)) | room test | none found |
+| carry 57 | two room tests | second-overflow edge cannot fail (P-57, Q-9): TE-6 |
+| carry 61 (b)-(d) | endpoint.rs carry_61 | (b)'s "two different hashes give the sentinel" (P-H passes): TE-7 |
+| tick16 bites | loopback.rs twin and clean test (s03/s04) | silent drop, judged figure 0 (Q-1): TE-1 |
+| client-rounding bite | client lib.rs tests (s07) | the endpoint's wiring (P-B): TE-3 |
+| lt-ack, lt-cmd-seq, lt-press, lt-tick-offset, lt-event-seq, server-echo, unbounded, owner-to-all, no-trailing, no-channel | twins pass (counted 524/0); s05, s06, s08-s15 | none found |
+
+### Block 6. Other reviewers' findings settled by run
+NC-H1 holds (Q-1). NC-M3 holds (Q-2: RTT Some(120,000,000) against 100,000,000 at arrival). NC-M4 partly (Q-11: its
+figures no; its order yes). NC-M5 holds (Q-10). SEC-U4E-1 holds (Q-3). SEC-U4E-3 holds (Q-4). SEC-U4E-4 holds (Q-6: 29
+full states in 30 ticks, 256,418 B, about 8 x the window). SEC-U4E-7 holds (Q-7: the overflow panic at lib.rs:526).
+RR-2 (P-G) and RR-10 (P-23) as above. Not settled by run: SEC-U4E-5 (the room half holds by reading, the caller half
+is U4r's and U6's), NC-M6, NC-L2 (a gap one period shorter; not run).
 
