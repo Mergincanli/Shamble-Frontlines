@@ -58,11 +58,21 @@ erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md.
       guards the reckoning only by t_m1's one seed, inside one half's noise; D-7's digest holds it for certain; a
       deterministic reckoning test is proposed (outside B1.2's symbols). TF-L1 to TF-L3 Low. NF-M1 confirmed by run.
       Same slip as the netcode-architect's (two blocks first written by python, then the file rewritten whole).
-  - **Running: the advisor's ruling on round 1** (run wf_5b2fb216-9fa, task w26tvllnl, started 00:00 UTC 2026-11-12;
-    script workflows/scripts/npt-u4d-f-advisor-r1-wf_5b2fb216-9fa.js; if cut, resume it, and its file keeps the
-    finished blocks; brief advisor-u4df-brief.md; ruling to advisor-u4df.md): NF-M1,
-    TF-M1, the seven Lows' routes, my two readings, the merge's conditions, the slip. Then the fix pass if it asks for
-    one (round 2 on what changed), then the merge.
+  - **The advisor's ruling on round 1: APPROVE WITH CONDITIONS** (advisor-u4df.md, 00:24 UTC 2026-11-12; read in full
+    by the main session; brief advisor-u4df-brief.md). Nothing for Mustafa. R1: 40 stays; RM (carry 67) for later
+    re-measures (9 seeds, 36-minute runs, every window in band, drift on the nine seeds' mean per 300 s block); its
+    erratum on B1.2 step 4's "stationary". R2: TF-M1's test lands before the merge as FX-1 (replay.rs's new test
+    module, plants Q1-Q5), with FX-2 (scene.rs docs, T3's words). R3: the Lows routed (carries 68-72, carry 59's
+    sentence, T1's report words). R4: both readings confirmed, two corrections of fact (t_m1 failed in steps 2-4; the
+    re-runs were in steps 2, 4 and 5). R5: the merge on M1-M9 after round 2. R6: T4 (now in Rules in force).
+  - **Running: the fix pass** (run wf_6d45d257-7c0, task we0n7sjzo, started 00:27 UTC; script
+    workflows/scripts/npt-u4d-f-fixpass-wf_6d45d257-7c0.js; one fresh builder in the copy; logs .gate/u4df/fx-*; notes
+    u4df-build.md "Fix pass, round 1" there). Expected: check.mjs twice 368 / 415 / 52; the three-seed test's 21
+    lines equal to end-three-seeds.log's. On return: read the result in full; then cut round 2's packet by script
+    (the diff from `.gate/u4df-r1`, a worktree at dad9566 with wip/u4df.patch applied, hashes equal to round 1's, to
+    the copy; R2's block; T3; no conclusion), then round 2 (netcode-architect read only; then the test-engineer,
+    general-purpose with Edit, its start hashes under .gate/u4df/; both briefs carry T4 item 1). APPROVE or Lows only:
+    merge on M1-M9 with no further ruling; a Medium or above: the advisor first.
   - Done meanwhile: TE2-5 (b), ten of ten runs exit 0, each 443 passed, 0 failed, 12 ignored (te2-5-record.md).
   - the saver, restarted after U4j's push (about 20:15 UTC, 110 minutes): `node .claude/scripts/checkpoint.mjs watch
     netcode-proof-test --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
@@ -172,7 +182,8 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
   confirm (closing checklist). The 19:30 UTC check-in (trig_01W9mBGauhxrWnn1rSuweDic) is deleted: its question is
   answered.
 - **Housekeeping later** (approved method: leftovers to a local branch, then a plain `git worktree remove`):
-  `.gate/u4a-prefix`, `u4b-prefix`, `u4b-wt`, `u4c-prefix`, `u4d-prefix`, `u4d-s1`, `u4j-prefix`; `.claude/worktrees/`
+  `.gate/u4a-prefix`, `u4b-prefix`, `u4b-wt`, `u4c-prefix`, `u4d-prefix`, `u4d-s1`, `u4j-prefix`, `u4df-prefix`,
+  `u4df-r1` (after U4d-F's merge); `.claude/worktrees/`
   agent-a9297644e7c0354f3 (U4a), wf_f54246ff-e0d-1 (U4d), wf_f54246ff-e0d-2 (U4c), agent-a3b8dfeb01ed52b50 (U4j,
   merged at 4d2b0ef).
 
@@ -212,6 +223,15 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
     crate the unit changes, or in a test that reads its files, stops that unit's merge until it is explained."
   - B6: plants by Edit in place, or the planted file's diff saved beside the run's output; the next review workflow's
     agents get the Edit tool, or are told to rewrite their notes whole with Write from the start.
+- **The advisor's U4d-F ruling (advisor-u4df.md, R1, R4.1 and R6):**
+  1. Every agent brief, builders' and reviewers' alike, carries this sentence word for word: "Write files with the
+     Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing files: apply
+     rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write."
+  2. A builder brief's TE2-5 stop clause reads, with the unit's crate named: "a failure in <crate>, or in a test that
+     reads <crate>'s files, stops your step group (report it), unless your step's plan names it as expected (a pin
+     your step re-pins, or a test a later step rebuilds): then record it under TE2-5 with its cause and the step that
+     ends it, and go on." B2.3's merge stop is unchanged.
+  3. RM (carry 67) for any change that moves ES's synthetic recording or the World's outcome on it.
 
 **Pointers**
 - Plan: plan.md. U4: u4-build-plan.md, advisor-u4*.md, u4s-carries.md, the unit notes (u4*-build.md, u4*-review*.md,

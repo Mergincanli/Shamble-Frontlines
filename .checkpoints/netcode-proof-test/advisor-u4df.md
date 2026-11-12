@@ -184,9 +184,9 @@ Three ride the push FX-1 needs anyway (as doc words, FX-2, or as the report's wo
 written once in u4s-carries.md (T2). Carries 67-72 are new; 1-66 exist (66 is the U4e brief ruling's F2-ROUTE).
 - **NF-L1** (ES's alive soldiers change yaw on 48 % of ticks and pitch on 18 %, against R2's yaw on every moving update
   and pitch half the time, docs/research/r2-netcode.md:1751; verified at that line): **a carry, two halves.** Carry 68
-  (§U4e) and carry 69 (§U4r): no ES byte or bandwidth figure is taken from the synthetic ES recording as ES's load, and
-  any figure taken from it states the two shares beside R2's. U4e is the half that matters: my U4d close ruling lets
-  U4e report ES numbers from U4d-F's scene, and U4e has no bots. Reach today: none (the netcode-architect's [6]).
+  (§U4e) and carry 69 (§U4r): no ES byte or bandwidth figure is taken from the synthetic ES recording as ES's load,
+  and any figure taken from it states the two shares beside R2's. U4e is the half that matters: my U4d close ruling
+  lets U4e report ES numbers from U4d-F's scene, and U4e has no bots. Reach today: none (the netcode-architect's [6]).
 - **NF-L2** (what 3b changes in what the recording exercises): **the report's words and one carry.** T1's "What the
   events are now" bullet gives the numbers (51.9 teleports a minute against 3.9; about 69 % blasts, 21 % sky-shot
   overlaps, 7 % aimed hits, 3.5 % kills; the team-phased minute, averaged out exactly by whole-minute windows). The
@@ -254,8 +254,8 @@ npt-server also link U4j's npt-log, so the merged tree pairs U4d-F's npt-sim wit
 (M5 and M6 cover it).
 
 The conditions (the main session; each result goes in u4df-build.md's new section "Merge into the spike branch"):
-- **M1, the copy is the one reviewed.** Before the snapshot: the copy's HEAD is still dad9566bdb90…, `git status` in it
-  shows the five crates/sim files modified and its record untracked, nothing else; and `sha256sum -c` of round 2's
+- **M1, the copy is the one reviewed.** Before the snapshot: the copy's HEAD is still dad9566bdb90…, `git status` in
+  it shows the five crates/sim files modified and its record untracked, nothing else; and `sha256sum -c` of round 2's
   start hashes, run from the copy's root, gives all OK. Round 2's test-engineer saves that hash file under .gate/u4df/
   (not in its scratchpad), in `sha256sum` form with paths from the copy's root. Any other result stops the merge and
   comes to me.
@@ -328,7 +328,7 @@ R6 written 2026-11-12.
 form: who built it, the rounds, the rulings, the checks on the merged tree, the carries met and added by number, the
 follow-ups, Decisions needed, For Mustafa). This section, as it is:
 ```
-## The estimate scene after U4d-F: the level, the halves and the drift (the advisor's U4d-F ruling: NF-M1, NF-L2, NF-L4, TF-L2, TF-L3)
+## The estimate scene after U4d-F (the advisor's U4d-F ruling: NF-M1, NF-L2, NF-L4, TF-L2, TF-L3)
 - **The acceptance (the advisor's U4d close ruling, B1.2 step 4) is met as ruled.** Seeds 1, 2 and 3, the last 18,000
   of 21,600 ticks: gameplay events 9.878, 9.743 and 10.098 a second, each 300 s half between 9.580 and 10.220, shots,
   live projectiles and spawns in their bands, 48 soldiers and 15 vehicles on every tick, every hull within 1,400 cm
@@ -446,7 +446,7 @@ step)") and before "## U4f (clock and commands)", with a blank line before and a
     deaths through its own inputs, or runs long enough for at least 10, and asserts that count by name."
 ```
 
-### T3. FX-2's doc words (scene.rs; the fix pass applies them by Edit and rewraps)
+### T3. FX-2's doc words (scene.rs; one line each here: the fix pass applies them by Edit at the doc's indent and rewraps to 120)
 **(a)** appended to `ES_AIM_ONE_IN`'s doc, after "(0.080 a second; 48's is 0.036).":
 ```
 Over seeds 1-9 and 36 minutes the rate is flat at about 9.88 a second, and a 300 s half's noise is 0.2-0.36 a second (U4d-F's review), so 40 is one passing set of halves, not a margin: a later change that moves ES is re-measured by the advisor's U4d-F ruling (RM), never re-tuned on three seeds.
@@ -501,9 +501,10 @@ Nothing.
   "Running" and "Rules in force"; u4s-carries.md's sections and entries 51-66; Mustafa's words at history.md:338-339
   (equal to the packet's quote); the packet's plan sections §4.13-§4.15 and its carry 52.
 - The copy: HEAD dad9566, `git status` (the five files and the record), the five files' sha256 equal to the builder's
-  final list and the test-engineer's [1]; its `git diff -- spikes/` byte-identical to wip/u4df.patch (sha256 755cd562…,
-  also at HEAD's committed version; equal patch-ids); `git apply --check` clean in the main folder at 1148c45;
-  crates/sim unchanged from dad9566 to the spike head; no other crate uses the changed symbols; npt-sim's dependants.
+  final list and the test-engineer's [1]; its `git diff -- spikes/` byte-identical to wip/u4df.patch (sha256
+  755cd562…, also at HEAD's committed version; equal patch-ids); `git apply --check` clean in the main folder at
+  1148c45; crates/sim unchanged from dad9566 to the spike head; no other crate uses the changed symbols; npt-sim's
+  dependants.
 - The code read: scene.rs's `ES_AIM_ONE_IN` and its doc, `fight_vehicles`, `grenade_fuse_ms` and `aim_one_in` docs;
   tests/world.rs's `EsRun`, t_m1 and the three-seed test (every band literal as the base's); replay.rs's `synthetic`
   whole (the phase-0 order, the held-back move, `after`, the sky aim, the send / hold / lose arms, 3b's loop);
