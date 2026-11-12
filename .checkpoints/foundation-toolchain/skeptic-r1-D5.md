@@ -21,9 +21,13 @@ review 4d78ad6; worktree HEAD 32386e1 differs from it only in .checkpoints/ (git
   Ubuntu 24.04.5): :254 `uid=1001(runner) gid=65534(nogroup) groups=65534(nogroup)`, :255 one line, `lo` only, :259
   `the network is cut: no TCP connection to 140.82.114.4:443 (curl exit 7)`. No CapXxx or NoNewPrivs line is printed
   (the SA says so too). HOLDS: printed, not compared; capability sets and no_new_privs are not even printed.
-- C3 local tools: root, util-linux 2.39.3-9ubuntu6.6 and libcap-ng 0.8.4 (Ubuntu 24.04's packages, the runner's OS),
-  sudo 1.9.15p5, kernel cap_last_cap 40. This setpriv binary has no "libcap-ng is too old" exit (strings: only
-  "cap %d: libcap-ng is broken"): `-all` runs to the kernel's cap_last_cap.
+  Push job 131510223737 (saved; a newer image, ubuntu-24.04 20261111.370.1): the same at :242 (uid/gid/groups), :243
+  (`lo` only) and :247 (curl exit 7); no Cap or NoNewPrivs line either.
+- C3 local tools: root, util-linux 2.39.3-9ubuntu6.6 and libcap-ng 0.8.4 (Ubuntu 24.04's packages; that the runner
+  has the same util-linux is inferred from its Ubuntu 24.04.5, the log prints no version), sudo 1.9.15p5, kernel
+  cap_last_cap 40. This setpriv binary has no "libcap-ng is too old" exit (strings: only "cap %d: libcap-ng is
+  broken"): setpriv's `-all` loop runs to the kernel's cap_last_cap (libcap-ng's own handling of an unknown
+  capability number not read).
 - C4 experiments, .gate/skeptic-D5/caps-test.sh (+ inner.sh), output caps-test.out, rc 0, every case exit 0:
   E1 job flags: uid 1001, gid/groups 65534, CapInh/Prm/Eff/Amb 0, CapBnd 000001fffeffffff (parent's), NoNewPrivs 1,
   ifaces lo (= the SA's test). E2 + `--inh-caps=-all --bounding-set=-all`: the same with CapBnd 0, exit 0 (= the SA).
@@ -45,7 +49,7 @@ review 4d78ad6; worktree HEAD 32386e1 differs from it only in .checkpoints/ (git
   --regid=1000 --inh-caps=-all*", and :59 (--no-new-privs) "the set-user-ID and set-group-ID bits as well as file
   capabilities will be disabled": the SA's quotes HOLD. setpriv.c v2.39.3 :994-1059: NNP first, KEEPCAPS + CAP_SETPCAP
   kept across setresuid, then the bounding set, then the inheritable set, then execvp; do_caps :530-535 loops `-all`
-  to the kernel's cap_last_cap() (no "too old" exit), so the flags cannot fail on a kernel with more capabilities.
+  to the kernel's cap_last_cap() (setpriv 2.39.3 has no "too old" exit; libcap-ng's side not read).
   capabilities(7) (man7.org): a 0 -> all-nonzero uid change clears "the permitted, effective, and ambient" sets;
   "P'(ambient) = (file is privileged) ? 0 : P(ambient)", a privileged file being one with capabilities or the
   set-user-ID bit: sudo's root therefore always starts with an empty ambient set, and only inheritable can carry
@@ -53,9 +57,10 @@ review 4d78ad6; worktree HEAD 32386e1 differs from it only in .checkpoints/ (git
 - C6 the exploit sketch's two branches. Container job: Docker's default capabilities (docs.docker.com, containers/run:
   AUDIT_WRITE, CHOWN, DAC_OVERRIDE, FOWNER, FSETID, KILL, MKNOD, NET_BIND_SERVICE, NET_RAW, SETFCAP, SETGID, SETPCAP,
   SETUID, SYS_CHROOT) exclude SYS_ADMIN, and its default seccomp profile lists `unshare` "Deny cloning new namespaces
-  ... Also gated by CAP_SYS_ADMIN" (security/seccomp): `sudo -n unshare --net` fails, the step goes red (fail closed),
-  and most images have no sudo at all. Green-but-uncut needs `container.options: --privileged` (GitHub's syntax page
-  forbids only --network and --entrypoint) plus sudo in the image. Self-hosted: actions/runner config.sh :6 and
+  ... Also gated by CAP_SYS_ADMIN" (security/seccomp): `sudo -n unshare --net` fails, the step goes red (fail closed;
+  the missing SYS_ADMIN alone decides it; that most images have no sudo at all is recall, not relied on).
+  Green-but-uncut needs `container.options: --privileged` (GitHub's syntax page forbids only --network and
+  --entrypoint) plus sudo in the image. Self-hosted: actions/runner config.sh :6 and
   run-helper.sh.template :5 refuse uid 0 unless RUNNER_ALLOW_RUNASROOT is set. So "a container job" overstates: both
   branches need a deliberate opt-in and a change to `runs-on`/`container` (a CI edit that asks him); the mechanism
   itself (uid 0 keeps every capability and re-enters the old netns, the probe still passes) HOLDS (E4).
@@ -67,3 +72,33 @@ review 4d78ad6; worktree HEAD 32386e1 differs from it only in .checkpoints/ (git
   "value = 0; respective fallback tunnels are created when module is loaded in every net namespaces"; local value 0;
   not reproducible here (no loadable modules). 4.4 :388-389: "the cleared groups and `no_new_privs` close the two easy
   ways out (docker, sudo)"; N2 :741 "the runner's docker group would reach the Docker socket from inside the cut".
+- C8 the proposed fix, piece by piece. (a) `--inh-caps=-all --bounding-set=-all`: right and safe: E2 exit 0, same
+  uid/gid/ifaces, and the tests already run with Prm/Eff/Amb 0 and NNP 1, so nothing they use changes; on today's
+  runner it changes no effective right (CapInh is already 0; the bounding set is inert under NNP, E3b vs E3c). For a
+  root step shell it zeroes the capabilities (E5) but leaves uid 0's owner rights over root-owned files (E5's
+  regular-file stand-in, root-owned 660, stays writable): the flags do not contain uid 0. (b) "id -u is not 0":
+  right, and the one piece that closes the root branch (it fails before the PR's code runs). (c) "`ip -o link` lists
+  only lo": breaks nothing today (both CI logs show one link, `lo`), but could go false red if a runner image ever
+  loads a tunnel module: per the kernel doc, at fb_tunnels_only_for_init_net's default 0 its fallback device appears
+  in every new namespace, the case the approved plan designed around (N6; the critic's G6, itself marked unverified;
+  not reproduced here). A false red fails closed. Suggestion (untested, no `ip` here): judge only that no device
+  but `lo` is UP, or leave the network property to the TCP probe, which already judges it. (d) Cap* all 0 and
+  NoNewPrivs 1: right once (a) is in (CapBnd 0 needs `--bounding-set=-all`). (e) INCOMPLETE: no groups check. The
+  plan's two "easy ways out" (4.4) are docker (cleared groups) and sudo (NNP); the fix asserts NNP only. A slip from
+  `--clear-groups` to `--keep-groups`/`--init-groups` would keep the runner's groups and stay green. Add
+  `[ "$(id -G)" = 65534 ]` (what CI :254/:242 and E1 show today). The runner's real socket mode and its docker
+  membership appear in no log read here (plan N2 is reasoning), so a direct socket check stays optional and
+  unverified, not part of this verdict. (f) Timing: at 2.3, asking him (A10: "Any other change to the CI job asks me again"; tier 2; a Low never
+  triggers a push); toolchain.yml is replaced at 2.3, so it must travel with the cut (overlaps D7 = IE-3).
+
+## Verdict (final, after the advisor tool's check: wording of my own counter-claims scoped to their evidence)
+HOLDS, Low. The core holds: no `--inh-caps=-all`/`--bounding-set=-all` (setpriv(1)'s advice, verbatim), and the cut's
+privilege properties are printed (uid, groups) or not printed at all (NNP, capability sets) and never asserted, so a
+later change that keeps uid 0 (E4: every capability, re-entry into the old netns, the probe still passes) would stay
+green. Corrections: "asserts none of its properties" overstates (the TCP probe asserts the network property, and
+print-only was the plan's approved design for the rest); "relies on sudo's root having empty inheritable and ambient
+sets" does not hold (E3 and capabilities(7)); the "container job" branch fails closed by default (C6). Reach is
+hypothetical (a reviewed CI edit to runs-on/container first), so Low, not Medium. Fix: right in direction (the flags
+are harmless but do not contain uid 0; the `id -u` check is what closes the root case); "only lo" breaks nothing today
+but could go false red (suggest judging only UP devices, untested); add the groups check (`id -G` = 65534); at 2.3
+with his ask, travelling with the cut (D7).
