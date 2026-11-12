@@ -160,3 +160,53 @@ once, name and panic here). Notes kept by Write/Edit only.
   two (process substitution, no file written): none. FX-1 and FX-2 change no recording. MET. (Process note: my first
   try put the grep output into scratch files by shell redirect; the guard refused the whole command before it ran,
   nothing written; re-run without redirects.)
+- [17] check.mjs, the one counted run (te2-check.log 01:30:44-01:35:39 UTC, -x, runner exit 0; `cargo test --locked
+  --workspace --no-run` and the same `--all-features` first in the same runner call: "Compiling npt-sim (this copy's
+  path)" x2, every npt-* crate x2 from this copy; idle 0 s, 10 GB, HEAD dad9566; no other cargo or rustc at the end):
+  PASS fmt 0.4 s; PASS clippy 3.2 s (both builds); PASS clippy-wasm32 0.9 s (both); PASS doc 46.5 s (both builds, host
+  and wasm32, warnings as errors); PASS test 234.4 s "measured build: 368 tests passed, 0 failed, 0 reported a skip;
+  bites build: 415 tests passed, 0 failed, 0 reported a skip"; PASS deps 0.7 s (109 crate files, 1 cargo config); PASS
+  refs 0.0 s (656 tracked files); PASS marks 0.6 s (81 marks, drafts 626df678, rows unchanged); PASS self 1.2 s "52 of
+  52 tests passed"; PASS redact 0.8 s (10 of 10; 183 items, 0 findings); "check: all 10 steps pass". Deltas on round
+  1's 367 / 414 / 52: measured +1 (368), bites +1 (415), self +0 (52) = R2's expected 368 / 415 / 52 and the
+  builder's fx-check1/2. MET.
+- [18] Test mutation M-1 (after check.mjs; is FX-1's held-back branch load-bearing?): old `let from = if held {
+  before[k] } else { now[k] };`, new `let from = if held { now[k] } else { now[k] };` (replay.rs:~868, the test only).
+  FX-1 by name, -x (te2-mut-m1.log 01:36:51-01:36:53 UTC, exit 101; warning unused `before`): FAILED (replay.rs:884,
+  "seed 2, slot 6, tick 1000224 (carried on 1000225), seq 225", left [620, -15], right [1019, 0]: the held-back
+  command whose carrying tick re-homed slot 6). The aim-from-its-own-tick rule is load-bearing, in the 11 cases count
+  6 counts (elsewhere `before` = `now` for a held slot, which sent nothing on its own tick). Restored by Edit; sha256
+  all 17 OK (01:37:00). The counted run in [17] was on these same bytes.
+- [19] Netcode round-2 findings settled: NC2-L1 CONFIRMED by run ([9]: R-A passes the whole measured suite, FX-1
+  fails it on seed 1 at the netcode's case; seeds [1, 2] run in 3.09 / 3.59 s). [5] (the clamp never bites: 400-799
+  against 10,000): by arithmetic, agreed; no run changes a recording. [9] (count 5's flag after a re-home): wording
+  nit, agreed no finding. [4]: out of scope, agreed.
+- [20] End: `sha256sum -c r2-start.sha256` from the copy's root, all 17 OK (01:35:43 after check.mjs, and 01:37:00
+  after M-1's restore); no PLANT, PROBE or `held_speed` text under crates/sim; git status the same 5 M + 1 ??; HEAD
+  dad9566; diff stat 5 files, +663 / -146 (= the builder's end). Byte-identical to [1]. Nothing committed; nothing
+  edited in the copy beyond restored plants, probes and M-1. No failure I did not plant: no TE2-5 entry.
+
+## Closures
+- TF-M1: CLOSED. FX-1 is the deterministic, exact reckoning test TF-M1 asked for (ES seed 2, every sky aim's x, y
+  against the recording's own inputs integrated by the World's move rule, truncated to cm; MoveSpeed clamped,
+  held-back moved when carried, lost never, placements resetting), counted in both builds (check.mjs +1 / +1), 1.6 /
+  1.8 s. P1 (= Q1) and P3 (= Q2) fail it by name ([4], [5]), as do Q3-Q5 and my R-B, R-C, R-D, R-E, R-G; under Q4,
+  Q5, R-B, R-C and R-G t_m1 passes and only D-7's pin failed beside it. Residual gap: NC2-L1 (Low).
+- NF-M1's wording point (FX-2 (a)): CLOSED. `ES_AIM_ONE_IN`'s doc = round 1's + T3 (a) exactly ([2]); it no longer
+  reads 40's 0.080 as a margin, and names RM. (The report half, T1, is outside this round.)
+- NF-L2's wording point (FX-2 (b)): CLOSED. "sets its 10 gameplay events a second" replaced by "tunes its gameplay
+  events toward 10 a second" and T3 (b) inserted, exactly ([2]); widest line 120; rustdoc PASS in [17].
+
+## Findings
+- None new from the fix pass. NC2-L1 (the netcode-architect's, Low, not before merge) CONFIRMED by run ([9]): count 6
+  lumps re-homed and re-sped carries; seed 2 has no re-sped carry, so a generator that moves a held-back command at its
+  hold-time speed passes the whole measured suite. Cheapest proof: R-A's three Edits ([9]) and te2-plant-ra.log /
+  te2-plant-ra-seed1.log. Fix (follow-up): split count 6 and add seed 1 (te2-probe-seeds12.log: 3.09 / 3.59 s, every
+  count above 0, count 6 24).
+- Not findings: R-F ([15], the estimate before a slot's first placement: outside what the recording says, as R2
+  rules); FX-1's tick assert (inside the test, defines "held").
+
+## Verdict
+APPROVE WITH FINDINGS (Lows only). FX-1 and FX-2 are exactly R2's and T3's, nothing else changed; every round-2 item
+proven by its own run here. One Low open (NC2-L1, the netcode-architect's, confirmed by run), a follow-up; none new.
+DONE (2026-11-12 01:38 UTC)
