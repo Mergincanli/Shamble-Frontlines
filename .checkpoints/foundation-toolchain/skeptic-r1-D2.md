@@ -39,3 +39,54 @@ advisor.md :157 :163 :224 :273-276 :323, STATUS.md :22) and grep for any it miss
   commit"), routine-guard.mjs:6 (header comment) and :990 (the PR Advisor's deny text "CI's gate and smoke results
   stand in"), routine-guard.test.mjs (5 lines name smoke), and START_HERE.md:87 (describes CI's jobs). A small gap
   in a 2.3 to-do list: better phrased as "every kit line that names `gate` and `smoke` as the checks (grep at 2.3)".
+- C6 CI on 4d78ad6 (GET commits/4d78ad6/check-runs, total 6): toolchain success on push run 43312017234 (job
+  131510223737) and pull_request run 43312027194 (job 131510257155); gate and smoke success on both. SA-4's evidence
+  HOLDS. PR #48 today: open, draft, head 1ebb1ca (an autosave), mergeable_state blocked. Open PRs: #48 and #40 (#40's
+  head is now a5784c21, not IE-1's 8eb5d09: drift in a "not verified" aside, immaterial to D2).
+- C7 "until 2.3": ADR 0002 :1421-1422 (foundation checklist item 2): "After the gate and CI (phase 2.3): in the
+  repository's settings, name the single required check ... in main's branch protection"; part 9 (:642-643) "one
+  aggregate required check"; PM-0002-57 (:1323). So "until 2.3" matches the ADR, but it lands only when he sets it and
+  the kit lines change (each asked of him); the rollback rule changes only by a kit edit.
+- C8 IE-1's cost note vs GitHub docs ("Troubleshooting required status checks", docs.github.com article API, read
+  2026-11-12): :94 "If `build` is required, the pull request is blocked with "Waiting for status to be reported.""; :62
+  a workflow skipped by path/branch filter or commit message: "Associated checks stay in a "Pending" state and block
+  merging". HOLDS: requiring `toolchain` now would block PRs whose head never ran it, and removing toolchain.yml while
+  it is required would block every PR.
+- C9 kit status of IE-1's 2.3 list: routine-guard.mjs:35-48 protectedRel covers CLAUDE.md, .github/, .claude/ and
+  GATE_FILES (:28-29, tools/ gate files only); docs/STATUS.md is not protected (E9: mergeAllowed). So "each a kit edit
+  asked of him" is wrong for STATUS.md:22 (a docs-keeper edit).
+- C10 precision: the report's Risks bullet 2 (:143-144) leans on "CI's `--locked` steps still fail a lock that does
+  not match" as the pins' mitigation; with toolchain not required, that failure stops a merge only through
+  advisor.md:323's text. Same gap as D2 (context for its severity, not a new finding). The deduped line's "blocks no
+  merge" drops IE-1's "mechanically": by advisor.md:323's text a red toolchain does forbid an approved merge, so the
+  fix must keep "mechanically" (or "not by the ruleset or the guard").
+
+## Draft verdict (before the advisor call)
+HOLDS, Medium. Every factual leg re-checked (C1-C6). Medium, not Low: the report drops a risk its approved plan named
+(C3) and the K1-GO decision entry omits what the job does not enforce, which bears on his decision; small reach
+(until 2.3; v2 code PRs only, which the PR Advisor cannot merge; advisor.md:323's text still forbids merging with
+failing checks; row :169 flags the question as open). SA-4's leg alone is Low (the advisor reviews every pushed head).
+Fix: right in substance, report text only, breaks nothing; refinements: keep "mechanically" and carry plan risk 2
+whole (both halves, line :323 on the branch, not :322); the 2.3 list misses advisor.md:294, guard :6 :990 and its
+tests (better: a grep at 2.3), and STATUS.md:22 is not a kit edit; SA-4's "merge check" must mean the session's own
+read of all check runs (both toolchain events) on the final SHA, since the guard cannot change here.
+
+## After the advisor call
+- C11 who advisor.md:323 binds: :33 the advisor merges "only when running as the PR Advisor routine"; :216 "Called
+  from any other session, give the verdict only"; the routine's act needs "all checks green" (:200) / "every check is
+  green" (:203); :323's verb is Merge. The routine cannot merge code or CI PRs (E9: not mergeAllowed), and those are
+  the PRs that can break toolchain; they merge from a day session under CLAUDE.md:128-131 ("with the gate and smoke
+  checks green"; :92's "Once approved with checks green" is unspecific). So plan risk 2's "advisor.md:322 already
+  forbids merging ... so the job blocks merges by the rules" overstates on the day-session route (#48's and every v2
+  code PR's): there, not even text requires a green toolchain. Supports Medium; makes SA-4's item-3 fix necessary; the
+  fix must reword plan risk 2, not copy it.
+- C12 guard tests: routine-guard.test.mjs :45 (fixture default checks gate+smoke), :144 'merge, no smoke' DAY, :145
+  'merge, gate failed' DAY, :364 'merge, gate still running' DAY change with mergeCheck; :2163 is unrelated
+  (tools/smoke.mjs path). The DAY cases confirm mergeCheck runs for day sessions.
+
+## Final verdict
+D2 HOLDS, Medium (SA-4's leg alone Low). Fix right in substance, report text only, breaks nothing (item 3 stricter
+than CLAUDE.md:130, allowed); needs: plan risk 2 reworded for the day-session route (C11), K1-GO's sentence naming
+what does not require the check, "until 2.3" tied to his settings step and the kit edits, advisor.md:294 added to the
+2.3 list (guard :6 :990 and tests :45 :144 :145 :364 too; STATUS.md:22 not a kit edit), SA-4's merge check as the
+session's own read of both toolchain runs on the final SHA, and Risks bullet 2 (:143-144) pointing to the new bullet.
