@@ -22,14 +22,20 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    .gate/u4e/fx-hashes-end.sha256 first (a plant may be in place), then resume with `Workflow({scriptPath,
    resumeFromRunId})`.
 2. **U4d2's launch** (the advisor's check, L1-L5): L1 DONE at 172c92d (rev 1.2 by u4d2_fold.py, its dry run read in
-   full; nothing left for the advisor); L2 DONE at 85c08df; P7 DONE (u4d2-run.sh). Main merged in at bfda3cd. In order:
-   (a) `u4d2_restamp.py --apply` (7.2 items 1, 2 and 8: P6 = bfda3cd with 399 / 446 / 52 / 10, P7, the plan cites of
-   sections 0-7 re-pointed to 3f58ff0d, section 0 re-stamped with the card's stamp read at that moment) and commit it
-   with this card (the launch-prep commit); (b) `git worktree add .claude/worktrees/u4d2-build -b u4d2-build <that
-   commit>`; (c) the `-k` demo there in shared mode (logs .gate/u4d2/k-demo-with.log and k-demo-without.log); (d) one
-   builder (general-purpose, opus, xhigh), no isolation, in that worktree: its prompt replaces 1.1's fast-forward as
-   U4e's did (record HEAD and `<base>`; `git diff --stat bfda3cd HEAD -- spikes/` empty), points at section 4 for the
-   rules (his words and the advisor's are there by script, so the prompt retypes none) and names the runner.
+   full; nothing left for the advisor); L2 DONE at 85c08df; P7 DONE (u4d2-run.sh). Main merged in at bfda3cd. Done:
+   (a) u4d2_restamp.py applied at 51520b4 (P6 = bfda3cd with 399 / 446 / 52 / 10, P7, the plan cites of sections 0-7
+   re-pointed to 3f58ff0d, section 0 re-stamped; brief sha256 146acf18); (b) the worktree
+   `.claude/worktrees/u4d2-build` (branch u4d2-build at 51520b4); (c) the `-k` demo there, shared mode, 16:27 UTC:
+   with `-k` exit 1 and both exit codes logged, without `-k` exit 1 and the first only (.gate/u4d2/k-demo-with.log,
+   k-demo-without.log). **(d) Running: U4d2's build,** workflow wf_e3cb6af2-079 (task wikkkfjvv; script
+   workflows/scripts/npt-u4d2-build-wf_e3cb6af2-079.js), launched about 16:28 UTC: one builder (general-purpose, opus,
+   xhigh), no isolation, in that worktree; the prompt replaces 1.1's fast-forward as U4e's did, points at section 4
+   for the rules (his words and the advisor's are there by script; it quotes only T4 item 1, as every agent brief
+   does) and names the runner; logs .gate/u4d2/; notes the worktree's u4d2-build.md. If cut: read its notes' last
+   plant line and `git diff` in the worktree (a plant may be in place: restore by Edit, check the sha256), then resume
+   with `Workflow({scriptPath, resumeFromRunId})`. On return: read its section 6 list and every stop in full; snapshot
+   the worktree (worktree_patch.py) and commit it; then the review per 7.2 item 7's panel (rust-reviewer,
+   engine-architect, test-engineer, infra-engineer, security-auditor), with U4e's seats counted in the three.
 - The saver runs as bg29bb0pt (restart it when it stops). The chat's size goes in every report.
 
 **Cuts by the spend limit** (SPEND-LIMIT (a), Mustafa 2026-11-12: at every cut, the notice's exact text, the time of

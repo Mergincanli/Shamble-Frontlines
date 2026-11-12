@@ -240,6 +240,26 @@ Edit, then `sha256sum -c --quiet r2-hashes-start.sha256` from the copy's root (2
   background with a 1,500,000 ms limit instead of 600,000 ms: round 1's counted run of mine took 590 s
   (r1-te-check-counted.log, test step 505 s), too near 600 s for a run that must not be cut; the runner, the lock and the
   command are the brief's.
+- Result (r2-te-check-counted.log): runner exit 0, "--- end 16:27:02 UTC, exit 0". Both `--no-run` builds exit 0
+  (16:16:14, 16:17:23), their Compiling lines naming the copy (npt-client, npt-room, npt-server among them). `node
+  check.mjs` exit 0 at 16:27:02 (579 s). Its step lines: PASS fmt 1.1 s; PASS clippy 20.7 s "measured build and bites
+  build both linted"; PASS clippy-wasm32 7.8 s; PASS doc 66.2 s "host and wasm32, rustdoc warnings as errors"; PASS test
+  475.2 s "measured build: 473 tests passed, 0 failed, 0 reported a skip; bites build: 541 tests passed, 0 failed, 0
+  reported a skip"; PASS deps 2.1 s; PASS refs 0.0 s "757 tracked files"; PASS marks 3.5 s "81 marks read and checked";
+  PASS self 1.3 s "52 of 52 tests passed"; PASS redact 0.8 s "10 of 10 tests passed; ... 255 item(s) checked, 0
+  finding(s)"; "check: all 10 steps pass".
+- Counts as deltas: on round 1's 458 / 524 / 52: +15 measured, +17 bites, +0 self. On the fix pass's 473 / 541 / 52
+  (fx-counted1.log, fx-counted2.log): +0, +0, +0. The 17 new tests are the builder's list (15 measured, 2 bites-only),
+  and each failed by name under a plant of mine above: endpoint e3 TE-4 (P-D'), carry_61_b (P-H), sec_u4e_7 (P-13c),
+  bites TE-3 (P-B); room sec_u4e_4 (P-7), a4 (P-5), a5 (P-6), carry_50 (P-G), bites a1 (P-3); loopback e6 binding
+  (P-A); pump e10 arrival (P-2), both a2 (P-4), both e9 size tests (P-C), sec_u4e_1 (P-13a), sec_u4e_3 (P-13b). The
+  renamed twin (P-1a), the re-pinned clean tick16 test (s03', s04'), e9's re-pinned Resync test (P-7, P-7+), carry 57
+  (P-57) and carry 23 (P-R10) also failed under theirs.
+
+## Step 5: end state
+- `sha256sum -c r2-hashes-start.sha256` from the copy's root: 23 of 23 OK, exit 0 (also after each plant and after
+  the counted run). `git status --untracked-files=all --short`: 24 lines (the 23 files and the builder's record);
+  HEAD 97bb9d3; nothing committed, nothing staged; every plant restored.
 
 ## Findings (ranked; severity on CLAUDE.md's one scale)
 None Critical, High or Medium. Two Lows of mine, neither before the merge (follow-ups by R8's outcome rule).
@@ -316,3 +336,12 @@ assert, which P-G and P-G+ show the test reaches); RR2-2's point that `file()`'s
 - Each other FX's test fails under its plant: FX-2 (P-2), FX-3 (P-3), FX-4 (P-4), FX-5 (P-5, P-5'), FX-6 (P-6), FX-7
   (P-7, P-7+, P-7-), FX-13 SEC-U4E-1 (P-13a), SEC-U4E-3 (P-13b), SEC-U4E-7 (P-13c), RR-10 (P-R10); RR-3 and FX-6's
   visibility half are compile-time.
+
+## Verdict
+APPROVE WITH FINDINGS, Lows only (TE2-L1, TE2-L2), neither before the merge: by R8's outcome rule the merge goes ahead
+and the two become follow-ups the main session records. Every FX's test fails by name under its plant (the builder's
+forms re-run, and my own on the edges: P-5', P-7+, P-7-, P-G+, P-G-); FX-1's plants (a) and (b) hold; TE-1 to TE-8 are
+closed; the counted check.mjs is all 10 PASS at 473 / 541 / 52 (+15 / +17 / +0 on round 1, +0 on the fix pass); no
+failure outside a plant (no TE2-5 record); nothing changed beyond R8's scope and bounds; the copy ends at 23 of 23
+start hashes. Not verified by me: the T5 prints' figures (the builder's), wasm32 test runs (none exist; clippy and doc
+only), and anything outside crates/room, crates/server and crates/client.
