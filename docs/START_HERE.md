@@ -1,5 +1,7 @@
 # Shamble Frontlines — START HERE (engineer onboarding)
 
+> **Legacy doc:** it describes the legacy build in `legacy/`. The legacy docs stay in `docs/`, marked legacy (ADR 0002, OQ-0002-2's answer, 2026-11-11); this one is rewritten for v2 later (row KT21 of `LEGACY_INVENTORY.md`, mark: redesign).
+
 > **Read this first in every chat.** Written 2026-10-02 from the live build, at the end of the animation-overhaul +
 > bug/optimization-audit chat. **[verified]** = confirmed against the code or measured; **[assumed]** = carried over,
 > grep before trusting. The code is the source of truth; every doc can drift.
@@ -9,7 +11,7 @@
 ## 0. What this is (30 seconds)
 
 Browser-based **top-down team shooter** in **Three.js r128** (UMD global), built as **classic multi-`<script>` files
-sharing globals**, played by **double-clicking an HTML file off disk** (`file://`) in Brave. PvE: on Cabana you and 3 ally bots fight 4 Soviet bots (three teams of bots on DM_Tri, `index.html?map=tri`), four
+sharing globals**, played by **double-clicking `legacy/index.html` off disk** (`file://`) in Brave. PvE: on Cabana you and 3 ally bots fight 4 Soviet bots (three teams of bots on DM_Tri, `index.html?map=tri`), four
 classes (Conscript, Peacekeeper, Imperial Warrior, Officer), the Juggernaut walker, a two-currency base-assault economy,
 win by destroying the enemy HQ. Fusion of Foxhole (camera), C&C Renegade (economy), Red Alert 3 (look, three factions),
 Gears of War (gun feel). Visual style: **"Living Comic"** (`ART_DIRECTION.md`). UI style: **"war-room dossier"**
@@ -19,8 +21,9 @@ Gears of War (gun feel). Visual style: **"Living Comic"** (`ART_DIRECTION.md`). 
 
 1. **`STATUS.md`** (where things stand; Mustafa's decisions, word for word: `DECISIONS.md`), then **this file**, then
    **`MODULE_MAP.md`** (who owns what, load order).
-2. **Work in the git repo.** The five code files sit at the repo root: `shamble-core.js`, `shamble-game.js`,
-   `shamble-editor.js`, `index.html`, `editor.html`. One change-set per branch `cs/<slug>`, cut from `origin/main`
+2. **Work in the git repo.** The five code files sit in `legacy/`: `shamble-core.js`, `shamble-game.js`,
+   `shamble-editor.js`, `index.html`, `editor.html` (moved there with `git mv` in foundation step 2.1b, bytes and line
+   numbers unchanged [verified 2026-11-11]). One change-set per branch `cs/<slug>`, cut from `origin/main`
    (`git fetch origin main` first; never move a session's main folder onto another branch: `CLAUDE.md`, Never;
    `/changeset`).
 3. Set up the **toolkit** once per machine (§5): `cd tools && npm ci`.
@@ -102,7 +105,7 @@ Not covered: logic and gameplay (that's `sim.js` and targeted tests), visuals (B
 doesn't click.
 Brace counts are a delta check only (GLSL inside JS strings gives a standing false imbalance).
 
-**Targeted tests** on the real code (harness snippets run through `node tools/preview.js . eval <snippet.js>`): animation metrics (hands on sockets < 1 cm, planted-foot drift, boots ≥ 0 cm above ground, IK stretch ≤ 0.98), fuzz (every class/ability, grenade, bow, Juggernaut, death/respawn — expect 0 errors), 3-minute soak (heap flat after GC), `sim.js` stall % (**random AI: compare ≥ 3 runs per build**), V8 sampling heap profiler for allocation rate, draw-call counts at fixed views.
+**Targeted tests** on the real code (harness snippets run through `node tools/preview.js legacy eval <snippet.js>`): animation metrics (hands on sockets < 1 cm, planted-foot drift, boots ≥ 0 cm above ground, IK stretch ≤ 0.98), fuzz (every class/ability, grenade, bow, Juggernaut, death/respawn — expect 0 errors), 3-minute soak (heap flat after GC), `sim.js` stall % (**random AI: compare ≥ 3 runs per build**), V8 sampling heap profiler for allocation rate, draw-call counts at fixed views.
 
 **Toolkit** (`tools/`, never shipped; full notes in `tools/README.md`). Once per machine, with Node 22:
 ```
@@ -110,11 +113,12 @@ cd tools
 npm ci                                    # the pinned versions in tools/package-lock.json
 npx --no -- playwright install chromium   # for the gate's smoke test (5a) and pageshot.js; --no never downloads another playwright
 ```
-Run every tool from the repo root. On Linux, prefix `preview.js` (and `pageshot.js --headed`) with `xvfb-run -a`;
-Windows needs no prefix. Generated output (renders, exports, builds) goes under `.gate/` (gitignored).
-- **`node tools/preview.js . <cmd>`**: renders the real **3D scene** headless (WebGL1): `shot`, `menu`, `top`, `eval <snippet>`, `evalshot <snippet> <out.png>`, `measure`, `time`. It **cannot draw the HUD/DOM/CSS**. Needs the optional native `gl` package.
-- **`node tools/pageshot.js . index.html <prefix> [--headed] <steps…>`**: Playwright + Chromium renders the **real pages including DOM, HUD and CSS** (use it for UI work). Headless = SwiftShader (CPU); `--headed` = the real GPU. Every shot prints the WebGL renderer it came from. The Linux container lacks Arial Black / Courier New / Segoe Print, so fonts differ from Brave there.
-- **`node tools/battery.js .`**: checks 3–4 as JSON (`gate.mjs` wraps it). **`sim.js`**: headless 90 s match (`node tools/preview.js . eval tools/sim.js [--map=tri]`; kill matrix included). **`reach.js`**: spawn-to-goal reachability on the NAV grid (`eval tools/reach.js [--map=tri]`). **`perfbots.js`**: bot scaling at 12 / 24 / 48 soldiers (`node --expose-gc tools/preview.js . eval tools/perfbots.js --map=tri --pre=<file.js>`). `preview.js --map=<id>` boots a map like `index.html?map=<id>`; `--pre=<file.js>` runs a file after the engine scripts load and before `bootGame()`; `pageshot.js` takes a query (`index.html?map=tri`). **`aabbs.js`** now also exports the live map's silo and tech points. **`aabbs.js` + `village.py`**: map layout export + validation (`python tools/village.py`, paths in its header).
+Run every tool from the repo root, with the build folder `legacy` as its folder argument (`tools/README.md`, "The build
+folder") [verified 2026-11-11: 2.1b's E6 ran `battery.js`, `preview.js` and `pageshot.js` with it]. On Linux, prefix
+`preview.js` (and `pageshot.js --headed`) with `xvfb-run -a`; Windows needs no prefix. Generated output (renders, exports, builds) goes under `.gate/` (gitignored).
+- **`node tools/preview.js legacy <cmd>`**: renders the real **3D scene** headless (WebGL1): `shot`, `menu`, `top`, `eval <snippet>`, `evalshot <snippet> <out.png>`, `measure`, `time`. It **cannot draw the HUD/DOM/CSS**. Needs the optional native `gl` package.
+- **`node tools/pageshot.js legacy index.html <prefix> [--headed] <steps…>`**: Playwright + Chromium renders the **real pages including DOM, HUD and CSS** (use it for UI work). Headless = SwiftShader (CPU); `--headed` = the real GPU. Every shot prints the WebGL renderer it came from. The Linux container lacks Arial Black / Courier New / Segoe Print, so fonts differ from Brave there.
+- **`node tools/battery.js legacy`**: checks 3–4 as JSON (`gate.mjs` wraps it). **`sim.js`**: headless 90 s match (`node tools/preview.js legacy eval tools/sim.js [--map=tri]`; kill matrix included). **`reach.js`**: spawn-to-goal reachability on the NAV grid (`eval tools/reach.js [--map=tri]`). **`perfbots.js`**: bot scaling at 12 / 24 / 48 soldiers (`node --expose-gc tools/preview.js legacy eval tools/perfbots.js --map=tri --pre=<file.js>`). `preview.js --map=<id>` boots a map like `index.html?map=<id>`; `--pre=<file.js>` runs a file after the engine scripts load and before `bootGame()`; `pageshot.js` takes a query (`index.html?map=tri`). **`aabbs.js`** now also exports the live map's silo and tech points. **`aabbs.js` + `village.py`**: map layout export + validation (`python tools/village.py`, paths in its header).
 - Node flags that paid off: `--expose-gc` (soak), `--allow-natives-syntax` (`%GetOptimizationStatus`), `--trace-deopt` / `--trace-compilation-dependencies` (why a function won't stay optimized).
 
 **Final gate: Mustafa's Brave screenshots** — the only real view of the HUD/DOM and of WebGL2. Perf claims about the browser need his DEV-panel FPS readout.

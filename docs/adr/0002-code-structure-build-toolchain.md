@@ -1,10 +1,10 @@
 # ADR-0002: Code structure, build and toolchain
 
-**Status:** Proposed
+**Status:** Proposed. Part 1 accepted by Mustafa on 2026-11-10, his SCOPE (a), word for word: "SCOPE: (a). I accept ADR 0002's part 1 alone: the repository after the restructure, with the legacy hard constraints applying to legacy/ only once the files have moved. Record it in the ADR's Status line in 2.1b's docs pass, on my go. Nothing else in ADR 0002 is accepted by this." (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-10: FREEZE-FDN (a), SPLIT (a), SCOPE (a) and the build go for 2.1a, in the foundation chat")
 **Date:** 2026-10-31
 **Author:** engine-architect (the "Pass marks" table: test-engineer, plan step 4) ·
 **Reviewed by:** (filled in at review) ·
-**Signed off by Mustafa:** as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted
+**Signed off by Mustafa:** as the basis for the spikes (2026-11-03, SPIKE-ORDER (b)); not yet accepted except ADR 0002's part 1, accepted by Mustafa on 2026-11-10 (SCOPE (a))
 
 This record decides how the v2 code is laid out, built, checked and shipped, and where the line between the Rust
 simulation and the TypeScript page runs. One repository holds a Cargo workspace (the Rust crates) and npm workspaces
@@ -1005,6 +1005,20 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
     mutation proofs still fail on the right checks, `docs/legacy-tuning.json` is reproduced byte for byte) with the
     fewest path changes, and where the legacy docs go (row KT21).
   - Research ids: R5-LAYOUT-OQ5, R5-GATE-OQ3.
+  - Answered in part, 2026-11-11, by its decider, the phase 1 restructure plan (foundation step 2.1, plan revision 3;
+    the main session with docs-keeper), with its reasons below; the evidence is in
+    `docs/reports/2026-11-11-foundation-2-1b.md`.
+    - (1) The legacy gate and tools stay in `tools/`, option (a), learning the `legacy/` path: 2 gate files edited in
+      step 2.1a (PR #50: `tools/gate.mjs`, `tools/smoke.mjs`) and 2 kit files in step 2.1b (CLAUDE.md,
+      `.claude/agents/verifier.md`), against option (b)'s cost (the guard's gate-file lists and its npm check, the 15
+      `tools/` allow rules in `.claude/settings.json` (counted 2026-11-12), CI's `--prefix tools` and both gate steps,
+      and kit lines in about 8 more files). R5-LAYOUT-REC6's marks hold (E2, E3 and E4 in the 2.1b report).
+    - (2) The legacy docs stay in `docs/`, marked legacy (row KT21): no path changes, against, by the plan's count of
+      2026-11-10, 27 lines in 12 files (8 of them protected), 2 broken relative links and about 25 dangling references
+      for `legacy/docs/`. START_HERE gets rewritten for v2 later (KT21's mark "redesign"), not archived.
+    - (3) The gate v2's script path is left to step 2.3's plan, which edits the guard anyway; so the question stays
+      open, marked "answered in part", by the register's own rule. That status is Mustafa's REG-TRUE (b) of 2026-11-11
+      (`docs/DECISIONS.md`, the entry of 2026-11-11, 21:39:44 UTC); the answer itself is the plan's.
 - **OQ-0002-3. In a local match, do the local server and the client endpoint share one Wasm instance?**
   - Why it matters: it sets the Worker's Wasm calls per tick and its memory in local play, and whether a trap in the
     client endpoint also ends the authority (ADR 0004's OQ-0004-7).
@@ -1593,7 +1607,7 @@ changed (how, why) · rejected (why). Open questions: answered (how, which part)
 | R5-LAYOUT-OQ2 | answered: the wasm-bindgen CLI directly, not wasm-pack | part 2 |
 | R5-LAYOUT-OQ3 | answered: `cargo tree` checks a path crate; whether cargo-deny also bans one is tried on the foundation's planted `server` dependency | part 3 |
 | R5-LAYOUT-OQ4 | spike: the boundary spike (two generator runs give byte-identical files) | the spike's item 4 |
-| R5-LAYOUT-OQ5 | open: OQ-0002-2 | part 1 |
+| R5-LAYOUT-OQ5 | answered in part: OQ-0002-2 | part 1 |
 | R5-TSLINT-OQ1 | answered: TypeScript 6.0.x until typescript-eslint supports 7; the move is its own change-set | part 2 |
 | R5-TSLINT-OQ2 | answered: not weighed (its pages were not read); revisit with R5-TSLINT-OQ1 | part 2 |
 | R5-TSLINT-OQ3 | spike: the boundary spike (`tsc --strict` on the generated package) | the spike's item 4 |
@@ -1623,7 +1637,7 @@ changed (how, why) · rejected (why). Open questions: answered (how, which part)
 | R5-PREV-OQ6 | spike: the preview hosting check (ADR 0006) | part 10 |
 | R5-GATE-OQ1 | answered: every check runs on every pull request until the first month's CI times | part 9 |
 | R5-GATE-OQ2 | answered: as R5-CI-OQ5, with ADR 0003's counts-only rule | part 9 |
-| R5-GATE-OQ3 | open: OQ-0002-2 | part 9 |
+| R5-GATE-OQ3 | answered in part: OQ-0002-2 | part 9 |
 | R5-GATE-OQ5 | answered: measured on the first gate v2 build against R5-GATE-REC3's proposed 30 minutes | part 9; Migration plan, phase 2, step 3 |
 | R5-XQ-OQ1 | open: OQ-0002-5 | part 8 |
 | R5-XQ-OQ2 | answered: one root lockfile, which CI's npm cache keys on | part 2 |

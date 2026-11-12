@@ -1,5 +1,5 @@
 # Usage: python tools/village.py [core.js] [aabbs.json] [out.json]
-#   defaults: <repo>/shamble-core.js, <repo>/.gate/aabbs.json (from: node tools/preview.js . eval tools/aabbs.js > .gate/aabbs.json),
+#   defaults: <repo>/legacy/shamble-core.js (else <repo>/shamble-core.js), <repo>/.gate/aabbs.json (from: node tools/preview.js legacy eval tools/aabbs.js > .gate/aabbs.json),
 #   <repo>/.gate/village.json (.gate/ is gitignored scratch). Paste the output into DM_Cabana.
 # Cabana Republic village pass: design the LEFT half, mirror to the right (team symmetry), validate every piece.
 # Output: JSON with houses/trees/props/covers in the exact shapes buildMap consumes.

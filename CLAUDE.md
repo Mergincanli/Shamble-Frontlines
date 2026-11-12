@@ -16,7 +16,7 @@ Write every plan and report so both can judge it from evidence alone.
   native code for the server, a TypeScript client on the latest three.js with the WebGPU renderer (WebGL 2 fallback),
   and our own netcode (server authority, WebTransport with a WebSocket fallback). Every engine feature traces to a
   `docs/VISION_V2.md` §6 need: no generic-engine features "for later"; a plan or draft that adds one is REVISE.
-- **The legacy game** (the five files below) is frozen: critical fixes only. It moves to `legacy/` in phase 1.
+- **The legacy game** (the five files below) is frozen: critical fixes only. It lives in `legacy/`.
 - **Phase 0** (`docs/V2_PHASE0_BRIEF.md`): process upgrades (kit-v3-0), then research (`docs/research/`), then decision
   drafts (`docs/ENGINE_OVERVIEW.md`, `docs/adr/0001`–`0006`). No engine code: throwaway spikes only, and only after
   Mustafa and the Advisor have approved the drafts; until then, stop.
@@ -40,8 +40,8 @@ Write every plan and report so both can judge it from evidence alone.
 - Workflow: git branches, the Edit tool, `node tools/gate.mjs` (START_HERE §1 and §5; toolkit setup in `tools/README.md`).
 
 ## Layout
-`shamble-core.js` (engine) ← `shamble-game.js` (gameplay + dispatch + `bootGame`) ← `shamble-editor.js` (authoring, editor.html only)
-`index.html` (player build) · `editor.html` (authoring build) · `docs/` · `tools/` (verification toolkit, never shipped) · `.claude/`
+`legacy/`: `shamble-core.js` (engine) ← `shamble-game.js` (gameplay + dispatch + `bootGame`) ← `shamble-editor.js` (authoring, editor.html only)
+`legacy/index.html` (player build) · `legacy/editor.html` (authoring build) · `docs/` · `tools/` (verification toolkit, never shipped) · `.claude/`
 Layering is hard: core references nothing above it; anything on index.html's live path resolves in core ∪ game, never editor.
 
 ## Hard constraints (change ONLY through an accepted ADR signed off by Mustafa, never on your own)

@@ -78,6 +78,11 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     first": the entry "Taken by Mustafa, 2026-11-11, 11:56:44 UTC: BRANCH-47 (a) and his words on the advisor tool";
     his sentence copied by script from `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A3.2):
     > CLAUDE.md keeps its wording until the kit unfreezes at the gate step (2.3); this clarification goes into it then.
+  - The render budget bench note (his task message of 2026-11-11, 20:21:02 UTC, in foundation 2.1b's session, under
+    "Decisions, newest first": the entry "Taken by Mustafa, 2026-11-11, 20:21:02 UTC: step 2.1b's task"; he asked for it
+    to be queued "in my words in docs/DECISIONS.md under "Queued""; copied by script from
+    `docs/reports/2026-11-11-foundation-2-1b.md`, Appendix A2, from inside its quote marks):
+    > A note for the render budget bench (ADR 0003), 2026-11-11. The stack stays as decided: Rust decides and computes, TypeScript on three.js draws. The bench reports three times per frame: the page's JavaScript, the Rust side, and the graphics card. If the page's JavaScript is the part over budget, that work moves to the Rust side before the JavaScript is tuned. Candidates I like for more Rust later: crowd and animation math for hundreds of soldiers, offline tools that prepare models, textures and maps, and heavy effects where they do not belong on the graphics card.
   - The entries below are pointers to items carried out.
   - STATUS-DIET and LANE-RULES, with his Models addition and ACCOUNTS (his queue of 2026-11-10, items 2 and 3, his
     answers of 07:08:14 UTC and his second message, item 1): carried out by status-diet, so moved from here to
@@ -96,6 +101,108 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-11, 22:38:50 UTC: his second message on auto mode** (foundation 2.1b, PR #51; his message
+  in that change-set's session, session_019YNMUWdGJZoQFUuuvvBP1Y, on his personal account, extracted by script from the
+  session's events, event 4a8479c4-7eff-41a2-ac6b-daca6b1209e7). The session's answer is in the report. Copied by script
+  from `docs/reports/2026-11-11-foundation-2-1b.md`, Appendix A6, and checked byte for byte against it:
+> I give you permission to go on auto mode, you can accept the needed permissions
+- **Taken by Mustafa, 2026-11-11, 21:39:44 UTC: KIT-2.1B (a), E8-RUN (a), REG-TRUE (b), and the build go for steps 6 and
+  7** (foundation 2.1b, PR #51; his message in that change-set's session, session_019YNMUWdGJZoQFUuuvvBP1Y, on his
+  personal account, extracted by script from the session's events, event 45563b1b-718b-4683-9e4c-663daf9cff74).
+  KIT-2.1B, E8-RUN and REG-TRUE are the session's three asks of that evening, in the report with the exact lines asked.
+  His REG-TRUE (b) replaces D1 (a)'s "answered" wording and new count in the entry below. Copied by script from
+  `docs/reports/2026-11-11-foundation-2-1b.md`, Appendix A5, and checked byte for byte against it:
+> My words of 2026-11-11, for the foundation chat (step 2.1b, branch claude/clever-fermi-oudsfq).
+>
+> The advisor tool. Tell me in one line which model answers the advisor tool now. If it is not Fable 5.2, say so and carry on; I will decide.
+>
+> KIT-2.1B: (a). Yes to exactly the four lines in your message, in one commit that holds nothing else. My Advisor compared the four "before" lines with main 76b4f7a: identical. My yes covers these four lines only. Any other kit or gate edit gets its own ask in chat.
+>
+> E8-RUN: (a). Yes to the rollback rehearsal as you describe it: in the throwaway copy .gate/fr-e8 only, by the main session only, nothing pushed and no branch made, the copy removed afterwards. It also covers one re-run the same way on a later head of this pull request, if a fix changes a file the gate reads or a kit line. Nothing else.
+>
+> REG-TRUE: (b). The register's own rule decides: OQ-0002-2 stays open as "answered in part", because the gate v2's path waits for step 2.3's plan. So 8 open, the Total line stays, and ADR 0002's lines 1596 and 1626 read "answered in part". The answer names all three parts. Add the two acceptance edits for my SCOPE (a). This replaces the "answered" wording and the new count in my D1 (a); the rest of D1 (a) stands.
+>
+> Then build: step 6, the move, and step 7.
+- **Taken by Mustafa, 2026-11-11, 21:10:58 UTC: his first message on auto mode** (foundation 2.1b, PR #51; his message
+  in that change-set's session, session_019YNMUWdGJZoQFUuuvvBP1Y, on his personal account, extracted by script from the
+  session's events, event 7a094d1e-41ed-40b7-91f8-544d91e4b64f). The session's answer is in the report. Copied by script
+  from `docs/reports/2026-11-11-foundation-2-1b.md`, Appendix A4, and checked byte for byte against it:
+> I give you permission to go on auto mode and accept yourself for the bash commands and what not
+- **Taken by Mustafa, 2026-11-11, 20:44:29 UTC: D1 (a), his Windows run of the new gate, and the Node 24 finding for
+  2.3** (foundation 2.1b, PR #51; his message in that change-set's session, session_019YNMUWdGJZoQFUuuvvBP1Y, on his
+  personal account, extracted by script from the session's events, event ce7f1f4b-08bc-476f-862e-3c1d9362c40b; sent
+  again byte-identical at 21:27:35 UTC, event 40ebaa1e-996c-42b2-b313-4198c6274017). D1 is the session's stop of that
+  evening: plan revision 3 named "the register's OQ-0002-2 row", which does not exist (the report). His REG-TRUE (b),
+  above, replaces this entry's "answered" wording and new count; the rest of D1 (a) stands. Copied by script from
+  `docs/reports/2026-11-11-foundation-2-1b.md`, Appendix A3, and checked byte for byte against it:
+> My words of 2026-11-11, for the foundation chat (step 2.1b, branch claude/clever-fermi-oudsfq).
+>
+> The advisor tool. Tell me in one line which model answers the advisor tool now. If it is not Fable 5.2, say so and carry on; I will decide.
+>
+> D1: (a). Record OQ-0002-2's answer as your plan check's section 3 proposes: the register's ADR 0002 row gets the new open-question count and my SCOPE (a) in its status column, PM-0002-36's reading goes into the register's loose-ends tables as one row, and ADR 0002's two lines that say "open: OQ-0002-2" read "answered". No new register row, and nothing wider.
+>
+> Windows. The new gate passed on my laptop tonight, on main 76b4f7a: Windows PowerShell 5.1, Node v24.17.0, base 44446a5, "files at the root" twice, every check PASS, the smoke 8 of 8 on index.html and 5 of 5 on editor.html, GATE PASS. Record it in the report.
+>
+> One finding from that run, for 2.3: with Node v24.17.0 the pinned Playwright's installer hung after the browser download reached 100%. It is a known bug with Node 24.16.0 and later and Playwright before 1.60.0. The same install finished under Node 24.15.0. If your own browser install stops after 100%, do not wait on it: record it as this bug and tell me.
+>
+> Then continue with your next steps: the advisor agent's review of the plan check, then the four kit lines and E8's ask to me in one message.
+- **Taken by Mustafa, 2026-11-11, 20:21:02 UTC: step 2.1b's task** (foundation 2.1b, PR #51; his message in that
+  change-set's session, session_019YNMUWdGJZoQFUuuvvBP1Y, on his personal account, extracted by script from the
+  session's events, event e018683d-30d9-49a0-b19d-ab279e7d23a1; first sent at 20:18:13 UTC, event
+  6743399f-9d86-4e25-8c08-aee3542d31dc, byte-identical, and interrupted by him at 20:19:40 UTC). Its render-budget note
+  waits in "Queued", above. Copied by script from `docs/reports/2026-11-11-foundation-2-1b.md`, Appendix A2, and checked
+  byte for byte against it:
+> My words of 2026-11-11, for a fresh foundation chat on my personal account. Step 2.1b: the move.
+>
+> Who you are. You are the foundation lane, step 2.1b. Step 2.1a is merged: main is 76b4f7a (PR #50). The old foundation chat is full and has stopped. Two other chats work on this repo: the netcode proof test (PR #40, branch claude/netcode-proof-test-plan-hcky5g, my university account) and the toolchain (PR #48, branch claude/laughing-pasteur-fwya24, my personal account). Never push to their branches and never touch spikes/.
+>
+> Model. The main model and every agent stay Opus 5.5. Check this session's model first and stop in one line if it is not Opus 5.5. Fable 5.2 advises through the advisor tool. My words on it of 2026-11-11 are in docs/DECISIONS.md and apply here: consult it at the five moments, record each consultation in the checkpoint in one line, and count them in the report. If the advisor tool is not on, say so in one line and carry on.
+>
+> Read first: CLAUDE.md, .claude/CHECKPOINTS.md, docs/STATUS.md, my words of 2026-11-10 and 2026-11-11 in docs/DECISIONS.md, and docs/reports/2026-11-11-foundation-2-1a.md. Then the old chat's notes at commit c8f4bb382d80d2248a3aef75f864753428bfac8b, under .checkpoints/foundation-restructure/: plan.md (revision 3) and what else a step needs. Copy plan.md into your own checkpoint folder as your step 0. Never redo finished work.
+>
+> The task. Build 2.1b now, under plan revision 3, steps 6 to 11.
+> - The five legacy files move into legacy/ with git mv, bytes unchanged, in one pushed commit that holds nothing else.
+> - Then the commands in text, the evidence E1 to E6 and E8, and the docs.
+> - My acceptance of ADR 0002's part 1 goes into the ADR's Status line in your docs pass, as my SCOPE (a) of 2026-11-10 says.
+> - Take these follow-ups from 2.1a's report into your plan check: IE-2, IE-3, IE-4, IE-7 and SA-L1.
+> - Check the plan's line numbers against today's main before you use them: CLAUDE.md and the docs changed with PR #49 and PR #50. If the plan and today's main disagree on more than a line number, stop and tell me in three lines.
+>
+> Kit and gate files.
+> - The plan names four kit lines: three in CLAUDE.md and one in .claude/agents/verifier.md. Ask me in chat with the exact changes, all four in one message, and write them only after my yes.
+> - The gate files are not touched in 2.1b. If you find that one must change, stop and tell me.
+> - A prompt from the guard counts as not seen by me only for an edit to a kit or gate file and for a move of the main folder. For every other question from the guard, my answer on the prompt is my answer.
+> - Do not edit any settings file, hook or allow-list.
+>
+> How to work. Plan check first, then the advisor agent's review of it, then build. At most 3 agents at a time, the saver running, a checkpoint after every step. Agents cannot be asked, so they write with the file tools or with one plain command and a literal path. Reviews as the plan's 1.7 says, within the review budget. If the guard, the deny list or the classifier refuses a command, record it and list it in the report with the route you took.
+>
+> Windows. The first run of the new gate on my laptop passed every check except the smoke, which lacked its browser. I am re-running it and will tell you the result.
+>
+> Also in your docs pass, queue this note in my words in docs/DECISIONS.md under "Queued", and change no other file for it:
+> "A note for the render budget bench (ADR 0003), 2026-11-11. The stack stays as decided: Rust decides and computes, TypeScript on three.js draws. The bench reports three times per frame: the page's JavaScript, the Rust side, and the graphics card. If the page's JavaScript is the part over budget, that work moves to the Rust side before the JavaScript is tuned. Candidates I like for more Rust later: crowd and animation math for hundreds of soldiers, offline tools that prepare models, textures and maps, and heavy effects where they do not belong on the graphics card."
+>
+> End with: the pull request's number and head SHA, what the proof showed, CI's gate and smoke on the final head with run numbers, how full this chat is, and what you need from me. For my part, give me exact steps in plain words: the saves backup with both console lines, the Brave check of legacy/index.html and legacy/editor.html, and the Windows command for your branch. Keep the pull request a draft until its report is in, then mark it ready and stop for my go.
+- **Taken by Mustafa, 2026-11-11, 20:20:36 UTC: his message before the task, in foundation 2.1b's session** (foundation
+  2.1b, PR #51; his message in that change-set's session, session_019YNMUWdGJZoQFUuuvvBP1Y, on his personal account,
+  extracted by script from the session's events, event 2f15e227-dcbb-43a7-b1fd-42179be83871). Before it, at 20:19:47
+  UTC, he sent "hi", event 844bb920-ac8e-4c79-bc10-5682fbd74f53, and interrupted it at 20:20:24 UTC (Appendix A1). His
+  task message, the entry above, followed 26 seconds later. Copied by script from
+  `docs/reports/2026-11-11-foundation-2-1b.md`, Appendix A1, and checked byte for byte against it:
+> hi, do not do anything yet
+- **Taken by Mustafa, 2026-11-11, 18:37:21 UTC: his go for #50** (foundation 2.1a, PR #50; his message in that
+  change-set's session, session_019YNMUWLffMoE47SbvkqJ5P, on his personal account, extracted by script from that
+  session's events, event f7945179-5b39-4984-9f26-330504b37386; merge commit 76b4f7a's message quotes it byte for byte,
+  checked by script; recorded here by foundation 2.1b, PR #51, after the advisor agent's review). Copied by script from
+  `docs/reports/2026-11-11-foundation-2-1b.md`, Appendix A7, and checked byte for byte against it:
+> merge #50
+>
+> My words of 2026-11-11, for the foundation chat (PR #50, foundation step 2.1a).
+> - Pinned to f6becf58a90059037e2f168867d12cb61eb0bbc9, by merge commit like #46 and #49, with this message quoted in it.
+> - Right before merging, re-check that the head has not moved and that CI's gate and smoke are green on it. If either differs, do not merge: stop and tell me.
+> - The texts in Appendix A are my words. My Advisor compared A1.1 to A1.3, A2.1, A2.2, A3.3 to A3.5 and A4 with the blocks as they were written for me: identical.
+> - The two gate edits of 2026-11-10 (tools/gate.mjs and tools/smoke.mjs in dd12aeb): whether or not each prompt reached me that morning, I approve both edits now. My Advisor read their diffs.
+> - I accept the follow-ups your message lists: IE-5, R2-1, SA-L1, A-1 and N2, each at the step the report names.
+> - No Brave check for 2.1a: no game file changes.
+> After the merge: tell me main's new head in one line, then stop. Do not start 2.1b here; this chat is 86% full. 2.1b runs in a fresh chat.
 - **Taken by Mustafa, 2026-11-11, 16:54:54 UTC: a correction to his words on permission prompts (the entry directly
   below)** (foundation 2.1a, PR #50; his message in that change-set's session, session_019YNMUWLffMoE47SbvkqJ5P, on his
   personal account, extracted by script from the session's events, event a10ee1d6-3120-4eb1-b83a-4e84afe50a94). Placed

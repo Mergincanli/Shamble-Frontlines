@@ -14,6 +14,9 @@ globals**, loaded in a fixed order (NOT ES modules — see TECHNICAL §1 for why
 
 ## The files
 
+All five files live in `legacy/` (moved from the repo root with `git mv` in foundation step 2.1b, bytes and line
+numbers unchanged: `shamble-game.js:N` means `legacy/shamble-game.js:N`) [verified 2026-11-11].
+
 | File | Role |
 |---|---|
 | **`shamble-core.js`** | **Shared truth / engine.** Config, arsenal, render globals, NPR pipeline, character builder, faction system, building kit, map schema, and the fenced headless SIM math. Loaded by both pages. References nothing above it. |
