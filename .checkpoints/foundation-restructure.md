@@ -305,6 +305,16 @@ Step 11: the verifier (workflow `fr-2-1b-verify`, wf_761376e1-e60) on 43733e5.
    named (C13); the prompt tally re-run before final; docs-keeper's own consultation counted apart; IE-2/-3/-4/-7 and
    SA-L1 closed by name; the saver stopped and no agent writing before the deletion commit; next consultation before
    ready.
+7. 2026-11-12 01:16 Amsterdam · the verifier PASS and the report final, before the deletion commit and ready (his
+   moment 5): is the finishing sequence right? · changed: his Windows pass given its own evidence row (pointing to A3);
+   #40 (238d39c, the same six docs files) and #48 (d8186fd, none shared) re-read at their tips for the PR body; the
+   session log checked for a message after 22:38:50 UTC (none: no A7); docs-check (20/20) and the appendix check run a
+   last time; the notes copied to `.gate/fr-notes-2-1b/` for the advisor agent; the saver stopped before staging (no
+   terminate autosave, no process left); CHECKPOINTS.md §9 read for the delete form; a plain `git commit` and one push;
+   E1 on the final head without the notes exclusion; the advisor agent briefed inline (full SHA, the last checkpoint
+   commit, the `.gate/` copy, notes under `.gate/`, the refused `git -C`); E8 not re-run (no gate-read file or kit line
+   changed since f0322d2), said in the PR body; the final message: both console lines printed from the report, each
+   Windows command in its own block with the final SHA, the chat's fullness from get_session, whether to watch #51.
 
 ## His mid-turn message (2026-11-11 21:10:58 UTC, event 7a094d1e-41ed-40b7-91f8-544d91e4b64f; captured: `mustafa-2026-11-11-permission.md`, 95 characters)
 "I give you permission to go on auto mode and accept yourself for the bash commands and what not". The chat is already
