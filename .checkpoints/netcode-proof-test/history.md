@@ -1973,7 +1973,7 @@ From "Next steps, in order" (as it was):
     then main's #51 row). Checks: rules, CI and gate files equal main's; repo-map check OK; check.mjs --only
     marks,refs,redact all pass; gate PASS --no-smoke.
 
-## Note: an addition to review_packet.py's ALLOWED (Mustafa's words of 2026-11-12, item 2), 2026-11-12 about 20:40 UTC
+## Note: an addition to review_packet.py's ALLOWED (Mustafa's words of 2026-11-12, item 2), 2026-11-12 about 20:15 UTC
 - Addition 1: `.checkpoints/netcode-proof-test/advisor-u4d2-brief.md`, the exact path.
   - Written by the advisor agent as its ruling: its title "The advisor's check of the U4d2 builder brief (rev 1.1),
     2026-11-12"; its seat line "a day session's advisor (workflow agent, opus), on main's `.claude/agents/advisor.md`".

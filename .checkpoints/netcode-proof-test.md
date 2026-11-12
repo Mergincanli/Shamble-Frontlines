@@ -4,7 +4,7 @@
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main, last merged in at bfda3cd (main 2aa5e9c, PRs #50 and #51, the legacy game into legacy/)
-- **Last update:** 2026-11-12 about 20:55 UTC (U4e merged at c88eb31; U4d2 built; U4d2's review round 1 running)
+- **Last update:** 2026-11-12 about 20:22 UTC (U4e merged at c88eb31; U4d2 built; U4d2's review round 1 running)
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
@@ -68,7 +68,7 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
    **(h) Running: U4d2's review round 1,** workflow wf_9294c443-01a (task wshmxx2ps; script
-   workflows/scripts/npt-u4d2-review-r1-wf_9294c443-01a.js), launched about 20:50 UTC. Batch 1 (Read):
+   workflows/scripts/npt-u4d2-review-r1-wf_9294c443-01a.js), launched 20:19 UTC. Batch 1 (Read):
    rust-reviewer, security-auditor, infra-engineer (runs in the builder's copy through u4d2-run.sh while nobody
    plants; the infra seat times `--only wasm` with `-x`). Batch 2 (Prove): engine-architect (the read copy, no runs)
    beside the test-engineer (general-purpose with Edit; plants by Edit in the builder's copy; one counted check.mjs).
