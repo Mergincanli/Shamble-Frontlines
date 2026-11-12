@@ -196,4 +196,136 @@ Edit 2, in `group()`: old `            } else {` / `                self.refused
 `            }` / `            return;` (the re-received group with other bytes); new `            } else {` /
 `                self.duplicates += 1;` / `            }` / `            return;`. Command as P-B's; log
 r1-te-ph-second-hash.log. (Planted before the run.)
+- Run: exit 0; npt-client recompiled (log line 11); every binary ok (client lib 2, bites 1, endpoint 9, gap 6,
+  loopback 6 (74.94 s), pump 11, schedule 17).
+- So a client that keeps the first hash of a tick and drops a second, different one (by either route) passes every
+  test: carry 61 (b)'s "two different hashes for one tick give the sentinel" has no test (the carry's own unit test
+  asks only for the reorder and the duplicate, which carry_61_... meets: endpoint.rs:157-203). TE-c8 confirmed
+  (finding TE-6, Low: the carry's named unit test is there; this clause has none).
+- Restored by the two reverse Edits; all 23 OK.
+
+**P-G + Q-6 + Q-7, one run (each read by its own test's name).**
+- P-G (TE-c5, carry 50's room wiring), room/src/room.rs:943. Old:
+  `            c.counters.events_expired += u64::from(c.queue.expire(t));`. New:
+  `            c.counters.events_expired += u64::from(t & 0);` (the room never expires an event; the encoder's
+  `t.wrapping_sub(q.tick) as u8`, room.rs:1170, then codes an age of 256 or more modulo 256).
+- Q-6 (settles SEC-U4E-4), room/tests/room.rs: after the file's last line `}` (the end of
+  `pm_0001_22_the_never_ackers_headroom_never_goes_below_0`), a `mod te_probes` with
+  `te_probe_q6_an_acked_resync_is_answered_again_at_once`: `Scene::stress()`, `world_room(&scene, 1, 100, 1)`, one
+  acked tick, then 30 times { `receive(Resync)`; `tick()`; collect; count and encode the full state if one came;
+  `ack.take`; `receive(Input(ack.input(vec![])))` }; prints the count, the bytes and the counters; asserts at least 25
+  full states in the 30 ticks.
+- Q-7 (settles SEC-U4E-7), client/tests/endpoint.rs: after the file's last line `}` (the end of `mod bites`), a
+  `mod te_probes` with `te_probe_q7_four_incomplete_groups_2_pow_31_apart_overflow_the_lost_run`: inside
+  `catch_unwind`, `joined(endpoint(), 100)`, then one `feed` of four `Snapshot { tick: 101 + k * (2^31 - 1), group 0,
+  groups 2, .. }` (k = 0..3); prints the outcome; asserts it panicked.
+- Command: `cargo test --locked --all-features --no-fail-fast -p npt-room -p npt-server -p npt-client -- --nocapture`
+  (the room's, the server's and the client's tests: every test that runs a room). Log r1-te-pg-q6-q7.log. (Planted
+  before the run.)
+- Run: exit 0; npt-room, npt-client and npt-server recompiled (log lines 11, 12, 31). Every binary ok: client lib 2,
+  bites 1, endpoint 10 (9 + Q-7), room lib 20, room bites 1, catalogue 1, room 23 (22 + Q-6), gap 6, loopback 6
+  (68.70 s), pump 11, schedule 17 (its three panics are its `should_panic` tests).
+- P-G: with the room's `expire` call gone, every test passes: carry 50's room half (the room drops an event at age
+  256 from the resend and counts it) is proven only by the queue's unit test (events.rs:137-145), which calls
+  `expire` itself. Carry 50 asks for "A unit test", which is there; the brief's e12 "an event at age 255 is still
+  sent, none at 256" is shown for the queue, not for what the room sends. With the call gone the encoder's `as u8`
+  (room.rs:1170) would code a 256-tick-old event as age 0 and no test would see it. TE-c5 confirmed (finding TE-5,
+  Low).
+- Q-6 printed "Q-6: 29 full states in 30 ticks, 256418 B; full_states 1 -> 30; resyncs 29; dropped 1": SEC-U4E-4
+  holds by run. A client that acks each full state and asks again gets about 29 full states a second, 256,418 B
+  (about 8.8 KB each), 8.0 x the 32,000 B a second the window allows, none of it counted against the window.
+- Q-7 printed "Q-7: panicked: None Some("attempt to add with overflow")" at client/src/lib.rs:526:13: SEC-U4E-7
+  holds by run (a hostile server's four incomplete groups 2^31 - 1 ticks apart panic the debug client).
+- Restored: room.rs (src) by the reverse Edit, room/tests/room.rs and client/tests/endpoint.rs by removing
+  `mod te_probes`; all 23 OK.
+- SEC-U4E-5 is not settled by run here: the room's `receive(slot, msg)` (room.rs:682) has no session argument, so the
+  room-side half holds by reading; the caller half (the lab ignores `replaced`, common/mod.rs:238-249) is U4r's and
+  U6's code, and a lab test would test the lab, not U4e. Said so; not run.
+
+**Step 2, part (ii) read (s01..s15):** each log is one `-x`, `--all-features` run by name in the bites build, and shows
+exactly the clean test named in the builder's record FAILED, with a panic value that is the bite's own defect (s01 "F
+363 coded at age Some(34)"; s02 "no fresh delta within 500 ms"; s03/s04 "Some(2768209054929083115) None"; s05/s06
+left (0,1,1) / (1,0,1) against (1,1,0); s07 left 7920; s08 Some(131071); s09 two hashes; s10..s12 (1,0,0) / (0,24,0)
+/ (0,0,34); s13 "232 own shots sent"; s14 -234; s15 "client 0's full state holds Soldier 1 gen 0"). The switch texts are
+not recorded, but the values tie each failure to its bite; I accept them, with two limits found by my own plants:
+s07 shows the floor grid at `Held::hashed`, not the endpoint's wiring (TE-3); s03/s04's failure is "the client files
+nothing", the silent drop (TE-1, with NC-H1). Part (i): b11-counted1/2 both "bites build: 524 tests passed, 0 failed",
+and b11-list.log names each twin; so each twin passes and no clean test fails in the bites build.
+
+**P-21 + P-22 + P-57, one run (three independent sites, each read by its own test's name).**
+- P-21, room/src/room.rs:835. Old: `        canonical(&mut self.input.commands);`. New:
+  `        let _ = &mut self.input.commands;` (the room steps commands in arrival order).
+- P-22, room/src/rewind.rs:10. Old:
+  `        && (r.fraction == 0 || history.get(r.tick_a.wrapping_add(1)).is_some())`. New:
+  `        && (r.fraction == 0 || r.fraction > 0)` (`rewind_at` names `tick_a + 1` whether or not the ring holds it).
+- P-57, room/src/room.rs, route_events. Old: the comment line
+  `                    // A second overflow inside an unacknowledged forced resync: Kick(overflow), the client dropped.`
+  then `                    c.kick(&mut self.roster);`. New: the comment line, then `                    c.queue.clear();`
+  (a second overflow clears the queue and never kicks).
+- Expected to fail by name: `carry_21_commands_received_in_two_orders_give_one_tick_input`,
+  `carry_22_rewind_at_never_names_tick_n_plus_1_and_accepts_every_held_view_time`,
+  `carry_57_a_never_acker_overflows_once_then_a_second_overflow_kicks`. Command `cargo test --locked --all-features
+  --no-fail-fast -p npt-room`; log r1-te-p21-22-57.log. (Planted before the run.)
+- Run: exit 101; npt-room recompiled (log line 7). room lib 20 ok, room bites 1 ok, catalogue 1 ok, room "FAILED. 20
+  passed; 2 failed": `carry_22_rewind_at_never_names_tick_n_plus_1_and_accepts_every_held_view_time` (room.rs:293:5,
+  left `Some(Rewind { tick_a: 1019, fraction: 1, cover: Present })`, right None) and
+  `carry_22_the_room_counts_each_firing_command_its_ring_cannot_rewind` (room.rs:338:5, left 0, right 1).
+- P-22: caught twice. P-21: not caught. `carry_21_commands_received_in_two_orders_give_one_tick_input` passes with no
+  sort, because `fill_input` (room.rs:796-834) builds the list in slot order, one command per slot under option B,
+  so it is already canonical; the sort's case (two commands of one slot, ticks across the wrap) arises only under
+  option A (U4f). The function is pinned by its unit test (room.rs `carry_21_two_arrival_orders_sort_...`), and its
+  call site by reading only (finding TE-8, Low, a carry for U4f). P-57: not caught.
+  `carry_57_a_never_acker_overflows_once_then_a_second_overflow_kicks` passes with the second-overflow kick gone,
+  because the never-acker is also kicked by the forced full state's timeout (room.rs:1014-1019). Probe Q-9 below.
+- Restored: the three reverse Edits; all 23 OK.
+
+**Q-9 (P-57's follow-up, clean build)**, room/tests/room.rs: after the file's last line `}`, a `mod te_probes` with
+`te_probe_q9_which_route_kicks_the_never_acker`: the setup of carry_57_a_never_acker_... (stress, seed 4, tick 400,
+8 slots, cap 48, slot 0 never acks), 300 ticks, recording the first overflow-resync tick f and the tick k of the first
+`Kick::Overflow` to slot 0; prints f, k, f + FULL_STATE_ACK_TICKS + 1 and the overflow-resync count; asserts k is
+Some. Command `cargo test --locked --all-features --no-fail-fast -p npt-room --test room -- --nocapture te_probe`;
+log r1-te-q9-kick-route.log. (Probe in place before the run.)
+- Run: exit 0, "test result: ok. 1 passed; 0 failed; ... 22 filtered out". Printed "Q-9: first overflow resync f
+  Some(434); kick k Some(459); f + window + 1 = Some(495); overflow resyncs 1".
+- So in the clean build the second-overflow route kicks (tick 459, before the timeout's 495); with that route off
+  (P-57) the timeout kicks at 495, inside the test's 300 ticks (400..700), and the test's
+  `assert!(kicked && c.kicked() && c.counters().kicked == 1)` (room.rs:889) passes either way: the test named for the
+  second-overflow edge does not pin its route. Brief e12's carry 57 "as two tests, a second overflow before the
+  FullState's ack, and no ack within FULL_STATE_ACK_TICKS, each sends Kick::Overflow ... (both edges)": the first
+  edge's test cannot fail when that edge is broken. Finding TE-7, Medium (a one-line fix: assert the kick's tick is
+  below f + FULL_STATE_ACK_TICKS + 1, or count the two routes apart).
+- Restored by removing `mod te_probes`; all 23 OK.
+- NC-H1's own cheapest proof (netcode notes :216-217: `lab.compare()` and slot 0's keys in the tick16 twin) is what
+  Q-1 ran: compared 30, bad 0, no key at or past 65,536 and none at 0..30. NC-H1 holds by run.
+
+**P-23 + Q-10, one run (two crates, each read by its own test's name).**
+- P-23 (settles RR-10), room/src/room.rs, route_events. Old: `                            gameplay.push(Queued {` /
+  `                                number,` / `                                tick,`. New: the same first two lines,
+  then `                                tick: tick.wrapping_add(1),` (each queued event carries the wrong tick; the room's
+  `stamped` list stays right). Expected to fail if the queue half is not vacuous:
+  `room::tests::carry_23_events_carry_their_tick_and_consecutive_32_bit_numbers_across_a_16_bit_wrap`.
+- Q-10 (settles NC-M5), client/tests/endpoint.rs: after the file's last `}`, a `mod te_probes` with
+  `te_probe_q10_event_numbers_far_from_the_clients_start_rebuild_wrong`: `joined(endpoint(), 100)` (event start 0),
+  one snapshot of tick 101 with events numbered 200,000 and 200,001; prints the filed hash against `client_hash` of
+  the right numbers; asserts they differ.
+- Command `cargo test --locked --all-features --no-fail-fast -p npt-room -p npt-client -- --nocapture`; log
+  r1-te-p23-q10.log. (Planted before the run.)
+- Run: exit 101; npt-room and npt-client recompiled (log lines 7, 8). room lib "FAILED. 19 passed; 1 failed":
+  `room::tests::carry_23_events_carry_their_tick_and_consecutive_32_bit_numbers_across_a_16_bit_wrap`, panicked at
+  room.rs:1404:21 with `Queued { number: 65598, tick: 903, ... }`; every other binary ok (client lib 2, bites 1,
+  endpoint 10, room bites 1, catalogue 1, room 22).
+- P-23: caught, by the queue half: in this run client 0's queue held events, so RR-10's "can pass vacuously" did not
+  happen here; the missing "at least one queued event was checked" assertion stays a Low robustness note (RR-10, as
+  the rust-reviewer wrote it; settled: real, not biting today).
+- Q-10 printed "Q-10: filed 8109853925905384090, right numbers' hash 16249022625642323684, equal false": NC-M5 holds
+  by run (an endpoint whose event counter starts at 0 rebuilds events numbered 200,000 wrong, and the hash reads
+  them).
+- Restored: room.rs by the reverse Edit, endpoint.rs by removing `mod te_probes`; all 23 OK.
+
+**Q-11 (settles NC-M4)**, server/tests/gap.rs: after the file's last `}` (the end of `mod bites`), a `mod te_probes`
+with `te_probe_q11_snapshots_after_the_gap_carry_events_before_entities`: gap_case's clean AfterSend setup (stress,
+4 clients, gap of ACK_RING_TICKS periods), recording per tick client 0's (skipped, bytes, groups, events_sent,
+events_resent, baseline_age); prints ticks F-2..F+7; asserts F was recorded. Command `cargo test --locked
+--all-features --no-fail-fast -p npt-server -p npt-client --test gap -- --nocapture te_probe`; log
+r1-te-q11-nearest8.log. (Probe in place before the run.)
 
