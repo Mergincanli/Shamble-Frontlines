@@ -14,7 +14,8 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
 
 **The current step: U4 wave 2's start.** U4e's launch (L4; L3, the carry-51 commit, done at 28a85e7); U4d2's brief with
 the advisor. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
-L2 edits and L3's §4.1 line at 1e8c188, 686a583c…; it read d928358b… before 1e8c188), u4s-carries.md (carries 1-72, cdab0240…); the advisor's rulings: advisor-u4.md,
+L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188
+to 85c08df, the version earlier rulings' and u4e-brief.md's plan cites read; d928358b… before 1e8c188), u4s-carries.md (carries 1-72, cdab0240…); the advisor's rulings: advisor-u4.md,
 advisor-u4-wave1.md (with B1.4's erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md,
 advisor-u4e-brief.md, advisor-u4df.md.
 - **Merged into the spike branch:** U4s f080551, U4b 411eeee, U4a 952f734, U4c f3f7c2f, U4d with W1-S1's npt-proto half
@@ -87,6 +88,22 @@ advisor-u4e-brief.md, advisor-u4df.md.
   resumeFromRunId})`. On return: read its stops and TE2-5 lines in full; check the copy against fx-hashes-end.sha256;
   re-cut wip/u4e.patch and commit it; cut round 2's packet (u4e-r2-packet.json: db49108's patch against the new one,
   this ruling as the "judged against" half); round 2 (R8's seats).
+  - **The fix pass: DONE** (FX-1 to FX-13 each with its test, its plant FAILED by name, restored; record "Fix pass,
+    round 1"). The builder was cut by the usage limit after its two counted runs (fx-counted1.log, fx-counted2.log:
+    all 10 steps PASS, measured 473 (+15), bites 541 (+17), self 52) and before it recorded them or wrote the end
+    hashes: the main session did both (a labelled block in the record; no crate file newer than 09:29:54;
+    fx-hashes-fixed.sha256 23 of 23 OK; fx-hashes-end.sha256 written, equal to it). Snapshot wip/u4e.patch re-cut at
+    4300944 (round 1's kept as .gate/u4e/u4e-r1-snapshot.patch). Its slip: two scratch lists by shell redirect in the
+    session scratchpad (recorded in its record).
+- **Running: U4e's review round 2,** workflow wf_e623d489-17e (task wh159bx8v; script
+  workflows/scripts/npt-u4e-review-r2-wf_e623d489-17e.js), launched about 15:30 UTC. Packet u4e-r2-packet.md
+  (ecf4394a…; round 1's tree `.gate/u4e-r1` against the fixed copy; R1-R8 and T1). Seats per R8 in batches of at
+  most two (the U4d2 brief check's L5): netcode-architect and security-auditor, then engine-architect and
+  rust-reviewer (all read only), then the test-engineer alone (start hashes r2-hashes-start.sha256, every FX plant
+  re-proved, one counted check.mjs). Notes u4e-review-r2-{netcode,security,arch,rust,test}.md; logs .gate/u4e/r2-*.
+  If cut: check the copy against fx-hashes-end.sha256 (a plant may be in place), then resume with
+  `Workflow({scriptPath, resumeFromRunId})`. Outcome (R8): APPROVE or Lows only → the merge on M1-M9; a Medium → the
+  advisor (follow-up or carry); a High → the advisor for a third round on it alone.
 - **Running: U4d2's builder brief** (next step 3), workflow wf_ec1d2b01-aab (task wgkj3qotm; script
   workflows/scripts/npt-u4d2-brief-wf_ec1d2b01-aab.js), launched 06:45 UTC in the slot round 1's batch 2 left free,
   one agent at a time: the rust-reviewer drafts rev 1 (u4d2-brief.md; notes u4d2-brief-notes.md), the test-engineer
@@ -146,11 +163,21 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
    stopped: stop the saver before editing toward a commit that must hold both). The counted run at 28a85e7: 10 steps
    PASS, 399 / 446 / 52 (.gate/u4e-l3/l3-check.log), filled into the brief's 7.2 item 1; gate PASS (--no-smoke).
    U4e's review reads its diff from 1e8c188 (engine-architect: a new pub item, A19; rust-reviewer).
-2. **L4, U4e's launch,** as the brief's section 1 says: one builder (general-purpose, opus, xhigh) in a worktree, under
-   W1-TARGET's lock; at most three agents at a time, reviewers included.
-3. **U4d2's builder brief,** with the advisor: carries 52, 65 and 66, N2-M2's ruling and W1-TARGET; it bases on U4d-F's
-   commit and names it.
-4. **U4r's brief:** the night's rev 2 at `cs/npt-u4r-brief` ed973c9 goes to the advisor after U4c, U4d2, U4e and U4j
+2. **U4e: built, round 1, fix pass DONE; round 2 running** (see Running): then the merge on R9's M1-M9.
+3. **U4d2's builder brief: rev 1.1, the advisor's check APPROVE WITH CONDITIONS** (advisor-u4d2-brief.md, L1-L5). L2
+   DONE at 85c08df (the plan's text, by u4d2_plan_edits.py). Next, by script, in the main session: L1 (the fold into
+   rev 1.2: blocks 4, 5, 6, 8, 9, 10's words, each old phrase found once), L3 (P1-P5 and P8 by anchor and sha256; P6
+   `<base>` = the head at launch, `git merge-base --is-ancestor adb1bab <base>` exit 0, counts 399 / 446 / 52 / 10 if
+   `git diff --stat 28a85e7 <base> -- spikes/netcode-proof` is empty; P7 u4d2-run.sh = u4e-run.sh plus `-k`, its diff
+   saved, `-k` shown once in U4d2's worktree), L4 (1.2's sentence on U4e's order), then L5's launch: one builder,
+   with U4e's round-2 seats at most two at a time.
+4. **After U4e's merge, before U4r's brief (the advisor's U4d2 brief check, A13):** crates/server/clippy.toml gains the
+   HashMap and HashSet type bans in the form U4e's room and client files use, and its header names them (Q9 (a); plan
+   §4.11); proof: a scratch `std::collections::HashMap` in crates/server/src refused by clippy by name under the runner
+   (-x), restored by Edit and its sha256 checked; then check.mjs counted, every step PASS and the counts unchanged; its
+   own commit, which the advisor's next ruling on the spike branch checks. U4r's brief gives npt-bots its clippy.toml
+   with both bans (§4.11).
+5. **U4r's brief:** the night's rev 2 at `cs/npt-u4r-brief` ed973c9 goes to the advisor after U4c, U4d2, U4e and U4j
    merge (carry 59's new sentence and carries 62, 63 and 69 to fold).
 - **Done for the report of 2026-11-11 evening:** the table per reviewer role (review-roles-wave1.md: findings rated
   Medium or higher only that role found in wave 1, from the notes, no agents): netcode 8, engine-architect 3,
