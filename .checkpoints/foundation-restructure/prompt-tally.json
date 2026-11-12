@@ -1,12 +1,12 @@
 {
  "file": "/root/.claude/projects/-home-user-Shamble-Frontlines/c0e5589d-9610-5933-a695-61d4b8cf6d47.jsonl",
- "toolResultsWithDecision": 388,
+ "toolResultsWithDecision": 494,
  "tally": {
-  "accept/config/rule": 130,
-  "accept/config/classifier": 233,
+  "accept/config/rule": 163,
+  "accept/config/classifier": 304,
   "accept/user_temporary": 14,
   "accept/config/mode": 3,
-  "accept/config": 6,
+  "accept/config": 8,
   "reject/hook/hook": 2
  },
  "prompts": [
