@@ -17,3 +17,10 @@ unsafe_code = "deny"
 
 [workspace.lints.clippy]
 all = { level = "warn", priority = -1 }
+
+# Overflow checks in every profile for the simulation and the protocol (ADR 0002 part 4).
+[profile.release.package.sim]
+overflow-checks = true
+
+[profile.release.package.protocol]
+overflow-checks = true
