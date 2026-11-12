@@ -277,7 +277,7 @@ checkpoint's resume card is the handoff; open this file only when a step needs t
        npt-room wants per client at U4); the probe in npt-lab with its own binary (plan §4.7 lists no npt-lab binary).
     R1 still waits for stop B.
 
-## Decisions taken
+## Decisions taken (to 2026-11-11, newest first; later ones are appended at the end, each under "## Decision: …")
 - **Mustafa, 2026-11-11 about 16:45 UTC (verbatim):** "My words of 2026-11-11, for the netcode chat (PR #40, the
   netcode proof test).
   First, before anything else and without agents: save what exists only in a work folder.
@@ -1923,3 +1923,47 @@ From "Next steps, in order" (as it was):
 3. Then U4d-F (workflow 3) as above; then U4d2's builder brief (carrying carry 52, N2-M2's ruling, W1-TARGET), with
    the advisor.
 4. U4r's brief: the night's rev 2 at `cs/npt-u4r-brief` ed973c9 goes to the advisor after U4c, U4d2, U4e and U4j merge.
+
+## Decision: Mustafa, 2026-11-12 about 15:32 UTC, after his /compact (SPEND-LIMIT (a), review_packet.py, main)
+- **Mustafa, 2026-11-12 about 15:32 UTC, after his /compact (verbatim):** "You were just compacted to cut usage. Read
+  the resume card in .checkpoints/netcode-proof-test.md first and continue from its next steps. Do not redo finished
+  work.
+  My words of 2026-11-12.
+  1. SPEND-LIMIT (a). The cap is my university's, so it stays as it is. Restore and resume after each cut, as you did
+     this morning. At every cut, write on the card the notice's exact text, the time of the cut and the time you
+     resumed.
+  2. review_packet.py. Your change in 1829b5f lets every file whose name starts with "advisor-" pass the name check.
+     Four of those files are your own briefs to the advisor: advisor-u4e-brief-brief.md, advisor-u4df-brief.md,
+     advisor-u4j-r2-brief.md and advisor-u4e-r1-brief.md. My rule is that the packet holds no conclusion of the builder
+     or the main session.
+  Before the next packet is cut, replace the "advisor-" exception with a list of exact file names that may pass,
+  starting with advisor-u4e-brief.md alone. Every other name the pattern forbids stays refused. You may add a file's
+  exact name to the list yourself when a packet needs it, only if the advisor agent wrote that file as its ruling, and
+  you note each addition in history.md. A file written by you or by a builder never goes on the list.
+  The packets already cut stay as they are. Do not re-cut them and do not restart a review.
+  3. Main moved. PR #51 (foundation step 2.1b, the legacy game into legacy/) merged as
+     2aa5e9ce03e9ab9ccfecd53e6aabf951abe705dd. Merge main into your branch at your next clean stop. Do not stop a
+     running agent for it. docs/DECISIONS.md and docs/STATUS.md will conflict: keep both sides, as you did for PR #49.
+  Record these words in history.md under my decisions. Tell me in a few lines what the last limit notice said and that
+  the script is changed. Then carry on."
+  - Read as (the main session):
+    - SPEND-LIMIT (a): the cap stays. After each cut the main session restores what a cut agent left (a plant, a half
+      edit) and resumes, as this morning; the card's block "Cuts by the spend limit" gives, for each cut, the notice's
+      exact text, the time of the cut and the time of the resume.
+    - review_packet.py: the "advisor-" exception gives way to ALLOWED, the exact paths that pass though the pattern
+      forbids them: advisor-u4e-brief.md alone. Every other name the pattern forbids is refused: the main session's four
+      briefs to the advisor, and advisor-u4d2-brief.md (the advisor's ruling, not needed by a packet yet). A file goes
+      on the list only if the advisor agent wrote it as its ruling and a packet needs it; each addition is noted below.
+      The packets already cut stay as they are; no review restarts.
+    - Main (PR #51, 2aa5e9c): merged into the branch at the next clean stop, no running agent stopped; docs/DECISIONS.md
+      and docs/STATUS.md keep both sides, as for PR #49.
+  - The main session's own addition, which only refuses more: the flag for his words (`words_of_mustafa`) now passes
+    history.md only; before, any flagged path passed the name check.
+  - Additions to ALLOWED (the exact name; that the advisor agent wrote it as its ruling; the packet that needed it):
+    none yet.
+  - Done: review_packet.py changed (sha256 784cfedf…). packet_name_check.py shows its name check on 11 paths (logs
+    .gate/packet-name-check/): the new script 11 of 11 as wanted; the script before the change (153b76ea…, 1829b5f's
+    rule) 5 of 11, the four briefs, advisor-u4d2-brief.md and a flagged report passing. The card's block "Cuts by the
+    spend limit" holds today's three cuts (02:02, 06:41 and 09:24 UTC), read from the session's transcript. This entry
+    is appended at the end of history.md under its own heading, and "Decisions taken" points here from its heading line,
+    so no cited line of history.md moves.

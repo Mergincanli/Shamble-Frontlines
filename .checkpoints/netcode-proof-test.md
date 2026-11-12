@@ -34,6 +34,19 @@ background; their notifications arrive after the compact:
    limits (history.md:291-293) and L4's sentence on U4e's order.
 - The saver runs as brww4gof7 (restart it when it stops). The chat's size goes in every report.
 
+**Cuts by the spend limit** (SPEND-LIMIT (a), Mustafa 2026-11-12: at every cut, the notice's exact text, the time of
+the cut and the time of the resume; UTC, read from the session's transcript):
+- 2026-11-12 02:02: "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit
+  resets 2:10am (UTC)". Cut: U4e's first build run (wf_0fa6595a-3e2, after 49 s, no code). Resumed 03:52, when the
+  saver's end woke the session; the build relaunched at 03:53 (wf_1e3b5232-26a).
+- 2026-11-12 06:41: "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit
+  resets 7:10am (UTC)". Cut: round 1's test seat (plant P-D left in place) and U4d2's brief run. Resumed 07:34 (P-D
+  restored by Edit 07:35; both runs resumed about 07:36).
+- 2026-11-12 09:24: "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit
+  resets 12:30pm (UTC)". Cut: the advisor's check of U4d2's brief (09:24) and U4e's fix builder (09:29, after its two
+  counted runs). Resumed 13:13, on Mustafa's message: the builder's copy checked against its hashes and its runs
+  recorded by the main session; the advisor's check resumed.
+
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188
 to 85c08df, the version earlier rulings' and u4e-brief.md's plan cites read; d928358b… before 1e8c188), u4s-carries.md (carries 1-72, cdab0240…); the advisor's rulings: advisor-u4.md,
@@ -220,7 +233,15 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
   row's owner deferred to U4e (carry 51); U4j's F1 by the review budget; the HOLD, lifted at the save (4ad80a9);
   USAGE-SAVINGS (a) with his limits; NIGHT-TONIGHT (c), one item.
 
-**Rules in force** (his words verbatim in history.md "Decisions taken" unless marked)
+**Rules in force** (his words verbatim in history.md "Decisions taken" unless marked; from 2026-11-12 on, each
+decision is appended at history.md's end under its own heading "## Decision: …", so no cited line moves)
+- **Mustafa, 2026-11-12** (history.md, "## Decision: Mustafa, 2026-11-12 about 15:32 UTC"): SPEND-LIMIT (a): the cap
+  stays; restore and resume after each cut; at every cut, the card's "Cuts by the spend limit" gets the notice's exact
+  text, the cut's time and the resume's time. review_packet.py: exact paths in ALLOWED pass though the pattern forbids
+  them (advisor-u4e-brief.md alone); a name goes on it only if the advisor agent wrote the file as its ruling and a
+  packet needs it, each addition noted under that history entry; a file by the main session or a builder never; the
+  packets already cut stay, no review restarts. Main's PR #51 (2aa5e9c): merged in at the next clean stop, no running
+  agent stopped, DECISIONS.md and STATUS.md keep both sides.
 - **Mustafa, 2026-11-11:** USAGE-SAVINGS (a), all three, with his limits: builders' pass or fail from the exit code
   and the test runner's own summary line, never a grep, and a fresh copy reads its notes and the diff in its worktree
   before it changes anything; the main session reads in full every finding rated Medium or higher and everything that
