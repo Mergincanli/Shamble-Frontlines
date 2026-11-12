@@ -369,11 +369,12 @@ ready, the report final, the checkpoint folded and deleted by hand, ready, the a
 Count: 5.
 
 ## Running work
-- workflow wf_d3a5ca64-901 (task w6wikh9i8): review round 1, run 1, five reviewers on head 4d78ad61e652f2e35ddf51c49557e725420248c8
-  (security-auditor, infra-engineer, rust-reviewer; then test-engineer, engine-architect; Opus 5.5 at max); script
-  `/root/.claude/projects/-home-user-Shamble-Frontlines/29a42dc7-ecd4-506e-b90a-121dd5e50988/workflows/scripts/foundation-2-2-review-round-1-wf_d3a5ca64-901.js`,
-  args {"head": "4d78ad61e652f2e35ddf51c49557e725420248c8"}; notes `<reviewer>-review-r1.md`; launched ~22:45 Amsterdam;
-  resume with resumeFromRunId. Run 2 (the skeptics, one per deduped finding, 3 at a time) follows.
+- workflow wf_b82244e7-a22 (task wk7mtwars): review round 1, run 1, relaunched 2026-11-12 ~23:05 Amsterdam after the
+  container restart stopped wf_d3a5ca64-901 (security-auditor and infra-engineer had started, with notes; none had
+  returned; rust-reviewer had not started); the same script, `.../workflows/scripts/foundation-2-2-review-round-1-wf_d3a5ca64-901.js`,
+  plus "continue after the last complete block of your notes"; args {"head": "4d78ad61e652f2e35ddf51c49557e725420248c8"};
+  resume with resumeFromRunId wf_b82244e7-a22.
+- saver: background task bgb28hxv6 (restarted after the container restart, which ended b52patinz).
 - saver: background task b52patinz (restarted 2026-11-12 ~22:30 Amsterdam after M6's revert; the worker restarted three
   times that evening and ended the earlier savers bg5v6agjr and b3kk7q32m).
 - workflow wf_29ac478b-0a7 (step 6's docs: docs-keeper and one fact checker): done, 2 of 2; its findings fixed in 13feadc.
