@@ -1,0 +1,19 @@
+# His D1 message for foundation step 2.1b, 2026-11-11, sent a second time
+
+Source: his chat message in session_019YNMUWdGJZoQFUuuvvBP1Y (his personal account, foundation step 2.1b), event 40ebaa1e-996c-42b2-b313-4198c6274017, at
+2026-11-11T21:27:35.969394Z, extracted by `capture-message.mjs` (run from `.gate/foundation-restructure/`; a copy beside this file) from
+the session's own events (`list_events`), never retyped.
+
+```text
+My words of 2026-11-11, for the foundation chat (step 2.1b, branch claude/clever-fermi-oudsfq).
+
+The advisor tool. Tell me in one line which model answers the advisor tool now. If it is not Fable 5.2, say so and carry on; I will decide.
+
+D1: (a). Record OQ-0002-2's answer as your plan check's section 3 proposes: the register's ADR 0002 row gets the new open-question count and my SCOPE (a) in its status column, PM-0002-36's reading goes into the register's loose-ends tables as one row, and ADR 0002's two lines that say "open: OQ-0002-2" read "answered". No new register row, and nothing wider.
+
+Windows. The new gate passed on my laptop tonight, on main 76b4f7a: Windows PowerShell 5.1, Node v24.17.0, base 44446a5, "files at the root" twice, every check PASS, the smoke 8 of 8 on index.html and 5 of 5 on editor.html, GATE PASS. Record it in the report.
+
+One finding from that run, for 2.3: with Node v24.17.0 the pinned Playwright's installer hung after the browser download reached 100%. It is a known bug with Node 24.16.0 and later and Playwright before 1.60.0. The same install finished under Node 24.15.0. If your own browser install stops after 100%, do not wait on it: record it as this bug and tell me.
+
+Then continue with your next steps: the advisor agent's review of the plan check, then the four kit lines and E8's ask to me in one message.
+```
