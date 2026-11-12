@@ -152,4 +152,48 @@ below, with the planted diff recorded, so each result rests on a diff in these n
 Command: `cargo test --locked --all-features --no-fail-fast -p npt-server -p npt-client` (every test that builds an
 endpoint). Log r1-te-pb2-rounding.log. (Planted before the run; if this line has no result after it, the plant may
 still be in place: check client/src/lib.rs's sha256 against the start list.)
+- Run: exit 0 (npt-client recompiled: the log's "Compiling npt-client" line 11). Every binary ok: client lib 2, bites 1,
+  endpoint 9, gap 6, loopback 6 (70.09 s), pump 11, schedule 17.
+- So an endpoint built with `with_bite("PM-0001-17/client-rounding")` that keeps the clean grid passes every test:
+  the bite's call-site wiring in `ClientEndpoint` (carry 24's "`ClientEndpoint` takes the grid for every call it makes
+  into `npt_sim::grid` from `npt_client::grid_with_bite`") has no test; the clean test and the part (i) twin call
+  `Held::hashed` with a grid passed in (lib.rs:753-799), never an endpoint. TE-c2 confirmed (finding TE-3).
+- Restored by the reverse Edit; client/src/lib.rs bd83870c...d9cfd9 = start; all 23 OK.
+
+**P-D (TE-c4: each group decoding alone)**, my own form, client/src/lib.rs, in `group()` after the
+`let Some(base) = base else { ... };` block. Old: `            return;` / `        };` /
+`        let mut tick = core::mem::take(&mut self.ring[i]);`. New: the same first two lines, then
+`        if self.ring[i].got & ((1u8 << g) - 1) != (1u8 << g) - 1 {` / `            self.refused += 1;` /
+`            self.sentinel(t);` / `            return;` / `        }`, then the `let mut tick` line (a client that decodes a
+group only once every lower-numbered group of its tick has: in-order decoding, stronger than the main session's
+group-0 form of the cut run). Command as P-B's; log r1-te-pd2-in-order.log. (Planted before the run.)
+- Run: exit 101; npt-client recompiled (log line 11). One FAILED, by name:
+  `e2_a_forced_split_decodes_group_by_group_and_the_mirror_equals_the_clients_hash`, panicked at loopback.rs:145:5
+  "a tick with a lost group is never filed" (after "e2: 3024 split ticks, 3023 compared equal": group 2 of the dropped
+  tick 330 arrives after the missing group 1, the plant refuses it and files the sentinel). Every other binary ok
+  (client lib 2, bites 1, endpoint 9, gap 6, loopback 5 of 6, pump 11, schedule 17). So e2 catches in-order decoding.
+- Restored by the reverse Edit (the five planted lines removed); all 23 OK.
+
+**P-D' (TE-c4, the group-0 form)**, the same site. New: `        if g > 0 && self.ring[i].got & 1 == 0 {` /
+`            self.refused += 1;` / `            self.sentinel(t);` / `            return;` / `        }` (a group above 0
+refused unless group 0 of its tick has arrived: the case "each group decoding alone" names that e2's drop of group 1
+never reaches). Command as P-B's; log r1-te-pd3-group0.log. (Planted before the run.)
+- Run: exit 0; npt-client recompiled (log line 11); every binary ok (client lib 2, bites 1, endpoint 9, gap 6,
+  loopback 6 (68.41 s), pump 11, schedule 17). The cut run's log r1-te-pd-group-alone.log gives the same, for the
+  same plant.
+- So a client that cannot decode a group above 0 while group 0 of its tick is missing (it files the sentinel where
+  the tick should stay pending, then be resolved lost) passes every test. e2 drops group 1 only (loopback.rs:120-122)
+  and e3 drops group 1 of 2 (endpoint.rs:122); no test delivers a later group with group 0 lost. The plan's "a forced
+  group split, each group decoding alone" (§5 U4e Tests) is met for "group 2 without group 1" (P-D) but not for "group
+  1 without group 0" (P-D'). TE-c4 confirmed in part (finding TE-4).
+- Restored by the reverse Edit; all 23 OK.
+
+**P-H (TE-c8: carry 61 (b), "two different hashes for one tick give the sentinel")**, client/src/lib.rs, two Edits as
+one plant (both routes to a second, different hash switched off). Edit 1, in `file()`: old
+`            Filed::Hash(h) if h != hash => {` / `                self.ring[i].filed = Filed::Sentinel;` /
+`                self.out.hashes.push((t, 0));` / `            }`; new `            Filed::Hash(h) if h != hash => {}`.
+Edit 2, in `group()`: old `            } else {` / `                self.refused += 1;` / `                self.sentinel(t);` /
+`            }` / `            return;` (the re-received group with other bytes); new `            } else {` /
+`                self.duplicates += 1;` / `            }` / `            return;`. Command as P-B's; log
+r1-te-ph-second-hash.log. (Planted before the run.)
 
