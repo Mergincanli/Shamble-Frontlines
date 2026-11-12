@@ -1,0 +1,22 @@
+{
+  "title": "U4d-F round 2, on what changed (the fix pass: FX-1, the exact reckoning test, and FX-2, scene.rs's doc words)",
+  "out": ".checkpoints/netcode-proof-test/u4df-r2-packet.md",
+  "heads": [
+    "Round 1's files: `.gate/u4df-r1`, a worktree at dad9566 with round 1's snapshot (`.checkpoints/netcode-proof-test/wip/u4df.patch` as committed at 9dd037a) applied; its five crates/sim files' sha256 equal round 1's (u4df-review-test.md [1]).",
+    "U4d-F's copy after the fix pass: `.claude/worktrees/wf_9ce88fa3-452-1` (branch u4df-build at dad9566; the change is uncommitted there).",
+    "The diffs below compare round 1's files with the fix pass's; the tests folder's diff is expected to be empty."
+  ],
+  "diffs": [
+    {"label": "npt-sim's sources (crates/sim/src), round 1 against the fix pass", "a": ".gate/u4df-r1/spikes/netcode-proof/crates/sim/src", "b": ".claude/worktrees/wf_9ce88fa3-452-1/spikes/netcode-proof/crates/sim/src"},
+    {"label": "npt-sim's tests (crates/sim/tests), round 1 against the fix pass", "a": ".gate/u4df-r1/spikes/netcode-proof/crates/sim/tests", "b": ".claude/worktrees/wf_9ce88fa3-452-1/spikes/netcode-proof/crates/sim/tests"}
+  ],
+  "docs": [
+    {"label": "The approved plan for the fix pass and round 2: the advisor's U4d-F ruling, R2 (advisor-u4df.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4df.md", "heading": "^### R2\\. "},
+    {"label": "FX-2's words: the advisor's U4d-F ruling, T3 (advisor-u4df.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4df.md", "heading": "^### T3\\. "},
+    {"label": "Round 1's finding FX-1 answers: TF-M1 (the test-engineer)", "path": ".checkpoints/netcode-proof-test/u4df-review-test.md", "lines": [154, 169]},
+    {"label": "Round 1's finding FX-2 (a) answers: NF-M1 (the netcode-architect)", "path": ".checkpoints/netcode-proof-test/u4df-review-netcode.md", "lines": [114, 126]},
+    {"label": "Round 1's finding FX-2 (b) answers: NF-L2 (the netcode-architect)", "path": ".checkpoints/netcode-proof-test/u4df-review-netcode.md", "lines": [135, 144]}
+  ],
+  "cited": [],
+  "carries": {"path": ".checkpoints/netcode-proof-test/u4s-carries.md", "include": "U4d-F"}
+}
