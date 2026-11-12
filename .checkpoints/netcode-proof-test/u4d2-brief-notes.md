@@ -1,9 +1,11 @@
 # U4d2 brief: drafter's notes (rust-reviewer, 2026-11-12)
 
-No Edit tool in this agent: this file is rewritten whole with Write at each save (the task's rule). No cargo build,
-test, clippy, doc or check.mjs was run. Read-only commands run: git log/diff/merge-base, `rustc --print cfg` (host and
-wasm32), `cargo rustc --print cfg` (refused by stable cargo before any build: see R-rows), `cargo tree` (offline,
---locked, resolution only), `nm -D` on glibc, `node --version`.
+No Edit tool in this agent: this file and the brief are rewritten whole with Write at each save (the task's rule). No
+cargo build, test, clippy, doc or check.mjs was run. Read-only commands run: git log/diff/merge-base/status, `rustc
+--print cfg` (host and wasm32), `cargo rustc --print cfg` (refused by stable cargo before any build; scratch target dir
+in the session scratchpad, nothing created), `cargo tree` (offline, --locked, resolution only), `nm -D` on glibc,
+`node --version`, `sha256sum`, `wc`, `grep`/`sed` reads. Web: two official Cargo pages (cargo-rustc, config), read as
+data.
 
 ## Plan
 1. Read the model brief u4e-brief.md (structure: sections 0-8) and its approval (advisor-u4e-brief.md).
@@ -17,64 +19,74 @@ wasm32), `cargo rustc --print cfg` (refused by stable cargo before any build: se
 9. Draft the brief by section (0..8), saving after each section; log choices and conflicts here.
 
 ## Progress
-- [x] sources read (all of steps 1-8)
-- [ ] brief §0-1
-- [ ] brief §2
-- [ ] brief §3
-- [ ] brief §4-6
-- [ ] brief §7-8
+- [x] sources read (steps 1-8)
+- [x] brief §0-1 (first save)
+- [x] brief §2 (second save)
+- [x] brief §3-8 (third save, 717 lines, sha256 ca2c3373…)
+- [x] cite pass over the whole brief, then a whole rewrite with the fixes (fourth save, 719 lines, sha256 e5869dbf…):
+  u4e-run.sh :15-16 → :16-17 and :28-31 → :30-32; u4e-brief.md :733-742 → :734-742; plan :691-693 → :688-693 (the
+  third exception); plan :700 → :699 ("an export not on the loader's list"); "no wasm-opt" → "wasm-opt is not run
+  here: C-U7-1"; the usize plant's site named (world.rs:1018 `dump`, hash.rs:14's word sink); `<crate>` in T4 item 2
+  read as "npt-hash-wasm, npt-lab or check.mjs (its self-tests)"; the -3 script's lines (:43-45, :52-59, :55, :65-72).
+- DONE: the brief is rev 1; the return goes to the workflow.
 
 ## Sources read (file:line, at the main folder's head cea8209; spikes/ equal to 28a85e7: `git diff --stat 28a85e7 HEAD -- spikes/` empty)
 - u4e-brief.md (982 lines, rev 3.3): structure §0 :120-135; §1 :139-172; §2 :176-564; §3 :568-717; §4 :721-781;
   §5 :785-801; §6 :805-834; §7 :838-912; §8 :916-982.
-- u4-build-plan.md (1,079 lines): §5 U4d2 :666-702; §4.1 :178-203 (hash-wasm :202; npt-lab subcommands :198;
-  Recording/Replayer :185); §4.2 :205-249; §4.3 :251-265; §4.11 :392-407; §4.14 hash-map row :476; §4.15 :478-504;
-  U4d :602-643 (D-2 :612-614; D-7 :629; bites :640-642); U4r :740-793 (HashCompare :766-767; det-u4.mjs :790-792);
-  Lanes :840-875 (step 0 :841-845; wave 2 :863-867; reviewers :872-873); §6 U7 :885-887; §7.1 :896-908; §7.2 :910-918;
-  §2 Features :157, C-U7-1 :159; RQ4/RQ5 :117-118; T9 :69, T22 :82, A8 :91, A12 :95, A13 :96; Q3 :981-985;
-  Q9 :1002-1005; Q21 :1040-1042.
-- plan.md: §4.1 :366-419 (hash-wasm :392-393); §4.2 :421-454 (three exceptions :435-447, hash-wasm :442-446, how read
-  :449-450); §4.5 :527-551 (flags :533-535; features :536; the check :546-551, Chromium :548, bites :551); §4.7 npt-lab
-  :617 (`HashCompare`), binaries :611-612.
-- u4s-carries.md: §U4d2 :407-446 (29 :408-411, 41 :412-414, 42 :415-417, 52 :418-428, 65 :429-435, 66 :436-446);
-  entry 34 :62-69; recordings section :351-379 (67 :352-369, 71 :370-374, 72 :375-379).
+- u4-build-plan.md (1,079 lines, sha256 686a583c…): §5 U4d2 :666-702; §4.1 :178-203 (hash-wasm :202; npt-lab
+  subcommands :198; Recording/Replayer :185); §4.2 :205-249; §4.3 :251-265; §4.5 :292-304 (baselines: no flags);
+  §4.11 :392-407; §4.14 hash-map row :476; §4.15 :478-504; §5 intro :507-512 (Cargo.lock :509); U4d :602-643 (D-2
+  :612-614; D-7 :629; bites :640-642); U4r :740-793 (HashCompare :766-767; det-u4.mjs :790-792); Lanes :840-875;
+  §6 U7 :885-887; §7.1 :896-908; §7.2 :910-918; §2 Features :157, C-U7-1 :159; RQ4/RQ5 :117-118; T9 :69, T22 :82,
+  A8 :91, A12 :95, A13 :96; Q3 :981-985; Q9 :1002-1005; Q21 :1040-1042.
+- plan.md (rev 3.3, sha256 2bef127b…): §4.1 :366-419 (hash-wasm :392-393); §4.2 :421-454 (three exceptions
+  :435-447, hash-wasm :442-446, how read :449-450, narrow surfaces :454); §4.5 :527-551 (flags :533-535; features :536;
+  the check :546-551, Chromium :548, bites :551); §4.7 npt-lab :617 (`HashCompare`), binaries :611-612.
+- u4s-carries.md (sha256 cdab0240…): §U4d2 :407-446 (29 :408-411, 41 :412-414, 42 :415-417, 52 :418-428, 65 :429-435,
+  66 :436-446); entry 34 :62-69; recordings section :351-379 (67 :352-369, 71 :370-374, 72 :375-379); carry 39
+  :169-179.
 - Entry 34: met by U4a (u4a-build.md:125-126; history.md:1335; u4ab-review-test.md:90; u4ab-review-rust.md:27). Carry
   42's condition ("If U4a's report does not list entry 34 as met") is false: U4d2 takes no word of entry 34.
 - advisor-u4.md: cond 2 :90-101; cond 7 :130-136; cond 8 :137-139; cond 10 :143-149 ((b) :145-146); cond 12 :154-158;
-  Q3 ruling :198-199; Q9 :207; U4s cond 2 :313-327 (carry 41's origin :324-326); F2 (3) :450-458 ("in wave 2 after
-  U4d2 has merged" :456).
-- advisor-u4-wave1.md: W1-PUB :353-435 (`Recording::synthetic` in the library :408-409; Recording one path :412-413);
-  W1-U4D's plan text :300-301; W1-TARGET :558-586 (disk :576-580).
-- advisor-u4d-close.md: B1.2 :42-134 (closed loop refused :48-51; U4d2 bases on U4d-F :117-119); B1.3 :165-180; B2
-  :229-308 (U4e's carries; nothing for U4d2 but carry 52's text :136-150).
+  nit (g) :169-171; Q3 ruling :198-199; Q9 :207; U4s cond 2 :313-327 (carry 41's origin :324-326); cond 4 :334-335;
+  U4S-BUILDER :365-371; F2 (3) :450-458 ("in wave 2 after U4d2 has merged" :456).
+- advisor-u4-wave1.md: W1-PUB :353-435 (U4d part :387-416); W1-U4D's plan text :300-301; W1-TARGET :558-586 (lock
+  :570-573, provenance :574-575, disk :576-580).
+- advisor-u4d-close.md: B1.2 :42-134 (closed loop refused :48-51; who lands U4d-F :116-119); B1.3 :165-180; B2
+  :229-308 (U4e's carries; carry 52's text :136-150).
 - advisor-u4df.md: R1 :28-87 (RM :71-85; "fix the scene before U4d2 pins" :53-56); R3 :182-210; R4.1 :213-231
-  (TE2-5 stop clause for next time :228-231); R5 M9 :294-297 (U4d2's brief names U4d-F's commit); R6 :301-322; T4
-  :459-470.
+  (TE2-5 stop clause for next time :228-231); R5 M9 :294-297; R6 :301-322; T4 :459-470.
 - advisor-u4j-r2.md: B2.3 :146-171 (carry 65's half (a) :158-160; the rule :167-171).
 - advisor-u4e-brief.md: F2-ROUTE :277-310; L4 :335-336.
-- netcode-proof-test.md (the card): Rules in force :137-176 (USAGE-SAVINGS :138-147; TE2-5 rule :161-165; T4 :168-176);
-  U4e's state :26-62 (build done, round 1 running); U4d2's brief workflow :63-70.
-- history.md: Decisions taken :280-309 (USAGE-SAVINGS builders' limits :291-293).
-- u4e-run.sh (90 lines) and main-run.sh.
-- Code (spikes/netcode-proof/ at 28a85e7): Cargo.toml (members :6-23; lints comment :73-92, forbid :93; libm comment
-  :50-53; release overrides :108-112); rust-toolchain.toml; .cargo/config.toml; crates/proto/Cargo.toml (bites comment
-  :13-14); crates/lab/Cargo.toml; crates/lab/src/{lib.rs,main.rs,probe.rs}; crates/sim/src/{replay.rs,world.rs,
-  hash.rs,lib.rs}; crates/sim/tests/replay.rs; crates/tcpinfo/{Cargo.toml,src/lib.rs,src/linux.rs};
-  crates/client-wasm/Cargo.toml; crates/server/{Cargo.toml,clippy.toml}; crates/l1/src/lib.rs :325-352;
-  crates/l1/tests/l1.rs :478-532; check.mjs (whole structure; :1-18, :31, :80-159, :161-216, :301-312, :394-452,
-  :489-543, :1013-1093, :1196-1284, :1398-1403, :1411-1421, :1433-1500, :1502-1590, :1594-1654); check.test.mjs
-  (:1-98, :1094-1165, :1246-1249, :1617-1698); ops/runs/c-u2-pm-0001-3.mjs; results/c-u2-pm-0001-3/*/runs.txt;
-  marks/SERIES.md :385-405; docs/adr/0002 :252-266, :498-506; docs/adr/0004 :1138-1145, :1184.
+- netcode-proof-test.md (the card): base counts :23-25; U4e's state :26-62; U4d2's brief workflow :63-70; Rules in
+  force :137-176 (USAGE-SAVINGS :138-147; U4 carries word for word :158-160; TE2-5 rule :161-165; B6 :166-167; T4
+  :168-176).
+- history.md: Decisions taken :280-309 (USAGE-SAVINGS line :291, builders' limits :292-293).
+- u4e-run.sh (90 lines: exports :16-17, log check :30-32) and main-run.sh.
+- Code (spikes/netcode-proof/ at 28a85e7): Cargo.toml (members :6-23; libm comment :50-53; lints comment :73-92, forbid
+  :93, clippy :95-99; release overrides :108-112); rust-toolchain.toml; .cargo/config.toml; crates/proto/Cargo.toml
+  (bites comment :13-14); crates/lab/{Cargo.toml, src/lib.rs, src/main.rs (doc :1-12, params :116, summary :167-183,
+  dispatch :186-213, tests :215-275), src/probe.rs (sha256 :210-217, :238-242; tests :415-440)}; crates/sim/src/
+  {replay.rs, world.rs (bites :585-635, loops' periods :794, BITES :934-938, with_bite :940-966, digest :968-973, sinf
+  :994-1000, dump :1018, place_vehicles :1215-1228), hash.rs (sink :14, StateDump :66-115), lib.rs};
+  crates/sim/tests/replay.rs; crates/tcpinfo/{Cargo.toml, src/lib.rs, src/linux.rs}; crates/client-wasm/Cargo.toml
+  (:9-13 "two unsafe_code exceptions"); crates/server/{Cargo.toml, clippy.toml}; crates/l1/src/lib.rs :325-352;
+  crates/l1/tests/l1.rs :478-532; check.mjs (:1-18, :31, :80-159, :161-216, :230-312, :364-380, :382-452, :489-543,
+  :689, :734-758, :1013-1093, :1196-1284, :1355-1361, :1398-1403, :1411-1421, :1433-1500, :1502-1590, :1594-1654);
+  check.test.mjs (:1-98, :1094-1165, :1246-1249, :1617-1698); ops/runs/c-u2-pm-0001-3.mjs (:43-45, :52-59, :65-72);
+  results/c-u2-pm-0001-3/{81c6d01e371b, 65869918809f}/runs.txt; marks/SERIES.md :385-405; docs/adr/0002 :252-266,
+  :498-506; docs/adr/0004 :1138-1145, :1184.
 
 ## Facts read or measured (each with its source)
 - F1. `rustc --print cfg` at 1.99.1: host target_feature fxsr, sse, sse2 only (no fma); wasm32-unknown-unknown:
   bulk-memory, multivalue, mutable-globals, nontrapping-fptoint, reference-types, sign-ext (no simd128, no
   relaxed-simd), panic="abort", pointer width 32.
 - F2. `cargo rustc --print cfg` on cargo 1.99.1: "error: the `print` flag is unstable, and only available on the
-  nightly channel of Cargo" (cargo issue 9357). So the read-back cannot ask cargo for the flags it would pass.
+  nightly channel of Cargo" (cargo issue 9357). The stable cargo-rustc page documents no --print
+  (https://doc.rust-lang.org/cargo/commands/cargo-rustc.html). So the read-back cannot ask cargo for its flags.
 - F3. Cargo's rustflags sources (https://doc.rust-lang.org/cargo/reference/config.html, build.rustflags): four
   mutually exclusive sources, first used: CARGO_ENCODED_RUSTFLAGS, RUSTFLAGS, all matching target.<triple>/<cfg>
-  rustflags joined, build.rustflags.
+  rustflags joined, build.rustflags; with --target, host artifacts get none.
 - F4. cargo tree (offline, --locked, -e normal, --format '{p} [{f}]'): npt-sim's subtree is libm [arch,default],
   ppv-lite86 [simd], rand_chacha [], rand_core [], zerocopy [simd], npt-sim [] in npt-server (x86-64), npt-lab
   (x86-64) and npt-sim alone (wasm32). A plain grep of the whole tree also picks getrandom and cfg-if from other
@@ -85,11 +97,12 @@ wasm32), `cargo rustc --print cfg` (refused by stable cargo before any build: se
 - F7. `Replayer` (replay.rs:621-770): new(), with_bite(&str, arm_tick) (bites only, :662-670), feed(u32), step() ->
   Step {Stepped(tick), NeedMore, Done, Failed(&'static str)} (:608-619), state_hash(), dump(), world(). Scene, seed,
   first tick, TICK_HZ and pools come from the recording's header (:8-15, :113-140, :709-736): nothing takes a seed or a
-  scene from the caller.
+  scene from the caller; World has no seed accessor.
 - F8. `World::BITES` (world.rs:934-938) = PM-0004-21/hash-map, PM-0004-21/std-sin, PM-0001-41/server-speed-1pct,
   PM-0001-41/server-quant-differs; the std-sin site replaces libm::sinf in the vehicles' loops only
-  (world.rs:994-1000, :1216-1228): theta = TAU * along / period, along = (elapsed + phase) mod period. Its input is
-  chosen by the loops, not by the caller: `World::with_bite` takes the arming tick only (:944-966).
+  (world.rs:994-1000, :1216-1228): theta = TAU * along / period, along = (elapsed + phase) mod period, period =
+  ticks_for_ms(60,000 + 5,000 v) (:794), at most 3,900 ticks for 15 vehicles. Its input is chosen by the loops, not by
+  the caller: `World::with_bite` takes the arming tick only (:944-966).
 - F9. D-2 (sim/tests/replay.rs:21-29, :264-309) and D-7 (:311-390) pin the three recordings: SS seed 1 from tick 0,
   ES seed 2 from 1,000,000, TC seed 3 from u32::MAX - 4,499; 9,000 ticks; span 2,000 ms; bytes 16,694,921 /
   16,700,849 / 799,693 with FNV-1a-64 35974458070191737 / 15077317756489230056 / 9126256229328065459; GENERATOR 2
@@ -103,7 +116,8 @@ wasm32), `cargo rustc --print cfg` (refused by stable cargo before any build: se
   results/c-u2-pm-0001-3/81c6d01e371b/runs.txt:16, :34, :28. U4c's L-c8 whole-v2-log prefixes are in
   results/c-u2-pm-0001-3/65869918809f/runs.txt (43745683ab36d67b, 722f20713e18352e, 432693efb9698c05).
 - F12. No crates/lab/clippy.toml exists (ls crates/*/clippy.toml: client, l1, link, log, proto, room, server, sim);
-  server/clippy.toml has the clock ban but no hash-map ban.
+  server/clippy.toml has the clock ban but no hash-map ban; crates/lab/src holds no HashMap, HashSet, Instant or
+  SystemTime (grep).
 - F13. marks.json holds no PM-0004-21, PM-0004-74 or S-HashMap (git grep): marks.json's marks are ADR 0001's PM-0001
   rows, PM-0004-67 and PM-0006-11 to -27 (check.mjs:1355-1361). "marks S-HashMap" in the plan is the marks scout's
   finding (u4-scout-marks.md:18; plan :12-15 names the scouts' findings "marks Fn"); PM-0004-21 and -74 are ADR 0004's
@@ -112,6 +126,9 @@ wasm32), `cargo rustc --print cfg` (refused by stable cargo before any build: se
   (u4-build-plan.md :687 and :692-693's plan.md edits are done).
 - F15. U4e's patch (wip/u4e.patch) touches only crates/room, crates/server (not schedule.rs) and crates/client: no
   file of U4d2's lane.
+- F16. The -3 script refuses a dirty tree (:43-45), builds into and copies from the main folder's target (:52-59,
+  `built` :55), and pushes each probe line as printed (:65-72); SERIES.md's header-params table holds
+  `fate_log_sha256` at :396; the probe has no SERIES test.
 
 ## Choices where the plan is silent (each written into the brief, marked "plan silent")
 - C1. Exports take and return 32-bit integers (u32 or i32) only, as the plan's lo/hi split implies: no i64 (Node
@@ -125,7 +142,8 @@ wasm32), `cargo rustc --print cfg` (refused by stable cargo before any build: se
 - C5. The Wasm leg's hash-map order digest is read from its dump at the arming tick (the folded word's field, named
   in the native dump), so no export is added.
 - C6. T22's committed state is one scene's initial dump (CO, 260 words: the smallest), committed as a vector file in
-  crates/hash-wasm/; its digest is its state hash; read on wasm32 through a header-only recording (F10).
+  crates/hash-wasm/; its digest is its state hash; read on wasm32 through a header-only recording (F10); every other
+  scene's initial state is checked for native-against-Wasm equality, so D-7's pins keep one home.
 - C7. The manifest's "script" (§4.15:502) for a synthetic entry is the generator's other arguments (first tick, tick
   count, span ms); it lives in crates/lab/ (npt-lab regenerates; U4d2's lane).
 - C8. The `wasm` step sits after `deps` in STEPS (the flags it builds with are checked first); 11 steps.
@@ -138,6 +156,14 @@ wasm32), `cargo rustc --print cfg` (refused by stable cargo before any build: se
   (LinkError): no host clock or random source can reach the Wasm leg.
 - C12. npt-lab gains no dependency (serde_json and sha2 are already its own: lab/Cargo.toml); Cargo.lock changes by
   npt-hash-wasm's own entry only.
+- C13. The PM-0004-21 bites run in the `wasm` step's bites half on every check.mjs run (plan.md §4.5:551 makes the two
+  bites part of "the check"); the hash-map run stops at its first mismatch (tick 1,234), so it is cheap; std-sin runs
+  there only if it is catchable (Q5).
+- C14. The loader and the deps scan share one list of export names, in one JS module the other imports.
+- C15. Carry 66's runs go through `npt-lab probe` directly (the -3 script refuses a dirty tree and reads the main
+  folder's target: F16), with -3's arguments; their values are compared with U2's full SHA-256s (F11).
+- C16. T4 item 2's `<crate>` for U4d2 is "npt-hash-wasm, npt-lab or check.mjs (its self-tests)": the unit changes two
+  crates and the test script.
 
 ## Conflicts found (plan vs rulings vs code), each a U4D2-Q in the brief
 - K1 (Q1). Drifted cites in plan §5 U4d2: check.mjs:25 (LEAF, now :31), :1110 (WASM_CRATES, now :1438), :135-137
@@ -151,7 +177,7 @@ wasm32), `cargo rustc --print cfg` (refused by stable cargo before any build: se
   rustflags (env or config), so it cannot see a flag set there; `cargo rustc --print` is unstable on 1.99.1 (F2).
 - K5 (Q5). The std-sin bite's "input from a scan" (:696-697; ADR 0004:1142 "the sin input taken from PM-0004-22's
   table"): the site U4d built takes its input from the vehicles' loops and `World::with_bite` takes only the arming
-  tick (F8); the 1-ulp stand-in has no home in U4d2's lane (crates/sim is nobody's in wave 2).
+  tick (F8); the 1-ulp stand-in has no home in U4d2's lane (crates/sim is nobody's in wave 2: close :117-118).
 - K6 (Q6). The features comparison names "the server build against the hash-wasm build" (:677-678), but the native
   legs run in npt-lab's build (:670-671), which the comparison does not cover; ADR 0004:1184 says "every build that
   runs the sim".
@@ -162,7 +188,7 @@ wasm32), `cargo rustc --print cfg` (refused by stable cargo before any build: se
   native build.
 - K9 (Q9). Carries 29 and 41 name "U4d2 or the main session (the workspace Cargo.toml, crates/proto/Cargo.toml and
   check.mjs)" (carries :407), while Lanes :863-865 give U4d2 "Cargo.toml's members" and not crates/proto/Cargo.toml;
-  the workspace Cargo.toml's lints comment (:74-92: "Two crates are ... exceptions") must change with the third
+  the workspace Cargo.toml's lints comment (:73-92: "Two crates are ... exceptions") must change with the third
   exception.
 - K10 (Q10). §4.11 (:393-395) and Q9 (a) (:1002-1005; advisor-u4.md:207) give npt-lab a clippy.toml (the clock ban;
   Q9 (a) adds the hash-map bans); none exists (F12) and no sub-unit's row builds it; U4d2 is the only wave-2 editor of
@@ -171,15 +197,24 @@ wasm32), `cargo rustc --print cfg` (refused by stable cargo before any build: se
 - K11 (Q11). T22's word-size bite (ADR 0004:1142: "a planted usize field in the serialized state must change the
   bytes between the two targets") is not in U4d2's Bites line (:696-700); without a plant the vector test has no
   shown failure.
-- K12 (notes only, not a question). The task's source list calls PM-0004-21, PM-0004-74 and S-HashMap "marks.json"
-  rows; none is (F13). The brief says where each lives and that no U4d2 bite is judged by npt-judge.
+- K12 (notes and brief §0 only, not a question). The task's source list calls PM-0004-21, PM-0004-74 and S-HashMap
+  "marks.json" rows; none is (F13). The brief says where each lives and that no U4d2 bite is judged by npt-judge.
+- K13 (brief 6 item 9, not a question). crates/client-wasm/Cargo.toml:9-13 says "one of the workspace's two
+  unsafe_code exceptions": false once hash-wasm lands; not U4d2's lane: the builder reports it for the main session.
+- K14 (not a question). The card stamps u4-build-plan.md as "d928358b…" (card :16); the file at the head is
+  686a583c…, so the plan changed after the card's stamp; the brief cites the file at the head and stamps 686a583c….
 
 ## Carries: what applies
-- §U4d2 (:407-446): 29 (workspace Cargo.toml's libm comment), 41 (proto's bites comment: lane question Q9), 42 (met
-  by U4a: entry 34 met; no action), 52 (pin only GENERATOR 2's recordings and U4d-F's ES; name adb1bab), 65 (check.mjs
+- §U4d2 (:407-446): 29 (workspace Cargo.toml's libm comment), 41 (proto's bites comment: lane question Q9), 42 (not
+  applicable: entry 34 met at U4a), 52 (pin only GENERATOR 2's recordings and U4d-F's ES; name adb1bab), 65 (check.mjs
   names failing tests; "the main session may make this change sooner": check at launch), 66 (the probe's datagram
   SHA-256; three probe runs equal U2's).
 - §recordings (:351-379: 67, 71, 72): U4d2's work is not such a change as planned: it changes no crates/sim file,
   regenerates with `Recording::synthetic` as merged and pins the bytes D-7 already pins (F9). They bind only if a
-  stop is lifted into a crates/sim change (Q5's option (b), or Q11's plant if it were kept), and then the change's
-  owner runs them.
+  stop is lifted into a crates/sim change (Q5's option (b)), and then the change's owner runs them; the scratch plants
+  of Q5 (a) and Q11 (b) are restored and change no committed byte.
+
+## Placeholders left for the main session (brief 7.2 item 3)
+- P1 carries :407-446; P2 history.md:291-293; P3 card :169-171 (df-ruling :462-464); P4 card :172-175 (df-ruling
+  :465-468) with `<crate>` read per C16; P5 card :162-165 (j-r2 :167-171); P6 `<base>` and its counts; P7 the runner
+  (u4d2-run.sh).

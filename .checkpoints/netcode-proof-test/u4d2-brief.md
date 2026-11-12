@@ -89,12 +89,12 @@ at launch (section 7.2). Every `<base>` and count is filled then too.
    - the code at `<base>`: sim/src/replay.rs (the layout :1-15, `Recording` :39-54, `GENERATOR` :285-288, `synthetic`
      :346-373, `Step` :608-619, `Replayer` :621-770), world.rs (`Bite` and `BITE_IDS` :585-606, `hash_map_order` and
      `std_sin` :608-635, the loops' periods :794, `World::BITES` :934-938, `with_bite` :940-966, `bite_order_digest`
-     :968-973, `sinf` :994-1000, `place_vehicles` :1215-1228), hash.rs (`StateDump` :66, `FieldDiff` :73-82, `words`
-     :93, `hash` :98, `field` :107, `first_difference` :115), lib.rs (:13-57); sim/tests/replay.rs (D-2 :21-309, D-7
-     :311-390); crates/lab (all four src files and Cargo.toml); crates/tcpinfo (Cargo.toml, src/lib.rs:1-40, the two
-     allows in src/linux.rs); l1's `FateLog` (l1/src/lib.rs:325-352) and l1/tests/l1.rs:478-532;
-     ops/runs/c-u2-pm-0001-3.mjs; Cargo.toml; and check.mjs and check.test.mjs whole (you are their only editor in
-     wave 2: plan :863-864).
+     :968-973, `sinf` :994-1000, `dump` :1018, `place_vehicles` :1215-1228), hash.rs (the word sink :14, `StateDump`
+     :66, `FieldDiff` :73-82, `words` :93, `hash` :98, `field` :107, `first_difference` :115), lib.rs (:13-57);
+     sim/tests/replay.rs (D-2 :21-309, D-7 :311-390); crates/lab (all four src files and Cargo.toml); crates/tcpinfo
+     (Cargo.toml, src/lib.rs:1-40, the two allows in src/linux.rs); l1's `FateLog` (l1/src/lib.rs:325-352) and
+     l1/tests/l1.rs:478-532; ops/runs/c-u2-pm-0001-3.mjs; Cargo.toml; and check.mjs and check.test.mjs whole (you are
+     their only editor in wave 2: plan :863-864).
 
 ---
 
@@ -207,10 +207,10 @@ fixture test, which fails if a check is unhooked from `depsStep` (check.test.mjs
 - **(a) The `wasm` step** (plan :675-676), after `deps` in `STEPS` (:1594-1627; plan silent on the place: the flags it
   builds with are checked first), so check.mjs has 11 steps:
   1. the release builds, with no flag added (the build flags are plan.md §4.5:533-535's: baseline x86-64, simd128 and
-     relaxed-simd off, no wasm-opt; by U4D2-Q2), overflow checks staying on for npt-sim in release on both targets
-     (Cargo.toml:108-112): npt-lab for x86-64, measured then bites, each artifact copied out before the next build
-     replaces it (as ops/runs/c-u2-pm-0001-3.mjs:52-59 does), and npt-hash-wasm for wasm32-unknown-unknown, measured
-     and bites; each artifact's path read from cargo's `--message-format=json`, never from a guessed folder
+     relaxed-simd off; wasm-opt is not run here: C-U7-1; by U4D2-Q2), overflow checks staying on for npt-sim in release
+     on both targets (Cargo.toml:108-112): npt-lab for x86-64, measured then bites, each artifact copied out before the
+     next build replaces it (as ops/runs/c-u2-pm-0001-3.mjs:52-59 does), and npt-hash-wasm for wasm32-unknown-unknown,
+     measured and bites; each artifact's path read from cargo's `--message-format=json`, never from a guessed folder
      (`CARGO_TARGET_DIR` is the shared target in a lane and unset in the main folder: section 4 rule 1;
      .cargo/config.toml);
   2. `npt-lab hash`: the manifest's recordings regenerated and checked, the two native legs;
@@ -276,9 +276,9 @@ fixture test, which fails if a check is unhooked from `depsStep` (check.test.mjs
   or a listed one with no allow; an allow on a helper; a second allow; by Q7 (a), an export taking an f64; hash-wasm
   depending on another crate; another crate depending on hash-wasm; its manifest at `"allow"` or `"forbid"`: each
   refused by name, the clean fixture passing. And the loader: its list pinned to the seven names and the linker's;
-  a hand-assembled module (a few dozen bytes, built in the test) with one export more is refused by name (plan :700:
+  a hand-assembled module (a few dozen bytes, built in the test) with one export more is refused by name (plan :699:
   "an export not on the loader's list"), and one that imports a function fails to instantiate.
-- **(e) The third exception** (advisor cond 7 (c), :135-136; plan :691-693): `UNSAFE_EXCEPTIONS` (:169) gains
+- **(e) The third exception** (advisor cond 7 (c), :135-136; plan :688-693): `UNSAFE_EXCEPTIONS` (:169) gains
   `"crates/hash-wasm/": "npt-hash-wasm"` and `EXCEPTION_LEVELS` (:171) `"deny"`. The texts that say two become three
   (:161-168; :204-206; :1509-1510; `DEPS_CHECKED`, :1531-1550, which also names every new check; the header, :1-18;
   Cargo.toml:73-92, in 2.5), and the tests that pin two follow (for example the deps fixture's line "only
@@ -361,7 +361,7 @@ file restored and its sha256 checked against the clean file, the run's output li
 | a stray `unsafe` block in hash-wasm | hash-wasm's rules | unit: 2.4 (d)'s self-test | a scratch plant in place (`unsafe {}` in hash-wasm's lib.rs): the deps step names file:line, and rustc refuses it under the crate's deny |
 | an export not on the loader's list | the loader | unit: 2.4 (d)'s hand-assembled module | a scratch plant in place: an eighth `#[unsafe(no_mangle)]` export with its allow: the loader refuses it by name (and the deps scan refuses the allow on an unlisted export) |
 | carry 65's unnamed failure | the test step | unit: 2.4 (f)'s self-test | no |
-| h2's vectors | the committed vector file; by Q11 (b) also npt-sim's serializer | by U4D2-Q11 (b): two scratch plants in place, each alone: one word of the vector file changed (h2's unit test and the step's vector check fail, naming the word); a `usize`-width length written into the dump (hash.rs; ADR 0004:1142's word-size bite: the dumps' lengths differ between the targets, so the step's equality check and the 27,000-tick comparison fail at their first tick) | the same two plants, each restored and sha256-checked |
+| h2's vectors | the committed vector file; by Q11 (b) also npt-sim's serializer | by U4D2-Q11 (b): two scratch plants in place, each alone: one word of the vector file changed (h2's unit test and the step's vector check fail, naming the word); a `usize`-width length written into the state (world.rs's `dump`, :1018, through hash.rs's word sink, :14; ADR 0004:1142's word-size bite: the dumps' lengths differ between the targets, so the step's equality check and the 27,000-tick comparison fail at their first tick) | the same two plants, each restored and sha256-checked |
 
 ### 2.8 The seam rule, and what stops the build
 - No item of npt-sim changes: `Replayer`, `Recording` and its `GENERATOR` and `synthetic`, `Step`, `StateDump`,
@@ -438,7 +438,7 @@ the World" with your final `git diff --stat <base> -- spikes/netcode-proof/crate
 **The shared target** (Mustafa's rule, 2026-11-09: plan §7.1 :896-908; the advisor's W1-TARGET, wave1 :558-586),
 binding on every cargo, rustc and rustdoc call in your worktree, check.mjs's and the `wasm` step's included:
 1. `CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/shared-target` and `CARGO_NET_OFFLINE=true` on every call (the
-   runner sets both: u4e-run.sh:15-16). Checked once after the first build: the artifacts are in that folder, and no
+   runner sets both: u4e-run.sh:16-17). Checked once after the first build: the artifacts are in that folder, and no
    `target/` appears in your worktree (advisor nit (g), :169-171).
 2. **The lock** (wave1 :570-573): every such call runs under `flock` on
    `/home/user/Shamble-Frontlines/.gate/shared-target/.lane.lock` (the runner takes it): shared (`-s`) for an ordinary
@@ -448,7 +448,7 @@ binding on every cargo, rustc and rustdoc call in your worktree, check.mjs's and
 3. **Provenance** (wave1 :574-575): a counted run's log shows cargo's "Compiling npt-hash-wasm v0.0.0 (<your
    worktree>/spikes/netcode-proof/crates/hash-wasm)" line, and the same for npt-lab, in each cargo invocation that
    builds them: the `cargo test --locked --workspace --no-run` and `--all-features --no-run` builds inside the same
-   exclusive lock before check.mjs (U4e's form: u4e-brief.md:733-742), and the `wasm` step's release builds in its own
+   exclusive lock before check.mjs (U4e's form: u4e-brief.md:734-742), and the `wasm` step's release builds in its own
    output. Match on the path, not the version. A missing line means "not counted", whatever the count says.
 4. Touch before each build: `find <copy>/spikes/netcode-proof/crates -type f -exec touch {} +` (plan :899; the runner
    does it).
@@ -478,9 +478,10 @@ crates/judge, marks/, docs/, the ops/ scripts or results/.
 - Git only in your worktree (`cd <worktree> && git ...`), never `git -C` or `git -c`; commit nothing and push nothing;
   the main session merges, one lane at a time (plan :910-913).
 - **The stop clause:** `<<P4>>` (T4 item 2: the card :172-175, from df-ruling :465-468, with `<crate>` read as
-  "npt-hash-wasm or npt-lab"); and, until carry 65 is met, `<<P5>>` (TE2-5's rule: the card :162-165, from j-r2
-  :167-171). Expected failures you can name in advance: none (your plan re-pins nothing of npt-sim's); a scratch plant's
-  own run fails by design and is reported as that plant's proof, never as a TE2-5 failure.
+  "npt-hash-wasm, npt-lab or check.mjs (its self-tests)"); and, until carry 65 is met, `<<P5>>` (TE2-5's rule: the
+  card :162-165, from j-r2 :167-171). Expected failures you can name in advance: none (your plan re-pins nothing of
+  npt-sim's); a scratch plant's own run fails by design and is reported as that plant's proof, never as a TE2-5
+  failure.
 - **The builders' limits** (Mustafa, 2026-11-11): `<<P2>>` (history.md:291-293, word for word).
 - .claude/rules/netcode.md binds proto, room, client and server code (plan §7.1 item 8, :907-908); you edit none of
   their sources (crates/proto's manifest comment aside), and npt-lab's `probe` and `hash` read no network input.
@@ -571,12 +572,13 @@ Run from spikes/netcode-proof/ in your worktree, each as a counted run under sec
    (`cd /home/user/Shamble-Frontlines && git diff --stat 28a85e7 <base> -- spikes/netcode-proof`), give its counts from
    a counted run in the main folder on its own cache (main-run.sh, as U4e's 7.2 item 1: the test step's two counts,
    self's "K of K", the step count); if not, they are 399, 446, 52 of 52 and 10 steps (card :23-25).
-2. **The runner (`<<P7>>`).** u4d2-run.sh: u4e-run.sh with the log check's folder `.gate/u4d2/` (u4e-run.sh:28-31) and
+2. **The runner (`<<P7>>`).** u4d2-run.sh: u4e-run.sh with the log check's folder `.gate/u4d2/` (u4e-run.sh:30-32) and
    its header naming U4d2; nothing else changes.
 3. **The placeholders, by script, each checked after the copy** (the old text found once, the new text in place):
    `<<P1>>` carries :407-446 (and a `diff` of the two line ranges, empty); `<<P2>>` history.md:291-293; `<<P3>>` the
-   card :169-171; `<<P4>>` the card :172-175 with `<crate>` read as "npt-hash-wasm or npt-lab" (say so beside it, as
-   the T4 item asks: "with the unit's crate named"); `<<P5>>` the card :162-165; `<<P6>>`; `<<P7>>`.
+   card :169-171; `<<P4>>` the card :172-175 with `<crate>` read as "npt-hash-wasm, npt-lab or check.mjs (its
+   self-tests)" (said beside it, as the T4 item asks: "with the unit's crate named"); `<<P5>>` the card :162-165;
+   `<<P6>>`; `<<P7>>`.
 4. **The advisor's rulings on U4D2-Q1 to Q11** (section 8), folded by script into the places marked "by U4D2-Qn"; any
    plan text a ruling allows (Q1's cites, Q2's "§4.5", Q3's `begin`, Q6's comparison line, Q8's names, Q10's
    clippy.toml line, Q11's bite line) in the main session's own commit, as the U4e brief ruling's L2 did.
@@ -699,7 +701,7 @@ the clock ban but not Q9 (a)'s hash-map bans, server/clippy.toml:1-13; not U4d2'
 - Why it matters: `HashCompare` and the native legs must not take an order from a `HashMap` or read a clock, and today
   nothing but review holds that in npt-lab.
 - Options: (a) U4d2 adds crates/lab/clippy.toml: the clock ban as server/clippy.toml words it, and the two type bans
-  (crates/lab/src holds no `HashMap`, `HashSet`, `Instant` or `SystemTime` today: grep), with one self-check that the
+  (crates/lab/src holds no `HashMap`, `HashSet`, `Instant` or `SystemTime` today: grep), the clippy steps showing the
   existing probe still lints; (b) U4r adds it with the runner; (c) only §4.11's clock ban, now.
 - Recommendation: (a), and server/clippy.toml's missing bans go to the main session as a follow-up for U4e's or a
   later server edit.
@@ -710,8 +712,8 @@ serialized state must change the bytes between the two targets"), which U4d2's B
 so as planned h2 has no shown failure.
 - Why it matters: a vector test never shown failing proves nothing about word size.
 - Options: (a) one scratch plant: a word of the committed vector file changed (h2 fails, naming the word); (b) as (a),
-  and a second scratch plant in place in npt-sim's serializer (hash.rs: a `usize`-width length written into the dump),
-  shown to change the bytes between the targets (the step's equality check and the 27,000-tick comparison fail at
-  their first tick), restored and sha256-checked; (c) none.
+  and a second scratch plant in place in npt-sim's serializer (world.rs's `dump`, :1018, through hash.rs's word sink,
+  :14: a `usize`-width length written into the state), shown to change the bytes between the targets (the step's
+  equality check and the 27,000-tick comparison fail at their first tick), restored and sha256-checked; (c) none.
 - Recommendation: (b): the first shows the comparison against the file can fail; only the second shows the check
   catches what T22 exists for; both are scratch, restored, and change no committed npt-sim byte.
