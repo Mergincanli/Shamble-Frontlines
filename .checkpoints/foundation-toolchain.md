@@ -126,8 +126,35 @@
     panic ... ok" from target/release) and pull_request 43259708110; gate push 43259689239 and pull_request
     43259708266. (The job log downloads from the public API with curl, status 200.) Next: M5.
 
+20. Step 5, part 4, 2026-11-12: M5 by Part 7's procedure (the saver stopped from before the kit writes until the
+    revert was pushed): 45f1bb5 removed the release overflow setting (its comment and both blocks) · pushed alone ·
+    red at the expected line: toolchain push 43281730739 (job 131404460318) and pull_request 43281743102 failed at
+    "Build and test with the network cut off": the cut held (curl exit 7), the dev tests passed, then `cargo test
+    --release` ran and protocol's "overflow_checks_are_on - should panic ... FAILED" ("test did not panic as expected at
+    crates/protocol/src/lib.rs:10:8"), exit code 101 (cargo stops at the first failing test binary, so sim's ran not);
+    gate push 43281730307 and pull_request 43281742710 green · revert a5823cf (`git revert -n` + commit; `git diff
+    45f1bb5^ a5823cf` empty) · pushed alone · all green: toolchain push 43282089237 (job 131405738690: cut held, 4x
+    "overflow_checks_are_on - should panic ... ok", the release build ran, npm 5/5, tsc 6.0.3) and pull_request
+    43282101125; gate push 43282089533 and pull_request 43282101160. The saver restarted (bg5v6agjr).
+    The re-run of the evidence on a5823cf: E1 local (cargo test 6/6; the wasm32 build of the five crates; `cargo test
+    --release -p sim -p protocol` both overflow tests ok; the tree clean; the build folder cleaned, 46.5 MiB) and its npm
+    half in CI (above); E4a, E5, E6 (no root "type"), E7 (6 files exact, typescript 6.0.3), E11 (69 = 64 npmjs sha512 +
+    5 links; install scripts: fsevents, optional, darwin) all PASS (`evidence-static.mjs`); E6 gate `--no-smoke` PASS;
+    E4c by CI's gate and smoke jobs (green); E8 first run: exit 1, 8 new top-level paths missing from the map
+    (toolchain.yml, Cargo.lock, Cargo.toml, crates/, package-lock.json, package.json, packages/, rust-toolchain.toml):
+    step 6's REPO_MAP entry; E9 first run (main's guard, main folder 2aa5e9c): 35 files outside .checkpoints/, 3
+    protected (CLAUDE.md, advisor.md, toolchain.yml: K2a-K4, K1/K1b, each in Part 5), none mergeAllowed; E10: the kit's
+    tests equal main's counts (routine-guard 1107/1107, settings 127/127, checkpoint 27/27, on the branch and on main);
+    E4b and E4d on a local merge of a5823cf with PR #40's head 1efd46f (worktree `.gate/e4-coexist`, merge e1e304e
+    never pushed; PR #40 adds nothing outside spikes/, .checkpoints/, docs/): E4b `cargo metadata --no-deps` in
+    spikes/netcode-proof names the spike's own root (16 npt-* members; the spike's own toolchain file), the top names
+    2.2's six crates; E4d `node spikes/netcode-proof/check.mjs --only deps,refs`: "check: all 2 steps pass" (deps: 127
+    crate files and 1 cargo config file read; refs: 876 tracked files, none outside spikes/ references it); the scratch
+    worktree removed (no force) and pruned.
+
 ## Current step
-Step 5 (superseded by steps 18-19 above): waiting for his chat yes on the exact texts of K2a, K2b, K3, K4 and the offered K1b (sent to him at the end of
+Step 5's evidence is in (step 20). Next: the advisor tool at moment 5 for step 5, then step 6 (docs).
+Earlier: Step 5 (superseded by steps 18-20 above): waiting for his chat yes on the exact texts of K2a, K2b, K3, K4 and the offered K1b (sent to him at the end of
 the turn after consultation 2), with the chat switched to Accept edits. On his yes: `get_session` (write nothing while
 `permission_mode` is still auto), Read the three files, the Edits only (each guard prompt counted), then commit and
 push (both on the allow list), then ask him to switch back to Auto and how many guard prompts he saw. Then, if K1b:
