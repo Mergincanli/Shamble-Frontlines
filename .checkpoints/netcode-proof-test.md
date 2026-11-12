@@ -68,7 +68,13 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
    **(h) Running: U4d2's review round 1,** workflow wf_9294c443-01a (task wshmxx2ps; cut at 20:52 in batch 2, after
-   batch 1 had returned; resumed 22:53 as task w6sp1gn2w; script
+   batch 1 had returned; resumed 22:53 as task w6sp1gn2w; batch 1, read by the main session (every Medium in full,
+   and the Lows that touch a build or a verdict: SEC-U4D2-5, INF-3, INF-4, INF-5): rust REVISE (RR-M1, RR-M2 Medium,
+   before the merge; RR-L1-L5), security REVISE (SEC-U4D2-1, -2 Medium before the merge, -2 = RR-M1; -7 Medium, not
+   before, its route the advisor's; -3 to -6, -8 Low), infra APPROVE WITH FINDINGS (INF-1 Medium before the merge,
+   text only: no cold time measured, its bound about 80 s of 300 s; INF-2-7 Low; INF-5: a counted run on c88eb31
+   takes about 11 minutes, so it runs in the background); the advisor's brief drafted, advisor-u4d2-r1-brief.md
+   (item 5 waits for batch 2); script
    workflows/scripts/npt-u4d2-review-r1-wf_9294c443-01a.js), launched 20:19 UTC. Batch 1 (Read):
    rust-reviewer, security-auditor, infra-engineer (runs in the builder's copy through u4d2-run.sh while nobody
    plants; the infra seat times `--only wasm` with `-x`). Batch 2 (Prove): engine-architect (the read copy, no runs)
