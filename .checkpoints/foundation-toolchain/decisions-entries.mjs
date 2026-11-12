@@ -31,7 +31,7 @@ export const ENTRIES = [
   { id: 'A1', before: '- **Taken by Mustafa, 2026-11-10, 16:04:59 UTC', head: `**Taken by Mustafa, 2026-11-10, 17:23:21 UTC: foundation 2.2's task, with two answers in advance** ${ours('bd0cc1cc-523f-4057-a0f6-bc0083156de3')}; a paste block from his Advisor chat, his instruction once pasted (ACCOUNTS). ${copied('A1')}` },
 ];
 const QUEUED_BEFORE = '  - The entries below are pointers to items carried out.';
-const QUEUED_HEAD = `  - The CLAUDE.md and agent-file change for models (his message of 2026-11-12, 15:35:17 UTC, in foundation 2.2's session, item 3, under "Decisions, newest first": the entry "Taken by Mustafa, 2026-11-12, 15:35:17 UTC: his words of 2026-11-12, 16:25, on models, and the Fable advisor's read of the built skeleton"; his two bullets copied by script from ${REP}, Appendix A9):`;
+const QUEUED_HEAD = `The CLAUDE.md and agent-file change for models (his message of 2026-11-12, 15:35:17 UTC, in foundation 2.2's session, item 3, under "Decisions, newest first": the entry "Taken by Mustafa, 2026-11-12, 15:35:17 UTC: his words of 2026-11-12, 16:25, on models, and the Fable advisor's read of the built skeleton"; his two bullets copied by script from ${REP}, Appendix A9):`;
 const QUEUED_LINES = (a9) => a9.split('\n').filter((l) => l.startsWith('- This replaces the sentence') || l.startsWith('- I allow the rule change'));
 
 function wrap(text, first, rest, width = 120) {
@@ -61,7 +61,7 @@ export function build(lines, blocks) {
   if (q < 0) throw new Error('the Queued anchor is missing');
   const ql = QUEUED_LINES(blocks.get('A9'));
   if (ql.length !== 2) throw new Error(`A9: ${ql.length} of the two queued bullets found`);
-  inserts.set(q, [...wrap(QUEUED_HEAD.trim(), '  - ', '    ').map((l, i) => (i === 0 ? l : l)), ...ql.map((l) => `    > ${l}`)]);
+  inserts.set(q, [...wrap(QUEUED_HEAD, '  - ', '    '), ...ql.map((l) => `    > ${l}`)]);
   const out = [];
   lines.forEach((l, i) => { if (inserts.has(i)) out.push(...inserts.get(i)); out.push(l); });
   return out;

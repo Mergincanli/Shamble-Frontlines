@@ -151,9 +151,21 @@
     2.2's six crates; E4d `node spikes/netcode-proof/check.mjs --only deps,refs`: "check: all 2 steps pass" (deps: 127
     crate files and 1 cargo config file read; refs: 876 tracked files, none outside spikes/ references it); the scratch
     worktree removed (no force) and pruned.
+21. Step 6, part 1, 2026-11-12: his input inventoried by script, two ways (the transcript's user entries and its queue):
+    12 messages (A2 sent twice, byte-identical, 19:43:00 and 19:43:01 UTC), his commands `/context`, `/advisor fable`,
+    `/compact`, the workflow-authoring skill loaded twice, no interrupted send; the rest of the queue his session's own
+    agents and task notifications, and one worker-restart notice (2026-11-11 09:00 UTC). `words-sources.mjs` reads the
+    12 from the transcript and #51's go from 2aa5e9c's message (round trip exact); the notes equal the transcript (A1's
+    note holds 4 excerpts, each verbatim; A4 had none). `report-appendix.mjs` wrote the report draft's Appendix A (13
+    blocks, each equal to its source; 8 body quotes checked); `decisions-entries.mjs` added 13 DECISIONS.md entries at
+    their places by time (A8 under "Replaced"; A7 a pointer, byte-identical to the end of the 11:56:44 UTC entry) and
+    the Queued item for the models change, all checked byte for byte; `register-row.mjs` added the register row Q2.2-a
+    with his sentence from A2 · 6135579 · pushed.
 
 ## Current step
-Step 5 done (consultation 3, 2026-11-12 ~19:58 Amsterdam). Now step 6, the docs pass: his message inventory by script, the report with Appendix A, DECISIONS.md by script, docs-keeper, the register entry.
+Step 6, part 2: docs-keeper (a general agent reading main's docs-keeper.md, Opus 5.5 at max) for REPO_MAP (E8),
+the STATUS dashboard, the archive and ROADMAP, then a fact check of its edits, in one workflow; then E8 and E9 re-run.
+Earlier: Step 5 done (consultation 3, 2026-11-12 ~19:58 Amsterdam).
 Earlier: Step 5 (superseded by steps 18-20 above): waiting for his chat yes on the exact texts of K2a, K2b, K3, K4 and the offered K1b (sent to him at the end of
 the turn after consultation 2), with the chat switched to Accept edits. On his yes: `get_session` (write nothing while
 `permission_mode` is still auto), Read the three files, the Edits only (each guard prompt counted), then commit and
