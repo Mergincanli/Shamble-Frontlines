@@ -15,7 +15,7 @@ const REPO = '/home/user/Shamble-Frontlines';
 const REPORT = 'docs/reports/2026-11-11-foundation-2-1b.md';
 const SESSION = 'session_019YNMUWdGJZoQFUuuvvBP1Y';
 const mode = process.argv[2];
-if (!['dry', 'write'].includes(mode)) { console.error('usage: decisions-entries.mjs dry | write'); process.exit(2); }
+if (!['dry', 'write', 'regen-dry', 'regen'].includes(mode)) { console.error('usage: decisions-entries.mjs dry | write | regen-dry | regen'); process.exit(2); }
 const md = readFileSync(join(REPO, REPORT), 'utf8');
 const at = md.indexOf("## Appendix A. Mustafa's words for this change-set, in full");
 if (at < 0) { console.error('no Appendix A in ' + REPORT); process.exit(2); }
@@ -41,8 +41,9 @@ const ENTRIES = [
   { id: 'A5', head: () => `- **Taken by Mustafa, 2026-11-11, 21:39:44 UTC: KIT-2.1B (a), E8-RUN (a), REG-TRUE (b), and the build go for steps 6 and 7** ${src('A5')}KIT-2.1B, E8-RUN and REG-TRUE are the session's three asks of that evening, in the report with the exact lines asked. His REG-TRUE (b) replaces D1 (a)'s "answered" wording and new count in the entry below. ${copied('A5')}` },
   { id: 'A4', head: () => `- **Taken by Mustafa, 2026-11-11, 21:10:58 UTC: his first message on auto mode** ${src('A4')}The session's answer is in the report. ${copied('A4')}` },
   { id: 'A3', head: () => `- **Taken by Mustafa, 2026-11-11, 20:44:29 UTC: D1 (a), his Windows run of the new gate, and the Node 24 finding for 2.3** ${src('A3', '; sent again byte-identical at 21:27:35 UTC, event 40ebaa1e-996c-42b2-b313-4198c6274017')}D1 is the session's stop of that evening: plan revision 3 named "the register's OQ-0002-2 row", which does not exist (the report). His REG-TRUE (b), above, replaces this entry's "answered" wording and new count; the rest of D1 (a) stands. ${copied('A3')}` },
-  { id: 'A2', head: () => `- **Taken by Mustafa, 2026-11-11, 20:21:02 UTC: step 2.1b's task** ${src('A2')}Its render-budget note waits in "Queued", above. ${copied('A2')}` },
-  { id: 'A1', head: () => `- **Taken by Mustafa, 2026-11-11, 20:20:36 UTC: his first message in foundation 2.1b's session** ${src('A1')}His task message, the entry above, followed 26 seconds later. ${copied('A1')}` },
+  { id: 'A2', head: () => `- **Taken by Mustafa, 2026-11-11, 20:21:02 UTC: step 2.1b's task** ${src('A2', '; first sent at 20:18:13 UTC, event 6743399f-9d86-4e25-8c08-aee3542d31dc, byte-identical, and interrupted by him at 20:19:40 UTC')}Its render-budget note waits in "Queued", above. ${copied('A2')}` },
+  { id: 'A1', head: () => `- **Taken by Mustafa, 2026-11-11, 20:20:36 UTC: his message before the task, in foundation 2.1b's session** ${src('A1')}Before it, at 20:19:47 UTC, he sent "hi", event 844bb920-ac8e-4c79-bc10-5682fbd74f53, and interrupted it at 20:20:24 UTC (Appendix A1). His task message, the entry above, followed 26 seconds later. ${copied('A1')}` },
+  { id: 'A7', head: () => `- **Taken by Mustafa, 2026-11-11, 18:37:21 UTC: his go for #50** (foundation 2.1a, PR #50; his message in that change-set's session, session_019YNMUWLffMoE47SbvkqJ5P, on his personal account, extracted by script from that session's events, event ${A.A7.event}; merge commit 76b4f7a's message quotes it byte for byte, checked by script; recorded here by foundation 2.1b, PR #51, after the advisor agent's review). ${copied('A7')}` },
 ];
 for (const e of ENTRIES) if (!A[e.id]) { console.error(`no ${e.id} block in the report`); process.exit(2); }
 for (const id of Object.keys(A)) if (!ENTRIES.some(e => e.id === id)) { console.error(`Appendix ${id} has no ENTRIES line: add one at the top`); process.exit(2); }
@@ -59,6 +60,30 @@ const iDec = lines.indexOf('## Decisions, newest first');
 const iPtr = lines.indexOf('  - The entries below are pointers to items carried out.');
 if (iDec < 0 || iPtr < 0 || iPtr > iDec) { console.error('anchors not found'); process.exit(2); }
 const decSection = lines.slice(iDec).join('\n');
+if (mode.startsWith('regen')) {
+  const iNext = lines.findIndex((l, i) => i > iDec && l.startsWith('- **Taken by Mustafa, 2026-11-11, 16:54:54 UTC'));
+  const old = lines.slice(iDec + 1, iNext);
+  const heads = old.filter(l => l.startsWith('- **'));
+  if (iNext < 0 || !heads.length || !old[0].startsWith('- **Taken by Mustafa, 2026-11-11, 22:38:50 UTC')) { console.error('regen: the block is not where it should be'); process.exit(2); }
+  const ownText = old.join('\n');
+  for (const h of heads) { const i = old.indexOf(h); const para = old.slice(i, i + 8).join(' ').replace(/\s+/g, ' '); if (!/PR #51/.test(para)) { console.error('regen: an entry not made by this script: ' + h.slice(0, 80)); process.exit(2); } }
+  const fresh = ENTRIES.map(e => wrap(e.head().replace(/^- /, ''), '- ', '  ') + '\n' + quote(A[e.id].text)).join('\n').split('\n');
+  const outR = [...lines.slice(0, iDec + 1), ...fresh, ...lines.slice(iNext)].join('\n');
+  let okR = true; const chk = (n, p, d = '') => { if (!p) okR = false; console.log(`${p ? 'PASS' : 'FAIL'} ${n}${d ? ' :: ' + d : ''}`); };
+  const nl = outR.split('\n');
+  for (const e of ENTRIES) {
+    const hi = nl.findIndex(l => l.startsWith(e.head().slice(0, 50)));
+    let j = hi; while (j + 1 < nl.length && !(nl[j + 1] === '>' || nl[j + 1].startsWith('> '))) j++;
+    const q = []; for (let k = j + 1; k < nl.length && (nl[k] === '>' || nl[k].startsWith('> ')); k++) q.push(nl[k] === '>' ? '' : nl[k].slice(2));
+    chk(`${e.id}: the entry's quote equals Appendix ${e.id} byte for byte`, hi >= 0 && q.join('\n') === A[e.id].text, `${q.length} lines`);
+  }
+  chk('outside the regenerated block the file is unchanged', [...nl.slice(0, iDec + 1), ...nl.slice(iDec + 1 + fresh.length)].join('\n') === [...lines.slice(0, iDec + 1), ...lines.slice(iNext)].join('\n'));
+  chk('the old block was only this script\'s entries', heads.length === 6, `${heads.length} entries replaced by ${ENTRIES.length}`);
+  if (!okR) { console.error('regen: FAIL (nothing written)'); process.exit(1); }
+  const tgt = mode === 'regen' ? path : join(REPO, '.gate/foundation-restructure/DECISIONS.dry.md');
+  writeFileSync(tgt, outR); console.log(`regen: PASS; ${ENTRIES.length} entries written to ${tgt.replace(REPO + '/', '')}`);
+  process.exit(0);
+}
 const todo = ENTRIES.filter(e => !decSection.includes(`event ${A[e.id].event}`));
 const skipped = ENTRIES.filter(e => !todo.includes(e)).map(e => e.id);
 const noteThere = lines.slice(0, iDec).includes('    > ' + NOTE);
@@ -74,7 +99,7 @@ const nl = text.split('\n');
 for (const e of ENTRIES) {
   const hi = nl.findIndex(l => l.startsWith(e.head().slice(0, 50)));
   if (hi < 0) { check(`${e.id}: the entry is in the file`, false); continue; }
-  let j = hi; while (j < nl.length && !nl[j].endsWith('checked byte for byte against it:')) j++;
+  let j = hi; while (j + 1 < nl.length && !(nl[j + 1] === '>' || nl[j + 1].startsWith('> '))) j++;
   const q = []; for (let k = j + 1; k < nl.length && (nl[k] === '>' || nl[k].startsWith('> ')); k++) q.push(nl[k] === '>' ? '' : nl[k].slice(2));
   check(`${e.id}: the entry's quote equals Appendix ${e.id} byte for byte${skipped.includes(e.id) ? ' (already there)' : ''}`, q.join('\n') === A[e.id].text, `${q.length} lines, ${A[e.id].text.length} characters`);
 }

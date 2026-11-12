@@ -1,14 +1,14 @@
 ## Appendix A. Mustafa's words for this change-set, in full
 
-_Each block below is copied byte for byte from its source by `report-appendix.mjs` (in the notes folder, readable at this branch's last checkpoint commit), never retyped: his messages in this session (session_019YNMUWdGJZoQFUuuvvBP1Y, his personal account), each extracted by `capture-message.mjs` from the session's own events. The same script checks every block against its source. Entries in `docs/DECISIONS.md` copy their quotes from here, because the notes folder is deleted before the PR is marked ready._
+_Each block below is copied byte for byte from its source by `report-appendix.mjs` (in the notes folder, readable at this branch's last checkpoint commit), never retyped: A1 to A6 are his messages in this session (session_019YNMUWdGJZoQFUuuvvBP1Y, his personal account), each extracted by `capture-message.mjs` from the session's own events; A7 is his go for #50, extracted the same way from foundation 2.1a's session, and equal to merge commit 76b4f7a's quoted record of it. The same script checks every block against its source. His other input in this session was commands, not messages: `/advisor fable` four times (20:19 to 20:21 UTC) and `/compact` at 21:35:45 UTC with his instructions for the summary (the session log). Entries in `docs/DECISIONS.md` copy their quotes from here, because the notes folder is deleted before the PR is marked ready._
 
-### A1. His first message in this session, 2026-11-11 20:20:36 UTC (event 2f15e227-dcbb-43a7-b1fd-42179be83871: `mustafa-2026-11-11-hi.md`)
+### A1. His message before the task, 2026-11-11 20:20:36 UTC (event 2f15e227-dcbb-43a7-b1fd-42179be83871: `mustafa-2026-11-11-hi.md`; before it, at 20:19:47 UTC, he sent "hi", event 844bb920-ac8e-4c79-bc10-5682fbd74f53: `mustafa-2026-11-11-hi-first.md`, and interrupted it at 20:20:24 UTC (the session log))
 
 ```text
 hi, do not do anything yet
 ```
 
-### A2. His task message: step 2.1b, the move, 2026-11-11 20:21:02 UTC (event e018683d-30d9-49a0-b19d-ab279e7d23a1: `mustafa-2026-11-11-task.md`)
+### A2. His task message: step 2.1b, the move, 2026-11-11 20:21:02 UTC (event e018683d-30d9-49a0-b19d-ab279e7d23a1: `mustafa-2026-11-11-task.md`; first sent at 20:18:13 UTC, event 6743399f-9d86-4e25-8c08-aee3542d31dc: `mustafa-2026-11-11-task-first.md`, byte-identical (checked by this script), and interrupted by him at 20:19:40 UTC (the session log))
 
 ```text
 My words of 2026-11-11, for a fresh foundation chat on my personal account. Step 2.1b: the move.
@@ -42,7 +42,7 @@ Also in your docs pass, queue this note in my words in docs/DECISIONS.md under "
 End with: the pull request's number and head SHA, what the proof showed, CI's gate and smoke on the final head with run numbers, how full this chat is, and what you need from me. For my part, give me exact steps in plain words: the saves backup with both console lines, the Brave check of legacy/index.html and legacy/editor.html, and the Windows command for your branch. Keep the pull request a draft until its report is in, then mark it ready and stop for my go.
 ```
 
-### A3. His D1 message: D1 (a), his Windows run of the new gate, the Node 24 finding for 2.3, 2026-11-11 20:44:29 UTC (event ce7f1f4b-08bc-476f-862e-3c1d9362c40b: `mustafa-2026-11-11-d1.md`; sent again at 21:27:35 UTC, event 40ebaa1e-996c-42b2-b313-4198c6274017: `mustafa-2026-11-11-d1-resent.md`, byte-identical, checked by this script)
+### A3. His D1 message: D1 (a), his Windows run of the new gate, the Node 24 finding for 2.3, 2026-11-11 20:44:29 UTC (event ce7f1f4b-08bc-476f-862e-3c1d9362c40b: `mustafa-2026-11-11-d1.md`; sent again at 21:27:35, event 40ebaa1e-996c-42b2-b313-4198c6274017: `mustafa-2026-11-11-d1-resent.md`, byte-identical, checked by this script)
 
 ```text
 My words of 2026-11-11, for the foundation chat (step 2.1b, branch claude/clever-fermi-oudsfq).
@@ -84,4 +84,19 @@ Then build: step 6, the move, and step 7.
 
 ```text
 I give you permission to go on auto mode, you can accept the needed permissions
+```
+
+### A7. His go for #50, in foundation 2.1a's session (session_019YNMUWLffMoE47SbvkqJ5P), 2026-11-11 18:37:21 UTC (event f7945179-5b39-4984-9f26-330504b37386: `mustafa-2026-11-11-go50.md`; byte-identical to merge commit 76b4f7a's record of it (quoted there with "> "), checked by this script)
+
+```text
+merge #50
+
+My words of 2026-11-11, for the foundation chat (PR #50, foundation step 2.1a).
+- Pinned to f6becf58a90059037e2f168867d12cb61eb0bbc9, by merge commit like #46 and #49, with this message quoted in it.
+- Right before merging, re-check that the head has not moved and that CI's gate and smoke are green on it. If either differs, do not merge: stop and tell me.
+- The texts in Appendix A are my words. My Advisor compared A1.1 to A1.3, A2.1, A2.2, A3.3 to A3.5 and A4 with the blocks as they were written for me: identical.
+- The two gate edits of 2026-11-10 (tools/gate.mjs and tools/smoke.mjs in dd12aeb): whether or not each prompt reached me that morning, I approve both edits now. My Advisor read their diffs.
+- I accept the follow-ups your message lists: IE-5, R2-1, SA-L1, A-1 and N2, each at the step the report names.
+- No Brave check for 2.1a: no game file changes.
+After the merge: tell me main's new head in one line, then stop. Do not start 2.1b here; this chat is 86% full. 2.1b runs in a fresh chat.
 ```

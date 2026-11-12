@@ -9,7 +9,7 @@
   **Base:** main 76b4f7a (PR #50 merged, 2.1a). **OLD** (the independent judge for E2 and E3): main 44446a5.
 - **Never:** push to `claude/netcode-proof-test-plan-hcky5g` (#40) or `claude/laughing-pasteur-fwya24` (#48); touch
   `spikes/`; touch a gate file; edit a settings file, hook or allow-list; write a kit line before his chat yes.
-- **Last update:** 2026-11-12 01:45 Amsterdam
+- **Last update:** 2026-11-12 01:53 Amsterdam
 
 ## Steps done
 0. Step 0 (this commit): model checked with get_session: `session_context.model` claude-opus-5-5,
@@ -244,8 +244,23 @@
    from cffe294 by script (`git show` per file; the staged tree equals cffe294's, empty diff); REG-CELL put to him in
    chat at once (the advisor tool's advice).
 
+15. The review fix, done (00:52 UTC): the sweep of the session log (every typed input of his: A1-A6, the two earlier
+   sends, the D1 resend; the commands `/advisor fable` x4 and `/compact` with his instructions; nothing else); the two
+   earlier sends captured by event id (`mustafa-2026-11-11-task-first.md`, byte-identical to A2;
+   `mustafa-2026-11-11-hi-first.md`, "hi"); the interruptions at 20:19:40 and 20:20:24 from the session log; his go for
+   #50 captured from 2.1a's session record (session_019YNMUWLffMoE47SbvkqJ5P, event f7945179-5b39-4984-9f26-330504b37386,
+   18:37:21 UTC, 1021 characters: `mustafa-2026-11-11-go50.md`), byte-identical to merge commit 76b4f7a's quoted record;
+   `report-appendix.mjs` (A1 "his message before the task" with the earlier "hi"; A2 with its first send; A7; one
+   `(event` key per heading; the commands named in the intro): check PASS (A7 also against the merge commit);
+   `decisions-entries.mjs regen`: this session's block rewritten with the A1/A2 headers and A7 in date order, every quote
+   equal; against 3860e3f no quoted line removed and the only added quoted lines are A7's 10; the report (What changed,
+   Reviews with the REVISE and its Mediums, the stale #50 line gone, consultations 8); STATUS (the #51 row true before
+   and after the verdict; the 2.3 follow-ups with security-auditor's F4, PROMPTS-2.3 and the refusals; a rewrap keeps it
+   at 120 lines) and ROADMAP (no "draft"; the reviews done). Checks: docs-check 20/20, appendix PASS, decisions dry (0 to
+   add), repo-map OK. No new message of his since 22:38:50 UTC (REG-CELL open).
+
 ## Current step
-The review fix after the advisor agent's REVISE on 3860e3f.
+The review fix's commits: the docs fix, this last checkpoint commit, the deletion commit, one push.
 
 ## Next steps
 1. Sweep the whole session for his typed input (the local log: user strings and queued messages); capture the two
