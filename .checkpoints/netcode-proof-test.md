@@ -67,7 +67,19 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    packet_name_check.py 12 of 12); u4d2-packet.md cut from u4d2-packet.json (sha256 9b670276…, 373 KB; its side file
    u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
-   **(h) Running: U4d2's review round 1,** workflow wf_9294c443-01a (task wshmxx2ps; cut at 20:52 in batch 2, after
+   **(i) Running: the advisor's ruling on round 1,** workflow wf_ff32624e-10a (task w0q05gown; one seat,
+   general-purpose, opus, xhigh, on main's advisor.md; read only), launched 23:27 UTC, from advisor-u4d2-r1-brief.md
+   (complete: item 5 filled with batch 2's findings); its ruling goes to advisor-u4d2-r1.md block by block. If cut:
+   resume with `Workflow({scriptPath, resumeFromRunId})` (script workflows/scripts/npt-u4d2-r1-advisor-wf_ff32624e-10a.js).
+   On return: read it whole; then the fix pass as it rules. Meanwhile, A13's server item (Next steps 4), unless the
+   ruling says to wait.
+   **(h) U4d2's review round 1: DONE** (23:22 UTC): rust REVISE, security REVISE, infra APPROVE WITH FINDINGS, arch
+   APPROVE WITH FINDINGS (EA-1-9, all Low), test REVISE (TE-M1 = RR-M2 and TE-M2 = RR-M1 = SEC-U4D2-2, proved by run;
+   TE-M3, an npt-net flake under TE2-5, `l2::delay::tests::a_shutdown_s_never_completes_ends_at_its_deadline_without_
+   spinning`, not before the merge; TE-L1-L4); the test seat's counted run 10 of 11 steps (the test step failed on
+   TE-M3's flake), a second test-step run 416 / 465, self 63 of 63; its end state: 17 files at their first sha256,
+   crates/sim untouched. Read by the main session: every Medium in full, and the Lows touching a build or a verdict
+   (SEC-U4D2-5, INF-3, INF-4, INF-5, EA-3, EA-6, EA-8, TE-L3, TE-L4). The run, workflow wf_9294c443-01a (task wshmxx2ps; cut at 20:52 in batch 2, after
    batch 1 had returned; resumed 22:53 as task w6sp1gn2w; batch 1, read by the main session (every Medium in full,
    and the Lows that touch a build or a verdict: SEC-U4D2-5, INF-3, INF-4, INF-5): rust REVISE (RR-M1, RR-M2 Medium,
    before the merge; RR-L1-L5), security REVISE (SEC-U4D2-1, -2 Medium before the merge, -2 = RR-M1; -7 Medium, not

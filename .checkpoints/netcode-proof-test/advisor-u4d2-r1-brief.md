@@ -1,4 +1,4 @@
-# The advisor's ruling on U4d2's round 1: the brief (the main session, 2026-11-12 about 23:00 UTC; item 5 filled when batch 2 returns)
+# The advisor's ruling on U4d2's round 1: the brief (the main session, 2026-11-12 about 23:00 UTC; item 5 filled at 23:25)
 
 **Your role:** read `cd /home/user/Shamble-Frontlines && git show origin/main:.claude/agents/advisor.md` first and work
 as it says. You rule on round 1 of U4d2 under CLAUDE.md's review budget: all five seats' findings, each one's route,
@@ -31,7 +31,9 @@ uncommitted). Its snapshot on the spike branch: `.checkpoints/netcode-proof-test
     not before the merge, its route yours; SEC-U4D2-3 to -6 and -8 Low);
   - infra-engineer `u4d2-review-infra.md`: APPROVE WITH FINDINGS (INF-1 Medium, before the merge, text only; INF-2 to
     INF-7 Low);
-  - engine-architect `u4d2-review-arch.md` and test-engineer `u4d2-review-test.md`: see item 5.
+  - engine-architect `u4d2-review-arch.md`: APPROVE WITH FINDINGS (EA-1 to EA-9, all Low);
+  - test-engineer `u4d2-review-test.md`: REVISE (TE-M1 and TE-M2 Medium, before the merge; TE-M3 Medium, not before
+    the merge; TE-L1 to TE-L4 Low): see item 5.
 - The builder's record (its claims, not evidence): `.checkpoints/netcode-proof-test/u4d2-build.md`. Its run logs:
   `.gate/u4d2/` (e1-check.log and e2-check.log: check.mjs all 11 steps PASS, measured 416, bites 465, self 63 of 63;
   e3-h7.log; b8-wasm1.log and b8-wasm2.log; b8-scan1.log and b8-scan2.log; p1-features.log to p6-usize.log). The seats'
@@ -78,7 +80,41 @@ copy cleans it), which INF-1 meets; the 9.5 floor (PM-0001-2), in carry 52's tex
    have the same slip; RR-L2, RR-L4, RR-L5; SEC-U4D2-3, -4, -6, -8; INF-2 Windows, INF-5, INF-6 U7's CI, INF-7 the
    README): each one's route (a fix-pass item where it is cheap and in the lane, a carry for U4r, U7 or U5, a
    follow-up, or the report's wording), with words where a carry is to be written.
-5. **The engine-architect's and the test-engineer's findings** (filled when batch 2 returns).
+5. **The engine-architect's and the test-engineer's findings:**
+   - The engine-architect's nine Lows: EA-1 (the Wasm leg walks the state twice per tick, hash_lo and hash_hi; with
+     RR-L4); EA-2 (the status numbers have two homes, lib.rs's consts and loader.mjs); EA-3 (check.mjs reads npt-lab's
+     verdicts from its English lines and never the exit codes of `npt-lab hash` and `hash compare`; every path fails
+     closed today); EA-4 (U7 can reuse the .wasm file as it is, not the loader); EA-5 with RR-L2 (LEAF's plan.md §4.2
+     line neither names npt-hash-wasm nor holds for it: no clippy.toml); EA-6 (HashCompare serves U4r's -30
+     pre-check unchanged, as your condition 2 asks, but TickHash.recording's doc invites legs named by run ids, which
+     mismatch at entry 0, and the comparison is by position, not keyed by tick); EA-7 (the public items to record in
+     W1-PUB's form: TickHash, HashCompare::of, HashCompare::Empty, the probe's field, the loader's and check.mjs's
+     exports); EA-8 (the manifest holds only the generator's inputs; §4.15 puts U4r's recordings in it, so U4r changes
+     its format); EA-9 (`hash compare` and the legs default `--on` differently; check.mjs always passes it).
+   - The test-engineer, resumed after the cut with no plant in place, ended with all 17 files at their first sha256,
+     `diff -rq` against the read copy empty and crates/sim untouched:
+     - TE-M1 is RR-M2, proved by its own run (r1-te-tp2-flags.log, run 3: the negation case passes, the control
+       fails); TE-M2 is RR-M1 with SEC-U4D2-2, proved by run (TP4: an `unsafe` read in begin's body is accepted by the
+       wasm32 build, clippy and the unit tests and refused only by the deps step; TP10: a scan regression that lets
+       it through leaves 63 of 63 self-tests and the live deps step passing). Both before the merge.
+     - TE-M3, Medium, not before the merge, its TE2-5 entry: `l2::delay::tests::a_shutdown_s_never_completes_ends_at_
+       its_deadline_without_spinning` (npt-net, U3's code, delay_tests.rs:2552) failed once in the bites build in its
+       counted run (r1-te-final-check.log; carry 65's line named it; its panic text lost), passed on the immediate
+       `--no-fail-fast` re-run (r1-te-te25-npt-net.log: 169 passed) and on a second test-step run; it failed the same
+       way in U3c (u3c-fix2-c2b.md:74). A recurring flake under load, outside U4d2's crates, which can fail a merge's
+       counted run.
+     - TE-L1 (SEC-U4D2-8, by run TP11: the loader's kind check disabled, 63 of 63 pass); TE-L2 (supports SEC-U4D2-3,
+       by run TP5: an f64 export caught by name by the deps scan only; the loader ran it); TE-L3 (the std-sin verdict
+       never re-shows that the bite caused the mismatch; sound for the committed catch only because SS-s1 tick 2 lies
+       inside the hash-map pair's equal prefix, ticks 0 to 1,233); TE-L4 (carry 65 names a failing test but check.mjs
+       prints only its last 40 lines, so B2.3's "name and panic" cannot be met when the re-run passes, as with TE-M3).
+     - Its other results: the builder's six plants and its own TP1 to TP11 each failed by name where they should
+       (TP9: the builder's TE2-5 fix undone makes the unchanged base test fail, so that test still pins what it pinned
+       at `<base>`); h1 to h8 assert what they claim; no wrong-reason path found for the hash-map verdict, one residual
+       for std-sin (TE-L3). Its counted run: 10 of 11 steps passed, the test step failed on TE-M3's flake; a second
+       test-step run passed with measured 416 and bites 465; self 63 of 63; the wasm step 40.0 s.
+   Rule each, and TE-M3's route under B2.3: what the merge's counted run does if the flake recurs there, and where its
+   root cause goes.
 6. **Points of the builder's** (u4d2-build.md; its return list, section 6, items 9, 12 and 13), not in the packet:
    - TE2-5: one existing check.test.mjs test failed mid-build (62 of 63), a failure its step plan did not name; it
      fixed its new hash-wasm rule (which repeated the sentence "npt-sim is not a workspace member" that the test pins
