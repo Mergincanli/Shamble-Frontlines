@@ -92,3 +92,106 @@ d3aef8209bbec3beeca3d02bb2cdd151b205f26e7496af2dc7f27f9c728b57a4 crates/hash-was
   netcode-proof-test/target\"\n", new the same + "rustflags = [\"--codegen\", \"target-feature=+relaxed-simd\"]\n". deps
   FAIL: "<copy>/.cargo/config.toml's rustflags passes \"-C target-feature=+relaxed-simd\"" and the wasm32 read-back lists
   simd128 and relaxed-simd. Restored 9ff1aa86 = HEAD's blob. No finding.
+- TP4 r1-te-tp4-body-unsafe.log (-x -k, exit 1 by design). Planted in crates/hash-wasm/src/lib.rs, begin's body: old
+  "pub extern \"C\" fn begin(bite: u32, arm_tick: u32) -> u32 {\n    let Some(replayer) =", new the same with
+  "    let bite = unsafe { core::ptr::read_volatile(&bite) };\n" after the brace. Release wasm32 build exit 0; clippy
+  wasm32 -D warnings exit 0; hash-wasm tests "ok. 5 passed; 0 failed"; deps FAIL "crates/hash-wasm/src/lib.rs:101 has
+  `unsafe` outside an attribute". So rustc, clippy and the tests accept it; the scan is the only layer and catches it
+  today. RR-M1 / SEC-U4D2-2 settled by run: agree (Medium, before merge: the self-test at check.test.mjs:1916, the deps
+  fixture plant at :1280 and the builder's P3 all plant in a new fn, where rustc's deny also refuses, so all would pass
+  with a scan that skipped export bodies). Restored 9d339055.
+- TP5 r1-te-tp5-f64.log (-x -k, exit 1 by design). Planted: old "pub extern \"C\" fn feed(word: u32) {" ...
+  "r.feed(word);", new "pub extern \"C\" fn feed(word: f64) {" ... "r.feed(word as u32);". Release wasm32 build exit 0
+  (Compiling npt-hash-wasm, worktree path); clippy wasm32 -D warnings exit 0; deps FAIL "crates/hash-wasm/src/lib.rs:118
+  exports feed with parameter word: f64: ... u32 or i32 only (the advisor's U4D2-Q7 ruling)". And the loader ran the f64
+  module on TC-s3: "9000 ticks stepped", and `npt-lab hash compare` against the clean step's TC-s3 lines: "9000 ticks
+  compared, 0 mismatching, equal". So the Q7 source scan is the invariant's only guard: the loader checks names and kinds,
+  not types, and the determinism comparison cannot see an f64 that carries integers. Fits SEC-U4D2-3 (Low: the source
+  scan reads tokens; Q7 (b), the loader reading the type section, would back it). Restored 9d339055.
+- TP6 r1-te-tp6-carry52.log (-x -k, exit 101 by design). Planted in crates/lab/src/hash.rs regenerate_all: the first
+  loop (the generator refusal over every entry) removed and the same `if e.generator != Recording::GENERATOR { return
+  Err(...) }` put after `keep(e, &bytes)?;` in the generation loop (old: refusal loop, then "let mut lines ...; for e in
+  entries { let bytes = generate(e)?; check(e, &bytes)?; keep(e, &bytes)?; lines.push(" ; new: "let mut lines ...; for e
+  in entries { ...keep(e, &bytes)?; if e.generator != ... { return Err(...) } lines.push("). FAILED by name:
+  hash::tests::h5_a_generator_other_than_recording_generator_is_refused_before_anything_is_generated, "assertion `left ==
+  right` failed: the good entry before it was not generated either, left: 2, right: 0"; "test result: FAILED. 5 passed; 1
+  failed". Carry 52's "refused before generating" bites. Restored 3b11bc2c.
+- TP7 r1-te-tp7-carry65.log (-x -k, exit 1 by design). Planted in check.mjs failingTests: old "if
+  (!names.includes(name)) names.push(name);", new "if (!names.length) names.push(name);". `node --test check.test.mjs`:
+  "not ok 59 - the test step names every failing test from libtest's failures: list ... (carry 65; j-r2 B2.3)" (only
+  hash::tests::h5_a named of two); "# tests 63 / # pass 62 / # fail 1". Carry 65 bites. Restored e657f7b8.
+- TP8 r1-te-tp8-carry66.log (-x -k, exit 101 by design). Planted in probe.rs v1_datagram_sha256: old "h.update(V1_TAG);",
+  new "h.update(&V1_TAG[..0]);" (v1's tag dropped). h7 (i) FAILED by name (probe.rs:566, left b9810ef6..., right
+  50028c02...); h7 (ii) by name on release FAILED: "P2 seed 1", left d4e02112..., right 913db8e9...14b11ecc; "test result:
+  FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 18 filtered out". Carry 66's #[ignore] test bites when run by name.
+  Restored 64f48629.
+- TP9 r1-te-tp9-te25.log (-x -k, exit 1 by design). Planted in check.mjs (the builder's TE2-5 fix undone): old
+  "if (!shippedDeps.includes(\"npt-sim\") && all.has(\"npt-sim\")) problems.push(", new "if
+  (!shippedDeps.includes(\"npt-sim\")) problems.push(". "not ok 9 - npt-sim ships with libm, rand_chacha and rand_core
+  alone ..." (actual ['npt-sim is not a workspace member', 'npt-hash-wasm does not depend on npt-sim']); 62 of 63.
+  Restored e657f7b8.
+- Step 5 (TE2-5 entry): the test (check.test.mjs:205-222) is byte-identical to <base>'s (sed range diff: SAME). Its
+  last assert pins `gone` deepEqual ["npt-sim is not a workspace member"]: a missing npt-sim said once. The builder's
+  change is to its own new rule (check.mjs:138, `&& all.has("npt-sim")`): with npt-sim not a member, hash-wasm's "does not
+  depend on npt-sim" is a second message for the same cause, which the test's "said once" exists to refuse (TP9 shows
+  the test catches it). The new rule's own bite stays tested where npt-sim is a member (check.test.mjs:1959:
+  ["npt-hash-wasm does not depend on npt-sim"]). So the test still pins what it pinned at <base>; the fix is right and
+  the test was not weakened. The builder's self-classification (judged within its step, not a stop) is a process
+  call for the advisor: the failure was in check.test.mjs, which the brief's stop clause names, and it was not named in
+  the step's plan in advance; it was recorded, explained and ended in the same step. No finding of mine (Low at most).
+- TP10 r1-te-tp10-scan-regression.log (-x -k, exit 0: the gap shown). Planted in check.mjs hashWasmProblems' unsafe loop,
+  after "if (allowed.has(m.index)) continue;": two lines that skip any `unsafe` after a listed export's
+  `pub extern "C" fn <name>` and before its closing "\n}\n" (tcpinfo's "unsafe inside the listed functions" pattern,
+  the regression RR-M1 and SEC-U4D2-2 name). `node --test check.test.mjs`: "# tests 63 / # pass 63 / # fail 0"; `node
+  check.mjs --only deps`: PASS. So no self-test, fixture plant or live plant pins the export-body case (TP4 shows the
+  real scan catches it today). RR-M1 / SEC-U4D2-2 fully settled: Medium, before merge (a self-test case plus TP4's plant).
+  Restored e657f7b8.
+- TP11 r1-te-tp11-loader-kind.log (-x -k, exit 0: the gap shown). Planted in loader.mjs:53: old "else if
+  (LOADER_EXPORTS[name] !== kind) problems.push(", new "else if (false && LOADER_EXPORTS[name] !== kind) problems.push(".
+  self: 63 of 63 pass. SEC-U4D2-8 settled by run: the kind refusal is untested (Low, follow-up). Restored 7c3c214b.
+- SEC-U4D2-1 (Object.prototype imports) was already settled by the security seat's own run (r1-sec-imports.log):
+  `constructor.constructor` instantiates with moduleProblems []. Not re-run (read-only probe; same code, same copy).
+
+## Step 2's wrong-reason question, by reading plus the runs above
+- hash-map: a Wasm leg that did not run fails (loader exit != 0 is a problem; a missing lines file leaves no comparison);
+  an unarmed or wrongly armed Wasm leg gives a dump without the two `bite[0].hash_map_order` words (SS's unarmed dump is
+  6,488 words, the field sits at [6488, 6489]), so its digest reads "none" and the pair is "not judged", a FAIL; each Wasm
+  leg is its own Node process with its own dump file; the native-Wasm pair is exercised (native keys are per process) and
+  must be first caught at (SS-s1, 1234, the field). "Not catchable on wasm32" is the record of equal Wasm digests, which
+  std 1.99.1's address-keyed wasm32 RandomState predicts; it never passes the step alone (no pair exercised fails).
+- std-sin: the committed scan cannot carry a stale pass: each run re-arms at T' and needs the first native-Wasm mismatch
+  at (R, T', F), so a build where the bite no longer differs, or differs earlier, FAILs (P6 shows "NOT caught ... first
+  mismatch SS-s1 tick 0"). Residual path (TE-L3 below): the step does not re-show that the bite causes the T' mismatch
+  (bitten against clean); for the committed catch (SS-s1, tick 2) the hash-map pair's equal prefix (bites builds,
+  native = Wasm on SS-s1 ticks 0-1233) covers it; for a catch on ES-s2 or TC-s3, or past tick 1,234, nothing would.
+- "Digests equal because nothing was hashed": the clean half's comparator is the same `hash compare` code that catches
+  std-sin's one-ulp change at its first tick and P6's word-size change at tick 0, and the hashes are npt-sim's state hash
+  (h3: the exports equal Replayer's own per tick). No path found.
+
+## Findings (ranked)
+- TE-M1 Medium, before merge (= RR-M2, settled by my run as well): check.mjs readBackCheck (:1522-1553) is given every
+  rustflags source at once and DEPS_CHECKED's limits text says that "fails closed"; cargo uses only the first non-empty
+  source, so a negation in a source cargo skips masks the flag it uses. Proof: r1-te-tp2-flags.log run 3, deps PASS with
+  CARGO_ENCODED_RUSTFLAGS=-Ctarget-cpu=bleeding-edge and RUSTFLAGS=-Ctarget-feature=-simd128,-relaxed-simd (control
+  FAILs); the module cargo builds there carries +simd128 +relaxed-simd (r1-rr-superset-build.log). The argv-pin self-test
+  (check.test.mjs:2173-2186) pins the superset and has no such case. Fix: read back what cargo uses (each source alone,
+  or cargo's precedence per target) and/or refuse a built module whose target_features section lists simd128 or
+  relaxed-simd; one self-test with the negation case.
+- TE-M2 Medium, before merge (= RR-M1 / SEC-U4D2-2, settled by TP4 and TP10): the one case the scan alone guards, an
+  `unsafe` block in a listed export's body, has no self-test, no fixture plant and no live plant (check.test.mjs:1916,
+  :1280 and P3 all plant a new fn, which rustc's deny refuses too). TP4: rustc, clippy -D warnings and the unit tests
+  accept it, deps refuses it (lib.rs:101). TP10: a scan regression that lets it through passes 63 of 63 self-tests and
+  the live deps step. Fix: one self-test assertion (an `unsafe {}` inside begin's body refused at its line) and the live
+  plant once (build exit 0 beside deps FAIL).
+- TE-L1 Low, follow-up (= SEC-U4D2-8, settled by TP11): loader.mjs:53's kind refusal is untested (63 of 63 pass with it
+  disabled). Fix: two cases in the loader test (a listed name as a global; `memory` as a function).
+- TE-L2 Low, follow-up (supports SEC-U4D2-3): Q7's export-signature bite is unit-tested only (check.test.mjs:1948); TP5's
+  live plant shows the deps scan catches `feed(word: f64)` by name, and that nothing else would: the loader runs the f64
+  module and its TC-s3 hashes equal the clean module's over 9,000 ticks. The scan reads the token; the loader's type
+  section read (Q7 (b)) would be the second layer.
+- TE-L3 Low, follow-up: std-sin's step verdict (check.mjs:2333-2349) does not re-show causality: it never compares the
+  bitten native leg with the clean one at T' (the clean half's native-1.lines already holds R's clean hashes), and the
+  `std-sin native legs` call's own result is unread. Sound for the committed catch (SS-s1, tick 2, inside the hash-map
+  pair's equal prefix); unguarded if the first catch moves to another recording or past tick 1,234. Fix: require the
+  bitten native leg's first difference from the clean native lines to be (R, T'), or assert the catch lies on rec0 before
+  HASH_MAP_ARM.
