@@ -14,7 +14,7 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
 
 **The current step: U4 wave 2's start.** U4e's launch (L4; L3, the carry-51 commit, done at 28a85e7); U4d2's brief with
 the advisor. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
-L2 edits, d928358b…), u4s-carries.md (carries 1-72, cdab0240…); the advisor's rulings: advisor-u4.md,
+L2 edits and L3's §4.1 line at 1e8c188, 686a583c…; it read d928358b… before 1e8c188), u4s-carries.md (carries 1-72, cdab0240…); the advisor's rulings: advisor-u4.md,
 advisor-u4-wave1.md (with B1.4's erratum), advisor-u4j.md, advisor-u4d-close.md, advisor-u4j-r2.md,
 advisor-u4e-brief.md, advisor-u4df.md.
 - **Merged into the spike branch:** U4s f080551, U4b 411eeee, U4a 952f734, U4c f3f7c2f, U4d with W1-S1's npt-proto half
@@ -95,6 +95,17 @@ advisor-u4e-brief.md, advisor-u4df.md.
   Then: the main session's fold, and the advisor's check before the build. If cut: resume with
   `Workflow({scriptPath, resumeFromRunId})`. **Its first launch failed in 5 s** (all three agents: the spend limit,
   06:45 UTC; nothing written); **resumed about 07:36 UTC** (task wp2rtgeks).
+  - **DONE about 09:00 UTC: rev 1.1** (u4d2-brief.md, 929 lines, sha256 e6bcefc8…). The check (u4d2-brief-check.md):
+    REVISE, TB-1 to TB-3 High (placeholders by moving line ranges; no pass or fail rule for the bites half; a
+    read-back no test can fail), TB-4 to TB-11 Medium, TB-12 to TB-20 Low; rev 1.1 applies 18 as written and 2 with a
+    change (U4D2-Q12). Questions for the advisor: U4D2-Q1 to Q12. Placeholders P1-P8 (by text anchor and sha256; P6
+    `<base>` and counts; P7 the runner u4d2-run.sh) for the main session at launch. Noted for the main session:
+    server/clippy.toml lacks Q9 (a)'s hash-map bans; crates/client-wasm/Cargo.toml:9-13 says "two" exceptions. The
+    drafter's slips: two `cp` copies and one stderr redirect, all in the session scratchpad, outside the repo.
+- **Running: the advisor's check of U4d2's brief rev 1.1,** workflow wf_6f64e718-539 (task wkw0bz0ml; script
+  workflows/scripts/npt-u4d2-brief-advisor-wf_6f64e718-539.js), launched about 09:00 UTC; ruling to
+  advisor-u4d2-brief.md (in advisor-u4e-brief.md's form; items 1-7). Then the main session folds its conditions and
+  plan edits by script, fills P1-P8 and launches U4d2's builder (three agents at most, with U4e's round 2).
 - The saver: `node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer
   "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" --trailer "Claude-Session:
   https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A"` (background, 120 minutes; restart it when it stops). Stop

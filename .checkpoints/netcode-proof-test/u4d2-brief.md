@@ -13,7 +13,8 @@ for the check"):
   dropped (the card is cited by section and item); section 0 re-stamped at fa91186; 7.2 item 3 rewritten and item 8
   added (re-stamp and re-check at launch).
 - TB-2: the bites half's verdict rules written (2.4 (a) item 6; 2.7): hash-map by D-2's rule per pair, std-sin by a
-  committed scan-data file (crates/lab/) and a (recording, tick, field) rule; their self-test cases; U4D2-Q5's
+  committed scan-data file (crates/lab/) and a (recording, tick, field) rule; their self-test cases (a catch at the
+  expected tick and field, at another tick, at another field, a miss; hash-map with no pair exercised); U4D2-Q5's
   options now say what the committed step holds under each.
 - TB-3: two live read-back runs (`target-cpu=haswell` on x86-64, `target-cpu=bleeding-edge` on wasm32), a recorder
   pin of the read-back's arguments per source, and the clean read-back's own non-vacuity (2.4 (c); 2.7).
@@ -21,7 +22,7 @@ for the check"):
   U4D2-Q11).
 - TB-5: the hash-map bite runs two Wasm legs in two Node processes; std's wasm32 seeding cited at tag 1.99.1 (2.4 (a)
   item 6; 2.7).
-- TB-6: exact tick counts in the pass rule; nine more self-test cases (2.4 (a)).
+- TB-6: exact tick counts in the pass rule; the six self-test cases TB-6 names (2.4 (a)).
 - TB-7: the expected failures named (four pins), `<crate>` replaced by the script, and the `wasm` step's no-retry
   rule (section 4); two pins of the check's list read differently (U4D2-Q12 (a)).
 - TB-8: release provenance from four release builds inside the same exclusive runner call (section 4 rule 3).
@@ -95,7 +96,7 @@ script at launch (section 7.2 item 3). Every `<base>` and count is filled then t
    `/home/user/Shamble-Frontlines/.claude/worktrees/` (`isolation: worktree`), under plan §7.1's shared-target rule and
    W1-TARGET's lock (section 4; plan :896-908; wave1 :558-586). U4d2 runs in wave 2 beside U4e's lane (plan :863-867;
    e-ruling L4, :335-336): two lanes, no shared file (U4e's patch touches crates/room, crates/client and crates/server
-   only: wip/u4e.patch's file list; e-r1 R9 M1, :444-447). Reviewers count toward the three-agent limit (plan
+   only: wip/u4e.patch's file list; e-r1 R9 M1, :445-448). Reviewers count toward the three-agent limit (plan
    :872-873).
 3. **Your notes:** `.checkpoints/netcode-proof-test/u4d2-build.md` in your worktree. Its first line names this task;
    then your plan as blocks (one block: one file's item with its tests, one check with its self-test, one bite and its
@@ -126,7 +127,7 @@ script at launch (section 7.2 item 3). Every `<base>` and count is filled then t
      ruling's point (3) (:450-458: "in wave 2 after U4d2 has merged");
    - wave1: W1-PUB's U4d part (:387-416), W1-TARGET (:558-586); close: B1.2 and B1.3 (:42-180) for carry 52;
      df-ruling: R1 (:28-87), R4.1 (:213-231), R6 (:301-322), T4 (:459-470); j-r2: B2.3 (:146-171), B6 (:283-298);
-     e-ruling: F2-ROUTE (:277-310), L4 (:335-336); e-r1: R6's provenance line (:349-350) and R9 (:438-470), for the
+     e-ruling: F2-ROUTE (:277-310), L4 (:335-336); e-r1: R6's provenance line (:349-350) and R9 (:438-493), for the
      merge order beside U4e;
    - carries §U4d2 (the section "U4d2 or the main session", at fa91186 :407-447), quoted in section 3; the recordings
      section (:351-379), for 3.2;
@@ -209,8 +210,8 @@ Where this brief finds the plan silent it says "plan silent" and keeps to the le
 - Streams a recording in (plan :670-671): the file's bytes as little-endian 32-bit words, the last zero-padded
   (sim/tests/replay.rs:31-43's `words`), fed in chunks with `step` called until NeedMore between them, never the whole
   file before the first step (the driver drains past 64 KiB: replay.rs:701-704). Per tick it writes the recording's
-  name, the tick and the 64-bit hash (from `hash_hi` and `hash_hi`'s partner `hash_lo`) in the line form npt-lab's
-  legs write (2.3), so `HashCompare` reads both; at the end it writes the count of ticks stepped.
+  name, the tick and the 64-bit hash (from `hash_hi` and `hash_lo`) in the line form npt-lab's legs write (2.3), so
+  `HashCompare` reads both; at the end it writes the count of ticks stepped.
 - A trap (`WebAssembly.RuntimeError`: the wasm32 build aborts on a panic, `rustc --print cfg` shows `panic="abort"`) or
   a Failed status ends it non-zero, naming the recording and the last tick stepped. On request it writes the dump's
   words at one tick T (`dump_len`, `dump_word`), for the field diff and for the hash-map leg's order digest. A bite
@@ -455,7 +456,7 @@ fixture test, which fails if a check is unhooked from `depsStep` (check.test.mjs
 - **h7, carry 66**: (i) a probe unit test: the new SHA-256 equals one the test computes from `for_each_canonical`'s
   datagram entries after v1's tag (l1/tests/l1.rs:479-505's walk, with SHA-256). (ii) An `#[ignore]` test in npt-lab
   (the precedent: sim/tests/world.rs:1188, "run once by name for the report"), run by name on the release build through
-  the runner (`cargo test --locked --release -p npt-lab <name> -- --ignored --exact`): it runs `probe::run`
+  the runner (`cargo test --locked --release -p npt-lab -- --ignored --exact <its full path>`): it runs `probe::run`
   (probe.rs:116) for P2, B1 and P4 at seed 1 with -3's arguments (the default packet count and rate: main.rs:73-75,
   probe.rs:20-22; the -3 script's call, :65-72) and asserts the three full SHA-256s of section 3's note; its pass is
   libtest's summary line. (iii) For the carry's "the commands it ran", the three runs of the release binary, `npt-lab
@@ -587,11 +588,13 @@ binding on every cargo, rustc and rustdoc call in your worktree, check.mjs's and
    does it).
 5. **Counts are deltas** (plan :900-901, :870-871), on check.mjs's measure (`testBothBuilds`, :1493-1500;
    `cargoCounts`, :1411-1421). The base: `<<P6>>` (measured, bites, self and the step count at `<base>`; at 28a85e7
-   they were measured 399, bites 446, self 52 of 52, 10 steps: the card's resume card, "The current step"). Each run's
-   count is the base plus the tests you added; check.mjs's step count is the base's plus 1 (`wasm`); the self count is
-   the base's plus your new check.test.mjs tests. A mismatch means another copy's artifact ran: touch, rebuild, never
-   report that run. `--list` (`cargo test --locked --workspace --all-features -- --list`) only names the new tests; it
-   is not a count. h7 (ii)'s `#[ignore]` test is listed as ignored in the counts and run by name only.
+   they were measured 399, bites 446, self 52 of 52, 10 steps: the card's resume card, its "Merged into the spike
+   branch" bullet). Each run's count is the base plus the tests you added; check.mjs's step count is the base's plus 1
+   (`wasm`); the self count is the base's plus your new check.test.mjs tests. A mismatch means another copy's artifact
+   ran: touch, rebuild, never report that run. `--list` (`cargo test --locked --workspace --all-features -- --list`)
+   only names the new tests; it is not a count. h7 (ii)'s `#[ignore]` test is not in check.mjs's count
+   (`cargoCounts` reads libtest's "passed" and "failed" only: :1411-1421; libtest counts it as ignored), so the deltas
+   exclude it; it is run by name only (h7).
 6. **Disk** (wave1 :576-580): `df -h /home/user` before each build, the reading in your notes. At least 4 GB free before
    any wasm32 or release build, which every check.mjs run now is (clippy-wasm32 and doc build wasm32: :1438-1439,
    :1472-1489; the `wasm` step builds release for both targets); at least 2 GB before every other build; below that,
@@ -705,13 +708,13 @@ Run from spikes/netcode-proof/ in your worktree, each as a counted run under sec
 | R11 | npt-sim's subtree features equal in npt-server, npt-lab (x86-64) and npt-sim (wasm32); npt-sim's manifest names libm, rand_chacha and rand_core | notes F4; crates/sim/Cargo.toml | 2.4 (b) | yes |
 | R12 | glibc 2.39's only same-named symbol is the compat `step@GLIBC_2.2.5` | notes F5 | 2.1, Q8 | no |
 | R13 | Node v22.23.4; no wasm-opt installed | notes F6 | 2.2; C-U7-1 | no |
-| R14 | check.mjs: 10 steps (:1594-1627); `depsStep` (:1563-1590) and its fixture test (check.test.mjs:1094-1165); the steps pin (:1617-1658, built from `WASM_CRATES`, no step list); the four exception-quoting pins (:288, :486, :508, :1141); `main` prints each step's last line (:1646); section 0's moved cites | check.mjs, check.test.mjs | 2.4, section 4 | yes (U4e edits neither) |
+| R14 | check.mjs: 10 steps (:1594-1627); `depsStep` (:1563-1590) and its fixture test (check.test.mjs:1094-1165); the steps pin (:1617-1658, built from `WASM_CRATES`, no step list); the four exception-quoting pins (:288, :486, :508, :1141); `main` prints each step's last line (:1646); `cargoCounts` reads passed and failed only (:1411-1421); section 0's moved cites | check.mjs, check.test.mjs | 2.4, section 4 | yes (U4e edits neither) |
 | R15 | plan.md §4.1 and §4.2 already hold hash-wasm's line and "three named exceptions" | plan.md:392-393, :435-447 | 2.4 (e) | no |
 | R16 | No crates/lab/clippy.toml; server/clippy.toml has the clock ban, no hash-map ban | `ls crates/*/clippy.toml`; server/clippy.toml:1-13 | Q10 | no |
 | R17 | U4e's patch touches crates/room, crates/client, crates/server only | wip/u4e.patch; e-r1 R9 M1 | 1.2 | yes (merged or not) |
 | R18 | U2's full v1 fate-log SHA-256s and their committed prefixes | 3.1's note on carry 66 | h7 | no |
 | R19 | Carry 65 not yet made: `run` joins stdout before stderr, main prints 40 lines | check.mjs:1402, :1649 | 2.4 (f) | yes |
-| R20 | The base counts at 28a85e7: measured 399, bites 446, self 52 of 52, 10 steps | the card's resume card, "The current step" | section 4 rule 5 | yes (`<<P6>>`) |
+| R20 | The base counts at 28a85e7: measured 399, bites 446, self 52 of 52, 10 steps | the card's resume card, its "Merged into the spike branch" bullet | section 4 rule 5 | yes (`<<P6>>`) |
 | R21 | npt-lab has serde_json and sha2; it dispatches `probe` alone | lab/Cargo.toml; main.rs:186-213 | 2.3, 2.5 | no |
 | R22 | The -3 script records each probe line as printed and reads its binary from the main folder's target | ops/runs/c-u2-pm-0001-3.mjs:43-45, :52-59, :65-72 | carry 66, h7 | no |
 | R23 | std 1.99.1 keys wasm32-unknown-unknown's `HashMap` from a stack and a heap address | the URL in 2.4 (a) item 6 (notes F20) | 2.4 (a), 2.7 | no |
