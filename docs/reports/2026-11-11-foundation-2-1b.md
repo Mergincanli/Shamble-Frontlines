@@ -41,9 +41,9 @@ pull-request run on the current main (C16); this report's items (C17).
 | CI, move commit c090843 | push #674 (base 2f4b974) and pull request #675 (base origin/main = 76b4f7a): gate PASS with that header; smoke 8/8 and 5/5 on the pinned Chromium |
 | E1, the bytes | `git diff --find-renames=100% --name-status c090843^ c090843`: five R100 rows, nothing else; blobs equal at 76b4f7a, 44446a5 and `legacy/` (e528dca, 24e86d5, fce6f37, 008c66f, 5ba72df); final head: in the PR body |
 | E2, OLD's gate | 44446a5's untouched gate files run on the moved bytes: GATE PASS, +0 -0, smoke 8/8 and 5/5 |
-| E3, the gate bites | 31 of 31: each mutation fails the same checks in OLD's gate (files at the root) and the head's gate (files in `legacy/`); controls pass in both; M19 and M20 differ from the 2026-10-14 report's loose "5b + 5d" wording only (as in 2.1a). The head's gate vs 44446a5, 8e58937 (+34 -0), 76b4f7a, c090843, b6b3b81: PASS |
-| E4, the oracle | tuning dumps at A (`.`) and head (`legacy`), both maps, twice: byte-identical (35792 and 37063 characters); R7's builder reproduces `legacy-tuning.json` (78862 bytes) and `LEGACY_TUNING.md` (22018 bytes); the head's edited tools give the same dump (`cmp`) |
-| E5, the saves | headless Chromium 1194 on Linux: SHARED (every `file://` page, any folder, one storage); control and reverse hold. Both console lines on the real `legacy/` pages: 10/10. Brave on Windows: not verified |
+| E3, the gate bites | 31 of 31: each of the 26 mutations fails the same checks in OLD's gate (files at the root) and the head's gate (files in `legacy/`); the controls C1-C3 and PC2 pass in both (exit 0); PC1 (P1 with `--allow-drop refreshRect`) fails 5a and 5b in both, against P1's 3, 5a and 5b: the flag removes exactly check 3, as designed (`refreshRect` is still called at boot), so PC1 is judged on check 3; M19 and M20 differ from the 2026-10-14 report's loose "5b + 5d" wording only (as in 2.1a). The head's gate vs 44446a5, 8e58937 (+34 -0), 76b4f7a, c090843, b6b3b81: PASS |
+| E4, the oracle | tuning dumps at A (`.`) and head (`legacy`), both maps, twice: byte-identical (35792 and 37063 characters); R7's builder reproduces `legacy-tuning.json` (78862 bytes) and `LEGACY_TUNING.md` (22018 bytes); the head's edited tools give the same default-map dump (`cmp`; their edits are header comments only) |
+| E5, the saves | headless Chromium 1194 on Linux: SHARED (every `file://` page, any folder, one storage); control and reverse hold; KVStore's backend read `localStorage` (recorded in run 1, not asserted by the verdict). Both console lines on the real `legacy/` pages: 10/10, with DevTools' `copy()` stubbed (the real clipboard step is his step 2). Brave on Windows: not verified |
 | E6, the commands | 14 of 14 changed command lines run as written; kit tests 1261/1261; `repo-map-check.mjs` exit 0 after the docs pass (112 entries, 99 paths) and on the final head (PR body) |
 | E8, the revert | main + `git merge --no-ff` of the PR head (c33ac99) + `git revert -m 1` (5f91112): tree = 76b4f7a; `node tools/gate.mjs c33ac99` PASS ("(files in legacy/) \| head = working tree (files at the root)"), `--smoke-only` PASS |
 | Kit lines | b6b3b81: the four removed and added lines equal the approved text and main's before lines, by script (14/14) |
@@ -64,6 +64,10 @@ review of the pushed head: filled in before the PR is marked ready.
   repo-map-check) and one blind reader of the ADR and register edits against his words: one Medium (the register's ADR
   0002 row did not mark -2 "answered in part"; fixed as REG-CELL (a), below), two Lows (the status sentence's "His
   words:", left as approved, stale list; the ADR's pointer to E2-E4 here, this report).
+- 2.1a's follow-ups, closed: IE-2, the move alone in c090843 with both runs read (#674, #675); IE-3 and SA-L1, the
+  build-folder paragraph in `tools/README.md`; IE-4, CI's smoke on the pinned Chromium ran `legacy/` (#674, #675); IE-7,
+  the pull-request run on the current main with the header "(files at the root) | head = working tree (files in
+  legacy/)" (the PR body).
 - OQ-0002-2's answer states its counts exactly: 2 gate files in 2.1a, 2 kit files in 2.1b; 15 `tools/` allow rules
   today (the plan counted 17); the docs counts labelled as the plan's of 2026-11-10.
 - The worker restarted between kit edits 2 and 3; `git diff` showed which were made; the commit holds all four.
@@ -72,6 +76,8 @@ review of the pushed head: filled in before the PR is marked ready.
 1. Saves in Brave on Windows: E5 is headless Chromium on Linux; his backup (For Mustafa, step 1) comes first.
 2. Reverting 2.1a while 2.1b is on main breaks the gate (2.1a reads `legacy/`): revert 2.1b first (plan 1.9).
 3. PR #40 shares DECISIONS.md, REPO_MAP.md, STATUS.md and STATUS_ARCHIVE.md: whichever merges second keeps both sides.
+   E8's pure revert holds while #51 is the last merge on those files; after #40 lands, a revert of #51 needs hand
+   resolution there (plan first) or a fix forward. Recommended order: #51 first, then #40 merges main.
 4. Windows and macOS letter case: by reading the code only.
 5. PM-0002-36's own wording still says the dump reproduces the docs file: fixed at ADR 0002's next revision (Q-A1).
 
@@ -92,13 +98,16 @@ Step 2.2, the toolchain (PR #48's lane), then 2.3, the gate step, with the findi
   decision): 14 reached you as prompts: 8 were the session's own `sed -i` lines on its checkpoint (stopped mid-session:
   the Edit tool asks nothing), 3 the kit edits (by design: your yes in chat came first), 1 E8's merge inside its
   throwaway worktree, 1 a worktree clean-up line, 1 the session's first command; the guard refused 2 lines (`git -C`).
-  Options: (a) 2.3's plan weighs allow rules or guard readings for the safe forms (git merge, revert and worktree
-  removal inside a `.gate/` worktree; a scripted edit of the session's own checkpoint), each asked of you as a kit edit;
+  Options: (a) 2.3's plan weighs guard readings that check where such a command runs (a `.gate/` worktree: git merge,
+  revert, worktree removal) or what it writes (the session's own checkpoint), never a plain settings allow rule, which
+  cannot tell the folder; each asked of you as a kit edit;
   (b) no rule change: sessions avoid those forms. Recommendation: (a), as findings for 2.3's plan (the kit stays frozen
   until 2.3).
 
 ## For Mustafa
-1. Confirm you have this version: download https://github.com/Mergincanli/Shamble-Frontlines/archive/refs/heads/claude/clever-fermi-oudsfq.zip and unzip it into a new folder · on screen, the folder holds
+1. Confirm you have this version: download the zip of the final head the PR body names
+   (`https://github.com/Mergincanli/Shamble-Frontlines/archive/<that SHA>.zip`; the branch's own zip follows any later
+   push) and unzip it into a new folder · on screen, the folder holds
    `legacy/` with the game in it, and no `index.html` at its top.
 2. Back up your saves first (nothing deletes them; this is the safety copy). In Brave, open your current
    `index.html` (your usual copy, not the new folder), press F12, open Console (type `allow pasting` if Brave asks),
@@ -120,14 +129,16 @@ Step 2.2, the toolchain (PR #48's lane), then 2.3, the gate step, with the findi
    ((o)=>{let n=0,s=0;for(const k of Object.keys(o)){if(localStorage.getItem(k)===null){localStorage.setItem(k,String(o[k]));n++}else s++}return n+' keys restored, '+s+' already there (left as they are)'})(PASTE_HERE)
    ```
    Expected: "<n> keys restored, <m> already there (left as they are)"; reload the page and the saves are back. It
-   only adds missing keys and never overwrites one.
+   only adds missing keys and never overwrites one. Paste only the text the backup line made (it starts with `{`): the
+   console runs what you paste.
 6. On Windows, the gate on this branch (PowerShell, in your repository folder; a separate folder, your own is not
-   changed): `git fetch origin`, then `git worktree add ..\shamble-2-1b origin/claude/clever-fermi-oudsfq`, then
+   changed): `git fetch origin`, then `git worktree add ..\shamble-2-1b <the final head's SHA from the PR body>`, then
    `cd ..\shamble-2-1b\tools`, `npm ci`, `cd ..`, `node tools/gate.mjs origin/main`. Expected: the header
-   "base origin/main = 76b4f7a (files at the root) | head = working tree (files in legacy/)", every check PASS, smoke
+   "base origin/main = <main's short SHA: 76b4f7a unless another PR merged first> (files at the root) | head = working
+   tree (files in legacy/)", every check PASS, smoke
    8/8 and 5/5, GATE PASS. Afterwards delete the folder `..\shamble-2-1b` and run `git worktree prune`.
 7. If every step passes, say "merge #51" in a session's chat (risk tier 2, needs your go; the advisor approves the final
-   head first).
+   head first). The merge is a merge commit, as #44, #46, #49 and #50 were and as E8 rehearsed.
 
 ## Findings for 2.3
 - The prompt tally above (PROMPTS-2.3), with every prompt and refusal listed in `prompt-tally.json` at this branch's
@@ -137,6 +148,9 @@ Step 2.2, the toolchain (PR #48's lane), then 2.3, the gate step, with the findi
 - Your finding from the Windows run (A3): the pinned Playwright's installer (before 1.60.0) hangs after the download
   reaches 100% under Node 24.16.0 and later; it finished under 24.15.0. This container's install (Node 22.23.4) did not
   hang. For 2.3's toolchain pins.
+- After the merge, base and head both read `legacy/`, so the gate's stray and decoy page check (it runs only when the
+  folder differs) no longer runs: 2.3's gate step should refuse page and engine names, in any letter case, outside the
+  build folder on every run (security-auditor, round 1).
 - The Bash tool's background limit (30 minutes by default) stopped the checkpoint saver once; restarted with the
   2-hour limit.
 

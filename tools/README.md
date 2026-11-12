@@ -13,7 +13,8 @@ else exit 2. When the folder differs between base and head (the move, or its rev
 page or engine file (`index.html`, `editor.html`, any `shamble-*.js`), matched in any letter case, or the gate stops
 with exit 2. Elsewhere `findBuild` and the file reads use exact names: on Linux (CI) a `Legacy/` folder or a
 `legacy/SHAMBLE-core.js` file is another name, neither counted nor read; on Windows and macOS, whose file systems
-ignore letter case by default, the same names open as the `legacy/` files (by reading the code, not run).
+ignore letter case by default, the same names open as the `legacy/` files (by reading the code, not run). A base is
+read from git, whose paths match exactly on every platform.
 
 ## Setup (once per machine)
 Node **22**, 22.13 or newer (headless-gl has prebuilt binaries up to Node 22; eslint-scope needs 22.13+).
@@ -69,8 +70,8 @@ node tools/pageshot.js legacy index.html .gate/gpu --headed size:1600x900 wait:2
 node tools/preview.js legacy menu .gate/preview_menu.png    # tells you whether headless-gl works natively here
 node --version                                         # 22.x
 ```
-Then, in Claude Code at the repo root, ask it to put a syntax error into `shamble-game.js` with the Edit tool and revert
-it: the syntax hook must answer "SYNTAX GATE FAILED". Paste the outputs to the Advisor.
+Then, in Claude Code at the repo root, ask it to put a syntax error into `legacy/shamble-game.js` with the Edit tool and
+revert it: the syntax hook must answer "SYNTAX GATE FAILED". Paste the outputs to the Advisor.
 
 ## Platform notes
 - **Windows:** no prefix needed. If `gl` fails to install natively, the gate is unaffected; report it and use WSL for preview.js.
