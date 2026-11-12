@@ -19,3 +19,31 @@ No memory folder exists for infra-engineer (checked .claude/agent-memory* in bot
 10. Run `node tools/gate.mjs origin/main --no-smoke` in the worktree; read CI logs for the head.
 
 ## Findings (one line each, as found)
+- F1 (REQUIRED-CHECK answered): `toolchain` is NOT required on main. Unauthenticated API 2026-11-12: /branches/main
+  protected=true, classic protection enabled=false, contexts []; /rules/branches/main: ruleset 25069670 "Shamble Ruleset 1"
+  (active, ~DEFAULT_BRANCH, updated 2026-10-17) requires gate + smoke only (integration 15368). Classic /protection 404
+  (needs admin). bypass_actors shows [] to an anonymous caller (may be redacted; not concluded). Also the guard's merge
+  check (routine-guard.mjs:1486, ['gate','smoke']), CLAUDE.md:130 merge rule, CLAUDE.md:119 + advisor.md:273 rollback
+  trigger, STATUS.md:22 name only gate+smoke: a red toolchain blocks nothing mechanically until 2.3 (advisor.md:323's
+  "failing ... checks" is the only text that covers it).
+- Source (read 2026-11-12): rustup CHANGELOG (raw.githubusercontent.com/rust-lang/rustup/main/CHANGELOG.md): 1.28.0
+  (2025-03-04) removed implicit install, "run `rustup toolchain install` with no arguments"; 1.28.1 (2025-03-05)
+  "Automatic install is enabled by default but can be opted out by setting RUSTUP_AUTO_INSTALL ... to 0"; 1.28.2 adds
+  `rustup set auto-install disable` (lower priority than the env var). The workflow's :21 comment is right.
+- Checked: all 14 planted red runs completed as failure at the claimed step (none cancelled); all 8 reverts exact
+  (git diff <plant>^ <revert> empty); fb17451..66d9888 empty outside .checkpoints. But 4 revert pushes (2ee2bff, 5c64404,
+  b60a996, 00cee0b) had toolchain AND gate push runs cancelled and no pull_request run; 2d9766f's gate push run cancelled.
+  Branch total: 82 runs; gate 37 success / 5 cancelled; toolchain 22 success / 14 failure (planted) / 4 cancelled.
+- M2 log (job 130098974545): without the file, `rustup toolchain install` = "using existing install for stable ...
+  active because: it's the default toolchain"; then `pin=$(sed ...)` exits 2 under bash -e before the script's own message.
+- E4c verified by CI logs: gate job "added 9 packages" on main (job 131211586861, run 43226692719 on 2aa5e9c) and on the
+  head (131510254606); smoke "added 159 packages" both (131211586912 / 131510255220), Playwright cache key
+  playwright-chromium-Linux-1.56.1 both, smoke 8/8 + 5/5 both. npm's own localPrefix rule: --prefix wins; a workspace
+  root only claims a child listed in its workspaces (packages/*), never tools/.
+- E5 verified: git diff origin/main 4d78ad6 -- .github/workflows/gate.yml = 0 lines; tools/ unchanged; no root .npmrc.
+- E6 re-run: `node tools/gate.mjs origin/main --no-smoke` in the worktree: GATE PASS, symbols +0 -0, base 2aa5e9c.
+- Timing (22 green toolchain jobs on the branch, API): 19-45 s, median 25 s; rustup install step 8-14 s (median 10 s,
+  downloads 6 components every run, no cache); cut step 4-6 s. Report E2 says "about 20 seconds" (the minimum). Nit.
+- Head runs: toolchain push 43312017234 (job 131510223737, 26 s) and PR 43312027194 (job 131510257155, 30 s): log
+  matches the report's E2 description (rustup "overridden by" the file, pin equal, control connected 140.82.114.4,
+  uid 1001 gid nogroup, only lo, curl (7), cargo 6/6, release 2/2, wasm32 build, npm ci --offline 46 pkgs, 5/5, tsc 6.0.3).
