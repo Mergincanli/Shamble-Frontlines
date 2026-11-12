@@ -67,12 +67,45 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    packet_name_check.py 12 of 12); u4d2-packet.md cut from u4d2-packet.json (sha256 9b670276…, 373 KB; its side file
    u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
-   **(i) Running: the advisor's ruling on round 1,** workflow wf_ff32624e-10a (task w0q05gown; one seat,
-   general-purpose, opus, xhigh, on main's advisor.md; read only), launched 23:23 UTC, from advisor-u4d2-r1-brief.md
-   (complete: item 5 filled with batch 2's findings); its ruling goes to advisor-u4d2-r1.md block by block. If cut:
-   resume with `Workflow({scriptPath, resumeFromRunId})` (script workflows/scripts/npt-u4d2-r1-advisor-wf_ff32624e-10a.js).
-   On return: read it whole; then the fix pass as it rules. Meanwhile, A13's server item (Next steps 4), unless the
-   ruling says to wait. **A13 DONE at 1b4a3c8** ("A13: npt-server's clippy.toml gains the HashMap and HashSet type
+   **(j) Running: U4d2's fix pass,** workflow wf_bb054eb3-70b (task wy27y3276; script
+   workflows/scripts/npt-u4d2-fixpass-r1-wf_bb054eb3-70b.js), launched about 23:58 UTC: one builder (general-purpose,
+   opus, xhigh), no isolation, in `.claude/worktrees/u4d2-build`; FX-1 to FX-12 as the ruling's Block 8 says; the
+   prompt points at u4d2-brief.md section 4's binding lines (650-690, 698-714, 724-730; Mustafa's words there by
+   script) and quotes only T4 item 1; logs .gate/u4d2/fx-*; its record: the worktree's u4d2-build.md, new section "Fix
+   pass, round 1"; at the end .gate/u4d2/fx-hashes-end.sha256. If cut: check crates/hash-wasm/src/lib.rs equals the
+   read copy's (`cmp` with .gate/u4d2-r1; the pass changes it only by FX-2's and FX-3's restored plants), crates/sim,
+   Cargo.lock and the manifests untouched (`git diff --stat`), and read the record's last plant line (a plant in
+   check.mjs, check.test.mjs, loader.mjs or hash.rs is restored by Edit to its fixed form's sha256, as the record
+   gives it); then resume with `Workflow({scriptPath, resumeFromRunId})`. On return (Block 8, "Then the main
+   session"): read its stops and TE2-5 entries in full; re-cut wip/u4d2.patch by worktree_patch.py and commit it;
+   check the copy against fx-hashes-end.sha256; cut round 2's packet by review_packet.py on what changed (round 1's
+   patch at e2f2a5b, a526ef8e…, against the new one; this ruling as the "judged against" half; advisor-u4d2-r1.md is
+   not on ALLOWED's pattern, so it needs no addition); then round 2 (Block 8's seats: batch 1 security, rust, infra
+   in the copy while nobody plants; batch 2 test (start hashes r2-hashes-start.sha256; one counted run in the
+   background, at least 1,500,000 ms) and arch (read only)).
+   **(i) The advisor's ruling on round 1: DONE** (wf_ff32624e-10a, 23:43 UTC; advisor-u4d2-r1.md, 729 lines, sha256
+   9978b43b…; read by the main session: Blocks 1-8 in full; Block 9, the texts T1-T5 and "Before the merge" are read
+   in full at the merge). Nothing to Mustafa. The fix pass FX-1 to FX-12 (Block 8): FX-1 the deps step refuses every
+   rustflags source holding a flag and CARGO_BUILD_TARGET or `build.target` (RR-M2's first half, SEC-U4D2-5, -6); FX-2
+   the loader refuses a module whose target_features section lists simd128 or relaxed-simd, or has none, two or a
+   bad one (RR-M2's second half, SEC-U4D2-7); FX-3 the unsafe-in-an-export-body self-test and plants (RR-M1); FX-4
+   every import refused by name, `Object.create(null)` (SEC-U4D2-1); FX-5 the two kind cases; FX-6 no build script and
+   no `include` path in a deny-level exception crate; FX-7 300 s timeouts on the step's non-cargo calls (INF-4); FX-8
+   "layouts differ" and one `--on` default (RR-L3, EA-9); FX-9 std-sin's IFUNC sentence (INF-3); FX-10 a failed
+   step's whole output kept under .gate/netcode-proof-test/ (TE-L4); FX-11 texts (the three "two"s at check.test.mjs
+   :328, :364, :529; sqrtf by `sqrtss`; SEC-U4D2-3's comment; TickHash's doc); FX-12 crates/hash-wasm/clippy.toml.
+   INF-1: report text (T5) now; the cold figure after the merge from one `--only wasm` run after the main session
+   empties the shared target between waves (W1-TARGET item 3), M9's last item, no exception to §7.1. TE-M3: not
+   U4d2's; at the merge M6 (re-run, name and panic, merge only on a whole 11-step pass); its cause a planned change
+   of the main session's after U4d2's merge and before U4r's merge (TE2-5 (c)). Carries 82 (RR-L5, EA-8) and 83 (EA-3,
+   EA-6, TE-L3) for U4r (T2); C-U7-2 (EA-2, EA-4, INF-6, SEC-U4D2-3's type read) in plan.md's U7 row (T3); T1 §4.1's
+   rows; T4 SERIES.md's `fate_log_v1_datagram_sha256` row, before M5's run; T5 the report. Follow-ups: RR-L4 with
+   EA-1, INF-2, INF-7, INF-3's CPU record, plan §7.1 item 6 (main-run.sh uses the shared target) at U4's close. For
+   Mustafa's information only: the rust seat built once into its own `.gate/u4d2-rr-target` (38 MB), against §7.1
+   item 1's letter (a SIMD-built module kept out of the shared target); recorded in T5, removed at M9. Block 7
+   confirmed my five points (plus check.test.mjs:529 and the brief's U4r cites :776-777, :800-802); A13 was right not
+   to wait. Merge M1-M9 (Block 9): read at the merge; expected 490 / 560 / 63 plus the fix pass's named deltas, 11
+   steps, in the background at least 1,500,000 ms. **A13 DONE at 1b4a3c8** ("A13: npt-server's clippy.toml gains the HashMap and HashSet type
    bans", pushed about 23:36 UTC, its own commit, the saver stopped for it; CI green: gate runs 43330155579 push and
    43330163225 pull_request; main unmoved at 2aa5e9c, so no conflict): the counted run
    (a13-check-counted.log, 23:25:24 to 23:34:59 UTC) all 10 steps PASS, measured 473, bites 541, self 52 of 52, marks
