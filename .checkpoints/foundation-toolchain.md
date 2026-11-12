@@ -330,9 +330,22 @@ there, then the four texts, the advisor tool, his chat ask.
    brief names the worktree's absolute path, the code SHA and an absolute notes path; infra-engineer asked whether
    `toolchain` is a required check on main; the advisor agent's brief: it runs the gate itself, the smoke cannot start
    here, CI's smoke on the exact head; the saver stopped before the checkpoint-deletion commit, made by hand.
-Count: 3.
+4. 2026-11-12 ~20:40 Amsterdam (docs workflow wf_29ac478b-0a7 running) · his item 4, the full read of the built
+   skeleton before the reviewers start (every skeleton file, gate.yml and ADR 0002 parts 2-4 and 7 printed; the overflow
+   tests checked under bench, test and dev): what to change before Fable builds on it? · changed: the docs workflow to
+   be committed before any code change or planted failure; four checks run before the reviewers: 2.3's lint commands
+   on the stubs (fmt and clippy clean; pedantic flags `should_panic_without_expect`: `expected` to be added), L2 never
+   ran anywhere (to plant as M6, the npm twin of M3), Node resolving up from tools/ (confirmed: a Risk and a 2.3 item),
+   gate.yml's setup-node on main and the branch (identical); items recorded for 2.3 (`findings-2-3-c4.md`: crate names
+   taken on crates.io, what CI does not yet enforce, no .wasm artifact, two Playwrights, CARGO_NET_OFFLINE, no licence
+   field); security-auditor's brief: the cut is hermetic tests, not a sandbox, and capability sets after setpriv; the
+   report's kit table to name the tree of each line number. The read before ready re-checks only files that changed.
+Count: 4.
 
 ## Running work
+- workflow wf_29ac478b-0a7 (task wcodvxshj), step 6's docs: docs-keeper (general agent reading main's docs-keeper.md,
+  Opus 5.5 at max) then one fact checker; script `/root/.claude/projects/-home-user-Shamble-Frontlines/29a42dc7-ecd4-506e-b90a-121dd5e50988/workflows/scripts/foundation-2-2-docs-wf_29ac478b-0a7.js`;
+  notes `docs-keeper-step6.md`, `docs-check-step6.md`; launched ~20:27 Amsterdam; resume with resumeFromRunId.
 - **Where the work lives since 2026-11-12 16:33 Amsterdam:** the branch worktree
   `/home/user/Shamble-Frontlines/.gate/foundation-toolchain-wt` (branch `claude/laughing-pasteur-fwya24`). The main
   folder sits on the local branch `main-folder`, made at origin/main 2aa5e9c (`git switch -c main-folder origin/main`,
