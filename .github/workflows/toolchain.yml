@@ -80,6 +80,7 @@ jobs:
                 *) echo "probe inconclusive: curl exit $rc"; exit 1 ;;
               esac
               cargo test --workspace --locked
+              cargo test --release -p sim -p protocol --locked
               cargo build --locked --target wasm32-unknown-unknown -p sim -p protocol -p room -p client-endpoint -p sim-wasm
               npm ci --offline --ignore-scripts --no-audit --no-fund
               npm test --workspaces
