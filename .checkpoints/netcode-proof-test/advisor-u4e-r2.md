@@ -24,7 +24,8 @@ and T6 stand; T7 is new. The test seat's longer wait is accepted. Nothing goes t
 ## Progress
 - [x] 1 read (the brief; advisor.md from main; R1-R9 and T1-T6; the packet whole, sha256 ecf4394a… as the brief says;
   the five seats' notes whole; the builder's "Fix pass, round 1"; history.md's 15:32 UTC entry)
-- [x] 2 spot-checks  - [x] Q1  - [x] Q2  - [x] Q3  - [x] Q4  - [ ] texts  - [ ] end sections
+- [x] 2 spot-checks  - [x] Q1  - [x] Q2  - [x] Q3  - [x] Q4  - [x] texts (T1, T2 (3), T3, T5, T7)  - [x] end
+  sections. DONE.
 
 ## Spot-checks (reading, git and sha256 only)
 - **The copy is the one round 2 reviewed.** In .claude/worktrees/wf_0fa6595a-3e2-1: HEAD 97bb9d32aa7b…;
@@ -264,6 +265,97 @@ added after C-U6-15, before the row's closing bar; C-U6-12 to C-U6-15 are unchan
 since -19 judges ML's Chrome "as it stands" (ADR 0001:1609);<br>**U4e's carries (the advisor's U4e round-1 and round-2 rulings, 2026-11-12):**<br>• **C-U6-12 the full-state stream and the control stream (R3 and R5: SEC-U4E-4's transport half, SEC-U4E-2):** at most one open full-state stream per session (the catalogue's FullState row, proposed there), npt-server refusing a client-opened one beyond it; and a per-connection limit on control-stream messages (`ClientSettings`, `Resync`, `SessionControl`), counted, a message over it dropped or the session closed as malformed, with the catalogue's rows gaining the limit; the room's half of SEC-U4E-4 is U4e's (a client's Resync answered at most once per `FULL_STATE_ACK_TICKS` ticks);<br>• **C-U6-13 the event base on the wire (R3: NC-M5, A3):** a join or rejoin starts the client's 32-bit event numbers from the room's: `JoinAccepted` or `FullState` carries the room's next event number (npt-proto and the catalogue), the client rebuilding from it; -19's join hash (C-U6-11) is the first judged case, since today a client admitted after the room has stamped 32,768 or more events past its start rebuilds every event number wrong (U4e's probe Q-10; u4s-carries.md entry 75 is U4r's stopgap);<br>• **C-U6-14 ending a session (R3: A6, SEC-U4E-5):** TickLoop, when `Room::join` reports a replacement, sends the old connection `Kick(replaced)` and closes it before routing anything else, and closes a kicked or left session; either the room checks a session generation on `receive` and `leave` (returned by `Room::join`, a stale one dropped and counted) or U6's report shows by test that no message of a closed session reaches the room; npt-server's library gains a call that ends a session only if TickLoop needs one, with its reason;<br>• **C-U6-15 the room's tick before -4 (R3: RR-5, with RR-4, A10 and A12):** before PM-0001-4's judged runs, the room's own tick at SS with 48 clients is measured on R2 by the rust-reviewer's U4e method (a counting allocator around `Room::tick` only; a twin World stepped on `tick_input()` with its state hash asserted equal; 100 warm and 600 measured ticks; release; three runs) and set beside -4's 16.67 ms p99 with the pump and the logs; U4e's cheap wins are made first, each with that bench before and after: the relevant set emitted in the index's key order instead of a sort by key through the records, no clone of the Packer's vectors per group, no fresh baseline-frame clone per client per tick, no per-client vectors built each tick, no double clone of a tick's baseline frame in the client, a linear acknowledgement pass over the event queue, and no per-tick copy of the sim's reports (`Room::reports`); at U4e, on a 4-vCPU VM, the room's own work was 5.4-5.9 ms mean and 9.5-11.2 ms p99, with 2,838 allocations and 6.2 MB requested a tick, linear in clients (u4e-review-rust.md, block 2);<br>• **C-U6-16 the Resync limit and U4e's other round-2 notes (round 2's Q1 and Q2: NC2-M1, SEC-U4E-R2-1, -3 and -4, A-R2-1, TE2-L2):** (a) U4e's room answers a client's `Resync` at most once per `FULL_STATE_ACK_TICKS` ticks after the last full state it sent that client (its join's, a forced one or an answered one), drops a sooner one with no reply (`resyncs_limited`), and keeps that clock in the client's slot, which every accepted `Join` rebuilds; so an honest `Resync` soon after a full state goes unanswered (a Worker trap or a hidden tab soon after a join: ADR 0001:771-772; PM-0004-61's 20 traps per browser at random ticks against this test's server: ADR 0004:1182 and §2's "Left to the boundary spike"), while a replacement or a re-join draws a fresh full state at once (SEC-U4E-R2-1). Before -19's runs and before the server is left re-runnable at P2 for PM-0004-61's online half, U6 gives the limit a form, chosen with the advisor, that answers an honest client's recovery at once wherever it falls and still bounds the full states one slot can draw, by `Resync` and by re-join together: for example a bucket allowing one full state beyond the last per window, kept outside `ClientSlot` (in the roster entry), or the other option the advisor's U4e round-1 ruling weighed (R3), every full state counted against the client's downstream window; its tests show a `Resync` one tick after the join's full state answered at the next tick, and N replacements or `Resync`s in N ticks drawing no more full states than the bound. The browser client's resync path sends its `Resync` again when no `FullState` has come within `FULL_STATE_ACK_TICKS` ticks (the catalogue's `Resync` row states the limit since U4e's merge). Spacing the trap injector instead would read -19's and PM-0004-61's rows: it comes to the advisor first, as a §15 reading; (b) the limit's tick count is taken at the room's rate (a `full_state_ack_ticks_at` form, carry 39's route) when a room first runs at a rate other than 30 Hz (SEC-U4E-R2-3; the card's RR-6 follow-up names the room's other 30 Hz sites); (c) TickLoop sends `Room::take_control`'s bytes on a channel that npt-proto or the room gives it (a public read of a framed message's channel, or each message's `Limits::TYPES` row beside its bytes), never by a copy of the test lab's `stream_of`, which finds the type byte at the offset of the channel it is trying to learn and holds only while a full state's length stays below 262,144 B (SEC-U4E-R2-4, A-R2-1; the card's A9 follow-up, at the next npt-proto change, may take it first); (d) the pump's SEC-U4E-1 test gains its wrong-direction case (a room-to-client type framed first on the control stream: the session closed, `first_not_join` 1, `Kick(malformed)` sent, the `Join` behind it never taken), with the first change to npt-server's pre-`Join` path (TE2-L2) |
 ```
 
+### T5. u4e-report.md's section on the review's rulings (new file, beside u4df-report.md)
+Copied by script as it is. Each `<…>` is a number the main session fills from the merged tree's M5 lines, and the
+notes name the log and line of each fill; no other word changes. Against round 1's T5: the heading names both
+rulings; the Round 1 bullet's placeholder becomes round 2's outcome; the tick16 and public-items bullets gain a
+sentence each; the Resync-limit and round-2-Lows bullets are new; the open security findings gain round 2's. Every
+other bullet is round 1's, word for word.
+```
+## What U4e's review settled (the advisor's U4e rulings: round 1, advisor-u4e-r1.md; round 2, advisor-u4e-r2.md)
+- **Round 1** (five seats on one head, 97bb9d3 plus the snapshot of db49108; the test seat was cut by the spend limit
+  at about 06:42 UTC and resumed at about 07:36 on the same bytes, so one round): netcode-architect and
+  engine-architect REVISE, test-engineer REVISE, security-auditor and rust-reviewer APPROVE WITH FINDINGS; two Highs
+  (NC-H1 and TE-1, one defect). One fix pass (FX-1 to FX-13), then round 2 on what changed (the snapshot of 4300944;
+  the same five seats in three batches of at most two): all five APPROVE WITH FINDINGS, one Medium (NC2-M1, carried)
+  and twelve Lows, none before the merge; every fix's test failed by name under its plant when the test seat re-ran
+  it, and its counted check.mjs passed all 10 steps at 473 / 541 / 52 of 52. No third round.
+- **tick16's proof (NC-H1, TE-1; High; fixed).** Under PM-0001-17/tick16 and PM-0001-58/tick16 the client dropped
+  every post-wrap group as too old and filed nothing, so the twin passed on a silent drop and a judged run would have
+  read 0 mismatches. Since the fix the client files the sentinel when a header names a tick before its first snapshot
+  and at least `npt_sim::ACK_RING_TICKS` ticks behind its newest (a bad header: marks/README.md §1), and the twin
+  asserts what the judge counts: under each bite <n> client hashes at ticks the room never logged for that slot and
+  none at or past 65,536; in the clean build 0 bad of <n> compared, the hash at 65,537 equal to the mirror's. U4r's
+  judged half: carry 73. The rest of the two cases' form (a bad header never acknowledged and kept out of the frame
+  ring; a tick already resolved dropped, never the sentinel) gets its own endpoint test at U4f (carry 80 (d)).
+- **The client's late groups (carry 61 (d); B2.1): "decode".** A group of a tick still in the client's frame ring is
+  decoded and hashed under its tick. A group of a tick from the client's first snapshot on that has left the ring
+  (already resolved) is dropped, never acknowledged, and counted in `ClientEndpoint::stale()`, which is not carry 61
+  (d)'s drop and has no SERIES.md row (U4r reports its sum: carry 77). The readings list gains no entry, and carry 62
+  (g)'s drop count does not apply.
+- **-18's condition 6 (§5 U4e; NC-L1): not triggered.** Under no-fallback the room codes F = <363> against B = <329> at
+  age <34> (AfterSend) and F = <362> at age <33> (BeforeSend). B's bytes are still in the client's ring slot <9> (F uses
+  slot <11> or <10>), but the client refuses a baseline age of `ACK_RING_TICKS` or more before it looks at the frame:
+  §4.5's "the client keeps its complete frames for the same ages". B is not held, so the bite is a defect on L1, and
+  -18's L1 part counts at U4r.
+- **The own-state section (carry 56, with carry 68).** SS: <mean> B mean, <p99> B p99, <max> B max per snapshot, the
+  OwnState record <mean> B, changed in <share> of snapshots; ES: <mean> B, <p99> B, <max> B, OwnState <mean> B, changed
+  in <share>. The SS mean is above R2's 16 B a snapshot for the local player's own state (r2-netcode.md:1756): reported
+  beside it, not judged (PM-0001-12 judges the downstream total). ES's figure comes from `Recording::synthetic`'s ES
+  recording, whose alive soldiers change yaw on about 48 % of soldier-ticks and pitch on about 18 %, against R2's
+  moving-delta assumption of yaw in every moving update and pitch half the time (docs/research/r2-netcode.md:1751);
+  the own Soldier record carries both, so ES's figure reads lighter than R2's estimate and is no measure of ES's load
+  (carry 68).
+- **e7's clauses (NC-L3).** On zero-delay Loopback no tick splits and no event is resent (e7: <its print line>). The
+  split clause is carried by e2 (300 B links: <n> split ticks, <n> compared equal) and the resend clause by gap.rs's
+  clean run (<n> pairs, 0 differ, <n> and <n> events resent).
+- **Carry 26 (A7).** The room copies each step's events once a tick into its stamp list (carry 23's tick and 32-bit
+  number), a reused vector of `Copy` events; raised with the advisor, who keeps the seam as it stands.
+- **Carry 54's series (A14):** `event.snap_refused.tick_count`, its row added to SERIES.md in the merge commit.
+- **§4.2's rewind assert (NC-L5, RR-1):** met by construction: `rewind_at` returns `None` before it builds a Rewind
+  that names an unheld tick, so its debug assert cannot fire.
+- **Values the plan leaves open (NC-L11, A11):** the interest radius (64 m) and its cell, on which the plan is silent,
+  and the hit history's 2 s (provisional until U4h: carry 28) are module constants, U4e's choices; a setter or getter
+  comes with the unit that first needs one.
+- **The RTT (A2).** The pump takes each session's RTT from its `RttSource` (§4.9). The room's per-tick report from the
+  pump (`pump_report`) carries the bytes sent and the link's largest datagram, not the RTT, which U4h's tolerance will
+  read; the builder's record (u4e-build.md, design decisions) says otherwise.
+- **A known deviation (SEC-U4E-6, A13).** A Hit or Kill reaches a client that sees only the victim with the shooter's
+  slot, against ADR 0001 part 9 (f) ("no shooter id when the shooter is not relevant to the viewer"); the wire has no
+  form without it, and part 9 is proven at slice 3 (ADR 0001:1687-1688).
+- **The 1,150 B case (TE-10).** The endpoint's test datagram is refused by its trailing bytes too; the size check's own
+  proof is npt-proto's a3 test (1,151 B refused by its size).
+- **Public items beyond §4.1's rows** (A5, RR-8): <the list re-derived from the merged tree for T6, each with its
+  reason>. Made pub(crate) in the fix pass: `Roster::new`, `Roster::is_bound`, `Decoder::limits`, `Decoder::is_joined`,
+  `ConnLimits::join_deadline_ns`, `ClientEndpoint::closed`, `ClientEndpoint::unknown_pongs`, `ClientSlot::skipped`.
+  `ClientEndpoint::with_lead` stays public for U4r (carry 74). The six types plan §4.7 lists whose methods are all
+  pub(crate) (`AckRing`, `Encoder`, `EventQueue`, `InterestGrid`, `AreaFlood`, `Priority`) are public in name only.
+  The fix pass also added two public fields to public counter types, the counters' own names the review asked for:
+  `ClientCounters::resyncs_limited` and `Counters::joining_dropped`.
+- **The Resync limit (SEC-U4E-4's room half; NC2-M1, Medium; carried).** A client's `Resync` is answered at most once
+  per `npt_sim::FULL_STATE_ACK_TICKS` ticks after the last full state the room sent it; a sooner one is dropped with
+  no reply and counted (`resyncs_limited`), and the catalogue's `Resync` row says so since the merge commit. For ADR
+  0001's message table, which proposes "one in flight" as `Resync`'s rate limit (ADR 0001:688): round 1's probe Q-6
+  showed a client that acknowledges each full state drawing 29 in 30 ticks under that rule, about 8 times its
+  downstream window, so the proof test adds the time limit. As built, the limit leaves an honest `Resync` soon after a
+  full state unanswered and starts afresh on a re-join (SEC-U4E-R2-1); its form is revisited at U6, before -19's runs
+  and the boundary spike's PM-0004-61 (C-U6-16 (a)). No U4 mark meets it.
+- **Round 2's Lows** (each routed; none pushed on its own). The client's two too-old cases pinned only by what the
+  judge counts (NC2-L1, TE2-L1), and carry 61 (b)'s "two different hashes for one tick give the sentinel" failing in
+  one order U4e's room never sends (a snapshot, then a full state of another hash for that tick: RR2-2): carry 80 (d)
+  and (e), U4f; carry 61 (b) is met for every order U4e's room sends. Case 3's "once" holds while the client remembers
+  the last 32 bad-header ticks (RR2-3): marks/README.md §1's sentence says so. The limit's 30 Hz tick count
+  (SEC-U4E-R2-3), `take_control`'s bytes carrying no channel (SEC-U4E-R2-4, A-R2-1) and SEC-U4E-1's untested
+  wrong-direction case (TE2-L2): C-U6-16 (b) to (d). The catalogue's `Resync` row (SEC-U4E-R2-2): closed in the merge
+  commit. `send_control` dropping an encode error unseen, unreachable today (A-R2-2), and carry 50's test's "none at
+  256" assertion that cannot fail alone (RR2-1): follow-ups on the card.
+- **Open security findings, for PR #40's report** (each left open keeps it needs-mustafa): SEC-U4E-4's transport half
+  (Medium; C-U6-12), SEC-U4E-2 (Low; C-U6-12), SEC-U4E-5 (Low; carry 76 and C-U6-14), SEC-U4E-6 (Low; slice 3),
+  SEC-U4E-8 (Low; carry 81), SEC-U4E-9 (Low; carry 80), SEC-U4E-R2-1, SEC-U4E-R2-3 and SEC-U4E-R2-4 (Low; C-U6-16).
+  Fixed in U4e: SEC-U4E-4's room half, SEC-U4E-1 (its wrong-direction case's test: C-U6-16 (d)), SEC-U4E-3 and
+  SEC-U4E-7; SEC-U4E-R2-2 by the merge commit's catalogue line.
+```
+
 ### T7. docs/design/netcode-proof-messages.md, the `Resync` row's Authority cell (the merge commit; new)
 The old text `is dropped and counted (row 673, proposed there; plan §4.4); answered with `FullState`` (found once, in
 the `Resync` row, :90 at ab48790) becomes the text below, in place, on the row's one line (no "|" added; the cell still
@@ -271,3 +363,63 @@ starts "Sender:" and names a side, as npt-proto's catalogue test asks):
 ```
 is dropped and counted (row 673, proposed there; plan §4.4); and at most one is answered per `npt_sim::FULL_STATE_ACK_TICKS` ticks after the last full state the room sent that client (its join's, a forced one or an answered one): a sooner one is dropped with no reply and counted (`resyncs_limited`; built in U4e for SEC-U4E-4, since an acknowledgement is the client's own claim and never frees a full state by itself), so a client whose `Resync` brings no `FullState` within that span sends it again (the limit's form is revisited before -19's runs, so that an honest recovery is answered at once); answered with `FullState`
 ```
+
+## Before the merge (in this order)
+1. **M1-M4** as R9 wrote them (Q3): the copy is the one reviewed (HEAD 97bb9d3, r2-hashes-start.sha256 all OK); the
+   base still fits; the snapshot (equal to 4300944's wip/u4e.patch) and the apply; the merged bytes are the reviewed
+   bytes.
+2. **M5, amended:** T1 (this file's), T4 (advisor-u4e-r1.md's) and T7 (this file's) applied by script first; then
+   check.mjs counted on the merged tree through main-run.sh (it may run in the background with a limit of at least
+   1,500,000 ms), all 10 steps, measured 473, bites 541, self 52 of 52 (plus U4d2's deltas if it merged first, the sum
+   shown), marks 81 with the ADR rows unchanged, redact 0 findings; the by-name lines for T5 (e7 equal to
+   fx-t5print.log's).
+3. **M6 and M7** as written: a failing test re-run at once and named; `node tools/gate.mjs` (main's gate since bfda3cd)
+   before the commit, `--no-smoke` only with both logs and the reason.
+4. **M8, amended:** one commit carrying the reviewed spikes/ bytes plus T1 and T4, the catalogue with T7, and under
+   .checkpoints/ the record, u4e-report.md (T5 as its rulings section), u4-build-plan.md's §4.1 rows (T6),
+   u4s-carries.md (T2: blocks (1), (2), (4), (5) from advisor-u4e-r1.md, block (3) from this file), plan.md's U6 row
+   (T3, this file's) and the card; `git rm` of wip/u4e.patch. Each text by script, each old text found once.
+5. **M9 after the push, amended:** carries 73-81 and C-U6-12 to C-U6-16 on the card; U4e's open security findings with
+   SEC-U4E-R2-1, -3 and -4 added; the card's follow-ups A-R2-2 and RR2-1 added, RR-6's with room.rs:728 and A9's with
+   SEC-U4E-R2-4 and A-R2-1; the saver restarted; the copies removed per CHECKPOINTS.md §10 once CI is green; U4r's
+   brief names carries 73-77 and 62 (h)'s measured window.
+
+## Decisions needed
+None. Every point is a technical or test choice inside the documented vision, or a route between lanes, which is mine
+to decide. NC2-M1's carry makes U6 change the room's form so that an honest client meets the drafts' marks; it bends no
+mark, reads no ADR row (the injector's spacing, which would, is sent to me first as a §15 reading), and loosens no pass
+bar. The proof test's finding on ADR 0001's proposed "one in flight" goes to the draft through U4e's report (T5), for
+the drafts' acceptance; the drafts are Proposed and nothing about them is decided here. Every Low rides the merge
+commit's texts or waits for its unit, so Mustafa's rule on Lows holds.
+
+## For Mustafa
+Nothing. PR #40 stays needs-mustafa for its existing reasons. U4e's report will list three more open security findings
+(SEC-U4E-R2-1, -3 and -4, each Low, each carried to U6 by C-U6-16), with no action for him now.
+
+## What I checked, and what I did not
+**Checked myself (reading, git and sha256; no build, run or plant):**
+- My role file from main, whole; the brief; my round-1 ruling (R1-R9, T1-T6); the packet whole (its sha256 ecf4394a…
+  as the brief gives); the five seats' round-2 notes, whole; the builder's "Fix pass, round 1"; history.md's
+  2026-11-12 15:32 UTC entry.
+- The copy: HEAD, status, both hash lists (23 of 23 OK; the two lists byte-equal); wip/u4e.patch against 4300944's.
+- R9's premises at ab48790: spikes/ unmoved since 97bb9d3, M2's six crates, 97bb9d3 equal to 28a85e7 in spikes/; the
+  gate files, .github/ and CLAUDE.md equal main's; docs/design/ unmoved; docs/adr/ moved only in ADR 0002 and its
+  README.
+- The counted run's log (lock, pwd, builds, ten step lines, counts, times).
+- The code the rulings rest on (the Resync arm and `last_full_state`, the fresh slot on `Join`, `old_header` and
+  `bad_header`, `full_state`'s duplicate branch, `send_control`, `stream_of`, the pre-`Join` close), in the packet's
+  diffs and the copy.
+- The documents NC2-M1 cites (the catalogue :90; ADR 0001:688, :771-772; ADR 0004:582, :1182; plan.md:330-341 and
+  :1100-1101; marks.json's -19), and README §1 (:56-71) for RR2-3.
+- The catalogue's tests (what a built row's Authority cell must hold) and check.mjs's refs rule, for T7.
+- Every old text T1-T7 replace or anchor on: found once at ab48790; T3's and T5's new words compared by script with
+  round 1's (only the intended changes), and entry 80's (a) to (c) unchanged.
+
+**Not checked:**
+- I built, ran and planted nothing. The plants' results are the test seat's and the builder's logs, which I read only
+  where a ruling rests on them (P-form, P-H's first edit, the counted run).
+- C-U6-16 (a)'s forms (a bucket, or full states counted against the window) are named, not designed or tested; U6
+  chooses with me.
+- How the boundary spike's harness recovers from a trap (a `Resync` on a live session or a fresh `Join`) is its own;
+  I read only ADR 0004's words and this test's -19 rule.
+- T7's edit was not run against npt-proto's catalogue test; M5's counted run on the merged tree runs it.
