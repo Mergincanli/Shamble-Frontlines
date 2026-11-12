@@ -80,7 +80,7 @@ advisor-u4e-brief.md, advisor-u4df.md.
     Round 2: five seats in two batches (R8). Merge on M1-M9 (R9). Nothing to Mustafa. Read in full by the main
     session: R1, R8, T1-T4 (the marks texts: no pass bar's number or direction moves; T1 is stricter).
 - **Running: U4e's fix pass,** workflow wf_4c29cbe6-2fd (task wsgylkqit; script
-  workflows/scripts/npt-u4e-fixpass-r1-wf_4c29cbe6-2fd.js), launched about 08:37 UTC: one builder (general-purpose,
+  workflows/scripts/npt-u4e-fixpass-r1-wf_4c29cbe6-2fd.js), launched about 08:35 UTC: one builder (general-purpose,
   opus, xhigh), no isolation, in `.claude/worktrees/wf_0fa6595a-3e2-1`; its record's new section "Fix pass, round 1"
   in the worktree's u4e-build.md; logs .gate/u4e/fx-*; end hashes .gate/u4e/fx-hashes-end.sha256. If cut: check the
   copy for a plant in place (its record's last plant line; restore by Edit), then resume with `Workflow({scriptPath,
