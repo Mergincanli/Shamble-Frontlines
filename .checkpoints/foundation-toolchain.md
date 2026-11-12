@@ -7,7 +7,7 @@
   APPROVE of revision 3, bf1737f).
 - **Branch:** `claude/laughing-pasteur-fwya24` (this cloud session's branch, standing in for `cs/foundation-toolchain`)
   · **Base:** main 2d22b69 (PR #46 merged)
-- **Last update:** 2026-11-11 13:54 Amsterdam
+- **Last update:** 2026-11-12 16:45 Amsterdam
 
 ## Steps done
 1. Model check: `get_session` shows `session_context.model` claude-opus-5-5 (Opus 5.5) · no commit · go.
@@ -95,14 +95,22 @@
     42893708791 and pull_request 42893718283 (gate and smoke jobs, 6 check runs, all success).
 
 ## Current step
-Steps 1-4 done. Waiting for 2.1b only (LANE-RULES merged with PR #49, bb2d817; his word, 2026-11-11); PR #48 stays a
-draft. Plan revision 8 records his advisor-tool words (the tool on since 2026-11-11) and "As built, steps 1 to 4".
+Step 5 started, 2026-11-12 (his words of that day, item 1: "Step 5 no longer waits: start it as your card says";
+`mustafa-2026-11-12-step5-models.md`). 2.1b merged as 2aa5e9c (PR #51). Read on main 2aa5e9c: condition 5 holds (ADR
+0002's Status line: "Proposed. Part 1 accepted by Mustafa on 2026-11-10, his SCOPE (a) ..."); the four kit lines are
+unchanged and re-found at CLAUDE.md:20-22 (K3), :47 (K2a), :53-55 (K2b) and advisor.md:107 (K4); main changed none of
+this branch's files (no conflict expected). The guard (main's, unchanged since 2d22b69) lets `git switch -c <new>
+origin/main` in the main folder pass without asking (`mainFolderMove`, `routine-guard.mjs:1307-1318`), so no guard
+prompt for the main folder's move arises. Next: the move into `.gate/foundation-toolchain-wt`, the merge of origin/main
+there, then the four texts, the advisor tool, his chat ask.
 
 ## Next steps
-1. Step 5 (main merged in by the worktree path, condition 5's check, then K2a, K2b, K3, K4: each asked in chat with its
-   exact text and written only after his yes, then the guard's ask at the write) after 2.1b and LANE-RULES
-   have merged (LANE-RULES is in: PR #49, bb2d817; 2.1b still to come) (K4 in Accept edits or Manual mode, CLAUDE.md:67-68; after K4 the advisor runs as a general agent
-   reading main's advisor.md, CLAUDE.md:59-61); steps 6-7 after (docs in the new layout: the dashboard docs/STATUS.md,
+1. Step 5, now (both conditions met: LANE-RULES with PR #49, bb2d817; 2.1b with PR #51, 2aa5e9c): main merged in by
+   the worktree path (plan Part 8 step 5), condition 5's check (holds on 2aa5e9c), then K2a, K2b, K3, K4: each asked in
+   chat with its exact text and written only after his yes, then the guard's ask at the write (K4 in Accept edits or
+   Manual mode, CLAUDE.md:69-70 on 2aa5e9c; after K4 the advisor runs as a general agent reading main's advisor.md,
+   CLAUDE.md:61-63 on 2aa5e9c; main's verifier.md also changed after this session started (2.1b), so the verifier too runs as a
+   general agent reading main's file); steps 6-7 after (docs in the new layout: the dashboard docs/STATUS.md,
    his decisions in docs/DECISIONS.md, the rest in docs/STATUS_ARCHIVE.md; docs-keeper's file changed on main after
    this session started, so docs-keeper runs as a general agent that reads main's .claude/agents/docs-keeper.md; incl.
    REPO_MAP and the register's G0 reading;
@@ -133,6 +141,9 @@ draft. Plan revision 8 records his advisor-tool words (the tool on since 2026-11
   the guard (`routine-guard.mjs:1046`); waits for the kit to unfreeze; docs-keeper records it in the build's docs pass.
 
 ## Key numbers
+- Model check, 2026-11-12 (`get_session`): `session_context.model` and `last_served_model` both claude-opus-5-5 (Opus
+  5.5, as his models decision keeps 2.2); the record's `configured_model` field reads claude-fable-5-2 and
+  `user_switched_model` claude-opus-5-5 (not read further: the model serving the turns is Opus 5.5).
 - The guard's marks on 2.2's files (2d22b69, `marks.mjs`): protected: the new workflow, CLAUDE.md, advisor.md, the
   rules, `.npmrc`; not protected: every root pin, `crates/**`, `packages/**`, `.gitignore`; the PR Advisor may merge
   only the docs among them (REPO_MAP, STATUS, ROADMAP, SPIKE_PLAN, reports), not the register or the ADRs.
@@ -142,6 +153,13 @@ draft. Plan revision 8 records his advisor-tool words (the tool on since 2026-11
   `rustup show active-toolchain` prints `1.99.1-x86_64-unknown-linux-gnu (overridden by '<repo>/rust-toolchain.toml')`.
 
 ## Decisions taken
+- Mustafa, 2026-11-12, 15:26:57 UTC (`mustafa-2026-11-12-step5-models.md`, saved by `save-words.mjs` from the
+  transcript, byte for byte): 2.1b merged (2aa5e9c, CI run #705 green), step 5 starts as the card says, each kit edit
+  (K2a, K2b, K3, K4) asked in chat with its exact text and written after his yes; the docs pass records his merge words
+  for #51 in DECISIONS.md, captured by script from 2aa5e9c's message, as 2.1b did for #50; his decision on models word
+  for word in DECISIONS.md ("Fable 5.2 builds the game and engine code on my personal account. ... Step 2.2 stays on
+  Opus 5.5 ... Until then these words are the rule."), the CLAUDE.md wording a finding for 2.3, no CLAUDE.md edit for it
+  now; the PR a draft until its report is done; tell him when he is needed for the kit edits, and in which mode.
 - Mustafa, 2026-11-11 (`mustafa-2026-11-11-advisor-tool.md`): "extra" means on top of the advisor agent's recorded plan
   review, never instead, and not optional; with the tool on, consult it at five moments (before committing to a plan or
   approach; when an error or failed approach comes back a second time; before any change to rules, the gate, CI or
