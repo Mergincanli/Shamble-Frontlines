@@ -377,3 +377,353 @@ Block 6 written 2026-11-12.
    crates. The counted run goes in the background with a limit of at least 1,500,000 ms (INF-5; U4e round 2's Q4).
 
 Block 7 written 2026-11-12.
+
+### Block 8. Item 8: the fix pass, its builder, and round 2's seats. APPROVE on these terms.
+**Scope (each item with its proof; nothing else):**
+- **FX-1** RR-M2's first half, SEC-U4D2-5 and SEC-U4D2-6 (Blocks 1 and 3). The deps step refuses every rustflags source
+  that holds a flag, and a set CARGO_BUILD_TARGET or a `build.target` key. readBackCheck's doc and DEPS_CHECKED's limits
+  say the read-back is exact because no source may hold a flag. Self-tests: RR-M2's negation pair (both sources named);
+  `--cfg feature="bites"`, `-C overflow-checks=off` and `-C llvm-args=-fp-contract=fast` in RUSTFLAGS; a config file's
+  `rustflags`; CARGO_BUILD_TARGET; `build.target`; each FAILs by name, and an environment with none passes. Live:
+  r1-rr-superset.log's first environment (`--only deps`) now FAILs, naming both sources.
+- **FX-2** RR-M2's second half and SEC-U4D2-7 (Blocks 1 and 2). `moduleProblems` refuses a `target_features` section
+  that lists simd128 or relaxed-simd (`+` or `=`), and a module with no such section, with more than one, or with one
+  that does not parse. Self-tests: hand-built modules (check.test.mjs's wasmModule helper) for +simd128, +relaxed-simd,
+  no section, two sections, a truncated section, and the clean list accepted. Live: Block 2's target_feature plant
+  (build exit 0, the step FAILs on the loader's refusal), and the two clean modules accepted.
+- **FX-3** RR-M1, SEC-U4D2-2 and TE-M2 (Block 1): the self-test case, the fixture plant in an export's body, and TP4's
+  live plant once (the wasm32 build exits 0, deps FAILs at the line).
+- **FX-4** SEC-U4D2-1 (Block 1): every import refused by name before instantiating; `Object.create(null)`; three
+  self-tests; the loader's header and instantiate's doc corrected.
+- **FX-5** SEC-U4D2-8 and TE-L1 (Block 4): the two kind cases.
+- **FX-6** SEC-U4D2-4 (Block 4): no build script in a deny-level exception crate; `include` refused as a path there;
+  pathProblems' doc; V4's two forms as self-tests.
+- **FX-7** INF-4 (Block 3): a 300 s timeout on each of the wasm step's non-cargo child calls; a timeout is a named FAIL;
+  one self-test.
+- **FX-8** RR-L3 and EA-9 (Blocks 3 and 5): "layouts differ (<n> and <m> words)" in place of a digest, with one unit
+  test; one default for `--on`, the legs', with h6 following.
+- **FX-9** INF-3 (Block 3): the std-sin failure line's IFUNC sentence.
+- **FX-10** TE-L4 (Block 5): a failed step's whole output kept in a file under .gate/netcode-proof-test/ (one per step,
+  replaced at each run), named in its FAIL lines; one self-test.
+- **FX-11** texts: check.test.mjs:328, :364 and :529's "two" (Block 7, point 4); Cargo.toml's libm comment, sqrtf by
+  `sqrtss` (RR-L1); SEC-U4D2-3's limit beside EXPORT_INTEGERS; TickHash.recording's doc (EA-6).
+- **FX-12** RR-L2 and EA-5 (Block 4): crates/hash-wasm/clippy.toml.
+- **Not the builder's:** the report, marks/SERIES.md (T4), the plan files and the carries (T1-T3), INF-1's figures and
+  words (T5), and A13 (done).
+
+**Bounds.** Files only in U4d2's lane, and of those only: check.mjs, check.test.mjs, crates/hash-wasm (loader.mjs,
+src/lib.rs only for FX-3's and FX-2's restored plants, and the new clippy.toml), crates/lab/src/hash.rs and
+crates/lab/src/lib.rs (a doc line), and Cargo.toml's libm comment. No Cargo.lock change, no manifest change, no new
+public Rust item, and no new loader or check.mjs export beyond what a self-test imports (each one named in the record).
+No change to recordings.json, std-sin-scan.txt or co-initial-dump.txt, and no crates/sim file, not even as a plant.
+Carry 52 holds: the recordings are U4d-F's generator's, and PM-0001-2's 9.5 floor does not move. Any of these needed,
+or a test that cannot be made to fail under its plant, stops that item: the builder reports it, and it comes to me.
+
+**Who builds:** one builder (general-purpose, Opus, effort xhigh), in the same worktree (`.claude/worktrees/u4d2-build`,
+uncommitted on 51520b4), reading its record (u4d2-build.md), this ruling's Blocks 1 to 8 and the copy's diff first,
+as U4e's fix pass did. It works under W1-TARGET's lock (the lane lock held for each cargo run, the shared target only,
+offline) through u4d2-run.sh, and counts in the three-agent limit. Its brief carries, word for word, u4d2-brief.md
+section 4's binding sentences: the write rule (T4 item 1's sentence), the plant rule (B6), the stop clause with the
+crates as named there, B2.3's rule, "No retry for the `wasm` step", and Mustafa's builders' limits. It also carries
+this ruling's note on the stop clause (Block 6: an unnamed failure stops the step group, whoever's code caused it). It
+cites the plan by section heading, never by line. Its plan is written first into the record's new section "Fix pass,
+round 1", then a notes line after each FX.
+
+**Its evidence (in the record):** for each FX, the plant's diff or the environment, the run (`-x -k`), the step, test
+or self-test that FAILED by name, the restore by Edit, and the file's sha256 equal to its fixed form. Then fmt
+(rustfmt's diff applied by Edit), clippy in both builds and for wasm32, and doc. Then check.mjs counted twice in the
+copy, all 11 steps, with the counts as deltas on 416 / 465 / 63 of 63 and each new test named, and the wasm step's
+printed split from both runs. At the end, the sha256 of every changed or new file under spikes/, in `sha256sum` form
+with paths from the copy's root, saved as .gate/u4d2/fx-hashes-end.sha256.
+
+**Then the main session** re-cuts the snapshot by worktree_patch.py (wip/u4d2.patch replaced, committed), checks that
+the copy's files equal fx-hashes-end.sha256, and cuts round 2's packet by review_packet.py on what changed (round 1's
+patch at e2f2a5b, a526ef8e…, against the new one), with this ruling as the "judged against" half.
+
+**Round 2's seats, on what changed** (Opus at xhigh; counted in the three-agent limit; each brief carries T4 item 1's
+write rule and "the shared target only"; batches as round 1's, so that no timing run meets a plant):
+- **Batch 1** (runs through the runner in the builder's copy while nobody plants):
+  - **security-auditor:** FX-1 against every source form it probed (r1-sec-scan.log's name-rule cases, RR-M2's pair,
+    CARGO_BUILD_TARGET); FX-2 on sec-probe-tf2's module (refused) and on both clean modules (accepted); FX-4 on
+    sec-probe-imports' modules (each refused by name); FX-6 on V4's forms; FX-3's case; SEC-U4D2-3's comment and
+    C-U7-2's words.
+  - **rust-reviewer:** FX-1 against cargo's rustflags and build-target rules; FX-2's section parse (LEB128 lengths, the
+    prefixes, a missing or duplicated section); FX-8 (panics, casts) and FX-12 (clippy in both builds and targets);
+    FX-11's libm comment against libm 0.2.16; r1-rr-superset.log's first environment, which must FAIL now.
+  - **infra-engineer:** FX-7 (which calls, the limit, a hang's FAIL line) and FX-10 (the file's place, its replacement
+    at each run, its size); the step's time after the fix pass (`--only wasm` with `-x`, twice); T5's INF-1 words
+    against its finding.
+- **Batch 2:**
+  - **test-engineer** (with Edit, in the copy): its start hashes first, as .gate/u4d2/r2-hashes-start.sha256; each FX's
+    proof re-shown in its own form where it doubts the builder's; TP2 run 3, TP4, TP10 and TP11 re-planted, each now
+    failing by name; one counted check.mjs (in the background, with a limit of at least 1,500,000 ms).
+  - **engine-architect** (read only): T1's §4.1 rows against the final diff (a loader export the fix pass adds or drops
+    is named there); FX-2's and FX-4's place in the loader against C-U7-2's split; carries 82 and 83 and C-U7-2's words
+    against the code.
+- **Round 2's outcome:** APPROVE, or APPROVE WITH FINDINGS with Lows only, lets the merge go ahead on M1-M9; its Lows
+  become follow-ups that the main session records. A Medium comes to me first and becomes a follow-up or a carry, never
+  a third round. A High or a Critical comes to me for a third round on it alone (the review budget's one exception);
+  one still open after that stops U4d2 for Mustafa.
+
+Block 8 written 2026-11-12.
+
+### Block 9. Item 9: the merge into the spike branch, after round 2, on conditions M1 to M9 (U4e's form)
+Checked now: the spike branch's head is 6c97718. Since 51520b4 its spikes/ changes are U4e's merge c88eb31
+(crates/room, crates/server, crates/client, marks/README.md, marks/SERIES.md) and A13's 1b4a3c8
+(crates/server/clippy.toml alone). U4d2's lane paths and crates/sim are unchanged since 51520b4 (`git diff --stat`
+empty). wip/u4d2.patch applies on c88eb31 (the card). plan.md §4.2 already names the three exceptions, npt-hash-wasm
+the third (plan.md:435-447, read), and plan.md §4.1's layout line holds it (:392-393): the merge commit changes neither.
+
+The conditions (the main session's; each result goes in u4d2-build.md's new section "Merge into the spike branch"):
+- **M1, the copy is the one reviewed.** Before the snapshot, the copy's HEAD is still 51520b43391a…. `git status
+  --untracked-files=all` shows only the fix pass's final file list under spikes/netcode-proof (round 1's 17 files and
+  the new crates/hash-wasm/clippy.toml) and the record. `sha256sum -c .gate/u4d2/r2-hashes-start.sha256` from the
+  copy's root gives all OK, and that list equals fx-hashes-end.sha256. Anything else stops the merge and comes to me.
+- **M2, the base still fits.** On the spike branch's head, `git diff --quiet 51520b4 HEAD --` U4d2's lane paths
+  (spikes/netcode-proof/check.mjs, check.test.mjs, Cargo.toml, Cargo.lock, crates/hash-wasm, crates/lab,
+  crates/proto/Cargo.toml, crates/client-wasm/Cargo.toml) and spikes/netcode-proof/crates/sim is true. Every other
+  spikes/ change since 51520b4 is U4e's merge c88eb31 or A13's 1b4a3c8, listed in the notes. A13's CI (gate and smoke)
+  is green on its pushed head. Anything else stops the merge.
+- **M3, the snapshot and the apply.** The saver is stopped first. worktree_patch.py on the copy gives a patch equal
+  (cmp) to the committed wip/u4d2.patch that round 2 reviewed (its commit and sha256 in the notes), listing exactly the
+  final files. Then `git apply --check`, then `git apply`, in the main folder.
+- **M4, the merged bytes are the reviewed bytes.** From the main folder's root, `sha256sum -c` of round 2's start
+  hashes gives all OK. A patch that applies but differs stops the merge.
+- **M5, the text, then check.mjs counted on the merged tree.** First T4 (marks/SERIES.md's row), by script as M8 says,
+  since the marks step and npt-net's name tests read SERIES.md. Then check.mjs through main-run.sh (the lane lock
+  exclusive and idle at the start, the 2 s touch loop, the shared target, offline), in the background with a limit of
+  at least 1,500,000 ms, its log under .gate/u4d2-merge/. Before it, in the same call, run section 4 rule 3's six
+  builds (`cargo test --locked --workspace --no-run` and the same with `--all-features`; the release npt-lab and the
+  release wasm32 npt-hash-wasm, each in both builds), whose "Compiling npt-hash-wasm" and "Compiling npt-lab" lines
+  name the main folder's path. Expected:
+  - **all 11 steps pass;**
+  - **the counts:** measured 490, bites 560 and self 63 of 63, each plus the fix pass's delta (each new test named, the
+    sums shown); marks 81 read and checked, with the ADR rows unchanged; redact 0 findings;
+  - **the deps line:** npt-sim's features one set across the server's, npt-lab's and npt-hash-wasm's builds on the
+    merged tree, where npt-server's library is now U4e's; the read-back "given no rustflags";
+  - **the wasm line:** 27000 ticks and 0 mismatching for both pairs; h2 equal; the hash-map bite caught natively and
+    native-against-Wasm (Wasm 1 against 2 not exercised); std-sin caught at SS-s1 tick 2 `vehicle[8].pos.y`; the step's
+    printed split, under 300 s (re-timed: INF-5).
+  
+  In the same main-run.sh call, run h7 (ii) by name on release, with libtest's summary "1 passed" (carry 66's three
+  values, for T5). Any other count or line is explained in the notes before the commit. A deps or wasm FAIL on the
+  merged tree stops the merge and comes to me: it would be an interaction with U4e's crates that the copy could not
+  show.
+- **M6, a failing test is never retried into green unnamed** (B2.3; Block 5's TE-M3 route). The failing build's crate
+  is re-run at once through main-run.sh with `--no-fail-fast`. Its whole output, and FX-10's file of the failed step,
+  are kept under .gate/u4d2-merge/, and the test's name and panic go in the notes. A failure in npt-hash-wasm, npt-lab
+  or npt-sim, in check.mjs's self-tests, or in a test that reads U4d2's files stops the merge and comes to me. Any other
+  failure (TE-M3's npt-net test among them) is recorded under TE2-5, and the merge goes ahead only on a whole counted
+  run with all 11 steps passing, the earlier failure named.
+- **M7, the gate:** `node tools/gate.mjs` before the commit. If smoke (5a) cannot start this container's Chromium, use
+  `--no-smoke`, keep both logs and give the reason in the notes. CI's gate and smoke are green on the pushed head.
+- **M8, one commit,** "U4d2: the Wasm-in-Node hash and the determinism step (npt-hash-wasm, npt-lab's `hash`,
+  check.mjs's wasm step), merged after review round 2". It carries:
+  - the spikes/ files exactly as applied, with T4 in marks/SERIES.md;
+  - `git rm` of wip/u4d2.patch;
+  - under .checkpoints/ only: u4d2-build.md (with "Fix pass, round 1" and "Merge into the spike branch");
+    u4d2-report.md (new; T5 is its rulings section, and the rest takes u4e-report.md's form: who built it, the rounds,
+    the checks on the merged tree, the carries met and added by number, the public items, the Wasm sizes, the timing
+    as T5 labels it, the follow-ups, Decisions needed, For Mustafa); u4-build-plan.md's §4.1 rows (T1); u4s-carries.md
+    (T2); plan.md's U7 row (T3); and the card.
+  
+  Every text is copied by script from this file's code blocks, never retyped: each old text found exactly once (line
+  breaks read as spaces), each new text found in place after, and no changed prose line over 120 characters (a table
+  line, as T1's, T3's and T4's, is not prose). If the fix pass's final diff adds or drops a loader export, T1's list
+  follows it as round 2's engine-architect names it. That is the one allowed change to a text, and it is recorded.
+  The commit's spikes/ part is the reviewed bytes plus T4, and nothing else.
+- **M9, after the push:**
+  - the saver restarted;
+  - the card updated: U4d2 merged at <sha>; the base counts for U4r; carries 82 and 83 and C-U7-2; the open security
+    finding SEC-U4D2-3 (Low, carried by C-U7-2) for PR #40's report; TE2-5 (c), TE-M3's planned change; the follow-ups
+    (RR-L4 with EA-1, INF-2, INF-3's CPU record, INF-7, and §7.1 item 6's text: see "What I checked");
+  - the copies removed per CHECKPOINTS.md §10 once CI is green: `.claude/worktrees/u4d2-build`, `.gate/u4d2-r1` and
+    `.gate/u4d2-prefix`, and `.gate/u4d2-rr-target` by `cargo clean --target-dir`;
+  - then, with wave 2 over and no lane running, the between-waves clean of the shared target (`cargo clean
+    --target-dir .gate/shared-target`: W1-TARGET item 3), and one `node check.mjs --only wasm` through main-run.sh,
+    whose seconds are INF-1's cold figure, recorded on the card and in U4's report before U4r's brief.
+
+Block 9 written 2026-11-12.
+
+## The texts (each copied by script from its code block; never retyped)
+Each anchor below was found exactly once at the head (6c97718), counted with `grep -cF`. Carry numbers 82 and 83 and
+the name C-U7-2 are free (no entry, no mention).
+
+### T1. u4-build-plan.md §4.1: npt-lab's row and npt-hash-wasm's row (the merge commit)
+(a) The row `| npt-lab | subcommands `scenario` (with `--record`), `replay` and `hash` | plan.md:590-591 |` becomes:
+```
+| npt-lab | subcommands `scenario` (with `--record`), `replay` and `hash` (`hash` with its modes: the two native legs, `compare`, `vectors` and `bites`); in the library, `HashCompare` (its constructor `of` and its variants `Equal`, `Empty` and `Mismatch`) and `TickHash` (the per-tick entry `of` takes); in the run header, the param `fate_log_v1_datagram_sha256` | plan.md:590-591; the advisor's condition 2 (`HashCompare` is U4r's -30 comparer, so it lives in the library and reads no file); §4.6's "0 compared fails" (`Empty`, as npt-judge's `eval::Outcome::Empty`); carry 66 (the v1 datagram hash, for §5 U4c's L-c8); the advisor's U4d2 round-1 ruling (EA-7) |
+```
+(b) The row `| a new crate | `npt-hash-wasm` (cdylib; integer-only exports) | U4-WASM (B) |` becomes:
+```
+| a new crate | `npt-hash-wasm` (cdylib): its seven `#[unsafe(no_mangle)] pub extern "C"` exports `begin`, `feed`, `step`, `hash_lo`, `hash_hi`, `dump_len` and `dump_word`, integer-only (u32), every const private, beside wasm-ld's `memory`; its Node loader crates/hash-wasm/loader.mjs, exporting `HASH_WASM_EXPORTS` (the export list's one home, which check.mjs imports), `LINKER_EXPORTS`, `LOADER_EXPORTS`, `BEGIN`, `STEP`, `moduleProblems`, `exportProblems`, `instantiate`, `forEachChunk`, `replay`, `parse` and `main` | U4-WASM (B); plan.md §4.2's third `unsafe` exception (ADR 0002:264-265); U7 splits the loader for the browser (C-U7-2); the advisor's U4d2 round-1 ruling (EA-7) |
+```
+
+### T2. u4s-carries.md §U4r, after entry 77 (its last), above "## The next change to crates/judge (whoever makes it; its first step)" (the merge commit)
+```
+82. **EA-8 with RR-L5, the recordings manifest (u4d2-review-arch.md, EA-8; u4d2-review-rust.md, RR-L5; the advisor's
+    U4d2 round-1 ruling, Blocks 4 and 5):** "U4r's runner recordings join crates/lab/recordings.json (§4.15), whose
+    entries today hold only the synthetic generator's inputs, read by hash.rs's `manifest` and generated by its
+    `regenerate_all`: U4r changes that schema (a kind or script key, and the dispatch both functions need), and its
+    brief says so. With that change, the reader checks each entry's name against `[A-Za-z0-9-]+` and bounds `ticks` by
+    `bytes / 12` before it generates anything (today a bad name reaches a file path and the `h <recording> <tick>
+    <hash>` line, and a large `ticks` reaches `Vec::with_capacity` before the length and SHA-256 check)."
+83. **EA-6, EA-3 and TE-L3, the comparer for -30 and the wasm step's verdicts (u4d2-review-arch.md, EA-3 and EA-6;
+    u4d2-review-test.md, TE-L3; the advisor's U4d2 round-1 ruling, Block 5):** "(a) For -30's pre-check, U4r gives
+    `HashCompare::of` two lists that name the same recording on both legs and line up tick for tick (it compares by
+    position, names included), and says where its printed comparison line comes from (`compare_text` is private to
+    npt-lab's binary). (b) At U4r's change to check.mjs's `wasm` step (its recordings: entry 82), the clean half also
+    requires exit 0 from `npt-lab hash` and `npt-lab hash compare` (today the verdict is read from their English lines
+    alone, which fails closed), with one fixture case each. (c) In the same change, the std-sin verdict re-shows that
+    the bite causes the mismatch it judges: the bitten native leg's first difference from a clean bites-build native leg
+    is the committed (recording, tick, field), or the step FAILs when the committed catch is not on the manifest's
+    first recording before the hash-map bite's arming tick (today it is sound only because SS-s1's tick 2 lies inside
+    the hash-map pair's equal prefix)."
+```
+
+### T3. plan.md's U7 row: C-U7-2 (the merge commit)
+The text `or states why not |` (found once, at the end of the U7 row's last cell) becomes the text below, on the row's
+one line (no "|" added inside the cell):
+```
+or states why not. **C-U7-2** (the advisor's U4d2 round-1 ruling, 2026-11-12: EA-2, EA-4, INF-6, SEC-U4D2-3 and TE-L2): U7's Chromium hash check loads U4d2's npt-hash-wasm.wasm as it is (no imports; the seven integer exports and `memory`), and splits crates/hash-wasm/loader.mjs into a browser-safe module (the export list, its one home kept; the status numbers, with one home or a test binding them to lib.rs's constants; `moduleProblems` with its import, kind and `target_features` refusals; the replay loop over a chunk source) beside the Node script; `moduleProblems` also reads each export's type from the module's type section and refuses any but i32 (U4d2's source scan reads the token `u32` only), and it runs on the wasm-opt output C-U7-1 checks, so U7 keeps that output's `target_features` section or states how it checks the features; U7's brief names how its Chromium leg and wasm-opt get pinned tools (no CI job runs spikes/; a CI home is .github/ work, risk tier 2, Mustafa's go) |
+```
+
+### T4. marks/SERIES.md, the header-params table, after `fate_log_sha256`'s row (the merge commit, before M5's run)
+After the line `| `fate_log_sha256` | hex string | -3 |` (found once, :397 at the head), insert:
+```
+| `fate_log_v1_datagram_sha256` | hex string: the SHA-256 of v1's tag and the v2 fate log's datagram entries (carry 66), which §5 U4c's L-c8 compares with U2's committed hashes | -3 (recorded) |
+```
+
+### T5. u4d2-report.md's section on the review's rulings (new file, beside u4e-report.md)
+Copied by script as it is. Each `<…>` is a value the main session fills from the named source (round 2's notes, the
+fix pass's record, or the merged tree's M5 lines), and the notes name the log and line of each fill; no other word
+changes.
+```
+## What U4d2's review settled (the advisor's U4d2 rulings: round 1, advisor-u4d2-r1.md; round 2, <round 2's ruling file>)
+- **Round 1** (five seats on one head, 51520b4 plus the snapshot at e2f2a5b; the spend limit cut the second batch at
+  20:52 UTC, after the architect's and the test seat's plans and with no plant in place, and both resumed at 22:53 on
+  the same bytes, so one round): rust-reviewer, security-auditor and test-engineer REVISE, infra-engineer and
+  engine-architect APPROVE WITH FINDINGS; no Critical or High; six Mediums (RR-M2 = TE-M1; RR-M1 = SEC-U4D2-2 = TE-M2;
+  SEC-U4D2-1; SEC-U4D2-7; INF-1; TE-M3). One fix pass (FX-1 to FX-12), then round 2 on what changed: <round 2's
+  verdicts>.
+- **The build-flag guard was fail-open for one case, now closed (RR-M2; Medium; fixed).** The read-back gave rustc every
+  rustflags source at once, but cargo uses only the first non-empty one, so a negation in a source cargo skips hid an
+  enabling flag in the one it used: the deps step passed while the module built so listed +simd128 and +relaxed-simd.
+  The advisor's U4D2-Q4 ruling had called that superset fail-closed; it was not. Since the fix the deps step refuses
+  every rustflags source that holds a flag (the spike's builds use none), and a set CARGO_BUILD_TARGET or
+  `build.target`, so the read-back reads exactly what cargo gives rustc; and the loader refuses a module whose
+  `target_features` section lists simd128 or relaxed-simd, or that has none, which also covers a safe
+  `#[target_feature]` function reaching the Wasm leg with no flag and no `unsafe` (SEC-U4D2-7; Medium; fixed).
+- **The third exception's guards (RR-M1, SEC-U4D2-1; Medium; fixed).** An `unsafe` block inside a listed export's body
+  is accepted by rustc under the export's own allow, so only the deps scan refuses it: that case now has its self-test
+  and was shown live (build exit 0, deps FAIL at its line). The loader's empty import object inherited
+  Object.prototype, so a module importing `constructor.constructor` instantiated; it now refuses every import by name
+  and instantiates with a null-prototype object. The kind refusal has its two self-tests (SEC-U4D2-8); a build script
+  and `include` used as a path are refused in the deny-level exception crates (SEC-U4D2-4).
+- **The step's time (INF-1; Medium; report text).** Every figure here is warm for dependencies, the workspace rebuilt
+  by the runner's touch loop: <the fix pass's and round 2's wasm step seconds>, and <the merged tree's> on the merged
+  tree, against a 5-minute budget. No cold run was taken before the merge: the shared target always held other lanes'
+  release dependencies, and Mustafa's one-folder rule gives a copy no empty target. The first release builds in the
+  lane took 16.04 s (npt-lab) and 3.57 s (npt-hash-wasm, wasm32), and the infra seat's bound for a cold step is about
+  80 s. The cold figure comes from the first run after the between-waves clean of the shared target (W1-TARGET item 3):
+  <its seconds, from the card>.
+- **An npt-net test that fails under load (TE-M3; Medium; not U4d2's).** `l2::delay::tests::a_shutdown_s_never_
+  completes_ends_at_its_deadline_without_spinning` failed once in the test seat's counted run (bites build) and passed
+  on the immediate re-run; it failed the same way in U3c. It reads no U4d2 file and is in no crate U4d2 changes, so it
+  did not stop the merge (B2.3's rule); its cause is a planned change of the main session's before U4r's merge (TE2-5
+  (c)). Since FX-10, a failed step's whole output is kept in a file, so the next failure keeps its panic.
+- **Process slips, none weakening the evidence.** The builder judged an unnamed check.test.mjs failure inside its step
+  instead of stopping (its own new rule repeated a sentence the test pins once; the test is unchanged and still bites:
+  TP9); three early `npt-lab hash` runs took the shared lock where `-x` was asked (none a reported result; each value
+  re-checked under `-x`); the rust seat built one module in a scratch target off the shared one (38 MB, removed by
+  `cargo clean --target-dir`) to keep a SIMD-built module out of it. The builder's brief cited four plan spans, and
+  U4r's two lines, at the plan's earlier stamp; the build covered §5 U4d2 whole.
+- **Carries.** Met: 29 (Cargo.toml's libm comment; sqrtf is `sqrtss`, sqrt `sqrtsd`, a correction to the carry's own
+  words), 41, 52 (only recordings by U4d-F's generator, adb1bab), 65 (the failing tests named; their panics kept since
+  FX-10), 66 (<the three v1 datagram hashes and their commands>); 42 does not apply (entry 34 was met by U4a). Added:
+  82 and 83 (U4r), C-U7-2 (U7).
+- **Open security finding:** SEC-U4D2-3 (Low): the integer-signature rule reads the token `u32`, not the type; the
+  limit is written beside the rule, and the type-section read is U7's (C-U7-2). Every other security finding of the
+  review is fixed in this change.
+```
+
+## Before the merge (in this order)
+1. **The fix pass** (Block 8): FX-1 to FX-12 in the builder's copy, with their proofs; the snapshot re-cut and
+   committed; round 2's packet.
+2. **Round 2** on what changed (Block 8's seats and batches), and its outcome under Block 8's rule (a Medium to me
+   first; a High or Critical a third round on it alone).
+3. **M1 to M4:** the copy is the one reviewed; the base still fits (U4e's merge and A13's commit the only other spikes/
+   changes; A13's CI green); the snapshot equal to the committed one, applied; the merged bytes equal round 2's start
+   hashes.
+4. **M5:** T4 by script; then check.mjs counted on the merged tree in the background (limit at least 1,500,000 ms),
+   after the six builds, all 11 steps, the counts 490 / 560 / 63 plus the fix pass's named deltas, marks 81, redact 0,
+   the deps and wasm lines as Block 9 says, and h7 (ii) by name.
+5. **M6 and M7:** a failing test re-run at once and named (TE-M3's flake does not stop the merge, but the merge needs a
+   whole clean run); `node tools/gate.mjs`, with `--no-smoke` only alongside both logs and the reason.
+6. **M8:** one commit carrying the reviewed spikes/ bytes plus T4, and under .checkpoints/ the record, u4d2-report.md
+   (T5), u4-build-plan.md (T1), u4s-carries.md (T2), plan.md (T3) and the card; `git rm` of wip/u4d2.patch.
+7. **M9 after the push:** the saver; the card (carries 82, 83 and C-U7-2; SEC-U4D2-3 open; TE2-5 (c); the follow-ups);
+   the copies and the rust seat's scratch target removed; then the between-waves clean and the cold `--only wasm` run
+   (INF-1), before U4r's brief, which names carries 82 and 83.
+
+## Verdict, per item of the brief
+| Item | Verdict | In one line |
+|---|---|---|
+| 1. RR-M2 (= TE-M1) | REVISE: fix pass, FX-1 and FX-2 | every rustflags source with a flag refused, plus the module's `target_features` read; my Q4 (a)'s "fail-closed" corrected |
+| 1. RR-M1 (= SEC-U4D2-2 = TE-M2) | REVISE: fix pass, FX-3 | the export-body self-test, the fixture plant in a body, TP4's live plant |
+| 1. SEC-U4D2-1 | REVISE: fix pass, FX-4 | every import refused by name; `Object.create(null)` |
+| 1. INF-1 | APPROVE as report text (T5) | the cold figure after the between-waves clean (W1-TARGET item 3); no §7.1 exception, nothing to Mustafa |
+| 2. SEC-U4D2-7 | APPROVE as a finding: fix pass, FX-2 | not a carry: the same section read, failing closed |
+| 3. SEC-U4D2-5, -6; INF-3; INF-4; RR-L3 | APPROVE routes: FX-1, FX-1, FX-9 (+ a follow-up), FX-7, FX-8 | each rides the needed push |
+| 4. the other Lows | APPROVE routes (Block 4) | FX-5, FX-6, FX-11, FX-12; carries 82 and C-U7-2; follow-ups; M5's wording |
+| 5. EA-1 to EA-9 | APPROVE WITH FINDINGS accepted; routes (Block 5) | FX-8, FX-11, FX-12; carries 82, 83, C-U7-2; T1; a follow-up |
+| 5. TE-M1, -M2; TE-L1 to -L4 | accepted; FX-1 to -5, FX-10, FX-11, carry 83, C-U7-2 | the test seat's runs stand as evidence |
+| 5. TE-M3 | APPROVE as a finding, not before the merge | M6's rule at the merge; its cause a planned change before U4r's merge (TE2-5 (c)); B2.3's rule stays until then |
+| 6. TE2-5 mid-build | outside the stop clause's letter; outcome stands; Low process slip in T5 | the clause stays as written |
+| 6. the three `-s` runs; rustfmt by Edit | slip recorded (Low); within the rule | no redo |
+| 7. points 1-5 | confirmed, 1 and 4 with one addition each; A13 checked at 1b4a3c8 | Block 7 |
+| 8. the fix pass and round 2 | APPROVE on Block 8's terms | FX-1 to FX-12; one builder, same worktree; five seats, two batches |
+| 9. the merge | M1 to M9 (Block 9) | 11 steps; 490 / 560 / 63 plus the fix pass's deltas; T1-T5 by script |
+
+Risk tier 1 (spike code and the spike's own check on PR #40's branch; check.mjs is not one of tools/' gate files), as
+at the brief check. Round count: round 1 done; one fix pass; round 2 on what changed; a third only for an open Critical
+or High.
+
+## Decisions needed
+None. Every point is a technical or test choice inside the documented vision, a route between units, or a correction
+of my own earlier ruling (U4D2-Q4 (a)'s "fail-closed"), all of which I decide. INF-1's cold figure needs no exception to
+Mustafa's shared-target rule: W1-TARGET item 3's between-waves clean is an approved method within his one-folder words
+(history.md:411-412). No word or decision of Mustafa's changes, and nothing a player sees, hears or feels is touched.
+
+## For Mustafa
+Nothing. PR #40 stays needs-mustafa for its existing reasons. U4d2's report will list one open security finding
+(SEC-U4D2-3, Low, carried to U7 by C-U7-2), with no action for him now. For his information: one reviewer seat ran one
+cargo build into its own 38 MB scratch folder instead of the shared one, a slip against his one-folder rule. Its
+reason was sound, it is in the report, and the folder is removed at M9.
+
+## What I checked, and what I did not
+**Checked myself (reading, git and sha256; no build, run or plant):**
+- My role file from main, whole; the brief, whole; the five seats' notes and the builder's record, whole; my brief
+  check (advisor-u4d2-brief.md), whole; U4e's R8, R9 and round-2 Q3 and Q4, for the form.
+- The rules by place: §5 U4d2, Lanes, §6, §7.1 and Mustafa's words behind it; W1-TARGET item 3; B2.3; carries 29, 41,
+  42, 52, 65 and 66; plan.md §4.2 and §4.5.
+- The copy: HEAD, status, and the 17 sha256 against the test seat's start list. The code each fix's form rests on
+  (check.mjs's rustflags sources, flag rules, read-back, run, failedRun and main's FAIL print; the loader's refusal
+  and instantiate). The seats' logs at the lines the Mediums cite.
+- The main session's points: the plan's headings at 1e8c188 and 51520b4; the brief's stale cites; the three "two"
+  texts; A13's commit, its plant log and its counted run; §4.1 at the head; the loader's and check.mjs's exports; every
+  anchor of T1 to T4, found once.
+- **A drift seen on the way (a follow-up, not U4d2's):** u4-build-plan.md §7.1 item 6 says the main folder's merge
+  checks run on its own cache with CARGO_TARGET_DIR unset. main-run.sh, which U4j's round-2 M5 and every merge since
+  have used, sets the shared target. The practice follows a later ruling, so the plan's text should say so; the main
+  session edits it at U4's close, or names the ruling.
+
+**Not checked:**
+- I built, ran and planted nothing. The fix forms rest on the seats' runs and on my reading of the code. I did not
+  confirm that a safe `#[target_feature(enable = "simd128")]` function with no SIMD intrinsic in its body makes wasm-ld
+  list +simd128; Block 2 names the relaxed_madd form the security seat proved as the fallback for FX-2's plant.
+- My reading that, on x86-64, calling a `#[target_feature]` function from code built without that feature needs
+  `unsafe` (Rust's target_feature 1.1) is from memory. I did not check it against the reference this run. It decides
+  only why the native legs are not SEC-U4D2-7's concern.
+- I did not read the packet's diff sections line by line. I read the changed files' load-bearing parts in the copies.
+- I did not re-run any seat's timing, and I did not check A13's CI run myself; M2 asks for it.
