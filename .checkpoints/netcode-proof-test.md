@@ -73,7 +73,8 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    resume with `Workflow({scriptPath, resumeFromRunId})` (script workflows/scripts/npt-u4d2-r1-advisor-wf_ff32624e-10a.js).
    On return: read it whole; then the fix pass as it rules. Meanwhile, A13's server item (Next steps 4), unless the
    ruling says to wait. **A13 DONE at 1b4a3c8** ("A13: npt-server's clippy.toml gains the HashMap and HashSet type
-   bans", pushed about 23:36 UTC, its own commit, the saver stopped for it; CI on it pending): the counted run
+   bans", pushed about 23:36 UTC, its own commit, the saver stopped for it; CI green: gate runs 43330155579 push and
+   43330163225 pull_request; main unmoved at 2aa5e9c, so no conflict): the counted run
    (a13-check-counted.log, 23:25:24 to 23:34:59 UTC) all 10 steps PASS, measured 473, bites 541, self 52 of 52, marks
    81 (ADR rows unchanged), redact 0 findings: the counts unchanged. The advisor's next ruling on the spike branch
    checks it. The record of the work: crates/server/clippy.toml gains the HashMap and
