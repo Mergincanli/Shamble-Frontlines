@@ -67,7 +67,29 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    packet_name_check.py 12 of 12); u4d2-packet.md cut from u4d2-packet.json (sha256 9b670276…, 373 KB; its side file
    u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
-   **(j) Running: U4d2's fix pass,** workflow wf_bb054eb3-70b (task wy27y3276; script
+   **(k) Running: U4d2's review round 2,** workflow wf_969ab29d-637 (task w538kzcct; script
+   workflows/scripts/npt-u4d2-review-r2-wf_969ab29d-637.js), launched about 00:36 UTC on 2026-11-13, on what changed:
+   batch 1 (Read) security, rust, infra in the builder's copy while nobody plants (the infra seat times `--only wasm`
+   with `-x` twice); batch 2 (Prove) test (general-purpose with Edit; start hashes .gate/u4d2/r2-hashes-start.sha256;
+   TP2 run 3, TP4, TP10, TP11 re-planted; one counted check.mjs in the background, at least 1,500,000 ms) beside arch
+   (read only, the read copy `.gate/u4d2-r2`: 51520b4 plus the new patch, 18 of 18 OK against fx-hashes-end, `diff
+   -rq` equal). Packet u4d2-r2-packet.md (sha256 dc753b5d…, 107 KB; side file u4d2-r2-packet-tests.md) from
+   u4d2-r2-packet.json: round 1's tree `.gate/u4d2-r1` against the fixed copy, the ruling's Blocks 1-8 and texts
+   T1-T5, the carries. Notes u4d2-r2-review-{security,rust,infra,test,arch}.md; logs .gate/u4d2/r2-*. If cut: check
+   the builder's copy with `sha256sum -c .gate/u4d2/fx-hashes-end.sha256` from its root (a plant may be in place;
+   restore by Edit until all 18 are OK) and crates/sim untouched, then resume with `Workflow({scriptPath,
+   resumeFromRunId})`. On return: every Medium or higher in full, and what touches the judge, the marks or a pass
+   bar; then Block 8's outcome: APPROVE, or Lows only → the merge on M1-M9 (read Block 9, the texts and "Before the
+   merge" in full first); a Medium → the advisor first; a High or Critical → the advisor, a third round on it alone.
+   **The fix pass: DONE** (about 00:31 UTC; not stopped; no TE2-5): FX-1 to FX-12 each done, each proof failing by
+   name and each restore sha256-checked (FX-11 text only); two counted runs (fx-check1.log, fx-check2.log) all 11
+   steps PASS, measured 417 (+1, FX-8's unit test), bites 466 (+1), self 71 of 71 (+8), the wasm step 41.8 s and
+   40.5 s; new check.mjs exports buildInputProblems and FAILED_STEP_DIR, each imported by a self-test; Cargo.toml's
+   change is the libm comment only (diff read); Cargo.lock, every manifest, hash-wasm's src/lib.rs, recordings.json,
+   std-sin-scan.txt and co-initial-dump.txt byte-equal to round 1's (cmp); 18 of 18 OK against fx-hashes-end.sha256.
+   Snapshot wip/u4d2.patch re-cut (18 files on 51520b4, sha256 9e71cda0…; applies on 51520b4 and on the spike head),
+   its record u4d2-build.md copied, committed at cb27931 (the saver stopped for it; now bei5o4kd5).
+   **(j) U4d2's fix pass,** workflow wf_bb054eb3-70b (task wy27y3276; script
    workflows/scripts/npt-u4d2-fixpass-r1-wf_bb054eb3-70b.js), launched about 23:45 UTC: one builder (general-purpose,
    opus, xhigh), no isolation, in `.claude/worktrees/u4d2-build`; FX-1 to FX-12 as the ruling's Block 8 says; the
    prompt points at u4d2-brief.md section 4's binding lines (650-690, 698-714, 724-730; Mustafa's words there by
@@ -160,8 +182,8 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    with `Workflow({scriptPath, resumeFromRunId})`. On return: read its section 6 list and every stop in full; snapshot
    the worktree (worktree_patch.py) and commit it; then the review per 7.2 item 7's panel (rust-reviewer,
    engine-architect, test-engineer, infra-engineer, security-auditor), with U4e's seats counted in the three.
-- The saver runs as bht12f61p (since 23:36 UTC, after A13's commit; restart it when it stops, with run_in_background
-  and timeout
+- The saver runs as bei5o4kd5 (since 00:33 UTC on 2026-11-13, after the fix pass's snapshot; restart it when it stops,
+  with run_in_background and timeout
   7200000: without the timeout the harness stops it at 30 minutes, as it stopped bg29bb0pt at 16:42 UTC). The chat's size goes in every
   report.
 
