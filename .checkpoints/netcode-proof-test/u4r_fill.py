@@ -44,7 +44,7 @@ COUNTED = ".gate/l3-manifests/counted.log"
 BRANCH = "claude/netcode-proof-test-plan-hcky5g"
 SP = "spikes/netcode-proof"
 L2C, L3C, TEM3C, U4D2C = "8bcbf36", "4e91830", "c49773f", "cc8595d"
-MAIN48 = "4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300"     # main's head merged into the branch at MAIN-48 (7685b2b, PR #48)
+MAIN48 = "4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300"     # main's head merged at MAIN-48 (7685b2b, PR #48)
 HASHES = {
     BRIEF: "362e771eb9e7166ef2751e3b57cf285c198e345e2cecf1e288b8e40a9ac4b241",   # rev 3.2 (a6b3410)
     PLAN: "1e631c55f4c4777edf0357b349fc5c8566d7410daffded926a06f82ff02f47d5",    # as L2 left it (8bcbf36)
@@ -555,8 +555,8 @@ def map_cite(line, k, tokm):
         fw, lw = PIN[key]
         for D, x, y, v in ((O, a, b, "8bcbf36~1"), (Nn, a + s, b + s, "now")):
             assert fw in at(D, x) and lw in at(D, y), (key, v, x, y)
-        return new, (f"shifted {s:+d} (an unchanged block), by its text (PIN: {k} :{a} {fw!r}, :{b} {lw!r}; now :{a + s} "
-                     f"and :{b + s})")
+        return new, (f"shifted {s:+d} (an unchanged block), by its text (PIN: {k} :{a} {fw!r}, :{b} {lw!r}; now "
+                     f":{a + s} and :{b + s})")
     return new, f"shifted {s:+d} (an unchanged block)"
 
 
@@ -630,8 +630,8 @@ LOG.append(f"cites: {len(CITES)} inventory entries ({sum(len(list(TOK.finditer(w
            f"tokens), each found once; {len(MANUAL)} MANUAL keys and {len(PIN)} PIN keys each used once; the "
            "classifier finds no other moved plan or carries cite outside section 10 (its one false positive: brief "
            ":1263's :752-758, l1/src/lib.rs's BITE_IDS)")
-LOG.append("the change lists at the top (FQ4 :103-105, \"every other cite\"; the main session's decision 1): their moved "
-           "plan cites are in the inventory above, :160's and :166's re-pointed and :45's held by its text: "
+LOG.append("the change lists at the top (FQ4 :103-105, \"every other cite\"; the main session's decision 1): their "
+           "moved plan cites are in the inventory above, :160's and :166's re-pointed and :45's held by its text: "
            + ", ".join(TOP_INV))
 LOG.append(f"left as written, section 10 whole (FQ4 :102-104): {len(LEFT_S10)} moved cites: " + ", ".join(LEFT_S10))
 
@@ -774,14 +774,29 @@ ITEMS.append(dict(tag="stamp history and sentence", old=STAMP_HIST, new=hist_new
                       "main session's words"))
 MAIN.append("section 0's stamps bullet, after the history stamp: " + SENT0)
 
+# ---------------------------------------------------------------- the launch's record under the title (decision 6)
+# one sentence at the end of the title block's rev 3.2 paragraph, the main session's words, `<base>` as read
+TITLE_END = "values (section 12 items 1 to 3, next)."
+TR = [i for i in range(H0) if ORIG[i] == TITLE_END]
+assert len(TR) == 1 and ORIG[TR[0] + 1] == "" and ORIG[TR[0] - 13].startswith("Rev 3.2 is the main session's fold"), TR
+TR = TR[0]
+assert ORIG[TR - 14] == "" and not any(ORIG[i] == "" for i in range(TR - 13, TR)), "the rev 3.2 paragraph"
+assert HIST_COMMITS and hist_new != STAMP_HIST, "the record says history's stamp was re-set (822c010's MAIN-48 lines)"
+SENT_TITLE = (f"At launch, by u4r_fill.py at `<base>` {B7}: P6 and P7 filled; P1 to P5 and P8 to P16 copied; "
+              "section 0's plan, carries and history stamps re-set and the cites L2 moved re-pointed, section 10 kept as "
+              "written; section 9's R11 re-walked for L3.")
+ITEMS.append(dict(tag="record (title)", old=TITLE_END, new=TITLE_END + " " + SENT_TITLE,
+                  src=f"the main session's words (decision 6), `<base>` {B7} as read"))
+MAIN.append("the title block's rev 3.2 paragraph, its last sentence (the launch's record): " + SENT_TITLE)
+
 # ---------------------------------------------------------------- items 1 and 2: P6 and P7 where they stand
 P6_1_OLD = ("(P6, filled by the main session at launch: the spike branch's head then; U4r depends on U4c, U4d2, U4e "
             "and U4j, plan :750, all merged by cc8595d).")
 P6_1_NEW = (f"(P6, filled by the main session at launch: {BASE}, the spike branch's head then, whose "
             f"spikes/netcode-proof is 4e91830's, L3's manifests (`git diff --quiet 4e91830 {B7} -- spikes/netcode-proof` "
-            "exits 0); U4r depends on U4c, U4d2, U4e and U4j, plan :750, all merged by cc8595d; your worktree may start "
-            "at a later commit whose spikes/ is `<base>`'s, the main session's fill commit, as at U4d2's launch, whose "
-            "builder recorded `git diff --stat <base> HEAD -- spikes/` empty).")
+            "exits 0); U4r depends on U4c, U4d2, U4e and U4j, plan :750, all merged by cc8595d).")
+# the main session's decision 3: the value only, in U4d2's form (the worktree's start commit is in the launch prompt)
+assert P6_1_NEW.endswith("all merged by cc8595d).") and "worktree" not in P6_1_NEW, P6_1_NEW
 P6_4_OLD = f"The base: {COUNTS} (P6: the counts at `<base>`; at cc8595d,"
 P6_4_NEW = f"The base: {COUNTS} (P6: the counts at `<base>`, {B7}, whose spikes/netcode-proof is 4e91830's; at cc8595d,"
 P6_12_OLD = "1. **`<base>` and its counts (P6).**"
@@ -974,7 +989,7 @@ for it in sorted(ITEMS, key=lambda x: x["rev32"]):
     how = block(it["tag"], it["names"]) if it.get("kind") == "block" else edit(it["tag"], it["old"], it["new"])
     a, b = it["rev32"]
     site = f":{a}" if a == b else f":{a}-{b}"
-    what = it["tag"] if it["tag"].startswith(("P", "R11", "tally", "stamp")) else "re-pointed"
+    what = it["tag"] if it["tag"].startswith(("P", "R11", "tally", "stamp", "record")) else "re-pointed"
     LOG.append(f"brief {site} ({what}): {it['src']}; {how}")
 
 # ---------------------------------------------------------------- the checks
@@ -1005,17 +1020,31 @@ for i in range(H10, H11):                                             # section 
     assert ORIG[i] in L, ("section 10 changed", i + 1)
 s10n = head("## 10. Questions for the advisor", L)
 assert L[s10n:s10n + (H11 - H10)] == ORIG[H10:H11], "section 10 changed"
-assert L[:H0] == ORIG[:H0], "the top (title, records, change lists) changed"
+# the top (title, records, change lists): rev 3.2's lines with exactly these changes (decisions 1 and 6): the launch's
+# record after the rev 3.2 paragraph's last words (that line rewrapped within 120 with it, the paragraph's other lines
+# as they are) and, each in its line, C22's and C24's moved plan cites
+TOPCITE = ((160, "(plan :885-886)", "(plan :886-887)"), (166, "(:917-918)", "(:918-919)"))
+TOP_WANT = list(ORIG[:H0])
+for ln_, o_, n_ in TOPCITE:
+    assert TOP_WANT[ln_ - 1].count(o_) == 1, (ln_, o_)
+    TOP_WANT[ln_ - 1] = TOP_WANT[ln_ - 1].replace(o_, n_)
+J0 = head("## 0. How to read the citations", L)
+KT = J0 - H0 + 1                                                      # the record's line, as it stands now
+assert KT >= 2 and L[:TR] == TOP_WANT[:TR] and L[TR + KT:J0] == TOP_WANT[TR + 1:], ("the top changed beyond decisions "
+                                                                                   "1 and 6", KT)
+assert L[TR].startswith(TITLE_END) and L[TR + KT] == "" and all(len(x) <= 120 for x in L[TR:TR + KT]), "the record"
+assert norm(" ".join(L[TR:TR + KT])) == norm(TITLE_END + " " + SENT_TITLE), "the record's words"
 LOG.append(f"words check: {len(FLAT)} changes; rev 3.2's words with only these made equal the result's; each new "
            f"phrase once; each replaced phrase gone; no <<P and a digit outside item 3's list (the intro's `<<P...>>` "
-           f"at :{gen[0]} names the form); item 3's list, section 10 and the top unchanged; no changed line over 120 "
-           "(rows exempt)")
+           f"at :{gen[0]} names the form); item 3's list and section 10 unchanged; the top rev 3.2's lines but for the "
+           f"launch's record (rev 3.2 :{TR + 1}, now :{TR + 1}-{TR + KT}) and C22's and C24's cites (rev 3.2 :160 and "
+           f":166, now :{160 + KT - 1} and :{166 + KT - 1}); no changed line over 120 (rows exempt)")
 # where each copy and fill stands now
 for tag, new in NEWS:
     mm = re.search(ws(new), final)
     WHERE[tag] = (final.count("\n", 0, mm.start()) + 1, final.count("\n", 0, mm.end()) + 1)
 LOG.append("in the result: " + "; ".join(f"{t} :{a}" + (f"-{b}" if b != a else "") for t, (a, b) in WHERE.items()
-                                         if t.startswith(("P", "R11", "tally", "stamp"))))
+                                         if t.startswith(("P", "R11", "tally", "stamp", "record"))))
 print("\n".join(LOG))
 print("the main session's words (no rule or ruling gives them word for word):")
 print("\n".join(f"- {x}" for x in MAIN))

@@ -17,9 +17,10 @@ its revision.**
   first), main 4d21c1a merged in the main folder: **7685b2b** (committed 18:47:11 UTC, pushed). One conflict, docs/STATUS.md's
   In-flight table, by merge_main_48.py against the merge base 2aa5e9c: this branch's #40 row (state brought up to
   date), main's #48 row, #51's row left out (main dropped it; this branch never changed it); 120 lines. spikes/
-  unchanged since 4e91830; gate PASS (`--no-smoke`). **Running:** the spike's check.mjs counted on 7685b2b (task
-  ba8dsrlmu; .gate/main-48/counted.log; expected 11 steps, 491 / 561 / 71), and CI on 7685b2b (gate, smoke, the new
-  `toolchain` job). **CI green on 7685b2b** (about 18:49 UTC): `toolchain` runs 43486051296 (push) and 43486055543
+  unchanged since 4e91830; gate PASS (`--no-smoke`). **The spike's check.mjs counted on 7685b2b: all 11 steps PASS**
+  (task ba8dsrlmu, 18:47:34-18:56:55 UTC, exit 0; .gate/main-48/counted.log): measured 491, bites 561, 0 failed;
+  self 71 of 71; marks 81 (ADR rows unchanged); redact 0; refs 957 tracked files, none outside spikes/; `wasm` 35.3 s;
+  test step 409.9 s (no TE2-5 failure). CI on 7685b2b: gate, smoke and the new `toolchain` job. **CI green on 7685b2b** (about 18:49 UTC): `toolchain` runs 43486051296 (push) and 43486055543
   (pull_request), gate runs 43486051289 and 43486055418. **The two lines told to Mustafa** (about 18:52 UTC).
 - **L4's script, first version (wf_d38bc2ef-a49, about 17:50-18:40 UTC): check FAIL** (u4r-fill-check.md, read in
   full): Medium F1 (the change lists' two moved plan cites, C22 :160 and C24 :166, left unmoved on a misread of the fold
@@ -41,8 +42,7 @@ its revision.**
   "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/u4r-fill-l4b-wf_62c0ab97-ae7.js",
   resumeFromRunId: "wf_62c0ab97-ae7"})`; the reviser continues after its notes' last block marked done, reading the
   script first (no brief edit exists: rev 3.2 362e771e… stays until the main session applies); (2) the counted run on
-  7685b2b (task ba8dsrlmu, .gate/main-48/counted.log; at 18:53 fmt, clippy, clippy-wasm32 and doc PASS, test running):
-  if it stopped, re-run the same call (nothing to restore: no plant, no source edit); (3) the saver if it stopped
+  7685b2b is DONE (11 of 11 PASS, above); (3) the saver if it stopped
   (run_in_background, timeout 7200000). On the card's "Cuts by the spend limit" block: the notice's exact text, the
   time of the cut and of the resume.
 **Earlier NOW (2026-11-13 about 17:55 UTC): U4r's launch, L4 running.** L3

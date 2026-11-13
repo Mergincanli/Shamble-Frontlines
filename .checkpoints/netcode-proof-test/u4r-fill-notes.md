@@ -82,3 +82,18 @@ the merge 7685b2b, main's 4d21c1a).
   "plan §7.1 item 6 (:917-918)" once (:166); "(plan §4.15 :500-501)" once (:45). Plan old :885-886 = new :886-887 and
   old :917-918 = new :918-919 (text equal); old :500-501 / new :500-501 hold "The determinism step" ... "pre-check
   only." Next: R2.
+- R2 done: CITES gains :45 (MANUAL (45, plan, 500-501), held), :160 and :166 (PIN, a new dict: first and last words
+  asserted in 8bcbf36~1's and the new plan's lines, on top of the shift path's line-equality assert; USEDPIN == PIN);
+  the classifier no longer exempts the top (LEFT_TOP gone; TOP_INV asserted to be exactly :45, :160, :166, each in the
+  inventory); the top assert is TOP_WANT (rev 3.2's top, the two tokens replaced in their lines) with the record's line
+  rewrapped (KT lines, its words = the old line + the record). C26's bots/Cargo.toml:24 stays in L3LEFT's log. Next: R3.
+- R3 done: NEW_R11 "(bots/Cargo.toml:{bots_net})"; asserts: the phrase once, no "(:" in R11, BOTN :25 is npt-net.
+- R4 done: P6_1_NEW ends "all merged by cc8595d)."; asserted (no "worktree").
+- R5 done: KEPT10 (the old stamps from OLDSTAMP, the path from L2C and PLAN), asserted equal to the decision's words;
+  both SENT0 branches use it; asserts: no "change lists", one sentence (no ". " inside, ends with ".").
+- R6 done: MAIN48 constant; `git rev-parse --verify <sha>^{commit}` equal, then `merge-base --is-ancestor`, else stop;
+  in the first LOG line.
+- R7 done: TITLE_END found once at rev 3.2 :29 (the rev 3.2 paragraph :16-29 asserted); SENT_TITLE with `<base>`'s
+  sha7, history's re-stamp asserted first; an item through edit() (tag "record (title)"; "record" added to the log
+  and WHERE filters); MAIN gains it. First run stopped on my own paragraph-start assert (off by one: :16, not :15);
+  fixed. Dry run now exit 0. Next: R8 (read the output whole).
