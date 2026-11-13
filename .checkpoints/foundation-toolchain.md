@@ -582,3 +582,17 @@ The verifier launched on bd44a68 (a general agent reading main's verifier.md, Op
 ROADMAP if needed, the checkpoint folded and deleted, the saver stopped first, no [skip ci]); the PR title and body
 (the last commit holding the notes); ready; the advisor agent's head review (its brief names the departures: the
 R2-L2 parenthetical, docs-keeper's three STATUS choices, the final pass's STATUS and ROADMAP moves).
+
+## Step 7, the verifier (2026-11-13 ~16:20 Amsterdam) and the last commit
+The verifier (a general agent reading main's verifier.md, Opus 5.5 at max; notes `verifier-final.md`) on bd44a68:
+PASS; nothing Critical or High; eight Low: F1 a departure from D1-R2 not in the brief's list (OVERFLOW-XCRATE-CI's
+recorded line, report and archive); F2 the runner's git is 2.56.1 since 2026-11-12; F3 the PR's title and body stale;
+F4 OVERFLOW-PANIC-RULE's due point in For Mustafa ("or a server crate"); F5 the archive's "its owner" for PM-0002-53
+(test-engineer); F6 STATUS :5, the archive intro, ROADMAP's header and its stray short line; F7 this file's "Current
+step" stale (deleted at ready); F8 a comma in E2. All Low, so report lines under C5; folded into the last commit with
+the verifier's line, E2's bd44a68 runs (43447034316, 43447042741), the report's header note, STATUS's #48 row and
+ROADMAP. This save is the last commit that holds the notes; the next commit deletes `.checkpoints/foundation-toolchain*`
+by hand (the saver stopped), then the PR's title and body, ready, and the advisor agent's head review (departures:
+the R2-L2 parenthetical; docs-keeper's three STATUS choices; the final pass's STATUS and ROADMAP moves; F1's recorded
+line; the last commit's Low fixes, F5 included; it re-runs `xcrate-check.sh` from this commit with summary lines and
+a wasm32 no-overflow control).
