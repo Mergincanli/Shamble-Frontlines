@@ -117,9 +117,9 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 **The foundation, 2.3: the first docs pass [2026-11-13, PR #52: in review]** — foundation-2-3-docs, by Mustafa's words
 of 2026-11-13 (docs only, no kit, gate or CI file): his go for #48 and his decision on step 2.3 go into
 `docs/DECISIONS.md` word for word, by script; dated pointers of 2026-11-13 in SPIKE_PLAN, ADR 0002, DECISIONS
-(SLICE-ORDER condition 3), ROADMAP and STATUS; the 2.2 report's fixes M1, L1, L2 (worded as the CI logs read), L3 and
-L5, two more archive lines and two pointing clauses; STATUS, ROADMAP, the archive and REPO_MAP made true for main
-4d21c1a. Report `docs/reports/2026-11-13-foundation-2-3-docs.md`. Next: review round 1, the verifier, the advisor
+(SLICE-ORDER condition 3) and ROADMAP, his decision quoted in STATUS; the 2.2 report's fixes M1, L1, L2 (worded as the
+CI logs read), L3 and L5, two more archive lines and two pointing clauses; STATUS, ROADMAP and the archive made true for
+main 4d21c1a. Report `docs/reports/2026-11-13-foundation-2-3-docs.md`. Next: review round 1, the verifier, the advisor
 agent's review of the final head, then his go. Step 2.3 is planned after this merges.
 
 **The foundation, 2.2: the toolchain [2026-11-10 to 11-13, MERGED]** — foundation-toolchain, ADR 0002's
@@ -133,11 +133,11 @@ build's heads, and eight planted failures each went red at the expected step and
 lines (the hard constraints bind `legacy/` only; his 2026-11-10 decision is the exception in the three lines that forbid
 v2 code) and the CI job's release-test line; main merged in (c901187); the overflow tests expect their panic's message.
 Review round 1 (five reviewers, 17 findings, each checked by a skeptic): the overflow setting widened to every workspace
-crate on the advisor agent's ruling (RR-1, High; his go asked, OVERFLOW-ALL). Review round 2 (four reviewers, nothing
-Critical or High): on the advisor agent's ruling D1-R2, `"*"` kept and the panic side handed to the drafts' owners. The
-Fable advisor's whole read before ready changed no file. The verifier passed (bd44a68). Merged: PR #48, 4d21c1a,
-2026-11-13 16:20 UTC, by merge commit, on Mustafa's go after the advisor agent's APPROVE of 9b20b67; CI green on main
-(gate run 43461710700, toolchain run 43461710673).
+crate on the advisor agent's ruling (RR-1, High; his go asked, then given with the merge, OVERFLOW-ALL). Review round 2
+(four reviewers, nothing Critical or High): on the advisor agent's ruling D1-R2, `"*"` kept and the panic side handed to
+the drafts' owners. The Fable advisor's whole read before ready changed no file. The verifier passed (bd44a68). Merged:
+PR #48, 4d21c1a, 2026-11-13 16:20 UTC, by merge commit, on Mustafa's go after the advisor agent's APPROVE of 9b20b67; CI
+green on main (gate run 43461710700, toolchain run 43461710673).
 
 **The foundation, 2.1b: the move [2026-11-11 to 11-12, MERGED]** — foundation-restructure, the second of step 2.1's two
 pull requests, after 2.1a (PR #50, merged as 76b4f7a on 2026-11-11, by merge commit, on Mustafa's go after the

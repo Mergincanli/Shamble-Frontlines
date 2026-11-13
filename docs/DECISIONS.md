@@ -112,11 +112,11 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   personal account, extracted by script from the session's transcript, message e5fa7ca0-6494-44d0-8366-81fc612c7958). It
   changes his words of 2026-11-10 for step 2.3 only, as it says; dated pointers of 2026-11-13 mark the older lines it
   overtakes (in this file, the entry "Taken by Mustafa, 2026-11-10: the second account may plan and build foundation
-  steps 2.1 and 2.2 now" and SLICE-ORDER's condition 3, below; SPIKE_PLAN, ADR 0002's migration step 1, ROADMAP and
-  STATUS). The kit lines that still name steps 2.1 and 2.2 as the only exception (CLAUDE.md :22 and :55,
-  `.claude/agents/advisor.md` :108, on main 4d21c1a) are not edited by this docs pass: by his words they are the rule
-  there too, and step 2.3's plan lists their edits. Copied by script from
-  `docs/reports/2026-11-13-foundation-2-3-docs.md`, Appendix A2, and checked byte for byte against it:
+  steps 2.1 and 2.2 now" and SLICE-ORDER's condition 3, below; SPIKE_PLAN, ADR 0002's migration step 1 and ROADMAP;
+  STATUS's "Next" quotes it). The kit lines that still name steps 2.1 and 2.2 as the only exception (CLAUDE.md :22 and
+  :55, `.claude/agents/advisor.md` :108, on main 4d21c1a) are not edited by this docs pass: his words are the rule there
+  too, and step 2.3's plan lists their edits. Copied by script from `docs/reports/2026-11-13-foundation-2-3-docs.md`,
+  Appendix A2, and checked byte for byte against it:
   - His decision, word for word (A2, from inside its quote marks):
     > Step 2.3 may be planned now. The parts of step 2.3 that need no proof test's result may be built before the proof tests report, after my go on the plan. Every gate check that needs a result joins later, when that result is in, with its pass marks unchanged. Steps 2.4 to 2.6 still wait for their results. This changes my words of 2026-11-10 ("Steps 2.3 to 2.6 keep their order and wait for their results") for step 2.3 only. These words are the rule from now, also where CLAUDE.md and .claude/agents/advisor.md still name steps 2.1 and 2.2 as the only exception.
   - His whole message (A2):

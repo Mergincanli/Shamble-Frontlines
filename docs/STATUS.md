@@ -10,8 +10,8 @@ _Last updated: 2026-11-13 (step 2.3's first docs pass, PR #52; main 4d21c1a)._
   `docs/ENGINE_OVERVIEW.md` and `docs/SPIKE_PLAN.md`) are the basis for the spikes and stay Proposed (the stop's
   answers, 2026-11-03: `docs/DECISIONS.md`), but for his SCOPE (a) of 2026-11-10: "I accept ADR 0002's part 1 alone
   (the repository layout, with the legacy constraints applying to legacy/ only)", recorded in ADR 0002 by 2.1b (#51).
-- **Last merged:** foundation 2.2, the toolchain (PR #48, 4d21c1a, 2026-11-13 16:20:12 UTC, by merge commit, on his
-  go, quoted in the merge commit's message, after the advisor agent's APPROVE of 9b20b67). Every merge: ROADMAP.
+- **Last merged:** foundation 2.2, the toolchain (PR #48, 4d21c1a, 2026-11-13 16:20:12 UTC, by merge commit, on his go,
+  quoted in its message, after the advisor agent's APPROVE of 9b20b67). Every merge: ROADMAP; the archive's "In flight".
 - **The kit:** KIT-FREEZE-2, what he meant by it (FREEZE-FDN) and his exceptions: `docs/DECISIONS.md`, "Queued"; his two
   additions of 2026-11-11 for the foundation chat: `docs/DECISIONS.md`. His words of 2026-11-13 for step 2.3:
   "The kit's freeze (KIT-FREEZE-2) ends with this step. That makes no edit unasked: every edit to a kit, gate or CI file
@@ -26,7 +26,7 @@ _Last updated: 2026-11-13 (step 2.3's first docs pass, PR #52; main 4d21c1a)._
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's builder running; main 4d21c1a merged in (7685b2b) (its checkpoint at 0066b63, read 2026-11-13 20:29 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| #52 | the foundation, 2.3: its first docs pass (his words for #48 and of 2026-11-13 in `docs/DECISIONS.md`, by script; dated pointers in SPIKE_PLAN, ADR 0002, DECISIONS (SLICE-ORDER condition 3), ROADMAP and STATUS; the 2.2 report's fixes M1, L1, L2 (worded as the CI logs read), L3 and L5, two more archive lines and two pointing clauses; STATUS, ROADMAP, the archive and REPO_MAP true for main 4d21c1a) | `claude/sweet-mayer-grsukw` (his personal account; for `cs/foundation-2-3-docs`) | draft | review round 1 (two reviewers), the verifier, the advisor agent's review of its final head; then his go (risk tier 1, decision docs) |
+| #52 | the foundation, 2.3: its first docs pass (his words for #48 and of 2026-11-13 in `docs/DECISIONS.md`, by script; dated pointers in SPIKE_PLAN, ADR 0002, DECISIONS (SLICE-ORDER condition 3) and ROADMAP, the decision quoted in STATUS; the 2.2 report's fixes M1, L1, L2 (worded as the CI logs read), L3 and L5, two more archive lines and two pointing clauses; STATUS, ROADMAP and the archive true for main 4d21c1a) | `claude/sweet-mayer-grsukw` (his personal account; for `cs/foundation-2-3-docs`) | draft | review round 1 (two reviewers), the verifier, the advisor agent's review of its final head; then his go (risk tier 1, decision docs) |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10), after status-diet (merged, #49): his unit walk of 2026-11-09 (a docs
