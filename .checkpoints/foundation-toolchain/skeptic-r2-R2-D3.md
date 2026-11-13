@@ -151,3 +151,9 @@ plan".
   carrying on with a wrong value. The design records already say no player input may crash a match, but their
   detailed lists do not name this cause yet, so the first plan that writes that code must say how it avoids it, and
   the records' owners weigh adding it (OVERFLOW-PANIC-RULE)."
+
+## Verdict
+R2-D3 holds, Medium. The fix is right in shape (a named follow-up plus a row clause), incomplete as written: provenance
+in the row, hand-off ("to weigh") not commitment, an owner per line, a builder-actionable anchor, the STATUS trigger
+without a new line (120-line cap), the report's follow-up list, one combined edit of README:234, point (6) moved to
+OVERFLOW-PER-CRATE, Appendix A :1617 added. Wording: the section above. Returned through StructuredOutput.
