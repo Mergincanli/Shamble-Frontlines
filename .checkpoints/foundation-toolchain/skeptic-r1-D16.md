@@ -61,12 +61,13 @@ the Wasm glue for a fallback; does "the Wasm glue" name a real package?); (7) ve
    net's package.json says "Empty until slice 3"; client's says "Empty until the skeleton step". No tsconfig*.json, no
    eslint* config (`git ls-tree` at head lists only package.json, package-lock.json, .gitignore at the root for these
    patterns). tools/gate.mjs at head has no packages/ check (its eslint-scope use is legacy check 5b); toolchain.yml
-   runs `npm test --workspaces` and `npx --no -- tsc --version` only. npm workspaces symlink every package into the
-   root node_modules/@shamble/ (seen in the worktree and in a scratch `npm ci --offline` of the head's lock in
-   .gate/skeptic-D16/tree), so an import needs no dependency declaration to resolve: a package.json discipline would not
-   hold the boundary; a lint rule is the right kind of tool. A planted client -> net import run through the head's
-   `npm test --workspaces` was denied by the permission system; not retried (not needed: nothing static exists to
-   catch it, which EA-5 itself says is as planned until 2.3's G3).
+   runs `npm test --workspaces` and `npx --no -- tsc --version` only. npm workspaces put a symlink for every package in
+   the root node_modules/@shamble/ (seen in the worktree and in a scratch `npm ci --offline` of the head's lock in
+   .gate/skeptic-D16/tree). The symlink exists; resolution of a bare `@shamble/net` import was NOT shown (the stubs'
+   package.json files have no `main` or `exports`), so I claim nothing about whether such an import resolves today. A
+   planted client -> net import run through the head's `npm test --workspaces` was denied by the permission system; not
+   retried. Not needed for the verdict: a lint rule reads import specifiers, not resolution, and nothing static exists
+   at head to catch one, which EA-5 itself says is as planned until 2.3's G3.
 8. The ADR's own principle, :893-895: "The legacy fence leaked because nothing checked it (row CS11); here every rule is
    a gate check with a planted defect that proves it (G5, G8, `--prove`)." CS11 (LEGACY_INVENTORY :180) was an
    unchecked comment fence. Part 5's page rules have a lasting gate check (PM-0002-64, G12) but NO `--prove` planted
@@ -76,13 +77,43 @@ the Wasm glue for a fallback; does "the Wasm glue" name a real package?); (7) ve
    the proof :895 asks for. This supports EA-5's direction more firmly than its own citation (:218) does.
 9. The glue's location: ADR 0002 :342-343 is the only place that places it ("Generated types, from three sources, into
    one committed package packages/types: wasm-bindgen's .d.ts and glue are build output (ignored)"); client legitimately
-   imports types (the layout and its hash, :343-345: "the page checks the hash at startup"). So "client never imports
-   the Wasm glue" must name the glue's files by path, not a package, and that path is fixed at 2.4 or 2.5 (sim-wasm has
+   imports types (the layout and its hash, :343-345: "the page checks the hash at startup"). INFERENCE: that sentence
+   can be read as putting the glue, ignored, inside packages/types; IF so, "client never imports the Wasm glue" must name
+   the glue's files by path, not a package. Either way the glue's path is fixed no earlier than 2.4 or 2.5 (sim-wasm has
    no crate type or exports at 4d78ad6), so 2.3 can plant it only against a provisional path; the net half is settleable
-   at 2.3 (net is a package; its code enters at slice 3, but a planted `import "@shamble/net"` in client bites now).
+   at 2.3 (net is a package; its code enters at slice 3, but a planted import of `@shamble/net` in client bites now).
 10. r5 R5-LAYOUT-REC2 (:1176-1193): the editor rule is "checked twice" because "a lint rule catches it before the build
    (R5-TSLINT-F14)" and "the built manifest shows what the player page really loads (F15)". R5-TSLINT-F14 (:234-238):
-   no-restricted-imports "Disallow[s] specified modules when loaded by `import`" by path pattern: it reads the linted
-   file's own import specifiers, so a client file importing a sim-worker module that itself imports net or the glue is
-   not caught (sim-worker may import both). engine-architect's own notes (:43) record EA-5 was kept "without the Vite
-   mechanism".
+   no-restricted-imports "Disallow[s] specified modules when loaded by `import`" by path pattern. INFERENCE from F14's
+   wording (ESLint's rule page not read at the source by me): it reads the linted file's own import specifiers, so a
+   client file importing a sim-worker module that itself imports net or the glue would not be caught (sim-worker may
+   import both). engine-architect's own notes (:43) record EA-5 was kept "without the Vite mechanism".
+11. The carrier. EA-5's fix says "No change in this PR". `grep` of the checkpoint, plan.md, findings-2-3.md,
+   findings-2-3-c4.md, docs/STATUS.md, STATUS_ARCHIVE.md, ROADMAP.md: only engine-architect-review-r1.md names the rule.
+   At 4d78ad6 the report's "Findings for 2.3" table (docs/reports/2026-11-12-foundation-2-2.md :156-180, 21 rows) and
+   STATUS_ARCHIVE "From foundation 2.2" (:551 on; its one `net` hit is CARGO-NET-OFFLINE) carry no page-side import
+   rule. So nothing yet carries EA-5 to 2.3's plan: the fix for this PR is one row in that table and in the archive's
+   list (the session's dedupe reading, "a 2.3 finding", already implies it); "no change" holds for the ADR and the code.
+12. How the page starts the Worker: ADR 0002 fixes no mechanism beyond "Vite bundles it" (:790) and "the Worker and the
+   Wasm load as files" (:431). Either usual form (a `new Worker(new URL(...))` call, which an import rule does not read,
+   or a worker-suffix import of a sim-worker file, a sim-worker specifier) is untouched by a rule on net and the glue
+   only, so the rule as worded breaks no Worker start. Closing check 10's transitive route by banning sim-worker from
+   client wholesale WOULD break the import form; 2.3 would need to allow the Worker entry only, or check the page's
+   built graph (the editor rule's second, manifest-level check).
+
+## Verdict
+HOLDS, Low (unchanged). Every premise checks out at 4d78ad6 (no static page-side rule anywhere: ADR 0002 part 3,
+part 7, PM-0002-42, r5's REC list, R1-BND-REC1/REC6, ADR 0001 :631; part 5's page rules are held only at run time).
+EA-5 omits PM-0002-64 (:1330), the lasting G12 counter on every gate run from 2.5, so its "why" is narrower than worded:
+the static rule's value is the paths a local-match G12 run never executes (online-only code) plus the `--prove` proof
+:893-895 asks for, which no G12 mutation gives the page rules today (PM-0002-51). Not a defect in PR #48; a proposal
+for 2.3's plan. Fix: right in direction, partial. Limits for 2.3's plan to weigh (not new findings): direct
+`WebSocket`, `WebTransport` or `WebAssembly` use on the page (PM-0002-22's own bite) is not an import; a client import
+that reaches net or the glue through a sim-worker module is not caught per file; PM-0002-64's counters still have no
+`--prove` defect; the glue half waits for 2.4/2.5's path. Breaks nothing found (lobby HTTPS, certificate hash, types,
+Worker start). Carrier: one row in the report's "Findings for 2.3" and STATUS_ARCHIVE "From foundation 2.2". Wording
+part 3 edits a Proposed decision doc: its PR needs Mustafa's go, not only the Advisor's agreement.
+
+Not verified: the planted client -> net run (denied by the permission system; not retried); whether a bare
+`@shamble/net` import resolves today; no-restricted-imports' per-file behaviour at ESLint's own page (inferred from r5
+F14's wording); where the glue will actually land (one reading of :342-343).

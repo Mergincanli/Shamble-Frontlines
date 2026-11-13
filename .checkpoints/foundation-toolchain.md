@@ -201,6 +201,18 @@
     args: the head and the 17 ids with their merges (`skeptic-args.json` holds the full items); notes
     `skeptic-r1-<id>.md`.
 
+27. Step 7, review round 1, run 2 (wf_fcb65072-3e7): all 17 skeptics returned; every finding holds at its reviewer's
+    severity (D1 High, D2 Medium, D3-D17 Low), most with refinements to the fix (`review-r1-verdicts.json`; notes
+    `skeptic-r1-D*.md`). Consultation 6 (D1: fix on the advisor agent's ruling). The advisor agent's ruling on D1 asked
+    (a general agent reading main's advisor.md, Opus 5.5 at max; notes `advisor-ruling-d1.md`), routes A, B, C, the "*"
+    override and the ADR pointer. Meanwhile the fix pass, not yet committed: the report (D2: `toolchain` not a required
+    check, in Risks, K1-GO and his step 3; D3: "every run that completed", the job's times; D4: the cut's concrete limit;
+    the findings table: G0 (D8, D17), REQUIRED-CHECK, SETUP-NODE-CACHE (D6), and new rows CUT-CARRY (D7), CUT-ESCAPE
+    (D4), SETPRIV-HARDEN (D5), CANCEL-ON-MAIN (D9), LINT-TABLE-PEDANTIC (D10), FEATURE-UNIFY (D11), ROOT-WORKSPACE (D12),
+    CLIENT-NET-RULE (D16); the follow-ups EMPTY-SLOTS (D14) and OQ-0002-8-TEST (D15)); the crate docs (D13, D14) in sim,
+    room, client-endpoint, sim-wasm. Waiting on the ruling: D1's Cargo.toml change, the overflow rows, M7, and the
+    archive, STATUS and REPO_MAP sync.
+
 ## Current step
 Step 6 done (4d78ad6; consultation 5). Step 7: review round 1, run 1 running (wf_d3a5ca64-901). Then: check `git status`
 outside .checkpoints/, dedupe the findings, run 2 (skeptics), the fix pass, the verifier, the Fable read (whole) before
