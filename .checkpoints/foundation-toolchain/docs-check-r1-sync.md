@@ -50,3 +50,52 @@ advisor-ruling-d1.md, review-r1-findings.json, review-r1-verdicts.json, skeptic-
   Low), OQ-0002-8-TEST (EA-4, D15; ADR :1099-1102 Advisor's answer; :222-229 reasons: holds), CLIENT-NET-RULE (EA-5,
   D16: holds but archive :766 names only "PM-0002-22's counter" for both page rules; the Wasm rule is PM-0002-2's
   counter (ADR :1265; D16 notes :36; PM-0002-64 keeps both): Low). All 17 verdicts hold at reviewer severity.
+- Unit 4 (intro, STATUS) DONE: fix-pass range 1de98a9..8a4f9b0 holds (git log; report last changed 8a4f9b0); main still
+  2aa5e9c (ls-remote); E12 figures hold (xcrate-before/after txt: 1 of 5 then 5 of 5; wasm32 release 0 then trap);
+  plan.md:269-274 supports EMPTY-SLOTS' clauses; skeptic-r1-D3.md check 3 has the four cancelled reverts (2-4 s);
+  STATUS #48 row, Waiting on Mustafa, Next item 2 (only "then" and a repeated date dropped), follow-ups: hold.
+- Unit 5 (his decisions/words) DONE: no go recorded as given (K1, Q2.2-a, OVERFLOW-ALL: "asked", "still waiting"); the
+  diff adds no quote of his (quoted strings: code, section names, ADR :1454-1455's done-when, toolchain.yml:78).
+
+## Candidate findings (before the advisor consult)
+1. Medium, report :227: G0 evidence "M2 meanwhile (exit 1 in 2.2's job)"; M2 exited 2 (report :112; D8, D17; job
+   130098974545; toolchain.yml:46 under bash -e). Archive :600/:608-609 right. Fix the report.
+2. Medium, report :201-202 and :241: "shown locally with git 2.56.0"; local runs were git 2.43.0 (SA notes :41; D4
+   notes :30); 2.56.0 = runner's git, source read only (D4 notes :37). Archive :705 right (no version). Fix the report.
+3. Low, archive :766: "PM-0002-22's counter" for both page rules; Wasm rule = PM-0002-2 (ADR :1265, :1330; D16).
+4. Low, archive :607-613 + report :227: IE-4's 2nd mutation (install step removed under RUSTUP_AUTO_INSTALL=0) kept by
+   D8 fix_ok 3, absent from the mutation list (only "never seen working").
+5. Low, archive :704-706: CUT-ESCAPE marks only the fsmonitor route; work-folder route is reasoning only (D4 fix_ok 1,
+   2 asks each route marked); SA-1's routes b (pathname sockets/resolver) and c (signals) dropped.
+6. Low, archive :783-784 + report :258: "a foundation step" attributed to 2.2's plan Part 3; plan.md:269 says "the
+   step that adds wasm-bindgen"; "foundation" is D14's reading (fix_ok 3).
+7. Low, archive :569-570: EMPTY-SLOTS left [assumed] without a [verified] tag for its plan clauses (plan not in the
+   2026-11-13 list); E12's figures likewise untagged (docs-keeper.md:25, :32). Content holds.
+8. Low, report :267-268: `docs/STATUS.md:47` is now :46 after the sync's rewrap of Next item 2.
+9. Low, STATUS :29: hand-back's "every new line <= 120" untrue for the #48 table row (1436 chars, was 1093); allowed by
+   one line per PR (docs-keeper.md:14); hand-back claim only.
+
+## After the advisor consult (1)
+- Unchanged rows: the report's table first appeared at 03b5a54 (after the archive's last commit 13feadc), so the 19
+  rows unchanged since 4d78ad6 were compared with their archive text by script (scratchpad side.mjs): all 19 match in
+  meaning (AUTO-ASK ... BRIEF-STALE). No unsynced row.
+- Tracked: review-r1-findings.json, review-r1-verdicts.json and all 17 skeptic-r1-D*.md are in git (19 of 19).
+- OVERFLOW-WASM, git grep over tracked files outside .checkpoints/: only STATUS_ARCHIVE.md:614 ("it replaces").
+- lightningcss: skeptic-r1-D4.md:58-62 calls "lightningcss runs inside the cut" a small overstatement (lazy import);
+  archive :703 and report :200 carry it: folded into the CUT-ESCAPE finding.
+- Severity of 1 and 2: Medium; ADR-INDEX rests on M2 failing closed (report :278), not its exit code; no decision entry
+  mentions the git version. Candidate 9 moved to "checked" (no file to fix).
+- Final re-run: STATUS 120 lines; repo-map-check exit 0; git status: the two docs + this notes file; docs diff 203/43
+  unchanged, so cited lines hold. HEAD 6947c63 (saver autosave).
+
+## Final findings
+1. Medium, report :227 (confirmed docs-keeper's report): "M2 meanwhile (exit 1 in 2.2's job)"; fixer: main session.
+2. Medium, report :202 and :241 (confirmed): "git 2.56.0" for the local run (was 2.43.0); fixer: main session.
+3. Low, archive :766: PM-0002-22 named for both page rules; add PM-0002-2.
+4. Low, archive :606-613 and report :227: IE-4's install-step mutation (kept by D8) missing from the mutation list.
+5. Low, archive :703-706: CUT-ESCAPE: lightningcss overstatement (D4 :58-62); work-folder and file-command routes
+   unmarked (D4 fix_ok 1-2); SA-1's routes b and c dropped.
+6. Low, archive :783 and report :258: "a foundation step" attributed to the plan (plan.md:269: "the step"); it is D14's
+   own suggested text.
+7. Low, archive :569-570: EMPTY-SLOTS' plan clauses and E12's figures carry no [verified]/[assumed] tag (both hold).
+8. Low, report :268 (confirmed): `docs/STATUS.md:47` is now :46 after the sync's rewrap; fixer: main session.
