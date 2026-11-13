@@ -7,11 +7,11 @@ ready; the last commit that holds them is {{NOTES-SHA}}._
 Mustafa's first item for step 2.3: "First: the docs pass. Its own small pull request, docs only, with no kit, gate or CI file in it." (A2) His words for PR #48 and his decision of 2026-11-13 go into `docs/DECISIONS.md` by script, with dated pointers at the older lines the decision overtakes; STATUS and ROADMAP become true for main 4d21c1a; the 2.2 report gets its five fixes. Nothing a player sees, hears or feels changes.
 
 ## Outcome
-- Built in six commits (1123175, 2f96f5c, 83c6ab6, d59ca43, 554face for review round 1's fix pass, then round 2's fix
-  pass), every script check and the gate passing; CI green on each through 554face (E7). Review round 1 (two reviewers,
-  four skeptics) found one High and two Mediums, all fixed. Review round 2 (two reviewers, one skeptic) found one High,
-  the advisor model (below), and eight Lows, all fixed or disclosed. The verifier and the advisor agent's review of the
-  final head follow.
+- Built in seven commits (1123175, 2f96f5c, 83c6ab6, d59ca43, 554face for review round 1's fix pass, 8e4fe7c for round
+  2's, then its follow-up), every script check and the gate passing; CI green on each through 8e4fe7c (E7). Review round
+  1 (two reviewers, four skeptics) found one High and two Mediums, all fixed. Review round 2 (two reviewers, one
+  skeptic) found one High, the advisor model (below), and eight Lows, all fixed or disclosed. The verifier and the
+  advisor agent's review of the final head follow.
 - **A gap against his rule on the advisor tool** (his words of 2026-11-11, moment 5: consult before a step or the task
   is declared done): steps 0 and 3 had no closing consultation of their own (step 3's was made late, consultation 6);
   steps 1, 2, 4 and 5 were consulted 6 seconds to 11 minutes after the checkpoint had called them done; and step 4's
@@ -69,12 +69,12 @@ Mustafa's first item for step 2.3: "First: the docs pass. Its own small pull req
 | Id | What | Result |
 |---|---|---|
 | E1 | his words | `words.mjs`: A1 (42 characters), A2 (6,190 characters, 36 lines) and A4 (68 characters) from this session's transcript; A3 (1,872 characters) from 4d21c1a's message, the round trip OK and identical byte for byte to foundation 2.2's chat record (message 96467900-…, its event stamped 16:16:36 UTC; the commit says 16:16:47) and to that session's merge call; the decision (562 characters) cut by its anchors; the transcript scan finds no other message of his up to the appendix's cut-off. `report-appendix.mjs`: the scan first (no problem), then the 4 blocks and the body's 2 quotes OK |
-| E2 | DECISIONS.md | `decisions.mjs --check`: OK, four entries; seven negative controls caught (each quote, the header sentence, the entry title); the only lines removed against 4d21c1a are the 2026-11-10 header's two reflowed lines; 2.2's `decisions-entries.mjs --check`: OK, 13 entries |
+| E2 | DECISIONS.md | `decisions.mjs --check`: OK, four entries; seven negative controls caught (each quote, the header sentence, the entry title); the only lines removed against 4d21c1a are the 2026-11-10 header's two reflowed lines; 2.2's `decisions-entries.mjs --check` on this tree: OK, 13 entries |
 | E3 | the pointers | `pointers.mjs --check`: P1 to P5, P7, P8 and his kit words in STATUS (to the end of his paragraph); each quote joined and found in his decision; a dropped word caught; SPIKE_PLAN +18 −0 lines, ADR 0002 +6 −0 |
 | E4 | the fixes | `fixes.mjs --check` on the head: the 2.2 report's Appendix A sha256 equal to 4d21c1a's; 2.2's body-quote check: 13 blocks, 10 quotes; the report's whole-file check (base plus the edits, no other word changed). At step 3 (2f96f5c), `--check --hunks` also showed 6 hunks in the report and 5 in the archive, and the archive's whole-file check, before docs-keeper's step 4. L2: seven job logs read; L3: the saved run's flag list; L1: the 2.2 checkpoint's F1 |
 | E5 | scope | `scope.mjs`, main's guard (`protectedRel`, `mergeAllowed` from origin/main 4d21c1a): every path under `docs/`, none protected, file modes plain; DECISIONS.md and ADR 0002 not mergeAllowed, so the PR Advisor cannot merge it |
 | E6 | gate | `node tools/gate.mjs --no-smoke`: GATE PASS after each step (the smoke in CI: this container's Chromium is not the toolkit's); repo map OK |
-| E7 | CI | Green on each step's commit (gate, with its gate and smoke jobs, and toolchain; push, then pull_request): 1123175 (43497813351, 43497824049; 43497813242, 43497823762); 2f96f5c (43501529364, 43501539671; 43501529328, 43501539371); 83c6ab6 (43504752852, 43504760971; 43504752955, 43504761167); d59ca43 (43506267790, 43506274539; 43506267759, 43506274417); 554face, round 1's fix pass (43517490537, 43517496130; 43517490505, 43517496110); round 2's fix pass: listed in the final commit; the final head's runs: in the pull request's body at ready |
+| E7 | CI | Green on each step's commit (gate, with its gate and smoke jobs, and toolchain; push, then pull_request): 1123175 (43497813351, 43497824049; 43497813242, 43497823762); 2f96f5c (43501529364, 43501539671; 43501529328, 43501539371); 83c6ab6 (43504752852, 43504760971; 43504752955, 43504761167); d59ca43 (43506267790, 43506274539; 43506267759, 43506274417); 554face, round 1's fix pass (43517490537, 43517496130; 43517490505, 43517496110); 8e4fe7c, round 2's fix pass (43528414752, 43528420177; 43528414776, 43528420127); its follow-up: listed in the final commit; the final head's runs: in the pull request's body at ready |
 | E8 | facts | `quotes.mjs` on STATUS, ROADMAP, the archive and REPO_MAP: every quoted span on the added lines found in his words, the base or DECISIONS.md (one split line judged by hand); R-STATE and the verifier on every SHA, run id and time |
 
 ## Reviews
@@ -164,6 +164,10 @@ pass 22:19:55 (461c82b, after number 8), review round 2 22:52:48 (ef1a7c1, after
    its ruling at 23:02:43 and a notes-only script change; before any tracked edit) and moment 1 for writing round 2's
    fix pass: the scripts' expectations first; round 2's count; times from commits; the appendix's cut-off from a
    scan-gated write; the intro's list checked against the scan; midnight.
+11. 23:39:10, moment 5 for round 2's fix pass, after its commit 8e4fe7c and before any "done" save: not done yet (the
+   clause on how Mustafa was told, worded from the records; E2's check run on this tree; the fragment check widened;
+   what is already known added now), and moment 1 for the verifier (its brief: the head, what is pending by design, the
+   CI tools, no words of his in its notes, 2.2's script copy, nothing posted on GitHub).
 The gaps: step 0's "done" save had no consultation of its own (number 1 came before the step's work); steps 1, 2, 4 and
 5 were consulted after their "done" saves; step 3 had none until number 6; step 4's departures (the STATUS cut, a design
 call, moment 4; the archive lines beyond plan §6) were committed in 83c6ab6 (20:47:12) before number 4; and number 10
@@ -173,8 +177,10 @@ came after the session had put its recommendation on his status request to the a
 - The advisor model (RW2-F1, High, held by its skeptic; fixed in round 2's fix pass): from step 0 the checkpoint, and
   from d59ca43 this report, said Opus 5.5 answered the advisor tool, taking the `/advisor fable` output's forecast as
   fact; round 1 compared the claim only with that output. The records say Fable 5.2 (the advisor-tool entry; every
-  call's usage record). No chat message named the advisor model before round 2; Mustafa was told in chat after it, at
-  first with the claim wrongly placed in an opening message of the session's, which its next message corrected.
+  call's usage record). No chat message named the advisor model before round 2. At 22:48:47 UTC the session relayed the
+  finding to Mustafa and wrongly added that it had told him the wrong thing at the start; its chat updates after the
+  compaction first repeated that and then corrected it, but neither update is in the transcript or the session's event
+  record, so the end message states the correction again.
 - His status request (22:27:05 UTC), sent while review round 2 ran, was found by the transcript scan after round 2: it
   is A4, with an entry in DECISIONS.md in E-HI's form (revision 2d). The appendix states the scan's cut-off; a message
   of his after it is added the same way before the final commit, and one after the final commit means a new head.
@@ -191,17 +197,18 @@ came after the session had put its recommendation on his status request to the a
   (Q3, Q5); round 1's archive fixes (2c, item 5).
 - `tools/` was not installed in this container: `npm ci --prefix tools` (CLAUDE.md's setup step; gitignored).
 - Commands refused by the guard, the deny list or the classifier (the transcript scan): the session's one, by the guard,
-  23:33:46 UTC (a `git -C` command; route: git run from the folder). The agents', all by the guard, each with the route
-  taken: the advisor agent, 19:31:18 UTC (a loop writing to a variable path; route: a read-only python3 script);
+  23:33:46 UTC (a `git -C` command; route: git run from the folder); besides, the harness's own Bash rule stopped a
+  foreground `sleep` at 23:38:22 (route: CI read through the API instead). The agents', all by the guard, each with the
+  route taken: the advisor agent, 19:31:18 UTC (a loop writing to a variable path; route: a read-only python3 script);
   R-WORDS, 21:14:45 (the same kind; route: literal paths); R-STATE, 21:05:55 (a `node -e` line with comments; route: a
   script file); R-STATE, 21:17:54 (a `sed -i` on a scratch file; route: the Edit tool); R2-STATE, 22:28:31 (a loop
   writing to a variable path; route: literal paths).
 - Retyped copies of his words in scratch files, each pushed by the saver and kept by history, none in any doc:
   docs-keeper's `fillcount.mjs` (e6fc6a9; his decision's four sentences and his kit words, byte-identical to the script
   cuts, checked); an earlier version of R-WORDS's notes (ec8f1bd, fragments); R-STATE's notes and `rs-roadmap.mjs`
-  (fragments); two versions of R2-WORDS's notes (461c82b and 7b5f53c, fragments; its notes now hold pointers, and no
-  pushed version of round 2's other notes holds a run of 30 characters of his words: `fp2-fragments-history.mjs`). His
-  words are public in DECISIONS.md already.
+  (fragments); two versions of R2-WORDS's notes (461c82b and 7b5f53c, fragments; its notes now hold pointers). No other
+  pushed version of round 2's 14 notes files holds a run of 30 characters of his words (`fp2-fragments-history.mjs`).
+  His words are public in DECISIONS.md already.
 - Two of the seven L2 logs (fd14855's push run, 45f1bb5's pull_request run) were read by the session only; the advisor
   agent read the other five.
 - The transcript-based checks (`words.mjs`'s A1, A2 and its scan; the chat-record pages) run only in this session's

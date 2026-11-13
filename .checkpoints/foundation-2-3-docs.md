@@ -218,6 +218,14 @@ Fix pass 2's "done" save after its consultation (moment 5), then the verifier on
    counted as 9 findings (RW2-F4 = R2-L2 once); times from commits; the cut-off from a scan-gated appendix write; the
    intro's list checked against the scan; the advisor-call count; midnight; D1(d)'s added clause; "For Mustafa" item 1.
 
+11. 2026-11-13 23:39:10 UTC, moment 5 for round 2's fix pass (after 8e4fe7c, before any "done" save): NOT DONE YET; and
+   moment 1 for the verifier. Changed: D1(d)'s clause "which its next message corrected" was false (the wrong placement
+   first came at 22:48:47; two post-compaction updates, the repeat and the correction, are in neither the transcript nor
+   the session's event record), so the clause is worded from the records; E2's 2.2 check run on this tree (OK, 13
+   entries); the fragment check widened to all 14 round-2 notes files; entry 11, the sleep block, 8e4fe7c's runs and both
+   SHAs added now; "Running work" brought up to date; the verifier's brief: the new head, a pending-by-design list, the
+   GitHub tools, no words of his in its notes, 2.2's script copy, nothing posted on GitHub.
+
 ## Refusals (guard, deny list, classifier) and the route taken
 - The session: one, by the guard, 2026-11-13 23:33:46 UTC (`git -C <notes folder> diff`: the guard wants git run from
   the folder; route: `cd`, then `git diff`); none before it (the transcript scan). Agents, all by the guard: the advisor agent
@@ -240,19 +248,8 @@ Fix pass 2's "done" save after its consultation (moment 5), then the verifier on
 - The slug `foundation-2-3-docs`; the docs pass is its own PR from this branch (his words).
 
 ## Running work
-- Review round 2: workflow run wf_dcd47e10-70e (task w8dqmr6ld) · script as launched `review-r2-run1.js` (a copy of
-  `review-r2.js`) · args {"base": "d59ca43c559fe085ca90f45fdbac593236399533", "head":
-  "554faceded1948a39eb635c42c4aa12ac9edf496"} · notes `r2-words.md`, `r2-state.md`, `r2-skeptic-*.md` · launched
-  22:14 UTC · status: running.
-- Round 1's fix pass: 554faceded1948a39eb635c42c4aa12ac9edf496 (pushed 22:13 UTC; the notes as used: 56e7750). CI:
-  toolchain green (push 43517490505, pull_request 43517496110); gate running (push 43517490537, pull_request
-  43517496130) at 22:14 UTC. Its "done" save waits for the gate and consultation 8 (condition 2c-6b).
-- Review round 1: workflow run wf_eb6cb5e5-3ce (task wnyzzm0vm) · script as launched: `review-r1-run1.js` (a copy of
-  `review-r1.js`) · args {"head": "d59ca43c559fe085ca90f45fdbac593236399533"} · notes: `r-words.md`, `r-state.md`,
-  `skeptic-*.md` in this folder · launched ~21:04 UTC · status: done (6 of 6 agents returned).
-- The container restarted ~22:00 UTC: the saver bhr4qixcn stopped after a local autosave (52845e0, then pushed by
-  hand); a fresh saver: task bw0zf0kg1 (`/tmp/claude-0/-home-user-Shamble-Frontlines/7261f3d7-f651-586a-9c39-c052553b68a3/tasks/bw0zf0kg1.output`),
-  started ~22:05 UTC, stops by ~23:55 UTC.
-- (old) Saver: background task bhr4qixcn · output
-  `/tmp/claude-0/-home-user-Shamble-Frontlines/7261f3d7-f651-586a-9c39-c052553b68a3/tasks/bhr4qixcn.output` · started
-  ~21:03 UTC · stops by ~22:53 UTC · the old saver bofczdenq stopped with TaskStop (its last save 28a64a8, pushed).
+- Fix pass 2's follow-up (consultation 11's items 1 to 5): being written; then its battery and gate, the commit, the
+  word-level diff on it, its four CI runs, the "done" save (no further consultation), then the verifier.
+- The saver: bpjfne3lu (started ~23:38 UTC).
+- Done: review round 2 (wf_dcd47e10-70e, 2 of 2 reviewers and 1 of 1 skeptic returned); round 1 (wf_eb6cb5e5-3ce, 6 of 6);
+  fix pass 1 (554face, CI green); fix pass 2 (8e4fe7c, CI green: 43528414752, 43528420177, 43528414776, 43528420127).

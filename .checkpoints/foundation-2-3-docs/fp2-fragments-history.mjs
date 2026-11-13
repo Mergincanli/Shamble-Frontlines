@@ -3,7 +3,11 @@
 import { execFileSync } from 'node:child_process';
 import { allItems } from './words.mjs';
 const texts = allItems().map((it) => [it.id, it.text.replace(/\s+/g, ' ')]);
-const files = ['r2-words.md', 'r2-state.md', 'r2-skeptic-R-WORDS-RW2-F1.md', 'r2-frag.mjs', 'r2-kit.mjs', 'r2w-kitbytes.py'].map((f) => `.checkpoints/foundation-2-3-docs/${f}`);
+// Every file of round 2's agents in the notes folder (their names start with r2, r2w or sk-f), as listed in git's
+// history, so a file deleted later is checked too.
+const files = [...new Set(execFileSync('git', ['log', '--format=', '--name-only', '--', '.checkpoints/foundation-2-3-docs/'], { encoding: 'utf8' })
+  .split('\n').filter((f) => /^\.checkpoints\/foundation-2-3-docs\/(r2|sk-f)/.test(f)))].sort();
+console.log(`${files.length} files: ${files.map((f) => f.split('/').pop()).join(', ')}`);
 for (const f of files) {
   const shas = execFileSync('git', ['log', '--format=%h', '--', f], { encoding: 'utf8' }).split('\n').filter(Boolean);
   for (const s of shas) {
