@@ -56,3 +56,21 @@ Checks:
   `cargo clippy --workspace --all-targets -- -W clippy::pedantic -W clippy::nursery -D warnings` (after cleaning the three
   crates): exit 0; `RUSTDOCFLAGS=-D warnings cargo doc --workspace --no-deps`: exit 0; `cargo fmt --all --check`: exit 0.
   Same clippy and doc on the untouched head copy: exit 0. The comment-only fix breaks nothing now or under 2.3's lints.
+- C3b (contrary evidence, weighed): ADR 0004:1253 (phase 3, Slice 1) lists "the tick and its loops" and "the local server
+  in the Worker" under slice 1, which may be where "its first slice" came from. It does not flip C3: ADR 0002 carries the
+  foundation and its step 2.5 done-when is explicit (0002:1467-1472), ADR 0001:1778-1782 says the same, and ADR 0004's own
+  foundation row (0004:1252) needs per-tick hashes of the first recording natively and in Wasm, i.e. sim code before slice
+  1. Slice 1 grows these crates; it does not bring their first code.
+- Verdict: HOLDS, Low. Timing half: true (every numbered-slice usage puts "slice" after the foundation; the foundation's
+  steps bring the first code of sim, room and client-endpoint). Omission half: true as quoted, but polish (the doc cites
+  parts 3 and 5; REPO_MAP rows are summaries; G5 enforces part 3 from 2.3). No player, Mustafa or session result changes:
+  2.3-2.5 are planned from the ADRs, and the stubs' doc lines get rewritten when code arrives.
+  Fix: right in kind and safe (C7, C8). Caveats: (1) "(foundation 2.5)" fits sim and room; for client-endpoint it may be
+  one step late (C4: 2.4's layout generator needs the writer's layout table): wording true either way, e.g. "Empty until
+  the foundation's generated-types and skeleton steps (2.4-2.5)". (2) The report :116-119 sentence must change in the
+  same push as the comments, or it becomes evidence that does not hold. (3) REPO_MAP:18: adding "the aim cast, the block
+  writer and its layout table" is enough; the full cell would make one crate's entry unlike its neighbours'. (4) A Low
+  never pushes alone: ride the D1 push if it touches crates/, otherwise a STATUS follow-up.
+  Not verified: the C4 inference (the ADR never names the step that first writes client-endpoint code); the finding's
+  "which a builder reads first" framing (CLAUDE.md sends readers to REPO_MAP first; not load-bearing). No file changed in
+  the worktree except this notes file; scratch work in .gate/skeptic-D13/.
