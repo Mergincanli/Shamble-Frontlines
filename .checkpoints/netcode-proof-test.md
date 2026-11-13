@@ -27,6 +27,17 @@ prompt), u4r-run.sh, D13 first; tell it its worktree's start commit and that `gi
 spikes/` exits 0 (as U4d2's builder recorded, its notes' Block 0); at most three agents with the builder counted.
 Follow-ups (Low, no push on their own): the fold's rewrap split three code spans across lines (u4r-fold-check2.md,
 words unchanged); the advisor's own premise on npt-net's tree (FQ6 (b)).
+**MAIN-48 (Mustafa, 2026-11-13 18:14 UTC; recorded in history.md by words_1113b.py, last entry):** merge main
+(origin/main 4d21c1a, PR #48, foundation 2.2: root Cargo workspace crates/*, rust-toolchain.toml 1.99.1, packages/*,
+the CI job `toolchain`) at the next clean stop, never stopping a running agent: **after L4's workflow returns, before
+its apply and L6** (nothing running then), so P6 and the builder's base hold it. In the main folder, as at PR #51's
+merge (merge_main_51.py): `git merge origin/main`; docs/STATUS.md's conflict keeps both sides, no line retyped, within
+120 lines (by script); other conflicts, if any, read first. Checked before: main's files name spikes/ only in docs/
+and .md files, which check.mjs's refs step skips (check.mjs:1786-1800); the spike keeps its own rust-toolchain.toml
+and .cargo/config.toml (cargo and rustup take the nearest), the same 1.99.1 pin; the `toolchain` job builds the root
+workspace and npm packages only. Then the gate (`--no-smoke`) and check.mjs counted through main-run.sh (11 steps,
+491 / 561 / 71 expected), push; report him in two lines: the merge commit, and the `toolchain` job's result on this
+branch.
 **The day's earlier blocks (2026-11-13 about 16:45 UTC): U4r's launch conditions, L3 then L2 and L1.** (Mustafa's
 compact came at about 16:28 UTC; the saver be5gxjhow ended its 110 minutes at 16:27.)
 - **L3 COMMITTED at 4e91830** (pushed 16:32): crates/lab/Cargo.toml `npt-bots.workspace = true`, crates/bots/Cargo.toml
