@@ -12,8 +12,41 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-13 about 21:30 UTC; read this first after a compact or a cut): U4r's rulings are in (ten points,
-nothing for Mustafa) and sent to copy 2, which builds on (at B10 by its logs); the carries amended at 18583c4.**
+**NOW (2026-11-13 about 22:00 UTC; read this first after a compact or a cut): U4r copy 2 ended at its context limit
+(21:51 UTC), about three quarters built; snapshot re-cut (48fa2959…); copy 3 resumes; the advisor rules on copy 2's
+two pre-check findings and its Lows.**
+- **Copy 2** (agent a6e4993cc3a5e4475, 20:55-21:51 UTC, 340 tool uses) stopped at a clean point (no plant, no half
+  edit, no run going); nothing committed. Its notes u4r-build.md (569 lines; copied here, equal by cmp): its part
+  :284-569, its state section "Copy 2: state and what is next". I read its part whole. Done: fmt; B9 `replay`
+  (replay.rs) with r3 (4,127 pairs, 0 mismatches; its bite 4,127 of 4,127); B10 the pre-check (precheck.rs; npt-server's
+  U4R-Q6 (a) items: pump.rs's wallclock site, BITES widened to four, the pin) with r6 PASS (120 ticks, both legs late
+  0, comparer Equal), r7's four cases, the late-command bite VOID by late_count 1, the wallclock bite FAIL at index 3
+  (117 of 120 differ); the rulings' points 2 (the radius pinned by placement: 6,400 cm held, 6,401 not; checked and
+  unchecked counted apart; r4's bite 33,020 breaches), 3 (-57's series only when listed), 4 (whole-as-lost: 16 of 16;
+  the kept 48-client run in .gate/u4r/whole-as-lost/), 5 (the ring pinned: age 60 rewound, 61 refused; hash.rs `check`
+  compares the header), 6 (the dump reader pinned: 13,990 shots, 8,830 hits, 2 kills), 9 (a) and (b), 1 (1) to (3)
+  (det-recordings.json, h5). Suites green in both builds (npt-lab bin 43 clean, 49 bites, 1 ignored each:
+  c2-rul-reg.log). Left: r2 with the real judge by hand and point 3's per-profile bytes; point 1 (4) to (7) with r10's
+  check.mjs half; B12; r5 and the end checks twice.
+- **Copy 2's findings:** (1) DEPTH: the room measures L - 1 at every take after each client's first (histogram {0: 48,
+  1: 5,568}), while 7.2's reading (brief :1193-1200) writes L as the header's `buffer_depth_ticks_count`: they differ by
+  1 by definition (input.rs:28); (2) the pre-check writes no per-leg log (its hashes are printed in the result lines),
+  while 7.2 (:1197-1200, :1306-1308) reads as if each leg had a header; (3) `cargo test -p npt-server --all-features`
+  does not compile tests/loopback.rs (npt-client's bites feature is not on under -p; check.mjs's workspace build is
+  unaffected); (4) r3's test bytes go to the system temp folder; (5) the kept whole-as-lost logs' header names commit
+  2fbec77 while the code is uncommitted. (1) and (2) are held for the advisor; (3) to (5) go to it as Lows, with a
+  conformance read of copy 2's ruled changes.
+- **Snapshot re-cut** (21:52 UTC, the saver stopped first): wip/u4r.patch, 17 files on 2fbec77, 6,022 lines, sha256
+  48fa2959799d7f0a6f65f6b2524e3d283a8b836474b6d27e96198c0ae69c7b53; `git apply --check` exit 0. The fixed copy
+  .gate/u4r-snap1 now holds it (the first snapshot reversed from 3160196's copy, the new one applied; its 17 files equal
+  the worktree's by cmp).
+- **Copy 3** (prompt u4r-copy3-prompt.md: the first prompt verbatim, checked by script, plus a copy-3 resume part):
+  copy 2's items (4) to (7); it holds precheck.rs's outputs and depth reading until the ruling. **If cut or ended:** as
+  for copy 2 (check the worktree, re-cut the snapshot, then a fresh copy from the latest prompt, its resume part
+  brought up to date).
+
+**Earlier NOW (2026-11-13 about 21:30 UTC): U4r's rulings are in (ten points, nothing for Mustafa) and sent to copy 2;
+the carries amended at 18583c4.**
 - **The rulings** (wf_21a67b58-19b returned about 21:25 UTC; 2 agents, 188 tool uses, 35 min):
   **advisor-u4r-build1-full.md** (169 lines, sha256 476121ab…; written by script, word for word, from the journal; the
   advisor's notes advisor-u4r-build1.md, the fact check's u4r-build1-facts.md). I read every point in full. None goes

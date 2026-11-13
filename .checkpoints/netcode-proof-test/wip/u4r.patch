@@ -263,7 +263,7 @@ index 2ff8533..278db8c 100644
    ]
  }
 diff --git a/spikes/netcode-proof/crates/lab/src/hash.rs b/spikes/netcode-proof/crates/lab/src/hash.rs
-index 6bb355d..fa9fbde 100644
+index 6bb355d..7ec5179 100644
 --- a/spikes/netcode-proof/crates/lab/src/hash.rs
 +++ b/spikes/netcode-proof/crates/lab/src/hash.rs
 @@ -195,10 +195,27 @@ pub(crate) fn parse(argv: &[String]) -> Result<Mode, String> {
@@ -314,7 +314,7 @@ index 6bb355d..fa9fbde 100644
  pub(crate) fn manifest(text: &str) -> Result<Vec<Entry>, String> {
      let v: Value =
          serde_json::from_str(text).map_err(|e| format!("the manifest is not JSON: {e}"))?;
-@@ -235,7 +263,32 @@ pub(crate) fn manifest(text: &str) -> Result<Vec<Entry>, String> {
+@@ -235,7 +263,34 @@ pub(crate) fn manifest(text: &str) -> Result<Vec<Entry>, String> {
                      .map_err(|_| format!("manifest entry {name}: \"{k}\" {n} is above 32 bits"))
              })
          };
@@ -329,7 +329,9 @@ index 6bb355d..fa9fbde 100644
 +                profile: e
 +                    .get("profile")
 +                    .and_then(Value::as_str)
-+                    .ok_or(format!("manifest entry {name}: a runner entry with no \"profile\""))?
++                    .ok_or(format!(
++                        "manifest entry {name}: a runner entry with no \"profile\""
++                    ))?
 +                    .to_owned(),
 +                clients: u8::try_from(num("clients")?)
 +                    .map_err(|_| format!("manifest entry {name}: \"clients\" above 255"))?,
@@ -347,7 +349,7 @@ index 6bb355d..fa9fbde 100644
              scene: u8::try_from(num("scene")?)
                  .map_err(|_| format!("manifest entry {name}: no such scene"))?,
              seed: num("seed")?,
-@@ -254,6 +307,12 @@ pub(crate) fn manifest(text: &str) -> Result<Vec<Entry>, String> {
+@@ -254,6 +309,12 @@ pub(crate) fn manifest(text: &str) -> Result<Vec<Entry>, String> {
          if out.iter().any(|o: &Entry| o.name == entry.name) {
              return Err(format!("manifest entry {} is named twice", entry.name));
          }
@@ -360,7 +362,7 @@ index 6bb355d..fa9fbde 100644
          out.push(entry);
      }
      Ok(out)
-@@ -266,10 +325,30 @@ fn sha256_hex(bytes: &[u8]) -> String {
+@@ -266,10 +327,38 @@ fn sha256_hex(bytes: &[u8]) -> String {
          .collect()
  }
  
@@ -379,8 +381,16 @@ index 6bb355d..fa9fbde 100644
 +            clients,
 +            warmup_s,
 +            measured_s,
-+        } => crate::scenario::record(&scene, profile, e.seed, *clients, e.first_tick, *warmup_s, *measured_s)
-+            .map_err(|m| format!("{}: {m}", e.name)),
++        } => crate::scenario::record(
++            &scene,
++            profile,
++            e.seed,
++            *clients,
++            e.first_tick,
++            *warmup_s,
++            *measured_s,
++        )
++        .map_err(|m| format!("{}: {m}", e.name)),
 +    }
 +}
 +
@@ -393,7 +403,35 @@ index 6bb355d..fa9fbde 100644
  }
  
  /// Whether `bytes` are the entry's: its length and SHA-256.
-@@ -294,7 +373,7 @@ pub(crate) fn regenerate_all(
+@@ -284,6 +373,27 @@ pub(crate) fn check(e: &Entry, bytes: &[u8]) -> Result<(), String> {
+             e.sha256
+         ));
+     }
++    // The bytes' own header against the entry (the advisor's U4r build ruling, point 5): a manifest field that
++    // disagrees with the bytes it pins fails by name.
++    let r = Recording::decode(bytes)
++        .map_err(|m| format!("{}: the bytes do not decode: {m}", e.name))?;
++    let held = [
++        (
++            "first_tick",
++            u64::from(r.first_tick),
++            u64::from(e.first_tick),
++        ),
++        ("span_ms", u64::from(r.span_ms), u64::from(e.span_ms)),
++        ("ticks", r.ticks.len() as u64, u64::from(e.ticks)),
++    ];
++    for (field, bytes_say, entry_says) in held {
++        if bytes_say != entry_says {
++            return Err(format!(
++                "{}: the recording's {field} is {bytes_say}, the manifest's {entry_says}",
++                e.name
++            ));
++        }
++    }
+     Ok(())
+ }
+ 
+@@ -294,7 +404,7 @@ pub(crate) fn regenerate_all(
      mut keep: impl FnMut(&Entry, &[u8]) -> Result<(), String>,
  ) -> Result<Vec<String>, String> {
      for e in entries {
@@ -402,7 +440,7 @@ index 6bb355d..fa9fbde 100644
              return Err(format!(
                  "{}: generator {}, not this build's Recording::GENERATOR {} (only its recordings are pinned)",
                  e.name,
-@@ -302,6 +381,12 @@ pub(crate) fn regenerate_all(
+@@ -302,6 +412,12 @@ pub(crate) fn regenerate_all(
                  Recording::GENERATOR
              ));
          }
@@ -415,7 +453,7 @@ index 6bb355d..fa9fbde 100644
      }
      let mut lines = Vec::new();
      for e in entries {
-@@ -1253,6 +1338,7 @@ mod tests {
+@@ -1253,6 +1369,7 @@ mod tests {
          let bytes = Recording::synthetic(&Scene::targets(), 8, u32::MAX - 20, 60, 2_000).encode();
          let e = Entry {
              name: "TC-s8".to_owned(),
@@ -423,20 +461,50 @@ index 6bb355d..fa9fbde 100644
              scene: Scene::targets().id(),
              seed: 8,
              first_tick: u32::MAX - 20,
-@@ -1324,16 +1410,76 @@ mod tests {
+@@ -1298,6 +1415,23 @@ mod tests {
+             "{err}"
+         );
+         assert_eq!(none, 0);
++        // Point 5 (the advisor's U4r build ruling): the bytes' header against the entry, field by field.
++        for (field, set) in [
++            (
++                "first_tick",
++                (|e: &mut Entry| e.first_tick += 1) as fn(&mut Entry),
++            ),
++            ("span_ms", |e: &mut Entry| e.span_ms += 1),
++            ("ticks", |e: &mut Entry| e.ticks -= 1),
++        ] {
++            let mut off = e.clone();
++            set(&mut off);
++            let err = check(&off, &bytes).expect_err(field);
++            assert!(
++                err.starts_with(&format!("TC-s8: the recording's {field} is ")),
++                "{err}"
++            );
++        }
+     }
+ 
+     #[test]
+@@ -1324,16 +1458,87 @@ mod tests {
          let text = include_str!("../recordings.json");
          let entries = manifest(text).unwrap();
          let names: Vec<&str> = entries.iter().map(|e| e.name.as_str()).collect();
-+        // U4d's three synthetic recordings (U4r's two runner recordings wait on the det-u4.mjs question: notes).
++        // U4d's three synthetic recordings; U4r's two runner recordings are det-recordings.json's (the advisor's U4r
++        // build ruling, point 1).
          assert_eq!(names, ["SS-s1", "ES-s2", "TC-s3"]);
--        assert!(
--            entries
--                .iter()
--                .all(|e| e.generator == Recording::GENERATOR && e.ticks == 9_000)
--        );
 +        assert!(entries.iter().all(|e| e.ticks == 9_000
 +            && e.kind == Kind::Synthetic
 +            && e.generator == Recording::GENERATOR));
++        let det = manifest(include_str!("../det-recordings.json")).unwrap();
++        let names: Vec<&str> = det.iter().map(|e| e.name.as_str()).collect();
++        assert_eq!(names, ["SS-P2-s1", "ES-P3-s2"]);
+         assert!(
+-            entries
+-                .iter()
+-                .all(|e| e.generator == Recording::GENERATOR && e.ticks == 9_000)
++            det.iter()
++                .all(|e| matches!(e.kind, Kind::Runner { .. }) && e.generator == 0)
+         );
 +        let pre = manifest(include_str!("../precheck-recordings.json")).unwrap();
 +        assert!(matches!(pre[0].kind, Kind::Runner { .. }) && pre[0].generator == 0);
 +        assert_eq!(pre.len(), 1);
@@ -464,7 +532,10 @@ index 6bb355d..fa9fbde 100644
 +            assert!(e.contains("is not one or more of"), "{bad:?}: {e}");
 +        }
 +        let at = 799_693 / 12;
-+        assert!(manifest(&one("TC-s3", at, k)).is_ok(), "ticks at bytes / 12");
++        assert!(
++            manifest(&one("TC-s3", at, k)).is_ok(),
++            "ticks at bytes / 12"
++        );
 +        let e = manifest(&one("TC-s3", at + 1, k)).expect_err("ticks above bytes / 12");
 +        assert!(e.contains("cannot fit"), "{e}");
 +        assert!(manifest(&one("TC-s3", 9_000, "")).is_err(), "no kind");
@@ -506,22 +577,24 @@ index 6bb355d..fa9fbde 100644
      fn h6_usage_errors_are_refused() {
          let base = "--manifest m --dir d --out o";
 diff --git a/spikes/netcode-proof/crates/lab/src/main.rs b/spikes/netcode-proof/crates/lab/src/main.rs
-index aa02208..ad8c7e3 100644
+index aa02208..510347f 100644
 --- a/spikes/netcode-proof/crates/lab/src/main.rs
 +++ b/spikes/netcode-proof/crates/lab/src/main.rs
-@@ -14,8 +14,11 @@
+@@ -14,8 +14,13 @@
  //! SHA-256 of v1's tag and the log's datagram entries, the hash U2's v1 logs had.
  
  mod hash;
 +mod logs;
  mod machine;
 +mod mirror;
++mod precheck;
  mod probe;
++mod replay;
 +mod scenario;
  
  use npt_l1::Profile;
  use npt_log::{Ended, Header, SCHEMA, Writer};
-@@ -216,10 +219,34 @@ fn main() -> ExitCode {
+@@ -216,10 +221,73 @@ fn main() -> ExitCode {
              }
          };
      }
@@ -548,13 +621,52 @@ index aa02208..ad8c7e3 100644
 +            }
 +        };
 +    }
++    if cmd == "replay" {
++        let s = match replay::parse(rest) {
++            Ok(s) => s,
++            Err(e) => {
++                eprintln!("npt-lab replay: {e}\nusage: {}", replay::USAGE);
++                return ExitCode::from(2);
++            }
++        };
++        return match replay::run(&s) {
++            Ok(o) => {
++                println!("{}", replay::summary_line(&s, &o));
++                ExitCode::SUCCESS
++            }
++            Err(hash::Failure::Usage(e)) => {
++                eprintln!("npt-lab replay: {e}\nusage: {}", replay::USAGE);
++                ExitCode::from(2)
++            }
++            Err(hash::Failure::Failed(e)) => {
++                eprintln!("npt-lab replay: {e}");
++                ExitCode::from(1)
++            }
++        };
++    }
++    if cmd == "precheck" {
++        return match precheck::main(rest) {
++            Ok(lines) => {
++                for l in lines {
++                    println!("{l}");
++                }
++                ExitCode::SUCCESS
++            }
++            Err((code, e)) => {
++                eprintln!("npt-lab precheck: {e}\nusage: {}", precheck::USAGE);
++                ExitCode::from(code)
++            }
++        };
++    }
      if cmd != "probe" {
          eprintln!(
 -            "npt-lab: unknown command {cmd:?}\nusage: {USAGE}\n       {}",
 -            hash::USAGE
-+            "npt-lab: unknown command {cmd:?}\nusage: {USAGE}\n       {}\n       {}",
++            "npt-lab: unknown command {cmd:?}\nusage: {USAGE}\n       {}\n       {}\n       {}\n       {}",
 +            hash::USAGE,
-+            scenario::USAGE
++            scenario::USAGE,
++            replay::USAGE,
++            precheck::USAGE
          );
          return ExitCode::from(2);
      }
@@ -771,6 +883,140 @@ index 11d395d..c4565b9 100644
 +        );
 +    }
  }
+diff --git a/spikes/netcode-proof/crates/server/src/pump.rs b/spikes/netcode-proof/crates/server/src/pump.rs
+index f558d7a..04fb86f 100644
+--- a/spikes/netcode-proof/crates/server/src/pump.rs
++++ b/spikes/netcode-proof/crates/server/src/pump.rs
+@@ -214,6 +214,35 @@ pub struct Decoder {
+     outstanding: VecDeque<(u8, u64)>,
+     samples: VecDeque<u64>,
+     sent_bytes: u32,
++    /// PM-0001-30/wallclock planted on this session (bites builds only; U4R-Q6 (a)).
++    #[cfg(feature = "bites")]
++    wallclock: bool,
++}
++
++/// PM-0001-30/wallclock (marks.json:6563: "a wall-clock read on one transport's command path"; U4R-Q6 (a)): the decoder
++/// of one -30 pre-check leg's sessions reads the wall clock and changes each passed-on command's aim by it, so that
++/// leg's room runs other commands than the other leg's on every run, whatever the machine's ticks per second.
++#[cfg(feature = "bites")]
++pub(crate) const WALLCLOCK_BITE: &str = "PM-0001-30/wallclock";
++
++/// The wallclock bite's site (bites builds only; U4R-Q6 (a)'s field rule): every command of `i` gets its aim's x XORed
++/// with `1 | (wall-clock ns & 0xfe)`, never 0, so the value is never the received one and moves at most 255 cm (inside
++/// the aim's range); a field the World takes at that tick, never the tick, sequence, slot, buttons, presses or view time.
++#[cfg(feature = "bites")]
++#[allow(
++    clippy::disallowed_methods,
++    clippy::disallowed_types,
++    reason = "the planted defect is a wall-clock read (PM-0001-30/wallclock): bites builds only"
++)]
++fn wallclock_aims(mut i: npt_proto::Input) -> npt_proto::Input {
++    let ns = std::time::SystemTime::now()
++        .duration_since(std::time::UNIX_EPOCH)
++        .map_or(0, |d| d.subsec_nanos());
++    let k = 1 | (ns & 0xfe) as i32;
++    for c in &mut i.commands {
++        c.aim[0] ^= k;
++    }
++    i
+ }
+ 
+ impl Decoder {
+@@ -242,9 +271,21 @@ impl Decoder {
+             outstanding: VecDeque::new(),
+             samples: VecDeque::new(),
+             sent_bytes: 0,
++            #[cfg(feature = "bites")]
++            wallclock: false,
+         }
+     }
+ 
++    /// The same decoder with one planted defect by its id (bites builds only; per instance, U4R-Q6 (a)):
++    /// PM-0001-30/wallclock; `None` for another id (the schedule's are `Schedule::with_bite`'s).
++    #[cfg(feature = "bites")]
++    pub fn with_bite(mut self, bite: &str) -> Option<Decoder> {
++        (bite == WALLCLOCK_BITE).then(|| {
++            self.wallclock = true;
++            self
++        })
++    }
++
+     /// The session's counts.
+     pub fn counters(&self) -> &Counters {
+         &self.counters
+@@ -407,6 +448,8 @@ impl Decoder {
+                 (_, Message::Join(_)) => self.counters.join_again += 1,
+                 (State::Joined, Message::Input(i)) => {
+                     if self.limits.input.take(now_ns) {
++                        #[cfg(feature = "bites")]
++                        let i = if self.wallclock { wallclock_aims(i) } else { i };
+                         out.push((Message::Input(i), r.arrival_ns));
+                     } else {
+                         self.counters.input_limited += 1;
+diff --git a/spikes/netcode-proof/crates/server/src/schedule.rs b/spikes/netcode-proof/crates/server/src/schedule.rs
+index e5587d3..04424bb 100644
+--- a/spikes/netcode-proof/crates/server/src/schedule.rs
++++ b/spikes/netcode-proof/crates/server/src/schedule.rs
+@@ -245,10 +245,16 @@ const BITE_IDS: [(&str, Bite); 3] = [
+     ("PM-0004-67/uncounted-drop", Bite::UncountedDrop),
+ ];
+ 
+-/// The bite ids this module plants (bites builds only): PM-0004-67's three, whose site is `due_ticks` (u4-build-plan.md
+-/// §5 U4b; §4.14 plants each bite where its code lives).
++/// The bite ids npt-server plants (bites builds only): PM-0004-67's three, whose site is `due_ticks` (u4-build-plan.md
++/// §5 U4b; §4.14 plants each bite where its code lives), and PM-0001-30/wallclock, whose site is the pump's command
++/// path (`Decoder::with_bite`; U4R-Q6 (a)).
+ #[cfg(feature = "bites")]
+-pub const BITES: [&str; 3] = [BITE_IDS[0].0, BITE_IDS[1].0, BITE_IDS[2].0];
++pub const BITES: [&str; 4] = [
++    BITE_IDS[0].0,
++    BITE_IDS[1].0,
++    BITE_IDS[2].0,
++    crate::pump::WALLCLOCK_BITE,
++];
+ 
+ #[cfg(feature = "bites")]
+ impl Schedule {
+diff --git a/spikes/netcode-proof/crates/server/tests/schedule.rs b/spikes/netcode-proof/crates/server/tests/schedule.rs
+index 01c465e..2f463d7 100644
+--- a/spikes/netcode-proof/crates/server/tests/schedule.rs
++++ b/spikes/netcode-proof/crates/server/tests/schedule.rs
+@@ -337,6 +337,8 @@ mod bites {
+     const TIMER_PERIOD: &str = "PM-0004-67/timer-period";
+     const UNCAPPED: &str = "PM-0004-67/uncapped-catchup";
+     const UNCOUNTED: &str = "PM-0004-67/uncounted-drop";
++    /// The pump's (U4R-Q6 (a)): in npt-server's list, never the schedule's.
++    const WALLCLOCK: &str = "PM-0001-30/wallclock";
+ 
+     fn bitten(hz: u32, cap: u32, id: &str) -> Schedule {
+         Schedule::with_bite(hz, cap, id).expect("npt-server plants it")
+@@ -344,7 +346,10 @@ mod bites {
+ 
+     #[test]
+     fn the_three_bites_are_planted_here_under_their_marks_json_ids() {
+-        assert_eq!(npt_server::BITES, [TIMER_PERIOD, UNCAPPED, UNCOUNTED]);
++        assert_eq!(
++            npt_server::BITES,
++            [TIMER_PERIOD, UNCAPPED, UNCOUNTED, WALLCLOCK]
++        );
+         let marks = include_str!("../../../marks/marks.json");
+         for id in npt_server::BITES {
+             assert!(
+@@ -352,7 +357,12 @@ mod bites {
+                 "{id} is not in marks.json"
+             );
+         }
+-        for other in ["PM-0004-67/no-such-bite", "PM-0001-17/client-rounding", ""] {
++        for other in [
++            "PM-0004-67/no-such-bite",
++            "PM-0001-17/client-rounding",
++            "",
++            WALLCLOCK,
++        ] {
+             assert!(Schedule::with_bite(30, 7, other).is_none(), "{other}");
+         }
+     }
 diff --git a/spikes/netcode-proof/crates/bots/clippy.toml b/spikes/netcode-proof/crates/bots/clippy.toml
 new file mode 100644
 index 0000000..30e689a
@@ -1036,6 +1282,19 @@ index 0000000..6dbe069
 +        "the clamp script aims far beyond the reach"
 +    );
 +}
+diff --git a/spikes/netcode-proof/crates/lab/det-recordings.json b/spikes/netcode-proof/crates/lab/det-recordings.json
+new file mode 100644
+index 0000000..e6cd904
+--- /dev/null
++++ b/spikes/netcode-proof/crates/lab/det-recordings.json
+@@ -0,0 +1,7 @@
++{
++  "about": "U4r's two runner recordings (u4-build-plan.md §4.15 :494-501; u4r-brief.md 2.1 (ii); carry 82's schema, recordings.json's), in a manifest of their own by the advisor's U4r build ruling, point 1 (advisor-u4r-build1, route (c)): ops/runs/det-u4.mjs runs check.mjs's `wasm` step's clean half on this file (regenerate and SHA-check, native leg 1 against leg 2, Wasm leg 1 against native leg 1), while check.mjs's step keeps recordings.json's three synthetic recordings. Each entry is regenerated by `npt-lab scenario --record` at its scene, seed, first tick, profile, clients, warmup_s and measured_s (the brawl on L1, generator 0), read by `npt-lab hash`'s same reader. Scene ids: 1 SS, 2 ES, 3 CO, 4 TC (Scene::by_id).",
++  "recordings": [
++    {"name": "SS-P2-s1", "kind": "runner", "profile": "P2", "clients": 48, "warmup_s": 10, "measured_s": 290, "scene": 1, "seed": 1, "first_tick": 0, "ticks": 9000, "span_ms": 2000, "generator": 0, "bytes": 16937652, "sha256": "5b79abb2a2cba55b06a8916b235aea1766960867f09a038aed146805a29a32e3"},
++    {"name": "ES-P3-s2", "kind": "runner", "profile": "P3", "clients": 48, "warmup_s": 10, "measured_s": 290, "scene": 2, "seed": 2, "first_tick": 1000000, "ticks": 9000, "span_ms": 2000, "generator": 0, "bytes": 16929501, "sha256": "fad8f67ded2a220e42d7e4d42a3d3f2f76e980d4c55abb4fbcd01c550045953b"}
++  ]
++}
 diff --git a/spikes/netcode-proof/crates/lab/precheck-recordings.json b/spikes/netcode-proof/crates/lab/precheck-recordings.json
 new file mode 100644
 index 0000000..9c4b6c5
@@ -1050,10 +1309,10 @@ index 0000000..9c4b6c5
 +}
 diff --git a/spikes/netcode-proof/crates/lab/src/logs.rs b/spikes/netcode-proof/crates/lab/src/logs.rs
 new file mode 100644
-index 0000000..9e161ab
+index 0000000..66761d6
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/logs.rs
-@@ -0,0 +1,677 @@
+@@ -0,0 +1,786 @@
 +//! The scenario's three logs (u4-build-plan.md §4.12 :410-415; marks/README.md §1 and §4; u4r-brief.md 2.1): on L1
 +//! one npt-lab process writes one log per process value the checks select on, each with its own header: `room` (the
 +//! room's per-tick World hash `h`, `hs.server_hash`, PM-0001-2's series, the `admit` events, `burst_eviction`), `client`
@@ -1145,6 +1404,35 @@ index 0000000..9e161ab
 +    format!("writing a log: {e}")
 +}
 +
++/// The World's events this tick, read from its dump's `events` section (npt-sim's canonical state: `World::dump`; the
++/// section is cleared at each step and written per event, kind 1 a shot, 2 a hit, 3 a kill): (events, shots, hits
++/// and kills). `at` caches the section's index (the sections before it are fixed-size pools). The advisor's U4r build
++/// ruling, point 6, pins it against `SimCore::step`'s returned events (the test below).
++pub(crate) fn dump_events(
++    world: &World,
++    at: &mut Option<usize>,
++) -> Result<(usize, i64, i64), String> {
++    let dump = world.dump();
++    let words = dump.words();
++    let a = match *at {
++        Some(a) => a,
++        None => {
++            let a = (0..words.len())
++                .find(|&i| dump.field(i).as_deref() == Some("events[0].count"))
++                .ok_or("the World's dump has no events count")?;
++            *at = Some(a);
++            a
++        }
++    };
++    let events = words.get(a).copied().unwrap_or(0) as usize;
++    let kind = |i: usize| words.get(a + 1 + 4 * i).copied().unwrap_or(0);
++    let shots = (0..events).filter(|&i| kind(i) == 1).count() as i64;
++    let reliable = (0..events)
++        .filter(|&i| kind(i) == 2 || kind(i) == 3)
++        .count() as i64;
++    Ok((events, shots, reliable))
++}
++
 +/// One (client, tick)'s resolution.
 +#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 +enum Res {
@@ -1184,8 +1472,10 @@ index 0000000..9e161ab
 +    written: Option<u64>,
 +    track: RoomTrack,
 +    wraps: BTreeMap<&'static str, u64>,
-+    /// carry 62 (h)'s bite: a sentinel filed as lost (null, `snap_incomplete` 1).
-+    refused_as_lost: bool,
++    /// carry 62 (h)'s bite, PM-0001-17/whole-as-lost (the advisor's U4r build ruling, point 4): on every client, its
++    /// first tick resolved whole in the measured phase filed as lost (null, `snap_incomplete` 1); per slot, that tick.
++    whole_as_lost: bool,
++    bitten_at: Vec<Option<u64>>,
 +    pub(crate) counts: Counts,
 +}
 +
@@ -1212,7 +1502,7 @@ index 0000000..9e161ab
 +        dir: Option<&std::path::Path>,
 +        meta: &Meta,
 +        first_tick: u32,
-+        refused_as_lost: bool,
++        whole_as_lost: bool,
 +    ) -> Result<Logs, String> {
 +        let n = meta.clients as usize;
 +        Ok(Logs {
@@ -1232,7 +1522,8 @@ index 0000000..9e161ab
 +            written: None,
 +            track: RoomTrack::default(),
 +            wraps: BTreeMap::new(),
-+            refused_as_lost,
++            whole_as_lost,
++            bitten_at: vec![None; n],
 +            counts: Counts::default(),
 +        })
 +    }
@@ -1253,7 +1544,13 @@ index 0000000..9e161ab
 +    }
 +
 +    /// The room admitted `slot` (its session `session`) before tick `t` ran.
-+    pub(crate) fn admit(&mut self, slot: u8, session: u64, t: u32, ph: Phase) -> Result<(), String> {
++    pub(crate) fn admit(
++        &mut self,
++        slot: u8,
++        session: u64,
++        t: u32,
++        ph: Phase,
++    ) -> Result<(), String> {
 +        let w = self.wide(t);
 +        if let Some(a) = self.admitted.get_mut(usize::from(slot)) {
 +            a.get_or_insert(w);
@@ -1269,7 +1566,8 @@ index 0000000..9e161ab
 +    /// Whether `slot` was admitted and has resolved a tick (carry 62 (d)'s head).
 +    pub(crate) fn started(&self, slot: u8) -> bool {
 +        let s = usize::from(slot);
-+        self.admitted.get(s).is_some_and(Option::is_some) && self.first.get(s).is_some_and(Option::is_some)
++        self.admitted.get(s).is_some_and(Option::is_some)
++            && self.first.get(s).is_some_and(Option::is_some)
 +    }
 +
 +    /// Whether every tick up to `w` is written (every client resolved it).
@@ -1328,7 +1626,17 @@ index 0000000..9e161ab
 +                self.counts.conflicts += 1;
 +                continue;
 +            }
-+            let as_lost = self.refused_as_lost && h == 0;
++            // The bite: a whole decode (not the sentinel) of the client's first measured tick, and every later filing
++            // of that tick, goes in as lost.
++            let as_lost = self.whole_as_lost
++                && h != 0
++                && match self.bitten_at[s] {
++                    Some(b) => b == w,
++                    None => self.phases.get(&w) == Some(&Phase::Measured),
++                };
++            if as_lost {
++                self.bitten_at[s] = Some(w);
++            }
 +            let e = &mut self.entry(w)[s];
 +            *e = match (*e, as_lost) {
 +                (_, true) => Res::Lost,
@@ -1378,7 +1686,10 @@ index 0000000..9e161ab
 +
 +    fn write_client_tick(&mut self, w: u64) -> Result<(), String> {
 +        let ph = self.phase(w);
-+        let list = self.res.remove(&w).unwrap_or_else(|| vec![Res::Open; self.n]);
++        let list = self
++            .res
++            .remove(&w)
++            .unwrap_or_else(|| vec![Res::Open; self.n]);
 +        self.logged.remove(&w);
 +        let mut errs = Errors::default();
 +        for (s, r) in list.iter().enumerate() {
@@ -1411,11 +1722,16 @@ index 0000000..9e161ab
 +            rec.s.insert("snap_incomplete".to_owned(), incomplete);
 +            self.client.tick(&rec).map_err(io)?;
 +        }
-+        if !errs.pos_um.is_empty() || !errs.yaw_microdeg.is_empty() || !errs.pitch_microdeg.is_empty() {
++        if !errs.pos_um.is_empty()
++            || !errs.yaw_microdeg.is_empty()
++            || !errs.pitch_microdeg.is_empty()
++        {
 +            let mut rec = TickRecord::new(w, ph);
 +            rec.s.insert("pos_err_um".to_owned(), errs.pos_um);
-+            rec.s.insert("yaw_err_microdeg".to_owned(), errs.yaw_microdeg);
-+            rec.s.insert("pitch_err_microdeg".to_owned(), errs.pitch_microdeg);
++            rec.s
++                .insert("yaw_err_microdeg".to_owned(), errs.yaw_microdeg);
++            rec.s
++                .insert("pitch_err_microdeg".to_owned(), errs.pitch_microdeg);
 +            self.lab.tick(&rec).map_err(io)?;
 +        }
 +        self.written = Some(w);
@@ -1489,7 +1805,9 @@ index 0000000..9e161ab
 +        self.track.refused.resize(n, [0; 4]);
 +        let mut refused_events = Vec::new();
 +        for (s, h) in server.iter_mut().enumerate() {
-+            let Some(c) = room.client(s as u8) else { continue };
++            let Some(c) = room.client(s as u8) else {
++                continue;
++            };
 +            *h = c.server_hash();
 +            if h.is_some() {
 +                self.logged.entry(w).or_insert_with(|| vec![false; n])[s] = true;
@@ -1525,10 +1843,7 @@ index 0000000..9e161ab
 +        );
 +        v.insert("snapshot_clients_count".into(), clients_count);
 +        v.insert("big_vehicles_count".into(), count(EntityKind::Vehicle));
-+        v.insert(
-+            "very_large_units_count".into(),
-+            index.large_units() as i64,
-+        );
++        v.insert("very_large_units_count".into(), index.large_units() as i64);
 +        v.insert("projectiles_count".into(), count(EntityKind::Projectile));
 +        v.insert(
 +            "effects_per_soldier_max_count".into(),
@@ -1580,22 +1895,7 @@ index 0000000..9e161ab
 +        ph: Phase,
 +        records: &[npt_sim::EntityRecord],
 +    ) -> Result<u64, String> {
-+        let dump = world.dump();
-+        let words = dump.words();
-+        let at = match self.track.events_at {
-+            Some(a) => a,
-+            None => {
-+                let a = (0..words.len())
-+                    .find(|&i| dump.field(i).as_deref() == Some("events[0].count"))
-+                    .ok_or("the World's dump has no events count")?;
-+                self.track.events_at = Some(a);
-+                a
-+            }
-+        };
-+        let events = words.get(at).copied().unwrap_or(0) as usize;
-+        let kind = |i: usize| words.get(at + 1 + 4 * i).copied().unwrap_or(0);
-+        let shots = (0..events).filter(|&i| kind(i) == 1).count() as i64;
-+        let reliable = (0..events).filter(|&i| kind(i) == 2 || kind(i) == 3).count() as i64;
++        let (events, shots, reliable) = dump_events(world, &mut self.track.events_at)?;
 +        let mut portal = 0i64;
 +        let mut spawns = 0i64;
 +        let mut stand_in_spawns = 0i64;
@@ -1688,14 +1988,12 @@ index 0000000..9e161ab
 +        if let Some((s, p, acc)) = self.track.second.take() {
 +            self.write_second(s, p, acc)?;
 +        }
-+        let logged: Vec<(u64, Vec<bool>)> = self
-+            .logged
-+            .iter()
-+            .map(|(w, l)| (*w, l.clone()))
-+            .collect();
++        let logged: Vec<(u64, Vec<bool>)> =
++            self.logged.iter().map(|(w, l)| (*w, l.clone())).collect();
 +        for (w, list) in logged {
 +            for (s, room_had) in list.iter().enumerate() {
-+                let inside = self.first[s].is_some_and(|f| f <= w) && self.last[s].is_some_and(|l| w <= l);
++                let inside =
++                    self.first[s].is_some_and(|f| f <= w) && self.last[s].is_some_and(|l| w <= l);
 +                if *room_had && inside && !self.gone[s] {
 +                    let e = &mut self.entry(w)[s];
 +                    if *e == Res::Open {
@@ -1731,12 +2029,82 @@ index 0000000..9e161ab
 +        Ok(self.counts)
 +    }
 +}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use npt_sim::{Command, HitHistory, Scene, SimCore, SimEvent, StandIns, TickInput};
++
++    /// The advisor's U4r build ruling, point 6: the dump reader's counts at each tick equal the shots, hits and kills
++    /// in `SimCore::step`'s returned events, over a short seeded run of the stress scene in which every soldier fires
++    /// at one soldier of another team (team 0 at slot 16, the others at slot 0), so there are kills.
++    #[test]
++    fn p6_the_dump_reader_counts_the_shots_hits_and_kills_simcore_step_returns() {
++        let scene = Scene::stress().with_stand_ins(StandIns::OFF);
++        let mut world = World::new(&scene, 3, 0);
++        let history = HitHistory::for_ms(2_000).expect("a ring");
++        let mut at = None;
++        let (mut shots, mut hits, mut kills) = (0i64, 0i64, 0i64);
++        for k in 0..600u32 {
++            let soldiers: BTreeMap<u16, [i32; 3]> = SimCore::entity_records(&world)
++                .iter()
++                .filter(|r| r.kind == EntityKind::Soldier)
++                .map(|r| (r.index, [r.grid[0], r.grid[1], r.grid[2]]))
++                .collect();
++            let commands = (0..48u8)
++                .filter_map(|s| {
++                    let p = soldiers.get(&if s < 16 { 16 } else { 0 })?;
++                    let c = Command {
++                        slot: s,
++                        tick: k,
++                        seq: k as u16,
++                        buttons: Command::FIRE,
++                        aim: [p[0], p[1], p[2] + 100],
++                        view_tick: k,
++                        ..Command::default()
++                    };
++                    Some((c, None))
++                })
++                .collect();
++            let input = TickInput {
++                tick: k,
++                commands,
++                ..TickInput::default()
++            };
++            let (mut s, mut r) = (0i64, 0i64);
++            for e in world.step(&input, &history) {
++                match e {
++                    SimEvent::Shot { .. } => s += 1,
++                    SimEvent::Hit { .. } => {
++                        r += 1;
++                        hits += 1;
++                    }
++                    SimEvent::Kill { .. } => {
++                        r += 1;
++                        kills += 1;
++                    }
++                }
++            }
++            shots += s;
++            let (_, rs, rr) = dump_events(&world, &mut at).expect("the reader");
++            assert_eq!(
++                (rs, rr),
++                (s, r),
++                "tick {k}: the reader's shots and hits plus kills"
++            );
++        }
++        println!(
++            "p6: 600 ticks; shots {shots}, hits {hits}, kills {kills}, each tick's counts equal"
++        );
++        assert!(shots > 0 && hits > 0 && kills > 0, "{shots} {hits} {kills}");
++    }
++}
 diff --git a/spikes/netcode-proof/crates/lab/src/mirror.rs b/spikes/netcode-proof/crates/lab/src/mirror.rs
 new file mode 100644
-index 0000000..007db1e
+index 0000000..c1a1b7a
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/mirror.rs
-@@ -0,0 +1,441 @@
+@@ -0,0 +1,469 @@
 +//! The room-side frame mirror (u4r-brief.md 2.1, 2.4 r4; catalogue §6 item 5): each client's snapshots and full
 +//! states as the room handed them out (`take_datagrams`, `take_control`), decoded with npt-proto and the `Quant` that
 +//! client decodes with, and rebuilt into the frame the room meant that client to hold at each tick (its baseline's
@@ -1790,14 +2158,19 @@ index 0000000..007db1e
 +    pub(crate) projectiles: u32,
 +}
 +
-+/// r4's counts: records audited per class, and the first breach of each rule.
++/// r4's counts: records audited per class, and the first breaches (the advisor's U4r build ruling, point 2).
 +#[derive(Clone, Debug, Default, PartialEq, Eq)]
 +pub(crate) struct Audit {
 +    pub(crate) owner: u64,
++    /// Entity-section records checked against the room's radius (soldiers, hulls, parts, projectiles).
 +    pub(crate) spatial: u64,
++    /// Entity-section records not checked against it: doors, the wall, and any record that tick's room records lack.
++    pub(crate) spatial_unchecked: u64,
 +    pub(crate) public: u64,
 +    pub(crate) events: u64,
++    /// The first 16 breaches' texts, and every breach counted.
 +    pub(crate) breaches: Vec<String>,
++    pub(crate) breaches_count: u64,
 +}
 +
 +#[derive(Clone, Debug, Default)]
@@ -1951,7 +2324,11 @@ index 0000000..007db1e
 +    /// The soldiers `slot`'s frame of `tick` holds, with their positions (the bots' view: npt-bots' `Behaviour`).
 +    pub(crate) fn view(&self, slot: u8, tick: u32, into: &mut Vec<(u8, [i32; 3])>) {
 +        into.clear();
-+        let Some(f) = self.clients.get(usize::from(slot)).and_then(|c| c.frame(tick)) else {
++        let Some(f) = self
++            .clients
++            .get(usize::from(slot))
++            .and_then(|c| c.frame(tick))
++        else {
 +            return;
 +        };
 +        for ((kind, index), r) in f {
@@ -1973,6 +2350,7 @@ index 0000000..007db1e
 +    }
 +
 +    fn breach(&mut self, text: String) {
++        self.audit.breaches_count += 1;
 +        if self.audit.breaches.len() < 16 {
 +            self.audit.breaches.push(text);
 +        }
@@ -1999,8 +2377,8 @@ index 0000000..007db1e
 +        }
 +        let me = room.get(EntityKind::Soldier, u16::from(slot));
 +        for r in entities {
-+            self.audit.spatial += 1;
 +            if self.own(slot, r) || matches!(r.kind, EntityKind::OwnState | EntityKind::Effect) {
++                self.audit.spatial_unchecked += 1;
 +                self.breach(format!(
 +                    "tick {tick}: client {slot}'s entity section holds {:?} {} (an owner-only record)",
 +                    r.kind, r.index
@@ -2019,7 +2397,13 @@ index 0000000..007db1e
 +                    .map(|x| [x.grid[0], x.grid[1]]),
 +                _ => None,
 +            };
-+            if let (Some(me), Some(at)) = (me, at) {
++            let (Some(me), Some(at)) = (me, at) else {
++                // Doors, the wall, or a record this tick's room records lack: no radius test.
++                self.audit.spatial_unchecked += 1;
++                continue;
++            };
++            self.audit.spatial += 1;
++            {
 +                let (dx, dy) = (
 +                    i64::from(at[0]) - i64::from(me.grid[0]),
 +                    i64::from(at[1]) - i64::from(me.grid[1]),
@@ -2041,10 +2425,12 @@ index 0000000..007db1e
 +            .iter()
 +            .filter(|s| **s != u16::from(slot))
 +            .all(|s| has(EntityKind::Soldier, *s));
-+        let vehicles = !self.with_vehicles || room.vehicles.iter().all(|v| has(EntityKind::Vehicle, *v));
++        let vehicles =
++            !self.with_vehicles || room.vehicles.iter().all(|v| has(EntityKind::Vehicle, *v));
 +        let large = !room.large.is_empty()
 +            && room.large.iter().all(|(h, parts)| {
-+                has(EntityKind::Vehicle, *h) && parts.iter().all(|p| has(EntityKind::VehiclePart, *p))
++                has(EntityKind::Vehicle, *h)
++                    && parts.iter().all(|p| has(EntityKind::VehiclePart, *p))
 +            });
 +        let projectiles = frame
 +            .keys()
@@ -2074,10 +2460,13 @@ index 0000000..007db1e
 +        }
 +        for b in control {
 +            let Ok(channel) = crate::scenario::stream_of(b, quant) else {
-+                self.breach(format!("tick {tick}: client {slot}: a reliable message on no known channel"));
++                self.breach(format!(
++                    "tick {tick}: client {slot}: a reliable message on no known channel"
++                ));
 +                continue;
 +            };
-+            let Ok(Message::FullState(f)) = quant.decode(Direction::RoomToClient, channel, b) else {
++            let Ok(Message::FullState(f)) = quant.decode(Direction::RoomToClient, channel, b)
++            else {
 +                continue;
 +            };
 +            self.audit.public += 1;
@@ -2102,8 +2491,12 @@ index 0000000..007db1e
 +        }
 +        let mut frame: Option<Frame> = None;
 +        for d in datagrams {
-+            let Ok(Message::Snapshot(s)) = quant.decode(Direction::RoomToClient, Channel::Datagram, d) else {
-+                self.breach(format!("tick {tick}: client {slot}: a datagram the mirror cannot decode"));
++            let Ok(Message::Snapshot(s)) =
++                quant.decode(Direction::RoomToClient, Channel::Datagram, d)
++            else {
++                self.breach(format!(
++                    "tick {tick}: client {slot}: a datagram the mirror cannot decode"
++                ));
 +                continue;
 +            };
 +            self.audit.public += 1;
@@ -2112,7 +2505,8 @@ index 0000000..007db1e
 +                frame = if s.baseline_age == 0 {
 +                    Some(Frame::new())
 +                } else {
-+                    c.frame(s.tick.wrapping_sub(u32::from(s.baseline_age))).cloned()
++                    c.frame(s.tick.wrapping_sub(u32::from(s.baseline_age)))
++                        .cloned()
 +                };
 +                if frame.is_none() {
 +                    self.breach(format!(
@@ -2164,7 +2558,9 @@ index 0000000..007db1e
 +                if let SimEvent::Shot { slot: shooter, .. } = e
 +                    && *shooter == slot
 +                {
-+                    self.breach(format!("tick {tick}: client {slot} was sent its own shot (cosmetic)"));
++                    self.breach(format!(
++                        "tick {tick}: client {slot} was sent its own shot (cosmetic)"
++                    ));
 +                }
 +            }
 +            self.audit_records(slot, tick, &own, &entities, room);
@@ -2178,12 +2574,1228 @@ index 0000000..007db1e
 +        errs
 +    }
 +}
+diff --git a/spikes/netcode-proof/crates/lab/src/precheck.rs b/spikes/netcode-proof/crates/lab/src/precheck.rs
+new file mode 100644
+index 0000000..e4e699b
+--- /dev/null
++++ b/spikes/netcode-proof/crates/lab/src/precheck.rs
+@@ -0,0 +1,777 @@
++//! The -30 pre-check (u4r-brief.md 7.2; plan :772-796; the advisor's conditions 2 and 3; carry 40): a recorded npt-lab
++//! test, never a judged id. Replay clients send the SS P0 recording's commands to one room over Loopback and to another
++//! over L1 P0, in RQ8's order on one SimClock each, and `HashCompare::of` compares the two rooms' per-tick World hashes.
++//!
++//! - **The tick base:** both legs' `World::new(scene, recording.seed, recording.first_tick)`, so each leg's first tick
++//!   is the recording's first (`run_leg` refuses a tick that is not the recording's), run at SimClock instant 0 (U4b's
++//!   schedule, base 0); the k-th tick is due at `due_ns(k)`.
++//! - **The encoder** (R16): `ClientEndpoint::input` stamps its own ticks and sequences, so it cannot send the
++//!   recording's. Each replay client runs a `ClientEndpoint` only to decode (`input(None, received, now)`) and to send
++//!   its `Join` and `Pong`s; the endpoint's own `Input` (the acknowledgement only: it is given no command) is read back
++//!   for its `ack_tick` and `ack_groups` and replaced by the replay client's own `Input`, encoded with npt-proto: that
++//!   acknowledgement and the recorded commands (their slot, tick, sequence, presses and view time as the room ran them),
++//!   newest first. So the acknowledgement names only snapshots the room sent it. No npt-client change.
++//! - **Pacing** (plan silent): the command stamped T is sent at the instant tick T − L runs (step 5, after the tick), L
++//!   the lead (`buffer_depth_ticks_count`, 1 to 7). On Loopback it is received at the next instant's step 2, the instant
++//!   tick T − L + 1 is due; on L1 P0 at the next net instant after the send (never the same instant: l1/src/lib.rs:65-70);
++//!   either way before tick T − L + 1 runs, so it waits at most L ticks, within `CMD_CATCHUP` (8). Each `Input` carries
++//!   every sent command whose tick has not run (at most L, newest first, consecutive sequences), so a lost datagram
++//!   would be covered by the next; at P0 and on Loopback none is lost. A command the recording repeats (option B's rerun:
++//!   its sequence again) is sent once: the room reruns it as the recording shows.
++//! - **Admission** does not enter the World's hashed state: only a tick's `TickInput` does (room.rs's join adds nothing
++//!   to it; scenario.rs s5 replays a runner recording's `TickInput`s alone to the room's every World hash), so the two
++//!   legs may admit a client at different ticks; the records give each client's admit tick per leg.
++//! - **A replay client sends its first `Input` only after it decodes `JoinAccepted`** (`ClientEndpoint::slot`).
++//! - **Scripts:** each recorded tick's spawns, teleports and attribute changes go to the leg's room by `Room::script`
++//!   before that tick, through carry 49's `check_placements`.
++//! - **The comparer:** `HashCompare::of` over each leg's `TickHash { recording, tick, hash }` list, the recording's
++//!   manifest name on both, from the recording's first tick, each hash npt-sim's `SimCore::state_hash` of the room's
++//!   World after the tick (the value logs.rs writes as the room log's `h`), never the mirror hash.
++//! - **The setup condition and the RTT rule:** per leg, `late_count` (the room's `late`), `rewinds_refused`, the commands
++//!   run off their stamp, and [`rtt_rule`]; the tolerance's replacements and the cap's clips are not built at U4r (0 by
++//!   construction: rewind.rs:1-2). Any of the first three above 0, or the RTT rule on the L1 leg, makes the pair VOID.
++
++use std::collections::BTreeMap;
++
++use npt_client::ClientEndpoint;
++use npt_l1::{L1Net, Profile};
++use npt_lab::{HashCompare, TickHash};
++use npt_link::{Channel, Link};
++use npt_proto::{Direction, Input, Limits, Message, Quant};
++use npt_room::Room;
++use npt_server::{RttSource, Schedule, due_ticks};
++use npt_sim::replay::Recording;
++use npt_sim::{Command, Scene, StandIns, World};
++
++use crate::scenario::{
++    Bites, CONTENT, MAX_DATAGRAM, Server, check_placements, credentials, join_of,
++};
++
++/// The pre-check's suite name (7.2).
++pub(crate) const SUITE: &str = "precheck-30";
++
++/// A pre-check leg.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub(crate) enum Leg {
++    Loopback,
++    L1,
++}
++
++impl Leg {
++    pub(crate) fn name(self) -> &'static str {
++        match self {
++            Leg::Loopback => "loopback",
++            Leg::L1 => "L1",
++        }
++    }
++}
++
++/// One client's records on one leg (7.2: the RTT rule's three, and the admit tick).
++#[derive(Clone, Debug, Default, PartialEq, Eq)]
++pub(crate) struct ClientRecord {
++    pub(crate) slot: u8,
++    pub(crate) admit_tick: Option<u32>,
++    /// The SimClock instant of the first pump call after which the session's `Decoder::rtt_ns(link)` is `Some`.
++    pub(crate) first_sample_ns: Option<u64>,
++    /// The instant of the pump call that decoded its first `Input` with a command.
++    pub(crate) first_input_ns: Option<u64>,
++    /// The tick its first command ran at, and that tick's run instant.
++    pub(crate) first_run_tick: Option<u32>,
++    pub(crate) first_run_ns: Option<u64>,
++}
++
++/// The RTT rule (7.2; plan :781-790; U4R-Q10 (b')): on the L1 leg, a client whose first command runs strictly before
++/// its first-sample instant, or that has no first-sample instant when its first command runs, makes the leg VOID; equal
++/// instants are not VOID (at one instant the pump comes before the tick). The Loopback leg's `rtt_ns` is Some(0) from
++/// the start (link/src/lib.rs:203-205), so the rule binds the L1 leg only. `Some(reason)` for VOID.
++pub(crate) fn rtt_rule(leg: Leg, records: &[ClientRecord]) -> Option<String> {
++    if leg == Leg::Loopback {
++        return None;
++    }
++    for r in records {
++        let Some(run) = r.first_run_ns else { continue };
++        match r.first_sample_ns {
++            None => {
++                return Some(format!(
++                    "client {}: no first-sample instant on the L1 leg when its first command runs ({run} ns)",
++                    r.slot
++                ));
++            }
++            Some(sample) if run < sample => {
++                return Some(format!(
++                    "client {}: its first command runs at {run} ns, before its first sample at {sample} ns",
++                    r.slot
++                ));
++            }
++            Some(_) => {}
++        }
++    }
++    None
++}
++
++/// One leg's outcome (the module text).
++#[derive(Clone, Debug, Default)]
++pub(crate) struct LegOutcome {
++    pub(crate) hashes: Vec<TickHash>,
++    pub(crate) late: u64,
++    pub(crate) rewinds_refused: u64,
++    /// New commands the room ran at another tick than their stamp.
++    pub(crate) off_stamp: u64,
++    /// The room's measured buffer depth (`ClientSlot::buffer_depth_ticks`: "how many ticks ahead the newest buffered
++    /// command was at the last take", room/src/input.rs:28), read after each tick for every client whose first command
++    /// has run: depth to the number of (client, tick) reads.
++    pub(crate) depth: BTreeMap<u32, u64>,
++    pub(crate) records: Vec<ClientRecord>,
++    /// Sessions ended on this leg: (slot, why).
++    pub(crate) ended: Vec<(u8, &'static str)>,
++    /// Scripted placements and attribute changes put into the room.
++    pub(crate) scripted: usize,
++    /// The late-command bite's delayed command's tick, on its leg.
++    pub(crate) delayed: Option<u32>,
++    pub(crate) rtt_void: Option<String>,
++}
++
++/// One replay client (the module text).
++struct ReplayClient {
++    slot: u8,
++    endpoint: ClientEndpoint,
++    link: Box<dyn Link>,
++    inbox: Vec<(Channel, Vec<u8>, u64)>,
++    /// The recorded commands of this slot, in sequence order (each once).
++    cmds: Vec<Command>,
++    /// Commands sent so far: `cmds[..next]`; `cmds[unrun..next]` sent and not yet run.
++    next: usize,
++    unrun: usize,
++    /// The late-command bite: the tick T whose command and every later one are held until T has run.
++    hold: Option<u32>,
++    released: bool,
++}
++
++impl ReplayClient {
++    /// RQ8's step 5 at `now`, after tick `ran` ran: the endpoint decodes what arrived and sends its `Join` and `Pong`s;
++    /// once joined, the commands due (stamped at most `ran + lead`) go in this client's own `Input`.
++    fn step(&mut self, now: u64, ran: u32, lead: u32) -> Option<u32> {
++        let mut got = std::mem::take(&mut self.inbox);
++        while let Some(r) = self.link.poll_recv(now) {
++            got.push((r.channel, r.bytes, r.arrival_ns));
++        }
++        self.endpoint.input(None, &got, now);
++        let out = self.endpoint.step();
++        for (ch, b) in &out.reliable {
++            self.link.send_reliable(*ch, b, now);
++        }
++        let mut ack = (0u16, 0u8);
++        for d in &out.datagrams {
++            match npt_proto::decode(Direction::ClientToRoom, Channel::Datagram, d) {
++                Ok(Message::Input(i)) => ack = (i.ack_tick, i.ack_groups),
++                _ => {
++                    self.link.send_unreliable(d, now);
++                }
++            }
++        }
++        self.endpoint.slot()?;
++        let held = |c: &Command, hold: Option<u32>| hold.is_some_and(|t| ran < t && c.tick >= t);
++        while self.next < self.cmds.len()
++            && self.cmds[self.next].tick <= ran.wrapping_add(lead)
++            && !held(&self.cmds[self.next], self.hold)
++        {
++            self.next += 1;
++        }
++        while self.unrun < self.next && self.cmds[self.unrun].tick <= ran {
++            self.unrun += 1;
++        }
++        let mut from = self.unrun;
++        let mut delayed = None;
++        if let Some(t) = self.hold
++            && ran >= t
++            && !self.released
++        {
++            // The bite's release: T first (it ran already: option B reran the last command there), the later ones after.
++            self.released = true;
++            if let Some(i) = self.cmds.iter().position(|c| c.tick >= t) {
++                from = from.min(i);
++                delayed = Some(self.cmds[i].tick);
++            }
++        }
++        let mut commands: Vec<Command> = Vec::new();
++        for c in self.cmds[from..self.next].iter().rev() {
++            if commands.len() == Limits::REDUNDANCY_CAP
++                || commands
++                    .last()
++                    .is_some_and(|n: &Command| n.seq != c.seq.wrapping_add(1))
++            {
++                break;
++            }
++            commands.push(*c);
++        }
++        if commands.is_empty() && ack == (0, 0) {
++            return delayed;
++        }
++        let input = Input {
++            ack_tick: ack.0,
++            ack_groups: ack.1,
++            commands,
++        };
++        let mut b = Vec::new();
++        if npt_proto::encode(&Message::Input(input), &mut b).is_ok() {
++            self.link.send_unreliable(&b, now);
++        }
++        delayed
++    }
++}
++
++/// Each slot's recorded commands, each once in sequence order (a rerun, its sequence again, skipped), checked to have
++/// run at their stamped tick in the recording.
++pub(crate) fn commands_of(rec: &Recording) -> Result<BTreeMap<u8, Vec<Command>>, String> {
++    let mut out: BTreeMap<u8, Vec<Command>> = BTreeMap::new();
++    for ti in &rec.ticks {
++        for (c, _) in &ti.commands {
++            let list = out.entry(c.slot).or_default();
++            if list.last().is_some_and(|l| l.seq == c.seq) {
++                continue;
++            }
++            if c.tick != ti.tick {
++                return Err(format!(
++                    "the recording's command {} of slot {} is stamped {} but ran at {}: not a clean recording",
++                    c.seq, c.slot, c.tick, ti.tick
++                ));
++            }
++            list.push(*c);
++        }
++    }
++    Ok(out)
++}
++
++/// Runs one leg (the module text) on the recording `rec` named `name`, at lead `lead`, with `bite` (an id) on it.
++pub(crate) fn run_leg(
++    rec: &Recording,
++    name: &str,
++    leg: Leg,
++    lead: u32,
++    bite: Option<&str>,
++) -> Result<LegOutcome, String> {
++    let scene = Scene::by_id(rec.scene)
++        .ok_or(format!("no scene {}", rec.scene))?
++        .with_stand_ins(StandIns::OFF);
++    let cmds = commands_of(rec)?;
++    let world = World::new(&scene, rec.seed, rec.first_tick);
++    let greybox = world.greybox().clone();
++    let tokens = (0..scene.slots())
++        .map(|slot| credentials(rec.seed, slot).0)
++        .collect();
++    let room = Room::new(
++        world,
++        &scene,
++        &greybox,
++        tokens,
++        cmds.len(),
++        npt_sim::TICK_HZ,
++    )
++    .with_hashes(CONTENT, [0; 32]);
++    let mut server = Server::new(room, Quant::default(), RttSource::Link);
++    let mut late_bite = false;
++    if let Some(id) = bite {
++        let b = Bites::of(id)?;
++        if b.pump {
++            server.decoder_bite = Some(id.to_owned());
++        } else if b.late_command {
++            late_bite = true;
++        } else {
++            return Err(format!("--bite {id}: not a -30 pre-check bite"));
++        }
++    }
++    let mut schedule = Schedule::new(npt_sim::TICK_HZ, npt_sim::LOOP_CATCHUP);
++    let net = L1Net::new(rec.seed);
++    let mut listener = net.listener();
++    let p0 = Profile::by_name("P0").ok_or("no profile P0")?;
++    let mut clients: Vec<ReplayClient> = Vec::new();
++    for (&slot, list) in &cmds {
++        let link: Box<dyn Link> = match leg {
++            Leg::L1 => net.connect(p0.clone(), MAX_DATAGRAM, 0),
++            Leg::Loopback => {
++                let (s, c) = npt_link::Loopback::pair(MAX_DATAGRAM);
++                server.accept(Box::new(s), 0);
++                Box::new(c)
++            }
++        };
++        let hold = if late_bite && clients.is_empty() {
++            let t0 = rec.ticks.first().map_or(rec.first_tick, |t| t.tick);
++            Some(
++                list.iter()
++                    .map(|c| c.tick)
++                    .find(|t| t.wrapping_sub(t0) >= 60 && t.wrapping_sub(t0) < 1 << 31)
++                    .ok_or("the late-command bite: slot's commands end before 60 ticks")?,
++            )
++        } else {
++            None
++        };
++        clients.push(ReplayClient {
++            slot,
++            endpoint: ClientEndpoint::new(join_of(rec.seed, slot), npt_sim::TICK_HZ)
++                .with_lead(lead),
++            link,
++            inbox: Vec::new(),
++            cmds: list.clone(),
++            next: 0,
++            unrun: 0,
++            hold,
++            released: false,
++        });
++    }
++    let mut o = LegOutcome::default();
++    let mut admitted: BTreeMap<u8, u32> = BTreeMap::new();
++    let mut first_run: BTreeMap<u8, (u32, u64)> = BTreeMap::new();
++    let mut last_seq: BTreeMap<u8, u16> = BTreeMap::new();
++    let mut now = 0u64;
++    let mut idx = 0usize;
++    while idx < rec.ticks.len() {
++        // (1) packets due, and each new link's server end (L1).
++        while let Some((link, _)) = listener.poll_accept(now) {
++            server.accept(link, now);
++        }
++        // (2) the server's I/O step.
++        server.io(now);
++        for (slot, _, tick) in std::mem::take(&mut server.admitted) {
++            admitted.entry(slot).or_insert(tick);
++        }
++        o.ended.append(&mut server.ended);
++        // (3) the server tick, if due.
++        let due = due_ticks(now, &schedule);
++        schedule = due.next;
++        let mut ran = None;
++        for _ in 0..due.to_run {
++            let Some(ti) = rec.ticks.get(idx) else { break };
++            check_placements(&ti.spawns, &ti.teleports)?;
++            o.scripted += ti.spawns.len() + ti.teleports.len() + ti.attributes.len();
++            server
++                .room
++                .script(&ti.spawns, &ti.teleports, &ti.attributes);
++            let t = server.room.last_tick().wrapping_add(1);
++            if t != ti.tick {
++                return Err(format!(
++                    "{} leg: the room's tick {t} is not the recording's {} (the tick base)",
++                    leg.name(),
++                    ti.tick
++                ));
++            }
++            server.room.tick();
++            o.hashes.push(TickHash {
++                recording: name.to_owned(),
++                tick: t,
++                hash: npt_sim::SimCore::state_hash(server.room.sim()),
++            });
++            for (c, _) in &server.room.tick_input().commands {
++                if last_seq.insert(c.slot, c.seq) != Some(c.seq) {
++                    o.off_stamp += u64::from(c.tick != t);
++                    first_run.entry(c.slot).or_insert((t, now));
++                }
++            }
++            for &slot in first_run.keys() {
++                if let Some(c) = server.room.client(slot) {
++                    *o.depth.entry(c.buffer_depth_ticks()).or_default() += 1;
++                }
++            }
++            for c in &clients {
++                let d = server.room.take_datagrams(c.slot);
++                let k = server.room.take_control(c.slot);
++                server.send(c.slot, &d, &k, now)?;
++            }
++            o.ended.append(&mut server.ended);
++            idx += 1;
++            ran = Some(t);
++        }
++        // (5) each replay client, after a tick ran.
++        if let Some(t) = ran {
++            for c in &mut clients {
++                if let Some(d) = c.step(now, t, lead) {
++                    o.delayed = Some(d);
++                }
++            }
++        }
++        for c in &mut clients {
++            while let Some(r) = c.link.poll_recv(now) {
++                c.inbox.push((r.channel, r.bytes, r.arrival_ns));
++            }
++        }
++        let mut next = schedule.next_due_ns();
++        if let Some(e) = net.next_event_ns() {
++            next = next.min(e.max(now + 1));
++        }
++        now = next.max(now + 1);
++    }
++    for c in &clients {
++        let k = server
++            .room
++            .client(c.slot)
++            .map(|x| x.counters().clone())
++            .unwrap_or_default();
++        o.late += k.late;
++        o.rewinds_refused += k.rewinds_refused;
++        let session = server.session(c.slot);
++        let (sample, input) =
++            session.map_or((None, None), |s| (s.first_sample_ns, s.first_input_ns));
++        o.records.push(ClientRecord {
++            slot: c.slot,
++            admit_tick: admitted.get(&c.slot).copied(),
++            first_sample_ns: sample,
++            first_input_ns: input,
++            first_run_tick: first_run.get(&c.slot).map(|r| r.0),
++            first_run_ns: first_run.get(&c.slot).map(|r| r.1),
++        });
++    }
++    o.rtt_void = rtt_rule(leg, &o.records);
++    Ok(o)
++}
++
++/// The pair's result (7.2): VOID if either leg breaks the setup condition (late, rewinds refused, a command off its
++/// stamp) or the RTT rule, or nothing was compared; else PASS when the comparer names no differing tick, FAIL when it
++/// names one. Returns (result, reason).
++pub(crate) fn verdict(a: &LegOutcome, b: &LegOutcome, cmp: &HashCompare) -> (&'static str, String) {
++    let mut void = Vec::new();
++    for (leg, o) in [("loopback", a), ("L1", b)] {
++        if o.late > 0 {
++            void.push(format!("{leg} late_count {}", o.late));
++        }
++        if o.rewinds_refused > 0 {
++            void.push(format!("{leg} rewinds_refused {}", o.rewinds_refused));
++        }
++        if o.off_stamp > 0 {
++            void.push(format!("{leg} commands off their stamp {}", o.off_stamp));
++        }
++        if let Some(r) = &o.rtt_void {
++            void.push(format!("{leg} RTT rule: {r}"));
++        }
++    }
++    if !void.is_empty() {
++        return ("VOID", void.join("; "));
++    }
++    match cmp {
++        HashCompare::Equal { entries } => {
++            ("PASS", format!("{entries} ticks, every World hash equal"))
++        }
++        HashCompare::Empty => (
++            "VOID",
++            "the comparer compared nothing (Empty is never equal)".to_owned(),
++        ),
++        HashCompare::Mismatch {
++            index,
++            ours,
++            theirs,
++            compared,
++            mismatching,
++        } => (
++            "FAIL",
++            format!(
++                "first differing index {index} (loopback {:?}, L1 {:?}); {mismatching} of {compared} differ",
++                ours.as_ref().map(|t| (t.tick, format!("{:016x}", t.hash))),
++                theirs
++                    .as_ref()
++                    .map(|t| (t.tick, format!("{:016x}", t.hash)))
++            ),
++        ),
++    }
++}
++
++/// `precheck`'s usage line.
++pub(crate) const USAGE: &str = "npt-lab precheck --manifest <precheck-recordings.json> --recording <file> \
++[--lead <1..7>] [--bite <id> --bite-leg loopback|L1]";
++
++/// The `precheck` subcommand: the recording checked against its manifest entry (its byte length and SHA-256), both legs
++/// run, and the result lines printed (the run script writes them to runs.txt). `Err` for a usage error (2) or a failure
++/// to run (1).
++pub(crate) fn main(argv: &[String]) -> Result<Vec<String>, (u8, String)> {
++    let usage = |m: String| (2u8, m);
++    let mut map: BTreeMap<&str, &str> = BTreeMap::new();
++    let mut it = argv.iter();
++    while let Some(flag) = it.next() {
++        let k = flag
++            .strip_prefix("--")
++            .ok_or(usage(format!("unexpected argument {flag:?}")))?;
++        let v = it.next().ok_or(usage(format!("{flag} needs a value")))?;
++        if map.insert(k, v).is_some() {
++            return Err(usage(format!("{flag} given twice")));
++        }
++    }
++    let manifest = map
++        .remove("manifest")
++        .ok_or(usage("--manifest is required".into()))?;
++    let file = map
++        .remove("recording")
++        .ok_or(usage("--recording is required".into()))?;
++    let lead = match map.remove("lead") {
++        None => crate::scenario::lead_for(&Profile::by_name("P0").ok_or((1, "no P0".to_owned()))?),
++        Some(v) => v
++            .parse::<u32>()
++            .ok()
++            .filter(|l| (1..=7).contains(l))
++            .ok_or(usage(format!("--lead {v:?}: 1 to 7")))?,
++    };
++    let bite = map.remove("bite");
++    let bite_leg = match (bite, map.remove("bite-leg")) {
++        (None, None) => None,
++        (Some(_), Some("loopback")) => Some(Leg::Loopback),
++        (Some(_), Some("L1")) => Some(Leg::L1),
++        _ => {
++            return Err(usage(
++                "--bite and --bite-leg loopback|L1 go together".into(),
++            ));
++        }
++    };
++    if let Some(k) = map.keys().next() {
++        return Err(usage(format!("unknown option --{k}")));
++    }
++    let text = std::fs::read_to_string(manifest).map_err(|e| (1, format!("{manifest}: {e}")))?;
++    let entries = crate::hash::manifest(&text).map_err(|e| (1, format!("{manifest}: {e}")))?;
++    let [entry] = entries.as_slice() else {
++        return Err((
++            1,
++            format!("{manifest}: the pre-check's manifest holds one entry"),
++        ));
++    };
++    let bytes = std::fs::read(file).map_err(|e| (1, format!("{file}: {e}")))?;
++    let sha = {
++        use sha2::{Digest, Sha256};
++        Sha256::digest(&bytes)
++            .iter()
++            .map(|b| format!("{b:02x}"))
++            .collect::<String>()
++    };
++    if bytes.len() as u64 != entry.bytes || sha != entry.sha256 {
++        return Err((
++            1,
++            format!(
++                "{file}: {} bytes, sha256 {sha}: not the manifest's {} ({} bytes, {})",
++                bytes.len(),
++                entry.name,
++                entry.bytes,
++                entry.sha256
++            ),
++        ));
++    }
++    let rec = Recording::decode(&bytes).map_err(|e| (1, format!("{file}: {e}")))?;
++    pair(&rec, &entry.name, lead, bite.zip(bite_leg)).map_err(|e| (1, e))
++}
++
++/// Both legs and the result lines (the module text).
++pub(crate) fn pair(
++    rec: &Recording,
++    name: &str,
++    lead: u32,
++    bite: Option<(&str, Leg)>,
++) -> Result<Vec<String>, String> {
++    let on = |leg: Leg| bite.filter(|b| b.1 == leg).map(|b| b.0);
++    let a = run_leg(rec, name, Leg::Loopback, lead, on(Leg::Loopback))?;
++    let b = run_leg(rec, name, Leg::L1, lead, on(Leg::L1))?;
++    let cmp = HashCompare::of(&a.hashes, &b.hashes);
++    let (result, why) = verdict(&a, &b, &cmp);
++    let mut lines = vec![format!(
++        "{SUITE} {name}: {} ticks from tick {} (the tick base, both legs: World::new(scene, {}, {})); lead {lead} \
++         (buffer_depth_ticks_count {lead}, both legs); cmd_timing B; bite {}",
++        rec.ticks.len(),
++        rec.ticks.first().map_or(rec.first_tick, |t| t.tick),
++        rec.seed,
++        rec.first_tick,
++        bite.map_or("none".to_owned(), |(id, leg)| format!(
++            "{id} on the {} leg",
++            leg.name()
++        ))
++    )];
++    for (leg, o) in [(Leg::Loopback, &a), (Leg::L1, &b)] {
++        let admits: Vec<u32> = o.records.iter().filter_map(|r| r.admit_tick).collect();
++        lines.push(format!(
++            "leg {}: clients admitted {} (admit ticks {}..{}); ended {:?}; late_count {}; rewinds_refused {}; commands \
++             off their stamp {}; the room's measured depth at its take (depth: client ticks) {:?}; scripted {}; \
++             view-time replacements \
++             and clipped shots: not built, 0 by construction; delayed command {}; RTT rule: {}",
++            leg.name(),
++            admits.len(),
++            admits.iter().min().copied().unwrap_or(0),
++            admits.iter().max().copied().unwrap_or(0),
++            o.ended,
++            o.late,
++            o.rewinds_refused,
++            o.off_stamp,
++            o.depth,
++            o.scripted,
++            o.delayed.map_or("none".to_owned(), |t| format!("tick {t}")),
++            o.rtt_void.as_deref().unwrap_or(if leg == Leg::Loopback {
++                "Some(0) from the start"
++            } else {
++                "holds"
++            })
++        ));
++        for r in &o.records {
++            lines.push(format!(
++                "  {} client {}: admit tick {:?}; first sample {:?} ns; first input {:?} ns; first run tick {:?} at {:?} ns",
++                leg.name(),
++                r.slot,
++                r.admit_tick,
++                r.first_sample_ns,
++                r.first_input_ns,
++                r.first_run_tick,
++                r.first_run_ns
++            ));
++        }
++    }
++    lines.push(format!(
++        "comparer (HashCompare::of, loopback against L1): {cmp:?}"
++    ));
++    lines.push(format!("result: {result} ({why})"));
++    Ok(lines)
++}
++
++/// Each leg's first run tick check (tests and the bites' records): the result line of `pair`'s output.
++#[cfg(test)]
++fn result_of(lines: &[String]) -> &str {
++    lines.last().map_or("", String::as_str)
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    /// The SS P0 seed 4 recording's first 120 ticks (its runner entry's settings, precheck-recordings.json, with a 4 s
++    /// warm-up and no measured phase: the run is the same, cut sooner), enough for every client's first commands.
++    fn short_recording() -> Recording {
++        let b =
++            crate::scenario::record(&Scene::stress(), "P0", 4, 48, 0, 4, 0).expect("a recording");
++        Recording::decode(&b).expect("it decodes")
++    }
++
++    fn rec(slot: u8, sample: Option<u64>, run: Option<u64>) -> ClientRecord {
++        ClientRecord {
++            slot,
++            first_sample_ns: sample,
++            first_run_ns: run,
++            ..ClientRecord::default()
++        }
++    }
++
++    /// r7 (U4R-Q10 (b')), case 1: a first-sample instant after the first command's run instant gives VOID.
++    #[test]
++    fn r7_a_first_sample_after_the_first_command_s_run_is_void() {
++        let v = rtt_rule(
++            Leg::L1,
++            &[rec(0, Some(10), Some(10)), rec(1, Some(101), Some(100))],
++        );
++        assert!(v.is_some_and(|r| r.contains("client 1") && r.contains("before its first sample")));
++    }
++
++    /// r7, case 2: equal instants are not VOID (the pump comes before the tick).
++    #[test]
++    fn r7_equal_instants_are_not_void() {
++        assert_eq!(rtt_rule(Leg::L1, &[rec(0, Some(100), Some(100))]), None);
++        assert_eq!(rtt_rule(Leg::L1, &[rec(0, Some(99), Some(100))]), None);
++    }
++
++    /// r7, case 3: no first-sample instant on the L1 leg when the first command runs gives VOID.
++    #[test]
++    fn r7_no_first_sample_on_the_l1_leg_is_void() {
++        let v = rtt_rule(
++            Leg::L1,
++            &[rec(0, Some(1), Some(5)), rec(7, None, Some(100))],
++        );
++        assert!(v.is_some_and(|r| r.contains("client 7") && r.contains("no first-sample")));
++        assert_eq!(
++            rtt_rule(Leg::L1, &[rec(7, None, None)]),
++            None,
++            "no command ran: nothing to judge"
++        );
++    }
++
++    /// r7, case 4: the Loopback leg ("Some(0) from the start") never gives VOID, whatever its records say.
++    #[test]
++    fn r7_the_loopback_leg_never_gives_void() {
++        assert_eq!(
++            rtt_rule(
++                Leg::Loopback,
++                &[rec(0, None, Some(100)), rec(1, Some(200), Some(100))]
++            ),
++            None
++        );
++    }
++
++    /// r6, the pre-check's pacing test (7.2's pacing rule): a short clean replay of the SS P0 recording over both legs
++    /// gives `late_count` 0 and `rewinds_refused` 0 on both, every command run at its stamped tick, the room's measured
++    /// depth the lead, every client admitted, the RTT rule holding, and equal per-tick World hashes (PASS).
++    #[test]
++    fn r6_a_clean_replay_runs_every_command_at_its_stamp_on_both_legs() {
++        let r = short_recording();
++        let lines = pair(&r, "SS-P0-s4", 2, None).expect("both legs run");
++        for l in lines.iter().filter(|l| !l.starts_with("  ")) {
++            println!("r6: {l}");
++        }
++        let a = run_leg(&r, "SS-P0-s4", Leg::Loopback, 2, None).expect("loopback");
++        let b = run_leg(&r, "SS-P0-s4", Leg::L1, 2, None).expect("L1");
++        for (leg, o) in [("loopback", &a), ("L1", &b)] {
++            assert_eq!((o.late, o.rewinds_refused, o.off_stamp), (0, 0, 0), "{leg}");
++            assert_eq!(o.records.len(), 48, "{leg}");
++            assert!(
++                o.records
++                    .iter()
++                    .all(|c| c.admit_tick.is_some() && c.first_run_tick.is_some()),
++                "{leg}"
++            );
++            println!(
++                "r6 {leg}: the room's measured depth at its take {:?}; {} scripted; ticks {}",
++                o.depth,
++                o.scripted,
++                o.hashes.len()
++            );
++            assert!(o.ended.is_empty(), "{leg}: {:?}", o.ended);
++            assert_eq!(o.rtt_void, None, "{leg}");
++        }
++        assert_eq!(
++            HashCompare::of(&a.hashes, &b.hashes),
++            HashCompare::Equal {
++                entries: r.ticks.len()
++            }
++        );
++        assert_eq!(result_of(&lines).split(' ').nth(1), Some("PASS"));
++    }
++
++    /// The late-command bite (2.5, 7.2; bites builds only): one replay client on the L1 leg holds T and every later
++    /// command until T has run, then sends T first: that leg's `late_count` is exactly 1, and the pair is VOID by it alone.
++    #[cfg(feature = "bites")]
++    #[test]
++    fn precheck_bite_late_command_makes_the_pair_void_by_late_count_alone() {
++        let r = short_recording();
++        let lines = pair(
++            &r,
++            "SS-P0-s4",
++            2,
++            Some(("PM-0001-30/late-command", Leg::L1)),
++        )
++        .expect("both legs run");
++        for l in lines.iter().filter(|l| !l.starts_with("  ")) {
++            println!("late-command bite: {l}");
++        }
++        let b = run_leg(&r, "SS-P0-s4", Leg::L1, 2, Some("PM-0001-30/late-command")).expect("L1");
++        assert_eq!(b.late, 1, "exactly the one delayed command");
++        assert!(b.delayed.is_some());
++        assert_eq!((b.rewinds_refused, b.rtt_void.clone()), (0, None));
++        let result = result_of(&lines);
++        assert!(
++            result.starts_with("result: VOID (L1 late_count 1)"),
++            "{result}"
++        );
++    }
++
++    /// The wallclock bite (2.5, 7.2; bites builds only): the L1 leg's pump sets each command's move from the wall clock,
++    /// so the pair is valid and the comparer names a differing tick (FAIL); a PASS would be a missed bite.
++    #[cfg(feature = "bites")]
++    #[test]
++    fn precheck_bite_wallclock_gives_a_valid_pair_whose_comparer_names_a_tick() {
++        let r = short_recording();
++        let lines = pair(&r, "SS-P0-s4", 2, Some(("PM-0001-30/wallclock", Leg::L1)))
++            .expect("both legs run");
++        for l in lines.iter().filter(|l| !l.starts_with("  ")) {
++            println!("wallclock bite: {l}");
++        }
++        let result = result_of(&lines);
++        assert!(
++            result.starts_with("result: FAIL (first differing index"),
++            "{result}"
++        );
++    }
++}
+diff --git a/spikes/netcode-proof/crates/lab/src/replay.rs b/spikes/netcode-proof/crates/lab/src/replay.rs
+new file mode 100644
+index 0000000..31a4aed
+--- /dev/null
++++ b/spikes/netcode-proof/crates/lab/src/replay.rs
+@@ -0,0 +1,427 @@
++//! `replay`, the x86-64 re-decode ([`ReplayX86`]; u4r-brief.md 2.1 and 2.4 r3; plan :753-755, :761-764; R-8, the
++//! advisor's condition 9): a run's logged client bytes (`scenario --bytes`: each client's received messages, step by
++//! step, with each step's host instant) decoded again natively by a fresh `ClientEndpoint` per client, with the run's
++//! join, lead and starts (read from the run's client log header), and the hashes it files written as `hs.replay_hash`
++//! in a `replay` log (process `replay`, this machine's arch: only an x86_64 one is read, judge/src/figures.rs:222-233),
++//! never in another log. Commands never reach the decoder (`ClientEndpoint::input` decodes what it is handed before it
++//! stamps a command: client/src/lib.rs:379-410), so the re-decode hands each step its bytes with no command and calls
++//! `step` as the run did; the hashes come back the run's. The re-decoder's client takes the run's bite when the run had
++//! one (the same client), or the one `--bite` names: r3's is npt-client's own PM-0001-17/client-rounding (its grid
++//! floored, `npt_client::grid_with_bite`, client/src/lib.rs:37-40), so npt-lab plants no new id.
++
++use std::collections::BTreeMap;
++use std::path::{Path, PathBuf};
++
++use npt_client::ClientEndpoint;
++use npt_link::Channel;
++use npt_log::{Ended, Header, Log, Phase, TickRecord, Writer};
++use serde_json::Value;
++
++use crate::hash::Failure;
++use crate::scenario::{Bites, join_of};
++
++/// `replay`'s usage line.
++pub(crate) const USAGE: &str =
++    "npt-lab replay --logs <run folder> --bytes <folder> --out <folder> [--bite <id>]";
++
++/// One `replay` call's settings.
++#[derive(Clone, Debug)]
++pub(crate) struct Settings {
++    /// The run's folder: its `client.jsonl` gives the header and the hashes compared.
++    pub(crate) logs: PathBuf,
++    /// The run's `--bytes` folder: one `client-<slot>.bytes` per client.
++    pub(crate) bytes: PathBuf,
++    /// Where `replay.jsonl` goes (never overwritten).
++    pub(crate) out: PathBuf,
++    pub(crate) bite: Option<String>,
++}
++
++/// `replay`'s options (after `replay`), as `--name value` pairs, each once.
++pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
++    let mut map: BTreeMap<&str, &str> = BTreeMap::new();
++    let mut it = argv.iter();
++    while let Some(flag) = it.next() {
++        let name = flag
++            .strip_prefix("--")
++            .ok_or(format!("unexpected argument {flag:?}"))?;
++        let value = it.next().ok_or(format!("{flag} needs a value"))?;
++        if map.insert(name, value).is_some() {
++            return Err(format!("{flag} given twice"));
++        }
++    }
++    let mut take = |k: &str| map.remove(k).map(PathBuf::from);
++    let logs = take("logs").ok_or("--logs is required")?;
++    let bytes = take("bytes").ok_or("--bytes is required")?;
++    let out = take("out").ok_or("--out is required")?;
++    let bite = map.remove("bite").map(str::to_owned);
++    if let Some(k) = map.keys().next() {
++        return Err(format!("unknown option --{k}"));
++    }
++    Ok(Settings {
++        logs,
++        bytes,
++        out,
++        bite,
++    })
++}
++
++/// One logged client step: its host instant and what it was handed, as (channel, bytes, arrival ns).
++pub(crate) type Step = (u64, Vec<(Channel, Vec<u8>, u64)>);
++
++struct Cursor<'a> {
++    b: &'a [u8],
++    at: usize,
++}
++
++impl<'a> Cursor<'a> {
++    fn take(&mut self, n: usize) -> Result<&'a [u8], String> {
++        let end = self
++            .at
++            .checked_add(n)
++            .filter(|e| *e <= self.b.len())
++            .ok_or_else(|| format!("cut short at byte {}", self.at))?;
++        let s = &self.b[self.at..end];
++        self.at = end;
++        Ok(s)
++    }
++
++    fn u64(&mut self) -> Result<u64, String> {
++        let mut w = [0u8; 8];
++        w.copy_from_slice(self.take(8)?);
++        Ok(u64::from_le_bytes(w))
++    }
++
++    fn u32(&mut self) -> Result<u32, String> {
++        let mut w = [0u8; 4];
++        w.copy_from_slice(self.take(4)?);
++        Ok(u32::from_le_bytes(w))
++    }
++}
++
++/// One client's bytes file, step by step (scenario.rs `write_step`'s format: host instant u64, count u32, then per
++/// message channel u8 (0 datagram, 1 control, 2 full state), arrival u64, length u32 and the bytes, little-endian).
++pub(crate) fn read_steps(bytes: &[u8]) -> Result<Vec<Step>, String> {
++    let mut c = Cursor { b: bytes, at: 0 };
++    let mut out = Vec::new();
++    while c.at < bytes.len() {
++        let host = c.u64()?;
++        let count = c.u32()?;
++        let mut got = Vec::new();
++        for _ in 0..count {
++            let channel = match c.take(1)?[0] {
++                0 => Channel::Datagram,
++                1 => Channel::Control,
++                2 => Channel::FullState,
++                x => return Err(format!("channel code {x} at byte {}", c.at - 1)),
++            };
++            let arrival = c.u64()?;
++            let len = c.u32()? as usize;
++            got.push((channel, c.take(len)?.to_vec(), arrival));
++        }
++        out.push((host, got));
++    }
++    Ok(out)
++}
++
++/// A header param as a whole number (the run's client log header).
++fn param(h: &Header, name: &str) -> Result<u64, String> {
++    h.params
++        .get(name)
++        .and_then(Value::as_u64)
++        .ok_or(format!("the run's client log header has no param {name}"))
++}
++
++/// The x86-64 re-decoder of one run (plan.md:617's `ReplayX86`): its clients' join, lead and starts, and the bite its
++/// clients take.
++pub(crate) struct ReplayX86 {
++    seed: u64,
++    lead: u32,
++    cmd_start: u32,
++    event_start: u32,
++    first_tick: u32,
++    bites: Bites,
++}
++
++impl ReplayX86 {
++    /// The re-decoder of the run whose client log header is `h`; `bite` the one `--bite` names (else the run's).
++    pub(crate) fn of(h: &Header, bite: Option<&str>) -> Result<ReplayX86, String> {
++        let small = |name: &str| {
++            u32::try_from(param(h, name)?).map_err(|_| format!("param {name} is above 32 bits"))
++        };
++        let bites = match bite.or(h.bite.as_deref()) {
++            None => Bites::default(),
++            Some(id) => Bites::of(id)?,
++        };
++        Ok(ReplayX86 {
++            seed: h.seed,
++            lead: small("lead_ticks_count")?,
++            cmd_start: small("cmd_start_count")?,
++            event_start: small("event_start_count")?,
++            first_tick: small("tick_start")?,
++            bites,
++        })
++    }
++
++    /// A 32-bit tick as the logs' never-wrapping tick: forward from the run's first tick (logs.rs `wide`).
++    fn wide(&self, t: u32) -> u64 {
++        u64::from(self.first_tick) + u64::from(t.wrapping_sub(self.first_tick))
++    }
++
++    /// Slot `slot`'s steps decoded again: the hashes its endpoint files, by wide tick (two different hashes for one
++    /// tick give the sentinel 0, as the client writer's rule: logs.rs `filed`).
++    pub(crate) fn decode(&self, slot: u8, steps: &[Step]) -> BTreeMap<u64, u64> {
++        let e = ClientEndpoint::new(join_of(self.seed, slot), npt_sim::TICK_HZ)
++            .with_lead(self.lead)
++            .with_starts(self.cmd_start, self.event_start);
++        let mut e = self.bites.client(e);
++        let mut out: BTreeMap<u64, u64> = BTreeMap::new();
++        for (host, got) in steps {
++            e.input(None, got, *host);
++            for (t, h) in e.step().hashes {
++                let w = self.wide(t);
++                let v = out.entry(w).or_insert(h);
++                if *v != h {
++                    *v = 0;
++                }
++            }
++        }
++        out
++    }
++}
++
++/// What one `replay` call found against the run's client log.
++#[derive(Clone, Debug, Default, PartialEq, Eq)]
++pub(crate) struct Outcome {
++    pub(crate) clients: usize,
++    pub(crate) steps: u64,
++    pub(crate) replay_hashes: u64,
++    /// (client, tick) pairs at which the client log holds a hash.
++    pub(crate) compared: u64,
++    /// Of those, the ones the replay gives no hash or another hash for, plus every replay hash at a (client, tick)
++    /// where the client log holds none.
++    pub(crate) mismatches: u64,
++    pub(crate) first: Option<String>,
++}
++
++/// Compares the client log's `hs.decoded_hash` with the replay's hashes `by_tick` (wide tick to one entry per slot).
++pub(crate) fn compare(client: &Log, by_tick: &BTreeMap<u64, Vec<Option<u64>>>) -> Outcome {
++    let mut o = Outcome::default();
++    let miss = |o: &mut Outcome, text: String| {
++        o.mismatches += 1;
++        o.first.get_or_insert(text);
++    };
++    let mut seen: BTreeMap<(u64, usize), u64> = BTreeMap::new();
++    for rec in &client.ticks {
++        let Some(list) = rec.hashes("decoded_hash") else {
++            continue;
++        };
++        for (slot, h) in list.iter().enumerate() {
++            let Some(h) = h else { continue };
++            o.compared += 1;
++            seen.insert((rec.t, slot), *h);
++            let r = by_tick
++                .get(&rec.t)
++                .and_then(|l| l.get(slot).copied().flatten());
++            if r != Some(*h) {
++                miss(
++                    &mut o,
++                    format!(
++                        "client {slot} tick {}: logged {h:016x}, replay {r:x?}",
++                        rec.t
++                    ),
++                );
++            }
++        }
++    }
++    for (t, list) in by_tick {
++        for (slot, r) in list.iter().enumerate() {
++            if let Some(r) = r
++                && !seen.contains_key(&(*t, slot))
++            {
++                miss(
++                    &mut o,
++                    format!(
++                        "client {slot} tick {t}: the replay gives {r:016x}, the client log nothing"
++                    ),
++                );
++            }
++        }
++    }
++    o
++}
++
++fn read_log(path: &Path) -> Result<Log, String> {
++    let f = std::fs::File::open(path).map_err(|e| format!("{}: {e}", path.display()))?;
++    npt_log::read_log(std::io::BufReader::new(f)).map_err(|e| format!("{}: {e}", path.display()))
++}
++
++/// One `replay` call (the module text): every client's bytes decoded again, `replay.jsonl` written into `s.out`, and
++/// the outcome against the run's client log.
++pub(crate) fn run(s: &Settings) -> Result<Outcome, Failure> {
++    let fail = Failure::Failed;
++    let client = read_log(&s.logs.join("client.jsonl")).map_err(fail)?;
++    let h = &client.header;
++    let rx = ReplayX86::of(h, s.bite.as_deref()).map_err(Failure::Usage)?;
++    let n = usize::try_from(h.clients).map_err(|_| fail("clients above usize".to_owned()))?;
++    let mut by_tick: BTreeMap<u64, Vec<Option<u64>>> = BTreeMap::new();
++    let mut o = Outcome {
++        clients: n,
++        ..Outcome::default()
++    };
++    for slot in 0..n {
++        let s8 = u8::try_from(slot).map_err(|_| fail(format!("slot {slot} above 255")))?;
++        let p = s.bytes.join(format!("client-{slot}.bytes"));
++        let bytes = std::fs::read(&p).map_err(|e| fail(format!("{}: {e}", p.display())))?;
++        let steps = read_steps(&bytes).map_err(|e| fail(format!("{}: {e}", p.display())))?;
++        o.steps += steps.len() as u64;
++        for (w, hash) in rx.decode(s8, &steps) {
++            by_tick.entry(w).or_insert_with(|| vec![None; n])[slot] = Some(hash);
++            o.replay_hashes += 1;
++        }
++    }
++    // The replay log: the run's header as the client log holds it, but its process, machine, build and bite.
++    let mut header = h.clone();
++    header.process = "replay".to_owned();
++    header.machine = crate::machine::container();
++    header.build = crate::machine::build(&h.build.commit).map_err(fail)?;
++    if s.bite.is_some() {
++        header.bite = s.bite.clone();
++    }
++    std::fs::create_dir_all(&s.out).map_err(|e| fail(format!("{}: {e}", s.out.display())))?;
++    let path = s.out.join("replay.jsonl");
++    let file = std::fs::File::create_new(&path).map_err(|e| {
++        fail(format!(
++            "{}: {e} (a log is never overwritten)",
++            path.display()
++        ))
++    })?;
++    let io = |e: std::io::Error| fail(format!("{}: {e}", path.display()));
++    let mut w = Writer::new(std::io::BufWriter::new(file), &header).map_err(io)?;
++    let phases: BTreeMap<u64, Phase> = client.ticks.iter().map(|r| (r.t, r.ph)).collect();
++    for (t, list) in &by_tick {
++        let ph = phases
++            .range(..=*t)
++            .next_back()
++            .map_or(Phase::Warmup, |(_, p)| *p);
++        let mut rec = TickRecord::new(*t, ph);
++        rec.set_hashes("replay_hash", list);
++        w.tick(&rec).map_err(io)?;
++    }
++    w.finish(Ended::Clean).map_err(io)?;
++    let c = compare(&client, &by_tick);
++    Ok(Outcome {
++        compared: c.compared,
++        mismatches: c.mismatches,
++        first: c.first,
++        ..o
++    })
++}
++
++/// The summary line of a `replay` call.
++pub(crate) fn summary_line(s: &Settings, o: &Outcome) -> String {
++    format!(
++        "replay of {}: {} clients, {} steps, {} replay hashes; against the client log: {} (client, tick) pairs \
++         compared, {} mismatches{}",
++        s.logs.display(),
++        o.clients,
++        o.steps,
++        o.replay_hashes,
++        o.compared,
++        o.mismatches,
++        o.first
++            .as_ref()
++            .map(|f| format!("; the first: {f}"))
++            .unwrap_or_default()
++    )
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use crate::scenario::tests::{read, scratch, settings};
++
++    /// r3's run: SS, 16 clients, P2, 6 s of warm-up and 2 s measured, each client's received bytes logged.
++    fn r3_run(name: &str) -> (PathBuf, PathBuf) {
++        let dir = scratch(name);
++        let bytes = scratch(&format!("{name}-bytes"));
++        let s = settings(
++            &dir,
++            &format!(
++                "--seed 1 --profile P2 --clients 16 --warmup-s 6 --measured-s 2 --after-max-s 10 --bytes {}",
++                bytes.display()
++            ),
++        );
++        crate::scenario::run(&s).unwrap_or_else(|e| panic!("r3's run: {e:?}"));
++        (dir, bytes)
++    }
++
++    /// The bytes file's reader takes back what `write_step` wrote, and refuses a cut-short file and an unknown channel.
++    #[test]
++    fn r3_the_bytes_file_reads_back_step_by_step() {
++        let steps: Vec<Step> = vec![
++            (5, Vec::new()),
++            (
++                9,
++                vec![
++                    (Channel::Control, vec![1, 2], 7),
++                    (Channel::Datagram, vec![], 8),
++                ],
++            ),
++            (12, vec![(Channel::FullState, vec![3; 300], 11)]),
++        ];
++        let mut b = Vec::new();
++        for (host, got) in &steps {
++            crate::scenario::write_step(&mut b, *host, got).expect("writes");
++        }
++        assert_eq!(read_steps(&b).expect("reads"), steps);
++        assert!(read_steps(&b[..b.len() - 1]).is_err(), "cut short");
++        let mut bad = b.clone();
++        bad[20] = 9;
++        assert!(read_steps(&bad).is_err(), "channel code 9");
++    }
++
++    /// r3, `replay`'s U4 test (plan :761-764): one short L1 run (SS P2) logs each client's received bytes; `replay`,
++    /// decoding them again, gives each client's logged hash at every (client, tick) that has one, with more than 0
++    /// compared, and its log is a `replay` log with one entry per client.
++    #[test]
++    fn r3_the_re_decode_gives_every_client_s_logged_hash() {
++        let (dir, bytes) = r3_run("r3");
++        let out = scratch("r3-replay");
++        let s = Settings {
++            logs: dir,
++            bytes,
++            out: out.clone(),
++            bite: None,
++        };
++        let o = run(&s).unwrap_or_else(|e| panic!("replay: {e:?}"));
++        println!("r3: {}", summary_line(&s, &o));
++        assert!(o.compared > 0, "a replay that compares nothing fails");
++        assert_eq!(o.mismatches, 0, "{:?}", o.first);
++        let log = read(&out, "replay");
++        assert_eq!(log.header.process, "replay");
++        assert!(
++            log.ticks
++                .iter()
++                .all(|t| t.hashes("replay_hash").is_some_and(|l| l.len() == 16)
++                    && !t.hs.contains_key("decoded_hash"))
++        );
++    }
++
++    /// r3's bite (plan :763-764): the re-decoder's grid floored (npt-client's PM-0001-17/client-rounding, given to
++    /// `--bite`: no new id) gives at least one (client, tick) mismatch.
++    #[cfg(feature = "bites")]
++    #[test]
++    fn r3_bite_a_floored_re_decoder_grid_gives_a_mismatch() {
++        let (dir, bytes) = r3_run("r3-bite");
++        let s = Settings {
++            logs: dir,
++            bytes,
++            out: scratch("r3-bite-replay"),
++            bite: Some("PM-0001-17/client-rounding".to_owned()),
++        };
++        let o = run(&s).unwrap_or_else(|e| panic!("replay: {e:?}"));
++        println!("r3 bite: {}", summary_line(&s, &o));
++        assert!(o.compared > 0);
++        assert!(o.mismatches >= 1, "the floored grid must give a mismatch");
++    }
++}
 diff --git a/spikes/netcode-proof/crates/lab/src/scenario.rs b/spikes/netcode-proof/crates/lab/src/scenario.rs
 new file mode 100644
-index 0000000..3601005
+index 0000000..5d94208
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/scenario.rs
-@@ -0,0 +1,1833 @@
+@@ -0,0 +1,2224 @@
 +//! `L1Scenario` (u4-build-plan.md §5 U4r; plan.md §4.7, RQ8; u4r-brief.md 2.1): one server and its clients on one
 +//! simulated clock, [`SimClock`] (integer ns), in RQ8's order at each instant:
 +//! 1. packets due: L1 applies every event due at or before the instant at the instant's first call (here the
@@ -2244,10 +3856,6 @@ index 0000000..3601005
 +pub(crate) const ADMIT_EVENTS_BOUND: u64 = 32_768;
 +/// The highest feet a scripted spawn or teleport may set, cm: World's stated clamp bound (TUNE-2; world.rs:653-660),
 +/// the position grid's top less the fire origin's 140 cm above the feet, read from npt-sim's grid.
-+#[cfg_attr(
-+    not(test),
-+    allow(dead_code, reason = "the -30 pre-check's leg glue scripts placements through it (B10)")
-+)]
 +pub(crate) const PLACEMENT_Z_BOUND_CM: i32 = npt_sim::grid::POSITION_Z.max() - 140;
 +
 +/// The simulated clock (plan.md:617): integer ns, which only moves forward.
@@ -2321,11 +3929,7 @@ index 0000000..3601005
 +/// The channel a reliable message the room encoded travels on: decoded on both stream channels with `quant`, the
 +/// one that takes it (the module text); an error when none does or both do.
 +pub(crate) fn stream_of(bytes: &[u8], quant: Quant) -> Result<Channel, String> {
-+    let ok = |ch| {
-+        quant
-+            .decode(Direction::RoomToClient, ch, bytes)
-+            .is_ok()
-+    };
++    let ok = |ch| quant.decode(Direction::RoomToClient, ch, bytes).is_ok();
 +    match (ok(Channel::Control), ok(Channel::FullState)) {
 +        (true, false) => Ok(Channel::Control),
 +        (false, true) => Ok(Channel::FullState),
@@ -2337,11 +3941,10 @@ index 0000000..3601005
 +}
 +
 +/// Carry 49 (TUNE-2): a scripted spawn or teleport above World's clamp bound is refused as a scenario error.
-+#[cfg_attr(
-+    not(test),
-+    allow(dead_code, reason = "the -30 pre-check's leg glue scripts placements through it (B10)")
-+)]
-+pub(crate) fn check_placements(spawns: &[Placement], teleports: &[Placement]) -> Result<(), String> {
++pub(crate) fn check_placements(
++    spawns: &[Placement],
++    teleports: &[Placement],
++) -> Result<(), String> {
 +    for (what, p) in spawns
 +        .iter()
 +        .map(|p| ("spawn", p))
@@ -2371,8 +3974,12 @@ index 0000000..3601005
 +    pub(crate) decoder: bool,
 +    pub(crate) l1: bool,
 +    pub(crate) schedule: bool,
-+    /// npt-lab's own: carry 62 (h)'s client writer.
-+    pub(crate) refused_as_lost: bool,
++    /// npt-server's pump (each session's `Decoder::with_bite`: PM-0001-30/wallclock, U4R-Q6 (a)).
++    pub(crate) pump: bool,
++    /// npt-lab's own: carry 62 (h)'s client writer, PM-0001-17/whole-as-lost (the advisor's U4r build ruling, point 4).
++    pub(crate) whole_as_lost: bool,
++    /// npt-lab's own: the -30 pre-check's late-command replay client (one leg's, one client's: precheck.rs).
++    pub(crate) late_command: bool,
 +    /// npt-lab's model bite, chosen by its unit tests only (r1): the clients connect in a hash map's order.
 +    #[cfg_attr(
 +        not(all(test, feature = "bites")),
@@ -2381,9 +3988,11 @@ index 0000000..3601005
 +    pub(crate) client_order: bool,
 +}
 +
-+/// npt-lab's own bite ids (bites builds only): carry 62 (h)'s client writer (U4R-Q2 (c)).
++/// npt-lab's own bite ids (bites builds only): carry 62 (h)'s client writer (U4R-Q2 (c); its form and id the advisor's
++/// U4r build ruling, point 4: "a client writer that files a tick it decoded whole as lost: null and incomplete 1"), and
++/// the -30 pre-check's late-command replay client (u4r-brief.md 2.5, 7.2; marks.json:6567).
 +#[cfg(feature = "bites")]
-+pub(crate) const LAB_BITES: [&str; 1] = ["PM-0001-17/refused-as-lost"];
++pub(crate) const LAB_BITES: [&str; 2] = ["PM-0001-17/whole-as-lost", "PM-0001-30/late-command"];
 +/// npt-lab's model bite (r1's), chosen only by its unit tests (l1's `with_model_bite` form).
 +#[cfg(all(test, feature = "bites"))]
 +pub(crate) const CLIENT_ORDER_BITE: &str = "npt-lab/client-order";
@@ -2401,12 +4010,31 @@ index 0000000..3601005
 +            decoder: proto,
 +            l1: L1Net::BITES.contains(&id),
 +            schedule: npt_server::BITES.contains(&id),
-+            refused_as_lost: LAB_BITES.contains(&id),
++            pump: Decoder::new(
++                Quant::default(),
++                npt_sim::TICK_HZ,
++                0,
++                VERSION,
++                CONTENT,
++                RttSource::Link,
++            )
++            .with_bite(id)
++            .is_some(),
++            whole_as_lost: LAB_BITES[0] == id,
++            late_command: LAB_BITES[1] == id,
 +            client_order: false,
 +        };
-+        let any = b.world || b.room || b.client || b.l1 || b.schedule || b.refused_as_lost;
++        let any = b.world
++            || b.room
++            || b.client
++            || b.l1
++            || b.schedule
++            || b.whole_as_lost
++            || b.late_command;
 +        if !any {
-+            return Err(format!("--bite {id:?}: no instance of this build plants it"));
++            return Err(format!(
++                "--bite {id:?}: no instance of this build plants it"
++            ));
 +        }
 +        Ok(b)
 +    }
@@ -2448,7 +4076,9 @@ index 0000000..3601005
 +        if self.room
 +            && let Some(id) = self.id.as_deref()
 +        {
-+            return room.with_bite(id).expect("the room plants its own and npt-proto's ids");
++            return room
++                .with_bite(id)
++                .expect("the room plants its own and npt-proto's ids");
 +        }
 +        room
 +    }
@@ -2458,7 +4088,9 @@ index 0000000..3601005
 +        if self.client
 +            && let Some(id) = self.id.as_deref()
 +        {
-+            return e.with_bite(id).expect("the client plants its own and npt-proto's ids");
++            return e
++                .with_bite(id)
++                .expect("the client plants its own and npt-proto's ids");
 +        }
 +        e
 +    }
@@ -2476,9 +4108,10 @@ index 0000000..3601005
 +    fn schedule(&self) -> Schedule {
 +        #[cfg(feature = "bites")]
 +        if self.schedule
-+            && let Some(s) = self.id.as_deref().and_then(|id| {
-+                Schedule::with_bite(npt_sim::TICK_HZ, npt_sim::LOOP_CATCHUP, id)
-+            })
++            && let Some(s) = self
++                .id
++                .as_deref()
++                .and_then(|id| Schedule::with_bite(npt_sim::TICK_HZ, npt_sim::LOOP_CATCHUP, id))
 +        {
 +            return s;
 +        }
@@ -2513,6 +4146,12 @@ index 0000000..3601005
 +    pub(crate) ended: Vec<(u8, &'static str)>,
 +    /// The sessions the room's slots are held by (r8 reads which).
 +    pub(crate) owner: BTreeMap<u8, u64>,
++    /// The pump's planted defect every session's decoder takes (`Bites::pump`; bites builds only).
++    #[cfg_attr(
++        not(feature = "bites"),
++        allow(dead_code, reason = "a measured build plants no bite")
++    )]
++    pub(crate) decoder_bite: Option<String>,
 +}
 +
 +impl Server {
@@ -2526,6 +4165,7 @@ index 0000000..3601005
 +            admitted: Vec::new(),
 +            ended: Vec::new(),
 +            owner: BTreeMap::new(),
++            decoder_bite: None,
 +        }
 +    }
 +
@@ -2541,6 +4181,13 @@ index 0000000..3601005
 +            CONTENT,
 +            self.rtt,
 +        );
++        #[cfg(feature = "bites")]
++        let decoder = match self.decoder_bite.as_deref() {
++            Some(id) => decoder
++                .with_bite(id)
++                .expect("Bites::pump checked that the pump plants it"),
++            None => decoder,
++        };
 +        self.sessions.push(Some(Session {
 +            id,
 +            link,
@@ -2866,6 +4513,9 @@ index 0000000..3601005
 +    let room = s.bites.room(room);
 +    let quant = s.bites.quant();
 +    let mut server = Server::new(room, quant, RttSource::Link);
++    if s.bites.pump {
++        server.decoder_bite = s.bites.id.clone();
++    }
 +    let mut schedule = s.bites.schedule();
 +    let net = s.bites.net(s.seed);
 +    let mut listener = net.listener();
@@ -2882,7 +4532,7 @@ index 0000000..3601005
 +        s.logs.then_some(s.out.as_path()),
 +        &meta,
 +        s.tick_start,
-+        s.bites.refused_as_lost,
++        s.bites.whole_as_lost,
 +    )
 +    .map_err(fail)?;
 +    let mut rng = s.seed ^ 0x6c61_622d_6f66_6673;
@@ -2908,9 +4558,11 @@ index 0000000..3601005
 +        let bytes_log = match &s.bytes {
 +            None => None,
 +            Some(dir) => {
-+                std::fs::create_dir_all(dir).map_err(|e| fail(format!("{}: {e}", dir.display())))?;
++                std::fs::create_dir_all(dir)
++                    .map_err(|e| fail(format!("{}: {e}", dir.display())))?;
 +                let p = dir.join(format!("client-{slot}.bytes"));
-+                let f = std::fs::File::create_new(&p).map_err(|e| fail(format!("{}: {e}", p.display())))?;
++                let f = std::fs::File::create_new(&p)
++                    .map_err(|e| fail(format!("{}: {e}", p.display())))?;
 +                Some(std::io::BufWriter::new(f))
 +            }
 +        };
@@ -2929,11 +4581,10 @@ index 0000000..3601005
 +    }
 +    clients.sort_by_key(|c| c.slot);
 +    let digest = order_digest(&order);
-+    let mut mirror = Mirror::new(
-+        scene.slots(),
-+        scene.effect_rows(),
-+        scene.name() == "ES",
-+    );
++    let mut mirror = Mirror::new(scene.slots(), scene.effect_rows(), scene.name() == "ES");
++    // -57's three series only on a run whose header lists PM-0001-57 (the advisor's U4r build ruling, point 3): the
++    // judge reads a run for a mark only when a header lists it, so no other run needs them.
++    let with_57 = s.meta.marks.iter().any(|m| m == "PM-0001-57");
 +    let mut bursts: Vec<Vec<Burst>> = (0..n)
 +        .map(|_| {
 +            s.profile
@@ -3016,7 +4667,7 @@ index 0000000..3601005
 +                let datagrams = server.room.take_datagrams(slot);
 +                let control = server.room.take_control(slot);
 +                let errs = mirror.tick(slot, t, &datagrams, &control, quant, &index);
-+                if s.logs {
++                if s.logs && with_57 {
 +                    logs.errors(slot, t, errs);
 +                }
 +                for b in &control {
@@ -3033,9 +4684,7 @@ index 0000000..3601005
 +                }
 +                sizes[usize::from(slot)] = datagrams.iter().map(Vec::len).collect();
 +                sets[usize::from(slot)] = mirror.latest(slot);
-+                server
-+                    .send(slot, &datagrams, &control, now)
-+                    .map_err(fail)?;
++                server.send(slot, &datagrams, &control, now).map_err(fail)?;
 +                if let Some(c) = server.room.client(slot) {
 +                    for w in c.wraps() {
 +                        logs.wrapped(w, t, ph).map_err(fail)?;
@@ -3073,7 +4722,9 @@ index 0000000..3601005
 +                    .map_err(fail)?;
 +            }
 +            inputs.clear();
-+            summary.world_hashes.push((t, npt_sim::SimCore::state_hash(server.room.sim())));
++            summary
++                .world_hashes
++                .push((t, npt_sim::SimCore::state_hash(server.room.sim())));
 +            k += 1;
 +            if k == s.warmup_ticks {
 +                for c in &clients {
@@ -3160,7 +4811,8 @@ index 0000000..3601005
 +        // Every client link's arrivals into its inbox (the socket's buffer), stamped on its host clock.
 +        for c in &mut clients {
 +            while let Some(r) = c.link.poll_recv(now) {
-+                c.inbox.push((r.channel, r.bytes, r.arrival_ns + c.offset_ns));
++                c.inbox
++                    .push((r.channel, r.bytes, r.arrival_ns + c.offset_ns));
 +            }
 +        }
 +        logs.flush().map_err(fail)?;
@@ -3195,7 +4847,8 @@ index 0000000..3601005
 +    let mut last = Vec::new();
 +    for c in &mut clients {
 +        if let Some(w) = c.bytes_log.as_mut() {
-+            w.flush().map_err(|e| fail(format!("a client's bytes log: {e}")))?;
++            w.flush()
++                .map_err(|e| fail(format!("a client's bytes log: {e}")))?;
 +        }
 +        let counters = server.room.client(c.slot).map(|x| x.counters().clone());
 +        let k = counters.unwrap_or_default();
@@ -3238,10 +4891,14 @@ index 0000000..3601005
 +        let sha = sha256_hex(&bytes);
 +        if let Some(path) = &s.record {
 +            if let Some(dir) = path.parent() {
-+                std::fs::create_dir_all(dir).map_err(|e| fail(format!("{}: {e}", dir.display())))?;
++                std::fs::create_dir_all(dir)
++                    .map_err(|e| fail(format!("{}: {e}", dir.display())))?;
 +            }
 +            let mut f = std::fs::File::create_new(path).map_err(|e| {
-+                fail(format!("{}: {e} (a recording is never overwritten)", path.display()))
++                fail(format!(
++                    "{}: {e} (a recording is never overwritten)",
++                    path.display()
++                ))
 +            })?;
 +            f.write_all(&bytes)
 +                .map_err(|e| fail(format!("{}: {e}", path.display())))?;
@@ -3263,11 +4920,15 @@ index 0000000..3601005
 +        EventRecord::new("class_audit", Phase::After)
 +            .with("owner_count", a.owner)
 +            .with("spatial_count", a.spatial)
++            .with("spatial_unchecked_count", a.spatial_unchecked)
 +            .with("public_count", a.public)
 +            .with("events_count", a.events)
 +            .with("team_count", 0)
-+            .with("breaches_count", a.breaches.len())
-+            .with("first_breach", a.breaches.first().cloned().unwrap_or_default()),
++            .with("breaches_count", a.breaches_count)
++            .with(
++                "first_breach",
++                a.breaches.first().cloned().unwrap_or_default(),
++            ),
 +    );
 +    let counts = logs.finish(Ended::Clean, &last).map_err(fail)?;
 +    summary.counts = counts;
@@ -3280,8 +4941,8 @@ index 0000000..3601005
 +}
 +
 +/// One client step's received bytes, for `replay` (r3): host instant u64, count u32, then per message channel u8,
-+/// arrival u64, length u32 and the bytes, little-endian.
-+fn write_step(
++/// arrival u64, length u32 and the bytes, little-endian (replay.rs `read_steps` reads it back).
++pub(crate) fn write_step(
 +    w: &mut impl Write,
 +    host_ns: u64,
 +    received: &[(Channel, Vec<u8>, u64)],
@@ -3366,7 +5027,13 @@ index 0000000..3601005
 +
 +/// B1's burst starts (u4r-brief.md 7.1, -18's row): `count` bursts, the first `first_s` after the measured phase's
 +/// first tick and one every `every_s`, each starting a seeded offset in [0, 1 tick) after its tick boundary.
-+pub(crate) fn burst_starts(seed: u64, warmup_ticks: u64, count: u64, first_s: u64, every_s: u64) -> Vec<u64> {
++pub(crate) fn burst_starts(
++    seed: u64,
++    warmup_ticks: u64,
++    count: u64,
++    first_s: u64,
++    every_s: u64,
++) -> Vec<u64> {
 +    let hz = u64::from(npt_sim::TICK_HZ);
 +    let mut rng = seed ^ 0x6275_7273_7473_0000;
 +    (0..count)
@@ -3398,7 +5065,8 @@ index 0000000..3601005
 +            .parse::<u64>()
 +            .map_err(|_| format!("--{k} {s:?} is not a whole number")),
 +    };
-+    let small = |v: u64, k: &str| u32::try_from(v).map_err(|_| format!("--{k} {v} is above 32 bits"));
++    let small =
++        |v: u64, k: &str| u32::try_from(v).map_err(|_| format!("--{k} {v} is above 32 bits"));
 +    let run = need(take("run"), "run")?;
 +    let set = need(take("set"), "set")?;
 +    let date = need(take("date"), "date")?;
@@ -3434,13 +5102,18 @@ index 0000000..3601005
 +    let after_max_ticks = num(take("after-max-s"), "after-max-s", 30)? * hz;
 +    let behaviour = take("behaviour").unwrap_or_else(|| "brawl".to_owned());
 +    if !["brawl", "presses", "clamp", "steady"].contains(&behaviour.as_str()) {
-+        return Err(format!("--behaviour {behaviour:?}: brawl, presses, clamp or steady"));
++        return Err(format!(
++            "--behaviour {behaviour:?}: brawl, presses, clamp or steady"
++        ));
 +    }
 +    let bursts = num(take("bursts"), "bursts", 10)?;
 +    let burst_first_s = num(take("burst-first-s"), "burst-first-s", 30)?;
 +    let burst_every_s = num(take("burst-every-s"), "burst-every-s", 60)?;
 +    let bite = take("bite");
-+    let arm_tick = small(num(take("arm-tick"), "arm-tick", u64::from(tick_start))?, "arm-tick")?;
++    let arm_tick = small(
++        num(take("arm-tick"), "arm-tick", u64::from(tick_start))?,
++        "arm-tick",
++    )?;
 +    let record = take("record").map(PathBuf::from);
 +    let bytes = take("bytes").map(PathBuf::from);
 +    let every_step = match take("every-step").as_deref() {
@@ -3474,10 +5147,27 @@ index 0000000..3601005
 +        return Err("--logs 0 is for a recording run (--record): a run keeps its logs".to_owned());
 +    }
 +    if (every_step || lead_override.is_some()) && !marks.is_empty() {
-+        return Err("--every-step and --lead are D13's test-only settings: a run with them lists no mark".to_owned());
++        return Err(
++            "--every-step and --lead are D13's test-only settings: a run with them lists no mark"
++                .to_owned(),
++        );
++    }
++    if (every_step || lead_override.is_some()) && record.is_some() {
++        // A recording's settings are its manifest entry's, which has neither key (hash.rs `Kind::Runner`; the
++        // advisor's U4r build ruling, point 9 (a)).
++        return Err(
++            "--every-step and --lead are D13's test-only settings: a recording run (--record) takes neither"
++                .to_owned(),
++        );
 +    }
 +    let profile = match profile_name.as_str() {
-+        "B1" => Profile::b1(&burst_starts(seed, warmup_ticks, bursts, burst_first_s, burst_every_s)),
++        "B1" => Profile::b1(&burst_starts(
++            seed,
++            warmup_ticks,
++            bursts,
++            burst_first_s,
++            burst_every_s,
++        )),
 +        p => Profile::by_name(p).ok_or(format!("--profile {p:?}: P0 to P4 or B1"))?,
 +    };
 +    let bites = match &bite {
@@ -3527,13 +5217,23 @@ index 0000000..3601005
 +}
 +
 +/// The summary line of a run.
++/// The summary line of a run. A `--logs 0` run prints "not counted (--logs 0)" for every figure taken from the logs'
++/// counts or from `room_tick`, never 0 (the advisor's U4r build ruling, point 9 (b)); the counts that need no log stay.
 +pub(crate) fn summary_line(s: &Settings, o: &Summary) -> String {
 +    let c = &o.counts;
++    let logged = |v: String| {
++        if s.logs {
++            v
++        } else {
++            "not counted (--logs 0)".to_owned()
++        }
++    };
 +    format!(
 +        "{} {} {} seed {}: {} ticks ({} after); lead {}; commands {} (steps without one {}, duplicate stamps {}); \
 +         late {}; press refused {}; buffer full {}; rewinds refused {}; stale {}; overflow resyncs {}; heals {}; \
 +         client hashes {} (sentinels {}); measured incomplete {}; decided lost at the stop {}; shots per measured \
-+         second {}; audit {} owner {} spatial, {} breaches; fate log {}; connect order digest {:016x}",
++         second {}; audit {} owner, {} spatial checked against the radius, {} spatial not checked, {} breaches; fate \
++         log {}; connect order digest {:016x}",
 +        s.meta.run,
 +        s.scene.name(),
 +        s.profile.name,
@@ -3551,14 +5251,20 @@ index 0000000..3601005
 +        o.stale,
 +        o.overflow_resyncs,
 +        o.heals,
-+        c.hashes,
-+        c.sentinels,
-+        c.incomplete_measured,
-+        c.lost_decided_at_stop,
-+        c.shots_measured.checked_div(c.measured_seconds).unwrap_or(0),
++        logged(c.hashes.to_string()),
++        logged(c.sentinels.to_string()),
++        logged(c.incomplete_measured.to_string()),
++        logged(c.lost_decided_at_stop.to_string()),
++        logged(
++            c.shots_measured
++                .checked_div(c.measured_seconds)
++                .unwrap_or(0)
++                .to_string()
++        ),
 +        o.audit.owner,
 +        o.audit.spatial,
-+        o.audit.breaches.len(),
++        o.audit.spatial_unchecked,
++        o.audit.breaches_count,
 +        &o.fate_log_sha256[..16.min(o.fate_log_sha256.len())],
 +        o.order_digest,
 +    )
@@ -3599,7 +5305,8 @@ index 0000000..3601005
 +
 +    /// r1's leg settings: 16 clients on P2 (its loss and jitter make each link's fates its own), 6 s of warm-up, 2 s
 +    /// measured.
-+    const R1_ARGS: &str = "--seed 1 --profile P2 --clients 16 --warmup-s 6 --measured-s 2 --after-max-s 10";
++    const R1_ARGS: &str =
++        "--seed 1 --profile P2 --clients 16 --warmup-s 6 --measured-s 2 --after-max-s 10";
 +
 +    /// One leg of r1, run as its own process (D-2's form: this test binary re-run through `current_exe`): a no-op
 +    /// unless `NPT_LAB_R1_LEG` names its folder; `NPT_LAB_R1_BITE` set selects the client-order bite.
@@ -3676,7 +5383,10 @@ index 0000000..3601005
 +                ));
 +            }
 +            for (p, q) in x.ticks.iter().zip(&y.ticks) {
-+                if p.t != q.t || p.h != q.h || p.hs != q.hs || p.s.get("snap_incomplete") != q.s.get("snap_incomplete")
++                if p.t != q.t
++                    || p.h != q.h
++                    || p.hs != q.hs
++                    || p.s.get("snap_incomplete") != q.s.get("snap_incomplete")
 +                {
 +                    return Err(format!("{process}: tick {} (and {}) differs", p.t, q.t));
 +                }
@@ -3703,7 +5413,10 @@ index 0000000..3601005
 +        let compared = twin_differences(&a, &b).unwrap_or_else(|e| panic!("r1: {e}"));
 +        assert!(compared > 200, "ticks compared: {compared}");
 +        assert_eq!(digest(&a), digest(&b), "slot order in both");
-+        println!("r1: {compared} tick records compared, equal; connect order digest {}", digest(&a));
++        println!(
++            "r1: {compared} tick records compared, equal; connect order digest {}",
++            digest(&a)
++        );
 +    }
 +
 +    /// r1's bite (marks F29; bites builds only): the clients connect in a `HashMap`'s order, which each process's
@@ -3717,7 +5430,8 @@ index 0000000..3601005
 +        println!("r1 bite: order digests {da} and {db}");
 +        assert_ne!(da, db, "not exercised: both processes drew one order");
 +        let fate = fate_difference(&a, &b).expect("r1 must catch the bite in the fate logs");
-+        let ticks = tick_differences(&a, &b).expect_err("r1 must catch the bite in the per-tick hashes");
++        let ticks =
++            tick_differences(&a, &b).expect_err("r1 must catch the bite in the per-tick hashes");
 +        println!("r1 bite: caught: {fate}; {ticks}");
 +    }
 +
@@ -3725,12 +5439,16 @@ index 0000000..3601005
 +    /// at the bound is accepted, and so are spawns at it.
 +    #[test]
 +    fn s1_a_scripted_placement_above_the_clamp_bound_is_refused_one_at_it_accepted() {
-+        assert_eq!(PLACEMENT_Z_BOUND_CM, 3_955, "World's stated bound: feet at 39.55 m");
++        assert_eq!(
++            PLACEMENT_Z_BOUND_CM, 3_955,
++            "World's stated bound: feet at 39.55 m"
++        );
 +        let at = |z| Placement {
 +            slot: 3,
 +            position: [100, -200, z],
 +        };
-+        let e = check_placements(&[], &[at(PLACEMENT_Z_BOUND_CM + 1)]).expect_err("above the bound");
++        let e =
++            check_placements(&[], &[at(PLACEMENT_Z_BOUND_CM + 1)]).expect_err("above the bound");
 +        assert!(e.contains("teleport") && e.contains("TUNE-2"), "{e}");
 +        assert!(check_placements(&[at(PLACEMENT_Z_BOUND_CM)], &[at(PLACEMENT_Z_BOUND_CM)]).is_ok());
 +        assert!(check_placements(&[at(4_000)], &[]).is_err(), "a spawn too");
@@ -3783,7 +5501,11 @@ index 0000000..3601005
 +        );
 +        s.record_mem = true;
 +        let o = run(&s).expect("the run");
-+        assert_eq!(o.recording_bytes.as_deref(), Some(a.as_slice()), "the logged run records the same bytes");
++        assert_eq!(
++            o.recording_bytes.as_deref(),
++            Some(a.as_slice()),
++            "the logged run records the same bytes"
++        );
 +        let words: Vec<u32> = a
 +            .chunks(4)
 +            .map(|c| {
@@ -3800,12 +5522,18 @@ index 0000000..3601005
 +        while let npt_sim::replay::Step::Stepped(tick) = rep.step() {
 +            replayed.push((tick, rep.state_hash().expect("a hash after a step")));
 +        }
-+        assert_eq!(replayed, o.world_hashes, "the replay's hash at every tick is the room's");
++        assert_eq!(
++            replayed, o.world_hashes,
++            "the replay's hash at every tick is the room's"
++        );
 +    }
 +
 +    /// r4's run: SS, 48 clients in 3 x 16, P2, 6 s of warm-up and 2 s measured.
 +    fn r4_run(seed: u64, bite: &str) -> Summary {
-+        let dir = scratch(&format!("r4-{seed}{}", if bite.is_empty() { "" } else { "-bite" }));
++        let dir = scratch(&format!(
++            "r4-{seed}{}",
++            if bite.is_empty() { "" } else { "-bite" }
++        ));
 +        let s = settings(
 +            &dir,
 +            &format!("--seed {seed} --profile P2 --warmup-s 6 --measured-s 2 {bite}"),
@@ -3822,16 +5550,21 @@ index 0000000..3601005
 +            let o = r4_run(seed, "");
 +            let a = &o.audit;
 +            println!(
-+                "r4 seed {seed}: {} ticks; audited owner {} (own-state records), spatial {} (entity records), public {} \
-+                 (headers), events {}; team 0 and public sections 0: not exercised; breaches {}",
++                "r4 seed {seed}: {} ticks; audited owner {} (own-state records), spatial {} checked against the \
++                 radius and {} not checked (entity records), public {} (headers), events {}; team 0 and public \
++                 sections 0: not exercised; breaches {}",
 +                o.ticks,
 +                a.owner,
 +                a.spatial,
++                a.spatial_unchecked,
 +                a.public,
 +                a.events,
-+                a.breaches.len()
++                a.breaches_count
 +            );
-+            assert!(a.owner > 0 && a.spatial > 0 && a.public > 0, "seed {seed}: audited");
++            assert!(
++                a.owner > 0 && a.spatial > 0 && a.public > 0,
++                "seed {seed}: audited"
++            );
 +            assert!(a.breaches.is_empty(), "seed {seed}: {:?}", a.breaches);
 +        }
 +    }
@@ -3842,7 +5575,10 @@ index 0000000..3601005
 +    fn r4_bite_owner_to_all_fails_the_audit_by_name() {
 +        let o = r4_run(1, "--role bite --bite catalogue-5/owner-to-all");
 +        let first = o.audit.breaches.first().cloned().unwrap_or_default();
-+        println!("r4 bite: {} breaches; the first: {first}", o.audit.breaches.len());
++        println!(
++            "r4 bite: {} breaches (16 texts kept); the first: {first}",
++            o.audit.breaches_count
++        );
 +        assert!(
 +            first.contains("own-state section holds"),
 +            "the owner rule fires: {first:?}"
@@ -3909,8 +5645,15 @@ index 0000000..3601005
 +        let world = World::new(&scene, 1, 0);
 +        let greybox = world.greybox().clone();
 +        let tokens = (0..scene.slots()).map(|s| credentials(1, s).0).collect();
-+        let room = Room::new(world, &scene, &greybox, tokens, usize::from(n), npt_sim::TICK_HZ)
-+            .with_hashes(CONTENT, [0; 32]);
++        let room = Room::new(
++            world,
++            &scene,
++            &greybox,
++            tokens,
++            usize::from(n),
++            npt_sim::TICK_HZ,
++        )
++        .with_hashes(CONTENT, [0; 32]);
 +        Server::new(room, Quant::default(), RttSource::Link)
 +    }
 +
@@ -3923,18 +5666,32 @@ index 0000000..3601005
 +        let (mut c1, mut e1, first) = joined(&mut server, 0, &mut now);
 +        assert_eq!(server.owner.get(&0), Some(&first));
 +        let (_c2, _e2, second) = joined(&mut server, 0, &mut now);
-+        assert_eq!(server.owner.get(&0), Some(&second), "the second holds slot 0");
-+        assert!(server.ended.contains(&(0, "replaced")), "the first was told and dropped");
++        assert_eq!(
++            server.owner.get(&0),
++            Some(&second),
++            "the second holds slot 0"
++        );
++        assert!(
++            server.ended.contains(&(0, "replaced")),
++            "the first was told and dropped"
++        );
 +        let before = room_counts(&server, 0);
 +        for _ in 0..5 {
 +            now += 33_000_000;
 +            send_input(&mut c1, &mut e1, now);
 +            server.io(now + 1);
 +        }
-+        assert_eq!(room_counts(&server, 0), before, "the first's Inputs reach no room call");
++        assert_eq!(
++            room_counts(&server, 0),
++            before,
++            "the first's Inputs reach no room call"
++        );
 +        send_leave(&mut c1, now);
 +        server.io(now + 2);
-+        assert!(server.room.client(0).is_some(), "the first's Leave freed nothing");
++        assert!(
++            server.room.client(0).is_some(),
++            "the first's Leave freed nothing"
++        );
 +        assert_eq!(server.owner.get(&0), Some(&second));
 +    }
 +
@@ -3981,7 +5738,10 @@ index 0000000..3601005
 +            }
 +        }
 +        assert!(kicked, "the room kicked the client that never acknowledged");
-+        assert!(server.session(0).is_none(), "the lab dropped the kicked session");
++        assert!(
++            server.session(0).is_none(),
++            "the lab dropped the kicked session"
++        );
 +        send_input(&mut c0, &mut e0, now + 10);
 +        send_leave(&mut c0, now + 10);
 +        server.io(now + 11);
@@ -4015,5 +5775,248 @@ index 0000000..3601005
 +        .expect("encodes");
 +        assert_eq!(stream_of(&fs, q), Ok(Channel::FullState));
 +        assert!(stream_of(&[0, 1, 99], q).is_err(), "no channel takes it");
++    }
++
++    /// The advisor's U4r build ruling, point 5: `ROOM_HISTORY_MS` (a copy of npt-room's private `HISTORY_MS`) pinned to
++    /// the room by behaviour. With the ring full, a firing command run at tick T claiming view tick T - C, C being
++    /// `HitHistory::for_ms(ROOM_HISTORY_MS)`'s capacity, gets a Rewind (the ring then holds T - C to T - 1), and one
++    /// claiming T - C - 1 counts in `rewinds_refused`.
++    #[test]
++    fn p5_the_room_s_ring_holds_room_history_ms_s_capacity_and_no_more() {
++        let c = npt_sim::HitHistory::for_ms(ROOM_HISTORY_MS)
++            .expect("a ring")
++            .capacity();
++        let mut server = lab_room(4);
++        let mut now = 1_000;
++        let (mut link, mut e, _) = joined(&mut server, 0, &mut now);
++        for _ in 0..c + 10 {
++            now += 33_333_333;
++            deliver(&mut server, &mut link, &mut e, now);
++        }
++        let mut seen = Vec::new();
++        for (seq, d) in [(0u16, c), (1, c + 1)] {
++            let t = server.room.last_tick().wrapping_add(1);
++            let cmd = npt_sim::Command {
++                slot: 0,
++                tick: t,
++                seq,
++                buttons: npt_sim::Command::FIRE,
++                aim: [0, 0, 100],
++                view_tick: t.wrapping_sub(d),
++                view_fraction: 0,
++                ..npt_sim::Command::default()
++            };
++            let mut b = Vec::new();
++            npt_proto::encode(
++                &Message::Input(npt_proto::Input {
++                    commands: vec![cmd],
++                    ..npt_proto::Input::default()
++                }),
++                &mut b,
++            )
++            .expect("an Input");
++            now += 33_333_333;
++            link.send_unreliable(&b, now);
++            server.io(now + 1);
++            let refused = |s: &Server| s.room.client(0).map_or(0, |x| x.counters().rewinds_refused);
++            let before = refused(&server);
++            deliver(&mut server, &mut link, &mut e, now + 2);
++            let rewind = server
++                .room
++                .tick_input()
++                .commands
++                .iter()
++                .find(|(x, _)| x.slot == 0 && x.seq == seq)
++                .map(|(_, r)| r.is_some());
++            seen.push((d, rewind, refused(&server) - before));
++        }
++        println!("p5: capacity {c} ticks; (view age, Rewind given, refused) {seen:?}");
++        assert_eq!(seen, [(c, Some(true), 0), (c + 1, Some(false), 1)]);
++    }
++
++    /// The advisor's U4r build ruling, point 2: mirror.rs's `INTEREST_RADIUS_CM` (a copy of npt-room's private
++    /// `RADIUS_CM`, room.rs:29) pinned to the room by placement. Two soldiers teleported (through `check_placements`)
++    /// to exactly the copy's radius and one cm beyond it from slot 0's soldier, in slot 0's own area; slot 0's join
++    /// FullState, decoded by the mirror, holds the first and not the second. `None` when no direction lands both
++    /// placements exactly in that area (the copy then unpinned).
++    fn radius_pin() -> Option<(bool, bool)> {
++        use crate::mirror::INTEREST_RADIUS_CM;
++        let r = i32::try_from(INTEREST_RADIUS_CM).expect("a radius in i32");
++        let mut server = lab_room(4);
++        server.room.tick();
++        let records = npt_sim::SimCore::entity_records(server.room.sim()).to_vec();
++        let at = |rs: &[npt_sim::EntityRecord], s: u16| {
++            rs.iter()
++                .find(|x| x.kind == npt_sim::EntityKind::Soldier && x.index == s)
++                .copied()
++                .expect("a soldier")
++        };
++        let me = at(&records, 0);
++        let p = [me.grid[0], me.grid[1], me.grid[2]];
++        let dirs = [(1, 0), (-1, 0), (0, 1), (0, -1)];
++        for &(ax, ay) in &dirs {
++            for &(bx, by) in &dirs {
++                let mut s = lab_room(4);
++                s.room.tick();
++                let a = Placement {
++                    slot: 20,
++                    position: [p[0] + ax * r, p[1] + ay * r, p[2]],
++                };
++                let b = Placement {
++                    slot: 21,
++                    position: [p[0] + bx * (r + 1), p[1] + by * (r + 1), p[2]],
++                };
++                check_placements(&[], &[a, b]).expect("inside carry 49's bound");
++                s.room.script(&[], &[a, b], &[]);
++                s.room.tick();
++                let recs = npt_sim::SimCore::entity_records(s.room.sim()).to_vec();
++                let (ra, rb, rm) = (at(&recs, 20), at(&recs, 21), at(&recs, 0));
++                let landed =
++                    |x: &npt_sim::EntityRecord, q: [i32; 3]| x.grid[0] == q[0] && x.grid[1] == q[1];
++                if !(landed(&ra, a.position)
++                    && landed(&rb, b.position)
++                    && ra.area == rm.area
++                    && rb.area == rm.area)
++                {
++                    continue;
++                }
++                let (srv, mut cl) = npt_link::Loopback::pair(MAX_DATAGRAM);
++                s.accept(Box::new(srv), 1);
++                let mut e = ClientEndpoint::new(join_of(1, 0), npt_sim::TICK_HZ);
++                e.input(None, &[], 1);
++                for (ch, bytes) in e.step().reliable {
++                    cl.send_reliable(ch, &bytes, 1);
++                }
++                s.io(2);
++                let t = s.room.last_tick().wrapping_add(1);
++                s.room.tick();
++                let recs = npt_sim::SimCore::entity_records(s.room.sim()).to_vec();
++                let control = s.room.take_control(0);
++                let datagrams = s.room.take_datagrams(0);
++                let mut mirror = Mirror::new(48, Scene::stress().effect_rows(), false);
++                mirror.tick(
++                    0,
++                    t,
++                    &datagrams,
++                    &control,
++                    Quant::default(),
++                    &Records::new(&recs),
++                );
++                let mut view = Vec::new();
++                mirror.view(0, t, &mut view);
++                let holds = |slot: u8| view.iter().any(|(x, _)| *x == slot);
++                println!(
++                    "p2: slot 0 at {p:?} (area {}); slot 20 at {:?}, slot 21 at {:?}; the join FullState of tick {t} \
++                     holds slot 20 {}, slot 21 {} ({} soldiers in view)",
++                    rm.area,
++                    a.position,
++                    b.position,
++                    holds(20),
++                    holds(21),
++                    view.len()
++                );
++                return Some((holds(20), holds(21)));
++            }
++        }
++        None
++    }
++
++    #[test]
++    fn p2_the_mirror_s_radius_copy_is_the_room_s_by_placement() {
++        match radius_pin() {
++            Some(held) => assert_eq!(held, (true, false), "at the radius held, one cm beyond not"),
++            None => println!(
++                "p2: no direction lands both placements in slot 0's area: the copy is unpinned"
++            ),
++        }
++    }
++
++    /// The advisor's U4r build ruling, point 9 (a): `--lead` and `--every-step` are refused with `--record` too.
++    #[test]
++    fn p9_lead_and_every_step_are_refused_with_record() {
++        let dir = scratch("p9");
++        let line = |extra: &str| {
++            format!(
++                "--run t --set t --date 2026-11-13 --commit {COMMIT} --out {} --scene SS --seed 1 --profile P0 \
++                 --record {}/r.rec {extra}",
++                dir.display(),
++                dir.display()
++            )
++        };
++        let argv = |l: String| l.split_whitespace().map(str::to_owned).collect::<Vec<_>>();
++        assert!(parse(&argv(line(""))).is_ok(), "a recording run");
++        for extra in ["--lead 3", "--every-step 1"] {
++            let e = parse(&argv(line(extra))).expect_err(extra);
++            assert!(
++                e.contains("a recording run (--record) takes neither"),
++                "{extra}: {e}"
++            );
++        }
++    }
++
++    /// The measured phase's sum of `tick.s.snap_incomplete` in a run's client log, and whether its lab log holds -57's
++    /// series.
++    fn incomplete_and_57(dir: &Path) -> (i64, bool) {
++        let client = read(dir, "client");
++        let sum = client
++            .ticks
++            .iter()
++            .filter(|t| t.ph == Phase::Measured)
++            .filter_map(|t| t.s.get("snap_incomplete"))
++            .flatten()
++            .sum();
++        let lab = read(dir, "lab");
++        (
++            sum,
++            lab.ticks.iter().any(|t| t.s.contains_key("pos_err_um")),
++        )
++    }
++
++    /// A short L1 P0 run: SS, 16 clients, 6 s of warm-up, 2 s measured.
++    const P0_SHORT: &str =
++        "--seed 2 --profile P0 --clients 16 --warmup-s 6 --measured-s 2 --after-max-s 10";
++
++    /// The advisor's U4r build ruling, points 3 and 4 (the clean half): a short L1 P0 run whose header lists
++    /// PM-0001-57 writes -57's series and files no tick lost in the measured phase (sum 0); one whose header does not
++    /// list it writes none of them.
++    #[test]
++    fn p3_p4_a_short_p0_run_writes_57_s_series_only_when_listed_and_files_no_tick_lost() {
++        let with = scratch("p3-with");
++        run(&settings(
++            &with,
++            &format!("{P0_SHORT} --marks PM-0001-17,PM-0001-57"),
++        ))
++        .expect("the run");
++        let without = scratch("p3-without");
++        run(&settings(
++            &without,
++            &format!("{P0_SHORT} --marks PM-0001-17"),
++        ))
++        .expect("the run");
++        let (sum_with, series_with) = incomplete_and_57(&with);
++        let (sum_without, series_without) = incomplete_and_57(&without);
++        println!(
++            "p3/p4 clean: listing -57: measured incomplete {sum_with}, -57 series {series_with}; not listing it: \
++             {sum_without}, {series_without}"
++        );
++        assert_eq!((sum_with, sum_without), (0, 0));
++        assert!(series_with && !series_without);
++    }
++
++    /// The advisor's U4r build ruling, point 4 (carry 62 (h)'s bite, PM-0001-17/whole-as-lost; bites builds only): the
++    /// bitten writer files each client's first tick resolved whole in the measured phase as lost, so the measured
++    /// phase's sum of `tick.s.snap_incomplete` is the client count (the clean run's is 0: the test above).
++    #[cfg(feature = "bites")]
++    #[test]
++    fn p4_bite_whole_as_lost_makes_the_measured_incomplete_sum_the_client_count() {
++        let dir = scratch("p4-bite");
++        let s = settings(
++            &dir,
++            &format!("{P0_SHORT} --marks PM-0001-17 --role bite --bite PM-0001-17/whole-as-lost"),
++        );
++        run(&s).expect("the run");
++        let (sum, _) = incomplete_and_57(&dir);
++        println!("p4 bite: measured incomplete {sum} of 16 clients");
++        assert_eq!(sum, 16);
 +    }
 +}
