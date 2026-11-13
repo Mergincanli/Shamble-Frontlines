@@ -749,19 +749,26 @@ ITEMS.append(dict(tag="stamp plan", old="(1,092 lines, 01ede63d…)", new=f"({pl
 ITEMS.append(dict(tag="stamp carries", old="u4s-carries.md (644 lines, 8b7f165e…)",
                   new=f"u4s-carries.md ({carr_n} lines, {HASHES[CARRIES][:8]}…)",
                   src=f"u4s-carries.md now ({carr_n} lines, sha256 {HASHES[CARRIES][:12]})"))
+# the main session's decision 4: section 10 alone is kept (decision 1), and the sentence says where its cites read
+KEPT10 = (f"except in section 10, which stays as written (records): its cites read the plan and the carries at the old "
+          f"stamps {OLDSTAMP[PLAN][1]}… and {OLDSTAMP[CARRIES][1]}… (`git show {L2C}~1:{PLAN}`, and the same for "
+          "u4s-carries.md)")
+assert KEPT10 == ("except in section 10, which stays as written (records): its cites read the plan and the carries at "
+                  "the old stamps 01ede63d… and 8b7f165e… (`git show 8bcbf36~1:.checkpoints/netcode-proof-test/"
+                  "u4-build-plan.md`, and the same for u4s-carries.md)"), KEPT10
 if HIST_COMMITS:
     hist_new = f"`history` is history.md ({nlines(HIST_NOW)} lines, {sha_b(HIST_NOW)[:8]}…)."
     SENT0 = ("The plan's, the carries' and history's stamps were re-set at launch (section 12 item 9, by u4r_fill.py): "
              "L2's commit 8bcbf36 changed the plan and the carries, and every cite of this brief into them whose line "
-             "moved was re-pointed then, except in section 10 and the change lists above, which stay as written "
-             f"(records); history gained lines at its end only ({', '.join(HIST_COMMITS)}), so no line of it moved; "
-             "plan.md's stamp holds.")
+             f"moved was re-pointed then, {KEPT10}; history gained lines at its end only ({', '.join(HIST_COMMITS)}), "
+             "so no line of it moved; plan.md's stamp holds.")
 else:
     hist_new = STAMP_HIST
     SENT0 = ("The plan's and the carries' stamps were re-set at launch (section 12 item 9, by u4r_fill.py) because L2's "
              "commit 8bcbf36 changed both files (plan.md's and history's stamps hold), and every cite of this brief "
-             "into them whose line moved was re-pointed then, except in section 10 and the change lists above, which "
-             "stay as written (records).")
+             f"into them whose line moved was re-pointed then, {KEPT10}.")
+assert "change lists" not in SENT0 and SENT0.count(KEPT10) == 1, SENT0
+assert SENT0.endswith(".") and not re.search(r"[.!?]\s", SENT0), ("section 0's sentence: one sentence", SENT0)
 ITEMS.append(dict(tag="stamp history and sentence", old=STAMP_HIST, new=hist_new + " " + SENT0,
                   src=f"history.md now ({nlines(HIST_NOW)} lines, sha256 {sha_b(HIST_NOW)[:12]}); the sentence is the "
                       "main session's words"))
