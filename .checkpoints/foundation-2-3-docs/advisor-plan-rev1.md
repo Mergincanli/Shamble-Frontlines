@@ -1,0 +1,55 @@
+Task: advisor plan review of foundation-2-3-docs plan.md revision 1 at ec16b30 (docs pass of step 2.3), PR #52.
+Plan (blocks):
+B1 read Mustafa's message e5fa7ca0 (byte-exact)
+B2 read plan.md rev1 at ec16b30
+B3 read advisor findings on 9b20b67 (tool-results file chars ~46500-56200) and PR #48 description / merge commit msg
+B4 check plan §4 table sites against repo (grep for overtaken lines)
+B5 check plan §5/§6 facts
+B6 risk tier / class / protocol checks
+B7 answers Q1-Q7, verdict, conditions
+Notes:
+B1 done: his message read (decision text, docs pass 4 bullets, kit para, how to work). Key: "docs only, with no kit, gate or CI file"; decision "These words are the rule from now, also where CLAUDE.md and advisor.md still name steps 2.1 and 2.2 as the only exception."
+B2 done: plan rev1 read (301 lines). Next B3.
+B3 (part a) done: advisor 9b20b67 findings read (chars 46000-56300 decoded). M1: For Mustafa step 3 + PR body say "one security finding left open"; 3 more (SA-2 SETPRIV-HARDEN, SA-3 SETUP-NODE-CACHE, SA-1 CUT-ESCAPE). L1 eight Low notes "fixed" but 7 listed, F1 named not fixed. L2 "2.56.1 since 2026-11-12" loose: c901187 15:34, fd14855 16:32 still 2.56.0; a5823cf 18:39 on 2.56.1. L3 E12 "on sim only": saved run never compiled protocol. L5 archive intro no 2f0fef3. Where: M1 report line, L1,L2,L3,L5 in docs sync. Plan's §5 texts match these.
+B3 done: merge commit 4d21c1a msg read (his go items 1-6; item 6: "Put both on step 2.3's list."; item 5 "The report says one; four is right."). PR #48 body lines 42-46 list M1,L1,L2,L3,L5 (REST api; gh pr view graphql 403). Next B4 site grep.
+B4 done: site grep on 4d21c1a. P1-P8,S1-S6 sites exist as cited. Not in table (Low, completeness): ADR 0002 :1097 (layout research "before the foundation", not overtaken) and the "before the foundation's preview step" lines (SPIKE_PLAN :142, :420; ADR 0006 :583, :1000, :1200: step 2.6 still waits, not overtaken); ADR 0002 :1432 "with the netcode proof test first" (slice-order line, 2.1a left it too). Archive :546-548 cites ADR 0002 :1115 (now :1129) - plan aware. Queued: KIT-FREEZE-2 stays; models item precedent "From the moment these words are in DECISIONS.md they are the rule" - no Queued add needed for 11-13 kit lines (his item 5 puts them in 2.3's plan). Next B5 facts.
+B5 done (facts): 2.2 report lines hold: :133 "rustc's overflow flag on `sim` only;", :227-230 "Its eight Low notes are fixed", "2.56.1 since 2026-11-12" x3 (:228 L1, :301 Risks, :345 CUT-ESCAPE), For Mustafa step 3 :443-448 "one security finding left open". Verifier F1-F8 at 2f0fef3 :587-591 match L1 text. xcrate-before flag list: extdep, room, sim, sim_wasm (no protocol) - L3 holds. L2 runs: 43249204290 c901187 15:34 push, 43259689336 fd14855 16:32, 43282089237 a5823cf 18:39; logs spot-checked: c901187 git 2.56.0, a5823cf 2.56.1. Archive :574, :732, :834 hold. PR48 merged_at 16:20:12Z, merge sha 4d21c1a; CI 4d21c1a: gate run 43461710700 (jobs gate 132010021689, smoke 132010021248) + toolchain 43461710673 - all success. A1 18:29:55.661Z, A2 18:47:55.795Z both str.
+FINDING F-a (Low): plan §6 #40 facts stale: API now head fe1460a, updated 19:17:42Z (plan: b4d1f0a, 18:57). Read at build time.
+FINDING F-b (Low): two saved pages hold uuid 96467900 once each (…1922657, …1937159), not one "saved page". Check both or name one.
+B6 done (tier/class): diff today only .checkpoints; built PR = docs only; DECISIONS.md + ADR 0002 decision-docs/his words -> risk tier 1, needs-mustafa, outside guard allow-list (DECISIONS.md in mergeAllowed's excluded list :88) -> day-session merge on his go. .checkpoints not gitignored (check-ignore rc=1). No Brave. Plan's tier/class correct.
+FINDING F-c (Low): pointer quote substring check must normalise line wraps/indent (2.1a pointers wrap mid-quote).
+FINDING F-d (Low): concurrency: workflow 2 agents + skeptics must stay <=3 total at once.
+FINDING F-e (Low): report header should name the last commit holding the notes (2.2 precedent :5) and fold checkpoint (CLAUDE.md step 6/CHECKPOINTS §9).
+FINDING F-f (Low): table completeness: ADR 0002 :1097, :1432; SPIKE_PLAN :142, :420; ADR 0006 :583, :1000, :1200 ("before the foundation's preview step": step 2.6, still waits) - add as "left, not overtaken" rows.
+Suggest: pointer text "for foundation step 2.3 only" to mirror his "for step 2.3 only".
+Next B7.
+Advisor tool consulted once (after B6): asked to read CHECKPOINTS, 2.2 scripts, sweep wrapped lines; rule on pointer limits; P4 ADR why-not-escalate; six places not five; P7/P5 wording; five moments.
+B6b done: CHECKPOINTS §4/§7/§9 read: §7 "session starts no other agent while [workflow agents] run"; §9 fold essentials into report, delete in last commit (CI runs), no .checkpoints in ready head. Plan step 8 order OK. go51() at 2f0fef3 words-sources.mjs:56-69 = plan's A3 method (round trip). decisions-entries.mjs finds 2.2 entries by exact first header line (:75) + Queued lines; new top entries and a sentence in the 11-10 entry's header do not touch those (read, NOT run). Wrapped multiline sweep (archive, ADR 0002, SPIKE_PLAN, ROADMAP, register, STATUS, DECISIONS): no other live 2.3-wait line; 2.1a's answer to "Name what in steps 2.3 to 2.6 must wait" lives only in docs/reports (dated). Archive :269, :438 "wait for the foundation's gate step" = kit items (KIT-FREEZE), not overtaken.
+FINDING F-g (Low): plan.md:179 "the 2.2 report's diff touches only the five places" but §5 makes six edits there (header note, M1 note, L1 :227-230, L2 :301, L2 :345, L3 :133). Name the six.
+FINDING F-h (Low): P7 (plan.md:121) "changed by" while its ROADMAP anchor's subject is "the netcode proof test before the foundation" (same as P5): use P5's "overtaken in part".
+FINDING F-i (Low): five moments: his words (DECISIONS :384-389) moment 5 = "before you declare a step or the task done" - every step of §10, not only step 8; moments 2-4 as they arise. §10 places only (1) and (moment 5).
+RULING pointer limits: P (plan.md:99-104) carries all four limits; "for foundation step 2.3" carries his "for step 2.3 only"; sentence 6 (rule also over CLAUDE.md/advisor.md) extends, omitting it loosens nothing. No High. Low condition: write "for foundation step 2.3 only".
+RULING P4 (ADR 0002 edit, esc. cat. 3): not ESCALATE: his task asks the pointers "as foundation 2.1a did" (2.1a pointed ADR 0002 :1440); added lines only; PR needs-mustafa, merges on his go.
+B7 (answers):
+Verdict APPROVE (rev1 ec16b30), conditions C1-C9:
+C1 #40 row facts read at build time (API now fe1460a, 19:17:42Z, not b4d1f0a 18:57; plan.md:197-198); re-check at final head.
+C2 pointer quote check (plan.md:130) joins wrapped lines and strips indentation/italic marks before the substring test; negative control with a one-word drop.
+C3 pointer text "for foundation step 2.3 only" (P and P5, P7).
+C4 P7 uses "overtaken in part" like P5.
+C5 §4 table adds "left, not overtaken" rows: ADR 0002 :1097, :1432; SPIKE_PLAN :142, :420; ADR 0006 :583, :1000, :1200 (preview step = 2.6, still waits).
+C6 plan.md:179 names the six places in the 2.2 report.
+C7 concurrency (plan.md:241-249): skeptics start only after the workflow's two agents return; never more than 3 agents at once (CHECKPOINTS §4, §7); count returned items.
+C8 A3 vs chat record: two saved pages hold message 96467900 once each (tool-results …1922657 and …1937159): compare against both, stop on any mismatch; the DECISIONS quote comes from the commit (his words name it).
+C9 advisor tool: consult before declaring each §10 step done (moment 5), moments 2-4 as they arise; one checkpoint line each.
+C10 report header names the last commit holding the notes (2.2 :5 precedent); fold checkpoint essentials into report before the delete (CHECKPOINTS §9).
+Revision 2 that only folds C1-C10 needs no new plan review; any other change does.
+Q1 (a) - keeps what was asked of him; correction dated.
+Q2 (a) - "to record word for word" + full record, precedent 2.1b/2.2.
+Q3 fix both - same claims; name them in the report as beyond the five.
+Q4 R-WORDS + R-STATE + verifier, no named reviewer - CLAUDE.md step 5 lists none for docs with no code/CI/network/storage.
+Q5 (a) one clause each, factual pointer to the 11-13 entry, no paraphrase of its limits.
+Q6 adopt - strictly stronger; commit stays the source.
+Q7 read-only git fetch + git show allowed; cite SHA/time read; content is that lane's data; never switch, never push.
+Tier/class: risk tier 1 (DECISIONS.md his words, ADR 0002 decision doc), needs-mustafa, his reconfirmation, day-session merge (DECISIONS.md and docs/adr outside mergeAllowed), no Brave, no security-auditor needed.
+Not checked: decisions-entries.mjs run on main (read only); byte compare of his #48 go vs chat record (parse of saved pages failed); gate (no code yet).
+DONE

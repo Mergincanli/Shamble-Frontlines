@@ -17,7 +17,14 @@
    (https://github.com/Mergincanli/Shamble-Frontlines/pull/52); the plan names #52 (sed, `#N` to `#52`, 5 places).
 
 ## Current step
-Step 1 of the plan: the advisor agent's plan review (the saver running).
+Step 1 of the plan: the advisor agent's plan review (the saver running). Meanwhile, notes only (no tracked file):
+- `words.mjs` written and run read-only: A1 42 chars; A2 6190 chars, 36 lines; A3 1872 chars, 17 lines, the round trip
+  OK, and identical byte for byte to the 2.2 chat record (event 96467900-..., created_at 2026-11-13T16:16:36.563252Z;
+  the merge commit says 16:16:47 UTC: the report cites the commit's time and names the event's); A2-DECISION 562 chars,
+  one line, inside A2, cut by its anchors.
+- `report-appendix.mjs` written; tested on a scratch copy in `.gate/fdn23-docs/` (OK; a one-byte change in A3 caught).
+- L2's log lines read (`l2-git-versions.md`): 2.56.0 on c901187 (15:34 UTC) and fd14855 (16:32 UTC); 2.56.1 on a5823cf
+  (18:39 UTC).
 
 ## Next steps
 1. The advisor agent's plan review against the plan's commit SHA (plan §12, Q1 to Q7); record the verdict and the SHA
