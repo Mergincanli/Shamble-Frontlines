@@ -38,7 +38,7 @@ client steps reading the same newest tick make the second command late whatever 
 recommending (b1) no command at a step whose newest tick did not move; D13 (a first short P2 run at leads 3 and 5
 before any recording). Open for the advisor: U4R-Q1, Q2 (part), Q4, Q6-Q14. **Next: the advisor's check** of the
 brief with u4r-run.sh and its diff and INF2-4's two diffs and proof logs: **running since about 12:52 UTC**, workflow
-wf_95beab47-c57 (task wy68rmrxh; script npt-u4r-brief-advisor-wf_95beab47-c57.js; notes advisor-u4r-brief-notes.md,
+wf_95beab47-c57 (task wy68rmrxh, cut 13:06; resumed 14:12 as task w6v3lazlq; script npt-u4r-brief-advisor-wf_95beab47-c57.js; notes advisor-u4r-brief-notes.md,
 ruling advisor-u4r-brief.md). If cut: `Workflow({scriptPath, resumeFromRunId: "wf_95beab47-c57"})`. The old run line: workflow wf_4eb3ef56-c8c (task wht1e1nqn; script
 npt-u4r-brief-r3-wf_4eb3ef56-c8c.js under the session's workflows/scripts/): draft (general-purpose acting as
 test-engineer, xhigh: u4r-brief.md in the notes folder, notes u4r-brief-r3-notes.md), check (netcode-architect, xhigh:
@@ -428,6 +428,14 @@ the cut and the time of the resume; UTC, read from the session's transcript):
   .gate/u4d2-r2 equal), the restore recorded in a labelled block at the end of u4d2-r2-review-test.md (TP10 to be
   re-planted in the seat's own form); round 2 resumed (`resumeFromRunId`, task wn0cahcg6: batch 1 from its cache);
   the saver restarted (bg7f0u6ss).
+- 2026-11-13 13:06: "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit
+  resets 2:10pm (UTC)". Cut: the advisor's check of U4r's brief (wf_95beab47-c57, 13:06:47; its notes B0-B9 done, B10,
+  writing advisor-u4r-brief.md, started; no ruling file yet). The TE-M3 commit check had returned before it (APPROVE,
+  about 12:55). Mustafa had warned of 92 % at 12:53, and everything was saved then (c787a3e). The saver kept
+  running. Resumed 14:11:57, on Mustafa's message ("I hit my usage limit while you were working, but it has reset now.
+  Please continue from where you left off.", 14:11:36), before the 14:34 check-in came due. Nothing to restore (no
+  plant, no cargo or runner left, the working tree clean); the run resumed (`resumeFromRunId`, a fresh copy that
+  continues at B10 from its notes).
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188
