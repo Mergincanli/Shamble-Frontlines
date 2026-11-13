@@ -36,3 +36,13 @@ Started 2026-11-13. Read only; I write this file and advisor-u4r-fold.md only.
   "is now c49773f's" head-read line, D1, item 1, section 1 item 1's ancestry, section 4 rule 5, return item 1: move the
   count and ancestry tests to 4e91830 (item 9 and section 9's lead-in keep c49773f so R11/D5 are re-walked).
 - Next B5: write the ruling; count each old phrase once (python3 -I print-only, from stdin).
+- Finding (Low): my D13 words (check :350, Q14.4's new text) hold "about 10 % by U4R-Q14's arithmetic": the dry run's
+  only added "by U4R-Q" (line 449 of its output), so FQ1's planned assertion would fail on it. Ruled: "in".
+- B5 counts done: all 31 old phrases once in the flattened rev 3.1 (incl. A2's six and Q9.2's, superseded); every new
+  phrase 0 in rev 3.1 and 0 in the dry run's added lines. Stamps te-m3 5ecc3e23, te-m3-check 1ffd0294 hold; head a98c790,
+  `git diff --quiet 4e91830 a98c790 -- spikes/netcode-proof` exits 0. Writing the ruling now.
+- B5 done: advisor-u4r-fold.md written. Parsed back by print-only python3 -I: 32 id bullets (F1-1 to F6-9, N1 to N7b,
+  F-D13), each one line, each old phrase once (F-D13's in my check's text), each new phrase 0 in rev 3.1; site line
+  ranges recomputed from the flattened map and corrected (F3-3, F3-4, N3); two lines that looked like bullets reworded
+  (the format line, FQ5 (e)); the L2 rewrap sentence corrected (carries :340-346 +3, plan :837-840 +1).
+- B6: hand back. Verdict: the fold goes ahead with these words; Mediums N1 and L3-1 (mine); nothing for Mustafa.
