@@ -14,14 +14,17 @@ const BASE = '4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300';
 const REPORT = 'docs/reports/2026-11-12-foundation-2-2.md';
 const ARCHIVE = 'docs/STATUS_ARCHIVE.md';
 const OLD_GIT = "(the runner's version on 2026-11-10; 2.56.1 since 2026-11-12)";
-const NEW_GIT = "(the runner's version on 2026-11-10, and still on c901187's and fd14855's runs of 2026-11-12; 2.56.1 from " +
-  "a5823cf's runs on, 2026-11-12 18:39 UTC)";
+// Worded as the seven job logs read (l2-git-versions.md): the runners differed on 2026-11-12.
+const NEW_GIT = "(the runner's version on 2026-11-10; on 2026-11-12 the runners differed: 2.56.1 on c901187's pull_request " +
+  "run at 15:34 UTC and on a5823cf's push run at 18:39 UTC, 2.56.0 on c901187's push run and on fd14855's and 45f1bb5's " +
+  'runs up to 18:37 UTC)';
 const SHA_NOTES = '2f0fef3b208c10d5c38b921d24fb5f90f71b7ecb';
 
 const HEADER_NOTE = "_Corrected after the merge (2026-11-13) by step 2.3's first docs pass (PR #52), as his go for #48 asks " +
   "(item 6): the advisor agent's report lines from its review of 9b20b67, listed in PR #48's description: M1 (a dated " +
   'correction under "For Mustafa", step 3), L1 and L2 (the verifier paragraph in "Reviews"; L2 also in "Risks" and the ' +
-  "CUT-ESCAPE row) and L3 (E12's row); L5 is in `docs/STATUS_ARCHIVE.md`. Appendix A and every other line are unchanged._";
+  "CUT-ESCAPE row) and L3 (E12's row); L5 is in `docs/STATUS_ARCHIVE.md`. Appendix A is unchanged, and so is every other " +
+  'word: the paragraphs these fixes touch are re-wrapped from the edited line on._';
 const M1_NOTE = "_Corrected after the merge (2026-11-13, by step 2.3's first docs pass, PR #52; the advisor agent's M1 on " +
   '9b20b67): four security findings were left open, not one. By main\'s `.claude/agents/advisor.md` (its needs-mustafa ' +
   'triggers, step 4), a security finding not fixed in the PR, a follow-up included, counts as left open, so beside SA2-2 ' +
@@ -31,8 +34,8 @@ const M1_NOTE = "_Corrected after the merge (2026-11-13, by step 2.3's first doc
 const L1_OLD = "Its eight Low notes are fixed in the last commit before ready: the runner's git version (2.56.1 since " +
   '2026-11-12), the PR\'s title and body, OVERFLOW-PANIC-RULE\'s due point in "For Mustafa", PM-0002-53\'s owner in the ' +
   'archive, the stale "last updated" and intro lines and ROADMAP\'s header, the checkpoint (deleted) and a comma in E2.';
-const L1_NEW = "Of its eight Low notes, seven are fixed in the last commit before ready: the runner's git version (2.56.1 " +
-  "from a5823cf's runs on, 2026-11-12 18:39 UTC), the PR's title and body, OVERFLOW-PANIC-RULE's due point in \"For " +
+const L1_NEW = "Of its eight Low notes, seven are fixed in the last commit before ready: the runner's git version (on " +
+  "2026-11-12, 2.56.0 or 2.56.1 by runner), the PR's title and body, OVERFLOW-PANIC-RULE's due point in \"For " +
   "Mustafa\", PM-0002-53's owner in the archive, the stale \"last updated\" and intro lines and ROADMAP's header, the " +
   "checkpoint (deleted) and a comma in E2; the eighth, that departure (OVERFLOW-XCRATE-CI's recorded line), was named " +
   "for the advisor agent's review of the final head, which accepted it.";
@@ -147,6 +150,24 @@ export async function verify(root, checkHunks) {
     const t = e.file === REPORT ? report : archive;
     if (!norm(t).includes(e.kind === 'insert' ? e.text : e.repl)) problems.push(`${e.id}: its new text is missing`);
     if (e.kind !== 'insert' && e.old !== OLD_GIT && norm(t).includes(e.old) && !norm(t).includes(e.repl)) problems.push(`${e.id}: its old text is still there`);
+  }
+  // Whole-file check: the base, whitespace-normalised, with the edits applied as plain string operations, equals the
+  // new file whitespace-normalised: no other word changed (the 2.2 report always; the archive until docs-keeper runs).
+  for (const [f, t, always] of [[REPORT, report, true], [ARCHIVE, archive, false]]) {
+    if (!always && !checkHunks) continue;
+    let b = norm(execFileSync('git', ['show', `${BASE}:${f}`], { encoding: 'utf8' }));
+    for (const e of EDITS.filter((x) => x.file === f)) {
+      if (e.kind === 'insert') {
+        const a = norm(e.after);
+        if (b.split(a).length !== 2) { problems.push(`${e.id}: its anchor is not once in the base`); continue; }
+        b = b.replace(a, `${a} ${e.text}`);
+      } else {
+        if (b.split(e.old).length - 1 < 1) { problems.push(`${e.id}: its old text is not in the base`); continue; }
+        const at = e.kind === 'inline' ? b.indexOf(e.old, b.indexOf(norm(e.start))) : b.indexOf(e.old);
+        b = b.slice(0, at) + e.repl + b.slice(at + e.old.length);
+      }
+    }
+    if (b !== norm(t)) problems.push(`${f}: the file is not the base plus the edits (whole-file check)`);
   }
   if (checkHunks && root === '.') {
     for (const [f, want] of [[REPORT, 6], [ARCHIVE, 5]]) {

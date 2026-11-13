@@ -5,7 +5,7 @@
   · plan: `.checkpoints/foundation-2-3-docs/plan.md`
 - **Branch:** claude/sweet-mayer-grsukw (for cs/foundation-2-3-docs) · **Base:** main
   4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300
-- **Last update:** 2026-11-13 21:20 Amsterdam
+- **Last update:** 2026-11-13 21:28 Amsterdam
 
 ## Steps done
 0. The model check: Opus 5.5 (get_session: session_context.model and last_served_model are claude-opus-5-5; effort
@@ -29,8 +29,18 @@
    --prefix tools`, gitignored); repo map OK. CI on 1123175 green: gate (push 43497813351, pull_request 43497824049;
    each with its gate and smoke jobs) and toolchain (push 43497813242, pull_request 43497823762).
 
+4. Step 3 (plan §10): 2f96f5c (pushed) · the 2.2 report: the header note, M1, L1 (with L2), L2 (Risks, CUT-ESCAPE
+   row), L3; the archive: L5, Q3 x2, Q5 x2. L2 is worded as seven job logs read (`l2-git-versions.md`: c901187's
+   pull_request run at 15:34 UTC already had 2.56.1), on the advisor agent's ruling (plan revision 2a, with the header
+   note's new ending; its conditions: keep the Appendix A hash check; re-run `fixes.mjs --check` on the final head).
+   `fixes.mjs --check --hunks` OK at 2f96f5c's tree: Appendix A sha256 equal to 4d21c1a's; 2.2's body-quote check 13
+   blocks, 10 quotes; whole-file checks (report and archive) OK; hunks vs 4d21c1a: the report 6 (-7,0 +8,6; -133
+   +139; -227,4 +233,5; -301,5 +308,7; -345 +354; -447,0 +457,6), the archive 5 (-548 +548,3; -574,4 +576,5; -732,6
+   +735,8; -834 +839; -855,2 +860,4). GATE PASS (--no-smoke); repo map OK.
+
 ## Current step
-Step 3 of the plan: the five report fixes. Notes done before step 2 (no tracked file):
+Step 4 of the plan: docs-keeper's sync (STATUS, ROADMAP, the archive's #48 row and block state, REPO_MAP), then the
+placeholders filled ({{P-2.3}}, {{Q-KIT}} in STATUS; P7 in ROADMAP) and the quote-span check. Notes done before step 2:
 - `words.mjs` written and run read-only: A1 42 chars; A2 6190 chars, 36 lines; A3 1872 chars, 17 lines, the round trip
   OK, and identical byte for byte to the 2.2 chat record (event 96467900-..., created_at 2026-11-13T16:16:36.563252Z;
   the merge commit says 16:16:47 UTC: the report cites the commit's time and names the event's); A2-DECISION 562 chars,
@@ -48,7 +58,10 @@ Step 3 of the plan: the five report fixes. Notes done before step 2 (no tracked 
   archive, every added non-table line at most 120 characters; a second write run refuses ("already written").
 
 ## Next steps
-1. The advisor tool (C9: moment 5 for step 2, moment 1 for step 3).
+1. docs-keeper (step 4), then `pointers.mjs` for P7, P8 and Q-KIT, the full `pointers.mjs --check`, a quote-span check
+   on the added lines of STATUS, ROADMAP, the archive and REPO_MAP (each quoted span found in A2, A3, the base file or
+   DECISIONS.md), the facts checked against git and the API; one commit, pushed; the advisor tool (C9).
+2. (done earlier) The advisor tool (C9: moment 5 for step 2, moment 1 for step 3).
 2. Step 3: `fixes.mjs` applies M1 (dated correction under "For Mustafa" step 3), L1, L2 (x3 in the report: :228 inside
    L1's sentence, :301, :345), L3 and the header note to the 2.2 report; L5 (:574) and Q3's two lines (:732, :834) in
    the archive; checks: Appendix A hash equal to 4d21c1a's, 2.2's body-quote check on the report's own blocks, the six
@@ -71,6 +84,13 @@ Step 3 of the plan: the five report fixes. Notes done before step 2 (no tracked 
    recorded below; the gate run before the step-2 commit; a plain push right after it; for step 4, docs-keeper puts
    `{{P-2.3}}` in STATUS only and leaves ROADMAP's 2.1a pointer byte-intact.
 
+3. 2026-11-13 ~21:15 Amsterdam, moment 5 for step 2 and moment 1 for step 3 (C9): is step 2 done, and is step 3's
+   approach right? Changed: the M5 runs and the two pull_request runs read (c901187's pull_request run had 2.56.1, so
+   L2 is worded as read, on the advisor agent's ruling, plan revision 2a); the header note no longer says "every other
+   line" unchanged, and `fixes.mjs` gained a whole-file check; the hunk counts recorded here; for step 4, placeholders
+   for his kit-freeze words as well and a quote-span check, the full pointer check after P7 and P8, the saver restarted
+   before the review agents, and #40's head refreshed.
+
 ## Refusals (guard, deny list, classifier) and the route taken
 - None so far.
 
@@ -81,7 +101,8 @@ Step 3 of the plan: the five report fixes. Notes done before step 2 (no tracked 
 - main 4d21c1a; CI on it: gate run 43461710700 and toolchain run 43461710673, both success (the API, 2026-11-13).
 - 2.2's `decisions-entries.mjs --check` on main: "OK: 13 entries (12 with quotes)", exit 0 (from a scratch copy in
   `.gate/fdn23-docs/s22/`).
-- PR #40: draft, head b4d1f0a, updated 2026-11-13 18:57 UTC (the API).
+- PR #40: draft, head 0066b635b65b4016c91af88825120312776a0a63, updated 2026-11-13 19:32:53 UTC, mergeable_state
+  blocked (the API, read 20:27 UTC; it was b4d1f0a at 18:57 UTC and fe1460a at 19:17 UTC).
 
 ## Decisions taken
 - The slug `foundation-2-3-docs`; the docs pass is its own PR from this branch (his words).

@@ -45,6 +45,18 @@ const START = '_Pointer (2026-11-11, foundation 2.1a)';
 const ROADMAP = { id: 'P7', file: 'docs/ROADMAP.md',
   anchor: "pointer, 2026-11-11: for foundation steps 2.1 and 2.2, overtaken by Mustafa's decision of 2026-11-10, `docs/DECISIONS.md`" };
 const STATUS = { id: 'P8', file: 'docs/STATUS.md', placeholder: '{{P-2.3}}' };
+const QKIT = { id: 'Q-KIT', file: 'docs/STATUS.md', placeholder: '{{Q-KIT}}', from: "The kit's freeze (KIT-FREEZE-2) ends with this step.", to: 'A guard prompt alone is not my yes.' };
+
+// His kit-freeze words of 2026-11-13, cut from A2 between two anchors (one paragraph of his message).
+export function kitWords() {
+  const a2 = messageText(ITEMS[1].uuid);
+  const i = a2.indexOf(QKIT.from);
+  const j = a2.indexOf(QKIT.to, i);
+  if (i < 0 || j < 0 || a2.indexOf(QKIT.from, i + 1) >= 0) throw new Error('A2: the kit-freeze words are not found once');
+  const t = a2.slice(i, j + QKIT.to.length);
+  if (t.includes('\n')) throw new Error('A2: the kit-freeze words span more than one line');
+  return t;
+}
 
 export function wrap(text, indent, width = 120) {
   const out = [];
@@ -106,6 +118,20 @@ export function apply(root, only, write) {
       done.push('P8 filled');
     }
   }
+  if (!only || only.includes('Q-KIT')) {
+    const lines = get(QKIT.file).split('\n');
+    const at = lines.map((l, i) => (l.trim() === QKIT.placeholder ? i : -1)).filter((i) => i >= 0);
+    const k = `"${kitWords()}"`;
+    const present = get(QKIT.file).replace(/\n */g, ' ').includes(k);
+    if (at.length === 0 && present) done.push('Q-KIT present');
+    else if (at.length !== 1) problems.push(`Q-KIT: ${at.length} placeholder lines in ${QKIT.file}`);
+    else {
+      const indent = lines[at[0]].match(/^ */)[0];
+      lines.splice(at[0], 1, ...wrap(k, indent));
+      files.set(QKIT.file, lines.join('\n'));
+      done.push('Q-KIT filled');
+    }
+  }
   if (write && !problems.length) for (const [f, t] of files) writeFileSync(join(root, f), t);
   return { problems, done, q };
 }
@@ -155,6 +181,11 @@ export function verify(root, only = null) {
     const st = readFileSync(join(root, STATUS.file), 'utf8');
     if (st.includes(STATUS.placeholder)) problems.push('P8: the placeholder is still there');
     if (!st.replace(/\n */g, ' ').includes(TEXT.status(q))) problems.push('P8: missing');
+  }
+  if (!only || only.includes('Q-KIT')) {
+    const st = readFileSync(join(root, QKIT.file), 'utf8');
+    if (st.includes(QKIT.placeholder)) problems.push('Q-KIT: the placeholder is still there');
+    if (!st.replace(/\n */g, ' ').includes(`"${kitWords()}"`)) problems.push('Q-KIT: his kit-freeze words are missing');
   }
   return problems;
 }

@@ -41,6 +41,16 @@ and its answers to Q1 to Q7, and changes nothing else:
 - **Not in scope:** planning step 2.3 (after this PR merges, in his order); any kit, gate or CI edit; PR #40's branch;
   `spikes/`.
 
+## Revision 2a (2026-11-13): two §5 text changes, approved by the advisor agent's ruling (notes: its addendum)
+Found while preparing step 3 and approved before any tracked edit: (1) L2 worded as seven job logs read
+(`l2-git-versions.md`: the runners differed on 2026-11-12; 2.56.1 already on c901187's pull_request run at 15:34 UTC);
+the texts in `fixes.mjs` (NEW_GIT; L1's "(on 2026-11-12, 2.56.0 or 2.56.1 by runner)"); the report names it "worded as
+the logs read" and the end message tells Mustafa the PR description's L2 line was refined by these logs. (2) The header
+note ends "Appendix A is unchanged, and so is every other word: the paragraphs these fixes touch are re-wrapped from the
+edited line on.", backed by `fixes.mjs`'s whole-file check; conditions: (a) the Appendix A sha256 check stays; (b)
+`fixes.mjs --check` runs on the 2.2 report again on the final head (the archive part at step 3 only, before docs-keeper).
+§5's L2 and header-note texts below are replaced by these.
+
 ## 1. What he asked, and what carries each
 1. "My words for PR #48 go into docs/DECISIONS.md, captured by script from merge commit 4d21c1a's message, as step 2.2
    did for PR #51." Carried by §3, entry E-48.
