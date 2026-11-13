@@ -268,7 +268,7 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    with `Workflow({scriptPath, resumeFromRunId})`. On return: read its section 6 list and every stop in full; snapshot
    the worktree (worktree_patch.py) and commit it; then the review per 7.2 item 7's panel (rust-reviewer,
    engine-architect, test-engineer, infra-engineer, security-auditor), with U4e's seats counted in the three.
-- The saver runs as bg7f0u6ss (since about 08:27 UTC on 2026-11-13, after the 01:22 cut; restart it when it stops,
+- The saver runs as bpxjaop78 (since about 09:29 UTC on 2026-11-13, after U4d2's merge commit; restart it when it stops,
   with run_in_background and timeout
   7200000: without the timeout the harness stops it at 30 minutes, as it stopped bg29bb0pt at 16:42 UTC). The chat's size goes in every
   report.
