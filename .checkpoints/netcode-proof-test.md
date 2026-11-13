@@ -56,8 +56,9 @@ re-run the same call if no failure was caught. Then the cause → te-m3-plan.md 
     advisor checks the commit). **Done:** the edit (delay_tests.rs only, AM-2's comment and the assertion; rustfmt
     --check 0; sha256 74d49de7…, delay.rs unchanged aaa6a588…); P4 (a) exit 101 "no spin while waiting: 22632 runs"
     and (b) exit 101 "4 shutdown calls for 2 pump runs", each restored by Edit (delay.rs aaa6a588…, git diff clean);
-    the record in te-m3-plan.md section 7. **Running: P2** (task bwz0jq8ww, since 12:26; p2.log; tally by
-    te_m3_tally.py p2). Then P3 (mode all, 10 x 2, 4 busy loops), P5 (check.mjs counted), P6 (gate), ONE commit
+    the record in te-m3-plan.md section 7. **P2 PASS** (12:26-12:28; 600 of 600 exit 0, one own line each, (2,1,3)
+    once). **Running: P3 then P5** (task bsv3s6ik3, from 12:29: p3.log, mode all, 10 x 2, 4 busy loops; then
+    p5-check.log, sha256sum of both files and `node check.mjs` counted). Then P6 (gate), ONE commit
     (delay_tests.rs and the record), push, CI, the advisor's check of the commit. If cut: the working tree holds the
     edit (delay_tests.rs 74d49de7…) and no plant (delay.rs aaa6a588…); re-run the interrupted P-step.
 0. **U4e's merge is next** (the advisor's round-2 ruling, advisor-u4e-r2.md: APPROVE on Q1-Q4; NC2-M1 a carry,
