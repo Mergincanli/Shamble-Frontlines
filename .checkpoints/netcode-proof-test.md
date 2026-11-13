@@ -67,7 +67,9 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    packet_name_check.py 12 of 12); u4d2-packet.md cut from u4d2-packet.json (sha256 9b670276…, 373 KB; its side file
    u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
-   **(k) Running: U4d2's review round 2,** workflow wf_969ab29d-637 (task w538kzcct; script
+   **(k) Running: U4d2's review round 2,** workflow wf_969ab29d-637 (task w538kzcct, stopped by the container's
+   restart at about 00:52 with the rust seat returned: APPROVE WITH FINDINGS, RR2-L1 to -L4; resumed about 00:55 as
+   task wzr3p9319; script
    workflows/scripts/npt-u4d2-review-r2-wf_969ab29d-637.js), launched about 00:34 UTC on 2026-11-13, on what changed:
    batch 1 (Read) security, rust, infra in the builder's copy while nobody plants (the infra seat times `--only wasm`
    with `-x` twice); batch 2 (Prove) test (general-purpose with Edit; start hashes .gate/u4d2/r2-hashes-start.sha256;
@@ -182,8 +184,8 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    with `Workflow({scriptPath, resumeFromRunId})`. On return: read its section 6 list and every stop in full; snapshot
    the worktree (worktree_patch.py) and commit it; then the review per 7.2 item 7's panel (rust-reviewer,
    engine-architect, test-engineer, infra-engineer, security-auditor), with U4e's seats counted in the three.
-- The saver runs as bei5o4kd5 (since 00:33 UTC on 2026-11-13, after the fix pass's snapshot; restart it when it stops,
-  with run_in_background and timeout
+- The saver runs as bibmey4j2 (since about 00:55 UTC on 2026-11-13, after the container's restart; restart it when it
+  stops, with run_in_background and timeout
   7200000: without the timeout the harness stops it at 30 minutes, as it stopped bg29bb0pt at 16:42 UTC). The chat's size goes in every
   report.
 
@@ -211,6 +213,13 @@ the cut and the time of the resume; UTC, read from the session's transcript):
   continue where you left off"): the builder's copy checked first (its spikes/ equal to the read copy's by `diff -rq`:
   no plant in place; crates/sim untouched); the saver restarted (b41pzpnmb); the run resumed (`resumeFromRunId`, task
   w6sp1gn2w: batch 1 from its cache, batch 2's two seats fresh, each continuing after its notes' last line).
+- 2026-11-13 about 00:52 (not the spend limit: the container was restarted, the saver's last commit "autosave
+  (terminated)" 11d5985 at 00:52:31): no notice; the harness reported the saver (bei5o4kd5) and round 2 (w538kzcct)
+  stopped. Cut: round 2's batch 1, the rust seat returned (APPROVE WITH FINDINGS, RR2-L1 to -L4), the security and
+  infra seats mid-run (notes 00:48 and 00:51); batch 2 not started. The disk kept everything (.gate/, the shared
+  target, the copies). Resumed about 00:55: the builder's copy checked first (`sha256sum -c` fx-hashes-end: 18 of 18
+  OK; crates/sim untouched; no cargo, rustc or runner left); round 2 resumed (`resumeFromRunId`, task wzr3p9319: the
+  rust seat from its cache); the saver restarted (bibmey4j2).
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188
