@@ -17,4 +17,7 @@ Started 2026-11-13 (session time). Effort xhigh. Instructions read from origin/m
 - B10: write the ruling advisor-u4r-brief.md; return summary.
 
 ## Progress
-- B0 started.
+- B0 done: advisor.md (main) read; d2 brief check's form (block list, verdict + L-conditions, checked/not, Decisions,
+  For Mustafa); brief rev 3.1 read whole (1,625 lines: C27-C33, C1-C26, sections 0-12, R1-R44, Q1-Q14, D1-D13, 12's
+  items 1-9); the r3 check (61 lines: F-j High, F-a/k/l/m Medium, 13 Lows) and the notes (314 lines; SLIP at top, B3a).
+- B1 started: plan §5 U4r read (u4-build-plan.md:750-803).
