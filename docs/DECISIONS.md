@@ -107,6 +107,12 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-13, 22:27:05 UTC: his status request, in foundation 2.3's session** (foundation 2.3, PR
+  #52; his message in that change-set's session, session_019YNMUWSsyRgaYWxk4auQ5b, on his personal account, extracted by
+  script from the session's transcript, message a994258f-93c9-45d2-8878-31e7cfee6dcd), sent while review round 2 ran.
+  Copied by script from `docs/reports/2026-11-13-foundation-2-3-docs.md`, Appendix A4, and checked byte for byte against
+  it:
+> Continue with what you are doing, I am just here for a status update
 - **Taken by Mustafa, 2026-11-13, 18:47:55 UTC: his decision on step 2.3 (step 2.3 may be planned now), and step 2.3's
   task** (foundation 2.3, PR #52; his message in that change-set's session, session_019YNMUWSsyRgaYWxk4auQ5b, on his
   personal account, extracted by script from the session's transcript, message e5fa7ca0-6494-44d0-8366-81fc612c7958). It

@@ -120,8 +120,8 @@ of 2026-11-13 (docs only, no kit, gate or CI file): his go for #48 and his decis
 (SLICE-ORDER condition 3) and ROADMAP, his decision quoted in STATUS; the 2.2 report's fixes M1, L1, L2 (worded as the
 CI logs read), L3 and L5, the archive's lines on the same claims, on #48's merge and on his go for it, and two pointing
 clauses; STATUS, ROADMAP and the archive made true for main 4d21c1a. Report
-`docs/reports/2026-11-13-foundation-2-3-docs.md`. Next: review round 1, the verifier, the advisor agent's review of the
-final head, then his go. Step 2.3 is planned after this merges.
+`docs/reports/2026-11-13-foundation-2-3-docs.md`. Next: the verifier, the advisor agent's review of the final head, then
+his go. Step 2.3 is planned after this merges.
 
 **The foundation, 2.2: the toolchain [2026-11-10 to 11-13, MERGED]** — foundation-toolchain, ADR 0002's
 migration plan step 2.2 (Mustafa's decision of 2026-11-10: the second account plans and builds steps 2.1 and 2.2 now).
