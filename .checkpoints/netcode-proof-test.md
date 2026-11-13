@@ -28,6 +28,15 @@ u4r_runner.py (u4r-run.sh.diff: 6 lines, the lane's names only; `bash -n` exit 0
 block. The check-in is enabled (11:39 UTC). On return: read the change list, every finding rated Medium or higher,
 and the open questions in full; then the advisor's check (the brief, u4r-run.sh and its diff, INF2-4's two diffs and
 proof logs).
+**Running (since 11:47 UTC): TE-M3's diagnosis loop** (TE2-5 (c)'s first step, advisor-u4d2-r1.md Block 5: the
+panic first; no source change, no retry into green): te_m3_loop.sh through main-run.sh (task bseqk2cc5; the lane lock
+held exclusively; log .gate/te-m3/loop.log, each run's whole output .gate/te-m3/run-<loop>-<i>.log): npt-net's library
+tests in the bites build, the whole binary, 30 runs in each of 2 parallel loops; it stops at the first failure and
+names its log and libtest's failures list. The code read so far (delay.rs:1686-1889, delay_clock.rs:204-273): a pump
+run at or after the deadline always ends the pump, and the test's count of runs at or after it reads the clock at
+:1707 while the end reads it again at :1862, so a run that starts before the deadline and reaches :1862 after it ends
+with `polls_after_deadline` 0 (a lead to test against the panic, not a finding yet). If cut: nothing to restore;
+re-run the same call if no failure was caught. Then the cause → te-m3-plan.md → the advisor, with U4r's brief.
 0. **U4e's merge is next** (the advisor's round-2 ruling, advisor-u4e-r2.md: APPROVE on Q1-Q4; NC2-M1 a carry,
    C-U6-16 (a); the merge goes ahead on R9's M1-M9 with Q3's amendments to M5, M8 and M9; T1, T2 (3), T3, T5 and the
    new T7 from advisor-u4e-r2.md, T2 (1), (2), (4), (5), T4 and T6 from advisor-u4e-r1.md; nothing to Mustafa). M1 and
