@@ -337,10 +337,13 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     U4f's lead controller comes after U4r's runs. On a link whose one-way delay is above about half a tick period every
     command would reach the room after its tick and be dropped as late, `last_run` would stay `None`, and option B
     would have nothing to repeat: -17 would compare a world of soldiers standing still. U4r sets each endpoint's lead
-    with `ClientEndpoint::with_lead` from the run's profile (its largest one-way delay, half the round trip plus half
-    the jitter, in ticks rounded up, plus 1), records it with `cmd_timing` in the header, and its contract test reports
-    on each short run the commands that arrived late (the room's `late` count) beside the commands sent; a run with more
-    than 1 % of its commands late comes to the advisor before its marks count."
+    with `ClientEndpoint::with_lead` from the run's profile (the round trip plus the jitter, in ticks rounded up, at
+    least 1, plus 1: `npt_sim::ticks_for_ms(rtt_ms + jitter_ms).max(1) + 1`, so P0 2, P1 3, P2 and B1 5, P3 7, within
+    `CMD_CATCHUP` = 8; its bots give a command only at a client step whose newest snapshot tick moved since their last
+    command, and move each press counter by at most one edge per command; the advisor's U4r brief check, U4R-Q14),
+    records it with `cmd_timing` in the header, and its contract test reports on each short run the commands that
+    arrived late (the room's `late` count) beside the commands sent; a run with more than 1 % of its commands late comes
+    to the advisor before its marks count."
 75. **NC-M5 and A3, the client's event-number base (u4e-review-netcode.md, Block h; u4e-review-arch.md, A3; the test
     seat's probe Q-10; the advisor's U4e round-1 ruling, R3):** "U4e's client rebuilds each event's 16-bit number near
     its own start (`ClientEndpoint::with_starts`, 0 by default), and the wire carries no event base (`JoinAccepted` and
@@ -518,6 +521,9 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     the endpoint's input; U4e's room sends a client a full state or a snapshot for a tick, never both, so no U4 run
     meets it. For a tick already received, `full_state` compares the frame's hash with the one filed and files the
     sentinel when they differ, with a test of that order that fails under its plant."
+86. **U4R-Q4, condition 5's option-A half (the advisor's U4r brief check):** U4f extends U4r's contract test (r2) to
+    -21's option-A suites and -20's P3 option A, with every PM-0001-2 check passing, not only resolving, and the shot
+    band, before -20's and -21's marks count; a suite that fails comes to the advisor first.
 
 ## U4g (prediction, interpolation and events)
 47. **A-M2, the predicting World's reset (advisor-u4-wave1.md:240-247; the advisor's W1-U4D ruling):** "The predicting
@@ -557,6 +563,17 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     view tick, up to the history's span, and `rewinds_refused` also counts reruns whose view tick has left the ring.
     U4h's tolerance judges each run of a command, reruns included, against the estimate at the tick it runs (or runs a
     rerun with fire released), counts reruns apart from claims, and shows by test that a starved uplink buys no rewind."
+87. **U4R-Q9, the TC B1 seed 3 recording (the advisor's U4r brief check):** U4h records TC B1 seed 3 with `scenario
+    --record` and its TC shooter, adds it to crates/lab/recordings.json under carry 82's schema, and states the `wasm`
+    step's time with it against the 5-minute budget.
+88. **O1's re-run (carry 40; the advisor's U4r brief check, U4R-Q12 (a)):** after U4h merges, the main session replays
+    U4r's SS P0 seed 4 recording on the U4h build and counts both legs' replacements; at 0 that is the clean pair, else
+    SS P0 seed 4 is re-recorded on the U4h build (its SHA-256 beside the old one's); then the three pairs (clean,
+    wallclock, late-command), six runs, by U4r's pre-check script, results in results/u4h-precheck-30/<commit>/, read by
+    the advisor in U4h's review; -30 stays NOT-RUN until U6. U4h's brief states what its estimate does with an L1
+    session whose `rtt_ns` is still `None`; the re-run compares each client's first-sample instant with the instant
+    U4h's estimate first reads that client's RTT (its receipt or its run, both logged at U4r); the Loopback leg's
+    sessions keep `RttSource::Link`.
 
 ## U4d2 or the main session (the workspace Cargo.toml, crates/proto/Cargo.toml and check.mjs; wave 2 or later)
 29. **rust 5 (nit):** "The workspace Cargo.toml's libm comment says `arch` gives 'hardware sqrt, floor, ceil, trunc and

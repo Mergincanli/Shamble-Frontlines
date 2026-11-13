@@ -493,12 +493,12 @@ sub-unit that moves its mark.
   runs it natively; npt-hash-wasm's exports wrap it; D-2 calls it in a test.
 - **Sources:** U4d's three synthetic recordings (open-loop commands, Rewinds drawn inside the ring) from a seeded
   generator in npt-sim's library (`Recording::synthetic`), since U4d2's step regenerates them from the manifest,
-  needing no room; U4r's three runner recordings (`scenario --record`: SS P2 seed 1, ES
-  P3 seed 2, TC B1 seed 3), which hold the room's real Rewinds; and a fourth runner recording, **SS P0 seed 4**
-  (`scenario --record`), the -30 pre-check's source (the advisor's condition 3). Replayed at P0, the other three's view
-  times sit about one RTT older than P0's estimate, so the room would replace them on both legs, each from its own RTT;
-  a recording made at P0 keeps them inside the tolerance. The determinism step keeps its three; the fourth serves the
-  pre-check only.
+  needing no room; U4r's two runner recordings (`scenario --record`: SS P2 seed 1, ES P3 seed 2) and U4h's TC B1 seed 3,
+  made with its TC shooter (the advisor's U4r brief check, U4R-Q9), which hold the room's real Rewinds; and a fourth
+  runner recording, **SS P0 seed 4** (`scenario --record`), the -30 pre-check's source (the advisor's condition 3).
+  Replayed at P0, the other three's view times sit about one RTT older than P0's estimate, so the room would replace
+  them on both legs, each from its own RTT; a recording made at P0 keeps them inside the tolerance. The determinism step
+  keeps the runner recordings (two at U4r, the third at U4h); SS P0 seed 4 serves the pre-check only.
 - **Where they live:** regenerated at check time under .gate/ from a committed recordings manifest (scene, seed,
   script, generator version) with each file's SHA-256; a different hash fails the step and names the recording.
   Never committed as files.
@@ -752,9 +752,9 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
   `cmd_timing`, `tick_start`, `ticks_below_wrap`, suite, `stand_ins`); the `--bite` dispatch to each instance; the
   per-process logs with `admit` events and footers (§4.12); `scenario` (with `--record`) and `replay` (the x86-64
   re-decode, R-8: it re-decodes a run's logged client bytes natively and writes the clients' hashes; the advisor's
-  condition 9); the four runner recordings (§4.15; the fourth, SS P0, for the -30 pre-check: the advisor's condition
-  3); -57's pairing (§4.6). npt-bots' library: the brawl `Behaviour` and the open-loop scripts. Run
-  scripts ops/runs/c-u4r-*.mjs, as U2's c-u2-pm-0001-3.mjs.
+  condition 9); three runner recordings (§4.15: SS P2 seed 1, ES P3 seed 2, and SS P0 seed 4 for the -30 pre-check: the
+  advisor's condition 3; TC B1 seed 3 is U4h's: U4R-Q9); -57's pairing (§4.6). npt-bots' library: the brawl `Behaviour`
+  and the open-loop scripts. Run scripts ops/runs/c-u4r-*.mjs, as U2's c-u2-pm-0001-3.mjs.
 - **Tests:** the runner's twin test with its bite (§4.11); the contract test (§4.12), which also shows every PM-0001-2
   check passing, not only resolving, on the short runs of each precondition suite: -17's four profiles, -18's B1,
   -20's P3 and each of -21's eight suites with its open-loop scripts; a suite that fails comes to the advisor before its
@@ -835,8 +835,9 @@ a checkpoint save and a push. A "bite" is a planted defect compiled only into th
 - **Builds:** `HitHistory`'s sizing and `rewind_at`'s rules (§4.9); the view-time estimate with the pump's RTT; the
   switchable cap; the per-shot log of its parts; `AimCast` through `World::ray_cast` on the published interpolated
   movers; the TC shooter's `Behaviour` (a page-like 60 Hz frame loop), the tolerance-edge stamper and the 150 ms pong
-  delayer; the figures `view_hit_registered_share`, `false_hit_share`, `rule_cap_set_by_rule` (fixtures only at U4) and
-  `throw_desync_count`, with fixtures.
+  delayer; the TC B1 seed 3 runner recording with the TC shooter, joining the recordings manifest (U4R-Q9); the figures
+  `view_hit_registered_share`, `false_hit_share`, `rule_cap_set_by_rule` (fixtures only at U4) and `throw_desync_count`,
+  with fixtures.
 - **Order inside (T14):** measure the largest honest rewind at P3 and P4, both options, on **calibration seeds 101-103**;
   round it up to ticks and add the margin (data): the test cap; size HitHistory from it (recorded: -7). Then the judged
   test-cap runs on **seeds 1-3**, with the setup check `clipped == 0` able to fail.
