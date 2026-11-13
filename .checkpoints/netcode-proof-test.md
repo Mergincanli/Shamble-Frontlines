@@ -18,18 +18,26 @@ L2 and L1.** (Mustafa's compact came at about 16:28 UTC; the saver be5gxjhow end
   form needs it; it adds no edge: a third line beyond the ruling's two, named in the commit for the advisor's next
   look). Cargo.lock by `cargo tree` offline through main-run.sh (.gate/l3-manifests/lock-update.log): exactly two
   lines, npt-bots gains "npt-sim", npt-lab gains "npt-bots"; no new package. Manifest sha256 before: Cargo.toml
-  d211ca52…, Cargo.lock 6e628ab7…, lab 393a21b1…, bots ec7ff2af…. **Running: its counted run** (task bz0ifgjgg, from
-  16:32; .gate/l3-manifests/counted.log; M5's form: the two test builds, npt-lab's two release builds, the two wasm32
-  builds, then `node check.mjs`). Expected: 11 steps PASS, 491 / 561, self 71 of 71, marks 81, redact 0, the deps
-  line's npt-sim "one set" in npt-server, npt-lab and npt-hash-wasm, the `wasm` step's seconds beside 33.1. If cut:
-  nothing to restore (no plant, no source edit); re-run the same call. **A fact for the advisor (Low, the record):**
+  d211ca52…, Cargo.lock 6e628ab7…, lab 393a21b1…, bots ec7ff2af…. CI green on 4e91830 (gate run 43463673720, push).
+  **Its counted run: DONE, all 11 steps PASS** (task bz0ifgjgg, 16:32-16:43:54 UTC, exit 0;
+  .gate/l3-manifests/counted.log; M5's form: the two test builds, npt-lab's two release builds, the two wasm32 builds,
+  then `node check.mjs`): measured 491, bites 561, 0 failed, 0 skipped; self 71 of 71; marks 81 (ADR rows unchanged);
+  redact 0 findings; the deps step's npt-sim features one set in npt-server, npt-lab and npt-hash-wasm, the same sets as
+  M5's (measured npt-sim [], libm [arch, default], rand_chacha [], ppv-lite86 [simd], zerocopy [simd], rand_core [];
+  bites with npt-sim [bites]); the `wasm` step 35.8 s (33.1 at M5: build npt-lab 5.9 and npt-lab-bites 6.1 against
+  5.4 and 5.2, the rest within 0.5 s; both pairs 27,000 ticks, 0 mismatching; both PM-0004-21 bites caught as before),
+  no time problem; test step 380.7 s; refs 913 tracked files. These are `<base>`'s counts (section 12 item 1), with
+  `git diff --quiet 4e91830 <base> -- spikes/netcode-proof` exiting 0. **A fact for the advisor (Low, the record):**
   npt-net's tree was in npt-lab's builds before L3, through npt-server (server/Cargo.toml names npt-net; U4d2's M5
   log, .gate/u4d2-merge/m5-counted.log:125-138, compiles npt-net and npt-tcpinfo in `cargo build --release -p
   npt-lab`), so L3 adds only npt-bots itself; U4R-Q1's premise and the ruling's (:185-186) read otherwise.
-- **L2 ready, not applied:** u4r_l2_text.py (dry run read in full by the main session: carry 74's amended words;
-  new entries 86 (§U4f, U4R-Q4), 87 and 88 (§U4h, U4R-Q9, U4R-Q12), numbered after 85 and appended at their sections'
-  ends; the plan's §4.15 two phrases, §5 U4r's phrase, §5 U4h's addition; the words check passes). Next: after the
-  counted run, stop the saver, `--apply`, commit carries + plan + script as one commit, push, restart the saver.
+- **L2 COMMITTED at 8bcbf36** (pushed about 16:46 UTC; the saver stopped first, restarted after): u4r_l2_text.py
+  `--apply` (dry run read in full by the main session): carry 74's amended words; new entries 86 (§U4f, U4R-Q4), 87
+  and 88 (§U4h, U4R-Q9, U4R-Q12), numbered after 85 and appended at their sections' ends; the plan's §4.15 two
+  phrases, §5 U4r's phrase, §5 U4h's addition; the words check passed. carries 8b7f165e… → e8675a02… (644 → 661
+  lines), plan 01ede63d… → 1e631c55… (1,092 → 1,093). Left of L2: section 12 item 9 (section 0's stamps re-set; the
+  brief's cites into the plan and carries that L2 moved re-pointed by script), after L1's fold. The moves: carries
+  +3 after :343 (carry 74), +6 after :520 (entry 86), +17 after :559 (87, 88); plan +1 after :839 (§5 U4h).
 - **Running: L1's fold script, workflow wf_bb7715a1-d7a** (task w6i37zcav, from about 16:42 UTC; script
   u4r-fold-l1-wf_bb7715a1-d7a.js under the session's workflows/scripts/): fold-writer (general-purpose, opus, xhigh)
   writes u4r_fold.py, dry run only (notes u4r-fold-notes.md); then fold-checker, adversarial (notes
@@ -37,7 +45,8 @@ L2 and L1.** (Mustafa's compact came at about 16:28 UTC; the saver be5gxjhow end
   after its notes' last block. On return: read the dry run's diff in full (pass bars: carry 74's 1 %, D13's stop), the
   questions for the advisor and the checker's findings; then apply, then L4 (items 1-3 with P16; P6 from L3's counted
   run) and item 9 (re-stamp; the plan and carries cites L2 moved).
-- **The check-in is enabled** (16:39 UTC; next 18:34). **The saver runs as b24prddnh** (since 16:32 UTC).
+- **The check-in is enabled** (16:39 UTC; next 18:34). **The saver runs as b9f761m21** (since about 16:46 UTC; b24prddnh
+  stopped for L2's commit).
 **NOW (2026-11-12 about 17:45 UTC; read this first after a compact or a cut).**
 **At 12:53 UTC Mustafa reported usage at 92 % ("make sure to save progress (Also for the agents)"):** everything saved
 and pushed, the two running advisor agents' notes with it (advisor-u4r-brief-notes.md: B0 done, B1 started; and
