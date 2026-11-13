@@ -5,7 +5,7 @@
   · plan: `.checkpoints/foundation-2-3-docs/plan.md`
 - **Branch:** claude/sweet-mayer-grsukw (for cs/foundation-2-3-docs) · **Base:** main
   4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300
-- **Last update:** 2026-11-13 22:08 Amsterdam
+- **Last update:** 2026-11-13 22:05 Amsterdam
 
 ## Steps done
 0. The model check: Opus 5.5 (get_session: session_context.model and last_served_model are claude-opus-5-5; effort
@@ -125,6 +125,14 @@ Step 6 of the plan: review round 1 on d59ca43 (the workflow `review-r1.js`, args
    and that the transcript checks run only here; `review-r1.js` gains `model: 'opus'`, a required head SHA and a line
    against retyping his words.
 
+5. 2026-11-13 ~22:00 Amsterdam, moment 5 for step 5 and moment 1 for step 6 (C9): is step 5 done, is the review
+   launch right? Changed: CI on d59ca43 read by SHA (gate 43506267790, 43506274539; toolchain 43506267759,
+   43506274417: green); `review-r1.js` brought up to revision 2b (P8 and the kit words as quotes; the ruling's checks for
+   R-WORDS; R-STATE: REPO_MAP unchanged, the three "go" lines, the report's body; forward-looking lines named; skeptic
+   notes prefixed by reviewer; scripts only with --check); the saver stopped and restarted; for the last content
+   commit: #52's STATUS row and ROADMAP entry true for the ready state, #40's second read, the report's consultation
+   line, "Last updated".
+
 ## Refusals (guard, deny list, classifier) and the route taken
 - None so far.
 
@@ -142,7 +150,9 @@ Step 6 of the plan: review round 1 on d59ca43 (the workflow `review-r1.js`, args
 - The slug `foundation-2-3-docs`; the docs pass is its own PR from this branch (his words).
 
 ## Running work
-- Saver: background task bofczdenq · output
-  `/tmp/claude-0/-home-user-Shamble-Frontlines/7261f3d7-f651-586a-9c39-c052553b68a3/tasks/bofczdenq.output` · started
-  19:22 UTC (20:22 Amsterdam) · stops by ~21:12 UTC (22:12 Amsterdam) · last check 19:57 UTC: ok ("watching ... every 10
-  min for 110 min").
+- Review round 1: workflow run wf_eb6cb5e5-3ce (task wnyzzm0vm) · script as launched: `review-r1-run1.js` (a copy of
+  `review-r1.js`) · args {"head": "d59ca43c559fe085ca90f45fdbac593236399533"} · notes: `r-words.md`, `r-state.md`,
+  `skeptic-*.md` in this folder · launched ~21:04 UTC · status: running.
+- Saver: background task bhr4qixcn · output
+  `/tmp/claude-0/-home-user-Shamble-Frontlines/7261f3d7-f651-586a-9c39-c052553b68a3/tasks/bhr4qixcn.output` · started
+  ~21:03 UTC · stops by ~22:53 UTC · the old saver bofczdenq stopped with TaskStop (its last save 28a64a8, pushed).
