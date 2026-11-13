@@ -13,3 +13,5 @@ Head under test: bd44a68. Base: origin/main 2aa5e9c. Worktree HEAD moves (sessio
 
 ## Log (one line per check)
 - 0. Later commits after bd44a68: 17952be only, touches only .checkpoints/foundation-toolchain.md (0 non-checkpoint files).
+- 1a. Gate: `node tools/gate.mjs --no-smoke` (worktree, base merge-base 2aa5e9c): GATE PASS; [1] 5/5, [2] PASS, [3] +0 -0 (core 138 / game 714 / editor 353), [4] 51 guarded 0 flagged, [5a] SKIP, [5b] 0 problems, [5c] 0 refs up, [5d] PASS. Log: .gate/verifier-final/gate.log.
+- 2a. Local cargo (CARGO_TARGET_DIR=.gate/verifier-final/target, fresh; rustc 1.99.1, clippy 0.1.99, rustfmt 1.10.0; worktree HEAD 59140e0 = bd44a68 + checkpoint-only commits): test --workspace 6/6 (sim, protocol overflow tests "should panic ... ok"); test --release -p sim -p protocol 2/2; wasm32 build of 5 crates rc 0; clippy -D warnings host --workspace --all-targets rc 0; clippy -D warnings wasm32 5 crates --all-targets rc 0; fmt --check rc 0; extra: test --workspace --release --no-fail-fast 6/6. Cargo.lock / package-lock.json sha256 unchanged by the runs; `git status` clean.
