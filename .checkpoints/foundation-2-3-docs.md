@@ -9,8 +9,9 @@
 
 ## Steps done
 0. The model check: Opus 5.5 (get_session: session_context.model and last_served_model are claude-opus-5-5; effort
-   max). The advisor tool is on; the `/advisor fable` output said this conversation keeps Opus 5.5 behind it until
-   `/clear` or `/compact`. Orientation: CLAUDE.md, CHECKPOINTS.md, STATUS, DECISIONS (2026-11-10 to 11-13 and
+   max). The advisor tool is on. CORRECTED (round 2, RW2-F1): the `/advisor fable` notice predicted Opus 5.5 behind it until
+   `/clear` or `/compact`, but the records show Fable 5.2 (claude-fable-5-2) answered every consultation: the one
+   advisor_tool attachment (18:47:56 UTC, model claude-fable-5-2) and every call's advisor usage record. Orientation: CLAUDE.md, CHECKPOINTS.md, STATUS, DECISIONS (2026-11-10 to 11-13 and
    "Queued"), 4d21c1a's message, the 2.2 report, PR #48's description, the advisor agent's verdict on 9b20b67 (the 2.2
    session's record, list_events) and 2.2's notes at 2f0fef3.
 1. The checkpoint and plan revision 1 saved (30483c3); the draft PR opened: #52
@@ -74,40 +75,46 @@
    diff d59ca43..554face (only 2c's phrases in STATUS, ROADMAP, the archive, DECISIONS and the 2.2 report); the 2.2
    report's hunks vs 4d21c1a: 6; all scripts --check OK; STATUS 120; GATE PASS. Consultation 8 before this save.
 
+9. Review round 2 on 554face (workflow wf_dcd47e10-70e, done ~22:48 UTC): 2 of 2 reviewers, 1 of 1 skeptic returned.
+   R2-WORDS: HIGH FOUND: RW2-F1 (High, held by its skeptic): the report says Opus 5.5 answered the advisor tool; the
+   records show Fable 5.2 answered every call (verified by the session: the advisor_tool attachment 18:47:56 UTC model
+   claude-fable-5-2; advisorModel fields; the advisor usage records). Lows: RW2-F2 (label consultation 6 also moment 5
+   for step 6; add step 6's save 3f98c0b 22:04:19 to the list), RW2-F3 (#48's row: "and quoted whole in the merge
+   commit's message"), RW2-F4 = R2-L2 (#52's waiting-on in STATUS and "Next:" in ROADMAP still list round 1: write
+   "the verifier, the advisor agent's review of its final head, then his go"), RW2-F5 (R2-WORDS's notes held fragments
+   of his words, pushed). R2-STATE: APPROVE, Lows: R2-L1 (the 2.1a follow-up should list plan S4's other lines, verified
+   on the tree: ADR 0001 :603, :1100, :1301, :1771; ADR 0003 :1373; ADR 0004 :1245, :1251; ADR 0005 :92; ADR 0006 :1469,
+   :1482; the register :72, :292), R2-L3 (step 4's departures, the STATUS cut and the archive lines beyond §6, were
+   committed before consultation 4; restore "for step 4" in entry 3), R2-L4 ("Since round 1, every "done" save has come
+   after its consultation."), R2-SELF (R2-STATE's guard refusal 22:28:31 UTC, a loop writing to a variable path; route:
+   literal paths). Records checked (consultation 9's ask): the main session's 638 assistant turns all claude-opus-5-5,
+   effort max (no stop condition); get_session: model and last served claude-opus-5-5; the agents: the advisor agent and
+   docs-keeper Opus 5.5 at high; every reviewer and skeptic Opus 5.5 at max.
+
 ## Current step
-Round 2 (wf_dcd47e10-70e) on what changed, d59ca43..554face. While it runs: no edit of docs/ or the check scripts in
-the working tree (the reviewers run them on the tree); drafts only in `report-body.md`. Notes done before step 2:
-- `words.mjs` written and run read-only: A1 42 chars; A2 6190 chars, 36 lines; A3 1872 chars, 17 lines, the round trip
-  OK, and identical byte for byte to the 2.2 chat record (event 96467900-..., created_at 2026-11-13T16:16:36.563252Z;
-  the merge commit says 16:16:47 UTC: the report cites the commit's time and names the event's); A2-DECISION 562 chars,
-  one line, inside A2, cut by its anchors.
-- `report-appendix.mjs` written; tested on a scratch copy in `.gate/fdn23-docs/` (OK; a one-byte change in A3 caught).
-- L2's log lines read (`l2-git-versions.md`): 2.56.0 on c901187 (15:34 UTC) and fd14855 (16:32 UTC); 2.56.1 on a5823cf
-  (18:39 UTC).
-
-- `pointers.mjs` tested on scratch trees (`.gate/fdn23-docs/tree2`): P1 to P5, P7 and P8 OK; idempotent; negative
-  control (one word dropped from P2's quote) caught.
-
-- Step 3 prepared: `fixes.mjs` (11 edits: the header note, M1, L1 with L2, L2 x2, L3 in the report; L5, Q3 x2, Q5 x2 in
-  the archive; minimal reflow that stops where the original line breaks resume); tested on `.gate/fdn23-docs/tree4`: OK,
-  the report's Appendix A equal to the base's, 2.2's body-quote check 10 quotes, 6 hunks in the report and 5 in the
-  archive, every added non-table line at most 120 characters; a second write run refuses ("already written").
+Fix pass 2 (round 2's findings): FIRST ask the advisor agent for revision 2d (the changed approved texts: the archive
+follow-up's added S4 clause, #48's row wording, #52's waiting lines; and round 3: none if no Critical or High stays
+open after this pass), then write. docs/ is clean (round 2 made no edit). The chat is ~88% full (876k of 1M tokens at
+22:45 UTC): resume from here after a compaction.
 
 ## Next steps
-1. When round 2 returns: count reviewers and skeptics (re-run a null one alone); `git status --short docs/` clean; one
-   fix pass if needed (round 2 is the last reviewer round unless a Critical or High stays open), its "done" save after a
-   consultation.
-2. The report after round 2: 554face's run ids in E7; consultations 8 onward; the "review round 1 done" save (22:04:22)
-   in the timeline (consultation 6 came just before it); round 2's findings with dispositions; round 2's notes checked
-   for fragments of his words; say that the session's own plan and scripts carry his sentences as draft texts and anchors.
-3. Stop the saver (it ends ~23:52 UTC) and start a fresh one before the verifier; the verifier (a general agent reading
-   main's verifier.md, Opus 5.5 max) with all findings' dispositions in its brief, until PASS.
-4. Step 8: a consultation; the checkpoint folded into the report; the saver stopped; the last checkpoint commit; the
-   final commit (the notes SHA, #52's state word in STATUS and ROADMAP, #40's second read, "Last updated", the
-   verifier's result) deletes `.checkpoints/foundation-2-3-docs*`; the full battery and the gate on that tree first;
-   the advisor agent's review of that SHA (the lines listed in its brief); the PR body; ready; stop for his go.
+1. SendMessage to the advisor agent (id a62455e264f542e79) for revision 2d with the exact texts above; record its
+   ruling in the plan.
+2. Fix pass 2: the report's advisor-tool section line ("Fable 5.2 (claude-fable-5-2) answered every consultation, per
+   the session's records: the advisor_tool attachment at 18:47:56 UTC and each call's usage record; the `/advisor fable`
+   notice had predicted Opus 5.5 until /clear or /compact, and why it did not hold is not established"), the appendix
+   intro (report-appendix.mjs: add the same record after the notice), report-body.md, "Decisions and deviations" (the
+   session's opening line and round 1 took the notice as fact); RW2-F2, RW2-F3, RW2-F4/R2-L2, RW2-F5, R2-L1, R2-L3,
+   R2-L4, R2-SELF; the Reviews section with all 10 round-2 findings; consultation 9 in the list (22:4x UTC: moment 5
+   for round 2's review, moment 1 for fix pass 2); E7 with 554face's runs (drafted in report-body.md). Then the battery,
+   the notes saved last (scripts frozen), the commit, the word-level diff 554face..fix, CI read, a consultation before
+   its "done" save.
+3. Tell Mustafa in a top line: Fable 5.2 answered the advisor tool (not Opus 5.5, as my opening line said).
+4. The verifier (briefed on the whole report: every claim about what ran checked against a record), the saver
+   restarted first (it ends ~23:52 UTC); then step 8 (see the plan §10 and the advisor's lists above); the last
+   consultation before the final commit, any later one in the PR body.
 
-## Advisor tool consultations (his words of 2026-11-11; in this conversation Opus 5.5 answers the tool)
+## Advisor tool consultations (his words of 2026-11-11; Fable 5.2 answered each, per the records: RW2-F1)
 1. 2026-11-13 ~20:00 Amsterdam, moment 1, before committing to the docs-pass approach: is the approach right? Changed:
    saved first (checkpoint, plan, draft PR) before any tracked edit; every pointer quotes all four limits; the grep
    widened (ROADMAP:93 and STATUS:38 are sites; every hit listed as added or left); the decision cut by anchors (nested
