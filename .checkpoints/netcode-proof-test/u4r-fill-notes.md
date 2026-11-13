@@ -33,3 +33,18 @@ or the script's dry run. Never --apply, never cargo or check.mjs, never commit.
   P5 j-r2 :168-171, P8 j-r2 :298, P9 m9 :252-256, P10 m9 :259-264, P11 d2-r2 :304-308, P12 d2-r1 :308-310, P13-P15
   carries :72-75, :116-119, :135-136, P16 te-m3 :136-139; homes found once each as `"<<Pn>>"` (fences for P1, P13-P15).
   P6 homes: :242, :766, :1621; P7: :257, :1625. Next: B5 (write the script).
+- B5 done: u4r_fill.py written (edit engine word by word, rewrap only past 120, refill's safe wrap from u4r_fold.py;
+  the words check; the classifier cross-check). Found while writing: history.md moved at 822c010 (16 lines appended:
+  MAIN-48, Mustafa's words recorded): the script now asserts rev 3.2's history (a6b3410, 88bc195f) is a prefix of the
+  current one, re-stamps history too and says so in the one sentence; no brief line cites history by line (P2 is a
+  text anchor). Carries entry 6's first line is 122 characters: the P13 copy rewraps that entry within 120 in its own
+  indent (item 3's "rewrapped to 120"; white space only, asserted). Docs the brief cites by line (ADR 0001, the
+  catalogue) asserted unchanged since a6b3410. Next: B6.
+- B6 done: dry run exit 0, last line "dry run: nothing written"; 63 changes; brief 1,682 -> 1,908 lines; read in full
+  (log, the main session's words, the diff). Script sha256 2c65d78b00164f71d6d815600e7b571343a4d0606aeae6a50a90a01b3e0d616c.
+  `<base>` at my last dry run: 209e35de5cc4a56880f75b681166bdc7042342df (an autosave commit; the main session's run
+  reads its own HEAD). No .pyc written (ast check only). Next: the result.
+- Question for the result: MAIN-48 (history, 18:14 UTC) merges main after L4's commit and before L6; `<base>` would
+  then predate main's merge and the builder's `git diff --stat <base>` (section 6 item 1) would list main's 42 files;
+  recommend merging main first and then running the script (its asserts hold after that merge: main's merge-base diff
+  touches no spikes/, .checkpoints/ or cited docs file).

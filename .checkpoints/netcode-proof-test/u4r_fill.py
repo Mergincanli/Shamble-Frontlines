@@ -672,9 +672,10 @@ assert OLD_R11 == ("**holds:** lab's and bots' manifests unchanged since df8975b
                    "(lab/Cargo.toml:23-34), npt-bots no npt-sim (bots/Cargo.toml:20-25). New fact for U4R-Q1: npt-bots "
                    "names npt-net (:24) (C26)"), OLD_R11
 NEW_R11 = (f"**changed:** since L3 ({L3C}, the main session's commit: U4R-Q1 (b)), npt-lab names npt-bots "
-           f"(lab/Cargo.toml:{lab_bots}, in its dependencies :{ld0}-{ld1}) and npt-bots names npt-sim, with no features "
-           f"(bots/Cargo.toml:{bots_sim}, in its dependencies :{bd0}-{bd1}), with the workspace table's `npt-bots` line "
-           f"that the `.workspace = true` form needs (Cargo.toml:{ws_bots}); Cargo.lock gains those two edges only. "
+           f"(lab/Cargo.toml:{lab_bots}, in its dependencies :{ld0}-{ld1}) and npt-bots names npt-sim, no features "
+           f"(bots/Cargo.toml:{bots_sim}, in its dependencies :{bd0}-{bd1}), and the workspace table gains the "
+           f"`npt-bots` line that the `.workspace = true` form needs (Cargo.toml:{ws_bots}); Cargo.lock gains those two "
+           "edges only. "
            f"npt-bots still names npt-net (:{bots_net}) (C26). 2.2 and D5 say so; re-walked at launch (section 12 item 9)")
 ITEMS.append(dict(tag="R11", old=OLD_R11, new=NEW_R11, src=f"git show {L3C}~1 and {B7} of crates/lab/Cargo.toml, "
                   "crates/bots/Cargo.toml and Cargo.toml (the facts above); the table's \"**changed:**\" form"))
