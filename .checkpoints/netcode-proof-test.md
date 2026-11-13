@@ -67,7 +67,27 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    packet_name_check.py 12 of 12); u4d2-packet.md cut from u4d2-packet.json (sha256 9b670276…, 373 KB; its side file
    u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
-   **(l) Running: the advisor's ruling on round 2,** workflow wf_41b3fc7e-f62 (task wldcr6vy3; one seat,
+   **(m) U4d2's merge, in progress** (advisor-u4d2-r2.md Block 5 and "Before the merge"; r1's Block 9 as amended; all
+   read in full by the main session, with T1, T3, T4 and T2's carries 82-85; T5 has two places to fill: the merged
+   tree's wasm seconds with M5's label, and carry 66's three v1 datagram hashes from the merged tree's h7 (ii) run).
+   **M1 met** (09:0x UTC): the copy's HEAD 51520b43391a…; 19 status lines (the 18 files and the record);
+   r2-hashes-start 18 of 18 OK and equal to fx-hashes-end (cmp). **M2 met:** at 99c7ed9, U4d2's lane paths and
+   crates/sim unchanged since 51520b4 (`git diff --quiet`); spikes/ commits since: c88eb31 (U4e) and 1b4a3c8 (A13)
+   only; spikes/ clean; A13's CI green (43330155579, 43330163225). **Running: the merge-text script's writer,**
+   workflow wf_c228865c-3b4 (task w6mudi3h7; notes u4d2-merge-text-notes.md): u4d2_merge_text.py --phase A (T4) | B
+   (T1, T2, T3, T5), dry run only. On return: commit it, run both dry runs and read the diffs (T4 and T1 in full: the
+   marks and the plan; T2, T3 against the code blocks); then stop the saver and M3 (worktree_patch.py to .gate/u4d2-merge/
+   with a prefix that copies no notes, cmp with cb27931's wip/u4d2.patch, 9e71cda0…; `git apply --check`, `git
+   apply`), M4 (r2-hashes-start from the main folder's root), M5 (phase A; then one main-run.sh call in the background,
+   limit 1,800,000 ms: the six pre-builds, `node check.mjs`, and h7 (ii): `cargo test --locked --release -p npt-lab --
+   --ignored --exact probe::tests::h7_carry_66_the_probes_v1_datagram_hashes_are_u2s_for_p2_b1_and_p4_seed_1
+   --nocapture`; expected 491 / 561 / 71 of 71, 11 steps; a stopped wasm call: `pgrep -a npt-lab`, `pgrep -af
+   loader.mjs`, record, end, to the advisor), M6, M7 (gate), u4d2-report.md with T5's anchor, phase B, the T5 fill,
+   M8 (one commit; `git rm` wip/u4d2.patch), push, M9.
+   **(l) The advisor's ruling on round 2: DONE** (wf_41b3fc7e-f62, about 09:05 UTC; advisor-u4d2-r2.md, 555 lines,
+   sha256 e776f0ba…): the merge APPROVE on M1-M9 as amended; INF2-1 → carry 84 (U4r); the security Lows → carry 85
+   (U4r); T2, T3, T5 amended; nothing to Mustafa (for his information: four open security Lows, all carried, and
+   INF2-1, carried). The run: workflow wf_41b3fc7e-f62 (task wldcr6vy3; one seat,
    general-purpose, opus, xhigh, on main's advisor.md; read only; script
    workflows/scripts/npt-u4d2-r2-advisor-wf_41b3fc7e-f62.js), launched about 08:46 UTC from advisor-u4d2-r2-brief.md:
    INF2-1's route, the Lows' routes, T3 and T5 amended in code blocks (SEC-U4D2-R2-4, EA2-4, INF2-3), the two process
