@@ -106,3 +106,6 @@ Started 2026-11-13 (session time). Effort xhigh. Instructions read from origin/m
   (0d69332c…): a read-only copy, unused for writes, outside the repo; said at the top of the notes (R6). Low, no push;
   the brief's section 4 already carries the lesson (the scratchpad included). `git status`: only this notes file.
 - B10 started: writing advisor-u4r-brief.md.
+- Resumed after the cut (14:12+): head ad248a2 (checkpoint commits only); brief sha256 bcaef383 and u4r-run.sh 349b51ad
+  unchanged; spikes/ still differs from cc8595d only by c49773f's delay_tests.rs. The ruling file did not exist: B10
+  continues by re-reading the brief's sections 0, 4, 5, 9, 10, 12 for the exact fix words.
