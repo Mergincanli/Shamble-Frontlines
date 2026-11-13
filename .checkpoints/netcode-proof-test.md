@@ -47,7 +47,7 @@ re-run the same call if no failure was caught. Then the cause → te-m3-plan.md 
     poll_shutdown 3 times. The cause (te-m3-plan.md section 2): the test's two counts cover different windows; a pump
     run under way when the shutdown began calls S once more but started before `before`. Not a DelayStream defect.
     The plan: one assertion (:2605, `s_calls <= polls + 1`) and its comment; proof P1-P6; TE-Q1 to TE-Q4.
-  - **Running (since about 12:20 UTC): the advisor's review of te-m3-plan.md**, workflow wf_5a565912-f9b (task
+  - **Running (since about 12:11 UTC): the advisor's review of te-m3-plan.md**, workflow wf_5a565912-f9b (task
     wx5wl32pq; script npt-te-m3-advisor-wf_5a565912-f9b.js; notes advisor-te-m3-notes.md, ruling advisor-te-m3.md). If
     cut: resume with `Workflow({scriptPath, resumeFromRunId: "wf_5a565912-f9b"})`. No source edit before its APPROVE.
 0. **U4e's merge is next** (the advisor's round-2 ruling, advisor-u4e-r2.md: APPROVE on Q1-Q4; NC2-M1 a carry,
