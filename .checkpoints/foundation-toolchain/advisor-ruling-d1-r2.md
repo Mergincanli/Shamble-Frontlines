@@ -61,3 +61,27 @@ Scratch only under /home/user/Shamble-Frontlines/.gate/advisor-d1-r2/. No tracke
   item); (b) holds. Q6 the four lines above. Q7 fixes: D4 (five Wasm crates), D6 ("the guard" is ambiguous here), D7
   (CI-edit parenthetical), D8/F2 (in-repo path dep wording; #[inline(never)] precision; security read), D9/F3 (SA2-2
   open), E (6-line wording). R2-D4 relabelled Low -> Medium in writing.
+- (advisor tool consulted once after orientation: D10's count of rules becomes three with (a); the report must carry
+  the round-2 runs the row cites; run the protocol-home claim or attribute it; STATUS exact six lines + wc -l = 120 and
+  OVERFLOW-PER-CRATE's tripwire decided; ROADMAP/STATUS #48 sync; no plan revision 11; 7d/7f and R2-L3 at my head
+  review; measure every wrapped block. All folded below.)
+- F7 own run, the test's home (scratch .gate/advisor-d1-r2/home = git archive 4bccf55 + sim `#[inline] pub fn
+  tick_next(u16) -> u16 { t + 1 }` in sim's normal build; protocol and room each get `sim` as a path dependency and
+  tests/home.rs: should_panic(expected = "attempt to add with overflow") on tick_next(u16::MAX) plus control 5 -> 6),
+  `cargo test --release --offline -p <crate> --test home`: route A (4bccf55's Cargo.toml): protocol 2 passed, room 2
+  passed. Part 4's two blocks (4d78ad6's Cargo.toml, byte for byte): protocol 2 passed; room 1 passed 1 failed "test
+  did not panic as expected at crates/room/tests/home.rs:3:4". Test profile under part 4's blocks: both 2 passed. So a
+  test in protocol cannot tell the settings apart; one in room can, in release only. R2-D4's Medium part reproduced.
+- F8 read ADR 0001 :493-503 (part 11: tick panic fatal to the room; unwind; bounded channels) and :766-771 (a
+  connection's panic closes only it; a tick panic ends the match, PM-0001-59; a Wasm trap restarts the Worker and
+  resyncs): D6's and D10's three outcomes hold.
+- F9 security-auditor's round-2 notes give a count verdict (0/0/2/1, "None calls for a round 3"), never the word
+  APPROVE: the report's round-2 paragraph must not say "all four APPROVE" unless its handback did.
+- F10 STATUS: the 2.2 bullet with "OVERFLOW-XCRATE-CI (or the first crate to depend on sim)", "OVERFLOW-PER-CRATE (with
+  the first third-party crate)", "OVERFLOW-PANIC-RULE (with room's first code)" wraps to 6 lines (max 120;
+  .gate/advisor-d1-r2/status-bullet.txt); with the night-shift line at 117 cols, STATUS stays 120 lines. Stale after
+  the pass: STATUS :5 (last updated), :29 (#48's row: "review round 2" as next), :42-43; ROADMAP :125-126 ("Next:
+  review round 2").
+- F11 blocks composed and measured at 120 (awk; no code span split across lines): row.txt (one table line, 3 cells),
+  D6-risks (6 lines, max 119), D8-per-crate (11, 120), D9-panic-rule (7, 120), D10-entry (22, 120),
+  plan-approval-bullet (8, 119), as-built-addition (4, 118); all in .gate/advisor-d1-r2/blocks/.
