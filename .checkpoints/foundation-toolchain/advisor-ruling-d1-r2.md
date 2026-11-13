@@ -42,7 +42,7 @@ Scratch only under /home/user/Shamble-Frontlines/.gate/advisor-d1-r2/. No tracke
   "*" table removed, opt "s" and "z": all three PANIC. Route A + [profile.release.package.extsum] overflow-checks = true,
   "s" and "z": all three PANIC. Route A, test profile (dev): all three PANIC. Control 1+2 = 3 in every run.
   So both closing options close it (tested), the shipped opt-level 3 is checked, and dev is unaffected.
-- F4 STATUS arithmetic: 120 lines at 4bccf55; draft E's two parentheticals, wrapped greedily at 120 (greedy is
+- F4 (superseded by F10: the final STATUS wording is F10's and block E's) STATUS arithmetic: 120 lines at 4bccf55; draft E's two parentheticals, wrapped greedily at 120 (greedy is
   line-optimal), make the 2.2 bullet 7 lines (+2), so with only the night-shift compaction STATUS would be 121. With
   "OVERFLOW-XCRATE-CI (sooner if a crate depends on sim before 2.3)" and "OVERFLOW-PANIC-RULE (with room's first code)"
   the bullet is 6 lines (+1), and the compaction of :65-66 (117 cols; not his words: no DECISIONS.md hit) keeps 120.
@@ -417,10 +417,11 @@ SA2-2 stays open as the follow-up OVERFLOW-PANIC-RULE.
 
 Round 2's local runs, which the register row OVERFLOW-ALL cites (cargo 1.99.1, scratch copies of 4bccf55):
 - Shared generics: with route A, the release profile at opt-level 0, 1, "s" or "z" let a workspace crate's own integer
-  `sum()`, and sim's `#[inline]` sum compiled in it, run a dependency's unchecked copy (200 + 100 as `u8` gave 44) when
-  that dependency, a crate outside the workspace, was in the same build; at opt-level 2 and 3, and in the test profile,
-  both panicked; dropping `"*"`, or a named override for the dependency, closed it (rust-reviewer; the R2-D1 skeptic;
-  the advisor agent's ruling D1-R2). The prebuilt std holds no such copy (the session).
+  `sum()` run a dependency's unchecked copy (200 + 100 as `u8` gave 44; 255 + 1 gave 0) when that dependency, a crate
+  outside the workspace, was in the same build, and sim's `#[inline]` sum compiled in that crate wrapped the same way;
+  at opt-level 2 and 3, and in the test profile, they panicked; dropping `"*"`, or a named override for the dependency,
+  closed it at "s" and "z" (rust-reviewer at 1, "s" and "z"; the R2-D1 skeptic and the advisor agent's ruling D1-R2 at
+  0, 1, "s" and "z", sim's sum included). The prebuilt std holds no such copy (the session).
 - `room`'s own arithmetic: with part 4's two blocks, release gave 4,294,967,246 for `100 - 150` as `u32` and 0 for
   `u16::MAX` plus one; with route A both panicked; the test profile panicked under both (security-auditor; the R2-D2 and
   R2-D3 skeptics).
@@ -436,7 +437,7 @@ Round 2's local runs, which the register row OVERFLOW-ALL cites (cargo 1.99.1, s
 | R2-D4 (TE2-2, TE2-3, EA2-4) | Medium (the reviewers' Low, relabelled by the advisor agent's ruling D1-R2) | OVERFLOW-XCRATE-CI: the test's home admits `protocol`, where it proves nothing; two missing constraints; no tripwire | fixed: the row, OVERFLOW-XCRATE-CI and STATUS's trigger |
 | R2-L1 (TE2-6, RR2-3) | Low | M7's row names no failing binary; "M7 proves the setting the tree ships" reads wider than M7 shows | fixed: As built and M7's row |
 | R2-L2 (TE2-7, EA2-1) | Medium | the entry's "misses most of the simulation's code" | fixed: the entry |
-| R2-L3 (TE2-4) | Low | E12's saved record is thin | fixed: E12's row; the advisor agent's head-review re-run keeps the summary lines and a wasm32 control |
+| R2-L3 (TE2-4) | Low | E12's saved record is thin | fixed: E12's row, resting on round 2's re-runs (test-engineer's unfiltered "6 passed; 0 failed" and wasm32 no-overflow controls; rust-reviewer's C3 and C10) |
 | R2-L4 (TE2-5) | Low | "revisions 1 to 9" | fixed |
 | R2-L5 (SA2-3) | Low | the D5 row and the capability-set sentence overstate round 1 | fixed |
 | R2-L6 (RR2-4) | Low | sim-wasm's "comes first"; D13's REPO_MAP half | fixed: sim-wasm's doc comment and REPO_MAP's crates row |
@@ -472,11 +473,13 @@ Round 2's local runs, which the register row OVERFLOW-ALL cites (cargo 1.99.1, s
   always, in the last commit before ready.
 - C7. Severities as above: R2-D4 Medium by my relabel; R2-L2 Medium.
 
-### Not run by me (my claims rest only on F3, F5 and F7 and the reads F1, F2, F6 and F8)
+### Not run by me (my claims rest only on my runs F3, F5 and F7, the arithmetic F4/F10 and F11, and the reads F1, F2, F6, F8 and F9)
 - TE2-1's split, which D8 and F2 word: a dependency's trait generics compiled in our crate are checked at opt-level 3,
   and the `#[inline(never)]` exception. These are the R2-D1 skeptic's K5 and K9 and test-engineer's probe.
 - RR2-1 on wasm32 (rust-reviewer's C15), Product and Sum<&u8> (C16), fat LTO (m3), and registry crates (path crates
   only).
+- RR2-2's membership behaviour, which D8 and F2 state (a member's path dependency inside the repository joins the
+  workspace and is checked; `[patch]` and excluded paths do not): rust-reviewer's C6 and C7 (source and runs).
 - The no_mangle refusal under the workspace lints (the R2-D4 skeptic; test-engineer).
 - cargo-fuzz's defaults and the lock-poison spread (the R2-D3 skeptic; security-auditor).
 - Room's own arithmetic in this round: I ran room's own add in D1's C4, not the 100 - 150 case.
