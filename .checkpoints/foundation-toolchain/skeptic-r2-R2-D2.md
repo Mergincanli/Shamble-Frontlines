@@ -55,3 +55,23 @@ silent-wrap example (100 - 150 as u32 = 4,294,967,246) in a scratch crate under 
   panic). Nuance: credits are a sim value (ADR 0004 part 17, economy as a sim phase); under the old blocks a credits
   helper in sim wrapped the same way when room called it directly (the RR-1 gap), so "credits" is a fair illustration
   either way, but the example should say whose code it ran in.
+- (a9) Room on the tick: ADR 0001's data flow :621-627 puts "commands -> sim step -> ... interest per client -> delta
+  encode + events" on the tick thread and decode/size checks on the I/O runtime; with ADR 0002 :189 (room = slot
+  table, command queues, snapshot/event encoding) and PM-0004-60, "where `room` runs" = the tick thread holds.
+- Advisor tool: overloaded, not consulted (one try).
+- (c) Replacement texts drafted and measured (awk length) in /home/user/Shamble-Frontlines/.gate/skeptic-r2-R2-D2/
+  drafts.txt and variants.txt. Risks: 5 lines, max 120. Why it matters (from "And an overflow" to the end, line 299
+  re-wrapped): 5 lines, max 119. No quotes of his words (Appendix A's quote check unaffected); no internal names in
+  the decision text; no pointer to notes. The finding's fix needs these refinements: (1) cite ADR 0001 part 11 / ADR
+  0004 part 20, both Proposed, not part 4 (part 4's panic rules exist so "one remote panic must not end a 48-player
+  match"); (2) "not an inference" goes too far: the rule is written, but no server code exists, so say "by the drafts"
+  and "no server code yet"; (3) say room is the tick-side code; (4) add local play (ADR 0004 part 20: recovery not
+  researched, OQ-0004-7); (5) say whose code the wrap ran in (room's own; credits are a sim value, ADR 0004 part 17);
+  (6) R2-D3's skeptic proposes an addition to the same "Why it matters": keep this sentence and append only that
+  addition's second sentence (its first repeats this one); if R2-D3's addition is not taken, append the fallback guard
+  sentence (variants.txt line 3).
+- Verdict: holds, Medium. Leftovers (not deleted): /home/user/Shamble-Frontlines/.gate/skeptic-r2-R2-D2/ (old/ and
+  routeA/ trees with target/ 7.3M and 1.7M, the probe in crates/room/src/bin and tests, sim helpers, room's sim path
+  dependency, scratch Cargo.lock updated; drafts.txt, l5.txt, variants.txt).
+- Not verified: a wasm32 build of room's own arithmetic (no trap run); the server crate (does not exist); which thread
+  a future server-side piece of code lands on; cargo-fuzz's build profile.
