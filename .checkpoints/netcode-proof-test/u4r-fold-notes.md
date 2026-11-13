@@ -18,3 +18,19 @@ No earlier notes or script: fresh start.
 - B7. Result.
 
 ## Log
+- B1 done: ruling :74-382, :415-420 read; brief read whole (1,625 lines); u4d2_fold.py and u4r_l2_text.py read. Next B2-B4.
+- Finding: "by U4R-Q<digit>" (lowercase) occurs six times: :20 (C27, history), :385 (Q9 covers), :439 (Q14 span covers),
+  :476 (2.2 "And, by U4R-Q14 (b)": no replacement), :680 (3.2 row 62 "(h)'s check by U4R-Q2 (b)": no replacement),
+  :859 (Q9 covers). Also "By U4R-Q14" twice at :440, :446 (inside Q14's 2.1 span) and the generic "by U4R-Qn" at :250
+  and :1605 (the instruction itself).
+- Finding: "P0 1" at :19 (C27), :442 (inside Q14's 2.1 span), :1459 (carry 74's old formula's value, Q14's question),
+  :1460 (the round-trip form at P0, Q14's question; kept as asked? question).
+- Finding: stale after the fold, not in the ruling's words: section 6 item 5 "D13's two runs" (:853); 7.1 "D13's short
+  P2 run at both leads" (:914); 7.4 "the determinism step's three ... green on the three" (:1105-1107); 2.1 (i) quotes
+  plan §4.15's old words (:384; L2 changes them); section 4 "(U4R-Q6's site aside, if ruled)" (:806); 7.3 "the ES and
+  TC recordings likely less" (:1085-1086). Left unchanged: one question.
+- Decisions (main session's words): stamps appended after `m9`'s with commas; P16 bullet after the P13-P15 bullet;
+  P4 line span from the old quoted string to "if U4R-Q6 rules (a))"; "**Open**" relabelled; table cells: the letter
+  from the ruling's bold label kept (else the row would not say what was ruled), cite at the Ruling cell's end; R table
+  rows matched by their first two cells.
+- B2-B4 done (by grep and reading). Next B5: write the script.
