@@ -59,3 +59,50 @@ Started 2026-11-13 (session time). Effort xhigh. Instructions read from origin/m
   :2544-2553, fn :2554-2614), not :2551-2603.
 - B3 started: rulings since rev 2 (ed973c9, 2026-11-11 02:23): wave1 later blocks, close, j-r2, e-ruling, df, e-r1,
   e-r2, d2-ruling, d2-r1, d2-r2, m9, te-m3.
+- B6 done (u4r-run.sh): my own `diff u4d2-run.sh u4r-run.sh`: 6 lines (2-3 header, 9 log folder, 16 usage, 41-42 the
+  log case); the tag check (:46-49), `exec 9>` and `flock "$mode" 9` (:52-53) and the provenance block byte-equal;
+  u4r-run.sh.diff equals it; u4r_runner.py asserts exactly that (KEEP list, one-line finds, <=120). sha256 349b51ad;
+  `bash -n` 0. Brief cites u4r-run.sh:12-15 and :18-22 hold. APPROVE, no finding.
+- B7 done (INF2-4 vs m9 Block 2 :155-206): main-run.sh.inf2-4.diff = Block 2 :157-171 exactly (S, T, LOCK=$T,
+  exports, log, shift, tag check with fi, mkdir, cd, exec, flock -x 9), the header sentence (:184-186) after "...exits
+  with that command's code.", MR9-L1's prov form (:179-182); u4d2-run.sh.inf2-4.diff = :188-198 (T, LOCK, export; tag
+  check between `[ -d ]` and mkdir; exec and flock "$mode" 9) + header sentence after "...first non-zero code."; its
+  provenance untouched (already anchored). No other line. Blob hashes d9ce0e1 / 0a5a587 = the diffs' post-images;
+  committed at 90f5f61. P1 re-run by me: `bash -n` 0 on all nine scripts. P3 logs: p3a -x 11:01:18 to end 11:01:26 exit
+  0, provenance block empty (MR9-L1 fixed); p3b (-s) held at 11:01:26 (mtime 0.45 s after p3a's), exit 0: the
+  criterion holds (p3b's start is not logged: the 6 s wait is the card's account, not the log's). P4: six copies one
+  line each (diffs read; inf2_4_proof.py asserts one line, by my Block 2's "small script"); I re-ran main-run's (a)
+  and (b) with logs under .gate/u4r-brief-check/: both exit 5, STOP line, no marker, no log, both missing folders
+  still absent ((b) made the empty .gate/u4r-brief-check/ by mkdir -p; (c) not re-run: it opens the live lock file).
+  APPROVE: INF2-4's follow-up is met; no finding.
+- B3 done (rulings since rev 2 applied as ruled): W1-N2/U4E-Q2 (-58 out: C2), U4E-Q3/Q4/Q5/Q6/Q13 (C6, carry 58,
+  owner-to-all), W1-TARGET item 3 as amended (P9), close F3 + carries 58-60, j-ruling carries (62) R2.4 FU-3 FU-6,
+  j-r2 B2.1/B2.3/B6/B3, e-ruling U4E-Q13 + F2-ROUTE (66 met by U4d2), df R3 (69) R4.1 (P4) R6 (slip line) T4 1-3, e-r1
+  R1 (73) A5 R3 (74-76) R4 NC-L1 (C7) NC-L4 R5 (77) M9, e-r2 merge note, d2-ruling A13 (bots clippy.toml), d2-r1
+  Blocks 4-5 (82, 83, TE-M3), INF-1 -> det-u4.mjs question, d2-r2 Blocks 1, 2, 5 (interim), 6 (P11), m9 Blocks 1-2:
+  all applied. Gaps: (i) d2-r1 RR-L4 (:210-212, a card follow-up tied to U4r's Evidence decision) not named in
+  section 5 item 4 -> Low; (ii) te-m3 TE-Q2/TE-Q3 (12:24, after the reviser's start; the brief was not to be touched
+  while its agent worked) not carried: section 4's TE-M3 line still says "its cause is the main session's planned
+  change", and P12 reads "until TE-M3's cause is found and fixed" -> Medium, exact words below. The commit check
+  (advisor-te-m3-check.md, APPROVE) asks the same (its item 2). P5 (.gate/te-m3/p5-check.log, HEAD 6533b63 with
+  the edit, sha256 74d49de7): 11 of 11, 491/561/71, marks 81, redact 0, wasm 49.9 s warm (builds 27.4 s of it).
+- B4 done (cites, spot-checked at the head): client :196, :336, :359, :379-410, :394, :401-406, :452, :548-560;
+  input.rs :59-66, :81-89, :107-116, :129-145; room.rs :488, :558, :579, :595, :607, :617, :637, :797, :805-829
+  (history push :819 after the step), :831-866 (repeats keep their view tick; rewind_at on fire only); rewind.rs
+  :1-33; pump.rs :183-190, :224-246, :295-303, :328-331; schedule.rs :240-251 ([&str; 3]), lib.rs:16, server/tests
+  schedule.rs:347 pin, loopback.rs:347 whole; clippy.tomls (server :6-17, lab :6-15), l1 :756-771, :1840-1848;
+  Cargo.toml:106; common/mod.rs :47, :262-284, :306; hash.rs :213, :292-302, :597; check.mjs :879, :914-924, :2020,
+  :2062, :2099, :2212, :2254-2263, :2289-2293; carries 6/14/20 spans; ADR 0001:1622's bite words ("a wall-clock
+  read on one transport's command path"). One wrong cite: 2.1 step (2)'s "pump.rs:265-275" for accept/reject is
+  :276-287 (:265-275 are is_closed/is_joined) -> Low.
+- B5 done (questions): Q1 (b); Q2 (c) with the check's commit timed before the merge's counted run and the judge on
+  the builder's bitten short P0 logs; Q4 (a) with the option-A halves to U4f by a carry; Q6 (a) with the field rule;
+  Q7 (a); Q8 (a); Q9 (b) (synthetic TC-s3 already in the step; every runner entry re-pins at U4f-U4h anyway, so the
+  real reason is the shooter's Rewinds) + a U4h carry line; Q10 (b'); Q11 (a); Q12 (a) (my own "6 runs" meant reading
+  (i)); Q13 (a) bounded; Q14 (a1) + (b1) + the P0 equal-instant rule + carry 74's amended words + D13's third run.
+- B8 done (TE-M3 line): must carry c49773f, the cause in one line, TE-Q3's quoted words (advisor-te-m3.md:136-139)
+  and TE-Q2's end (:119-121), replacing "its cause is the main session's planned change ..." and qualifying P12.
+- B9 done (slip): plan-df.md in the session scratchpad, 11:41:23, sha256 = `git show df8975b:...u4-build-plan.md`'s
+  (0d69332c…): a read-only copy, unused for writes, outside the repo; said at the top of the notes (R6). Low, no push;
+  the brief's section 4 already carries the lesson (the scratchpad included). `git status`: only this notes file.
+- B10 started: writing advisor-u4r-brief.md.
