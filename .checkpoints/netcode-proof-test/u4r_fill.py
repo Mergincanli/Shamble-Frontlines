@@ -1,10 +1,10 @@
 """U4r's launch step on the builder brief rev 3.2 (u4r-brief.md section 12 items 1, 2, 3 and 9; the advisor's check,
 advisor-u4r-brief.md, condition L4 (:428-429) and L2's last sentence (:423-424); the fold ruling, advisor-u4r-fold.md,
 FQ4 (:101-112), N7a's note (:89-90) and FQ6 (:151-159)). It changes the brief only:
-- item 1: P6, `<base>` = the spike branch's head when this runs (`git rev-parse HEAD`), with spikes/netcode-proof equal
-  to 4e91830's and HEAD's brief equal to rev 3.2, so the counts are D1's, read from L3's counted run
-  (.gate/l3-manifests/counted.log); filled where P6 stands outside item 3's list (section 1 item 1, section 4 rule 5,
-  section 12 item 1), in u4d2_restamp.py's form;
+- item 1: P6, `<base>` = the spike branch's head when this runs (`git rev-parse HEAD`), with main's 4d21c1a an ancestor
+  of it (MAIN-48: main is merged before the fill), spikes/netcode-proof equal to 4e91830's and HEAD's brief equal to rev
+  3.2, so the counts are D1's, read from L3's counted run (.gate/l3-manifests/counted.log); filled where P6 stands
+  outside item 3's list (section 1 item 1, section 4 rule 5, section 12 item 1), in u4d2_restamp.py's form;
 - item 2: P7, u4r-run.sh, its sha256 and `bash -n` asserted; filled where it stands (section 1 item 4, section 12
   item 2);
 - item 3: P1 to P5 and P8 to P16 by item 3's own rules, each rule read from item 3's own text (the anchors and the
@@ -14,14 +14,16 @@ FQ4 (:101-112), N7a's note (:89-90) and FQ6 (:151-159)). It changes the brief on
   saying so; (b) every cite of the brief into the plan or the carries whose line L2 (8bcbf36) moved, re-pointed: a cite
   wholly inside an unchanged block (difflib over the two versions) shifts by that block's offset, a cite touching a
   rewritten block is mapped by its text (MANUAL: the range's first and last line asserted in both versions; each key
-  used once); section 10 and the change lists at the top are left as written (records: FQ4; fold ruling :93-95), and
-  their moved cites are listed; (c) section 9's re-walk for L3 (4e91830): R11's verdict as the head shows it, its
-  cites read through `git show`, and section 9's tally line with it; every other cite of the four files outside
-  section 10 asserted at `<base>`.
+  used once); section 10 is left whole (FQ4) and its moved cites are listed, and the change lists' moved cites at the
+  top are re-pointed too (FQ4's "every other cite"; the main session's decision 1); (c) section 9's re-walk for L3
+  (4e91830): R11's verdict as the head shows it, its cites read through `git show`, and section 9's tally line with
+  it; every other cite of the four files outside section 10 asserted at `<base>`;
+- the launch's record: one sentence at the end of the title block's rev 3.2 paragraph (the main session's words).
 Checks: the sha256 of the brief and every source first; each anchor and each old phrase found once (white space read as
 one space); a nearest-file classifier over the brief that every moved plan or carries cite is in the inventory; the
 words check (rev 3.2's words with only these changes made equal the result's); no `<<P` and a digit outside item 3's
-list; no changed line over 120 characters (table rows exempt). A table row is edited in its line; any other unit is
+list; no changed line over 120 characters (table rows exempt); the top equal to rev 3.2's but for the launch's record
+and the change lists' two re-pointed cites; section 10 whole. A table row is edited in its line; any other unit is
 rewrapped within 120 from its first changed line to its end only where a line would pass 120.
 Run from the repo root:  python3 -I .checkpoints/netcode-proof-test/u4r_fill.py [--apply]
 Without --apply it writes nothing: it prints one line per change (brief line, what, source lines), the main session's
@@ -42,6 +44,7 @@ COUNTED = ".gate/l3-manifests/counted.log"
 BRANCH = "claude/netcode-proof-test-plan-hcky5g"
 SP = "spikes/netcode-proof"
 L2C, L3C, TEM3C, U4D2C = "8bcbf36", "4e91830", "c49773f", "cc8595d"
+MAIN48 = "4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300"     # main's head merged into the branch at MAIN-48 (7685b2b, PR #48)
 HASHES = {
     BRIEF: "362e771eb9e7166ef2751e3b57cf285c198e345e2cecf1e288b8e40a9ac4b241",   # rev 3.2 (a6b3410)
     PLAN: "1e631c55f4c4777edf0357b349fc5c8566d7410daffded926a06f82ff02f47d5",    # as L2 left it (8bcbf36)
@@ -138,6 +141,11 @@ if git("rev-parse", "--abbrev-ref", "HEAD").strip() != BRANCH:
 BASE = git("rev-parse", "HEAD").strip()
 assert re.fullmatch(r"[0-9a-f]{40}", BASE), BASE
 B7 = BASE[:7]
+# MAIN-48 (history's last entry): main is merged before the fill, so `<base>` holds main's 4d21c1a
+if git("rev-parse", "--verify", f"{MAIN48}^{{commit}}").strip() != MAIN48:
+    stop(f"main's {MAIN48} is not a commit here")
+if git_rc("merge-base", "--is-ancestor", MAIN48, BASE):
+    stop(f"main's 4d21c1a is not an ancestor of HEAD {B7} (MAIN-48: main is merged before the fill)")
 if git_rc("diff", "--quiet", L3C, BASE, "--", SP):
     stop(f"spikes/netcode-proof at HEAD {B7} differs from 4e91830's (section 12 item 1: a counted run gives the counts)")
 for anc, desc in ((U4D2C, TEM3C), (TEM3C, L3C), (L2C, BASE), (L3C, BASE)):
@@ -151,7 +159,8 @@ for p in ("docs/adr/0001-multiplayer-netcode.md", "docs/design/netcode-proof-mes
     if git_rc("diff", "--quiet", REV32, BASE, "--", p):
         stop(f"{p} changed since rev 3.2's commit: its cites need a re-check")
 LOG.append(f"<base> = HEAD {BASE} on {BRANCH}; `git diff --quiet 4e91830 {B7} -- {SP}` exit 0; HEAD's brief = the "
-           f"working file = rev 3.2 ({HASHES[BRIEF][:12]}); cc8595d < c49773f < 4e91830 < HEAD")
+           f"working file = rev 3.2 ({HASHES[BRIEF][:12]}); cc8595d < c49773f < 4e91830 < HEAD; main's {MAIN48} "
+           "(MAIN-48) < HEAD")
 # L2: the plan and the carries, before and after; plan.md and history unchanged
 if set(git("diff", "--name-only", f"{L2C}~1", L2C).split()) != {PLAN, CARRIES}:
     stop("8bcbf36 changed more than the plan and the carries")
@@ -410,6 +419,7 @@ def moved(k, a, b):
 # (rev 3.2's line of the cite, file, old range): (new range, words on its first line, words on its last line), each
 # asserted in the old version's line and in the new one's ("" as the last words: a blank line before the next "## ")
 MANUAL = {
+    (45, "plan", "500-501"): ("500-501", "The determinism step", "pre-check only."),        # C28's, in the change lists
     (224, "plan", "494-497"): ("494-497", "- **Sources:** U4d's three synthetic recordings",
                                "which hold the room's real Rewinds"),
     (273, "plan", "750-803"): ("750-803", "### U4r, the L1 runner and its judged runs", "- **Reviewers:** netcode-architect"),
@@ -429,10 +439,21 @@ MANUAL = {
     (229, "carries", "548-560"): ("554-577", "## U4h (lag compensation and aim)", ""),
     (1244, "carries", "548-560"): ("554-577", "## U4h (lag compensation and aim)", ""),
 }
+# a cite that shifts in an unchanged block and is also pinned by its text (the main session's decision 1: the change
+# lists' two moved plan cites): (rev 3.2's line, file, old range): (words on its first line, words on its last line),
+# each asserted in the old version's lines and in the new one's
+PIN = {
+    (160, "plan", "885-886"): ("- **Reviewers count toward the 3-agent limit**",
+                               "a review round starts only when enough of the three slots are free."),
+    (166, "plan", "917-918"): ("6. The main folder keeps its own cache", "with `CARGO_TARGET_DIR` unset."),
+}
 # every cite of the brief into the plan or the carries whose line moved or which touches a rewritten block, outside
-# section 10 and the change lists: (rev 3.2's line of its first cite, file, its words as the brief has them); every
-# `:n` in the words is that file's
+# section 10 (the change lists at the top included: FQ4's "every other cite", the main session's decision 1): (rev
+# 3.2's line of its first cite, file, its words as the brief has them); every `:n` in the words is that file's
 CITES = [
+    (45, "plan", "(plan §4.15 :500-501)"),                                                  # C28: holds, by its text
+    (160, "plan", "(plan :885-886), for the advisor to confirm."),                          # C22 (:1673 has its own)
+    (166, "plan", "plan §7.1 item 6 (:917-918)"),                                           # C24
     (224, "plan", "| plan :494-497 (`Recording::synthetic` in npt-sim's library) |"),       # section 0's table, 3rd
     (226, "plan", "| plan :873-880 (U4d2's lane widened) |"),                              # cell only (the 1st is
     (229, "carries", "| §U4h | carries :548-560 |"),                                       # rev 2's, a record)
@@ -488,7 +509,7 @@ CITES = [
 # a cite the classifier below gives to the plan that is not the plan's (its nearest file name is the row's plan cite)
 FALSEPOS = {(1263, ":752-758"): "l1/src/lib.rs's BITE_IDS, R6's row"}
 TOK = re.compile(r"(?<![\w.]):(\d+)(?:-(\d+))?")
-USED, INVPOS, ITEMS = set(), set(), []
+USED, USEDPIN, INVPOS, ITEMS = set(), set(), set(), []
 
 
 def once_in(text, phrase, tag):
@@ -528,6 +549,14 @@ def map_cite(line, k, tokm):
     s = shifts.pop()
     assert O[a - 1:b] == Nn[a - 1 + s:b + s], key
     new = f":{a + s}" if a == b else f":{a + s}-{b + s}"
+    if key in PIN:
+        assert key not in USEDPIN, key
+        USEDPIN.add(key)
+        fw, lw = PIN[key]
+        for D, x, y, v in ((O, a, b, "8bcbf36~1"), (Nn, a + s, b + s, "now")):
+            assert fw in at(D, x) and lw in at(D, y), (key, v, x, y)
+        return new, (f"shifted {s:+d} (an unchanged block), by its text (PIN: {k} :{a} {fw!r}, :{b} {lw!r}; now :{a + s} "
+                     f"and :{b + s})")
     return new, f"shifted {s:+d} (an unchanged block)"
 
 
@@ -553,9 +582,10 @@ for line, k, words in CITES:
         continue
     ITEMS.append(dict(tag=tag, old=words, new=newwords, src="; ".join(parts)))
 assert USED == set(MANUAL), ("MANUAL keys not used", set(MANUAL) - USED)
+assert USEDPIN == set(PIN), ("PIN keys not used", set(PIN) - USEDPIN)
 
-# the classifier: every cite token outside section 10 and the change lists whose nearest file name is the plan or the
-# carries, and whose lines moved or touch a rewritten block, must be in the inventory above
+# the classifier: every cite token outside section 10 (the change lists at the top included) whose nearest file name is
+# the plan or the carries, and whose lines moved or touch a rewritten block, must be in the inventory above
 MARKER = re.compile(r"(plan\.md|plan|carries|u4s-carries\.md|history|[\w/-]+(?:\.[\w-]+)*\.(?:rs|mjs|json|md|toml|sh|"
                     r"lock|js|py|log)|advisor-[\w-]+\.md|advisor|wave1|close|j-ruling|j-r2|df-ruling|e-ruling|e-r1|e-r2|"
                     r"d2-ruling|d2-r1|d2-r2|m9|te-m3-check|te-m3|u4r-check|catalogue|README|c-u2|ADR 0001)(?=[\s:(§,]|$)"
@@ -575,7 +605,7 @@ def file_of(pos):
 
 
 T0 = [i for i in range(H0, H1) if ORIG[i].startswith("| ")]
-LEFT_TOP, LEFT_S10, FP_USED = [], [], set()
+TOP_INV, LEFT_S10, FP_USED = [], [], set()
 for t in TOK.finditer(OTEXT):
     a, b = int(t.group(1)), int(t.group(2) or t.group(1))
     ln0 = OTEXT.count("\n", 0, t.start())
@@ -585,21 +615,24 @@ for t in TOK.finditer(OTEXT):
     if ln0 in T0 and OTEXT.count("|", OTEXT.rfind("\n", 0, t.start()) + 1, t.start()) < 2:
         continue                                        # section 0's table, first cell: rev 2's cite, a record
     what = f":{ln0 + 1} {k} {t.group(0)}"
-    if ln0 < H0:
-        LEFT_TOP.append(what)
-    elif H10 <= ln0 < H11:
+    if H10 <= ln0 < H11:
         LEFT_S10.append(what)
     elif (ln0 + 1, t.group(0)) in FALSEPOS:
         FP_USED.add((ln0 + 1, t.group(0)))
     elif t.start() not in INVPOS:
         stop(f"brief :{ln0 + 1}: {k} cite {t.group(0)} moved and is not in the inventory")
+    elif ln0 < H0:
+        TOP_INV.append(what)                            # the change lists' moved cites, in the inventory (decision 1)
 assert FP_USED == set(FALSEPOS), FP_USED
+# the change lists' moved plan cites are exactly C28's (held by its text), C22's and C24's (re-pointed)
+assert TOP_INV == [":45 plan :500-501", ":160 plan :885-886", ":166 plan :917-918"], TOP_INV
 LOG.append(f"cites: {len(CITES)} inventory entries ({sum(len(list(TOK.finditer(w))) for _, _, w in CITES)} cite "
-           f"tokens), each found once; {len(MANUAL)} MANUAL keys each used once; the classifier finds no other moved "
-           "plan or carries cite outside section 10 and the change lists (its one false positive: brief :1263's "
-           ":752-758, l1/src/lib.rs's BITE_IDS)")
-LOG.append("left as written (records), moved cites in the change lists at the top (C1's head fa8e335; the fold ruling "
-           ":93-95): " + ", ".join(LEFT_TOP))
+           f"tokens), each found once; {len(MANUAL)} MANUAL keys and {len(PIN)} PIN keys each used once; the "
+           "classifier finds no other moved plan or carries cite outside section 10 (its one false positive: brief "
+           ":1263's :752-758, l1/src/lib.rs's BITE_IDS)")
+LOG.append("the change lists at the top (FQ4 :103-105, \"every other cite\"; the main session's decision 1): their moved "
+           "plan cites are in the inventory above, :160's and :166's re-pointed and :45's held by its text: "
+           + ", ".join(TOP_INV))
 LOG.append(f"left as written, section 10 whole (FQ4 :102-104): {len(LEFT_S10)} moved cites: " + ", ".join(LEFT_S10))
 
 # ---------------------------------------------------------------- item 9 (c): L3's files, R11 and the tally
@@ -676,7 +709,12 @@ NEW_R11 = (f"**changed:** since L3 ({L3C}, the main session's commit: U4R-Q1 (b)
            f"(bots/Cargo.toml:{bots_sim}, in its dependencies :{bd0}-{bd1}), and the workspace table gains the "
            f"`npt-bots` line that the `.workspace = true` form needs (Cargo.toml:{ws_bots}); Cargo.lock gains those two "
            "edges only. "
-           f"npt-bots still names npt-net (:{bots_net}) (C26). 2.2 and D5 say so; re-walked at launch (section 12 item 9)")
+           f"npt-bots still names npt-net (bots/Cargo.toml:{bots_net}) (C26). 2.2 and D5 say so; re-walked at launch "
+           "(section 12 item 9)")
+# the main session's decision 2: R11's npt-net cite names its file (a bare ":25" after Cargo.toml and Cargo.lock reads
+# as Cargo.toml's)
+assert NEW_R11.count(f"npt-bots still names npt-net (bots/Cargo.toml:{bots_net}) (C26)") == 1 and "(:" not in NEW_R11
+assert at(BOTN, bots_net) == "npt-net.workspace = true"
 ITEMS.append(dict(tag="R11", old=OLD_R11, new=NEW_R11, src=f"git show {L3C}~1 and {B7} of crates/lab/Cargo.toml, "
                   "crates/bots/Cargo.toml and Cargo.toml (the facts above); the table's \"**changed:**\" form"))
 MAIN.append("R11's last cell (section 9; item 9's re-walk for L3): " + NEW_R11)

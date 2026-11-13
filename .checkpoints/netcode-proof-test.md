@@ -34,6 +34,17 @@ its revision.**
   run (fills, stamps, re-points, R11, the top's changes in full); stop the saver; apply; commit; push; restart the
   saver; then L6.
 - The saver runs as bcp64186u (since 18:47:34 UTC). The check-in is enabled (next 20:34).
+- **At 18:53 UTC Mustafa reported usage at 95 % ("save progress for yourself and agents we're at 95% usage, but the
+  rest is very soon so no worries."):** everything saved and pushed with the running agent's notes (u4r-fill-notes.md,
+  "Revision for the main session's decisions": block R1 done, R2 next; u4r_fill.py mid-edit, the fill-reviser's own).
+  **If a cut stops work, resume in this order:** (1) the revision workflow: `Workflow({scriptPath:
+  "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/u4r-fill-l4b-wf_62c0ab97-ae7.js",
+  resumeFromRunId: "wf_62c0ab97-ae7"})`; the reviser continues after its notes' last block marked done, reading the
+  script first (no brief edit exists: rev 3.2 362e771e… stays until the main session applies); (2) the counted run on
+  7685b2b (task ba8dsrlmu, .gate/main-48/counted.log; at 18:53 fmt, clippy, clippy-wasm32 and doc PASS, test running):
+  if it stopped, re-run the same call (nothing to restore: no plant, no source edit); (3) the saver if it stopped
+  (run_in_background, timeout 7200000). On the card's "Cuts by the spend limit" block: the notice's exact text, the
+  time of the cut and of the resume.
 **Earlier NOW (2026-11-13 about 17:55 UTC): U4r's launch, L4 running.** L3
 DONE (4e91830, its counted run PASS), L2 DONE (8bcbf36), **L1 DONE at a6b3410** (the brief is rev 3.2, sha256
 362e771e…, 1,682 lines; u4r_fold.py 9e3a123c…; the bullets below). **Running (since about 17:50 UTC): L4 and
