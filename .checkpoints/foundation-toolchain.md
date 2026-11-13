@@ -259,9 +259,14 @@ Now (step 7, in this order):
 a. Round 2: when a reviewer returns, start engine-architect (at most 3 at a time); dedupe the findings; skeptics on any
    Medium or higher; one fix pass (a Low triggers no push on its own; below High a STATUS follow-up). CI on 4bccf55
    (toolchain, gate, smoke) checked green; Cargo.lock unchanged; E9 re-run.
+a2. NOW: the advisor agent's ruling D1-R2 (a general agent reading main's advisor.md, Opus 5.5 at max, background,
+   launched ~14:50; notes `advisor-ruling-d1-r2.md`) on `"*"`, the row's rewording, the panic clause, the decision
+   entry and the comment. Then the fix pass as one commit from `fix-r2-drafts.md` as ruled (plus the ruling's home in
+   "Plan and approval" and "As built"; STATUS: the old night-shift line on one line, the 2.2 bullet on six; the grep
+   for superseded phrases); checks, gate, push, CI green. This is the budget's last fix pass.
 b. Moment 5: the Fable advisor reads the built skeleton as a whole (print the 35 skeleton files, committed first, then
-   call the advisor); fix what it finds within the review budget, or record it in the report. Log the consultation
-   (count 7). Before the verifier, so that its fixes are in the head the verifier checks.
+   call the advisor) after CI is green on the fix-pass head; findings below High become report lines or follow-ups.
+   Log the consultation (count 8). Before the verifier, so that its fixes are in the head the verifier checks.
 c. The verifier on the final head: a general agent reading main's .claude/agents/verifier.md, Opus 5.5 at max.
 d. The report final: the consultation log and count, round 2, the verifier; E9; the checkpoint folded in.
 e. Stop the saver; delete .checkpoints/foundation-toolchain* in a manual commit (no [skip ci]); push; mark PR #48 ready.
