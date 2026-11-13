@@ -1986,3 +1986,26 @@ From "Next steps, in order" (as it was):
 - review_packet.py after the addition: sha256 7d887492…. packet_name_check.py now has 12 cases: case 6 wants "pass"
   for this file, and a new case 7 wants "refused" for advisor-u4e-r2-brief.md, the main session's fifth brief to the
   advisor. Result: 12 of 12 as wanted (.gate/packet-name-check/).
+
+## Decision: Mustafa, 2026-11-13 about 11:31 UTC, after his /compact (CHECK-IN)
+- **Mustafa, 2026-11-13 about 11:31 UTC, after his /compact (verbatim):** "You were just compacted to cut usage. Read
+  the resume card in .checkpoints/netcode-proof-test.md first and continue from its next steps. Do not redo finished
+  work.
+  My words of 2026-11-13. Last night the work stood still from 01:22 to 08:25 UTC, although the limit reset at 03:50.
+  From now on, while agents are running, keep one check-in scheduled about every two hours. A check-in only looks
+  whether a cut stopped something, restores and resumes it by the card as SPEND-LIMIT (a) says, and ends. If you cannot
+  schedule that, tell me. Record these words in history.md under my decisions."
+  - Read as (the main session):
+    - CHECK-IN: while any agent or workflow of this session runs, one scheduled check-in into this session comes due
+      about every two hours; while none runs, it is paused, so there is never more than one. A check-in only looks
+      whether a cut stopped something (the spend limit's cut; a container restart stops runs the same way, so it is
+      looked for too), restores and resumes it by the card as SPEND-LIMIT (a) says (the notice's exact text, the time of
+      the cut and the time of the resume on the card's block "Cuts by the spend limit"), and ends: it starts no new
+      work. A check-in that comes due while the limit still holds is expected not to run; the next one comes due two
+      hours later, so the work should resume within about two hours of the reset (not yet seen on a real cut).
+  - Done: the scheduled task "npt check-in (every 2 h while agents run)" (trig_01EKqNqwZrQTVJ6caAyRrug5), bound to this
+    session, created 11:34:38 UTC, schedule `34 */2 * * *` (UTC: 12:34, 14:34, and so on; the server set the minute from
+    the time it was made). Its prompt holds three steps: look whether a cut stopped something; if nothing did, one line
+    and end; if something did, restore and resume it by the card, the cut recorded, the saver restarted if it stopped,
+    the card saved, then end. It is paused while no agent runs and enabled before each launch (the card's saver line
+    says so). The schedule could be made, so there is nothing to tell him about it.

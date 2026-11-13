@@ -4,7 +4,7 @@
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main, last merged in at bfda3cd (main 2aa5e9c, PRs #50 and #51, the legacy game into legacy/)
-- **Last update:** 2026-11-12 about 20:22 UTC (U4e merged at c88eb31; U4d2 built; U4d2's review round 1 running)
+- **Last update:** 2026-11-13 about 11:40 UTC (U4d2 merged at cc8595d and closed; CHECK-IN set; U4r's brief next)
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
@@ -12,6 +12,13 @@ lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAG
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
 **NOW (2026-11-12 about 17:45 UTC; read this first after a compact or a cut).**
+**Latest (2026-11-13 about 11:40 UTC, after Mustafa's compact):** U4d2 is merged and closed (item 2 (o) and its M9).
+His words of today are recorded (history.md's last entry, CHECK-IN) and the check-in exists (the saver block). **Now:
+U4r's brief** (Next steps 5): the night's rev 2 (`git show ed973c9:.checkpoints/npt-u4r-brief/u4r-brief-draft.md`,
+1,007 lines; its check netcode-architect-u4r-check.md and notes there) brought to the merged state (base counts 491 /
+561 / 71 of 71, 11 steps; carries 59's new sentence, 62, 63, 69, 82-85 and C-U7-2's context; the recheck table R1-R34
+and the day items D1-D12; the lane runner copied from u4d2-run.sh), then the advisor's check with INF2-4's two diffs
+and proof logs. TE2-5 (c), TE-M3's planned change, before U4r's merge.
 0. **U4e's merge is next** (the advisor's round-2 ruling, advisor-u4e-r2.md: APPROVE on Q1-Q4; NC2-M1 a carry,
    C-U6-16 (a); the merge goes ahead on R9's M1-M9 with Q3's amendments to M5, M8 and M9; T1, T2 (3), T3, T5 and the
    new T7 from advisor-u4e-r2.md, T2 (1), (2), (4), (5), T4 and T6 from advisor-u4e-r1.md; nothing to Mustafa). M1 and
@@ -307,6 +314,10 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
   with run_in_background and timeout
   7200000: without the timeout the harness stops it at 30 minutes, as it stopped bg29bb0pt at 16:42 UTC). The chat's size goes in every
   report.
+- **The check-in** (CHECK-IN, Mustafa 2026-11-13; history.md, "## Decision: Mustafa, 2026-11-13 about 11:31 UTC"): the
+  scheduled task trig_01EKqNqwZrQTVJ6caAyRrug5, "npt check-in (every 2 h while agents run)", into this session at :34
+  of every even hour UTC. **Enable it (update_trigger, enabled true) before launching any agent or workflow; pause it
+  (enabled false) when the last one returns.** Paused since 11:35 UTC (no agent running).
 
 **Cuts by the spend limit** (SPEND-LIMIT (a), Mustafa 2026-11-12: at every cut, the notice's exact text, the time of
 the cut and the time of the resume; UTC, read from the session's transcript):
@@ -552,6 +563,10 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
 
 **Rules in force** (his words verbatim in history.md "Decisions taken" unless marked; from 2026-11-12 on, each
 decision is appended at history.md's end under its own heading "## Decision: …", so no cited line moves)
+- **Mustafa, 2026-11-13** (history.md, "## Decision: Mustafa, 2026-11-13 about 11:31 UTC"; recorded by words_1113.py):
+  CHECK-IN: while agents run, one check-in scheduled about every two hours; a check-in only looks whether a cut stopped
+  something, restores and resumes it by the card as SPEND-LIMIT (a) says, and ends; if it cannot be scheduled, tell
+  him (it could be: the saver block names it).
 - **Mustafa, 2026-11-12** (history.md, "## Decision: Mustafa, 2026-11-12 about 15:32 UTC"): SPEND-LIMIT (a): the cap
   stays; restore and resume after each cut; at every cut, the card's "Cuts by the spend limit" gets the notice's exact
   text, the cut's time and the resume's time. review_packet.py: exact paths in ALLOWED pass though the pattern forbids
