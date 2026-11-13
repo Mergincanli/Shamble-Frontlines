@@ -1,0 +1,86 @@
+# Advisor report: foundation-2-3-docs, step 2.3's first docs pass (2026-11-13; PR #52; branch claude/sweet-mayer-grsukw for cs/foundation-2-3-docs; base main 4d21c1a)
+
+_The notes (the plan, the scripts, the agents' notes, the evidence files) are deleted before the pull request is marked
+ready; the last commit that holds them is {{NOTES-SHA}}._
+
+## Goal
+Mustafa's first item for step 2.3: "First: the docs pass. Its own small pull request, docs only, with no kit, gate or CI file in it." (A2) His words for PR #48 and his decision of 2026-11-13 go into `docs/DECISIONS.md` by script, with dated pointers at the older lines the decision overtakes; STATUS and ROADMAP become true for main 4d21c1a; the 2.2 report gets its five fixes. Nothing a player sees, hears or feels changes.
+
+## Outcome
+{{OUTCOME}}
+
+## Plan and approval
+- The plan: `.checkpoints/foundation-2-3-docs/plan.md`, revisions 1, 2 and 2a.
+- The advisor agent: APPROVE of revision 1 (ec16b30) with ten Low conditions, C1 to C10, folded in revision 2 ("If
+  revision 2 only folds in C1 to C10, it needs no new plan review"). Its answers: M1 as a dated correction (Q1 (a)); the
+  decision alone, then the whole message (Q2 (a)); the archive's two copies of the same claims fixed too (Q3); two
+  reviewers plus the verifier (Q4); one pointing clause each in two archive follow-ups (Q5); his go for #48 checked
+  against the chat record (Q6); #40's row read without switching (Q7).
+- Revision 2a, its ruling before any tracked edit: L2 worded as seven job logs read; the header note's ending; its
+  conditions: (a) the Appendix A hash check stays, (b) `fixes.mjs --check` re-runs on the final head.
+- The conditions as met: C1 #40's facts read at the build and on the final head; C2 the pointers' quotes joined and
+  tested, with a negative control; C3 and C4 the wording; C5 the site table; C6 six hunks; C7 the skeptics after the
+  reviewers, never more than 3 agents; C8 both saved pages identical; C9 the advisor tool before each step was called
+  done ({{CONSULTS}} consultations); C10 this header names the notes' last commit, and the checkpoint is folded in here.
+
+## What changed
+- `docs/DECISIONS.md`: three entries at the top: his decision of 2026-11-13 (alone, then his whole task message), his
+  message before it, and his go for #48. One sentence in his 2026-11-10 entry's header (two lines reflowed, its other
+  words unchanged), and the pointer P5 at SLICE-ORDER's condition 3. Nothing leaves "Queued" and nothing is added.
+- Dated pointers quoting his decision's first four sentences, "for foundation step 2.3 only": `docs/SPIKE_PLAN.md`
+  (P1 to P3), ADR 0002's migration step 1 (P4), `docs/ROADMAP.md` (P7), `docs/STATUS.md` (P8).
+- `docs/reports/2026-11-12-foundation-2-2.md`: M1, L1, L2 (worded as the logs read), L3 and a dated header note.
+- `docs/STATUS_ARCHIVE.md`: L5; Q3's two lines; Q5's two clauses; #48's row in "In flight"; the 2.2 block's state.
+- `docs/STATUS.md` ({{STATUS_LINES}} lines), `docs/ROADMAP.md`, `docs/REPO_MAP.md`: true for main 4d21c1a (docs-keeper).
+- This report. No code: the gate's symbol check is +0 −0.
+
+## Evidence
+| Id | What | Result |
+|---|---|---|
+| E1 | his words | `words.mjs`: A1 (42 characters) and A2 (6,190 characters, 36 lines) from this session's transcript; A3 (1,872 characters) from 4d21c1a's message, the round trip OK and identical byte for byte to foundation 2.2's chat record (message 96467900-…, its event stamped 16:16:36 UTC; the commit says 16:16:47) and to that session's merge call; the decision (562 characters) cut by its anchors; the transcript scan finds no other message of his. `report-appendix.mjs`: the blocks and the body's quotes OK |
+| E2 | DECISIONS.md | `decisions.mjs --check`: OK; six negative controls caught (each quote, the header sentence, the entry title); the only lines removed against 4d21c1a are the 2026-11-10 header's two reflowed lines; 2.2's `decisions-entries.mjs --check`: OK, 13 entries |
+| E3 | the pointers | `pointers.mjs --check`: P1 to P5, P7, P8 and his kit-freeze words in STATUS; each quote joined and found in his decision; a dropped word caught; SPIKE_PLAN +18 −0 lines, ADR 0002 +6 −0 |
+| E4 | the fixes | `fixes.mjs --check --hunks`: the 2.2 report's Appendix A sha256 equal to 4d21c1a's; 2.2's body-quote check: 13 blocks, 10 quotes; the whole-file checks; 6 hunks in the report, 5 in the archive (before docs-keeper); L2: seven job logs read; L3: the saved run's flag list; L1: the 2.2 checkpoint's F1 |
+| E5 | scope | {{SCOPE}} |
+| E6 | gate | `node tools/gate.mjs --no-smoke`: GATE PASS after each step (the smoke in CI: this container's Chromium is not the toolkit's); repo map OK |
+| E7 | CI | 1123175: gate push 43497813351 and pull_request 43497824049, toolchain 43497813242 and 43497823762, all green; {{CI}} |
+| E8 | facts | `quotes.mjs` on STATUS, ROADMAP, the archive and REPO_MAP: {{QUOTES}}; R-STATE and the verifier on every SHA, run id and time |
+
+## Reviews
+{{REVIEWS}}
+
+## The advisor tool: consultations (his words of 2026-11-11)
+In this conversation Opus 5.5 answers the advisor tool (the `/advisor fable` output: until `/clear` or `/compact`).
+{{CONSULT_LIST}}
+
+## Decisions and deviations
+- L2 is worded as the logs read: on 2026-11-12 the runners differed, and c901187's pull_request run had 2.56.1 at 15:34
+  UTC. That refines the line in PR #48's description, on the advisor agent's ruling.
+- The header note says "every other word" unchanged, not "every other line" (the touched paragraphs reflow), backed by
+  a whole-file check, on the same ruling.
+- Beyond the five: the archive's copies of the same two claims, and a pointing clause in each of two follow-ups (Q3,
+  Q5).
+- `tools/` was not installed in this container: `npm ci --prefix tools` (CLAUDE.md's setup step; gitignored).
+- Commands refused by the guard, the deny list or the classifier: {{REFUSALS}}.
+
+## Risks
+- The chat record's copies of his #48 go are API pages saved outside the repository; the sessions API re-reads them.
+- STATUS's Routines section dates from 2026-11-10: this account cannot read the university account's routines.
+
+## Findings for step 2.3's plan
+- The kit lines that still name steps 2.1 and 2.2 as the only exception (CLAUDE.md :22 and :55, `.claude/agents/advisor.md`
+  :108): his decision is the rule there; step 2.3 asks their edits.
+- BRIEF-STALE and the five "before the foundation" lines now lack the 2026-11-13 decision too (the archive's clauses).
+- This container had no `tools/` install; the local smoke still cannot start (the toolkit's Playwright wants another
+  Chromium build).
+
+## Proposed next step
+Step 2.3's plan, after #52 merges, in his order.
+
+## Decisions needed
+None.
+
+## For Mustafa
+1. Read this report and Appendix A (your words, copied by script).
+2. When the advisor agent has approved the final head and gate, smoke and toolchain are green on it, say "merge #52" in
+   this chat. No Brave check: nothing a player sees, hears or feels changes.
