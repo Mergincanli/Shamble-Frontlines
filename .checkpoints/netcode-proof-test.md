@@ -400,7 +400,7 @@ re-run the same call if no failure was caught. Then the cause → te-m3-plan.md 
    with `Workflow({scriptPath, resumeFromRunId})`. On return: read its section 6 list and every stop in full; snapshot
    the worktree (worktree_patch.py) and commit it; then the review per 7.2 item 7's panel (rust-reviewer,
    engine-architect, test-engineer, infra-engineer, security-auditor), with U4e's seats counted in the three.
-- The saver runs as bxvi6anv8 (since about 12:49 UTC on 2026-11-13, restarted after TE-M3's commit; restart it when it stops,
+- The saver runs as be5gxjhow (since about 14:40 UTC on 2026-11-13, restarted when bxvi6anv8's 110 minutes ended; restart it when it stops,
   with run_in_background and timeout
   7200000: without the timeout the harness stops it at 30 minutes, as it stopped bg29bb0pt at 16:42 UTC). The chat's size goes in every
   report.
