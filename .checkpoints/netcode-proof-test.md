@@ -68,7 +68,7 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
    **(k) Running: U4d2's review round 2,** workflow wf_969ab29d-637 (task w538kzcct; script
-   workflows/scripts/npt-u4d2-review-r2-wf_969ab29d-637.js), launched about 00:36 UTC on 2026-11-13, on what changed:
+   workflows/scripts/npt-u4d2-review-r2-wf_969ab29d-637.js), launched about 00:34 UTC on 2026-11-13, on what changed:
    batch 1 (Read) security, rust, infra in the builder's copy while nobody plants (the infra seat times `--only wasm`
    with `-x` twice); batch 2 (Prove) test (general-purpose with Edit; start hashes .gate/u4d2/r2-hashes-start.sha256;
    TP2 run 3, TP4, TP10, TP11 re-planted; one counted check.mjs in the background, at least 1,500,000 ms) beside arch
