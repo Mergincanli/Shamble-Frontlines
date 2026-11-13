@@ -67,6 +67,20 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    packet_name_check.py 12 of 12); u4d2-packet.md cut from u4d2-packet.json (sha256 9b670276…, 373 KB; its side file
    u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
+   **(o) U4d2 MERGED at cc8595d** (pushed about 09:29 UTC on 2026-11-13; CI on it pending), the fill script
+   committed after it (056c6ef), the saver restarted (bpxjaop78). M9's items for the card, now on it: carries 82 to 85
+   (U4r) and C-U7-2 (U7), in the merge commit; the open findings for PR #40's report: four security Lows, each carried
+   (SEC-U4D2-3 to U7's C-U7-2; SEC-U4D2-R2-1 to -3 to U4r's entry 85) and one Medium (INF2-1, U4r's entry 84); TE2-5
+   (c), TE-M3's cause, a planned change of the main session's (plan first, with the advisor) after this merge and
+   before U4r's merge; the follow-ups as u4d2-report.md lists them (round 1's: RR-L4 with EA-1, INF-2, INF-3's CPU
+   record, INF-7, §7.1 item 6's text; round 2's: RR2-L4 (b), INF2-4's runner half before U4r's brief, INF2-5); Block
+   6's lesson and the leftover on "Housekeeping later". **Left for M9:** CI's gate and smoke on cc8595d (then the
+   merged list's "CI green" covers it); `.gate/u4d2-rr-target` by `cargo clean --target-dir`; the cold run (one
+   main-run.sh call: `cat /proc/uptime`, `cargo clean --target-dir <shared> --release`, the same with `--target
+   wasm32-unknown-unknown`, `test -f <shared>/.lane.lock`, `test -f <shared>/CACHEDIR.TAG`, `test ! -e
+   <shared>/release/deps`, `test ! -e <shared>/wasm32-unknown-unknown/release/deps`, then `node check.mjs --only wasm`;
+   its seconds and split, with that uptime, on the card and in U4's report; over 300 s or a stopped call → the
+   advisor), with no lane running, before U4r's brief; INF2-4's runner follow-up before U4r's brief.
    **(n) U4d2's merge commit: M1 to M8 met** (u4d2-build.md, "Merge into the spike branch"; u4d2-report.md): M5's
    counted run all 11 steps PASS at 491 / 561 / 71 of 71 (473+17+1, 541+19+1, 52+11+8), marks 81, redact 0, the wasm
    step 33.1 s at 52 minutes of uptime, no call stopped, h7 (ii) 1 passed; M6 no failure; M7 GATE PASS with
@@ -310,8 +324,11 @@ advisor-u4e-brief.md, advisor-u4df.md.
   39f4290 (report u4d-report.md), U4j 4d2b0ef and d50396a (u4j-build.md), and **U4d-F** (the commit "U4d-F: the
   estimate scene fix (npt-sim), merged after review round 2", adb1bab; report u4df-report.md; record u4df-build.md),
   and **U4e** (c88eb31, "U4e: the room and the codec path (npt-room, npt-server's library, npt-client), merged after
-  review round 2"; report u4e-report.md; record u4e-build.md; counts at its merge 473 / 541 / 52 of 52, 10 steps);
-  CI green on each (U4d-F's: run 43137225827). Main merged in at 5ca77eb (PR #49). At U4d-F's merge: check.mjs 10
+  review round 2"; report u4e-report.md; record u4e-build.md; counts at its merge 473 / 541 / 52 of 52, 10 steps),
+  and **U4d2** (cc8595d, "U4d2: the Wasm-in-Node hash and the determinism step (npt-hash-wasm, npt-lab's `hash`,
+  check.mjs's wasm step), merged after review round 2"; report u4d2-report.md; record u4d2-build.md; counts at its
+  merge 491 / 561 / 71 of 71, 11 steps: **the base counts for U4r**); A13's 1b4a3c8 between them (server/clippy.toml's
+  type bans); CI green on each (U4d-F's: run 43137225827). Main merged in at 5ca77eb (PR #49). At U4d-F's merge: check.mjs 10
   steps, measured 399, bites 446, self 52: the base counts for the next lanes. U4e's `<base>` is L3's commit 28a85e7,
   with the same counts (its counted run, .gate/u4e-l3/l3-check.log; the accessor adds no test).
 - **U4e's build (L4): DONE** (05:41 UTC; first run wf_0fa6595a-3e2 cut by the usage limit at 02:03 after 49 s, no
@@ -484,7 +501,14 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
   `u4df-r1` (after U4d-F's merge), `u4e-prefix`, `u4e-r1`, `u4e-empty` (after U4e's merge); `.claude/worktrees/`
   agent-a9297644e7c0354f3 (U4a), wf_f54246ff-e0d-1 (U4d), wf_f54246ff-e0d-2 (U4c), agent-a3b8dfeb01ed52b50 (U4j,
   merged at 4d2b0ef), wf_9ce88fa3-452-1 (U4d-F, merged 2026-11-12), wf_0fa6595a-3e2-1 (U4e, merged at c88eb31; its
-  untracked notes are on the branch) and `.gate/u4e-merge/` (logs only; keep for the report).
+  untracked notes are on the branch) and `.gate/u4e-merge/` (logs only; keep for the report); after U4d2's merge
+  (cc8595d): `.claude/worktrees/u4d2-build` (its record is on the branch), `.gate/u4d2-r1`, `.gate/u4d2-r2` (round
+  2's read copy, the reviewed patch applied), `.gate/u4d2-prefix`, and `.gate/u4d2-merge/` (logs only; keep for the
+  report); `.gate/u4d2-rr-target` (38 MB, round 1's rust seat's scratch target) by `cargo clean --target-dir` (it holds
+  its CACHEDIR.TAG). Outside the repository, under LEFTOVER-DELETE (history.md:404): `/nonexistent-cargo-home` (12 KB,
+  a round-2 probe's; the advisor's round-2 ruling, Block 6: leave it). The lesson for later briefs (Block 6): never run
+  cargo with CARGO_HOME or CARGO_TARGET_DIR at a path that does not exist; test check.mjs's reading of such a value by
+  passing it to check.mjs's function only.
 
 **Open questions for Mustafa:** none open.
 - Answered today (verbatim in history.md): NIGHT-BUDGET (a); the drift fix before U4d2's pins (carry 52); the effect
