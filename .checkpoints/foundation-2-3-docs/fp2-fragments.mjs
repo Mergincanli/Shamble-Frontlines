@@ -1,4 +1,4 @@
-// Round 2's fix pass: which of round 2's notes files (and the session's own fix-pass-2 notes) hold a run of 40 or more
+// Round 2's fix pass: which of round 2's notes files (and the session's own fix-pass-2 notes) hold a run of 30 or more
 // characters of his words (A1 to A4), as pushed to the branch. Prints file names and counts only, never the text.
 //   node .checkpoints/foundation-2-3-docs/fp2-fragments.mjs
 import { readFileSync, readdirSync } from 'node:fs';
@@ -11,7 +11,7 @@ for (const f of files) {
   const hits = [];
   for (const [id, w] of texts) {
     let n = 0;
-    for (let i = 0; i + 40 <= w.length; i += 20) if (t.includes(w.slice(i, i + 40))) n++;
+    for (let i = 0; i + 30 <= w.length; i += 1) if (t.includes(w.slice(i, i + 30))) n++;
     if (n) hits.push(`${id}: ${n} windows`);
   }
   console.log(`${f}: ${hits.length ? hits.join(', ') : 'none'}`);
