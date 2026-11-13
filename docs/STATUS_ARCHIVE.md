@@ -647,7 +647,10 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       the first change that adds a dependency on sim, or step 2.3, whichever comes first; STATUS names the earlier
       trigger. If nothing depends on sim when 2.3 starts, 2.3's plan either adds the test with its own test-only
       dependency on sim, or asks the advisor agent to move the anchor to the first real one. 2.2's wasm32 build is
-      dev-profile only (WASM-ARTIFACT).
+      dev-profile only (WASM-ARTIFACT). The overflow tests' doc comments in `sim` and `protocol` say `cargo test
+      --release` "proves the release profile's setting", which M7 shows only for code compiled in their own crates (the
+      wording R2-L1 fixed in the report); recorded only, reworded with that test (the Fable advisor's whole read,
+      consultation 8).
     - **TSCONFIG** (S2): TypeScript is pinned but never type-checked: no `tsconfig`, and CI prints `tsc --version` only.
       ADR 0002 part 7 gives the shared strict base tsconfig and `tsc -b` to the lint step (G3). The stubs import
       `./index.ts`, a convention `tsc -b` would need `allowImportingTsExtensions` (with no emit) or
