@@ -5,7 +5,7 @@
   · plan: `.checkpoints/foundation-2-3-docs/plan.md`
 - **Branch:** claude/sweet-mayer-grsukw (for cs/foundation-2-3-docs) · **Base:** main
   4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300
-- **Last update:** 2026-11-13 23:08 Amsterdam
+- **Last update:** 2026-11-13 23:17 Amsterdam
 
 ## Steps done
 0. The model check: Opus 5.5 (get_session: session_context.model and last_served_model are claude-opus-5-5; effort
@@ -67,8 +67,16 @@
    Each Medium or higher finding held under its skeptic, at its severity. Fix pass: plan revision 2c asked of the
    advisor agent (the changes to approved texts, the C9 timeline, the refusals, round 2 or not).
 
+8. Round 1's fix pass (plan revision 2c, the advisor agent's ruling: every item approved; conditions: the advisor-tool
+   gap in the report's top lines and the end message; a consultation before every "done" save; round 2 on what
+   changed): 554faceded1948a39eb635c42c4aa12ac9edf496 (pushed 22:13 UTC; the notes as used: 56e7750). CI green: gate push
+   43517490537, pull_request 43517496130; toolchain push 43517490505, pull_request 43517496110. Checks: the word-level
+   diff d59ca43..554face (only 2c's phrases in STATUS, ROADMAP, the archive, DECISIONS and the 2.2 report); the 2.2
+   report's hunks vs 4d21c1a: 6; all scripts --check OK; STATUS 120; GATE PASS. Consultation 8 before this save.
+
 ## Current step
-Step 6's fix pass: waiting for the advisor agent's revision 2c ruling, then one fix pass. Notes done before step 2:
+Round 2 (wf_dcd47e10-70e) on what changed, d59ca43..554face. While it runs: no edit of docs/ or the check scripts in
+the working tree (the reviewers run them on the tree); drafts only in `report-body.md`. Notes done before step 2:
 - `words.mjs` written and run read-only: A1 42 chars; A2 6190 chars, 36 lines; A3 1872 chars, 17 lines, the round trip
   OK, and identical byte for byte to the 2.2 chat record (event 96467900-..., created_at 2026-11-13T16:16:36.563252Z;
   the merge commit says 16:16:47 UTC: the report cites the commit's time and names the event's); A2-DECISION 562 chars,
@@ -86,19 +94,18 @@ Step 6's fix pass: waiting for the advisor agent's revision 2c ruling, then one 
   archive, every added non-table line at most 120 characters; a second write run refuses ("already written").
 
 ## Next steps
-1. The advisor tool (C9: moment 5 for step 5, moment 1 for step 6); CI on d59ca43 read.
-2. Stop the saver (TaskStop bofczdenq) and start a fresh one; then launch `review-r1.js` with args {head: d59ca43...};
-   count what comes back; one fix pass; the advisor agent's review of what changed only if needed.
-3. Step 7: the verifier (a general agent reading main's verifier.md, Opus 5.5 max) until PASS.
-4. Step 8: the advisor tool; fold the checkpoint into the report; stop the saver; last checkpoint commit; the deleting
-   commit writes {{NOTES-SHA}}; `fixes.mjs --check` before it; the advisor agent's review of that SHA (give it the
-   notes' last SHA to run the scripts from); PR body; ready; stop.
-2. (done earlier) The advisor tool (C9: moment 5 for step 2, moment 1 for step 3).
-2. Step 3: `fixes.mjs` applies M1 (dated correction under "For Mustafa" step 3), L1, L2 (x3 in the report: :228 inside
-   L1's sentence, :301, :345), L3 and the header note to the 2.2 report; L5 (:574) and Q3's two lines (:732, :834) in
-   the archive; checks: Appendix A hash equal to 4d21c1a's, 2.2's body-quote check on the report's own blocks, the six
-   places only (C6); one commit, pushed.
-3. Then steps 4 to 8.
+1. When round 2 returns: count reviewers and skeptics (re-run a null one alone); `git status --short docs/` clean; one
+   fix pass if needed (round 2 is the last reviewer round unless a Critical or High stays open), its "done" save after a
+   consultation.
+2. The report after round 2: 554face's run ids in E7; consultations 8 onward; the "review round 1 done" save (22:04:22)
+   in the timeline (consultation 6 came just before it); round 2's findings with dispositions; round 2's notes checked
+   for fragments of his words; say that the session's own plan and scripts carry his sentences as draft texts and anchors.
+3. Stop the saver (it ends ~23:52 UTC) and start a fresh one before the verifier; the verifier (a general agent reading
+   main's verifier.md, Opus 5.5 max) with all findings' dispositions in its brief, until PASS.
+4. Step 8: a consultation; the checkpoint folded into the report; the saver stopped; the last checkpoint commit; the
+   final commit (the notes SHA, #52's state word in STATUS and ROADMAP, #40's second read, "Last updated", the
+   verifier's result) deletes `.checkpoints/foundation-2-3-docs*`; the full battery and the gate on that tree first;
+   the advisor agent's review of that SHA (the lines listed in its brief); the PR body; ready; stop for his go.
 
 ## Advisor tool consultations (his words of 2026-11-11; in this conversation Opus 5.5 answers the tool)
 1. 2026-11-13 ~20:00 Amsterdam, moment 1, before committing to the docs-pass approach: is the approach right? Changed:
@@ -156,6 +163,12 @@ Step 6's fix pass: waiting for the advisor agent's revision 2c ruling, then one 
    commit and no script changed after; round 2 as `review-r2.js` with `r2-` notes, briefed on what changed only (both
    SHAs, the 23 dispositions, the 2c rulings, what is pending by design, R-WORDS byte-checks E-TASK's header and the kit
    quote, R-STATE re-derives the consultation timeline and the refusals).
+
+8. 2026-11-13 ~22:16 UTC (23:16 Amsterdam), moment 5 for round 1's fix pass (before its "done" save): done once two
+   checks pass. Changed: the word-level diff re-read on the commit (d59ca43..554face) for STATUS and ROADMAP, and the 2.2
+   report's 6 hunks counted; this checkpoint brought up to date in the same save; no docs or script edits while round 2
+   runs; the saver's output checked; for after round 2: the 22:04:22 save in the report's timeline, 554face's run ids,
+   consultations 8 onward, round 2's notes checked for fragments; round 2 the last reviewer round.
 
 ## Refusals (guard, deny list, classifier) and the route taken
 - The session: none (the transcript scan, 2026-11-13 ~22:05 UTC). Agents, all by the guard: the advisor agent
