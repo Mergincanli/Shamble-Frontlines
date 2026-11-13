@@ -12,9 +12,52 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-13 about 20:51 UTC; read this first after a compact or a cut): U4r's first builder copy ended at its
-context limit, about half built; snapshot wip/u4r.patch (3160196); copy 2 runs in the same worktree; the rulings
-workflow runs (fact check, then the advisor) on nine points (u4r-build1-questions.md).**
+**NOW (2026-11-13 about 21:30 UTC; read this first after a compact or a cut): U4r's rulings are in (ten points,
+nothing for Mustafa) and sent to copy 2, which builds on (at B10 by its logs); the carries amended at 18583c4.**
+- **The rulings** (wf_21a67b58-19b returned about 21:25 UTC; 2 agents, 188 tool uses, 35 min):
+  **advisor-u4r-build1-full.md** (169 lines, sha256 476121ab…; written by script, word for word, from the journal; the
+  advisor's notes advisor-u4r-build1.md, the fact check's u4r-build1-facts.md). I read every point in full. None goes
+  to Mustafa. (1, Medium) the determinism route (c): the two runner entries in a new crates/lab/det-recordings.json;
+  ops/runs/det-u4.mjs runs `wasmStep`'s clean half on it (two new options: the manifest, the bites half; one
+  check.test.mjs case); recordings.json keeps the synthetic three; hash.rs `legs` unchanged; check.mjs's step keeps a
+  set only while its cold printed figure is at most 200 s, det-u4.mjs's non-cargo calls at most 240 s of carry 84's
+  shared 300 s (above: to the advisor, RR-L4 first); judged on this container (CI runs no check.mjs). The builder's
+  "~170 s" was not measured: about 195 s per legs call, so the step would be about 621 s + W warm. (2, Medium) F1:
+  (a), the radius copy pinned by a behaviour test, r4's checked and unchecked spatial records counted apart, a full
+  breach counter, the report's words given (never "spatial passed"). (3, Medium) F3: no change of form; -57's series
+  only on runs whose header lists PM-0001-57; the main session's disk plan. (4, Medium) F4: the bite becomes "a tick
+  decoded whole filed as lost", id PM-0001-17/whole-as-lost, a bitten run's logs kept in .gate/u4r/whole-as-lost/.
+  (5, Low) F5: the copy kept, pinned by behaviour if reachable; hash.rs `check` compares each header with its entry.
+  (6, Low) F2: the dump accepted, its reader pinned by a test. (7, Low) the brawl's view accepted, worded. (8) D13 (2):
+  a fact. (9, Medium) `--lead` and `--every-step` refused with `--record` too; a no-log summary prints "not counted
+  (--logs 0)"; the recordings' wall times labelled. (10, Low) four follow-ups. Further findings: r4's spatial count
+  overstates (Medium, in point 2); the judge's memory on a set (Medium, in point 3); line nuances (Low).
+- **Done:** copy 2 sent its parts (about 21:27 UTC, by message: the full file's Builder lines; the lanes opened:
+  crates/lab/det-recordings.json, `wasmStep`'s two options with a check.test.mjs case, ops/runs/det-u4.mjs).
+  **u4s-carries.md amended in place at 18583c4** (carry 62 (h)'s bite, carries 82 and 87, new carry 89 for U4h; 14
+  lines added, none removed; every quote checked by script; 675 lines, c74e5255…); the brief's carries cites read at
+  its stamp e8675a02…. Disk 5.4 GB free at 21:29.
+- **The main session's later tasks (the ruling's):** (a) at the next plan edit, u4-build-plan.md :800-802: det-u4.mjs
+  runs at every merge that touches npt-sim, npt-proto, npt-room, npt-hash-wasm or a crate on the scenario's path
+  (npt-server, npt-client, npt-l1, npt-link, npt-bots, npt-lab), and in U4r's merge step (main-run.sh -x, after
+  check.mjs); a SHA-256 failure there re-pins that unit, never a retry. (b) The review panel: infra-engineer reads
+  det-u4.mjs and `wasmStep`'s two options (carry 84's seat), engine-architect counts the check.mjs changes (2.7); the
+  main session checks r4's words and counts, the dump reader's test, D13 as a fact, the no-log labels. (c) Before the
+  first judged set: the disk plan in writing (point 3's five steps: approved part-cleans only, no log deleted, moved or
+  compressed; df before each run; the judge's peak memory and wall time on one P0 run first; to Mustafa only if the set
+  cannot fit). (d) After r2's evidence (sum 0 on every short L1 P0 run): the check and the bite
+  "PM-0001-17/whole-as-lost" into -17's L1 P0 part in marks.json, in its own commit before U4r's counted merge run;
+  then `npt-judge --only PM-0001-17` on .gate/u4r/whole-as-lost/ shows the setup check FAIL by name; not 0: the cause
+  to the advisor first.
+- **Follow-ups (homes as ruled; no push for any):** r4's full spatial half through one read-only npt-room item, for the
+  next unit whose lane opens crates/room (point 2); SERIES.md:91 and :94's writer column, at the main session's next
+  marks/ edit (point 6); the brawl's client-side view, for U6's brief (point 7); point 10: (1) the fold's rewrap, fixed
+  only if the brief is re-stamped; (2) the advisor's premise on npt-net's tree, in U4r's report item 15; (3) R6's l1
+  cites (:746-751; :753-766) and (4) section 0's df8975b bullet (:217-218; npt-net at bots/Cargo.toml:25, not the :24
+  of C26 :173 and :1565), sent to copy 2 as data. The fixed copy .gate/u4r-snap1 stays (LEFTOVER-DELETE).
+
+**Earlier NOW (2026-11-13 about 20:51 UTC): U4r's first builder copy ended at its context limit, about half built;
+snapshot wip/u4r.patch (3160196); copy 2 runs in the same worktree; the rulings workflow runs.**
 - **Launched about 20:50 UTC:** copy 2 (agent a6e4993cc3a5e4475, background; prompt u4r-copy2-prompt.md) and the
   rulings workflow **wf_21a67b58-19b** (task wss4jbdqk; script u4r-build1-rulings-wf_21a67b58-19b.js in the session's
   workflows/scripts folder): u4r-facts (notes u4r-build1-facts.md), then advisor-u4r-build1 (its ruling file
