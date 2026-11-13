@@ -94,3 +94,85 @@ Scratch copies only under /home/user/Shamble-Frontlines/.gate/advisor-d1/.
   both functions panicked. So a named override beats "*" (tested, not inferred).
   S3 [profile.release] overflow-checks = true without "*": extdep and room both -C overflow-checks=on (after cargo clean
   of the two packages); both panicked.
+- C6 settings spike item 8 may pick, on the reviewer's repro (room calls sim's plain, inline, generic, Tick::next and
+  #[inline(never)] functions, release): route A passes 5 of 5 at opt-level "z", at "s", and with fat LTO plus
+  codegen-units 1 (env overrides CARGO_PROFILE_RELEASE_*). The head's blocks fail the same 4 of 5 at opt-level "z" and
+  at opt-level 1, so no opt-level choice closes the hole. (Not run before by the reviewer or the skeptic.)
+- C7 Wasm by behaviour (.gate/advisor-d1/wasm: scratch sim-wasm cdylib exporting step_inline -> sim::tick_next
+  (#[inline] t + 1) and step_generic -> sim::add_generic (a + 1); run in Node 22.23.4 with u32::MAX): dev build (the
+  debug client), head's blocks: both trapped (RuntimeError: unreachable). Release, head's blocks: both returned 0
+  (wrapped), 354 bytes. Release, route A: both trapped, 20,379 bytes (raw sizes of a toy export: the jump is the panic
+  machinery, not a budget). So under the head's blocks a debug client and a release client disagree on the overflow;
+  under route A they agree. Matches skeptic C5/C6.
+- C8 inheritance under route A (repro copy + `[profile.ci-release] inherits = "release"`): `cargo test --profile bench
+  -p room` 5 of 5 cross-crate panics; `--profile ci-release` 5 of 5; sim's and protocol's own tests pass under bench.
+- C9 the head moved while I worked: worktree HEAD aee92cc; since 4d78ad6 the non-checkpoint changes are 1de98a9
+  ("fix(review round 1)"): doc comments in crates/{sim,room,client-endpoint,sim-wasm}/src/lib.rs (EA-2, EA-3) and the
+  report (required-check facts, E1/E2 wording, findings for 2.3). Cargo.toml and every crate's code are unchanged; the
+  report's overflow wording (E1's step-2 control, M5, OVERFLOW-WASM, OVERFLOW-PER-CRATE) is unchanged, waiting for this
+  ruling. So C1-C8 (run on 4d78ad6's Rust files) describe the current head's behaviour too.
+- Not run by me: the legacy gate (no head with the fix exists); CI on route A (none yet); protocol in the cross-crate
+  experiment (same mechanism as sim); Windows; any cost measurement (no code); non-profile routes (a lint forcing
+  explicit checked/strict ops in sim); I did not re-read the rustc sources RR-1 and the skeptic cite: my claims rest on
+  the behaviour runs above.
+
+## Ruling (written before the final consultation)
+APPROVE route A, on conditions 1-7. Scope: the route and the one change to the approved plan's pin (Part 2's Overflow
+row); this ruling is the plan approval for that change. It approves no head (none carries the fix yet) and does not
+cover the as-built changes of plan revisions 4-9 (my final-head review does). RR-1 stays High; it is fixed, not
+deferred, so no relabel.
+1. Setting: Cargo.toml:21-26 (two per-package blocks) -> exactly `[profile.release] overflow-checks = true` and
+   `[profile.release.package."*"] overflow-checks = false`; no other profile key (spike item 8 / part 4 defaults), no
+   `[profile.dev]` line; a short comment: every workspace crate, every profile (part 4); why not the per-package form
+   (sim's inline/generic/small functions compile inside the callers); "*" = non-members only, dependencies keep the
+   release default; the register row's code.
+2. Plan revision 10: Part 2's Overflow row (value, source "part 4 widened by the advisor agent's ruling D1,
+   2026-11-13, on RR-1", proof M7 + the local cross-crate run); As built; Part 7 gains M7 and the local run. Nothing
+   else changes (no crate code or dependency, no CI edit, no ADR text edit); anything beyond comes back first (a CI edit
+   asks Mustafa, A10). No new plan review if folded as written; my next head review checks the fold.
+3. Register row in the loose-ends register's table "The critic's remaining items and the answered escalations", beside
+   Q-A1 and in its form (not in "Decisions the drafts ask for"): the loose end (RR-1), "the advisor agent's ruling (D1,
+   2026-11-13), never his decision", "his go for this row: PR #48's merge" (never worded as given), what Cargo.toml sets
+   and its reach (every workspace crate; dependencies at the release default, decided at the first third-party crate in
+   sim's dependency tree: a named override, which beats "*", or dropping "*", cost measured), PM-0002-53's test from a
+   crate that depends on sim (release, native and wasm32), engine-architect rewords part 4 and PM-0002-53 at the next
+   revision. No edit to ADR 0002's text.
+4. Its own Decisions-needed entry in the report (OVERFLOW-ALL, drafted in the handback), with the "no" branch: Cargo.toml
+   back to part 4's two blocks, comments narrowed, the row out, the gap an open High deferred on his word.
+5. Split of D1: RR-1 fixed by 1. New finding OVERFLOW-XCRATE-CI (Medium, my label): no CI step can show the cross-crate
+   reach at 2.2 (K1b/M7 cannot tell A from the old blocks); anchored to the first change adding a dependency on sim or
+   2.3, whichever first; lands with PM-0002-53's test run from a crate depending on sim; a CI edit, asks Mustafa then.
+   Replaces or rewrites OVERFLOW-WASM.
+6. Stale lines in the same push: REPO_MAP.md:16, ROADMAP.md:116, STATUS_ARCHIVE OVERFLOW-WASM and OVERFLOW-PER-CRATE,
+   the report's Outcome :19, E1, M5, OVERFLOW-WASM, OVERFLOW-PER-CRATE rows; STATUS name list if a name changes.
+   OVERFLOW-PER-CRATE rewritten for third-party crates (the skeptic's "moot" corrected), not dropped.
+7. Evidence before head approval: (a) M7 in CI (remove only the release line, red at K1b inside the cut, exact revert,
+   green); (b) the local cross-crate run on the fixed head (script on the fixed head: room 5/5; -v flags after clean;
+   bench + inheriting profile; wasm32 in Node); (c) M5 and step 2's control relabelled historical; (d) CI green
+   (toolchain push+PR, gate, smoke), Cargo.lock unchanged, local gate PASS, E9; (e) round 2 on what changed:
+   rust-reviewer, test-engineer, security-auditor (panic-vs-wrap for room/server own arithmetic), engine-architect
+   (register row and entry); (f) the verifier on the final head.
+Per question: 1 route A; 2 keep "*"; 3 ADR untouched, loose-end row beside Q-A1 with its own entry; 4 yes, this ruling
+approves that one change on conditions; 5 condition 7; 6 no ESCALATE (inherent widening C4, release = debug C4,
+reversible, no room/server code), the row goes to him as OVERFLOW-ALL with his #48 go.
+
+## After the final consultation (corrections folded into the handback)
+- C10 ruled on branch head aee92cc1fdd4bcb524e37ec840657f2a1a26ae5d: Cargo.toml, Cargo.lock, rust-toolchain.toml, the six
+  crate manifests and toolchain.yml equal 4d78ad6's (0 diff lines); non-checkpoint changes since 4d78ad6 are only the
+  four crates' doc comments and the report (1de98a9).
+- Correction to C5: "its MIR carries no checks" is the skeptic's source reading (C9 there), not mine; I tested only
+  concrete arithmetic in a non-member crate. Dependency GENERIC code instantiated in a workspace crate is untested.
+  Wording for the row and comment: "dependencies keep the release default setting".
+- Condition 6 made a check (line numbers moved with 1de98a9): every overflow mention in the PR's files is true on the
+  fixed head. Known stale now: Cargo.toml's comment; REPO_MAP's Cargo.toml row; ROADMAP's 2.2 entry; STATUS_ARCHIVE's
+  provenance list (OVERFLOW-WASM's PM-0002-53, OVERFLOW-PER-CRATE), OVERFLOW-WASM, WASM-ARTIFACT's "joins OVERFLOW-WASM",
+  OVERFLOW-PER-CRATE; STATUS's name lists if names change; the report's Outcome (pins bullet), As built (K1b and M5),
+  E1 (step-2 control), M5, the note under the evidence table, OVERFLOW-WASM, OVERFLOW-PER-CRATE; the plan's In one
+  screen, Part 2 row, Part 7 E1. True as they stand: the crates' "passes only while overflow checks are on" comments,
+  REPO_MAP's crates and toolchain.yml rows. Untouched: Mustafa's words (DECISIONS.md, the report's A10) and ADR 0002's
+  own lines (part 4; Appendix A's R1-RR-OQ4 answer; R5-RUSTLINT-OQ4; PM-0002-53), which the row hands to the owner.
+- Plan deleted before ready, so the report's "Plan and approval" and "What the build did differently" carry this ruling
+  and the pin change.
+- OVERFLOW-ALL sequence: answered before "merge #48"; (b) = a new head, my review, his go again; the route is my ruling,
+  his "no" overrules it.
+- At my head review I re-run the cross-crate script myself on the pushed head.
