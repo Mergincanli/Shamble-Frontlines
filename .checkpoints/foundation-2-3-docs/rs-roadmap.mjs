@@ -11,9 +11,8 @@ console.log("after anchor in head:", JSON.stringify(hl.slice(i + anchor.length, 
 const bi = bl.indexOf(anchor);
 console.log("after anchor in base:", JSON.stringify(bl.slice(bi + anchor.length, bi + anchor.length + 40)));
 const ins1 = " (PR #40); the foundation: 2.1a, 2.1b and 2.2 merged (PRs #50, #51, #48), step 2.3 planned after its first docs pass (PR #52) merges";
-const endMark = "still wait for their results.\"";
 const p7s = hl.indexOf("; pointer, 2026-11-13:");
-const p7 = hl.slice(p7s, hl.indexOf(endMark, p7s) + endMark.length);
+const p7 = hl.slice(p7s, hl.indexOf("\")", p7s) + 1);
 const r = hl.replace(ins1, "").replace(p7, "");
 console.log("head line minus the two insertions == base line:", r === bl);
 if (r !== bl) {

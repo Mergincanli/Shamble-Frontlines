@@ -51,3 +51,17 @@ B9. Write findings; DONE.
 - F4 Low .checkpoints/foundation-2-3-docs/decisions.mjs at d59ca43: fails --check ("E-TASK: the header differs"); fixed in 636f260; E2 reproducible only from 636f260 on (covered once {{NOTES-SHA}} is filled).
 - F5 Low plan.md §4 table (notes): docs/adr/README.md:155 (OQ-0006-13, "before the foundation's client-host token") is a grep hit not listed; not overtaken (preview step 2.6 still waits); no doc change needed.
 - F6 Low docs/STATUS_ARCHIVE.md:860-865: BRIEF-STALE's "[verified 2026-11-12]" now follows a clause about the 2026-11-13 decision.
+## After the advisor tool (consultation 1, before DONE)
+- Notes hygiene: six lines above held fragments of his words; rewritten as pointers (Edit). The saver's autosave ec8f1bd (21:12:28 UTC) holds the earlier copy of this file with five such lines; history keeps them (3695fda's copy held none).
+- Joined-text search (rw-joined.mjs, patterns passed on the command line; head d59ca43; outside docs/reports/ and .checkpoints/): 96 joined hits, 7 span a line break: DECISIONS :936-937, SPIKE_PLAN :94-95, :138-139 (2.1a pointers = P5, P1, P2 anchors, pointed); STATUS :89-90 (2.1a follow-up id); archive :453-454 (kit item waits for the gate step, consistent); NEW: docs/adr/0003-rendering.md:51-52 and docs/adr/0006-infrastructure-operations.md:56-57 ("runs before the foundation", drafts' lines in S4's class, missing from the plan §4 table and from the archive follow-up's list). Second run (eight more phrases): 4 line-spanning hits, all 2.1a pointers (P3, P4 anchors) or unrelated history (SPIKE_PLAN :597-598, archive :292-293).
+- Independent byte check (rw-bytes.py, Python, reads transcript + 4d21c1a message + git show d59ca43; prints booleans): E-TASK decision quote, E-TASK whole message, E-HI, E-48 all True; appendix A1, A2, A3 True; body quote True; P1-P5 (SPIKE_PLAN :96, :140, :457; ADR 0002 :1444; DECISIONS :938), P7, P8 each == first four sentences and (P1-P5, P7) carry "for foundation step 2.3 only"; one P7, one P8; 2026-11-10 header sentence quote inside that entry's own quote True; STATUS kit quote inside his kit paragraph, 57 chars left out at its end (confirms F1). 2.2 report Appendix A sha256 prefix 9a127e1795751516, 18282 chars, base == head. Working tree docs/ == d59ca43 (git diff --quiet).
+- STATUS :21-22 REQUIRED-CHECK timing: judged consistent with ADR 0002 step 2.3's done-when (his setting named at step 2.3, head :1463-1470) and A2's run-ids paragraph; not raised; facts left to R-STATE.
+## Final findings
+- F1 Medium docs/STATUS.md:15-19 (as drafted; not High because every kit edit still needs his typed yes with the exact text, the guard asks him first, and the full paragraph stands at DECISIONS head :152 and report head :164).
+- F2 Low docs/DECISIONS.md:113-118 (E-TASK header: unqualified "his words" after "his words of 2026-11-10"; present-tense "lists").
+- F3 Low docs/reports/2026-11-13-foundation-2-3-docs.md:15, :26-29, :58.
+- F4 Low .checkpoints/foundation-2-3-docs/decisions.mjs at d59ca43 (fix as a condition: {{NOTES-SHA}} 636f260 or later).
+- F5 Low plan §4 table and the archive's drafts follow-up (head :547-551): adr/README.md:155, ADR 0003 :51-52, ADR 0006 :56-57 not listed; all left by design (S4/S8 classes), no pointer needed.
+- F6 Low docs/STATUS_ARCHIVE.md:860-865 (BRIEF-STALE's date mark).
+- Verdict: REVISE (one Medium, no High).
+DONE
