@@ -38,13 +38,22 @@ L2 and L1.** (Mustafa's compact came at about 16:28 UTC; the saver be5gxjhow end
   lines), plan 01ede63d… → 1e631c55… (1,092 → 1,093). Left of L2: section 12 item 9 (section 0's stamps re-set; the
   brief's cites into the plan and carries that L2 moved re-pointed by script), after L1's fold. The moves: carries
   +3 after :343 (carry 74), +6 after :520 (entry 86), +17 after :559 (87, 88); plan +1 after :839 (§5 U4h).
-- **Running: L1's fold script, workflow wf_bb7715a1-d7a** (task w6i37zcav, from about 16:42 UTC; script
-  u4r-fold-l1-wf_bb7715a1-d7a.js under the session's workflows/scripts/): fold-writer (general-purpose, opus, xhigh)
-  writes u4r_fold.py, dry run only (notes u4r-fold-notes.md); then fold-checker, adversarial (notes
-  u4r-fold-check.md). If cut: `Workflow({scriptPath, resumeFromRunId: "wf_bb7715a1-d7a"})`; each agent continues
-  after its notes' last block. On return: read the dry run's diff in full (pass bars: carry 74's 1 %, D13's stop), the
-  questions for the advisor and the checker's findings; then apply, then L4 (items 1-3 with P16; P6 from L3's counted
-  run) and item 9 (re-stamp; the plan and carries cites L2 moved).
+- **L1's fold script: DONE, not applied** (workflow wf_bb7715a1-d7a, about 16:42-17:13 UTC): u4r_fold.py (sha256
+  a9196126…; dry run exit 0, 51 changes, 1,625 → 1,662 lines; notes u4r-fold-notes.md). The independent check
+  (u4r-fold-check.md, read in full by the main session): **FAIL**, one High (two "by U4R-Qn" sites, :476 and :680,
+  with no ruling words: not folded, not logged), three Medium (the Q14 row's cell is the arithmetic's premise, not the
+  ruled lead; the main session's "Its words applied in place" inside the Ruling cells; the "**Open**" label changed
+  without the advisor), two Low (two character changes unlogged; the writer's .pyc, committed by autosave bb412c8,
+  removed by `git rm` at 23a34f5). The writer's slips (a shell redirect into the scratchpad; the py_compile write) are
+  at the top of its notes. CI green on 8bcbf36 (L2).
+- **Running (since about 17:22 UTC): the advisor's ruling on the fold's questions**, workflow wf_520e62c5-a7d (task
+  wp3mqrimw; script u4r-fold-advisor-wf_520e62c5-a7d.js): u4r-fold-questions.md (the main session's FQ1-FQ7: the two
+  sites, section 10's two labels, six stale texts, the rows' cites and item 9's scope, the main session's words incl.
+  the check's row fixes, L3's third manifest line and the npt-net fact, the slips); notes advisor-u4r-fold-notes.md,
+  ruling advisor-u4r-fold.md. If cut: `Workflow({scriptPath, resumeFromRunId: "wf_520e62c5-a7d"})`. On return: read
+  the ruling in full; edit u4r_fold.py once (the check's row fixes, the ruled words read from the ruling by line
+  range, the "by U4R-Q" after-check), dry run, read it in full (pass bars: carry 74's 1 %, D13's stop), apply, commit;
+  then L4 (items 1-3 with P16; P6 and the counts from L3's counted run) and item 9 (re-stamp; L2's moved cites).
 - **The check-in is enabled** (16:39 UTC; next 18:34). **The saver runs as b9f761m21** (since 16:44:43 UTC; b24prddnh
   stopped for L2's commit).
 **NOW (2026-11-12 about 17:45 UTC; read this first after a compact or a cut).**
