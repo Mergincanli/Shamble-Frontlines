@@ -548,16 +548,27 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     diagram's label) and :202.
   - **Docs passes:** stale `tools/` citations in dated research docs, left as dated records: `docs/LEGACY_INVENTORY.md`
     TL1, TL6 and TL9; `docs/research/r5-toolchain-quality.md` :925 and :1737.
-- **From foundation 2.2** (PR #48, in flight: the session's list of 2026-11-12, which the report
-  `docs/reports/2026-11-12-foundation-2-2.md` is to take into its "Findings for 2.3" at step 7; his words: the report's
-  Appendix A and `docs/DECISIONS.md`. The codes: S1 to S5 are the checks of the Fable advisor's early read of the built
-  skeleton (through the advisor tool, 2026-11-12); K1 is the write of the new CI job; M2 and M5 are planted failures in
-  the report's evidence; PM-0002-* are ADR 0002's pass marks, OQ-0002-* its open questions, G0 and G3 checks of its
-  gate v2. Checked against the repository by docs-keeper on 2026-11-12 [verified]: GIT-C (`.claude/CHECKPOINTS.md:221`),
-  ADVISOR-TOOL-WORDS and MODELS-2026-11-12 (their "Queued" items), G0 (PM-0002-39 and the register row), OVERFLOW-WASM's PM-0002-53,
-  TSCONFIG's stubs and CI line, REQUIRED-CHECK, SAVER-SKIP-CI, OVERFLOW-PER-CRATE, PACKAGE-ENTRIES and BRIEF-STALE;
-  carried from the session's list and the report [assumed]: AUTO-ASK's times, MANUAL-MODE's documentation page and mode
-  name, REFUSED-PUSH, PIN-GUARD's marks, SETUP-NODE-CACHE's job log, M2's and M5's runs, NODE-26's dates, EMPTY-SLOTS):
+- **From foundation 2.2** (PR #48, in flight: the report `docs/reports/2026-11-12-foundation-2-2.md`, its "Findings for
+  2.3" table and "Follow-ups for later steps" list as review round 1's fix pass left them (1de98a9 to 8a4f9b0), and the
+  advisor agent's ruling D1 of 2026-11-13; his words: the report's Appendix A and `docs/DECISIONS.md`. The codes: S1 to
+  S5 are the checks of the Fable advisor's early read of the built skeleton (through the advisor tool, 2026-11-12); K1
+  is the write of the new CI job, K1b its release-test line; M2 and M7 are planted failures and E12 a local check in the
+  report's evidence; D1 to D17 are review round 1's findings as the session deduped them (head 4d78ad6, 2026-11-12 and
+  13; the report's "Reviews"), by rust-reviewer (RR-*), infra-engineer (IE-*), security-auditor (SA-*), engine-architect
+  (EA-*) and test-engineer (TE-*), each then tested by a skeptic of its own; route A is the root overflow setting the
+  ruling D1 approved; PM-0002-* are ADR 0002's pass marks, OQ-0002-* its open questions, G0, G2, G3, G5, G9 and G12
+  checks of its gate v2. Checked against the repository by docs-keeper [verified]: on 2026-11-12, GIT-C
+  (`.claude/CHECKPOINTS.md:221`), ADVISOR-TOOL-WORDS and MODELS-2026-11-12 (their "Queued" items), G0 (PM-0002-39 and
+  the register row), TSCONFIG's stubs and CI line, SAVER-SKIP-CI, PACKAGE-ENTRIES and BRIEF-STALE; on 2026-11-13, every
+  repository line that the new and reworded items cite, in `toolchain.yml`, `gate.yml`, `Cargo.toml`, the root
+  `package.json`, ADR 0002, CLAUDE.md, `.claude/agents/advisor.md` and the guard; and, read by the sync's fact check,
+  2.2's plan, Part 3 (EMPTY-SLOTS) and the report's E12 run (its two result files). SETUP-NODE-CACHE is [verified] from
+  setup-node's own source at the pinned SHA: security-auditor read it (SA-3), and its skeptic ran the shipped detection
+  code (D6). The round-1 items rest on the reviewers' and skeptics' notes (`review-r1-findings.json`,
+  `review-r1-verdicts.json` and `skeptic-r1-D*.md` in `.checkpoints/foundation-toolchain/`, readable at the branch's
+  last checkpoint commit): their CI runs, API reads, source reads and scratch runs are theirs, not re-run by
+  docs-keeper. Carried from the session's list and the report [assumed]: AUTO-ASK's times, MANUAL-MODE's documentation
+  page and mode name, REFUSED-PUSH, PIN-GUARD's marks, SETUP-NODE-CACHE's runs, M2's and M7's runs, NODE-26's dates):
   - **For the gate step (2.3), when the kit unfreezes:**
     - **AUTO-ASK** (his KIT-ASK-SEEN (b): `docs/DECISIONS.md`, 2026-11-11, 00:07:48 UTC; the report's Appendix A5):
       auto mode can pass the guard's ask. K1 (2026-11-10 20:02:42 UTC): the guard's ask was answered "allow" six
@@ -583,23 +594,71 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       does not protect the new pins (`rust-toolchain.toml`, `Cargo.toml`, `Cargo.lock`, `package.json`,
       `package-lock.json`): `protectedRel` is false for them, so routines may write them on a branch and day sessions
       get no ask.
-    - **G0** (the register row Q2.2-a in `docs/adr/README.md`: the advisor agent's ruling, final; his go for the row:
-      PR #48's merge): G0's exit-2 mark moves to step 2.3, where 2.3's G0 is to prove "deleting the toolchain file fails
-      G0 with exit 2" under `--prove` (PM-0002-39); until then the toolchain job fails closed without the file (M2: red
-      at the pin check with exit 2, no cargo step run).
-    - **OVERFLOW-WASM** (what S1 left open): PM-0002-53 wants the overflow rule in four builds (dev and release, native
-      and Wasm) with a committed counter test; 2.2's CI proves the native release build for `protocol` (M5: the release
-      overflow setting removed, red at `cargo test --release`), and `sim`'s rests on step 2's local control.
+    - **G0** (the register row Q2.2-a in `docs/adr/README.md`: the advisor agent's ruling, final; his go for the row,
+      asked in the report's "Decisions needed" (ADR-INDEX), is to come with PR #48's merge and is still waiting;
+      reworded on D8, infra-engineer's IE-4, and on D17's pin-check half, test-engineer's TE-3): G0's exit-2 mark moves
+      to step 2.3, where 2.3's G0 is to prove "deleting the toolchain file fails G0 with exit 2" under `--prove`
+      (PM-0002-39); until then the toolchain job fails closed without the file (M2: red at the pin check with exit 2, no
+      cargo step run). 2.3's pin check must keep this job's source checks, by what they do, since 2.3 replaces
+      `toolchain.yml`: `RUSTUP_TOOLCHAIN` unset, the active toolchain named by `rust-toolchain.toml` (`rustup show
+      active-toolchain`), and `RUSTUP_AUTO_INSTALL=0`, so that only the explicit install brings a toolchain
+      (`toolchain.yml:21-22` and :48-50 [verified 2026-11-13]). Why: the runner image's own stable Rust equals the pin
+      today (1.99.1, by the image's software list, which infra-engineer and its skeptic read; no log prints the image
+      stable's version), so comparing versions alone cannot show where the toolchain came from. Mutations beyond
+      PM-0002-39's file deletion: `RUSTUP_TOOLCHAIN` set to the pin's own channel (it passes a version-only check and
+      fails the source check on any image); the install step removed under `RUSTUP_AUTO_INSTALL=0` (G0 must then fail
+      with exit 2 instead of installing; never run: 2.2's job would exit 1); and the check's other branches, never yet
+      seen red: M2 stopped at the file
+      read (:46), and in 2.2's job those branches exit 1 (:47-52 [verified 2026-11-13]), where G0 exits 2 on any setup
+      failure (ADR 0002's G0 row). rustup does not self-update in CI (it turns self-update off when `CI` is set, since
+      rustup 1.28.0, and GitHub sets `CI=true`), so the image's rustup is the one that runs; and `RUSTUP_AUTO_INSTALL=0`
+      has never been seen working in a run, since no planted failure removed the install step (infra-engineer and its
+      skeptic).
+    - **OVERFLOW-XCRATE-CI** (Medium, the advisor agent's label; a STATUS follow-up; it replaces OVERFLOW-WASM. D1,
+      rust-reviewer's RR-1, High, is fixed by route A, and the advisor agent's ruling D1, condition 5, split this proof
+      out of it): the root `Cargo.toml` now sets `[profile.release] overflow-checks = true` and
+      `[profile.release.package."*"] overflow-checks = false` (4bd9dd5; `Cargo.toml:25-29` [verified 2026-11-13]; the
+      register row OVERFLOW-ALL, his go asked and still waiting), so every workspace crate checks overflow in every
+      profile. No CI step can yet show that the setting reaches sim's code compiled in another crate: K1b's release test
+      and M7 (red at that test with `[profile.release]` removed) run inside sim's and protocol's own packages, so they
+      cannot tell route A from the per-package blocks it replaced. That reach is shown locally only (the report's E12:
+      with the old blocks, 1 of 5 of room's cross-crate overflow tests panicked under release, bench and an inheriting
+      custom profile, and the wasm32 release build returned 0 in Node; with route A, 5 of 5, and the wasm32 release
+      build traps, as dev does). The fix: PM-0002-53's committed counter test (a planted counter that overflows panics
+      in the four builds, dev and release, native and Wasm) runs from a crate that depends on sim, in release, native
+      and wasm32, since a test inside sim's own package cannot see the gap; ADR 0002 places that test in `sim` (:1319
+      [verified 2026-11-13]), and its owner rewords that at the next revision (the register row). A CI edit, so it asks
+      him then. Anchor: the first change that adds a dependency on sim, or step 2.3, whichever comes first. 2.2's wasm32
+      build is dev-profile only (WASM-ARTIFACT).
     - **TSCONFIG** (S2): TypeScript is pinned but never type-checked: no `tsconfig`, and CI prints `tsc --version` only.
       ADR 0002 part 7 gives the shared strict base tsconfig and `tsc -b` to the lint step (G3). The stubs import
       `./index.ts`, a convention `tsc -b` would need `allowImportingTsExtensions` (with no emit) or
       `rewriteRelativeImportExtensions` for: 2.3 decides it.
-    - **REQUIRED-CHECK**: whether `toolchain` is a required check on main (step 7's infra-engineer answers); step 2.3
-      replaces `toolchain.yml` with the gate v2's workflow (the file's header says so), and ADR 0002 gives that workflow
-      one aggregate required check (:642, PM-0002-57).
-    - **SETUP-NODE-CACHE** (S4): setup-node v7.0.0 runs with `package-manager-cache: true` (the job log); what it caches
-      if a `packageManager` field is added to the unprotected root `package.json` is unverified (step 7's
-      security-auditor).
+    - **REQUIRED-CHECK** (D2: infra-engineer's IE-1, Medium, and security-auditor's SA-4; the report's Risks):
+      `toolchain` is not a required check on main. Ruleset 25069670 requires `gate` and `smoke` only (infra-engineer
+      read it without a token, 2026-11-12), main's guard checks only those two before a merge
+      (`.claude/hooks/routine-guard.mjs:1486`), and CLAUDE.md's merge rule for a day session (:130) names only them, so
+      until 2.3 a red `toolchain` stops such a merge only if the advisor or Mustafa looks at it, and it is no rollback
+      trigger (CLAUDE.md:119). The PR Advisor routine waits for every check, but it cannot merge this kind of pull
+      request (the report's E9); for #48 itself, the session reads the two `toolchain` runs (push and pull_request)
+      before it merges (the report's "For Mustafa", item 3). Step 2.3 replaces `toolchain.yml` with the gate v2's
+      workflow (the file's header says so), and ADR 0002 gives that workflow one aggregate required check (:642,
+      PM-0002-57), which, by ADR 0002's foundation checklist (item 2), he names in main's branch protection after 2.3.
+      With it, every kit line that names `gate` and `smoke` as the required checks changes, found by grep then, each
+      edit asked of him: today CLAUDE.md:119 and :130, `.claude/agents/advisor.md` :157, :163, :224, :273, :294 and
+      :323, and the guard's merge check (`routine-guard.mjs:1486`) with its comments and tests [verified 2026-11-13].
+    - **SETUP-NODE-CACHE** (S4; reworded on D6, security-auditor's SA-3): setup-node v7.0.0 (pinned by SHA 8207627 in
+      `toolchain.yml` and `gate.yml` [verified 2026-11-13]) turns automatic caching on when the root `package.json`
+      names npm in its top-level `packageManager` field or in `devEngines.packageManager`. The root `package.json` has
+      neither [verified 2026-11-13], so nothing is cached today (runs 43226692719 and 43282089533). Once either field
+      names npm, setup-node would cache the whole `~/.npm` folder under one key built from the root lockfile and save it
+      in its post step, after the cut, so code inside the cut could write into that folder before it is saved; `npm ci`
+      re-checks every tarball's sha512, so the reach is a failed or slow install, not swapped code, and a pull request's
+      run cannot write main's cache scope (security-auditor; its skeptic's poison tests on npm 10.9.9 and its reading of
+      GitHub's caching reference). Fix at 2.3: `package-manager-cache: false` on every setup-node step of the workflows
+      2.3 leaves, or a cache saved before the cut (CI edits: each asks him). Source: setup-node at 8207627,
+      `action.yml:24` and `main.ts:144-173` [verified from setup-node's source: security-auditor read it; its skeptic
+      fetched the pinned SHA and ran the shipped detection code on eight `package.json` variants].
     - **SAVER-SKIP-CI**: the checkpoint saver marks a push of `.checkpoints/` alone `[skip ci]`
       (`.claude/scripts/checkpoint.mjs:168`), so a ready head made by the saver would carry no checks; the last commit
       before ready (the notes' deletion) is made by hand.
@@ -616,7 +675,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       versions stay exact (2.2 checked that by a script in its notes).
     - **WASM-ARTIFACT**: `sim-wasm` is a plain library, so the wasm32 step compiles the crates but emits no `.wasm`
       file; its crate type and its `unsafe_code` exception come with the bindings; the wasm32 build is dev-profile only
-      (it joins OVERFLOW-WASM).
+      (it joins OVERFLOW-XCRATE-CI, whose counter test runs in wasm32 release).
     - **TWO-PLAYWRIGHTS**: two Playwright versions now live in the repository (the toolkit's 1.56.1, the root's
       1.65.0), so 2.3's browser cache needs a key per version; no real browser has run inside the cut's privilege drop.
     - **TOOLKIT-RESOLVES-UP**: with the root installed and `tools/` installed without its optional packages (the gate
@@ -627,14 +686,122 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     - **CARGO-NET-OFFLINE**: `CARGO_NET_OFFLINE=true` inside the cut would give fast, clear failures once third-party
       crates exist (a CI-job edit, so it asks him).
     - **CRATE-LICENCE**: the crates carry no `license` field, which cargo-deny's licence check reads.
+    - From review round 1 (head 4d78ad6, 2026-11-12 and 13; each finding tested by a skeptic of its own, all holding at
+      Low; the report's "Reviews" and Risks):
+    - **CUT-CARRY** (D7, infra-engineer's IE-3, with D17's probe half, test-engineer's TE-3): nothing yet carries the
+      network cut into 2.3. `toolchain.yml`'s header says step 2.3 replaces the file with the gate v2's workflow (:3),
+      ADR 0002 part 9 puts no cut around G9's tests (G12's outbound rule covers only the end-to-end run), and PM-0002-37
+      is a one-run mark (ADR 0002 :578, :581 and :1303 [verified 2026-11-13]). So 2.3 keeps the cut around its build and
+      test commands (what PM-0002-37 proved: the commands at `toolchain.yml:82-87`, from `cargo test --workspace
+      --locked` to `npm test --workspaces` and `tsc --version`), or drops it by a recorded decision citing PM-0002-37's
+      one-run mark. A kept cut takes SETPRIV-HARDEN and CUT-ESCAPE with it, and adds a red run with `--net` removed,
+      ending in the probe's "the network is still reachable inside the cut" line (`toolchain.yml:78`), which no run has
+      shown yet (test-engineer counted none in the 30 runs that had reached the cut by review round 1).
+      CARGO-NET-OFFLINE and the last clause of TWO-PLAYWRIGHTS speak of the cut, so they depend on this choice
+      (infra-engineer and its skeptic).
+    - **CUT-ESCAPE** (D4, security-auditor's SA-1; the report's Risks): the cut proves that the tests run without the
+      network; it is not a sandbox. Inside it the tests keep the runner's uid (1001) and share its filesystem and
+      process table with what runs after the step, with the network, the docker group and passwordless sudo
+      (`toolchain.yml:68-73`: a network namespace only, and `setpriv` back to the same uid [verified 2026-11-13]). So
+      code that runs inside the cut (a compromised dev dependency, such as the native rolldown binary; lightningcss is
+      installed there but loads only lazily) can reach past it. Examples of the class: files that later steps, post
+      steps or the runner itself run or read, such as a `core.fsmonitor` hook in the workspace's `.git/config`, which
+      actions/checkout's post step runs (shown locally with git 2.43.0 and in the source of git 2.56.0, the runner's
+      version; not run on the runner), files in the runner's work folder, or the step's `GITHUB_PATH` and `GITHUB_ENV`
+      files (these two by the runner's layout and documentation, not shown); host pathname sockets such as D-Bus or
+      systemd-resolved (from documentation, untested on the runner); and signals to the runner's own processes
+      (kill(2)). A real boundary needs a different uid with its own copy of the workspace, a container or VM, or a
+      separate job whose output nothing trusted runs. Today the job has `contents: read` and no secrets, and
+      `gate.yml`'s toolkit dependencies already run with the same reach (security-auditor).
+    - **SETPRIV-HARDEN** (D5, security-auditor's SA-2): the cut's privilege drop (`setpriv --reuid="$(id -u)"
+      --regid=nogroup --clear-groups --no-new-privs`, `toolchain.yml:69` [verified 2026-11-13]) has neither
+      `--inh-caps=-all` (setpriv(1)'s own advice when dropping from root) nor `--bounding-set=-all`, and the step prints
+      `id` and `ip -o link` but asserts none of the privilege properties (only the TCP probe judges the network, as the
+      approved plan designed). Today the result is right: a local run as root (util-linux 2.39.3) gave effective,
+      permitted and ambient sets 0, and the full bounding set is inert under no_new_privs. At 2.3: add `--inh-caps=-all
+      --bounding-set=-all`; fail before the tests if `id -u` is 0 (the check that closes the root case, since it fails
+      before the pull request's code runs); assert capability sets 0, NoNewPrivs 1 and groups `65534`; and check that no
+      device but `lo` is up (a CI edit: it asks him).
+    - **CANCEL-ON-MAIN** (D9, infra-engineer's IE-5): both workflows cancel in-progress runs in one group per ref, main
+      included (`toolchain.yml:16-18` and `gate.yml:15-17` [verified 2026-11-13]; ADR 0002 part 9 keeps concurrency
+      cancel), so two merges close together leave the first without a green check: main's gate run 39046286643 on
+      04c086c was cancelled when df1e6d3's run started 5 s later, and its check-run annotation names a higher-priority
+      waiting request in the same group (the skeptic's API read). With 2.3's `if: always()` aggregate job a cancelled
+      main run gives a red verdict or none, and the Revert rule needs a red commit's first parent to be green
+      (`.claude/agents/advisor.md:273-276`). At 2.3: main's runs must not share one group, or the group must keep more
+      than one pending run (the skeptic's reading of GitHub's docs: the default queue keeps one pending run, so of three
+      merges inside one run the middle one's run is cancelled; not tested); and planted failures wait for each run, a
+      revert's included (four revert runs in this change-set were cancelled by the next plant, 2 to 4 s later). CI
+      edits: each asks him.
+    - **LINT-TABLE-PEDANTIC** (D10, rust-reviewer's RR-2): ADR 0002 part 7 asks both that every crate opt into the
+      workspace lint table (`[lints] workspace = true`, itself a gate check) and that pedantic be at warn on `sim`,
+      `protocol` and `content` only (:433-436 [verified 2026-11-13]); Cargo cannot hold both: cargo 1.99.1 refuses a
+      member's own lint table beside `workspace = true`, and the whole workspace then stops loading (exit 101). Routes
+      for 2.3's lint stage (G2): a crate-level `#![warn(clippy::pedantic)]` in those crates, repeating after it the
+      table's levels for single pedantic lints (an allow or a deny); or the gate's own `cargo clippy ... --no-deps -- -W
+      clippy::pedantic`, repeating them too (that flag overrides a lint the table allows and lowers a deny to warn, and
+      without `--no-deps` it also lints the workspace crates the three depend on). Rewording part 7 is for the ADR's
+      owner and needs his go. Today the head is pedantic-clean through the gate flag (`sim` and `protocol`, host and
+      wasm32: the session's run and its skeptic's).
+    - **FEATURE-UNIFY** (D11, rust-reviewer's RR-3): on the pinned 1.99.1, in edition 2024, a member's
+      `default-features` overrides the `[workspace.dependencies]` entry without a warning (from 1.85 to 1.98 the
+      combination was an error), and one cargo command unifies features across all the members it builds; so part 3's
+      rule that the maths-relevant features of the dependencies `sim` shares with `server` are set once in
+      `[workspace.dependencies]` (ADR 0002 :212-217 [verified 2026-11-13]) is not enforced by Cargo. Part 3's
+      cross-build comparison of the resolved feature lists (`cargo tree -e features`, in G5) stays the guarantee. A
+      manifest lint would catch it earlier, at its cause: for every crate in sim's tree, no member-level
+      `default-features` or `features` keys in any dependency table, no non-inherited declarations of it, and no
+      `name/feat` or `name?/feat` entries naming it in members' `[features]` tables; with the workspace entries written
+      with an explicit `default-features = false` and feature list. It starts with the first third-party maths crate;
+      such a lint widens G5 beyond PM-0002-44, so it would enter through 2.3's plan and the ADR's next revision (the
+      skeptic).
+    - **ROOT-WORKSPACE** (D12, engine-architect's EA-1): the root `[workspace]` (members `crates/*`, no `exclude`:
+      `Cargo.toml:2-4` [verified 2026-11-13]) now captures every Cargo package below the root that is not a member and
+      has no workspace of its own, such as a lone crate in `.gate/`, `.checkpoints/` or `spikes/`, or a crate nested
+      inside a member: cargo refuses to build it as the current package (exit 101; the error names both fixes). Spikes
+      keep their own `[workspace]`, as PR #40's spike and scratch crates do. Options for 2.3: `exclude = [".gate",
+      ".checkpoints"]` in the root workspace (tested locally: still six members, `Cargo.lock` unchanged, and a lone
+      crate in `spikes/` still needs its own table), and a note in CHECKPOINTS §4 that every such package carries its
+      own `[workspace]` (a kit edit, after the freeze). For 2.4's plan: ADR 0002 part 5 puts `TS_RS_EXPORT_DIR` in a
+      `.cargo/config.toml` but names no folder (:345-346 [verified 2026-11-13]); a root config's `[env]` would reach
+      every nested workspace when cargo runs inside the tree, so the command line's `--config` is safer (tested
+      locally).
+    - **CLIENT-NET-RULE** (D16, engine-architect's EA-5, a proposal for 2.3's plan): part 3's rule list has no static
+      rule for the page's side of the boundary: nothing says that `client` never imports `net` or the Wasm glue (ADR
+      0002 :207-209 and :424 [verified 2026-11-13]). Part 5's rules that the page never instantiates Wasm and that the
+      Worker owns the network connection are checked only at run time (PM-0002-2's and PM-0002-22's counters, which
+      PM-0002-64 keeps in G12 from 2.5, in a 1-minute local match). 2.3's plan weighs a G3 `no-restricted-imports` entry
+      for it, with a planted defect (PM-0002-42). Its limits: direct WebSocket, WebTransport or WebAssembly use in
+      `client` (part 7's `no-restricted-globals` is the companion); imports through `sim-worker` (allow only the Worker
+      entry, or check the built graph); and the glue's path, fixed at 2.4 or 2.5. Wording it into part 3 is for the
+      ADR's owner (engine-architect) and needs his go.
   - **For later steps:**
-    - **OVERFLOW-PER-CRATE** (S3): the release overflow setting is per package; a crate with simulation arithmetic that
-      enters later (`content`, a maths crate) needs the same block (the first slice).
+    - **OVERFLOW-PER-CRATE** (S3; rewritten on the advisor agent's ruling D1, condition 6): workspace crates are covered
+      by the root setting now (`[profile.release] overflow-checks = true`). A third-party crate with simulation
+      arithmetic (a maths crate) is not: `[profile.release.package."*"] overflow-checks = false` keeps dependencies at
+      the release default. The first such crate that enters sim's dependency tree decides, with its cost measured,
+      between a named override for it (a named package override beats `"*"`) and dropping `"*"` (the register row
+      OVERFLOW-ALL, his go asked and still waiting).
     - **PACKAGE-ENTRIES** (S5): the packages have no `exports` or entry fields (the step that gives them code).
-    - **EMPTY-SLOTS** (2.2's plan, Part 3, readable at the branch's last checkpoint commit): OQ-0002-7 and the
-      wasm-bindgen pin; OQ-0002-3 (one Wasm instance or two); OQ-0002-4 (isolation); OQ-0002-1 (the editor from
-      `file://`); the boundary spike's items 4 (generated types) and 8 (sizes, wasm-opt, `skipLibCheck`, the three.js
-      casts, Playwright's clock): each waits for the boundary spike.
+    - **EMPTY-SLOTS** (2.2's plan, Part 3, readable at the branch's last checkpoint commit; reworded on D14,
+      engine-architect's EA-3): OQ-0002-7 and the wasm-bindgen pin: the pin comes with `sim-wasm`'s bindings, after the
+      boundary spike fixes its exports; OQ-0002-7's decider, a by-day reading of wasm-bindgen's maintenance issue #4533
+      and the guide's governance page (ADR 0002 :1082-1084 [verified 2026-11-13]), comes before the step that adds
+      wasm-bindgen (2.2's plan, Part 3; by the D14 skeptic's reading, the foundation step that adds it to `crates/`,
+      not the throwaway boundary spike, which adds it first). OQ-0002-3 (one Wasm instance or two), OQ-0002-4
+      (isolation), OQ-0002-1 (the editor from `file://`) and the boundary spike's items 4 (generated types) and 8
+      (sizes, wasm-opt, `skipLibCheck`, the three.js casts, Playwright's clock) wait for the boundary spike.
+    - **OQ-0002-8-TEST** (D15, engine-architect's EA-4): the Advisor's answer (a) to OQ-0002-8 (2026-11-03, recorded in
+      ADR 0002) keeps `room`, `client-endpoint` and `navbake` proposed and labelled not researched, and makes the first
+      foundation milestone that builds them their test (:1095-1102 [verified 2026-11-13]). 2.2 builds `room` and
+      `client-endpoint` empty (one stub test each; CI's wasm32 step compiles both) and exercises neither reason ADR 0002
+      gives for them (`room`: the local server in the Worker, which cannot carry the server's async runtime and
+      transport; `client-endpoint`: the endpoint's Rust code run natively and headless for ADR 0001's network marks), so
+      the 2.2 report does not count 2.2 as OQ-0002-8 (a)'s test. The later marks that touch them: PM-0002-44 at 2.3 (G5
+      enforces the rules behind those reasons: `tokio` added to `room`, wasm-bindgen or a transport crate added to
+      `client-endpoint`; its row carries no phase, and `--prove` and G5 arrive at 2.3) and PM-0002-64 at 2.5 (their code
+      runs, with ADR 0001's loopback milestone); `navbake` enters at slice 2. Which of these is the test is for the
+      Advisor to say, or a dated reading from the advisor agent.
     - **BRIEF-STALE**: `docs/V2_PHASE0_BRIEF.md:20-21` (phase 0: no engine code but throwaway spikes) and `:144` (its
       "Don't" list: no engine code in phase 0) still forbid engine code in phase 0, with no word of the exception for
       foundation steps 2.1 and 2.2; it is Mustafa's and the Advisor's brief (its line 3), one of DOCS-ALIGN's documents, so

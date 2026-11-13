@@ -2,7 +2,7 @@
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
 next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
 `docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
-_Last updated: 2026-11-12 (foundation 2.2, PR #48, its docs pass; main 2aa5e9c)._
+_Last updated: 2026-11-13 (foundation 2.2, PR #48, review round 1's docs sync; main 2aa5e9c)._
 
 ## Phase
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
@@ -26,22 +26,21 @@ _Last updated: 2026-11-12 (foundation 2.2, PR #48, its docs pass; main 2aa5e9c).
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done, U4 in build | its units, runs and report; his OK of each run's plan and cost cap |
-| #48 | the foundation, 2.2: the toolchain (the Rust and npm pins, six empty crates and five empty packages, the offline CI job) | `claude/laughing-pasteur-fwya24` (his personal account; for `cs/foundation-toolchain`) | draft; steps 1 to 5 done: the pins, the crates and packages, the CI job (K1), the planted failures, main merged in (c901187), and on his yes the four kit lines (the hard constraints scoped to `legacy/`; his 2026-11-10 decision named as the exception in the three lines that forbid v2 code) and the CI job's release-test line (K1b); the docs pass done; the Fable advisor's full read of the skeleton (run early, on 2026-11-12, before the review round; his item 4 of that day places it before ready, so the report tells him) and its two changes: the overflow tests expect their panic's message, and planted failure M6 (L2) went red and was reverted | the review round and the verifier; the report; the Fable advisor's re-check of the changed files before ready; the advisor agent's review of its final head; then his go (risk tier 2: the CI job and kit lines; decision docs) |
+| #48 | the foundation, 2.2: the toolchain (the Rust and npm pins, six empty crates and five empty packages, the offline CI job) | `claude/laughing-pasteur-fwya24` (his personal account; for `cs/foundation-toolchain`) | draft; steps 1 to 5 done: the pins, the crates and packages, the CI job (K1), the planted failures, main merged in (c901187), and on his yes the four kit lines (the hard constraints scoped to `legacy/`; his 2026-11-10 decision named as the exception in the three lines that forbid v2 code) and the CI job's release-test line (K1b); the docs pass done; the Fable advisor's early full read of the skeleton (2026-11-12, before the review round) and its two changes (the overflow tests expect their panic's message; planted failure M6 (L2) went red and was reverted); review round 1 done (5 reviewers, 17 findings, each checked by a skeptic: all hold) and its fix pass done (1de98a9 to 8a4f9b0): the overflow setting widened to every workspace crate on the advisor agent's ruling D1 (route A, 4bd9dd5; planted failure M7 went red and was reverted) | review round 2 (rust-reviewer, test-engineer, security-auditor, engine-architect); the verifier; the Fable advisor's whole read again, before ready (his item 4 of 2026-11-12); the report; the advisor agent's review of its final head; then his go (risk tier 2: the CI job and kit lines; decision docs), with his go on K1 and on the register rows Q2.2-a and OVERFLOW-ALL |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10), after status-diet (merged, #49): his unit walk of 2026-11-09 (a docs
    change-set: UNITS.md §0 and LOOP_V2), then the Slice 1 note of 2026-11-10, each in a fresh chat. His words:
    `docs/DECISIONS.md`, "Queued".
-2. v2: the netcode proof test (#40); the foundation in his order of 2026-11-11 (#49, 2.1a (#50) and 2.1b (#51)
-   merged; then 2.2, #48, in flight). Wave 1 runs one heavy spike at a time (SPIKE_PLAN: the netcode proof test, the
-   sim core spike and its 60 Hz run, the boundary spike, the look proof test once its models exist; the preview
-   hosting check alongside any). _Pointer: his decision of 2026-11-10 lets the second account plan and build
-   foundation steps 2.1 and 2.2 now (`docs/DECISIONS.md`, 2026-11-10)._ Then phase 1 and the playable slices
-   (SLICE-ORDER, 2026-10-31: `docs/DECISIONS.md`).
+2. v2: the netcode proof test (#40); the foundation in his order of 2026-11-11 (#49, 2.1a (#50) and 2.1b (#51) merged;
+   2.2, #48, in flight). Wave 1 runs one heavy spike at a time (SPIKE_PLAN: the netcode proof test, the sim core spike
+   and its 60 Hz run, the boundary spike, the look proof test once its models exist; the preview hosting check alongside
+   any). _Pointer: his decision of 2026-11-10 lets the second account plan and build foundation steps 2.1 and 2.2 now
+   (`docs/DECISIONS.md`)._ Then phase 1 and the playable slices (SLICE-ORDER, 2026-10-31: `docs/DECISIONS.md`).
 
 ## Waiting on Mustafa
-- His go for #48 (2.2; risk tier 2), once its report is in and the advisor agent approves its final head; with it,
-  his go on the CI job as written (K1; its guard prompt counts as unseen) and on the register row Q2.2-a.
+- His go for #48 (2.2; risk tier 2), once its report is in and the advisor agent approves its final head; with it, his
+  go on the CI job as written (K1; its guard prompt counts as unseen), Q2.2-a and OVERFLOW-ALL: all still waiting.
 - The netcode proof test's items (its plan in #40; the older list: the archive's "Phase", "Next (v2)"): OK each run's
   plan and cost cap; name the laptop and desktop; the Mac when one is available; the Safari workflow's own PR.
 - Legacy, frozen (the archive's "In flight" and "Phase"): his Windows run ("Check a new machine", `tools/README.md`);
@@ -94,9 +93,10 @@ A finding below the review budget's bar becomes a follow-up: its id goes here, i
   2026-11-11, 20:44:29 UTC); the gate's stray-page check stops after the merge (security-auditor's F4, Low, open);
   PROMPTS-2.3 and the guard's `git -C` refusals (the 2.1b report, "Findings for 2.3").
 - **From foundation 2.2 (PR #48), for 2.3:** AUTO-ASK, MANUAL-MODE, GIT-C, ADVISOR-TOOL-WORDS, MODELS-2026-11-12,
-  REFUSED-PUSH, PIN-GUARD, G0, OVERFLOW-WASM, TSCONFIG, REQUIRED-CHECK, SETUP-NODE-CACHE, SAVER-SKIP-CI, CRATE-NAMES,
-  CI-ENFORCED-LATER, WASM-ARTIFACT, TWO-PLAYWRIGHTS, TOOLKIT-RESOLVES-UP, CARGO-NET-OFFLINE, CRATE-LICENCE, NODE-26;
-  later: OVERFLOW-PER-CRATE, PACKAGE-ENTRIES, EMPTY-SLOTS, BRIEF-STALE (archive: "Follow-ups", "From foundation 2.2").
+  REFUSED-PUSH, PIN-GUARD, G0, OVERFLOW-XCRATE-CI, TSCONFIG, REQUIRED-CHECK, SETUP-NODE-CACHE, SAVER-SKIP-CI,
+  CRATE-NAMES, CI-ENFORCED-LATER, WASM-ARTIFACT, TWO-PLAYWRIGHTS, TOOLKIT-RESOLVES-UP, CARGO-NET-OFFLINE, CRATE-LICENCE,
+  CUT-CARRY, CUT-ESCAPE, SETPRIV-HARDEN, CANCEL-ON-MAIN, LINT-TABLE-PEDANTIC, FEATURE-UNIFY, ROOT-WORKSPACE,
+  CLIENT-NET-RULE, NODE-26; later: OVERFLOW-PER-CRATE, PACKAGE-ENTRIES, EMPTY-SLOTS, OQ-0002-8-TEST, BRIEF-STALE.
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100
