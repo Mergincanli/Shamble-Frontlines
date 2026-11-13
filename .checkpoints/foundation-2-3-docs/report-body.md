@@ -28,10 +28,12 @@ Mustafa's first item for step 2.3: "First: the docs pass. Its own small pull req
   message before it, and his go for #48. One sentence in his 2026-11-10 entry's header (two lines reflowed, its other
   words unchanged), and the pointer P5 at SLICE-ORDER's condition 3. Nothing leaves "Queued" and nothing is added.
 - Dated pointers quoting his decision's first four sentences, "for foundation step 2.3 only": `docs/SPIKE_PLAN.md`
-  (P1 to P3), ADR 0002's migration step 1 (P4), `docs/ROADMAP.md` (P7), `docs/STATUS.md` (P8).
+  (P1 to P3), ADR 0002's migration step 1 (P4), `docs/ROADMAP.md` (P7); in `docs/STATUS.md` (P8) the same four
+  sentences, quoted after STATUS's own lead-in.
 - `docs/reports/2026-11-12-foundation-2-2.md`: M1, L1, L2 (worded as the logs read), L3 and a dated header note.
 - `docs/STATUS_ARCHIVE.md`: L5; Q3's two lines; Q5's two clauses; #48's row in "In flight"; the 2.2 block's state.
-- `docs/STATUS.md` ({{STATUS_LINES}} lines), `docs/ROADMAP.md`, `docs/REPO_MAP.md`: true for main 4d21c1a (docs-keeper).
+- `docs/STATUS.md` (120 lines) and `docs/ROADMAP.md`: true for main 4d21c1a (docs-keeper, then the session's checks);
+  `docs/REPO_MAP.md` unchanged (it lists four reports; its `docs/reports/` row covers this one).
 - This report. No code: the gate's symbol check is +0 −0.
 
 ## Evidence
@@ -41,9 +43,9 @@ Mustafa's first item for step 2.3: "First: the docs pass. Its own small pull req
 | E2 | DECISIONS.md | `decisions.mjs --check`: OK; six negative controls caught (each quote, the header sentence, the entry title); the only lines removed against 4d21c1a are the 2026-11-10 header's two reflowed lines; 2.2's `decisions-entries.mjs --check`: OK, 13 entries |
 | E3 | the pointers | `pointers.mjs --check`: P1 to P5, P7, P8 and his kit-freeze words in STATUS; each quote joined and found in his decision; a dropped word caught; SPIKE_PLAN +18 −0 lines, ADR 0002 +6 −0 |
 | E4 | the fixes | `fixes.mjs --check --hunks`: the 2.2 report's Appendix A sha256 equal to 4d21c1a's; 2.2's body-quote check: 13 blocks, 10 quotes; the whole-file checks; 6 hunks in the report, 5 in the archive (before docs-keeper); L2: seven job logs read; L3: the saved run's flag list; L1: the 2.2 checkpoint's F1 |
-| E5 | scope | {{SCOPE}} |
+| E5 | scope | `scope.mjs`, main's guard (`protectedRel`, `mergeAllowed` from origin/main 4d21c1a): every path under `docs/`, none protected, file modes plain; DECISIONS.md and ADR 0002 not mergeAllowed, so the PR Advisor cannot merge it |
 | E6 | gate | `node tools/gate.mjs --no-smoke`: GATE PASS after each step (the smoke in CI: this container's Chromium is not the toolkit's); repo map OK |
-| E7 | CI | 1123175: gate push 43497813351 and pull_request 43497824049, toolchain 43497813242 and 43497823762, all green; {{CI}} |
+| E7 | CI | Green on each step's commit (gate, with its gate and smoke jobs, and toolchain; push, then pull_request): 1123175 (43497813351, 43497824049; 43497813242, 43497823762); 2f96f5c (43501529364, 43501539671; 43501529328, 43501539371); 83c6ab6 (43504752852, 43504760971; 43504752955, 43504761167); {{CI}} |
 | E8 | facts | `quotes.mjs` on STATUS, ROADMAP, the archive and REPO_MAP: {{QUOTES}}; R-STATE and the verifier on every SHA, run id and time |
 
 ## Reviews
@@ -62,6 +64,13 @@ In this conversation Opus 5.5 answers the advisor tool (the `/advisor fable` out
   Q5).
 - `tools/` was not installed in this container: `npm ci --prefix tools` (CLAUDE.md's setup step; gitignored).
 - Commands refused by the guard, the deny list or the classifier: {{REFUSALS}}.
+- docs-keeper's scratch file `fillcount.mjs` held a retyped copy of his decision's four sentences and his kit-freeze
+  words, to count lines; the saver pushed it (e6fc6a9) before it was deleted. The copy is byte-identical to the script
+  cut (checked), it stands in no doc, and history keeps it.
+- Two of the seven L2 logs (fd14855's push run, 45f1bb5's pull_request run) were read by the session only; the advisor
+  agent read the other five.
+- The transcript-based checks (`words.mjs`'s A1, A2 and its scan; the chat-record pages) run only in this session's
+  container: elsewhere the sessions API re-reads them.
 
 ## Risks
 - The chat record's copies of his #48 go are API pages saved outside the repository; the sessions API re-reads them.

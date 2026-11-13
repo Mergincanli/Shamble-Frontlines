@@ -33,8 +33,9 @@ function appendix(list) {
     'cites. His other input in this session was a command: `/advisor fable` (2026-11-13 18:30:08 UTC), whose output said ' +
     'this conversation keeps Opus 5.5 as its advisor model until `/clear` or `/compact`. The session\'s other entries are ' +
     'the harness\'s and its agents\': the command\'s caveat, the workflow-authoring skill (loaded with A2, 18:47:56 UTC), ' +
-    'a notice that the session\'s worker had restarted (19:22:24 UTC), and the hand-backs and task notifications of the ' +
-    'session\'s own agents; `words.mjs` classifies every entry of the transcript and finds no other message of his. ' +
+    'a notice that the session\'s worker had restarted (19:22:24 UTC), the advisor-report skill\'s text (loaded by the ' +
+    'session), stop-hook feedback, and the hand-backs and task notifications of the session\'s own agents; `words.mjs` ' +
+    'classifies every entry of the transcript and finds no other message of his. ' +
     'Entries in `docs/DECISIONS.md` copy their quotes from here, because the notes folder is deleted before the pull ' +
     'request is marked ready._';
   const blocks = list.map((s) => {

@@ -47,7 +47,12 @@
    all found; `fixes.mjs --check`, `decisions.mjs --check`, `report-appendix.mjs --check` OK; scope OK; GATE PASS; repo
    map OK. docs-keeper's findings: its scratch `fillcount.mjs` held a retyped copy of his four sentences and kit-freeze
    words, pushed by the saver (e6fc6a9) and then deleted; byte-identical to the script cut (checked); in no doc
-   (a report finding, Low); the archive's stale :608 (fixed here).
+   (a report finding, Low); the archive's stale :608 (fixed here). CI on 83c6ab6 green: gate push 43504752852,
+   pull_request 43504760971; toolchain push 43504752955, pull_request 43504761167 (2f96f5c: gate 43501529364,
+   43501539671; toolchain 43501529328, 43501539371). Proofs (consultation 4): the archive's word-level diff
+   2f96f5c..83c6ab6 shows only the #48 row, the block opening and the three "go" phrases; STATUS's base lines 21 and 46
+   are present unchanged and Routines is identical to 4d21c1a's; the #48 row's order, times (16:20:10 commit, 16:20:12
+   merged_at), parents (2aa5e9c, 9b20b67) and items match git and A3.
 
 ## Current step
 Step 5 of the plan: the report's body (from `report-body.md`), E1 to E8, CI on 83c6ab6. Notes done before step 2:
@@ -101,6 +106,15 @@ Step 5 of the plan: the report's body (from `report-body.md`), E1 to E8, CI on 8
    line" unchanged, and `fixes.mjs` gained a whole-file check; the hunk counts recorded here; for step 4, placeholders
    for his kit-freeze words as well and a quote-span check, the full pointer check after P7 and P8, the saver restarted
    before the review agents, and #40's head refreshed.
+
+4. 2026-11-13 ~21:50 Amsterdam, moment 5 for step 4 and moment 1 for step 5 (C9): is step 4 done? Not yet. Changed:
+   STATUS's #52 row and ROADMAP's #52 entry lose their REPO_MAP claim (step 5's commit); the archive's #48 row read whole
+   (order, times and items against A3: right); a word-level diff of the archive 2f96f5c..83c6ab6 (only the #48 row, the
+   block opening and the three "go" phrases); STATUS's base lines 21 and 46 and Routines checked by diff (unchanged);
+   step 4's departures put to the advisor agent (revision 2b); the transcript re-scanned (15 entries; the intro names
+   the new kinds); CI read on 83c6ab6 by SHA; the report discloses the retyped copy, the two logs only the session read,
+   and that the transcript checks run only here; `review-r1.js` gains `model: 'opus'`, a required head SHA and a line
+   against retyping his words.
 
 ## Refusals (guard, deny list, classifier) and the route taken
 - None so far.

@@ -6,11 +6,12 @@ export const meta = {
 
 const ROOT = '/home/user/Shamble-Frontlines'
 const NOTES = `${ROOT}/.checkpoints/foundation-2-3-docs`
-const HEAD = args && args.head ? args.head : 'HEAD'
+if (!args || !/^[0-9a-f]{40}$/.test(args.head || '')) throw new Error('args.head must be the reviewed commit\'s full SHA (the saver moves HEAD)')
+const HEAD = args.head
 
 const SAVE = (part) => `## Saving your progress
 A usage limit can cut you off part way, and you would then be started again with this same task. Keep notes in ${NOTES}/${part}.md (make the folder; you may always write there). Look there first: if the first line names another task, move the file into ${NOTES}/old/ and start fresh; if the notes end with DONE, write your answer from them; otherwise go on after the last block they mark done. Trust the blocks they mark done: never reread, recheck or redo them (a later block may still read a file it needs). Start a new file with one line naming your task, then your plan: the blocks you will do, in order (a block: a source read, a file reviewed, a test group run, a section written). Write each finished block to its file at once. Add a notes line for each finding as you find it (what, where), and one after each finished block (done, what comes next). Redo a block the notes don't mark done, written over, never appended. Scratch files go in ${NOTES}/: text and small scripts only; builds and binaries go under .gate/foundation-2-3-docs/. This folder is pushed to a public repository: never put a secret, token, environment value, request header, cookie or raw payload in it, whether in a note, a script or a script's output; the saver's secret check only knows a few token formats and cannot read archives or binaries. End with DONE, then give your answer from your notes alone, opening no other file. Never commit or push.
-Write with the Write or Edit tool, or one plain shell command with a literal path: the guard can refuse a shell line it cannot read. Edit no file outside ${NOTES}/ (you review; you never fix).`
+Write with the Write or Edit tool, or one plain shell command with a literal path: the guard can refuse a shell line it cannot read. Edit no file outside ${NOTES}/ (you review; you never fix). Never retype Mustafa's words into a note or a scratch file: point at their source (file and line, or the script that cuts them) instead.`
 
 const COMMON = `Repository: ${ROOT} (the main folder; never switch it to another branch, never push). PR #52, branch claude/sweet-mayer-grsukw, head ${HEAD}, base main 4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300. It is step 2.3's first docs pass: docs only (no kit, gate or CI file). The plan: ${NOTES}/plan.md (revisions 1, 2 and 2a; the advisor agent approved it; its notes: ${NOTES}/advisor-plan-rev1.md). The diff: \`git diff 4d21c1a..${HEAD} -- docs/\`. The scripts that wrote and check his words: ${NOTES}/words.mjs, report-appendix.mjs, decisions.mjs, pointers.mjs, fixes.mjs, quotes.mjs (run them with node from ${ROOT}; \`--check\` writes nothing). Mustafa's task message (his words, the source of truth for this task) is in this session's transcript, ${'/root/.claude/projects/-home-user-Shamble-Frontlines/7261f3d7-f651-586a-9c39-c052553b68a3.jsonl'}, the line whose "uuid" is "e5fa7ca0-6494-44d0-8366-81fc612c7958"; the new report's Appendix A (docs/reports/2026-11-13-foundation-2-3-docs.md) holds it too, copied by script. Severity, one scale (CLAUDE.md): Critical breaks security, data, the guard or main; High: a wrong result or rule a player, Mustafa or a session would hit, a rule loosened beyond his words, his words misquoted, a decision of his recorded wrongly or as decided while open, evidence that does not hold; Medium: a real defect with a workaround or a small reach; Low: polish, wording, a nit. Every finding cites file:line and the evidence (the command and its output, or the source line). Do not report what you only suspect without saying so.`
 
@@ -76,8 +77,8 @@ const VERDICT = {
 
 phase('Review')
 const [words, state] = await parallel([
-  () => agent(R_WORDS, { label: 'R-WORDS', phase: 'Review', schema: FINDINGS, effort: 'max', agentType: 'general-purpose' }),
-  () => agent(R_STATE, { label: 'R-STATE', phase: 'Review', schema: FINDINGS, effort: 'max', agentType: 'general-purpose' }),
+  () => agent(R_WORDS, { label: 'R-WORDS', phase: 'Review', schema: FINDINGS, effort: 'max', model: 'opus', agentType: 'general-purpose' }),
+  () => agent(R_STATE, { label: 'R-STATE', phase: 'Review', schema: FINDINGS, effort: 'max', model: 'opus', agentType: 'general-purpose' }),
 ])
 log(`R-WORDS: ${words ? `${words.verdict}, ${words.findings.length} findings` : 'NO RESULT'}; R-STATE: ${state ? `${state.verdict}, ${state.findings.length} findings` : 'NO RESULT'}`)
 
@@ -90,7 +91,7 @@ for (let i = 0; i < toTest.length; i += 3) {
   const batch = toTest.slice(i, i + 3)
   const got = await parallel(batch.map((f) => () => agent(
     `You are a skeptic (Opus 5.5, effort max). Try to REFUTE one review finding on PR #52; default to holds=false only with evidence that it is wrong, and say if its severity should change.\n${COMMON}\nThe finding (${f.by}, ${f.id}, ${f.severity}): ${f.claim}\nFile: ${f.file} ${f.line || ''}\nIts evidence: ${f.evidence}\nIts proposed fix: ${f.fix}\nRe-check it yourself from the sources (run the commands again; read the lines). Answer in the schema.\n${SAVE(`skeptic-${f.id.replace(/[^A-Za-z0-9-]/g, '')}`)}`,
-    { label: `skeptic:${f.id}`, phase: 'Skeptics', schema: VERDICT, effort: 'max', agentType: 'general-purpose' })))
+    { label: `skeptic:${f.id}`, phase: 'Skeptics', schema: VERDICT, effort: 'max', model: 'opus', agentType: 'general-purpose' })))
   got.forEach((v, k) => verdicts.push({ finding: batch[k], verdict: v }))
 }
 log(`skeptics: ${verdicts.length} sent, ${verdicts.filter((v) => v.verdict).length} returned`)
