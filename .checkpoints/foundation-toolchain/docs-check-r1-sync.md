@@ -99,3 +99,8 @@ advisor-ruling-d1.md, review-r1-findings.json, review-r1-verdicts.json, skeptic-
    own suggested text.
 7. Low, archive :569-570: EMPTY-SLOTS' plan clauses and E12's figures carry no [verified]/[assumed] tag (both hold).
 8. Low, report :268 (confirmed): `docs/STATUS.md:47` is now :46 after the sync's rewrap; fixer: main session.
+- After the advisor consult (2): docs-keeper's "no other current citation into the shifted STATUS range" holds: git grep
+  outside .checkpoints/ finds only dated pre-diet citations (LEGACY_INVENTORY.md rows, r1 :841 etc., r2 :456 etc.,
+  kit-v3-4 report :110) besides the 2.2 report's :267-268. Candidate 9 (table row length) is a refuted hand-back claim,
+  reported under "checked", not as a finding.
+- DONE: findings 1-8 above returned via StructuredOutput (repoMapExit 0, statusLines 120).
