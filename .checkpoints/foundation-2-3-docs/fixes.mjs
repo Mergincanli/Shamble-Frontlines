@@ -34,8 +34,9 @@ const M1_NOTE = "_Corrected after the merge (2026-11-13, by step 2.3's first doc
 const L1_OLD = "Its eight Low notes are fixed in the last commit before ready: the runner's git version (2.56.1 since " +
   '2026-11-12), the PR\'s title and body, OVERFLOW-PANIC-RULE\'s due point in "For Mustafa", PM-0002-53\'s owner in the ' +
   'archive, the stale "last updated" and intro lines and ROADMAP\'s header, the checkpoint (deleted) and a comma in E2.';
-const L1_NEW = "Of its eight Low notes, seven are fixed in the last commit before ready: the runner's git version (on " +
-  "2026-11-12, 2.56.0 or 2.56.1 by runner), the PR's title and body, OVERFLOW-PANIC-RULE's due point in \"For " +
+const L1_NEW = "Of its eight Low notes, seven are fixed in the last commit before ready: the runner's git version (as worded " +
+  "at 9b20b67; L2 corrected it after the merge, in Risks and the CUT-ESCAPE row), the PR's title and body, " +
+  "OVERFLOW-PANIC-RULE's due point in \"For " +
   "Mustafa\", PM-0002-53's owner in the archive, the stale \"last updated\" and intro lines and ROADMAP's header, the " +
   "checkpoint (deleted) and a comma in E2; the eighth, that departure (OVERFLOW-XCRATE-CI's recorded line), was named " +
   "for the advisor agent's review of the final head, which accepted it.";
@@ -55,7 +56,7 @@ export const EDITS = [
   { id: 'L5', file: ARCHIVE, kind: 'reflow', start: "`.checkpoints/foundation-toolchain/`, readable at the branch's last checkpoint commit): their CI runs", stop: (l) => l.startsWith('  - '), old: "readable at the branch's last checkpoint commit):", repl: `readable at the branch's last checkpoint commit, ${SHA_NOTES}):`, cont: '  ' },
   { id: 'Q3 (L2 in the archive)', file: ARCHIVE, kind: 'reflow', start: "actions/checkout's post step runs (shown locally with git 2.43.0 and in the source of git 2.56.0 (the runner's", stop: (l) => l.startsWith('    - '), old: OLD_GIT, repl: NEW_GIT, cont: '      ' },
   { id: 'Q3 (EMPTY-SLOTS)', file: ARCHIVE, kind: 'reflow', start: "- **EMPTY-SLOTS** (2.2's plan, Part 3, readable at the branch's last checkpoint commit;", stop: (l) => l.startsWith('    - '), old: "readable at the branch's last checkpoint commit;", repl: "readable at the branch's last checkpoint commit, 2f0fef3;", cont: '      ' },
-  { id: 'Q5 (the 2.1a follow-up)', file: ARCHIVE, kind: 'reflow', start: '  - **For the drafts\' next revision:** five "before the foundation" lines with no pointer to his decision of 2026-11-10', stop: (l) => l.startsWith('  - '), old: "SPIKE_PLAN :100 (the diagram's label) and :202.", repl: `SPIKE_PLAN :100 (the diagram's label) and :202. Nor to his decision of 2026-11-13 on step 2.3 ${POINT}, whose pointers stand beside 2.1a's (2026-11-13, foundation 2.3's first docs pass).`, cont: '    ' },
+  { id: 'Q5 (the 2.1a follow-up)', file: ARCHIVE, kind: 'reflow', start: '  - **For the drafts\' next revision:** five "before the foundation" lines with no pointer to his decision of 2026-11-10', stop: (l) => l.startsWith('  - '), old: "ADR 0002 :38, :724, :1115; SPIKE_PLAN :100 (the diagram's label) and :202.", repl: `ADR 0002 :38, :724, :1129 (:1115 when 2.1a counted); SPIKE_PLAN :106 (the diagram's label) and :214 (:100 and :202 before this PR's pointers); also ADR 0003 :51-52 and ADR 0006 :56-57, each wrapped across two lines. Nor to his decision of 2026-11-13 on step 2.3 ${POINT}, whose pointers stand beside 2.1a's (2026-11-13, foundation 2.3's first docs pass).`, cont: '    ' },
   { id: 'Q5 (BRIEF-STALE)', file: ARCHIVE, kind: 'reflow', start: '- **BRIEF-STALE**: `docs/V2_PHASE0_BRIEF.md:20-21`', stop: (l) => l === '', old: 'with no word of the exception for foundation steps 2.1 and 2.2;', repl: `with no word of the exception for foundation steps 2.1 and 2.2, nor of his decision of 2026-11-13 on step 2.3 ${POINT};`, cont: '      ' },
 ];
 

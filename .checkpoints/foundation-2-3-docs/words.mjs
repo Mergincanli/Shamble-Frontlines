@@ -138,8 +138,11 @@ export function scan() {
       if (Array.isArray(c) && c.length && c.every((b) => b?.type === 'tool_result')) continue;
       const text = typeof c === 'string' ? c : (c ?? []).filter((b) => b?.type === 'text').map((b) => b.text).join(' ');
       let cls;
+      const ok = o.origin?.kind;
       if (ids.has(o.uuid)) cls = `his words (${ids.get(o.uuid)})`;
       else if (o.isMeta) cls = 'harness (meta)';
+      else if (ok === 'task-notification' || ok === 'peer') cls = `this session's agents (${ok})`;
+      else if (ok === 'human') { cls = 'HIS MESSAGE, NOT AN ITEM'; problems.push(`${o.uuid} ${o.timestamp}: a message of his that is not an item`); }
       else if (/^<command-name>\/[a-z-]+<\/command-name>/.test(text)) cls = 'his command';
       else { cls = 'UNCLASSIFIED'; problems.push(`${o.uuid} ${o.timestamp}: an unclassified user entry`); }
       rows.push({ at: o.timestamp, uuid: o.uuid, cls, preview: text.slice(0, 70).replace(/\s+/g, ' ') });

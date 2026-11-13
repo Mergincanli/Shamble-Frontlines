@@ -46,7 +46,7 @@ const START = '_Pointer (2026-11-11, foundation 2.1a)';
 const ROADMAP = { id: 'P7', file: 'docs/ROADMAP.md',
   anchor: "pointer, 2026-11-11: for foundation steps 2.1 and 2.2, overtaken by Mustafa's decision of 2026-11-10, `docs/DECISIONS.md`" };
 const STATUS = { id: 'P8', file: 'docs/STATUS.md', placeholder: '{{P-2.3}}' };
-const QKIT = { id: 'Q-KIT', file: 'docs/STATUS.md', placeholder: '{{Q-KIT}}', from: "The kit's freeze (KIT-FREEZE-2) ends with this step.", to: 'A guard prompt alone is not my yes.' };
+const QKIT = { id: 'Q-KIT', file: 'docs/STATUS.md', placeholder: '{{Q-KIT}}', from: "The kit's freeze (KIT-FREEZE-2) ends with this step.", to: 'No such edit happens in the docs pass or while planning.' };
 
 // His kit-freeze words of 2026-11-13, cut from A2 between two anchors (one paragraph of his message).
 export function kitWords() {
