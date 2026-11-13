@@ -40,7 +40,7 @@ reach today; (f) exact replacement text for Cargo.toml:21-24 and OVERFLOW-PER-CR
   `!share_generics() && inline != InlineAttr::Never` -> None; non-generic -> None; else
   `upstream_monomorphizations_for(def)`. Export side, rustc_codegen_ssa/src/back/symbol_export.rs:299-397: an rlib
   exports its generic instances (local_crate_exports_generics, context.rs:1415-1439: rlib/dylib yes; bin, cdylib,
-  staticlib no) when share_generics() is on, or for #[inline(never)] defs even when off (:389-397). Tie-break,
+  staticlib no) when share_generics() is on, or for #[inline(never)] defs even when off (:389-398). Tie-break,
   :498-556 upstream_monomorphizations_provider: over every loaded crate (`tcx.crates(())`, transitive ones included),
   several exporters of one instance -> the lowest stable_crate_id wins (:546-551), i.e. an arbitrary hash order, so a
   checked member's exported copy is no protection against a dependency's unchecked one downstream. The reviewer's C14
@@ -61,3 +61,25 @@ reach today; (f) exact replacement text for Cargo.toml:21-24 and OVERFLOW-PER-CR
   goes through a trait (Add, Sum) and that our crate instantiates is checked in release, so ", unchecked" is wrong
   there (more checks, not fewer). At env "s": trait_add::<u16> (an instance extgen already holds) WRAPS from room
   (room reuses extgen's copy), trait_add::<u8> still panics: TE2-1's case flips back at sharing opt-levels.
+- K6 (d) Cargo book 1.99.1, fetched myself (doc.rust-lang.org/1.99.1/cargo/reference/{profiles,workspaces}.html, 200):
+  profiles: 'To override the settings for all dependencies (but not any workspace member), use the "*" package name';
+  precedence (first match wins): named package, then '"*" - For any non-workspace member', build-override, the
+  profile, defaults. "Overrides and generics" even names this mechanism: "rustc has some optimizations where it will
+  attempt to share monomorphized generics between crates. If the opt-level is 2 or 3, then a crate will not use
+  monomorphized generics from other crates, nor will it export locally defined monomorphized items". workspaces: "All
+  path dependencies residing in the workspace directory automatically become members"; `exclude` removes them. cargo
+  source: the crate cargo-0.100.0 from static.crates.io (read only, never built), .cargo_vcs_info.json sha1
+  5f94df4789f005f9a352888e8355ffc645b7ed0e = local cargo 1.99.1 (5f94df478): src/workspace/profiles.rs:496-538
+  merge_toml_overrides: "*" merged only `if !is_member` (:510-514), then the one named spec (:515-536, later merge
+  wins); src/workspace/workspace.rs:693-695 is_member = member_ids.contains; :943-997 find_path_deps: a path dependency
+  whose folder is under the workspace root (or whose own root search lands here) and is not excluded becomes a member
+  (:957-975); only path sources are followed (:986). RR2-2 HOLDS as a description; the shipped words "crates outside
+  the workspace" are right in Cargo's terms (non-members), but ", so dependencies keep the release default" is wrong
+  for an in-repo path dependency (a member, so checked). More checks, not fewer; reach zero. Low. I did not re-run the
+  star.sh behaviour; the reviewer's star2-4bccf55.txt shows inside -> member, checked; patched/excluded -> unchecked.
+- K7 sources for the class: library/core/src/iter/traits/iterator.rs:3664-3681 (1.99.1) Iterator::sum and ::product
+  carry no #[inline]; accum.rs:47-91 the integer Sum/Product impls (no #[inline]) fold with a
+  `#[rustc_inherit_overflow_checks]` closure; neither file has #[inline(never)], so opt 2 and 3 do not share them.
+- K8 (f support) scripts/run-f.sh -> run-f.txt, route A, env "s" and "z": F1 + [profile.release.package.extsum]
+  overflow-checks = true -> member_total panics at both; F2 "*" table removed -> member_total panics at both. Both
+  closing options in the records close RR2-1 (and C2 above: the dependency at opt-level 3 closes it too).

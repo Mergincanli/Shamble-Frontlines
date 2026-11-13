@@ -65,3 +65,79 @@ to an owner; check Cargo.toml and CI for what the shipped setting does; then jud
   doc comment at 4bccf55 says the same), and runs there in the Worker, in Wasm, so an overflow traps the local sim
   (local recovery not researched, ADR 0004 OQ-0004-7); `server` enters at slice 3, online (:1489). So "room's first
   code" is 2.5 at the latest by plan, sooner if the next builder writes room code.
+- [read] cargo-fuzz source at main (raw.githubusercontent.com, rust-fuzz/cargo-fuzz, src/options.rs and src/project.rs,
+  read 2026-11-13, as data; no cargo-fuzz version is pinned here): `-a` "Build artifacts with debug assertions and
+  overflow checks enabled (default if not -O)"; project.rs passes `--release` unless `--dev`, and adds
+  `-Cdebug-assertions` "if !build.release || build.debug_assertions || build.careful_mode". So a default `cargo fuzz`
+  build checks overflow whatever the workspace; `-O` without `-a` does not. Point (4) is a pin against `-O`, small.
+  "PM-0004-60 pins no profile" still holds literally.
+- [checked] STATUS cap: docs-keeper.md:14 quotes Mustafa's STATUS-DIET: "docs/STATUS.md: at most 120 lines."
+  `wc -l docs/STATUS.md` = 120, so any STATUS edit in the fix pass must add no line (STATUS.md:99 is 113 characters;
+  other lines run to 1436, so a longer :99 is allowed, a new line is not).
+- Severity: Medium holds. Real record gap for a consequence the PR's own change brings (my run); nothing reaches a
+  player or session today (room is an empty stub, no server crate); part 20's first sentence already forbids it in
+  plain words, but nothing anchors the rewording to room's first code. Not High: no rule of his loosened (ADR 0002 part
+  4 not accepted; route A waits for his go), nothing of his misrecorded, no evidence fails.
+- (c) A clause in the row is right, on four conditions: (1) its own provenance: the row's State says "the advisor
+  agent's ruling (D1)", whose condition 3 lists the row's content with no panic hand-off and whose condition 7(e) sent
+  the question to round 2; (2) a tested fact plus a pointer only, no rule content (the row falls under his merge go;
+  rule content belongs in the archive as the security review's proposal for the owners); (3) the decision entry
+  OVERFLOW-ALL (R2-D2's rewrite) points to the follow-up, so his go covers it knowingly (EA2-2's point); (4) one edit of
+  README:234 with R2-D1's, EA2-3's and EA2-4's, not repeating the disputed "dependencies keep the release default,
+  unchecked".
+- (d) Owners per line: engine-architect (ADR 0002 parts 4 and 7, Appendix A), rust-reviewer (ADR 0004 part 20),
+  test-engineer (PM-0004-60, PM-0001-34), netcode-architect (ADR 0001, if point 3 is kept). Anchor a builder can act on
+  without an ADR revision: the plan of the first change that gives `room` or a server crate code states the overflow
+  rule its arithmetic follows (2.5 at the latest by ADR 0002 :1467-1472); ADR wording at each ADR's next revision, with
+  his go. Tripwire (R2-D4's same defect): the name with its trigger in STATUS's "later" group (:99), no new line.
+  Mirrors: STATUS_ARCHIVE "For later steps"; the report's "Follow-ups for later steps" (:253); R2-D2 rewrites the Risks
+  IOU and the entry to point here.
+- (e) Points (1), (2), (4): in the follow-up as lines to revisit, their content the owners' to decide. (5): a question
+  only (ADR 0002 :471, :1617 already answered "not added", its reason "REC4 overflow" now rests on the old scope). (3):
+  not route A's (any handler panic poisons a std Mutex; ADR 0001 :495-496 covers only a lock the tick unwraps; not
+  run): out, or one clause as input for netcode-architect. (6): into OVERFLOW-PER-CRATE and the row's dependency
+  sentence as a tested fact (a path crate's own arithmetic), not into the new follow-up.
+- also_noticed: review-r2-findings.md predates engine-architect's findings (its :3 "pending"); EA2-1 (Medium,
+  engine-architect-review-r2.md:34) is the same sentence as R2-L2 (Low, review-r2-findings.md:18, TE2-7), so the merged
+  item takes Medium; EA2-3 and EA2-4 also edit README:234.
+- Scratch leftovers (not deleted): /home/user/Shamble-Frontlines/.gate/skeptic-r2-R2-D3/ (routeA/, p4/, star/,
+  target-a/, target-p4/, target-star1/, target-star2/, target-star3/, star1.log, star2.log). Runs: native only, toy
+  functions, a path crate (not a registry crate); no wasm32 run of room's own arithmetic.
+- Not verified: cargo-fuzz at any pinned version (read at main only); a registry crate without "*" (path crate only);
+  the lock-poison spread (point 3); room's own arithmetic in a wasm32 build (the ruling's C7 ran sim functions only).
+
+## Exact wording proposed (the fix pass may trim; facts as run above)
+- Row README:234, third column, before "Shown by" (one edit with R2-D1, EA2-3, EA2-4): "Added at review round 2
+  (security-auditor's SA2-2), not part of the ruling: with this setting an overflow in `room`'s or a server crate's own
+  arithmetic panics in release too, where part 4's two blocks let it wrap (local native runs). The lines that keep a
+  value a client or content can set from reaching such a panic (part 4's explicit operations, which name counters and
+  tick numbers; ADR 0004 part 20's panic sources, which name no overflow; the fuzz marks PM-0004-60 and PM-0001-34) are
+  reworded by their owners: the follow-up OVERFLOW-PANIC-RULE."
+- Row's dependency sentence, point (6): "... or dropping `"*"`, which would check every dependency too, the server's
+  future network crates included)"; the same words in OVERFLOW-PER-CRATE (archive :779-784, report :254-257).
+- STATUS.md:99, no new line: "later: OVERFLOW-PER-CRATE, OVERFLOW-PANIC-RULE (with room's first code), PACKAGE-ENTRIES,
+  ...".
+- STATUS_ARCHIVE, "For later steps", after OVERFLOW-PER-CRATE: "**OVERFLOW-PANIC-RULE** (review round 2,
+  security-auditor's SA2-2; Medium): with route A, an overflow in `room`'s or a server crate's own arithmetic panics in
+  release instead of wrapping (test builds already panic); on the server's tick that would end the match (ADR 0004
+  part 20), repeatably if a client can drive the value. The lines that should keep it out of a client's reach are
+  worded for part 4's two-crate setting: ADR 0002 part 4's explicit operations name counters and tick numbers
+  (:247-249); part 7 leaves out `arithmetic_side_effects`, with REC4 as what covers overflow (:471, :1617); ADR 0004
+  part 20's panic sources name no overflow (:562-566); PM-0004-60 and PM-0001-34 name no build setting (`cargo fuzz`
+  checks overflow by default, not with `-O`). For the owners to decide, each at its ADR's next revision with his go
+  (engine-architect: ADR 0002; rust-reviewer: part 20; test-engineer: the marks), the security review proposes:
+  `wrapping_*` only where a wrap is meant, `checked_*` or `saturating_*` with a defined result for values a client or
+  content can set or add up; part 20 names overflow, and room's and the server's tick code beside the sim; the fuzz
+  builds keep overflow checks on; `arithmetic_side_effects` weighed for room's command handling. Anchor: the plan of
+  the first change that gives `room` or a server crate code (2.5 at the latest) states the overflow rule its arithmetic
+  follows."
+- Report, "Follow-ups for later steps", after OVERFLOW-PER-CRATE: "OVERFLOW-PANIC-RULE: with route A, an overflow in
+  `room`'s or a server crate's own arithmetic panics in release instead of wrapping; the lines that keep it out of a
+  client's reach (ADR 0002 part 4's explicit operations, ADR 0004 part 20, the fuzz marks) are worded for the old
+  two-crate setting. The plan of the first change that gives `room` or a server crate code (2.5 at the latest) states
+  the rule its arithmetic follows; each owner rewords its lines at its ADR's next revision (the register row
+  OVERFLOW-ALL)."
+- For the entry OVERFLOW-ALL's "Why it matters" (R2-D2 rewrites it; plain words): "With the setting, a number that
+  grows too big in the future server's own code can end that match instead of quietly carrying on with a wrong value.
+  The rules that keep a player from causing that are not yet written for the server's code, so this also asks the
+  owners of the design records to write them before that code is built (OVERFLOW-PANIC-RULE)."
