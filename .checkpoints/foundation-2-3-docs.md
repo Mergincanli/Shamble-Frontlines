@@ -26,7 +26,8 @@
    lines reflowed, the only removed lines vs 4d21c1a), P5 (`decisions.mjs --check --negative`: OK, 6 of 6 controls
    caught); P1 to P4 in SPIKE_PLAN and ADR 0002 (`pointers.mjs --check --only P1..P5` OK; SPIKE_PLAN +18 -0, ADR 0002
    +6 -0); 2.2's `decisions-entries.mjs --check` OK (13 entries); GATE PASS (--no-smoke; `tools/` installed with `npm ci
-   --prefix tools`, gitignored); repo map OK. CI on 1123175: to read.
+   --prefix tools`, gitignored); repo map OK. CI on 1123175 green: gate (push 43497813351, pull_request 43497824049;
+   each with its gate and smoke jobs) and toolchain (push 43497813242, pull_request 43497823762).
 
 ## Current step
 Step 3 of the plan: the five report fixes. Notes done before step 2 (no tracked file):
@@ -41,8 +42,13 @@ Step 3 of the plan: the five report fixes. Notes done before step 2 (no tracked 
 - `pointers.mjs` tested on scratch trees (`.gate/fdn23-docs/tree2`): P1 to P5, P7 and P8 OK; idempotent; negative
   control (one word dropped from P2's quote) caught.
 
+- Step 3 prepared: `fixes.mjs` (11 edits: the header note, M1, L1 with L2, L2 x2, L3 in the report; L5, Q3 x2, Q5 x2 in
+  the archive; minimal reflow that stops where the original line breaks resume); tested on `.gate/fdn23-docs/tree4`: OK,
+  the report's Appendix A equal to the base's, 2.2's body-quote check 10 quotes, 6 hunks in the report and 5 in the
+  archive, every added non-table line at most 120 characters; a second write run refuses ("already written").
+
 ## Next steps
-1. Read CI (gate, smoke, toolchain) on 1123175; the advisor tool (C9: moment 5 for step 2).
+1. The advisor tool (C9: moment 5 for step 2, moment 1 for step 3).
 2. Step 3: `fixes.mjs` applies M1 (dated correction under "For Mustafa" step 3), L1, L2 (x3 in the report: :228 inside
    L1's sentence, :301, :345), L3 and the header note to the 2.2 report; L5 (:574) and Q3's two lines (:732, :834) in
    the archive; checks: Appendix A hash equal to 4d21c1a's, 2.2's body-quote check on the report's own blocks, the six
