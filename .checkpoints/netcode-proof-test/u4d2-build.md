@@ -254,3 +254,303 @@
   D-2's form; native against Wasm by an in-process native replay to the mismatching tick, deterministic once leg 1 and
   leg 2 agree). Two dumps that arrive as words alone (Wasm 1 against Wasm 2; native leg 1's dump file against Wasm 1's
   in the bites half) are compared word by word and named by the native replay's `StateDump::field`.
+
+## Fix pass, round 1 (the advisor's ruling advisor-u4d2-r1.md, Blocks 1-8; a fresh builder, 2026-11-12)
+- Start (nothing changed before this): read this record whole, the ruling's Blocks 1 to 8, the five seats' notes
+  (rust, security, infra, arch, test), the brief's section 4 (u4d2-brief.md:648-733), the runner, and the copy's
+  `git status --untracked-files=all` (9 M, 9 new with this record) and `git diff`. HEAD 51520b4; the 17 files' sha256
+  equal the test seat's step-1 list (check.mjs e657f7b8, check.test.mjs 04edf795, loader.mjs 7c3c214b, hash-wasm
+  lib.rs 9d339055, hash.rs 3b11bc2c, lab lib.rs da4e9b7e, Cargo.toml 16b1353c, Cargo.lock 6e628ab7). df 6.5G free;
+  shared target 7.7G. No section "Fix pass, round 1" existed (a fresh start).
+- Bounds kept: check.mjs, check.test.mjs, crates/hash-wasm/loader.mjs, crates/hash-wasm/clippy.toml (new),
+  crates/lab/src/hash.rs, crates/lab/src/lib.rs (one doc line), Cargo.toml's libm comment; hash-wasm's src/lib.rs only
+  as FX-2's and FX-3's plants, restored. No Cargo.lock, manifest, recordings.json, std-sin-scan.txt,
+  co-initial-dump.txt or crates/sim change. New exports: check.mjs `buildInputProblems` only (FX-1, imported by its
+  self-test); loader.mjs none. New Rust items: one private fn in hash.rs (FX-8), no public one.
+- Each FX's proof below is one `-x -k` runner call (fx-<n>-*.log), the plant by Edit in place (or the environment, no
+  file changed), restored by Edit and its sha256 checked against the fixed form before the next call.
+
+### The plan, one line per FX (proof; plant or environment; failures named in advance)
+- **FX-1** (RR-M2/TE-M1, SEC-U4D2-5, -6): `buildInputProblems(env, configs)`, called by depsStep: every rustflags
+  source rustflagSources reads that holds a flag is refused naming the source and its flags; CARGO_BUILD_TARGET (any
+  value) and a `target` key in a cargo config (build.target, read in any table as the config keys are) refused.
+  readBackCheck's doc and DEPS_CHECKED's limits say the read-back is exact because no source may hold a flag ("which
+  fails closed" goes). Self-test (new): RR-M2's negation pair (both named), `--cfg feature="bites"`,
+  `-C overflow-checks=off`, `-C llvm-args=-fp-contract=fast` in RUSTFLAGS, a config's rustflags, CARGO_BUILD_TARGET,
+  `[build] target` and `build.target`, each by name; the container's environment and the spike's config pass; the
+  pair through depsStep. Live (fx-1-env.log, environment only): r1-rr-superset.log's first environment `--only deps`
+  FAILs naming both sources; CARGO_BUILD_TARGET and `RUSTFLAGS=--cfg feature="bites"` FAIL; the clean environment
+  PASSes. Expected failures: none (the C2R-5 test's bad fixture gains one line, read by `includes`; I add
+  buildInputProblems to its list in the same step). Plant (fx-1-plant.log): the refusal loop disabled in check.mjs:
+  the new self-test FAILs by name.
+- **FX-2** (RR-M2's second half, SEC-U4D2-7): loader.mjs's moduleProblems reads the `target_features` custom section
+  (LEB128 count; per entry a prefix `+`, `-` or `=` and a LEB128-length name): refused when it lists simd128 or
+  relaxed-simd with `+` or `=`, when there is no section or more than one, or when it does not parse (truncated, a
+  bad prefix, bytes left over), each by name. Self-test (new): wasmModule-built modules for +simd128, +relaxed-simd,
+  =simd128, no section, two, truncated, bad prefix; the real modules' list and -simd128 accepted. **Expected
+  failures, ended in the same edit:** every existing loader test that builds a clean module with wasmModule
+  (check.test.mjs's "the loader's list ..." test) would be refused for no section, so the helper gains a default
+  clean section in the same step (kept short, so its "< 256 bytes" assert holds). Live (fx-2-tf.log): Block 2's
+  plant, a safe `#[target_feature(enable = "simd128")]` fn under cfg(wasm32) called from `dump_word` in hash-wasm's
+  lib.rs: wasm32 release build exit 0, `--only deps` PASS, `--only wasm` FAIL on the loader's refusal naming +simd128;
+  restored to 9d339055. The two clean modules accepted: the counted runs' wasm step.
+- **FX-3** (RR-M1, SEC-U4D2-2, TE-M2): self-test (new): an `unsafe {}` as the first line of each listed export's body
+  refused by hashWasmProblems at its file:line; the C2R-5 fixture's stray-unsafe plant also put in begin's body (its
+  new-fn case stays). **Expected:** that fixture's line numbers move (strayAt), re-computed in the same edit. Live
+  (fx-3-tp4.log): TP4's plant (`let bite = unsafe { core::ptr::read_volatile(&bite) };` in begin's body): wasm32
+  release build exit 0, `--only deps` FAIL at lib.rs:101; restored 9d339055. Plant (fx-3-tp10.log): TP10's scan
+  regression in check.mjs (skip `unsafe` inside a listed export's body): the new self-test and the C2R-5 test FAIL by
+  name; restored.
+- **FX-4** (SEC-U4D2-1): moduleProblems refuses every `WebAssembly.Module.imports` entry by module and name, before
+  anything is instantiated; instantiate passes `Object.create(null)`; the header and instantiate's doc say so.
+  Self-test (new): modules importing `constructor.constructor`, `__proto__.valueOf` and `env.now`, each refused by
+  name, by moduleProblems and by instantiate. **Expected failure, re-pinned in the same edit:** the existing loader
+  test's assert of the old instantiate message ("does not instantiate with no imports (it imports env.now ...)").
+  Plant (fx-4-plant.log): the import loop disabled: the new self-test FAILs by name; restored.
+- **FX-5** (SEC-U4D2-8, TE-L1): self-test (new): `begin` exported as a global, `memory` as a function, each refused by
+  name (wasmModule gains `kinds`). Plant (fx-5-tp11.log): TP11's disable (`false &&` on loader.mjs's kind branch): the
+  new self-test FAILs by name; restored.
+- **FX-6** (SEC-U4D2-4): in each exception crate whose level is deny (npt-tcpinfo, npt-hash-wasm): a build.rs file, a
+  `build` key in its manifest (unsafeProblems) and a custom-build target in cargo metadata (layoutProblems) refused;
+  `include` used as a path (not an include!, include_str! or include_bytes! call) refused in its sources;
+  pathProblems' doc names npt-hash-wasm. Self-test (new): V4's two forms (r1-sec-scan.log: the build.rs writing
+  `\x75nsafe` code; `use std::include as inc;` with `inc!(...)` in begin's body), the manifest key, the metadata
+  target, each by name; the real crates pass. Expected: none (no deny crate has a build script or an `include` path).
+  Plant (fx-6-plant.log): the build.rs rule and the include rule disabled: the new self-test FAILs by name; restored.
+- **FX-7** (INF-4): wasmStep's `call` gives every non-cargo child call a 300 s timeout (run() passes spawnSync's
+  `timeout` and reports `timedOut`); a timeout is a FAIL naming the call and the limit. Self-test (new): in a clean
+  run each non-cargo call gets 300,000 ms and each cargo build none; a Wasm leg that times out FAILs naming it within
+  main's 40 lines. Fixture: wasmWorld's runner records the limit and passes `timedOut` (no existing assert reads it).
+  Expected: none. Plant (fx-7-plant.log): the timeout line dropped: the new self-test FAILs by name; restored.
+- **FX-8** (RR-L3, EA-9): hash.rs: a private `digest_text` gives "layouts differ (<n> and <m> words)" in place of a
+  digest when a dump's length is not this build's own; `compare` arms the bite on bitten_name's recording (`--on`'s,
+  else the first listed: the legs' one default), replay_to no longer filters. Unit test (new, both builds) on
+  digest_text; h6's bites test asserts the default (the first listed armed, the second not). Plant
+  (fx-8-plant.log): digest_text's length check removed: the new unit test FAILs by name (`cargo test -p npt-lab
+  --bin npt-lab`); restored. Expected: none (h6's added asserts are mine, in my step).
+- **FX-9** (INF-3): the std-sin failure line adds that glibc picks `sinf` by the CPU's features when it loads (an
+  IFUNC), so on another CPU or libc the scan is re-run there (u4d2-brief.md 2.4 (a) item 6). Self-test: the existing
+  bites test's std-sin miss asserts the sentence (an assert added). Plant (fx-9-plant.log): the sentence dropped: that
+  test FAILs by name; restored.
+- **FX-10** (TE-L4): main(argv, steps, log, keepDir): before each step its file
+  `<checkout>/.gate/netcode-proof-test/failed-steps/<step>.log` is removed; a failed step's whole output is written
+  there and its FAIL lines name the path. Self-test (new): a recorded failing test step whose panic lies above the last
+  40 lines: the file holds it, the printed lines name it, a later passing run removes it. Plant (fx-10-plant.log): the
+  write dropped: the new self-test FAILs by name; restored. Expected: none (no test calls main).
+- **FX-11** texts: check.test.mjs's three "two" (the tests at :328 and :529 renamed, the comment at :364); Cargo.toml's
+  libm comment (sqrtf by `sqrtss`, sqrt by `sqrtsd`, libm 0.2.16 src/math/arch/x86.rs:13 and :26); SEC-U4D2-3's limit
+  beside EXPORT_INTEGERS; TickHash.recording's doc. Proof: text, no test (a rename changes no count); a grep for "two
+  exception" in the copy's spikes/ after. Expected: none.
+- **FX-12** (RR-L2, EA-5): crates/hash-wasm/clippy.toml (HashMap/HashSet type bans and the std clock bans, lab's form
+  without tokio lines; header citing plan.md §4.2's leaf rule). Proof: clippy -D warnings on npt-hash-wasm, host and
+  wasm32, both builds, exit 0; plant (fx-12-plant.log): a ban of `std::cell::RefCell` (lib.rs uses it) added to the
+  file: clippy on npt-hash-wasm FAILs naming the disallowed type; restored. Expected: none.
+- Then: fmt (rustfmt's diff applied by Edit), clippy both builds and wasm32, doc; check.mjs counted twice (the six
+  pre-builds first, -x), all 11 steps, counts as deltas on 416 / 465 / 63 of 63: expected measured 417, bites 466 (+1
+  each: FX-8's unit test), self 71 of 71 (+8: FX-1 to FX-7 and FX-10, one new test each); the wasm step's split from
+  both runs; fx-hashes-end.sha256.
+- Stop rule kept: any failure the stop clause covers that is not named above stops that step group and is reported;
+  a failure outside its crates in a counted run follows B2.3 (TE2-5); a wasm step mismatch is never re-run into green.
+
+### Notes, one line per FX as it finishes
+- Code first, all twelve FX, then the proofs. fx-self1.log (-s): node --test "# tests 71 / # pass 71 / # fail 0" at
+  the first run (no test failed, existing or new). fx-rust1.log (-s -k): fmt check exit 1 (two rustfmt hunks in my new
+  hash.rs test code; one applied by Edit as rustfmt gave it, the other by shortening the new test's name), npt-lab
+  tests "19 passed; 0 failed; 1 ignored" (bin) and lib 5 in both builds, clippy -D warnings host (npt-lab,
+  npt-hash-wasm, all targets, both builds) and wasm32 (npt-hash-wasm, both builds) exit 0; fx-rust2.log: fmt clean,
+  the new test and h6's by name ok in both builds. fx-loader-probe.log (-x): the new loader on the step folder's two
+  modules (48b5ec5f, d196dd19): one 132-byte target_features section each, imports [], exportProblems [].
+- Fixed forms (the restore reference): check.mjs 343c59c5, check.test.mjs 8db13620, loader.mjs f2f2293f,
+  hash-wasm/clippy.toml 583a796a, hash-wasm/src/lib.rs 9d339055 (unchanged), hash.rs 5677c39c, lab/src/lib.rs
+  a3888046, Cargo.toml d211ca52, Cargo.lock 6e628ab7 (unchanged). New exports: check.mjs `buildInputProblems` and
+  `FAILED_STEP_DIR` (FX-10's place, which its self-test pins), both imported by check.test.mjs; loader.mjs none.
+- **FX-1 done.** Live, environment only (fx-1-env.log, -x -k, exit 1 by design): `node check.mjs --only deps` PASS
+  ("given no rustflags"; the held line's new clause); r1-rr-superset.log's first environment
+  (CARGO_ENCODED_RUSTFLAGS=-Ctarget-cpu=bleeding-edge RUSTFLAGS=-Ctarget-feature=-simd128,-relaxed-simd) FAIL:
+  "CARGO_ENCODED_RUSTFLAGS in the environment holds \"-Ctarget-cpu=bleeding-edge\": no rustflags source may hold a
+  flag ..." and "RUSTFLAGS in the environment holds \"-Ctarget-feature=-simd128,-relaxed-simd\": ..."; 
+  CARGO_BUILD_TARGET=x86_64-unknown-linux-gnu FAIL ("sets the build target"); `RUSTFLAGS=--cfg feature="bites"` FAIL.
+  Plant (fx-1-plant.log, -x -k): check.mjs's `if (!flags.length) continue;` -> `if (true || !flags.length) continue;`
+  (sha256 2ae82fe8): "not ok 63 - no rustflags source may hold a flag ... (U4d2 round 1, FX-1)" and "not ok 38 - the
+  deps step is depsStep, and it calls every check ..." ("# tests 71 / # pass 69 / # fail 2"), and RR-M2's pair PASSed
+  again. Restored by Edit: 343c59c5.
+- **FX-2 done.** Self-test (new, in fx-self1's 71): "the loader reads the module's target_features section ...
+  (U4d2 round 1, FX-2)". Live plant (fx-2-tf.log, -x -k, exit 1 by design), Block 2's form, in hash-wasm's lib.rs
+  (sha256 289ef83a): before dump_word's doc, `#[cfg(target_arch = "wasm32")] #[target_feature(enable = "simd128")] fn
+  planted_simd(x: u32) -> u32 { use core::arch::wasm32::{u32x4_add, u32x4_extract_lane, u32x4_splat};
+  u32x4_extract_lane::<1>(u32x4_add(u32x4_splat(x), u32x4_splat(x))) }`, and in dump_word's body `#[cfg(target_arch =
+  "wasm32")] let i = planted_simd(i);` (a safe call, no `unsafe`). `cargo build --locked --release --target
+  wasm32-unknown-unknown -p npt-hash-wasm`: exit 0 (Compiling npt-hash-wasm, the copy's path); `node check.mjs --only
+  deps`: PASS; `node check.mjs --only wasm`: FAIL 26.4 s, 15 problems, among them "Wasm leg 1: loader: <copy>/.gate/
+  netcode-proof-test/wasm-step/bin/npt-hash-wasm.wasm: refused: the module's target_features section lists +simd128,
+  which plan.md §4.5 leaves off (simd128 and relaxed-simd)" for each Wasm leg, h2's four, and the bites module's
+  hash-map and std-sin legs; native 1 against 2 still 27000/0. Restored by Edit: 9d339055. The two clean modules'
+  acceptance: fx-loader-probe.log, then the counted runs. FX-10 seen live here too: fx-1-env's failed deps run wrote
+  failed-steps/deps.log, this call's passing deps run removed it, and the failed wasm run wrote failed-steps/wasm.log.
+- **FX-3 done.** Self-test (new): "npt-hash-wasm: an `unsafe` block inside a listed export's body is refused at its
+  line ... (U4d2 round 1, FX-3: RR-M1, SEC-U4D2-2, TE-M2)" (every listed export, two forms each, and three deeper
+  ones); the C2R-5 fixture's plant now also puts `unsafe {}` in begin's body (its new-fn case kept; strayAt moved by one
+  line, re-computed in the same edit as planned). TP4 live (fx-3-tp4.log, -x -k, exit 1 by design): lib.rs's begin
+  gains `let bite = unsafe { core::ptr::read_volatile(&bite) };` as its first line (sha256 afc08ca7): `cargo build
+  --locked --release --target wasm32-unknown-unknown -p npt-hash-wasm` exit 0; `cargo clippy --locked --target
+  wasm32-unknown-unknown -p npt-hash-wasm -- -D warnings` exit 0; `node check.mjs --only deps` FAIL
+  "crates/hash-wasm/src/lib.rs:101 has `unsafe` outside an attribute; npt-hash-wasm's only unsafe is the
+  #[unsafe(no_mangle)] of its listed exports (...)". Restored by Edit: 9d339055. TP10 (fx-3-tp10.log, -x -k): in
+  check.mjs's hashWasmProblems, after `if (allowed.has(m.index)) continue;`, a line skipping any `unsafe` between a
+  `pub extern "C" fn`'s `{` and the next "\n}\n" (sha256 95734421): "not ok 54 - npt-hash-wasm: an `unsafe` block
+  inside a listed export's body is refused at its line ..." and "not ok 38 - the deps step is depsStep ..." ("# tests
+  71 / # pass 69 / # fail 2"). Restored by Edit: 343c59c5.
+- **FX-4 done.** loader.mjs: moduleProblems refuses each `WebAssembly.Module.imports` entry ("the module imports
+  \"<module>.<name>\" (a <kind>): the loader gives a module nothing to import"); instantiate passes
+  `Object.create(null)`; the header and instantiate's doc say so. Self-test (new): "the loader refuses every import by
+  module and name before instantiating, Object.prototype's names included (U4d2 round 1, FX-4: SEC-U4D2-1)"
+  (constructor.constructor, __proto__.valueOf, constructor.keys, env.now, and two at once). The re-pin named in the
+  plan: the loader's list test's instantiate assert now expects that refusal (edited in the same step; no unnamed
+  failure). Plant (fx-4-plant.log, -x -k): the loop's source `WebAssembly.Module.imports(module)` ->
+  `WebAssembly.Module.imports(module).filter(() => false)` (sha256 82b42447): "not ok 58 - the loader refuses every
+  import ..." and "not ok 56 - the loader's list is the seven exports ..." ("# tests 71 / # pass 69 / # fail 2"). The
+  same call ran the security seat's sec-probe-imports.mjs on the copy: all four modules refused, but by FX-2's "0
+  target_features sections" (the seat's modules carry none), so that probe no longer isolates the import rule; the
+  self-tests' modules carry a clean section and do. Restored by Edit: f2f2293f.
+- **FX-5 done.** Self-test (new): "the loader refuses a listed name exported as another kind: begin as a global,
+  memory as a function (U4d2 round 1, FX-5: SEC-U4D2-8, TE-L1)" (wasmModule's new `kinds`). TP11 (fx-5-tp11.log, -x
+  -k): `else if (LOADER_EXPORTS[name] !== kind)` -> `else if (false && LOADER_EXPORTS[name] !== kind)` (sha256
+  fc1877fa): "not ok 59 - the loader refuses a listed name exported as another kind ..." ("# tests 71 / # pass 70 /
+  # fail 1"). Restored by Edit: f2f2293f.
+- **FX-6 done.** check.mjs: in EXCEPTION_LEVELS' deny crates (npt-tcpinfo, npt-hash-wasm) unsafeProblems refuses a
+  build.rs at the crate root, a `build` key in the manifest and `include` named other than as an include!,
+  include_str! or include_bytes! call; layoutProblems refuses a custom-build target there; pathProblems' and
+  unsafeProblems' docs and DEPS_CHECKED name it. Self-test (new): "npt-tcpinfo and npt-hash-wasm, the deny-level
+  exceptions, have no build script and name `include` only as a macro call: V4's two forms are refused by name (U4d2
+  round 1, FX-6: SEC-U4D2-4)" (V4's build.rs in each crate; `use std::include as inc;` + `inc!(...)` in begin's body;
+  `use core::r#include as i;` in tcpinfo; both manifest forms; both metadata targets; the macro calls by name, another
+  crate's `use std::include` and npt-bots' build script pass; the real crates pass). Plant (fx-6-plant.log, -x -k):
+  `if (EXCEPTION_LEVELS[crate] === "deny") {` -> `if (false && EXCEPTION_LEVELS[crate] === "deny") {` (sha256
+  a4a5c527): "not ok 55 - npt-tcpinfo and npt-hash-wasm, the deny-level exceptions, ..." ("# tests 71 / # pass 70 /
+  # fail 1"). Restored by Edit: 343c59c5.
+- **FX-7 done.** check.mjs: run() takes a `timeout` (ms) for spawnSync and returns `timedOut` (ETIMEDOUT); wasmStep's
+  `call` gives every non-cargo call WASM_CALL_LIMIT_MS (300,000; not exported) and the cargo builds none; a timeout
+  adds "<label>: still running after 300 s, so it was stopped (the wasm step's limit on each call but its four cargo
+  builds)". wasmWorld's runner records `limit` and passes `timedOut` (fixture; no existing assert changed). Self-test
+  (new): "the wasm step gives each call but its four cargo builds 300 s, and a call stopped by it fails the step naming
+  the call and the limit (U4d2 round 1, FX-7: INF-4)". Plant (fx-7-plant.log, -x -k): `if (r.timedOut)` -> `if (false
+  && r.timedOut)` (sha256 d3d42f95): "not ok 69 - the wasm step gives each call but its four cargo builds 300 s ..."
+  ("# tests 71 / # pass 70 / # fail 1"). Restored by Edit: 343c59c5. Node v22.23.4's spawnSync on a timeout, checked
+  directly (`sleep 5` with timeout 1000): status null, signal SIGTERM, error.code ETIMEDOUT, 1003 ms: what run() reads.
+- **FX-8 done.** hash.rs: private `digest_text(own_len, at, words)` ("layouts differ (<n> and <m> words)" when a dump's
+  length is not this build's own) used by `--digest-field`; private `arm_for(arm, on, e)` used by serve and by
+  compare, which now takes `on` from bitten_name over the recordings its lists hold (one default, EA-9); replay_to no
+  longer filters (its callers pass arm_for's). Module doc updated. Unit test (new, both builds):
+  `hash::tests::a_digest_field_of_a_dump_of_another_length_says_the_layouts_differ`; h6's bites test gains the
+  default's asserts (first listed armed, the second not; `--on`'s armed; an `--on` not listed refused). Plant
+  (fx-8-plant.log, -x -k, exit 101 by design): `if words.len() != own_len {` -> `if false && words.len() != own_len {`
+  (sha256 511f6af8): "test hash::tests::a_digest_field_of_a_dump_of_another_length_says_the_layouts_differ ... FAILED"
+  (left "0000000700000006", right "layouts differ (10 and 12 words)"), "test result: FAILED. 18 passed; 1 failed; 1
+  ignored". Restored by Edit: 5677c39c.
+- **FX-9 done.** check.mjs: the std-sin miss's problem line ends "; glibc picks its sinf by the CPU's features when
+  it loads (an IFUNC), so on another CPU or libc the scan is re-run there (u4d2-brief.md 2.4 (a) item 6; INF-3)".
+  Self-test: one assert added to the existing bites test ("the wasm step judges PM-0004-21's two bites ..."), the
+  whole tail from the libc part to the sentence, within main's 40 lines. Plant (fx-9-plant.log, -x -k): the two
+  sentence strings replaced by "" (sha256 24609228): "not ok 70 - the wasm step judges PM-0004-21's two bites ..."
+  ("# tests 71 / # pass 70 / # fail 1"). Restored by Edit: 343c59c5. The scan file's format is unchanged (the card's
+  CPU-record follow-up is not mine).
+- **FX-10 done.** check.mjs: `FAILED_STEP_DIR` = <checkout>/.gate/netcode-proof-test/failed-steps (exported, pinned by
+  its self-test); main(argv, steps, log, keep): before each step its `<step>.log` is removed; a failed step's whole
+  output is written there and a line "      the step's whole output (<n> lines): <path>" follows its 40 lines; a write
+  that fails is said, not thrown. Self-test (new): "a failed step's whole output is kept in its file under the
+  checkout's .gate/, named in its FAIL lines, and removed when the step next runs (U4d2 round 1, FX-10: TE-L4)".
+  Plant (fx-10-plant.log, -x -k): `writeFileSync(file, ...)` -> `if (false) writeFileSync(file, ...)` (sha256
+  ae91bd34): "not ok 66 - a failed step's whole output is kept ..." ("# tests 71 / # pass 70 / # fail 1"). Restored
+  by Edit: 343c59c5. Live: fx-1-env.log's FAIL lines name failed-steps/deps.log; fx-2-tf.log's wasm FAIL wrote
+  failed-steps/wasm.log (20 lines, 4,994 B) and its passing deps run removed the older deps.log.
+- **FX-11 done (texts; no test, no plant: a rename changes no count).** check.test.mjs: the tests "unsafe_code: an
+  attribute relaxing it outside the three exceptions fails, in every form" and "unsafe code outside the three exception
+  crates fails however the lint was relaxed (review S1)" renamed, the comment "The three exceptions' manifests set their
+  own level"; a grep of the copy's spikes/ files in my lane for "two exception", "the two exceptions" and "two unsafe
+  exception" finds nothing (exit 1). Cargo.toml's libm comment: "sqrtf by x86-64's `sqrtss` and sqrt by its `sqrtsd`"
+  with "arch/x86.rs:13 and :26" cited (read in the registry: libm-0.2.16/src/math/arch/x86.rs:13 "sqrtss {x}, {x}",
+  :26 "sqrtsd {x}, {x}"); carry 29's own text is not touched. check.mjs's EXPORT_INTEGERS doc states SEC-U4D2-3's
+  limit (`type u32 = f64;`, `use core::primitive::f64 as u32;`; export types not read; Q7 (b) and C-U7-2).
+  crates/lab/src/lib.rs: TickHash.recording's doc "The recording both legs replay (the same name on both legs), as its
+  manifest names it." (the struct's own line, "the recording (or run) it replays", left as it is: one doc line).
+- **FX-12 done.** crates/hash-wasm/clippy.toml (new, 583a796a): the HashMap and HashSet type bans and the std clock
+  bans (types and `now` methods), lab's form without tokio lines, its header citing plan.md §4.2's leaf rule. clippy -D
+  warnings host both builds and wasm32 both builds exit 0 (fx-rust1.log). Plant (fx-12-plant.log, -x -k, exit 101 by
+  design): `{ path = "std::cell::RefCell", ... }` added to its disallowed-types (sha256 33635feb): `cargo clippy
+  --locked -p npt-hash-wasm -- -D warnings` and the wasm32 bites build's "error: use of a disallowed type
+  `std::cell::RefCell` --> crates/hash-wasm/src/lib.rs:45:1" (and :65:19, :66:9), exit 101 each: clippy reads the file
+  for this crate. Restored by Edit: 583a796a.
+- Every plant restored and checked: check.mjs 343c59c5, loader.mjs f2f2293f, lib.rs 9d339055, hash.rs 5677c39c,
+  clippy.toml 583a796a. No crates/sim, Cargo.lock, manifest, recordings.json, std-sin-scan.txt or
+  co-initial-dump.txt change.
+
+### End checks
+- Untouched, checked: `git diff --stat -- spikes/netcode-proof/crates/sim` empty; Cargo.lock 6e628ab7 (round 1's: its
+  diff against HEAD is round 1's 7 lines); recordings.json 9979c409, std-sin-scan.txt 905ae057, co-initial-dump.txt
+  76326a64, hash-wasm/Cargo.toml d3aef820 (each the test seat's step-1 value).
+- fx-end-lint.log (-x, exit 0; df 6.6G): `node check.mjs --only fmt,clippy,clippy-wasm32,doc`: fmt PASS 0.6 s
+  (rustfmt's two hunks were applied by Edit earlier: fx-rust1/2); clippy PASS 8.8 s; clippy-wasm32 PASS 1.4 s; doc
+  PASS 68.3 s; "check: all 4 steps pass".
+- **Counted run 1** (fx-check1.log, -x, exit 0; df 6.6G, shared target 7.6G before): the six pre-builds, each exit 0,
+  then `node check.mjs`: "check: all 11 steps pass". fmt 0.6 s; clippy 3.7 s; clippy-wasm32 1.0 s; doc 69.4 s; test
+  257.1 s "measured build: 417 tests passed, 0 failed, 0 reported a skip; bites build: 466 tests passed, 0 failed, 0
+  reported a skip"; deps 1.5 s (read-back "given no rustflags": x86-64 fxsr, sse, sse2; wasm32 bulk-memory,
+  multivalue, mutable-globals, nontrapping-fptoint, reference-types, sign-ext; npt-sim's features one set, measured and
+  bites as round 1); wasm 41.8 s; refs 0.0 s (793 tracked files); marks 3.4 s (81 marks); self 1.9 s "71 of 71 tests
+  passed"; redact 0.8 s (10 of 10; 247 items, 0 findings). Provenance: 4 x "Compiling npt-hash-wasm v0.0.0
+  (<copy>/spikes/netcode-proof/crates/hash-wasm)", 4 x npt-lab's, 6 x npt-sim's.
+- Run 1's wasm line: native 1 vs 2 27000/0 and native vs Wasm 27000/0 (SS-s1, ES-s2, TC-s3 9000 each); h2 equal;
+  hash-map native 1-2 caught at SS-s1 1234 bite[0].hash_map_order (22269414978ac615, cbc363f6bf11cae5), native-Wasm
+  caught (22269414978ac615, f5e8d0e818b168c5), Wasm 1-2 not exercised (f5e8d0e818b168c5 both): not catchable on
+  wasm32; std-sin caught at SS-s1 tick 2, vehicle[8].pos.y (the scan's other catch ES-s2 1000002). Split (s): builds
+  6.4, 6.4, 1.5, 1.5; npt-lab hash 4.3; Wasm SS-s1 3.3, ES-s2 1.0, TC-s3 0.1; compare 0.0; h2 0.1, 0.0, 0.0, 0.0,
+  vectors 0.0; bites 0.0; hash-map native legs 3.0, Wasm 1 3.3, Wasm 2 3.3, compares 0.6, 0.3; std-sin legs 3.0, Wasm
+  3.3, compare 0.1.
+- **Counted run 2** (fx-check2.log, -x, exit 0; df 7.2G before): the six pre-builds, each exit 0, then `node
+  check.mjs`: "check: all 11 steps pass". fmt 0.6 s; clippy 4.0 s; clippy-wasm32 0.9 s; doc 76.7 s; test 258.3 s
+  "measured build: 417 tests passed, 0 failed, 0 reported a skip; bites build: 466 tests passed, 0 failed, 0 reported a
+  skip"; deps 1.4 s (the same read-back, "given no rustflags", and features); wasm 40.5 s; refs 0.0 s; marks 0.8 s; self
+  1.7 s "71 of 71 tests passed"; redact 0.7 s. Provenance: 4 x npt-hash-wasm's, 4 x npt-lab's, 6 x npt-sim's Compiling
+  lines (the copy's path). Its wasm line: 27000/0 both pairs; h2 equal; hash-map native 1-2 caught (04a8a7c3df34e895,
+  9e77033f5be90b25), native-Wasm caught (04a8a7c3df34e895, f5e8d0e818b168c5), Wasm 1-2 not exercised
+  (f5e8d0e818b168c5 both): not catchable on wasm32; std-sin caught at SS-s1 tick 2, vehicle[8].pos.y. Split (s): builds
+  5.8, 6.5, 1.5, 1.5; npt-lab hash 4.0; Wasm 3.3, 1.1, 0.1; compare 0.0; h2 0.1, 0.0, 0.0, 0.0, vectors 0.0; bites
+  0.0; hash-map legs 2.9, Wasm 3.2, 3.4, compares 0.6, 0.3; std-sin legs 2.8, Wasm 3.2, compare 0.1. Shared target
+  7.0G after (7.6G before run 1: it shrank by a hand not mine; this builder cleans nothing); df 7.2G.
+- No failure in either counted run, so no TE2-5 entry (npt-net's TE-M3 test passed in both bites builds), and no
+  wasm step mismatch at any time; the only failing runs were the plants' and the environments' own, each named above,
+  and fx-rust1's `cargo fmt --all --check` (exit 1) on my new hash.rs test code, whose two hunks I applied by Edit
+  (round 1's b8-rust1 had the same; the ruling's Block 6: within the write rule).
+- **Counts as deltas on 416 / 465 / 63 of 63 (round 1's), 11 steps:** measured 417 (+1), bites 466 (+1): npt-lab's
+  `hash::tests::a_digest_field_of_a_dump_of_another_length_says_the_layouts_differ` (FX-8), in each build; self 71 of 71
+  (+8), the new tests: (1) "no rustflags source may hold a flag and no build target may be set, so the read-back is
+  given what cargo gives rustc; RR-M2's negation pair fails naming both sources (U4d2 round 1, FX-1)"; (2) "the loader
+  reads the module's target_features section: simd128 or relaxed-simd used or required is refused, and so is a module
+  with none, two or one that does not parse; the built modules' list passes (U4d2 round 1, FX-2)"; (3) "npt-hash-wasm:
+  an `unsafe` block inside a listed export's body is refused at its line, where that export's own allow lets rustc
+  compile it (U4d2 round 1, FX-3: RR-M1, SEC-U4D2-2, TE-M2)"; (4) "the loader refuses every import by module and name
+  before instantiating, Object.prototype's names included (U4d2 round 1, FX-4: SEC-U4D2-1)"; (5) "the loader refuses a
+  listed name exported as another kind: begin as a global, memory as a function (U4d2 round 1, FX-5: SEC-U4D2-8,
+  TE-L1)"; (6) "npt-tcpinfo and npt-hash-wasm, the deny-level exceptions, have no build script and name `include` only
+  as a macro call: V4's two forms are refused by name (U4d2 round 1, FX-6: SEC-U4D2-4)"; (7) "the wasm step gives each
+  call but its four cargo builds 300 s, and a call stopped by it fails the step naming the call and the limit (U4d2
+  round 1, FX-7: INF-4)"; (8) "a failed step's whole output is kept in its file under the checkout's .gate/, named in
+  its FAIL lines, and removed when the step next runs (U4d2 round 1, FX-10: TE-L4)". Steps 11 (unchanged). On <base>
+  399 / 446 / 52 / 10: 399 + 17 + 1 = 417; 446 + 19 + 1 = 466; 52 + 11 + 8 = 71; 10 + 1 = 11.
+- Existing tests changed, no count change: the C2R-5 deps test (buildInputProblems' line; FX-3's body plant and its
+  strayAt), the loader list test (FX-4's re-pin; wasmModule's new options and default target_features section), the
+  bites test (FX-9's assert), the two renamed (FX-11); wasmWorld records each call's limit (FX-7). Rust: h6's bites test
+  (EA-9's asserts).
+- **The end hashes:** /home/user/Shamble-Frontlines/.gate/u4d2/fx-hashes-end.sha256 (saved with Write from
+  `sha256sum` of the 18 paths `git status --short --untracked-files=all -- spikes` lists, from the copy's root): round
+  1's 17 files plus
+  crates/hash-wasm/clippy.toml; changed in this pass: check.mjs 343c59c5, check.test.mjs 8db13620, loader.mjs f2f2293f,
+  hash-wasm/clippy.toml 583a796a (new), hash.rs 5677c39c, lab/src/lib.rs a3888046, Cargo.toml d211ca52; the other 11
+  equal round 1's (the test seat's step-1 list). `sha256sum -c` from the copy's root: 18 OK, exit 0. `git status
+  --untracked-files=all`: 19 lines (the 18 and this record); HEAD 51520b4; nothing committed.
+- For round 2 (notes, not changes): the security seat's sec-probe-imports.mjs modules carry no target_features section,
+  so FX-2's rule refuses them before FX-4's is reached (fx-4-plant.log); a module with a clean section (check.test.mjs's
+  wasmModule) isolates FX-4. One plan line said `buildInputProblems` would be the only new export; `FAILED_STEP_DIR`
+  is a second, imported by FX-10's self-test to pin the file's place (named above). Nothing stopped: no item needed a
+  file outside the bounds, and every new test failed by name under its plant.
+- Done. Next: the main session (the snapshot by worktree_patch.py, the check against fx-hashes-end.sha256, round 2).
