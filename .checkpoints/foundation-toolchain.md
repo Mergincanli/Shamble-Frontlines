@@ -552,3 +552,10 @@ Count: 7.
   build waits for 2.1b and LANE-RULES (no agents, no workflow); restart it when step 5 begins.
 - workflow run wf_93f9ff1a-f0b (task wt8ab4d43) · script as launched `foundation-toolchain/verify-fold-run1.js` · no
   args · notes `.checkpoints/foundation-toolchain/fold-check-*.md` · launched 19:10 Amsterdam · done 19:24, 4 of 4.
+
+## Step 7, CI on 790ac31 (2026-11-13 ~15:36 Amsterdam)
+All green: toolchain push 43444015165 and pull_request 43444024411; gate (gate and smoke jobs) push 43444015079 and
+pull_request 43444024479. The skeleton printed in the session for the Fable whole read (consultation 8): the root
+pins, the six crates, the five packages, the lockfile summary (64 registry packages, registry.npmjs.org only, integrity
+on all; install scripts: fsevents only), the kit-line diffs, ADR 0002 parts 2-4 and 7; toolchain.yml unchanged since
+fd14855 (printed earlier in the session).
