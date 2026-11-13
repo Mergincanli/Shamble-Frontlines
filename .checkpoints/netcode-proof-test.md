@@ -38,7 +38,7 @@ L2 and L1.** (Mustafa's compact came at about 16:28 UTC; the saver be5gxjhow end
   lines), plan 01ede63d… → 1e631c55… (1,092 → 1,093). Left of L2: section 12 item 9 (section 0's stamps re-set; the
   brief's cites into the plan and carries that L2 moved re-pointed by script), after L1's fold. The moves: carries
   +3 after :343 (carry 74), +6 after :520 (entry 86), +17 after :559 (87, 88); plan +1 after :839 (§5 U4h).
-- **L1's fold script: DONE, not applied** (workflow wf_bb7715a1-d7a, about 16:42-17:13 UTC): u4r_fold.py (sha256
+- **L1's fold script: DONE, not applied** (workflow wf_bb7715a1-d7a, about 16:40-17:11 UTC): u4r_fold.py (sha256
   a9196126…; dry run exit 0, 51 changes, 1,625 → 1,662 lines; notes u4r-fold-notes.md). The independent check
   (u4r-fold-check.md, read in full by the main session): **FAIL**, one High (two "by U4R-Qn" sites, :476 and :680,
   with no ruling words: not folded, not logged), three Medium (the Q14 row's cell is the arithmetic's premise, not the
@@ -46,7 +46,7 @@ L2 and L1.** (Mustafa's compact came at about 16:28 UTC; the saver be5gxjhow end
   without the advisor), two Low (two character changes unlogged; the writer's .pyc, committed by autosave bb412c8,
   removed by `git rm` at 23a34f5). The writer's slips (a shell redirect into the scratchpad; the py_compile write) are
   at the top of its notes. CI green on 8bcbf36 (L2).
-- **Running (since about 17:22 UTC): the advisor's ruling on the fold's questions**, workflow wf_520e62c5-a7d (task
+- **Running (since about 17:14 UTC): the advisor's ruling on the fold's questions**, workflow wf_520e62c5-a7d (task
   wp3mqrimw; script u4r-fold-advisor-wf_520e62c5-a7d.js): u4r-fold-questions.md (the main session's FQ1-FQ7: the two
   sites, section 10's two labels, six stale texts, the rows' cites and item 9's scope, the main session's words incl.
   the check's row fixes, L3's third manifest line and the npt-net fact, the slips); notes advisor-u4r-fold-notes.md,
