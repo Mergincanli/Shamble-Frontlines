@@ -29,9 +29,9 @@ exclude; the netcode spike's cargoConfigFiles check, PR #40); (5) re-grep the la
    directly fails (exit 101). So (a)'s "any lone package ... will fail to build" is a little broad: it fails when cargo
    runs with it as the current package (a spike or scratch crate built in its own folder), not when it is only a path
    dependency. Today's practice in the main folder's .gate/ (275 manifests scanned, the branch worktree, target/ and
-   node_modules/ left out): every agent copy is a git-archive copy that carries its own root [workspace]; the only lone
-   packages are path-dependency stubs (rust-reviewer-r1-star/ext, skeptic-D11/ext/depx and depy) and my control, so
-   nothing there breaks after the merge. The failure is loud and self-explaining: the error names both fixes.
+   node_modules/ left out): 271 of them sit under a [workspace] of their own below .gate/ (whole-workspace copies); the
+   only 4 lone packages are path-dependency stubs (rust-reviewer-r1-star/ext, skeptic-D11/ext/depx and depy) and my
+   control, and the stub pattern still builds as a dependency (above), so nothing there breaks after the merge. The failure is loud and self-explaining: the error names both fixes.
 5. Scope of (a): SPIKE_PLAN.md:12 at 4d78ad6 "A spike is throwaway, lives in `spikes/`"; :84-95 order: the netcode
    proof test, then the sim core spike (then the 60 Hz run), then the boundary spike, and Mustafa's words quoted there
    (:95, :133): "Steps 2.3 to 2.6 keep their order and wait for their results." So spikes in spikes/ do come before
@@ -40,12 +40,12 @@ exclude; the netcode spike's cargoConfigFiles check, PR #40); (5) re-grep the la
 6. No record (a). `git grep -F '[workspace]' / 'own workspace'` at 4d78ad6 outside .checkpoints/: only Cargo.toml:2,
    report :105 (E4b, "the netcode spike keeps its own workspace": a check that the spike complies, not a rule for
    later packages) and r5 research :78 (Cargo's docs on virtual manifests). Broader grep (workspace.exclude, nested
-   workspace, lone crate, "believes it"): nothing on point. Report "Findings for 2.3" (:160-179) and "Follow-ups for
-   later steps" (:181-191), REPO_MAP:16 (the root Cargo.toml's row), CHECKPOINTS §4 and §10: none says it. Holds.
+   workspace, lone crate, "believes it"): nothing on point. Report "## Findings for 2.3" (heading :156, rows to :179) and
+   "## Follow-ups for later steps" (:181-191; "## Decisions needed" at :193), REPO_MAP:16 (the root Cargo.toml's row), CHECKPOINTS §4 and §10: none says it. Holds.
 7. (b) anchors. ADR 0002 :345-346 at 4d78ad6: "ts-rs writes the protocol and message types into
    `packages/types/src/generated/` on `cargo test`, through `TS_RS_EXPORT_DIR` in `.cargo/config.toml` (option D3)":
    no folder named, as the finding says. ADR 0002's migration plan, step 2.4 "Generated types. `packages/types` with
-   the three generators" (:1468-1469 region), so "for 2.4" is the right step.
+   the three generators" (:1465, by `grep -n`; step 2.2 :1450, step 2.5 :1467), so "for 2.4" is the right step.
 8. (b) reproduced in the copy. Root .cargo/config.toml with `[build] target-dir = ".gate/root-target"` and `[env]
    TS_RS_EXPORT_DIR = { value = "packages/types/src/generated", relative = true }`:
    - spikes/ws-spike (own [workspace], no config): `cargo metadata` target = <copy>/.gate/root-target; its test sees
@@ -97,6 +97,19 @@ exclude; the netcode spike's cargoConfigFiles check, PR #40); (5) re-grep the la
     for 2.3, as the fix says. CHECKPOINTS §10 is "Disk hygiene (Mustafa, 2026-11-08; guidance, no rule change)"; §4 is
     where scratch builds are placed, a closer home. REPO_MAP:16 (the root Cargo.toml's row) is where sessions look
     first and is tier-0 docs.
+15. The spike's own tests (the `self` step), closing check 9: PR #40's check.test.mjs read as text at 811a476 (not
+    run). Every depsStep call (:1097, :1127, :1154, :1161, :1164) runs on depsFixture's folder, made by
+    `mkdtempSync(join(tmpdir(), "npt-deps-"))` (:1058) with `CARGO_HOME` inside it (:1091); the only pinned count,
+    "6 crate files and 1 cargo config file(s) read" (:1099), is that fixture's, whose parents are the OS temp folder,
+    not the repository. :882-883 read only the spike's own .cargo/config.toml. The STEPS loop (:1617-1620) records
+    cargo calls with a fake runner. No test runs depsStep on the real spike folder. So a root config holding only
+    [env] (and a target-dir) trips neither `deps` nor `self`; one with rustflags carrying a lint-lowering flag, a
+    `runner`, an `include`, a `rustc`/`rustc-workspace-wrapper` key or a clippy/fmt alias would trip `deps`. Check 9
+    stands, scoped that way.
+16. Not run or inferred: PR #40's check.mjs and check.test.mjs (read only; unreviewed code); report E4b (taken from
+    the report, not re-run); "a spike using ts-rs without its own TS_RS_EXPORT_DIR would write its types into
+    packages/types/src/generated" is an inference: check 8 shows the variable reaching a nested test process, but no
+    ts-rs ran. No CI run (the exclude option was tested locally only).
 
 ## Verdict
 Holds, Low. (a) holds as stated, reproduced: once the root [workspace] (new in this PR; main has no Cargo.toml) is in
@@ -106,11 +119,14 @@ the error is loud and names both fixes, path-dependency stubs and today's whole-
 the 6 members are untouched; the 60 Hz run reuses the netcode spike's harness, so it likely adds no package. (b) holds
 in its core (a root .cargo/config.toml, [env] included, reaches every nested workspace when cargo runs inside the
 tree; reproduced), but its clause "per plan Part 6, it would also trip the netcode spike's cargoConfigFiles check"
-does not hold: PR #40's check reads those files but flags only rustflags/aliases/rustc wrappers/include/runner and
-does not read [env]. Not High or Medium: a documentation gap for standard Cargo behaviour with a self-explaining error.
-Fix: line 1 right (say "not directly in crates/", or "not a member"); also one clause on REPO_MAP:16. Line 2 must drop
-the cargoConfigFiles clause and "waits for the spike's removal"; say instead that a root config's [env] reaches nested
-spikes (a spike using ts-rs without its own TS_RS_EXPORT_DIR would write into packages/types/src/generated), and that
-a sub-folder config is not read by a root-run `cargo test --workspace`, so the alternative is the command line
-(`--config env.TS_RS_EXPORT_DIR...`, tested). The exclude option works as described and breaks nothing found; it
-needs a CI run and the report :116-119 rewording, so 2.3. Docs-only lines break nothing.
+does not hold for a config holding TS_RS_EXPORT_DIR: PR #40's check reads those files but flags only
+rustflags/aliases/rustc wrappers/include/runner and does not read [env], and its tests pin no count for the real
+folder (checks 9 and 15). Not High or Medium: a documentation gap for standard Cargo behaviour with a
+self-explaining error. Fix: line 1 right (say "not directly in crates/", or "not a member"); also one clause on
+REPO_MAP:16 would put it where sessions look. Line 2 must drop the cargoConfigFiles clause and "waits for the spike's
+removal"; the real point is that a root config's [env] reaches nested spikes (inferred: a spike using ts-rs without
+its own TS_RS_EXPORT_DIR would write into packages/types/src/generated), and a sub-folder config is not read by a
+root-run `cargo test --workspace` (tested), so "elsewhere" means the command line (`--config
+env.TS_RS_EXPORT_DIR...`, tested locally), offered as a tested alternative, not a plan. The exclude option works as
+described and breaks nothing found; it needs a CI run and the report :116-119 rewording, so 2.3. Docs-only lines
+break nothing.
