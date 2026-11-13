@@ -33,4 +33,16 @@ Effort xhigh. Read-only on source; notes and ruling via Write/Edit only.
   p6, in that order.
 - Block 4 done (CI): runs 43428174558 (push) and 43428182600 (pull_request), both headSha c49773f..., gate + smoke
   success; no other runs on that commit.
-- Block 5: my run next (main-run.sh, tag adv-check, one 150 2 6).
+- Block 5 done (my run): main-run.sh, lock held 12:52:51, idle 0 s, HEAD 87d80dd; sha256 at start 74d49de7... /
+  aaa6a588...; Compiling npt-net line; binary npt_net-301de27e05915ce7 built 12:52:53 and carries the new message
+  ("one more for a run already under way when the wait began", grep -a: 1). 12:52:53-12:53:58: 300 of 300 exit 0,
+  main-run exit 0, first failure none. Tally: 300 logs, 300 own lines, 0 bad; (2,1,2) 294, (3,1,2) 1, (3,1,3) 5;
+  S = runs+1: 0 (the covered case did not occur in my 300; P2 showed it once in 600). 0 panics; lateness 0.095 to
+  15.3 ms, median 0.24 ms. No polls = 4.
+- Block 6 done (the gate): full `node tools/gate.mjs`: checks 1-4, 5b-5d PASS; 5a FAIL only because this container
+  has no Playwright Chromium (/opt/pw-browsers/chromium_headless_shell-1194 missing): environment, not the commit.
+  `--no-smoke`: GATE PASS, exit 0. The branch changes no legacy/ file vs origin/main (empty list); CI's smoke job
+  success on c49773f in both runs.
+- Block 7 done: ruling written (advisor-te-m3-check.md). Hand-back next.
+- (was) Block 7 plan: Verdict APPROVE; conditions 1-7 met; Lows: CK-1 (card's stale
+  pre-commit sentences), observations on section 4's rev-1 wording, P4's sha lines, P5's Compiling line.

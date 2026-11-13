@@ -80,14 +80,13 @@ re-run the same call if no failure was caught. Then the cause → te-m3-plan.md 
     once). **Running: P3 then P5** (task bsv3s6ik3, from 12:29: p3.log, mode all, 10 x 2, 4 busy loops; then
     p5-check.log, sha256sum of both files and `node check.mjs` counted). **P3, P5, P6 PASS; COMMITTED c49773f**
     ("TE2-5 (c): TE-M3's cause and fix ...", pushed about 12:48 UTC; delay_tests.rs and te-m3-plan.md's section 7
-    record; **CI green**: gate runs 43428174558 push and 43428182600 pull_request). **Running since about 12:53 UTC:
-    the advisor's check of the commit** (wf_a25d667a-fc8, task weib1qo2t; notes advisor-te-m3-check-notes.md, ruling
-    advisor-te-m3-check.md; if cut: resumeFromRunId "wf_a25d667a-fc8"; its run adv-check holds the lane lock: no
-    plant, nothing to restore). It covers (TE-Q4: the diff,
-    conditions 1-7, the P2-P6 logs, its own run `te_m3_loop.sh <tag> one 150 2 6`). TE2-5's rule runs until U4r's
-    merge (TE-Q2). Then P6 (gate), ONE commit
-    (delay_tests.rs and the record), push, CI, the advisor's check of the commit. If cut: the working tree holds the
-    edit (delay_tests.rs 74d49de7…) and no plant (delay.rs aaa6a588…); re-run the interrupted P-step.
+    record; **CI green**: gate runs 43428174558 push and 43428182600 pull_request). **Advisor's check: APPROVE
+    (advisor-te-m3-check.md); TE-M3 closed at c49773f.** (wf_a25d667a-fc8, about 13:00 UTC: conditions 1-7 met; its own
+    run adv-check, 300 of 300 exit 0, no polls = 4 in 900 runs of the fixed test; CK-1 Low, this entry's stale lines,
+    fixed here.) Left from it: TE2-5's rule runs until U4r's merge (TE-Q2; P5 had no test-step failure); U4r's brief
+    gets its TE-M3 line (TE-Q3's words, c49773f, the rule's end) after the advisor's check of the brief returns; any
+    failure in U4r's counted and judged runs comes to the advisor whole, never a retry; .gate/te-m3/ (the adv-check
+    logs too) is kept until the spike's report folds the record (te-m3-plan.md section 7).
 0. **U4e's merge is next** (the advisor's round-2 ruling, advisor-u4e-r2.md: APPROVE on Q1-Q4; NC2-M1 a carry,
    C-U6-16 (a); the merge goes ahead on R9's M1-M9 with Q3's amendments to M5, M8 and M9; T1, T2 (3), T3, T5 and the
    new T7 from advisor-u4e-r2.md, T2 (1), (2), (4), (5), T4 and T6 from advisor-u4e-r1.md; nothing to Mustafa). M1 and
