@@ -1,4 +1,4 @@
-# U4r builder brief: the L1 runner and its judged runs (rev 3, drafted by test-engineer, 2026-11-13)
+# U4r builder brief: the L1 runner and its judged runs (rev 3.1, drafted by test-engineer, 2026-11-13)
 
 Rev 2 was the night shift's (2026-11-11; `git show ed973c9:.checkpoints/npt-u4r-brief/u4r-brief-draft.md`, every cite
 at df8975b), after netcode-architect's check of rev 1 (`git show
@@ -8,8 +8,10 @@ rev 2 brought to the merged state of wave 2 (U4c, U4d with W1-S1, U4j, U4d-F, U4
 cite re-pointed to the head, the rulings since rev 2 applied, the recheck table walked and the day items filled where
 a read settles them. The drafter ran no cargo, check.mjs or node script; the read-only commands it ran (git reads and
 greps, a print-only `python3 -I` line map and two print-only reads of marks.json) and one own slip are in
-u4r-brief-r3-notes.md. Next: netcode-architect's check of rev 3, one revision, then the advisor's check with INF2-4's
-two diffs and proof logs (advisor-u4d2-m9.md Block 2, :223-227), then section 12's launch steps.
+u4r-brief-r3-notes.md. Rev 3.1 is that workflow's one revision after netcode-architect's check of rev 3
+(u4r-brief-r3-check.md: REVISE, 1 High, 4 Medium, 13 Low, all applied: the change list below; the revision's notes
+are u4r-brief-r3-notes.md's "Revision for the check"). Next: the advisor's check with INF2-4's two diffs and proof
+logs (advisor-u4d2-m9.md Block 2, :223-227), then section 12's launch steps.
 
 ## Changes in rev 3 (rev 2 to rev 3; each with its source)
 
@@ -227,6 +229,12 @@ script at launch (section 12 item 3). Every `<base>` and count is filled then to
    - catalogue §3 Field groups (:125-158) and §6 at U4, item 5 (:251-254); its `Resync` row (:90);
    - advisor-u3q.md:180-186 (-18's fresh-delta reading); advisor-u2.md:72-83 (C1, C2) and :97-103 (records; C4);
    - c-u2 (the run-script model, 114 lines);
+   - crates/server/tests/common/mod.rs, U4e's Loopback lab, the working model of 2.1's step (2) (the pump called again
+     after a `Join`, `Decoder::accept` or `reject` on the room's answer, :262-282; each reliable message sent on its
+     type's stream, `stream_of` :47 and :306), with its two known gaps, which U4r's glue closes: it ignores `replaced`
+     and kicked sessions (carry 76), and `stream_of` probes npt-proto's framing offsets and falls back to Control
+     silently, right today only because every full state stays under 262,144 B (SEC-U4E-R2-4, A-R2-1;
+     u4e-review-r2-arch.md:61-68): say how U4r's glue picks the channel;
    - the code as merged at `<base>`: crates/lab (all src files, Cargo.toml, clippy.toml, recordings.json), crates/bots
      (a library stub and two binary stubs), crates/l1 (lib.rs's model doc :1-70 and `L1Net` :1790-1898), crates/room
      (room.rs, input.rs, rewind.rs, events.rs, lib.rs), crates/server (lib.rs, pump.rs, schedule.rs's `new` and
@@ -261,7 +269,11 @@ Each item from plan :751-757, built to the section named.
 - **`L1Scenario`, in RQ8's order** (plan.md:618-624), at each simulated instant: (1) packets due, by arrival time and
   then fate-log index, never delivered in the instant they were sent, P0 included (l1/src/lib.rs:65-70; `poll`
   :1667-1681); (2) the server's I/O step: per session `Decoder::pump(link, now, tick, out)` (server/src/pump.rs:331),
-  then the room's `join`, `receive` and `pump_report` for what it decoded (room.rs:637, :713, :700); (3) the server
+  then the room's `join`, `receive` and `pump_report` for what it decoded (room.rs:637, :713, :700): after `Ok` from
+  `Room::join`, `Decoder::accept()`, on `Err`, `Decoder::reject(link, reason, now)` (pump.rs:265-275; without `accept`
+  the session stays joining and its datagrams count as before the join), the pump called again after a `Join` (it
+  returns after one, pump.rs:328-330; U4e's lab, server/tests/common/mod.rs:262-282), and each `take_control` message
+  sent on the channel its type byte's row of `Limits::TYPES` names (room.rs:603-606); (3) the server
   tick if due (tick k due at base + ⌊k × 10⁹ / TICK_HZ⌋ ns, through U4b's `Schedule` built as
   `Schedule::new(npt_sim::TICK_HZ, npt_sim::LOOP_CATCHUP)`: schedule.rs:77, carry 6), `Room::tick` (room.rs:805), then
   each session's output (`take_datagrams` :595, `take_control` :607) onto its link; (4) the client frames that are due
@@ -320,11 +332,29 @@ Each item from plan :751-757, built to the section named.
   through npt-sim's `Recording` (`Recording::encode`, replay.rs:294), its ticks the room's `tick_input()` after each
   tick (room.rs:579: "what a recording holds"), never a second writer: `generator` 0, a runner's (replay.rs:51-52),
   `first_tick` the run's, `span_ms` the ring the room used (HISTORY_MS 2,000, provisional until U4h: room.rs:33, :446;
-  carry 14's header half). They join crates/lab/recordings.json under carry 82 (2.6): its schema gains a kind or script
-  key and the dispatch `manifest` and `regenerate_all` need (hash.rs:213, :292), the reader checks each entry's name
-  against `[A-Za-z0-9-]+` and bounds `ticks` by `bytes / 12` before it generates anything. The determinism step's route
-  (plan :800-802): 2.6 and U4R-Q2. No ES byte or bandwidth figure is taken from `Recording::synthetic`'s ES recording
-  as ES's load (carry 69).
+  carry 14's header half). Under carry 82 (2.6) the manifest's schema gains a kind or script key and the dispatch
+  `manifest` and `regenerate_all` need (hash.rs:213, :292), and the reader checks each entry's name against
+  `[A-Za-z0-9-]+` and bounds `ticks` by `bytes / 12` before it generates anything. Three things the plan fixes or
+  leaves, stated here:
+  (i) **Which manifest.** "The determinism step keeps its three; the fourth serves the pre-check only" (§4.15
+  :500-501). So the determinism step's three runner recordings (SS P2 seed 1, ES P3 seed 2, TC B1 seed 3, or two by
+  U4R-Q9) join crates/lab/recordings.json beside U4d's three synthetic ones, under carry 82's key. SS P0 seed 4 gets
+  a manifest of its own, crates/lab/precheck-recordings.json (this brief's name), in the same schema and read by the
+  same `manifest`, which the pre-check script regenerates and checks before it replays it; check.mjs's `wasm` step
+  replays every entry of recordings.json on its Wasm leg (check.mjs:2289-2293) and never reads the second file, so
+  check.mjs's manifest read stays out of U4r's lane (it is not among carries 83 to 85).
+  (ii) **What regenerating a runner entry means** ("regenerated at check time ... from a committed recordings
+  manifest (scene, seed, script, generator version)": §4.15 :502-504; today `regenerate_all` refuses every generator
+  but 2, hash.rs:292-305): re-running that entry's `scenario --record` settings (48 clients, the whole L1 scenario,
+  9,000 ticks) inside the `npt-lab hash` call, then the SHA-256 check. Its cost is about 3 × 9,000 / R s on top of
+  the step's 33.1 s warm (R the ticks per second of 7.3: 300 s at R = 90, the whole 5-minute budget; 90 s at R =
+  300), beside the runner entries' own native and Wasm replays: section 5 item 4 and D3.
+  (iii) **Who re-pins them.** Each later change to a crate on the scenario's path (npt-room, npt-server, npt-client,
+  npt-l1, npt-bots, npt-lab's runner; npt-sim and npt-proto already re-pin by U4d2's step) moves the runner entries'
+  SHA-256s, so U4f, U4g and U4h each re-pin them: your report names it as a line for their carries (the main
+  session's to add).
+  The determinism step's route (plan :800-802): 2.6 and U4R-Q2. No ES byte or bandwidth figure is taken from
+  `Recording::synthetic`'s ES recording as ES's load (carry 69).
 - **-57's pairing** (§4.6 :327-328): npt-lab pairs (client, tick, entity) only for the fields that tick's snapshot
   carried and the client decoded, against the server's pre-grid value at that tick (`EntityRecord::raw`, carry 9: the
   room's `sim().entity_records()`, seam.rs:554), and writes `tick.s.pos_err_um`, `tick.s.yaw_err_microdeg` and
@@ -341,7 +371,13 @@ Each item from plan :751-757, built to the section named.
   instant (a fresh delta; deltas queued during the burst do not count)"): per client and burst, one
   `event.burst_heal` with `after_link_ns`, the SimClock ns from the link's return to the first decode of a `Snapshot`
   delta encoded at or after that return (a snapshot of a tick whose run instant is at or after it), and `burst`, its
-  index (SERIES.md:134, :323). A `FullState` never counts (catalogue :150: no baseline). A client that never heals
+  index (SERIES.md:134, :323). A `FullState` never counts (catalogue :150: no baseline). **A decode** here is a non-zero
+  hash in `StepOut::hashes` (client/src/lib.rs:196) for a tick k whose due instant (step (3)'s base + ⌊k × 10⁹ /
+  TICK_HZ⌋) is at or after the link's return, k not the tick of a `FullState` the lab routed to that client since the
+  burst's start; its instant is the SimClock instant of the step that returned it. The sentinel 0 never counts: under
+  PM-0001-18/no-fallback each delta coded against the evicted baseline is refused and filed as 0 (:711-712: "else the
+  group is refused (no baseline) and the tick gets the sentinel"), so a record that took any filed hash would heal
+  the bitten run and miss the bite (its check: r2's -18 bullet). A client that never heals
   writes none, which the ≥ 480 count catches (marks.json -18's second check). Per client and burst, also: whether a
   `FullState` reached that client between the burst's start and its heal (the lab sees it on the FullState channel;
   npt-client never sends `Resync`, R34, so after the join only the room's overflow resync sends one:
@@ -355,14 +391,21 @@ Each item from plan :751-757, built to the section named.
   (carry 75); every client is admitted before the room has stamped 32,768 events past that start (about 30 s of SS's
   events), a later admission coming to the advisor first (carry 75). -58's judged runs are U4g's (C2); U4r's contract
   test runs these settings (r2).
-- **The lead** (carry 74): each endpoint's `with_lead` (client/src/lib.rs:291-295; 1 by default, :262) from the run's
-  profile, its largest one-way delay (half the round trip plus half the jitter: `Profile::one_way_ns` and
-  `half_jitter_ns`, l1/src/lib.rs:215-221) in ticks rounded up, plus 1, recorded beside `cmd_timing` in the header.
+- **The lead** (carry 74, by U4R-Q14): each endpoint's `with_lead` (client/src/lib.rs:291-295; 1 by default, :262)
+  from the run's profile, recorded beside `cmd_timing` in the header. By U4R-Q14 (a) it covers the round trip:
+  `npt_sim::ticks_for_ms((rtt_ns + jitter_ns) / 1,000,000) + 1` (sim/src/ticks.rs:35, rounding up: carry 39; every
+  profile is in whole ms, l1/src/lib.rs:166-175), so P0 1, P2 and B1 5, P3 7, each within `CMD_CATCHUP` = 8
+  (room/src/input.rs:59-61). Carry 74's own formula (its largest one-way delay, half the round trip plus half the
+  jitter, `Profile::one_way_ns` and `half_jitter_ns`, l1/src/lib.rs:215-221, in ticks rounded up, plus 1) gives 1, 3,
+  3 and 4, which leave most P2, P3 and B1 commands late (U4R-Q14); it stands until the advisor's ruling amends it, and
+  this brief rewords no rule. By U4R-Q14 (b) the bots give no command at a client step whose newest tick did not move
+  (2.2). Either way r2 reports each short run's late count beside the commands sent (carry 74).
 - **Session handling** (carry 76; tests r8 and r9): when `Room::join` reports a replacement (`Ok((slot, true))`,
   room.rs:632-637), the lab sends the old session `Kick(replaced)` and drops its `Decoder` and link before it routes
   anything else; when the room kicks a client (`ClientSlot::kicked`) or takes its `Leave`, the lab drops that session.
 - **Scripted spawns and teleports** (carry 49): the runner refuses one above World's stated clamp bound (TUNE-2) as a
-  scenario error.
+  scenario error. A unit test shows the refusal can fire: a scripted teleport above the bound is refused by name and
+  one at the bound is accepted.
 - **The -30 pre-check's replay clients** (their encoder, their pacing, the tick base, and the per-client records the
   RTT rule reads) and the late-command bite: section 7.2.
 - **The sizes for fixes.rs** (§2 :150; plan :797-799): on L1 B1 runs of the stress scene, each client's per-tick
@@ -379,6 +422,26 @@ Each item from plan :751-757, built to the section named.
   builds (plan :756): the brawl (the stress scene's 48 soldiers fighting in 3 × 16, holding fire so the scene's shot
   rate can meet PM-0001-2's band: §4.13 :428-447; and a short ES suite: carry 59) and the open-loop scripts (the
   contract test's suites, U4R-Q4). The TC shooter is U4h's (:837); the cheats and the never-acker are U4f's (:808-809).
+- **When the bots give a command, and the view time they stamp** (plan silent; this brief's reading of the merged
+  endpoint and room):
+  - at most one command per client step (30 a second: plan.md E12), given to `ClientEndpoint::input` at the step's
+    instant (RQ8's step 5), and `None` at the 60 Hz frames between steps: a second command in one step is stamped for
+    the tick already buffered and counted late (room/src/input.rs:107-113; room.rs:797). `None` too until the
+    endpoint holds a snapshot (`newest_tick()` `Some`; before it the stamp is tick 0, client/src/lib.rs:394, late once
+    the room has run a tick for that client). And, by U4R-Q14 (b), `None` at a step whose newest tick did not move
+    since the bot's last command: per step `input(None, &received, now)` first, then `input(Some(command), &[], now)`
+    only if `newest_tick()` moved (a call with nothing received only stamps: client/src/lib.rs:379-410); the tick so
+    skipped runs option B's repeat (input.rs:135-141), and r2 reports per run the steps without a command beside the
+    commands sent.
+  - The view time: a client without `Interp` (U4g's) shows the newest snapshot, so each command carries `view_tick` =
+    the endpoint's `newest_tick()` and `view_fraction` = 0, which `rewind_at` holds at every lead of 1 or more: at
+    tick T's fill the ring holds the ticks up to T − 1, the history being pushed after the step (room.rs:819). A
+    fraction above 0 needs `view_tick + 1` too (rewind.rs:8-11), which at lead 1 is T itself, so every firing command
+    would be refused. Never the default 0: the ring holds only the last 2 s, and past tick 65,535 (as -17's
+    `tick_start` = 63,736 runs reach) the endpoint replaces a view time more than 65,535 ticks old by the command's own
+    tick (client/src/lib.rs:401-406), which the ring never holds at that tick's fill. r2 and r6 report
+    `rewinds_refused` per suite, 0 expected; a value above 0 on the SS P0 seed 4 recording run stops the work before
+    the pre-check (by carry 40 it would make every pair VOID: 7.1's order).
 - The button bits and press-counter indices come from npt-sim's constants (carry 17; `Command::FIRE` and
   `Command::PRESS_FIRE`, as the room reads them: room.rs:840, :855). At the head npt-bots depends on npt-link,
   npt-proto, npt-client, npt-net and npt-log, not on npt-sim (bots/Cargo.toml:20-25), npt-proto re-exports no npt-sim
@@ -402,7 +465,8 @@ Each item from plan :751-757, built to the section named.
   "release", ...)`, c-u2:55 and :61; .cargo/config.toml:3-4), as plan §7.1 item 6 has judged runs (`CARGO_TARGET_DIR`
   unset: :917-918). Read each artifact's path from cargo's `--message-format=json` messages instead (check.mjs's form
   for its release builds, WASM_BUILDS, :2120-2140), so that a script is right under the main folder's cache and under
-  the shared target alike, and say so; the main session chooses the target at the judged runs (section 12 item 8).
+  the shared target alike, and say so. The judged runs use the main folder's own cache, `CARGO_TARGET_DIR` unset (plan
+  §7.1 item 6); a move to the shared target comes to the advisor first (section 12 item 8).
 - Each script also times each npt-lab process it starts (wall time around the call) and writes it per run, for the
   ticks-per-second figure (2.4 r5).
 - The sets and their files: section 7. One script per set or one for all is your choice; say which.
@@ -412,8 +476,12 @@ Each item from plan :751-757, built to the section named.
 ### 2.4 Tests (plan :758-765), each named in your report with its file
 - **r1, the runner's twin test** (§4.11 :406-407): two processes, same seed and scenario: equal fate-log hashes, equal
   per-tick server and client hashes over the run (carry 62 (f): a run and its twin log `h` over the same ticks). Bite: a
-  HashMap-ordered client order (marks F29), bites build only, planted in npt-lab's client loop: the two processes'
-  per-tick hashes must differ. Each process logs its order digest; equal digests mean "not exercised", never caught or
+  HashMap-ordered client order (marks F29), bites build only, planted in npt-lab's client loop, chosen per instance
+  (§4.11 :399-401) by a crate-local id that only npt-lab's tests select (l1's `with_model_bite` form:
+  l1/src/lib.rs:756-766, :1840-1848), its site carrying `#[allow(clippy::disallowed_types,
+  clippy::iter_over_hash_type)]` in the form of l1's bite site (:768-771): lab/clippy.toml:6-7 bans HashMap and
+  HashSet, and the workspace denies `iter_over_hash_type` (Cargo.toml:106). The two processes' per-tick hashes must
+  differ. Each process logs its order digest; equal digests mean "not exercised", never caught or
   missed (the rule §4.14 :476 gives the sim's hash-map bite). Say how the second process is started (U4d's D-2 re-runs
   itself through `std::env::current_exe()`: plan :612).
 - **r2, the contract test** (§4.12 :412-415; plan :758-761; the advisor's condition 5, :119-122): a short scenario per
@@ -436,10 +504,16 @@ Each item from plan :751-757, built to the section named.
     measured phase on each short L1 P0 run, and what follows from it (3.2);
   - carry 73: one short tick16 bite run past the wrap (`ticks_below_wrap` = 30), the judge's outcome the mismatch figure
     FAIL with at least one mismatch, never INVALID;
-  - carry 74: on each short run the commands that arrived late (the room's `late` count) beside the commands sent;
+  - carry 74: on each short run the commands that arrived late (the room's `late` count) beside the commands sent,
+    with the lead used (2.1, U4R-Q14 (a)) and the client steps without a command (2.2, U4R-Q14 (b)); a run with more
+    than 1 % of its commands late comes to the advisor before its marks count;
   - carry 75: `decoded_hash_mismatch_count` 0 on a run whose event start is far from 0 (-58/lt-event-seq's setting, 3
     below the wrap, among them);
-  - carry 77 (c): each client's `ClientEndpoint::stale()` sum (client/src/lib.rs:359) on each short L1 run.
+  - carry 77 (c): each client's `ClientEndpoint::stale()` sum (client/src/lib.rs:359) on each short L1 run;
+  - this brief's, for 2.1 and 2.2: `rewinds_refused` per suite (0 expected: 2.2's view time); and -18's heal record
+    shown to bite: on a short B1 run with PM-0001-18/no-fallback no client holds a heal within 500 ms of a burst's
+    link return, while the clean run holds one per client and burst (a record that took the sentinel 0 or a
+    `FullState`'s tick as a decode would pass the bitten run).
   The short runs' length is not in the plan: say which you used. Negative cases for (b) and (c): U4R-Q11.
 - **r3, `replay`'s U4 test** (plan :761-764; the advisor's condition 9): one short L1 run (SS P2) logs each client's
   received bytes under .gate/; `replay`, re-decoding them, gives each client's logged hash at every (client, tick)
@@ -460,8 +534,9 @@ Each item from plan :751-757, built to the section named.
   (plan :764-765): section 7.3.
 - **r6, the pre-check's pacing test** (this brief's, for 7.2's pacing rule, which the plan leaves silent): a short clean
   replay of the SS P0 recording (its first ticks, enough for every replay client's first commands; say how many) over
-  both legs gives `tick.v.late_count` 0 on both legs, every command run at its stamped tick, and equal per-tick World
-  hashes. Its negative case is the late-command bite (2.5), which must give exactly that leg's one late command.
+  both legs gives `tick.v.late_count` 0 on both legs, `rewinds_refused` 0 on both legs, every command run at its
+  stamped tick, and equal per-tick World hashes. Its negative case is the late-command bite (2.5), which must give
+  exactly that leg's one late command.
 - **r7, the RTT rule's unit test** (only if U4R-Q10 rules (b')): the rule's code on doctored per-client records: a
   first-sample instant after the first command's run instant gives VOID; equal instants give not VOID; no first-sample
   instant on the L1 leg before the first command gives VOID; the Loopback leg's "Some(0) from the start" never gives
@@ -487,7 +562,7 @@ and passes in the clean build. The bites U4r runs judged but other units planted
 |---|---|---|
 | the twin test's HashMap-ordered client order (marks F29) | npt-lab's client loop, bites only | r1: the per-tick hashes of the two processes differ; equal order digests mean "not exercised" (§4.14 :476) |
 | the re-decoder's floored grid (plan :763-764) | `ReplayX86`'s decoder (id: 2.4 r3) | r3: at least one (client, tick) mismatch |
-| PM-0001-30/late-command (plan :791-792; marks.json:6567) | the pre-check's replay client, one leg: the command stamped T and every later one held out of every `Input` until tick T has run on that leg, then T sent first (delayed, never dropped), the later ones after it (7.2) | 7.2: the pair VOID by `late_count` alone (that leg's `late_count` expected 1), never a pass |
+| PM-0001-30/late-command (plan :791-792; marks.json:6567) | the pre-check's replay client, one leg: the command stamped T and every later one held out of every `Input` until tick T has run on that leg, then T sent first (delayed, never dropped), the later ones after it, all in one `Input` of at most 8 (the pre-check's lead at most 7) or T alone in an `Input` sent first (7.2) | 7.2: the pair VOID by `late_count` alone (that leg's `late_count` expected 1), never a pass |
 | PM-0001-30/wallclock (plan :791; marks.json:6563) | "a wall-clock read in the pump for one leg's sessions" (npt-server, U4e's crate): U4R-Q6; the read changes a sim input on that leg on every run (7.2) | 7.2: the pair valid and the comparer naming a tick; a PASS is a missed bite, reported |
 | carry 62 (h)'s bite, only if its check goes into -17 | "a client that writes null and incomplete 1 for a refused group": npt-lab's client writer (its id then lives in npt-lab's sources) | -17's L1 P0 setup check fails on that bite's run (carry 62 (h); U4R-Q2 (b)) |
 
@@ -561,7 +636,7 @@ Seventeen entries: 40, 49, 58, 59, 60, 62, 63, 69, 73, 74, 75, 76, 77, 82, 83, 8
 | 63 (FU-3, FU-7's log half) | U4R-Q13 | crates/log is not in U4r's lane unless the ruling gives it |
 | 69 (NF-L1's U4r half) | 2.1 (the runner recordings) | |
 | 73 (tick16's judged half) | 2.1's logs (the client writer's placement), 2.4 r2 | the -17/tick16 judged bite run (7.1) depends on it |
-| 74 (the endpoint's lead) | 2.1 (the lead), 2.4 r2 | a short run with more than 1 % of its commands late comes to the advisor before its marks count |
+| 74 (the endpoint's lead) | 2.1 (the lead), 2.2 (the steps without a command), 2.4 r2, U4R-Q14, D13 | a short run with more than 1 % of its commands late comes to the advisor before its marks count; the carry's formula is one-way and the stamp needs the round trip, and duplicate stamps under jitter count late at any lead: U4R-Q14 asks the advisor before launch, and the brief rewords no rule |
 | 75 (the event-number base) | 2.1 (the starts), 2.4 r2 | |
 | 76 (ending a session) | 2.1 (session handling), 2.4 r8 and r9 | a security boundary: security-auditor's seat (section 12 item 7) |
 | 77 (U4r's readings of the room and client) | (a): 2.1's logs; (b): 2.1's -18 record, 7.1's -18 row; (c): 2.4 r2 | |
@@ -638,22 +713,27 @@ binding on every cargo, rustc and rustdoc call in your worktree, check.mjs's and
    :917-918).
 
 **Your files, and only these** (Lanes :881; carries 82 to 85 and A13 by their words; anything more only by a ruling of
-section 10): crates/lab/ (src/ and tests/; recordings.json's schema and entries, carry 82; U2's `probe` and `machine`
+section 10): crates/lab/ (src/ and tests/; recordings.json's schema and entries, carry 82; precheck-recordings.json,
+new, for SS P0 seed 4 alone: 2.1 (i); U2's `probe` and `machine`
 kept as merged; U4d2's `hash`, `HashCompare` and `TickHash` kept as merged but for carries 82 and 83); crates/bots/src/
 but src/bin/, crates/bots/tests/ and crates/bots/clippy.toml (new, A13); ops/runs/c-u4r-*.mjs; check.mjs and
 check.test.mjs for carries 83 (b) to (d), 84 and 85 only (or ops/runs/det-u4.mjs in place of the step's runs, if the
 Evidence decision moves them: carry 84); crates/hash-wasm/loader.mjs's header sentence (:13-14) only (carry 85 (a)).
 - **Waiting on a ruling, so not yours until it comes:** crates/lab/Cargo.toml, crates/bots/Cargo.toml and Cargo.lock
   (U4R-Q1); marks/SERIES.md and marks.json's one check (U4R-Q2 (a) and (b)); crates/log (U4R-Q13); the wallclock bite's
-  site in crates/server/src (U4R-Q6). A part that needs one stops, goes in your report, and the rest is built.
-- **Never:** crates/sim, crates/proto, crates/l1, crates/link, crates/room, crates/server (but U4R-Q6's site, if ruled),
+  items in npt-server (U4R-Q6 (a): the site in pump.rs, `Decoder::with_bite`, `npt_server::BITES` widened to four, and
+  its pin in crates/server/tests/schedule.rs:347; loopback.rs:347's one-home test reads the list whole). A part that
+  needs one stops, goes in your report, and the rest is built.
+- **Never:** crates/sim, crates/proto, crates/l1, crates/link, crates/room, crates/server (but U4R-Q6 (a)'s items, if
+  ruled),
   crates/client, crates/log (but U4R-Q13's), crates/judge, crates/hash-wasm (but loader.mjs's sentence), crates/net,
   crates/tcpinfo; marks/ (but U4R-Q2's); docs/; results/ (the main session's runs write it: §7.2 :927-928).
 - **Files:** "<<P3>>" (the advisor's U4d-F ruling, T4 item 1's sentence, word for word). **Plants:** "<<P8>>" (the
   advisor's U4j round-2 ruling, B6, word for word), then restored and the sha256 checked against the clean file. A
   `cp`, `mv` or `tee`, and a `>` or `2>` into a file, are shell writes too, in any folder, the session scratchpad
   included (u4d2-brief.md section 4; this brief's drafter slipped so once: u4r-brief-r3-notes.md): read an older
-  revision with `git show <sha>:<path>`, and let the runner's log hold a command's output.
+  revision with `git show <sha>:<path>`, and let the runner's log hold a command's output. An agent that slips says so
+  at the top of its notes (the advisor's U4d-F ruling, R6, df-ruling :317-318).
 - **Git** only in your worktree (`cd <worktree> && git ...`), never `git -C` or `git -c`; commit nothing and push
   nothing; the main session merges (plan :924-926).
 - npt-lab's sources never spell another crate's bite id as a string literal: check.mjs reads every exact-id literal
@@ -689,14 +769,19 @@ Run from spikes/netcode-proof/ in your worktree, each as a counted run under sec
    wasm, refs, marks, self, redact: :2468-2503), so "check: all 11 steps pass" (:2548). Each run's runner call holds
    section 4 rule 3's builds before check.mjs. Report both runs' last lines, the test step's two counts, the self count,
    the `deps` and `wasm` lines, the `wasm` step's seconds labelled as d2-r2 Block 5 labels them (warm for dependencies;
-   the machine's uptime in the notes: :252-254), and each run's provenance lines.
+   the machine's uptime in the notes: :252-254), and each run's provenance lines. A check.mjs run in which TE-M3's
+   test failed is recorded under TE2-5 (section 4) and is not one of these two: each of the two is a whole run in
+   which all 11 steps pass (d2-r1 :298-299).
 2. clippy on the host and on wasm32, in both builds, warnings as errors: check.mjs's clippy and clippy-wasm32 steps
    (`lintBothBuilds`, :1935); the wasm32 step covers WASM_CRATES (LEAF plus npt-tcpinfo: :39, :1891), which holds
    neither npt-lab nor npt-bots, so U4r's crates are linted on the host only (crates/bots/clippy.toml read there). State
    each step's line.
 3. fmt: check.mjs's fmt step (`cargo fmt --all --check`, :2469); a diff is applied by Edit (section 4's write rule).
 4. **The `wasm` step's time with U4r's recordings** in the manifest, if they join it (carry 82), each run labelled:
-   against the 5-minute budget, beside the base's 33.1 s warm and 61.6 s cold (section 11's D3). Over 300 s, it comes to
+   against the 5-minute budget, beside the base's 33.1 s warm and 61.6 s cold (section 11's D3). Expected: each runner
+   entry regenerated by its `scenario --record` settings inside the `npt-lab hash` call (2.1 (ii)) adds about 9,000 /
+   R s, so the three about 3 × 9,000 / R s (300 s at R = 90; 90 s at R = 300), plus their replays; state the measured
+   R (r5) beside the step's time. Over 300 s, it comes to
    the advisor as U4r's det-u4.mjs question (m9 Block 1, :117-119, :144-145); the step's runs move to
    ops/runs/det-u4.mjs only on the advisor's ok (plan :800-802).
 5. The run scripts: each npt-lab command line they issue, run by hand on a short setting (2.3), with its output line.
@@ -759,7 +844,11 @@ part's validity `pre:PM-0001-2` (plan :418-424; marks.json -17's and -18's L1 pa
 their number nor their profile; the scripts follow c-u2's model, one run per bite at seed 1 (c-u2:80-84), with the
 part's own settings (length, scene, clients), so a bite is shown on a run its part would accept; each bite run is in the
 bites build and each measured run in the measured build (U4j's C4: eval.rs:539-570). -58's judged runs are U4g's, not
-here (C2).
+here (C2). Each run's lead is 2.1's (U4R-Q14), in its header. Each run's warm-up lasts until all 48 clients are
+admitted and their first snapshots resolved, before the room's first measured hash for any slot (carry 62 (d)), each
+admission inside carry 75's bound (32,768 events past the event start, about 30 s of SS's events); its after phase
+lasts until every measured tick is resolved (carry 62 (e)). Both lengths go in the header, and 7.3's totals add them
+once measured.
 
 | Part (marks.json) | Layer, profile | Scene, clients | Length | Seeds | Bites (planted by) and their run settings | What the part checks |
 |---|---|---|---|---|---|---|
@@ -775,7 +864,9 @@ here (C2).
 | -30 pre-check, suite `precheck-30`: not a part, no mark (7.2) | leg 1 `loopback`; leg 2 L1, P0 | SS (the recording), 48 replay clients | the SS P0 recording's length (seed 4; about 5 min if it holds 9,000 ticks: §4.15 :483-484) | the recording's seed 4 only (one recording; "3 seeds per part" is for parts) | wallclock (U4R-Q6) and late-command (U4r's), each run as a pair | 7.2 |
 
 - **The order inside the set:** the four recordings first (the pre-check needs SS P0 seed 4), then the pre-check, then
-  the judged sets; the ticks-per-second measure (7.3) before any of them.
+  the judged sets; the ticks-per-second measure (7.3) before any of them. A `rewinds_refused` above 0 in the SS P0
+  seed 4 recording's run stops the set before the pre-check (by carry 40 every pair would be VOID: 2.2's view time).
+  In the build, D13's short P2 run at both leads comes before any `scenario --record`.
 - **Before -17's judged runs:** carry 62 (h)'s outcome (r2's measured-phase sum of `tick.s.snap_incomplete` on each
   short L1 P0 run): 0 on every one puts its setup check, with its bite, into -17's L1 P0 part first (U4R-Q2 (b));
   not 0 sends the cause to the advisor first.
@@ -787,6 +878,12 @@ silent, what you state:
   (layer `L1`). Replay clients send the SS P0 recording's commands (§4.15) to the room on both legs, re-encoded as
   `Input` (stamped ticks, view times, sequences and press counters from the recording; the ack from what that leg's
   replay client decodes live), and the room computes its own Rewinds (§4.15 :487-491). Option B (`cmd_timing` B).
+  Each recorded tick's spawns, teleports and attribute changes go into both legs' rooms by `Room::script` before that
+  tick (room.rs:617-630; the room puts them into that tick's `TickInput`, :831-838), or the report shows the SS P0
+  seed 4 recording holds none. On the Loopback leg the same RQ8 order runs over Loopback pairs: its instants are the
+  ticks' due instants and the replay clients' send instants, and a datagram sent at step 3 is received at steps 4 and
+  5 of the same instant (Loopback's arrival is the send instant and it delivers at `arrival_ns <= now_ns`:
+  link/src/lib.rs:154-164, :185-193).
 - **The depth (changed at the head: R17).** Option B has no depth setting: the room measures how far ahead of the tick
   last run the newest buffered command was (`ClientSlot::buffer_depth_ticks`, room.rs:289-292; input.rs:28-29,
   :142-145), and holds at most `CMD_CATCHUP` = 8 commands per client (input.rs:56-58, :118-120; limits.rs:17). So "the
@@ -817,7 +914,8 @@ silent, what you state:
   (`World::new(scene, seed, first_tick)`: world.rs:701; the room's first tick is the one after the World's hit volumes'
   tick: room.rs:424-426, :442), recorded in both legs' headers beside the lead;
   (b) the pacing rule: when a replay client sends the command stamped T (for example at the SimClock instant at which
-  tick T − L is due, L the lead, 1 ≤ L ≤ 8, the same instant on both legs), why it reaches the room before tick T runs
+  tick T − L is due, L the lead, 1 ≤ L ≤ 7, so that the late-command bite's T and every later command fit one `Input`
+  of at most 8: proto/src/input.rs:47-49; the same instant on both legs), why it reaches the room before tick T runs
   on both legs at P0 and is still kept by the buffer, and how the `Input`'s redundancy covers it; a command the
   recording repeats (its sequence again) is sent once, since the room takes a second copy as a repeat (input.rs:84-89)
   and option B reruns the last command on a tick with none (input.rs:136-141), as in the recording;
@@ -885,7 +983,8 @@ silent, what you state:
     never re-planted into a fail without saying so.
   - **late-command** (changed at the head: R17). One replay client on one leg holds the command stamped T **and every
     later command** out of every `Input` until tick T has run on that leg (option B then reruns its last command at T:
-    input.rs:136-141), then sends T first, with the later ones after it in the same `Input` (the room offers an
+    input.rs:136-141), then sends T first, with the later ones after it in the same `Input` (L ≤ 7, so T and the
+    later commands fit one `Input`, 8 in all; or T goes alone in its own `Input`, sent first) (the room offers an
     `Input`'s commands oldest first: room.rs:791-792 over the newest-first list, proto/src/input.rs:47-49). So T arrives
     as the newest sequence received, passes the forward compare and is counted late once (input.rs:84-89, then
     :111-117; room.rs:797), and the later commands reach the room in time for their own ticks. Delayed, never dropped (a
@@ -937,7 +1036,10 @@ not measured here) and the judge's passes:
 Assumptions, each to be replaced by the measured value: runs one at a time (c-u2 starts one process at a time:
 c-u2:65-84; §7.2 :927's "one set at a time"); every bite run at its part's full length; each runner recording and the
 pre-check's legs 9,000 ticks (5 min: §4.15 :483-484); every run costing what SS with 48 clients costs (the ES and TC
-recordings likely less); no run repeated; -58's runs gone to U4g (C2; rev 2 counted 144 s for them). The tests' own runs
+recordings likely less); no run repeated; -58's runs gone to U4g (C2; rev 2 counted 144 s for them); each run's
+warm-up and after phase left out (7.1: their lengths go in each header and are added here once measured; carry 75's
+bound keeps each admission inside about 30 s of SS's events, so the warm-ups add at most about 31 runs × 30 s = 930 s
+if each used the whole bound; the after phases are not bounded here). The tests' own runs
 (the contract test's short runs, the class audit, `replay`'s test, the twin test) run in the build's and the merge's
 test steps, not in this set. Which R applies cannot be known before a run: the estimate is the arithmetic, never the
 answer.
@@ -953,8 +1055,9 @@ answer.
   run), the clients admitted with each one's admit tick and any drop or kick, and the result with its reason; for the
   late-command pair, the delayed command's tick and that leg's `late_count`; no verdict.json (the judge never reads
   these runs).
-- **The recordings' SHA-256s** (plan :801) in runs.txt and in the committed recordings manifest (carry 82; §4.15
-  :502-504), and U4d2's determinism step green on them (in check.mjs if the step stays within 5 minutes, else through
+- **The recordings' SHA-256s** (plan :801) in runs.txt and in the committed manifests (the determinism step's three in
+  recordings.json under carry 82, SS P0 seed 4 in precheck-recordings.json: 2.1 (i); §4.15 :502-504), and U4d2's
+  determinism step green on the three (in check.mjs if the step stays within 5 minutes, else through
   ops/runs/det-u4.mjs at every merge that touches sim, proto, room or hash-wasm, on the advisor's ok: plan :800-802;
   section 5 item 4).
 - **Raw logs** under .gate/netcode-proof-test/runs/<set>-<short>/ (c-u2:9-10, :48), never committed (plan §7.2 :928).
@@ -1190,11 +1293,20 @@ sessions, bites build only" (plan :791)?
   on every run, whatever the machine's ticks per second (7.2; marks.json:6563: "a wall-clock read on one transport's
   command path"): on the commands the pump passes on, never in its RTT or ping code, which nothing in the room reads at
   U4r, nor in a rate bucket, whose starving depends on the machine.
-- Options: (a) U4r's lane gains that one bites-only site with its allow in crates/server/src/pump.rs, and the id's line
-  in `npt_server::BITES` (schedule.rs:251, or a list in lib.rs beside it), nothing else; (b) the main session plants it
-  in its own commit before U4r's build; (c) the site moves into npt-lab's leg glue (not "in the pump", and npt-lab's own
-  clock ban, lab/clippy.toml, would need an allow too).
-- Recommendation: (a): the plan plants each bite where its code lives (§4.14 :454), and U4r is the unit that shows it.
+- What a pump site needs at the head: `Decoder` has no bite selection of its own (`Decoder::new` takes only a
+  `Quant`, pump.rs:224-247), and §4.11 forbids a static (:399-401), so a per-instance pump bite needs a new public
+  constructor; and `npt_server::BITES` is a fixed `[&str; 3]` built from U4b's `BITE_IDS` (schedule.rs:240-251,
+  re-exported at lib.rs:16), pinned whole by crates/server/tests/schedule.rs:347, so adding an id changes its shape.
+- Options: (a) U4r's lane gains in npt-server, bites builds only: `Decoder::with_bite(self, &str) -> Option<Decoder>`
+  (a pub item beyond §4.1, named in the report under this ruling, as U4E-Q3 had U4e name its pump ids: wave1
+  :453-455); the site in `pump` on that instance's `Input`s, with `#[allow(clippy::disallowed_methods,
+  clippy::disallowed_types)]` (server/clippy.toml:6-17); `npt_server::BITES` widened to four (schedule.rs:251, or a
+  list in lib.rs re-exported in its place), with server/tests' pin (schedule.rs:347) updated; reviewed by rust-reviewer
+  and engine-architect; (b) the main session plants the same items in its own commit before U4r's build; (c) the site
+  moves into npt-lab's leg glue: one allow in npt-lab's glue (lab/clippy.toml:8-15 bans the clock), no npt-server
+  edit, but not "in the pump" (plan :791), so the bite's words change by the ruling.
+- Recommendation: (a): the plan plants each bite where its code lives (§4.14 :454), and U4r is the unit that shows it;
+  its cost is one pub item and one list's shape, each named and reviewed.
 
 **U4R-Q7 (-17's clean runs' `tick_start`).** Do -17's clean L1 runs start at `tick_start` = 63,736 like its tick16 bite
 runs?

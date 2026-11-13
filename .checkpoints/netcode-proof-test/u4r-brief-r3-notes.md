@@ -1,5 +1,8 @@
 # U4r brief rev 3: test-engineer's notes (workflow draft step, 2026-11-13)
 
+SLIP (R6, df-ruling :317-318): in the draft step I wrote one read-only copy of df8975b's plan to the scratchpad with a
+shell redirect (`git show ... > plan-df.md`), against the write rule; details at B3a below. None in the revision.
+
 Deliverable: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u4r-brief.md (rev 3).
 Head read: (filled in block 1)
 
@@ -246,3 +249,35 @@ Block log:
   bots give None until newest_tick() is Some (folded into F-r's line).
   late-zero applies to -30 only (marks.json:6544, :6570), so the duplicates make no -17 run INVALID; carry 74's 1 %
   rule is what trips.
+- V2 done (cites at e913b43; spikes/ = cc8595d but TE-M3's delay_tests.rs in the working tree): client :196 (sentinel
+  doc), :336 newest_tick, :379-410 input (stamp :394, view-time swap :401-406), :548-560 see, :712 (no baseline ->
+  sentinel); room input.rs: forward compare :81-89, late :107-113, Full :114-116, CMD_CATCHUP :59-61, getter :63-66,
+  take :129-145 (the brief's :84-89, :111-117, :56-58, :118-120, :60-63 are off by 3-4: re-pointed in rev 3.1);
+  room.rs:797 (Late counted), :805-829 tick (history push :819 after the step), :831-838 scripts into fill_input,
+  :603-606 take_control's channel doc, :617-630 script; rewind.rs:8-11 holds (fraction > 0 needs tick_a + 1);
+  pump.rs:224-247 new (Quant only, no bite), :265-275 accept/reject; schedule.rs:240-251 BITE_IDS/BITES [&str; 3],
+  re-exported server lib.rs:16; pins server/tests/schedule.rs:347 and loopback.rs:347; server/clippy.toml 17 lines,
+  lab/clippy.toml 16; workspace Cargo.toml:104-106 (disallowed_* and iter_over_hash_type deny); l1 MODEL_BITE_IDS
+  :756-766, allow site :768-771, with_model_bite :1840-1848; server/tests/common/mod.rs stream_of :47, accept/reject
+  :272-276, send on stream_of :306; proto input.rs:47-49 (newest first, at most REDUNDANCY_CAP = 8, limits.rs:17);
+  link Loopback send :154-164 (arrival = send instant), poll :185-193 (arrival <= now); check.mjs:2289-2293 (every
+  manifest entry into the wasm loader); hash.rs:213-260 manifest, :292-321 regenerate_all (generator != 2 refused);
+  replay.rs:50-51 (generator 0 for a runner's); npt_sim::ticks_for_ms (ticks.rs:35, rounds up); plan :500-501
+  ("The determinism step keeps its three; the fourth serves the pre-check only."), :502-504, :396-401 (§4.11 bites
+  per instance), §7.1 item 6 :917-918; df-ruling R6 :317-318; d2-r1 :298-299, :716-719; m9 :215-216; the card's
+  INF2-4 record (P3 at 11:01 UTC with u4d2-run.sh, card lines 139-140 today; cited by item, not line). Stamps at
+  e913b43 equal section 0's (plan 01ede63d, plan.md 3ca4e12a, carries 8b7f165e, history 88bc195f, u4r-run.sh 349b51ad).
+- V4a edits made in the brief: title rev 3.1 and the header's "Next"; section 1 item 6 (U4e's lab as the model, F-n);
+  2.1 step (2) (F-n), the four recordings (i)-(iii) (F-a), -18's decode (F-k), the lead by U4R-Q14 (F-j), carry 49's
+  unit test (F-b). Next: 2.2 (F-l, F-r), 2.3 (F-h), 2.4 (F-g, r2 bullets), 2.5, 3.2, section 4, 5, 7, 10, 11, 12.
+- V4b edits made: 2.2's new bullet (commands per step, None before the first snapshot and at a step whose newest did
+  not move by U4R-Q14 (b); the view time newest/0 and rewinds_refused 0: F-r, F-l); 2.3 (F-h); r1 (F-g); r2's carry 74
+  bullet and a new bullet (rewinds_refused, -18's bite check: F-l, F-k); r6 (rewinds_refused); 2.5's late-command row
+  (F-o); 3.2 row 74. Next: section 4 (lane, Q6 wait list, R6 line), 5 (F-i, F-a), 7.1-7.4, 10 (Q6, Q14), 11 (D13),
+  12, input.rs cites, change list.
+- V4c edits made: section 4 lane (precheck-recordings.json), wait list (Q6 (a)'s items; only schedule.rs:347 pins
+  BITES, loopback.rs:347 reads it whole: checked), Never line, R6's slip line (F-f); my notes' SLIP line moved to the
+  top (R6); section 5 item 1 (F-i), item 4 (F-a cost); 7.1 preamble (lead, warm-up, after phase: F-s, F-j) and order
+  (rewinds_refused stop, D13 first: F-l, F-j); 7.2 scripts and Loopback instants (F-q, F-p), L <= 7 (F-o, both
+  places); 7.3 assumptions (warm-ups at most 31 runs x 30 s = 930 s: F-s); 7.4 manifests (F-a). Next: 10 (Q6, Q14),
+  11 (D13), 12 (F-d, F-e, Q14, F-h), input.rs cites, change list, self-check.
