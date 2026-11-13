@@ -11,8 +11,24 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-13 about 16:45 UTC; read this first after a compact or a cut): U4r's launch conditions, L3 then
-L2 and L1.** (Mustafa's compact came at about 16:28 UTC; the saver be5gxjhow ended its 110 minutes at 16:27.)
+**NOW (2026-11-13 about 17:55 UTC; read this first after a compact or a cut): U4r's launch, L4 running.** L3
+DONE (4e91830, its counted run PASS), L2 DONE (8bcbf36), **L1 DONE at a6b3410** (the brief is rev 3.2, sha256
+362e771e…, 1,682 lines; u4r_fold.py 9e3a123c…; the bullets below). **Running (since about 17:52 UTC): L4 and
+section 12 item 9's script**, workflow wf_d38bc2ef-a49 (task w1p1izvpz; script u4r-fill-l4-wf_d38bc2ef-a49.js):
+fill-writer (general-purpose, opus, xhigh; notes u4r-fill-notes.md) writes u4r_fill.py, dry run only: P6 = the head
+when it runs (spikes/ = 4e91830's; D1's counts from L3's counted run, read from its log), P7 = u4r-run.sh, P1-P5 and
+P8-P16 by item 3's rules, section 0's plan and carries stamps re-set, L2's moved cites re-pointed (section 10 left
+whole; N7a's re-pointed), R11 and the four L3 files' cites re-walked; then fill-checker, adversarial (notes
+u4r-fill-check.md). If cut: `Workflow({scriptPath, resumeFromRunId: "wf_d38bc2ef-a49"})`. **On return:** read the
+dry run (the copies are asserted equal to their sources; read the fills, stamps, re-points and R11's words in full) and
+every Medium or higher finding; stop the saver; apply; commit; push; restart the saver. **Then L6:** one builder
+(general-purpose, opus, xhigh, `isolation: worktree`), the brief rev 3.2 as filled (its path and sha256 in the
+prompt), u4r-run.sh, D13 first; tell it its worktree's start commit and that `git diff --quiet <base> HEAD --
+spikes/` exits 0 (as U4d2's builder recorded, its notes' Block 0); at most three agents with the builder counted.
+Follow-ups (Low, no push on their own): the fold's rewrap split three code spans across lines (u4r-fold-check2.md,
+words unchanged); the advisor's own premise on npt-net's tree (FQ6 (b)).
+**The day's earlier blocks (2026-11-13 about 16:45 UTC): U4r's launch conditions, L3 then L2 and L1.** (Mustafa's
+compact came at about 16:28 UTC; the saver be5gxjhow ended its 110 minutes at 16:27.)
 - **L3 COMMITTED at 4e91830** (pushed 16:32): crates/lab/Cargo.toml `npt-bots.workspace = true`, crates/bots/Cargo.toml
   `npt-sim.workspace = true`, and the workspace table's `npt-bots = { path = "crates/bots" }` (the `.workspace = true`
   form needs it; it adds no edge: a third line beyond the ruling's two, named in the commit for the advisor's next
@@ -57,15 +73,15 @@ L2 and L1.** (Mustafa's compact came at about 16:28 UTC; the saver be5gxjhow end
   L3: F6-1), Lows N2-N7b, F6-2, F6-3, F-D13; F6-4 to F6-9 replace A2.1-A2.4, A2.7, A2.8 (the tests move to 4e91830),
   F3-6 replaces Q9.2. No Mustafa item. The questions file's title says "about 17:20 UTC"; it was written about 17:12
   (kept as the advisor read it, sha256 645488be…).
-- **Running (since about 17:31 UTC): the fold script's revision and its second check**, workflow wf_ce5794b5-55e (task
-  w01a340zn; script u4r-fold-l1b-wf_ce5794b5-55e.js): fold-reviser (general-purpose, opus, xhigh; notes appended to
-  u4r-fold-notes.md, "Revision for the fold ruling") edits u4r_fold.py by the ruling's :187-193, dry run only; then
-  fold-checker-2, adversarial (notes u4r-fold-check2.md). If cut: `Workflow({scriptPath, resumeFromRunId:
-  "wf_ce5794b5-55e"})`. On return: read the dry run in full (pass bars: carry 74's 1 %, D13's stop) and every Medium
-  or higher finding; apply; commit; then L4 (items 1-3 with P16; P6 and D1's counts from L3's counted run) and item 9
-  (re-stamp; L2's moved cites, section 10 left whole; R11 re-walked).
-- **The check-in is enabled** (16:39 UTC; next 18:34). **The saver runs as b9f761m21** (since 16:44:43 UTC; b24prddnh
-  stopped for L2's commit).
+- **The fold script's revision and its second check: DONE** (workflow wf_ce5794b5-55e, about 17:31-17:47 UTC):
+  u4r_fold.py 9e3a123c… (693 lines); its dry run exit 0, 74 changes, 1,625 → 1,682 lines, the fold ruling's 32 id
+  bullets each used once, "by U4R-Q" left only at C27, section 1 item 5 and section 12 item 4. The second check
+  (u4r-fold-check2.md): **PASS**, two Lows (the rewrap split three code spans, words unchanged: a follow-up; the stamp
+  of the passed script is 9e3a123c…, not the first version's a9196126…). **The main session read the dry run in full**
+  (the log, its words list, the whole diff: carry 74's 1 % rule unchanged; D13's stop widened by the advisor to any
+  press refusal). **Applied and COMMITTED at a6b3410** (pushed; the saver stopped first, its terminated autosave
+  bb2f91e; restarted as bxb8xf01r).
+- **The check-in is enabled** (16:39 UTC; next 18:34). **The saver runs as bxb8xf01r** (since about 17:50 UTC).
 **NOW (2026-11-12 about 17:45 UTC; read this first after a compact or a cut).**
 **At 12:53 UTC Mustafa reported usage at 92 % ("make sure to save progress (Also for the agents)"):** everything saved
 and pushed, the two running advisor agents' notes with it (advisor-u4r-brief-notes.md: B0 done, B1 started; and
