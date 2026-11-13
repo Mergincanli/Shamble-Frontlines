@@ -37,6 +37,11 @@ run at or after the deadline always ends the pump, and the test's count of runs 
 :1707 while the end reads it again at :1862, so a run that starts before the deadline and reaches :1862 after it ends
 with `polls_after_deadline` 0 (a lead to test against the panic, not a finding yet). If cut: nothing to restore;
 re-run the same call if no failure was caught. Then the cause → te-m3-plan.md → the advisor, with U4r's brief.
+  - Loop 1 (11:47-12:05, .gate/te-m3/loop.log): the whole binary 60 times (30 in each of 2 loops): every run exit 0,
+    169 passed, 0 failed: no failure. The VM reports steal time (/proc/stat: 8,379 jiffies at 12:06, about 1 h
+    up), so a host-side stall is a second lead. Loop 2 (task b9gvshw83, from about 12:08; te_m3_loop.sh extended:
+    tag, mode, busy loops; .gate/te-m3/one-h6.log): TE-M3's test alone with --nocapture, 300 runs in each of 2
+    loops, 6 busy loops, each run's steal time logged.
 0. **U4e's merge is next** (the advisor's round-2 ruling, advisor-u4e-r2.md: APPROVE on Q1-Q4; NC2-M1 a carry,
    C-U6-16 (a); the merge goes ahead on R9's M1-M9 with Q3's amendments to M5, M8 and M9; T1, T2 (3), T3, T5 and the
    new T7 from advisor-u4e-r2.md, T2 (1), (2), (4), (5), T4 and T6 from advisor-u4e-r1.md; nothing to Mustafa). M1 and

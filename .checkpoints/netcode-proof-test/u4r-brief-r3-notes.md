@@ -197,3 +197,5 @@ Head read: (filled in block 1)
 - B7c written: sections 3 (3.1 P1; 3.2 table of 17 entries + carry 66 not U4r's; 3.3 P13-P15), 4 (rules 1-9, lane,
   P2-P5, P8-P12, TE-M3, no-retry), 5, 6 (18 items). Next: 7 (7.1 without -58; 7.2 rewritten for C6, C9-C13; 7.3
   recomputed; 7.4), 8.
+- B7d written: sections 7 (7.1-7.4) and 8 (8.1-8.4). Fix at the end: lab/clippy.toml is 16 lines (":1-15" ->
+  ":1-16" in C3 and 2.2). Next: 9 (table), 10 (questions + ruled table), 11, 12; then the end fixes and self-check.
