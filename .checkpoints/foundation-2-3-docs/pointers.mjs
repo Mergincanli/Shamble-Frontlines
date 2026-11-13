@@ -22,15 +22,15 @@ export function four() {
 
 const TEXT = {
   // P1 to P4: the sites that quote his words of 2026-11-10.
-  quote: (q) => `_Pointer (2026-11-13, foundation 2.3's first docs pass): for foundation step 2.3, his words of 2026-11-10 ` +
+  quote: (q) => `_Pointer (2026-11-13, foundation 2.3's first docs pass): for foundation step 2.3 only, his words of 2026-11-10 ` +
     `quoted above are changed by his decision of 2026-11-13 (\`docs/DECISIONS.md\`, the entry "${ENTRY}"): "${q}"_`,
   // P5: SLICE-ORDER's condition 3.
-  slice: (q) => `_Pointer (2026-11-13, foundation 2.3's first docs pass): for foundation step 2.3, overtaken in part by his ` +
+  slice: (q) => `_Pointer (2026-11-13, foundation 2.3's first docs pass): for foundation step 2.3 only, overtaken in part by his ` +
     `decision of 2026-11-13: the entry "${ENTRY}", above; its words: "${q}"_`,
   // P7: ROADMAP's v2 line, inline after 2.1a's pointer.
-  roadmap: (q) => `pointer, 2026-11-13: for step 2.3, changed by his decision of 2026-11-13, \`docs/DECISIONS.md\`: "${q}"`,
+  roadmap: (q) => `pointer, 2026-11-13: for foundation step 2.3 only, overtaken in part by his decision of 2026-11-13, \`docs/DECISIONS.md\`: "${q}"`,
   // P8: STATUS's Next item (docs-keeper's placeholder line).
-  status: (q) => `_Pointer (2026-11-13): for step 2.3, his decision of 2026-11-13 (\`docs/DECISIONS.md\`): "${q}"_`,
+  status: (q) => `_Pointer (2026-11-13): for foundation step 2.3 only, his decision of 2026-11-13 (\`docs/DECISIONS.md\`): "${q}"_`,
 };
 
 // Block sites: after the n-th 2.1a pointer block in a file, ended by the first line that ends with `end`.
@@ -110,10 +110,35 @@ export function apply(root, only, write) {
   return { problems, done, q };
 }
 
+// C2: every 2026-11-13 pointer in a file, its wrapped lines joined, indentation and italic marks stripped; its quote
+// (the text between ': "' and the closing '"') must be a substring of the decision cut from A2.
+export function joinedQuotes(text) {
+  const lines = text.split('\n');
+  const out = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (!lines[i].includes(MARK.slice(1)) && !lines[i].includes('pointer, 2026-11-13:')) continue;
+    let j = i;
+    let joined = lines[i].trim();
+    while (!/"_?\)?\s*$/.test(joined) && j + 1 < lines.length && lines[j + 1].trim() !== '') joined += ` ${lines[++j].trim()}`;
+    joined = joined.replace(/^_|_$/g, '');
+    const m = joined.match(/: "(.+?)"_?\)?(?:\s.*)?$/);
+    out.push({ line: i + 1, quote: m ? m[1] : null, joined });
+    i = j;
+  }
+  return out;
+}
+
 // The check: every site carries its pointer once, right after its anchor, with the quote equal to four().
 export function verify(root) {
   const q = four();
   const problems = [];
+  const d = decision(messageText(ITEMS[1].uuid));
+  for (const f of [...new Set([...SITES.map((x) => x.file), ROADMAP.file, STATUS.file])]) {
+    for (const p of joinedQuotes(readFileSync(join(root, f), 'utf8'))) {
+      if (!p.quote) problems.push(`${f}:${p.line}: a 2026-11-13 pointer with no quote found`);
+      else if (!d.includes(p.quote)) problems.push(`${f}:${p.line}: the quote is not a substring of his decision`);
+    }
+  }
   for (const site of SITES) {
     const lines = readFileSync(join(root, site.file), 'utf8').split('\n');
     const b = blockSite(lines, site);

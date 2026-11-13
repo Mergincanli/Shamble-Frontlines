@@ -1,4 +1,31 @@
-# Plan: foundation 2.3, the first docs pass (foundation-2-3-docs), revision 1
+# Plan: foundation 2.3, the first docs pass (foundation-2-3-docs), revision 2
+
+## Revision 2 (2026-11-13): the advisor agent's APPROVE of revision 1 folded
+The advisor agent approved revision 1 (ec16b30bcb359f85f2974ffc55096c28a464f78d) with ten Low conditions; its notes:
+`advisor-plan-rev1.md`. "If revision 2 only folds in C1 to C10, it needs no new plan review." This revision folds them,
+and its answers to Q1 to Q7, and changes nothing else:
+- C1: #40's row: its facts read at the build and again on the final head (the API said head fe1460a, updated
+  2026-11-13T19:17:42Z, during the review). Folded in §6.
+- C2: the pointer quote check joins wrapped lines and strips indentation and italic marks before the substring test
+  against A2-DECISION; a negative control drops one word. Folded in §4.
+- C3: "for foundation step 2.3 only" in P, P5 and P7 (and P8). C4: P7 says "overtaken in part", as P5. Folded in §4.
+- C5: §4's table lists as "left, not overtaken": ADR 0002 :1097 and :1432; "before the foundation's preview step" at
+  SPIKE_PLAN :142 and :420 and ADR 0006 :583, :1000 and :1200 (that step is 2.6, which still waits). Folded in §4.
+- C6: the 2.2 report's diff check names six places: the header note, the M1 note, L1 (:227-230), L2 (:301), L2 again
+  (:345) and L3 (:133). Folded in §5.
+- C7: the skeptics start only after the workflow's two reviewers have returned; never more than 3 agents at once; the
+  returned items counted. Folded in §9.
+- C8: his #48 go is compared with both saved pages that hold message 96467900-...
+  (`...list_events-1794595922657.txt` and `...-1794595937159.txt`); any mismatch stops the work; the DECISIONS.md quote
+  still comes from merge commit 4d21c1a. Folded in §2.
+- C9: the advisor tool is consulted before each step of §10 is declared done (his moment 5), and at moments 2 to 4 as
+  they come up, one checkpoint line each. Folded in §10.
+- C10: the report's header names the last commit that holds the notes; the checkpoint's essentials are folded into the
+  report before the deleting commit. Folded in §10.
+- Answers: Q1 (a); Q2 (a); Q3 both archive lines, named in the report as fixes beyond the five; Q4 R-WORDS and R-STATE
+  plus the verifier; Q5 (a), one clause each that points at the 2026-11-13 entry, without paraphrasing its limits; Q6
+  adopted (C8); Q7 a read-only `git fetch` and `git show`, citing the SHA and the time read, the content treated as the
+  other lane's data.
 
 - **Task:** step 2.3's first docs pass, from Mustafa's words of 2026-11-13 ("First: the docs pass"), his task message in
   this session (transcript message e5fa7ca0-6494-44d0-8366-81fc612c7958, 18:47:55 UTC).
@@ -39,7 +66,9 @@ The script `words.mjs` (in the notes folder) reads each source:
   them must give the commit's block back byte for byte (2.2's `go51()` method). It is also checked byte for byte against
   the 2.2 session's chat record: message 96467900-83d8-4b54-8f8b-7884a0dc0fde in session_019YNMUSc7FA68ujhLgXfEJA's
   events, read with the sessions API (list_events) and saved by the harness to this session's tool-results folder. The
-  script parses that saved page, which is not tracked; a reviewer can re-read the event with get_event.
+  script parses that saved page, which is not tracked; a reviewer can re-read the event with get_event. C8: the
+  second saved page that holds the same message (`...list_events-1794595922657.txt`) is compared too; any mismatch
+  stops the work. The DECISIONS.md quote comes from the merge commit, the source his words name.
 - **Not words:** `/advisor fable` (18:30:08 UTC, a command; its output said this conversation keeps Opus 5.5 as the
   advisor model until `/clear` or `/compact`) and the workflow-authoring skill, loaded with A2 (18:47:56 UTC). The
   appendix's intro names both.
@@ -96,8 +125,8 @@ quote is copied from the appendix.
 The script `pointers.mjs` inserts the pointer text P and checks its quote as a substring of A2-DECISION:
 
 ```
-_Pointer (2026-11-13, foundation 2.3's first docs pass): for foundation step 2.3, his words of 2026-11-10 quoted above
-are changed by his decision of 2026-11-13 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-13, 18:47:55 UTC:
+_Pointer (2026-11-13, foundation 2.3's first docs pass): for foundation step 2.3 only, his words of 2026-11-10 quoted
+above are changed by his decision of 2026-11-13 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-13, 18:47:55 UTC:
 his decision on step 2.3 (step 2.3 may be planned now), and step 2.3's task"): "Step 2.3 may be planned now. The parts
 of step 2.3 that need no proof test's result may be built before the proof tests report, after my go on the plan. Every
 gate check that needs a result joins later, when that result is in, with its pass marks unchanged. Steps 2.4 to 2.6
@@ -116,9 +145,9 @@ in tracked files outside `docs/reports/`, the archive included (grep of main 4d2
 | P2 | `docs/SPIKE_PLAN.md:131-133` | P added |
 | P3 | `docs/SPIKE_PLAN.md:441-444` (the foundation entry's "Depends on") | P added, indented like 2.1a's pointer |
 | P4 | ADR 0002 :1440-1443 (migration plan, step 1) | P added, indented |
-| P5 | `docs/DECISIONS.md:850-852` (SLICE-ORDER condition 3; 2.1a's pointer) | a variant: `_Pointer (2026-11-13, foundation 2.3's first docs pass): for foundation step 2.3, overtaken in part by his decision of 2026-11-13: the entry "Taken by Mustafa, 2026-11-13, 18:47:55 UTC: ...", above; its words: "<the same four sentences>"_` |
+| P5 | `docs/DECISIONS.md:850-852` (SLICE-ORDER condition 3; 2.1a's pointer) | a variant: `_Pointer (2026-11-13, foundation 2.3's first docs pass): for foundation step 2.3 only, overtaken in part by his decision of 2026-11-13: the entry "Taken by Mustafa, 2026-11-13, 18:47:55 UTC: ...", above; its words: "<the same four sentences>"_` |
 | P6 | `docs/DECISIONS.md:534-543` (the 2026-11-10 entry) | the header sentence (§3) |
-| P7 | `docs/ROADMAP.md:93` (the v2 line's "pointer, 2026-11-11: ...") | `; pointer, 2026-11-13: for step 2.3, changed by his decision of 2026-11-13, `docs/DECISIONS.md`: "<the four sentences>"` inside the same parentheses, after 2.1a's pointer |
+| P7 | `docs/ROADMAP.md:93` (the v2 line's "pointer, 2026-11-11: ...") | `; pointer, 2026-11-13: for foundation step 2.3 only, overtaken in part by his decision of 2026-11-13, `docs/DECISIONS.md`: "<the four sentences>"` (C3, C4) inside the same parentheses, after 2.1a's pointer |
 | P8 | `docs/STATUS.md:38` (Next, item 2: 2.1a's pointer) | STATUS is rewritten (§6); its Next item for step 2.3 carries P's quote |
 | S1 | CLAUDE.md :22 and :55; `.claude/agents/advisor.md:108` | left: kit files, and no kit edit in this pass (his words); his decision is the rule there; step 2.3's plan lists the edits |
 | S2 | `docs/V2_PHASE0_BRIEF.md:20-21` and `:144` | left: his and the Advisor's brief; no session edits it (BRIEF-STALE) |
@@ -126,10 +155,13 @@ in tracked files outside `docs/reports/`, the archive included (grep of main 4d2
 | S4 | the five "before the foundation" lines 2.1a left (ADR 0002 :38, :724, :1129, cited then as :1115; SPIKE_PLAN :100, :202) and the other drafts' lines (ADR 0001 :603, :1100, :1301, :1771; ADR 0003 :1373; ADR 0004 :1245, :1251; ADR 0005 :92; ADR 0006 :1469, :1482; the register :72, :292) | left: the archive's follow-up "For the drafts' next revision: five "before the foundation" lines with no pointer" covers them; Q5: one clause added to it naming the 2026-11-13 decision too (recommended) |
 | S5 | `docs/ROADMAP.md:114` and `:142` (2.2's and 2.1a's entries name the 2026-11-10 decision) | left: true as history |
 | S6 | `docs/DECISIONS.md:550` ("3. Name what in steps 2.3 to 2.6 must wait") | left: his task words of 2026-11-10 |
+| S7 | ADR 0002 :1097 (the layout research before the foundation) and :1432 ("with the netcode proof test first") | left, not overtaken (C5) |
+| S8 | "before the foundation's preview step": SPIKE_PLAN :142 and :420; ADR 0006 :583, :1000 and :1200 | left, not overtaken: that step is 2.6, which still waits (C5) |
 
-**Checks:** each pointer's quote is a substring of A2-DECISION (and so of A2); each pointer sits on the line right after
-its anchor (2.1a's pointer's last line); P1 to P5 and P7 appear exactly once each; SPIKE_PLAN's and ADR 0002's diffs are
-added lines only.
+**Checks:** each pointer's quote is a substring of A2-DECISION (and so of A2), tested after joining the pointer's wrapped
+lines and stripping indentation and italic marks (C2), with a negative control that drops one word from one pointer;
+each pointer sits on the line right after its anchor (2.1a's pointer's last line); P1 to P5 and P7 appear exactly once
+each; SPIKE_PLAN's and ADR 0002's diffs are added lines only.
 
 ## 5. The five report fixes
 Their source: PR #48's description, and the advisor agent's findings in its review of 9b20b67, read from the 2.2
@@ -176,8 +208,9 @@ In `docs/STATUS_ARCHIVE.md`:
 
 **Checks:** the 2.2 report's Appendix A is byte-identical to origin/main's (sha256 of the text from the appendix heading
 to the end); the body-quote check of 2.2's `report-appendix.mjs` (its `check()`, with the appendix's own blocks as the
-sources) still finds every "<words>" (A<n>) quote (10 today); the 2.2 report's diff touches only the five places; L2's
-log lines are read and quoted in the report.
+sources) still finds every "<words>" (A<n>) quote (10 today); L2's
+log lines are read and quoted in the report. The 2.2 report's diff touches only six places (C6): the header note, the
+M1 note, L1 (:227-230), L2 (:301), L2 again (:345, the CUT-ESCAPE row) and L3 (:133).
 
 ## 6. STATUS, ROADMAP, the archive and REPO_MAP (docs-keeper, then the main session's pointer script)
 docs-keeper (its own agent file, Opus 5.5, at its file's effort), with a brief that gives the facts and their sources:
@@ -195,8 +228,8 @@ docs-keeper (its own agent file, Opus 5.5, at its file's effort), with a brief t
   - main's line: the required checks are gate and smoke; toolchain runs but is not required until step 2.3
     (REQUIRED-CHECK); CI green on 4d21c1a, with the two run ids;
   - In flight: #48's row out (to the archive) and this PR's row in. #40's row only from what can be read: the API
-    (draft, head b4d1f0a, updated 2026-11-13 18:57 UTC), and its branch's checkpoint read-only by `git show` after
-    `git fetch`, never switched (Q7); otherwise carried over with its date;
+    and its branch's checkpoint read-only by `git show` after `git fetch`, never switched (Q7), read at the build and
+    again on the final head (C1), with the SHA and the time read cited and the content treated as the other lane's data;
   - Next: step 2.3 (this docs pass, then the plan after it merges), with P's quote through a placeholder the script
     fills;
   - Waiting on Mustafa: his go for this PR (risk tier 1, decision docs); #48's line out;
@@ -245,7 +278,8 @@ risks, findings for step 2.3's plan, Decisions needed, For Mustafa, and Appendix
   - R-STATE reviews adversarially STATUS, ROADMAP, the archive, REPO_MAP and the five fixes against git, the API and CI
     logs.
   - Both are general agents on Opus 5.5 at effort max (his words: "reviewers and the verifier may run at effort max").
-    Each Medium or higher finding is then tested by a skeptic of its own (Opus 5.5, max, at most 3 at a time); the
+    Each Medium or higher finding is then tested by a skeptic of its own (Opus 5.5, max, at most 3 at a time), started
+    only after both reviewers have returned (C7: never more than 3 agents at once; the returned items counted); the
     session checks the Lows. One fix pass.
 - **The verifier:** a general agent reading main's `verifier.md`, as in 2.2 (Opus 5.5, max), on the head after the fix
   pass, until PASS.
@@ -260,6 +294,8 @@ risks, findings for step 2.3's plan, Decisions needed, For Mustafa, and Appendix
   items counted.
 
 ## 10. Steps and commit points
+The advisor tool is consulted before each step below is declared done (his moment 5), and at moments 2 to 4 as they
+come up, with one checkpoint line each (C9).
 0. The checkpoint and this plan saved; the saver started; the draft PR opened; the advisor tool consulted (1).
 1. The advisor agent's plan review (APPROVE, REVISE or ESCALATE) against this plan's commit SHA; its conditions folded
    into revision 2.
@@ -270,8 +306,9 @@ risks, findings for step 2.3's plan, Decisions needed, For Mustafa, and Appendix
 5. The report's body; E1 to E8; the gate; push; CI read.
 6. Review round 1, the skeptics, one fix pass.
 7. The verifier, until PASS.
-8. The advisor tool (moment 5); the saver stopped; the last commit deletes `.checkpoints/foundation-2-3-docs*` by hand
-   (CI runs); the advisor agent's review of that SHA; the PR body; ready; stop for his go. The end message gives the PR's
+8. The advisor tool (moment 5); the checkpoint's essentials folded into the report; the saver stopped; the last
+   checkpoint commit made; the deleting commit by hand writes that commit's SHA into the report's header (C10) and deletes
+   `.checkpoints/foundation-2-3-docs*` (CI runs); the advisor agent's review of that SHA; the PR body; ready; stop for his go. The end message gives the PR's
    number and head SHA, the run ids of gate, smoke and toolchain on that head (push and pull_request), and what is needed
    from him.
 

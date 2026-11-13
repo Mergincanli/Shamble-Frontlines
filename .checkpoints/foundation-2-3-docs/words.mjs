@@ -12,7 +12,10 @@ import { execFileSync } from 'node:child_process';
 
 export const TRANSCRIPT = '/root/.claude/projects/-home-user-Shamble-Frontlines/7261f3d7-f651-586a-9c39-c052553b68a3.jsonl';
 export const SESSION = 'session_019YNMUWSsyRgaYWxk4auQ5b';
-export const PAGE48 = '/root/.claude/projects/-home-user-Shamble-Frontlines/7261f3d7-f651-586a-9c39-c052553b68a3/tool-results/mcp-claude-code-remote-list_events-1794595937159.txt';
+export const PAGES48 = [
+  '/root/.claude/projects/-home-user-Shamble-Frontlines/7261f3d7-f651-586a-9c39-c052553b68a3/tool-results/mcp-claude-code-remote-list_events-1794595937159.txt',
+  '/root/.claude/projects/-home-user-Shamble-Frontlines/7261f3d7-f651-586a-9c39-c052553b68a3/tool-results/mcp-claude-code-remote-list_events-1794595922657.txt',
+];
 export const ITEMS = [
   { id: 'A1', uuid: 'b031379c-ea4c-47db-b279-54e937bf147a', at: '2026-11-13 18:29:55', title: 'his message before the task' },
   { id: 'A2', uuid: 'e5fa7ca0-6494-44d0-8366-81fc612c7958', at: '2026-11-13 18:47:55', title: "his task message: step 2.3's first docs pass and its plan, with his decision of 2026-11-13 on step 2.3" },
@@ -78,20 +81,47 @@ export function go48() {
   return text;
 }
 
-// The 2.2 session's chat record of the same message, from the saved list_events page (JSON inside the harness's
-// envelope). Returns { text, createdAt } or null when the page is not on this machine.
-export function chat48() {
-  if (!existsSync(PAGE48)) return null;
-  const raw = readFileSync(PAGE48, 'utf8');
+// The 2.2 session's chat record of the same message, from a saved list_events page (JSON inside the harness's
+// envelope): the first page holds user events, the second assistant events, whose tool results can quote it too.
+// Returns { text, createdAt } from the user event, or null when the page is not on this machine.
+export function chat48(page = PAGES48[0]) {
+  if (!existsSync(page)) return null;
+  const raw = readFileSync(page, 'utf8');
   const a = raw.indexOf('{"ccr"');
   const b = raw.lastIndexOf('\n</other-session');
   if (a < 0 || b < a) throw new Error('the saved page has no JSON body');
-  const page = JSON.parse(raw.slice(a, b));
-  const hits = (page.ccr?.data ?? []).filter((e) => e.user?.uuid === GO48.chatUuid);
+  const parsed = JSON.parse(raw.slice(a, b));
+  const hits = (parsed.ccr?.data ?? []).filter((e) => e.user?.uuid === GO48.chatUuid);
   if (hits.length !== 1) throw new Error(`the saved page holds ${hits.length} events for ${GO48.chatUuid}`);
   const content = hits[0].user.internal_anthropic_catchall?.message?.content;
   if (typeof content !== 'string') throw new Error('the chat event is not one string');
   return { text: content, createdAt: hits[0].created_at };
+}
+
+// C8's second page: the 2.2 session's merge call (assistant event), whose commit_message quotes his go after "quoted
+// whole"; the quoted block, unquoted, must equal A3. Returns { text, createdAt } or null when the page is missing.
+export function mergeCall48(page = PAGES48[1]) {
+  if (!existsSync(page)) return null;
+  const raw = readFileSync(page, 'utf8');
+  const a = raw.indexOf('{"ccr"');
+  const b = raw.lastIndexOf('\n</other-session');
+  const data = JSON.parse(raw.slice(a, b)).ccr?.data ?? [];
+  const hits = data.filter((e) => (e.assistant?.internal_anthropic_catchall?.message?.content ?? [])
+    .some((c) => typeof c?.input?.commit_message === 'string' && c.input.commit_message.includes(GO48.chatUuid)));
+  if (hits.length !== 1) throw new Error(`the second page holds ${hits.length} merge calls naming ${GO48.chatUuid}`);
+  const msg = hits[0].assistant.internal_anthropic_catchall.message.content.find((c) => c?.input?.commit_message).input.commit_message;
+  return { text: unquoteAfter(msg, '4d21c1a\'s merge call'), createdAt: hits[0].created_at };
+}
+
+function unquoteAfter(msg, what) {
+  const lines = msg.split('\n');
+  const at = lines.findIndex((l) => l.includes('quoted whole'));
+  if (at < 0) throw new Error(`${what}: "quoted whole" not found`);
+  let i = at + 1;
+  while (i < lines.length && lines[i] === '') i++;
+  const block = [];
+  while (i < lines.length && (lines[i] === '>' || lines[i].startsWith('> '))) block.push(lines[i++]);
+  return block.map((l) => (l === '>' ? '' : l.slice(2))).join('\n');
 }
 
 export function allItems() {
@@ -109,4 +139,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const c = chat48();
   if (!c) console.log('A3 vs the chat record: the saved page is not on this machine');
   else console.log(`A3 vs the chat record (event ${GO48.chatUuid}, created_at ${c.createdAt}): ${c.text === list[2].text ? 'identical, byte for byte' : `DIFFERS (chat ${c.text.length} chars, commit ${list[2].text.length})`}`);
+  const m = mergeCall48();
+  if (!m) console.log('A3 vs the 2.2 session\'s merge call: the second page is not on this machine');
+  else console.log(`A3 vs the 2.2 session's merge call (its commit_message, ${m.createdAt}): ${m.text === list[2].text ? 'identical, byte for byte' : `DIFFERS (${m.text.length} chars, commit ${list[2].text.length})`}`);
+  if ((c && c.text !== list[2].text) || (m && m.text !== list[2].text)) process.exit(1);
 }
