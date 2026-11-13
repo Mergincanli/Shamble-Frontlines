@@ -75,3 +75,11 @@ against step 1's hashes. Never commit, never clean, the shared target only.
   `sha256sum -c` of r2-hashes-start from the copy's root: 18 of 18 OK; `diff -rq` of spikes/ against .gate/u4d2-r2:
   equal. TP10 is to be re-planted in this seat's own form after the resume (its 01:22:57 log is not a recorded
   result).
+
+## Resume (this seat, after the cut)
+- Re-checked at the resume: `sha256sum -c r2-hashes-start.sha256` from the copy's root 18 of 18 OK; `cmp` with
+  fx-hashes-end.sha256 equal; git status 9 M, 10 new; HEAD 51520b4; crates/sim diff empty; no cargo, rustc or check.mjs
+  running (the main session's checkpoint saver only). The copy's failed-steps/ holds deps.log (235 B, 01:22, TP4's
+  `--only deps` FAIL: lib.rs:101's line), left by the cut; a passing deps run removes it (FX-10). Read again: the
+  packet's diffs, its tests side file, Block 8; the three batch-1 seats' notes; the builder's "Fix pass, round 1".
+  Continuing at step 3 (TP10, TP11), then step 4, 5, 6.

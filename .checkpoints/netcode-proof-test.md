@@ -71,7 +71,19 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    restart at about 00:52 with the rust seat returned: APPROVE WITH FINDINGS, RR2-L1 to -L4; resumed about 00:55 as
    task wzr3p9319; batch 1 returned (security APPROVE WITH FINDINGS, SEC-U4D2-R2-1 to -4, all Low; infra returned
    01:17); batch 2 cut by the spend limit at 01:22 with TP10's plant in place, restored by the main session; resumed
-   08:27 as task wn0cahcg6; script
+   08:27 as task wn0cahcg6. Batch 1 read by the main session (the Medium in full, the Lows in short, INF2-3 in full):
+   rust APPROVE WITH FINDINGS (RR2-L1 a custom linker unread; -L2 an empty CARGO_HOME read differently; -L3 EA-9's
+   compare default unpinned; -L4 two wording nits); security APPROVE WITH FINDINGS (SEC-U4D2-R2-1 two comments claim
+   too much for the section read: a RUSTC_WRAPPER's link args rewrite it, built; -R2-2 a cargo config's per-package
+   profile turns npt-sim's overflow checks off unseen; -R2-3 `m!(include!)` and a meta-built #[path] get past FX-6,
+   built; -R2-4 T3's and T5's "the token `u32`" wording, and T5's "every other security finding is fixed" true for
+   round 1 only; all Low, none before the merge); infra APPROVE WITH FINDINGS (INF2-1 Medium, not before the merge:
+   the per-call 300 s limits do not bound the step, up to 12 calls times 300 s under the lock if the replay hangs,
+   and a stopped call leaves its leg children running; FX-7 meets its ruled form, so to the advisor as a carry or a
+   follow-up (Block 8); INF2-2, -4, -5 Low; INF2-3 Low, for M8's T5 fill: label round 2's first timing run, 73.7 s,
+   "the first run after a machine restart (page cache cold, no dependency rebuilt)", beside 41.8 and 40.5 s (fix
+   pass) and 40.4 s (round 2); the bound "about 80 s with a warm page cache; a first run after a restart adds about
+   30 s"; the card's cold figure names the machine's uptime). Script
    workflows/scripts/npt-u4d2-review-r2-wf_969ab29d-637.js), launched about 00:34 UTC on 2026-11-13, on what changed:
    batch 1 (Read) security, rust, infra in the builder's copy while nobody plants (the infra seat times `--only wasm`
    with `-x` twice); batch 2 (Prove) test (general-purpose with Edit; start hashes .gate/u4d2/r2-hashes-start.sha256;
