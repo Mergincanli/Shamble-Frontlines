@@ -149,6 +149,14 @@ Step 6's fix pass: waiting for the advisor agent's revision 2c ruling, then one 
    Exact times of the advisor-tool calls (from the transcript): 18:59:07, 19:55:37, 20:13:33, 20:47:41, 20:57:48,
    21:58:15 UTC; the "step N done" saves: step 0 19:22:36, 1 19:55:30, 2 20:02:41, 3 20:27:37, 4 20:47:34, 5 20:57:42.
 
+7. 2026-11-13 22:09:54 UTC (23:09 Amsterdam), moment 5 for round 1's fix pass (before its commit and "done" save) and
+   moment 1 for round 2: not done yet. Changed: the word-level diff of docs/ d59ca43..tree read (only revision 2c's
+   phrases); the report's "CI green" limited to the first four commits; revision 2c in the plan (with the F5 site
+   rows); #52's own STATUS row and ROADMAP entry now name the archive's changes truly; the notes saved before the docs
+   commit and no script changed after; round 2 as `review-r2.js` with `r2-` notes, briefed on what changed only (both
+   SHAs, the 23 dispositions, the 2c rulings, what is pending by design, R-WORDS byte-checks E-TASK's header and the kit
+   quote, R-STATE re-derives the consultation timeline and the refusals).
+
 ## Refusals (guard, deny list, classifier) and the route taken
 - The session: none (the transcript scan, 2026-11-13 ~22:05 UTC). Agents, all by the guard: the advisor agent
   19:31:18 UTC (a loop writing to a variable path; route: a read-only python3 script); R-WORDS 21:14:45 (the same kind;

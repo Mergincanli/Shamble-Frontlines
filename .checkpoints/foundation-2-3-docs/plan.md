@@ -51,6 +51,19 @@ edited line on.", backed by `fixes.mjs`'s whole-file check; conditions: (a) the 
 `fixes.mjs --check` runs on the 2.2 report again on the final head (the archive part at step 3 only, before docs-keeper).
 §5's L2 and header-note texts below are replaced by these.
 
+## Revision 2c (2026-11-13): review round 1's fix pass, ruled by the advisor agent (its notes: "PLAN REVISION 2c")
+All approved: (1) E-TASK's header "his words of 2026-11-13 are the rule there too, and step 2.3's plan is to list their
+edits"; (2) the 2.2 report's L1 "(as worded at 9b20b67; L2 corrected it after the merge, in Risks and the CUT-ESCAPE
+row)"; (3) STATUS's kit quote to the end of his paragraph; (4) STATUS's main line "(REQUIRED-CHECK, a finding for step
+2.3)" (the reviewer's text refused: it stated step 2.3's plan as fact); (5) the archive: BRIEF-STALE re-dated, the 2.1a
+follow-up's lines (current numbers; ADR 0003 :51-52 and ADR 0006 :56-57 added), REQUIRED-CHECK in the past tense with
+run ids, #48's row naming its time's source; (6) the advisor-tool gap disclosed in full, in the report's top lines and
+the end message, and a consultation before every "done" save from now on; (7) the refusals (none by the session, four by
+agents) and the pushed scratch fragments disclosed; (8) round 2 on what changed only, then the verifier with all 23
+findings' dispositions. Site table additions (R-WORDS F5): S9 ADR 0003 :51-52 and ADR 0006 :56-57, "before the
+foundation" lines wrapped across two lines (S4's class, now in the archive's follow-up); S10 the register's OQ-0006-13
+row (:155, the preview step, 2.6: S8's class, left).
+
 ## Revision 2b (2026-11-13): step 4's departures, ruled by the advisor agent (its notes: "PLAN REVISION 2b")
 STATUS within 120 lines once his words were filled in: (1) the kit line as pointers, his kit-freeze words quoted; (2)
 P8 as his four sentences quoted after STATUS's lead-in; (3) the old-sections table's two "same names" rows joined; (4)

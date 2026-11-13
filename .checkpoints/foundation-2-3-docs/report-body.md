@@ -8,8 +8,9 @@ Mustafa's first item for step 2.3: "First: the docs pass. Its own small pull req
 
 ## Outcome
 - Built in five commits (1123175, 2f96f5c, 83c6ab6, d59ca43, then review round 1's fix pass), every script check and
-  the gate passing, CI green on each. Review round 1 (two reviewers, four skeptics) found one High and two Mediums, all
-  fixed; round 2, the verifier and the advisor agent's review of the final head follow.
+  the gate passing; CI green on the first four (E7), the fix pass's runs read after its push. Review round 1 (two
+  reviewers, four skeptics) found one High and two Mediums, all fixed; round 2, the verifier and the advisor agent's
+  review of the final head follow.
 - **A gap against his rule on the advisor tool** (his words of 2026-11-11, moment 5: consult before a step or the task
   is declared done): steps 0 and 3 had no closing consultation of their own (step 3's was made late, consultation 6);
   steps 1, 2, 4 and 5 were consulted 6 seconds to 11 minutes after the checkpoint had called them done; and the STATUS
@@ -115,6 +116,9 @@ step 1 19:55:30 (35c3e81), step 2 20:02:41 (de3845d), step 3 20:27:37 (1137ec4),
    revision 2b; the saver restarted before the review.
 6. 21:58:15, late moment 5 for step 3 (its "done" save had none) and moment 1 for the fix pass: every gap named; L-a's
    suggested text refused; revision 2c asked before any write.
+7. 22:09:54, moment 5 for round 1's fix pass, before its commit and "done" save, and moment 1 for round 2: not done yet
+   (the word-level diff read; "CI green" limited to the first four commits; revision 2c in the plan; #52's own STATUS
+   row and ROADMAP entry made true); round 2 with new notes names, briefed on what changed only.
 The gaps: step 0's "done" save had no consultation of its own (number 1 came before the step's work); steps 1, 2, 4 and
 5 were consulted after their "done" saves; step 3 had none until number 6; and the STATUS cut (a design call, moment 4)
 was committed in 83c6ab6 (20:47) before number 4.
