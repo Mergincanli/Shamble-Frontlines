@@ -1,0 +1,44 @@
+== profile test
+   3: extdep::add
+extdep::add(255, 1) -> Err(Any { .. })
+test tests::generic_from_room - should panic ... 
+test tests::inline_from_room - should panic ... 
+test tests::never_inline_from_room - should panic ... 
+test tests::outside_crate_wraps_in_release_only ... 
+test tests::plain_from_room - should panic ... 
+test tests::tick_next_from_room - should panic ... 
+== profile release
+test tests::generic_from_room - should panic ... FAILED
+test tests::inline_from_room - should panic ... FAILED
+test tests::never_inline_from_room - should panic ... 
+test tests::outside_crate_wraps_in_release_only ... extdep::add(255, 1) -> Ok(0)
+test tests::plain_from_room - should panic ... FAILED
+test tests::tick_next_from_room - should panic ... FAILED
+== profile bench
+test tests::generic_from_room - should panic ... FAILED
+test tests::inline_from_room - should panic ... FAILED
+test tests::never_inline_from_room - should panic ... 
+test tests::outside_crate_wraps_in_release_only ... extdep::add(255, 1) -> Ok(0)
+test tests::plain_from_room - should panic ... FAILED
+test tests::tick_next_from_room - should panic ... FAILED
+== profile relcustom
+test tests::generic_from_room - should panic ... FAILED
+test tests::inline_from_room - should panic ... FAILED
+test tests::never_inline_from_room - should panic ... 
+test tests::outside_crate_wraps_in_release_only ... extdep::add(255, 1) -> Ok(0)
+test tests::plain_from_room - should panic ... FAILED
+test tests::tick_next_from_room - should panic ... FAILED
+== rustc's overflow flag per crate (release, -v, after a clean)
+extdep: no overflow flag
+room: no overflow flag
+sim: -C overflow-checks=on
+sim_wasm: no overflow flag
+== wasm32 cdylib in Node: dev, then release (each call with an overflowing value)
+dev plain traps: unreachable
+dev inline traps: unreachable
+dev generic traps: unreachable
+dev tick traps: unreachable
+release plain returns 0
+release inline returns 0
+release generic returns 0
+release tick returns 0

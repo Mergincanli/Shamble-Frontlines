@@ -213,6 +213,21 @@
     room, client-endpoint, sim-wasm. Waiting on the ruling: D1's Cargo.toml change, the overflow rows, M7, and the
     archive, STATUS and REPO_MAP sync.
 
+28. Step 7, round 1's fix pass, part 2, 2026-11-13: the advisor agent's ruling D1 (`advisor-ruling-d1.md`; a general
+    agent reading main's advisor.md, Opus 5.5 at max): APPROVE route A on conditions 1-7 (the setting, exactly two
+    tables; plan revision 10 and the report; the register row OVERFLOW-ALL in the loose-ends table beside Q-A1, "never
+    his decision", his go: PR #48's merge; a Decisions-needed entry OVERFLOW-ALL; D1 split: RR-1 fixed, a new finding
+    OVERFLOW-XCRATE-CI, Medium, a STATUS follow-up anchored to the first dependency on sim or 2.3; every overflow mention
+    true on the fixed head, OVERFLOW-PER-CRATE rewritten, not dropped; evidence: M7 in CI, the local cross-crate run, M5
+    and step 2's control relabelled historical, CI green, gate, E9, round 2 with rust-reviewer, test-engineer,
+    security-auditor and engine-architect, the verifier); keep "*"; no ADR text edit; RR-1 stays High, fixed. Then:
+    1de98a9 (part 1 of the fix pass, the stop hook's ask) · 4bd9dd5 (route A in Cargo.toml; locally 6 of 6, release
+    2 of 2, wasm32, clippy, fmt, Cargo.lock unchanged) · pushed. The local cross-crate run (`xcrate-check.sh`, outputs
+    `xcrate-before-1de98a9.txt`, `xcrate-after-4bd9dd5.txt`): release, bench and an inheriting profile 1 of 5 before, 5
+    of 5 after; rustc's flag on sim only before, on sim, room and sim_wasm after, on no crate outside the workspace;
+    wasm32 release in Node returned 0 before and traps after, like dev. The saver ended at its time limit (bw54oxpqz)
+    and stays off until M7's revert is pushed.
+
 ## Current step
 Step 6 done (4d78ad6; consultation 5). Step 7: review round 1, run 1 running (wf_d3a5ca64-901). Then: check `git status`
 outside .checkpoints/, dedupe the findings, run 2 (skeptics), the fix pass, the verifier, the Fable read (whole) before
