@@ -83,3 +83,14 @@ reach today; (f) exact replacement text for Cargo.toml:21-24 and OVERFLOW-PER-CR
 - K8 (f support) scripts/run-f.sh -> run-f.txt, route A, env "s" and "z": F1 + [profile.release.package.extsum]
   overflow-checks = true -> member_total panics at both; F2 "*" table removed -> member_total panics at both. Both
   closing options in the records close RR2-1 (and C2 above: the dependency at opt-level 3 closes it too).
+
+## Draft verdict (before the advisor consult)
+- Holds, Medium. RR2-1 reproduced (K1-K4: room's own sum and sim's inline code compiled in room wrap at 0, 1, "s",
+  "z" in a release profile when a non-member dependency that room loads holds the same core instance; 2 and 3
+  checked; no dependency, or the dependency at 3, or a named override, or no "*" -> checked; mechanism shown in the
+  symbols and in rustc 1.99.1's source). TE2-1 reproduced at opt 3 (K5). RR2-2 confirmed in the Cargo book and cargo's
+  source (K6), a wording point (Cargo's "outside the workspace" = non-member is right; "dependencies" is not = "non-
+  members" for an in-repo path crate). Medium: zero reach today (no dependency; release at 3; "*" only in release),
+  but ADR 0002 part 4 and PM-0002-29 plan "s"/"z" for the sim-wasm file with parry3d, and wasm-bindgen (first planned
+  third-party crate) enters sim-wasm, outside sim's tree, which the trigger misses (K4); tested workarounds exist.
+- Comment draft: comment-draft.txt in my folder (4 lines, 114-115 columns).

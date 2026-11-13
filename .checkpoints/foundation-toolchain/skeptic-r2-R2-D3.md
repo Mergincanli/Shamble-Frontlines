@@ -106,38 +106,48 @@ to an owner; check Cargo.toml and CI for what the shipped setting does; then jud
 - Not verified: cargo-fuzz at any pinned version (read at main only); a registry crate without "*" (path crate only);
   the lock-poison spread (point 3); room's own arithmetic in a wasm32 build (the ruling's C7 ran sim functions only).
 
-## Exact wording proposed (the fix pass may trim; facts as run above)
+## Exact wording proposed (corrected after the final advisor consultation; supersedes the first draft)
+Corrections: the entry sentence no longer says the rules are "not yet written" (ADR 0004 part 20's first sentence
+already forbids a reachable panic); "are reworded by their owners" became "handed to their owners to weigh" (only
+engine-architect concurred, and (e) leaves the content, and whether to reword at all, to each owner); the cargo-fuzz
+parenthetical left the archive text (read at main through a summarising fetch, never run here); point (6) keeps its
+"path crate" qualifier; "a server crate" is not claimed as run; "2.5 at the latest" became "2.5 by ADR 0002's migration
+plan".
 - Row README:234, third column, before "Shown by" (one edit with R2-D1, EA2-3, EA2-4): "Added at review round 2
-  (security-auditor's SA2-2), not part of the ruling: with this setting an overflow in `room`'s or a server crate's own
-  arithmetic panics in release too, where part 4's two blocks let it wrap (local native runs). The lines that keep a
-  value a client or content can set from reaching such a panic (part 4's explicit operations, which name counters and
-  tick numbers; ADR 0004 part 20's panic sources, which name no overflow; the fuzz marks PM-0004-60 and PM-0001-34) are
-  reworded by their owners: the follow-up OVERFLOW-PANIC-RULE."
-- Row's dependency sentence, point (6): "... or dropping `"*"`, which would check every dependency too, the server's
-  future network crates included)"; the same words in OVERFLOW-PER-CRATE (archive :779-784, report :254-257).
-- STATUS.md:99, no new line: "later: OVERFLOW-PER-CRATE, OVERFLOW-PANIC-RULE (with room's first code), PACKAGE-ENTRIES,
-  ...".
+  (security-auditor's SA2-2), not part of the ruling: with this setting an overflow in `room`'s own arithmetic panics in
+  release too, where part 4's two blocks let it wrap (review round 2's local native runs), and a future server crate's
+  code would do the same. The lines that keep a value a client or content can set from reaching such a panic (part 4's
+  explicit operations, which name counters and tick numbers; ADR 0004 part 20, whose list of panic sources names no
+  overflow; the fuzz marks PM-0004-60 and PM-0001-34) are handed to their owners to weigh: the follow-up
+  OVERFLOW-PANIC-RULE."
+- Row's dependency sentence, point (6): "(a named override for that crate, which beats `"*"`, or dropping `"*"`, which
+  would also check every dependency, the server's future network crates included, as a local run showed for a path
+  crate's own arithmetic)"; the same words in OVERFLOW-PER-CRATE (archive :779-784, report :254-257).
+- STATUS.md:99, no new line (Mustafa's 120-line cap): "later: OVERFLOW-PER-CRATE, OVERFLOW-PANIC-RULE (with room's
+  first code), PACKAGE-ENTRIES, ...".
 - STATUS_ARCHIVE, "For later steps", after OVERFLOW-PER-CRATE: "**OVERFLOW-PANIC-RULE** (review round 2,
-  security-auditor's SA2-2; Medium): with route A, an overflow in `room`'s or a server crate's own arithmetic panics in
-  release instead of wrapping (test builds already panic); on the server's tick that would end the match (ADR 0004
-  part 20), repeatably if a client can drive the value. The lines that should keep it out of a client's reach are
-  worded for part 4's two-crate setting: ADR 0002 part 4's explicit operations name counters and tick numbers
-  (:247-249); part 7 leaves out `arithmetic_side_effects`, with REC4 as what covers overflow (:471, :1617); ADR 0004
-  part 20's panic sources name no overflow (:562-566); PM-0004-60 and PM-0001-34 name no build setting (`cargo fuzz`
-  checks overflow by default, not with `-O`). For the owners to decide, each at its ADR's next revision with his go
-  (engine-architect: ADR 0002; rust-reviewer: part 20; test-engineer: the marks), the security review proposes:
-  `wrapping_*` only where a wrap is meant, `checked_*` or `saturating_*` with a defined result for values a client or
-  content can set or add up; part 20 names overflow, and room's and the server's tick code beside the sim; the fuzz
-  builds keep overflow checks on; `arithmetic_side_effects` weighed for room's command handling. Anchor: the plan of
-  the first change that gives `room` or a server crate code (2.5 at the latest) states the overflow rule its arithmetic
-  follows."
+  security-auditor's SA2-2; Medium): with route A, an overflow in `room`'s own arithmetic panics in release instead of
+  wrapping (a local native run; test builds already panic), and a future server crate's code would do the same; on the
+  server's tick that would end the match (ADR 0004 part 20), repeatably if a client can drive the value. ADR 0004 part
+  20's first sentence already forbids any panic reachable from network input or content data, but its list of panic
+  sources names no overflow (:562-566), and the other lines are worded for part 4's two-crate setting: ADR 0002 part
+  4's explicit operations name counters and tick numbers (:247-249); part 7 leaves out `arithmetic_side_effects`, with
+  REC4 as what covers overflow (:471, :1617); PM-0004-60 and PM-0001-34 name no build setting. Handed to the owners to
+  weigh, each at its ADR's next revision, any wording with his go (engine-architect: ADR 0002; rust-reviewer: part 20;
+  test-engineer: the marks), with the security review's proposals: `wrapping_*` only where a wrap is meant, `checked_*`
+  or `saturating_*` with a defined result for values a client or content can set or add up; part 20 names overflow,
+  and room's and the server's tick code beside the sim; the fuzz builds keep overflow checks on; `arithmetic_side_effects`
+  weighed for room's command handling. Anchor: the plan of the first change that gives `room` or a server crate code
+  (2.5 by ADR 0002's migration plan) states the overflow rule its arithmetic follows."
 - Report, "Follow-ups for later steps", after OVERFLOW-PER-CRATE: "OVERFLOW-PANIC-RULE: with route A, an overflow in
-  `room`'s or a server crate's own arithmetic panics in release instead of wrapping; the lines that keep it out of a
-  client's reach (ADR 0002 part 4's explicit operations, ADR 0004 part 20, the fuzz marks) are worded for the old
-  two-crate setting. The plan of the first change that gives `room` or a server crate code (2.5 at the latest) states
-  the rule its arithmetic follows; each owner rewords its lines at its ADR's next revision (the register row
+  `room`'s or a future server crate's own arithmetic panics in release instead of wrapping. ADR 0004 part 20 already
+  forbids a panic a client can reach, but the detailed lines are narrower: part 4's explicit operations name counters
+  and tick numbers, part 20's list of causes names no overflow, and the fuzz marks name no build setting. The plan of
+  the first change that gives `room` or a server crate code (2.5 by ADR 0002's migration plan) states the rule its
+  arithmetic follows; the lines go to their owners to weigh at each ADR's next revision (the register row
   OVERFLOW-ALL)."
-- For the entry OVERFLOW-ALL's "Why it matters" (R2-D2 rewrites it; plain words): "With the setting, a number that
-  grows too big in the future server's own code can end that match instead of quietly carrying on with a wrong value.
-  The rules that keep a player from causing that are not yet written for the server's code, so this also asks the
-  owners of the design records to write them before that code is built (OVERFLOW-PANIC-RULE)."
+- Entry OVERFLOW-ALL, "Why it matters": an addition to R2-D2's rewrite, not a competing replacement (plain words): "With
+  the setting, a number that grows too big in the future server's own code can end that match instead of quietly
+  carrying on with a wrong value. The design records already say no player input may crash a match, but their
+  detailed lists do not name this cause yet, so the first plan that writes that code must say how it avoids it, and
+  the records' owners weigh adding it (OVERFLOW-PANIC-RULE)."
