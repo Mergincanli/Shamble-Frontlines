@@ -499,7 +499,18 @@ Count: 7.
   EA2-3: the row's reword list omits Appendix A's R5-RUSTLINT-REC4 row, 0002:1586, checked inline; EA2-4: where
   PM-0002-53's wasm32 half lives is a part 3 question, the test crate a root-workspace member; merged into R2-D4 and
   added to `review-r2-findings.md` before R2-D4's skeptic started). R2-L2 now Medium (two reviewers converged); R2-L7
-  (EA2-2) and R2-L8 (EA2-3) checked inline: hold. All four reviewers APPROVE; no Critical or High; no round 3.
+  (EA2-2) and R2-L8 (EA2-3) checked inline: hold. rust-reviewer, test-engineer and engine-architect APPROVE;
+  security-auditor gave counts only (0/0/2/1; corrected by the ruling D1-R2: my chat update said "all four approved");
+  no Critical or High; no round 3.
+  Ruling D1-R2 DONE (~15:20, `advisor-ruling-d1-r2.md`): APPROVE the fix pass with its changes; `"*"` kept; no setting
+  changes; R2-D4 relabelled Medium; SA2-2 open (OVERFLOW-PANIC-RULE; needs-mustafa on that count too); conditions
+  C1-C7 (one push; Cargo.lock unchanged; STATUS 120 lines; docs-keeper syncs STATUS :5, :29, :42-43 and ROADMAP
+  :125-126; before its head approval: CI green, local gate, E9 re-run, the verifier's PASS, the Fable read; then its
+  head review re-runs the cross-crate script with summary lines and a wasm32 control). Applied by
+  `apply-fix-r2.mjs` (its 14 blocks, draft B, the R2-D4 skeptic's F1): every target matched once; STATUS 120;
+  appendix and decisions checks pass; repo-map-check 0; superseded phrases gone (only the Reviews table quotes them);
+  cargo build, 6 dev tests, 2 release tests, fmt, clippy -D warnings clean; Cargo.lock = 4bccf55's. docs-keeper's C3
+  sync running (a general agent reading main's docs-keeper.md).
   The session's own check: std supplies no unchecked shared Sum/Product (`session-std-share.txt`).
   Skeptics DONE (wf_72a8ddd0-ec7, 4 of 4, ~14:45): R2-D1 holds Medium (RR2-1 reproduced: u8 sum wraps at 0/1/s/z with
   a shared dependency, panics at 2/3; controls; rustc source read; TE2-1 and RR2-2 hold, Low); R2-D2 holds Medium
