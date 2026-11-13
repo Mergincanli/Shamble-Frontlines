@@ -36,7 +36,7 @@ nothing for Mustafa) and sent to copy 2, which builds on (at B10 by its logs); t
   crates/lab/det-recordings.json, `wasmStep`'s two options with a check.test.mjs case, ops/runs/det-u4.mjs).
   **u4s-carries.md amended in place at 18583c4** (carry 62 (h)'s bite, carries 82 and 87, new carry 89 for U4h; 14
   lines added, none removed; every quote checked by script; 675 lines, c74e5255…); the brief's carries cites read at
-  its stamp e8675a02…. Disk 5.4 GB free at 21:29.
+  its stamp e8675a02…. Disk 5.4 GB free at 21:29. The saver restarted as **bjl8fjasb** (21:30 UTC, after 3e26741).
 - **The main session's later tasks (the ruling's):** (a) at the next plan edit, u4-build-plan.md :800-802: det-u4.mjs
   runs at every merge that touches npt-sim, npt-proto, npt-room, npt-hash-wasm or a crate on the scenario's path
   (npt-server, npt-client, npt-l1, npt-link, npt-bots, npt-lab), and in U4r's merge step (main-run.sh -x, after
