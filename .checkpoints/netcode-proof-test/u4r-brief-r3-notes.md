@@ -141,3 +141,59 @@ Head read: (filled in block 1)
     testBothBuilds :1973-1982; cargoCounts :1864; BITE_ID :879; biteHomeProblems :914-924; "nothing depends on
     npt-lab" :175-178; depsStep :2062; RECORDINGS_MANIFEST :2099; WASM_BUILDS :2120-2140; WASM_CALL_LIMIT_MS
     :2212 (per call: carry 84); wasmStep :2254.
+- B5c code (rest) done:
+  - R3 L-c6 `lc6_at_one_instant_internal_events_come_before_application_sends` l1/src/tests.rs:1432 (body :1344);
+    L-c7 :1561 (body :1445); L-c5 :1043. R5 tag `npt-l1 fate log v2` l1/src/lib.rs:330, for_each_canonical :351;
+    probe's fate_log_sha256 probe.rs:47, header params main.rs:120-123 (+ v1 datagram hash, carry 66 met at U4d2).
+  - lab main.rs: doc :1-14 (exit 2 on usage :12-13), dispatch hash/probe :195-235; tick_hz literal 30 :159 (was
+    :151); burst_starts_ns :142. R31 `Schedule::new(tick_hz, catchup)` schedule.rs:77; npt_server::BITES [3] :251,
+    `Schedule::with_bite(tick_hz, catchup, bite)` :257. R32 `Quant::with_bite` quant.rs:102-112; npt_proto::BITES [7]
+    :34-42 (-57 x3, -17/tick16, -58/tick16, -21/no-trailing, -21/no-channel). World::with_bite(scene, seed,
+    first_tick, bite, arm_tick) world.rs:944; World::BITES [4] :937-938.
+  - Proto ids reach every wire instance: Room::with_bite forwards to Quant (room.rs:510-518), ClientEndpoint::with_bite
+    too (client :308-320), Decoder::new takes a Quant (pump.rs:224).
+  - D6: -17/tick16 quant.rs:38, -17/client-rounding client :29; -18/no-fallback room lib.rs:39; -57 x3 quant.rs:35-37;
+    -58: tick16 quant.rs:39, lt-ack/lt-cmd-seq/lt-press room lib.rs:40-42, lt-tick-offset/lt-event-seq client :30-31;
+    catalogue-5/owner-to-all room lib.rs:45; PM-0001-30/*: planted nowhere.
+  - marks.json at head: -17 :3845 (parts L1 P0/P2/P3/B1 select layer, scene SS, profile, clients 48; part validity
+    pre:PM-0001-2; tick_start setup check only on 'every S30'; bites :3991, :3995); -57 :4008 (parts by profile only,
+    no scene/clients; checks pos/yaw/pitch; bites :4089-4097); -58 :4107; -18 :4262 (parts L1 B1 SS 48, L2 B1 wt, L2
+    B1 ws; series event.burst_heal.after_link_ns; >= 480 records; notes :4442 hold the fresh-delta reading; bites
+    no-fallback :4427, ws-budget-x2 :4431); -30 :6512 (validity late-zero; report buffer_depth_ticks_count :6557;
+    bites wallclock :6563, late-command :6567).
+  - SERIES.md (763 lines): rows exist for pos/yaw/pitch err (:67, :73, :66), counter_wrap (:150), burst_heal (:134,
+    :323), burst_eviction (:321), snap_incomplete (:320), late_count (:365), hs rows (:317-319), snap_refused (:218),
+    buffer_depth_ticks_count (:240), tick_start (:252), ticks_below_wrap (:253), suite (:376), stand_ins (:374),
+    cmd_timing (:375), burst_starts_ns (:403), fate_log_v1 (:398), snap_datagram_bytes/snap_wire_bytes (:70, :72;
+    writer npt-server). No row: admit (an event, README :80), event rate / queue high-water (carry 58), overflow
+    resync, the RTT rule's instants, admit tick, FullState flag, lead, weapon/health params, input payload and the
+    Join/JoinAccepted/FullState sizes.
+  - README §1 :8-86 (`h` per tick = state hash :15; `loopback` layer :36; `hs` :44-79; admit event :80); §4 :247-316
+    (complete :250, roster :258, late-zero :275). npt-log: TickRecord set_hash :144, set_hashes :158; Writer :338-412;
+    check_header :305 (carry 63's cite holds); read_log :454.
+  - judge eval.rs at head: select by marks :32 (was :30); gap :314-327 (was :310-323); run judging :1165-1168 (was
+    :1048-1051); expect-invalid :1412 (was :1283); C4 :539-570. figures.rs decoded_hash_mismatch_count :542.
+  - catalogue: :73, :125-158, :144-145, :150, :153-154, :237-238 hold; §6 item 5 now :251-254 (was :249-252); Q8 now
+    :284 (was :282); Resync row :90 (gains the limit, T7).
+  - plan.md: §4.2 :421-454 holds; npt-lab §4.7 entry :617-628 (was :616-627), RQ8 order :618-624, host clock :625,
+    RTT :626, bites :630-631, binaries :611-612, npt-client :609; U7 row :1247 (C-U7-1, C-U7-2: context only).
+  - link/src/lib.rs unchanged: Loopback send in the instant :154-163, poll :185-190, rtt_ns Some(0) :203-205.
+- B6 D-items: D1 (cc8595d counts; spikes/ = cc8595d at fa8e335), D2, D3 (11 steps; 33.1 s warm / 61.6 s cold), D5,
+  D6, D8 (no clock in lab/bots sources; lab/clippy.toml bans them), D10, D11 (no Resync sender; cap 1,024
+  provisional events.rs:40), D12 (P0 sample at the send instant, applied at the next net call at or after it) filled;
+  D4, D7, D9 stay.
+- B7 plan of the brief: Q answered: Q3 (U4D2-Q10 + A13), Q5 (W1-N2/U4E-Q2 widened). Q2 partly (manifest and the
+  determinism step: carries 82-85; open: SERIES.md rows and carry 62 (h)'s marks.json check). New Q13 (carry 63:
+  crates/log or not). Others open with updated facts. New findings: R16 (replay client cannot use
+  ClientEndpoint::input; -57 pairing source), R17 (late-command bite must not send a later command first), R34 (no
+  client Resync), R2 (None before first sample), 8.2 item 1 (setup condition CAN fail at U4r through rewinds_refused:
+  carry 40's last sentence / U4E-Q5).
+- B7a written: u4r-brief.md header, change list C1-C26, verbatim paragraph, section 0 (stamps at fa8e335, moved-cite
+  table), section 1. To fix at the end: C20's counts; close cites ":20-215" -> ":21-228" and ":320-327" -> ":321-327"
+  (F3 at close :321). End marker `<!-- rev3-continues -->` for appends.
+- B7b written: section 2 (2.1-2.7). Cites verified: room.rs:840, :855 (FIRE, PRESS_FIRE); lab/Cargo.toml:23-34;
+  bots/Cargo.toml:20-25; c-u2:55, :61 (the built paths); DEPS_CHECKED check.mjs:2020; buildInputProblems :1560.
+  Next: sections 3 (P1, 3.2 table, 3.3 P13-P15), 4, 5, 6.
+- B7c written: sections 3 (3.1 P1; 3.2 table of 17 entries + carry 66 not U4r's; 3.3 P13-P15), 4 (rules 1-9, lane,
+  P2-P5, P8-P12, TE-M3, no-retry), 5, 6 (18 items). Next: 7 (7.1 without -58; 7.2 rewritten for C6, C9-C13; 7.3
+  recomputed; 7.4), 8.
