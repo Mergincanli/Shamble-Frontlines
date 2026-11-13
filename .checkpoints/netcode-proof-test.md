@@ -4,15 +4,50 @@
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main, last merged in at bfda3cd (main 2aa5e9c, PRs #50 and #51, the legacy game into legacy/)
-- **Last update:** 2026-11-13 about 11:40 UTC (U4d2 merged at cc8595d and closed; CHECK-IN set; U4r's brief next)
+- **Last update:** 2026-11-13 about 21:00 UTC (U4r's build: copy 1 ended at its context limit; copy 2 and the
+  advisor's rulings next; the NOW block below)
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-13 about 19:35 UTC; read this first after a compact or a cut): L4 and item 9 applied (2fbec77); L6
-launched: the U4r builder runs.**
+**NOW (2026-11-13 about 21:00 UTC; read this first after a compact or a cut): U4r's first builder copy ended at its
+context limit, about half built; snapshot wip/u4r.patch; copy 2 resumes in the same worktree; the advisor rules on
+nine points (u4r-build1-questions.md).**
+- **The first copy** (agent a11e2354169f39acf, 19:31-20:39 UTC, 263 tool uses) ended at its context limit, not by a
+  cut; nothing committed. Its notes u4r-build.md (282 lines; copied here by worktree_patch.py, equal by cmp) end with
+  "State at this copy's end, and what is next". Done: B3 (carry 63), B4 (npt-bots' `Behaviour`; clippy.toml with both
+  plants), B5-B7 (scenario, logs, mirror: compiling, clippy clean), B8 (carry 82's manifest schema), D13 (five runs, no
+  stop: (1) 0.28 %, (4) 0.19 %, (5) 0 % late, 0 press refused), B13 in part (the three recordings), B11 in part (r1,
+  r4, r8, r9 with their bites and plants). Next in its order: fmt (53 hunks), B9 replay and r3, B10 the pre-check with
+  r6 and r7, r2 with the real judge by hand, r10's check.mjs half, B12, r5, the end checks twice. I read its report
+  and its notes whole.
+- **Snapshot** (about 20:50 UTC, the saver stopped first, no autosave commit): wip/u4r.patch, 11 files on 2fbec77,
+  4,019 lines, sha256 1e2fa56a09b6dc2e921e54a84a26bc81575b77d621d067413b24e177c4726380; `git apply --check` exit 0 on
+  this folder. The worktree is kept.
+- **The nine points for the advisor** (u4r-build1-questions.md, no option preferred): (1) the determinism route
+  (section 5 item 4: with the two runner entries in recordings.json one `npt-lab hash` call takes 201.0 s, and the
+  `wasm` step's three legs calls each regenerate every entry, so over 300 s; the entries held out of recordings.json);
+  (2) F1, r4's spatial rule checks a copy of the radius, not the flood; (3) F3, -57's series about 440 MB per 10-minute
+  run (the judged runs' disk); (4) F4, carry 62 (h)'s bite has nothing to act on at P0; (5) F5, span_ms a copy of
+  HISTORY_MS; (6) F2, events per second from the World's dump; (7) the brawl's view from the room-side mirror; (8)
+  D13 (2)'s 14 % against the arithmetic's 10 %; (9) anything else. To run as a workflow: a fact check on a fixed copy
+  (.gate/u4r-snap1 = 2fbec77 plus the patch), then the advisor (advisor-u4r-build1.md).
+- **Copy 2** (general-purpose, opus, xhigh, no isolation: the worktree exists): its prompt is
+  u4r-copy2-prompt.md (the first prompt verbatim, checked by script, plus a resume part): the checks (HEAD 2fbec77,
+  brief 59d570b8…, runner 349b51ad…, df); its notes and the diff read first; items 1-4; points 1-5 held until the
+  rulings come by message. **If cut or ended:** check the worktree's HEAD and the brief's hash, re-cut the snapshot
+  (`python3 -I .checkpoints/netcode-proof-test/worktree_patch.py <worktree> .checkpoints/netcode-proof-test/wip/u4r.patch
+  u4r-build`), then a fresh copy from u4r-copy2-prompt.md with its resume part brought up to date.
+- **An inspection slip (20:40 UTC):** one read-only command's `cd` into the builder's worktree moved this session's
+  working folder there for one call (the harness said so); the next command returned it to the main folder. No branch
+  moved; the worktree's files outside .checkpoints/ equal this branch's head, and this branch's kit files equal
+  origin/main's (`git diff --stat`, empty both).
+- **WRONG-CHAT closed:** Mustafa (about 20:58 UTC, verbatim): "It was meant for this chat after I had used the compact
+  command, but I had used it a bit later due to forgetting about it. You can continue, its all good"
+
+**Earlier NOW (2026-11-13 about 19:35 UTC): L4 and item 9 applied (2fbec77); L6 launched: the U4r builder runs.**
 - **L4's second check: PASS** (wf_62c0ab97-ae7, task w7zvg0wdh, returned about 19:20 UTC; u4r-fill-check2.md, K1-K7
   done; script 2276287d… checked). No finding Medium or higher. Two Lows: (1) decision 2's "end" is read at the clause:
   the cell goes on ". 2.2 and D5 say so; re-walked at launch (section 12 item 9)", which is accurate (2.2 :511-515, D5
