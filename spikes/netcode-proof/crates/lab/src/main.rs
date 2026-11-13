@@ -1,15 +1,19 @@
 //! The npt-lab command (plan §4.7, §6.4): runs on this container's simulated time and writes npt-log results logs for
-//! npt-judge. Today it has one subcommand, `probe` (PM-0001-3's L1 half, unit U2); the scenario runner, the x86-64
-//! replay and the hash comparer join it in U4.
+//! npt-judge. Two subcommands: `probe` (PM-0001-3's L1 half, unit U2) and `hash` (U4d2: the recordings manifest
+//! regenerated and checked, the two native legs of the determinism check and its comparisons, in the release build;
+//! its own usage is in hash.rs); the scenario runner and the x86-64 replay join it in U4.
 //!
 //! ```text
 //! npt-lab probe --run <id> --set <set> --profile <P1..P4|B1> --seed <n> --date <YYYY-MM-DD> --commit <sha>
 //!               --out <file.jsonl> [--role measured|twin|bite] [--twin <run>] [--bite <id>]
 //!               [--packets <n>] [--rate <per second>] [--burst-at-s <s>]
+//! npt-lab hash ...
 //! ```
 //! A log is never overwritten: `--out` must not exist. Exit 0 on a written log, 1 when the run failed, 2 on a usage
-//! error.
+//! error. `probe`'s log header and summary line carry the whole fate log's SHA-256 and, since U4d2 (carry 66), the
+//! SHA-256 of v1's tag and the log's datagram entries, the hash U2's v1 logs had.
 
+mod hash;
 mod machine;
 mod probe;
 
@@ -114,6 +118,10 @@ fn run_probe(a: &Args) -> Result<String, String> {
         |(delivered, reordered): (u64, u64)| (reordered * 1000).checked_div(delivered).unwrap_or(0);
     let mut params: BTreeMap<String, serde_json::Value> = BTreeMap::new();
     params.insert("fate_log_sha256".into(), o.fate_log_sha256.clone().into());
+    params.insert(
+        "fate_log_v1_datagram_sha256".into(),
+        o.fate_log_v1_datagram_sha256.clone().into(),
+    );
     params.insert("reorder_up_permille".into(), permille(o.reorder[0]).into());
     params.insert(
         "reorder_down_permille".into(),
@@ -166,7 +174,7 @@ fn run_probe(a: &Args) -> Result<String, String> {
     let s = &o.summary;
     Ok(format!(
         "{} {} seed {}: {} sent each way; lost up {} down {}; mean one-way up {} ns down {} ns; mean round trip {} ns \
-         over {} samples; reorder up {} down {} of 1000; fate log {}",
+         over {} samples; reorder up {} down {} of 1000; fate log {}; v1 datagram fate log {}",
         a.run,
         profile.name,
         a.seed,
@@ -180,17 +188,39 @@ fn run_probe(a: &Args) -> Result<String, String> {
         permille(o.reorder[0]),
         permille(o.reorder[1]),
         &o.fate_log_sha256[..16],
+        &o.fate_log_v1_datagram_sha256[..16],
     ))
 }
 
 fn main() -> ExitCode {
     let argv: Vec<String> = std::env::args().skip(1).collect();
     let Some((cmd, rest)) = argv.split_first() else {
-        eprintln!("usage: {USAGE}");
+        eprintln!("usage: {USAGE}\n       {}", hash::USAGE);
         return ExitCode::from(2);
     };
+    if cmd == "hash" {
+        return match hash::run(rest) {
+            Ok((lines, equal)) => {
+                for l in lines {
+                    println!("{l}");
+                }
+                ExitCode::from(if equal { 0 } else { 1 })
+            }
+            Err(hash::Failure::Usage(e)) => {
+                eprintln!("npt-lab hash: {e}\nusage: {}", hash::USAGE);
+                ExitCode::from(2)
+            }
+            Err(hash::Failure::Failed(e)) => {
+                eprintln!("npt-lab hash: {e}");
+                ExitCode::from(1)
+            }
+        };
+    }
     if cmd != "probe" {
-        eprintln!("npt-lab: unknown command {cmd:?}\nusage: {USAGE}");
+        eprintln!(
+            "npt-lab: unknown command {cmd:?}\nusage: {USAGE}\n       {}",
+            hash::USAGE
+        );
         return ExitCode::from(2);
     }
     let args = match parse(rest) {

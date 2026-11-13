@@ -554,3 +554,45 @@
   is a second, imported by FX-10's self-test to pin the file's place (named above). Nothing stopped: no item needed a
   file outside the bounds, and every new test failed by name under its plant.
 - Done. Next: the main session (the snapshot by worktree_patch.py, the check against fx-hashes-end.sha256, round 2).
+
+## Merge into the spike branch (the main session, 2026-11-13; advisor-u4d2-r1.md Block 9 as advisor-u4d2-r2.md Block 5 amends it)
+- **Round 2 and its ruling:** all five seats APPROVE WITH FINDINGS (one Medium, INF2-1, and Lows, none before the
+  merge); the advisor's round-2 ruling (advisor-u4d2-r2.md, sha256 e776f0ba…): the merge APPROVE on M1 to M9 as
+  amended; INF2-1 carried (entry 84), the security Lows carried (entry 85); T2, T3 and T5 amended.
+- **M1 met** (09:06 UTC): the copy's HEAD 51520b43391a453a3e37ce235b9f5753df55ab93; `git status
+  --untracked-files=all` 19 lines (the 18 files under spikes/netcode-proof and this record); `sha256sum -c
+  .gate/u4d2/r2-hashes-start.sha256` from the copy's root 18 of 18 OK; that file equals fx-hashes-end.sha256 (cmp).
+- **M2 met:** at 99c7ed9, `git diff --quiet 51520b4 HEAD --` the lane paths (check.mjs, check.test.mjs, Cargo.toml,
+  Cargo.lock, crates/hash-wasm, crates/lab, crates/proto/Cargo.toml, crates/client-wasm/Cargo.toml) and crates/sim:
+  true; spikes/'s commits since 51520b4: c88eb31 (U4e's merge) and 1b4a3c8 (A13) only; A13's CI green (gate runs
+  43330155579 push and 43330163225 pull_request); spikes/ clean in the main folder.
+- **The texts' script:** u4d2_merge_text.py (written by an agent, wf_c228865c-3b4; sha256 af8e955e…; committed at
+  3b7f0a6); both dry runs exit 0, every assert passed; phase A's diff read in full by the main session, phase B's T1
+  and T3 rows read, T2 and T5 checked byte for byte by the script against their code blocks.
+- **M3 met** (the saver stopped first, about 09:15 UTC): worktree_patch.py's new cut of the copy
+  (.gate/u4d2-merge/u4d2-merge-cut.patch; no notes copied) `cmp`-equal to cb27931's wip/u4d2.patch (sha256
+  9e71cda07d4a…, unchanged since cb27931: `git diff --quiet cb27931 --`); `git apply --check`, then `git apply`, in
+  the main folder.
+- **M4 met:** `sha256sum -c .gate/u4d2/r2-hashes-start.sha256` from the main folder's root: 18 of 18 OK.
+- **M5 met:** phase A applied (T4; spikes/netcode-proof/marks/SERIES.md f118a8de… → 3a967369…); the machine's uptime
+  3,140 s at the call's start (.gate/u4d2-merge/uptime-m5.txt); one main-run.sh call (.gate/u4d2-merge/m5-counted.log,
+  09:16 to 09:25 UTC): the six pre-builds exit 0, their Compiling npt-hash-wasm (5) and npt-lab (6) lines naming the
+  main folder's crates; "check: all 11 steps pass" (:175): measured 491 = 473 + 17 + 1, bites 561 = 541 + 19 + 1, 0
+  failed, 0 skips (356.6 s); self 71 of 71 = 52 + 11 + 8; marks 81, the ADR rows unchanged; redact 264 items, 0
+  findings; the deps line with the fix pass's two clauses, the read-back "given no rustflags", npt-sim's features one
+  set across the npt-server, npt-lab and npt-hash-wasm builds; the wasm line (:170) 33.1 s, 27000 ticks and 0
+  mismatching for both pairs, h2 equal, the hash-map bite caught natively and native-against-Wasm at SS-s1 tick 1234
+  (Wasm 1 against 2 not exercised), std-sin caught at SS-s1 tick 2 `vehicle[8].pos.y`, no call stopped by the 300 s
+  limit (INF2-1's interim rule not triggered; no npt-lab or loader process to list); h7 (ii) by name on release
+  (:177-204): "test result: ok. 1 passed", P2 913db8e914bdb773…, B1 feabf2f02d023fa9…, P4 b8a04f2f8ddc0d39…, each
+  equal to U2's full value (the test's assertion).
+- **M6 met:** no failure in any run; nothing under TE2-5; the copy's failed-steps/ folder empty.
+- **M7 met:** `node tools/gate.mjs`: every check PASS but smoke (5a), which could not start this container's Chromium
+  (tools/'s Playwright expects /opt/pw-browsers/chromium_headless_shell-1194, not installed: gate-full.log); `node
+  tools/gate.mjs --no-smoke`: GATE PASS (gate-nosmoke.log); both logs under .gate/u4d2-merge/. CI's gate and smoke run
+  on the pushed head.
+- **M8:** phase B applied (T1: u4-build-plan.md §4.1's npt-lab and npt-hash-wasm rows; T2: u4s-carries.md entries 82
+  to 85 after entry 77; T3: plan.md's U7 row, C-U7-2; T5: u4d2-report.md's rulings section at its anchor; each read
+  back byte for byte); T5's two places filled by u4d2_t5_fill.py from m5-counted.log:170, :177, :199-201 and :204 and
+  uptime-m5.txt:3; u4d2-report.md written (its other sections in u4e-report.md's form); `git rm` wip/u4d2.patch; one
+  commit. M9 after the push.

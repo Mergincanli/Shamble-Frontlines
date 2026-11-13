@@ -45,6 +45,8 @@ pub struct Setup {
 pub struct Outcome {
     pub seconds: Vec<SecondRecord>,
     pub fate_log_sha256: String,
+    /// SHA-256 of v1's tag and the v2 fate log's datagram entries ([`v1_datagram_sha256`]; carry 66).
+    pub fate_log_v1_datagram_sha256: String,
     /// Per direction (up, down): (datagrams delivered, of them reordered), from the fate log.
     pub reorder: [(u64, u64); 2],
     /// Datagrams sent per direction, bursts included.
@@ -207,13 +209,20 @@ pub fn run(setup: &Setup) -> Result<Outcome, String> {
         t += interval;
     }
     drop(server);
-    let (fate_log_sha256, reorder) =
-        net.with_fate_log(|log| (sha256_hex(log), log.reorder_counts()));
+    let (fate_log_sha256, v1, reorder) = net.with_fate_log(|log| {
+        (
+            sha256_hex(log),
+            v1_datagram_sha256(log),
+            log.reorder_counts(),
+        )
+    });
+    let fate_log_v1_datagram_sha256 = v1?;
     let seconds = per_second(profile, interval, &up_delay, &down_delay, &rtt);
     let summary = summarize(&up_delay, &down_delay, &rtt);
     Ok(Outcome {
         seconds,
         fate_log_sha256,
+        fate_log_v1_datagram_sha256,
         reorder,
         sent: total,
         summary,
@@ -239,6 +248,38 @@ fn sha256_hex(log: &FateLog) -> String {
     let mut h = Sha256::new();
     log.for_each_canonical(|b| h.update(b));
     h.finalize().iter().map(|b| format!("{b:02x}")).collect()
+}
+
+/// The fate log's canonical form's first bytes since U4c (v2), and v1's, which U2's committed hashes began with.
+const V2_TAG: &[u8] = b"npt-l1 fate log v2\n";
+const V1_TAG: &[u8] = b"npt-l1 fate log v1\n";
+/// A datagram's entry in the canonical form: 40 bytes, flow code 0 at byte 5 (`FateLog::for_each_canonical`).
+const DATAGRAM_ENTRY: usize = 40;
+
+/// SHA-256 of v1's tag followed by the v2 fate log's datagram entries, read through npt-l1's public
+/// `FateLog::for_each_canonical` (carry 66; u4c-review-netcode.md F2; L-c8): the v2 tag is skipped and the 40-byte
+/// entries with flow code 0 are kept (the acknowledgements v2 logs beside them are not), as l1/tests/l1.rs:479-505
+/// walks them. A datagram's entry is v1's form, so for the probe, whose v1 log held only datagrams, this is the hash
+/// v1's whole log had for the same run: U2's committed
+/// 913db8e9…, feabf2f0… and b8a04f2f… for P2, B1 and P4 at seed 1. A log whose form starts with another tag is refused.
+fn v1_datagram_sha256(log: &FateLog) -> Result<String, String> {
+    let mut h = Sha256::new();
+    h.update(V1_TAG);
+    let mut tag: Option<Vec<u8>> = None;
+    log.for_each_canonical(|b| {
+        if tag.is_none() {
+            tag = Some(b.to_vec());
+        } else if b.len() == DATAGRAM_ENTRY && b[5] == 0 {
+            h.update(b);
+        }
+    });
+    if tag.as_deref() != Some(V2_TAG) {
+        return Err(format!(
+            "the fate log's canonical form starts with {:?}, not v2's tag: the v1 datagram hash reads v2's form only",
+            tag.map(|t| String::from_utf8_lossy(&t).into_owned())
+        ));
+    }
+    Ok(h.finalize().iter().map(|b| format!("{b:02x}")).collect())
 }
 
 fn as_i64(v: u64) -> i64 {
@@ -457,6 +498,115 @@ mod tests {
         let o = run(&setup(Profile::p3(), 3, 10_000)).unwrap();
         for (delivered, reordered) in o.reorder {
             assert!(delivered > 9_000 && reordered > 0 && reordered <= delivered);
+        }
+    }
+
+    /// SHA-256 of v1's tag and a log's datagram entries, by l1/tests/l1.rs:479-505's walk: the v2 tag first, then
+    /// every entry by its size and flow code (40 and 0 a datagram, 64 and 1 or 2 a stream piece, 56 and 3 an
+    /// acknowledgement), the datagrams hashed.
+    fn v1_walk(log: &FateLog) -> (String, [u64; 3]) {
+        let mut h = Sha256::new();
+        h.update(b"npt-l1 fate log v1\n");
+        let mut counts = [0u64; 3];
+        let mut tag = true;
+        log.for_each_canonical(|b| {
+            if tag {
+                assert_eq!(b, b"npt-l1 fate log v2\n");
+                tag = false;
+                return;
+            }
+            match (b.len(), b[5]) {
+                (40, 0) => {
+                    counts[0] += 1;
+                    h.update(b);
+                }
+                (64, 1 | 2) => counts[1] += 1,
+                (56, 3) => counts[2] += 1,
+                other => panic!("an entry of {} bytes with flow code {}", other.0, other.1),
+            }
+        });
+        let hex = h.finalize().iter().map(|b| format!("{b:02x}")).collect();
+        (hex, counts)
+    }
+
+    #[test]
+    fn h7_the_v1_datagram_hash_is_v1s_tag_and_the_logs_datagram_entries() {
+        // A probe's traffic on L1: datagrams both ways, as `run` sends them, at P2's loss and delay.
+        let net = L1Net::new(1);
+        let mut client = net.connect(Profile::p2(), MAX_DATAGRAM, 0);
+        let mut listener = net.listener();
+        let mut server: Option<Box<dyn Link>> = None;
+        for i in 0..3_000u64 {
+            let t = send_time(i, 100_000);
+            if server.is_none() {
+                server = listener.poll_accept(t).map(|(l, _)| l);
+            }
+            let s = server.as_mut().expect("accepted at once");
+            while s.poll_recv(t).is_some() {}
+            while client.poll_recv(t).is_some() {}
+            let d = |dir| Datagram {
+                dir,
+                index: i,
+                sent_ns: t,
+                echo: NONE,
+                hold_ns: 0,
+            };
+            assert_eq!(client.send_unreliable(&encode(&d(0)), t), SendResult::Sent);
+            assert_eq!(s.send_unreliable(&encode(&d(1)), t), SendResult::Sent);
+        }
+        drop(server);
+        net.with_fate_log(|log| {
+            // Every datagram has its entry; v2 also logs the acknowledgements beside them, which v1 had not.
+            let (walked, [datagrams, stream, acks]) = v1_walk(log);
+            assert_eq!((datagrams, stream), (6_000, 0));
+            assert!(
+                acks > 0,
+                "{acks} acknowledgements logged beside the datagrams"
+            );
+            assert_eq!(v1_datagram_sha256(log), Ok(walked.clone()));
+            // The whole log's hash starts with the v2 tag, so the two differ on the same entries.
+            assert_ne!(sha256_hex(log), walked);
+        });
+        // A probe run carries both, each 64 lowercase hex digits.
+        let o = run(&setup(Profile::p2(), 1, 10_000)).unwrap();
+        for h in [&o.fate_log_sha256, &o.fate_log_v1_datagram_sha256] {
+            assert!(
+                h.len() == 64
+                    && h.bytes()
+                        .all(|b| b.is_ascii_hexdigit() && !b.is_ascii_uppercase())
+            );
+        }
+        assert_ne!(o.fate_log_sha256, o.fate_log_v1_datagram_sha256);
+    }
+
+    /// h7 (ii), carry 66's three values, run once by name on the release build for the report (the precedent:
+    /// sim/tests/world.rs:1188): P2, B1 and P4 at seed 1 with -3's arguments (1,000,000 datagrams each way at 10,000
+    /// a second; B1's burst at 50 s, as main.rs builds it), each SHA-256 of v1's tag and the datagram entries U2's
+    /// whole v1 log's (results/c-u2-pm-0001-3/81c6d01e371b/runs.txt:16, :34, :28 hold their first 16 digits).
+    #[test]
+    #[ignore = "carry 66's judged values: 3 probe runs of 1,000,000 datagrams each way; run by name (u4d2-brief.md 2.6 h7)"]
+    fn h7_carry_66_the_probes_v1_datagram_hashes_are_u2s_for_p2_b1_and_p4_seed_1() {
+        for (name, want) in [
+            (
+                "P2",
+                "913db8e914bdb773f6f19ac404c7098f711798790fcd1a861502502764b11ecc",
+            ),
+            (
+                "B1",
+                "feabf2f02d023fa9784b2f9630ec6e2ceeed0bcdd28507c203b0ba40de1c25bf",
+            ),
+            (
+                "P4",
+                "b8a04f2f8ddc0d39624d853730636c50ffb354ddb187938066fabc156c1f602b",
+            ),
+        ] {
+            let profile = crate::profile(name, 50).unwrap();
+            let o = run(&setup(profile, 1, PACKETS)).unwrap();
+            println!(
+                "{name} seed 1: fate log {}; v1 datagram fate log {}",
+                o.fate_log_sha256, o.fate_log_v1_datagram_sha256
+            );
+            assert_eq!(o.fate_log_v1_datagram_sha256, want, "{name} seed 1");
         }
     }
 

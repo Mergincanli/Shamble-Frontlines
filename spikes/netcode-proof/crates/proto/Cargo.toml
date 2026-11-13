@@ -10,8 +10,8 @@ publish.workspace = true
 workspace = true
 
 [features]
-# The planted defects (plan §4.7, E19), bites builds only; npt-sim's too, since the wire grid's bites are chosen through
-# its config value (u4-build-plan.md §4.4, §4.11).
+# The planted defects (plan §4.7, E19), bites builds only; npt-sim's too, so a bites build of npt-proto compiles its
+# dependency's own bites in (after carry 2, npt-proto's bites are its own: u4-build-plan.md §4.4, §4.11).
 bites = ["npt-sim/bites"]
 
 [dependencies]

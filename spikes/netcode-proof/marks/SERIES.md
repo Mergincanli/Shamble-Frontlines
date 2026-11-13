@@ -395,6 +395,7 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
 | `kind` | move or flash | -43 |
 | `collision_rule` | string | -42 (recorded) |
 | `fate_log_sha256` | hex string | -3 |
+| `fate_log_v1_datagram_sha256` | hex string: the SHA-256 of v1's tag and the v2 fate log's datagram entries (carry 66), which §5 U4c's L-c8 compares with U2's committed hashes | -3 (recorded) |
 | `reorder_up_permille`, `reorder_down_permille` | each direction's measured reorder share: RFC 4737's reordered datagrams per 1000 delivered (`reorder_permille` is the lower of the two) | -3 (recorded), the `reorder` rule |
 | `reorder_step_permille` | the reorder step's draw share (part 13's 10, on in every run), recorded beside the profile | -3 (recorded) |
 | `probe_rate_pps` | the probe's datagrams per second per direction (10,000) | -3 (recorded) |

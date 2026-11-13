@@ -9,26 +9,34 @@
 // `cargo metadata` shows, with every feature and target, and its unsafe_code rule, from the crates' files, the
 // manifests and the environment and cargo configs this command's cargo reads: DEPS_CHECKED says what it checks, and
 // the comment above it what it does not; with U4s's three greps: the tick constants of u4-build-plan.md §4.3,
-// npt-room's float-free sources, §4.11, and each bite id in one crate's sources, §4.14; and U4a's two: npt-proto's
-// clippy.toml against npt-sim's, §2, and npt-link's Channel alone in npt-proto and npt-client); refs (nothing outside
-// spikes/
-// references it, §4.2 and §4.9);
+// npt-room's float-free sources, §4.11, and each bite id in one crate's sources, §4.14; U4a's two: npt-proto's
+// clippy.toml against npt-sim's, §2, and npt-link's Channel alone in npt-proto and npt-client; and U4d2's: npt-sim's
+// resolved features in each build that runs it, the build flags with rustc's read-back of them, and npt-hash-wasm's
+// rules, the spike's third unsafe exception, §5 U4d2); wasm (the determinism check, plan.md §4.5 and u4-build-plan.md
+// §5 U4d2: release builds of npt-lab for x86-64 and npt-hash-wasm for wasm32, measured and bites; the recordings
+// manifest regenerated and checked; npt-lab's two native legs and the Node loader's Wasm leg over its recordings,
+// compared tick by tick, with the field diff at a first mismatch; PM-0004-21's cross-target vectors; and its two
+// bites, hash-map and std-sin, in the bites builds); refs (nothing outside spikes/ references it, §4.2 and §4.9);
 // marks (marks.json compiles in the judge, covers exactly the plan's marks, and every row it hashed is unchanged); self
 // (this file's own tests); redact (redact-check's tests, then a scan of the spike's folder). It runs every step and
 // exits 1 if any failed.
 
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFileSync, readdirSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { HASH_WASM_EXPORTS } from "./crates/hash-wasm/loader.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..", "..");
 
-/** The leaf crates (plan §4.2): built for wasm32, free of every transport crate and async runtime. */
-export const LEAF = ["npt-link", "npt-l1", "npt-sim", "npt-proto", "npt-room", "npt-client", "npt-log"];
+/**
+ * The leaf crates (plan §4.2): built for wasm32, free of every transport crate and async runtime; npt-hash-wasm, the
+ * check-only cdylib over npt-sim, among them (u4-build-plan.md §5 U4d2), so the wasm32 clippy and doc steps take it.
+ */
+export const LEAF = ["npt-link", "npt-l1", "npt-sim", "npt-proto", "npt-room", "npt-client", "npt-log", "npt-hash-wasm"];
 /** Transport crates and async runtimes no leaf crate may reach (plan §4.2's list, with their own parts). */
 export const TRANSPORT = [
   "tokio",
@@ -119,6 +127,21 @@ export function dependencyProblems(meta) {
     if (name === "npt-net") continue;
     for (const d of n.deps) if (byId.get(d.pkg).name === "npt-tcpinfo") problems.push(`${name} depends on npt-tcpinfo`);
   }
+  // npt-hash-wasm (U4d2; u4-build-plan.md §5 U4d2): npt-sim is its only shipped dependency, and nothing depends on it,
+  // in any kind: a check-only cdylib that Node loads, whose exports are the spike's third unsafe exception. A missing
+  // npt-hash-wasm is said once, by the LEAF loop above (it is a leaf crate), and so is a missing npt-sim (below).
+  const hashWasmId = meta.workspace_members.find((id) => byId.get(id).name === "npt-hash-wasm");
+  if (hashWasmId) {
+    const node = meta.resolve.nodes.find((n) => n.id === hashWasmId);
+    const shippedDeps = (node?.deps ?? []).filter(isShipped).map((d) => byId.get(d.pkg).name);
+    for (const name of shippedDeps) if (name !== "npt-sim") problems.push(`npt-hash-wasm depends on ${name}`);
+    if (!shippedDeps.includes("npt-sim") && all.has("npt-sim")) problems.push("npt-hash-wasm does not depend on npt-sim");
+  }
+  for (const n of meta.resolve.nodes) {
+    for (const d of n.deps) {
+      if (byId.get(d.pkg).name === "npt-hash-wasm") problems.push(`${byId.get(n.id).name} depends on npt-hash-wasm`);
+    }
+  }
   // npt-sim (U4s; the arch review's F4): it ships with SIM_DEPENDENCIES alone, so the sim stays free of every crate
   // above it and of any dependency no review has read; a dev dependency does not ship (C10). A missing npt-sim fails
   // here too, not only in the LEAF loop above (it is a leaf crate), which says the same sentence: it is said once.
@@ -161,14 +184,47 @@ export function dependencyProblems(meta) {
 /**
  * The crates that may relax `unsafe_code`, by folder: ADR 0002:264-265's exceptions ("an exception needs a written
  * invariant, a test and an #[allow] with its reason"), named in the workspace Cargo.toml. The workspace forbids the
- * lint, so these two carry their own [lints] tables in place of `workspace = true` (EXCEPTION_LEVELS):
+ * lint, so these three carry their own [lints] tables in place of `workspace = true` (EXCEPTION_LEVELS):
  * npt-client-wasm allows it for the whole crate (wasm-bindgen's generated code), so its files are not scanned for it;
  * npt-tcpinfo denies it, which its two #[allow]s can relax (forbid could not), only through the attributes
- * TCPINFO_UNSAFE_FNS allows, and has `unsafe` only inside those functions.
+ * TCPINFO_UNSAFE_FNS allows, and has `unsafe` only inside those functions; npt-hash-wasm, the third (U4d2; the
+ * advisor's condition 7), denies it too, and relaxes it only by one #[allow] on each of its listed exports
+ * (HASH_WASM_EXPORTS, the Node loader's list), whose `#[unsafe(no_mangle)]` is its only `unsafe`.
  */
-export const UNSAFE_EXCEPTIONS = { "crates/client-wasm/": "npt-client-wasm", "crates/tcpinfo/": "npt-tcpinfo" };
+export const UNSAFE_EXCEPTIONS = {
+  "crates/client-wasm/": "npt-client-wasm",
+  "crates/tcpinfo/": "npt-tcpinfo",
+  "crates/hash-wasm/": "npt-hash-wasm",
+};
 /** The unsafe_code level each exception's own [lints.rust] gives, its other lints being the workspace's (review C2R-1). */
-const EXCEPTION_LEVELS = { "crates/client-wasm/": "allow", "crates/tcpinfo/": "deny" };
+const EXCEPTION_LEVELS = { "crates/client-wasm/": "allow", "crates/tcpinfo/": "deny", "crates/hash-wasm/": "deny" };
+/**
+ * Why a deny-level exception (npt-tcpinfo, npt-hash-wasm) may have no build script and may name `include` only as a
+ * macro call (the advisor's U4d2 round-1 ruling, FX-6: SEC-U4D2-4, C2R-2's known limit): code a build script writes,
+ * brought in by an `include!` the scan cannot see by its name (`use std::include as inc;`), would sit inside a listed
+ * function's allow, where rustc compiles unsafe code the scan never reads.
+ */
+const DENY_EXCEPTION_WHY =
+  "code a build script writes, brought in by a renamed include!, would sit inside a listed function's allow, where " +
+  "rustc compiles unsafe code the scan never reads (SEC-U4D2-4)";
+/** The exceptions' names as a sentence lists them: "a, b and c". */
+const exceptionNames = () => {
+  const names = Object.values(UNSAFE_EXCEPTIONS);
+  return `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+};
+/** npt-hash-wasm's one file with unsafe code, its seven exports (u4-build-plan.md §5 U4d2; u4d2-brief.md 2.4 (d)). */
+export const HASH_WASM_UNSAFE_FILE = "crates/hash-wasm/src/lib.rs";
+/**
+ * The types an export's parameters and result may have (the advisor's U4D2-Q7 ruling): rustc lowers both to Wasm's
+ * i32, so every export has integer signatures only (the third exception's written invariant).
+ * Known limit (SEC-U4D2-3; the advisor's U4d2 round-1 ruling, FX-11): the scan reads the type's token, not the type.
+ * A module-local `type u32 = f64;` or `use core::primitive::f64 as u32;` passes it, and the built module's export
+ * types are not read (Wasm then types the export `(f64) -> (f64)`: r1-sec-rustc.log); review is the wall until the
+ * loader reads the type section (Q7 (b), C-U7-2).
+ */
+const EXPORT_INTEGERS = ["u32", "i32"];
+/** The one attribute whose `unsafe` npt-hash-wasm may have: `#[unsafe(no_mangle)]`, sitting on a listed export. */
+const NO_MANGLE = /^\s*unsafe\s*\(\s*no_mangle\s*\)\s*$/;
 /** npt-tcpinfo's only relaxing attributes (u3c-plan.md 1.8 (a)): one on each of these functions, in this file. */
 export const TCPINFO_UNSAFE_FILE = "crates/tcpinfo/src/linux.rs";
 export const TCPINFO_UNSAFE_FNS = ["srtt_us", "unacked_and_unsent"];
@@ -201,9 +257,9 @@ const UNSAFE_CODE_NAME = /\bunsafe[-_]code\b/i;
  * the unsafe_code lint denies that edition 2024 lets go without the keyword (`#[no_mangle]`, `#[export_name]` and
  * `#[link_section]` need `#[unsafe(...)]` there; rustc 1.99.1 compiles a macro-built `#[allow($l)]` over
  * `global_asm!("")` with no `unsafe` in sight). Found in code, they are unsafe code whatever relaxed the lint: an
- * attribute this scan cannot read (one built by a macro), rustflags or `--cap-lints`. In every crate but the two
+ * attribute this scan cannot read (one built by a macro), rustflags or `--cap-lints`. In every crate but the three
  * exceptions the compiler refuses them first (the workspace's forbid: E0453 on any allow, a macro-built one included);
- * this scan is the second layer there, and inside npt-tcpinfo the only one.
+ * this scan is the second layer there, and inside npt-tcpinfo and npt-hash-wasm the only one.
  */
 const UNSAFE_CODE = /(?<!r#)\bunsafe\b|\bglobal_asm\b/g;
 /** The one form npt-tcpinfo may use: `allow(unsafe_code, reason = "...")` and nothing else in the attribute. */
@@ -224,8 +280,8 @@ const isPlacedAllow = (body) =>
  * blank the code after it.
  * Known limit (review C2R-1): this is not rustc's lexer. A first line `#!...` (a shebang, which rustc drops from any
  * source file) or a `\u{...}` escape with underscores past six characters puts it out of step, so text rustc compiles
- * can read here as a comment or a literal. Outside the two exception crates the workspace's forbid makes rustc refuse
- * unsafe code this misses; inside npt-tcpinfo (deny, not forbid) nothing but review does.
+ * can read here as a comment or a literal. Outside the three exception crates the workspace's forbid makes rustc refuse
+ * unsafe code this misses; inside npt-tcpinfo and npt-hash-wasm (deny, not forbid) nothing but review does.
  */
 export function lexRust(src) {
   const blank = (s) => s.replace(/[^\n]/g, " ");
@@ -323,8 +379,10 @@ const lineAt = (text, offset) => text.slice(0, offset).split("\n").length;
  * given at the call).
  * Known limit (review C2R-2): the literal is read as written, its escapes not decoded (`.\x2e/` is `../` to rustc),
  * and include! is found by its name only (`use std::include as inc;` hides it). Code such a path brings into a crate
- * under the workspace's forbid is still refused by rustc if it holds unsafe code or an allow of the lint; into
- * npt-tcpinfo, only review stops it.
+ * under the workspace's forbid is still refused by rustc if it holds unsafe code or an allow of the lint. Into
+ * npt-tcpinfo or npt-hash-wasm (deny, not forbid), whose listed functions' allows would cover it, unsafeProblems
+ * refuses the two routes found (SEC-U4D2-4): a build script, whose output an include! brings in, and `include` named
+ * as a path; a literal with escapes there is review's.
  */
 function pathProblems(f, crate, code, mask, attrs) {
   const problems = [];
@@ -452,6 +510,111 @@ function tcpinfoProblems(f, code, mask, attrs, sites, state) {
 }
 
 /**
+ * The item an outer attribute ending at `at` sits on, other outer attributes skipped, read for npt-hash-wasm's exports:
+ * `item` its first line as written (from `code`), `export` its name when it is `pub extern "C" fn <name>(` with the
+ * name on HASH_WASM_EXPORTS, else null. itemAfter reads `pub fn` only, and in the mask the `"C"` is blanked, so the ABI
+ * is read from `code`.
+ */
+function exportAfter(code, mask, at, attrs) {
+  let j = at;
+  for (;;) {
+    while (j < mask.length && /\s/.test(mask[j])) j++;
+    const next = attrs.find((a) => a.start === j && !a.inner);
+    if (!next) break;
+    j = next.end;
+  }
+  const item = code.slice(j).split("\n", 1)[0].trim() || "(nothing)";
+  const name = code.slice(j).match(/^pub\s+extern\s+"C"\s+fn\s+([A-Za-z_]\w*)\s*\(/)?.[1] ?? null;
+  return { item, export: name && HASH_WASM_EXPORTS.includes(name) ? name : null };
+}
+
+/**
+ * npt-hash-wasm's rules (the spike's third unsafe exception: u4-build-plan.md §5 U4d2; u4d2-brief.md 2.4 (d)), each
+ * broken one reported with its line, in tcpinfoProblems' pattern:
+ * - every relaxing of unsafe_code in the crate is an outer `#[allow(unsafe_code, reason = "...")]` in
+ *   HASH_WASM_UNSAFE_FILE sitting directly on a listed export, `pub extern "C" fn <one of HASH_WASM_EXPORTS>` (other
+ *   outer attributes may sit between), its reason not empty; anything else is a problem: an inner attribute, cfg_attr,
+ *   expect or warn, an allow on a helper or any other item, a mention in a string or a macro's text, `unsafe_code`
+ *   named in code outside an attribute; `sites` counts the placed allows per export (one each, checked by the caller);
+ * - every `unsafe` in the crate is the `unsafe` of a `#[unsafe(no_mangle)]` on a listed export in that file: any other
+ *   (a block, an unsafe fn, impl or trait, an `unsafe extern` block, `#[unsafe(export_name = ...)]`,
+ *   `#[unsafe(link_section = ...)]`, a no_mangle on an export not on the list) and `global_asm!` is a problem;
+ * - every listed export's parameters, and its result if it has one, are u32 or i32 (EXPORT_INTEGERS; the advisor's
+ *   U4D2-Q7 ruling): Wasm gets i32 for both, so the written invariant's "integer signatures only" holds.
+ */
+function hashWasmProblems(f, code, mask, attrs, sites) {
+  const problems = [];
+  const lists = `its listed exports (${HASH_WASM_EXPORTS.join(", ")}) in ${HASH_WASM_UNSAFE_FILE}`;
+  const inAttribute = (i) => attrs.some((a) => i >= a.start && i < a.end);
+  let inAttributes = 0;
+  for (const a of attrs) {
+    if (!mask.slice(a.bodyStart, a.bodyEnd).match(RELAX_UNSAFE)) continue;
+    const body = code.slice(a.bodyStart, a.bodyEnd);
+    inAttributes += body.match(RELAX_UNSAFE)?.length ?? 0;
+    const after = a.inner ? { item: "its whole module or crate (#!)", export: null } : exportAfter(code, mask, a.end, attrs);
+    const placed = f === HASH_WASM_UNSAFE_FILE && !a.inner && isPlacedAllow(body) && after.export;
+    if (placed) sites.set(after.export, (sites.get(after.export) ?? 0) + 1);
+    else {
+      const on = a.inner ? after.item : `\`${after.item}\``;
+      problems.push(
+        `${f}:${lineAt(code, a.start)} relaxes unsafe_code on ${on}; npt-hash-wasm may only put #[allow(unsafe_code, ` +
+          `reason = "...")] directly on ${lists}`,
+      );
+    }
+  }
+  const all = code.match(RELAX_UNSAFE)?.length ?? 0;
+  if (all > inAttributes) problems.push(`${f} names an unsafe_code relaxing outside an attribute (a string or a macro's text)`);
+  for (const m of mask.matchAll(/\bunsafe_code\b/g)) {
+    if (!inAttribute(m.index)) {
+      problems.push(`${f}:${lineAt(mask, m.index)} names unsafe_code outside an attribute (a macro can build the attribute from it)`);
+    }
+  }
+  // The one `unsafe` each listed export may have: its #[unsafe(no_mangle)]'s.
+  const allowed = new Set();
+  for (const a of attrs) {
+    const body = mask.slice(a.bodyStart, a.bodyEnd);
+    if (a.inner || f !== HASH_WASM_UNSAFE_FILE || !NO_MANGLE.test(body)) continue;
+    if (exportAfter(code, mask, a.end, attrs).export) allowed.add(a.bodyStart + body.indexOf("unsafe"));
+  }
+  for (const m of mask.matchAll(UNSAFE_CODE)) {
+    if (allowed.has(m.index)) continue;
+    const a = attrs.find((x) => m.index >= x.start && m.index < x.end);
+    const where = a
+      ? `in #[${code.slice(a.bodyStart, a.bodyEnd).trim()}] on \`${a.inner ? "its whole module or crate (#!)" : exportAfter(code, mask, a.end, attrs).item}\``
+      : "outside an attribute";
+    problems.push(
+      `${f}:${lineAt(mask, m.index)} has \`${m[0]}\` ${where}; npt-hash-wasm's only unsafe is the #[unsafe(no_mangle)] ` +
+        `of ${lists}`,
+    );
+  }
+  // Each listed export's signature: u32 or i32 in and out.
+  if (f === HASH_WASM_UNSAFE_FILE) {
+    for (const m of code.matchAll(/\bpub\s+extern\s+"C"\s+fn\s+([A-Za-z_]\w*)\s*\(/g)) {
+      if (!HASH_WASM_EXPORTS.includes(m[1]) || mask.slice(m.index, m.index + 3) !== "pub") continue;
+      const open = m.index + m[0].length - 1;
+      let depth = 0;
+      let close = open;
+      do {
+        if (mask[close] === "(") depth++;
+        else if (mask[close] === ")") depth--;
+        close++;
+      } while (depth > 0 && close < mask.length);
+      const params = mask.slice(open + 1, close - 1).split(",").map((p) => p.trim()).filter(Boolean);
+      const types = params.map((p) => p.slice(p.indexOf(":") + 1).trim());
+      const result = mask.slice(close).match(/^\s*(?:->\s*([^{]*?))?\s*(?:where\b[^{]*)?\{/)?.[1]?.trim();
+      const bad = [...types.map((t, k) => (EXPORT_INTEGERS.includes(t) ? null : `parameter ${params[k]}`)), ...(result === undefined || EXPORT_INTEGERS.includes(result) ? [] : [`result ${result}`])].filter(Boolean);
+      if (bad.length || !params.every((p) => p.includes(":"))) {
+        problems.push(
+          `${f}:${lineAt(code, m.index)} exports ${m[1]} with ${bad.join(" and ") || "a parameter it cannot read"}: npt-hash-wasm's ` +
+            "exports take and give u32 or i32 only (the advisor's U4D2-Q7 ruling)",
+        );
+      }
+    }
+  }
+  return problems;
+}
+
+/**
  * Whether a crate manifest has `[lints]` with `workspace = true`, read from tomlScan's mask, as lintTables reads, so a
  * header or a key inside a string or a comment is none (review C2c N2: the two lines moved into a multi-line string,
  * basic or literal, had read as inherited while cargo gave rustc no lint flag at all). Any other spelling (quoted,
@@ -472,13 +635,19 @@ function inheritsWorkspaceLints(text) {
  * Every place under crates/ that breaks the unsafe_code rule, as a sentence; empty when none does (u3c-plan.md 1.8 (a)
  * and (d)). `files` are paths relative to the spike's folder (crates/<crate>/...): its .rs files and crate manifests.
  * What is caught, as lexRust reads the code (its known limit is there):
- * - outside the two exception crates, any `allow`, `expect` or `warn` of unsafe_code in a .rs file, comments included
+ * - outside the three exception crates, any `allow`, `expect` or `warn` of unsafe_code in a .rs file, comments included
  *   (and a comment or literal inside the attribute's list), and any `unsafe` or `global_asm!` in code;
- * - a manifest other than the two exceptions' that names unsafe_code outside its comments (UNSAFE_CODE_NAME:
+ * - a manifest other than the three exceptions' that names unsafe_code outside its comments (UNSAFE_CODE_NAME:
  *   `unsafe-code` too) or does not inherit the workspace lints, as read outside its strings and comments
  *   (inheritsWorkspaceLints; the exceptions' own tables are exceptionLintProblems');
  * - in npt-tcpinfo, any relaxing but the two placed allows, `unsafe` outside their two functions, the two clippy lints
  *   named outside lib.rs's crate-level deny or that deny missing (tcpinfoProblems), and either allow missing;
+ * - in npt-hash-wasm, any relaxing but one placed allow on each listed export, any `unsafe` but a listed export's
+ *   `#[unsafe(no_mangle)]`, a listed export whose parameters or result are not u32 or i32 (hashWasmProblems), and a
+ *   listed export with no allow or two;
+ * - in npt-tcpinfo and npt-hash-wasm (EXCEPTION_LEVELS' deny), a build.rs at the crate's root, a `build` key in its
+ *   manifest, and `include` named other than as an include!, include_str! or include_bytes! call (the advisor's U4d2
+ *   round-1 ruling, FX-6: SEC-U4D2-4); layoutProblems refuses a custom-build target there too;
  * - in every crate, a #[path] or include! whose literal names anything but a .rs file inside the crate's folder
  *   (pathProblems, with its known limit), the way another crate could compile npt-tcpinfo's file under its own name.
  * npt-client-wasm's .rs files are not scanned for unsafe code: its manifest allows the lint for the whole crate.
@@ -489,8 +658,9 @@ function inheritsWorkspaceLints(text) {
 export function unsafeProblems(files, read) {
   const problems = [];
   const sites = new Map();
+  const hashSites = new Map();
   const state = { rootDeny: false };
-  const others = Object.values(UNSAFE_EXCEPTIONS).join(" and ");
+  const others = exceptionNames();
   for (const f of files) {
     const crate = f.match(/^crates\/[^/]+\//)?.[0];
     if (!crate) continue;
@@ -506,7 +676,23 @@ export function unsafeProblems(files, read) {
         }
       }
       if (crate === "crates/tcpinfo/") problems.push(...tcpinfoProblems(f, code, mask, attrs, sites, state));
+      if (crate === "crates/hash-wasm/") problems.push(...hashWasmProblems(f, code, mask, attrs, hashSites));
+      if (EXCEPTION_LEVELS[crate] === "deny") {
+        const name = UNSAFE_EXCEPTIONS[crate];
+        if (f === `${crate}build.rs`) problems.push(`${f} is a build script in ${name}, which may have none: ${DENY_EXCEPTION_WHY}`);
+        for (const m of mask.matchAll(/\binclude\b(?!\s*!)/g)) {
+          problems.push(
+            `${f}:${lineAt(mask, m.index)} names \`include\` other than as an include!, include_str! or include_bytes! call ` +
+              `(a renamed include!, as \`use std::include as inc;\`, hides the call from the include! rule), which ${name} may not: ` +
+              DENY_EXCEPTION_WHY,
+          );
+        }
+      }
       problems.push(...pathProblems(f, crate, code, mask, attrs));
+    } else if (f === `${crate}Cargo.toml` && EXCEPTION_LEVELS[crate] === "deny") {
+      if (tomlValues(tomlScan(text), "build").length) {
+        problems.push(`${f} has a key \`build\`: a build script in ${UNSAFE_EXCEPTIONS[crate]}, which may have none: ${DENY_EXCEPTION_WHY}`);
+      }
     } else if (f === `${crate}Cargo.toml` && !(crate in UNSAFE_EXCEPTIONS)) {
       // The name is looked for outside comments, strings included (a quoted key is the lint to cargo; a string that
       // names it fails closed), in tomlScan's `clean`: a `#` inside a string is no comment there (review C2c N2's
@@ -521,6 +707,10 @@ export function unsafeProblems(files, read) {
   }
   if (!state.rootDeny) {
     problems.push(`${TCPINFO_ROOT} does not deny clippy::${TCPINFO_CLIPPY_LINTS.join(" and clippy::")} at the crate root`);
+  }
+  for (const fn of HASH_WASM_EXPORTS) {
+    const n = hashSites.get(fn) ?? 0;
+    if (n !== 1) problems.push(`npt-hash-wasm's export ${fn} has ${n} #[allow(unsafe_code, reason = ...)] attributes, not 1`);
   }
   return problems;
 }
@@ -990,7 +1180,7 @@ function lintTables(text, prefix, file) {
 
 /**
  * The workspace manifest's unsafe_code lint, which the whole rule rests on: `[workspace.lints.rust] unsafe_code =
- * "forbid"` (or `{ level = "forbid", priority = n }`), the compiler backstop (review C2R-1): every member but the two
+ * "forbid"` (or `{ level = "forbid", priority = n }`), the compiler backstop (review C2R-1): every member but the three
  * exceptions inherits it, and under it rustc refuses unsafe code and any allow of the lint (E0453), a macro-built one
  * included. Every line naming unsafe_code outside strings and comments, in any case and with `-` for `_` (cargo reads
  * `unsafe-code` as the same lint), must be that entry; a form lintTables does not read, or another level, place or
@@ -1011,11 +1201,11 @@ export function workspaceLintProblems(text) {
 }
 
 /**
- * The two exceptions' own lint tables (review C2R-1; replacing u3c-plan.md 1.8 (a)'s "keep [lints] workspace = true"
+ * The three exceptions' own lint tables (review C2R-1; replacing u3c-plan.md 1.8 (a)'s "keep [lints] workspace = true"
  * for npt-tcpinfo, the advisor's ruling of 2026-11-08): each crate's `[lints.<tool>]` tables hold exactly the
  * workspace's `[workspace.lints.<tool>]` keys and values, every tool and key, but unsafe_code, which is
- * EXCEPTION_LEVELS' level: "deny" for npt-tcpinfo (its two #[allow]s need a level they can relax), "allow" for
- * npt-client-wasm. Key for key as cargo reads the manifest: any lint given in a form lintTables does not read (a lint's
+ * EXCEPTION_LEVELS' level: "deny" for npt-tcpinfo (its two #[allow]s need a level they can relax) and for
+ * npt-hash-wasm (its seven, U4d2), "allow" for npt-client-wasm. Key for key as cargo reads the manifest: any lint given in a form lintTables does not read (a lint's
  * own sub-table, a quoted, dotted, hyphenated or uppercase name, a dotted key or an inline table elsewhere) is reported
  * with them (review C2b F1: a `[lints.clippy.iter-over-hash-type]` table with level "allow" had relaxed the clippy
  * deny unseen). So leaving the workspace's lints costs them nothing else. `read(path)` reads a file under the spike.
@@ -1087,6 +1277,8 @@ export function layoutProblems(meta) {
       else if (!src.endsWith(".rs")) problems.push(`${what} compiles ${rel(src)}, not a .rs file the scan reads`);
       if (t.edition !== "2024") problems.push(`${what} is edition ${t.edition}, not 2024`);
       if (t.kind.includes("proc-macro")) problems.push(`${what} is a proc-macro crate, whose expansions the lint and the scan cannot see`);
+      const denied = Object.keys(EXCEPTION_LEVELS).some((c) => EXCEPTION_LEVELS[c] === "deny" && UNSAFE_EXCEPTIONS[c] === p.name);
+      if (denied && t.kind.includes("custom-build")) problems.push(`${what} is a build script in ${p.name}, which may have none: ${DENY_EXCEPTION_WHY}`);
     }
   }
   return problems;
@@ -1283,6 +1475,263 @@ export function cargoConfigProblems(env, configs) {
   return problems;
 }
 
+/**
+ * Every rustflags source cargo may read for a build (https://doc.rust-lang.org/cargo/reference/config.html,
+ * build.rustflags: CARGO_ENCODED_RUSTFLAGS, RUSTFLAGS, the target tables, build.rustflags), each as { where, flags }
+ * with its flags as rustc would get them: the environment's *RUSTFLAGS variables (CARGO_ENCODED_RUSTFLAGS split at
+ * \x1f, the others at whitespace; CARGO_TARGET_<triple>_RUSTFLAGS and CARGO_BUILD_RUSTFLAGS among them) and every
+ * `rustflags` key of the cargo configs read (a string split at whitespace, an array as it is), in any table. A value
+ * this check cannot read is cargoConfigProblems' to report.
+ */
+export function rustflagSources(env, configs) {
+  const sources = [];
+  for (const [k, v] of Object.entries(env)) {
+    if (typeof v !== "string" || !/RUSTFLAGS$/.test(k)) continue;
+    sources.push({ where: `${k} in the environment`, flags: v.split(k === "CARGO_ENCODED_RUSTFLAGS" ? "\x1f" : /\s+/).filter(Boolean) });
+  }
+  for (const { path, text } of configs) {
+    for (const v of tomlValues(tomlScan(text), "rustflags")) {
+      if (v === null) continue;
+      sources.push({ where: `${path}'s rustflags`, flags: v.length === 1 ? v[0].split(/\s+/).filter(Boolean) : v });
+    }
+  }
+  return sources;
+}
+
+/** The target features plan.md §4.5's build flags leave off (baseline x86-64, simd128 and relaxed-simd off; no FMA). */
+const REFUSED_FEATURES = ["fma", "simd128", "relaxed-simd"];
+/** The CPU name plan.md §4.5 refuses: `target-cpu=native` builds for the machine that compiles. */
+const REFUSED_CPUS = ["native"];
+
+/**
+ * The refused build flags in the rustflags sources (u4d2-brief.md 2.4 (c) (i); the advisor's condition 7 (a); ADR
+ * 0002:256-258; plan.md §4.5): `+fma`, `+simd128` or `+relaxed-simd` in a target-feature list, and
+ * `target-cpu=native`, in every form rustc reads a codegen option (`-C opt`, `-Copt`, `--codegen opt`,
+ * `--codegen=opt`; the option split across two tokens or not; `_` for `-` in its name), each item of a comma list read;
+ * a feature named without a sign is read as enabled, which fails closed. As sentences, naming the source and the flag.
+ */
+export function buildFlagProblems(sources) {
+  const problems = [];
+  for (const { where, flags } of sources) {
+    const options = [];
+    for (let i = 0; i < flags.length; i++) {
+      const t = flags[i];
+      if (t === "-C" || t === "--codegen") {
+        if (i + 1 < flags.length) options.push(flags[++i]);
+      } else if (t.startsWith("--codegen=")) options.push(t.slice("--codegen=".length));
+      else if (t.startsWith("-C")) options.push(t.slice(2));
+    }
+    for (const o of options) {
+      const eq = o.indexOf("=");
+      const name = (eq < 0 ? o : o.slice(0, eq)).replace(/_/g, "-");
+      const value = eq < 0 ? "" : o.slice(eq + 1);
+      if (name === "target-feature") {
+        for (const item of value.split(",").map((s) => s.trim())) {
+          const feature = item.replace(/^[+-]/, "");
+          if (REFUSED_FEATURES.includes(feature) && !item.startsWith("-")) {
+            problems.push(`${where} passes ${JSON.stringify(`-C ${o}`)}: it enables ${feature}, which plan.md §4.5's build flags refuse`);
+          }
+        }
+      } else if (name === "target-cpu" && REFUSED_CPUS.includes(value)) {
+        problems.push(`${where} passes ${JSON.stringify(`-C ${o}`)}: plan.md §4.5's build flags refuse target-cpu=native`);
+      }
+    }
+  }
+  return problems;
+}
+
+/**
+ * Every rustflags source that holds a flag, whatever the flag, and every build target set outside the builds' own
+ * `--target` (the advisor's U4d2 round-1 ruling, FX-1: RR-M2 with TE-M1, SEC-U4D2-5, SEC-U4D2-6), as sentences naming
+ * the source and its value:
+ * - each source rustflagSources reads (every environment variable whose name ends in RUSTFLAGS, and every `rustflags`
+ *   key of the cargo configs read) with a flag in it. Cargo gives rustc the first non-empty one of
+ *   CARGO_ENCODED_RUSTFLAGS, RUSTFLAGS, the target tables and build.rustflags and drops the others
+ *   (https://doc.rust-lang.org/cargo/reference/config.html, build.rustflags), so a read-back given all of them could
+ *   take a flag's negation from a source cargo drops (`-Ctarget-feature=-simd128,-relaxed-simd` in RUSTFLAGS beside
+ *   CARGO_ENCODED_RUSTFLAGS=-Ctarget-cpu=bleeding-edge passed while the module cargo built held both: RR-M2), and a
+ *   flag no name rule knows (`--cfg feature="bites"`, `-C overflow-checks=off`, `-C llvm-args=...`) reached rustc unseen
+ *   by both (SEC-U4D2-5). The spike's builds use none, so with every source empty the read-back is given exactly what
+ *   cargo gives rustc: no flag;
+ * - CARGO_BUILD_TARGET in the environment, whatever its value, and a `target` key in a cargo config (build.target; read
+ *   in any table or form, as this file reads config keys, which fails closed): either builds npt-lab's native legs for
+ *   another target than the x86-64 one the read-back and the features comparison read (SEC-U4D2-6).
+ */
+export function buildInputProblems(env, configs) {
+  const problems = [];
+  for (const { where, flags } of rustflagSources(env, configs)) {
+    if (!flags.length) continue;
+    problems.push(
+      `${where} holds ${JSON.stringify(flags.join(" "))}: no rustflags source may hold a flag (cargo uses one source ` +
+        "and drops the rest, so the read-back could not be given what rustc gets: the advisor's U4d2 round-1 ruling, FX-1)",
+    );
+  }
+  if (typeof env.CARGO_BUILD_TARGET === "string") {
+    problems.push(
+      `CARGO_BUILD_TARGET in the environment sets the build target (${JSON.stringify(env.CARGO_BUILD_TARGET)}): the native ` +
+        "builds take cargo's default target, the x86-64 one the read-back and the features comparison read",
+    );
+  }
+  for (const { path, text } of configs) {
+    if (tomlValues(tomlScan(text), "target").length) {
+      problems.push(
+        `${path} has a key \`target\` (build.target): it sets the build target, and the native builds take cargo's ` +
+          "default target, the x86-64 one the read-back and the features comparison read",
+      );
+    }
+  }
+  return problems;
+}
+
+/**
+ * rustc's read-back of the target features (the advisor's condition 7 (a): it fails the step, never only reports; the
+ * advisor's U4D2-Q4 ruling): `rustc --print cfg --target <triple>` run from the spike's folder (rust-toolchain.toml
+ * picks the toolchain cargo uses), given every rustflag of every source read. The deps step refuses every source that
+ * holds a flag (buildInputProblems: the advisor's U4d2 round-1 ruling, FX-1), so whenever the step can pass the
+ * read-back is given no flag, which is exactly what cargo gives rustc; given flags, it still reads them (a CPU name
+ * meant for one target empties or cuts the other's list: rustc 1.99.1, the advisor's U4d2 brief check, A15), on a step
+ * that already fails. Per target: the features it must not list, and the one a read-back that read anything lists
+ * (non-vacuity: a parse that reads nothing never passes).
+ */
+export const READ_BACK = [
+  { target: "x86_64-unknown-linux-gnu", refused: ["fma"], present: "sse2" },
+  { target: "wasm32-unknown-unknown", refused: ["simd128", "relaxed-simd"], present: "sign-ext" },
+];
+
+/** The read-back through `runner` (from `here`): { problems, line }, the line naming rustc's version and each list. */
+export function readBackCheck(sources, runner, here) {
+  const flags = sources.flatMap((s) => s.flags);
+  const given = flags.length ? `given ${JSON.stringify(flags.join(" "))}` : "given no rustflags";
+  const problems = [];
+  const lists = [];
+  const version = runner("rustc", ["--version"], here);
+  const rustc = version.ok ? (version.stdout || version.out).trim().split("\n")[0] : "rustc (its version did not print)";
+  if (!version.ok) problems.push(`rustc --version failed in ${here}: the read-back cannot run (${lastLines(version.out, 1)})`);
+  for (const { target, refused, present } of READ_BACK) {
+    const r = runner("rustc", ["--print", "cfg", "--target", target, ...flags], here);
+    if (!r.ok) {
+      problems.push(`rustc --print cfg --target ${target} (${given}) failed: ${lastLines(r.out, 1)}`);
+      continue;
+    }
+    const features = [...(r.stdout || r.out).matchAll(/^target_feature="([^"]+)"\r?$/gm)].map((m) => m[1]);
+    lists.push(`${target} ${features.join(", ") || "none"}`);
+    for (const f of refused) {
+      if (features.includes(f)) problems.push(`rustc's read-back for ${target} (${given}) lists target_feature="${f}", which plan.md §4.5's build flags refuse`);
+    }
+    if (!features.includes(present)) {
+      problems.push(
+        `rustc's read-back for ${target} (${given}) lists no target_feature="${present}": it read nothing a build for it has ` +
+          "(a CPU name meant for the other target, or a parse that reads nothing), so it proves nothing",
+      );
+    }
+  }
+  return { problems, line: `${rustc}'s read-back, ${given}: ${lists.join("; ")}` };
+}
+
+/**
+ * The builds whose npt-sim must resolve one feature set, like for like (ADR 0004:1184, PM-0004-74; u4-build-plan.md
+ * §5 U4d2; the advisor's U4D2-Q6 ruling): the server's, npt-lab's (the native legs of the determinism check) and
+ * npt-hash-wasm's for wasm32 (its Wasm leg); measured with measured, bites (`--features bites`) with bites.
+ */
+export const SIM_BUILDS = [
+  { pkg: "npt-server", target: "x86_64-unknown-linux-gnu" },
+  { pkg: "npt-lab", target: "x86_64-unknown-linux-gnu" },
+  { pkg: "npt-hash-wasm", target: "wasm32-unknown-unknown" },
+];
+
+/** The `cargo tree` arguments for one build: its normal edges, every package once per path, each with its features. */
+export const treeArgs = ({ pkg, target }, bites) => [
+  "tree",
+  "--locked",
+  "-e",
+  "normal",
+  "--target",
+  target,
+  "-p",
+  pkg,
+  ...(bites ? ["--features", "bites"] : []),
+  "--no-dedupe",
+  "--prefix",
+  "depth",
+  "--format",
+  "{p} [{f}]",
+];
+
+/**
+ * npt-sim's subtree in one `cargo tree` output (treeArgs's form: `<depth><name> v<version>[ (<path>)] [<features>]`):
+ * a Map from `<name> v<version>` to its features, sorted and joined, npt-sim's own included; null when npt-sim is not
+ * in the tree. The first npt-sim met is walked, down to the next line at its depth or above (--no-dedupe repeats every
+ * subtree in full, so none is cut short by a `(*)`); one build resolves one feature set per package, so every npt-sim
+ * in a tree is the same.
+ */
+export function simSubtree(text) {
+  const rows = text
+    .split("\n")
+    .map((l) => l.trimEnd().match(/^(\d+)(\S+) v(\S+)(?: \(.*\))? \[([^\]]*)\]$/))
+    .filter(Boolean);
+  const at = rows.findIndex((m) => m[2] === "npt-sim");
+  if (at < 0) return null;
+  const depth = Number(rows[at][1]);
+  const out = new Map();
+  for (let i = at; i < rows.length && (i === at || Number(rows[i][1]) > depth); i++) {
+    const [, , name, version, features] = rows[i];
+    out.set(`${name} v${version}`, features.split(",").map((s) => s.trim()).filter(Boolean).sort().join(", "));
+  }
+  return out;
+}
+
+/**
+ * npt-sim's resolved features compared across SIM_BUILDS (u4d2-brief.md 2.4 (b)), through `runner` (`cargo tree` from
+ * `here`): { problems, line }. Per feature set (measured, then bites), each pair of builds' npt-sim subtrees,
+ * package by package (npt-sim's own features and each package below it, transitive ones included): a package missing
+ * from one, or with other features, fails, naming it, the two builds and the features. Not vacuous: each
+ * subtree must hold npt-sim and each normal dependency npt-sim's own manifest names (`meta`'s npt-sim package, the
+ * cargo metadata the deps step takes). A measured tree is never compared with a bites tree.
+ */
+export function simFeatureCheck(meta, runner, here) {
+  const problems = [];
+  const sim = meta.packages.find((p) => p.name === "npt-sim" && meta.workspace_members.includes(p.id));
+  const direct = (sim?.dependencies ?? []).filter((d) => d.kind === null || d.kind === undefined).map((d) => d.name);
+  const shown = [];
+  for (const bites of [false, true]) {
+    const set = bites ? "bites" : "measured";
+    const name = (b) => `${b.pkg} (${b.target}, ${set})`;
+    const trees = [];
+    for (const b of SIM_BUILDS) {
+      const r = runner("cargo", treeArgs(b, bites), here);
+      if (!r.ok) {
+        problems.push(`cargo tree for the ${name(b)} build failed: ${lastLines(r.out, 1)}`);
+        continue;
+      }
+      const tree = simSubtree(r.stdout || r.out);
+      if (!tree) {
+        problems.push(`the ${name(b)} build's tree holds no npt-sim subtree, so its features prove nothing`);
+        continue;
+      }
+      const names = [...tree.keys()].map((k) => k.split(" ")[0]);
+      for (const d of direct) {
+        if (!names.includes(d)) problems.push(`the ${name(b)} build's npt-sim subtree lacks ${d}, which crates/sim/Cargo.toml names`);
+      }
+      trees.push({ b, tree });
+    }
+    // Every pair of builds in the set, so a difference names each build it sets apart.
+    for (let i = 0; i < trees.length; i++) {
+      for (let j = i + 1; j < trees.length; j++) {
+        const [p, q] = [trees[i], trees[j]];
+        for (const pkg of new Set([...p.tree.keys(), ...q.tree.keys()])) {
+          const [x, y] = [p.tree.get(pkg), q.tree.get(pkg)];
+          if (x === y) continue;
+          const show = (v) => (v === undefined ? "is not in its npt-sim subtree" : `[${v}]`);
+          problems.push(`npt-sim's ${pkg} resolves ${show(x)} in the ${name(p.b)} build and ${show(y)} in the ${name(q.b)} build`);
+        }
+      }
+    }
+    const first = trees[0];
+    if (first) shown.push(`${set}: ${[...first.tree].map(([k, v]) => `${k.split(" ")[0]} [${v}]`).join(", ")}`);
+  }
+  return { problems, line: `npt-sim's features, one set in ${SIM_BUILDS.map((b) => b.pkg).join(", ")}: ${shown.join("; ")}` };
+}
+
 /** The manifest keys manifestKeyProblems refuses, with why. */
 const MANIFEST_KEYS = {
   "cargo-features": "it unlocks unstable manifest keys (a profile's rustflags among them)",
@@ -1395,11 +1844,15 @@ export function marksProblems(marks, readFile) {
   return problems;
 }
 
-function run(cmd, args, cwd, env = process.env) {
-  const r = spawnSync(cmd, args, { cwd, env, encoding: "utf8", maxBuffer: 1 << 28 });
+/**
+ * One command, waited for: `timeout` (ms; 0, none) stops it with SIGTERM once passed, and the result says so
+ * (`timedOut`: spawnSync's ETIMEDOUT), so a hung call is a named failure, not a lock held forever (INF-4).
+ */
+function run(cmd, args, cwd, env = process.env, timeout = 0) {
+  const r = spawnSync(cmd, args, { cwd, env, encoding: "utf8", maxBuffer: 1 << 28, ...(timeout ? { timeout } : {}) });
   // `stdout` alone is kept for the steps that parse it: cargo writes progress lines ("Blocking waiting for file
   // lock", "Downloaded …") to stderr, and they must never reach a JSON parser.
-  return { ok: r.status === 0, out: `${r.stdout ?? ""}${r.stderr ?? ""}`, stdout: r.stdout ?? "", status: r.status };
+  return { ok: r.status === 0, out: `${r.stdout ?? ""}${r.stderr ?? ""}`, stdout: r.stdout ?? "", status: r.status, timedOut: r.error?.code === "ETIMEDOUT" };
 }
 
 /**
@@ -1443,10 +1896,36 @@ const WASM_ARGS = ["--target", "wasm32-unknown-unknown", ...WASM_CRATES.flatMap(
  * its output, not cargo's last line ("warning: build failed, waiting for other jobs to finish..."; the rust fix2
  * review's nit, u4s-carries.md entry 34): `what` says which run failed. The detail stays in the lines above it.
  */
-export function failedRun(r, what, before = "") {
+export function failedRun(r, what, before = "", note = "") {
   const first = r.out.split("\n").find((l) => /^error(?:\[\w+\])?:/.test(l.trim()));
   const said = first ? first.trim() : "its output has no error line (the lines above)";
-  return { ...r, ok: false, out: `${before}${r.out}\n${what} failed: ${said}` };
+  return { ...r, ok: false, out: `${before}${r.out}${note}\n${what} failed: ${said}` };
+}
+
+/**
+ * The failing tests' names, from libtest's `failures:` lists in a test run's stdout (the list after the panics, one
+ * name a line, four spaces in), in order, each once (carry 65; the advisor's U4j round-2 ruling, B2.3: `run` joins
+ * stdout before stderr and main prints a failed step's last 40 lines, so without this line the names never show).
+ */
+export function failingTests(stdout) {
+  const names = [];
+  const lines = stdout.split("\n").map((l) => l.replace(/\r$/, ""));
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i] !== "failures:") continue;
+    for (let j = i + 1; j < lines.length && /^ {4}\S/.test(lines[j]); j++) {
+      const name = lines[j].trim();
+      if (!names.includes(name)) names.push(name);
+    }
+  }
+  return names;
+}
+
+/** The line a failed test run gets just above its summary: its failing tests by name, or why none is named. */
+function failingTestsLine(r, build) {
+  const names = failingTests(r.stdout ?? r.out);
+  return names.length
+    ? `\n${build}'s failing tests (libtest's failures: list): ${names.join(", ")}`
+    : `\n${build}: no failing test in libtest's failures: list (a build or harness error: the lines above)`;
 }
 
 /**
@@ -1489,13 +1968,16 @@ export function docBothBuilds(runner = run, base = process.env) {
 }
 
 /** Both builds' tests: the measured build (no features), then the bites build (every feature, the planted defects
- * compiled in: plan §4.7). Each count is reported, skips included (cargoCounts). Through `runner`, as lintBothBuilds. */
+ * compiled in: plan §4.7). Each count is reported, skips included (cargoCounts); a failed run names its failing tests
+ * just above its summary (failingTests: carry 65). Through `runner`, as lintBothBuilds. */
 export function testBothBuilds(runner = run) {
   const measured = runner("cargo", ["test", "--locked", "--workspace"], HERE);
-  if (!measured.ok) return failedRun(measured, `the measured build's tests (${cargoCounts(measured.out)})`);
+  if (!measured.ok) {
+    return failedRun(measured, `the measured build's tests (${cargoCounts(measured.out)})`, "", failingTestsLine(measured, "the measured build"));
+  }
   const bites = runner("cargo", ["test", "--locked", "--workspace", "--all-features"], HERE);
   const summary = `measured build: ${cargoCounts(measured.out)}; bites build: ${cargoCounts(bites.out)}`;
-  if (!bites.ok) return failedRun(bites, `the bites build's tests (${summary})`, measured.out);
+  if (!bites.ok) return failedRun(bites, `the bites build's tests (${summary})`, measured.out, failingTestsLine(bites, "the bites build"));
   return { ok: true, out: `${measured.out}${bites.out}\n${summary}`, status: bites.status };
 }
 
@@ -1507,11 +1989,17 @@ export function testBothBuilds(runner = run) {
  *
  * The static unsafe scan guards against an accidental relaxation; review, and U5's audit, are the wall against a
  * deliberate one. Between them stands the compiler: under the workspace's forbid, rustc refuses unsafe code and any
- * allow of the lint (E0453, a macro-built allow included) in every crate but the two exceptions, whatever the scan
+ * allow of the lint (E0453, a macro-built allow included) in every crate but the three exceptions, whatever the scan
  * misreads. Known limits, which the step does not report:
  * - lexRust is not rustc's lexer (a shebang line; a `\u{...}` escape with underscores past six characters: review
  *   C2R-1), and pathProblems reads a #[path] or include! literal with its escapes undecoded and include! by its name
- *   only (C2R-2). The compiler covers both in the crates under the forbid; inside npt-tcpinfo only review does.
+ *   only (C2R-2). The compiler covers both in the crates under the forbid; inside npt-tcpinfo and npt-hash-wasm only
+ *   review does.
+ * - The build-flag scan and rustc's read-back read the rustflags sources above, not a build script's
+ *   `cargo::rustc-flags` or a RUSTC_WRAPPER's own flags. No source may hold a flag (buildInputProblems: the advisor's
+ *   U4d2 round-1 ruling, FX-1), so on a step that passes the read-back is given no flag, which is what cargo gives
+ *   rustc from those sources; a flag reaching rustc another way, or a source-level `#[target_feature]`, is the Wasm
+ *   leg's loader's to refuse from the module itself (its target_features section, FX-2).
  * - Inputs that can lower lints and are not read here: a cargo config's [env] table (CLIPPY_ARGS, C2R-4 G, or any
  *   other variable it sets for rustc), what a member's build script prints (`cargo::rustc-env`, C2R-4 H), a
  *   RUSTC_WRAPPER program (allowed, for sccache) and a rust-toolchain.toml `path`. Lint capping by any of them
@@ -1524,23 +2012,32 @@ export function testBothBuilds(runner = run) {
  *   variable, a patched or rebuilt cargo or rustc) is out of the scan's reach.
  * - Unsafe code a dependency's macro expands into a crate is not linted by rustc (another crate's code); the
  *   dependencies are U5's audit.
- * - Too wide, not too narrow: the runner refusal covers every target triple, so a future wasm32 test runner
- *   (wasm-bindgen-test's `[target.wasm32-unknown-unknown] runner`) would be refused too, though the test step runs
- *   host tests only (no wasm test is planned; review C2b's note).
+ * - Too wide, not too narrow: the runner refusal covers every target triple, so a wasm32 test runner
+ *   (wasm-bindgen-test's `[target.wasm32-unknown-unknown] runner`) would be refused too, though the test step runs host
+ *   tests only (review C2b's note). The wasm step's Wasm legs need none: they are a Node script (crates/hash-wasm's
+ *   loader, run through process.execPath), not a cargo test, so the refusal stands (u4-build-plan.md §5 U4d2).
  */
 const DEPS_CHECKED =
   "held: no leaf crate reaches a transport or runtime; npt-client has no npt-net; npt-super and npt-host keep off the " +
   "sim, room, proto (and client) crates; npt-judge ships npt-log and serde only; npt-tcpinfo ships libc only and only " +
-  "npt-net uses it; npt-net has no direct libc; npt-sim ships libm, rand_chacha and rand_core only; nothing depends " +
-  "on npt-lab; the workspace forbids unsafe_code and " +
-  "every member inherits its lints but npt-client-wasm (allow) and npt-tcpinfo (deny), whose own lint tables are the " +
-  "workspace's otherwise, key for key, with no lint given in a form the reader does not read (a lint's own table, a " +
-  "quoted, dotted, hyphenated or uppercase name); no manifest has a cargo-features or rustflags key; as the scan " +
-  "reads crates/ (lexRust), no other crate relaxes unsafe_code or has unsafe code, " +
-  "and npt-tcpinfo relaxes it only by the #[allow] on srtt_us and unacked_and_unsent, has unsafe code only inside " +
-  "them, and keeps lib.rs's deny of the two clippy unsafe lints; the environment and the cargo configs read pass no " +
+  "npt-net uses it; npt-net has no direct libc; npt-sim ships libm, rand_chacha and rand_core only; npt-hash-wasm " +
+  "ships npt-sim only; nothing depends on npt-lab or npt-hash-wasm; the workspace forbids unsafe_code and " +
+  "every member inherits its lints but npt-client-wasm (allow), npt-tcpinfo (deny) and npt-hash-wasm (deny), whose own " +
+  "lint tables are the workspace's otherwise, key for key, with no lint given in a form the reader does not read (a " +
+  "lint's own table, a quoted, dotted, hyphenated or uppercase name); no manifest has a cargo-features or rustflags " +
+  "key; as the scan reads crates/ (lexRust), no other crate relaxes unsafe_code or has unsafe code, " +
+  "npt-tcpinfo relaxes it only by the #[allow] on srtt_us and unacked_and_unsent, has unsafe code only inside " +
+  "them, and keeps lib.rs's deny of the two clippy unsafe lints, and npt-hash-wasm relaxes it only by one #[allow] on " +
+  "each of its seven listed exports, whose #[unsafe(no_mangle)] is its only unsafe code, each taking and giving u32 " +
+  "or i32 only; neither npt-tcpinfo nor npt-hash-wasm has a build script or names `include` but as a macro call; " +
+  "the environment and the cargo configs read pass no " +
   "lint-lowering rustflags and set no clippy or fmt alias, no other rustc or workspace wrapper, no config include and " +
-  "no test runner, and the environment has no RUSTC_BOOTSTRAP or cargo channel override; every member lives in " +
+  "no test runner, and the environment has no RUSTC_BOOTSTRAP or cargo channel override; no rustflags source holds a " +
+  "flag (so none enables fma, simd128 or relaxed-simd or sets target-cpu=native) and neither the environment nor a " +
+  "cargo config sets the build target, and rustc's read-back, given what cargo gives rustc, lists sse2 and " +
+  "no fma for x86-64 and sign-ext and no simd128 or relaxed-simd for wasm32; npt-sim's resolved features, its own " +
+  "and every package's below it, are one set in the npt-server, npt-lab and npt-hash-wasm (wasm32) builds, measured " +
+  "with measured and bites with bites, each holding npt-sim's own dependencies; every member lives in " +
   "crates/ and builds only .rs files in its own folder, in edition 2024, none " +
   "a proc-macro, and every path dependency is a member; no symbolic link under crates/; every #[path] and include! " +
   "literal names a .rs file in its own crate; TICK_HZ is set from a literal once, in npt-sim; each derived tick " +
@@ -1556,11 +2053,13 @@ function cargoMetadata(here) {
 }
 
 /**
- * The deps step on the spike in `here`, with `env` as the environment and `metadata(here)` for cargo metadata: every
- * check it makes is called here, and STEPS.deps is this function (review C2R-5: check.test.mjs runs it on a fixture
- * with one plant per check, so a check unhooked from it fails a test).
+ * The deps step on the spike in `here`, with `env` as the environment, `metadata(here)` for cargo metadata and
+ * `runner` for the `cargo tree` and `rustc` calls of the features comparison and the read-back: every check it makes is
+ * called here, and STEPS.deps is this function (review C2R-5: check.test.mjs runs it on a fixture with one plant per
+ * check, so a check unhooked from it fails a test). Its summary line ends with the read-back's lists and npt-sim's
+ * features.
  */
-export function depsStep(here = HERE, env = process.env, metadata = cargoMetadata) {
+export function depsStep(here = HERE, env = process.env, metadata = cargoMetadata, runner = run) {
   const r = metadata(here);
   if (!r.ok) return r;
   const { meta } = r;
@@ -1570,6 +2069,9 @@ export function depsStep(here = HERE, env = process.env, metadata = cargoMetadat
   const workspace = read("Cargo.toml");
   const manifests = [{ path: "Cargo.toml", text: workspace }];
   for (const f of files) if (f.endsWith("/Cargo.toml")) manifests.push({ path: f, text: read(f) });
+  const sources = rustflagSources(env, configs);
+  const readBack = readBackCheck(sources, runner, here);
+  const features = simFeatureCheck(meta, runner, here);
   const problems = [
     ...dependencyProblems(meta),
     ...workspaceLintProblems(workspace),
@@ -1584,9 +2086,381 @@ export function depsStep(here = HERE, env = process.env, metadata = cargoMetadat
     ...biteHomeProblems(files, read),
     ...clippyTwinProblems(read),
     ...linkUseProblems(files, read),
+    ...buildFlagProblems(sources),
+    ...buildInputProblems(env, configs),
+    ...readBack.problems,
+    ...features.problems,
   ];
-  const counts = `${files.length} crate files and ${configs.length} cargo config file(s) read`;
+  const counts = `${files.length} crate files and ${configs.length} cargo config file(s) read; ${readBack.line}; ${features.line}`;
   return { ok: problems.length === 0, out: problems.join("\n") || `${DEPS_CHECKED} (${counts})` };
+}
+
+/** The recordings manifest (u4-build-plan.md §4.15; carry 52), the std-sin scan data and h2's committed vector. */
+export const RECORDINGS_MANIFEST = "crates/lab/recordings.json";
+export const STD_SIN_SCAN = "crates/lab/std-sin-scan.txt";
+export const H2_VECTOR = "crates/hash-wasm/co-initial-dump.txt";
+/** The Node loader of the Wasm legs. */
+export const LOADER = join(HERE, "crates", "hash-wasm", "loader.mjs");
+/** Where the wasm step's copies of its builds, its recordings and its legs' outputs go: the checkout's .gate/. */
+export const WASM_STEP_DIR = join(ROOT, ".gate", "netcode-proof-test", "wasm-step");
+/**
+ * The two bites the wasm step arms (PM-0004-21's, planted by U4d in npt-sim: plan.md §4.5:551, "one std `sin` and one
+ * hash-map iteration, each caught at the first tick it changes"), named here as ops/runs/c-u2-pm-0001-3.mjs names
+ * PM-0001-3's; each one's index (from 1, as npt-hash-wasm's `begin` takes it) is read from `npt-lab hash bites`.
+ */
+export const WASM_BITES = { hashMap: "PM-0004-21/hash-map", stdSin: "PM-0004-21/std-sin" };
+/** The hash-map bite's arming: the manifest's first recording at tick 1,234 (D-2's form, sim/tests/replay.rs:291). */
+export const HASH_MAP_ARM = 1_234;
+/** The state word its order is folded into (world.rs's write_state: two words under one name). */
+export const HASH_MAP_FIELD = "bite[0].hash_map_order";
+/**
+ * The step's release builds (u4d2-brief.md 2.4 (a) item 1: plan.md §4.5's flags, so none is added; wasm-opt is U7's,
+ * C-U7-1), each artifact read from cargo's JSON messages and copied out before the next build replaces it.
+ */
+export const WASM_BUILDS = [
+  { key: "lab", what: "npt-lab (x86-64, measured)", copy: "npt-lab", target: "npt-lab", kind: "bin", args: ["build", "--locked", "--release", "-p", "npt-lab", "--message-format=json"] },
+  { key: "labBites", what: "npt-lab (x86-64, bites)", copy: "npt-lab-bites", target: "npt-lab", kind: "bin", args: ["build", "--locked", "--release", "-p", "npt-lab", "--features", "bites", "--message-format=json"] },
+  {
+    key: "wasm",
+    what: "npt-hash-wasm (wasm32, measured)",
+    copy: "npt-hash-wasm.wasm",
+    target: "npt_hash_wasm",
+    kind: "cdylib",
+    args: ["build", "--locked", "--release", "--target", "wasm32-unknown-unknown", "-p", "npt-hash-wasm", "--message-format=json"],
+  },
+  {
+    key: "wasmBites",
+    what: "npt-hash-wasm (wasm32, bites)",
+    copy: "npt-hash-wasm-bites.wasm",
+    target: "npt_hash_wasm",
+    kind: "cdylib",
+    args: ["build", "--locked", "--release", "--target", "wasm32-unknown-unknown", "-p", "npt-hash-wasm", "--features", "bites", "--message-format=json"],
+  },
+];
+
+/** The artifact a build's JSON messages name: a bin's executable, a cdylib's .wasm file; null if none. */
+export function builtArtifact(stdout, { target, kind }) {
+  let found = null;
+  for (const line of stdout.split("\n")) {
+    if (!line.startsWith("{")) continue;
+    let m;
+    try {
+      m = JSON.parse(line);
+    } catch {
+      continue;
+    }
+    if (m.reason !== "compiler-artifact" || m.target?.name !== target || !m.target?.kind?.includes(kind)) continue;
+    found = kind === "bin" ? (m.executable ?? null) : ((m.filenames ?? []).find((f) => f.endsWith(".wasm")) ?? null);
+  }
+  return found;
+}
+
+/**
+ * One `<a> against <b>: ...` line of npt-lab's `hash` or `hash compare` (HashCompare's result, as compare_text writes
+ * it), read: { line, compared, mismatching, equal, first: { recording, tick } when both sides' first mismatching entries
+ * are the same tick, `at`: that entry as written, field: the first differing field when named, counts: each
+ * recording's ticks in its first list }; null when no such line was written (the run failed).
+ */
+export function readComparison(text, a, b) {
+  const head = `${a} against ${b}: `;
+  const line = text.split("\n").find((l) => l.startsWith(head));
+  if (!line) return null;
+  const body = line.slice(head.length);
+  const tail = body.match(/ \(([^()]*)\)$/);
+  const counts = new Map(
+    (tail?.[1] ?? "")
+      .split(", ")
+      .filter(Boolean)
+      .map((s) => [s.split(" ")[0], Number(s.split(" ")[1])]),
+  );
+  const rest = tail ? body.slice(0, tail.index) : body;
+  const compared = Number(rest.match(/^(\d+) ticks compared/)?.[1] ?? Number.NaN);
+  const mismatching = compared === 0 ? 0 : Number(rest.match(/, (\d+) mismatching/)?.[1] ?? Number.NaN);
+  const firstAt = rest.match(/; first mismatch at entry \d+: (.*)$/)?.[1] ?? null;
+  const sides = firstAt?.match(/^(\S+) tick (\d+) hash \S+ against (\S+) tick (\d+) hash \S+;/);
+  const first = sides && sides[1] === sides[3] && sides[2] === sides[4] ? { recording: sides[1], tick: Number(sides[2]) } : null;
+  return {
+    line,
+    compared,
+    mismatching,
+    equal: /, 0 mismatching, equal$/.test(rest),
+    first,
+    at: firstAt,
+    field: firstAt?.match(/; field (\S+) \(word \d+\)/)?.[1] ?? null,
+    counts,
+  };
+}
+
+/** The std-sin scan data (STD_SIN_SCAN; u4d2-brief.md 2.3): its catches (`catch <recording> <tick> <field>`), whether it
+ * says "not catchable at this site on x86-64 and wasm32", and its other lines (the scan's record). */
+export function readScan(text) {
+  const catches = [];
+  let notCatchable = false;
+  const record = [];
+  for (const raw of text.split("\n")) {
+    const l = raw.trim();
+    if (!l || l.startsWith("#")) continue;
+    const c = l.match(/^catch (\S+) (\d+) (\S+)$/);
+    if (c) catches.push({ recording: c[1], tick: Number(c[2]), field: c[3] });
+    else if (l === "not catchable at this site on x86-64 and wasm32") notCatchable = true;
+    else record.push(l);
+  }
+  return { catches, notCatchable, record };
+}
+
+/** The wasm step's time limit on each of its calls but its cargo builds: the step's whole 5-minute budget. */
+const WASM_CALL_LIMIT_MS = 300_000;
+/** The real file operations of the wasm step (check.test.mjs passes its own), paths under the spike for `read`. */
+const WASM_IO = {
+  reset: (dir) => {
+    rmSync(dir, { recursive: true, force: true });
+    mkdirSync(dir, { recursive: true });
+  },
+  mkdir: (dir) => mkdirSync(dir, { recursive: true }),
+  copy: (from, to) => copyFileSync(from, to),
+  exists: (path) => existsSync(path),
+  read: (path) => readFileSync(join(HERE, path), "utf8"),
+  libc: () => {
+    const v = process.report?.getReport?.()?.header?.glibcVersionRuntime;
+    return v ? `glibc ${v} (Node's report)` : "no glibc found by Node's report";
+  },
+};
+
+/**
+ * The determinism check (u4-build-plan.md §5 U4d2; plan.md §4.5:546-551; ADR 0002:500-505), through `runner` for every
+ * command (cargo, npt-lab, Node), `io` for its files and `now` for its clock (main's, Date.now, which times each call;
+ * npt-lab reads none):
+ * 1. the release builds (WASM_BUILDS), each artifact's path read from cargo's JSON and copied out;
+ * 2. `npt-lab hash` (measured): the manifest's recordings regenerated into the step's folder and checked by length and
+ *    SHA-256, then its two native legs in lock step, leg 1 against leg 2;
+ * 3. the Node loader, once per recording, its own process each (process.execPath): Wasm leg 1;
+ * 4. `npt-lab hash compare`: native leg 1 against Wasm leg 1, and at a first mismatch the loader again with that tick's
+ *    dump and the compare again, which names the field;
+ * 5. h2's vectors on wasm32: each header-only recording through the loader to its dump, then `npt-lab hash vectors`;
+ * 6. the bites half, in the bites builds: `npt-lab hash bites` for the indexes; PM-0004-21/hash-map on the manifest's
+ *    first recording at tick 1,234, four legs (native 1 and 2, Wasm 1 and 2, each its own process), three pairs by
+ *    D-2's rule (sim/tests/replay.rs:300-308): digests that differ must first differ at that recording, that tick,
+ *    HASH_MAP_FIELD; equal digests are "not exercised" and no tick may differ; no pair exercised fails; equal Wasm
+ *    digests are "not catchable on wasm32". PM-0004-21/std-sin by the scan data (STD_SIN_SCAN, the advisor's U4D2-Q5
+ *    ruling): a catch (recording R, tick T', field F) arms it at T' on R, native leg 1 and Wasm leg 1, whose first
+ *    mismatch must be (R, T', F); "not catchable at this site on x86-64 and wasm32" is printed with the scan's record,
+ *    and no std-sin leg runs.
+ * It passes only with every manifest recording's ticks compared (its count each, their sum per pair) and 0 mismatching
+ * for leg 1 against leg 2 and leg 1 against Wasm, h2's vectors equal and each bite's verdict as above. On a failure it
+ * still runs every comparison it has the legs for; its last lines are one line per pair, h2 and each bite, then each
+ * problem, then the summary, which main prints: the ticks per pair, the mismatches, each bite's outcome and each timed
+ * call's seconds.
+ */
+export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_STEP_DIR) {
+  const problems = [];
+  const lines = [];
+  const timed = [];
+  // Every call but the four cargo builds has WASM_CALL_LIMIT_MS (the advisor's U4d2 round-1 ruling, FX-7: INF-4): a
+  // hung leg would hold the lane lock for every other lane's cargo. The builds have none: under the exclusive lock no
+  // other cargo holds theirs, and a cold build's time is INF-1's to measure, not to cut.
+  const call = (label, cmd, args) => {
+    const t0 = now();
+    const limit = cmd === "cargo" ? 0 : WASM_CALL_LIMIT_MS;
+    const r = runner(cmd, args, HERE, undefined, limit);
+    timed.push(`${label} ${((now() - t0) / 1000).toFixed(1)}`);
+    if (r.timedOut) problems.push(`${label}: still running after ${limit / 1000} s, so it was stopped (the wasm step's limit on each call but its four cargo builds)`);
+    return r;
+  };
+  const failure = (r) => lastLines(r.out, 1).trim() || `exit ${r.status}`;
+  const bin = join(dir, "bin");
+  const rec = join(dir, "recordings");
+  const meas = join(dir, "measured");
+  const hm = join(dir, "hash-map");
+  const sin = join(dir, "std-sin");
+  io.reset(dir);
+  for (const d of [bin, rec, meas, hm, sin]) io.mkdir(d);
+  // 1. The builds.
+  const art = {};
+  for (const b of WASM_BUILDS) {
+    const r = call(`build ${b.copy}`, "cargo", b.args);
+    const path = r.ok ? builtArtifact(r.stdout ?? "", b) : null;
+    if (!r.ok) problems.push(`the release build of ${b.what} failed: ${failure(r)}`);
+    else if (!path) problems.push(`the release build of ${b.what} names no ${b.kind} artifact in cargo's JSON messages`);
+    else {
+      art[b.key] = join(bin, b.copy);
+      io.copy(path, art[b.key]);
+    }
+  }
+  // The manifest's recordings, as the loader needs them (npt-lab checks the manifest's own rules).
+  let entries = [];
+  try {
+    const m = JSON.parse(io.read(RECORDINGS_MANIFEST));
+    entries = m.recordings.map((e) => ({ name: e.name, first: e.first_tick, ticks: e.ticks }));
+  } catch (e) {
+    problems.push(`${RECORDINGS_MANIFEST} cannot be read: ${e.message}`);
+  }
+  const total = entries.reduce((s, e) => s + e.ticks, 0);
+  const manifestArgs = ["--manifest", RECORDINGS_MANIFEST, "--dir", rec];
+  const loader = (wasm, e, out, extra = []) => [LOADER, "--wasm", wasm, "--rec", join(rec, `${e.name}.rec`), "--name", e.name, "--first-tick", String(e.first), "--out", out, ...extra];
+  const stepped = (r) => Number(r.out.match(/: (\d+) ticks stepped/)?.[1] ?? Number.NaN);
+  // A recording regenerated in this run (the folder is new each run, and npt-lab writes each file once it is checked).
+  const has = (e) => io.exists(join(rec, `${e.name}.rec`));
+  // One pair of the clean half: every recording at its count, the sum compared, 0 mismatching.
+  const judgePair = (what, c, r) => {
+    if (!c) {
+      problems.push(`${what}: no comparison was written${r ? `: ${failure(r)}` : " (no leg to compare)"}`);
+      return `${what}: not compared`;
+    }
+    if (c.compared !== total) problems.push(`${what}: ${c.compared} ticks compared, not the manifest's ${total}`);
+    for (const e of entries) {
+      if (c.counts.get(e.name) !== e.ticks) problems.push(`${what}: ${e.name} has ${c.counts.get(e.name) ?? 0} ticks compared, the manifest's ${e.ticks}`);
+    }
+    if (!c.equal) problems.push(`${what}: ${c.mismatching} mismatching; first mismatch at ${c.at ?? "no entry named"}`);
+    return c.line;
+  };
+  // 2-4. The clean half.
+  let vectors = [];
+  if (art.lab && entries.length) {
+    const legs = call("npt-lab hash", art.lab, ["hash", ...manifestArgs, "--out", meas]);
+    const regen = legs.out.match(/^npt-lab hash: (.*(?:the manifest has|not this build's Recording::GENERATOR).*)$/m)?.[1];
+    if (regen) problems.push(`the recordings manifest: ${regen}`);
+    if (/order digest/.test(legs.out)) problems.push("a clean-half native leg wrote an order digest: a bites build's output given to the measured half");
+    vectors = (legs.out.match(/^wrote the header-only recordings (.*) \(seed 1/m)?.[1] ?? "").split(", ").filter(Boolean);
+    lines.push(judgePair("native leg 1 against native leg 2", readComparison(legs.out, "native leg 1", "native leg 2"), legs));
+  } else if (!art.lab) problems.push("the clean half did not run: no measured npt-lab build");
+  if (art.lab && art.wasm && entries.some(has)) {
+    const theirs = [];
+    for (const e of entries.filter(has)) {
+      const out = join(meas, `wasm-${e.name}.lines`);
+      const r = call(`Wasm ${e.name}`, process.execPath, loader(art.wasm, e, out));
+      if (!r.ok) problems.push(`Wasm leg 1: ${failure(r)}`);
+      else if (stepped(r) !== e.ticks) problems.push(`Wasm leg 1: ${e.name} stepped ${stepped(r)} ticks, the manifest's ${e.ticks}`);
+      if (/\bbite\b/.test(r.out)) problems.push(`Wasm leg 1: ${e.name}'s leg carries a bite (a bites build's output given to the measured half)`);
+      if (io.exists(out)) theirs.push(out);
+    }
+    const compareArgs = ["hash", "compare", "--ours", join(meas, "native-1.lines"), "--theirs", theirs.join(","), ...manifestArgs];
+    const names = ["--ours-name", "native leg 1", "--theirs-name", "Wasm leg 1"];
+    const cr = theirs.length ? call("compare", art.lab, [...compareArgs, ...names]) : null;
+    let c = cr ? readComparison(cr.out, "native leg 1", "Wasm leg 1") : null;
+    const e = c?.first && !c.field ? entries.find((x) => x.name === c.first.recording) : null;
+    if (e) {
+      // The field diff: the loader again, with that tick's dump, then the compare naming the field.
+      const dump = join(meas, `wasm-${e.name}-${c.first.tick}.dump`);
+      const r = call(`Wasm dump ${e.name}`, process.execPath, loader(art.wasm, e, join(meas, `wasm-${e.name}-dump.lines`), ["--dump-at", String(c.first.tick), "--dump-out", dump]));
+      if (r.ok) c = readComparison(call("compare field", art.lab, [...compareArgs, "--theirs-dump", dump, ...names]).out, "native leg 1", "Wasm leg 1") ?? c;
+    }
+    lines.push(judgePair("native leg 1 against Wasm leg 1", c, cr));
+  } else problems.push(`the Wasm leg did not run: ${art.wasm ? "no recording was regenerated" : "no measured npt-hash-wasm build"}`);
+  // 5. h2's vectors on wasm32.
+  if (art.lab && art.wasm && vectors.length) {
+    for (const v of vectors) {
+      const r = call(`h2 ${v}`, process.execPath, loader(art.wasm, { name: v, first: 0 }, join(meas, `${v}.lines`), ["--dump-at", "end", "--dump-out", join(meas, `${v}.dump`)]));
+      if (!r.ok) problems.push(`h2: ${failure(r)}`);
+    }
+    const r = call("h2 vectors", art.lab, ["hash", "vectors", "--dir", rec, "--dumps", meas, "--committed", H2_VECTOR]);
+    const said = r.out.split("\n").filter((l) => l.startsWith("h2: "));
+    lines.push(...said);
+    const differs = said.filter((l) => l !== "h2: the vectors differ (the lines above)").map((l) => l.slice(4));
+    if (!r.ok) problems.push(`h2: the vectors differ or did not run: ${differs.join("; ") || failure(r)}`);
+  } else problems.push("h2: the vectors did not run (no build, or npt-lab wrote no header-only recording)");
+  // 6. The bites half.
+  const bites = { hashMap: "not run", stdSin: "not run" };
+  const index = {};
+  if (art.labBites && art.wasmBites && entries.some(has)) {
+    const listed = call("npt-lab bites", art.labBites, ["hash", "bites"]);
+    for (const m of listed.out.matchAll(/^(\d+) (\S+)$/gm)) index[m[2]] = Number(m[1]);
+    for (const id of Object.values(WASM_BITES)) if (!index[id]) problems.push(`npt-lab hash bites lists no ${id} (World::BITES)`);
+  } else problems.push(`the bites half did not run: ${art.labBites && art.wasmBites ? "no recording was regenerated" : "no bites builds"}`);
+  const rec0 = entries[0];
+  if (index[WASM_BITES.hashMap] && rec0 && !has(rec0)) problems.push(`hash-map: ${rec0.name} was not regenerated, so it did not run`);
+  if (index[WASM_BITES.hashMap] && rec0 && has(rec0)) {
+    const arm = String(HASH_MAP_ARM);
+    const bite = ["--bite", WASM_BITES.hashMap, "--arm", arm, "--on", rec0.name];
+    const legs = call("hash-map native legs", art.labBites, ["hash", ...manifestArgs, "--out", hm, "--only", rec0.name, "--bite", WASM_BITES.hashMap, "--arm", arm, "--dump-at", arm]);
+    const digests = { "native leg 1": legs.out.match(/^leg 1 order digest (\S+)/m)?.[1], "native leg 2": legs.out.match(/^leg 2 order digest (\S+)/m)?.[1] };
+    for (const k of [1, 2]) {
+      const r = call(`hash-map Wasm ${k}`, process.execPath, loader(art.wasmBites, rec0, join(hm, `wasm-${k}.lines`), ["--bite", String(index[WASM_BITES.hashMap]), "--arm", arm, "--dump-at", arm, "--dump-out", join(hm, `wasm-${k}.dump`)]));
+      if (!r.ok) problems.push(`hash-map Wasm leg ${k}: ${failure(r)}`);
+    }
+    const pair = (label, a, b, ours, theirs) => {
+      const r = call(label, art.labBites, ["hash", "compare", "--ours", join(hm, `${ours}.lines`), "--theirs", join(hm, `${theirs}.lines`), ...manifestArgs, "--ours-dump", join(hm, `${ours}.dump`), "--theirs-dump", join(hm, `${theirs}.dump`), "--digest-field", HASH_MAP_FIELD, ...bite, "--ours-name", a, "--theirs-name", b]);
+      for (const n of [a, b]) digests[n] ??= r.out.match(new RegExp(`^${n} digest (\\S+) \\(`, "m"))?.[1];
+      return readComparison(r.out, a, b);
+    };
+    const n12 = readComparison(legs.out, "native leg 1", "native leg 2");
+    const nw = pair("hash-map compare native-Wasm", "native leg 1", "Wasm leg 1", "native-1", "wasm-1");
+    const ww = pair("hash-map compare Wasm-Wasm", "Wasm leg 1", "Wasm leg 2", "wasm-1", "wasm-2");
+    // D-2's rule, per pair (sim/tests/replay.rs:300-308).
+    const verdicts = [];
+    let exercised = 0;
+    for (const [a, b, c] of [["native leg 1", "native leg 2", n12], ["native leg 1", "Wasm leg 1", nw], ["Wasm leg 1", "Wasm leg 2", ww]]) {
+      const [da, db] = [digests[a], digests[b]];
+      const what = `hash-map, ${a} against ${b}`;
+      if (!c || !da || !db || da === "none" || db === "none") {
+        problems.push(`${what}: ${c ? `a leg logged no order digest (${da ?? "none"}, ${db ?? "none"})` : "no comparison was written (the lines above)"}`);
+        verdicts.push(`${a} - ${b} not judged`);
+        continue;
+      }
+      if (c.compared !== rec0.ticks) problems.push(`${what}: ${c.compared} ticks compared, not ${rec0.name}'s ${rec0.ticks}`);
+      if (da === db) {
+        if (c.mismatching !== 0 || !c.equal) problems.push(`${what}: digests equal (${da}: not exercised), yet ${c.mismatching} ticks differ, first at ${c.at}`);
+        verdicts.push(`${a} - ${b} not exercised (digests equal, ${da})`);
+      } else {
+        exercised++;
+        const caught = c.first?.recording === rec0.name && c.first?.tick === HASH_MAP_ARM && c.field === HASH_MAP_FIELD;
+        if (!caught) {
+          problems.push(`${what}: digests ${da} and ${db} differ, but the first mismatch is ${c.first ? `${c.first.recording} tick ${c.first.tick}, field ${c.field ?? "none"}` : (c.at ?? "none")}, not ${rec0.name} tick ${HASH_MAP_ARM}, field ${HASH_MAP_FIELD}`);
+        }
+        verdicts.push(`${a} - ${b} ${caught ? `caught at ${rec0.name} tick ${HASH_MAP_ARM}, ${HASH_MAP_FIELD}` : "NOT caught as D-2's rule asks"} (digests ${da}, ${db})`);
+      }
+    }
+    if (exercised === 0) problems.push("hash-map: no pair was exercised (every pair's digests equal)");
+    const wasmEqual = digests["Wasm leg 1"] && digests["Wasm leg 1"] === digests["Wasm leg 2"];
+    bites.hashMap = `${verdicts.join("; ")}${wasmEqual ? "; not catchable on wasm32 (its two Wasm digests are equal)" : ""}`;
+    lines.push(`PM-0004-21/hash-map (${rec0.name} armed at tick ${HASH_MAP_ARM}): ${bites.hashMap}`);
+  }
+  if (index[WASM_BITES.stdSin]) {
+    let scan = null;
+    try {
+      scan = readScan(io.read(STD_SIN_SCAN));
+    } catch (e) {
+      problems.push(`${STD_SIN_SCAN} cannot be read: ${e.message}`);
+    }
+    const order = entries.map((e) => e.name);
+    const catches = (scan?.catches ?? []).filter((c) => order.includes(c.recording)).sort((x, y) => order.indexOf(x.recording) - order.indexOf(y.recording));
+    const record = scan?.record.join("; ") ?? "";
+    const e = catches.length ? entries.find((x) => x.name === catches[0].recording) : null;
+    if (e && !has(e)) problems.push(`std-sin: ${e.name} was not regenerated, so its leg did not run`);
+    else if (e) {
+      const { recording, tick, field } = catches[0];
+      const t = String(tick);
+      call("std-sin native legs", art.labBites, ["hash", ...manifestArgs, "--out", sin, "--only", recording, "--bite", WASM_BITES.stdSin, "--arm", t, "--dump-at", t]);
+      const r = call("std-sin Wasm", process.execPath, loader(art.wasmBites, e, join(sin, "wasm-1.lines"), ["--bite", String(index[WASM_BITES.stdSin]), "--arm", t, "--dump-at", t, "--dump-out", join(sin, "wasm-1.dump")]));
+      if (!r.ok) problems.push(`std-sin Wasm leg 1: ${failure(r)}`);
+      const c = readComparison(
+        call("std-sin compare", art.labBites, ["hash", "compare", "--ours", join(sin, "native-1.lines"), "--theirs", join(sin, "wasm-1.lines"), ...manifestArgs, "--ours-dump", join(sin, "native-1.dump"), "--theirs-dump", join(sin, "wasm-1.dump"), "--bite", WASM_BITES.stdSin, "--arm", t, "--on", recording, "--ours-name", "native leg 1", "--theirs-name", "Wasm leg 1"]).out,
+        "native leg 1",
+        "Wasm leg 1",
+      );
+      const caught = c?.first?.recording === recording && c.first.tick === tick && c.field === field;
+      bites.stdSin = caught
+        ? `caught at ${recording} tick ${tick}, ${field}, as the scan found`
+        : `NOT caught at the scan's ${recording} tick ${tick}, ${field}: ${c ? `first mismatch ${c.first ? `${c.first.recording} tick ${c.first.tick}, field ${c.field ?? "none"}` : (c.at ?? "none")}` : "no comparison was written"}`;
+      if (!caught) {
+        problems.push(
+          `std-sin: ${bites.stdSin}; this step ran on ${io.libc()}, the scan on ${scan.record.find((l) => /libc|ldd/i.test(l)) ?? "a libc it does not name"}; ` +
+            "glibc picks its sinf by the CPU's features when it loads (an IFUNC), so on another CPU or libc the scan is re-run " +
+            "there (u4d2-brief.md 2.4 (a) item 6; INF-3)",
+        );
+      }
+      if (catches.length > 1) bites.stdSin += ` (the scan's other catches: ${catches.slice(1).map((x) => `${x.recording} tick ${x.tick}`).join(", ")})`;
+    } else if (scan?.notCatchable) {
+      bites.stdSin = `not catchable at this site on x86-64 and wasm32 (the scan: ${record}); no std-sin leg runs (the scratch plant stood in once: u4d2-brief.md 2.7)`;
+    } else if (scan) {
+      problems.push(`${STD_SIN_SCAN} records neither a catch on a manifest recording nor "not catchable at this site on x86-64 and wasm32"`);
+    }
+    lines.push(`PM-0004-21/std-sin: ${bites.stdSin}`);
+  }
+  const pairs = lines.filter((l) => / against /.test(l) && !l.startsWith("PM-"));
+  const summary =
+    `${problems.length ? `${problems.length} problem(s); ` : ""}${pairs.join("; ") || "no pair compared"}; h2 ${lines.some((l) => l.startsWith("h2: CO's wasm32 dump is the committed vector")) ? "equal" : "not equal"}; ` +
+    `hash-map: ${bites.hashMap}; std-sin: ${bites.stdSin}; seconds: ${timed.join(", ")}`;
+  return { ok: problems.length === 0, out: [...lines, ...problems, summary].join("\n") };
 }
 
 // Each cargo step takes the runner it calls cargo through (`run` when main calls it), so check.test.mjs pins what each
@@ -1600,6 +2474,8 @@ export const STEPS = {
   doc: docBothBuilds,
   test: testBothBuilds,
   deps: depsStep,
+  // After deps, so the flags its builds use are checked first (u4d2-brief.md 2.4 (a)).
+  wasm: (runner = run) => wasmStep(runner),
   refs: () => {
     const r = run("git", ["ls-files", "-z"], ROOT);
     if (!r.ok) return r;
@@ -1630,26 +2506,46 @@ function lastLines(text, n) {
   return text.trimEnd().split("\n").slice(-n).join("\n");
 }
 
-export function main(argv) {
+/**
+ * Where a failed step's whole output is kept (the advisor's U4d2 round-1 ruling, FX-10: TE-L4): `<step>.log` in the
+ * checkout's .gate/ (gitignored), one per step, removed when the step starts and written when it fails, so a panic
+ * above the 40 lines main prints (B2.3's "name and panic") survives the run.
+ */
+export const FAILED_STEP_DIR = join(ROOT, ".gate", "netcode-proof-test", "failed-steps");
+
+/**
+ * The command: each step (all, or `--only`'s) from `steps`, its PASS or FAIL line printed through `log`; a failed
+ * step's last 40 lines, then the path of the file in `keep` that holds its whole output.
+ */
+export function main(argv, steps = STEPS, log = console.log, keep = FAILED_STEP_DIR) {
   let only = null;
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--only" && i + 1 < argv.length) only = argv[++i].split(",");
     else throw new Error(`unknown argument ${argv[i]}`);
   }
-  const names = only ?? Object.keys(STEPS);
-  for (const n of names) if (!STEPS[n]) throw new Error(`no step ${n}; the steps: ${Object.keys(STEPS).join(", ")}`);
+  const names = only ?? Object.keys(steps);
+  for (const n of names) if (!steps[n]) throw new Error(`no step ${n}; the steps: ${Object.keys(steps).join(", ")}`);
   let failed = 0;
   for (const n of names) {
+    const file = join(keep, `${n}.log`);
+    rmSync(file, { force: true });
     const started = Date.now();
-    const r = STEPS[n]();
+    const r = steps[n]();
     const secs = ((Date.now() - started) / 1000).toFixed(1);
-    console.log(`${r.ok ? "PASS" : "FAIL"}  ${n.padEnd(13)} ${secs} s  ${lastLines(r.out, 1)}`);
+    log(`${r.ok ? "PASS" : "FAIL"}  ${n.padEnd(13)} ${secs} s  ${lastLines(r.out, 1)}`);
     if (!r.ok) {
       failed++;
-      console.log(lastLines(r.out, 40).replace(/^/gm, "      "));
+      log(lastLines(r.out, 40).replace(/^/gm, "      "));
+      try {
+        mkdirSync(keep, { recursive: true });
+        writeFileSync(file, r.out.endsWith("\n") ? r.out : `${r.out}\n`);
+        log(`      the step's whole output (${r.out.split("\n").length} lines): ${file}`);
+      } catch (e) {
+        log(`      the step's whole output could not be kept in ${file}: ${e.message}`);
+      }
     }
   }
-  console.log(failed ? `check: ${failed} step(s) failed` : `check: all ${names.length} steps pass`);
+  log(failed ? `check: ${failed} step(s) failed` : `check: all ${names.length} steps pass`);
   return failed ? 1 : 0;
 }
 

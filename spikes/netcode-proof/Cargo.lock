@@ -800,6 +800,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "npt-hash-wasm"
+version = "0.0.0"
+dependencies = [
+ "npt-sim",
+]
+
+[[package]]
 name = "npt-host"
 version = "0.0.0"
 dependencies = [

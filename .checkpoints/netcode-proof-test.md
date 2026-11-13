@@ -67,13 +67,36 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    packet_name_check.py 12 of 12); u4d2-packet.md cut from u4d2-packet.json (sha256 9b670276…, 373 KB; its side file
    u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
-   **(m) U4d2's merge, in progress** (advisor-u4d2-r2.md Block 5 and "Before the merge"; r1's Block 9 as amended; all
+   **(n) U4d2's merge commit: M1 to M8 met** (u4d2-build.md, "Merge into the spike branch"; u4d2-report.md): M5's
+   counted run all 11 steps PASS at 491 / 561 / 71 of 71 (473+17+1, 541+19+1, 52+11+8), marks 81, redact 0, the wasm
+   step 33.1 s at 52 minutes of uptime, no call stopped, h7 (ii) 1 passed; M6 no failure; M7 GATE PASS with
+   `--no-smoke` (5a: no Chromium here; both logs in .gate/u4d2-merge/); phase B applied (T1, T2's entries 82-85, T3,
+   T5) and T5's two places filled by u4d2_t5_fill.py (committed after the merge, as U4e's scripts were). The merge
+   commit holds the 18 reviewed spikes/ files, T4 and the .checkpoints/ files M8 names, and `git rm` wip/u4d2.patch.
+   **Next, M9:** push; CI's gate and smoke green; the SHA in the merged list; the saver restarted; the card's items
+   (carries 82-85 and C-U7-2; the four open security Lows; INF2-1; TE2-5 (c); round 1's and round 2's follow-ups;
+   Block 6's lesson; the leftover's line); the copies by the approved method or on "Housekeeping later"; then the
+   cold run (one main-run.sh call: `cat /proc/uptime`, the two release-only cleans, the four `test` guards, `node
+   check.mjs --only wasm`) before U4r's brief, and INF2-4's runner follow-up before U4r's brief too.
+   **(m) U4d2's merge** (advisor-u4d2-r2.md Block 5 and "Before the merge"; r1's Block 9 as amended; all
    read in full by the main session, with T1, T3, T4 and T2's carries 82-85; T5 has two places to fill: the merged
    tree's wasm seconds with M5's label, and carry 66's three v1 datagram hashes from the merged tree's h7 (ii) run).
    **M1 met** (09:06 UTC): the copy's HEAD 51520b43391a…; 19 status lines (the 18 files and the record);
    r2-hashes-start 18 of 18 OK and equal to fx-hashes-end (cmp). **M2 met:** at 99c7ed9, U4d2's lane paths and
    crates/sim unchanged since 51520b4 (`git diff --quiet`); spikes/ commits since: c88eb31 (U4e) and 1b4a3c8 (A13)
-   only; spikes/ clean; A13's CI green (43330155579, 43330163225). **Running: the merge-text script's writer,**
+   only; spikes/ clean; A13's CI green (43330155579, 43330163225). **The script: DONE** (u4d2_merge_text.py,
+   af8e955e…, committed at 3b7f0a6; both dry runs exit 0, every assert passed; phase A's diff read in full: T4's one
+   row after `fate_log_sha256`'s at spikes/netcode-proof/marks/SERIES.md:397; phase B's: T1's two §4.1 rows, T2's
+   entries 82-85 (61 lines) at u4s-carries.md:371, T3 at plan.md:1247, T5 at the report's anchor). **The saver
+   stopped at about 09:17 UTC** (bg7f0u6ss) until the merge commit: card edits wait in the working tree. **M3 met:**
+   worktree_patch.py's new cut (.gate/u4d2-merge/u4d2-merge-cut.patch) `cmp`-equal to cb27931's wip/u4d2.patch
+   (9e71cda0…, unchanged since); `git apply --check`, `git apply` in the main folder. **M4 met:** r2-hashes-start
+   18 of 18 OK from the main folder's root. **M5: phase A applied** (SERIES.md f118a8de… → 3a967369…, read back byte
+   for byte); uptime 3,140 s (since about 08:23); **running:** main-run.sh (task bw0ykjvfh, about 09:19 UTC, limit
+   1,800,000 ms; log .gate/u4d2-merge/m5-counted.log): the six pre-builds, `node check.mjs`, h7 (ii). If cut: the
+   main folder holds the applied patch and T4 (uncommitted); check r2-hashes-start (18 OK) and SERIES.md's 3a967369…,
+   then re-run the counted call. The script's writer was workflow wf_c228865c-3b4 (task w6mudi3h7; notes
+   u4d2-merge-text-notes.md): u4d2_merge_text.py --phase A (T4) | B
    workflow wf_c228865c-3b4 (task w6mudi3h7; notes u4d2-merge-text-notes.md): u4d2_merge_text.py --phase A (T4) | B
    (T1, T2, T3, T5), dry run only. On return: commit it, run both dry runs and read the diffs (T4 and T1 in full: the
    marks and the plan; T2, T3 against the code blocks); then stop the saver and M3 (worktree_patch.py to .gate/u4d2-merge/
