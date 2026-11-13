@@ -57,7 +57,7 @@ L2 and L1.** (Mustafa's compact came at about 16:28 UTC; the saver be5gxjhow end
   L3: F6-1), Lows N2-N7b, F6-2, F6-3, F-D13; F6-4 to F6-9 replace A2.1-A2.4, A2.7, A2.8 (the tests move to 4e91830),
   F3-6 replaces Q9.2. No Mustafa item. The questions file's title says "about 17:20 UTC"; it was written about 17:12
   (kept as the advisor read it, sha256 645488be…).
-- **Running (since about 17:33 UTC): the fold script's revision and its second check**, workflow wf_ce5794b5-55e (task
+- **Running (since about 17:31 UTC): the fold script's revision and its second check**, workflow wf_ce5794b5-55e (task
   w01a340zn; script u4r-fold-l1b-wf_ce5794b5-55e.js): fold-reviser (general-purpose, opus, xhigh; notes appended to
   u4r-fold-notes.md, "Revision for the fold ruling") edits u4r_fold.py by the ruling's :187-193, dry run only; then
   fold-checker-2, adversarial (notes u4r-fold-check2.md). If cut: `Workflow({scriptPath, resumeFromRunId:
