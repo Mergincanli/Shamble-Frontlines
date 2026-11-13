@@ -12,9 +12,18 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-13 about 21:00 UTC; read this first after a compact or a cut): U4r's first builder copy ended at its
-context limit, about half built; snapshot wip/u4r.patch; copy 2 resumes in the same worktree; the advisor rules on
-nine points (u4r-build1-questions.md).**
+**NOW (2026-11-13 about 20:51 UTC; read this first after a compact or a cut): U4r's first builder copy ended at its
+context limit, about half built; snapshot wip/u4r.patch (3160196); copy 2 runs in the same worktree; the rulings
+workflow runs (fact check, then the advisor) on nine points (u4r-build1-questions.md).**
+- **Launched about 20:50 UTC:** copy 2 (agent a6e4993cc3a5e4475, background; prompt u4r-copy2-prompt.md) and the
+  rulings workflow **wf_21a67b58-19b** (task wss4jbdqk; script u4r-build1-rulings-wf_21a67b58-19b.js in the session's
+  workflows/scripts folder): u4r-facts (notes u4r-build1-facts.md), then advisor-u4r-build1 (its ruling file
+  advisor-u4r-build1.md), both general-purpose, opus, xhigh, read-only but their notes, on the fixed copy
+  **.gate/u4r-snap1** (`git worktree add --detach` at 2fbec77, then `git apply` of wip/u4r.patch; its 11 files equal the
+  builder's worktree by cmp). Two agents at a time. **If cut:** `Workflow({scriptPath, resumeFromRunId:
+  "wf_21a67b58-19b"})`; copy 2 as its bullet below says. **On the ruling:** read every point in full (all Medium or
+  higher, and all that touch the judge, the marks or a pass bar), then send copy 2 its parts by message; anything for
+  Mustafa goes in "Decisions needed". The check-in stays (next 22:34 UTC).
 - **The first copy** (agent a11e2354169f39acf, 19:31-20:39 UTC, 263 tool uses) ended at its context limit, not by a
   cut; nothing committed. Its notes u4r-build.md (282 lines; copied here by worktree_patch.py, equal by cmp) end with
   "State at this copy's end, and what is next". Done: B3 (carry 63), B4 (npt-bots' `Behaviour`; clippy.toml with both
@@ -23,7 +32,7 @@ nine points (u4r-build1-questions.md).**
   r4, r8, r9 with their bites and plants). Next in its order: fmt (53 hunks), B9 replay and r3, B10 the pre-check with
   r6 and r7, r2 with the real judge by hand, r10's check.mjs half, B12, r5, the end checks twice. I read its report
   and its notes whole.
-- **Snapshot** (about 20:50 UTC, the saver stopped first, no autosave commit): wip/u4r.patch, 11 files on 2fbec77,
+- **Snapshot** (about 20:44 UTC, the saver stopped first, no autosave commit): wip/u4r.patch, 11 files on 2fbec77,
   4,019 lines, sha256 1e2fa56a09b6dc2e921e54a84a26bc81575b77d621d067413b24e177c4726380; `git apply --check` exit 0 on
   this folder. The worktree is kept.
 - **The nine points for the advisor** (u4r-build1-questions.md, no option preferred): (1) the determinism route
@@ -40,11 +49,12 @@ nine points (u4r-build1-questions.md).**
   rulings come by message. **If cut or ended:** check the worktree's HEAD and the brief's hash, re-cut the snapshot
   (`python3 -I .checkpoints/netcode-proof-test/worktree_patch.py <worktree> .checkpoints/netcode-proof-test/wip/u4r.patch
   u4r-build`), then a fresh copy from u4r-copy2-prompt.md with its resume part brought up to date.
-- **An inspection slip (20:40 UTC):** one read-only command's `cd` into the builder's worktree moved this session's
-  working folder there for one call (the harness said so); the next command returned it to the main folder. No branch
-  moved; the worktree's files outside .checkpoints/ equal this branch's head, and this branch's kit files equal
-  origin/main's (`git diff --stat`, empty both).
-- **WRONG-CHAT closed:** Mustafa (about 20:58 UTC, verbatim): "It was meant for this chat after I had used the compact
+- **Two inspection slips (20:40 and 20:50 UTC):** a command whose last `cd` went into a worktree (the builder's; then
+  .gate/u4r-snap1) moved this session's working folder there for one call (the harness said so); the next command
+  returned it to the main folder. No branch moved; the builder's worktree's files outside .checkpoints/ equal this
+  branch's head, and this branch's kit files equal origin/main's (`git diff --stat`, empty both). **Lesson:** a command
+  for a worktree runs in a subshell, `( cd <worktree> && ... )`, so the session's folder stays the main folder.
+- **WRONG-CHAT closed:** Mustafa (about 20:46 UTC, verbatim): "It was meant for this chat after I had used the compact
   command, but I had used it a bit later due to forgetting about it. You can continue, its all good"
 
 **Earlier NOW (2026-11-13 about 19:35 UTC): L4 and item 9 applied (2fbec77); L6 launched: the U4r builder runs.**
