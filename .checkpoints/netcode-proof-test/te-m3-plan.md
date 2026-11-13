@@ -5,6 +5,7 @@ Owner: the main session (npt-net is U3's code; no U4 lane holds crates/net). Rou
 first step is the panic ... Never a retry, and never a looser bound without its cause"). U4d2 merged at cc8595d; U4r
 has not merged. Every spikes/ file:line below is at cc8595d (spikes/ is unchanged since: `git diff --quiet cc8595d
 HEAD -- spikes/netcode-proof` exits 0).
+Risk tier 1 (a spike's test file); no Brave check; reviewers per TE-Q4 (advisor-te-m3.md AM-6).
 
 ## 0. In plain words
 npt-net's test `l2::delay::tests::a_shutdown_s_never_completes_ends_at_its_deadline_without_spinning` checks that a
@@ -96,3 +97,36 @@ summary line)
   assertion (recommended), or more runs first?
 - **TE-Q4, review:** this plan's review and the advisor's check of the commit (recommended), or also a test-engineer
   seat on the diff?
+
+## 7. Done (the record; the advisor's conditions 1 to 7, advisor-te-m3.md)
+- **The advisor's review:** APPROVE with conditions 1 to 7 (advisor-te-m3.md; workflow wf_5a565912-f9b, done about
+  12:24 UTC). TE-Q1: `s_calls <= polls + 1`. TE-Q2: TE2-5's rule ends at U4r's merge, and only if no check.mjs
+  test-step failure happens in P5 or in U4r's counted and judged runs. TE-Q3: accepted, with its words below. TE-Q4:
+  no test-engineer seat now; the advisor checks the commit (the diff, conditions 1-7, the P2-P6 logs, and its own run
+  of the fixed test under the same load).
+- **P1, twice (condition 7):** .gate/te-m3/one-h6-1-4.log (the main session's loop 2, 12:06:52 UTC, the 9th run) and
+  .gate/te-m3/adv-h6-2-44.log (the advisor's own reproduction, 89 runs: the same panic at delay_tests.rs:2605:5 and the
+  same triple (2, 1, 3), ending 0.19 ms after the deadline).
+- **The mechanism (AM-3):** a pump run already under way when the shutdown began started before `before` was read, so
+  `polls` does not count it; it reaches its shutdown block after the shutdown began and calls S's poll_shutdown once.
+  Two wakers can start such a run as the wait ends: the clock's fire for the model's last event, and `until`'s step
+  (DelayStream::current, delay.rs:1163-1175). The bound needs neither: tokio polls a task on one thread at a time, so
+  at most one run can be under way.
+- **The edit (condition 2):** delay_tests.rs only. The doc comment, from "so the pump runs at most 3 times" onward,
+  replaced by AM-2's text, wrapped to the file's width; the assertion as section 3.1 gives it, in rustfmt's layout
+  (`rustfmt --check` exit 0). delay_tests.rs sha256 17c63a39… before, 74d49de7… after; delay.rs unchanged
+  (aaa6a588…).
+- **P4, by message (condition 3):** each plant made by Edit in delay.rs's shutdown block, run through main-run.sh
+  (te_m3_loop.sh, mode `one`, the first run failing as wanted), restored by Edit, delay.rs's sha256 then aaa6a588…
+  (its start) and `git diff` clean.
+  - (a) the old spin, `} else { cx.waker().wake_by_ref(); }` after the timeout branch: exit 101, "panicked at
+    crates/net/src/l2/delay_tests.rs:2607:5: no spin while waiting: 22632 runs"; its own line: 22,632 runs, 22,632 S
+    calls (p4a.log, p4a-1-1.log).
+  - (b) S's poll_shutdown called twice in the shutdown block: exit 101, "panicked at
+    crates/net/src/l2/delay_tests.rs:2608:5: 4 shutdown calls for 2 pump runs: at most one per run, and one more for a
+    run already under way when the wait began"; its own line: 2 runs, 4 S calls (p4b.log, p4b-1-1.log).
+- **TE-Q3's words (the advisor's, for this record, the commit's notes and U4r's brief's TE-M3 line):** "U3c's
+  (u3c-fix2-c2b.md:74) and U4d2's (u4d2-review-test.md:182-186) failures of this test: their assertion is not shown (no
+  panic kept). If U3c's :2002 was the panic site, it was 'every byte, then EOF', a different failure. P2, P3 and every
+  later counted run watch every assertion."
+- **P2 (conditions 1 and 6):** running (p2.log; te_m3_tally.py p2 gives the tally).

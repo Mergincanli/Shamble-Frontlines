@@ -23,8 +23,10 @@ in this seat: the notes are rewritten whole with Write after each block.
   - F-a (recordings' scope): plan §4.15 :500-501 "The determinism step keeps its three; the fourth serves the
     pre-check only", yet brief 2.1 says the four "join crates/lab/recordings.json under carry 82" and section 5 item 4
     times the wasm step "with U4r's recordings". The brief never says whether SS P0 seed 4 enters the wasm step's
-    set, nor that regenerating a generator-0 (runner) entry means running the whole L1 scenario at check time
-    (hash.rs:292-311 refuses any generator != Recording::GENERATOR today; replay.rs:50-51 generator 0 = a runner's).
+    set (check.mjs:2289-2293 replays every manifest entry on the Wasm leg; check.mjs is in the lane only for 83-85),
+    nor that regenerating a generator-0 (runner) entry at check time means re-running the whole L1 scenario
+    (§4.15 :502-504; hash.rs:292-311 refuses generator != 2 today; replay.rs:50-51 generator 0 = a runner's): about
+    3 x 9,000 / R s more (R = 90: 300 s, the whole budget).
   - F-b (carry 49 refusal): no test of the spawn/teleport refusal (not required by the carry; Low).
   - F-c (U4R-Q4 narrows plan :759-760 "each of -21's eight suites"): open question to the advisor, fine.
   - F-d (section 12 item 2): INF2-4's P3 was run at 11:01 UTC with u4d2-run.sh and u4d2-build (card :128-130), so the
@@ -58,3 +60,47 @@ in this seat: the notes are rewritten whole with Write after each block.
   - F-i (TE-M3 under section 5): a check.mjs run in which TE-M3 failed is recorded and does not stop the step group,
     but section 5 needs two runs "each with every step passing"; the brief does not say that run is not one of the
     two (d2-r1 :298-299: a whole run in which all 11 pass). Low.
+- B4 done (rows at the head 83c7801, spikes/ = cc8595d): hold as the brief states: R2/R38 (l1 lib.rs:42-44 doc, :118
+  INITIAL_RTT_NS, :633-635 smoothed_ns, :64 doc, :1748-1750 rtt_ns reads `smoothed`); R4/D12 (no first-sample
+  accessor; send_ack :1418-1465 sends at arrival with delay 0 at P0; advance :947-959; poll needs gate_ns < now
+  :1667-1681); R13 (Room::new :431-438 six args; with_bite :510; BITES 7 ids room/lib.rs:38-46); R15/R37 (pump.rs
+  RttSource :183-190, new :224-247, rtt_ns :298-303, pump reads no RTT, pings only when Joined :346); R16 (input stamps
+  newest + lead and its own seq: client :390-400; StepOut :189-202); R17 (offer: forward compare :84-89 before late
+  :111-117; take :136-158; CMD_CATCHUP = REDUNDANCY_CAP :56-58); R18 (getters :195-297 at the cited lines); R19/R36
+  (rewinds_refused :133-135 field; count in fill_input :860-864; late :846); R33/D10 (git grep at HEAD: only pump.rs
+  and lib.rs:14); R34/D11 (no Resync in client/src; PROVISIONAL_CAP 1_024 events.rs:40); R43 (with_lead :291-295,
+  default 1 :262; with_starts :298-302; with_event_start room.rs:488); R44 (join returns (slot, replaced) :637); R30
+  (World::new :701; with_bite :944; state_hash seam.rs:551; entity_records :554); check.mjs cites :39, :879, :914,
+  :1560, :1864, :1891, :1935, :1973, :2020, :2062, :2099, :2120, :2212, :2254, :2468-2503, :2520, :2548 all hold.
+  New facts found:
+  - F-j (HIGH, carry 74's lead): ClientEndpoint stamps `newest + lead` with newest the newest snapshot tick it holds
+    (client :336, :390-392), which is already one downlink delay plus up to one client step old; so the command must
+    cover downlink + step wait + uplink: lead >= ceil(max RTT / tick) + 1. Carry 74's formula covers one way only
+    (P0 1, P2/B1 3, P3 4). Print-only model (uniform jitter as l1 lib.rs:790-812; snapshots each tick; client steps at
+    a fixed phase; 5 phases x 20,000 steps): late share at P2 L=3 0.977, L=4 0.023, L=5 0; at P3 L=4 0.982, L=5
+    0.558, L=6 0. So under carry 74 every P2, P3 and B1 run has ~98 % of commands late: the 1 % rule sends every one
+    to the advisor; -17 P2/P3/B1 and -18 B1 cannot count; SS P2 s1 and ES P3 s2 recordings hold mostly reruns.
+    The brief must raise it (a new question), it cannot reword carry 74.
+  - F-k (Medium, -18's heal "decode" undefined): under no-fallback the client files the sentinel 0 for each refused
+    delta (client :196, :352, :486); a heal record that takes any filed hash heals the bitten run. The brief's 2.1 says
+    "first decode" but never "a non-zero hash".
+  - F-l (Medium, the brawl's view time): rewind_at refuses a fraction > 0 unless view_tick + 1 is in the ring
+    (rewind.rs:8-11); the ring holds ticks <= T - 1 when tick T fills its input (room.rs:812-819). A brawl that
+    stamps (newest, fraction > 0) at lead 1 (P0) gets every firing command refused: rewinds_refused > 0 on both legs
+    of the pre-check, VOID by carry 40 forever. The brief never states the view time the brawl stamps.
+  - F-m (Medium, U4R-Q6 (a) is incomplete): Decoder has no bite selection of its own (pump.rs: only its Quant;
+    `Decoder::new` :224-231); npt_server::BITES is a fixed [&str; 3] of Schedule's BITE_IDS (schedule.rs:245-251). A
+    per-instance pump bite (§4.11 :399-401) needs a new pub `Decoder::with_bite` (A19) and a change to BITES' shape in
+    U4b's file, plus the site's allow (server/clippy.toml:6-17): not "nothing else".
+  - F-n (Low): the lab's I/O step must call `Decoder::accept` after an Ok join (pump.rs:265-269; without it the
+    session stays Joining and every datagram counts `before_join`) and `reject` on Err; 2.1 names neither.
+  - F-o (Low): the late-command bite's one Input holds T..T+L (L+1 commands); REDUNDANCY_CAP 8 (input.rs:56-58;
+    proto input.rs:42-50) drops the oldest beyond 8, so L = 8 would drop T itself (a miss, not late): L <= 7 or T
+    sent alone first.
+  - F-p (Low): the Loopback leg has no next_event_ns; 2.1/7.2 never say what instants the RQ8 loop visits there.
+  - F-q (Low): the pre-check never says it scripts each recorded tick's spawns, teleports and attributes into both
+    rooms (Room::script, room.rs:617-630), or that SS P0 s4 holds none.
+  - F-r (Low): commands once per client step (plan.md E12: 30 inputs a second), never per 60 Hz frame: a second
+    command stamped for an already-buffered tick counts late (input.rs:111-117).
+  - F-s (Low): warm-up and after-phase lengths are not stated (carry 62 (d)/(e); carry 75's 32,768 events), nor in
+    7.3's arithmetic.

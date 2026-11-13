@@ -32,6 +32,9 @@ case "$BIN" in
   *) BIN="$(pwd)/$BIN" ;;
 esac
 [ -x "$BIN" ] || { echo "STOP: no test binary found in $build (got: $BIN)"; exit 2; }
+# AM-7 (advisor-te-m3.md): the bytes this run tests, and the build's own line for npt-net.
+sha256sum crates/net/src/l2/delay_tests.rs crates/net/src/l2/delay.rs
+grep -E "^ *Compiling npt-net " "$build" | sed 's/^ *//'
 steal() { awk '/^cpu /{print $9}' /proc/stat; }
 echo "binary $BIN; mode $MODE; $N runs in each of $P loops; $H busy loops; steal $(steal); start $(date -u +%T) UTC"
 stop="$OUT/$TAG-stop"

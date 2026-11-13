@@ -50,6 +50,16 @@ re-run the same call if no failure was caught. Then the cause → te-m3-plan.md 
   - **Running (since about 12:11 UTC): the advisor's review of te-m3-plan.md**, workflow wf_5a565912-f9b (task
     wx5wl32pq; script npt-te-m3-advisor-wf_5a565912-f9b.js; notes advisor-te-m3-notes.md, ruling advisor-te-m3.md). If
     cut: resume with `Workflow({scriptPath, resumeFromRunId: "wf_5a565912-f9b"})`. No source edit before its APPROVE.
+  - **The advisor: APPROVE with conditions 1-7** (advisor-te-m3.md, read in full by the main session: AM-1 Medium,
+    AM-2 to AM-7 Low; TE-Q1 `s_calls <= polls + 1`; TE-Q2 TE2-5's rule ends at U4r's merge, only if no check.mjs
+    test-step failure in P5 or U4r's counted and judged runs; TE-Q3 accepted with its words; TE-Q4 no seat now, the
+    advisor checks the commit). **Done:** the edit (delay_tests.rs only, AM-2's comment and the assertion; rustfmt
+    --check 0; sha256 74d49de7…, delay.rs unchanged aaa6a588…); P4 (a) exit 101 "no spin while waiting: 22632 runs"
+    and (b) exit 101 "4 shutdown calls for 2 pump runs", each restored by Edit (delay.rs aaa6a588…, git diff clean);
+    the record in te-m3-plan.md section 7. **Running: P2** (task bwz0jq8ww, since 12:26; p2.log; tally by
+    te_m3_tally.py p2). Then P3 (mode all, 10 x 2, 4 busy loops), P5 (check.mjs counted), P6 (gate), ONE commit
+    (delay_tests.rs and the record), push, CI, the advisor's check of the commit. If cut: the working tree holds the
+    edit (delay_tests.rs 74d49de7…) and no plant (delay.rs aaa6a588…); re-run the interrupted P-step.
 0. **U4e's merge is next** (the advisor's round-2 ruling, advisor-u4e-r2.md: APPROVE on Q1-Q4; NC2-M1 a carry,
    C-U6-16 (a); the merge goes ahead on R9's M1-M9 with Q3's amendments to M5, M8 and M9; T1, T2 (3), T3, T5 and the
    new T7 from advisor-u4e-r2.md, T2 (1), (2), (4), (5), T4 and T6 from advisor-u4e-r1.md; nothing to Mustafa). M1 and

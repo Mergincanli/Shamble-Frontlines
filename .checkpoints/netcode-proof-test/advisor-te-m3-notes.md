@@ -42,3 +42,16 @@
   (adv-h6-2-44.log): panicked at delay_tests.rs:2605:5 "3 shutdown calls", its line (2 runs, 1 after, 3 calls),
   ended only 191416 ns after the deadline (so lateness is not the trigger). Tally of the 89 own lines: 87 x (2,1,2),
   1 x (2,1,3) (the failure), 1 x (3,1,3) (the doc's third run, a pass). Same binary npt_net-301de27e05915ce7.
+- Block 7 (judgement): cause CONFIRMED by deduction from the code plus two failures with the same triple (theirs
+  and mine). Change: smallest honest one (test-only; end-of-run counting in delay.rs would also fix the windows but
+  is a bigger change to U3's cfg(test) code with several exits: not asked). Nothing hidden: the extra call is
+  correct C3 behaviour. Findings: AM-1 (Medium) P2 must show a (2,1,3) pass, else it does not show the fix covers
+  its case; AM-2 (Low) the doc keeps "and S's poll_shutdown no more often": replace, with the one-thread reason;
+  AM-3 (Low) don't name the waker (clock fire as likely); AM-4 (Low) P4 by message and new lines; AM-5 (Low) P3's
+  other-test failures path; AM-6 (Low) no risk tier named (tier 1); AM-7 (Low) bytes tie (sha256 at each run).
+  Observation: polls <= 3 rests on the same "one queued wake" reasoning; watched by P2, no change asked.
+  Rulings: TE-Q1 polls + 1 (s_calls <= 3 fails on correct code: R0 under way + N1 + delayed shutdown wake -> (3,1,4));
+  TE-Q2 at U4r's merge, not this commit; TE-Q3 accept, recorded as not shown; TE-Q4 no extra seat now.
+  Verdict: APPROVE with conditions.
+- Block 8: ruling written to advisor-te-m3.md (verdict, AM-1..AM-7, the Observation, TE-Q1..TE-Q4, next steps).
+  Citations re-checked (poll_shutdown :1611-1636, its wake :1631-1634; wakers :844-853). Done.
