@@ -31,3 +31,27 @@ silent-wrap example (100 - 150 as u32 = 4,294,967,246) in a scratch crate under 
   panic; Why: "one remote panic must not end a 48-player match". So "by ADR 0002 part 4's panic rules that would likely
   end that match" cites part 4 for the opposite of what its panic rules are for; the match-ending rule is ADR 0001
   part 11 / ADR 0004 part 20 (tick thread only).
+- (a7) Where room's code runs: ADR 0002 :189 `room` = "the room's match logic with no I/O, no async runtime and no
+  clock (its timers count ticks)": slot table, bots, per-client command queues, snapshot/event encoding, so it runs on
+  the tick; :192 `server` = transport, async runtime, supervisor hook, metrics (the I/O side, per-connection work).
+  PM-0004-60 and PM-0001-34 treat a panic in room's control-message handling as match-ending ("a panic there ends the
+  match too"). So: room's overflow -> match ends (by the drafts); server's per-connection overflow -> that connection
+  only; server's tick-side code -> match ends. The report's "room's or the future server's ... would likely end that
+  match" is right for room and tick-side code, wrong for connection-side code.
+- (a8) The claim appears only at the report :213-215 and :299-302 (git grep of 4bccf55 outside .checkpoints/, ADRs
+  0001/0004 and research excluded). Reviews :166 still says round 2 "(pending)", so :215's "Round 2's security review
+  reads it against part 4 and R2-ROOM-REC2" is a forward IOU; the review's full text lives only in the notes, deleted
+  before ready (CLAUDE.md, Checkpoints 6).
+- (b) Silent-wrap example reproduced, rustc/cargo 1.99.1, in /home/user/Shamble-Frontlines/.gate/skeptic-r2-R2-D2/
+  (old/ = git archive 4d78ad6, part 4's two blocks; routeA/ = git archive 4bccf55; identical probe added to both: room
+  bin src/bin/wrap_r2d2.rs + test tests/wrap_r2d2.rs, room-own `credits - price` u32 and `id + 1` u16 (#[inline(never)],
+  black_box, catch_unwind), plus sim helpers spend_inline/spend_never called from room (room got `sim` as a path dep;
+  the scratch Cargo.lock updated, no network)). Results, `cargo run --release` and `cargo test --release`, the same:
+  OLD release: control 150-100 Ok(50); room 100-150 Ok(4294967246); room u16::MAX+1 Ok(0); sim inline helper from room
+  Ok(4294967246); sim never-inline helper panicked "attempt to subtract with overflow" (crates/sim/src/lib.rs:25).
+  ROUTE A release: control Ok(50); all four panicked ("attempt to subtract with overflow" / "attempt to add with
+  overflow"). OLD dev profile (cargo run, no --release): all four panicked ("as test builds already do").
+  2^32 - 50 = 4,294,967,246. The example holds as stated (release, old blocks, room's own code: 4,294,967,246; route A:
+  panic). Nuance: credits are a sim value (ADR 0004 part 17, economy as a sim phase); under the old blocks a credits
+  helper in sim wrapped the same way when room called it directly (the RR-1 gap), so "credits" is a fair illustration
+  either way, but the example should say whose code it ran in.

@@ -135,11 +135,22 @@ comment-draft*.txt, adr0002.md, *.orig and *.probe copies.
 (Also left: Cargo.toml.routeA. ws/ ends with Cargo.toml = route A and sim's lib = 4bccf55's; room holds the extsum probe.)
 
 ## Exact wording proposed
-- Cargo.toml:21-24 (applied and built in fixcheck/; 113, 119, 120, 118 columns):
-  # Overflow checks are on in every profile for every workspace crate (ADR 0002 part 4, widened on foundation 2.2's
-  # review, RR-1: sim's inline, generic and small functions compile in their callers; the register row OVERFLOW-ALL). "*"
-  # matches every non-member: each keeps the release default setting. In release, or a profile inheriting it, at opt-level
-  # 0, 1, "s" or "z" our crates can reuse a dependency's unchecked generics: drop "*" or give it overflow-checks = true.
+- Cargo.toml:21-24 (final, scoped after the second consult: K9 shows reuse of a dependency's own #[inline(never)] copy
+  at opt 3, so the last sentence names only our sum() and product(); applied in fixcheck/, 120, 115, 118, 117 columns,
+  `cargo build --workspace --locked` exit 0, Cargo.lock byte-identical, `cargo metadata --locked` ok):
+  # Overflow checks are on in all profiles for every workspace crate (ADR 0002 part 4, widened on foundation 2.2's review,
+  # RR-1: sim's inline, generic and small functions compile in their callers; register row OVERFLOW-ALL). "*" matches
+  # every non-member, which keeps the release default setting. At opt-level 0, 1, "s" or "z" in release or an inheriting
+  # profile, our sum() and product() can run a dependency's unchecked copy: drop "*" or give it overflow-checks = true.
+- TE2-1's split, ruled IN for OVERFLOW-PER-CRATE (where the "*" decision is made; the comment and the row keep only
+  "release default setting", the one phrase that holds for all dependency code): "What "*" leaves unchecked: a
+  dependency's own arithmetic, concrete arithmetic inside its generic functions included; arithmetic its generic code
+  does through a trait (T: Add, Sum) takes our crate's setting when our crate compiles it, but not when rustc reuses
+  the dependency's own copy (an #[inline(never)] function at any opt-level; any shared generic at 0, 1, "s" or "z")."
+  (K5, K9.)
+- K12 the per-package case, run (scripts/run-p.sh -> run-p.txt): route A + [profile.release.package.room] opt-level =
+  "s" (extsum at 3): member_total panics; route A + extsum alone at "s" (room at 3): panics. So a sharing level on one
+  crate alone does not open RR2-1; both must share (replaces the "not run as such" in the corrections above).
 - OVERFLOW-PER-CRATE's trigger (STATUS_ARCHIVE and report :254-257), replacing "The first such crate that enters sim's
   dependency tree decides, with its cost measured, between a named override for it (...) and dropping "*"": "The first
   third-party crate that any workspace crate uses, not only one in sim's dependency tree, decides, with its cost
@@ -157,3 +168,9 @@ comment-draft*.txt, adr0002.md, *.orig and *.probe copies.
   1, "s" or "z" also lets our crates reuse a dependency's unchecked generic code (integer sum() and product(), foundation
   2.2's round-2 review). That is decided when the first third-party crate enters any workspace crate's dependency tree,
   with its cost measured (a named override for each such crate, which beats "*", or dropping "*")".
+- Leftovers added since the list above: target-p-p1/, target-p-p2/, log-p-p1.txt, log-p-p2.txt, run-p.txt,
+  fixcheck-Cargo.lock.orig; fixcheck/Cargo.toml holds the final comment.
+- Timing (my recommendation): fold the comment, the row and the trigger in this round's fix pass, not "at the next
+  Cargo.toml change" (TE2-1) or as a later follow-up (RR2-1): the row goes to Mustafa for his go (R2-L7), and the
+  comment is what a future opt-level change reads. It makes a new head: CI (toolchain, gate, smoke) and the advisor
+  agent's head review, which also signs off the reworded ruling conditions 3 and 6.
