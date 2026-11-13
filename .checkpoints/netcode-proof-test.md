@@ -84,9 +84,24 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    exact lines with no plan step (main-run.sh: `T=`, the CACHEDIR.TAG check before any `mkdir`, `exec 9>` and `flock -x
    9` each `|| { echo STOP; exit 5; }`, u4d2-run.sh's provenance form fixing MR9-L1, a header sentence; u4d2-run.sh: the
    same, with `flock "$mode" 9`); proof P1 (`bash -n`), P2 (the two diffs saved beside them), P3 (one lock across both
-   runners), P4 (three fail-closed copies per runner, each exit 5, no marker). **Next:** the edits by Edit, P1 to P4,
-   then the card (P1-P4, MR9-L1 fixed, W1-TARGET item 3 as amended in Block 2, the two lessons, u4e-run.sh and
-   u4df-run.sh retired), a checkpoint save, then U4r's brief (the advisor checks the two diffs and the proof logs then).
+   runners), P4 (three fail-closed copies per runner, each exit 5, no marker).
+   **INF2-4's runner follow-up: DONE** (by Edit, Block 2's lines exactly; committed by the 10:00:08 autosave 90f5f61):
+   P1 `bash -n` exit 0 on both runners; P2 main-run.sh.inf2-4.diff (-6 +14) and u4d2-run.sh.inf2-4.diff (-6 +13),
+   saved beside them by inf2_4_proof.py, Block 2's lines only; P3 (11:01 UTC) main-run.sh `sleep 8` held the lock
+   exclusively 11:01:18 to its end 11:01:26, u4d2-run.sh `true` held it (-s) at 11:01:26, both exit 0
+   (.gate/u4d2-merge/inf2-4-p3a.log, .gate/u4d2/inf2-4-p3b.log), and p3a's provenance block holds no count line:
+   **MR9-L1 fixed**; P4 the six one-line copies (<r>.inf2-4-{a,b,c}.sh, each with its .diff; the script asserts one
+   line each): every one exit 5 with its STOP line, no marker, .gate/no-such-target and .gate/no-such-dir absent before
+   and after. **W1-TARGET item 3 as amended** (the advisor's text, advisor-u4d2-m9.md Block 2 :252-256; advisor-u4-wave1.md
+   stays a record): a shared-target clean is the six part-cleans or a part of them on one of the two tagged roots, with
+   `test` guards; never the folder-level form while the lock's file lives in it; never `--target` without `-p`. **The
+   two lessons for later briefs** (Block 2 :259-264): `--target` without `-p` in `cargo clean`; a dry run may write
+   `.rustc_info.json`. **u4e-run.sh and u4df-run.sh retired** (no brief names them again); later lane runners are
+   copied from u4d2-run.sh with the tag check and the two lock lines unchanged. **U4d2's M9: DONE.** The container
+   restarted again between 10:00 and 11:01 UTC (not the spend limit: the machine up since 11:01:00; nothing lost, the
+   last autosave 90f5f61 holding every change); the saver restarted as b1yq9a1id. **Next: U4r's brief** (Next steps
+   5; the advisor checks it with INF2-4's two diffs and proof logs), and TE2-5 (c), TE-M3's planned change, before U4r's
+   merge.
    **(o) U4d2 MERGED at cc8595d** (pushed about 09:29 UTC on 2026-11-13; CI green), the fill script
    committed after it (056c6ef), the saver restarted (bpxjaop78). M9's items for the card, now on it: carries 82 to 85
    (U4r) and C-U7-2 (U7), in the merge commit; the open findings for PR #40's report: four security Lows, each carried
@@ -288,7 +303,7 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    with `Workflow({scriptPath, resumeFromRunId})`. On return: read its section 6 list and every stop in full; snapshot
    the worktree (worktree_patch.py) and commit it; then the review per 7.2 item 7's panel (rust-reviewer,
    engine-architect, test-engineer, infra-engineer, security-auditor), with U4e's seats counted in the three.
-- The saver runs as bpxjaop78 (since about 09:29 UTC on 2026-11-13, after U4d2's merge commit; restart it when it stops,
+- The saver runs as b1yq9a1id (since about 11:02 UTC on 2026-11-13, after the container's restart; restart it when it stops,
   with run_in_background and timeout
   7200000: without the timeout the harness stops it at 30 minutes, as it stopped bg29bb0pt at 16:42 UTC). The chat's size goes in every
   report.
