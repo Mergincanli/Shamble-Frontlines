@@ -116,8 +116,15 @@
    (23:38:22 UTC; not the guard, the deny list or the classifier; route: CI read through the API instead). The
    verifier's brief: `verifier-brief.md`.
 
+13. Fix pass 2 DONE: its follow-up a1d0317b5d6d6bef920e394c51c07ca869efb601 (23:48:08 UTC; the notes as used: fe2482c),
+   pushed; every script check, 2.2's decisions-entries check and the gate passed before the commit; its word-level
+   diff read; CI on a1d0317, all success: gate push 43529793262, toolchain push 43529793189, gate pull_request
+   43529799958, toolchain pull_request 43529799786. Consultation 11 said no further consultation is needed for this
+   save. The verifier's brief updated for a1d0317 (`verifier-brief.md`).
+
 ## Current step
-Fix pass 2's "done" save after its consultation (moment 5), then the verifier on 8e4fe7c (brief: verifier-brief.md).
+The verifier on a1d0317 (a general agent on Opus 5.5 at effort max, reading main's verifier.md; brief:
+verifier-brief.md; notes verifier-1.md), until PASS.
 
 ## Next steps
 1. Scripts (consultation 10's items 1 to 6 block the commit): grep every "before" string of D2 to D4 in the notes'
@@ -248,8 +255,7 @@ Fix pass 2's "done" save after its consultation (moment 5), then the verifier on
 - The slug `foundation-2-3-docs`; the docs pass is its own PR from this branch (his words).
 
 ## Running work
-- Fix pass 2's follow-up (consultation 11's items 1 to 5): being written; then its battery and gate, the commit, the
-  word-level diff on it, its four CI runs, the "done" save (no further consultation), then the verifier.
+- The verifier on a1d0317: launched after this save (see the next save for its agent id).
 - The saver: bpjfne3lu (started ~23:38 UTC).
 - Done: review round 2 (wf_dcd47e10-70e, 2 of 2 reviewers and 1 of 1 skeptic returned); round 1 (wf_eb6cb5e5-3ce, 6 of 6);
   fix pass 1 (554face, CI green); fix pass 2 (8e4fe7c, CI green: 43528414752, 43528420177, 43528414776, 43528420127).
