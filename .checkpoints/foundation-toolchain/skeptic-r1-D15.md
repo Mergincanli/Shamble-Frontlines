@@ -52,8 +52,9 @@ Then judge: holds or not, severity on CLAUDE.md's scale, and whether the one-sen
   Step 2.5's done-when has the loopback exchange "with L1 behind it in CI", so 2.5 is the first milestone that runs
   room's and client-endpoint's code; the native headless use is exercised by slice 2's nightly soaks over L1 at the
   latest; navbake's first build is slice 2. The fix's "2.5" is right as "the first step that gives them code".
+  [Superseded by c10 and c11: true for room; for client-endpoint the ADR names no step, and 2.4 may come first.]
 - c7 (where follow-ups live): the report's "Follow-ups for later steps" (:181-191) are mirrored in
-  STATUS_ARCHIVE.md:626-641 ("For later steps": OVERFLOW-PER-CRATE, PACKAGE-ENTRIES, EMPTY-SLOTS, BRIEF-STALE) and
+  STATUS_ARCHIVE.md:630-641 ("For later steps": OVERFLOW-PER-CRATE, PACKAGE-ENTRIES, EMPTY-SLOTS, BRIEF-STALE) and
   named in STATUS.md:96-99 ("later: ..."). CLAUDE.md sends every session to STATUS first, so a sentence only in the
   report would not reach the session that plans 2.5. The EMPTY-SLOTS bullet ends "each waits for the boundary spike"
   (report :186, archive :637): OQ-0002-8 is answered, not an empty slot, so the sentence belongs in its own follow-up
@@ -86,10 +87,11 @@ Then judge: holds or not, severity on CLAUDE.md's scale, and whether the one-sen
   test builds `sim-wasm` with one field added to a section"). So client-endpoint plausibly gets its first code (the
   layout table) at 2.4, not 2.5; the ADR names no step for it, so this is a "may", not a fact. room's first code is
   2.5 (nothing at 2.4 needs it; ts-rs types come from `protocol`).
-- Effect on the fix: "(2.5, under 2.3's G5 rules)" treats 2.3 as background, but PM-0002-44 at 2.3 is the first
-  foundation milestone that checks both crates' defining rules, and 2.4 may give client-endpoint code before 2.5. So
-  the fix's single step is incomplete, and which mark is "their test" is itself the reading the Advisor's ruling
-  leaves open: one more reason to label the sentence as a reading.
+- Effect on the fix: "(2.5, under 2.3's G5 rules)" names 2.3's G5 without its mark; PM-0002-44 (phase inferred: 2.3)
+  is the first foundation mark that checks both crates' defining rules (a `--prove` bite on empty crates, not a run of
+  the placement), and 2.4 may give client-endpoint code before 2.5. So the fix's step attribution is imprecise (not
+  wrong), and which mark is "their test" is itself the reading the Advisor's ruling leaves open: one more reason to
+  word the sentence as facts plus an open question, not as a fourth reading.
 
 ## Verdict (draft, before the advisor consult)
 - Holds: yes, as stated. Every cited fact re-checks (c1, c2, c5, c8); the ambiguity is real because ADR
@@ -102,7 +104,7 @@ Then judge: holds or not, severity on CLAUDE.md's scale, and whether the one-sen
   an empty build) is available to the Advisor and to a later session, and the plan and the advisor agent's verdicts
   never addressed it (c4).
 - Fix: right in substance (2.2 should not count; 2.5 is the first step that gives them code: c3, c6; G5 is 2.3's:
-  0002:1457), but not complete as written:
+  0002:1457) [the "2.5" half superseded by c10 and c11], but not complete as written:
   (i) not inside EMPTY-SLOTS, whose bullet says "each waits for the boundary spike" (c7): a named bullet of its own
       under "Follow-ups for later steps";
   (ii) also in STATUS_ARCHIVE's "For later steps" and STATUS.md:99's list (docs-keeper), or the session that plans
@@ -117,22 +119,25 @@ Then judge: holds or not, severity on CLAUDE.md's scale, and whether the one-sen
 - Holds: yes, as stated. Severity: Low (unchanged by c10-c11).
 - Fix: right in direction (say that 2.2 builds room and client-endpoint empty and does not count as OQ-0002-8 (a)'s
   test), not complete as written. Completeness points, all about the fix, none a new finding:
-  (a) the step: "2.5, under 2.3's G5 rules" skips PM-0002-44 at 2.3, which plants `tokio` in room and wasm-bindgen or a
-      transport crate in client-endpoint (c10), and 2.4 may give client-endpoint its layout table first (c11). Name
-      the marks instead of one step: PM-0002-44 (2.3, the crates' rules bite, on empty crates) and PM-0002-64 with ADR
-      0001's loopback milestone (2.5, the first that runs room's and client-endpoint's code); navbake at slice 2.
-      Keep client-endpoint's claim at "first step with code": nothing read pins its native headless use to 2.5.
+  (a) the step attribution is imprecise, not wrong: the fix names 2.3's G5 without its mark, PM-0002-44, a
+      `--prove` mark showing the gate fails a planted `tokio` in room and wasm-bindgen or a transport crate in
+      client-endpoint, on empty crates; it checks the rule that encodes each crate's reason and does not run the
+      placement (c10). PM-0002-44's phase is inferred, not read off the table: the row is untagged, and `--prove` and
+      G5 are 2.3's deliverables. And "the first step that gives them code (2.5)" holds for room but is not pinned by
+      the ADR for client-endpoint, which may get its layout table at 2.4 (c11, a "may"). Nothing read pins
+      client-endpoint's native headless use to 2.5 either.
   (b) wording: a labelled reading of the Advisor's ruling (dated, the session's or the advisor agent's), not the
       ruling; not a "Decisions needed" entry, no push of its own (it rides the D1 push).
   (c) placement: its own bullet under "Follow-ups for later steps", not inside EMPTY-SLOTS ("each waits for the
       boundary spike").
-  (d) reach: the same named item in STATUS_ARCHIVE "For later steps" (:631-641) and STATUS.md:99's list
+  (d) reach: the same named item in STATUS_ARCHIVE "For later steps" (:630-641) and STATUS.md:99's list
       (docs-keeper); then the archive's [verified]/[assumed] list at :556-560 takes the new name too.
 - Breaks: nothing in the report (the quote check matches only `"..." (A<n>)`); the docs-keeper edits touch no gate
   file.
-- Suggested sentence (for the session to weigh): "2.2 builds `room` and `client-endpoint` empty (one stub test each;
-  CI's wasm32 step compiles both), which exercises none of the reasons OQ-0002-8 (a)'s crates exist for, so this
-  report does not count 2.2 as their test. The session's reading, for the Advisor to confirm: their test is the first
-  marks that exercise those reasons, PM-0002-44 at 2.3 (G5 fails `tokio` in `room`, wasm-bindgen or a transport crate
-  in `client-endpoint`) and step 2.5's skeleton (PM-0002-64, with ADR 0001's loopback milestone: the local server and
-  the client endpoint in the Worker); `navbake`'s comes at slice 2."
+- Suggested text (facts plus an open question, so it adds no third reading beside the literal one, 2.2, and EA-4's,
+  2.5): "2.2 builds `room` and `client-endpoint` empty (one stub test each; CI's wasm32 step compiles both) and
+  exercises neither reason ADR 0002 gives for them (part 3), so this report does not count 2.2 as OQ-0002-8 (a)'s
+  test. The later marks that touch them: PM-0002-44 at 2.3 (G5 enforces the rules that encode those reasons: `tokio`
+  in `room`, wasm-bindgen or a transport crate in `client-endpoint`) and PM-0002-64 at 2.5 (their code runs, with ADR
+  0001's loopback milestone); `navbake` enters at slice 2. Which of these is the test is for the Advisor to say, or a
+  dated reading from the advisor agent."
