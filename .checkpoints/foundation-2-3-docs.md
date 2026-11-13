@@ -255,7 +255,8 @@ verifier-brief.md; notes verifier-1.md), until PASS.
 - The slug `foundation-2-3-docs`; the docs pass is its own PR from this branch (his words).
 
 ## Running work
-- The verifier on a1d0317: launched after this save (see the next save for its agent id).
+- The verifier on a1d0317: agent ad5b8a361fccd378c (general-purpose, Opus 5.5, effort max), launched ~23:50 UTC;
+  notes `verifier-1.md`; brief `verifier-brief.md`. Do not start another: wait for its notification.
 - The saver: bpjfne3lu (started ~23:38 UTC).
 - Done: review round 2 (wf_dcd47e10-70e, 2 of 2 reviewers and 1 of 1 skeptic returned); round 1 (wf_eb6cb5e5-3ce, 6 of 6);
   fix pass 1 (554face, CI green); fix pass 2 (8e4fe7c, CI green: 43528414752, 43528420177, 43528414776, 43528420127).
