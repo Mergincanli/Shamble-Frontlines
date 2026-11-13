@@ -109,3 +109,13 @@ Started 2026-11-13 (session time). Effort xhigh. Instructions read from origin/m
 - Resumed after the cut (14:12+): head ad248a2 (checkpoint commits only); brief sha256 bcaef383 and u4r-run.sh 349b51ad
   unchanged; spikes/ still differs from cc8595d only by c49773f's delay_tests.rs. The ruling file did not exist: B10
   continues by re-reading the brief's sections 0, 4, 5, 9, 10, 12 for the exact fix words.
+- Brief re-read whole (sections 0-12). Q14 re-derived from the code (client :379-456; input.rs :80-117 offer, press
+  compare :91-104 before late :107-113; l1 delay :805 d - a + U[0,2a]; poll :1667-1681 gate_ns < now): with delay > 0,
+  newest n at s means s < t_{n+1} + d + a, so arrival < t_{n+1} + rtt + jitter, in time iff (L-1)P >= rtt + jitter; at
+  P0 s <= t_{n+1} (not delivered in its send instant) and the uplink arrives after s, so L >= 2. Ruling: lead =
+  `ticks_for_ms(rtt_ms + jitter_ms).max(1) + 1`: P0 2, P1 3, P2/B1 5, P3 7 (<= 8). Resend after a loss at the ruled lead:
+  late share about loss x 2 % (P2 0.05 %, P3 about 0.1 %); B1 bursts under (b1): about 2 late per client per burst (the
+  commands given while pre-burst snapshots still arrive), 0.1 % of a 10-min run; under (b2) up to 8 per burst (the
+  redundancy cap) plus the 10 % duplicates. (b1) needs one more rule: press edges counted per command given, never per
+  step (a skipped step then a command covering 1 tick with 2 edges is PressRefused, :96-99). D13 widened: P2 at 3 and 5,
+  P3 at 7, P0 at 2.
