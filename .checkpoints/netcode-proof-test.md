@@ -34,6 +34,11 @@ its revision.**
   u4r-fill-check2.md). If cut: `Workflow({scriptPath, resumeFromRunId: "wf_62c0ab97-ae7"})`. On return: read the dry
   run (fills, stamps, re-points, R11, the top's changes in full); stop the saver; apply; commit; push; restart the
   saver; then L6.
+  **The reviser: DONE** (18:58 UTC): u4r_fill.py 2276287d…, 1,059 lines, dry run exit 0, 66 changes, 1,682 → 1,909
+  lines; all six decisions met by its account (its questions: "stay" → "stays" for agreement in decision 4's sentence;
+  C28's :45 cite held in the inventory, unchanged; the docstring's stale "(plan.md and history asserted unchanged)").
+  **The checker was cut at 19:00 (the cuts block); resumed 19:12 UTC** (task w7zvg0wdh, the same run id; its prompt
+  gained a resume line so it re-runs; the reviser's result cached).
 - The saver runs as bcp64186u (since 18:47:34 UTC). The check-in is enabled (next 20:34).
 - **At 18:53 UTC Mustafa reported usage at 95 % ("save progress for yourself and agents we're at 95% usage, but the
   rest is very soon so no worries."):** everything saved and pushed with the running agent's notes (u4r-fill-notes.md,
@@ -574,6 +579,14 @@ the cut and the time of the resume; UTC, read from the session's transcript):
   Please continue from where you left off.", 14:11:36), before the 14:34 check-in came due. Nothing to restore (no
   plant, no cargo or runner left, the working tree clean); the run resumed (`resumeFromRunId`, a fresh copy that
   continues at B10 from its notes).
+- 2026-11-13 19:00: "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit
+  resets 7:10pm (UTC)". Cut: the fill script's second check, fill-checker-2 (wf_62c0ab97-ae7, its last record
+  19:00:48; its notes u4r-fill-check2.md: K1 and K2 done, K3 next). The fill-reviser had returned before it (18:58:04:
+  u4r_fill.py 2276287d…, dry run exit 0, 1,682 → 1,909 lines). Mustafa had warned of 95 % at 18:53, and everything was
+  saved then (cc1fa41). The saver kept running (last save 19:07:39). Resumed 19:11:44, on Mustafa's message ("I hit my
+  usage limit while you were working, but it has reset now. Please continue from where you left off.", 19:11:33).
+  Nothing to restore (no plant, no cargo or runner running, the brief still rev 3.2, the script the reviser's); the
+  run resumed (`resumeFromRunId`: the reviser's result cached, a fresh checker that continues at K3 from its notes).
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188
