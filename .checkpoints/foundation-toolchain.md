@@ -467,7 +467,17 @@ Older items, done:
    below High from the whole read or the verifier become report lines or follow-ups; the verifier told to diff the
    mirrored items across row, report and archive; the whole read (consultation 8) after CI is green on the fix-pass
    head; the PR body names the last commit holding the notes at the deletion commit; comment A's ambiguous "it".
-Count: 7.
+8. 2026-11-13 ~15:37 Amsterdam (after dc397be; CI green on 790ac31) · moment 5, his item 4: the whole read of the built
+   skeleton before ready (every skeleton file, the lockfile summary, the kit diffs and ADR 0002 parts 2-4 and 7 printed)
+   · changed: no skeleton file (it stands; no push for it); the report's final pass moves before the verifier (the
+   consultation log, E2 with 790ac31's four runs, E9 re-run, the SHA-pinned evidence lines grepped and updated with
+   `git diff 4bd9dd5 790ac31 -- Cargo.toml crates` shown comments-only, STATUS's #48 row, the "runs again, whole"
+   sentence); only the verifier's line and the deletion stay for the last commit; the head-review brief names the
+   departures from D1-R2's exact texts (the R2-L2 parenthetical; docs-keeper's three STATUS choices); "For Mustafa" to
+   say his merge accepts one open security finding (SA2-2); the PR title and body (the last commit holding the notes);
+   recorded only: the overflow tests' doc comments say `cargo test --release` "proves the release profile's setting",
+   the wide wording R2-L1 fixed, one line under OVERFLOW-XCRATE-CI.
+Count: 8.
 
 ## Running work
 - review round 2 (step 30), background agents launched ~13:20 Amsterdam: rust-reviewer, security-auditor,
