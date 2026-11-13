@@ -74,7 +74,10 @@ re-run the same call if no failure was caught. Then the cause → te-m3-plan.md 
     once). **Running: P3 then P5** (task bsv3s6ik3, from 12:29: p3.log, mode all, 10 x 2, 4 busy loops; then
     p5-check.log, sha256sum of both files and `node check.mjs` counted). **P3, P5, P6 PASS; COMMITTED c49773f**
     ("TE2-5 (c): TE-M3's cause and fix ...", pushed about 12:48 UTC; delay_tests.rs and te-m3-plan.md's section 7
-    record; CI running). **Next:** CI green on c49773f, then the advisor's check of the commit (TE-Q4: the diff,
+    record; **CI green**: gate runs 43428174558 push and 43428182600 pull_request). **Running since about 12:53 UTC:
+    the advisor's check of the commit** (wf_a25d667a-fc8, task weib1qo2t; notes advisor-te-m3-check-notes.md, ruling
+    advisor-te-m3-check.md; if cut: resumeFromRunId "wf_a25d667a-fc8"; its run adv-check holds the lane lock: no
+    plant, nothing to restore). It covers (TE-Q4: the diff,
     conditions 1-7, the P2-P6 logs, its own run `te_m3_loop.sh <tag> one 150 2 6`). TE2-5's rule runs until U4r's
     merge (TE-Q2). Then P6 (gate), ONE commit
     (delay_tests.rs and the record), push, CI, the advisor's check of the commit. If cut: the working tree holds the
