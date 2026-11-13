@@ -51,3 +51,32 @@ logs .gate/u4r/; brief u4r-brief.md; carries u4s-carries.md; plan.md.
   over 1,828 ticks. SERIES.md:66,67,73 are -57's rows (68-72 others). marks.json:4008-4100 -57 parts P0,P2,P3,B1 min 3,
   max checks + p99 report. Brief 7.1 :1153-1170: -57 on -17's runs, 4 parts x 3 seeds, 10 min; bites one run per bite
   at seed 1. df now 5.6G (5,998,694,400 B avail). du shared-target 8.1G; .gate 22G; .gate/u4r 291M.
+- P4 done: refused_as_lost logs.rs:275-282 turns every filed sentinel (h==0) into Lost (null, incomplete 1); bite id
+  PM-0001-17/refused-as-lost scenario.rs:200 (bites build). Client sentinel causes client/src/lib.rs:473-487 (decode
+  err), :690-701 (dup group, other bytes), :703-710 (groups/base-age mismatch), :711-730 (no baseline), :741-749
+  (apply err), :501-530 (bad header), :608-622 (second different hash). L1 P0 = 0 ms, 0 jitter, 0 loss, reorder 1 %
+  (l1/src/lib.rs:166-180; smoke header reorder_step_permille 10); no duplication built (l1 :75). Runs: sentinels 0 in
+  smoke1, d13-5, rec SS-P0-s4. Carry 62 (h) u4s-carries.md:289-312; wording from advisor-u4j.md:438-449 (R2.4).
+- P5 done: room.rs:33 private HISTORY_MS 2_000, used :446; scenario.rs:54-56 ROOM_HISTORY_MS copy; span_ms written
+  scenario.rs:770 (Recording header), :1068 (lab `recording` event); s5 asserts r.span_ms == ROOM_HISTORY_MS (copy vs
+  copy) scenario.rs:1590-1592; hash.rs runner entries' manifest span_ms read (:297) but not compared (generate :330-344,
+  check :353-365 bytes+sha only). Room has no history accessor; HitHistory::capacity pub (sim history.rs:42).
+- P8 done: d13.log:19,22,25,28,31 all table figures held; shares recomputed. Notes :175 "1,800 ticks measured" not held
+  (warm-up 300 + measured 1,500; after 0-35). U4R-Q14 (b) 1/6 arithmetic held (J/T x 1/6: P2 10.0 %, P3 15.0 %).
+  Measured skipped shares: (1) 12,290/87,709 = 14.01 %; (4) 17,889/87,541 = 20.44 %.
+- P9 done: parse scenario.rs:1260-1292; no-log runs skip room_tick (scenario.rs:884-888) so shots, measured incomplete,
+  carry 75's events_stamped bound (:803-809) not counted: rec.log:7,14,21 print shots 0. Fix for -57 pile-up present at
+  scenario.rs:833-835. rec.log real 3m20.101s/1m44.248s/2m47.190s. CI workflows run no check.mjs (gate.yml,
+  toolchain.yml). "plan :800-802" = u4-build-plan.md:800-802 (det-u4.mjs text), not plan.md.
+
+## Computed (all from the measured figures above; W = the two runner entries' Wasm leg-1 calls, not measured)
+- Runner regen G = 142.6 + 52.6 = 195.2 s (regen-all mtimes); hash call 201.0 s.
+- Today's code, runner entries in recordings.json: non-cargo 19.9 + (201.0-3.1) + 195.2 + 195.2 + W = 608.2 + W;
+  step warm 13.0 + 608.2 = 621.2 + W (L3 basis 623.9 + W); cold 649.7 + W. No single call reaches 300 s (max 201.0).
+- (a) RR-L4 (Wasm leg only): saving <= Wasm calls 11.6 + W -> non-cargo >= 596.6 s; step >= 609.6 s warm.
+- (b) --only regen: non-cargo 19.9 + 197.9 + W = 217.8 + W; step warm 230.8 + W (L3 233.5 + W), cold 259.3 + W.
+  Margins vs 300: shared non-cargo deadline 82.2 - W; whole printed step 69.2 - W warm, 40.7 - W cold.
+- (c)/(d) step = base 33.1 warm (M5) / 35.8 warm (L3) / 61.6 cold.
+- P3 per 10-min run (18,300 ticks, measured-phase B/tick of 3 logs): P0 27,810 -> 508.9 MB (lab 453.3); P2 12,005 ->
+  219.7 MB; P3 6,868 -> 125.7 MB; B1 not measured. 12 measured runs: 2,562.9 MB + 3 x B1.
+- All items done.
