@@ -199,3 +199,11 @@ Head read: (filled in block 1)
   recomputed; 7.4), 8.
 - B7d written: sections 7 (7.1-7.4) and 8 (8.1-8.4). Fix at the end: lab/clippy.toml is 16 lines (":1-15" ->
   ":1-16" in C3 and 2.2). Next: 9 (table), 10 (questions + ruled table), 11, 12; then the end fixes and self-check.
+- B7e written: sections 9 (R1-R34 walked: 18 hold, 16 changed; R35-R44 added), 10 (ruled table: Q3, Q5, Q2 (ii)
+  and (iii); open Q1, Q2 (a)/(b), Q4, Q6-Q12, new Q13), 11 (D1-D3, D5, D6, D8, D10-D12 filled; D4, D7, D9 stay), 12
+  (launch items 1-9, placeholders P1-P15).
+- B7f self-check done: end fixes applied (C20 counts; close cites; clippy.toml lengths 16/17; l1 allow :768-770; C9's
+  row R38); placeholders appear once in their home and once in section 12's list (the change list names them without
+  angle brackets); no prose line over 120 (python print-only check); no end marker left. Brief 1,413 lines.
+  Verified late: pump.rs:328-330 (returns after a Join), l1 :768-770, server/clippy.toml 17 lines.
+- B8: handback. DONE.

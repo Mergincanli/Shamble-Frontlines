@@ -42,6 +42,14 @@ re-run the same call if no failure was caught. Then the cause → te-m3-plan.md 
     up), so a host-side stall is a second lead. Loop 2 (task b9gvshw83, from about 12:08; te_m3_loop.sh extended:
     tag, mode, busy loops; .gate/te-m3/one-h6.log): TE-M3's test alone with --nocapture, 300 runs in each of 2
     loops, 6 busy loops, each run's steal time logged.
+  - **Loop 2 caught it** (12:06:52, the 9th run; one-h6-1-4.log): "panicked at crates/net/src/l2/delay_tests.rs:2605:5:
+    3 shutdown calls"; the run's line: the pump ran 2 times during the wait (1 at or after the deadline), S's
+    poll_shutdown 3 times. The cause (te-m3-plan.md section 2): the test's two counts cover different windows; a pump
+    run under way when the shutdown began calls S once more but started before `before`. Not a DelayStream defect.
+    The plan: one assertion (:2605, `s_calls <= polls + 1`) and its comment; proof P1-P6; TE-Q1 to TE-Q4.
+  - **Running (since about 12:20 UTC): the advisor's review of te-m3-plan.md**, workflow wf_5a565912-f9b (task
+    wx5wl32pq; script npt-te-m3-advisor-wf_5a565912-f9b.js; notes advisor-te-m3-notes.md, ruling advisor-te-m3.md). If
+    cut: resume with `Workflow({scriptPath, resumeFromRunId: "wf_5a565912-f9b"})`. No source edit before its APPROVE.
 0. **U4e's merge is next** (the advisor's round-2 ruling, advisor-u4e-r2.md: APPROVE on Q1-Q4; NC2-M1 a carry,
    C-U6-16 (a); the merge goes ahead on R9's M1-M9 with Q3's amendments to M5, M8 and M9; T1, T2 (3), T3, T5 and the
    new T7 from advisor-u4e-r2.md, T2 (1), (2), (4), (5), T4 and T6 from advisor-u4e-r1.md; nothing to Mustafa). M1 and
