@@ -1,5 +1,16 @@
 # u4r_fold.py: notes (workflow agent, opus, high)
 
+**Slip (recorded first, as df-ruling R6's form):** the first dry run's output went by a shell redirect (`> ... 2>&1`)
+into the session scratchpad, /tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/scratchpad/dry1.txt,
+against this task's write rule (no shell redirect). It is outside the repository, holds only that dry run's printed
+output (exit 0), and nothing in the repository changed by it. Every later run prints to the terminal only (piped to
+head, tail or grep, never into a file).
+**Slip 2:** a syntax check by `python3 -I -m py_compile` wrote
+.checkpoints/netcode-proof-test/__pycache__/u4r_fold.cpython-313.pyc (43,614 B, 16:56): a Python write, against the
+same rule. It is untracked and NOT gitignored (`git status`: `??`), so the background saver could commit it (the folder
+already tracks u4c-test-plant.cpython-313.pyc). Not removed (a removal is a write too): the main session's to delete
+before the saver's next commit. Running the script itself writes no .pyc (a main script is not cached).
+
 Task: write .checkpoints/netcode-proof-test/u4r_fold.py, the L1 fold of advisor-u4r-brief.md (sha256 35f281bf…) into
 u4r-brief.md rev 3.1 (bcaef383…) -> rev 3.2. Never applied by me: dry run only (`python3 -I`, no --apply).
 Inputs hashed at start: ruling 35f281bf (463 lines), brief bcaef383 (1,625 lines), te-m3 5ecc3e23, te-m3-check 1ffd0294.
@@ -34,3 +45,17 @@ No earlier notes or script: fresh start.
   from the ruling's bold label kept (else the row would not say what was ruled), cite at the Ruling cell's end; R table
   rows matched by their first two cells.
 - B2-B4 done (by grep and reading). Next B5: write the script.
+- B5 done: u4r_fold.py written (u4d2_fold.py's machinery; spans, rows, row removal, the R rows by their first two
+  cells, the P16 bullet, the table rows, title and record; a "(i) "/"(a) "/"(1) " line starts a unit of its own so 2.1's
+  (i)-(iii) keep their line starts). Next B6.
+- B6 done: dry run `python3 -I .checkpoints/netcode-proof-test/u4r_fold.py` exit 0; 51 item lines; words check: 51
+  changes, 61 new phrases each once, 45 replaced phrases gone, no changed line over 120 (rows exempt); brief 1,625 ->
+  1,662 lines; last line "dry run: nothing written"; brief sha256 still bcaef383. Script sha256 a9196126b2efdd9b…
+  (a9196126b2efdd9b9d6ad89ee96735fbc4abfcd6daeb8debc708e972d0802d4e), its own lines all within 120.
+- Finding (no question): Q9.1+Q9.2 as ruled give "and SS P0 seed 4 (TC B1 seed 3 is U4h's, with its TC shooter:
+  U4R-Q9 (b)) (the -30 pre-check's source only)": two parentheses in a row, the ruling's words exact.
+- Finding (no question): A6's cite is the bullet's first changed word, so 2.1 step (2)'s bullet rewraps from :318
+  (words unchanged); D1's rewrap splits the main-run.sh command's code span over two lines (words unchanged).
+- B7 done: result returned (script sha256 a9196126…, dry run exit 0, last line "dry run: nothing written"; four
+  questions for the advisor: 2.2's "by U4R-Q14 (b)", 3.2 row 62's "by U4R-Q2 (b)", Q14's question "P0 1" at :1460, and
+  the stale references list; plus the two slips, the .pyc left for the main session). Nothing next.

@@ -246,8 +246,8 @@ item("A1.3", (99, 101), "span", A=A, B=B, new=new)                      # sectio
 P16 = P16.replace('\\"', '"')
 assert "\\" not in P16 and P16.startswith("`<<P16>>` "), P16[:20]
 # the P16 line's two ends, each found once in the lines of advisor-te-m3.md it names, and its sha256 prefix
-m16 = re.match(r"`<<P16>>` (\S+) :(\d+)-(\d+): .*?from \"(.+?)\" to \"(.+?)\" \(each found once; sha256 ([0-9a-f]{8})…",
-               P16)
+m16 = re.match(r"`<<P16>>` (\S+) :(\d+)-(\d+): .*?from \"(.+?)\" to \"(.+?)\" "
+               r"\(each found once; sha256 ([0-9a-f]{8})…", P16)
 assert m16 and m16.group(1) == STAMPED["te-m3"][0].split("/")[-1], P16
 tj = " ".join(l.strip() for l in lines(STAMPED["te-m3"][0])[int(m16.group(2)) - 1:int(m16.group(3))])
 assert tj.count(m16.group(4)) == 1 and tj.count(m16.group(5)) == 1, ("P16's ends in advisor-te-m3.md", m16.groups())
@@ -315,8 +315,8 @@ A, B, new = cut(345, 356, 'replace the span from "', '" to "', '" with "', LAST)
 item("Q14.4", (345, 356), "span", A=A, B=B, new=new)                    # D13, widened
 # section 4's lane (:360-375)
 (A, B, nlane, n1o, n1n, n2o, n2n, n3o, n3n, p4) = cut(
-    360, 375, 'Replace the bullet from "', '" to "', '" with "', '" In "Never": "', '" → "', '"; "', '" → "', '"; "',
-    '" → "', '". P4\'s replacement: "', '" (both of section 12')
+    360, 375, 'Replace the bullet from "', '" to "', '" with "', '" In "Never": "', '" → "', '"; "', '" → "',
+    '"; "', '" → "', '". P4\'s replacement: "', '" (both of section 12')
 item("S4.1", (360, 368), "span", A=A, B=B, new=nlane)                   # the waiting bullet -> the opened bullet
 R("S4.2", 368, 369, n1o, n1n)                                           # "Never": crates/server
 R("S4.3", 369, 370, n2o, n2n)                                           # "Never": crates/log
@@ -342,8 +342,8 @@ QORDER = (1, 2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14)
 WENT = {
     7: "Its words applied in place: 7.1's -17 L1 P0 row.",
     8: "Its words applied in place: 7.1's -17 L1 B1 row; 7.3's -18 measured row removed.",
-    9: "Its words applied in place: 2.1's recordings with (i) and (ii), section 5 item 4, section 6 item 9, 7.1's order "
-       "and 7.3; its plan text and §U4h carry line are the main session's L2 commit.",
+    9: "Its words applied in place: 2.1's recordings with (i) and (ii), section 5 item 4, section 6 item 9, 7.1's "
+       "order and 7.3; its plan text and §U4h carry line are the main session's L2 commit.",
     14: "Its words applied in place: 2.1's lead, 2.2's press rule, 3.2's row 74 and D13; carry 74's amended words are "
         "the main session's L2 commit.",
 }
@@ -375,10 +375,10 @@ for n in QORDER:
     form = "its letter, first sentence and where its words went" if n in WENT else "its letter and its whole text"
     ROWLOG.append(f"  S10 row U4R-Q{n}: ruling :{a}-{b} ({form}); asked at brief rev 3.1 :{ORIG.index(asked[0]) + 1}")
 item("S10", (176, 375), "rows", anchor="| Question | Ruling | Where the brief now stands |", rows=ROWS)
-MAIN.append("S10: each Ruling cell starts with the ruled letter as the ruling's bold label gives it (after its title's "
-            "\"): \", the bold marks left out), so the row says what was ruled, then the text after the label; the cite "
-            "(u4r-check :a-b) ends that cell; for Q7, Q8, Q9 and Q14 the sentence \"Its words applied in place: ...\" "
-            "(WENT); every third cell (WHERE)")
+MAIN.append("S10: each Ruling cell starts with the ruled letter as the ruling's bold label gives it (after its "
+            "title's \"): \", the bold marks left out), so the row says what was ruled, then the text after the label; "
+            "the cite (u4r-check :a-b) ends that cell; for Q7, Q8, Q9 and Q14 the sentence \"Its words applied in "
+            "place: ...\" (WENT); every third cell (WHERE)")
 item("S10.open", None, "replace", old="**Open** (each self-contained;",
      new="**As asked in rev 3.1, each ruled since (the table above)** (each self-contained;")
 MAIN.append("S10.open: the label \"**Open**\" above the questions becomes \"**As asked in rev 3.1, each ruled since "
@@ -468,14 +468,14 @@ for it in ITEMS:
         e = next(i for i in range(2, len(L)) if not L[i].strip()) - 1
         assert L[e + 2].startswith("## Changes in rev 3.1"), L[e + 2][:30]
         RECORD = ("Rev 3.2 is the main session's fold of the advisor's check of rev 3.1 (advisor-u4r-brief.md, sha256 "
-                  f"{sha(RULING)[:8]}…: APPROVE WITH CONDITIONS, L1 to L6), condition L1, by u4r_fold.py. Folded, in "
-                  "the ruling's words: A1 (with section 12 item 3's P16 line and section 0's three new stamps), A2 and "
-                  "A5 to A8; the twelve rulings (U4R-Q1, Q2, Q4 and Q6 to Q14), U4R-Q7's, Q8's, Q9's and Q14's brief "
-                  "words in place; section 4's lane as the rulings leave it, with section 12 item 3's P4 line; section "
-                  "10's \"Answered\" table's twelve new rows, the questions kept below it as asked. Not folded here: A3 "
-                  "and A4 (their words are inside U4R-Q14's ruling); A9 (a record: no brief change); the plan and "
-                  "carries text (the main session's L2 commit); the placeholders and values (section 12 items 1 to 3, "
-                  "next).")
+                  f"{sha(RULING)[:8]}…: APPROVE WITH CONDITIONS, L1 to L6), condition L1, by u4r_fold.py. Folded as "
+                  "written: A1 (with section 12 item 3's P16 line and section 0's three new stamps), A2 and A5 to A8; "
+                  "U4R-Q7's, Q8's, Q9's and Q14's brief words in place; section 4's lane as the rulings leave it, with "
+                  "section 12 item 3's P4 line. Section 10's \"Answered\" table gains a row for each of the twelve "
+                  "rulings (U4R-Q1, Q2, Q4 and Q6 to Q14), its third cell the main session's; the questions stay "
+                  "below it as asked, relabelled. Not folded here: A3 and A4 (their words are inside U4R-Q14's "
+                  "ruling); A9 (a record: no brief change); the plan and carries text (the main session's L2 commit); "
+                  "the placeholders and values (section 12 items 1 to 3, next).")
         out = refill(RECORD, "", "")
         FLAT.append((norm(" ".join(L[2:e + 1])), norm(" ".join(L[2:e + 1]) + " " + RECORD)))
         L[e + 1:e + 1] = [""] + out
@@ -483,6 +483,8 @@ for it in ITEMS:
         how = f"a new paragraph of {len(out)} lines after :{e + 1} (the title block's paragraph :3-{e + 1})"
     src = f"ruling :{it['src'][0]}-{it['src'][1]}" if it["src"] else "the main session's words"
     LOG.append(f"{tag}: {src} -> brief rev 3.1 :{it['rev31'][0]}-{it['rev31'][1]}; {how}")
+    if k == "rows":
+        LOG.extend(ROWLOG)
 
 # ---------------------------------------------------------------- the words check
 final = "\n".join(L)
