@@ -535,7 +535,8 @@ Count: 8.
   runner, all reproduced). Verdicts: `review-r2-verdicts.json`. Drafted texts of the whole fix pass:
   `fix-r2-drafts.md`. Next: consult the advisor tool (count 7), then the advisor agent's ruling D1-R2 on the row's
   rewording and the decision entry, then one fix pass and push.
-- saver: background task b5z3yarke, `--every 2 --for 115`, started ~14:04 Amsterdam (b2ppm4x49 stopped by the session
+- saver: background task bnchuj8e9, `--every 2 --for 90`, started ~16:00 Amsterdam (b5z3yarke ended at its time limit;
+  before it, b2ppm4x49 was stopped by the session
   to shorten the interval while the agents write notes). Stop it before the checkpoint-deletion commit.
 - workflow wf_3198650c-b78 (the sync): done; its fixes in 4bccf55.
 - workflow wf_b82244e7-a22 (review round 1, run 1): done, 5 of 5 (step 26).
