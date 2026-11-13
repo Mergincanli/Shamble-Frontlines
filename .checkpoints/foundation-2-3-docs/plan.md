@@ -51,7 +51,7 @@ edited line on.", backed by `fixes.mjs`'s whole-file check; conditions: (a) the 
 `fixes.mjs --check` runs on the 2.2 report again on the final head (the archive part at step 3 only, before docs-keeper).
 §5's L2 and header-note texts below are replaced by these.
 
-## Revision 2d (2026-11-13, asked 23:02 UTC): review round 2's fix pass (the advisor agent's ruling, ~23:06 UTC:
+## Revision 2d (2026-11-13, asked 23:01:53 UTC): review round 2's fix pass (the advisor agent's ruling, 23:02:43 UTC:
 ## APPROVE D1 to D6, D6(a) as (a1) with three conditions; D7 agreed: no round 3; its notes: "PLAN REVISION 2d")
 Ruling's conditions for D6(a1): the entry's header says only what the message is ("his status request ... sent while
 review round 2 ran") and does not read it as a decision; the report states the cut-off time after which no message of
