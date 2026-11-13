@@ -23,7 +23,8 @@ workflow runs (fact check, then the advisor) on nine points (u4r-build1-question
   builder's worktree by cmp). Two agents at a time. **If cut:** `Workflow({scriptPath, resumeFromRunId:
   "wf_21a67b58-19b"})`; copy 2 as its bullet below says. **On the ruling:** read every point in full (all Medium or
   higher, and all that touch the judge, the marks or a pass bar), then send copy 2 its parts by message; anything for
-  Mustafa goes in "Decisions needed". The check-in stays (next 22:34 UTC).
+  Mustafa goes in "Decisions needed". The check-in stays (next 22:34 UTC). The saver restarted as **bhcysef92**
+  (20:52 UTC, after d909323).
 - **The first copy** (agent a11e2354169f39acf, 19:31-20:39 UTC, 263 tool uses) ended at its context limit, not by a
   cut; nothing committed. Its notes u4r-build.md (282 lines; copied here by worktree_patch.py, equal by cmp) end with
   "State at this copy's end, and what is next". Done: B3 (carry 63), B4 (npt-bots' `Behaviour`; clippy.toml with both
