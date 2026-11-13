@@ -128,3 +128,19 @@ Agent memory: none in this environment (no .claude/agent-memory-local/); round-1
 - TE2-6 Low M7 row: names no failing binary (protocol's), no word that sim's release binary never ran in CI.
 - TE2-7 Low OVERFLOW-ALL decision entry :298-300 "most of the simulation's code": unmeasured; mechanism says narrower.
 - Verdict draft: APPROVE, 0 Critical, 0 High, 0 Medium, 7 Low.
+
+### Advisor tool consulted (after the drafts); its points applied
+- Line numbers re-grepped: ADR 0002 protocol row is :188 (not :186); the "most" sentence is report :295-296; As built
+  :72-78. Both probes re-run with panic messages kept: DEP's only panic "attempt to add with overflow" at
+  extdep/src/lib.rs:7 (add_trait's `a + b`); REACH's two at sim lib.rs:24 (add_inline) and :40 (Tick::next).
+- D3/D17 judged against the skeptics' refined fixes (review-r1-verdicts.json): D3's K1-GO wording matches its skeptic's
+  suggestion, the trees named as 66d9888's; D17's mutations sit in G0's row ("beyond PM-0002-39's file deletion") and
+  CUT-CARRY ("a red run with --net removed"); plan.md's "already show that the probe bites" is in no tracked doc.
+- STATUS.md:29 read in full (M7 "went red and was reverted"; 17 findings "all hold"): holds. The 2.2 follow-up line
+  lost its "(archive: ...)" tail, but :69 says "its text in the archive". HEAD 4f1a799 = 4bccf55 outside .checkpoints/.
+- .gate/xcrate-fixed is cited nowhere (grep of .checkpoints/ and docs/). Main's advisor.md has no step that matches a
+  plan's files against open follow-ups (:17 read STATUS; :169 STATUS updated).
+
+## FINAL (the handback, as sent)
+Verdict: APPROVE. 0 Critical, 0 High, 0 Medium, 7 Low (TE2-1..TE2-7; text in the handback). Highest value: TE2-7
+(the decision entry Mustafa reads) and TE2-3 (what PM-0002-53's dependent-crate test needs) ride the fold commit.
