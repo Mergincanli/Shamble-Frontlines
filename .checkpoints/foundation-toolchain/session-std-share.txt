@@ -1,0 +1,7 @@
+The session's own check, 2026-11-13 (for R2-D1 / RR2-1's "not verified": does the prebuilt std hand a member an
+unchecked shared copy of core's integer Sum/Product?). A standalone crate (.gate/session-std-share/, its own
+[workspace], [profile.release] overflow-checks = true, no dependencies), rustc 1.99.1, native:
+[255u8,1].iter().sum::<u8>(), [128u8,2] product::<u8>(), [u32::MAX,1] sum::<u32>(), each under catch_unwind.
+dev (opt 0) and release at opt-level 0, 1, 2, 3, "s" and "z": all three panicked at every level.
+So std supplies no unchecked shared copy of these three; RR2-1's case needs a dependency built in the same build
+that instantiates the same generic with the same types (the reviewer's conditions).
