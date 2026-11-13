@@ -5,20 +5,27 @@
 # touched first and every 2 s while the commands run (the loop starts and stops here), each command run from the main
 # folder's spikes/netcode-proof with the shared target, offline. Everything goes to the log file; each command's exit
 # code and, at the end, the provenance lines (Compiling/Checking/Documenting npt-*) are appended. The sequence stops at
-# the first command that fails; the script exits with that command's code.
+# the first command that fails; the script exits with that command's code. It stops with exit 5 before taking the lock
+# if the shared target has no CACHEDIR.TAG, and before any command if the lock's file cannot be opened or the lock
+# taken (INF2-4: advisor-u4d2-m9.md, Block 2); no runner ever makes the shared target's folder.
 # Usage: bash main-run.sh <log file> <command...> [:: <command...>]...
 set -u
 M=/home/user/Shamble-Frontlines
 S=$M/spikes/netcode-proof
-LOCK=$M/.gate/shared-target/.lane.lock
-export CARGO_TARGET_DIR=$M/.gate/shared-target
+T=$M/.gate/shared-target
+LOCK=$T/.lane.lock
+export CARGO_TARGET_DIR=$T
 export CARGO_NET_OFFLINE=true
 log="$1"
 shift
+if [ ! -f "$T/CACHEDIR.TAG" ]; then
+  echo "STOP: $T has no CACHEDIR.TAG (missing, or not cargo's own folder); no runner makes it"
+  exit 5
+fi
 mkdir -p "$(dirname "$log")"
 cd "$S" || exit 1
-exec 9>"$LOCK"
-flock -x 9
+exec 9>"$LOCK" || { echo "STOP: cannot open the lane lock $LOCK"; exit 5; }
+flock -x 9 || { echo "STOP: cannot take the lane lock $LOCK"; exit 5; }
 i=0
 while pgrep -x cargo >/dev/null || pgrep -x rustc >/dev/null; do
   i=$((i + 1))
@@ -70,9 +77,10 @@ for a in "$@" "::"; do
 done
 kill $toucher 2>/dev/null
 wait $toucher 2>/dev/null
+prov=$(grep -E "^ *(Compiling|Checking|Documenting) npt-" "$log" | sed 's/^ *//' | sort | uniq -c)
 {
   echo "--- provenance (Compiling/Checking/Documenting npt-* lines, counted):"
-  grep -E "(Compiling|Checking|Documenting) npt-" "$log" | sed 's/^ *//' | sort | uniq -c
+  echo "$prov"
   echo "--- other cargo or rustc now: $(pgrep -a cargo | head -3) $(pgrep -a rustc | head -3)"
   echo "--- end $(date -u +%T) UTC, exit $status"
 } >> "$log"

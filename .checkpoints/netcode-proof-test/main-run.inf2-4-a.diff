@@ -1,0 +1,11 @@
+--- .checkpoints/netcode-proof-test/main-run.sh
++++ .checkpoints/netcode-proof-test/main-run.inf2-4-a.sh
+@@ -12,7 +12,7 @@
+ set -u
+ M=/home/user/Shamble-Frontlines
+ S=$M/spikes/netcode-proof
+-T=$M/.gate/shared-target
++T=$M/.gate/no-such-target
+ LOCK=$T/.lane.lock
+ export CARGO_TARGET_DIR=$T
+ export CARGO_NET_OFFLINE=true

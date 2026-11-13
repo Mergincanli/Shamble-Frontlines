@@ -9,13 +9,16 @@
 # /home/user/Shamble-Frontlines/.gate/u4d2/; each command's exit code and, at the end, the provenance lines
 # (Compiling/Checking/Documenting npt-*) are appended. The sequence stops at the first command that fails, and the
 # script exits with that command's code; with `-k` (given after `-x` when both are) every command runs even after one
-# fails, each exit code logged, and the script exits with the first non-zero code. A run's result is that exit code and
-# the test runner's own summary lines, read from the log.
+# fails, each exit code logged, and the script exits with the first non-zero code. It stops with exit 5 before taking
+# the lock if the shared target has no CACHEDIR.TAG, and before any command if the lock's file cannot be opened or the
+# lock taken (INF2-4: advisor-u4d2-m9.md, Block 2); no runner ever makes the shared target's folder. A run's result is
+# that exit code and the test runner's own summary lines, read from the log.
 # Usage: bash u4d2-run.sh [-x] [-k] <worktree> <log file> <command...> [:: <command...>]...
 set -u
 M=/home/user/Shamble-Frontlines
-LOCK=$M/.gate/shared-target/.lane.lock
-export CARGO_TARGET_DIR=$M/.gate/shared-target
+T=$M/.gate/shared-target
+LOCK=$T/.lane.lock
+export CARGO_TARGET_DIR=$T
 export CARGO_NET_OFFLINE=true
 mode=-s
 if [ "${1:-}" = "-x" ]; then
@@ -40,10 +43,14 @@ case "$log" in
 esac
 S=$W/spikes/netcode-proof
 [ -d "$S/crates" ] || { echo "STOP: no $S/crates"; exit 2; }
+if [ ! -f "$T/CACHEDIR.TAG" ]; then
+  echo "STOP: $T has no CACHEDIR.TAG (missing, or not cargo's own folder); no runner makes it"
+  exit 5
+fi
 mkdir -p "$(dirname "$log")"
 cd "$S" || exit 1
-exec 9>"$LOCK"
-flock "$mode" 9
+exec 9>"$LOCK" || { echo "STOP: cannot open the lane lock $LOCK"; exit 5; }
+flock "$mode" 9 || { echo "STOP: cannot take the lane lock $LOCK"; exit 5; }
 i=0
 while pgrep -x cargo >/dev/null || pgrep -x rustc >/dev/null; do
   i=$((i + 1))
