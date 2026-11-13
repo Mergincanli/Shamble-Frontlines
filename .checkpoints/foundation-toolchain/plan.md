@@ -1,6 +1,12 @@
-# Plan: foundation step 2.2, the toolchain (revision 9)
+# Plan: foundation step 2.2, the toolchain (revision 10)
 
-Status: revision 9 records Mustafa's two messages of 2026-11-12 (`mustafa-2026-11-12-step5-models.md` and
+Status: revision 10 folds the advisor agent's ruling D1 (2026-11-13; notes `advisor-ruling-d1.md`) on review round 1's
+finding RR-1 (High): route A approved on conditions 1 to 7, as the plan approval for one changed pinned value, Part
+2's overflow row (the per-package blocks become `[profile.release] overflow-checks = true` with
+`[profile.release.package."*"] overflow-checks = false`); its proof is M7 (Part 7) and the local cross-crate run
+E12; M5 and step 2's control become historical; the register row OVERFLOW-ALL and the decision OVERFLOW-ALL go to
+him; OVERFLOW-XCRATE-CI (Medium) is split out as a follow-up. Nothing else changed from revision 9.
+revision 9 records Mustafa's two messages of 2026-11-12 (`mustafa-2026-11-12-step5-models.md` and
 `mustafa-2026-11-12-models-skeleton.md`, word for word; the second re-sends the first with item 3 changed and item 4
 new, and governs). Step 5 started on his word (2.1b merged as 2aa5e9c): main was merged in from the branch worktree
 (As built, step 5). His models words of 2026-11-12, 16:25 go into DECISIONS.md word for word in step 6, with "What I
@@ -51,7 +57,7 @@ check's notes `fold-check-*.md` (this folder).
   Part 4, Part 9 (the advisor agent: APPROVE of revision 1, with conditions, folded here).
 - **Pins now** (Part 2): Rust 1.99.1 (the netcode spike's pin, the same four keys), a virtual Cargo workspace
   (`crates/*`, resolver 3, edition 2024, `rust-version` 1.99.1, an empty `[workspace.dependencies]`, the workspace lint
-  table, overflow checks for `sim` and `protocol`), `Cargo.lock`; npm workspaces (`packages/*`, one lockfile, exact
+  table, overflow checks in every profile for every workspace crate: revision 10, the ruling D1), `Cargo.lock`; npm workspaces (`packages/*`, one lockfile, exact
   versions, no root `"type"`), Node 22, TypeScript 6.0.3, Vitest 5.1.0, @playwright/test 1.65.0 (versions as read
   2026-11-10); six empty crates and five empty packages, one trivial test each; two `.gitignore` lines.
 - **Empty slots** (Part 3), each named: OQ-0002-7 and the wasm-bindgen pin; OQ-0002-3 (one Wasm instance or two);
@@ -144,6 +150,16 @@ The advisor agent approved revision 3 and has not seen these changes of method: 
   agents that review, verify or design game and engine code always run at max"; the crates are the engine skeleton),
   passed as `model: "opus"`, `effort: "max"`; the approved plan said each file's effort (high; engine-architect xhigh).
 
+### As built, step 7 (review round 1 and its fix pass, 2026-11-12 and 13)
+- Round 1 on 4d78ad6: five reviewers at effort max, 20 findings, deduped into 17, each tested by its own skeptic; all
+  hold (D1 High, D2 Medium, the rest Low). The fix pass: 1de98a9 (the report and four crates' doc comments), 4bd9dd5
+  (route A, on the advisor agent's ruling D1), then M7 (297d48a, red at the release test, exit 101) and its exact revert
+  8d622ac. E12, the local cross-crate run (`xcrate-check.sh`), shows the gap on 1de98a9 and its fix on 4bd9dd5. M5 and
+  step 2's control are historical: they proved the per-package blocks route A replaced.
+- The docs follow: the register row OVERFLOW-ALL, the decision OVERFLOW-ALL, OVERFLOW-XCRATE-CI (Medium) in place of
+  OVERFLOW-WASM, OVERFLOW-PER-CRATE rewritten; then round 2 on what changed (rust-reviewer, test-engineer,
+  security-auditor, engine-architect), the verifier and the Fable read before ready.
+
 ## Part 1. Goal, scope, rules, risk tier
 
 ### 1.1 Goal and change type
@@ -214,7 +230,7 @@ on the final diff (Part 8); merges on Mustafa's go from a day session, after 2.1
 | Cargo workspace | virtual; `members = ["crates/*"]` and no `exclude`; `resolver = "3"`; `[workspace.package]` `edition = "2024"`, `rust-version = "1.99.1"`, `publish = false`; an empty `[workspace.dependencies]` | root `Cargo.toml` | part 2; R5-LAYOUT-REC1; Appendix B | E1, E2; M3 |
 | Lockfile | `Cargo.lock` committed; every CI cargo command takes `--locked` | root `Cargo.lock` | part 2; R5-CI-REC2 | M3 |
 | Lint table | `[workspace.lints.rust] unsafe_code = "deny"`; `[workspace.lints.clippy] all = { level = "warn", priority = -1 }`; `[lints] workspace = true` in every crate | root `Cargo.toml`, each crate | parts 4 and 7 (rustc enforces the deny now; clippy's levels act from 2.3, G2) | L1 |
-| Overflow | `[profile.release.package.sim] overflow-checks = true`, the same for `protocol` | root `Cargo.toml` | part 4 | E1: the release run of `sim` and `protocol` |
+| Overflow | `[profile.release] overflow-checks = true` and `[profile.release.package."*"] overflow-checks = false` (revision 10; revisions 1-9 pinned the per-package blocks `[profile.release.package.sim]` and `.protocol`) | root `Cargo.toml` | ADR 0002 part 4, widened by the advisor agent's ruling D1 (2026-11-13) on finding RR-1 | M7 and the local cross-crate run E12 (the release run of `sim` and `protocol` in K1b stays) |
 | npm workspaces | `workspaces: ["packages/*"]`; one root `package-lock.json`; exact versions; `private: true`; no `"type"` key | root `package.json` | part 2; Appendix B | E1, E2, E6, E7 |
 | Node | 22: `engines.node: "22.x"`, CI `node-version: 22` | root `package.json`, the workflow | part 2 ("the way the legacy toolkit pins 22", TL17); Q2.2-c (a), the advisor's ruling | E2 prints it |
 | TypeScript | `6.0.3` (the 6.0 line's last patch; npm's `latest` is 7.0.2, which part 2 leaves to its own change-set) | root `devDependencies` | part 2 | E2 prints `tsc --version`; E7 |
@@ -465,7 +481,7 @@ Local cargo runs build into `.gate/foundation-toolchain/target` (`--target-dir`)
 --target-dir .gate/foundation-toolchain/target` (`CHECKPOINTS.md` §10; the advisor's F-11); CI keeps `/target/`.
 | Id | What | How | Pass |
 |---|---|---|---|
-| E1 | the workspaces build and test locally | `cargo test --workspace --locked`; the wasm32 build of Part 4; `cargo test --release -p sim -p protocol --locked` (each with the target folder above); `npm ci --ignore-scripts && npm test --workspaces`; `git status --porcelain` | all pass; the release run's `should_panic` tests pass (part 4's overflow pin); the tree stays clean |
+| E1 | the workspaces build and test locally | `cargo test --workspace --locked`; the wasm32 build of Part 4; `cargo test --release -p sim -p protocol --locked` (each with the target folder above); `npm ci --ignore-scripts && npm test --workspaces`; `git status --porcelain` | all pass; the release run's `should_panic` tests pass (part 4's overflow pin); the tree stays clean (revision 10: the step-2 control of the per-package blocks is historical; E12 and M7 prove the shipped setting) |
 | L1 | the lint table bites | an `unsafe {}` block in one stub, `cargo test` | compile error from `unsafe_code`; reverted |
 | L2 | a stale npm lock fails | a devDependency added to `package.json` without the lock, `npm ci` | npm's mismatch error; reverted |
 | L3 | a package without a test script fails | its `test` script removed, `npm test --workspaces` | non-zero exit (N3); reverted |
@@ -482,6 +498,8 @@ Local cargo runs build into `.gate/foundation-toolchain/target` (`--target-dir`)
 | E9 | the kit-edit list is complete | `marks.mjs` on the final file list | every P path is in Part 5 and was asked; no new path but the docs is M |
 | E10 | the kit's own tests still pass | `node --test .claude/hooks/routine-guard.test.mjs .claude/hooks/settings.test.mjs .claude/scripts/checkpoint.test.mjs` | main's counts |
 | E11 | the dependency review (condition 4) | from `package-lock.json`: the package count, stated with and without the five workspace links; every package with `hasInstallScript`; every `node_modules/` entry is either one of the five workspace links (`resolved: "packages/<name>"`, `link: true`) or carries a `resolved` address starting with `https://registry.npmjs.org/` and an `integrity` hash (the advisor's L-c; the root entry and each workspace's own `packages/<name>` entry carry no `resolved` and are not judged) | listed in security-auditor's brief and the report; any `node_modules/` entry that is neither fails it |
+| E12 | the setting reaches sim's code compiled in other crates (revision 10; the ruling D1, condition 7b) | `xcrate-check.sh` on the fixed head beside the head before it: sim functions (plain, `#[inline]`, generic, `Tick::next`, `#[inline(never)]`) called from room under release, bench and an inheriting profile; rustc's overflow flag per crate; a wasm32 cdylib run in Node | 5 of 5 panic in each; the flag on every workspace crate built, none outside; the wasm32 release build traps |
+| M7 | the shipped release overflow setting removed (revision 10; condition 7a) | Part 7's procedure, below: one commit removing only `[profile.release]`'s line, pushed alone, then its exact revert | red at `cargo test --release` inside the cut ("test did not panic as expected", exit 101), then green |
 
 **The planted failures** (M1a, M1b, M2, M3; condition 3): each is one commit on the change-set's own branch while its PR
 is a draft. Push it alone, by hand (`git push origin <branch>`), never through a checkpoint save (a foreground

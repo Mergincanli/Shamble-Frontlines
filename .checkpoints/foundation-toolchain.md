@@ -228,6 +228,18 @@
     wasm32 release in Node returned 0 before and traps after, like dev. The saver ended at its time limit (bw54oxpqz)
     and stays off until M7's revert is pushed.
 
+29. Step 7, round 1's fix pass, part 3, 2026-11-13: CI on 4bd9dd5 all green (toolchain push 43414840093, pull_request
+    43414847203: the release tests ran and passed inside the cut; gate push 43414840159, pull_request 43414847569). M7
+    by Part 7's procedure (no saver running): 297d48a removed only `[profile.release]` ("*" kept) · pushed alone · red
+    at the expected line: toolchain push 43415093334 (job 131850863497) and pull_request 43415101662, inside the cut,
+    after the dev tests passed, protocol's "test did not panic as expected at crates/protocol/src/lib.rs:10:8", exit 101;
+    gate push 43415093339 and pull_request 43415101832 green · revert 8d622ac (`git diff 297d48a^ 8d622ac` empty) ·
+    pushed alone · all green (toolchain 43415458569, 43415465726; gate 43415458525, 43415465755). The saver restarted
+    (b2ppm4x49). Docs: the register row OVERFLOW-ALL beside Q-A1, the report (the ruling in its sections, M5 historical,
+    M7 and E12, OVERFLOW-XCRATE-CI, OVERFLOW-PER-CRATE rewritten, Risks, round 1's dispositions, the decision
+    OVERFLOW-ALL), REPO_MAP, ROADMAP · 8a4f9b0 · pushed; plan revision 10 in the notes. The STATUS and archive sync:
+    workflow wf_3198650c-b78 (docs-keeper, then a fact checker), launched ~12:45 Amsterdam.
+
 ## Current step
 Step 6 done (4d78ad6; consultation 5). Step 7: review round 1, run 1 running (wf_d3a5ca64-901). Then: check `git status`
 outside .checkpoints/, dedupe the findings, run 2 (skeptics), the fix pass, the verifier, the Fable read (whole) before
@@ -419,9 +431,10 @@ Count: 6.
 
 ## Running work
 - workflow wf_b82244e7-a22 (review round 1, run 1): done, 5 of 5 (step 26).
-- workflow wf_fcb65072-3e7 (task wlv2eos3o): review round 1, run 2, the skeptics; script `.checkpoints/foundation-toolchain/skeptics-r1.js`
-  (copy of the scratchpad's); launched ~23:55 Amsterdam; resume with resumeFromRunId wf_fcb65072-3e7 and the same args
-  (the head 4d78ad61e652f2e35ddf51c49557e725420248c8 and the 17 ids, gists and merges).
+- workflow wf_fcb65072-3e7 (round 1, run 2, the skeptics): done, 17 of 17.
+- workflow wf_3198650c-b78 (task wnagbkl2m): the STATUS and archive sync, docs-keeper then a fact checker; resume with
+  resumeFromRunId wf_3198650c-b78.
+- saver: background task b2ppm4x49 (restarted after M7's revert).
 - saver: background task bw54oxpqz (bgb28hxv6 ended at its time limit, 23:39 UTC; b52patinz by the container restart).
 - saver: background task b52patinz (restarted 2026-11-12 ~22:30 Amsterdam after M6's revert; the worker restarted three
   times that evening and ended the earlier savers bg5v6agjr and b3kk7q32m).
