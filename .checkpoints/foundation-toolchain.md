@@ -449,7 +449,20 @@ Older items, done:
    decision for him (workspace-wide checks, or back to the ADR's blocks with narrowed wording; room's and the server's
    own overflows then panic), and round 2 on what changed with rust-reviewer and test-engineer at least. The advisor
    tool's own earlier S3 and "matches ADR parts 2 to 4" compared wording, not the goal.
-Count: 6.
+7. 2026-11-13 ~14:42 Amsterdam (after 5c2c755) · moment 4, round 2's fix pass (four skeptic-verified Mediums, the row
+   rewording ruling D1's conditions 3, 5 and 6, the decision entry): ask the advisor agent first, and are the drafts
+   right? · changed: no tracked file until the advisor agent rules (keeping `"*"` is the fork); its brief gives the
+   evidence first (`review-r2-findings.md`, `review-r2-verdicts.json`, the skeptic notes) and `fix-r2-drafts.md` as
+   one candidate, "D1-R2" a placeholder, the skeptic's "not part of the ruling" marker offered, and asks whether a row
+   under his go should carry test-method detail; the ruling gets a home in the report ("Plan and approval", "As
+   built") in the same commit; STATUS's two additions measured against the 120-line cap before writing; E12's flag
+   line corrected (three reviewers; six crates native, five wasm32); the Reviews paragraph says R2-L2 (Medium) had no
+   skeptic (two reviewers converged); after applying, a grep for the superseded phrases across tracked docs (STATUS's
+   "Waiting on Mustafa", ROADMAP's 2.2 entry, REPO_MAP:16 included); this is the budget's last fix pass: findings
+   below High from the whole read or the verifier become report lines or follow-ups; the verifier told to diff the
+   mirrored items across row, report and archive; the whole read (consultation 8) after CI is green on the fix-pass
+   head; the PR body names the last commit holding the notes at the deletion commit; comment A's ambiguous "it".
+Count: 7.
 
 ## Running work
 - review round 2 (step 30), background agents launched ~13:20 Amsterdam: rust-reviewer, security-auditor,
