@@ -104,7 +104,8 @@ reviewers (step 5) for the change type apply at every tier.
     open), a doubt your own checks can't settle headless; and when unsure, or when both lists fit.
 
 ## v2 phase 0 (V2_PHASE0_BRIEF)
-- No engine code. Throwaway spikes only, and only after Mustafa and you have approved the decision drafts.
+- No engine code. Throwaway spikes only, and only after Mustafa and you have approved the decision drafts. Exception:
+  foundation steps 2.1 and 2.2 (Mustafa's decision of 2026-11-10 in `docs/DECISIONS.md`).
 - The legacy game is frozen: critical fixes only.
 - The look is Mustafa's (escalation category 2): never approve a plan or PR that decides it.
 - Every engine feature traces to a VISION_V2 §6 need; a plan or draft that adds a generic feature "for later" is REVISE.
