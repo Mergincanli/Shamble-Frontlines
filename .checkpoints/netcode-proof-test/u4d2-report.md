@@ -70,6 +70,14 @@ brief: u4d2-brief.md rev 1.2 (the advisor's check, advisor-u4d2-brief.md: APPROV
   adds about 30 s. The cold figure comes from one run after this merge, once the shared target's release builds for both
   targets are cleaned between waves (W1-TARGET item 3's method, narrowed so that the lane lock's file stays: INF2-4),
   and it is recorded on the card and in U4's report before U4r's brief.
+- **The cold figure (INF-1; measured after the merge, M9).** 61.6 s for the wasm step (PASS), against a 5-minute
+  budget, from one `node check.mjs --only wasm` in main-run.sh's exclusive call (2026-11-13 09:50 UTC, uptime 5215 s;
+  .gate/u4d2-merge/cold-run2.log), after both targets' release folders were cleaned by `cargo clean --target-dir`: the
+  host's in `<shared>`, the wasm32 one through its own tagged root `<shared>/wasm32-unknown-unknown` (the advisor's M9
+  ruling, advisor-u4d2-m9.md). The four release builds took 41.8 s (npt-lab 31.2, its bites 5.4, npt-hash-wasm 3.9, its
+  bites 1.3), the rest 19.8 s; no call stopped. Cold: every release artifact of both targets. Warm: the toolchain,
+  cargo's registry cache and the debug and doc folders, which the step does not read. A first try stopped before the
+  step at its own guard: `--release --target wasm32-unknown-unknown` with no `-p` cleans `<shared>/release` only.
 - **A stopped call's bound and its processes (INF2-1; Medium; carried to U4r, entry 84).** The wasm step gives each of
   its calls but the four cargo builds its own 300 s (FX-7), so a hang in npt-sim's replay could hold the exclusive lane
   lock for 12 x 300 s, and a stopped `npt-lab hash` call can leave its two leg processes running. The advisor's
@@ -162,7 +170,8 @@ relaxed-simd (FX-2's refusal accepts both builds). No wasm-opt (C-U7-1).
 - TE2-5 (c): the cause of npt-net's load-sensitive test (TE-M3), a planned change of the main session's after this
   merge and before U4r's merge (advisor-u4d2-r1.md, Block 5).
 - The cold figure (INF-1; M9): one `node check.mjs --only wasm` after the release-only clean of the shared target on
-  both targets, with the machine's uptime, recorded on the card and in U4's report before U4r's brief.
+  both targets, with the machine's uptime, recorded on the card and in U4's report before U4r's brief. Done after the
+  merge: the cold figure's bullet, above.
 - Housekeeping: the leftover folder `/nonexistent-cargo-home` (12 KB, outside the repository, from a round-2 probe)
   stays under LEFTOVER-DELETE (history.md:404), on the card's "Housekeeping later" list.
 
