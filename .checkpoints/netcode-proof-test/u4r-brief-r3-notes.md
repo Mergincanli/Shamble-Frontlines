@@ -230,3 +230,19 @@ Block log:
   working tree changed since fa8e335). Sections hit: 2.1 :258-375, 2.2 :377-392, 2.4 :412-480, 2.5 :482-495, 3.2
   :551-575, 4 :596-681, 5 :685-703, 7.1 :755-781, 7.2 :783-904, 7.3 :906-943, 7.4 :945-961, 10 :1124-1289, 11
   :1293-1349, 12 :1353-1411.
+- V3a F-j verified: stamp `tick = newest + lead` (client/src/lib.rs:390), newest moves only on a newer header (`see`
+  :585-600); Profile P2 100/20, P3 150/30, B1 = P2 (l1 :176-202); `one_way_ns` = rtt/2, `half_jitter_ns` = jitter/2
+  (:211-218); delay = one_way - a + U[0, 2a] (:810). Needed: d_down + wait (< 1 tick) + d_up <= lead x P, so lead >=
+  (rtt + jitter)/P + 1: ceil(...) + 1 gives P0 1, P2/B1 5 (120/33.3 = 3.6), P3 7 (180/33.3 = 5.4); carry 74's form
+  gives 1, 3, 4. CMD_CATCHUP 8 (input.rs:59). Holds.
+  NEW (own, from the same read): input.rs:111-117 also counts LATE a command stamped for a tick already buffered.
+  With jitter, a client step inside a snapshot's arrival window (width = jitter_ns: 20 ms at P2/B1, 30 ms at P3, of
+  33.3 ms) sees that snapshot arrived or not by a fresh draw per step, so two steps in a row read the same newest with
+  probability p(1-p) (up to 25 % at p = 1/2; analytic, about jitter/P x 1/6 averaged over phase: ~10 % P2, ~15 %
+  P3) and the second command is stamped for a tick already buffered: room.rs:797 counts it late, whatever the lead.
+  P0 (no jitter, rate 1) has none. So the round-trip lead alone does not meet carry 74's 1 % on P2, P3, B1: goes into
+  U4R-Q14 as its part (b). Not modelled by run (no runs allowed): the D-item measures both.
+  Also: before the first snapshot `newest` is None and the stamp is tick 0 (:390), late once ran_through is set: the
+  bots give None until newest_tick() is Some (folded into F-r's line).
+  late-zero applies to -30 only (marks.json:6544, :6570), so the duplicates make no -17 run INVALID; carry 74's 1 %
+  rule is what trips.
