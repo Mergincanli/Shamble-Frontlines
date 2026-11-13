@@ -71,6 +71,13 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
   code): `.claude/hooks/` (`routine-guard.mjs`, `guard.mjs` and their tests) make the night shift and the PR Advisor
   safe to run unattended (a limited shell, no web, no push to main, no `.claude/` edits; day sessions unchanged);
   GUARD-FILE (a); reports/2026-10-27-kit-v3-1.md.
+- **TEST-RUN part B + docs after kit v3.1 (2026-11-04):** part-b-test (PR #34, 868e165; docs only: the kit-v3-1
+  report's corrections): the PR Advisor routine, started by "Run now", reviewed it, labelled it `ready-to-merge` and
+  merged it with `expectedHeadSha` a432692…: TEST-RUN B2; Mustafa accepted parts A and B; the routines are set up (the
+  PR Advisor on a schedule trigger only) · docs-after-kit-v3-1 (PR #35, 4893ab6, on Mustafa's go after the advisor's
+  APPROVE of 76c35bf; rules and docs): CLAUDE.md's routine lines and advisor.md's PR review match the routine setup;
+  STATUS, ROADMAP and REPO_MAP record PRs #33, #30 and #34, the setup and TEST-RUN; PORTAL-EMBED as open questions
+  OQ-0002-9 and OQ-0006-23; report `docs/reports/2026-11-04-docs-after-kit-v3-1.md`.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
 
@@ -103,7 +110,23 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**The foundation, 2.1b: the move [2026-11-11, PR #51]** — foundation-restructure, the second of step 2.1's two
+**The foundation, 2.2: the toolchain [2026-11-10 to 11-13, PR #48: in review]** — foundation-toolchain, ADR 0002's
+migration plan step 2.2 (Mustafa's decision of 2026-11-10: the second account plans and builds steps 2.1 and 2.2 now).
+The pins: Rust 1.99.1 (`rust-toolchain.toml`); a virtual Cargo workspace and its lock with six empty crates in `crates/`
+(unsafe code denied, overflow checks in every profile for every workspace crate); npm workspaces with exact versions and
+one lock, five empty packages in `packages/` (TypeScript 6.0.3, Vitest 5.1.0, @playwright/test 1.65.0, Node 22). The CI
+job `toolchain` (`.github/workflows/toolchain.yml`; `gate.yml` unchanged) installs the pinned toolchain, checks rustc
+against the pin, then builds and tests with the network cut off (a TCP probe must fail inside); it is green on the
+build's heads, and eight planted failures each went red at the expected step and were reverted. On his yes: the four kit
+lines (the hard constraints bind `legacy/` only; his 2026-11-10 decision is the exception in the three lines that forbid
+v2 code) and the CI job's release-test line; main merged in (c901187); the overflow tests expect their panic's message.
+Review round 1 (five reviewers, 17 findings, each checked by a skeptic): the overflow setting widened to every workspace
+crate on the advisor agent's ruling (RR-1, High; his go asked, OVERFLOW-ALL). Review round 2 (four reviewers, nothing
+Critical or High): on the advisor agent's ruling D1-R2, `"*"` kept and the panic side handed to the drafts' owners. The
+Fable advisor's whole read before ready changed no file. The verifier passed (bd44a68). Next: the advisor's review of
+the final head and his go.
+
+**The foundation, 2.1b: the move [2026-11-11 to 11-12, MERGED]** — foundation-restructure, the second of step 2.1's two
 pull requests, after 2.1a (PR #50, merged as 76b4f7a on 2026-11-11, by merge commit, on Mustafa's go after the
 advisor's APPROVE of f6becf5). The five legacy files move into `legacy/` with `git mv`, bytes unchanged, in a commit of
 their own (c090843); the commands in text name the `legacy` folder (`tools/README.md` with the build-folder rule, the
@@ -111,9 +134,10 @@ tool headers, `tools/village.py`, the root README: 1e6f84e); the four kit lines 
 :19, :43, :44 and `.claude/agents/verifier.md:28`: b6b3b81); the docs (his words of 2026-11-11 in `docs/DECISIONS.md`,
 his SCOPE (a) in ADR 0002 and the register, OQ-0002-2 answered in part, the maps, STATUS). Evidence E1-E6 and E8 PASS;
 CI's gate and smoke green on c090843, 1e6f84e and b6b3b81. Review round 1 and the verifier passed; the report:
-`docs/reports/2026-11-11-foundation-2-1b.md`. Next: his go, after the advisor's review of the final head.
+`docs/reports/2026-11-11-foundation-2-1b.md`. Merged: PR #51, 2aa5e9c, 2026-11-12 13:22 UTC, by merge commit, on
+Mustafa's go after the advisor's APPROVE of 5d50bf2; CI green on main (run 43226692719).
 
-**The foundation, 2.1a: the legacy gate reads both layouts [2026-11-10 to 11-11, PR #50: in review]** —
+**The foundation, 2.1a: the legacy gate reads both layouts [2026-11-10 to 11-11, MERGED]** —
 foundation-restructure, the first of step 2.1's two pull requests (Mustafa's decision of 2026-11-10: the second
 account plans and builds steps 2.1 and 2.2 now; his SPLIT (a)); gate files and tools only, no game file, no file
 moved, symbols +0 −0 (dd12aeb, 3f29cb8). `tools/smoke.mjs` finds the build folder (`legacy/` when it holds a
@@ -126,8 +150,9 @@ planted fault fails the same checks on the old gate, the edited gate at the root
 control passes on all three); the F1 rows red on the unfixed gate and green on the fixed one; the decoy stopped; both
 move directions and their bases recorded raw; gate PASS. PR #50 replaces #47 (his BRANCH-47 (a)); its docs pass records
 #49's merge and his words of 2026-11-10 and 2026-11-11 (`docs/DECISIONS.md`). Round 2: three APPROVE; the verifier PASS
-WITH NOTES; report `docs/reports/2026-11-11-foundation-2-1a.md`. Next:
-the advisor's review and his go.
+WITH NOTES; report `docs/reports/2026-11-11-foundation-2-1a.md`. Merged:
+PR #50, 76b4f7a, 2026-11-11 18:38 UTC, by merge commit, on Mustafa's go after the advisor's APPROVE of f6becf5; CI
+green on main (run 43079707687).
 
 **STATUS-DIET with LANE-RULES [2026-11-10 to 11-11, MERGED]** — status-diet (Mustafa's queue of 2026-11-10, items 2
 and 3, with ACCOUNTS and his Models addition): STATUS (1233 lines) split by a line-range script into STATUS (109 lines:
@@ -178,7 +203,3 @@ next change-set, kit-v3-5.
 **Kit v3.2, checkpoint rules for every session [2026-11-04, MERGED]** — kit-v3-2 (PR #37, 12d7961, 23:06 UTC, by merge commit, on Mustafa's go after the advisor's APPROVE of 342ff49; A2 on Mustafa's list; rules, no code, symbols +0 −0): `.claude/CHECKPOINTS.md` takes his four anti-waste rules of 2026-11-03 for every session: at most 3 agents at a time, workflow agents included; each agent writes its plan first and saves each block as it goes, a restart continuing after the last complete block and trusting the blocks its notes mark done (E9-1: E9's dry run of the paste block found restarted agents re-checking them); scratch text and small scripts in the notes folder, builds and binaries under `.gate/<task-slug>/`; the background saver checked and restarted at every checkpoint update. CLAUDE.md, NIGHT_SHIFT.md, the `changeset` skill, four agent files and tools/README.md restate them. TOY-BOX and LOOK-LINES (B): CLAUDE.md, art-director.md and graphics-engineer.md point at `docs/LOOK_V2.md`. Mustafa's four answers: "recommendations” in V3." (AGENT-CAP A, SCRATCH-HOME A, SAVER-CHECK A, LOOK-LINES B). Plan revisions 1 and 2, the advisor's APPROVE with 11 conditions. Also takes #36's final-review follow-ups (STATUS, ROADMAP). Report: `docs/reports/2026-11-04-kit-v3-2.md`.
 
 **Mustafa's design walk [2026-11-04, MERGED]** — b3-design-walk (PR #36, 8bcc65e, 19:58 UTC, by merge commit (the branch's step commits stay reachable from main), on Mustafa's go after the advisor's APPROVE of a32e4c0; B3 on his list, not the SharedArrayBuffer ring or ADR 0006 part 13's B3 row; docs only, symbols +0 −0): Mustafa's 2026-11-04 decisions and ideas recorded word for word, tagged `[DECIDED]`, `[IDEA]` (new tag) or, for the war around the matches, `[OPEN]`, plus one Advisor `[DEFAULT]` reading in §13 (no learn-by-doing layer), which Mustafa may veto: LOOP_V2 (spawn protection, factions, infiltrators, active reload, sprint-to-fire, account progression; new §13: amps, loot and ammo), UNITS.md §0 (factions, the tier-one amp ladders, infiltrators, faction ideas), DESIGN_NOTES pointers, and "bears on" clauses in the ADR register (no ADR edited). His answers B3-Q1 to B3-Q3 decided (STATUS, Decisions pending). Also takes #35's final-review follow-ups (STATUS, ROADMAP). VISION_V2 lines 36-37, 59 and 86 (as numbered before B.2) handed to B2, taken by B.2 (PR #42). Plan revisions 1 and 2, each with the advisor's APPROVE with conditions. Report: `docs/reports/2026-11-04-b3-design-walk.md`.
-
-**Docs after kit v3.1 [2026-11-04, MERGED]** — docs-after-kit-v3-1 (PR #35, 4893ab6, 15:50 UTC, on Mustafa's go after the advisor's APPROVE of 76c35bf; rules and docs, symbols +0 −0): CLAUDE.md's routine lines and advisor.md's PR review match the routine setup; STATUS, ROADMAP and REPO_MAP record PRs #33, #30 and #34, the setup and TEST-RUN; PORTAL-EMBED (web portals such as CrazyGames and Poki) as open questions OQ-0002-9 and OQ-0006-23. Plan revision 1, the advisor's APPROVE with 16 conditions; revision 2 adds Mustafa's answers (KIT-FOLLOWUPS (a), EFFORT-SOURCE (a)). Reviewed once on the final diff (five reviewers, a skeptic per finding; 30 of 31 upheld and fixed). Report `docs/reports/2026-11-04-docs-after-kit-v3-1.md`.
-
-**TEST-RUN part B, the PR Advisor's first unattended merge [2026-11-04, MERGED]** — part-b-test (PR #34, 868e165, 13:35 UTC; docs only: the kit-v3-1 report's corrections). The PR Advisor routine, started by "Run now" (13:26:48–13:35:54 UTC), reviewed it, labelled it `ready-to-merge` and merged it with `expectedHeadSha` a432692…: TEST-RUN B2. B1 (13:20 UTC) and part A passed too; Mustafa accepted parts A and B. The routines are set up: role environments, the PR Advisor on a schedule trigger only (07:45, 13:45, 19:45 Amsterdam), un-paused.

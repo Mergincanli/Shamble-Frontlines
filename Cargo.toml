@@ -1,0 +1,29 @@
+# The v2 Rust workspace (ADR 0002 parts 2, 3, 4 and 7; foundation step 2.2). Every CI cargo command takes --locked.
+[workspace]
+members = ["crates/*"]
+resolver = "3"
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.99.1"
+publish = false
+
+# Shared dependency versions, set once here; each enters with the first crate that needs it (ADR 0002 part 3).
+[workspace.dependencies]
+
+# Every crate opts in with `[lints] workspace = true` (ADR 0002 parts 4 and 7).
+[workspace.lints.rust]
+unsafe_code = "deny"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+
+# Overflow checks are on in all profiles for every workspace crate (ADR 0002 part 4, widened on foundation 2.2's review,
+# RR-1: sim's inline, generic and small functions compile in their callers; register row OVERFLOW-ALL). "*" keeps every
+# non-member at the release default setting, so release or an inheriting profile at opt-level 0, 1, "s" or "z" can
+# make our sum() and product() run a dependency's unchecked copy: drop "*" or give that crate overflow-checks = true.
+[profile.release]
+overflow-checks = true
+
+[profile.release.package."*"]
+overflow-checks = false

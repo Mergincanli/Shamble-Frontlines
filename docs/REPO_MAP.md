@@ -3,7 +3,7 @@
 Read this instead of exploring. It says which file answers which question; `MODULE_MAP.md` maps the inside of the
 engine files, and `START_HERE.md` explains how they work and why. docs-keeper keeps this map current and checks it with
 `node .claude/scripts/repo-map-check.mjs`. `.checkpoints/` holds in-progress task checkpoints
-(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-11-11.
+(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-11-12.
 
 ## Top level
 | Path | What it is |
@@ -12,12 +12,19 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `README.md` | The project in one page, for people |
 | `FIRST_PROMPTS.md` | The first prompts Mustafa used (Phase 0, scale test, build spike, ADR run): history |
 | `legacy/` | The legacy build, frozen (critical fixes only): the three engine files and the two pages. `shamble-core.js`: engine (tuning, arsenal, look pipeline, characters, kits, maps, KVStore, the SIM math); `shamble-game.js`: gameplay, AI, economy, HUD, menus, animation, the loop and `bootGame`; `shamble-editor.js`: map editor, Character Lab, Anim Lab (`editor.html` only); `index.html`: the player build (three.js r128 → core → game → `bootGame();`); `editor.html`: the authoring build (adds the editor and `bootEditor();`). Moved from the root with `git mv` in foundation step 2.1b (PR #51), bytes unchanged, so `file:line` citations keep their numbers: `shamble-game.js:N` means `legacy/shamble-game.js:N` |
+| `rust-toolchain.toml` | The pinned Rust toolchain for v2 (ADR 0002 part 2; foundation step 2.2): channel 1.99.1, the minimal profile, clippy, rustfmt and the `wasm32-unknown-unknown` target. CI installs it with rustup before any cargo call and checks `rustc --version` against it; each bump is its own change-set |
+| `Cargo.toml` | The v2 Rust workspace, a virtual one (ADR 0002 parts 2-4 and 7): members `crates/*`, resolver 3, edition 2024, `rust-version` equal to the pin, `publish = false`; `[workspace.dependencies]`, empty for now, where each shared version enters with the first crate that needs it; the workspace lints (`unsafe_code` denied, clippy's `all` at warn), which every crate opts into; overflow checks in every profile for every workspace crate (`[profile.release] overflow-checks = true`, dependencies at the release default, the register row OVERFLOW-ALL) |
+| `Cargo.lock` | Its lockfile; every CI cargo command takes `--locked` |
+| `crates/` | The v2 Rust crates (ADR 0002 part 3), each still an empty stub with one test: `sim` (the simulation: state, phases, tick, the navigation runtime), `protocol` (message types, the codec, decoders that never panic, the loopback transport), `room` (the room's match logic, with no I/O and no clock), `client-endpoint` (prediction and reconciliation, interpolation, snapshot decoding, the aim cast, the block writer and its layout table), `sim-wasm` (the wasm-bindgen bindings the Worker loads; none until the boundary spike), `devtools` (the replay runner, hash comparer, tick bench, legacy-golden reader, headless protocol clients). The tests in `sim` and `protocol` pass only while overflow checks are on |
+| `package.json` | The v2 npm workspaces (`packages/*`; ADR 0002 parts 2 and 3), private, exact versions only: TypeScript, Vitest and @playwright/test as dev dependencies, Node 22 in `engines`; no `"type"` field. The legacy toolkit keeps its own `tools/package.json` |
+| `package-lock.json` | Its lockfile (CI runs `npm ci`, then `npm ci --offline` with the network cut off) |
+| `packages/` | The v2 TypeScript packages (ADR 0002 part 3), each empty with one stub test (`npm test --workspaces`): `client` (`@shamble/client`, the player entry: input, camera, HUD, rendering), `sim-worker` (hosts `sim-wasm`, paces the tick, runs the local match), `net` (the browser's two transport backends, WebTransport and WebSocket), `types` (types generated from Rust), `e2e` (end-to-end tests with Playwright Test) |
 | `docs/` | Status, design, vision, research, decisions, reports (below) |
 | `tools/` | The legacy verification toolkit: never shipped (below) |
 | `.claude/` | Agents, skills, rules, hooks, scripts and settings for Claude Code (below) |
 | `.github/` | CI (below) |
 | `.gitattributes` | LF line endings everywhere |
-| `.gitignore` | node_modules; `.gate/` (generated output: renders, exports, builds); `dist/`, `*.log`, `.env*`, local Claude settings and agent memory |
+| `.gitignore` | node_modules; `.gate/` (generated output: renders, exports, builds); `dist/`, `*.log`, `.env*`, local Claude settings and agent memory; `/target/` (cargo's build folder) and `test-results/` (Playwright Test's output) |
 
 ## docs/
 | Path | What it is · when to read it |
@@ -136,3 +143,4 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 |---|---|
 | `.github/workflows/` | CI workflows |
 | `.github/workflows/gate.yml` | Jobs `gate` (checks 1–4, 5b–5d) and `smoke` (5a) on every push and pull request |
+| `.github/workflows/toolchain.yml` | Job `toolchain` (foundation step 2.2) on every push and pull request: installs the pinned Rust toolchain with rustup, checks `rustc` against the pin, runs `cargo fetch --locked` and `npm ci` (the last steps with the network), then builds and tests with the network cut off (its own network namespace; a TCP probe must fail inside): `cargo test --workspace --locked`, the release overflow tests of `sim` and `protocol`, the `wasm32-unknown-unknown` build of five crates, `npm ci --offline`, `npm test --workspaces`. Step 2.3 replaces it with the gate v2's workflow |

@@ -1,0 +1,11 @@
+{
+  "name": "@shamble/e2e",
+  "version": "0.0.0",
+  "private": true,
+  "description": "End-to-end tests with Playwright Test (ADR 0002 part 8). Empty until the gate step.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test"
+  }
+}
