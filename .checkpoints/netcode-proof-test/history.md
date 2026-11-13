@@ -2009,3 +2009,19 @@ From "Next steps, in order" (as it was):
     and end; if something did, restore and resume it by the card, the cut recorded, the saver restarted if it stopped,
     the card saved, then end. It is paused while no agent runs and enabled before each launch (the card's saver line
     says so). The schedule could be made, so there is nothing to tell him about it.
+
+## Decision: Mustafa, 2026-11-13 about 18:14 UTC (MAIN-48)
+- **Mustafa, 2026-11-13 about 18:14 UTC (verbatim):** "My words of 2026-11-13. Main moved again: PR #48 (foundation step
+  2.2, the toolchain) merged as 4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300. Merge main into your branch at your next clean
+  stop. Do not stop a running agent for it. docs/STATUS.md will conflict: keep both sides and stay within its 120 lines.
+  Main now has a Rust workspace at the root and a new CI job named toolchain, which will also run on your pushes. Your
+  spike keeps its own workspace. Tell me in two lines when main is in and whether the toolchain job is green on your
+  branch. Record these words in history.md under my decisions."
+  - Read as (the main session):
+    - MAIN-48: main's PR #48 (foundation step 2.2, the toolchain) is merged as 4d21c1a. Main (origin/main, 4d21c1a or
+      later) is merged into this branch at the next clean stop: the point where no step is half done, never by stopping
+      a running agent. Here that is after L4's script returns and its commit, before L6's launch, so U4r's builder
+      starts on the merged state. docs/STATUS.md's conflict keeps both sides, no line retyped, within its 120 lines (as
+      at the PR #49 and PR #51 merges). The spike keeps its own workspace (spikes/netcode-proof/Cargo.toml); main's root
+      workspace and its CI job `toolchain` are main's, and the job also runs on this branch's pushes. The report to him:
+      two lines, when main is in (the merge commit) and whether the `toolchain` job is green on this branch.
