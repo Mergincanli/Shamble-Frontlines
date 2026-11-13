@@ -21,7 +21,7 @@ and the day items D1-D12; the lane runner copied from u4d2-run.sh), then the adv
 and proof logs. TE2-5 (c), TE-M3's planned change, before U4r's merge.
 **Running (since 11:41 UTC): U4r's brief rev 3**, workflow wf_4eb3ef56-c8c (task wht1e1nqn; script
 npt-u4r-brief-r3-wf_4eb3ef56-c8c.js under the session's workflows/scripts/): draft (general-purpose acting as
-test-engineer, xhigh: ${N}/u4r-brief.md, notes u4r-brief-r3-notes.md), check (netcode-architect, xhigh:
+test-engineer, xhigh: u4r-brief.md in the notes folder, notes u4r-brief-r3-notes.md), check (netcode-architect, xhigh:
 u4r-brief-r3-check.md), one revision. The lane runner made first: u4r-run.sh (sha256 349b51ad…) from u4d2-run.sh by
 u4r_runner.py (u4r-run.sh.diff: 6 lines, the lane's names only; `bash -n` exit 0). If cut: resume with
 `Workflow({scriptPath, resumeFromRunId: "wf_4eb3ef56-c8c"})`; each agent continues after its notes' last complete
