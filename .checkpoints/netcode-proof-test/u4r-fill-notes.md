@@ -97,3 +97,14 @@ the merge 7685b2b, main's 4d21c1a).
   sha7, history's re-stamp asserted first; an item through edit() (tag "record (title)"; "record" added to the log
   and WHERE filters); MAIN gains it. First run stopped on my own paragraph-start assert (off by one: :16, not :15);
   fixed. Dry run now exit 0. Next: R8 (read the output whole).
+- R8 done: ast OK (no .pyc: __pycache__ holds only u4c-test-plant's); dry run exit 0, 687 output lines, last line "dry
+  run: nothing written"; read whole (log, the main session's words, the diff: 40 hunks). 66 changes (63 + the record +
+  :160 + :166); brief 1,682 -> 1,909 lines (the record +2, P6's item 1 unit -2 against the first version, section 0's
+  bullet +1); result sha256 dc244dde…; `<base>` read 60d11f780f1df564696a2cb5496a6a367b198685 (an autosave commit;
+  the main session's run reads its own HEAD). Result lines: record :29-31; C22 :162, C24 :168 (C28 :47 held); section
+  0's sentence :195-200 (bullet :193-208); P6 item 1 :249-251 (unit :249-254); R11 row :1493. Four of my new code lines
+  over 120 rewrapped (output unchanged: same result sha). Script sha256
+  2276287d262b3fe1217bd95c0acff93ba3f4d52b4c1c3d8eecc80f5a12eb7aa6, 1,059 lines. Note for the result: decision 4's drop
+  leaves "section 10, which stay"; the script writes "stays" (agreement), asked. The docstring's item 9 (a) "(plan.md
+  and history asserted unchanged)" predates this revision and is stale (history is re-stamped); left as it was. Next:
+  the result.
