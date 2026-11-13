@@ -66,3 +66,65 @@ Agent memory: none in this environment (no .claude/agent-memory-local/); round-1
   client-endpoint, sim-wasm, wasmcheck): every member on (client_endpoint, devtools, protocol, room, sim, sim_wasm,
   wasmcheck), extdep off. Before: sim and protocol only, native and wasm32. E12's three-crate flag list understates it;
   "every workspace crate" holds for all six real members, both targets.
+
+### Block 3 DONE (relabelled evidence)
+- M5 and step 2's control appear only at report :69-71 (As built: "historical now; M7 proves the setting the tree
+  ships"), :106 (E1: "Historical, for the per-package blocks ...; E12 and M7 prove the shipped setting"), :115 (M5 row
+  "(historical)") and :131 (the note: M5 ran on the merged tree). STATUS, the archive, the register, REPO_MAP and ROADMAP
+  name neither; the archive's OVERFLOW-WASM ("sim's rests on step 2's local control") is gone, replaced by
+  OVERFLOW-XCRATE-CI. Nothing current leans on them. Holds.
+
+### Block 5/6 (anchor; PM-0002-53 placement)
+- No tripwire: toolchain.yml has no dependency-graph step; the crate manifests are unguarded (PIN-GUARD); the legacy
+  gate ignores crates/. STATUS.md:95-96 lists OVERFLOW-XCRATE-CI by name under "From foundation 2.2 (PR #48), for 2.3";
+  the archive files it under "For the gate step (2.3)" (:617); the report under "Findings for 2.3" (:231). The first
+  prong ("the first change that adds a dependency on sim") is written only inside the item's text.
+- Mustafa's order (ADR 0002:1442 pointer: "Steps 2.3 to 2.6 keep their order") and CLAUDE.md (no v2 code but 2.1/2.2)
+  put 2.3 first, so 2.3 is the binding trigger and its planner reads the 2.3 lists. But at 2.3 no crate depends on sim
+  and sim is empty (code enters at 2.5), so 2.3 can land the test only by adding a dependency on sim and a planted
+  counter in sim's normal build.
+- ADR 0002 part 3 (:186): protocol depends on sim types. K1b already runs `-p protocol` in release, so a counter test
+  in protocol needs no CI edit for its native half once protocol depends on sim; the wasm32 half does.
+- Experiment (orig-before, the OLD blocks): an integration test in crates/sim/tests/ calling sim::add_inline and
+  add_generic with 255+1, `cargo test --release -p sim --test xc`: 2 passed (both panicked). So "a test inside sim's
+  own package cannot see the gap" holds, integration tests included (a separate crate, the same package override).
+- Experiment (lintcheck, 4bd9dd5 + a `#[unsafe(no_mangle)]` export in sim-wasm, cdylib): `cargo build --release
+  --target wasm32-unknown-unknown -p sim-wasm` -> "error: usage of the unsafe `no_mangle` attribute ... -D
+  unsafe-code". E12's export method works only because its scratch crate skips `[lints] workspace = true`; a committed
+  wasm32 half needs part 4's unsafe exception (invariant, test, #[allow] with reason) or wasm-bindgen + a runner.
+- Design constraint not stated in the row: the planted counter must be in sim's normal build (cfg(test) items are not
+  visible to dependents; a test-only feature breaks part 3's one feature set; part 4 makes real counters use
+  wrapping_*/checked_*, so the `+` counter is planted scaffolding).
+- Experiment (orig-after, route A, release; extdep = crate outside the workspace, called from room): plain Ok(0),
+  inline Ok(0), concrete-in-generic Ok(0), trait-generic `T: Add` Err (panicked). Test profile: all four panic.
+  So Cargo.toml:24 "dependencies keep the release default, unchecked" is wrong for a dependency's trait-generic
+  arithmetic instantiated in a workspace crate (core's operator impls follow the compiling crate). The register row's
+  "can still differ between dev and release builds" holds. Only Cargo.toml:24 says "unchecked" (grep).
+
+### Block 7 (dispositions and rows)
+- TE-1 fix: the four quick reverts 2ee2bff, 5c64404, b60a996, 00cee0b each equal 66d9888 outside .checkpoints/ (git
+  diff --stat empty). "their tree is 66d9888's, which is green" holds. TE-3 (D17): G0's row lists the other branches
+  as mutations; CUT-CARRY adds the --net-removed red run. Holds.
+- Report :40-41 "revisions 1 to 9" vs :49 "folded into plan revision 10"; plan.md:1 is revision 10. Stale.
+- E12 row: "(the notes)" resolves through the report's convention (:40 "readable at this branch's last checkpoint
+  commit, named in the PR body"). OK, if the PR body names it.
+
+### Extra checks DONE
+- E1 on the head (fresh git archive of 4bccf55 = 4bd9dd5 for every Rust file): dev 6 x "1 passed"; K1b release 2/2;
+  bench sim+protocol 2/2; wasm32 dev build of the five crates (5 rlibs); clippy -D warnings clean; fmt clean;
+  Cargo.lock byte-identical after all runs; Cargo.lock unchanged 4d78ad6..4bccf55.
+- Reach under the OLD blocks (orig-before, release): sim::add_inline called from room Ok(0); the same helpers reached
+  through a sim `#[inline(never)] entry` panic (u8 and tick); control (no overflow) Ok((6, 6, 6)). So the RR-1 gap is
+  sim code the caller compiles itself (inline, small, generic, called directly), not sim code behind sim's own
+  non-inlined functions. The register row (:234) and As built (:72-74) say this right; the OVERFLOW-ALL decision entry
+  (:298-300) says "misses most of the simulation's code as soon as another crate calls it": unmeasured "most".
+
+## Draft findings (before the advisor tool)
+- TE2-1 Low Cargo.toml:24 "unchecked" wrong for trait-generic dependency arithmetic instantiated in a member.
+- TE2-2 Low OVERFLOW-XCRATE-CI's first prong: no tripwire; filed only under 2.3 headings; at 2.3 no crate depends on sim.
+- TE2-3 Low PM-0002-53 placement right but omits: planted counter in sim's normal build; wasm32 runner (no_mangle denied).
+- TE2-4 Low E12 record: no "ok"/summary lines, no wasm32 control, flag list understated (all close on my re-run).
+- TE2-5 Low report :40-41 "revisions 1 to 9" (plan is revision 10, :49).
+- TE2-6 Low M7 row: names no failing binary (protocol's), no word that sim's release binary never ran in CI.
+- TE2-7 Low OVERFLOW-ALL decision entry :298-300 "most of the simulation's code": unmeasured; mechanism says narrower.
+- Verdict draft: APPROVE, 0 Critical, 0 High, 0 Medium, 7 Low.

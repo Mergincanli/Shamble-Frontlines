@@ -108,3 +108,160 @@ Writes: this file; scratch copies under /home/user/Shamble-Frontlines/.gate/secu
   So: (i) route A makes release do what test builds already do for room's own arithmetic (agrees with the ruling's C4,
   which used a sim call too); (ii) part 4's form, in release, turns a credit underflow into ~4.29 billion credits and a
   counter into 0 (a limiter that resets), silently. Scratch Cargo.toml restored to route A after the run.
+
+## Focus 1, the answer (after the advisor consultation)
+- Does route A open a DoS path that part 4's form avoided? Yes, narrowly. Room's own arithmetic and any server code on
+  the tick thread now panic in release, where part 4's two blocks left them wrapping (my scratch run; the ruling's C4).
+  Part 4's isolation separates each connection's work from the tick; it does not protect the tick from itself (ADR 0001
+  :495-503, ADR 0004 :566-572: a tick panic is caught at the loop top and is fatal to the match). Connection-side server
+  code: an overflow panic closes only that connection (ADR 0001 :768, PM-0001-26) = self-harm, with one caveat: state
+  shared between connections (per-address limits, ADR 0001 part 11's I/O side) behind a std Mutex that handlers
+  unwrap would spread a poison to every handler; ADR 0001's lock rule (:495-496) and PM-0001-26's bites name only a
+  lock shared with the tick (reasoning from ADR 0001's own Mutex note; not run).
+- What guards the tick: ADR 0004 part 20's first sentence ("No panic is reachable from network input or content
+  data"), PM-0004-60 (fuzzed commands into the sim; room's control messages "once room exists"), PM-0001-34
+  (decoders), PM-0001-58 (every 16-bit counter crosses its wrap in an L1 test), all in drafts still Proposed: rules
+  and proposed marks, not code or CI.
+- Part 4's form was never panic-free on the tick: sim's own (non-inlined) code already panicked in release under the
+  two blocks, and sim runs on the tick. Test builds already panic in room under both forms (scratch run), so route A
+  adds no panic a test-profile run cannot already see; what changes is an escaped bug's outcome in production.
+- Is a silent wrap worse? As the default for an authoritative server, yes. A wrap is a silent integrity failure: under
+  the old blocks a release build turned 100 - 150 credits into 4,294,967,246 and a u16 counter into 0 (a limiter
+  that resets = bypass, fail-open); the wrong number is broadcast as authoritative and written into the match record at
+  Ended. A panic is fail-stop: one match (one process per room), reported (ADR 0006), located (panic message), and the
+  Wasm client and server no longer disagree. Counter-case, stated plainly: a benign wrap (a statistics counter, a
+  cosmetic id) that a client can drive becomes a match-ender that client can repeat on every match it joins. The fix
+  for both cases is the same (no client-reachable overflow), so fail-stop is the better default, provided the rule
+  below lands with room's first code.
+- The rule for when room (or a server crate) gets code: see SA2-2's fix.
+
+## Findings (round 2)
+- SA2-1 Medium, docs/reports/2026-11-12-foundation-2-2.md:213-215 (Risks) and :299-302 (OVERFLOW-ALL, "Why it
+  matters"): both say an overflow in room's or the server's code "would likely end that match (inferred ...)" from part
+  4's panic rules; by ADR 0001 part 11 (:493-503, :768-769, PM-0001-26, PM-0001-59) and ADR 0004 part 20 (:566-572),
+  only a panic on the tick thread ends the match (answered by the Advisor, OQ-0001-18, in a draft still Proposed: not
+  an inference), a panic in one connection's work closes only that connection, and a browser trap ends that player's
+  sim instance (online, a fresh one resyncs). The Risks bullet also ends with an IOU, "Round 2's security review reads
+  it against part 4 and R2-ROOM-REC2", which points at notes deleted before ready (round 1's D4 defect again).
+  Fix: replace the IOU and the "likely ... inferred" clause in both places with the three outcomes above, the silent-
+  wrap example (credits 100 - 150 = 4,294,967,246 in release under the old blocks; panic under route A), and the guard
+  (ADR 0004 part 20's rule and its fuzz marks, written but not built), pointing to SA2-2's follow-up.
+- SA2-2 Medium, docs/adr/README.md:234 (row OVERFLOW-ALL), STATUS.md "From foundation 2.2" list, STATUS_ARCHIVE
+  :617-631 and :779-784: no record hands the panic side of route A to the owners or anchors it to room's first code.
+  The row hands engine-architect only part 4's setting, its R1-RR-OQ4 answer and PM-0002-53 (the determinism side).
+  The rules that must now cover room and the server are worded narrower: part 4's explicit-operations rule names
+  "counters and tick numbers" for sim and protocol (ADR 0002 :247-249); ADR 0004 part 20 covers overflow only through
+  its first sentence's plain words, while its named sources are unwrap, an unchecked index and std clamp "inside the
+  sim" (:562-566); R5-RUSTLINT-REC3's no-implicit-panic lints reach protocol's decoders and content's loader only, and
+  `arithmetic_side_effects` was never read (R5-RUSTLINT-OQ2, r5:1788-1789); R5-RUSTLINT-REC4's reason assumed "the
+  rest of the workspace keeps the release default" (r5:1357-1358), which route A reverses. Exploit sketch (once room
+  has code): a client sends valid commands that drive a room-side sum or counter written with bare `+`/`-` past its
+  type (a u16 per-room id a client can advance; credits - price without a check): route A ends the match for 48
+  players, repeatably; the old blocks wrap silently instead. Also the row's later option "dropping '*'" turns release
+  overflow checks on in every dependency, not only sim's maths crate (without "*" a non-member gets
+  `-C overflow-checks=on`: the ruling's S3, tested), and the row names only its cost.
+  Fix: a named follow-up (for example OVERFLOW-PANIC-RULE) in STATUS and STATUS_ARCHIVE, and a clause in the row for
+  the owners, anchored to the first change that gives room or a server crate code, or ADR 0002's next revision,
+  whichever comes first: (1) part 4's explicit-operations rule reaches every workspace crate: `wrapping_*` only where
+  wrap is the defined behaviour (tick offsets, sequence numbers: ADR 0001 :776), `checked_*`/`saturating_*` with a
+  defined result (reject the command, clamp) for values a client or content can set or accumulate (credits, scores,
+  counts, durations, ids, lengths), widths a match cannot exhaust; (2) ADR 0004 part 20 names integer overflow among
+  its sources and room's and the server's tick-side code beside the sim; (3) state shared between connections never
+  sits behind a lock that handlers unwrap after a poison; (4) PM-0004-60 and PM-0001-34 build with overflow checks on
+  (route A gives it in every profile; pin it in the marks); (5) weigh clippy's `arithmetic_side_effects` (restriction)
+  for room's command handling and the server's limiter code (R5-RUSTLINT-OQ2's candidate); (6) "dropping '*'" names
+  its reach (every dependency, the server's network stack included) and gets the security review's read then.
+- SA2-3 Low, docs/reports/2026-11-12-foundation-2-2.md:148 and :162-164: the Reviews table's D5 row still says "the
+  cut asserts none of its properties", which the D5 skeptic corrected (the TCP probe asserts the network property;
+  print-only was the approved design); STATUS_ARCHIVE :719 and the report's SETPRIV-HARDEN row carry the corrected
+  wording. And the Reviews sentence says security-auditor "confirmed" the capability sets after setpriv; round 1
+  confirmed them by a local run as root (util-linux 2.39.3) and, for the runner, by capabilities(7) only (CI's log
+  prints no capability lines). Fix: D5 row "setpriv's flags; the cut asserts none of its privilege properties"; the
+  sentence "... confirmed locally (a run as root, util-linux 2.39.3) and, for the runner, by capabilities(7) ...".
+
+## Checked and found right (one line each)
+- Focus 4: nothing under .github/ or .claude/, no CLAUDE.md, CLAUDE.local.md, AGENTS.md or gate file changed since
+  4d78ad6; Cargo.lock unchanged; the head moved only in .checkpoints/ (b79424c).
+- Cargo.toml :21-29 = the ruling's condition 1; 4bd9dd5 touches Cargo.toml only; no dependency added; no `panic` key in
+  any profile, so the server keeps unwind and Wasm keeps the target's abort (part 4's panic strategy untouched).
+- M7: 297d48a removes only the [profile.release] table; 8d622ac is its exact revert (empty diff).
+- The row's mechanics match the Cargo Book: "*" = non-members only; a named override beats "*"; generic code is built
+  where it is instantiated.
+- Row OVERFLOW-ALL: "the advisor agent's ruling (D1, 2026-11-13), never his decision; his go for this row: PR #48's
+  merge" (not worded as given); ADR 0002's own text untouched.
+- Decision entry OVERFLOW-ALL: (a)/(b) as condition 4 asks; (b) = back to part 4's two blocks, comments narrowed, row
+  out, an open High deferred on his word, a new head with the advisor's review and his go again; the question text
+  names the silent wrong number; recommendation (a) is right from the security side.
+- STATUS_ARCHIVE OVERFLOW-XCRATE-CI (:617-631) and OVERFLOW-PER-CRATE (:779-784): true to the ruling and E12;
+  OVERFLOW-PER-CRATE rewritten for third-party crates, not dropped.
+- REPO_MAP :16, ROADMAP's 2.2 entry, STATUS: overflow wording matches route A; his go on OVERFLOW-ALL recorded as
+  waiting, not given.
+- CUT-ESCAPE (report :197-207 and :244; STATUS_ARCHIVE :702-715) takes all four of D4's fixes: a class with examples,
+  each route marked shown or not, a real boundary named, the full text in STATUS_ARCHIVE with a report row;
+  lightningcss corrected ("loads only lazily"); "hermetic" appears nowhere in the PR's files.
+- SETPRIV-HARDEN (report :245; STATUS_ARCHIVE :716-724) takes D5's corrections: no "relies on" claim; "asserts none of
+  the privilege properties (only the TCP probe judges the network)"; the id -u check named as what closes the root
+  case; the groups 65534 check added; "no device but lo is up"; at 2.3, asking him; it travels with the cut (CUT-CARRY).
+- My round-1 SA-4 is in: For Mustafa item 3 names the two toolchain runs.
+- The four crates' doc comments (1de98a9) make no security claim.
+
+## Not verified
+- M7's CI runs and their revert runs (43415093334, 43415101662, 43415458569, 43415465726; gate 43415458525,
+  43415465755): not read by me.
+- E12 and the ruling's C1-C8: not re-run; my scratch run covers room's own arithmetic only, native, cargo 1.99.1 here;
+  no wasm32 and no sim call.
+- Which profile and flags PM-0004-60's and PM-0001-34's fuzz builds use (cargo-fuzz defaults not read): "the fuzz sees an
+  overflow as a panic" holds only for a build with overflow checks on.
+- The poison spread through a lock shared between connections: reasoning from ADR 0001's own Mutex note, not run.
+- `arithmetic_side_effects`: read at clippy master, not the 1.99.1 tag; its noise on our code not measured.
+- CUT-ESCAPE states the runner's docker group outside the cut without a label; no log shows it (the D4 skeptic's
+  note); immaterial, since GitHub documents passwordless sudo. The inheritable set and /proc reads are omitted from
+  the wording: omissions, not errors. Cache reach sits under SETUP-NODE-CACHE, not CUT-ESCAPE: acceptable.
+
+## Durable decisions (no security-auditor memory folder exists, and this review writes notes only)
+- v2 Rust threat-model position: overflow checks are a fail-stop backstop, never the validator. Arithmetic on any value a
+  client or content can set or accumulate uses checked_/saturating_ with a defined result, or wrapping_ where wrap is
+  the defined behaviour. A silent wrap in authoritative state counts as an integrity (cheat) defect; a client-reachable
+  panic on the tick counts as a DoS defect. Both block.
+- Accepted risk until ADR 0004 part 20's fuzz marks are built: a client-reachable overflow on the tick ends one match
+  (one process per room), and the crash is reported.
+
+## Verdict
+0 Critical, 0 High, 2 Medium (SA2-1, SA2-2), 1 Low (SA2-3). Nothing here calls for a round 3. SA2-1 and SA2-3 are docs
+wording that the fix pass can take if it pushes anyway; SA2-2 becomes a named STATUS follow-up plus a clause in the row.
+Each stays open until it is fixed or explicitly deferred.
+Scratch leftovers (not deleted): /home/user/Shamble-Frontlines/.gate/security-auditor-r2/ (head/ with
+crates/room/tests/overflow_r2.rs, target-a/, target-p4/, Cargo.toml.4d78ad6, Cargo.toml.routeA).
+
+## Corrections after the second advisor consultation (these supersede the lines named)
+- The "Working view before the advisor consultation" block is superseded: its headline ("opens no DoS path the ADRs
+  leave unguarded") is replaced by focus 1's answer ("yes, narrowly"); its draft SA2-3 (dropping "*") is folded into
+  SA2-2 as fix (6); its "(decided, not inferred)" in the ADR 0001 line now reads "answered by the Advisor (OQ-0001-18,
+  2026-11-03) in a draft still Proposed" (ADR 0001 :3, ADR 0004 :3: Status Proposed).
+- SA2-2 fix (4) now reads: PM-0004-60 and PM-0001-34 pin a build with overflow checks on. Route A reaches a fuzz
+  build only if that build runs inside this workspace ("Cargo only looks at the profile settings in the Cargo.toml
+  manifest at the root of the workspace. Profile settings defined in dependencies will be ignored.": Cargo Book,
+  Profiles, re-read 2026-11-13). A fuzz crate with its own [workspace] takes its own profile.
+- Attributions in focus 1's answer: sim's own code panicking in release under the old blocks is the ruling's C1 (the
+  #[inline(never)] call); the release Wasm client and the server agreeing under route A is the report's E12 and the
+  ruling's C7, not my runs. The match-record effect "would be", since no room code exists.
+- Focus 4 re-run at HEAD 4f1a799303b54b48052bdf054bcdb96ea837be5c: 4bccf55..4f1a799 touches only .checkpoints/
+  (b79424c, 64738ad, 4f1a799); since 4d78ad6 no path under .github/ or .claude/, no CLAUDE.md, CLAUDE.local.md,
+  AGENTS.md or gate file, and Cargo.lock unchanged. `git status --short` shows only three notes files modified (mine and
+  rust-reviewer's and test-engineer's round-2 notes); no tracked file outside .checkpoints/ changed.
+- STATUS.md's "From foundation 2.2" follow-up list: :95-99.
+
+## Final answer (as handed back)
+Reviewed: 4d78ad6..4bccf55 outside .checkpoints/; the head is now 4f1a799, with only checkpoint commits since 4bccf55.
+Worktree root for every relative path: /home/user/Shamble-Frontlines/.gate/foundation-toolchain-wt.
+
+1. Verdict: 0 Critical, 0 High, 2 Medium (SA2-1, SA2-2), 1 Low (SA2-3). None calls for a round 3. All three stay open
+   until fixed or explicitly deferred. An open security finding keeps the PR needs-mustafa at any severity (it is
+   needs-mustafa anyway: tier 2, decision docs). Focus 1: route A does open a DoS path that part 4's form avoided, but
+   only a narrow one, and a silent wrap is the worse default (the panic-versus-wrap answer, in the notes above).
+2. Findings: SA2-1 (Medium), SA2-2 (Medium), SA2-3 (Low), as written under "Findings (round 2)", with SA2-2's fix (4)
+   as corrected above.
+3. Checked and found right: "Checked and found right" above. Anti-cheat coverage table: not applicable (no game,
+   server or protocol code; room is an empty stub).
+4. Not verified: "Not verified" above. Memory not written (no folder; notes only). Scratch leftovers named in the
+   Verdict section.

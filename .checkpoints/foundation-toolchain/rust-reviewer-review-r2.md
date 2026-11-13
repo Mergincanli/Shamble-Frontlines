@@ -100,3 +100,73 @@ Agent memory: none exists (no .claude/agent-memory*/rust-reviewer); round 1's no
   not run in either M7 run (sim's failure under M7's state is local only: the ruling's C3, my C8). Revert runs
   43415458569 and 43415465726 (8d622ac): success, release protocol and sim "should panic ... ok". Head 4bccf55: toolchain
   push 43424298848 and pull_request 43424306336, gate 43424299180 and 43424306390, all success.
+- C10 (done): wasm32 control, xcrate copy, route A release (own target dir): rustc "sim ... wasm32 ... opt-level=3
+  -C overflow-checks=on", "wasmcheck --crate-type cdylib ... wasm32 ... -C overflow-checks=on"; wasmcheck.wasm 20,510
+  bytes (toy); in Node 22: plain/inline/generic(1,1) -> 2, tick(41) -> 42, plain(254,1) -> 255; plain/inline/generic
+  (255,1) and tick(4294967295) -> "traps: unreachable". So the release traps are the overflow checks, not a trap on
+  every input.
+- C11 (done): the four doc comments (1de98a9) against ADR 0002: crate table :186 (sim), :189 (room), :190
+  (client-endpoint: same list, built for Wasm inside sim-wasm and natively for the headless clients of part 8), :191
+  (sim-wasm "the wasm-bindgen bindings the Worker loads, and nothing else"); migration :1465 (2.4 generated types; the
+  layout hash comes from the writer's layout table, :344, which client-endpoint holds), :1467-1472 (2.5 skeleton: the
+  Worker's client endpoint and local server exchange Join/JoinAccepted/Input/Snapshot; sim's per-tick hashes);
+  OQ-0002-3 (:1022, one Wasm instance or two; decider the boundary spike) and OQ-0002-7 (:1077, wasm-bindgen's health;
+  decider "a by-day reading of its maintenance issue (#4533) and the guide's governance page"); the report's
+  EMPTY-SLOTS (:259-263) puts that reading before the step that adds wasm-bindgen. All four accurate. Not changed this
+  round and out of scope: sim's "depends on `content` only" omits the table's "(and its maths dependencies, ADR 0004)".
+- C12 (done): pristine 4bccf55: `cargo fmt --all --check` exit 0; clippy --workspace --all-targets -D warnings clean;
+  fresh target dir with -W clippy::pedantic -W clippy::nursery clean (the new doc comments pass doc_markdown); wasm32
+  clippy on the five crates clean; RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps clean; cargo test
+  --workspace 6 passed; Cargo.lock byte-identical to `cargo generate-lockfile --offline`.
+- C13 (done, NEW): shared generics leak "*" into members. Copy share/ (archive of 4bccf55; room depends on extsum, a
+  path crate outside the root whose #[inline(never)] ext_sum does `v.iter().copied().sum()` on &[u8]; room's own
+  #[inline(never)] room_sum does the same; both called with [255, 1]), `cargo test --release -p room` with
+  CARGO_PROFILE_RELEASE_OPT_LEVEL: opt 3 and 2 -> room_sum panics (checked); opt 1, "s", "z" -> room_sum WRAPS (returns
+  0), with route A as shipped. Controls (share-controls.sh -> share-controls.txt), opt "s": (a) extsum a dependency but
+  never named in room's code -> checked; (a2) no dependency -> checked at 1, s, z (std alone does not supply this
+  instance); (c) extsum instantiates sum::<u16> instead -> checked; (r1) the original pair again -> WRAPS; (d) route A
+  without the "*" table -> both checked at s and z; (e) route A + [profile.release.package.extsum] overflow-checks =
+  true -> both checked at s and z; (f) dev/test profile -> both checked. So at opt-levels where rustc shares generic
+  instances, a member that uses a non-member crate links to that crate's unchecked copy of a std generic that inherits
+  the caller's overflow setting (here <u8 as Sum>::sum::<Copied<Iter<u8>>>), and the member's own `sum()` wraps.
+  Reach today: zero (no dependency; release opt-level 3 = default). ADR 0002 part 4 / PM-0002-29 measure opt-level "s"
+  and "z" for the sim-wasm build.
+- C14 (done): sources for C13 at tag 1.99.1 (raw.githubusercontent.com/rust-lang/rust/1.99.1/...):
+  compiler/rustc_session/src/config.rs:1521-1529 `share_generics()`: None => OptLevel::No | Less | Size | SizeMin =>
+  true, More | Aggressive => false (opt 0, 1, "s", "z" share; 2, 3 do not); compiler/rustc_middle/src/ty/instance.rs:
+  214-243 `upstream_monomorphization`: with share-generics on (or the item #[inline(never)]), a non-local generic
+  instance is taken from `upstream_monomorphizations_for(def)` instead of instantiated locally. core's items that
+  inherit the caller's overflow setting: library/core/src/iter/traits/accum.rs:52-89 (Sum and Product fold closures,
+  #[rustc_inherit_overflow_checks]), iter/adapters/enumerate.rs:78-161 (Enumerate), iter/traits/iterator.rs:231
+  (count), :3140 (position).
+- C15 (done): C13 on wasm32: share/crates/wasmsum (a member cdylib; depends on extsum; exports own_sum(a, b) =
+  `[a, b].iter().copied().sum()` and ext_sum), route A, CARGO_PROFILE_RELEASE_OPT_LEVEL, run in Node 22: opt 3:
+  own_sum(1,2) -> 3, own_sum(255,1) traps, ext_sum(255,1) -> 0; opt "s" and "z": own_sum(255,1) -> 0 (wrapped). So a
+  sim-wasm-like member built at "s"/"z" with a dependency loses its std-iterator overflow checks, while a native build at
+  opt 3 keeps them: a Wasm/native split on overflow, what part 4 exists to prevent.
+
+## Findings (draft, before the advisor consultation)
+- RR2-1 (Medium) Cargo.toml:23-24; docs/adr/README.md:234 (OVERFLOW-ALL); report :19-20, :76-77, :254-257
+  (OVERFLOW-PER-CRATE). "*" does more than keep dependencies at the release default: at opt-levels where rustc shares
+  generic instances (0, 1, "s", "z"), a workspace crate that uses a dependency links to that dependency's unchecked copy
+  of core's overflow-inheriting generics (Sum, Product, count, position, Enumerate), so the member's own arithmetic
+  wraps in release, native and wasm32 (C13, C15; rustc config.rs:1521-1529, instance.rs:214-243; core accum.rs:52-89).
+  The record anchors the "*" decision to "the first third-party crate in sim's dependency tree" and names neither this
+  nor the opt-level trigger. Reach zero today (no dependency, release opt-level 3; dev/test check every crate); trigger
+  = any third-party crate any workspace crate uses (wasm-bindgen in sim-wasm is the likely first) + a release-derived
+  profile at 1/"s"/"z" (PM-0002-29 and spike item 8 measure "s" and "z"). Fix as a follow-up: the trigger becomes "the
+  first third-party crate any workspace crate uses, or a release-derived profile leaving opt-level 2/3, whichever
+  first"; the text says "*" reaches members through shared generics there; dropping "*" or a named override per crate
+  closes it (C13 d, e); PM-0002-53's dependent-crate test includes a core iterator sum with a dependency present, at the
+  shipped opt-level. Or drop "*" now (identical today).
+- RR2-2 (Low) Cargo.toml:23-24 (same words in the row and the report). Cargo matches "*" by membership, not by
+  folder: a member's plain path dependency inside the repository joins the workspace automatically (even outside
+  `crates/*`) and is checked (also linted and tested by --workspace commands); a [patch] or excluded path crate inside
+  the folder stays a non-member, unchecked (C6 workspace.rs:943-995; C7 inside/patched/D). Fix: wording at the next
+  touch ('"*" matches every non-member: registry, git, a path crate outside the repository, a [patch] or excluded
+  path; a path dependency inside the repository becomes a member and is checked').
+- RR2-3 (Low) report :70-71, :117 (M7). Both M7 runs stopped at protocol's release binary ("error: test failed, to
+  rerun pass `-p protocol --lib`"); sim's release test never ran under M7 in CI (the M5 row states that limit, M7's
+  does not); and "M7 proves the setting the tree ships" reads wider than M7 shows (CI turns red when the release line
+  goes; the "*" half, the cross-crate reach and wasm32 are E12's, local). Fix: name protocol's binary and the local
+  --no-fail-fast run for sim in M7's row; :71 "M7 proves CI catches the release line's removal; E12 its reach".

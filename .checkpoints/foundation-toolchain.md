@@ -455,6 +455,12 @@ Count: 6.
 - review round 2 (step 30), background agents launched ~13:20 Amsterdam: rust-reviewer, security-auditor,
   test-engineer (notes `rust-reviewer-review-r2.md`, `security-auditor-review-r2.md`, `test-engineer-review-r2.md`;
   scratch under `.gate/<agent>-r2/`). If they are lost to a restart: relaunch each with "continue from your notes".
+  security-auditor DONE (~13:40): 0 Critical, 0 High, 2 Medium (SA2-1: the report's "would likely end that match
+  (inferred)" and the IOU to round 2 in Risks :213-215 and OVERFLOW-ALL :299-302 → the ADRs' three outcomes, the
+  silent-wrap example, the guard; SA2-2: no record hands route A's panic side to the ADR owners → a follow-up
+  OVERFLOW-PANIC-RULE in STATUS and the archive plus a clause in the register row), 1 Low (SA2-3: the D5 row and
+  "confirmed ... capability sets" in Reviews :148, :162-164). engine-architect launched in its slot (notes
+  `engine-architect-review-r2.md`). Ultracode is on (system, 2026-11-13): the skeptics run as a workflow, 3 at a time.
 - workflow wf_3198650c-b78 (the sync): done; its fixes in 4bccf55.
 - workflow wf_b82244e7-a22 (review round 1, run 1): done, 5 of 5 (step 26).
 - workflow wf_fcb65072-3e7 (round 1, run 2, the skeptics): done, 17 of 17.
