@@ -18,6 +18,28 @@ advisor-te-m3-check-notes.md: blocks 1-4 done, block 5, its own loop run, next).
 workflow by its run id below (wf_95beab47-c57, U4r's brief check; wf_a25d667a-fc8, the TE-M3 commit check); each agent
 continues after its notes' last complete block. Nothing to restore: no plant, no source edit in the working tree. The
 check-in (trig_01EKqNqwZrQTVJ6caAyRrug5) is enabled and comes due at :34 of every even hour UTC.
+**NOW (2026-11-13 about 14:30 UTC): U4r's brief, the advisor's check: APPROVE WITH CONDITIONS L1-L6**
+(advisor-u4r-brief.md; wf_95beab47-c57, cut 13:06, resumed 14:12, done about 14:27; read in full by the main
+session: A1 and A3 Medium, the twelve rulings, the conditions). Rulings, none escalated, no pass bar loosened: Q1 (b)
+the main session's manifest commit (npt-lab on npt-bots, npt-bots on npt-sim with no features; Cargo.lock's two edges
+only; a counted run: 11 steps, the base counts, SIM_BUILDS one set, the wasm step's seconds; a time problem → the
+advisor first); Q2 (c) SERIES.md new rows only, carry 62 (h)'s marks.json check the main session's before the merge's
+counted run; Q4 (a) option-A half to U4f, same bar (a §U4f carry line); Q6 (a) `Decoder::with_bite`, BITES widened to
+four, the field rule (move or aim, never tick, sequence, slot, buttons, press counters or view time); Q7 (a) every -17
+L1 run at tick_start 63,736; Q8 (a) -18 shares -17's B1 runs; Q9 (b) TC B1 seed 3 is U4h's, U4r records three, 13,500
+s simulated (plan edits, a §U4h carry line); Q10 (b'); Q11 (a); Q12 (a) reading (i) (a §U4h carry line); Q13 (a)
+bounded (crates/log for carry 63's two refusals); Q14 (a1) amended by A3 with (b1) and A4's press rule: the lead
+`npt_sim::ticks_for_ms(rtt_ms + jitter_ms).max(1) + 1`, P0 2, P1 3, P2 and B1 5, P3 7, within CMD_CATCHUP 8; carry 74's
+words amended, its 1 % rule unchanged; D13 widened to five short runs. A1 (Medium): the TE-M3 line gets c49773f, the
+cause, P16 (TE-Q3's words) and TE-Q2's end. A3 (Medium): P0's lead 2. Lows A2 (the cc8595d tests now c49773f's), A4,
+A5 (item 9 not 8), A6 (pump.rs:276-287), A7, A8 (RR-L4's remedy), A9 (the drafter's slip, recorded). u4r-run.sh
+APPROVED; INF2-4's runner follow-up MET (both diffs equal Block 2; bash -n on all nine; P3 logs; P4 (a), (b) re-run,
+exit 5). The panel confirmed: six seats at xhigh, two batches of three, one round. **L5 done here.** **Next, in order:**
+L3 the manifest commit and its counted run; L2 the carries and plan text commit (carry 74, §U4f, two §U4h lines, the
+plan's §4.15, §5 U4r and §5 U4h), then section 0's stamps re-set and moved cites re-pointed by script; L1 the fold
+into rev 3.2 by script (each old phrase found once; a miss or any other word → the advisor); L4 the placeholders and
+values with P16; L6 the launch (one builder in its own worktree from `<base>`, u4r-run.sh, D13 first). The check-in is
+paused while no agent runs; enable it at L6.
 **Latest (2026-11-13 about 11:40 UTC, after Mustafa's compact):** U4d2 is merged and closed (item 2 (o) and its M9).
 His words of today are recorded (history.md's last entry, CHECK-IN) and the check-in exists (the saver block). **Now:
 U4r's brief** (Next steps 5): the night's rev 2 (`git show ed973c9:.checkpoints/npt-u4r-brief/u4r-brief-draft.md`,
