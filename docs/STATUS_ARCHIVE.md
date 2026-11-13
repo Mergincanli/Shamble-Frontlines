@@ -545,7 +545,9 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       `/^(index\.html|editor\.html|shamble-.*\.js)[. ]*$/i` (a gate file: his ask first).
   - **For the drafts' next revision:** five "before the foundation" lines with no pointer to his decision of 2026-11-10
     (docs-keeper's note; the brief named only the lines it pointed): ADR 0002 :38, :724, :1115; SPIKE_PLAN :100 (the
-    diagram's label) and :202.
+    diagram's label) and :202. Nor to his decision of 2026-11-13 on step 2.3 (`docs/DECISIONS.md`, the entry "Taken by
+    Mustafa, 2026-11-13, 18:47:55 UTC: his decision on step 2.3 (step 2.3 may be planned now), and step 2.3's task"),
+    whose pointers stand beside 2.1a's (2026-11-13, foundation 2.3's first docs pass).
   - **Docs passes:** stale `tools/` citations in dated research docs, left as dated records: `docs/LEGACY_INVENTORY.md`
     TL1, TL6 and TL9; `docs/research/r5-toolchain-quality.md` :925 and :1737.
 - **From foundation 2.2** (PR #48, in flight: the report `docs/reports/2026-11-12-foundation-2-2.md`, its "Findings for
@@ -571,10 +573,11 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   code (D6). The round-1 and round-2 items rest on the reviewers' and skeptics' notes (`review-r1-findings.json`,
   `review-r1-verdicts.json`, `skeptic-r1-D*.md`, `review-r2-findings.md`, `review-r2-verdicts.json`,
   `skeptic-r2-R2-D*.md`, the reviewers' `*-review-r2.md` and the advisor agent's `advisor-ruling-d1-r2.md` in
-  `.checkpoints/foundation-toolchain/`, readable at the branch's last checkpoint commit): their CI runs, API reads,
-  source reads and scratch runs are theirs, not re-run by docs-keeper. Carried from the session's list and the report
-  [assumed]: AUTO-ASK's times, MANUAL-MODE's documentation page and mode name, REFUSED-PUSH, PIN-GUARD's marks,
-  SETUP-NODE-CACHE's runs, M2's and M7's runs, NODE-26's dates):
+  `.checkpoints/foundation-toolchain/`, readable at the branch's last checkpoint commit,
+  2f0fef3b208c10d5c38b921d24fb5f90f71b7ecb): their CI runs, API reads, source reads and scratch runs are theirs, not
+  re-run by docs-keeper. Carried from the session's list and the report [assumed]: AUTO-ASK's times, MANUAL-MODE's
+  documentation page and mode name, REFUSED-PUSH, PIN-GUARD's marks, SETUP-NODE-CACHE's runs, M2's and M7's runs,
+  NODE-26's dates):
   - **For the gate step (2.3), when the kit unfreezes:**
     - **AUTO-ASK** (his KIT-ASK-SEEN (b): `docs/DECISIONS.md`, 2026-11-11, 00:07:48 UTC; the report's Appendix A5):
       auto mode can pass the guard's ask. K1 (2026-11-10 20:02:42 UTC): the guard's ask was answered "allow" six
@@ -729,12 +732,14 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       installed there but loads only lazily) can reach past it. Examples of the class: files that later steps, post
       steps or the runner itself run or read, such as a `core.fsmonitor` hook in the workspace's `.git/config`, which
       actions/checkout's post step runs (shown locally with git 2.43.0 and in the source of git 2.56.0 (the runner's
-      version on 2026-11-10; 2.56.1 since 2026-11-12); not run on the runner), files in the runner's work folder, or the
-      step's `GITHUB_PATH` and `GITHUB_ENV` files (these two by the runner's layout and documentation, not shown); host
-      pathname sockets such as D-Bus or systemd-resolved (from documentation, untested on the runner); and signals to
-      the runner's own processes (kill(2)). A real boundary needs a different uid with its own copy of the workspace, a
-      container or VM, or a separate job whose output nothing trusted runs. Today the job has `contents: read` and no
-      secrets, and `gate.yml`'s toolkit dependencies already run with the same reach (security-auditor).
+      version on 2026-11-10; on 2026-11-12 the runners differed: 2.56.1 on c901187's pull_request run at 15:34 UTC and
+      on a5823cf's push run at 18:39 UTC, 2.56.0 on c901187's push run and on fd14855's and 45f1bb5's runs up to 18:37
+      UTC); not run on the runner), files in the runner's work folder, or the step's `GITHUB_PATH` and `GITHUB_ENV`
+      files (these two by the runner's layout and documentation, not shown); host pathname sockets such as D-Bus or
+      systemd-resolved (from documentation, untested on the runner); and signals to the runner's own processes
+      (kill(2)). A real boundary needs a different uid with its own copy of the workspace, a container or VM, or a
+      separate job whose output nothing trusted runs. Today the job has `contents: read` and no secrets, and
+      `gate.yml`'s toolkit dependencies already run with the same reach (security-auditor).
     - **SETPRIV-HARDEN** (D5, security-auditor's SA-2): the cut's privilege drop (`setpriv --reuid="$(id -u)"
       --regid=nogroup --clear-groups --no-new-privs`, `toolchain.yml:69` [verified 2026-11-13]) has neither
       `--inh-caps=-all` (setpriv(1)'s own advice when dropping from root) nor `--bounding-set=-all`, and the step prints
@@ -831,7 +836,7 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       handling. Anchor: the plan of the first change that gives `room` or a server crate code (2.5 by ADR 0002's
       migration plan) states the overflow rule its arithmetic follows.
     - **PACKAGE-ENTRIES** (S5): the packages have no `exports` or entry fields (the step that gives them code).
-    - **EMPTY-SLOTS** (2.2's plan, Part 3, readable at the branch's last checkpoint commit; reworded on D14,
+    - **EMPTY-SLOTS** (2.2's plan, Part 3, readable at the branch's last checkpoint commit, 2f0fef3; reworded on D14,
       engine-architect's EA-3): OQ-0002-7 and the wasm-bindgen pin: the pin comes with `sim-wasm`'s bindings, after the
       boundary spike fixes its exports; OQ-0002-7's decider, a by-day reading of wasm-bindgen's maintenance issue #4533
       and the guide's governance page (ADR 0002 :1082-1084 [verified 2026-11-13]), comes before the step that adds
@@ -852,8 +857,10 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       Advisor to say, or a dated reading from the advisor agent.
     - **BRIEF-STALE**: `docs/V2_PHASE0_BRIEF.md:20-21` (phase 0: no engine code but throwaway spikes) and `:144` (its
       "Don't" list: no engine code in phase 0) still forbid engine code in phase 0, with no word of the exception for
-      foundation steps 2.1 and 2.2; it is Mustafa's and the Advisor's brief (its line 3), one of DOCS-ALIGN's documents, so
-      no session edits it [verified 2026-11-12].
+      foundation steps 2.1 and 2.2, nor of his decision of 2026-11-13 on step 2.3 (`docs/DECISIONS.md`, the entry "Taken
+      by Mustafa, 2026-11-13, 18:47:55 UTC: his decision on step 2.3 (step 2.3 may be planned now), and step 2.3's
+      task"); it is Mustafa's and the Advisor's brief (its line 3), one of DOCS-ALIGN's documents, so no session edits
+      it [verified 2026-11-12].
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
