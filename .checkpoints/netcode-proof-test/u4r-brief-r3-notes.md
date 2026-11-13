@@ -207,3 +207,26 @@ Head read: (filled in block 1)
   angle brackets); no prose line over 120 (python print-only check); no end marker left. Brief 1,413 lines.
   Verified late: pump.rs:328-330 (returns after a Join), l1 :768-770, server/clippy.toml 17 lines.
 - B8: handback. DONE.
+
+## Revision for the check (rev 3.1, 2026-11-13)
+
+Task: apply the check's findings (u4r-brief-r3-check.md): F-j High; F-a, F-k, F-l, F-m Medium; Lows F-n..F-s, F-g,
+F-b, F-d..F-f, F-h, F-i (one-line text fixes applied, the rest listed). Edit u4r-brief.md in place; add "rev 3.1" to
+its change list. No runs. A line per finding below as each is done or rejected.
+
+Plan (blocks):
+- V1. Read the brief's affected parts (2.1, 2.2, 2.4, 2.5, 3.2, 4, 5, 7.1-7.4, 10, 12) and its change list form.
+- V2. Verify each finding's code cites at the head (client lib.rs, room input.rs/rewind.rs/room.rs, l1, pump.rs,
+  schedule.rs, server/clippy.toml, check.mjs, hash.rs, replay.rs, proto input.rs, server/tests/common/mod.rs,
+  lab/clippy.toml) and the plan/ruling cites (§4.15, §4.11, §7.1 item 6, advisor-u4df.md R6, advisor-u4d2-r1.md).
+- V3. F-j: check the model's premise against the stamping code and the late rule; F-j's arithmetic (rtt/jitter per
+  profile, CMD_CATCHUP); write U4R-Q14, the 2.1 pointer, the D-item.
+- V4. Mediums F-a, F-k, F-l, F-m: edits.
+- V5. Lows: apply the one-line ones; list the rest.
+- V6. Change list rev 3.1 block; self-check (line widths, cites); notes lines; handback.
+
+Block log:
+- V1 done: the brief read whole at head e913b43 (1,412 lines; only .checkpoints/ and TE-M3's delay_tests.rs in the
+  working tree changed since fa8e335). Sections hit: 2.1 :258-375, 2.2 :377-392, 2.4 :412-480, 2.5 :482-495, 3.2
+  :551-575, 4 :596-681, 5 :685-703, 7.1 :755-781, 7.2 :783-904, 7.3 :906-943, 7.4 :945-961, 10 :1124-1289, 11
+  :1293-1349, 12 :1353-1411.
