@@ -569,3 +569,15 @@ pull_request 43444024479. The skeleton printed in the session for the Fable whol
 pins, the six crates, the five packages, the lockfile summary (64 registry packages, registry.npmjs.org only, integrity
 on all; install scripts: fsevents only), the kit-line diffs, ADR 0002 parts 2-4 and 7; toolchain.yml unchanged since
 fd14855 (printed earlier in the session).
+
+## Step 7, after the whole read (2026-11-13 ~15:55 Amsterdam)
+Consultation 8 (logged above): the skeleton stands. The report's final pass before the verifier: apply-final.mjs
+(E1 on 790ac31's code, `git diff 4bd9dd5 790ac31 -- Cargo.toml crates` comments only; E2's runs to 790ac31; E9
+re-run, the same; E11's 75 lockfile entries; the evidence note; As built; the consultation section, count 8; For
+Mustafa names SA2-2 open; OVERFLOW-XCRATE-CI's recorded line in the report and the archive; STATUS #48 and ROADMAP);
+the A9 quote rejoined on one line (the checker counts 10 again); the archive's "this report" fixed · bd44a68 · pushed.
+The verifier launched on bd44a68 (a general agent reading main's verifier.md, Opus 5.5 at max; notes
+`verifier-final.md`). Next: its PASS; then the last commit (the verifier's line in the report, STATUS's #48 row and
+ROADMAP if needed, the checkpoint folded and deleted, the saver stopped first, no [skip ci]); the PR title and body
+(the last commit holding the notes); ready; the advisor agent's head review (its brief names the departures: the
+R2-L2 parenthetical, docs-keeper's three STATUS choices, the final pass's STATUS and ROADMAP moves).
