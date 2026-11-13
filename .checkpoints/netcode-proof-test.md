@@ -49,7 +49,8 @@ two pre-check findings and its Lows.**
   advisor-u4r-build2, notes advisor-u4r-build2.md; on the fixed copy): DEPTH, LOGS, the three Lows, a conformance read
   of copy 2's ruled changes, anything else. Two agents at a time. **If cut:** `Workflow({scriptPath, resumeFromRunId:
   "wf_083df555-757"})`. **On the ruling:** write it word for word by script (as advisor-u4r-build1-full.md), read it in
-  full, send copy 3 its parts by message. The check-in stays (next 22:34 UTC).
+  full, send copy 3 its parts by message. The check-in stays (next 22:34 UTC). The saver restarted as **b9e3voucs**
+  (21:55 UTC, after f2e560b).
 
 **Earlier NOW (2026-11-13 about 21:30 UTC): U4r's rulings are in (ten points, nothing for Mustafa) and sent to copy 2;
 the carries amended at 18583c4.**
