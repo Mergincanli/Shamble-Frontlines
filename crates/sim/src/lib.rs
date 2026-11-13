@@ -1,5 +1,5 @@
 //! The simulation: state, phases, tick and the navigation runtime (ADR 0002 part 3; ADR 0004). It depends on
-//! `content` only, with no transport, no async runtime and no clock. Empty until its first slice.
+//! `content` only, with no transport, no async runtime and no clock. Empty until the skeleton step (foundation 2.5).
 
 #[cfg(test)]
 mod tests {
