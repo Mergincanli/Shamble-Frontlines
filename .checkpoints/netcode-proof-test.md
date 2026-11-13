@@ -19,6 +19,15 @@ U4r's brief** (Next steps 5): the night's rev 2 (`git show ed973c9:.checkpoints/
 561 / 71 of 71, 11 steps; carries 59's new sentence, 62, 63, 69, 82-85 and C-U7-2's context; the recheck table R1-R34
 and the day items D1-D12; the lane runner copied from u4d2-run.sh), then the advisor's check with INF2-4's two diffs
 and proof logs. TE2-5 (c), TE-M3's planned change, before U4r's merge.
+**Running (since 11:41 UTC): U4r's brief rev 3**, workflow wf_4eb3ef56-c8c (task wht1e1nqn; script
+npt-u4r-brief-r3-wf_4eb3ef56-c8c.js under the session's workflows/scripts/): draft (general-purpose acting as
+test-engineer, xhigh: ${N}/u4r-brief.md, notes u4r-brief-r3-notes.md), check (netcode-architect, xhigh:
+u4r-brief-r3-check.md), one revision. The lane runner made first: u4r-run.sh (sha256 349b51ad…) from u4d2-run.sh by
+u4r_runner.py (u4r-run.sh.diff: 6 lines, the lane's names only; `bash -n` exit 0). If cut: resume with
+`Workflow({scriptPath, resumeFromRunId: "wf_4eb3ef56-c8c"})`; each agent continues after its notes' last complete
+block. The check-in is enabled (11:39 UTC). On return: read the change list, every finding rated Medium or higher,
+and the open questions in full; then the advisor's check (the brief, u4r-run.sh and its diff, INF2-4's two diffs and
+proof logs).
 0. **U4e's merge is next** (the advisor's round-2 ruling, advisor-u4e-r2.md: APPROVE on Q1-Q4; NC2-M1 a carry,
    C-U6-16 (a); the merge goes ahead on R9's M1-M9 with Q3's amendments to M5, M8 and M9; T1, T2 (3), T3, T5 and the
    new T7 from advisor-u4e-r2.md, T2 (1), (2), (4), (5), T4 and T6 from advisor-u4e-r1.md; nothing to Mustafa). M1 and
