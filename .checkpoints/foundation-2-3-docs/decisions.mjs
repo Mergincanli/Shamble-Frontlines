@@ -26,10 +26,10 @@ export const ENTRIES = [
   { id: 'A2', key: 'E-TASK', parts: true, head: `**${ENTRY}** ${ours('e5fa7ca0-6494-44d0-8366-81fc612c7958')}. It changes ` +
     'his words of 2026-11-10 for step 2.3 only, as it says; dated pointers of 2026-11-13 mark the older lines it ' +
     'overtakes (in this file, the entry "Taken by Mustafa, 2026-11-10: the second account may plan and build foundation ' +
-    'steps 2.1 and 2.2 now" and SLICE-ORDER\'s condition 3, below; SPIKE_PLAN, ADR 0002\'s migration step 1, ROADMAP and ' +
-    'STATUS). The kit lines that still name steps 2.1 and 2.2 as the only exception (CLAUDE.md :22 and :55, ' +
-    '`.claude/agents/advisor.md` :108, on main 4d21c1a) are not edited by this docs pass: by his words they are the rule ' +
-    `there too, and step 2.3's plan lists their edits. ${copied('A2')}` },
+    'steps 2.1 and 2.2 now" and SLICE-ORDER\'s condition 3, below; SPIKE_PLAN, ADR 0002\'s migration step 1 and ROADMAP; ' +
+    'STATUS\'s "Next" quotes it). The kit lines that still name steps 2.1 and 2.2 as the only exception (CLAUDE.md :22 and ' +
+    ':55, `.claude/agents/advisor.md` :108, on main 4d21c1a) are not edited by this docs pass: his words are the rule there ' +
+    `too, and step 2.3's plan lists their edits. ${copied('A2')}` },
   { id: 'A1', key: 'E-HI', head: '**Taken by Mustafa, 2026-11-13, 18:29:55 UTC: his message before the task, in foundation ' +
     `2.3's session** ${ours('b031379c-ea4c-47db-b279-54e937bf147a')}. His task message, the entry above, followed at ` +
     `18:47:55 UTC. ${copied('A1')}` },

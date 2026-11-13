@@ -5,7 +5,7 @@
   · plan: `.checkpoints/foundation-2-3-docs/plan.md`
 - **Branch:** claude/sweet-mayer-grsukw (for cs/foundation-2-3-docs) · **Base:** main
   4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300
-- **Last update:** 2026-11-13 21:58 Amsterdam
+- **Last update:** 2026-11-13 22:08 Amsterdam
 
 ## Steps done
 0. The model check: Opus 5.5 (get_session: session_context.model and last_served_model are claude-opus-5-5; effort
@@ -54,8 +54,14 @@
    are present unchanged and Routines is identical to 4d21c1a's; the #48 row's order, times (16:20:10 commit, 16:20:12
    merged_at), parents (2aa5e9c, 9b20b67) and items match git and A3.
 
+6. Step 5 (plan §10): d59ca43c559fe085ca90f45fdbac593236399533 (pushed) · the report's body merged above Appendix A
+   (only {{NOTES-SHA}} left, for step 8); E-TASK's header fixed (revision 2b item 7 and H-1, `etask-header.mjs`); STATUS
+   "Last merged" restored and #52's row; ROADMAP's #52 and #48 entries (`step5-fixes.mjs`); all checks OK (words.mjs: 17
+   entries classified; report-appendix, decisions --negative, pointers, fixes, quotes 15 spans; STATUS 120; scope;
+   GATE PASS; repo map). Revision 2b recorded in the plan.
+
 ## Current step
-Step 5 of the plan: the report's body (from `report-body.md`), E1 to E8, CI on 83c6ab6. Notes done before step 2:
+Step 6 of the plan: review round 1 on d59ca43 (the workflow `review-r1.js`, args.head = d59ca43...). Notes done before step 2:
 - `words.mjs` written and run read-only: A1 42 chars; A2 6190 chars, 36 lines; A3 1872 chars, 17 lines, the round trip
   OK, and identical byte for byte to the 2.2 chat record (event 96467900-..., created_at 2026-11-13T16:16:36.563252Z;
   the merge commit says 16:16:47 UTC: the report cites the commit's time and names the event's); A2-DECISION 562 chars,
@@ -73,10 +79,13 @@ Step 5 of the plan: the report's body (from `report-body.md`), E1 to E8, CI on 8
   archive, every added non-table line at most 120 characters; a second write run refuses ("already written").
 
 ## Next steps
-1. The advisor tool (C9: moment 5 for step 4, moment 1 for step 5); restart the saver before the review agents.
-2. Step 5: the report's body into `docs/reports/2026-11-13-foundation-2-3-docs.md` above Appendix A (placeholders
-   filled; `report-appendix.mjs` re-run); CI on 83c6ab6 read; one commit, pushed.
-3. Step 6: review round 1 (`review-r1.js`, a workflow: R-WORDS and R-STATE, then skeptics); one fix pass.
+1. The advisor tool (C9: moment 5 for step 5, moment 1 for step 6); CI on d59ca43 read.
+2. Stop the saver (TaskStop bofczdenq) and start a fresh one; then launch `review-r1.js` with args {head: d59ca43...};
+   count what comes back; one fix pass; the advisor agent's review of what changed only if needed.
+3. Step 7: the verifier (a general agent reading main's verifier.md, Opus 5.5 max) until PASS.
+4. Step 8: the advisor tool; fold the checkpoint into the report; stop the saver; last checkpoint commit; the deleting
+   commit writes {{NOTES-SHA}}; `fixes.mjs --check` before it; the advisor agent's review of that SHA (give it the
+   notes' last SHA to run the scripts from); PR body; ready; stop.
 2. (done earlier) The advisor tool (C9: moment 5 for step 2, moment 1 for step 3).
 2. Step 3: `fixes.mjs` applies M1 (dated correction under "For Mustafa" step 3), L1, L2 (x3 in the report: :228 inside
    L1's sentence, :301, :345), L3 and the header note to the 2.2 report; L5 (:574) and Q3's two lines (:732, :834) in

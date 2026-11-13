@@ -51,6 +51,15 @@ edited line on.", backed by `fixes.mjs`'s whole-file check; conditions: (a) the 
 `fixes.mjs --check` runs on the 2.2 report again on the final head (the archive part at step 3 only, before docs-keeper).
 §5's L2 and header-note texts below are replaced by these.
 
+## Revision 2b (2026-11-13): step 4's departures, ruled by the advisor agent (its notes: "PLAN REVISION 2b")
+STATUS within 120 lines once his words were filled in: (1) the kit line as pointers, his kit-freeze words quoted; (2)
+P8 as his four sentences quoted after STATUS's lead-in; (3) the old-sections table's two "same names" rows joined; (4)
+three archive lines beyond §6 (his go for Q2.2-a and OVERFLOW-ALL came with the merge); (5) no REPO_MAP row, and the
+claim dropped from STATUS, ROADMAP and the report: all APPROVE. (6) "Last merged" keeps its archive pointer (its two
+lines, no line cost). (7) E-TASK's header: "SPIKE_PLAN, ADR 0002's migration step 1 and ROADMAP; STATUS's "Next" quotes
+it)". H-1 (High): E-TASK's header "by his words they are the rule there too" becomes "his words are the rule there too".
+L-x (Low): ROADMAP's #48 entry "his go asked, then given with the merge". All carried out in step 5 (d59ca43).
+
 ## 1. What he asked, and what carries each
 1. "My words for PR #48 go into docs/DECISIONS.md, captured by script from merge commit 4d21c1a's message, as step 2.2
    did for PR #51." Carried by §3, entry E-48.
