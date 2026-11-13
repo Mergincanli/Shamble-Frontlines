@@ -68,9 +68,18 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
    **M9 progress:** CI green on cc8595d (gate runs 43401792311 push and 43401799970 pull_request); `.gate/u4d2-rr-target`
-   removed by `cargo clean --target-dir` (85 files, 38.0 MiB; .gate/u4d2-merge/rr-target-clean.log); **running: the
-   cold run** (task btd6aci0w, about 09:32 UTC; log .gate/u4d2-merge/cold-run.log), the advisor's one main-run.sh call.
-   If cut: read the log's last `===` line; the cleans are idempotent and the guards re-check, so re-run the same call.
+   removed by `cargo clean --target-dir` (85 files, 38.0 MiB; .gate/u4d2-merge/rr-target-clean.log). **The cold run
+   STOPPED at its fourth guard** (09:31:52 UTC; .gate/u4d2-merge/cold-run.log; uptime 4102.92 s): the host's release
+   clean removed 1134 files, 293.6 MiB; `cargo clean --target-dir <shared> --release --target wasm32-unknown-unknown`
+   removed 0 files, so `test ! -e <shared>/wasm32-unknown-unknown/release/deps` exited 1 and the step did not run (M9:
+   it comes to the advisor). Read-only dry runs (cargo 1.99.1): `--release --target wasm32` (with `--target-dir` or
+   CARGO_TARGET_DIR) and `--profile release --target wasm32` find 0 files; `--target wasm32` without a profile would
+   remove the whole shared target (34576 files, 7.9 GiB: a full clean, which Block 5 forbids until INF2-4's follow-up).
+   Now: the host's release artifacts cleaned, the wasm32 release ones warm (40M, 44 files in deps), the lock file and
+   CACHEDIR.TAG in place. **Running: the advisor's ruling on it,** workflow wf_c72fb1eb-1d3 (task wuunznz9q; brief
+   advisor-u4d2-m9-brief.md; ruling to advisor-u4d2-m9.md): the cold figure's route, and INF2-4's runner follow-up
+   (its form, its proof, whether it needs a plan step, and how a full clean would then work). Nothing is improvised
+   meanwhile: no other delete in the shared target.
    **(o) U4d2 MERGED at cc8595d** (pushed about 09:29 UTC on 2026-11-13; CI green), the fill script
    committed after it (056c6ef), the saver restarted (bpxjaop78). M9's items for the card, now on it: carries 82 to 85
    (U4r) and C-U7-2 (U7), in the merge commit; the open findings for PR #40's report: four security Lows, each carried
