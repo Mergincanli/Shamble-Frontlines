@@ -5,7 +5,7 @@
   · plan: `.checkpoints/foundation-2-3-docs/plan.md`
 - **Branch:** claude/sweet-mayer-grsukw (for cs/foundation-2-3-docs) · **Base:** main
   4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300
-- **Last update:** 2026-11-13 22:05 Amsterdam
+- **Last update:** 2026-11-13 23:08 Amsterdam
 
 ## Steps done
 0. The model check: Opus 5.5 (get_session: session_context.model and last_served_model are claude-opus-5-5; effort
@@ -60,8 +60,15 @@
    entries classified; report-appendix, decisions --negative, pointers, fixes, quotes 15 spans; STATUS 120; scope;
    GATE PASS; repo map). Revision 2b recorded in the plan.
 
+7. Review round 1 on d59ca43 (workflow wf_eb6cb5e5-3ce, done ~21:56 UTC): 2 of 2 reviewers, 4 of 4 skeptics returned.
+   R-WORDS: REVISE, 6 findings (F1 Medium: STATUS's kit quote stops before his paragraph's last sentence; F2-F6 Low).
+   R-STATE: HIGH FOUND, 17 findings (F1 High: the report calls C9 met though step 3 had no moment-5 consultation; F2
+   Medium: "no command was refused" is false for the agents; F4 Medium = R-WORDS F1; F1b, F3, RS-SELF, L-a to L-k Low).
+   Each Medium or higher finding held under its skeptic, at its severity. Fix pass: plan revision 2c asked of the
+   advisor agent (the changes to approved texts, the C9 timeline, the refusals, round 2 or not).
+
 ## Current step
-Step 6 of the plan: review round 1 on d59ca43 (the workflow `review-r1.js`, args.head = d59ca43...). Notes done before step 2:
+Step 6's fix pass: waiting for the advisor agent's revision 2c ruling, then one fix pass. Notes done before step 2:
 - `words.mjs` written and run read-only: A1 42 chars; A2 6190 chars, 36 lines; A3 1872 chars, 17 lines, the round trip
   OK, and identical byte for byte to the 2.2 chat record (event 96467900-..., created_at 2026-11-13T16:16:36.563252Z;
   the merge commit says 16:16:47 UTC: the report cites the commit's time and names the event's); A2-DECISION 562 chars,
@@ -133,8 +140,20 @@ Step 6 of the plan: review round 1 on d59ca43 (the workflow `review-r1.js`, args
    commit: #52's STATUS row and ROADMAP entry true for the ready state, #40's second read, the report's consultation
    line, "Last updated".
 
+6. 2026-11-13 21:58:15 UTC (22:58 Amsterdam), LATE moment 5 for step 3 and moment 1 for the fix pass: is step 3 done,
+   is the fix approach right? Changed: the C9 disclosure covers every gap (step 0 none; steps 1, 2, 4, 5 consulted after
+   the "done" save; step 3 none until this one; the STATUS cut committed before consultation 4), never "met"; L-a's
+   suggested text not used (it would state step 2.3's plan as fact); revision 2c asked of the advisor agent before any
+   write; the Reviews section accounts for all 23 findings; the word-level diff read after the pass; what lands after
+   the verifier kept tiny and listed for the head review; the refusal scan and words.mjs re-run before the last commit.
+   Exact times of the advisor-tool calls (from the transcript): 18:59:07, 19:55:37, 20:13:33, 20:47:41, 20:57:48,
+   21:58:15 UTC; the "step N done" saves: step 0 19:22:36, 1 19:55:30, 2 20:02:41, 3 20:27:37, 4 20:47:34, 5 20:57:42.
+
 ## Refusals (guard, deny list, classifier) and the route taken
-- None so far.
+- The session: none (the transcript scan, 2026-11-13 ~22:05 UTC). Agents, all by the guard: the advisor agent
+  19:31:18 UTC (a loop writing to a variable path; route: a read-only python3 script); R-WORDS 21:14:45 (the same kind;
+  route: literal paths); R-STATE 21:05:55 (a `node -e` line with comments; route: the script `rs-roadmap.mjs`); R-STATE
+  21:17:54 (a `sed -i` on a scratch file; route: the Edit tool). docs-keeper and the four skeptics: none.
 
 ## Open findings
 - None.
@@ -152,7 +171,10 @@ Step 6 of the plan: review round 1 on d59ca43 (the workflow `review-r1.js`, args
 ## Running work
 - Review round 1: workflow run wf_eb6cb5e5-3ce (task wnyzzm0vm) · script as launched: `review-r1-run1.js` (a copy of
   `review-r1.js`) · args {"head": "d59ca43c559fe085ca90f45fdbac593236399533"} · notes: `r-words.md`, `r-state.md`,
-  `skeptic-*.md` in this folder · launched ~21:04 UTC · status: running.
-- Saver: background task bhr4qixcn · output
+  `skeptic-*.md` in this folder · launched ~21:04 UTC · status: done (6 of 6 agents returned).
+- The container restarted ~22:00 UTC: the saver bhr4qixcn stopped after a local autosave (52845e0, then pushed by
+  hand); a fresh saver: task bw0zf0kg1 (`/tmp/claude-0/-home-user-Shamble-Frontlines/7261f3d7-f651-586a-9c39-c052553b68a3/tasks/bw0zf0kg1.output`),
+  started ~22:05 UTC, stops by ~23:55 UTC.
+- (old) Saver: background task bhr4qixcn · output
   `/tmp/claude-0/-home-user-Shamble-Frontlines/7261f3d7-f651-586a-9c39-c052553b68a3/tasks/bhr4qixcn.output` · started
   ~21:03 UTC · stops by ~22:53 UTC · the old saver bofczdenq stopped with TaskStop (its last save 28a64a8, pushed).
