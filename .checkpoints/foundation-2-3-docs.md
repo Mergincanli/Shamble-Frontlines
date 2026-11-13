@@ -97,27 +97,33 @@
    scan passes (28 entries, no problem).
 
 ## Current step
-Fix pass 2 (round 2's findings): FIRST ask the advisor agent for revision 2d (the changed approved texts: the archive
-follow-up's added S4 clause, #48's row wording, #52's waiting lines; and round 3: none if no Critical or High stays
-open after this pass), then write. docs/ is clean (round 2 made no edit). The chat is ~88% full (876k of 1M tokens at
-22:45 UTC): resume from here after a compaction.
+Fix pass 2 (round 2's findings, revision 2d approved at 23:02:43 UTC): the notes' scripts first (expectations for D2 to
+D4, decisions.mjs's fourth entry with its negative control, report-appendix.mjs's scan-gated write and cut-off), then
+the tracked edits, the report from report-body.md, the checks, the commit. docs/ is still as at 554face.
 
 ## Next steps
-1. SendMessage to the advisor agent (id a62455e264f542e79) for revision 2d with the exact texts above; record its
-   ruling in the plan.
-2. Fix pass 2: the report's advisor-tool section line ("Fable 5.2 (claude-fable-5-2) answered every consultation, per
-   the session's records: the advisor_tool attachment at 18:47:56 UTC and each call's usage record; the `/advisor fable`
-   notice had predicted Opus 5.5 until /clear or /compact, and why it did not hold is not established"), the appendix
-   intro (report-appendix.mjs: add the same record after the notice), report-body.md, "Decisions and deviations" (the
-   session's opening line and round 1 took the notice as fact); RW2-F2, RW2-F3, RW2-F4/R2-L2, RW2-F5, R2-L1, R2-L3,
-   R2-L4, R2-SELF; the Reviews section with all 10 round-2 findings; consultation 9 in the list (22:4x UTC: moment 5
-   for round 2's review, moment 1 for fix pass 2); E7 with 554face's runs (drafted in report-body.md). Then the battery,
-   the notes saved last (scripts frozen), the commit, the word-level diff 554face..fix, CI read, a consultation before
-   its "done" save.
-3. Tell Mustafa in a top line: Fable 5.2 answered the advisor tool (not Opus 5.5, as my opening line said).
-4. The verifier (briefed on the whole report: every claim about what ran checked against a record), the saver
-   restarted first (it ends ~23:52 UTC); then step 8 (see the plan §10 and the advisor's lists above); the last
-   consultation before the final commit, any later one in the PR body.
+1. Scripts (consultation 10's items 1 to 6 block the commit): grep every "before" string of D2 to D4 in the notes'
+   scripts and update their expectations (fixes.mjs's Q5 text gains D3); decisions.mjs: E-STATUS first in ENTRIES,
+   blocks 4, a one-byte negative control on its quote; a new insert script for the entry (build refuses a written
+   file); report-appendix.mjs: the intro (A1, A2 and A4; the advisor-model record; the compaction summary; the list of
+   other entries checked against the scan's 28 rows: the 22:01 restart pair and the 21:54:48 reminder too), scan()
+   before writing, refusing on any problem, the cut-off as the last scanned entry's time.
+2. Report (report-body.md, then copied in): D1 (a), (c), (d) (with the clause: the session's first telling at ~22:56
+   wrongly placed the claim in an opening message; its next message corrected that); D5's items; "What changed": four
+   DECISIONS entries; round 2's table with 9 findings (RW2-F4 = R2-L2 counted once: one High, eight Lows) and the same
+   count in Outcome and here; consultations 8 (22:15:20), 9 (22:49:58), 10 (23:03:56) and any later; the done saves
+   from commit times (3f98c0b 22:04:19, 461c82b 22:19:55, ef1a7c1 22:52:48; 83c6ab6 20:47:12); every evidence row that
+   quotes script output re-run and pasted; the body's quote count up by exactly one ("Fable 5.2 advises through the
+   advisor tool." (A2) on one line); "For Mustafa" item 1 points at the correction too.
+3. The battery, the notes saved last (scripts frozen), the commit, the word-level diff 554face..fix, CI read, a
+   consultation before its "done" save.
+4. The verifier (its brief: the whole report, every claim about what ran against a record; RW2-F1 against the records;
+   the new entry's byte check and negative control; consultation 10's items 4 to 6), the saver restarted first (it
+   ends ~23:52 UTC); then step 8 (the plan §10; consultation 10's items 7 to 10: the cut-off; a re-scan path after the
+   deleting commit, from the last notes commit into the scratchpad; the advisor-call count equal to the numbered list;
+   times after 00:00 UTC date-qualified, "Last updated" and ROADMAP's date from `date -u`, the report's file name kept);
+   name D1(d)'s added clause to the advisor agent at its final-head review; the last consultation before the final
+   commit, any later one in the PR body.
 
 ## Advisor tool consultations (his words of 2026-11-11; Fable 5.2 answered each, per the records: RW2-F1)
 1. 2026-11-13 ~20:00 Amsterdam, moment 1, before committing to the docs-pass approach: is the approach right? Changed:
@@ -176,11 +182,23 @@ open after this pass), then write. docs/ is clean (round 2 made no edit). The ch
    SHAs, the 23 dispositions, the 2c rulings, what is pending by design, R-WORDS byte-checks E-TASK's header and the kit
    quote, R-STATE re-derives the consultation timeline and the refusals).
 
-8. 2026-11-13 ~22:16 UTC (23:16 Amsterdam), moment 5 for round 1's fix pass (before its "done" save): done once two
+8. 2026-11-13 22:15:20 UTC (23:15 Amsterdam), moment 5 for round 1's fix pass (before its "done" save): done once two
    checks pass. Changed: the word-level diff re-read on the commit (d59ca43..554face) for STATUS and ROADMAP, and the 2.2
    report's 6 hunks counted; this checkpoint brought up to date in the same save; no docs or script edits while round 2
    runs; the saver's output checked; for after round 2: the 22:04:22 save in the report's timeline, 554face's run ids,
    consultations 8 onward, round 2's notes checked for fragments; round 2 the last reviewer round.
+
+9. 2026-11-13 22:49:58 UTC, moment 5 for review round 2 (before its "done" save, ef1a7c1 at 22:52:48) and moment 1 for
+   fix pass 2: is round 2 done, how to fix RW2-F1? Changed: the correction worded from the records only and made
+   everywhere (report, appendix intro, checkpoint, PR body, end message); revision 2d asked before any write, round 3
+   put to the advisor agent; Mustafa told in a top line; the main session's and the agents' models checked in the
+   records.
+10. 2026-11-13 23:03:56 UTC, moment 4 for D6 (LATE: after the session recommended (a1) to the advisor agent, after its
+   ruling at 23:02:43 and after the notes-only words.mjs change; before any tracked edit), and moment 1 for writing fix
+   pass 2: is (a1) right, what do my checks miss? Changed: the scripts' expectations first (fixes.mjs's Q5, decisions.mjs
+   blocks 4, a new insert script, a negative control); the "opening line" claim struck from this checkpoint; round 2
+   counted as 9 findings (RW2-F4 = R2-L2 once); times from commits; the cut-off from a scan-gated appendix write; the
+   intro's list checked against the scan; the advisor-call count; midnight; D1(d)'s added clause; "For Mustafa" item 1.
 
 ## Refusals (guard, deny list, classifier) and the route taken
 - The session: none (the transcript scan, 2026-11-13 ~22:05 UTC). Agents, all by the guard: the advisor agent
