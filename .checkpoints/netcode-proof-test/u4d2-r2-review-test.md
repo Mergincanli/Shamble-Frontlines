@@ -83,3 +83,67 @@ against step 1's hashes. Never commit, never clean, the shared target only.
   `--only deps` FAIL: lib.rs:101's line), left by the cut; a passing deps run removes it (FX-10). Read again: the
   packet's diffs, its tests side file, Block 8; the three batch-1 seats' notes; the builder's "Fix pass, round 1".
   Continuing at step 3 (TP10, TP11), then step 4, 5, 6.
+- TP10 (this seat's own form; check.mjs hashWasmProblems, after `if (allowed.has(m.index)) continue;`). Planted diff,
+  old "    if (allowed.has(m.index)) continue;\n    const a = attrs.find(...)", new the same with, between the two:
+  "    if (f === HASH_WASM_UNSAFE_FILE) {\n      const fnAt = code.lastIndexOf('pub extern \"C\" fn ', m.index);\n
+  const open = fnAt < 0 ? -1 : mask.indexOf(\"{\", fnAt);\n      let inside = open >= 0 && open < m.index;\n      for
+  (let k = open, depth = 0; inside && k < m.index; k++) {\n        depth += mask[k] === \"{\" ? 1 : mask[k] === \"}\" ?
+  -1 : 0;\n        if (depth === 0) inside = false;\n      }\n      if (inside) continue;\n    }" (an `unsafe` skipped
+  while the nearest export's body brace is still open; sha256 84d01add). My first two forms were vacuous, mine not
+  the tests': `mask.lastIndexOf('pub extern "C" fn ')` never matches, as lexRust blanks literals in `mask` (`"C"`);
+  r2-te-tp10b-scan-regression.log ran that form: 71 of 71 pass, not counted as a result. Corrected form run
+  r2-te-tp10c-scan-regression.log (-x -k; runner exit 1 by design): `node --test check.test.mjs` "# tests 71 / # pass
+  69 / # fail 2": **not ok 38** "the deps step is depsStep, and it calls every check ... (review C2R-5)" ("unsafeProblems
+  (npt-hash-wasm, inside an export's body: U4d2 round 1, FX-3)'s plant is not reported"; the stray fn's line still
+  reported, so the plant hit the body case only) and **not ok 54** "npt-hash-wasm: an `unsafe` block inside a listed
+  export's body is refused at its line ..." (begin: `unsafe {}`, actual [], expected lib.rs:9's line). `node check.mjs
+  --only deps` on the real tree under the plant: PASS (21.3 s; the real lib.rs has no body unsafe; this run also
+  removed the cut's leftover failed-steps/deps.log). Restored by Edit: 343c59c5 = start. TP10 now fails by name: settled.
+- TP11 (this seat's own form, not the builder's `false &&`): loader.mjs moduleProblems, old "    else if
+  (LOADER_EXPORTS[name] !== kind) problems.push(", new "    else if (LOADER_EXPORTS[name] !== kind && kind ===
+  \"table\") problems.push(" (the kind check kept for tables only; sha256 a15170f1). r2-te-tp11-loader-kind.log (-x -k;
+  runner exit 1 by design): "# tests 71 / # pass 70 / # fail 1": **not ok 59** "the loader refuses a listed name
+  exported as another kind: begin as a global, memory as a function (U4d2 round 1, FX-5: SEC-U4D2-8, TE-L1)" (actual
+  [], expected 'the module exports "begin" as a global, not a function'). Round 1: 63 of 63 green under TP11. Restored
+  by Edit: f2f2293f = start. TP11 now fails by name: settled.
+
+## Step 4: plants where a proof was not shown or a seat's finding can be settled by run
+- FX-2's self-test against its own rules (the builder's FX-2 proof was the live simd128 plant only, fx-2-tf.log; no
+  plant showed the self-test itself bites). Three plants in loader.mjs, each one -x -k call, each restored to f2f2293f
+  (sha256 checked after each):
+  - A, the prefix rule: old `if (REFUSED_FEATURES.includes(name) && prefix !== "-") {`, new `... && prefix === "=") {`
+    (sha256 3f2afc54): r2-te-fx2a-prefix.log "# pass 70 / # fail 1", **not ok 57** (the FX-2 test), at "+simd128":
+    actual [], expected the "lists +simd128" line.
+  - B, the count rule: old `if (sections.length !== 1) {`, new `if (sections.length === 0) {` (8e8bd064):
+    r2-te-fx2b-count.log 70 / 1, **not ok 57** at the two-sections case (actual [], expected "has 2 target_features
+    sections, not one").
+  - C, the parse's end: old `if (at !== bytes.length) throw new Error(`, new `if (at > bytes.length) throw new Error(`
+    (49b74e39): r2-te-fx2c-trailing.log 70 / 1, **not ok 57** (actual [], expected "does not parse: 1 byte(s) follow its
+    last entry").
+  The FX-2 self-test bites on each rule it names (deepEqual on whole problem lists). No finding.
+- INF2-2 (infra, by reading) settled by run: check.mjs run(), old `maxBuffer: 1 << 28, ...(timeout ? { timeout } : {})
+  });`, new `maxBuffer: 1 << 28 });` (the timeout never reaches spawnSync; sha256 be0a86f4).
+  r2-te-inf2-2-run-timeout.log (-x -k; exit 0): "# tests 71 / # pass 71 / # fail 0". FX-7's self-test sees `call`'s
+  wiring and the line, not run()'s: a dropped timeout leaves every test green. Restored by Edit: 343c59c5. Agree: Low
+  (TE2-R2-1 below, the same item; the ruled proof was "one self-test", which it has).
+- RR2-L3 (rust, by reading) settled by run: hash.rs compare, old `let armed = |e: &Entry| arm_for(arm.as_ref(),
+  on.as_deref(), e);`, new `... arm_for(arm.as_ref(), Some(e.name.as_str()), e);` (every recording armed again, as
+  before FX-8; sha256 4cfb4053). r2-te-rr2-l3-compare-arm.log (-x -k; exit 0): `cargo test --locked -p npt-lab --bin
+  npt-lab --no-fail-fast` "test result: ok. 19 passed; 0 failed; 1 ignored"; the same `--all-features` "19 passed; 0
+  failed; 1 ignored"; `node check.mjs --only wasm` PASS 54.9 s (a plant run, not a timing figure), "check: all 1 steps
+  pass". The only trace is rustc's "unused variable: `on`" (my one-line form leaves `on` unused; clippy -D warnings
+  would refuse that, but a clean revert of the two lines leaves nothing). Restored by Edit: 5677c39c. Agree: Low (check.mjs
+  always passes `--on`, so no verdict depends on compare's default today).
+- SEC-U4D2-R2-3 (security; built outside the copy) settled live in the copy: hash-wasm/src/lib.rs, two Edits: before
+  begin's doc, new "macro_rules! m {\n    ($($t:tt)*) => {\n        $($t)*
+  (\"/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/sec-r2-incl-gen.txt\")\n    };\n}\n\n"; as begin's
+  first line, new "    let bite = bite.wrapping_add(m!(include!)).wrapping_sub(7);\n" (the security seat's gen file,
+  outside the copy and the repo's tracked files, its text `unsafe { core::ptr::read_volatile(&7u32) }`; no new file in
+  the copy; sha256 dfb43f46). r2-te-sec-r2-3-macro-include.log (-x -k; exit 0, every command): wasm32 release build
+  exit 0 (Compiling npt-hash-wasm, the copy's path: the include resolved and the unsafe block compiled under begin's
+  allow, the crate's deny notwithstanding); clippy wasm32 -D warnings exit 0; clippy host --all-targets -D warnings exit
+  0; `cargo test -p npt-hash-wasm` "5 passed; 0 failed"; `node check.mjs --only deps` **PASS**, its held line still
+  saying "every #[path] and include! literal names a .rs file in its own crate" and "npt-hash-wasm ... whose
+  #[unsafe(no_mangle)] is its only unsafe code". Restored by two Edits: 9d339055; `sha256sum -c` 18 of 18 OK. Agree:
+  Low (FX-6's ruled form, V4's two forms, is met; this near form is new, and review is the stated wall in the
+  deny-level crates), with one addition: the deps step's PASS line asserts a claim that is false under it.
