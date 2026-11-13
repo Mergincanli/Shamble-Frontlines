@@ -461,6 +461,14 @@ Count: 6.
   OVERFLOW-PANIC-RULE in STATUS and the archive plus a clause in the register row), 1 Low (SA2-3: the D5 row and
   "confirmed ... capability sets" in Reviews :148, :162-164). engine-architect launched in its slot (notes
   `engine-architect-review-r2.md`). Ultracode is on (system, 2026-11-13): the skeptics run as a workflow, 3 at a time.
+  test-engineer DONE (~13:50): APPROVE, 0/0/0, 7 Low: TE2-1 Cargo.toml:24 ", unchecked" wrong for a dependency's
+  generic `T: Add` code instantiated by our crate (checked in release; probe); TE2-2 OVERFLOW-XCRATE-CI's first trigger
+  has no tripwire (name it in STATUS:96; say what 2.3 does if nothing depends on sim); TE2-3 PM-0002-53's home needs
+  two constraints (the counter in sim's normal build; no wasm32 runner: `no_mangle` refused by `-D unsafe-code`);
+  TE2-4 E12's saved record thin (summary lines, wasm32 control, "every workspace crate"); TE2-5 report :40-41
+  "revisions 1 to 9" → 10; TE2-6 the M7 row: protocol's binary failed, sim's never ran in CI; TE2-7 OVERFLOW-ALL's
+  "misses most of the simulation's code" not measured → "misses the small, inline and generic functions whenever
+  another crate calls them directly". E12 reproduced byte for byte; E1 reproduced; CI all green since 4d78ad6.
 - workflow wf_3198650c-b78 (the sync): done; its fixes in 4bccf55.
 - workflow wf_b82244e7-a22 (review round 1, run 1): done, 5 of 5 (step 26).
 - workflow wf_fcb65072-3e7 (round 1, run 2, the skeptics): done, 17 of 17.

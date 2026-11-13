@@ -144,3 +144,39 @@ Agent memory: none in this environment (no .claude/agent-memory-local/); round-1
 ## FINAL (the handback, as sent)
 Verdict: APPROVE. 0 Critical, 0 High, 0 Medium, 7 Low (TE2-1..TE2-7; text in the handback). Highest value: TE2-7
 (the decision entry Mustafa reads) and TE2-3 (what PM-0002-53's dependent-crate test needs) ride the fold commit.
+
+### Findings (final text)
+- TE2-1 Low, Cargo.toml:24. "so dependencies keep the release default, unchecked": "unchecked" is wrong for a
+  dependency's trait-generic integer arithmetic instantiated in a workspace crate. Evidence: route A, release, extdep
+  (outside the workspace) called from room: add Ok(0), #[inline] Ok(0), concrete + inside a generic fn Ok(0),
+  add_trait::<u8> (T: Add) panics "attempt to add with overflow" (extdep lib.rs:7); test profile: all four panic. The
+  ruling (advisor-ruling-d1.md:163-165) asked for "keep the release default setting" and called this untested. The
+  register row's "can still differ between dev and release builds" holds. Fix: drop ", unchecked" (next Cargo.toml
+  change, or the fold if Cargo.toml is touched anyway); give OVERFLOW-PER-CRATE (STATUS_ARCHIVE.md:779-784, report
+  follow-ups) the split for the "*" decision.
+- TE2-2 Low, report :231; STATUS.md:95-96; STATUS_ARCHIVE.md:572, :617-631. The anchor's first prong has no tripwire
+  and is filed only under 2.3 headings. Facts both ways: ADR 0002:1442-1443 "Steps 2.3 to 2.6 keep their order" (2.3
+  first, its planner reads its list) vs the ruling's R6 (advisor-ruling-d1.md:44-46: first cross-crate call from the
+  next builder, "possibly before 2.3's gate"). At 2.3 no crate depends on sim and sim is empty. No CI/gate/guard check
+  reads the dependency graph (PIN-GUARD); advisor.md has no follow-up match step. ADR 0002:188: protocol depends on sim
+  types; K1b runs -p protocol in release, so a native counter test there needs no CI edit; wasm32 does. Fix (docs,
+  fold): name the first prong in STATUS.md:96; say what 2.3 does if no crate depends on sim yet.
+- TE2-3 Low, docs/adr/README.md:234; report :231; STATUS_ARCHIVE.md:627-631. The placement is right (old blocks: an
+  integration test in crates/sim/tests/ panics, 2 passed) but omits: (1) the planted counter must be in sim's normal
+  build (cfg(test) invisible to dependents; part 3's one feature set; part 4's wrapping_/checked_ counters); (2) no
+  wasm32 runner in the tree: E12's #[unsafe(no_mangle)] export is refused by the workspace lints ("usage of the unsafe
+  `no_mangle` attribute", -D unsafe-code, sim-wasm on 4bd9dd5): part 4's unsafe exception or wasm-bindgen + a runner;
+  "(a CI edit: it asks him)" undercounts. "in release, native and wasm32" can read as replacing the four builds. Fix:
+  docs, fold.
+- TE2-4 Low, report :118; xcrate-check.sh:152, :159-168. The record shows less than E12 claims: no "ok"/summary lines,
+  no wasm32 no-overflow control, a three-crate flag list. My re-runs close all three (before 2 passed 4 failed, after 6
+  passed 0 failed; controls 2 and 6 in four builds; every member flagged, native and wasm32). Fix: keep summary lines
+  and add the control at the next run; E12 may say "every workspace member".
+- TE2-5 Low, report :40-41. "revisions 1 to 9" vs :49 and plan.md:1 (revision 10). Fix: "1 to 10".
+- TE2-6 Low, report :117. M7 names no failing binary and does not say sim's release binary never ran in CI (job
+  131850863497: only protocol's ran). Holds (one line governs both; sim's side: the ruling's C3, local). Fix: say so.
+- TE2-7 Low, report :295-296. "misses most of the simulation's code" is unmeasured (no sim code; 4 of 5 kinds tried),
+  and a counter-case is shown: old blocks, release, sim helpers reached through a non-inlined sim function panic (sim
+  lib.rs:24, :40) while the same helper called directly wraps; control (6, 6, 6). Register row and As built word it
+  right. Fix before the question goes to Mustafa (fold): "misses the simulation's small, inline and generic functions
+  whenever another crate calls them directly (tick counters, maths helpers)".
