@@ -35,10 +35,16 @@ const done = [];
 // D4: #52's waiting lines.
 {
   const f = 'docs/STATUS.md';
-  const r = apply(readFileSync(f, 'utf8'), { id: "D4, STATUS #52's row", kind: 'inline', start: '| #52 |',
-    old: "review round 1 (two reviewers), the verifier, the advisor agent's review of its final head; then his go (risk tier 1, decision docs)",
-    repl: "the verifier, the advisor agent's review of its final head; then his go (risk tier 1, decision docs)" });
-  writeFileSync(f, r.text); done.push(`STATUS #52's row: ${r.done}`);
+  // Not apply()'s inline kind: the new text is a suffix of the old, which apply() would take as already present.
+  const lines = readFileSync(f, 'utf8').split('\n');
+  const at = lines.findIndex((l) => l.startsWith('| #52 |'));
+  const OLD = "review round 1 (two reviewers), the verifier, the advisor agent's review of its final head; then his go (risk tier 1, decision docs)";
+  const NEW = "the verifier, the advisor agent's review of its final head; then his go (risk tier 1, decision docs)";
+  if (at < 0 || lines.filter((l) => l.startsWith('| #52 |')).length !== 1) throw new Error("STATUS: #52's row not found once");
+  if (lines[at].split(OLD).length === 2) { lines[at] = lines[at].replace(OLD, NEW); done.push(`STATUS #52's row: replaced on line ${at + 1}`); }
+  else if (lines[at].includes(`| ${NEW} |`)) done.push("STATUS #52's row: present");
+  else throw new Error("STATUS: #52's waiting cell is neither the old nor the new text");
+  writeFileSync(f, lines.join('\n'));
 }
 {
   const f = 'docs/ROADMAP.md';

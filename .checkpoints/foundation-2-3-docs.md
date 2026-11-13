@@ -96,10 +96,21 @@
    status request, 22:27:05) in ITEMS; the compaction summary classified as the harness's; allItems sorted by id; the
    scan passes (28 entries, no problem).
 
+11. Fix pass 2 applied (not yet committed at this save): the scripts first (words.mjs lastEntry; decisions.mjs E-STATUS,
+   blocks 4, its negative control; report-appendix.mjs's intro, scan gate and cut-off; fixes.mjs's Q5 with D3), then
+   report-body.md (`fp2-body.py`; the refusals bullet re-wrapped by hand), the report copied from it, its appendix
+   written (cut-off 2026-11-13 23:34:50 UTC; 4 blocks, 2 body quotes: up by exactly one), `fixpass2.mjs` (D2, D3, D4's
+   ROADMAP line, E-STATUS). Its first run left STATUS's #52 row unchanged: apply()'s inline kind took the new text, a
+   suffix of the old, as present; fixed in the script and the row replaced by the same code run inline. Checks, all
+   exit 0: words.mjs (30 entries, no problem), report-appendix.mjs --check, decisions.mjs --check --negative (4 entries,
+   7 controls caught), pointers.mjs --check, fixes.mjs --check (11 edits; Appendix A sha equal; 10 quotes), quotes.mjs
+   (15 spans; the one split line judged by hand, as before), scope.mjs (69 paths, none protected), the gate --no-smoke
+   PASS, repo map OK. Round 2's notes: no pushed version but R2-WORDS's 461c82b and 7b5f53c holds a 30-character run of
+   his words (`fp2-fragments-history.mjs`). The session's own guard refusal, 23:33:46 UTC (`git -C`; route: cd, git).
+
 ## Current step
-Fix pass 2 (round 2's findings, revision 2d approved at 23:02:43 UTC): the notes' scripts first (expectations for D2 to
-D4, decisions.mjs's fourth entry with its negative control, report-appendix.mjs's scan-gated write and cut-off), then
-the tracked edits, the report from report-body.md, the checks, the commit. docs/ is still as at 554face.
+Fix pass 2: the notes saved (scripts frozen), then the docs commit, the push, the word-level diff 554face..fix read on
+the commit, CI read, a consultation (moment 5) before its "done" save.
 
 ## Next steps
 1. Scripts (consultation 10's items 1 to 6 block the commit): grep every "before" string of D2 to D4 in the notes'
@@ -201,10 +212,12 @@ the tracked edits, the report from report-body.md, the checks, the commit. docs/
    intro's list checked against the scan; the advisor-call count; midnight; D1(d)'s added clause; "For Mustafa" item 1.
 
 ## Refusals (guard, deny list, classifier) and the route taken
-- The session: none (the transcript scan, 2026-11-13 ~22:05 UTC). Agents, all by the guard: the advisor agent
+- The session: one, by the guard, 2026-11-13 23:33:46 UTC (`git -C <notes folder> diff`: the guard wants git run from
+  the folder; route: `cd`, then `git diff`); none before it (the transcript scan). Agents, all by the guard: the advisor agent
   19:31:18 UTC (a loop writing to a variable path; route: a read-only python3 script); R-WORDS 21:14:45 (the same kind;
   route: literal paths); R-STATE 21:05:55 (a `node -e` line with comments; route: the script `rs-roadmap.mjs`); R-STATE
-  21:17:54 (a `sed -i` on a scratch file; route: the Edit tool). docs-keeper and the four skeptics: none.
+  21:17:54 (a `sed -i` on a scratch file; route: the Edit tool); R2-STATE 22:28:31 (a loop writing to a variable path;
+  route: literal paths). docs-keeper, the four skeptics, R2-WORDS and round 2's skeptic: none.
 
 ## Open findings
 - None.
