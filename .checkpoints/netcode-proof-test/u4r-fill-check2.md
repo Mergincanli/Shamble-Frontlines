@@ -20,3 +20,6 @@ Read-only: git reads, bash -n, sha256sum, python3 -I dry run.
 - K2 done: script read whole (1,059 lines); diff dac2aec..b4d1f0a read (the revision's changes: MAIN48, PIN, CITES
   :45/:160/:166 + MANUAL :45, TOP_INV, NEW_R11, KEPT10/SENT0, TITLE_END/SENT_TITLE, P6_1_NEW, TOPCITE/TOP_WANT asserts).
   Dry run at HEAD ff54815: exit 0, 687 lines, 66 changes, 1,682 -> 1,909, result sha256 28d90673…; no .pyc written.
+- Resumed (fresh copy after the 19:00 cut) at HEAD 9627723 (checkpoint commits only since ff54815: the root card and
+  this file); script still 2276287d, brief 362e771e. Dry run re-read whole at 9627723: exit 0, 687 lines, 66 changes,
+  1,682 -> 1,909, result sha256 9370a6ad… (differs from 28d90673 only by `<base>`'s value, as it must).
