@@ -69,13 +69,13 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
    **(l) Running: the advisor's ruling on round 2,** workflow wf_41b3fc7e-f62 (task wldcr6vy3; one seat,
    general-purpose, opus, xhigh, on main's advisor.md; read only; script
-   workflows/scripts/npt-u4d2-r2-advisor-wf_41b3fc7e-f62.js), launched about 08:52 UTC from advisor-u4d2-r2-brief.md:
+   workflows/scripts/npt-u4d2-r2-advisor-wf_41b3fc7e-f62.js), launched about 08:46 UTC from advisor-u4d2-r2-brief.md:
    INF2-1's route, the Lows' routes, T3 and T5 amended in code blocks (SEC-U4D2-R2-4, EA2-4, INF2-3), the two process
    events, the merge's M1-M9 with any amendment (expected counts at M5: 491 / 561 / 71 of 71, 11 steps), and the
    leftover `/nonexistent-cargo-home` (not removed: LEFTOVER-DELETE, history.md:404). If cut: resume with
    `Workflow({scriptPath, resumeFromRunId})`. On return: read it whole; then the merge: Block 9's M1-M9 as amended, the
    texts T1-T5 as amended, "Before the merge (in this order)" (advisor-u4d2-r1.md), each text copied by script.
-   **(k) U4d2's review round 2: DONE** (about 08:48 UTC): all five APPROVE WITH FINDINGS. Test TE2-R2-1 to -3 (Low,
+   **(k) U4d2's review round 2: DONE** (about 08:44 UTC): all five APPROVE WITH FINDINGS. Test TE2-R2-1 to -3 (Low,
    each settling INF2-2, RR2-L3 and SEC-U4D2-R2-3 by run); its counted run r2-te-check.log all 11 steps PASS, 417 /
    466 / 71 of 71, the wasm step 34.8 s; TP2 run 3, TP4, TP10 (its own form, after the cut) and TP11 each fail by
    name; end 18 of 18 OK, crates/sim untouched. Arch EA2-1 to -4 (Low: two check.mjs exports, each imported by a
