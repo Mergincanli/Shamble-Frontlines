@@ -31,7 +31,7 @@ L2 and L1.** (Mustafa's compact came at about 16:28 UTC; the saver be5gxjhow end
   npt-net's tree was in npt-lab's builds before L3, through npt-server (server/Cargo.toml names npt-net; U4d2's M5
   log, .gate/u4d2-merge/m5-counted.log:125-138, compiles npt-net and npt-tcpinfo in `cargo build --release -p
   npt-lab`), so L3 adds only npt-bots itself; U4R-Q1's premise and the ruling's (:185-186) read otherwise.
-- **L2 COMMITTED at 8bcbf36** (pushed about 16:46 UTC; the saver stopped first, restarted after): u4r_l2_text.py
+- **L2 COMMITTED at 8bcbf36** (16:44:37 UTC, pushed; the saver stopped first, restarted after): u4r_l2_text.py
   `--apply` (dry run read in full by the main session): carry 74's amended words; new entries 86 (§U4f, U4R-Q4), 87
   and 88 (§U4h, U4R-Q9, U4R-Q12), numbered after 85 and appended at their sections' ends; the plan's §4.15 two
   phrases, §5 U4r's phrase, §5 U4h's addition; the words check passed. carries 8b7f165e… → e8675a02… (644 → 661
@@ -45,7 +45,7 @@ L2 and L1.** (Mustafa's compact came at about 16:28 UTC; the saver be5gxjhow end
   after its notes' last block. On return: read the dry run's diff in full (pass bars: carry 74's 1 %, D13's stop), the
   questions for the advisor and the checker's findings; then apply, then L4 (items 1-3 with P16; P6 from L3's counted
   run) and item 9 (re-stamp; the plan and carries cites L2 moved).
-- **The check-in is enabled** (16:39 UTC; next 18:34). **The saver runs as b9f761m21** (since about 16:46 UTC; b24prddnh
+- **The check-in is enabled** (16:39 UTC; next 18:34). **The saver runs as b9f761m21** (since 16:44:43 UTC; b24prddnh
   stopped for L2's commit).
 **NOW (2026-11-12 about 17:45 UTC; read this first after a compact or a cut).**
 **At 12:53 UTC Mustafa reported usage at 92 % ("make sure to save progress (Also for the agents)"):** everything saved
