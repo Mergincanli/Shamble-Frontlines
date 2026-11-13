@@ -5,7 +5,7 @@
   · plan: `.checkpoints/foundation-2-3-docs/plan.md`
 - **Branch:** claude/sweet-mayer-grsukw (for cs/foundation-2-3-docs) · **Base:** main
   4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300
-- **Last update:** 2026-11-13 20:12 Amsterdam
+- **Last update:** 2026-11-13 21:20 Amsterdam
 
 ## Steps done
 0. The model check: Opus 5.5 (get_session: session_context.model and last_served_model are claude-opus-5-5; effort
@@ -21,8 +21,15 @@
    C1 to C10 and the answers: no new review needed, its words). Scripts follow it: `pointers.mjs` (C2 joined-quote
    check, C3/C4 wording), `words.mjs` (C8: both saved pages compared, identical).
 
+3. Step 2 (plan §10): 1123175 (pushed) · the report's draft with Appendix A (A1, A2, A3: `report-appendix.mjs` OK);
+   DECISIONS.md: E-TASK (the decision and the whole message), E-HI, E-48 at the top, the 2026-11-10 header sentence (2
+   lines reflowed, the only removed lines vs 4d21c1a), P5 (`decisions.mjs --check --negative`: OK, 6 of 6 controls
+   caught); P1 to P4 in SPIKE_PLAN and ADR 0002 (`pointers.mjs --check --only P1..P5` OK; SPIKE_PLAN +18 -0, ADR 0002
+   +6 -0); 2.2's `decisions-entries.mjs --check` OK (13 entries); GATE PASS (--no-smoke; `tools/` installed with `npm ci
+   --prefix tools`, gitignored); repo map OK. CI on 1123175: to read.
+
 ## Current step
-Step 2 of the plan: the build of his words and the pointers. Notes done before it (no tracked file):
+Step 3 of the plan: the five report fixes. Notes done before step 2 (no tracked file):
 - `words.mjs` written and run read-only: A1 42 chars; A2 6190 chars, 36 lines; A3 1872 chars, 17 lines, the round trip
   OK, and identical byte for byte to the 2.2 chat record (event 96467900-..., created_at 2026-11-13T16:16:36.563252Z;
   the merge commit says 16:16:47 UTC: the report cites the commit's time and names the event's); A2-DECISION 562 chars,
@@ -35,11 +42,12 @@ Step 2 of the plan: the build of his words and the pointers. Notes done before i
   control (one word dropped from P2's quote) caught.
 
 ## Next steps
-1. The advisor tool (C9: moment 5 for step 1, moment 1 for step 2).
-2. Step 2: write `decisions.mjs`; create the report file with its skeleton; run `report-appendix.mjs` (Appendix A),
-   `decisions.mjs` (three entries, the 2026-11-10 header sentence) and `pointers.mjs --only P1,P2,P3,P4,P5`; their checks
-   and negative controls; 2.2's `decisions-entries.mjs --check`; one commit.
-3. Then the plan's steps 3 to 8.
+1. Read CI (gate, smoke, toolchain) on 1123175; the advisor tool (C9: moment 5 for step 2).
+2. Step 3: `fixes.mjs` applies M1 (dated correction under "For Mustafa" step 3), L1, L2 (x3 in the report: :228 inside
+   L1's sentence, :301, :345), L3 and the header note to the 2.2 report; L5 (:574) and Q3's two lines (:732, :834) in
+   the archive; checks: Appendix A hash equal to 4d21c1a's, 2.2's body-quote check on the report's own blocks, the six
+   places only (C6); one commit, pushed.
+3. Then steps 4 to 8.
 
 ## Advisor tool consultations (his words of 2026-11-11; in this conversation Opus 5.5 answers the tool)
 1. 2026-11-13 ~20:00 Amsterdam, moment 1, before committing to the docs-pass approach: is the approach right? Changed:
@@ -48,6 +56,14 @@ Step 2 of the plan: the build of his words and the pointers. Notes done before i
    quotes); 2.2's appendix check replaced by a hash check plus the body-quote check; KIT-FREEZE-2 quoted, not
    paraphrased; Q1 to Q4 put to the advisor agent; agent briefs per CHECKPOINTS §4; the final head approved as the
    commit that deletes the checkpoint; #40's row only from what can be read.
+
+2. 2026-11-13 ~20:57 Amsterdam, moment 5 for step 1 and moment 1 for step 2 (C9): is step 1 done, and is step 2's build
+   right? Changed: `decisions.mjs` imports the entry title from `pointers.mjs` and checks DECISIONS.md holds it;
+   `pointers.mjs --check` honours `--only`; `words.mjs` scans every user-type transcript entry and classifies it, and the
+   appendix intro names the harness notices; DECISIONS.md's diff proven (only the 2026-11-10 header reflowed, its words
+   equal old + one sentence; SPIKE_PLAN and ADR 0002 add lines only; negative controls on both E-TASK quotes); the saver
+   recorded below; the gate run before the step-2 commit; a plain push right after it; for step 4, docs-keeper puts
+   `{{P-2.3}}` in STATUS only and leaves ROADMAP's 2.1a pointer byte-intact.
 
 ## Refusals (guard, deny list, classifier) and the route taken
 - None so far.
@@ -65,4 +81,7 @@ Step 2 of the plan: the build of his words and the pointers. Notes done before i
 - The slug `foundation-2-3-docs`; the docs pass is its own PR from this branch (his words).
 
 ## Running work
-- Saver: not started yet.
+- Saver: background task bofczdenq · output
+  `/tmp/claude-0/-home-user-Shamble-Frontlines/7261f3d7-f651-586a-9c39-c052553b68a3/tasks/bofczdenq.output` · started
+  19:22 UTC (20:22 Amsterdam) · stops by ~21:12 UTC (22:12 Amsterdam) · last check 19:57 UTC: ok ("watching ... every 10
+  min for 110 min").

@@ -31,9 +31,12 @@ function appendix(list) {
     'planned now.") and its last words ("only exception."), since it holds quote marks of its own. The same script ' +
     "checks every block against its source, and every quote of his words in this report's body against the item it " +
     'cites. His other input in this session was a command: `/advisor fable` (2026-11-13 18:30:08 UTC), whose output said ' +
-    'this conversation keeps Opus 5.5 as its advisor model until `/clear` or `/compact`; the workflow-authoring skill was ' +
-    'loaded into the session with A2 (18:47:56 UTC). Entries in `docs/DECISIONS.md` copy their quotes from here, because ' +
-    'the notes folder is deleted before the pull request is marked ready._';
+    'this conversation keeps Opus 5.5 as its advisor model until `/clear` or `/compact`. The session\'s other entries are ' +
+    'the harness\'s and its agents\': the command\'s caveat, the workflow-authoring skill (loaded with A2, 18:47:56 UTC), ' +
+    'a notice that the session\'s worker had restarted (19:22:24 UTC), and the hand-backs and task notifications of the ' +
+    'session\'s own agents; `words.mjs` classifies every entry of the transcript and finds no other message of his. ' +
+    'Entries in `docs/DECISIONS.md` copy their quotes from here, because the notes folder is deleted before the pull ' +
+    'request is marked ready._';
   const blocks = list.map((s) => {
     const fence = s.text.includes('```') ? '````' : '```';
     return `${s.header}\n\n${fence}text\n${s.text}\n${fence}\n`;

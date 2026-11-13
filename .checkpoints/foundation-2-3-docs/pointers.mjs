@@ -131,7 +131,7 @@ export function joinedQuotes(text) {
 }
 
 // The check: every site carries its pointer once, right after its anchor, with the quote equal to four().
-export function verify(root) {
+export function verify(root, only = null) {
   const q = four();
   const problems = [];
   const d = decision(messageText(ITEMS[1].uuid));
@@ -141,17 +141,21 @@ export function verify(root) {
       else if (!d.includes(p.quote)) problems.push(`${f}:${p.line}: the quote is not a substring of his decision`);
     }
   }
-  for (const site of SITES) {
+  for (const site of SITES.filter((x) => !only || only.includes(x.id))) {
     const lines = readFileSync(join(root, site.file), 'utf8').split('\n');
     const b = blockSite(lines, site);
     const add = wrap(TEXT[site.text](q), b.indent);
     if (lines.slice(b.end + 1, b.end + 1 + add.length).join('\n') !== add.join('\n')) problems.push(`${site.id}: the pointer is not right after 2.1a's pointer`);
   }
-  const rm = readFileSync(join(root, ROADMAP.file), 'utf8');
-  if (!rm.includes(`${ROADMAP.anchor}; ${TEXT.roadmap(q)})`)) problems.push('P7: missing');
-  const st = readFileSync(join(root, STATUS.file), 'utf8');
-  if (st.includes(STATUS.placeholder)) problems.push('P8: the placeholder is still there');
-  if (!st.replace(/\n */g, ' ').includes(TEXT.status(q))) problems.push('P8: missing');
+  if (!only || only.includes('P7')) {
+    const rm = readFileSync(join(root, ROADMAP.file), 'utf8');
+    if (!rm.includes(`${ROADMAP.anchor}; ${TEXT.roadmap(q)})`)) problems.push('P7: missing');
+  }
+  if (!only || only.includes('P8')) {
+    const st = readFileSync(join(root, STATUS.file), 'utf8');
+    if (st.includes(STATUS.placeholder)) problems.push('P8: the placeholder is still there');
+    if (!st.replace(/\n */g, ' ').includes(TEXT.status(q))) problems.push('P8: missing');
+  }
   return problems;
 }
 
@@ -161,8 +165,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const oi = process.argv.indexOf('--only');
   const only = oi > 0 ? process.argv[oi + 1].split(',') : null;
   if (process.argv.includes('--check')) {
-    const p = verify(root);
-    console.log(`${p.length ? 'FAIL' : 'OK'}: P1 to P5, P7 and P8 checked under ${root}; the quote is the decision's first ${four().length} characters`);
+    const p = verify(root, only);
+    console.log(`${p.length ? 'FAIL' : 'OK'}: ${only ? only.join(', ') : 'P1 to P5, P7 and P8'} checked under ${root}, and every 2026-11-13 pointer's quote in those files; the quote is the decision's first ${four().length} characters`);
     for (const x of p) console.log(`  ${x}`);
     process.exit(p.length ? 1 : 0);
   }

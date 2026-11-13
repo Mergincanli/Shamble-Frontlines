@@ -124,6 +124,38 @@ function unquoteAfter(msg, what) {
   return block.map((l) => (l === '>' ? '' : l.slice(2))).join('\n');
 }
 
+// Every user-type transcript entry that is not a tool result, and every queued message, classified: his words (must be
+// an item of the appendix), his command, the harness's (meta entries: a command's caveat, a skill's text, a worker
+// restart), or this session's agents and tasks (queued peer hand-backs and task notifications). Anything else, or a
+// message of his that is not an item, is a problem: the appendix would then not hold all his words.
+export function scan() {
+  const ids = new Map(ITEMS.map((it) => [it.uuid, it.id]));
+  const rows = [];
+  const problems = [];
+  for (const o of transcript()) {
+    if (o.type === 'user') {
+      const c = o.message?.content;
+      if (Array.isArray(c) && c.length && c.every((b) => b?.type === 'tool_result')) continue;
+      const text = typeof c === 'string' ? c : (c ?? []).filter((b) => b?.type === 'text').map((b) => b.text).join(' ');
+      let cls;
+      if (ids.has(o.uuid)) cls = `his words (${ids.get(o.uuid)})`;
+      else if (o.isMeta) cls = 'harness (meta)';
+      else if (/^<command-name>\/[a-z-]+<\/command-name>/.test(text)) cls = 'his command';
+      else { cls = 'UNCLASSIFIED'; problems.push(`${o.uuid} ${o.timestamp}: an unclassified user entry`); }
+      rows.push({ at: o.timestamp, uuid: o.uuid, cls, preview: text.slice(0, 70).replace(/\s+/g, ' ') });
+    } else if (o.type === 'attachment' && o.attachment?.type === 'queued_command') {
+      const kind = o.attachment.origin?.kind ?? 'none';
+      let cls;
+      if (kind === 'human') { cls = 'HIS QUEUED MESSAGE'; problems.push(`${o.uuid} ${o.timestamp}: a message of his sent while a turn ran, not an item`); }
+      else if (kind === 'peer' || kind === 'task-notification') cls = `this session's agents (${kind})`;
+      else { cls = 'UNCLASSIFIED'; problems.push(`${o.uuid} ${o.timestamp}: an unclassified queued message (${kind})`); }
+      rows.push({ at: o.timestamp, uuid: o.uuid, cls, preview: String(o.attachment.prompt ?? '').slice(0, 70).replace(/\s+/g, ' ') });
+    }
+  }
+  for (const it of ITEMS) if (!rows.some((r) => r.uuid === it.uuid)) problems.push(`${it.id}: not found by the scan`);
+  return { rows, problems };
+}
+
 export function allItems() {
   const list = ITEMS.map((it) => ({ ...it, text: messageText(it.uuid), timestamp: timestampOf(it.uuid) }));
   list.push({ ...GO48, text: go48() });
@@ -142,5 +174,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const m = mergeCall48();
   if (!m) console.log('A3 vs the 2.2 session\'s merge call: the second page is not on this machine');
   else console.log(`A3 vs the 2.2 session's merge call (its commit_message, ${m.createdAt}): ${m.text === list[2].text ? 'identical, byte for byte' : `DIFFERS (${m.text.length} chars, commit ${list[2].text.length})`}`);
-  if ((c && c.text !== list[2].text) || (m && m.text !== list[2].text)) process.exit(1);
+  const sc = scan();
+  console.log(`scan: ${sc.rows.length} entries classified: ${[...new Set(sc.rows.map((r) => r.cls))].map((k) => `${k} ${sc.rows.filter((r) => r.cls === k).length}`).join('; ')}`);
+  for (const r of sc.rows) console.log(`  ${r.at} ${r.uuid.slice(0, 8)} ${r.cls}: ${r.preview}`);
+  for (const p of sc.problems) console.log(`  PROBLEM ${p}`);
+  if ((c && c.text !== list[2].text) || (m && m.text !== list[2].text) || sc.problems.length) process.exit(1);
 }
