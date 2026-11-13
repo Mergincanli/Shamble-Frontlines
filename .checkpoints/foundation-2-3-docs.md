@@ -15,9 +15,14 @@
    session's record, list_events) and 2.2's notes at 2f0fef3.
 1. The checkpoint and plan revision 1 saved (30483c3); the draft PR opened: #52
    (https://github.com/Mergincanli/Shamble-Frontlines/pull/52); the plan names #52 (sed, `#N` to `#52`, 5 places).
+2. The advisor agent's plan review of revision 1 at ec16b30bcb359f85f2974ffc55096c28a464f78d (2026-11-13, ~19:32 UTC,
+   notes `advisor-plan-rev1.md`): **APPROVE with conditions C1 to C10, all Low**; Q1 (a), Q2 (a), Q3 both lines, Q4
+   R-WORDS + R-STATE + the verifier, Q5 (a), Q6 adopt, Q7 read-only fetch allowed. Folded into plan revision 2 (only
+   C1 to C10 and the answers: no new review needed, its words). Scripts follow it: `pointers.mjs` (C2 joined-quote
+   check, C3/C4 wording), `words.mjs` (C8: both saved pages compared, identical).
 
 ## Current step
-Step 1 of the plan: the advisor agent's plan review (the saver running). Meanwhile, notes only (no tracked file):
+Step 2 of the plan: the build of his words and the pointers. Notes done before it (no tracked file):
 - `words.mjs` written and run read-only: A1 42 chars; A2 6190 chars, 36 lines; A3 1872 chars, 17 lines, the round trip
   OK, and identical byte for byte to the 2.2 chat record (event 96467900-..., created_at 2026-11-13T16:16:36.563252Z;
   the merge commit says 16:16:47 UTC: the report cites the commit's time and names the event's); A2-DECISION 562 chars,
@@ -26,10 +31,15 @@ Step 1 of the plan: the advisor agent's plan review (the saver running). Meanwhi
 - L2's log lines read (`l2-git-versions.md`): 2.56.0 on c901187 (15:34 UTC) and fd14855 (16:32 UTC); 2.56.1 on a5823cf
   (18:39 UTC).
 
+- `pointers.mjs` tested on scratch trees (`.gate/fdn23-docs/tree2`): P1 to P5, P7 and P8 OK; idempotent; negative
+  control (one word dropped from P2's quote) caught.
+
 ## Next steps
-1. The advisor agent's plan review against the plan's commit SHA (plan §12, Q1 to Q7); record the verdict and the SHA
-   here; fold its conditions into revision 2.
-2. Then the plan's steps 2 to 8.
+1. The advisor tool (C9: moment 5 for step 1, moment 1 for step 2).
+2. Step 2: write `decisions.mjs`; create the report file with its skeleton; run `report-appendix.mjs` (Appendix A),
+   `decisions.mjs` (three entries, the 2026-11-10 header sentence) and `pointers.mjs --only P1,P2,P3,P4,P5`; their checks
+   and negative controls; 2.2's `decisions-entries.mjs --check`; one commit.
+3. Then the plan's steps 3 to 8.
 
 ## Advisor tool consultations (his words of 2026-11-11; in this conversation Opus 5.5 answers the tool)
 1. 2026-11-13 ~20:00 Amsterdam, moment 1, before committing to the docs-pass approach: is the approach right? Changed:

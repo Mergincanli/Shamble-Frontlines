@@ -116,13 +116,15 @@ export function joinedQuotes(text) {
   const lines = text.split('\n');
   const out = [];
   for (let i = 0; i < lines.length; i++) {
-    if (!lines[i].includes(MARK.slice(1)) && !lines[i].includes('pointer, 2026-11-13:')) continue;
+    const block = lines[i].trimStart().startsWith('_Pointer (2026-11-13');
+    const inline = lines[i].includes('pointer, 2026-11-13:');
+    if (!block && !inline) continue;
     let j = i;
     let joined = lines[i].trim();
-    while (!/"_?\)?\s*$/.test(joined) && j + 1 < lines.length && lines[j + 1].trim() !== '') joined += ` ${lines[++j].trim()}`;
-    joined = joined.replace(/^_|_$/g, '');
-    const m = joined.match(/: "(.+?)"_?\)?(?:\s.*)?$/);
-    out.push({ line: i + 1, quote: m ? m[1] : null, joined });
+    if (block) while (!joined.endsWith('"_') && j + 1 < lines.length && j - i < 8) joined += ` ${lines[++j].trim()}`;
+    const from = block ? 0 : joined.indexOf('pointer, 2026-11-13:');
+    const m = joined.slice(from).replace(/^_/, '').match(/: "([^"]+)"/);
+    out.push({ line: i + 1, quote: m ? m[1] : null });
     i = j;
   }
   return out;
