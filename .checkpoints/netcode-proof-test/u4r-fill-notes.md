@@ -48,3 +48,37 @@ or the script's dry run. Never --apply, never cargo or check.mjs, never commit.
   then predate main's merge and the builder's `git diff --stat <base>` (section 6 item 1) would list main's 42 files;
   recommend merging main first and then running the script (its asserts hold after that merge: main's merge-base diff
   touches no spikes/, .checkpoints/ or cited docs file).
+
+## Revision for the main session's decisions
+
+Task: revise u4r_fill.py (2c65d78b…, 985 lines) for the main session's six decisions on u4r-fill-check.md (F1 to F5 and
+the writer's question); keep everything else; asserts and the words check extended, never loosened. Edit tool only;
+read-only commands and the dry run only. Branch claude/netcode-proof-test-plan-hcky5g, HEAD 86951ce at the start (after
+the merge 7685b2b, main's 4d21c1a).
+
+### Plan (blocks)
+- R1. Read: the notes, the script whole, the check, section 12, the title block (:1-29), the change lists (:157-168),
+  section 0 (:180-237), section 1 item 1, FQ4, u4d2_restamp.py's P6 and launch sentence; plan :885-886/:917-918 at
+  8bcbf36~1 and :886-887/:918-919 now; a first dry run at HEAD.
+- R2. Decision 1: the top's two moved plan cites into the inventory (C22 :160 "(plan :885-886), for the advisor to
+  confirm.", C24 :166 "plan §7.1 item 6 (:917-918)"), each with a text pin asserted in both plan versions; C28's :45
+  "(plan §4.15 :500-501)" into it too as a held cite by its text (MANUAL), so the classifier no longer exempts the top
+  (every moved cite outside section 10 must be in the inventory); the top assert: rev 3.2's top with exactly the two
+  cites and decision 6's record changed; C26's L3 cite stays logged. Logs, comments and docstring follow.
+- R3. Decision 2: R11's "(:{bots_net})" -> "(bots/Cargo.toml:{bots_net})" and the old R11 assert unchanged.
+- R4. Decision 3: P6_1_NEW ends at "all merged by cc8595d)." (the worktree clause dropped).
+- R5. Decision 4: SENT0 (both branches): "except in section 10, which stays as written (records): its cites read the
+  plan and the carries at the old stamps 01ede63d… and 8b7f165e… (`git show 8bcbf36~1:<plan>`, and the same for
+  u4s-carries.md)"; one sentence.
+- R6. Decision 5: after BASE, stop unless main's 4d21c1a7… is an ancestor of HEAD; logged.
+- R7. Decision 6: the launch record appended to the rev 3.2 paragraph (after "values (section 12 items 1 to 3,
+  next)."), an item through the edit engine (rewrap within 120), in the words check, the top assert, MAIN and WHERE.
+- R8. Syntax check (ast), dry run read whole, every assert holds; sha256; result.
+
+### Progress
+- R1 done: all read; first dry run at HEAD 8e64c53: exit 0 (63 changes, 1,682 -> 1,908; head-limited read). The rev 3.2
+  paragraph ends at :29 (the task's "after" phrase found once there); "(plan :885-886)" stands twice (:160 and :1673,
+  the latter already re-pointed), so :160's cite is found by "(plan :885-886), for the advisor to confirm." (once);
+  "plan §7.1 item 6 (:917-918)" once (:166); "(plan §4.15 :500-501)" once (:45). Plan old :885-886 = new :886-887 and
+  old :917-918 = new :918-919 (text equal); old :500-501 / new :500-501 hold "The determinism step" ... "pre-check
+  only." Next: R2.

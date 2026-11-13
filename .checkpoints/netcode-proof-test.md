@@ -19,7 +19,8 @@ its revision.**
   date), main's #48 row, #51's row left out (main dropped it; this branch never changed it); 120 lines. spikes/
   unchanged since 4e91830; gate PASS (`--no-smoke`). **Running:** the spike's check.mjs counted on 7685b2b (task
   ba8dsrlmu; .gate/main-48/counted.log; expected 11 steps, 491 / 561 / 71), and CI on 7685b2b (gate, smoke, the new
-  `toolchain` job). **Owed to Mustafa: two lines** (main in at 7685b2b; the `toolchain` job's result on this branch).
+  `toolchain` job). **CI green on 7685b2b** (about 18:49 UTC): `toolchain` runs 43486051296 (push) and 43486055543
+  (pull_request), gate runs 43486051289 and 43486055418. **The two lines told to Mustafa** (about 18:52 UTC).
 - **L4's script, first version (wf_d38bc2ef-a49, about 17:50-18:40 UTC): check FAIL** (u4r-fill-check.md, read in
   full): Medium F1 (the change lists' two moved plan cites, C22 :160 and C24 :166, left unmoved on a misread of the fold
   ruling :93-95; FQ4 names only section 10), Medium F2 (R11's bare ":25" reads as Cargo.toml's), Lows (P6's added
