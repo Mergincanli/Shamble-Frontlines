@@ -51,6 +51,88 @@ edited line on.", backed by `fixes.mjs`'s whole-file check; conditions: (a) the 
 `fixes.mjs --check` runs on the 2.2 report again on the final head (the archive part at step 3 only, before docs-keeper).
 §5's L2 and header-note texts below are replaced by these.
 
+## Revision 2d (2026-11-13, asked ~23:10 UTC): review round 2's fix pass (asked of the advisor agent; ruling: below when given)
+Round 2 on 554face (workflow wf_dcd47e10-70e): 2 of 2 reviewers and 1 of 1 skeptic returned. One High, held by its
+skeptic (RW2-F1); nine Lows (RW2-F2 to F5, R2-L1 to L4, R2-SELF). Two more items found by the session after round 2
+(D6). The changed texts:
+
+D1. The advisor model (RW2-F1, High). Records, checked by the session (`r2w-advisor-model.py` re-run after the
+compaction): the transcript's advisor-tool entry at 18:47:56 UTC (with A2) names claude-fable-5-2, and again at
+22:54:40 (after the compaction); each of the 9 calls (18:59:07 to 22:49:58) has an advisor_message usage record, all
+claude-fable-5-2. The `/advisor fable` output (18:30:08): "Advisor set to Fable 5.2" then "The current conversation
+keeps Opus 5.5 as its advisor model until /clear or /compact, so the tool it has already declared stays unchanged;
+turning the advisor on or off applies right away." No chat message of the session named the advisor model before
+22:48 UTC (every main-session text searched); the PR body never did. The wrong claim stood in the report (:102, from
+d59ca43) and the checkpoint (step 0's line and the consultations heading; corrected in ef1a7c1).
+ (a) Report :102. Before: "In this conversation Opus 5.5 answers the advisor tool (the `/advisor fable` output: until
+     `/clear` or `/compact`)." After: "Fable 5.2 (`claude-fable-5-2`) answered every consultation below, by the
+     session's records: the transcript's advisor-tool entry names that model (18:47:56 UTC, with A2), and so does each
+     call's usage record. The `/advisor fable` output (18:30:08 UTC) had said "The current conversation keeps Opus 5.5
+     as its advisor model until /clear or /compact"; this report and the checkpoint repeated that as fact until round 2
+     (RW2-F1; "Decisions and deviations"). Why that forecast did not hold is not established."
+ (b) The appendix intro (report-appendix.mjs). Before: "...whose output said this conversation keeps Opus 5.5 as its
+     advisor model until `/clear` or `/compact`." After: "...whose output said this conversation keeps Opus 5.5 as its
+     advisor model until `/clear` or `/compact`; by the session's records, Fable 5.2 answered every advisor-tool call
+     ("The advisor tool")."
+ (c) Outcome, a new bullet after the gap bullet: "**The advisor model, corrected in round 2:** by the session's records,
+     Fable 5.2 answered every advisor-tool consultation, as his task message has it ("Fable 5.2 advises through the
+     advisor tool." (A2)). Until round 2 this report and the checkpoint said Opus 5.5, from the `/advisor fable`
+     output's forecast (RW2-F1). Details: "The advisor tool"."
+ (d) "Decisions and deviations", a new first bullet: "The advisor model (RW2-F1, High, held by its skeptic; fixed in
+     round 2's fix pass): from step 0 the checkpoint, and from d59ca43 this report, said Opus 5.5 answered the advisor
+     tool, taking the `/advisor fable` output's forecast as fact; round 1 compared the claim only with that output. The
+     records say Fable 5.2 (the advisor-tool entry; every call's usage record). No chat message named the advisor model
+     before round 2; Mustafa was told in chat after it."
+ (e) The checkpoint: done (ef1a7c1). The PR body at ready names Fable 5.2; so does the end message.
+
+D2. RW2-F3, #48's row (archive :159). Before: "at 16:16:47 UTC (per the merge commit's message; the chat record's event
+is stamped 16:16:36 UTC) and quoted whole there". After: "at 16:16:47 UTC by the merge commit's message, which quotes it
+whole (the chat record's event is stamped 16:16:36 UTC)".
+
+D3. R2-L1, the 2.1a follow-up (archive :547-553). Before: "...also ADR 0003 :51-52 and ADR 0006 :56-57, each wrapped
+across two lines. Nor to his decision..." After: "...also ADR 0003 :51-52 and ADR 0006 :56-57, each wrapped across two
+lines; and in the other drafts: ADR 0001 :603, :1100, :1301, :1771; ADR 0003 :1373; ADR 0004 :1245, :1251; ADR 0005 :92;
+ADR 0006 :1469, :1482; the register (`docs/adr/README.md`) :72, :292. Nor to his decision..." (each line read by the
+session: every one holds "before the foundation"; none of these files is touched by this PR, so the numbers are main's).
+
+D4. RW2-F4 = R2-L2, #52's waiting lines. STATUS :29, before: "review round 1 (two reviewers), the verifier, the advisor
+agent's review of its final head; then his go (risk tier 1, decision docs)"; after: "the verifier, the advisor agent's
+review of its final head; then his go (risk tier 1, decision docs)". ROADMAP :123-124, before: "Next: review round 1, the
+verifier, the advisor agent's review of the final head, then his go."; after: "Next: the verifier, the advisor agent's
+review of the final head, then his go." The final commit then drops "the verifier, " and sets the state word, as planned.
+
+D5. Report-only fixes (the session's text, for the record): RW2-F2 (the "done" saves line gains review round 1 22:04:19
+(3f98c0b, after number 6), round 1's fix pass 22:19:55 (461c82b, after number 8), review round 2 22:52:50 (ef1a7c1,
+after number 9); entry 6 opens "moment 5 for review round 1 (6 minutes before its "done" save)"); R2-L3 (the gap
+sentence: "step 4's departures (the STATUS cut, a design call, moment 4; the archive lines beyond plan §6) were committed
+in 83c6ab6 (20:47:12) before number 4"; entries 2 and 3 get back their "for step 4" clauses from the checkpoint); R2-L4
+(Outcome: "Since round 1, every "done" save has come after its consultation."); R2-L2's entry 7 ("naming the archive's
+changes truly; their waiting lines fixed in round 2's fix pass, R2-L2"); RW2-F5 (the scratch-copies bullet adds R2-WORDS's
+round-2 notes, 461c82b and 7b5f53c, fragments, rewritten as pointers); R2-SELF (the refusals bullet adds R2-STATE,
+22:28:31, a loop writing to a variable path; route: literal paths); the round-2 Reviews table (10 rows); Outcome's first
+bullet (six commits; round 2's counts); consultations 8 and 9 and any later one before the final commit; E7 with
+554face's runs.
+
+D6. Found by the session after round 2 (`words.mjs --check` now fails twice):
+ (a) His message at 22:27:05 UTC (transcript message a994258f-93c9-45d2-8878-31e7cfee6dcd), sent while round 2 ran,
+     is not an item, so the appendix intro's "finds no other message of his" is no longer true. Options: (a1) A4 in
+     words.mjs's ITEMS and in Appendix A, copied by script, the intro's "A1 and A2 are his messages" made "A1, A2 and
+     A4", and an entry at the top of DECISIONS.md in E-HI's form: "**Taken by Mustafa, 2026-11-13, 22:27:05 UTC: his
+     status request, in foundation 2.3's session** (foundation 2.3, PR #52; his message in that change-set's session,
+     session_019YNMUWSsyRgaYWxk4auQ5b, on his personal account, extracted by script from the session's transcript,
+     message a994258f-93c9-45d2-8878-31e7cfee6dcd), sent while review round 2 ran. Copied by script from
+     `docs/reports/2026-11-13-foundation-2-3-docs.md`, Appendix A4, and checked byte for byte against it:" then his
+     words as a quote block; (a2) A4 in the appendix only (it decides nothing). Recommended: (a1), E-HI's precedent
+     (every message of his in this session is in the register); any later message of his before the final commit the
+     same way (A5 on).
+ (b) The compaction summary (22:54:40 UTC, a user entry marked isCompactSummary) is unclassified: words.mjs classifies
+     it as the harness's, and the intro's list of other entries names "the summary that carried the session on when its
+     context filled (22:54:40 UTC)" (the session's only compaction; the transcript's one compact_boundary).
+
+D7. Round 3: the budget allows a third round "only for an open Critical or High". RW2-F1 is fixed in this pass, so none
+stays open: no round 3. The verifier checks every claim about what ran against a record (the correction included), and
+the advisor agent's review of the final head re-checks RW2-F1's fix.
+
 ## Revision 2c (2026-11-13): review round 1's fix pass, ruled by the advisor agent (its notes: "PLAN REVISION 2c")
 All approved: (1) E-TASK's header "his words of 2026-11-13 are the rule there too, and step 2.3's plan is to list their
 edits"; (2) the 2.2 report's L1 "(as worded at 9b20b67; L2 corrected it after the merge, in Risks and the CUT-ESCAPE
