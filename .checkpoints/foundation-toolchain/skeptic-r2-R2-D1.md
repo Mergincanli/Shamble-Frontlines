@@ -94,3 +94,66 @@ reach today; (f) exact replacement text for Cargo.toml:21-24 and OVERFLOW-PER-CR
   but ADR 0002 part 4 and PM-0002-29 plan "s"/"z" for the sim-wasm file with parry3d, and wasm-bindgen (first planned
   third-party crate) enters sim-wasm, outside sim's tree, which the trigger misses (K4); tested workarounds exist.
 - Comment draft: comment-draft.txt in my folder (4 lines, 114-115 columns).
+
+## After the advisor consult (corrections and the last checks)
+- Overclaims withdrawn from the draft verdict: (1) wasm-bindgen: K4 shows only that the trigger would not fire for a
+  crate outside sim's tree; whether wasm-bindgen holds a matching instance is not shown. (2) "s"/"z": ADR 0002
+  :265-267 and PM-0002-29 (:1294) have the spikes MEASURE the sim-wasm file at "s" and "z" (with parry3d), not ship
+  them; and the leak needs the dependency at a sharing level too (C2), so a per-package "z" on sim-wasm alone would not
+  trigger it (from C2 and the export rule; not run as such). (3) "checked at 2 or 3" is shown only for core's sum on u8
+  (mine) and Sum/Product/Sum<&u8> (the reviewer's C16), so it stays out of the replacement wording.
+- K9 (c, the #[inline(never)] exception) scripts/run-c2.sh -> run-c2.txt: extnev (outside the root) has
+  `#[inline(never)] pub fn never_add<T: Add>` and itself instantiates never_add::<u16> (holds_u16). Route A as shipped,
+  opt 3 (and 2): room's never_add::<u8> PANICS (instantiated in room: `T extnev::never_add::<u8>` in room's rlib); room's
+  never_add::<u16> RETURNS 0 (wrapped): room's rlib has `U extnev::never_add::<u16>`, extnev's defines it. Test profile:
+  all panic. So TE2-1's "checked in release" also has an exception at the shipped opt-level: our crates reuse a
+  dependency's own copy of an #[inline(never)] generic (symbol_export.rs:389-398, instance.rs:224-230). Neither
+  "unchecked" nor "checked" holds for all dependency code; the ruling's "keep the release default setting" does.
+- K10 what the fix would break: the session's checks do not pin the text (grep of register-row.mjs,
+  decisions-entries.mjs, report-appendix.mjs, evidence-static.mjs for overflow / dependency tree / release default /
+  unchecked: no match; report-appendix --check reads only quotes of Mustafa's words, none in these lines). The new
+  comment applied to a fresh archive (fixcheck/): 4 lines, 113-120 columns; `cargo build --workspace --locked` exit 0,
+  Cargo.lock byte-identical. Widening the trigger rewords the ruling's conditions 3 and 6 (its own words: "decided at
+  the first third-party crate in sim's dependency tree"), so the advisor agent signs it off at its head review. R2-D3
+  (OVERFLOW-PANIC-RULE clause), R2-L7 (EA2-2) and R2-L8 (EA2-3) also edit README:234: one row edit. No word of
+  Mustafa's, no CI, gate or crate code is touched.
+- K11 RR2-1's fix (4) judged: at the shipped opt-level 3 that test passes whatever "*" does (K1 M3, C1), so it cannot
+  detect RR2-1; it bites only at a sharing opt-level, with a dependency that holds the same instance and is loaded in
+  the same compilation (K2's caveat). Not right as worded.
+- Evidence ownership: mine: K1-K5, K8, K9, the source and book reads (K3, K6, K7). The reviewer's only (not re-run):
+  Product and Sum<&u8> (C16), wasm32 (C15), fat LTO (m3), star.sh's inside/patched/excluded behaviour (C7). The
+  tie-break (lowest stable_crate_id) is source-read only.
+
+## Verdict
+Holds, Medium (RR2-1 carries it; TE2-1 and RR2-2 are Low and both point to more checks than the text says, not fewer).
+Final comment text: comment-draft-final.txt in my folder. Leftovers (deletes not attempted), all under
+/home/user/Shamble-Frontlines/.gate/skeptic-r2-R2-D1/: ws/ (archive of 4bccf55 + probes; room's manifest and lib.rs
+hold the extsum probe), fixcheck/, ext/ (extsum, extgen, extnev), target-* (r0, c1, c2, m0-m3, ms, mz, sym-s, sym-3,
+sym2-s, sym2-3, c3, c3-0/1/z, a4-s, a4-3, a4-ctl, c-3, c-t, c-s, c2-3, c2-2, c2-t, f-*, fixcheck), rustc-src-dl/,
+cargo-book-dl/, cargo-src-dl/ (cargo-0.100.0.crate, unpacked, read only), scripts/, log-*.txt, run-*.txt,
+comment-draft*.txt, adr0002.md, *.orig and *.probe copies.
+(Also left: Cargo.toml.routeA. ws/ ends with Cargo.toml = route A and sim's lib = 4bccf55's; room holds the extsum probe.)
+
+## Exact wording proposed
+- Cargo.toml:21-24 (applied and built in fixcheck/; 113, 119, 120, 118 columns):
+  # Overflow checks are on in every profile for every workspace crate (ADR 0002 part 4, widened on foundation 2.2's
+  # review, RR-1: sim's inline, generic and small functions compile in their callers; the register row OVERFLOW-ALL). "*"
+  # matches every non-member: each keeps the release default setting. In release, or a profile inheriting it, at opt-level
+  # 0, 1, "s" or "z" our crates can reuse a dependency's unchecked generics: drop "*" or give it overflow-checks = true.
+- OVERFLOW-PER-CRATE's trigger (STATUS_ARCHIVE and report :254-257), replacing "The first such crate that enters sim's
+  dependency tree decides, with its cost measured, between a named override for it (...) and dropping "*"": "The first
+  third-party crate that any workspace crate uses, not only one in sim's dependency tree, decides, with its cost
+  measured, between a named override for each such crate (a named package override beats "*") and dropping "*"; while
+  "*" stays, moving the release profile, or one inheriting it, to opt-level 0, 1, "s" or "z" reopens it, because at
+  those levels our crates, and sim's code compiled inside them, can reuse a dependency's unchecked copy of shared
+  generic code (integer sum() and product(), tested)." Its first sentence: "keeps dependencies at the release default"
+  -> "keeps every non-member at the release default setting (a path crate inside the repository joins the workspace
+  and is checked unless excluded)".
+- The row OVERFLOW-ALL (README:234), in the same edit as R2-D3, R2-L7 and R2-L8: "and dependencies keep the release
+  default, so their integer arithmetic can still differ between dev and release builds; that is decided when the first
+  third-party crate enters sim's dependency tree, with its cost measured (a named override for that crate, which beats
+  "*", or dropping "*")" -> "and every non-member keeps the release default setting, so its integer arithmetic can
+  still differ between dev and release builds; with "*" kept, the release profile or one inheriting it at opt-level 0,
+  1, "s" or "z" also lets our crates reuse a dependency's unchecked generic code (integer sum() and product(), foundation
+  2.2's round-2 review). That is decided when the first third-party crate enters any workspace crate's dependency tree,
+  with its cost measured (a named override for each such crate, which beats "*", or dropping "*")".
