@@ -476,6 +476,8 @@ Count: 6.
   (SA2-1), R2-D3 (SA2-2), R2-D4 (TE2-2+TE2-3, Low) go to skeptics; R2-L1..L6 (TE2-6+RR2-3, TE2-7, TE2-4, TE2-5, SA2-3,
   RR2-4) checked inline by the session. Skeptics: workflow wf_72a8ddd0-ec7 (task wfrwh3h8j), pool 2 while
   engine-architect runs; script `skeptics-r2.js`; notes `skeptic-r2-<id>.md`; resume with resumeFromRunId.
+- saver: background task b5z3yarke, `--every 2 --for 115`, started ~14:04 Amsterdam (b2ppm4x49 stopped by the session
+  to shorten the interval while the agents write notes). Stop it before the checkpoint-deletion commit.
 - workflow wf_3198650c-b78 (the sync): done; its fixes in 4bccf55.
 - workflow wf_b82244e7-a22 (review round 1, run 1): done, 5 of 5 (step 26).
 - workflow wf_fcb65072-3e7 (round 1, run 2, the skeptics): done, 17 of 17.
