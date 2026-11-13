@@ -5,7 +5,7 @@
   · plan: `.checkpoints/foundation-2-3-docs/plan.md`
 - **Branch:** claude/sweet-mayer-grsukw (for cs/foundation-2-3-docs) · **Base:** main
   4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300
-- **Last update:** 2026-11-13 21:28 Amsterdam
+- **Last update:** 2026-11-13 21:58 Amsterdam
 
 ## Steps done
 0. The model check: Opus 5.5 (get_session: session_context.model and last_served_model are claude-opus-5-5; effort
@@ -38,9 +38,19 @@
    +139; -227,4 +233,5; -301,5 +308,7; -345 +354; -447,0 +457,6), the archive 5 (-548 +548,3; -574,4 +576,5; -732,6
    +735,8; -834 +839; -855,2 +860,4). GATE PASS (--no-smoke); repo map OK.
 
+5. Step 4 (plan §10): 83c6ab6 (pushed) · docs-keeper's sync (notes `docs-keeper-sync.md`): STATUS, ROADMAP (the oldest
+   entry folded into Build history), the archive's #48 row and the 2.2 block's opening; its REPO_MAP row taken out (the
+   map lists 4 reports only). The session's `sync-fixes.mjs`: STATUS back to 120 lines once filled (the kit line as
+   pointers; the old-sections table's two "same names" rows joined; P8 as his four sentences quoted, after STATUS's own
+   lead-in), the archive's opening split under 120 columns, three archive lines that still called his go for Q2.2-a and
+   OVERFLOW-ALL pending. `pointers.mjs` filled P7, P8 and Q-KIT; full `pointers.mjs --check` OK; `quotes.mjs`: 13 spans,
+   all found; `fixes.mjs --check`, `decisions.mjs --check`, `report-appendix.mjs --check` OK; scope OK; GATE PASS; repo
+   map OK. docs-keeper's findings: its scratch `fillcount.mjs` held a retyped copy of his four sentences and kit-freeze
+   words, pushed by the saver (e6fc6a9) and then deleted; byte-identical to the script cut (checked); in no doc
+   (a report finding, Low); the archive's stale :608 (fixed here).
+
 ## Current step
-Step 4 of the plan: docs-keeper's sync (STATUS, ROADMAP, the archive's #48 row and block state, REPO_MAP), then the
-placeholders filled ({{P-2.3}}, {{Q-KIT}} in STATUS; P7 in ROADMAP) and the quote-span check. Notes done before step 2:
+Step 5 of the plan: the report's body (from `report-body.md`), E1 to E8, CI on 83c6ab6. Notes done before step 2:
 - `words.mjs` written and run read-only: A1 42 chars; A2 6190 chars, 36 lines; A3 1872 chars, 17 lines, the round trip
   OK, and identical byte for byte to the 2.2 chat record (event 96467900-..., created_at 2026-11-13T16:16:36.563252Z;
   the merge commit says 16:16:47 UTC: the report cites the commit's time and names the event's); A2-DECISION 562 chars,
@@ -58,9 +68,10 @@ placeholders filled ({{P-2.3}}, {{Q-KIT}} in STATUS; P7 in ROADMAP) and the quot
   archive, every added non-table line at most 120 characters; a second write run refuses ("already written").
 
 ## Next steps
-1. docs-keeper (step 4), then `pointers.mjs` for P7, P8 and Q-KIT, the full `pointers.mjs --check`, a quote-span check
-   on the added lines of STATUS, ROADMAP, the archive and REPO_MAP (each quoted span found in A2, A3, the base file or
-   DECISIONS.md), the facts checked against git and the API; one commit, pushed; the advisor tool (C9).
+1. The advisor tool (C9: moment 5 for step 4, moment 1 for step 5); restart the saver before the review agents.
+2. Step 5: the report's body into `docs/reports/2026-11-13-foundation-2-3-docs.md` above Appendix A (placeholders
+   filled; `report-appendix.mjs` re-run); CI on 83c6ab6 read; one commit, pushed.
+3. Step 6: review round 1 (`review-r1.js`, a workflow: R-WORDS and R-STATE, then skeptics); one fix pass.
 2. (done earlier) The advisor tool (C9: moment 5 for step 2, moment 1 for step 3).
 2. Step 3: `fixes.mjs` applies M1 (dated correction under "For Mustafa" step 3), L1, L2 (x3 in the report: :228 inside
    L1's sentence, :301, :345), L3 and the header note to the 2.2 report; L5 (:574) and Q3's two lines (:732, :834) in

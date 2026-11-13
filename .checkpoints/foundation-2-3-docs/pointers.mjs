@@ -30,7 +30,8 @@ const TEXT = {
   // P7: ROADMAP's v2 line, inline after 2.1a's pointer.
   roadmap: (q) => `pointer, 2026-11-13: for foundation step 2.3 only, overtaken in part by his decision of 2026-11-13, \`docs/DECISIONS.md\`: "${q}"`,
   // P8: STATUS's Next item (docs-keeper's placeholder line).
-  status: (q) => `_Pointer (2026-11-13): for foundation step 2.3 only, his decision of 2026-11-13 (\`docs/DECISIONS.md\`): "${q}"_`,
+  // P8: STATUS's Next item: its own lead-in names his decision of 2026-11-13; the fill is his four sentences, quoted.
+  status: (q) => `"${q}"`,
 };
 
 // Block sites: after the n-th 2.1a pointer block in a file, ended by the first line that ends with `end`.
