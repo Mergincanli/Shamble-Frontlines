@@ -259,9 +259,10 @@ Now (step 7, in this order):
 a. Round 2: when a reviewer returns, start engine-architect (at most 3 at a time); dedupe the findings; skeptics on any
    Medium or higher; one fix pass (a Low triggers no push on its own; below High a STATUS follow-up). CI on 4bccf55
    (toolchain, gate, smoke) checked green; Cargo.lock unchanged; E9 re-run.
-b. The verifier on the final head: a general agent reading main's .claude/agents/verifier.md, Opus 5.5 at max.
-c. Moment 5: the Fable advisor reads the built skeleton as a whole (print the skeleton files, then call the advisor);
-   fix what it finds within the review budget, or record it in the report. Log the consultation (count 7).
+b. Moment 5: the Fable advisor reads the built skeleton as a whole (print the 35 skeleton files, committed first, then
+   call the advisor); fix what it finds within the review budget, or record it in the report. Log the consultation
+   (count 7). Before the verifier, so that its fixes are in the head the verifier checks.
+c. The verifier on the final head: a general agent reading main's .claude/agents/verifier.md, Opus 5.5 at max.
 d. The report final: the consultation log and count, round 2, the verifier; E9; the checkpoint folded in.
 e. Stop the saver; delete .checkpoints/foundation-toolchain* in a manual commit (no [skip ci]); push; mark PR #48 ready.
 f. The advisor agent's final-head review (a general agent reading main's advisor.md, at max; it re-runs the cross-crate
