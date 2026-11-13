@@ -119,3 +119,19 @@ Started 2026-11-13 (session time). Effort xhigh. Instructions read from origin/m
   redundancy cap) plus the 10 % duplicates. (b1) needs one more rule: press edges counted per command given, never per
   step (a skipped step then a command covering 1 tick with 2 edges is PressRefused, :96-99). D13 widened: P2 at 3 and 5,
   P3 at 7, P0 at 2.
+- Fold anchors counted in the flattened brief (print-only python3 -I from stdin): all 50 old phrases once each. Extra
+  Low found: three cross-references send the launch re-check to "section 12 item 8" (:172, :185 "items 3 and 8",
+  :1220); the re-check is item 9. TE-Q3's words: advisor-te-m3.md:136-139 (sha256 5ecc3e23), anchors once: new P16.
+  Counts at c49773f: P5 11/11, 491/561, self 71 of 71, marks 81, redact 0 (te-m3-check :76). TE-M3's test at the head:
+  doc :2544-2553, attribute :2554, fn :2555-2614. npt-log's tests are inline (log/src/lib.rs:549): Q13's lane is
+  lib.rs only. ClientCounters' press_refused, late, buffer_full are pub (room.rs:118-122). With Q8 (a) and Q9 (b):
+  13,500 s = 405,000 ticks; 27 runs' warm-ups at most 810 s. Q1: SIM_BUILDS (check.mjs:1636-1640) keeps one npt-sim set
+  if npt-bots names npt-sim with no features; npt-net's tree adds to the wasm step's npt-lab release builds: the
+  commit's own counted run measures it.
+- B10: writing the ruling file now.
+- B10 done: advisor-u4r-brief.md written. APPROVE WITH CONDITIONS (L1-L6). Mediums A1 (TE-M3 line, P12, P16), A3 (P0
+  lead margin); Lows A2 (c49773f tests), A4 (press rule for b1), A5 (item 8 -> 9), A6 (pump.rs :276-287), A7 (carry 49
+  test unmarked), A8 (RR-L4, d2-r1 :209-212), A9 (the slip). Q1 (b), Q2 (c), Q4 (a), Q6 (a) + field rule, Q7 (a), Q8 (a),
+  Q9 (b), Q10 (b'), Q11 (a), Q12 (a), Q13 (a) bounded, Q14 (a1) amended + (b1) + press rule; carry 74 amended; D13
+  widened; P4's string gains npt-log, npt-server and the marks step. Runner approved; INF2-4 met. Nothing for Mustafa.
+  Plan and carries anchors for L2 counted once each.
