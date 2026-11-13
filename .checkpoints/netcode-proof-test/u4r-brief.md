@@ -26,7 +26,9 @@ r1's cite and D5 (FQ6). Section 10's "Answered" table gains a row for each of th
 to Q14), its third cell the main session's, with the fold ruling's words for U4R-Q1 (FQ6), Q4 and Q12 and its additions
 for Q9 and Q14 (FQ4); the questions stay below it as asked. Not folded here: A3 and A4 (their words are inside U4R-Q14's
 ruling); A9 (a record: no brief change); the plan and carries text (the main session's L2 commit); the placeholders and
-values (section 12 items 1 to 3, next).
+values (section 12 items 1 to 3, next). At launch, by u4r_fill.py at `<base>` 614823c: P6 and P7 filled; P1 to P5 and P8
+to P16 copied; section 0's plan, carries and history stamps re-set and the cites L2 moved re-pointed, section 10 kept as
+written; section 9's R11 re-walked for L3.
 
 ## Changes in rev 3.1 (rev 3 to rev 3.1: netcode-architect's check, u4r-brief-r3-check.md; each by its finding)
 
@@ -157,13 +159,13 @@ values (section 12 items 1 to 3, next).
 - **C22. The review panel** (section 12 item 7): plan :803's four (netcode-architect, test-engineer, engine-architect,
   rust-reviewer) plus security-auditor (carry 76's session boundary, carry 85's refusals; carry 63 if U4R-Q13 gives it
   to U4r) and infra-engineer (carry 84's time bound; the step's time against its budget), at most three at a time
-  (plan :885-886), for the advisor to confirm.
+  (plan :886-887), for the advisor to confirm.
 - **C23. U4R-Q10's facts settled at the head** (D12): at P0 the server end's first sample, from `JoinAccepted`'s
   packet, is applied by the first net call at or after its send (l1/src/lib.rs:947-959, :1418-1465), before any later
   read at that instant; so the RTT rule's VOID cannot fire on a correct build at P0, and (a') could not show it.
   The recommendation (b') stands.
 - **C24. The run scripts' target folder:** c-u2 builds into the main folder's own cache and reads its binaries from
-  .gate/netcode-proof-test/target (c-u2:55-61; .cargo/config.toml:3-4), as plan §7.1 item 6 (:917-918) has the
+  .gate/netcode-proof-test/target (c-u2:55-61; .cargo/config.toml:3-4), as plan §7.1 item 6 (:918-919) has the
   judged runs; 2.3 asks the scripts to read each artifact's path from cargo's JSON messages (check.mjs:2120-2140's form)
   so that they hold under either target, and section 12 item 8 leaves the choice to the main session.
 - **C25. U4R-Q4 updated** for -58's move and the contract test's new suites (ES: carry 59; tick16 past the wrap: 73;
@@ -188,17 +190,22 @@ script at launch (section 12 item 3). Every `<base>` and count is filled then to
   (c88eb31), A13's server bans (1b4a3c8) and main's PRs #50 and #51 (bfda3cd). The checkpoint saver may add commits
   after it; they touch .checkpoints/ only, and the stamps below are what the re-check at launch compares (section 12
   item 9).
-- **Stamps at that head** (sha256, line count): `plan` is .checkpoints/netcode-proof-test/u4-build-plan.md (1,092
-  lines, 01ede63d…); `plan.md` is the proof test's plan (rev 3.3, 1,518 lines, 3ca4e12a…); `carries` is
-  u4s-carries.md (644 lines, 8b7f165e…); `history` is history.md (2,011 lines, 88bc195f…). The advisor's rulings, each
-  a closed record: `advisor` advisor-u4.md (7b3e76ca…), `wave1` advisor-u4-wave1.md (a45575ae…), `close`
-  advisor-u4d-close.md (cbc7e1c9…), `j-ruling` advisor-u4j.md (a98dfdb4…), `j-r2` advisor-u4j-r2.md (7efa9410…),
-  `df-ruling` advisor-u4df.md (842ec092…), `e-ruling` advisor-u4e-brief.md (3485a6c6…), `e-r1` advisor-u4e-r1.md
-  (7c129309…), `e-r2` advisor-u4e-r2.md (14b0b180…), `d2-ruling` advisor-u4d2-brief.md (155f3376…), `d2-r1`
-  advisor-u4d2-r1.md (9978b43b…), `d2-r2` advisor-u4d2-r2.md (e776f0ba…), `m9` advisor-u4d2-m9.md (f31f7876…), `te-m3`
-  advisor-te-m3.md (5ecc3e23…), `te-m3-check` advisor-te-m3-check.md (1ffd0294…), `u4r-check` advisor-u4r-brief.md
-  (35f281bf…). All of these are in .checkpoints/netcode-proof-test/. `card` is .checkpoints/netcode-proof-test.md, cited
-  by section and item, never by line.
+- **Stamps at that head** (sha256, line count): `plan` is .checkpoints/netcode-proof-test/u4-build-plan.md (1,093
+  lines, 1e631c55…); `plan.md` is the proof test's plan (rev 3.3, 1,518 lines, 3ca4e12a…); `carries` is
+  u4s-carries.md (661 lines, e8675a02…); `history` is history.md (2,027 lines, 40ae4c30…). The plan's, the carries' and
+  history's stamps were re-set at launch (section 12 item 9, by u4r_fill.py): L2's commit 8bcbf36 changed the plan and
+  the carries, and every cite of this brief into them whose line moved was re-pointed then, except in section 10, which
+  stays as written (records): its cites read the plan and the carries at the old stamps 01ede63d… and 8b7f165e… (`git
+  show 8bcbf36~1:.checkpoints/netcode-proof-test/u4-build-plan.md`, and the same for u4s-carries.md); history gained
+  lines at its end only (822c010), so no line of it moved; plan.md's stamp holds. The advisor's rulings, each a closed
+  record: `advisor` advisor-u4.md (7b3e76ca…), `wave1` advisor-u4-wave1.md (a45575ae…), `close` advisor-u4d-close.md
+  (cbc7e1c9…), `j-ruling` advisor-u4j.md (a98dfdb4…), `j-r2` advisor-u4j-r2.md (7efa9410…), `df-ruling` advisor-u4df.md
+  (842ec092…), `e-ruling` advisor-u4e-brief.md (3485a6c6…), `e-r1` advisor-u4e-r1.md (7c129309…), `e-r2`
+  advisor-u4e-r2.md (14b0b180…), `d2-ruling` advisor-u4d2-brief.md (155f3376…), `d2-r1` advisor-u4d2-r1.md (9978b43b…),
+  `d2-r2` advisor-u4d2-r2.md (e776f0ba…), `m9` advisor-u4d2-m9.md (f31f7876…), `te-m3` advisor-te-m3.md (5ecc3e23…),
+  `te-m3-check` advisor-te-m3-check.md (1ffd0294…), `u4r-check` advisor-u4r-brief.md (35f281bf…). All of these are in
+  .checkpoints/netcode-proof-test/. `card` is .checkpoints/netcode-proof-test.md, cited by section and item, never by
+  line.
 - **Living and closed files.** The card, carries, history and the plan are living (history's "Decisions taken" is
   newest first; carries gain entries at merges): every placeholder in a living file is copied by a text anchor, and
   every plan or carries cite is re-checked at launch if its sha256 moved (section 12 items 3 and 9). The rulings are
@@ -223,10 +230,10 @@ script at launch (section 12 item 3). Every `<base>` and count is filled then to
 | plan :193-197 | §4.1's npt-room, npt-server, npt-bots and npt-lab rows | plan :194, :195, :197, :198 (rows widened by W1-PUB, e-r1 T6 and d2-r1 T1) |
 | plan :478-480 | §4.15's sources (the generator in test support) | plan :494-497 (`Recording::synthetic` in npt-sim's library) |
 | plan :651-657 | §5 U4d2's `begin`, `hash` and `wasm` step lines | plan :668-683 (`begin(bite, arm_tick)`; npt-lab's clippy.toml by U4D2-Q10) |
-| plan :832-834 | the wave-2 Lanes line | plan :873-880 (U4d2's lane widened) |
+| plan :832-834 | the wave-2 Lanes line | plan :874-881 (U4d2's lane widened) |
 | carries :176-182 | carry 40 | carries :256-264 (its words changed: F3 and U4E-Q5; C6) |
 | carries :146-147 | carry 21 (the canonical order) | carries :148-153 |
-| carries :184-189 | §U4h | carries :548-560 |
+| carries :184-189 | §U4h | carries :554-577 |
 | marks.json :3845-4308, :6325-6390 | -17, -57, -58, -18, -30 | -17 :3845, -57 :4008, -58 :4107, -18 :4262, -30 :6512 (U4j's split of -18 and its edits) |
 | lab/src/main.rs:132-135, :151, :10-11 | U2's probe header: `burst_starts_ns`, `tick_hz` 30, exit 2 | :142, :159, :12-13 |
 | l1/src/lib.rs:349-353, :515, :527, :858 | `rtt_ns` before a sample; P0's ack timing; `with_bite` | :64 and :1748-1750 (None); :947-959 and :1418-1465; :1828-1840 |
@@ -239,31 +246,32 @@ script at launch (section 12 item 3). Every `<base>` and count is filled then to
 
 ## 1. Start
 
-1. **Base:** `<base>` (P6, filled by the main session at launch: the spike branch's head then; U4r depends on U4c,
-   U4d2, U4e and U4j, plan :750, all merged by cc8595d). In your worktree: `git merge --ff-only <base>`; if that cannot
-   fast-forward, `git switch -c u4r-build <base>`; then `git log -1 --format=%H` shows `<base>` and `git merge-base
-   --is-ancestor 4e91830 HEAD` exits 0 (L3's manifests, after TE-M3's fix c49773f on U4d2's merge cc8595d). Record both
-   in your notes before anything else.
+1. **Base:** `<base>` (P6, filled by the main session at launch: 614823c3e69f93c5e2c3d9d57f842c15368710b6, the spike
+   branch's head then, whose spikes/netcode-proof is 4e91830's, L3's manifests (`git diff --quiet 4e91830 614823c --
+   spikes/netcode-proof` exits 0); U4r depends on U4c, U4d2, U4e and U4j, plan :750, all merged by cc8595d). In your
+   worktree: `git merge --ff-only <base>`; if that cannot fast-forward, `git switch -c u4r-build <base>`; then `git log
+   -1 --format=%H` shows `<base>` and `git merge-base --is-ancestor 4e91830 HEAD` exits 0 (L3's manifests, after TE-M3's
+   fix c49773f on U4d2's merge cc8595d). Record both in your notes before anything else.
 2. **Who and where:** one builder, general-purpose, opus, effort xhigh, in an isolated worktree under
    `/home/user/Shamble-Frontlines/.claude/worktrees/` (`isolation: worktree`), under plan §7.1's shared-target rule and
-   W1-TARGET's lock (section 4; plan :909-921; wave1 :558-586). U4r runs alone after wave 2; U4f, U4g and U4h follow it
-   one at a time (Lanes, plan :881-882). The judged runs and the -30 pre-check are not yours: the main session runs them
-   after the merge, in the main folder (plan :766; §7.2 :927-928; section 7).
+   W1-TARGET's lock (section 4; plan :910-922; wave1 :558-586). U4r runs alone after wave 2; U4f, U4g and U4h follow it
+   one at a time (Lanes, plan :882-883). The judged runs and the -30 pre-check are not yours: the main session runs them
+   after the merge, in the main folder (plan :766; §7.2 :928-929; section 7).
 3. **Your notes:** `.checkpoints/netcode-proof-test/u4r-build.md` in your worktree. Its first line names this task;
    then your plan as blocks (one block: one type with its tests, one test, one bite and its proof, one run script, one
    check.mjs change with its self-tests); each finished block written at once, a notes line per finding, one line after
    each block (done, what next). On a restart, read your notes and `git diff` in the worktree first, then continue after
    the last block marked done (section 4's builders' limits).
 4. **The runner:** `/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u4r-run.sh` (P7: sha256 349b51ad…,
-   made by the main session from u4d2-run.sh, only the lane's names changed: u4r-run.sh.diff). `bash <runner> [-x] [-k]
-   <worktree> <log> <command...> [:: <command...>]` takes the lane lock for that one call (`-x` exclusive, else
-   shared), waits until no other cargo or rustc runs, checks 4 GB free, touches every file under your copy's crates/
-   first and every 2 s while the commands run, runs each command from your copy's spikes/netcode-proof with the shared
-   target and `CARGO_NET_OFFLINE=true`, and appends each exit code and the provenance lines (u4r-run.sh:2-16). It stops
-   with exit 5 before taking the lock if the shared target has no CACHEDIR.TAG, and before any command if the lock's
-   file cannot be opened or the lock taken (u4r-run.sh:12-15; m9 Block 2). It stops at the first command that fails;
-   with `-k` it runs them all and exits with the first non-zero code. A run's result is its exit code and the test
-   runner's own summary lines, never a grep (section 4).
+   `bash -n` exit 0 at launch; made by the main session from u4d2-run.sh, only the lane's names changed:
+   u4r-run.sh.diff). `bash <runner> [-x] [-k] <worktree> <log> <command...> [:: <command...>]` takes the lane lock for
+   that one call (`-x` exclusive, else shared), waits until no other cargo or rustc runs, checks 4 GB free, touches
+   every file under your copy's crates/ first and every 2 s while the commands run, runs each command from your copy's
+   spikes/netcode-proof with the shared target and `CARGO_NET_OFFLINE=true`, and appends each exit code and the
+   provenance lines (u4r-run.sh:2-16). It stops with exit 5 before taking the lock if the shared target has no
+   CACHEDIR.TAG, and before any command if the lock's file cannot be opened or the lock taken (u4r-run.sh:12-15; m9
+   Block 2). It stops at the first command that fails; with `-k` it runs them all and exits with the first non-zero
+   code. A run's result is its exit code and the test runner's own summary lines, never a grep (section 4).
 5. **What stops you** (each written in your notes and report, then build the rest): a change to a file outside your
    lane or to an item another unit merged (2.6); a failure under the stop clause (section 4); a manifest change (the
    main session's: U4R-Q1 (b)); a new external dependency; disk below section 4 rule 6's floors; a part a ruling leaves
@@ -273,8 +281,8 @@ script at launch (section 12 item 3). Every `<base>` and count is filled then to
    - plan §5 U4r (:750-803) and what it builds to: §2's rows C2, C4, -18 split and "Sizes for fixes.rs" (:145-150);
      §3's U4-SEAM and U4-SERVER (:162-170); §4.1 (:178-203; npt-bots :197, npt-lab :198); §4.4's starts (:285-286);
      §4.5 (:292-304); §4.6 (:306-328; -57's pairing :327-328); §4.7 (:330-336); §4.9 (:343-358); §4.11 to §4.15
-     (:392-504); §5 U4e's Builds and -18 lines (:715-741); U4g's -58 line (:828-831); U4h's Builds (:835-839); Lanes
-     (:850-888); §6 (:890-906); §7 (:908-931);
+     (:392-504); §5 U4e's Builds and -18 lines (:715-741); U4g's -58 line (:828-831); U4h's Builds (:835-840); Lanes
+     (:851-889); §6 (:891-907); §7 (:909-932);
    - plan.md §4.2 (:421-454; "Nothing depends on npt-lab", :431-432) and §4.7's npt-lab entry with RQ8's order
      (:617-628), its binaries (:611-612) and bites (:630-631); context only, U7's work: plan.md's U7 row, C-U7-2
      (:1247: U7 splits loader.mjs; carry 85 (a) edits its header sentence first);
@@ -286,7 +294,7 @@ script at launch (section 12 item 3). Every `<base>` and count is filled then to
      U4E-Q13 (:246-264) and "For later briefs" (:338-344); e-r1 R1, R2's A5, R4 and R5 (:57-122, :157-166, :221-250,
      :282-285); e-r2's merge note (:190-196); d2-ruling A13 (:568-592); d2-r1 Block 5 (:287-310) and its routes
      (:205-216); d2-r2 Blocks 1, 2 and 6 (:59-170, :294-311); m9 Blocks 1 and 2 (:82-266);
-   - carries §U4r whole (section 3.1) and entries 6, 14 and 20 (3.3); the recordings section (carries :461-489), for
+   - carries §U4r whole (section 3.1) and entries 6, 14 and 20 (3.3); the recordings section (carries :464-492), for
      2.6's RM line;
    - marks.json as merged at `<base>`: -17 (:3845 on), -57 (:4008 on), -18 (:4262 on), -30 (:6512 on), PM-0001-2
      (:152 on), -20's and -21's parts (for U4R-Q4); SERIES.md's rows of section 9's R26; README §1 (:8-86) and §4
@@ -308,7 +316,7 @@ script at launch (section 12 item 3). Every `<base>` and count is filled then to
      `with_bite`), crates/proto (lib.rs, quant.rs's `BITES` and `with_bite`, input.rs's `Input`, snapshot.rs's
      `EntityDelta`), crates/hash-wasm/loader.mjs's header (:1-30); check.mjs's steps (:2468-2503), test step
      (:1973-1982), deps step (:2062 on) and wasm step (:2099 on), and check.test.mjs's tests of those two steps;
-   - .claude/rules/netcode.md: binding on proto, room, client and server code (plan §7.1 item 8, :920-921); U4r edits
+   - .claude/rules/netcode.md: binding on proto, room, client and server code (plan §7.1 item 8, :921-922); U4r edits
      none of those crates, but its runner, replay clients and bots feed them, and its determinism lines (seeded RNG, no
      clock in shared code, deterministic iteration order) are what the twin test checks.
 
@@ -322,8 +330,8 @@ records -30's pre-check without moving -30 (:772-796) and logs the sizes for fix
 plan: `InputBuffer` option A, `ClockSync` and the cheats' `Behaviour`s (U4f, :806-809); `Predictor`, `Interp`,
 `CueLog` (U4g, :819-823); -58's judged runs (U4g, :828-831: W1-N2); the view-time tolerance, the cap, the view-time
 estimate with the pump's RTT, the TC shooter's `Behaviour`, the tolerance-edge stamper and the 150 ms pong delayer (U4h,
-:835-839); npt-bots' npt-net glue and npt-load (U6, :896-897); -30's marked C part (U6, :894-895); fixes.rs's
-run-structured bound (its own small unit after U4r, :903-904: U4r only logs the sizes). Where this brief finds the
+:835-840); npt-bots' npt-net glue and npt-load (U6, :897-898); -30's marked C part (U6, :895-896); fixes.rs's
+run-structured bound (its own small unit after U4r, :904-905: U4r only logs the sizes). Where this brief finds the
 plan silent it says so; it adds nothing it does not mark as its own (2.1's test of carry 49's refusal, 2.4 r6 and r7,
 7.2's added records, 8.4's switch), each there for the advisor to keep or drop. The carries' own tests and reports
 (section 3.2) are the carries', not additions.
@@ -390,7 +398,7 @@ Each item from plan :751-757, built to the section named.
 - **`scenario`** (with `--record`) and **`replay`** (§4.1 :198; plan :753-755): `replay` is the x86-64 re-decode (R-8,
   the advisor's condition 9, :140-142): it re-decodes a run's logged client bytes natively and writes the clients'
   hashes as `hs.replay_hash`, only in a `replay` log on x86_64 (carry 62 (a); SERIES.md:319). The clients' received
-  bytes (datagrams and stream bytes) are logged under .gate/ (plan :762); never committed (plan §7.2 :927-928). U4d2's
+  bytes (datagrams and stream bytes) are logged under .gate/ (plan :762); never committed (plan §7.2 :928-929). U4d2's
   `hash` subcommand, `HashCompare` and `TickHash` stay as merged but for carries 82 and 83 (2.6).
 - **The three runner recordings at U4r** (§4.15 :494-501; plan :755-756; the advisor's condition 3): `scenario --record`
   at SS P2 seed 1 and ES P3 seed 2, and SS P0 seed 4 (the -30 pre-check's source only; TC B1 seed 3 is U4h's, with its
@@ -483,7 +491,7 @@ Each item from plan :751-757, built to the section named.
 
 ### 2.2 npt-bots' library and its clippy.toml (crates/bots: src/ but src/bin/, clippy.toml, tests/)
 - **`Behaviour`** (§4.1 :197), clock-injected and transport-free (U4-SERVER, plan :169-170), with the two kinds U4r
-  builds (plan :756): the brawl (the stress scene's 48 soldiers fighting in 3 × 16, holding fire so the scene's shot
+  builds (plan :756-757): the brawl (the stress scene's 48 soldiers fighting in 3 × 16, holding fire so the scene's shot
   rate can meet PM-0001-2's band: §4.13 :428-447; and a short ES suite: carry 59) and the open-loop scripts (the
   contract test's suites, U4R-Q4). The TC shooter is U4h's (:837); the cheats and the never-acker are U4f's (:808-809).
 - **When the bots give a command, and the view time they stamp** (plan silent; this brief's reading of the merged
@@ -522,7 +530,7 @@ Each item from plan :751-757, built to the section named.
 - crates/bots/src/bin/ (npt-bots, npt-load) stay as merged: their U4 halves are not in the plan.
 
 ### 2.3 Run scripts (ops/runs/c-u4r-*.mjs)
-- As c-u2 does (plan :756-757): `--date YYYY-MM-DD` (c-u2:40-42); refuse uncommitted changes to tracked files
+- As c-u2 does (plan :757): `--date YYYY-MM-DD` (c-u2:40-42); refuse uncommitted changes to tracked files
   (c-u2:43-45); raw logs under .gate/netcode-proof-test/runs/<set>-<short>/ and results under results/<set>/<short>/,
   never overwritten (c-u2:46-50); both builds of npt-lab built `--release --locked` and copied out before the next build
   replaces them, then npt-judge (c-u2:52-61); `npt-judge --marks marks/marks.json --logs <logs> --only <ids> --out
@@ -530,7 +538,7 @@ Each item from plan :751-757, built to the section named.
   one line per run (c-u2:93-104).
 - **Where the binaries are read from:** c-u2 reads them from the main folder's own cache (`join(GATE, "target",
   "release", ...)`, c-u2:55 and :61; .cargo/config.toml:3-4), as plan §7.1 item 6 has judged runs (`CARGO_TARGET_DIR`
-  unset: :917-918). Read each artifact's path from cargo's `--message-format=json` messages instead (check.mjs's form
+  unset: :918-919). Read each artifact's path from cargo's `--message-format=json` messages instead (check.mjs's form
   for its release builds, WASM_BUILDS, :2120-2140), so that a script is right under the main folder's cache and under
   the shared target alike, and say so. The judged runs use the main folder's own cache, `CARGO_TARGET_DIR` unset (plan
   §7.1 item 6); a move to the shared target comes to the advisor first (section 12 item 8).
@@ -623,7 +631,7 @@ Each item from plan :751-757, built to the section named.
   other lanes built (2.6).
 
 ### 2.5 Bites U4r plants (unit-shown; sites in U4r's files unless marked)
-Each chosen per instance (§4.11 :399-401), shown by a test that fails by name in the bites build (§7.1 item 3, :913-914)
+Each chosen per instance (§4.11 :399-401), shown by a test that fails by name in the bites build (§7.1 item 3, :914-915)
 and passes in the clean build. The bites U4r runs judged but other units planted are in section 7.
 
 | Bite | Site | Proof |
@@ -661,21 +669,21 @@ and passes in the clean build. The bites U4r runs judged but other units planted
   carry 18's route). Run settings that marks.json and SERIES.md fix as data (`tick_start` = 63,736: -17's setup check;
   `ticks_below_wrap` = 30: SERIES.md:253) are header values, never `*_TICKS` constants; durations are in ns or s, turned
   into ticks through npt-sim's functions.
-- **RM (T4 item 3; carry 67, carries :462-479)** binds only a change that moves ES's synthetic recording (D-7's ES
+- **RM (T4 item 3; carry 67, carries :465-482)** binds only a change that moves ES's synthetic recording (D-7's ES
   digest) or the World's outcome on it (t_m1's line); carries 71 and 72 likewise. U4r's plan is neither: it edits
   no crates/sim file and regenerates the three synthetic recordings with `Recording::synthetic` as merged. Your report
   says "not applicable, no change to the synthetic recordings or the World" with `git diff --stat <base> --
   spikes/netcode-proof/crates/sim` (empty). If your manifest change alters how the synthetic three are generated, that
   is such a change: stop.
 
-### 2.7 Public items (A19; plan §7.2 :929-930)
+### 2.7 Public items (A19; plan §7.2 :930-931)
 - Allowed: npt-lab's `SimClock`, `L1Scenario`, `ReplayX86` (plan.md:617; `HashCompare` and `TickHash` are U4d2's) and
   its subcommands `scenario` (with `--record`) and `replay` beside U4d2's `hash` (§4.1 :198); npt-bots' `Behaviour`
   (§4.1 :197). Everything else `pub(crate)` (plan.md:454); `probe`, `machine` and `hash` stay modules of the binary
   (lab/src/main.rs:16-18).
 - Your report lists every pub item U4r adds (types, functions, methods, fields, constants), by crate, against §4.1 and
   plan.md §4.7, and the names check.mjs newly exports for its self-tests, counted as d2-r2 counted them (EA2-1,
-  :150-154); engine-architect checks them (check.mjs does not: plan :930).
+  :150-154); engine-architect checks them (check.mjs does not: plan :931).
 
 ---
 
@@ -688,7 +696,187 @@ main session copies the block by its heading, by script, at launch (section 12 i
 number, "met" (file:line and the test or record that shows it), "not met" (why) or "not applicable" (why).
 
 ```
-<<P1>>
+## U4r (the L1 runner and its judged runs)
+40. **O1 (u4-conditions-check.md:42-45; advisor-u4.md:343-347; the advisor's U4s ruling, O1; its last sentence the main
+    session's words for the advisor's W1-U4E ruling, U4E-Q5, approved with the clause 'for the tolerance and the cap' by
+    the advisor's U4d close ruling):** "U4r's brief, which comes to the advisor, states that at U4r the room has neither
+    the view-time tolerance nor the cap (both land in U4h: u4-build-plan.md §5 U4e's `rewind_at` and §5 U4h), so the -30
+    pre-check's setup condition (0 view-time replacements and 0 clipped shots on both legs: the advisor's condition 3)
+    holds by construction at U4r for the tolerance and the cap, and its RTT argument cannot be tested there; and it
+    either re-runs the pre-check pair after U4h merges (6 runs) or says why not (the advisor's lean is the re-run). The
+    room's count of commands that `rewind_at` gives no Rewind, because the ring does not hold their claimed view time's
+    tick, counts as a replacement in that setup condition: a pre-check leg with any is VOID (U4E-Q5)."
+49. **N-M4 and TUNE-2 (advisor-u4-wave1.md:291-294; the advisor's W1-U4D ruling):** "The contract test's report gives,
+    for each SS suite, the share of snapshots whose client set holds all 4 very large units, and the mean number of
+    projectiles per client set (reported, not judged: W1-U4D N-M4). The runner refuses a scripted spawn or teleport
+    above World's stated clamp bound (W1-U4D TUNE-2)."
+58. **U4E-Q6's two conditions (advisor-u4-wave1.md:476-479; the advisor's W1-U4E ruling; homed by the advisor's U4d
+    close ruling):** "U4r's contract test logs each client's relevant gameplay-event rate and its event queue's
+    high-water mark per burst. An overflow resync in any judged -17 or -18 run (U4r's, or a later unit's) is reported,
+    and those runs come to the advisor before they count: net F121 warns that a cap set too low resyncs every client
+    on every burst and changes -18's heal path."
+59. **A2-L3 and T2-M1, ES under the bots (u4d-round2-arch.md, u4d-round2-test.md; the advisor's U4d close ruling):**
+    "U4r's contract test also runs a short ES suite of the brawl `Behaviour` (48 clients) and resolves PM-0001-2's ES
+    checks on it: shots, gameplay events, live projectiles and spawns in their bands (W1-U4D T-M1's numbers) and the
+    share of snapshots whose client set holds all 47 other soldiers and all 15 vehicles. A band or share missed goes
+    to the advisor before any ES run of PM-0001-12 counts. The ES runs themselves stay under PM-0001-2's counter
+    script, run by run (ADR 0001:1480). Since U4d-F all 15 of ES's hulls loop inside the fight (the advisor's U4d close
+    ruling, B1.3), where they are cover and block moves: on the synthetic recording, at its old reckoning and share,
+    they cut ES's gameplay events from 9.853 to 7.250 a second over 300 s (U4d-F's step 2). The brawl meets the same
+    hulls. U4r's report gives that figure beside its ES suite's event rate, and a missed event band is not read as a
+    bot defect before the advisor has seen both."
+60. **TUNE-1's header (advisor-u4-wave1.md:252-253; the advisor's W1-U4D ruling; homed by the advisor's U4d close
+    ruling):** "Each run's header records the scene's weapon (interval, damage, reach, magazine, reload, spread) and
+    its soldiers' health, read from `Scene::weapon()` and `Scene::health()`. U4r's runner writes them into npt-lab's
+    L1 headers, and the contract test shows them in every header. U6's npt-server header does the same (plan.md's U6
+    row)."
+62. **U4j's log rules, U4r's runner and logs (the advisor's U4j ruling, "Carries", U4r, with FX-5 (a), FX-10, FX-12
+    and R2.4; its round-2 ruling, B2.1: NC-U4J-R2-N1 and N6):** "U4r's logs meet marks/README.md §1's `hs` rules as
+    U4j merged them, and the judge's coverage rule (SERIES.md's `decoded_hash_mismatch_count` row): (a) each name
+    only in its own process's log: `server_hash` in the room's (process `room`), `decoded_hash` in the clients'
+    (`client` on L1, `bots` on L2), `replay_hash` only in a `replay` log on x86_64; (b) every `hs` list and every
+    `tick.s.snap_incomplete` list holds exactly the room header's `clients` entries, at the room's slot; (c) the
+    writer buffers each client's ticks until every earlier tick is resolved, and writes a tick lost only once none of
+    its groups can still decode (once it has left the client's frame ring, or at the stop: on L1 the runner may
+    decide it there); a hash is never dropped, else the log ends `crash`; (d) the head: every client is admitted,
+    and its first snapshot resolved, in the warm-up, before the room's first measured hash for its slot (a client
+    admitted later is -19's join: C-U6-11); (e) the tail: after the measured phase the clients keep logging until
+    every measured tick is resolved, a tick still in flight at the stop is not written, and the room's log covers
+    every snapshot the room sent (it sends none of a tick it does not log); (f) a run and its twin log `h` over the
+    same ticks; (g) the contract test shows `decoded_hash_mismatch_count` resolving with no gap on every -17 suite, a
+    short L1 P3 suite with the reorder step on among them (no `crash` footer, 0 mismatches, no gap), and, if U4e's
+    client drops stale groups (entry 61 (d)), reports its drop count beside `decoded_hash_compared_count` on -58's
+    P3 suite; (h) NC-10 (the advisor's U4j ruling, R2.4): the contract test reports `tick.s.snap_incomplete`'s sum on
+    each short L1 P0 run. If it is 0 on every one, U4r adds to -17's L1 P0 part, with a bite (a client that writes
+    null and incomplete 1 for a refused group), before -17's judged runs: `{"name": "setup: L1 P0 loses no group (no
+    client-tick left incomplete)", "series": "tick.s.snap_incomplete", "stat": "sum", "window": "measured", "op": "==",
+    "value": 0, "parts": ["L1 P0"], "setup": true}`. If it is not 0, the cause goes to the advisor first. (Both the
+    reported sum and the check read the measured phase: each join's ticks between its full state and that full state's
+    acknowledgement carry no snapshot, so the client resolves them lost by design in the warm-up: the advisor's U4e
+    round-1 ruling, R5, NC-L10.) marks/ is not U4r's lane unless its brief gives it this one check; else the main
+    session adds it in its own commit."
+63. **FU-3 and FU-7's log half, the next change to npt-log (the advisor's U4j ruling, FU-3: SEC-F10; its round-2
+    ruling, B3: SEC-R2-N2):** "The next change to npt-log (U4r's, if its brief takes crates/log; else the unit that
+    next edits it) adds two refusals, each with a test that fails before it: `read_log` refuses a JSON object with a
+    duplicate key (today the last one wins, silently: FU-3); `check_header` refuses any header text field holding a
+    character for which Rust's `char::is_control` holds (today it refuses only an empty `run`, `set`, `role` or
+    `process`: log/src/lib.rs:305-321; FU-7). Until then both stay open security findings in PR #40's report."
+69. **NF-L1's U4r half (u4df-review-netcode.md; the advisor's U4d-F ruling, R3):** "U4r takes no ES byte or bandwidth
+    figure from `Recording::synthetic`'s ES recording as ES's load: its judged ES runs are the bots' (carry 59). Any ES
+    byte figure it reports from that recording states the recording's churn beside R2's moving-delta assumption: yaw
+    changing on about 48 % of alive soldier-ticks and pitch on about 18 % (U4d-F's scene), against yaw in every moving
+    update and pitch half the time (docs/research/r2-netcode.md:1751)."
+73. **NC-H1 and TE-1, tick16's judged half (u4e-review-netcode.md, Block h; u4e-review-test.md, TE-1 and probe Q-1;
+    the advisor's U4e round-1 ruling, R1):** "Since U4e, under PM-0001-17/tick16 and PM-0001-58/tick16 the client
+    files the sentinel for each post-wrap group under the tick its 16-bit header names (0, 1, 2 …): ticks before the
+    client's first snapshot, which the room never logged for that slot (marks/README.md §1's bad-header sentence), so
+    `decoded_hash_mismatch_count` counts each one, while the post-wrap ticks the room did log stay unresolved for that
+    client. U4r's client writer places those hashes in its log (README §1: it files every hash under its rebuilt tick,
+    buffering and sorting before it writes, so that records stay in tick order) and never ends the log `crash` for
+    them. Its contract test runs one short tick16 bite run past the wrap (-58/tick16's `ticks_below_wrap` = 30 keeps it
+    short) and shows the judge's outcome: the mismatch figure FAIL with at least one mismatch, never INVALID (the judge
+    returns a mismatch count before it reads a coverage gap: judge/src/figures.rs:542-554)."
+74. **NC-M6, the endpoint's lead (u4e-review-netcode.md, Block h; the advisor's U4e round-1 ruling, R3):** "U4e's
+    `ClientEndpoint` stamps each command `newest + lead`, with a lead of 1 by default (crates/client/src/lib.rs), and
+    U4f's lead controller comes after U4r's runs. On a link whose one-way delay is above about half a tick period every
+    command would reach the room after its tick and be dropped as late, `last_run` would stay `None`, and option B
+    would have nothing to repeat: -17 would compare a world of soldiers standing still. U4r sets each endpoint's lead
+    with `ClientEndpoint::with_lead` from the run's profile (the round trip plus the jitter, in ticks rounded up, at
+    least 1, plus 1: `npt_sim::ticks_for_ms(rtt_ms + jitter_ms).max(1) + 1`, so P0 2, P1 3, P2 and B1 5, P3 7, within
+    `CMD_CATCHUP` = 8; its bots give a command only at a client step whose newest snapshot tick moved since their last
+    command, and move each press counter by at most one edge per command; the advisor's U4r brief check, U4R-Q14),
+    records it with `cmd_timing` in the header, and its contract test reports on each short run the commands that
+    arrived late (the room's `late` count) beside the commands sent; a run with more than 1 % of its commands late comes
+    to the advisor before its marks count."
+75. **NC-M5 and A3, the client's event-number base (u4e-review-netcode.md, Block h; u4e-review-arch.md, A3; the test
+    seat's probe Q-10; the advisor's U4e round-1 ruling, R3):** "U4e's client rebuilds each event's 16-bit number near
+    its own start (`ClientEndpoint::with_starts`, 0 by default), and the wire carries no event base (`JoinAccepted` and
+    `FullState` have none), so a client whose start is 32,768 or more from the room's counter rebuilds every event
+    number wrong, and the hash reads them (Q-10). U4r's lab gives each endpoint, through `with_starts`, the event start
+    it gave the room (`Room::with_event_start`) and its command start, and admits every client before the room has
+    stamped 32,768 events past that start (about 30 s of SS's events); a later admission comes to the advisor first
+    (the room exposes no event counter). The contract test shows `decoded_hash_mismatch_count` 0 on a run whose event
+    start is far from 0 (-58/lt-event-seq's, 3 below the wrap, among them). The wire field is U6's (C-U6-13)."
+76. **A6 and SEC-U4E-5, ending a session (u4e-review-arch.md, A6; u4e-review-security.md, SEC-U4E-5; the advisor's U4e
+    round-1 ruling, R3):** "npt-room decides a replacement and a `Kick(overflow)` but sends the old connection nothing,
+    npt-server's `Decoder` has no call that ends a session, and `Room::receive` takes any message by slot alone, so the
+    caller's session handling is a security boundary. U4r's lab, when `Room::join` reports a replacement, sends the old
+    session `Kick(replaced)` and drops its `Decoder` and link before it routes anything else; when the room kicks a
+    client or takes its `Leave`, it drops that session. Two tests: a second endpoint joining with slot 0's token and
+    bind while the first is live, after which the first's Inputs and `Leave` reach no room call and the second keeps
+    the slot; and a kicked session whose later datagrams reach no room call."
+77. **U4r's readings of U4e's room and client (u4e-review-netcode.md, NC-L2, NC-L4, NC-L9 and NC-L10; the advisor's U4e
+    round-1 ruling, R4 and R5):** "(a) -58's wrap check counts `event.counter_wrap` records (marks.json -58), and the
+    room and the client report wraps per client slot (`ClientSlot::wraps`, `StepOut::wraps`): U4r writes one record per
+    counter name that wrapped (SERIES.md's row: 'per counter that wrapped'), never one per client, so one counter's 48
+    per-client wraps cannot pass the check. (b) Under PM-0001-18/no-fallback, a burst whose last acknowledged baseline
+    is exactly 32 ticks old at the first tick after it logs `event.burst_eviction` 1, yet the bitten room codes that
+    tick from the defaults (its stale copy is taken only once B's ring slot is overwritten) and heals: U4r's report
+    counts the bitten runs' bursts at that age apart. (c) The contract test reports each client's
+    `ClientEndpoint::stale()` sum on each short L1 run (groups of ticks already resolved when they left the frame ring;
+    no SERIES.md row); a sum above 0 on L1 comes to the advisor."
+82. **EA-8 with RR-L5, the recordings manifest (u4d2-review-arch.md, EA-8; u4d2-review-rust.md, RR-L5; the advisor's
+    U4d2 round-1 ruling, Blocks 4 and 5):** "U4r's runner recordings join crates/lab/recordings.json (§4.15), whose
+    entries today hold only the synthetic generator's inputs, read by hash.rs's `manifest` and generated by its
+    `regenerate_all`: U4r changes that schema (a kind or script key, and the dispatch both functions need), and its
+    brief says so. With that change, the reader checks each entry's name against `[A-Za-z0-9-]+` and bounds `ticks` by
+    `bytes / 12` before it generates anything (today a bad name reaches a file path and the `h <recording> <tick>
+    <hash>` line, and a large `ticks` reaches `Vec::with_capacity` before the length and SHA-256 check)."
+83. **EA-6, EA-3 and TE-L3, the comparer for -30 and the wasm step's verdicts (u4d2-review-arch.md, EA-3 and EA-6;
+    u4d2-review-test.md, TE-L3; the advisor's U4d2 round-1 ruling, Block 5; with EA2-3, RR2-L3 and TE2-R2-2: the
+    advisor's U4d2 round-2 ruling, Block 2):** "(a) For -30's pre-check, U4r gives `HashCompare::of` two lists that
+    name the same recording on both legs and line up tick for tick (it compares by position, names included), and says
+    where its printed comparison line comes from (`compare_text` is private to npt-lab's binary); TickHash's struct doc
+    then says what its field doc says, 'the recording both legs replay' (today it still says 'the recording (or run) it
+    replays'). (b) At U4r's change to check.mjs's `wasm` step (its recordings: entry 82), the clean half also requires
+    exit 0 from `npt-lab hash` and `npt-lab hash compare` (today the verdict is read from their English lines alone,
+    which fails closed), with one fixture case each. (c) In the same change, the std-sin verdict re-shows that the bite
+    causes the mismatch it judges: the bitten native leg's first difference from a clean bites-build native leg is the
+    committed (recording, tick, field), or the step FAILs when the committed catch is not on the manifest's first
+    recording before the hash-map bite's arming tick (today it is sound only because SS-s1's tick 2 lies inside the
+    hash-map pair's equal prefix). (d) One npt-lab bin test runs `hash compare` with a bite and no `--on` over two
+    recordings and asserts that only the first listed is armed (EA-9's one default, the legs'; today no test pins it:
+    compare arming every recording again leaves every test and the step green, r2-te-rr2-l3-compare-arm.log)."
+84. **INF2-1 with INF2-2 and TE2-R2-1, the wasm step's time bound and a stopped call's processes
+    (u4d2-r2-review-infra.md, INF2-1 and INF2-2; u4d2-r2-review-test.md, TE2-R2-1; the advisor's U4d2 round-2 ruling,
+    Block 1):** "At U4r's change to check.mjs's `wasm` step (entries 82 and 83), or in ops/runs/det-u4.mjs if U4r's
+    Evidence decision moves the step's runs there: (a) the step's calls other than its cargo builds share one deadline,
+    WASM_CALL_LIMIT_MS (300 s) from the first of them: each is given what is left, and once one is stopped the rest are
+    not started, each named as skipped (today each call has its own 300 s, so a hang in npt-sim's replay makes 12 calls
+    each wait out 300 s, 60 min under the exclusive lane lock: r2-inf-hang.log). (b) A call stopped by the deadline
+    takes every process it started with it (today spawnSync's timeout signals only the direct child, so `npt-lab
+    hash`'s two leg processes can keep running after their parent is stopped, unseen by the runners' idle wait, which
+    looks for cargo and rustc only), by a documented means (its own process group, killed whole, or another) or by one
+    whose effect (c)'s second test proves. (c) Two self-tests: the shared deadline, with a fake runner and clock (a
+    first call that takes the whole limit; the next calls skipped and named); and run() itself on real processes (a
+    child that starts a grandchild and sleeps, with a limit of about 200 ms: run() returns `timedOut`, and neither
+    process is left), which also pins run()'s timeout wiring (today dropping it leaves 71 of 71 green:
+    r2-te-inf2-2-run-timeout.log)."
+85. **The deps step's unread inputs and two overclaims (u4d2-r2-review-security.md, SEC-U4D2-R2-1 to -3;
+    u4d2-r2-review-rust.md, RR2-L1, RR2-L2 and RR2-L4 (a); u4d2-r2-review-test.md, TE2-R2-3; the advisor's U4d2 round-2
+    ruling, Block 2):** "At U4r's change to check.mjs (entries 82 to 84), the deps step, each refusal naming its source
+    and value, with one self-test case each, and the container's environment and the spike's own config still passing:
+    (a) refuses a linker set for any target, by an environment variable whose name ends in _LINKER or by a `linker` key
+    in any table of a cargo config read, as COMPILER_ENV and COMPILER_KEYS refuse a compiler (today
+    CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER passes: r2-rr-superset.log run 3); and DEPS_CHECKED's limits and
+    crates/hash-wasm/loader.mjs's header (the one edit U4r makes in crates/hash-wasm) say what the target_features read
+    gives: a feature enabled at compile time shows in the section, which the loader refuses, but the section is the
+    linker's record, so link arguments from a RUSTC_WRAPPER (allowed, for sccache) can rewrite it (built:
+    sec_probe_tf2_ld.wasm, r2-sec-loader.log), and the x86-64 legs have no artifact check (today both say a flag from a
+    route check.mjs does not read is refused too). (b) It refuses any `profile` key in a cargo config read and any
+    environment variable whose name starts with CARGO_PROFILE_ (today a config's `[profile.release.package.npt-sim]
+    overflow-checks = false` passes and drops npt-sim's `-C overflow-checks=on`, which plan §4.5 asks for in every
+    profile: r2-sec-fx1-config.log, r2-sec-routes.log). (c) In npt-tcpinfo and npt-hash-wasm it refuses `include` other
+    than directly before `!` and an opening bracket, and in every crate an attribute whose text starts with a
+    metavariable (`#[$` or `#![$`; none today), so that neither `m!(include!)` nor a #[path] built from a `meta`
+    fragment brings an unread file under a listed export's allow (today both pass, and deps' held line says every
+    include! literal names a .rs file: r2-te-sec-r2-3-macro-include.log, r2-sec-pathmeta.log). (d) It reads an empty
+    CARGO_HOME as unset and a relative one against the folder cargo runs in, as cargo does (today an empty one hides
+    ~/.cargo/config.toml from FX-1's refusal and from the read-back: r2-rr-cargohome.log). (e) Its text beside
+    buildInputProblems says which source cargo uses: CARGO_ENCODED_RUSTFLAGS if set, even empty; else RUSTFLAGS if set,
+    even empty; else the matching target tables' flags, if any; else build.rustflags (today 'the first non-empty
+    one')."
+
 ```
 
 Seventeen entries: 40, 49, 58, 59, 60, 62, 63, 69, 73, 74, 75, 76, 77, 82, 83, 84 and 85.
@@ -725,9 +913,16 @@ U4r's code meets it (met, with file:line; or not met, with why). The routing sta
 reports them is the advisor's to confirm in reviewing this brief.
 
 ```
-<<P13>>
-<<P14>>
-<<P15>>
+6. **arch F6 / rust 1 (the grep's stated limit):** "The tick grep cannot see a literal passed as an argument.
+   npt-server's and npt-lab's callers build `Schedule::new(npt_sim::TICK_HZ, npt_sim::LOOP_CATCHUP)`; the 60 Hz tests
+   pass `npt_sim::loop_catchup_at(60)`, never a literal 15; a test asserts the server's schedule's catch-up cap equals
+   `npt_sim::LOOP_CATCHUP`."
+14. **rust 3 (the 1 MB half):** "`HitHistory::for_ms` also returns `None` for a span whose ring would exceed 1 MB
+    (capacity × one tick's `HitVolumes` bytes: u4-build-plan.md §4.9), tested at the edge, once `HitVolumes` holds its
+    volumes. The recording header carries the ring's span in ms beside `TICK_HZ` (nit b's capacity), and the replayer
+    rebuilds the ring with `HitHistory::for_ms(span_ms)`."
+20. **arch N2:** "`grid::Config` has a bites-only field, so its shape differs by build: never hash, record or compare it
+    across builds; pass it by value."
 ```
 
 Notes for the builder, which change no word: carry 6's npt-lab half is `L1Scenario`'s `Schedule::new` call (2.1);
@@ -740,7 +935,7 @@ header U4r writes.
 
 ## 4. Build rules
 
-**The shared target** (Mustafa's rule, 2026-11-09: plan §7.1 :909-921; the advisor's W1-TARGET, wave1 :558-586),
+**The shared target** (Mustafa's rule, 2026-11-09: plan §7.1 :910-922; the advisor's W1-TARGET, wave1 :558-586),
 binding on every cargo, rustc and rustdoc call in your worktree, check.mjs's and the `wasm` step's included:
 1. `CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/shared-target` and `CARGO_NET_OFFLINE=true` on every call (the
    runner sets both: u4r-run.sh:18-22). Checked once after the first build: the artifacts are in that folder, and no
@@ -760,30 +955,43 @@ binding on every cargo, rustc and rustdoc call in your worktree, check.mjs's and
    WASM_BUILDS gives them (check.mjs:2120-2140). Their "Compiling npt-lab v… (<your
    worktree>/spikes/netcode-proof/crates/lab)" and npt-bots lines the runner appends are the provenance. Match on
    the path, not the version. A missing line means "not counted", whatever the count says.
-4. Touch before each build: `find <copy>/spikes/netcode-proof/crates -type f -exec touch {} +` (plan :912; the runner
+4. Touch before each build: `find <copy>/spikes/netcode-proof/crates -type f -exec touch {} +` (plan :913; the runner
    does it).
-5. **Counts are deltas** (plan :913-914, :883-884), on check.mjs's measure (`testBothBuilds`, :1973-1982;
+5. **Counts are deltas** (plan :914-915, :884-885), on check.mjs's measure (`testBothBuilds`, :1973-1982;
    `cargoCounts`, :1864). The base: measured 491, bites 561, self 71 of 71, 11 steps, marks 81, redact 0 (P6: the
-   counts at `<base>`; at cc8595d, U4d2's merge, at c49773f, TE-M3's fix, and at 4e91830, L3's manifests, the same: D1).
-   Each run's count is the base plus the tests you added; the step count stays 11 unless your change adds a step; the
-   self count is the base's plus your new check.test.mjs tests. A mismatch means another copy's artifact ran: touch,
-   rebuild, never report that run. `--list` (`cargo test --locked --workspace --all-features -- --list`) only names the
-   new tests; it is not a count. An `#[ignore]` test is not in check.mjs's count (`cargoCounts` reads libtest's "passed"
-   and "failed" only).
+   counts at `<base>`, 614823c, whose spikes/netcode-proof is 4e91830's; at cc8595d, U4d2's merge, at c49773f, TE-M3's
+   fix, and at 4e91830, L3's manifests, the same: D1). Each run's count is the base plus the tests you added; the step
+   count stays 11 unless your change adds a step; the self count is the base's plus your new check.test.mjs tests. A
+   mismatch means another copy's artifact ran: touch, rebuild, never report that run. `--list` (`cargo test --locked
+   --workspace --all-features -- --list`) only names the new tests; it is not a count. An `#[ignore]` test is not in
+   check.mjs's count (`cargoCounts` reads libtest's "passed" and "failed" only).
 6. **Disk** (wave1 :576-580; the runner checks the first floor itself): `df -h /home/user` before each build, the
    reading in your notes. At least 4 GB free before any wasm32 or release build, which every check.mjs run is
    (clippy-wasm32, doc, the `wasm` step) and every `scenario --record` or r5 timing build; at least 2 GB before every
-   other build; below that, stop and report; never clean anything (plan :919).
-7. **Cleans and cargo probes are not yours.** No copy cleans the shared folder (plan :919). The main session's cleans
-   follow W1-TARGET item 3 as amended: "<<P9>>" (m9 Block 2, :252-256). Every brief that cleans or dry-runs cargo keeps
-   m9 Block 2's two lessons: "<<P10>>" (:259-264). Every brief that probes cargo keeps d2-r2 Block 6's lesson:
-   "<<P11>>" (:304-308); it binds carry 85 (d)'s self-test, which reads an empty or relative CARGO_HOME through
-   check.mjs's own function, never by running cargo with it.
-8. After the last bite or plant, touch and rebuild before any further claim (plan :915).
-9. Cargo's own lock still serializes builds: expected (plan :916). The main folder's cache is not yours (plan
-   :917-918).
+   other build; below that, stop and report; never clean anything (plan :920).
+7. **Cleans and cargo probes are not yours.** No copy cleans the shared folder (plan :920). The main session's cleans
+   follow W1-TARGET item 3 as amended: "Between waves, with no lane running, the main session may empty the shared
+   folder by the six part-cleans in one main-run.sh call (advisor-u4d2-m9.md, Block 2), or any part of it by `cargo
+   clean --target-dir` on one of its two tagged roots with `--release`, `--profile dev` or `--doc`, each with its `test`
+   guards; never by a clean without one of those three (the folder-level `cargo clean --target-dir .gate/shared-target`,
+   or one with `--target` alone) while the lane lock's file lives in it; never `--target` without `-p`." (m9 Block 2,
+   :252-256). Every brief that cleans or dry-runs cargo keeps m9 Block 2's two lessons: "(1) never pass `--target` to
+   `cargo clean` without `-p`: with a profile it changes nothing, without one it cleans the whole folder; a triple's
+   folders are reached through `--target-dir <shared>/<triple>`. (2) `cargo clean --dry-run` deletes nothing, but it may
+   write cargo's `.rustc_info.json` into the `--target-dir` it is given: mine did (356 bytes in the triple root,
+   09:37:38). That file is cargo's own cache in its own tagged folder; it stays (a folder-level clean would take it, the
+   part-cleans keep it), and no session removes it by hand." (:259-264). Every brief that probes cargo keeps d2-r2 Block
+   6's lesson: "never run cargo with CARGO_HOME or CARGO_TARGET_DIR at a path that does not exist (cargo creates it,
+   outside every approved removal method); to test check.mjs's reading of such a value, pass it to check.mjs's function
+   only, as the security seat did (sec-r2-deps-home.mjs: the probe value for the reader, the real environment for cargo
+   and rustc). The path also no longer means "missing" on this machine, so no later control may use it as one."
+   (:304-308); it binds carry 85 (d)'s self-test, which reads an empty or relative CARGO_HOME through check.mjs's own
+   function, never by running cargo with it.
+8. After the last bite or plant, touch and rebuild before any further claim (plan :916).
+9. Cargo's own lock still serializes builds: expected (plan :917). The main folder's cache is not yours (plan
+   :918-919).
 
-**Your files, and only these** (Lanes :881; carries 82 to 85 and A13 by their words; anything more only by a ruling of
+**Your files, and only these** (Lanes :882; carries 82 to 85 and A13 by their words; anything more only by a ruling of
 section 10): crates/lab/ (src/ and tests/; recordings.json's schema and entries, carry 82; precheck-recordings.json,
 new, for SS P0 seed 4 alone: 2.1 (i); U2's `probe` and `machine`
 kept as merged; U4d2's `hash`, `HashCompare` and `TickHash` kept as merged but for carries 82 and 83); crates/bots/src/
@@ -800,43 +1008,60 @@ Evidence decision moves them: carry 84); crates/hash-wasm/loader.mjs's header se
 - **Never:** crates/sim, crates/proto, crates/l1, crates/link, crates/room, crates/server (but U4R-Q6 (a)'s items),
   crates/client, crates/log (but carry 63's two refusals: U4R-Q13 (a)), crates/judge, crates/hash-wasm (but loader.mjs's
   sentence), crates/net, crates/tcpinfo; marks/ (but SERIES.md's new rows: U4R-Q2 (c)); docs/; results/ (the main
-  session's runs write it: §7.2 :927-928).
-- **Files:** "<<P3>>" (the advisor's U4d-F ruling, T4 item 1's sentence, word for word). **Plants:** "<<P8>>" (the
-  advisor's U4j round-2 ruling, B6, word for word), then restored and the sha256 checked against the clean file. A
-  `cp`, `mv` or `tee`, and a `>` or `2>` into a file, are shell writes too, in any folder, the session scratchpad
-  included (u4d2-brief.md section 4; this brief's drafter slipped so once: u4r-brief-r3-notes.md): read an older
-  revision with `git show <sha>:<path>`, and let the runner's log hold a command's output. An agent that slips says so
-  at the top of its notes (the advisor's U4d-F ruling, R6, df-ruling :317-318).
+  session's runs write it: §7.2 :928-929).
+- **Files:** "Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo
+  fmt` writing files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with
+  Write." (the advisor's U4d-F ruling, T4 item 1's sentence, word for word). **Plants:** "plants by Edit in place, or
+  the planted file's diff saved beside the run's output." (the advisor's U4j round-2 ruling, B6, word for word), then
+  restored and the sha256 checked against the clean file. A `cp`, `mv` or `tee`, and a `>` or `2>` into a file, are
+  shell writes too, in any folder, the session scratchpad included (u4d2-brief.md section 4; this brief's drafter
+  slipped so once: u4r-brief-r3-notes.md): read an older revision with `git show <sha>:<path>`, and let the runner's log
+  hold a command's output. An agent that slips says so at the top of its notes (the advisor's U4d-F ruling, R6,
+  df-ruling :317-318).
 - **Git** only in your worktree (`cd <worktree> && git ...`), never `git -C` or `git -c`; commit nothing and push
-  nothing; the main session merges (plan :924-926).
+  nothing; the main session merges (plan :925-927).
 - npt-lab's sources never spell another crate's bite id as a string literal: check.mjs reads every exact-id literal
   in crates/<crate>/src/ outside test modules and fails an id found in two crates (`biteHomeProblems`, :914-924). The
   `--bite` dispatch finds each id's owner through that crate's own list at run time; tests and the run scripts may name
   ids.
-- **The stop clause:** "<<P4>>" (the advisor's U4d-F ruling, T4 item 2's clause, with `<crate>` replaced by the script);
-  and TE2-5's rule, "<<P5>>" (the advisor's U4j round-2 ruling, B2.3's rule), which after U4d2's merge reads: "<<P12>>"
-  (the advisor's U4d2 round-1 ruling, Block 5); since TE-M3's fix (c49773f) the rule ends at U4r's merge, and only if no
-  failure of check.mjs's test step (any test) happens in U4r's counted and judged runs; if one does, the rule continues
-  and that failure comes to the advisor (TE-Q2, advisor-te-m3.md:119-121; TE-M3's P5 had none). **Expected failures,
-  named in advance:** a check.test.mjs pin that a carry 84 or 85 change re-pins (plan the edit and its re-pin as one
-  step, or record each under TE2-5 with the step that re-pins it); and TE-M3's npt-net test,
+- **The stop clause:** "a failure in npt-lab or npt-bots, or in npt-log, or in npt-server, in check.mjs's deps, wasm or
+  marks step, or in check.test.mjs, or in a test that reads their files, stops your step group (report it), unless your
+  step's plan names it as expected (a pin your step re-pins, or a test a later step rebuilds): then record it under
+  TE2-5 with its cause and the step that ends it, and go on." (the advisor's U4d-F ruling, T4 item 2's clause, with
+  `<crate>` replaced by the script); and TE2-5's rule, "a FAIL in check.mjs's test step is never retried into green
+  unnamed. The failing build's crate is re-run at once through the runner with `--no-fail-fast`, its whole output saved
+  under .gate/, and the failing test's name and panic go into the notes, tagged TE2-5. A failure in a crate the unit
+  changes, or in a test that reads its files, stops that unit's merge until it is explained." (the advisor's U4j round-2
+  ruling, B2.3's rule), which after U4d2's merge reads: "its "until carry 65 is met" is read as met for the name only.
+  The rule stays in force until TE-M3's cause is found and fixed. With FX-10, a first failure keeps its panic, so the
+  rule's "name and panic" can be met from that failure itself." (the advisor's U4d2 round-1 ruling, Block 5); since
+  TE-M3's fix (c49773f) the rule ends at U4r's merge, and only if no failure of check.mjs's test step (any test) happens
+  in U4r's counted and judged runs; if one does, the rule continues and that failure comes to the advisor (TE-Q2,
+  advisor-te-m3.md:119-121; TE-M3's P5 had none). **Expected failures, named in advance:** a check.test.mjs pin that a
+  carry 84 or 85 change re-pins (plan the edit and its re-pin as one step, or record each under TE2-5 with the step that
+  re-pins it); and TE-M3's npt-net test,
   `l2::delay::tests::a_shutdown_s_never_completes_ends_at_its_deadline_without_spinning` (delay_tests.rs:2544-2614, its
   doc :2544-2553), which failed under a counted run's load (d2-r1 :287-293). Its cause is found and fixed at c49773f
   (TE2-5 (c); the advisor's TE-M3 ruling, advisor-te-m3.md, and its check of the commit, advisor-te-m3-check.md:
   APPROVE): a pump run already under way when the shutdown began calls S's `poll_shutdown` once but started before the
-  test's count, so the assertion is `s_calls <= polls + 1`. "<<P16>>" (the advisor's TE-M3 ruling, TE-Q3, word for
-  word). The test is in no crate U4r changes and reads no U4r file, so a failure of it (polls = 4 included) is recorded
-  under TE2-5 with its name and panic (FX-10's file of the failed step kept beside the log under .gate/u4r/), does not
-  stop your step group, and comes to the advisor whole; never a retry. A scratch plant's own run fails by design and is
-  reported as that plant's proof, never as a TE2-5 failure.
+  test's count, so the assertion is `s_calls <= polls + 1`. "U3c's (u3c-fix2-c2b.md:74) and U4d2's
+  (u4d2-review-test.md:182-186) failures of this test: their assertion is not shown (no panic kept). If U3c's :2002 was
+  the panic site, it was 'every byte, then EOF', a different failure. P2, P3 and every later counted run watch every
+  assertion." (the advisor's TE-M3 ruling, TE-Q3, word for word). The test is in no crate U4r changes and reads no U4r
+  file, so a failure of it (polls = 4 included) is recorded under TE2-5 with its name and panic (FX-10's file of the
+  failed step kept beside the log under .gate/u4r/), does not stop your step group, and comes to the advisor whole;
+  never a retry. A scratch plant's own run fails by design and is reported as that plant's proof, never as a TE2-5
+  failure.
 - **No retry for the `wasm` step** (u4d2-brief.md section 4's rule, applied to the step that judges determinism): a
   `wasm` step run that mismatches, traps, fails a SHA-256 or reports a call stopped by the limit is never re-run into
   green. Its first tick, field diff and digests go into your notes, tagged TE2-5, with the run's whole log kept under
   .gate/u4r/, and it stops your step group until it is explained. For a stopped call, until carry 84 is in: list and end
   any leftover process (`pgrep -a npt-lab`; `pgrep -af loader.mjs`) and record them (d2-r2 Block 5's interim rule,
   :255-257).
-- **The builders' limits** (Mustafa, 2026-11-11): "<<P2>>" (history, word for word).
-- .claude/rules/netcode.md binds proto, room, client and server code (plan §7.1 item 8, :920-921): none of them is
+- **The builders' limits** (Mustafa, 2026-11-11): "Builders: pass or fail comes from the exit code and the test runner's
+  own summary line, never from a grep. A fresh copy reads its notes and the diff in its worktree before it changes
+  anything." (history, word for word).
+- .claude/rules/netcode.md binds proto, room, client and server code (plan §7.1 item 8, :921-922): none of them is
   yours (U4R-Q6 (a)'s items aside, which it binds); your runner, replay clients and bots feed them only through their
   public items.
 
@@ -915,12 +1140,12 @@ Run from spikes/netcode-proof/ in your worktree, each as a counted run under sec
 ## 7. The judged runs and the -30 pre-check (the main session's, after the merge)
 
 Run in the main folder, on release builds, one set at a time, in the background, raw logs under .gate/, verdicts and
-runs.txt committed under results/ (plan :766; §7.2 :927-928), by the scripts of 2.3, judged by `npt-judge --only`
+runs.txt committed under results/ (plan :766; §7.2 :928-929), by the scripts of 2.3, judged by `npt-judge --only`
 (plan :766). You build the scripts and show their npt-lab lines work (2.3); you run none of the sets.
 
 ### 7.1 One row per part
 3 seeds per part (plan :766): seeds 1, 2 and 3, as c-u2 runs them (c-u2:23) and as U4h's judged runs are numbered
-(plan :841-842). Every part's select at `<base>` holds scene SS and clients 48 where §4.12's table gives them, and the
+(plan :842-843). Every part's select at `<base>` holds scene SS and clients 48 where §4.12's table gives them, and the
 part's validity `pre:PM-0001-2` (plan :418-424; marks.json -17's and -18's L1 parts). Bite runs: the plan fixes neither
 their number nor their profile; the scripts follow c-u2's model, one run per bite at seed 1 (c-u2:80-84), with the
 part's own settings (length, scene, clients), so a bite is shown on a run its part would accept; each bite run is in the
@@ -1116,7 +1341,7 @@ not measured here) and the judge's passes:
 | 10 | 0.33× | 40,500 s ≈ 11.3 h |
 
 Assumptions, each to be replaced by the measured value: runs one at a time (c-u2 starts one process at a time:
-c-u2:65-84; §7.2 :927's "one set at a time"); every bite run at its part's full length; each runner recording and the
+c-u2:65-84; §7.2 :928's "one set at a time"); every bite run at its part's full length; each runner recording and the
 pre-check's legs 9,000 ticks (5 min: §4.15 :483-484); every run costing what SS with 48 clients costs (the ES recording
 likely less); no run repeated; -58's runs gone to U4g (C2; rev 2 counted 144 s for them); each run's warm-up and after
 phase left out (7.1: their lengths go in each header and are added here once measured; carry 75's bound keeps each
@@ -1141,7 +1366,7 @@ cannot be known before a run: the estimate is the arithmetic, never the answer.
   and U4d2's determinism step green on the two (in check.mjs if the step stays within 5 minutes, else through
   ops/runs/det-u4.mjs at every merge that touches sim, proto, room or hash-wasm, on the advisor's ok: plan :800-802;
   section 5 item 4).
-- **Raw logs** under .gate/netcode-proof-test/runs/<set>-<short>/ (c-u2:9-10, :48), never committed (plan §7.2 :928).
+- **Raw logs** under .gate/netcode-proof-test/runs/<set>-<short>/ (c-u2:9-10, :48), never committed (plan §7.2 :929).
 - **The sizes for fixes.rs** (§2 :150) as series in -17's (and -18's) B1 logs, with SERIES.md rows (U4R-Q2 (a)).
 
 ---
@@ -1216,7 +1441,7 @@ holds; only the line numbers are those of an earlier text of the plan. Carry 40 
   U4R-Q12), read by the advisor in U4h's review as condition 2 asks for U4r's; -30 stays NOT-RUN until U6.
 - **The recording:** first replay U4r's SS P0 seed 4 recording on U4h's room and count the replacements; this replay
   is the re-run's clean pair. U4r's clients have no `Interp` (U4g, plan :822) and no `ClockSync` (U4f, :806), so the
-  view times they stamp may not be what U4h's estimate expects, and §4.15 :498-500's reason for a P0 recording ("a
+  view times they stamp may not be what U4h's estimate expects, and §4.15 :499-500's reason for a P0 recording ("a
   recording made at P0 keeps them inside the tolerance") was written for clients that interpolate. If any view time is
   replaced on either leg, that clean pair is VOID: re-record SS P0 seed 4 with `scenario --record` on the U4h build
   (one more run, its SHA-256 beside the old one's), then run the six. Needs a run (day), after U4h merges: D7.
@@ -1225,7 +1450,7 @@ holds; only the line numbers are those of an earlier text of the plan. Carry 40 
   2,700 s). At 7.3's R values: 1,800 s takes about 3 min at R = 300 and 30 min at R = 30; 2,700 s about 4.5 min and 45
   min. U4R-Q12 (a) ruled reading (i), so these are its totals.
 - **Why not the alternatives:** (b) no re-run leaves the setup condition's tolerance-and-cap half and the RTT argument
-  untested until U6's -30 C part on the real transports (plan :894-895), where a VOID or a mismatch would mix the
+  untested until U6's -30 C part on the real transports (plan :895-896), where a VOID or a mismatch would mix the
   transports' effects with the room's, which is what the pre-check exists to separate first (conditions 2 and 3); (c)
   moving U4r's pre-check to after U4h drops what it already tests at U4r (8.2 item 3), and condition 2 records it as
   U4r's (advisor :97).
@@ -1241,7 +1466,7 @@ holds; only the line numbers are those of an earlier text of the plan. Carry 40 
   so the re-run needs no new log whichever instant U4h's estimate reads the RTT at (the receipt, if the estimate is
   taken in the pump; the run, if `rewind_at` reads it at the command's tick).
 - U4h's brief then carries the re-run and its premises (the main session's line in u4s-carries.md's §U4h, carries
-  :548-560: entry 88, U4R-Q12 (a), added at 8bcbf36).
+  :554-577: entry 88, U4R-Q12 (a), added at 8bcbf36).
 
 ---
 
@@ -1265,7 +1490,7 @@ what this brief now says. Re-check at launch only if spikes/ at `<base>` differs
 | R8 | `HashCompare`, two per-tick hash lists (plan :672-673) | U4d2 | the pre-check's comparer (7.2) | **changed:** `HashCompare::of(&[TickHash], &[TickHash])`, `TickHash { recording, tick, hash }` (lab/src/lib.rs:8-61): it compares by position, names included; a shorter list gives `Mismatch` with `None` at the first missing index; two empty lists give `Empty`. 7.2's comparer, carry 83 (a) |
 | R9 | npt-lab's `hash` subcommand (plan :670-673) | U4d2 | `scenario` and `replay` beside it (2.1, 2.7) | **changed:** main.rs dispatches `hash` and `probe` (:195-235); `hash`'s modes: the two native legs, `compare`, `vectors`, `bites` (hash.rs:111-139); no clock read (D8; lab/clippy.toml bans it). No name clash. U4R-Q3 answered (C3) |
 | R10 | check.mjs's `wasm` step, its 5-minute budget and printed wall time (plan :677-680) | U4d2 | the recordings' determinism route (7.4; U4R-Q2) | **changed:** the step exists (`wasmStep`, check.mjs:2254 on), each call but its builds limited to 300 s on its own (WASM_CALL_LIMIT_MS :2212, :2258-2266; carry 84 makes it one deadline); 33.1 s warm and 61.6 s cold on the three synthetic recordings (D3). Section 5 item 4 |
-| R11 | crates/lab/Cargo.toml as U4d2 left it (plan :873-880) | U4d2 | U4R-Q1 | **holds:** lab's and bots' manifests unchanged since df8975b (D5): npt-lab names no npt-bots (lab/Cargo.toml:23-34), npt-bots no npt-sim (bots/Cargo.toml:20-25). New fact for U4R-Q1: npt-bots names npt-net (:24) (C26) |
+| R11 | crates/lab/Cargo.toml as U4d2 left it (plan :874-881) | U4d2 | U4R-Q1 | **changed:** since L3 (4e91830, the main session's commit: U4R-Q1 (b)), npt-lab names npt-bots (lab/Cargo.toml:32, in its dependencies :23-35) and npt-bots names npt-sim, no features (bots/Cargo.toml:22, in its dependencies :20-26), and the workspace table gains the `npt-bots` line that the `.workspace = true` form needs (Cargo.toml:42); Cargo.lock gains those two edges only. npt-bots still names npt-net (bots/Cargo.toml:25) (C26). 2.2 and D5 say so; re-walked at launch (section 12 item 9) |
 | R12 | check.mjs's steps (10 at df8975b) | U4d2 | section 5's "every step passing" | **changed:** 11 steps, `wasm` after `deps` (check.mjs:2468-2503); the last line :2548 (C17) |
 | R13 | `Room<S: SimCore>`, `Room::with_bite` (§4.1 :194; §4.11 :400) | U4e | `L1Scenario`; the dispatch (2.1) | **holds:** `Room::new(sim, scene, greybox, tokens, n, tick_hz)` (room.rs:431-478); `with_bite(&str) -> Option<Room>`, its own ids or npt-proto's (:510-518); `npt_room::BITES`, 7 ids (room/src/lib.rs:37-46) |
 | R14 | `Roster`, tokens passed in by the caller (plan :716) | U4e | the lab's tokens (2.1) | **holds:** `Vec<[u8; 16]>` into `Room::new` (room.rs:431-438, :447) |
@@ -1300,8 +1525,9 @@ what this brief now says. Re-check at launch only if spikes/ at `<base>` differs
 | R43 (new) | the client's lead and starts, and the room's event start | U4e | carries 74 and 75 (2.1) | `with_lead` (client/src/lib.rs:291-295; default 1, :262), `with_starts` (:298-302), `Room::with_event_start` (room.rs:488) |
 | R44 (new) | the session-ending surface | U4e | carry 76 (2.1; r8, r9) | `Room::join` returns `(slot, replaced)` (room.rs:632-637); no `Decoder::close` (pump.rs; e-r1 :206-209); `ClientSlot::kicked` (:295) |
 
-Of R1-R34: 18 hold (R1, R3, R5, R6, R7, R11, R13, R14, R20, R22, R23, R24, R25, R27, R28, R31, R32, R33) and 16
-changed (R2, R4, R8, R9, R10, R12, R15, R16, R17, R18, R19, R21, R26, R29, R30, R34); ten rows added (R35-R44).
+Of R1-R34: 17 hold (R1, R3, R5, R6, R7, R13, R14, R20, R22, R23, R24, R25, R27, R28, R31, R32, R33) and 17 changed (R2,
+R4, R8, R9, R10, R11, R12, R15, R16, R17, R18, R19, R21, R26, R29, R30, R34; R11 at launch, for L3's manifests: section
+12 item 9); ten rows added (R35-R44).
 
 ---
 
@@ -1618,15 +1844,16 @@ SHA of section 1.
 
 ## 12. Left for the main session at launch
 
-1. **`<base>` and its counts (P6).** The spike branch's head at launch. If `cd /home/user/Shamble-Frontlines && git diff
-   --quiet 4e91830 <base> -- spikes/netcode-proof` exits 0, the counts are D1's (measured 491, bites 561, self 71 of 71,
-   11 steps, marks 81, redact 0); else D1's counted run through main-run.sh gives them. Fill P6 in section 1 item 1 and
-   section 4 rule 5.
-2. **The runner (P7: u4r-run.sh, sha256 349b51ad…).** Made from u4d2-run.sh by u4r_runner.py, its diff u4r-run.sh.diff
-   holding only the lane's names (the header, the log folder .gate/u4r/, the usage line), the CACHEDIR.TAG check and the
-   two lock lines u4d2-run.sh's (m9 Block 2, :202-206). INF2-4's P3 ran at 11:01 UTC with u4d2-run.sh in u4d2-build
-   (the card's INF2-4 record), so m9 :215-216's "first call of U4r's lane runner" branch did not arise; at launch
-   u4r-run.sh needs only its sha256 and `bash -n`.
+1. **`<base>` and its counts (P6: 614823c; measured 491, bites 561, self 71 of 71, 11 steps, marks 81, redact 0, its
+   spikes/netcode-proof being 4e91830's; done at launch).** The spike branch's head at launch. If `cd
+   /home/user/Shamble-Frontlines && git diff --quiet 4e91830 <base> -- spikes/netcode-proof` exits 0, the counts are
+   D1's (measured 491, bites 561, self 71 of 71, 11 steps, marks 81, redact 0); else D1's counted run through
+   main-run.sh gives them. Fill P6 in section 1 item 1 and section 4 rule 5.
+2. **The runner (P7: u4r-run.sh, sha256 349b51ad…, `bash -n` exit 0; done at launch).** Made from u4d2-run.sh by
+   u4r_runner.py, its diff u4r-run.sh.diff holding only the lane's names (the header, the log folder .gate/u4r/, the
+   usage line), the CACHEDIR.TAG check and the two lock lines u4d2-run.sh's (m9 Block 2, :202-206). INF2-4's P3 ran at
+   11:01 UTC with u4d2-run.sh in u4d2-build (the card's INF2-4 record), so m9 :215-216's "first call of U4r's lane
+   runner" branch did not arise; at launch u4r-run.sh needs only its sha256 and `bash -n`.
 3. **The placeholders, by script, each checked after the copy** (u4d2-brief.md 7.2 item 3's rules: the anchor found
    once, the copy's first and last words as named, the placeholder gone from its one home outside this list, no other
    byte of the brief changed; a source span that wraps is copied with each line break and the next line's indent read
@@ -1666,13 +1893,13 @@ SHA of section 1.
    advisor's check, which also checks INF2-4's two diffs (main-run.sh.inf2-4.diff, u4d2-run.sh.inf2-4.diff) and the
    proof logs P1 to P4, with u4r-run.sh and its diff (m9 Block 2, :223-227).
 7. **The review panel** (plan :803 and the rulings): netcode-architect, test-engineer, engine-architect (public items:
-   plan :929-930), rust-reviewer (the npt-server and npt-log edits included: U4R-Q6 (a), U4R-Q13 (a)); plus
+   plan :930-931), rust-reviewer (the npt-server and npt-log edits included: U4R-Q6 (a), U4R-Q13 (a)); plus
    security-auditor (carry 76's session boundary, carry 85's refusals, carry 63's two refusals: U4R-Q13 (a); the
    wall-clock read in server code: U4R-Q6 (a)) and infra-engineer (carry 84's time bound and the `wasm` step's time
    against its budget: no CI job runs check.mjs); at effort xhigh, at most three agents at a time, reviewers included
-   (plan :885-886), so in two batches; the advisor confirms the panel.
+   (plan :886-887), so in two batches; the advisor confirms the panel.
 8. **The judged runs' target.** The scripts read their binaries' paths from cargo's JSON messages (2.3). The judged
-   runs use the main folder's own cache, `CARGO_TARGET_DIR` unset (plan §7.1 item 6, :917-918), and D4 is measured
+   runs use the main folder's own cache, `CARGO_TARGET_DIR` unset (plan §7.1 item 6, :918-919), and D4 is measured
    there first; a move to the shared target under main-run.sh's lock comes to the advisor first (its drift note, d2-r1
    :716-719, covers the merge checks only).
 9. **Re-stamp and re-check at launch.** Re-stamp section 0's sha256 of the plan, plan.md, carries and history; if one

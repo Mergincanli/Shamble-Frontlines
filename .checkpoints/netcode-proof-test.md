@@ -11,8 +11,28 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-13 about 18:50 UTC; read this first after a compact or a cut): main merged (MAIN-48); L4's script in
-its revision.**
+**NOW (2026-11-13 about 19:30 UTC; read this first after a compact or a cut): L4 and item 9 applied; L6 next.**
+- **L4's second check: PASS** (wf_62c0ab97-ae7, task w7zvg0wdh, returned about 19:20 UTC; u4r-fill-check2.md, K1-K7
+  done; script 2276287d… checked). No finding Medium or higher. Two Lows: (1) decision 2's "end" is read at the clause:
+  the cell goes on ". 2.2 and D5 say so; re-walked at launch (section 12 item 9)", which is accurate (2.2 :511-515, D5
+  :1568-1572, read by the main session); (2) R6 has a second stale l1/src/lib.rs cite, "(:764-773)" (now :753-757, the
+  doc and cfg), beside BITE_IDS :752-758 (now :746-751); both predate the head read. Its third question for the
+  advisor: section 0's "How rev 2's df8975b cites were re-pointed" bullet (:210-211) still lists crates/lab/Cargo.toml
+  and crates/bots/Cargo.toml as unchanged since df8975b (a record of rev 3's re-pointing; :182-186 says spikes/ is
+  4e91830's, naming both files).
+- **The main session's decisions on them** (about 19:25 UTC): decision 2 meant the npt-net clause (the file named), so
+  the cell stays as the script writes it; the reviser's "stays" (agreement), C28's held cite and the stale docstring
+  line stay as they are. R6's two cites and section 0's df8975b bullet go to the advisor as Lows with the follow-ups
+  below; no script change (a Low never triggers a push).
+- **The apply:** the saver stopped (its last commit 614823c, "autosave (terminated)", the checker's notes); the dry run
+  at 614823c equals the one read in full at fe1460a but for the sha (diff: the sha256-after line only); `--apply` at
+  `<base>` 614823c; then commit (this card in it), push, restart the saver, L6.
+- **L6, next:** one builder (general-purpose, opus, xhigh, `isolation: worktree`, under .claude/worktrees/), the brief
+  as filled (path and sha256 in the prompt), u4r-run.sh (349b51ad…), D13's runs first; the prompt names its worktree's
+  start commit (the head at launch, later than `<base>` by .checkpoints/ commits only) and `git diff --quiet <base>
+  HEAD -- spikes/` exiting 0 (U4d2's Block 0 precedent). At most three agents, the builder counted; the check-in stays.
+
+**Earlier NOW (2026-11-13 about 18:50 UTC): main merged (MAIN-48); L4's script in its revision.**
 - **MAIN-48 DONE (the merge):** at the clean stop after L4's workflow returned (nothing running; the saver stopped
   first), main 4d21c1a merged in the main folder: **7685b2b** (committed 18:47:11 UTC, pushed). One conflict, docs/STATUS.md's
   In-flight table, by merge_main_48.py against the merge base 2aa5e9c: this branch's #40 row (state brought up to
