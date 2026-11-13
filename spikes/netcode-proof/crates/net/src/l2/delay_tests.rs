@@ -2546,8 +2546,11 @@ impl AsyncWrite for NeverShut {
 /// with a counted timeout, S dropped (the client reads EOF); the pump ended at its first run at or after the deadline,
 /// having given S the whole wait. Counted, not timed: while it waits, nothing but the shutdown's own wake and the
 /// deadline's can run the pump (the model is idle, S never wakes), so the pump runs at most 3 times (2 expected; one
-/// more allowed for a wake already queued when the wait began) and S's poll_shutdown no more often. The old code
-/// spun here, re-arming the past deadline at once: thousands of runs and no end.
+/// more allowed for a wake already queued when the wait began). S's poll_shutdown is called at most once per run and
+/// only once the shutdown began, so at most once per counted run and once more: a run already under way when the wait
+/// began (counted before `before`; tokio polls a task on one thread at a time, so there is at most one such run) can
+/// reach its shutdown block after the shutdown began. The old code spun here, re-arming the past deadline at once:
+/// thousands of runs and no end.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_shutdown_s_never_completes_ends_at_its_deadline_without_spinning() {
     let (client, server) = tokio::io::duplex(1 << 20);
@@ -2602,7 +2605,11 @@ async fn a_shutdown_s_never_completes_ends_at_its_deadline_without_spinning() {
         "ended at its first run at or after the deadline"
     );
     assert!(polls <= 3, "no spin while waiting: {polls} runs");
-    assert!(s_calls <= polls, "{s_calls} shutdown calls");
+    assert!(
+        s_calls <= polls + 1,
+        "{s_calls} shutdown calls for {polls} pump runs: at most one per run, and one more for a run already under \
+         way when the wait began"
+    );
     assert_eq!(rd.await.expect("read"), 10_000, "every byte, then EOF");
 }
 

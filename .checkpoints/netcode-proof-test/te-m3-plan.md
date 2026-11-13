@@ -135,4 +135,17 @@ summary line)
   v0.0.0 (/home/user/Shamble-Frontlines/spikes/netcode-proof/crates/net)". 600 run logs, 600 own lines (exactly one per
   run), 600 exits 0. The tally (runs, at or after the deadline, S calls): (2, 1, 2) 591; (2, 1, 3) 1; (3, 1, 2) 3;
   (3, 1, 3) 5. One passing run with S calls = runs + 1: the case the fix covers, met (AM-1).
-- **P3 and P5:** running (p3.log, then p5-check.log, in one chain: P5 only if P3 exits 0).
+- **P3 (conditions 4 and 6): PASS** (12:29-12:36 UTC; .gate/te-m3/p3.log; `te_m3_loop.sh p3 all 10 2 4` through
+  main-run.sh). At its start: delay_tests.rs 74d49de7…, delay.rs aaa6a588…, "Compiling npt-net v0.0.0
+  (/home/user/Shamble-Frontlines/spikes/netcode-proof/crates/net)". 20 runs of the whole npt-net binary (10 in each of
+  2 loops, 4 busy loops): every run exit 0, "169 passed; 0 failed; 12 ignored". No other test failed.
+- **P5 (condition 6): PASS** (12:36:18-12:46:02 UTC; .gate/te-m3/p5-check.log; main-run.sh, the lane lock held
+  exclusively): at its start, `sha256sum` printed delay_tests.rs 74d49de7… and delay.rs aaa6a588…; then `node
+  check.mjs`: all 11 steps PASS; the test step "measured build: 491 tests passed, 0 failed ...; bites build: 561 tests
+  passed, 0 failed"; self 71 of 71; marks 81; redact 264 items, 0 findings; the wasm step 49.9 s. check.mjs prints its
+  own step lines only, so the log holds no "Compiling npt-net" line (its provenance block is empty, as after MR9-L1's
+  fix); the bytes it built are tied by the sha256 at its start and by main-run.sh's touch loop (every file under
+  crates/ touched first and every 2 s, so cargo rebuilt the workspace's crates).
+- **P6: PASS:** `node tools/gate.mjs --no-smoke` (12:46 UTC; .gate/te-m3/p6-gate.log): "GATE PASS (5a smoke skipped:
+  --no-smoke)". CI on the commit: the card.
+- **The commit:** delay_tests.rs and this record, one commit; then the advisor's check of it (TE-Q4).
