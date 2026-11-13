@@ -281,3 +281,34 @@ Block log:
   (rewinds_refused stop, D13 first: F-l, F-j); 7.2 scripts and Loopback instants (F-q, F-p), L <= 7 (F-o, both
   places); 7.3 assumptions (warm-ups at most 31 runs x 30 s = 930 s: F-s); 7.4 manifests (F-a). Next: 10 (Q6, Q14),
   11 (D13), 12 (F-d, F-e, Q14, F-h), input.rs cites, change list, self-check.
+- V4d edits made: U4R-Q6 rewritten (what a pump site needs; (a) with Decoder::with_bite, the allow, BITES to four and
+  schedule.rs:347's pin, U4E-Q3's precedent wave1 :453-455 checked; (c)'s cost: F-m); U4R-Q14 added after Q13 ((a)
+  the round-trip lead with the check's arithmetic and model numbers, cited as not re-run; (b) the duplicate stamps,
+  my own reading with the arithmetic marked as arithmetic; options a1/a2, b1-b3; recommendation a1 + b1: F-j).
+  Checked: client step period :450-453, l1 delay :790-813. Next: 11 (D13), 12, input.rs cites, change list.
+- V5 done: D13 added (section 11) and section 6 item 5; section 12 items 2 (F-d), 3's P4 (F-e), 4 (Q14), 8 (F-h);
+  input.rs cites re-pointed by replace_all (same lengths: no rewrap); change list "rev 3.1" C27-C33 added above rev
+  3's. Next: self-check (line widths, the new cites, placeholders untouched), then the per-finding lines and handback.
+- V6 self-check done: 0 prose lines over 120 characters (grep -P in C.utf8; 147 at 119-120, so the grep counts);
+  placeholders as before (P1-P5, P8-P15 twice each: home and section 12's list; P6, P7 once); 7.2's setup condition
+  gained one sentence (the recording's view times are the brawl's: F-l). Brief 1,625 lines. git status: only my two
+  files and the main session's delay_tests.rs changed.
+
+Per finding (all done; none rejected):
+- F-j High: done. U4R-Q14 (a) as the fix asks (arithmetic, the check's model numbers cited as not re-run,
+  recommendation yes before launch); 2.1's lead "by U4R-Q14"; r2's late report kept; D13 added. Beyond the fix, from
+  my own read: U4R-Q14 (b), duplicate stamps (input.rs:110 "or one already buffered" + newest moving only on a newer
+  header, client :557-560) count late at any lead under jitter, about 10-15 % by arithmetic; recommendation (b1), the
+  bots skip a step whose newest did not move (2.2). Marked in C27 as added by the revision, not a run.
+- F-a Medium: done. 2.1 (i) own manifest precheck-recordings.json for SS P0 s4 (chosen over a skipped key, so
+  check.mjs:2289-2293 stays out of the lane); (ii) regeneration = scenario --record inside `npt-lab hash`, 3 x 9,000/R
+  s (section 5 item 4); (iii) the re-pin line for U4f-U4h; lane and 7.4 follow.
+- F-k Medium: done (2.1's decode definition; r2's bite check).
+- F-l Medium: done (2.2's view time newest/0, never the default 0; r2, r6; 7.1's stop; 7.2's sentence).
+- F-m Medium: done (U4R-Q6 rewritten; only schedule.rs:347 pins BITES, loopback.rs:347 reads it whole: so one pin,
+  not two; (c)'s cost restated; section 4's wait list).
+- Lows, all applied: F-n, F-o, F-p, F-q, F-r (with None before the first snapshot: the stamp is tick 0 then, client
+  :394), F-s (7.3: warm-ups at most 31 runs x 30 s = 930 s; after phases unbounded here), F-g (allow site :768-771),
+  F-b, F-d (the card cited by item, its P3 record), F-e, F-f (and my SLIP line moved to the notes' top), F-h, F-i.
+- In passing: input.rs cites re-pointed (C33).
+- Done. Handback next.

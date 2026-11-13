@@ -13,6 +13,51 @@ u4r-brief-r3-notes.md. Rev 3.1 is that workflow's one revision after netcode-arc
 are u4r-brief-r3-notes.md's "Revision for the check"). Next: the advisor's check with INF2-4's two diffs and proof
 logs (advisor-u4d2-m9.md Block 2, :223-227), then section 12's launch steps.
 
+## Changes in rev 3.1 (rev 3 to rev 3.1: netcode-architect's check, u4r-brief-r3-check.md; each by its finding)
+
+- **C27. F-j (High): carry 74's lead, and new U4R-Q14.** The carry's formula counts one direction; the stamp (newest +
+  lead: client/src/lib.rs:336, :394) needs the round trip. New U4R-Q14 (a) gives the arithmetic (P0 1, P2 and B1 5,
+  P3 7, within `CMD_CATCHUP` 8) and the check's model numbers (cited, not re-run); 2.1's lead bullet reads "by
+  U4R-Q14", carry 74's formula standing until the ruling amends it; r2's per-run late report is kept, with the lead and
+  the steps without a command; 3.2's row 74, section 6 item 5, 7.1's preamble and order, section 12 item 4 (Q14) and
+  new D13 (the builder's first short P2 run at leads 3 and 5, before any `scenario --record`) follow. **Added by this
+  revision, beyond the check** (a reading of the merged code, not a run): U4R-Q14 (b), the duplicate stamps. The room
+  also counts late a command stamped for a tick already buffered (room/src/input.rs:110), and under jitter two client
+  steps in a row can read the same newest tick, so by arithmetic about 10 % (P2, B1) to 15 % (P3) of the commands
+  would count late at any lead; options (b1) to (b3), recommendation (b1): the bots give no command at a step whose
+  newest tick did not move (2.2).
+- **C28. F-a (Medium): the fourth recording and the runner entries.** 2.1's recordings paragraph states (i) the
+  determinism step's three join recordings.json (plan §4.15 :500-501) and SS P0 seed 4 gets a manifest of its own,
+  crates/lab/precheck-recordings.json, so check.mjs's manifest read (:2289-2293) stays out of U4r's lane; (ii)
+  regenerating a runner entry re-runs its `scenario --record` settings inside `npt-lab hash`, about 3 × 9,000 / R s
+  (section 5 item 4); (iii) each later change to a crate on the scenario's path re-pins them (a line for U4f to U4h's
+  carries). Section 4's lane and 7.4 follow.
+- **C29. F-k (Medium): -18's decode.** 2.1's -18 record defines a decode as a non-zero hash in `StepOut::hashes` for a
+  tick due at or after the link's return, not a routed `FullState`'s tick; the sentinel 0 never counts
+  (client/src/lib.rs:196, :711-712). r2 gains the bite check (no heal within 500 ms under no-fallback; one per client
+  and burst on the clean run).
+- **C30. F-l (Medium): the view time.** 2.2 states it: `view_tick` = `newest_tick()` and `view_fraction` = 0, which
+  `rewind_at` holds at every lead of 1 or more (room.rs:819; rewind.rs:8-11), never the default 0
+  (client/src/lib.rs:401-406). r2 and r6 report `rewinds_refused` (0 expected); 7.1's order stops the set before the
+  pre-check on a value above 0 in SS P0 seed 4's recording run.
+- **C31. F-m (Medium): U4R-Q6 (a) made buildable.** Option (a) names `Decoder::with_bite` (a pub item beyond §4.1),
+  the allow (server/clippy.toml:6-17), `npt_server::BITES` widened to four with its pin
+  (crates/server/tests/schedule.rs:347), and the reviewers; (c)'s cost is restated; section 4's waiting list follows.
+- **C32. The Lows, all applied as text:** F-n (2.1 step (2): `Decoder::accept` and `reject`, the pump called again
+  after a `Join`, each control message on its type's channel; section 1 item 6: U4e's lab glue as the model, with its
+  two gaps); F-o (7.2 and 2.5: the pre-check's lead at most 7, or T alone first); F-p (7.2: the Loopback leg's
+  instants); F-q (7.2: the recording's scripts into both rooms); F-r (2.2: at most one command per client step, `None`
+  between steps and before the first snapshot); F-s (7.1: the warm-up and the after phase stated and in the header;
+  7.3: left out of the totals, the warm-ups at most about 930 s); F-g (r1: the bite's per-instance id and its allow);
+  F-b (2.1: carry 49's refusal gets a unit test); F-d (section 12 item 2: INF2-4's P3 ran at 11:01 UTC); F-e (section
+  12 item 3: P4 gains npt-server under U4R-Q6 (a)); F-f (section 4: R6's slip line; the drafter's notes carry their
+  slip at the top); F-h (2.3 and section 12 item 8: the judged runs on the main folder's own cache, a move to the
+  shared target to the advisor first; C24's "the main session chooses" is withdrawn); F-i (section 5 item 1: a
+  check.mjs run with TE-M3's failure is not one of the two).
+- **C33. Cites re-read in passing:** room/src/input.rs's lines were 3 or 4 off (the forward compare :81-89, late
+  :107-113, full :114-116, `CMD_CATCHUP` :59-61, the depth getter :63-66), re-pointed throughout; no text changed with
+  them.
+
 ## Changes in rev 3 (rev 2 to rev 3; each with its source)
 
 - **C1. Section 0 re-stamped** at the head fa8e335 with the sha256 of the plan, plan.md and the carries (the task's
@@ -58,7 +103,7 @@ logs (advisor-u4d2-m9.md Block 2, :223-227), then section 12's launch steps.
   other reader of an RTT and no replace, clip or tolerance path in npt-room. 7.2's leg glue gives both legs
   `RttSource::Link`.
 - **C11. R17, a new finding: the late-command bite as rev 2 worded it would not count late.** The room's forward
-  compare runs before its lateness check (room/src/input.rs:84-89 before :111-117): a delayed command whose sequence is
+  compare runs before its lateness check (room/src/input.rs:81-89 before :107-113): a delayed command whose sequence is
   not after the newest received is a repeat, never late. Rev 2's bite (hold one command, keep sending the later ones)
   would give `late_count` 0 and a mismatch. 2.5 and 7.2 now have the bite hold the command and every later one until its
   tick has run, then send it first. Option B's depth is measured, not set (input.rs:28-29, :142-145): 7.2 says so.
@@ -805,7 +850,7 @@ Run from spikes/netcode-proof/ in your worktree, each as a counted run under sec
    two plants that show crates/bots/clippy.toml's bans, with each restore's sha256.
 5. The contract test (r2): per suite, each check that resolved, each PM-0001-2 check's value against its band, the shot
    band, and each carry's figure (49, 58, 59, 60, 62 (g) and (h), 73, 74, 75, 77 (c)); every suite that failed and every
-   figure that goes to the advisor under its carry; the short runs' length.
+   figure that goes to the advisor under its carry; the short runs' length; D13's two runs (section 11).
 6. The class audit (r4): per seed, the groups audited by class, the run length, the bite's failing line; `team` and
    `public` reported as not exercised.
 7. `replay` (r3): the (client, tick) pairs compared, 0 mismatches clean, the bite's mismatch count.
@@ -886,7 +931,7 @@ silent, what you state:
   link/src/lib.rs:154-164, :185-193).
 - **The depth (changed at the head: R17).** Option B has no depth setting: the room measures how far ahead of the tick
   last run the newest buffered command was (`ClientSlot::buffer_depth_ticks`, room.rs:289-292; input.rs:28-29,
-  :142-145), and holds at most `CMD_CATCHUP` = 8 commands per client (input.rs:56-58, :118-120; limits.rs:17). So "the
+  :142-145), and holds at most `CMD_CATCHUP` = 8 commands per client (input.rs:59-61, :114-116; limits.rs:17). So "the
   input buffer deep enough for P0" (plan :774-775) is set by how far ahead the replay clients send (the pacing rule
   below). This brief's reading (plan silent at the head): write the pacing lead in ticks as the header's
   `buffer_depth_ticks_count` on both legs (marks.json:6557, read as "max"; SERIES.md:240: "-30's input buffer depth set
@@ -917,7 +962,7 @@ silent, what you state:
   tick T − L is due, L the lead, 1 ≤ L ≤ 7, so that the late-command bite's T and every later command fit one `Input`
   of at most 8: proto/src/input.rs:47-49; the same instant on both legs), why it reaches the room before tick T runs
   on both legs at P0 and is still kept by the buffer, and how the `Input`'s redundancy covers it; a command the
-  recording repeats (its sequence again) is sent once, since the room takes a second copy as a repeat (input.rs:84-89)
+  recording repeats (its sequence again) is sent once, since the room takes a second copy as a repeat (input.rs:81-89)
   and option B reruns the last command on a tick with none (input.rs:136-141), as in the recording;
   (c) whether admitting a client changes the World's hashed state (a join makes a full state due, room.rs:656; spawns
   are `TickInput`'s, §4.15 :481). Loopback delivers in the instant of the send (link/src/lib.rs:154-163, :185-190), L1
@@ -946,6 +991,8 @@ silent, what you state:
   commands' sequences, :264, :860-864), **counts as a replacement in that setup condition: a leg with any is VOID**
   (carry 40's last sentence; U4E-Q5's condition, wave1 :470-471). Log it per leg and per command. (Rev 2 logged it as a
   report beyond the plan; carry 40 now makes it a VOID cause.) The ring holds 2 s at U4r (HISTORY_MS, room.rs:33).
+  The recording's view times are the brawl's (2.2: the newest tick, fraction 0), so a replay that runs each command at
+  its recorded tick finds each one in the ring; the recording run's own count is checked first (7.1's order).
 - **The RTT rule** (plan :781-790). The runner logs per client, on each leg:
   (1) the first-sample instant: the SimClock instant of the first pump call (RQ8's step 2) after which that session's
   `Decoder::rtt_ns(link)` (pump.rs:295-303) is `Some`: on L1 the link's estimate is `None` until its first sample
@@ -986,10 +1033,10 @@ silent, what you state:
     input.rs:136-141), then sends T first, with the later ones after it in the same `Input` (L ≤ 7, so T and the
     later commands fit one `Input`, 8 in all; or T goes alone in its own `Input`, sent first) (the room offers an
     `Input`'s commands oldest first: room.rs:791-792 over the newest-first list, proto/src/input.rs:47-49). So T arrives
-    as the newest sequence received, passes the forward compare and is counted late once (input.rs:84-89, then
-    :111-117; room.rs:797), and the later commands reach the room in time for their own ticks. Delayed, never dropped (a
+    as the newest sequence received, passes the forward compare and is counted late once (input.rs:81-89, then
+    :107-113; room.rs:797), and the later commands reach the room in time for their own ticks. Delayed, never dropped (a
     command never sent is a miss, which the late counter may not count). A later command sent before T would make T a
-    repeat, never late (input.rs:84-89), and the pair a FAIL that says nothing of the late rule: a mis-built bite,
+    repeat, never late (input.rs:81-89), and the pair a FAIL that says nothing of the late rule: a mis-built bite,
     reported as such. It is shown only when the pair comes out VOID by `late_count` alone, with the setup counts and the
     RTT rule holding (the judge's rule for an expect-invalid bite, eval.rs:1412: "shown only when its run is INVALID by
     that one rule and holds every other"). The bite run's records state the delayed command's tick and that leg's
@@ -1190,7 +1237,7 @@ spikes/ at `<base>` differs from cc8595d (section 12 item 8).
 | R14 | `Roster`, tokens passed in by the caller (plan :716) | U4e | the lab's tokens (2.1) | **holds:** `Vec<[u8; 16]>` into `Room::new` (room.rs:431-438, :447) |
 | R15 | `Decoder::pump` with the per-client RTT (plan :722-723; §4.1 :195) | U4e | step 2 of the order; the RTT rule; the wallclock bite's site (U4R-Q6) | **changed:** `pump(&mut self, link: &mut dyn Link, now_ns, tick: u32, out: &mut Vec<(Message, u64)>)` (pump.rs:331-447) reads no RTT; the getter `rtt_ns(link)` (:295-303) by `RttSource` (`Link` or `Pings`, :183-190), which the caller sets at `Decoder::new` (:224-247). 7.2's leg glue: `RttSource::Link` on both legs (C10) |
 | R16 | `ClientEndpoint` and `StepOut` (plan :726; plan.md:609) | U4e | step 5; the client logs; -57's pairing; -18's record | **changed:** `new(join, tick_hz)` (client/src/lib.rs:253), `with_lead`, `with_starts`, `with_bite` (:291-320), `input(command, received, now)` stamping the tick (newest + lead) and the sequence itself (:379-409, :390-400), `step() -> StepOut` (:415-456; `StepOut` :189-202: hashes, lost, wraps); no decoded record or held float is exposed. 2.1's -57 route, 7.2's replay-client encoder (C12) |
-| R17 | `InputBuffer` option B with `buffer_depth_ticks` (plan :719) | U4e | `cmd_timing` B; the pre-check's depth, pacing and late-command bite (7.2) | **changed:** no depth setting; `buffer_depth_ticks` is measured (input.rs:28-29, :60-63, :142-145; room.rs:289-292); at most 8 buffered (:56-58, :118-120); late when stamped for a tick already run or already buffered (:111-117) or dropped at the take (:131-134), the forward compare first (:84-89), so a delayed command that is not the newest sequence is a repeat. 7.2's depth and late-command bite (C11) |
+| R17 | `InputBuffer` option B with `buffer_depth_ticks` (plan :719) | U4e | `cmd_timing` B; the pre-check's depth, pacing and late-command bite (7.2) | **changed:** no depth setting; `buffer_depth_ticks` is measured (input.rs:28-29, :63-66, :142-145; room.rs:289-292); at most 8 buffered (:59-61, :114-116); late when stamped for a tick already run or already buffered (:107-113) or dropped at the take (:131-134), the forward compare first (:81-89), so a delayed command that is not the newest sequence is a repeat. 7.2's depth and late-command bite (C11) |
 | R18 | the encoder's exposed values (§4.5 :299-300; §4.6 :307-328; U4E-Q7) | U4e; `EntityRecord::raw` U4d's (carry 9) | 2.1's logs; -57's pairing; -18's record | **changed:** `ClientSlot`'s getters (room.rs:195-297: `server_hash` :206, `burst_eviction` :212, `baseline_age` :217, `groups` :222, `bytes` :227, `budget` :232, `last_acked` :238, `own_section` :244, `overflow_resync` :253, `wraps` :258, `rewinds_refused` :264, `queue` :278, `headroom` :285, `buffer_depth_ticks` :290, `kicked` :295); the fields a snapshot carried are not exposed: the lab decodes the bytes (2.1); `raw` through `room.sim().entity_records()` (seam.rs:554) |
 | R19 | `rewind_at`'s answer for a view time the ring does not hold, and its counter (U4E-Q5) | U4e | the pre-check's setup condition (7.2) | **changed:** `rewind_at -> Option<Rewind>` (rewind.rs:18-33), counted as `ClientCounters::rewinds_refused` (room.rs:133-135, :860-864), firing commands only; by carry 40 a replacement in the setup condition, so a VOID cause, no longer only a report (C6) |
 | R20 | the bites U4e planted, and its -18 end-to-end finding (condition 6) | U4e (tick16 with U4a) | the judged runs' bites (7.1); r4 | **holds, its open part settled:** npt-room's 7 ids and npt-client's 3 (D6); tick16 stays in `npt_proto::BITES` (U4E-Q4); no-trailing and no-channel are npt-proto's, through the pump; condition 6 not triggered: -18's L1 part counts at U4r as planned (e-r1 R4, NC-L1, :224-232) (C7) |
@@ -1400,6 +1447,51 @@ crates/log; else the unit that next edits it)" two refusals: `read_log` refusing
 - Recommendation: (a): two small refusals with their tests, next to the first large set of logs they guard, reviewed by
   the seat that raised them; (c) if the advisor prefers U4r's lane to stay inside crates/lab and crates/bots.
 
+**U4R-Q14 (carry 74: the lead, and the duplicate stamps a jittered link makes).** May U4r set each endpoint's lead
+from the round trip, `npt_sim::ticks_for_ms((rtt_ns + jitter_ns) / 1,000,000) + 1`, and how are the commands stamped
+twice for one tick kept from counting late?
+- Why it matters, (a) the lead: `ClientEndpoint` stamps each command newest + lead, newest being the newest snapshot
+  tick it holds (client/src/lib.rs:336, :394). By the time a command is stamped, that snapshot is already one downlink
+  delay old, plus up to one client step, and the command must then reach the room before its tick runs, else it is
+  late (room/src/input.rs:107-113). So lead × tick period must cover the downlink, the wait and the uplink: at most
+  `rtt_ns` + `jitter_ns` + one step (l1's delay is each way the one-way delay ± half the jitter, uniform:
+  l1/src/lib.rs:215-221, :790-813), so lead ≥ (`rtt_ns` + `jitter_ns`) / tick period + 1. Carry 74's formula (the
+  largest one-way delay in ticks rounded up, plus 1) covers one direction: P0 1, P2 and B1 3, P3 4. The round-trip
+  form gives P0 1, P2 and B1 5 (120 ms / 33.3 ms = 3.6, so 4, plus 1), P3 7 (180 / 33.3 = 5.4, so 6, plus 1), all
+  within `CMD_CATCHUP` = 8 (input.rs:59-61). The carry's own premise ("on a link whose one-way delay is above about
+  half a tick period every command would reach the room after its tick") is the round-trip form at lead 1, so its
+  formula contradicts it. netcode-architect's print-only model of the merged stamping and the room's late rule
+  (uniform jitter as l1's delay, a snapshot every tick, client steps at a fixed phase, 5 phases × 20,000 steps:
+  u4r-brief-r3-check.md, F-j; not re-run here) gives these late shares: P2 at lead 3 97.7 %, at 4 2.3 %, at 5 0; P3 at
+  lead 4 98.2 %, at 5 55.8 %, at 6 0. Under carry 74's formula every short P2, P3 and B1 run trips its own 1 % rule:
+  -17's P2, P3 and B1 parts and -18's B1 part cannot count, the soldiers mostly stand still (PM-0001-2's shot band at
+  risk), and the SS P2 seed 1 and ES P3 seed 2 recordings hold mostly reruns.
+- Why it matters, (b) the duplicate stamps (this revision's reading of the merged code, not modelled by a run): the
+  room also counts as late a command stamped for a tick already buffered (input.rs:110; room.rs:797). Under jitter, a
+  client step that falls inside a snapshot's arrival window (as wide as `jitter_ns`: 20 ms at P2 and B1, 30 ms at P3,
+  of a 33.3 ms tick) finds that snapshot arrived or not by a fresh draw each step, so two steps in a row can read the
+  same newest tick (the newest moves only on a newer header: client/src/lib.rs:557-560), and the second command is
+  then stamped for the tick the first holds: late, whatever the lead. A step whose snapshot has arrived with
+  probability p repeats the previous newest with probability p(1 − p), at most 25 %; over phases spread evenly, about
+  `jitter_ns` / tick period × 1/6 of the commands: about 10 % at P2 and B1 and 15 % at P3 (arithmetic, one datagram per
+  snapshot assumed; several groups per tick move p, not the conclusion). The model's 0 at the round-trip lead is
+  lateness by arrival; these come on top. P0 has none while a client's host clock runs at rate 1 (no jitter, and the
+  step period is the tick period: client/src/lib.rs:450-453); a seeded rate other than 1 (plan.md:625) drifts the
+  phase, so a step can repeat a newest there too. So the round-trip lead alone does not meet carry 74's 1 % at P2, P3
+  or B1.
+- Options for (a): (a1) the round-trip form, carry 74's formula amended by the ruling; (a2) carry 74's formula as
+  worded, its runs coming to the advisor under its 1 % rule. Options for (b): (b1) the bots give no command at a step
+  whose newest tick did not move since their last command (2.2: `input(None, &received, now)`, then `input(Some(c),
+  &[], now)` only if `newest_tick()` moved; a call with nothing received only stamps, client/src/lib.rs:379-410): the
+  room's late count stays a link-timing signal and carry 74's words stand; the tick so skipped runs option B's repeat
+  (input.rs:135-141), so a jittered link gives fewer than 30 commands a second (still 30 `Input`s a second: plan.md
+  E12), the steps without a command reported per run; (b2) a command every step, the lab counting the duplicates apart
+  (each command's stamp is `newest_tick()` + lead after the call, :394), and the advisor reading carry 74's 1 % on the
+  arrival-late share; (b3) an npt-client change (a stamp never at or before the last one stamped) by the main session
+  through the advisor (2.6), ahead of U4f's lead controller.
+- Recommendation: (a1) and (b1), ruled before launch: no seam change, the carry's 1 % rule keeps its words and its
+  meaning, and D13 measures both before any `scenario --record`. r2 keeps its per-run late report whatever is ruled.
+
 ---
 
 ## 11. Needs a run (day)
@@ -1459,6 +1551,13 @@ SHA of section 1.
   applied by the first call that takes a `now` at or after it (`advance`, :947-959; only the sends-before-events bite
   applies it inside the send, :941-945), and the sample is that arrival minus the send, 0. The pump reads no RTT
   (D10); the lab reads `Decoder::rtt_ns` after each pump call (7.2). R4; U4R-Q10.
+- **D13, the lead and the duplicate stamps on a short P2 run (stays; the builder's, before any `scenario --record`):**
+  the builder's first short L1 P2 run of the brawl (SS, 48 clients, seed 1; its length in the notes), run twice, at
+  lead 3 (carry 74's formula) and at lead 5 (U4R-Q14 (a)), each under the bots' rule U4R-Q14 (b) rules; its notes give
+  per run the commands sent, the room's `late` count and its share, the duplicates apart (commands stamped for a tick
+  already stamped: `newest_tick()` + lead after each call) and the steps without a command. Its exact command line
+  cannot be written before the build (as D4); it runs under the runner (`-x`) like every result run, and a share above
+  1 % at the ruled lead stops the build's recordings and comes to the advisor (carry 74).
 
 ---
 
@@ -1470,9 +1569,9 @@ SHA of section 1.
    section 4 rule 5.
 2. **The runner (P7: u4r-run.sh, sha256 349b51ad…).** Made from u4d2-run.sh by u4r_runner.py, its diff u4r-run.sh.diff
    holding only the lane's names (the header, the log folder .gate/u4r/, the usage line), the CACHEDIR.TAG check and the
-   two lock lines u4d2-run.sh's (m9 Block 2, :202-206). Re-check its sha256 and `bash -n` at launch. If
-   `.claude/worktrees/u4d2-build` is gone, INF2-4's P3 second call is instead the first call of U4r's lane runner, with
-   the same check, shown at U4r's brief (m9 :211-216).
+   two lock lines u4d2-run.sh's (m9 Block 2, :202-206). INF2-4's P3 ran at 11:01 UTC with u4d2-run.sh in u4d2-build
+   (the card's INF2-4 record), so m9 :215-216's "first call of U4r's lane runner" branch did not arise; at launch
+   u4r-run.sh needs only its sha256 and `bash -n`.
 3. **The placeholders, by script, each checked after the copy** (u4d2-brief.md 7.2 item 3's rules: the anchor found
    once, the copy's first and last words as named, the placeholder gone from its one home outside this list, no other
    byte of the brief changed; a source span that wraps is copied with each line break and the next line's indent read
@@ -1488,8 +1587,9 @@ SHA of section 1.
      with Write.".
    - `<<P4>>` df-ruling :465-468: the clause inside T4 item 2's quotation marks, from "a failure in <crate>" to "and go
      on.", with the first `<crate>` replaced by "npt-lab or npt-bots, in check.mjs's deps or wasm step, or in
-     check.test.mjs" (and ", or in npt-log" after "npt-bots" if U4R-Q13 gives U4r crates/log) and "<crate>'s files" by
-     "their files"; the script asserts the replacements and no `<crate>` left.
+     check.test.mjs" (and ", or in npt-log" after "npt-bots" if U4R-Q13 gives U4r crates/log, ", or in npt-server"
+     after "npt-bots" if U4R-Q6 rules (a)) and "<crate>'s files" by "their files"; the script asserts the replacements
+     and no `<crate>` left.
    - `<<P5>>` j-r2 :168-171: from "a FAIL in check.mjs's test step" to "until it is explained.".
    - `<<P8>>` j-r2 :298: the words after "From now on: " to the line's end.
    - `<<P9>>` m9 :252-256: the text inside W1-TARGET item 3's quotation marks, from "Between waves, with no lane
@@ -1501,7 +1601,7 @@ SHA of section 1.
      half)" and "20. **arch N2:**" (each found once) to the line before the next line that begins with an entry number
      or "## ".
    - `<<P6>>` (item 1); `<<P7>>` (item 2): values, filled wherever they stand.
-4. **The advisor's rulings on U4R-Q1, Q2 (a) and (b), Q4, Q6 to Q13** (section 10), folded into the places they name
+4. **The advisor's rulings on U4R-Q1, Q2 (a) and (b), Q4, Q6 to Q14** (section 10), folded into the places they name
    (each "by U4R-Qn" read as the ruling's words), with the lane of section 4 widened or narrowed to match; the plan text
    a ruling changes is in the main session's own commit, as the earlier briefs' rulings were.
 5. **TE2-5 (c), TE-M3's planned change** (d2-r1 :303-304: before U4r's merge): name its state here (planned, made at
@@ -1514,9 +1614,10 @@ SHA of section 1.
    U4R-Q13 gives it to U4r) and infra-engineer (carry 84's time bound and the `wasm` step's time against its budget: no
    CI job runs check.mjs); at effort xhigh, at most three agents at a time, reviewers included (plan :885-886), so in
    two batches; the advisor confirms the panel.
-8. **The judged runs' target.** The scripts read their binaries' paths from cargo's JSON messages (2.3); at the judged
-   runs the main session chooses the main folder's own cache (plan §7.1 item 6, `CARGO_TARGET_DIR` unset: :917-918) or
-   the shared target under main-run.sh's lock, and measures D4 there first.
+8. **The judged runs' target.** The scripts read their binaries' paths from cargo's JSON messages (2.3). The judged
+   runs use the main folder's own cache, `CARGO_TARGET_DIR` unset (plan §7.1 item 6, :917-918), and D4 is measured
+   there first; a move to the shared target under main-run.sh's lock comes to the advisor first (its drift note, d2-r1
+   :716-719, covers the merge checks only).
 9. **Re-stamp and re-check at launch.** Re-stamp section 0's sha256 of the plan, plan.md, carries and history; if one
    moved, re-check every cite of this brief into it (the carries gain entries at merges; history's "Decisions taken" is
    newest first) and fold the new lines in the main session's commit; if spikes/ at `<base>` differs from cc8595d,
