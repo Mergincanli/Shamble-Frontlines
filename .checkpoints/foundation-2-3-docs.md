@@ -13,14 +13,16 @@
    `/clear` or `/compact`. Orientation: CLAUDE.md, CHECKPOINTS.md, STATUS, DECISIONS (2026-11-10 to 11-13 and
    "Queued"), 4d21c1a's message, the 2.2 report, PR #48's description, the advisor agent's verdict on 9b20b67 (the 2.2
    session's record, list_events) and 2.2's notes at 2f0fef3.
+1. The checkpoint and plan revision 1 saved (30483c3); the draft PR opened: #52
+   (https://github.com/Mergincanli/Shamble-Frontlines/pull/52); the plan names #52 (sed, `#N` to `#52`, 5 places).
 
 ## Current step
-Step 0: the checkpoint and the plan saved; the draft PR; the saver.
+Step 1 of the plan: the advisor agent's plan review (the saver running).
 
 ## Next steps
-1. Open the draft PR (docs only, from this branch); record its number here and in the plan; save.
-2. The advisor agent's plan review against the plan's commit SHA (plan §12, Q1 to Q7); fold its conditions.
-3. Then the plan's steps 2 to 8.
+1. The advisor agent's plan review against the plan's commit SHA (plan §12, Q1 to Q7); record the verdict and the SHA
+   here; fold its conditions into revision 2.
+2. Then the plan's steps 2 to 8.
 
 ## Advisor tool consultations (his words of 2026-11-11; in this conversation Opus 5.5 answers the tool)
 1. 2026-11-13 ~20:00 Amsterdam, moment 1, before committing to the docs-pass approach: is the approach right? Changed:

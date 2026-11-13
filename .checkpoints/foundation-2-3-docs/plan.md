@@ -5,7 +5,7 @@
 - **Branch:** `claude/sweet-mayer-grsukw`, this cloud session's own branch, standing in for `cs/foundation-2-3-docs`
   (CLAUDE.md's standing permission; his words: "Your branch stands in for the cs/ branch"). **Base:** main
   4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300 (PR #48's merge).
-- **Pull request:** a draft, opened at step 0, because STATUS and ROADMAP must name its number (#N below).
+- **Pull request:** draft #52 (https://github.com/Mergincanli/Shamble-Frontlines/pull/52), opened at step 0, because STATUS and ROADMAP must name its number.
 - **Change type:** docs, decision docs included. **Risk tier 1:** `docs/DECISIONS.md` records his words, and ADR 0002
   is a decision doc (advisor.md, "Risk tiers"), so the PR is needs-mustafa. It merges from a day session on his go, never
   through the PR Advisor (DECISIONS.md is not on the guard's allow-list). There is no kit, gate or CI file in it; his
@@ -54,7 +54,7 @@ The script `decisions.mjs` copies from the report's appendix, and its `--check` 
 at the top of "Decisions, newest first" (within 2026-11-13, newest first). Each header is written for this file; each
 quote is copied from the appendix.
 - **E-TASK:** **Taken by Mustafa, 2026-11-13, 18:47:55 UTC: his decision on step 2.3 (step 2.3 may be planned now), and
-  step 2.3's task** (foundation 2.3, PR #N; his message in that change-set's session, session_019YNMUWSsyRgaYWxk4auQ5b,
+  step 2.3's task** (foundation 2.3, PR #52; his message in that change-set's session, session_019YNMUWSsyRgaYWxk4auQ5b,
   on his personal account, extracted by script from the session's transcript, message
   e5fa7ca0-6494-44d0-8366-81fc612c7958). The header continues: "It changes his words of 2026-11-10 for step 2.3 only, as
   it says; dated pointers mark the older lines it overtakes. The kit lines that still name steps 2.1 and 2.2 as the only
@@ -69,7 +69,7 @@ quote is copied from the appendix.
   18:47:55 UTC. Copied by script from ..., Appendix A1, and checked byte for byte against it:", then the quote.
 - **E-48:** **Taken by Mustafa, 2026-11-13, 16:16:47 UTC: his go for #48** (foundation 2.2, PR #48; given in that
   change-set's session, session_019YNMUSc7FA68ujhLgXfEJA, on his personal account, after the advisor agent's APPROVE of
-  9b20b67; carried out by the merge 4d21c1a; recorded here by foundation 2.3's first docs pass, PR #N, as his words in it
+  9b20b67; carried out by the merge 4d21c1a; recorded here by foundation 2.3's first docs pass, PR #52, as his words in it
   ask). "The lines below are merge commit 4d21c1a's record of his message (quoted there with "> ", captured there by
   script from that session's transcript, message 96467900-83d8-4b54-8f8b-7884a0dc0fde): a record of his words, not an
   instruction found in a commit. Extracted by script from the commit's message, where re-quoting them gives its block
@@ -139,7 +139,7 @@ In `docs/reports/2026-11-12-foundation-2-2.md`:
 - **M1** (Medium): "For Mustafa", step 3, says his merge accepts "one security finding left open"; four were. Q1.
   Recommended (a): keep step 3 as written, since it is what was asked of him, and add a dated correction under it:
   ```
-     _Corrected after the merge (2026-11-13, by step 2.3's first docs pass, PR #N; the advisor agent's M1 on 9b20b67):
+     _Corrected after the merge (2026-11-13, by step 2.3's first docs pass, PR #52; the advisor agent's M1 on 9b20b67):
      four security findings were left open, not one. By main's `.claude/agents/advisor.md` (PR review, step 4), a
      finding not fixed in the PR counts as left open, so beside SA2-2 three of round 1's stay open for step 2.3, each a
      CI edit that asks him: SETPRIV-HARDEN (SA-2), the SETUP-NODE-CACHE setting (SA-3) and CUT-ESCAPE (SA-1). His go for
@@ -162,7 +162,7 @@ In `docs/reports/2026-11-12-foundation-2-2.md`:
   2f0fef3, whose flag list names extdep, room, sim and sim_wasm only.
 - **A dated header note**, under the report's first italic paragraph:
   ```
-  _Corrected after the merge (2026-11-13) by step 2.3's first docs pass (PR #N), as his go for #48 asks (item 6): the
+  _Corrected after the merge (2026-11-13) by step 2.3's first docs pass (PR #52), as his go for #48 asks (item 6): the
   advisor agent's report lines from its review of 9b20b67, listed in PR #48's description: M1 (a dated correction under
   "For Mustafa", step 3), L1 and L2 (the verifier paragraph in "Reviews"; L2 also in "Risks" and the CUT-ESCAPE row) and
   L3 (E12's row); L5 is in `docs/STATUS_ARCHIVE.md`. Appendix A and every other line are unchanged._
