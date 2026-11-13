@@ -11,10 +11,10 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-13 about 19:05 UTC; read this first after a compact or a cut): main merged (MAIN-48); L4's script in
+**NOW (2026-11-13 about 18:50 UTC; read this first after a compact or a cut): main merged (MAIN-48); L4's script in
 its revision.**
 - **MAIN-48 DONE (the merge):** at the clean stop after L4's workflow returned (nothing running; the saver stopped
-  first), main 4d21c1a merged in the main folder: **7685b2b** (pushed about 19:00 UTC). One conflict, docs/STATUS.md's
+  first), main 4d21c1a merged in the main folder: **7685b2b** (committed 18:47:11 UTC, pushed). One conflict, docs/STATUS.md's
   In-flight table, by merge_main_48.py against the merge base 2aa5e9c: this branch's #40 row (state brought up to
   date), main's #48 row, #51's row left out (main dropped it; this branch never changed it); 120 lines. spikes/
   unchanged since 4e91830; gate PASS (`--no-smoke`). **Running:** the spike's check.mjs counted on 7685b2b (task
@@ -27,12 +27,12 @@ its revision.**
   BITE_IDS cite, pre-existing: to the advisor). **The main session's six decisions** (binding): F1 re-point C22 and C24;
   F2 "(bots/Cargo.toml:25)"; P6 value-only (the start commit goes in the launch prompt); section 0's sentence names
   01ede63d… and 8b7f165e…; the 4d21c1a assert; a one-sentence launch record under the title. **Running (since about
-  19:03 UTC): the revision and its second check**, workflow wf_62c0ab97-ae7 (task w43mplsdo; script
+  18:48 UTC): the revision and its second check**, workflow wf_62c0ab97-ae7 (task w43mplsdo; script
   u4r-fill-l4b-wf_62c0ab97-ae7.js; notes u4r-fill-notes.md "Revision for the main session's decisions" and
   u4r-fill-check2.md). If cut: `Workflow({scriptPath, resumeFromRunId: "wf_62c0ab97-ae7"})`. On return: read the dry
   run (fills, stamps, re-points, R11, the top's changes in full); stop the saver; apply; commit; push; restart the
   saver; then L6.
-- The saver runs as bcp64186u (since about 19:00 UTC). The check-in is enabled (next 20:34).
+- The saver runs as bcp64186u (since 18:47:34 UTC). The check-in is enabled (next 20:34).
 **Earlier NOW (2026-11-13 about 17:55 UTC): U4r's launch, L4 running.** L3
 DONE (4e91830, its counted run PASS), L2 DONE (8bcbf36), **L1 DONE at a6b3410** (the brief is rev 3.2, sha256
 362e771e…, 1,682 lines; u4r_fold.py 9e3a123c…; the bullets below). **Running (since about 17:50 UTC): L4 and
