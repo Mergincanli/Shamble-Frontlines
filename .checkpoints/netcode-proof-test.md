@@ -13,7 +13,7 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
 
 **NOW (2026-11-13 about 17:55 UTC; read this first after a compact or a cut): U4r's launch, L4 running.** L3
 DONE (4e91830, its counted run PASS), L2 DONE (8bcbf36), **L1 DONE at a6b3410** (the brief is rev 3.2, sha256
-362e771e…, 1,682 lines; u4r_fold.py 9e3a123c…; the bullets below). **Running (since about 17:52 UTC): L4 and
+362e771e…, 1,682 lines; u4r_fold.py 9e3a123c…; the bullets below). **Running (since about 17:50 UTC): L4 and
 section 12 item 9's script**, workflow wf_d38bc2ef-a49 (task w1p1izvpz; script u4r-fill-l4-wf_d38bc2ef-a49.js):
 fill-writer (general-purpose, opus, xhigh; notes u4r-fill-notes.md) writes u4r_fill.py, dry run only: P6 = the head
 when it runs (spikes/ = 4e91830's; D1's counts from L3's counted run, read from its log), P7 = u4r-run.sh, P1-P5 and
