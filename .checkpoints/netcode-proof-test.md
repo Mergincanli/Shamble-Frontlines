@@ -70,7 +70,7 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    **(m) U4d2's merge, in progress** (advisor-u4d2-r2.md Block 5 and "Before the merge"; r1's Block 9 as amended; all
    read in full by the main session, with T1, T3, T4 and T2's carries 82-85; T5 has two places to fill: the merged
    tree's wasm seconds with M5's label, and carry 66's three v1 datagram hashes from the merged tree's h7 (ii) run).
-   **M1 met** (09:0x UTC): the copy's HEAD 51520b43391a…; 19 status lines (the 18 files and the record);
+   **M1 met** (09:06 UTC): the copy's HEAD 51520b43391a…; 19 status lines (the 18 files and the record);
    r2-hashes-start 18 of 18 OK and equal to fx-hashes-end (cmp). **M2 met:** at 99c7ed9, U4d2's lane paths and
    crates/sim unchanged since 51520b4 (`git diff --quiet`); spikes/ commits since: c88eb31 (U4e) and 1b4a3c8 (A13)
    only; spikes/ clean; A13's CI green (43330155579, 43330163225). **Running: the merge-text script's writer,**
