@@ -80,3 +80,25 @@ Inputs hashed at start: fold ruling d4417040 (217 lines), ruling 35f281bf (463),
 
 ### Log
 - V1 done: notes, script, fold ruling (whole), questions, check, ruling :70-429 read. Next V1's brief sites, then V2.
+- V1 done (sites): the 32 id bullets (fold ruling :47-168) parse one per line; each old phrase once in flattened rev
+  3.1, each new 0 times (print-only `python3 -I` from stdin); "by U4R-Q" (any case) at ten sites: :20, :250, :385,
+  :439, :440, :446, :476, :680, :859, :1605; the plan :500-501 sentence read. Next V2-V3: the script edits.
+- Decisions (the main session's words, in MAIN): Q7/Q8/Q9/Q14's third cells = WHERE, then "; its words in place: ..."
+  (WENT's lists, the ruling's form), then FQ4's additions; F3-6 and F6-4..F6-9 keep the A2/Q9.2 slots, tagged with
+  the fold ids; the "by U4R-Q" after-check by count (3), flattened context and the line each came from.
+- V2-V3 done: u4r_fold.py edited by Edit only (asserts for the fold ruling d4417040 and the plan 1e631c55; the id-bullet
+  reader; A2/Q9.2 slots; F-D13 into Q14.4; the 24 other ids; rows, third cells, record; the after-checks). Next V4.
+- V4 done: ast check (writes nothing) passes; dry run `python3 -I .checkpoints/netcode-proof-test/u4r_fold.py` exit 0,
+  last line "dry run: nothing written"; 74 changes, 84 new phrases each once, 67 replaced phrases gone, 32 ids each
+  used once; brief 1,625 -> 1,682 lines; "by U4R-Q" after: 3, at rev 3.2 :35, :270, :1661 (rev 3.1's :20, :250 (item
+  5, rewrapped by N2), :1605); brief sha256 still bcaef383. Whole diff read against both rulings. An in-memory run
+  (`python3 -I -B`, runpy, stdout captured) confirmed rev 3.1's :459, :612, :916, :1111, C1-C31 and item 4 unchanged.
+  Script lines all within 120. One check run piped the dry run's stdout to /dev/null (`> /dev/null`): it wrote no file.
+- Finding (no question): F6-3's rewrap splits a code span over two lines (`git show 4e91830 --` / `spikes/...`), as
+  D1's did in the first dry run: words unchanged.
+- Finding (no question): 2.1 (i) keeps "the determinism step's three runner recordings (SS P2 seed 1 and ES P3 seed 2
+  at U4r; U4h adds TC B1 seed 3)" (Q9.3's words): three in all, U4h adding the third; neither ruling changes it.
+- V5 done: script docstring rewrapped (its lines all within 120); final dry run exit 0, last line "dry run: nothing
+  written", brief 1,625 -> 1,682; script sha256 9e3a123cfe923fb0eae8cf10d00980f4dca924e81a4d4acaf133b79fa2096287
+  (693 lines); brief still bcaef383. No old phrase failed; no word outside both rulings but the main session's (MAIN:
+  third cells, record, the char changes). Result returned. Nothing next.
