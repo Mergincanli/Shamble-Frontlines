@@ -17,3 +17,6 @@ Seat: the advisor agent, run by the main session's workflow, working from main's
    summary for the caller.
 
 ## Notes (one line per check, as done)
+- Read whole: the brief (73 lines); advisor.md at origin/main; my round-1 ruling (730 lines: Blocks 1-9, T1-T5,
+  "Before the merge", the verdict table); the five seats' notes (infra 190, security 201, rust 141, arch 127, test 254
+  lines); the builder's "Fix pass, round 1" (u4d2-build.md:258-556, its claims).
