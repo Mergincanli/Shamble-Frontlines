@@ -550,20 +550,21 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
     TL1, TL6 and TL9; `docs/research/r5-toolchain-quality.md` :925 and :1737.
 - **From foundation 2.2** (PR #48, in flight: the report `docs/reports/2026-11-12-foundation-2-2.md`, its "Findings for
   2.3" table and "Follow-ups for later steps" list as review round 1's and round 2's fix passes left them (1de98a9 to
-  8a4f9b0, then round 2's fix), and the advisor agent's ruling D1 of 2026-11-13 and its ruling D1-R2; his words: the
-  report's Appendix A and `docs/DECISIONS.md`. The codes: S1 to S5 are the checks of the Fable advisor's early read of
-  the built skeleton (through the advisor tool, 2026-11-12); K1 is the write of the new CI job, K1b its release-test
-  line; M2 and M7 are planted failures and E12 a local check in the report's evidence; D1 to D17 are review round 1's
-  findings as the session deduped them (head 4d78ad6, 2026-11-12 and 13; the report's "Reviews"), by rust-reviewer
-  (RR-*), infra-engineer (IE-*), security-auditor (SA-*), engine-architect (EA-*) and test-engineer (TE-*), each then
-  tested by a skeptic of its own; R2-D1 to R2-D4 and R2-L1 to R2-L8 are review round 2's items as the session deduped
-  them (head 4bccf55, 2026-11-13; the report's "Reviews"), from rust-reviewer (RR2-*), security-auditor (SA2-*),
-  test-engineer (TE2-*) and engine-architect (EA2-*), R2-D1 to R2-D4 each tested by a skeptic of its own; route A is the
-  root overflow setting the ruling D1 approved; PM-0002-* are ADR 0002's pass marks, OQ-0002-* its open questions, G0,
-  G2, G3, G5, G9 and G12 checks of its gate v2. Checked against the repository by docs-keeper [verified]: on 2026-11-12,
-  GIT-C (`.claude/CHECKPOINTS.md:221`), ADVISOR-TOOL-WORDS and MODELS-2026-11-12 (their "Queued" items), G0 (PM-0002-39
-  and the register row), TSCONFIG's stubs and CI line, SAVER-SKIP-CI, PACKAGE-ENTRIES and BRIEF-STALE; on 2026-11-13,
-  every repository line that the new and reworded items cite, in `toolchain.yml`, `gate.yml`, `Cargo.toml`, the root
+  8a4f9b0, then round 2's fix 790ac31, the report's final pass bd44a68 and the last commit before ready), and the
+  advisor agent's ruling D1 of 2026-11-13 and its ruling D1-R2; his words: the report's Appendix A and
+  `docs/DECISIONS.md`. The codes: S1 to S5 are the checks of the Fable advisor's early read of the built skeleton
+  (through the advisor tool, 2026-11-12); K1 is the write of the new CI job, K1b its release-test line; M2 and M7 are
+  planted failures and E12 a local check in the report's evidence; D1 to D17 are review round 1's findings as the
+  session deduped them (head 4d78ad6, 2026-11-12 and 13; the report's "Reviews"), by rust-reviewer (RR-*),
+  infra-engineer (IE-*), security-auditor (SA-*), engine-architect (EA-*) and test-engineer (TE-*), each then tested by
+  a skeptic of its own; R2-D1 to R2-D4 and R2-L1 to R2-L8 are review round 2's items as the session deduped them (head
+  4bccf55, 2026-11-13; the report's "Reviews"), from rust-reviewer (RR2-*), security-auditor (SA2-*), test-engineer
+  (TE2-*) and engine-architect (EA2-*), R2-D1 to R2-D4 each tested by a skeptic of its own; route A is the root overflow
+  setting the ruling D1 approved; PM-0002-* are ADR 0002's pass marks, OQ-0002-* its open questions, G0, G2, G3, G5, G9
+  and G12 checks of its gate v2. Checked against the repository by docs-keeper [verified]: on 2026-11-12, GIT-C
+  (`.claude/CHECKPOINTS.md:221`), ADVISOR-TOOL-WORDS and MODELS-2026-11-12 (their "Queued" items), G0 (PM-0002-39 and
+  the register row), TSCONFIG's stubs and CI line, SAVER-SKIP-CI, PACKAGE-ENTRIES and BRIEF-STALE; on 2026-11-13, every
+  repository line that the new and reworded items cite, in `toolchain.yml`, `gate.yml`, `Cargo.toml`, the root
   `package.json`, ADR 0002, CLAUDE.md, `.claude/agents/advisor.md` and the guard; and, read by the sync's fact check,
   2.2's plan, Part 3 (EMPTY-SLOTS) and the report's E12 run (its two result files). SETUP-NODE-CACHE is [verified] from
   setup-node's own source at the pinned SHA: security-auditor read it (SA-3), and its skeptic ran the shipped detection
@@ -636,20 +637,20 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       R2-D4 skeptic's run: a counter test in protocol passed CI's release line under both settings). Its planted failure
       is Cargo.toml set back to part 4's two blocks, where the release run must go red; removing `[profile.release]`, as
       M7 did, turns the test red in any crate, protocol included. ADR 0002 places the test in `sim` (:1319 [verified
-      2026-11-13]); its owner rewords that at the next revision (the register row). Two things it needs that the tree
-      lacks: the planted counter must be sim code other crates can call (a `#[cfg(test)]` item is invisible to them;
-      part 4 makes real counters use `wrapping_*` or `checked_*`, so this `+` counter is test scaffolding); and a way to
-      run Wasm: there is no runner, E12's raw `#[unsafe(no_mangle)]` export is refused by the workspace's `unsafe_code =
-      "deny"` unless it takes part 4's written exception (an invariant, a test and an `#[allow]` with its reason), room
-      and client-endpoint take no wasm-bindgen (part 3), and wasm-bindgen comes only after its by-day reading
-      (EMPTY-SLOTS), so where the Wasm half lives is ADR 0002's owner's call, settled in that change's plan. CI runs
-      only sim and protocol in release and no Wasm test, so both halves are CI edits, each asked of him then. Anchor:
-      the first change that adds a dependency on sim, or step 2.3, whichever comes first; STATUS names the earlier
-      trigger. If nothing depends on sim when 2.3 starts, 2.3's plan either adds the test with its own test-only
-      dependency on sim, or asks the advisor agent to move the anchor to the first real one. 2.2's wasm32 build is
-      dev-profile only (WASM-ARTIFACT). The overflow tests' doc comments in `sim` and `protocol` say `cargo test
-      --release` "proves the release profile's setting", which M7 shows only for code compiled in their own crates (the
-      wording R2-L1 fixed in the report); recorded only, reworded with that test (the Fable advisor's whole read,
+      2026-11-13]); test-engineer, PM-0002-53's owner, rewords that at the next revision (the register row). Two things
+      it needs that the tree lacks: the planted counter must be sim code other crates can call (a `#[cfg(test)]` item is
+      invisible to them; part 4 makes real counters use `wrapping_*` or `checked_*`, so this `+` counter is test
+      scaffolding); and a way to run Wasm: there is no runner, E12's raw `#[unsafe(no_mangle)]` export is refused by the
+      workspace's `unsafe_code = "deny"` unless it takes part 4's written exception (an invariant, a test and an
+      `#[allow]` with its reason), room and client-endpoint take no wasm-bindgen (part 3), and wasm-bindgen comes only
+      after its by-day reading (EMPTY-SLOTS), so where the Wasm half lives is ADR 0002's owner's call, settled in that
+      change's plan. CI runs only sim and protocol in release and no Wasm test, so both halves are CI edits, each asked
+      of him then. Anchor: the first change that adds a dependency on sim, or step 2.3, whichever comes first; STATUS
+      names the earlier trigger. If nothing depends on sim when 2.3 starts, 2.3's plan either adds the test with its own
+      test-only dependency on sim, or asks the advisor agent to move the anchor to the first real one. 2.2's wasm32
+      build is dev-profile only (WASM-ARTIFACT). The overflow tests' doc comments in `sim` and `protocol` say `cargo
+      test --release` "proves the release profile's setting", which M7 shows only for code compiled in their own crates
+      (the wording R2-L1 fixed in the report); recorded only, reworded with that test (the Fable advisor's whole read,
       consultation 8).
     - **TSCONFIG** (S2): TypeScript is pinned but never type-checked: no `tsconfig`, and CI prints `tsc --version` only.
       ADR 0002 part 7 gives the shared strict base tsconfig and `tsc -b` to the lint step (G3). The stubs import
@@ -727,13 +728,13 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       code that runs inside the cut (a compromised dev dependency, such as the native rolldown binary; lightningcss is
       installed there but loads only lazily) can reach past it. Examples of the class: files that later steps, post
       steps or the runner itself run or read, such as a `core.fsmonitor` hook in the workspace's `.git/config`, which
-      actions/checkout's post step runs (shown locally with git 2.43.0 and in the source of git 2.56.0, the runner's
-      version; not run on the runner), files in the runner's work folder, or the step's `GITHUB_PATH` and `GITHUB_ENV`
-      files (these two by the runner's layout and documentation, not shown); host pathname sockets such as D-Bus or
-      systemd-resolved (from documentation, untested on the runner); and signals to the runner's own processes
-      (kill(2)). A real boundary needs a different uid with its own copy of the workspace, a container or VM, or a
-      separate job whose output nothing trusted runs. Today the job has `contents: read` and no secrets, and
-      `gate.yml`'s toolkit dependencies already run with the same reach (security-auditor).
+      actions/checkout's post step runs (shown locally with git 2.43.0 and in the source of git 2.56.0 (the runner's
+      version on 2026-11-10; 2.56.1 since 2026-11-12); not run on the runner), files in the runner's work folder, or the
+      step's `GITHUB_PATH` and `GITHUB_ENV` files (these two by the runner's layout and documentation, not shown); host
+      pathname sockets such as D-Bus or systemd-resolved (from documentation, untested on the runner); and signals to
+      the runner's own processes (kill(2)). A real boundary needs a different uid with its own copy of the workspace, a
+      container or VM, or a separate job whose output nothing trusted runs. Today the job has `contents: read` and no
+      secrets, and `gate.yml`'s toolkit dependencies already run with the same reach (security-auditor).
     - **SETPRIV-HARDEN** (D5, security-auditor's SA-2): the cut's privilege drop (`setpriv --reuid="$(id -u)"
       --regid=nogroup --clear-groups --no-new-privs`, `toolchain.yml:69` [verified 2026-11-13]) has neither
       `--inh-caps=-all` (setpriv(1)'s own advice when dropping from root) nor `--bounding-set=-all`, and the step prints
