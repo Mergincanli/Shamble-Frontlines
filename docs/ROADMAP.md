@@ -113,15 +113,17 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 **The foundation, 2.2: the toolchain [2026-11-10 to 11-12, PR #48: draft]** — foundation-toolchain, ADR 0002's
 migration plan step 2.2 (Mustafa's decision of 2026-11-10: the second account plans and builds steps 2.1 and 2.2 now).
 The pins: Rust 1.99.1 (`rust-toolchain.toml`); a virtual Cargo workspace and its lock with six empty crates in
-`crates/` (unsafe code denied, release overflow checks for `sim` and `protocol`); npm workspaces with exact versions and
+`crates/` (unsafe code denied, overflow checks in every profile for every workspace crate); npm workspaces with exact
+versions and
 one lock, five empty packages in `packages/` (TypeScript 6.0.3, Vitest 5.1.0, @playwright/test 1.65.0, Node 22). The
 CI job `toolchain` (`.github/workflows/toolchain.yml`; `gate.yml` unchanged) installs the pinned toolchain, checks
 rustc against the pin, then builds and tests with the network cut off (a TCP probe must fail inside); it is green on
-the build's heads, and seven planted failures each went red at the expected step and were reverted. On his yes: the four
+the build's heads, and eight planted failures each went red at the expected step and were reverted. On his yes: the four
 kit lines (the hard constraints bind `legacy/` only; his 2026-11-10 decision is the exception in the three lines that
 forbid v2 code) and the CI job's release-test line; main merged in (c901187); the overflow tests expect their panic's
-message. Next: the review round, the verifier, the report, the Fable advisor's re-check before ready, the
-advisor's review and his go.
+message. Review round 1 (five reviewers, 17 findings, each checked by a skeptic): the overflow setting widened to every
+workspace crate on the advisor agent's ruling (RR-1, High; his go asked, OVERFLOW-ALL). Next: review round 2, the
+verifier, the report, the Fable advisor's read before ready, the advisor's review and his go.
 
 **The foundation, 2.1b: the move [2026-11-11 to 11-12, MERGED]** — foundation-restructure, the second of step 2.1's two
 pull requests, after 2.1a (PR #50, merged as 76b4f7a on 2026-11-11, by merge commit, on Mustafa's go after the
