@@ -1,0 +1,5 @@
+# The security seat's round-2 probe (u4d2-r2-review-security.md): a CARGO_HOME config whose profile table turns off
+# plan.md §4.5's overflow checks for npt-sim with no rustflag. Read only by sec-r2-deps-home.mjs; no cargo process is
+# given this folder.
+[profile.release.package.npt-sim]
+overflow-checks = false
