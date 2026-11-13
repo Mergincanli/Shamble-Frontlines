@@ -12,6 +12,12 @@ lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAG
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
 **NOW (2026-11-12 about 17:45 UTC; read this first after a compact or a cut).**
+**At 12:53 UTC Mustafa reported usage at 92 % ("make sure to save progress (Also for the agents)"):** everything saved
+and pushed, the two running advisor agents' notes with it (advisor-u4r-brief-notes.md: B0 done, B1 started; and
+advisor-te-m3-check-notes.md: blocks 1-4 done, block 5, its own loop run, next). If a cut stops them: resume each
+workflow by its run id below (wf_95beab47-c57, U4r's brief check; wf_a25d667a-fc8, the TE-M3 commit check); each agent
+continues after its notes' last complete block. Nothing to restore: no plant, no source edit in the working tree. The
+check-in (trig_01EKqNqwZrQTVJ6caAyRrug5) is enabled and comes due at :34 of every even hour UTC.
 **Latest (2026-11-13 about 11:40 UTC, after Mustafa's compact):** U4d2 is merged and closed (item 2 (o) and its M9).
 His words of today are recorded (history.md's last entry, CHECK-IN) and the check-in exists (the saver block). **Now:
 U4r's brief** (Next steps 5): the night's rev 2 (`git show ed973c9:.checkpoints/npt-u4r-brief/u4r-brief-draft.md`,
