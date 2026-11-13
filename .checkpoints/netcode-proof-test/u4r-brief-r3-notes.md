@@ -97,3 +97,47 @@ Head read: (filled in block 1)
     :155. D10's greps: no RTT reader in crates/room/src or crates/client/src; in crates/server/src only pump.rs's
     RttSource and getter; no tolerance, clip or estimate path in crates/room/src (rewind.rs:2: "The tolerance and the
     cap are U4h's").
+- B5b code (room, client, sim, lab, bots, check.mjs):
+  - R13: `Room::new(sim, scene, greybox, tokens: Vec<[u8;16]>, n, tick_hz)` room.rs:431-478 (first tick = the tick
+    after the World's hit volumes' tick :424-426, :442); builders with_event_cap :481, with_event_start :488,
+    with_hashes :494, with_cover :501, with_bite(&str) -> Option (own ids or npt-proto's Quant) :510-518;
+    `npt_room::BITES` [7] lib.rs:37-46 (no-fallback, lt-ack, lt-cmd-seq, lt-press, server-echo, unbounded,
+    catalogue-5/owner-to-all). HISTORY_MS 2,000 provisional until U4h :33, :446. Event cap PROVISIONAL_CAP 1,024
+    events.rs:40.
+  - R14: tokens `Vec<[u8; 16]>` into Room::new (Roster::new(tokens, n) :447).
+  - R17 CHANGED: option B has no depth setting; `buffer_depth_ticks` is measured (how far ahead the newest buffered
+    command was at the last take: input.rs:28-29, :60-63, :142-145; ClientSlot :289-292); the buffer keeps at most
+    CMD_CATCHUP = REDUNDANCY_CAP = 8 commands (input.rs:56-58, :118-120; limits.rs:17). Late: offered for a tick
+    already run or already buffered (input.rs:111-117, counted room.rs:797) or dropped at take (input.rs:131-134,
+    room.rs:846). The forward compare comes first (input.rs:84-89): a command whose sequence is not after the newest
+    received is a Repeat, never Late. So rev 2's late-command bite (hold T, send T+1.. on time, send T after its tick)
+    gives Repeat, `late` 0, and a mismatch (option B reruns T-1's command at T on that leg): the bite must send no
+    later command before the delayed one. NEW FINDING for 7.2.
+  - R16 CHANGED: `ClientEndpoint::input(command, received, now)` stamps tick = newest + lead and seq = its own counter
+    (client/src/lib.rs:390-400), so a replay client cannot send the recording's ticks and sequences through it;
+    StepOut {datagrams, reliable, next_due_ns, hashes, lost, wraps} :189-202; no accessor for decoded records or held
+    floats (pub fns :253-365), so -57's pairing must read what each snapshot carried elsewhere (the room's sent bytes,
+    decoded by npt-proto; EntityDelta carries absolute grid integers per changed field, snapshot.rs:62-77). with_lead
+    :291-295 (default 1 :262), with_starts(start, event_start) :298-302, with_bite :308-320; BITES [3] :28-32.
+  - R34 CHANGED: npt-client never sends `Resync` (git grep Resync in crates/client/src: no hit); FullStates after the
+    join come only from the room's overflow resync (room.rs: `full_state_due` forced; ClientSlot::overflow_resync
+    :253). The client files a FullState's hash like a snapshot's (full_state :775-800), so StepOut cannot tell them
+    apart; the lab sees a FullState by its channel. Room's Resync handling with the limit (room.rs:713-741;
+    resyncs_limited :107-110 = NC2-M1/C-U6-16, U6's).
+  - R30 holds/answered: `Recording { scene, seed, first_tick, span_ms, generator (0 for a runner's), ticks }`
+    replay.rs:41-54, header 15 words :7-15; `World::new(scene, seed, first_tick)` world.rs:701;
+    `SimCore::state_hash(&self) -> u64` seam.rs:551 (via `room.sim()` room.rs:563); `room.tick_input()` :579 = the
+    tick's whole input (a recording's tick). GENERATOR 2 :288.
+  - R11/D5: `git diff df8975b HEAD` of lab/Cargo.toml and bots/Cargo.toml: empty. npt-lab's deps: link, l1, sim, proto,
+    room, server, client, log, serde_json, sha2 (no npt-bots); npt-bots' deps: link, proto, client, net, log (no sim;
+    npt-proto re-exports no npt-sim item: proto lib.rs:31-44). NEW for Q1: npt-bots names npt-net
+    (bots/Cargo.toml:24), so npt-lab -> npt-bots brings npt-net's tree into npt-lab.
+  - npt-lab clippy.toml exists (U4d2; both bans + clock ban); npt-bots has none (ls crates/*/clippy.toml).
+  - lab lib.rs: TickHash {recording, tick, hash} :8-17 (struct doc :8 still "the recording (or run) it replays" =
+    carry 83 (a)); HashCompare {Equal{entries}, Empty, Mismatch{index, ours, theirs, compared, mismatching}} :19-39;
+    `of` :43-61 (a shorter list: Mismatch at the first missing index, partner None).
+  - check.mjs: STEPS :2468-2503 (11: fmt, clippy, clippy-wasm32, doc, test, deps, wasm, refs, marks, self, redact);
+    main's last line :2548; LEAF :39 (npt-hash-wasm in it); WASM_CRATES :1891; lintBothBuilds :1935;
+    testBothBuilds :1973-1982; cargoCounts :1864; BITE_ID :879; biteHomeProblems :914-924; "nothing depends on
+    npt-lab" :175-178; depsStep :2062; RECORDINGS_MANIFEST :2099; WASM_BUILDS :2120-2140; WASM_CALL_LIMIT_MS
+    :2212 (per call: carry 84); wasmStep :2254.
