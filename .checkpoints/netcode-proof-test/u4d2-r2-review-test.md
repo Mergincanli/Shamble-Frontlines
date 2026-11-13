@@ -147,3 +147,108 @@ against step 1's hashes. Never commit, never clean, the shared target only.
   #[unsafe(no_mangle)] is its only unsafe code". Restored by two Edits: 9d339055; `sha256sum -c` 18 of 18 OK. Agree:
   Low (FX-6's ruled form, V4's two forms, is met; this near form is new, and review is the stated wall in the
   deny-level crates), with one addition: the deps step's PASS line asserts a claim that is false under it.
+
+## Step 4 by reading: the eight new self-tests and FX-8's unit test (claim, what bites it, could it pass wrongly)
+- FX-1 (packet-tests :343-379): deepEqual on buildInputProblems' whole list for the pair, the three SEC-U4D2-5 flags
+  (beside buildFlagProblems [] for each: the name rule alone passes them, so the new rule is the one that bites), every
+  env and config form, CARGO_BUILD_TARGET ("" included), three build.target forms; four negatives (the container's
+  variables with empty RUSTFLAGS and CARGO_ENCODED_RUSTFLAGS, the spike's real .cargo/config.toml, a target table's
+  linker, target-dir, `rustflags = []`, an [env] value holding "target = y"); and the pair through depsStep (C2R-5's
+  rule). The builder's plant (fx-1-plant.log) and my TP2 run 3 bite it. Only the doc step gives its cargo children a
+  flags variable (RUSTDOCFLAGS, check.mjs:1952-1953); no step sets a *RUSTFLAGS for its children, so the deps step reads
+  what every step's cargo gets. Sound.
+- FX-2 (:279-309): deepEqual throughout; built list and `-` names accepted; +/= of both names, the tf2 list, none, two,
+  six malformed forms, exportProblems' path. My plants A, B, C each bite it (above). Sound.
+- FX-3 (:129-148): every listed export x two forms, plus three deeper forms; the line computed from the planted text.
+  TP10 (mine) bites it and the C2R-5 test. Sound.
+- FX-4 (:311-326): four modules (Block 1 asks for three) and a pair, each beside the helper's clean target_features
+  section, so FX-2's rule cannot stand in for FX-4's (the builder's note on sec-probe-imports holds); exact messages
+  from moduleProblems and from instantiate (an engine LinkError would not match). fx-4-plant.log bites it. Sound.
+- FX-5 (:328-334): two cases, deepEqual. TP11 (mine) bites the first; the second is checked after the counted run.
+- FX-6 (:150-189): deepEqual on the whole list for each case: build.rs in each crate, the renamed include! and r#include,
+  both manifest forms, both metadata targets; negatives (the macros by name, prose, a string, another crate, npt-bots'
+  build script) and the real crates []. fx-6-plant.log disabled the .rs rule only, but the manifest and layout cases are
+  deepEqual against [], so a removed rule there fails too (by reading). No `m!(include!)` case: SEC-U4D2-R2-3, settled
+  above as a gap, not a wrong pass of this test.
+- FX-7 (:440-453): each fake call's limit, exactly four zero limits, two timed-out calls named within main's tail. It
+  cannot see run(): INF2-2, settled above (71 of 71 with the timeout dropped).
+- FX-10 (:388-410): a temp dir passed as `keep` (no self-test writes into the real failed-steps/), the panic above the
+  40 lines, the file whole, the path line, the last line, and the removal on the next run with another step's file
+  kept. fx-10-plant.log bites it. No timing dependence (no clock read). Sound.
+- FX-9 (one assert added to the bites test): the whole tail from the libc part to the sentence. fx-9-plant.log bites
+  it. Sound.
+- FX-8's unit test (hash.rs, a_digest_field_of_a_dump_of_another_length_says_the_layouts_differ): equal length gives
+  the u64 digest, longer and shorter give "layouts differ", empty and one-index forms; fx-8-plant.log bites it. Its
+  reach is a length change (P6's form, the one Block 3 names); two layouts of one length are not separable by length,
+  which no ruling asks. h6's added asserts pin bitten_name and arm_for, not compare's use of them: RR2-L3, settled above.
+- Block 4 asks that "both" FX-5 cases fail under TP11. My first form stopped at the first assert, so a second form:
+  old "    else if (LOADER_EXPORTS[name] !== kind) problems.push(", new "... !== kind && kind === \"global\")
+  problems.push(" (`begin` as a global still refused, `memory` as a function not; sha256 ae09294c).
+  r2-te-tp11b-loader-kind-memory.log (-x -k; runner exit 1 by design): 70 / 1, **not ok 59** at its second assert
+  (actual [], expected 'the module exports "memory" as a function, not a memory'). Restored by Edit: f2f2293f. Each of
+  the two cases fails by name on its own: settled.
+
+## Step 5: one counted check.mjs (done)
+- r2-te-check.log (-x, in the background with a 2,400,000 ms limit; lock 08:36:53, end 08:45:00 UTC, runner exit 0):
+  the six pre-builds each exit 0 (`cargo test --workspace --no-run`, the same `--all-features`, npt-lab release and
+  `--features bites`, npt-hash-wasm wasm32 release and `--features bites`), then `node check.mjs` exit 0, "check: all 11
+  steps pass": fmt 0.8 s; clippy 20.4 s; clippy-wasm32 2.7 s; doc 81.2 s; test 216.0 s "measured build: 417 tests
+  passed, 0 failed, 0 reported a skip; bites build: 466 tests passed, 0 failed, 0 reported a skip"; deps 1.3 s; wasm
+  34.8 s; refs 0.4 s (793 tracked files); marks 5.8 s (81 marks); self 1.6 s "71 of 71 tests passed"; redact 0.7 s (10
+  of 10; 247 items, 0 findings).
+- Counts as deltas on 416 / 465 / 63 of 63 and 11 steps: measured 417 (+1), bites 466 (+1), self 71 of 71 (+8), steps
+  11 (+0); equal to the fix pass's fx-check1 and fx-check2. No failure anywhere, so no TE2-5 entry (npt-net's TE-M3
+  test passed in both builds); failed-steps/ empty after the run.
+- The wasm step's line: native 1 against 2 and native against Wasm 27000 ticks, 0 mismatching (SS-s1, ES-s2, TC-s3 9000
+  each); h2 equal; hash-map native 1-2 caught at SS-s1 tick 1234, bite[0].hash_map_order (761badec63c37be5,
+  48b7293ffebe2fe5), native-Wasm caught (761badec63c37be5, f5e8d0e818b168c5), Wasm 1-2 not exercised (f5e8d0e818b168c5
+  both): not catchable on wasm32; std-sin caught at SS-s1 tick 2, vehicle[8].pos.y, as the scan found (other catch
+  ES-s2 1000002). Split (s): builds 5.6, 5.7, 1.3, 1.3 (13.9); npt-lab hash 3.4; Wasm 2.8, 0.9, 0.1; compare 0.0; h2
+  0.0 x5; bites 0.0; hash-map legs 2.3, Wasm 2.6, 2.7, compares 0.6, 0.3; std-sin legs 2.3, Wasm 2.7, compare 0.1 (rest
+  20.9). The Wasm digest f5e8d0e8... equals round 1's and the fix pass's; the native hash-map digests vary per run as
+  before. Provenance: 4 x npt-hash-wasm, 4 x npt-lab, 6 x npt-sim Compiling lines, each the copy's path.
+
+## Step 6: end (done, 08:47 UTC)
+- `sha256sum -c r2-hashes-start.sha256` from the copy's root: 18 of 18 OK, exit 0. `git diff --stat --
+  spikes/netcode-proof/crates/sim`: empty. git status: 9 M and 10 new, as at the start; HEAD 51520b4; nothing committed.
+  `diff -rq` of the copy's spikes/netcode-proof against .gate/u4d2-r2's: empty, exit 0. failed-steps/ empty. No file
+  in the copy was created or removed by this seat (the SEC-R2-3 plant named a file outside the copy).
+
+## Findings (ranked; none Medium or above)
+- TE2-R2-1 (Low; with INF2-2, the same item; follow-up): check.mjs:1851-1856, run()'s timeout wiring is pinned by no
+  test. Scenario: an edit drops `...(timeout ? { timeout } : {})` or reads the wrong error code, and a hung leg holds
+  the exclusive lock again with every self-test green. Proof: r2-te-inf2-2-run-timeout.log (71 of 71 with it dropped).
+  Cheapest fix: export run (or a wrapper) and one self-test, `process.execPath -e "setTimeout(()=>{},1e4)"` with a
+  200 ms limit gives timedOut true. Block 8's ruled proof ("one self-test") is met; not before the merge.
+- TE2-R2-2 (Low; with RR2-L3; follow-up): hash.rs:1036-1037, :1042, :1071, :1083: compare's one default for `--on` is
+  pinned by no test. Proof: r2-te-rr2-l3-compare-arm.log (every recording armed again: 19 passed in both builds, wasm
+  step PASS). Fix: one bin test that runs compare on two recordings with an `--on`-less arm and asserts the second
+  replays unarmed. No verdict depends on it today (check.mjs always passes `--on`); not before the merge.
+- TE2-R2-3 (Low; with SEC-U4D2-R2-3; settled live): the deps step PASSes, its held line saying "every #[path] and
+  include! literal names a .rs file in its own crate", while begin's body includes a .txt outside the repository through
+  `m!(include!)`, and its unsafe block compiles under begin's allow (r2-te-sec-r2-3-macro-include.log: wasm32 build,
+  both clippy runs, the crate's tests and deps, each exit 0). The security seat's fix (no macro_rules! in the
+  deny-level crates, or the lookahead `(?!\s*!\s*[([{])`) with one self-test case each; not before the merge (the same
+  class as SEC-U4D2-4: a deliberate committed change, review the stated wall there).
+- Process note (mine, no finding): two of my TP10 forms were vacuous (searched `mask`, where lexRust blanks `"C"`); the
+  runs are kept and labelled (r2-te-tp10b), and only the corrected form's run (r2-te-tp10c) is counted.
+
+## Claim / proof / gap
+| Claim (Block 8) | Proof re-shown here | Gap |
+|---|---|---|
+| FX-1: every flagged source and a set target refused, by name | TP2 run 3 FAIL naming both sources (r2-te-tp2-flags.log); self-test deepEqual (read); no step gives its children a *RUSTFLAGS | none |
+| FX-2: the section read refuses +/= simd128, relaxed-simd, none, two, unparsable | plants A, B, C each fail the FX-2 test by name; counted run accepts both built modules | none (SEC-U4D2-R2-1's link-arg route is the security seat's) |
+| FX-3: an `unsafe` in an export's body refused at its line | TP4 live (deps FAIL at lib.rs:101, build and clippy exit 0); TP10 fails tests 38 and 54 | none |
+| FX-4: every import refused by name before instantiating | read; the builder's plant; the security seat's runs | none |
+| FX-5: both kind cases | TP11 (begin) and TP11b (memory), each not ok 59 | none |
+| FX-6: V4's two forms refused | read (deepEqual); the builder's plant | macro-token include! (TE2-R2-3) |
+| FX-7: 300 s on each non-build call, a named FAIL | read; the builder's plant | run()'s wiring untested (TE2-R2-1) |
+| FX-8: "layouts differ"; one default for `--on` | the builder's plant on digest_text | compare's default untested (TE2-R2-2) |
+| FX-9, FX-10, FX-11, FX-12 | the builder's plants (read); FX-10 live (failed-steps/ written and removed in my runs) | none |
+| Counts and steps | r2-te-check.log: 417 / 466 / 71 of 71, 11 of 11 | none |
+| Bounds | 18 of 18 equal at start and end; crates/sim untouched; diff -rq empty | none |
+
+## Verdict
+APPROVE WITH FINDINGS: three Lows (TE2-R2-1 to -3, each also another seat's finding, now settled by run), none
+before the merge. Every FX meets its ruled form and proof; TP2 run 3, TP4, TP10 and TP11 (both cases) now fail by
+name; one counted run passes all 11 steps at 417 / 466 / 71 of 71; every file is byte-identical to its start hash.
