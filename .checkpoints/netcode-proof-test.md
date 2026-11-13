@@ -11,7 +11,8 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-13 about 19:30 UTC; read this first after a compact or a cut): L4 and item 9 applied; L6 next.**
+**NOW (2026-11-13 about 19:35 UTC; read this first after a compact or a cut): L4 and item 9 applied (2fbec77); L6
+launched: the U4r builder runs.**
 - **L4's second check: PASS** (wf_62c0ab97-ae7, task w7zvg0wdh, returned about 19:20 UTC; u4r-fill-check2.md, K1-K7
   done; script 2276287d… checked). No finding Medium or higher. Two Lows: (1) decision 2's "end" is read at the clause:
   the cell goes on ". 2.2 and D5 say so; re-walked at launch (section 12 item 9)", which is accurate (2.2 :511-515, D5
@@ -26,11 +27,27 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
   below; no script change (a Low never triggers a push).
 - **The apply:** the saver stopped (its last commit 614823c, "autosave (terminated)", the checker's notes); the dry run
   at 614823c equals the one read in full at fe1460a but for the sha (diff: the sha256-after line only); `--apply` at
-  `<base>` 614823c; then commit (this card in it), push, restart the saver, L6.
-- **L6, next:** one builder (general-purpose, opus, xhigh, `isolation: worktree`, under .claude/worktrees/), the brief
-  as filled (path and sha256 in the prompt), u4r-run.sh (349b51ad…), D13's runs first; the prompt names its worktree's
-  start commit (the head at launch, later than `<base>` by .checkpoints/ commits only) and `git diff --quiet <base>
-  HEAD -- spikes/` exiting 0 (U4d2's Block 0 precedent). At most three agents, the builder counted; the check-in stays.
+  `<base>` 614823c: **the brief is 1,909 lines, sha256 59d570b8a73fa6d9ab6b9a02e9f6d6cf6ec37a57d36d2c3ef3285bc8c5196046**
+  (the apply's log equals the dry run's but its last line); committed and pushed **2fbec77** (19:28 UTC); the saver
+  restarted as **bi031aiax** (19:28 UTC).
+- **L6 LAUNCHED (about 19:30 UTC):** one builder (general-purpose, opus, xhigh, `isolation: worktree`), in
+  /home/user/Shamble-Frontlines/.claude/worktrees/agent-a11e2354169f39acf (branch worktree-agent-a11e2354169f39acf);
+  its notes .checkpoints/netcode-proof-test/u4r-build.md in that worktree. Its prompt: the brief (path in its worktree,
+  sha256 59d570b8…), u4r-run.sh (349b51ad…), D13's five runs before any `scenario --record` (7.1 :1175), T4 item 1
+  and the syntax check, git only in the worktree, no agents, no commits; its report is section 6's return list.
+  **The worktree was created at 4d21c1a (origin/main's head), not at the spike head 2fbec77** (the prompt had said the
+  head at launch): the builder was told at once (19:32 UTC, by message) to `git merge --ff-only 2fbec77…` before
+  anything else (4d21c1a is its ancestor), never to stop at `<base>` 614823c (its brief is the one before the fill,
+  362e771e…), then to record the start checks (HEAD 2fbec77; `git diff --quiet 614823c HEAD -- spikes/` exits 0; the
+  614823c and 4e91830 ancestor checks; df). Disk at launch: 6.8 GB free (the shared target 7.3 GB, tagged; U4d2
+  started at 7.6 GB). **If cut:** check the worktree's HEAD is 2fbec77 or a descendant and its brief 59d570b8…, then a
+  fresh copy with the same prompt plus a resume line (read the notes and `git diff` in the worktree first; continue
+  after the last block marked done). At most three agents, the builder counted. The check-in stays enabled
+  (trig_01EKqNqwZrQTVJ6caAyRrug5, every 2 h at :34, next 20:34 UTC).
+- **Mustafa's message of about 19:28 UTC** (mid-turn): "You were just compacted so that Fable 5.2 answers the advisor
+  tool from now on. Read your checkpoint card (.checkpoints/foundation-2-3-docs.md) first ..." That card is not on
+  this branch (nor in its history); this session has no advisor tool (get_session: configured and served model Opus
+  5.5). Told him so; this session went on with its own card. Not recorded in history.md (he did not ask).
 
 **Earlier NOW (2026-11-13 about 18:50 UTC): main merged (MAIN-48); L4's script in its revision.**
 - **MAIN-48 DONE (the merge):** at the clean stop after L4's workflow returned (nothing running; the saver stopped
