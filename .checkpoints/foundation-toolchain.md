@@ -469,6 +469,13 @@ Count: 6.
   "revisions 1 to 9" → 10; TE2-6 the M7 row: protocol's binary failed, sim's never ran in CI; TE2-7 OVERFLOW-ALL's
   "misses most of the simulation's code" not measured → "misses the small, inline and generic functions whenever
   another crate calls them directly". E12 reproduced byte for byte; E1 reproduced; CI all green since 4d78ad6.
+  rust-reviewer DONE (~14:00): APPROVE, 0/0, 1 Medium (RR2-1: at opt-levels 0, 1, "s", "z" a member reuses a
+  dependency's unchecked copy of core's integer Sum/Product (share-generics), so its own sum() wraps; reach zero today),
+  3 Low (RR2-2: "*" follows membership, not folders; RR2-3: M7 says more than it shows; RR2-4: sim-wasm "comes first"
+  open, D13's REPO_MAP:18 half unapplied). Deduped (`review-r2-findings.md`): R2-D1 (RR2-1+TE2-1+RR2-2, Medium), R2-D2
+  (SA2-1), R2-D3 (SA2-2), R2-D4 (TE2-2+TE2-3, Low) go to skeptics; R2-L1..L6 (TE2-6+RR2-3, TE2-7, TE2-4, TE2-5, SA2-3,
+  RR2-4) checked inline by the session. Skeptics: workflow wf_72a8ddd0-ec7 (task wfrwh3h8j), pool 2 while
+  engine-architect runs; script `skeptics-r2.js`; notes `skeptic-r2-<id>.md`; resume with resumeFromRunId.
 - workflow wf_3198650c-b78 (the sync): done; its fixes in 4bccf55.
 - workflow wf_b82244e7-a22 (review round 1, run 1): done, 5 of 5 (step 26).
 - workflow wf_fcb65072-3e7 (round 1, run 2, the skeptics): done, 17 of 17.
