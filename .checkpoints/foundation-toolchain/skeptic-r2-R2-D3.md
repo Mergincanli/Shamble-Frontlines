@@ -45,3 +45,23 @@ to an owner; check Cargo.toml and CI for what the shipped setting does; then jud
   and Ok(0). So route A turns room's own release arithmetic from a silent wrap into a panic: the premise holds (agrees
   with SA2-2's scratch run and the ruling's C4). room's doc comment at 4bccf55: "Empty until the skeleton step
   (foundation 2.5)"; no `server` crate exists yet.
+- [ran] point (6), /home/user/Shamble-Frontlines/.gate/skeptic-r2-R2-D3/star/ (route A tree + a path crate `extdep`
+  outside the workspace folder, room depends on it, #[inline(never)] `ext_add(255, 1)`, release, -v, fresh target
+  folders): with "*": extdep gets no overflow flag, room `-C overflow-checks=on`, ext_add = Ok(0) (wraps). "*" removed:
+  extdep and room both `-C overflow-checks=on`, ext_add = PANIC. So dropping "*" checks every non-member crate, which
+  would include the server's network crates once they exist (agrees with the ruling's S3). The row names only the
+  option's cost (README:234). Holds.
+- (b) [grep] REPO_MAP, ROADMAP, STATUS, DECISIONS, STATUS_ARCHIVE (all of it), the report: no record hands the panic
+  side to an owner with an anchor. What exists: the report's Risks bullet :213-215 (names it, then an IOU to "Round 2's
+  security review"); the entry OVERFLOW-ALL :299-302 (tells Mustafa "would likely end that match (inferred)");
+  OVERFLOW-XCRATE-CI (STATUS_ARCHIVE :617-632) and OVERFLOW-PER-CRATE (:779-784) are the determinism side only. ADR
+  lines that partly cover it, none of which names route A's change: ADR 0004 part 20's first sentence (plain words);
+  ADR 0001's failure row :776 and PM-0001-58 (every wire tick and sequence counter tested just below its wrap, an L1
+  test: counters only); ADR 0002 part 7 :465-468 (unwrap/expect/indexing at deny in the sim's command module: no
+  overflow). engine-architect's round-2 notes :39 concur ("SA2-2's panic side belongs in the row's hand-off list";
+  part 4's rule "is mine to reword"); its EA2-3 (Low) also edits the row's hand-off list (adds Appendix A's REC4 row,
+  :1586 "adopted"; notes route A's cost falls on room and the server too). The two edits must be one clause.
+- ADR 0002's migration plan [read]: room gets code at 2.5, "the client + local server skeleton" (:1467-1472; room's
+  doc comment at 4bccf55 says the same), and runs there in the Worker, in Wasm, so an overflow traps the local sim
+  (local recovery not researched, ADR 0004 OQ-0004-7); `server` enters at slice 3, online (:1489). So "room's first
+  code" is 2.5 at the latest by plan, sooner if the next builder writes room code.

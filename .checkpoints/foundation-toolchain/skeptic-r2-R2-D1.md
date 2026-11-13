@@ -52,3 +52,12 @@ reach today; (f) exact replacement text for Cargo.toml:21-24 and OVERFLOW-PER-CR
   sim alone: panics. So at a sharing opt-level a third-party crate used by any workspace crate (here room) reaches
   sim's own code compiled in that crate, the RR-1 class again: OVERFLOW-PER-CRATE's trigger "the first such crate
   that enters sim's dependency tree" is too narrow, as RR2-1's fix (1) says.
+- K5 (c) scripts/run-c.sh -> run-c.txt: extgen (path crate OUTSIDE the root) with plain, trait_add<T: Add>,
+  trait_sum<T: Sum>, concrete_in_generic<T> (concrete u8 `+`), and holds_u16 (extgen itself instantiates
+  trait_add::<u16>); room calls each with an overflowing input. Route A as shipped (opt 3; flags: room
+  -C overflow-checks=on, extgen none): trait_add::<u8> PANICS, trait_sum::<u8> PANICS, trait_add::<u16> PANICS;
+  plain and concrete_in_generic wrap (0). Test profile: all five panic. Control trait_add::<u8>(1+2) = 3 (my label says
+  "(wrapped)" for every Ok; 3 is the right sum). TE2-1 HOLDS at the shipped opt-level: a dependency's arithmetic that
+  goes through a trait (Add, Sum) and that our crate instantiates is checked in release, so ", unchecked" is wrong
+  there (more checks, not fewer). At env "s": trait_add::<u16> (an instance extgen already holds) WRAPS from room
+  (room reuses extgen's copy), trait_add::<u8> still panics: TE2-1's case flips back at sharing opt-levels.

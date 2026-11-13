@@ -476,6 +476,13 @@ Count: 6.
   (SA2-1), R2-D3 (SA2-2), R2-D4 (TE2-2+TE2-3, Low) go to skeptics; R2-L1..L6 (TE2-6+RR2-3, TE2-7, TE2-4, TE2-5, SA2-3,
   RR2-4) checked inline by the session. Skeptics: workflow wf_72a8ddd0-ec7 (task wfrwh3h8j), pool 2 while
   engine-architect runs; script `skeptics-r2.js`; notes `skeptic-r2-<id>.md`; resume with resumeFromRunId.
+  engine-architect DONE (~14:10): APPROVE, 0/0, 1 Medium (EA2-1 = TE2-7, the decision entry's "misses most of the
+  simulation's code"; :294 calls protocol the simulation), 3 Low (EA2-2: the entry omits the row's two other rules;
+  EA2-3: the row's reword list omits Appendix A's R5-RUSTLINT-REC4 row, 0002:1586, checked inline; EA2-4: where
+  PM-0002-53's wasm32 half lives is a part 3 question, the test crate a root-workspace member; merged into R2-D4 and
+  added to `review-r2-findings.md` before R2-D4's skeptic started). R2-L2 now Medium (two reviewers converged); R2-L7
+  (EA2-2) and R2-L8 (EA2-3) checked inline: hold. All four reviewers APPROVE; no Critical or High; no round 3.
+  The session's own check: std supplies no unchecked shared Sum/Product (`session-std-share.txt`).
 - saver: background task b5z3yarke, `--every 2 --for 115`, started ~14:04 Amsterdam (b2ppm4x49 stopped by the session
   to shorten the interval while the agents write notes). Stop it before the checkpoint-deletion commit.
 - workflow wf_3198650c-b78 (the sync): done; its fixes in 4bccf55.
