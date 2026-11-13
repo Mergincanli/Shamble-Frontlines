@@ -67,7 +67,11 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    packet_name_check.py 12 of 12); u4d2-packet.md cut from u4d2-packet.json (sha256 9b670276…, 373 KB; its side file
    u4d2-packet-tests.md holds check.test.mjs's diff); base copy `.gate/u4d2-prefix` (51520b4); read copy
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
-   **(o) U4d2 MERGED at cc8595d** (pushed about 09:29 UTC on 2026-11-13; CI on it pending), the fill script
+   **M9 progress:** CI green on cc8595d (gate runs 43401792311 push and 43401799970 pull_request); `.gate/u4d2-rr-target`
+   removed by `cargo clean --target-dir` (85 files, 38.0 MiB; .gate/u4d2-merge/rr-target-clean.log); **running: the
+   cold run** (task btd6aci0w, about 09:32 UTC; log .gate/u4d2-merge/cold-run.log), the advisor's one main-run.sh call.
+   If cut: read the log's last `===` line; the cleans are idempotent and the guards re-check, so re-run the same call.
+   **(o) U4d2 MERGED at cc8595d** (pushed about 09:29 UTC on 2026-11-13; CI green), the fill script
    committed after it (056c6ef), the saver restarted (bpxjaop78). M9's items for the card, now on it: carries 82 to 85
    (U4r) and C-U7-2 (U7), in the merge commit; the open findings for PR #40's report: four security Lows, each carried
    (SEC-U4D2-3 to U7's C-U7-2; SEC-U4D2-R2-1 to -3 to U4r's entry 85) and one Medium (INF2-1, U4r's entry 84); TE2-5
