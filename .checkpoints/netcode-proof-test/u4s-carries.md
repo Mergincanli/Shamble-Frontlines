@@ -311,6 +311,9 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     acknowledgement carry no snapshot, so the client resolves them lost by design in the warm-up: the advisor's U4e
     round-1 ruling, R5, NC-L10.) marks/ is not U4r's lane unless its brief gives it this one check; else the main
     session adds it in its own commit."
+    **(h) amended (the advisor's U4r build ruling, point 4; advisor-u4r-build1-full.md):** the bite's wording now reads
+    "(a client writer that files a tick it decoded whole as lost: null and incomplete 1)", its id
+    PM-0001-17/whole-as-lost; the check's JSON stays word for word. U4r's brief 2.5 row (:643) reads this way.
 63. **FU-3 and FU-7's log half, the next change to npt-log (the advisor's U4j ruling, FU-3: SEC-F10; its round-2
     ruling, B3: SEC-R2-N2):** "The next change to npt-log (U4r's, if its brief takes crates/log; else the unit that
     next edits it) adds two refusals, each with a test that fails before it: `read_log` refuses a JSON object with a
@@ -378,6 +381,9 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     brief says so. With that change, the reader checks each entry's name against `[A-Za-z0-9-]+` and bounds `ticks` by
     `bytes / 12` before it generates anything (today a bad name reaches a file path and the `h <recording> <tick>
     <hash>` line, and a large `ticks` reaches `Vec::with_capacity` before the length and SHA-256 check)."
+    **Amended (the advisor's U4r build ruling, point 1; advisor-u4r-build1-full.md):** "U4r's runner recordings join
+    crates/lab/recordings.json" now reads "join crates/lab/det-recordings.json, in recordings.json's schema"; the rule
+    (kind key, dispatch, name and ticks checks) is unchanged.
 83. **EA-6, EA-3 and TE-L3, the comparer for -30 and the wasm step's verdicts (u4d2-review-arch.md, EA-3 and EA-6;
     u4d2-review-test.md, TE-L3; the advisor's U4d2 round-1 ruling, Block 5; with EA2-3, RR2-L3 and TE2-R2-2: the
     advisor's U4d2 round-2 ruling, Block 2):** "(a) For -30's pre-check, U4r gives `HashCompare::of` two lists that
@@ -566,6 +572,10 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
 87. **U4R-Q9, the TC B1 seed 3 recording (the advisor's U4r brief check):** U4h records TC B1 seed 3 with `scenario
     --record` and its TC shooter, adds it to crates/lab/recordings.json under carry 82's schema, and states the `wasm`
     step's time with it against the 5-minute budget.
+    **Amended (the advisor's U4r build ruling, point 1; advisor-u4r-build1-full.md):** from "adds it to" on, it now
+    reads "adds it to crates/lab/det-recordings.json under carry 82's schema, and states det-u4.mjs's time with it, its
+    non-cargo calls against carry 84's shared 300 s deadline (over 240 s it comes to the advisor, RR-L4's remedy
+    weighed first)".
 88. **O1's re-run (carry 40; the advisor's U4r brief check, U4R-Q12 (a)):** after U4h merges, the main session replays
     U4r's SS P0 seed 4 recording on the U4h build and counts both legs' replacements; at 0 that is the clean pair, else
     SS P0 seed 4 is re-recorded on the U4h build (its SHA-256 beside the old one's); then the three pairs (clean,
@@ -574,6 +584,10 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     session whose `rtt_ns` is still `None`; the re-run compares each client's first-sample instant with the instant
     U4h's estimate first reads that client's RTT (its receipt or its run, both logged at U4r); the Loopback leg's
     sessions keep `RttSource::Link`.
+89. **F5, the recordings' span copy (the advisor's U4r build ruling, point 5; advisor-u4r-build1-full.md; added by the
+    main session):** "When U4h changes npt-room's HISTORY_MS (it sizes the ring: §4.9; carry 28), it makes the span
+    readable outside npt-room (a pub constant or getter), npt-lab's ROOM_HISTORY_MS gives way to it, and the runner
+    entries are re-pinned (the advisor's U4r build ruling, point 5)."
 
 ## U4d2 or the main session (the workspace Cargo.toml, crates/proto/Cargo.toml and check.mjs; wave 2 or later)
 29. **rust 5 (nit):** "The workspace Cargo.toml's libm comment says `arch` gives 'hardware sqrt, floor, ceil, trunc and
