@@ -59,3 +59,24 @@ No earlier notes or script: fresh start.
 - B7 done: result returned (script sha256 a9196126…, dry run exit 0, last line "dry run: nothing written"; four
   questions for the advisor: 2.2's "by U4R-Q14 (b)", 3.2 row 62's "by U4R-Q2 (b)", Q14's question "P0 1" at :1460, and
   the stale references list; plus the two slips, the .pyc left for the main session). Nothing next.
+
+## Revision for the fold ruling
+Task: revise u4r_fold.py (a9196126…, 520 lines) so its dry run folds advisor-u4r-fold.md (d4417040…, 217 lines) with
+advisor-u4r-brief.md (35f281bf…) into rev 3.1 (bcaef383…), as the fold ruling's :24-41 and :187-193 say. Dry run only.
+Inputs hashed at start: fold ruling d4417040 (217 lines), ruling 35f281bf (463), brief bcaef383 (1,625), plan 1e631c55
+(1,093), script a9196126 (520). No earlier "Revision" part: fresh start.
+
+### Plan (blocks)
+- V1. Read the notes, the script, the fold ruling whole, the questions, the check; the ruling's A2, Q9, Q14 and L1;
+  the brief at every site; the plan :500-501.
+- V2. A reader for the fold ruling's id bullets: one line each, `- ID (site): "old" → "new"`, `\"` read as `"`; the ids
+  asserted as the ruling lists them (F1-1 .. F6-9, N1 .. N7b, F-D13); the third cells (:109, :111, :149) read from their
+  lines; the plan's :500-501 sentence read and asserted equal to F3-7's quoted words.
+- V3. Edit the script: the asserts; A2.1-A2.4, A2.7, A2.8 -> F6-4..F6-9, Q9.2 -> F3-6; F-D13 into Q14.4's new text;
+  S10.open -> F2-1; the added items; section 10's rows (FQ5 (d)); the third cells; the record paragraph (FQ5 (e)); the
+  two character changes logged as the main session's (FQ5 (f)); the "by U4R-Q" after-check.
+- V4. Syntax check (ast, writes nothing); dry run; fix until exit 0; read the whole diff against both rulings.
+- V5. Result.
+
+### Log
+- V1 done: notes, script, fold ruling (whole), questions, check, ruling :70-429 read. Next V1's brief sites, then V2.
