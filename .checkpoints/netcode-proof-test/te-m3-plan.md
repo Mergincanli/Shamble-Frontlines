@@ -129,4 +129,10 @@ summary line)
   (u3c-fix2-c2b.md:74) and U4d2's (u4d2-review-test.md:182-186) failures of this test: their assertion is not shown (no
   panic kept). If U3c's :2002 was the panic site, it was 'every byte, then EOF', a different failure. P2, P3 and every
   later counted run watch every assertion."
-- **P2 (conditions 1 and 6):** running (p2.log; te_m3_tally.py p2 gives the tally).
+- **P2 (conditions 1 and 6): PASS** (12:26:43-12:28:57 UTC; .gate/te-m3/p2.log; `te_m3_loop.sh p2 one 300 2 6` through
+  main-run.sh, the lane lock held exclusively; the tally by `python3 -I .checkpoints/netcode-proof-test/te_m3_tally.py
+  p2`). At its start: delay_tests.rs sha256 74d49de7…, delay.rs aaa6a588… (the committed blob), "Compiling npt-net
+  v0.0.0 (/home/user/Shamble-Frontlines/spikes/netcode-proof/crates/net)". 600 run logs, 600 own lines (exactly one per
+  run), 600 exits 0. The tally (runs, at or after the deadline, S calls): (2, 1, 2) 591; (2, 1, 3) 1; (3, 1, 2) 3;
+  (3, 1, 3) 5. One passing run with S calls = runs + 1: the case the fix covers, met (AM-1).
+- **P3 and P5:** running (p3.log, then p5-check.log, in one chain: P5 only if P3 exits 0).
