@@ -8,7 +8,7 @@ Mustafa's first item for step 2.3: "First: the docs pass. Its own small pull req
 
 ## Outcome
 - Built in five commits (1123175, 2f96f5c, 83c6ab6, d59ca43, then review round 1's fix pass), every script check and
-  the gate passing; CI green on the first four (E7), the fix pass's runs read after its push. Review round 1 (two
+  the gate passing; CI green on each (E7). Review round 1 (two
   reviewers, four skeptics) found one High and two Mediums, all fixed; round 2, the verifier and the advisor agent's
   review of the final head follow.
 - **A gap against his rule on the advisor tool** (his words of 2026-11-11, moment 5: consult before a step or the task
@@ -65,7 +65,7 @@ Mustafa's first item for step 2.3: "First: the docs pass. Its own small pull req
 | E4 | the fixes | `fixes.mjs --check` on the head: the 2.2 report's Appendix A sha256 equal to 4d21c1a's; 2.2's body-quote check: 13 blocks, 10 quotes; the report's whole-file check (base plus the edits, no other word changed). At step 3 (2f96f5c), `--check --hunks` also showed 6 hunks in the report and 5 in the archive, and the archive's whole-file check, before docs-keeper's step 4. L2: seven job logs read; L3: the saved run's flag list; L1: the 2.2 checkpoint's F1 |
 | E5 | scope | `scope.mjs`, main's guard (`protectedRel`, `mergeAllowed` from origin/main 4d21c1a): every path under `docs/`, none protected, file modes plain; DECISIONS.md and ADR 0002 not mergeAllowed, so the PR Advisor cannot merge it |
 | E6 | gate | `node tools/gate.mjs --no-smoke`: GATE PASS after each step (the smoke in CI: this container's Chromium is not the toolkit's); repo map OK |
-| E7 | CI | Green on each step's commit (gate, with its gate and smoke jobs, and toolchain; push, then pull_request): 1123175 (43497813351, 43497824049; 43497813242, 43497823762); 2f96f5c (43501529364, 43501539671; 43501529328, 43501539371); 83c6ab6 (43504752852, 43504760971; 43504752955, 43504761167); d59ca43 (43506267790, 43506274539; 43506267759, 43506274417); the final head's runs: in the pull request's body at ready |
+| E7 | CI | Green on each step's commit (gate, with its gate and smoke jobs, and toolchain; push, then pull_request): 1123175 (43497813351, 43497824049; 43497813242, 43497823762); 2f96f5c (43501529364, 43501539671; 43501529328, 43501539371); 83c6ab6 (43504752852, 43504760971; 43504752955, 43504761167); d59ca43 (43506267790, 43506274539; 43506267759, 43506274417); 554face, round 1's fix pass (43517490537, 43517496130; 43517490505, 43517496110); the final head's runs: in the pull request's body at ready |
 | E8 | facts | `quotes.mjs` on STATUS, ROADMAP, the archive and REPO_MAP: every quoted span on the added lines found in his words, the base or DECISIONS.md (one split line judged by hand); R-STATE and the verifier on every SHA, run id and time |
 
 ## Reviews
@@ -102,7 +102,8 @@ Round 2 (on what changed since d59ca43), the verifier and the advisor agent's re
 In this conversation Opus 5.5 answers the advisor tool (the `/advisor fable` output: until `/clear` or `/compact`).
 Times are the calls' own, from the session's transcript (UTC). The "step N done" saves: step 0 19:22:36 (ec16b30),
 step 1 19:55:30 (35c3e81), step 2 20:02:41 (de3845d), step 3 20:27:37 (1137ec4), step 4 20:47:34 (1cfe292), step 5
-20:57:42 (636f260).
+20:57:42 (636f260), review round 1 22:04:22 (3f98c0b, after number 6), round 1's fix pass 22:19:55 (461c82b, after
+number 8).
 1. 18:59:07, moment 1 (the approach): saved first; every pointer quotes all four limits; the grep widened; the decision
    cut by anchors; 2.2's appendix check replaced by a hash check; KIT-FREEZE-2 quoted, not paraphrased; questions put to
    the advisor agent; the final head approved as the commit that deletes the checkpoint.
@@ -119,6 +120,9 @@ step 1 19:55:30 (35c3e81), step 2 20:02:41 (de3845d), step 3 20:27:37 (1137ec4),
 7. 22:09:54, moment 5 for round 1's fix pass, before its commit and "done" save, and moment 1 for round 2: not done yet
    (the word-level diff read; "CI green" limited to the first four commits; revision 2c in the plan; #52's own STATUS
    row and ROADMAP entry made true); round 2 with new notes names, briefed on what changed only.
+8. 22:15:20, moment 5 for round 1's fix pass, before its "done" save: done once the word-level diff on the commit and
+   the 2.2 report's six hunks were re-checked; the checkpoint brought up to date in that save; no docs or script edits
+   while round 2 runs.
 The gaps: step 0's "done" save had no consultation of its own (number 1 came before the step's work); steps 1, 2, 4 and
 5 were consulted after their "done" saves; step 3 had none until number 6; and the STATUS cut (a design call, moment 4)
 was committed in 83c6ab6 (20:47) before number 4.
