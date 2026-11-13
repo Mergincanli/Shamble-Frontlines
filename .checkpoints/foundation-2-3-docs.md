@@ -177,6 +177,13 @@ Step 6's fix pass: waiting for the advisor agent's revision 2c ruling, then one 
 - The slug `foundation-2-3-docs`; the docs pass is its own PR from this branch (his words).
 
 ## Running work
+- Review round 2: workflow run wf_dcd47e10-70e (task w8dqmr6ld) · script as launched `review-r2-run1.js` (a copy of
+  `review-r2.js`) · args {"base": "d59ca43c559fe085ca90f45fdbac593236399533", "head":
+  "554faceded1948a39eb635c42c4aa12ac9edf496"} · notes `r2-words.md`, `r2-state.md`, `r2-skeptic-*.md` · launched
+  22:14 UTC · status: running.
+- Round 1's fix pass: 554faceded1948a39eb635c42c4aa12ac9edf496 (pushed 22:13 UTC; the notes as used: 56e7750). CI:
+  toolchain green (push 43517490505, pull_request 43517496110); gate running (push 43517490537, pull_request
+  43517496130) at 22:14 UTC. Its "done" save waits for the gate and consultation 8 (condition 2c-6b).
 - Review round 1: workflow run wf_eb6cb5e5-3ce (task wnyzzm0vm) · script as launched: `review-r1-run1.js` (a copy of
   `review-r1.js`) · args {"head": "d59ca43c559fe085ca90f45fdbac593236399533"} · notes: `r-words.md`, `r-state.md`,
   `skeptic-*.md` in this folder · launched ~21:04 UTC · status: done (6 of 6 agents returned).
