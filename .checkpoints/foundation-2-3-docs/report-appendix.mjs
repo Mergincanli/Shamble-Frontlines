@@ -3,8 +3,10 @@
 // words in the report's body written as "<words>" (A<n>) against the item it cites (A2-DECISION counts as A2).
 //   node .checkpoints/foundation-2-3-docs/report-appendix.mjs [--check] [--file <path>]
 // --check writes nothing and only checks; --file points at another copy (a scratch test). Exit 1 on any mismatch.
+// Both modes run words.mjs's transcript scan first; on any problem (a message of his that is not an item, an entry it
+// cannot classify) nothing is written. The intro states the scan's cut-off: the transcript's last entry when written.
 import { readFileSync, writeFileSync } from 'node:fs';
-import { allItems, chat48, SESSION, GO48 } from './words.mjs';
+import { allItems, chat48, scan, lastEntry, SESSION, GO48 } from './words.mjs';
 
 export const REPORT = 'docs/reports/2026-11-13-foundation-2-3-docs.md';
 export const HEAD = "## Appendix A. Mustafa's words for this change-set, in full";
@@ -21,21 +23,25 @@ export function sources() {
       `sessions API${stamp})` }));
 }
 
-function appendix(list) {
+function appendix(list, cutoff) {
   const intro = '_Each block below is copied byte for byte from its source by `report-appendix.mjs` (in the notes ' +
-    'folder, readable at this branch\'s last checkpoint commit, named in the header above), never retyped. A1 and A2 are ' +
-    `his messages in this session (${SESSION}, his personal account), each read from the session's transcript by ` +
+    'folder, readable at this branch\'s last checkpoint commit, named in the header above), never retyped. A1, A2 and A4 ' +
+    `are his messages in this session (${SESSION}, his personal account), each read from the session's transcript by ` +
     "`words.mjs`: a message's single text. A3 is his go for #48, read from merge commit " +
     `${GO48.commit.slice(0, 7)}'s message and checked byte for byte against foundation 2.2's chat record. His decision ` +
     'of 2026-11-13 is the text inside its quote marks in A2, cut by `words.mjs` at its first sentence ("Step 2.3 may be ' +
     'planned now.") and its last words ("only exception."), since it holds quote marks of its own. The same script ' +
     "checks every block against its source, and every quote of his words in this report's body against the item it " +
     'cites. His other input in this session was a command: `/advisor fable` (2026-11-13 18:30:08 UTC), whose output said ' +
-    'this conversation keeps Opus 5.5 as its advisor model until `/clear` or `/compact`. The session\'s other entries are ' +
-    'the harness\'s and its agents\': the command\'s caveat, the workflow-authoring skill (loaded with A2, 18:47:56 UTC), ' +
-    'a notice that the session\'s worker had restarted (19:22:24 UTC), the advisor-report skill\'s text (loaded by the ' +
-    'session), stop-hook feedback, and the hand-backs and task notifications of the session\'s own agents; `words.mjs` ' +
-    'classifies every entry of the transcript and finds no other message of his. ' +
+    'this conversation keeps Opus 5.5 as its advisor model until `/clear` or `/compact`; by the session\'s records, ' +
+    'Fable 5.2 answered every advisor-tool call ("The advisor tool"). The session\'s other entries are the harness\'s and ' +
+    'its agents\': the command\'s caveat, the workflow-authoring skill (loaded with A2, 18:47:56 UTC), notices that the ' +
+    'session\'s worker had restarted (19:22:24 and 22:01:23 UTC, the second after a notice that its container had ' +
+    'restarted, 22:01:22), the advisor-report skill\'s text (loaded by the session), stop-hook feedback, a reminder that ' +
+    'came with review round 1\'s task notification (21:54:48 UTC), the summary that carried the session on when its ' +
+    'context filled (22:54:40 UTC), and the hand-backs and task notifications of the session\'s own agents, with the ' +
+    'harness\'s notices that carry them; `words.mjs` classifies every entry of the transcript up to its last entry when ' +
+    `this appendix was written (${cutoff} UTC) and finds no other message of his. ` +
     'Entries in `docs/DECISIONS.md` copy their quotes from here, because the notes folder is deleted before the pull ' +
     'request is marked ready._';
   const blocks = list.map((s) => {
@@ -80,12 +86,20 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const fi = process.argv.indexOf('--file');
   const file = fi > 0 ? process.argv[fi + 1] : REPORT;
   const list = sources();
+  const sc = scan();
+  if (sc.problems.length) {
+    console.log(`FAIL: the transcript scan found ${sc.problems.length} problems; nothing written`);
+    for (const p of sc.problems) console.log(`  ${p}`);
+    process.exit(1);
+  }
+  const cutoff = lastEntry().replace('T', ' ').replace(/\.\d+Z$/, '');
   if (!process.argv.includes('--check')) {
     let report = readFileSync(file, 'utf8');
     const at = report.indexOf(HEAD);
-    report = (at < 0 ? `${report.replace(/\s*$/, '')}\n\n` : report.slice(0, at)) + appendix(list);
+    report = (at < 0 ? `${report.replace(/\s*$/, '')}\n\n` : report.slice(0, at)) + appendix(list, cutoff);
     writeFileSync(file, report);
-  }
+    console.log(`written: the scan's cut-off ${cutoff} UTC (${sc.rows.length} entries classified, no problem)`);
+  } else console.log(`the scan now: ${sc.rows.length} entries classified, no problem (its last entry ${cutoff} UTC)`);
   const r = check(readFileSync(file, 'utf8'), list);
   console.log(`${r.problems.length ? 'FAIL' : 'OK'}: ${r.blocks} blocks checked against their sources; ${r.quotes} quotes in the body checked (${file})`);
   for (const p of r.problems) console.log(`  ${p}`);

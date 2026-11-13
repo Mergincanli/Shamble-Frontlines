@@ -23,6 +23,8 @@ const ours = (uuid) => `(foundation 2.3, PR #52; his message in that change-set'
 const copied = (id) => `Copied by script from ${REP}, Appendix ${id}, and checked byte for byte against it:`;
 
 export const ENTRIES = [
+  { id: 'A4', key: 'E-STATUS', head: '**Taken by Mustafa, 2026-11-13, 22:27:05 UTC: his status request, in foundation ' +
+    `2.3's session** ${ours('a994258f-93c9-45d2-8878-31e7cfee6dcd')}, sent while review round 2 ran. ${copied('A4')}` },
   { id: 'A2', key: 'E-TASK', parts: true, head: `**${ENTRY}** ${ours('e5fa7ca0-6494-44d0-8366-81fc612c7958')}. It changes ` +
     'his words of 2026-11-10 for step 2.3 only, as it says; dated pointers of 2026-11-13 mark the older lines it ' +
     'overtakes (in this file, the entry "Taken by Mustafa, 2026-11-10: the second account may plan and build foundation ' +
@@ -147,7 +149,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const file = arg('--file') ?? FILE;
   const report = arg('--report') ?? REPORT;
   const blocks = reportBlocks(readFileSync(report, 'utf8'));
-  if (blocks.size !== 3) { console.error(`the report's appendix has ${blocks.size} blocks; expected 3`); process.exit(1); }
+  if (blocks.size !== 4) { console.error(`the report's appendix has ${blocks.size} blocks; expected 4`); process.exit(1); }
   const a2 = blocks.get('A2');
   const base = execFileSync('git', ['show', `${BASE}:${FILE}`], { encoding: 'utf8' });
   if (!process.argv.includes('--check') && !process.argv.includes('--negative')) {
@@ -169,6 +171,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       ['the decision\'s quote', '      > Step 2.3 may be planned now. The parts'],
       ['the whole message\'s quote', '      > My words of 2026-11-13, for a fresh chat'],
       ['E-HI\'s quote', "> Hi, don't do anything yet"],
+      ['E-STATUS\'s quote', '> Continue with what you are doing'],
       ['E-48\'s quote', '> 1. ADR-INDEX (a). Yes to the register row'],
       ['the header sentence\'s quoted words', 'Its sentence "Steps 2.3 to 2.6 keep'],
       ['the entry title', `**${ENTRY.slice(0, 40)}`],

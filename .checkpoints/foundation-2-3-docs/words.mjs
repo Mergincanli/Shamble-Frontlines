@@ -46,6 +46,12 @@ export function messageText(uuid) {
   return t[0];
 }
 
+// The latest timestamp among the transcript's entries, as read by this process: the appendix's cut-off (no message of
+// his after it is covered; a later one means re-running the scan and a new head).
+export function lastEntry() {
+  return transcript().map((o) => o.timestamp).filter((t) => typeof t === 'string').sort().at(-1) ?? null;
+}
+
 export function timestampOf(uuid) {
   return transcript().find((o) => o.uuid === uuid)?.timestamp ?? null;
 }
