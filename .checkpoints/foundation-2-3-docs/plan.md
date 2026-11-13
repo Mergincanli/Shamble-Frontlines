@@ -51,7 +51,14 @@ edited line on.", backed by `fixes.mjs`'s whole-file check; conditions: (a) the 
 `fixes.mjs --check` runs on the 2.2 report again on the final head (the archive part at step 3 only, before docs-keeper).
 §5's L2 and header-note texts below are replaced by these.
 
-## Revision 2d (2026-11-13, asked ~23:10 UTC): review round 2's fix pass (asked of the advisor agent; ruling: below when given)
+## Revision 2d (2026-11-13, asked 23:02 UTC): review round 2's fix pass (the advisor agent's ruling, ~23:06 UTC:
+## APPROVE D1 to D6, D6(a) as (a1) with three conditions; D7 agreed: no round 3; its notes: "PLAN REVISION 2d")
+Ruling's conditions for D6(a1): the entry's header says only what the message is ("his status request ... sent while
+review round 2 ran") and does not read it as a decision; the report states the cut-off time after which no message of
+his is in the appendix; any later message of his before the final commit the same way (A5 on), and one after the final
+commit means a new head. D1: keep "Why that forecast did not hold is not established."; the end message names the
+correction in its top lines, beside the advisor-tool gap. D7: the verifier must still confirm the fix against the
+records (a verifier FAIL counts as High); the advisor agent's final-head review re-checks RW2-F1.
 Round 2 on 554face (workflow wf_dcd47e10-70e): 2 of 2 reviewers and 1 of 1 skeptic returned. One High, held by its
 skeptic (RW2-F1); nine Lows (RW2-F2 to F5, R2-L1 to L4, R2-SELF). Two more items found by the session after round 2
 (D6). The changed texts:

@@ -91,6 +91,11 @@
    effort max (no stop condition); get_session: model and last served claude-opus-5-5; the agents: the advisor agent and
    docs-keeper Opus 5.5 at high; every reviewer and skeptic Opus 5.5 at max.
 
+10. Plan revision 2d (D1 to D7, plan.md at 73db213), asked of the advisor agent at 23:02 UTC: APPROVE D1 to D6 (D6(a) as
+   (a1): A4 plus a DECISIONS.md entry in E-HI's form, with three conditions), D7 agreed (no round 3). words.mjs: A4 (his
+   status request, 22:27:05) in ITEMS; the compaction summary classified as the harness's; allItems sorted by id; the
+   scan passes (28 entries, no problem).
+
 ## Current step
 Fix pass 2 (round 2's findings): FIRST ask the advisor agent for revision 2d (the changed approved texts: the archive
 follow-up's added S4 clause, #48's row wording, #52's waiting lines; and round 3: none if no Critical or High stays

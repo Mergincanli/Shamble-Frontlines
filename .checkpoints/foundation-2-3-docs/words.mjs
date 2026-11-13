@@ -1,8 +1,8 @@
 // Mustafa's words for foundation 2.3's first docs pass, from their sources, by script (never retyped). Used by
 // report-appendix.mjs and decisions.mjs; run alone to print each item and the checks (it writes nothing):
 //   node .checkpoints/foundation-2-3-docs/words.mjs
-// A1 and A2 come from this session's transcript (the .jsonl Claude Code keeps): a user entry whose content is one
-// string, found exactly once by its uuid. A2-DECISION is cut from inside its quote marks in A2 by two anchors, because
+// A1, A2 and A4 come from this session's transcript (the .jsonl Claude Code keeps): a user entry whose content is one
+// string, found exactly once by its uuid (A4, his status request, was found by the scan after review round 2). A2-DECISION is cut from inside its quote marks in A2 by two anchors, because
 // the decision holds nested quote marks. A3, his go for #48, comes from merge commit 4d21c1a's message: the "> " lines
 // after "quoted whole", unquoted; re-quoting them must give the commit's block back byte for byte (2.2's go51 method).
 // A3 is also compared with the 2.2 session's chat record: the event of message 96467900-... in a page of that
@@ -19,6 +19,7 @@ export const PAGES48 = [
 export const ITEMS = [
   { id: 'A1', uuid: 'b031379c-ea4c-47db-b279-54e937bf147a', at: '2026-11-13 18:29:55', title: 'his message before the task' },
   { id: 'A2', uuid: 'e5fa7ca0-6494-44d0-8366-81fc612c7958', at: '2026-11-13 18:47:55', title: "his task message: step 2.3's first docs pass and its plan, with his decision of 2026-11-13 on step 2.3" },
+  { id: 'A4', uuid: 'a994258f-93c9-45d2-8878-31e7cfee6dcd', at: '2026-11-13 22:27:05', title: 'his status request, sent while review round 2 ran' },
 ];
 export const GO48 = { id: 'A3', commit: '4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300', at: '2026-11-13 16:16:47', chatUuid: '96467900-83d8-4b54-8f8b-7884a0dc0fde', title: "his go for #48, in foundation 2.2's session (session_019YNMUSc7FA68ujhLgXfEJA)" };
 export const DECISION_START = 'Step 2.3 may be planned now.';
@@ -141,6 +142,7 @@ export function scan() {
       const ok = o.origin?.kind;
       if (ids.has(o.uuid)) cls = `his words (${ids.get(o.uuid)})`;
       else if (o.isMeta) cls = 'harness (meta)';
+      else if (o.isCompactSummary === true && text.startsWith('This session is being continued from a previous conversation')) cls = 'harness (the summary at a compaction)';
       else if (ok === 'task-notification' || ok === 'peer') cls = `this session's agents (${ok})`;
       else if (ok === 'human') { cls = 'HIS MESSAGE, NOT AN ITEM'; problems.push(`${o.uuid} ${o.timestamp}: a message of his that is not an item`); }
       else if (/^<command-name>\/[a-z-]+<\/command-name>/.test(text)) cls = 'his command';
@@ -162,24 +164,27 @@ export function scan() {
 export function allItems() {
   const list = ITEMS.map((it) => ({ ...it, text: messageText(it.uuid), timestamp: timestampOf(it.uuid) }));
   list.push({ ...GO48, text: go48() });
-  return list;
+  return list.sort((a, b) => Number(a.id.slice(1)) - Number(b.id.slice(1)));
 }
+export const item = (list, id) => { const it = list.find((x) => x.id === id); if (!it) throw new Error(`${id}: not an item`); return it; };
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const list = allItems();
   for (const it of list) console.log(`${it.id} ${it.at} UTC ${it.uuid ?? `commit ${it.commit.slice(0, 7)}`}${it.timestamp ? ` (transcript ${it.timestamp})` : ''}: ${it.text.length} chars, ${it.text.split('\n').length} lines`);
-  const d = decision(list[1].text);
-  console.log(`A2-DECISION: ${d.length} chars, one line; starts "${d.slice(0, 28)}", ends "${d.slice(-15)}"; inside A2: ${list[1].text.includes(d)}`);
+  const a2 = item(list, 'A2').text;
+  const a3 = item(list, 'A3').text;
+  const d = decision(a2);
+  console.log(`A2-DECISION: ${d.length} chars, one line; starts "${d.slice(0, 28)}", ends "${d.slice(-15)}"; inside A2: ${a2.includes(d)}`);
   console.log('A3: the round trip OK (re-quoting gives the commit\'s block back byte for byte)');
   const c = chat48();
   if (!c) console.log('A3 vs the chat record: the saved page is not on this machine');
-  else console.log(`A3 vs the chat record (event ${GO48.chatUuid}, created_at ${c.createdAt}): ${c.text === list[2].text ? 'identical, byte for byte' : `DIFFERS (chat ${c.text.length} chars, commit ${list[2].text.length})`}`);
+  else console.log(`A3 vs the chat record (event ${GO48.chatUuid}, created_at ${c.createdAt}): ${c.text === a3 ? 'identical, byte for byte' : `DIFFERS (chat ${c.text.length} chars, commit ${a3.length})`}`);
   const m = mergeCall48();
   if (!m) console.log('A3 vs the 2.2 session\'s merge call: the second page is not on this machine');
-  else console.log(`A3 vs the 2.2 session's merge call (its commit_message, ${m.createdAt}): ${m.text === list[2].text ? 'identical, byte for byte' : `DIFFERS (${m.text.length} chars, commit ${list[2].text.length})`}`);
+  else console.log(`A3 vs the 2.2 session's merge call (its commit_message, ${m.createdAt}): ${m.text === a3 ? 'identical, byte for byte' : `DIFFERS (${m.text.length} chars, commit ${a3.length})`}`);
   const sc = scan();
   console.log(`scan: ${sc.rows.length} entries classified: ${[...new Set(sc.rows.map((r) => r.cls))].map((k) => `${k} ${sc.rows.filter((r) => r.cls === k).length}`).join('; ')}`);
   for (const r of sc.rows) console.log(`  ${r.at} ${r.uuid.slice(0, 8)} ${r.cls}: ${r.preview}`);
   for (const p of sc.problems) console.log(`  PROBLEM ${p}`);
-  if ((c && c.text !== list[2].text) || (m && m.text !== list[2].text) || sc.problems.length) process.exit(1);
+  if ((c && c.text !== a3) || (m && m.text !== a3) || sc.problems.length) process.exit(1);
 }
