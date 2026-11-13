@@ -240,12 +240,33 @@
     OVERFLOW-ALL), REPO_MAP, ROADMAP · 8a4f9b0 · pushed; plan revision 10 in the notes. The STATUS and archive sync:
     workflow wf_3198650c-b78 (docs-keeper, then a fact checker), launched ~12:45 Amsterdam.
 
+30. Step 7, the sync, 2026-11-13: wf_3198650c-b78 done (docs-keeper: STATUS 120 lines, PR #48's row, OVERFLOW-ALL in
+    "Waiting on Mustafa"; the archive's "From foundation 2.2" with round 1's items; repo-map-check exit 0). Its fact
+    check: 8 findings (2 Medium: G0's M2 exit code, the local git version; 6 Low: CLIENT-NET-RULE's counters, IE-4's
+    second mutation, CUT-ESCAPE's three gaps, EMPTY-SLOTS' attribution, the [verified] list, STATUS.md:46). All 8
+    applied by the main session in the report and the archive together (`docs-check-r1-sync.md`); appendix check and
+    decisions check pass; gate --no-smoke PASS · 4bccf55 · pushed. Review round 2 launched on 4d78ad6..4bccf55 (outside
+    .checkpoints/), Opus 5.5 at max, three at a time: rust-reviewer, security-auditor, test-engineer (background
+    agents; notes `<agent>-review-r2.md`); engine-architect when one returns.
+
 ## Current step
-Step 6 done (4d78ad6; consultation 5). Step 7: review round 1, run 1 running (wf_d3a5ca64-901). Then: check `git status`
-outside .checkpoints/, dedupe the findings, run 2 (skeptics), the fix pass, the verifier, the Fable read (whole) before
-ready, the report final, the checkpoint folded and deleted by hand, ready, the advisor agent's review, his go.
+Step 7, review round 2 (step 30): rust-reviewer, security-auditor and test-engineer running on 4d78ad6..4bccf55;
+engine-architect next (the register row OVERFLOW-ALL and the decision entry against part 4 and PM-0002-53; the crate
+doc comments; EMPTY-SLOTS and CLIENT-NET-RULE). The older "Next steps" items 1-3 below are done (steps 5 and 6).
 
 ## Next steps
+Now (step 7, in this order):
+a. Round 2: when a reviewer returns, start engine-architect (at most 3 at a time); dedupe the findings; skeptics on any
+   Medium or higher; one fix pass (a Low triggers no push on its own; below High a STATUS follow-up). CI on 4bccf55
+   (toolchain, gate, smoke) checked green; Cargo.lock unchanged; E9 re-run.
+b. The verifier on the final head: a general agent reading main's .claude/agents/verifier.md, Opus 5.5 at max.
+c. Moment 5: the Fable advisor reads the built skeleton as a whole (print the skeleton files, then call the advisor);
+   fix what it finds within the review budget, or record it in the report. Log the consultation (count 7).
+d. The report final: the consultation log and count, round 2, the verifier; E9; the checkpoint folded in.
+e. Stop the saver; delete .checkpoints/foundation-toolchain* in a manual commit (no [skip ci]); push; mark PR #48 ready.
+f. The advisor agent's final-head review (a general agent reading main's advisor.md, at max; it re-runs the cross-crate
+   script); then ask him ADR-INDEX, K1-GO and OVERFLOW-ALL and wait for "merge #48" for that head.
+Older items, done:
 1. Step 5, now (both conditions met: LANE-RULES with PR #49, bb2d817; 2.1b with PR #51, 2aa5e9c): main merged in by
    the worktree path (plan Part 8 step 5), condition 5's check (holds on 2aa5e9c), then K2a, K2b, K3, K4: each asked in
    chat with its exact text and written only after his yes, then the guard's ask at the write (K4 in Accept edits or
@@ -430,6 +451,10 @@ ready, the report final, the checkpoint folded and deleted by hand, ready, the a
 Count: 6.
 
 ## Running work
+- review round 2 (step 30), background agents launched ~13:20 Amsterdam: rust-reviewer, security-auditor,
+  test-engineer (notes `rust-reviewer-review-r2.md`, `security-auditor-review-r2.md`, `test-engineer-review-r2.md`;
+  scratch under `.gate/<agent>-r2/`). If they are lost to a restart: relaunch each with "continue from your notes".
+- workflow wf_3198650c-b78 (the sync): done; its fixes in 4bccf55.
 - workflow wf_b82244e7-a22 (review round 1, run 1): done, 5 of 5 (step 26).
 - workflow wf_fcb65072-3e7 (round 1, run 2, the skeptics): done, 17 of 17.
 - workflow wf_3198650c-b78 (task wnagbkl2m): the STATUS and archive sync, docs-keeper then a fact checker; resume with
