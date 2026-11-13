@@ -483,6 +483,16 @@ Count: 6.
   added to `review-r2-findings.md` before R2-D4's skeptic started). R2-L2 now Medium (two reviewers converged); R2-L7
   (EA2-2) and R2-L8 (EA2-3) checked inline: hold. All four reviewers APPROVE; no Critical or High; no round 3.
   The session's own check: std supplies no unchecked shared Sum/Product (`session-std-share.txt`).
+  Skeptics DONE (wf_72a8ddd0-ec7, 4 of 4, ~14:45): R2-D1 holds Medium (RR2-1 reproduced: u8 sum wraps at 0/1/s/z with
+  a shared dependency, panics at 2/3; controls; rustc source read; TE2-1 and RR2-2 hold, Low); R2-D2 holds Medium
+  (cite ADR 0001 part 11 and ADR 0004 part 20, both Proposed, not part 4; room is tick-side; offline OQ-0004-7; the
+  wrap example reproduced); R2-D3 holds Medium (provenance: the clause is not part of D1; owners; anchor: the first
+  plan giving room or a server crate code; STATUS at its 120-line cap; ADR 0002 :471 and :1617 too); R2-D4 holds,
+  raised to Medium (a test in protocol passes under part 4's blocks too, so the test lives in a crate other than
+  protocol; its planted failure = Cargo.toml back to the two blocks; no_mangle refused, cfg(test) invisible, no Wasm
+  runner, all reproduced). Verdicts: `review-r2-verdicts.json`. Drafted texts of the whole fix pass:
+  `fix-r2-drafts.md`. Next: consult the advisor tool (count 7), then the advisor agent's ruling D1-R2 on the row's
+  rewording and the decision entry, then one fix pass and push.
 - saver: background task b5z3yarke, `--every 2 --for 115`, started ~14:04 Amsterdam (b2ppm4x49 stopped by the session
   to shorten the interval while the agents write notes). Stop it before the checkpoint-deletion commit.
 - workflow wf_3198650c-b78 (the sync): done; its fixes in 4bccf55.
