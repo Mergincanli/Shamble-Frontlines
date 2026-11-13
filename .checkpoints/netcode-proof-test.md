@@ -69,7 +69,9 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    `.gate/u4d2-r1` (51520b4 plus the patch; `diff -rq` of spikes/ against the builder's copy: equal; 17 sha256 equal).
    **(k) Running: U4d2's review round 2,** workflow wf_969ab29d-637 (task w538kzcct, stopped by the container's
    restart at about 00:52 with the rust seat returned: APPROVE WITH FINDINGS, RR2-L1 to -L4; resumed about 00:55 as
-   task wzr3p9319; script
+   task wzr3p9319; batch 1 returned (security APPROVE WITH FINDINGS, SEC-U4D2-R2-1 to -4, all Low; infra returned
+   01:17); batch 2 cut by the spend limit at 01:22 with TP10's plant in place, restored by the main session; resumed
+   08:27 as task wn0cahcg6; script
    workflows/scripts/npt-u4d2-review-r2-wf_969ab29d-637.js), launched about 00:34 UTC on 2026-11-13, on what changed:
    batch 1 (Read) security, rust, infra in the builder's copy while nobody plants (the infra seat times `--only wasm`
    with `-x` twice); batch 2 (Prove) test (general-purpose with Edit; start hashes .gate/u4d2/r2-hashes-start.sha256;
@@ -184,8 +186,8 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
    with `Workflow({scriptPath, resumeFromRunId})`. On return: read its section 6 list and every stop in full; snapshot
    the worktree (worktree_patch.py) and commit it; then the review per 7.2 item 7's panel (rust-reviewer,
    engine-architect, test-engineer, infra-engineer, security-auditor), with U4e's seats counted in the three.
-- The saver runs as bibmey4j2 (since about 00:55 UTC on 2026-11-13, after the container's restart; restart it when it
-  stops, with run_in_background and timeout
+- The saver runs as bg7f0u6ss (since about 08:27 UTC on 2026-11-13, after the 01:22 cut; restart it when it stops,
+  with run_in_background and timeout
   7200000: without the timeout the harness stops it at 30 minutes, as it stopped bg29bb0pt at 16:42 UTC). The chat's size goes in every
   report.
 
@@ -220,6 +222,16 @@ the cut and the time of the resume; UTC, read from the session's transcript):
   target, the copies). Resumed about 00:55: the builder's copy checked first (`sha256sum -c` fx-hashes-end: 18 of 18
   OK; crates/sim untouched; no cargo, rustc or runner left); round 2 resumed (`resumeFromRunId`, task wzr3p9319: the
   rust seat from its cache); the saver restarted (bibmey4j2).
+- 2026-11-13 01:22: "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit
+  resets 3:50am (UTC)". Cut: round 2's batch 2, the architect seat (01:22:52) and the test seat (01:22:58), the test
+  seat with TP10's plant in place (check.mjs, two lines in hashWasmProblems; its run's log written 01:22:57, its
+  result unrecorded); batch 1 had returned (rust 00:50, security 01:04, infra 01:17). The saver had run to its end.
+  Resumed 08:25, on Mustafa's message ("Continue with your work, will compact later"): the builder's copy checked
+  first (`sha256sum -c` fx-hashes-end: 17 OK, check.mjs FAILED); TP10's two lines removed by Edit at about 08:26
+  (check.mjs = 343c59c5…, 18 of 18 OK against r2-hashes-start, which equals fx-hashes-end; `diff -rq` against
+  .gate/u4d2-r2 equal), the restore recorded in a labelled block at the end of u4d2-r2-review-test.md (TP10 to be
+  re-planted in the seat's own form); round 2 resumed (`resumeFromRunId`, task wn0cahcg6: batch 1 from its cache);
+  the saver restarted (bg7f0u6ss).
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188

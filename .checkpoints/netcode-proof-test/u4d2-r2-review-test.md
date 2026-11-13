@@ -64,3 +64,14 @@ against step 1's hashes. Never commit, never clean, the shared target only.
   "crates/hash-wasm/src/lib.rs:101 has `unsafe` outside an attribute; npt-hash-wasm's only unsafe is the
   #[unsafe(no_mangle)] of its listed exports (...)", its line. Restored by Edit: 9d339055 = start. As round 1: the scan
   is the only layer for this case and it bites.
+
+## The main session, after the cut (labelled; not this seat's own line)
+- The org's spend limit cut this seat at 01:22:58 UTC ("You've hit your org's monthly spend limit · ask your admin for
+  a higher limit · your 5-hour limit resets 3:50am (UTC)"), with TP10's plant in place: two lines added in
+  check.mjs's hashWasmProblems after `if (allowed.has(m.index)) continue;`, `const fnAt = code.lastIndexOf('pub extern
+  "C" fn ', m.index);` and a `continue` for an `unsafe` inside a listed export's body. Its run's log
+  .gate/u4d2/r2-te-tp10-scan-regression.log was written at 01:22:57; no result line was recorded here.
+- Restored by the main session by Edit at about 08:26 UTC: check.mjs's sha256 343c59c5… = r2-hashes-start.sha256's;
+  `sha256sum -c` of r2-hashes-start from the copy's root: 18 of 18 OK; `diff -rq` of spikes/ against .gate/u4d2-r2:
+  equal. TP10 is to be re-planted in this seat's own form after the resume (its 01:22:57 log is not a recorded
+  result).
