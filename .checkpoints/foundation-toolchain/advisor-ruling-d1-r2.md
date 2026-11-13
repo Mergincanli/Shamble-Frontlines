@@ -42,3 +42,22 @@ Scratch only under /home/user/Shamble-Frontlines/.gate/advisor-d1-r2/. No tracke
   "*" table removed, opt "s" and "z": all three PANIC. Route A + [profile.release.package.extsum] overflow-checks = true,
   "s" and "z": all three PANIC. Route A, test profile (dev): all three PANIC. Control 1+2 = 3 in every run.
   So both closing options close it (tested), the shipped opt-level 3 is checked, and dev is unaffected.
+- F4 STATUS arithmetic: 120 lines at 4bccf55; draft E's two parentheticals, wrapped greedily at 120 (greedy is
+  line-optimal), make the 2.2 bullet 7 lines (+2), so with only the night-shift compaction STATUS would be 121. With
+  "OVERFLOW-XCRATE-CI (sooner if a crate depends on sim before 2.3)" and "OVERFLOW-PANIC-RULE (with room's first code)"
+  the bullet is 6 lines (+1), and the compaction of :65-66 (117 cols; not his words: no DECISIONS.md hit) keeps 120.
+- F5 comment: four lines (120/119/114/117 cols) in .gate/advisor-d1-r2/comment-final.txt, applied to a fresh archive
+  of 4bccf55 (fixcheck/): `cargo build --workspace --locked --offline` exit 0, Cargo.lock byte-identical (cmp), K1b's
+  release tests 1+1 passed.
+- F6 owners: ADR 0002 author engine-architect, its pass marks (PM-0002-53) test-engineer (:5); ADR 0004 author
+  rust-reviewer, pass marks test-engineer; ADR 0001 author netcode-architect, pass marks (PM-0001-34) test-engineer.
+  D1's condition 3 named engine-architect alone for PM-0002-53: corrected here.
+- Working view (before the advisor tool): Q1 keep "*" (zero reach today; both closing options tested; the ADR never
+  asked for dependency checks; dropping it widens to every dependency with cost and security reach unmeasured). Q2
+  approve with changes (state column: rulings D1 and D1-R2; owners incl. test-engineer; "non-member" plain; opt-level
+  reopen as a trigger; PM-0002-53 home without the planted failure). Q3 (a): the panic hand-off as part of D1-R2 (tested
+  fact + owners + anchor + pointer, no rule content). Q4 rule/trigger/owners/home in the row; method to follow-ups.
+  Q5 D10 accurate with fixes ("directly"; the reason for the wider trigger; the reopen; "drafts"; open security
+  item); (b) holds. Q6 the four lines above. Q7 fixes: D4 (five Wasm crates), D6 ("the guard" is ambiguous here), D7
+  (CI-edit parenthetical), D8/F2 (in-repo path dep wording; #[inline(never)] precision; security read), D9/F3 (SA2-2
+  open), E (6-line wording). R2-D4 relabelled Low -> Medium in writing.
