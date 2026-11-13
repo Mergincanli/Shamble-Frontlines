@@ -57,3 +57,37 @@ No commit, no push. His words: not quoted (pointers to the report and DECISIONS.
 
 ## Progress
 - plan written (this file).
+- Advisor tool consulted once, after orientation and before the edits: keep the plan; CUT-ESCAPE says "shown locally,
+  not on the runner" with no local git version; G0 keeps "M2: exit 2" and does not import "(exit 1 in 2.2's job)";
+  expand only from skeptic-confirmed text (not EA-1's cargoConfigFiles clause, not SA-2's "relies on" or container
+  example, not "all three jobs restore and save", no `--no-self-update`); nothing open worded as decided; STATUS cuts
+  from 2.2-owned text; check the name sets by script; report the two discrepancies first.
+- Report diff 4d78ad6..HEAD: only G0, OVERFLOW-WASM -> OVERFLOW-XCRATE-CI, REQUIRED-CHECK, SETUP-NODE-CACHE, the eight
+  new 2.3 rows, OVERFLOW-PER-CRATE, EMPTY-SLOTS and OQ-0002-8-TEST changed in the two lists (WASM-ARTIFACT's row did not;
+  its archive text named OVERFLOW-WASM).
+- DONE docs/STATUS_ARCHIVE.md, "From foundation 2.2": intro rewritten (sources, codes, provenance); G0, REQUIRED-CHECK,
+  SETUP-NODE-CACHE reworded in place; OVERFLOW-WASM replaced in place by OVERFLOW-XCRATE-CI; WASM-ARTIFACT joins
+  OVERFLOW-XCRATE-CI; a "From review round 1" group with the eight new 2.3 items after CRATE-LICENCE; OVERFLOW-PER-CRATE
+  rewritten, EMPTY-SLOTS reworded, OQ-0002-8-TEST added after it. Each repository line re-checked today is tagged
+  [verified 2026-11-13]; reviewer and skeptic runs stay attributed. Three cross-item sentences then attributed (CUT-CARRY's
+  link to CARGO-NET-OFFLINE and TWO-PLAYWRIGHTS; CANCEL-ON-MAIN's queue reading; FEATURE-UNIFY's G5 widening).
+- DONE docs/STATUS.md: Last updated 2026-11-13; #48's row (round 1 done: 5 reviewers, 17 findings, each checked by a
+  skeptic, all hold; fix pass 1de98a9 to 8a4f9b0; route A on the ruling D1, M7; waits on round 2's four reviewers, the
+  verifier, the Fable advisor's whole read before ready, the report, the advisor agent's final-head review, his go with
+  K1, Q2.2-a and OVERFLOW-ALL); Waiting on Mustafa: K1, Q2.2-a and OVERFLOW-ALL, "all still waiting" (2 lines); the 2.2
+  follow-ups list (29 + 5 names; its trailing archive pointer dropped, the section header gives it; 4 -> 5 lines); Next
+  item 2 rewrapped to 5 lines ("then" and the pointer's repeated date 2026-11-10 dropped) to stay at 120 lines.
+- Checks: STATUS.md 120 lines; names by script: report 29 + 5 = archive = STATUS (same order for 2.3), no duplicates;
+  no OVERFLOW-WASM left except the archive's "replaces OVERFLOW-WASM"; repo-map-check "repo map OK: 120 entries cover
+  107 required paths", exit 0; his quoted STATUS lines untouched; new lines all <= 120 characters (680, 681 and 800 are
+  older, unchanged lines); git status: only the two docs and this file.
+- Stale lines seen and left (renumbered): STATUS.md:21 and :46 (was :47; his Windows run); STATUS.md:56 (Routines read
+  2026-11-10); STATUS.md:92-94 (2.1b's follow-ups have no archive block); ROADMAP.md:3; README.md:16-26.
+- Advisor tool consulted a second time, before handback: the intro overclaimed ("the crates", "2.2's plan" among the
+  2026-11-13 lines; neither is tagged in an item) and SETUP-NODE-CACHE's run ids had lost their [assumed] tag. Fixed:
+  the intro now says every repository line the new and reworded items cite (toolchain.yml, gate.yml, Cargo.toml, the
+  root package.json, ADR 0002, CLAUDE.md, advisor.md, the guard; each re-read today), and [assumed] lists
+  "SETUP-NODE-CACHE's runs". G2 checked: ADR 0002 :571, the Rust lint stage. Line citations into the current STATUS
+  shifted by the Next-item rewrap (lines 41-95 up by one): only the report's `docs/STATUS.md:47` (report :267-268); the
+  rest are dated citations of the pre-diet STATUS. Re-checked: no new line over 120; names 4 of 4 same; STATUS 120;
+  repo-map-check exit 0. Ready to hand back.
