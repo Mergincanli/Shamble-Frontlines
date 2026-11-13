@@ -108,9 +108,16 @@
    PASS, repo map OK. Round 2's notes: no pushed version but R2-WORDS's 461c82b and 7b5f53c holds a 30-character run of
    his words (`fp2-fragments-history.mjs`). The session's own guard refusal, 23:33:46 UTC (`git -C`; route: cd, git).
 
+12. Fix pass 2 committed: 8e4fe7c863418eb034352dacbb3d998abc5b9bb1 (23:36:48 UTC; the notes as used: 1016823),
+   pushed. The word-level diff 554face..8e4fe7c read on the commit (DECISIONS +6, ROADMAP 4, STATUS 2, the archive 11,
+   the report 144 lines). CI on 8e4fe7c, all success: gate push 43528414752 (jobs gate 132239779212, smoke 132239779524),
+   toolchain push 43528414776, gate pull_request 43528420177, toolchain pull_request 43528420127. The saver restarted:
+   bw0zf0kg1 stopped, bpjfne3lu started (~23:38 UTC). A foreground `sleep 45` was blocked by the harness's own Bash rule
+   (23:38:22 UTC; not the guard, the deny list or the classifier; route: CI read through the API instead). The
+   verifier's brief: `verifier-brief.md`.
+
 ## Current step
-Fix pass 2: the notes saved (scripts frozen), then the docs commit, the push, the word-level diff 554face..fix read on
-the commit, CI read, a consultation (moment 5) before its "done" save.
+Fix pass 2's "done" save after its consultation (moment 5), then the verifier on 8e4fe7c (brief: verifier-brief.md).
 
 ## Next steps
 1. Scripts (consultation 10's items 1 to 6 block the commit): grep every "before" string of D2 to D4 in the notes'
