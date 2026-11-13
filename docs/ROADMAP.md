@@ -122,8 +122,10 @@ the build's heads, and eight planted failures each went red at the expected step
 kit lines (the hard constraints bind `legacy/` only; his 2026-11-10 decision is the exception in the three lines that
 forbid v2 code) and the CI job's release-test line; main merged in (c901187); the overflow tests expect their panic's
 message. Review round 1 (five reviewers, 17 findings, each checked by a skeptic): the overflow setting widened to every
-workspace crate on the advisor agent's ruling (RR-1, High; his go asked, OVERFLOW-ALL). Next: review round 2, the
-verifier, the report, the Fable advisor's read before ready, the advisor's review and his go.
+workspace crate on the advisor agent's ruling (RR-1, High; his go asked, OVERFLOW-ALL). Review round 2 (four reviewers,
+nothing Critical or High): on the advisor agent's ruling D1-R2, `"*"` kept and the panic side handed to the drafts'
+owners. Next: the Fable advisor's whole read, the verifier, the report, the advisor's review of the final head and his
+go.
 
 **The foundation, 2.1b: the move [2026-11-11 to 11-12, MERGED]** — foundation-restructure, the second of step 2.1's two
 pull requests, after 2.1a (PR #50, merged as 76b4f7a on 2026-11-11, by merge commit, on Mustafa's go after the

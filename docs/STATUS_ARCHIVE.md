@@ -549,26 +549,31 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
   - **Docs passes:** stale `tools/` citations in dated research docs, left as dated records: `docs/LEGACY_INVENTORY.md`
     TL1, TL6 and TL9; `docs/research/r5-toolchain-quality.md` :925 and :1737.
 - **From foundation 2.2** (PR #48, in flight: the report `docs/reports/2026-11-12-foundation-2-2.md`, its "Findings for
-  2.3" table and "Follow-ups for later steps" list as review round 1's fix pass left them (1de98a9 to 8a4f9b0), and the
-  advisor agent's ruling D1 of 2026-11-13; his words: the report's Appendix A and `docs/DECISIONS.md`. The codes: S1 to
-  S5 are the checks of the Fable advisor's early read of the built skeleton (through the advisor tool, 2026-11-12); K1
-  is the write of the new CI job, K1b its release-test line; M2 and M7 are planted failures and E12 a local check in the
-  report's evidence; D1 to D17 are review round 1's findings as the session deduped them (head 4d78ad6, 2026-11-12 and
-  13; the report's "Reviews"), by rust-reviewer (RR-*), infra-engineer (IE-*), security-auditor (SA-*), engine-architect
-  (EA-*) and test-engineer (TE-*), each then tested by a skeptic of its own; route A is the root overflow setting the
-  ruling D1 approved; PM-0002-* are ADR 0002's pass marks, OQ-0002-* its open questions, G0, G2, G3, G5, G9 and G12
-  checks of its gate v2. Checked against the repository by docs-keeper [verified]: on 2026-11-12, GIT-C
-  (`.claude/CHECKPOINTS.md:221`), ADVISOR-TOOL-WORDS and MODELS-2026-11-12 (their "Queued" items), G0 (PM-0002-39 and
-  the register row), TSCONFIG's stubs and CI line, SAVER-SKIP-CI, PACKAGE-ENTRIES and BRIEF-STALE; on 2026-11-13, every
-  repository line that the new and reworded items cite, in `toolchain.yml`, `gate.yml`, `Cargo.toml`, the root
+  2.3" table and "Follow-ups for later steps" list as review round 1's and round 2's fix passes left them (1de98a9 to
+  8a4f9b0, then round 2's fix), and the advisor agent's ruling D1 of 2026-11-13 and its ruling D1-R2; his words: the
+  report's Appendix A and `docs/DECISIONS.md`. The codes: S1 to S5 are the checks of the Fable advisor's early read of
+  the built skeleton (through the advisor tool, 2026-11-12); K1 is the write of the new CI job, K1b its release-test
+  line; M2 and M7 are planted failures and E12 a local check in the report's evidence; D1 to D17 are review round 1's
+  findings as the session deduped them (head 4d78ad6, 2026-11-12 and 13; the report's "Reviews"), by rust-reviewer
+  (RR-*), infra-engineer (IE-*), security-auditor (SA-*), engine-architect (EA-*) and test-engineer (TE-*), each then
+  tested by a skeptic of its own; R2-D1 to R2-D4 and R2-L1 to R2-L8 are review round 2's items as the session deduped
+  them (head 4bccf55, 2026-11-13; the report's "Reviews"), from rust-reviewer (RR2-*), security-auditor (SA2-*),
+  test-engineer (TE2-*) and engine-architect (EA2-*), R2-D1 to R2-D4 each tested by a skeptic of its own; route A is the
+  root overflow setting the ruling D1 approved; PM-0002-* are ADR 0002's pass marks, OQ-0002-* its open questions, G0,
+  G2, G3, G5, G9 and G12 checks of its gate v2. Checked against the repository by docs-keeper [verified]: on 2026-11-12,
+  GIT-C (`.claude/CHECKPOINTS.md:221`), ADVISOR-TOOL-WORDS and MODELS-2026-11-12 (their "Queued" items), G0 (PM-0002-39
+  and the register row), TSCONFIG's stubs and CI line, SAVER-SKIP-CI, PACKAGE-ENTRIES and BRIEF-STALE; on 2026-11-13,
+  every repository line that the new and reworded items cite, in `toolchain.yml`, `gate.yml`, `Cargo.toml`, the root
   `package.json`, ADR 0002, CLAUDE.md, `.claude/agents/advisor.md` and the guard; and, read by the sync's fact check,
   2.2's plan, Part 3 (EMPTY-SLOTS) and the report's E12 run (its two result files). SETUP-NODE-CACHE is [verified] from
   setup-node's own source at the pinned SHA: security-auditor read it (SA-3), and its skeptic ran the shipped detection
-  code (D6). The round-1 items rest on the reviewers' and skeptics' notes (`review-r1-findings.json`,
-  `review-r1-verdicts.json` and `skeptic-r1-D*.md` in `.checkpoints/foundation-toolchain/`, readable at the branch's
-  last checkpoint commit): their CI runs, API reads, source reads and scratch runs are theirs, not re-run by
-  docs-keeper. Carried from the session's list and the report [assumed]: AUTO-ASK's times, MANUAL-MODE's documentation
-  page and mode name, REFUSED-PUSH, PIN-GUARD's marks, SETUP-NODE-CACHE's runs, M2's and M7's runs, NODE-26's dates):
+  code (D6). The round-1 and round-2 items rest on the reviewers' and skeptics' notes (`review-r1-findings.json`,
+  `review-r1-verdicts.json`, `skeptic-r1-D*.md`, `review-r2-findings.md`, `review-r2-verdicts.json`,
+  `skeptic-r2-R2-D*.md`, the reviewers' `*-review-r2.md` and the advisor agent's `advisor-ruling-d1-r2.md` in
+  `.checkpoints/foundation-toolchain/`, readable at the branch's last checkpoint commit): their CI runs, API reads,
+  source reads and scratch runs are theirs, not re-run by docs-keeper. Carried from the session's list and the report
+  [assumed]: AUTO-ASK's times, MANUAL-MODE's documentation page and mode name, REFUSED-PUSH, PIN-GUARD's marks,
+  SETUP-NODE-CACHE's runs, M2's and M7's runs, NODE-26's dates):
   - **For the gate step (2.3), when the kit unfreezes:**
     - **AUTO-ASK** (his KIT-ASK-SEEN (b): `docs/DECISIONS.md`, 2026-11-11, 00:07:48 UTC; the report's Appendix A5):
       auto mode can pass the guard's ask. K1 (2026-11-10 20:02:42 UTC): the guard's ask was answered "allow" six
@@ -625,11 +630,24 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       with the old blocks, 1 of 5 of room's cross-crate overflow tests panicked under release, bench and an inheriting
       custom profile, and the wasm32 release build returned 0 in Node; with route A, 5 of 5, and the wasm32 release
       build traps, as dev does). The fix: PM-0002-53's committed counter test (a planted counter that overflows panics
-      in the four builds, dev and release, native and Wasm) runs from a crate that depends on sim, in release, native
-      and wasm32, since a test inside sim's own package cannot see the gap; ADR 0002 places that test in `sim` (:1319
-      [verified 2026-11-13]), and its owner rewords that at the next revision (the register row). A CI edit, so it asks
-      him then. Anchor: the first change that adds a dependency on sim, or step 2.3, whichever comes first. 2.2's wasm32
-      build is dev-profile only (WASM-ARTIFACT).
+      in the four builds, dev and release, native and Wasm; the release builds are the ones that tell the two settings
+      apart) runs from a workspace crate other than protocol that depends on sim (room or client-endpoint, say): part
+      4's two blocks check sim's and protocol's own packages, so a test in either passes under those blocks too (the
+      R2-D4 skeptic's run: a counter test in protocol passed CI's release line under both settings). Its planted failure
+      is Cargo.toml set back to part 4's two blocks, where the release run must go red; removing `[profile.release]`, as
+      M7 did, turns the test red in any crate, protocol included. ADR 0002 places the test in `sim` (:1319 [verified
+      2026-11-13]); its owner rewords that at the next revision (the register row). Two things it needs that the tree
+      lacks: the planted counter must be sim code other crates can call (a `#[cfg(test)]` item is invisible to them;
+      part 4 makes real counters use `wrapping_*` or `checked_*`, so this `+` counter is test scaffolding); and a way to
+      run Wasm: there is no runner, E12's raw `#[unsafe(no_mangle)]` export is refused by the workspace's `unsafe_code =
+      "deny"` unless it takes part 4's written exception (an invariant, a test and an `#[allow]` with its reason), room
+      and client-endpoint take no wasm-bindgen (part 3), and wasm-bindgen comes only after its by-day reading
+      (EMPTY-SLOTS), so where the Wasm half lives is ADR 0002's owner's call, settled in that change's plan. CI runs
+      only sim and protocol in release and no Wasm test, so both halves are CI edits, each asked of him then. Anchor:
+      the first change that adds a dependency on sim, or step 2.3, whichever comes first; STATUS names the earlier
+      trigger. If nothing depends on sim when 2.3 starts, 2.3's plan either adds the test with its own test-only
+      dependency on sim, or asks the advisor agent to move the anchor to the first real one. 2.2's wasm32 build is
+      dev-profile only (WASM-ARTIFACT).
     - **TSCONFIG** (S2): TypeScript is pinned but never type-checked: no `tsconfig`, and CI prints `tsc --version` only.
       ADR 0002 part 7 gives the shared strict base tsconfig and `tsc -b` to the lint step (G3). The stubs import
       `./index.ts`, a convention `tsc -b` would need `allowImportingTsExtensions` (with no emit) or
@@ -776,12 +794,38 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       entry, or check the built graph); and the glue's path, fixed at 2.4 or 2.5. Wording it into part 3 is for the
       ADR's owner (engine-architect) and needs his go.
   - **For later steps:**
-    - **OVERFLOW-PER-CRATE** (S3; rewritten on the advisor agent's ruling D1, condition 6): workspace crates are covered
-      by the root setting now (`[profile.release] overflow-checks = true`). A third-party crate with simulation
-      arithmetic (a maths crate) is not: `[profile.release.package."*"] overflow-checks = false` keeps dependencies at
-      the release default. The first such crate that enters sim's dependency tree decides, with its cost measured,
-      between a named override for it (a named package override beats `"*"`) and dropping `"*"` (the register row
-      OVERFLOW-ALL, his go asked and still waiting).
+    - **OVERFLOW-PER-CRATE** (S3; rewritten on the advisor agent's ruling D1, condition 6, and widened on its ruling
+      D1-R2, on review round 2's R2-D1): workspace crates are covered by the root setting now
+      (`[profile.release] overflow-checks = true`); `[profile.release.package."*"] overflow-checks = false` keeps every
+      crate that is not a workspace member at the release default setting (a member's path dependency inside the
+      repository joins the workspace and is checked, unless excluded; a `[patch]` path does not). It leaves a
+      dependency's own arithmetic unchecked, concrete arithmetic inside its generic functions included; arithmetic its
+      generic code does through a trait (`T: Add`, `Sum`) takes our crate's setting when our crate compiles it, but not
+      when rustc reuses the dependency's own copy (an `#[inline(never)]` function the dependency already uses with the
+      same types, at any opt-level; any shared generic it holds, at opt-level 0, 1, "s" or "z", where our own integer
+      `sum()` and `product()`, and sim's code compiled in our crates, can then wrap too). The first third-party crate
+      that any workspace crate uses decides, with its cost measured, between a named override for each such crate (a
+      named package override beats `"*"`) and dropping `"*"` (which checks every dependency, the server's future network
+      crates included, so security-auditor reads it then: SA2-2's point 6); while `"*"` stays, moving the release
+      profile, or one inheriting it, to opt-level 0, 1, "s" or "z" reopens it (the register row OVERFLOW-ALL, his go
+      asked and still waiting). The runs: review round 2's, in the report's "Reviews" (rust-reviewer and the R2-D1
+      skeptic for the shared generics and both closing options, repeated by the advisor agent's ruling D1-R2; the R2-D1
+      skeptic and test-engineer for the dependency's generic code).
+    - **OVERFLOW-PANIC-RULE** (review round 2, security-auditor's SA2-2; Medium, open; handed to the owners by the
+      advisor agent's ruling D1-R2 and the register row OVERFLOW-ALL): with route A, an overflow in `room`'s own
+      arithmetic panics in release instead of wrapping (local native runs; test builds already panic), and a future
+      server crate's code would do the same; on the server's tick that would end the match (ADR 0004 part 20),
+      repeatably if a client can drive the value. ADR 0004 part 20's first sentence already forbids any panic reachable
+      from network input or content data, but its list of panic sources names no overflow (:562-566), and the other
+      lines are worded for part 4's two-crate setting: ADR 0002 part 4's explicit operations name counters and tick
+      numbers (:247-249); part 7 leaves out `arithmetic_side_effects`, with REC4 as what covers overflow (:471, :1617);
+      PM-0004-60 and PM-0001-34 name no build setting. Handed to the owners to weigh, each at its ADR's next revision,
+      any wording with his go (engine-architect: ADR 0002; rust-reviewer: part 20; test-engineer: the marks), with the
+      security review's proposals: `wrapping_*` only where a wrap is meant, `checked_*` or `saturating_*` with a defined
+      result for values a client or content can set or add up; part 20 names overflow, and room's and the server's tick
+      code beside the sim; the fuzz builds keep overflow checks on; `arithmetic_side_effects` weighed for room's command
+      handling. Anchor: the plan of the first change that gives `room` or a server crate code (2.5 by ADR 0002's
+      migration plan) states the overflow rule its arithmetic follows.
     - **PACKAGE-ENTRIES** (S5): the packages have no `exports` or entry fields (the step that gives them code).
     - **EMPTY-SLOTS** (2.2's plan, Part 3, readable at the branch's last checkpoint commit; reworded on D14,
       engine-architect's EA-3): OQ-0002-7 and the wasm-bindgen pin: the pin comes with `sim-wasm`'s bindings, after the

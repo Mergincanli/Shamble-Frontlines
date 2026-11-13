@@ -18,10 +18,10 @@ unsafe_code = "deny"
 [workspace.lints.clippy]
 all = { level = "warn", priority = -1 }
 
-# Overflow checks are on in every profile for every workspace crate (ADR 0002 part 4). Not part 4's per-package form:
-# sim's inline, generic and small functions are compiled inside the crates that call them, which that form does not
-# reach (foundation 2.2's review, RR-1; the register row OVERFLOW-ALL). "*" matches only crates outside the workspace,
-# so dependencies keep the release default, unchecked.
+# Overflow checks are on in all profiles for every workspace crate (ADR 0002 part 4, widened on foundation 2.2's review,
+# RR-1: sim's inline, generic and small functions compile in their callers; register row OVERFLOW-ALL). "*" keeps every
+# non-member at the release default setting, so release or an inheriting profile at opt-level 0, 1, "s" or "z" can
+# make our sum() and product() run a dependency's unchecked copy: drop "*" or give that crate overflow-checks = true.
 [profile.release]
 overflow-checks = true
 
