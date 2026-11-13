@@ -39,6 +39,7 @@ npt-room = { path = "crates/room" }
 npt-server = { path = "crates/server" }
 npt-net = { path = "crates/net" }
 npt-client = { path = "crates/client" }
+npt-bots = { path = "crates/bots" }
 npt-log = { path = "crates/log" }
 npt-tcpinfo = { path = "crates/tcpinfo" }
 # External crates, exact versions (more join as the units need them, each reviewed: plan §4.8).

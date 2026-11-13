@@ -781,6 +781,7 @@ dependencies = [
  "npt-log",
  "npt-net",
  "npt-proto",
+ "npt-sim",
 ]
 
 [[package]]
@@ -835,6 +836,7 @@ dependencies = [
 name = "npt-lab"
 version = "0.0.0"
 dependencies = [
+ "npt-bots",
  "npt-client",
  "npt-l1",
  "npt-link",
