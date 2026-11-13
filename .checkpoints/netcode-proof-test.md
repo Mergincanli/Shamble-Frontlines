@@ -19,7 +19,21 @@ U4r's brief** (Next steps 5): the night's rev 2 (`git show ed973c9:.checkpoints/
 561 / 71 of 71, 11 steps; carries 59's new sentence, 62, 63, 69, 82-85 and C-U7-2's context; the recheck table R1-R34
 and the day items D1-D12; the lane runner copied from u4d2-run.sh), then the advisor's check with INF2-4's two diffs
 and proof logs. TE2-5 (c), TE-M3's planned change, before U4r's merge.
-**Running (since 11:41 UTC): U4r's brief rev 3**, workflow wf_4eb3ef56-c8c (task wht1e1nqn; script
+**U4r's brief rev 3.1: DONE** (wf_4eb3ef56-c8c ended about 12:47 UTC; u4r-brief.md 1,625 lines, committed in the
+saver's 8bebe87). The draft: 26 changes C1-C26, recheck R1-R34 walked (18 hold, 16 changed) plus R35-R44, D1-D3, D5,
+D6, D8, D10-D12 filled, placeholders P1-P15, section 12 "Left for the main session at launch"; its own slip (a shell
+redirect into the scratchpad, read-only, unused: notes B3a). The check (netcode-architect, u4r-brief-r3-check.md):
+REVISE, read in full by the main session: F-j High (carry 74's lead counts one direction; the stamp needs the round
+trip: about 98 % late at P2/P3 at carry 74's leads, 0 % at 5 and 7, so a new question U4R-Q14), F-a (the fourth
+recording's manifest and a runner entry's check-time cost), F-k (-18's decode is a non-zero hash, never the sentinel
+0), F-l (the bots' view time: newest tick, fraction 0), F-m (U4R-Q6 (a) needs `Decoder::with_bite` and BITES widened)
+Medium; 13 Lows. The revision (rev 3.1, C27-C33): all applied, none rejected; its own new point U4R-Q14 (b): two
+client steps reading the same newest tick make the second command late whatever the lead (about 10-15 %),
+recommending (b1) no command at a step whose newest tick did not move; D13 (a first short P2 run at leads 3 and 5
+before any recording). Open for the advisor: U4R-Q1, Q2 (part), Q4, Q6-Q14. **Next: the advisor's check** of the
+brief with u4r-run.sh and its diff and INF2-4's two diffs and proof logs: **running since about 12:52 UTC**, workflow
+wf_95beab47-c57 (task wy68rmrxh; script npt-u4r-brief-advisor-wf_95beab47-c57.js; notes advisor-u4r-brief-notes.md,
+ruling advisor-u4r-brief.md). If cut: `Workflow({scriptPath, resumeFromRunId: "wf_95beab47-c57"})`. The old run line: workflow wf_4eb3ef56-c8c (task wht1e1nqn; script
 npt-u4r-brief-r3-wf_4eb3ef56-c8c.js under the session's workflows/scripts/): draft (general-purpose acting as
 test-engineer, xhigh: u4r-brief.md in the notes folder, notes u4r-brief-r3-notes.md), check (netcode-architect, xhigh:
 u4r-brief-r3-check.md), one revision. The lane runner made first: u4r-run.sh (sha256 349b51ad…) from u4d2-run.sh by
@@ -58,7 +72,11 @@ re-run the same call if no failure was caught. Then the cause → te-m3-plan.md 
     and (b) exit 101 "4 shutdown calls for 2 pump runs", each restored by Edit (delay.rs aaa6a588…, git diff clean);
     the record in te-m3-plan.md section 7. **P2 PASS** (12:26-12:28; 600 of 600 exit 0, one own line each, (2,1,3)
     once). **Running: P3 then P5** (task bsv3s6ik3, from 12:29: p3.log, mode all, 10 x 2, 4 busy loops; then
-    p5-check.log, sha256sum of both files and `node check.mjs` counted). Then P6 (gate), ONE commit
+    p5-check.log, sha256sum of both files and `node check.mjs` counted). **P3, P5, P6 PASS; COMMITTED c49773f**
+    ("TE2-5 (c): TE-M3's cause and fix ...", pushed about 12:48 UTC; delay_tests.rs and te-m3-plan.md's section 7
+    record; CI running). **Next:** CI green on c49773f, then the advisor's check of the commit (TE-Q4: the diff,
+    conditions 1-7, the P2-P6 logs, its own run `te_m3_loop.sh <tag> one 150 2 6`). TE2-5's rule runs until U4r's
+    merge (TE-Q2). Then P6 (gate), ONE commit
     (delay_tests.rs and the record), push, CI, the advisor's check of the commit. If cut: the working tree holds the
     edit (delay_tests.rs 74d49de7…) and no plant (delay.rs aaa6a588…); re-run the interrupted P-step.
 0. **U4e's merge is next** (the advisor's round-2 ruling, advisor-u4e-r2.md: APPROVE on Q1-Q4; NC2-M1 a carry,
@@ -352,7 +370,7 @@ re-run the same call if no failure was caught. Then the cause → te-m3-plan.md 
    with `Workflow({scriptPath, resumeFromRunId})`. On return: read its section 6 list and every stop in full; snapshot
    the worktree (worktree_patch.py) and commit it; then the review per 7.2 item 7's panel (rust-reviewer,
    engine-architect, test-engineer, infra-engineer, security-auditor), with U4e's seats counted in the three.
-- The saver runs as b1yq9a1id (since about 11:02 UTC on 2026-11-13, after the container's restart; restart it when it stops,
+- The saver runs as bxvi6anv8 (since about 12:49 UTC on 2026-11-13, restarted after TE-M3's commit; restart it when it stops,
   with run_in_background and timeout
   7200000: without the timeout the harness stops it at 30 minutes, as it stopped bg29bb0pt at 16:42 UTC). The chat's size goes in every
   report.
@@ -609,6 +627,9 @@ decision is appended at history.md's end under its own heading "## Decision: …
   CHECK-IN: while agents run, one check-in scheduled about every two hours; a check-in only looks whether a cut stopped
   something, restores and resumes it by the card as SPEND-LIMIT (a) says, and ends; if it cannot be scheduled, tell
   him (it could be: the saver block names it).
+- **The advisor's TE-M3 ruling (advisor-te-m3.md, TE-Q2):** TE2-5's rule (B2.3) stays in force until U4r's merge,
+  and ends then only if no check.mjs test-step failure happens in P5 or in U4r's counted and judged runs; after it,
+  FX-10's saved output stays and a failing test is still a defect until its cause is known.
 - **Mustafa, 2026-11-12** (history.md, "## Decision: Mustafa, 2026-11-12 about 15:32 UTC"): SPEND-LIMIT (a): the cap
   stays; restore and resume after each cut; at every cut, the card's "Cuts by the spend limit" gets the notice's exact
   text, the cut's time and the resume's time. review_packet.py: exact paths in ALLOWED pass though the pattern forbids
