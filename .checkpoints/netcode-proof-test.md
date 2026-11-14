@@ -63,6 +63,14 @@ then the judged sets P3, B1, P2 and P0.**
   - **After each set:** commit results/u4r/<commit12>/<P>/, fill the report's item 7 and the card, then save.
   - **Before P0:** the judge measured apart on one measured run's logs (wall time and peak memory) and the P0
     projection; over 10 GiB goes to the advisor. RUN_LIMIT_MS re-checked against the judge's time.
+    - **The method:** `bash .checkpoints/netcode-proof-test/judge-apart.sh <set folder> <run>`, after P3's results
+      are committed (one P3 run) and again after P2's (one P2 run). It makes two peak.py calls under the lock: one
+      with the set's marks, and one with `--only PM-0001-30`, which is reading alone and gives RR3-L6's read_log share.
+      Logs go to .gate/u4r-judge-apart/<set>-<run>.log, and the verdict files are scratch. P0's judge memory and time
+      are projected from bytes using both points.
+  - **P3 RUNS (started 18:03:40 UTC; background task bnfsffmbo; kept log .gate/u4r-sets/P3-0f066338dd8d.log; raw logs
+    .gate/netcode-proof-test/runs/u4r-P3-0f066338dd8d/).** **If cut:** follow the run procedure's items (6) and (7)
+    (orphans first). A set stopped by a cut is not a result: ask the advisor before any re-run.
   - **Any run flagged for overflow resyncs** goes to the advisor before it counts (P0's tick16 bite run: about 48
     expected).
   - **B1's -17 and -18 verdicts** are INVALID by design: recorded, never counted.
@@ -70,6 +78,9 @@ then the judged sets P3, B1, P2 and P0.**
   - Mustafa typed /compact at about 17:32 UTC. The chat resumed from this card.
   - A fourth folder slip at about 17:34: a `cd` into the notes folder inside a compound command. I went back at once.
     Use `( cd … && … )` or absolute paths.
+  - **A fifth slip at about 18:04:** a `cd` into spikes/netcode-proof inside a compound read, while P3 ran. I went back
+    at once, and the set was not touched. **Rule: never start a command with `cd <other folder> &&`; use a subshell
+    or absolute paths.**
 
 **Earlier NOW (2026-11-14 about 15:42 UTC): U4r IS MERGED at 71ee13d and the
 advisor APPROVES the pushed head (advisor-u4r-merge-full.md, 57 lines, sha256 40284472…, by u4r_merge_review_full.py
