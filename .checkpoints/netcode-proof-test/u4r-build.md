@@ -904,3 +904,161 @@ changes; point 32 comes before the next full run.
   (5) Point 1 (4)'s "no deviation" meets the recording's last L - 1 ticks (48 takes of 0 at tick 119). (6) r2's design:
   `npt-lab contract`, a subcommand beyond 2.7's list (the second ruling's point 5 left it to copy 3; the advisor or
   the review rules it).
+
+## Copy 4
+
+### Start checks (done)
+
+- Started 2026-11-14 00:54 UTC, from the copy-4 prompt (the main folder's u4r-copy4-prompt.md, 35 lines, read whole).
+- Worktree /home/user/Shamble-Frontlines/.claude/worktrees/agent-a11e2354169f39acf, branch
+  worktree-agent-a11e2354169f39acf; `git rev-parse HEAD`: 2fbec7780cd04feafd8a3c67e1ebdb8889ad45ef (holds).
+- Brief sha256 59d570b8a73fa6d9ab6b9a02e9f6d6cf6ec37a57d36d2c3ef3285bc8c5196046 (holds).
+- Runner sha256 349b51adbed43a889ba9b88eeb89d573aadc3b4f035e186cc8b56de18f4e0831 (holds).
+- Rulings files: advisor-u4r-build1-full.md 476121ab... and advisor-u4r-build2-full.md f4f5ac92... (both hold);
+  wip/u4r.patch 987946cc... (holds).
+- `df -h /home/user`: /dev/vda 252G size, 34G used, 4.9G avail, 88 %.
+- No cargo or npt-* process running at start.
+- Held for the advisor's third ruling (u4r-build3-questions.md): r5 and section 5's end checks, the brawl, the after
+  phase's cap for bite runs, the mirror's tick keying, contract.rs, precheck.rs's depth assertion, the -18 and tick16
+  bite runs. None changed until a ruling reaches me by message.
+- Read before any change (00:55-01:05 UTC): these notes whole (906 lines); `git status --short` (10 modified, 11
+  untracked under spikes/ and this file); `git diff` of all 10 modified files (recordings.json, hash.rs, lab/lib.rs,
+  main.rs, pump.rs, schedule.rs, tests/schedule.rs, SERIES.md, log/lib.rs, bots/lib.rs); each untracked file whole:
+  bots/clippy.toml, bots/tests/behaviour.rs (236), lab/det-recordings.json, lab/precheck-recordings.json,
+  lab/src/contract.rs (478), mirror.rs (473), logs.rs (786), replay.rs (429), precheck.rs (958), scenario.rs (2,291).
+- Re-read: the brief's 2.3, 2.4 (r1-r10), 2.5-2.7, carries 82-85 word for word (:818-878), 4, 5, 6; ruling 1 point 1's
+  Builder line; u4r-build3-questions.md (points 1-8, the held items); check.mjs `run` (:1851), the deps step
+  (:1984-2096) and `wasmStep` (:2098-2464).
+
+### Item 1 plan (check.mjs half and det-u4.mjs; each sub-block saved when done)
+
+- C4a ruling 1 point 1 (4): `wasmStep`'s two options (manifest path, default RECORDINGS_MANIFEST; bites half, default
+  on) + one check.test.mjs case (fake runner).
+- C4b carry 84: one shared 300 s deadline from the first non-cargo call (each call given what is left; once one is
+  stopped the rest not started, each named skipped); `run` stopping a timed-out call's whole process group; its two
+  self-tests (fake runner and clock; real processes, a child that starts a grandchild, ~200 ms).
+- C4c carry 83 (b): the clean half requires exit 0 from `npt-lab hash` and `npt-lab hash compare` (one fixture case
+  each); (c) the std-sin re-show (the bitten native leg's first difference from a clean bites-build native leg is the
+  committed catch, or FAIL when the catch is not on the first recording before HASH_MAP_ARM) with its failing case; (d)
+  the npt-lab bin test (hash.rs) of `hash compare` with a bite and no `--on` over two recordings.
+- C4d carry 85 (a)-(e): the deps step's refusals with one self-test each, DEPS_CHECKED's limits, the text beside
+  `buildInputProblems`, loader.mjs's header sentence (:13-14).
+- C4e ops/runs/det-u4.mjs and its one -x run (df >= 4 GB; non-cargo calls above 240 s: stop and report).
+- Order taken: C4a-C4c, then C4e (det-u4.mjs needs C4a and inherits C4b and 83 (b)), then C4d (85 touches only the
+  deps step), then 83 (d)'s Rust test.
+
+### C4a, C4b, C4c (b) and (c): built, tests green (.gate/u4r/c4-self1.log, 01:04 UTC, df 4.9G)
+
+- A probe first (`node -e`, no file written): Node 22.23.4's `spawnSync` with a 300 ms timeout returns at 305 ms
+  (ETIMEDOUT, the child SIGTERM'd) while a grandchild holding stdout keeps running (state S); with `detached: true`
+  the grandchild is in the child's new group (pgid = the child's pid), and `process.kill(-pid, "SIGKILL")` leaves it a
+  zombie (dead, unreaped: state Z). The probe left two such zombies (pids 27807, 27821), reaped by their new parent.
+- check.mjs `run` (now exported, for 84 (c)'s test): a call with a timeout gets `detached: true`, and on ETIMEDOUT its
+  whole group is SIGKILLed (carry 84 (b); its doc names the means and two limits: a process leaving the group by its
+  own setsid, and a Ctrl-C of check.mjs not reaching the call's own session).
+- `wasmStep(runner, io, now, dir, { manifest = RECORDINGS_MANIFEST, bitesHalf = true } = {})` (point 1 (4)): the
+  manifest reaches `io.read`, every `--manifest` and so the loader's entries; `bitesHalf: false` skips the two bites
+  builds and step 6, and the summary says "hash-map: not run: the bites half is off (wasmStep's bitesHalf option)" (and
+  std-sin the same). With the defaults the calls are as before.
+- Carry 84 (a): one deadline, WASM_CALL_LIMIT_MS from the first non-cargo call; each call given what is left; once one
+  is stopped (or the time spent) every later non-cargo call is not started and named "<label>: not started (skipped):
+  <label> was stopped at the step's deadline (300 s shared by every call but its cargo builds, from the first of
+  them)"; a stopped call's line names the seconds it was left.
+- Carry 83 (b): `exited`: `npt-lab hash` and the clean `compare` must exit 0 ("<what>: exit N, not 0 (the clean half
+  requires exit 0 as well as its lines)").
+- Carry 83 (c): after the std-sin native-Wasm verdict, the re-show: `npt-lab-bites hash compare --ours
+  <hash-map>/native-1.lines --theirs <std-sin>/native-1.lines --manifest .. --dir .. --theirs-dump
+  <std-sin>/native-1.dump --ours-name "clean native leg 1" --theirs-name "std-sin native leg 1"` (no bite: compare's
+  own replay of "ours" is a clean bites-build replay, hash.rs:1186-1193), which must first differ at the scan's
+  (recording, tick, field); a catch not on entries[0] before HASH_MAP_ARM fails the step by name. The caught line adds
+  "; re-shown against a clean bites-build native leg".
+- check.test.mjs: `wasmWorld` takes `recs`, `manifestPath`, `options` and a per-answer `ms`; std-sin's answers follow
+  the scan's armed catch (new CATCH_SCAN_SS, SS-s1 tick 2 as the committed scan). Re-pinned (planned with the change,
+  section 4's expected-failure rule): the FX-7 test (now "...share one 300 s deadline...", limits 300,000 - 1,500 i, the
+  stopped text) and the first test's std-sin catch path (SS-s1 tick 2, four calls with the re-show, plus 83 (c)'s two
+  failing cases: ES-s2's catch and a catch at tick 1,234; and a re-show first differing at tick 3). New tests: "carry
+  84 (c), the shared deadline with a fake runner and clock ..." (legs takes the whole 300 s: nothing starts after it,
+  Wasm SS-s1/ES-s2/TC-s3 and npt-lab bites each named skipped; a call ending at the deadline: the next "skipped: the
+  step's deadline had passed"); "carry 84 (b) and (c): run() stops a timed call with every process it started ..."
+  (real processes, limit 200 ms; both pids gone or zombies within 2 s); "carry 83 (b): ..." (one case each); "wasmStep's
+  two options ..." (det-recordings.json's two entries reach both hash calls and the loader; no bites-build call).
+- Result: `node --test check.test.mjs` through the runner (shared): **75 of 75 pass** (base 71 + 4), exit 0, 1.7 s.
+  sha256 now: check.mjs 48dde7c1..., check.test.mjs 5985da0e....
+- Not changed: the std-sin NOT-caught cases in "the wasm step judges PM-0004-21's two bites" still use CATCH_SCAN
+  (ES-s2), so they now fail for two reasons (NOT caught, and 83 (c)'s not-first); their asserted lines still appear.
+
+### C4a-C4c's plants (done; each one -x call, restored by Edit, check.mjs sha256 48dde7c1... after each)
+
+| Plant (check.mjs) | Log (.gate/u4r/) | Fails by name |
+|---|---|---|
+| 84 (b): no group kill (`&& false` on the kill) | c4-plant-84b.log | 74 of 75: "not ok 71 - carry 84 (b) and (c): run() stops a timed call ..." (grandchild 30867 left running, ended by its own 30 s) |
+| 84 (a): per-call 300 s and no skip | c4-plant-84a.log | 73 of 75: tests 69 (the shared deadline's limits) and 70 (carry 84 (c), skipped calls) |
+| run()'s timeout wiring dropped | c4-plant-84run.log | 74 of 75: test 71, "run() reports the timeout: {...status 0, timedOut false}" |
+| 83 (b): `exited` a no-op | c4-plant-83b.log | 74 of 75: "not ok 72 - carry 83 (b) ..." |
+| 83 (c): both re-show refusals off | c4-plant-83c.log | 74 of 75: "not ok 67 - the wasm step's builds, legs and comparisons, in order ..." |
+| point 1 (4): the hash calls given RECORDINGS_MANIFEST | c4-plant-p14.log | 74 of 75: "not ok 73 - wasmStep's two options ..." |
+
+### C4e: ops/runs/det-u4.mjs and its one run (done; .gate/u4r/det-u4.log, -x, 01:07:59-01:11:41 UTC)
+
+- ops/runs/det-u4.mjs (new, ruling 1 point 1 (5)): imports check.mjs's `wasmStep`, `main` and FAILED_STEP_DIR; runs
+  `wasmStep(run, WASM_IO, Date.now, <ROOT>/.gate/netcode-proof-test/det-u4, { manifest:
+  "crates/lab/det-recordings.json", bitesHalf: false })` as main's one step "det-u4" (so it prints as main prints a
+  step, keeps a failed run's whole output in FAILED_STEP_DIR/det-u4.log, and exits 0 only on PASS). `node --check`:
+  ok. No self-test of its own (the options' test covers what it passes).
+- Before: uptime 56 min, load 0.11; df 4.9G (above the 4 GB floor). One -x call: `cargo build --locked --release -p
+  npt-lab`, `cargo build --locked --release --target wasm32-unknown-unknown -p npt-hash-wasm` (provenance: every npt-*
+  crate "Compiling ... (<wt>/spikes/netcode-proof/crates/...)", npt-sim twice), then `node ops/runs/det-u4.mjs`. exit 0.
+- **The line, word for word:** "PASS  det-u4        200.5 s  native leg 1 against native leg 2: 18000 ticks compared, 0
+  mismatching, equal (SS-P2-s1 9000, ES-P3-s2 9000); native leg 1 against Wasm leg 1: 18000 ticks compared, 0
+  mismatching, equal (SS-P2-s1 9000, ES-P3-s2 9000); h2 equal; hash-map: not run: the bites half is off (wasmStep's
+  bitesHalf option); std-sin: not run: the bites half is off (wasmStep's bitesHalf option); seconds: build npt-lab 8.5,
+  build npt-hash-wasm.wasm 1.0, npt-lab hash 187.8, Wasm SS-P2-s1 2.3, Wasm ES-P3-s2 0.8, compare 0.0, h2 vector-SS 0.0,
+  h2 vector-ES 0.0, h2 vector-CO 0.0, h2 vector-TC 0.0, h2 vectors 0.0", then "check: all 1 steps pass".
+- **Figures:** the calls other than the cargo builds sum to **190.9 s** (187.8 + 2.3 + 0.8 + 0.0 x 7, at the line's
+  0.1 s precision): under 240 s, so no stop (ruling 1 point 1 (6)). **W** (the two Wasm legs) = 2.3 + 0.8 = **3.1 s**.
+  The step 200.5 s, warm (uptime 56 min; its two builds 9.5 s, rebuilt after the runner's touch). `npt-lab hash`'s
+  187.8 s holds both runner regenerations (each a whole `scenario --record` re-run: point 9 (c)'s time after the
+  no-log memory fix) and the native legs; the split is not printed. df after 4.9G.
+
+### C4d: carry 85 (a)-(e) (built; .gate/u4r/c4-self3.log: 76 of 76, 01:16 UTC)
+
+- Checked first (names only, no value read): no environment variable ends in _LINKER or starts with CARGO_PROFILE_,
+  CARGO_HOME unset, no ~/.cargo/config(.toml); in crates/tcpinfo and crates/hash-wasm every `include` is in a comment;
+  no `#[$` / `#![$` anywhere in crates/.
+- (a) `cargoConfigProblems`: an env var ending in _LINKER ("<k> in the environment sets a linker (<v>): its arguments can
+  rewrite the target_features section the Wasm loader reads") and a `linker` key in any table or form of a config
+  ("<path> has a key `linker` (<v>): ..."); its doc list names both. DEPS_CHECKED's limits bullet and loader.mjs's
+  header sentence (:11-16 now; it was :13-14) say what the target_features read gives: a compile-time feature shows and
+  is refused, but the section is the linker's record (a RUSTC_WRAPPER's link arguments can rewrite it:
+  sec_probe_tf2_ld.wasm, r2-sec-loader.log), and the x86-64 legs have no artifact check.
+- (b) an env var starting CARGO_PROFILE_ ("... sets a profile key (<v>): it can drop npt-sim's -C overflow-checks=on,
+  which plan §4.5 asks for in every profile") and a `profile` header, dotted key, key or quoted key in a config
+  ("<path> has a `profile` key or table: ...").
+- (c) `unsafeProblems`: in the deny-level crates `include` only directly before `!` and `(`, `[` or `{` (regex
+  `\binclude\b(?!![([{])`; the message re-worded, FX-6's pinned text re-pinned with it); in every crate an attribute
+  whose text starts with a metavariable (`#\s*!?\s*\[\s*\$` on lexRust's mask).
+- (d) `cargoConfigDirs` (new export, split out of `cargoConfigFiles`): CARGO_HOME empty reads as unset (~/.cargo), a
+  relative one resolved against `start`, the folder cargo runs in (cargo's home crate's rule).
+- (e) `buildInputProblems`' doc: "Cargo gives rustc one source and drops the others ...: CARGO_ENCODED_RUSTFLAGS if
+  set, even empty; else RUSTFLAGS if set, even empty; else the matching target tables' flags, if any; else
+  build.rustflags."
+- DEPS_CHECKED (the deps step's summary): "... names `include` but directly before `!` and an opening bracket; no
+  attribute's text starts with a metavariable; ... no other rustc or workspace wrapper, no linker, no profile, no config
+  include and no test runner ...".
+- Tests: new "carry 85 (a), (b) and (d): ..." (one case per refusal and form, a no-false-positive config, the real
+  `process.env` with the spike's .cargo/config.toml passing, CARGO_HOME unset/empty/relative/absolute); FX-6's test
+  gains (c)'s cases (`m!(include!)` and `include ! (...)` refused at their lines, `include!{..}` and `include![..]`
+  pass, two metavariable attributes refused at :6 and :12 of a fixture). Re-pinned: FX-6's include message, and
+  C2R-8's config pin (:1037), whose `[target.x86_64-unknown-linux-gnu] linker = "cc"` passed and is now refused
+  (now `rustflags = []` there). First run (c4-self2.log) failed only on those two, as planned plus my guessed line
+  numbers (10 and 15, actual 6 and 12), fixed.
+- sha256 now: check.mjs 7297ca9d..., check.test.mjs 24563ff3..., loader.mjs a0507d1e....
+- The real step (.gate/u4r/c4-deps.log, -x, 01:17 UTC, df 4.9G): `node check.mjs --only deps,self`: "PASS  deps  4.1 s
+  held: ..." (the container's environment and the spike's own config pass the new rules), "PASS  self  1.7 s  76 of 76
+  tests passed", "check: all 2 steps pass".
+- Plants (each one -x call, restored by Edit, check.mjs sha256 7297ca9d... after each): (a) the env rule matching
+  `_LINKER_PLANT$` (c4-plant-85a.log): 75 of 76, "not ok 38 - carry 85 (a), (b) and (d) ..."; (b) the config profile
+  refusal off (c4-plant-85b.log): the same test 38 fails; (c) the old `(?!\s*!)` include form (c4-plant-85c1.log): "not
+  ok 56 - npt-tcpinfo and npt-hash-wasm, the deny-level exceptions ..."; (c) the metavariable pattern unmatchable
+  (c4-plant-85c2.log): test 56 fails; (d) `env.CARGO_HOME ?? ...` (c4-plant-85d.log): test 38 fails at "an empty
+  CARGO_HOME is unset".

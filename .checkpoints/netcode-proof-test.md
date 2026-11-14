@@ -12,9 +12,19 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 01:00 UTC; read this first after a compact or a cut): U4r copy 3 ended at its context limit
-(00:50), r2 and the second ruling done; snapshot 987946cc…; copy 4 builds on (point 1 (4)-(7), B12); the advisor's
-third ruling on copy 3's findings (u4r-build3-questions.md), with a fact check and a netcode-architect read.**
+**NOW (2026-11-14 about 01:22 UTC; read this first after a compact or a cut): a container restart at about 01:18
+stopped copy 4, the third ruling and the saver (see "Cuts by the spend limit"); all resumed about 01:22; snapshot
+ad3631d9… (24 files).**
+- **Copy 4 before the restart** (00:54-01:18 UTC; its notes "## Copy 4", :908 on): read its notes and the diff whole;
+  C4a (`wasmStep`'s two options), C4b (carry 84: one shared 300 s deadline, a stopped call's whole group killed), C4c
+  (carry 83 (b) and (c)), each with plants failing by name, check.test.mjs 75 of 75; C4e (ops/runs/det-u4.mjs; its one
+  -x run **PASS, 200.5 s**, non-cargo calls 190.9 s, under 240 s; W 3.1 s); C4d (carry 85 (a) to (e), loader.mjs's
+  header sentence; 76 of 76; `check.mjs --only deps,self` PASS; five plants failing by name). Left: carry 83 (d)'s
+  Rust test; then B12; r5 and the end checks wait for the third ruling.
+
+**Earlier NOW (2026-11-14 about 01:00 UTC): U4r copy 3 ended at its context limit (00:50), r2 and the second ruling
+done; snapshot 987946cc…; copy 4 builds on (point 1 (4)-(7), B12); the advisor's third ruling on copy 3's findings
+(u4r-build3-questions.md), with a fact check and a netcode-architect read.**
 - **Copy 3** (agent a5d1a2ea28e8704c8; 21:54-22:02 and 00:16-00:50 UTC, cut by the spend limit between; 99 tool uses)
   stopped at a clean point (no plant, no run going); nothing committed. Its notes u4r-build.md (906 lines, copied,
   equal), its part :571-906, its state section "Copy 3: state and what is next". I read its suites, bites and bytes
@@ -845,6 +855,18 @@ the cut and the time of the resume; UTC, read from the session's transcript):
   restore (no plant: copy 3's part names none; no cargo or runner running; HEAD 2fbec77, the brief 59d570b8…); the
   snapshot re-cut first (wip/u4r.patch, 19 files on 2fbec77, 6,561 lines, sha256 585a8639…, applies). Resumed: copy 3
   by SendMessage (its context intact), the ruling by `resumeFromRunId` (a fresh advisor continuing from its notes).
+- 2026-11-14 about 01:18 (not the spend limit: the container was restarted, the saver's last commit "autosave
+  (terminated)" bc645fd at 01:18:33; uptime 1 min at 01:19:53): no notice; the harness reported copy 4 (a033afc8d5205b476),
+  the third ruling (wl2aqoae4) and the saver (bpkkvrymq) stopped. Cut: copy 4 after its C4d block (carry 85's five
+  refusals built, 76 of 76, five plants each failing by name; its last log c4-plant-85d.log at 01:17), C4a-C4c and C4e
+  done before (det-u4.mjs PASS, 200.5 s, non-cargo 190.9 s); the third ruling's advisor mid-run (notes
+  advisor-u4r-build3.md, 21 lines), its fact check and architect read done (both results in the journal). The disk
+  kept everything (.gate/, the shared target, the worktree, the fixed copy). Resumed about 01:22: checked first (no
+  cargo, rustc or runner left; check.mjs 7297ca9d…, check.test.mjs 24563ff3…, loader.mjs a0507d1e…, the values the
+  notes give after the last plant's restore; no plant marker in check.mjs); the snapshot re-cut (wip/u4r.patch, 24
+  files on 2fbec77, 7,614 lines, sha256 ad3631d9…, applies); copy 4 by SendMessage (its transcript intact, as after a
+  limit cut); the ruling by `resumeFromRunId` (the two reads from the cache, a fresh advisor from its notes); the saver
+  restarted.
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188
