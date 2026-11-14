@@ -110,3 +110,4 @@ R5. Cut-off 2026-11-14 00:43:01: any message of his after it; 12 advisor calls b
 R6. CI on 922cadf (43536145305, 43536145352, 43536148552, 43536148433) final results, jobs incl. smoke.
 R7. Pending-by-design list; verdict; DONE.
 Notes:
+- R0 orient: 922cadf (00:43:52Z) and 83b99af (00:43:49Z) exist; HEAD 06d4290 (checkpoint save); a1d0317..922cadf outside .checkpoints/: only the report (+55 -25); 83b99af..922cadf: only the report; tree scripts (*.mjs, *.py) = 83b99af (empty diff); docs unchanged 922cadf..HEAD. Plan revision 2e read (plan.md :54-..., E1-E5); the advisor agent's ruling read (advisor-plan-rev1.md :61-67): E1 REVISE to an exact text naming four messages (lines 1887, 2122, 2869, 2929) + 'any later chat message on this before the final commit is added the same way'; E2-E5 APPROVE (optional Low on E2's 'none in any doc'); process: resume the verifier, count every main-session chat text from 22:40Z. R0 done.
