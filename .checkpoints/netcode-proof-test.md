@@ -41,7 +41,11 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   720; whole-as-lost measured incomplete 48. **For carry 62 (h) (step 12):** the clean P0 suites' measured incomplete:
   p0 0, evstart 0, tick16-clean 0, forged 0, clamp 0, fast-clock 0, **lag-switch 300** (a -21 option-B stand-in): the
   ruling says any sum not 0 goes to the advisor first, before any marks.json change or -17 run. Next: the advisor's
-  ruling on r2 and carry 62 (h); no marks.json edit before it.
+  ruling on r2 and carry 62 (h); no marks.json edit before it. **The saver restarted as boscgjicj** (15:46).
+- **The advisor's ruling on r2 runs:** workflow **wf_ec319c2d-f45** (task wvtrfj4a9; agent advisor-u4r-r2run, notes
+  advisor-u4r-r2run.md). **If cut:** `resumeFromRunId: "wf_ec319c2d-f45"`. **On return:** write it word for word by
+  script (advisor-u4r-r2run-full.md); its "For Mustafa" onto this card at once; then its next steps (carry 62 (h)'s
+  marks.json change or the cause to find; then U4r-F1's plan; the report's judged-runs section with MRG-L1 to -L3).
 
 **Earlier NOW (2026-11-14 about 13:45 UTC): the advisor's ROUND-2 RULING IS IN
 (advisor-u4r-r2-full.md, 126 lines, sha256 6dcc0a81…, by u4r_ruling_r2_full.py word for word); next: U4r's merge into
