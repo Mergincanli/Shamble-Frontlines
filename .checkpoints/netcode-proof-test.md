@@ -54,6 +54,31 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   push (crates unchanged since e59ece9); then the c62h record (r2's judge, --only PM-0001-17, on r2's whole-as-lost and
   tick16 folders, into .gate/netcode-proof-test/c62h-<commit12>/: both bites shown, never INVALID); then the card and
   u4r-report.md's r2 section with MRG-L1 to -L3; then U4r-F1 (RUN-L1 rides it).
+- **U4r-F1's PLAN IS APPROVED WITH CONDITIONS (about 16:47 UTC): advisor-u4r-f1-plan-full.md** (47 lines, sha256
+  13e666a0…, by u4r_f1_plan_review_full.py word for word); nothing for Mustafa. Choices: Q1 (a) one exported helper in
+  c-u4r-runs.mjs imported by c-u4r-r2.mjs; Q2 (a) a non-stop npt-lab non-zero exit still throws; Q3 (a) + condition 1;
+  Q4 (a) the recording's stop stops the set before the pairs with its exact message; Q5 (a) header text (flock -x form
+  from the repo root, not main-run.sh); Q6 (b) `-v` on both scripts' cargo builds. **Its 8 conditions:** (1) the
+  judge's end always writes runs.txt (stdout / `judge: stopped at <s> s (no verdict)` / `judge: exit <n> (no verdict):
+  <output>`), verdict.json only on exit 0, then exit 1 with its message; evidence: a judge-shim exit-1 mode on a cut
+  .jsonl, and one real-judge check (r2's npt-judge on a /dev/shm copy of r2's whole-as-lost with one .jsonl cut
+  mid-line: exit 1 naming file and line); (2) INF-R2-1's stagings with real git in a /dev/shm scratch repository (a)
+  a .checkpoints/-only commit mid-set: HEAD's copies stop, F1's complete; (b) a tracked edit under spikes/netcode-proof:
+  F1's stop quoting the status line; (c) a commit under spikes/netcode-proof: F1's stop naming both tree hashes; (3)
+  INF-R2-3 staged on both scripts (floor() edited in scratch copies to refuse the first run / suite p0; F1's leave no
+  set folder, HEAD's do), (ii) on HEAD's copy too; (4) every new stop line staged in a RUN_LIMIT_MS = 2,000 copy and
+  quoted (a judged run, a pre-check pair, the recording, the judge, condition 1's line; `pgrep -f` shows no sleeper
+  left); (5) `-v` on both cargo builds, the shim accepts it, and at the pre-check set (first real use) both npt-lab
+  builds show Compiling/Fresh npt-* lines naming the main folder's crates, else to the advisor; (6) **run-procedure
+  rules: commit each set's results/ before the next set starts and never commit under spikes/ during a set; after any
+  stopped or killed set, `pgrep -a npt-lab` empty before another lane takes the lock**; (7) the start's whole-repo
+  `start.status` goes with its compare; (8) redact-check alone on the edited tree (0 findings) and the helper test
+  asserts JDG-ONLY-1's interim rule. **Size: about 110 to 125 lines expected; the measured diff stat goes here.**
+  **The build (the main session, main folder, Edit only; no agent edits the two scripts):** read the plan and both
+  scripts; edits A-E plus conditions 1, 5, 7; node --check; gate --no-smoke; redact-check; the evidence harness on
+  /dev/shm with logs copied to .gate/u4r-f1/ (never committed); then infra-engineer's one round on the final diff and
+  evidence; then one commit (the two scripts and the card), push, the advisor's review of the head. Build notes:
+  u4r-f1-build.md (a line per step as it goes).
 - **Done (about 16:35 UTC):** u4r-report.md updated (266 lines; r2 and carry 62 (h) done in its judged-runs section;
   MRG-L1 to -L3 folded; JDG-ONLY-1 (Medium) and F1's two riding Lows in Follow-ups; its opening line corrected by the
   main session); **u4r-f1-plan.md** drafted (135 lines, sha256 774b952d…; five items A to E; six choices Q1-Q6 for the
