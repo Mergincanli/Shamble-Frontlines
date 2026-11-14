@@ -1091,3 +1091,10 @@ event age (8 bits), never cross a wrap, so they get no bite (W1-N2); and PM-0001
 as applying only where the server logged a hash: a client hash at a tick the server never logged counts on every machine
 (stricter; the advisor's U4j ruling, FX-5 (c)). Q10 is off the list. A third unsafe exception (Q3 B) is the advisor's
 call (plan.md:430-438).
+Added to the readings PR's list at the plan's next edit after U4r's merge (2026-11-14), each in the advisor's words:
+from its U4r build ruling 3, main session item 4 (advisor-u4r-build3-full.md): "pre:PM-0001-2's everyone-in-view share
+applied to every -17 and -18 L1 run (Q22), where ADR 0001:1589 names it 'for the downstream rows'; stricter"; and from
+its ruling on U4r's r2 run, step 2 (advisor-u4r-r2run-full.md): "PM-0001-17's L1 P0 part gains a plain check, 'L1 P0
+loses no group (no client-tick left incomplete)': the measured sum of tick.s.snap_incomplete == 0, so a lost group on
+P0 FAILs -17 (stricter; it was a report only), with its bite PM-0001-17/whole-as-lost (carry 62 (h); the advisor's U4r
+build ruling 4, further finding; r2 at e59ece9 shows 0 on the six clean short L1 P0 suites)".
