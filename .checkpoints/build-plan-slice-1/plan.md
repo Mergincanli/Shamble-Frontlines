@@ -55,9 +55,17 @@ transcript). This is a plan: nothing is built, and no file outside `.checkpoints
 - **Machines** (the drafts' names): the minimum laptop, the recommended desktop, the Mac for Safari, your PC in Brave
   (which judges and never measures), the reference server (a rented CCX23), and CI's runners (counts and yes-or-no
   results only, never a time).
-- **Each change-set still gets its own short plan** before any edit (files, symbols, risks, evidence, reviewers),
-  reviewed by the advisor agent, as CLAUDE.md's protocol asks. Your go on this plan covers all of them as long as a
-  change-set's plan stays inside this one; a plan that leaves it comes back to you.
+- **Each change-set still gets its own short plan** before any edit (files, the symbols it adds, risks, evidence,
+  reviewers, and the Brave checklist for what a player sees, hears or feels), reviewed by the advisor agent, as
+  CLAUDE.md's protocol asks. Your go on this plan covers all of them as long as a change-set's plan stays inside this
+  one; a plan that leaves it comes back to you.
+- **Risk tier.** Every change-set is risk tier 1: game code and tests; change-set 0 is a decision doc. None edits a
+  kit, gate or CI file. One file may change that: once the 2.3 chat's guard change protects the root `Cargo.toml`, a
+  change-set that adds a shared dependency line there asks you first and takes the security-auditor's review, which
+  new dependencies get in any case.
+- **Evidence by kind of change** (CLAUDE.md, protocol step 4): logic by tests on the real code; netcode by
+  deterministic tests with injected delay, jitter and loss (L1); performance by numbers with their method; anything
+  visible by screenshots that name their backend, then your eyes in Brave.
 - **Models and effort.** This chat and every builder agent it starts: Fable 5.2. Every other agent: Opus 5.5. Agents
   that review, verify or design game and engine code: effort max, passed by the caller (the agent files still say
   high). The advisor tool stays off. At most 3 agents at a time; the saver runs; a checkpoint after every step.
@@ -158,7 +166,8 @@ when and what. No code.
   a second.
 - `sim`: the soldier table with its ids, the tick's loops, our own movement on parry3d's queries (walk, sprint,
   step-up, jump, with legacy's numbers), the time unit every duration will use, chosen from a rounding report over
-  every duration in the legacy tuning before any timer exists.
+  every duration in the legacy tuning before any timer exists. The jump is integrated at the tick and is not pinned to
+  legacy's reach: which reach v2 keeps is an open rule question (OQ-0002-6), for the game-designer and you.
 - The path: the command with its aim point (the Worker casts the page's cursor ray), soldier fields in the snapshot,
   the block's soldier section, interpolation between the two newest blocks on the page.
 - The page: a plain stand-in figure (it shows facing and aim; the Look change-set replaces it), the yard, the follow
@@ -575,8 +584,9 @@ A. The soldier (one sheet)
    head size. (Look brief: slimmer, serious proportions; references XIII and Valiant Hearts.)
 4. The parts that make the silhouette, in order of importance from above: headgear first, then the weapon, the
    shoulders, the coat's shape, the pack.
-5. The colour areas: which parts take the faction's main colour, which its second colour, and which stay neutral
-   (cloth, leather, metal, skin).
+5. The colour areas: which parts take the faction's colour and which stay neutral (cloth, metal, skin). The game's
+   drafts allow at most 4 colour areas on a soldier, counting body, headgear and held weapon together: say which
+   four, and which you would add if more became possible.
 6. The uniform details that must survive at small size, each marked "must read from the game camera" or "close-up
    only".
 7. How he holds the gun at rest and when aiming.
@@ -719,10 +729,11 @@ it; if you would rather I only search my own files for the three rules, say so.
   own; when it lands, the next change-set takes its formatting as one mechanical commit. Rule between the two chats, so
   that no file has two authors: lint, format and type settings are the 2.3 chat's; build files (each crate's and
   package's manifest, the Vite config) are mine.
-- **Changes how I work, not when: its guard change-set (CS-D).** By its option PIN-SCOPE (b), the root `Cargo.toml`
-  becomes a protected file. A dependency that several crates share has its version there (ADR 0002 part 2), so each
-  new shared dependency then asks you with its exact text, with the chat in Accept edits. I expect one such ask in
-  most change-sets (serde, wasm-bindgen, parry3d, and so on).
+- **Changes how I work, not when: its guard change-set (CS-D).** By its option PIN-SCOPE (b), which that plan
+  recommends and you have yet to answer, the root `Cargo.toml` becomes a protected file. A dependency that several
+  crates share has its version there (ADR 0002 part 2), so each new shared dependency then asks you with its exact
+  text, with the chat in Accept edits. I expect one such ask in most change-sets (serde, wasm-bindgen, parry3d, and so
+  on). By its option (a) the root `package.json` and both lockfiles ask too, so every dependency change would.
 - **Follow my change-sets** (decision GATE-FOLLOW): the gate and CI checks the 2.3 plan lets ride steps 2.4 and 2.5.
   That plan was written before your decision of today and ties them to spike reports that no longer come first: its
   later parts need your word to follow my change-sets instead. In my order: after 1, G4 (generated types in step);
@@ -788,7 +799,127 @@ pull request has a link and the zip is no longer needed.
 
 **Not yours in this work:** nothing on the netcode proof test changes. Its chat needs nothing from this one.
 
-<!-- part 11 -->
+## Part 11. The rules a model file must follow (your item 11)
+**Who answers, and when.**
+- This is the export and slot-naming part of the asset research: which checks an export passes (OQ-0005-AS3) and how
+  a model's materials are named into the colour areas (OQ-0005-AS4). SPIKE_PLAN gives it to graphics-engineer,
+  "verified like R3".
+- **A first reading is done, today, for this plan.** graphics-engineer (Opus 5.5, effort max) read the drafts, the
+  glTF 2.0 specification, the Blender exporter's documentation and source, and the three.js loader's source. The list
+  below comes from it; every source line and address is in `graphics-engineer-asset-rules.md` and `asset-rules.md`
+  beside this file.
+- **Change-set 0 makes it firm, first after your go** (decision RULES-WHO), in about 6 hours of session work:
+  1. graphics-engineer closes the open points listed under the block;
+  2. one round trip proves the list: a cube and a small skinned figure go through the real exporter and the real
+     loader, on both backends. That needs Blender: headless in this chat's container if it installs there, otherwise
+     one export from your PC;
+  3. the verifier spot-checks the key claims against their sources;
+  4. one docs pull request records it: a research file, and the two open questions marked answered in ADR 0005. That
+     is a decision doc, so it merges on your go.
+- **Until then the list is a draft.** It can go into the Blender brief today, marked as a draft: no rule in it is
+  costly to change before the first model is made. The names in rules 12 and 21 are proposals of a naming convention,
+  not of the look; they need your or the Advisor's OK, because the Art brief will use them.
+- One line of yours rides this part: on 2026-11-03 you said that when it reports, LOOK_V2 §8 says "Spline or Blender".
+  A docs chat is carrying your look decisions into that file, so I leave that line to it unless you say otherwise.
+
+**Does Slice 1's soldier need a skin? Yes.** ADR 0003's line for Slice 1 says "one skinned soldier", and ADR 0005
+says "Soldiers are skinned": one mesh, with joints and weights. Your words of 2026-11-03 set the bar: "blockouts with a
+skin, named colour slots and LOOK_V2's proportions are enough". The code-built stand-in of change-set 6 is therefore
+built the way the loader builds a model: one skinned mesh per colour area on one shared skeleton, with the same joint
+names and the same colour-area names, so the model replaces it without engine changes. The stand-in stays code: it is
+named in the asset list as a builder, and the loading of a file is first used at change-set M. A blockout's skin may
+be rigid: each part follows one joint.
+
+**The list to paste** (a draft until change-set 0 confirms it):
+
+```
+Rules for a model file (draft of 2026-11-14)
+
+The file and the export (Blender's own glTF 2.0 exporter)
+1. One .glb file per model: Format "glTF Binary (.glb)".
+2. Mesh: "+Y Up" on, "Apply Modifiers" on, "UVs" on, "Normals" on, "Tangents" off.
+3. Materials: "Export" (never "No Export": it merges the colour areas into one); Images: None; vertex colour: None.
+4. Skin: "Skinning" on, "Bone Influences" 4, "Include All Bone Influences" off, "Use Rest Position Armature" on.
+5. Off, because the game does not read them: animations, shape keys, custom properties, cameras, lights.
+6. No compression (Draco, Meshopt) and no detail levels.
+7. The same as one call, for a Blender MCP script:
+   bpy.ops.export_scene.gltf(export_format='GLB', export_yup=True, export_apply=True, export_texcoords=True,
+   export_normals=True, export_tangents=False, export_materials='EXPORT', export_image_format='NONE',
+   export_vertex_color='NONE', export_skins=True, export_influence_nb=4, export_all_influences=False,
+   export_rest_position_armature=True, export_animations=False, export_morph=False, export_extras=False,
+   export_cameras=False, export_lights=False, export_draco_mesh_compression_enable=False,
+   export_meshopt_compression_enable=False)
+
+Scale, axes, origin
+8. One Blender unit is one metre: build at real size.
+9. The model stands up along Blender's Z and faces Blender's -Y (the exporter turns that into +Y up, front +Z).
+10. The origin is on the ground under the model's centre (for a soldier, between the feet). Apply all transforms
+    (rotation and scale) before rigging and before export.
+
+Names
+11. Letters, digits and underscores only: no spaces, dots, colons, slashes or brackets, and no ".001" endings.
+12. One colour area is one material. The material's name is the area's name, and it starts with its class:
+    unit_ (for example unit_skin, unit_cloth, unit_metal), faction_ (for example faction_primary), emissive_,
+    structure_ or environment_.
+13. A faction_ area takes each faction's colour in the game: its colour in Blender is only a placeholder.
+14. Only emissive_ areas glow: give each its glow colour as the material's Emission.
+15. Every other area's colour is its material's base colour, set to the sheet's hex value.
+
+Caps
+16. A soldier as drawn (body, headgear and held weapon together) has at most 4 materials, so at most 4 colour areas.
+17. Triangles: no cap is set yet. Keep a soldier with headgear and weapon near or under about 5,200 triangles (a
+    quad counts as 2); that figure is a planning ceiling, and the real cap will be lower.
+18. A weapon is its own .glb, by the same rules. A very large unit is one mesh per part under one parent, with
+    parts times materials at most 25.
+
+The skin
+19. Yes, the soldier is skinned: one mesh for the whole body, on one armature.
+20. Every vertex follows at least one bone and at most 4, and its weights add up to 1. A blockout may be rigid:
+    each part follows exactly one bone.
+21. The bones are exactly the game's joint list, with no helper or IK bones in the file. Proposed list: hips, spine,
+    chest, head, upper_arm_l, lower_arm_l, hand_l, upper_arm_r, lower_arm_r, hand_r, upper_leg_l, lower_leg_l,
+    foot_l, upper_leg_r, lower_leg_r, foot_r.
+
+Not in the file
+22. No baked light, no outlines or ink, no toon or custom shading: the game applies the look.
+23. No textures and no vertex colours for now.
+24. No model file goes into the repository before Mustafa has said whether models may be public.
+```
+
+**Where each rule comes from** (line numbers and addresses in full: `asset-rules.md`, sections 1 and 2).
+| Rules | Source |
+|---|---|
+| 1 | ADR 0005, GPU rule 6 (:1803-1804): only glTF/GLB, through three.js's loader on both backends, never Spline's runtime; the exporter's documentation |
+| 2, 4, 5 | the exporter's documentation and its option list in the source (the option names are those of its current main branch); the three.js loader binds one set of four joints and weights per vertex; ADR 0003 (:797): the procedural animation is ported, so the game drives the joints. "Apply Modifiers" on and "Tangents" off are proposals |
+| 3, 12, 15 | the exporter writes one primitive per material that faces use, keeps each material's name, and merges them under "No Export" (its documentation and source); the loader gives one mesh per primitive and keeps the name; ADR 0005, GPU rules 1 and 2 (:1748-1770): slots name a material class, and the class list and names are content data, given only "for example". The prefix convention is a proposal |
+| 6, 22, 23 | ADR 0005 (:1748-1755, :1810-1816) and SPIKE_PLAN (:390-391): a model carries no baked lighting and no ink; the first models are plain exports with no compression or LOD step. No textures or vertex colours yet is a proposal (OQ-0005-AS4) |
+| 7 | the exporter's source (`__init__.py`): the same options by their script names |
+| 8 | EDITOR_V2 `[DECIDED]`: "1 unit = 1 metre"; glTF: "The units for all linear distances are meters". No decision draft states the scale yet (already listed for the drafts' next revision) |
+| 9, 10 | glTF: "+Y as up; the front side of a glTF asset faces +Z"; a skinned mesh ignores its own object's transform. The facing and the origin are proposals of the engine |
+| 11 | the loader's source: node names lose `[ ] . : /`, and spaces become underscores, so "hand.L" would arrive as "handL" |
+| 13, 14 | ADR 0005 (:1764-1769, :1582-1583): faction slots take the faction's colour at load; only emissive slots glow |
+| 16, 18 | ADR 0005, GPU rules 3 and 4 (:1771-1795): at most 4 materials per pass for a soldier as drawn; a very large unit's parts are separate meshes under one group, at most 25 parts times materials |
+| 17 | ADR 0005 (:1787-1792): about 5.2k triangles per soldier as drawn at Low, "if soldiers had the whole row": a planning input, not a budget (OQ-0005-AS5, AS6) |
+| 19, 20 | ADR 0003 (:1397) and ADR 0005 (:1771-1774); the glTF specification on joints and weights; r3-rendering.md (R3-CHAR-REC1): rigid weights, one bone per part, is the baseline; an unweighted vertex gets a stray extra joint from the exporter |
+| 21 | proposed by the engine: no draft gives a joint list. Its seed is what legacy's animation drives (LEGACY_INVENTORY GA2, GA7, GA8: two-bone arms and legs, spine, chest, head, hands on the gun) |
+| 24 | your item 13 of today; ADR 0006 (:1105-1106) |
+
+**Still open, for change-set 0.**
+- **Four colour areas are few.** The cap counts body, headgear and weapon together. If skin, cloth and metal each
+  take one, one faction area is left, while legacy has five palette roles. More areas need another way to carry colour
+  (a mask in vertex colours, or one texture), which nothing read so far researches (OQ-0005-AS4). How many faction
+  areas the soldier shows is a look question, so it is yours and the Advisor's; the research gives the counts.
+- The names: the class prefixes and the joint list are proposals of a naming convention, to confirm.
+- Sharp or smooth edges in the normals: it depends on the ink family, your pick at change-set 6.
+- Whether headgear is its own model, and the names of the weapon's grip points.
+- Which Blender version runs on your PC: the option names were read on the exporter's current main branch.
+- How the exporter cuts a vertex with more than 4 influences; whether Blender's scene unit scale changes the size.
+- How many joints fit: three.js's skinning for WebGPU uses a uniform buffer and falls back to a bone texture for
+  larger skeletons (its source); 16 joints are few either way.
+- The checks a file must pass before it enters the game (OQ-0005-AS3), with candidates from this reading: a named
+  material from the slot table on every primitive, normals present, one set of joints only, the joint list equal to
+  the game's, no images or animations, a known-size object measuring its size in metres, the caps, the file size.
+- The round trip itself, which settles the facing, the scale and the names.
 
 ## Part 12. The first Blender model, and the asset spike's marks (your item 12)
 **The change-set: M, "The first model".** It replaces the code-built soldier with the Blender one. It takes the next
@@ -809,6 +940,9 @@ you have answered MODEL-PUBLIC. After 10 (Body) the model also moves; before it,
 **How the file reaches the repository.** Under MODEL-PUBLIC (a): you upload the GLB to this chat; I commit it in M's
 pull request. Where model files live for good is an open question of the rest of the asset research (OQ-0005-AP1); M's
 plan names a place and says it may move.
+
+**One question of ADR 0005 comes nearer with this route:** whether a model drafted by an AI may ship (OQ-0005-AP3). It
+is yours. Nothing in Slice 1 needs the answer: these are test builds.
 
 **The asset spike's marks.** SPIKE_PLAN places the asset spike "before the first authored model enters the game". By
 your addition of 15:03 it is treated like the tests of your decision: each mark is measured on the real game, here or

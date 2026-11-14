@@ -6,7 +6,7 @@
   yet)
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/build-plan-slice-1) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-14 15:39 Amsterdam
+- **Last update:** 2026-11-14 15:45 Amsterdam
 
 ## Steps done
 1. Orientation · the session's model read with get_session at 2026-11-14 13:58 UTC: `session_context.model` and
@@ -25,15 +25,22 @@
    "For Mustafa"; Part 3's tables counted by `count-marks.mjs` (201 marks expected, 201 placed, none missing, none
    twice; the asset spike's 7 in Part 12).
 
+6. Part 11 (the model-file rules) written from graphics-engineer's source notes
+   (`graphics-engineer-asset-rules.md`: the drafts, the glTF specification, the Blender exporter's documentation and
+   source, the three.js loader's source); its own result file `asset-rules.md` was not written yet at 14:43 UTC.
+
+7. `asset-rules.md` landed (graphics-engineer, DONE; its file's time 14:44 UTC, its hand-back after that): Part 11's
+   paste list, source table and open points rewritten from it; Part 4 A.5 (at most 4 colour areas) and Part 12
+   (OQ-0005-AP3) adjusted. The advisor agent was told which three places changed after its launch.
+
 ## Current step
-6. Part 11 (the model-file rules) waits for graphics-engineer's `asset-rules.md` (effort max; reading official
-   documentation; still running at 14:38 UTC). Then the advisor agent's plan review.
+8. The advisor agent's plan review of revision 1 (Opus 5.5, effort max; launched after 14:43 UTC; notes:
+   `advisor-plan-r1.md`).
 
 ## Next steps
-1. Read `asset-rules.md` when its agent ends; write Part 11 from it.
-2. The advisor agent's plan review (Opus 5.5, effort max; no review rounds, no verifier, by his words); fold what it
-   finds; record its verdict in Part 14.
-3. Stop for his go, with the summary he asked for.
+1. Fold what the advisor agent finds; record its verdict in Part 14; a re-read by the advisor agent of what changed
+   if it asks for one.
+2. Stop for his go, with the summary he asked for.
 
 ## Open findings
 - The PR Advisor's merge places are `docs/`, `tools/`, `README.md` and `FIRST_PROMPTS.md` only
