@@ -65,3 +65,9 @@ E1 REVISE, exact text from "Three chat messages since bear on it" to the end of 
 E2 APPROVE (accurate for my notes: A4 whole at :60, runs of A2 and A3 in B1/B3 lines). Optional Low: "none in any doc" -> "none of them in docs/".
 E3 APPROVE. E4 APPROVE (the scope note is honest). E5 APPROVE for the record.
 Process APPROVE: resume the same verifier; its brief adds every main-session chat text from 22:40 UTC to the final commit (count them; not only the cited lines). No new review round: no reviewer finding is open at Critical or High, and F-V1 (a verifier FAIL, High) is fixed here and re-verified until PASS. DONE (2e)
+PLAN REVISION 2f: started; blocks: read Revision 2f at 89a1fb9; check lines 3183, 3195, 2922; rule F1-F7.
+PLAN REVISION 2f (advisor ruling on the final commit's texts; plan.md "Revision 2f" at 89a1fb9 read). Checked read-only: transcript line 3183 (assistant, 00:46:25) and 3195 (assistant, 01:00:24) say what F1's two clauses say; line 2922 (user entry carrying the verifier's hand-back, 00:30:33) holds F3's quoted scope sentence byte for byte (substring test True); commits 1123175, 2f96f5c, 83c6ab6, d59ca43, 554face, 8e4fe7c, a1d0317, 922cadf exist and are the branch's nine-minus-final docs commits; 922cadf CI: gate push 43536145305, gate pull_request 43536148552, toolchain push 43536145352, toolchain pull_request 43536148433, all success; #40 commits 0066b63 (committed 2026-11-13 19:32:51Z) and d0d1cfd (committed 2026-11-14 01:04:56Z; #40's branch head at my read).
+F1 APPROVE. F2 APPROVE (the anchor is 28 characters). F3 APPROVE. F4 APPROVE. F5 APPROVE.
+F6 APPROVE with one Low condition: the #40 times are read times, not commit times; write "read on 2026-11-13 at 20:29 UTC" and "read on 2026-11-14 at 01:05 UTC" (0066b63 was committed at 19:32 UTC).
+F7 APPROVE for the record.
+Head review: my notes for it go to .gate/foundation-2-3-docs/ or the hand-back only (the final commit deletes this folder). DONE (2f)

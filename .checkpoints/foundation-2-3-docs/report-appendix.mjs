@@ -35,11 +35,13 @@ function appendix(list, cutoff) {
     'cites. His other input in this session was a command: `/advisor fable` (2026-11-13 18:30:08 UTC), whose output said ' +
     'this conversation keeps Opus 5.5 as its advisor model until `/clear` or `/compact`; by the session\'s records, ' +
     'Fable 5.2 answered every advisor-tool call ("The advisor tool"). The session\'s other entries are the harness\'s and ' +
-    'its agents\': the command\'s caveat, the workflow-authoring skill (loaded with A2, 18:47:56 UTC), notices that the ' +
+    'its agents\': the command\'s caveat, the workflow-authoring skill (loaded with A2, 18:47:56 UTC, and again by the ' +
+    'harness, 2026-11-14 00:07:21), notices that the ' +
     'session\'s worker had restarted (19:22:24 and 22:01:23 UTC, the second after a notice that its container had ' +
     'restarted, 22:01:22), the advisor-report skill\'s text (loaded by the session), stop-hook feedback, a reminder that ' +
     'came with review round 1\'s task notification (21:54:48 UTC), the summary that carried the session on when its ' +
-    'context filled (22:54:40 UTC), and the hand-backs and task notifications of the session\'s own agents, with the ' +
+    'context filled (22:54:40 UTC), and the hand-backs and task notifications of the session\'s own agents and ' +
+    'background tasks, with the ' +
     'harness\'s notices that carry them; `words.mjs` classifies every entry of the transcript up to its last entry when ' +
     `this appendix was written (${cutoff} UTC) and finds no other message of his. ` +
     'Entries in `docs/DECISIONS.md` copy their quotes from here, because the notes folder is deleted before the pull ' +
