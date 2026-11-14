@@ -7,8 +7,11 @@
 //   CARGO_TARGET_DIR unset (plan §7.1 item 6: the judged runs build in the main folder's own cache), not through
 //   main-run.sh, which sets CARGO_TARGET_DIR: this script refuses it, since a shared-target run comes to the advisor
 //   first (u4r-brief.md section 12 item 8). The set runs under the lane lock, exclusive, from the repository root:
-//   `flock -x .gate/shared-target/.lane.lock node spikes/netcode-proof/ops/runs/c-u4r-runs.mjs …`. Each npt-lab call
-//   and the judge are bounded at RUN_LIMIT_MS (advisor-u4r-r2, INF-R2-4); the builds are not.
+//   `flock -x .gate/shared-target/.lane.lock node spikes/netcode-proof/ops/runs/c-u4r-runs.mjs …`. If this script dies
+//   while a call runs, the lane lock is freed at once (no npt-lab or npt-judge call holds it: advisor-u4r-f1-head,
+//   INF-F1-1, measured), while the call, in its own session, runs on with no limit: to stop a set, end the call's group
+//   first (`kill -9 -- -<pid>`, the pid from `pgrep -a npt-lab; pgrep -af npt-judge`), then the script. Each npt-lab
+//   call and the judge are bounded at RUN_LIMIT_MS (advisor-u4r-r2, INF-R2-4); the builds are not.
 // - precheck (set u4r-precheck-30; 7.2): SS P0 seed 4's recording made again by `npt-lab scenario --record` at its
 //   crates/lab/precheck-recordings.json entry's settings (the set stops if that run's rewinds refused are above 0: 7.1),
 //   then three pairs by `npt-lab precheck`, each checking the file against that entry first: clean (the measured
@@ -26,6 +29,12 @@
 //   plans the disk and judges each set's folder apart). A run whose summary line counts an overflow resync above 0 and
 //   whose header lists -17 or -18 is marked on its runs.txt line: it goes to the advisor before it counts (carry 58;
 //   FP-5 (g)).
+// - A set with bites (only P0: bitesOf) is judged in two calls (U4r-F2: advisor-u4r-sets-r1, Q2; advisor-u4r-f2-plan):
+//   its measured runs write under <logs>/measured/<run> and its bite runs under <logs>/bites/<run>; npt-judge reads
+//   measured/ into verdict.json, then bites/ into verdict-bites.json, each call at most 10 GiB of judge memory where
+//   one call over the whole folder would project about 11.5 GiB. No run's verdict reads another run, so each call's
+//   verdicts are what one call gives. Both calls always run, each after its own re-check; results/ is made only after
+//   both, each file copied on its own exit 0. A set without bites keeps one call and its <logs>/<run> layout.
 // - The tick16 bite run (the advisor's U4r build ruling 3, point 3): its tick_start is computed from its own lengths,
 //   65,551 - (warm-up ticks + measured ticks) (47,251 for 300 + 18,000), so the 16-bit wrap falls 15 ticks before the
 //   measured phase's end and the measured window ends before the bitten room evicts; every other -17 run, clean and the
@@ -122,6 +131,11 @@ export const PAIR_BYTES = 25_164;
 /** The late-command pair's one expected result line (precheck.rs, the late-command bite's test). */
 export const LATE_COMMAND_LINE = "result: VOID (L1 late_count 1)";
 /**
+ * The one fixed line above a set's two judge lines in runs.txt when the set has bites (U4r-F2: advisor-u4r-f2-plan,
+ * condition 3 (b)); it never parses the judge's output.
+ */
+export const SPLIT_LINE = "the set is judged in two calls, each at most 10 GiB (U4r-F2); verdict.json holds the measured runs' verdicts (read its L1 P0 parts; its bites read 'no run yet' by design); verdict-bites.json holds the bite runs' verdicts (read its bites; every part reads '0 of n valid runs' by design)";
+/**
  * Each npt-lab call's and the judge's limit, ms (advisor-u4r-r2, INF-R2-4): about 12 times r5's slowest judged run
  * (18,300 ticks at 60.1 ticks/s, about 304 s); re-checked against the judge's measured time before the P0 set.
  */
@@ -214,13 +228,16 @@ export function bitesOf(profile, marks) {
   return out;
 }
 
-/** The judged set's runs, in order, each with its projected bytes (the module text; FP-5 (b)). */
+/**
+ * The judged set's runs, in order, each with its projected bytes (the module text; FP-5 (b)) and its group, measured or
+ * bites (a set with bites is judged in two calls: U4r-F2).
+ */
 export function planJudged(profile, marks) {
   const listed = listedOf(profile);
-  const runs = SEEDS.map((s) => ({ run: `l1-${profile.toLowerCase()}-s${s}`, exe: "lab", seed: s, marks: listed, extra: ["--role", "measured", "--marks", listed.join(",")], tickStart: TICK_START }));
+  const runs = SEEDS.map((s) => ({ run: `l1-${profile.toLowerCase()}-s${s}`, exe: "lab", seed: s, marks: listed, extra: ["--role", "measured", "--marks", listed.join(",")], tickStart: TICK_START, group: "measured" }));
   for (const b of bitesOf(profile, marks)) {
     const marksOf = ["PM-0001-2", b.mark];
-    runs.push({ run: `bite-${b.id.split("/")[1]}`, exe: "labBites", seed: 1, marks: marksOf, extra: ["--role", "bite", "--bite", b.id, "--marks", marksOf.join(",")], tickStart: b.id === TICK16 ? TICK16_START : TICK_START });
+    runs.push({ run: `bite-${b.id.split("/")[1]}`, exe: "labBites", seed: 1, marks: marksOf, extra: ["--role", "bite", "--bite", b.id, "--marks", marksOf.join(",")], tickStart: b.id === TICK16 ? TICK16_START : TICK_START, group: "bites" });
   }
   return runs.map((r) => ({ ...r, what: r.run, bytes: runBytes({ profile, marks: r.marks, measuredS: MEASURED_S }) }));
 }
@@ -347,6 +364,7 @@ function main(argv) {
   copyFileSync(join(SPIKE, "marks", "marks.json"), binMarks);
   if (sha256(binMarks) !== marksSha) throw new Error("marks/marks.json changed since the set started: stopped before the set's folder");
   const runs = planOf(JSON.parse(readFileSync(binMarks, "utf8")));
+  const split = runs.some((r) => r.group === "bites");
   floor(runs[0].what, runs[0].bytes);
   mkdirSync(logs, { recursive: true });
   const marksCopy = join(logs, "marks.json");
@@ -358,7 +376,7 @@ function main(argv) {
     `npt-lab (bites build) sha256 ${sha256(labBites)}`,
     ...(judge ? [`npt-judge sha256 ${sha256(judge)}`] : []),
     `marks.json sha256 ${marksSha} (copied into the bin folder and checked there, then into the raw-log folder; the bite list and the judge read those copies)`,
-    `raw logs: .gate/netcode-proof-test/runs/${name}-${short}/ (not committed: plan §7.2)`,
+    `raw logs: .gate/netcode-proof-test/runs/${name}-${short}/ (${split ? "measured/ and bites/; " : ""}not committed: plan §7.2)`,
     `projection: ${before}`,
     `projection: ${after}`,
     `start: ${start.machine}`,
@@ -415,35 +433,47 @@ function main(argv) {
   for (const r of runs) {
     floor(r.what, r.bytes);
     const exe = r.exe === "lab" ? lab : labBites;
-    const t = timed(exe, ["scenario", "--run", r.run, ...common, "--out", join(logs, r.run), "--seed", String(r.seed), ...settings(r.tickStart), ...r.extra]);
+    const t = timed(exe, ["scenario", "--run", r.run, ...common, "--out", join(logs, split ? r.group : "", r.run), "--seed", String(r.seed), ...settings(r.tickStart), ...r.extra]);
     const said = t.stopped ? `${r.run}: stopped at ${t.secs} s (a result, never retried: condition 5)` : `${t.out} (wall ${t.secs} s)${overflowFlag(t.out, r.marks)}`;
     console.log(said);
     lines.push(said);
   }
-  unchanged("the judge");
-  // The judge, bounded too (INF-R2-4). Whatever its end, runs.txt is written; verdict.json only on exit 0: a stopped
-  // run's log is cut (written through a buffer flushed at its footer), and the judge refuses a cut log
-  // (advisor-u4r-f1-plan, condition 1).
-  const verdict = join(logs, "verdict.json");
-  const t0 = Date.now();
-  const j = run(judge, ["--marks", marksCopy, "--logs", logs, "--only", listedOf(profile).join(","), "--out", verdict], ROOT, process.env, RUN_LIMIT_MS);
-  const jSecs = ((Date.now() - t0) / 1000).toFixed(1);
-  const judgedOk = !j.timedOut && j.status === 0;
-  const judged = judgedOk ? j.stdout.trim() : j.timedOut ? `stopped at ${jSecs} s (no verdict)` : `exit ${j.status ?? "by a signal"} (no verdict): ${j.out.trim()}`;
-  console.log(judged);
+  // The judge, bounded too (INF-R2-4). Whatever its end, runs.txt is written; a verdict file only on its call's exit 0:
+  // a stopped run's log is cut (written through a buffer flushed at its footer), and the judge refuses a cut log
+  // (advisor-u4r-f1-plan, condition 1). A set with bites is judged in two calls, measured/ then bites/, each after its
+  // own re-check; both always run, and results/ is made only after both (U4r-F2: advisor-u4r-f2-plan, conditions 2, 3).
+  const judgeCall = (what, dir, file) => {
+    unchanged(what);
+    const out = join(logs, file);
+    const t0 = Date.now();
+    const j = run(judge, ["--marks", marksCopy, "--logs", dir, "--only", listedOf(profile).join(","), "--out", out], ROOT, process.env, RUN_LIMIT_MS);
+    const secs = ((Date.now() - t0) / 1000).toFixed(1);
+    const ok = !j.timedOut && j.status === 0;
+    const line = ok ? j.stdout.trim() : j.timedOut ? `stopped at ${secs} s (no verdict)` : `exit ${j.status ?? "by a signal"} (no verdict): ${j.out.trim()}`;
+    console.log(line);
+    return { what, out, file, ok, line, end: j.timedOut ? `stopped at ${secs} s` : `exited ${j.status ?? "by a signal"}` };
+  };
+  const calls = split
+    ? [judgeCall("the judge (measured runs)", join(logs, "measured"), "verdict.json"), judgeCall("the judge (bite runs)", join(logs, "bites"), "verdict-bites.json")]
+    : [judgeCall("the judge", logs, "verdict.json")];
   mkdirSync(results, { recursive: true });
-  if (judgedOk) copyFileSync(verdict, join(results, "verdict.json"));
+  for (const c of calls) if (c.ok) copyFileSync(c.out, join(results, c.file));
+  const judgeLines = split
+    ? [SPLIT_LINE, `judge (measured runs): ${calls[0].line}`, `judge (bite runs): ${calls[1].line}`]
+    : [`judge: ${calls[0].line}`];
   const top = [
     `# ${name}: -17's, -57's${profile === "B1" ? " and -18's" : ""} L1 ${profile} part(s), run in this container on ${date} (u4r-brief.md 7.1)`,
     ...head,
     `end: ${machineNow()}`,
-    `judge: ${judged}`,
+    ...judgeLines,
     "",
     "# one line per run (npt-lab's own summary line and its wall time; the judge reads the logs, never these lines)",
   ];
   writeFileSync(join(results, "runs.txt"), `${[...top, ...lines].join("\n")}\n`);
-  if (!judgedOk) throw new Error(`the judge ${j.timedOut ? `stopped at ${jSecs} s` : `exited ${j.status ?? "by a signal"}`}: runs.txt written with no verdict (to the advisor)`);
-  console.log(`written: ${join("spikes", "netcode-proof", "results", "u4r", short, profile)}/verdict.json and runs.txt`);
+  const failed = calls.filter((c) => !c.ok);
+  if (failed.length && !split) throw new Error(`the judge ${failed[0].end}: runs.txt written with no verdict (to the advisor)`);
+  if (failed.length) throw new Error(`${failed.map((c) => `${c.what} ${c.end}`).join("; ")}: runs.txt written, with no verdict from ${failed.length === 1 ? "that call" : "those calls"} (to the advisor)`);
+  console.log(`written: ${join("spikes", "netcode-proof", "results", "u4r", short, profile)}/${split ? "verdict.json, verdict-bites.json" : "verdict.json"} and runs.txt`);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

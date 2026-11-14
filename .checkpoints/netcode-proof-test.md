@@ -93,10 +93,21 @@ bytes and the judge's peak (over 10 GiB: P0 does not start; plan the smallest ch
     moved to .gate/u4r-f2/scratch/ (sha256 ecfc8c84… and 56be2e1d…, unchanged), never committed. `rm -rf
     /dev/shm/u4r-f2` (66 MB, tmpfs) was denied by the permission system, so it stays (LEFTOVER-DELETE; it goes at the
     next restart).
-- **infra-engineer's one round runs (Q5):** workflow **wf_8a10f9e4-993** (task wm2a5diae; notes
-  u4r-f2-review-infra.md). **If cut:** `resumeFromRunId: "wf_8a10f9e4-993"`. **On return:** write it word for word
-  by script; read every Medium or higher in full; a Low never triggers a push of its own. Then one commit (the script;
-  the card), push, CI, and the advisor's review of the head, with P2's fingerprint question.
+- **infra-engineer's one round is in (about 21:16 UTC): APPROVE WITH FINDINGS, no code defect**
+  (u4r-f2-review-full.md, 31 lines, sha256 f540a2f5…, written word for word by u4r_f2_review_full.py).
+  - **It re-ran:** 15 stagings, 0 FAIL; the helper test 5 of 5; node --check; redact-check 0 findings. Its own three
+    checks include "exit by a signal" through check.mjs's run().
+  - **Conditions 1 to 6 and 8 hold**, with 6 holding until CI runs.
+  - **INF-F2-1 (Medium, read in full):** in a P0 set, the written stop order leaves the bite-runs call orphaned. **Fixed
+    in the card's run procedure item (6) above, in its words; no code change.** The same sentence goes in the script's
+    header at the runner's next change, unless the advisor allows it now (ADV-Q, for the head review).
+  - **INF-F2-2 (Low):** three comments overstate or understate. They are reworded at the runner's next change, in its
+    suggested words. One of them: "No run's verdict reads another run" holds only for -2's, -17's and -57's checks,
+    since twin figures read the set.
+  - **INF-F2-3 (Low):** /dev/shm/u4r-f2 is still there (its removal was denied), and the harness's NOTES path still
+    names the old scratch folder. Housekeeping only, no push.
+  - **Next:** one commit (the script exactly as tested, sha256 18c1dcf6…), push, CI, and the advisor's review of the
+    head, with ADV-Q and P2's fingerprint question.
 - **R at P0's start = 4,096 + 1.504 x 3,073.3 + 500 = 9,218.6 MiB.** Free space is 8,147 MiB, so (B) (about 480
   MiB) and then (C) (7.7 GiB) are needed, done right before P0 with df on the card.
 - **The evidence agent runs:** workflow **wf_ada59e1b-2f4** (task wmg28j1r6; Opus at high effort; notes
@@ -348,7 +359,10 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   so no npt-lab or npt-judge call holds the lane lock; flock holds it only while the script lives. If the script dies
   mid-call, the lock is freed at once and a waiting lane starts, while the call (its own session, its limit gone with
   the script) runs on. (6) **To stop a set by hand:** end the call's group first (`pgrep -a npt-lab; pgrep -af
-  npt-judge`, then `kill -9 -- -<pid>`, since the call leads its own group), and only then the script. (7) **After
+  npt-judge`, then `kill -9 -- -<pid>`, since the call leads its own group), and only then the script. **In a set
+  with bites (P0; INF-F2-1, u4r-f2-review-full.md):** "In a set with bites (P0), ending the measured judge call's
+  group starts the bite-runs call at once: pgrep again and end that call's group too; the script then writes runs.txt
+  and exits 1 on its own. Kill the script only when no npt-lab or npt-judge call is left." (7) **After
   any killed set or session cut:** check `pgrep -a npt-lab` and `pgrep -af npt-judge` at once and kill any orphan;
   any lane that held the lock in that window sends its timed or measured results from it to the advisor.
 - **U4r-F1 BUILT by the main session (about 16:49 UTC), uncommitted in the main folder:** c-u4r-runs.mjs and
