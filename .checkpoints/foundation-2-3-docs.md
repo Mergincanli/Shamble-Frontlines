@@ -151,10 +151,13 @@
    43536145305, toolchain push 43536145352, gate pull_request 43536148552, toolchain pull_request 43536148433 (running
    at 00:45 UTC; the gate jobs already green).
 
+17. Fix pass 3 DONE: CI on 922cadf all green (gate push 43536145305 with jobs gate 132265498288 and smoke 132265498065;
+   toolchain push 43536145352; gate pull_request 43536148552 with jobs gate 132265509815 and smoke 132265509486, the
+   last one done at 00:45:03 UTC; toolchain pull_request 43536148433). Consultation 12 said this save needs no further
+   consultation.
+
 ## Current step
-The verifier's re-run on 922cadf (agent ad5b8a361fccd378c resumed ~00:47 UTC with `verifier-brief-2.md`; its notes: a
-"RE-RUN on 922cadf" block in verifier-1.md). Fix pass 3's "done" save once the pull_request smoke job (132265509486,
-run 43536148552) is green; the other five jobs were green at 00:46 UTC. Then step 8.
+The verifier's re-run on 922cadf (agent ad5b8a361fccd378c resumed ~00:45 UTC with `verifier-brief-2.md`). Then step 8.
 
 ## Next steps
 1. Scripts (consultation 10's items 1 to 6 block the commit): grep every "before" string of D2 to D4 in the notes'

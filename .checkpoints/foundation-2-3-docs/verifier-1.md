@@ -97,3 +97,16 @@ FAIL: F-V1 High (RW2-F1's fix: the post-compaction sentence does not hold agains
 
 ## VERDICT: FAIL (F-V1, High). Everything else checked holds: gate PASS (symbols +0 -0), all 8 scripts exit 0, CI 28/28 green incl. a1d0317's four runs (gate + smoke jobs), Appendix A byte-exact and regenerated equal but for the cut-off, DECISIONS quotes and headers, pointers (dropped-word control reproduced), STATUS 120 lines and true for 4d21c1a, #40's row true for its read, all report SHAs/times/run ids/counts, refusals, 11 consultations by Fable 5.2, both rounds' findings and dispositions. No message of his after the cut-off (checked to 00:22:36Z). Pending-by-design items as listed in B8.
 DONE
+
+## RE-RUN on 922cadf
+Task: re-run of the verifier for PR #52 on head 922cadfce7131f94aa3827f04fb862a729c8da64 (00:43:52Z), base for the re-run a1d0317, notes as used 83b99af; brief: verifier-brief-2.md (first brief's limits stand; its item 4 last bullet withdrawn). No words of his here: pointers, lengths, booleans.
+Plan (blocks):
+R0. Orient: head/notes commits; diff a1d0317..922cadf (files, word diff); scripts at 83b99af vs the tree; plan revision 2e and the advisor agent's 'PLAN REVISION 2e' ruling (E1 text).
+R1. Gate --no-smoke vs 4d21c1a; repo-map; the eight scripts (words, report-appendix --check, decisions --check --negative, pointers --check, fixes --check, quotes, scope, 2.2 decisions-entries --check).
+R2. Every changed sentence vs its record (transcript, git, CI API, the ruling's exact E1 text).
+R3. Every report sentence about what was said in chat vs a transcript line; every main-session chat text 22:40Z to the head's commit, counted; any bearing on how he was told about the advisor model missing from the D&D bullet (lines 1887, 2122, 2869, 2929).
+R4. F-V3's new bullet vs fp3-fragments-all.mjs (whole sentences or longer, some pushed version; no unbacked count).
+R5. Cut-off 2026-11-14 00:43:01: any message of his after it; 12 advisor calls before the head, all Fable 5.2.
+R6. CI on 922cadf (43536145305, 43536145352, 43536148552, 43536148433) final results, jobs incl. smoke.
+R7. Pending-by-design list; verdict; DONE.
+Notes:
