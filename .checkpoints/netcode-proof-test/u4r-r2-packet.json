@@ -1,0 +1,138 @@
+{
+ "title": "U4r round 2 (only what changed since snapshot 572c4f69: the fix pass FP-1 to FP-9 of the advisor's ruling on round 1, and FP-0's two runner diffs)",
+ "out": ".checkpoints/netcode-proof-test/u4r-r2-packet.md",
+ "side_out": ".checkpoints/netcode-proof-test/u4r-r2-packet-tests.md",
+ "heads": [
+  "The snapshot reviewed in round 1: `.checkpoints/netcode-proof-test/wip/u4r.patch` sha256 572c4f69435da2ad6f62d54d4bcbc47b04d6329b5493e0faf78fcecfdc4a09c2 (26 files on 2fbec77; committed at b084998). Its read copy `.gate/u4r-snap1`: a detached worktree at 2fbec77 with that patch applied.",
+  "The snapshot under review: `.checkpoints/netcode-proof-test/wip/u4r.patch` sha256 21ca46be23704131c77cc20981a4bfe866811b33f9ca853279f7ddbfb5d58bce (26 files on 2fbec77; committed at 450af1a). Its read copy `.gate/u4r-snap2`: a detached worktree at 2fbec77 with that patch applied; each of its 26 files equals the builder worktree's (`.claude/worktrees/agent-a11e2354169f39acf`, HEAD 2fbec77, the work uncommitted) by cmp.",
+  "The diffs below compare `.gate/u4r-snap1/spikes/netcode-proof` with `.gate/u4r-snap2/spikes/netcode-proof` file by file: the 14 files that differ, found by comparing the two folders. The fix pass added no file under spikes/ and removed none.",
+  "Counts at snapshot 572c4f69 (round 1's head): measured build 526 tests passed, bites build 603, self 76 of 76; check.mjs 11 steps.",
+  "The fix pass's runs, all through the lane's runner `.checkpoints/netcode-proof-test/u4r-run.sh` (sha256 6efb91572cf06fd9ad6472c077cd39c9a59bfed8d4a3dac561992aafd5729bc8, after FP-0) in the builder worktree, logs under `.gate/u4r/`: c6-ceil-1.log, c6-det-u4.log, c6-end1.log, c6-end2.log, c6-end3.log, c6-fp12-1.log, c6-fp12-2.log, c6-fp3-1.log, c6-fp4-1.log, c6-fp4-2.log, c6-fp5-helpers.log, c6-fp5-wal.log, c6-fp6-1.log, c6-fp6-2.log, c6-fp6-3.log, c6-fp7-1.log, c6-plant-ceil.log, c6-plant-fp1.log, c6-plant-fp2i-b.log, c6-plant-fp2i.log, c6-plant-fp2ii.log, c6-plant-fp3.log, c6-plant-fp4.log, c6-regen-precheck.log.",
+  "Among them, the check.mjs runs: c6-end1.log, c6-end2.log, c6-end3.log; FP-8's runs: c6-det-u4.log and c6-regen-precheck.log (round 1's det-u4.log and regen-precheck.log are older); the plant runs: c6-plant-ceil.log, c6-plant-fp1.log, c6-plant-fp2i-b.log, c6-plant-fp2i.log, c6-plant-fp2ii.log, c6-plant-fp3.log, c6-plant-fp4.log.",
+  "FP-0's two runner diffs are copied below: the runners are outside the patch, and the main session edited them (each diff is `git diff` of the runner against its committed version).",
+  "Round 1's packet, with the approved plan's lines, marks.json's and SERIES.md's rows, the catalogue and the carries as round 1 had them: `.checkpoints/netcode-proof-test/u4r-packet.md` and `.checkpoints/netcode-proof-test/u4r-packet-tests.md`."
+ ],
+ "diffs": [
+  {
+   "label": "spikes/netcode-proof/check.mjs",
+   "a": ".gate/u4r-snap1/spikes/netcode-proof/check.mjs",
+   "b": ".gate/u4r-snap2/spikes/netcode-proof/check.mjs",
+   "side": false
+  },
+  {
+   "label": "spikes/netcode-proof/check.test.mjs",
+   "a": ".gate/u4r-snap1/spikes/netcode-proof/check.test.mjs",
+   "b": ".gate/u4r-snap2/spikes/netcode-proof/check.test.mjs",
+   "side": true
+  },
+  {
+   "label": "spikes/netcode-proof/crates/bots/src/lib.rs",
+   "a": ".gate/u4r-snap1/spikes/netcode-proof/crates/bots/src/lib.rs",
+   "b": ".gate/u4r-snap2/spikes/netcode-proof/crates/bots/src/lib.rs",
+   "side": false
+  },
+  {
+   "label": "spikes/netcode-proof/crates/lab/src/contract.rs",
+   "a": ".gate/u4r-snap1/spikes/netcode-proof/crates/lab/src/contract.rs",
+   "b": ".gate/u4r-snap2/spikes/netcode-proof/crates/lab/src/contract.rs",
+   "side": false
+  },
+  {
+   "label": "spikes/netcode-proof/crates/lab/src/hash.rs",
+   "a": ".gate/u4r-snap1/spikes/netcode-proof/crates/lab/src/hash.rs",
+   "b": ".gate/u4r-snap2/spikes/netcode-proof/crates/lab/src/hash.rs",
+   "side": false
+  },
+  {
+   "label": "spikes/netcode-proof/crates/lab/src/lib.rs",
+   "a": ".gate/u4r-snap1/spikes/netcode-proof/crates/lab/src/lib.rs",
+   "b": ".gate/u4r-snap2/spikes/netcode-proof/crates/lab/src/lib.rs",
+   "side": false
+  },
+  {
+   "label": "spikes/netcode-proof/crates/lab/src/logs.rs",
+   "a": ".gate/u4r-snap1/spikes/netcode-proof/crates/lab/src/logs.rs",
+   "b": ".gate/u4r-snap2/spikes/netcode-proof/crates/lab/src/logs.rs",
+   "side": false
+  },
+  {
+   "label": "spikes/netcode-proof/crates/lab/src/precheck.rs",
+   "a": ".gate/u4r-snap1/spikes/netcode-proof/crates/lab/src/precheck.rs",
+   "b": ".gate/u4r-snap2/spikes/netcode-proof/crates/lab/src/precheck.rs",
+   "side": false
+  },
+  {
+   "label": "spikes/netcode-proof/crates/lab/src/replay.rs",
+   "a": ".gate/u4r-snap1/spikes/netcode-proof/crates/lab/src/replay.rs",
+   "b": ".gate/u4r-snap2/spikes/netcode-proof/crates/lab/src/replay.rs",
+   "side": false
+  },
+  {
+   "label": "spikes/netcode-proof/crates/lab/src/scenario.rs",
+   "a": ".gate/u4r-snap1/spikes/netcode-proof/crates/lab/src/scenario.rs",
+   "b": ".gate/u4r-snap2/spikes/netcode-proof/crates/lab/src/scenario.rs",
+   "side": false
+  },
+  {
+   "label": "spikes/netcode-proof/crates/server/tests/schedule.rs",
+   "a": ".gate/u4r-snap1/spikes/netcode-proof/crates/server/tests/schedule.rs",
+   "b": ".gate/u4r-snap2/spikes/netcode-proof/crates/server/tests/schedule.rs",
+   "side": true
+  },
+  {
+   "label": "spikes/netcode-proof/ops/runs/c-u4r-r2.mjs",
+   "a": ".gate/u4r-snap1/spikes/netcode-proof/ops/runs/c-u4r-r2.mjs",
+   "b": ".gate/u4r-snap2/spikes/netcode-proof/ops/runs/c-u4r-r2.mjs",
+   "side": false
+  },
+  {
+   "label": "spikes/netcode-proof/ops/runs/c-u4r-runs.mjs",
+   "a": ".gate/u4r-snap1/spikes/netcode-proof/ops/runs/c-u4r-runs.mjs",
+   "b": ".gate/u4r-snap2/spikes/netcode-proof/ops/runs/c-u4r-runs.mjs",
+   "side": false
+  },
+  {
+   "label": "spikes/netcode-proof/ops/runs/det-u4.mjs",
+   "a": ".gate/u4r-snap1/spikes/netcode-proof/ops/runs/det-u4.mjs",
+   "b": ".gate/u4r-snap2/spikes/netcode-proof/ops/runs/det-u4.mjs",
+   "side": false
+  },
+  {
+   "label": "FP-5's helper test (a scratch file in the builder worktree's notes folder, never committed; the ruling's FP-5 EVIDENCE)",
+   "a": "/dev/null",
+   "b": ".claude/worktrees/agent-a11e2354169f39acf/.checkpoints/netcode-proof-test/u4r-fp5-helpers.test.mjs",
+   "side": true
+  }
+ ],
+ "docs": [
+  {
+   "label": "FP-0: u4r-run.sh against its committed version",
+   "path": ".checkpoints/netcode-proof-test/u4r-run.sh.inf-u4r-4.diff"
+  },
+  {
+   "label": "FP-0: main-run.sh against its committed version",
+   "path": ".checkpoints/netcode-proof-test/main-run.sh.inf-u4r-4.diff"
+  },
+  {
+   "label": "The advisor's ruling on round 1: the fix pass, round 2 and each finding",
+   "path": ".checkpoints/netcode-proof-test/advisor-u4r-r1-full.md"
+  },
+  {
+   "label": "Round 1's findings, the six seats' results word for word",
+   "path": ".checkpoints/netcode-proof-test/u4r-review-r1-full.md"
+  },
+  {
+   "label": "Mustafa's words of 2026-11-14 (his SIZE-U4R answer (a) sets the fix pass's scope)",
+   "path": ".checkpoints/netcode-proof-test/history.md",
+   "lines": [
+    2040,
+    2058
+   ],
+   "words_of_mustafa": true
+  }
+ ],
+ "carries": {
+  "path": ".checkpoints/netcode-proof-test/u4s-carries.md",
+  "include": "^(18|39|40|58|60|62|75|76|77|82|83|84|85|87)\\. \\*\\*"
+ }
+}

@@ -35,7 +35,18 @@ report 12:50 UTC); snapshot 21ca46be…; next: round 2 (five seats, two batches)
 - **SIZE-CHECK: U4r, planned M (about 3,000; past above 6,000): 8,362 lines at snapshot 21ca46be** (6,906 in 13 new
   files, 1,456 inserted into 13 files, 106 removed); 7,568 at 572c4f69. Past; his SIZE-U4R (a) covers it; the one line
   to him sent with this step's report.
-- **Next:** the round-2 packet by script (u4r-r2-packet.json → u4r-r2-packet.md: the diffs .gate/u4r-snap1 →
+- **Round 2 LAUNCHED about 12:58 UTC:** workflow **wf_5e07787a-ae9** (task wuv8w2o4q; script
+  u4r-review-r2-wf_5e07787a-ae9.js under the session's workflows/scripts/), five seats (batch 1 netcode, security,
+  test; batch 2 rust, infra), opus, xhigh, each on the ruling's "Round 2" list and its own round-1 ids; notes
+  u4r-review2-<seat>.md; runner logs .gate/u4r/review2-<seat>/. The packet: **u4r-r2-packet.md** (sha256 b1526bde…,
+  by u4r_r2_packet_config.py then review_packet.py: 14 changed files plus FP-5's helper test, FP-0's diffs, the
+  ruling, round 1's findings, his words of today, carries 18, 39, 40, 58, 60, 62, 75, 76, 77, 82, 83, 84, 85, 87; 75
+  left out, ids at its end) and u4r-r2-packet-tests.md (637249a5…). The builder's report is named in the seats'
+  prompt only (the ruling puts its report words in round 2's subject), as claims to check, never in the packet.
+  **If cut:** `Workflow({scriptPath, resumeFromRunId: "wf_5e07787a-ae9"})`. **On return:** write the results word for
+  word by script (u4r-review-r2-full.md, as round 1's); read every Medium or higher in full; the advisor's ruling on
+  round 2 (a Critical or High opens round 3 for it alone; below High → STATUS follow-ups); then the report.
+- **Next (as planned before the launch):** the round-2 packet by script (u4r-r2-packet.json → u4r-r2-packet.md: the diffs .gate/u4r-snap1 →
   .gate/u4r-snap2, FP-0's two diffs, the ruling and round 1's findings, the carries the fix pass touches); round 2 as a
   workflow (batch 1 netcode, security, test; batch 2 rust, infra; the ruling's "Round 2" says who reads what); the
   main session's own reads meanwhile (EA-U4R-1, -4, -5, -8, -9; FP-4's verdict and c-u4r-runs.mjs's judge feed, as
