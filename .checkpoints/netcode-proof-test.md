@@ -68,9 +68,28 @@ then the judged sets P3, B1, P2 and P0.**
       with the set's marks, and one with `--only PM-0001-30`, which is reading alone and gives RR3-L6's read_log share.
       Logs go to .gate/u4r-judge-apart/<set>-<run>.log, and the verdict files are scratch. P0's judge memory and time
       are projected from bytes using both points.
-  - **P3 RUNS (started 18:03:40 UTC; background task bnfsffmbo; kept log .gate/u4r-sets/P3-0f066338dd8d.log; raw logs
-    .gate/netcode-proof-test/runs/u4r-P3-0f066338dd8d/).** **If cut:** follow the run procedure's items (6) and (7)
-    (orphans first). A set stopped by a cut is not a result: ask the advisor before any re-run.
+  - **P3 IS DONE (18:03:40-18:20:36 UTC, exit 0); its results are committed at 5afd4e7**
+    (results/u4r/0f066338dd8d/P3/; kept log .gate/u4r-sets/P3-0f066338dd8d.log; peak.py 1,018.1 s, 1,507.9 MiB).
+    - **-57's L1 P3 part: PASS** (3 valid runs).
+    - **-2: FAIL on everyone-in-view only.** The least per-slot shares are 0.352778, 0.085444 and 0.203556 against
+      0.99; -2's other ten checks pass. **So -17's L1 P3 part is INVALID by pre:PM-0001-2.** The ruling expects
+      INVALID only on B1, so **this goes to the advisor before it counts.**
+    - Overflow resyncs: 0 on every run. Measured incomplete: 43,117, 43,210 and 43,441 of 864,000 client-ticks.
+    - redact-check: 280 items, 0 findings.
+  - **Raw logs are bigger than projected: 519 MiB against 360 (1.42 times).** One P3 run: lab.jsonl 122.9 MB,
+    room.jsonl 36.6 MB, client.jsonl 19.5 MB. At 1.42 times the rest: B1 about 774 MiB, P2 893, P0 4,364. With 9,714
+    MiB free now, P0's per-run floor check would stop it before pitch-8bit (its last bite), and the end would fall below
+    4 GiB. **The disk plan needs a revision before P0, which goes to the advisor.**
+  - **The judge measured apart (judge-apart.sh, .gate/u4r-judge-apart/u4r-P3-0f066338dd8d-l1-p3-s1.log):** one P3 run,
+    178,922,504 B.
+    - Full judging: 2.7 s and 641.1 MiB. Reading alone (`--only PM-0001-30`): 1.9 s and 426.2 MiB. RR3-L6's read_log
+      share is therefore about 70 %.
+    - With the set's 1,507.9 MiB on 519 MiB, a straight line gives memory = about 216 MiB + 2.49 x log MiB. **P0
+      projected: 3,073 MiB of logs gives 7.7 GiB, and 4,364 MiB (at 1.42 times) gives 10.8 GiB. That is over 10 GiB,
+      so it goes to the advisor before P0.**
+    - The judge's time for P0 is about 70 s, far below RUN_LIMIT_MS (3,600 s).
+  - **NEXT: B1 (independent of these questions), then P2, while the advisor rules on three things:** P3's -17
+    INVALID, P0's judge memory, and the disk revision. No P0 before that ruling.
   - **Any run flagged for overflow resyncs** goes to the advisor before it counts (P0's tick16 bite run: about 48
     expected).
   - **B1's -17 and -18 verdicts** are INVALID by design: recorded, never counted.
