@@ -72,7 +72,8 @@ advisor agent's review of revision 1 (Part 14) and the three Art sheets he sent 
 - **What is only for development and tests.** The scripted walkers, the fake-lag switch, the bench mode with its
   "copy report" button, the camera panel's "copy values" button and the zip's small server serve the marks and your
   checks; none is a feature of the player's game, and each is kept out of the production build. The walkers go when
-  Slice 2's bots come. The ink family you do not pick is removed in the change-set after your pick.
+  Slice 2's bots come. The ink family you do not pick leaves the game after your pick, but only once both families
+  are measured on the named machines; until then it is kept as a patch and a build, like Part 3.2's tests.
 - **Evidence by kind of change** (CLAUDE.md, protocol step 4): logic by tests on the real code; netcode by
   deterministic tests with injected delay, jitter and loss (L1); performance by numbers with their method; anything
   visible by screenshots that name their backend, then your eyes in Brave.
@@ -200,8 +201,8 @@ when and what. No code.
   two soldiers meet (decision START-RULES).
 - Measured here: identical hashes natively, in Node and in Chromium on a movement recording; movement against its data
   (step, apex, no tunnelling); the collision tree byte for byte; ids over random spawns; even motion on your display.
-- If this change-set nears twice its size, the far-corner test map and the size comparison against other libraries
-  move out first; the camera panel stays.
+- If this change-set nears twice its size, two things move out first: the test map that sits at the far corner of a
+  2 km map (PM-0004-39) and the size comparison against other libraries. The camera panel stays.
 - Reviewers: rust-reviewer, engine-architect, netcode-architect; then graphics-engineer, test-engineer,
   security-auditor; then game-designer, perf-auditor.
 
@@ -319,7 +320,7 @@ or CI check of the 2.3 chat that follows my change-set n (decision GATE-FOLLOW).
 | PM-0002-64 | a 1-minute local match in three browser engines: every tick on the newest post, at most one post per drawn frame, blocks equal ticks within 1, 0 Wasm calls and 0 network messages by the page, the backend named per engine | 3 (Chromium here) | 2.3 after 3 (Firefox and WebKit run only in CI) |
 | ADR 0003's foundation line (:1390-1393) | `await renderer.init()`; the backend in the overlay and in every test screenshot; CI gates the render counts; the preview link names its backend | 2 (the first two; the counts hook and a committed baseline) | the CI gate on counts 2.3 after 3 (PM-0003-36); the preview link at step 2.6 |
 | ADR 0004's foundation line (:1252) | the hash-map ban and the float rules as lints; a replay runner; the first recording in CI | 3 (the runner, the recording, and a scan test for the rules) | the lints are 2.3's (its CS-C for the hash-map and clock bans; the float ban after 3's vectors) |
-| PM-0002-49 | L1: the same seed gives the same packet-fate log and hashes; loss, delay and jitter within 5 % over 1,000,000 packets per profile | 3 | 3; its gate step (G11) and PM-0002-50's planted defects 2.3 after 3 |
+| PM-0002-49 | L1: the same seed gives the same packet-fate log and hashes; loss, delay and jitter within 5 % over 1,000,000 packets per profile | 3 | 3; its gate step (G11) and PM-0002-50's planted defects are the 2.3 chat's, after the netcode proof test's report or after 3, by your answer to GATE-FOLLOW's sub-question |
 | PM-0002-53 | a planted counter overflow panics in debug and release, natively and in Wasm | 3 | 3 natively; the Wasm half in CI 2.3 after 3 |
 | "The foundation is done" (PM-0002-69) | an empty scene through the full stack in the browser, CI green, a preview link; it asks that every foundation mark (PM-0002-35 to -68) passes | 3 for the scene | step 2.6 (Part 8) and the last of step 2.3's marks, whichever comes later |
 
@@ -357,8 +358,9 @@ or CI check of the 2.3 chat that follows my change-set n (decision GATE-FOLLOW).
 Change-set 12 ends the building of Slice 1. It does not by itself make Slice 1's done-when lines true. Its report
 lists every row above with its state, so that "Slice 1 is done" is not said early. By this plan the open ones will be:
 - **Waiting for the 2.3 chat's CI jobs:** every "in CI" clause for WebAssembly and for Firefox and WebKit: the
-  determinism suite on every target, PM-0002-64, the gate on render counts, the goldens' planted moves, and the gate
-  forms of the type marks.
+  determinism suite on every target, PM-0002-64, the gate on render counts, the goldens' planted moves, the gate
+  forms of the type marks, and the gate's network step (which may also wait for the netcode proof test's report:
+  GATE-FOLLOW's sub-question).
 - **Waiting for named machines:** every timed clause: the hand-off marks inside PM-0002-70 (marks 4, 7, 8 and 13),
   PM-0001-43, the comparisons of Part 3.2; Safari on the Mac; Windows on the minimum laptop for the determinism suite.
 - **Waiting for a later slice, by the mark's own nouns:** the real-network halves of PM-0001-20, -41 and -42 (Slice
@@ -386,7 +388,7 @@ Each of these would cost the most to learn late. Each is placed at the first bui
 | The float and hash-map rules enforced by the build | PM-0004-23, with -10 (no clock) and -74 (one feature set) | 3 (a scan test in the sim crate) | the lints themselves are the 2.3 chat's |
 | The hand-off between page and simulation at 12 players | PM-0002-4, -6, -7, -8, -13, with -3 and -28 | a first reading in 2 and 3 (a block padded to 12 and 48 soldiers); the marks in 5 | the minimum laptop's own 60 Hz screen, named; until then a reading on your laptop |
 | The Worker's pacing, and a press reaching its tick | PM-0002-26 (PM-0004-68 to -70), PM-0002-12, -13 | 2 and 3; even motion in 4 | screens at 60, 120 and 144 Hz for the smoothness clause |
-| One WebAssembly instance or two | PM-0002-25 (OQ-0002-3, OQ-0004-7) | 3, as a small separate test | both layouts built; the game keeps one |
+| One WebAssembly instance or two | PM-0002-25 (OQ-0002-3, OQ-0004-7) | a small separate test: 3 for the trap check, 5 for the numbers at 12 and 48 soldiers | both layouts built; the game keeps one |
 | The time unit every timer uses | PM-0004-11, then -9 | 4 (the unit, from the rounding report), 8 (every legacy fire rate) | counted in CI |
 | Our own movement on the collision library | PM-0004-30, -20, -32, -39 | 4 | the ledge block in the yard; hashes natively against Wasm |
 | The frame time on the weakest machine with the look on | PM-0003-9, -12, -13 (as a reading), -21's post-processing row, with -3, -7, -8, -10 | 6 | the named minimum laptop at Low; full-screen passes cost by resolution, so their early numbers hold |
@@ -402,7 +404,7 @@ the side the game builds is provisional.
 
 | Mark | The question | Built | Judged | Size |
 |---|---|---|---|---|
-| PM-0002-25 | one Wasm instance or two in a local match | 3 (does a trap in the client endpoint leave the authority running); 5 (calls, time and memory at 12 and 48 soldiers) | counts here; time and memory on the minimum laptop in Chrome, when named. Reported, as the mark says | half a day, twice |
+| PM-0002-25 | one Wasm instance or two in a local match | 3 (does a trap in the client endpoint leave the authority running); 5 (calls, time and memory at 12 and 48 soldiers) | the counts are read in this chat's container, which gives the same counts as CI would (the test is never merged, so CI cannot run it: this plan's reading of the mark's "CI"); time and memory on the minimum laptop in Chrome, when named. Reported, as the mark says | half a day, twice |
 | PM-0002-10 | the block laid out per entity or per field | 5 (48 walkers); again in 12, with the event and projectile sections | reported: every cell on the minimum laptop (Chrome, Edge, Firefox) and on the Mac (Safari), when named | half a day |
 | PM-0002-11 | the transferred block or the shared ring | 5 | on the minimum laptop, when named (Safari reported). Until then the transferred block is provisional | one day |
 | PM-0002-27 | the fallback pacing (`Atomics.wait`): by its own words only if PM-0002-26's jitter fails | then | as PM-0002-26 | one day |
@@ -641,7 +643,8 @@ and numbers are typed out in `art-sheets-2026-11-14.md` beside this file):
 
 **What the plan takes from them.**
 - The first soldier is the sheet's Conscript (decision FIRST-SOLDIER now only asks you to confirm it). The code-built
-  stand-in follows the sheet's sizes; the enemy dummies are the same soldier in another faction's colours.
+  stand-in follows the sheet's sizes; the enemy dummies are the same soldier in a plain second colour, and in another
+  faction's colours once the brief holds them.
 - The scene you play in is the sheet's street corner. Beside it stands a training yard built from the tests' own
   shapes (a step of 0.55 m and one of 0.56 m, ledges and platforms with ramps, thin walls, a 50 m lane with range
   posts), because the marks need those exact shapes. Its colours are the Art project's to say (the block below asks).
@@ -716,8 +719,9 @@ and 14 November are not in it).
   soldiers move.
 - **The Art sheets and the brief.** The sheets you sent today hold look choices that the brief on main does not hold
   yet: the factions' colours, palette A, and a line rule that draws units thicker than buildings, where LOOK_V2 §2
-  says "thick black outlines, especially strong on buildings". For v2 work the brief wins (CLAUDE.md), so the carry
-  brings them into it before change-set 6 is built. Until then the plan takes only sizes and layout from the sheets.
+  says "thick black outlines, especially strong on buildings". For v2 work the brief wins (CLAUDE.md). If you want
+  the sheets' choices used, the carry brings them into the brief before change-set 6 is built. Until then the plan
+  takes only sizes and layout from the sheets.
 - **Do not wait:** 1 to 5, 7, 8, 9 and 12. Their figures and scene are plain on purpose and are judged for nothing
   but play.
 - **What you judge in Brave, by change-set** (the look checklist of ADR 0003, PM-0003-17; step numbers are the draft's):
@@ -824,7 +828,8 @@ check runs in its own chat when it next takes main; a breach it finds there is m
   step, and the float ban from change-set 3's vectors.
 - **One check is tied to the netcode proof test, which is not one of the six and still runs:** the gate's network
   step (G11) re-proves the link simulator that test builds. Your words of 2026-11-13 still stand for it: "Every gate
-  check that needs a result joins later, when that result is in." So the network step waits for the proof test's
+  check that needs a result joins later, when that result is in, with its pass marks unchanged." So the network
+  step waits for the proof test's
   report unless you say otherwise (GATE-FOLLOW asks). My own L1 tests run in the plain test job from change-set 3
   either way, because step 2.5's done-when asks for L1 behind the loopback.
 
@@ -897,7 +902,8 @@ They stand at the end of this plan, under "Decisions needed", so that the asks c
     its token. Later, for step 2.6: the deploy token in the `preview` environment.
 11. Bring the Art project's sheets back before change-set 6.
 12. Answer MODEL-PUBLIC before any model file is committed. Then run the Blender session on your PC (Claude through the
-    Blender MCP, from the Art project's brief and Part 11's rules), export the GLB, and upload it to this chat.
+    Blender MCP, from the Art project's brief and Part 11's rules), export the GLB, and upload it to this chat. That
+    upload is not proven either; the first test export (Part 11) tries it.
 13. When a Mac is available: one visit for the Safari rows collected so far.
 14. Screens at 120 and 144 Hz, if you can reach one, for the smoothness rows of change-set 4.
 15. Two feel calls in Brave, as design questions that stay yours (decision START-RULES): how far the jump reaches
@@ -1024,6 +1030,9 @@ Not in the file
   faction; a shape that changes needs a rule of its own: a small part of its own per faction, or one model per
   faction. The sheet lets the stand-in leave the shape out at game size, so nothing in Slice 1 waits for this.
 - The names: the class prefixes and the joint list are proposals of a naming convention, to confirm.
+- **One colour per faction area.** The Conscript has three areas that change with the faction (coat, top, trim),
+  while the drafts speak of "the faction's colour". The faction's data then holds one colour per such area, and
+  PM-0005-42 is read per area.
 - Sharp or smooth edges in the normals: it depends on the ink family, your pick at change-set 6.
 - Whether headgear is its own model, and the names of the weapon's grip points.
 - Which Blender version runs on your PC: the option names were read on the exporter's current main branch.
@@ -1055,7 +1064,7 @@ you have answered MODEL-PUBLIC. After 10 (Body) the model also moves; before it,
   perf-auditor, test-engineer.
 
 **How the file reaches the repository.** Under MODEL-PUBLIC (a): you upload the GLB to this chat; I commit it in M's
-pull request. Where model files live for good is an open question of the rest of the asset research (OQ-0005-AP1); M's
+pull request. Whether an upload into this chat reaches my container is not proven; the first test export tries it. Where model files live for good is an open question of the rest of the asset research (OQ-0005-AP1); M's
 plan names a place and says it may move.
 
 **One question of ADR 0005 comes nearer with this route:** whether a model drafted by an AI may ship (OQ-0005-AP3). It
@@ -1143,7 +1152,15 @@ maps); Part 4 now cites it and asks the Art project instead of stating it.
 **Its ruling, inside its authority.** The scan test in the sim crate may stand in for the 2.3 chat's float ban until
 that lint merges, on the three conditions Part 7 states.
 
-**The re-read of revision 2.** <!-- reread -->
+**The re-read of revision 2.** The advisor agent re-read revision 2 at commit ee41298 (asked after 15:18 UTC; its
+notes `advisor-plan-r2.md` were last written at 15:24 UTC and end with DONE). Verdict: **APPROVE**. By its notes all
+3 High and all 11 Medium findings are fixed; it re-ran the count (201 of 201; the asset spike's 7) and checked every
+new quotation against its source. It withdrew one finding of its own: "higher is lighter" has a source (LOOP_V2 §9).
+It left eleven Low findings to fold without a further review; they are folded in this text (revision 2, as saved
+after its verdict): the network step in Part 2's rows, your sentence of 2026-11-13 quoted whole, the counts of the
+two-instance test, the named test map, one colour per faction area, the carry's wording, the dummies' colour before
+the carry, the unproven upload of a model file, when the unpicked ink family leaves, Part 3.1's row, and the Art
+sheets' text on a public branch (decision MODEL-PUBLIC). Its APPROVE is the review you asked for; it is not your go.
 
 ## Decisions needed
 1. **SPLIT-25: is step 2.5 built as two change-sets?**
@@ -1170,7 +1187,8 @@ that lint merges, on the three conditions Part 7 states.
      sets aside your words of 2026-11-12; (c) they wait until Slice 1 ends.
    - One check needs its own answer. The gate's network step re-proves the link simulator of the netcode proof test,
      which is not one of the six, and your words of 2026-11-13 still stand for it: "Every gate check that needs a
-     result joins later, when that result is in." (i) It waits for the proof test's report, as those words say;
+     result joins later, when that result is in, with its pass marks unchanged." (i) It waits for the proof test's
+     report, as those words say;
      (ii) it follows change-set 3 like the others.
    - Recommendation: (a), with (i).
 4. **MACHINES: when do you name the minimum laptop and the recommended desktop?**
@@ -1217,6 +1235,9 @@ that lint merges, on the three conditions Part 7 states.
      previews only; (b) models live in a private store outside the repository and the build fetches them with a
      secret: the build is then no longer free of secrets, and the store is not researched; (c) the repository becomes
      private: CI minutes are then counted against your plan, and the reviewer on previews needs a paid plan.
+   - The same question touches the Art sheets. Their images are not in the repository and stay out until you
+     answer. Their text and numbers are in this plan's notes on my branch, which is public, since 15:18 UTC today: I
+     typed them there before weighing this question. Say if such notes should stay out too.
    - Recommendation: (a) for the first soldier and the other test models, as the infra review recommends "until the
      first model that must stay unseen", and the question again before such a model. Under (a) only the exported GLB
      is committed; the Blender file stays with you until the asset research says where sources live. No model file is

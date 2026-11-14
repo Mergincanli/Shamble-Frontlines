@@ -5,7 +5,7 @@
   edit outside this checkpoint, no docs pull request. · plan: `.checkpoints/build-plan-slice-1/plan.md` (revision 2)
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/build-plan-slice-1) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-14 16:20 Amsterdam
+- **Last update:** 2026-11-14 16:30 Amsterdam
 
 ## Steps done
 1. Orientation · the session's model read with get_session at 2026-11-14 13:58 UTC: `session_context.model` and
@@ -31,18 +31,25 @@
 8. Plan revision 2 · ee41298 · every finding of the review folded in (Part 14's table says where), the Art sheets
    taken in (Part 4, FIRST-SOLDIER, Part 11 rule 12); the count unchanged (201 of 201; 7).
 
+9. The advisor agent's re-read of revision 2 at ee41298 (asked after 15:18 UTC; its notes `advisor-plan-r2.md` last
+   written 15:24 UTC, DONE): **APPROVE**, with eleven Lows to fold without a further review; all eleven folded (Part
+   14, "The re-read of revision 2"); the count unchanged (201 of 201; 7).
+
 ## Current step
-9. The advisor agent's re-read of revision 2 (asked after 15:18 UTC; notes: `advisor-plan-r2.md`).
+10. Done: the plan is approved by the advisor agent and saved; stopped for his go.
 
 ## Next steps
-1. Fold what the re-read finds; record its verdict in Part 14 ("The re-read of revision 2").
-2. Send the plan to Mustafa as a file (it also tries the file route of Part 8) and stop for his go, with the summary
-   he asked for: the plan's path, the one-screen summary, the table of change-sets, the decisions, how full the chat is.
-3. On his go, and once his decision of 2026-11-14 is on main (the 2.3 chat's docs change-set): change-set 0's own
-   plan, then the advisor agent's review of it.
+1. Stopped for his go on the plan and his answers to its twelve decisions (SPLIT-25, FIRST-SOLDIER, GATE-FOLLOW,
+   MACHINES, BRAVE-ROUTE, PREVIEW-START, STAND-IN-LOOK, COMPARE, MODEL-PUBLIC, RULES-WHO, SCOPE-RELOAD, START-RULES).
+2. On his go, and once his decision of 2026-11-14 is on main (the 2.3 chat's docs change-set): change-set 0's own
+   plan (the model-file rules), then the advisor agent's review of it. Its pull request also carries this plan to
+   main as a report, with his messages in its appendix.
 
 ## Open findings
-- The advisor agent's review of revision 1: REVISE; all folded into revision 2; the re-read is pending.
+- The advisor agent's review of revision 1: REVISE; all folded into revision 2; its re-read: APPROVE (closed).
+- The Art sheets' text and numbers are in `art-sheets-2026-11-14.md` on this public branch since ee41298 (15:18
+  UTC), typed before the question whether unreleased art may be seen (OQ-0006-18) was weighed; told to him in the
+  closing message and in decision MODEL-PUBLIC. The images are not in the repository.
 - The PR Advisor's merge places are `docs/`, `tools/`, `README.md` and `FIRST_PROMPTS.md` only
   (`.claude/hooks/routine-guard.mjs:84`): every change-set that touches `crates/` or `packages/` merges on his go from
   a day session.
@@ -74,4 +81,4 @@
   `/tmp/claude-0/-home-user-Shamble-Frontlines/f707c56b-26b4-5848-b1e1-237a99a6a881/tasks/b33kcams4.output` · started
   13:59 UTC (14:59 Amsterdam) · stops by 15:49 UTC · last check 15:18 UTC: ok ("saved and pushed df19945" at 15:09
   UTC; a manual save ee41298 at 15:18 UTC).
-- agents: the advisor agent's re-read of revision 2, asked after 15:18 UTC.
+- agents: none running.
