@@ -12,8 +12,19 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 08:15 UTC; read this first after a compact or a cut): U4r's review round 1 RETURNED; the
-advisor rules on its findings (workflow u4r-review-r1-ruling, notes advisor-u4r-r1.md); then the fix pass.**
+**NOW (2026-11-14 about 08:32 UTC; read this first after a compact or a cut): U4r's round-1 RULING IS IN
+(advisor-u4r-r1-full.md, 316 lines, sha256 7b552e8c…, written by script word for word): 50 findings, 45 fix now, 5
+follow-ups, none Critical or High; an 11-item fix pass (FP-1 to FP-11); round 2 = five seats on what changed (batch 1
+netcode, security, test; batch 2 rust, infra). Nothing for Mustafa beyond the report's plain story.**
+- **Next, in order:** (1) read every round-1 Medium in full (u4r-review-r1-full.md: NC-U4R-1, T-1, T-2, SEC-U4R-1,
+  SEC-U4R-2, RR3-M1, INF-U4R-1 to -4) and the ruling's fix pass and Mediums in full (advisor-u4r-r1-full.md); (2) copy
+  6 for the fix pass: a fresh copy from u4r-copy5-prompt.md's form (the first prompt verbatim, checked by script), its
+  resume part brought up to date (notes 1,586 lines; snapshot 572c4f69…; the fix pass FP-1 to FP-11 word for word from
+  advisor-u4r-r1-full.md; its tests, plants, the regenerations and both end checks); (3) snapshot; the round-2 packet
+  cut by script on the diff from 572c4f69 to the new snapshot; (4) round 2 (five seats, two batches); (5) the report.
+  The saver bn7dtt86b's window ends about 08:50 UTC: restart it after.
+
+**Earlier NOW (2026-11-14 about 08:15 UTC): U4r's review round 1 RETURNED; the advisor ruled on its findings.**
 - **Round 1** (wf_a3541dc5-9e1, six seats, 528 tool uses): **u4r-review-r1-full.md** (402 lines, sha256 ec61dfbd…;
   written by script, word for word, from the journal). Verdicts: netcode, test, security, engine-architect and infra
   APPROVE WITH FINDINGS; **rust REQUEST CHANGES** (RR3-M1). **10 Medium, 40 Low, no Critical or High.** The Mediums:
