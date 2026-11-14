@@ -18,3 +18,15 @@ Sections:
 13. Decisions needed / For Mustafa
 
 ## Progress
+- Sources read: r2 ruling whole; u4d2-report whole; u4r-build.md copies' starts/states, copy 5 (1173-1587), copy 6
+  (1588-2111); build rulings 1-4 decisions; brief check verdict; r1 review headings + r1 ruling FP list, FP-9, For
+  Mustafa; r2 review headings; carries §U4r entry list; history 396-401, 2039-2086.
+- Verified read-only: patch sha 21ca46be, 26 files +8362 -106 (new 6,906, existing 1,456); spikes/ = 2fbec77's at
+  HEAD; origin/main 4460ef5; patch unchanged since 450af1a; check.mjs exports 67->69 (cargoConfigDirs, run new);
+  EA-U4R-1 lines hold in merged tree (scenario.rs:341, :742; precheck.rs:285); main.rs subcommands :225-285.
+- No separate copy-5 "section 6 return list" file found; used copy 5's blocks in u4r-build.md (1173-1587).
+- Not in builder notes by number: carries 20 and 69 (mark as not verified).
+- DONE: all 13 sections written (u4r-report.md, 205 lines); cites re-checked by sed against the sources; placeholders
+  {{MERGE_SHA}} (x2), {{M5}}, {{M6}}, {{M7}} on their own lines.
+- Disagreement to state: det-u4 rise cause (builder names FP-1's link check, u4r-build.md:1922; ruling says
+  unexplained by FP-1's constant-time state() read, advisor-u4r-r2-full.md:48).
