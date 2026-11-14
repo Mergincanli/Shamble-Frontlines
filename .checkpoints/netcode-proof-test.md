@@ -31,7 +31,8 @@ snapshot 707cc3df… (26 files).**
   "wf_f276e5ae-878"`.
 - **Copy 5 resumed about 02:04 UTC by SendMessage** (its context intact) on: point 8 (A)'s two runs, the two script
   items, c-u4r-r2.mjs's lines by hand (its tick16 text left for the ruling), the report words; r5 and the end checks
-  held for the ruling. **On the ruling:** write it word for word by script, read it, send copy 5 its parts.
+  held for the ruling. **On the ruling:** write it word for word by script, read it, send copy 5 its parts. The saver
+  restarted as **bv7wsa5bk** (02:02 UTC, after d91a00e). The check-in stays (next 02:34 UTC).
 
 **Earlier NOW (2026-11-14 about 01:42 UTC): U4r's third ruling is in (nothing for Mustafa now; three points block the
 merge until done: 3, 6, 8); copy 5 builds them, then r5 and the end checks.**
