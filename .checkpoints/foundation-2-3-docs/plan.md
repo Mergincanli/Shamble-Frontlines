@@ -51,6 +51,63 @@ edited line on.", backed by `fixes.mjs`'s whole-file check; conditions: (a) the 
 `fixes.mjs --check` runs on the 2.2 report again on the final head (the archive part at step 3 only, before docs-keeper).
 §5's L2 and header-note texts below are replaced by these.
 
+## Revision 2e (2026-11-14, asked ~00:40 UTC): the verifier's fix pass (fix pass 3), asked of the advisor agent
+The verifier failed a1d0317 (agent ad5b8a361fccd378c; notes verifier-1.md): F-V1 (High), F-V3 (Low); all else held.
+Consultation 12 (2026-11-14 00:34:39 UTC) came first. The changed texts (E1 to E4) and the record-only items (E5):
+
+E1. F-V1: the D&D bullet on the advisor model, replacing approved D1(d) (as reworded in a1d0317) whole:
+"- The advisor model (RW2-F1, High, held by its skeptic; fixed in round 2's fix pass): from step 0 the checkpoint, and
+from d59ca43 this report, said Opus 5.5 answered the advisor tool, taking the `/advisor fable` output's forecast as
+fact; round 1 compared the claim only with that output. The records say Fable 5.2 (the advisor-tool entry; every call's
+usage record). No chat message named the advisor model before round 2. Three chat messages since bear on it (the
+transcript's lines 1887, 2122 and 2869): at 22:48:47 UTC the session relayed the finding and added "If true, I told you
+the wrong thing at the start."; at 22:59:04 it wrote that it was checking "where I first told you the advisor model"; at
+23:51:05 it wrote that Fable 5.2 had answered all 11 advisor-tool consultations, that no chat message of its own had
+named the advisor model before 22:48 UTC, and that the wrong claim had been only in the report and the checkpoint."
+(Each read in full from the transcript; 1887 and 2122 described from their own text.)
+
+E2. F-V3: the copies bullet, replacing "- Retyped copies of his words in scratch files, ..." whole:
+"- Copies of his words in the notes folder, each pushed by the saver and kept by history, none in any doc. Certain
+copies (whole sentences or longer): the plan (his decision, his kit words and A1, which its pointer texts and checks
+used); this report's draft body (its quotes) and `fp2-body.py`; the checkpoint; the advisor agent's notes (A4 whole, and
+runs of A2 and A3); docs-keeper's `fillcount.mjs` (e6fc6a9; his decision's four sentences and his kit words,
+byte-identical to the script cuts), `dk-para.txt` and `dk-para-wrapped.txt`; the scripts that cut or check his words
+and the review briefs (`decisions.mjs`, `pointers.mjs`, `fixpass1.mjs`, `review-r1.js` and `review-r2.js` with their
+launched copies: anchors, negative controls, and his kit words for the reviewers); and R-WORDS's notes at ec8f1bd.
+Fragments, among others: R-STATE's notes and `rs-roadmap.mjs` (RS-SELF), R2-WORDS's notes at 461c82b and 7b5f53c
+(RW2-F5). `fp3-fragments-all.mjs` checks every version of every notes file for runs of 30 characters or more of his
+words; shorter shared runs, among them the base SHA, file paths and names his message also holds, exist in other files
+and are not listed. His words are public in DECISIONS.md already."
+(The certain copies were each seen by the session: the run's text printed to the console only, never saved.)
+
+E3. Effort: "each a general agent on Opus 5.5 at effort max" (Reviews, rounds 1 and 2) becomes "each a general agent on
+Opus 5.5, asked for effort max"; the verifier's line says the same. The transcripts record the model only.
+
+E4. Reviews: after round 2's table, the verifier as it happened:
+"The verifier (a general agent on Opus 5.5, asked for effort max, reading main's verifier.md), on a1d0317: FAIL, with
+one High and one Low; everything else it checked held (the gate; the eight scripts; every SHA, time and run id; the
+records of the consultations, the agents' models and the refusals; Appendix A and DECISIONS.md). Its scope note:
+everything after 554face, the new DECISIONS entry included, had the verifier and the advisor agent but no reviewer.
+| F-V1 | High | "Decisions and deviations" told how Mustafa was told about the advisor model from recall: it claimed two updates
+no record holds, left out the recorded one of 22:59:04 and dropped the "If true" of 22:48:47 | fixed: the three recorded
+messages, each from its own text (fix pass 3) |
+| F-V3 | Low | the copies of his words: "round 2's 14 notes files" held five of round 1's; the list was incomplete | fixed:
+the certain copies named, with the check and its threshold |
+Its re-run on fix pass 3: to come." Outcome's first bullet: eight commits (a1d0317 named, then the verifier's fix pass);
+"The verifier failed a1d0317 on one High (how Mustafa was told, written from recall), fixed in fix pass 3; its re-run
+and the advisor agent's review of the final head follow."
+
+E5. For the record (the session's text): the refusals bullet gains the verifier's two, dated 2026-11-14 (00:12:07, the
+permission system denied a compound command with `rm -rf`; route: the Write tool, each step on its own, plain `rm` and
+`rmdir` of named files; 00:16:46, the guard refused a loop writing to a variable path; route: literal paths); entry 9's
+"Mustafa told in chat" anchored to the record (the correction is on record at 23:51:05, line 2869); entry 11's "worded
+from the records" replaced by "reworded, still from recall: the verifier failed it (F-V1)"; entry 12 (moment 2 for the
+clause, moment 1 for fix pass 3, moment 4 for F-V3's form; before the advisor agent was asked); the "done" saves line
+gains round 2's fix pass 23:49:35 (7249a13, after number 11); the commit message withdraws a1d0317's claim of two
+unrecorded updates; the checkpoint's consultation-11 line and the verifier's brief corrected likewise. The verifier is
+resumed (same agent) with a narrow brief: the diff from a1d0317, the gate and the eight scripts, and every sentence about
+what was said in chat against a transcript line; head, notes SHA, cut-off and call count updated.
+
 ## Revision 2d (2026-11-13, asked 23:01:53 UTC): review round 2's fix pass (the advisor agent's ruling, 23:02:43 UTC:
 ## APPROVE D1 to D6, D6(a) as (a1) with three conditions; D7 agreed: no round 3; its notes: "PLAN REVISION 2d")
 Ruling's conditions for D6(a1): the entry's header says only what the message is ("his status request ... sent while

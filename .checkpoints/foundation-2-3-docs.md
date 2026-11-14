@@ -241,12 +241,19 @@ for the fix), ask the advisor agent for revision 2e, then write, check, commit, 
    intro's list checked against the scan; the advisor-call count; midnight; D1(d)'s added clause; "For Mustafa" item 1.
 
 11. 2026-11-13 23:39:10 UTC, moment 5 for round 2's fix pass (after 8e4fe7c, before any "done" save): NOT DONE YET; and
-   moment 1 for the verifier. Changed: D1(d)'s clause "which its next message corrected" was false (the wrong placement
-   first came at 22:48:47; two post-compaction updates, the repeat and the correction, are in neither the transcript nor
-   the session's event record), so the clause is worded from the records; E2's 2.2 check run on this tree (OK, 13
+   moment 1 for the verifier. Changed: D1(d)'s clause "which its next message corrected" was false, so the clause was
+   reworded, but still from recall (it claimed two post-compaction updates no record holds; the verifier failed it as
+   F-V1); E2's 2.2 check run on this tree (OK, 13
    entries); the fragment check widened to all 14 round-2 notes files; entry 11, the sleep block, 8e4fe7c's runs and both
    SHAs added now; "Running work" brought up to date; the verifier's brief: the new head, a pending-by-design list, the
    GitHub tools, no words of his in its notes, 2.2's script copy, nothing posted on GitHub.
+
+12. 2026-11-14 00:34:39 UTC, moment 2 for the clause on how Mustafa was told (its wording failed a second time), moment 1
+   for fix pass 3 and moment 4 for F-V3's form, before the advisor agent was asked: the clause from three recorded lines
+   only (1887, 2122, 2869), each read in full and described from its own text; nothing about messages the records do
+   not hold or not yet sent; F-V3 narrowed (no counts; the certain copies named; "copies", not "retyped"); "asked for
+   effort max"; the verifier's FAIL and scope note recorded as they happened; its two refusals; entries 9 and 11 fixed;
+   the same verifier resumed with a narrow brief; a1d0317's commit-message claim withdrawn in the next commit's message.
 
 ## Refusals (guard, deny list, classifier) and the route taken
 - The session: one, by the guard, 2026-11-13 23:33:46 UTC (`git -C <notes folder> diff`: the guard wants git run from
