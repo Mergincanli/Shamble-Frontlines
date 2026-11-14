@@ -107,3 +107,12 @@ Hashes checked: u4r-brief.md 59d570b8a73f... (matches); wip/u4r.patch 48fa295979
 - wip/u4r.patch replaced at 00:14 (585a8639): data for the main session.
 - Copy 3's contract.rs design (beyond 2.7's list): outside this ruling (copy 3's part).
 - Nothing for Mustafa: no word or decision of his changes; risk tier 1 (spike code, checkpoint text).
+- Further (Low): client lines print the instant the first command's tick ran; 7.2 (3) asks for that tick's due
+  instant. Equal in run_leg by construction (instants step to schedule.next_due_ns(), no catch-up at P0); the report
+  says so, or the line prints both.
+- 3 (ii) note: a test removing the folder it made in that run is its own teardown, not a "clean" under section 4 rule
+  6; the 93 existing folders are never deleted by a session.
+
+### Result (done)
+- Returned through StructuredOutput: points 1, 2, 31, 32, 33, 4, 5; severities Medium, Medium, Low, Low, Medium, Low,
+  Low; none to Mustafa.

@@ -23,6 +23,43 @@ advisor's second ruling at 22:02 (see "Cuts by the spend limit"); both resumed a
   SERIES.md rows and that no plant is in place); the ruling by `resumeFromRunId: "wf_083df555-757"` (task wfdl0093n).
   The saver restarted as **boxdca04m** (00:16 UTC, after 29d86ed). The check-in stays (next 00:34 UTC). Everything in
   the earlier NOW block below still holds (copy 3's prompt, the ruling's points, "On the ruling").
+- **The second ruling** (wf_083df555-757 returned about 00:29 UTC): **advisor-u4r-build2-full.md** (62 lines, sha256
+  f4f5ac92…; by script, word for word, from the journal; the advisor's notes advisor-u4r-build2.md). I read it whole.
+  None goes to Mustafa. (1, Medium) DEPTH: (a) made exact: the result lines keep `buffer_depth_ticks_count L` (the
+  value set) and print beside it the room's measured depth with its relation (L - 1 at every take after each client's
+  first, by input.rs:28-29 and the pacing), the histogram over later takes, the count and first 64 deviations, each
+  client's first-take depth; r6 asserts no deviation; a deviation is reported, never VOID. (2, Medium) LOGS: no per-leg
+  npt-log log; the result lines (runs.txt) are the record, made complete: `--commit` required and a build line
+  (commit, binary SHA-256, features, machine), the recording line, each leg's room configuration with the ring, the
+  refused Rewinds per command. (31, Low) `cargo test -p npt-server --all-features`: not U4r's (predates it); the
+  report's "known, not fixed". (32, Low) test scratch moves from /tmp into the cargo target dir, each test removing its
+  folder when it passes; the 93 folders in /tmp/npt-lab-tests (126 MB) stay. (33, Medium) builder logs made before
+  the code is committed are builder evidence only, labelled; **ruling 1 point 4's main-session step is amended** (below).
+  (4, Low) copy 2's work conforms; two test fixes (p2's pin fails by name if no placement; the late-command bite test
+  asserts the exact line and the other leg's zeros). (5, Low) carry 83 (a)'s TickHash doc; `Bites::of` takes `b.pump`.
+  Further: (Low) the client lines' due instant (print it, or one report line); (Medium) the point 4 amendment.
+  **Sent to copy 3** about 00:30 UTC by message (the full file's Builder lines; precheck.rs released).
+- **The main session's tasks from the second ruling:** (a) 7.2's words as ruled, held here because the brief is a
+  closed record at its stamp: :1197-1200 now reads "report any take after each client's first where the room's
+  measured depth is not L - 1" (point 1); 7.2's "header" words (:1197-1202, :1221) read as the pair's result lines in
+  runs.txt (point 2); plan :793 and marks/README.md:36 stay. (b) B12's pre-check script passes `--commit` (the merged
+  commit) and writes the lines to results/u4r-precheck-30/<commit12>/runs.txt (point 2). (c) **Ruling 1 point 4's
+  step now reads** (point 33): after U4r's code is committed (the merge step's commit), the main session re-makes one
+  bitten short L1 P0 run from that commit with the builder's command line (bites build, `--commit` that commit, marks
+  PM-0001-17, `--bite PM-0001-17/whole-as-lost`) into a new folder under .gate/ named with the commit's first 12 hex
+  digits; after its own marks.json commit (the setup check and the bite entry) it runs `npt-judge --only PM-0001-17` on
+  that run and shows the setup check FAIL by name; that run and its verdict are the record, before -17's judged runs;
+  the builder's kept logs may be judged first only as a labelled pre-commit dry check; no builder-made log is ever
+  cited as a run of a commit. (d) The disk plan counts /tmp/npt-lab-tests (126 MB); no delete (point 32). (e) U4r's
+  review: the depth lines and runs.txt's build and recording lines; the two test fixes; copy 3's r2 design (contract.rs,
+  `npt-lab contract`, a subcommand beyond 2.7's list) read there, the main session's choice over a ruling now, since
+  the brief's r2 is "a short scenario per suite shows" (a) to (e) and the design keeps those words; each review names
+  its own snapshot.
+- **New follow-ups (no push for any):** `cargo test -p npt-server --all-features` made to compile, for the next unit
+  whose lane opens npt-server's manifest or tests (U4h's server items, or U4f if sooner), its run as the evidence
+  (point 31); for U6's brief (-30's marked C part) and U4f's (option A): `header.params.buffer_depth_ticks_count` is
+  the depth set (under option B, the pacing lead), and the room's measure at its take reads L - 1 under this pacing
+  (point 1).
 
 **Earlier NOW (2026-11-13 about 22:00 UTC): U4r copy 2 ended at its context limit (21:51 UTC), about three quarters
 built; snapshot re-cut (48fa2959…); copy 3 resumes; the advisor rules on copy 2's two pre-check findings and its
