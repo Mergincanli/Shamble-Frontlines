@@ -8,3 +8,25 @@ D4. K-4 How line; Part 4 row 108; kit-texts.md regenerated?
 D5. Verdict; DONE.
 
 NOTES:
+- D1 part 1 done (diff lines 1-150). Scope: only .checkpoints/ changed vs main; working tree equals 94c5c5a. Folded so far: L-1 (D1, -52 later of slice 5 and PM-0003-36), L-2 (CS-E replacement jobs), L-3 (archive only needed paths, never .claude/ or CLAUDE.md; no prompt expected), L-6 (each v2 job; legacy jobs stay as moved). Revision 2.2 so far: Appendix B rule block (Part 3), CS-C1/CS-D/CS-C/CS-E evidence lines, PM-0002-42 spike variant "after PR #40 merges, when Appendix B lifts", Part 4 row 108, #40 head 30b7b83. To check: old plan Appendix B text (when it lifts), pages.md:3-4, CLAUDE.md:46, K-4 How line, L-4, L-5.
+- D1-D4 done: L-1..L-6 folded; revision 2.2 checked against 26e0d82 :636-655; #40 check.mjs at 30b7b83 not local (not checked); main has no non-Markdown spikes/ text outside docs/.checkpoints/spikes; Appendix K identical (30 items, 19 quotes); Part 4 108 = 50/49/5/2/2. Lows R3-1 (spike-path wording narrower than old Appendix B and reading.md:113-114) and R3-2 (spike variant trigger; legacy plant meets the or-clause). Verdict APPROVE 94c5c5a.
+- D5: final answer, handed back unchanged:
+**APPROVE 94c5c5a5aa4022a65476009001ceebbf7dd15f82.** There are two Lows; neither blocks. Fold them in without a new review, or carry them into CS-C's plan.
+
+**What I checked:**
+- Only `.checkpoints/` differs from main, and the working tree equals 94c5c5a.
+- Appendix K is identical to `kit-texts.md` (30 items, 19 quotes of his).
+- Part 4 recounts to 108 rows: 50 first part, 49 later, 5 dropped, 2 not ours, 2 chat.
+- L-1 to L-6 are all folded in as asked.
+- The Appendix B items on `.cargo`, `"type"` and the rule globs match 26e0d82 :636-655.
+- Row 108's citations hold (`pages.md:3-4`, CLAUDE.md:46).
+- K-4's new Opus line restates CLAUDE.md's existing rule and loosens nothing.
+
+**PM-0002-42 is unchanged.** Its text is untouched, and the planted import from `legacy/` meets its clause "an import from `legacy/` or `spikes/`".
+
+**Lows**
+- **R3-1.** plan.md:232-234 and :777-778 say #40's check fails on "the text of the spike folder's path". The old Appendix B (26e0d82 :637) and your own reading.md:113-114 say any text `spikes/`. Fix: use `spikes/`, the stricter wording. No non-Markdown file outside `docs/`, `.checkpoints/` and `spikes/` contains it today, so the change costs nothing.
+- **R3-2.** plan.md:194 and :350 have the spike-folder variant join "after PR #40 merges, when Appendix B lifts". But once #40 merges, its spike sits in main's tree (ADR 0002 part 1 keeps `spikes/`), so Appendix B need not lift at that point. Fix: call the variant an extra that joins when Appendix B lifts, not a clause that holds PM-0002-42's met-at (slice 5).
+
+**Not checked:** #40's `check.mjs` at 30b7b83, which is not in this clone.
+DONE
