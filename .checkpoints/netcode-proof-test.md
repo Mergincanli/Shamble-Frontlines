@@ -54,6 +54,17 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   push (crates unchanged since e59ece9); then the c62h record (r2's judge, --only PM-0001-17, on r2's whole-as-lost and
   tick16 folders, into .gate/netcode-proof-test/c62h-<commit12>/: both bites shown, never INVALID); then the card and
   u4r-report.md's r2 section with MRG-L1 to -L3; then U4r-F1 (RUN-L1 rides it).
+- **Carry 62 (h) COMMITTED at 5e563b9** (marks.json +15; pushed about 16:17 UTC; the plan's readings lines went in
+  at a36babd, the saver's last autosave when stopped: **stopping the saver commits pending notes once more, so stop it
+  BEFORE edits that must share a commit**). **Step 5's record did NOT come out as expected:** r2's judge, the committed
+  marks.json, `--only PM-0001-17`, on r2's whole-as-lost and tick16 folders (.gate/netcode-proof-test/c62h-5e563b9589d3/,
+  README.txt names commit, marks sha256 9fb5be57…, judge 65acacfe…): **both bites INVALID**, invalid_why "pre:PM-0001-2:
+  not in marks.json" (the --only filter drops PM-0001-2, so the precondition cannot find it; the ruling had read the
+  opposite). A labelled diagnostic, not the record (…-diag-with-2/, `--only PM-0001-2,PM-0001-17`, r2's form): both
+  shown and valid, exactly the ruling's figures (whole-as-lost: 0 mismatches pass, new check 48 fail; tick16: 2,880
+  and 720, both fail). **To the advisor whole:** workflow **wf_d16081f4-f98** (task wqbsud21t; agent
+  advisor-u4r-c62h, notes advisor-u4r-c62h.md). **If cut:** `resumeFromRunId: "wf_d16081f4-f98"`. marks.json stays as
+  committed until it rules; no -17 run and no step 13 before its ruling.
 - **Carry 62 (h)'s edit: check.mjs PASSED on it** (.gate/u4r-merge/c62h-check.log, 15:59:43-16:14:08, uptime first:
   up 5:24, load 0.16; all 11 steps; 531 and 609, 0 failed; marks 81, ADR rows unchanged); committed in the commit that
   carries this line; next the c62h record (the r2-run ruling's step 5). Its details, as made (about 16:02 UTC): marks.json +15 lines exactly
