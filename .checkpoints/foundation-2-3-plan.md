@@ -40,10 +40,24 @@
   (Mustafa, 2026-11-14, his message starting the plan).
 
 ## Advisor-tool consultations (one line each)
-- (none yet in this task)
+1. 2026-11-14 ~11:00 UTC (12:00 Amsterdam), moment 1, after the reading notes and approach.md: is the approach (the
+   cut, the order, the needs-result reading, who decides what) right, and what is missing? Changed: a mark counts as
+   met only when every clause holds, X named with its trigger; item 9 gets the exact-text mechanism (patch at a
+   checkpoint SHA, his yes naming it, byte check) and prompt counts per CS; PIN-GUARD's scope becomes his decision, the
+   config file names fixed in the plan; the reading completed (root manifests, crates/ and packages/, recursive greps
+   over .claude/, .github/, tools/README.md, W1-W3); the exception lines carry his limits, the advisor-tool text is his
+   bullets by script, the moment-5 line marked wider than his words, SD-N1 out of CS-B, the settings allow rule put to
+   him beside his allow-list words; three facts settled by read-only checks (hook input's permission mode; which
+   workflow file a pull_request run uses and conflicting PRs; whether the sim core spike's open questions touch ADR 0004
+   part 7's allow-list); the summary says each CS gets its own plan and plan review.
 
 ## Refusals (guard, deny list, classifier)
 - (none yet in this task)
 
 ## Running work
-- saver: (starting)
+- saver: background task b6ean8gz0 · output /tmp/claude-0/-home-user-Shamble-Frontlines/7261f3d7-f651-586a-9c39-c052553b68a3/tasks/b6ean8gz0.output ·
+  started 10:44 UTC (11:44 Amsterdam) · stops by ~12:34 UTC (110 minutes) · last check 11:00 UTC: ok (first line
+  "watching .checkpoints/ on claude/sweet-mayer-grsukw every 10 min for 110 min").
+- agents (2 of 3, read-only, no notes of their own: they cannot write; results saved to reading.md on return):
+  claude-code-guide on the hook input's permission mode; web-fetch on GitHub's pull_request workflow source and
+  conflicting PRs (launched ~11:02 UTC).
