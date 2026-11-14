@@ -30,3 +30,17 @@
 - [done] P3 tick16b vs c summaries (c3-r2-tick16b.log:46, -c.log:19): equal except projectiles per set 12.65 -> 12.33 and audit counts (434460/187272/31646/5828 -> 459038/264878/33677/0).
 - [done] P7 clean re-run: c3-r2-p0.log:20 vs c3-r2-tick16c.log:50 summary text equal after run id; p0-s1 vs p0-s1b logs equal record for record (header run/build blanked) except lab run_lengths gains after_capped false. Span 63736-64635: does not cross the wrap.
 - [done] P7 (a) code: scenario.rs:1034-1049 cap -> error if s.bites.id is none, else after_capped; run_lengths.after_capped scenario.rs:1102; summary text :1468-1472; default after-max-s 30 (scenario.rs:1318). carry 62 (e)/(c) words u4s-carries.md:289-312.
+- [done] P3 extra: tick16c collapse pattern: wrap 65536; 0 at 65567 (wrap+31); 48 overflow resyncs at 65605 restore 48 for 32 ticks; 0 at 65637; 46+2 resyncs 65683/65685 -> 26-31; 0 from 65715. Datagrams 998 B each after collapse. Client log: 1,018 tick records at ticks room never logged (ph after, up to 4294968314), 48,772 non-null hashes there (= summary's sentinels).
+- [done] P4 b1-nofallback lab.jsonl: 96 heals, 25 <=500 ms, p50 (49th of 96) 1,197,359,484, max 1,688,286,323; full_state 71; all 25 fast ones full_state 0, all 71 full_state 1 >500 ms; burst 0: the 14 fast = the 14 evicted with baseline_age 0. Evictions ages 0 x14, 33 x67, 34 x15. Clean b1: 96/96 <=500 ms (max 129.6 ms), full_state 0. Held.
+- [done] P4 verdict: -18 bite status invalid by pre:PM-0001-2 = 0.48 (not 0.273333); checks [] (max check not judged). Bite run's mirror: 2,314 breaches (first "tick 64218: client 23: its baseline frame (age 35) is not mirrored"), not in notes :701-707; contract PASS regardless (contract.rs has no breach check).
+- [done] P4 brief 2.4 r2 words :589-592 quoted; C29 :52-55 "no heal within 500 ms under no-fallback".
+- [done] P5 c3-rul2b.log:153-168: r6 both legs {Some(1):48} first takes; after {0:48,1:5520}; 48 deviations all (c,119,0). precheck.rs:814-890 asserts deviations == end set (lead hard-coded 2). Copy 2's reading notes :406-407 held. Ruling 2 pt 1 (4) words advisor-u4r-build2-full.md:13.
+- [done] P6 contract.rs read; exit 1 also for unreadable files (not only FAIL); ruling 2 pt 5 words :54,:56.
+- [done] P8 SERIES.md: 21 new rows (notes :879 says 22: not held); 31 insertions, 0 deletions; baseline_age row says "-1 when it had none" but code -1 = no snapshot sent that tick, 0 = coded from defaults (scenario.rs:914, room.rs:216-219).
+- [done] P8 point 33 labels: every binary sha256 matches headers (13 folders checked full); regen/ and regen-all/ (recordings, .lines) not labelled.
+- [done] P1 extra: b1-verdict.json PM-0001-2 itself FAIL (its "SS runs" part selects scene SS + 48 clients, any profile; 1 failing run fails the part though min 3). pre: rule eval.rs:958-996 (run must pass the pre mark's checks for its matched parts).
+- [done] P1 lane: brief :1009 "Never: ... crates/room"; bots in lane :997; marks.json not U4r's :1006-1007; judge "Never" :1010.
+- [done] P6 lab/Cargo.toml deps: no npt-judge (held); c2-rul-reg.log:185 90.72 s (held); c3-reg.log:145 45 passed 1 ignored (held).
+- [done] P8 suite table rows (c3-r2-suites.log :20-148, verdicts): all figures match.
+- ALL ITEMS DONE; result returned via StructuredOutput.
+- [done] P8 per-profile bytes: recomputed, all match (d13-5 sum 27,816.x -> notes 27,817 by rounding parts); forged lab 16,877, evstart 16,748; r2/ 119M.
