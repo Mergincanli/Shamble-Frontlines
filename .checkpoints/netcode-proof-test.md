@@ -61,7 +61,11 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   kept log and condition 6 (a) in a written procedure: below); INF-F1-3 (a signal-killed judge's signal is not named:
   record the judge's peak memory at step 17, as the round-2 ruling already says, and a report line); INF-F1-4 (the
   stagings' count: corrected below); INF-F1-5 (A3's message shows the first status line trimmed: a report line).
-  **Next:** one commit (the two scripts and this card), push, CI, the advisor's review of the head; then the saver.
+  **COMMITTED at f1f131b** (the two scripts and the card; pushed about 17:24 UTC). The saver restarted as
+  **bg0s11ol6**. **The advisor's review of the head runs:** workflow **wf_6bfb2c19-ce1** (task we8k5wqbm; notes
+  advisor-u4r-f1-head.md). **If cut:** `resumeFromRunId: "wf_6bfb2c19-ce1"`. **On return:** word for word by script;
+  its "For Mustafa" here at once; its header-sentence decision; then the disk plan, D4, the pre-check set (by the run
+  procedure below) and the judged sets P3, B1, P2, then P0.
 - **THE SETS' RUN PROCEDURE (steps 16 and 17; condition 6 as INF-F1-1 corrects it; INF-F1-2):** (1) before a set:
   the card committed and pushed; `pgrep -a npt-lab; pgrep -af npt-judge` empty; HEAD's tree clean. (2) The command,
   from the repository root, with a kept log: `flock -x .gate/shared-target/.lane.lock node
