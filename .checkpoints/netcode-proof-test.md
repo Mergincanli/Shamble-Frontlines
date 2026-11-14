@@ -41,8 +41,12 @@ the spike branch, M1 to M9, as its steps 2-10 say.**
   pre-check set (16), the judged sets P3, B1, P2, then P0 (17).
 - **COMPACT-WAIT:** /compact was asked at about 13:27; this block is the refresh; work carries on. The 20-minute
   reminder fired at 13:47 with no /compact typed: the card was already current (2494918, 13:45); carried on.
-- **U4r IS MERGED into the spike branch at 71ee13d** (pushed about 14:10 UTC; CI gate run 43603457356 and toolchain
-  run 43603457370 started on it). The saver restarted as **b02nlg0ph** (about 14:11). **Then, in order:** CI green;
+- **U4r IS MERGED into the spike branch at 71ee13d** (pushed about 14:10 UTC). **CI green on it** (14:10:58): gate run
+  43603457356 (its gate job and its smoke job, 5a passing on CI) and toolchain run 43603457370. **The advisor's review
+  of the pushed head runs:** workflow **wf_ed59da85-818** (task wo8sfizxe; agent advisor-u4r-merge, notes
+  advisor-u4r-merge.md). **If cut:** `resumeFromRunId: "wf_ed59da85-818"`. **On return:** write it word for word by
+  script (advisor-u4r-merge-full.md); its "For Mustafa" onto this card at once; then the r2 record run (after it, as
+  no agent may write in the main folder during r2). The saver restarted as **b02nlg0ph** (about 14:11). **Then, in order:** CI green;
   the advisor's review of the pushed head 71ee13d (a workflow agent; it writes advisor notes, so it runs BEFORE the r2
   record run, which allows no agent writing in the main folder); then step 11's r2 record run under INF-R2-1's
   interim rule; copy 6's worktree kept until U4r-F1's evidence is in.
