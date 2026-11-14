@@ -567,3 +567,54 @@ det-u4.mjs's run needs df >= 4 GB, and its non-cargo calls summed above 240 s st
 - Copy 2's findings for the report: the depth's L - 1 against the header's L (B10 above); the `-p npt-server
   --all-features` feature-selection artefact (B10a); r3's bytes in the system temp folder in the test (B9); the
   pre-check writes no per-leg room log (B10).
+
+## Copy 3
+
+### Start checks (done)
+
+- Started 2026-11-13 21:54 UTC, from the copy-3 prompt (the main folder's u4r-copy3-prompt.md, 34 lines, read whole).
+- Worktree /home/user/Shamble-Frontlines/.claude/worktrees/agent-a11e2354169f39acf, branch
+  worktree-agent-a11e2354169f39acf; `git rev-parse HEAD`: 2fbec7780cd04feafd8a3c67e1ebdb8889ad45ef (holds).
+- Brief sha256 59d570b8a73fa6d9ab6b9a02e9f6d6cf6ec37a57d36d2c3ef3285bc8c5196046 (holds).
+- Runner sha256 349b51adbed43a889ba9b88eeb89d573aadc3b4f035e186cc8b56de18f4e0831 (holds).
+- `df -h /home/user`: /dev/vda 252G size, 34G used, 5.3G avail, 87 %.
+- Held for the advisor (no ruling yet): precheck.rs's outputs and its depth reading; neither changed.
+- Read before any change: these notes whole (569 lines); `git status --short` (8 modified, 10 untracked under spikes/
+  and this file); `git diff` of all 8 modified files; and each untracked file whole: bots/clippy.toml,
+  bots/tests/behaviour.rs (236), lab/det-recordings.json, lab/precheck-recordings.json, lab/src/mirror.rs (469),
+  logs.rs (786), scenario.rs (2,224), replay.rs (427), precheck.rs (777). Brief re-read: 2.3, 2.4 (r1-r10), 2.5-2.7,
+  4, 5, 6, 7.1. The advisor's rulings file (sha256 476121ab..., holds) read: points 1-10 and their Builder lines.
+- Seen in the read (a nit, fixed with the next scenario.rs edit): scenario.rs:1421-1422 doubles the doc's first line
+  "The summary line of a run.".
+
+### Item 4, r2: the design (stated for the report)
+
+- npt-lab does not depend on npt-judge, and crates/lab/Cargo.toml is not my lane, so r2 has two halves. (1) A
+  checker, crates/lab/src/contract.rs (`npt-lab contract --logs <run folder> --series marks/SERIES.md`, a subcommand
+  beyond 2.7's list, named as such), for r2 (b) (every written name has its SERIES.md row), (c) (one `admit` per
+  client with `in_roster` true, a footer on every log, `tick.v.late_count` on every room tick record: stronger than
+  "where late-zero applies", which is PM-0001-30's only and no U4r run's) and (e) (the shot band), plus the carries'
+  figures it can read from the logs; its unit tests carry U4R-Q11's four negative cases on doctored copies of one
+  short run and are in check.mjs's count. (2) The per-suite short runs (48 clients, the release build, by hand through
+  the runner, -x: each output a result): `scenario`, then `contract`, then the real judge (`npt-judge --marks
+  marks/marks.json --logs <run> --only <ids> --out <run>-verdict.json`) for (a) and (d). Why not one Rust test: ten
+  48-client suites cannot go into check.mjs's test step (npt-lab's bin tests already take 90.7 s in debug:
+  c2-rul-reg.log:185).
+- scenario.rs: the summary line now prints carry 49's figures (measured client sets, the share holding every very
+  large unit, projectiles per set; "not counted (--logs 0)" on a no-log run); the doubled doc line fixed.
+- Short runs' length: 10 s warm-up (300 ticks) and 20 s measured (600 ticks), plus the after phase; B1 longer (below).
+
+### r2 suite 1: -17 L1 P0 (done; .gate/u4r/c3-r2-p0.log, -x, 21:58:56-21:59:20 UTC, df 5.3G)
+
+- Release build of npt-lab and npt-judge (provenance: every npt-* crate "Compiling ... (<wt>/...)"), then `scenario
+  --run u4r-r2-p0-1 --set u4r-r2 --scene SS --profile P0 --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 20
+  --marks PM-0001-2,PM-0001-17,PM-0001-57 --suite r2-p0` (logs .gate/u4r/r2/p0-s1/): 900 ticks (0 after), 12 s wall;
+  lead 2; commands 43,152, steps without one 0, duplicates 0; late 0; press refused 0; buffer full 0; rewinds refused
+  0; stale 0; overflow resyncs 0; client hashes 43,152, sentinels 0; **measured incomplete 0** (carry 62 (h)); shots 700
+  a measured second; carry 49: 28,800 measured sets, all holding every very large unit (1.0000), 298.98 projectiles
+  per set; audit 0 breaches.
+- The judge (`--only PM-0001-2,PM-0001-17,PM-0001-57`, verdict .gate/u4r/r2/p0-s1-verdict.json): each mark NOT-RUN
+  "1 of 3 valid runs" (a part needs 3 seeds); the run valid; **every check resolves, none a gap**: PM-0001-2's 11 SS
+  checks all pass (48, 16, 48, 15, 4, 300, shots 700.8 in [665, 735], portal 1 in [0.95, 1.05], everyone in view 1);
+  -17 pass (0 mismatches; 43,152 compared; 0 left incomplete); -57 pass (position max 6,981 µm, yaw 2,750 µdeg, pitch
+  88,044 µdeg; position p99 5,638).

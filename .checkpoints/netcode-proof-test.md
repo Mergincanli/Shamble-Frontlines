@@ -12,9 +12,17 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-13 about 22:00 UTC; read this first after a compact or a cut): U4r copy 2 ended at its context limit
-(21:51 UTC), about three quarters built; snapshot re-cut (48fa2959…); copy 3 resumes; the advisor rules on copy 2's
-two pre-check findings and its Lows.**
+**NOW (2026-11-14 about 00:15 UTC; read this first after a compact or a cut): the spend limit cut copy 3 and the
+advisor's second ruling at 22:02 (see "Cuts by the spend limit"); both resumed about 00:15; snapshot 585a8639….**
+- **Copy 3 before the cut** (21:54-22:02 UTC; its notes :571-620): read its notes and the diff whole, built
+  crates/lab/src/contract.rs (`npt-lab contract`: r2 (b), (c), (e), the carries' figures; U4R-Q11's four negatives in
+  its unit tests), ran r2 suite 1 (-17 L1 P0, 48 clients, 10 s + 20 s; measured incomplete 0; judged by hand: every
+  check of PM-0001-2, -17 and -57 resolves, none a gap; each mark NOT-RUN "1 of 3 valid runs" as a short run must be),
+  and was adding SERIES.md's rows for r2 (b) when cut.
+
+**Earlier NOW (2026-11-13 about 22:00 UTC): U4r copy 2 ended at its context limit (21:51 UTC), about three quarters
+built; snapshot re-cut (48fa2959…); copy 3 resumes; the advisor rules on copy 2's two pre-check findings and its
+Lows.**
 - **Copy 2** (agent a6e4993cc3a5e4475, 20:55-21:51 UTC, 340 tool uses) stopped at a clean point (no plant, no half
   edit, no run going); nothing committed. Its notes u4r-build.md (569 lines; copied here, equal by cmp): its part
   :284-569, its state section "Copy 2: state and what is next". I read its part whole. Done: fmt; B9 `replay`
@@ -753,6 +761,16 @@ the cut and the time of the resume; UTC, read from the session's transcript):
   usage limit while you were working, but it has reset now. Please continue from where you left off.", 19:11:33).
   Nothing to restore (no plant, no cargo or runner running, the brief still rev 3.2, the script the reviser's); the
   run resumed (`resumeFromRunId`: the reviser's result cached, a fresh checker that continues at K3 from its notes).
+- 2026-11-13 22:02: "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit
+  resets 12:10am (UTC)". Cut: U4r's builder copy 3 (agent a5d1a2ea28e8704c8, 22:02:54; its last act an Edit of
+  marks/SERIES.md that succeeded, 31 rows added so far: r2's names; r2 suite 1 done and judged) and the advisor's
+  second ruling (wf_083df555-757, agent advisor-u4r-build2, 22:02:57; its notes advisor-u4r-build2.md, 45 lines, the
+  reading block done). The session's worker process was later restarted; the saver ended (exit 0; its last save
+  bd7898f, 22:04:56); the 22:34 check-in waited until 00:12. Resumed 00:13, on Mustafa's message ("I hit my usage limit
+  while you were working, but it has reset now. Please continue from where you left off."). Restored: nothing to
+  restore (no plant: copy 3's part names none; no cargo or runner running; HEAD 2fbec77, the brief 59d570b8…); the
+  snapshot re-cut first (wip/u4r.patch, 19 files on 2fbec77, 6,561 lines, sha256 585a8639…, applies). Resumed: copy 3
+  by SendMessage (its context intact), the ruling by `resumeFromRunId` (a fresh advisor continuing from its notes).
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188

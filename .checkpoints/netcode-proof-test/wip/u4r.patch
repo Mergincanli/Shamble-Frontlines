@@ -577,12 +577,14 @@ index 6bb355d..7ec5179 100644
      fn h6_usage_errors_are_refused() {
          let base = "--manifest m --dir d --out o";
 diff --git a/spikes/netcode-proof/crates/lab/src/main.rs b/spikes/netcode-proof/crates/lab/src/main.rs
-index aa02208..510347f 100644
+index aa02208..c2f348a 100644
 --- a/spikes/netcode-proof/crates/lab/src/main.rs
 +++ b/spikes/netcode-proof/crates/lab/src/main.rs
-@@ -14,8 +14,13 @@
+@@ -13,9 +13,15 @@
+ //! error. `probe`'s log header and summary line carry the whole fate log's SHA-256 and, since U4d2 (carry 66), the
  //! SHA-256 of v1's tag and the log's datagram entries, the hash U2's v1 logs had.
  
++mod contract;
  mod hash;
 +mod logs;
  mod machine;
@@ -594,7 +596,7 @@ index aa02208..510347f 100644
  
  use npt_l1::Profile;
  use npt_log::{Ended, Header, SCHEMA, Writer};
-@@ -216,10 +221,73 @@ fn main() -> ExitCode {
+@@ -216,10 +222,92 @@ fn main() -> ExitCode {
              }
          };
      }
@@ -658,15 +660,34 @@ index aa02208..510347f 100644
 +            }
 +        };
 +    }
++    if cmd == "contract" {
++        return match contract::main(rest) {
++            Ok(lines) => {
++                for l in lines {
++                    println!("{l}");
++                }
++                ExitCode::SUCCESS
++            }
++            Err((code, e)) => {
++                if code == 2 {
++                    eprintln!("npt-lab contract: {e}\nusage: {}", contract::USAGE);
++                } else {
++                    println!("{e}");
++                }
++                ExitCode::from(code)
++            }
++        };
++    }
      if cmd != "probe" {
          eprintln!(
 -            "npt-lab: unknown command {cmd:?}\nusage: {USAGE}\n       {}",
 -            hash::USAGE
-+            "npt-lab: unknown command {cmd:?}\nusage: {USAGE}\n       {}\n       {}\n       {}\n       {}",
++            "npt-lab: unknown command {cmd:?}\nusage: {USAGE}\n       {}\n       {}\n       {}\n       {}\n       {}",
 +            hash::USAGE,
 +            scenario::USAGE,
 +            replay::USAGE,
-+            precheck::USAGE
++            precheck::USAGE,
++            contract::USAGE
          );
          return ExitCode::from(2);
      }
@@ -1017,6 +1038,48 @@ index 01c465e..2f463d7 100644
              assert!(Schedule::with_bite(30, 7, other).is_none(), "{other}");
          }
      }
+diff --git a/spikes/netcode-proof/marks/SERIES.md b/spikes/netcode-proof/marks/SERIES.md
+index 4d08c19..df3f61d 100644
+--- a/spikes/netcode-proof/marks/SERIES.md
++++ b/spikes/netcode-proof/marks/SERIES.md
+@@ -330,6 +330,37 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
+ | `header.params.burst_spacing_ns` | ns | npt-lab (L1), the run script (L2) | B1's scheduled interval between burst starts, before each burst's offset; a practice run and its counted run share it | -18 (the rule) |
+ | `header.params.config_hz` | Hz | the run script (L2) | RS's kernel CONFIG_HZ (the ruling's `machine.config_hz`, as a header param: README §2.5) | -18 (the practice record's header checks) |
+ 
++### Names added with U4r (the L1 runner, npt-lab `scenario`; u4r-brief.md 2.1; U4R-Q2 (c): new rows only, 2026-11-13)
++
++Every name U4r's runner writes that had no row. The header params record the run's settings (README §1's `params`:
++name to JSON value); the events in the lab log (`client_counts`, `class_audit`, `fate_log`, `run_lengths`, `recording`)
++are written once at the run's end, after the measured phase. No mark reads them yet but -18's two `burst_heal` fields
++(reported).
++
++| Name | Unit | Written by (crate) | Meaning | Marks |
++|---|---|---|---|---|
++| `header.params.lead_ticks_count` | count (ticks) | npt-lab | the command lead every client of the run stamps with: the profile's round trip plus its jitter in ticks, rounded up, at least 1, plus 1 (carry 74 as U4R-Q14 ruled: P0 2, P1 3, P2 and B1 5, P3 7) | none (recorded beside `cmd_timing`) |
++| `header.params.event_start_count`, `.cmd_start_count` | count (a sequence) | npt-lab | the room's first event sequence (`Room::with_event_start`) and each client's first command sequence (`ClientEndpoint::with_starts`): 0, or a run's start near the 16-bit wrap (carry 75) | none (recorded) |
++| `header.params.event_queue_cap_count` is above; `header.params.event_queue_cap_provisional` | flag (true or false) | npt-lab (from `Room::event_cap`) | true while the room's event-queue cap is provisional (carry 57) | none (recorded beside `event_queue_cap_count`) |
++| `header.params.warmup_ticks_count`, `.measured_ticks_count` | count (ticks) | npt-lab | the run's warm-up and measured lengths in ticks (the after phase's: `event.run_lengths.after_ticks_count`) | none (recorded) |
++| `header.params.behaviour` | string | npt-lab | the bots' behaviour (npt-bots' `Behaviour`): `brawl`, or an open-loop script `presses`, `clamp` or `steady` | none (recorded) |
++| `header.params.features` | list of strings | npt-lab | the npt-lab build's features: `["bites"]` or `[]` (the header's `build.features` is the judge's) | none (recorded) |
++| `header.params.every_step` | flag (true) | npt-lab | present only on D13's test-only runs, which give a command at every client step (never a judged run: refused with marks) | none |
++| `header.params.stand_in_burn_ns`, `.stand_in_top_up_ns` | ns | npt-lab | S1's stand-in burn and top-up as run: 0 on L1 (stand-ins off: §4.13) | none (recorded) |
++| `header.params.weapon_interval_us`, `.weapon_damage_count`, `.weapon_reach_cm`, `.weapon_magazine_count`, `.weapon_reload_ms`, `.weapon_spread_urad` | as each name's suffix (µs, count, cm, count, ms, µrad) | npt-lab (from `Scene::weapon`) | the scene's weapon: shot interval, damage, reach, magazine, reload and spread (carry 60) | none (recorded) |
++| `header.params.soldier_health_count` | count | npt-lab (from `Scene::health`) | the scene's soldiers' health (carry 60) | none (recorded) |
++| `tick.s.input_payload_bytes` | bytes | npt-lab | the room log: each `Input` datagram's payload the clients sent since the last tick, in send order (not one per slot) | none (recorded) |
++| `event.admit.session`, `.in_roster` | identifier; flag (true or false) | npt-lab (the room log) | per admission (field `slot`): the session's id in the run, and whether its join was in the room's roster (README §4's `roster` rule reads `in_roster`) | the `roster` rule |
++| `event.burst_heal.full_state`, `.queue_max_count` | flag; count | npt-lab (L1) | per heal record (fields `slot`, `burst`): 1 when a `FullState` reached that client during the burst (a full state never counts as the heal); the client's event queue's high-water mark from the burst's start to its heal (carry 58) | -18 (reported) |
++| `event.burst_eviction.baseline_age` | count (ticks), signed | npt-lab (from npt-room) | per client per burst (fields `slot`, `burst`): the age of the client's baseline at the first tick after the burst, -1 when it had none | -18 (recorded) |
++| `event.counter_wrap.counter` | name | npt-lab | the counter that wrapped (beside `tick_count`) | -58 (recorded) |
++| `event.snap_refused.kind` | name | npt-lab (from npt-room's refusal counters) | `out_of_range`, `too_many`, `too_large` or `not_canonical` (beside `tick_count`) | none (recorded) |
++| `event.client_counts.commands_count`, `.steps_without_command_count`, `.duplicate_stamps_count`, `.late_count`, `.press_refused_count`, `.buffer_full_count`, `.rewinds_refused_count`, `.stale_count`, `.events_queued_count`, `.overflow_resyncs_count` | count | npt-lab (from npt-bots, npt-room and npt-client's counters) | per client at the run's end (field `slot`): commands given, client steps without one, two commands stamped for one tick (D13 only), the room's late, press-refused, buffer-full and refused-rewind counts, `ClientEndpoint::stale()`, events queued, overflow resyncs (carries 74 and 77 (c)) | none (r2 reports them) |
++| `event.class_audit.owner_count`, `.spatial_count`, `.spatial_unchecked_count`, `.public_count`, `.events_count`, `.team_count`, `.breaches_count`, `.first_breach` | count; the last a text | npt-lab (the room-side mirror) | r4's class audit over the run: own-state records, entity records checked against the interest radius and not checked, headers, events, team records (0: no team section in the spike), every breach, and the first breach's text | none (r4) |
++| `event.fate_log.sha256` | hex string | npt-lab (from npt-l1's fate log) | the SHA-256 of the run's L1 fate log (r1, the twin test) | none (r1) |
++| `event.run_lengths.warmup_ticks_count`, `.measured_ticks_count`, `.after_ticks_count`, `.order_digest` | count (ticks); the last 16 hex digits | npt-lab | the run's three phases in ticks, and the digest of the order its clients connected in (r1's bite) | none (recorded) |
++| `event.recording.ticks_count`, `.bytes`, `.sha256`, `.span_ms` | count; bytes; hex string; ms | npt-lab | a `--record` run's recording: its ticks, size, SHA-256 and the room's hit-volume span (carry 82) | none (recorded) |
++
+ ## Series read only by figures (18)
+ 
+ | Name | Unit | Written by (crate) | Meaning | Figures |
 diff --git a/spikes/netcode-proof/crates/bots/clippy.toml b/spikes/netcode-proof/crates/bots/clippy.toml
 new file mode 100644
 index 0000000..30e689a
@@ -1306,6 +1369,463 @@ index 0000000..9c4b6c5
 +  "recordings": [
 +    {"name": "SS-P0-s4", "kind": "runner", "profile": "P0", "clients": 48, "warmup_s": 10, "measured_s": 290, "scene": 1, "seed": 4, "first_tick": 0, "ticks": 9000, "span_ms": 2000, "generator": 0, "bytes": 16950444, "sha256": "6933b56a619197c719439ff0c16eed3b8927645c3a0bb66910568c6ccf83bab3"}
 +  ]
++}
+diff --git a/spikes/netcode-proof/crates/lab/src/contract.rs b/spikes/netcode-proof/crates/lab/src/contract.rs
+new file mode 100644
+index 0000000..ea7cb4c
+--- /dev/null
++++ b/spikes/netcode-proof/crates/lab/src/contract.rs
+@@ -0,0 +1,451 @@
++//! r2, the contract test's checker (u4r-brief.md 2.4 r2 (b), (c) and (e); U4R-Q11 (a)): one run's three logs, read
++//! back, against marks/SERIES.md and the judge's validity inputs. The judge's own half, (a) every check of the parts
++//! the run's header lists resolving with no gap and (d) PM-0001-2 passing, is `npt-judge --only` on the same folder:
++//! npt-lab does not depend on npt-judge (its manifest is not U4r's lane), so the two halves run side by side, by hand
++//! and from the run scripts.
++//! - **(b) names:** every name the logs write (each header param as `header.params.<name>`, every `tick.v`, `tick.s`
++//!   and `hs` name, every `second.v` and `second.s` name, every event field as `event.<event>.<field>`) has its
++//!   SERIES.md row; a header param also counts by its bare name in the header params table, and an event's
++//!   identifiers (`slot`, `burst`, `seq`: SERIES.md:313) are not measured values.
++//! - **(c) validity inputs:** a footer on every log (the `complete` rule: README §4); one `admit` event per client,
++//!   each `in_roster` true (the `roster` rule); `tick.v.late_count` on every room tick record. `late-zero` applies to
++//!   PM-0001-30 alone, which judges no U4r run, so this asks it of every run (stronger than "where it applies").
++//! - **(e) the shot band** (§4.13 :446-447): the measured seconds' mean of the room's `second.v.shots_count`, SS within
++//!   [665, 735], ES within [68.4, 75.6].
++//!
++//! The carries' figures the logs give (reported, never a failure): 60 (the weapon and health params in every header:
++//! a failure if missing), 62 (h) (the measured phase's sum of `tick.s.snap_incomplete`), 58, 74, 77 (c), the
++//! rewinds refused, and -18's heal records.
++
++use std::collections::{BTreeMap, BTreeSet};
++use std::path::Path;
++
++use npt_log::{Log, Phase};
++
++/// `contract`'s usage line.
++pub(crate) const USAGE: &str = "npt-lab contract --logs <run folder> --series <SERIES.md>";
++
++/// The event fields that name an event's subject and are no measured value (SERIES.md:313).
++const IDENTIFIERS: [&str; 3] = ["slot", "burst", "seq"];
++/// Carry 60's header params: the weapon and the health.
++const CARRY_60: [&str; 7] = [
++    "weapon_interval_us",
++    "weapon_damage_count",
++    "weapon_reach_cm",
++    "weapon_magazine_count",
++    "weapon_reload_ms",
++    "weapon_spread_urad",
++    "soldier_health_count",
++];
++/// -18's heal bound on L1, ns (marks.json -18: `event.burst_heal.after_link_ns` <= 500,000,000).
++const HEAL_BOUND_NS: u64 = 500_000_000;
++
++/// What one run's logs gave: the report's lines, and every failure by name.
++#[derive(Clone, Debug, Default, PartialEq, Eq)]
++pub(crate) struct Outcome {
++    pub(crate) lines: Vec<String>,
++    pub(crate) failures: Vec<String>,
++}
++
++/// Every name SERIES.md gives a row: each backticked name in a table row's first cell, a `.x` shorthand joined to the
++/// cell's first name's record (`event.ws_practice.class`, `.m_p_ns`: SERIES.md:316).
++pub(crate) fn rows(series: &str) -> BTreeSet<String> {
++    let mut out = BTreeSet::new();
++    for line in series.lines() {
++        let Some(rest) = line.strip_prefix('|') else {
++            continue;
++        };
++        let cell = rest.split('|').next().unwrap_or("");
++        let names: Vec<&str> = cell.split('`').skip(1).step_by(2).collect();
++        let Some(first) = names.first() else {
++            continue;
++        };
++        let stem = first.rsplit_once('.').map_or("", |(s, _)| s);
++        for n in &names {
++            if n.starts_with('.') {
++                out.insert(format!("{stem}{n}"));
++            } else {
++                out.insert((*n).to_owned());
++            }
++        }
++    }
++    out
++}
++
++/// Every name the logs write (the module text's (b)).
++pub(crate) fn written(logs: &[Log]) -> BTreeSet<String> {
++    let mut out = BTreeSet::new();
++    for l in logs {
++        for k in l.header.params.keys() {
++            out.insert(format!("header.params.{k}"));
++        }
++        for t in &l.ticks {
++            out.extend(t.v.keys().map(|k| format!("tick.v.{k}")));
++            out.extend(t.s.keys().map(|k| format!("tick.s.{k}")));
++            out.extend(t.hs.keys().map(|k| format!("hs.{k}")));
++        }
++        for s in &l.seconds {
++            out.extend(s.v.keys().map(|k| format!("second.v.{k}")));
++            out.extend(s.s.keys().map(|k| format!("second.s.{k}")));
++        }
++        for e in &l.events {
++            for f in e.f.keys().filter(|f| !IDENTIFIERS.contains(&f.as_str())) {
++                out.insert(format!("event.{}.{f}", e.ev));
++            }
++        }
++    }
++    out
++}
++
++fn by_process<'a>(logs: &'a [Log], process: &str) -> Option<&'a Log> {
++    logs.iter().find(|l| l.header.process == process)
++}
++
++fn field_u64(e: &npt_log::EventRecord, name: &str) -> Option<u64> {
++    e.f.get(name).and_then(serde_json::Value::as_u64)
++}
++
++/// r2's checker over one run's logs (the module text).
++pub(crate) fn check(logs: &[Log], series: &str) -> Outcome {
++    let mut o = Outcome::default();
++    // (b) every written name has its row.
++    let have = rows(series);
++    let names = written(logs);
++    let missing: Vec<&String> = names
++        .iter()
++        .filter(|n| {
++            !have.contains(n.as_str())
++                && !n
++                    .strip_prefix("header.params.")
++                    .is_some_and(|k| have.contains(k))
++        })
++        .collect();
++    o.lines.push(format!(
++        "(b) names: {} written, {} without a SERIES.md row",
++        names.len(),
++        missing.len()
++    ));
++    for n in missing {
++        o.failures.push(format!("(b) {n} has no SERIES.md row"));
++    }
++    // (c) the validity inputs.
++    for l in logs {
++        if l.footer.is_none() {
++            o.failures.push(format!(
++                "(c) the {} log has no footer (complete)",
++                l.header.process
++            ));
++        }
++        for k in CARRY_60 {
++            if !l.header.params.contains_key(k) {
++                o.failures.push(format!(
++                    "carry 60: the {} log's header has no params.{k}",
++                    l.header.process
++                ));
++            }
++        }
++    }
++    for p in ["room", "client", "lab"] {
++        if by_process(logs, p).is_none() {
++            o.failures.push(format!("(c) no {p} log"));
++        }
++    }
++    let Some(room) = by_process(logs, "room") else {
++        return o;
++    };
++    let clients = u64::from(room.header.clients);
++    let mut admits: BTreeMap<u64, u64> = BTreeMap::new();
++    for e in room.events.iter().filter(|e| e.ev == "admit") {
++        let slot = field_u64(e, "slot").unwrap_or(u64::MAX);
++        *admits.entry(slot).or_default() += 1;
++        if e.f.get("in_roster") != Some(&serde_json::Value::Bool(true)) {
++            o.failures
++                .push(format!("(c) slot {slot}'s admit is not in_roster true"));
++        }
++    }
++    for slot in 0..clients {
++        match admits.get(&slot) {
++            Some(1) => {}
++            n => o.failures.push(format!(
++                "(c) slot {slot}: {} admit events, not 1",
++                n.copied().unwrap_or(0)
++            )),
++        }
++    }
++    let lacking = room
++        .ticks
++        .iter()
++        .filter(|t| !t.v.contains_key("late_count"))
++        .count();
++    if lacking > 0 || room.ticks.is_empty() {
++        o.failures.push(format!(
++            "(c) {lacking} of {} room tick records have no tick.v.late_count",
++            room.ticks.len()
++        ));
++    }
++    let late: i64 = room.ticks.iter().filter_map(|t| t.v.get("late_count")).sum();
++    o.lines.push(format!(
++        "(c) footers on {} logs; admit events {} for {clients} clients; tick.v.late_count on {} room ticks, sum {late}",
++        logs.iter().filter(|l| l.footer.is_some()).count(),
++        admits.values().sum::<u64>(),
++        room.ticks.len() - lacking
++    ));
++    // (e) the shot band.
++    let measured: Vec<i64> = room
++        .seconds
++        .iter()
++        .filter(|s| s.ph == Phase::Measured)
++        .filter_map(|s| s.v.get("shots_count").copied())
++        .collect();
++    let n = measured.len() as i64;
++    let sum: i64 = measured.iter().sum();
++    let (lo, hi) = match room.header.scene.as_str() {
++        "ES" => (684, 756),
++        _ => (6_650, 7_350),
++    };
++    let in_band = n > 0 && sum * 10 >= lo * n && sum * 10 <= hi * n;
++    o.lines.push(format!(
++        "(e) shots per measured second: mean {:.2} over {n} s, band [{}, {}]: {}",
++        if n > 0 { sum as f64 / n as f64 } else { 0.0 },
++        lo as f64 / 10.0,
++        hi as f64 / 10.0,
++        if in_band { "in" } else { "out" }
++    ));
++    if !in_band {
++        o.failures
++            .push("(e) the shot band: the measured mean is outside it".to_owned());
++    }
++    carries(logs, &mut o);
++    o
++}
++
++/// The carries' figures (reported).
++fn carries(logs: &[Log], o: &mut Outcome) {
++    if let Some(c) = by_process(logs, "client") {
++        let sum: i64 = c
++            .ticks
++            .iter()
++            .filter(|t| t.ph == Phase::Measured)
++            .filter_map(|t| t.s.get("snap_incomplete"))
++            .flatten()
++            .sum();
++        o.lines.push(format!(
++            "carry 62 (h): the measured phase's sum of tick.s.snap_incomplete {sum}"
++        ));
++    }
++    let Some(lab) = by_process(logs, "lab") else {
++        return;
++    };
++    let keys = [
++        "commands_count",
++        "late_count",
++        "steps_without_command_count",
++        "stale_count",
++        "rewinds_refused_count",
++        "events_queued_count",
++        "overflow_resyncs_count",
++    ];
++    let mut t: BTreeMap<&str, u64> = keys.iter().map(|k| (*k, 0)).collect();
++    for e in lab.events.iter().filter(|e| e.ev == "client_counts") {
++        for k in keys {
++            *t.entry(k).or_default() += field_u64(e, k).unwrap_or(0);
++        }
++    }
++    let lead = lab
++        .header
++        .params
++        .get("lead_ticks_count")
++        .cloned()
++        .unwrap_or_default();
++    o.lines.push(format!(
++        "carry 74: lead {lead}; commands {}, late {}, steps without a command {}; carry 77 (c): stale {}; rewinds \
++         refused {}; carry 58: events queued {}, overflow resyncs {}",
++        t["commands_count"],
++        t["late_count"],
++        t["steps_without_command_count"],
++        t["stale_count"],
++        t["rewinds_refused_count"],
++        t["events_queued_count"],
++        t["overflow_resyncs_count"]
++    ));
++    let heals: Vec<&npt_log::EventRecord> = lab
++        .events
++        .iter()
++        .filter(|e| e.ev == "burst_heal")
++        .collect();
++    if !heals.is_empty() || lab.header.profile == "B1" {
++        let within = heals
++            .iter()
++            .filter(|e| field_u64(e, "after_link_ns").is_some_and(|n| n <= HEAL_BOUND_NS))
++            .count();
++        let pairs: BTreeSet<(u64, u64)> = heals
++            .iter()
++            .filter_map(|e| Some((field_u64(e, "slot")?, field_u64(e, "burst")?)))
++            .collect();
++        let queue_max = heals
++            .iter()
++            .filter_map(|e| field_u64(e, "queue_max_count"))
++            .max()
++            .unwrap_or(0);
++        let full = heals
++            .iter()
++            .filter(|e| field_u64(e, "full_state") == Some(1))
++            .count();
++        let bursts = lab
++            .header
++            .params
++            .get("burst_starts_ns")
++            .and_then(serde_json::Value::as_array)
++            .map_or(0, Vec::len);
++        o.lines.push(format!(
++            "-18: {} heal records ({} within 500 ms; {} (client, burst) pairs of {} clients x {bursts} bursts; a full \
++             state during {full}); carry 58: queue high-water mark {queue_max}",
++            heals.len(),
++            within,
++            pairs.len(),
++            lab.header.clients
++        ));
++    }
++}
++
++/// The run folder's three logs, read back.
++pub(crate) fn read(dir: &Path) -> Result<Vec<Log>, String> {
++    ["room", "client", "lab"]
++        .iter()
++        .map(|p| {
++            let path = dir.join(format!("{p}.jsonl"));
++            let f = std::fs::File::open(&path).map_err(|e| format!("{}: {e}", path.display()))?;
++            npt_log::read_log(std::io::BufReader::new(f))
++                .map_err(|e| format!("{}: {e}", path.display()))
++        })
++        .collect()
++}
++
++/// The `contract` subcommand: `Ok` with the lines when nothing failed, else `Err((1, lines and failures))`; a usage
++/// error is `Err((2, ...))`.
++pub(crate) fn main(argv: &[String]) -> Result<Vec<String>, (u8, String)> {
++    let usage = |m: &str| (2u8, m.to_owned());
++    let (mut logs, mut series) = (None, None);
++    let mut it = argv.iter();
++    while let Some(flag) = it.next() {
++        let v = it.next().ok_or(usage("each option needs a value"))?;
++        match flag.as_str() {
++            "--logs" if logs.is_none() => logs = Some(v),
++            "--series" if series.is_none() => series = Some(v),
++            _ => return Err(usage(&format!("unexpected {flag:?}"))),
++        }
++    }
++    let (Some(logs), Some(series)) = (logs, series) else {
++        return Err(usage("--logs and --series are required"));
++    };
++    let text = std::fs::read_to_string(series).map_err(|e| (1, format!("{series}: {e}")))?;
++    let read = read(Path::new(logs)).map_err(|e| (1, e))?;
++    let o = check(&read, &text);
++    let mut lines = vec![format!("contract of {logs}:")];
++    lines.extend(o.lines.iter().cloned());
++    if o.failures.is_empty() {
++        lines.push("contract: PASS".to_owned());
++        Ok(lines)
++    } else {
++        lines.extend(o.failures.iter().map(|f| format!("FAIL {f}")));
++        lines.push(format!("contract: FAIL ({} failures)", o.failures.len()));
++        Err((1, lines.join("\n")))
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use crate::scenario::tests::{scratch, settings};
++
++    const SERIES: &str = include_str!("../../../marks/SERIES.md");
++
++    /// One short L1 P0 run's logs (SS, 16 clients, 6 s of warm-up, 2 s measured, its header listing -17).
++    fn short_run() -> Vec<Log> {
++        let dir = scratch("r2");
++        let s = settings(
++            &dir,
++            "--seed 2 --profile P0 --clients 16 --warmup-s 6 --measured-s 2 --after-max-s 10 --marks PM-0001-17",
++        );
++        crate::scenario::run(&s).expect("the run");
++        read(&dir).expect("its logs")
++    }
++
++    /// r2's checker passes the clean run, and each of U4R-Q11's four doctored copies fails it by name.
++    #[test]
++    fn r2_the_checker_passes_a_clean_run_and_fails_each_doctored_copy_by_name() {
++        let logs = short_run();
++        let clean = check(&logs, SERIES);
++        for l in &clean.lines {
++            println!("r2 clean: {l}");
++        }
++        assert_eq!(clean.failures, Vec::<String>::new(), "the clean run");
++        let room = logs
++            .iter()
++            .position(|l| l.header.process == "room")
++            .expect("a room log");
++        // (1) one admit event gone.
++        let mut d = logs.clone();
++        let i = d[room]
++            .events
++            .iter()
++            .position(|e| e.ev == "admit")
++            .expect("an admit");
++        let slot = field_u64(&d[room].events[i], "slot").expect("its slot");
++        d[room].events.remove(i);
++        let f = check(&d, SERIES).failures;
++        assert!(
++            f.contains(&format!("(c) slot {slot}: 0 admit events, not 1")),
++            "{f:?}"
++        );
++        // (2) one footer gone.
++        let mut d = logs.clone();
++        d[1].footer = None;
++        let f = check(&d, SERIES).failures;
++        assert!(
++            f.contains(&format!(
++                "(c) the {} log has no footer (complete)",
++                d[1].header.process
++            )),
++            "{f:?}"
++        );
++        // (3) one written name's SERIES.md row gone.
++        let row = "| `tick.s.snap_incomplete` |";
++        assert!(SERIES.contains(row), "the row is there");
++        let without: String = SERIES
++            .lines()
++            .filter(|l| !l.starts_with(row))
++            .collect::<Vec<_>>()
++            .join("\n");
++        let f = check(&logs, &without).failures;
++        assert_eq!(
++            f,
++            ["(b) tick.s.snap_incomplete has no SERIES.md row".to_owned()]
++        );
++        // (4) one late_count series gone (a room tick record without it).
++        let mut d = logs.clone();
++        d[room].ticks[3].v.remove("late_count");
++        let f = check(&d, SERIES).failures;
++        assert!(
++            f.contains(&format!(
++                "(c) 1 of {} room tick records have no tick.v.late_count",
++                d[room].ticks.len()
++            )),
++            "{f:?}"
++        );
++        println!("r2: the four doctored copies each fail by name");
++    }
++
++    /// The row reader takes every backticked name of a first cell and joins `.x` shorthands to its record.
++    #[test]
++    fn r2_rows_reads_each_first_cell_s_names() {
++        let r = rows(
++            "| `a.b.c`, `.d_ns` | x | y |\n| `soak` | S30 | z |\nnot a row `e.f`\n| Name | Unit |\n",
++        );
++        let want: BTreeSet<String> = ["a.b.c", "a.b.d_ns", "soak"]
++            .iter()
++            .map(|s| (*s).to_owned())
++            .collect();
++        assert_eq!(r, want);
++    }
 +}
 diff --git a/spikes/netcode-proof/crates/lab/src/logs.rs b/spikes/netcode-proof/crates/lab/src/logs.rs
 new file mode 100644
@@ -3792,10 +4312,10 @@ index 0000000..31a4aed
 +}
 diff --git a/spikes/netcode-proof/crates/lab/src/scenario.rs b/spikes/netcode-proof/crates/lab/src/scenario.rs
 new file mode 100644
-index 0000000..5d94208
+index 0000000..867361d
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/scenario.rs
-@@ -0,0 +1,2224 @@
+@@ -0,0 +1,2243 @@
 +//! `L1Scenario` (u4-build-plan.md §5 U4r; plan.md §4.7, RQ8; u4r-brief.md 2.1): one server and its clients on one
 +//! simulated clock, [`SimClock`] (integer ns), in RQ8's order at each instant:
 +//! 1. packets due: L1 applies every event due at or before the instant at the instant's first call (here the
@@ -5216,7 +5736,15 @@ index 0000000..5d94208
 +    Ok(s)
 +}
 +
-+/// The summary line of a run.
++/// `part / whole` as a decimal for a report line (0 when `whole` is 0): carry 49's figures, reported, never judged.
++fn share(part: u64, whole: u64) -> f64 {
++    if whole == 0 {
++        0.0
++    } else {
++        part as f64 / whole as f64
++    }
++}
++
 +/// The summary line of a run. A `--logs 0` run prints "not counted (--logs 0)" for every figure taken from the logs'
 +/// counts or from `room_tick`, never 0 (the advisor's U4r build ruling, point 9 (b)); the counts that need no log stay.
 +pub(crate) fn summary_line(s: &Settings, o: &Summary) -> String {
@@ -5232,8 +5760,9 @@ index 0000000..5d94208
 +        "{} {} {} seed {}: {} ticks ({} after); lead {}; commands {} (steps without one {}, duplicate stamps {}); \
 +         late {}; press refused {}; buffer full {}; rewinds refused {}; stale {}; overflow resyncs {}; heals {}; \
 +         client hashes {} (sentinels {}); measured incomplete {}; decided lost at the stop {}; shots per measured \
-+         second {}; audit {} owner, {} spatial checked against the radius, {} spatial not checked, {} breaches; fate \
-+         log {}; connect order digest {:016x}",
++         second {}; carry 49: measured client sets {}, holding every very large unit {}, projectiles per set {}; \
++         audit {} owner, {} spatial checked against the radius, {} spatial not checked, {} breaches; fate log {}; \
++         connect order digest {:016x}",
 +        s.meta.run,
 +        s.scene.name(),
 +        s.profile.name,
@@ -5261,6 +5790,16 @@ index 0000000..5d94208
 +                .unwrap_or(0)
 +                .to_string()
 +        ),
++        logged(c.sets_measured.to_string()),
++        logged(format!(
++            "{} ({:.4})",
++            c.large_measured,
++            share(c.large_measured, c.sets_measured)
++        )),
++        logged(format!(
++            "{:.2}",
++            share(c.projectiles_measured, c.sets_measured)
++        )),
 +        o.audit.owner,
 +        o.audit.spatial,
 +        o.audit.spatial_unchecked,
