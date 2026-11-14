@@ -7,11 +7,12 @@ ready; the last commit that holds them is {{NOTES-SHA}}._
 Mustafa's first item for step 2.3: "First: the docs pass. Its own small pull request, docs only, with no kit, gate or CI file in it." (A2) His words for PR #48 and his decision of 2026-11-13 go into `docs/DECISIONS.md` by script, with dated pointers at the older lines the decision overtakes; STATUS and ROADMAP become true for main 4d21c1a; the 2.2 report gets its five fixes. Nothing a player sees, hears or feels changes.
 
 ## Outcome
-- Built in seven commits (1123175, 2f96f5c, 83c6ab6, d59ca43, 554face for review round 1's fix pass, 8e4fe7c for round
-  2's, then its follow-up), every script check and the gate passing; CI green on each through 8e4fe7c (E7). Review round
-  1 (two reviewers, four skeptics) found one High and two Mediums, all fixed. Review round 2 (two reviewers, one
-  skeptic) found one High, the advisor model (below), and eight Lows, all fixed or disclosed. The verifier and the
-  advisor agent's review of the final head follow.
+- Built in eight commits (1123175, 2f96f5c, 83c6ab6, d59ca43, 554face for review round 1's fix pass, 8e4fe7c for round
+  2's, a1d0317 its follow-up, then the verifier's fix pass), every script check and the gate passing; CI green on each
+  through a1d0317 (E7). Review round 1 (two reviewers, four skeptics) found one High and two Mediums, all fixed. Review
+  round 2 (two reviewers, one skeptic) found one High, the advisor model (below), and eight Lows, all fixed or
+  disclosed. The verifier failed a1d0317 on one High (how Mustafa was told about the advisor model, written from
+  recall), fixed in the verifier's fix pass; its re-run and the advisor agent's review of the final head follow.
 - **A gap against his rule on the advisor tool** (his words of 2026-11-11, moment 5: consult before a step or the task
   is declared done): steps 0 and 3 had no closing consultation of their own (step 3's was made late, consultation 6);
   steps 1, 2, 4 and 5 were consulted 6 seconds to 11 minutes after the checkpoint had called them done; and step 4's
@@ -79,8 +80,8 @@ Mustafa's first item for step 2.3: "First: the docs pass. Its own small pull req
 
 ## Reviews
 Round 1, on d59ca43 (workflow wf_eb6cb5e5-3ce): R-WORDS (his words and decisions) and R-STATE (the state, the fixes,
-this report), each a general agent on Opus 5.5 at effort max; 2 of 2 returned. 23 findings: R-WORDS 6, R-STATE 17.
-Each Medium or higher was then tested by a skeptic of its own (4 of 4 returned): all four hold, at their severities.
+this report), each a general agent on Opus 5.5, asked for effort max; 2 of 2 returned. 23 findings: R-WORDS 6, R-STATE
+17. Each Medium or higher was then tested by a skeptic of its own (4 of 4 returned): all four hold, at their severities.
 Every finding was fixed in round 1's fix pass unless its row says otherwise.
 
 | Id | Severity | Finding | Disposition |
@@ -105,8 +106,8 @@ Every finding was fixed in round 1's fix pass unless its row says otherwise.
 | RW-F5 | Low | three "before the foundation" hits missing from the plan's site table | fixed: ADR 0003 :51-52 and ADR 0006 :56-57 added to the archive's follow-up; the register's OQ-0006-13 row (:155) is the preview step, 2.6, which still waits (S8), so it is left |
 | RW-F6 = RS-L-k | Low | BRIEF-STALE kept "[verified 2026-11-12]" | fixed |
 
-Round 2, on what changed from d59ca43 to 554face (workflow wf_dcd47e10-70e): R2-WORDS and R2-STATE, each a general
-agent on Opus 5.5 at effort max; 2 of 2 returned. 10 findings: R2-WORDS 5, R2-STATE 5, one of them found by both
+Round 2, on what changed from d59ca43 to 554face (workflow wf_dcd47e10-70e): R2-WORDS and R2-STATE, each a general agent
+on Opus 5.5, asked for effort max; 2 of 2 returned. 10 findings: R2-WORDS 5, R2-STATE 5, one of them found by both
 (RW2-F4 = R2-L2), so nine in the table. Its one High was then tested by a skeptic (1 of 1 returned): it holds, at High.
 Every finding was fixed in round 2's fix pass (plan revision 2d) unless its row says otherwise.
 
@@ -122,7 +123,17 @@ Every finding was fixed in round 2's fix pass (plan revision 2d) unless its row 
 | R2-L4 | Low | Outcome's "each consultation comes before the "done" save it covers" read literally false | fixed (Outcome) |
 | R2-SELF | Low | R2-STATE's own refusal by the guard, for the refusal list | disclosed ("Decisions and deviations") |
 
-The verifier and the advisor agent's review of the final head: to come.
+The verifier (a general agent on Opus 5.5, asked for effort max, reading main's verifier.md), on a1d0317: FAIL, with
+one High and one Low; everything else it checked held (the gate; the eight scripts; every SHA, time and run id; the
+records of the consultations, the agents' models and the refusals; Appendix A and DECISIONS.md). Its scope note:
+everything after 554face, the new DECISIONS entry included, had the verifier and the advisor agent but no reviewer.
+
+| Id | Severity | Finding | Disposition |
+|---|---|---|---|
+| F-V1 | High | "Decisions and deviations" told how Mustafa was told about the advisor model from recall: it claimed two updates no record holds, left out the recorded one of 22:59:04 and dropped the "If true" of 22:48:47 | fixed: the recorded messages, each from its own text (the verifier's fix pass) |
+| F-V3 | Low | the copies of his words: "round 2's 14 notes files" held five of round 1's; the list was incomplete | fixed: the certain copies named, with the check and its threshold |
+
+Its re-run on the verifier's fix pass and the advisor agent's review of the final head: to come.
 
 ## The advisor tool: consultations (his words of 2026-11-11)
 Fable 5.2 (`claude-fable-5-2`) answered every consultation below, by the session's records: the transcript's
@@ -133,7 +144,8 @@ forecast did not hold is not established.
 Times are the calls' own, from the session's transcript (UTC); the "done" saves' times are their commits'. The "done"
 saves: step 0 19:22:36 (ec16b30), step 1 19:55:30 (35c3e81), step 2 20:02:41 (de3845d), step 3 20:27:37 (1137ec4),
 step 4 20:47:34 (1cfe292), step 5 20:57:42 (636f260), review round 1 22:04:19 (3f98c0b, after number 6), round 1's fix
-pass 22:19:55 (461c82b, after number 8), review round 2 22:52:48 (ef1a7c1, after number 9).
+pass 22:19:55 (461c82b, after number 8), review round 2 22:52:48 (ef1a7c1, after number 9), round 2's fix pass
+23:49:35 (7249a13, after number 11).
 1. 18:59:07, moment 1 (the approach): saved first; every pointer quotes all four limits; the grep widened; the decision
    cut by anchors; 2.2's appendix check replaced by a hash check; KIT-FREEZE-2 quoted, not paraphrased; questions put to
    the advisor agent; the final head approved as the commit that deletes the checkpoint.
@@ -159,15 +171,22 @@ pass 22:19:55 (461c82b, after number 8), review round 2 22:52:48 (ef1a7c1, after
    while round 2 runs.
 9. 22:49:58, moment 5 for review round 2 (before its "done" save) and moment 1 for its fix pass: the advisor-model
    correction worded from the records only and made everywhere; revision 2d asked before any write, round 3 put to the
-   advisor agent; Mustafa told in chat; the main session's and the agents' models checked in the records.
+   advisor agent; the correction for Mustafa in chat (on record at 23:51:05, transcript line 2869); the main session's
+   and the agents' models checked in the records.
 10. 23:03:56, late moment 4 for recording his status request (after the session's recommendation to the advisor agent,
    its ruling at 23:02:43 and a notes-only script change; before any tracked edit) and moment 1 for writing round 2's
    fix pass: the scripts' expectations first; round 2's count; times from commits; the appendix's cut-off from a
    scan-gated write; the intro's list checked against the scan; midnight.
 11. 23:39:10, moment 5 for round 2's fix pass, after its commit 8e4fe7c and before any "done" save: not done yet (the
-   clause on how Mustafa was told, worded from the records; E2's check run on this tree; the fragment check widened;
+   clause on how Mustafa was told reworded, still from recall: the verifier failed it, F-V1; E2's check run on this
+   tree; the fragment check widened;
    what is already known added now), and moment 1 for the verifier (its brief: the head, what is pending by design, the
    CI tools, no words of his in its notes, 2.2's script copy, nothing posted on GitHub).
+12. 2026-11-14 00:34:39, moment 2 for the clause on how Mustafa was told (its wording failed a second time), moment 1
+   for the verifier's fix pass and moment 4 for the form of F-V3's fix, before the advisor agent was asked: the clause
+   from the recorded messages only, each read in full and described from its own text; nothing about messages the
+   records do not hold; F-V3 narrowed (no counts; the certain copies named); "asked for effort max"; the verifier's FAIL
+   recorded as it happened; the same verifier resumed with a narrow brief.
 The gaps: step 0's "done" save had no consultation of its own (number 1 came before the step's work); steps 1, 2, 4 and
 5 were consulted after their "done" saves; step 3 had none until number 6; step 4's departures (the STATUS cut, a design
 call, moment 4; the archive lines beyond plan §6) were committed in 83c6ab6 (20:47:12) before number 4; and number 10
@@ -177,10 +196,14 @@ came after the session had put its recommendation on his status request to the a
 - The advisor model (RW2-F1, High, held by its skeptic; fixed in round 2's fix pass): from step 0 the checkpoint, and
   from d59ca43 this report, said Opus 5.5 answered the advisor tool, taking the `/advisor fable` output's forecast as
   fact; round 1 compared the claim only with that output. The records say Fable 5.2 (the advisor-tool entry; every
-  call's usage record). No chat message named the advisor model before round 2. At 22:48:47 UTC the session relayed the
-  finding to Mustafa and wrongly added that it had told him the wrong thing at the start; its chat updates after the
-  compaction first repeated that and then corrected it, but neither update is in the transcript or the session's event
-  record, so the end message states the correction again.
+  call's usage record). No chat message named the advisor model before round 2. Four chat messages since bear on it (the
+  transcript's lines 1887, 2122, 2869 and 2929): at 22:48:47 UTC the session relayed the finding and added "If true, I
+  told you the wrong thing at the start."; at 22:59:04 it wrote that it was checking "where I first told you the advisor
+  model"; at 23:51:05 it wrote that Fable 5.2 had answered all 11 advisor-tool consultations, that no chat message of
+  its own had named the advisor model before 22:48 UTC, that its 22:48 message and its first update after the context
+  reset had wrongly said it had told him Opus 5.5 at the start, and that the wrong claim had been only in the report and
+  the checkpoint; at 00:31:35 on 2026-11-14 it wrote that the verifier had failed this bullet's earlier wording (F-V1),
+  that its 22:59 update is on record, and that two correcting updates it believed it had sent are not.
 - His status request (22:27:05 UTC), sent while review round 2 ran, was found by the transcript scan after round 2: it
   is A4, with an entry in DECISIONS.md in E-HI's form (revision 2d). The appendix states the scan's cut-off; a message
   of his after it is added the same way before the final commit, and one after the final commit means a new head.
@@ -202,13 +225,20 @@ came after the session had put its recommendation on his status request to the a
   route taken: the advisor agent, 19:31:18 UTC (a loop writing to a variable path; route: a read-only python3 script);
   R-WORDS, 21:14:45 (the same kind; route: literal paths); R-STATE, 21:05:55 (a `node -e` line with comments; route: a
   script file); R-STATE, 21:17:54 (a `sed -i` on a scratch file; route: the Edit tool); R2-STATE, 22:28:31 (a loop
-  writing to a variable path; route: literal paths).
-- Retyped copies of his words in scratch files, each pushed by the saver and kept by history, none in any doc:
-  docs-keeper's `fillcount.mjs` (e6fc6a9; his decision's four sentences and his kit words, byte-identical to the script
-  cuts, checked); an earlier version of R-WORDS's notes (ec8f1bd, fragments); R-STATE's notes and `rs-roadmap.mjs`
-  (fragments); two versions of R2-WORDS's notes (461c82b and 7b5f53c, fragments; its notes now hold pointers). No other
-  pushed version of round 2's 14 notes files holds a run of 30 characters of his words (`fp2-fragments-history.mjs`).
-  His words are public in DECISIONS.md already.
+  writing to a variable path; route: literal paths); the verifier, 2026-11-14 00:12:07 (a compound command with an `rm
+  -rf`, denied by the permission system; route: the Write tool, each step on its own, plain `rm` and `rmdir` of named
+  files) and 00:16:46 (the guard: a loop writing to a variable path; route: literal paths).
+- Copies of his words in the notes folder, each pushed by the saver and kept by history, none of them in docs/. Certain
+  copies (whole sentences or longer): the plan (his decision, his kit words and A1, which its pointer texts and checks
+  used); this report's draft body (its quotes) and `fp2-body.py`; the checkpoint; the advisor agent's notes (A4 whole,
+  and runs of A2 and A3); docs-keeper's `fillcount.mjs` (e6fc6a9; his decision's four sentences and his kit words,
+  byte-identical to the script cuts), `dk-para.txt` and `dk-para-wrapped.txt`; the scripts that cut or check his words
+  and the review briefs (`decisions.mjs`, `pointers.mjs`, `fixpass1.mjs`, `review-r1.js` and `review-r2.js` with their
+  launched copies: anchors, negative controls, and his kit words for the reviewers); and R-WORDS's notes at ec8f1bd.
+  Fragments, among others: R-STATE's notes and `rs-roadmap.mjs` (RS-SELF), R2-WORDS's notes at 461c82b and 7b5f53c
+  (RW2-F5). `fp3-fragments-all.mjs` checks every version of every notes file for runs of 30 characters or more of his
+  words; shorter shared runs, among them the base SHA, file paths and names his message also holds, exist in other files
+  and are not listed. His words are public in DECISIONS.md already.
 - Two of the seven L2 logs (fd14855's push run, 45f1bb5's pull_request run) were read by the session only; the advisor
   agent read the other five.
 - The transcript-based checks (`words.mjs`'s A1, A2 and its scan; the chat-record pages) run only in this session's
@@ -243,7 +273,7 @@ None.
 
 ## Appendix A. Mustafa's words for this change-set, in full
 
-_Each block below is copied byte for byte from its source by `report-appendix.mjs` (in the notes folder, readable at this branch's last checkpoint commit, named in the header above), never retyped. A1, A2 and A4 are his messages in this session (session_019YNMUWSsyRgaYWxk4auQ5b, his personal account), each read from the session's transcript by `words.mjs`: a message's single text. A3 is his go for #48, read from merge commit 4d21c1a's message and checked byte for byte against foundation 2.2's chat record. His decision of 2026-11-13 is the text inside its quote marks in A2, cut by `words.mjs` at its first sentence ("Step 2.3 may be planned now.") and its last words ("only exception."), since it holds quote marks of its own. The same script checks every block against its source, and every quote of his words in this report's body against the item it cites. His other input in this session was a command: `/advisor fable` (2026-11-13 18:30:08 UTC), whose output said this conversation keeps Opus 5.5 as its advisor model until `/clear` or `/compact`; by the session's records, Fable 5.2 answered every advisor-tool call ("The advisor tool"). The session's other entries are the harness's and its agents': the command's caveat, the workflow-authoring skill (loaded with A2, 18:47:56 UTC), notices that the session's worker had restarted (19:22:24 and 22:01:23 UTC, the second after a notice that its container had restarted, 22:01:22), the advisor-report skill's text (loaded by the session), stop-hook feedback, a reminder that came with review round 1's task notification (21:54:48 UTC), the summary that carried the session on when its context filled (22:54:40 UTC), and the hand-backs and task notifications of the session's own agents, with the harness's notices that carry them; `words.mjs` classifies every entry of the transcript up to its last entry when this appendix was written (2026-11-13 23:47:48 UTC) and finds no other message of his. Entries in `docs/DECISIONS.md` copy their quotes from here, because the notes folder is deleted before the pull request is marked ready._
+_Each block below is copied byte for byte from its source by `report-appendix.mjs` (in the notes folder, readable at this branch's last checkpoint commit, named in the header above), never retyped. A1, A2 and A4 are his messages in this session (session_019YNMUWSsyRgaYWxk4auQ5b, his personal account), each read from the session's transcript by `words.mjs`: a message's single text. A3 is his go for #48, read from merge commit 4d21c1a's message and checked byte for byte against foundation 2.2's chat record. His decision of 2026-11-13 is the text inside its quote marks in A2, cut by `words.mjs` at its first sentence ("Step 2.3 may be planned now.") and its last words ("only exception."), since it holds quote marks of its own. The same script checks every block against its source, and every quote of his words in this report's body against the item it cites. His other input in this session was a command: `/advisor fable` (2026-11-13 18:30:08 UTC), whose output said this conversation keeps Opus 5.5 as its advisor model until `/clear` or `/compact`; by the session's records, Fable 5.2 answered every advisor-tool call ("The advisor tool"). The session's other entries are the harness's and its agents': the command's caveat, the workflow-authoring skill (loaded with A2, 18:47:56 UTC), notices that the session's worker had restarted (19:22:24 and 22:01:23 UTC, the second after a notice that its container had restarted, 22:01:22), the advisor-report skill's text (loaded by the session), stop-hook feedback, a reminder that came with review round 1's task notification (21:54:48 UTC), the summary that carried the session on when its context filled (22:54:40 UTC), and the hand-backs and task notifications of the session's own agents, with the harness's notices that carry them; `words.mjs` classifies every entry of the transcript up to its last entry when this appendix was written (2026-11-14 00:43:01 UTC) and finds no other message of his. Entries in `docs/DECISIONS.md` copy their quotes from here, because the notes folder is deleted before the pull request is marked ready._
 
 ### A1. His message before the task, 2026-11-13 18:29:55 UTC (transcript message b031379c-ea4c-47db-b279-54e937bf147a)
 
