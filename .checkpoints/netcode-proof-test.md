@@ -29,6 +29,9 @@ rules on it.**
   write it word for word by script (advisor-u4r-r2-full.md, as advisor-u4r-r1-full.md); copy its "For Mustafa" and any
   decision onto this card at once (the morning's miss); then its next steps (the merge, the report).
 - **Do not run any judged or pre-check set** before the ruling says how INF-R2-1 is handled.
+- **/compact asked about 13:27 UTC** (chat about 35 %, after b3f7ace); the COMPACT-WAIT reminder (send_later, 20
+  minutes) comes due about 13:47: if no /compact by then, refresh this block and carry on. The saver runs as
+  **bpe802i8q** (since 12:51; its window ends about 14:41: restart it then). The check-in is enabled (next 14:34).
 
 **Earlier NOW (2026-11-14 about 12:55 UTC): U4r's FIX PASS IS DONE (copy 6, its
 report 12:50 UTC); snapshot 21ca46be…; next: round 2 (five seats, two batches).**
