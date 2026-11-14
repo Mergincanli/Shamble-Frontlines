@@ -34,3 +34,40 @@
   fail -> invalid; :1476/1660 bite Invalid -> mark INVALID), contradicting carry 73. Also whole-as-lost as a bite entry
   would be INVALID (expect-invalid bites name only validity rules: marks.rs:862-876). Medium; main session's 7.1
   decision; to me before the check is added.
+- Clean partner verified from tick16-clean-verdict.json: -2 11 of 11 pass, -17 0, -57 6,981/2,750/88,044, valid;
+  ticks_below_wrap 600; run_lengths after 0, capped false.
+
+## Point 2 (CR-ID): facts checked
+- contract.rs:15-19 (module doc), :248-256 (room_class_filter_bite: npt_room::BITES.contains && !starts_with("PM-"),
+  false in a measured build), :258-301 (audit), test :540-575 (6th doctored case; bites-build exemption for
+  owner-to-all, another bite fails). room/src/lib.rs:32-46 documents the one non-PM id (7 ids).
+- Brief section 4 (:1023-1026): "npt-lab's sources never spell another crate's bite id as a string literal" (all ids,
+  not only the PM- form); check.mjs BITE_ID (:887) = PM- form only, so the scan would not catch it: the rule would
+  still be broken. Tests may name ids (scenario.rs:1852-1856 and contract.rs:569 are in test modules).
+- A measured build cannot make an owner-to-all run (C4; --bite in a measured build is a usage error), and both run
+  scripts run each suite's contract with that suite's own build (c-u4r-r2.mjs:129-130). r4's owner-to-all runs are
+  unit tests (scenario.rs:1811-1860), no contract over them. So the measured-build no-exemption is fail-closed.
+- Risk: a second non-PM id in npt_room::BITES would widen the exemption silently. Guard: assert the count is 1 in
+  the bites-build test (rides the current work: Low).
+- Decision: keep the run-time lookup. Severity none (+ one Low). My ruling 3 words read "npt-room's class-filter bite
+  (catalogue-5/owner-to-all), exempt by a bites-build contract".
+
+## Point 3: facts checked
+- Ruling 3 point 3 Decision (build3-full :27) and main-session item 4 (:29); point 1 Decision (:13: "-18's bitten
+  judged run moves to U4g") and main-session item 2 (:15). Both items are mine: confirmed.
+- Snapshot (wip/u4r.patch 707cc3df): TICK_START 63_736 for every run; bitesOn -18 -> "B1"; no-fallback run on B1.
+- Live worktree c-u4r-runs.mjs (copy 5, resumed): :20-27 header, :60-65 TICK16_START = 65,536 + 15 - (10+600)*30 =
+  47,251; :68-69 NOT_AT_U4R no-fallback; :187-193 bitesOn -18 -> null; clean and client-rounding at 63,736. Correct.
+  Wrap at measured tick 17,985, 15 before the end; ticks_below_wrap 18,285.
+- Carry 58 applies to the judged tick16 bite run (expected resyncs ~48 at about wrap + 60, after phase): with the set.
+
+## Further finding (setup check vs carry 73 and whole-as-lost): decided form
+- Plan §11 (u4-build-plan.md:1081-1093) lists stricter readings for Mustafa's go (e.g. FX-5 (c)); carry 62 (h)'s check is
+  not on it. Decision: the check goes into marks.json as a plain check of -17's L1 P0 part (no "setup": true, the name
+  without "setup: "), stricter on clean runs (FAIL, not INVALID), both bites then Shown (tick16: mismatch 2,880 and
+  incomplete 720; whole-as-lost: incomplete 48). Amends carry 62 (h)'s JSON and ruling 1 point 4 ("JSON stays word
+  for word"; "setup check FAIL by name"): both the advisor's words. Added only at 7.1 after the record run's clean
+  short L1 P0 sums are 0; onto plan §11's readings-PR list. Medium; not blocking; Mustafa via readings PR.
+
+## Status
+- All three points ruled; result returned by StructuredOutput (2026-11-14).
