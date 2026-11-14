@@ -12,9 +12,9 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 02:00 UTC; read this first after a compact or a cut): U4r's third ruling is in (nothing for
+**NOW (2026-11-14 about 01:42 UTC; read this first after a compact or a cut): U4r's third ruling is in (nothing for
 Mustafa now; three points block the merge until done: 3, 6, 8); copy 5 builds them, then r5 and the end checks.**
-- **The third ruling** (wf_345cc3c9-ca1 returned about 01:55 UTC): **advisor-u4r-build3-full.md** (235 lines, sha256
+- **The third ruling** (wf_345cc3c9-ca1 returned about 01:39 UTC): **advisor-u4r-build3-full.md** (235 lines, sha256
   78ebb5af…; by script, word for word, from the journal; with the architect's read and the fact check). I read the
   rulings whole. (1, High, not blocking) B1: the room's recovery after an eviction is a defect and a plan gap (carry
   78's packing order; the set rebuilt from the defaults under the 1,000 B cap); no bar moves; the fix and -17's and
@@ -45,7 +45,7 @@ Mustafa now; three points block the merge until done: 3, 6, 8); copy 5 builds th
   the next SERIES.md edit. (f) U4r's report tells Mustafa the B1 story in plain words. (g) U4r's review reads the
   tick16 runs' verdicts, contract.rs against point 6, the mirror's last_acked keep, r6's assertion, and the two fixes.
   (h) When U4g's brief is sized, weigh his SIZE-CHECK (history.md:398-399).
-- **Copy 5 launched about 02:00 UTC** (agent a507d682db446aa0a, general-purpose, opus, xhigh, background; prompt
+- **Copy 5 launched about 01:41 UTC** (agent a507d682db446aa0a, general-purpose, opus, xhigh, background; prompt
   u4r-copy5-prompt.md: the first prompt verbatim, checked by script, plus a copy-5 resume part with the work order).
   **If cut:** by the limit or a restart, SendMessage (its transcript intact) after checking the worktree for a plant or
   a half edit and re-cutting the snapshot; if it ends at its context limit, a fresh copy from the latest prompt, its
