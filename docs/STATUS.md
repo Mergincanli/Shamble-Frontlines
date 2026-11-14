@@ -2,7 +2,7 @@
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
 next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
 `docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
-_Last updated: 2026-11-13 (step 2.3's first docs pass, PR #52; main 4d21c1a)._
+_Last updated: 2026-11-14 (step 2.3's first docs pass, PR #52; main 4d21c1a)._
 
 ## Phase
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
@@ -25,8 +25,8 @@ _Last updated: 2026-11-13 (step 2.3's first docs pass, PR #52; main 4d21c1a)._
 ## In flight (one line per PR)
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
-| #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's builder running; main 4d21c1a merged in (7685b2b) (its checkpoint at 0066b63, read 2026-11-13 20:29 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| #52 | the foundation, 2.3: its first docs pass (his words for #48 and of 2026-11-13 in `docs/DECISIONS.md`, by script; dated pointers in SPIKE_PLAN, ADR 0002, DECISIONS (SLICE-ORDER condition 3) and ROADMAP, the decision quoted in STATUS; the 2.2 report's fixes M1, L1, L2 (worded as the CI logs read), L3 and L5, the archive's lines on the same claims, on #48's merge and on his go for it, and two pointing clauses; STATUS, ROADMAP and the archive true for main 4d21c1a) | `claude/sweet-mayer-grsukw` (his personal account; for `cs/foundation-2-3-docs`) | draft | the verifier, the advisor agent's review of its final head; then his go (risk tier 1, decision docs) |
+| #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
+| #52 | the foundation, 2.3: its first docs pass (his words for #48 and of 2026-11-13 in `docs/DECISIONS.md`, by script; dated pointers in SPIKE_PLAN, ADR 0002, DECISIONS (SLICE-ORDER condition 3) and ROADMAP, the decision quoted in STATUS; the 2.2 report's fixes M1, L1, L2 (worded as the CI logs read), L3 and L5, the archive's lines on the same claims, on #48's merge and on his go for it, and two pointing clauses; STATUS, ROADMAP and the archive true for main 4d21c1a) | `claude/sweet-mayer-grsukw` (his personal account; for `cs/foundation-2-3-docs`) | final (marked ready after the advisor agent's review) | the advisor agent's review of its final head; then his go (risk tier 1, decision docs) |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10), after status-diet (merged, #49): his unit walk of 2026-11-09 (a docs

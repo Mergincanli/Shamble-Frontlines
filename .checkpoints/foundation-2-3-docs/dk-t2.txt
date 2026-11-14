@@ -1,1 +1,0 @@
-Wave 1: one heavy spike at a time (SPIKE_PLAN); then phase 1 and the slices (SLICE-ORDER, `docs/DECISIONS.md`).

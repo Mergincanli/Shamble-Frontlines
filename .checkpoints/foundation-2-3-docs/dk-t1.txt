@@ -1,1 +1,0 @@
-**Last merged:** foundation 2.2, the toolchain (PR #48, 4d21c1a, 2026-11-13 16:20:12 UTC, by merge commit, on his go, quoted in the merge commit's message, after the advisor agent's APPROVE of 9b20b67). Every merge: ROADMAP, the archive.

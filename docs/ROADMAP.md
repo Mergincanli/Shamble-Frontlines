@@ -114,14 +114,14 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**The foundation, 2.3: the first docs pass [2026-11-13, PR #52: in review]** — foundation-2-3-docs, by Mustafa's words
-of 2026-11-13 (docs only, no kit, gate or CI file): his go for #48 and his decision on step 2.3 go into
+**The foundation, 2.3: the first docs pass [2026-11-13 to 11-14, PR #52: in review]** — foundation-2-3-docs, by
+Mustafa's words of 2026-11-13 (docs only, no kit, gate or CI file): his go for #48 and his decision on step 2.3 go into
 `docs/DECISIONS.md` word for word, by script; dated pointers of 2026-11-13 in SPIKE_PLAN, ADR 0002, DECISIONS
 (SLICE-ORDER condition 3) and ROADMAP, his decision quoted in STATUS; the 2.2 report's fixes M1, L1, L2 (worded as the
 CI logs read), L3 and L5, the archive's lines on the same claims, on #48's merge and on his go for it, and two pointing
 clauses; STATUS, ROADMAP and the archive made true for main 4d21c1a. Report
-`docs/reports/2026-11-13-foundation-2-3-docs.md`. Next: the verifier, the advisor agent's review of the final head, then
-his go. Step 2.3 is planned after this merges.
+`docs/reports/2026-11-13-foundation-2-3-docs.md`. Next: the advisor agent's review of the final head, then his go. Step
+2.3 is planned after this merges.
 
 **The foundation, 2.2: the toolchain [2026-11-10 to 11-13, MERGED]** — foundation-toolchain, ADR 0002's
 migration plan step 2.2 (Mustafa's decision of 2026-11-10: the second account plans and builds steps 2.1 and 2.2 now).
