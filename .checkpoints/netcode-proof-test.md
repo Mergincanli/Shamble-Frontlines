@@ -21,12 +21,13 @@ CI GREEN, THE ADVISOR'S HEAD REVIEW RUNS; BRAWL-1's PLAN REVIEW RUNS.**
     the card, u4r-f3-review-full.md, the infra notes and the BRAWL-1 advisor's notes then in progress.
   - Pushed. CI green: gate run 43654541605 (jobs gate and smoke) and toolchain run 43654541555.
   - **Running:** the advisor's head review, workflow wf_a90fed9f-b0b (task whqq6el9y), notes advisor-u4r-f3-head.md.
-- **When the head review returns:**
-  1. Run u4r_f3_head_review_full.py (ready).
-  2. Read its findings of Medium or higher in full.
-  3. On APPROVE, U4r-F3 closes: set task #68 completed and add u4r-report.md's F3 entry (done at 493b3d7; the size 157/34;
-     the evidence 25/25; infra APPROVE WITH FINDINGS; the follow-ups INF-F3-1 and INF-F1-3 at the runner's next change).
-  4. On REVISE, follow its findings.
+- **U4r-F3 IS CLOSED at 493b3d7.** The advisor APPROVES the pushed head (advisor-u4r-f3-head-full.md, 66 lines, sha256
+  918df211…; 15 checks; findings ADV-F3H-1, INF-F3-1 and INF-F3-2, all Low).
+  - Both readings of the conditions are accepted, and the size (157/34) is accepted.
+  - u4r-report.md carries the F3 entry, and the check.mjs follow-up now also carries INF-F1-3, INF-F3-1 and ADV-F3H-1.
+  - Task #68 is completed.
+  - The re-run sets run on c-u4r-runs.mjs 99dd070e at BRAWL-1's commit.
+  - /dev/shm/u4r-f3 is left in place: a few MB, and rm is denied.
 - **BRAWL-1's PLAN: APPROVE WITH CONDITIONS 1-18** (advisor-brawl1-plan-full.md, 118 lines, sha256 a7e68b90…, written
   word for word by brawl1_plan_review_full.py; workflow wf_533068a9-b2b).
   - **Its four Mediums, read in full:**

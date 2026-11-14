@@ -180,18 +180,38 @@ advisor-u4r-r2-full.md:32).
   - ADV-F2H-1: the stagings ran on harness.mjs sha256 99f583a2 (sources.log). The kept copy, sha256 d0dd4ec3, differs
     only by the NOTES re-point to .gate/u4r-f2/scratch/ (INF-F2-3), made after the run. infra-engineer's re-run used
     the original.
-- **One runner change after the P0 set** (both run scripts, c-u4r-runs.mjs and c-u4r-r2.mjs; plan first, with the
-  advisor's plan review; before the next judged set after U4r's: advisor-u4r-f2-plan-full.md, condition 8):
-  - INF-F2-1's header sentence and INF-F2-2's three comment wordings, in infra-engineer's words (u4r-f2-review-full.md;
-    advisor-u4r-f2-head-full.md, ADV-Q);
-  - INF-F1-5's untrimmed status read;
-  - RUNS-LINE (runs.txt prints each listed mark's verdict for the set's own part: advisor-u4r-sets-r1-full.md);
-  - RATES-1 (the projection's rates from these sets' whole-run bytes: the measured ratios P3 1.44, B1 1.504, P2 1.238
-    and P0 1.057; advisor-u4r-sets-r2-full.md);
-  - a printed judge-peak projection for each judge call, from the six judge points' fit (302.2 + 2.3403 x log MiB;
-    the plan names the formula: the same ruling);
-  - INF-F1-3's signal name, once check.mjs's run() returns the signal (INF-R2-5, below).
-  - It lands before BRAWL-1's re-run sets, which are now the next judged sets.
+- **U4r-F3, the one runner change, done at 493b3d7** (both run scripts, before BRAWL-1's re-run sets: the P0 ruling's
+  next step 3):
+  - **What it does:**
+    - INF-F2-1's header sentence, and INF-F2-2's three wordings with the change of words the advisor allowed (Q1 (b));
+    - INF-F1-5's untrimmed status read, in both scripts;
+    - RUNS-LINE: runs.txt prints, under each judge call that exits 0, each part and bite holding a run of that call,
+      copied from the verdict file;
+    - RATES-1: BYTES_10MIN_57 from the largest measured run per profile (P0 603.7, P2 272.9, P3 183.3, B1 291.4 MB),
+      with OTHER kept at 56 MB;
+    - the judge's projected peak (302.2 + 2.3403 x MiB, the six-point fit) printed for each call, and a set whose call
+      projects over 10,240 MiB stops before the builds.
+  - **The plan:** approved with conditions 1-10 (advisor-u4r-f3-plan-full.md). F3P-2, the Medium, put every new line in
+    judgeCall behind one guard.
+  - **The evidence:** 25 of 25 stagings PASS; the helper test (setParts equals an independent reading of all five
+    verdict files; all 19 verdicts match the one-table summary); node --check, redact-check (287 items, 0 findings) and
+    gate --no-smoke (.gate/u4r-f3/logs/).
+    - The evidence agent's summary named HEAD's copy "c5cd4d9c", which is F1's copy. sources.log records 18c1dcf6, the
+      true HEAD copy, so the evidence holds.
+    - The on-disk projection's value is proven by infra-engineer's own check (.gate/u4r-f3-review/logbytes-check.mjs,
+      INF-F3-2), with the advisor's find sums (P3 543,998,603 B; P0/bites 1,856,944,887 B).
+  - **CI:** gate run 43654541605 (gate and smoke) and toolchain run 43654541555, both green.
+  - **The reviews:**
+    - infra-engineer's one round: APPROVE WITH FINDINGS, two Lows (u4r-f3-review-full.md);
+    - the advisor's review of the head: APPROVE (advisor-u4r-f3-head-full.md).
+    - Both readings of the conditions are accepted: one guard helper used twice, and the on-disk line's "printed only"
+      ending.
+  - **Size:** 157 insertions and 34 deletions, against the planned 100/25 and the advisor's 100-130 and 20-30. That is
+    under the 250-line "well past" line; the excess is the conditions' required text.
+  - **The pre-check's projection**, carried in condition 8's words: the folder holds the recording (16,950,444 B, the
+    entry's bytes) and marks.json (372,637 B). The projection counted the recording plus three pairs' output (75,492
+    B), which goes into results/runs.txt. So the folder is 297,145 B over the projection, which is immaterial.
+  - **Its follow-ups**, on the check.mjs follow-up's list below: INF-F3-1, ADV-F3H-1 and INF-F1-3.
 - **BRAWL-1, widened (Medium; the next npt-lab lane with N2-1, before U4g's judged B1 runs and before U4 closes;
   advisor-u4r-sets-r2-full.md, finding BRAWL-1, which replaces the sets-r1 fix line):**
   - **The cause:** the brawl's walk is open loop. It closes only if every step moves its full length. A re-run command
@@ -235,7 +255,11 @@ advisor-u4r-r2-full.md:32).
 - **The check.mjs follow-up** (check.mjs's next change; before PR #40 is marked ready at the latest): SEC-U4R-R2-1,
   SEC-U4R-R2-2, TE-R2-3 (a TERM-trapping child in the real-process test), INF-R2-5 (`run()` returns the signal) and
   round 1's INF-U4R-10 (2) (a group kill after a timed call that did not exit 0) (advisor-u4r-r2-full.md:24, :52-62,
-  :87-90, :122-125; advisor-u4r-r1-full.md:17).
+  :87-90, :122-125; advisor-u4r-r1-full.md:17). It also carries three items in c-u4r-runs.mjs, since it edits
+  judgeCall's "by a signal" phrases anyway (advisor-u4r-f3-head-full.md, next step 3):
+  - INF-F1-3: both scripts name the signal;
+  - INF-F3-1: collapse whitespace in guarded()'s catch (`String(e?.message ?? e).replace(/\s+/g, " ")`);
+  - ADV-F3H-1: the RATES-1 comment reads "the builder's rates from 30 to 50 s runs (u4r-build.md:739-751)".
 - **The next npt-lab lane:** N2-1 = TE-R2-1 (the roster check in closed_checks), TE-R2-2 (the untested overflow
   refusals), RR4-L2 (bounds on a run's last tick and the bursts), RR4-L1 (a 36,000-tick manifest cap, before U4h adds its
   carry-87 entry at the latest), with round 1's EA-U4R-1's shared loop, EA-U4R-2's `Sim` type and one server
