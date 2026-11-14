@@ -400,6 +400,20 @@ advisor-u4r-r2-full.md:32).
        ruled: recorded, never counted. -2: FAIL on everyone in view.
      - Overflow resyncs 0; heals 480 per run; measured incomplete 31,346, 31,279 and 31,635.
      - Raw logs 821 MiB, against the runner's 545.3 MiB projection (1.51 times).
+   - **P2 (18:55-19:11:54 UTC, exit 0; results at 1eacb60: results/u4r/ab10f058a828/P2/; kept log
+     .gate/u4r-sets/P2-ab10f058a828.log; peak.py 1,011.4 s, 2,173.5 MiB):**
+     - -57's L1 P2 part: PASS (3 valid runs).
+     - -2's SS part: run s1 passes every check (everyone in view 1.0); s2 and s3 fail on everyone in view only (0.5875,
+       0.7295). So -17's L1 P2 part is INVALID by pre:PM-0001-2: recorded, never counted, and moved with -17's L1 P3
+       part (the ruling's Q1 (3)).
+     - **BRAWL-1's fingerprint** (brawl_fingerprint.py; .gate/u4r-sets/fingerprint-P2-ab10f058a828.log): onsets at
+       ticks 73,816 and 76,325, with every slot holding before; the others' count folded on (t - 63,736) mod 360 sits
+       at 0 for about 150 to 180 ticks and then climbs to about 45; overflow resyncs 0; very large units held in
+       0.9839 and 0.9937 of sets.
+     - **One difference from P3:** the least slot holds everyone in view on 795 of 8,220 (s2) and 842 of 5,711 (s3)
+       ticks after the onset, against P3's 4 to 50. It went to the advisor to confirm the attribution.
+     - Raw logs 778.6 MiB of .jsonl against the runner's 628.9 MiB projection (1.24 times). Measured incomplete 17,260,
+       17,089 and 17,532 of 864,000 client-ticks (2.0 %).
    - **The judge, measured apart** on one P3 run (judge-apart.sh; .gate/u4r-judge-apart/u4r-P3-0f066338dd8d-l1-p3-s1.log;
      178,922,504 B):
      - Full judging: 2.7 s and 641.1 MiB. Reading alone: 1.9 s and 426.2 MiB, so RR3-L6's read_log share is about
