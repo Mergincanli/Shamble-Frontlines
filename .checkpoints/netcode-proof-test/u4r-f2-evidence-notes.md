@@ -31,3 +31,18 @@ as advisor-u4r-f2-plan-full.md's conditions 2, 3, 4 and 5 extend them. On a rest
 - collect to .gate/u4r-f2/logs/ (+ sources.log, summary.log), then rm -rf /dev/shm/u4r-f2.
 
 ## Progress
+- prep done (main folder HEAD 14b8f10: checkpoint commits only since e0b3c7c; spikes/ unchanged). F2 working copy
+  18c1dcf6..., HEAD's c5cd4d9c...; f2-limit 4fa42fe3... (one line: RUN_LIMIT_MS 3_600_000 -> 2_000, line 142).
+  Shims cargo/git/npt-lab byte-equal to F1's (sha checked); npt-judge.cjs new (7eba9bac...). /dev/shm/u4r-f2/logs/sources.log.
+- cmp-{precheck,P0,P2,P3,B1,r2}: all PASS (9, 20, 13, 13, 13, 9 checks; logs cmp-<set>.log). P0 carries (i) and (d);
+  P3 carries (v). Precheck, P2, P3, B1, r2: argv, runs.txt/r2.txt, cargo and git calls identical masked.
+- fail-measured (ii) 7/7, fail-bites (iii) 7/7, fail-both (4 b) 6/6, fail-P3 (3 e, HEAD = F2 exit line) 3/3: PASS.
+- lim-measured (iv) 10/10 ("stopped at 2.0 s", call 2 ran, exit line), lim-bites 10/10: PASS.
+- recheck-bites-edit (vi) 5/5, recheck-bites-commit 5/5, recheck-measured-edit (control) 4/4: PASS.
+- helper: # tests 5, # pass 5, # fail 0 (exit 0): PASS.
+- realjudge (cond. 5) 11/11 PASS: judge 65acacfe..., marks 9fb5be57... checked; three calls under flock -x on the lane
+  lock, each exit 0; compare.py: for -2, -17, -57 parts/report/bites equal: True; tick16 and whole-as-lost shown in
+  both; "RESULT: ALL EQUAL". Kept: .gate/u4r-f2/real/{verdict-combined,verdict-measured,verdict-bites}.json, compare.out.
+- collect done: .gate/u4r-f2/logs/ (17 staging logs, summary.log, sources.log, edited-copies/f2-limit). The
+  `rm -rf /dev/shm/u4r-f2` was DENIED by the permission system: 66 MB left on tmpfs, not worked around; for the main
+  session. DONE otherwise.
