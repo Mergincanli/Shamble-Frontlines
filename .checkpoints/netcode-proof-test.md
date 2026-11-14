@@ -12,9 +12,30 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 02:05 UTC; read this first after a compact or a cut): copy 5 stopped by the stop rule on one
-item (tick16's after_capped false); the fourth ruling (P3-CAP, CR-ID) runs; copy 5 resumed on the independent items;
-snapshot 707cc3df… (26 files).**
+**NOW (2026-11-14 about 02:20 UTC; read this first after a compact or a cut): the fourth ruling is in (nothing for
+Mustafa, nothing blocks the merge); sent to copy 5, which finishes with r5 and section 5's end checks twice.**
+- **The fourth ruling** (wf_f276e5ae-878 returned about 02:19 UTC): **advisor-u4r-build4-full.md** (32 lines, sha256
+  9d49b484…; by script, word for word). I read it whole. (1, Low) P3-CAP option (a): `after_capped` records the run's
+  path, not a result; ruling 3 point 3's expectation now reads "after_capped as it comes"; carry 73 met at the new
+  setting (valid, -17 FAIL 2,880, 0 breaches); c-u4r-r2.mjs's tick16 expect text replaced. (2, none) CR-ID: keep the
+  run-time lookup (the brief's rule covers every id); one Low assertion (exactly one npt_room::BITES id outside the PM-
+  form); ruling 3 point 6 (1)'s exception now reads "unless its header's bite is npt-room's class-filter bite
+  (catalogue-5/owner-to-all), exempted by a bites-build contract". (3, none) both script items confirmed. Further
+  (Medium, the main session's at 7.1): carry 62 (h)'s check goes into marks.json as a **plain** check of -17's L1 P0
+  part (not `"setup": true`, no "setup: " prefix), else the tick16 and whole-as-lost bites would read INVALID; added
+  only after the record run of c-u4r-r2.mjs shows 0 on every clean short L1 P0 run; then `npt-judge --only
+  PM-0001-2,PM-0001-17` on .gate/u4r/whole-as-lost/ (the re-made one) and the record tick16 folder shows both bites
+  Shown, never INVALID; the check goes on plan §11's readings-PR list for Mustafa's go before R5.
+- **The main session's tasks from it:** carry 73's reading on the card (the post-wrap ticks resolve lost once the
+  room's overflow resync sends a full state; a bite run's after_capped records its path); 7.1's judged tick16 bite run
+  (tick_start 47,251): its overflow resyncs come to the advisor with the P0 set's verdict before -17's L1 P0 counts
+  (expected about 48 at about wrap + 60, all in the after phase); the review reads tick16d's logs, the expect text,
+  contract.rs:248-301 with the new assertion, and c-u4r-runs.mjs's live lines (not the snapshot's).
+- **Sent to copy 5** about 02:20 UTC by message (its context intact): points 1 to 3's Builder lines, then r5 and the
+  end checks twice; its report is section 6's return list if it finishes. **If cut:** SendMessage after the checks.
+
+**Earlier NOW (2026-11-14 about 02:05 UTC): copy 5 stopped by the stop rule on one item (tick16's after_capped
+false); the fourth ruling (P3-CAP, CR-ID) runs; copy 5 resumed on the independent items; snapshot 707cc3df….**
 - **Copy 5's report** (01:41-02:00 UTC; notes 1,325 lines, copied, equal; its state section :1292): item (1) done, the
   third ruling's code changes green in both builds (npt-lab bin 47 and 54, 1 ignored each; c5-3.log): mirror.rs keeps
   each client's frame at `last_acked()`; SERIES.md's baseline_age row; `burst_spacing_ns` in B1 headers; contract.rs's
