@@ -155,7 +155,13 @@ bytes and the judge's peak (over 10 GiB: P0 does not start; plan the smallest ch
   .gate/u4r-sets/P0-051995db9cea.log; raw logs .gate/netcode-proof-test/runs/u4r-P0-051995db9cea/measured/ and
   bites/).** The preconditions held: tree clean, pgrep empty, df 16,490 MiB against R 9,218.6, no other lane, and
   spikes/ unchanged since 791bc55. **About 40 minutes of runs, then two judge calls.** No commit under spikes/ until
-  it ends. **If cut:** follow item (6)'s P0 sentence and item (7) (orphans first). A set stopped by a cut is not a
+  it ends.
+  - **At 21:51 UTC, 5 of 9 runs were done:** l1-p0-s1 to -s3 (18,300 ticks each; commands 878,352; steps without one
+    0; late 0; overflow resyncs 0), bite-tick16 (**overflow resyncs 48, flagged as expected**; rewinds refused 960;
+    steps without one 3,792) and bite-client-rounding. bite-whole-as-lost was running, with pos-4cm, yaw-12bit and
+    pitch-8bit to follow. Raw logs 1,605 MiB so far; free space 14,878 MiB.
+  - **COMPACT-WAIT:** /compact was asked for at 21:29 UTC; the reminder fired at 21:51 with no /compact typed. The card
+    was refreshed and the work goes on. **If cut:** follow item (6)'s P0 sentence and item (7) (orphans first). A set stopped by a cut is not a
   result: ask the advisor before any re-run.
 - **THE CLEANS FOR R ARE DONE (the sets ruling's Q3 (B) and (C), with no lane running; one main-run.sh call each,
   lock exclusive, test guards all exit 0):**
