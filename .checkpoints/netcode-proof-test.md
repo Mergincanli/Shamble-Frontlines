@@ -46,10 +46,41 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
     u4r-f3-evidence-notes.md; harness and logs under .gate/u4r-f3/; scratch in /dev/shm/u4r-f3/.
   - the BRAWL-1 facts workflow wf_d24f7a9b-8fe (task wr6edj0nd; two readers).
   That makes 3 agents.
-- **Next for F3:** read the evidence's return.
-  - All PASS: infra-engineer's one round (from its agent file), then one commit (both scripts plus the card), push, CI,
-    and the advisor's review of the head. No set runs before that review (condition 10).
-  - A FAIL: find whether the script or the harness is at fault before any change. Any change re-runs the cmp stagings.
+- **F3's evidence: ALL PASS** (workflow wf_6ecf285f-2eb, ended about 23:32 UTC).
+  - **The run:** `node harness.mjs run all` exit 0, 25 stagings, 25 PASS. summary.log and sources.log are in
+    .gate/u4r-f3/logs/. The harness's sha256 e8516622 is the same before and after the final run.
+  - **The copies:** the stagings ran on c-u4r-runs.mjs 99dd070e and c-u4r-r2.mjs 4e007500, which equal the working
+    copies (sha256sum checked again).
+  - **The basics:** node --check 2/2; redact-check tests 10/10 and scan 287 items, 0 findings; gate --no-smoke PASS.
+  - **The helper test:**
+    - (a) setParts equals the independent python reading line for line on all five files, and all 19 verdicts match the
+      report's table;
+    - (b) the six fit points hold, and the boundary sits between 4,246 and 4,247 MiB;
+    - (c) the projections hold;
+    - (d) the untrimmed reading gives "reads:  M spikes/…".
+  - **The stagings:**
+    - cmp-P3, -B1, -P2, -P0, -precheck and -r2;
+    - fail-P3, fail-P0-measured, fail-P0-bites and fail-both, each with HEAD's exit lines word for word;
+    - lim-P0 and lim-P0-bites;
+    - four parts-unreadable cases (one error line each; on P0 the measured parts stay);
+    - big-plan (stops before the builds, nothing made);
+    - recheck-P3, -P0-measured, -P0-bites and -r2.
+  - **The deviations, recorded:**
+    - The disk projection lines' figures change by RATES-1, as planned, and the harness checks them.
+    - One harness check was narrowed in the trial run, before the final run.
+    - The extra stagings are lim-P0-bites, recheck-P0-bites and the HEAD contrasts.
+    - The on-disk projection line is shown only on tiny staged logs. Its over-the-line wording is covered by helper (b)
+      alone.
+  - **One slip in the agent's own text:** its return and notes give HEAD's c-u4r-runs.mjs as "c5cd4d9c…".
+    sources.log:5 records 18c1dcf6…, and `git show HEAD:…` gives 18c1dcf6…, so the slip is in the summary only.
+  - **Leftovers:** /dev/shm/u4r-f3 holds a few MB.
+- **Running: infra-engineer's one round** (workflow wf_f1a61ab6-984, task wnmdsg7df; from its agent file), notes
+  u4r-f3-review-infra.md. When it returns, run u4r_f3_review_full.py (ready). Then:
+  1. one commit (both scripts, unchanged since the stagings, plus the card);
+  2. push;
+  3. CI;
+  4. the advisor's review of the head.
+  No set runs before that review (condition 10). Any wording fix after the stagings re-runs the cmp stagings.
 - **For BRAWL-1's disk plan (condition 7):** the runner's new start figures are P3 524.4, P2 780.8 and P0 3,614.6 MiB,
   each plus the 4,096 MiB floor, not the measured 519 / 779 / 3,248.
 - **BRAWL-1's plan is WITH THE ADVISOR** (about 23:50 UTC): brawl1-plan.md, sections 1-13, choices Q1-Q8.

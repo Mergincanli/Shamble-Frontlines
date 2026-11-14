@@ -14,3 +14,10 @@
 6. Verdict.
 
 ## Checks (a line each as I go)
+- C1 read: plan (13 sections, Q1-Q8); sets-r2 (BRAWL-1 Fix a-d, steps 4-6); r2 (item 18, N2-1, TE-R2-1/2, RR4-L1/2);
+  r1 (EA-U4R-1/-2, RR3-L2 (a)); build1 point 7 (R16 is a brief facts row: "npt-client exposes no decoded record";
+  point 7 routes U6 to "an npt-client read item (R16) or U4g's Interp"; no rule bars a pub item, but r1 said
+  engine-architect rejoins when a pub item / dependency / seam change comes); facts-full (A1-A9, B).
+- C1a build1 line 14: "A SHA-256 failure there means that unit re-pins, never a retry" (det-u4 at every merge touching
+  the scenario path) vs INF-U4R-1 "a re-pin without a ruling is not allowed: a mismatch comes to me whole". Both stand:
+  the unit re-pins, but on a ruling. Q3 asks for that ruling up front.

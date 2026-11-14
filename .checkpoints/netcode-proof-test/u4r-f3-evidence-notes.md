@@ -36,3 +36,31 @@ read this file, check /dev/shm/u4r-f3/ and .gate/u4r-f3/logs/, continue at the f
   final run (ADV-F2H-1).
 
 ## Progress
+- Harness written (.gate/u4r-f3/harness/: harness.mjs; shims git/cargo/npt-lab byte-equal to F2's, npt-judge adapted);
+  scratch expected_parts.py (its counts on the five files: P3 3/6/0, B1 4/9/0, P2 3/4/0, P0 3/2/0, P0 bites 0/0/6, as
+  condition 6 (c)) and u4r-f3-helpers.test.mjs. prep done (HEAD 993a5ec; f3 copies = working copies 99dd070e /
+  4e007500; fixtures = committed files); edited copies by Edit: head-limit, f3-limit (RUN_LIMIT_MS 2_000), f3-big (P0
+  1_450_000_000).
+- Trial run (not the record): 23 stagings, 22 PASS; cmp-precheck FAILED one check: the HARNESS was at fault (its "no
+  judge line" check grepped /judge/ across runs.txt, which HEAD's own marks.json head line contains: "the judge read
+  those copies"); fixed in the harness to look for judge projection, judge and parts lines only; then 23/23 PASS.
+- Found (not a failure): the cmp's runs.txt also differs from HEAD's in the disk projection's "projected <n> MiB"
+  figure (RATES-1: P3 360 -> 524, B1 545 -> 834, P2 629 -> 781, P0 3073 -> 3615), a planned change the brief's list of
+  differences leaves out. The harness checks it against its own figure from condition 7's rates, not masked.
+- Harness settled; trial logs cleared (rm of /dev/shm/u4r-f3/{logs,recs,stage,helper}).
+- FINAL RUN (2026-11-14 23:31 UTC), harness.mjs sha256 e8516622... (unchanged before and after; never edited since):
+  25 stagings, 25 PASS, 0 FAIL (`node harness.mjs run all` exit 0). Scripts run: f3 99dd070e... / 4e007500... (= the
+  main folder's working copies), head c5cd4d9c... / 94564f8c...
+  - basics-check 2/2 (node --check both); basics-redact 2/2 (tests 10/10; scan "287 item(s) checked, 0 finding(s)");
+    basics-gate 1/1 (GATE PASS, 5a skipped: --no-smoke; base origin/main 4d21c1a).
+  - helper 2/2 (node --test: 6 tests, 6 pass): (a) setParts = python3 -I reading on all five files with the counts;
+    19 part/bite verdicts match u4r-report.md's one table; (b) six points within 0.1, 4,246 room / 4,247 over;
+    (c) 524.4 / 833.7 / 780.8 / 3,614.6 MiB, each >= measured; P0 calls 1,727.2 / 1,887.4; (d) "reads:  M spikes/...".
+  - cmp-P3 16/16, cmp-B1 16/16, cmp-P2 16/16, cmp-P0 17/17, cmp-precheck 11/11, cmp-r2 10/10.
+  - fail-P3 9/9, fail-P0-measured 9/9, fail-P0-bites 9/9, fail-both 9/9, lim-P0 15/15, lim-P0-bites 15/15.
+  - parts-P3-notjson 10/10, parts-P3-empty 10/10, parts-P0-bites-notjson 12/12, parts-P0-bites-empty 12/12.
+  - big-plan 9/9 (bites call 4,308.7 MiB -> 10,386 MiB over; measured 4,148.5 -> 10,011 room; no cargo, no folders).
+  - recheck-P3 9/9, recheck-P0-measured 9/9, recheck-P0-bites 9/9, recheck-r2 7/7 (F3 quotes " M ..."; HEAD's "M ...").
+- shas then collect done: .gate/u4r-f3/logs/ (25 staging logs, summary.log, sources.log, ran-scripts.txt,
+  edited-copies/{head-limit,f3-limit,f3-big}). /dev/shm/u4r-f3 left in place (stage folders; the main session may
+  remove it). DONE.
