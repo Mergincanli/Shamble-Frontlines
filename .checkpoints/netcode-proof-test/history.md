@@ -2035,3 +2035,52 @@ From "Next steps, in order" (as it was):
     UTC); `git diff --stat 013f7c3 HEAD` on it is empty, so nobody changed it since.
   - The packet that needs it: U4r's review (u4r-packet.json). The build is judged against this ruling: its conditions
     L1 to L6 and the U4R-Q rulings, which the build and carries 86 to 88 answer to.
+
+## Decision: Mustafa, 2026-11-14 about 11:07 UTC, after his /compact (SIZE-U4R, SIZE-CHECK, /compact, main)
+- **Mustafa, 2026-11-14 about 11:07 UTC, after his /compact (verbatim):** "You were just compacted to cut usage. Read
+  the resume card in .checkpoints/netcode-proof-test.md first and continue from its next steps. Restart the saver. Do
+  not redo finished work.
+  My words of 2026-11-14.
+  1. SIZE-U4R: (a). The fix pass as your advisor ruled it in advisor-u4r-r1-full.md: the 10 Mediums and the small Lows
+     in the same files. Your reports of this morning said "Decisions needed: none", but that ruling's "For Mustafa" asks
+     me this question, and the card does not carry it. Put it on the card and in history.md with this answer. When the
+     fix pass is done, tell me in one line how many lines U4r has then.
+  2. SIZE-CHECK from now on. My rule of 2026-11-10 was not applied to U4r. Check a unit's size at every snapshot and
+     write it on the card beside its planned size. "Well past its plan" means more than twice the plan. Where the plan
+     gives only a size letter, take what earlier units of that letter came to (M: about 3,000 lines). When a unit passes
+     that, stop and tell me in three lines, as the rule says.
+  3. Do not wait for my /compact. This morning the work stood still from about 08:31 UTC until this message. Ask me as
+     before. If I have not typed /compact within 20 minutes of your asking, refresh the card and carry on: the system
+     compacts the chat by itself, and after that you read the card first.
+  4. Main is now 4460ef5b8d6dc8566b29c15ded75c6f0c8be386b: PR #52 is merged (foundation step 2.3's first docs pass,
+     eight files under docs/, no code and no kit, gate or CI file). Do not merge it in now. Take main in when main
+     changes code, CI or rules, and once before PR #40 is marked ready.
+  Record these words in history.md under my decisions."
+  - Read as (the main session):
+    - SIZE-U4R (a): the fix pass as the advisor's ruling on round 1 rules it (advisor-u4r-r1-full.md, "The fix pass, in
+      order": FP-0 to FP-9, the 10 Mediums and the small Lows in the same files), not option (b). The question
+      (advisor-u4r-r1-full.md:48-52) goes on the card with this answer; the card's ruling block had said "Nothing for
+      Mustafa beyond the report's plain story", which missed it, and the main session's reports of the morning said
+      "Decisions needed: none". When the fix pass is done (its snapshot cut), one line to him: how many lines U4r has
+      then, counted as the ruling counted its about 7,600 (lines added by the snapshot's patch on 2fbec77: into existing
+      files plus the new files' lines).
+    - SIZE-CHECK, from now on: at every snapshot of a unit the main session counts the unit's lines that way and writes
+      them on the card beside its planned size. "Well past its plan" is more than twice the plan. Where the plan gives
+      only a size letter, the plan is what earlier units of that letter came to: M about 3,000 lines (his figure; U4c
+      3,130 and U4j 2,860), so an M unit is past at more than 6,000. For another letter the main session writes on the
+      card, before the unit's first snapshot, what earlier units of that letter came to, with their sources. When a unit
+      passes that line: stop and tell him in three lines (what grew, why, and the cheaper option), as his rule of
+      2026-11-10 says (history.md:398-399). U4r is past: 7,568 lines at snapshot 572c4f69 (6,282 in 13 new files, 1,286
+      inserted into 13 files; the ruling's about 7,600) for M; his SIZE-U4R answer (a) covers its fix pass, and its
+      count still goes on the card at each snapshot.
+    - COMPACT-WAIT (the main session's label for his item 3): the main session still asks him to type /compact when the
+      chat is at 35 to 40 % of its size, after refreshing the card (USAGE-SAVINGS (a)), but never waits for it: the work
+      goes on. The ask's time goes on the card, and a one-time reminder into this session is set for 20 minutes after
+      the ask, so a turn that ends after the ask cannot stand still. If he has not typed /compact by then, the card is
+      refreshed and the work carries on; the system then compacts the chat by itself, and after that the card is read
+      first, as after his /compact.
+    - MAIN-52 (the main session's label for his item 4): main is 4460ef5 (PR #52 merged: foundation step 2.3's first
+      docs pass, eight files under docs/, no code and no kit, gate or CI file). It is not merged into this branch now.
+      Main is merged in when main changes code, CI or rules (the kit, gate or CI files, a CLAUDE.md, .claude/ or
+      .github/), and once before PR #40 is marked ready; each snapshot's card update looks at what main's new commits
+      change. The card's Base line says so.

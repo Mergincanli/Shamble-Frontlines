@@ -3,16 +3,39 @@
   (`.checkpoints/netcode-proof-test/plan.md`, revision 3.3; approved by the advisor and Mustafa, 2026-11-06) · verdict:
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
-  **Base:** main, last merged in at bfda3cd (main 2aa5e9c, PRs #50 and #51, the legacy game into legacy/)
-- **Last update:** 2026-11-13 about 21:00 UTC (U4r's build: copy 1 ended at its context limit; copy 2 and the
-  advisor's rulings next; the NOW block below)
+  **Base:** main, last merged in at 7685b2b (main 4d21c1a, PR #48, the toolchain). Main is now 4460ef5 (PR #52, eight
+  files under docs/ only), **not merged in** (MAIN-52, Mustafa 2026-11-14: take main in when main changes code, CI or
+  rules, and once before PR #40 is marked ready)
+- **Last update:** 2026-11-14 about 11:25 UTC (Mustafa's SIZE-U4R answer (a); U4r's fix pass starts; the NOW block
+  below)
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 08:32 UTC; read this first after a compact or a cut): U4r's round-1 RULING IS IN
+**NOW (2026-11-14 about 11:25 UTC; read this first after a compact or a cut): Mustafa answered SIZE-U4R with (a)
+at 11:07 UTC; U4r's fix pass starts.** His words of today are history.md's last entry (words_1114.py, word for word).
+- **SIZE-U4R** (the round-1 ruling's question to him, advisor-u4r-r1-full.md:48-52, which the 08:32 block below
+  missed: it said "Nothing for Mustafa"): U4r grew well past its plan (M). (a) the fix pass as ruled: the 10 Mediums
+  plus the small Lows in the same files; (b) cheaper: the Mediums, NC-U4R-3 and the security Lows only. **His answer:
+  (a).** When the fix pass's snapshot is cut: **one line to him, U4r's lines then.**
+- **SIZE-CHECK** (his item 2: at every snapshot, the unit's lines on the card beside its plan; past = more than twice
+  the plan; a size letter = what earlier units of it came to, M about 3,000): **U4r, planned M (about 3,000 lines:
+  U4c 3,130, U4j 2,860; past above 6,000): 7,568 lines at snapshot 572c4f69** (6,282 in 13 new files, 1,286 inserted
+  into 13 files, 96 removed; `git apply --numstat` on wip/u4r.patch). Past; his (a) covers the fix pass.
+- **COMPACT-WAIT** (his item 3): ask for /compact as before (35-40 %, after refreshing the card) and never wait: set a
+  one-time reminder (send_later, 20 minutes) at the ask; no /compact by then → refresh the card and carry on.
+- **The fix pass's ids, corrected:** the ruling's 11 items are item 1 (copy 6's rules), item 2 FP-0 (the main
+  session's runner edit), items 3-11 FP-1 to FP-9. Where the blocks below say "FP-1 to FP-11", read FP-0 to FP-9.
+- **Next, in order:** (1) FP-0 by the main session (u4r-run.sh :63, :68; main-run.sh :38, :43; a .diff beside each
+  in INF2-4's form; `bash -n` prints nothing); (2) read every round-1 Medium in full (u4r-review-r1-full.md); (3) copy
+  6: enable the check-in; a fresh copy in u4r-copy5-prompt.md's form (the first prompt verbatim, checked by script
+  against the scratchpad's u4r-launch-prompt.txt), its resume part with notes 1,586 lines, snapshot 572c4f69…, the
+  ruling's items 1 and 3-11 word for word by script; (4) on its return: snapshot, SIZE-CHECK, the one line to Mustafa;
+  the round-2 packet by script on the diff from 572c4f69; (5) round 2 (five seats, two batches); (6) the report.
+
+**Earlier NOW (2026-11-14 about 08:32 UTC): U4r's round-1 RULING IS IN
 (advisor-u4r-r1-full.md, 316 lines, sha256 7b552e8c…, written by script word for word): 50 findings, 45 fix now, 5
 follow-ups, none Critical or High; an 11-item fix pass (FP-1 to FP-11); round 2 = five seats on what changed (batch 1
 netcode, security, test; batch 2 rust, infra). Nothing for Mustafa beyond the report's plain story.**
@@ -1280,6 +1303,14 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
 
 **Rules in force** (his words verbatim in history.md "Decisions taken" unless marked; from 2026-11-12 on, each
 decision is appended at history.md's end under its own heading "## Decision: …", so no cited line moves)
+- **Mustafa, 2026-11-14** (history.md, "## Decision: Mustafa, 2026-11-14 about 11:07 UTC"; recorded by words_1114.py):
+  SIZE-U4R (a): U4r's fix pass as the advisor ruled it; one line with U4r's lines when it is done. SIZE-CHECK from now
+  on: at every snapshot, the unit's size on the card beside its planned size; "well past its plan" = more than twice
+  the plan; a size letter alone = what earlier units of that letter came to (M: about 3,000 lines); past → stop and
+  tell him in three lines (what grew, why, the cheaper option). /compact: ask as before, never wait; if he has not
+  typed it within 20 minutes of the ask, refresh the card and carry on (the system compacts by itself; then read the
+  card first). Main 4460ef5 (PR #52, docs): not merged in now; take main in when main changes code, CI or rules, and
+  once before PR #40 is marked ready.
 - **Mustafa, 2026-11-13** (history.md, "## Decision: Mustafa, 2026-11-13 about 11:31 UTC"; recorded by words_1113.py):
   CHECK-IN: while agents run, one check-in scheduled about every two hours; a check-in only looks whether a cut stopped
   something, restores and resumes it by the card as SPEND-LIMIT (a) says, and ends; if it cannot be scheduled, tell
