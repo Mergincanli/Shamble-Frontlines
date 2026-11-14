@@ -69,5 +69,25 @@
 - C13 disk: shared target measured full 8.2G (u4r-disk-plan.md:12: debug 7.7G); 13,225 - 8,397 = ~4.8 GiB, but
   plan's own "about 9 GiB" gives 3.9 GiB (< floor). Plan's "4.2" is my sets-r2 arithmetic mixing units. Rule 6:
   4 GB before wasm32/release builds, 2 GB others. Thin margin either way.
+- C15 crates unchanged since faf42aeb (git diff --stat faf42aeb034c HEAD -- spikes/netcode-proof/crates: empty), so
+  results/u4r-precheck-30/faf42aeb034c/runs.txt "## pair clean" (wall 192.8 s; record 127.5 s) is a valid "before".
+- C16 manifests read: det SS-P2-s1 5b79abb2 16,937,652; ES-P3-s2 fad8f67d 16,929,501 (ES scene, first_tick 1,000,000);
+  precheck SS-P0-s4 6933b56a 16,950,444. Re-pin moves only bytes+sha256.
+- C17 npt-sim pub: ticks_for_ms, ticks_for_ms_at (lib.rs:34-38) -> test lengths via npt-sim (carry 39). CMD_CATCHUP
+  is npt-room's; --lead cap 8 (scenario.rs:1291). npt-bots deps include npt-sim (normal): an in-crate #[cfg(test)]
+  module can host both tests, so npt-bots needs no pub item (smaller surface than pub next_command; EA-U4R-5 is U6's).
+- C18 wall health 500, damage 1/hit, down 10 s (world.rs:111-113, :1602-1605): pins at the wall likely self-heal when
+  shot down; still Medium-low, constants fix is free.
+- C19 self-note: one stray no-op shell call used a heredoc into /dev/null (no file written, nothing changed). Recorded
+  for honesty; my limits say Write/Edit only for files, and none was written that way.
 - C14 compression measured (python zlib-6 in memory, P3 s2 181.4 MB -> 51.2 MB): 3.55x (lab 4.17, room 3.04,
   client 2.15). Draft's "5-10x, about 1 GiB" is wrong: about 2.1 GiB of archives for 7.4 GiB.
+
+## Verdict (written before the StructuredOutput)
+APPROVE WITH CONDITIONS 1-18 (no Critical or High). Findings: BP-1 Medium (run_leg proof gap), BP-2 Medium (wall
+pin + stuck print), BP-3 Medium (sim-only test: zero-age feed, no B1 record), BP-4 Medium (merge step lacks det-u4,
+build ruling 1), BP-5 Low (engine-architect missing; pub next_command), BP-6..BP-10 Low (case-3 digits; -57 wording;
+disk arithmetic; draft ratio; names/rows). Mine: ADV-BP-1 (N2-1 "all four"), ADV-BP-2 (sets-r2 "4.2 GiB").
+Q1 (a) with bounds R_IN >= 1,300, R_OUT in [R_IN+100, 1,500]; Q2 (a); Q3 (a) with conditions; Q4 (a); Q5 (a);
+Q6 (a) conformance only; Q7 (a) now, recommend (c) + the old 4 GB cache; Q8 (a).
+Size: about 700 planned (450-750 with conditions); well past > 1,400. To Mustafa: KEPT-LOGS only.

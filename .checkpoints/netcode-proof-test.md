@@ -27,9 +27,46 @@ CI GREEN, THE ADVISOR'S HEAD REVIEW RUNS; BRAWL-1's PLAN REVIEW RUNS.**
   3. On APPROVE, U4r-F3 closes: set task #68 completed and add u4r-report.md's F3 entry (done at 493b3d7; the size 157/34;
      the evidence 25/25; infra APPROVE WITH FINDINGS; the follow-ups INF-F3-1 and INF-F1-3 at the runner's next change).
   4. On REVISE, follow its findings.
-- **BRAWL-1's plan review is still running:** wf_533068a9-b2b (task wr3evnp7j), notes advisor-brawl1-plan.md. When it
-  returns, run brawl1_plan_review_full.py (ready). If Mustafa's KEPT-LOGS question comes back from it, it goes to him
-  under "Decisions needed" in plain words.
+- **BRAWL-1's PLAN: APPROVE WITH CONDITIONS 1-18** (advisor-brawl1-plan-full.md, 118 lines, sha256 a7e68b90…, written
+  word for word by brawl1_plan_review_full.py; workflow wf_533068a9-b2b).
+  - **Its four Mediums, read in full:**
+    - BP-1: run_leg's half of the refactors needs its own proof, condition 6: the clean pre-check pair at the old pin,
+      diffed against faf42aeb's runs.txt "## pair clean", and the precheck tests' --nocapture output, diffed before and
+      after Part 1.
+    - BP-2: R_IN of at least 1,300 cm, because the wall stand-in's reach is 1,260 cm; R_OUT from R_IN + 100 to 1,500 cm;
+      the stuck print uses a 100 cm square over 300 commands (conditions 1-2).
+    - BP-3: an 8-step delayed position feed; a printed-only B1 pattern recorded for U4g's brief; every length from
+      npt_sim::ticks_for_ms; World::new(scene, seed, 63_736) (condition 3).
+    - BP-4: the merge step in the M-list form, with one counted main-run.sh call that reproduces the new pins
+      (condition 9).
+  - **The Lows:** BP-5 to BP-10 and ADV-BP-1.
+  - **Other conditions:**
+    - npt-bots gains no pub item: the decision function is crate-private, and its tests sit in #[cfg(test)] in src/
+      (condition 4).
+    - The npt-client read item's exact form (condition 5).
+    - The re-pin of exactly three entries, after the old-pin proofs; the manifest diff touches only bytes and sha256
+      (conditions 7-8).
+    - Every written name gets a SERIES.md row (condition 10).
+    - engine-architect joins test-engineer, netcode-architect and rust-reviewer: one round in two batches of at most 3,
+      at xhigh (condition 11).
+    - TE-R2-2's case 3 in full digits (condition 12).
+    - The full sim-only test is `#[ignore = reason]`; a short copy runs, and if it takes more than 60 s it is shortened
+      (condition 13).
+    - The evidence runs are never named u4r-*; a miss stops the re-run sets (condition 14).
+    - -57's verdict or bite differences come to the advisor whole (condition 15).
+    - Disk: about 4.7 GiB free in the build phase; rule 6 is 4 GB before wasm32 or release builds, 2 GB before others
+      (condition 16).
+    - The brief goes to the advisor for a conformance check only (condition 17).
+    - The report records ADV-BP-1 and ADV-BP-2 (condition 18).
+  - **The choices:** all (a). Q1 takes condition 1's bounds, and the plan's R_IN of 1,200 cm is refused.
+  - **Size:** about 700 planned, 450-750 with the conditions. "Well past" is more than about 1,400, and past that the
+    builder stops (three lines to Mustafa).
+  - **For Mustafa:** KEPT-LOGS, in the advisor's words in "The KEPT-LOGS question" (options a, b and c; recommended (c),
+    with the old 4 GB cache named in the same rule). It goes to him now; the lane does not wait for his answer.
+  - **NEXT for BRAWL-1:**
+    1. Write the builder's brief (brawl1-brief.md), carrying every plan section and all 18 conditions.
+    2. The advisor's conformance check (condition 17).
+    3. Launch the builder copy: general-purpose, opus, xhigh, isolation worktree, building in .gate/shared-target.
 - **COMPACT-WAIT:** at about 36 % of the chat (23:50 UTC), the card refreshed. I asked Mustafa for /compact and set a
   20-minute reminder. If no /compact comes by then, carry on from this card.
 

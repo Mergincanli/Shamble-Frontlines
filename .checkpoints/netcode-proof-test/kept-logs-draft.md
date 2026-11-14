@@ -77,9 +77,16 @@ rulings are closed?
   - **What it frees:** U4r's 5,385 MiB and U2's 1,996 MiB.
   - **What is lost:** the raw logs, so those sets could no longer be judged again by hand. Their verdict files and
     runs.txt stay committed. Condition 5 already bars any re-run at those commits.
-- **(c) The same rule, with an archive first.** Each set's raw logs are compressed (zstd or gzip, about 5 to 10 times
-  smaller for JSON lines) into one file under .gate/ before the folder is removed. That keeps a re-judge possible at
-  about 1 GiB in all. It costs the compression time (minutes), and the rule must name the archive step.
+- **(c) The same rule, with an archive first.** Each set's raw logs are compressed into one file under .gate/ before the
+  folder is removed. That keeps a re-judge possible. The advisor measured about 3.55 times smaller (one P3 run, zlib-6),
+  so about 2.1 GiB of archives for the 7.4 GiB (advisor-brawl1-plan-full.md, condition 16, corrects this draft's earlier
+  "5 to 10 times"). It costs the compression time (minutes), and the rule must name the archive step.
+- **The advisor's ruling (Q7 (a)):** it goes to Mustafa now, and the lane does not wait. The advisor recommends (c), with
+  the same rule also naming the old 4 GB build cache that cargo refuses (.gate/u3c-review-target, no evidence in it).
+  The words for Mustafa are in advisor-brawl1-plan-full.md, "The KEPT-LOGS question".
+- **The build-phase figure** is corrected too (condition 16): the measured full shared target is 8.2 GiB, so about 4.7
+  GiB is free after the refill, not 4.2. Brief rule 6: 4 GB free before any wasm32 or release build, 2 GB before any
+  other.
 - **My recommendation:** (b), before BRAWL-1's build if Mustafa agrees, else before U4g.
   - The raw logs back no open ruling: U4r's and U2's results are committed and closed.
   - Condition 5 bars re-runs at those commits.
