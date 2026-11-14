@@ -39,11 +39,19 @@ then the judged sets P3, B1, P2 and P0.**
     files ("6.7GiB total"). All four guards passed: the tag stays, debug is gone, release stays, and `ls -A` lists
     .rustc_info.json, .rustdoc_fingerprint.json, CACHEDIR.TAG, doc, release, tmp and wasm32-unknown-unknown. **Free
     space went from 4,467 to 10,592 MiB.** No lane was running (pgrep empty at 17:42:15).
-- **D4 RUNS (started about 17:43 UTC):** `bash .checkpoints/netcode-proof-test/d4.sh` (background task bxx6l73i0),
-  one exclusive cache-run.sh call: the release build with -v, then r5's 15 timed runs into .gate/u4r-d4/r5/ (log
-  .gate/u4r-d4/d4.log). Then R per scene and profile, and the sets' wall time, go in u4r-report.md's item 4. **If
-  cut:** read d4.log. A D4 stopped by a cut is not a result. .gate/u4r-d4 is never overwritten (d4.sh refuses), so
-  ask the advisor before any re-run into a new folder.
+- **D4 IS DONE (17:42:44-17:49:47 UTC, exit 0; .gate/u4r-d4/d4.log; the tables in u4r-report.md's item 4, by
+  d4_table.py).**
+  - **Slowest R (ticks per second):** SS P0 69.6, P2 51.6, P3 54.7, B1 58.4; ES P3 148.0. That is 8 to 18 % below
+    r5's. P0's seed 1 matched r5's time exactly, and the later runs were slower. The cause is not separated: machine
+    noise, or the fix pass's code (r5's binary came from before it). The slower R is the one that counts.
+  - **The sets' runs:** 6,288 s = 1.75 h in all. Pre-check about 15 min, P3 17, B1 16, P2 18, P0 40, plus builds and
+    the judge.
+  - **The limit:** RUN_LIMIT_MS is 10.1 times the longest judged run (355.4 s).
+  - **Disk:** 320 MiB of logs; free space 10,267 MiB after D4.
+- **NEXT: the pre-check set, by the run procedure below:** `mkdir -p .gate/u4r-sets`, then `python3 -I
+  .checkpoints/netcode-proof-test/peak.py flock -x .gate/shared-target/.lane.lock node
+  spikes/netcode-proof/ops/runs/c-u4r-runs.mjs precheck --date 2026-11-14 > .gate/u4r-sets/precheck-<commit12>.log 2>&1`
+  in the background. Before it: this card committed and pushed, pgrep empty, and HEAD's tree clean.
 - **Session notes:**
   - Mustafa typed /compact at about 17:32 UTC. The chat resumed from this card.
   - A fourth folder slip at about 17:34: a `cd` into the notes folder inside a compound command. I went back at once.

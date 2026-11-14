@@ -287,7 +287,46 @@ advisor-u4r-r2-full.md:32).
    - **INF-F1-1's optional header sentence:** deferred to the run scripts' next change, in the advisor's words
      (advisor-u4r-f1-head-full.md, "INF-F1-1's optional header sentence"). A comment-only push now would be a push for
      a Low.
-4. **D4:** the runner's ticks per second in the main folder's own cache, the set's wall time redone (:20). Pending.
+4. **D4:** the runner's ticks per second in the main folder's own cache, the set's wall time redone (:20). **Done**
+   (17:42:44-17:49:47 UTC, exit 0; .gate/u4r-d4/d4.log, written by d4.sh in one exclusive cache-run.sh call, with
+   CARGO_TARGET_DIR unset).
+   - **The build:** npt-lab's release build in the main folder's cache took 17.64 s. Its Compiling lines name
+     /home/user/Shamble-Frontlines/spikes/netcode-proof/crates/….
+   - **The runs:** r5's 15 timed runs, unchanged except for the binary's path, --commit (514a3c7, whose spikes/ equals
+     f1f131b's) and --out. Each exited 0, and together they wrote 320 MiB of logs. R is ticks run divided by `time`'s
+     real seconds (d4_table.py).
+
+   | Scene, profile | Seed 1 | Seed 2 | Seed 3 | Slowest kept (ticks per second) | r5's slowest |
+   |---|---|---|---|---|---|
+   | SS P0 | 1,800 / 22.60 s = 79.7 | 1,800 / 25.85 s = 69.6 | 1,800 / 25.86 s = 69.6 | **69.6** | 79.6 |
+   | SS P2 | 1,833 / 32.50 s = 56.4 | 1,833 / 33.81 s = 54.2 | 1,834 / 35.55 s = 51.6 | **51.6** | 63.1 |
+   | SS P3 | 1,835 / 33.54 s = 54.7 | 1,834 / 33.41 s = 54.9 | 1,835 / 32.76 s = 56.0 | **54.7** | 60.1 |
+   | SS B1 | 1,833 / 30.50 s = 60.1 | 1,833 / 31.36 s = 58.4 | 1,834 / 31.05 s = 59.1 | **58.4** | 67.1 |
+   | ES P3 | 1,835 / 11.95 s = 153.5 | 1,835 / 12.30 s = 149.2 | 1,835 / 12.40 s = 148.0 | **148.0** | 161.6 |
+
+   - **Slower than r5, by 8 to 18 %.** P0's seed 1 ran at r5's speed (22.60 s against r5's 22.61 s). The runs after
+     it were slower. The load average was 0.11 at the start and 1.00 at the end, which is the run itself. The binaries
+     differ too: r5's was built from 2fbec77 plus copy 5's uncommitted changes, before the fix pass, and D4's from
+     f1f131b's tree. This measurement does not separate the two causes, and the slower R is the one that counts.
+   - **7.3's estimate, redone at D4's slowest R:** each judged run is 18,335 ticks (300 + 18,000 + about 35). P0 now
+     has six bites, since whole-as-lost joined -17's.
+
+   | Item | Runs | Wall s at the slowest R |
+   |---|---|---|
+   | -17 measured (also -57's), P0 x 3 seeds | 3 | 790.1 |
+   | P2 x 3 | 3 | 1,066.3 |
+   | P3 x 3 | 3 | 1,005.3 |
+   | B1 x 3 | 3 | 941.2 |
+   | -17's bites (tick16, client-rounding, whole-as-lost) and -57's (pos-4cm, yaw-12bit, pitch-8bit), P0 | 6 | 1,580.2 |
+   | -30 pre-check's recording (SS P0 seed 4, 9,000 ticks, --logs 0), at P0's R (upper bound) | 1 | 129.3 |
+   | -30 pre-check, 3 pairs x 2 legs x 9,000 ticks, at P0's R (upper bound) | 6 | 775.6 |
+   | **Total** | | **6,288.0 s = 104.8 min = 1.75 h** (r5: 5,240.9 s = 1.46 h) |
+
+   - **Per set (runs only; the builds and the judge come on top):** pre-check about 15 min, P3 about 17, B1 about 16,
+     P2 about 18, P0 about 40.
+   - **The limit:** the longest judged run at the slowest R is 355.4 s. RUN_LIMIT_MS (3,600 s) is 10.1 times that.
+     The code's comment says "about 12 times" from r5's figure. The margin is still ample, and it is re-checked
+     against the judge's measured time before the P0 set (step 17).
 5. **The disk plan**, in writing: 4,681 MiB free; kept logs of about 162 + 16 + 360 + 545 + 629 + 3,020 MiB plus the
    4 GiB floor and builds leave it about 4.1 GiB short; space only from the approved part-cleans; never delete a log;
    if P0 still cannot fit, it goes to Mustafa under Decisions needed (:21). **Done:** u4r-disk-plan.md, written before
