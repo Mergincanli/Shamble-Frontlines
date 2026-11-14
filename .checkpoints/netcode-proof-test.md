@@ -14,8 +14,28 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 11:25 UTC; read this first after a compact or a cut): Mustafa answered SIZE-U4R with (a)
-at 11:07 UTC; U4r's fix pass starts.** His words of today are history.md's last entry (words_1114.py, word for word).
+**NOW (2026-11-14 about 11:20 UTC; read this first after a compact or a cut): Mustafa answered SIZE-U4R with (a)
+at 11:07 UTC; U4r's fix pass runs (copy 6).** His words of today are history.md's last entry (words_1114.py, word for
+word).
+- **Done since:** FP-0 (11:15 UTC, the main session): u4r-run.sh and main-run.sh read free space in bytes and stop
+  below exactly 4 GiB, log `free <n> MiB`; diffs beside them (u4r-run.sh.inf-u4r-4.diff, main-run.sh.inf-u4r-4.diff,
+  by fp0_runner_diffs.py: three ruled lines each, `bash -n` clean); u4r-run.sh's sha256 is now **6efb9157…**. Every
+  round-1 Medium read in full (11:18): they match the ruling's items; none moves the judge, a mark or a pass bar. The
+  worktree's diff checked equal to 572c4f69 (11:20); notes 1,586 lines, equal. Free 4,784 MiB.
+- **Copy 6** (the fix pass): prompt **u4r-copy6-prompt.md** (sha256 13c555b2…, 27,362 characters; built by
+  u4r_copy6_prompt.py: the launch prompt checked equal, the resume part, the ruling's lines 5-17 copied word for word),
+  general-purpose, opus, xhigh, background, no isolation (the worktree
+  /home/user/Shamble-Frontlines/.claude/worktrees/agent-a11e2354169f39acf exists). **Launched about 11:21 UTC as
+  agent a2cf82539d5d40483** (its short prompt names the file and its sha256, T4 item 1 and the folder rule).
+  **If cut:** resume it by SendMessage (its transcript is kept); if it ended at its context limit, a fresh copy from
+  u4r-copy6-prompt.md's form with its resume part brought up to date. **On its report:** read it in full; snapshot
+  (worktree_patch.py, then `git apply --check` and `cmp` on the notes); SIZE-CHECK on the card and the one line to
+  Mustafa; then round 2.
+- **The check-in is enabled** (11:16 UTC; next 12:34). **The saver runs as bxlww5izu** (since 11:12 UTC, after
+  e366a80); its window ends about 13:02: restart it then.
+- **A third folder slip** (11:14 UTC): a `cd .checkpoints/netcode-proof-test && …` moved the session's folder into
+  the notes folder (inside the main folder, not a worktree); returned to the main folder at once. Use absolute paths or
+  a subshell.
 - **SIZE-U4R** (the round-1 ruling's question to him, advisor-u4r-r1-full.md:48-52, which the 08:32 block below
   missed: it said "Nothing for Mustafa"): U4r grew well past its plan (M). (a) the fix pass as ruled: the 10 Mediums
   plus the small Lows in the same files; (b) cheaper: the Mediums, NC-U4R-3 and the security Lows only. **His answer:

@@ -35,12 +35,12 @@ while pgrep -x cargo >/dev/null || pgrep -x rustc >/dev/null; do
   fi
   sleep 1
 done
-avail=$(df -BG --output=avail /home/user | tail -1 | tr -dc 0-9)
+avail=$(df -B1 --output=avail /home/user | tail -1 | tr -dc 0-9)
 {
   echo "lock $LOCK held exclusively at $(date -u +%T) UTC; idle after ${i} s"
-  echo "pwd $(pwd); free ${avail} GB; HEAD $(cd "$M" && git rev-parse --short HEAD)"
+  echo "pwd $(pwd); free $((avail/1048576)) MiB; HEAD $(cd "$M" && git rev-parse --short HEAD)"
 } > "$log"
-if [ "$avail" -lt 4 ]; then
+if [ "$avail" -lt $((4*1024*1024*1024)) ]; then
   echo "STOP: under 4 GB free" >> "$log"
   exit 3
 fi

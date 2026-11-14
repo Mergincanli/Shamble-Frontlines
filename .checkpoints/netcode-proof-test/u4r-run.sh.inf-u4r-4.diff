@@ -1,0 +1,20 @@
+diff --git a/.checkpoints/netcode-proof-test/u4r-run.sh b/.checkpoints/netcode-proof-test/u4r-run.sh
+index b040c7f..8678438 100644
+--- a/.checkpoints/netcode-proof-test/u4r-run.sh
++++ b/.checkpoints/netcode-proof-test/u4r-run.sh
+@@ -60,12 +60,12 @@ while pgrep -x cargo >/dev/null || pgrep -x rustc >/dev/null; do
+   fi
+   sleep 1
+ done
+-avail=$(df -BG --output=avail /home/user | tail -1 | tr -dc 0-9)
++avail=$(df -B1 --output=avail /home/user | tail -1 | tr -dc 0-9)
+ {
+   echo "lock $LOCK held ($mode) at $(date -u +%T) UTC; idle after ${i} s"
+-  echo "pwd $(pwd); free ${avail} GB; HEAD $(git rev-parse --short HEAD); CARGO_TARGET_DIR $CARGO_TARGET_DIR"
++  echo "pwd $(pwd); free $((avail/1048576)) MiB; HEAD $(git rev-parse --short HEAD); CARGO_TARGET_DIR $CARGO_TARGET_DIR"
+ } > "$log"
+-if [ "$avail" -lt 4 ]; then
++if [ "$avail" -lt $((4*1024*1024*1024)) ]; then
+   echo "STOP: under 4 GB free" >> "$log"
+   exit 3
+ fi
