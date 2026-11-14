@@ -6,15 +6,44 @@
   **Base:** main, last merged in at 7685b2b (main 4d21c1a, PR #48, the toolchain). Main is now 4460ef5 (PR #52, eight
   files under docs/ only), **not merged in** (MAIN-52, Mustafa 2026-11-14: take main in when main changes code, CI or
   rules, and once before PR #40 is marked ready)
-- **Last update:** 2026-11-14 about 15:42 UTC (U4r merged at 71ee13d and approved by the advisor's review of the
-  pushed head; the r2 record run next; the NOW block below)
+- **Last update:** 2026-11-14 about 17:55 UTC (U4r-F1 done at f1f131b and approved by the advisor's review of the
+  head; the disk plan written; next the part-clean, D4 and the pre-check set; the NOW block below)
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 15:42 UTC; read this first after a compact or a cut): U4r IS MERGED at 71ee13d and the
+**NOW (2026-11-14 about 17:55 UTC; read this first after a compact or a cut): U4r-F1 IS DONE AND APPROVED. The
+advisor's review of the pushed head f1f131b says APPROVE (advisor-u4r-f1-head-full.md, 69 lines, sha256 8a9d0704…,
+written word for word by u4r_f1_head_review_full.py). Next: the disk plan's part-clean, then D4, then the pre-check set,
+then the judged sets P3, B1, P2 and P0.**
+- **Its "For Mustafa" (copied here at once):** nothing goes to him now. A heads-up: P0 needs about 4 GiB more free
+  disk than today. If the approved cache cleans do not cover it, P0 comes to him under Decisions needed (his
+  LEFTOVER-DELETE route).
+  - **INF-F1-1's header sentence:** at the run scripts' next change, in the review's own words (u4r-report.md,
+    Follow-ups); not now.
+  - **Its three Lows:** ADV-F1H-1 is fixed in the run procedure below (the mkdir and peak.py). ADV-F1H-2 and -3 are in
+    u4r-report.md's U4r-F1 entry (the judged runs, item 3, now done). No push for any of them.
+- **The disk plan is written: u4r-disk-plan.md.**
+  - **The numbers:** 4,470 MiB free at 17:33. The projections come from the runner's own functions: pre-check 16.2,
+    P3 359.9, B1 545.3, P2 628.9 and P0 3,073.3 MiB. P0 wants 7,169.3 MiB free at its start: whole-as-lost adds one
+    bite run. Also D4's 320 MiB, the release builds (up to 400) and the bin copies (up to 100).
+  - **Why a clean:** without one, after D4 no set could start (3,750 MiB is below P3's 4,456).
+  - **The clean:** the dev profile of the main folder's cache only. It holds 6,066 MiB, was last written 2026-11-12, and
+    nothing still to come uses it. The command: `bash .checkpoints/netcode-proof-test/cache-run.sh
+    .gate/u4r-sets/clean-main-dev.log cargo clean --target-dir <main cache> --profile dev :: <test guards> :: ls -A`,
+    with no lane running.
+  - **After it:** about 5,090 MiB stays free after P0. The shared target stays (check.mjs's warm cache).
+- **D4:** `bash .checkpoints/netcode-proof-test/d4.sh`, one exclusive cache-run.sh call: the release build with -v,
+  then r5's 15 timed runs into .gate/u4r-d4/r5/ (log .gate/u4r-d4/d4.log). Then R per scene and profile, and the sets'
+  wall time, go in u4r-report.md's item 4.
+- **Session notes:**
+  - Mustafa typed /compact at about 17:32 UTC. The chat resumed from this card.
+  - A fourth folder slip at about 17:34: a `cd` into the notes folder inside a compound command. I went back at once.
+    Use `( cd … && … )` or absolute paths.
+
+**Earlier NOW (2026-11-14 about 15:42 UTC): U4r IS MERGED at 71ee13d and the
 advisor APPROVES the pushed head (advisor-u4r-merge-full.md, 57 lines, sha256 40284472…, by u4r_merge_review_full.py
 word for word); next: the r2 record run (the round-2 ruling's step 11).**
 - **Its "For Mustafa" (copied here at once):** nothing to decide or do; the open Low security weakness (SEC-U4R-R2-1)
@@ -68,10 +97,14 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   procedure below) and the judged sets P3, B1, P2, then P0.
 - **THE SETS' RUN PROCEDURE (steps 16 and 17; condition 6 as INF-F1-1 corrects it; INF-F1-2):** (1) before a set:
   the card committed and pushed; `pgrep -a npt-lab; pgrep -af npt-judge` empty; HEAD's tree clean. (2) The command,
-  from the repository root, with a kept log: `flock -x .gate/shared-target/.lane.lock node
+  from the repository root, with a kept log (`mkdir -p .gate/u4r-sets` first: ADV-F1H-1): `python3 -I
+  .checkpoints/netcode-proof-test/peak.py flock -x .gate/shared-target/.lane.lock node
   spikes/netcode-proof/ops/runs/c-u4r-runs.mjs <precheck | judged --profile P> --date <date> >
-  .gate/u4r-sets/<set>-<commit12>.log 2>&1` (run in the background; condition 5's Compiling/Fresh lines are read
-  from that log at the pre-check set). (3) During a set: no commit under spikes/ (the tree hash covers results/);
+  .gate/u4r-sets/<set>-<commit12>.log 2>&1`. Run it in the background. At the pre-check set, condition 5's
+  Compiling/Fresh lines are read from that log. peak.py's last line in the log gives the call's wall time and step
+  17's peak memory: getrusage(RUSAGE_CHILDREN).ru_maxrss, the largest single process in the tree (a build's rustc,
+  npt-lab or the judge). The judge's own peak and wall time are measured apart, on one measured run's kept logs, into
+  a scratch path (step 17). (3) During a set: no commit under spikes/ (the tree hash covers results/);
   .checkpoints/ saves are fine (the saver commits through a private index). (4) After each set: commit its results/
   before the next set starts. (5) **The lock, as it really works:** Node marks the lock's descriptor close-on-exec,
   so no npt-lab or npt-judge call holds the lane lock; flock holds it only while the script lives. If the script dies
