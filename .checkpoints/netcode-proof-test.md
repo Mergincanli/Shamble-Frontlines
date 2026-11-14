@@ -78,6 +78,25 @@ bytes and the judge's peak (over 10 GiB: P0 does not start; plan the smallest ch
   - **F = 1.504** (B1). P3 is 1.440 and P2 1.238.
   - **The measured call: 2,190.9 MiB of logs, so 5.57 GiB (break-even F 2.75). The bites call: 2,431.9 MiB, so 6.16
     GiB (break-even F 2.48). Both are at most 10 GiB.** One call would have been 11.52 GiB.
+- **U4r-F2's EVIDENCE IS IN (about 21:01 UTC): ALL PASS, 17 stagings** (.gate/u4r-f2/logs/summary.log):
+  - **Unchanged or as planned:** the cmp- stagings for precheck, P0, P2, P3, B1 and r2 (P0 differs only as planned);
+  - **Failure paths:** fail-measured, fail-bites, fail-both, fail-P3, lim-measured and lim-bites (a RUN_LIMIT_MS =
+    2,000 copy, sha256 4fa42fe3…), and recheck-bites-edit, recheck-bites-commit and recheck-measured-edit (real git
+    in a /dev/shm repository);
+  - **The helper test:** 5 of 5.
+  - **realjudge, one call against two on r2's p0, tick16 and whole-as-lost:** every mark's parts[], report[] and
+    bites[] are equal; both -17 bites read shown; "RESULT: ALL EQUAL" (.gate/u4r-f2/real/).
+  - **Sources:** F2's script sha256 18c1dcf6… is the copy tested, and it equals the working copy now.
+  - The evidence agent's notes: u4r-f2-evidence-notes.md.
+  - Its Low: sh() trims the status line, as already known from F1 (INF-F1-5's later home).
+  - **Housekeeping:** its scratch helper test and compare.py were in the notes folder and never tracked. They are
+    moved to .gate/u4r-f2/scratch/ (sha256 ecfc8c84… and 56be2e1d…, unchanged), never committed. `rm -rf
+    /dev/shm/u4r-f2` (66 MB, tmpfs) was denied by the permission system, so it stays (LEFTOVER-DELETE; it goes at the
+    next restart).
+- **infra-engineer's one round runs (Q5):** workflow **wf_8a10f9e4-993** (task wm2a5diae; notes
+  u4r-f2-review-infra.md). **If cut:** `resumeFromRunId: "wf_8a10f9e4-993"`. **On return:** write it word for word
+  by script; read every Medium or higher in full; a Low never triggers a push of its own. Then one commit (the script;
+  the card), push, CI, and the advisor's review of the head, with P2's fingerprint question.
 - **R at P0's start = 4,096 + 1.504 x 3,073.3 + 500 = 9,218.6 MiB.** Free space is 8,147 MiB, so (B) (about 480
   MiB) and then (C) (7.7 GiB) are needed, done right before P0 with df on the card.
 - **The evidence agent runs:** workflow **wf_ada59e1b-2f4** (task wmg28j1r6; Opus at high effort; notes
