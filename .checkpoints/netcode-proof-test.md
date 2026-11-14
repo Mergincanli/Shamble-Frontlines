@@ -65,9 +65,19 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   --no-smoke PASS. **The evidence harness runs:** agent **a21c4927d090c1160** (its harness and the scratch helper test
   in .gate/u4r-f1/harness/, logs in .gate/u4r-f1/logs/, scratch trees on /dev/shm/u4r-f1/; notes
   u4r-f1-evidence-notes.md). **If cut:** SendMessage to it (its transcript is kept) or a fresh agent that reads its
-  notes first; the two scripts stay as edited (not committed: nothing runs from them until the commit). **Next:**
-  read its evidence; then infra-engineer's one round on the final diff and the evidence; then one commit (the two
-  scripts and the card), push, the advisor's review of the head.
+  notes first; the two scripts stay as edited (not committed: nothing runs from them until the commit). **Its
+  evidence (about 17:20 UTC): every condition PASS** (48 stagings; the helper test 9 of 9; the argv compare equal but
+  whole-as-lost's two lines; condition 1 with the shim and the real judge (exit 1 on a cut client.jsonl, line 451);
+  condition 2 on real git 18 of 18; condition 3 on both scripts, HEAD's leaving folders, F1's none; condition 4's four
+  stop lines in the 2,000 ms copy; the sleeper gone by the group kill, a control without it shows it survives). Logs:
+  .gate/u4r-f1/logs/ (summary.log, sources.log, edited-copies/); harness .gate/u4r-f1/harness/. Two Lows it noted, for
+  the reviewer: the quoted status line loses its leading space (sh() trims); a judge that prints verdicts then fails
+  to write --out puts those lines into runs.txt's one judge head line. /dev/shm/u4r-f1/ (75 MB, tmpfs) left in place:
+  its `rm -rf` was refused by the permission system, so it stays (LEFTOVER-DELETE; gone at the next container
+  restart). **infra-engineer's one round runs:** workflow **wf_9ca6c622-b4f** (task w2syzefee; notes
+  u4r-f1-review-infra.md). **If cut:** `resumeFromRunId: "wf_9ca6c622-b4f"`. **On return:** write it word for word by
+  script; read every Medium or higher in full; a Low never triggers a push of its own; then one commit (the two
+  scripts and the card), push, CI, the advisor's review of the head.
 - **U4r-F1's PLAN IS APPROVED WITH CONDITIONS (about 16:47 UTC): advisor-u4r-f1-plan-full.md** (47 lines, sha256
   13e666a0…, by u4r_f1_plan_review_full.py word for word); nothing for Mustafa. Choices: Q1 (a) one exported helper in
   c-u4r-runs.mjs imported by c-u4r-r2.mjs; Q2 (a) a non-stop npt-lab non-zero exit still throws; Q3 (a) + condition 1;

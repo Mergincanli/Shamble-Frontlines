@@ -30,3 +30,22 @@ first staging without a "done" line.
 - collect logs to .gate/u4r-f1/logs/, then rm -rf /dev/shm/u4r-f1.
 
 ## Progress
+- prep done (main folder HEAD then 24d795f; spikes/ unchanged since 7ff3823). Sources and edited copies' sha256s:
+  /dev/shm/u4r-f1/logs/sources.log (kept as .gate/u4r-f1/logs/sources.log at collect). f1-limit runs 3c7bc1e4...,
+  f1-floor runs 3c2eb8f5... r2 4c0ed845..., head-floor runs e79746ad... r2 c9c2a3a3...
+- cmp-{precheck,P0,P2,P3,B1,r2}: all PASS (logs cmp-<set>.log). r2: only calls 40 and 42 differ (--marks, --only).
+- git-{a,b,c}-{P0,r2,precheck}-{head,f1}: all 18 PASS (logs git-*.log). Note (Low, cosmetic): sh() trims the porcelain
+  line, so (b) quotes "M spikes/netcode-proof/marks/marks.json" (raw " M ...").
+- ii-{P0,precheck}-{head,f1} (with re-runs) and floor-{P0,precheck,r2}-{head-floor,f1-floor}: all 10 PASS (logs ii-*.log,
+  floor-*.log): F1 leaves no set folder and its re-run completes; HEAD leaves it and its re-run is refused.
+- lim-{run,pair,rec,judge}: first run FAILed one check each through the HARNESS's own liveness test (kill(pid, 0)
+  succeeds on a zombie: the killed sleeper waits for PID 1 to reap it); fixed to read /proc/<pid>/stat; re-run: all
+  PASS, every "stopped at 2.0 s". Added lim-control (no group kill: the sleeper outlives its parent; then the group
+  kill ends it): PASS. Logs lim-*.log; summary.log keeps both runs.
+- realjudge PASS (r2's npt-judge 65acacfe...: uncut copy exit 0; client.jsonl cut mid-line 451: exit 1 "npt-judge:
+  .../client.jsonl: line 451: not one JSON record: EOF while parsing a string at line 1 column 548"); helper PASS
+  (# tests 9, # pass 9, # fail 0); redact (extra, F1's two scripts copied) PASS: 0 findings.
+- collect done: 44 files in .gate/u4r-f1/logs/ (42 staging logs, sources.log, summary.log; the edited copies in
+  logs/edited-copies/). The `rm -rf
+  /dev/shm/u4r-f1` was DENIED by the permission system: the 75 MB scratch tree is still there, not worked around; for
+  the main session. DONE otherwise; the report went to the main session.
