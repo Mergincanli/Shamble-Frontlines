@@ -90,6 +90,15 @@ then the judged sets P3, B1, P2 and P0.**
     - The judge's time for P0 is about 70 s, far below RUN_LIMIT_MS (3,600 s).
   - **NEXT: B1 (independent of these questions), then P2, while the advisor rules on three things:** P3's -17
     INVALID, P0's judge memory, and the disk revision. No P0 before that ruling.
+  - **B1 RUNS (started 18:29:45 UTC; background task besyqqxet; kept log .gate/u4r-sets/B1-64f3307d5c7f.log).**
+    **THE ADVISOR'S RULING RUNS:** workflow **wf_01e8109f-947** (task wmqmr3esu; notes advisor-u4r-sets-r1.md),
+    asked Q1 (P3's -17 INVALID), Q2 (P0's judge memory) and Q3 (the disk revision), read-only. **If cut:**
+    `Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/u4r-sets-ruling-1-wf_01e8109f-947.js",
+    resumeFromRunId: "wf_01e8109f-947"})`. **On return:** write it word for word by script; put its "For Mustafa"
+    here at once.
+  - **Disk facts for the revision:** 26 worktrees total about 800 MiB (u4d2-build 180, copy 6 103). The shared
+    target's release, doc and wasm32 folders hold about 480 MiB, and its debug folder 7.7 GiB. .gate/u3c-review-target
+    holds 4,051 MiB (the LEFTOVER-DELETE leftover). .gate/netcode-proof-test/runs holds 2,545 MiB.
   - **Any run flagged for overflow resyncs** goes to the advisor before it counts (P0's tick16 bite run: about 48
     expected).
   - **B1's -17 and -18 verdicts** are INVALID by design: recorded, never counted.
