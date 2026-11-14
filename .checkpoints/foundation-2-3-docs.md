@@ -122,9 +122,24 @@
    43529799958, toolchain pull_request 43529799786. Consultation 11 said no further consultation is needed for this
    save. The verifier's brief updated for a1d0317 (`verifier-brief.md`).
 
+14. The verifier on a1d0317 (agent ad5b8a361fccd378c, 2026-11-14 ~00:31 UTC): FAIL. F-V1 (High): the report's clause on
+   how Mustafa was told (D&D, :181-183) claims two post-compaction updates no record holds and leaves out the recorded
+   one with the wrong premise (22:59:04, transcript line 2122, "where I first told you the advisor model"); sub-item
+   (Low): the 22:48:47 message said "If true, ..."; the first correction in the records is 23:51:05 (line 2869), after
+   a1d0317. F-V3 (Low): "round 2's 14 notes files" (9 are round 2's, 5 are round 1's skeptics' scripts) and the copies
+   list incomplete (plan.md; advisor-plan-rev1.md :60 A4 whole). Everything else held (gate; 8 scripts; 11 Fable calls;
+   every SHA, time and run id; 28 runs green; 10 findings; Appendix A; DECISIONS; cut-off: no message of his after
+   23:47:48; #40 now bd7898f, updated 22:04:59Z). Its refusals: 00:12:07 (the permission system denied a compound command
+   with `rm -rf`; route: Write tool, steps one by one, plain rm/rmdir of named files) and 00:16:46 (the guard: a loop
+   writing to a variable path; route: literal paths). Not verified by it: agents' effort as run (the transcripts record
+   the model only), consultations' content, 3 of 7 L2 logs, local smoke. `fp3-fragments-all.mjs`: 190 file versions, 29
+   files with a run of 30+ characters of his words; 60+ only in plan.md (307), fillcount.mjs (251), report-body.md (96),
+   advisor-plan-rev1.md (68, A4 whole), decisions.mjs (60); the rest are script anchors and needles, review briefs, short
+   phrases in agents' notes and the checkpoint, and the base SHA and paths (the verifier's notes hold only those).
+
 ## Current step
-The verifier on a1d0317 (a general agent on Opus 5.5 at effort max, reading main's verifier.md; brief:
-verifier-brief.md; notes verifier-1.md), until PASS.
+Fix pass 3 (the verifier's F-V1 and F-V3): consult the advisor tool (moment 2: the clause failed a second time; moment 1
+for the fix), ask the advisor agent for revision 2e, then write, check, commit, push, CI, and the verifier's re-run.
 
 ## Next steps
 1. Scripts (consultation 10's items 1 to 6 block the commit): grep every "before" string of D2 to D4 in the notes'
