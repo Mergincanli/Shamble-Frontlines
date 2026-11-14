@@ -29,7 +29,7 @@
 6. Plan revision 2.1 · 38c4bfa · the six Lows of the APPROVE of 00984ae folded.
 7. Plan revision 2.2 · 94c5c5a · advisor-tool consultation 2 (12:11:15 UTC): the old plan's Appendix B carried; main
    re-fetched (4460ef5), #40 re-read (30b7b83, 12:14:41 UTC). The advisor agent read the diff from 00984ae (asked
-   12:17:4x UTC): APPROVE 94c5c5a5aa4022a65476009001ceebbf7dd15f82 (hand-back 12:26:10 UTC, the transcript;
+   12:17:53 UTC): APPROVE 94c5c5a5aa4022a65476009001ceebbf7dd15f82 (hand-back 12:26:10 UTC, the transcript;
    advisor-plan-r3.md), with three Lows (R3-1 to R3-3) foldable without a further review.
 8. Plan revision 2.3: R3-1 to R3-3 folded (rev 2.3 note in Part 11).
 
