@@ -257,6 +257,11 @@ verifier-brief.md; notes verifier-1.md), until PASS.
 ## Running work
 - The verifier on a1d0317: agent ad5b8a361fccd378c (general-purpose, Opus 5.5, effort max), launched ~23:50 UTC;
   notes `verifier-1.md`; brief `verifier-brief.md`. Do not start another: wait for its notification.
-- The saver: bpjfne3lu (started ~23:38 UTC).
+- The saver: b3u81dqk2, started 2026-11-14 00:07 UTC with the longest timeout (2 hours, so it stops by ~02:07 UTC).
+  bpjfne3lu (started 2026-11-13 ~23:38 UTC) was stopped by its background time limit; its last saves: 58f3fee
+  (23:57:25 UTC) and 9ce5aaa ("autosave (terminated)", 2026-11-14 00:07:20 UTC).
+- Ultracode was switched on by a system message (2026-11-14 ~00:07 UTC). The repo's limits still apply: at most 3
+  agents at a time (CHECKPOINTS.md §2) and the review budget (no third round without an open Critical or High). So no
+  extra review workflow on this PR; the verifier and the advisor agent's review of the final head are the gates.
 - Done: review round 2 (wf_dcd47e10-70e, 2 of 2 reviewers and 1 of 1 skeptic returned); round 1 (wf_eb6cb5e5-3ce, 6 of 6);
   fix pass 1 (554face, CI green); fix pass 2 (8e4fe7c, CI green: 43528414752, 43528420177, 43528414776, 43528420127).
