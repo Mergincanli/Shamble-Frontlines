@@ -32,6 +32,11 @@ held for the third ruling (task w5rwxf34m, its advisor running). No builder runs
   profile per judged call, one bite run per bite id, no `--bytes`, whole-as-lost only once marks.json lists it; the B1,
   tick16 and -18 no-fallback lines built as the brief says, may change with the third ruling (tick16 and no-fallback
   not run by hand: held); (5) disk is tight (4.9 GB free; a judged P0 set needs the disk plan).
+- **Next:** on the third ruling (wf_345cc3c9-ca1, task w5rwxf34m): write it word for word by script, read it in full,
+  then copy 5 (a fresh copy from u4r-copy4-prompt.md, its resume part brought up to date: notes 1,171 lines, snapshot
+  e40449a7…, the third ruling's file) for the ruled changes, r5 and section 5's end checks twice; anything for Mustafa
+  in "Decisions needed". The saver restarted as **bpkkvrymq**'s successor **b6cyy6n9c** (01:39 UTC, after abfc108). The
+  check-in stays (next 02:34 UTC).
 
 **Earlier NOW (2026-11-14 about 01:22 UTC): a container restart at about 01:18 stopped copy 4, the third ruling and
 the saver; all resumed about 01:22; snapshot ad3631d9… (24 files).**
