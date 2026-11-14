@@ -37,8 +37,8 @@ function appendix(list, cutoff) {
     'Fable 5.2 answered every advisor-tool call ("The advisor tool"). The session\'s other entries are the harness\'s and ' +
     'its agents\': the command\'s caveat, the workflow-authoring skill (loaded with A2, 18:47:56 UTC, and again by the ' +
     'harness, 2026-11-14 00:07:21), notices that the ' +
-    'session\'s worker had restarted (19:22:24 and 22:01:23 UTC, the second after a notice that its container had ' +
-    'restarted, 22:01:22), the advisor-report skill\'s text (loaded by the session), stop-hook feedback, a reminder that ' +
+    'session\'s worker had restarted (19:22:24, 22:01:23 and 2026-11-14 08:31:08 UTC; the second after a notice that ' +
+    'its container had restarted, 22:01:22), the advisor-report skill\'s text (loaded by the session), stop-hook feedback, a reminder that ' +
     'came with review round 1\'s task notification (21:54:48 UTC), the summary that carried the session on when its ' +
     'context filled (22:54:40 UTC), and the hand-backs and task notifications of the session\'s own agents and ' +
     'background tasks, with the ' +

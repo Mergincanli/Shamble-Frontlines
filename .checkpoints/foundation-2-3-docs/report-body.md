@@ -201,11 +201,16 @@ verifier 01:04:17 (b37cdd2, after number 13).
    from the recorded messages only, each read in full and described from its own text; nothing about messages the
    records do not hold; F-V3 narrowed (no counts; the certain copies named); "asked for effort max"; the verifier's FAIL
    recorded as it happened; the same verifier resumed with a narrow brief.
-13. 2026-11-14 01:01:09, moment 5 for step 7, the verifier (before its "done" save), and moment 1 for the final edits:
-   step 7 done; revision 2f asked before writing; a keyword screen of every chat text from 22:40 UTC; no status line on
-   how Mustafa was told until the final commit; the fold pointing at sections; the appendix intro's list re-derived from
-   the scan; the saver stopped before the notes SHA; every count recomputed; nothing pushed after the final commit.
-{{C14}}
+13. 2026-11-14 01:01:09, moment 5 for step 7, the verifier (before its "done" save), moment 2 for the copies bullet (it
+   had failed a second time) and moment 1 for the final edits: step 7 done; revision 2f asked before writing; a keyword
+   screen of every chat text from 22:40 UTC; no status line on how Mustafa was told until the final commit; the fold
+   pointing at sections; the appendix intro's list re-derived from the scan; the saver stopped before the notes SHA;
+   every count recomputed; nothing pushed after the final commit.
+14. 2026-11-14 08:32:12, moment 5 for step 8 and the task, before the final commit: main still 4d21c1a; the third
+   worker-restart notice added to the appendix intro's list; this consultation's model read from its record (Fable
+   5.2; 14 calls, 14 entries); the word-level diff from 922cadf read before the commit; the placeholders, the cited
+   transcript lines, the keyword screen and the refusal scan re-run on the last tree; the checkpoint brought up to date
+   before the last notes commit.
 The gaps: step 0's "done" save had no consultation of its own (number 1 came before the step's work); steps 1, 2, 4 and
 5 were consulted after their "done" saves; step 3 had none until number 6; step 4's departures (the STATUS cut, a design
 call, moment 4; the archive lines beyond plan §6) were committed in 83c6ab6 (20:47:12) before number 4; and number 10

@@ -178,33 +178,19 @@
    stopped at 01:57:36 ("time is up"), its last autosave c4f275c (01:07:44) holding every notes change.
 
 ## Current step
-Consultation 14 (moment 5 for the task, before the final commit); then entry 14, the report re-copied and its appendix
-re-written, the last notes commit (its SHA = the header's), the header SHA, the --check runs, the deletion, the gate,
-the commit (no [skip ci]), the push, CI, the advisor agent's review, the re-scan, the PR body, ready.
+Step 8, the final commit: this checkpoint is the last notes commit (its SHA goes into the report's header).
 
 ## Next steps
-1. Scripts (consultation 10's items 1 to 6 block the commit): grep every "before" string of D2 to D4 in the notes'
-   scripts and update their expectations (fixes.mjs's Q5 text gains D3); decisions.mjs: E-STATUS first in ENTRIES,
-   blocks 4, a one-byte negative control on its quote; a new insert script for the entry (build refuses a written
-   file); report-appendix.mjs: the intro (A1, A2 and A4; the advisor-model record; the compaction summary; the list of
-   other entries checked against the scan's 28 rows: the 22:01 restart pair and the 21:54:48 reminder too), scan()
-   before writing, refusing on any problem, the cut-off as the last scanned entry's time.
-2. Report (report-body.md, then copied in): D1 (a), (c), (d) (with the clause: the session's first telling at ~22:56
-   wrongly placed the claim in an opening message; its next message corrected that); D5's items; "What changed": four
-   DECISIONS entries; round 2's table with 9 findings (RW2-F4 = R2-L2 counted once: one High, eight Lows) and the same
-   count in Outcome and here; consultations 8 (22:15:20), 9 (22:49:58), 10 (23:03:56) and any later; the done saves
-   from commit times (3f98c0b 22:04:19, 461c82b 22:19:55, ef1a7c1 22:52:48; 83c6ab6 20:47:12); every evidence row that
-   quotes script output re-run and pasted; the body's quote count up by exactly one ("Fable 5.2 advises through the
-   advisor tool." (A2) on one line); "For Mustafa" item 1 points at the correction too.
-3. The battery, the notes saved last (scripts frozen), the commit, the word-level diff 554face..fix, CI read, a
-   consultation before its "done" save.
-4. The verifier (its brief: the whole report, every claim about what ran against a record; RW2-F1 against the records;
-   the new entry's byte check and negative control; consultation 10's items 4 to 6), the saver restarted first (it
-   ends ~23:52 UTC); then step 8 (the plan §10; consultation 10's items 7 to 10: the cut-off; a re-scan path after the
-   deleting commit, from the last notes commit into the scratchpad; the advisor-call count equal to the numbered list;
-   times after 00:00 UTC date-qualified, "Last updated" and ROADMAP's date from `date -u`, the report's file name kept);
-   name D1(d)'s added clause to the advisor agent at its final-head review; the last consultation before the final
-   commit, any later one in the PR body.
+1. The header's notes SHA; the appendix re-written; the --check runs; `git rm -r` of `.checkpoints/foundation-2-3-docs*`;
+   the gate; the commit (no [skip ci]); the push; `git status` clean, no `.checkpoints/` file in the head, the diff
+   against 4d21c1a names only `docs/` paths.
+2. CI on the final head (gate with its gate and smoke jobs, toolchain; push and pull_request), read by the session.
+3. The advisor agent's review of that exact SHA (its notes in `.gate/` or its hand-back only), naming the final commit's
+   changes against F1 to F7 and F6's condition.
+4. The re-scan from a scratch copy of words.mjs (git show of the last notes commit) for any message of his after the
+   cut-off.
+5. The PR body; ready (draft false); the end message (the head SHA, the run ids, the advisor-model correction and the
+   gap, 00:46's copies claim withdrawn, Decisions needed, For Mustafa). Then stop for his go; push nothing more.
 
 ## Advisor tool consultations (his words of 2026-11-11; Fable 5.2 answered each, per the records: RW2-F1)
 1. 2026-11-13 ~20:00 Amsterdam, moment 1, before committing to the docs-pass approach: is the approach right? Changed:
@@ -304,6 +290,13 @@ the commit (no [skip ci]), the push, CI, the advisor agent's review, the re-scan
    all named), again right before the commit; no status line on the subject; the fold points at sections; the intro's
    list re-derived from the scan; the saver stopped before the notes SHA; the counts recomputed; nothing pushed after
    the final commit; a re-scan from a scratch copy of words.mjs before ready; the end message withdraws 00:46's claim.
+
+14. 2026-11-14 08:32:12 UTC, moment 5 for step 8 and the task, before the final commit: is the final tree sound after the
+   7.5-hour gap? Changed: main checked (still 4d21c1a); the third worker-restart notice (08:31:08) added to the appendix
+   intro's list; this consultation's model read from its record (Fable 5.2; 14 calls, 14 entries); the word-level diff
+   from 922cadf read before the commit; the placeholders, the cited lines' timestamps, the keyword screen (26 texts, the
+   six known) and the refusal scan (no new refusal after 00:16:46) re-run on the last tree; entry 13 gains moment 2; this
+   checkpoint brought up to date before the last notes commit.
 
 ## Refusals (guard, deny list, classifier) and the route taken
 - The session: one, by the guard, 2026-11-13 23:33:46 UTC (`git -C <notes folder> diff`: the guard wants git run from
