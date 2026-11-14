@@ -1,8 +1,8 @@
 diff --git a/spikes/netcode-proof/check.mjs b/spikes/netcode-proof/check.mjs
-index c015186..ecbec86 100644
+index c015186..461dee0 100644
 --- a/spikes/netcode-proof/check.mjs
 +++ b/spikes/netcode-proof/check.mjs
-@@ -680,14 +680,22 @@ export function unsafeProblems(files, read) {
+@@ -680,14 +680,26 @@ export function unsafeProblems(files, read) {
        if (EXCEPTION_LEVELS[crate] === "deny") {
          const name = UNSAFE_EXCEPTIONS[crate];
          if (f === `${crate}build.rs`) problems.push(`${f} is a build script in ${name}, which may have none: ${DENY_EXCEPTION_WHY}`);
@@ -20,15 +20,19 @@ index c015186..ecbec86 100644
            );
          }
        }
-+      // Carry 85 (c): no attribute in any crate whose text starts with a metavariable, so a #[path] (or an allow) built
-+      // from a macro's `meta` fragment cannot bring an unread file under a listed export's allow.
-+      for (const m of mask.matchAll(/#\s*!?\s*\[\s*\$/g)) {
-+        problems.push(`${f}:${lineAt(mask, m.index)} has an attribute whose text starts with a metavariable (\`#[$\` or \`#![$\`): a macro could build a #[path] from a \`meta\` fragment that this scan does not read`);
++      // Carry 85 (c), as advisor-u4r-r1 widened it (FP-6 item 8: SEC-U4R-5): no attribute in any crate holds a
++      // metavariable (`$`) anywhere in its text, from `#[` or `#![` to its matching `]` in the mask, so neither a #[path]
++      // nor an allow built from a macro's fragment (`#[$p]`, `#[cfg_attr(all(), $a)]`) can bring an unread file under a
++      // listed export's allow.
++      for (const a of attrs) {
++        if (mask.slice(a.bodyStart, a.bodyEnd).includes("$")) {
++          problems.push(`${f}:${lineAt(mask, a.start)} has an attribute holding a metavariable (\`$\` between \`#[\` or \`#![\` and its \`]\`): a macro could build a #[path] or an allow from a fragment that this scan does not read`);
++        }
 +      }
        problems.push(...pathProblems(f, crate, code, mask, attrs));
      } else if (f === `${crate}Cargo.toml` && EXCEPTION_LEVELS[crate] === "deny") {
        if (tomlValues(tomlScan(text), "build").length) {
-@@ -1425,6 +1433,13 @@ const UNSTABLE_ENV = {
+@@ -1425,6 +1437,13 @@ const UNSTABLE_ENV = {
   *   the ones cargoConfigFiles finds); a rustflags value this check cannot read;
   * - an alias that replaces clippy or fmt (CARGO_ALIAS_CLIPPY or _FMT, or such a key in a config file);
   * - another compiler or a workspace wrapper (COMPILER_ENV, COMPILER_KEYS);
@@ -42,7 +46,7 @@ index c015186..ecbec86 100644
   * - a config `include` key or `[[include]]` table, its name quoted or not, which loads a config file cargoConfigFiles
   *   does not read (cargo 1.99.1 honours it);
   * - a target runner (CARGO_TARGET_<triple>_RUNNER, or a `runner` key in a config file): it runs the test binaries in
-@@ -1452,6 +1467,8 @@ export function cargoConfigProblems(env, configs) {
+@@ -1452,6 +1471,8 @@ export function cargoConfigProblems(env, configs) {
      const alias = k.match(/^CARGO_ALIAS_(\w+)$/)?.[1].toLowerCase();
      if (SHADOWABLE.includes(alias)) problems.push(`${k} in the environment replaces \`cargo ${alias}\` with an alias`);
      if (COMPILER_ENV.includes(k)) problems.push(`${k} in the environment replaces rustc or wraps the workspace's rustc calls (only RUSTC_WRAPPER may wrap them)`);
@@ -51,7 +55,7 @@ index c015186..ecbec86 100644
      if (/^CARGO_TARGET_\w+_RUNNER$/.test(k)) problems.push(`${k} in the environment runs the test binaries in cargo's place`);
      if (Object.hasOwn(UNSTABLE_ENV, k)) problems.push(`${k} in the environment ${UNSTABLE_ENV[k]}`);
    }
-@@ -1467,6 +1484,15 @@ export function cargoConfigProblems(env, configs) {
+@@ -1467,6 +1488,25 @@ export function cargoConfigProblems(env, configs) {
      for (const name of COMPILER_KEYS) {
        if (tomlValues(scan, name).length) problems.push(`${path} has a key \`${name}\`: it replaces rustc or wraps the workspace's rustc calls`);
      }
@@ -63,11 +67,21 @@ index c015186..ecbec86 100644
 +      tomlHeaderHeads(scan).includes("profile") ||
 +      /(?:^|[\s.{,])profile[ \t]*[.=]/m.test(scan.mask) ||
 +      scan.strings.some((s) => s.value === "profile" && /^[ \t]*[.=]/.test(scan.mask.slice(s.end)) && /(?:^|[\s.{,[])$/.test(scan.mask.slice(0, s.start)));
-+    if (profile) problems.push(`${path} has a \`profile\` key or table: it can drop npt-sim's -C overflow-checks=on, which plan §4.5 asks for in every profile`);
++    if (profile) {
++      // Its line and text, as the refusals above name their value (advisor-u4r-r1, FP-6 item 9: SEC-U4R-6): the first
++      // place a header, a bare or dotted key, or a quoted key names `profile`.
++      const header = scan.mask.match(/^[ \t]*\[\[?[ \t]*profile[ \t]*[.\]]/m);
++      const key = scan.mask.match(/(?:^|[\s.{,])profile[ \t]*[.=]/m);
++      const quoted = scan.strings.find((s) => s.value === "profile" && /^[ \t]*[.=]/.test(scan.mask.slice(s.end)) && /(?:^|[\s.{,[])$/.test(scan.mask.slice(0, s.start)));
++      const found = [header?.index, key ? key.index + key[0].indexOf("profile") : undefined, quoted?.start].filter((i) => i !== undefined);
++      const line = lineAt(scan.mask, found.length ? Math.min(...found) : 0);
++      const said = text.split("\n")[line - 1].trim();
++      problems.push(`${path}:${line} has a profile key or table (${JSON.stringify(said)}): it can drop npt-sim's -C overflow-checks=on, which plan §4.5 asks for in every profile`);
++    }
      if (tomlValues(scan, "include").length || tomlHeaderHeads(scan).includes("include")) {
        problems.push(`${path} has a key \`include\`: it loads a config file this check does not read`);
      }
-@@ -1545,9 +1571,10 @@ export function buildFlagProblems(sources) {
+@@ -1545,9 +1585,10 @@ export function buildFlagProblems(sources) {
   * `--target` (the advisor's U4d2 round-1 ruling, FX-1: RR-M2 with TE-M1, SEC-U4D2-5, SEC-U4D2-6), as sentences naming
   * the source and its value:
   * - each source rustflagSources reads (every environment variable whose name ends in RUSTFLAGS, and every `rustflags`
@@ -81,7 +95,7 @@ index c015186..ecbec86 100644
   *   take a flag's negation from a source cargo drops (`-Ctarget-feature=-simd128,-relaxed-simd` in RUSTFLAGS beside
   *   CARGO_ENCODED_RUSTFLAGS=-Ctarget-cpu=bleeding-edge passed while the module cargo built held both: RR-M2), and a
   *   flag no name rule knows (`--cfg feature="bites"`, `-C overflow-checks=off`, `-C llvm-args=...`) reached rustc unseen
-@@ -1759,16 +1786,26 @@ export function manifestKeyProblems(manifests) {
+@@ -1759,16 +1800,26 @@ export function manifestKeyProblems(manifests) {
  }
  
  /**
@@ -112,14 +126,17 @@ index c015186..ecbec86 100644
    const found = [];
    for (const dir of new Set(dirs)) {
      for (const name of ["config.toml", "config"]) {
-@@ -1846,13 +1883,27 @@ export function marksProblems(marks, readFile) {
+@@ -1845,14 +1896,29 @@ export function marksProblems(marks, readFile) {
+ }
  
  /**
-  * One command, waited for: `timeout` (ms; 0, none) stops it with SIGTERM once passed, and the result says so
+- * One command, waited for: `timeout` (ms; 0, none) stops it with SIGTERM once passed, and the result says so
 - * (`timedOut`: spawnSync's ETIMEDOUT), so a hung call is a named failure, not a lock held forever (INF-4).
 - */
 -function run(cmd, args, cwd, env = process.env, timeout = 0) {
 -  const r = spawnSync(cmd, args, { cwd, env, encoding: "utf8", maxBuffer: 1 << 28, ...(timeout ? { timeout } : {}) });
++ * One command, waited for: `timeout` (ms; 0, none) stops it with SIGKILL once passed (a SIGTERM the call handles could
++ * hold it past the deadline: advisor-u4r-r1, FP-6 item 11, INF-U4R-10 (1)), and the result says so
 + * (`timedOut`: spawnSync's ETIMEDOUT), so a hung call is a named failure, not a lock held forever (INF-4). A call with a
 + * timeout runs in its own process group (spawnSync's `detached`: the child calls setsid), and once it is stopped that
 + * whole group is killed (SIGKILL to the group), so every process it started goes with it (carry 84 (b): spawnSync's
@@ -129,7 +146,7 @@ index c015186..ecbec86 100644
 + * loader.mjs`). check.test.mjs runs it on real processes (carry 84 (c)).
 + */
 +export function run(cmd, args, cwd, env = process.env, timeout = 0) {
-+  const r = spawnSync(cmd, args, { cwd, env, encoding: "utf8", maxBuffer: 1 << 28, ...(timeout ? { timeout, detached: true } : {}) });
++  const r = spawnSync(cmd, args, { cwd, env, encoding: "utf8", maxBuffer: 1 << 28, ...(timeout ? { timeout, detached: true, killSignal: "SIGKILL" } : {}) });
 +  const timedOut = r.error?.code === "ETIMEDOUT";
 +  if (timedOut && r.pid) {
 +    try {
@@ -145,7 +162,7 @@ index c015186..ecbec86 100644
  }
  
  /**
-@@ -1998,8 +2049,11 @@ export function testBothBuilds(runner = run) {
+@@ -1998,8 +2064,11 @@ export function testBothBuilds(runner = run) {
   * - The build-flag scan and rustc's read-back read the rustflags sources above, not a build script's
   *   `cargo::rustc-flags` or a RUSTC_WRAPPER's own flags. No source may hold a flag (buildInputProblems: the advisor's
   *   U4d2 round-1 ruling, FX-1), so on a step that passes the read-back is given no flag, which is what cargo gives
@@ -159,13 +176,13 @@ index c015186..ecbec86 100644
   * - Inputs that can lower lints and are not read here: a cargo config's [env] table (CLIPPY_ARGS, C2R-4 G, or any
   *   other variable it sets for rustc), what a member's build script prints (`cargo::rustc-env`, C2R-4 H), a
   *   RUSTC_WRAPPER program (allowed, for sccache) and a rust-toolchain.toml `path`. Lint capping by any of them
-@@ -2029,9 +2083,11 @@ const DEPS_CHECKED =
+@@ -2029,9 +2098,11 @@ const DEPS_CHECKED =
    "npt-tcpinfo relaxes it only by the #[allow] on srtt_us and unacked_and_unsent, has unsafe code only inside " +
    "them, and keeps lib.rs's deny of the two clippy unsafe lints, and npt-hash-wasm relaxes it only by one #[allow] on " +
    "each of its seven listed exports, whose #[unsafe(no_mangle)] is its only unsafe code, each taking and giving u32 " +
 -  "or i32 only; neither npt-tcpinfo nor npt-hash-wasm has a build script or names `include` but as a macro call; " +
 +  "or i32 only; neither npt-tcpinfo nor npt-hash-wasm has a build script or names `include` but directly before `!` " +
-+  "and an opening bracket; no attribute's text starts with a metavariable; " +
++  "and an opening bracket; no attribute holds a metavariable; " +
    "the environment and the cargo configs read pass no " +
 -  "lint-lowering rustflags and set no clippy or fmt alias, no other rustc or workspace wrapper, no config include and " +
 +  "lint-lowering rustflags and set no clippy or fmt alias, no other rustc or workspace wrapper, no linker, no profile, " +
@@ -173,7 +190,7 @@ index c015186..ecbec86 100644
    "no test runner, and the environment has no RUSTC_BOOTSTRAP or cargo channel override; no rustflags source holds a " +
    "flag (so none enables fma, simd128 or relaxed-simd or sets target-cpu=native) and neither the environment nor a " +
    "cargo config sets the build target, and rustc's read-back, given what cargo gives rustc, lists sse2 and " +
-@@ -2208,7 +2264,10 @@ export function readScan(text) {
+@@ -2208,7 +2279,10 @@ export function readScan(text) {
    return { catches, notCatchable, record };
  }
  
@@ -185,7 +202,18 @@ index c015186..ecbec86 100644
  const WASM_CALL_LIMIT_MS = 300_000;
  /** The real file operations of the wasm step (check.test.mjs passes its own), paths under the spike for `read`. */
  const WASM_IO = {
-@@ -2245,28 +2304,55 @@ const WASM_IO = {
+@@ -2228,8 +2302,8 @@ const WASM_IO = {
+ 
+ /**
+  * The determinism check (u4-build-plan.md §5 U4d2; plan.md §4.5:546-551; ADR 0002:500-505), through `runner` for every
+- * command (cargo, npt-lab, Node), `io` for its files and `now` for its clock (main's, Date.now, which times each call;
+- * npt-lab reads none):
++ * command (cargo, npt-lab, Node), `io` for its files and `now` for its clock (by default monotonic, performance.now,
++ * which times each call and the shared deadline: advisor-u4r-r1, FP-6 item 11, INF-U4R-10 (3); npt-lab reads none):
+  * 1. the release builds (WASM_BUILDS), each artifact's path read from cargo's JSON and copied out;
+  * 2. `npt-lab hash` (measured): the manifest's recordings regenerated into the step's folder and checked by length and
+  *    SHA-256, then its two native legs in lock step, leg 1 against leg 2;
+@@ -2245,28 +2319,57 @@ const WASM_IO = {
   *    ruling): a catch (recording R, tick T', field F) arms it at T' on R, native leg 1 and Wasm leg 1, whose first
   *    mismatch must be (R, T', F); "not catchable at this site on x86-64 and wasm32" is printed with the scan's record,
   *    and no std-sin leg runs.
@@ -208,7 +236,7 @@ index c015186..ecbec86 100644
 + * half off; check.mjs runs the defaults.
   */
 -export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_STEP_DIR) {
-+export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_STEP_DIR, { manifest = RECORDINGS_MANIFEST, bitesHalf = true } = {}) {
++export function wasmStep(runner = run, io = WASM_IO, now = () => performance.now(), dir = WASM_STEP_DIR, { manifest = RECORDINGS_MANIFEST, bitesHalf = true } = {}) {
    const problems = [];
    const lines = [];
    const timed = [];
@@ -233,7 +261,9 @@ index c015186..ecbec86 100644
 +        return { ok: false, out: "", stdout: "", status: null, timedOut: false, skipped: true };
 +      }
 +    }
-+    const limit = cmd === "cargo" ? 0 : deadline - t0;
++    // Whole ms, as spawnSync takes them (the monotonic clock is fractional); at least 1 while time is left, never 0
++    // (no limit).
++    const limit = cmd === "cargo" ? 0 : Math.ceil(deadline - t0);
      const r = runner(cmd, args, HERE, undefined, limit);
      timed.push(`${label} ${((now() - t0) / 1000).toFixed(1)}`);
 -    if (r.timedOut) problems.push(`${label}: still running after ${limit / 1000} s, so it was stopped (the wasm step's limit on each call but its four cargo builds)`);
@@ -252,7 +282,7 @@ index c015186..ecbec86 100644
    const bin = join(dir, "bin");
    const rec = join(dir, "recordings");
    const meas = join(dir, "measured");
-@@ -2274,9 +2360,9 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
+@@ -2274,9 +2377,9 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
    const sin = join(dir, "std-sin");
    io.reset(dir);
    for (const d of [bin, rec, meas, hm, sin]) io.mkdir(d);
@@ -264,7 +294,7 @@ index c015186..ecbec86 100644
      const r = call(`build ${b.copy}`, "cargo", b.args);
      const path = r.ok ? builtArtifact(r.stdout ?? "", b) : null;
      if (!r.ok) problems.push(`the release build of ${b.what} failed: ${failure(r)}`);
-@@ -2289,13 +2375,13 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
+@@ -2289,13 +2392,13 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
    // The manifest's recordings, as the loader needs them (npt-lab checks the manifest's own rules).
    let entries = [];
    try {
@@ -281,7 +311,7 @@ index c015186..ecbec86 100644
    const loader = (wasm, e, out, extra = []) => [LOADER, "--wasm", wasm, "--rec", join(rec, `${e.name}.rec`), "--name", e.name, "--first-tick", String(e.first), "--out", out, ...extra];
    const stepped = (r) => Number(r.out.match(/: (\d+) ticks stepped/)?.[1] ?? Number.NaN);
    // A recording regenerated in this run (the folder is new each run, and npt-lab writes each file once it is checked).
-@@ -2317,6 +2403,7 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
+@@ -2317,6 +2420,7 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
    let vectors = [];
    if (art.lab && entries.length) {
      const legs = call("npt-lab hash", art.lab, ["hash", ...manifestArgs, "--out", meas]);
@@ -289,7 +319,7 @@ index c015186..ecbec86 100644
      const regen = legs.out.match(/^npt-lab hash: (.*(?:the manifest has|not this build's Recording::GENERATOR).*)$/m)?.[1];
      if (regen) problems.push(`the recordings manifest: ${regen}`);
      if (/order digest/.test(legs.out)) problems.push("a clean-half native leg wrote an order digest: a bites build's output given to the measured half");
-@@ -2336,6 +2423,7 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
+@@ -2336,6 +2440,7 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
      const compareArgs = ["hash", "compare", "--ours", join(meas, "native-1.lines"), "--theirs", theirs.join(","), ...manifestArgs];
      const names = ["--ours-name", "native leg 1", "--theirs-name", "Wasm leg 1"];
      const cr = theirs.length ? call("compare", art.lab, [...compareArgs, ...names]) : null;
@@ -297,7 +327,7 @@ index c015186..ecbec86 100644
      let c = cr ? readComparison(cr.out, "native leg 1", "Wasm leg 1") : null;
      const e = c?.first && !c.field ? entries.find((x) => x.name === c.first.recording) : null;
      if (e) {
-@@ -2361,17 +2449,24 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
+@@ -2361,17 +2466,24 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
    // 6. The bites half.
    const bites = { hashMap: "not run", stdSin: "not run" };
    const index = {};
@@ -323,7 +353,7 @@ index c015186..ecbec86 100644
      const digests = { "native leg 1": legs.out.match(/^leg 1 order digest (\S+)/m)?.[1], "native leg 2": legs.out.match(/^leg 2 order digest (\S+)/m)?.[1] };
      for (const k of [1, 2]) {
        const r = call(`hash-map Wasm ${k}`, process.execPath, loader(art.wasmBites, rec0, join(hm, `wasm-${k}.lines`), ["--bite", String(index[WASM_BITES.hashMap]), "--arm", arm, "--dump-at", arm, "--dump-out", join(hm, `wasm-${k}.dump`)]));
-@@ -2438,8 +2533,29 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
+@@ -2438,8 +2550,29 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
          "Wasm leg 1",
        );
        const caught = c?.first?.recording === recording && c.first.tick === tick && c.field === field;
@@ -355,7 +385,7 @@ index c015186..ecbec86 100644
        if (!caught) {
          problems.push(
 diff --git a/spikes/netcode-proof/check.test.mjs b/spikes/netcode-proof/check.test.mjs
-index d1d2039..782c33e 100644
+index d1d2039..fe20714 100644
 --- a/spikes/netcode-proof/check.test.mjs
 +++ b/spikes/netcode-proof/check.test.mjs
 @@ -5,7 +5,7 @@ import assert from "node:assert/strict";
@@ -383,7 +413,51 @@ index d1d2039..782c33e 100644
    rustflagSources,
    SIM_DEPENDENCIES,
    simFeatureCheck,
-@@ -1032,7 +1034,8 @@ test("another rustc, a workspace wrapper, a config include and a test runner are
+@@ -524,13 +526,20 @@ test("unsafe_code: no #[path] or include! reaches outside its crate, the way npt
+       f["crates/room/src/k.rs"] = code;
+     });
+     const line = code.startsWith("#") ? 1 : 3;
+-    assert.deepEqual(p, [`crates/room/src/k.rs:${line} has a #[path] whose value is not a plain string literal, not a .rs file inside crates/room/`], code);
++    // The macro forms' attribute holds a metavariable too (carry 85 (c) as advisor-u4r-r1 widened it: FP-6 item 8).
++    const held = code.startsWith("#") ? [] : [metaHeld(`crates/room/src/k.rs:${line}`)];
++    assert.deepEqual(p, [...held, `crates/room/src/k.rs:${line} has a #[path] whose value is not a plain string literal, not a .rs file inside crates/room/`], code);
+   }
+ });
+ 
+ /** One unsafe block, as rustc 1.99.1 compiles it once unsafe_code is relaxed. */
+ const UNSAFE_FN = "pub fn f() -> u8 {\n    let x = 1u8;\n    unsafe { *(&raw const x) }\n}\n";
+ 
++/** Carry 85 (c)'s refusal of an attribute holding a metavariable (advisor-u4r-r1, FP-6 item 8: SEC-U4R-5), at `where`. */
++function metaHeld(where) {
++  return `${where} has an attribute holding a metavariable (\`$\` between \`#[\` or \`#![\` and its \`]\`): a macro could build a #[path] or an allow from a fragment that this scan does not read`;
++}
++
+ test("unsafe code outside the three exception crates fails however the lint was relaxed (review S1)", () => {
+   const relaxedElsewhere = {
+     // Relaxed by RUSTFLAGS=-Aunsafe_code, --cap-lints warn or a cargo config: no attribute to see, the block still shows.
+@@ -546,9 +555,11 @@ test("unsafe code outside the three exception crates fails however the lint was
+       f["crates/room/src/evil.rs"] = code;
+     });
+     const n = code.match(/\bunsafe\b|\bglobal_asm\b/g).length;
++    // A macro-built allow's attribute holds a metavariable: refused as well (FP-6 item 8).
++    const held = what.includes("macro-built allow") ? [metaHeld("crates/room/src/evil.rs:3")] : [];
+     assert.deepEqual(
+       p,
+-      [`crates/room/src/evil.rs:${firstLine[what]} has unsafe code (${n} \`unsafe\` or \`global_asm\`; only npt-client-wasm, npt-tcpinfo and npt-hash-wasm may)`],
++      [`crates/room/src/evil.rs:${firstLine[what]} has unsafe code (${n} \`unsafe\` or \`global_asm\`; only npt-client-wasm, npt-tcpinfo and npt-hash-wasm may)`, ...held],
+       what,
+     );
+   }
+@@ -583,6 +594,8 @@ test("npt-tcpinfo: unsafe only inside srtt_us and unacked_and_unsent, unsafe_cod
+   assert.deepEqual(lax, [
+     "crates/tcpinfo/src/linux.rs:" + (at + 9) + " names unsafe_code outside an attribute (a macro can build the attribute from it)",
+     outside(`crates/tcpinfo/src/linux.rs:${at + 5}`),
++    // Its attribute holds a metavariable (FP-6 item 8).
++    metaHeld(`crates/tcpinfo/src/linux.rs:${at + 2}`),
+   ]);
+   // In the tests, an example or the stub: outside the two functions.
+   for (const file of ["crates/tcpinfo/src/tests.rs", "crates/tcpinfo/examples/probe.rs", "crates/tcpinfo/src/stub.rs"]) {
+@@ -1032,7 +1045,8 @@ test("another rustc, a workspace wrapper, a config include and a test runner are
    };
    assert.deepEqual(cargoConfigProblems(normal, []), []);
    const config = (text) => cargoConfigProblems({}, [{ path: "c.toml", text }]);
@@ -393,7 +467,7 @@ index d1d2039..782c33e 100644
    // C2R-8: another compiler, or a wrapper around the workspace crates' rustc calls.
    for (const k of ["RUSTC", "CARGO_BUILD_RUSTC", "RUSTC_WORKSPACE_WRAPPER", "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER"]) {
      assert.deepEqual(cargoConfigProblems({ ...normal, [k]: "/opt/other/rustc" }, []), [
-@@ -1098,6 +1101,44 @@ test("RUSTC_BOOTSTRAP, cargo's channel override, and a manifest's cargo-features
+@@ -1098,6 +1112,47 @@ test("RUSTC_BOOTSTRAP, cargo's channel override, and a manifest's cargo-features
    assert.deepEqual(manifestKeyProblems(own), []);
  });
  
@@ -411,15 +485,18 @@ index d1d2039..782c33e 100644
 +  assert.deepEqual(cargoConfigProblems({ CARGO_PROFILE_RELEASE_OVERFLOW_CHECKS: "false" }, []), [
 +    "CARGO_PROFILE_RELEASE_OVERFLOW_CHECKS in the environment sets a profile key (\"false\"): it can drop npt-sim's -C overflow-checks=on, which plan §4.5 asks for in every profile",
 +  ]);
-+  const profile = "c.toml has a `profile` key or table: it can drop npt-sim's -C overflow-checks=on, which plan §4.5 asks for in every profile";
++  // Each refusal names its line and text (advisor-u4r-r1, FP-6 item 9: SEC-U4R-6).
++  const profile = (line, said) =>
++    `c.toml:${line} has a profile key or table (${JSON.stringify(said)}): it can drop npt-sim's -C overflow-checks=on, which plan §4.5 asks for in every profile`;
 +  for (const text of [
 +    "[profile.release.package.npt-sim]\noverflow-checks = false\n",
 +    "profile.release.overflow-checks = false\n",
 +    '["profile".dev]\nopt-level = 1\n',
 +    "profile = { release = { debug = true } }\n",
 +  ]) {
-+    assert.deepEqual(config(text), [profile], text);
++    assert.deepEqual(config(text), [profile(1, text.split("\n")[0])], text);
 +  }
++  assert.deepEqual(config('[build]\njobs = 2\n\n[profile.dev]\nopt-level = 1\n'), [profile(4, "[profile.dev]")], "its line");
 +  // Neither name in a string value or inside another key's name.
 +  assert.deepEqual(config('[build]\ntarget-dir = "profile/linker"\nprofiles = 1\nlinkers = 2\n'), []);
 +  // This container's environment and the spike's own config, as the deps step reads them, pass.
@@ -438,7 +515,7 @@ index d1d2039..782c33e 100644
  /** The tick grep's message for a tick-count name (not a derived one) set from `init` at `at` (u4-build-plan.md §4.3). */
  const fromLiteral = (at, name, init) =>
    `${at} sets ${name} from \`${init}\`: a tick-counted value is a const fn of npt_sim::TICK_HZ, never a literal ` +
-@@ -2024,8 +2065,9 @@ test("npt-tcpinfo and npt-hash-wasm, the deny-level exceptions, have no build sc
+@@ -2024,8 +2079,9 @@ test("npt-tcpinfo and npt-hash-wasm, the deny-level exceptions, have no build sc
    // Its second: `use std::include as inc;`, and `inc!(concat!(env!("OUT_DIR"), "/gen.rs"));` in begin's body, which the
    // include! rule cannot see by its name; and a raw identifier's form in npt-tcpinfo.
    const includeAt = (where, name) =>
@@ -450,7 +527,7 @@ index d1d2039..782c33e 100644
    const renamed = `use std::include as inc;\n${HASH_WASM_LIB.replace(BEGIN_HEAD, `${BEGIN_HEAD}    inc!(concat!(env!("OUT_DIR"), "/gen.rs"));\n`)}`;
    assert.deepEqual(unsafeWith((f) => (f[F] = renamed)), [includeAt(`${F}:1`, "npt-hash-wasm")]);
    assert.deepEqual(unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] += "use core::r#include as i;\n")), [includeAt("crates/tcpinfo/src/lib.rs:8", "npt-tcpinfo")]);
-@@ -2034,6 +2076,15 @@ test("npt-tcpinfo and npt-hash-wasm, the deny-level exceptions, have no build sc
+@@ -2034,6 +2090,18 @@ test("npt-tcpinfo and npt-hash-wasm, the deny-level exceptions, have no build sc
    const calls = 'include!("k.rs");\nconst V: &str = include_str!("../x.txt");\nconst B: &[u8] = include_bytes!("../y.bin");\n// include\nconst S: &str = "include";\n';
    assert.deepEqual(unsafeWith((f) => (f[F] = `${HASH_WASM_LIB}${calls}`)), []);
    assert.deepEqual(unsafeWith((f) => (f["crates/net/src/lib.rs"] += "use std::include as inc;\n")), []);
@@ -459,14 +536,17 @@ index d1d2039..782c33e 100644
 +  assert.deepEqual(unsafeWith((f) => (f[F] = `${HASH_WASM_LIB}m!(include!);\n`)), [includeAt(`${F}:${HASH_WASM_LIB.split("\n").length}`, "npt-hash-wasm")]);
 +  assert.deepEqual(unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] += 'const K: &str = include ! ("k.rs");\n')), [includeAt("crates/tcpinfo/src/lib.rs:8", "npt-tcpinfo")]);
 +  assert.deepEqual(unsafeWith((f) => (f[F] = `${HASH_WASM_LIB}include!{"k.rs"}\ninclude!["k.rs"];\n`)), []);
-+  // Carry 85 (c), every crate: an attribute whose text starts with a metavariable, either form; none in the spike.
-+  const metaAt = (where) => `${where} has an attribute whose text starts with a metavariable (\`#[$\` or \`#![$\`): a macro could build a #[path] from a \`meta\` fragment that this scan does not read`;
++  // Carry 85 (c), every crate, as advisor-u4r-r1 widened it (FP-6 item 8: SEC-U4R-5): an attribute holding a
++  // metavariable anywhere in its text, either form; none in the spike.
++  const metaAt = (where) => `${where} has an attribute holding a metavariable (\`$\` between \`#[\` or \`#![\` and its \`]\`): a macro could build a #[path] or an allow from a fragment that this scan does not read`;
 +  const meta = "macro_rules! m {\n    ($p:meta) => {\n        #[$p]\n        mod x;\n    };\n}\nmacro_rules! n {\n    ($p:meta) => {\n        # ! [ $p ]\n    };\n}\n";
 +  assert.deepEqual(unsafeWith((f) => (f["crates/net/src/lib.rs"] += meta)), [metaAt("crates/net/src/lib.rs:6"), metaAt("crates/net/src/lib.rs:12")]);
++  const inner = "macro_rules! k {\n    ($a:meta) => {\n        #[cfg_attr(all(), $a)]\n        mod y;\n    };\n}\n";
++  assert.deepEqual(unsafeWith((f) => (f["crates/net/src/lib.rs"] += inner)), [metaAt("crates/net/src/lib.rs:6")]);
    // A `build` key in the manifest, in either form cargo reads; a custom-build target in cargo metadata.
    const manifestKey = (crate) => `crates/${crate}/Cargo.toml has a key \`build\`: a build script in npt-${crate}, which may have none: ${why}`;
    assert.deepEqual(unsafeWith((f) => (f["crates/hash-wasm/Cargo.toml"] = HASH_WASM_MANIFEST.replace("\n\n[lints.rust]", '\nbuild = "gen.rs"\n\n[lints.rust]'))), [manifestKey("hash-wasm")]);
-@@ -2532,17 +2583,27 @@ const cmpLine = (a, b, { compared = 27_000, mismatching = 0, rec, tick, field, c
+@@ -2532,17 +2600,27 @@ const cmpLine = (a, b, { compared = 27_000, mismatching = 0, rec, tick, field, c
  const NOT_CATCHABLE_SCAN = "# std-sin's scan\nnot catchable at this site on x86-64 and wasm32\nscanned on: the test's tree\nlibc: ldd (test) 2.39\n";
  /** A scan with two catches, listed out of the manifest's order (ES-s2 comes before TC-s3 there, so ES-s2's is armed). */
  const CATCH_SCAN = "catch TC-s3 4294962800 vehicle[0].pos.y\ncatch ES-s2 1000123 vehicle[3].pos.y\nlibc: ldd (Ubuntu GLIBC 2.39-0ubuntu8.6) 2.39\n";
@@ -498,7 +578,7 @@ index d1d2039..782c33e 100644
    const arg = (args, k) => (args.includes(k) ? args[args.indexOf(k) + 1] : null);
    const kindOf = (cmd, args) => {
      if (cmd === "cargo") return `build ${args.includes("npt-hash-wasm") ? "wasm" : "lab"}${args.includes("bites") ? " bites" : ""}`;
-@@ -2557,6 +2618,7 @@ function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
+@@ -2557,6 +2635,7 @@ function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
      const where = arg(args, "--out") ?? arg(args, "--ours");
      const area = where.startsWith(WS.hm) ? "hash-map " : where.startsWith(WS.sin) ? "std-sin " : "";
      if (args[1] !== "compare") return `${area}legs`;
@@ -506,7 +586,7 @@ index d1d2039..782c33e 100644
      if (area === "hash-map ") return `hash-map compare ${arg(args, "--theirs-name") === "Wasm leg 2" ? "ww" : "nw"}`;
      return `${area}compare${!area && args.includes("--theirs-dump") ? " field" : ""}`;
    };
-@@ -2572,10 +2634,10 @@ function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
+@@ -2572,10 +2651,10 @@ function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
        legs: {
          stdout:
            "wrote the header-only recordings vector-SS, vector-ES, vector-CO, vector-TC (seed 1, first tick 0, no tick) for h2\n" +
@@ -520,7 +600,7 @@ index d1d2039..782c33e 100644
        vectors: { stdout: "h2: CO's wasm32 dump is the committed vector (260 words, digest b432ac332054c77b); every scene's initial dump and hash are equal natively and on wasm32 (SS 6488, ES 1944, CO 260, TC 340)\n" },
        bites: { stdout: "1 PM-0004-21/hash-map\n2 PM-0004-21/std-sin\n3 PM-0001-41/server-speed-1pct\n4 PM-0001-41/server-quant-differs\n" },
        "hash-map legs": {
-@@ -2597,11 +2659,9 @@ function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
+@@ -2597,11 +2676,9 @@ function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
            `Wasm leg 2 digest 3333333333333333 (${HASH_MAP_FIELD} at words [6488, 6489] of its dump at SS-s1 tick 1234)\n` +
            `${cmpLine("Wasm leg 1", "Wasm leg 2", { compared: 9_000, counts: "SS-s1 9000" })}\n`,
        },
@@ -535,7 +615,7 @@ index d1d2039..782c33e 100644
      }[kind];
      if (said) return said;
      // The loader's runs.
-@@ -2616,7 +2676,7 @@ function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
+@@ -2616,7 +2693,7 @@ function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
      copy: (from, to) => copies.push([from, to]),
      exists: (p) => files.has(p),
      read: (p) => {
@@ -544,7 +624,7 @@ index d1d2039..782c33e 100644
        if (p === STD_SIN_SCAN) return scan;
        throw new Error(`ENOENT ${p}`);
      },
-@@ -2630,11 +2690,11 @@ function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
+@@ -2630,11 +2707,11 @@ function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
      const base = answer(kind, args);
      const r = over[kind] ? { ...base, ...over[kind](base, args) } : base;
      for (const w of r.writes ?? []) files.add(w);
@@ -558,7 +638,7 @@ index d1d2039..782c33e 100644
    return { ...result, calls, copies, kinds: calls.map((c) => c.kind) };
  }
  
-@@ -2695,16 +2755,37 @@ test("the wasm step's builds, legs and comparisons, in order; a clean run passes
+@@ -2695,16 +2772,37 @@ test("the wasm step's builds, legs and comparisons, in order; a clean run passes
    assert.equal((last.match(/ 1\.5(?:,|$)/g) ?? []).length, w.calls.length, "each timed call's seconds");
    assert.deepEqual(STEPS.wasm.length, 0, "STEPS.wasm(runner) defaults its runner");
    assert.deepEqual(Object.keys(STEPS), ["fmt", "clippy", "clippy-wasm32", "doc", "test", "deps", "wasm", "refs", "marks", "self", "redact"]);
@@ -604,7 +684,7 @@ index d1d2039..782c33e 100644
  });
  
  test("the wasm step fails on every outcome that is not an equal, counted run, naming what failed within the lines main prints (U4d2, 2.4 (a))", () => {
-@@ -2781,19 +2862,104 @@ test("the wasm step fails on every outcome that is not an equal, counted run, na
+@@ -2781,19 +2879,114 @@ test("the wasm step fails on every outcome that is not an equal, counted run, na
    fails(wasmWorld({ over: { "build lab": () => ({ stdout: "" }) } }), "the release build of npt-lab (x86-64, measured) names no bin artifact in cargo's JSON messages");
  });
  
@@ -650,11 +730,21 @@ index d1d2039..782c33e 100644
 +  assert.equal(spent.kinds.filter((k) => !k.startsWith("build ")).length, 1, "only the first call ran");
 +});
 +
++test("the shared deadline on a fractional clock (wasmStep's default is performance.now: advisor-u4r-r1, FP-6 item 11) gives every call a whole limit, as spawnSync takes it", () => {
++  // `npt-lab hash` takes 1,500.4 ms, so the time left for every later call is fractional.
++  const w = wasmWorld({ over: { legs: (b) => ({ ...b, ms: 1_500.4 }) } });
++  assert.equal(w.ok, true, w.out);
++  const timedCalls = w.calls.filter((c) => !c.kind.startsWith("build "));
++  for (const c of timedCalls) assert.ok(Number.isInteger(c.limit) && c.limit > 0, `${c.kind}: ${c.limit}`);
++  assert.equal(timedCalls[1].limit, 298_500, "300,000 - 1,500.4, rounded up");
++});
++
 +test("carry 84 (b) and (c): run() stops a timed call with every process it started (a child that starts a grandchild and sleeps, limit 200 ms)", () => {
-+  const child =
-+    'console.log("child " + process.pid); const g = require("node:child_process").spawn(process.execPath, ["-e", "setTimeout(() => {}, 30000)"], { stdio: "inherit" }); console.log("grandchild " + g.pid); setTimeout(() => {}, 30000);';
++  // A /bin/sh child, which starts far inside the limit (advisor-u4r-r1, FP-6 item 7: T-3; a node child took 203.7-204.0
++  // ms in all, so one slow start would fail a check that is never retried).
++  const child = "echo child $$; sleep 30 & echo grandchild $!; wait";
 +  const t0 = Date.now();
-+  const r = run(process.execPath, ["-e", child], HERE, process.env, 200);
++  const r = run("/bin/sh", ["-c", child], HERE, process.env, 200);
 +  const ms = Date.now() - t0;
 +  assert.equal(r.timedOut, true, `run() reports the timeout: ${JSON.stringify(r)}`);
 +  assert.ok(ms < 10_000, `run() returned after ${ms} ms, not the child's 30 s`);
@@ -717,10 +807,10 @@ index d1d2039..782c33e 100644
  
  test("the wasm step judges PM-0004-21's two bites: each caught at its tick and field, or not exercised; anything else fails (U4d2, 2.4 (a) item 6)", () => {
 diff --git a/spikes/netcode-proof/crates/bots/src/lib.rs b/spikes/netcode-proof/crates/bots/src/lib.rs
-index 9477f5f..0519f46 100644
+index 9477f5f..1e4aa54 100644
 --- a/spikes/netcode-proof/crates/bots/src/lib.rs
 +++ b/spikes/netcode-proof/crates/bots/src/lib.rs
-@@ -1,3 +1,242 @@
+@@ -1,3 +1,244 @@
  //! npt-bots: the netcode proof test's headless clients (plan E12-E14): 30 inputs per second, the brawl, the
  //! target-course shooter with a page-like frame loop, the cheats, the hostile clients, and the load orchestrator's
  //! calibration and roll-out across the CAX21s. Built in units U4 and U6.
@@ -749,8 +839,8 @@ index 9477f5f..0519f46 100644
 +use npt_link::Channel;
 +use npt_sim::{Command, Scene};
 +
-+/// Move vectors 22.5 degrees apart round the circle, each inside the room's x² + y² ≤ 127² check: a soldier walking
-+/// through them, one step every [`TURN_EVERY`] commands, walks a circle about 2 m across at the stress scene's speed.
++/// Move vectors 22.5 degrees apart round the circle, each inside the room's x² + y² ≤ 127² check: a soldier walks
++/// through them, one step every [`TURN_EVERY`] commands.
 +const MOVES: [[i8; 2]; 16] = [
 +    [127, 0],
 +    [117, 49],
@@ -769,9 +859,10 @@ index 9477f5f..0519f46 100644
 +    [89, -89],
 +    [117, -49],
 +];
-+/// Commands between two turns of the move vector.
++/// Commands between two turns of the move vector: a count of commands given, with no time or speed in it (a cadence in
++/// time would need a rate-derived constant from npt-sim: carry 39; advisor-u4r-r1, FP-7 item 1).
 +const TURN_EVERY: u64 = 4;
-+/// Commands a brawler keeps its target before it picks again (about 1 s at 30 commands a second).
++/// Commands a brawler keeps its target before it picks again: a count of commands given, with no time in it.
 +const RETARGET_EVERY: u64 = 30;
 +/// How far above a target's feet the brawl aims, cm (inside a soldier's box).
 +const AIM_ABOVE_FEET_CM: i32 = 100;
@@ -895,7 +986,8 @@ index 9477f5f..0519f46 100644
 +    /// One client step at `now_ns` on the host's clock (u4r-brief.md 2.2; the module text): `received` goes to the
 +    /// endpoint first, then a command if one is due. `view` is what the host says this client sees at its newest tick:
 +    /// (slot, position in the position grid's cm) of other soldiers; the open-loop scripts never read it. Returns
-+    /// whether a command was given.
++    /// whether a command was given. A host that computes a view must feed the endpoint itself and pass `&[]` (the view
++    /// is of the newest tick the endpoint holds after what it was fed: advisor-u4r-r1, FP-7 item 4).
 +    pub fn step(
 +        &mut self,
 +        endpoint: &mut ClientEndpoint,
@@ -998,7 +1090,7 @@ index 2ff8533..278db8c 100644
    ]
  }
 diff --git a/spikes/netcode-proof/crates/lab/src/hash.rs b/spikes/netcode-proof/crates/lab/src/hash.rs
-index 6bb355d..7a4a92f 100644
+index 6bb355d..7212591 100644
 --- a/spikes/netcode-proof/crates/lab/src/hash.rs
 +++ b/spikes/netcode-proof/crates/lab/src/hash.rs
 @@ -195,10 +195,27 @@ pub(crate) fn parse(argv: &[String]) -> Result<Mode, String> {
@@ -1029,7 +1121,7 @@ index 6bb355d..7a4a92f 100644
      pub(crate) scene: u8,
      pub(crate) seed: u64,
      pub(crate) first_tick: u32,
-@@ -209,7 +226,18 @@ pub(crate) struct Entry {
+@@ -209,7 +226,25 @@ pub(crate) struct Entry {
      pub(crate) sha256: String,
  }
  
@@ -1037,6 +1129,12 @@ index 6bb355d..7a4a92f 100644
 +/// The fewest bytes one tick of a recording takes (its tick and four counts: replay.rs's tick header), so no
 +/// recording of `bytes` holds more than `bytes / 12` ticks (carry 82).
 +const TICK_HEADER_BYTES: u64 = 12;
++/// The most bytes an entry's recording may hold: 64 MiB, four times today's largest entry (SS-P0-s4, 16,950,444 B); a
++/// larger recording comes to the advisor first (advisor-u4r-r1, FP-3: RR3-L1).
++const MAX_ENTRY_BYTES: u64 = 64 * 1024 * 1024;
++/// The profiles a runner entry may name (`npt-lab scenario --profile`'s), each checked by name before its settings
++/// reach `scenario::record` (advisor-u4r-r1, FP-3: RR3-M1 = SEC-U4R-2).
++const RUNNER_PROFILES: [&str; 6] = ["P0", "P1", "P2", "P3", "P4", "B1"];
 +
 +/// Whether `name` is a manifest name: one or more of `A-Z`, `a-z`, `0-9` and `-` (carry 82: it reaches a file path and
 +/// the `h <recording> <tick> <hash>` line).
@@ -1044,12 +1142,13 @@ index 6bb355d..7a4a92f 100644
 +    !name.is_empty() && name.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-')
 +}
 +
-+/// The manifest's entries, in its order. Each entry's name and its `ticks` against its `bytes` are checked here,
-+/// before anything is generated (carry 82).
++/// The manifest's entries, in its order. Each entry's name, its `ticks` against its `bytes` and its `bytes` against 64
++/// MiB are checked here, before anything is generated (carry 82), and a runner entry's profile by name, its `ticks`
++/// against its warm-up and measured seconds, and its `span_ms` against the room's (advisor-u4r-r1, FP-3).
  pub(crate) fn manifest(text: &str) -> Result<Vec<Entry>, String> {
      let v: Value =
          serde_json::from_str(text).map_err(|e| format!("the manifest is not JSON: {e}"))?;
-@@ -235,7 +263,34 @@ pub(crate) fn manifest(text: &str) -> Result<Vec<Entry>, String> {
+@@ -235,7 +270,34 @@ pub(crate) fn manifest(text: &str) -> Result<Vec<Entry>, String> {
                      .map_err(|_| format!("manifest entry {name}: \"{k}\" {n} is above 32 bits"))
              })
          };
@@ -1084,7 +1183,7 @@ index 6bb355d..7a4a92f 100644
              scene: u8::try_from(num("scene")?)
                  .map_err(|_| format!("manifest entry {name}: no such scene"))?,
              seed: num("seed")?,
-@@ -254,6 +309,12 @@ pub(crate) fn manifest(text: &str) -> Result<Vec<Entry>, String> {
+@@ -254,6 +316,53 @@ pub(crate) fn manifest(text: &str) -> Result<Vec<Entry>, String> {
          if out.iter().any(|o: &Entry| o.name == entry.name) {
              return Err(format!("manifest entry {} is named twice", entry.name));
          }
@@ -1094,10 +1193,51 @@ index 6bb355d..7a4a92f 100644
 +                entry.name, entry.ticks, entry.bytes
 +            ));
 +        }
++        if entry.bytes > MAX_ENTRY_BYTES {
++            return Err(format!(
++                "manifest entry {}: bytes {} is above {MAX_ENTRY_BYTES} (64 MiB, four times today's largest entry): a \
++                 larger recording comes to the advisor first",
++                entry.name, entry.bytes
++            ));
++        }
++        if let Kind::Runner {
++            profile,
++            warmup_s,
++            measured_s,
++            ..
++        } = &entry.kind
++        {
++            if !RUNNER_PROFILES.contains(&profile.as_str()) {
++                return Err(format!(
++                    "manifest entry {}: profile {profile:?} is not one of P0, P1, P2, P3, P4 or B1",
++                    entry.name
++                ));
++            }
++            let hz = u64::from(npt_sim::TICK_HZ);
++            let ticks = warmup_s
++                .checked_add(*measured_s)
++                .and_then(|s| s.checked_mul(hz));
++            if ticks != Some(u64::from(entry.ticks)) {
++                return Err(format!(
++                    "manifest entry {}: ticks {} is not (warmup_s {warmup_s} + measured_s {measured_s}) x {hz} ({})",
++                    entry.name,
++                    entry.ticks,
++                    ticks.map_or("an overflow".to_owned(), |t| t.to_string())
++                ));
++            }
++            if entry.span_ms != crate::scenario::ROOM_HISTORY_MS {
++                return Err(format!(
++                    "manifest entry {}: span_ms {} is not the room's ROOM_HISTORY_MS {}",
++                    entry.name,
++                    entry.span_ms,
++                    crate::scenario::ROOM_HISTORY_MS
++                ));
++            }
++        }
          out.push(entry);
      }
      Ok(out)
-@@ -266,10 +327,38 @@ fn sha256_hex(bytes: &[u8]) -> String {
+@@ -266,10 +375,38 @@ fn sha256_hex(bytes: &[u8]) -> String {
          .collect()
  }
  
@@ -1138,7 +1278,7 @@ index 6bb355d..7a4a92f 100644
  }
  
  /// Whether `bytes` are the entry's: its length and SHA-256.
-@@ -284,6 +373,27 @@ pub(crate) fn check(e: &Entry, bytes: &[u8]) -> Result<(), String> {
+@@ -284,6 +421,27 @@ pub(crate) fn check(e: &Entry, bytes: &[u8]) -> Result<(), String> {
              e.sha256
          ));
      }
@@ -1166,7 +1306,7 @@ index 6bb355d..7a4a92f 100644
      Ok(())
  }
  
-@@ -294,7 +404,7 @@ pub(crate) fn regenerate_all(
+@@ -294,7 +452,7 @@ pub(crate) fn regenerate_all(
      mut keep: impl FnMut(&Entry, &[u8]) -> Result<(), String>,
  ) -> Result<Vec<String>, String> {
      for e in entries {
@@ -1175,7 +1315,7 @@ index 6bb355d..7a4a92f 100644
              return Err(format!(
                  "{}: generator {}, not this build's Recording::GENERATOR {} (only its recordings are pinned)",
                  e.name,
-@@ -302,6 +412,12 @@ pub(crate) fn regenerate_all(
+@@ -302,6 +460,12 @@ pub(crate) fn regenerate_all(
                  Recording::GENERATOR
              ));
          }
@@ -1188,7 +1328,7 @@ index 6bb355d..7a4a92f 100644
      }
      let mut lines = Vec::new();
      for e in entries {
-@@ -1253,6 +1369,7 @@ mod tests {
+@@ -1253,6 +1417,7 @@ mod tests {
          let bytes = Recording::synthetic(&Scene::targets(), 8, u32::MAX - 20, 60, 2_000).encode();
          let e = Entry {
              name: "TC-s8".to_owned(),
@@ -1196,7 +1336,7 @@ index 6bb355d..7a4a92f 100644
              scene: Scene::targets().id(),
              seed: 8,
              first_tick: u32::MAX - 20,
-@@ -1298,6 +1415,23 @@ mod tests {
+@@ -1298,6 +1463,23 @@ mod tests {
              "{err}"
          );
          assert_eq!(none, 0);
@@ -1220,7 +1360,7 @@ index 6bb355d..7a4a92f 100644
      }
  
      #[test]
-@@ -1324,16 +1458,87 @@ mod tests {
+@@ -1324,16 +1506,150 @@ mod tests {
          let text = include_str!("../recordings.json");
          let entries = manifest(text).unwrap();
          let names: Vec<&str> = entries.iter().map(|e| e.name.as_str()).collect();
@@ -1308,10 +1448,73 @@ index 6bb355d..7a4a92f 100644
 +        assert_eq!(kept, 0);
 +    }
 +
++    /// advisor-u4r-r1, FP-3 (RR3-M1 = SEC-U4R-2, SEC-U4R-3, RR3-L1): before anything is generated, a runner entry's
++    /// profile is checked by name, its ticks against (warmup_s + measured_s) x TICK_HZ and its span_ms against the room's,
++    /// and every entry's bytes against 64 MiB; each refusal names the entry and the value. The committed manifests read.
++    #[test]
++    fn r10_fp3_a_runner_entry_s_profile_ticks_and_span_and_any_entry_s_bytes_are_checked() {
++        let text = "{\"recordings\": [{\"name\": \"SS-P2-s1\", \"kind\": \"runner\", \"profile\": \"P2\", \
++                    \"clients\": 48, \"warmup_s\": 10, \"measured_s\": 290, \"scene\": 1, \"seed\": 1, \
++                    \"first_tick\": 0, \"ticks\": 9000, \"span_ms\": 2000, \"generator\": 0, \"bytes\": 999999, \
++                    \"sha256\": \"00\"}]}";
++        assert!(manifest(text).is_ok(), "the clean runner entry");
++        let refused = |from: &str, to: &str, why: &str| {
++            let e = manifest(&text.replace(from, to)).expect_err(why);
++            assert!(e.starts_with("manifest entry SS-P2-s1: "), "{why}: {e}");
++            e
++        };
++        let e = refused(
++            "\"profile\": \"P2\"",
++            "\"profile\": \"P2 --record x\"",
++            "the profile \"P2 --record x\"",
++        );
++        assert!(
++            e.contains("profile \"P2 --record x\" is not one of P0, P1, P2, P3, P4 or B1"),
++            "{e}"
++        );
++        let e = refused(
++            "\"ticks\": 9000",
++            "\"ticks\": 8999",
++            "ticks 8,999 with 10 + 290",
++        );
++        assert!(
++            e.contains("ticks 8999 is not (warmup_s 10 + measured_s 290) x 30 (9000)"),
++            "{e}"
++        );
++        let e = refused("\"span_ms\": 2000", "\"span_ms\": 1000", "span_ms 1,000");
++        assert!(
++            e.contains("span_ms 1000 is not the room's ROOM_HISTORY_MS 2000"),
++            "{e}"
++        );
++        let e = refused(
++            "\"bytes\": 999999",
++            "\"bytes\": 67108865",
++            "bytes 67,108,865",
++        );
++        assert!(e.contains("bytes 67108865 is above 67108864"), "{e}");
++        assert!(
++            manifest(&text.replace("\"bytes\": 999999", "\"bytes\": 67108864")).is_ok(),
++            "bytes at 64 MiB"
++        );
++        for (name, committed) in [
++            ("recordings.json", include_str!("../recordings.json")),
++            (
++                "det-recordings.json",
++                include_str!("../det-recordings.json"),
++            ),
++            (
++                "precheck-recordings.json",
++                include_str!("../precheck-recordings.json"),
++            ),
++        ] {
++            assert!(manifest(committed).is_ok(), "{name} reads");
++        }
++    }
++
      #[test]
      fn h6_usage_errors_are_refused() {
          let base = "--manifest m --dir d --out o";
-@@ -1439,6 +1644,110 @@ mod tests {
+@@ -1439,6 +1755,110 @@ mod tests {
          );
      }
  
@@ -1423,12 +1626,21 @@ index 6bb355d..7a4a92f 100644
      fn a_digest_field_of_a_dump_of_another_length_says_the_layouts_differ() {
          // RR-L3: the field's indexes are this build's own dump's, so a dump of another layout (P6's word-size plant
 diff --git a/spikes/netcode-proof/crates/lab/src/lib.rs b/spikes/netcode-proof/crates/lab/src/lib.rs
-index dbfd0d5..8bc3479 100644
+index dbfd0d5..bca64ab 100644
 --- a/spikes/netcode-proof/crates/lab/src/lib.rs
 +++ b/spikes/netcode-proof/crates/lab/src/lib.rs
-@@ -5,7 +5,8 @@
- //! ticks); the x86-64 re-decode and replay tool for the Arm rule (`ReplayX86`); the native-against-Wasm hash comparer
- //! ([`HashCompare`], U4d2). Nothing depends on this crate. Built in units U2 and U4.
+@@ -1,11 +1,13 @@
+ //! npt-lab: ADR 0002's devtools analogue for the netcode proof test (plan §4.7; engine EA-3, EA-11).
+ //!
+-//! `SimClock` (integer ns) and `L1Scenario`, which steps one server and 48 headless clients on one simulated clock in a
+-//! fixed order per instant (due packets, the server's I/O step, the server tick if due, due client frames, due client
+-//! ticks); the x86-64 re-decode and replay tool for the Arm rule (`ReplayX86`); the native-against-Wasm hash comparer
+-//! ([`HashCompare`], U4d2). Nothing depends on this crate. Built in units U2 and U4.
++//! This library holds the native-against-Wasm hash comparer ([`HashCompare`], U4d2) and its [`TickHash`]. The npt-lab
++//! binary holds `SimClock` (integer ns) and the L1 runner, plan §4.7's `L1Scenario`, built as `scenario::run` with its
++//! `Server` (one server and 48 headless clients on one simulated clock, in a fixed order per instant: due packets, the
++//! server's I/O step, the server tick if due, due client frames, due client ticks), and the x86-64 re-decode and replay
++//! tool for the Arm rule (`replay::ReplayX86`). Nothing depends on this crate. Built in units U2 and U4.
  
 -/// One tick's entry in a leg's per-tick hash list: the recording (or run) it replays, the tick and the state hash.
 +/// One tick's entry in a leg's per-tick hash list: the recording both legs replay (its manifest name), the tick and the
@@ -1863,10 +2075,10 @@ index e5587d3..04424bb 100644
  #[cfg(feature = "bites")]
  impl Schedule {
 diff --git a/spikes/netcode-proof/crates/server/tests/schedule.rs b/spikes/netcode-proof/crates/server/tests/schedule.rs
-index 01c465e..2f463d7 100644
+index 01c465e..aa50b56 100644
 --- a/spikes/netcode-proof/crates/server/tests/schedule.rs
 +++ b/spikes/netcode-proof/crates/server/tests/schedule.rs
-@@ -337,6 +337,8 @@ mod bites {
+@@ -337,14 +337,21 @@ mod bites {
      const TIMER_PERIOD: &str = "PM-0004-67/timer-period";
      const UNCAPPED: &str = "PM-0004-67/uncapped-catchup";
      const UNCOUNTED: &str = "PM-0004-67/uncounted-drop";
@@ -1875,11 +2087,14 @@ index 01c465e..2f463d7 100644
  
      fn bitten(hz: u32, cap: u32, id: &str) -> Schedule {
          Schedule::with_bite(hz, cap, id).expect("npt-server plants it")
-@@ -344,7 +346,10 @@ mod bites {
+     }
  
++    /// npt-server's four bite ids, each in marks.json: three are the schedule's (`Schedule::with_bite`) and one the
++    /// pump's (`Decoder::with_bite`: U4R-Q6 (a)), which the schedule refuses.
      #[test]
-     fn the_three_bites_are_planted_here_under_their_marks_json_ids() {
+-    fn the_three_bites_are_planted_here_under_their_marks_json_ids() {
 -        assert_eq!(npt_server::BITES, [TIMER_PERIOD, UNCAPPED, UNCOUNTED]);
++    fn npt_server_s_four_bites_are_listed_under_their_marks_json_ids() {
 +        assert_eq!(
 +            npt_server::BITES,
 +            [TIMER_PERIOD, UNCAPPED, UNCOUNTED, WALLCLOCK]
@@ -1887,7 +2102,7 @@ index 01c465e..2f463d7 100644
          let marks = include_str!("../../../marks/marks.json");
          for id in npt_server::BITES {
              assert!(
-@@ -352,7 +357,12 @@ mod bites {
+@@ -352,7 +359,12 @@ mod bites {
                  "{id} is not in marks.json"
              );
          }
@@ -2235,10 +2450,10 @@ index 0000000..9c4b6c5
 +}
 diff --git a/spikes/netcode-proof/crates/lab/src/contract.rs b/spikes/netcode-proof/crates/lab/src/contract.rs
 new file mode 100644
-index 0000000..4221f73
+index 0000000..414e55f
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/contract.rs
-@@ -0,0 +1,632 @@
+@@ -0,0 +1,633 @@
 +//! r2, the contract test's checker (u4r-brief.md 2.4 r2 (b), (c) and (e); U4R-Q11 (a)): one run's three logs, read
 +//! back, against marks/SERIES.md and the judge's validity inputs. The judge's own half, (a) every check of the parts
 +//! the run's header lists resolving with no gap and (d) PM-0001-2 passing, is `npt-judge --only` on the same folder:
@@ -2684,27 +2899,28 @@ index 0000000..4221f73
 +#[cfg(test)]
 +mod tests {
 +    use super::*;
-+    use crate::scenario::tests::{scratch, settings};
++    use crate::scenario::tests::{Scratch, scratch, settings};
 +
 +    const SERIES: &str = include_str!("../../../marks/SERIES.md");
 +
 +    /// One short L1 P0 run's logs (SS, 48 clients so the shot band applies, 6 s of warm-up, 2 s measured, its header
-+    /// listing -17).
-+    fn short_run() -> Vec<Log> {
++    /// listing -17), with its scratch guard, so a failing caller keeps them (advisor-u4r-r1, FP-6 item 6: T-5).
++    fn short_run() -> (Scratch, Vec<Log>) {
 +        let dir = scratch("r2");
 +        let s = settings(
 +            &dir,
 +            "--seed 2 --profile P0 --warmup-s 6 --measured-s 2 --after-max-s 10 --marks PM-0001-17",
 +        );
 +        crate::scenario::run(&s).expect("the run");
-+        read(&dir).expect("its logs")
++        let logs = read(&dir).expect("its logs");
++        (dir, logs)
 +    }
 +
 +    /// r2's checker passes the clean run, and each of U4R-Q11's four doctored copies fails it by name, and so do two
 +    /// more: the shot band, and a mirror breach (the advisor's U4r build ruling 3, point 6 (1)).
 +    #[test]
 +    fn r2_the_checker_passes_a_clean_run_and_fails_each_doctored_copy_by_name() {
-+        let logs = short_run();
++        let (_guard, logs) = short_run();
 +        let clean = check(&logs, SERIES);
 +        for l in &clean.lines {
 +            println!("r2 clean: {l}");
@@ -2873,10 +3089,10 @@ index 0000000..4221f73
 +}
 diff --git a/spikes/netcode-proof/crates/lab/src/logs.rs b/spikes/netcode-proof/crates/lab/src/logs.rs
 new file mode 100644
-index 0000000..66761d6
+index 0000000..a104ea4
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/logs.rs
-@@ -0,0 +1,786 @@
+@@ -0,0 +1,803 @@
 +//! The scenario's three logs (u4-build-plan.md §4.12 :410-415; marks/README.md §1 and §4; u4r-brief.md 2.1): on L1
 +//! one npt-lab process writes one log per process value the checks select on, each with its own header: `room` (the
 +//! room's per-tick World hash `h`, `hs.server_hash`, PM-0001-2's series, the `admit` events, `burst_eviction`), `client`
@@ -3038,7 +3254,10 @@ index 0000000..66761d6
 +    wraps: BTreeMap<&'static str, u64>,
 +    /// carry 62 (h)'s bite, PM-0001-17/whole-as-lost (the advisor's U4r build ruling, point 4): on every client, its
 +    /// first tick resolved whole in the measured phase filed as lost (null, `snap_incomplete` 1); per slot, that tick.
++    /// Bites builds only, so the measured binary holds no bite code (advisor-u4r-r1, FP-6 item 3: RR3-L4).
++    #[cfg(feature = "bites")]
 +    whole_as_lost: bool,
++    #[cfg(feature = "bites")]
 +    bitten_at: Vec<Option<u64>>,
 +    pub(crate) counts: Counts,
 +}
@@ -3069,6 +3288,8 @@ index 0000000..66761d6
 +        whole_as_lost: bool,
 +    ) -> Result<Logs, String> {
 +        let n = meta.clients as usize;
++        #[cfg(not(feature = "bites"))]
++        let _ = whole_as_lost;
 +        Ok(Logs {
 +            room: open(dir, "room", meta)?,
 +            client: open(dir, "client", meta)?,
@@ -3086,7 +3307,9 @@ index 0000000..66761d6
 +            written: None,
 +            track: RoomTrack::default(),
 +            wraps: BTreeMap::new(),
++            #[cfg(feature = "bites")]
 +            whole_as_lost,
++            #[cfg(feature = "bites")]
 +            bitten_at: vec![None; n],
 +            counts: Counts::default(),
 +        })
@@ -3177,6 +3400,22 @@ index 0000000..66761d6
 +        }
 +    }
 +
++    /// The whole-as-lost bite's site (bites builds only): a whole decode (not the sentinel) of slot `s`'s first measured
++    /// tick, and every later filing of that tick, goes in as lost; `w` the filing's tick, `h` its hash.
++    #[cfg(feature = "bites")]
++    fn bitten(&mut self, s: usize, w: u64, h: u64) -> bool {
++        let as_lost = self.whole_as_lost
++            && h != 0
++            && match self.bitten_at[s] {
++                Some(b) => b == w,
++                None => self.phases.get(&w) == Some(&Phase::Measured),
++            };
++        if as_lost {
++            self.bitten_at[s] = Some(w);
++        }
++        as_lost
++    }
++
 +    /// What one client step filed: (tick, hash) pairs (0 the sentinel) and the runs of ticks it resolved lost.
 +    pub(crate) fn filed(&mut self, slot: u8, hashes: &[(u32, u64)], lost: &[(u32, u32)]) {
 +        let s = usize::from(slot);
@@ -3190,23 +3429,17 @@ index 0000000..66761d6
 +                self.counts.conflicts += 1;
 +                continue;
 +            }
-+            // The bite: a whole decode (not the sentinel) of the client's first measured tick, and every later filing
-+            // of that tick, goes in as lost.
-+            let as_lost = self.whole_as_lost
-+                && h != 0
-+                && match self.bitten_at[s] {
-+                    Some(b) => b == w,
-+                    None => self.phases.get(&w) == Some(&Phase::Measured),
-+                };
-+            if as_lost {
-+                self.bitten_at[s] = Some(w);
++            #[cfg(feature = "bites")]
++            if self.bitten(s, w, h) {
++                self.entry(w)[s] = Res::Lost;
++                self.resolved(s, w);
++                continue;
 +            }
 +            let e = &mut self.entry(w)[s];
-+            *e = match (*e, as_lost) {
-+                (_, true) => Res::Lost,
-+                (Res::Open | Res::Lost, false) => Res::Hash(h),
-+                (Res::Hash(x), false) if x == h => Res::Hash(x),
-+                (Res::Hash(_), false) => Res::Hash(0),
++            *e = match *e {
++                Res::Open | Res::Lost => Res::Hash(h),
++                Res::Hash(x) if x == h => Res::Hash(x),
++                Res::Hash(_) => Res::Hash(0),
 +            };
 +            self.resolved(s, w);
 +        }
@@ -4161,13 +4394,14 @@ index 0000000..8e542eb
 +}
 diff --git a/spikes/netcode-proof/crates/lab/src/precheck.rs b/spikes/netcode-proof/crates/lab/src/precheck.rs
 new file mode 100644
-index 0000000..1eef179
+index 0000000..8daf08e
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/precheck.rs
-@@ -0,0 +1,977 @@
+@@ -0,0 +1,1057 @@
 +//! The -30 pre-check (u4r-brief.md 7.2; plan :772-796; the advisor's conditions 2 and 3; carry 40): a recorded npt-lab
 +//! test, never a judged id. Replay clients send the SS P0 recording's commands to one room over Loopback and to another
-+//! over L1 P0, in RQ8's order on one SimClock each, and `HashCompare::of` compares the two rooms' per-tick World hashes.
++//! over L1 P0, in RQ8's order, each leg on its own simulated clock (integer ns), and `HashCompare::of` compares the two
++//! rooms' per-tick World hashes.
 +//!
 +//! - **The tick base:** both legs' `World::new(scene, recording.seed, recording.first_tick)`, so each leg's first tick
 +//!   is the recording's first (`run_leg` refuses a tick that is not the recording's), run at SimClock instant 0 (U4b's
@@ -4200,7 +4434,8 @@ index 0000000..1eef179
 +//!   client's first take), and the refused Rewinds per command.
 +//! - **The setup condition and the RTT rule:** per leg, `late_count` (the room's `late`), `rewinds_refused`, the commands
 +//!   run off their stamp, and [`rtt_rule`]; the tolerance's replacements and the cap's clips are not built at U4r (0 by
-+//!   construction: rewind.rs:1-2). Any of the first three above 0, or the RTT rule on the L1 leg, makes the pair VOID.
++//!   construction: rewind.rs:1-2). Any of the first three above 0, a refused Rewind logged per command, a session ended
++//!   on the leg (its counters cannot be read), or the RTT rule on the L1 leg, makes the pair VOID.
 +
 +use std::collections::BTreeMap;
 +
@@ -4329,12 +4564,38 @@ index 0000000..1eef179
 +    /// Commands sent so far: `cmds[..next]`; `cmds[unrun..next]` sent and not yet run.
 +    next: usize,
 +    unrun: usize,
-+    /// The late-command bite: the tick T whose command and every later one are held until T has run.
++    /// The late-command bite: the tick T whose command and every later one are held until T has run. Bites builds
++    /// only, so the measured binary holds no bite code (advisor-u4r-r1, FP-6 item 3: RR3-L4).
++    #[cfg(feature = "bites")]
 +    hold: Option<u32>,
++    #[cfg(feature = "bites")]
 +    released: bool,
 +}
 +
 +impl ReplayClient {
++    /// The late-command bite's hold (bites builds only): the next command, stamped T or later, waits while T has not run.
++    #[cfg(feature = "bites")]
++    fn held(&self, ran: u32) -> bool {
++        self.hold
++            .is_some_and(|t| ran < t && self.cmds[self.next].tick >= t)
++    }
++
++    /// The late-command bite's release (bites builds only): once T has run, T first (it ran already: option B reran the
++    /// last command there), the later ones after; (the first command to send, the delayed command's tick).
++    #[cfg(feature = "bites")]
++    fn release(&mut self, ran: u32, from: usize) -> (usize, Option<u32>) {
++        if let Some(t) = self.hold
++            && ran >= t
++            && !self.released
++        {
++            self.released = true;
++            if let Some(i) = self.cmds.iter().position(|c| c.tick >= t) {
++                return (from.min(i), Some(self.cmds[i].tick));
++            }
++        }
++        (from, None)
++    }
++
 +    /// RQ8's step 5 at `now`, after tick `ran` ran: the endpoint decodes what arrived and sends its `Join` and `Pong`s;
 +    /// once joined, the commands due (stamped at most `ran + lead`) go in this client's own `Input`.
 +    fn step(&mut self, now: u64, ran: u32, lead: u32) -> Option<u32> {
@@ -4357,29 +4618,20 @@ index 0000000..1eef179
 +            }
 +        }
 +        self.endpoint.slot()?;
-+        let held = |c: &Command, hold: Option<u32>| hold.is_some_and(|t| ran < t && c.tick >= t);
-+        while self.next < self.cmds.len()
-+            && self.cmds[self.next].tick <= ran.wrapping_add(lead)
-+            && !held(&self.cmds[self.next], self.hold)
-+        {
++        while self.next < self.cmds.len() && self.cmds[self.next].tick <= ran.wrapping_add(lead) {
++            #[cfg(feature = "bites")]
++            if self.held(ran) {
++                break;
++            }
 +            self.next += 1;
 +        }
 +        while self.unrun < self.next && self.cmds[self.unrun].tick <= ran {
 +            self.unrun += 1;
 +        }
-+        let mut from = self.unrun;
-+        let mut delayed = None;
-+        if let Some(t) = self.hold
-+            && ran >= t
-+            && !self.released
-+        {
-+            // The bite's release: T first (it ran already: option B reran the last command there), the later ones after.
-+            self.released = true;
-+            if let Some(i) = self.cmds.iter().position(|c| c.tick >= t) {
-+                from = from.min(i);
-+                delayed = Some(self.cmds[i].tick);
-+            }
-+        }
++        #[cfg(feature = "bites")]
++        let (from, delayed) = self.release(ran, self.unrun);
++        #[cfg(not(feature = "bites"))]
++        let (from, delayed) = (self.unrun, None);
 +        let mut commands: Vec<Command> = Vec::new();
 +        for c in self.cmds[from..self.next].iter().rev() {
 +            if commands.len() == Limits::REDUNDANCY_CAP
@@ -4456,17 +4708,17 @@ index 0000000..1eef179
 +    )
 +    .with_hashes(CONTENT, [0; 32]);
 +    let mut server = Server::new(room, Quant::default(), RttSource::Link);
-+    let mut late_bite = false;
 +    if let Some(id) = bite {
 +        let b = Bites::of(id)?;
 +        if b.pump {
 +            server.decoder_bite = Some(id.to_owned());
-+        } else if b.late_command {
-+            late_bite = true;
-+        } else {
++        } else if !b.late_command {
 +            return Err(format!("--bite {id}: not a -30 pre-check bite"));
 +        }
 +    }
++    // The late-command bite's replay client (bites builds only: a measured build's `Bites::of` refused every id above).
++    #[cfg(feature = "bites")]
++    let late_bite = bite == Some(crate::scenario::LAB_BITES[1]);
 +    let mut schedule = Schedule::new(npt_sim::TICK_HZ, npt_sim::LOOP_CATCHUP);
 +    let net = L1Net::new(rec.seed);
 +    let mut listener = net.listener();
@@ -4481,6 +4733,7 @@ index 0000000..1eef179
 +                Box::new(c)
 +            }
 +        };
++        #[cfg(feature = "bites")]
 +        let hold = if late_bite && clients.is_empty() {
 +            let t0 = rec.ticks.first().map_or(rec.first_tick, |t| t.tick);
 +            Some(
@@ -4501,7 +4754,9 @@ index 0000000..1eef179
 +            cmds: list.clone(),
 +            next: 0,
 +            unrun: 0,
++            #[cfg(feature = "bites")]
 +            hold,
++            #[cfg(feature = "bites")]
 +            released: false,
 +        });
 +    }
@@ -4647,9 +4902,10 @@ index 0000000..1eef179
 +    Ok(o)
 +}
 +
-+/// The pair's result (7.2): VOID if either leg breaks the setup condition (late, rewinds refused, a command off its
-+/// stamp) or the RTT rule, or nothing was compared; else PASS when the comparer names no differing tick, FAIL when it
-+/// names one. Returns (result, reason).
++/// The pair's result (7.2): VOID if either leg breaks the setup condition (late, rewinds refused, refused Rewinds logged
++/// per command, a command off its stamp) or the RTT rule, or a session ended on it (its counters, read at the leg's end,
++/// cannot be read once its slot is gone: advisor-u4r-r1, FP-4), or nothing was compared; else PASS when the comparer
++/// names no differing tick, FAIL when it names one. Returns (result, reason).
 +pub(crate) fn verdict(a: &LegOutcome, b: &LegOutcome, cmp: &HashCompare) -> (&'static str, String) {
 +    let mut void = Vec::new();
 +    for (leg, o) in [("loopback", a), ("L1", b)] {
@@ -4658,6 +4914,15 @@ index 0000000..1eef179
 +        }
 +        if o.rewinds_refused > 0 {
 +            void.push(format!("{leg} rewinds_refused {}", o.rewinds_refused));
++        }
++        if o.refused_logged > 0 {
++            void.push(format!("{leg} refused Rewinds logged {}", o.refused_logged));
++        }
++        if !o.ended.is_empty() {
++            void.push(format!(
++                "{leg} sessions ended on the leg {:?}: their counters cannot be read",
++                o.ended
++            ));
 +        }
 +        if o.off_stamp > 0 {
 +            void.push(format!("{leg} commands off their stamp {}", o.off_stamp));
@@ -4979,6 +5244,54 @@ index 0000000..1eef179
 +        );
 +    }
 +
++    /// advisor-u4r-r1, FP-4 (NC-U4R-3, T-6's verdict half): `verdict` on doctored outcomes, one VOID cause each on the
++    /// L1 leg (late, rewinds refused, refused Rewinds logged alone, off-stamp, the RTT rule, a session ended), each named;
++    /// and on clean legs the comparer decides: Empty VOID, Equal PASS, Mismatch FAIL.
++    #[test]
++    fn fp4_each_void_cause_alone_gives_void_by_name_and_the_comparer_decides_a_clean_pair() {
++        let clean = LegOutcome::default();
++        let equal = HashCompare::Equal { entries: 3 };
++        type Doctor = fn(&mut LegOutcome);
++        let causes: [(&str, Doctor); 6] = [
++            ("L1 late_count 1", |o| o.late = 1),
++            ("L1 rewinds_refused 2", |o| o.rewinds_refused = 2),
++            ("L1 refused Rewinds logged 3", |o| o.refused_logged = 3),
++            ("L1 commands off their stamp 4", |o| o.off_stamp = 4),
++            ("L1 RTT rule: client 5: planted", |o| {
++                o.rtt_void = Some("client 5: planted".to_owned());
++            }),
++            (
++                "L1 sessions ended on the leg [(6, \"closed\")]: their counters cannot be read",
++                |o| o.ended = vec![(6, "closed")],
++            ),
++        ];
++        for (named, doctor) in causes {
++            let mut l1 = LegOutcome::default();
++            doctor(&mut l1);
++            let (result, why) = verdict(&clean, &l1, &equal);
++            assert_eq!(
++                (result, why.as_str()),
++                ("VOID", named),
++                "the cause {named:?}"
++            );
++        }
++        assert_eq!(verdict(&clean, &clean, &HashCompare::Empty).0, "VOID");
++        assert_eq!(
++            verdict(&clean, &clean, &equal),
++            ("PASS", "3 ticks, every World hash equal".to_owned())
++        );
++        let mismatch = HashCompare::Mismatch {
++            index: 1,
++            ours: None,
++            theirs: None,
++            compared: 3,
++            mismatching: 1,
++        };
++        let (result, why) = verdict(&clean, &clean, &mismatch);
++        assert_eq!(result, "FAIL", "{why}");
++        assert!(why.starts_with("first differing index 1 "), "{why}");
++    }
++
 +    /// r6, the pre-check's pacing test (7.2's pacing rule): a short clean replay of the SS P0 recording over both legs
 +    /// gives `late_count` 0 and `rewinds_refused` 0 on both, every command run at its stamped tick, the room's measured
 +    /// depth L - 1 at every take after each client's first (input.rs:28-29: the newest buffered command's tick minus
@@ -5144,10 +5457,10 @@ index 0000000..1eef179
 +}
 diff --git a/spikes/netcode-proof/crates/lab/src/replay.rs b/spikes/netcode-proof/crates/lab/src/replay.rs
 new file mode 100644
-index 0000000..241ef0d
+index 0000000..4def2cb
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/replay.rs
-@@ -0,0 +1,429 @@
+@@ -0,0 +1,486 @@
 +//! `replay`, the x86-64 re-decode ([`ReplayX86`]; u4r-brief.md 2.1 and 2.4 r3; plan :753-755, :761-764; R-8, the
 +//! advisor's condition 9): a run's logged client bytes (`scenario --bytes`: each client's received messages, step by
 +//! step, with each step's host instant) decoded again natively by a fresh `ClientEndpoint` per client, with the run's
@@ -5411,15 +5724,26 @@ index 0000000..241ef0d
 +    let fail = Failure::Failed;
 +    let client = read_log(&s.logs.join("client.jsonl")).map_err(fail)?;
 +    let h = &client.header;
++    // The header's client count as a slot count, 1 to 255, before any .bytes file is read or any list sized
++    // (advisor-u4r-r1, FP-6 item 4: RR3-L7).
++    let clients = u8::try_from(h.clients)
++        .ok()
++        .filter(|c| *c > 0)
++        .ok_or_else(|| {
++            fail(format!(
++                "the run's client log header names {} clients: 1 to 255",
++                h.clients
++            ))
++        })?;
 +    let rx = ReplayX86::of(h, s.bite.as_deref()).map_err(Failure::Usage)?;
-+    let n = usize::try_from(h.clients).map_err(|_| fail("clients above usize".to_owned()))?;
++    let n = usize::from(clients);
 +    let mut by_tick: BTreeMap<u64, Vec<Option<u64>>> = BTreeMap::new();
 +    let mut o = Outcome {
 +        clients: n,
 +        ..Outcome::default()
 +    };
-+    for slot in 0..n {
-+        let s8 = u8::try_from(slot).map_err(|_| fail(format!("slot {slot} above 255")))?;
++    for s8 in 0..clients {
++        let slot = usize::from(s8);
 +        let p = s.bytes.join(format!("client-{slot}.bytes"));
 +        let bytes = std::fs::read(&p).map_err(|e| fail(format!("{}: {e}", p.display())))?;
 +        let steps = read_steps(&bytes).map_err(|e| fail(format!("{}: {e}", p.display())))?;
@@ -5506,6 +5830,52 @@ index 0000000..241ef0d
 +        (dir, bytes)
 +    }
 +
++    /// advisor-u4r-r1, FP-6 item 4 (RR3-L7): a run's client log whose header names 256 clients is refused as a failure
++    /// before any .bytes file is read (the bytes folder given does not exist).
++    #[test]
++    fn fp6_a_header_of_256_clients_is_refused_before_any_bytes_file_is_read() {
++        let dir = scratch("replay-256");
++        std::fs::create_dir_all(&*dir).expect("the folder");
++        let header = Header {
++            schema: npt_log::SCHEMA,
++            run: "t".to_owned(),
++            set: "t".to_owned(),
++            role: "measured".to_owned(),
++            marks: Vec::new(),
++            machine: crate::machine::container(),
++            build: crate::machine::build(crate::scenario::tests::COMMIT).expect("a build"),
++            bite: None,
++            layer: "L1".to_owned(),
++            profile: "P0".to_owned(),
++            seed: 1,
++            tick_hz: npt_sim::TICK_HZ,
++            clients: 256,
++            scene: "SS".to_owned(),
++            process: "client".to_owned(),
++            slot: 0,
++            date: "2026-11-14".to_owned(),
++            params: BTreeMap::new(),
++        };
++        let f = std::fs::File::create(dir.join("client.jsonl")).expect("the log");
++        Writer::new(f, &header)
++            .expect("its header")
++            .finish(Ended::Clean)
++            .expect("its footer");
++        let s = Settings {
++            logs: dir.to_path_buf(),
++            bytes: dir.join("no-such-bytes-folder"),
++            out: dir.join("out"),
++            bite: None,
++        };
++        match run(&s) {
++            Err(Failure::Failed(m)) => {
++                assert_eq!(m, "the run's client log header names 256 clients: 1 to 255")
++            }
++            Err(Failure::Usage(m)) => panic!("a usage error: {m}"),
++            Ok(o) => panic!("replayed: {o:?}"),
++        }
++    }
++
 +    /// The bytes file's reader takes back what `write_step` wrote, and refuses a cut-short file and an unknown channel.
 +    #[test]
 +    fn r3_the_bytes_file_reads_back_step_by_step() {
@@ -5579,10 +5949,10 @@ index 0000000..241ef0d
 +}
 diff --git a/spikes/netcode-proof/crates/lab/src/scenario.rs b/spikes/netcode-proof/crates/lab/src/scenario.rs
 new file mode 100644
-index 0000000..460a3c9
+index 0000000..4865e70
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/scenario.rs
-@@ -0,0 +1,2304 @@
+@@ -0,0 +1,2518 @@
 +//! `L1Scenario` (u4-build-plan.md §5 U4r; plan.md §4.7, RQ8; u4r-brief.md 2.1): one server and its clients on one
 +//! simulated clock, [`SimClock`] (integer ns), in RQ8's order at each instant:
 +//! 1. packets due: L1 applies every event due at or before the instant at the instant's first call (here the
@@ -5592,8 +5962,8 @@ index 0000000..460a3c9
 +//!    `Err`, `Decoder::reject`), the pump called again after a `Join` (it returns after one), `receive` for every other
 +//!    message of a joined session, and `pump_report` with the bytes the pump sent;
 +//! 3. the server tick if due, through U4b's `Schedule::new(npt_sim::TICK_HZ, npt_sim::LOOP_CATCHUP)` (carry 6), then
-+//!    each session's datagrams and reliable messages onto its link, each reliable message on the channel its type's
-+//!    row of `Limits::TYPES` names;
++//!    each session's datagrams and reliable messages onto its link, each reliable message on the one stream channel
++//!    that decodes it (`stream_of`; the paragraph below);
 +//! 4. the clients' 60 Hz frames: no work until U4g's `Interp`, so the runner adds no instant for them;
 +//! 5. each client whose next step is due, in slot order: what its link delivered since its last step (polled into its
 +//!    inbox at every instant: the socket's buffer), its `Behaviour::step`, then `ClientEndpoint::step`, whose datagrams
@@ -5604,10 +5974,12 @@ index 0000000..460a3c9
 +//! is U4f's cheat), and each arrival is stamped on it. L1's RTT is its own RFC 9002 estimate.
 +//!
 +//! **Session handling** (carry 76): when `Room::join` reports a replacement, the lab sends the old session
-+//! `Kick(replaced)` and drops its `Decoder` and link before it routes anything else; when the room kicks a client or
-+//! takes its `Leave`, the lab drops that session. **Reliable messages' channel:** each is decoded on both stream
-+//! channels with the `Quant` it was coded with, and exactly one must take it (never a silent fall-back to Control).
-+//! **Tokens** are seeded per slot and never logged.
++//! `Kick(replaced)` and drops its `Decoder` and link before it routes anything else (the `Kick(replaced)` is sent once;
++//! on L1 the old link is dropped in the same instant, so a lost first transmission is not resent: best effort); when
++//! the room kicks a client or takes its `Leave`, the lab drops that session; a closed decoder or link ends the session
++//! and frees the room's slot (`Room::leave`, as its doc has it: "a closed link"). **Reliable messages' channel:** each
++//! is decoded on both stream channels with the `Quant` it was coded with, and exactly one must take it (never a silent
++//! fall-back to Control). **Tokens** are seeded per slot and never logged.
 +
 +use std::collections::BTreeMap;
 +use std::io::Write;
@@ -5616,7 +5988,7 @@ index 0000000..460a3c9
 +use npt_bots::Behaviour;
 +use npt_client::ClientEndpoint;
 +use npt_l1::{L1Net, Profile};
-+use npt_link::{Channel, Link};
++use npt_link::{Channel, Link, LinkState};
 +use npt_log::{Ended, EventRecord, Phase};
 +use npt_proto::{Direction, Join, Kick, Message, Quant};
 +use npt_room::Room;
@@ -5642,7 +6014,8 @@ index 0000000..460a3c9
 +/// Carry 75's bound: every client is admitted before the room has stamped this many events past its start.
 +pub(crate) const ADMIT_EVENTS_BOUND: u64 = 32_768;
 +/// The highest feet a scripted spawn or teleport may set, cm: World's stated clamp bound (TUNE-2; world.rs:653-660),
-+/// the position grid's top less the fire origin's 140 cm above the feet, read from npt-sim's grid.
++/// the position grid's top less the fire origin's 140 cm above the feet, a copy of npt-sim's private `CHEST_CM`
++/// (sim/src/world.rs:79; its `FEET_Z_BOUND_CM`, :71), with the grid's top read from npt-sim's grid.
 +pub(crate) const PLACEMENT_Z_BOUND_CM: i32 = npt_sim::grid::POSITION_Z.max() - 140;
 +
 +/// The simulated clock (plan.md:617): integer ns, which only moves forward.
@@ -5796,7 +6169,9 @@ index 0000000..460a3c9
 +            client: npt_client::BITES.contains(&id) || proto,
 +            decoder: proto,
 +            l1: L1Net::BITES.contains(&id),
-+            schedule: npt_server::BITES.contains(&id),
++            // npt-server's list also holds the pump's id, which the schedule never plants (advisor-u4r-r1, FP-6 item 2:
++            // EA-U4R-3 = RR3-L8): the schedule's own answer decides.
++            schedule: Schedule::with_bite(npt_sim::TICK_HZ, npt_sim::LOOP_CATCHUP, id).is_some(),
 +            pump: Decoder::new(
 +                Quant::default(),
 +                npt_sim::TICK_HZ,
@@ -5848,12 +6223,10 @@ index 0000000..460a3c9
 +    fn world(&self, scene: &Scene, seed: u64, first_tick: u32, arm_tick: u32) -> World {
 +        #[cfg(feature = "bites")]
 +        if self.world
-+            && let Some(w) = self
-+                .id
-+                .as_deref()
-+                .and_then(|id| World::with_bite(scene, seed, first_tick, id, arm_tick))
++            && let Some(id) = self.id.as_deref()
 +        {
-+            return w;
++            return World::with_bite(scene, seed, first_tick, id, arm_tick)
++                .expect("Bites::of checked that this instance plants it");
 +        }
 +        let _ = arm_tick;
 +        World::new(scene, seed, first_tick)
@@ -5886,9 +6259,10 @@ index 0000000..460a3c9
 +    fn net(&self, seed: u64) -> L1Net {
 +        #[cfg(feature = "bites")]
 +        if self.l1
-+            && let Some(net) = self.id.as_deref().and_then(|id| L1Net::with_bite(seed, id))
++            && let Some(id) = self.id.as_deref()
 +        {
-+            return net;
++            return L1Net::with_bite(seed, id)
++                .expect("Bites::of checked that this instance plants it");
 +        }
 +        L1Net::new(seed)
 +    }
@@ -5896,12 +6270,10 @@ index 0000000..460a3c9
 +    fn schedule(&self) -> Schedule {
 +        #[cfg(feature = "bites")]
 +        if self.schedule
-+            && let Some(s) = self
-+                .id
-+                .as_deref()
-+                .and_then(|id| Schedule::with_bite(npt_sim::TICK_HZ, npt_sim::LOOP_CATCHUP, id))
++            && let Some(id) = self.id.as_deref()
 +        {
-+            return s;
++            return Schedule::with_bite(npt_sim::TICK_HZ, npt_sim::LOOP_CATCHUP, id)
++                .expect("Bites::of checked that this instance plants it");
 +        }
 +        Schedule::new(npt_sim::TICK_HZ, npt_sim::LOOP_CATCHUP)
 +    }
@@ -6072,10 +6444,16 @@ index 0000000..460a3c9
 +            let Some(x) = self.sessions[i].as_mut() else {
 +                continue;
 +            };
-+            if x.decoder.is_closed() {
-+                let slot = x.slot;
++            // Carry 76 (advisor-u4r-r1, FP-1): after the pump drained what had arrived, a closed decoder or link ends
++            // the session, and the room's slot is freed when this session holds it (`Room::leave`: "a closed link").
++            if x.decoder.is_closed() || x.link.state() == LinkState::Closed {
++                let (id, slot) = (x.id, x.slot);
 +                self.sessions[i] = None;
 +                if let Some(slot) = slot {
++                    if self.owner.get(&slot) == Some(&id) {
++                        self.room.leave(slot);
++                        self.owner.remove(&slot);
++                    }
 +                    self.ended.push((slot, "closed"));
 +                }
 +                continue;
@@ -6160,7 +6538,9 @@ index 0000000..460a3c9
 +}
 +
 +/// A runner recording made again (carry 82; u4r-brief.md 2.1 (ii)): `npt-lab scenario --record` at these settings, the
-+/// brawl, no log kept, its bytes handed back.
++/// brawl, no log kept, its bytes handed back. Its argv holds these flags only, each value one item (never a line split
++/// on whitespace: advisor-u4r-r1, FP-3), so no manifest value can add a flag, and the advisor's U4r build ruling 1,
++/// point 9 (a)'s refusal of `--lead` and `--every-step` holds on this path by construction.
 +pub(crate) fn record(
 +    scene: &Scene,
 +    profile: &str,
@@ -6170,13 +6550,43 @@ index 0000000..460a3c9
 +    warmup_s: u64,
 +    measured_s: u64,
 +) -> Result<Vec<u8>, String> {
-+    let line = format!(
-+        "--run regenerate --set regenerate --date 2000-01-01 --commit {} --out - --scene {} --profile {profile} \
-+         --seed {seed} --clients {clients} --tick-start {first_tick} --warmup-s {warmup_s} --measured-s {measured_s}",
++    let (commit, seed, clients, first_tick, warmup_s, measured_s) = (
 +        "0".repeat(40),
-+        scene.name()
++        seed.to_string(),
++        clients.to_string(),
++        first_tick.to_string(),
++        warmup_s.to_string(),
++        measured_s.to_string(),
 +    );
-+    let argv: Vec<String> = line.split_whitespace().map(str::to_owned).collect();
++    let argv: Vec<String> = [
++        "--run",
++        "regenerate",
++        "--set",
++        "regenerate",
++        "--date",
++        "2000-01-01",
++        "--commit",
++        &commit,
++        "--out",
++        "-",
++        "--scene",
++        scene.name(),
++        "--profile",
++        profile,
++        "--seed",
++        &seed,
++        "--clients",
++        &clients,
++        "--tick-start",
++        &first_tick,
++        "--warmup-s",
++        &warmup_s,
++        "--measured-s",
++        &measured_s,
++    ]
++    .into_iter()
++    .map(str::to_owned)
++    .collect();
 +    let mut s = parse(&argv)?;
 +    s.logs = false;
 +    s.record_mem = true;
@@ -6431,6 +6841,9 @@ index 0000000..460a3c9
 +        // (2) the server's I/O step.
 +        server.io(now);
 +        for (slot, session, tick) in std::mem::take(&mut server.admitted) {
++            // Carry 75's bound is checked on logged runs only: `events_stamped` counts what `room_tick` returns, which
++            // a no-log run (--logs 0, or `npt-lab hash`'s regeneration) does not call, so there it stays 0
++            // (advisor-u4r-r1, FP-7 item 6: RR3-L2 (b)).
 +            if events_stamped >= ADMIT_EVENTS_BOUND {
 +                return Err(fail(format!(
 +                    "slot {slot} admitted after {events_stamped} events past the event start (carry 75's bound \
@@ -6904,9 +7317,23 @@ index 0000000..460a3c9
 +    let event_start = small(num(take("event-start"), "event-start", 0)?, "event-start")?;
 +    let cmd_start = small(num(take("cmd-start"), "cmd-start", 0)?, "cmd-start")?;
 +    let hz = u64::from(npt_sim::TICK_HZ);
-+    let warmup_ticks = num(take("warmup-s"), "warmup-s", 10)? * hz;
-+    let measured_ticks = num(take("measured-s"), "measured-s", 60)? * hz;
-+    let after_max_ticks = num(take("after-max-s"), "after-max-s", 30)? * hz;
++    // Checked products and sums (advisor-u4r-r1, FP-3: SEC-U4R-3, RR3-L3): each overflow a usage error naming its
++    // option, so `run`'s plain sums of these lengths cannot overflow.
++    let mut ticks_of = |k: &str, default: u64| -> Result<u64, String> {
++        let s = num(take(k), k, default)?;
++        s.checked_mul(hz).ok_or(format!(
++            "--{k} {s}: its ticks ({s} x {hz}) overflow 64 bits"
++        ))
++    };
++    let warmup_ticks = ticks_of("warmup-s", 10)?;
++    let measured_ticks = ticks_of("measured-s", 60)?;
++    let after_max_ticks = ticks_of("after-max-s", 30)?;
++    let measured_end = warmup_ticks
++        .checked_add(measured_ticks)
++        .ok_or("--warmup-s and --measured-s: their ticks' sum overflows 64 bits".to_owned())?;
++    measured_end
++        .checked_add(after_max_ticks)
++        .ok_or("--after-max-s: the run's last tick overflows 64 bits".to_owned())?;
 +    let behaviour = take("behaviour").unwrap_or_else(|| "brawl".to_owned());
 +    if !["brawl", "presses", "clamp", "steady"].contains(&behaviour.as_str()) {
 +        return Err(format!(
@@ -6967,6 +7394,18 @@ index 0000000..460a3c9
 +                .to_owned(),
 +        );
 +    }
++    // The last burst's tick, checked before `burst_starts` sums it (FP-3: RR3-L3), which bounds every sum there.
++    if profile_name == "B1" && bursts > 0 {
++        (bursts - 1)
++            .checked_mul(burst_every_s)
++            .and_then(|x| x.checked_add(burst_first_s))
++            .and_then(|x| x.checked_mul(hz))
++            .and_then(|x| x.checked_add(warmup_ticks))
++            .ok_or(format!(
++                "--bursts {bursts}, --burst-first-s {burst_first_s} and --burst-every-s {burst_every_s}: the last \
++                 burst's tick overflows 64 bits"
++            ))?;
++    }
 +    let profile = match profile_name.as_str() {
 +        "B1" => Profile::b1(&burst_starts(
 +            seed,
@@ -6981,6 +7420,13 @@ index 0000000..460a3c9
 +        None => Bites::default(),
 +        Some(id) => Bites::of(id)?,
 +    };
++    // advisor-u4r-r1, FP-6 item 1 (NC-U4R-2): an id whose only instance is the -30 pre-check's late-command replay
++    // client is planted by no instance of a scenario run, so it is a usage error here (u4r-brief.md 2.1).
++    if let (true, Some(id)) = (bites.late_command, &bite) {
++        return Err(format!(
++            "--bite {id} is the -30 pre-check's (npt-lab precheck)"
++        ));
++    }
 +    let lead = lead_override.unwrap_or_else(|| lead_for(&profile));
 +    let burst_spacing_ns = if profile.bursts_ns.is_empty() {
 +        0
@@ -7215,30 +7661,33 @@ index 0000000..460a3c9
 +    }
 +
 +    /// r1's comparison: the fate logs' SHA-256s, the room's per-tick World hash `h` and `hs.server_hash`, and the
-+    /// clients' `hs.decoded_hash` and `tick.s.snap_incomplete`, over the same ticks. `Ok` with the ticks compared, or
-+    /// the first difference.
-+    fn twin_differences(a: &Path, b: &Path) -> Result<usize, String> {
++    /// clients' `hs.decoded_hash` and `tick.s.snap_incomplete`, over the same ticks. `Ok` with the tick records compared
++    /// per process (room, client), or the first difference.
++    fn twin_differences(a: &Path, b: &Path) -> Result<[usize; 2], String> {
 +        if let Some(e) = fate_difference(a, b) {
 +            return Err(e);
 +        }
 +        tick_differences(a, b)
 +    }
 +
-+    fn fate_difference(a: &Path, b: &Path) -> Option<String> {
-+        let fate = |d: &Path| {
-+            read(d, "lab")
-+                .events
-+                .iter()
-+                .find(|e| e.ev == "fate_log")
-+                .map(|e| e.f["sha256"].clone())
-+        };
-+        (fate(a) != fate(b)).then(|| format!("fate logs {:?} and {:?}", fate(a), fate(b)))
++    /// A run's `fate_log` record's SHA-256, if its lab log holds one.
++    fn fate_of(d: &Path) -> Option<serde_json::Value> {
++        read(d, "lab")
++            .events
++            .iter()
++            .find(|e| e.ev == "fate_log")
++            .map(|e| e.f["sha256"].clone())
 +    }
 +
-+    /// The per-tick half of r1's comparison.
-+    fn tick_differences(a: &Path, b: &Path) -> Result<usize, String> {
-+        let mut compared = 0;
-+        for process in ["room", "client"] {
++    fn fate_difference(a: &Path, b: &Path) -> Option<String> {
++        (fate_of(a) != fate_of(b))
++            .then(|| format!("fate logs {:?} and {:?}", fate_of(a), fate_of(b)))
++    }
++
++    /// The per-tick half of r1's comparison: the tick records compared per process (room, client).
++    fn tick_differences(a: &Path, b: &Path) -> Result<[usize; 2], String> {
++        let mut compared = [0; 2];
++        for (i, process) in ["room", "client"].into_iter().enumerate() {
 +            let (x, y) = (read(a, process), read(b, process));
 +            if x.ticks.len() != y.ticks.len() {
 +                return Err(format!(
@@ -7255,7 +7704,7 @@ index 0000000..460a3c9
 +                {
 +                    return Err(format!("{process}: tick {} (and {}) differs", p.t, q.t));
 +                }
-+                compared += 1;
++                compared[i] += 1;
 +            }
 +        }
 +        Ok(compared)
@@ -7275,11 +7724,22 @@ index 0000000..460a3c9
 +    #[test]
 +    fn r1_two_processes_of_one_seed_give_equal_fate_logs_and_per_tick_hashes() {
 +        let [a, b] = two_legs("r1", false);
-+        let compared = twin_differences(&a, &b).unwrap_or_else(|e| panic!("r1: {e}"));
-+        assert!(compared > 200, "ticks compared: {compared}");
++        // advisor-u4r-r1, FP-6 item 5 (T-4): both fates are there (None against None is no comparison), and each
++        // process's half compared records in both legs (its count, not the sum).
++        assert!(
++            fate_of(&a).is_some(),
++            "the first leg's lab log holds its fate_log record"
++        );
++        let [room, client] = twin_differences(&a, &b).unwrap_or_else(|e| panic!("r1: {e}"));
++        assert!(
++            room > 0 && client > 0,
++            "tick records compared: room {room}, client {client}"
++        );
++        assert!(room + client > 200, "ticks compared: {room} + {client}");
 +        assert_eq!(digest(&a), digest(&b), "slot order in both");
 +        println!(
-+            "r1: {compared} tick records compared, equal; connect order digest {}",
++            "r1: {room} room and {client} client tick records compared, equal; fate log {:?}; connect order digest {}",
++            fate_of(&a),
 +            digest(&a)
 +        );
 +    }
@@ -7393,8 +7853,9 @@ index 0000000..460a3c9
 +        );
 +    }
 +
-+    /// r4's run: SS, 48 clients in 3 x 16, P2, 6 s of warm-up and 2 s measured.
-+    fn r4_run(seed: u64, bite: &str) -> Summary {
++    /// r4's run: SS, 48 clients in 3 x 16, P2, 6 s of warm-up and 2 s measured; its scratch guard is handed back, so a
++    /// failing caller keeps the logs (advisor-u4r-r1, FP-6 item 6: T-5).
++    fn r4_run(seed: u64, bite: &str) -> (Scratch, Summary) {
 +        let dir = scratch(&format!(
 +            "r4-{seed}{}",
 +            if bite.is_empty() { "" } else { "-bite" }
@@ -7403,7 +7864,8 @@ index 0000000..460a3c9
 +            &dir,
 +            &format!("--seed {seed} --profile P2 --warmup-s 6 --measured-s 2 {bite}"),
 +        );
-+        run(&s).unwrap_or_else(|e| panic!("r4 seed {seed}: {e:?}"))
++        let o = run(&s).unwrap_or_else(|e| panic!("r4 seed {seed}: {e:?}"));
++        (dir, o)
 +    }
 +
 +    /// r4, the class audit (catalogue §6 at U4, item 5): every group the encoder writes into each client's snapshots
@@ -7412,7 +7874,7 @@ index 0000000..460a3c9
 +    #[test]
 +    fn r4_every_group_is_one_its_class_lets_that_client_see_on_three_seeds() {
 +        for seed in 1..=3 {
-+            let o = r4_run(seed, "");
++            let (_guard, o) = r4_run(seed, "");
 +            let a = &o.audit;
 +            println!(
 +                "r4 seed {seed}: {} ticks; audited owner {} (own-state records), spatial {} checked against the \
@@ -7438,7 +7900,7 @@ index 0000000..460a3c9
 +    #[cfg(feature = "bites")]
 +    #[test]
 +    fn r4_bite_owner_to_all_fails_the_audit_by_name() {
-+        let o = r4_run(1, "--role bite --bite catalogue-5/owner-to-all");
++        let (_guard, o) = r4_run(1, "--role bite --bite catalogue-5/owner-to-all");
 +        let first = o.audit.breaches.first().cloned().unwrap_or_default();
 +        println!(
 +            "r4 bite: {} breaches (16 texts kept); the first: {first}",
@@ -7457,6 +7919,18 @@ index 0000000..460a3c9
 +        slot: u8,
 +        now: &mut u64,
 +    ) -> (npt_link::Loopback, ClientEndpoint, u64) {
++        let (mut c, mut e, id) = join_only(server, slot, now);
++        deliver(server, &mut c, &mut e, *now);
++        (c, e, id)
++    }
++
++    /// `joined`'s join alone: the session accepted and its `Join` taken by the server's I/O step, before the room's
++    /// next tick.
++    fn join_only(
++        server: &mut Server,
++        slot: u8,
++        now: &mut u64,
++    ) -> (npt_link::Loopback, ClientEndpoint, u64) {
 +        let (s, mut c) = npt_link::Loopback::pair(MAX_DATAGRAM);
 +        let id = server.accept(Box::new(s), *now);
 +        let mut e = ClientEndpoint::new(join_of(1, slot), npt_sim::TICK_HZ);
@@ -7466,7 +7940,6 @@ index 0000000..460a3c9
 +        }
 +        *now += 1;
 +        server.io(*now);
-+        deliver(server, &mut c, &mut e, *now);
 +        (c, e, id)
 +    }
 +
@@ -7483,13 +7956,6 @@ index 0000000..460a3c9
 +            got.push((r.channel, r.bytes, r.arrival_ns));
 +        }
 +        e.input(None, &got, now + 1);
-+    }
-+
-+    fn room_counts(server: &Server, slot: u8) -> u64 {
-+        server.room.client(slot).map_or(0, |c| {
-+            let k = c.counters();
-+            k.commands_buffered + k.commands_repeat + k.late + k.buffer_full + k.press_refused
-+        })
 +    }
 +
 +    fn send_input(c: &mut npt_link::Loopback, e: &mut ClientEndpoint, now: u64) {
@@ -7522,15 +7988,17 @@ index 0000000..460a3c9
 +        Server::new(room, Quant::default(), RttSource::Link)
 +    }
 +
-+    /// r8 (carry 76): a second endpoint joins with slot 0's token and bind while the first is live; after it the
-+    /// first's Inputs and `Leave` reach no room call, and the second keeps the slot.
++    /// r8 (carry 76): a second endpoint joins with slot 0's token and bind while the first is live; the first is sent
++    /// `Kick(replaced)` once; after it the first's Inputs and `Leave` reach no room call (the slot's whole counters
++    /// unchanged), and the second keeps the slot.
 +    #[test]
 +    fn r8_a_replaced_session_s_inputs_and_leave_reach_no_room_call() {
 +        let mut server = lab_room(4);
 +        let mut now = 1_000;
 +        let (mut c1, mut e1, first) = joined(&mut server, 0, &mut now);
 +        assert_eq!(server.owner.get(&0), Some(&first));
-+        let (_c2, _e2, second) = joined(&mut server, 0, &mut now);
++        // The second join, read right after it, before the room's next tick (FP-2 (b)).
++        let (mut c2, mut e2, second) = join_only(&mut server, 0, &mut now);
 +        assert_eq!(
 +            server.owner.get(&0),
 +            Some(&second),
@@ -7540,14 +8008,30 @@ index 0000000..460a3c9
 +            server.ended.contains(&(0, "replaced")),
 +            "the first was told and dropped"
 +        );
-+        let before = room_counts(&server, 0);
++        // advisor-u4r-r1, FP-2 (b): the first is told once, on Control, `Kick(replaced)`.
++        let mut control = Vec::new();
++        while let Some(r) = c1.poll_recv(now) {
++            if r.channel == Channel::Control {
++                control.push(r.bytes);
++            }
++        }
++        assert_eq!(control.len(), 1, "one Control-channel message to the first");
++        assert_eq!(
++            Quant::default().decode(Direction::RoomToClient, Channel::Control, &control[0]),
++            Ok(Message::Kick(Kick::Replaced)),
++            "the first's Control message is Kick(replaced)"
++        );
++        deliver(&mut server, &mut c2, &mut e2, now);
++        // FP-2 (a): the slot's whole counters (`ClientCounters`, ack_refused and ack_refused_commands among them);
++        // nothing ticks inside the loop.
++        let before = server.room.client(0).map(|c| c.counters().clone());
 +        for _ in 0..5 {
 +            now += 33_000_000;
 +            send_input(&mut c1, &mut e1, now);
 +            server.io(now + 1);
 +        }
 +        assert_eq!(
-+            room_counts(&server, 0),
++            server.room.client(0).map(|c| c.counters().clone()),
 +            before,
 +            "the first's Inputs reach no room call"
 +        );
@@ -7613,6 +8097,73 @@ index 0000000..460a3c9
 +        assert!(
 +            server.room.client(0).is_some_and(|c| c.kicked()),
 +            "its Leave reached no room call: the kicked slot is not left"
++        );
++    }
++
++    /// FP-1's three checks of a session that ended closed on `slot`: the room's slot freed, no owner, and `(slot,
++    /// "closed")` in `ended`; each that fails, by name.
++    fn closed_checks(server: &Server, slot: u8) -> Vec<String> {
++        let mut failed = Vec::new();
++        if server.room.client(slot).is_some() {
++            failed.push(format!(
++                "the room still holds slot {slot}: its slot was not freed"
++            ));
++        }
++        if server.owner.contains_key(&slot) {
++            failed.push(format!("the lab's owner map still holds slot {slot}"));
++        }
++        if !server.ended.contains(&(slot, "closed")) {
++            failed.push(format!("ended holds no ({slot}, \"closed\")"));
++        }
++        failed
++    }
++
++    /// Carry 76's boundary (advisor-u4r-r1, FP-1: NC-U4R-1 = SEC-U4R-1): a session whose decoder closes, (a) on a
++    /// control-stream frame it refuses as malformed, or whose link closes, (b) its client end dropped, ends, and the
++    /// room's slot is freed (`Room::leave`: "a closed link"); after (a) a new endpoint with that slot's token and bind is
++    /// admitted, and not as a replacement. Each case's checks are collected, so a failure names its case.
++    #[test]
++    fn fp1_a_closed_decoder_or_link_ends_the_session_and_frees_the_room_s_slot() {
++        // (a) A frame the pump refuses with an error other than WrongChannel or WrongDirection: `close_malformed`.
++        let mut a = lab_room(4);
++        let mut now = 1_000;
++        let (mut c, _e, _) = joined(&mut a, 0, &mut now);
++        let bad = [0xffu8; 3];
++        let refused = Quant::default()
++            .decode(Direction::ClientToRoom, Channel::Control, &bad)
++            .expect_err("the decoder refuses the frame");
++        assert!(
++            !matches!(
++                refused,
++                npt_proto::DecodeError::WrongChannel | npt_proto::DecodeError::WrongDirection
++            ),
++            "refused as {refused:?}: a forged kind, which the pump counts and keeps"
++        );
++        c.send_reliable(Channel::Control, &bad, now);
++        now += 1;
++        a.io(now);
++        let case_a = closed_checks(&a, 0);
++        let (_c2, _e2, again) = joined(&mut a, 0, &mut now);
++        // (b) The client end dropped: the server end's link reads Closed.
++        let mut b = lab_room(4);
++        let mut now_b = 1_000;
++        let (c, _e, _) = joined(&mut b, 0, &mut now_b);
++        drop(c);
++        b.io(now_b + 1);
++        let case_b = closed_checks(&b, 0);
++        println!("fp1: case (a) {case_a:?}; case (b) {case_b:?}; (a)'s new session {again}");
++        assert!(
++            case_a.is_empty() && case_b.is_empty(),
++            "case (a), the decoder closed: {case_a:?}; case (b), the link closed: {case_b:?}"
++        );
++        assert_eq!(
++            a.owner.get(&0),
++            Some(&again),
++            "(a): the new endpoint is admitted"
++        );
++        assert!(
++            !a.ended.contains(&(0, "replaced")),
++            "(a): the new endpoint is no replacement"
 +        );
 +    }
 +
@@ -7821,6 +8372,39 @@ index 0000000..460a3c9
 +        }
 +    }
 +
++    /// advisor-u4r-r1, FP-3 (SEC-U4R-3, RR3-L3): a length whose ticks overflow 64 bits is a usage error naming its
++    /// option, never a wrapped length.
++    #[test]
++    fn fp3_a_length_whose_ticks_overflow_is_a_usage_error_naming_its_option() {
++        let line = format!(
++            "--run t --set t --date 2026-11-14 --commit {COMMIT} --out x --scene SS --seed 1 --profile P0 \
++             --measured-s 1000000000000000000"
++        );
++        let argv: Vec<String> = line.split_whitespace().map(str::to_owned).collect();
++        let e = parse(&argv).expect_err("--measured-s 10^18 x 30 overflows");
++        assert!(e.starts_with("--measured-s 1000000000000000000: "), "{e}");
++    }
++
++    /// advisor-u4r-r1, FP-6 items 1 and 2 (NC-U4R-2; EA-U4R-3 = RR3-L8; bites builds only): `scenario` refuses the
++    /// pre-check's late-command id as a usage error, and `Bites::of` gives the pump's wallclock id to the pump alone,
++    /// never to the schedule (whose `with_bite` refuses it).
++    #[cfg(feature = "bites")]
++    #[test]
++    fn fp6_the_late_command_id_is_refused_by_scenario_and_the_wallclock_id_is_the_pump_s_alone() {
++        let line = format!(
++            "--run t --set t --date 2026-11-14 --commit {COMMIT} --out x --scene SS --seed 1 --profile P0 \
++             --role bite --bite PM-0001-30/late-command"
++        );
++        let argv: Vec<String> = line.split_whitespace().map(str::to_owned).collect();
++        let e = parse(&argv).expect_err("the pre-check's id");
++        assert_eq!(
++            e,
++            "--bite PM-0001-30/late-command is the -30 pre-check's (npt-lab precheck)"
++        );
++        let b = Bites::of("PM-0001-30/wallclock").expect("the pump's id");
++        assert!(!b.schedule && b.pump, "{b:?}");
++    }
++
 +    /// The measured phase's sum of `tick.s.snap_incomplete` in a run's client log, and whether its lab log holds -57's
 +    /// series.
 +    fn incomplete_and_57(dir: &Path) -> (i64, bool) {
@@ -7889,76 +8473,118 @@ index 0000000..460a3c9
 +}
 diff --git a/spikes/netcode-proof/ops/runs/c-u4r-r2.mjs b/spikes/netcode-proof/ops/runs/c-u4r-r2.mjs
 new file mode 100644
-index 0000000..b8df242
+index 0000000..7653965
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/runs/c-u4r-r2.mjs
-@@ -0,0 +1,146 @@
+@@ -0,0 +1,223 @@
 +#!/usr/bin/env node
 +// U4r's contract test r2 (u4r-brief.md 2.4 r2), re-made from a commit: the advisor's U4r build ruling 3, point 6 (4).
 +// The builder's own r2 runs are builder evidence only (ruling 2, point 33); this script's run from the merge commit is
 +// the record, before -17's judged runs and before carry 62 (h)'s setup check is decided (7.1).
 +//   node spikes/netcode-proof/ops/runs/c-u4r-r2.mjs --date YYYY-MM-DD
 +// - Each suite's three lines exactly as the builder ran them (.gate/u4r/c3-r2-p0.log, c3-r2-suites.log and
-+//   c3-r2-bites.log, U4r's copy 3; then copy 5's runs of ruling 3), but for --date, --commit and --out: `npt-lab
-+//   scenario` (SS or ES, 48 clients, seed 1, a 10 s warm-up and 20 s measured unless the suite names other lengths),
-+//   then `npt-lab contract --logs <its folder> --series marks/SERIES.md`, then `npt-judge --marks marks/marks.json
-+//   --logs <its folder> --only <the run's marks> --out <suite>-verdict.json`.
++//   c3-r2-bites.log, U4r's copy 3; then copy 5's runs of ruling 3), but for --date, --commit, --out and the copies of
++//   marks.json and SERIES.md: `npt-lab scenario` (SS or ES, 48 clients, seed 1, a 10 s warm-up and 20 s measured unless
++//   the suite names other lengths), then `npt-lab contract --logs <its folder> --series <SERIES.md's copy>`, then
++//   `npt-judge --marks <marks.json's copy> --logs <its folder> --only <the run's marks> --out <suite>-verdict.json`.
 +// - The suites: the ten measured ones of copy 3 (p0, p2, p3, b1; -21's option-B stand-ins forged, clamp, fast-clock and
 +//   lag-switch; es, carry 59's; evstart, carry 75's); ruling 3's point 3 pair (the tick16 bite at tick_start 64,651, so
 +//   the 16-bit wrap falls at measured tick 585, 15 before the measured end; and its clean partner at 64,936, the wrap at
-+//   measured tick 300); and point 4's bitten B1 run (PM-0001-18/no-fallback; since point 8 (A) the mirror keeps the
-+//   frame the room's stale copy codes against). Copy 3's three earlier tick16 tries (tick_start 65,506) stay builder
-+//   evidence and are not re-made.
++//   measured tick 300); point 4's bitten B1 run (PM-0001-18/no-fallback; since point 8 (A) the mirror keeps the frame
++//   the room's stale copy codes against); and carry 62 (h)'s bite, PM-0001-17/whole-as-lost, on the p0 suite's
++//   settings (advisor-u4r-r1, FP-5 (i): T-7; the builder's .gate/u4r/whole-as-lost/ is a labelled dry check only).
++//   Copy 3's three earlier tick16 tries (tick_start 65,506) stay builder evidence and are not re-made.
 +// - Every command runs whatever the one before gave, each exit code recorded: a FAIL is a result here, never a stop and
-+//   never re-run (condition 5). Expected, by ruling 3: b1 fails PM-0001-2's everyone-in-view share, so its -17 and -18
-+//   are INVALID and not counted (point 1: npt-room's, fixed in U4g); es fails ES's reliable-events band (point 2: U4h's);
++//   never re-run (condition 5). Each command runs through check.mjs's run() with a 600 s limit, in its own process
++//   group, which is killed whole at the limit: its exit line then reads "stopped at <s> s", a result, never a retry
++//   (FP-5 (f): INF-U4R-11). Expected, by ruling 3: b1 fails PM-0001-2's everyone-in-view share, so its -17 and -18 are
++//   INVALID and not counted (point 1: npt-room's, fixed in U4g); es fails ES's reliable-events band (point 2: U4h's);
 +//   b1-nofallback fails -18's max check and is INVALID by pre:PM-0001-2 while the room is unfixed (points 4 and 8 (A)).
 +//   Each suite's line in r2.txt states what is expected beside what came; the main session reads both.
 +// - Run it under the lane lock, exclusive (u4r-brief.md section 4 rule 2: it holds bite runs, and its outputs are a
 +//   record): `bash <runner> -x <copy> <log> node ops/runs/c-u4r-r2.mjs --date ...` or the main folder's own runner.
-+// - It refuses uncommitted changes to tracked files (every log names its commit). Its outputs go under
-+//   .gate/netcode-proof-test/r2-<commit12>/ (gitignored): one folder per suite (its three logs), <suite>-verdict.json
-+//   beside it, the binaries under bin/, and r2.txt (the commit, the binaries' SHA-256s, then per suite each command, its
-+//   exit code, its wall seconds and its output). Never overwritten. It stops before a run when less than 4 GB is free
-+//   (section 4 rule 6's floor). The binaries: npt-lab's measured and bites builds and npt-judge, built --release
-+//   --locked, each artifact's path read from cargo's --message-format=json messages (check.mjs's builtArtifact) and
-+//   copied out before the next build replaces it.
++// - Its order (FP-5 (a): INF-U4R-2): the usage and git checks (no uncommitted change to a tracked file, and no untracked
++//   file under spikes/netcode-proof/crates: every log names its commit); each suite's key checked as a name (one or more
++//   of A-Z, a-z, 0-9 and -: FP-5 (h)); the projection; each release build (--release --locked --offline), with at least
++//   4 GiB free before each (section 4 rule 6); the projection again; only then the output folder,
++//   .gate/netcode-proof-test/r2-<commit12>/ (gitignored, never overwritten): one folder per suite (its three logs),
++//   <suite>-verdict.json beside it, the copies of marks/marks.json and marks/SERIES.md (their sha256s in r2.txt's head:
++//   FP-5 (e)), and r2.txt (the commit, the binaries' SHA-256s, then per suite each command, its exit line and its
++//   output). The binaries go to .gate/netcode-proof-test/bin/r2-<commit12>/, which no exists-check reads, so a stop
++//   before the first suite leaves nothing that blocks a re-run at that commit. Before r2.txt is written, HEAD and the
++//   tracked files' status are checked against their start values (FP-5 (e)).
++// - The projection (FP-5 (b), (c)): the builder's own 13 suites took about 145 MB (u4r-build.md, copy 5's state: the
++//   r2 folder; their 13 folders sum to 115,746,371 B, du -sb in copy 6), plus whole-as-lost at the p0 suite's size
++//   (24,813,722 B); it starts only when free space minus that total is at least 4 GiB, printing both; before each suite,
++//   free space minus that suite's own measured size must be at least 4 GiB.
++// - The binaries: npt-lab's measured and bites builds and npt-judge, each artifact's path read from cargo's
++//   --message-format=json messages (check.mjs's builtArtifact) and copied out before the next build replaces it.
++// - Its pure helpers are exported (the projection, the name check); main runs only when this file is the entry module.
 +
 +import { spawnSync } from "node:child_process";
 +import { createHash } from "node:crypto";
 +import { copyFileSync, existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from "node:fs";
-+import { dirname, join } from "node:path";
++import { dirname, join, resolve } from "node:path";
 +import { fileURLToPath } from "node:url";
-+import { builtArtifact } from "../../check.mjs";
++import { builtArtifact, run } from "../../check.mjs";
 +
 +const SPIKE = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 +const ROOT = join(SPIKE, "..", "..");
 +const GATE = join(ROOT, ".gate", "netcode-proof-test");
-+/** The free space below which no run starts, bytes (section 4 rule 6's 4 GB floor). */
-+const FLOOR = 4 * 1024 ** 3;
++/** The free space a build and a suite must leave, bytes (section 4 rule 6's 4 GB floor, as 4 GiB). */
++export const FLOOR = 4 * 1024 ** 3;
++/** Each command's limit, ms (FP-5 (f)): the longest suite command the builder ran took well under it. */
++const STEP_LIMIT_MS = 600_000;
 +const MARKS_17 = "PM-0001-2,PM-0001-17,PM-0001-57";
 +const B1 = "--profile B1 --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 30 --bursts 2 --burst-first-s 5 --burst-every-s 15";
++const P0 = "--scene SS --profile P0 --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 20";
++/** The builder's 13 suites' bytes, about 145 MB (the module text), and the p0 suite's own (whole-as-lost's projection). */
++export const SUITES_13_BYTES = 145_000_000;
++const P0_SUITE_BYTES = 24_813_722;
++/** A suite key, a folder name (FP-5 (h)): one or more of A-Z, a-z, 0-9 and -. */
++const NAME = /^[A-Za-z0-9-]+$/;
 +
 +/**
 + * The suites, in the order the builder ran them: `build` names the npt-lab build (`lab` measured, `bites`), `run` the
 + * run id, `args` the scenario's settings after --out, `marks` its header's marks (the judge's --only), `expect` ruling
-+ * 3's or copy 3's outcome.
++ * 3's or copy 3's outcome, `bytes` the builder's folder of that suite (du -sb, copy 6; whole-as-lost: the p0 suite's).
 + */
-+const SUITES = [
-+  { key: "p0", build: "lab", run: "u4r-r2-p0-1", args: "--scene SS --profile P0 --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 20", marks: MARKS_17, suite: "r2-p0", expect: "contract PASS; PM-0001-2's SS checks, -17 (0 mismatches) and -57 pass on the run" },
-+  { key: "p2", build: "lab", run: "u4r-r2-p2-1", args: "--scene SS --profile P2 --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 20", marks: MARKS_17, suite: "r2-p2", expect: "contract PASS; PM-0001-2, -17 and -57 pass" },
-+  { key: "p3", build: "lab", run: "u4r-r2-p3-1", args: "--scene SS --profile P3 --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 20", marks: MARKS_17, suite: "r2-p3", expect: "contract PASS; PM-0001-2, -17 and -57 pass (carry 62 (g): P3, the reorder step on)" },
-+  { key: "b1", build: "lab", run: "u4r-r2-b1-1", args: `--scene SS ${B1}`, marks: `${MARKS_17},PM-0001-18`, suite: "r2-b1", expect: "contract PASS; PM-0001-2 FAIL (everyone in view 0.273333, needs >= 0.99), so -17 and -18 L1 B1 INVALID by pre:PM-0001-2, recorded and not counted; -57 passes (ruling 3, point 1: npt-room's, fixed in U4g)" },
-+  { key: "forged", build: "lab", run: "u4r-r2-forged-1", args: "--scene SS --profile P0 --seed 1 --warmup-s 10 --measured-s 20 --behaviour presses", marks: "PM-0001-2", suite: "forged", expect: "contract PASS; PM-0001-2 passes" },
-+  { key: "clamp", build: "lab", run: "u4r-r2-clamp-1", args: "--scene SS --profile P0 --seed 1 --warmup-s 10 --measured-s 20 --behaviour clamp", marks: "PM-0001-2", suite: "clamp", expect: "contract PASS; PM-0001-2 passes" },
-+  { key: "fast-clock", build: "lab", run: "u4r-r2-fast-clock-1", args: "--scene SS --profile P0 --seed 1 --warmup-s 10 --measured-s 20 --behaviour steady", marks: "PM-0001-2", suite: "fast-clock", expect: "contract PASS; PM-0001-2 passes" },
-+  { key: "lag-switch", build: "lab", run: "u4r-r2-lag-switch-1", args: "--scene SS --profile P1 --seed 1 --warmup-s 10 --measured-s 20 --behaviour steady", marks: "PM-0001-2", suite: "lag-switch", expect: "contract PASS; PM-0001-2 passes" },
-+  { key: "es", build: "lab", run: "u4r-r2-es-1", args: "--scene ES --profile P0 --seed 1 --warmup-s 10 --measured-s 20", marks: "PM-0001-2", suite: "r2-es", expect: "contract PASS; PM-0001-2 FAIL by ES's reliable events (50.05 a second against 9.5-10.5), the other 11 ES checks pass; no ES run counts at U4r (ruling 3, point 2: U4h's)" },
-+  { key: "evstart", build: "lab", run: "u4r-r2-evstart-1", args: "--scene SS --profile P0 --seed 1 --tick-start 63736 --event-start 65533 --warmup-s 10 --measured-s 20", marks: "PM-0001-2,PM-0001-17", suite: "r2-evstart", expect: "contract PASS; PM-0001-2 and -17 (0 mismatches) pass (carry 75)" },
-+  { key: "tick16", build: "bites", run: "u4r-r2-tick16-4", args: "--scene SS --profile P0 --seed 1 --tick-start 64651 --warmup-s 10 --measured-s 20 --after-max-s 5 --role bite --bite PM-0001-17/tick16", marks: "PM-0001-2,PM-0001-17", suite: "r2-tick16", expect: "contract PASS (0 mirror breaches); PM-0001-2 passes; -17's bite run FAILs by decoded_hash_mismatch_count with at least 48 mismatches; after_capped as it comes (false when the room's overflow resync resolves the measured ticks before the cap, true when the cap path of ruling 3, point 7 (a) ends the run); carry 62 (h)'s measured sum is the bite's own (tick16d: 720 = 48 x 15 post-wrap measured ticks) (ruling 3, point 3, as ruling 4, point 1 reads it; carry 73)" },
-+  { key: "tick16-clean", build: "lab", run: "u4r-r2-tick16-clean-1", args: "--scene SS --profile P0 --seed 1 --tick-start 64936 --warmup-s 10 --measured-s 20 --after-max-s 5", marks: MARKS_17, suite: "r2-tick16-clean", expect: "contract PASS (0 mirror breaches); PM-0001-2, -17 (0 mismatches) and -57 pass; the after phase resolves without the cap (ruling 3, point 3)" },
-+  { key: "b1-nofallback", build: "bites", run: "u4r-r2-b1-nofallback-1", args: `--scene SS ${B1} --role bite --bite PM-0001-18/no-fallback`, marks: `${MARKS_17},PM-0001-18`, suite: "r2-b1", expect: "contract PASS (0 mirror breaches, ruling 3, point 8 (A)); -18's max check FAILs (a heal later than 500 ms); INVALID by pre:PM-0001-2 is expected while npt-room is unfixed (ruling 3, points 4 and 8 (A))" },
++export const SUITES = [
++  { key: "p0", build: "lab", run: "u4r-r2-p0-1", args: P0, marks: MARKS_17, suite: "r2-p0", bytes: P0_SUITE_BYTES, expect: "contract PASS; PM-0001-2's SS checks, -17 (0 mismatches) and -57 pass on the run" },
++  { key: "p2", build: "lab", run: "u4r-r2-p2-1", args: "--scene SS --profile P2 --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 20", marks: MARKS_17, suite: "r2-p2", bytes: 11_483_900, expect: "contract PASS; PM-0001-2, -17 and -57 pass" },
++  { key: "p3", build: "lab", run: "u4r-r2-p3-1", args: "--scene SS --profile P3 --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 20", marks: MARKS_17, suite: "r2-p3", bytes: 6_509_038, expect: "contract PASS; PM-0001-2, -17 and -57 pass (carry 62 (g): P3, the reorder step on)" },
++  { key: "b1", build: "lab", run: "u4r-r2-b1-1", args: `--scene SS ${B1}`, marks: `${MARKS_17},PM-0001-18`, suite: "r2-b1", bytes: 13_900_772, expect: "contract PASS; PM-0001-2 FAIL (everyone in view 0.273333, needs >= 0.99), so -17 and -18 L1 B1 INVALID by pre:PM-0001-2, recorded and not counted; -57 passes (ruling 3, point 1: npt-room's, fixed in U4g)" },
++  { key: "forged", build: "lab", run: "u4r-r2-forged-1", args: "--scene SS --profile P0 --seed 1 --warmup-s 10 --measured-s 20 --behaviour presses", marks: "PM-0001-2", suite: "forged", bytes: 2_761_291, expect: "contract PASS; PM-0001-2 passes" },
++  { key: "clamp", build: "lab", run: "u4r-r2-clamp-1", args: "--scene SS --profile P0 --seed 1 --warmup-s 10 --measured-s 20 --behaviour clamp", marks: "PM-0001-2", suite: "clamp", bytes: 2_734_499, expect: "contract PASS; PM-0001-2 passes" },
++  { key: "fast-clock", build: "lab", run: "u4r-r2-fast-clock-1", args: "--scene SS --profile P0 --seed 1 --warmup-s 10 --measured-s 20 --behaviour steady", marks: "PM-0001-2", suite: "fast-clock", bytes: 2_761_213, expect: "contract PASS; PM-0001-2 passes" },
++  { key: "lag-switch", build: "lab", run: "u4r-r2-lag-switch-1", args: "--scene SS --profile P1 --seed 1 --warmup-s 10 --measured-s 20 --behaviour steady", marks: "PM-0001-2", suite: "lag-switch", bytes: 2_878_953, expect: "contract PASS; PM-0001-2 passes" },
++  { key: "es", build: "lab", run: "u4r-r2-es-1", args: "--scene ES --profile P0 --seed 1 --warmup-s 10 --measured-s 20", marks: "PM-0001-2", suite: "r2-es", bytes: 2_737_959, expect: "contract PASS; PM-0001-2 FAIL by ES's reliable events (50.05 a second against 9.5-10.5), the other 11 ES checks pass; no ES run counts at U4r (ruling 3, point 2: U4h's)" },
++  { key: "evstart", build: "lab", run: "u4r-r2-evstart-1", args: "--scene SS --profile P0 --seed 1 --tick-start 63736 --event-start 65533 --warmup-s 10 --measured-s 20", marks: "PM-0001-2,PM-0001-17", suite: "r2-evstart", bytes: 2_766_566, expect: "contract PASS; PM-0001-2 and -17 (0 mismatches) pass (carry 75)" },
++  { key: "tick16", build: "bites", run: "u4r-r2-tick16-4", args: "--scene SS --profile P0 --seed 1 --tick-start 64651 --warmup-s 10 --measured-s 20 --after-max-s 5 --role bite --bite PM-0001-17/tick16", marks: "PM-0001-2,PM-0001-17", suite: "r2-tick16", bytes: 2_937_440, expect: "contract PASS (0 mirror breaches); PM-0001-2 passes; -17's bite run FAILs by decoded_hash_mismatch_count with at least 48 mismatches; after_capped as it comes (false when the room's overflow resync resolves the measured ticks before the cap, true when the cap path of ruling 3, point 7 (a) ends the run); carry 62 (h)'s measured sum is the bite's own (tick16d: 720 = 48 x 15 post-wrap measured ticks) (ruling 3, point 3, as ruling 4, point 1 reads it; carry 73)" },
++  { key: "tick16-clean", build: "lab", run: "u4r-r2-tick16-clean-1", args: "--scene SS --profile P0 --seed 1 --tick-start 64936 --warmup-s 10 --measured-s 20 --after-max-s 5", marks: MARKS_17, suite: "r2-tick16-clean", bytes: 24_813_880, expect: "contract PASS (0 mirror breaches); PM-0001-2, -17 (0 mismatches) and -57 pass; the after phase resolves without the cap (ruling 3, point 3)" },
++  { key: "b1-nofallback", build: "bites", run: "u4r-r2-b1-nofallback-1", args: `--scene SS ${B1} --role bite --bite PM-0001-18/no-fallback`, marks: `${MARKS_17},PM-0001-18`, suite: "r2-b1", bytes: 14_647_138, expect: "contract PASS (0 mirror breaches, ruling 3, point 8 (A)); -18's max check FAILs (a heal later than 500 ms); INVALID by pre:PM-0001-2 is expected while npt-room is unfixed (ruling 3, points 4 and 8 (A))" },
++  { key: "whole-as-lost", build: "bites", run: "u4r-r2-whole-as-lost-1", args: `${P0} --role bite --bite PM-0001-17/whole-as-lost`, marks: "PM-0001-17", suite: "r2-whole-as-lost", bytes: P0_SUITE_BYTES, expect: "carry 62 (h)'s bite: measured incomplete equal to the client count (48), as in the builder's .gate/u4r/whole-as-lost/ dry check; -17's verdict as it comes until marks.json holds ruling 4's plain check" },
 +];
++
++/** The set's projected bytes (FP-5 (b)): the 13 suites' figure plus whole-as-lost's, or the suites' own sum if larger. */
++export function r2Projected(suites = SUITES) {
++  const sum = suites.reduce((s, x) => s + x.bytes, 0);
++  return Math.max(SUITES_13_BYTES + P0_SUITE_BYTES, sum);
++}
++
++/** Each suite key that is not a name, as a sentence (FP-5 (h)). */
++export const keyProblems = (suites = SUITES) =>
++  suites.filter((s) => !NAME.test(s.key)).map((s) => `suite key ${JSON.stringify(s.key)} is not one or more of A-Z, a-z, 0-9 and -: refused before any use`);
++
++/** Whether `free` bytes leave the 4 GiB floor after `projected` more, with the line that prints both. */
++export function roomFor(free, projected, what) {
++  const ok = free - projected >= FLOOR;
++  const mib = (b) => (b / 1024 ** 2).toFixed(0);
++  return {
++    ok,
++    line: `${what}: free ${mib(free)} MiB, projected ${mib(projected)} MiB, so ${mib(free - projected)} MiB after it against the 4 GiB floor (4096 MiB): ${ok ? "room" : "no room, stopped before it"}`,
++  };
++}
 +
 +function sh(cmd, args, cwd = SPIKE) {
 +  const r = spawnSync(cmd, args, { cwd, encoding: "utf8", maxBuffer: 1 << 28 });
@@ -7968,102 +8594,144 @@ index 0000000..b8df242
 +
 +const sha256 = (path) => createHash("sha256").update(readFileSync(path)).digest("hex");
 +
-+/** One release build, its artifact's path read from cargo's JSON messages and copied to `to`. */
++function freeBytes() {
++  const s = statfsSync(ROOT);
++  return s.bavail * s.bsize;
++}
++
++/** Stops unless free space minus `projected` bytes leaves the floor (0: a build's own check, 4 GiB free). */
++function floor(what, projected = 0) {
++  const r = roomFor(freeBytes(), projected, what);
++  if (!r.ok) throw new Error(r.line);
++}
++
++/** One release build, at least 4 GiB free before it, its artifact's path read from cargo's JSON messages and copied to `to`. */
 +function build(args, target, to) {
-+  const out = sh("cargo", ["build", "--release", "--locked", ...args, "--message-format=json"]);
++  floor(`the release build of ${target}${args.includes("bites") ? " (bites)" : ""}`);
++  const out = sh("cargo", ["build", "--release", "--locked", "--offline", ...args, "--message-format=json"]);
 +  const path = builtArtifact(out, { target, kind: "bin" });
 +  if (!path) throw new Error(`cargo build ${args.join(" ")} names no ${target} executable in its JSON messages`);
 +  copyFileSync(path, to);
 +  return to;
 +}
 +
-+/** Stops before a run when less than FLOOR bytes are free where the logs go. */
-+function floor(what) {
-+  const s = statfsSync(ROOT);
-+  const free = s.bavail * s.bsize;
-+  if (free < FLOOR) throw new Error(`${what}: ${(free / 1024 ** 3).toFixed(1)} GB free, below the 4 GB floor: stopped before it`);
-+}
-+
-+/** One command, run from the spike whatever it gives: its line, exit code, wall seconds and output. */
++/**
++ * One command, run from the spike whatever it gives, through check.mjs's run() with STEP_LIMIT_MS (its own process
++ * group, killed whole at the limit: FP-5 (f)): its line, its exit line ("stopped at <s> s" for a stopped one) and output.
++ */
 +function step(exe, args) {
 +  const t0 = Date.now();
-+  const r = spawnSync(exe, args, { cwd: SPIKE, encoding: "utf8", maxBuffer: 1 << 28 });
++  const r = run(exe, args, SPIKE, process.env, STEP_LIMIT_MS);
 +  const secs = ((Date.now() - t0) / 1000).toFixed(1);
-+  const code = r.status ?? `signal ${r.signal}`;
-+  return [`$ ${[exe, ...args].join(" ")}`, `exit ${code} (wall ${secs} s)`, `${r.stdout ?? ""}${r.stderr ?? ""}`.trimEnd()];
++  const exit = r.timedOut ? `stopped at ${secs} s` : `exit ${r.status ?? "by a signal"} (wall ${secs} s)`;
++  return [`$ ${[exe, ...args].join(" ")}`, exit, r.out.trimEnd()];
 +}
 +
 +function main(argv) {
 +  const date = argv.includes("--date") ? argv[argv.indexOf("--date") + 1] : undefined;
 +  if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? "") || argv.length !== 2) throw new Error("usage: c-u4r-r2.mjs --date YYYY-MM-DD");
-+  if (sh("git", ["status", "--porcelain", "--untracked-files=no"])) {
-+    throw new Error("tracked files have uncommitted changes: commit first, since every log names its commit");
-+  }
++  const tracked = () => sh("git", ["status", "--porcelain", "--untracked-files=no"]);
++  if (tracked()) throw new Error("tracked files have uncommitted changes: commit first, since every log names its commit");
++  const untracked = sh("git", ["status", "--porcelain", "--untracked-files=all", "--", "crates"]);
++  if (untracked) throw new Error(`files under spikes/netcode-proof/crates are not committed (${untracked.split("\n").join("; ")}): commit first, since every log names its commit`);
 +  const commit = sh("git", ["rev-parse", "HEAD"]);
++  const start = { commit, status: tracked() };
 +  const out = join(GATE, `r2-${commit.slice(0, 12)}`);
 +  if (existsSync(out)) throw new Error(`${out} exists: a run set is never overwritten`);
-+  const bin = join(out, "bin");
++  const bad = keyProblems();
++  if (bad.length) throw new Error(bad.join("; "));
++  const total = r2Projected();
++  const room = (when) => {
++    const r = roomFor(freeBytes(), total, `r2: the ${SUITES.length} suites' projected logs, ${when}`);
++    console.log(r.line);
++    if (!r.ok) throw new Error(r.line);
++    return r.line;
++  };
++  const before = room("before the builds");
++  const bin = join(GATE, "bin", `r2-${commit.slice(0, 12)}`);
 +  mkdirSync(bin, { recursive: true });
 +  const exe = {
 +    lab: build(["-p", "npt-lab"], "npt-lab", join(bin, "npt-lab")),
 +    bites: build(["-p", "npt-lab", "--features", "bites"], "npt-lab", join(bin, "npt-lab-bites")),
 +  };
 +  const judge = build(["-p", "npt-judge"], "npt-judge", join(bin, "npt-judge"));
++  const after = room("after the builds");
++  mkdirSync(out, { recursive: true });
++  const copies = {};
++  for (const f of ["marks.json", "SERIES.md"]) {
++    copies[f] = join(out, f);
++    copyFileSync(join(SPIKE, "marks", f), copies[f]);
++  }
 +  const lines = [
 +    `# U4r's r2, re-made from commit ${commit} on ${date} (the advisor's U4r build ruling 3, point 6 (4))`,
 +    `npt-lab (measured build) sha256 ${sha256(exe.lab)}`,
 +    `npt-lab (bites build) sha256 ${sha256(exe.bites)}`,
 +    `npt-judge sha256 ${sha256(judge)}`,
++    `marks.json sha256 ${sha256(copies["marks.json"])}, SERIES.md sha256 ${sha256(copies["SERIES.md"])} (copied into the output folder at the start; contract and the judge read the copies)`,
++    `projection: ${before}`,
++    `projection: ${after}`,
 +    "",
 +  ];
 +  for (const s of SUITES) {
-+    floor(`suite ${s.key}`);
++    floor(`suite ${s.key}`, s.bytes);
 +    const logs = join(out, s.key);
 +    const said = [
 +      `## suite ${s.key} (the ${s.build === "lab" ? "measured" : "bites"} build); expected: ${s.expect}`,
 +      ...step(exe[s.build], ["scenario", "--run", s.run, "--set", "u4r-r2", "--date", date, "--commit", commit, "--out", logs, ...s.args.split(" "), "--marks", s.marks, "--suite", s.suite]),
-+      ...step(exe[s.build], ["contract", "--logs", logs, "--series", "marks/SERIES.md"]),
-+      ...step(judge, ["--marks", "marks/marks.json", "--logs", logs, "--only", s.marks, "--out", join(out, `${s.key}-verdict.json`)]),
++      ...step(exe[s.build], ["contract", "--logs", logs, "--series", copies["SERIES.md"]]),
++      ...step(judge, ["--marks", copies["marks.json"], "--logs", logs, "--only", s.marks, "--out", join(out, `${s.key}-verdict.json`)]),
 +      "",
 +    ];
 +    console.log(said.join("\n"));
 +    lines.push(...said);
 +  }
++  if (sh("git", ["rev-parse", "HEAD"]) !== start.commit || tracked() !== start.status) {
++    throw new Error("HEAD or the tracked files changed since the set started: stopped before r2.txt is written (FP-5 (e))");
++  }
 +  writeFileSync(join(out, "r2.txt"), `${lines.join("\n")}\n`);
 +  console.log(`written: ${join(".gate", "netcode-proof-test", `r2-${commit.slice(0, 12)}`, "r2.txt")}`);
 +}
 +
-+try {
-+  main(process.argv.slice(2));
-+} catch (e) {
-+  console.error(`c-u4r-r2: ${e.message}`);
-+  process.exit(1);
++if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
++  try {
++    main(process.argv.slice(2));
++  } catch (e) {
++    console.error(`c-u4r-r2: ${e.message}`);
++    process.exit(1);
++  }
 +}
 diff --git a/spikes/netcode-proof/ops/runs/c-u4r-runs.mjs b/spikes/netcode-proof/ops/runs/c-u4r-runs.mjs
 new file mode 100644
-index 0000000..ca29c1a
+index 0000000..3178e9b
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/runs/c-u4r-runs.mjs
-@@ -0,0 +1,216 @@
+@@ -0,0 +1,391 @@
 +#!/usr/bin/env node
 +// U4r's judged runs and the -30 pre-check, in this container (u4r-brief.md 2.3 and section 7; c-u2-pm-0001-3.mjs's
 +// model). One script for every set, the set named first:
 +//   node spikes/netcode-proof/ops/runs/c-u4r-runs.mjs precheck --date YYYY-MM-DD
 +//   node spikes/netcode-proof/ops/runs/c-u4r-runs.mjs judged --profile P0|P2|P3|B1 --date YYYY-MM-DD
++// - How it is run (advisor-u4r-r1, FP-5 (d): INF-U4R-8): in the main folder, with CARGO_TARGET_DIR unset (plan §7.1
++//   item 6: the judged runs build in the main folder's own cache), not through main-run.sh; it refuses a set
++//   CARGO_TARGET_DIR, since a shared-target run comes to the advisor first (u4r-brief.md section 12 item 8). The main
++//   session's notes say whether it held the lane lock (`flock -x` on .gate/shared-target/.lane.lock) for the set.
 +// - precheck (set u4r-precheck-30; 7.2): SS P0 seed 4's recording made again by `npt-lab scenario --record` at its
 +//   crates/lab/precheck-recordings.json entry's settings (the set stops if that run's rewinds refused are above 0: 7.1),
 +//   then three pairs by `npt-lab precheck`, each checking the file against that entry first: clean (the measured
 +//   build), PM-0001-30/wallclock and PM-0001-30/late-command (the bites build), each bite on the L1 leg. runs.txt holds
 +//   every pair's lines whole (both legs' records, the comparer's output and the result) and no verdict: the judge
-+//   never reads these runs.
++//   never reads these runs. The late-command pair is as expected only when its whole result line is
++//   `result: VOID (L1 late_count 1)` (precheck's own test asserts that line: FP-5 (g)).
 +// - judged (set u4r-<profile>; 7.1): the profile's three measured runs (seeds 1 to 3; SS, 48 clients, L1, a 10 s
 +//   warm-up, 600 s measured, tick_start 63,736; B1 with 10 bursts, every 60 s from 30 s into the measured phase), their
 +//   headers listing PM-0001-2 (every L1 part's pre:PM-0001-2), PM-0001-17 and PM-0001-57 (-57's parts are on -17's
 +//   runs), and PM-0001-18 on B1; then, in the bites build at seed 1 with the same settings, one run per bite of those
-+//   marks (marks.json's lists, read at run time) whose part has this profile: -17's and -57's on P0, each header
++//   marks (marks.json's lists, read from the set's copy) whose part has this profile: -17's and -57's on P0, each header
 +//   listing PM-0001-2 and the bite's own mark; then `npt-judge --only` on the set's folder. One profile per call keeps
 +//   each set's logs and the judge's memory to one profile's (the advisor's U4r build ruling, point 3: the main session
-+//   plans the disk and judges each set's folder apart).
++//   plans the disk and judges each set's folder apart). A run whose summary line counts an overflow resync above 0 and
++//   whose header lists -17 or -18 is marked on its runs.txt line: it goes to the advisor before it counts (carry 58;
++//   FP-5 (g)).
 +// - The tick16 bite run (the advisor's U4r build ruling 3, point 3): its tick_start is computed from its own lengths,
 +//   65,551 - (warm-up ticks + measured ticks) (47,251 for 300 + 18,000), so the 16-bit wrap falls 15 ticks before the
 +//   measured phase's end and the measured window ends before the bitten room evicts; every other -17 run, clean and the
@@ -8072,23 +8740,37 @@ index 0000000..ca29c1a
 +//   moves to U4g with the room's fix; ws-budget-x2 is L2's. The three B1 measured runs stay in this set for -57's L1 B1
 +//   part, which has no precondition; their -17 and -18 verdicts are recorded INVALID (pre:PM-0001-2's everyone-in-view
 +//   share, npt-room's recovery after each burst) and never counted.
-+// - It refuses uncommitted changes to tracked files (every log names its commit); raw logs go under
-+//   .gate/netcode-proof-test/runs/<set>-<commit12>/ (one folder per run), results under results/u4r/<commit12>/<profile>/
-+//   or results/u4r-precheck-30/<commit12>/; neither is ever overwritten. It stops before a run when less than 4 GB is
-+//   free (u4r-brief.md section 4 rule 6's floor).
-+// - Both npt-lab builds and npt-judge are built --release --locked, each artifact's path read from cargo's
++// - Its order (FP-5 (a): INF-U4R-2): the usage and git checks (no uncommitted change to a tracked file, and no untracked
++//   file under spikes/netcode-proof/crates: every log names its commit); the CARGO_TARGET_DIR refusal; the names (the
++//   pre-check entry's name and each bite id's tail, each one or more of A-Z, a-z, 0-9 and -, before any use: FP-5 (h));
++//   the projection; each release build, with at least 4 GiB free before each (u4r-brief.md section 4 rule 6); the
++//   projection again; only then the set's folders. The binaries go to .gate/netcode-proof-test/bin/<set>-<commit12>/,
++//   which no exists-check reads, so a stop before the first run leaves nothing that blocks a re-run at that commit.
++// - The projection (FP-5 (b), (c): INF-U4R-3): each run's log bytes from the builder's measured rates (BYTES_10MIN_57,
++//   BYTES_10MIN_OTHER, PAIR_BYTES), the set's total checked before the builds and after them: it starts only when free
++//   space minus the total is at least 4 GiB, printing both; before each run, free space minus that run's projected
++//   bytes must be at least 4 GiB, else it stops before that run.
++// - Raw logs go under .gate/netcode-proof-test/runs/<set>-<commit12>/ (one folder per run), results under
++//   results/u4r/<commit12>/<profile>/ or results/u4r-precheck-30/<commit12>/; neither is ever overwritten. Right after
++//   the raw-log folder is made, marks/marks.json is copied into it (its sha256 in runs.txt's head); the bite list is read
++//   from that copy and the judge is given it. Before the judge, HEAD and the tracked files' status are checked against
++//   their start values, and the set stops if either changed (FP-5 (e): INF-U4R-9). runs.txt's head names the target
++//   (the main folder's own cache) and the uptime and load average at the start and at the end.
++// - Both npt-lab builds and npt-judge are built --release --locked --offline, each artifact's path read from cargo's
 +//   --message-format=json messages (check.mjs's builtArtifact, as the wasm step reads its builds) and copied out before
-+//   the next build replaces it: so it is right under the main folder's own cache (CARGO_TARGET_DIR unset, as plan §7.1
-+//   item 6 has judged runs) and under the shared target alike.
++//   the next build replaces it.
 +// - Each npt-lab process is timed (the wall time around the call) and its seconds go on its runs.txt line beside its
 +//   ticks (npt-lab's summary line), for the ticks-per-second figure (2.4 r5, 7.3).
 +// - No run logs its clients' bytes (`scenario --bytes`): no part these sets judge reads a replay log (only an x86_64
 +//   replay log of an L2 Arm run is read: judge/src/figures.rs:222-233).
++// - Its pure helpers are exported (the projection, the name check, the summary line's flag, the pairs' check); main
++//   runs only when this file is the entry module.
 +
 +import { spawnSync } from "node:child_process";
 +import { createHash } from "node:crypto";
 +import { copyFileSync, existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from "node:fs";
-+import { dirname, join } from "node:path";
++import { loadavg, uptime } from "node:os";
++import { dirname, join, resolve } from "node:path";
 +import { fileURLToPath } from "node:url";
 +import { builtArtifact } from "../../check.mjs";
 +
@@ -8114,10 +8796,116 @@ index 0000000..ca29c1a
 +const L2_ONLY = ["PM-0001-18/ws-budget-x2"];
 +/** The bites whose judged run is not U4r's (the advisor's U4r build ruling 3, point 1: -18's no-fallback, to U4g). */
 +const NOT_AT_U4R = ["PM-0001-18/no-fallback"];
-+/** The free space below which no run starts, bytes (section 4 rule 6's 4 GB floor). */
-+const FLOOR = 4 * 1024 ** 3;
++/** The free space a build and a run must leave, bytes (section 4 rule 6's 4 GB floor, as 4 GiB). */
++export const FLOOR = 4 * 1024 ** 3;
 +/** precheck-recordings.json's scene ids (Scene::by_id). */
 +const SCENES = { 1: "SS", 2: "ES", 3: "CO", 4: "TC" };
++/** A name that reaches a file path or a run id (FP-5 (h): SEC-U4R-7): one or more of A-Z, a-z, 0-9 and -. */
++const NAME = /^[A-Za-z0-9-]+$/;
++/**
++ * One judged run's projected log bytes over a 10-minute measured phase (18,300 ticks with its warm-up and after phase),
++ * from the builder's measured bytes per measured tick (u4r-build.md:739-751; MB = 10^6 B): a run whose header lists
++ * PM-0001-57 writes -57's three series (the advisor's U4r build ruling, point 3), P0 509.1 MB, P2 219.8 MB, P3 125.8
++ * MB, B1 190.6 MB; any other run about 3,050 B a measured tick at every profile, 56 MB.
++ */
++export const BYTES_10MIN_57 = { P0: 509_100_000, P2: 219_800_000, P3: 125_800_000, B1: 190_600_000 };
++export const BYTES_10MIN_OTHER = 56_000_000;
++/**
++ * One -30 pre-check pair's output (its lines, kept for runs.txt), at most 25,164 B in the builder's pre-check runs
++ * (.gate/u4r/c4-b12-3.log:18-365: the clean, wallclock and late-command pairs, 24,840, 25,164 and 25,093 B); the
++ * recording itself is its manifest entry's bytes.
++ */
++export const PAIR_BYTES = 25_164;
++/** The late-command pair's one expected result line (precheck.rs, the late-command bite's test). */
++export const LATE_COMMAND_LINE = "result: VOID (L1 late_count 1)";
++
++/** Whether `s` is a name (NAME). */
++export const nameOk = (s) => typeof s === "string" && NAME.test(s);
++
++/** Each [what, value] whose value is not a name, as a sentence naming both (FP-5 (h)). */
++export function nameProblems(named) {
++  return named
++    .filter(([, v]) => !nameOk(v))
++    .map(([what, v]) => `${what} ${JSON.stringify(v)} is not one or more of A-Z, a-z, 0-9 and -: refused before any use`);
++}
++
++/**
++ * One run's projected log bytes (FP-5 (b)): its profile's figure when its header lists PM-0001-57 (the largest, P0's,
++ * for a profile the table lacks), else BYTES_10MIN_OTHER, scaled by its measured seconds over 600.
++ */
++export function runBytes({ profile, marks, measuredS }) {
++  const per10 = marks.includes("PM-0001-57") ? (BYTES_10MIN_57[profile] ?? BYTES_10MIN_57.P0) : BYTES_10MIN_OTHER;
++  return Math.ceil((per10 * measuredS) / 600);
++}
++
++/** The set's projected bytes: its runs' sum. */
++export const projectedBytes = (plan) => plan.reduce((s, r) => s + r.bytes, 0);
++
++/**
++ * Whether `free` bytes leave the 4 GiB floor after `projected` more (FP-5 (b), (c)), with the line that prints both.
++ */
++export function roomFor(free, projected, what) {
++  const ok = free - projected >= FLOOR;
++  const mib = (b) => (b / 1024 ** 2).toFixed(0);
++  return {
++    ok,
++    line: `${what}: free ${mib(free)} MiB, projected ${mib(projected)} MiB, so ${mib(free - projected)} MiB after it against the 4 GiB floor (4096 MiB): ${ok ? "room" : "no room, stopped before it"}`,
++  };
++}
++
++/**
++ * The mark a run's summary line takes (FP-5 (g): NC-U4R-6): its "overflow resyncs N" above 0 on a run whose header
++ * lists PM-0001-17 or PM-0001-18 goes to the advisor before the run counts (carry 58); "" otherwise.
++ */
++export function overflowFlag(line, marks) {
++  const n = Number(line.match(/overflow resyncs (\d+)/)?.[1] ?? 0);
++  return n > 0 && marks.some((m) => m === "PM-0001-17" || m === "PM-0001-18") ? " (overflow resyncs: to the advisor before it counts, carry 58)" : "";
++}
++
++/**
++ * Whether a pair's output is as expected (FP-5 (g)): the late-command pair only when its whole result line is
++ * LATE_COMMAND_LINE; the clean and wallclock pairs by the result's first word.
++ */
++export function pairAsExpected(pair, expected, out) {
++  const line = out.match(/^result: .*$/m)?.[0] ?? "";
++  return pair === "late-command" ? line === LATE_COMMAND_LINE : line.match(/^result: (\S+)/)?.[1] === expected;
++}
++
++/** The marks a judged set's headers list (the module text). */
++const listedOf = (profile) => ["PM-0001-2", "PM-0001-17", "PM-0001-57", ...(profile === "B1" ? ["PM-0001-18"] : [])];
++
++/**
++ * The bites a judged set runs, from marks.json's lists: one run each at seed 1 on P0, the profile of a part that reads
++ * it (-17's and -57's); -18's none at U4r (ruling 3, point 1: to U4g), so a B1 set runs no bite.
++ */
++export function bitesOf(profile, marks) {
++  const listed = listedOf(profile);
++  const bitesOn = (mark) => (mark === "PM-0001-18" ? null : "P0");
++  const out = [];
++  for (const m of marks.marks.filter((x) => listed.includes(x.id) && x.id !== "PM-0001-2" && bitesOn(x.id) === profile)) {
++    for (const b of (m.bites ?? []).filter((x) => !L2_ONLY.includes(x.id) && !NOT_AT_U4R.includes(x.id))) out.push({ id: b.id, mark: m.id });
++  }
++  return out;
++}
++
++/** The judged set's runs, in order, each with its projected bytes (the module text; FP-5 (b)). */
++export function planJudged(profile, marks) {
++  const listed = listedOf(profile);
++  const runs = SEEDS.map((s) => ({ run: `l1-${profile.toLowerCase()}-s${s}`, exe: "lab", seed: s, marks: listed, extra: ["--role", "measured", "--marks", listed.join(",")], tickStart: TICK_START }));
++  for (const b of bitesOf(profile, marks)) {
++    const marksOf = ["PM-0001-2", b.mark];
++    runs.push({ run: `bite-${b.id.split("/")[1]}`, exe: "labBites", seed: 1, marks: marksOf, extra: ["--role", "bite", "--bite", b.id, "--marks", marksOf.join(",")], tickStart: b.id === TICK16 ? TICK16_START : TICK_START });
++  }
++  return runs.map((r) => ({ ...r, what: r.run, bytes: runBytes({ profile, marks: r.marks, measuredS: MEASURED_S }) }));
++}
++
++/** The pre-check set's outputs, each with its projected bytes (FP-5 (b)): the recording, then the three pairs. */
++export function planPrecheck(entry) {
++  return [
++    { what: `the recording ${entry.name}`, bytes: entry.bytes },
++    ...["clean", "wallclock", "late-command"].map((p) => ({ what: `the ${p} pair`, bytes: PAIR_BYTES })),
++  ];
++}
 +
 +function sh(cmd, args, cwd = ROOT) {
 +  const r = spawnSync(cmd, args, { cwd, encoding: "utf8", maxBuffer: 1 << 28 });
@@ -8127,20 +8915,26 @@ index 0000000..ca29c1a
 +
 +const sha256 = (path) => createHash("sha256").update(readFileSync(path)).digest("hex");
 +
-+/** One release build, its artifact's path read from cargo's JSON messages and copied to `to`. */
++/** The free bytes where the logs go. */
++function freeBytes() {
++  const s = statfsSync(ROOT);
++  return s.bavail * s.bsize;
++}
++
++/** Stops unless free space minus `projected` bytes leaves the floor (0: a build's own check, 4 GiB free). */
++function floor(what, projected = 0) {
++  const r = roomFor(freeBytes(), projected, what);
++  if (!r.ok) throw new Error(r.line);
++}
++
++/** One release build, at least 4 GiB free before it, its artifact's path read from cargo's JSON messages and copied to `to`. */
 +function build(args, target, to) {
-+  const out = sh("cargo", ["build", "--release", "--locked", ...args, "--message-format=json"], SPIKE);
++  floor(`the release build of ${target}${args.includes("bites") ? " (bites)" : ""}`);
++  const out = sh("cargo", ["build", "--release", "--locked", "--offline", ...args, "--message-format=json"], SPIKE);
 +  const path = builtArtifact(out, { target, kind: "bin" });
 +  if (!path) throw new Error(`cargo build ${args.join(" ")} names no ${target} executable in its JSON messages`);
 +  copyFileSync(path, to);
 +  return to;
-+}
-+
-+/** Stops before a run when less than FLOOR bytes are free where the logs go. */
-+function floor(what) {
-+  const s = statfsSync(ROOT);
-+  const free = s.bavail * s.bsize;
-+  if (free < FLOOR) throw new Error(`${what}: ${(free / 1024 ** 3).toFixed(1)} GB free, below the 4 GB floor: stopped before it`);
 +}
 +
 +/** One npt-lab process, timed: its summary line with the wall seconds. */
@@ -8151,6 +8945,9 @@ index 0000000..ca29c1a
 +  return { out, secs };
 +}
 +
++/** The machine's uptime and load average now (runs.txt's head: FP-5 (d)). */
++const machineNow = () => `uptime ${uptime().toFixed(0)} s, load average ${loadavg().map((x) => x.toFixed(2)).join(" ")}`;
++
 +function main(argv) {
 +  const set = argv[0];
 +  const opt = (k) => (argv.includes(k) ? argv[argv.indexOf(k) + 1] : undefined);
@@ -8159,15 +8956,43 @@ index 0000000..ca29c1a
 +  const usage = "usage: c-u4r-runs.mjs precheck --date YYYY-MM-DD | judged --profile P0|P2|P3|B1 --date YYYY-MM-DD";
 +  if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? "") || !["precheck", "judged"].includes(set)) throw new Error(usage);
 +  if (set === "judged" && !PROFILES.includes(profile)) throw new Error(usage);
-+  if (sh("git", ["status", "--porcelain", "--untracked-files=no"])) {
-+    throw new Error("tracked files have uncommitted changes: commit first, since every log names its commit");
++  const tracked = () => sh("git", ["status", "--porcelain", "--untracked-files=no"]);
++  if (tracked()) throw new Error("tracked files have uncommitted changes: commit first, since every log names its commit");
++  const untracked = sh("git", ["status", "--porcelain", "--untracked-files=all", "--", "crates"], SPIKE);
++  if (untracked) throw new Error(`files under spikes/netcode-proof/crates are not committed (${untracked.split("\n").join("; ")}): commit first, since every log names its commit`);
++  if (process.env.CARGO_TARGET_DIR !== undefined) {
++    throw new Error(
++      `CARGO_TARGET_DIR is set (${JSON.stringify(process.env.CARGO_TARGET_DIR)}): this script runs in the main folder with its own cache (plan §7.1 item 6); a shared-target run comes to the advisor first (u4r-brief.md section 12 item 8)`,
++    );
 +  }
 +  const commit = sh("git", ["rev-parse", "HEAD"]);
++  const start = { commit, status: tracked(), machine: machineNow() };
 +  const short = commit.slice(0, 12);
 +  const name = set === "precheck" ? "u4r-precheck-30" : `u4r-${profile}`;
 +  const logs = join(GATE, "runs", `${name}-${short}`);
 +  const results = set === "precheck" ? join(SPIKE, "results", "u4r-precheck-30", short) : join(SPIKE, "results", "u4r", short, profile);
 +  for (const d of [logs, results]) if (existsSync(d)) throw new Error(`${d} exists: a run set is never overwritten`);
++  const marksText = readFileSync(join(SPIKE, "marks", "marks.json"), "utf8");
++  const marksSha = createHash("sha256").update(marksText).digest("hex");
++  const manifest = join(SPIKE, "crates", "lab", "precheck-recordings.json");
++  const entry = set === "precheck" ? JSON.parse(readFileSync(manifest, "utf8")).recordings[0] : null;
++
++  // The names, before any use (FP-5 (h)).
++  const named = set === "precheck" ? [["the pre-check entry's name", entry?.name]] : bitesOf(profile, JSON.parse(marksText)).map((b) => [`bite ${JSON.stringify(b.id)}'s tail`, b.id.split("/")[1]]);
++  const bad = nameProblems(named);
++  if (bad.length) throw new Error(bad.join("; "));
++
++  // The projection, before the builds and after them (FP-5 (b)).
++  const planOf = (marks) => (set === "precheck" ? planPrecheck(entry) : planJudged(profile, marks));
++  const plan = planOf(JSON.parse(marksText));
++  const total = projectedBytes(plan);
++  const room = (when) => {
++    const r = roomFor(freeBytes(), total, `${name}: the set's ${plan.length} runs' projected logs, ${when}`);
++    console.log(r.line);
++    if (!r.ok) throw new Error(r.line);
++    return r.line;
++  };
++  const before = room("before the builds");
 +
 +  // Both builds of npt-lab, each copied out before the next build replaces it, and the judge.
 +  const bin = join(GATE, "bin", `${name}-${short}`);
@@ -8175,78 +9000,87 @@ index 0000000..ca29c1a
 +  const lab = build(["-p", "npt-lab"], "npt-lab", join(bin, "npt-lab"));
 +  const labBites = build(["-p", "npt-lab", "--features", "bites"], "npt-lab", join(bin, "npt-lab-bites"));
 +  const judge = set === "judged" ? build(["-p", "npt-judge"], "npt-judge", join(bin, "npt-judge")) : null;
++  const after = room("after the builds");
++
++  // The set's folder, and its copy of marks.json, which the bite list and the judge read (FP-5 (e)).
 +  mkdirSync(logs, { recursive: true });
++  const marksCopy = join(logs, "marks.json");
++  copyFileSync(join(SPIKE, "marks", "marks.json"), marksCopy);
++  if (sha256(marksCopy) !== marksSha) throw new Error("marks/marks.json changed since the set started: stopped before the first run");
++  const runs = planOf(JSON.parse(readFileSync(marksCopy, "utf8")));
 +  const head = [
 +    `commit ${commit}`,
++    "target: the main folder's own cache (CARGO_TARGET_DIR unset: plan §7.1 item 6)",
 +    `npt-lab (measured build) sha256 ${sha256(lab)}`,
 +    `npt-lab (bites build) sha256 ${sha256(labBites)}`,
 +    ...(judge ? [`npt-judge sha256 ${sha256(judge)}`] : []),
++    `marks.json sha256 ${marksSha} (copied into the raw-log folder at the set's start; the bite list and the judge read that copy)`,
 +    `raw logs: .gate/netcode-proof-test/runs/${name}-${short}/ (not committed: plan §7.2)`,
++    `projection: ${before}`,
++    `projection: ${after}`,
++    `start: ${start.machine}`,
 +  ];
 +  const common = ["--set", name, "--date", date, "--commit", commit];
 +  const lines = [];
++  const unchanged = (what) => {
++    if (sh("git", ["rev-parse", "HEAD"]) !== start.commit || tracked() !== start.status) {
++      throw new Error(`HEAD or the tracked files changed since the set started: stopped before ${what} (FP-5 (e))`);
++    }
++  };
 +
 +  if (set === "precheck") {
-+    const manifest = join(SPIKE, "crates", "lab", "precheck-recordings.json");
-+    const [e] = JSON.parse(readFileSync(manifest, "utf8")).recordings;
-+    const rec = join(logs, `${e.name}.rec`);
-+    floor(`the recording ${e.name}`);
++    const rec = join(logs, `${entry.name}.rec`);
++    floor(runs[0].what, runs[0].bytes);
 +    const made = timed(lab, [
-+      "scenario", "--run", `record-${e.name}`, ...common, "--out", join(logs, `record-${e.name}`), "--scene", SCENES[e.scene],
-+      "--profile", e.profile, "--seed", String(e.seed), "--clients", String(e.clients), "--tick-start", String(e.first_tick),
-+      "--warmup-s", String(e.warmup_s), "--measured-s", String(e.measured_s), "--logs", "0", "--suite", "record", "--record", rec,
++      "scenario", "--run", `record-${entry.name}`, ...common, "--out", join(logs, `record-${entry.name}`), "--scene", SCENES[entry.scene],
++      "--profile", entry.profile, "--seed", String(entry.seed), "--clients", String(entry.clients), "--tick-start", String(entry.first_tick),
++      "--warmup-s", String(entry.warmup_s), "--measured-s", String(entry.measured_s), "--logs", "0", "--suite", "record", "--record", rec,
 +    ]);
 +    console.log(made.out);
-+    lines.push(`# the recording (npt-lab scenario --record at the manifest entry's settings; wall ${made.secs} s)`, made.out, `${e.name} sha256 ${sha256(rec)}`);
++    lines.push(`# the recording (npt-lab scenario --record at the manifest entry's settings; wall ${made.secs} s)`, made.out, `${entry.name} sha256 ${sha256(rec)}`);
 +    const refused = Number(made.out.match(/rewinds refused (\d+)/)?.[1] ?? Number.NaN);
-+    if (refused !== 0) throw new Error(`${e.name}'s run refused ${refused} rewinds: the set stops before the pre-check (7.1; carry 40)`);
++    if (refused !== 0) throw new Error(`${entry.name}'s run refused ${refused} rewinds: the set stops before the pre-check (7.1; carry 40)`);
 +    const pairs = [
 +      { pair: "clean", exe: lab, extra: [], expected: "PASS" },
 +      { pair: "wallclock", exe: labBites, extra: ["--bite", "PM-0001-30/wallclock", "--bite-leg", "L1"], expected: "FAIL" },
 +      { pair: "late-command", exe: labBites, extra: ["--bite", "PM-0001-30/late-command", "--bite-leg", "L1"], expected: "VOID" },
 +    ];
-+    for (const p of pairs) {
-+      floor(`the ${p.pair} pair`);
++    for (const [i, p] of pairs.entries()) {
++      floor(runs[i + 1].what, runs[i + 1].bytes);
 +      const r = timed(p.exe, ["precheck", "--manifest", manifest, "--recording", rec, "--commit", commit, ...p.extra]);
 +      const result = r.out.match(/^result: (\S+)/m)?.[1] ?? "none";
-+      const said = `## pair ${p.pair} (wall ${r.secs} s): result ${result}, expected ${p.expected}${result === p.expected ? "" : " (NOT as expected: to the advisor)"}`;
++      const expected = p.pair === "late-command" ? `${p.expected}, the whole line "${LATE_COMMAND_LINE}"` : p.expected;
++      const said = `## pair ${p.pair} (wall ${r.secs} s): result ${result}, expected ${expected}${pairAsExpected(p.pair, p.expected, r.out) ? ", as expected" : " (NOT as expected: to the advisor)"}`;
 +      console.log(said);
 +      lines.push(said, r.out);
 +    }
++    unchanged("runs.txt is written");
 +    mkdirSync(results, { recursive: true });
 +    const top = [`# u4r-precheck-30: the -30 pre-check (u4r-brief.md 7.2), run in this container on ${date}; no verdict (no judged id)`];
-+    writeFileSync(join(results, "runs.txt"), `${[...top, ...head, "", ...lines].join("\n")}\n`);
++    writeFileSync(join(results, "runs.txt"), `${[...top, ...head, `end: ${machineNow()}`, "", ...lines].join("\n")}\n`);
 +    console.log(`written: ${join("spikes", "netcode-proof", "results", "u4r-precheck-30", short)}/runs.txt`);
 +    return;
 +  }
 +
-+  const marks = JSON.parse(readFileSync(join(SPIKE, "marks", "marks.json"), "utf8"));
-+  const listed = ["PM-0001-2", "PM-0001-17", "PM-0001-57", ...(profile === "B1" ? ["PM-0001-18"] : [])];
 +  const settings = (tickStart) => ["--scene", "SS", "--profile", profile, "--tick-start", String(tickStart), "--warmup-s", String(WARMUP_S), "--measured-s", String(MEASURED_S), "--suite", name];
-+  const one = (exe, run, seed, extra, tickStart = TICK_START) => {
-+    floor(run);
-+    const r = timed(exe, ["scenario", "--run", run, ...common, "--out", join(logs, run), "--seed", String(seed), ...settings(tickStart), ...extra]);
-+    const said = `${r.out} (wall ${r.secs} s)`;
++  for (const r of runs) {
++    floor(r.what, r.bytes);
++    const exe = r.exe === "lab" ? lab : labBites;
++    const t = timed(exe, ["scenario", "--run", r.run, ...common, "--out", join(logs, r.run), "--seed", String(r.seed), ...settings(r.tickStart), ...r.extra]);
++    const said = `${t.out} (wall ${t.secs} s)${overflowFlag(t.out, r.marks)}`;
 +    console.log(said);
 +    lines.push(said);
-+  };
-+  for (const s of SEEDS) one(lab, `l1-${profile.toLowerCase()}-s${s}`, s, ["--role", "measured", "--marks", listed.join(",")]);
-+  // The bites: one run each at seed 1 on P0, the profile of a part that reads it (-17's and -57's); -18's none at U4r
-+  // (ruling 3, point 1: to U4g), so a B1 set runs no bite. The tick16 run at TICK16_START (ruling 3, point 3).
-+  const bitesOn = (mark) => (mark === "PM-0001-18" ? null : "P0");
-+  for (const m of marks.marks.filter((x) => listed.includes(x.id) && x.id !== "PM-0001-2" && bitesOn(x.id) === profile)) {
-+    for (const b of (m.bites ?? []).filter((x) => !L2_ONLY.includes(x.id) && !NOT_AT_U4R.includes(x.id))) {
-+      one(labBites, `bite-${b.id.split("/")[1]}`, 1, ["--role", "bite", "--bite", b.id, "--marks", `PM-0001-2,${m.id}`], b.id === TICK16 ? TICK16_START : TICK_START);
-+    }
 +  }
++  unchanged("the judge");
 +  const verdict = join(logs, "verdict.json");
-+  const judged = sh(judge, ["--marks", join(SPIKE, "marks", "marks.json"), "--logs", logs, "--only", listed.join(","), "--out", verdict]);
++  const judged = sh(judge, ["--marks", marksCopy, "--logs", logs, "--only", listedOf(profile).join(","), "--out", verdict]);
 +  console.log(judged);
 +  mkdirSync(results, { recursive: true });
 +  copyFileSync(verdict, join(results, "verdict.json"));
 +  const top = [
 +    `# ${name}: -17's, -57's${profile === "B1" ? " and -18's" : ""} L1 ${profile} part(s), run in this container on ${date} (u4r-brief.md 7.1)`,
 +    ...head,
++    `end: ${machineNow()}`,
 +    `judge: ${judged}`,
 +    "",
 +    "# one line per run (npt-lab's own summary line and its wall time; the judge reads the logs, never these lines)",
@@ -8255,18 +9089,20 @@ index 0000000..ca29c1a
 +  console.log(`written: ${join("spikes", "netcode-proof", "results", "u4r", short, profile)}/verdict.json and runs.txt`);
 +}
 +
-+try {
-+  main(process.argv.slice(2));
-+} catch (e) {
-+  console.error(`c-u4r-runs: ${e.message}`);
-+  process.exit(1);
++if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
++  try {
++    main(process.argv.slice(2));
++  } catch (e) {
++    console.error(`c-u4r-runs: ${e.message}`);
++    process.exit(1);
++  }
 +}
 diff --git a/spikes/netcode-proof/ops/runs/det-u4.mjs b/spikes/netcode-proof/ops/runs/det-u4.mjs
 new file mode 100644
-index 0000000..a0ba0f4
+index 0000000..450f52f
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/runs/det-u4.mjs
-@@ -0,0 +1,36 @@
+@@ -0,0 +1,39 @@
 +#!/usr/bin/env node
 +// U4r's determinism run on its two runner recordings (the advisor's U4r build ruling, point 1, route (c);
 +// u4-build-plan.md :800-802): check.mjs's `wasm` step, imported (never a copy), on crates/lab/det-recordings.json with
@@ -8279,15 +9115,16 @@ index 0000000..a0ba0f4
 +// - The step's rules hold here as they are wasmStep's own: `npt-lab hash` and its compare must exit 0 (carry 83 (b));
 +//   every call but the cargo builds shares one 300 s deadline from the first of them, and a call stopped by it takes
 +//   every process it started (carry 84).
-+// - It prints as check.mjs's main prints a step (PASS or FAIL, the step's seconds and its summary: each pair, h2 and
-+//   each call's seconds; on a FAIL its last 40 lines and the file under .gate/ that keeps its whole output) and exits 0
-+//   only on PASS. A FAIL is never re-run into a PASS (u4r-brief.md section 4's no-retry rule for the wasm step).
++// - It runs check.mjs's `deps` step first, then the clean half (advisor-u4r-r1, FP-6 item 10: INF-U4R-5). It prints as
++//   check.mjs's main prints its steps (PASS or FAIL, each step's seconds and its summary: for the clean half each pair,
++//   h2 and each call's seconds; on a FAIL its last 40 lines and the file under .gate/ that keeps its whole output) and
++//   exits 0 only when both pass. A FAIL is never re-run into a PASS (u4r-brief.md section 4's no-retry rule for the wasm step).
 +// - Run it as check.mjs is run: under the lane lock, with the session's CARGO_TARGET_DIR (the step's cargo builds read
 +//   their artifacts' paths from cargo's JSON messages, so either cache serves).
 +
 +import { dirname, join } from "node:path";
 +import { fileURLToPath } from "node:url";
-+import { FAILED_STEP_DIR, main, wasmStep } from "../../check.mjs";
++import { FAILED_STEP_DIR, STEPS, main, wasmStep } from "../../check.mjs";
 +
 +const SPIKE = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 +const ROOT = join(SPIKE, "..", "..");
@@ -8296,7 +9133,9 @@ index 0000000..a0ba0f4
 +/** Its own folder under .gate/ (gitignored), emptied at each run as the step empties its own. */
 +const DET_DIR = join(ROOT, ".gate", "netcode-proof-test", "det-u4");
 +
-+const steps = { "det-u4": () => wasmStep(undefined, undefined, undefined, DET_DIR, { manifest: DET_MANIFEST, bitesHalf: false }) };
++// check.mjs's deps step first (advisor-u4r-r1, FP-6 item 10: INF-U4R-5), so this exits 0 only when the builds pass the
++// checks check.mjs would make of them and the clean half passes.
++const steps = { deps: STEPS.deps, "det-u4": () => wasmStep(undefined, undefined, undefined, DET_DIR, { manifest: DET_MANIFEST, bitesHalf: false }) };
 +try {
 +  process.exitCode = main(process.argv.slice(2), steps, console.log, FAILED_STEP_DIR);
 +} catch (e) {

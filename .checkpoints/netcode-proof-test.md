@@ -14,7 +14,34 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 11:17 UTC; read this first after a compact or a cut): Mustafa answered SIZE-U4R with (a)
+**NOW (2026-11-14 about 12:55 UTC; read this first after a compact or a cut): U4r's FIX PASS IS DONE (copy 6, its
+report 12:50 UTC); snapshot 21ca46be…; next: round 2 (five seats, two batches).**
+- **Copy 6's result** (agent a2cf82539d5d40483, 11:17-12:50; its report at the end of u4r-build.md, "## Fix pass,
+  round 1: report"; notes 2,111 lines, copied, equal): FP-1 to FP-9 done; end checks c6-end2.log (12:13-12:26) and
+  c6-end3.log (12:26-12:40) "check: all 11 steps pass" each; **measured 531 (+5), bites 609 (+6), self 77 (+1)**, 11
+  steps; wasm 43.1 s and 48.7 s (warm). FP-8: c6-det-u4.log PASS 235.0 s (non-cargo 223.7 s of 240);
+  c6-regen-precheck.log PASS (SS-P0-s4 16,950,444 B, sha256 as the manifest's). Six new Rust tests and one self-test.
+  **Two outcomes differed from the ruling and copy 6 fixed them itself instead of stopping** (for round 2 and the
+  advisor, both runs kept): FP-2 plant (i)'s first run failed at the Kick assert (its own test read c1 too late), and
+  end check 1 (c6-end1.log) failed at the wasm step, exit 2, on a fractional spawnSync timeout from its own FP-6 item 11
+  edit (fixed with Math.ceil plus one self-test, beyond the ruling). TE2-5 entries: that run; and a by-hand
+  `node --test` 73 of 76 whose fixtures (tests 21, 22, 24) the widened SEC-U4R-5 rule refuses, re-pinned. The FP-5
+  helper test is a scratch file in the worktree only (.checkpoints/netcode-proof-test/u4r-fp5-helpers.test.mjs, 4 of
+  4; never committed, never copied here).
+- **Snapshot (12:51 UTC): wip/u4r.patch sha256 21ca46be23704131c77cc20981a4bfe866811b33f9ca853279f7ddbfb5d58bce**
+  (26 files on 2fbec77). Read copies: **.gate/u4r-snap1 stays at 572c4f69** (round 1's), and **.gate/u4r-snap2**
+  (new: `git worktree add --detach` at 2fbec77 plus the patch; its 26 files equal the worktree's by cmp). Between them:
+  14 files, +1,060 −276; no new Rust `pub` line, no Cargo.toml change (engine-architect stays out, as the ruling says).
+- **SIZE-CHECK: U4r, planned M (about 3,000; past above 6,000): 8,362 lines at snapshot 21ca46be** (6,906 in 13 new
+  files, 1,456 inserted into 13 files, 106 removed); 7,568 at 572c4f69. Past; his SIZE-U4R (a) covers it; the one line
+  to him sent with this step's report.
+- **Next:** the round-2 packet by script (u4r-r2-packet.json → u4r-r2-packet.md: the diffs .gate/u4r-snap1 →
+  .gate/u4r-snap2, FP-0's two diffs, the ruling and round 1's findings, the carries the fix pass touches); round 2 as a
+  workflow (batch 1 netcode, security, test; batch 2 rust, infra; the ruling's "Round 2" says who reads what); the
+  main session's own reads meanwhile (EA-U4R-1, -4, -5, -8, -9; FP-4's verdict and c-u4r-runs.mjs's judge feed, as
+  they touch the judge).
+
+**Earlier NOW (2026-11-14 about 11:17 UTC): Mustafa answered SIZE-U4R with (a)
 at 11:07 UTC; U4r's fix pass runs (copy 6).** His words of today are history.md's last entry (words_1114.py, word for
 word).
 - **Done since:** FP-0 (about 11:13 UTC, the main session): u4r-run.sh and main-run.sh read free space in bytes and stop
