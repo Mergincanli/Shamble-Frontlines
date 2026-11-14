@@ -6,15 +6,35 @@
   **Base:** main, last merged in at 7685b2b (main 4d21c1a, PR #48, the toolchain). Main is now 4460ef5 (PR #52, eight
   files under docs/ only), **not merged in** (MAIN-52, Mustafa 2026-11-14: take main in when main changes code, CI or
   rules, and once before PR #40 is marked ready)
-- **Last update:** 2026-11-14 about 11:25 UTC (Mustafa's SIZE-U4R answer (a); U4r's fix pass starts; the NOW block
-  below)
+- **Last update:** 2026-11-14 about 15:42 UTC (U4r merged at 71ee13d and approved by the advisor's review of the
+  pushed head; the r2 record run next; the NOW block below)
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 13:45 UTC; read this first after a compact or a cut): the advisor's ROUND-2 RULING IS IN
+**NOW (2026-11-14 about 15:42 UTC; read this first after a compact or a cut): U4r IS MERGED at 71ee13d and the
+advisor APPROVES the pushed head (advisor-u4r-merge-full.md, 57 lines, sha256 40284472…, by u4r_merge_review_full.py
+word for word); next: the r2 record run (the round-2 ruling's step 11).**
+- **Its "For Mustafa" (copied here at once):** nothing to decide or do; the open Low security weakness (SEC-U4R-R2-1)
+  goes in PR #40's report. **Its three Lows** (MRG-L1: the 0.27 load is the call's start, not det-u4's, and the
+  provenance counts cover seven builds; MRG-L2: carries 20 and 69 are met, with its references; MRG-L3: name
+  EA-U4R-2's U4-SEAM deviation in the report): folded into u4r-report.md **after r2.txt is written, in the same edit
+  that fills its judged-runs section**; report words only, no round, no push of their own. Its step 5: the
+  day-session advisor runs the full gate itself on PR #40's head before any merge to main.
+- **The r2 record run, under INF-R2-1's interim rule:** this card committed and pushed right before; the saver
+  stopped; no agent running; then `bash main-run.sh .gate/u4r-merge/r2.log node ops/runs/c-u4r-r2.mjs --date
+  2026-11-14` (lock exclusive) in the background. **Until r2.txt is written: no commit and no edit to any tracked file
+  in the main folder (this card included; the COMPACT-WAIT reminder's card refresh and any check-in save wait).**
+  Then save and restart the saver. b1, es and b1-nofallback are expected to fail as ruled: recorded, never re-run. Any
+  "stopped at" or "exit by a signal" line goes to the advisor whole. **If cut mid-run:** nothing committed meanwhile;
+  read r2.log; a run stopped by a cut is not a result: ask the advisor before any re-run at this commit (its output
+  folder .gate/netcode-proof-test/r2-71ee13d29dc6/ is never overwritten).
+- **After r2:** carry 62 (h) (step 12); U4r-F1 (13); D4 (14); the disk plan (15); the pre-check set (16); the judged
+  sets P3, B1, P2, then P0 (17).
+
+**Earlier NOW (2026-11-14 about 13:45 UTC): the advisor's ROUND-2 RULING IS IN
 (advisor-u4r-r2-full.md, 126 lines, sha256 6dcc0a81…, by u4r_ruling_r2_full.py word for word); next: U4r's merge into
 the spike branch, M1 to M9, as its steps 2-10 say.**
 - **Its "For Mustafa" (copied here at once):** nothing to decide or do. Two heads-ups, neither a decision now: (1) the
