@@ -5,7 +5,8 @@ pre-check and the run scripts, merged after review round 2": advisor-u4r-r2-full
 u4r-brief.md rev 3.2 (sha256 59d570b8…, 1,909 lines: u4r-build.md:20-21; the advisor's check of rev 3.1,
 advisor-u4r-brief.md:10-11: APPROVE WITH CONDITIONS on L1 to L5), built on 2fbec77 (the spike head, whose spikes/ is
 the brief's `<base>` 614823c's: u4r-build.md:5-14). The bytes merged: wip/u4r.patch, sha256 21ca46be…, 26 files. The
-judged runs come after this merge and are pending (last section). For U4's report, which folds this one
+runs after this merge: the r2 record run and carry 62 (h) are done, the judged sets pending (last section). For U4's
+report, which folds this one
 (advisor-u4r-r2-full.md:23).
 
 ## Who built it, and how
@@ -53,8 +54,10 @@ judged runs come after this merge and are pending (last section). For U4's repor
 - **Round 1:** two real code defects (a closed connection left a ghost slot in the room: NC-U4R-1 = SEC-U4R-1, fixed by
   FP-1; manifest text could inject extra settings: RR3-M1 = SEC-U4R-2, fixed by FP-3), a weak test (T-1, FP-2), an
   unproven regeneration (T-2 = INF-U4R-1, FP-8) and four disk-safety problems in the scripts and runners (FP-0, FP-5); of the
-  40 Lows, 26 rode the fix pass, 9 in part, 5 became follow-ups (advisor-u4r-r1-full.md:46). Mustafa chose SIZE-U4R
-  (a), the fix pass as ruled (history.md:2044).
+  40 Lows, 26 rode the fix pass, 9 in part, 5 became follow-ups (advisor-u4r-r1-full.md:46). EA-U4R-2: a deviation
+  from U4-SEAM (u4-build-plan.md:162-163): npt-lab names npt_sim::World at logs.rs:97, :472, :595 and precheck.rs:296,
+  and builds the room twice (scenario.rs:751, precheck.rs:301); its follow-up is below (u4r-build.md:1930-1934;
+  advisor-u4r-merge-full.md, MRG-L3). Mustafa chose SIZE-U4R (a), the fix pass as ruled (history.md:2044).
 - **Round 2:** every round-1 fix confirmed (advisor-u4r-r2-full.md:32). INF-R2-1 (Medium: the run scripts compare the
   whole repository's HEAD and status before the judge, so a checkpoint commit mid-set stops the set; it fails closed)
   becomes U4r-F1, a change-set of its own before any c-u4r-runs.mjs set (:38-41). INF-R2-2 (Low) is done at this merge:
@@ -84,7 +87,8 @@ copy 6's by-hand node --test at 73 of 76, re-pinned in the same step, recorded u
   63713cf344482a9b3e5f911bab4012d16201dab753b972c6e042c5fd894aa5bf.
 - **M5** (the counted run on the merged tree, .gate/u4r-merge/m5.log; expected as advisor-u4r-r2-full.md:12 says):
   one main-run.sh call, 13:44:35-14:06:39 UTC, lane lock exclusive, offline, free 4,679 MiB at its start. `uptime`
-  first: up 3:09, load average 0.27, 0.09, 0.10. The six builds' provenance lines all name
+  first: up 3:09, load average 0.27, 0.09, 0.10. The provenance lines, counted over the whole call (seven builds, the
+  regeneration's npt-lab build included; advisor-u4r-merge-full.md, MRG-L1), all name
   /home/user/Shamble-Frontlines/spikes/netcode-proof/crates/... (npt-lab 5, npt-bots 5, npt-hash-wasm 4, npt-sim 7).
   `node check.mjs`: "check: all 11 steps pass"; test 635.8 s, measured build 531 tests passed, 0 failed, 0 reported a
   skip, bites build 609, 0 failed, 0 reported a skip; self 77 of 77; marks 81 read and checked, the ADR rows
@@ -92,8 +96,10 @@ copy 6's by-hand node --test at 73 of 76, re-pinned in the same step, recorded u
   43.5 s (27,000 ticks, 0 mismatching for both pairs; h2 equal; hash-map caught at SS-s1 tick 1234; std-sin at SS-s1
   tick 2, vehicle[8].pos.y). `node ops/runs/det-u4.mjs`: deps PASS 1.7 s; det-u4 PASS 240.3 s in all, 18,000 ticks
   and 0 mismatching for both comparisons; **its non-cargo calls 227.2 s** (npt-lab hash 223.8 + Wasm 2.5 + 0.9),
-  under 240 s, at load average 0.27. The pre-check regeneration: "regenerated SS-P0-s4: 16950444 bytes, sha256
-  6933b56a…bab3, as the manifest's", native legs equal over 9,000 ticks, 2 min 10 s.
+  under 240 s; the call's uptime at 13:44:36, 15 min 41 s before det-u4 started (after check.mjs; m5.log:3, :184):
+  load average 0.27, 0.09, 0.10; the load at det-u4's own start was not measured (advisor-u4r-merge-full.md, MRG-L1).
+  The pre-check regeneration: "regenerated SS-P0-s4: 16950444 bytes, sha256 6933b56a…bab3, as the manifest's", native
+  legs equal over 9,000 ticks, 2 min 10 s.
 - **M6** (TE2-5, advisor-u4r-r2-full.md:13):
   no test failed in the counted run (531 and 609, 0 failed); nothing was re-run. So TE2-5's rule ends at this merge
   (TE-Q2, as the ruling's M6 says).
@@ -107,24 +113,26 @@ copy 6's by-hand node --test at 73 of 76, re-pinned in the same step, recorded u
 - **Met by U4r's code** (the builder's evidence; each judged figure comes from the record run or the sets, pending):
   6 (`Schedule::new(npt_sim::TICK_HZ, npt_sim::LOOP_CATCHUP)`, scenario.rs:323, precheck.rs:322); 14's U4r half (the
   recording's `span_ms` is the room's ring, ROOM_HISTORY_MS, scenario.rs:855; a copy of a private constant:
-  u4r-build.md:168-169); 49 (the placement refusal above 3,955 cm, u4r-build.md:135; its figures in r2, :680-681); 58
-  (the queue high-water mark reported, :683; a judged -17 or -18 run with overflow resyncs is flagged to the advisor,
-  `overflowFlag`, c-u4r-runs.mjs:152); 59 (the ES suite reported FAIL beside U4d-F's 7.250, routed to U4h:
-  :1391-1398); 60 (missing header params are a contract failure, :1235); 62 (a) to (f) (the client writer:
-  u4r-review-r1-full.md:13), (h)'s check the main session's (step 12 below); 63 (two refusals in crates/log, each
-  test shown failing first: u4r-build.md:65-77); 73 (the tick16 bite run at ruling 3's settings: tick16d, :1430-1439);
-  74 (lead 2 at P0; no clean short run above 1 % late, the highest 0.617 %: :680, u4r-review-r1-full.md:27); 75 (the
-  evstart suite, :677; the bound is checked on logged runs only, :1826); 76 (session handling, with FP-1's closed
-  decoder or link ending the session and freeing the slot: scenario.rs:492-506, u4r-build.md:1967-1969); 77 (b) and
-  (c) (-18's heals counted apart, :1399-1410; stale 0, :632); 82 (the manifest's `kind` schema, the runner entries in
-  det-recordings.json: :151-170); 83 (b) to (d), 84 and 85 (a) to (e) (check.mjs and det-u4.mjs, each with its
-  self-test and plant: :933-1065).
+  u4r-build.md:168-169); 20 (`grid::Config` never hashed across builds: crates/lab/src names it only at mirror.rs:23
+  and :152, a local Config::default() used by value, and replay's re-decoder takes npt-client's own grid_with_bite,
+  replay.rs:8-10; nothing hashes, records or compares a Config: this head's review, advisor-u4r-merge.md, C13 (b)); 49
+  (the placement refusal above 3,955 cm, u4r-build.md:135; its figures in r2, :680-681); 58 (the queue high-water mark
+  reported, :683; a judged -17 or -18 run with overflow resyncs is flagged to the advisor, `overflowFlag`,
+  c-u4r-runs.mjs:152); 59 (the ES suite reported FAIL beside U4d-F's 7.250, routed to U4h: :1391-1398); 60 (missing
+  header params are a contract failure, :1235); 62 (a) to (f) (the client writer: u4r-review-r1-full.md:13), (h)'s
+  check the main session's (step 12 below); 63 (two refusals in crates/log, each test shown failing first:
+  u4r-build.md:65-77); 69 (NF-L1's U4r half: Recording::synthetic appears only in hash.rs's regeneration, hash.rs:384,
+  and neither crates/lab/src nor the run scripts report an ES byte or bandwidth figure; the scripts' "bytes" are disk
+  sizes, c-u4r-r2.mjs:55-78: the same review, C13 (b)); 73 (the tick16 bite run at ruling 3's settings: tick16d,
+  u4r-build.md:1430-1439); 74 (lead 2 at P0; no clean short run above 1 % late, the highest 0.617 %: :680,
+  u4r-review-r1-full.md:27); 75 (the evstart suite, :677; the bound is checked on logged runs only, :1826); 76
+  (session handling, with FP-1's closed decoder or link ending the session and freeing the slot: scenario.rs:492-506,
+  u4r-build.md:1967-1969); 77 (b) and (c) (-18's heals counted apart, :1399-1410; stale 0, :632); 82 (the manifest's
+  `kind` schema, the runner entries in det-recordings.json: :151-170); 83 (b) to (d), 84 and 85 (a) to (e) (check.mjs
+  and det-u4.mjs, each with its self-test and plant: :933-1065).
 - **Its judged half pending:** 40 (the tolerance and the cap are not built at U4r; the pre-check set, step 16 below,
   stops if the recording refused a rewind: advisor-u4r-r2-full.md:22); 73's judged bite run and 58's flagged runs (the
   P0 set, step 17).
-- **Not found by number in the builder's notes, not verified here:** 20 (`grid::Config` never hashed across builds;
-  the brief names it at u4r-brief.md:145 and :597) and 69 (NF-L1's U4r half; the brief at :430). For the advisor's
-  review of this head.
 
 ## Public items
 - npt-lab's binary: L1Scenario is built as scenario::run plus Server (scenario.rs:341-552, :742-1199); the pre-check's
@@ -163,7 +171,20 @@ advisor-u4r-r2-full.md:32).
 - **U4r-F1** (before any c-u4r-runs.mjs set; plan first, infra-engineer as its one round): INF-R2-1 (compare only the
   spike's tree hash and its own status before the judge or r2.txt), INF-R2-3 (no set folder before the first floor),
   INF-R2-4 (a 3,600 s limit on each npt-lab and judge call) (advisor-u4r-r2-full.md:19, :38-41, :108-118). Until then
-  only r2's record run may run, with saves paused (:40).
+  only r2's record run may run, with saves paused (:40). Two Lows ride it: RUN-L1 (r2.log's provenance block is empty:
+  both run scripts' sh() keeps cargo's output; both print cargo's "Compiling/Fresh npt-* (path)" lines from stderr into
+  the runner log; the record holds through r2.txt's clean-tree check, commit and sha256s: advisor-u4r-r2run-full.md:17);
+  and c-u4r-r2.mjs's whole-as-lost suite (:87) gets marks "PM-0001-2,PM-0001-17" (header and --only, tick16's form) and
+  the expect line "contract PASS; bite PM-0001-17/whole-as-lost shown: mismatches 0 pass, L1 P0 loses no group 48
+  FAIL; the run valid", for a future run only (advisor-u4r-c62h-full.md:45).
+- **JDG-ONLY-1 (Medium; npt-judge's next change, with its own plan, the advisor's plan review and cli.rs fixtures,
+  before PR #40 is marked ready at the latest and before any expect-invalid bite with a pre: rule enters marks.json):**
+  the judge's --only drops every unnamed mark before judging (main.rs:94), so pre:PM-0001-2 cannot find PM-0001-2 and
+  the run reads INVALID, "not in marks.json" (eval.rs:958-962). It fails closed for today's marks.json (a latent
+  expect-invalid bite with a pre: rule would read a false "shown"; none exists); no recorded verdict rests on it
+  (advisor-u4r-c62h-full.md:7-20). Interim rule: every npt-judge --only that names a mark carrying pre:PM-0001-2 also
+  names PM-0001-2 (:20, :44). The ruling says both run scripts already do, yet its reach notes c-u4r-r2.mjs's
+  whole-as-lost suite names only PM-0001-17 (:19): the Low on the U4r-F1 line.
 - **The check.mjs follow-up** (check.mjs's next change; before PR #40 is marked ready at the latest): SEC-U4R-R2-1,
   SEC-U4R-R2-2, TE-R2-3 (a TERM-trapping child in the real-process test), INF-R2-5 (`run()` returns the signal) and
   round 1's INF-U4R-10 (2) (a group kill after a timed call that did not exit 0) (advisor-u4r-r2-full.md:24, :52-62,
@@ -188,15 +209,41 @@ advisor-u4r-r2-full.md:32).
 - **SEC-U4R-R2-2 (Low, message only):** a profile refusal under a quoted table header names line 1; the refusal itself
   fires (:59-62).
 
-## The judged runs (pending, in the ruling's order)
-1. **The r2 record run** from the merge commit: `node ops/runs/c-u4r-r2.mjs --date <today>`, lock exclusive, saves paused
-   until r2.txt is written; b1, es and b1-nofallback are expected to fail as ruled and are never re-run
-   (advisor-u4r-r2-full.md:17). Pending.
-2. **Carry 62 (h)** from r2: if every clean short L1 P0 suite's measured-phase sum of snap_incomplete is 0, the main
-   session's own commit adds the plain check and PM-0001-17/whole-as-lost to -17's L1 P0 part in marks.json, plus the
-   readings-PR list line, and `npt-judge --only PM-0001-17` on r2's whole-as-lost and tick16 folders must read both
-   bites Shown, never INVALID; otherwise the cause goes to the advisor first, before any -17 run (:18). Pending.
-3. **U4r-F1** (above; :19). Pending.
+## The judged runs (in the ruling's order; 1 and 2 done, the rest pending)
+1. **The r2 record run: done.** `node ops/runs/c-u4r-r2.mjs --date 2026-11-14` through main-run.sh, lock exclusive,
+   run 15:40:37-15:44:52 UTC, exit 0 (.gate/u4r-merge/r2.log:1-3 and its end), at commit e59ece9, whose spikes/ equals
+   the merge commit 71ee13d's (`git diff --quiet 71ee13d e59ece9 -- spikes/` exit 0). r2.txt
+   (.gate/netcode-proof-test/r2-e59ece9ecafc/r2.txt, 278 lines): 14 suites, all 42 commands exit 0, no "stopped at"
+   line. The advisor's ruling (advisor-u4r-r2run-full.md, wf_ec319c2d-f45): all 14 as expected, r2 at e59ece9 the
+   record, the three ruled fails recorded and never re-run (:11). Each suite, expected, then what came (:27-109):
+   - p0, p2, p3, tick16-clean: contract PASS; -2, -17, -57 pass. Came so: -2 11 of 11, -17 0 mismatches each; measured
+     incomplete 0, 585 (P2's 2 % loss: 2.03 %), 1,485 (P3's 5 %: 5.16 %; carry 62 (g) shown) and 0 across the wrap.
+   - b1: -2 FAIL at 0.273333, -17 and -18 L1 B1 INVALID, -57 passes. Came so (the ruled fail: ruling 3 point 1; U4g's).
+   - forged, clamp, fast-clock: -2 passes; evstart: -2 and -17 pass. Came so, incomplete 0; evstart shows carry 75.
+   - lag-switch: -2 passes. Came 11 of 11; its 300 incomplete client-ticks (1.04 % of 28,800) are profile P1's designed
+     1 % loss: the run is P1, outside -17's L1 P0 part, so not carry 62 (h)'s condition (:69-73).
+   - es: -2 FAIL by reliable events. Came 50.05 a second against 10.5, the other 11 pass (ruled: ruling 3 point 2; U4h's).
+   - tick16 (bite): -17's bite run FAILs with at least 48 mismatches; -2 passes. Came: bite PM-0001-17/tick16 shown,
+     2,880 mismatches; measured incomplete 720 = 48 x 15. "PM-0001-2 passes" is the bite run's validity (pre:PM-0001-2
+     holds; the judge's -2 line reads NOT-RUN because no -2 part takes a bite run); carry 73 met (:87-91).
+   - b1-nofallback (bite): -18's max FAILs, INVALID by pre:PM-0001-2. Came: max heal 1.69 s, INVALID at 0.453333 (ruled; U4g's).
+   - whole-as-lost (bite): measured incomplete 48. Came 48; -17 NOT-RUN (the bite was not yet in marks.json).
+2. **Carry 62 (h): done.** The six clean short L1 P0 suites (p0, forged, clamp, fast-clock, evstart, tick16-clean) read
+   0 each (advisor-u4r-r2run-full.md:7). marks.json changed at commit 5e563b9 (+15 lines): PM-0001-17 gains the check
+   "L1 P0 loses no group (no client-tick left incomplete)" (measured sum of tick.s.snap_incomplete == 0 on L1 P0) and
+   the bite PM-0001-17/whole-as-lost; the readings-PR line in u4-build-plan.md section 11 went in at a36babd (`git show
+   --stat` of both). On that tree: npt-judge --check-marks (r2's binary, sha256 65acacfe…) exit 0, 81 marks (5e563b9's
+   message; the card); check.mjs all 11 steps, 531 and 609 tests, 0 failed, marks 81, ADR rows unchanged
+   (.gate/u4r-merge/c62h-check.log, 15:59:43-16:14:08 UTC). The first try (.gate/netcode-proof-test/c62h-5e563b9589d3/
+   README.txt) followed the advisor's wording, `--only PM-0001-17` alone, and read both bites INVALID ("pre:PM-0001-2:
+   not in marks.json") through the judge's --only defect (JDG-ONLY-1, Follow-ups); the advisor's ruling says its own
+   ruling had misread the judge, the error being the advisor's (advisor-u4r-c62h-full.md:7-13). The record is the
+   second try, in the run scripts' form, `--only PM-0001-2,PM-0001-17` (.gate/netcode-proof-test/
+   c62h-5e563b9589d3-record/README.txt and its two verdict files; marks.json sha256 9fb5be57…): whole-as-lost: bite
+   shown, run valid, mismatches 0 (pass), the new check 48 (FAIL); tick16: bite shown, run valid, mismatches 2,880
+   (FAIL), the new check 720 (FAIL); PM-0001-2 NOT-RUN with no runs, as expected; each verdict cmp-equal to the labelled
+   diagnostic (per the README). Carry 62 (h) stands as committed (advisor-u4r-c62h-full.md:36-38).
+3. **U4r-F1** (above; advisor-u4r-r2-full.md:19). Pending.
 4. **D4:** the runner's ticks per second in the main folder's own cache, the set's wall time redone (:20). Pending.
 5. **The disk plan**, in writing: 4,681 MiB free; kept logs of about 162 + 16 + 360 + 545 + 629 + 3,020 MiB plus the
    4 GiB floor and builds leave it about 4.1 GiB short; space only from the approved part-cleans; never delete a log;
