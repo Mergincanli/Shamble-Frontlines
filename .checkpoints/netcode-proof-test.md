@@ -41,7 +41,41 @@ bytes and the judge's peak (over 10 GiB: P0 does not start; plan the smallest ch
     - So (A) gave 56 MiB, not the ruling's estimated 710. **Before P0, (B) and then (C) will be needed for R.**
 - **P2 RUNS (started about 18:55 UTC; background task b9eoa0vup; kept log .gate/u4r-sets/P2-ab10f058a828.log).** Its
   expected lines are in the ruling's next step 4. **If cut:** follow the run procedure's items (6) and (7).
-- **U4r-F2's PLAN IS WRITTEN (u4r-f2-plan.md):** the P0 set judged in two calls, measured runs and bite runs apart,
+- **U4r-F2's PLAN IS APPROVED WITH CONDITIONS 1-9 (about 19:10 UTC): advisor-u4r-f2-plan-full.md** (72 lines,
+  sha256 56ee4aba…, written word for word by u4r_f2_plan_review_full.py). Its three Mediums (F2-1, F2-2, F2-3) were read
+  in full, and its conditions answer them.
+  - **Its "For Mustafa" (copied here at once):** nothing to decide or check. This is the "small fix before that set"
+    from the earlier heads-up: P0 is judged in two halves, at about 5.5 GB and 6.1 GB. Each half gives exactly the
+    verdicts one pass would give.
+  - **The conditions in short (the full words are in the file):**
+    - (1) No edit under spikes/netcode-proof until P2 has ended and its results are committed. The F2 commit comes
+      after that and before P0, and nothing else is committed under spikes/ until P0 has ended. The harness and the
+      real-judge check also wait until P2 has ended.
+    - (2) results/ is made only after both calls. Re-checks run as `unchanged("the judge (measured runs)")` and
+      `unchanged("the judge (bite runs)")`. A re-check stop throws and leaves no results/.
+    - (3) Exact forms: the two judge lines; one fixed-text line above them; the raw-logs line names measured/ and
+      bites/; the exit line's form. A set without bites stays word for word.
+    - (4) The harness compares HEAD's and F2's copies on precheck, P0, P2, P3, B1 and r2. It adds the both-fail case,
+      which file is kept, and the call order with no overlap.
+    - (5) Real judge, one call against two: /dev/shm copies of r2's p0, tick16 and whole-as-lost runs, judged with
+      r2's judge and marks, `--only PM-0001-2,PM-0001-17,PM-0001-57`, in three calls (combined, measured/ alone,
+      bites/ alone). A python comparison checks parts[], report[] and bites[], under the lane lock, after P2 and
+      before P0. The /dev/shm copies are removed afterwards.
+    - (6) node --check, redact-check (log kept) and gate --no-smoke before the commit; CI green after the push;
+      planned against actual size on the card.
+    - (7) Before P0: judge-apart P2's folder; F = the largest of 1.44, 1.504 and P2's ratio, and at least 1.5; a refit
+      over four points; each call's peak at F x 1,456.6 MiB (measured) and F x 1,616.8 MiB (bites). Over 10 GiB goes
+      to the advisor. P0's head must show the same sha256s as P3's and B1's.
+    - (8) INF-F1-1's header sentence rides, in the advisor's words (advisor-u4r-f1-head-full.md:33). INF-F1-5,
+      RUNS-LINE and RATES-1 go to one runner change after P0, covering both scripts, plan first, before the next
+      judged set after U4r's.
+    - (9) The evidence agent runs on Opus at high effort; infra-engineer from its agent file; at most 3 agents;
+      neither edits the script.
+  - **Choices:** Q1 (a) subfolders only for a set with bites; Q2 (a) both calls always run, then runs.txt, then exit
+    1 naming each failed call; Q3 (a) verdict.json and verdict-bites.json; Q4 only INF-F1-1 rides; Q5 (a)
+    infra-engineer, one round, then the advisor's review of the head.
+  - **Expected size:** 50 to 70 insertions and 10 to 15 deletions in one file.
+- **U4r-F2's plan (u4r-f2-plan.md):** the P0 set judged in two calls, measured runs and bite runs apart,
   each at most 10 GiB (5.5 and 6.1 GiB at F = 1.5). Only c-u4r-runs.mjs changes. The planned size is about 40 to 60
   lines. Choices Q1 to Q5 go to the advisor. **Its plan review runs:** workflow **wf_4b7d75ec-24c** (task wpki2oiw7;
   notes advisor-u4r-f2-plan.md). **If cut:** `resumeFromRunId: "wf_4b7d75ec-24c"` with its script path in the
