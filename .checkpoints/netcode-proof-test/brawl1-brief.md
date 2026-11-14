@@ -6,6 +6,9 @@ It decides nothing new. Where the plan and the review differ, the review wins, a
 
 ## 0. Who you are and what binds you
 
+- **The goal** (plan section 1): the brawl's walk is open loop; a re-run command, or a step that collide() cuts short,
+  leaves an offset nothing corrects, so soldiers drift into buildings and the room rightly drops them. The fix: each
+  brawler steers by its own soldier's decoded position, never by server state.
 - **Who:** you are BRAWL-1's builder for the netcode proof test (PR #40, spike branch
   claude/netcode-proof-test-plan-hcky5g). You are one builder, alone, in your own isolated worktree.
 - **What binds you, in order:**
@@ -19,7 +22,8 @@ It decides nothing new. Where the plan and the review differ, the review wins, a
 - **What is not yours** (the main session does these after your build):
   - the review round;
   - the merge step (condition 9);
-  - the marks/SERIES.md edit (condition 10: you draft the rows);
+  - the marks/SERIES.md edit (plan section 7: the main session's Edit; you draft the rows for it);
+  - the disk cleans (B) and (C) after the merge (plan section 8);
   - the two 10-minute evidence runs (condition 14);
   - the re-run sets (condition 15);
   - the -30 pre-check set's re-run, at U4h (plan section 5);
@@ -38,10 +42,12 @@ It decides nothing new. Where the plan and the review differ, the review wins, a
    - Logs go under /home/user/Shamble-Frontlines/.gate/u4r/brawl1/.
    - Use `-x` (exclusive) for every check.mjs run, det-u4.mjs, every plant, every bite run and every counted run.
    - It runs with CARGO_TARGET_DIR on .gate/shared-target and takes the lane lock.
-5. **Disk** (condition 16): about 13.2 GiB is free now and the shared target is cold. Your first check.mjs run refills
+5. **Disk** (condition 16): about 12.9 GiB (13,205 MiB on 2026-11-14) is free now and the shared target is cold (1 MiB).
+   Your first check.mjs run refills
    it, about 8.2 GiB, which leaves about 4.7 GiB free.
-   - Rule 6: 4 GB free before any wasm32 or release build, and 2 GB before any other build. The runner checks 4 GB
-     before every command.
+   - Rule 6: 4 GB free before any wasm32 or release build, and 2 GB before any other build. The runner checks 4 GB once
+     per call, before its first command, never between the commands of one call; rule 6 applies to every build inside a
+     call.
    - A floor stop is reported whole, never cleaned around.
    - No build target of your own, and no 10-minute run.
 
@@ -57,6 +63,8 @@ It decides nothing new. Where the plan and the review differ, the review wins, a
 - **Secrets and network:** never read .env or secrets. No network (CARGO_NET_OFFLINE).
 - **Pass or fail** comes from the exit code and the test runner's own summary line, never from a grep.
 - **A fresh copy** reads its notes and the diff in its worktree before it changes anything.
+- **Not in this lane** (plan section 6): EA-U4R-4 (no npt-sim edit: the leash needs none, Q1); T-6's contract half
+  (contract.rs is not edited); JDG-ONLY-1 (no judge change); and the check.mjs follow-up.
 
 ## 3. The work, in order (plan section 7; conditions 6 and 7)
 
@@ -78,6 +86,7 @@ into a log under .gate/u4r/brawl1/ (condition 6 (ii), the "before").
    - run_leg uses SimClock;
    - admitted and ended go to each caller's own sinks: the runner's logs.admit and logs.gone, and the pre-check's maps
      and o.ended.
+   - The one-loop driver is not built.
 3. **N2-1 with TE-R2-1** (plan section 6; Q5 (a); ADV-BP-1):
    - closed_checks gains the fourth check, with the ruled message: "the roster still holds slot {slot}: a rejoin would
      be a replacement". Its doc says four checks.
@@ -89,11 +98,11 @@ into a log under .gate/u4r/brawl1/ (condition 6 (ii), the "before").
      - roster.leave (room.rs:691) deleted: the new check alone fails.
 4. **TE-R2-2 with RR4-L2** (plan section 6; condition 12):
    - **Order:** the 64-bit checks come first and keep their messages. Then RR4-L2's four refusals:
-     - a run's last tick above u64::from(u32::MAX);
+     - a run's last tick (measured_end + after_max_ticks) above u64::from(u32::MAX);
      - the last burst's tick above the same;
      - --bursts above 1,000;
      - --burst-every-s 0 with more than one burst.
-     Each refusal is a usage error naming its options.
+     Each refusal is a usage error naming its options. You word the messages; each goes in your notes and report.
    - **Where the caps apply:** the burst caps where bursts are used (B1, as today's guard); the last-tick cap on every
      profile.
    - **fp3's cases:**
@@ -106,18 +115,21 @@ into a log under .gate/u4r/brawl1/ (condition 6 (ii), the "before").
 5. **RR4-L1** (plan section 6):
    - `const MAX_ENTRY_TICKS: u32 = 36_000;`, refused right after the bytes cap and before the runner checks, with the
      ruled message.
-   - r10_fp3: 36,001 is refused by name, and a synthetic entry at 36,000 passes.
+   - r10_fp3: 36,001 is refused by name, a synthetic entry at 36,000 passes, and the three committed manifests still
+     read (RR4-L1's ruling).
 6. **RR3-L2 (a)** (plan section 6):
    - a Logs flag set from open's `dir.is_some()`;
-   - on a no-log run, filed() resolves only and never grows `res`; `last` stays;
-   - a new logs.rs unit test.
+   - on a no-log run, filed() resolves only and never grows `res`;
+   - `last` stays (finish reads it); a new logs.rs unit test: Logs::open(None, ..), admit, filed over many ticks, then
+     `res` is empty and started() is true.
 
 **Part 1's proofs** (condition 6), all at the old pins 6933b56a, 5b79abb2 and fad8f67d, recorded in the notes before
 Part 2 starts:
 - (a) check.mjs, all steps PASS.
-- (b) det-u4.mjs PASS. `uptime` comes first, in the same runner call, with no other lane running. A non-cargo sum over
-  240 s stops you and is reported whole with the uptime, never retried (condition 8).
-- (c) `npt-lab hash --manifest crates/lab/precheck-recordings.json` byte-equal.
+- (b) det-u4.mjs PASS. `uptime` comes first, in the same runner call, with no other lane building or running. A
+  non-cargo sum over 240 s stops you and is reported whole with the uptime, never retried (condition 8).
+- (c) `npt-lab hash --manifest crates/lab/precheck-recordings.json` byte-equal. (a) to (c) prove only scenario::run's
+  half: they regenerate through `scenario --record`. (d) and (e) prove run_leg's half.
 - (d) **The clean pre-check pair,** run_leg's half: record SS-P0-s4 at its entry's settings (sha256 6933b56a), then run
   `npt-lab precheck --manifest crates/lab/precheck-recordings.json --recording <file> --commit <sha>` with no bite, on
   the measured build. Its output lines must equal the "## pair clean" section of
@@ -132,7 +144,8 @@ Any difference in (a) to (e) stops you, and it comes to the advisor whole.
 1. **The npt-client read item** (Q2 (a); condition 5): one read-only pub method on ClientEndpoint (`&self`).
    - It returns, by value, an `Option` of the own soldier's decoded grid x, y (and z) and its dead bit (flags bit 3).
    - The source is the newest tick that is complete (Tick::complete) and filed Filed::Hash, with ticks compared by the
-     endpoint's wrap rule.
+     endpoint's wrap rule. It also returns None when the newest complete, filed tick has no own section (plan section
+     2).
    - No reference into the ring, no float, no new dependency. Its doc says it reads the client's own decoded state.
    - Its npt-client test shows: None before the first complete tick; after a complete tick, Some equal to the own
      record's x, y, z and dead bit; and no change from a newer incomplete, refused or sentinel tick.
@@ -141,26 +154,39 @@ Any difference in (a) to (e) stops you, and it comes to the advisor whole.
    read item's result. The leash, for Kind::Brawl only (the open-loop scripts are unchanged):
    - toward the cluster centre (the origin);
    - R_IN at least 1,300 cm; R_OUT at least R_IN + 100 cm and at most 1,500 cm;
-   - past R_OUT, a vector toward the origin with x^2 + y^2 <= 127^2, so the sim never takes its scale path;
+   - past R_OUT, the walk vector becomes a vector toward the origin, scaled to full command length within x^2 + y^2 <=
+     127^2, so the sim never takes its scale path;
    - back inside R_IN, the open-loop walk;
    - None or dead keeps the walk;
-   - the sideways part may stay or go;
+   - the sideways part may stay or go (condition 1). If it stays, it is the plan's: deterministic, used only when the
+     steer is straight along one axis, never 0 after the 1 cm snap (|m| > 3 of 127), and inside the 127^2 bound;
    - aim and fire as today.
    - The constants are cm against cm, with no rate-derived constant (carry 39; FP-7 item 1). Record every tuned value.
+     The walk's TURN_EVERY and RETARGET_EVERY stay pure command counts. Your record of the leash gives its margin as the
+     door-entry margin (a soldier's centre at 1,800 cm at building 0's door, x 1,800 with |y| < 60: greybox.rs:83-136),
+     never "2.6 m from any footprint", and notes that the spawn grid's corners lie at 1,414 cm (world.rs:703-722;
+     scene.rs:153).
    - npt-bots' library code names no World or SimCore. Only its #[cfg(test)] module does.
 3. **The figure** (Fix (b); condition 10): in Logs::room_tick, server side, take the slots (with their areas) whose
-   Soldier record has `area != 0`.
+   Soldier record has `area != 0`. A new name in room.jsonl's tick record (you name it) holds the list.
    - The list is written on every logged tick where it is not empty, in any phase.
-   - Counts counts measured ticks, and the summary line prints the total.
+   - Counts counts measured ticks, and the summary line prints it as "in a building: N slot-ticks (slots …)".
    - Every name you write (the tick name, and any lab end-event field carrying the total) gets a SERIES.md row "none
      (recorded)". Draft the rows in your notes.
    - No judge change and no marks.json change.
 4. **The tests,** all in a #[cfg(test)] module in npt-bots' src/, with no Cargo.toml change (conditions 2, 3, 4 and 13):
-   - **The steering unit test** (plan section 4.1's list), which also asserts x^2 + y^2 <= 127^2 on every leash vector.
+   - **The steering unit test** calls the crate-private decision function with set positions and shows: inside R_IN,
+     the walk as today; past R_OUT, the steer toward the origin; the hysteresis between them; the sideways part on each
+     axis-aligned case (if kept); None and dead keep the walk; under a skip pattern (the last command re-run) and
+     blocked steps (positions that do not move), the steer stays toward the origin until inside R_IN. It also asserts
+     x^2 + y^2 <= 127^2 on every leash vector.
    - **The sim-only test:**
      - Setup: `World::new(scene, seed, 63_736)`, SS, 48 clients, seeds 1 to 3. Lengths come from npt_sim::ticks_for_ms:
-       610,000 ms for the full run, 120,000 ms for the short copy. Never a literal tick count.
-     - Pattern (i), barred: a command every tick, each slot fed its position from 8 steps earlier.
+       610,000 ms for the full run, 120,000 ms for the short copy. Never a literal tick count. It drives npt-sim's World
+       through the crate-private decision function. The position fed in is World's own record, standing in for the
+       decoded position: with no network they are equal, and the test checks steering, not decoding.
+     - Pattern (i), barred: a command every tick, each slot fed its position from 8 steps earlier: the largest lead a run
+       takes (--lead's cap), as a step count with no time claim.
      - Pattern (ii), barred: a seeded skip pattern, where a skipped tick re-runs the last command unchanged, as
        InputBuffer::take does, with the same 8-step delayed feed. Its rate and longest streak are stated in the doc and
        printed.
@@ -181,7 +207,7 @@ Any difference in (a) to (e) stops you, and it comes to the advisor whole.
    - Regenerate SS-P0-s4 (precheck-recordings.json), and SS-P2-s1 and ES-P3-s2 (det-recordings.json), each by its own
      route: `npt-lab hash` prints the new bytes and sha256.
    - The manifests' diff changes only those three entries' `bytes` and `sha256`. Every other field and both "about"
-     texts stay.
+     texts stay. The three synthetic entries in recordings.json do not move.
    - Write each new pin beside the old one in your notes.
    - Then check.mjs, det-u4.mjs (condition 8 as above) and the precheck manifest regeneration must pass at the new
      pins.
@@ -192,9 +218,10 @@ Any difference in (a) to (e) stops you, and it comes to the advisor whole.
 - **The worktree's uncommitted diff, complete.** The main session saves it as wip/brawl1.patch at each snapshot and
   merges it by condition 9's M-list:
   1. the merged bytes equal the reviewed bytes (cmp and the tree fingerprint);
-  2. one counted main-run.sh call: uptime, check.mjs with all 11 steps, det-u4.mjs, and the precheck regeneration at
-     the new pin;
-  3. the gate;
+  2. one counted main-run.sh call on the merged tree: uptime, check.mjs with all 11 steps, det-u4.mjs, and the precheck
+     regeneration at the new pin, where each new pin must be reproduced (one that is not comes to the advisor whole:
+     condition 7);
+  3. the gate (--no-smoke, with the reason, if Chromium cannot start);
   4. CI;
   5. the advisor's review of the pushed head.
 - **The SERIES.md rows,** drafted in your notes.
@@ -225,8 +252,10 @@ Any difference in (a) to (e) stops you, and it comes to the advisor whole.
 5. **check.mjs's final run:** its counts.
 6. **The size:** `git diff --stat` against about 700.
 7. **Anything that stopped you,** whole.
+8. **The advisor's two corrections, in its words:** ADV-BP-1: N2-1's "all four checks fail" was wrong; under the leave
+   plant two fail (Q5). ADV-BP-2: the advisor's sets-r2 figure of "about 4.2 GiB free after the refill" mixed units.
 
 After you: the main session runs one review round on the final diff: test-engineer, netcode-architect, rust-reviewer and
-engine-architect, in two batches of at most 3, each at xhigh (condition 11). Then the merge step (condition 9), the
-evidence runs (condition 14) and the re-run sets (condition 15). Your report must record the advisor's two corrections
-(ADV-BP-1, ADV-BP-2) where they touch your work (condition 18).
+engine-architect, in two batches of at most 3, each at xhigh; engine-architect reviews the npt-client pub item and the
+form of EA-U4R-1 and EA-U4R-2 (condition 11). Then the merge step (condition 9), the evidence runs (condition 14) and
+the re-run sets (condition 15). Your report records both corrections (item 8; condition 18).
