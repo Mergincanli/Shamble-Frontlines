@@ -15,6 +15,9 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
 **NOW (2026-11-14 about 06:38 UTC; read this first after a compact or a cut): the spend limit cut copy 5 at 02:31
 during its first end-check run, which finished anyway (all 11 steps PASS); copy 5 resumed about 06:38 to record it,
 run the second end check and report section 6's return list; snapshot 572c4f69….**
+- Copy 5 resumed by SendMessage about 06:39 UTC (agent a507d682db446aa0a). The saver restarted as **bln1hv25x** (06:39
+  UTC, after 8d6025e). The check-in stays (next 08:34 UTC). **On its report:** read it in full; snapshot; if the build
+  is done, the review panel (section 12 item 7: two batches, at most three agents; each review names its snapshot).
 
 **Earlier NOW (2026-11-14 about 02:12 UTC): the fourth ruling is in (nothing for Mustafa, nothing blocks the merge);
 sent to copy 5, which finishes with r5 and section 5's end checks twice.**
