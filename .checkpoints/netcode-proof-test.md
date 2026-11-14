@@ -12,8 +12,21 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 07:16 UTC; read this first after a compact or a cut): U4r's review round 1 RUNS (workflow
-wf_a3541dc5-9e1, task w4aijiqmv: batch 1 netcode, test, security; then batch 2 engine-architect, rust, infra).**
+**NOW (2026-11-14 about 08:15 UTC; read this first after a compact or a cut): U4r's review round 1 RETURNED; the
+advisor rules on its findings (workflow u4r-review-r1-ruling, notes advisor-u4r-r1.md); then the fix pass.**
+- **Round 1** (wf_a3541dc5-9e1, six seats, 528 tool uses): **u4r-review-r1-full.md** (402 lines, sha256 ec61dfbd…;
+  written by script, word for word, from the journal). Verdicts: netcode, test, security, engine-architect and infra
+  APPROVE WITH FINDINGS; **rust REQUEST CHANGES** (RR3-M1). **10 Medium, 40 Low, no Critical or High.** The Mediums:
+  NC-U4R-1 (a closed joined session never leaves the room: a ghost slot), T-1, T-2, SEC-U4R-1, SEC-U4R-2, RR3-M1,
+  INF-U4R-1 to -4. **The main session still reads every Medium in full** (USAGE-SAVINGS (a)): not yet done at this
+  card's writing; do it first after a compact, from u4r-review-r1-full.md.
+- **The ruling** runs as a one-agent workflow (advisor-u4r-r1; its run id in the Workflow result; script
+  u4r-review-r1-ruling-*.js in the session's workflows/scripts folder). **If cut:** `resumeFromRunId`. **On return:**
+  write it word for word by script (advisor-u4r-r1-full.md); read it; then a builder copy (copy 6, a fresh copy from
+  u4r-copy5-prompt.md's form, its resume part brought up to date: notes 1,586 lines, snapshot 572c4f69…, the round-1
+  findings and the ruling's fix list) for the fix pass, then round 2 on what changed, as the ruling says.
+
+**Earlier NOW (2026-11-14 about 07:16 UTC): U4r's review round 1 ran (wf_a3541dc5-9e1).**
 - **Done before it:** the panel confirmed by the advisor (advisor-u4r-panel-full.md, written by script word for word;
   make-up unchanged: the brief's six seats, xhigh, two batches); the packet's config drafted by an agent
   (u4r-packet.json: 9 heads, 26 diffs, 47 docs, the carries regex), with **review_packet.py's ALLOWED addition 2**
