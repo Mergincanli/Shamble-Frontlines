@@ -33,6 +33,15 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   folder .gate/netcode-proof-test/r2-71ee13d29dc6/ is never overwritten).
 - **After r2:** carry 62 (h) (step 12); U4r-F1 (13); D4 (14); the disk plan (15); the pre-check set (16); the judged
   sets P3, B1, P2, then P0 (17).
+- **r2 DONE (15:40:37-15:44:52 UTC, exit 0; main-run.sh log .gate/u4r-merge/r2.log):** r2.txt at
+  **.gate/netcode-proof-test/r2-e59ece9ecafc/r2.txt** (278 lines; it names commit e59ece9, whose spikes/ equals
+  71ee13d's: `git diff --stat 71ee13d HEAD -- spikes/` empty; the card says r2-71ee13d29dc6 above: read r2-e59ece9ecafc).
+  14 suites, every command exit 0, no "stopped at" or signal line. As ruled: b1 PM-0001-2 FAIL 0.273333 (-17, -18
+  INVALID); es FAIL 50.05 reliable events; b1-nofallback -18 INVALID; tick16 overflow resyncs 48, measured incomplete
+  720; whole-as-lost measured incomplete 48. **For carry 62 (h) (step 12):** the clean P0 suites' measured incomplete:
+  p0 0, evstart 0, tick16-clean 0, forged 0, clamp 0, fast-clock 0, **lag-switch 300** (a -21 option-B stand-in): the
+  ruling says any sum not 0 goes to the advisor first, before any marks.json change or -17 run. Next: the advisor's
+  ruling on r2 and carry 62 (h); no marks.json edit before it.
 
 **Earlier NOW (2026-11-14 about 13:45 UTC): the advisor's ROUND-2 RULING IS IN
 (advisor-u4r-r2-full.md, 126 lines, sha256 6dcc0a81…, by u4r_ruling_r2_full.py word for word); next: U4r's merge into
