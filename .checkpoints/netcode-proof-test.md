@@ -12,9 +12,9 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 02:20 UTC; read this first after a compact or a cut): the fourth ruling is in (nothing for
+**NOW (2026-11-14 about 02:12 UTC; read this first after a compact or a cut): the fourth ruling is in (nothing for
 Mustafa, nothing blocks the merge); sent to copy 5, which finishes with r5 and section 5's end checks twice.**
-- **The fourth ruling** (wf_f276e5ae-878 returned about 02:19 UTC): **advisor-u4r-build4-full.md** (32 lines, sha256
+- **The fourth ruling** (wf_f276e5ae-878 returned about 02:11 UTC): **advisor-u4r-build4-full.md** (32 lines, sha256
   9d49b484…; by script, word for word). I read it whole. (1, Low) P3-CAP option (a): `after_capped` records the run's
   path, not a result; ruling 3 point 3's expectation now reads "after_capped as it comes"; carry 73 met at the new
   setting (valid, -17 FAIL 2,880, 0 breaches); c-u4r-r2.mjs's tick16 expect text replaced. (2, none) CR-ID: keep the
@@ -31,7 +31,7 @@ Mustafa, nothing blocks the merge); sent to copy 5, which finishes with r5 and s
   (tick_start 47,251): its overflow resyncs come to the advisor with the P0 set's verdict before -17's L1 P0 counts
   (expected about 48 at about wrap + 60, all in the after phase); the review reads tick16d's logs, the expect text,
   contract.rs:248-301 with the new assertion, and c-u4r-runs.mjs's live lines (not the snapshot's).
-- **Sent to copy 5** about 02:20 UTC by message (its context intact): points 1 to 3's Builder lines, then r5 and the
+- **Sent to copy 5** about 02:12 UTC by message (its context intact): points 1 to 3's Builder lines, then r5 and the
   end checks twice; its report is section 6's return list if it finishes. **If cut:** SendMessage after the checks.
 
 **Earlier NOW (2026-11-14 about 02:05 UTC): copy 5 stopped by the stop rule on one item (tick16's after_capped
