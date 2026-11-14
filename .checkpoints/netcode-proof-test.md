@@ -42,6 +42,8 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   p0 0, evstart 0, tick16-clean 0, forged 0, clamp 0, fast-clock 0, **lag-switch 300** (a -21 option-B stand-in): the
   ruling says any sum not 0 goes to the advisor first, before any marks.json change or -17 run. Next: the advisor's
   ruling on r2 and carry 62 (h); no marks.json edit before it. **The saver restarted as boscgjicj** (15:46).
+- **COMPACT-WAIT:** asked again at about 15:33; the reminder fired at 15:54 with no /compact typed; the card was
+  current (3712306), the saver runs (boscgjicj); carried on.
 - **The advisor's ruling on r2 runs:** workflow **wf_ec319c2d-f45** (task wvtrfj4a9; agent advisor-u4r-r2run, notes
   advisor-u4r-r2run.md). **If cut:** `resumeFromRunId: "wf_ec319c2d-f45"`. **On return:** write it word for word by
   script (advisor-u4r-r2run-full.md); its "For Mustafa" onto this card at once; then its next steps (carry 62 (h)'s
