@@ -39,7 +39,8 @@ the spike branch, M1 to M9, as its steps 2-10 say.**
   "Merge into the spike branch", u4r-report.md new in u4d2-report.md's form, the card); M9 saver, CI, card. Then r2's
   record run (step 11, the interim rule), carry 62 (h) (step 12), U4r-F1 (13), D4 (14), the disk plan (15), the
   pre-check set (16), the judged sets P3, B1, P2, then P0 (17).
-- **COMPACT-WAIT:** /compact was asked at about 13:27; this block is the refresh; work carries on.
+- **COMPACT-WAIT:** /compact was asked at about 13:27; this block is the refresh; work carries on. The 20-minute
+  reminder fired at 13:47 with no /compact typed: the card was already current (2494918, 13:45); carried on.
 - **The merge, as it stands (about 13:55 UTC):** M1 and M2 hold (patch 21ca46be unchanged since 450af1a; snap2's
   spikes/ = the worktree's; fingerprint 63713cf3… from the copy's root; spikes/ unchanged since 2fbec77, only
   .checkpoints/ commits since; main 4460ef5). **M3 done: the patch is applied in the main folder** (13 M, 13 new,
