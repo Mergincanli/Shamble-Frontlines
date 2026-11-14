@@ -20,3 +20,5 @@ Notes as I go. Plan first; one line per check. On a restart: read this, continue
 - C1 head: origin branch tip 7e5ecaa; 493b3d7..7e5ecaa touches only .checkpoints/ (card, this notes file, a writer .py). 493b3d7 touches 4 .checkpoints files + the two scripts. PASS.
 - C2 sha256 at 493b3d7: c-u4r-runs.mjs 99dd070e... (608 lines; parent 18c1dcf6..., 486), c-u4r-r2.mjs 4e007500... (236 lines; parent 94564f8c..., 235). Worktree equal. Match the tested ones. PASS (logs' records checked below).
 - C3 size: numstat runs 153/31, r2 4/3; total 157/34.
+- C4 tested copy: sources.log: f3/ copies 99dd070e / 4e007500, equal to the working copies at 23:31:59; head/ copies 18c1dcf6 / 94564f8c (= 493b3d7^). All 25 stagings' f3 runs name 99dd070e / 4e007500 (or the two edited copies). Edited copies each differ by exactly one line from the committed script (diff by me: f3-big :152 P0 rate 1.45e9; f3-limit :171 RUN_LIMIT_MS 2000; head-limit :142 from 18c1dcf6). Harness.mjs + 4 shims + 2 scratch files: sha256 now = sources.log's; harness mtime 23:30:00 before the run at 23:31. PASS (ADV-F2H-1 held).
+- C5 read the diff whole (both scripts). Notes on each condition below.
