@@ -156,8 +156,23 @@
    last one done at 00:45:03 UTC; toolchain pull_request 43536148433). Consultation 12 said this save needs no further
    consultation.
 
+18. The verifier's re-run on 922cadf (2026-11-14, handed back ~01:00 UTC): PASS WITH NOTES. F-V1 fixed; no Critical, High
+   or Medium. Lows: F-V5a (four files named as certain copies hold fragments only: review-r1.js with review-r1-run1.js,
+   dk-para.txt, dk-para-wrapped.txt: move them to "Fragments"; the Reviews row then holds), F-V6 (its scope note
+   reworded: its own words were "no reviewer" and only the verifier covered that work). Observation F-V5b: words.mjs holds
+   a whole 28-character sentence of his (its cut anchor). Nits: entry 11's stray short line; the appendix intro's list
+   lacks the workflow-authoring skill's second, harness-made load (2026-11-14 00:07:21). Due at the final commit: chat
+   lines 3183 (00:46:25) and 3195 (01:00:24) bear on how Mustafa was told, so they join the D&D bullet (2e's condition);
+   3183's "now names every file holding whole sentences" is corrected by F-V5a's fix. RULE: no chat message on that
+   subject until the final commit. Its checks: gate PASS; 8 scripts exit 0; 18 chat texts 22:40 to the head, four bear
+   on it, none missing; CI on 922cadf all green; no message of his after the cut-off (to 00:58:57).
+
 ## Current step
-The verifier's re-run on 922cadf (agent ad5b8a361fccd378c resumed ~00:45 UTC with `verifier-brief-2.md`). Then step 8.
+Step 8: consultation 13 (moment 5 for step 7, moment 1 for the final edits), step 7's "done" save, the final edits
+(F-V5a, F-V6, the nits, the bullet's two messages, the checkpoint folded in, STATUS and ROADMAP for ready, #40's second
+read, E7, Reviews, Outcome, entries 13 and on), consultation 14 (moment 5 before the final commit), the last notes
+commit, the header SHA, the appendix's cut-off, the checks, the deletion, the gate, the commit, CI, the advisor agent's
+review of that head, the PR body, ready.
 
 ## Next steps
 1. Scripts (consultation 10's items 1 to 6 block the commit): grep every "before" string of D2 to D4 in the notes'
