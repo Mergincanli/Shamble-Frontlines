@@ -17,3 +17,6 @@ Notes as I go. Plan first; one line per check. On a restart: read this, continue
 12. Verdict, next steps, Mustafa.
 
 ## Checks
+- C1 head: origin branch tip 7e5ecaa; 493b3d7..7e5ecaa touches only .checkpoints/ (card, this notes file, a writer .py). 493b3d7 touches 4 .checkpoints files + the two scripts. PASS.
+- C2 sha256 at 493b3d7: c-u4r-runs.mjs 99dd070e... (608 lines; parent 18c1dcf6..., 486), c-u4r-r2.mjs 4e007500... (236 lines; parent 94564f8c..., 235). Worktree equal. Match the tested ones. PASS (logs' records checked below).
+- C3 size: numstat runs 153/31, r2 4/3; total 157/34.
