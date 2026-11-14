@@ -146,8 +146,15 @@
    the gate pass. The re-run brief: `verifier-brief-2.md`. Rule kept: no chat message on how Mustafa was told about the
    advisor model until the final commit.
 
+16. Fix pass 3 committed: 922cadfce7131f94aa3827f04fb862a729c8da64 (2026-11-14 00:43:52 UTC; the notes as used: 83b99af),
+   pushed; its diff read (the report only, +55 −25; the appendix's cut-off 00:43:01). CI on 922cadf: gate push
+   43536145305, toolchain push 43536145352, gate pull_request 43536148552, toolchain pull_request 43536148433 (running
+   at 00:45 UTC; the gate jobs already green).
+
 ## Current step
-Fix pass 3: the notes saved, the commit, the push, CI, the "done" save, then the verifier's re-run (same agent).
+The verifier's re-run on 922cadf (agent ad5b8a361fccd378c resumed ~00:47 UTC with `verifier-brief-2.md`; its notes: a
+"RE-RUN on 922cadf" block in verifier-1.md). Fix pass 3's "done" save once the pull_request smoke job (132265509486,
+run 43536148552) is green; the other five jobs were green at 00:46 UTC. Then step 8.
 
 ## Next steps
 1. Scripts (consultation 10's items 1 to 6 block the commit): grep every "before" string of D2 to D4 in the notes'
