@@ -40,3 +40,8 @@ B8. DONE + answer.
 - Finding F9: SP:44 machines named "before the look proof test"; that test no longer built separately -> naming trigger gone; ML/RD/MAC-judged marks wait for naming.
 - Finding F10: PM71/72 run only with 60 Hz margin test; wave-1 early signal gone with spikes; still decide at Slice 6.
 - Next: B5 write table rows 1-40.
+- B5 DONE: marks-0004.md header + rows PM1-PM40 written. Next: B6 rows 41-75 (append).
+- B6 DONE: rows PM41-PM75 appended. Next: B7 sections 2-7.
+- B7 DONE: sections 2-7 written.
+- Answer summary: count 75/75, none missing. Measure early: PM19, PM23, PM22, PM9, PM30, PM20, PM13, PM7. Surprises: F5 (phase 3 milestone S5/S6/S9 includes marks slice 1 cannot show), F7 (vehicles in no slice), F8 (separate rigs PM33 comparisons, PM34, PM40/44 second generator, PM26 A64), F9 (machines' naming trigger gone), F10 (60 Hz early signal gone; PM71/72 still decide at Slice 6), F1 (SP:334 omits S21/S22), PM8 waits on R1-TICK-OQ7, PM59/PM42 can run before the slices the migration names.
+DONE
