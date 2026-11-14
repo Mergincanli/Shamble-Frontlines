@@ -54,6 +54,11 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   push (crates unchanged since e59ece9); then the c62h record (r2's judge, --only PM-0001-17, on r2's whole-as-lost and
   tick16 folders, into .gate/netcode-proof-test/c62h-<commit12>/: both bites shown, never INVALID); then the card and
   u4r-report.md's r2 section with MRG-L1 to -L3; then U4r-F1 (RUN-L1 rides it).
+- **Running (about 16:28 UTC): workflow wf_6a2d5d79-ac9** (task wb99pq6o0): u4r-report-edit (folds r2, carry 62
+  (h), MRG-L1 to -L3 and JDG-ONLY-1 into u4r-report.md; notes u4r-report-edit-notes.md) and u4r-f1-plan (drafts
+  u4r-f1-plan.md; notes u4r-f1-plan-notes.md), in parallel. **If cut:** `resumeFromRunId: "wf_6a2d5d79-ac9"`. **On
+  return:** read the report's edits and the plan in full; the plan goes to the advisor's plan review (a workflow) before
+  any build; F1's size goes on the card (SIZE-CHECK).
 - **CARRY 62 (h) DONE (about 16:35 UTC).** The advisor's ruling on the first try: **advisor-u4r-c62h-full.md** (34
   lines, sha256 18dd3d20…, by u4r_c62h_ruling_full.py word for word): the INVALID came from its own wording (`--only
   PM-0001-17` alone) and a wrong code claim; the judge narrows marks with --only before Rule::Pre looks for PM-0001-2
