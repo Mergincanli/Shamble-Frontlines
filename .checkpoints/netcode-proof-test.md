@@ -54,6 +54,22 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   push (crates unchanged since e59ece9); then the c62h record (r2's judge, --only PM-0001-17, on r2's whole-as-lost and
   tick16 folders, into .gate/netcode-proof-test/c62h-<commit12>/: both bites shown, never INVALID); then the card and
   u4r-report.md's r2 section with MRG-L1 to -L3; then U4r-F1 (RUN-L1 rides it).
+- **CARRY 62 (h) DONE (about 16:35 UTC).** The advisor's ruling on the first try: **advisor-u4r-c62h-full.md** (34
+  lines, sha256 18dd3d20…, by u4r_c62h_ruling_full.py word for word): the INVALID came from its own wording (`--only
+  PM-0001-17` alone) and a wrong code claim; the judge narrows marks with --only before Rule::Pre looks for PM-0001-2
+  (main.rs:94, eval.rs:958-962): **JDG-ONLY-1, Medium** (fails closed; a latent High path only for an expect-invalid
+  bite with a pre: rule, none today; reach: npt-judge's command line only; c-u4r-runs.mjs's sets unaffected; no recorded
+  verdict touched). Home: npt-judge's next change, before PR #40 is marked ready at the latest and before any such
+  bite; **interim rule: every npt-judge --only that names a mark carrying pre:PM-0001-2 also names PM-0001-2.** Carry
+  62 (h) stands as committed. **The record:** .gate/netcode-proof-test/c62h-5e563b9589d3-record/ (README.txt; `--only
+  PM-0001-2,PM-0001-17`; both verdicts cmp-equal to the diagnostic): whole-as-lost shown (valid; mismatches 0 pass;
+  the new check 48 fail); tick16 shown (valid; 2,880 and 720, both fail). The first try c62h-5e563b9589d3/ kept
+  unchanged. **Its "For Mustafa": nothing now.** **Next:** the report's r2 section (the r2-run ruling's step 6:
+  r2's 14 suites expected beside what came, lag-switch's 300 as P1's designed loss, tick16's "PM-0001-2 passes" as
+  the bite run's validity; the c62h story: first try INVALID by the advisor's wording, the record second; MRG-L1 to
+  -L3 folded; JDG-ONLY-1 (Medium) in Follow-ups with its home and the interim rule); then U4r-F1's plan (INF-R2-1,
+  -3, -4; RUN-L1; c-u4r-r2.mjs's whole-as-lost suite marks "PM-0001-2,PM-0001-17" and its new expect line); D4; the
+  disk plan; the pre-check set; the judged sets.
 - **Carry 62 (h) COMMITTED at 5e563b9** (marks.json +15; pushed about 16:17 UTC; CI's check suites finished on it
   with none failed, 16:18; the plan's readings lines went in
   at a36babd, the saver's last autosave when stopped: **stopping the saver commits pending notes once more, so stop it
