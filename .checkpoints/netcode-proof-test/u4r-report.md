@@ -169,10 +169,21 @@ copy 6's by-hand node --test at 73 of 76, re-pinned in the same step, recorded u
 advisor-u4r-r2-full.md:32).
 
 ## Follow-ups (each with its home; none triggers a push)
-- **U4r-F2 (before the P0 set; advisor-u4r-f2-plan-full.md):** the P0 set judged in two calls, and INF-F1-1's header
-  sentence rides it, in the advisor's words (condition 8).
+- **U4r-F2, done at 791bc55 (before the P0 set):** the P0 set judged in two calls, with INF-F1-1's header sentence
+  riding it in the advisor's words (condition 8). The record:
+  - the plan, approved with conditions 1 to 9 (advisor-u4r-f2-plan-full.md);
+  - the evidence: 17 stagings, all PASS, and on the real judge one call equals two (.gate/u4r-f2/);
+  - infra-engineer's one round: APPROVE WITH FINDINGS (u4r-f2-review-full.md; INF-F2-1 fixed in the card's run
+    procedure);
+  - the advisor's review of the head: APPROVE (advisor-u4r-f2-head-full.md); CI green.
+  - Size: 52 insertions and 22 deletions in one file.
+  - ADV-F2H-1: the stagings ran on harness.mjs sha256 99f583a2 (sources.log). The kept copy, sha256 d0dd4ec3, differs
+    only by the NOTES re-point to .gate/u4r-f2/scratch/ (INF-F2-3), made after the run. infra-engineer's re-run used
+    the original.
 - **One runner change after the P0 set** (both run scripts, c-u4r-runs.mjs and c-u4r-r2.mjs; plan first, with the
   advisor's plan review; before the next judged set after U4r's: advisor-u4r-f2-plan-full.md, condition 8):
+  - INF-F2-1's header sentence and INF-F2-2's three comment wordings, in infra-engineer's words (u4r-f2-review-full.md;
+    advisor-u4r-f2-head-full.md, ADV-Q);
   - INF-F1-5's untrimmed status read;
   - RUNS-LINE (runs.txt prints each listed mark's verdict for the set's own part: advisor-u4r-sets-r1-full.md);
   - RATES-1 (the projection's rates from these sets' whole-run bytes, P0's from the P0 set: the same ruling);
@@ -412,6 +423,20 @@ advisor-u4r-r2-full.md:32).
        0.9839 and 0.9937 of sets.
      - **One difference from P3:** the least slot holds everyone in view on 795 of 8,220 (s2) and 842 of 5,711 (s3)
        ticks after the onset, against P3's 4 to 50. It went to the advisor to confirm the attribution.
+     - **The advisor's ruling (advisor-u4r-f2-head-full.md, FP-P2): BRAWL-1's fingerprint.** It confirmed this from
+       its own reads of the logs:
+       - (1) s2's onset is at tick 73,816, on a door's close edge (phase 0 of the 360-tick cycle). s3's is at 76,325
+         (phase 349), inside door 5's closed half: a soldier walked into a building whose door was already shut.
+       - (2) After the onset, all 48 slots are at 0 in every closed half.
+       - (3) s3 has one soldier in one building: slot 33's view returns 53 to 162 ticks after door 5 opens, while the
+         others return in a median of 2 to 3 ticks.
+       - (4) s2 has two soldiers in two buildings: slot 6 from the onset, and slot 28 behind door 2 from about tick
+         75,436, where the others wait door 2's 60-tick gap.
+       - (5) At P2's lower loss the re-adds finish inside the 180-tick open half, so the least slot holds only late in
+         the open half. That is why it holds 795 and 842 ticks against P3's 4 to 50.
+       - (6) Overflow resyncs 0; very large units held in 1.0000, 0.9839 and 0.9937 of sets.
+       - **What follows:** -17's L1 P2 part moves with L1 P3 to BRAWL-1's re-run at the fix's commit. s2 shows that
+         more than one soldier can drift, so BRAWL-1's run figure must name every soldier outside the cluster.
      - Raw logs 778.6 MiB of .jsonl against the runner's 628.9 MiB projection (1.24 times). Measured incomplete 17,260,
        17,089 and 17,532 of 864,000 client-ticks (2.0 %).
    - **The judge, measured apart** on one P3 run (judge-apart.sh; .gate/u4r-judge-apart/u4r-P3-0f066338dd8d-l1-p3-s1.log;

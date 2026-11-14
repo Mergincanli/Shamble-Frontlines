@@ -115,6 +115,42 @@ bytes and the judge's peak (over 10 GiB: P0 does not start; plan the smallest ch
   APPROVE and CI is green: (B), then (C) only if free space is below R (9,218.6 MiB), with df before and after each,
   then P0 by the run procedure. P0 is a split set: two judge lines, verdict-bites.json, and INF-F2-1's stop order.
   - The harness's NOTES path now points at .gate/u4r-f2/scratch/ (INF-F2-3's second half; scratch, not tracked).
+- **THE ADVISOR APPROVES U4r-F2's HEAD 791bc55 (about 21:31 UTC): advisor-u4r-f2-head-full.md** (57 lines, sha256
+  4c8c3431…, written word for word by u4r_f2_head_review_full.py). CI is green on 791bc55 (gate run 43641942150: gate
+  and smoke success; toolchain 43641942137 success).
+  - **Its "For Mustafa" (copied here at once):** nothing to decide or check. The two-half judging is built, tested and
+    approved, so the last set can start. P2 showed the same bot flaw; in one run two bots went into two buildings.
+  - **ADV-Q:** INF-F2-1's header sentence and INF-F2-2's three wordings go into the script at the runner's next
+    change, beside INF-F1-5, RUNS-LINE and RATES-1. The card's item (6) is the binding stop rule now.
+  - **FP-P2: it is BRAWL-1's fingerprint.**
+    - s2 has two soldiers in two buildings: slot 6 from the onset, and slot 28 behind door 2 from about tick 75,436.
+      s3 has one (slot 33).
+    - All slots are at 0 in every closed half.
+    - The re-adds finish within the open half at P2's lower loss, so the least slot holds only late in the open
+      half.
+    - The Q1 (3) wording now reads "one slot per soldier inside a shut building".
+    - -17 L1 P2 moves with L1 P3 to BRAWL-1's re-run. BRAWL-1's run figure must name every soldier outside the
+      cluster.
+  - **ADV-F2H-1 (Low):** the stagings ran on harness.mjs sha256 99f583a2 (sources.log). The kept copy, d0dd4ec3,
+    differs only by the NOTES re-point to .gate/u4r-f2/scratch/ (INF-F2-3), made after the run. infra-engineer's
+    re-run used the original. No push.
+  - **PRE-P0: condition 7 is met; P0 may start now.**
+    - (a) The tree is clean: commit the card first.
+    - (b) pgrep empty.
+    - (c) df at least R (9,218.6 MiB).
+    - (d) No check.mjs run, no shared-target build and no other lane before the start.
+    - (e) The run procedure, items (1) to (7), with item (6)'s P0 sentence.
+    - P0's runs.txt head must show npt-lab b3b4a60d, bites 33e1f49f, judge 65acacfe and marks 9fb5be57; any
+      difference goes to the advisor before P0 counts.
+  - **After P0 (its next steps 5 to 7):**
+    - Check the head's sha256s, the fixed line, the two judge lines and the raw-logs line.
+    - Read the parts from verdict.json and the bites from verdict-bites.json.
+    - To the advisor before they count: a failed or stopped call, the flagged tick16 run, and any -17 L1 P0 INVALID
+      (whole).
+    - Commit results/u4r/<c12>/P0/.
+    - judge-apart each half (measured and bites) under the lock against 5.57 and 6.16 GiB (RR3-L6); peak.py's
+      whole-set maximum.
+    - Then the report's P0 section and the card.
 - **THE CLEANS FOR R ARE DONE (the sets ruling's Q3 (B) and (C), with no lane running; one main-run.sh call each,
   lock exclusive, test guards all exit 0):**
   - **(B)** (21:17:37-21:17:39 UTC; .gate/u4r-sets/clean-shared-B.log): the shared target's release, doc and wasm32
