@@ -1,0 +1,631 @@
+[
+  {
+    "mark": "PM-0001-2",
+    "title": "The load is the stress scene",
+    "verdict": "FAIL",
+    "why": [
+      "SS runs: run l1-p2-s2: everyone in view on at least 99 % of each client's snapshots = 0.5875, needs >= 0.99",
+      "SS runs: run l1-p2-s3: everyone in view on at least 99 % of each client's snapshots = 0.7295, needs >= 0.99"
+    ],
+    "parts": [
+      {
+        "name": "SS runs",
+        "verdict": "FAIL",
+        "why": [
+          "SS runs: run l1-p2-s2: everyone in view on at least 99 % of each client's snapshots = 0.5875, needs >= 0.99",
+          "SS runs: run l1-p2-s3: everyone in view on at least 99 % of each client's snapshots = 0.7295, needs >= 0.99"
+        ],
+        "runs": [
+          {
+            "run": "l1-p2-s1",
+            "valid": true,
+            "checks": [
+              {
+                "name": "48 soldiers on every measured tick",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "three teams of 16",
+                "outcome": "pass",
+                "value": "16",
+                "needs": ">= 16"
+              },
+              {
+                "name": "a connected snapshot-receiving client on every soldier",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "15 big vehicles",
+                "outcome": "pass",
+                "value": "15",
+                "needs": ">= 15"
+              },
+              {
+                "name": "4 very large units of at least 20 parts",
+                "outcome": "pass",
+                "value": "4",
+                "needs": ">= 4"
+              },
+              {
+                "name": "300 live projectiles",
+                "outcome": "pass",
+                "value": "300",
+                "needs": ">= 300"
+              },
+              {
+                "name": "700 shots per second, run mean at least -5 %",
+                "outcome": "pass",
+                "value": "694.606667",
+                "needs": ">= 665"
+              },
+              {
+                "name": "700 shots per second, run mean at most +5 %",
+                "outcome": "pass",
+                "value": "694.606667",
+                "needs": "<= 735"
+              },
+              {
+                "name": "portal changes 1 per second, mean at least -5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.95"
+              },
+              {
+                "name": "portal changes 1 per second, mean at most +5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "<= 1.05"
+              },
+              {
+                "name": "everyone in view on at least 99 % of each client's snapshots",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.99"
+              }
+            ]
+          },
+          {
+            "run": "l1-p2-s2",
+            "valid": true,
+            "checks": [
+              {
+                "name": "48 soldiers on every measured tick",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "three teams of 16",
+                "outcome": "pass",
+                "value": "16",
+                "needs": ">= 16"
+              },
+              {
+                "name": "a connected snapshot-receiving client on every soldier",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "15 big vehicles",
+                "outcome": "pass",
+                "value": "15",
+                "needs": ">= 15"
+              },
+              {
+                "name": "4 very large units of at least 20 parts",
+                "outcome": "pass",
+                "value": "4",
+                "needs": ">= 4"
+              },
+              {
+                "name": "300 live projectiles",
+                "outcome": "pass",
+                "value": "300",
+                "needs": ">= 300"
+              },
+              {
+                "name": "700 shots per second, run mean at least -5 %",
+                "outcome": "pass",
+                "value": "694.658333",
+                "needs": ">= 665"
+              },
+              {
+                "name": "700 shots per second, run mean at most +5 %",
+                "outcome": "pass",
+                "value": "694.658333",
+                "needs": "<= 735"
+              },
+              {
+                "name": "portal changes 1 per second, mean at least -5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.95"
+              },
+              {
+                "name": "portal changes 1 per second, mean at most +5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "<= 1.05"
+              },
+              {
+                "name": "everyone in view on at least 99 % of each client's snapshots",
+                "outcome": "fail",
+                "value": "0.5875",
+                "needs": ">= 0.99"
+              }
+            ]
+          },
+          {
+            "run": "l1-p2-s3",
+            "valid": true,
+            "checks": [
+              {
+                "name": "48 soldiers on every measured tick",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "three teams of 16",
+                "outcome": "pass",
+                "value": "16",
+                "needs": ">= 16"
+              },
+              {
+                "name": "a connected snapshot-receiving client on every soldier",
+                "outcome": "pass",
+                "value": "48",
+                "needs": ">= 48"
+              },
+              {
+                "name": "15 big vehicles",
+                "outcome": "pass",
+                "value": "15",
+                "needs": ">= 15"
+              },
+              {
+                "name": "4 very large units of at least 20 parts",
+                "outcome": "pass",
+                "value": "4",
+                "needs": ">= 4"
+              },
+              {
+                "name": "300 live projectiles",
+                "outcome": "pass",
+                "value": "300",
+                "needs": ">= 300"
+              },
+              {
+                "name": "700 shots per second, run mean at least -5 %",
+                "outcome": "pass",
+                "value": "694.618333",
+                "needs": ">= 665"
+              },
+              {
+                "name": "700 shots per second, run mean at most +5 %",
+                "outcome": "pass",
+                "value": "694.618333",
+                "needs": "<= 735"
+              },
+              {
+                "name": "portal changes 1 per second, mean at least -5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": ">= 0.95"
+              },
+              {
+                "name": "portal changes 1 per second, mean at most +5 % (proposed band)",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "<= 1.05"
+              },
+              {
+                "name": "everyone in view on at least 99 % of each client's snapshots",
+                "outcome": "fail",
+                "value": "0.7295",
+                "needs": ">= 0.99"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ES runs",
+        "verdict": "NOT-RUN",
+        "why": [
+          "ES runs: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "SS N=24 (PM-0001-10's scale step)",
+        "verdict": "NOT-RUN",
+        "why": [
+          "SS N=24 (PM-0001-10's scale step): 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "SS N=36 (PM-0001-10's scale step)",
+        "verdict": "NOT-RUN",
+        "why": [
+          "SS N=36 (PM-0001-10's scale step): 0 of 3 valid runs"
+        ],
+        "runs": []
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-2/fire-stops",
+        "status": "not_run",
+        "runs": []
+      }
+    ],
+    "report": [
+      {
+        "name": "effects per soldier, max",
+        "part": "SS runs",
+        "run": "l1-p2-s1",
+        "value": "8"
+      },
+      {
+        "name": "effects per soldier, max",
+        "part": "SS runs",
+        "run": "l1-p2-s2",
+        "value": "8"
+      },
+      {
+        "name": "effects per soldier, max",
+        "part": "SS runs",
+        "run": "l1-p2-s3",
+        "value": "8"
+      },
+      {
+        "name": "stand-in entity changes per second, mean",
+        "part": "SS runs",
+        "run": "l1-p2-s1",
+        "value": "0"
+      },
+      {
+        "name": "stand-in entity changes per second, mean",
+        "part": "SS runs",
+        "run": "l1-p2-s2",
+        "value": "0"
+      },
+      {
+        "name": "stand-in entity changes per second, mean",
+        "part": "SS runs",
+        "run": "l1-p2-s3",
+        "value": "0"
+      },
+      {
+        "name": "stand-in entity spawns per second, mean",
+        "part": "SS runs",
+        "run": "l1-p2-s1",
+        "value": "74.823333"
+      },
+      {
+        "name": "stand-in entity spawns per second, mean",
+        "part": "SS runs",
+        "run": "l1-p2-s2",
+        "value": "74.638333"
+      },
+      {
+        "name": "stand-in entity spawns per second, mean",
+        "part": "SS runs",
+        "run": "l1-p2-s3",
+        "value": "74.458333"
+      }
+    ]
+  },
+  {
+    "mark": "PM-0001-17",
+    "title": "Every decoded snapshot is the server's state",
+    "verdict": "INVALID",
+    "why": [
+      "L1 P2: run l1-p2-s2: pre:PM-0001-2: everyone in view on at least 99 % of each client's snapshots = 0.5875, needs >= 0.99",
+      "L1 P2: run l1-p2-s3: pre:PM-0001-2: everyone in view on at least 99 % of each client's snapshots = 0.7295, needs >= 0.99"
+    ],
+    "parts": [
+      {
+        "name": "L1 P0",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 P0: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L1 P2",
+        "verdict": "INVALID",
+        "why": [
+          "L1 P2: run l1-p2-s2: pre:PM-0001-2: everyone in view on at least 99 % of each client's snapshots = 0.5875, needs >= 0.99",
+          "L1 P2: run l1-p2-s3: pre:PM-0001-2: everyone in view on at least 99 % of each client's snapshots = 0.7295, needs >= 0.99"
+        ],
+        "runs": [
+          {
+            "run": "l1-p2-s1",
+            "valid": true,
+            "checks": [
+              {
+                "name": "100 % of decoded snapshots rebuild the server's quantised state (0 mismatches; on L2 under the Arm rule)",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              }
+            ]
+          },
+          {
+            "run": "l1-p2-s2",
+            "valid": false,
+            "invalid_why": [
+              "pre:PM-0001-2: everyone in view on at least 99 % of each client's snapshots = 0.5875, needs >= 0.99"
+            ],
+            "checks": []
+          },
+          {
+            "run": "l1-p2-s3",
+            "valid": false,
+            "invalid_why": [
+              "pre:PM-0001-2: everyone in view on at least 99 % of each client's snapshots = 0.7295, needs >= 0.99"
+            ],
+            "checks": []
+          }
+        ]
+      },
+      {
+        "name": "L1 P3",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 P3: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L1 B1",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 B1: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L2 P0",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 P0: 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L2 P2",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 P2: 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L2 P3",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 P3: 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L2 B1",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 B1: 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "every S30",
+        "verdict": "NOT-RUN",
+        "why": [
+          "every S30: 0 of 3 valid runs"
+        ],
+        "runs": []
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-17/tick16",
+        "status": "not_run",
+        "runs": []
+      },
+      {
+        "id": "PM-0001-17/client-rounding",
+        "status": "not_run",
+        "runs": []
+      },
+      {
+        "id": "PM-0001-17/whole-as-lost",
+        "status": "not_run",
+        "runs": []
+      }
+    ],
+    "report": [
+      {
+        "name": "aarch64-only mismatches (a cross-architecture finding; decides nothing)",
+        "part": "L1 P2",
+        "run": "l1-p2-s1",
+        "value": "0"
+      },
+      {
+        "name": "decoded snapshots compared",
+        "part": "L1 P2",
+        "run": "l1-p2-s1",
+        "value": "861996"
+      },
+      {
+        "name": "client-ticks left incomplete (a group lost, none refused: not compared, u4-build-plan.md §4.6)",
+        "part": "L1 P2",
+        "run": "l1-p2-s1",
+        "value": "17739"
+      }
+    ]
+  },
+  {
+    "mark": "PM-0001-57",
+    "title": "Decoded values keep the protocol's precision",
+    "verdict": "NOT-RUN",
+    "why": [
+      "L1 P0: 0 of 3 valid runs",
+      "L1 P3: 0 of 3 valid runs",
+      "L1 B1: 0 of 3 valid runs",
+      "bite PM-0001-57/pos-4cm: no run yet",
+      "bite PM-0001-57/yaw-12bit: no run yet",
+      "bite PM-0001-57/pitch-8bit: no run yet"
+    ],
+    "parts": [
+      {
+        "name": "L1 P0",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 P0: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L1 P2",
+        "verdict": "PASS",
+        "why": [],
+        "runs": [
+          {
+            "run": "l1-p2-s1",
+            "valid": true,
+            "checks": [
+              {
+                "name": "positions: max error at most 1 cm",
+                "outcome": "pass",
+                "value": "6984",
+                "needs": "<= 10000"
+              },
+              {
+                "name": "yaw: max error at most 0.01 degree",
+                "outcome": "pass",
+                "value": "2750",
+                "needs": "<= 10000"
+              },
+              {
+                "name": "pitch: max error at most one 0.18 degree step",
+                "outcome": "pass",
+                "value": "88063",
+                "needs": "<= 180000"
+              }
+            ]
+          },
+          {
+            "run": "l1-p2-s2",
+            "valid": true,
+            "checks": [
+              {
+                "name": "positions: max error at most 1 cm",
+                "outcome": "pass",
+                "value": "6984",
+                "needs": "<= 10000"
+              },
+              {
+                "name": "yaw: max error at most 0.01 degree",
+                "outcome": "pass",
+                "value": "2750",
+                "needs": "<= 10000"
+              },
+              {
+                "name": "pitch: max error at most one 0.18 degree step",
+                "outcome": "pass",
+                "value": "88063",
+                "needs": "<= 180000"
+              }
+            ]
+          },
+          {
+            "run": "l1-p2-s3",
+            "valid": true,
+            "checks": [
+              {
+                "name": "positions: max error at most 1 cm",
+                "outcome": "pass",
+                "value": "6984",
+                "needs": "<= 10000"
+              },
+              {
+                "name": "yaw: max error at most 0.01 degree",
+                "outcome": "pass",
+                "value": "2750",
+                "needs": "<= 10000"
+              },
+              {
+                "name": "pitch: max error at most one 0.18 degree step",
+                "outcome": "pass",
+                "value": "88063",
+                "needs": "<= 180000"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "L1 P3",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 P3: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L1 B1",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 B1: 0 of 3 valid runs"
+        ],
+        "runs": []
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-57/pos-4cm",
+        "status": "not_run",
+        "runs": []
+      },
+      {
+        "id": "PM-0001-57/yaw-12bit",
+        "status": "not_run",
+        "runs": []
+      },
+      {
+        "id": "PM-0001-57/pitch-8bit",
+        "status": "not_run",
+        "runs": []
+      }
+    ],
+    "report": [
+      {
+        "name": "positions: error p99",
+        "part": "L1 P2",
+        "run": "l1-p2-s1",
+        "value": "5257"
+      },
+      {
+        "name": "positions: error p99",
+        "part": "L1 P2",
+        "run": "l1-p2-s2",
+        "value": "5280"
+      },
+      {
+        "name": "positions: error p99",
+        "part": "L1 P2",
+        "run": "l1-p2-s3",
+        "value": "5283"
+      }
+    ]
+  }
+]

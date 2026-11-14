@@ -1,0 +1,20 @@
+# u4r-P2: -17's, -57's L1 P2 part(s), run in this container on 2026-11-14 (u4r-brief.md 7.1)
+commit ab10f058a8288dfe17edbc6fc846a6e23d5a4e8d, spikes/netcode-proof tree 866c323b74c51b834eded77a418872263ec6d6f1
+target: the main folder's own cache (CARGO_TARGET_DIR unset: plan §7.1 item 6)
+npt-lab (measured build) sha256 b3b4a60da4cfb4b34247159ea000e11836cd610dd6fc3b233f99cd3545d9b2ce
+npt-lab (bites build) sha256 33e1f49f963b9f2aeb1ef62b47c51dd56e852043d2d7d643f157fa06d991491f
+npt-judge sha256 65acacfefa22ff0aea1e43778d8aecf339d966a41681e961ea95f01452406d82
+marks.json sha256 9fb5be578b27d4c378a890d297c5ba636af0ac239bb6d50eae157ed44884a3c5 (copied into the bin folder and checked there, then into the raw-log folder; the bite list and the judge read those copies)
+raw logs: .gate/netcode-proof-test/runs/u4r-P2-ab10f058a828/ (not committed: plan §7.2)
+projection: u4r-P2: the set's 3 runs' projected logs, before the builds: free 8936 MiB, projected 629 MiB, so 8307 MiB after it against the 4 GiB floor (4096 MiB): room
+projection: u4r-P2: the set's 3 runs' projected logs, after the builds: free 8930 MiB, projected 629 MiB, so 8301 MiB after it against the 4 GiB floor (4096 MiB): room
+start: uptime 30005 s, load average 0.22 0.31 0.54
+end: uptime 31017 s, load average 1.00 1.00 0.88
+judge: PM-0001-2    FAIL      SS runs: run l1-p2-s2: everyone in view on at least 99 % of each client's snapshots = 0.5875, needs >= 0.99
+PM-0001-17   INVALID   L1 P2: run l1-p2-s2: pre:PM-0001-2: everyone in view on at least 99 % of each client's snapshots = 0.5875, needs >= 0.99
+PM-0001-57   NOT-RUN   L1 P0: 0 of 3 valid runs
+
+# one line per run (npt-lab's own summary line and its wall time; the judge reads the logs, never these lines)
+l1-p2-s1 SS P2 seed 1: 18333 ticks (33 after); lead 5; commands 757589 (steps without one 122098, duplicate stamps 0); late 1982; press refused 0; buffer full 0; rewinds refused 0; stale 0; overflow resyncs 0; heals 0; client hashes 861996 (sentinels 0); measured incomplete 17260; decided lost at the stop 30; shots per measured second 694; carry 49: measured client sets 864000, holding every very large unit 864000 (1.0000), projectiles per set 298.70; audit 2293242 owner, 29327645 spatial checked against the radius, 271570 spatial not checked, 0 breaches; fate log 9f541da1b334c850; connect order digest e826cbd37d20d3ae (wall 325.7 s)
+l1-p2-s2 SS P2 seed 2: 18330 ticks (30 after); lead 5; commands 761086 (steps without one 118464, duplicate stamps 0); late 1584; press refused 0; buffer full 0; rewinds refused 0; stale 0; overflow resyncs 0; heals 0; client hashes 862011 (sentinels 0); measured incomplete 17089; decided lost at the stop 24; shots per measured second 694; carry 49: measured client sets 864000, holding every very large unit 850100 (0.9839), projectiles per set 295.20; audit 2292246 owner, 29480491 spatial checked against the radius, 283416 spatial not checked, 0 breaches; fate log 8a625f98cb746ef7; connect order digest e826cbd37d20d3ae (wall 331.5 s)
+l1-p2-s3 SS P2 seed 3: 18333 ticks (33 after); lead 5; commands 776262 (steps without one 103461, duplicate stamps 0); late 1692; press refused 0; buffer full 0; rewinds refused 0; stale 0; overflow resyncs 0; heals 0; client hashes 861731 (sentinels 0); measured incomplete 17532; decided lost at the stop 23; shots per measured second 694; carry 49: measured client sets 864000, holding every very large unit 858525 (0.9937), projectiles per set 297.19; audit 2293762 owner, 28936336 spatial checked against the radius, 273528 spatial not checked, 0 breaches; fate log 6806cca61810afd6; connect order digest e826cbd37d20d3ae (wall 341.3 s)
