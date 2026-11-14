@@ -93,6 +93,12 @@ three days."
 _Pointer (2026-11-11, foundation 2.1a): for foundation steps 2.1 and 2.2, overtaken by Mustafa's decision of 2026-11-10
 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-10: the second account may plan and build foundation steps
 2.1 and 2.2 now"); for the rest, his words there: "Steps 2.3 to 2.6 keep their order and wait for their results."_
+_Pointer (2026-11-13, foundation 2.3's first docs pass): for foundation step 2.3 only, his words of 2026-11-10 quoted
+above are changed by his decision of 2026-11-13 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-13, 18:47:55
+UTC: his decision on step 2.3 (step 2.3 may be planned now), and step 2.3's task"): "Step 2.3 may be planned now. The
+parts of step 2.3 that need no proof test's result may be built before the proof tests report, after my go on the plan.
+Every gate check that needs a result joins later, when that result is in, with its pass marks unchanged. Steps 2.4 to
+2.6 still wait for their results."_
 
 ```mermaid
 flowchart LR
@@ -131,6 +137,12 @@ playable, and slice 6's 60 Hz margin run on the real sim, which makes the final 
 _Pointer (2026-11-11, foundation 2.1a): for foundation steps 2.1 and 2.2, overtaken by Mustafa's decision of 2026-11-10
 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-10: the second account may plan and build foundation steps
 2.1 and 2.2 now"); for the rest, his words there: "Steps 2.3 to 2.6 keep their order and wait for their results."_
+_Pointer (2026-11-13, foundation 2.3's first docs pass): for foundation step 2.3 only, his words of 2026-11-10 quoted
+above are changed by his decision of 2026-11-13 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-13, 18:47:55
+UTC: his decision on step 2.3 (step 2.3 may be planned now), and step 2.3's task"): "Step 2.3 may be planned now. The
+parts of step 2.3 that need no proof test's result may be built before the proof tests report, after my go on the plan.
+Every gate check that needs a result joins later, when that result is in, with its pass marks unchanged. Steps 2.4 to
+2.6 still wait for their results."_
 
 | # | Spike | Size | Place | Pass marks |
 |---|---|---|---|---|
@@ -442,6 +454,12 @@ _Pointer (2026-11-11, foundation 2.1a): for foundation steps 2.1 and 2.2, overta
   2026-11-10 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-10: the second account may plan and build
   foundation steps 2.1 and 2.2 now"); for the rest, his words there: "Steps 2.3 to 2.6 keep their order and wait for
   their results."_
+  _Pointer (2026-11-13, foundation 2.3's first docs pass): for foundation step 2.3 only, his words of 2026-11-10 quoted
+  above are changed by his decision of 2026-11-13 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-13,
+  18:47:55 UTC: his decision on step 2.3 (step 2.3 may be planned now), and step 2.3's task"): "Step 2.3 may be planned
+  now. The parts of step 2.3 that need no proof test's result may be built before the proof tests report, after my go on
+  the plan. Every gate check that needs a result joins later, when that result is in, with its pass marks unchanged.
+  Steps 2.4 to 2.6 still wait for their results."_
 - **Size:** L (six change-sets: restructure, toolchain, gate and CI, generated types, skeleton, previews).
 - **Research it carries:** R5-LAYOUT-REC1, REC2, REC6; R5-TSLINT-REC1–REC4; R5-RUSTLINT-REC1–REC6; R5-TEST-REC1,
   REC6; R5-CI-REC1–REC5; R5-PREV-REC1, REC4 (mark 1); R5-GATE-REC1–REC4; R1-BND-REC4's CI checks. It re-proves as gate
