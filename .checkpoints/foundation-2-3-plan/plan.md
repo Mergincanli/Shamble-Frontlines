@@ -1,4 +1,4 @@
-# Plan: foundation step 2.3, the gate v2 and CI, and the end of the kit's freeze (revision 2.3)
+# Plan: foundation step 2.3, the gate v2 and CI, and the end of the kit's freeze (revision 2.4)
 
 - **The task:** Mustafa's words of 2026-11-13 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-13, 18:47:55
   UTC", from "Then, after the docs pass is merged: plan step 2.3." to its end: items 1 to 9), and his message of
@@ -14,7 +14,8 @@
   and its four rulings). Revision 2.1 folds in the six Lows of its APPROVE of revision 2 (00984ae), which it allowed
   without a further review. Revision 2.2 carries the old plan's Appendix B (the rules kept while PR #40's spike is in
   the tree), found missing by the advisor tool's moment-5 check; revision 2.3 folds the three Lows of the advisor
-  agent's APPROVE of revision 2.2 (94c5c5a). Part 11 lists what changed.
+  agent's APPROVE of revision 2.2 (94c5c5a); revision 2.4 makes two sentences true after the advisor tool's third check.
+  Part 11 lists what changed.
 - **Sources in this folder:**
   - `reading.md`: blocks B1 to B13, each source with its file and line;
   - `approach.md`: the sketch the advisor tool checked;
@@ -48,7 +49,8 @@
      - the network cut stays around the tests, hardened.
   7. **CS-F, the switch:** the guard and the rules name `required`. He adds it to his required checks between CS-E and
      CS-F, and remove `gate` and `smoke` after CS-F.
-- **The rest of step 2.3 joins later,** each piece when its result is in, with its pass marks unchanged:
+- **The rest of step 2.3 joins later,** each piece when its result is in, or later still where this plan waits for the
+  step that gives the check something to check (Part 0, Rule 3; G11 among them), with its pass marks unchanged:
   - **2.3-B** rides step 2.4, after the boundary spike: G4, the boundary layer of G9, G7 and the budget file.
   - **2.3-S**, its own change-set after the sim core spike: G2's float ban and G5's same-feature check.
   - **2.3-E** rides step 2.5, after the netcode proof test and the sim core spike: G6's Vite build, G8, G10, G11, G12.
@@ -140,7 +142,7 @@
 - **"Met"** means every clause in the mark's row holds: its controls, its machines and its run counts. A mark whose
   clauses are partly built is "met at" the change-set where its last clause joins.
 - **The advisor tool:** consultation 1 at 2026-11-14 11:00:19 UTC (the transcript) changed this plan's shape. Its line
-  is in the checkpoint, and the later consultations will be there too.
+  is in the checkpoint, as are the later two (Part 11).
 
 ## Part 1. Check by check, G0 to G13 (item 1)
 On main today, no check below exists as a gate v2 check. The second column says what CI already runs of it.
@@ -873,10 +875,12 @@ required checks while the ruleset no longer did.
   and no verifier.
 - **The advisor agent** (its file last changed in b478380, before this session started) reviews this plan at a pushed
   commit. Its verdict is recorded in the checkpoint against that SHA. REVISE means a new revision and a new review.
-- **The advisor tool:**
-  - consultation 1 (moment 1) is done;
-  - any design call with more than one defensible answer gets moment 4;
-  - moment 5 comes before the plan is saved as done, after the advisor agent's verdict, by his rule 2 of 2026-11-14.
+- **The advisor tool:** this task's calls, by the transcript, each answered by Fable 5.2 by its record:
+  - 11:00:19 UTC, moment 1, before the approach;
+  - 12:11:15 UTC, moment 5, before "done": not done (revision 2.2);
+  - 12:27:39 UTC, moment 5 again, before "done": two sentences and the record fixed (revision 2.4).
+  - No separate moment-4 call was made. PROOF-57, ROLLBACK-SCOPE, the scratch-copy route and MODELS-HOW (c) are
+    each put to him or ruled on by the advisor agent.
 - **Revision 2** (the advisor agent's review of revision 1 at 03d05f5: REVISE), what changed:
   - H1: PM-0002-57's "cannot merge" and D2's "single required check" move to PROOF-57, after his second ruleset
     step; Part 8's and Part 10's sentences on the order restated (the ruleset is the stricter one from step 1 to CS-F).
@@ -917,6 +921,8 @@ required checks while the ruleset no longer did.
   without a further review): R3-1, #40's check fails on any text `spikes/`; R3-2, the rule and the spike-folder
   variant last until the spike's check lifts it (once G5 and G8 exist), not until #40 merges, and PM-0002-42 is met
   at the later of slice 5's change-set and that; R3-3, the `exclude` line's departure from Appendix B, named.
+- **Revision 2.4** (the advisor tool's third check, 12:27:39 UTC): the summary says some later parts wait past their
+  result by this plan's choice (Rule 3); this Part's advisor-tool lines say what happened, not what would.
 
 ## Decisions needed
 - **GATE-PATH: where does the gate v2's script live?**

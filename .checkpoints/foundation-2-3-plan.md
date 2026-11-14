@@ -4,10 +4,11 @@
   its end (items 1 to 9), plus his message of 2026-11-14 starting the plan (three additions; review by the advisor agent
   and the advisor tool only). No build; no edit outside this checkpoint. His rules of 2026-11-14 (merge commit 4460ef5's
   message, items 2 and 3): consult the advisor tool before a step is saved as done; in a report, write about my own
-  process only what a record shows, with its time. · plan: `.checkpoints/foundation-2-3-plan/plan.md` (to write)
+  process only what a record shows, with its time. · plan: `.checkpoints/foundation-2-3-plan/plan.md` (revision 2.4: 108 rows in Part 4, 30 kit texts with
+  19 quotes of his checked)
 - **Branch:** claude/sweet-mayer-grsukw (stands in for cs/foundation-2-3-plan; restarted from main by fast-forward
   bfd719b..4460ef5, pushed) · **Base:** main 4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-14 13:22 Amsterdam
+- **Last update:** 2026-11-14 13:31 Amsterdam
 
 ## Steps done
 1. Orientation: the session's model read from get_session (session_context.model and last_served_model:
@@ -32,16 +33,18 @@
    12:17:53 UTC): APPROVE 94c5c5a5aa4022a65476009001ceebbf7dd15f82 (hand-back 12:26:10 UTC, the transcript;
    advisor-plan-r3.md), with three Lows (R3-1 to R3-3) foldable without a further review.
 8. Plan revision 2.3: R3-1 to R3-3 folded (rev 2.3 note in Part 11).
+9. Advisor-tool consultation 3 (12:27:39 UTC, moment 5): plan revision 2.4 (two sentences made true: the summary's
+   later parts, Part 11's advisor-tool record); `actions_run_trigger` has `cancel_workflow_run` (so "cancelled through
+   the API" holds); the saver stopped with TaskStop (its log: last save 12:24:30 UTC, then "[killed]"); this checkpoint
+   brought up to date; the "done" save.
 
 ## Current step
-9. Advisor tool, moment 5 (consultation 3), before the plan is saved as done; then the "done" save, the saver stopped
-   (TaskStop, recorded), and the end message.
+10. Done: the plan is saved as done after consultation 3; stopped for his go.
 
 ## Next steps
-1. Finish plan.md; commit it with the checkpoint (record its SHA here).
-2. The advisor agent's plan review (the advisor agent itself: advisor.md last changed in b478380, 2026-11-13
-   12:44 UTC, before this session started at 18:29 UTC, and this branch does not change it); fix on REVISE.
-3. Advisor tool, moment 5, before the plan is saved as done; then the end message and stop for his go.
+1. Stopped for his go on the plan and his answers: GATE-PATH, PIN-SCOPE, FREEZE-END and MODELS-HOW (ALLOW-GATE2 and
+   ROLLBACK-SCOPE now or at CS-F).
+2. On his go: CS-A's plan (the docs after #52 and this plan's record), on this branch, plan first.
 
 ## Open findings
 - The advisor agent's plan review of revision 1 (03d05f5): REVISE (notes: advisor-plan-r1.md). All fixed in revision 2
@@ -70,7 +73,7 @@
     unprotected; MODELS-HOW: quote DECISIONS.md :91.
 
 ## Key numbers
-- Advisor-tool consultations in this task: 2 so far (the docs pass's 17 are counted in its report and the merge).
+- Advisor-tool consultations in this task: 3, all answered by Fable 5.2 by their records (the docs pass's 17 are counted in its report and the merge).
 
 ## Decisions taken
 - Step 2.3 may be planned now; its parts that need no proof test's result may be built after his go on the plan
@@ -96,6 +99,10 @@
    end message's shape. The record shows two consultations so far, at moments 1 and 5: no separate moment-4 call was
    made for PROOF-57, ROLLBACK-SCOPE, the scratch-copy route or MODELS-HOW (c); each is put to him or ruled on by the
    advisor agent.
+3. 2026-11-14 12:27:39 UTC (13:27 Amsterdam; the transcript), moment 5 again, after revision 2.3 and the advisor agent's
+   APPROVE of 94c5c5a: is the plan done? Changed: the saver stopped before the last edits; two plan sentences made
+   true (revision 2.4); this checkpoint's stale lines fixed; one hand save, ending on a clean tree; the API cancel
+   checked; for the end message: three readings named, the approval chain from the diff, the record's three calls.
 
 ## Refusals (guard, deny list, classifier)
 - 11:06:47 UTC (the transcript): auto mode flagged the claude-code-guide agent's hand-back ("Undermining Oversight"); the report quoted
@@ -103,8 +110,7 @@
   its quotes marked as the agent's reading, not re-fetched; the guard CS re-reads the page before building G-3.
 
 ## Running work
-- saver: background task b6ean8gz0 · output /tmp/claude-0/-home-user-Shamble-Frontlines/7261f3d7-f651-586a-9c39-c052553b68a3/tasks/b6ean8gz0.output ·
-  started 10:44 UTC (11:44 Amsterdam) · stops by ~12:34 UTC (110 minutes) · last check 11:00 UTC: ok (first line
-  "watching .checkpoints/ on claude/sweet-mayer-grsukw every 10 min for 110 min").
-- agents: none running. Both docs agents done (hand-backs 11:06:47 and 11:10:42 UTC); the advisor agent's review
-  (11:52:31 UTC) and re-review (12:09:32 UTC) done.
+- saver: background task b6ean8gz0, started 10:44:11 UTC; stopped with TaskStop at the end of the task (its log: last
+  save 12:24:30 UTC, then "[killed]"). The final save is by hand.
+- agents: none running. Both docs agents done (hand-backs 11:06:47 and 11:10:42 UTC); the advisor agent: REVISE
+  (11:52:31 UTC), APPROVE of 00984ae (12:09:32 UTC), APPROVE of 94c5c5a (12:26:10 UTC).
