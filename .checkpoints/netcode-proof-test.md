@@ -12,8 +12,12 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 02:12 UTC; read this first after a compact or a cut): the fourth ruling is in (nothing for
-Mustafa, nothing blocks the merge); sent to copy 5, which finishes with r5 and section 5's end checks twice.**
+**NOW (2026-11-14 about 06:38 UTC; read this first after a compact or a cut): the spend limit cut copy 5 at 02:31
+during its first end-check run, which finished anyway (all 11 steps PASS); copy 5 resumed about 06:38 to record it,
+run the second end check and report section 6's return list; snapshot 572c4f69….**
+
+**Earlier NOW (2026-11-14 about 02:12 UTC): the fourth ruling is in (nothing for Mustafa, nothing blocks the merge);
+sent to copy 5, which finishes with r5 and section 5's end checks twice.**
 - **The fourth ruling** (wf_f276e5ae-878 returned about 02:11 UTC): **advisor-u4r-build4-full.md** (32 lines, sha256
   9d49b484…; by script, word for word). I read it whole. (1, Low) P3-CAP option (a): `after_capped` records the run's
   path, not a result; ruling 3 point 3's expectation now reads "after_capped as it comes"; carry 73 met at the new
@@ -984,6 +988,16 @@ the cut and the time of the resume; UTC, read from the session's transcript):
   files on 2fbec77, 7,614 lines, sha256 ad3631d9…, applies); copy 4 by SendMessage (its transcript intact, as after a
   limit cut); the ruling by `resumeFromRunId` (the two reads from the cache, a fresh advisor from its notes); the saver
   restarted.
+- 2026-11-14 02:31: "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit
+  resets 5:10am (UTC)". Cut: U4r's builder copy 5 (agent a507d682db446aa0a, 02:31:54), while its first end-check run
+  went on in the runner (started 02:21; it ended 02:35:28, exit 0: **check: all 11 steps pass**, measured build 526
+  tests, bites build 603, wasm 39.6 s; .gate/u4r/c5-end1.log). The fourth ruling's changes and r5 were done before
+  (c5-r5.log). The saver ended (exit 0) after its last save 22eeba8 (02:12); the worker process and later the container
+  were restarted (uptime 1 min at 06:36:53); the 02:34 and 04:34 check-ins waited until 06:36. Resumed about 06:38 by
+  the 06:35 check-in (the limit had reset at 05:10). Checked first: no cargo, rustc, check.mjs or runner left; HEAD
+  2fbec77; copy 5 ran no plant in this stretch. The snapshot re-cut (wip/u4r.patch, 26 files on 2fbec77, 8,305 lines,
+  sha256 572c4f69…, applies). Copy 5 resumed by SendMessage (its transcript intact) to record end-check run 1 from its
+  log, run the second, and report; the saver restarted.
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188

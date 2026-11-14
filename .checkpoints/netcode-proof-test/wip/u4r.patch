@@ -2235,10 +2235,10 @@ index 0000000..9c4b6c5
 +}
 diff --git a/spikes/netcode-proof/crates/lab/src/contract.rs b/spikes/netcode-proof/crates/lab/src/contract.rs
 new file mode 100644
-index 0000000..d7947e2
+index 0000000..4221f73
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/contract.rs
-@@ -0,0 +1,620 @@
+@@ -0,0 +1,632 @@
 +//! r2, the contract test's checker (u4r-brief.md 2.4 r2 (b), (c) and (e); U4R-Q11 (a)): one run's three logs, read
 +//! back, against marks/SERIES.md and the judge's validity inputs. The judge's own half, (a) every check of the parts
 +//! the run's header lists resolving with no gap and (d) PM-0001-2 passing, is `npt-judge --only` on the same folder:
@@ -2815,6 +2815,18 @@ index 0000000..d7947e2
 +            );
 +            x[lab].header.bite = Some("PM-0001-18/no-fallback".to_owned());
 +            assert_eq!(check(&x, SERIES).failures.len(), 1, "another bite");
++            // The advisor's U4r build ruling 4, point 2: exactly one id of npt-room's list lies outside the `PM-` form,
++            // so a second such id cannot widen the exemption unseen.
++            let outside: Vec<&str> = npt_room::BITES
++                .iter()
++                .copied()
++                .filter(|b| !b.starts_with("PM-"))
++                .collect();
++            assert_eq!(
++                outside,
++                ["catalogue-5/owner-to-all"],
++                "npt-room's ids outside the PM- form"
++            );
 +        }
 +        println!("r2: the six doctored copies each fail by name");
 +    }
@@ -7877,7 +7889,7 @@ index 0000000..460a3c9
 +}
 diff --git a/spikes/netcode-proof/ops/runs/c-u4r-r2.mjs b/spikes/netcode-proof/ops/runs/c-u4r-r2.mjs
 new file mode 100644
-index 0000000..78ed0fc
+index 0000000..b8df242
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/runs/c-u4r-r2.mjs
 @@ -0,0 +1,146 @@
@@ -7943,7 +7955,7 @@ index 0000000..78ed0fc
 +  { key: "lag-switch", build: "lab", run: "u4r-r2-lag-switch-1", args: "--scene SS --profile P1 --seed 1 --warmup-s 10 --measured-s 20 --behaviour steady", marks: "PM-0001-2", suite: "lag-switch", expect: "contract PASS; PM-0001-2 passes" },
 +  { key: "es", build: "lab", run: "u4r-r2-es-1", args: "--scene ES --profile P0 --seed 1 --warmup-s 10 --measured-s 20", marks: "PM-0001-2", suite: "r2-es", expect: "contract PASS; PM-0001-2 FAIL by ES's reliable events (50.05 a second against 9.5-10.5), the other 11 ES checks pass; no ES run counts at U4r (ruling 3, point 2: U4h's)" },
 +  { key: "evstart", build: "lab", run: "u4r-r2-evstart-1", args: "--scene SS --profile P0 --seed 1 --tick-start 63736 --event-start 65533 --warmup-s 10 --measured-s 20", marks: "PM-0001-2,PM-0001-17", suite: "r2-evstart", expect: "contract PASS; PM-0001-2 and -17 (0 mismatches) pass (carry 75)" },
-+  { key: "tick16", build: "bites", run: "u4r-r2-tick16-4", args: "--scene SS --profile P0 --seed 1 --tick-start 64651 --warmup-s 10 --measured-s 20 --after-max-s 5 --role bite --bite PM-0001-17/tick16", marks: "PM-0001-2,PM-0001-17", suite: "r2-tick16", expect: "contract PASS (0 mirror breaches); PM-0001-2 passes; -17's bite run FAILs by decoded_hash_mismatch_count with at least 48 mismatches; after_capped true (ruling 3, point 3; carry 73)" },
++  { key: "tick16", build: "bites", run: "u4r-r2-tick16-4", args: "--scene SS --profile P0 --seed 1 --tick-start 64651 --warmup-s 10 --measured-s 20 --after-max-s 5 --role bite --bite PM-0001-17/tick16", marks: "PM-0001-2,PM-0001-17", suite: "r2-tick16", expect: "contract PASS (0 mirror breaches); PM-0001-2 passes; -17's bite run FAILs by decoded_hash_mismatch_count with at least 48 mismatches; after_capped as it comes (false when the room's overflow resync resolves the measured ticks before the cap, true when the cap path of ruling 3, point 7 (a) ends the run); carry 62 (h)'s measured sum is the bite's own (tick16d: 720 = 48 x 15 post-wrap measured ticks) (ruling 3, point 3, as ruling 4, point 1 reads it; carry 73)" },
 +  { key: "tick16-clean", build: "lab", run: "u4r-r2-tick16-clean-1", args: "--scene SS --profile P0 --seed 1 --tick-start 64936 --warmup-s 10 --measured-s 20 --after-max-s 5", marks: MARKS_17, suite: "r2-tick16-clean", expect: "contract PASS (0 mirror breaches); PM-0001-2, -17 (0 mismatches) and -57 pass; the after phase resolves without the cap (ruling 3, point 3)" },
 +  { key: "b1-nofallback", build: "bites", run: "u4r-r2-b1-nofallback-1", args: `--scene SS ${B1} --role bite --bite PM-0001-18/no-fallback`, marks: `${MARKS_17},PM-0001-18`, suite: "r2-b1", expect: "contract PASS (0 mirror breaches, ruling 3, point 8 (A)); -18's max check FAILs (a heal later than 500 ms); INVALID by pre:PM-0001-2 is expected while npt-room is unfixed (ruling 3, points 4 and 8 (A))" },
 +];

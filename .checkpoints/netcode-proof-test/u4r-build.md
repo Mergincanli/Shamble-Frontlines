@@ -1415,6 +1415,77 @@ section 5's end checks twice.
   clean P0 re-run equal record for record but the added after_capped field; across the wrap, point 3's clean partner
   (r2/tick16-clean: 0 breaches, every check passing).
 
+## Rulings (advisor-u4r-build4)
+
+Source: the main folder's .checkpoints/netcode-proof-test/advisor-u4r-build4-full.md (sha256 9d49b484cd3fb0aa...,
+32 lines; holds), read whole at 02:12 UTC; each point's "Builder:" line is mine.
+
+| Point | What | State |
+|---|---|---|
+| 1 (P3-CAP) | option (a): keep tick16d and tick16-clean; no re-run; c-u4r-r2.mjs tick16 expect text replaced word for word; report words (r2 section) | expect text done (02:12); report words below |
+| 2 (CR-ID) | keep the run-time lookup; one assertion in contract.rs's bites-build test block: exactly one npt_room::BITES id outside the PM- form; report's two lines | assertion added (an assertion, not a test: the bites bin count stays 54); c5-r4.log (02:13 UTC): clippy both builds exit 0; `cargo test -p npt-lab --features npt-lab/bites --bin npt-lab contract` 3 passed; fmt 1 hunk (the assertion) applied by Edit, re-checked in the end checks |
+| 3 | both c-u4r-runs.mjs items confirmed as made; change nothing more; keep c-u4r-r2.mjs's b1-nofallback suite | nothing to change |
+| Medium finding | carry 62 (h)'s check as a plain check, not setup: the main session's (marks.json, after the merge) | none of mine |
+
+- **Point 1's report words (r2 section):** the tick16 bite run at ruling 3's setting: ticks_below_wrap 885, the wrap at
+  measured tick 585; run valid (PM-0001-2's everyone-in-view share 1.0, 600 of 600 measured ticks); -17's bite shown
+  by decoded_hash_mismatch_count 2,880 (60 orphans per client); 0 mirror breaches; contract PASS. after_capped false,
+  because at 65,596 (wrap + 60) the room's 48 overflow resyncs sent full states, after which every measured tick was
+  resolved (the 15 post-wrap measured ticks lost: measured incomplete 720), so the run ended by carry 62 (e)'s normal
+  path 46 ticks into the after phase, below the 150-tick cap; 1,488 after-phase client-ticks (48 x 31) were decided
+  lost at the stop. Flag segments: 48 from 64,652 to 65,566, 0 from 65,567 to 65,595, 48 at 65,596. The clean partner:
+  900 ticks, 0 after; PM-0001-2 11 of 11 pass; -17 0 mismatches; -57 6,981, 2,750, 88,044; 0 breaches; it shows ruling
+  3, point 7 (b) across the wrap. The cap path is shown by tick16b and tick16c (after_capped true, 150 after-phase
+  ticks).
+- **Point 2's report lines:** (1) the exemption is applied only by a bites-build contract, the one build that can make
+  that run; both run scripts run each suite's contract with its own build, and a measured-build contract fails an
+  owner-to-all run's breaches and names the bite. (2) r4's owner-to-all runs are unit tests, and no script runs
+  contract over them.
+- **Point 3's report line:** c-u4r-runs.mjs's two changes, each with its source: the judged tick16 bite run's
+  tick_start 65,551 - (warm-up + measured ticks) = 47,251 (ruling 3, point 3); no -18 bite run in the B1 set (ruling 3,
+  point 1).
+
+### r5: the runner's measured ticks per second, and 7.3's estimate redone (done; .gate/u4r/c5-r5.log, -x -k, 02:14:31-02:21 UTC)
+
+- Before: df 4.8G, up 55 min, load 0.24. One exclusive call: `cargo build --release --locked -p npt-lab` (the measured
+  build), then 15 runs, each `bash -c "time <shared-target>/release/npt-lab scenario --run r5-<scene>-<p>-s<n> --set
+  u4r-r5 --date 2026-11-14 --commit 2fbec77... --out .gate/u4r/r5/<scene>-<p>-s<n> --scene <SS|ES> --profile <p> --seed
+  <n> [--tick-start 63736] --warmup-s 10 --measured-s 50 --marks <...> --suite r5"`: SS with the judged runs' marks
+  (PM-0001-2,PM-0001-17,PM-0001-57, and PM-0001-18 on B1: so -57's series are written, as in the judged runs; B1 with
+  its defaults, 10 bursts every 60 s from 30 s, so one burst falls in the window), ES P3 (the recording's scene and
+  profile) with PM-0001-2 and logs on (its recording is made with --logs 0, so its R here is a lower bound). Every
+  command exit 0 (16). R = ticks run / the `time` real seconds (the wall time around the npt-lab process; npt-lab reads
+  no clock). Label: tree 2fbec77 plus the uncommitted U4r changes.
+
+| Scene, profile | Seed 1 | Seed 2 | Seed 3 | Slowest kept (ticks per second) |
+|---|---|---|---|---|
+| SS P0 | 1,800 ticks / 22.61 s = 79.6 | 86.5 | 89.6 | **79.6** |
+| SS P2 | 1,833 / 29.04 s = 63.1 | 64.5 | 64.7 | **63.1** |
+| SS P3 | 1,835 / 30.52 s = 60.1 | 65.0 | 65.4 | **60.1** |
+| SS B1 | 1,833 / 27.32 s = 67.1 | 67.5 | 68.6 | **67.1** |
+| ES P3 | 1,835 / 11.36 s = 161.6 | 164.5 | 162.8 | **161.6** |
+
+- **7.3's estimate redone** (python print only; each judged run 300 + 18,000 + about 35 after-phase ticks; the set as
+  the rulings shape it: no -18 bite run, ruling 3 point 1):
+
+| Item | Runs | Wall s at the slowest R |
+|---|---|---|
+| -17 measured (also -57's), P0 x 3 seeds | 3 | 691.0 |
+| P2 x 3 | 3 | 871.7 |
+| P3 x 3 | 3 | 915.2 |
+| B1 x 3 | 3 | 819.7 |
+| -17's bites (tick16, client-rounding) and -57's (pos-4cm, yaw-12bit, pitch-8bit), P0 | 5 | 1,151.7 |
+| -30 pre-check's recording (SS P0 seed 4, 9,000 ticks, --logs 0), at P0's R | 1 | 113.1 (upper bound) |
+| -30 pre-check, 3 pairs x 2 legs x 9,000 ticks, at P0's R | 6 legs | 678.4 (upper bound: a replay leg runs no bots, no mirror, no log) |
+| **Total** | | **5,240.9 s = 87.3 min = 1.46 h** |
+
+  Plus the builds (two npt-lab, one npt-judge) and the judge's passes, not measured here; plus 230.3 s if
+  PM-0001-17/whole-as-lost joins -17's bites in marks.json (ruling 1 point 4; the main session's). The det recordings
+  are det-u4.mjs's (190.9 s non-cargo, copy 4), not this set's. Simulated time: 17 judged runs x 610 s = 10,370 s plus
+  the pre-check's 7 x 300 s. Against 7.3's table: at R = 60-80 the brief's "R = 90: about 1.3 h" row is the nearest;
+  measured, about 1.5 h. The main session measures R again in the main folder before the set (D4).
+- .gate/u4r/r5/ holds 320 MB; df after 4.5G.
+
 ## Copy 5: state and what is next (a fresh copy resumes here)
 
 - **Updated 02:08 UTC, after the coordinator's four items (all done):** point 8 (A)'s two runs (as expected), the two
