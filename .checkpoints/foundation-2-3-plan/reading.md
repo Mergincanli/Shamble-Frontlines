@@ -183,3 +183,32 @@ cannot start (Chromium build mismatch); 4 the advisor-tool moment 5 is easy to m
   4d21c1a, mergeable_state "dirty" (behind 4460ef5 and conflicting), 820 files, 684 commits. Its result (L1) is not
   near. Its own rules: never push to its branch, never touch spikes/. Its Safari workflow is planned as a separate
   `.github/` PR (W-PR) asking Mustafa.
+
+## B13 the three facts the advisor tool asked to settle (2026-11-14 ~11:05-11:25 UTC)
+- F-HOOK (a claude-code-guide agent's reading of https://code.claude.com/docs/en/hooks, 2026-11-14; its quotes, not
+  re-fetched by the session; auto mode flagged the report ("Undermining Oversight": it quotes mode names), used as data):
+  `permission_mode` is a common input field ("Not all events receive this field"); the PreToolUse and
+  PermissionRequest examples carry it; values "default", "plan", "acceptEdits", "auto", "dontAsk", "bypassPermissions";
+  "The mode labeled **Manual** arrives as "default"". On asks: "In auto mode, a PreToolUse hook's "ask" normally sends
+  the tool call to the permission prompt, and the classifier doesn't decide it." For calls Claude Code's own checks
+  flag (protected-path writes, commands outside the sandbox): "The classifier can deny one of these calls before any
+  prompt appears. If it approves, the call normally still goes to the prompt." So AUTO-ASK's K1 record (answered in six
+  seconds, by whom unknown) is not explained by the docs; a guard check on `permission_mode` is buildable (G-3), and
+  must fail closed on a missing field. L13 (the ask in a cloud day session and in bypassPermissions) is the same
+  family: G-3 covers bypassPermissions and dontAsk too.
+- F-FLOAT (the session, from the repo): the sim core spike decides R1-DET-OQ10 ("Does Wasm's sqrt instruction ...
+  match IEEE squareRoot exactly? ... Decided by REC2's unit vectors"), and `sqrt` is on ADR 0004 part 7's allow-list
+  (0004 :262-264); part 7 also lets `rem_euclid`/`div_euclid` join only after PM-0004-22's extended vectors, and marks
+  `copysign` "proposed". So the float ban (the allow-list's complement) needs the sim core spike's result: it joins
+  later. The hash-map ban (part 9) and the clock bans (part 7 of ADR 0002: std's clock panics on wasm32; ticks replay)
+  rest on no open question: built now.
+- F-PR (a web-fetch agent's reading of GitHub's docs, 2026-11-14; its verbatim quotes, not re-fetched by the
+  session): events-that-trigger-workflows, `pull_request`: GITHUB_SHA "Last merge commit on the `GITHUB_REF` branch",
+  GITHUB_REF "PR merge branch `refs/pull/PULL_REQUEST_NUMBER/merge`"; workflows page: "Each workflow run will use the
+  version of the workflow that is present in the associated commit SHA or Git ref of the event." So a pull_request run
+  uses the workflow of the merge commit (the PR head merged into main). Conflicts: "Workflows will not run on
+  `pull_request` activity if the pull request has a merge conflict." "The merge conflict must be resolved first."
+  Rulesets binding a required check to a source app: not found for rulesets (about-protected-branches documents it
+  for branch protection rules: "you can select an app that has recently set this check as the expected source of
+  status updates"). So: #40 (dirty) gets no pull_request runs until it merges main; its push runs use its branch's
+  workflows (gate.yml, toolchain.yml) until it takes main's new workflow.
