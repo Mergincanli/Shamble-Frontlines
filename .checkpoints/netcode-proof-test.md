@@ -41,6 +41,11 @@ the spike branch, M1 to M9, as its steps 2-10 say.**
   pre-check set (16), the judged sets P3, B1, P2, then P0 (17).
 - **COMPACT-WAIT:** /compact was asked at about 13:27; this block is the refresh; work carries on. The 20-minute
   reminder fired at 13:47 with no /compact typed: the card was already current (2494918, 13:45); carried on.
+- **U4r IS MERGED into the spike branch at 71ee13d** (pushed about 14:10 UTC; CI gate run 43603457356 and toolchain
+  run 43603457370 started on it). The saver restarted as **b02nlg0ph** (about 14:11). **Then, in order:** CI green;
+  the advisor's review of the pushed head 71ee13d (a workflow agent; it writes advisor notes, so it runs BEFORE the r2
+  record run, which allows no agent writing in the main folder); then step 11's r2 record run under INF-R2-1's
+  interim rule; copy 6's worktree kept until U4r-F1's evidence is in.
 - **The merge at about 14:12 UTC: M1 to M7 PASS; M8 is the commit carrying this card.** M5 (.gate/u4r-merge/m5.log,
   13:44:35-14:06:39, exit 0): uptime first (up 3:09, load 0.27); check.mjs all 11 steps, 531/609 0 failed, self 77,
   marks 81, redact 0, wasm 43.5 s as expected; det-u4 PASS, non-cargo 227.2 s (≤ 240); SS-P0-s4 regenerated, sha256
