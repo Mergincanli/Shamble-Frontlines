@@ -3968,6 +3968,17 @@
             "every S30"
           ],
           "setup": true
+        },
+        {
+          "name": "L1 P0 loses no group (no client-tick left incomplete)",
+          "series": "tick.s.snap_incomplete",
+          "stat": "sum",
+          "window": "measured",
+          "op": "==",
+          "value": 0,
+          "parts": [
+            "L1 P0"
+          ]
         }
       ],
       "report": [
@@ -3994,6 +4005,10 @@
         {
           "id": "PM-0001-17/client-rounding",
           "what": "a client quantiser that rounds differently from the server's"
+        },
+        {
+          "id": "PM-0001-17/whole-as-lost",
+          "what": "a client writer that files a tick it decoded whole as lost: null and incomplete 1"
         }
       ],
       "stand_in": false,

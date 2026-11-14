@@ -54,6 +54,17 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   push (crates unchanged since e59ece9); then the c62h record (r2's judge, --only PM-0001-17, on r2's whole-as-lost and
   tick16 folders, into .gate/netcode-proof-test/c62h-<commit12>/: both bites shown, never INVALID); then the card and
   u4r-report.md's r2 section with MRG-L1 to -L3; then U4r-F1 (RUN-L1 rides it).
+- **Carry 62 (h)'s edit: check.mjs PASSED on it** (.gate/u4r-merge/c62h-check.log, 15:59:43-16:14:08, uptime first:
+  up 5:24, load 0.16; all 11 steps; 531 and 609, 0 failed; marks 81, ADR rows unchanged); committed in the commit that
+  carries this line; next the c62h record (the r2-run ruling's step 5). Its details, as made (about 16:02 UTC): marks.json +15 lines exactly
+  (PM-0001-17's checks gain the "L1 P0 loses no group" check; its bites gain PM-0001-17/whole-as-lost; nothing else);
+  u4-build-plan.md §11 gains the readings-PR lines (the r2-run ruling's step 2, and build ruling 3's main-session item
+  4, both in the advisor's words, at this plan edit). Build ruling 3 item 3's plan changes (§5's U4r judged-runs line
+  and U4g's "Marks moved" line) still wait for a plan edit that drafts them. `npt-judge --check-marks` with r2's binary
+  (65acacfe…): 81 marks read and checked, exit 0. **check.mjs runs** as background shell **bjxitnatx** (main-run.sh,
+  log .gate/u4r-merge/c62h-check.log). **The saver is stopped** (since about 16:03) so marks.json, the plan's lines
+  and this card land in one commit; restart it after the push. **If cut:** the edits stay in the tree; re-run check.mjs
+  whole (a cut is not a failure); a FAIL goes to the advisor whole, never retried.
 - **COMPACT-WAIT:** asked again at about 15:33; the reminder fired at 15:54 with no /compact typed; the card was
   current (3712306), the saver runs (boscgjicj); carried on.
 - **The advisor's ruling on r2 runs:** workflow **wf_ec319c2d-f45** (task wvtrfj4a9; agent advisor-u4r-r2run, notes
