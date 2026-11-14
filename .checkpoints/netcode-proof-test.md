@@ -115,6 +115,14 @@ bytes and the judge's peak (over 10 GiB: P0 does not start; plan the smallest ch
   APPROVE and CI is green: (B), then (C) only if free space is below R (9,218.6 MiB), with df before and after each,
   then P0 by the run procedure. P0 is a split set: two judge lines, verdict-bites.json, and INF-F2-1's stop order.
   - The harness's NOTES path now points at .gate/u4r-f2/scratch/ (INF-F2-3's second half; scratch, not tracked).
+- **THE CLEANS FOR R ARE DONE (the sets ruling's Q3 (B) and (C), with no lane running; one main-run.sh call each,
+  lock exclusive, test guards all exit 0):**
+  - **(B)** (21:17:37-21:17:39 UTC; .gate/u4r-sets/clean-shared-B.log): the shared target's release, doc and wasm32
+    roots (296.1 + 21.1 + 37.3 + 130.3 + 11.9 MiB removed). **df: 8,138 to 8,618 MiB**, still below R (9,218.6).
+  - **(C)** (about 21:18 UTC; .gate/u4r-sets/clean-shared-C.log): the shared target's dev profile, 37,190 files,
+    "9.0GiB total". **df: 8,618 to 16,492 MiB.** The lock's file and both tags stay (`ls -A`).
+  - **R is met** with about 7.1 GiB to spare. The next check.mjs run rebuilds the shared target cold and refills it,
+    so these cleans only lend space for P0, as the ruling says.
 - **R at P0's start = 4,096 + 1.504 x 3,073.3 + 500 = 9,218.6 MiB.** Free space is 8,147 MiB, so (B) (about 480
   MiB) and then (C) (7.7 GiB) are needed, done right before P0 with df on the card.
 - **The evidence agent runs:** workflow **wf_ada59e1b-2f4** (task wmg28j1r6; Opus at high effort; notes
