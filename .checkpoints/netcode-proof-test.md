@@ -48,10 +48,24 @@ then the judged sets P3, B1, P2 and P0.**
     the judge.
   - **The limit:** RUN_LIMIT_MS is 10.1 times the longest judged run (355.4 s).
   - **Disk:** 320 MiB of logs; free space 10,267 MiB after D4.
-- **NEXT: the pre-check set, by the run procedure below:** `mkdir -p .gate/u4r-sets`, then `python3 -I
-  .checkpoints/netcode-proof-test/peak.py flock -x .gate/shared-target/.lane.lock node
-  spikes/netcode-proof/ops/runs/c-u4r-runs.mjs precheck --date 2026-11-14 > .gate/u4r-sets/precheck-<commit12>.log 2>&1`
-  in the background. Before it: this card committed and pushed, pgrep empty, and HEAD's tree clean.
+- **THE PRE-CHECK SET IS DONE (17:51-18:02 UTC, exit 0), and every result is as expected.** runs.txt is committed at
+  **d666aeb** (results/u4r-precheck-30/faf42aeb034c/runs.txt; kept log .gate/u4r-sets/precheck-faf42aeb034c.log).
+  - The recording refused 0 rewinds, and its sha256 6933b56a… equals the manifest's.
+  - clean PASS; wallclock FAIL; late-command VOID with the whole line "result: VOID (L1 late_count 1)".
+  - Condition 5 is met (Fresh and Compiling npt-* lines on the main folder's crates).
+  - peak.py: 684.7 s, 538.1 MiB. redact-check: 278 items, 0 findings.
+  - The report's item 6 is filled. Nothing goes to the advisor.
+- **NEXT: the judged sets, one at a time, by the run procedure below: P3, then B1, P2 and P0.** Each runs as `python3
+  -I .checkpoints/netcode-proof-test/peak.py flock -x .gate/shared-target/.lane.lock node
+  spikes/netcode-proof/ops/runs/c-u4r-runs.mjs judged --profile <P> --date 2026-11-14 >
+  .gate/u4r-sets/<P>-<commit12>.log 2>&1`, in the background.
+  - **Before each set:** this card committed and pushed, pgrep empty, and HEAD's tree clean.
+  - **After each set:** commit results/u4r/<commit12>/<P>/, fill the report's item 7 and the card, then save.
+  - **Before P0:** the judge measured apart on one measured run's logs (wall time and peak memory) and the P0
+    projection; over 10 GiB goes to the advisor. RUN_LIMIT_MS re-checked against the judge's time.
+  - **Any run flagged for overflow resyncs** goes to the advisor before it counts (P0's tick16 bite run: about 48
+    expected).
+  - **B1's -17 and -18 verdicts** are INVALID by design: recorded, never counted.
 - **Session notes:**
   - Mustafa typed /compact at about 17:32 UTC. The chat resumed from this card.
   - A fourth folder slip at about 17:34: a `cd` into the notes folder inside a compound command. I went back at once.

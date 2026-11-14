@@ -343,7 +343,21 @@ advisor-u4r-r2-full.md:32).
    - **What stays:** the shared target, check.mjs's warm cache.
    - **The projection with the clean:** about 5,090 MiB free after P0, so P0 fits without going to Mustafa.
 6. **The pre-check set** after F1 and D4; the late-command pair counts only on 'result: VOID (L1 late_count 1)' (:22).
-   Pending.
+   **Done** (17:51-18:02 UTC, exit 0). Committed at d666aeb: results/u4r-precheck-30/faf42aeb034c/runs.txt, 345 lines.
+   Kept log: .gate/u4r-sets/precheck-faf42aeb034c.log.
+   - **The recording** SS-P0-s4 (9,000 ticks, wall 127.5 s) refused 0 rewinds. Its sha256 is 6933b56a…, the
+     manifest's.
+   - **The three pairs, all as expected; nothing goes to the advisor:**
+     - clean: PASS, every World hash equal over 9,000 ticks (192.8 s);
+     - wallclock: FAIL, as its bite expects: the first differing index is 3, and 8,997 of 9,000 differ (177.4 s);
+     - late-command: VOID, with the whole line "result: VOID (L1 late_count 1)" (174.8 s).
+   - **Condition 5 is met:** the measured build's Fresh npt-* lines and the bites build's Compiling and Fresh lines
+     all name /home/user/Shamble-Frontlines/spikes/netcode-proof/crates/….
+   - **Time and memory (peak.py):** wall 684.7 s, against D4's upper bound of about 905 s of runs at P0's R. Peak
+     resident memory 538.1 MiB, the largest single process (a build's rustc or npt-lab).
+   - **redact-check** on the spike folder with runs.txt: 278 items, 0 findings
+     (.gate/u4r-sets/redact-precheck-faf42aeb034c.log).
+   - **Raw logs:** 17 MiB, in .gate/netcode-proof-test/runs/u4r-precheck-30-faf42aeb034c/.
 7. **The judged sets, one at a time: P3, then B1, then P2, then P0 last**; peak memory by getrusage (no /usr/bin/time
    here); B1's -17 and -18 INVALID, recorded and never counted; every run flagged for overflow resyncs to the advisor
    before it counts (P0's tick16 bite run expected, about 48); P0's judge memory projected first, over 10 GiB to the
