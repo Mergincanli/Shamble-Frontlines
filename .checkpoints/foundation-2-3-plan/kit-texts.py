@@ -14,7 +14,8 @@ def show(path):
     return r.stdout.split('\n')
 
 FILES = {p: show(p) for p in ['CLAUDE.md', '.claude/agents/advisor.md', '.claude/agents/netcode-architect.md',
-                             '.claude/CHECKPOINTS.md', 'docs/DECISIONS.md']}
+                             '.claude/CHECKPOINTS.md', 'docs/DECISIONS.md', '.claude/agents/verifier.md',
+                             '.claude/skills/gate/SKILL.md']}
 DEC = FILES['docs/DECISIONS.md']
 
 def lines(path, a, b, expect):
@@ -217,6 +218,59 @@ for kid, path, n, expect, reps in REQ:
         after = after.replace(a, b)
     item(kid, 'CS-F', path, n, n, expect, [after], 'Same strength: `required` fails unless gate, smoke and every gate v2 '
          'job succeeded; re-wraps when written.')
+
+# K-14 (CS-B): the agents' paste block learns the shell forms the guard refuses (PROMPTS-2.3's route; his words of
+# 2026-11-11, 16:54:54 UTC, asked this for 2.1a's briefs; standing here)
+FILES['.claude/CHECKPOINTS.md']  # loaded above
+item('K-14', 'CS-B', '.claude/CHECKPOINTS.md', 128, 128, '  from your notes alone, opening no other file.',
+     ['  from your notes alone, opening no other file. Never commit or push. Write files with the Write or Edit tool, or',
+      '  with one plain command whose target is a literal path: the guard refuses `git -C`, a write after `cd`, and a',
+      '  write to a path held in a variable or built in a loop.'],
+     'Stricter-neutral guidance (fewer refusals); the paste block re-wraps when written.')
+
+# K-6b (CS-D, only with G-3): step 3 says the guard refuses kit and gate edits in Auto mode
+item('K-6b', 'CS-D', 'CLAUDE.md', 71, 73, '   (in auto mode',
+     wrap('(in Auto mode the guard refuses a kit or gate edit outright, and Claude Code\'s own classifier may refuse a '
+          '`.claude/` edit before the prompt: switch the chat to Accept edits first, the mode a cloud session offers '
+          'besides Plan and Auto, or use a CLI\'s Manual mode, which hooks see as `default`); agents and teammates may '
+          'not edit them. The ask is a seatbelt, not the wall: the PR review and Mustafa\'s go are the wall.',
+          '   ', '   '),
+     'Wording for G-3 (CS-D); replaces K-6 once G-3 is built. Stricter (the guard refuses where it asked).')
+
+# K-11 (CS-D): the protected-file and gate-file lists name the gate v2's folder and, by PIN-SCOPE (b), the pins and configs
+item('K-11a', 'CS-D', 'CLAUDE.md', 68, 69, '   (the guard\'s protected files',
+     wrap('(the guard\'s protected files: `.claude/` except agent memory, every `CLAUDE.md`, `CLAUDE.local.md` and '
+          '`AGENTS.md`, `.github/`, `tools/gate.mjs` and the other gate files, the gate v2\'s folder `tools/gate-v2/`, '
+          'and the v2 pins and gate configs at the root: `rust-toolchain.toml`, `Cargo.toml`, `deny.toml`, '
+          '`rustfmt.toml`, `tsconfig.base.json`, `eslint.config.mjs`, `.prettierrc.json`, `.prettierignore`, and each '
+          'crate\'s `clippy.toml`) made with a file tool or a shell write asks Mustafa first, in', '   ', '   '),
+     'Stricter (more protected paths); the list follows GATE-PATH (a) and PIN-SCOPE (b); re-wraps when written.')
+item('K-11b', 'CS-D', '.claude/agents/advisor.md', 164, 166, '     the approved SHA. That green stands only',
+     wrap('the approved SHA. That green stands only when the PR touches neither `.github/` nor the gate\'s own files '
+          '(`tools/gate.mjs`, `smoke.mjs`, `battery.js`, `gate-globals.json`, `package*.json`, `npm-shrinkwrap.json`, '
+          'any `.npmrc`; the gate v2\'s folder `tools/gate-v2/`; the v2 pins and gate configs the guard protects) — '
+          'otherwise CI', '     ', '     '),
+     'Stricter (more files make the PR Advisor\'s CI green insufficient); re-wraps when written.')
+
+# K-13 (CS-F): the lines that name the gate's command learn the gate v2 for v2 code
+item('K-13a', 'CS-F', 'CLAUDE.md', 74, 75, '4. Gate: `/gate` must PASS',
+     wrap('4. Gate: `/gate` must PASS (syntax, concatenation, symbol conservation, player-build resolvability, and check '
+          '5: smoke, names, layering, script order), and for v2 code (`crates/`, `packages/`, the root pins) the gate '
+          'v2, `node tools/gate-v2/gate.mjs`, must PASS too, plus evidence:', '', '   '),
+     'Stricter (a second gate for v2 code).')
+item('K-13b', 'CS-F', 'CLAUDE.md', 238, 239, '- Gate: `node tools/gate.mjs',
+     FILES['CLAUDE.md'][237:239] + wrap('- Gate v2 (v2 code): `node tools/gate-v2/gate.mjs [baseRef] [--allow-removed a,b] [--quick] '
+          '[--prove] [--only G1,G2] [--json]` (checks G0-G13 as built; exits 0, 1 or 2; CI runs it inside the required '
+          'check `required`)', '', '  '),
+     'A new command line beside the legacy gate\'s.')
+item('K-13c', 'CS-F', '.claude/agents/verifier.md', 21, 21, '   (This is the legacy gate;',
+     ['   (This is the legacy gate. For v2 code also run the gate v2, `node tools/gate-v2/gate.mjs <baseRef>`, and its',
+      '   `--prove` when the change touches the gate, its checks or its configs.)'],
+     'Stricter (the verifier runs the gate v2 for v2 code).')
+item('K-13d', 'CS-F', '.claude/skills/gate/SKILL.md', 6, 6, 'Run `node tools/gate.mjs',
+     ['Run `node tools/gate.mjs $ARGUMENTS` and read the whole output. When the change touches v2 code (`crates/`,',
+      '`packages/`, the root pins), also run `node tools/gate-v2/gate.mjs $ARGUMENTS` and read its whole output.'],
+     'Stricter (the skill runs both gates for v2 code).')
 
 md = ['# Kit texts for the step-2.3 plan (generated by kit-texts.py from main 4460ef5; his words checked against '
       'docs/DECISIONS.md)', '',

@@ -7,7 +7,7 @@
   process only what a record shows, with its time. · plan: `.checkpoints/foundation-2-3-plan/plan.md` (to write)
 - **Branch:** claude/sweet-mayer-grsukw (stands in for cs/foundation-2-3-plan; restarted from main by fast-forward
   bfd719b..4460ef5, pushed) · **Base:** main 4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-14 12:40 Amsterdam
+- **Last update:** 2026-11-14 12:21 Amsterdam
 
 ## Steps done
 1. Orientation: the session's model read from get_session (session_context.model and last_served_model:
@@ -42,7 +42,7 @@
   (Mustafa, 2026-11-14, his message starting the plan).
 
 ## Advisor-tool consultations (one line each)
-1. 2026-11-14 ~11:00 UTC (12:00 Amsterdam), moment 1, after the reading notes and approach.md: is the approach (the
+1. 2026-11-14 11:00:19 UTC (12:00 Amsterdam; the transcript), moment 1, after the reading notes and approach.md: is the approach (the
    cut, the order, the needs-result reading, who decides what) right, and what is missing? Changed: a mark counts as
    met only when every clause holds, X named with its trigger; item 9 gets the exact-text mechanism (patch at a
    checkpoint SHA, his yes naming it, byte check) and prompt counts per CS; PIN-GUARD's scope becomes his decision, the
@@ -54,7 +54,7 @@
    part 7's allow-list); the summary says each CS gets its own plan and plan review.
 
 ## Refusals (guard, deny list, classifier)
-- ~11:25 UTC: auto mode flagged the claude-code-guide agent's hand-back ("Undermining Oversight"); the report quoted
+- 11:06:47 UTC (the transcript): auto mode flagged the claude-code-guide agent's hand-back ("Undermining Oversight"); the report quoted
   the hooks page's permission-mode names; the agent only read that page (9 tool uses). Route: its report used as data,
   its quotes marked as the agent's reading, not re-fetched; the guard CS re-reads the page before building G-3.
 

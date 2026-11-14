@@ -184,7 +184,8 @@ cannot start (Chromium build mismatch); 4 the advisor-tool moment 5 is easy to m
   near. Its own rules: never push to its branch, never touch spikes/. Its Safari workflow is planned as a separate
   `.github/` PR (W-PR) asking Mustafa.
 
-## B13 the three facts the advisor tool asked to settle (2026-11-14 ~11:05-11:25 UTC)
+## B13 the three facts the advisor tool asked to settle (agents launched 11:03:18 and 11:03:24 UTC; hand-backs
+11:06:47 and 11:10:42 UTC, the transcript)
 - F-HOOK (a claude-code-guide agent's reading of https://code.claude.com/docs/en/hooks, 2026-11-14; its quotes, not
   re-fetched by the session; auto mode flagged the report ("Undermining Oversight": it quotes mode names), used as data):
   `permission_mode` is a common input field ("Not all events receive this field"); the PreToolUse and

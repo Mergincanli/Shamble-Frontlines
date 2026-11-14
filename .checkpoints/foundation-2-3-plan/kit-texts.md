@@ -379,3 +379,140 @@ After:
 
 Same strength: `required` fails unless gate, smoke and every gate v2 job succeeded; re-wraps when written.
 
+## K-14 (CS-B): `.claude/CHECKPOINTS.md` lines 128-128 on 4460ef5
+
+Before:
+```
+  from your notes alone, opening no other file. Never commit or push.
+```
+
+After:
+```
+  from your notes alone, opening no other file. Never commit or push. Write files with the Write or Edit tool, or
+  with one plain command whose target is a literal path: the guard refuses `git -C`, a write after `cd`, and a
+  write to a path held in a variable or built in a loop.
+```
+
+Stricter-neutral guidance (fewer refusals); the paste block re-wraps when written.
+
+## K-6b (CS-D): `CLAUDE.md` lines 71-73 on 4460ef5
+
+Before:
+```
+   (in auto mode, Claude Code's own classifier may refuse a `.claude/` edit before the prompt; make that edit in Accept
+   edits or Manual mode); agents and teammates may not edit them. The ask is a seatbelt, not the wall: the PR review
+   and Mustafa's go are the wall.
+```
+
+After:
+```
+   (in Auto mode the guard refuses a kit or gate edit outright, and Claude Code's own classifier may refuse a `.claude/`
+   edit before the prompt: switch the chat to Accept edits first, the mode a cloud session offers besides Plan and Auto,
+   or use a CLI's Manual mode, which hooks see as `default`); agents and teammates may not edit them. The ask is a
+   seatbelt, not the wall: the PR review and Mustafa's go are the wall.
+```
+
+Wording for G-3 (CS-D); replaces K-6 once G-3 is built. Stricter (the guard refuses where it asked).
+
+## K-11a (CS-D): `CLAUDE.md` lines 68-69 on 4460ef5
+
+Before:
+```
+   (the guard's protected files: `.claude/` except agent memory, every `CLAUDE.md`, `CLAUDE.local.md` and `AGENTS.md`,
+   `.github/`, `tools/gate.mjs` and the other gate files) made with a file tool or a shell write asks Mustafa first, in
+```
+
+After:
+```
+   (the guard's protected files: `.claude/` except agent memory, every `CLAUDE.md`, `CLAUDE.local.md` and `AGENTS.md`,
+   `.github/`, `tools/gate.mjs` and the other gate files, the gate v2's folder `tools/gate-v2/`, and the v2 pins and
+   gate configs at the root: `rust-toolchain.toml`, `Cargo.toml`, `deny.toml`, `rustfmt.toml`, `tsconfig.base.json`,
+   `eslint.config.mjs`, `.prettierrc.json`, `.prettierignore`, and each crate's `clippy.toml`) made with a file tool or
+   a shell write asks Mustafa first, in
+```
+
+Stricter (more protected paths); the list follows GATE-PATH (a) and PIN-SCOPE (b); re-wraps when written.
+
+## K-11b (CS-D): `.claude/agents/advisor.md` lines 164-166 on 4460ef5
+
+Before:
+```
+     the approved SHA. That green stands only when the PR touches neither `.github/` nor the gate's own files
+     (`tools/gate.mjs`, `smoke.mjs`, `battery.js`, `gate-globals.json`, `package*.json`, `npm-shrinkwrap.json`, any
+     `.npmrc`) — otherwise CI
+```
+
+After:
+```
+     the approved SHA. That green stands only when the PR touches neither `.github/` nor the gate's own files
+     (`tools/gate.mjs`, `smoke.mjs`, `battery.js`, `gate-globals.json`, `package*.json`, `npm-shrinkwrap.json`, any
+     `.npmrc`; the gate v2's folder `tools/gate-v2/`; the v2 pins and gate configs the guard protects) — otherwise CI
+```
+
+Stricter (more files make the PR Advisor's CI green insufficient); re-wraps when written.
+
+## K-13a (CS-F): `CLAUDE.md` lines 74-75 on 4460ef5
+
+Before:
+```
+4. Gate: `/gate` must PASS (syntax, concatenation, symbol conservation, player-build resolvability, and check 5: smoke,
+   names, layering, script order), plus evidence:
+```
+
+After:
+```
+4. Gate: `/gate` must PASS (syntax, concatenation, symbol conservation, player-build resolvability, and check 5: smoke,
+   names, layering, script order), and for v2 code (`crates/`, `packages/`, the root pins) the gate v2, `node
+   tools/gate-v2/gate.mjs`, must PASS too, plus evidence:
+```
+
+Stricter (a second gate for v2 code).
+
+## K-13b (CS-F): `CLAUDE.md` lines 238-239 on 4460ef5
+
+Before:
+```
+- Gate: `node tools/gate.mjs [baseRef] [--allow-drop a,b] [--no-smoke]` (checks 1–4 and 5a–5d vs the base ref, default:
+  merge-base with main or origin/main, whichever is newer; CI runs it)
+```
+
+After:
+```
+- Gate: `node tools/gate.mjs [baseRef] [--allow-drop a,b] [--no-smoke]` (checks 1–4 and 5a–5d vs the base ref, default:
+  merge-base with main or origin/main, whichever is newer; CI runs it)
+- Gate v2 (v2 code): `node tools/gate-v2/gate.mjs [baseRef] [--allow-removed a,b] [--quick] [--prove] [--only G1,G2]
+  [--json]` (checks G0-G13 as built; exits 0, 1 or 2; CI runs it inside the required check `required`)
+```
+
+A new command line beside the legacy gate's.
+
+## K-13c (CS-F): `.claude/agents/verifier.md` lines 21-21 on 4460ef5
+
+Before:
+```
+   (This is the legacy gate; the gate v2 arrives in phase 1 and replaces it for v2 code.)
+```
+
+After:
+```
+   (This is the legacy gate. For v2 code also run the gate v2, `node tools/gate-v2/gate.mjs <baseRef>`, and its
+   `--prove` when the change touches the gate, its checks or its configs.)
+```
+
+Stricter (the verifier runs the gate v2 for v2 code).
+
+## K-13d (CS-F): `.claude/skills/gate/SKILL.md` lines 6-6 on 4460ef5
+
+Before:
+```
+Run `node tools/gate.mjs $ARGUMENTS` and read the whole output.
+```
+
+After:
+```
+Run `node tools/gate.mjs $ARGUMENTS` and read the whole output. When the change touches v2 code (`crates/`,
+`packages/`, the root pins), also run `node tools/gate-v2/gate.mjs $ARGUMENTS` and read its whole output.
+```
+
+Stricter (the skill runs both gates for v2 code).
+
