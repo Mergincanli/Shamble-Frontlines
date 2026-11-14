@@ -39,8 +39,26 @@ bytes and the judge's peak (over 10 GiB: P0 does not start; plan the smallest ch
       the branch through the merged patches. Two copies also hold evidence logs as ignored files:
       wf_2c76ec82-8fc-1 (u3d-fix-bite-*.log) and wf_f54246ff-e0d-2 (u4c-fix/*.log).
     - So (A) gave 56 MiB, not the ruling's estimated 710. **Before P0, (B) and then (C) will be needed for R.**
-- **P2 RUNS (started about 18:55 UTC; background task b9eoa0vup; kept log .gate/u4r-sets/P2-ab10f058a828.log).** Its
-  expected lines are in the ruling's next step 4. **If cut:** follow the run procedure's items (6) and (7).
+- **P2 IS DONE (18:55-19:11:54 UTC, exit 0); its results are committed at 1eacb60** (results/u4r/ab10f058a828/P2/;
+  kept log .gate/u4r-sets/P2-ab10f058a828.log; peak.py 1,011.4 s, 2,173.5 MiB; raw logs 816,778,012 B = 778.9 MiB
+  against 628.9 projected, **1.24 times**; redact-check 284 items, 0 findings).
+  - -57 L1 P2: PASS. -2 SS: run s1 passes every check (everyone in view 1.0); runs s2 and s3 fail on everyone in view
+    only (0.5875, 0.7295). **So -17 L1 P2 is INVALID by pre:PM-0001-2** (only s1 valid).
+  - **BRAWL-1's fingerprint, checked** (brawl_fingerprint.py; .gate/u4r-sets/fingerprint-P2-ab10f058a828.log):
+    - onsets at ticks 73,816 (s2) and 76,325 (s3), with every slot holding before;
+    - the others' count folded on (t - 63,736) mod 360 sits at 0 for about 150 to 180 ticks, then climbs to about 45;
+    - overflow resyncs 0; very large units held in 0.9839 and 0.9937 of sets.
+    - **One difference from P3:** the least slot (28 in s2, 33 in s3) holds everyone in view on 795 of 8,220 and 842
+      of 5,711 ticks after the onset. P3's held on 4 to 50 ticks: 50 of 11,700 in s1, by the same script. So it is not
+      strictly "at 0 from the onset".
+    - The INVALID is recorded and never counted either way. **The cause attribution goes to the advisor for
+      confirmation** ("anything else comes to me"), with F2's evidence or its head review. It does not block F2 or P0.
+- **A CONTAINER RESTART between about 19:13 and 20:21 UTC** (uptime 2 min at 20:23:19). The session's message was
+  "This session's worker process was restarted." No spend-limit notice was shown. Nothing was running (P2 was done and
+  no agent was out), and no orphans were found. .gate/ survived; /dev/shm was wiped (the F1 scratch trees went, as
+  LEFTOVER-DELETE expected). The saver restarted as **bxs0uzskj** at about 20:24. P2's results commit 1eacb60 was made
+  just after the restart. **Resumed 20:23 UTC.**
+- **Condition 1 is met** (P2's results committed): **NEXT, U4r-F2's build by Edit, then its evidence and checks.**
 - **U4r-F2's PLAN IS APPROVED WITH CONDITIONS 1-9 (about 19:10 UTC): advisor-u4r-f2-plan-full.md** (72 lines,
   sha256 56ee4aba…, written word for word by u4r_f2_plan_review_full.py). Its three Mediums (F2-1, F2-2, F2-3) were read
   in full, and its conditions answer them.
