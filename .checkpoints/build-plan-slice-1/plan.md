@@ -61,8 +61,12 @@ transcript). This is a plan: nothing is built, and no file outside `.checkpoints
   one; a plan that leaves it comes back to you.
 - **Risk tier.** Every change-set is risk tier 1: game code and tests; change-set 0 is a decision doc. None edits a
   kit, gate or CI file. One file may change that: once the 2.3 chat's guard change protects the root `Cargo.toml`, a
-  change-set that adds a shared dependency line there asks you first and takes the security-auditor's review, which
-  new dependencies get in any case.
+  change-set that adds a shared dependency line there is risk tier 2 for that file: it asks you first with the exact
+  text and takes the security-auditor's review, which new dependencies get in any case.
+- **What is only for development and tests.** The scripted walkers, the fake-lag switch, the bench mode with its
+  "copy report" button, the camera panel's "copy values" button and the zip's small server serve the marks and your
+  checks; none is a feature of the player's game, and each is kept out of the production build. The walkers go when
+  Slice 2's bots come. The ink family you do not pick is removed in the change-set after your pick.
 - **Evidence by kind of change** (CLAUDE.md, protocol step 4): logic by tests on the real code; netcode by
   deterministic tests with injected delay, jitter and loss (L1); performance by numbers with their method; anything
   visible by screenshots that name their backend, then your eyes in Brave.
@@ -98,7 +102,9 @@ transcript). This is a plan: nothing is built, and no file outside `.checkpoints
 Sum: about 28,200 lines and 188 to 199 hours.
 
 **The order and what may move.**
-- 0 runs first (Part 11): the Blender brief waits for it. It is research by an Opus agent and one docs pull request.
+- 0 runs first (Part 11): the Blender brief waits for it. It is research by an Opus agent and one docs pull request,
+  and it needs nothing from your PC: its proof by a real export waits for the first file (Part 11), so it cannot hold
+  change-set 1. It moves the first page by about half a day; decision RULES-WHO offers the other orders.
 - 1, 2, 3 are the foundation's steps 2.4 and 2.5, in the drafts' order. Step 2.5 is cut in two so that the first page
   reaches you one change-set earlier (decision SPLIT-25).
 - 4 to 12 are Slice 1. Two tracks run through them: the simulation (4 Walk, 7 Lag, 8 Shoot, 9 Throw) and the picture
@@ -122,6 +128,8 @@ when and what. No code.
   table; ts-rs for the message types, its derives kept out of shipped builds; an export test per crate that
   regenerates into a scratch folder and fails on any difference from the committed files.
 - TypeScript: the generated files, committed; the layout-hash check the page runs at startup, with its own test.
+- The mark's own planted defects are run once here and shown in the report: a Rust field renamed without
+  regenerating fails, a generated file edited by hand fails, and regenerating after the rename passes.
 - Not here: wasm-bindgen's own `.d.ts` (build output, arrives with the bindings in 2); content's schema and types
   (arrive with the `content` crate in 4).
 - One departure from the draft's wording: ADR 0002 sets ts-rs's output folder in a root `.cargo/config.toml`; while
@@ -138,10 +146,13 @@ when and what. No code.
   frame time, errors, the build's commit), the layout-hash check, the newest input posted once per drawn frame; the
   measurement harness's CPU side (frame times, the renderer's counters, labelled run sets); `e2e`: a Playwright run on
   the built client.
+- The zip's small server (Part 8) is built and reviewed here: one file in the `client` package, Node's built-in
+  modules only, bound to this computer alone (127.0.0.1), serving only the files of its own folder.
 - Measured here: zero Wasm calls by the page; one block per tick; the backend named; a first reading of the hand-off
   with the block filled to the size of 12 and of 48 soldiers; a first reading of the Worker's pacing; the size of the
   Wasm file; what a double-click on the built page does in each browser (the editor's open question, first result).
-- Reviewers: engine-architect, graphics-engineer, rust-reviewer; then perf-auditor, security-auditor, test-engineer.
+- Reviewers: engine-architect, graphics-engineer, rust-reviewer; then perf-auditor, security-auditor (the new
+  dependencies, the page's text, the small server), test-engineer.
 
 **3. The loop closes (step 2.5, second half).** The real messages over the loopback, and the first recording.
 - Rust: `protocol`'s codec (decoders that return errors and never panic) and the thin transport interface with its
@@ -155,8 +166,10 @@ when and what. No code.
   the first 10,000 outputs of each random stream, bit for bit natively and in WebAssembly; a scan test in the `sim`
   crate that fails on a hash map, a clock call or a float method outside the allow-list (decision GATE-FOLLOW).
 - A small separate test, kept because the game builds only one of the two: the Worker with two Wasm instances beside
-  the one-instance layout (calls, time, memory, and whether a trap in the client endpoint leaves the authority
-  running).
+  the one-instance layout. Here it shows whether a trap in the client endpoint leaves the authority running; its
+  counts, times and memory at 12 and 48 soldiers follow in change-set 5, where soldiers exist.
+- If this change-set nears twice its size, the two-instance test and the table of build options move to a follow-up
+  of their own first.
 - Reviewers: netcode-architect, engine-architect, rust-reviewer; then test-engineer, security-auditor.
 
 **4. Walk.** Slice 1 begins: the first playable build, with your camera panel.
@@ -174,8 +187,12 @@ when and what. No code.
   camera at legacy's framing, and **the live camera tuning panel** (Part 5).
 - The yard is built from the marks' own fixtures, so the tests and the play share one scene: a step of 0.55 m and one
   of 0.56 m, ledges and platforms with ramps, thin walls, a lane with range posts.
+- Two rules must start somewhere before their design questions are answered: the jump's reach and what happens when
+  two soldiers meet (decision START-RULES).
 - Measured here: identical hashes natively, in Node and in Chromium on a movement recording; movement against its data
   (step, apex, no tunnelling); the collision tree byte for byte; ids over random spawns; even motion on your display.
+- If this change-set nears twice its size, the far-corner test map and the size comparison against other libraries
+  move out first; the camera panel stays.
 - Reviewers: rust-reviewer, engine-architect, netcode-architect; then graphics-engineer, test-engineer,
   security-auditor; then game-designer, perf-auditor.
 
@@ -184,8 +201,9 @@ when and what. No code.
   bots replace them). A switch sets 24, 36 or 48 walkers.
 - A bench mode in the page runs the hand-off marks and shows a table to copy: the page's frame cost with and without
   the simulation, the block's delay, allocations, the press-to-tick delay, the simulation's step time in the Worker.
-- Two small separate tests ride here, because the game builds one of each pair: the block's two layouts (per entity
-  against per field) and the shared ring against the transferred block.
+- Three small separate tests ride here, because the game builds one of each pair: the block's two layouts (per
+  entity against per field), the shared ring against the transferred block, and the two-instance Worker of
+  change-set 3 at 12 and 48 soldiers. Each is kept as a build you can run later on the named machines (Part 3.2).
 - Reviewers: engine-architect, perf-auditor, test-engineer, rust-reviewer.
 
 **6. Look.** The look's techniques on the real game, measured on the weakest machine.
@@ -194,8 +212,9 @@ when and what. No code.
   emissive slots; the shared scene pass every effect reads; the quality tiers as data (Low and High); every material
   variant compiled behind the loading screen, so nothing stutters at first sight; the same look on WebGPU and on the
   WebGL 2 fallback.
-- The soldier becomes the code-built stand-in from the Art sheets: one skinned mesh, with the material slots and the
-  joints that change-set 0's rules name, so that the Blender model can replace it without engine changes.
+- The soldier becomes the code-built stand-in from the Art sheets, built the way the loader builds a model: one
+  skinned mesh per colour area on one shared skeleton, with the colour areas and the joints that change-set 0's rules
+  name, so that the Blender model can replace it without engine changes.
 - The measurement harness gets its GPU side (timestamp queries).
 - Measured here: each technique's cost alone; both ink families at 12, 24 and 48 soldiers; the Low frame; draw calls;
   the same pixels on both backends; no compile after the loading screen.
@@ -205,8 +224,9 @@ when and what. No code.
 **7. Lag.** Prediction and reconciliation, against the local server.
 - `client-endpoint`: the prediction step for the local soldier, the reset and replay on each snapshot, the fade and
   the snap of a correction, the interpolation buffer and delayed clock for the other soldiers, the clock estimate.
-- The room's command scheduler behind one seam, because the netcode proof test still chooses how commands are timed
-  (Part 6).
+- The room's command scheduler behind one seam, with both ways of timing commands built (run on arrival; buffered,
+  one per tick), because the netcode proof test still chooses between them (Part 6) and the slice's mark runs under
+  each.
 - Headless tests over L1 under its profiles, with 48 scripted clients where a mark asks for 48; the same client
   endpoint also run as WebAssembly against a native room.
 - In development builds, the fake lag switch puts L1 behind the loopback in the browser.
@@ -250,8 +270,10 @@ when and what. No code.
 
 **12. Close.** Slice 1's marks with everything on.
 - The target course as yard content; the slice's recordings for the determinism check; the hand-off marks at 12
-  players again with every section in the block; a match that ends, restarts and leaves nothing behind; the marks
-  ledger brought up to date; STATUS, ROADMAP and the repository map.
+  players again with every section in the block; a match that ends, restarts and leaves nothing behind; STATUS,
+  ROADMAP and the repository map.
+- Its report lists, mark by mark, what of Slice 1's done-when is met and what is still only shown or still waits
+  (Part 2, "What is still open when change-set 12 merges"), so that nobody reads "Slice 1 is done" into it early.
 - Reviewers: test-engineer, engine-architect, perf-auditor; then docs-keeper.
 
 **M. The first model.** Part 12.
@@ -268,10 +290,10 @@ or CI check of the 2.3 chat that follows my change-set n (decision GATE-FOLLOW).
 | Line or mark | What it asks, in short | Shown at | Met at |
 |---|---|---|---|
 | PM-0002-15 | regenerating every generated type changes 0 bytes; a renamed Rust field without regeneration fails; a hand edit fails | 1 (the export tests run in today's `cargo test` job) | 1; its gate form (G4) 2.3 after 1 |
-| PM-0002-16 | a layout change without regeneration fails at build or at page startup (the layout hash), by a committed test | 1 (the test); the page's startup check runs in 2 | 2 |
+| PM-0002-16 | a layout change without regeneration fails at build or at page startup (the layout hash), by a committed test | 1 (the test); the page's startup check runs in 2 | 2.3 after 2: the mark's own method builds `sim-wasm` with a changed layout and runs the page's check in CI |
 | PM-0002-17 | `tsc -b` on `packages/types` with the strict base settings: 0 errors; a parameter property and an `enum` are refused; an ambient `enum` recorded | 1 (tsc by its path, with the draft's flags) | 2.3: with its `tsconfig.base.json` and its `typescript` job (its CS-C and CS-E) |
 | PM-0002-18 | CI fails when the wasm-bindgen CLI and the library in `Cargo.lock` differ | 2 (the build script compares them before it generates bindings) | 2.3 after 2 (its wasm-bindgen install step) |
-| PM-0002-19 | two generator runs give identical bytes; 20 runs give 20 identical sets | 1 (20 runs, hashed) | 1 |
+| PM-0002-19 | two generator runs give identical bytes; 20 runs of `cargo test` on one commit give 20 identical sets | 1 (20 runs here, hashed) | 2.3 after 1 (the 20 runs once in CI) |
 | PM-0002-63 | marks 15 to 19 hold in the foundation's CI with the three generators | 1 and 2 | 2.3 after 2 (the third generator, wasm-bindgen's, enters in 2) |
 | PM-0002-43 | the gate's planted defects for G4 | none: gate work | 2.3 after 1 |
 | ADR 0005's foundation line (:2439-2441) | the `content` crate's place; its generated schema and types diffed; glTF readers kept out of `sim` and `server` | 4 (the crate enters with Slice 1, as ADR 0002 part 3 places it; its schema and types are generated and diffed like the rest) | 4; the dependency rule against glTF readers is 2.3's G5 and must hold before M |
@@ -289,7 +311,7 @@ or CI check of the 2.3 chat that follows my change-set n (decision GATE-FOLLOW).
 | ADR 0004's foundation line (:1252) | the hash-map ban and the float rules as lints; a replay runner; the first recording in CI | 3 (the runner, the recording, and a scan test for the rules) | the lints are 2.3's (its CS-C for the hash-map and clock bans; the float ban after 3's vectors) |
 | PM-0002-49 | L1: the same seed gives the same packet-fate log and hashes; loss, delay and jitter within 5 % over 1,000,000 packets per profile | 3 | 3; its gate step (G11) and PM-0002-50's planted defects 2.3 after 3 |
 | PM-0002-53 | a planted counter overflow panics in debug and release, natively and in Wasm | 3 | 3 natively; the Wasm half in CI 2.3 after 3 |
-| "The foundation is done" (PM-0002-69) | an empty scene through the full stack in the browser, CI green, a preview link | 3 for the first two | step 2.6 (Part 8) |
+| "The foundation is done" (PM-0002-69) | an empty scene through the full stack in the browser, CI green, a preview link; it asks that every foundation mark (PM-0002-35 to -68) passes | 3 for the scene | step 2.6 (Part 8) and the last of step 2.3's marks, whichever comes later |
 
 ### Slice 1 (ADR 0002 :1487-1491, with the lines of ADR 0001, 0003, 0004 and 0005 it names)
 | Line or mark | What it asks, in short | Shown at | Met at |
@@ -299,7 +321,7 @@ or CI check of the 2.3 chat that follows my change-set n (decision GATE-FOLLOW).
 | ADR 0002: the first legacy goldens (ray maths, shot resolution, the imported tables); PM-0002-71 | each golden fails past its tolerance; 20,000 of 20,000 rays; a regenerated fixture is byte-identical | 8 (movement's table in 4; the animation metrics in 10) | 8; the gate's planted moves 2.3 after 8 |
 | ADR 0002: the determinism recordings in G10 | | 4 on (a recording per change-set that changes the simulation); the set fixed in 12 | G10 itself is 2.3 after 3 |
 | ADR 0001 (:1785): a recorded input replay gives the same per-tick hash on two runs | | 4 | 4 |
-| ADR 0001: R2-SYNC-REC2 marks 1 and 2 (PM-0001-20) on the loopback under L1 | commands in time under loss; 10,000 presses, none lost or doubled | 7 (headless over L1, 48 scripted clients, each command-timing option that is built) | 7 for the L1 half; its real-network half at Slice 3 |
+| ADR 0001: R2-SYNC-REC2 marks 1 and 2 (PM-0001-20) on the loopback under L1 | commands in time under loss; 10,000 presses, none lost or doubled | 7 (headless over L1, 48 scripted clients, under both ways of timing commands, as the mark asks) | 7 for the L1 half; its real-network half at Slice 3 |
 | ADR 0001: R2-SYNC-REC3 mark 1 (PM-0001-41) | 0 corrections above 1 mm when every command arrived in time | 7 | 7 for the L1 half; the minimum laptop over a real link at Slice 3 |
 | ADR 0001: R2-SYNC-REC3 mark 2 (PM-0001-42) | small corrections in a crowd of 48 | 7 (the snapshot share, 48 scripted clients; the collision rule named) | Slice 3 for the per-frame half |
 | ADR 0001: R2-SYNC-REC3 mark 3 (PM-0001-43) | own movement and own muzzle flash feel the same at any latency (a time mark on presented frames) | 7 (movement) and 8 (muzzle flash), in the browser with L1 behind the loopback: readings on your laptop | when the minimum laptop and the desktop are named. Our reading of "on the loopback under L1's profiles" for a time mark; netcode-architect confirms it in 7's plan |
@@ -316,7 +338,7 @@ or CI check of the 2.3 chat that follows my change-set n (decision GATE-FOLLOW).
 | ADR 0003's milestone: zero per-frame allocation in the render path (PM-0003-29) | | 6, 10, 11 | 11 |
 | ADR 0003's milestone: your Brave check | | every change-set from 2 on | 12 |
 | ADR 0005 (:2443-2445): CD-1 to CD-8 on weapons and movement, the import's tables, weapons as data, the bundle and its hash in local play | | 4 (the loader, the writer, versions, the movement table, development reload), 8 (weapons, the import report, the bundle and hash) | 8 |
-| ADR 0005: content item 1 | every double of the legacy tuning and 10,000 random ones parse to the same bits natively, in Wasm and in `JSON.parse`, and write back the same | 4 | 4 |
+| ADR 0005: content item 1 | every double of the legacy tuning and 10,000 random ones parse to the same bits natively, in Wasm and in `JSON.parse`, and write back the same | 4 (natively, Wasm in Node, `JSON.parse` in Node and Chromium) | when CI runs Wasm and the three browser engines (2.3 after 3); its Safari half on the Mac |
 | ADR 0005: content item 2 | a fuzz corpus of 10,000 files: 0 crashes, 0 accepted invalid files, the same verdict natively and in Wasm | 4 (for the kinds that exist), 8 (with weapons) | 8 |
 | ADR 0005: content item 6 | a stale or altered bundle is refused or fetched again (3 cases); a repeat visit loads it from the cache; the Rust hash equals WebCrypto's | 8 | 8 in local play; its record half with the match record (Slice 4) |
 | ADR 0005: ability item 2 | per shot, each legacy weapon equals the legacy tables (integers exactly, floats within 1e-6) | 8 (single-ray weapons), 9 (pellets, the bow, the grenade) | 9 |
