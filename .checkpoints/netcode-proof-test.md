@@ -151,6 +151,12 @@ bytes and the judge's peak (over 10 GiB: P0 does not start; plan the smallest ch
     - judge-apart each half (measured and bites) under the lock against 5.57 and 6.16 GiB (RR3-L6); peak.py's
       whole-set maximum.
     - Then the report's P0 section and the card.
+- **P0 RUNS (started about 21:29 UTC at commit 051995db9cea; background task bmz0u98k2; kept log
+  .gate/u4r-sets/P0-051995db9cea.log; raw logs .gate/netcode-proof-test/runs/u4r-P0-051995db9cea/measured/ and
+  bites/).** The preconditions held: tree clean, pgrep empty, df 16,490 MiB against R 9,218.6, no other lane, and
+  spikes/ unchanged since 791bc55. **About 40 minutes of runs, then two judge calls.** No commit under spikes/ until
+  it ends. **If cut:** follow item (6)'s P0 sentence and item (7) (orphans first). A set stopped by a cut is not a
+  result: ask the advisor before any re-run.
 - **THE CLEANS FOR R ARE DONE (the sets ruling's Q3 (B) and (C), with no lane running; one main-run.sh call each,
   lock exclusive, test guards all exit 0):**
   - **(B)** (21:17:37-21:17:39 UTC; .gate/u4r-sets/clean-shared-B.log): the shared target's release, doc and wasm32
