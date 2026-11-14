@@ -64,9 +64,14 @@ CI GREEN, THE ADVISOR'S HEAD REVIEW RUNS; BRAWL-1's PLAN REVIEW RUNS.**
   - **For Mustafa:** KEPT-LOGS, in the advisor's words in "The KEPT-LOGS question" (options a, b and c; recommended (c),
     with the old 4 GB cache named in the same rule). It goes to him now; the lane does not wait for his answer.
   - **NEXT for BRAWL-1:**
-    1. Write the builder's brief (brawl1-brief.md), carrying every plan section and all 18 conditions.
-    2. The advisor's conformance check (condition 17).
-    3. Launch the builder copy: general-purpose, opus, xhigh, isolation worktree, building in .gate/shared-target.
+    1. DONE: the builder's brief, brawl1-brief.md (about 23:55 UTC), sections 0-6, carrying the plan and conditions
+       1-18. The runner is u4r-run.sh unchanged (6efb9157), with logs under .gate/u4r/brawl1/; notes in brawl1-build.md.
+    2. RUNNING: the advisor's conformance check (condition 17), workflow wf_12d3f66b-ca1 (task wx5pjc4uj), notes
+       advisor-brawl1-brief.md. When it returns, run brawl1_brief_check_full.py (ready) and apply any edits by Edit.
+    3. Then launch the builder copy: general-purpose, opus, xhigh, isolation worktree, building in .gate/shared-target,
+       with `<base>` = the spike branch's head at launch. Its prompt: "Read brawl1-brief.md whole, then start at section
+       1."
+    - Agent count while it runs: the builder plus at most 2 others (the cap is 3).
 - **COMPACT-WAIT:** at about 36 % of the chat (23:50 UTC), the card refreshed. I asked Mustafa for /compact and set a
   20-minute reminder. If no /compact comes by then, carry on from this card.
 
