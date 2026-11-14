@@ -54,6 +54,20 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   push (crates unchanged since e59ece9); then the c62h record (r2's judge, --only PM-0001-17, on r2's whole-as-lost and
   tick16 folders, into .gate/netcode-proof-test/c62h-<commit12>/: both bites shown, never INVALID); then the card and
   u4r-report.md's r2 section with MRG-L1 to -L3; then U4r-F1 (RUN-L1 rides it).
+- **U4r-F1 BUILT by the main session (about 17:05 UTC), uncommitted in the main folder:** c-u4r-runs.mjs and
+  c-u4r-r2.mjs edited with Edit (A: spikeChanged and spikeReading exported from runs, imported by r2, both read from the
+  repository root, start.status gone; B: marks.json into the bin folder and checked there, the first run's floor, then
+  the folders (runs), floor(suite p0) before the output folder (r2); C: RUN_LIMIT_MS 3,600,000, timed() and the judge
+  through check.mjs's run(), the stopped lines, Q4's recording stop, condition 1's judge end; D: `-v` and the npt-*
+  Compiling/Fresh lines printed; E: whole-as-lost marks "PM-0001-2,PM-0001-17" and its new expect line). **SIZE-CHECK:
+  `git diff --stat`: 125 insertions, 48 deletions** (runs 100/35, r2 25/13; planned about 100, the advisor's expected
+  110-125). node --check both OK; the import works; every r2 suite names PM-0001-2; redact-check 0 findings; gate
+  --no-smoke PASS. **The evidence harness runs:** agent **a21c4927d090c1160** (its harness and the scratch helper test
+  in .gate/u4r-f1/harness/, logs in .gate/u4r-f1/logs/, scratch trees on /dev/shm/u4r-f1/; notes
+  u4r-f1-evidence-notes.md). **If cut:** SendMessage to it (its transcript is kept) or a fresh agent that reads its
+  notes first; the two scripts stay as edited (not committed: nothing runs from them until the commit). **Next:**
+  read its evidence; then infra-engineer's one round on the final diff and the evidence; then one commit (the two
+  scripts and the card), push, the advisor's review of the head.
 - **U4r-F1's PLAN IS APPROVED WITH CONDITIONS (about 16:47 UTC): advisor-u4r-f1-plan-full.md** (47 lines, sha256
   13e666a0…, by u4r_f1_plan_review_full.py word for word); nothing for Mustafa. Choices: Q1 (a) one exported helper in
   c-u4r-runs.mjs imported by c-u4r-r2.mjs; Q2 (a) a non-stop npt-lab non-zero exit still throws; Q3 (a) + condition 1;
