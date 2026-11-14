@@ -1239,6 +1239,14 @@ the cut and the time of the resume; UTC, read from the session's transcript):
   2fbec77; copy 5 ran no plant in this stretch. The snapshot re-cut (wip/u4r.patch, 26 files on 2fbec77, 8,305 lines,
   sha256 572c4f69…, applies). Copy 5 resumed by SendMessage (its transcript intact) to record end-check run 1 from its
   log, run the second, and report; the saver restarted.
+- 2026-11-14 14:14: "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit
+  resets 3:30pm (UTC)" (transcript 14:14:07; the workflow's failure arrived 14:14:28). Cut: the advisor's review of
+  the pushed head 71ee13d (wf_ed59da85-818, agent advisor-u4r-merge, after 3 min and 26 tool uses: no result), and the
+  14:34 check-in's turn (14:34:35). Resumed 15:32, on Mustafa's message ("I hit my usage limit while you were
+  working, but it has reset now. Please continue from where you left off.", 15:31:34). Checked first: the tree clean
+  (U4r merged at 71ee13d, CI green), the saver b02nlg0ph still running, no run going (the review writes only its
+  notes). The review resumed by `resumeFromRunId: "wf_ed59da85-818"` (its agent re-runs live and reads its notes
+  advisor-u4r-merge.md first).
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188
