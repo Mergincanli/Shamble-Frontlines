@@ -90,7 +90,19 @@ then the judged sets P3, B1, P2 and P0.**
     - The judge's time for P0 is about 70 s, far below RUN_LIMIT_MS (3,600 s).
   - **NEXT: B1 (independent of these questions), then P2, while the advisor rules on three things:** P3's -17
     INVALID, P0's judge memory, and the disk revision. No P0 before that ruling.
-  - **B1 RUNS (started 18:29:45 UTC; background task besyqqxet; kept log .gate/u4r-sets/B1-64f3307d5c7f.log).**
+  - **B1 IS DONE (18:29:45-18:46:14 UTC, exit 0), as ruled; its results are committed at 73060fd**
+    (results/u4r/64f3307d5c7f/B1/).
+    - -57's L1 B1 part: PASS.
+    - -17's and -18's L1 B1 parts: INVALID by pre:PM-0001-2 (0.129944, 0.268056, 0.3075): recorded, never counted.
+    - Overflow resyncs 0. peak.py: 983.8 s, 2,260.5 MiB.
+    - **Raw logs 821 MiB against 545.3 projected (1.51 times).** Free space is now 8,883 MiB.
+    - The memory line holds: about 216 MiB plus 2.49 times the log MiB. **P0 projects to 10.8 to 11.5 GiB.**
+    - The report's item 7 is filled for P3 and B1.
+    - **Next: P2**, by the approved order, unless the advisor's ruling says otherwise. **P2 waits for the ruling**
+      (about 18:48 UTC). The advisor's notes so far place the cause in npt-bots' brawl. Under command loss the
+      16-step circle does not close, so soldiers drift into buildings whose doors shut 6 s in every 12 s, and the room
+      then drops them from interest, rightly. A ruling that changes code would supersede a P2 run made now.
+  - **B1 ran (started 18:29:45 UTC; background task besyqqxet; kept log .gate/u4r-sets/B1-64f3307d5c7f.log).**
     **THE ADVISOR'S RULING RUNS:** workflow **wf_01e8109f-947** (task wmqmr3esu; notes advisor-u4r-sets-r1.md),
     asked Q1 (P3's -17 INVALID), Q2 (P0's judge memory) and Q3 (the disk revision), read-only. **If cut:**
     `Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/u4r-sets-ruling-1-wf_01e8109f-947.js",

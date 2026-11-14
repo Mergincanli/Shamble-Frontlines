@@ -361,7 +361,29 @@ advisor-u4r-r2-full.md:32).
 7. **The judged sets, one at a time: P3, then B1, then P2, then P0 last**; peak memory by getrusage (no /usr/bin/time
    here); B1's -17 and -18 INVALID, recorded and never counted; every run flagged for overflow resyncs to the advisor
    before it counts (P0's tick16 bite run expected, about 48); P0's judge memory projected first, over 10 GiB to the
-   advisor (:23). Each pending; this section and the card are filled after each set.
+   advisor (:23). Each set's lines are filled here after it.
+   - **P3 (18:03:40-18:20:36 UTC, exit 0; results at 5afd4e7: results/u4r/0f066338dd8d/P3/; kept log
+     .gate/u4r-sets/P3-0f066338dd8d.log; peak.py 1,018.1 s, 1,507.9 MiB):**
+     - -57's L1 P3 part: PASS (3 valid runs).
+     - -2: FAIL on everyone in view only (least per-slot share 0.352778, 0.085444 and 0.203556 against 0.99; its other
+       ten checks pass). So -17's L1 P3 part is INVALID by pre:PM-0001-2. That is not among the ruled INVALIDs (only
+       B1's), so it went to the advisor before it counts (advisor-u4r-sets-r1).
+     - Overflow resyncs 0; measured incomplete 43,117, 43,210 and 43,441 of 864,000 client-ticks.
+     - Raw logs 519 MiB, against the runner's 359.9 MiB projection.
+   - **B1 (18:29:45-18:46:14 UTC, exit 0; results at 73060fd: results/u4r/64f3307d5c7f/B1/; kept log
+     .gate/u4r-sets/B1-64f3307d5c7f.log; peak.py 983.8 s, 2,260.5 MiB):**
+     - -57's L1 B1 part: PASS (6,984, 2,750 and 88,063 on each run).
+     - -17's and -18's L1 B1 parts: INVALID by pre:PM-0001-2 (everyone in view 0.129944, 0.268056 and 0.3075), as
+       ruled: recorded, never counted. -2: FAIL on everyone in view.
+     - Overflow resyncs 0; heals 480 per run; measured incomplete 31,346, 31,279 and 31,635.
+     - Raw logs 821 MiB, against the runner's 545.3 MiB projection (1.51 times).
+   - **The judge, measured apart** on one P3 run (judge-apart.sh; .gate/u4r-judge-apart/u4r-P3-0f066338dd8d-l1-p3-s1.log;
+     178,922,504 B):
+     - Full judging: 2.7 s and 641.1 MiB. Reading alone: 1.9 s and 426.2 MiB, so RR3-L6's read_log share is about
+       70 %.
+     - Across the three readings (that run, the P3 set's call and the B1 set's call), memory is about 216 MiB plus 2.49
+       times the log MiB. P0's projection at 1.42 to 1.51 times the runner's bytes is 10.8 to 11.5 GiB, over the
+       advisor's 10 GiB line, so it went to the advisor before P0.
 
 ## Decisions needed
 None.

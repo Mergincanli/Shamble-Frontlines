@@ -29,3 +29,16 @@
   906-935) or a defaults-coded snapshot. Large units held 0.96-0.99 rules out frequent defaults coding. So soldier W
   drops out of the room's interest for everyone, flickering; per-client lags (baseline age, cap placement) scatter it.
 - Steps without a command vs per-slot share: Spearman ~0 (dominated by W); W's own steps_without high in s1/s2.
+- THE CAUSE (fingerprint): the others' flag count, post-onset, has autocorrelation peaks at lags ~355 and 1,080 ticks
+  (0.88-0.92); phase-folded on (t-63,736) mod 360 it is a square wave: ~180 ticks at ~0 holding, ~180 ticks rising
+  (s1 closed from phase ~120 to ~300 = door 4's toggles; s2 ~0-195 = door 0; s3 ~30-210 = door 1). world.rs:1203-1208:
+  door (second mod 6) toggles each second, so each door is shut 6 s of every 12 s (360 ticks); greybox.rs:89-99 six
+  buildings 22 m out, doors facing the centre, joins [0, a]; room.rs:932 relevance needs flood.reaches. So soldier W
+  is inside a building: while its door is shut the room drops W from every field client's set and the field from W's.
+  The room's interest is right; the scene's precondition (everyone in view) stops holding.
+- Why at P3 and not short runs/P0: bots/src/lib.rs:31-51, :206-215: the brawl walks a 16-step circle (~2 m radius),
+  turning every 4 commands GIVEN (no time in it, FP-7 item 1); room/src/input.rs take(): a tick with no command re-runs
+  the last one. At P3 16-27 % of ticks re-run (client_counts steps_without 1,026-5,172 of ~18,300 per slot), so the
+  circle does not close and each soldier random-walks; onsets 60-210 s after start (r2 30 s, D4 60 s: both too short).
+  r2 P0 (same npt-lab sha b3b4a60d): 43,152 commands = 48 x 899, steps without 0, late 0: at P0 the circle closes.
+- Not U4r's runner, the judge or the mirror (0 breaches); it is npt-bots' brawl (U4r's crate) in the stress scene.
