@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, readlinkSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { dirname, join, relative } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -34,6 +34,7 @@ import {
   buildFlagProblems,
   buildInputProblems,
   builtArtifact,
+  cargoConfigDirs,
   cargoConfigProblems,
   cargoCounts,
   clippyTwinProblems,
@@ -58,6 +59,7 @@ import {
   readScan,
   referenceProblems,
   roomFloatProblems,
+  run,
   rustflagSources,
   SIM_DEPENDENCIES,
   simFeatureCheck,
@@ -524,12 +526,19 @@ test("unsafe_code: no #[path] or include! reaches outside its crate, the way npt
       f["crates/room/src/k.rs"] = code;
     });
     const line = code.startsWith("#") ? 1 : 3;
-    assert.deepEqual(p, [`crates/room/src/k.rs:${line} has a #[path] whose value is not a plain string literal, not a .rs file inside crates/room/`], code);
+    // The macro forms' attribute holds a metavariable too (carry 85 (c) as advisor-u4r-r1 widened it: FP-6 item 8).
+    const held = code.startsWith("#") ? [] : [metaHeld(`crates/room/src/k.rs:${line}`)];
+    assert.deepEqual(p, [...held, `crates/room/src/k.rs:${line} has a #[path] whose value is not a plain string literal, not a .rs file inside crates/room/`], code);
   }
 });
 
 /** One unsafe block, as rustc 1.99.1 compiles it once unsafe_code is relaxed. */
 const UNSAFE_FN = "pub fn f() -> u8 {\n    let x = 1u8;\n    unsafe { *(&raw const x) }\n}\n";
+
+/** Carry 85 (c)'s refusal of an attribute holding a metavariable (advisor-u4r-r1, FP-6 item 8: SEC-U4R-5), at `where`. */
+function metaHeld(where) {
+  return `${where} has an attribute holding a metavariable (\`$\` between \`#[\` or \`#![\` and its \`]\`): a macro could build a #[path] or an allow from a fragment that this scan does not read`;
+}
 
 test("unsafe code outside the three exception crates fails however the lint was relaxed (review S1)", () => {
   const relaxedElsewhere = {
@@ -546,9 +555,11 @@ test("unsafe code outside the three exception crates fails however the lint was 
       f["crates/room/src/evil.rs"] = code;
     });
     const n = code.match(/\bunsafe\b|\bglobal_asm\b/g).length;
+    // A macro-built allow's attribute holds a metavariable: refused as well (FP-6 item 8).
+    const held = what.includes("macro-built allow") ? [metaHeld("crates/room/src/evil.rs:3")] : [];
     assert.deepEqual(
       p,
-      [`crates/room/src/evil.rs:${firstLine[what]} has unsafe code (${n} \`unsafe\` or \`global_asm\`; only npt-client-wasm, npt-tcpinfo and npt-hash-wasm may)`],
+      [`crates/room/src/evil.rs:${firstLine[what]} has unsafe code (${n} \`unsafe\` or \`global_asm\`; only npt-client-wasm, npt-tcpinfo and npt-hash-wasm may)`, ...held],
       what,
     );
   }
@@ -583,6 +594,8 @@ test("npt-tcpinfo: unsafe only inside srtt_us and unacked_and_unsent, unsafe_cod
   assert.deepEqual(lax, [
     "crates/tcpinfo/src/linux.rs:" + (at + 9) + " names unsafe_code outside an attribute (a macro can build the attribute from it)",
     outside(`crates/tcpinfo/src/linux.rs:${at + 5}`),
+    // Its attribute holds a metavariable (FP-6 item 8).
+    metaHeld(`crates/tcpinfo/src/linux.rs:${at + 2}`),
   ]);
   // In the tests, an example or the stub: outside the two functions.
   for (const file of ["crates/tcpinfo/src/tests.rs", "crates/tcpinfo/examples/probe.rs", "crates/tcpinfo/src/stub.rs"]) {
@@ -1032,7 +1045,8 @@ test("another rustc, a workspace wrapper, a config include and a test runner are
   };
   assert.deepEqual(cargoConfigProblems(normal, []), []);
   const config = (text) => cargoConfigProblems({}, [{ path: "c.toml", text }]);
-  assert.deepEqual(config('[build]\nrustc-wrapper = "sccache"\ntarget-dir = "t"\n[target.x86_64-unknown-linux-gnu]\nlinker = "cc"\n'), []);
+  // A target table passes; its `linker` key no longer does (carry 85 (a): the test below).
+  assert.deepEqual(config('[build]\nrustc-wrapper = "sccache"\ntarget-dir = "t"\n[target.x86_64-unknown-linux-gnu]\nrustflags = []\n'), []);
   // C2R-8: another compiler, or a wrapper around the workspace crates' rustc calls.
   for (const k of ["RUSTC", "CARGO_BUILD_RUSTC", "RUSTC_WORKSPACE_WRAPPER", "CARGO_BUILD_RUSTC_WORKSPACE_WRAPPER"]) {
     assert.deepEqual(cargoConfigProblems({ ...normal, [k]: "/opt/other/rustc" }, []), [
@@ -1096,6 +1110,47 @@ test("RUSTC_BOOTSTRAP, cargo's channel override, and a manifest's cargo-features
   for (const f of crateFiles(join(HERE, "crates")).files.filter((f) => f.endsWith("/Cargo.toml"))) own.push({ path: f, text: readFileSync(join(HERE, f), "utf8") });
   assert.ok(own.length >= 17, `${own.length} manifests`);
   assert.deepEqual(manifestKeyProblems(own), []);
+});
+
+test("carry 85 (a), (b) and (d): a linker for any target and a profile outside the manifests are refused, naming the source and value; CARGO_HOME is read as cargo reads it; this container's environment and the spike's own config pass", () => {
+  // (a) A linker: an environment variable whose name ends in _LINKER, or a `linker` key in any table or form.
+  assert.deepEqual(cargoConfigProblems({ PATH: "/bin", CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER: "/opt/ld" }, []), [
+    'CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER in the environment sets a linker ("/opt/ld"): its arguments can rewrite the target_features section the Wasm loader reads',
+  ]);
+  const config = (text) => cargoConfigProblems({}, [{ path: "c.toml", text }]);
+  const linker = (v) => `c.toml has a key \`linker\` (${v}): it sets a linker, whose arguments can rewrite the target_features section the Wasm loader reads`;
+  assert.deepEqual(config('[target.wasm32-unknown-unknown]\nlinker = "rust-lld"\n'), [linker('"rust-lld"')]);
+  assert.deepEqual(config('target.x86_64-unknown-linux-gnu.linker = "cc"\n'), [linker('"cc"')]);
+  assert.deepEqual(config('[host]\n"linker" = "cc"\n'), [linker('"cc"')]);
+  // (b) A profile: CARGO_PROFILE_* in the environment; a `profile` table, quoted table, dotted key or key in a config.
+  assert.deepEqual(cargoConfigProblems({ CARGO_PROFILE_RELEASE_OVERFLOW_CHECKS: "false" }, []), [
+    "CARGO_PROFILE_RELEASE_OVERFLOW_CHECKS in the environment sets a profile key (\"false\"): it can drop npt-sim's -C overflow-checks=on, which plan §4.5 asks for in every profile",
+  ]);
+  // Each refusal names its line and text (advisor-u4r-r1, FP-6 item 9: SEC-U4R-6).
+  const profile = (line, said) =>
+    `c.toml:${line} has a profile key or table (${JSON.stringify(said)}): it can drop npt-sim's -C overflow-checks=on, which plan §4.5 asks for in every profile`;
+  for (const text of [
+    "[profile.release.package.npt-sim]\noverflow-checks = false\n",
+    "profile.release.overflow-checks = false\n",
+    '["profile".dev]\nopt-level = 1\n',
+    "profile = { release = { debug = true } }\n",
+  ]) {
+    assert.deepEqual(config(text), [profile(1, text.split("\n")[0])], text);
+  }
+  assert.deepEqual(config('[build]\njobs = 2\n\n[profile.dev]\nopt-level = 1\n'), [profile(4, "[profile.dev]")], "its line");
+  // Neither name in a string value or inside another key's name.
+  assert.deepEqual(config('[build]\ntarget-dir = "profile/linker"\nprofiles = 1\nlinkers = 2\n'), []);
+  // This container's environment and the spike's own config, as the deps step reads them, pass.
+  assert.deepEqual(cargoConfigProblems(process.env, [{ path: ".cargo/config.toml", text: readFileSync(join(HERE, ".cargo", "config.toml"), "utf8") }]), []);
+  // (d) CARGO_HOME as cargo's home crate reads it: an empty one as unset, a relative one against the folder cargo runs
+  // in, read through check.mjs's own function (cargo never runs with these values: u4r-brief.md section 4 rule 7).
+  const start = join(HERE, "crates", "lab");
+  const home = (env) => cargoConfigDirs(start, env).at(-1);
+  assert.equal(home({}), join(homedir(), ".cargo"));
+  assert.equal(home({ CARGO_HOME: "" }), join(homedir(), ".cargo"), "an empty CARGO_HOME is unset");
+  assert.equal(home({ CARGO_HOME: "../h" }), join(HERE, "crates", "h"), "a relative CARGO_HOME, against the folder cargo runs in");
+  assert.equal(home({ CARGO_HOME: "/opt/cargo" }), "/opt/cargo");
+  assert.ok(cargoConfigDirs(start, {}).includes(join(HERE, ".cargo")), "and every folder above it");
 });
 
 /** The tick grep's message for a tick-count name (not a derived one) set from `init` at `at` (u4-build-plan.md §4.3). */
@@ -2024,8 +2079,9 @@ test("npt-tcpinfo and npt-hash-wasm, the deny-level exceptions, have no build sc
   // Its second: `use std::include as inc;`, and `inc!(concat!(env!("OUT_DIR"), "/gen.rs"));` in begin's body, which the
   // include! rule cannot see by its name; and a raw identifier's form in npt-tcpinfo.
   const includeAt = (where, name) =>
-    `${where} names \`include\` other than as an include!, include_str! or include_bytes! call (a renamed include!, as ` +
-    `\`use std::include as inc;\`, hides the call from the include! rule), which ${name} may not: ${why}`;
+    `${where} names \`include\` other than directly before \`!\` and an opening bracket, as an include!, include_str! or ` +
+    `include_bytes! call is written (a renamed include!, as \`use std::include as inc;\`, or one a macro builds, as ` +
+    `\`m!(include!)\`, hides the call from the include! rule), which ${name} may not: ${why}`;
   const renamed = `use std::include as inc;\n${HASH_WASM_LIB.replace(BEGIN_HEAD, `${BEGIN_HEAD}    inc!(concat!(env!("OUT_DIR"), "/gen.rs"));\n`)}`;
   assert.deepEqual(unsafeWith((f) => (f[F] = renamed)), [includeAt(`${F}:1`, "npt-hash-wasm")]);
   assert.deepEqual(unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] += "use core::r#include as i;\n")), [includeAt("crates/tcpinfo/src/lib.rs:8", "npt-tcpinfo")]);
@@ -2034,6 +2090,18 @@ test("npt-tcpinfo and npt-hash-wasm, the deny-level exceptions, have no build sc
   const calls = 'include!("k.rs");\nconst V: &str = include_str!("../x.txt");\nconst B: &[u8] = include_bytes!("../y.bin");\n// include\nconst S: &str = "include";\n';
   assert.deepEqual(unsafeWith((f) => (f[F] = `${HASH_WASM_LIB}${calls}`)), []);
   assert.deepEqual(unsafeWith((f) => (f["crates/net/src/lib.rs"] += "use std::include as inc;\n")), []);
+  // Carry 85 (c): `include` must be directly before `!` and an opening bracket: `m!(include!)` (the bare name handed to
+  // a macro, which can build the call) and `include ! (...)` are refused; `include!{...}` and `include![...]` pass.
+  assert.deepEqual(unsafeWith((f) => (f[F] = `${HASH_WASM_LIB}m!(include!);\n`)), [includeAt(`${F}:${HASH_WASM_LIB.split("\n").length}`, "npt-hash-wasm")]);
+  assert.deepEqual(unsafeWith((f) => (f["crates/tcpinfo/src/lib.rs"] += 'const K: &str = include ! ("k.rs");\n')), [includeAt("crates/tcpinfo/src/lib.rs:8", "npt-tcpinfo")]);
+  assert.deepEqual(unsafeWith((f) => (f[F] = `${HASH_WASM_LIB}include!{"k.rs"}\ninclude!["k.rs"];\n`)), []);
+  // Carry 85 (c), every crate, as advisor-u4r-r1 widened it (FP-6 item 8: SEC-U4R-5): an attribute holding a
+  // metavariable anywhere in its text, either form; none in the spike.
+  const metaAt = (where) => `${where} has an attribute holding a metavariable (\`$\` between \`#[\` or \`#![\` and its \`]\`): a macro could build a #[path] or an allow from a fragment that this scan does not read`;
+  const meta = "macro_rules! m {\n    ($p:meta) => {\n        #[$p]\n        mod x;\n    };\n}\nmacro_rules! n {\n    ($p:meta) => {\n        # ! [ $p ]\n    };\n}\n";
+  assert.deepEqual(unsafeWith((f) => (f["crates/net/src/lib.rs"] += meta)), [metaAt("crates/net/src/lib.rs:6"), metaAt("crates/net/src/lib.rs:12")]);
+  const inner = "macro_rules! k {\n    ($a:meta) => {\n        #[cfg_attr(all(), $a)]\n        mod y;\n    };\n}\n";
+  assert.deepEqual(unsafeWith((f) => (f["crates/net/src/lib.rs"] += inner)), [metaAt("crates/net/src/lib.rs:6")]);
   // A `build` key in the manifest, in either form cargo reads; a custom-build target in cargo metadata.
   const manifestKey = (crate) => `crates/${crate}/Cargo.toml has a key \`build\`: a build script in npt-${crate}, which may have none: ${why}`;
   assert.deepEqual(unsafeWith((f) => (f["crates/hash-wasm/Cargo.toml"] = HASH_WASM_MANIFEST.replace("\n\n[lints.rust]", '\nbuild = "gen.rs"\n\n[lints.rust]'))), [manifestKey("hash-wasm")]);
@@ -2532,17 +2600,27 @@ const cmpLine = (a, b, { compared = 27_000, mismatching = 0, rec, tick, field, c
 const NOT_CATCHABLE_SCAN = "# std-sin's scan\nnot catchable at this site on x86-64 and wasm32\nscanned on: the test's tree\nlibc: ldd (test) 2.39\n";
 /** A scan with two catches, listed out of the manifest's order (ES-s2 comes before TC-s3 there, so ES-s2's is armed). */
 const CATCH_SCAN = "catch TC-s3 4294962800 vehicle[0].pos.y\ncatch ES-s2 1000123 vehicle[3].pos.y\nlibc: ldd (Ubuntu GLIBC 2.39-0ubuntu8.6) 2.39\n";
+/** A scan whose first catch in the manifest's order is on SS-s1 before HASH_MAP_ARM, as the committed scan's is. */
+const CATCH_SCAN_SS = "catch ES-s2 1000123 vehicle[3].pos.y\ncatch SS-s1 2 vehicle[8].pos.y\nlibc: ldd (Ubuntu GLIBC 2.39-0ubuntu8.6) 2.39\n";
 
 /**
  * A recorded wasm step: a runner that answers each command as cargo, npt-lab and the loader do (an equal run, the
- * hash-map bite caught natively and not catchable on wasm32, std-sin by `scan`), `over[kind]` replacing one answer,
- * and an in-memory io (the manifest and the scan data read, the files each command writes known to exist).
+ * hash-map bite caught natively and not catchable on wasm32, std-sin by `scan`: caught and re-shown at its first catch
+ * in the manifest's order), `over[kind]` replacing one answer (`ms`: the call's time, 1,500 by default), and an
+ * in-memory io (the manifest `manifestPath` holding `recs`, and the scan data, read; the files each command writes
+ * known to exist). `options` goes to wasmStep as its fifth argument.
  */
-function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
+function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN, recs = RECS, manifestPath = RECORDINGS_MANIFEST, options } = {}) {
   const calls = [];
   const files = new Set();
   const copies = [];
-  const manifest = { recordings: RECS.map((r) => ({ name: r.name, first_tick: r.first, ticks: 9_000 })) };
+  const manifest = { recordings: recs.map((r) => ({ name: r.name, first_tick: r.first, ticks: 9_000 })) };
+  const all = { compared: 9_000 * recs.length, counts: recs.map((r) => `${r.name} 9000`).join(", ") };
+  const order = recs.map((r) => r.name);
+  const sc = readScan(scan)
+    .catches.filter((c) => order.includes(c.recording))
+    .sort((x, y) => order.indexOf(x.recording) - order.indexOf(y.recording))[0] ?? { recording: "ES-s2", tick: 1_000_123, field: "vehicle[3].pos.y" };
+  const sinAt = { compared: 9_000, mismatching: 8_000, rec: sc.recording, tick: sc.tick, field: sc.field, counts: `${sc.recording} 9000` };
   const arg = (args, k) => (args.includes(k) ? args[args.indexOf(k) + 1] : null);
   const kindOf = (cmd, args) => {
     if (cmd === "cargo") return `build ${args.includes("npt-hash-wasm") ? "wasm" : "lab"}${args.includes("bites") ? " bites" : ""}`;
@@ -2557,6 +2635,7 @@ function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
     const where = arg(args, "--out") ?? arg(args, "--ours");
     const area = where.startsWith(WS.hm) ? "hash-map " : where.startsWith(WS.sin) ? "std-sin " : "";
     if (args[1] !== "compare") return `${area}legs`;
+    if (arg(args, "--theirs-name") === "std-sin native leg 1") return "std-sin re-show";
     if (area === "hash-map ") return `hash-map compare ${arg(args, "--theirs-name") === "Wasm leg 2" ? "ww" : "nw"}`;
     return `${area}compare${!area && args.includes("--theirs-dump") ? " field" : ""}`;
   };
@@ -2572,10 +2651,10 @@ function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
       legs: {
         stdout:
           "wrote the header-only recordings vector-SS, vector-ES, vector-CO, vector-TC (seed 1, first tick 0, no tick) for h2\n" +
-          `${RECS.map((r) => `regenerated ${r.name}: 100 bytes, sha256 ab, as the manifest's\n`).join("")}${cmpLine("native leg 1", "native leg 2")}\n`,
-        writes: [...RECS.map((r) => join(WS.rec, `${r.name}.rec`)), ...["SS", "ES", "CO", "TC"].map((s) => join(WS.rec, `vector-${s}.rec`))],
+          `${recs.map((r) => `regenerated ${r.name}: 100 bytes, sha256 ab, as the manifest's\n`).join("")}${cmpLine("native leg 1", "native leg 2", all)}\n`,
+        writes: [...recs.map((r) => join(WS.rec, `${r.name}.rec`)), ...["SS", "ES", "CO", "TC"].map((s) => join(WS.rec, `vector-${s}.rec`))],
       },
-      compare: { stdout: `${cmpLine("native leg 1", "Wasm leg 1")}\n` },
+      compare: { stdout: `${cmpLine("native leg 1", "Wasm leg 1", all)}\n` },
       vectors: { stdout: "h2: CO's wasm32 dump is the committed vector (260 words, digest b432ac332054c77b); every scene's initial dump and hash are equal natively and on wasm32 (SS 6488, ES 1944, CO 260, TC 340)\n" },
       bites: { stdout: "1 PM-0004-21/hash-map\n2 PM-0004-21/std-sin\n3 PM-0001-41/server-speed-1pct\n4 PM-0001-41/server-quant-differs\n" },
       "hash-map legs": {
@@ -2597,11 +2676,9 @@ function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
           `Wasm leg 2 digest 3333333333333333 (${HASH_MAP_FIELD} at words [6488, 6489] of its dump at SS-s1 tick 1234)\n` +
           `${cmpLine("Wasm leg 1", "Wasm leg 2", { compared: 9_000, counts: "SS-s1 9000" })}\n`,
       },
-      "std-sin legs": { stdout: `${cmpLine("native leg 1", "native leg 2", { compared: 9_000, counts: "ES-s2 9000" })}\n` },
-      "std-sin compare": {
-        status: 1,
-        stdout: `${cmpLine("native leg 1", "Wasm leg 1", { compared: 9_000, mismatching: 8_000, rec: "ES-s2", tick: 1_000_123, field: "vehicle[3].pos.y", counts: "ES-s2 9000" })}\n`,
-      },
+      "std-sin legs": { stdout: `${cmpLine("native leg 1", "native leg 2", { compared: 9_000, counts: `${sc.recording} 9000` })}\n` },
+      "std-sin compare": { status: 1, stdout: `${cmpLine("native leg 1", "Wasm leg 1", sinAt)}\n` },
+      "std-sin re-show": { status: 1, stdout: `${cmpLine("clean native leg 1", "std-sin native leg 1", sinAt)}\n` },
     }[kind];
     if (said) return said;
     // The loader's runs.
@@ -2616,7 +2693,7 @@ function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
     copy: (from, to) => copies.push([from, to]),
     exists: (p) => files.has(p),
     read: (p) => {
-      if (p === RECORDINGS_MANIFEST) return JSON.stringify(manifest);
+      if (p === manifestPath) return JSON.stringify(manifest);
       if (p === STD_SIN_SCAN) return scan;
       throw new Error(`ENOENT ${p}`);
     },
@@ -2630,11 +2707,11 @@ function wasmWorld({ over = {}, scan = NOT_CATCHABLE_SCAN } = {}) {
     const base = answer(kind, args);
     const r = over[kind] ? { ...base, ...over[kind](base, args) } : base;
     for (const w of r.writes ?? []) files.add(w);
-    clock += 1_500;
+    clock += r.ms ?? 1_500;
     const status = r.timedOut ? null : (r.status ?? 0);
     return { ok: status === 0, status, stdout: r.stdout ?? "", out: `${r.stdout ?? ""}${r.stderr ?? ""}`, timedOut: Boolean(r.timedOut) };
   };
-  const result = wasmStep(runner, io, () => clock);
+  const result = wasmStep(runner, io, () => clock, undefined, options);
   return { ...result, calls, copies, kinds: calls.map((c) => c.kind) };
 }
 
@@ -2695,16 +2772,37 @@ test("the wasm step's builds, legs and comparisons, in order; a clean run passes
   assert.equal((last.match(/ 1\.5(?:,|$)/g) ?? []).length, w.calls.length, "each timed call's seconds");
   assert.deepEqual(STEPS.wasm.length, 0, "STEPS.wasm(runner) defaults its runner");
   assert.deepEqual(Object.keys(STEPS), ["fmt", "clippy", "clippy-wasm32", "doc", "test", "deps", "wasm", "refs", "marks", "self", "redact"]);
-  // The std-sin catch path: armed at the scan's first catch in the manifest's order, native leg 1 and Wasm leg 1.
-  const c = wasmWorld({ scan: CATCH_SCAN });
+  // The std-sin catch path: armed at the scan's first catch in the manifest's order, native leg 1 and Wasm leg 1, then
+  // the re-show (carry 83 (c)): the hash-map half's native leg 1, clean before its arming tick, against the bitten
+  // native leg, its field named by compare's own clean replay against the bitten leg's dump.
+  const c = wasmWorld({ scan: CATCH_SCAN_SS });
   assert.equal(c.ok, true, c.out);
-  const sinArgs = "--bite PM-0004-21/std-sin --arm 1000123";
-  assert.deepEqual(c.calls.slice(-3).map((x) => x.line), [
-    `${LAB_BITES} hash ${manifestArgs} --out ${WS.sin} --only ES-s2 ${sinArgs} --dump-at 1000123`,
-    loader(WASM_B, RECS[1], join(WS.sin, "wasm-1.lines"), ` --bite 2 --arm 1000123 --dump-at 1000123 --dump-out ${join(WS.sin, "wasm-1.dump")}`),
-    `${LAB_BITES} hash compare --ours ${join(WS.sin, "native-1.lines")} --theirs ${join(WS.sin, "wasm-1.lines")} ${manifestArgs} --ours-dump ${join(WS.sin, "native-1.dump")} --theirs-dump ${join(WS.sin, "wasm-1.dump")} ${sinArgs} --on ES-s2 --ours-name native leg 1 --theirs-name Wasm leg 1`,
+  const sinArgs = "--bite PM-0004-21/std-sin --arm 2";
+  assert.deepEqual(c.calls.slice(-4).map((x) => x.line), [
+    `${LAB_BITES} hash ${manifestArgs} --out ${WS.sin} --only SS-s1 ${sinArgs} --dump-at 2`,
+    loader(WASM_B, RECS[0], join(WS.sin, "wasm-1.lines"), ` --bite 2 --arm 2 --dump-at 2 --dump-out ${join(WS.sin, "wasm-1.dump")}`),
+    `${LAB_BITES} hash compare --ours ${join(WS.sin, "native-1.lines")} --theirs ${join(WS.sin, "wasm-1.lines")} ${manifestArgs} --ours-dump ${join(WS.sin, "native-1.dump")} --theirs-dump ${join(WS.sin, "wasm-1.dump")} ${sinArgs} --on SS-s1 --ours-name native leg 1 --theirs-name Wasm leg 1`,
+    `${LAB_BITES} hash compare --ours ${join(WS.hm, "native-1.lines")} --theirs ${join(WS.sin, "native-1.lines")} ${manifestArgs} --theirs-dump ${join(WS.sin, "native-1.dump")} --ours-name clean native leg 1 --theirs-name std-sin native leg 1`,
   ]);
-  assert.ok(lastLine(c.out).includes("std-sin: caught at ES-s2 tick 1000123, vehicle[3].pos.y, as the scan found (the scan's other catches: TC-s3 tick 4294962800)"), lastLine(c.out));
+  assert.ok(
+    lastLine(c.out).includes("std-sin: caught at SS-s1 tick 2, vehicle[8].pos.y, as the scan found; re-shown against a clean bites-build native leg (the scan's other catches: ES-s2 tick 1000123)"),
+    lastLine(c.out),
+  );
+  // Carry 83 (c)'s failing cases: a catch not on the manifest's first recording before HASH_MAP_ARM (no clean leg
+  // covers it), and a re-show whose first difference is not the scan's.
+  const notFirst = "std-sin: the scan's catch ES-s2 tick 1000123 is not on the manifest's first recording (SS-s1) before the hash-map bite's arming tick 1234";
+  for (const scan of [CATCH_SCAN, "catch SS-s1 1234 vehicle[8].pos.y\n"]) {
+    const w2 = wasmWorld({ scan });
+    assert.equal(w2.ok, false, w2.out);
+    assert.ok(tail(w2.out).includes(scan === CATCH_SCAN ? notFirst : "the scan's catch SS-s1 tick 1234 is not on the manifest's first recording"), tail(w2.out));
+    assert.ok(!w2.kinds.includes("std-sin re-show"), "no re-show runs");
+  }
+  const off = wasmWorld({
+    scan: CATCH_SCAN_SS,
+    over: { "std-sin re-show": () => ({ status: 1, stdout: `${cmpLine("clean native leg 1", "std-sin native leg 1", { compared: 9_000, mismatching: 9, rec: "SS-s1", tick: 3, field: "vehicle[8].pos.y", counts: "SS-s1 9000" })}\n` }) },
+  });
+  assert.equal(off.ok, false, off.out);
+  assert.ok(tail(off.out).includes("std-sin: the re-show (the bitten native leg against a clean bites-build native leg) first differs at SS-s1 tick 3, field vehicle[8].pos.y, not at the scan's SS-s1 tick 2, vehicle[8].pos.y"), tail(off.out));
 });
 
 test("the wasm step fails on every outcome that is not an equal, counted run, naming what failed within the lines main prints (U4d2, 2.4 (a))", () => {
@@ -2781,19 +2879,114 @@ test("the wasm step fails on every outcome that is not an equal, counted run, na
   fails(wasmWorld({ over: { "build lab": () => ({ stdout: "" }) } }), "the release build of npt-lab (x86-64, measured) names no bin artifact in cargo's JSON messages");
 });
 
-test("the wasm step gives each call but its four cargo builds 300 s, and a call stopped by it fails the step naming the call and the limit (U4d2 round 1, FX-7: INF-4)", () => {
+test("the wasm step's calls but its four cargo builds share one 300 s deadline from the first of them, each given what is left; a call stopped by it fails the step naming the call (carry 84 (a); before it U4d2 round 1, FX-7: INF-4)", () => {
   const w = wasmWorld();
   assert.equal(w.ok, true, w.out);
-  for (const c of w.calls) assert.equal(c.limit, c.kind.startsWith("build ") ? 0 : 300_000, `${c.kind}: ${c.limit}`);
+  // The fake clock moves 1,500 ms a call: the i-th call after the builds is given 300,000 - 1,500 i ms.
+  const timedCalls = w.calls.filter((c) => !c.kind.startsWith("build "));
+  timedCalls.forEach((c, i) => assert.equal(c.limit, 300_000 - 1_500 * i, `${c.kind}: ${c.limit}`));
   assert.equal(w.calls.filter((c) => c.limit === 0).length, 4, "the four cargo builds alone have no limit");
-  const stopped = (label) => `${label}: still running after 300 s, so it was stopped (the wasm step's limit on each call but its four cargo builds)`;
-  // A Wasm leg that hangs, and the native legs' call: each fails the step, named within main's 40 lines.
+  const stopped = (label, left) =>
+    `${label}: still running at the step's deadline (300 s shared by every call but its cargo builds, from the first of them; ${left} s were left for it), so it was stopped with every process it started`;
+  // A Wasm leg that hangs: the step fails naming it, within main's 40 lines.
   const hung = wasmWorld({ over: { "wasm ES-s2": () => ({ timedOut: true, stdout: "" }) } });
   assert.equal(hung.ok, false, hung.out);
-  assert.ok(tail(hung.out).split("\n").includes(stopped("Wasm ES-s2")), tail(hung.out));
-  const legs = wasmWorld({ over: { legs: () => ({ timedOut: true, stdout: "", writes: [] }) } });
+  assert.ok(tail(hung.out).split("\n").includes(stopped("Wasm ES-s2", "297.0")), tail(hung.out));
+});
+
+test("carry 84 (c), the shared deadline with a fake runner and clock: a first call that takes the whole limit is stopped, and the next calls are not started, each named as skipped", () => {
+  // `npt-lab hash`, the first call after the builds, runs the whole 300 s and is stopped (it had regenerated the
+  // recordings first).
+  const w = wasmWorld({ over: { legs: (b) => ({ timedOut: true, ms: 300_000, stdout: "", writes: b.writes }) } });
+  assert.equal(w.ok, false, w.out);
+  assert.deepEqual(w.kinds, ["build lab", "build lab bites", "build wasm", "build wasm bites", "legs"], "nothing starts after the stopped call");
+  const said = w.out.split("\n");
+  assert.ok(said.some((l) => l.startsWith("npt-lab hash: still running at the step's deadline") && l.includes("300.0 s were left for it")), w.out);
+  for (const label of ["Wasm SS-s1", "Wasm ES-s2", "Wasm TC-s3", "npt-lab bites"]) {
+    assert.ok(
+      said.includes(`${label}: not started (skipped): npt-lab hash was stopped at the step's deadline (300 s shared by every call but its cargo builds, from the first of them)`),
+      `${label}\n${w.out}`,
+    );
+  }
+  // A call that ends exactly at the deadline is not stopped, but the time is spent: the next is skipped as such.
+  const spent = wasmWorld({ over: { legs: (b) => ({ ...b, ms: 300_000 }) } });
+  assert.equal(spent.ok, false, spent.out);
+  assert.ok(spent.out.split("\n").includes("Wasm SS-s1: not started (skipped): the step's deadline had passed (300 s shared by every call but its cargo builds, from the first of them)"), spent.out);
+  assert.equal(spent.kinds.filter((k) => !k.startsWith("build ")).length, 1, "only the first call ran");
+});
+
+test("the shared deadline on a fractional clock (wasmStep's default is performance.now: advisor-u4r-r1, FP-6 item 11) gives every call a whole limit, as spawnSync takes it", () => {
+  // `npt-lab hash` takes 1,500.4 ms, so the time left for every later call is fractional.
+  const w = wasmWorld({ over: { legs: (b) => ({ ...b, ms: 1_500.4 }) } });
+  assert.equal(w.ok, true, w.out);
+  const timedCalls = w.calls.filter((c) => !c.kind.startsWith("build "));
+  for (const c of timedCalls) assert.ok(Number.isInteger(c.limit) && c.limit > 0, `${c.kind}: ${c.limit}`);
+  assert.equal(timedCalls[1].limit, 298_500, "300,000 - 1,500.4, rounded up");
+});
+
+test("carry 84 (b) and (c): run() stops a timed call with every process it started (a child that starts a grandchild and sleeps, limit 200 ms)", () => {
+  // A /bin/sh child, which starts far inside the limit (advisor-u4r-r1, FP-6 item 7: T-3; a node child took 203.7-204.0
+  // ms in all, so one slow start would fail a check that is never retried).
+  const child = "echo child $$; sleep 30 & echo grandchild $!; wait";
+  const t0 = Date.now();
+  const r = run("/bin/sh", ["-c", child], HERE, process.env, 200);
+  const ms = Date.now() - t0;
+  assert.equal(r.timedOut, true, `run() reports the timeout: ${JSON.stringify(r)}`);
+  assert.ok(ms < 10_000, `run() returned after ${ms} ms, not the child's 30 s`);
+  const pids = ["child", "grandchild"].map((k) => Number(r.out.match(new RegExp(`^${k} (\\d+)$`, "m"))?.[1]));
+  assert.ok(pids.every((p) => p > 0), `both started and said their pid: ${r.out}`);
+  // Left means still running: a process gone, or a zombie (dead, its exit status not yet collected by its new parent),
+  // is not left. SIGKILL is delivered at once, but /proc may show the state a moment later.
+  const running = (pid) => {
+    try {
+      return readFileSync(`/proc/${pid}/stat`, "utf8").split(") ")[1][0] !== "Z";
+    } catch {
+      return false;
+    }
+  };
+  const until = Date.now() + 2_000;
+  while (pids.some(running) && Date.now() < until);
+  assert.deepEqual(pids.map(running), [false, false], `child ${pids[0]}, grandchild ${pids[1]}`);
+});
+
+test("carry 83 (b): the clean half requires exit 0 from npt-lab hash and from its compare, whatever their lines say", () => {
+  const legs = wasmWorld({ over: { legs: (b) => ({ ...b, status: 1 }) } });
   assert.equal(legs.ok, false, legs.out);
-  assert.ok(tail(legs.out).split("\n").includes(stopped("npt-lab hash")), tail(legs.out));
+  assert.ok(tail(legs.out).split("\n").includes("npt-lab hash: exit 1, not 0 (the clean half requires exit 0 as well as its lines)"), tail(legs.out));
+  const compare = wasmWorld({ over: { compare: (b) => ({ ...b, status: 1 }) } });
+  assert.equal(compare.ok, false, compare.out);
+  assert.ok(
+    tail(compare.out).split("\n").includes("npt-lab hash compare (native leg 1 against Wasm leg 1): exit 1, not 0 (the clean half requires exit 0 as well as its lines)"),
+    tail(compare.out),
+  );
+  // Their lines alone said equal: only the exit code fails each.
+  for (const w of [legs, compare]) assert.equal(w.out.split("\n").filter((l) => /exit 1, not 0/.test(l)).length, 1, w.out);
+});
+
+test("wasmStep's two options (the advisor's U4r build ruling, point 1 (4)): a non-default manifest reaches every npt-lab hash call and the loader's recordings; the bites half off starts no bites-build call", () => {
+  const DET = "crates/lab/det-recordings.json";
+  const recs = [
+    { name: "SS-P2-s1", first: 0 },
+    { name: "ES-P3-s2", first: 1_000_000 },
+  ];
+  const w = wasmWorld({ recs, manifestPath: DET, options: { manifest: DET, bitesHalf: false } });
+  assert.equal(w.ok, true, w.out);
+  const hashCalls = w.calls.filter((c) => c.line.startsWith(`${LAB} hash`) && !c.line.startsWith(`${LAB} hash vectors`));
+  assert.deepEqual(hashCalls.map((c) => c.kind), ["legs", "compare"]);
+  for (const c of hashCalls) assert.ok(c.line.includes(` --manifest ${DET} --dir ${WS.rec}`) && !c.line.includes(RECORDINGS_MANIFEST), c.line);
+  const wasmLegs = w.calls.filter((c) => c.kind.startsWith("wasm "));
+  assert.deepEqual(
+    wasmLegs.map((c) => c.line),
+    recs.map((r) => `node ${LOADER} --wasm ${WASM_M} --rec ${join(WS.rec, `${r.name}.rec`)} --name ${r.name} --first-tick ${r.first} --out ${join(WS.meas, `wasm-${r.name}.lines`)}`),
+  );
+  assert.ok(w.calls.every((c) => !c.line.includes("--features bites") && !c.line.startsWith(LAB_BITES) && !c.line.includes(WASM_B)), "no bites-build call");
+  assert.deepEqual(w.kinds.filter((k) => k.startsWith("build ")), ["build lab", "build wasm"]);
+  const last = lastLine(w.out);
+  assert.ok(last.includes("native leg 1 against Wasm leg 1: 18000 ticks compared, 0 mismatching, equal (SS-P2-s1 9000, ES-P3-s2 9000)"), last);
+  assert.ok(last.includes("hash-map: not run: the bites half is off (wasmStep's bitesHalf option); std-sin: not run: the bites half is off (wasmStep's bitesHalf option)"), last);
+  // The defaults: check.mjs's own manifest and the bites half.
+  const d = wasmWorld();
+  assert.ok(d.calls.some((c) => c.line.startsWith(LAB_BITES)) && d.calls.every((c) => !c.line.includes(DET)));
 });
 
 test("the wasm step judges PM-0004-21's two bites: each caught at its tick and field, or not exercised; anything else fails (U4d2, 2.4 (a) item 6)", () => {

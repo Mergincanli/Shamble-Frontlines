@@ -2109,3 +2109,29 @@ two end checks both pass all 11 steps, and FP-8's two regenerations pass.
 ### For Mustafa
 
 - Nothing.
+
+## Merge into the spike branch (the main session, 2026-11-14; the advisor's round-2 ruling, advisor-u4r-r2-full.md, steps 2-9)
+
+- **M1:** wip/u4r.patch sha256 21ca46be23704131c77cc20981a4bfe866811b33f9ca853279f7ddbfb5d58bce, unchanged since
+  450af1a (`git diff --stat 450af1a HEAD` on it: empty); `diff -rq .gate/u4r-snap2/spikes <copy 6's worktree>/spikes`:
+  empty; the tree fingerprint from the copy's root: 63713cf344482a9b3e5f911bab4012d16201dab753b972c6e042c5fd894aa5bf.
+- **M2:** `git diff --quiet 2fbec77 HEAD -- spikes/` exit 0; every commit since 2fbec77 touches only .checkpoints/;
+  origin/main 4460ef5 (docs only), not merged in (MAIN-52).
+- **M3 (about 13:44 UTC):** the card pushed (0eded3c), the saver stopped; `git apply --check`, then `git apply`, in
+  the main folder: 13 modified and 13 new files, all under spikes/netcode-proof, nothing else.
+- **M4:** each of the 26 files cmp-equal to .gate/u4r-snap2's copy (26 compared, 0 differ); the fingerprint from the
+  main folder's root 63713cf344482a9b3e5f911bab4012d16201dab753b972c6e042c5fd894aa5bf.
+- **M5** (.gate/u4r-merge/m5.log, one main-run.sh call, 13:44:35-14:06:39 UTC, exit 0, free 4,679 MiB at its start):
+  `uptime` first (up 3:09, load average 0.27, 0.09, 0.10); the six builds, every provenance line under
+  /home/user/Shamble-Frontlines/spikes/netcode-proof/crates/; `node check.mjs` "check: all 11 steps pass" (test 531
+  and 609, 0 failed, 0 skips; self 77 of 77; marks 81; redact 0; deps as c6-end2.log:173; wasm 43.5 s as
+  c6-end2.log:174); `node ops/runs/det-u4.mjs` deps PASS and det-u4 PASS (18,000 ticks, 0 mismatching, both
+  comparisons; non-cargo 227.2 s: npt-lab hash 223.8 + Wasm 2.5 + 0.9); the measured npt-lab build, then the pre-check
+  regeneration: SS-P0-s4 16,950,444 bytes, sha256 6933b56a…bab3 as the manifest's, legs equal (9,000 ticks).
+- **M6:** no test failure; nothing re-run; TE2-5's rule ends at this merge (TE-Q2).
+- **M7:** `node tools/gate.mjs`: all PASS except 5a smoke, which could not start (the tools' Playwright looks for
+  chromium_headless_shell-1194; the container holds 1243; .gate/u4r-merge/gate.log); `node tools/gate.mjs --no-smoke`:
+  GATE PASS (.gate/u4r-merge/gate-no-smoke.log). CI's gate, smoke and toolchain jobs: on the pushed head (M9).
+- **M8:** one commit, "U4r: the L1 runner, the -30 pre-check and the run scripts, merged after review round 2": the
+  26 files as applied, `git rm` of wip/u4r.patch, these notes, u4r-report.md and the card. The FP-5 helper test stays
+  in copy 6's worktree only (never committed).

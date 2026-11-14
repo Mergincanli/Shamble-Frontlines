@@ -41,7 +41,15 @@ the spike branch, M1 to M9, as its steps 2-10 say.**
   pre-check set (16), the judged sets P3, B1, P2, then P0 (17).
 - **COMPACT-WAIT:** /compact was asked at about 13:27; this block is the refresh; work carries on. The 20-minute
   reminder fired at 13:47 with no /compact typed: the card was already current (2494918, 13:45); carried on.
-- **The merge, as it stands (about 13:55 UTC):** M1 and M2 hold (patch 21ca46be unchanged since 450af1a; snap2's
+- **The merge at about 14:12 UTC: M1 to M7 PASS; M8 is the commit carrying this card.** M5 (.gate/u4r-merge/m5.log,
+  13:44:35-14:06:39, exit 0): uptime first (up 3:09, load 0.27); check.mjs all 11 steps, 531/609 0 failed, self 77,
+  marks 81, redact 0, wasm 43.5 s as expected; det-u4 PASS, non-cargo 227.2 s (≤ 240); SS-P0-s4 regenerated, sha256
+  6933b56a… as the manifest's. M6: no test failure, so TE2-5's rule ends here (TE-Q2). M7: the full gate PASS but 5a
+  smoke, which could not start (the tools want chromium_headless_shell-1194; 1243 is installed: gate.log); --no-smoke
+  GATE PASS (gate-no-smoke.log). u4r-report.md filled (220 lines); u4r-build.md gained "Merge into the spike branch".
+  **Next: M9** (push; restart the saver; CI's gate, smoke and toolchain green on the pushed head; the card: U4r merged
+  at <sha>), then the advisor's review of the pushed head, then the r2 record run under INF-R2-1's interim rule.
+- **The merge, as it stood about 13:55 UTC:** M1 and M2 hold (patch 21ca46be unchanged since 450af1a; snap2's
   spikes/ = the worktree's; fingerprint 63713cf3… from the copy's root; spikes/ unchanged since 2fbec77, only
   .checkpoints/ commits since; main 4460ef5). **M3 done: the patch is applied in the main folder** (13 M, 13 new,
   nothing else; uncommitted until M8). M4 holds (26 files cmp-equal to snap2; fingerprint 63713cf3… from the main

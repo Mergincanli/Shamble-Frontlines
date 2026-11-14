@@ -10,8 +10,10 @@
 //   so no host clock or random source can reach the Wasm leg (the advisor's U4d2 round-1 ruling, FX-4: an import
 //   object `{}` would have given a module importing `constructor.constructor` JS's Function); and a target_features
 //   section that lists simd128 or relaxed-simd as used or required, or none, or more than one, or one that does not
-//   parse (FX-2: plan.md §4.5's "simd128 and relaxed-simd off", read from the module itself, so a source-level
-//   `#[target_feature]` or a flag reaching rustc by a route check.mjs does not read is refused too). It instantiates
+//   parse (FX-2: plan.md §4.5's "simd128 and relaxed-simd off", read from the module itself: a feature enabled at
+//   compile time, by a source-level `#[target_feature]` or a flag from a route check.mjs does not read, shows in that
+//   section and is refused; but the section is the linker's record, so link arguments from a RUSTC_WRAPPER, allowed for
+//   sccache, can rewrite it, and the x86-64 legs have no such check: carry 85 (a)). It instantiates
 //   with `Object.create(null)`, an import object with nothing in it, not even Object.prototype's names.
 // - It streams the recording in: the file's bytes as little-endian 32-bit words, the last zero-padded, fed in chunks
 //   of 64 KiB with `step` called until NEED_MORE between them, never the whole file before the first step.

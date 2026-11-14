@@ -1,11 +1,13 @@
 //! npt-lab: ADR 0002's devtools analogue for the netcode proof test (plan §4.7; engine EA-3, EA-11).
 //!
-//! `SimClock` (integer ns) and `L1Scenario`, which steps one server and 48 headless clients on one simulated clock in a
-//! fixed order per instant (due packets, the server's I/O step, the server tick if due, due client frames, due client
-//! ticks); the x86-64 re-decode and replay tool for the Arm rule (`ReplayX86`); the native-against-Wasm hash comparer
-//! ([`HashCompare`], U4d2). Nothing depends on this crate. Built in units U2 and U4.
+//! This library holds the native-against-Wasm hash comparer ([`HashCompare`], U4d2) and its [`TickHash`]. The npt-lab
+//! binary holds `SimClock` (integer ns) and the L1 runner, plan §4.7's `L1Scenario`, built as `scenario::run` with its
+//! `Server` (one server and 48 headless clients on one simulated clock, in a fixed order per instant: due packets, the
+//! server's I/O step, the server tick if due, due client frames, due client ticks), and the x86-64 re-decode and replay
+//! tool for the Arm rule (`replay::ReplayX86`). Nothing depends on this crate. Built in units U2 and U4.
 
-/// One tick's entry in a leg's per-tick hash list: the recording (or run) it replays, the tick and the state hash.
+/// One tick's entry in a leg's per-tick hash list: the recording both legs replay (its manifest name), the tick and the
+/// state hash.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TickHash {
     /// The recording both legs replay (the same name on both legs), as its manifest names it.

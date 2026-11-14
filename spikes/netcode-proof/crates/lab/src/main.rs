@@ -13,9 +13,15 @@
 //! error. `probe`'s log header and summary line carry the whole fate log's SHA-256 and, since U4d2 (carry 66), the
 //! SHA-256 of v1's tag and the log's datagram entries, the hash U2's v1 logs had.
 
+mod contract;
 mod hash;
+mod logs;
 mod machine;
+mod mirror;
+mod precheck;
 mod probe;
+mod replay;
+mod scenario;
 
 use npt_l1::Profile;
 use npt_log::{Ended, Header, SCHEMA, Writer};
@@ -216,10 +222,95 @@ fn main() -> ExitCode {
             }
         };
     }
+    if cmd == "scenario" {
+        let s = match scenario::parse(rest) {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("npt-lab scenario: {e}\nusage: {}", scenario::USAGE);
+                return ExitCode::from(2);
+            }
+        };
+        return match scenario::run(&s) {
+            Ok(o) => {
+                println!("{}", scenario::summary_line(&s, &o));
+                ExitCode::SUCCESS
+            }
+            Err(hash::Failure::Usage(e)) => {
+                eprintln!("npt-lab scenario: {e}\nusage: {}", scenario::USAGE);
+                ExitCode::from(2)
+            }
+            Err(hash::Failure::Failed(e)) => {
+                eprintln!("npt-lab scenario: {e}");
+                ExitCode::from(1)
+            }
+        };
+    }
+    if cmd == "replay" {
+        let s = match replay::parse(rest) {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("npt-lab replay: {e}\nusage: {}", replay::USAGE);
+                return ExitCode::from(2);
+            }
+        };
+        return match replay::run(&s) {
+            Ok(o) => {
+                println!("{}", replay::summary_line(&s, &o));
+                ExitCode::SUCCESS
+            }
+            Err(hash::Failure::Usage(e)) => {
+                eprintln!("npt-lab replay: {e}\nusage: {}", replay::USAGE);
+                ExitCode::from(2)
+            }
+            Err(hash::Failure::Failed(e)) => {
+                eprintln!("npt-lab replay: {e}");
+                ExitCode::from(1)
+            }
+        };
+    }
+    if cmd == "precheck" {
+        return match precheck::main(rest) {
+            Ok(lines) => {
+                for l in lines {
+                    println!("{l}");
+                }
+                ExitCode::SUCCESS
+            }
+            Err((code, e)) => {
+                eprintln!("npt-lab precheck: {e}\nusage: {}", precheck::USAGE);
+                ExitCode::from(code)
+            }
+        };
+    }
+    if cmd == "contract" {
+        return match contract::main(rest) {
+            Ok(lines) => {
+                for l in lines {
+                    println!("{l}");
+                }
+                ExitCode::SUCCESS
+            }
+            Err((code, e)) => {
+                if code == 2 {
+                    eprintln!("npt-lab contract: {e}\nusage: {}", contract::USAGE);
+                } else if code == contract::UNREADABLE {
+                    // Not the contract's FAIL (the advisor's U4r build ruling 3, point 6 (3)).
+                    eprintln!("npt-lab contract: {e} (exit {code}: an input that cannot be read)");
+                } else {
+                    println!("{e}");
+                }
+                ExitCode::from(code)
+            }
+        };
+    }
     if cmd != "probe" {
         eprintln!(
-            "npt-lab: unknown command {cmd:?}\nusage: {USAGE}\n       {}",
-            hash::USAGE
+            "npt-lab: unknown command {cmd:?}\nusage: {USAGE}\n       {}\n       {}\n       {}\n       {}\n       {}",
+            hash::USAGE,
+            scenario::USAGE,
+            replay::USAGE,
+            precheck::USAGE,
+            contract::USAGE
         );
         return ExitCode::from(2);
     }

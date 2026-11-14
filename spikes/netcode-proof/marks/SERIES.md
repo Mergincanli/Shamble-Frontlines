@@ -330,6 +330,37 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
 | `header.params.burst_spacing_ns` | ns | npt-lab (L1), the run script (L2) | B1's scheduled interval between burst starts, before each burst's offset; a practice run and its counted run share it | -18 (the rule) |
 | `header.params.config_hz` | Hz | the run script (L2) | RS's kernel CONFIG_HZ (the ruling's `machine.config_hz`, as a header param: README §2.5) | -18 (the practice record's header checks) |
 
+### Names added with U4r (the L1 runner, npt-lab `scenario`; u4r-brief.md 2.1; U4R-Q2 (c): new rows only, 2026-11-13)
+
+Every name U4r's runner writes that had no row. The header params record the run's settings (README §1's `params`:
+name to JSON value); the events in the lab log (`client_counts`, `class_audit`, `fate_log`, `run_lengths`, `recording`)
+are written once at the run's end, after the measured phase. No mark reads them yet but -18's two `burst_heal` fields
+(reported).
+
+| Name | Unit | Written by (crate) | Meaning | Marks |
+|---|---|---|---|---|
+| `header.params.lead_ticks_count` | count (ticks) | npt-lab | the command lead every client of the run stamps with: the profile's round trip plus its jitter in ticks, rounded up, at least 1, plus 1 (carry 74 as U4R-Q14 ruled: P0 2, P1 3, P2 and B1 5, P3 7) | none (recorded beside `cmd_timing`) |
+| `header.params.event_start_count`, `.cmd_start_count` | count (a sequence) | npt-lab | the room's first event sequence (`Room::with_event_start`) and each client's first command sequence (`ClientEndpoint::with_starts`): 0, or a run's start near the 16-bit wrap (carry 75) | none (recorded) |
+| `header.params.event_queue_cap_provisional` | flag (true or false) | npt-lab (from `Room::event_cap`) | true while the room's event-queue cap is provisional (carry 57) | none (recorded beside `event_queue_cap_count`) |
+| `header.params.warmup_ticks_count`, `.measured_ticks_count` | count (ticks) | npt-lab | the run's warm-up and measured lengths in ticks (the after phase's: `event.run_lengths.after_ticks_count`) | none (recorded) |
+| `header.params.behaviour` | string | npt-lab | the bots' behaviour (npt-bots' `Behaviour`): `brawl`, or an open-loop script `presses`, `clamp` or `steady` | none (recorded) |
+| `header.params.features` | list of strings | npt-lab | the npt-lab build's features: `["bites"]` or `[]` (the header's `build.features` is the judge's) | none (recorded) |
+| `header.params.every_step` | flag (true) | npt-lab | present only on D13's test-only runs, which give a command at every client step (never a judged run: refused with marks) | none |
+| `header.params.stand_in_burn_ns`, `.stand_in_top_up_ns` | ns | npt-lab | S1's stand-in burn and top-up as run: 0 on L1 (stand-ins off: §4.13) | none (recorded) |
+| `header.params.weapon_interval_us`, `.weapon_damage_count`, `.weapon_reach_cm`, `.weapon_magazine_count`, `.weapon_reload_ms`, `.weapon_spread_urad` | as each name's suffix (µs, count, cm, count, ms, µrad) | npt-lab (from `Scene::weapon`) | the scene's weapon: shot interval, damage, reach, magazine, reload and spread (carry 60) | none (recorded) |
+| `header.params.soldier_health_count` | count | npt-lab (from `Scene::health`) | the scene's soldiers' health (carry 60) | none (recorded) |
+| `tick.s.input_payload_bytes` | bytes | npt-lab | the room log: each `Input` datagram's payload the clients sent since the last tick, in send order (not one per slot) | none (recorded) |
+| `event.admit.session`, `.in_roster` | identifier; flag (true or false) | npt-lab (the room log) | per admission (field `slot`): the session's id in the run, and whether its join was in the room's roster (README §4's `roster` rule reads `in_roster`) | the `roster` rule |
+| `event.burst_heal.full_state`, `.queue_max_count` | flag; count | npt-lab (L1) | per heal record (fields `slot`, `burst`): 1 when a `FullState` reached that client during the burst (a full state never counts as the heal); the client's event queue's high-water mark from the burst's start to its heal (carry 58) | -18 (reported) |
+| `event.burst_eviction.baseline_age` | count (ticks), signed | npt-lab (from npt-room) | per client per burst (fields `slot`, `burst`): the age of the client's baseline at the first tick after the burst; 0: coded against the per-type defaults (no baseline); -1: no snapshot sent that tick | -18 (recorded) |
+| `event.counter_wrap.counter` | name | npt-lab | the counter that wrapped (beside `tick_count`) | -58 (recorded) |
+| `event.snap_refused.kind` | name | npt-lab (from npt-room's refusal counters) | `out_of_range`, `too_many`, `too_large` or `not_canonical` (beside `tick_count`) | none (recorded) |
+| `event.client_counts.commands_count`, `.steps_without_command_count`, `.duplicate_stamps_count`, `.late_count`, `.press_refused_count`, `.buffer_full_count`, `.rewinds_refused_count`, `.stale_count`, `.events_queued_count`, `.overflow_resyncs_count` | count | npt-lab (from npt-bots, npt-room and npt-client's counters) | per client at the run's end (field `slot`): commands given, client steps without one, two commands stamped for one tick (D13 only), the room's late, press-refused, buffer-full and refused-rewind counts, `ClientEndpoint::stale()`, events queued, overflow resyncs (carries 74 and 77 (c)) | none (r2 reports them) |
+| `event.class_audit.owner_count`, `.spatial_count`, `.spatial_unchecked_count`, `.public_count`, `.events_count`, `.team_count`, `.breaches_count`, `.first_breach` | count; the last a text | npt-lab (the room-side mirror) | r4's class audit over the run: own-state records, entity records checked against the interest radius and not checked, headers, events, team records (0: no team section in the spike), every breach, and the first breach's text | none (r4) |
+| `event.fate_log.sha256` | hex string | npt-lab (from npt-l1's fate log) | the SHA-256 of the run's L1 fate log (r1, the twin test) | none (r1) |
+| `event.run_lengths.warmup_ticks_count`, `.measured_ticks_count`, `.after_ticks_count`, `.order_digest`, `.after_capped` | count (ticks); 16 hex digits; flag (true or false) | npt-lab | the run's three phases in ticks; the digest of the order its clients connected in (r1's bite); true when a bite run's after phase reached its cap with measured ticks unresolved, so the stop decided them lost (carry 73's tick16 past the wrap; a measured run fails there instead) | none (recorded) |
+| `event.recording.ticks_count`, `.bytes`, `.sha256`, `.span_ms` | count; bytes; hex string; ms | npt-lab | a `--record` run's recording: its ticks, size, SHA-256 and the room's hit-volume span (carry 82) | none (recorded) |
+
 ## Series read only by figures (18)
 
 | Name | Unit | Written by (crate) | Meaning | Figures |

@@ -680,12 +680,24 @@ export function unsafeProblems(files, read) {
       if (EXCEPTION_LEVELS[crate] === "deny") {
         const name = UNSAFE_EXCEPTIONS[crate];
         if (f === `${crate}build.rs`) problems.push(`${f} is a build script in ${name}, which may have none: ${DENY_EXCEPTION_WHY}`);
-        for (const m of mask.matchAll(/\binclude\b(?!\s*!)/g)) {
+        // Carry 85 (c): `include` only directly before `!` and an opening bracket, so neither a rename nor a macro
+        // given the bare name (`m!(include!)`) can build a call the include! rule does not see.
+        for (const m of mask.matchAll(/\binclude\b(?!![([{])/g)) {
           problems.push(
-            `${f}:${lineAt(mask, m.index)} names \`include\` other than as an include!, include_str! or include_bytes! call ` +
-              `(a renamed include!, as \`use std::include as inc;\`, hides the call from the include! rule), which ${name} may not: ` +
+            `${f}:${lineAt(mask, m.index)} names \`include\` other than directly before \`!\` and an opening bracket, as an ` +
+              `include!, include_str! or include_bytes! call is written (a renamed include!, as \`use std::include as inc;\`, or ` +
+              `one a macro builds, as \`m!(include!)\`, hides the call from the include! rule), which ${name} may not: ` +
               DENY_EXCEPTION_WHY,
           );
+        }
+      }
+      // Carry 85 (c), as advisor-u4r-r1 widened it (FP-6 item 8: SEC-U4R-5): no attribute in any crate holds a
+      // metavariable (`$`) anywhere in its text, from `#[` or `#![` to its matching `]` in the mask, so neither a #[path]
+      // nor an allow built from a macro's fragment (`#[$p]`, `#[cfg_attr(all(), $a)]`) can bring an unread file under a
+      // listed export's allow.
+      for (const a of attrs) {
+        if (mask.slice(a.bodyStart, a.bodyEnd).includes("$")) {
+          problems.push(`${f}:${lineAt(mask, a.start)} has an attribute holding a metavariable (\`$\` between \`#[\` or \`#![\` and its \`]\`): a macro could build a #[path] or an allow from a fragment that this scan does not read`);
         }
       }
       problems.push(...pathProblems(f, crate, code, mask, attrs));
@@ -1425,6 +1437,13 @@ const UNSTABLE_ENV = {
  *   the ones cargoConfigFiles finds); a rustflags value this check cannot read;
  * - an alias that replaces clippy or fmt (CARGO_ALIAS_CLIPPY or _FMT, or such a key in a config file);
  * - another compiler or a workspace wrapper (COMPILER_ENV, COMPILER_KEYS);
+ * - a linker set for any target (carry 85 (a)), as the compiler is: an environment variable whose name ends in _LINKER
+ *   (CARGO_TARGET_<triple>_LINKER, CARGO_HOST_LINKER) or a `linker` key in any table of a config file: a linker's own
+ *   arguments can rewrite the Wasm module's target_features section, the linker's record that the loader reads;
+ * - a profile set outside the manifests (carry 85 (b)): an environment variable whose name starts with CARGO_PROFILE_,
+ *   or a `profile` key, dotted key or table in a config file (any table or form, which fails closed): a config's
+ *   `[profile.release.package.npt-sim] overflow-checks = false` drops npt-sim's `-C overflow-checks=on`, which plan §4.5
+ *   asks for in every profile;
  * - a config `include` key or `[[include]]` table, its name quoted or not, which loads a config file cargoConfigFiles
  *   does not read (cargo 1.99.1 honours it);
  * - a target runner (CARGO_TARGET_<triple>_RUNNER, or a `runner` key in a config file): it runs the test binaries in
@@ -1452,6 +1471,8 @@ export function cargoConfigProblems(env, configs) {
     const alias = k.match(/^CARGO_ALIAS_(\w+)$/)?.[1].toLowerCase();
     if (SHADOWABLE.includes(alias)) problems.push(`${k} in the environment replaces \`cargo ${alias}\` with an alias`);
     if (COMPILER_ENV.includes(k)) problems.push(`${k} in the environment replaces rustc or wraps the workspace's rustc calls (only RUSTC_WRAPPER may wrap them)`);
+    if (/_LINKER$/.test(k)) problems.push(`${k} in the environment sets a linker (${JSON.stringify(v)}): its arguments can rewrite the target_features section the Wasm loader reads`);
+    if (/^CARGO_PROFILE_/.test(k)) problems.push(`${k} in the environment sets a profile key (${JSON.stringify(v)}): it can drop npt-sim's -C overflow-checks=on, which plan §4.5 asks for in every profile`);
     if (/^CARGO_TARGET_\w+_RUNNER$/.test(k)) problems.push(`${k} in the environment runs the test binaries in cargo's place`);
     if (Object.hasOwn(UNSTABLE_ENV, k)) problems.push(`${k} in the environment ${UNSTABLE_ENV[k]}`);
   }
@@ -1466,6 +1487,25 @@ export function cargoConfigProblems(env, configs) {
     }
     for (const name of COMPILER_KEYS) {
       if (tomlValues(scan, name).length) problems.push(`${path} has a key \`${name}\`: it replaces rustc or wraps the workspace's rustc calls`);
+    }
+    for (const v of tomlValues(scan, "linker")) {
+      problems.push(`${path} has a key \`linker\` (${v === null ? "a value this check cannot read" : JSON.stringify(v.join(" "))}): it sets a linker, whose arguments can rewrite the target_features section the Wasm loader reads`);
+    }
+    // A key, dotted key or table header named `profile`, bare or quoted (as tomlValues reads keys, and `.` too).
+    const profile =
+      tomlHeaderHeads(scan).includes("profile") ||
+      /(?:^|[\s.{,])profile[ \t]*[.=]/m.test(scan.mask) ||
+      scan.strings.some((s) => s.value === "profile" && /^[ \t]*[.=]/.test(scan.mask.slice(s.end)) && /(?:^|[\s.{,[])$/.test(scan.mask.slice(0, s.start)));
+    if (profile) {
+      // Its line and text, as the refusals above name their value (advisor-u4r-r1, FP-6 item 9: SEC-U4R-6): the first
+      // place a header, a bare or dotted key, or a quoted key names `profile`.
+      const header = scan.mask.match(/^[ \t]*\[\[?[ \t]*profile[ \t]*[.\]]/m);
+      const key = scan.mask.match(/(?:^|[\s.{,])profile[ \t]*[.=]/m);
+      const quoted = scan.strings.find((s) => s.value === "profile" && /^[ \t]*[.=]/.test(scan.mask.slice(s.end)) && /(?:^|[\s.{,[])$/.test(scan.mask.slice(0, s.start)));
+      const found = [header?.index, key ? key.index + key[0].indexOf("profile") : undefined, quoted?.start].filter((i) => i !== undefined);
+      const line = lineAt(scan.mask, found.length ? Math.min(...found) : 0);
+      const said = text.split("\n")[line - 1].trim();
+      problems.push(`${path}:${line} has a profile key or table (${JSON.stringify(said)}): it can drop npt-sim's -C overflow-checks=on, which plan §4.5 asks for in every profile`);
     }
     if (tomlValues(scan, "include").length || tomlHeaderHeads(scan).includes("include")) {
       problems.push(`${path} has a key \`include\`: it loads a config file this check does not read`);
@@ -1545,9 +1585,10 @@ export function buildFlagProblems(sources) {
  * `--target` (the advisor's U4d2 round-1 ruling, FX-1: RR-M2 with TE-M1, SEC-U4D2-5, SEC-U4D2-6), as sentences naming
  * the source and its value:
  * - each source rustflagSources reads (every environment variable whose name ends in RUSTFLAGS, and every `rustflags`
- *   key of the cargo configs read) with a flag in it. Cargo gives rustc the first non-empty one of
- *   CARGO_ENCODED_RUSTFLAGS, RUSTFLAGS, the target tables and build.rustflags and drops the others
- *   (https://doc.rust-lang.org/cargo/reference/config.html, build.rustflags), so a read-back given all of them could
+ *   key of the cargo configs read) with a flag in it. Cargo gives rustc one source and drops the others
+ *   (https://doc.rust-lang.org/cargo/reference/config.html, build.rustflags; carry 85 (e)): CARGO_ENCODED_RUSTFLAGS if
+ *   set, even empty; else RUSTFLAGS if set, even empty; else the matching target tables' flags, if any; else
+ *   build.rustflags. So a read-back given all of them could
  *   take a flag's negation from a source cargo drops (`-Ctarget-feature=-simd128,-relaxed-simd` in RUSTFLAGS beside
  *   CARGO_ENCODED_RUSTFLAGS=-Ctarget-cpu=bleeding-edge passed while the module cargo built held both: RR-M2), and a
  *   flag no name rule knows (`--cfg feature="bites"`, `-C overflow-checks=off`, `-C llvm-args=...`) reached rustc unseen
@@ -1759,16 +1800,26 @@ export function manifestKeyProblems(manifests) {
 }
 
 /**
- * The cargo config files cargo reads when it runs in `start`: .cargo/config.toml and .cargo/config in `start` and in
- * every folder above it, then in CARGO_HOME (`env`'s, default ~/.cargo); each that exists, as { path, text }.
+ * The folders cargo reads its config files from when it runs in `start`: .cargo in `start` and in every folder above
+ * it, then CARGO_HOME (`env`'s) as cargo reads it (carry 85 (d)): an empty one as unset (~/.cargo), a relative one
+ * against `start`, the folder cargo runs in (cargo's home crate: CARGO_HOME non-empty, joined to the working folder).
  */
-function cargoConfigFiles(start, env) {
+export function cargoConfigDirs(start, env) {
   const dirs = [];
   for (let d = resolve(start); ; d = dirname(d)) {
     dirs.push(join(d, ".cargo"));
     if (dirname(d) === d) break;
   }
-  dirs.push(env.CARGO_HOME ?? join(homedir(), ".cargo"));
+  dirs.push(env.CARGO_HOME ? resolve(start, env.CARGO_HOME) : join(homedir(), ".cargo"));
+  return dirs;
+}
+
+/**
+ * The cargo config files cargo reads when it runs in `start`: .cargo/config.toml and .cargo/config in each of
+ * cargoConfigDirs; each that exists, as { path, text }.
+ */
+function cargoConfigFiles(start, env) {
+  const dirs = cargoConfigDirs(start, env);
   const found = [];
   for (const dir of new Set(dirs)) {
     for (const name of ["config.toml", "config"]) {
@@ -1845,14 +1896,29 @@ export function marksProblems(marks, readFile) {
 }
 
 /**
- * One command, waited for: `timeout` (ms; 0, none) stops it with SIGTERM once passed, and the result says so
- * (`timedOut`: spawnSync's ETIMEDOUT), so a hung call is a named failure, not a lock held forever (INF-4).
+ * One command, waited for: `timeout` (ms; 0, none) stops it with SIGKILL once passed (a SIGTERM the call handles could
+ * hold it past the deadline: advisor-u4r-r1, FP-6 item 11, INF-U4R-10 (1)), and the result says so
+ * (`timedOut`: spawnSync's ETIMEDOUT), so a hung call is a named failure, not a lock held forever (INF-4). A call with a
+ * timeout runs in its own process group (spawnSync's `detached`: the child calls setsid), and once it is stopped that
+ * whole group is killed (SIGKILL to the group), so every process it started goes with it (carry 84 (b): spawnSync's
+ * timeout signals the direct child alone, so `npt-lab hash`'s two leg processes kept running). Limits: a process that
+ * leaves the group by its own setsid is not reached; and since the group is its own session, a signal that stops
+ * check.mjs while such a call runs (Ctrl-C) does not reach the call: end it by hand (`pgrep -a npt-lab`; `pgrep -af
+ * loader.mjs`). check.test.mjs runs it on real processes (carry 84 (c)).
  */
-function run(cmd, args, cwd, env = process.env, timeout = 0) {
-  const r = spawnSync(cmd, args, { cwd, env, encoding: "utf8", maxBuffer: 1 << 28, ...(timeout ? { timeout } : {}) });
+export function run(cmd, args, cwd, env = process.env, timeout = 0) {
+  const r = spawnSync(cmd, args, { cwd, env, encoding: "utf8", maxBuffer: 1 << 28, ...(timeout ? { timeout, detached: true, killSignal: "SIGKILL" } : {}) });
+  const timedOut = r.error?.code === "ETIMEDOUT";
+  if (timedOut && r.pid) {
+    try {
+      process.kill(-r.pid, "SIGKILL");
+    } catch {
+      // ESRCH: no process of the group is left.
+    }
+  }
   // `stdout` alone is kept for the steps that parse it: cargo writes progress lines ("Blocking waiting for file
   // lock", "Downloaded …") to stderr, and they must never reach a JSON parser.
-  return { ok: r.status === 0, out: `${r.stdout ?? ""}${r.stderr ?? ""}`, stdout: r.stdout ?? "", status: r.status, timedOut: r.error?.code === "ETIMEDOUT" };
+  return { ok: r.status === 0, out: `${r.stdout ?? ""}${r.stderr ?? ""}`, stdout: r.stdout ?? "", status: r.status, timedOut };
 }
 
 /**
@@ -1998,8 +2064,11 @@ export function testBothBuilds(runner = run) {
  * - The build-flag scan and rustc's read-back read the rustflags sources above, not a build script's
  *   `cargo::rustc-flags` or a RUSTC_WRAPPER's own flags. No source may hold a flag (buildInputProblems: the advisor's
  *   U4d2 round-1 ruling, FX-1), so on a step that passes the read-back is given no flag, which is what cargo gives
- *   rustc from those sources; a flag reaching rustc another way, or a source-level `#[target_feature]`, is the Wasm
- *   leg's loader's to refuse from the module itself (its target_features section, FX-2).
+ *   rustc from those sources. The Wasm leg's loader reads the module's target_features section (FX-2): a feature
+ *   enabled at compile time, by a flag from another route or a source-level `#[target_feature]`, shows there and is
+ *   refused; but the section is the linker's record, so link arguments from a RUSTC_WRAPPER (allowed, for sccache) can
+ *   rewrite it (built: sec_probe_tf2_ld.wasm, r2-sec-loader.log), and the x86-64 legs have no artifact check at all
+ *   (carry 85 (a)).
  * - Inputs that can lower lints and are not read here: a cargo config's [env] table (CLIPPY_ARGS, C2R-4 G, or any
  *   other variable it sets for rustc), what a member's build script prints (`cargo::rustc-env`, C2R-4 H), a
  *   RUSTC_WRAPPER program (allowed, for sccache) and a rust-toolchain.toml `path`. Lint capping by any of them
@@ -2029,9 +2098,11 @@ const DEPS_CHECKED =
   "npt-tcpinfo relaxes it only by the #[allow] on srtt_us and unacked_and_unsent, has unsafe code only inside " +
   "them, and keeps lib.rs's deny of the two clippy unsafe lints, and npt-hash-wasm relaxes it only by one #[allow] on " +
   "each of its seven listed exports, whose #[unsafe(no_mangle)] is its only unsafe code, each taking and giving u32 " +
-  "or i32 only; neither npt-tcpinfo nor npt-hash-wasm has a build script or names `include` but as a macro call; " +
+  "or i32 only; neither npt-tcpinfo nor npt-hash-wasm has a build script or names `include` but directly before `!` " +
+  "and an opening bracket; no attribute holds a metavariable; " +
   "the environment and the cargo configs read pass no " +
-  "lint-lowering rustflags and set no clippy or fmt alias, no other rustc or workspace wrapper, no config include and " +
+  "lint-lowering rustflags and set no clippy or fmt alias, no other rustc or workspace wrapper, no linker, no profile, " +
+  "no config include and " +
   "no test runner, and the environment has no RUSTC_BOOTSTRAP or cargo channel override; no rustflags source holds a " +
   "flag (so none enables fma, simd128 or relaxed-simd or sets target-cpu=native) and neither the environment nor a " +
   "cargo config sets the build target, and rustc's read-back, given what cargo gives rustc, lists sse2 and " +
@@ -2208,7 +2279,10 @@ export function readScan(text) {
   return { catches, notCatchable, record };
 }
 
-/** The wasm step's time limit on each of its calls but its cargo builds: the step's whole 5-minute budget. */
+/**
+ * The wasm step's one deadline, shared by every call but its cargo builds from the first of them (carry 84 (a)): the
+ * step's whole 5-minute budget.
+ */
 const WASM_CALL_LIMIT_MS = 300_000;
 /** The real file operations of the wasm step (check.test.mjs passes its own), paths under the spike for `read`. */
 const WASM_IO = {
@@ -2228,8 +2302,8 @@ const WASM_IO = {
 
 /**
  * The determinism check (u4-build-plan.md §5 U4d2; plan.md §4.5:546-551; ADR 0002:500-505), through `runner` for every
- * command (cargo, npt-lab, Node), `io` for its files and `now` for its clock (main's, Date.now, which times each call;
- * npt-lab reads none):
+ * command (cargo, npt-lab, Node), `io` for its files and `now` for its clock (by default monotonic, performance.now,
+ * which times each call and the shared deadline: advisor-u4r-r1, FP-6 item 11, INF-U4R-10 (3); npt-lab reads none):
  * 1. the release builds (WASM_BUILDS), each artifact's path read from cargo's JSON and copied out;
  * 2. `npt-lab hash` (measured): the manifest's recordings regenerated into the step's folder and checked by length and
  *    SHA-256, then its two native legs in lock step, leg 1 against leg 2;
@@ -2245,28 +2319,57 @@ const WASM_IO = {
  *    ruling): a catch (recording R, tick T', field F) arms it at T' on R, native leg 1 and Wasm leg 1, whose first
  *    mismatch must be (R, T', F); "not catchable at this site on x86-64 and wasm32" is printed with the scan's record,
  *    and no std-sin leg runs.
+ *    The re-show (carry 83 (c)): the bitten native leg against a clean bites-build native leg (the hash-map half's
+ *    native leg 1, clean on the manifest's first recording before HASH_MAP_ARM: that pair's equal prefix) must first
+ *    differ at the scan's (recording, tick, field); a catch elsewhere fails the step, as no clean leg covers it.
  * It passes only with every manifest recording's ticks compared (its count each, their sum per pair) and 0 mismatching
- * for leg 1 against leg 2 and leg 1 against Wasm, h2's vectors equal and each bite's verdict as above. On a failure it
- * still runs every comparison it has the legs for; its last lines are one line per pair, h2 and each bite, then each
- * problem, then the summary, which main prints: the ticks per pair, the mismatches, each bite's outcome and each timed
- * call's seconds.
+ * for leg 1 against leg 2 and leg 1 against Wasm, `npt-lab hash` and its clean `compare` exiting 0 (carry 83 (b)), h2's
+ * vectors equal and each bite's verdict as above. On a failure it still runs every comparison it has the legs for; its
+ * last lines are one line per pair, h2 and each bite, then each problem, then the summary, which main prints: the
+ * ticks per pair, the mismatches, each bite's outcome and each timed call's seconds.
+ *
+ * Its options (the advisor's U4r build ruling, point 1 (4)): `manifest`, the recordings manifest every `npt-lab hash`
+ * call and the Wasm legs read (RECORDINGS_MANIFEST by default); `bitesHalf`, whether step 6 and its two bites builds
+ * run (by default they do). ops/runs/det-u4.mjs runs the clean half on crates/lab/det-recordings.json with the bites
+ * half off; check.mjs runs the defaults.
  */
-export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_STEP_DIR) {
+export function wasmStep(runner = run, io = WASM_IO, now = () => performance.now(), dir = WASM_STEP_DIR, { manifest = RECORDINGS_MANIFEST, bitesHalf = true } = {}) {
   const problems = [];
   const lines = [];
   const timed = [];
-  // Every call but the four cargo builds has WASM_CALL_LIMIT_MS (the advisor's U4d2 round-1 ruling, FX-7: INF-4): a
-  // hung leg would hold the lane lock for every other lane's cargo. The builds have none: under the exclusive lock no
-  // other cargo holds theirs, and a cold build's time is INF-1's to measure, not to cut.
+  // Every call but the four cargo builds shares one deadline, WASM_CALL_LIMIT_MS from the first of them (carry 84 (a);
+  // before it, each call had its own: the advisor's U4d2 round-1 ruling, FX-7: INF-4): each is given what is left, and
+  // once one is stopped, or the time is spent, the rest are not started, each named as skipped. A hung leg would hold
+  // the lane lock for every other lane's cargo. The builds have none: under the exclusive lock no other cargo holds
+  // theirs, and a cold build's time is INF-1's to measure, not to cut.
+  const share = `${WASM_CALL_LIMIT_MS / 1000} s shared by every call but its cargo builds, from the first of them`;
+  let deadline = null;
+  let stopped = null;
   const call = (label, cmd, args) => {
     const t0 = now();
-    const limit = cmd === "cargo" ? 0 : WASM_CALL_LIMIT_MS;
+    if (cmd !== "cargo") {
+      deadline ??= t0 + WASM_CALL_LIMIT_MS;
+      if (stopped || t0 >= deadline) {
+        problems.push(`${label}: not started (skipped): ${stopped ? `${stopped} was stopped at the step's deadline` : "the step's deadline had passed"} (${share})`);
+        return { ok: false, out: "", stdout: "", status: null, timedOut: false, skipped: true };
+      }
+    }
+    // Whole ms, as spawnSync takes them (the monotonic clock is fractional); at least 1 while time is left, never 0
+    // (no limit).
+    const limit = cmd === "cargo" ? 0 : Math.ceil(deadline - t0);
     const r = runner(cmd, args, HERE, undefined, limit);
     timed.push(`${label} ${((now() - t0) / 1000).toFixed(1)}`);
-    if (r.timedOut) problems.push(`${label}: still running after ${limit / 1000} s, so it was stopped (the wasm step's limit on each call but its four cargo builds)`);
+    if (r.timedOut) {
+      stopped ??= label;
+      problems.push(`${label}: still running at the step's deadline (${share}; ${(limit / 1000).toFixed(1)} s were left for it), so it was stopped with every process it started`);
+    }
     return r;
   };
-  const failure = (r) => lastLines(r.out, 1).trim() || `exit ${r.status}`;
+  const failure = (r) => (r.skipped ? "not started (skipped: the step's deadline)" : lastLines(r.out, 1).trim() || `exit ${r.status}`);
+  // Carry 83 (b): a clean-half call must also exit 0; its lines alone are not its verdict.
+  const exited = (what, r) => {
+    if (r && !r.skipped && !r.timedOut && r.status !== 0) problems.push(`${what}: exit ${r.status ?? "by a signal"}, not 0 (the clean half requires exit 0 as well as its lines)`);
+  };
   const bin = join(dir, "bin");
   const rec = join(dir, "recordings");
   const meas = join(dir, "measured");
@@ -2274,9 +2377,9 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
   const sin = join(dir, "std-sin");
   io.reset(dir);
   for (const d of [bin, rec, meas, hm, sin]) io.mkdir(d);
-  // 1. The builds.
+  // 1. The builds (the two bites builds only with the bites half).
   const art = {};
-  for (const b of WASM_BUILDS) {
+  for (const b of WASM_BUILDS.filter((x) => bitesHalf || !["labBites", "wasmBites"].includes(x.key))) {
     const r = call(`build ${b.copy}`, "cargo", b.args);
     const path = r.ok ? builtArtifact(r.stdout ?? "", b) : null;
     if (!r.ok) problems.push(`the release build of ${b.what} failed: ${failure(r)}`);
@@ -2289,13 +2392,13 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
   // The manifest's recordings, as the loader needs them (npt-lab checks the manifest's own rules).
   let entries = [];
   try {
-    const m = JSON.parse(io.read(RECORDINGS_MANIFEST));
+    const m = JSON.parse(io.read(manifest));
     entries = m.recordings.map((e) => ({ name: e.name, first: e.first_tick, ticks: e.ticks }));
   } catch (e) {
-    problems.push(`${RECORDINGS_MANIFEST} cannot be read: ${e.message}`);
+    problems.push(`${manifest} cannot be read: ${e.message}`);
   }
   const total = entries.reduce((s, e) => s + e.ticks, 0);
-  const manifestArgs = ["--manifest", RECORDINGS_MANIFEST, "--dir", rec];
+  const manifestArgs = ["--manifest", manifest, "--dir", rec];
   const loader = (wasm, e, out, extra = []) => [LOADER, "--wasm", wasm, "--rec", join(rec, `${e.name}.rec`), "--name", e.name, "--first-tick", String(e.first), "--out", out, ...extra];
   const stepped = (r) => Number(r.out.match(/: (\d+) ticks stepped/)?.[1] ?? Number.NaN);
   // A recording regenerated in this run (the folder is new each run, and npt-lab writes each file once it is checked).
@@ -2317,6 +2420,7 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
   let vectors = [];
   if (art.lab && entries.length) {
     const legs = call("npt-lab hash", art.lab, ["hash", ...manifestArgs, "--out", meas]);
+    exited("npt-lab hash", legs);
     const regen = legs.out.match(/^npt-lab hash: (.*(?:the manifest has|not this build's Recording::GENERATOR).*)$/m)?.[1];
     if (regen) problems.push(`the recordings manifest: ${regen}`);
     if (/order digest/.test(legs.out)) problems.push("a clean-half native leg wrote an order digest: a bites build's output given to the measured half");
@@ -2336,6 +2440,7 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
     const compareArgs = ["hash", "compare", "--ours", join(meas, "native-1.lines"), "--theirs", theirs.join(","), ...manifestArgs];
     const names = ["--ours-name", "native leg 1", "--theirs-name", "Wasm leg 1"];
     const cr = theirs.length ? call("compare", art.lab, [...compareArgs, ...names]) : null;
+    exited("npt-lab hash compare (native leg 1 against Wasm leg 1)", cr);
     let c = cr ? readComparison(cr.out, "native leg 1", "Wasm leg 1") : null;
     const e = c?.first && !c.field ? entries.find((x) => x.name === c.first.recording) : null;
     if (e) {
@@ -2361,17 +2466,24 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
   // 6. The bites half.
   const bites = { hashMap: "not run", stdSin: "not run" };
   const index = {};
-  if (art.labBites && art.wasmBites && entries.some(has)) {
+  if (!bitesHalf) {
+    // Off by the option: no bites build was made and no bites-build call starts (ops/runs/det-u4.mjs).
+    bites.hashMap = "not run: the bites half is off (wasmStep's bitesHalf option)";
+    bites.stdSin = bites.hashMap;
+  } else if (art.labBites && art.wasmBites && entries.some(has)) {
     const listed = call("npt-lab bites", art.labBites, ["hash", "bites"]);
     for (const m of listed.out.matchAll(/^(\d+) (\S+)$/gm)) index[m[2]] = Number(m[1]);
     for (const id of Object.values(WASM_BITES)) if (!index[id]) problems.push(`npt-lab hash bites lists no ${id} (World::BITES)`);
   } else problems.push(`the bites half did not run: ${art.labBites && art.wasmBites ? "no recording was regenerated" : "no bites builds"}`);
   const rec0 = entries[0];
+  // Whether the hash-map half's native legs ran: its leg 1 is the std-sin re-show's clean bites-build leg.
+  let cleanLeg = false;
   if (index[WASM_BITES.hashMap] && rec0 && !has(rec0)) problems.push(`hash-map: ${rec0.name} was not regenerated, so it did not run`);
   if (index[WASM_BITES.hashMap] && rec0 && has(rec0)) {
     const arm = String(HASH_MAP_ARM);
     const bite = ["--bite", WASM_BITES.hashMap, "--arm", arm, "--on", rec0.name];
     const legs = call("hash-map native legs", art.labBites, ["hash", ...manifestArgs, "--out", hm, "--only", rec0.name, "--bite", WASM_BITES.hashMap, "--arm", arm, "--dump-at", arm]);
+    cleanLeg = !legs.skipped && !legs.timedOut;
     const digests = { "native leg 1": legs.out.match(/^leg 1 order digest (\S+)/m)?.[1], "native leg 2": legs.out.match(/^leg 2 order digest (\S+)/m)?.[1] };
     for (const k of [1, 2]) {
       const r = call(`hash-map Wasm ${k}`, process.execPath, loader(art.wasmBites, rec0, join(hm, `wasm-${k}.lines`), ["--bite", String(index[WASM_BITES.hashMap]), "--arm", arm, "--dump-at", arm, "--dump-out", join(hm, `wasm-${k}.dump`)]));
@@ -2438,8 +2550,29 @@ export function wasmStep(runner = run, io = WASM_IO, now = Date.now, dir = WASM_
         "Wasm leg 1",
       );
       const caught = c?.first?.recording === recording && c.first.tick === tick && c.field === field;
+      // The re-show (carry 83 (c)): the bite, not another native-Wasm difference, causes the mismatch judged. The bitten
+      // native leg against a clean bites-build native leg, the hash-map half's leg 1 (clean on the manifest's first
+      // recording before HASH_MAP_ARM: its pair's equal prefix), replayed clean in `compare`'s own process to name the
+      // field against the bitten leg's dump.
+      let reshown = false;
+      if (recording !== rec0.name || tick >= HASH_MAP_ARM) {
+        problems.push(
+          `std-sin: the scan's catch ${recording} tick ${tick} is not on the manifest's first recording (${rec0.name}) before the hash-map bite's arming tick ${HASH_MAP_ARM}, so no clean bites-build native leg covers it and the bite's cause is not re-shown`,
+        );
+      } else if (!cleanLeg) {
+        problems.push("std-sin: the re-show did not run: the hash-map half's native legs, its clean leg, did not run");
+      } else {
+        const s = call("std-sin re-show", art.labBites, ["hash", "compare", "--ours", join(hm, "native-1.lines"), "--theirs", join(sin, "native-1.lines"), ...manifestArgs, "--theirs-dump", join(sin, "native-1.dump"), "--ours-name", "clean native leg 1", "--theirs-name", "std-sin native leg 1"]);
+        const rs = readComparison(s.out, "clean native leg 1", "std-sin native leg 1");
+        reshown = rs?.first?.recording === recording && rs.first.tick === tick && rs.field === field;
+        if (!reshown) {
+          problems.push(
+            `std-sin: the re-show (the bitten native leg against a clean bites-build native leg) ${rs ? `first differs at ${rs.first ? `${rs.first.recording} tick ${rs.first.tick}, field ${rs.field ?? "none"}` : (rs.at ?? "no entry")}` : `wrote no comparison: ${failure(s)}`}, not at the scan's ${recording} tick ${tick}, ${field}`,
+          );
+        }
+      }
       bites.stdSin = caught
-        ? `caught at ${recording} tick ${tick}, ${field}, as the scan found`
+        ? `caught at ${recording} tick ${tick}, ${field}, as the scan found${reshown ? "; re-shown against a clean bites-build native leg" : ""}`
         : `NOT caught at the scan's ${recording} tick ${tick}, ${field}: ${c ? `first mismatch ${c.first ? `${c.first.recording} tick ${c.first.tick}, field ${c.field ?? "none"}` : (c.at ?? "none")}` : "no comparison was written"}`;
       if (!caught) {
         problems.push(

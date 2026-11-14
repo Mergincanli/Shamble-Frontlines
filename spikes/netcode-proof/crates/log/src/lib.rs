@@ -302,7 +302,114 @@ fn check_names<'a>(names: impl Iterator<Item = &'a String>) -> io::Result<()> {
     Ok(())
 }
 
+/// The first text in `v` (a string or an object key, at any depth) holding a character for which `char::is_control`
+/// holds, as (its path, the character): carry 63, FU-7.
+fn control_char(v: &serde_json::Value, path: &str) -> Option<(String, char)> {
+    match v {
+        serde_json::Value::String(s) => s
+            .chars()
+            .find(|c| c.is_control())
+            .map(|c| (path.to_owned(), c)),
+        serde_json::Value::Array(a) => a
+            .iter()
+            .enumerate()
+            .find_map(|(i, x)| control_char(x, &format!("{path}[{i}]"))),
+        serde_json::Value::Object(o) => o.iter().find_map(|(k, x)| {
+            let p = if path.is_empty() {
+                k.clone()
+            } else {
+                format!("{path}.{k}")
+            };
+            k.chars()
+                .find(|c| c.is_control())
+                .map(|c| (p.clone(), c))
+                .or_else(|| control_char(x, &p))
+        }),
+        _ => None,
+    }
+}
+
+/// A JSON value walked only to find an object that holds one key twice (carry 63, FU-3): serde_json's own reading
+/// keeps the last one silently.
+struct NoDuplicateKey;
+
+impl<'de> serde::de::DeserializeSeed<'de> for NoDuplicateKey {
+    type Value = ();
+
+    fn deserialize<D: serde::Deserializer<'de>>(self, d: D) -> Result<(), D::Error> {
+        d.deserialize_any(self)
+    }
+}
+
+impl<'de> serde::de::Visitor<'de> for NoDuplicateKey {
+    type Value = ();
+
+    fn expecting(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("a JSON value")
+    }
+
+    fn visit_bool<E>(self, _: bool) -> Result<(), E> {
+        Ok(())
+    }
+
+    fn visit_i64<E>(self, _: i64) -> Result<(), E> {
+        Ok(())
+    }
+
+    fn visit_u64<E>(self, _: u64) -> Result<(), E> {
+        Ok(())
+    }
+
+    fn visit_f64<E>(self, _: f64) -> Result<(), E> {
+        Ok(())
+    }
+
+    fn visit_str<E>(self, _: &str) -> Result<(), E> {
+        Ok(())
+    }
+
+    fn visit_unit<E>(self) -> Result<(), E> {
+        Ok(())
+    }
+
+    fn visit_seq<A: serde::de::SeqAccess<'de>>(self, mut seq: A) -> Result<(), A::Error> {
+        while seq.next_element_seed(NoDuplicateKey)?.is_some() {}
+        Ok(())
+    }
+
+    fn visit_map<A: serde::de::MapAccess<'de>>(self, mut map: A) -> Result<(), A::Error> {
+        let mut seen = std::collections::BTreeSet::new();
+        while let Some(key) = map.next_key::<String>()? {
+            if seen.contains(&key) {
+                return Err(serde::de::Error::custom(format!(
+                    "an object holds the key {key:?} twice"
+                )));
+            }
+            map.next_value_seed(NoDuplicateKey)?;
+            seen.insert(key);
+        }
+        Ok(())
+    }
+}
+
+/// Refuses a JSON text in which any object holds one key twice (carry 63, FU-3).
+fn no_duplicate_key(text: &str) -> Result<(), String> {
+    use serde::de::DeserializeSeed;
+    let mut de = serde_json::Deserializer::from_str(text);
+    NoDuplicateKey
+        .deserialize(&mut de)
+        .and_then(|()| de.end())
+        .map_err(|e| format!("not one JSON record: {e}"))
+}
+
 fn check_header(h: &Header) -> Result<(), String> {
+    let v = serde_json::to_value(h).map_err(|e| format!("header: {e}"))?;
+    if let Some((field, c)) = control_char(&v, "") {
+        return Err(format!(
+            "header field {field:?} holds the control character U+{:04X}",
+            u32::from(c)
+        ));
+    }
     if h.schema != SCHEMA {
         return Err(format!(
             "header schema {} (this build reads {SCHEMA})",
@@ -448,9 +555,10 @@ impl fmt::Display for ReadError {
 
 impl std::error::Error for ReadError {}
 
-/// Reads one log and checks its discipline: the header first and only once, known record kinds and fields only,
-/// ticks strictly increasing, seconds never going back, the footer last with the right record count. A file with no
-/// footer reads as cut short (`footer` is `None`); the judge's `complete` rule decides what that means.
+/// Reads one log and checks its discipline: the header first and only once, known record kinds and fields only, no
+/// JSON object holding one key twice (carry 63), no control character in the header's text (carry 63), ticks strictly
+/// increasing, seconds never going back, the footer last with the right record count. A file with no footer reads as
+/// cut short (`footer` is `None`); the judge's `complete` rule decides what that means.
 pub fn read_log<R: BufRead>(input: R) -> Result<Log, ReadError> {
     let mut header: Option<Header> = None;
     let mut log_ticks = Vec::new();
@@ -467,6 +575,7 @@ pub fn read_log<R: BufRead>(input: R) -> Result<Log, ReadError> {
         if footer.is_some() {
             return Err(err("a record after the footer".to_owned()));
         }
+        no_duplicate_key(&text).map_err(err)?;
         let mut value: serde_json::Value =
             serde_json::from_str(&text).map_err(|e| err(format!("not one JSON record: {e}")))?;
         let kind = match value.as_object_mut().and_then(|o| o.remove("k")) {
@@ -859,5 +968,72 @@ mod tests {
         );
         let e = read_log(back.as_bytes()).expect_err("must fail");
         assert_eq!(e.line, 3);
+    }
+
+    /// Carry 63, FU-3: a JSON object holding one key twice is refused on read, at any depth (serde_json alone keeps
+    /// the last one, silently).
+    #[test]
+    fn fu3_a_json_object_with_a_duplicate_key_is_refused_on_read() {
+        let text = String::from_utf8(sample_log()).expect("utf-8");
+        let mut lines: Vec<String> = text.lines().map(str::to_owned).collect();
+        assert!(read_log(text.as_bytes()).is_ok(), "the clean log reads");
+        // A tick record whose `v` holds one name twice: the first value would be lost.
+        lines[1] = lines[1].replacen("\"work_ns\":", "\"work_ns\":1,\"work_ns\":", 1);
+        let doubled = lines.join("\n") + "\n";
+        let e = read_log(doubled.as_bytes()).expect_err("a duplicate key in a tick's v");
+        assert_eq!(e.line, 2);
+        assert!(e.msg.contains("work_ns"), "{}", e.msg);
+        // A duplicate at the record's top level, and one inside the header's params.
+        let top = format!("{}\n", text.lines().next().expect("header")).replacen(
+            "\"run\":",
+            "\"run\":\"R0-other\",\"run\":",
+            1,
+        );
+        let e = read_log(top.as_bytes()).expect_err("a duplicate key in the header");
+        assert_eq!(e.line, 1);
+        let nested = format!("{}\n", text.lines().next().expect("header")).replacen(
+            "\"sim\":",
+            "\"sim\":\"x\",\"sim\":",
+            1,
+        );
+        assert!(
+            read_log(nested.as_bytes()).is_err(),
+            "a duplicate key in params"
+        );
+    }
+
+    /// Carry 63, FU-7: a header text field holding a character for which `char::is_control` holds is refused, on write
+    /// and on read (today only an empty `run`, `set`, `role` or `process` is).
+    #[test]
+    fn fu7_a_header_text_field_with_a_control_character_is_refused() {
+        let cases: [fn(&mut Header); 6] = [
+            |h| h.run = "R0\u{7}".to_owned(),
+            |h| h.scene = "S\nS".to_owned(),
+            |h| h.marks = vec!["PM-0001-4\u{1b}[2J".to_owned()],
+            |h| h.machine.cpu = "cpu\r".to_owned(),
+            |h| h.build.features = vec!["bites\u{0}".to_owned()],
+            |h| {
+                h.params
+                    .insert("note".to_owned(), serde_json::json!(["a", "b\u{85}"]));
+            },
+        ];
+        for (i, case) in cases.iter().enumerate() {
+            let mut h = header();
+            case(&mut h);
+            assert!(
+                Writer::new(Vec::new(), &h).is_err(),
+                "case {i}: the writer refuses the header"
+            );
+            let line = format!(
+                "{}\n",
+                serde_json::to_string(&Line::Header(&h)).expect("serializes")
+            );
+            let e = read_log(line.as_bytes()).expect_err("the reader refuses the header");
+            assert!(e.msg.contains("control"), "case {i}: {}", e.msg);
+        }
+        assert!(
+            Writer::new(Vec::new(), &header()).is_ok(),
+            "the clean header writes"
+        );
     }
 }

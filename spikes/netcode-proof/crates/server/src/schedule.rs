@@ -245,10 +245,16 @@ const BITE_IDS: [(&str, Bite); 3] = [
     ("PM-0004-67/uncounted-drop", Bite::UncountedDrop),
 ];
 
-/// The bite ids this module plants (bites builds only): PM-0004-67's three, whose site is `due_ticks` (u4-build-plan.md
-/// §5 U4b; §4.14 plants each bite where its code lives).
+/// The bite ids npt-server plants (bites builds only): PM-0004-67's three, whose site is `due_ticks` (u4-build-plan.md
+/// §5 U4b; §4.14 plants each bite where its code lives), and PM-0001-30/wallclock, whose site is the pump's command
+/// path (`Decoder::with_bite`; U4R-Q6 (a)).
 #[cfg(feature = "bites")]
-pub const BITES: [&str; 3] = [BITE_IDS[0].0, BITE_IDS[1].0, BITE_IDS[2].0];
+pub const BITES: [&str; 4] = [
+    BITE_IDS[0].0,
+    BITE_IDS[1].0,
+    BITE_IDS[2].0,
+    crate::pump::WALLCLOCK_BITE,
+];
 
 #[cfg(feature = "bites")]
 impl Schedule {

@@ -83,11 +83,25 @@ copy 6's by-hand node --test at 73 of 76, re-pinned in the same step, recorded u
 - **M4:** each of the 26 files cmp-equal to .gate/u4r-snap2's copy; the fingerprint from the main folder's root
   63713cf344482a9b3e5f911bab4012d16201dab753b972c6e042c5fd894aa5bf.
 - **M5** (the counted run on the merged tree, .gate/u4r-merge/m5.log; expected as advisor-u4r-r2-full.md:12 says):
-{{M5}}
+  one main-run.sh call, 13:44:35-14:06:39 UTC, lane lock exclusive, offline, free 4,679 MiB at its start. `uptime`
+  first: up 3:09, load average 0.27, 0.09, 0.10. The six builds' provenance lines all name
+  /home/user/Shamble-Frontlines/spikes/netcode-proof/crates/... (npt-lab 5, npt-bots 5, npt-hash-wasm 4, npt-sim 7).
+  `node check.mjs`: "check: all 11 steps pass"; test 635.8 s, measured build 531 tests passed, 0 failed, 0 reported a
+  skip, bites build 609, 0 failed, 0 reported a skip; self 77 of 77; marks 81 read and checked, the ADR rows
+  unchanged; redact 0 findings; deps held ("no attribute holds a metavariable"; npt-sim's features one set); wasm
+  43.5 s (27,000 ticks, 0 mismatching for both pairs; h2 equal; hash-map caught at SS-s1 tick 1234; std-sin at SS-s1
+  tick 2, vehicle[8].pos.y). `node ops/runs/det-u4.mjs`: deps PASS 1.7 s; det-u4 PASS 240.3 s in all, 18,000 ticks
+  and 0 mismatching for both comparisons; **its non-cargo calls 227.2 s** (npt-lab hash 223.8 + Wasm 2.5 + 0.9),
+  under 240 s, at load average 0.27. The pre-check regeneration: "regenerated SS-P0-s4: 16950444 bytes, sha256
+  6933b56a…bab3, as the manifest's", native legs equal over 9,000 ticks, 2 min 10 s.
 - **M6** (TE2-5, advisor-u4r-r2-full.md:13):
-{{M6}}
+  no test failed in the counted run (531 and 609, 0 failed); nothing was re-run. So TE2-5's rule ends at this merge
+  (TE-Q2, as the ruling's M6 says).
 - **M7** (the gate, advisor-u4r-r2-full.md:14):
-{{M7}}
+  `node tools/gate.mjs` (the full gate): every check PASS except 5a smoke, which could not start: the tools'
+  Playwright looks for chromium_headless_shell-1194, and this container holds build 1243 (.gate/u4r-merge/gate.log;
+  no browser installed, by the session's rules). `node tools/gate.mjs --no-smoke`: "GATE PASS (5a smoke skipped:
+  --no-smoke)" (.gate/u4r-merge/gate-no-smoke.log). CI's gate, smoke and toolchain jobs run on the pushed head (M9).
 
 ## Carries, by number (u4s-carries.md §U4r, :255-441; the brief's table, u4r-brief.md:884-908)
 - **Met by U4r's code** (the builder's evidence; each judged figure comes from the record run or the sets, pending):

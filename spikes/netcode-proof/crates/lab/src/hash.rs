@@ -195,10 +195,27 @@ pub(crate) fn parse(argv: &[String]) -> Result<Mode, String> {
     Ok(parsed)
 }
 
+/// How an entry's recording is made (carry 82: the schema's `kind` key and the dispatch `manifest` and
+/// `regenerate_all` need).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) enum Kind {
+    /// `Recording::synthetic` of the entry's scene, seed, first tick, ticks and span (generator 2).
+    Synthetic,
+    /// A runner recording: `npt-lab scenario --record` at these settings (generator 0), the brawl on L1 with the
+    /// entry's scene, seed and first tick, re-run whole to regenerate it (u4r-brief.md 2.1 (ii)).
+    Runner {
+        profile: String,
+        clients: u8,
+        warmup_s: u64,
+        measured_s: u64,
+    },
+}
+
 /// One recordings manifest entry (u4-build-plan.md §4.15; crates/lab/recordings.json).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct Entry {
     pub(crate) name: String,
+    pub(crate) kind: Kind,
     pub(crate) scene: u8,
     pub(crate) seed: u64,
     pub(crate) first_tick: u32,
@@ -209,7 +226,25 @@ pub(crate) struct Entry {
     pub(crate) sha256: String,
 }
 
-/// The manifest's entries, in its order.
+/// The fewest bytes one tick of a recording takes (its tick and four counts: replay.rs's tick header), so no
+/// recording of `bytes` holds more than `bytes / 12` ticks (carry 82).
+const TICK_HEADER_BYTES: u64 = 12;
+/// The most bytes an entry's recording may hold: 64 MiB, four times today's largest entry (SS-P0-s4, 16,950,444 B); a
+/// larger recording comes to the advisor first (advisor-u4r-r1, FP-3: RR3-L1).
+const MAX_ENTRY_BYTES: u64 = 64 * 1024 * 1024;
+/// The profiles a runner entry may name (`npt-lab scenario --profile`'s), each checked by name before its settings
+/// reach `scenario::record` (advisor-u4r-r1, FP-3: RR3-M1 = SEC-U4R-2).
+const RUNNER_PROFILES: [&str; 6] = ["P0", "P1", "P2", "P3", "P4", "B1"];
+
+/// Whether `name` is a manifest name: one or more of `A-Z`, `a-z`, `0-9` and `-` (carry 82: it reaches a file path and
+/// the `h <recording> <tick> <hash>` line).
+fn name_ok(name: &str) -> bool {
+    !name.is_empty() && name.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-')
+}
+
+/// The manifest's entries, in its order. Each entry's name, its `ticks` against its `bytes` and its `bytes` against 64
+/// MiB are checked here, before anything is generated (carry 82), and a runner entry's profile by name, its `ticks`
+/// against its warm-up and measured seconds, and its `span_ms` against the room's (advisor-u4r-r1, FP-3).
 pub(crate) fn manifest(text: &str) -> Result<Vec<Entry>, String> {
     let v: Value =
         serde_json::from_str(text).map_err(|e| format!("the manifest is not JSON: {e}"))?;
@@ -235,7 +270,34 @@ pub(crate) fn manifest(text: &str) -> Result<Vec<Entry>, String> {
                     .map_err(|_| format!("manifest entry {name}: \"{k}\" {n} is above 32 bits"))
             })
         };
+        if !name_ok(&name) {
+            return Err(format!(
+                "manifest entry {i}: name {name:?} is not one or more of A-Z, a-z, 0-9 and -"
+            ));
+        }
+        let kind = match e.get("kind").and_then(Value::as_str) {
+            Some("synthetic") => Kind::Synthetic,
+            Some("runner") => Kind::Runner {
+                profile: e
+                    .get("profile")
+                    .and_then(Value::as_str)
+                    .ok_or(format!(
+                        "manifest entry {name}: a runner entry with no \"profile\""
+                    ))?
+                    .to_owned(),
+                clients: u8::try_from(num("clients")?)
+                    .map_err(|_| format!("manifest entry {name}: \"clients\" above 255"))?,
+                warmup_s: num("warmup_s")?,
+                measured_s: num("measured_s")?,
+            },
+            other => {
+                return Err(format!(
+                    "manifest entry {name}: \"kind\" {other:?}, not \"synthetic\" or \"runner\""
+                ));
+            }
+        };
         let entry = Entry {
+            kind,
             scene: u8::try_from(num("scene")?)
                 .map_err(|_| format!("manifest entry {name}: no such scene"))?,
             seed: num("seed")?,
@@ -254,6 +316,53 @@ pub(crate) fn manifest(text: &str) -> Result<Vec<Entry>, String> {
         if out.iter().any(|o: &Entry| o.name == entry.name) {
             return Err(format!("manifest entry {} is named twice", entry.name));
         }
+        if u64::from(entry.ticks) > entry.bytes / TICK_HEADER_BYTES {
+            return Err(format!(
+                "manifest entry {}: {} ticks cannot fit {} bytes (at most bytes / {TICK_HEADER_BYTES})",
+                entry.name, entry.ticks, entry.bytes
+            ));
+        }
+        if entry.bytes > MAX_ENTRY_BYTES {
+            return Err(format!(
+                "manifest entry {}: bytes {} is above {MAX_ENTRY_BYTES} (64 MiB, four times today's largest entry): a \
+                 larger recording comes to the advisor first",
+                entry.name, entry.bytes
+            ));
+        }
+        if let Kind::Runner {
+            profile,
+            warmup_s,
+            measured_s,
+            ..
+        } = &entry.kind
+        {
+            if !RUNNER_PROFILES.contains(&profile.as_str()) {
+                return Err(format!(
+                    "manifest entry {}: profile {profile:?} is not one of P0, P1, P2, P3, P4 or B1",
+                    entry.name
+                ));
+            }
+            let hz = u64::from(npt_sim::TICK_HZ);
+            let ticks = warmup_s
+                .checked_add(*measured_s)
+                .and_then(|s| s.checked_mul(hz));
+            if ticks != Some(u64::from(entry.ticks)) {
+                return Err(format!(
+                    "manifest entry {}: ticks {} is not (warmup_s {warmup_s} + measured_s {measured_s}) x {hz} ({})",
+                    entry.name,
+                    entry.ticks,
+                    ticks.map_or("an overflow".to_owned(), |t| t.to_string())
+                ));
+            }
+            if entry.span_ms != crate::scenario::ROOM_HISTORY_MS {
+                return Err(format!(
+                    "manifest entry {}: span_ms {} is not the room's ROOM_HISTORY_MS {}",
+                    entry.name,
+                    entry.span_ms,
+                    crate::scenario::ROOM_HISTORY_MS
+                ));
+            }
+        }
         out.push(entry);
     }
     Ok(out)
@@ -266,10 +375,38 @@ fn sha256_hex(bytes: &[u8]) -> String {
         .collect()
 }
 
-/// The entry's recording, generated (after its generator is checked: `regenerate_all` checks every entry first).
+/// The entry's recording, generated (after its generator is checked: `regenerate_all` checks every entry first): the
+/// synthetic generator's, or a runner recording's whole scenario re-run (carry 82).
 fn generate(e: &Entry) -> Result<Vec<u8>, String> {
     let scene = Scene::by_id(e.scene).ok_or(format!("{}: no scene {}", e.name, e.scene))?;
-    Ok(Recording::synthetic(&scene, e.seed, e.first_tick, e.ticks, e.span_ms).encode())
+    match &e.kind {
+        Kind::Synthetic => {
+            Ok(Recording::synthetic(&scene, e.seed, e.first_tick, e.ticks, e.span_ms).encode())
+        }
+        Kind::Runner {
+            profile,
+            clients,
+            warmup_s,
+            measured_s,
+        } => crate::scenario::record(
+            &scene,
+            profile,
+            e.seed,
+            *clients,
+            e.first_tick,
+            *warmup_s,
+            *measured_s,
+        )
+        .map_err(|m| format!("{}: {m}", e.name)),
+    }
+}
+
+/// The generator an entry's kind must name: `Recording::GENERATOR` for a synthetic one, 0 for a runner's.
+fn generator_of(k: &Kind) -> u32 {
+    match k {
+        Kind::Synthetic => Recording::GENERATOR,
+        Kind::Runner { .. } => 0,
+    }
 }
 
 /// Whether `bytes` are the entry's: its length and SHA-256.
@@ -284,6 +421,27 @@ pub(crate) fn check(e: &Entry, bytes: &[u8]) -> Result<(), String> {
             e.sha256
         ));
     }
+    // The bytes' own header against the entry (the advisor's U4r build ruling, point 5): a manifest field that
+    // disagrees with the bytes it pins fails by name.
+    let r = Recording::decode(bytes)
+        .map_err(|m| format!("{}: the bytes do not decode: {m}", e.name))?;
+    let held = [
+        (
+            "first_tick",
+            u64::from(r.first_tick),
+            u64::from(e.first_tick),
+        ),
+        ("span_ms", u64::from(r.span_ms), u64::from(e.span_ms)),
+        ("ticks", r.ticks.len() as u64, u64::from(e.ticks)),
+    ];
+    for (field, bytes_say, entry_says) in held {
+        if bytes_say != entry_says {
+            return Err(format!(
+                "{}: the recording's {field} is {bytes_say}, the manifest's {entry_says}",
+                e.name
+            ));
+        }
+    }
     Ok(())
 }
 
@@ -294,12 +452,18 @@ pub(crate) fn regenerate_all(
     mut keep: impl FnMut(&Entry, &[u8]) -> Result<(), String>,
 ) -> Result<Vec<String>, String> {
     for e in entries {
-        if e.generator != Recording::GENERATOR {
+        if e.kind == Kind::Synthetic && e.generator != Recording::GENERATOR {
             return Err(format!(
                 "{}: generator {}, not this build's Recording::GENERATOR {} (only its recordings are pinned)",
                 e.name,
                 e.generator,
                 Recording::GENERATOR
+            ));
+        }
+        if e.generator != generator_of(&e.kind) {
+            return Err(format!(
+                "{}: generator {}, not a runner recording's 0",
+                e.name, e.generator
             ));
         }
     }
@@ -1253,6 +1417,7 @@ mod tests {
         let bytes = Recording::synthetic(&Scene::targets(), 8, u32::MAX - 20, 60, 2_000).encode();
         let e = Entry {
             name: "TC-s8".to_owned(),
+            kind: Kind::Synthetic,
             scene: Scene::targets().id(),
             seed: 8,
             first_tick: u32::MAX - 20,
@@ -1298,6 +1463,23 @@ mod tests {
             "{err}"
         );
         assert_eq!(none, 0);
+        // Point 5 (the advisor's U4r build ruling): the bytes' header against the entry, field by field.
+        for (field, set) in [
+            (
+                "first_tick",
+                (|e: &mut Entry| e.first_tick += 1) as fn(&mut Entry),
+            ),
+            ("span_ms", |e: &mut Entry| e.span_ms += 1),
+            ("ticks", |e: &mut Entry| e.ticks -= 1),
+        ] {
+            let mut off = e.clone();
+            set(&mut off);
+            let err = check(&off, &bytes).expect_err(field);
+            assert!(
+                err.starts_with(&format!("TC-s8: the recording's {field} is ")),
+                "{err}"
+            );
+        }
     }
 
     #[test]
@@ -1324,14 +1506,148 @@ mod tests {
         let text = include_str!("../recordings.json");
         let entries = manifest(text).unwrap();
         let names: Vec<&str> = entries.iter().map(|e| e.name.as_str()).collect();
+        // U4d's three synthetic recordings; U4r's two runner recordings are det-recordings.json's (the advisor's U4r
+        // build ruling, point 1).
         assert_eq!(names, ["SS-s1", "ES-s2", "TC-s3"]);
+        assert!(entries.iter().all(|e| e.ticks == 9_000
+            && e.kind == Kind::Synthetic
+            && e.generator == Recording::GENERATOR));
+        let det = manifest(include_str!("../det-recordings.json")).unwrap();
+        let names: Vec<&str> = det.iter().map(|e| e.name.as_str()).collect();
+        assert_eq!(names, ["SS-P2-s1", "ES-P3-s2"]);
         assert!(
-            entries
-                .iter()
-                .all(|e| e.generator == Recording::GENERATOR && e.ticks == 9_000)
+            det.iter()
+                .all(|e| matches!(e.kind, Kind::Runner { .. }) && e.generator == 0)
         );
+        let pre = manifest(include_str!("../precheck-recordings.json")).unwrap();
+        assert!(matches!(pre[0].kind, Kind::Runner { .. }) && pre[0].generator == 0);
+        assert_eq!(pre.len(), 1);
+        assert_eq!(pre[0].name, "SS-P0-s4");
         assert!(manifest("{\"recordings\": [{\"name\": \"x\"}]}").is_err());
         assert!(manifest("[]").is_err());
+    }
+
+    /// One manifest entry's text, `name` and `ticks` given (a synthetic TC entry of 799,693 bytes otherwise).
+    fn one(name: &str, ticks: u64, kind: &str) -> String {
+        format!(
+            "{{\"recordings\": [{{\"name\": {name:?}, {kind} \"scene\": 4, \"seed\": 3, \"first_tick\": 0, \
+             \"ticks\": {ticks}, \"span_ms\": 2000, \"generator\": 2, \"bytes\": 799693, \"sha256\": \"00\"}}]}}"
+        )
+    }
+
+    /// r10, carry 82: the reader refuses a name outside `[A-Za-z0-9-]+` and a `ticks` above `bytes / 12` before it
+    /// generates anything (`manifest` runs before `regenerate_all` generates), and an entry with no known kind.
+    #[test]
+    fn r10_carry_82_the_manifest_refuses_a_bad_name_and_ticks_above_bytes_over_12() {
+        let k = "\"kind\": \"synthetic\",";
+        assert!(manifest(&one("TC-s3", 9_000, k)).is_ok(), "the clean entry");
+        for bad in ["../TC", "TC s3", "TC\nh x 1 2", "", "TC_s3", "TC.rec"] {
+            let e = manifest(&one(bad, 9_000, k)).expect_err(bad);
+            assert!(e.contains("is not one or more of"), "{bad:?}: {e}");
+        }
+        let at = 799_693 / 12;
+        assert!(
+            manifest(&one("TC-s3", at, k)).is_ok(),
+            "ticks at bytes / 12"
+        );
+        let e = manifest(&one("TC-s3", at + 1, k)).expect_err("ticks above bytes / 12");
+        assert!(e.contains("cannot fit"), "{e}");
+        assert!(manifest(&one("TC-s3", 9_000, "")).is_err(), "no kind");
+        assert!(
+            manifest(&one("TC-s3", 9_000, "\"kind\": \"script\",")).is_err(),
+            "an unknown kind"
+        );
+    }
+
+    /// Carry 82's dispatch: a runner entry names its settings and generator 0; a synthetic one generator 2.
+    #[test]
+    fn r10_carry_82_a_runner_entry_reads_its_settings_and_its_generator_is_0() {
+        let text = "{\"recordings\": [{\"name\": \"SS-P2-s1\", \"kind\": \"runner\", \"profile\": \"P2\", \
+                    \"clients\": 48, \"warmup_s\": 10, \"measured_s\": 290, \"scene\": 1, \"seed\": 1, \
+                    \"first_tick\": 0, \"ticks\": 9000, \"span_ms\": 2000, \"generator\": 0, \"bytes\": 999999, \
+                    \"sha256\": \"00\"}]}";
+        let e = manifest(text).expect("a runner entry");
+        assert_eq!(
+            e[0].kind,
+            Kind::Runner {
+                profile: "P2".to_owned(),
+                clients: 48,
+                warmup_s: 10,
+                measured_s: 290
+            }
+        );
+        let wrong = text.replace("\"generator\": 0", "\"generator\": 2");
+        let mut kept = 0;
+        let err = regenerate_all(&manifest(&wrong).expect("reads"), |_, _| {
+            kept += 1;
+            Ok(())
+        })
+        .expect_err("a runner entry of generator 2");
+        assert!(err.contains("not a runner recording's 0"), "{err}");
+        assert_eq!(kept, 0);
+    }
+
+    /// advisor-u4r-r1, FP-3 (RR3-M1 = SEC-U4R-2, SEC-U4R-3, RR3-L1): before anything is generated, a runner entry's
+    /// profile is checked by name, its ticks against (warmup_s + measured_s) x TICK_HZ and its span_ms against the room's,
+    /// and every entry's bytes against 64 MiB; each refusal names the entry and the value. The committed manifests read.
+    #[test]
+    fn r10_fp3_a_runner_entry_s_profile_ticks_and_span_and_any_entry_s_bytes_are_checked() {
+        let text = "{\"recordings\": [{\"name\": \"SS-P2-s1\", \"kind\": \"runner\", \"profile\": \"P2\", \
+                    \"clients\": 48, \"warmup_s\": 10, \"measured_s\": 290, \"scene\": 1, \"seed\": 1, \
+                    \"first_tick\": 0, \"ticks\": 9000, \"span_ms\": 2000, \"generator\": 0, \"bytes\": 999999, \
+                    \"sha256\": \"00\"}]}";
+        assert!(manifest(text).is_ok(), "the clean runner entry");
+        let refused = |from: &str, to: &str, why: &str| {
+            let e = manifest(&text.replace(from, to)).expect_err(why);
+            assert!(e.starts_with("manifest entry SS-P2-s1: "), "{why}: {e}");
+            e
+        };
+        let e = refused(
+            "\"profile\": \"P2\"",
+            "\"profile\": \"P2 --record x\"",
+            "the profile \"P2 --record x\"",
+        );
+        assert!(
+            e.contains("profile \"P2 --record x\" is not one of P0, P1, P2, P3, P4 or B1"),
+            "{e}"
+        );
+        let e = refused(
+            "\"ticks\": 9000",
+            "\"ticks\": 8999",
+            "ticks 8,999 with 10 + 290",
+        );
+        assert!(
+            e.contains("ticks 8999 is not (warmup_s 10 + measured_s 290) x 30 (9000)"),
+            "{e}"
+        );
+        let e = refused("\"span_ms\": 2000", "\"span_ms\": 1000", "span_ms 1,000");
+        assert!(
+            e.contains("span_ms 1000 is not the room's ROOM_HISTORY_MS 2000"),
+            "{e}"
+        );
+        let e = refused(
+            "\"bytes\": 999999",
+            "\"bytes\": 67108865",
+            "bytes 67,108,865",
+        );
+        assert!(e.contains("bytes 67108865 is above 67108864"), "{e}");
+        assert!(
+            manifest(&text.replace("\"bytes\": 999999", "\"bytes\": 67108864")).is_ok(),
+            "bytes at 64 MiB"
+        );
+        for (name, committed) in [
+            ("recordings.json", include_str!("../recordings.json")),
+            (
+                "det-recordings.json",
+                include_str!("../det-recordings.json"),
+            ),
+            (
+                "precheck-recordings.json",
+                include_str!("../precheck-recordings.json"),
+            ),
+        ] {
+            assert!(manifest(committed).is_ok(), "{name} reads");
+        }
     }
 
     #[test]
@@ -1436,6 +1752,110 @@ mod tests {
                 &[&first]
             )
             .is_err()
+        );
+    }
+
+    /// Carry 83 (d) (EA-9's one default, the legs'): `hash compare` with a bite and no `--on`, over two recordings,
+    /// arms only the first its lists hold. The hash-map bite's field is in a World's dump only once the bite is armed
+    /// and its tick reached (npt-sim's world.rs `write_state`), so `--digest-field`, which replays the first given
+    /// dump's recording to that dump's tick as `compare` arms it, finds the field on the first recording and not on the
+    /// second. A `compare` that armed every recording would find it on both, and read the second's clean dump as
+    /// another layout.
+    #[cfg(feature = "bites")]
+    #[test]
+    fn r10_carry_83_d_compare_with_a_bite_and_no_on_arms_only_the_first_recording_listed() {
+        const FIELD: &str = "bite[0].hash_map_order";
+        let dir = crate::scenario::tests::scratch("hash-83d");
+        std::fs::create_dir_all(&*dir).expect("the folder");
+        let d = dir.to_str().expect("a UTF-8 path").to_owned();
+        let path = |f: &str| format!("{d}/{f}");
+        let (first, first_bytes) = short();
+        let second_bytes =
+            Recording::synthetic(&Scene::targets(), 9, u32::MAX - 20, 60, 2_000).encode();
+        let second = Entry {
+            name: "TC-s9".to_owned(),
+            seed: 9,
+            bytes: second_bytes.len() as u64,
+            sha256: sha256_hex(&second_bytes),
+            ..first.clone()
+        };
+        // Both recordings in the folder, their manifest, and one clean list of both (ours and theirs alike).
+        let mut lines = String::new();
+        let mut entries = Vec::new();
+        for (e, bytes) in [(&first, &first_bytes), (&second, &second_bytes)] {
+            std::fs::write(rec_path(&d, &e.name), bytes).expect("the recording");
+            let mut rp = Replayer::new();
+            for w in le_words(bytes) {
+                rp.feed(w);
+            }
+            while let Step::Stepped(tick) = rp.step() {
+                let hash = rp.state_hash().expect("a hash after a step");
+                let h = TickHash {
+                    recording: e.name.clone(),
+                    tick,
+                    hash,
+                };
+                lines.push_str(&format!("{}\n", hash_line(&h)));
+            }
+            entries.push(format!(
+                "{{\"name\": \"{}\", \"kind\": \"synthetic\", \"scene\": {}, \"seed\": {}, \"first_tick\": {}, \
+                 \"ticks\": {}, \"span_ms\": {}, \"generator\": {}, \"bytes\": {}, \"sha256\": \"{}\"}}",
+                e.name, e.scene, e.seed, e.first_tick, e.ticks, e.span_ms, e.generator, e.bytes, e.sha256
+            ));
+        }
+        std::fs::write(
+            path("m.json"),
+            format!("{{\"recordings\": [{}]}}", entries.join(", ")),
+        )
+        .expect("the manifest");
+        std::fs::write(path("ours.lines"), &lines).expect("ours");
+        std::fs::write(path("theirs.lines"), &lines).expect("theirs");
+        let arm = Arm {
+            id: "PM-0004-21/hash-map".to_owned(),
+            tick: first.first_tick.wrapping_add(5),
+            on: None,
+        };
+        let at = first.first_tick.wrapping_add(10);
+        // The first recording's dump with the bite armed, the second's clean, each at that tick.
+        for (e, a, f) in [
+            (&first, Some(&arm), "first.dump"),
+            (&second, None, "second.dump"),
+        ] {
+            let own = replay_to(&d, e, at, a).expect("a replay");
+            std::fs::write(path(f), dump_text(&e.name, at, own.hash(), own.words()))
+                .expect("a dump");
+        }
+        let digest = |dump: &str| {
+            let (out, equal) = run(&argv(&format!(
+                "compare --ours {} --theirs {} --manifest {} --dir {d} --ours-dump {} --digest-field {FIELD} \
+                 --ours-name ours --theirs-name theirs --bite {} --arm {}",
+                path("ours.lines"),
+                path("theirs.lines"),
+                path("m.json"),
+                path(dump),
+                arm.id,
+                arm.tick
+            )))
+            .expect("compare runs");
+            assert!(equal, "the two lists are equal: {out:?}");
+            out.into_iter()
+                .find(|l| l.starts_with("ours digest "))
+                .expect("a digest line")
+        };
+        let armed = digest("first.dump");
+        let clean = digest("second.dump");
+        println!("83 (d): {armed}\n83 (d): {clean}");
+        let word = armed.split(' ').nth(2).unwrap_or("");
+        assert!(
+            word.len() == 16
+                && word.bytes().all(|b| b.is_ascii_hexdigit())
+                && armed.contains(&format!("of its dump at TC-s8 tick {at})")),
+            "the first recording listed is armed: {armed}"
+        );
+        assert_eq!(
+            clean,
+            format!("ours digest none ({FIELD} at words [] of its dump at TC-s9 tick {at})"),
+            "the second is not"
         );
     }
 

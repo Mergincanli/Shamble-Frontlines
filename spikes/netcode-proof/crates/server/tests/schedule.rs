@@ -337,14 +337,21 @@ mod bites {
     const TIMER_PERIOD: &str = "PM-0004-67/timer-period";
     const UNCAPPED: &str = "PM-0004-67/uncapped-catchup";
     const UNCOUNTED: &str = "PM-0004-67/uncounted-drop";
+    /// The pump's (U4R-Q6 (a)): in npt-server's list, never the schedule's.
+    const WALLCLOCK: &str = "PM-0001-30/wallclock";
 
     fn bitten(hz: u32, cap: u32, id: &str) -> Schedule {
         Schedule::with_bite(hz, cap, id).expect("npt-server plants it")
     }
 
+    /// npt-server's four bite ids, each in marks.json: three are the schedule's (`Schedule::with_bite`) and one the
+    /// pump's (`Decoder::with_bite`: U4R-Q6 (a)), which the schedule refuses.
     #[test]
-    fn the_three_bites_are_planted_here_under_their_marks_json_ids() {
-        assert_eq!(npt_server::BITES, [TIMER_PERIOD, UNCAPPED, UNCOUNTED]);
+    fn npt_server_s_four_bites_are_listed_under_their_marks_json_ids() {
+        assert_eq!(
+            npt_server::BITES,
+            [TIMER_PERIOD, UNCAPPED, UNCOUNTED, WALLCLOCK]
+        );
         let marks = include_str!("../../../marks/marks.json");
         for id in npt_server::BITES {
             assert!(
@@ -352,7 +359,12 @@ mod bites {
                 "{id} is not in marks.json"
             );
         }
-        for other in ["PM-0004-67/no-such-bite", "PM-0001-17/client-rounding", ""] {
+        for other in [
+            "PM-0004-67/no-such-bite",
+            "PM-0001-17/client-rounding",
+            "",
+            WALLCLOCK,
+        ] {
             assert!(Schedule::with_bite(30, 7, other).is_none(), "{other}");
         }
     }

@@ -214,6 +214,35 @@ pub struct Decoder {
     outstanding: VecDeque<(u8, u64)>,
     samples: VecDeque<u64>,
     sent_bytes: u32,
+    /// PM-0001-30/wallclock planted on this session (bites builds only; U4R-Q6 (a)).
+    #[cfg(feature = "bites")]
+    wallclock: bool,
+}
+
+/// PM-0001-30/wallclock (marks.json:6563: "a wall-clock read on one transport's command path"; U4R-Q6 (a)): the decoder
+/// of one -30 pre-check leg's sessions reads the wall clock and changes each passed-on command's aim by it, so that
+/// leg's room runs other commands than the other leg's on every run, whatever the machine's ticks per second.
+#[cfg(feature = "bites")]
+pub(crate) const WALLCLOCK_BITE: &str = "PM-0001-30/wallclock";
+
+/// The wallclock bite's site (bites builds only; U4R-Q6 (a)'s field rule): every command of `i` gets its aim's x XORed
+/// with `1 | (wall-clock ns & 0xfe)`, never 0, so the value is never the received one and moves at most 255 cm (inside
+/// the aim's range); a field the World takes at that tick, never the tick, sequence, slot, buttons, presses or view time.
+#[cfg(feature = "bites")]
+#[allow(
+    clippy::disallowed_methods,
+    clippy::disallowed_types,
+    reason = "the planted defect is a wall-clock read (PM-0001-30/wallclock): bites builds only"
+)]
+fn wallclock_aims(mut i: npt_proto::Input) -> npt_proto::Input {
+    let ns = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |d| d.subsec_nanos());
+    let k = 1 | (ns & 0xfe) as i32;
+    for c in &mut i.commands {
+        c.aim[0] ^= k;
+    }
+    i
 }
 
 impl Decoder {
@@ -242,7 +271,19 @@ impl Decoder {
             outstanding: VecDeque::new(),
             samples: VecDeque::new(),
             sent_bytes: 0,
+            #[cfg(feature = "bites")]
+            wallclock: false,
         }
+    }
+
+    /// The same decoder with one planted defect by its id (bites builds only; per instance, U4R-Q6 (a)):
+    /// PM-0001-30/wallclock; `None` for another id (the schedule's are `Schedule::with_bite`'s).
+    #[cfg(feature = "bites")]
+    pub fn with_bite(mut self, bite: &str) -> Option<Decoder> {
+        (bite == WALLCLOCK_BITE).then(|| {
+            self.wallclock = true;
+            self
+        })
     }
 
     /// The session's counts.
@@ -407,6 +448,8 @@ impl Decoder {
                 (_, Message::Join(_)) => self.counters.join_again += 1,
                 (State::Joined, Message::Input(i)) => {
                     if self.limits.input.take(now_ns) {
+                        #[cfg(feature = "bites")]
+                        let i = if self.wallclock { wallclock_aims(i) } else { i };
                         out.push((Message::Input(i), r.arrival_ns));
                     } else {
                         self.counters.input_limited += 1;

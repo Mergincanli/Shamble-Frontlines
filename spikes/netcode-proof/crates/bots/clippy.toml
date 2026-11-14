@@ -1,0 +1,17 @@
+# npt-bots' clock and hash-map bans (u4-build-plan.md §4.11; the advisor's U4d2 brief check, A13): the bots are
+# clock-injected and transport-free (U4-SERVER), so their commands follow from what they are given and a seed alone,
+# and they take no order from a hash map. The clock ban is npt-server's, as its clippy.toml words it; the two type bans
+# are npt-sim's. Crate-wide; U6's runtime half adds its reviewed allows (§4.11). The workspace sets disallowed_types and
+# disallowed_methods to deny.
+disallowed-types = [
+    { path = "std::collections::HashMap", reason = "hash-map ban (GLOSSARY §7): iteration order is not deterministic" },
+    { path = "std::collections::HashSet", reason = "hash-map ban (GLOSSARY §7): iteration order is not deterministic" },
+    { path = "std::time::Instant", reason = "the clock ban: time is passed in" },
+    { path = "std::time::SystemTime", reason = "the clock ban: time is passed in" },
+    { path = "tokio::time::Instant", reason = "the clock ban: time is passed in", allow-invalid = true },
+]
+disallowed-methods = [
+    { path = "std::time::Instant::now", reason = "the clock ban" },
+    { path = "std::time::SystemTime::now", reason = "the clock ban" },
+    { path = "tokio::time::Instant::now", reason = "the clock ban", allow-invalid = true },
+]
