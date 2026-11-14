@@ -12,8 +12,24 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 07:00 UTC; read this first after a compact or a cut): U4r's BUILD IS FINISHED (copy 5's
-section 6 return list, 06:58 UTC); final snapshot 572c4f69… (26 files on 2fbec77); next: the review panel.**
+**NOW (2026-11-14 about 07:16 UTC; read this first after a compact or a cut): U4r's review round 1 RUNS (workflow
+wf_a3541dc5-9e1, task w4aijiqmv: batch 1 netcode, test, security; then batch 2 engine-architect, rust, infra).**
+- **Done before it:** the panel confirmed by the advisor (advisor-u4r-panel-full.md, written by script word for word;
+  make-up unchanged: the brief's six seats, xhigh, two batches); the packet's config drafted by an agent
+  (u4r-packet.json: 9 heads, 26 diffs, 47 docs, the carries regex), with **review_packet.py's ALLOWED addition 2**
+  (advisor-u4r-brief.md, the advisor's ruling; noted in history.md at its end under its own heading, as Mustafa's rule
+  of 2026-11-12 item 2 asks) and its docs entry; the packet cut by script: **u4r-packet.md** (sha256 cbd82485…, 724 KB)
+  and **u4r-packet-tests.md** (d12555c8…), 62 carries left out, their ids at its end; saved 2a75146. The drafter's two
+  other questions, answered by the main session: rulings 2 to 4's carry words stay on the card until U4g's and U4h's
+  briefs (the rulings are in the packet whole); the plan's edits wait for its next edit, as the rulings say.
+- **Each seat's notes:** u4r-review-<netcode|test|security|arch|rust|infra>.md; logs under .gate/u4r-review-<seat>/.
+  **If cut:** `Workflow({scriptPath, resumeFromRunId: "wf_a3541dc5-9e1"})`. **On return:** write the results word for
+  word by script (u4r-review-r1-full.md); read every Medium or higher finding in full; then the advisor's ruling on the
+  findings (round 1's fix list), then a builder copy for the fix pass (from the latest prompt), per the review budget
+  (round 2 only on what changed).
+
+**Earlier NOW (2026-11-14 about 07:00 UTC): U4r's BUILD IS FINISHED (copy 5's section 6 return list, 06:58 UTC);
+final snapshot 572c4f69… (26 files on 2fbec77); next: the review panel.**
 - **The build's figures** (copy 5's return list; notes u4r-build.md 1,586 lines, copied here, equal): two end checks,
   "check: all 11 steps pass" each (c5-end1.log 02:21-02:35, c5-end2.log 06:40-06:56, a cold machine); measured build
   526 tests (+35), bites build 603 (+42), self 76 of 76 (+5), 11 steps (0); wasm step 39.6 s and 41.9 s (base 33.1 s
