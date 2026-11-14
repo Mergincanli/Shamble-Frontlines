@@ -1208,9 +1208,9 @@ section 5's end checks twice.
 | 3 | tick16 bite at --tick-start 64651 (bites build) and clean partner at 64936 (measured build), each once | both run once (c5-p3.log); clean partner as expected; the bite run as expected but `after_capped` false: stopped, to the advisor |
 | 4 | -18 bite: no code; report words (25 fast heals counted apart: 14 burst 0 age 0, 11 burst 1 age 33/34; 71 slow after full state; 2,314 breaches; 0.48) | report only |
 | 5 | precheck.rs: L from the leg's configured lead (not `let lead = 2u32`); whole deviation list or count <= 64 asserted | done (c5-3.log) |
-| 6 | contract.rs (1) class_audit breaches fail (but owner-to-all) + 6th doctored case; (2) module doc; (3) unreadable input own exit code in USAGE; (4) c-u4r-r2.mjs | (1)-(3) done (c5-3.log); (4) script written, its lines not yet run by hand |
+| 6 | contract.rs (1) class_audit breaches fail (but owner-to-all) + 6th doctored case; (2) module doc; (3) unreadable input own exit code in USAGE; (4) c-u4r-r2.mjs | (1)-(3) done (c5-3.log); (4) script written, its lines run by hand (c5-r2lines.log; b1 and es not re-run, by points 1 and 2) |
 | 7 | after cap and mirror tick keying accepted: no change; report words | report only |
-| 8 | (A) mirror keeps the frame at last_acked() beyond FRAMES_KEPT + its bite run and clean P0 equality; (B) baseline_age row; (C) labels regen/, regen-all/; (D) burst_spacing_ns in every B1 header; (E), (F) report words | (A) code done, its two runs not yet; (B), (D) done; (C), (E), (F) open |
+| 8 | (A) mirror keeps the frame at last_acked() beyond FRAMES_KEPT + its bite run and clean P0 equality; (B) baseline_age row; (C) labels regen/, regen-all/; (D) burst_spacing_ns in every B1 header; (E), (F) report words | (A) done, both runs as expected (c5-p8a.log); (B), (D) done; (C), (E), (F) report words written (item (4) block) |
 
 ### Work item (1): the third ruling's code changes (written 01:44-01:49 UTC)
 
@@ -1289,17 +1289,150 @@ section 5's end checks twice.
   in [0.95, 1.05], everyone in view 1 >= 0.99); -17 pass (0 == 0); -57 pass (6,981; 2,750; 88,044). **As expected on
   every item**, and it shows ruling 3's point 7 (b) (frames by the room's tick) across the wrap.
 
+### The coordinator's message after the stop (about 02:02 UTC)
+
+- "Your stop was right." P3-CAP and CR-ID are with the advisor (u4r-build4-questions.md); its ruling comes by
+  message. Meanwhile, in order: (1) point 8 (A)'s two runs, once each; (2) two c-u4r-runs.mjs items read as ruling 3's
+  own words: the judged tick16 bite's tick_start = 65,551 - (warm-up + measured ticks) from its own lengths (point 3,
+  main session item 4), and no -18 no-fallback bite on B1 at U4r (point 1), said in the script's text; (3)
+  c-u4r-r2.mjs's lines run by hand, its tick16 expected-outcome text left as it is until the ruling; (4) the report
+  words 8 (C), (E), (F) and points 1, 2, 4, 7. **Hold r5 and section 5's end checks until the ruling** (CR-ID may
+  change code). Snapshot re-cut 02:01 UTC: wip/u4r.patch, 26 files, sha256 707cc3df3c409d5fd3e21249567acc1b54a67f5833f2ee4df0abcb383a4bdaa5.
+
+### Point 8 (A)'s two runs, once each (done; .gate/u4r/c5-p8a.log, -x -k, 02:02:22-02:03:08 UTC, df 4.8G)
+
+- One call: bites build, the bitten run's three lines, measured build, the clean P0 run's three lines; every command
+  exit 0. Labels (point 33): tree 2fbec77 plus the uncommitted U4r changes; header.build.commit names 2fbec77.
+- **The no-fallback bite run** (`--run u4r-r2-b1-nofallback-1 --set u4r-r2 --date 2026-11-14 --commit 2fbec77... --out
+  .gate/u4r/r2/b1-nofallback2 --scene SS --profile B1 --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 30 --bursts
+  2 --burst-first-s 5 --burst-every-s 15 --role bite --bite PM-0001-18/no-fallback --marks
+  PM-0001-2,PM-0001-17,PM-0001-57,PM-0001-18 --suite r2-b1`): 1,233 ticks (33 after); commands 47,990; late 309
+  (0.64 %); rewinds refused 0; overflow resyncs 71; heals 96; client hashes 54,500 (sentinels 2,631); measured
+  incomplete 3,957; carry 49 0.8236, 274.41; **audit 0 breaches** (copy 3's r2/b1-nofallback: 2,314). contract
+  **PASS** ("class audit: breaches_count 0"; "-18: 96 heal records (25 within 500 ms; 96 (client, burst) pairs of 48
+  clients x 2 bursts; a full state during 71); carry 58: queue high-water mark 1023"). Heals (read-only, lab.jsonl):
+  96, 25 within 500 ms, **max 1,688,286,323 ns** (> 500,000,000: -18's max check fails), median 1,376,834,974 ns. The
+  judge: PM-0001-18 **INVALID**, "bite PM-0001-18/no-fallback: its run is invalid", invalid_why "pre:PM-0001-2:
+  everyone in view on at least 99 % of each client's snapshots = **0.453333**, needs >= 0.99" (the worst slot 408 of
+  900 measured ticks); an invalid run lists no checks, so the max FAIL is read from the heal records above. **As the
+  ruling expects** (0 breaches; INVALID by pre:PM-0001-2 while the room is unfixed, reported): no stop. The header
+  holds `burst_spacing_ns` **15,000,000,000** (8 (D) shown) beside burst_starts_ns [15,029,325,961, 30,011,005,135].
+  Fact for the report: with the mirror following the stale baseline, the bots' view changes (their view is the
+  mirror's frame), so the bitten run's commands differ from copy 3's (its median heal was 1,197,359,484); the max is
+  the same 1,688,286,323. The PM-0001-2 value is now 0.453333, not copy 3's 0.48 (which the broken mirror gave).
+- **The clean P0 run** (`--run u4r-r2-p0-1 --set u4r-r2 --date 2026-11-13 --commit 2fbec77... --out .gate/u4r/r2/p0-s1c
+  --scene SS --profile P0 --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 20 --marks PM-0001-2,PM-0001-17,PM-0001-57
+  --suite r2-p0`; its run id and date as r2/p0-s1's): 900 ticks (0 after), 0 breaches, contract PASS, the judge 1 of 3
+  valid runs each. **Equal record for record** (read-only Python, every line compared): against r2/p0-s1b every record
+  line of all three logs equal (980 / 901 / 952 lines); against r2/p0-s1 every line equal but lab.jsonl:950, run_lengths'
+  added `after_capped: false`. Headers: equal but build.binary_sha256 (the new binary), machine.kernel and
+  machine.mem_mb (the container restart at about 01:18) and, against p0-s1b only, the run id (u4r-r2-p0-2 there).
+
+### c-u4r-runs.mjs: ruling 3's two script items (done, 02:06 UTC; `node --check` ok)
+
+- **Ruling 3, point 3 (main session item 4):** `TICK16_START = 65_536 + 15 - (WARMUP_S + MEASURED_S) * TICK_HZ` (47,251
+  for 300 + 18,000: the wrap at measured tick 17,985 of 18,000, 15 before the end; `node -e` arithmetic); `one()` takes
+  a tick start, the tick16 bite run gets TICK16_START, every other run (clean, client-rounding, -57's) TICK_START
+  63,736. The header text and TICK_START's doc say so (U4R-Q7 (a) as ruling 3 reads it). The short form of this line
+  (10 s + 20 s: 65,551 - 900 = 64,651) is point 3's run above, so the line form is run by hand.
+- **Ruling 3, point 1:** `NOT_AT_U4R = ["PM-0001-18/no-fallback"]` filters the bite loop and `bitesOn` gives -18 no
+  profile, so a B1 set runs no bite; the header text says -18's bitten judged run moves to U4g, the three B1 measured
+  runs stay for -57's L1 B1 part, and their -17 and -18 verdicts are recorded INVALID, never counted.
+- 7.3's table changes with it (one -18 bite run fewer, 600 s): redone with r5, held.
+
+### Item (3): c-u4r-r2.mjs's npt-lab lines run by hand (done; .gate/u4r/c5-r2lines.log, -x -k, 02:07-02:09 UTC, df 4.8G)
+
+- The script refuses uncommitted tracked changes, so its lines go through the runner as copy 4 did for
+  c-u4r-runs.mjs: `cargo build --release --locked -p npt-lab -p npt-judge`, then per suite the script's scenario line
+  (its run id, `--set u4r-r2 --date 2026-11-14 --commit 2fbec77...`, `--out .gate/u4r/r2c5/<key>`, its args, marks and
+  suite), `npt-lab contract` on the folder (flags given as `--series marks/SERIES.md --logs <dir>`: the script's
+  order is `--logs` first; the parser reads either order) and `npt-judge --marks marks/marks.json --logs <dir> --only
+  <its marks> --out .gate/u4r/r2c5/<key>-verdict.json`. Every command exit 0.
+- **Run here:** p2, p3, forged, clamp, fast-clock, lag-switch, evstart. Each summary equal to copy 3's figure for
+  figure (p2 38,311 / late 112 / 6,194 / incomplete 585; p3 35,169 / 73 / 9,139 / 1,485; lag-switch 42,771 / 222 /
+  1,811 / 300; the P0 four 43,152 / 0 / 0 / 0); every contract PASS with "class audit: breaches_count 0"; per run
+  (read-only over the verdicts): PM-0001-2's 11 SS checks pass on all seven, -17 passes on p2, p3, evstart, -57's three
+  pass on p2 and p3; every run valid.
+- **Run before, with the script's own lines:** p0 (r2/p0-s1c, but its --date 2026-11-13, kept for the record-for-record
+  comparison), tick16 (r2/tick16d), tick16-clean (r2/tick16-clean), b1-nofallback (r2/b1-nofallback2): the blocks above.
+- **Not run, by ruling:** b1 (ruling 3, point 1: "do not re-run the b1 suite") and es (point 2: "do not re-run the es
+  suite"). Their line forms are shown: b1's is b1-nofallback's without `--role bite --bite ...` (the same flags ran
+  above in the bites build), es's is the P0 form with `--scene ES` (copy 3's c3-r2-suites.log:132). The main session's
+  run from the merge commit makes both, expected to fail there as here (point 6's main-session item 2).
+- Not run by hand: the script's three `cargo build --release --locked ... --message-format=json` lines with
+  builtArtifact and the copy out (the same function and form as c-u4r-runs.mjs's, which copy 4's B12 used), and
+  r2.txt's writing. Labels (point 33): tree 2fbec77 plus the uncommitted U4r changes; header.build.commit names 2fbec77.
+  .gate/u4r/r2c5/ holds 31 MB.
+
+### Item (4): the report words (done here; the report repeats them)
+
+- **8 (C), labels:** .gate/u4r/regen/ and .gate/u4r/regen-all/ (each holds out/ and rec/: `npt-lab hash`'s
+  regenerations, copy 1's regen-precheck.log and regen-all.log): "tree: 2fbec77 plus the uncommitted U4r changes; no
+  header".
+- **8 (E), corrections:** "Names added with U4r" holds **21** rows (counted at the head: awk over the subsection's
+  table rows), not 22 as copy 3's state section said. tick16c's flags: the first collapse at **65,567**, every flag 0
+  from **65,715** to the end (not 65,746). The bitten B1 run's PM-0001-2 value was **0.48** on copy 3's r2/b1-nofallback
+  (not "as the clean b1", 0.273333), and that value is no figure (the mirror then had 2,314 breaches); with point 8
+  (A)'s fix the re-made run (r2/b1-nofallback2) gives **0.453333** with 0 breaches. The P0 bytes sum per measured tick
+  is **27,816** (27,817 is the sum of the rounded parts 1,953 + 1,096 + 24,768); the B1 window figures are means with
+  one decimal: 47.9, 0.5, 0.0, 0.0, 0.0, 0.6, 4.1, 12.4, 23.1, 31.9, 40.1, 44.2, 45.8, 46.3 (slots holding everyone,
+  per 30-tick window from tick 64,186).
+- **8 (F):** npt-lab writes `tick.s.everyone_in_view` (the room log) from its room-side mirror of the room's datagrams
+  and full states (logs.rs `room_tick`, from mirror.rs `SetStats::everyone`); SERIES.md:368 names npt-room as its
+  writer (that row is the main session's to correct: U4r adds rows only).
+- **Point 1, B1 (r2):** the b1 suite is a FAIL under condition 5: PM-0001-2's everyone in view 0.273333 (the worst slot
+  246 of 900 measured ticks), so -17 and -18 L1 B1 are INVALID by pre:PM-0001-2, while -57 L1 B1's three checks pass
+  (6,974; 2,750; 88,060). The cause, in three lines: (1) every client's baseline is evicted at each burst: 96
+  burst_eviction records, evicted 1, baseline_age 0; (2) the event backlog is packed before any entity change
+  (room.rs:1208-1235; queue high-water 631); (3) each client's set is rebuilt from the defaults under the 1,000 B cap
+  (snap_datagram_bytes 996-1,000 B per client per tick before, during and after). The 30-tick window means are as in
+  8 (E). If every burst costs what burst 0 did, the least share at 10 bursts in 600 s is at most 0.919. It is
+  npt-room's, not U4r's; by the advisor's ruling 3, point 1, the room's fix and the passing evidence of -17's and -18's
+  L1 B1 parts go to U4g. (Plain words for Mustafa: after each 1 s loss burst every client lost sight of the other
+  soldiers for about 4-11 s; the room's, fixed in U4g, and -18's L1 evidence moves there.)
+- **Point 2, ES (r2):** the es suite is a FAIL under condition 5, carry 59's pair side by side: reliable events 50.05 a
+  second (1,001 in the 20 measured seconds) against the band 9.5-10.5, beside U4d-F's 7.250 (the synthetic recording
+  at its old reckoning). Cause: the brawl aims at its target's exact position (bots/src/lib.rs:226-245), so between
+  68.5 % and 69.5 % of its 1,440 measured shots hit (reliable events are Hit and Kill; at most 14 kills at damage 10 and
+  health 1,000). The other 11 ES checks pass; no ES run counts at U4r; by ruling 3, point 2, the brawl's ES hit rule
+  and its measurement are U4h's.
+- **Point 4, -18's bite (r2):** in place of "no client holds a heal within 500 ms": the bitten run fails -18's max check
+  (max 1,688,286,323 ns > 500,000,000; copy 3's run and copy 5's re-made run alike), and the clean run holds 96 of 96
+  heals within 500 ms. The 25 fast heals counted apart: 14 in burst 0, each at burst_eviction baseline_age 0 (carry 77
+  (b)'s case); 11 in burst 1, at baseline_age 33 or 34, a second case of the same cause: the stale copy is taken only
+  when the ring slot is overwritten (ack.rs:109-114), after the base is chosen (room.rs:1163-1170); derived from
+  timing, not shown client by client. All 71 slow heals followed a full state (71 overflow resyncs, full_state 1 on
+  each); the heal record takes neither the sentinel nor a full state's tick (scenario.rs:994-999). Copy 3's run had
+  2,314 mirror breaches (the first "tick 64218: client 23: its baseline frame (age 35) is not mirrored"), so its
+  PM-0001-2 value 0.48 was no figure; after point 8 (A) the re-made run has 0 breaches and 0.453333 (INVALID by
+  pre:PM-0001-2 while the room is unfixed). The re-made run (read-only over its logs) splits the same way: fast heals
+  14 at (burst 0, baseline_age 0), 8 at (burst 1, 33) and 3 at (burst 1, 34); the 71 slow heals all with full_state 1,
+  no fast one with it; evictions 96, ages 0 (14), 33 (67), 34 (15).
+- **Point 7:** (a) carry 62 (e)'s reading for bite runs, in ruling 3's words: "a bite run that reaches the after
+  phase's cap stops there; its unresolved ticks are decided lost at the stop (carry 62 (c)); the stop is recorded as
+  after_capped in the summary and run_lengths". (b) the mirror's frames looked up by the room's tick: tick16b's 5,828
+  breaches (the first "tick 65536: client 0: its baseline frame (age 1) is not mirrored") against tick16c's 0; the
+  clean P0 re-run equal record for record but the added after_capped field; across the wrap, point 3's clean partner
+  (r2/tick16-clean: 0 breaches, every check passing).
+
 ## Copy 5: state and what is next (a fresh copy resumes here)
 
-- **Copy 5 stopped at 02:00 UTC at a clean point, by the stop rule** (an outcome that differs from the ruling's
-  expectation: point 3's tick16 bite run's `after_capped` false; the block above). No plant in place; no half edit; no
-  run going (no npt-lab, cargo or rustc process); the measured release build is the last one built (c5-p3.log). df
-  4.9G; .gate/u4r/r2/ holds 145 MB.
+- **Updated 02:08 UTC, after the coordinator's four items (all done):** point 8 (A)'s two runs (as expected), the two
+  c-u4r-runs.mjs items (ruling 3, points 3 and 1), c-u4r-r2.mjs's lines by hand (b1 and es not re-run, by points 1 and
+  2), and the report words (item (4) block). **Held until the advisor's ruling on P3-CAP and CR-ID** (by message):
+  c-u4r-r2.mjs's tick16 `expect` text (it still says "after_capped true"), r5, and section 5's end checks twice (CR-ID
+  may change contract.rs). No plant in place; no half edit; no run going; the measured release build is the last
+  one built (c5-r2lines.log). df 4.8G; .gate/u4r/r2/ 145 MB plus r2/b1-nofallback2 and p0-s1c; .gate/u4r/r2c5/ 31 MB.
 - `git status` holds copy 4's 26 entries plus copy 5's changes: mirror.rs, scenario.rs, contract.rs, main.rs,
-  precheck.rs, marks/SERIES.md (one row's words), and ops/runs/c-u4r-r2.mjs (new). Nothing committed.
+  precheck.rs, marks/SERIES.md (one row's words), ops/runs/c-u4r-runs.mjs (two items), and ops/runs/c-u4r-r2.mjs (new).
+  Nothing committed.
 - Clean at: c5-2.log (fmt exit 0; clippy -p npt-lab -p npt-bots --all-targets -D warnings exit 0, and with
   --all-features exit 0) and c5-3.log (npt-lab bin 47 passed, 1 ignored; bites 54 passed, 1 ignored; lib 5; bots 5).
-- **Next, in order, once the main session answers (the advisor's reading of point 3's `after_capped`):**
+  No Rust file changed since; the two .mjs files pass `node --check`.
+- **Next, once the ruling arrives:** apply it (P3-CAP: the tick16 `expect` text in c-u4r-r2.mjs; CR-ID: contract.rs's
+  exception, and then fmt, clippy and npt-lab's tests in both builds again); then r5 (seeds 1-3 per scene and profile,
+  the slowest kept; 7.3's estimate redone, with one -18 bite run fewer), then section 5's end checks twice, last.
+- **The earlier plan (copy 5's first stop), kept for the record; items 1 to 3 are done above:**
   1. Point 8 (A)'s runs, each once, in one -x call: bites build, then `npt-lab scenario --run u4r-r2-b1-nofallback-1
      --set u4r-r2 --date 2026-11-14 --commit 2fbec77... --out .gate/u4r/r2/b1-nofallback2 --scene SS --profile B1
      --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 30 --bursts 2 --burst-first-s 5 --burst-every-s 15 --role
@@ -1319,7 +1452,5 @@ section 5's end checks twice.
      tick.s.everyone_in_view from its mirror; SERIES.md:368 names npt-room); points 1, 2, 4, 7 by their Builder lines.
   4. Item (5): r5 (seeds 1-3 per scene and profile, the slowest kept; 7.3's estimate redone), then section 5's end
      checks twice, last.
-- Not done and not in my Builder lines (for the main session, point 3's and point 1's main-session items): c-u4r-runs.mjs
-  still runs the judged tick16 bite at tick_start 63,736 (ruling 3 point 3: 65,551 - (warm-up + measured ticks), 47,251
-  for 300 + 18,000) and still runs -18's no-fallback bite on B1 (point 1: moved to U4g). Unchanged until the main
-  session says.
+- (Done since, on the coordinator's message: c-u4r-runs.mjs's tick16 start and -18's bite, the block "c-u4r-runs.mjs:
+  ruling 3's two script items".)

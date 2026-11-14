@@ -8029,10 +8029,10 @@ index 0000000..78ed0fc
 +}
 diff --git a/spikes/netcode-proof/ops/runs/c-u4r-runs.mjs b/spikes/netcode-proof/ops/runs/c-u4r-runs.mjs
 new file mode 100644
-index 0000000..997278f
+index 0000000..ca29c1a
 --- /dev/null
 +++ b/spikes/netcode-proof/ops/runs/c-u4r-runs.mjs
-@@ -0,0 +1,197 @@
+@@ -0,0 +1,216 @@
 +#!/usr/bin/env node
 +// U4r's judged runs and the -30 pre-check, in this container (u4r-brief.md 2.3 and section 7; c-u2-pm-0001-3.mjs's
 +// model). One script for every set, the set named first:
@@ -8048,10 +8048,18 @@ index 0000000..997278f
 +//   warm-up, 600 s measured, tick_start 63,736; B1 with 10 bursts, every 60 s from 30 s into the measured phase), their
 +//   headers listing PM-0001-2 (every L1 part's pre:PM-0001-2), PM-0001-17 and PM-0001-57 (-57's parts are on -17's
 +//   runs), and PM-0001-18 on B1; then, in the bites build at seed 1 with the same settings, one run per bite of those
-+//   marks (marks.json's lists, read at run time) whose part has this profile: -17's and -57's on P0, -18's no-fallback
-+//   on B1 (its ws-budget-x2 is L2's), each header listing PM-0001-2 and the bite's own mark; then `npt-judge --only` on
-+//   the set's folder. One profile per call keeps each set's logs and the judge's memory to one profile's (the advisor's
-+//   U4r build ruling, point 3: the main session plans the disk and judges each set's folder apart).
++//   marks (marks.json's lists, read at run time) whose part has this profile: -17's and -57's on P0, each header
++//   listing PM-0001-2 and the bite's own mark; then `npt-judge --only` on the set's folder. One profile per call keeps
++//   each set's logs and the judge's memory to one profile's (the advisor's U4r build ruling, point 3: the main session
++//   plans the disk and judges each set's folder apart).
++// - The tick16 bite run (the advisor's U4r build ruling 3, point 3): its tick_start is computed from its own lengths,
++//   65,551 - (warm-up ticks + measured ticks) (47,251 for 300 + 18,000), so the 16-bit wrap falls 15 ticks before the
++//   measured phase's end and the measured window ends before the bitten room evicts; every other -17 run, clean and the
++//   client-rounding bite run, starts at 63,736 (U4R-Q7 (a) as that ruling reads it).
++// - No -18 bite run at U4r (the advisor's U4r build ruling 3, point 1): -18's bitten judged run (PM-0001-18/no-fallback)
++//   moves to U4g with the room's fix; ws-budget-x2 is L2's. The three B1 measured runs stay in this set for -57's L1 B1
++//   part, which has no precondition; their -17 and -18 verdicts are recorded INVALID (pre:PM-0001-2's everyone-in-view
++//   share, npt-room's recovery after each burst) and never counted.
 +// - It refuses uncommitted changes to tracked files (every log names its commit); raw logs go under
 +//   .gate/netcode-proof-test/runs/<set>-<commit12>/ (one folder per run), results under results/u4r/<commit12>/<profile>/
 +//   or results/u4r-precheck-30/<commit12>/; neither is ever overwritten. It stops before a run when less than 4 GB is
@@ -8077,13 +8085,23 @@ index 0000000..997278f
 +const GATE = join(ROOT, ".gate", "netcode-proof-test");
 +const SEEDS = [1, 2, 3];
 +const PROFILES = ["P0", "P2", "P3", "B1"];
-+/** -17's L1 runs start here, clean and bitten (U4R-Q7 (a)): tick16's run crosses the 16-bit wrap 1,800 ticks in. */
++/** -17's L1 runs start here, clean and the client-rounding bite run (U4R-Q7 (a), as ruling 3, point 3 reads it). */
 +const TICK_START = 63_736;
 +/** Each judged run's warm-up and measured lengths, s (plan :767: 10 minutes measured). */
 +const WARMUP_S = 10;
 +const MEASURED_S = 600;
++/** npt_sim::TICK_HZ: ticks per second. */
++const TICK_HZ = 30;
++/**
++ * The tick16 bite run's start (the advisor's U4r build ruling 3, point 3): from its own lengths, so the wrap (65,536)
++ * falls 15 ticks before its measured phase's end: 65,551 - (warm-up ticks + measured ticks).
++ */
++const TICK16 = "PM-0001-17/tick16";
++const TICK16_START = 65_536 + 15 - (WARMUP_S + MEASURED_S) * TICK_HZ;
 +/** The bites of these marks that only L2 plants (marks.json: -18's ws-budget-x2 is the L2 B1 ws part's). */
 +const L2_ONLY = ["PM-0001-18/ws-budget-x2"];
++/** The bites whose judged run is not U4r's (the advisor's U4r build ruling 3, point 1: -18's no-fallback, to U4g). */
++const NOT_AT_U4R = ["PM-0001-18/no-fallback"];
 +/** The free space below which no run starts, bytes (section 4 rule 6's 4 GB floor). */
 +const FLOOR = 4 * 1024 ** 3;
 +/** precheck-recordings.json's scene ids (Scene::by_id). */
@@ -8192,20 +8210,21 @@ index 0000000..997278f
 +
 +  const marks = JSON.parse(readFileSync(join(SPIKE, "marks", "marks.json"), "utf8"));
 +  const listed = ["PM-0001-2", "PM-0001-17", "PM-0001-57", ...(profile === "B1" ? ["PM-0001-18"] : [])];
-+  const settings = ["--scene", "SS", "--profile", profile, "--tick-start", String(TICK_START), "--warmup-s", String(WARMUP_S), "--measured-s", String(MEASURED_S), "--suite", name];
-+  const one = (exe, run, seed, extra) => {
++  const settings = (tickStart) => ["--scene", "SS", "--profile", profile, "--tick-start", String(tickStart), "--warmup-s", String(WARMUP_S), "--measured-s", String(MEASURED_S), "--suite", name];
++  const one = (exe, run, seed, extra, tickStart = TICK_START) => {
 +    floor(run);
-+    const r = timed(exe, ["scenario", "--run", run, ...common, "--out", join(logs, run), "--seed", String(seed), ...settings, ...extra]);
++    const r = timed(exe, ["scenario", "--run", run, ...common, "--out", join(logs, run), "--seed", String(seed), ...settings(tickStart), ...extra]);
 +    const said = `${r.out} (wall ${r.secs} s)`;
 +    console.log(said);
 +    lines.push(said);
 +  };
 +  for (const s of SEEDS) one(lab, `l1-${profile.toLowerCase()}-s${s}`, s, ["--role", "measured", "--marks", listed.join(",")]);
-+  // The bites: one run each at seed 1 on the profile of a part that reads it (-17's and -57's on P0, -18's on B1).
-+  const bitesOn = (mark) => (mark === "PM-0001-18" ? "B1" : "P0");
++  // The bites: one run each at seed 1 on P0, the profile of a part that reads it (-17's and -57's); -18's none at U4r
++  // (ruling 3, point 1: to U4g), so a B1 set runs no bite. The tick16 run at TICK16_START (ruling 3, point 3).
++  const bitesOn = (mark) => (mark === "PM-0001-18" ? null : "P0");
 +  for (const m of marks.marks.filter((x) => listed.includes(x.id) && x.id !== "PM-0001-2" && bitesOn(x.id) === profile)) {
-+    for (const b of (m.bites ?? []).filter((x) => !L2_ONLY.includes(x.id))) {
-+      one(labBites, `bite-${b.id.split("/")[1]}`, 1, ["--role", "bite", "--bite", b.id, "--marks", `PM-0001-2,${m.id}`]);
++    for (const b of (m.bites ?? []).filter((x) => !L2_ONLY.includes(x.id) && !NOT_AT_U4R.includes(x.id))) {
++      one(labBites, `bite-${b.id.split("/")[1]}`, 1, ["--role", "bite", "--bite", b.id, "--marks", `PM-0001-2,${m.id}`], b.id === TICK16 ? TICK16_START : TICK_START);
 +    }
 +  }
 +  const verdict = join(logs, "verdict.json");
