@@ -7,7 +7,7 @@
   process only what a record shows, with its time. · plan: `.checkpoints/foundation-2-3-plan/plan.md` (to write)
 - **Branch:** claude/sweet-mayer-grsukw (stands in for cs/foundation-2-3-plan; restarted from main by fast-forward
   bfd719b..4460ef5, pushed) · **Base:** main 4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-14 13:15 Amsterdam
+- **Last update:** 2026-11-14 13:22 Amsterdam
 
 ## Steps done
 1. Orientation: the session's model read from get_session (session_context.model and last_served_model:
@@ -23,10 +23,12 @@
 4. The advisor agent's review of revision 1 (03d05f5): REVISE (advisor-plan-r1.md; hand-back 2026-11-14, the
    transcript); every finding folded into revision 2 (Part 11 lists them); Part 4 recounted: 107 rows, 50 first part,
    48 later, 5 dropped, 2 not ours, 2 rules for this chat.
+5. Plan revision 2 · 00984ae · the advisor agent re-reviewed what changed: APPROVE, with six Lows (L-1 to L-6;
+   advisor-plan-r2.md), which it said may be folded without a further review; revision 2.1 folds them.
 
 ## Current step
-5. Plan revision 2 written (rev2.py applied to plan.md; kit-texts.py regenerated: 30 items, 19 quotes checked); the
-   advisor agent re-reviews what changed from 03d05f5.
+6. Plan revision 2.1 written (rev21.py: the six Lows of the advisor agent's APPROVE of revision 2 at 00984ae, folded as
+   it allowed without a further review). Next: advisor tool moment 5, then "done", then the end message.
 
 ## Next steps
 1. Finish plan.md; commit it with the checkpoint (record its SHA here).
@@ -35,8 +37,8 @@
 3. Advisor tool, moment 5, before the plan is saved as done; then the end message and stop for his go.
 
 ## Open findings
-- The advisor agent's plan review of revision 1 (03d05f5): REVISE (notes: advisor-plan-r1.md). All folded into
-  revision 2 (fixed in the commit after 03d05f5; Part 11's list); its re-review on what changed is open:
+- The advisor agent's plan review of revision 1 (03d05f5): REVISE (notes: advisor-plan-r1.md). All fixed in revision 2
+  (00984ae; Part 11's list) and APPROVED on re-review (advisor-plan-r2.md); its six Lows folded in revision 2.1. Closed:
   - H1 PM-0002-57 and D2 "met at CS-E" do not hold ("cannot merge" needs `required` in the ruleset; "the single
     required check" needs ruleset step 2): prove on scratch PRs after ruleset step 2; restate Part 8 and Part 10
     (between ruleset step 1 and CS-F the ruleset requires more than the guard).

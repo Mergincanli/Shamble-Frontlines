@@ -154,13 +154,13 @@ Before:
 After:
 ```
 - **Effort is always stated** (Opus 5.5 defaults to medium): `max` for every agent that reviews, verifies or designs
-  game or engine code (his words above), set in their agent files (K-5 in this change-set); the netcode chat keeps its
-  efforts by passing each agent its former effort (`high`, or `xhigh` for engine-architect and netcode-architect) until
-  PR #40 has merged. Otherwise `high` by default; `xhigh` for architecture decisions (ADRs, `docs/ENGINE_OVERVIEW.md`,
-  the synthesis) and netcode. Agent files set it in their frontmatter. The caller passes it for everything else: the
-  Agent tool's `effort` for built-in agents and for a `high` agent working on an ADR or on netcode (`xhigh`); `effort:
-  'high'`, `'xhigh'` or `'max'` on every workflow `agent()` call (without it, a workflow agent takes the session's
-  effort).
+  game or engine code (his words above), set in their agent files in this change-set; the netcode chat keeps its efforts
+  by passing each agent its former effort (`high`, or `xhigh` for engine-architect and netcode-architect) until PR #40
+  has merged [to verify before this text is asked: an effort the caller passes overrides the agent file's]. Otherwise
+  `high` by default; `xhigh` for architecture decisions (ADRs, `docs/ENGINE_OVERVIEW.md`, the synthesis) and netcode.
+  Agent files set it in their frontmatter. The caller passes it for everything else: the Agent tool's `effort` for
+  built-in agents and for a `high` agent working on an ADR or on netcode (`xhigh`); `effort: 'high'`, `'xhigh'` or
+  `'max'` on every workflow `agent()` call (without it, a workflow agent takes the session's effort).
 ```
 
 MODELS-HOW (a) only: the effort bullet; the agent files change in CS-B.

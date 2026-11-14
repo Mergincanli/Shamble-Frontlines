@@ -111,7 +111,7 @@ item('K-3', 'CS-B', '.claude/agents/advisor.md', 107, 108, '- No engine code.',
      'go; checks that need a result join later with marks unchanged).')
 
 # K-4: CLAUDE.md "Models and effort", bullets 1-4 (Routines unchanged). MODELS-HOW (c) shown: callers pass max until
-# PR #40 has merged; the agent files' effort lines follow then (K-5).
+# PR #40 has merged; the agent files' effort lines follow then (Part 5.3's agent-file lines).
 models_after = []
 models_after += wrap('- **Who runs on which model** (Mustafa\'s words of 2026-11-12, 16:25, and what he means by them; '
                      'word for word in `docs/DECISIONS.md`, the entry of 2026-11-12, 15:35:17 UTC; they replace '
@@ -161,9 +161,10 @@ EFFORT_TAIL = ('Otherwise `high` by default; `xhigh` for architecture decisions 
                'workflow agent takes the session\'s effort).')
 item('K-4 (a)', 'CS-B', 'CLAUDE.md', 174, 178, '- **Effort is always stated**',
      wrap('- **Effort is always stated** (Opus 5.5 defaults to medium): `max` for every agent that reviews, verifies or '
-          'designs game or engine code (his words above), set in their agent files (K-5 in this change-set); the '
+          'designs game or engine code (his words above), set in their agent files in this change-set; the '
           'netcode chat keeps its efforts by passing each agent its former effort (`high`, or `xhigh` for '
-          'engine-architect and netcode-architect) until PR #40 has merged. ' + EFFORT_TAIL, '', '  '),
+          'engine-architect and netcode-architect) until PR #40 has merged [to verify before this text is asked: '
+          'an effort the caller passes overrides the agent file\'s]. ' + EFFORT_TAIL, '', '  '),
      'MODELS-HOW (a) only: the effort bullet; the agent files change in CS-B.')
 item('K-4 (b)', 'CS-B', 'CLAUDE.md', 174, 178, '- **Effort is always stated**',
      wrap('- **Effort is always stated** (Opus 5.5 defaults to medium): `max` for every agent that reviews, verifies or '
