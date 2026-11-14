@@ -14,7 +14,26 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 23:40 UTC; read this first after a compact or a cut): U4r-F3 IS BUILT; ITS EVIDENCE RUNS.**
+**NOW (2026-11-14 about 23:50 UTC; read this first after a compact or a cut): U4r-F3 COMMITTED AND PUSHED (493b3d7),
+CI GREEN, THE ADVISOR'S HEAD REVIEW RUNS; BRAWL-1's PLAN REVIEW RUNS.**
+- **U4r-F3:**
+  - The commit 493b3d7 carries both scripts. `git show HEAD:…` gives 99dd070e and 4e007500, the tested copies. With them:
+    the card, u4r-f3-review-full.md, the infra notes and the BRAWL-1 advisor's notes then in progress.
+  - Pushed. CI green: gate run 43654541605 (jobs gate and smoke) and toolchain run 43654541555.
+  - **Running:** the advisor's head review, workflow wf_a90fed9f-b0b (task whqq6el9y), notes advisor-u4r-f3-head.md.
+- **When the head review returns:**
+  1. Run u4r_f3_head_review_full.py (ready).
+  2. Read its findings of Medium or higher in full.
+  3. On APPROVE, U4r-F3 closes: set task #68 completed and add u4r-report.md's F3 entry (done at 493b3d7; the size 157/34;
+     the evidence 25/25; infra APPROVE WITH FINDINGS; the follow-ups INF-F3-1 and INF-F1-3 at the runner's next change).
+  4. On REVISE, follow its findings.
+- **BRAWL-1's plan review is still running:** wf_533068a9-b2b (task wr3evnp7j), notes advisor-brawl1-plan.md. When it
+  returns, run brawl1_plan_review_full.py (ready). If Mustafa's KEPT-LOGS question comes back from it, it goes to him
+  under "Decisions needed" in plain words.
+- **COMPACT-WAIT:** at about 36 % of the chat (23:50 UTC), the card refreshed. I asked Mustafa for /compact and set a
+  20-minute reminder. If no /compact comes by then, carry on from this card.
+
+**Earlier NOW (2026-11-14 about 23:40 UTC): U4r-F3 IS BUILT; ITS EVIDENCE RUNS.**
 - **The plan review: APPROVE WITH CONDITIONS 1-10** (advisor-u4r-f3-plan-full.md, 68 lines, sha256 9182a09c…, written
   word for word by u4r_f3_plan_review_full.py). Its one Medium, F3P-2, was read in full: every new line in judgeCall sits
   behind one guard, so nothing new can throw after a 70-minute set. The choices: Q1 (b), Q2 (a), Q3 (b), Q4 (a), Q5 (a),
