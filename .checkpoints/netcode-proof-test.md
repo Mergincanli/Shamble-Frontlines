@@ -42,7 +42,8 @@ third ruling on copy 3's findings (u4r-build3-questions.md), with a fact check a
   Three agents at a time now, the most allowed. **If cut:** `Workflow({scriptPath, resumeFromRunId:
   "wf_345cc3c9-ca1"})`; copy 4 by SendMessage if cut by the limit (its context intact), else a fresh copy from the
   latest prompt. **On the ruling:** write it word for word by script (as advisor-u4r-build2-full.md), read it in full,
-  send copy 4 its parts; anything for Mustafa goes in "Decisions needed". The check-in stays (next 02:34 UTC).
+  send copy 4 its parts; anything for Mustafa goes in "Decisions needed". The check-in stays (next 02:34 UTC). The
+  saver restarted as **bpkkvrymq** (00:55 UTC, after 016ccc8).
 
 **Earlier NOW (2026-11-14 about 00:15 UTC): the spend limit cut copy 3 and the advisor's second ruling at 22:02;
 both resumed about 00:15; snapshot 585a8639….**
