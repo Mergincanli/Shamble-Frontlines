@@ -54,7 +54,8 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   push (crates unchanged since e59ece9); then the c62h record (r2's judge, --only PM-0001-17, on r2's whole-as-lost and
   tick16 folders, into .gate/netcode-proof-test/c62h-<commit12>/: both bites shown, never INVALID); then the card and
   u4r-report.md's r2 section with MRG-L1 to -L3; then U4r-F1 (RUN-L1 rides it).
-- **Carry 62 (h) COMMITTED at 5e563b9** (marks.json +15; pushed about 16:17 UTC; the plan's readings lines went in
+- **Carry 62 (h) COMMITTED at 5e563b9** (marks.json +15; pushed about 16:17 UTC; CI's check suites finished on it
+  with none failed, 16:18; the plan's readings lines went in
   at a36babd, the saver's last autosave when stopped: **stopping the saver commits pending notes once more, so stop it
   BEFORE edits that must share a commit**). **Step 5's record did NOT come out as expected:** r2's judge, the committed
   marks.json, `--only PM-0001-17`, on r2's whole-as-lost and tick16 folders (.gate/netcode-proof-test/c62h-5e563b9589d3/,
