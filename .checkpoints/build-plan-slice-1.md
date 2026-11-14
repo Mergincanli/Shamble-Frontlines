@@ -77,8 +77,8 @@
   chat's float ban until that lint merges, on three conditions (plan, Part 7).
 
 ## Running work
-- saver: background task b33kcams4 · output
-  `/tmp/claude-0/-home-user-Shamble-Frontlines/f707c56b-26b4-5848-b1e1-237a99a6a881/tasks/b33kcams4.output` · started
-  13:59 UTC (14:59 Amsterdam) · stops by 15:49 UTC · last check 15:18 UTC: ok ("saved and pushed df19945" at 15:09
-  UTC; a manual save ee41298 at 15:18 UTC).
+- saver: stopped with TaskStop after the save of 15:26 UTC (background task b33kcams4; started 13:59 UTC; its log:
+  saves every 10 minutes from 14:09 UTC, each "saved and pushed"). Start it again with the same command when agents run.
 - agents: none running.
+- The plan was sent to Mustafa as a file through the session's file tool after the save of 15:26 UTC (it also tries
+  the route of the plan's Part 8).
