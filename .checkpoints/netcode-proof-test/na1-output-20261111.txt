@@ -1,0 +1,21 @@
+NA1's proof (night item 5, npt-u3d-skeptic at 558fc0e: .checkpoints/npt-u3d-skeptic/na1_sampling.py), run by the day
+session on 2026-11-11 about 10:05 UTC: `nice -n 19 python3 -I na1_sampling.py` from a scratch copy (read first: stdlib
+only, reads and writes nothing); 8.9 s. Output, verbatim:
+
+n 990091; -3's p99.9 fails at >= 991 delays above 30250000 ns; no lateness above 10 ms
+1,980 at 5.25 ms: E (L0 = 0) 9999 ns, would PASS; expected count above 990.0; -3 p99.9 FAIL in 994 of 2000 seeds (49.7 %)
+1,880 at 5.25 ms: E (L0 = 0) 9494 ns, would PASS; expected count above 940.0; -3 p99.9 FAIL in 23 of 2000 seeds (1.1 %)
+ramps 21 x 10 ms: E (L0 = 0) 9980 ns, would PASS; expected count above 988.2; -3 p99.9 FAIL in 897 of 2000 seeds (44.9 %)
+ramps 43 x 7 ms: E (L0 = 0) 9752 ns, would PASS; expected count above 965.6; -3 p99.9 FAIL in 271 of 2000 seeds (13.6 %)
+2,040 at 5.25 ms (MISS side): E (L0 = 0) 10302 ns, would MISS; expected count above 1020.0; -3 p99.9 FAIL in 1818 of 2000 seeds (90.9 %)
+ramps 22 x 10 ms (MISS side): E (L0 = 0) 10455 ns, would MISS; expected count above 1035.2; -3 p99.9 FAIL in 1984 of 2000 seeds (99.2 %)
+full sample check 0 (1,980 at 5.25 ms): p99.9 30017263 ns, PASS
+full sample check 1 (1,980 at 5.25 ms): p99.9 30201862 ns, PASS
+full sample check 2 (1,980 at 5.25 ms): p99.9 30061062 ns, PASS
+
+Reading: NA1 = TE1 holds. Near the bar, E (L0 = 0) can PASS while -3's p99.9 FAILs (49.7 % at E 9,999 ns; 44.9 % for
+the 10 ms ramps at 9,980 ns), and E can MISS while -3 passes (9.1 % and 0.8 % on the MISS side). R-31's "never the
+reverse" holds on average, not per run. The dry run's E was 11.4-19.7 µs, far from the bar, so no past verdict
+changes. The three full-sample checks (whole samples, three seeds) all pass at E 9,999 ns: not against the
+shortcut's ~50 % rate (three passes have a 1-in-8 chance at 50 %), but too few draws to confirm it on whole samples.
+To the advisor with NA5 and the plan text edits.

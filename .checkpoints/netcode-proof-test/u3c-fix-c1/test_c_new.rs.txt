@@ -1,0 +1,208 @@
+/// One run of mechanism test (c)'s connection.
+#[derive(Debug)]
+struct WriterRun {
+    /// Each per-return record with N at the writer's last write before it (the formula's, from the srtt the gate read
+    /// then) and N at the return's own srtt.
+    judged: Vec<(Return, u64, u64)>,
+    /// The bursts' starts asked for (DelayStream's clock).
+    starts: [u64; 2],
+    written: u64,
+    skipped: u64,
+    /// Writes after which tungstenite still owed bytes.
+    owed_after: u64,
+    ticks: u64,
+}
+
+/// Mechanism test (c)'s connection: the server's shipped per-tick writer (with `bite`, or reading unsent bytes only)
+/// writes one 1,024 B snapshot (1,050 B in the model) per tick over TLS and tokio-tungstenite at P2, through two 1 s
+/// bursts added after the wrap at `bursts` from the start. Each write goes through the Sink without waiting (fed, then
+/// one flush attempt), as a WsServer's tick must never park: what tungstenite cannot pass on stays in its buffer, and
+/// DelayStream counts it as owed. The gate reads its inputs in one reading (`gate_inputs`: one lock, one step; F11).
+///
+/// It runs until the model has recorded both returns and, after each, its first in-order byte and first whole message
+/// down (S12; model state, F-K), with a hang guard of `hang_ticks`. N at each write is recorded (the formula's, from the
+/// srtt the gate read), and each write is matched to its record in the log (one record of SNAP model bytes per gated
+/// write, asserted), so each return is judged against N at the last write whose model stamp is before it (NC-U3c-1).
+async fn writer_run(
+    seed: u64,
+    conn: u32,
+    bite: Option<Bite>,
+    unsent_only: bool,
+    bursts: [u64; 2],
+    hang_ticks: u64,
+) -> WriterRun {
+    let c = cfg(Profile::p2(), seed);
+    let (mut server, mut client, _, _) = pair(&c, conn).await;
+    let reader = tokio::spawn(async move { while let Some(Ok(_)) = client.next().await {} });
+    let start = now();
+    for b in bursts {
+        server.get_ref().add_burst(start + b, SEC).expect("a burst");
+    }
+    let mut w = TickWriter::new(TICK);
+    if let Some(b) = bite {
+        w = w.with_bite(b);
+    }
+    let mut owed_after = 0;
+    let mut n_at_write = Vec::new();
+    let t0 = tokio::time::Instant::now();
+    let done = |rets: &[Return]| {
+        rets.len() == 2
+            && rets
+                .iter()
+                .all(|r| r.first_byte_ns[DOWN].is_some() && r.first_message_ns[DOWN].is_some())
+    };
+    let mut ticks = 0;
+    while !done(&server.get_ref().returns()) {
+        assert!(
+            ticks < hang_ticks,
+            "hang guard: {hang_ticks} ticks without both returns' first byte and message"
+        );
+        read_until(
+            &mut server,
+            t0 + Duration::from_nanos(ticks * TICK),
+            &mut |_, _| {},
+        )
+        .await;
+        // Whatever tungstenite still holds gets one more chance to go (none is expected: the gate needs owed 0).
+        let _ = server.flush().now_or_never();
+        let ds = server.get_ref();
+        let mut inp = ds.gate_inputs();
+        if unsent_only {
+            inp.outstanding = ds.unsent_bytes();
+        }
+        if w.on_tick(Snap { id: ticks, size: SNAP }, inp).is_some() {
+            n_at_write.push(snapshot_budget(inp.srtt_ns, TICK));
+            let _ = server
+                .feed(Message::Binary(vec![0x5a; 1_024].into()))
+                .now_or_never();
+            let _ = server.flush().now_or_never();
+            owed_after += u64::from(server.get_ref().owed_bytes() != 0);
+        }
+        ticks += 1;
+    }
+    let ds = server.get_ref();
+    let rets = ds.returns();
+    let s = ds.snapshot();
+    let wrote: Vec<u64> = s
+        .logs
+        .steps
+        .iter()
+        .filter_map(|&(t, st)| (st == Step::Write { end: DOWN, bytes: SNAP }).then_some(t))
+        .collect();
+    assert_eq!(
+        wrote.len(),
+        n_at_write.len(),
+        "each gated write is one record of {SNAP} model bytes"
+    );
+    let judged = rets
+        .into_iter()
+        .map(|r| {
+            let at = r.at_ns - s.origin;
+            let last = wrote.iter().filter(|&&t| t < at).count();
+            assert!(last > 0, "a write before the return at {}", r.at_ns);
+            (r, n_at_write[last - 1], snapshot_budget(r.srtt_ns, TICK))
+        })
+        .collect();
+    drop(server);
+    reader.abort();
+    WriterRun {
+        judged,
+        starts: bursts.map(|b| start + b),
+        written: w.written(),
+        skipped: w.skipped(),
+        owed_after,
+        ticks,
+    }
+}
+
+/// Mechanism test (c) (u3c-plan.md 1.4, C9): on DelayStream at P2 under B1, through TLS 1.3 and tokio-tungstenite on
+/// loopback, the shipped writer keeps outstanding <= N x size at every return, N being the one in force at the
+/// writer's last write before the return (NC-U3c-1: the gate guarantees outstanding <= N(srtt at a write) x size after
+/// each write, and outstanding never grows between writes; srtt, and so N, can fall after the budget filled, so N at
+/// the return's own srtt is not the bound), and leaves nothing owed after any write. Identities on model state:
+/// - each return lands at its burst's end on DelayStream's clock (start + burst offset + 1 s: F-B, C5);
+/// - not vacuous (NC-U3c-10): at each faithful return the gate would refuse on outstanding, outstanding > (N(srtt at
+///   the return) − 1) x size: the budget was reached (no acknowledgement arrives late in a 1 s burst, so outstanding
+///   and srtt stand as at the last refusal);
+/// - S12's per-burst times (C8): the first in-order byte down at least one least delay after the return, the first
+///   whole message no earlier.
+///
+/// Counts: 2 faithful connections and one per bite, run together; 2 bursts each (1 s, at 1.5 s and 4.5 s plus a phase
+/// of 0, 11, 17 or 29 ms); each runs until both returns have their first byte and message down (model state, F-K;
+/// typically about 230 ticks, 7.7 s; hang guard 900 ticks, 30 s). Identities, so no band. Bites (d): budget_scale 2
+/// and "outstanding = unsent only" (SIOCOUTQNSD) each break the bound at a return.
+///
+/// What can fail and what cannot (the critic's note): "owed = 0 before a write" is not asserted, since the gate
+/// (may_write) requires it and it could never fail here; what is asserted is that nothing is owed AFTER each write,
+/// which fails if a snapshot the gate let through did not fit DelayStream's room whole (SNAP counting the frame
+/// wrongly, or a record rule that takes less than the room allows).
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn c_the_writer_keeps_outstanding_within_n_snapshots_at_every_return() {
+    const HANG_TICKS: u64 = 900;
+    let at = |phase_ms: u64| [1_500 * MS + phase_ms * MS, 4_500 * MS + phase_ms * MS];
+    let (a, b, x2, unsent) = tokio::join!(
+        writer_run(41, 0, None, false, at(0), HANG_TICKS),
+        writer_run(42, 1, None, false, at(11), HANG_TICKS),
+        writer_run(43, 2, Some(Bite::BudgetX2), false, at(17), HANG_TICKS),
+        writer_run(44, 3, None, true, at(29), HANG_TICKS),
+    );
+    let over = |run: &WriterRun| {
+        run.judged
+            .iter()
+            .filter(|(r, n, _)| r.outstanding > n * SNAP)
+            .count()
+    };
+    for (name, run) in [
+        ("faithful A", &a),
+        ("faithful B", &b),
+        ("budget x2", &x2),
+        ("unsent only", &unsent),
+    ] {
+        let shown: Vec<String> = run
+            .judged
+            .iter()
+            .map(|(r, n, n_ret)| {
+                format!(
+                    "{} B vs {} B (N {n} at the last write, {n_ret} at the return)",
+                    r.outstanding,
+                    n * SNAP
+                )
+            })
+            .collect();
+        println!(
+            "(c) {name}: {} ticks, {} written, {} skipped, owed after a write {}; at each return: {}",
+            run.ticks,
+            run.written,
+            run.skipped,
+            run.owed_after,
+            shown.join("; ")
+        );
+        assert_eq!(run.judged.len(), 2, "{name}: both bursts returned");
+        for ((r, _, _), start) in run.judged.iter().zip(run.starts) {
+            assert_eq!(r.at_ns, start + SEC, "{name}: the return on DelayStream's clock");
+        }
+    }
+    let least = Profile::p2().one_way_ns() - Profile::p2().half_jitter_ns();
+    for run in [&a, &b] {
+        assert_eq!(over(run), 0, "outstanding within N x size at every return");
+        assert_eq!(run.owed_after, 0, "nothing owed after any write");
+        for (r, _, n_ret) in &run.judged {
+            assert!(
+                r.outstanding > (n_ret - 1) * SNAP,
+                "the budget was reached: {} B > ({n_ret} - 1) x {SNAP} B",
+                r.outstanding
+            );
+            let byte = r.first_byte_ns[DOWN].expect("a byte after the return");
+            let message = r.first_message_ns[DOWN].expect("a message after the return");
+            println!(
+                "(c) return at {} ns: first byte {:.1} ms, first message {:.1} ms after it",
+                r.at_ns,
+                byte as f64 / 1e6,
+                message as f64 / 1e6
+            );
+            assert!(byte >= least && message >= byte, "{byte} {message}");
+        }
+    }
+    assert!(over(&x2) > 0, "the budget x2 bite breaks (c)");
+    assert!(over(&unsent) > 0, "the unsent-only bite breaks (c)");
+}

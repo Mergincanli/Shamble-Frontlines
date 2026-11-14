@@ -1,0 +1,440 @@
+diff --git a/spikes/netcode-proof/crates/net/src/tcp_model/fixes.rs b/spikes/netcode-proof/crates/net/src/tcp_model/fixes.rs
+index 12170e1..6b389e6 100644
+--- a/spikes/netcode-proof/crates/net/src/tcp_model/fixes.rs
++++ b/spikes/netcode-proof/crates/net/src/tcp_model/fixes.rs
+@@ -25,7 +25,12 @@
+ 
+ use super::*;
+ use std::collections::VecDeque;
+-use std::sync::atomic::{AtomicU64, Ordering};
++use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
++static L2R: AtomicBool = AtomicBool::new(false);
++static TRACE: AtomicBool = AtomicBool::new(false);
++static NO_CANCEL: AtomicBool = AtomicBool::new(false);
++static CLOSED101: AtomicU64 = AtomicU64::new(0);
++static ABORT_K: AtomicU64 = AtomicU64::new(0);
+ 
+ const MS: u64 = 1_000_000;
+ const SEC: u64 = 1_000_000_000;
+@@ -227,6 +232,17 @@ impl Throttler {
+     /// A new WebSocket at `t`: its delay (from `draw` when the throttler exists), then its pending tracker.
+     fn issue(&mut self, t: u64, draw: impl FnOnce() -> u64) -> u64 {
+         self.roll_to(t);
++        if L2R.load(Ordering::Relaxed) {
++            self.exists = true;
++            if self.next_roll.is_none() {
++                self.next_roll = Some(t + THROTTLE_PERIOD);
++            }
++            self.pending += 1;
++            let f = u64::from(self.failed[0] + self.failed[1]);
++            let s = u64::from(self.succeeded[0] + self.succeeded[1]);
++            let e = (u64::from(self.pending) + f / (s + 1)).min(16);
++            return (1_000 + below(draw(), 4_001)) * (1 << e) / 65_536 * MS;
++        }
+         let delay_ms = if self.exists {
+             let f = u64::from(self.failed[0] + self.failed[1]);
+             let s = u64::from(self.succeeded[0] + self.succeeded[1]);
+@@ -486,6 +502,7 @@ struct Outcome {
+     ticks: u64,
+     /// An attempt was still pending when the run stopped, 3 s after the last recovery.
+     pending_at_end: bool,
++    trace: Vec<(u64, &'static str, u64)>,
+ }
+ 
+ /// Which outstanding attempt blocks an endpoint.
+@@ -558,6 +575,12 @@ impl<'a> Sim<'a> {
+         }
+     }
+ 
++    fn ev(&mut self, t: u64, k: &'static str, v: u64) {
++        if TRACE.load(Ordering::Relaxed) {
++            self.out.trace.push((t, k, v));
++        }
++    }
++
+     /// This burst window's record (none before the first burst).
+     fn slot(&mut self) -> Option<&mut BurstOut> {
+         let w = self.win?;
+@@ -652,8 +675,14 @@ impl<'a> Sim<'a> {
+                 }
+                 Step::Switching if d >= sf + SWITCHING => {
+                     // The 101: the page sees open and sends its Join; the browser frees the endpoint.
+-                    c.owed[1] += JOIN;
+-                    c.step = Step::Joined;
++                    if NO_CANCEL.load(Ordering::Relaxed) && i != self.client_cur && c.created <= self.newest_whole {
++                        c.step = Step::Joined;
++                        c.dead = true;
++                        CLOSED101.fetch_add(1, Ordering::Relaxed);
++                    } else {
++                        c.owed[1] += JOIN;
++                        c.step = Step::Joined;
++                    }
+                     opened = true;
+                 }
+                 _ => {}
+@@ -674,6 +703,7 @@ impl<'a> Sim<'a> {
+             }
+             if opened {
+                 self.gate.opened(t, k);
++                self.ev(t, "101", i as u64);
+             }
+         }
+     }
+@@ -688,6 +718,7 @@ impl<'a> Sim<'a> {
+             return;
+         };
+         self.client_cur = i;
++        self.ev(t, "switch", i as u64);
+         self.last_data = t;
+         self.outage = 0;
+         self.newest_whole = self.conns[i].resume.map_or(0, |r| r.1);
+@@ -704,6 +735,9 @@ impl<'a> Sim<'a> {
+     /// H6: the page closes each attempt still before its 101 once the current connection has delivered a whole
+     /// snapshot the room wrote at or after the attempt's creation.
+     fn cancel(&mut self, t: u64) {
++        if NO_CANCEL.load(Ordering::Relaxed) {
++            return;
++        }
+         let nw = self.newest_whole;
+         let mut n = 0;
+         let mut kept = Vec::new();
+@@ -724,6 +758,7 @@ impl<'a> Sim<'a> {
+             }
+         }
+         if n > 0 {
++            self.ev(t, "cancel", u64::from(n));
+             self.out.cancels += n;
+             if let Some(b) = self.slot() {
+                 b.cancels += n;
+@@ -759,6 +794,7 @@ impl<'a> Sim<'a> {
+             }
+         }
+         if takeovers > 0 {
++            self.ev(t, "takeover", self.server_cur as u64);
+             self.out.takeovers += takeovers;
+             let after = self.after_recovery();
+             if let Some(b) = self.slot() {
+@@ -799,7 +835,11 @@ impl<'a> Sim<'a> {
+         }
+         match self.blocker(self.made % r.endpoints) {
+             None => Some(due),
+-            Some((created, true, _)) => r.abort_after.map(|a| due.max(created + a)),
++            Some((created, true, _)) => r.abort_after.map(|a| {
++                let k = ABORT_K.load(Ordering::Relaxed);
++                let a = if k > 0 { a.max(k * self.app_rtt.unwrap_or(100 * MS)) } else { a };
++                due.max(created + a)
++            }),
+             // Past its 101: it runs to its Join.
+             Some(_) => None,
+         }
+@@ -825,8 +865,15 @@ impl<'a> Sim<'a> {
+                 Which::Conn(j) => self.close_conn(j, t, false),
+             }
+             self.out.aborts += 1;
++            self.ev(t, "abort", 0);
+         }
++        let mut th = self.gate.throttler;
++        th.roll_to(t);
++        let code = u64::from(th.pending) * 1_000_000 + u64::from(th.failed[0] + th.failed[1]) * 1_000
++            + u64::from(th.succeeded[0] + th.succeeded[1]);
+         let delay = self.gate.create(t);
++        self.ev(t, "create(p*1e6+f*1e3+s)", code);
++        self.ev(t, "throttle_ms", delay / MS);
+         self.waiting.push(Waiting {
+             created: t,
+             endpoint: k,
+@@ -881,6 +928,7 @@ impl<'a> Sim<'a> {
+                 let mut c = Conn::new(m, Step::Connecting, k, w.created);
+                 c.began = t;
+                 self.conns.push(c);
++                self.ev(t, "begin", (self.conns.len() - 1) as u64);
+                 if let Some(b) = self.slot() {
+                     b.wait_max = b.wait_max.max(t - w.created);
+                 }
+@@ -1007,6 +1055,7 @@ impl<'a> Sim<'a> {
+                     .any(|c| !c.dead && c.fresh_end.is_some_and(|e| c.m.delivered(1) >= e))
+             {
+                 self.out.bursts[self.meas].recovery = Some(t - self.backs[self.meas]);
++                self.ev(t, "recovery", (t - self.backs[self.meas]) / MS);
+                 self.meas += 1;
+                 for c in &mut self.conns {
+                     c.fresh_end = None;
+@@ -1974,3 +2023,278 @@ fn chromiums_throttler_and_firefoxs_fail_delay_follow_their_sources() {
+     g.opened(71 * SEC, 0);
+     assert!(g.fail[0].is_none(), "an open clears it");
+ }
++
++#[cfg(test)]
++mod diag_v3h {
++    use super::*;
++
++    fn win(o: Opts, ms: u64) -> Opts {
++        let mut o = o;
++        o.client_os = ClientOs::Windows { initial_rto_ms: ms };
++        o
++    }
++
++    #[test]
++    #[ignore]
++    fn diag_rows() {
++        let c = configs();
++        let mut rows: Vec<(String, Opts)> = Vec::new();
++        let mut nots = c[1].1;
++        nots.cfg.timestamps = false;
++        rows.push(("fix 1 alone, Linux client without timestamps".into(), nots));
++        for ms in [1_000u64, 2_000, 3_000] {
++            rows.push((format!("fix 1 alone, Windows-like {ms}"), win(c[1].1, ms)));
++        }
++        rows.push(("recommended, Windows-like 2000".into(), win(c[3].1, 2_000)));
++        rows.push(("abort 500, Windows-like 2000".into(), win(c[4].1, 2_000)));
++        for (name, o) in rows {
++            let sets = sweep_sets(o, TABLE_SETS);
++            println!("{name}: {}", summary(&pooled(&sets)));
++            println!("  {}", side(&sets));
++        }
++    }
++
++    fn lineage(o: Opts, r: u64, n: u64, spacing: u64) -> Outcome {
++        let b0 = 5 * SEC + ((r * 618_033_989) % SEC) * 2;
++        let starts: Vec<u64> = (0..n).map(|j| b0 + j * spacing).collect();
++        let p = Profile::b1(&starts);
++        run(&p, 9_000_000 + r, b0 + (n - 1) * spacing + 13 * SEC, o)
++    }
++
++    fn multi_summary(name: &str, o: Opts, runs: u64, n: u64) {
++        let outs = multi(o, runs, n, 20 * SEC);
++        let bursts: Vec<&BurstOut> = outs.iter().flat_map(|r| r.bursts.iter()).collect();
++        let mut all: Vec<u64> = bursts.iter().map(|b| b.recovery.unwrap_or(u64::MAX)).collect();
++        all.sort_unstable();
++        let thr = bursts.iter().filter(|b| b.throttle_max >= MS).count();
++        let thr500 = bursts.iter().filter(|b| b.throttle_max >= 500 * MS).count();
++        let tmax = bursts.iter().map(|b| b.throttle_max).max().unwrap_or(0) / MS;
++        let att: u64 = bursts.iter().map(|b| u64::from(b.attempts)).sum();
++        let tk: u64 = bursts.iter().map(|b| u64::from(b.takeovers + b.takeovers_after)).sum();
++        println!("{name} {n} x {runs}: {}; throttled>=1ms {thr}, >=500ms {thr500}, max {tmax} ms; attempts/burst {:.3}, takeovers/burst {:.3}",
++            summary(&all), att as f64 / bursts.len() as f64, tk as f64 / bursts.len() as f64);
++    }
++
++    #[test]
++    #[ignore]
++    fn diag_order() {
++        let c = configs();
++        let rec = c[3].1;
++        let mut ab = rec;
++        ab.reconnect = serial(500 * MS, Some(500 * MS));
++        for l2r in [false, true] {
++            L2R.store(l2r, Ordering::Relaxed);
++            let tag = if l2r { "L2R (Linux/macOS Chromium)" } else { "R2L (Windows Chromium)" };
++            for (name, o) in [("recommended", rec), ("abort 500", ab), ("recommended Windows-like 3000", win(rec, 3_000)), ("abort 500 Windows-like 3000", win(ab, 3_000))] {
++                multi_summary(&format!("{tag} {name}"), o, 1_000, 30);
++            }
++            let s = pooled(&sweep_sets(ab, TABLE_SETS));
++            println!("{tag} abort 500 single: {}", summary(&s));
++        }
++        L2R.store(false, Ordering::Relaxed);
++    }
++
++    #[test]
++    #[ignore]
++    fn diag_nocancel() {
++        let c = configs();
++        let rec = c[3].1;
++        let mut ab = rec;
++        ab.reconnect = serial(500 * MS, Some(500 * MS));
++        let ff = |o: Opts| { let mut o = o; o.browser = Browser::Firefox; o };
++        for nc in [false, true] {
++            NO_CANCEL.store(nc, Ordering::Relaxed);
++            let tag = if nc { "JOIN-OR-CLOSE at the 101" } else { "H6 cancel" };
++            for (name, o) in [("recommended", rec), ("abort 500", ab), ("recommended Win3s", win(rec, 3_000)), ("abort 500 Win3s", win(ab, 3_000)), ("abort 500 Firefox", ff(ab)), ("abort 500 Firefox Win3s", ff(win(ab, 3_000)))] {
++                CLOSED101.store(0, Ordering::Relaxed);
++                let sets = sweep_sets(o, TABLE_SETS);
++                println!("{tag} {name} single: {}", summary(&pooled(&sets)));
++                println!("  {}; closed at the 101 without a Join {:.3} a phase", side(&sets), CLOSED101.load(Ordering::Relaxed) as f64 / 60_000.0);
++            }
++            for (name, o) in [("recommended", rec), ("abort 500", ab), ("abort 500 Win3s", win(ab, 3_000)), ("abort 500 Firefox", ff(ab))] {
++                multi_summary(&format!("{tag} {name}"), o, 1_000, 30);
++            }
++        }
++        NO_CANCEL.store(false, Ordering::Relaxed);
++    }
++
++    fn phase_on(base: &Profile, seed: u64, burst: u64, o: Opts) -> BurstOut {
++        let mut p = base.clone();
++        p.bursts_ns = vec![(burst, SEC)];
++        let out = run(&p, seed, burst + SEC + PHASE_WINDOW, o);
++        let mut b = out.bursts[0];
++        if b.recovery.is_none() {
++            b.recovery = Some(PHASE_WINDOW);
++        }
++        b
++    }
++
++    #[test]
++    #[ignore]
++    fn diag_lengths() {
++        let c = configs();
++        let rec = c[3].1;
++        let mut ab = rec;
++        ab.reconnect = serial(500 * MS, Some(500 * MS));
++        for len_ms in [600u64, 1_500, 2_500] {
++            for (name, o, nc, k) in [("fix 1 alone", c[1].1, false, 0u64), ("never abandoned, H6 cancel", rec, false, 0), ("never abandoned, Win3s", win(rec, 3_000), false, 0), ("abort max(500, 4 x RTT), join-or-close", ab, true, 4), ("abort max(500, 4 x RTT), join-or-close, Win3s", win(ab, 3_000), true, 4)] {
++                NO_CANCEL.store(nc, Ordering::Relaxed);
++                ABORT_K.store(k, Ordering::Relaxed);
++                let sets: Vec<SetOut> = pool(20, |kk| {
++                    let mut s = SetOut::default();
++                    for i in 0..PHASES {
++                        let (seed, burst) = phase_at(kk, i);
++                        let mut p = Profile::p2();
++                        p.bursts_ns = vec![(burst, len_ms * MS)];
++                        let out = run(&p, seed, burst + len_ms * MS + PHASE_WINDOW, o);
++                        let b = out.bursts[0];
++                        s.rec.push(b.recovery.unwrap_or(PHASE_WINDOW));
++                        s.attempts += u64::from(b.attempts);
++                        s.takeovers += u64::from(b.takeovers);
++                        s.takeovers_after += u64::from(b.takeovers_after);
++                    }
++                    s.rec.sort_unstable();
++                    s
++                });
++                let n = 20_000.0;
++                println!("P2 + {len_ms} ms burst, {name}: {}; attempts {:.2}, takeovers {:.2}", summary(&pooled(&sets)),
++                    sets.iter().map(|s| s.attempts).sum::<u64>() as f64 / n,
++                    sets.iter().map(|s| s.takeovers + s.takeovers_after).sum::<u64>() as f64 / n);
++            }
++        }
++        NO_CANCEL.store(false, Ordering::Relaxed);
++        ABORT_K.store(0, Ordering::Relaxed);
++    }
++
++    #[test]
++    #[ignore]
++    fn diag_profiles() {
++        let c = configs();
++        let rec = c[3].1;
++        let mut ab = rec;
++        ab.reconnect = serial(500 * MS, Some(500 * MS));
++        for base in [Profile::p2(), Profile::p3(), Profile::p4()] {
++            for (name, o, nc, k) in [("fix 1 alone", c[1].1, false, 0u64), ("never abandoned, H6 cancel", rec, false, 0), ("abort 500, join-or-close", ab, true, 0), ("abort max(500, 4 x RTT), join-or-close", ab, true, 4), ("abort max(500, 4 x RTT), join-or-close, Win3s", win(ab, 3_000), true, 4), ("never abandoned, Win3s", win(rec, 3_000), false, 0)] {
++                NO_CANCEL.store(nc, Ordering::Relaxed);
++                ABORT_K.store(k, Ordering::Relaxed);
++                CLOSED101.store(0, Ordering::Relaxed);
++                let base2 = base.clone();
++                let sets: Vec<SetOut> = pool(20, |kk| {
++                    let mut s = SetOut::default();
++                    for i in 0..PHASES {
++                        let (seed, burst) = phase_at(kk, i);
++                        let b = phase_on(&base2, seed, burst, o);
++                        s.rec.push(b.recovery.unwrap_or(u64::MAX));
++                        s.attempts += u64::from(b.attempts);
++                        s.attempts_max = s.attempts_max.max(b.attempts);
++                        s.takeovers += u64::from(b.takeovers);
++                        s.takeovers_after += u64::from(b.takeovers_after);
++                        s.cancels += u64::from(b.cancels);
++                        s.capped += u64::from(b.capped);
++                        s.wait_max = s.wait_max.max(b.wait_max);
++                    }
++                    s.rec.sort_unstable();
++                    s
++                });
++                println!("{} + 1 s burst, {name}: {}", base.name, summary(&pooled(&sets)));
++                println!("  {}; closed at the 101 {:.3}", side(&sets), CLOSED101.load(Ordering::Relaxed) as f64 / 20_000.0);
++            }
++        }
++        // Side effects without a burst, 3 x 10 min, P3 and P4.
++        for (name, o, nc, k) in [("abort 500, join-or-close", ab, true, 0u64), ("abort max(500, 4 x RTT), join-or-close", ab, true, 4)] {
++            NO_CANCEL.store(nc, Ordering::Relaxed);
++            ABORT_K.store(k, Ordering::Relaxed);
++            for p in [Profile::p2(), Profile::p3(), Profile::p4()] {
++                let runs = pool(3, |seed| run(&p, seed + 1, 600 * SEC, o));
++                let sum = |f: fn(&Outcome) -> u64| runs.iter().map(f).sum::<u64>();
++                println!("{} no burst, {name}: 30 min: attempts {}, aborts {}, takeovers {}", p.name, sum(|r| u64::from(r.attempts)), sum(|r| u64::from(r.aborts)), sum(|r| u64::from(r.takeovers)));
++            }
++        }
++        NO_CANCEL.store(false, Ordering::Relaxed);
++        ABORT_K.store(0, Ordering::Relaxed);
++    }
++
++    #[test]
++    #[ignore]
++    fn diag_ratchet() {
++        let c = configs();
++        let mut ab = c[3].1;
++        ab.reconnect = serial(500 * MS, Some(500 * MS));
++        let outs = multi(ab, 1_000, 30, 20 * SEC);
++        let (r, _) = outs.iter().enumerate().map(|(r, o)| (r, o.bursts.iter().map(|b| b.throttle_max).max().unwrap_or(0))).max_by_key(|x| x.1).unwrap();
++        // How many lineages reach >= 1 s throttle in some burst, and from which burst on.
++        let mut first: Vec<usize> = Vec::new();
++        for o in &outs {
++            if let Some(j) = o.bursts.iter().position(|b| b.throttle_max >= SEC) {
++                first.push(j + 1);
++            }
++        }
++        first.sort_unstable();
++        println!("lineages with a >= 1 s throttle: {} of 1000; first burst (sorted): {:?}", first.len(), &first[..first.len().min(40)]);
++        TRACE.store(true, Ordering::Relaxed);
++        let o = lineage(ab, r as u64, 30, 20 * SEC);
++        TRACE.store(false, Ordering::Relaxed);
++        println!("worst lineage r={r}");
++        for (j, b) in o.bursts.iter().enumerate() {
++            println!("  #{}: rec {:?} ms att {} canc {} tk {}/{} thr {} ms capped {}", j + 1, b.recovery.map(|x| x / MS), b.attempts, b.cancels, b.takeovers, b.takeovers_after, b.throttle_max / MS, b.capped);
++        }
++        let b0 = 5 * SEC + ((r as u64 * 618_033_989) % SEC) * 2;
++        for (t, k, v) in &o.trace {
++            if k.starts_with("create") || *k == "throttle_ms" || *k == "101" || *k == "recovery" || *k == "takeover" {
++                let rel = (*t as i64 - b0 as i64) / MS as i64;
++                println!("    {} ms (burst #{} +{} ms) {k} {v}", rel, rel.div_euclid(20_000) + 1, rel.rem_euclid(20_000));
++            }
++        }
++    }
++
++    #[test]
++    #[ignore]
++    fn diag_worst() {
++        let rec = configs()[3].1;
++        // Recommended, 600 sets: the phases over 2.5 s.
++        let worst: Vec<Vec<(u64, u64, u64)>> = pool(TAIL_SETS, |k| {
++            let mut v = Vec::new();
++            for i in 0..PHASES {
++                let (seed, burst) = phase_at(k, i);
++                let (b, _) = phase(seed, burst, rec);
++                let r = b.recovery.unwrap_or(u64::MAX);
++                if r > 2_500 * MS {
++                    v.push((r, seed, burst));
++                }
++            }
++            v
++        });
++        let mut w: Vec<(u64, u64, u64)> = worst.into_iter().flatten().collect();
++        w.sort_unstable();
++        w.reverse();
++        println!("recommended phases over 2.5 s: {}", w.len());
++        TRACE.store(true, Ordering::Relaxed);
++        for &(r, seed, burst) in w.iter().take(4) {
++            let p = Profile::b1(&[burst]);
++            let out = run(&p, seed, burst + SEC + PHASE_WINDOW, rec);
++            let fix1 = run(&p, seed, burst + SEC + PHASE_WINDOW, configs()[1].1);
++            println!("seed {seed} recovery {} ms (fix 1 alone same seed {:?} ms)", r / MS, fix1.bursts[0].recovery.map(|x| x / MS));
++            for (t, k, v) in &out.trace {
++                println!("    {} ms after the burst start: {k} {v}", (*t as i64 - burst as i64) / MS as i64);
++            }
++        }
++        // Takeovers after the recovery: was the 101 before the recovery?
++        let (mut before, mut after, mut phases) = (0, 0, 0);
++        for k in 0..10 {
++            for i in 0..PHASES {
++                let (seed, burst) = phase_at(k, i);
++                let p = Profile::b1(&[burst]);
++                let out = run(&p, seed, burst + SEC + PHASE_WINDOW, rec);
++                phases += 1;
++                let rec_t = out.trace.iter().find(|e| e.1 == "recovery").map(|e| e.0);
++                let Some(rt) = rec_t else { continue };
++                if out.trace.iter().any(|e| e.1 == "takeover" && e.0 > rt) {
++                    let o101 = out.trace.iter().filter(|e| e.1 == "101").map(|e| e.0).last().unwrap();
++                    if o101 <= rt { before += 1 } else { after += 1 }
++                }
++            }
++        }
++        TRACE.store(false, Ordering::Relaxed);
++        println!("{phases} phases: takeovers after the recovery whose 101 came at or before it {before}, after it {after}");
++    }
++}

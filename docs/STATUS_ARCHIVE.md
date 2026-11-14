@@ -106,8 +106,9 @@ run's cost cap, in its plan (OQ-0006-20, answered); the GitHub macOS runner chec
 if that fails (MACHINES-TIMING, answered); and, for its own plan with security-auditor, the certificate method, how a
 session holds its SSH key, and how it checks the new VMs' host keys. "Decisions needed" from PR #33: none open
 (MACHINES-TIMING and LG-COUNT answered); OQ-0006-22 is a later item (before slice 3). For Mustafa: borrow and name the
-laptop and desktop (rough checks first, then a short re-run), the Mac as the runner check decides; OK each run's cost
-cap; the `.github/` workflow for the Safari check, if the proof test's plan puts it in this repository. Two later steps:
+laptop and desktop (rough checks first, then a short re-run), and the Mac once one is available; OK each run's plan and
+cap; approve W-PR, the Safari workflow (`.github/`, its own small PR before the first run: plan §9); before R1, Chrome
+and Firefox (stable) on the laptop (plan §0.4). Two later steps:
 LOOK_V2 §8 reads "Spline or Blender" once the asset research's export part reports (that part's change-set makes the
 edit, and it goes to Mustafa for the merge); the drafts take up the design answers at their next revision. Then phase 1
 and the playable slices (SLICE-ORDER, below). The legacy game is frozen (critical fixes only).
@@ -288,8 +289,9 @@ visual/UI work first, gameplay after the foundation refactor) is paused by LOOP_
       bash's, to find syntax it neither reads exactly nor flags; each form found joins D-ASK's list (an ask, not a
       parse: Mustafa, 2026-11-05). Not before the kit freeze lifts.
   - From A3's pass-4 ruling (`.checkpoints/kit-v3-3/advisor-pass4.md`, section 6), under Mustafa's review budget (below
-    Critical or High: a follow-up, not code). Each waits for the kit freeze to lift (A4-FREEZE (a): after the netcode
-    proof test is under way); none is built in A3; FU-P3a and the earlier follow-ups stand:
+    Critical or High: a follow-up, not code). Each waited for the kit freeze to lift (A4-FREEZE (a): after the netcode
+    proof test is under way), which it did on 2026-11-06 (UNDER-WAY (a)); none is built in A3; FU-P3a and the earlier
+    follow-ups stand:
     - **FU-P4a, here-document bodies in D-ASK** (pass 4, P4-S6, Medium, day): D-ASK does not look inside a
       here-document's body. So in a day session, a body with an unquoted delimiter can run a command unseen: a `$(...)`
       or a backtick in the body, or a backslash-newline that moves the end line so that the next lines run as commands.
@@ -973,6 +975,15 @@ and the night shift's first guarded night (2026-11-05 from 00:10 Amsterdam); nei
   B2 left no files and did not set it off.
 
 ## Open bugs and risks
+- **netcode proof test** (in flight, PR #40; its plan ranks 15 risks, plan §13; here its numbers 1 to 4 and 11):
+  1. WebTransport with a pinned certificate hash may not work in every browser (U7 locally, R1's smoke page, then
+  reading R-24); 2. R5-TEST-OQ2 has no fallback if neither WebTransport crate sits on a custom quinn endpoint (U3
+  answers it before any VM hour; else stop, R-22); 3. the laptop session is a new trust point: a shell on Mustafa's
+  laptop with SSH and push rights, reading text attackers can shape, and native Windows has no sandbox, so his
+  Manual-mode prompts are the wall (plan §12.3; the guard check at stop B); 4. the macOS runner's UDP is unknown: the
+  plan's "the Mac is borrowed before R4" is overtaken by his answer of 2026-11-06 (no Mac now; the timed Safari rows
+  wait for one: Decisions pending); 11. leaks into the public repository (redact-check, the saver's secret check,
+  review at stops B and C).
 - **CI, the smoke job's Chromium step** (for infra-engineer; PR #42's checks, read with the GitHub API by the main
   session on 2026-11-07): on #42's head e223ecc, the pull_request run 42313665674 stalled in the step "Install
   Chromium's system libraries (browser restored from the cache)", which comes before "Smoke (check 5a)": attempt 1
@@ -1027,7 +1038,7 @@ and the night shift's first guarded night (2026-11-05 from 00:10 Amsterdam); nei
   1. Asking before kit and gate edits: routines had it since #30; day sessions now ask too (file tools and shell
      writes), and an agent's or teammate's kit edit is refused [verified: `routine-guard.mjs:741`, `:865`, `:939`].
   2. The URL-escaped secret gap: the saver's `sk-`, AWS and Slack patterns now accept a key behind `%XX` and other
-     escapes [verified: `checkpoint.mjs:30-40`]; before A3 only `%3D` worked (main's `checkpoint.mjs:30`). Anthropic
+     escapes [verified: `checkpoint.mjs:30-40`]; before A3 only `%3D` worked (12d7961's `checkpoint.mjs:30`). Anthropic
      `sk-ant-` keys were already caught. GitHub secret scanning and push protection are on (Mustafa).
   3. Read-only GitHub Actions tools for pr-advisor: `actions_get` (get_workflow, get_workflow_run, get_workflow_job,
      get_workflow_run_usage) and `actions_list` (its four list methods), this repository only; the night shift and
@@ -1186,6 +1197,8 @@ and the night shift's first guarded night (2026-11-05 from 00:10 Amsterdam); nei
 ## Health (latest measurements)
 | Metric | Value | When | Source |
 |---|---|---|---|
+| Netcode proof test: the spike's test command (`node spikes/netcode-proof/check.mjs`, at 8368869) | all 8 steps pass: fmt; clippy host and wasm32, warnings as errors; cargo test, 35 Rust tests; the dependency rules; no reference from outside `spikes/` (246 tracked files); its node tests 8/8 and 10/10; redact-check, 0 findings [assumed: the session's run, from its checkpoint; not re-run by docs-keeper] | 2026-11-06 | `.checkpoints/netcode-proof-test.md` step 18 (folded into the report at the close) |
+| Gate (CI) on the netcode proof test's branch | `gate` and `smoke` success on 8368869, two runs each [verified: GitHub check runs, read 2026-11-06]; no file in `.claude/`, CLAUDE.md, `.github/` or `tools/` differs from main [verified: `git diff --stat af8393e HEAD`] | 2026-11-06 | gate.yml |
 | Combat allocation (GC churn) | ~4.9 MB/s (audit harness, scripted combat; not comparable to the 2026-10-15 headless match) | 2026-09-26 | audit CS11 |
 | Perf baselines, team-prep-fixes head (headless): `hasLOS` | 103 B per call (was 20-26 KB) | 2026-10-15 | reports/2026-10-15-team-prep-fixes.md |
 | `resolveShot` / `enemyFire` / `syncSimWorld` | `resolveShot` 648-750 B at 6 players, about 5.4 KB at 48 (was 18.1 KB) · `enemyFire` 0.88-1.0 KB per call (was 3.7-7.0 KB) · `syncSimWorld` 561 B per call (pre-existing, the houses fallback array) | 2026-10-15 | reports/2026-10-15-team-prep-fixes.md |

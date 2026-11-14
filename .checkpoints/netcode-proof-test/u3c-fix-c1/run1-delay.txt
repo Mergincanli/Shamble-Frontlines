@@ -1,0 +1,100 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s
+     Running unittests src/lib.rs (/home/user/Shamble-Frontlines/.gate/u3v3-harness-check-target/debug/deps/npt_net-088534cbcaf56b90)
+
+running 48 tests
+test l2::delay::tests::a_burst_past_the_clocks_range_is_refused_and_never_wraps ... ok
+test l2::delay::tests::a_thousand_opens_and_closes_leave_the_clock_tables_empty ... ok
+S never shuts down: the pump ran 2 times during the wait (1 at or after the deadline), S's poll_shutdown 2 times; ended 381501 ns after the deadline
+test l2::delay::tests::a_shutdown_s_never_completes_ends_at_its_deadline_without_spinning ... ok
+EOF after 12468 B in 41 records; up stalls 0
+test l2::delay::tests::an_eof_from_s_ends_the_up_direction_after_its_last_byte ... ok
+written 65360 B before Pending; held now [64336, 62632], largest [65360, 62632]
+test l2::delay::tests::a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded ... ok
+S took 0 B before the drop; the client read 0 B, then EOF
+test l2::delay::tests::dropping_it_ends_the_pump_and_drops_s ... ok
+Frame after a 4096 B head: closed before buffering (4118 B up); 0 B handed, 0 B released
+Frame after a 145 B head: closed before buffering (167 B up); 0 B handed, 0 B released
+Frame after a 153 B head: closed before buffering (175 B up); 0 B handed, 0 B released
+Frame after a 148 B head: closed before buffering (170 B up); 0 B handed, 0 B released
+Frame: closed before buffering (170 B up); with [Frame] off: CountedAs(Message), closed Some(Message), 170 B up
+Frame: closed before buffering (170 B up); with [Frame, Message] off: Enters, closed None, 714 B up
+Message after a 148 B head: closed before buffering (500 B up); 0 B handed, 0 B released
+Message: closed before buffering (500 B up); with [Message] off: Enters, closed None, 744 B up
+Unmasked after a 148 B head: closed before buffering (170 B up); 0 B handed, 0 B released
+Unmasked: closed before buffering (170 B up); with [Unmasked] off: Enters, closed None, 204 B up
+Control after a 148 B head: closed before buffering (170 B up); 0 B handed, 0 B released
+Control: closed before buffering (170 B up); with [Control] off: Enters, closed None, 326 B up
+Control after a 148 B head: closed before buffering (170 B up); 0 B handed, 0 B released
+Control: closed before buffering (170 B up); with [Control] off: Enters, closed None, 203 B up
+Length after a 148 B head: closed before buffering (170 B up); 0 B handed, 0 B released
+Length: closed before buffering (170 B up); with [Length] off: CountedAs(Frame), closed Some(Frame), 170 B up
+Request after a 9004 B head: closed before buffering (0 B up); 0 B handed, 0 B released
+Request: closed before buffering (0 B up); with [Request] off: Enters, closed None, 9026 B up
+test l2::delay::tests::each_limit_closes_before_buffering_and_is_counted ... ok
+test l2::delay::tests::its_rows_use_the_named_series ... ok
+test l2::delay::tests::lateness_evidence_run ... ignored, an evidence run of about 5.6 min, for the main session (condition 10)
+1 burst(s) [(503997880, 600000000)] over 50 ticks; transmissions inside each (down, up): [[9, 10]]; all lost
+test l2::delay::tests::an_added_burst_loses_every_transmission_inside_it_both_ways ... ok
+test l2::delay::tests::one_record_per_write_never_beyond_the_budget ... ok
+replay: 91 ticks, 1 burst(s), 185 steps, 181 releases; down (86, 4, 3, 7) up (87, 0, 8, 7) (transmissions, lost, burst, stalls)
+test l2::delay::tests::a_replay_on_a_pure_model_gives_the_same_counters_and_stamps ... ok
+test l2::delay::tests::shutdown_waits_for_delivery_and_at_most_its_deadline ... ok
+split: 90 messages each way in order; segments down 91 up 90, stalls down 0 up 2
+test l2::delay::tests::split_halves_in_separate_tasks_both_ways ... ok
+test l2::delay::tests::the_base_rtt_is_netted_out_through_the_shared_helper ... ok
+test l2::delay::tests::the_model_adds_bursts_after_its_start_only ... ok
+pump by hand: 5 S writes, 127 S reads, room 536 B < floor 549 B with 62143 B held up
+test l2::delay::tests::the_pump_never_calls_s_under_the_lock_and_wakes_come_after_it ... ok
+test l2::delay::tests::the_request_is_one_record ... ok
+test l2::delay::tests::the_websocket_tls_is_tls13_with_http11_on_ring_and_no_process_default ... ok
+(c) faithful A: 218 ticks, 104 written, 114 skipped, owed after a write 0; at each return: 7350 B vs 7350 B (N 7 at the last write, 7 at the return); 7350 B vs 7350 B (N 7 at the last write, 7 at the return)
+(c) faithful B: 183 ticks, 108 written, 75 skipped, owed after a write 0; at each return: 7350 B vs 7350 B (N 7 at the last write, 7 at the return); 7350 B vs 7350 B (N 7 at the last write, 7 at the return)
+(c) budget x2: 200 ticks, 120 written, 80 skipped, owed after a write 0; at each return: 14700 B vs 7350 B (N 7 at the last write, 7 at the return); 16800 B vs 8400 B (N 8 at the last write, 8 at the return)
+(c) unsent only: 184 ticks, 118 written, 66 skipped, owed after a write 0; at each return: 15750 B vs 7350 B (N 7 at the last write, 7 at the return); 15750 B vs 8400 B (N 8 at the last write, 8 at the return)
+(c) return at 3185286084 ns: first byte 462.3 ms, first message 462.3 ms after it
+(c) return at 6185286084 ns: first byte 1727.7 ms, first message 1727.7 ms after it
+(c) return at 3179164768 ns: first byte 475.4 ms, first message 475.4 ms after it
+(c) return at 6179164768 ns: first byte 538.7 ms, first message 538.7 ms after it
+test l2::delay::tests::c_the_writer_keeps_outstanding_within_n_snapshots_at_every_return ... ok
+test l2::delay::tests::wrap_needs_a_tokio_runtime ... ok
+test l2::delay::tests::wrap_refuses_a_pass_through_config_and_bad_limits ... ok
+test l2::delay_names::tests::every_name_follows_the_rule_once ... ok
+test l2::delay_names::tests::every_name_has_a_series_row ... ok
+test l2::stats::tests::a_running_window_equals_a_fresh_histogram_of_its_samples ... ok
+test l2::stats::tests::an_empty_window_reports_zeros ... ok
+test l2::stats::tests::buckets_are_1_us_then_8_per_octave ... ok
+test l2::stats::tests::excess_counts_only_beyond_the_allowance ... ok
+test l2::stats::tests::send_errors_fall_in_their_classes ... ok
+test l2::stats::tests::the_fate_log_is_bounded_and_canonical ... ok
+test l2::delay::tests::wrap_moves_the_profiles_bursts_to_the_models_axis ... ok
+test l2::ws_frame::tests::a_request_without_its_blank_line_closes_at_its_cap ... ok
+test l2::ws_frame::tests::each_limit_closes_at_the_header ... ok
+test l2::stats::tests::the_summary_matches_brute_force_within_a_microsecond ... ok
+test l2::ws_frame::tests::the_head_ends_where_tungstenite_ends_it ... ok
+heads: 14997 completed by both at the same byte, 4746 ended by the scanner and refused by tungstenite, 257 not ended
+test l2::ws_frame::tests::the_head_matches_tungstenite_on_seeded_inputs ... ok
+test l2::ws_frame::tests::the_request_then_each_frame_is_a_boundary_in_any_chunking ... ok
+test l2::ws_frame::tests::the_server_direction_applies_no_limit ... ok
+test ws_gate::tests::a_the_budget_table_at_30_hz ... ok
+test ws_gate::tests::b_the_budget_never_decreases_and_never_falls_below_3 ... ok
+(b) 64 x 20,000 ticks: Seen { writes: 1162272, skip_owed: 85941, skip_free: 2760, skip_budget: 29027 }
+test ws_gate::tests::b_the_writer_writes_iff_the_three_conditions_hold_and_only_the_newest ... ok
+test ws_gate::tests::bite_a_budget_twice_the_formula_fails_a ... ok
+test ws_gate::tests::bite_a_budget_twice_the_formula_fails_b ... ok
+test ws_gate::tests::bite_a_queueing_writer_fails_b ... ok
+test ws_gate::tests::may_write_needs_all_three_conditions ... ok
+random input: 24716 boundaries, closes by reason [612, 3064, 33, 5580, 5449, 18]
+test l2::ws_frame::tests::random_input_never_panics_and_stays_within_its_bounds ... ok
+dir 0: receipt − release (lateness, the kernel's TCP, TLS and tungstenite): p50 0.507 ms p99 0.994 ms max 3.524 ms
+dir 0: 298 segments, 5 stalls (99.9 % band 0-15), repairs rack 5 probe 0 timeout 0
+dir 1: receipt − (delivery + lateness): p50 0.032 ms p99 0.100 ms max 0.112 ms; the poll's own window: p50 0.075 ms p99 0.152 ms max 0.419 ms; intake (model write − send): p50 0.268 ms p99 0.516 ms max 0.762 ms
+dir 1: 296 segments, 5 stalls (99.9 % band 0-15), repairs rack 6 probe 0 timeout 0
+lateness down (P2, 30 Hz, 10.0 s): n 301 p50 0.366 ms p99 0.735 ms p99.9 3.557 ms max 3.557 ms E 11.8 µs over 9  ** CONDITION 10's TRIGGER: bring to the advisor **
+lateness up (P2, 30 Hz, 10.0 s): n 301 p50 0.375 ms p99 0.933 ms p99.9 1.409 ms max 1.409 ms E 14.9 µs over 23  ** CONDITION 10's TRIGGER: bring to the advisor **
+test l2::delay::tests::loopback_tls_tungstenite_at_p2_30_hz_both_ways ... ok
+dir 0: 674 records released, each seen at or after its model stamp
+dir 1: 201 records released, each seen at or after its model stamp
+test l2::delay::tests::order_and_integrity_both_ways_and_no_byte_seen_before_its_release ... ok
+
+test result: ok. 47 passed; 0 failed; 1 ignored; 0 measured; 107 filtered out; finished in 18.42s
+

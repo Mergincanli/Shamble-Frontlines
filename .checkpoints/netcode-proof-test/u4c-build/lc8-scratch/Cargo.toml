@@ -1,0 +1,15 @@
+# U4c scratch (never shipped, never in the workspace): L-c8's hash check ahead of the judged re-run. It replays the
+# probe's send loop (crates/lab/src/probe.rs run()) on npt-l1 and prints SHA-256 of the whole canonical fate log and
+# of (the v1 tag + the datagram entries); and FNV-1a-64 of the latter for three small mixed scenarios.
+[package]
+name = "u4c-lc8-scratch"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+npt-l1 = { path = "../../../../spikes/netcode-proof/crates/l1" }
+npt-link = { path = "../../../../spikes/netcode-proof/crates/link" }
+sha2 = "=0.11.1"

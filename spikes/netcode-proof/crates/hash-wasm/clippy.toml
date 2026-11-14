@@ -1,0 +1,16 @@
+# npt-hash-wasm's clock and hash-map bans: it is a leaf crate (check.mjs's LEAF; u4-build-plan.md §5 U4d2), and plan.md
+# §4.2's leaf rule says "Clock reads are banned in them by clippy (§4.5)" (the advisor's U4d2 round-1 ruling, FX-12:
+# RR-L2, EA-5). The form is npt-lab's and npt-room's: the two type bans are npt-sim's, the clock ban npt-room's; no
+# tokio lines, as the crate has no tokio. It hashes npt-sim's state, which takes no order from a hash map and reads no
+# clock, and the Node loader gives it nothing to import. The workspace sets disallowed_types and disallowed_methods to
+# deny, and the crate's own lint tables keep both.
+disallowed-types = [
+    { path = "std::collections::HashMap", reason = "hash-map ban (GLOSSARY §7): iteration order is not deterministic" },
+    { path = "std::collections::HashSet", reason = "hash-map ban (GLOSSARY §7): iteration order is not deterministic" },
+    { path = "std::time::Instant", reason = "the clock ban: time is passed in" },
+    { path = "std::time::SystemTime", reason = "the clock ban: time is passed in" },
+]
+disallowed-methods = [
+    { path = "std::time::Instant::now", reason = "the clock ban" },
+    { path = "std::time::SystemTime::now", reason = "the clock ban" },
+]

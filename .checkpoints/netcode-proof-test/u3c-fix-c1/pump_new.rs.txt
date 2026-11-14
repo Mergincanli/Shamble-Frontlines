@@ -1,0 +1,256 @@
+    fn poll_shutdown(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {
+        let sh = &self.sh;
+        let mut c = sh.lock();
+        if c.down_done || c.pump_done {
+            return Poll::Ready(Ok(()));
+        }
+        let mut pump = None;
+        if c.shutdown.is_none() {
+            c.shutdown = Some(sh.clock.now_ns().saturating_add(c.shutdown_wait));
+            c.reschedule(sh.clock, sh.key);
+            pump = c.pump_waker.clone();
+        }
+        match &c.shutter {
+            Some(w) if w.will_wake(cx.waker()) => {}
+            _ => c.shutter = Some(cx.waker().clone()),
+        }
+        // The pump is woken after the lock is released (F2).
+        drop(c);
+        if let Some(p) = pump {
+            p.wake();
+        }
+        Poll::Pending
+    }
+}
+
+/// The connection's pump: owns S (C3).
+struct Pump<S> {
+    sh: Arc<Shared>,
+    s: Option<S>,
+    /// The front down record's bytes, staged once under the lock (F4): `staged` bytes, of which S has taken `sent`.
+    /// Kept across a Pending or a partial write, so S is offered the rest without a copy.
+    scratch: Box<[u8]>,
+    staged: usize,
+    sent: usize,
+    /// S's reads land here, outside the lock, before they go into the scanner's buffer under it (F3): one largest
+    /// frame, the most the scanner takes after the request.
+    rbuf: Box<[u8]>,
+    unflushed: bool,
+    /// Write calls the front down record has taken so far without finishing (a split record).
+    front_calls: u32,
+}
+
+impl<S> Drop for Pump<S> {
+    /// Ends the connection's part of the clock and wakes whoever waits, whatever ended the pump.
+    fn drop(&mut self) {
+        let w = {
+            let mut c = self.sh.lock();
+            c.pump_done = true;
+            #[cfg(test)]
+            {
+                c.life.ended_ns = Some(self.sh.clock.now_ns());
+            }
+            [c.reader.take(), c.writer.take(), c.shutter.take()]
+        };
+        self.sh.clock.release(self.sh.key);
+        wake_all(w);
+    }
+}
+
+impl<S: AsyncRead + AsyncWrite + Unpin> Future for Pump<S> {
+    type Output = ();
+
+    /// One run: each block takes the connection's lock for its own state and releases it before S is polled (F3), so
+    /// S's calls (rustls's encryption, the syscalls) never run under it and DelayStream's side never waits on them.
+    /// The pump alone owns S, the front down record (nothing else removes it) and the scanner's buffer, so what it
+    /// staged stays valid while the lock is free. A dropped DelayStream ends it at the next block.
+    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<()> {
+        let this = self.get_mut();
+        let sh = Arc::clone(&this.sh);
+        let Some(s) = this.s.as_mut() else {
+            return Poll::Ready(());
+        };
+        let mut wake_reader;
+        let mut wake_writer = false;
+        {
+            let mut c = sh.lock();
+            if c.dropped {
+                return Poll::Ready(());
+            }
+            match &c.pump_waker {
+                Some(w) if w.will_wake(cx.waker()) => {}
+                _ => c.pump_waker = Some(cx.waker().clone()),
+            }
+            #[cfg(test)]
+            {
+                c.life.polls += 1;
+                c.life.deadline = c.shutdown;
+                if c.shutdown.is_some_and(|d| sh.clock.now_ns() >= d) {
+                    c.life.polls_after_deadline += 1;
+                }
+            }
+            let t = c.model_t(sh.clock.now_ns());
+            wake_reader = c.step_to(t)[UP];
+        }
+
+        // Down: each released record into S in one write call (C1), staged once (F4), S polled outside the lock.
+        loop {
+            if this.staged == 0 {
+                let c = sh.lock();
+                if c.dropped {
+                    return Poll::Ready(());
+                }
+                if c.released[DOWN] == 0 {
+                    break;
+                }
+                let rem = c.recs[DOWN][0].len - c.front_done[DOWN];
+                let (a, b) = c.bytes[DOWN].as_slices();
+                let k = rem.min(a.len());
+                this.scratch[..k].copy_from_slice(&a[..k]);
+                this.scratch[k..rem].copy_from_slice(&b[..rem - k]);
+                this.staged = rem;
+                this.sent = 0;
+            }
+            let r = Pin::new(&mut *s).poll_write(cx, &this.scratch[this.sent..this.staged]);
+            // The release's lateness is taken at poll_write's return (M1), before the lock.
+            let at = sh.clock.now_ns();
+            match r {
+                Poll::Ready(Ok(n)) if n > 0 => {
+                    // AsyncWrite's contract bounds n by what was offered; kept so even a faulty S cannot overrun it.
+                    let n = n.min(this.staged - this.sent);
+                    this.sent += n;
+                    this.unflushed = true;
+                    let mut c = sh.lock();
+                    c.bytes[DOWN].drain(..n);
+                    c.front_done[DOWN] += n;
+                    if c.dropped {
+                        return Poll::Ready(());
+                    }
+                    if this.sent < this.staged {
+                        this.front_calls += 1;
+                        continue;
+                    }
+                    this.staged = 0;
+                    this.sent = 0;
+                    if let Some(rec) = c.recs[DOWN].pop_front() {
+                        c.released[DOWN] -= 1;
+                        c.released_model[DOWN] -= rec.len as u64 + OVERHEAD;
+                        c.front_done[DOWN] = 0;
+                        if this.front_calls > 0 {
+                            c.own.split_writes += 1;
+                        }
+                        this.front_calls = 0;
+                        let due = c.origin.saturating_add(rec.released.unwrap_or_default());
+                        c.late(DOWN, at.saturating_sub(due));
+                        wake_writer = true;
+                    }
+                }
+                Poll::Ready(Ok(_)) => {
+                    sh.lock().failed = Some(io::ErrorKind::WriteZero);
+                    return Poll::Ready(());
+                }
+                Poll::Ready(Err(e)) => {
+                    sh.lock().failed = Some(e.kind());
+                    return Poll::Ready(());
+                }
+                Poll::Pending => break,
+            }
+        }
+        if this.unflushed {
+            match Pin::new(&mut *s).poll_flush(cx) {
+                Poll::Ready(Ok(())) => this.unflushed = false,
+                Poll::Ready(Err(e)) => {
+                    sh.lock().failed = Some(e.kind());
+                    return Poll::Ready(());
+                }
+                Poll::Pending => {}
+            }
+        }
+
+        // Up: S read outside the lock into the pump's buffer while the up room holds one largest record (C2); under the
+        // lock the bytes join the scanner's buffer, the model steps to a fresh now (it never goes back: another task
+        // may have stepped it while the lock was free; and a record enters the model no earlier than its bytes were
+        // read, NC-U3c-3), then the limits apply before anything is buffered (C6) and whole records enter the model.
+        let mut fresh = 0;
+        loop {
+            let room = {
+                let mut c = sh.lock();
+                if c.dropped {
+                    return Poll::Ready(());
+                }
+                if fresh > 0 {
+                    let at = c.parse_len;
+                    c.parse[at..at + fresh].copy_from_slice(&this.rbuf[..fresh]);
+                    c.parse_len += fresh;
+                    fresh = 0;
+                }
+                let t = c.model_t(sh.clock.now_ns());
+                wake_reader |= c.step_to(t)[UP];
+                if let Err(r) = c.scan_up(t) {
+                    c.close(r);
+                    return Poll::Ready(());
+                }
+                let limit = c.read_limit();
+                if c.up_eof || c.parse_len >= limit || c.up_room() < c.read_floor {
+                    break;
+                }
+                (limit - c.parse_len).min(this.rbuf.len())
+            };
+            let mut rb = ReadBuf::new(&mut this.rbuf[..room]);
+            match Pin::new(&mut *s).poll_read(cx, &mut rb) {
+                Poll::Ready(Ok(())) => {
+                    fresh = rb.filled().len();
+                    if fresh == 0 {
+                        sh.lock().up_eof = true;
+                        wake_reader = true;
+                        break;
+                    }
+                }
+                Poll::Ready(Err(e)) => {
+                    sh.lock().failed = Some(e.kind());
+                    return Poll::Ready(());
+                }
+                Poll::Pending => break,
+            }
+        }
+
+        // Shutdown (C3, W3): once every down byte is delivered and taken, S's own shutdown (polled outside the lock).
+        // The deadline bounds all of it, S's shutdown included: at or past it, S is dropped and counted, whatever it
+        // still waits for. Before it, the pump sleeps until the deadline (`due`) or a wake from S, so a shutdown that S
+        // never completes costs one wake at the deadline, never a spin. Nothing new enters the down direction once a
+        // shutdown began (poll_write refuses), so "taken" read under the lock stays true while it is free.
+        let shutdown = {
+            let c = sh.lock();
+            if c.dropped {
+                return Poll::Ready(());
+            }
+            c.shutdown
+                .filter(|_| !c.down_done)
+                .map(|d| (d, c.recs[DOWN].is_empty() && !this.unflushed))
+        };
+        if let Some((deadline, taken)) = shutdown {
+            let done = taken && Pin::new(&mut *s).poll_shutdown(cx).is_ready();
+            let mut c = sh.lock();
+            if done {
+                c.down_done = true;
+            } else if sh.clock.now_ns() >= deadline {
+                c.own.shutdown_timeouts += 1;
+                c.down_done = true;
+                return Poll::Ready(());
+            }
+        }
+
+        let w = {
+            let mut c = sh.lock();
+            if c.dropped {
+                return Poll::Ready(());
+            }
+            c.held_now();
+            c.reschedule(sh.clock, sh.key);
+            c.wakers(wake_reader, wake_writer)
+        };
+        wake_all(w);
+        Poll::Pending
+    }
+}
+

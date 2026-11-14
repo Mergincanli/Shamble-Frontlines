@@ -632,6 +632,28 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     - _Pointer: the foundation chat's own record of SPLIT (a) and SCOPE (a), in his words: the entry "Taken by
       Mustafa, 2026-11-10: FREEZE-FDN (a), SPLIT (a), SCOPE (a) and the build go for 2.1a, in the foundation chat",
       above._
+- **Asked of Mustafa, the netcode proof test; answered 2026-11-06** (plan revision 3.1 §16, with the advisor's
+  recommendations; his answers in revision 3.2 §0.4, `.checkpoints/netcode-proof-test/plan.md`; the advisor's verdict:
+  `.checkpoints/netcode-proof-test/advisor-verdict.md`):
+  - The plan: approved (revision 3.1, with the advisor's 12 conditions C1-C12).
+  - ROUTE (a), on his laptop: cloud-init builds each VM, and Claude Code on his laptop does the hands-on part over SSH,
+    with a key made there, its own fixed settings file, and his Manual-mode prompts as the wall. The laptop: an MSI
+    Vector 18 HX AI (Intel Core Ultra 9, RTX 5080), native Windows with PowerShell; Brave and Edge, Chrome and Firefox
+    to be installed; the Claude Code CLI under his university's Enterprise login.
+  - SAFARI-TIME (b): Safari's timed rows re-run when he borrows the Mac for the look proof test; PM-0001-36's datagram
+    cap stays provisional until then.
+  - FIXED-IP (a): two fixed addresses, kept for the test and deleted at the close.
+  - DENSITY-FIGURE (a), OQ-0006-19: the rooms-per-server figure is "a lower bound, provisional until slice 6".
+  - UNDER-WAY (a): the test is under way once the plan is approved and its first build step is committed; both done
+    (U0, f6886bf), so his kit freeze (A4-FREEZE (a)) has lifted and A4 may start.
+  - Branches: this session may push `claude/npt-readings` (R-PR, PR #41) and `claude/npt-safari-wf` (W-PR).
+  - Later the same day, his words: "No Mac available for now (the loan Macs are out of stock). Nothing in this test
+    waits on one: the timed Safari rows wait until a Mac is available, at the latest for the look proof test." This
+    overtakes MACHINES-TIMING's "If they can't, I borrow the Mac before the netcode proof test" (below). The session's
+    reading: if the runners fail their conditions, every Safari row waits for that Mac too (passed to R-PR for
+    SPIKE_PLAN).
+  - His go to merge PR #41 came the same day (d8c485a). His WebSocket decisions of 2026-11-07 merged with
+    PR #45 (626df67), on his go.
 _A3's notes, cited in this file as `.checkpoints/kit-v3-3/…` (17 lines), were deleted in 8b7cfb3 (CHECKPOINTS.md §9);
 read them at its parent 6c6c91a (`git show 6c6c91a:<path>`; the same files as at 4f268da)._
 - **Asked of Mustafa, A3; answered 2026-11-05 about 10:30 UTC** (kit-v3-3, PR #38; plan revision 2 §3.1, the
@@ -802,7 +824,8 @@ read them at its parent 6c6c91a (`git show 6c6c91a:<path>`; the same files as at
     GitHub's macOS runners (real Safari, free while the repository is public) have a Safari new enough for WebTransport
     and can reach the test servers. If they can, that is the Safari check, and I borrow the Mac only for the look proof
     test. If they can't, I borrow the Mac before the netcode proof test. The laptop and desktop stay on my timing: rough
-    checks first, then a short re-run once they're named."
+    checks first, then a short re-run once they're named." Its Mac fallback is overtaken by his words of 2026-11-06 (no
+    Mac available now: the netcode proof test's entry, above).
   - DOMAIN: "DOMAIN: done. shamblefrontlines.com is registered at Cloudflare."
   - New open question OQ-0006-22: which x86 plan runs the staging game server, now that the proposed CX33 cannot be
     ordered in Falkenstein; Mustafa (money), with the Advisor, before slice 3.

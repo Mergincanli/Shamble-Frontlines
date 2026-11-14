@@ -1,0 +1,9 @@
+# The clock ban (plan §4.5): L1 runs on npt-lab's simulated clock; real time never enters it.
+disallowed-types = [
+    { path = "std::time::Instant", reason = "the clock ban: L1 runs on simulated time" },
+    { path = "std::time::SystemTime", reason = "the clock ban: L1 runs on simulated time" },
+]
+disallowed-methods = [
+    { path = "std::time::Instant::now", reason = "the clock ban" },
+    { path = "std::time::SystemTime::now", reason = "the clock ban" },
+]

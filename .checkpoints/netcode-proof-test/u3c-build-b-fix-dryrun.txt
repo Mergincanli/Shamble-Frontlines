@@ -1,0 +1,49 @@
+# siocoutq-root-check DRY RUN (no iptables call) at 20261108T000006Z
+# kernel 6.18.44-fc-v310, CONFIG_HZ 250
+# sysctl tcp_congestion_control=bbr tcp_recovery=1 tcp_early_retrans=3 tcp_sack=1 tcp_frto=2 tcp_rto_min_us=200000 tcp_thin_linear_timeouts=0
+# spike commit 539709a70a634a014a8366b0867d9aef4f47b9a1 (with uncommitted changes)
+INFO kernel=6.18.44-fc-v310 port=47617 client_port=50896 congestion=cubic congestion_set=ok srtt_us=Some(7) siocoutq=0 notsent=Some(0) rto_us=Some(204000) total_retrans=Some(0) snd_cwnd=Some(10) snd_mss=Some(32768) notsent_offset=144 rtt_offset=68
+RULE R0 pass
+READY
+# sent GO
+SAMPLE phase=write k=1 t_us=679 written=200 siocoutq=0 siocoutq_again=0 delivered=200 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=12 backoff=0 ca_state=0
+SAMPLE phase=write k=2 t_us=6054 written=400 siocoutq=0 siocoutq_again=0 delivered=400 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=16 backoff=0 ca_state=0
+SAMPLE phase=write k=3 t_us=10690 written=600 siocoutq=0 siocoutq_again=0 delivered=600 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=22 backoff=0 ca_state=0
+SAMPLE phase=write k=4 t_us=15748 written=800 siocoutq=0 siocoutq_again=0 delivered=800 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=26 backoff=0 ca_state=0
+SAMPLE phase=write k=5 t_us=20662 written=1000 siocoutq=0 siocoutq_again=0 delivered=1000 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=27 backoff=0 ca_state=0
+SAMPLE phase=write k=6 t_us=25648 written=1200 siocoutq=0 siocoutq_again=0 delivered=1200 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=31 backoff=0 ca_state=0
+SAMPLE phase=write k=7 t_us=30645 written=1400 siocoutq=0 siocoutq_again=0 delivered=1400 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=42 backoff=0 ca_state=0
+SAMPLE phase=write k=8 t_us=35651 written=1600 siocoutq=0 siocoutq_again=0 delivered=1600 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=45 backoff=0 ca_state=0
+SAMPLE phase=write k=9 t_us=40709 written=1800 siocoutq=0 siocoutq_again=0 delivered=1800 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=47 backoff=0 ca_state=0
+SAMPLE phase=write k=10 t_us=45657 written=2000 siocoutq=0 siocoutq_again=0 delivered=2000 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=47 backoff=0 ca_state=0
+SAMPLE phase=write k=11 t_us=50640 written=2200 siocoutq=0 siocoutq_again=0 delivered=2200 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=48 backoff=0 ca_state=0
+SAMPLE phase=write k=12 t_us=55684 written=2400 siocoutq=0 siocoutq_again=0 delivered=2400 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=48 backoff=0 ca_state=0
+SAMPLE phase=write k=13 t_us=60628 written=2600 siocoutq=0 siocoutq_again=0 delivered=2600 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=48 backoff=0 ca_state=0
+SAMPLE phase=write k=14 t_us=65633 written=2800 siocoutq=0 siocoutq_again=0 delivered=2800 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=47 backoff=0 ca_state=0
+SAMPLE phase=write k=15 t_us=70635 written=3000 siocoutq=0 siocoutq_again=0 delivered=3000 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=46 backoff=0 ca_state=0
+SAMPLE phase=write k=16 t_us=75620 written=3200 siocoutq=0 siocoutq_again=0 delivered=3200 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=46 backoff=0 ca_state=0
+SAMPLE phase=write k=17 t_us=80603 written=3400 siocoutq=0 siocoutq_again=0 delivered=3400 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=45 backoff=0 ca_state=0
+SAMPLE phase=write k=18 t_us=85633 written=3600 siocoutq=0 siocoutq_again=0 delivered=3600 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=44 backoff=0 ca_state=0
+SAMPLE phase=write k=19 t_us=90621 written=3800 siocoutq=0 siocoutq_again=0 delivered=3800 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=44 backoff=0 ca_state=0
+SAMPLE phase=write k=20 t_us=95608 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+INFO writes=20 (all 20 writes made)
+SAMPLE phase=hold k=1 t_us=200264 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=2 t_us=300289 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=3 t_us=400354 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=4 t_us=500345 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=5 t_us=600340 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=6 t_us=700309 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=7 t_us=800320 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=8 t_us=900314 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=9 t_us=1000313 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+HOLD-END
+# sent RELEASED
+SAMPLE phase=release k=1 t_us=1000926 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 in_flight=0 snd_cwnd=10 snd_mss=32768 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+RULE R1 fail (20 findings; first: R1 write 1: SIOCOUTQ 0 then 0, not 200)
+RULE R2 fail (9 findings; first: R2 hold 1: SIOCOUTQ 0 then 0, not 4000)
+RULE R3 fail (1 findings; first: R3: tcpi_total_retrans 0 at GO, Some(0) at the hold's end: no retransmission, so no ACK was dropped)
+RULE R4 pass
+INFO release_ms=0 r4_bound=Some(408ms) rto_us_at_release=Some(204000) backoff_at_release=Some(0) last_write_us=95215 writes=20
+VERDICT FAIL 30 findings
+# dry run: verdict FAIL, R1 fail, R3 fail: the rule fails without the drop, as it must
+# log: /home/user/Shamble-Frontlines/.claude/worktrees/agent-a3dfcb36e3c15ab56/spikes/netcode-proof/results/u3c-kernel-check/siocoutq-root-check-dry-20261108T000006Z.txt

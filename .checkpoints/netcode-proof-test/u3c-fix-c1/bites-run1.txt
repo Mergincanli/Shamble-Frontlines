@@ -1,0 +1,16 @@
+BITES  F1: no range refusal (a_burst_past_the_clocks_range): thread 'l2::delay::tests::a_burst_past_the_clocks_range_is_refused_and_never_wraps' (16120) panicked at crates/net/src/l2/delay_tests.rs:1025:42:
+BITES  NC-U3c-8: start at the model's now accepted (a_burst_past_the_clocks_range): thread 'l2::delay::tests::a_burst_past_the_clocks_range_is_refused_and_never_wraps' (16402) panicked at crates/net/src/l2/delay_tests.rs:1053:5:
+BITES  F2: current()'s wakes before the unlock (the_pump_never_calls_s_under_the_lock): thread 'l2::delay::tests::the_pump_never_calls_s_under_the_lock_and_wakes_come_after_it' (16708) panicked at crates/net/src/l2/delay_tests.rs:1548:5:
+BITES  F2: poll_shutdown wakes under the lock (the_pump_never_calls_s_under_the_lock): thread 'l2::delay::tests::the_pump_never_calls_s_under_the_lock_and_wakes_come_after_it' (16995) panicked at crates/net/src/l2/delay_tests.rs:1608:5:
+BITES  F3: S's write under the lock (the_pump_never_calls_s_under_the_lock): thread 'l2::delay::tests::the_pump_never_calls_s_under_the_lock_and_wakes_come_after_it' (17302) panicked at crates/net/src/l2/delay_tests.rs:1608:5:
+BITES  F4: the record copied again on every attempt (the_pump_never_calls_s_under_the_lock): thread 'l2::delay::tests::the_pump_never_calls_s_under_the_lock_and_wakes_come_after_it' (17586) panicked at crates/net/src/l2/delay_tests.rs:1554:5:
+BITES  F-R2: no read floor (the_pump_never_calls_s_under_the_lock): thread 'l2::delay::tests::the_pump_never_calls_s_under_the_lock_and_wakes_come_after_it' (17873) panicked at crates/net/src/l2/delay_tests.rs:1604:5:
+BITES  F5: a zero-capacity read waits (the_request_is_one_record): thread 'l2::delay::tests::the_request_is_one_record' (18161) panicked at crates/net/src/l2/delay_tests.rs:645:5:
+BITES  S2: no bare-LF end (l2::ws_frame::tests::the_head): thread 'l2::ws_frame::tests::the_head_ends_where_tungstenite_ends_it' (18443) panicked at crates/net/src/l2/ws_frame.rs:505:17:
+BITES  S2: leading empty lines not skipped (l2::ws_frame::tests::the_head): thread 'l2::ws_frame::tests::the_head_matches_tungstenite_on_seeded_inputs' (18724) panicked at crates/net/src/l2/ws_frame.rs:555:17:
+BITES  F-B: add_burst without the origin (burst test alone) (an_added_burst_loses_every_transmission): thread 'l2::delay::tests::an_added_burst_loses_every_transmission_inside_it_both_ways' (19003) panicked at crates/net/src/l2/delay_tests.rs:1215:5:
+BITES  F-A: the profile's burst ends left on the clock's axis (wrap_moves_the_profiles_bursts): thread 'l2::delay::tests::wrap_moves_the_profiles_bursts_to_the_models_axis' (19285) panicked at crates/net/src/l2/delay_tests.rs:1085:5:
+BITES  F-G: EOF while records wait (an_eof_from_s_ends_the_up_direction): thread 'l2::delay::tests::an_eof_from_s_ends_the_up_direction_after_its_last_byte' (19567) panicked at crates/net/src/l2/delay_tests.rs:1646:5:
+BITES  F7: the sparse mark never marks a bucket touched (a_running_window_equals): thread 'l2::stats::tests::a_running_window_equals_a_fresh_histogram_of_its_samples' (19854) panicked at crates/net/src/l2/stats.rs:586:13:
+BITES  F7: a window stays dense after it closes (a_running_window_equals): thread 'l2::stats::tests::a_running_window_equals_a_fresh_histogram_of_its_samples' (20140) panicked at crates/net/src/l2/stats.rs:590:13:
+DONE

@@ -48,8 +48,8 @@ model's outputs are committed on the same branch at `975e72b` under `spikes/netc
 - **Credentials deferred.** How a reconnect proves who it is (RESUME-CRED) waits for the reconnect work; three
   readings of "bound to the session" are open (§4).
 - **Measuring it.** The proof test's L2 setup cannot measure a reconnect as it is: it needs loss below TCP, a client
-  that follows the browser's rules, and Windows-like clients (§6). How the pass bar is set is open
-  (WS-RECONNECT-BAR, Mustafa's: §6.4).
+  that follows the browser's rules, and Windows-like clients (§6). How the pass bar is set stays open until the
+  reconnect work's plan (WS-RECONNECT-BAR (b), Mustafa, 2026-11-08: §6.4).
 
 ## 1. The requirement and its target
 
@@ -570,15 +570,16 @@ return against fix 1's limit; the browser, the OS and whether TLS resumed; the b
 (`u3-verify3-stats.md:176-181`; `fixes.rs:463-476`). A count of recoveries equal to the bursts expected, since a
 client that never heals writes no record (`u3-verify3-stats.md:154-156`).
 
-### 6.4 The bar (open: WS-RECONNECT-BAR, Mustafa's)
+### 6.4 The bar (WS-RECONNECT-BAR (b): open until the reconnect work's plan; Mustafa, 2026-11-08)
 - **The target** (Mustafa, §1.1): on a faithful setup at P2 with a 1 s burst, 99 % of client-bursts decode a fresh
   delta within about 1.05 s of the link's return. Slice 3's *Done when* asks for the reconnect to be built and measured
   against it before the first online playtest, a miss going to Mustafa (§5.1).
-- **How the pass bar is set is not decided.** The docs PR that lands this record asks Mustafa (its "Decisions needed",
-  WS-RECONNECT-BAR): (a) borrow WS-BAR's rule now, or (b) leave it open, so the reconnect work proposes its bar with
-  its plan, for his go, against the target. The advisor recommends (b): the faithful setup, the policy and the sample
-  size are not known yet, and nothing in the proof test depends on it. Until he answers, the form below stays
-  **proposed, Mustafa to confirm (WS-RECONNECT-BAR)**.
+- **How the pass bar is set: open until the reconnect work's plan.** The docs PR that landed this record (#45) asked
+  Mustafa (its "Decisions needed", WS-RECONNECT-BAR): (a) borrow WS-BAR's rule now, or (b) leave it open, so the
+  reconnect work proposes its bar with its plan, for his go, against the target. The advisor recommended (b): the
+  faithful setup, the policy and the sample size are not known yet, and nothing in the proof test depends on it. His
+  answer, 2026-11-08: "WS-RECONNECT-BAR: (b), open until the reconnect work's plan." So the form below is a starting
+  proposal for that plan, not a decision.
 - **Proposed form, borrowed from WS-BAR** (§1.1): tail parts (at most k over a time, none over a maximum) plus
   mechanism checks; a median part only with its margin stated. Numbers from the model and one practice run on the
   faithful setup, never looser than the model predicts for a correct build; a practice run worse than the model is
@@ -682,8 +683,8 @@ equals its last change, under `.checkpoints/netcode-proof-test/`:
    the graceful close of the old one (§3.9; what a leaked credential allows, §4.1 reading 2); part 10's per-address
    cap, handshake cap and new-session rate sized for a room-wide outage (§3.9); and the 2 s `Join` deadline per
    attempt, kept and modelled or lengthened for every connection (§3.9).
-5. **The bar** (§6.4): WS-RECONNECT-BAR, Mustafa's: the borrowed WS-BAR form now, or a bar the reconnect work proposes
-   with its plan. Either way: the statistic that measures the reconnect's slowdown (the median barely moves), the
+5. **The bar** (§6.4): open until the reconnect work's plan, which proposes it for Mustafa's go (WS-RECONNECT-BAR (b),
+   2026-11-08). That plan states the statistic that measures the reconnect's slowdown (the median barely moves), the
    sample size for "99 %", and the numbers after a practice run on the faithful setup.
 6. **Not researched:** Safari's (WebKit's) WebSocket connect rules and throttles, though VISION_V2 §4 names Safari
    (`docs/VISION_V2.md:55`); the dual-stack case once the room publishes IPv6 (Chromium's 300 ms IPv4 fallback, a lock

@@ -1,0 +1,47 @@
+# c-u2-pm-0001-3: PM-0001-3's L1 half, run in this container (machine role C) on 2026-11-11
+commit 65869918809f24067f248601493f120cb9dd1e89
+npt-lab (measured build) sha256 4c7651118087dfba5d6c4f49a96ababdc9562fc1d00b8a1b3ef7d38af6815308
+npt-lab (bites build) sha256 5d272592d501f2f8158d44d43d5c190eb62298e193ef49e5c389b82e71e0b546
+npt-judge sha256 01066078213a0af9b0524c7338679ef933f611c803c61a2a572606630332d791
+raw logs: .gate/netcode-proof-test/runs/c-u2-pm-0001-3-65869918809f/ (not committed: plan §10.6)
+judge: PM-0001-3    NOT-RUN   L2 P1: 0 of 1 valid runs
+
+# one line per run (npt-lab's own summary; the judge reads the logs, never these lines)
+l1-p1-s1 P1 seed 1: 1000000 sent each way; lost up 9981 down 10244; mean one-way up 25018896 ns down 25022790 ns; mean round trip 50048918 ns over 621840 samples; reorder up 873 down 872 of 1000; fate log d69ddf35e8d81d63
+l1-p1-s1-twin P1 seed 1: 1000000 sent each way; lost up 9981 down 10244; mean one-way up 25018896 ns down 25022790 ns; mean round trip 50048918 ns over 621840 samples; reorder up 873 down 872 of 1000; fate log d69ddf35e8d81d63
+l1-p1-s2 P1 seed 2: 1000000 sent each way; lost up 9911 down 10019; mean one-way up 25014238 ns down 25018871 ns; mean round trip 50034197 ns over 621942 samples; reorder up 872 down 873 of 1000; fate log fdcffd599ed57e52
+l1-p1-s2-twin P1 seed 2: 1000000 sent each way; lost up 9911 down 10019; mean one-way up 25014238 ns down 25018871 ns; mean round trip 50034197 ns over 621942 samples; reorder up 872 down 873 of 1000; fate log fdcffd599ed57e52
+l1-p1-s3 P1 seed 3: 1000000 sent each way; lost up 10007 down 10051; mean one-way up 25020843 ns down 25021238 ns; mean round trip 50033915 ns over 621852 samples; reorder up 872 down 873 of 1000; fate log 6751d7f8369226fa
+l1-p1-s3-twin P1 seed 3: 1000000 sent each way; lost up 10007 down 10051; mean one-way up 25020843 ns down 25021238 ns; mean round trip 50033915 ns over 621852 samples; reorder up 872 down 873 of 1000; fate log 6751d7f8369226fa
+l1-p2-s1 P2 seed 1: 1000000 sent each way; lost up 20191 down 20175; mean one-way up 50038109 ns down 50045151 ns; mean round trip 100074285 ns over 610746 samples; reorder up 910 down 910 of 1000; fate log 43745683ab36d67b
+l1-p2-s1-twin P2 seed 1: 1000000 sent each way; lost up 20191 down 20175; mean one-way up 50038109 ns down 50045151 ns; mean round trip 100074285 ns over 610746 samples; reorder up 910 down 910 of 1000; fate log 43745683ab36d67b
+l1-p2-s2 P2 seed 2: 1000000 sent each way; lost up 19873 down 19899; mean one-way up 50027778 ns down 50036265 ns; mean round trip 100056696 ns over 611300 samples; reorder up 910 down 910 of 1000; fate log 990425d55bfe5657
+l1-p2-s2-twin P2 seed 2: 1000000 sent each way; lost up 19873 down 19899; mean one-way up 50027778 ns down 50036265 ns; mean round trip 100056696 ns over 611300 samples; reorder up 910 down 910 of 1000; fate log 990425d55bfe5657
+l1-p2-s3 P2 seed 3: 1000000 sent each way; lost up 20055 down 20007; mean one-way up 50040568 ns down 50041565 ns; mean round trip 100073928 ns over 610787 samples; reorder up 909 down 910 of 1000; fate log af8dc2157a8fc76a
+l1-p2-s3-twin P2 seed 3: 1000000 sent each way; lost up 20055 down 20007; mean one-way up 50040568 ns down 50041565 ns; mean round trip 100073928 ns over 610787 samples; reorder up 909 down 910 of 1000; fate log af8dc2157a8fc76a
+l1-p3-s1 P3 seed 1: 1000000 sent each way; lost up 49986 down 50036; mean one-way up 75055116 ns down 75064959 ns; mean round trip 150077111 ns over 580893 samples; reorder up 925 down 925 of 1000; fate log 3aa818c1a6ac44bb
+l1-p3-s1-twin P3 seed 1: 1000000 sent each way; lost up 49986 down 50036; mean one-way up 75055116 ns down 75064959 ns; mean round trip 150077111 ns over 580893 samples; reorder up 925 down 925 of 1000; fate log 3aa818c1a6ac44bb
+l1-p3-s2 P3 seed 2: 1000000 sent each way; lost up 49964 down 50250; mean one-way up 75039055 ns down 75054155 ns; mean round trip 150092387 ns over 580939 samples; reorder up 925 down 925 of 1000; fate log 81e135d2d4237b91
+l1-p3-s2-twin P3 seed 2: 1000000 sent each way; lost up 49964 down 50250; mean one-way up 75039055 ns down 75054155 ns; mean round trip 150092387 ns over 580939 samples; reorder up 925 down 925 of 1000; fate log 81e135d2d4237b91
+l1-p3-s3 P3 seed 3: 1000000 sent each way; lost up 50076 down 49797; mean one-way up 75062191 ns down 75060417 ns; mean round trip 150105194 ns over 581627 samples; reorder up 925 down 925 of 1000; fate log e670e8015f1a1703
+l1-p3-s3-twin P3 seed 3: 1000000 sent each way; lost up 50076 down 49797; mean one-way up 75062191 ns down 75060417 ns; mean round trip 150105194 ns over 581627 samples; reorder up 925 down 925 of 1000; fate log e670e8015f1a1703
+l1-p4-s1 P4 seed 1: 1000000 sent each way; lost up 49986 down 50036; mean one-way up 100073332 ns down 100086450 ns; mean round trip 200130218 ns over 580931 samples; reorder up 935 down 935 of 1000; fate log 432693efb9698c05
+l1-p4-s1-twin P4 seed 1: 1000000 sent each way; lost up 49986 down 50036; mean one-way up 100073332 ns down 100086450 ns; mean round trip 200130218 ns over 580931 samples; reorder up 935 down 935 of 1000; fate log 432693efb9698c05
+l1-p4-s2 P4 seed 2: 1000000 sent each way; lost up 49964 down 50250; mean one-way up 100051913 ns down 100072048 ns; mean round trip 200119833 ns over 580348 samples; reorder up 935 down 935 of 1000; fate log 6c45c79d874a619e
+l1-p4-s2-twin P4 seed 2: 1000000 sent each way; lost up 49964 down 50250; mean one-way up 100051913 ns down 100072048 ns; mean round trip 200119833 ns over 580348 samples; reorder up 935 down 935 of 1000; fate log 6c45c79d874a619e
+l1-p4-s3 P4 seed 3: 1000000 sent each way; lost up 50076 down 49797; mean one-way up 100082762 ns down 100080395 ns; mean round trip 200134298 ns over 581141 samples; reorder up 935 down 935 of 1000; fate log 979b54cbc0b1b44d
+l1-p4-s3-twin P4 seed 3: 1000000 sent each way; lost up 50076 down 49797; mean one-way up 100082762 ns down 100080395 ns; mean round trip 200134298 ns over 581141 samples; reorder up 935 down 935 of 1000; fate log 979b54cbc0b1b44d
+l1-b1-s1 B1 seed 1: 1010000 sent each way; lost up 30209 down 30162; mean one-way up 50037095 ns down 50045657 ns; mean round trip 100073668 ns over 610386 samples; reorder up 910 down 910 of 1000; fate log 722f20713e18352e
+l1-b1-s1-twin B1 seed 1: 1010000 sent each way; lost up 30209 down 30162; mean one-way up 50037095 ns down 50045657 ns; mean round trip 100073668 ns over 610386 samples; reorder up 910 down 910 of 1000; fate log 722f20713e18352e
+l1-b1-s2 B1 seed 2: 1010000 sent each way; lost up 29890 down 29902; mean one-way up 50028306 ns down 50034660 ns; mean round trip 100053166 ns over 611033 samples; reorder up 910 down 910 of 1000; fate log 1ae8772f23d5cfd2
+l1-b1-s2-twin B1 seed 2: 1010000 sent each way; lost up 29890 down 29902; mean one-way up 50028306 ns down 50034660 ns; mean round trip 100053166 ns over 611033 samples; reorder up 910 down 910 of 1000; fate log 1ae8772f23d5cfd2
+l1-b1-s3 B1 seed 3: 1010000 sent each way; lost up 30049 down 30020; mean one-way up 50040185 ns down 50040478 ns; mean round trip 100072360 ns over 610468 samples; reorder up 909 down 910 of 1000; fate log d8812eab87e6c577
+l1-b1-s3-twin B1 seed 3: 1010000 sent each way; lost up 30049 down 30020; mean one-way up 50040185 ns down 50040478 ns; mean round trip 100072360 ns over 610468 samples; reorder up 909 down 910 of 1000; fate log d8812eab87e6c577
+bite-rtt-each-way P2 seed 1: 1000000 sent each way; lost up 20191 down 20175; mean one-way up 100038109 ns down 100045151 ns; mean round trip 200079725 ns over 610458 samples; reorder up 910 down 910 of 1000; fate log d9fa01d7d7f2f4b5
+bite-rtt-each-way-twin P2 seed 1: 1000000 sent each way; lost up 20191 down 20175; mean one-way up 100038109 ns down 100045151 ns; mean round trip 200079725 ns over 610458 samples; reorder up 910 down 910 of 1000; fate log d9fa01d7d7f2f4b5
+bite-loss-per-round-trip P2 seed 1: 1000000 sent each way; lost up 10123 down 10146; mean one-way up 50038185 ns down 50044460 ns; mean round trip 100074150 ns over 620736 samples; reorder up 910 down 910 of 1000; fate log a74f0c4e3a89cef0
+bite-loss-per-round-trip-twin P2 seed 1: 1000000 sent each way; lost up 10123 down 10146; mean one-way up 50038185 ns down 50044460 ns; mean round trip 100074150 ns over 620736 samples; reorder up 910 down 910 of 1000; fate log a74f0c4e3a89cef0
+bite-normal-jitter P2 seed 1: 1000000 sent each way; lost up 20191 down 20175; mean one-way up 50023681 ns down 50017431 ns; mean round trip 100030390 ns over 610773 samples; reorder up 932 down 932 of 1000; fate log 8b361e33295ae7d3
+bite-normal-jitter-twin P2 seed 1: 1000000 sent each way; lost up 20191 down 20175; mean one-way up 50023681 ns down 50017431 ns; mean round trip 100030390 ns over 610773 samples; reorder up 932 down 932 of 1000; fate log 8b361e33295ae7d3
+bite-clock-seed P2 seed 1: 1000000 sent each way; lost up 19919 down 20364; mean one-way up 50036254 ns down 50033906 ns; mean round trip 100063138 ns over 610769 samples; reorder up 909 down 910 of 1000; fate log f0b655a35fa94826
+bite-clock-seed-twin P2 seed 1: 1000000 sent each way; lost up 19927 down 20217; mean one-way up 50037042 ns down 50032503 ns; mean round trip 100055653 ns over 610870 samples; reorder up 910 down 909 of 1000; fate log 841e336d304823ec

@@ -1,0 +1,22 @@
+[package]
+name = "npt-client"
+description = "The client endpoint: prediction, reconciliation, interpolation, clock, aim cast, block writer"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# The planted defects (plan §4.7, E19), bites builds only, with those of the crates it calls (U4s adds it for U4e:
+# u4-build-plan.md §5 Lanes, the advisor's condition 10 (b)).
+bites = ["npt-sim/bites", "npt-proto/bites"]
+
+[dependencies]
+# No bindings, no transport, no clock; native and wasm32 (plan §4.2, E7). Never npt-net. npt-link for `Channel` only
+# (received messages arrive with their channel: u4-build-plan.md §4.1).
+npt-link.workspace = true
+npt-proto.workspace = true
+npt-sim.workspace = true

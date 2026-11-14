@@ -1,0 +1,33 @@
+[package]
+name = "npt-tcpinfo"
+description = "Two readings of a Linux TCP socket for the plain WebSocket path: tcpi_rtt (TCP_INFO) and SIOCOUTQ"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+# Not `workspace = true`: the workspace forbids unsafe_code, which no #[allow] can relax (E0453), so this crate has its
+# own tables (the advisor's ruling of 2026-11-08, in place of u3c-plan.md 1.8 (a)'s "keep [lints] workspace = true").
+# [lints.rust] denies the lint, so srtt_us and unacked_and_unsent in src/linux.rs can each carry one
+# #[allow(unsafe_code, reason = "...")] (ADR 0002:264-265; R20 (a)), and nothing else in the crate relaxes it. Every
+# other lint is the workspace's, key for key. check.mjs's deps step checks the level, the tables against the
+# workspace's key for key (it refuses a lint given in any form its reader does not read: a lint's own
+# [lints.<tool>.<lint>] table, or a quoted, dotted, hyphenated or uppercase name, as cargo reads `unsafe-code` as
+# unsafe_code), and where the two allows sit.
+[lints.rust]
+unsafe_code = "deny"
+
+[lints.clippy]
+disallowed_types = "deny"
+disallowed_methods = "deny"
+iter_over_hash_type = "deny"
+
+# libc is the only normal dependency, and only on Linux; the other targets build the stub. check.mjs's deps step
+# checks that libc is all the crate ships with (socket2 below is a dev dependency: tests and the probe only).
+[target.'cfg(target_os = "linux")'.dependencies]
+libc.workspace = true
+
+[dev-dependencies]
+# Tests and the root-run probe only; already in Cargo.lock (tokio's). "all" opens TCP_QUICKACK, TCP_CONGESTION and
+# raw sockets (the probe's sock_diag query); a feature is not recorded in Cargo.lock.
+socket2 = { version = "=0.6.5", features = ["all"] }

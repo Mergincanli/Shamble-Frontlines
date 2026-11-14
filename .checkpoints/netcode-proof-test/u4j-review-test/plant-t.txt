@@ -1,0 +1,22 @@
+Plant T (test-engineer, U4j round 1), 2026-11-11 10:50:58-10:51:00 UTC, in place in
+/home/user/Shamble-Frontlines/.claude/worktrees/agent-a3b8dfeb01ed52b50/spikes/netcode-proof/crates/judge/src/practice.rs
+(sha256 before 1e59bdea..., planted f07fe7cc..., restored 1e59bdea... = the builder's; 537 lines throughout).
+
+The plant (three loosening changes in one file; since each only loosens, a committed suite passing under all three
+passes under each alone):
+  :387  "IN TOLERANCE" => s >= bound.band_low && s <= tolerance,
+     -> "IN TOLERANCE" => s <= tolerance + Ratio::new(1, 50),          (band_low dropped; cap 1.10 -> 1.12)
+  :388  "BEYOND" => chance && s <= tolerance,
+     -> "BEYOND" => chance && s <= tolerance + Ratio::new(1, 50),       (cap 1.10 -> 1.12)
+  :436  if over as i64 > practice.bound.k_count || worst > practice.moved(BoundNumber::Z) {
+     -> if over as i64 > practice.bound.k_count && worst >= Ratio::int(0) {   (Z' recheck dropped)
+
+Run: idle before; touch + 2 s loop; cargo test --locked --no-fail-fast -p npt-judge; Compiling npt-log and npt-judge
+from this copy's path. With a TEMPORARY tests/zz_review_probe_t.rs (4 boundary probes; it passed 4/4 on the unplanted
+code at 10:49:50 and was removed after).
+
+Committed tests under the plant: lib 11 passed, main 0, cli 2 passed, engine 37 passed, fixtures 15 passed:
+  ALL 65 PASS -> plant T SURVIVES the committed suite (Mustafa's 10 % cap raised to 12 %, band_low and Z' unchecked).
+Boundary probes under the plant: probe_t1a (s = 1.10, PASS) passed; probe_t1b (s = 1.1001) FAILED,
+  probe_t2 (IN TOLERANCE at s = 0.95) FAILED, probe_t3 (over Z' only) FAILED -> each proposed case bites.
+After restore: sha256 1e59bdea (match); the probe file removed; git status 34 paths; all 34 start hashes match.

@@ -1,0 +1,13 @@
+start socket_tests.rs sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == builder
+start socket.rs sha256 7ad7cb22e4316c9f98f4d3abedc36fcab8ddea312239dd5e0b95f2c0856e76f9 == builder
+start stats.rs sha256 27dfd3266a0647b28cd642a062ffa45c7caac8da31a55ec4e62f9983187e9e22 == builder
+       df /home/user: 14.2 GB free
+PASSED (informative) X1 (extra) agree() always says disagree: the_cross_check_reads_delay_plus_lateness; ran 1; compiled; test result: ok. 1 passed; 0 failed; says '': -
+       at -: (no panic)
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+PASSED (informative) X2 (extra) the loss share over the Delivered count, not every fate: the_cross_check_reads_delay_plus_lateness; ran 1; compiled; test result: ok. 1 passed; 0 failed; says '': -
+       at -: (no panic)
+       restored: {'socket_tests.rs': True}
+summary: X1 PASSED (informative); X2 PASSED (informative)
+exit 0

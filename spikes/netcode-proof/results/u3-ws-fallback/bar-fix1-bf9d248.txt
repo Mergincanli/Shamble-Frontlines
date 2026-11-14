@@ -1,0 +1,20 @@
+   Compiling npt-net v0.0.0 (/home/user/Shamble-Frontlines/spikes/netcode-proof/crates/net)
+    Finished `release` profile [optimized] target(s) in 2.43s
+     Running unittests src/lib.rs (../../.gate/netcode-proof-test/target/release/deps/npt_net-dda8722a69a66d14)
+
+running 1 test
+test tcp_model::fixes::ws_bar_fix1 has been running for over 60 seconds
+fix 1 (correct): 600000 p50 654 ms, p99 2164 ms, p99.9 3945 ms, p99.99 5801 ms, max 11384 ms; over 800 ms 68840, 1000 ms 52406, 1200 ms 43738, 1500 ms 24442, 2000 ms 15226
+today: 64 KB, no fix 1: 600000 p50 1121 ms, p99 2686 ms, p99.9 4068 ms, p99.99 6484 ms, max 12068 ms; over 800 ms 582384, 1000 ms 505371, 1200 ms 192133, 1500 ms 64398, 2000 ms 21968
+fix 1 with a budget twice too large: 600000 p50 776 ms, p99 2341 ms, p99.9 4109 ms, p99.99 5843 ms, max 11766 ms; over 800 ms 220321, 1000 ms 69549, 1200 ms 57377, 1500 ms 29640, 2000 ms 16783
+model bound at 480 client-bursts: half within 0.67 s, at most 20 of 480 over 2.00 s, none over 6.90 s: fix 1 (correct) 0.9689, today: 64 KB, no fix 1 0.0000, fix 1 with a budget twice too large 0.0000 (correct build's bootstrap 0.9608-0.9764); the correct build under model error: x1.05 0.001, x1.10 0.000, +20 ms 0.159, +40 ms 0.000
+model bound at 480 client-bursts: half within 0.67 s, at most 5 of 480 over 2.50 s, none over 6.90 s: fix 1 (correct) 0.9681, today: 64 KB, no fix 1 0.0000, fix 1 with a budget twice too large 0.0000 (correct build's bootstrap 0.9602-0.9754); the correct build under model error: x1.05 0.001, x1.10 0.000, +20 ms 0.159, +40 ms 0.000
+model bound at 480 client-bursts: half within 0.67 s, at most 3 of 480 over 3.00 s, none over 6.90 s: fix 1 (correct) 0.9682, today: 64 KB, no fix 1 0.0000, fix 1 with a budget twice too large 0.0000 (correct build's bootstrap 0.9602-0.9753); the correct build under model error: x1.05 0.001, x1.10 0.000, +20 ms 0.159, +40 ms 0.000
+model bound at 1440 client-bursts: half within 0.67 s, at most 49 of 1440 over 2.00 s, none over 9.80 s: fix 1 (correct) 0.9630, today: 64 KB, no fix 1 0.0000, fix 1 with a budget twice too large 0.0000 (correct build's bootstrap 0.9484-0.9758); the correct build under model error: x1.05 0.000, x1.10 0.000, +20 ms 0.039, +40 ms 0.000
+model bound at 1440 client-bursts: half within 0.67 s, at most 11 of 1440 over 2.50 s, none over 9.80 s: fix 1 (correct) 0.9665, today: 64 KB, no fix 1 0.0000, fix 1 with a budget twice too large 0.0000 (correct build's bootstrap 0.9522-0.9792); the correct build under model error: x1.05 0.000, x1.10 0.000, +20 ms 0.039, +40 ms 0.000
+model bound at 1440 client-bursts: half within 0.67 s, at most 7 of 1440 over 3.00 s, none over 9.80 s: fix 1 (correct) 0.9743, today: 64 KB, no fix 1 0.0000, fix 1 with a budget twice too large 0.0000 (correct build's bootstrap 0.9604-0.9862); the correct build under model error: x1.05 0.000, x1.10 0.000, +20 ms 0.039, +40 ms 0.000
+phases censored at 60 s after the return (counted over every bar): 0
+test tcp_model::fixes::ws_bar_fix1 ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 56 filtered out; finished in 65.50s
+

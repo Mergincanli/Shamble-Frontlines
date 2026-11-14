@@ -1,0 +1,58 @@
+# npt-sim's determinism bans (plan §4.5; ADR 0002 part 7; ADR 0004 part 7's float allow-list, lines 262-286).
+# Allowed floats: + - * / and negation; comparisons and total_cmp; sqrt, floor, ceil, round, trunc, fract, explicit
+# mul_add; abs, copysign; `as` casts; the exact non-arithmetic methods (is_nan, is_finite, is_infinite, is_normal,
+# is_subnormal, classify, is_sign_positive, is_sign_negative, to_bits, from_bits, the byte conversions). Every other
+# std f32 and f64 method is banned below; min, max and clamp are replaced by the sim's own three helpers.
+# Transcendentals go through the pinned pure-Rust libm crate only. Re-read this list at every Rust bump (part 2).
+# The workspace sets disallowed_types, disallowed_methods and iter_over_hash_type to deny.
+
+disallowed-types = [
+    { path = "std::collections::HashMap", reason = "hash-map ban (GLOSSARY §7): iteration order is not deterministic" },
+    { path = "std::collections::HashSet", reason = "hash-map ban (GLOSSARY §7): iteration order is not deterministic" },
+    { path = "std::time::Instant", reason = "the clock ban: time is the tick counter, passed in" },
+    { path = "std::time::SystemTime", reason = "the clock ban: time is the tick counter, passed in" },
+]
+
+disallowed-methods = [
+    { path = "std::time::Instant::now", reason = "the clock ban" },
+    { path = "std::time::SystemTime::now", reason = "the clock ban" },
+    "f32::round_ties_even", "f64::round_ties_even",
+    "f32::signum", "f64::signum",
+    "f32::div_euclid", "f64::div_euclid",
+    "f32::rem_euclid", "f64::rem_euclid",
+    "f32::powi", "f64::powi",
+    "f32::powf", "f64::powf",
+    "f32::exp", "f64::exp",
+    "f32::exp2", "f64::exp2",
+    "f32::exp_m1", "f64::exp_m1",
+    "f32::ln", "f64::ln",
+    "f32::log", "f64::log",
+    "f32::log2", "f64::log2",
+    "f32::log10", "f64::log10",
+    "f32::ln_1p", "f64::ln_1p",
+    "f32::cbrt", "f64::cbrt",
+    "f32::hypot", "f64::hypot",
+    "f32::sin", "f64::sin",
+    "f32::cos", "f64::cos",
+    "f32::tan", "f64::tan",
+    "f32::asin", "f64::asin",
+    "f32::acos", "f64::acos",
+    "f32::atan", "f64::atan",
+    "f32::atan2", "f64::atan2",
+    "f32::sin_cos", "f64::sin_cos",
+    "f32::sinh", "f64::sinh",
+    "f32::cosh", "f64::cosh",
+    "f32::tanh", "f64::tanh",
+    "f32::asinh", "f64::asinh",
+    "f32::acosh", "f64::acosh",
+    "f32::atanh", "f64::atanh",
+    "f32::recip", "f64::recip",
+    "f32::to_degrees", "f64::to_degrees",
+    "f32::to_radians", "f64::to_radians",
+    "f32::max", "f64::max",
+    "f32::min", "f64::min",
+    "f32::clamp", "f64::clamp",
+    "f32::midpoint", "f64::midpoint",
+    "f32::next_up", "f64::next_up",
+    "f32::next_down", "f64::next_down",
+]

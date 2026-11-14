@@ -1,0 +1,12 @@
+dir 0: receipt − release (lateness, the kernel's TCP, TLS and tungstenite): p50 0.604 ms p99 1.096 ms max 2.944 ms
+dir 1: receipt − (delivery + lateness): p50 0.041 ms p99 0.123 ms max 0.145 ms; the poll's own window: p50 0.095 ms p99 0.204 ms max 0.247 ms; intake (model write − send): p50 0.292 ms p99 0.477 ms max 0.499 ms
+lateness down (P2, 30 Hz, 10.0 s): n 301 p50 0.431 ms p99 0.725 ms p99.9 0.885 ms max 0.885 ms E 1.6 µs over 6
+lateness up (P2, 30 Hz, 10.0 s): n 301 p50 0.553 ms p99 1.244 ms p99.9 2.555 ms max 2.555 ms E 19.7 µs over 21  ** CONDITION 10's TRIGGER: bring to the advisor **
+dir 0: receipt − release (lateness, the kernel's TCP, TLS and tungstenite): p50 0.534 ms p99 3.229 ms max 4.321 ms
+dir 1: receipt − (delivery + lateness): p50 0.037 ms p99 0.510 ms max 3.916 ms; the poll's own window: p50 0.084 ms p99 0.543 ms max 3.946 ms; intake (model write − send): p50 0.303 ms p99 0.952 ms max 3.906 ms
+lateness down (P2, 30 Hz, 10.0 s): n 301 p50 0.444 ms p99 2.904 ms p99.9 4.175 ms max 4.175 ms E 81.5 µs over 29  ** CONDITION 10's TRIGGER: bring to the advisor **
+lateness up (P2, 30 Hz, 10.0 s): n 301 p50 0.413 ms p99 5.383 ms p99.9 9.140 ms max 9.140 ms E 183.8 µs over 43  ** CONDITION 10's TRIGGER: bring to the advisor **
+dir 0: receipt − release (lateness, the kernel's TCP, TLS and tungstenite): p50 0.556 ms p99 2.504 ms max 4.014 ms
+dir 1: receipt − (delivery + lateness): p50 0.040 ms p99 0.103 ms max 0.331 ms; the poll's own window: p50 0.092 ms p99 0.211 ms max 0.462 ms; intake (model write − send): p50 0.288 ms p99 1.035 ms max 2.394 ms
+lateness down (P2, 30 Hz, 10.0 s): n 301 p50 0.388 ms p99 1.244 ms p99.9 3.867 ms max 3.867 ms E 30.1 µs over 8  ** CONDITION 10's TRIGGER: bring to the advisor **
+lateness up (P2, 30 Hz, 10.0 s): n 301 p50 0.440 ms p99 1.941 ms p99.9 2.805 ms max 2.805 ms E 38.0 µs over 18  ** CONDITION 10's TRIGGER: bring to the advisor **

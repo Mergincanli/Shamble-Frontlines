@@ -1,0 +1,26 @@
+U4j review (test-engineer), the counted check.mjs run, 2026-11-11 11:17:31-11:19:57 UTC, exit 0.
+Copy: /home/user/Shamble-Frontlines/.claude/worktrees/agent-a3b8dfeb01ed52b50 (no probe file present; 34 paths, all
+34 equal to hashes-start.sha256 before and after).
+Rules: pgrep cargo/rustc empty before and after; df /home/user 11 GB free; every file under spikes/netcode-proof/crates
+touched, then a 2 s touch loop for the whole run (started and stopped in the same command); CARGO_TARGET_DIR
+/home/user/Shamble-Frontlines/.gate/shared-target, CARGO_NET_OFFLINE=true.
+Provenance (cargo test --locked --no-run -p npt-judge -p npt-log, just before):
+   Compiling npt-log v0.0.0 (/home/user/Shamble-Frontlines/.claude/worktrees/agent-a3b8dfeb01ed52b50/spikes/netcode-proof/crates/log)
+   Compiling npt-judge v0.0.0 (/home/user/Shamble-Frontlines/.claude/worktrees/agent-a3b8dfeb01ed52b50/spikes/netcode-proof/crates/judge)
+Command: node spikes/netcode-proof/check.mjs (from the copy's root).
+
+PASS  fmt           0.4 s
+PASS  clippy        9.0 s  measured build and bites build both linted
+PASS  clippy-wasm32 0.9 s  measured build and bites build both linted
+PASS  doc           27.5 s  measured build and bites build both documented, rustdoc warnings as errors
+PASS  test          104.1 s  measured build: 304 tests passed, 0 failed, 0 reported a skip; bites build: 327 tests passed, 0 failed, 0 reported a skip
+PASS  deps          0.7 s  held: ... npt-judge ships npt-log and serde only; ... (87 crate files and 1 cargo config file(s) read)
+PASS  refs          0.0 s  597 tracked files: none outside spikes/ references it
+PASS  marks         0.7 s  npt-judge: 81 marks read and checked (drafts at 626df678cae0835fb2ce62b8113f548697968406); rows in this branch's docs/adr/: all unchanged
+PASS  self          1.2 s  48 of 48 tests passed
+PASS  redact        0.7 s  10 of 10 tests passed; redact-check: 182 item(s) checked, 0 finding(s)
+check: all 10 steps pass
+
+Deltas: measured 304 = 286 + 18; bites 327 = 309 + 18; self 48 of 48: the expected counts (no foreign artifact ran).
+After: 34 paths, all 34 sha256 equal to the start (marks.json 97c5cab5, README 71e4c637, SERIES e95febab); Cargo.toml,
+Cargo.lock and check.mjs: no diff against the base.

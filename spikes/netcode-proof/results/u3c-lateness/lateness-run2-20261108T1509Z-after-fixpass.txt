@@ -1,0 +1,20 @@
+ 15:09:06 up 7 min,  0 user,  load average: 1.47, 1.43, 0.71
+    Finished `release` profile [optimized] target(s) in 0.05s
+     Running unittests src/lib.rs (../../.gate/netcode-proof-test/target/release/deps/npt_net-f72f21a42e60b4c9)
+
+running 1 test
+loadavg at the start: 1.47 1.43 0.71 5/114 4009
+test l2::delay::tests::lateness_evidence_run has been running for over 60 seconds
+dir 0: receipt − release (lateness, the kernel's TCP, TLS and tungstenite): p50 0.190 ms p99 1.079 ms max 11.338 ms
+dir 0: 9953 segments, 193 stalls (99.9 % band 155-247), repairs rack 200 probe 0 timeout 0
+dir 1: receipt − (delivery + lateness): p50 0.014 ms p99 0.044 ms max 1.738 ms; the poll's own window: p50 0.020 ms p99 0.057 ms max 1.843 ms; intake (model write − send): p50 0.063 ms p99 0.164 ms max 3.565 ms
+dir 1: 9830 segments, 195 stalls (99.9 % band 153-244), repairs rack 196 probe 0 timeout 0
+lateness down (P2, 30 Hz, 335.0 s): n 10051 p50 0.155 ms p99 0.628 ms p99.9 3.483 ms max 11.281 ms E 16.4 µs over 157  ** CONDITION 10's TRIGGER: bring to the advisor **
+lateness up (P2, 30 Hz, 335.0 s): n 10051 p50 0.206 ms p99 1.398 ms p99.9 2.906 ms max 10.641 ms E 25.9 µs over 334  ** CONDITION 10's TRIGGER: bring to the advisor **
+loadavg at the end: 0.04 0.46 0.48 1/110 4125
+lateness samples: down 10051 up 10051
+test l2::delay::tests::lateness_evidence_run ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 154 filtered out; finished in 338.06s
+
+ 15:14:44 up 13 min,  0 user,  load average: 0.04, 0.46, 0.48

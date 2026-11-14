@@ -1,0 +1,11 @@
+--- .checkpoints/netcode-proof-test/u4d2-run.sh
++++ .checkpoints/netcode-proof-test/u4d2-run.inf2-4-a.sh
+@@ -16,7 +16,7 @@
+ # Usage: bash u4d2-run.sh [-x] [-k] <worktree> <log file> <command...> [:: <command...>]...
+ set -u
+ M=/home/user/Shamble-Frontlines
+-T=$M/.gate/shared-target
++T=$M/.gate/no-such-target
+ LOCK=$T/.lane.lock
+ export CARGO_TARGET_DIR=$T
+ export CARGO_NET_OFFLINE=true

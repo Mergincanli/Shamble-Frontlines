@@ -1,0 +1,61 @@
+start socket_tests.rs sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == builder
+start socket.rs sha256 7ad7cb22e4316c9f98f4d3abedc36fcab8ddea312239dd5e0b95f2c0856e76f9 == builder
+start stats.rs sha256 27dfd3266a0647b28cd642a062ffa45c7caac8da31a55ec4e62f9983187e9e22 == builder
+       df /home/user: 14.2 GB free
+BITES S1 the pacers at 9,800 per second: l2_timing_self_test; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'the rate fell': True
+       at crates/net/src/l2/socket_tests.rs:1590:5: the rate fell to 9800 per second per direction: the run is INVALID, not a lateness verdict | stack backtrace: | 0: __rustc::rust_begin_unwind | 1: core::panicking::panic_fmt
+       self-test prints before the panic: 45
+       up: E with L0 = 0, the judged form (U3D-L0): 15359 ns vs bar 10000 ns: would MISS (reported, not judged here)
+       down: E with L0 = 0, the judged form (U3D-L0): 14226 ns vs bar 10000 ns: would MISS (reported, not judged here)
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES S2 the stop with no d + a + 500 ms wait: l2_timing_self_test; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'INVALID': True
+       at crates/net/src/l2/socket_tests.rs:1600:9: assertion `left == right` failed: up: every datagram accounted for: the run is INVALID, not a lateness verdict | left: 29756 | right: 30000 | stack backtrace:
+       self-test prints before the panic: 45
+       up: E with L0 = 0, the judged form (U3D-L0): 49628 ns vs bar 10000 ns: would MISS (reported, not judged here)
+       down: E with L0 = 0, the judged form (U3D-L0): 31999 ns vs bar 10000 ns: would MISS (reported, not judged here)
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES S3 the loss band at twice P1's ppm: l2_timing_self_test; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says "outside P1's band": True
+       at crates/net/src/l2/socket_tests.rs:1606:9: up: 325 lost, outside P1's band 480-720: the run is INVALID, not a lateness verdict | stack backtrace: | 0: __rustc::rust_begin_unwind | 1: core::panicking::panic_fmt
+       self-test prints before the panic: 45
+       up: E with L0 = 0, the judged form (U3D-L0): 48803 ns vs bar 10000 ns: would MISS (reported, not judged here)
+       down: E with L0 = 0, the judged form (U3D-L0): 29700 ns vs bar 10000 ns: would MISS (reported, not judged here)
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES S4 the fate log's capacity n (too small): l2_timing_self_test; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'INVALID': True
+       at crates/net/src/l2/socket_tests.rs:1606:9: up: 325 lost, outside P1's band 90-210: the run is INVALID, not a lateness verdict | stack backtrace: | 0: __rustc::rust_begin_unwind | 1: core::panicking::panic_fmt
+       self-test prints before the panic: 45
+       up: E with L0 = 0, the judged form (U3D-L0): 56704 ns vs bar 10000 ns: would MISS (reported, not judged here)
+       down: E with L0 = 0, the judged form (U3D-L0): 12495 ns vs bar 10000 ns: would MISS (reported, not judged here)
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES S5 the pre-touch's drain removed (log full from the start): l2_timing_self_test; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'INVALID': True
+       at crates/net/src/l2/socket_tests.rs:1605:9: up: 325 lost, outside P1's band 490-730: the run is INVALID, not a lateness verdict | stack backtrace: | 0: __rustc::rust_begin_unwind | 1: core::panicking::panic_fmt
+       self-test prints before the panic: 45
+       up: E with L0 = 0, the judged form (U3D-L0): 0 ns vs bar 10000 ns: would PASS (reported, not judged here)
+       down: E with L0 = 0, the judged form (U3D-L0): 0 ns vs bar 10000 ns: would PASS (reported, not judged here)
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+PASSED (informative) S6 the pre-touch skipped (no page touched first): l2_timing_self_test; ran 1; compiled; test result: ok. 1 passed; 0 failed; says '': -
+       at -: (no panic)
+       self-test prints before the panic: 45
+       up: E with L0 = 0, the judged form (U3D-L0): 3788 ns vs bar 10000 ns: would PASS (reported, not judged here)
+       down: E with L0 = 0, the judged form (U3D-L0): 3843 ns vs bar 10000 ns: would PASS (reported, not judged here)
+       restored: {'socket_tests.rs': True}
+       df /home/user: 14.2 GB free
+BITES S7 the release thread leaves its slack at the default: l2_timing_self_test; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says 'the slack read back': True
+       at crates/net/src/l2/socket_tests.rs:1627:5: assertion `left == right` failed: the slack read back at start under SCHED_OTHER 0: the run is INVALID, not a lateness verdict | left: 50000 | right: 1 | stack backtrace:
+       self-test prints before the panic: 45
+       up: E with L0 = 0, the judged form (U3D-L0): 811 ns vs bar 10000 ns: would PASS (reported, not judged here)
+       down: E with L0 = 0, the judged form (U3D-L0): 726 ns vs bar 10000 ns: would PASS (reported, not judged here)
+       restored: {'socket.rs': True}
+       df /home/user: 14.2 GB free
+BITES S8 the poller counts one per batch: l2_timing_self_test; ran 1; compiled; test result: FAILED. 0 passed; 1 failed; says "the poller's count": True
+       at crates/net/src/l2/socket_tests.rs:1617:5: assertion `left == right` failed: the poller's count: the run is INVALID, not a lateness verdict | left: 22018 | right: 29675 | stack backtrace:
+       self-test prints before the panic: 45
+       up: E with L0 = 0, the judged form (U3D-L0): 40508 ns vs bar 10000 ns: would MISS (reported, not judged here)
+       down: E with L0 = 0, the judged form (U3D-L0): 33258 ns vs bar 10000 ns: would MISS (reported, not judged here)
+       restored: {'socket_tests.rs': True}
+summary: S1 BITES; S2 BITES; S3 BITES; S4 BITES; S5 BITES; S6 PASSED (informative); S7 BITES; S8 BITES
+exit 0

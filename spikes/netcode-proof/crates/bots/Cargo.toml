@@ -1,0 +1,26 @@
+[package]
+name = "npt-bots"
+description = "Headless, cheating and hostile clients (npt-bots) and the load orchestrator on LG (npt-load)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "npt-bots"
+path = "src/bin/npt-bots.rs"
+
+[[bin]]
+name = "npt-load"
+path = "src/bin/npt-load.rs"
+
+[dependencies]
+npt-link.workspace = true
+npt-sim.workspace = true
+npt-proto.workspace = true
+npt-client.workspace = true
+npt-net.workspace = true
+npt-log.workspace = true

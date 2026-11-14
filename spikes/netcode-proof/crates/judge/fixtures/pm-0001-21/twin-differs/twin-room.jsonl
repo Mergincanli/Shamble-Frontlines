@@ -1,0 +1,5 @@
+{"k":"header","schema":1,"run":"forged-a-1-twin","set":"u4f-21","role":"twin","marks":["PM-0001-21"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P0","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":0,"date":"2026-11-10","params":{"suite":"forged","cmd_timing":"A"}}
+{"k":"tick","t":1,"ph":"measured","h":"00000000000a0001"}
+{"k":"tick","t":2,"ph":"measured","h":"00000000000b0002"}
+{"k":"tick","t":3,"ph":"measured","h":"00000000000a0003"}
+{"k":"footer","records":4,"ended":"clean"}

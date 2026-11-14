@@ -1,0 +1,111 @@
+
+##### 2026-11-08 21:26:18 run control
+
+=== control (expect: all pass) exit=0 11.5s
+test l2::delay::tests::a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded ... written 65360 B before Pending; held now [64336, 62632], largest [65360, 62632]; the pump ran 115 times in the 1.5 s hold
+test l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error ... ok
+test l2::delay::tests::a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof ... ok
+test l2::delay::tests::an_acknowledgement_add_burst_steps_that_reopens_the_up_room_wakes_the_pump ... attempt 1: the add_burst call's step lifted the up room 176 -> 5116 B across 549 B
+test l2::delay::tests::an_acknowledgement_an_application_task_steps_that_reopens_the_up_room_wakes_the_pump ... attempt 1: the current() call's step lifted the up room 176 -> 5116 B across 549 B
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 159 filtered out; finished in 2.76s
+   Compiling npt-net v0.0.0 (/home/user/Shamble-Frontlines/.gate/c1c-review-scratch/netcode-proof/crates/net)
+     Running unittests src/lib.rs (/home/user/Shamble-Frontlines/.gate/u3v3-harness-check-target/debug/deps/npt_net-088534cbcaf56b90)
+thread 'tokio-rt-worker' (17660) panicked at crates/net/src/l2/delay_tests.rs:2331:9:
+restored: control hashes ok
+
+##### 2026-11-08 21:26:35 run R1-SPIN
+
+=== R1-SPIN (expect: fail at :792 (polls >= 2000)) exit=101 3.2s
+test l2::delay::tests::a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded ... written 65360 B before Pending; held now [64336, 62632], largest [65360, 62632]; the pump ran 158276 times in the 1.5 s hold
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 163 filtered out; finished in 1.61s
+   Compiling npt-net v0.0.0 (/home/user/Shamble-Frontlines/.gate/c1c-review-scratch/netcode-proof/crates/net)
+     Running unittests src/lib.rs (/home/user/Shamble-Frontlines/.gate/u3v3-harness-check-target/debug/deps/npt_net-088534cbcaf56b90)
+thread 'l2::delay::tests::a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded' (17958) panicked at crates/net/src/l2/delay_tests.rs:792:5:
+error: test failed, to rerun pass `-p npt-net --lib`
+restored: R1-SPIN hashes ok
+
+##### 2026-11-08 21:26:38 run WAKE-ADDBURST-ONLY
+
+=== WAKE-ADDBURST-ONLY (expect: add_burst test fails (woke 0), current() passes) exit=101 3.1s
+test l2::delay::tests::an_acknowledgement_add_burst_steps_that_reopens_the_up_room_wakes_the_pump ... attempt 1: the add_burst call's step lifted the up room 176 -> 5116 B across 549 B
+test l2::delay::tests::an_acknowledgement_an_application_task_steps_that_reopens_the_up_room_wakes_the_pump ... attempt 1: the current() call's step lifted the up room 176 -> 5116 B across 549 B
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.90s
+   Compiling npt-net v0.0.0 (/home/user/Shamble-Frontlines/.gate/c1c-review-scratch/netcode-proof/crates/net)
+     Running unittests src/lib.rs (/home/user/Shamble-Frontlines/.gate/u3v3-harness-check-target/debug/deps/npt_net-088534cbcaf56b90)
+thread 'l2::delay::tests::an_acknowledgement_add_burst_steps_that_reopens_the_up_room_wakes_the_pump' (18249) panicked at crates/net/src/l2/delay_tests.rs:2124:9:
+assertion `left == right` failed: the add_burst call's step that reopened the up room woke the pump once
+  left: 0
+ right: 1
+error: test failed, to rerun pass `-p npt-net --lib`
+restored: WAKE-ADDBURST-ONLY hashes ok
+
+##### 2026-11-08 21:26:41 run PANIC-ALWAYS
+
+=== PANIC-ALWAYS (expect: normal-end test fails (clean close: Other); panic test passes) exit=101 2.7s
+test l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error ... FAILED
+test l2::delay::tests::a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof ... ok
+    l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.14s
+   Compiling npt-net v0.0.0 (/home/user/Shamble-Frontlines/.gate/c1c-review-scratch/netcode-proof/crates/net)
+     Running unittests src/lib.rs (/home/user/Shamble-Frontlines/.gate/u3v3-harness-check-target/debug/deps/npt_net-088534cbcaf56b90)
+thread 'l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error' (18552) panicked at crates/net/src/l2/delay_tests.rs:2392:19:
+a clean close, then the pump's task cancelled: the reader got Other (other error), not a clean EOF
+   2: npt_net::l2::delay::tests::ends_without_the_panic_error::<tokio::io::util::mem::DuplexStream>::{closure#0}
+   3: npt_net::l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error::{closure#0}
+  15: npt_net::l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error
+  16: npt_net::l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error::{closure#0}
+  17: <npt_net::l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+thread 'tokio-rt-worker' (18557) panicked at crates/net/src/l2/delay_tests.rs:2331:9:
+error: test failed, to rerun pass `-p npt-net --lib`
+restored: PANIC-ALWAYS hashes ok
+
+##### 2026-11-08 21:26:44 run PANIC-ALWAYS-DEADLINE-ONLY
+
+=== PANIC-ALWAYS-DEADLINE-ONLY (expect: normal-end test fails in its deadline half (Other)) exit=101 2.7s
+test l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error ... FAILED
+    l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 163 filtered out; finished in 0.42s
+   Compiling npt-net v0.0.0 (/home/user/Shamble-Frontlines/.gate/c1c-review-scratch/netcode-proof/crates/net)
+     Running unittests src/lib.rs (/home/user/Shamble-Frontlines/.gate/u3v3-harness-check-target/debug/deps/npt_net-088534cbcaf56b90)
+thread 'l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error' (18848) panicked at crates/net/src/l2/delay_tests.rs:2392:19:
+the shutdown's deadline: the reader got Other (other error), not a clean EOF
+   2: npt_net::l2::delay::tests::ends_without_the_panic_error::<tokio::io::util::mem::DuplexStream>::{closure#0}
+   3: npt_net::l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error::{closure#0}
+  15: npt_net::l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error
+  16: npt_net::l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error::{closure#0}
+  17: <npt_net::l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+error: test failed, to rerun pass `-p npt-net --lib`
+restored: PANIC-ALWAYS-DEADLINE-ONLY hashes ok
+
+##### 2026-11-08 21:26:47 run SHUTDOWN-OK
+
+=== SHUTDOWN-OK (expect: panic test fails at the shutdown assert) exit=101 2.8s
+test l2::delay::tests::a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof ... FAILED
+    l2::delay::tests::a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 163 filtered out; finished in 0.12s
+   Compiling npt-net v0.0.0 (/home/user/Shamble-Frontlines/.gate/c1c-review-scratch/netcode-proof/crates/net)
+     Running unittests src/lib.rs (/home/user/Shamble-Frontlines/.gate/u3v3-harness-check-target/debug/deps/npt_net-088534cbcaf56b90)
+thread 'tokio-rt-worker' (19157) panicked at crates/net/src/l2/delay_tests.rs:2331:9:
+thread 'l2::delay::tests::a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof' (19155) panicked at crates/net/src/l2/delay_tests.rs:2380:10:
+a panicked pump's shutdown read as a clean one: ()
+   3: <core::result::Result<(), core::io::error::Error>>::expect_err
+   4: npt_net::l2::delay::tests::a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof::{closure#0}
+  16: npt_net::l2::delay::tests::a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof
+  17: npt_net::l2::delay::tests::a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof::{closure#0}
+  18: <npt_net::l2::delay::tests::a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+error: test failed, to rerun pass `-p npt-net --lib`
+restored: SHUTDOWN-OK hashes ok
+
+##### 2026-11-08 21:27:01 run control
+
+=== control (expect: all pass) exit=0 5.1s
+test l2::delay::tests::a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded ... written 65360 B before Pending; held now [64336, 62651], largest [65360, 62651]; the pump ran 114 times in the 1.5 s hold
+test l2::delay::tests::a_pump_that_ends_without_a_panic_never_gives_the_panic_error ... ok
+test l2::delay::tests::a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof ... ok
+test l2::delay::tests::an_acknowledgement_add_burst_steps_that_reopens_the_up_room_wakes_the_pump ... attempt 1: the add_burst call's step lifted the up room 176 -> 5116 B across 549 B
+test l2::delay::tests::an_acknowledgement_an_application_task_steps_that_reopens_the_up_room_wakes_the_pump ... attempt 1: the current() call's step lifted the up room 176 -> 5116 B across 549 B
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 159 filtered out; finished in 2.74s
+   Compiling npt-net v0.0.0 (/home/user/Shamble-Frontlines/.gate/c1c-review-scratch/netcode-proof/crates/net)
+     Running unittests src/lib.rs (/home/user/Shamble-Frontlines/.gate/u3v3-harness-check-target/debug/deps/npt_net-088534cbcaf56b90)
+thread 'tokio-rt-worker' (19534) panicked at crates/net/src/l2/delay_tests.rs:2331:9:
+restored: control hashes ok
