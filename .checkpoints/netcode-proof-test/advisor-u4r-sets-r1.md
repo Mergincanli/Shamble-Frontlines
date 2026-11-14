@@ -31,7 +31,7 @@
 - Steps without a command vs per-slot share: Spearman ~0 (dominated by W); W's own steps_without high in s1/s2.
 - THE CAUSE (fingerprint): the others' flag count, post-onset, has autocorrelation peaks at lags ~355 and 1,080 ticks
   (0.88-0.92); phase-folded on (t-63,736) mod 360 it is a square wave: ~180 ticks at ~0 holding, ~180 ticks rising
-  (s1 closed from phase ~120 to ~300 = door 4's toggles; s2 ~0-195 = door 0; s3 ~30-210 = door 1). world.rs:1203-1208:
+  (s1 closed from phase ~120 to ~300 = door 4's toggles; s2 and s3 ~0 to ~180-195 = door 0; corrected on re-read). world.rs:1203-1208:
   door (second mod 6) toggles each second, so each door is shut 6 s of every 12 s (360 ticks); greybox.rs:89-99 six
   buildings 22 m out, doors facing the centre, joins [0, a]; room.rs:932 relevance needs flood.reaches. So soldier W
   is inside a building: while its door is shut the room drops W from every field client's set and the field from W's.
@@ -42,3 +42,30 @@
   circle does not close and each soldier random-walks; onsets 60-210 s after start (r2 30 s, D4 60 s: both too short).
   r2 P0 (same npt-lab sha b3b4a60d): 43,152 commands = 48 x 899, steps without 0, late 0: at P0 the circle closes.
 - Not U4r's runner, the judge or the mirror (0 breaches); it is npt-bots' brawl (U4r's crate) in the stress scene.
+- Q2: judge-apart log read: one run 178,922,504 B -> 641.1 MiB, 2.7 s; read alone 426.2 MiB, 1.9 s (70 %).
+  main.rs:99 + lib.rs:37-46: read_logs reads every .jsonl whole before judge(); --only does not cut reading.
+  The whole-set 1,507.9 MiB is peak.py around the whole set call (cargo builds incl. rustc for npt-judge, npt-lab runs,
+  the judge): not shown to be the judge's, so the 216 + 2.49x line has one judge point only (slope an upper bound if
+  linear). Read-alone scaling 2.5x bytes: P0 at 3,073 MiB -> ~7.7 GiB; at 1.5x bytes (4,610) -> ~11.5 GiB. free -m:
+  16,087 total, 14,529 available (B1 running).
+- Q3: du -sm P3 folder 519; du -sb 543,998,603 B = 518.8 MiB; runner printed 360 MiB: ratio 1.44 (not 1.42).
+  B1 s1 285.6 MB, s2 283.1 MB vs 190.6 MB projected: 1.49-1.50x. lab.jsonl per tick grows over a run (P3 s1:
+  3,949 B in minute 1 to ~7,800 by minute 7; room/client flat). D4 P0 first 50 s: 24.3-25.4 kB lab per tick, flat,
+  matching the runner's P0 rate (27.8 kB/tick with room+client); P0's growth over 10 min unknown.
+  df now 9,017 MiB (B1's s3 running). Copies: .claude/worktrees 413 MiB + .gate copies 299 MiB = ~712 MiB.
+  shared-target: debug 7,875, release 282, wasm32 176, doc 24 MiB. W1-TARGET item 3 as amended (advisor-u4d2-m9.md
+  :252-257) allows --release/--profile dev/--doc part-cleans between waves with no lane running. CHECKPOINTS s10
+  read. LEFTOVER-DELETE (history.md:404-410) read: deletes past approved methods = a narrow kit rule, his.
+  Runner: floor() (:250-255) per run with runBytes (low rates); a mid-set stop throws, leaving a partial set.
+- Bites (eval.rs:1385-1500): a bite run is judged on its own checks with its parts' validity; reading is still whole.
+
+## Ruling (summary; full text in the StructuredOutput)
+- Q1: not as expected; cause = brawl drift into a building (door fingerprint). -17 L1 P3 INVALID recorded, never
+  counted, no re-run at this commit; moves with BRAWL-1 (next npt-lab lane) to its re-run. P2 runs as planned; -17
+  L1 P2 INVALID with the same fingerprint is recorded and moved without a stop; anything else to me. Nothing to
+  Mustafa to decide; heads-up in PR #40's report.
+- Q2: P0 does not start until the judge is measured on whole set folders (P3, B1, P2) apart; P0 runs if the fit at
+  F x 3,073 MiB is <= 10 GiB; else a plan first (judge in parts or shorter bites).
+- Q3: A (copies, s10) between B1 and P2; after P2, R = 4,096 + F x 3,073 + 500 MiB; B then C only if short; manual
+  margin suffices for P0; runner rates corrected at the next c-u4r-runs.mjs change (RATES-1). Heads-up to Mustafa:
+  after U4r the disk sits near the floor; the next judged runs will need his narrow-rule decision.
