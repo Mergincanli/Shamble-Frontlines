@@ -12,8 +12,29 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 01:42 UTC; read this first after a compact or a cut): U4r's third ruling is in (nothing for
-Mustafa now; three points block the merge until done: 3, 6, 8); copy 5 builds them, then r5 and the end checks.**
+**NOW (2026-11-14 about 02:05 UTC; read this first after a compact or a cut): copy 5 stopped by the stop rule on one
+item (tick16's after_capped false); the fourth ruling (P3-CAP, CR-ID) runs; copy 5 resumed on the independent items;
+snapshot 707cc3df… (26 files).**
+- **Copy 5's report** (01:41-02:00 UTC; notes 1,325 lines, copied, equal; its state section :1292): item (1) done, the
+  third ruling's code changes green in both builds (npt-lab bin 47 and 54, 1 ignored each; c5-3.log): mirror.rs keeps
+  each client's frame at `last_acked()`; SERIES.md's baseline_age row; `burst_spacing_ns` in B1 headers; contract.rs's
+  class-audit failure (with r4's owner-to-all exception found at run time), its doc, exit 3 for unreadable inputs;
+  precheck.rs's lead from the leg and the whole deviation list. Item (2) point 3's pair, once each (c5-p3.log): the
+  clean partner as expected on every item; the tick16 bite run valid (share 1.0), -17 FAIL with 2,880 mismatches, 0
+  breaches, contract PASS, but **after_capped false** (the overflow resyncs at wrap + 60 resolve the 15 post-wrap
+  measured ticks as lost, 46 ticks after the measured end, before the 150-tick cap). Item (3) started: ops/runs/
+  c-u4r-r2.mjs written, not yet run by hand.
+- **To the advisor** (u4r-build4-questions.md; workflow **wf_f276e5ae-878**, task wxbeu1ayg, one agent
+  advisor-u4r-build4, notes advisor-u4r-build4.md): P3-CAP (does "after_capped true" stand at this setting); CR-ID (the
+  exception's id read at run time); and two script items read as ruling 3's own (c-u4r-runs.mjs's tick16 tick_start =
+  65,551 - (warm-up + measured ticks); -18's no-fallback B1 bite off at U4r). **If cut:** `resumeFromRunId:
+  "wf_f276e5ae-878"`.
+- **Copy 5 resumed about 02:04 UTC by SendMessage** (its context intact) on: point 8 (A)'s two runs, the two script
+  items, c-u4r-r2.mjs's lines by hand (its tick16 text left for the ruling), the report words; r5 and the end checks
+  held for the ruling. **On the ruling:** write it word for word by script, read it, send copy 5 its parts.
+
+**Earlier NOW (2026-11-14 about 01:42 UTC): U4r's third ruling is in (nothing for Mustafa now; three points block the
+merge until done: 3, 6, 8); copy 5 builds them, then r5 and the end checks.**
 - **The third ruling** (wf_345cc3c9-ca1 returned about 01:39 UTC): **advisor-u4r-build3-full.md** (235 lines, sha256
   78ebb5af…; by script, word for word, from the journal; with the architect's read and the fact check). I read the
   rulings whole. (1, High, not blocking) B1: the room's recovery after an eviction is a defect and a plan gap (carry

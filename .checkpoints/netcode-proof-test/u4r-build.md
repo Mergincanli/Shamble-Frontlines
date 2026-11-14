@@ -1169,3 +1169,157 @@ changes; point 32 comes before the next full run.
   tick16 bite runs, and c-u4r-runs.mjs's B1, tick16 and -18 lines with them). Nothing else is open.
 - check.mjs's names newly exported for its self-tests (2.7's count): `run`, `cargoConfigDirs`. The new scripts export
   nothing.
+
+## Copy 5
+
+### Start checks (done)
+
+- Started 2026-11-14 01:41 UTC, from the copy-5 prompt (the main folder's u4r-copy5-prompt.md, 34 lines, read whole).
+- Worktree /home/user/Shamble-Frontlines/.claude/worktrees/agent-a11e2354169f39acf, branch
+  worktree-agent-a11e2354169f39acf; `git rev-parse HEAD`: 2fbec7780cd04feafd8a3c67e1ebdb8889ad45ef (holds).
+- Brief sha256 59d570b8a73fa6d9ab6b9a02e9f6d6cf6ec37a57d36d2c3ef3285bc8c5196046 (holds).
+- Runner sha256 349b51adbed43a889ba9b88eeb89d573aadc3b4f035e186cc8b56de18f4e0831 (holds).
+- Rulings: advisor-u4r-build1-full.md 476121ab..., -build2-full.md f4f5ac92..., -build3-full.md
+  78ebb5af7d48a035cc5260436cb5a92dc0636ad19624a8ca2647e5d4c0490862 (all hold); wip/u4r.patch e40449a7... (holds).
+- `df -h /home/user`: /dev/vda 252G size, 34G used, 4.9G avail, 88 %.
+- No cargo, rustc or npt-* process running at start. `git status --short`: 13 modified, 13 untracked (this file
+  included), as copy 4's state section lists.
+- Read before any change (01:42-01:58 UTC): these notes whole (1,171 lines); `git diff` of all 13 modified files
+  (SERIES.md, recordings.json, lab/lib.rs, main.rs, pump.rs, schedule.rs, tests/schedule.rs, loader.mjs, check.mjs,
+  check.test.mjs, bots/lib.rs, log/lib.rs, hash.rs); each untracked file whole: bots/clippy.toml,
+  bots/tests/behaviour.rs (236), lab/det-recordings.json, lab/precheck-recordings.json, lab/src/mirror.rs (473),
+  contract.rs (478), precheck.rs (958), scenario.rs (2,291), logs.rs (786), replay.rs (429), ops/runs/c-u4r-runs.mjs
+  (197), ops/runs/det-u4.mjs (36). Also room.rs:205-245 and :1155-1175, ack.rs:95-213 (`stale()` filters on
+  `Some(s.tick) == last_acked`: so pinning the mirror's frame at `last_acked()` is exactly the stale copy's frame).
+
+## Rulings (advisor-u4r-build3)
+
+Source: the main folder's .checkpoints/netcode-proof-test/advisor-u4r-build3-full.md (sha256 78ebb5af..., 235 lines),
+section "The rulings" (:9-71) read whole at 01:42 UTC; each point's "Builder:" line is mine. Work order (the prompt):
+(1) code: 8 (A), 8 (B), 8 (D), 6 (1)-(3), 5's two precheck.rs changes, then fmt, clippy, npt-lab tests both builds;
+(2) runs once each: 3's tick16 bite and its clean partner, 8 (A)'s no-fallback bite and the clean P0 equality;
+(3) 6 (4) c-u4r-r2.mjs, its npt-lab lines by hand; (4) report words 8 (C), (E), (F), points 1, 2, 4, 7; (5) r5, then
+section 5's end checks twice.
+
+| Point | What | State |
+|---|---|---|
+| 1 | B1: no code, no re-run; report words (FAIL under condition 5, three cause lines, window means, 0.919, U4g's) | report only |
+| 2 | ES: no code, no re-run; report words (50.05 vs 9.5-10.5 beside 7.250; 68.5-69.5 % hits; U4h's) | report only |
+| 3 | tick16 bite at --tick-start 64651 (bites build) and clean partner at 64936 (measured build), each once | both run once (c5-p3.log); clean partner as expected; the bite run as expected but `after_capped` false: stopped, to the advisor |
+| 4 | -18 bite: no code; report words (25 fast heals counted apart: 14 burst 0 age 0, 11 burst 1 age 33/34; 71 slow after full state; 2,314 breaches; 0.48) | report only |
+| 5 | precheck.rs: L from the leg's configured lead (not `let lead = 2u32`); whole deviation list or count <= 64 asserted | done (c5-3.log) |
+| 6 | contract.rs (1) class_audit breaches fail (but owner-to-all) + 6th doctored case; (2) module doc; (3) unreadable input own exit code in USAGE; (4) c-u4r-r2.mjs | (1)-(3) done (c5-3.log); (4) script written, its lines not yet run by hand |
+| 7 | after cap and mirror tick keying accepted: no change; report words | report only |
+| 8 | (A) mirror keeps the frame at last_acked() beyond FRAMES_KEPT + its bite run and clean P0 equality; (B) baseline_age row; (C) labels regen/, regen-all/; (D) burst_spacing_ns in every B1 header; (E), (F) report words | (A) code done, its two runs not yet; (B), (D) done; (C), (E), (F) open |
+
+### Work item (1): the third ruling's code changes (written 01:44-01:49 UTC)
+
+- **8 (A)** mirror.rs: `ClientMirror::keep(tick, frame, pin)` keeps the newest FRAMES_KEPT frames whose tick is not
+  `pin`, plus the frame of `pin`; `Mirror::tick` gains `last_acked: Option<u32>` (the room's
+  `ClientSlot::last_acked()` for that slot after the tick; `#[allow(clippy::too_many_arguments)]` with its reason);
+  FRAMES_KEPT's doc says why (ack.rs `stale()` returns the stale copy only while its tick is `last_acked`, so the pin
+  is exactly the stale copy's frame). scenario.rs `run` passes `server.room.client(slot).and_then(|c| c.last_acked())`;
+  the p2 test's call passes the same for slot 0. The early return on a missing baseline is unchanged.
+- **8 (B)** SERIES.md's `event.burst_eviction.baseline_age` row: "...at the first tick after the burst; 0: coded
+  against the per-type defaults (no baseline); -1: no snapshot sent that tick".
+- **8 (D)** scenario.rs: `Settings.burst_spacing_ns` (`--burst-every-s` x 10^9, saturating; 0 off B1), and `params`
+  writes `burst_spacing_ns` beside `burst_starts_ns` on every run with bursts (so in all three logs' headers).
+- **6 (1)** contract.rs `audit`: the lab log's `class_audit` `breaches_count` printed on every run ("class audit:
+  breaches_count N (the first: ...)"); a failure when the event or the count is missing, or the count is above 0,
+  unless the header's bite is npt-room's class-filter bite. **Choice (for the report):** the id is not spelled in
+  npt-lab's sources (brief section 4: "npt-lab's sources never spell another crate's bite id as a string literal"):
+  `room_class_filter_bite` takes it from `npt_room::BITES` at run time, the one id there outside the `PM-` form
+  (room/src/lib.rs:32-46 documents it so); a measured build holds no list, so its contract never exempts. Test: a
+  sixth doctored case (breaches_count 1 added: fails by its exact text), and in the bites build the exemption for
+  `catalogue-5/owner-to-all` (the test module may spell ids) and a failure for another bite's breaches.
+- **6 (2)** the module doc now says carry 60's missing params are a failure, names the class audit, and lists the
+  exit codes.
+- **6 (3)** `UNREADABLE` = 3: a `--series` file or a log that cannot be opened is exit 3, "cannot read ...", on
+  stderr (main.rs), never "contract: FAIL"; a log that npt-log's reader refuses stays a FAIL (exit 1, "FAIL (c) <path>
+  does not read back as a log"). USAGE names the four codes. Test
+  `r2_an_input_that_cannot_be_read_is_exit_3_never_the_contract_s_fail` (empty folder; missing SERIES file).
+- **5** precheck.rs: `LegOutcome.lead` (the leg's configured lead, set by `run_leg`); r6 passes P0's `lead_for` and
+  asserts `o.lead` is it, takes L from `o.lead`, asserts `depth_deviations <= 64` and the kept list's length equals
+  it before comparing, and builds the end set from the records' slots (not 0..48). The leg lines of `pair` print the
+  leg's own `o.lead` (room configuration and depth lines), so the field is read outside the tests too.
+- Runs: .gate/u4r/c5-1.log (-k, shared, 01:49:20-01:53:04 UTC, df 4.9G): fmt exit 1 (2 hunks, contract.rs), clippy
+  exit 101 both builds ("field `lead` is never read": fixed as above); `cargo test --locked -p npt-lab -p npt-bots`
+  exit 0, npt-lab bin **47 passed, 1 ignored** (46 + the exit-3 test), lib 5, behaviour.rs 5; with `--features
+  npt-lab/bites` exit 0, npt-lab bin **54 passed, 1 ignored** (53 + 1). Then the 2 fmt hunks applied by Edit and the
+  lead lines changed; c5-2.log (01:53:35-01:53:37): fmt exit 0, clippy `-p npt-lab -p npt-bots --all-targets -D
+  warnings` exit 0 and with `--all-features` exit 0. Tests re-run on that final code: c5-3.log (01:53:40-01:57:27,
+  runner exit 0): clean npt-lab bin **47 passed, 1 ignored**, lib 5, bots 5; bites npt-lab bin **54 passed, 1
+  ignored**, lib 5, bots 5. **Item (1) done.**
+- ops/runs/c-u4r-r2.mjs written (work item 3's file; `node --check` ok): its lines are run by hand after item (2).
+
+### Work item (2), point 3's pair: run once each (.gate/u4r/c5-p3.log, -x -k, 01:57:39-01:58:27 UTC, df 4.9G, up 38 min)
+
+- One call: `cargo build --release --locked -p npt-judge`, `... -p npt-lab --features bites`, then the bite run's three
+  lines, then `cargo build --release --locked -p npt-lab` (the measured build, rule 8), then the clean partner's three
+  lines. Every command exit 0. Label (point 33): tree 2fbec77 plus the uncommitted U4r changes; header.build.commit
+  names 2fbec77; the bite run's binary dba6232ed87f59640eda5be82206d738e80954461a19098ba7f8bfbfb1c733f0 (features
+  bites), the clean run's 76fd20903636bfea85298168f23934f4f6b8410943b7e996d53edf555e1115d2. Verdicts: tick16d-verdict.json
+  76291cbc..., tick16-clean-verdict.json d774ff87....
+- **(1) the tick16 bite run** (`--run u4r-r2-tick16-4 ... --out .gate/u4r/r2/tick16d --scene SS --profile P0 --seed 1
+  --tick-start 64651 --warmup-s 10 --measured-s 20 --after-max-s 5 --role bite --bite PM-0001-17/tick16 --marks
+  PM-0001-2,PM-0001-17 --suite r2-tick16`): header ticks_below_wrap **885**; measured ticks 64,951-65,550, the wrap at
+  measured tick 585. Summary: 946 ticks (**46 after**, no cap note); commands 42,480; late 0; rewinds refused 48;
+  overflow resyncs 48; client hashes 45,360 (sentinels 2,880); measured incomplete 720 (= 48 x the 15 post-wrap
+  measured ticks 65,536-65,550); decided lost at the stop 1,488; shots 700 a measured second; carry 49 1.0000, 298.97;
+  **audit 0 breaches**. contract: **PASS** ("class audit: breaches_count 0"; (e) 700.80 in). The judge: PM-0001-17's
+  bite PM-0001-17/tick16 **shown**: run valid **true** (so pre:PM-0001-2 held), check "100 % of decoded snapshots
+  rebuild..." **fail, value 2,880, needs == 0** (>= 48 as expected). Read-only from room.jsonl: every slot holds
+  everyone on 600 of 600 measured ticks (share 1.0); the flag sum is 48 from 64,652 to 65,566, 0 from **65,567** (after
+  phase) to 65,595, 48 again from 65,596; the 48 overflow_resync events all at tick **65,596**; run_lengths
+  `after_capped` **false**, after_ticks_count 46.
+- **Differs from the ruling's expectation in one item: `after_capped` is false, not true.** Everything else holds
+  (PM-0001-2 valid, -17 FAIL with 2,880 >= 48, 0 mirror breaches, contract PASS). Why (from the logs): the room keeps the
+  pre-wrap baselines until about wrap + 31 (65,567, as tick16c's 65,566 + 1), then at 65,596 (wrap + 60) sends each
+  bitten client a full state by overflow resync, and that resolves the 15 post-wrap measured ticks as lost, so every
+  measured tick is resolved 46 ticks into the after phase, before the 150-tick cap. The run ends by carry 62 (e)'s
+  normal path, not by the bite run's cap. **Stopped here (condition 5; the prompt's rule): not re-run; to the main
+  session and the advisor.** Open question for them: is the expectation "after_capped is true" to be read as not
+  required at this setting (the cap path is not reached because the overflow resync resolves the measured ticks), and
+  does c-u4r-r2.mjs's tick16 `expect` text (it says "after_capped true") change with it?
+- **(2) the clean partner** (`--run u4r-r2-tick16-clean-1 ... --out .gate/u4r/r2/tick16-clean ... --tick-start 64936
+  --warmup-s 10 --measured-s 20 --after-max-s 5 --marks PM-0001-2,PM-0001-17,PM-0001-57 --suite r2-tick16-clean`, no
+  bite; the wrap at measured tick 300): 900 ticks (**0 after**: resolved without the cap); commands 43,152; late 0;
+  rewinds refused 0; client hashes 43,152 (sentinels 0); measured incomplete 0; **0 breaches**; contract PASS. The
+  judge, per run (valid true): PM-0001-2 all 11 SS checks pass (48, 16, 48, 15, 4, 300, 700.8 in [665, 735], portal 1
+  in [0.95, 1.05], everyone in view 1 >= 0.99); -17 pass (0 == 0); -57 pass (6,981; 2,750; 88,044). **As expected on
+  every item**, and it shows ruling 3's point 7 (b) (frames by the room's tick) across the wrap.
+
+## Copy 5: state and what is next (a fresh copy resumes here)
+
+- **Copy 5 stopped at 02:00 UTC at a clean point, by the stop rule** (an outcome that differs from the ruling's
+  expectation: point 3's tick16 bite run's `after_capped` false; the block above). No plant in place; no half edit; no
+  run going (no npt-lab, cargo or rustc process); the measured release build is the last one built (c5-p3.log). df
+  4.9G; .gate/u4r/r2/ holds 145 MB.
+- `git status` holds copy 4's 26 entries plus copy 5's changes: mirror.rs, scenario.rs, contract.rs, main.rs,
+  precheck.rs, marks/SERIES.md (one row's words), and ops/runs/c-u4r-r2.mjs (new). Nothing committed.
+- Clean at: c5-2.log (fmt exit 0; clippy -p npt-lab -p npt-bots --all-targets -D warnings exit 0, and with
+  --all-features exit 0) and c5-3.log (npt-lab bin 47 passed, 1 ignored; bites 54 passed, 1 ignored; lib 5; bots 5).
+- **Next, in order, once the main session answers (the advisor's reading of point 3's `after_capped`):**
+  1. Point 8 (A)'s runs, each once, in one -x call: bites build, then `npt-lab scenario --run u4r-r2-b1-nofallback-1
+     --set u4r-r2 --date 2026-11-14 --commit 2fbec77... --out .gate/u4r/r2/b1-nofallback2 --scene SS --profile B1
+     --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 30 --bursts 2 --burst-first-s 5 --burst-every-s 15 --role
+     bite --bite PM-0001-18/no-fallback --marks PM-0001-2,PM-0001-17,PM-0001-57,PM-0001-18 --suite r2-b1`, contract,
+     `npt-judge --only PM-0001-2,PM-0001-17,PM-0001-57,PM-0001-18`; expected 0 breaches, -18's max FAIL, INVALID by
+     pre:PM-0001-2 reported (anything else goes to the advisor). Then the measured build and the clean P0 equality:
+     `--run u4r-r2-p0-1 ... --out .gate/u4r/r2/p0-s1c --scene SS --profile P0 --seed 1 --tick-start 63736 --warmup-s 10
+     --measured-s 20 --marks PM-0001-2,PM-0001-17,PM-0001-57 --suite r2-p0`, compared record for record (read-only)
+     with r2/p0-s1b (every line after the header equal; the header equal but build.binary_sha256) and with r2/p0-s1
+     (equal but run_lengths' added after_capped). The B1 header now carries burst_spacing_ns (15,000,000,000): check it.
+  2. Item (3): c-u4r-r2.mjs's npt-lab lines run by hand on this tree (short: they are the r2 suites themselves; the
+     script refuses uncommitted changes, so each line is run through the runner as copy 4 did for c-u4r-runs.mjs),
+     after the tick16 `expect` text follows the advisor's answer.
+  3. Item (4): report words: 8 (C) labels (.gate/u4r/regen/ and regen-all/: "tree: 2fbec77 plus the uncommitted U4r
+     changes; no header"); 8 (E) (21 rows, not 22; tick16's flags 0 from 65,715, first collapse 65,567; the bitten
+     run's PM-0001-2 value 0.48; the P0 sum 27,816; window figures as means); 8 (F) (npt-lab writes
+     tick.s.everyone_in_view from its mirror; SERIES.md:368 names npt-room); points 1, 2, 4, 7 by their Builder lines.
+  4. Item (5): r5 (seeds 1-3 per scene and profile, the slowest kept; 7.3's estimate redone), then section 5's end
+     checks twice, last.
+- Not done and not in my Builder lines (for the main session, point 3's and point 1's main-session items): c-u4r-runs.mjs
+  still runs the judged tick16 bite at tick_start 63,736 (ruling 3 point 3: 65,551 - (warm-up + measured ticks), 47,251
+  for 300 + 18,000) and still runs -18's no-fallback bite on B1 (point 1: moved to U4g). Unchanged until the main
+  session says.

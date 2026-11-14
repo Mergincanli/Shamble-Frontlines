@@ -1437,7 +1437,7 @@ index dbfd0d5..8bc3479 100644
  pub struct TickHash {
      /// The recording both legs replay (the same name on both legs), as its manifest names it.
 diff --git a/spikes/netcode-proof/crates/lab/src/main.rs b/spikes/netcode-proof/crates/lab/src/main.rs
-index aa02208..c2f348a 100644
+index aa02208..dcd2e4e 100644
 --- a/spikes/netcode-proof/crates/lab/src/main.rs
 +++ b/spikes/netcode-proof/crates/lab/src/main.rs
 @@ -13,9 +13,15 @@
@@ -1456,7 +1456,7 @@ index aa02208..c2f348a 100644
  
  use npt_l1::Profile;
  use npt_log::{Ended, Header, SCHEMA, Writer};
-@@ -216,10 +222,92 @@ fn main() -> ExitCode {
+@@ -216,10 +222,95 @@ fn main() -> ExitCode {
              }
          };
      }
@@ -1531,6 +1531,9 @@ index aa02208..c2f348a 100644
 +            Err((code, e)) => {
 +                if code == 2 {
 +                    eprintln!("npt-lab contract: {e}\nusage: {}", contract::USAGE);
++                } else if code == contract::UNREADABLE {
++                    // Not the contract's FAIL (the advisor's U4r build ruling 3, point 6 (3)).
++                    eprintln!("npt-lab contract: {e} (exit {code}: an input that cannot be read)");
 +                } else {
 +                    println!("{e}");
 +                }
@@ -1899,7 +1902,7 @@ index 01c465e..2f463d7 100644
          }
      }
 diff --git a/spikes/netcode-proof/marks/SERIES.md b/spikes/netcode-proof/marks/SERIES.md
-index 4d08c19..6af6641 100644
+index 4d08c19..9672bd2 100644
 --- a/spikes/netcode-proof/marks/SERIES.md
 +++ b/spikes/netcode-proof/marks/SERIES.md
 @@ -330,6 +330,37 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
@@ -1928,7 +1931,7 @@ index 4d08c19..6af6641 100644
 +| `tick.s.input_payload_bytes` | bytes | npt-lab | the room log: each `Input` datagram's payload the clients sent since the last tick, in send order (not one per slot) | none (recorded) |
 +| `event.admit.session`, `.in_roster` | identifier; flag (true or false) | npt-lab (the room log) | per admission (field `slot`): the session's id in the run, and whether its join was in the room's roster (README §4's `roster` rule reads `in_roster`) | the `roster` rule |
 +| `event.burst_heal.full_state`, `.queue_max_count` | flag; count | npt-lab (L1) | per heal record (fields `slot`, `burst`): 1 when a `FullState` reached that client during the burst (a full state never counts as the heal); the client's event queue's high-water mark from the burst's start to its heal (carry 58) | -18 (reported) |
-+| `event.burst_eviction.baseline_age` | count (ticks), signed | npt-lab (from npt-room) | per client per burst (fields `slot`, `burst`): the age of the client's baseline at the first tick after the burst, -1 when it had none | -18 (recorded) |
++| `event.burst_eviction.baseline_age` | count (ticks), signed | npt-lab (from npt-room) | per client per burst (fields `slot`, `burst`): the age of the client's baseline at the first tick after the burst; 0: coded against the per-type defaults (no baseline); -1: no snapshot sent that tick | -18 (recorded) |
 +| `event.counter_wrap.counter` | name | npt-lab | the counter that wrapped (beside `tick_count`) | -58 (recorded) |
 +| `event.snap_refused.kind` | name | npt-lab (from npt-room's refusal counters) | `out_of_range`, `too_many`, `too_large` or `not_canonical` (beside `tick_count`) | none (recorded) |
 +| `event.client_counts.commands_count`, `.steps_without_command_count`, `.duplicate_stamps_count`, `.late_count`, `.press_refused_count`, `.buffer_full_count`, `.rewinds_refused_count`, `.stale_count`, `.events_queued_count`, `.overflow_resyncs_count` | count | npt-lab (from npt-bots, npt-room and npt-client's counters) | per client at the run's end (field `slot`): commands given, client steps without one, two commands stamped for one tick (D13 only), the room's late, press-refused, buffer-full and refused-rewind counts, `ClientEndpoint::stale()`, events queued, overflow resyncs (carries 74 and 77 (c)) | none (r2 reports them) |
@@ -2232,10 +2235,10 @@ index 0000000..9c4b6c5
 +}
 diff --git a/spikes/netcode-proof/crates/lab/src/contract.rs b/spikes/netcode-proof/crates/lab/src/contract.rs
 new file mode 100644
-index 0000000..ccff3d4
+index 0000000..d7947e2
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/contract.rs
-@@ -0,0 +1,478 @@
+@@ -0,0 +1,620 @@
 +//! r2, the contract test's checker (u4r-brief.md 2.4 r2 (b), (c) and (e); U4R-Q11 (a)): one run's three logs, read
 +//! back, against marks/SERIES.md and the judge's validity inputs. The judge's own half, (a) every check of the parts
 +//! the run's header lists resolving with no gap and (d) PM-0001-2 passing, is `npt-judge --only` on the same folder:
@@ -2250,10 +2253,19 @@ index 0000000..ccff3d4
 +//!   PM-0001-30 alone, which judges no U4r run, so this asks it of every run (stronger than "where it applies").
 +//! - **(e) the shot band** (§4.13 :446-447): the measured seconds' mean of the room's `second.v.shots_count`, SS within
 +//!   [665, 735], ES within [68.4, 75.6].
++//! - **The class audit** (the advisor's U4r build ruling 3, point 6 (1)): the lab log's `class_audit` event, its
++//!   `breaches_count` printed on every run; a run with no such event, or with a count above 0, fails, unless the run's
++//!   bite (its header's) is npt-room's class-filter bite, r4's, which must breach (catalogue item 5: the one id of
++//!   `npt_room::BITES` outside the `PM-` form, room/src/lib.rs:32-46, looked up at run time in a bites build and never
++//!   spelled here). The mirror's figures (everyone in view, -57's pairing, the audit) hold only on a run it followed.
++//! - **Carry 60:** the weapon and health params in every log's header; a missing one is a failure.
 +//!
-+//! The carries' figures the logs give (reported, never a failure): 60 (the weapon and health params in every header:
-+//! a failure if missing), 62 (h) (the measured phase's sum of `tick.s.snap_incomplete`), 58, 74, 77 (c), the
-+//! rewinds refused, and -18's heal records.
++//! The other carries' figures the logs give (reported, never a failure): 62 (h) (the measured phase's sum of
++//! `tick.s.snap_incomplete`), 58, 74, 77 (c), the rewinds refused, and -18's heal records.
++//!
++//! Exit codes (`main`): 0 PASS, 1 FAIL (every failure by name; a log that npt-log's reader refuses is one), 2 a usage
++//! error, 3 an input that cannot be read (the `--series` file or a log in the `--logs` folder), never reported as the
++//! contract's FAIL (point 6 (3)).
 +
 +use std::collections::{BTreeMap, BTreeSet};
 +use std::path::Path;
@@ -2261,7 +2273,10 @@ index 0000000..ccff3d4
 +use npt_log::{Log, Phase};
 +
 +/// `contract`'s usage line.
-+pub(crate) const USAGE: &str = "npt-lab contract --logs <run folder> --series <SERIES.md>";
++pub(crate) const USAGE: &str = "npt-lab contract --logs <run folder> --series <SERIES.md> (exit 0 PASS, 1 FAIL, \
++2 a usage error, 3 an input that cannot be read: the --series file or a log in the --logs folder)";
++/// The exit code of an input that cannot be read (the module text).
++pub(crate) const UNREADABLE: u8 = 3;
 +
 +/// The event fields that name an event's subject and are no measured value (SERIES.md:313).
 +const IDENTIFIERS: [&str; 3] = ["slot", "burst", "seq"];
@@ -2390,6 +2405,7 @@ index 0000000..ccff3d4
 +            o.failures.push(format!("(c) no {p} log"));
 +        }
 +    }
++    audit(logs, &mut o);
 +    let Some(room) = by_process(logs, "room") else {
 +        return o;
 +    };
@@ -2468,6 +2484,59 @@ index 0000000..ccff3d4
 +    }
 +    carries(logs, &mut o);
 +    o
++}
++
++/// Whether `bite` is npt-room's class-filter bite, r4's (the module text): the one id of npt-room's own list outside the
++/// `PM-` form, read from that list at run time. A measured build holds no list, so it knows no bite as that one.
++fn room_class_filter_bite(bite: &str) -> bool {
++    #[cfg(feature = "bites")]
++    let room_s = npt_room::BITES.contains(&bite);
++    #[cfg(not(feature = "bites"))]
++    let room_s = false;
++    room_s && !bite.starts_with("PM-")
++}
++
++/// The class audit (the module text): the lab log's `class_audit` event, its `breaches_count` on every run.
++fn audit(logs: &[Log], o: &mut Outcome) {
++    let Some(lab) = by_process(logs, "lab") else {
++        return;
++    };
++    let Some(e) = lab.events.iter().find(|e| e.ev == "class_audit") else {
++        o.failures
++            .push("class audit: the lab log has no class_audit event".to_owned());
++        return;
++    };
++    let Some(n) = field_u64(e, "breaches_count") else {
++        o.failures
++            .push("class audit: the class_audit event has no breaches_count".to_owned());
++        return;
++    };
++    let first =
++        e.f.get("first_breach")
++            .and_then(serde_json::Value::as_str)
++            .unwrap_or("");
++    let bite = lab.header.bite.as_deref();
++    let exempt = bite.is_some_and(room_class_filter_bite);
++    o.lines.push(format!(
++        "class audit: breaches_count {n}{}{}",
++        if n > 0 {
++            format!(" (the first: {first:?})")
++        } else {
++            String::new()
++        },
++        if exempt {
++            "; the run's bite is npt-room's class filter (r4's), which must breach: not a failure"
++        } else {
++            ""
++        }
++    ));
++    if n > 0 && !exempt {
++        o.failures.push(format!(
++            "class audit: {n} breaches of the room-side mirror (the first: {first:?}), so its figures (everyone in \
++             view, -57's pairing, the audit) do not hold{}",
++            bite.map_or(String::new(), |b| format!(" (the run's bite {b})"))
++        ));
++    }
 +}
 +
 +/// The carries' figures (reported).
@@ -2556,21 +2625,31 @@ index 0000000..ccff3d4
 +    }
 +}
 +
-+/// The run folder's three logs, read back.
-+pub(crate) fn read(dir: &Path) -> Result<Vec<Log>, String> {
++/// The run folder's three logs, read back: `Err((UNREADABLE, why))` for a log that cannot be opened (the module text's
++/// exit 3), `Err((1, the FAIL lines))` for one that npt-log's reader refuses (a contract FAIL: the log is there and is
++/// not a log by README §1's discipline).
++pub(crate) fn read(dir: &Path) -> Result<Vec<Log>, (u8, String)> {
 +    ["room", "client", "lab"]
 +        .iter()
 +        .map(|p| {
 +            let path = dir.join(format!("{p}.jsonl"));
-+            let f = std::fs::File::open(&path).map_err(|e| format!("{}: {e}", path.display()))?;
-+            npt_log::read_log(std::io::BufReader::new(f))
-+                .map_err(|e| format!("{}: {e}", path.display()))
++            let f = std::fs::File::open(&path)
++                .map_err(|e| (UNREADABLE, format!("cannot read {}: {e}", path.display())))?;
++            npt_log::read_log(std::io::BufReader::new(f)).map_err(|e| {
++                (
++                    1,
++                    format!(
++                        "FAIL (c) {} does not read back as a log: {e}\ncontract: FAIL (1 failure)",
++                        path.display()
++                    ),
++                )
++            })
 +        })
 +        .collect()
 +}
 +
 +/// The `contract` subcommand: `Ok` with the lines when nothing failed, else `Err((1, lines and failures))`; a usage
-+/// error is `Err((2, ...))`.
++/// error is `Err((2, ...))`, an input that cannot be read `Err((UNREADABLE, ...))` (the module text).
 +pub(crate) fn main(argv: &[String]) -> Result<Vec<String>, (u8, String)> {
 +    let usage = |m: &str| (2u8, m.to_owned());
 +    let (mut logs, mut series) = (None, None);
@@ -2586,8 +2665,9 @@ index 0000000..ccff3d4
 +    let (Some(logs), Some(series)) = (logs, series) else {
 +        return Err(usage("--logs and --series are required"));
 +    };
-+    let text = std::fs::read_to_string(series).map_err(|e| (1, format!("{series}: {e}")))?;
-+    let read = read(Path::new(logs)).map_err(|e| (1, e))?;
++    let text = std::fs::read_to_string(series)
++        .map_err(|e| (UNREADABLE, format!("cannot read --series {series}: {e}")))?;
++    let read = read(Path::new(logs))?;
 +    let o = check(&read, &text);
 +    let mut lines = vec![format!("contract of {logs}:")];
 +    lines.extend(o.lines.iter().cloned());
@@ -2620,7 +2700,8 @@ index 0000000..ccff3d4
 +        read(&dir).expect("its logs")
 +    }
 +
-+    /// r2's checker passes the clean run, and each of U4R-Q11's four doctored copies fails it by name.
++    /// r2's checker passes the clean run, and each of U4R-Q11's four doctored copies fails it by name, and so do two
++    /// more: the shot band, and a mirror breach (the advisor's U4r build ruling 3, point 6 (1)).
 +    #[test]
 +    fn r2_the_checker_passes_a_clean_run_and_fails_each_doctored_copy_by_name() {
 +        let logs = short_run();
@@ -2698,7 +2779,71 @@ index 0000000..ccff3d4
 +            f,
 +            ["(e) the shot band: the measured mean is outside it".to_owned()]
 +        );
-+        println!("r2: the five doctored copies each fail by name");
++        // (6) the advisor's U4r build ruling 3, point 6 (1): one breach of the mirror added to the lab log's audit.
++        let lab = logs
++            .iter()
++            .position(|l| l.header.process == "lab")
++            .expect("a lab log");
++        let mut d = logs.clone();
++        let a = d[lab]
++            .events
++            .iter_mut()
++            .find(|e| e.ev == "class_audit")
++            .expect("the class audit");
++        a.f.insert("breaches_count".to_owned(), serde_json::json!(1));
++        a.f.insert(
++            "first_breach".to_owned(),
++            serde_json::json!("tick 2: client 0: planted"),
++        );
++        let f = check(&d, SERIES).failures;
++        assert_eq!(
++            f,
++            ["class audit: 1 breaches of the room-side mirror (the first: \"tick 2: client 0: planted\"), so its \
++              figures (everyone in view, -57's pairing, the audit) do not hold"
++                .to_owned()]
++        );
++        // Its one exception, r4's bite (bites builds only: npt-room's list is read at run time); another bite's
++        // breaches still fail.
++        #[cfg(feature = "bites")]
++        {
++            let mut x = d.clone();
++            x[lab].header.bite = Some("catalogue-5/owner-to-all".to_owned());
++            assert_eq!(
++                check(&x, SERIES).failures,
++                Vec::<String>::new(),
++                "r4's bite"
++            );
++            x[lab].header.bite = Some("PM-0001-18/no-fallback".to_owned());
++            assert_eq!(check(&x, SERIES).failures.len(), 1, "another bite");
++        }
++        println!("r2: the six doctored copies each fail by name");
++    }
++
++    /// The advisor's U4r build ruling 3, point 6 (3): a `--series` file or a log that cannot be read is exit 3 with its
++    /// own message, never the contract's FAIL (exit 1).
++    #[test]
++    fn r2_an_input_that_cannot_be_read_is_exit_3_never_the_contract_s_fail() {
++        let dir = scratch("r2-unreadable");
++        std::fs::create_dir_all(&*dir).expect("the folder");
++        let d = dir.to_str().expect("a UTF-8 path");
++        let argv = |logs: &str, series: &str| -> Vec<String> {
++            ["--logs", logs, "--series", series]
++                .iter()
++                .map(|s| (*s).to_owned())
++                .collect()
++        };
++        let series = format!("{}/../../marks/SERIES.md", env!("CARGO_MANIFEST_DIR"));
++        let e = main(&argv(d, &series)).expect_err("an empty folder: no log");
++        assert_eq!(e.0, UNREADABLE, "{}", e.1);
++        assert!(
++            e.1.starts_with("cannot read ") && !e.1.contains("FAIL"),
++            "{}",
++            e.1
++        );
++        let e = main(&argv(d, &format!("{d}/no-such-SERIES.md"))).expect_err("no SERIES file");
++        assert_eq!(e.0, UNREADABLE, "{}", e.1);
++        assert!(e.1.starts_with("cannot read --series "), "{}", e.1);
++        assert!(USAGE.contains("3 an input that cannot be read"));
 +    }
 +
 +    /// The row reader takes every backticked name of a first cell and joins `.x` shorthands to its record.
@@ -3508,10 +3653,10 @@ index 0000000..66761d6
 +}
 diff --git a/spikes/netcode-proof/crates/lab/src/mirror.rs b/spikes/netcode-proof/crates/lab/src/mirror.rs
 new file mode 100644
-index 0000000..ecbac68
+index 0000000..8e542eb
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/mirror.rs
-@@ -0,0 +1,473 @@
+@@ -0,0 +1,490 @@
 +//! The room-side frame mirror (u4r-brief.md 2.1, 2.4 r4; catalogue §6 item 5): each client's snapshots and full
 +//! states as the room handed them out (`take_datagrams`, `take_control`), decoded with npt-proto and the `Quant` that
 +//! client decodes with, and rebuilt into the frame the room meant that client to hold at each tick (its baseline's
@@ -3542,7 +3687,10 @@ index 0000000..ecbac68
 +pub(crate) const INTEREST_RADIUS_CM: i64 = 6_400;
 +/// A very large unit's parts, at least (PM-0001-2: "4 very large units of at least 20 parts").
 +pub(crate) const LARGE_UNIT_PARTS: usize = 20;
-+/// Frames kept per client: the ack ring's ticks and two more (a baseline is at most the ring old).
++/// Frames kept per client: the ack ring's ticks and two more (a baseline is at most the ring old). Beyond them each
++/// client also keeps the frame of the room's `ClientSlot::last_acked()` (room.rs:238), as the room's own stale copy
++/// does: under PM-0001-18/no-fallback the room codes against that tick's frame after it left the ring (ack.rs `stale`,
++/// taken only while its tick is `last_acked`), at ages 33 and more (the advisor's U4r build ruling 3, point 8 (A)).
 +const FRAMES_KEPT: usize = npt_sim::ACK_RING_TICKS as usize + 2;
 +
 +type Frame = BTreeMap<(EntityKind, u16), EntityRecord>;
@@ -3591,11 +3739,18 @@ index 0000000..ecbac68
 +        self.frames.iter().find(|(t, _)| *t == tick).map(|(_, f)| f)
 +    }
 +
-+    fn keep(&mut self, tick: u32, frame: Frame) {
++    /// Keeps `frame` as the room's frame of `tick`: the newest [`FRAMES_KEPT`] frames, and beyond them the frame of
++    /// `pin`, the room's `last_acked()` for this client (the constant's text). In a clean run the baseline is always
++    /// inside the ring, so the frames looked up are the same as with no pin.
++    fn keep(&mut self, tick: u32, frame: Frame, pin: Option<u32>) {
 +        self.frames.retain(|(t, _)| *t != tick);
 +        self.frames.push_back((tick, frame));
-+        while self.frames.len() > FRAMES_KEPT {
-+            self.frames.pop_front();
++        let unpinned = |t: u32| Some(t) != pin;
++        while self.frames.iter().filter(|(t, _)| unpinned(*t)).count() > FRAMES_KEPT {
++            let Some(i) = self.frames.iter().position(|(t, _)| unpinned(*t)) else {
++                break;
++            };
++            self.frames.remove(i);
 +        }
 +    }
 +}
@@ -3851,7 +4006,13 @@ index 0000000..ecbac68
 +    }
 +
 +    /// One tick's messages for `slot` (the room's datagrams and reliable messages, as it handed them out), decoded with
-+    /// `quant`: the frame rebuilt, the audit run, and -57's errors of what the snapshot carried returned.
++    /// `quant`: the frame rebuilt, the audit run, and -57's errors of what the snapshot carried returned. `last_acked`
++    /// is the room's `ClientSlot::last_acked()` for `slot` after the tick, whose frame is kept beyond the ring's
++    /// ([`FRAMES_KEPT`]'s text).
++    #[allow(
++        clippy::too_many_arguments,
++        reason = "the room's tick output for one client, and the one room value the frames' keep needs"
++    )]
 +    pub(crate) fn tick(
 +        &mut self,
 +        slot: u8,
@@ -3860,6 +4021,7 @@ index 0000000..ecbac68
 +        control: &[Vec<u8>],
 +        quant: Quant,
 +        room: &Records<'_>,
++        last_acked: Option<u32>,
 +    ) -> Errors {
 +        let mut errs = Errors::default();
 +        if slot >= self.slots {
@@ -3896,7 +4058,7 @@ index 0000000..ecbac68
 +            c.latest = stats;
 +            // Kept under the room's tick: the room builds a full state at the tick it takes it (the wire's tick is
 +            // the same in a clean run, and a bitten header's under tick16).
-+            c.keep(tick, frame);
++            c.keep(tick, frame, last_acked);
 +        }
 +        let mut frame: Option<Frame> = None;
 +        for d in datagrams {
@@ -3980,17 +4142,17 @@ index 0000000..ecbac68
 +            let stats = self.stats(&f, room, slot);
 +            let c = &mut self.clients[usize::from(slot)];
 +            c.latest = stats;
-+            c.keep(tick, f);
++            c.keep(tick, f, last_acked);
 +        }
 +        errs
 +    }
 +}
 diff --git a/spikes/netcode-proof/crates/lab/src/precheck.rs b/spikes/netcode-proof/crates/lab/src/precheck.rs
 new file mode 100644
-index 0000000..d003ba4
+index 0000000..1eef179
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/precheck.rs
-@@ -0,0 +1,958 @@
+@@ -0,0 +1,977 @@
 +//! The -30 pre-check (u4r-brief.md 7.2; plan :772-796; the advisor's conditions 2 and 3; carry 40): a recorded npt-lab
 +//! test, never a judged id. Replay clients send the SS P0 recording's commands to one room over Loopback and to another
 +//! over L1 P0, in RQ8's order on one SimClock each, and `HashCompare::of` compares the two rooms' per-tick World hashes.
@@ -4114,6 +4276,8 @@ index 0000000..d003ba4
 +/// One leg's outcome (the module text).
 +#[derive(Clone, Debug, Default)]
 +pub(crate) struct LegOutcome {
++    /// The lead L this leg's replay clients paced by (its configured lead: `run_leg`'s `lead`).
++    pub(crate) lead: u32,
 +    pub(crate) hashes: Vec<TickHash>,
 +    pub(crate) late: u64,
 +    pub(crate) rewinds_refused: u64,
@@ -4329,7 +4493,10 @@ index 0000000..d003ba4
 +            released: false,
 +        });
 +    }
-+    let mut o = LegOutcome::default();
++    let mut o = LegOutcome {
++        lead,
++        ..LegOutcome::default()
++    };
 +    let mut admitted: BTreeMap<u8, u32> = BTreeMap::new();
 +    let mut first_run: BTreeMap<u8, (u32, u64)> = BTreeMap::new();
 +    let mut first_take: BTreeMap<u8, u32> = BTreeMap::new();
@@ -4658,22 +4825,24 @@ index 0000000..d003ba4
 +    for (leg, o) in [(Leg::Loopback, &a), (Leg::L1, &b)] {
 +        let admits: Vec<u32> = o.records.iter().filter_map(|r| r.admit_tick).collect();
 +        lines.push(format!(
-+            "leg {}: room configuration: layer {}, profile {}, cmd_timing B, lead {lead}, tick base World::new(scene, \
++            "leg {}: room configuration: layer {}, profile {}, cmd_timing B, lead {}, tick base World::new(scene, \
 +             {}, {}), seed {}, ring {} ms = {ring} ticks (HitHistory::for_ms)",
 +            leg.name(),
 +            leg.name(),
 +            if leg == Leg::L1 { "P0" } else { "none" },
++            o.lead,
 +            rec.seed,
 +            rec.first_tick,
 +            rec.seed,
 +            crate::scenario::ROOM_HISTORY_MS
 +        ));
 +        lines.push(format!(
-+            "leg {}: buffer_depth_ticks_count {lead} (the pacing lead, the value set); the room's measured depth at its \
++            "leg {}: buffer_depth_ticks_count {} (the pacing lead, the value set); the room's measured depth at its \
 +             take (input.rs:28-29: the newest buffered command's tick minus the tick taken) is L - 1 by definition under \
 +             this pacing: over the takes after each client's first (depth: takes) {:?}; takes where it is not L - 1: {}, \
 +             the first 64 (client, tick, measured) {:?}",
 +            leg.name(),
++            o.lead,
 +            o.depth,
 +            o.depth_deviations,
 +            o.deviations
@@ -4806,12 +4975,14 @@ index 0000000..d003ba4
 +    #[test]
 +    fn r6_a_clean_replay_runs_every_command_at_its_stamp_on_both_legs() {
 +        let r = short_recording();
-+        let lines = pair(&r, "SS-P0-s4", 2, None).expect("both legs run");
++        // `precheck`'s default lead, P0's (main: `lead_for`).
++        let p0 = crate::scenario::lead_for(&Profile::by_name("P0").expect("P0"));
++        let lines = pair(&r, "SS-P0-s4", p0, None).expect("both legs run");
 +        for l in lines.iter().filter(|l| !l.starts_with("  ")) {
 +            println!("r6: {l}");
 +        }
-+        let a = run_leg(&r, "SS-P0-s4", Leg::Loopback, 2, None).expect("loopback");
-+        let b = run_leg(&r, "SS-P0-s4", Leg::L1, 2, None).expect("L1");
++        let a = run_leg(&r, "SS-P0-s4", Leg::Loopback, p0, None).expect("loopback");
++        let b = run_leg(&r, "SS-P0-s4", Leg::L1, p0, None).expect("L1");
 +        for (leg, o) in [("loopback", &a), ("L1", &b)] {
 +            assert_eq!((o.late, o.rewinds_refused, o.off_stamp), (0, 0, 0), "{leg}");
 +            assert_eq!(o.records.len(), 48, "{leg}");
@@ -4831,14 +5002,24 @@ index 0000000..d003ba4
 +            assert_eq!(o.rtt_void, None, "{leg}");
 +            // Point 1 (4): L - 1 at every take after each client's first, but at the recording's last L - 1 ticks,
 +            // where the recording holds no command stamped j + L - 1, so the newest held is its last tick: there the
-+            // measured depth is exactly (last tick - j), one take per client and tick, and nothing else deviates.
-+            let lead = 2u32;
++            // measured depth is exactly (last tick - j), one take per client and tick, and nothing else deviates. L is
++            // the leg's configured lead, and the list compared is whole (at most 64 kept): the advisor's U4r build
++            // ruling 3, point 5.
++            let lead = o.lead;
++            assert_eq!(lead, p0, "{leg}: the leg's configured lead");
++            assert!(
++                o.depth_deviations <= 64 && o.deviations.len() as u64 == o.depth_deviations,
++                "{leg}: {} deviations, {} kept: the list compared must be whole",
++                o.depth_deviations,
++                o.deviations.len()
++            );
 +            let last = r.ticks.last().map(|t| t.tick).expect("ticks");
++            let slots: Vec<u8> = o.records.iter().map(|c| c.slot).collect();
 +            let end: Vec<(u8, u32, u32)> = (1..lead)
 +                .rev()
 +                .flat_map(|back| {
 +                    let j = last - (back - 1);
-+                    (0..48u8).map(move |s| (s, j, last - j))
++                    slots.iter().map(move |&s| (s, j, last - j))
 +                })
 +                .collect();
 +            let mut seen = o.deviations.clone();
@@ -5386,10 +5567,10 @@ index 0000000..241ef0d
 +}
 diff --git a/spikes/netcode-proof/crates/lab/src/scenario.rs b/spikes/netcode-proof/crates/lab/src/scenario.rs
 new file mode 100644
-index 0000000..1bfc26c
+index 0000000..460a3c9
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/lab/src/scenario.rs
-@@ -0,0 +1,2291 @@
+@@ -0,0 +1,2304 @@
 +//! `L1Scenario` (u4-build-plan.md §5 U4r; plan.md §4.7, RQ8; u4r-brief.md 2.1): one server and its clients on one
 +//! simulated clock, [`SimClock`] (integer ns), in RQ8's order at each instant:
 +//! 1. packets due: L1 applies every event due at or before the instant at the instant's first call (here the
@@ -5950,6 +6131,9 @@ index 0000000..1bfc26c
 +    pub(crate) warmup_ticks: u64,
 +    pub(crate) measured_ticks: u64,
 +    pub(crate) after_max_ticks: u64,
++    /// B1's scheduled interval between burst starts, ns, before each burst's offset (`--burst-every-s`); 0 on another
++    /// profile.
++    pub(crate) burst_spacing_ns: u64,
 +    pub(crate) behaviour: String,
 +    pub(crate) every_step: bool,
 +    pub(crate) bites: Bites,
@@ -6263,7 +6447,8 @@ index 0000000..1bfc26c
 +            for slot in 0..n {
 +                let datagrams = server.room.take_datagrams(slot);
 +                let control = server.room.take_control(slot);
-+                let errs = mirror.tick(slot, t, &datagrams, &control, quant, &index);
++                let acked = server.room.client(slot).and_then(|c| c.last_acked());
++                let errs = mirror.tick(slot, t, &datagrams, &control, quant, &index, acked);
 +                if s.logs && with_57 {
 +                    logs.errors(slot, t, errs);
 +                }
@@ -6615,6 +6800,8 @@ index 0000000..1bfc26c
 +    if !s.profile.bursts_ns.is_empty() {
 +        let starts: Vec<u64> = s.profile.bursts_ns.iter().map(|b| b.0).collect();
 +        p.insert("burst_starts_ns".into(), starts.into());
++        // SERIES.md's row names npt-lab (L1) as its writer (the advisor's U4r build ruling 3, point 8 (D)).
++        p.insert("burst_spacing_ns".into(), s.burst_spacing_ns.into());
 +    }
 +    if let Some(t) = twin {
 +        p.insert("twin".into(), t.into());
@@ -6783,6 +6970,11 @@ index 0000000..1bfc26c
 +        Some(id) => Bites::of(id)?,
 +    };
 +    let lead = lead_override.unwrap_or_else(|| lead_for(&profile));
++    let burst_spacing_ns = if profile.bursts_ns.is_empty() {
++        0
++    } else {
++        burst_every_s.saturating_mul(SEC)
++    };
 +    let mut s = Settings {
 +        meta: Meta {
 +            run,
@@ -6810,6 +7002,7 @@ index 0000000..1bfc26c
 +        warmup_ticks,
 +        measured_ticks,
 +        after_max_ticks,
++        burst_spacing_ns,
 +        behaviour,
 +        every_step,
 +        bites,
@@ -7561,6 +7754,7 @@ index 0000000..1bfc26c
 +                    &control,
 +                    Quant::default(),
 +                    &Records::new(&recs),
++                    s.room.client(0).and_then(|c| c.last_acked()),
 +                );
 +                let mut view = Vec::new();
 +                mirror.view(0, t, &mut view);
@@ -7680,6 +7874,158 @@ index 0000000..1bfc26c
 +        println!("p4 bite: measured incomplete {sum} of 16 clients");
 +        assert_eq!(sum, 16);
 +    }
++}
+diff --git a/spikes/netcode-proof/ops/runs/c-u4r-r2.mjs b/spikes/netcode-proof/ops/runs/c-u4r-r2.mjs
+new file mode 100644
+index 0000000..78ed0fc
+--- /dev/null
++++ b/spikes/netcode-proof/ops/runs/c-u4r-r2.mjs
+@@ -0,0 +1,146 @@
++#!/usr/bin/env node
++// U4r's contract test r2 (u4r-brief.md 2.4 r2), re-made from a commit: the advisor's U4r build ruling 3, point 6 (4).
++// The builder's own r2 runs are builder evidence only (ruling 2, point 33); this script's run from the merge commit is
++// the record, before -17's judged runs and before carry 62 (h)'s setup check is decided (7.1).
++//   node spikes/netcode-proof/ops/runs/c-u4r-r2.mjs --date YYYY-MM-DD
++// - Each suite's three lines exactly as the builder ran them (.gate/u4r/c3-r2-p0.log, c3-r2-suites.log and
++//   c3-r2-bites.log, U4r's copy 3; then copy 5's runs of ruling 3), but for --date, --commit and --out: `npt-lab
++//   scenario` (SS or ES, 48 clients, seed 1, a 10 s warm-up and 20 s measured unless the suite names other lengths),
++//   then `npt-lab contract --logs <its folder> --series marks/SERIES.md`, then `npt-judge --marks marks/marks.json
++//   --logs <its folder> --only <the run's marks> --out <suite>-verdict.json`.
++// - The suites: the ten measured ones of copy 3 (p0, p2, p3, b1; -21's option-B stand-ins forged, clamp, fast-clock and
++//   lag-switch; es, carry 59's; evstart, carry 75's); ruling 3's point 3 pair (the tick16 bite at tick_start 64,651, so
++//   the 16-bit wrap falls at measured tick 585, 15 before the measured end; and its clean partner at 64,936, the wrap at
++//   measured tick 300); and point 4's bitten B1 run (PM-0001-18/no-fallback; since point 8 (A) the mirror keeps the
++//   frame the room's stale copy codes against). Copy 3's three earlier tick16 tries (tick_start 65,506) stay builder
++//   evidence and are not re-made.
++// - Every command runs whatever the one before gave, each exit code recorded: a FAIL is a result here, never a stop and
++//   never re-run (condition 5). Expected, by ruling 3: b1 fails PM-0001-2's everyone-in-view share, so its -17 and -18
++//   are INVALID and not counted (point 1: npt-room's, fixed in U4g); es fails ES's reliable-events band (point 2: U4h's);
++//   b1-nofallback fails -18's max check and is INVALID by pre:PM-0001-2 while the room is unfixed (points 4 and 8 (A)).
++//   Each suite's line in r2.txt states what is expected beside what came; the main session reads both.
++// - Run it under the lane lock, exclusive (u4r-brief.md section 4 rule 2: it holds bite runs, and its outputs are a
++//   record): `bash <runner> -x <copy> <log> node ops/runs/c-u4r-r2.mjs --date ...` or the main folder's own runner.
++// - It refuses uncommitted changes to tracked files (every log names its commit). Its outputs go under
++//   .gate/netcode-proof-test/r2-<commit12>/ (gitignored): one folder per suite (its three logs), <suite>-verdict.json
++//   beside it, the binaries under bin/, and r2.txt (the commit, the binaries' SHA-256s, then per suite each command, its
++//   exit code, its wall seconds and its output). Never overwritten. It stops before a run when less than 4 GB is free
++//   (section 4 rule 6's floor). The binaries: npt-lab's measured and bites builds and npt-judge, built --release
++//   --locked, each artifact's path read from cargo's --message-format=json messages (check.mjs's builtArtifact) and
++//   copied out before the next build replaces it.
++
++import { spawnSync } from "node:child_process";
++import { createHash } from "node:crypto";
++import { copyFileSync, existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from "node:fs";
++import { dirname, join } from "node:path";
++import { fileURLToPath } from "node:url";
++import { builtArtifact } from "../../check.mjs";
++
++const SPIKE = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
++const ROOT = join(SPIKE, "..", "..");
++const GATE = join(ROOT, ".gate", "netcode-proof-test");
++/** The free space below which no run starts, bytes (section 4 rule 6's 4 GB floor). */
++const FLOOR = 4 * 1024 ** 3;
++const MARKS_17 = "PM-0001-2,PM-0001-17,PM-0001-57";
++const B1 = "--profile B1 --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 30 --bursts 2 --burst-first-s 5 --burst-every-s 15";
++
++/**
++ * The suites, in the order the builder ran them: `build` names the npt-lab build (`lab` measured, `bites`), `run` the
++ * run id, `args` the scenario's settings after --out, `marks` its header's marks (the judge's --only), `expect` ruling
++ * 3's or copy 3's outcome.
++ */
++const SUITES = [
++  { key: "p0", build: "lab", run: "u4r-r2-p0-1", args: "--scene SS --profile P0 --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 20", marks: MARKS_17, suite: "r2-p0", expect: "contract PASS; PM-0001-2's SS checks, -17 (0 mismatches) and -57 pass on the run" },
++  { key: "p2", build: "lab", run: "u4r-r2-p2-1", args: "--scene SS --profile P2 --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 20", marks: MARKS_17, suite: "r2-p2", expect: "contract PASS; PM-0001-2, -17 and -57 pass" },
++  { key: "p3", build: "lab", run: "u4r-r2-p3-1", args: "--scene SS --profile P3 --seed 1 --tick-start 63736 --warmup-s 10 --measured-s 20", marks: MARKS_17, suite: "r2-p3", expect: "contract PASS; PM-0001-2, -17 and -57 pass (carry 62 (g): P3, the reorder step on)" },
++  { key: "b1", build: "lab", run: "u4r-r2-b1-1", args: `--scene SS ${B1}`, marks: `${MARKS_17},PM-0001-18`, suite: "r2-b1", expect: "contract PASS; PM-0001-2 FAIL (everyone in view 0.273333, needs >= 0.99), so -17 and -18 L1 B1 INVALID by pre:PM-0001-2, recorded and not counted; -57 passes (ruling 3, point 1: npt-room's, fixed in U4g)" },
++  { key: "forged", build: "lab", run: "u4r-r2-forged-1", args: "--scene SS --profile P0 --seed 1 --warmup-s 10 --measured-s 20 --behaviour presses", marks: "PM-0001-2", suite: "forged", expect: "contract PASS; PM-0001-2 passes" },
++  { key: "clamp", build: "lab", run: "u4r-r2-clamp-1", args: "--scene SS --profile P0 --seed 1 --warmup-s 10 --measured-s 20 --behaviour clamp", marks: "PM-0001-2", suite: "clamp", expect: "contract PASS; PM-0001-2 passes" },
++  { key: "fast-clock", build: "lab", run: "u4r-r2-fast-clock-1", args: "--scene SS --profile P0 --seed 1 --warmup-s 10 --measured-s 20 --behaviour steady", marks: "PM-0001-2", suite: "fast-clock", expect: "contract PASS; PM-0001-2 passes" },
++  { key: "lag-switch", build: "lab", run: "u4r-r2-lag-switch-1", args: "--scene SS --profile P1 --seed 1 --warmup-s 10 --measured-s 20 --behaviour steady", marks: "PM-0001-2", suite: "lag-switch", expect: "contract PASS; PM-0001-2 passes" },
++  { key: "es", build: "lab", run: "u4r-r2-es-1", args: "--scene ES --profile P0 --seed 1 --warmup-s 10 --measured-s 20", marks: "PM-0001-2", suite: "r2-es", expect: "contract PASS; PM-0001-2 FAIL by ES's reliable events (50.05 a second against 9.5-10.5), the other 11 ES checks pass; no ES run counts at U4r (ruling 3, point 2: U4h's)" },
++  { key: "evstart", build: "lab", run: "u4r-r2-evstart-1", args: "--scene SS --profile P0 --seed 1 --tick-start 63736 --event-start 65533 --warmup-s 10 --measured-s 20", marks: "PM-0001-2,PM-0001-17", suite: "r2-evstart", expect: "contract PASS; PM-0001-2 and -17 (0 mismatches) pass (carry 75)" },
++  { key: "tick16", build: "bites", run: "u4r-r2-tick16-4", args: "--scene SS --profile P0 --seed 1 --tick-start 64651 --warmup-s 10 --measured-s 20 --after-max-s 5 --role bite --bite PM-0001-17/tick16", marks: "PM-0001-2,PM-0001-17", suite: "r2-tick16", expect: "contract PASS (0 mirror breaches); PM-0001-2 passes; -17's bite run FAILs by decoded_hash_mismatch_count with at least 48 mismatches; after_capped true (ruling 3, point 3; carry 73)" },
++  { key: "tick16-clean", build: "lab", run: "u4r-r2-tick16-clean-1", args: "--scene SS --profile P0 --seed 1 --tick-start 64936 --warmup-s 10 --measured-s 20 --after-max-s 5", marks: MARKS_17, suite: "r2-tick16-clean", expect: "contract PASS (0 mirror breaches); PM-0001-2, -17 (0 mismatches) and -57 pass; the after phase resolves without the cap (ruling 3, point 3)" },
++  { key: "b1-nofallback", build: "bites", run: "u4r-r2-b1-nofallback-1", args: `--scene SS ${B1} --role bite --bite PM-0001-18/no-fallback`, marks: `${MARKS_17},PM-0001-18`, suite: "r2-b1", expect: "contract PASS (0 mirror breaches, ruling 3, point 8 (A)); -18's max check FAILs (a heal later than 500 ms); INVALID by pre:PM-0001-2 is expected while npt-room is unfixed (ruling 3, points 4 and 8 (A))" },
++];
++
++function sh(cmd, args, cwd = SPIKE) {
++  const r = spawnSync(cmd, args, { cwd, encoding: "utf8", maxBuffer: 1 << 28 });
++  if (r.status !== 0) throw new Error(`${cmd} ${args.join(" ")}: exit ${r.status}\n${r.stdout}${r.stderr}`);
++  return r.stdout.trim();
++}
++
++const sha256 = (path) => createHash("sha256").update(readFileSync(path)).digest("hex");
++
++/** One release build, its artifact's path read from cargo's JSON messages and copied to `to`. */
++function build(args, target, to) {
++  const out = sh("cargo", ["build", "--release", "--locked", ...args, "--message-format=json"]);
++  const path = builtArtifact(out, { target, kind: "bin" });
++  if (!path) throw new Error(`cargo build ${args.join(" ")} names no ${target} executable in its JSON messages`);
++  copyFileSync(path, to);
++  return to;
++}
++
++/** Stops before a run when less than FLOOR bytes are free where the logs go. */
++function floor(what) {
++  const s = statfsSync(ROOT);
++  const free = s.bavail * s.bsize;
++  if (free < FLOOR) throw new Error(`${what}: ${(free / 1024 ** 3).toFixed(1)} GB free, below the 4 GB floor: stopped before it`);
++}
++
++/** One command, run from the spike whatever it gives: its line, exit code, wall seconds and output. */
++function step(exe, args) {
++  const t0 = Date.now();
++  const r = spawnSync(exe, args, { cwd: SPIKE, encoding: "utf8", maxBuffer: 1 << 28 });
++  const secs = ((Date.now() - t0) / 1000).toFixed(1);
++  const code = r.status ?? `signal ${r.signal}`;
++  return [`$ ${[exe, ...args].join(" ")}`, `exit ${code} (wall ${secs} s)`, `${r.stdout ?? ""}${r.stderr ?? ""}`.trimEnd()];
++}
++
++function main(argv) {
++  const date = argv.includes("--date") ? argv[argv.indexOf("--date") + 1] : undefined;
++  if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? "") || argv.length !== 2) throw new Error("usage: c-u4r-r2.mjs --date YYYY-MM-DD");
++  if (sh("git", ["status", "--porcelain", "--untracked-files=no"])) {
++    throw new Error("tracked files have uncommitted changes: commit first, since every log names its commit");
++  }
++  const commit = sh("git", ["rev-parse", "HEAD"]);
++  const out = join(GATE, `r2-${commit.slice(0, 12)}`);
++  if (existsSync(out)) throw new Error(`${out} exists: a run set is never overwritten`);
++  const bin = join(out, "bin");
++  mkdirSync(bin, { recursive: true });
++  const exe = {
++    lab: build(["-p", "npt-lab"], "npt-lab", join(bin, "npt-lab")),
++    bites: build(["-p", "npt-lab", "--features", "bites"], "npt-lab", join(bin, "npt-lab-bites")),
++  };
++  const judge = build(["-p", "npt-judge"], "npt-judge", join(bin, "npt-judge"));
++  const lines = [
++    `# U4r's r2, re-made from commit ${commit} on ${date} (the advisor's U4r build ruling 3, point 6 (4))`,
++    `npt-lab (measured build) sha256 ${sha256(exe.lab)}`,
++    `npt-lab (bites build) sha256 ${sha256(exe.bites)}`,
++    `npt-judge sha256 ${sha256(judge)}`,
++    "",
++  ];
++  for (const s of SUITES) {
++    floor(`suite ${s.key}`);
++    const logs = join(out, s.key);
++    const said = [
++      `## suite ${s.key} (the ${s.build === "lab" ? "measured" : "bites"} build); expected: ${s.expect}`,
++      ...step(exe[s.build], ["scenario", "--run", s.run, "--set", "u4r-r2", "--date", date, "--commit", commit, "--out", logs, ...s.args.split(" "), "--marks", s.marks, "--suite", s.suite]),
++      ...step(exe[s.build], ["contract", "--logs", logs, "--series", "marks/SERIES.md"]),
++      ...step(judge, ["--marks", "marks/marks.json", "--logs", logs, "--only", s.marks, "--out", join(out, `${s.key}-verdict.json`)]),
++      "",
++    ];
++    console.log(said.join("\n"));
++    lines.push(...said);
++  }
++  writeFileSync(join(out, "r2.txt"), `${lines.join("\n")}\n`);
++  console.log(`written: ${join(".gate", "netcode-proof-test", `r2-${commit.slice(0, 12)}`, "r2.txt")}`);
++}
++
++try {
++  main(process.argv.slice(2));
++} catch (e) {
++  console.error(`c-u4r-r2: ${e.message}`);
++  process.exit(1);
 +}
 diff --git a/spikes/netcode-proof/ops/runs/c-u4r-runs.mjs b/spikes/netcode-proof/ops/runs/c-u4r-runs.mjs
 new file mode 100644
