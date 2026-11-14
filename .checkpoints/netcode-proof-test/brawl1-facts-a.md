@@ -1,0 +1,32 @@
+# BRAWL-1 facts, part A (the brawl, the world, the recordings)
+
+Agent notes (read-only facts with file:line; no plan, no decision). Line numbers at HEAD 630c6c1 of
+claude/netcode-proof-test-plan-hcky5g unless said otherwise. Spike root: spikes/netcode-proof (SP below).
+
+## Plan
+1. Read rulings: advisor-u4r-sets-r2-full.md (BRAWL-1, Q1 Why a-f) [done], advisor-u4r-sets-r1-full.md (first form).
+2. A1: SP/crates/bots/src/lib.rs whole; callers (grep Behaviour / brawl in crates/lab, crates/client?).
+3. A2: client host decode path (crates/lab or crates/client): decoded entity for own slot; where server World is reachable.
+4. A3: SP/crates/sim/src/world.rs scene + scene.rs: homes, cluster centre, buildings, doors, crates, wall, vehicles.
+5. A4: world.rs collide() and the move per command.
+6. A5: crates/log record types; lab summary; SERIES.md; contract --series; message catalogue / class audit; judge, marks.json.
+7. A6: dependency rules in check.mjs, deny.toml, cargo metadata tests; ticks/s for sim alone in notes/logs.
+8. A7: precheck-recordings.json, det-recordings.json, ops/runs/det-u4.mjs, native-vs-Wasm hash test, r2 suites, hashes; rulings (carry 87, carry 40).
+9. A8: FP-7 item 1, carry 39, brief 2.6 words.
+10. A9: c-u4r-runs.mjs command form; PM-0001-2 measure; wall times from .gate/u4r-sets/*.log and runs.txt.
+
+## Findings (a line per finding, file:line)
+
+### A1 (the brawl's walk)
+- A1-1 MOVES: 16 [i8;2] vectors 22.5 deg apart, each |v| <= 127 (room's x^2+y^2 <= 127^2 check): SP/crates/bots/src/lib.rs:29-48. Pairs i and i+8 are exact negatives, so the 16 sum to 0.
+- A1-2 TURN_EVERY = 4 (u64, "a count of commands given, with no time or speed in it ... carry 39; advisor-u4r-r1, FP-7 item 1"): lib.rs:49-51. RETARGET_EVERY = 30: lib.rs:52-53. AIM_ABOVE_FEET_CM = 100: :54-55. BLIND_SPREAD_CM = 1,000: :56-57. FAR_CM = 32,000: :58-60.
+- A1-3 Kind enum Brawl/Presses/Clamp/Steady: lib.rs:62-73. Behaviour struct fields kind, team, teams, rng, phase, blind, target, every_step, presses, last_newest, given, skipped: lib.rs:76-92 (no position, no home, no scene geometry held).
+- A1-4 new(): rng = seed ^ (slot << 56) ^ 0x6e70_742d_626f_7473; phase = below(next(rng), 16) (first draw); blind = seeded point within +/-1,000 cm, z 100 (Clamp: +/-32,000): lib.rs:109-136. team/teams from Scene::team(slot): :124-125. splitmix64 next(): :95-101; below() multiply-shift: :104-106.
+- A1-5 pub API: `pub fn brawl(scene: &Scene, slot: u8, seed: u64) -> Behaviour` :139-141; `pub fn script(scene: &Scene, slot: u8, seed: u64, script: &str) -> Option<Behaviour>` :145-153; `pub fn every_step(mut self) -> Behaviour` :158-161; `pub fn given(&self) -> u64` :164; `pub fn skipped(&self) -> u64` :169.
+- A1-6 The per-step entry (no trait; an inherent method): `pub fn step(&mut self, endpoint: &mut ClientEndpoint, received: &[(Channel, Vec<u8>, u64)], now_ns: u64, view: &[(u8, [i32; 3])]) -> bool` lib.rs:178-184. It calls endpoint.input(None, received, now) :185; returns false until newest_tick() and slot() are Some :186-188; skips (skipped += 1) when newest tick did not move since the last command unless every_step :189-192; else command(newest, view), endpoint.input(Some(command), &[], now), last_newest = newest, given += 1 :193-197.
+- A1-7 command(): k = given (count of commands given BEFORE this one) :202; Presses moves PRESS_FIRE on odd k :203-205; aim = brawl_aim(k, view) for Brawl else blind :206-209; walk = MOVES[((k / TURN_EVERY + phase) % 16)] :210; Command{buttons: FIRE, presses, move_xy: walk (Clamp: [0,0]), aim, view_tick: newest, view_fraction: 0, ..default} :211-223. So fire is held on every command; the walk advances one vector every 4 commands GIVEN (not per tick), open loop: nothing in command() reads position.
+- A1-8 brawl_aim(): enemy = team Some and != own team; re-picks target when k % 30 == 0 or the target is not in view, uniformly among enemies in view by the rng; aims at target's [x, y, z+100] from view, else blind: lib.rs:228-243.
+- A1-9 What a Behaviour receives per tick today: the endpoint (mutable), `received` (the lab passes &[]), the host clock now_ns, and `view` = Vec<(slot u8, [x, y, z] grid cm)> of every Soldier in the mirror's frame of the client's newest tick, the client's OWN soldier included (mirror.rs:228-244 iterates every (Soldier, index) of the frame; the own section is inserted into the frame at mirror.rs:462 (`f.insert((kind, index), rebuilt)` for both sections) and from a full state at :383-388 (`.chain(&f.own)`), kept at :402). So the own position is ALREADY in `view` today, from the mirror (room-side), but brawl ignores it (enemy filter :229-232).
+- A1-10 Who calls it: only npt-lab's runner. scenario.rs:795-799 builds Behaviour::brawl(&scene, slot, s.seed) when s.behaviour == "brawl" else Behaviour::script; :800-804 every_step for D13. Step loop (5): scenario.rs:991-1018: c.endpoint.input(None, &received, host) :1004; mirror.view(c.slot, newest, &mut view) with newest = c.endpoint.newest_tick() :1005-1009; c.behaviour.step(&mut c.endpoint, &[], host, &view) :1011; then c.endpoint.step() :1018. Module doc order of each instant: scenario.rs:1-16 (step 5 at :13-15). No other non-test caller (grep `Behaviour::` / `.step(` over *.rs: scenario.rs:796-798, :1011 and crates/bots/tests/behaviour.rs only). npt-bots' own bins are 6-line stubs (src/bin/npt-bots.rs, npt-load.rs). The pre-check (precheck.rs) does not use Behaviour (its clients use a replay encoder: precheck.rs:9, :207, :461).
+- A1-11 Prior ruling on the view source: advisor-u4r-build1-full.md:54-57 (U4r build ruling 1 point 7): "Accepted as built. The brawl aims from the room-side frame of that client's newest tick: the mirror, fed with the room's datagrams before the link ... npt-client exposes no decoded record (R16), so a client-side view would need a seam change ... A follow-up goes to U6's brief ... an npt-client read item (R16) or U4g's Interp." :151-152: the mirror view may hold entities from datagrams the client lost or refused, or a baseline it never completed.
+- A1-12 Unit tests today: crates/bots/tests/behaviour.rs (236 lines): b1 no command before a snapshot, then one per moved newest tick :87; b2 every_step :130; b3 press edges :177; b4 same seed same commands, every move inside 127^2 :199-211; b5 aims at an enemy in view, never a teammate; clamp far :214-236. Helper commands(b, n) :158. No test reads a position or the walk's closure.

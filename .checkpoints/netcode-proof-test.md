@@ -36,6 +36,20 @@ ADVISOR.** Mustafa typed /compact at about 22:50; the chat resumed from this car
 - **Next while it runs:** step (4), BRAWL-1's plan (the next npt-lab lane with N2-1), and step (5), the kept-logs draft.
   BRAWL-1's plan must also weigh the recordings that hash the brawl: precheck-recordings.json's SS P0 seed-4 entry and
   det-recordings.json change when the bots change.
+- **Also running (23:05 UTC):** the BRAWL-1 facts workflow wf_d24f7a9b-8fe (task wr6edj0nd). Two readers:
+  - (a) the brawl, the world and the recordings, notes brawl1-facts-a.md;
+  - (b) the N2-1 items, notes brawl1-facts-b.md.
+  That makes 3 agents with the advisor. When it returns, write BRAWL-1's plan (brawl1-plan.md) from the facts, with the
+  ruling's Fix (a)-(d), the N2-1 items, the re-run sets' expected lines and the disk plan.
+- **Step (5) drafted:** kept-logs-draft.md.
+  - The disk today: free 13,225 MiB; kept raw logs 7,380 MiB (U4r 5,385, U2 1,996); the main cache 776 MiB; the shared
+    target 1 MiB.
+  - The approved cleans hold BRAWL-1's re-run sets if the order is build and review, merge, (B) and (C), then the runs.
+    The build phase sits at about 4.2 GiB free, at the floor. After the sets, U4g's refill does not fit.
+  - It recommends KEPT-LOGS (b), a narrow kit rule removing one closed run-set folder, before BRAWL-1's build or before
+    U4g. It goes to the advisor with BRAWL-1's plan.
+- **Ready:** u4r_f3_plan_review_full.py (syntax checked) writes the advisor's F3 plan review word for word when
+  wf_8674561f-d44 ends.
 
 **Earlier NOW (2026-11-14 about 22:40 UTC): U4r's JUDGED RUNS ARE CLOSED.** The P0
 ruling: **advisor-u4r-sets-r2-full.md** (64 lines, sha256 7b6aa38c…, written word for word by u4r_sets_r2_ruling_full.py;
