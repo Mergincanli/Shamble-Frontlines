@@ -1,4 +1,4 @@
-# Plan: foundation step 2.3, the gate v2 and CI, and the end of the kit's freeze (revision 2.2)
+# Plan: foundation step 2.3, the gate v2 and CI, and the end of the kit's freeze (revision 2.3)
 
 - **The task:** Mustafa's words of 2026-11-13 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-13, 18:47:55
   UTC", from "Then, after the docs pass is merged: plan step 2.3." to its end: items 1 to 9), and his message of
@@ -13,7 +13,8 @@
 - **Revision 2** folds in the advisor agent's review of revision 1 (03d05f5: REVISE, one High, seven Medium, five Low,
   and its four rulings). Revision 2.1 folds in the six Lows of its APPROVE of revision 2 (00984ae), which it allowed
   without a further review. Revision 2.2 carries the old plan's Appendix B (the rules kept while PR #40's spike is in
-  the tree), found missing by the advisor tool's moment-5 check. Part 11 lists what changed.
+  the tree), found missing by the advisor tool's moment-5 check; revision 2.3 folds the three Lows of the advisor
+  agent's APPROVE of revision 2.2 (94c5c5a). Part 11 lists what changed.
 - **Sources in this folder:**
   - `reading.md`: blocks B1 to B13, each source with its file and line;
   - `approach.md`: the sketch the advisor tool checked;
@@ -191,7 +192,7 @@ editor at slice 5. Run counts and machines are part of each mark.
 | PM-0002-39 (G0) | toolchain file deleted: G0 exit 2, no other Rust; `Cargo.toml` edited without `Cargo.lock` fails at the first cargo step; missing Playwright browser: exit 2 with the setup command; control: a consistent toolchain bump passes | CS-C: the first, second and fourth, plus the G0 finding's source-check mutations | the missing-browser clause (2.3-E) | 2.3-E |
 | PM-0002-40 (G1) | misformatted `.rs`, CRLF `.rs`, misformatted `.ts` each fail G1 only; control: long string literals pass; after `prettier --write`, ESLint reports 0; the formatted tree is byte-identical on Windows and Linux (once, his PC) | CS-C, and his Windows run (Part 9) | | **CS-C** + his run |
 | PM-0002-41 (G2) | the planted defects ADR 0002 lists at :1307, each failing G2 only with its reason; controls in `server`, in a `#[test]`, and sim's min/max/clamp helpers with `abs` and `fract` | CS-C: HashMap field and `map.values().sum()` in sim; `Instant::now()` in a tick function, in room and in client-endpoint; a correctness bug; a style warning; `unsafe`; a crate without `[lints] workspace = true`; `+fma`, `-C target-cpu=native`, `relaxed-simd` in the build flags; control `.unwrap()` in a `#[test]` | `sin`, `powi`, `to_radians`, `min`, and the helper controls (2.3-S); `.unwrap()` and `buf[i]` in a decoder (2.3-E); `-ffm` in `wasm-opt` (2.3-B); the `server` control (slice 3) | slice 3 |
-| PM-0002-42 (G3) | one violation per strict flag; `eval` and `new Function` in client; an unawaited promise; a switch over a generated union missing one kind; an import of editor from client; a bare `event`; DOM code imported by sim-worker or net; an import from `legacy/` or `spikes/`; controls: `import type` from types in editor passes; the clean tree is 0 and 0 | CS-C: all but the generated union and the two editor clauses; the switch rule is on from CS-C, with an interim plant on a hand-written union that does not count to the mark (the advisor agent's ruling (d)) | generated union (2.3-B); the variant of the legacy-or-spike import mutation that names the spike folder (after PR #40 merges, when Appendix B lifts); the editor clauses (slice 5) | slice 5 |
+| PM-0002-42 (G3) | one violation per strict flag; `eval` and `new Function` in client; an unawaited promise; a switch over a generated union missing one kind; an import of editor from client; a bare `event`; DOM code imported by sim-worker or net; an import from `legacy/` or `spikes/`; controls: `import type` from types in editor passes; the clean tree is 0 and 0 | CS-C: all but the generated union and the two editor clauses; the switch rule is on from CS-C, with an interim plant on a hand-written union that does not count to the mark (the advisor agent's ruling (d)) | generated union (2.3-B); the variant of the legacy-or-spike import mutation that names the spike folder (when the spike's check lifts its rule: by its own text, once G5 and G8 exist; G8 comes with 2.3-E); the editor clauses (slice 5) | the later of slice 5's change-set and the spike's check lifting its rule |
 | PM-0002-43 (G4) | all | | 2.3-B | 2.3-B |
 | PM-0002-44 (G5) | transport crate or `tokio`/`quinn` in sim; `tokio` in room; `navbake` or `server` reachable from sim-wasm (each when that crate enters); wasm-bindgen or a transport crate in client-endpoint; a git dependency; a wildcard; a second version off the skip list; a server-only feature on a shared maths dependency (feature lists differ across server, devtools, navbake, sim-wasm); controls: proptest as sim's dev-dependency, a dev-only feature on devtools | CS-C: all but the feature comparison and the two crates that enter later; how each dependency mutation keeps `Cargo.lock` consistent offline is CS-C's design (local stand-in crates by name, or the network in CI's `--prove` job) | the feature comparison (2.3-S); navbake (slice 2) and server (slice 3), as the mark says | 2.3-S, and its own per-crate clauses as those crates enter |
 | PM-0002-45 (G7) | all | | 2.3-B | 2.3-B |
@@ -228,10 +229,12 @@ editor at slice 5. Run counts and machines are part of each mark.
 - **Rule and guard edits stay apart from the gate v2's code** (his item 3): CS-B and CS-F hold rules text, CS-D holds
   guard code, CS-C holds gate code, CS-E holds CI.
 - **Prompt counts are estimates.** Each count assumes one Write per protected file.
-- **While PR #40's spike is in the tree** (the old plan's Appendix B, 26e0d82 `plan.md:636-655`, which 2.2 kept):
-  - no tracked file outside `spikes/`, `docs/` and `.checkpoints/` that is not Markdown may contain the text of the
-    spike folder's path: the spike's `check.mjs` (`referenceProblems`) fails on it. Configs name what they cover,
-    never what they skip; no test row, fixture, workflow or config names the spike folder;
+- **While PR #40's spike holds its rule** (the old plan's Appendix B, 26e0d82 `plan.md:636-655`, which 2.2 kept; by
+  the spike's own `check.mjs`, as the advisor agent read it at 4bd5ac3 :1786, the rule holds until the foundation's
+  G5 and G8 exist, also after #40 merges, when the spike and its check sit in main's tree):
+  - no tracked file outside `spikes/`, `docs/` and `.checkpoints/` that is not Markdown may contain the text
+    `spikes/`: the spike's `check.mjs` (`referenceProblems`, :1799 at 4bd5ac3) fails on it. Configs name what they
+    cover, never what they skip; no test row, fixture, workflow or config names the spike folder;
   - no root `.cargo/config.toml`: target folders and flags go on the command line;
   - no `"type"` in the root `package.json`;
   - each change-set that adds or changes such a file runs `node spikes/netcode-proof/check.mjs --only deps,refs` on
@@ -347,9 +350,11 @@ editor at slice 5. Run counts and machines are part of each mark.
 - **Appendix B in CS-C's files:**
   - G3's import rule says what it allows: imports stay inside their package, or name a workspace package or a
     dependency. It names no folder it forbids. The mutation for PM-0002-42's "an import from `legacy/` or ..."
-    plants an import from `legacy/`; the variant naming the spike folder joins after PR #40 merges;
+    plants an import from `legacy/`; the variant naming the spike folder joins when the spike's check lifts its rule,
+    by its own text once the foundation's G5 and G8 exist (G8 comes with 2.3-E);
   - Prettier is pointed at `packages/**`; a `.prettierignore`, if any, names no spike path;
-  - ROOT-WORKSPACE's `exclude` lists `.gate` and `.checkpoints` only;
+  - ROOT-WORKSPACE's `exclude` lists `.gate` and `.checkpoints` only. That departs from Appendix B's "no `exclude`
+    line" and keeps its purpose, since the line holds no text `spikes/`;
   - no root `.cargo/config.toml`, and no `"type"` added to the root `package.json`;
   - the evidence runs #40's `check.mjs --only deps,refs` on a local merge with its head.
 - **Tools run by their path, never through `npm run`, `npm test` or `npx`.** The settings deny those
@@ -775,7 +780,7 @@ So no guard rule changes for PROMPTS-2.3: one rules line (K-14) and one rule fix
 - #40 is a draft, head 30b7b83 (read 2026-11-14 12:14:41 UTC). GitHub lists its base as 4d21c1a, and it conflicts with
   main 4460ef5.
 - Its `check.mjs` (`referenceProblems`) reads every tracked file outside the spike folder, `docs/` and `.checkpoints/`
-  that is not Markdown, and fails on the text of the spike folder's path. So each change-set below keeps the old
+  that is not Markdown, and fails on any text `spikes/`. So each change-set below keeps the old
   plan's Appendix B (Part 3), and runs that check on a local merge with #40's head.
 - While it conflicts, GitHub runs no `pull_request` workflow on it (F-PR). Its push runs use its own branch's workflow
   files.
@@ -908,6 +913,10 @@ required checks while the ruleset no longer did.
   - #40's head re-read: 30b7b83 (12:14:41 UTC); main re-fetched: still 4460ef5;
   - Part 4 row 108: the legacy rules' globs, for step 2.5;
   - K-4's "How" says positively that every other main session runs on Opus 5.5 (the advisor tool's note for CS-B).
+- **Revision 2.3** (the advisor agent's APPROVE of revision 2.2 at 94c5c5a, with three Lows it allowed to be folded
+  without a further review): R3-1, #40's check fails on any text `spikes/`; R3-2, the rule and the spike-folder
+  variant last until the spike's check lifts it (once G5 and G8 exist), not until #40 merges, and PM-0002-42 is met
+  at the later of slice 5's change-set and that; R3-3, the `exclude` line's departure from Appendix B, named.
 
 ## Decisions needed
 - **GATE-PATH: where does the gate v2's script live?**

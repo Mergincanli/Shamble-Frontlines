@@ -26,12 +26,16 @@
 5. Plan revision 2 · 00984ae · the advisor agent re-reviewed what changed (asked 12:00:56 UTC): APPROVE (hand-back
    12:09:32 UTC, the transcript), with six Lows (L-1 to L-6;
    advisor-plan-r2.md), which it said may be folded without a further review; revision 2.1 folds them.
+6. Plan revision 2.1 · 38c4bfa · the six Lows of the APPROVE of 00984ae folded.
+7. Plan revision 2.2 · 94c5c5a · advisor-tool consultation 2 (12:11:15 UTC): the old plan's Appendix B carried; main
+   re-fetched (4460ef5), #40 re-read (30b7b83, 12:14:41 UTC). The advisor agent read the diff from 00984ae (asked
+   12:17:4x UTC): APPROVE 94c5c5a5aa4022a65476009001ceebbf7dd15f82 (hand-back 12:26:10 UTC, the transcript;
+   advisor-plan-r3.md), with three Lows (R3-1 to R3-3) foldable without a further review.
+8. Plan revision 2.3: R3-1 to R3-3 folded (rev 2.3 note in Part 11).
 
 ## Current step
-7. Plan revision 2.2 (rev22.py): the old plan's Appendix B carried, found missing by advisor-tool consultation 2;
-   main re-fetched (still 4460ef5), #40 re-read (30b7b83, 12:14:41 UTC); row 108; K-4's positive Opus line. Next: the
-   advisor agent names the final SHA from the diff; advisor tool moment 5 again; "done"; the saver stopped; the end
-   message.
+9. Advisor tool, moment 5 (consultation 3), before the plan is saved as done; then the "done" save, the saver stopped
+   (TaskStop, recorded), and the end message.
 
 ## Next steps
 1. Finish plan.md; commit it with the checkpoint (record its SHA here).
