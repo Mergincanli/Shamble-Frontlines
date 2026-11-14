@@ -14,7 +14,30 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 22:40 UTC; read this first after a compact or a cut): U4r's JUDGED RUNS ARE CLOSED.** The P0
+**NOW (2026-11-14 about 23:15 UTC; read this first after a compact or a cut): STEP (3), U4r-F3's PLAN IS WITH THE
+ADVISOR.** Mustafa typed /compact at about 22:50; the chat resumed from this card.
+- **The plan:** u4r-f3-plan.md (sections 1-10, choices Q1-Q6). It covers the list of the P0 ruling's step 3:
+  - INF-F2-1's sentence and INF-F2-2's wordings; Q1 flags "before either" in the second wording;
+  - INF-F1-5 in both scripts (keepLead);
+  - RUNS-LINE: setParts copies each part and bite holding a run of the call from the verdict file;
+  - RATES-1: the largest run per profile, from du -sb of the kept run folders: P0 603.7 MB (pos-4cm), P2 272.9, P3 183.3,
+    B1 291.4; OTHER 56 MB kept;
+  - the judge projection: 302.2 + 2.3403 x MiB, reproduced from the six judge-apart logs; Q3 (b) proposes a start stop
+    above 10,240 MiB;
+  - INF-F1-3 waits for the check.mjs follow-up (Q4 (a)).
+- **New projections:** P3 524.4, B1 833.7, P2 780.8 and P0 3,614.6 MiB, each at least its measured bytes. The largest
+  judge call is P0's bites call: 1,887 MiB of logs, so 4,719 MiB.
+- **SIZE-CHECK:** U4r-F3's planned size is about 100 lines added and 25 removed (both scripts); actual: not built yet.
+- **Running:** the advisor's plan review, workflow wf_8674561f-d44 (task wcaj7y9a3), notes advisor-u4r-f3-plan.md. When
+  it returns, write it word for word by a script modelled on u4r_f2_plan_review_full.py (u4r_f3_plan_review_full.py),
+  then build by Edit.
+- **Folder slips 6 and 7** (23:00 UTC): a bare `cd` into the notes folder, then into .gate/netcode-proof-test/runs. I went
+  back at once both times. Never start a command with `cd <folder> &&`: use `( cd X && … )` or absolute paths.
+- **Next while it runs:** step (4), BRAWL-1's plan (the next npt-lab lane with N2-1), and step (5), the kept-logs draft.
+  BRAWL-1's plan must also weigh the recordings that hash the brawl: precheck-recordings.json's SS P0 seed-4 entry and
+  det-recordings.json change when the bots change.
+
+**Earlier NOW (2026-11-14 about 22:40 UTC): U4r's JUDGED RUNS ARE CLOSED.** The P0
 ruling: **advisor-u4r-sets-r2-full.md** (64 lines, sha256 7b6aa38c…, written word for word by u4r_sets_r2_ruling_full.py;
 its two Mediums, BRAWL-1 and ADV-SR2-1, read in full). u4r-report.md carries its Q3 record: the P0 subsection, the
 one-table summary, RR3-L6 closed, the byte ratios, the cleans and disk, the corrections, the follow-ups and For
