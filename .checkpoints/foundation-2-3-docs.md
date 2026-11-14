@@ -167,12 +167,10 @@
    subject until the final commit. Its checks: gate PASS; 8 scripts exit 0; 18 chat texts 22:40 to the head, four bear
    on it, none missing; CI on 922cadf all green; no message of his after the cut-off (to 00:58:57).
 
+19. Step 7 DONE (the verifier: PASS WITH NOTES on 922cadf), after consultation 13.
+
 ## Current step
-Step 8: consultation 13 (moment 5 for step 7, moment 1 for the final edits), step 7's "done" save, the final edits
-(F-V5a, F-V6, the nits, the bullet's two messages, the checkpoint folded in, STATUS and ROADMAP for ready, #40's second
-read, E7, Reviews, Outcome, entries 13 and on), consultation 14 (moment 5 before the final commit), the last notes
-commit, the header SHA, the appendix's cut-off, the checks, the deletion, the gate, the commit, CI, the advisor agent's
-review of that head, the PR body, ready.
+Step 8: revision 2f asked of the advisor agent; then the final edits (see consultation 13's list).
 
 ## Next steps
 1. Scripts (consultation 10's items 1 to 6 block the commit): grep every "before" string of D2 to D4 in the notes'
@@ -287,6 +285,15 @@ review of that head, the PR body, ready.
    not hold or not yet sent; F-V3 narrowed (no counts; the certain copies named; "copies", not "retyped"); "asked for
    effort max"; the verifier's FAIL and scope note recorded as they happened; its two refusals; entries 9 and 11 fixed;
    the same verifier resumed with a narrow brief; a1d0317's commit-message claim withdrawn in the next commit's message.
+
+13. 2026-11-14 01:01:1x UTC (see the transcript), moment 5 for step 7 (before its "done" save) and moment 1 for the final
+   edits: step 7 done (PASS, nothing above Low; no third verifier run needed). Changed: revision 2f asked of the advisor
+   agent before writing (the bullet's lines 3183 and 3195, F-V5a with the 30-character threshold in the definition and
+   words.mjs's 28-character anchor in one clause, F-V6 quoted from line 2922, the re-run's Reviews rows and "the
+   verifier did not see the changes after 922cadf"); a keyword screen over every chat text (23 texts; six bear on it,
+   all named), again right before the commit; no status line on the subject; the fold points at sections; the intro's
+   list re-derived from the scan; the saver stopped before the notes SHA; the counts recomputed; nothing pushed after
+   the final commit; a re-scan from a scratch copy of words.mjs before ready; the end message withdraws 00:46's claim.
 
 ## Refusals (guard, deny list, classifier) and the route taken
 - The session: one, by the guard, 2026-11-13 23:33:46 UTC (`git -C <notes folder> diff`: the guard wants git run from
