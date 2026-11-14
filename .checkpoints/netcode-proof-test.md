@@ -52,6 +52,23 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
   - A FAIL: find whether the script or the harness is at fault before any change. Any change re-runs the cmp stagings.
 - **For BRAWL-1's disk plan (condition 7):** the runner's new start figures are P3 524.4, P2 780.8 and P0 3,614.6 MiB,
   each plus the 4,096 MiB floor, not the measured 519 / 779 / 3,248.
+- **BRAWL-1's plan is WITH THE ADVISOR** (about 23:50 UTC): brawl1-plan.md, sections 1-13, choices Q1-Q8.
+  - **Its facts:** brawl1-facts-full.md, the two readers' returns word for word, written by brawl1_facts_full.py; 158
+    lines, sha256 5fb6bf3c…
+  - **The plan in short:**
+    - Fix (a): a new npt-client pub read of the own soldier's decoded position (the brawl's `view` is the room-side
+      mirror, so it is server state) feeds one pub next_command in npt-bots, which steers by a centre leash: R_OUT
+      1,400 cm and R_IN 1,200 cm, with a sideways part. The nearest footprint corner is 16.6 m away.
+    - Fix (b): the building-area figure, server side in Logs::room_tick (the record's `area`), plus a SERIES.md row.
+    - Fix (c): a unit test; the sim-only test in npt-bots' tests/ (full test #[ignore], Q4); two 10-minute runs by hand
+      after the merge.
+    - The re-pin of SS-P0-s4, SS-P2-s1 and ES-P3-s2 is asked as a ruling (Q3).
+    - Part 1 (EA-U4R-2, EA-U4R-1 narrow, N2-1, TE-R2-2 with RR4-L2, RR4-L1, RR3-L2 (a)) is proved at the old pins
+      before Part 2.
+    - N2-1's plant shows two of four (Q5). KEPT-LOGS goes to Mustafa now (Q7 (a)). Planned size 450-700 lines (the card
+      carries 700).
+  - **Running:** the plan review, workflow wf_533068a9-b2b (task wr3evnp7j), notes advisor-brawl1-plan.md. When it
+    returns, run brawl1_plan_review_full.py (ready, syntax checked).
 
 **Earlier NOW (2026-11-14 about 23:15 UTC): STEP (3), U4r-F3's PLAN IS WITH THE ADVISOR.** Mustafa typed /compact at
 about 22:50; the chat resumed from this card.
