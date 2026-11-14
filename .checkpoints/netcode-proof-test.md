@@ -31,7 +31,13 @@ snapshot 707cc3df… (26 files).**
   "wf_f276e5ae-878"`.
 - **Copy 5 resumed about 02:04 UTC by SendMessage** (its context intact) on: point 8 (A)'s two runs, the two script
   items, c-u4r-r2.mjs's lines by hand (its tick16 text left for the ruling), the report words; r5 and the end checks
-  held for the ruling. **On the ruling:** write it word for word by script, read it, send copy 5 its parts. The saver
+  held for the ruling. **Done by 02:08 UTC** (c5-p8a.log, c5-r2lines.log): point 8 (A)'s no-fallback run 0 breaches
+  (copy 3's had 2,314), -18 INVALID by pre:PM-0001-2 at 0.453333 as expected while the room is unfixed, max heal
+  1.688 s (the 25 fast heals split as ruled), `burst_spacing_ns` in its header; the clean P0 run equal record for
+  record (but run_lengths' added `after_capped`); c-u4r-runs.mjs: `TICK16_START` 47,251 and no -18 no-fallback bite at
+  U4r; c-u4r-r2.mjs's lines by hand (seven suites equal to copy 3's figure for figure; b1 and es not re-run, by the
+  rulings); the report words. Snapshot re-cut (26 files, 89e4139e…; 88a97f1); notes 1,456 lines. Copy 5 now waits for
+  the ruling (SendMessage resumes it). **On the ruling:** write it word for word by script, read it, send copy 5 its parts. The saver
   restarted as **bv7wsa5bk** (02:02 UTC, after d91a00e). The check-in stays (next 02:34 UTC).
 
 **Earlier NOW (2026-11-14 about 01:42 UTC): U4r's third ruling is in (nothing for Mustafa now; three points block the
