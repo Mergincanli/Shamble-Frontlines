@@ -7,7 +7,7 @@
   process only what a record shows, with its time. · plan: `.checkpoints/foundation-2-3-plan/plan.md` (to write)
 - **Branch:** claude/sweet-mayer-grsukw (stands in for cs/foundation-2-3-plan; restarted from main by fast-forward
   bfd719b..4460ef5, pushed) · **Base:** main 4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-14 12:30 Amsterdam
+- **Last update:** 2026-11-14 13:15 Amsterdam
 
 ## Steps done
 1. Orientation: the session's model read from get_session (session_context.model and last_served_model:
@@ -20,11 +20,13 @@
 3. Plan revision 1 written · 03d05f5 · items 1-9 and his three additions; Part 4 counted by script (107 rows:
    49 first part, 47 later, 6 dropped, 2 not ours, 2 rules for this chat, 1 ruling); Appendix K from kit-texts.py
    (27 items, 19 quotes of his checked).
+4. The advisor agent's review of revision 1 (03d05f5): REVISE (advisor-plan-r1.md; hand-back 2026-11-14, the
+   transcript); every finding folded into revision 2 (Part 11 lists them); Part 4 recounted: 107 rows, 50 first part,
+   48 later, 5 dropped, 2 not ours, 2 rules for this chat.
 
 ## Current step
-4. The advisor agent reviews plan revision 1 (plan.md at 03d05f55a2e49cac3be98ddffdc228632a9ef0c7), launched
-   2026-11-14 ~11:29 UTC at effort max (his words of 2026-11-13: reviewers may run at max); its notes:
-   `.checkpoints/foundation-2-3-plan/advisor-plan-r1.md`.
+5. Plan revision 2 written (rev2.py applied to plan.md; kit-texts.py regenerated: 30 items, 19 quotes checked); the
+   advisor agent re-reviews what changed from 03d05f5.
 
 ## Next steps
 1. Finish plan.md; commit it with the checkpoint (record its SHA here).
@@ -33,10 +35,33 @@
 3. Advisor tool, moment 5, before the plan is saved as done; then the end message and stop for his go.
 
 ## Open findings
-- (none yet)
+- The advisor agent's plan review of revision 1 (03d05f5): REVISE (notes: advisor-plan-r1.md). All folded into
+  revision 2 (fixed in the commit after 03d05f5; Part 11's list); its re-review on what changed is open:
+  - H1 PM-0002-57 and D2 "met at CS-E" do not hold ("cannot merge" needs `required` in the ruleset; "the single
+    required check" needs ruleset step 2): prove on scratch PRs after ruleset step 2; restate Part 8 and Part 10
+    (between ruleset step 1 and CS-F the ruleset requires more than the guard).
+  - M2 CS-E's planted skipped job and removed check (and reverts) are .github/ edits: asked and counted; use a
+    failing test and an API cancel where the mark allows.
+  - M3 Part 2 cells: PM-0002-52 needs every mutation of -39..-51 (met at slice 5); name the change-sets at the rows
+    without one; the summary adds -44, -51, -52; PM-0002-38 placed (CS-E, wasm-bindgen line 2.3-B).
+  - M4 Rule 3 is the plan's choice under his "may", with its list (G11 may wait past its result).
+  - M5 K-4: "except the netcode chat"; variants for MODELS-HOW (a) and (b); [to verify] on `model: "fable"`, "on
+    his personal account".
+  - M6 K-11c for advisor.md:40-43 (escalation category 3); K-12a/f/g are a widening of "main breaks".
+  - M7 until CS-E, each change-set reads `toolchain`'s runs by hand.
+  - M8 row 94: local smoke is a precondition of CS-C1, not dropped.
+  - Lows: OQ-0002-8-TEST -> PM-0002-64 (its reading); routine-guard MERGE_PLACES is :84; `npm ci --ignore-scripts`;
+    5.1 says how the scratch copy is made and counts its prompts; the checkpoint's consultation count.
+  - Rulings: (a) OVERFLOW-XCRATE-CI anchor moved (native half with the first dependency on sim; PM-0002-53 met at
+    the first CS with a sim dependant and a Wasm runner, expected 2.3-B; CS-A rewrites STATUS :95 and the archive's
+    anchor text); (b) float ban right, on condition 2.3-S merges before any f32/f64 arithmetic enters sim; (c)
+    `required` accepted: code font, job id and name both exactly `required`, a G-4 test row with two same-named
+    runs, one red, refused; (d) agreed, with an interim plant on a hand-written union not counted to the mark.
+  - Decisions: GATE-PATH (a) cost: imports resolve tools/node_modules first; PIN-SCOPE: say what (b) leaves
+    unprotected; MODELS-HOW: quote DECISIONS.md :91.
 
 ## Key numbers
-- Advisor-tool consultations in this task: 0 so far (the docs pass's 17 are counted in its report and the merge).
+- Advisor-tool consultations in this task: 1 so far (the docs pass's 17 are counted in its report and the merge).
 
 ## Decisions taken
 - Step 2.3 may be planned now; its parts that need no proof test's result may be built after his go on the plan

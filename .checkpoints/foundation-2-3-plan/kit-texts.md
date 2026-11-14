@@ -98,17 +98,17 @@ After:
   > - The netcode chat on my university account keeps its models and efforts as they are.
 - **How:** agent files say `model: opus`, which resolves to Opus 5.5 today (`claude-opus-5-5`; an `opus` agent reported
   it on 2026-10-25). When a newer Opus appears, Mustafa decides whether to move. Built-in agents (Explore, Plan,
-  general-purpose) get their model passed explicitly: `model: "fable"` for the builder agents of a chat that writes game
-  or engine code, `model: "opus"` for every other. Workflow agents inherit the session's model, so a chat on Fable 5.2
-  sets every workflow agent that is not a builder to Opus 5.5 [to verify in the workflow reference before this text is
-  asked].
+  general-purpose) get their model passed explicitly: `model: "fable"` for the builder agents of a chat on his personal
+  account that writes game or engine code, `model: "opus"` for every other. Workflow agents inherit the session's model,
+  so a chat on Fable 5.2 sets every workflow agent that is not a builder to Opus 5.5 [to verify before this text is
+  asked: the Agent tool's model value for Fable 5.2, and the workflow API's model option].
 - **Effort is always stated** (Opus 5.5 defaults to medium): `max` for every agent that reviews, verifies or designs
   game or engine code (his words above); until PR #40, the netcode chat, has merged, the caller passes `effort: "max"`
-  to those agents, and their agent files say `max` after that, so the netcode chat keeps its efforts. Otherwise `high`
-  by default; `xhigh` for architecture decisions (ADRs, `docs/ENGINE_OVERVIEW.md`, the synthesis) and netcode. Agent
-  files set it in their frontmatter. The caller passes it for everything else: the Agent tool's `effort` for built-in
-  agents and for a `high` agent working on an ADR or on netcode (`xhigh`); `effort: 'high'`, `'xhigh'` or `'max'` on
-  every workflow `agent()` call (without it, a workflow agent takes the session's effort).
+  to those agents, except in the netcode chat, which keeps its efforts; their agent files say `max` after that.
+  Otherwise `high` by default; `xhigh` for architecture decisions (ADRs, `docs/ENGINE_OVERVIEW.md`, the synthesis) and
+  netcode. Agent files set it in their frontmatter. The caller passes it for everything else: the Agent tool's `effort`
+  for built-in agents and for a `high` agent working on an ADR or on netcode (`xhigh`); `effort: 'high'`, `'xhigh'` or
+  `'max'` on every workflow `agent()` call (without it, a workflow agent takes the session's effort).
 - **Sonnet 5.5 only for purely mechanical chores, and only when genuinely necessary:** file moves, formatting, link
   checks, summarizing logs. Opus remains the preference even there. No other model, except Fable 5.2 on Mustafa's
   personal account: the main model of a chat that writes game or engine code and of its builder agents (above), and the
@@ -139,6 +139,55 @@ After:
 ```
 
 Rules text to match his words of 2026-11-12 and 2026-11-11; nothing looser than his words (the optional lines are marked and his to refuse).
+
+## K-4 (a) (CS-B): `CLAUDE.md` lines 174-178 on 4460ef5
+
+Before:
+```
+- **Effort is always stated** (Opus 5.5 defaults to medium): `high` by default; `xhigh` for architecture decisions
+  (ADRs, `docs/ENGINE_OVERVIEW.md`, the synthesis) and netcode. Agent files set it in their frontmatter. The caller
+  passes it for everything else: the Agent tool's `effort` for built-in agents and for a `high` agent working on an ADR
+  or on netcode (`xhigh`); `effort: 'high'` or `'xhigh'` on every workflow `agent()` call (without it, a workflow agent
+  takes the session's effort).
+```
+
+After:
+```
+- **Effort is always stated** (Opus 5.5 defaults to medium): `max` for every agent that reviews, verifies or designs
+  game or engine code (his words above), set in their agent files (K-5 in this change-set); the netcode chat keeps its
+  efforts by passing each agent its former effort (`high`, or `xhigh` for engine-architect and netcode-architect) until
+  PR #40 has merged. Otherwise `high` by default; `xhigh` for architecture decisions (ADRs, `docs/ENGINE_OVERVIEW.md`,
+  the synthesis) and netcode. Agent files set it in their frontmatter. The caller passes it for everything else: the
+  Agent tool's `effort` for built-in agents and for a `high` agent working on an ADR or on netcode (`xhigh`); `effort:
+  'high'`, `'xhigh'` or `'max'` on every workflow `agent()` call (without it, a workflow agent takes the session's
+  effort).
+```
+
+MODELS-HOW (a) only: the effort bullet; the agent files change in CS-B.
+
+## K-4 (b) (CS-B): `CLAUDE.md` lines 174-178 on 4460ef5
+
+Before:
+```
+- **Effort is always stated** (Opus 5.5 defaults to medium): `high` by default; `xhigh` for architecture decisions
+  (ADRs, `docs/ENGINE_OVERVIEW.md`, the synthesis) and netcode. Agent files set it in their frontmatter. The caller
+  passes it for everything else: the Agent tool's `effort` for built-in agents and for a `high` agent working on an ADR
+  or on netcode (`xhigh`); `effort: 'high'` or `'xhigh'` on every workflow `agent()` call (without it, a workflow agent
+  takes the session's effort).
+```
+
+After:
+```
+- **Effort is always stated** (Opus 5.5 defaults to medium): `max` for every agent that reviews, verifies or designs
+  game or engine code (his words above): the caller passes `effort: "max"` to those agents, except in the netcode chat,
+  which keeps its efforts. Otherwise `high` by default; `xhigh` for architecture decisions (ADRs,
+  `docs/ENGINE_OVERVIEW.md`, the synthesis) and netcode. Agent files set it in their frontmatter. The caller passes it
+  for everything else: the Agent tool's `effort` for built-in agents and for a `high` agent working on an ADR or on
+  netcode (`xhigh`); `effort: 'high'`, `'xhigh'` or `'max'` on every workflow `agent()` call (without it, a workflow
+  agent takes the session's effort).
+```
+
+MODELS-HOW (b) only: the effort bullet; the agent files keep their effort lines.
 
 ## K-6 (CS-B): `CLAUDE.md` lines 71-73 on 4460ef5
 
@@ -279,7 +328,7 @@ After:
 - **Rollback** (A4): if main breaks (the required check `required` red on main after one re-run, pinned to one merge; Mustafa
 ```
 
-Same strength: `required` fails unless gate, smoke and every gate v2 job succeeded; re-wraps when written.
+A widening of "main breaks" (Rollback): a red gate v2 job on main then also starts a revert with no plan step; his words needed (ROLLBACK-SCOPE, asked at CS-F); re-wraps when written.
 
 ## K-12b (CS-F): `CLAUDE.md` lines 130-130 on 4460ef5
 
@@ -349,7 +398,7 @@ After:
 - **Main breaks** when one of these holds: `required` is red on a main commit, still red after one re-run, and
 ```
 
-Same strength: `required` fails unless gate, smoke and every gate v2 job succeeded; re-wraps when written.
+A widening of "main breaks" (Rollback): a red gate v2 job on main then also starts a revert with no plan step; his words needed (ROLLBACK-SCOPE, asked at CS-F); re-wraps when written.
 
 ## K-12g (CS-F): `.claude/agents/advisor.md` lines 294-294 on 4460ef5
 
@@ -363,7 +412,7 @@ After:
     holds: the red `required` run on main names that commit and its re-run is red too, or the report is
 ```
 
-Same strength: `required` fails unless gate, smoke and every gate v2 job succeeded; re-wraps when written.
+A widening of "main breaks" (Rollback): a red gate v2 job on main then also starts a revert with no plan step; his words needed (ROLLBACK-SCOPE, asked at CS-F); re-wraps when written.
 
 ## K-12h (CS-F): `.claude/agents/advisor.md` lines 323-323 on 4460ef5
 
@@ -450,6 +499,29 @@ After:
 ```
 
 Stricter (more files make the PR Advisor's CI green insufficient); re-wraps when written.
+
+## K-11c (CS-D): `.claude/agents/advisor.md` lines 39-43 on 4460ef5
+
+Before:
+```
+3. **The rules themselves:** changes to hard constraints, ADRs, `CLAUDE.md`, `.claude/` (this file included), CI
+   (`.github/`), security rules, or the gate's own files: every file `tools/gate.mjs` or `.github/workflows/` run as
+   code or read as settings, not the game files they check (today `tools/gate.mjs`, `tools/smoke.mjs`,
+   `tools/battery.js`, `tools/gate-globals.json`, `tools/package.json`, `tools/package-lock.json`,
+   `tools/npm-shrinkwrap.json`) and any `.npmrc`.
+```
+
+After:
+```
+3. **The rules themselves:** changes to hard constraints, ADRs, `CLAUDE.md`, `.claude/` (this file included), CI
+   (`.github/`), security rules, or the gate's own files: every file `tools/gate.mjs`, the gate v2 (`tools/gate-v2/`) or
+   `.github/workflows/` run as code or read as settings, not the game files they check (today `tools/gate.mjs`,
+   `tools/smoke.mjs`, `tools/battery.js`, `tools/gate-globals.json`, `tools/package.json`, `tools/package-lock.json`,
+   `tools/npm-shrinkwrap.json`, the gate v2's folder and the v2 pins and gate configs the guard protects) and any
+   `.npmrc`.
+```
+
+Stricter (escalation category 3 names the gate v2 and the protected pins); follows GATE-PATH (a) and PIN-SCOPE (b).
 
 ## K-13a (CS-F): `CLAUDE.md` lines 74-75 on 4460ef5
 

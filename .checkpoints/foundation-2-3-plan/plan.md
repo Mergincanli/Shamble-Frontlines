@@ -1,4 +1,4 @@
-# Plan: foundation step 2.3, the gate v2 and CI, and the end of the kit's freeze (revision 1)
+# Plan: foundation step 2.3, the gate v2 and CI, and the end of the kit's freeze (revision 2)
 
 - **The task:** Mustafa's words of 2026-11-13 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-13, 18:47:55
   UTC", from "Then, after the docs pass is merged: plan step 2.3." to its end: items 1 to 9), and his message of
@@ -10,6 +10,8 @@
   in Accept edits (his words of 2026-11-13).
 - **Base:** main 4460ef5 (PR #52's merge, 2026-11-14 09:06:30 UTC). **Branch:** `claude/sweet-mayer-grsukw`, which
   stands in for `cs/foundation-2-3-plan`. It was moved to main by a fast-forward and pushed.
+- **Revision 2** folds in the advisor agent's review of revision 1 (03d05f5: REVISE, one High, seven Medium, five Low,
+  and its four rulings). Part 11 lists what changed.
 - **Sources in this folder:**
   - `reading.md`: blocks B1 to B13, each source with its file and line;
   - `approach.md`: the sketch the advisor tool checked;
@@ -49,27 +51,29 @@
   - **2.3-E** rides step 2.5, after the netcode proof test and the sim core spike: G6's Vite build, G8, G10, G11, G12.
   - **G13** rides slice 2, as ADR 0002 already places it.
 - **Marks, read strictly** (every clause holds):
-  - The first part fully meets only PM-0002-40 (with his one Windows run), PM-0002-54, PM-0002-57, and D2, D4, D6 and
-    D7.
+  - By CS-E, the first part fully meets PM-0002-40 (with his one Windows run), PM-0002-54, and D4, D6 and D7.
+    PM-0002-57 and D2 are met at its closing proof, after his second ruleset step (PROOF-57).
   - Every other mark is met when its last clause joins, at a named change-set. Its built clauses run from CS-C on.
   - No mark is dropped or loosened (Part 2).
-  - Several marks name things that arrive only after the foundation: `server` (slice 3), the editor (slice 5),
-    legacy goldens (slice 1). Those clauses join there, so PM-0002-41, -42, -46 and -47 are met only then.
+  - Several marks name things that arrive only after the foundation: `server` and `navbake` (slices 3 and 2), the
+    editor (slice 5), legacy goldens (slice 1), ADR 0003's count baseline. Those clauses join there, so PM-0002-41,
+    -42, -44, -46, -47, -51 and -52 are met only then.
 - **The waiting items** (Part 4, 107 rows in one table, one per item and source, counted by script):
-  - 49 are carried by the first part.
-  - 47 come later, each with its time.
-  - 6 are dropped, each with its reason.
-  - 2 are not a session's edit, 2 are rules for this chat, and 1 waits for the advisor agent's ruling.
+  - 50 are carried by the first part.
+  - 48 come later, each with its time.
+  - 5 are dropped, each with its reason.
+  - 2 are not a session's edit, and 2 are rules for this chat.
   - Leaning to the smallest step, as he asked: the old kit follow-ups go to a kit queue after 2.3. GUARD-SEC comes
     first, with PX-1 (the merge check that trusts CI results by their name alone) and W1 to W3 (gaps in what the
     guard lets routines and agents write).
 - **His part in the first part** (Part 9):
   - his go on this plan;
-  - six exact-text asks (CS-B, C1, D, C, E, F). Each is a patch at a pushed checkpoint commit, approved by naming the
-    commit's SHA and written in Accept edits, with about 2 to 21 guard prompts each, about 41 in all;
+  - seven exact-text asks (CS-B, C1, D, C, F, and two for CS-E: its workflow, and its two planted workflow failures
+    with their reverts). Each is a patch at a pushed checkpoint commit, approved by naming the commit's SHA and
+    written in Accept edits, with about 2 to 21 guard prompts each, about 45 in all;
   - seven merge gos;
   - two ruleset edits on GitHub;
-  - one scratch branch;
+  - three scratch branches, for PROOF-57's pull requests;
   - one Windows run.
   Each change-set still gets its own plan, the advisor agent's plan review, review rounds within the budget, the
   verifier, and the advisor agent's review of its final head.
@@ -78,7 +82,8 @@
   - PIN-SCOPE: which v2 pins and configs the guard protects;
   - FREEZE-END: when KIT-FREEZE-2 ends;
   - MODELS-HOW: effort max set in the agent files now, or after PR #40;
-  - ALLOW-GATE2: an allow rule for the gate v2's command.
+  - ALLOW-GATE2: an allow rule for the gate v2's command;
+  - ROLLBACK-SCOPE: whether a red gate v2 job on main counts as "main breaks" (may wait until CS-F).
 - **#52's leftovers are not on main 4460ef5:**
   - STATUS :5, :13, :29, :36 and :43, and ROADMAP :117, still show #52 open;
   - `docs/DECISIONS.md` has no entry of 2026-11-14;
@@ -108,8 +113,16 @@
   - **Rule 2, a re-proof.** A check also needs a result when it re-proves a spike's mark. SPIKE_PLAN's foundation entry
     (`docs/SPIKE_PLAN.md:465-467`) names these marks: R5-LAYOUT-REC4 and R5-TEST-REC2's tools from the sim core spike,
     and R5-TEST-REC4's L1 from the netcode proof test.
-  - **Rule 3, code from a later step.** A check whose subject arrives only with a later step (2.4, 2.5) joins with that
-    step. A check with nothing to check would be a feature "for later", which CLAUDE.md rules out.
+  - **Rule 3, this plan's choice under his "may".** His decision says the parts that need no result "may be built"
+    now; it does not say they must. A check whose subject arrives only with a later step waits for that step, even
+    when its result is in earlier, because a check with nothing to check would be a feature "for later", which
+    CLAUDE.md rules out. The checks this choice holds back:
+    - G4 and the generated-union mutation (step 2.4's generators);
+    - G9's boundary layer and Wasm tests, G6's `.wasm` file, G7 and the `wasm-opt` check (step 2.4's bindings);
+    - G6's Vite build, G8 and G12 (step 2.5's client and server), and the decoder panic lints (step 2.5's protocol);
+    - G10 (step 2.5's first recording, after the sim core spike);
+    - G11 with PM-0002-49 and -50 (step 2.5's loopback). G11 is the one that may wait past its result: if the netcode
+      proof test reports before step 2.5, L1 still has nothing to run against until then.
   - **The three facts this reading rests on** (`reading.md` B13):
     - F-FLOAT: the sim core spike decides R1-DET-OQ10, whether Wasm's `sqrt` is exact, and `sqrt` is on ADR 0004 part
       7's float allow-list. So the float ban waits. The hash-map and clock bans rest on no open question.
@@ -153,8 +166,9 @@ The later change-sets named below:
 | Name | Holds | Trigger | Kind |
 |---|---|---|---|
 | **2.3-B** | the boundary checks | the boundary spike's report merged (its items 4 and 8) | rides step 2.4's change-set (one PR, or a PR right before it, as 2.4's plan says), because G4 checks what 2.4 generates |
-| **2.3-S** | the sim core spike's checks | the sim core spike's report merged (ADR 0004 part 7's final list, sim's dependency set, R5-LAYOUT-REC4's result) | step 2.3's own change-set, built right after that report |
+| **2.3-S** | the sim core spike's checks | the sim core spike's report merged (ADR 0004 part 7's final list, sim's dependency set, R5-LAYOUT-REC4's result) | step 2.3's own change-set, built right after that report, and merged before any f32 or f64 arithmetic enters `sim` (the advisor agent's ruling (b)) |
 | **2.3-E** | the skeleton checks | the netcode proof test's and the sim core spike's reports merged, and step 2.5's code | rides step 2.5's change-set (2.5's plan may put it in a PR just before) |
+| **PROOF-57** | the merge-box proofs: PM-0002-57's "cannot merge" and D2's "single required check" | his second ruleset step, after CS-F | an evidence step with no files: scratch pull requests on branches he allows, read in GitHub's merge box, recorded by the next change-set's docs pass |
 
 Clauses that name a crate or a package that enters later join with the change-set that brings it, as the marks say ("from
 slice 1", "each when that crate enters") or as their nouns require: `server` at slice 3, `navbake` at slice 2, the
@@ -162,32 +176,33 @@ editor at slice 5. Run counts and machines are part of each mark.
 
 | Line or mark | Its clauses | First part | Joins later | Met at |
 |---|---|---|---|---|
-| D1 | `--prove` passes; every mutation fails exactly its named checks; every control passes | CS-C, for the built checks | each check's mutations as it joins | 2.3-E (the last of G0-G12 joins), as PM-0002-52 |
-| D2 | a TypeScript-only pull request runs and passes the single required check | CS-E (a scratch pull request) | | **CS-E** |
+| D1 | `--prove` passes; every mutation fails exactly its named checks; every control passes | CS-C, for the built checks | each check's mutations as it joins | holds on every `--prove` run from CS-C on, for the mutations then built; met in full at slice 5, with PM-0002-52 |
+| D2 | a TypeScript-only pull request runs and passes the single required check | CS-E shows such a pull request passing `required` | "the single required check" holds only after his second ruleset step | **PROOF-57** |
 | D3 | warm pull-request wall time at most 10 min at p50 over 5 runs; at most 20 min cold | CS-E measures and reports it | the full workflow | 2.3-E, as PM-0002-56 |
 | D4 | a failing and a cancelled job each turn the required check red | CS-E | | **CS-E** |
 | D5 | a fork pull request runs every job with no secret | | step 2.6, where the first secret enters (PM-0002-58 covers part 10 too) | step 2.6 |
 | D6 | the repository's Rust cache at or below 8 GB | CS-E (3 runs) | re-measured at 2.3-E | **CS-E** |
 | D7 | Mustafa names the required check in his branch protection | his ruleset change after CS-E | | **CS-E** (his setting) |
+| PM-0002-38 (every tool pinned; part 2; outside his range -39 to -62, claimed by no change-set: the old plan gave it to 2.2, whose report does not name it) | `rustc`, clippy, rustfmt, Node, TypeScript and the wasm-bindgen CLI print versions equal to their pins in every job's log; the same commit gives the same lint result on two CI runs a week apart | CS-E: each job writes its version lines and the aggregate compares them with the pins; the week-apart pair read a week after CS-E's merge, recorded by the next docs pass | the wasm-bindgen line (2.3-B) | 2.3-B |
 | PM-0002-39 (G0) | toolchain file deleted: G0 exit 2, no other Rust; `Cargo.toml` edited without `Cargo.lock` fails at the first cargo step; missing Playwright browser: exit 2 with the setup command; control: a consistent toolchain bump passes | CS-C: the first, second and fourth, plus the G0 finding's source-check mutations | the missing-browser clause (2.3-E) | 2.3-E |
 | PM-0002-40 (G1) | misformatted `.rs`, CRLF `.rs`, misformatted `.ts` each fail G1 only; control: long string literals pass; after `prettier --write`, ESLint reports 0; the formatted tree is byte-identical on Windows and Linux (once, his PC) | CS-C, and his Windows run (Part 9) | | **CS-C** + his run |
 | PM-0002-41 (G2) | the planted defects ADR 0002 lists at :1307, each failing G2 only with its reason; controls in `server`, in a `#[test]`, and sim's min/max/clamp helpers with `abs` and `fract` | CS-C: HashMap field and `map.values().sum()` in sim; `Instant::now()` in a tick function, in room and in client-endpoint; a correctness bug; a style warning; `unsafe`; a crate without `[lints] workspace = true`; `+fma`, `-C target-cpu=native`, `relaxed-simd` in the build flags; control `.unwrap()` in a `#[test]` | `sin`, `powi`, `to_radians`, `min`, and the helper controls (2.3-S); `.unwrap()` and `buf[i]` in a decoder (2.3-E); `-ffm` in `wasm-opt` (2.3-B); the `server` control (slice 3) | slice 3 |
-| PM-0002-42 (G3) | one violation per strict flag; `eval` and `new Function` in client; an unawaited promise; a switch over a generated union missing one kind; an import of editor from client; a bare `event`; DOM code imported by sim-worker or net; an import from `legacy/` or `spikes/`; controls: `import type` from types in editor passes; the clean tree is 0 and 0 | CS-C: all but the generated union and the two editor clauses | generated union (2.3-B); the editor clauses (slice 5) | slice 5 |
+| PM-0002-42 (G3) | one violation per strict flag; `eval` and `new Function` in client; an unawaited promise; a switch over a generated union missing one kind; an import of editor from client; a bare `event`; DOM code imported by sim-worker or net; an import from `legacy/` or `spikes/`; controls: `import type` from types in editor passes; the clean tree is 0 and 0 | CS-C: all but the generated union and the two editor clauses; the switch rule is on from CS-C, with an interim plant on a hand-written union that does not count to the mark (the advisor agent's ruling (d)) | generated union (2.3-B); the editor clauses (slice 5) | slice 5 |
 | PM-0002-43 (G4) | all | | 2.3-B | 2.3-B |
 | PM-0002-44 (G5) | transport crate or `tokio`/`quinn` in sim; `tokio` in room; `navbake` or `server` reachable from sim-wasm (each when that crate enters); wasm-bindgen or a transport crate in client-endpoint; a git dependency; a wildcard; a second version off the skip list; a server-only feature on a shared maths dependency (feature lists differ across server, devtools, navbake, sim-wasm); controls: proptest as sim's dev-dependency, a dev-only feature on devtools | CS-C: all but the feature comparison and the two crates that enter later; how each dependency mutation keeps `Cargo.lock` consistent offline is CS-C's design (local stand-in crates by name, or the network in CI's `--prove` job) | the feature comparison (2.3-S); navbake (slice 2) and server (slice 3), as the mark says | 2.3-S, and its own per-crate clauses as those crates enter |
 | PM-0002-45 (G7) | all | | 2.3-B | 2.3-B |
 | PM-0002-46 (G8) | all | | 2.3-E; the editor's clauses (slice 5) | slice 5 |
-| PM-0002-47 (G9 layers) | a broken property; a golden beyond tolerance (from slice 1); a changed insta snapshot; a byte swap in one encoder; a page error in deploy; control: an equal-output refactor | CS-C: the control, for `cargo test` and Vitest | the boundary layer (2.3-B), the end-to-end clause (2.3-E), the property and insta clauses with the first such test, the golden (slice 1) | slice 1 |
+| PM-0002-47 (G9 layers) | a broken property; a golden beyond tolerance (from slice 1); a changed insta snapshot; a byte swap in one encoder; a page error in deploy; control: an equal-output refactor | CS-C: the control, for `cargo test` and Vitest | the boundary layer (2.3-B); the end-to-end clause (2.3-E); the property, insta and golden clauses with slice 1's change-set (the first sim rules, v2 outputs and legacy goldens; a property test or snapshot added earlier joins from its own change-set) | slice 1's change-set |
 | PM-0002-48 (G10) | three planted divergences reported at the first tick; a control; G10 under 3 min over 5 runs | | 2.3-E | 2.3-E |
 | PM-0002-49 (L1) | the same seed gives an identical fate log and hashes twice; over 1,000,000 packets per profile, loss, delay and jitter within 5 %; G11 under 2 min | | 2.3-E (L1 enters behind the loopback at 2.5) | 2.3-E |
 | PM-0002-50 (G11) | all | | 2.3-E | 2.3-E |
-| PM-0002-51 (G12) | throw in deploy; console error; outbound request; WebSocket broken (from slice 3); +20 % draw calls against ADR 0003's baseline; control; the `forceWebGL` run and the backend named | | 2.3-E; WebSocket (slice 3, as the mark says); the draw-call clause when ADR 0003's count baseline is committed | slice 3, and that baseline |
-| PM-0002-52 (`--prove`) | every mutation of PM-0002-39 to -51; one mutation and one control per id G0-G12; under 30 min | CS-C, for the built ids | as each check joins | 2.3-E (all of G0-G12); later mutations join it as their crates enter |
-| PM-0002-53 (overflow, 4 builds) | a planted counter panics in dev and release, native and Wasm; `wrapping_add` agrees in all four; the cost reported | | the anchor of OVERFLOW-XCRATE-CI (Part 4): its Wasm half needs a Wasm runner, which comes with wasm-bindgen at 2.4 | 2.3-B at the earliest |
+| PM-0002-51 (G12) | throw in deploy; console error; outbound request; WebSocket broken (from slice 3); +20 % draw calls against ADR 0003's baseline; control; the `forceWebGL` run and the backend named | | 2.3-E; WebSocket with slice 3's change-set, as the mark says; the draw-call clause with the change-set that commits ADR 0003's count baseline (PM-0003-36, its benchmark scene in CI) | the later of slice 3's change-set and PM-0003-36's |
+| PM-0002-52 (`--prove`) | every mutation of PM-0002-39 to -51; one mutation and one control per id G0-G12; under 30 min | CS-C, for the built ids | as each check joins | slice 5's change-set: the last mutations of PM-0002-39 to -51 (the editor's, in -42 and -46) join there; one mutation and one control per id G0-G12 from 2.3-E |
+| PM-0002-53 (overflow, 4 builds) | a planted counter panics in dev and release, native and Wasm; `wrapping_add` agrees in all four; the cost reported | | moved by the advisor agent's ruling (a) of this review: the native half rides the first change-set that adds any dependency on `sim`; the Wasm half needs a Wasm runner (wasm-bindgen, at 2.4) | the first change-set with both a crate depending on `sim` and a Wasm runner (expected 2.3-B) |
 | PM-0002-54 (lint and type speed) | `tsc -b` under 30 s, typed lint under 60 s, clippy under 30 s warm and 3 min cold; 5 runs each | CS-C and CS-E (5 runs each, from the job logs) | | **CS-E** |
 | PM-0002-55 (gate speed) | `--quick` under 60 s warm; the full gate under 10 min warm, on Linux and on Windows; 5 runs per system | measured and reported at CS-C (not the full gate yet) | the full gate (2.3-E) and his Windows runs | 2.3-E |
 | PM-0002-56 (CI speed) | as D3, per job and in total | measured and reported at CS-E | the full workflow | 2.3-E |
-| PM-0002-57 (one required check) | a TypeScript-only pull request passes; a failing, a cancelled and a skipped job each turn it red and block the merge; removing a check fails the aggregate | CS-E (scratch pull requests, planted failures on CS-E's own pull request) | | **CS-E** |
+| PM-0002-57 (one required check) | a TypeScript-only pull request passes; a failing, a cancelled and a skipped job each turn it red and block the merge; removing a check fails the aggregate | CS-E, on its own pull request: a failing job (a failing test, no workflow edit) and a cancelled job (cancelled through the API) each turn `required` red; a skipped job and a removed check (each a workflow edit, asked of him with its exact revert) each fail the aggregate | "block the merge", read in GitHub's merge box once `required` is in the ruleset, and "passes the single required check" once it is the only one: scratch pull requests after his second ruleset step | **PROOF-57** |
 | PM-0002-58 (forks) | a fork pull request runs every job with no secret; its deploy job skipped | | step 2.6 (and a test account, his) | step 2.6 |
 | PM-0002-59 (caches) | warm: no dependency crate recompiled; total Actions cache at or below 8 GB with every v2 job cached; warm against cold reported; 3 runs each | measured at CS-E | every v2 job (2.3-E) | 2.3-E |
 | PM-0002-60 (wasm-bindgen install) | exactly the lock's version, under 30 s, 3 runs | | 2.3-B | 2.3-B |
@@ -209,6 +224,10 @@ editor at slice 5. Run counts and machines are part of each mark.
 - **Rule and guard edits stay apart from the gate v2's code** (his item 3): CS-B and CS-F hold rules text, CS-D holds
   guard code, CS-C holds gate code, CS-E holds CI.
 - **Prompt counts are estimates.** Each count assumes one Write per protected file.
+- **`toolchain` read by hand until `required` counts.** Until his first ruleset step makes `required` a required check,
+  the ruleset and the guard check only `gate` and `smoke`, while `toolchain` alone tests the root manifests, the
+  lockfiles and the crates. So every change-set before then merges only with `toolchain` green on its head, push and
+  pull_request, read by the session, as his gos for #48 and #52 asked.
 
 ### CS-A: the docs after #52, and this plan's record (risk tier 1: decision docs; needs-mustafa)
 - **Files:**
@@ -228,7 +247,8 @@ editor at slice 5. Run counts and machines are part of each mark.
 ### CS-B: the rules text (risk tier 2; CLAUDE.md, three agent files, `.claude/CHECKPOINTS.md`; no code)
 - **Edits** (exact texts in Appendix K):
   - K-1, K-2, K-3: the three exception lines, now carrying his decision of 2026-11-13 with its limits.
-  - K-4: "Models and effort", with his words of 2026-11-12 and of 2026-11-11.
+  - K-4: "Models and effort", with his words of 2026-11-12 and of 2026-11-11; its effort line exempts the netcode
+    chat.
   - K-6: MANUAL-MODE. K-7: GIT-C. K-8: L-4. K-9: SD-N2.
   - K-10a to K-10c: status-diet's citations.
   - K-14: the agents' paste block names the shell forms the guard refuses (PROMPTS-2.3's route).
@@ -262,6 +282,10 @@ editor at slice 5. Run counts and machines are part of each mark.
   - Each fix shown failing before it and passing after it.
   - The gate on a local merge with PR #40's head, never pushed: no refusal for `spikes/`.
   - CI's `gate` and `smoke` green.
+- **Precondition: a local smoke run.** CS-C1 edits `smoke.mjs`, and the advisor agent's day-session seat runs the full
+  gate, smoke included (`advisor.md`, step 2 and its Never line). So before CS-C1's review the session must run the
+  smoke locally: with the toolkit's Chromium build (the allowed `node tools/node_modules/playwright/cli.js install
+  chromium`), or by 2.1a's route of the container's Chromium under that build's name. Its plan settles which (row 94).
 - **Reviews:** security-auditor and test-engineer, then the advisor agent.
 - **His asks:** one. **Protected writes:** 2, so about 2 prompts. **His go:** the merge.
 
@@ -270,10 +294,10 @@ editor at slice 5. Run counts and machines are part of each mark.
   - G-1, PIN-GUARD, by PIN-SCOPE;
   - G-2, the gate v2's folder, by GATE-PATH;
   - G-3, AUTO-ASK;
-  - the kit lists that name the protected files: K-6b, K-11a and K-11b.
+  - the kit lists that name the protected files: K-6b, and K-11a to K-11c.
 - **Why it comes before CS-C:** the gate v2's files are then protected from their first commit. Without it, a routine
   could write them on a branch, a day session would get no ask, and the PR Advisor could merge them, since `tools/` is
-  one of its merge places (`routine-guard.mjs:87`).
+  one of its merge places (`routine-guard.mjs:84`).
 - **Evidence:**
   - The guard's suite (1107 tests today), `settings.test.mjs` (127) and `checkpoint.test.mjs` (27).
   - New rows for each protected path:
@@ -341,46 +365,60 @@ editor at slice 5. Run counts and machines are part of each mark.
   - Swatinem/rust-cache, saved from main only;
   - per-job timeouts, SHA pins, `contents: read`, `persist-credentials: false`.
 - **Evidence:**
-  - PM-0002-57's checks: a TypeScript-only scratch pull request; planted failing, cancelled and skipped jobs and a
-    removed check on CS-E's own pull request, each red and blocking, then reverted exactly;
+  - PM-0002-57's and D4's checks on CS-E's own pull request: a failing job made by a failing test (no workflow edit)
+    and a cancelled job (cancelled through the API), each turning `required` red; a skipped job and a removed check,
+    each a workflow edit asked of him with its exact revert, each failing the aggregate. The merge-box clauses and
+    the TypeScript-only pull request wait for PROOF-57;
+  - PM-0002-38: each job writes its tools' version lines for the aggregate to compare with the pins; the same
+    commit's lint result read again a week later;
+  - the name: the aggregate's job id and job name are both exactly `required`, in code font in every kit text (the
+    advisor agent's ruling (c));
   - a red run with `--net` removed, ending in the probe's "still reachable" line (CUT-CARRY);
   - SETPRIV-HARDEN's assertions in the log;
   - timings for D3 and PM-0002-56 (5 warm, 3 cold), reported;
   - the cache size for D6;
   - the legacy jobs diffed against `gate.yml`'s: equal but for the named fixes.
 - **Reviews:** security-auditor, infra-engineer and test-engineer, then the advisor agent.
-- **His asks:** one. **Protected writes:** 3 (`ci.yml` written; `gate.yml` and `toolchain.yml` removed), so about 3
-  prompts. **His go:** the merge.
+- **His asks:** two: the workflow (3 protected writes: `ci.yml` written, `gate.yml` and `toolchain.yml` removed), and
+  the two planted workflow failures with their exact reverts (4 writes). So about 7 prompts. **His go:** the merge.
 - **Then his ruleset step:** add `required` once its first push run on main is green (Part 8).
 
 ### CS-F: the switch (risk tier 2: the guard's merge check; rules text; settings)
 - **Edits:**
   - G-4: the guard's merge check requires `required`, `gate` and `smoke`, plus its comment at `routine-guard.mjs:6`, its
     message at `:990`, and its tests;
-  - K-12a to K-12h: the lines naming `gate` and `smoke` as the required checks;
+  - K-12a to K-12h: the lines naming `gate` and `smoke` as the required checks (K-12a, f and g widen "main breaks",
+    so they need his words: ROLLBACK-SCOPE);
   - K-13a to K-13d: the lines naming the gate's command learn the gate v2 for v2 code;
   - S-1, by ALLOW-GATE2: the allow rule;
   - the docs: STATUS (REQUIRED-CHECK closed), and DECISIONS.md's "Queued" (KIT-FREEZE-2 leaves, by FREEZE-END (a)).
 - **Evidence:**
-  - the guard's tests: no `required` refuses; `required` pending or red refuses; all three green allows;
+  - the guard's tests: no `required` refuses; `required` pending or red refuses; two runs named `required`, one of
+    them red, refuse (the advisor agent's ruling (c)); all three green allows;
   - a grep: no kit line still names `gate` and `smoke` alone as the required checks;
   - the settings test.
 - **Reviews:** security-auditor and test-engineer, then the advisor agent.
 - **His asks:** one. **Protected writes:** 7 (the guard, its tests, CLAUDE.md, advisor.md, verifier.md, the gate skill,
   settings.json), so about 7 prompts. **His go:** the merge.
 - **Then his ruleset step:** remove `gate` and `smoke` from the required checks. They still run inside `required`.
+- **Then PROOF-57,** the first part's closing proof: three scratch pull requests, one TypeScript-only that passes the
+  single required check, and one with a failing job and one with a cancelled job, each blocked in GitHub's merge box.
+  Its record goes into the next change-set's docs pass.
 
 ### First part, in sum
 - 7 change-sets.
-- 6 exact-text asks.
-- About 41 guard prompts by PIN-SCOPE (b): 4 + 2 + 4 + 21 + 3 + 7.
+- 7 exact-text asks (CS-E has two).
+- About 45 guard prompts by PIN-SCOPE (b): 4 + 2 + 4 + 21 + 7 + 7, and at most one more per change-set for making
+  its scratch copy (5.1).
 - 7 merge gos.
+- Then PROOF-57.
 
 ### The later parts
-- **2.3-B** rides step 2.4: G4, G9's boundary layer and Wasm tests, G7 with the budget file, PM-0002-60, the
-  `wasm-opt` flag clause, the Wasm half of PM-0002-53, and WASM-ARTIFACT.
-- **2.3-S**, its own change-set after the sim core spike: the float ban, the map types from sim's dependencies, the
-  same-feature check and FEATURE-UNIFY.
+- **2.3-B** rides step 2.4: G4, G9's boundary layer and Wasm tests, G7 with the budget file, PM-0002-60, PM-0002-38's
+  wasm-bindgen line, the `wasm-opt` flag clause, PM-0002-53 (its native half rides the first change-set that adds a
+  dependency on `sim`, by the advisor agent's ruling (a)), and WASM-ARTIFACT.
+- **2.3-S**, its own change-set after the sim core spike, merged before any f32 or f64 arithmetic enters `sim`: the
+  float ban, the map types from sim's dependencies, the same-feature check and FEATURE-UNIFY.
 - **2.3-E** rides step 2.5: G6's Vite build, G8, G10, G11 with L1, G12, the decoder panic lints, the missing-browser
   clause, TWO-PLAYWRIGHTS, and the full-gate runs for PM-0002-52, -55, -56, -59 and -61.
 - **G13** rides slice 2.
@@ -397,8 +435,7 @@ editor at slice 5. Run counts and machines are part of each mark.
   - [later]: with when;
   - [dropped]: with why;
   - [not ours]: not a session's edit;
-  - [chat]: a rule for this chat;
-  - [ruling]: the advisor agent rules at this plan's review.
+  - [chat]: a rule for this chat.
 - **A row carried by several change-sets** is tagged by its first part.
 - **The later kit queue names:**
   - **GUARD-SEC**: the guard's security pass, its own change-set right after CS-F;
@@ -430,7 +467,7 @@ editor at slice 5. Run counts and machines are part of each mark.
 | 19 | REFUSED-PUSH | 2.2 :338 | [dropped] the session's permission check refused a compound line, no kit rule did, and the guard allows the push; a plain `git push` line is the route |
 | 20 | PIN-GUARD | 2.2 :339 | [1st] CS-D (G-1), by PIN-SCOPE |
 | 21 | G0: exit 2, the source checks, the mutations | 2.2 :340 | [1st] CS-C |
-| 22 | OVERFLOW-XCRATE-CI (Medium) | 2.2 :341 | [ruling] its text asks this plan to add a test-only dependency or ask the advisor agent to move the anchor. Recommended: move it to the first change that adds a dependency on `sim` (2.3-B with step 2.4's `sim-wasm`, or 2.5). No crate calls `sim` today, and the Wasm half needs a Wasm runner, which comes with wasm-bindgen at 2.4. PM-0002-53 moves with it unchanged |
+| 22 | OVERFLOW-XCRATE-CI (Medium) | 2.2 :341 | [later] the advisor agent's ruling (a) of this review moved the anchor, as its text allows: the native half rides the first change-set that adds any dependency on `sim`; PM-0002-53 is met at the first change-set with both a crate depending on `sim` and a Wasm runner (expected 2.3-B). CS-A rewrites STATUS :95 and the archive's anchor text |
 | 23 | TSCONFIG | 2.2 :342 | [1st] CS-C (G3) |
 | 24 | REQUIRED-CHECK | 2.2 :343 | [1st] CS-E, his ruleset, CS-F |
 | 25 | SETUP-NODE-CACHE (security, accepted with #48) | 2.2 :344 | [1st] CS-E, a CI edit asked of him |
@@ -455,7 +492,7 @@ editor at slice 5. Run counts and machines are part of each mark.
 | 44 | OVERFLOW-PANIC-RULE (security, accepted with #48) | 2.2 :375; his go for #48, item 5 | [later] the first code in `room` or a server crate (2.5) |
 | 45 | PACKAGE-ENTRIES | 2.2 :382 | [later] the step that gives a package code (2.5) |
 | 46 | EMPTY-SLOTS (OQ-0002-7, the wasm-bindgen pin) | 2.2 :383 | [later] step 2.4, after its reading by day |
-| 47 | OQ-0002-8-TEST | 2.2 :388 | [later] the Advisor's or the advisor agent's reading; CS-C's G5 (PM-0002-44) is one candidate |
+| 47 | OQ-0002-8-TEST | 2.2 :388 | [later] PM-0002-64, at step 2.5, is its test (the advisor agent's reading in this review); recorded by CS-A |
 | 48 | BRIEF-STALE | 2.2 :393 | [not ours] his and the Advisor's brief |
 | 49 | PX-1: the merge check trusts `gate` and `smoke` by name alone | STATUS :70; archive :457-464 | [later] GUARD-SEC, by his PX1-ROUTE (a): "its own change-set after the foundation's gate step" |
 | 50 | PX-1's two test gaps | archive :465-468 | [later] GUARD-SEC (they ride PX-1) |
@@ -502,7 +539,7 @@ editor at slice 5. Run counts and machines are part of each mark.
 | 91 | five "before the foundation" lines with no pointer to his decisions | archive :547-554 | [later] the drafts' next revision, by their owners |
 | 92 | the three exception lines (2.3-docs finding 1) | 2.3-docs report :288-289 | [1st] CS-B (K-1 to K-3) |
 | 93 | BRIEF-STALE and those lines also lack the 2026-11-13 decision (finding 2) | 2.3-docs :290 | [not ours] the brief is his and the Advisor's; the drafts' lines go with row 91 |
-| 94 | no `tools/` install in this container, so the local smoke cannot start (finding 3) | 2.3-docs :291-292 | [dropped] for 2.3: CI's smoke job runs on every head, as in 2.1b and 2.2. A setup script for this environment is his option |
+| 94 | no `tools/` install in this container, so the local smoke cannot start (finding 3) | 2.3-docs :291-292 | [1st] a precondition of CS-C1, which edits `smoke.mjs`: a local smoke run before its review (Part 3). For the other change-sets, CI's smoke job stands, as in 2.1b and 2.2 |
 | 95 | the advisor-tool moment-5 line (finding 4) | 2.3-docs :293-294 | [1st] CS-B: K-4's optional line B, wider than his words, for him to accept or refuse |
 | 96 | read the advisor tool's model from the records (finding 5) | 2.3-docs :295-296 | [1st] CS-B: K-4's optional line A |
 | 97 | STATUS still lists #52 as open (:5, :13, :29, :36, :43) | main 4460ef5 | [1st] CS-A (not in on main) |
@@ -520,9 +557,16 @@ editor at slice 5. Run counts and machines are part of each mark.
 ## Part 5. Every kit, gate and CI edit foreseen (item 5)
 
 ### 5.1 How each edit is asked and written (the F1-FIX way of 2026-11-11, at scale)
-1. **Prepared away from the main folder.** The session makes the change in a scratch copy under `.gate/`, never in the
-   main folder. It saves the copy's `git diff` as a patch in the change-set's notes folder, and pushes it with a
-   checkpoint save.
+1. **Prepared away from the main folder.**
+   - Rules text (CS-B, and the kit lines of CS-D and CS-F): the patch is generated by script from main's text and the
+     after-texts, as `kit-texts.py` does, so no kit file is written before his yes.
+   - Code (CS-C1, CS-C, CS-D's guard, CS-E): developed and tested in a plain copy of the tree made with `git
+     archive`, never a worktree of this repository and never committed. For builds the copy sits under
+     `.gate/<change-set>/` (CHECKPOINTS §4); for the guard's own files it sits in the session's scratchpad, outside
+     the project, so no step leans on the guard's nested-folder gap (W1). The 2.1a precedent: `.gate/fdn-scratch`,
+     and F1-FIX's patch.
+   - The patch (the copy's diff against main) goes into the change-set's notes folder and is pushed with a checkpoint
+     save. Before his yes there is at most one guard prompt per change-set, for making the copy.
 2. **Asked in chat.** The ask carries:
    - the patch's path;
    - the checkpoint commit's full SHA, and the patch's sha256;
@@ -544,15 +588,15 @@ editor at slice 5. Run counts and machines are part of each mark.
 | K-1 | CLAUDE.md :20-23 | CS-B | the Phase 0 bullet's exception names his decision of 2026-11-13, quoting its sentence whole | looser, by his exception, inside its limits |
 | K-2 | CLAUDE.md :54-57 | CS-B | "Phase 0 writes no v2 code, except ...", the same | looser, as K-1 |
 | K-3 | advisor.md :107-108 | CS-B | the reviewer's line, with both of his limiting sentences | looser, as K-1 |
-| K-4 | CLAUDE.md :170-185 | CS-B | "Models and effort", bullets 1 to 4 (Routines unchanged): his words of 2026-11-12 (four bullets) and of 2026-11-11 (his bullets, without the replaced model sentence and the request to record them), with two optional lines (A, B) for him to accept or refuse | neither: it matches his words. Optional B is wider than his words. One clause is marked to verify (a workflow agent's model option) |
+| K-4 | CLAUDE.md :170-185 | CS-B | "Models and effort", bullets 1 to 4 (Routines unchanged): his words of 2026-11-12 (four bullets) and of 2026-11-11 (his bullets, without the replaced model sentence and the request to record them), with two optional lines (A, B) for him to accept or refuse; its effort line exempts the netcode chat, and is also given under MODELS-HOW (a) and (b) | neither: it matches his words. Optional B is wider than his words. One clause is marked to verify (a workflow agent's model option) |
 | K-6 | CLAUDE.md :71-73 | CS-B | MANUAL-MODE: "Accept edits or Manual mode" made true for a cloud session | wording |
 | K-6b | CLAUDE.md :71-73 | CS-D | the same clause says the guard refuses kit edits in Auto mode (only with G-3) | stricter |
 | K-7 | CHECKPOINTS.md :219-224 | CS-B | GIT-C: `git status` run inside the copy | wording |
 | K-8 | CLAUDE.md :236-237 | CS-B | L-4: the setup line uses the allowed `node tools/node_modules/playwright/cli.js install chromium` | wording |
 | K-9 | CLAUDE.md :127-130 | CS-B | SD-N2: "the advisor agent" approved, twice | wording |
 | K-10a to c | advisor.md :17, :286-287; netcode-architect.md :23-24 | CS-B | status-diet's citations point to the archive and DECISIONS.md | wording |
-| K-11a, b | CLAUDE.md :68-69; advisor.md :164-166 | CS-D | the lists of protected and gate files name the gate v2's folder and PIN-SCOPE's paths | stricter |
-| K-12a to h | CLAUDE.md :119, :130; advisor.md :157, :163, :224, :273, :294, :323 | CS-F | `gate` and `smoke` as the required checks become `required`, which needs both and every v2 job | same strength |
+| K-11a to c | CLAUDE.md :68-69; advisor.md :164-166 and :39-43 | CS-D | the lists of protected and gate files, and escalation category 3's, name the gate v2's folder and PIN-SCOPE's paths | stricter |
+| K-12a to h | CLAUDE.md :119, :130; advisor.md :157, :163, :224, :273, :294, :323 | CS-F | `gate` and `smoke` as the required checks become `required`, which needs both and every v2 job | same strength, except K-12a, f and g, which widen "main breaks" (ROLLBACK-SCOPE) |
 | K-13a to d | CLAUDE.md :74-75, :238-239; verifier.md :21; the gate skill :6 | CS-F | the gate's command lines learn the gate v2 for v2 code | stricter |
 | K-14 | CHECKPOINTS.md :128 | CS-B | the agents' paste block names the shell forms the guard refuses | guidance |
 
@@ -712,7 +756,7 @@ So no guard rule changes for PROMPTS-2.3: one rules line (K-14) and one rule fix
 | After | What #40 must do |
 |---|---|
 | CS-A | nothing now. When it next merges main (in its worktree), it keeps both sides in STATUS, ROADMAP and DECISIONS.md, where #52 already conflicts with it |
-| CS-B | nothing. Nothing in `spikes/` changes. The new CLAUDE.md keeps the netcode chat's models and efforts, by his words and by MODELS-HOW (c), which leaves the agent files' effort lines alone until it merges |
+| CS-B | nothing. Nothing in `spikes/` changes. The new CLAUDE.md keeps the netcode chat's models and efforts: K-4 exempts it from the callers' `max`, and MODELS-HOW (c) leaves the agent files' effort lines alone until it merges |
 | CS-C1 | nothing. Its gate command `node tools/gate.mjs --no-smoke` stays. The stray-page check looks at the root and the old folder only; CS-C1's evidence runs on a local merge with its head |
 | CS-D | nothing to change. After its next main merge it runs the new guard: the root pins and gate configs are protected, its `spikes/` manifests are not, and in Auto mode a kit edit is refused (its planned `.github/` Safari workflow needs Accept edits and his yes anyway) |
 | CS-C | nothing. The gate v2 ignores `spikes/`: the spikes keep their own workspace, G1 and G3 read `packages/**`, and G2 and G5 read the root workspace. CS-C's evidence runs the gate v2 on a local merge with its head |
@@ -727,24 +771,32 @@ So no guard rule changes for PROMPTS-2.3: one rules line (K-14) and one rule fix
    documented for branch protection rules; this session could not confirm it for rulesets.
 2. **After CS-F merges:** remove `gate` and `smoke`. They still run inside `required`.
 
-Why this order: at every moment the guard and the ruleset require the same checks, or the guard requires more.
+Why this order: every merge needs `gate` and `smoke` green from both the ruleset and the guard, throughout. From step 1
+to CS-F the ruleset also requires `required`, so it is stricter than the guard, which is safe. From CS-F on, both
+require `required`. Reordering instead, step 2 before CS-F, would leave the rules text naming `gate` and `smoke` as the
+required checks while the ruleset no longer did.
+
+**Then PROOF-57** (after step 2): the merge-box proofs of PM-0002-57 and D2, on scratch pull requests.
 
 ## Part 9. What he does himself (item 9)
 1. **Now:**
-   - answer GATE-PATH, PIN-SCOPE, FREEZE-END, MODELS-HOW and ALLOW-GATE2 (ALLOW-GATE2 may wait until CS-F);
+   - answer GATE-PATH, PIN-SCOPE, FREEZE-END and MODELS-HOW, and ALLOW-GATE2 and ROLLBACK-SCOPE now or at CS-F;
    - give or refuse his go on this plan.
 2. **For each change-set:**
-   - **The exact-text ask** (CS-B, C1, D, C, E, F: six): say yes in chat, naming the checkpoint commit's SHA.
+   - **The exact-text asks** (CS-B, C1, D, C, F, and two for CS-E: seven): say yes in chat, naming the checkpoint
+     commit's SHA.
    - **Modes:** switch the chat to Accept edits before the writes, and back to Auto after. The session says when.
-   - **Guard prompts:** answer each, about 4, 2, 4, 21, 3 and 7.
+   - **Guard prompts:** answer each, about 4, 2, 4, 21, 7 and 7, and at most one per change-set for its scratch copy.
    - **The merge** (CS-A to CS-F, seven): give his go in the chat, after the advisor agent's APPROVE of the final head.
 3. **GitHub:** ruleset 25069670 (Settings → Rules → Rulesets):
    - add `required` after CS-E, choosing GitHub Actions as its source if offered;
    - remove `gate` and `smoke` after CS-F.
-4. **A scratch branch for PM-0002-57's TypeScript-only pull request:** let the session push one branch,
-   `claude/sweet-mayer-grsukw-ts-only`, closed unmerged afterwards. Or open that pull request himself.
+4. **Three scratch branches for PROOF-57,** after his second ruleset step: let the session push
+   `claude/sweet-mayer-grsukw-ts-only`, `claude/sweet-mayer-grsukw-fail` and `claude/sweet-mayer-grsukw-cancel`, each
+   opened as a pull request, read in GitHub's merge box and closed unmerged. Or open them himself.
 5. **His Windows laptop, after CS-C:** PM-0002-40's two-system check. Exact steps come in CS-C's report, in plain words:
-   1. install the v2 toolchain: rustup takes the pin from `rust-toolchain.toml`, Node 22, `npm ci` at the root;
+   1. install the v2 toolchain: rustup takes the pin from `rust-toolchain.toml`, Node 22, `npm ci --ignore-scripts` at
+      the root;
    2. run the gate v2's format step;
    3. paste the hash line it prints into the chat.
    With 2.3-E later: PM-0002-55's Windows timing, 5 runs.
@@ -762,8 +814,9 @@ Why this order: at every moment the guard and the ruleset require the same check
    PIN-SCOPE is his.
 3. **CS-E moves the legacy jobs into a new workflow.** A slip there would weaken the legacy game's guard. Against it:
    the moved jobs are diffed against `gate.yml`'s, equal but for the named fixes, and each job gets a planted failure.
-4. **The switch order.** A wrong order could block every merge, which fails closed, or loosen the merge check. Part 8's
-   order keeps the guard equal to or stricter than the ruleset at every step.
+4. **The switch order.** A wrong order could block every merge, which fails closed, or loosen the merge check. In Part
+   8's order, `gate` and `smoke` stay required by both the ruleset and the guard at every step, the ruleset is at
+   least as strict as the guard from step 1 on, and the rules text stays true at every merge.
 5. **#40's merge burden** grows with each docs change-set. It must merge main before its own merge, and after CS-E it
    needs the new workflow.
 6. **G-3 rests on the hook input's `permission_mode`.** Its fallback is today's ask.
@@ -785,12 +838,34 @@ Why this order: at every moment the guard and the ruleset require the same check
   - consultation 1 (moment 1) is done;
   - any design call with more than one defensible answer gets moment 4;
   - moment 5 comes before the plan is saved as done, after the advisor agent's verdict, by his rule 2 of 2026-11-14.
+- **Revision 2** (the advisor agent's review of revision 1 at 03d05f5: REVISE), what changed:
+  - H1: PM-0002-57's "cannot merge" and D2's "single required check" move to PROOF-57, after his second ruleset
+    step; Part 8's and Part 10's sentences on the order restated (the ruleset is the stricter one from step 1 to CS-F).
+  - M2: CS-E's planted skipped job and removed check, with their reverts, are a second ask (4 writes); its failing
+    and cancelled jobs use a failing test and an API cancel; the totals become 7 asks and about 45 prompts.
+  - M3: Part 2's cells: D1 and PM-0002-52 met at slice 5; PM-0002-47, -51 and -53 name their change-sets;
+    PM-0002-38 placed (CS-E, its wasm-bindgen line at 2.3-B); the summary adds -44, -51 and -52.
+  - M4: Rule 3 is the plan's choice under his "may", with its list; G11 may wait past its result.
+  - M5: K-4's effort line exempts the netcode chat; its effort line under MODELS-HOW (a) and (b) added; [to verify]
+    covers `model: "fable"`, "on his personal account" added.
+  - M6: K-11c (escalation category 3's gate files); K-12a, f and g labelled a widening (ROLLBACK-SCOPE, a new
+    decision, at CS-F).
+  - M7: until `required` counts, each change-set reads `toolchain`'s runs by hand.
+  - M8: row 94 is a precondition of CS-C1 (a local smoke run), not dropped.
+  - Lows: row 47 (PM-0002-64 is OQ-0002-8's test, its reading); `routine-guard.mjs:84`; `npm ci --ignore-scripts`;
+    5.1 says how the scratch copy is made and counts its prompt; the checkpoint's consultation count.
+  - Rulings folded: (a) OVERFLOW-XCRATE-CI's anchor moved (row 22, PM-0002-53); (b) the float ban, with its condition
+    on 2.3-S; (c) `required`, with its three conditions (CS-E, CS-F); (d) the interim union plant (PM-0002-42).
+  - Decisions: GATE-PATH (a)'s import cost; PIN-SCOPE (b)'s unprotected pins; MODELS-HOW quotes DECISIONS.md :91.
 
 ## Decisions needed
 - **GATE-PATH: where does the gate v2's script live?**
   - Why it matters: the guard, the allow rules and the kit's command lines all name it, and CS-C builds it there.
   - Options:
-    - (a) its own folder beside the legacy gate, `tools/gate-v2/` (run as `node tools/gate-v2/gate.mjs`);
+    - (a) its own folder beside the legacy gate, `tools/gate-v2/` (run as `node tools/gate-v2/gate.mjs`). One more cost:
+      a script there that imports a package by its bare name finds `tools/node_modules` first (acorn, eslint-scope,
+      Playwright 1.56.1), not the root's, so the gate v2 imports no package by bare name and runs the root's tools by
+      their path;
     - (b) it takes `tools/gate.mjs`, and the legacy gate moves;
     - (c) a new root folder `gate/`, which adds to the layout he accepted in ADR 0002 part 1.
   - Recommendation: (a). The fewest changes, and the legacy gate stays untouched (Part 7).
@@ -803,7 +878,9 @@ Why this order: at every moment the guard and the ruleset require the same check
     - (b) the gate's own rules and the toolchain pin: `rust-toolchain.toml`, the root `Cargo.toml` (its lint table,
       overflow setting and shared versions), `deny.toml`, `rustfmt.toml`, each crate's `clippy.toml`,
       `tsconfig.base.json`, `eslint.config.mjs`, `.prettierrc.json` and `.prettierignore`. Dependency changes stay with
-      CI (`--locked`, G5's bans and sources, exact versions), with review and with his go at merge;
+      CI (`--locked`, G5's bans and sources, exact versions), with review and with his go at merge. It leaves
+      unprotected the gate v2's own npm tool pins (the root `package.json` and lockfile, which hold ESLint, Prettier,
+      TypeScript and Vitest) and `Cargo.lock`, while the legacy gate's `tools/package*.json` are gate files today;
     - (c) none beyond the gate v2's folder.
   - Recommendation: (b). Nobody can quietly weaken the gate's rules, and dependency work stays possible for builder
     agents, while his go at merge still sees every dependency change.
@@ -817,13 +894,17 @@ Why this order: at every moment the guard and the ruleset require the same check
 - **MODELS-HOW: how should "the agents that review, verify or design game and engine code always run at max" be
   written?**
   - Why it matters: his words also say "The netcode chat on my university account keeps its models and efforts as they
-    are", and it takes main's agent files when it merges main.
+    are", and it takes main's agent files when it merges main. And they say "Step 2.3 changes CLAUDE.md's "Models and
+    effort" section and the agent files to match" (DECISIONS.md :91), which (c) meets for the agent files only after
+    PR #40 merges.
   - Options:
     - (a) `effort: max` in those 12 agent files now, in CS-B. The netcode chat's agents then run at max after its next
       main merge;
     - (b) the agent files stay as they are, and CLAUDE.md tells every caller to pass `effort: "max"` to those agents;
     - (c) CLAUDE.md says (b) now, and the 12 agent files say `max` right after PR #40 merges (KIT-EFFORT).
-  - Recommendation: (c). It keeps both of his sentences true.
+  - Recommendation: (c). It keeps the netcode chat's efforts exactly as his words say, at the cost of the agent
+    files' part of step 2.3 coming after #40. (a) keeps step 2.3 whole, but leaves the netcode chat to pass its old
+    efforts itself.
 - **ALLOW-GATE2: may `.claude/settings.json` allow the gate v2's command?** That is `node tools/gate-v2/gate.mjs`, with
   and without arguments, as it allows `node tools/gate.mjs` today.
   - Why it matters: without the rule, routines cannot run the gate v2 unattended, and day sessions are asked each time.
@@ -833,9 +914,19 @@ Why this order: at every moment the guard and the ruleset require the same check
     - (b) no: sessions answer the prompts, and routines do no v2 gate runs.
   - Recommendation: (a). The legacy gate has the same two rules, and the night shift will need the gate v2.
   - He can answer it now or at CS-F.
+- **ROLLBACK-SCOPE: should a red gate v2 job on main count as "main breaks"?** "Main breaks" starts a revert with no
+  plan step (CLAUDE.md :119-122; `advisor.md`, "Revert"). Today it means `gate` or `smoke` red on main.
+  - Why it matters: K-12a, f and g, as drafted, make it "`required` red on main", which counts every gate v2 job. That
+    is more cases where a day session reverts first: a widening his words must allow (Part 4 row 56, F5, has the same
+    shape).
+  - Options:
+    - (a) yes: `required` red on main, after one re-run and pinned to one merge, is "main breaks";
+    - (b) no: "main breaks" stays `gate` or `smoke` red, and a red gate v2 job on main gets a fix forward, plan first.
+  - Recommendation: (a). After CS-F, `required` is the whole gate, and a red gate on main is what the rule is for.
+  - He can answer it now or at CS-F.
 
 ## For Mustafa
-1. Answer GATE-PATH, PIN-SCOPE, FREEZE-END and MODELS-HOW, and ALLOW-GATE2 if he wishes now.
+1. Answer GATE-PATH, PIN-SCOPE, FREEZE-END and MODELS-HOW, and ALLOW-GATE2 and ROLLBACK-SCOPE if he wishes now.
 2. Give or refuse his go on this plan, after the advisor agent's verdict, which the end message names.
 3. If a docs chat on main should carry #52's leftovers before CS-A, say so. CS-A then keeps only this plan's record.
 
@@ -844,7 +935,6 @@ Each "Before" is read from main 4460ef5 by line number, with its opening checked
 copied from `docs/DECISIONS.md` and checked against it. Lines marked "re-wraps when written" keep their words; the
 line breaks are set when the change-set writes them. The texts are proposals: each is asked of him again, as a patch,
 in its change-set (5.1).
-
 Quotes of his words checked: 19, each found in DECISIONS.md once whitespace is joined.
 
 ### K-1 (CS-B): `CLAUDE.md` lines 20-23 on 4460ef5
@@ -943,17 +1033,17 @@ After:
   > - The netcode chat on my university account keeps its models and efforts as they are.
 - **How:** agent files say `model: opus`, which resolves to Opus 5.5 today (`claude-opus-5-5`; an `opus` agent reported
   it on 2026-10-25). When a newer Opus appears, Mustafa decides whether to move. Built-in agents (Explore, Plan,
-  general-purpose) get their model passed explicitly: `model: "fable"` for the builder agents of a chat that writes game
-  or engine code, `model: "opus"` for every other. Workflow agents inherit the session's model, so a chat on Fable 5.2
-  sets every workflow agent that is not a builder to Opus 5.5 [to verify in the workflow reference before this text is
-  asked].
+  general-purpose) get their model passed explicitly: `model: "fable"` for the builder agents of a chat on his personal
+  account that writes game or engine code, `model: "opus"` for every other. Workflow agents inherit the session's model,
+  so a chat on Fable 5.2 sets every workflow agent that is not a builder to Opus 5.5 [to verify before this text is
+  asked: the Agent tool's model value for Fable 5.2, and the workflow API's model option].
 - **Effort is always stated** (Opus 5.5 defaults to medium): `max` for every agent that reviews, verifies or designs
   game or engine code (his words above); until PR #40, the netcode chat, has merged, the caller passes `effort: "max"`
-  to those agents, and their agent files say `max` after that, so the netcode chat keeps its efforts. Otherwise `high`
-  by default; `xhigh` for architecture decisions (ADRs, `docs/ENGINE_OVERVIEW.md`, the synthesis) and netcode. Agent
-  files set it in their frontmatter. The caller passes it for everything else: the Agent tool's `effort` for built-in
-  agents and for a `high` agent working on an ADR or on netcode (`xhigh`); `effort: 'high'`, `'xhigh'` or `'max'` on
-  every workflow `agent()` call (without it, a workflow agent takes the session's effort).
+  to those agents, except in the netcode chat, which keeps its efforts; their agent files say `max` after that.
+  Otherwise `high` by default; `xhigh` for architecture decisions (ADRs, `docs/ENGINE_OVERVIEW.md`, the synthesis) and
+  netcode. Agent files set it in their frontmatter. The caller passes it for everything else: the Agent tool's `effort`
+  for built-in agents and for a `high` agent working on an ADR or on netcode (`xhigh`); `effort: 'high'`, `'xhigh'` or
+  `'max'` on every workflow `agent()` call (without it, a workflow agent takes the session's effort).
 - **Sonnet 5.5 only for purely mechanical chores, and only when genuinely necessary:** file moves, formatting, link
   checks, summarizing logs. Opus remains the preference even there. No other model, except Fable 5.2 on Mustafa's
   personal account: the main model of a chat that writes game or engine code and of its builder agents (above), and the
@@ -984,6 +1074,55 @@ After:
 ```
 
 Rules text to match his words of 2026-11-12 and 2026-11-11; nothing looser than his words (the optional lines are marked and his to refuse).
+
+### K-4 (a) (CS-B): `CLAUDE.md` lines 174-178 on 4460ef5
+
+Before:
+```
+- **Effort is always stated** (Opus 5.5 defaults to medium): `high` by default; `xhigh` for architecture decisions
+  (ADRs, `docs/ENGINE_OVERVIEW.md`, the synthesis) and netcode. Agent files set it in their frontmatter. The caller
+  passes it for everything else: the Agent tool's `effort` for built-in agents and for a `high` agent working on an ADR
+  or on netcode (`xhigh`); `effort: 'high'` or `'xhigh'` on every workflow `agent()` call (without it, a workflow agent
+  takes the session's effort).
+```
+
+After:
+```
+- **Effort is always stated** (Opus 5.5 defaults to medium): `max` for every agent that reviews, verifies or designs
+  game or engine code (his words above), set in their agent files (K-5 in this change-set); the netcode chat keeps its
+  efforts by passing each agent its former effort (`high`, or `xhigh` for engine-architect and netcode-architect) until
+  PR #40 has merged. Otherwise `high` by default; `xhigh` for architecture decisions (ADRs, `docs/ENGINE_OVERVIEW.md`,
+  the synthesis) and netcode. Agent files set it in their frontmatter. The caller passes it for everything else: the
+  Agent tool's `effort` for built-in agents and for a `high` agent working on an ADR or on netcode (`xhigh`); `effort:
+  'high'`, `'xhigh'` or `'max'` on every workflow `agent()` call (without it, a workflow agent takes the session's
+  effort).
+```
+
+MODELS-HOW (a) only: the effort bullet; the agent files change in CS-B.
+
+### K-4 (b) (CS-B): `CLAUDE.md` lines 174-178 on 4460ef5
+
+Before:
+```
+- **Effort is always stated** (Opus 5.5 defaults to medium): `high` by default; `xhigh` for architecture decisions
+  (ADRs, `docs/ENGINE_OVERVIEW.md`, the synthesis) and netcode. Agent files set it in their frontmatter. The caller
+  passes it for everything else: the Agent tool's `effort` for built-in agents and for a `high` agent working on an ADR
+  or on netcode (`xhigh`); `effort: 'high'` or `'xhigh'` on every workflow `agent()` call (without it, a workflow agent
+  takes the session's effort).
+```
+
+After:
+```
+- **Effort is always stated** (Opus 5.5 defaults to medium): `max` for every agent that reviews, verifies or designs
+  game or engine code (his words above): the caller passes `effort: "max"` to those agents, except in the netcode chat,
+  which keeps its efforts. Otherwise `high` by default; `xhigh` for architecture decisions (ADRs,
+  `docs/ENGINE_OVERVIEW.md`, the synthesis) and netcode. Agent files set it in their frontmatter. The caller passes it
+  for everything else: the Agent tool's `effort` for built-in agents and for a `high` agent working on an ADR or on
+  netcode (`xhigh`); `effort: 'high'`, `'xhigh'` or `'max'` on every workflow `agent()` call (without it, a workflow
+  agent takes the session's effort).
+```
+
+MODELS-HOW (b) only: the effort bullet; the agent files keep their effort lines.
 
 ### K-6 (CS-B): `CLAUDE.md` lines 71-73 on 4460ef5
 
@@ -1124,7 +1263,7 @@ After:
 - **Rollback** (A4): if main breaks (the required check `required` red on main after one re-run, pinned to one merge; Mustafa
 ```
 
-Same strength: `required` fails unless gate, smoke and every gate v2 job succeeded; re-wraps when written.
+A widening of "main breaks" (Rollback): a red gate v2 job on main then also starts a revert with no plan step; his words needed (ROLLBACK-SCOPE, asked at CS-F); re-wraps when written.
 
 ### K-12b (CS-F): `CLAUDE.md` lines 130-130 on 4460ef5
 
@@ -1194,7 +1333,7 @@ After:
 - **Main breaks** when one of these holds: `required` is red on a main commit, still red after one re-run, and
 ```
 
-Same strength: `required` fails unless gate, smoke and every gate v2 job succeeded; re-wraps when written.
+A widening of "main breaks" (Rollback): a red gate v2 job on main then also starts a revert with no plan step; his words needed (ROLLBACK-SCOPE, asked at CS-F); re-wraps when written.
 
 ### K-12g (CS-F): `.claude/agents/advisor.md` lines 294-294 on 4460ef5
 
@@ -1208,7 +1347,7 @@ After:
     holds: the red `required` run on main names that commit and its re-run is red too, or the report is
 ```
 
-Same strength: `required` fails unless gate, smoke and every gate v2 job succeeded; re-wraps when written.
+A widening of "main breaks" (Rollback): a red gate v2 job on main then also starts a revert with no plan step; his words needed (ROLLBACK-SCOPE, asked at CS-F); re-wraps when written.
 
 ### K-12h (CS-F): `.claude/agents/advisor.md` lines 323-323 on 4460ef5
 
@@ -1295,6 +1434,29 @@ After:
 ```
 
 Stricter (more files make the PR Advisor's CI green insufficient); re-wraps when written.
+
+### K-11c (CS-D): `.claude/agents/advisor.md` lines 39-43 on 4460ef5
+
+Before:
+```
+3. **The rules themselves:** changes to hard constraints, ADRs, `CLAUDE.md`, `.claude/` (this file included), CI
+   (`.github/`), security rules, or the gate's own files: every file `tools/gate.mjs` or `.github/workflows/` run as
+   code or read as settings, not the game files they check (today `tools/gate.mjs`, `tools/smoke.mjs`,
+   `tools/battery.js`, `tools/gate-globals.json`, `tools/package.json`, `tools/package-lock.json`,
+   `tools/npm-shrinkwrap.json`) and any `.npmrc`.
+```
+
+After:
+```
+3. **The rules themselves:** changes to hard constraints, ADRs, `CLAUDE.md`, `.claude/` (this file included), CI
+   (`.github/`), security rules, or the gate's own files: every file `tools/gate.mjs`, the gate v2 (`tools/gate-v2/`) or
+   `.github/workflows/` run as code or read as settings, not the game files they check (today `tools/gate.mjs`,
+   `tools/smoke.mjs`, `tools/battery.js`, `tools/gate-globals.json`, `tools/package.json`, `tools/package-lock.json`,
+   `tools/npm-shrinkwrap.json`, the gate v2's folder and the v2 pins and gate configs the guard protects) and any
+   `.npmrc`.
+```
+
+Stricter (escalation category 3 names the gate v2 and the protected pins); follows GATE-PATH (a) and PIN-SCOPE (b).
 
 ### K-13a (CS-F): `CLAUDE.md` lines 74-75 on 4460ef5
 

@@ -120,14 +120,14 @@ models_after += quote_block(['- ' + m[2:] for m in MODELS], '  ')
 models_after += wrap('- **How:** agent files say `model: opus`, which resolves to Opus 5.5 today (`claude-opus-5-5`; an '
                      '`opus` agent reported it on 2026-10-25). When a newer Opus appears, Mustafa decides whether to '
                      'move. Built-in agents (Explore, Plan, general-purpose) get their model passed explicitly: '
-                     '`model: "fable"` for the builder agents of a chat that writes game or engine code, `model: "opus"` '
-                     'for every other. Workflow agents inherit the session\'s model, so a chat on Fable 5.2 sets every '
-                     'workflow agent that is not a builder to Opus 5.5 [to verify in the workflow reference before this '
-                     'text is asked].', '', '  ')
+                     '`model: "fable"` for the builder agents of a chat on his personal account that writes game or engine '
+                     'code, `model: "opus"` for every other. Workflow agents inherit the session\'s model, so a chat on '
+                     'Fable 5.2 sets every workflow agent that is not a builder to Opus 5.5 [to verify before this text is '
+                     'asked: the Agent tool\'s model value for Fable 5.2, and the workflow API\'s model option].', '', '  ')
 models_after += wrap('- **Effort is always stated** (Opus 5.5 defaults to medium): `max` for every agent that reviews, '
                      'verifies or designs game or engine code (his words above); until PR #40, the netcode chat, has '
-                     'merged, the caller passes `effort: "max"` to those agents, and their agent files say `max` after '
-                     'that, so the netcode chat keeps its efforts. Otherwise `high` by default; `xhigh` for architecture '
+                     'merged, the caller passes `effort: "max"` to those agents, except in the netcode chat, which keeps its '
+                     'efforts; their agent files say `max` after that. Otherwise `high` by default; `xhigh` for architecture '
                      'decisions (ADRs, `docs/ENGINE_OVERVIEW.md`, the synthesis) and netcode. Agent files set it in '
                      'their frontmatter. The caller passes it for everything else: the Agent tool\'s `effort` for '
                      'built-in agents and for a `high` agent working on an ADR or on netcode (`xhigh`); `effort: '
@@ -152,6 +152,24 @@ models_after += ['  [OPTIONAL A, not his words (the 2.3-docs report, finding 5):
 item('K-4', 'CS-B', 'CLAUDE.md', 170, 185, '- **Opus 5.5 for everything that thinks:**', models_after,
      'Rules text to match his words of 2026-11-12 and 2026-11-11; nothing looser than his words (the optional lines are '
      'marked and his to refuse).')
+
+# K-4 (a) and K-4 (b): the effort bullet under MODELS-HOW's other options (bullets 1, 2, 4 and 5 as K-4)
+EFFORT_TAIL = ('Otherwise `high` by default; `xhigh` for architecture decisions (ADRs, `docs/ENGINE_OVERVIEW.md`, the '
+               'synthesis) and netcode. Agent files set it in their frontmatter. The caller passes it for everything '
+               'else: the Agent tool\'s `effort` for built-in agents and for a `high` agent working on an ADR or on netcode '
+               '(`xhigh`); `effort: \'high\'`, `\'xhigh\'` or `\'max\'` on every workflow `agent()` call (without it, a '
+               'workflow agent takes the session\'s effort).')
+item('K-4 (a)', 'CS-B', 'CLAUDE.md', 174, 178, '- **Effort is always stated**',
+     wrap('- **Effort is always stated** (Opus 5.5 defaults to medium): `max` for every agent that reviews, verifies or '
+          'designs game or engine code (his words above), set in their agent files (K-5 in this change-set); the '
+          'netcode chat keeps its efforts by passing each agent its former effort (`high`, or `xhigh` for '
+          'engine-architect and netcode-architect) until PR #40 has merged. ' + EFFORT_TAIL, '', '  '),
+     'MODELS-HOW (a) only: the effort bullet; the agent files change in CS-B.')
+item('K-4 (b)', 'CS-B', 'CLAUDE.md', 174, 178, '- **Effort is always stated**',
+     wrap('- **Effort is always stated** (Opus 5.5 defaults to medium): `max` for every agent that reviews, verifies or '
+          'designs game or engine code (his words above): the caller passes `effort: "max"` to those agents, except in '
+          'the netcode chat, which keeps its efforts. ' + EFFORT_TAIL, '', '  '),
+     'MODELS-HOW (b) only: the effort bullet; the agent files keep their effort lines.')
 
 # K-6: MANUAL-MODE (step 3's mode clause)
 item('K-6', 'CS-B', 'CLAUDE.md', 71, 73, '   (in auto mode',
@@ -216,8 +234,11 @@ for kid, path, n, expect, reps in REQ:
         if a not in after:
             sys.exit(f'{kid}: {a!r} not on {path}:{n}')
         after = after.replace(a, b)
-    item(kid, 'CS-F', path, n, n, expect, [after], 'Same strength: `required` fails unless gate, smoke and every gate v2 '
-         'job succeeded; re-wraps when written.')
+    widen = kid in ('K-12a', 'K-12f', 'K-12g')
+    note = ('A widening of "main breaks" (Rollback): a red gate v2 job on main then also starts a revert with no plan '
+            'step; his words needed (ROLLBACK-SCOPE, asked at CS-F); re-wraps when written.') if widen else \
+           ('Same strength: `required` fails unless gate, smoke and every gate v2 job succeeded; re-wraps when written.')
+    item(kid, 'CS-F', path, n, n, expect, [after], note)
 
 # K-14 (CS-B): the agents' paste block learns the shell forms the guard refuses (PROMPTS-2.3's route; his words of
 # 2026-11-11, 16:54:54 UTC, asked this for 2.1a's briefs; standing here)
@@ -251,6 +272,15 @@ item('K-11b', 'CS-D', '.claude/agents/advisor.md', 164, 166, '     the approved 
           'any `.npmrc`; the gate v2\'s folder `tools/gate-v2/`; the v2 pins and gate configs the guard protects) — '
           'otherwise CI', '     ', '     '),
      'Stricter (more files make the PR Advisor\'s CI green insufficient); re-wraps when written.')
+
+item('K-11c', 'CS-D', '.claude/agents/advisor.md', 39, 43, '3. **The rules themselves:**',
+     wrap('3. **The rules themselves:** changes to hard constraints, ADRs, `CLAUDE.md`, `.claude/` (this file included), '
+          'CI (`.github/`), security rules, or the gate\'s own files: every file `tools/gate.mjs`, the gate v2 '
+          '(`tools/gate-v2/`) or `.github/workflows/` run as code or read as settings, not the game files they check '
+          '(today `tools/gate.mjs`, `tools/smoke.mjs`, `tools/battery.js`, `tools/gate-globals.json`, '
+          '`tools/package.json`, `tools/package-lock.json`, `tools/npm-shrinkwrap.json`, the gate v2\'s folder and the v2 '
+          'pins and gate configs the guard protects) and any `.npmrc`.', '', '   '),
+     'Stricter (escalation category 3 names the gate v2 and the protected pins); follows GATE-PATH (a) and PIN-SCOPE (b).')
 
 # K-13 (CS-F): the lines that name the gate's command learn the gate v2 for v2 code
 item('K-13a', 'CS-F', 'CLAUDE.md', 74, 75, '4. Gate: `/gate` must PASS',
