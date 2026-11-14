@@ -51,6 +51,63 @@ edited line on.", backed by `fixes.mjs`'s whole-file check; conditions: (a) the 
 `fixes.mjs --check` runs on the 2.2 report again on the final head (the archive part at step 3 only, before docs-keeper).
 §5's L2 and header-note texts below are replaced by these.
 
+## Revision 2f (2026-11-14, asked ~01:08 UTC): the final commit's texts (the verifier's re-run notes), asked first
+The verifier passed 922cadf WITH NOTES (F-V5a, F-V6 Low; F-V5b an observation; two nits; lines 3183 and 3195 due in
+the D&D bullet). Consultation 13 (01:01:09 UTC) came first. A keyword screen of all 23 chat texts from 22:40 UTC
+(`fp4-screen.py`: "told you", advisor..model, "Opus 5.5", "Fable") finds six on the subject: 1887, 2122, 2869, 2929, 3183,
+3195. The changed texts:
+
+F1. The D&D bullet: "Four chat messages ... (lines 1887, 2122, 2869 and 2929)" becomes "Six chat messages since bear on it
+(the transcript's lines 1887, 2122, 2869, 2929, 3183 and 3195)", the four clauses kept word for word, and two clauses
+added at the end: "; at 00:46:25 it wrote that this bullet was now worded only from its four chat messages on record, in
+the advisor agent's exact wording; at 01:00:24 it wrote that its 00:46 update also bore on how it had told him about the
+advisor tool's model, and that by the advisor agent's rule the report had to list it too."
+
+F2. The copies bullet (F-V5a, F-V5b): "Certain copies (whole sentences or longer):" becomes "Certain copies, meaning files
+where some pushed version holds a run of 30 characters or more that is a whole sentence of his or longer:"; the scripts'
+item becomes "the scripts that cut or check his words and a review brief (`decisions.mjs`, `pointers.mjs`, `fixpass1.mjs`,
+and `review-r2.js` with its launched copy: anchors, negative controls, and his kit words for the reviewers)"; docs-keeper's
+item keeps `fillcount.mjs` only; after "R-WORDS's notes at ec8f1bd." one sentence: "`words.mjs` also holds one whole
+sentence of his under that length: the decision's first sentence (28 characters), its cut anchor."; "Fragments, among
+others:" gains "`review-r1.js` with its launched copy, and docs-keeper's `dk-para.txt` and `dk-para-wrapped.txt`".
+
+F3. F-V6: Reviews' "Its scope note: everything after 554face, the new DECISIONS entry included, had the verifier and
+the advisor agent but no reviewer." becomes "Its scope note, in its words (its hand-back, transcript line 2922): "A4, E-STATUS
+and everything after 554face (8e4fe7c and a1d0317) had no reviewer. Only this verifier covered them." The advisor agent
+ruled on the texts (plan revisions 2d and 2e) and reviews the final head."
+
+F4. Reviews, the re-run: "Its re-run on the verifier's fix pass and the advisor agent's review of the final head: to
+come." becomes "Its re-run, on 922cadf: PASS WITH NOTES. F-V1 fixed; nothing Critical, High or Medium; two Lows and two
+nits, all fixed in the final commit." plus two rows: "| F-V5a | Low | four files named as certain copies hold fragments
+only (`review-r1.js` with its launched copy, `dk-para.txt`, `dk-para-wrapped.txt`) | fixed: moved to "Fragments", the
+30-character threshold in the definition, `words.mjs`'s 28-character anchor named |" and "| F-V6 | Low | its scope note
+was reworded | fixed: quoted from its hand-back |", then: "The verifier did not see the changes after 922cadf; the
+advisor agent's review of the final head covers them."
+
+F5. Outcome: "Built in nine commits (1123175, 2f96f5c, 83c6ab6, d59ca43, 554face for review round 1's fix pass, 8e4fe7c
+for round 2's, a1d0317 its follow-up, 922cadf the verifier's fix pass, then the final commit, which deletes the notes)";
+"CI green on each through 922cadf (E7)"; "The verifier failed a1d0317 on one High (how Mustafa was told about the advisor
+model, written from recall), fixed in 922cadf; its re-run passed 922cadf with two Lows, fixed in the final commit; the
+advisor agent's review of the final head follows."
+
+F6. The fold, a new section before "Risks": "## From the checkpoint" — "The checkpoint's essentials (`.claude/CHECKPOINTS.md`
+§9): the steps and their commits are in Outcome, E7 and "The advisor tool" (the "done" saves); the decisions in "Plan
+and approval" and "Decisions and deviations"; the findings in "Reviews" and "Findings for step 2.3's plan"; none is
+open. Numbers not given above: main 4d21c1a's CI (gate run 43461710700, toolchain run 43461710673, both success); PR
+#40's checkpoint as read for STATUS (0066b63 on 2026-11-13 at 20:29 UTC; d0d1cfd on 2026-11-14 at 01:05 UTC); STATUS
+at 120 lines."
+
+F7. The rest, for the record: STATUS ("Last updated: 2026-11-14 ..."; #52's state "final (marked ready after the advisor
+agent's review)", waiting "the advisor agent's review of its final head; then his go (risk tier 1, decision docs)";
+#40's row from its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC: "U4r's build on its fourth builder copy"); ROADMAP
+(the #52 heading "[2026-11-13 to 11-14, PR #52: in review]"; "Next: the advisor agent's review of the final head, then
+his go."); E7 gains 922cadf's runs (43536145305, 43536148552; 43536145352, 43536148433); entry 11's stray line re-wrapped;
+entries 13 and 14 (the consultation before the final commit) added; the "done" saves gain step 7's save; "Plan and
+approval" gains 2e and 2f; C1 and C10 marked met; "For Mustafa" item 1 unchanged; the appendix intro's list re-derived
+from the scan (the workflow-authoring skill "loaded with A2, 18:47:56 UTC, and again by the harness, 2026-11-14
+00:07:21"; "the hand-backs and task notifications of the session's own agents and background tasks, with the harness's
+notices that carry them"); the header's notes SHA; the notes deleted.
+
 ## Revision 2e (2026-11-14, asked ~00:40 UTC): the verifier's fix pass (fix pass 3), asked of the advisor agent
 The verifier failed a1d0317 (agent ad5b8a361fccd378c; notes verifier-1.md): F-V1 (High), F-V3 (Low); all else held.
 Consultation 12 (2026-11-14 00:34:39 UTC) came first. The changed texts (E1 to E4) and the record-only items (E5):

@@ -286,7 +286,7 @@ Step 8: revision 2f asked of the advisor agent; then the final edits (see consul
    effort max"; the verifier's FAIL and scope note recorded as they happened; its two refusals; entries 9 and 11 fixed;
    the same verifier resumed with a narrow brief; a1d0317's commit-message claim withdrawn in the next commit's message.
 
-13. 2026-11-14 01:01:1x UTC (see the transcript), moment 5 for step 7 (before its "done" save) and moment 1 for the final
+13. 2026-11-14 01:01:09 UTC, moment 5 for step 7 (before its "done" save) and moment 1 for the final
    edits: step 7 done (PASS, nothing above Low; no third verifier run needed). Changed: revision 2f asked of the advisor
    agent before writing (the bullet's lines 3183 and 3195, F-V5a with the 30-character threshold in the definition and
    words.mjs's 28-character anchor in one clause, F-V6 quoted from line 2922, the re-run's Reviews rows and "the
