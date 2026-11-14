@@ -12,8 +12,32 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 00:15 UTC; read this first after a compact or a cut): the spend limit cut copy 3 and the
-advisor's second ruling at 22:02 (see "Cuts by the spend limit"); both resumed about 00:15; snapshot 585a8639….**
+**NOW (2026-11-14 about 01:00 UTC; read this first after a compact or a cut): U4r copy 3 ended at its context limit
+(00:50), r2 and the second ruling done; snapshot 987946cc…; copy 4 builds on (point 1 (4)-(7), B12); the advisor's
+third ruling on copy 3's findings (u4r-build3-questions.md), with a fact check and a netcode-architect read.**
+- **Copy 3** (agent a5d1a2ea28e8704c8; 21:54-22:02 and 00:16-00:50 UTC, cut by the spend limit between; 99 tool uses)
+  stopped at a clean point (no plant, no run going); nothing committed. Its notes u4r-build.md (906 lines, copied,
+  equal), its part :571-906, its state section "Copy 3: state and what is next". I read its suites, bites and bytes
+  blocks (:659-752) and its state section whole. Done: r2 (contract.rs, `npt-lab contract`; ten measured suites and
+  three bite runs, each through the real judge; SERIES.md's 22 rows), the second ruling whole, carry 83 (a). Suites
+  green in both builds (npt-lab bin 46 clean, 52 bites, 1 ignored each: c3-rul2b.log). Point 3's bytes: P0 509 MB, P2
+  220 MB, P3 126 MB, B1 191 MB per 10-minute run with -57's series; about 56 MB without.
+- **Copy 3's findings, to the advisor** (u4r-build3-questions.md): (1) B1: PM-0001-2's everyone in view 0.273 (needs
+  at least 0.99), so -17's and -18's L1 B1 parts are INVALID: npt-room rebuilds every client's set from nothing after
+  each burst; (2) ES: reliable events 50.05 a second against 9.5-10.5 (the brawl hits about 70 %); (3) carry 73's
+  tick16 run is INVALID by pre:PM-0001-2 (the sets collapse past the wrap), not FAIL; (4) -18's no-fallback bite: 25
+  of 96 heals within 500 ms, not none; (5) ruling 2's point 1 (4) at the recording's end; (6) the `contract`
+  subcommand; (7) copy 3's two code fixes (a bite run ends at the after phase's cap, `after_capped`; the mirror keyed by
+  the room's tick); (8) anything else. B1 and ES are condition-5 suite failures: reported, never re-run into a pass.
+- **Snapshot re-cut** (00:51 UTC, the saver stopped first): wip/u4r.patch, 20 files on 2fbec77, 6,837 lines, sha256
+  987946ccf717878329f55308f8b3f693f544863000402d9c3437daf6079ae097; applies. The fixed copy .gate/u4r-snap1 holds it
+  (48fa2959's reversed from 38a29f3's copy; 20 files equal by cmp). Disk 4.9 GB free.
+- **Copy 4** (prompt u4r-copy4-prompt.md: the first prompt verbatim, checked, plus a copy-4 resume part): copy 3's
+  items 1 and 2 (point 1 (4) to (7) with r10's check.mjs half and det-u4.mjs's run; B12's scripts); it holds item 3 (r5
+  and the end checks) and everything the third ruling's points touch.
+
+**Earlier NOW (2026-11-14 about 00:15 UTC): the spend limit cut copy 3 and the advisor's second ruling at 22:02;
+both resumed about 00:15; snapshot 585a8639….**
 - **Copy 3 before the cut** (21:54-22:02 UTC; its notes :571-620): read its notes and the diff whole, built
   crates/lab/src/contract.rs (`npt-lab contract`: r2 (b), (c), (e), the carries' figures; U4R-Q11's four negatives in
   its unit tests), ran r2 suite 1 (-17 L1 P0, 48 clients, 10 s + 20 s; measured incomplete 0; judged by hand: every
