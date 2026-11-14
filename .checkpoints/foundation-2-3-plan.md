@@ -20,15 +20,18 @@
 3. Plan revision 1 written · 03d05f5 · items 1-9 and his three additions; Part 4 counted by script (107 rows:
    49 first part, 47 later, 6 dropped, 2 not ours, 2 rules for this chat, 1 ruling); Appendix K from kit-texts.py
    (27 items, 19 quotes of his checked).
-4. The advisor agent's review of revision 1 (03d05f5): REVISE (advisor-plan-r1.md; hand-back 2026-11-14, the
-   transcript); every finding folded into revision 2 (Part 11 lists them); Part 4 recounted: 107 rows, 50 first part,
+4. The advisor agent's review of revision 1 (03d05f5; launched 11:29:10 UTC): REVISE (advisor-plan-r1.md; hand-back
+   11:52:31 UTC, the transcript); every finding folded into revision 2 (Part 11 lists them); Part 4 recounted: 107 rows, 50 first part,
    48 later, 5 dropped, 2 not ours, 2 rules for this chat.
-5. Plan revision 2 · 00984ae · the advisor agent re-reviewed what changed: APPROVE, with six Lows (L-1 to L-6;
+5. Plan revision 2 · 00984ae · the advisor agent re-reviewed what changed (asked 12:00:56 UTC): APPROVE (hand-back
+   12:09:32 UTC, the transcript), with six Lows (L-1 to L-6;
    advisor-plan-r2.md), which it said may be folded without a further review; revision 2.1 folds them.
 
 ## Current step
-6. Plan revision 2.1 written (rev21.py: the six Lows of the advisor agent's APPROVE of revision 2 at 00984ae, folded as
-   it allowed without a further review). Next: advisor tool moment 5, then "done", then the end message.
+7. Plan revision 2.2 (rev22.py): the old plan's Appendix B carried, found missing by advisor-tool consultation 2;
+   main re-fetched (still 4460ef5), #40 re-read (30b7b83, 12:14:41 UTC); row 108; K-4's positive Opus line. Next: the
+   advisor agent names the final SHA from the diff; advisor tool moment 5 again; "done"; the saver stopped; the end
+   message.
 
 ## Next steps
 1. Finish plan.md; commit it with the checkpoint (record its SHA here).
@@ -63,7 +66,7 @@
     unprotected; MODELS-HOW: quote DECISIONS.md :91.
 
 ## Key numbers
-- Advisor-tool consultations in this task: 1 so far (the docs pass's 17 are counted in its report and the merge).
+- Advisor-tool consultations in this task: 2 so far (the docs pass's 17 are counted in its report and the merge).
 
 ## Decisions taken
 - Step 2.3 may be planned now; its parts that need no proof test's result may be built after his go on the plan
@@ -82,6 +85,13 @@
    him beside his allow-list words; three facts settled by read-only checks (hook input's permission mode; which
    workflow file a pull_request run uses and conflicting PRs; whether the sim core spike's open questions touch ADR 0004
    part 7's allow-list); the summary says each CS gets its own plan and plan review.
+2. 2026-11-14 12:11:15 UTC (13:11 Amsterdam; the transcript), moment 5, after the advisor agent's APPROVE of revision 2
+   and revision 2.1's six Lows: is the plan done? Changed: not done; the old plan's Appendix B carried (revision 2.2:
+   Part 3's rule block; CS-C1, CS-D, CS-C, CS-E; Part 8; Part 10; PM-0002-42); main and #40 re-read; typed times
+   replaced by the transcript's; row 108; K-4's positive Opus line; the saver to be stopped after the final save; the
+   end message's shape. The record shows two consultations so far, at moments 1 and 5: no separate moment-4 call was
+   made for PROOF-57, ROLLBACK-SCOPE, the scratch-copy route or MODELS-HOW (c); each is put to him or ruled on by the
+   advisor agent.
 
 ## Refusals (guard, deny list, classifier)
 - 11:06:47 UTC (the transcript): auto mode flagged the claude-code-guide agent's hand-back ("Undermining Oversight"); the report quoted
@@ -92,4 +102,5 @@
 - saver: background task b6ean8gz0 · output /tmp/claude-0/-home-user-Shamble-Frontlines/7261f3d7-f651-586a-9c39-c052553b68a3/tasks/b6ean8gz0.output ·
   started 10:44 UTC (11:44 Amsterdam) · stops by ~12:34 UTC (110 minutes) · last check 11:00 UTC: ok (first line
   "watching .checkpoints/ on claude/sweet-mayer-grsukw every 10 min for 110 min").
-- agents: both docs agents done (results in reading.md B13). Running: the advisor agent (plan review r1), 1 of 3.
+- agents: none running. Both docs agents done (hand-backs 11:06:47 and 11:10:42 UTC); the advisor agent's review
+  (11:52:31 UTC) and re-review (12:09:32 UTC) done.

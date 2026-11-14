@@ -178,7 +178,8 @@ cannot start (Chromium build mismatch); 4 the advisor-tool moment 5 is easy to m
 - toolchain.yml: one job `toolchain`; RUSTUP_AUTO_INSTALL=0; pin check :44-53 (source checks); fetch outside the cut;
   the cut :60-88 (unshare --net, setpriv --reuid --regid=nogroup --clear-groups --no-new-privs, env -i, probe).
 
-## B12 PR #40 — done (read 2026-11-14 ~11:10 UTC with the GitHub API)
+## B12 PR #40 — done (read 2026-11-14 10:54:55 UTC with the GitHub API, the transcript; re-read 12:14:41 UTC:
+head 30b7b83, `updated_at` 11:18:50 UTC, still a draft, dirty)
 - Draft, head 4bd5ac3 (2026-11-14 08:31:05 UTC: "U4r's round-1 ruling in ... fix pass FP-1 to FP-11"), base shown
   4d21c1a, mergeable_state "dirty" (behind 4460ef5 and conflicting), 820 files, 684 commits. Its result (L1) is not
   near. Its own rules: never push to its branch, never touch spikes/. Its Safari workflow is planned as a separate

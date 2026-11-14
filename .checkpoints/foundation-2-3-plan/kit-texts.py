@@ -119,7 +119,9 @@ models_after += wrap('- **Who runs on which model** (Mustafa\'s words of 2026-11
 models_after += quote_block(['- ' + m[2:] for m in MODELS], '  ')
 models_after += wrap('- **How:** agent files say `model: opus`, which resolves to Opus 5.5 today (`claude-opus-5-5`; an '
                      '`opus` agent reported it on 2026-10-25). When a newer Opus appears, Mustafa decides whether to '
-                     'move. Built-in agents (Explore, Plan, general-purpose) get their model passed explicitly: '
+                     'move. Every main session that does not write game or engine code runs on Opus 5.5: architecture, reviews, '
+                     'research, plans and reports, the kit, the gate and CI. Built-in agents (Explore, Plan, '
+                     'general-purpose) get their model passed explicitly: '
                      '`model: "fable"` for the builder agents of a chat on his personal account that writes game or engine '
                      'code, `model: "opus"` for every other. Workflow agents inherit the session\'s model, so a chat on '
                      'Fable 5.2 sets every workflow agent that is not a builder to Opus 5.5 [to verify before this text is '

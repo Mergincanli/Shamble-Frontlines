@@ -1,4 +1,4 @@
-# Plan: foundation step 2.3, the gate v2 and CI, and the end of the kit's freeze (revision 2.1)
+# Plan: foundation step 2.3, the gate v2 and CI, and the end of the kit's freeze (revision 2.2)
 
 - **The task:** Mustafa's words of 2026-11-13 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-13, 18:47:55
   UTC", from "Then, after the docs pass is merged: plan step 2.3." to its end: items 1 to 9), and his message of
@@ -12,7 +12,8 @@
   stands in for `cs/foundation-2-3-plan`. It was moved to main by a fast-forward and pushed.
 - **Revision 2** folds in the advisor agent's review of revision 1 (03d05f5: REVISE, one High, seven Medium, five Low,
   and its four rulings). Revision 2.1 folds in the six Lows of its APPROVE of revision 2 (00984ae), which it allowed
-  without a further review. Part 11 lists what changed.
+  without a further review. Revision 2.2 carries the old plan's Appendix B (the rules kept while PR #40's spike is in
+  the tree), found missing by the advisor tool's moment-5 check. Part 11 lists what changed.
 - **Sources in this folder:**
   - `reading.md`: blocks B1 to B13, each source with its file and line;
   - `approach.md`: the sketch the advisor tool checked;
@@ -59,9 +60,9 @@
   - Several marks name things that arrive only after the foundation: `server` and `navbake` (slices 3 and 2), the
     editor (slice 5), legacy goldens (slice 1), ADR 0003's count baseline. Those clauses join there, so PM-0002-41,
     -42, -44, -46, -47, -51 and -52 are met only then.
-- **The waiting items** (Part 4, 107 rows in one table, one per item and source, counted by script):
+- **The waiting items** (Part 4, 108 rows in one table, one per item and source, counted by script):
   - 50 are carried by the first part.
-  - 48 come later, each with its time.
+  - 49 come later, each with its time.
   - 5 are dropped, each with its reason.
   - 2 are not a session's edit, and 2 are rules for this chat.
   - Leaning to the smallest step, as he asked: the old kit follow-ups go to a kit queue after 2.3. GUARD-SEC comes
@@ -90,7 +91,8 @@
   - `docs/DECISIONS.md` has no entry of 2026-11-14;
   - they are CS-A's, unless a docs chat on main carries them first.
 - **PR #40** has nothing to do now. It merges main before its own merge, and before his ruleset's `required` matters
-  to it (Part 8).
+  to it. Every change-set keeps the rules 2.2 kept while its spike is in the tree (the old plan's Appendix B), and
+  checks them with the spike's own check (Parts 3 and 8).
 
 ## Part 0. Method and base
 - **Today's main against the old plan's part 3** (26e0d82, `.checkpoints/foundation-restructure/plan.md:442-452`):
@@ -99,8 +101,9 @@
     - "PR #46 merged": 2d22b69;
     - the gate v2's path is decided in this plan (item 7).
   - **Still waiting:**
-    - the netcode proof test (PR #40: a draft, head 4bd5ac3, 2026-11-14 08:31:05 UTC, in its U4r fix pass, behind and
-      conflicting with main);
+    - the netcode proof test (PR #40: a draft, head 30b7b83, GitHub's `updated_at` 2026-11-14 11:18:50 UTC, read again
+      at 12:14:41 UTC; first read at 10:54:55 UTC at head 4bd5ac3, in its U4r fix pass; behind and conflicting with
+      main);
     - the sim core spike and the boundary spike, neither started (`docs/SPIKE_PLAN.md`: one heavy spike at a time);
     - his branch-protection setting.
   - **New:** his decision of 2026-11-13 builds the parts that need no result now.
@@ -188,7 +191,7 @@ editor at slice 5. Run counts and machines are part of each mark.
 | PM-0002-39 (G0) | toolchain file deleted: G0 exit 2, no other Rust; `Cargo.toml` edited without `Cargo.lock` fails at the first cargo step; missing Playwright browser: exit 2 with the setup command; control: a consistent toolchain bump passes | CS-C: the first, second and fourth, plus the G0 finding's source-check mutations | the missing-browser clause (2.3-E) | 2.3-E |
 | PM-0002-40 (G1) | misformatted `.rs`, CRLF `.rs`, misformatted `.ts` each fail G1 only; control: long string literals pass; after `prettier --write`, ESLint reports 0; the formatted tree is byte-identical on Windows and Linux (once, his PC) | CS-C, and his Windows run (Part 9) | | **CS-C** + his run |
 | PM-0002-41 (G2) | the planted defects ADR 0002 lists at :1307, each failing G2 only with its reason; controls in `server`, in a `#[test]`, and sim's min/max/clamp helpers with `abs` and `fract` | CS-C: HashMap field and `map.values().sum()` in sim; `Instant::now()` in a tick function, in room and in client-endpoint; a correctness bug; a style warning; `unsafe`; a crate without `[lints] workspace = true`; `+fma`, `-C target-cpu=native`, `relaxed-simd` in the build flags; control `.unwrap()` in a `#[test]` | `sin`, `powi`, `to_radians`, `min`, and the helper controls (2.3-S); `.unwrap()` and `buf[i]` in a decoder (2.3-E); `-ffm` in `wasm-opt` (2.3-B); the `server` control (slice 3) | slice 3 |
-| PM-0002-42 (G3) | one violation per strict flag; `eval` and `new Function` in client; an unawaited promise; a switch over a generated union missing one kind; an import of editor from client; a bare `event`; DOM code imported by sim-worker or net; an import from `legacy/` or `spikes/`; controls: `import type` from types in editor passes; the clean tree is 0 and 0 | CS-C: all but the generated union and the two editor clauses; the switch rule is on from CS-C, with an interim plant on a hand-written union that does not count to the mark (the advisor agent's ruling (d)) | generated union (2.3-B); the editor clauses (slice 5) | slice 5 |
+| PM-0002-42 (G3) | one violation per strict flag; `eval` and `new Function` in client; an unawaited promise; a switch over a generated union missing one kind; an import of editor from client; a bare `event`; DOM code imported by sim-worker or net; an import from `legacy/` or `spikes/`; controls: `import type` from types in editor passes; the clean tree is 0 and 0 | CS-C: all but the generated union and the two editor clauses; the switch rule is on from CS-C, with an interim plant on a hand-written union that does not count to the mark (the advisor agent's ruling (d)) | generated union (2.3-B); the variant of the legacy-or-spike import mutation that names the spike folder (after PR #40 merges, when Appendix B lifts); the editor clauses (slice 5) | slice 5 |
 | PM-0002-43 (G4) | all | | 2.3-B | 2.3-B |
 | PM-0002-44 (G5) | transport crate or `tokio`/`quinn` in sim; `tokio` in room; `navbake` or `server` reachable from sim-wasm (each when that crate enters); wasm-bindgen or a transport crate in client-endpoint; a git dependency; a wildcard; a second version off the skip list; a server-only feature on a shared maths dependency (feature lists differ across server, devtools, navbake, sim-wasm); controls: proptest as sim's dev-dependency, a dev-only feature on devtools | CS-C: all but the feature comparison and the two crates that enter later; how each dependency mutation keeps `Cargo.lock` consistent offline is CS-C's design (local stand-in crates by name, or the network in CI's `--prove` job) | the feature comparison (2.3-S); navbake (slice 2) and server (slice 3), as the mark says | 2.3-S, and its own per-crate clauses as those crates enter |
 | PM-0002-45 (G7) | all | | 2.3-B | 2.3-B |
@@ -225,6 +228,14 @@ editor at slice 5. Run counts and machines are part of each mark.
 - **Rule and guard edits stay apart from the gate v2's code** (his item 3): CS-B and CS-F hold rules text, CS-D holds
   guard code, CS-C holds gate code, CS-E holds CI.
 - **Prompt counts are estimates.** Each count assumes one Write per protected file.
+- **While PR #40's spike is in the tree** (the old plan's Appendix B, 26e0d82 `plan.md:636-655`, which 2.2 kept):
+  - no tracked file outside `spikes/`, `docs/` and `.checkpoints/` that is not Markdown may contain the text of the
+    spike folder's path: the spike's `check.mjs` (`referenceProblems`) fails on it. Configs name what they cover,
+    never what they skip; no test row, fixture, workflow or config names the spike folder;
+  - no root `.cargo/config.toml`: target folders and flags go on the command line;
+  - no `"type"` in the root `package.json`;
+  - each change-set that adds or changes such a file runs `node spikes/netcode-proof/check.mjs --only deps,refs` on
+    a local merge with #40's head, never pushed, as 2.2's E4d did.
 - **`toolchain` read by hand until `required` counts.** Until his first ruleset step makes `required` a required check,
   the ruleset and the guard check only `gate` and `smoke`, while `toolchain` alone tests the root manifests, the
   lockfiles and the crates. So every change-set before then merges only with `toolchain` green on its head, push and
@@ -282,7 +293,8 @@ editor at slice 5. Run counts and machines are part of each mark.
 - **Evidence:**
   - Phase 0's mutation proofs re-run (31 of 31, as 2.1b's E3).
   - Each fix shown failing before it and passing after it.
-  - The gate on a local merge with PR #40's head, never pushed: no refusal for `spikes/`.
+  - The gate on a local merge with PR #40's head, never pushed: no refusal for its pages, and its `check.mjs --only
+    deps,refs` passing: F4 names the folders it checks, never the spike folder.
   - CI's `gate` and `smoke` green.
 - **Precondition: a local smoke run.** CS-C1 edits `smoke.mjs`, and the advisor agent's day-session seat runs the full
   gate, smoke included (`advisor.md`, step 2 and its Never line). So before CS-C1's review the session must run the
@@ -306,7 +318,8 @@ editor at slice 5. Run counts and machines are part of each mark.
     - it asks in a day session;
     - it is refused for a routine and for an agent;
     - its case variants are caught on win32 and darwin folding;
-    - PR #40's `spikes/...` manifests stay free;
+    - a nested `Cargo.toml` under another folder stays free. No row names the spike's path (Appendix B); #40's real
+      manifests are checked in a scratch run, and its `check.mjs --only deps,refs` passes on a local merge;
     - `mergeAllowed` refuses the gate v2's folder.
   - New rows for G-3:
     - `auto`, `dontAsk` and `bypassPermissions` refuse, with the message to switch to Accept edits;
@@ -331,6 +344,14 @@ editor at slice 5. Run counts and machines are part of each mark.
 - **The command:** today's conventions (the base-ref rule; exits 0, 1 and 2; `--json`; `--allow-removed`; `--quick`;
   `--prove`), plus `--only <ids>` and `--list` for CI's jobs.
 - **Checks:** as Part 1's first-part column.
+- **Appendix B in CS-C's files:**
+  - G3's import rule says what it allows: imports stay inside their package, or name a workspace package or a
+    dependency. It names no folder it forbids. The mutation for PM-0002-42's "an import from `legacy/` or ..."
+    plants an import from `legacy/`; the variant naming the spike folder joins after PR #40 merges;
+  - Prettier is pointed at `packages/**`; a `.prettierignore`, if any, names no spike path;
+  - ROOT-WORKSPACE's `exclude` lists `.gate` and `.checkpoints` only;
+  - no root `.cargo/config.toml`, and no `"type"` added to the root `package.json`;
+  - the evidence runs #40's `check.mjs --only deps,refs` on a local merge with its head.
 - **Tools run by their path, never through `npm run`, `npm test` or `npx`.** The settings deny those
   (`.claude/settings.json:237-240`), and a package script could otherwise put a command into the gate.
 - **Evidence:**
@@ -379,7 +400,9 @@ editor at slice 5. Run counts and machines are part of each mark.
   - SETPRIV-HARDEN's assertions in the log;
   - timings for D3 and PM-0002-56 (5 warm, 3 cold), reported;
   - the cache size for D6;
-  - the legacy jobs diffed against `gate.yml`'s: equal but for the named fixes.
+  - the legacy jobs diffed against `gate.yml`'s: equal but for the named fixes;
+  - the workflow names no spike path (Appendix B), and #40's `check.mjs --only deps,refs` passes on a local merge
+    with its head.
 - **Reviews:** security-auditor, infra-engineer and test-engineer, then the advisor agent.
 - **His asks:** two: the workflow (3 protected writes: `ci.yml` written, `gate.yml` and `toolchain.yml` removed), and
   the two planted workflow failures with their exact reverts (4 writes). So about 7 prompts. **His go:** the merge.
@@ -554,6 +577,7 @@ editor at slice 5. Run counts and machines are part of each mark.
 | 105 | the old plan's "the gate v2's path (OQ-0002-2's third part)" | old plan part 3; ADR 0002 :1019-1021 | [1st] GATE-PATH (Part 7); CS-C builds it; the register's OQ-0002-2 row reads "answered" from CS-C's docs pass |
 | 106 | the old plan's "Mustafa's branch-protection setting" | old plan part 3 | [1st] his ruleset steps around CS-E and CS-F (Parts 8 and 9) |
 | 107 | the per-edit hook (PM-0002-62) | ADR 0002 :1328 | [later] ADR 0002's own place: its kit change-set in phase 1 |
+| 108 | the legacy rules' globs (`.claude/rules/pages.md:3-4`: `**/index.html`, `**/editor.html`) and CLAUDE.md:46's bare `index.html` will also match a v2 page | old plan Appendix B (26e0d82 :648-651); still so on main 4460ef5 | [later] step 2.5, which brings the first v2 page: a kit edit narrowing them to `legacy/`, asked then |
 
 ## Part 5. Every kit, gate and CI edit foreseen (item 5)
 
@@ -657,8 +681,9 @@ After `.claude/settings.json:7` (`"Bash(node tools/gate.mjs *)",`), two lines:
 - What could go wrong:
   - **Friction.** By (b), each change to the root `Cargo.toml` asks him; that file also holds the shared dependency
     versions. By (a), every dependency change asks too, and no builder agent may make one.
-  - **A pattern matching any depth** would catch PR #40's `spikes/netcode-proof/Cargo.toml` and stall that chat. Root
-    anchoring and a test row prevent it.
+  - **A pattern matching any depth** would catch PR #40's own `Cargo.toml` inside the spike folder and stall that chat.
+    Root anchoring and a test row on a nested `Cargo.toml` under another folder prevent it. No row names the spike's
+    path (Appendix B).
   - **A missed case fold.**
 
 **G-2, the gate v2's folder (CS-D)**
@@ -747,7 +772,11 @@ So no guard rule changes for PROMPTS-2.3: one rules line (K-14) and one rule fix
 
 ## Part 8. PR #40 after each merge, and when he changes the required check (item 8)
 **Facts:**
-- #40 is a draft, head 4bd5ac3. GitHub lists its base as 4d21c1a, and it conflicts with main 4460ef5.
+- #40 is a draft, head 30b7b83 (read 2026-11-14 12:14:41 UTC). GitHub lists its base as 4d21c1a, and it conflicts with
+  main 4460ef5.
+- Its `check.mjs` (`referenceProblems`) reads every tracked file outside the spike folder, `docs/` and `.checkpoints/`
+  that is not Markdown, and fails on the text of the spike folder's path. So each change-set below keeps the old
+  plan's Appendix B (Part 3), and runs that check on a local merge with #40's head.
 - While it conflicts, GitHub runs no `pull_request` workflow on it (F-PR). Its push runs use its own branch's workflow
   files.
 - A `pull_request` run takes the workflow of the PR head merged into main (F-PR).
@@ -758,9 +787,9 @@ So no guard rule changes for PROMPTS-2.3: one rules line (K-14) and one rule fix
 |---|---|
 | CS-A | nothing now. When it next merges main (in its worktree), it keeps both sides in STATUS, ROADMAP and DECISIONS.md, where #52 already conflicts with it |
 | CS-B | nothing. Nothing in `spikes/` changes. The new CLAUDE.md keeps the netcode chat's models and efforts: K-4 exempts it from the callers' `max`, and MODELS-HOW (c) leaves the agent files' effort lines alone until it merges |
-| CS-C1 | nothing. Its gate command `node tools/gate.mjs --no-smoke` stays. The stray-page check looks at the root and the old folder only; CS-C1's evidence runs on a local merge with its head |
-| CS-D | nothing to change. After its next main merge it runs the new guard: the root pins and gate configs are protected, its `spikes/` manifests are not, and in Auto mode a kit edit is refused (its planned `.github/` Safari workflow needs Accept edits and his yes anyway) |
-| CS-C | nothing. The gate v2 ignores `spikes/`: the spikes keep their own workspace, G1 and G3 read `packages/**`, and G2 and G5 read the root workspace. CS-C's evidence runs the gate v2 on a local merge with its head |
+| CS-C1 | nothing, while Appendix B holds. Its gate command `node tools/gate.mjs --no-smoke` stays. The stray-page check looks at the root and the old folder only; CS-C1's evidence runs the gate and its `check.mjs` on a local merge with its head |
+| CS-D | nothing to change, while Appendix B holds (no test row names its folder). After its next main merge it runs the new guard: the root pins and gate configs are protected, its `spikes/` manifests are not, and in Auto mode a kit edit is refused (its planned `.github/` Safari workflow needs Accept edits and his yes anyway) |
+| CS-C | nothing, while Appendix B holds. The gate v2 ignores the spike: it keeps its own workspace, G1 and G3 read `packages/**`, and G2 and G5 read the root workspace. CS-C's evidence runs the gate v2 and its `check.mjs` on a local merge with its head |
 | CS-E | it must merge main, resolving its conflicts, **before its next ready**, so its push and `pull_request` runs carry `required`. Until then its push runs use its old `gate.yml` and `toolchain.yml` |
 | his ruleset change (add `required`) | from then on #40 merges only with `required` green on a head that has taken main. It is a draft, so nothing breaks now |
 | CS-F | its merge, on his go from its own day session, is checked against `required` by the guard |
@@ -831,6 +860,8 @@ required checks while the ruleset no longer did.
    end message; a fresh chat per change-set is possible, each with its own checkpoint.
 10. **Readings by agents.** F-HOOK and F-PR rest on two docs agents' quotes of official pages. CS-D's and CS-E's plans
     re-read the pages before building on them.
+11. **#40's own check.** A root file naming the spike folder would fail #40's `check.mjs` after its next main merge.
+    Part 3's Appendix B rule, and that check run on a local merge in each change-set, stand against it.
 
 ## Part 11. This plan's review
 - **His message of 2026-11-14:** the advisor agent's review, and the advisor tool at its five moments. No review rounds
@@ -869,6 +900,14 @@ required checks while the ruleset no longer did.
   - L-4: K-4 (a) no longer cites an undefined K-5, and its [to verify] covers an effort passed by the caller.
   - L-5: "directly, or through `required`" in Part 8's and Part 10's order sentences.
   - L-6: PM-0002-38's version lines come from the v2 jobs; the legacy jobs stay as moved.
+- **Revision 2.2** (the advisor tool's moment-5 check, 2026-11-14 12:11:15 UTC, the transcript):
+  - the old plan's Appendix B carried: a rule block in Part 3; F4 (CS-C1), the guard's test rows (CS-D), G3's
+    import rule, Prettier, `exclude`, `.cargo`, `"type"` (CS-C) and the workflow (CS-E) name no spike path; each runs
+    #40's `check.mjs --only deps,refs` on a local merge; PM-0002-42's spike-folder variant waits for #40's merge;
+    Part 8 and Part 10 say so;
+  - #40's head re-read: 30b7b83 (12:14:41 UTC); main re-fetched: still 4460ef5;
+  - Part 4 row 108: the legacy rules' globs, for step 2.5;
+  - K-4's "How" says positively that every other main session runs on Opus 5.5 (the advisor tool's note for CS-B).
 
 ## Decisions needed
 - **GATE-PATH: where does the gate v2's script live?**
@@ -1044,11 +1083,13 @@ After:
   > - The guard, the gate and CI work stays with Opus 5.5.
   > - The netcode chat on my university account keeps its models and efforts as they are.
 - **How:** agent files say `model: opus`, which resolves to Opus 5.5 today (`claude-opus-5-5`; an `opus` agent reported
-  it on 2026-10-25). When a newer Opus appears, Mustafa decides whether to move. Built-in agents (Explore, Plan,
-  general-purpose) get their model passed explicitly: `model: "fable"` for the builder agents of a chat on his personal
-  account that writes game or engine code, `model: "opus"` for every other. Workflow agents inherit the session's model,
-  so a chat on Fable 5.2 sets every workflow agent that is not a builder to Opus 5.5 [to verify before this text is
-  asked: the Agent tool's model value for Fable 5.2, and the workflow API's model option].
+  it on 2026-10-25). When a newer Opus appears, Mustafa decides whether to move. Every main session that does not write
+  game or engine code runs on Opus 5.5: architecture, reviews, research, plans and reports, the kit, the gate and CI.
+  Built-in agents (Explore, Plan, general-purpose) get their model passed explicitly: `model: "fable"` for the builder
+  agents of a chat on his personal account that writes game or engine code, `model: "opus"` for every other. Workflow
+  agents inherit the session's model, so a chat on Fable 5.2 sets every workflow agent that is not a builder to Opus 5.5
+  [to verify before this text is asked: the Agent tool's model value for Fable 5.2, and the workflow API's model
+  option].
 - **Effort is always stated** (Opus 5.5 defaults to medium): `max` for every agent that reviews, verifies or designs
   game or engine code (his words above); until PR #40, the netcode chat, has merged, the caller passes `effort: "max"`
   to those agents, except in the netcode chat, which keeps its efforts; their agent files say `max` after that.

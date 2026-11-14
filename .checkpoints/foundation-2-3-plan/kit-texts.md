@@ -97,11 +97,13 @@ After:
   > - The guard, the gate and CI work stays with Opus 5.5.
   > - The netcode chat on my university account keeps its models and efforts as they are.
 - **How:** agent files say `model: opus`, which resolves to Opus 5.5 today (`claude-opus-5-5`; an `opus` agent reported
-  it on 2026-10-25). When a newer Opus appears, Mustafa decides whether to move. Built-in agents (Explore, Plan,
-  general-purpose) get their model passed explicitly: `model: "fable"` for the builder agents of a chat on his personal
-  account that writes game or engine code, `model: "opus"` for every other. Workflow agents inherit the session's model,
-  so a chat on Fable 5.2 sets every workflow agent that is not a builder to Opus 5.5 [to verify before this text is
-  asked: the Agent tool's model value for Fable 5.2, and the workflow API's model option].
+  it on 2026-10-25). When a newer Opus appears, Mustafa decides whether to move. Every main session that does not write
+  game or engine code runs on Opus 5.5: architecture, reviews, research, plans and reports, the kit, the gate and CI.
+  Built-in agents (Explore, Plan, general-purpose) get their model passed explicitly: `model: "fable"` for the builder
+  agents of a chat on his personal account that writes game or engine code, `model: "opus"` for every other. Workflow
+  agents inherit the session's model, so a chat on Fable 5.2 sets every workflow agent that is not a builder to Opus 5.5
+  [to verify before this text is asked: the Agent tool's model value for Fable 5.2, and the workflow API's model
+  option].
 - **Effort is always stated** (Opus 5.5 defaults to medium): `max` for every agent that reviews, verifies or designs
   game or engine code (his words above); until PR #40, the netcode chat, has merged, the caller passes `effort: "max"`
   to those agents, except in the netcode chat, which keeps its efforts; their agent files say `max` after that.
