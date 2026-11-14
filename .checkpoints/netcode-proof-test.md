@@ -54,7 +54,7 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   push (crates unchanged since e59ece9); then the c62h record (r2's judge, --only PM-0001-17, on r2's whole-as-lost and
   tick16 folders, into .gate/netcode-proof-test/c62h-<commit12>/: both bites shown, never INVALID); then the card and
   u4r-report.md's r2 section with MRG-L1 to -L3; then U4r-F1 (RUN-L1 rides it).
-- **U4r-F1 BUILT by the main session (about 17:05 UTC), uncommitted in the main folder:** c-u4r-runs.mjs and
+- **U4r-F1 BUILT by the main session (about 16:49 UTC), uncommitted in the main folder:** c-u4r-runs.mjs and
   c-u4r-r2.mjs edited with Edit (A: spikeChanged and spikeReading exported from runs, imported by r2, both read from the
   repository root, start.status gone; B: marks.json into the bin folder and checked there, the first run's floor, then
   the folders (runs), floor(suite p0) before the output folder (r2); C: RUN_LIMIT_MS 3,600,000, timed() and the judge
