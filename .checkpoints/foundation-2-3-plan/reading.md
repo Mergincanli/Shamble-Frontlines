@@ -151,3 +151,35 @@ cannot start (Chromium build mismatch); 4 the advisor-tool moment 5 is easy to m
   refused in a cloud day session by the settings' npx deny), v2 root page vs pre-move bases, IE-5 (Medium: live
   mirrors; step timeout + retry, `cache: npm`, or an image), TE-7, R2-1 (trailing dot/space; pattern given).
 - 2.2 for 2.3: as the report's table (B4); G0's source checks and mutations (:611-630).
+
+## B10 kit lines on main 4460ef5 — done (exact texts extracted by script into kit-before.md when the plan is written)
+- The 2.1/2.2 exception: CLAUDE.md:22 (K3), CLAUDE.md:55 (K2b), advisor.md:108 (K4).
+- Required checks named: CLAUDE.md:119 (Rollback), :130 (merge rule); advisor.md :157, :163, :224, :273, :294, :303,
+  :323; routine-guard.mjs:6 (comment), :1486 (`for (const nm of ['gate', 'smoke'])` in mergeCheck), :990 (pr-advisor
+  message); routine-guard.test.mjs :45, :144, :145, :364 (+ more rows to find).
+- Agent files: all 13 `model: opus`; effort high except engine-architect and netcode-architect (xhigh); advisor.md:123
+  "model and effort follow `CLAUDE.md` "Models and effort"".
+
+## B11 the guard and CI on main — done
+- routine-guard.mjs:28-29 GATE_FILES = tools/gate.mjs, smoke.mjs, battery.js, gate-globals.json, package.json,
+  package-lock.json, npm-shrinkwrap.json; protectedRel (:35-48): CLAUDE.md/.npmrc/.mcp.json/CLAUDE.local.md/AGENTS.md
+  at any depth, .github/, .git/, .claude/ (but agent-memory-local), GATE_FILES. mergeAllowed (:87-100): places docs/,
+  tools/, README.md, FIRST_PROMPTS.md; refuses rules names, gate names under tools/, docs/adr/, decision docs. So a gate
+  v2 file under tools/ that is not in GATE_FILES would be routine-writable, unasked in day sessions, and PR-Advisor
+  mergeable: the guard must learn it before the gate v2's code lands.
+- mergeCheck (:1473-1510): expectedHeadSha; same repo; the check list read whole; `gate` and `smoke` by name (PX-1).
+- No guard code reads the hook's permission mode (grep: none) -> AUTO-ASK as a guard change needs the hook input's
+  `permission_mode` field verified first.
+- settings.json allow: `node tools/gate.mjs`, `node tools/gate.mjs *`, smoke, battery, preview, pageshot,
+  `node tools/node_modules/playwright/cli.js install chromium` (:12), `node .gate/*.mjs`; deny: `npx *`, `npm exec *`,
+  `npm run *`, `npm test*` (:237-240) -> the gate v2 should call tool binaries by path, never package scripts.
+- gate.yml: jobs `gate` (legacy checks 1-4, 5b-5d) and `smoke` (5a), concurrency cancel-in-progress on every ref
+  (CANCEL-ON-MAIN), setup-node without cache (IE-5), apt install with no timeout/retry (IE-5).
+- toolchain.yml: one job `toolchain`; RUSTUP_AUTO_INSTALL=0; pin check :44-53 (source checks); fetch outside the cut;
+  the cut :60-88 (unshare --net, setpriv --reuid --regid=nogroup --clear-groups --no-new-privs, env -i, probe).
+
+## B12 PR #40 — done (read 2026-11-14 ~11:10 UTC with the GitHub API)
+- Draft, head 4bd5ac3 (2026-11-14 08:31:05 UTC: "U4r's round-1 ruling in ... fix pass FP-1 to FP-11"), base shown
+  4d21c1a, mergeable_state "dirty" (behind 4460ef5 and conflicting), 820 files, 684 commits. Its result (L1) is not
+  near. Its own rules: never push to its branch, never touch spikes/. Its Safari workflow is planned as a separate
+  `.github/` PR (W-PR) asking Mustafa.
