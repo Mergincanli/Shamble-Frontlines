@@ -14,7 +14,23 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 12:55 UTC; read this first after a compact or a cut): U4r's FIX PASS IS DONE (copy 6, its
+**NOW (2026-11-14 about 13:25 UTC; read this first after a compact or a cut): U4r's ROUND 2 RETURNED; the advisor
+rules on it.**
+- **Round 2** (wf_5e07787a-ae9, five seats, 310 tool uses, done about 13:22): **u4r-review-r2-full.md** (173 lines,
+  sha256 1ea6fc44…; by u4r_review_r2_full.py, word for word from the journal). All five APPROVE WITH FINDINGS; every
+  round-1 finding confirmed fixed as ruled or deferred as ruled. **1 Medium, 12 Low, no Critical or High** (no round
+  3). The Medium, read in full: **INF-R2-1** (the run scripts' re-check before the judge compares the whole
+  repository's HEAD and tracked status, so a checkpoint save during a set stops it before the judge after every run;
+  fix: scope to `HEAD:spikes/netcode-proof` and `-- spikes/netcode-proof`; until it lands, stop the saver and make no
+  commit or tracked edit in the main folder for a whole set). Lows: N2-1 and TE-R2-1 (fp1's rejoin asserts cannot
+  fail; check the roster), SEC-U4R-R2-1/-2, TE-R2-2/-3, RR4-L1/-L2, INF-R2-2 (det-u4 223.7 s of 240), INF-R2-3/-4/-5.
+- **The ruling runs:** workflow **wf_24167e6e-996** (task wuwkcjc6t; script u4r-review-r2-ruling-wf_24167e6e-996.js;
+  agent advisor-u4r-r2, notes advisor-u4r-r2.md). **If cut:** `resumeFromRunId: "wf_24167e6e-996"`. **On return:**
+  write it word for word by script (advisor-u4r-r2-full.md, as advisor-u4r-r1-full.md); copy its "For Mustafa" and any
+  decision onto this card at once (the morning's miss); then its next steps (the merge, the report).
+- **Do not run any judged or pre-check set** before the ruling says how INF-R2-1 is handled.
+
+**Earlier NOW (2026-11-14 about 12:55 UTC): U4r's FIX PASS IS DONE (copy 6, its
 report 12:50 UTC); snapshot 21ca46be…; next: round 2 (five seats, two batches).**
 - **Copy 6's result** (agent a2cf82539d5d40483, 11:17-12:50; its report at the end of u4r-build.md, "## Fix pass,
   round 1: report"; notes 2,111 lines, copied, equal): FP-1 to FP-9 done; end checks c6-end2.log (12:13-12:26) and
