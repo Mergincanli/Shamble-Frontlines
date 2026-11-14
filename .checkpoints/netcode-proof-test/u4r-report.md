@@ -169,9 +169,17 @@ copy 6's by-hand node --test at 73 of 76, re-pinned in the same step, recorded u
 advisor-u4r-r2-full.md:32).
 
 ## Follow-ups (each with its home; none triggers a push)
-- **The run scripts' next change** (c-u4r-runs.mjs, c-u4r-r2.mjs; from U4r-F1's round and head review): INF-F1-1's
-  header sentence, in the advisor's words (advisor-u4r-f1-head-full.md); INF-F1-5's untrimmed status read; and
-  INF-F1-3's signal name, once check.mjs's run() returns the signal (INF-R2-5, below).
+- **U4r-F2 (before the P0 set; advisor-u4r-f2-plan-full.md):** the P0 set judged in two calls, and INF-F1-1's header
+  sentence rides it, in the advisor's words (condition 8).
+- **One runner change after the P0 set** (both run scripts, c-u4r-runs.mjs and c-u4r-r2.mjs; plan first, with the
+  advisor's plan review; before the next judged set after U4r's: advisor-u4r-f2-plan-full.md, condition 8):
+  - INF-F1-5's untrimmed status read;
+  - RUNS-LINE (runs.txt prints each listed mark's verdict for the set's own part: advisor-u4r-sets-r1-full.md);
+  - RATES-1 (the projection's rates from these sets' whole-run bytes, P0's from the P0 set: the same ruling);
+  - INF-F1-3's signal name, once check.mjs's run() returns the signal (INF-R2-5, below).
+- **BRAWL-1 (Medium; the next npt-lab lane, before U4g's judged B1 runs: advisor-u4r-sets-r1-full.md):** the brawl
+  keeps each soldier in the fight whatever the commands' coverage, with a run figure that names any soldier outside the
+  cluster. Then -17's L1 P3 judged part (and L1 P2 if it reads INVALID) is re-run at the fix's commit.
 - **U4r-F1, done at f1f131b** (the judged runs, item 3) (before any c-u4r-runs.mjs set; plan first, infra-engineer as
   its one round): INF-R2-1 (compare only the
   spike's tree hash and its own status before the judge or r2.txt), INF-R2-3 (no set folder before the first floor),
