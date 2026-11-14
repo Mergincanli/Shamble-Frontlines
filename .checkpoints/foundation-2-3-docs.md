@@ -137,9 +137,17 @@
    advisor-plan-rev1.md (68, A4 whole), decisions.mjs (60); the rest are script anchors and needles, review briefs, short
    phrases in agents' notes and the checkpoint, and the base SHA and paths (the verifier's notes hold only those).
 
+15. Plan revision 2e (asked 2026-11-14 ~00:40 UTC): the advisor agent REVISE E1 (four messages: lines 1887, 2122, 2869
+   and 2929, with 23:51:05's own retraction; its exact text used; condition: any later chat message on this subject
+   before the final commit added the same way), APPROVE E2 (optional Low taken: "none of them in docs/"), E3, E4, E5 and
+   the process (the same verifier resumed, narrow, plus every main-session chat text from 22:40 UTC counted; no new
+   review round). Fix pass 3 applied (`fp3-body.py`, a scratch dry run first): the report from report-body.md, its
+   appendix re-written (cut-off 2026-11-14 00:43:01 UTC; 38 entries, no problem); every script check, 2.2's check and
+   the gate pass. The re-run brief: `verifier-brief-2.md`. Rule kept: no chat message on how Mustafa was told about the
+   advisor model until the final commit.
+
 ## Current step
-Fix pass 3 (the verifier's F-V1 and F-V3): consult the advisor tool (moment 2: the clause failed a second time; moment 1
-for the fix), ask the advisor agent for revision 2e, then write, check, commit, push, CI, and the verifier's re-run.
+Fix pass 3: the notes saved, the commit, the push, CI, the "done" save, then the verifier's re-run (same agent).
 
 ## Next steps
 1. Scripts (consultation 10's items 1 to 6 block the commit): grep every "before" string of D2 to D4 in the notes'
