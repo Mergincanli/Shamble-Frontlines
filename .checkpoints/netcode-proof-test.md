@@ -12,9 +12,32 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 06:38 UTC; read this first after a compact or a cut): the spend limit cut copy 5 at 02:31
-during its first end-check run, which finished anyway (all 11 steps PASS); copy 5 resumed about 06:38 to record it,
-run the second end check and report section 6's return list; snapshot 572c4f69….**
+**NOW (2026-11-14 about 07:00 UTC; read this first after a compact or a cut): U4r's BUILD IS FINISHED (copy 5's
+section 6 return list, 06:58 UTC); final snapshot 572c4f69… (26 files on 2fbec77); next: the review panel.**
+- **The build's figures** (copy 5's return list; notes u4r-build.md 1,586 lines, copied here, equal): two end checks,
+  "check: all 11 steps pass" each (c5-end1.log 02:21-02:35, c5-end2.log 06:40-06:56, a cold machine); measured build
+  526 tests (+35), bites build 603 (+42), self 76 of 76 (+5), 11 steps (0); wasm step 39.6 s and 41.9 s (base 33.1 s
+  warm); det-u4.mjs PASS 200.5 s (non-cargo 190.9 s); r5's slowest R: SS P0 79.6, P2 63.1, P3 60.1, B1 67.1, ES P3
+  161.6 ticks/s; 7.3 redone: 5,241 s (about 1.46 h) for the judged set as ruled (plus builds and judge passes; +230 s
+  if whole-as-lost joins -17's bites). r2: the clean suites pass; B1 and ES FAIL under condition 5 (to U4g and U4h by
+  ruling 3); tick16 at ruling 3's setting valid and FAIL by 2,880 mismatches (ruling 4 point 1). Public items: npt-bots
+  `Behaviour`; npt-server `Decoder::with_bite` (bites only), BITES 3 to 4; npt-lab none (`precheck` and `contract`
+  subcommands beyond 2.7's list, accepted by ruling 3 point 6); check.mjs exports `run` and `cargoConfigDirs`. No plant,
+  no run going, nothing committed in the worktree.
+- **Next: the review panel** (brief section 12 item 7): netcode-architect, test-engineer, engine-architect (public
+  items: plan :930-931; and the check.mjs changes' count, ruling 1 point 1), rust-reviewer (npt-server's and npt-log's
+  edits), security-auditor (carry 76's session boundary, carry 85's refusals, carry 63's refusals, the wall-clock read
+  in npt-server) and infra-engineer (carry 84's bound, the wasm step's time, det-u4.mjs and `wasmStep`'s options: ruling
+  1 point 1); xhigh; at most three agents at a time, so two batches; **the advisor confirms the panel first**. The
+  packet cut by script (review_packet.py, U4d2's; no conclusion of the builder or the main session; it ends with the
+  ids of the carries it left out), naming its snapshot (572c4f69…). The main session's own review reads, from rulings
+  2 to 4: the depth lines and runs.txt's build and recording lines; the two test fixes (ruling 2 point 4); contract.rs
+  against ruling 3 point 6 (:248-301, the new assertion); the mirror's last_acked keep; r6's assertion; the two fixes
+  (scenario.rs:1034-1049, mirror.rs:396-414); tick16d's logs and c-u4r-r2.mjs's expect text; c-u4r-runs.mjs's live
+  lines.
+
+**Earlier NOW (2026-11-14 about 06:38 UTC): the spend limit cut copy 5 at 02:31 during its first end-check run, which
+finished anyway (all 11 steps PASS); copy 5 resumed to record it, run the second end check and report.**
 - Copy 5 resumed by SendMessage about 06:39 UTC (agent a507d682db446aa0a). The saver restarted as **bln1hv25x** (06:39
   UTC, after 8d6025e). The check-in stays (next 08:34 UTC). **On its report:** read it in full; snapshot; if the build
   is done, the review panel (section 12 item 7: two batches, at most three agents; each review names its snapshot).

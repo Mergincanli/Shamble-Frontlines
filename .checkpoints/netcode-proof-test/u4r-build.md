@@ -1486,7 +1486,66 @@ Source: the main folder's .checkpoints/netcode-proof-test/advisor-u4r-build4-ful
   measured, about 1.5 h. The main session measures R again in the main folder before the set (D4).
 - .gate/u4r/r5/ holds 320 MB; df after 4.5G.
 
+### Section 5's end checks, run 1 (done; .gate/u4r/c5-end1.log, -x, 02:21-02:35:28 UTC, exit 0)
+
+- Before: df 4.5G (above the 4 GB floor), up about 1 h. The spend limit cut this copy at 02:31:54 UTC while the call
+  ran; the runner went on and finished (the coordinator's message; the log read whole at its end, lines 166-200).
+- One exclusive call, section 4 rule 3's builds first: `cargo test --locked --workspace --no-run` (exit 0, 02:22:07),
+  the same with `--all-features` (02:23:12), `cargo build --locked --release -p npt-lab` (02:23:20), the same with
+  `--features bites` (02:23:29), `cargo build --locked --release --target wasm32-unknown-unknown -p npt-hash-wasm`
+  (02:23:35) and with `--features bites` (02:23:36); then `node check.mjs` (02:23:36-02:35:28): **"check: all 11 steps
+  pass"**.
+- Step lines: fmt PASS 0.6 s; clippy PASS 20.6 s "measured build and bites build both linted"; clippy-wasm32 PASS 6.3 s
+  "measured build and bites build both linted"; doc PASS 76.3 s; **test PASS 556.8 s "measured build: 526 tests passed,
+  0 failed, 0 reported a skip; bites build: 603 tests passed, 0 failed, 0 reported a skip"**; deps PASS 3.8 s (its
+  summary names carry 85's rules: "names `include` but directly before `!` and an opening bracket; no attribute's
+  text starts with a metavariable; ... no linker, no profile ..."); **wasm PASS 39.6 s** (warm: the four builds 8.8,
+  9.1, 1.2, 1.2 s, rebuilt after the runner's touch; native leg 1 against leg 2 and against Wasm leg 1: 27,000 ticks,
+  0 mismatching, SS-s1/ES-s2/TC-s3 9,000 each; h2 equal; hash-map caught natively at SS-s1 tick 1234, not catchable on
+  wasm32; std-sin "caught at SS-s1 tick 2, vehicle[8].pos.y, as the scan found; re-shown against a clean bites-build
+  native leg"; npt-lab hash 3.0 s); refs PASS 0.5 s; marks PASS 4.9 s (81 marks); **self PASS 1.7 s "76 of 76"**;
+  redact PASS 0.7 s.
+- **Counts as deltas** from `<base>`'s (measured 491, bites 561, self 71, 11 steps): measured **+35** (npt-log 2, npt-bots
+  behaviour.rs 5, npt-lab bin 28: hash.rs 2, scenario.rs 14 with r1_leg, logs.rs 1, replay.rs 2, precheck.rs 6,
+  contract.rs 3); bites **+42** (the 35 and the 7 bites-only: r1's, r3's, r4's, p4's, the late-command and wallclock
+  pairs, carry 83 (d)'s); self **+5** (copy 4's four check.test.mjs tests and carry 85's one); steps 11.
+- Provenance (the runner's count, each "(<worktree>/spikes/netcode-proof/crates/<crate>)"): npt-lab 4, npt-bots 4,
+  npt-hash-wasm 4, npt-sim 6, npt-log 4, npt-server 4, npt-room 4, npt-client 4, npt-proto 4, npt-l1 4, npt-link 4,
+  npt-net 4, npt-tcpinfo 4, npt-judge 2, npt-host 2, npt-super 2, npt-client-wasm 2. Label: tree 2fbec77 plus the
+  uncommitted U4r changes (no edit since 02:14 UTC: contract.rs's fmt hunk of ruling 4, point 2).
+
+### Section 5's end checks, run 2 (done; .gate/u4r/c5-end2.log, -x, 06:40-06:56:47 UTC, exit 0)
+
+- Before: df 4.7G; up 5 min (the container restarted after the cut: a cold run); no process; no source edit since run
+  1 (only these notes are newer than c5-end1.log outside crates/, whose mtimes are the runner's touch). The same six
+  provenance builds (each exit 0, 06:42:05-06:44:05), then `node check.mjs` (06:44:05-06:56:43): **"check: all 11 steps
+  pass"**, then `cargo test --locked --workspace --all-features -- --list` (exit 0, 06:56:47; 617 lines ": test").
+- Step lines: fmt PASS 0.9 s; clippy PASS 29.3 s; clippy-wasm32 PASS 5.3 s; doc PASS 81.7 s; **test PASS 588.5 s
+  "measured build: 526 tests passed, 0 failed, 0 reported a skip; bites build: 603 tests passed, 0 failed, 0 reported a
+  skip"**; deps PASS 3.1 s; **wasm PASS 41.9 s** (cold machine, warm dependencies; builds 9.4, 9.4, 1.3, 1.5 s; npt-lab
+  hash 3.4 s; both pairs 27,000 ticks 0 mismatching; std-sin "caught at SS-s1 tick 2, vehicle[8].pos.y, as the scan
+  found; re-shown against a clean bites-build native leg"); refs PASS 0.3 s; marks PASS 4.9 s; **self PASS 1.7 s "76 of
+  76"**; redact PASS 0.9 s. Counts as run 1: measured +35, bites +42, self +5, 11 steps.
+- Provenance (the runner's count; the --list call adds one build of each): npt-lab 5, npt-bots 5, npt-hash-wasm 5,
+  npt-sim 7, each "(<worktree>/spikes/netcode-proof/crates/<crate>)". df after 4.8G.
+- `--list` names the new tests (npt-lab bin: hash::tests::r10_carry_82 x2 and r10_carry_83_d; scenario::tests::r1,
+  r1_leg, r1_bite, s1-s5, r4, r4_bite, r8, r9, p2, p3_p4, p4_bite, p5, p9; logs::tests::p6; replay::tests::r3 x3;
+  precheck::tests::r6, r7 x4, the two bites, without_commit; contract::tests::r2 x3; npt-bots behaviour b1-b5; npt-log
+  tests::fu3, fu7).
+- **Section 5 is done: both runs whole, every step passing.**
+
 ## Copy 5: state and what is next (a fresh copy resumes here)
+
+- **Final, 06:58 UTC: the build is finished.** Ruling 4 applied; r5 done; end checks run 1 (c5-end1.log) and run 2
+  (c5-end2.log) both "check: all 11 steps pass". Nothing committed; no plant; no run going; the measured release build
+  is the last npt-lab built. Next: the report (section 6's return list) to the main session.
+- **Updated 06:41 UTC:** ruling 4 applied (point 1's expect text, point 2's assertion; point 3 nothing); r5 done; end
+  check run 1 PASS (c5-end1.log); **end check run 2 started 06:40 UTC** (.gate/u4r/c5-end2.log: the six provenance
+  builds, `node check.mjs`, then `cargo test --locked --workspace --all-features -- --list`). If cut: read that log's
+  end; if it ends "check: all 11 steps pass" and exit 0, record it as run 1 is recorded, and report section 6's
+  return list; if a step failed, it is never re-run: record it under TE2-5 (section 4) and report. Snapshot at 06:37:
+  wip/u4r.patch 572c4f69.... No source edit since 02:14 UTC.
+- (The entries below are older states, kept for the record.)
 
 - **Updated 02:08 UTC, after the coordinator's four items (all done):** point 8 (A)'s two runs (as expected), the two
   c-u4r-runs.mjs items (ruling 3, points 3 and 1), c-u4r-r2.mjs's lines by hand (b1 and es not re-run, by points 1 and
