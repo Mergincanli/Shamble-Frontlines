@@ -74,3 +74,26 @@ Started 2026-11-14. Seat: day-session advisor agent (read-only shell; this notes
   /tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/scratchpad/hashcmp.py, against my
   limits (Write/Edit only; only this notes file). Outside the repo, print-only, nothing else touched. I cannot remove
   it within my limits; the main session may remove it or leave it (scratchpad). Reported in my output.
+- C15 marks.json: -17's parts carry validity ["pre:PM-0001-2"], min 3; -57 has no validity rule (so its seed-1 bites
+  and s1 count). RR3-L6's text (u4r-r2-packet.md:2487-2490, :2864-2868): report read_log's share of the judge's time;
+  "if it matters" an npt-log one-pass change. Shares (time / memory): P3 s1 70/66, P3 76/85, B1 70/82, P2 40/81 (cold
+  page cache after the restart: time share not usable), P0 measured 56/78, P0 bites 79/82. Max judge call 27.2 s vs
+  RUN_LIMIT_MS 3,600 s: time does not matter; memory does (handled by the split). Six-point fit 302.2 + 2.3403 x MiB
+  (residuals -90 to +70); four-point 212.3 + 2.5062 x MiB over-predicts P0 by 85 and 294 MiB.
+
+## Status
+All checks done (C1-C15). Facts 1-7 hold as given (free space now 13,231 MiB, the saver's commits aside). Final text
+returned in my StructuredOutput; findings BRAWL-1 (Medium, widened), ADV-SR2-1 (Medium, my cause error), TICK16-WORDING
+(Low, mine), ADV-SR2-2 (Low, my limit breach).
+
+## Rulings (drafted; final text in my StructuredOutput)
+- Q1: same defect as BRAWL-1 (open-loop walk), a second trigger my sets-r1 text missed: blocked steps (crates, wall,
+  fight vehicles, closed doors), at every profile. Not netcode. -17 L1 P0 and its 3 bites: recorded, never counted,
+  never re-run at 051995db9cea; move to BRAWL-1's re-run sets with L1 P2/P3. BRAWL-1 widens (closed-loop on own
+  position; withdraw "a walk that closes despite re-runs"; sim-only full-length test; P0 seed-1 10-min run). My error:
+  ADV-SR2-1 (Medium). Mustafa: heads-up only.
+- Q2: tick16 counts for nothing (invalid run, bite not shown/not missed); its flag is cleared as expected (48, one per
+  client, after phase, no kick); moves with -17 L1 P0. The "about wrap + 60" wording becomes "one per client, all in
+  the after phase, none measured, no kick".
+- Q3: report sections; follow-ups (BRAWL-1 widened; runner change before the re-run sets with RATES-1's four ratios
+  and a printed judge-peak projection; RR3-L6 closed; kept-logs decision to Mustafa before the re-run sets); next steps.

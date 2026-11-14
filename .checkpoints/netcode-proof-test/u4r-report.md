@@ -5,8 +5,8 @@ pre-check and the run scripts, merged after review round 2": advisor-u4r-r2-full
 u4r-brief.md rev 3.2 (sha256 59d570b8…, 1,909 lines: u4r-build.md:20-21; the advisor's check of rev 3.1,
 advisor-u4r-brief.md:10-11: APPROVE WITH CONDITIONS on L1 to L5), built on 2fbec77 (the spike head, whose spikes/ is
 the brief's `<base>` 614823c's: u4r-build.md:5-14). The bytes merged: wip/u4r.patch, sha256 21ca46be…, 26 files. The
-runs after this merge: the r2 record run, carry 62 (h) and U4r-F1 (f1f131b) are done; the judged sets are pending
-(last section). For U4's
+runs after this merge: the r2 record run, carry 62 (h), U4r-F1 (f1f131b), U4r-F2 (791bc55), the pre-check and the four
+judged sets are all done, and the judged runs are closed (advisor-u4r-sets-r2-full.md; last section). For U4's
 report, which folds this one
 (advisor-u4r-r2-full.md:23).
 
@@ -186,11 +186,34 @@ advisor-u4r-r2-full.md:32).
     advisor-u4r-f2-head-full.md, ADV-Q);
   - INF-F1-5's untrimmed status read;
   - RUNS-LINE (runs.txt prints each listed mark's verdict for the set's own part: advisor-u4r-sets-r1-full.md);
-  - RATES-1 (the projection's rates from these sets' whole-run bytes, P0's from the P0 set: the same ruling);
+  - RATES-1 (the projection's rates from these sets' whole-run bytes: the measured ratios P3 1.44, B1 1.504, P2 1.238
+    and P0 1.057; advisor-u4r-sets-r2-full.md);
+  - a printed judge-peak projection for each judge call, from the six judge points' fit (302.2 + 2.3403 x log MiB;
+    the plan names the formula: the same ruling);
   - INF-F1-3's signal name, once check.mjs's run() returns the signal (INF-R2-5, below).
-- **BRAWL-1 (Medium; the next npt-lab lane, before U4g's judged B1 runs: advisor-u4r-sets-r1-full.md):** the brawl
-  keeps each soldier in the fight whatever the commands' coverage, with a run figure that names any soldier outside the
-  cluster. Then -17's L1 P3 judged part (and L1 P2 if it reads INVALID) is re-run at the fix's commit.
+  - It lands before BRAWL-1's re-run sets, which are now the next judged sets.
+- **BRAWL-1, widened (Medium; the next npt-lab lane with N2-1, before U4g's judged B1 runs and before U4 closes;
+  advisor-u4r-sets-r2-full.md, finding BRAWL-1, which replaces the sets-r1 fix line):**
+  - **The cause:** the brawl's walk is open loop. It closes only if every step moves its full length. A re-run command
+    (P2, P3, B1) or a step cut short by collide() leaves a net offset that nothing corrects. collide() cuts steps on
+    crates, the wall stand-in, closed doors and the fight vehicles' parts, at every profile, P0 included.
+  - **The fix:** plan first, with the advisor's plan review; reviewers test-engineer, netcode-architect and
+    rust-reviewer.
+    - (a) Each brawler steers by its own soldier's position, as the host tells it from the decoded snapshot, never from
+      the server's state. For example, a leash toward its team's home or the cluster centre, in cm, with no
+      rate-derived constant. The option "a walk that closes despite re-runs" is withdrawn.
+    - (b) A run figure names every soldier whose feet are in a building area, per measured tick.
+    - (c) Evidence:
+      - a unit test under skipped and blocked steps;
+      - a sim-only test with no network (18,300 ticks, seeds 1 to 3, with a command every tick and with a seeded
+        skip pattern), showing no soldier in a building area on any tick;
+      - one 10-minute SS P0 seed-1 run and one SS P3 run, each with everyone in view at 0.99 or more.
+    - (d) The re-run sets P3, P2 and P0 (with its six bites) at the fix's commit. -2's SS part passing everywhere is
+      the fix's proof. -17's parts and bites count from that commit. -57's results there are recorded beside U4r's,
+      and any difference goes to the advisor.
+- **The kept-logs decision (to Mustafa under Decisions needed, before the re-run sets if the approved cleans cannot
+  hold them; drafted with BRAWL-1's plan):** free space, the 5,385 MiB of kept logs, the refill figures, and options
+  within LEFTOVER-DELETE (a narrow kit rule, never a one-off delete).
 - **U4r-F1, done at f1f131b** (the judged runs, item 3) (before any c-u4r-runs.mjs set; plan first, infra-engineer as
   its one round): INF-R2-1 (compare only the
   spike's tree hash and its own status before the judge or r2.txt), INF-R2-3 (no set folder before the first floor),
@@ -220,8 +243,7 @@ advisor-u4r-r2-full.md:32).
   advisor-u4r-r1-full.md:17).
 - **Round 1's others** (advisor-u4r-r1-full.md:17; u4r-build.md:1936-1950): NC-U4R-4 (U4g's brief); NC-U4R-5 with
   EA-U4R-7's logs half (the first logged replacement: U4f or U6); EA-U4R-4 (the next lane that opens crates/sim);
-  EA-U4R-5 (the U6 brief's bots'-view follow-up); NC-U4R-7's derivation (carry 18's route); RR3-L6 (measured inside
-  the judge timing of step 17); T-6's contract half (the next unit that edits contract.rs); INF-U4R-6 (U4h's brief,
+  EA-U4R-5 (the U6 brief's bots'-view follow-up); NC-U4R-7's derivation (carry 18's route); T-6's contract half (the next unit that edits contract.rs); INF-U4R-6 (U4h's brief,
   now with INF-R2-2's base above); SEC-U4R-4's U6 half (U6's TickLoop carry).
 - **Housekeeping:** /tmp/npt-lab-tests holds 124 folders, none deleted (Mustafa's LEFTOVER-DELETE; u4r-build.md:1927-1929).
 
@@ -233,7 +255,7 @@ advisor-u4r-r2-full.md:32).
 - **SEC-U4R-R2-2 (Low, message only):** a profile refusal under a quoted table header names line 1; the refusal itself
   fires (:59-62).
 
-## The judged runs (in the ruling's order; 1 and 2 done, the rest pending)
+## The judged runs (all done, items 1 to 7; closed by advisor-u4r-sets-r2-full.md, Q3)
 1. **The r2 record run: done.** `node ops/runs/c-u4r-r2.mjs --date 2026-11-14` through main-run.sh, lock exclusive,
    run 15:40:37-15:44:52 UTC, exit 0 (.gate/u4r-merge/r2.log:1-3 and its end), at commit e59ece9, whose spikes/ equals
    the merge commit 71ee13d's (`git diff --quiet 71ee13d e59ece9 -- spikes/` exit 0). r2.txt
@@ -398,6 +420,9 @@ advisor-u4r-r2-full.md:32).
      - **What follows:** -17's L1 P3 part stays INVALID: recorded, never counted, never re-run at this commit. It
        moves to BRAWL-1's fix and is re-run at that fix's commit, before U4g's judged B1 runs. -57's L1 P3 PASS
        counts. -2's SS part at P3 is recorded as FAIL. The 99 % bar stays.
+     - **Correction (ADV-SR2-1):** the cause also includes blocked steps at every profile (advisor-u4r-sets-r2-full.md,
+       Q1). The sets-r1 claim that "at P0 ... the circle closes" rested on r2's 30 s command counts, and was the
+       advisor's error. No verdict rested on it.
      - Overflow resyncs 0, nothing flagged. Measured incomplete 43,117, 43,210 and 43,441 of 864,000 client-ticks
        (5.0 %, which is P3's loss).
      - Raw logs 518.8 MiB (du -sb), against the runner's 359.9 MiB projection: **1.44 times** (FACTS-1). The cause:
@@ -439,6 +464,73 @@ advisor-u4r-r2-full.md:32).
          more than one soldier can drift, so BRAWL-1's run figure must name every soldier outside the cluster.
      - Raw logs 778.6 MiB of .jsonl against the runner's 628.9 MiB projection (1.24 times). Measured incomplete 17,260,
        17,089 and 17,532 of 864,000 client-ticks (2.0 %).
+   - **P0 (21:28:45-22:07 UTC, exit 0; results at 930d2a6: results/u4r/051995db9cea/P0/, runs.txt, verdict.json and
+     verdict-bites.json; kept log .gate/u4r-sets/P0-051995db9cea.log):**
+     - **The run:** judged in two calls (U4r-F2), both exit 0. peak.py 2,316.2 s and 4,356.9 MiB, the bite-runs
+       judge's peak. redact-check 287 items, 0 findings. The head's sha256s equal P3's, B1's and P2's.
+     - **-57:** L1 P0 PASS (6,984 / 2,750 / 88,063 on each run; p99 5,719 / 5,718 / 5,715). Its bites are shown:
+       pos-4cm 34,830, yaw-12bit 46,692, pitch-8bit 440,312, each failing only its own check.
+     - **-2:** SS FAIL on s1 only (0.861889). Its other ten checks pass on every run; shots 694.16 / 694.19 / 693.98.
+     - **-17:** L1 P0 INVALID. s1 is invalid. s2 and s3 are valid, with 0 mismatches of 878,352 compared and 0
+       incomplete in each. Its three bites (tick16, client-rounding, whole-as-lost) are invalid at the same 0.861889,
+       since they are seed-1 runs with the same drift.
+     - **The cause (advisor-u4r-sets-r2-full.md, Q1):** BRAWL-1, through a second trigger. It is not a netcode fault.
+       - (a) Not loss, timing or decoding. P0 has no loss: s1's commands are 878,352, with 0 steps without one, late
+         0, overflow resyncs 0 and measured incomplete 0.
+       - (b) One soldier behind one door. The onset at tick 77,476 is door 2's 77th toggle: door 2 starts open and
+         shuts on that tick. The others' count is 47 in door 2's open half and 0 in its shut half, re-added within one
+         30-tick bin since nothing is lost. Slot 21 is in team 1, whose home is about 8.7 m from building 2's door.
+         The building is inferred, since no log carries positions.
+       - (c) It is deterministic: client-rounding is identical, and tick16's onset is at the same elapsed tick
+         (13,740).
+       - (d) The mechanism: the walk is open loop, and collide() cuts steps on crates, the wall stand-in, closed doors
+         and the four fight vehicles' parts (world.rs:1233-1285). Nothing pulls a soldier back.
+       - (e) The sets-r1 claim that "at P0 the circle closes" was wrong (ADV-SR2-1). The step that held this case for
+         a ruling anticipated it, so nothing counted wrongly.
+     - **The new home:** -17's L1 P0 part and its three bites move to BRAWL-1's re-run sets at the fix's commit, with
+       its L1 P3 and L1 P2 parts.
+     - **The tick16 flag (Q2):** 48 overflow resyncs, one per client, all at tick 65,615, all in the after phase (65
+       after ticks, not capped), none in the measured window, no kick. Each client had 79 steps without a command and
+       20 rewinds refused, as the wrapped 16-bit header predicts. The run counts for nothing: it is invalid by
+       pre:PM-0001-2. tick16's "shown" still rests on r2's 30 s record (c62h: shown, 2,880 mismatches, the new check
+       720).
+     - **The bites' mechanics** (not a judged result): whole-as-lost's measured incomplete 48; tick16's 720 and 48
+       resyncs. Each bite bit as designed.
+     - **Bytes and disk:** 3,248.3 MiB of logs against 3,073.3 projected (1.057). Free space 13,233 MiB afterwards.
+   - **U4r's judged results in one table** (advisor-u4r-sets-r2-full.md, Q3 (3)):
+
+   | Mark and part | Result |
+   |---|---|
+   | -57 L1 P0, P2, P3, B1 | PASS, counted; its three bites shown |
+   | -17 L1 P0, P2, P3 | INVALID by BRAWL-1; moved to its re-run sets |
+   | -17 and -18 L1 B1 | INVALID as ruled (U4g's) |
+   | -17's three bites | invalid; moved |
+   | -2's SS part | FAIL at every profile, on everyone in view only |
+   | -17's valid runs (P0 s2, s3; P2 s1) | 0 mismatches in all 2,618,700 snapshots compared |
+   | the -30 pre-check | as recorded (item 6) |
+
+   - **The judge measurements, and RR3-L6 closed** (Q3 (4)):
+     - read_log's share of the judge's time: one P3 run 70 %, the P3 folder 76 %, B1 70 %, P0's measured half 56 %,
+       P0's bites half 79 %. P2's 40 % is not usable, because its page cache was cold after the restart.
+     - Its share of peak memory: 66 / 85 / 82 / 81 / 78 / 82 %.
+     - The longest call took 27.2 s, against RUN_LIMIT_MS 3,600 s. So time does not matter at these sizes, and
+       npt-log needs no one-pass change for time. Memory is the limit: reading holds about 80 % of the peak. The split
+       and the runner change's projection handle it.
+     - The fits: the four-point fit (212.3 + 2.5062 x MiB) over-predicted P0's halves by 85 and 294 MiB, so it is
+       conservative. The six-point fit is 302.2 + 2.3403 x MiB, with residuals of -90 to +70 MiB.
+     - A single call at P0's actual bytes would have projected about 8.2 GiB. The split was needed only because F was
+       1.504, and it changed no verdict (U4r-F2's proof that one call equals two).
+     - RR3-L6 is closed; it leaves "Round 1's others", and no STATUS line is needed.
+   - **Byte ratios, RATES-1's inputs** (Q3 (5)): P3 1.44, B1 1.504, P2 1.238, P0 1.057.
+   - **The cleans and the disk** (Q3 (6)):
+     - (A) 8,881 to 8,937 MiB; (B) 8,138 to 8,618; (C) 8,618 to 16,492; 16,490 at P0's start; 13,233 after.
+     - Kept raw logs total 5,385 MiB: pre-check 17, P3 519, B1 821, P2 779, P0 3,249.
+     - The shared target is cold (1 MiB). Its next refill, about 9 GiB, leaves about 4.2 GiB free.
+   - **Corrections** (Q3 (7)):
+     - ADV-SR2-1: the BRAWL-1 cause, as above.
+     - TICK16-WORDING: from BRAWL-1's re-run sets on, tick16's expected line reads "one overflow resync per client, all
+       in the after phase, none in the measured window, no kick", with no fixed offset. r2 had them at wrap + 60 and
+       P0 at wrap + 79, because the reliable queue fills at the event rate after the wrap.
    - **The judge, measured apart** on one P3 run (judge-apart.sh; .gate/u4r-judge-apart/u4r-P3-0f066338dd8d-l1-p3-s1.log;
      178,922,504 B):
      - Full judging: 2.7 s and 641.1 MiB. Reading alone: 1.9 s and 426.2 MiB, so RR3-L6's read_log share is about
@@ -469,7 +561,19 @@ advisor-u4r-r2-full.md:32).
 None.
 
 ## For Mustafa
-Nothing to decide or do now (advisor-u4r-r2-full.md:32). The merge into the spike branch needs no go from you: it is not
+**After the judged runs (advisor-u4r-sets-r2-full.md):** nothing to decide or do now. All of U4r's test sets have run.
+- **Accuracy:** the position-accuracy check passed in every setting.
+- **The main check** (every snapshot a client decodes is exactly the server's state) has no counted result yet in
+  this unit. The test bots walk blind circles and get knocked off course, by lost commands or by bumping into crates,
+  the wall or a moving vehicle, until one drifts into a building. When its door shuts, the server rightly hides that
+  bot, which breaks the test's "everyone in view" load condition. Those runs are recorded as invalid and move to
+  re-runs after a bot fix, which must make bots steer back by where they actually are. In every run where the check
+  could be judged, about 2.6 million snapshots in all, it found zero errors.
+- **A heads-up:** the kept test logs now take about 5.4 GB. Once the build caches refill, the disk sits near its safety
+  floor, so before the re-runs you get a decision about the kept logs, under your rule that nothing is deleted outside
+  the approved methods.
+
+**At the merge (advisor-u4r-r2-full.md:32):** The merge into the spike branch needs no go from you: it is not
 a merge to main, and nothing a player sees changes. One line, as you asked for SIZE-U4R: U4r has 8,362 lines after its
 fix pass, against about 3,000 for its size M; your answer (a) covers it. Two heads-ups, neither a decision now: (1) the
 judged runs need about 4 GiB more free disk than today; the approved cache cleans should cover it, and if they do not, it

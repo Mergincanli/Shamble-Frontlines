@@ -14,7 +14,43 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 18:55 UTC; read this first after a compact or a cut): THE SETS' FIRST RULING IS IN:
+**NOW (2026-11-14 about 22:40 UTC; read this first after a compact or a cut): U4r's JUDGED RUNS ARE CLOSED.** The P0
+ruling: **advisor-u4r-sets-r2-full.md** (64 lines, sha256 7b6aa38c…, written word for word by u4r_sets_r2_ruling_full.py;
+its two Mediums, BRAWL-1 and ADV-SR2-1, read in full). u4r-report.md carries its Q3 record: the P0 subsection, the
+one-table summary, RR3-L6 closed, the byte ratios, the cleans and disk, the corrections, the follow-ups and For
+Mustafa. Nothing is re-run at any U4r set commit.
+- **Its "For Mustafa" (copied here at once):** nothing to decide or do now.
+  - All of U4r's sets have run, and the position-accuracy check passed everywhere.
+  - The main check (decoded snapshot = server state) has no counted result yet in this unit. The test bots drift into
+    buildings, by lost commands or by bumping into crates, the wall or vehicles. Those runs are recorded invalid and
+    move to re-runs after a bot fix that steers by position. Where judgeable (about 2.6 million snapshots), zero errors.
+  - Heads-up: the kept logs take about 5.4 GB, so a kept-logs decision comes to him before the re-runs.
+- **Its rulings in short:**
+  - **Q1:** -17 L1 P0 is INVALID by BRAWL-1's second trigger: collide() cuts the open-loop walk's steps at every
+    profile. Its three bites are invalid too. All move to BRAWL-1's re-run sets with L1 P3 and P2. **BRAWL-1 widens:**
+    steer by the soldier's own position (decoded snapshot), a figure naming every soldier in a building area, a
+    sim-only test, and P0 seed-1 and P3 runs at 0.99 or more. The "walk that closes" option is withdrawn.
+  - **Q2:** the tick16 flag clears as expected (48 resyncs at 65,615, all in the after phase, no kick). The run counts
+    for nothing (invalid).
+  - **Q3:** the record listed above. RR3-L6 is closed.
+  - Findings: ADV-SR2-1 (the advisor's own error), TICK16-WORDING (no fixed offset), and ADV-SR2-2 (its scratchpad
+    script hashcmp.py: leave it).
+- **NEXT, in the ruling's order:**
+  - **(3) The one runner change**, c-u4r-runs.mjs and c-u4r-r2.mjs, plan first with the advisor's plan review. Its list:
+    INF-F2-1's header sentence; INF-F2-2's wordings; INF-F1-5; RUNS-LINE; RATES-1 with P3 1.44, B1 1.504, P2 1.238 and
+    P0 1.057; a printed judge-peak projection per call (the six-point fit 302.2 + 2.3403 x MiB); INF-F1-3 once run()
+    returns the signal. Then stagings, infra-engineer's one round, CI and the advisor's review of the head. It lands
+    before BRAWL-1's re-run sets.
+  - **(4) BRAWL-1** in the next npt-lab lane, with N2-1: plan first, with the widened scope and evidence, the re-run
+    sets' expected lines and their disk plan (about 4.5 GiB of logs plus the floor, against the shared target's refill
+    of about 9 GiB).
+  - **(5)** The kept-logs decision drafted with BRAWL-1's plan; it goes to Mustafa if the approved cleans cannot hold
+    the re-runs.
+  - **(6)** The re-run sets P3, P2 and P0 (split) at BRAWL-1's commit, before U4g's judged B1 runs.
+  - **(7)** U4's report folds U4r's.
+  - **Then the U4 order continues:** U4f, then U4g and U4h, each with its brief to the advisor first.
+
+**Earlier NOW (2026-11-14 about 18:55 UTC): THE SETS' FIRST RULING IS IN:
 advisor-u4r-sets-r1-full.md** (66 lines, sha256 8e45f9a5…, written word for word by u4r_sets_r1_ruling_full.py; two
 Mediums read in full). The sets so far: pre-check (d666aeb), P3 (5afd4e7) and B1 (73060fd) are done. **Next, in the
 ruling's order:** (3) judge-apart on the whole P3 and B1 folders, then (A) remove the merged copies by CHECKPOINTS
