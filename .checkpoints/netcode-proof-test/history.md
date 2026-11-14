@@ -2025,3 +2025,13 @@ From "Next steps, in order" (as it was):
       at the PR #49 and PR #51 merges). The spike keeps its own workspace (spikes/netcode-proof/Cargo.toml); main's root
       workspace and its CI job `toolchain` are main's, and the job also runs on this branch's pushes. The report to him:
       two lines, when main is in (the merge commit) and whether the `toolchain` job is green on this branch.
+
+## Note: an addition to review_packet.py's ALLOWED (Mustafa's words of 2026-11-12, item 2), 2026-11-14 about 07:20 UTC
+- Addition 2: `.checkpoints/netcode-proof-test/advisor-u4r-brief.md`, the exact path.
+  - Written by the advisor agent as its ruling: its title "The advisor's check of the U4r builder brief (rev 3.1),
+    2026-11-13"; its seat line "a day session's advisor (workflow agent, opus, effort xhigh), on main's
+    `.claude/agents/advisor.md`". The run: workflow wf_95beab47-c57 (U4r's brief check; cut by the spend limit at
+    13:06 UTC, resumed 14:12, done about 14:27). The file's last commit is the saver's 013f7c3 (2026-11-13 14:28:07
+    UTC); `git diff --stat 013f7c3 HEAD` on it is empty, so nobody changed it since.
+  - The packet that needs it: U4r's review (u4r-packet.json). The build is judged against this ruling: its conditions
+    L1 to L6 and the U4R-Q rulings, which the build and carries 86 to 88 answer to.

@@ -27,3 +27,12 @@
 - Carries: §U4r ids 40, 49, 58, 59, 60, 62, 63, 69, 73-77, 82-85; rulings name 14, 28, 49, 57-60, 62, 73, 75, 77, 78,
   82-85, 87; task adds 74, 76, 89. `|U4r` adds 61, 66, 86, 88. Rulings 2-4's carry amendments (59, 62 (e), 73, 77 (b),
   78) are not in u4s-carries.md yet (only ruling 1's: 62 (h), 82, 87, 89): a question.
+- Config written: u4r-packet.json. 9 heads, 26 diffs (3 side: check.test.mjs, bots/tests/behaviour.rs,
+  server/tests/schedule.rs), 46 docs, carries include `^(14|28|40|49|57|58|59|60|62|63|69|73|74|75|76|77|78|82|83|84|85|87|89)\. \*\*|U4r`
+  (takes 27, leaves 62). SERIES labels reworded to name the lines held, with no claim about rows between.
+- Checks (print-only python replicating the script's rules): JSON parses; every path exists; the 26 "b" paths equal
+  snap1's status list; each "a" is the main folder copy or /dev/null for new files; no doc path FORBIDDEN; every heading
+  matches exactly one line; every line range in bounds; out and side_out not yet present. Did not run review_packet.py.
+- Possible additions left as questions: advisor-u4r-brief.md (FORBIDDEN, not ALLOWED); advisor-u4.md conditions 2, 3,
+  5, 9 (the plan's U4r entry names them); marks/README.md §1 and §4; the plan's Lanes; Mustafa's words the rulings
+  quote (history.md:294-295, 338-340, 404-406 via words_of_mustafa).
