@@ -19,3 +19,23 @@ On a restart: read this file, continue after the last item marked done.
   set holds all 47 other soldiers on at least 99 % of its snapshots ... proposed share"; downstream "every run of
   PM-0001-4 to PM-0001-27"). SERIES.md:368 flag's writer "npt-room"; U4r's lab computes it from the mirror frame
   (logs.rs:538-541; mirror.rs:1-8, "the frame the room meant that client to hold").
+- [done] Restart (copy 2 of this advisor, fresh context): re-read advisor.md, questions, notes :571-906, ruling 2
+  whole, brief 2.4 and 7.1 and section 4's lanes, carries 40-78, history.md :281-345, :364-415, :1928-2027 (also
+  SIZE-CHECK :398-399, USAGE-SAVINGS :291-299).
+- [done] Code/doc checks for point 1: mirror.rs:1-8, :314-337 (flag = the mirror frame holds every other soldier; ES
+  and vehicles), :396-414 (a missing baseline frame is a breach and returns early: that tick's stats not updated);
+  room.rs:1163-1170 (baseline, stale under no-fallback, else defaults age 0), :1208-1235 (events oldest first before
+  any entity change), :1236 on (nearest 8 then the rest). ADR 0001 is "Status: Proposed" (:3); :1589 scopes the share
+  "for the downstream rows", last column "every run of PM-0001-4 to PM-0001-27"; :705 the downstream estimate
+  "everyone in view". marks.json: -17 and -18 L1 parts validity [pre:PM-0001-2] (notes: "the advisor's Q22 ruling");
+  -57 parts none; -58 window all. Plan §4.12 :416-424 (Q22: -17 "the codec under the real load", -18 "B1 ... inside the
+  band"), §4.5 :296-300, §4.14 :461 (-18 bite "a gap evicts B"), §5 U4g :818-833, order :882 (U4r, then U4f, U4g,
+  U4h); RQ1 :114 is U4-wide ("bursts (-18)"). Plan §10/§11 :970-976, :1080-1093: the readings list has Q22's -22
+  exception only, not Q22's share on -17/-18. Carry 78 (u4s-carries.md:546-553): "so no U4e or U4r run meets it".
+- Point 1 draft: High (npt-room's recovery, not U4r's code). Q22 stands, no bar moves; the FAIL stands (condition 5);
+  B1 judged runs stay in U4r's set for -57 (no pre), -17/-18 B1 recorded INVALID, never counted; their passing evidence
+  moves to U4g with carry 78 widened (relevant soldiers the baseline lacks first; form is U4g's plan; target share
+  >= 0.99 at 10 bursts in 600 s = at most 18 flag-0 ticks per client per burst on average). Readings PR gains Q22's
+  share on -17/-18 (ADR's "for the downstream rows"). Not to Mustafa now.
+- Next: spot-check b1 logs; point 2 (ES owner of -12 runs; brawl aim); point 3 (figures.rs orphans; tick16c segments);
+  point 4 (scenario.rs heal record; b1-nofallback breaches); points 5-8.
