@@ -111,10 +111,11 @@ export function roomFor(free, projected, what) {
   };
 }
 
-function sh(cmd, args, cwd = SPIKE) {
+function sh(cmd, args, cwd = SPIKE, keepLead = false) {
   const r = spawnSync(cmd, args, { cwd, encoding: "utf8", maxBuffer: 1 << 28 });
   if (r.status !== 0) throw new Error(`${cmd} ${args.join(" ")}: exit ${r.status}\n${r.stdout}${r.stderr}`);
-  return r.stdout.trim();
+  // keepLead: the re-check's readings keep the status's first column (INF-F1-5: " M" is an unstaged change).
+  return keepLead ? r.stdout.trimEnd() : r.stdout.trim();
 }
 
 const sha256 = (path) => createHash("sha256").update(readFileSync(path)).digest("hex");
@@ -167,7 +168,7 @@ function main(argv) {
   if (untracked) throw new Error(`files under spikes/netcode-proof/crates are not committed (${untracked.split("\n").join("; ")}): commit first, since every log names its commit`);
   const commit = sh("git", ["rev-parse", "HEAD"]);
   // From the repository root: this script's sh() runs in the spike, where the pathspec would match nothing (INF-R2-1).
-  const reading = () => spikeReading((args) => sh("git", args, ROOT));
+  const reading = () => spikeReading((args) => sh("git", args, ROOT, true));
   const start = { commit, ...reading() };
   const out = join(GATE, `r2-${commit.slice(0, 12)}`);
   if (existsSync(out)) throw new Error(`${out} exists: a run set is never overwritten`);

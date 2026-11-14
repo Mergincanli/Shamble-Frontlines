@@ -10,8 +10,11 @@
 //   `flock -x .gate/shared-target/.lane.lock node spikes/netcode-proof/ops/runs/c-u4r-runs.mjs …`. If this script dies
 //   while a call runs, the lane lock is freed at once (no npt-lab or npt-judge call holds it: advisor-u4r-f1-head,
 //   INF-F1-1, measured), while the call, in its own session, runs on with no limit: to stop a set, end the call's group
-//   first (`kill -9 -- -<pid>`, the pid from `pgrep -a npt-lab; pgrep -af npt-judge`), then the script. Each npt-lab
-//   call and the judge are bounded at RUN_LIMIT_MS (advisor-u4r-r2, INF-R2-4); the builds are not.
+//   first (`kill -9 -- -<pid>`, the pid from `pgrep -a npt-lab; pgrep -af npt-judge`), then the script. In a set with
+//   bites (P0), ending the measured judge call's group starts the bite-runs call at once: pgrep again and end that
+//   call's group too; the script then writes runs.txt and exits 1 on its own. Kill the script only when no npt-lab or
+//   npt-judge call is left (U4r-F2's review, INF-F2-1). Each npt-lab call and the judge are bounded at RUN_LIMIT_MS
+//   (advisor-u4r-r2, INF-R2-4); the builds are not.
 // - precheck (set u4r-precheck-30; 7.2): SS P0 seed 4's recording made again by `npt-lab scenario --record` at its
 //   crates/lab/precheck-recordings.json entry's settings (the set stops if that run's rewinds refused are above 0: 7.1),
 //   then three pairs by `npt-lab precheck`, each checking the file against that entry first: clean (the measured
@@ -32,9 +35,13 @@
 // - A set with bites (only P0: bitesOf) is judged in two calls (U4r-F2: advisor-u4r-sets-r1, Q2; advisor-u4r-f2-plan):
 //   its measured runs write under <logs>/measured/<run> and its bite runs under <logs>/bites/<run>; npt-judge reads
 //   measured/ into verdict.json, then bites/ into verdict-bites.json, each call at most 10 GiB of judge memory where
-//   one call over the whole folder would project about 11.5 GiB. No run's verdict reads another run, so each call's
-//   verdicts are what one call gives. Both calls always run, each after its own re-check; results/ is made only after
-//   both, each file copied on its own exit 0. A set without bites keeps one call and its <logs>/<run> layout.
+//   one call over the whole folder projected about 11.5 GiB before the set (the four-point fit at F 1.504); at P0's
+//   measured bytes (3,248.3 MiB of logs), one call projects about 7.7 GiB by the six-point fit (8.2 GiB by the
+//   four-point fit: advisor-u4r-sets-r2). No run's verdict reads another run for -2's, -17's and -57's checks (no
+//   against threshold, no ws-practice rule, figures that read one run); a mark that compares runs (a twin figure) needs
+//   one call. Both calls run whatever the first's end; a re-check stop before either call ends the set there, with no
+//   results/. Each call runs after its own re-check; results/ is made only after both, each file copied on its own
+//   exit 0. A set without bites keeps one call and its <logs>/<run> layout.
 // - The tick16 bite run (the advisor's U4r build ruling 3, point 3): its tick_start is computed from its own lengths,
 //   65,551 - (warm-up ticks + measured ticks) (47,251 for 300 + 18,000), so the 16-bit wrap falls 15 ticks before the
 //   measured phase's end and the measured window ends before the bitten room evicts; every other -17 run, clean and the
@@ -50,10 +57,22 @@
 //   projection again; marks.json copied into the bin folder and its sha256 checked there; the first run's floor; only
 //   then the set's folders (advisor-u4r-r2, INF-R2-3). The binaries go to .gate/netcode-proof-test/bin/<set>-<commit12>/,
 //   which no exists-check reads, so a stop before the first run leaves nothing that blocks a re-run at that commit.
-// - The projection (FP-5 (b), (c): INF-U4R-3): each run's log bytes from the builder's measured rates (BYTES_10MIN_57,
-//   BYTES_10MIN_OTHER, PAIR_BYTES), the set's total checked before the builds and after them: it starts only when free
-//   space minus the total is at least 4 GiB, printing both; before each run, free space minus that run's projected
-//   bytes must be at least 4 GiB, else it stops before that run.
+// - The projection (FP-5 (b), (c): INF-U4R-3): each run's log bytes from U4r's judged sets' largest measured runs
+//   (BYTES_10MIN_57, BYTES_10MIN_OTHER: RATES-1, advisor-u4r-sets-r1) and the builder's PAIR_BYTES, the set's total
+//   checked before the builds and after them: it starts only when free space minus the total is at least 4 GiB,
+//   printing both; before each run, free space minus that run's projected bytes must be at least 4 GiB, else it stops
+//   before that run.
+// - The judge's projected peak (the advisor's P0 ruling, next step 3; advisor-u4r-f3-plan, condition 4): 302.2 +
+//   2.3403 x the MiB of logs a call reads (JUDGE_FIT, the six-point fit over U4r's judge measurements apart:
+//   advisor-u4r-sets-r2, residuals -90 to +70 MiB). Right after the disk projection before the builds, one line per
+//   judge call from the plan's bytes for that call's runs; the set stops there, with nothing made, if any call projects
+//   over the 10 GiB line (JUDGE_LINE_MIB: advisor-u4r-sets-r1, Q2). Before each call, after its re-check, the same line
+//   from the bytes on disk, which only prints. The pre-check has no judge and prints none.
+// - Under each judge call that exits 0, runs.txt prints each part and bite that holds a run of that call, with its
+//   verdict or status, each run's validity and the part's why lines, copied from the verdict file (setParts; RUNS-LINE:
+//   advisor-u4r-sets-r1): the judge's own summary gives each mark's overall verdict, which can hide the set's part.
+//   Nothing is judged there. These lines and the on-disk projection go through one guard, so they can add a line
+//   naming an error but never stop runs.txt being written (advisor-u4r-f3-plan, condition 3).
 // - Raw logs go under .gate/netcode-proof-test/runs/<set>-<commit12>/ (one folder per run), results under
 //   results/u4r/<commit12>/<profile>/ or results/u4r-precheck-30/<commit12>/; neither is ever overwritten. The bin
 //   folder's copy of marks/marks.json (its sha256 in runs.txt's head) gives the bite list, and the same bytes, copied into
@@ -65,8 +84,8 @@
 //   load average at the start and at the end.
 // - A stopped call (RUN_LIMIT_MS) is a result, never retried (condition 5): a judged run's or a pair's line says
 //   "stopped at <s> s" and the set goes on; a stopped recording stops the set before the pairs; when the judge stops or
-//   exits non-zero, runs.txt is written with the run lines and no verdict, and the script exits 1 (advisor-u4r-f1-plan,
-//   condition 1).
+//   exits non-zero, runs.txt is written with the run lines and no verdict from that call, and the script exits 1
+//   (advisor-u4r-f1-plan, condition 1).
 // - Both npt-lab builds and npt-judge are built -v --release --locked --offline, each artifact's path read from cargo's
 //   --message-format=json messages (check.mjs's builtArtifact, as the wasm step reads its builds) and copied out before
 //   the next build replaces it; cargo's own "Compiling" or "Fresh" lines for the npt-* crates go to the runner log
@@ -75,12 +94,13 @@
 //   ticks (npt-lab's summary line), for the ticks-per-second figure (2.4 r5, 7.3).
 // - No run logs its clients' bytes (`scenario --bytes`): no part these sets judge reads a replay log (only an x86_64
 //   replay log of an L2 Arm run is read: judge/src/figures.rs:222-233).
-// - Its pure helpers are exported (the projection, the name check, the summary line's flag, the pairs' check, and the
-//   spike's re-check, which c-u4r-r2.mjs imports); main runs only when this file is the entry module.
+// - Its pure helpers are exported (the projection, the judge's projected peak, the name check, the summary line's flag,
+//   the pairs' check, the verdict file's parts lines, and the spike's re-check, which c-u4r-r2.mjs imports); main runs
+//   only when this file is the entry module.
 
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statfsSync, statSync, writeFileSync } from "node:fs";
 import { loadavg, uptime } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -116,11 +136,20 @@ const SCENES = { 1: "SS", 2: "ES", 3: "CO", 4: "TC" };
 const NAME = /^[A-Za-z0-9-]+$/;
 /**
  * One judged run's projected log bytes over a 10-minute measured phase (18,300 ticks with its warm-up and after phase),
- * from the builder's measured bytes per measured tick (u4r-build.md:739-751; MB = 10^6 B): a run whose header lists
- * PM-0001-57 writes -57's three series (the advisor's U4r build ruling, point 3), P0 509.1 MB, P2 219.8 MB, P3 125.8
- * MB, B1 190.6 MB; any other run about 3,050 B a measured tick at every profile, 56 MB.
+ * from U4r's judged sets (RATES-1: advisor-u4r-sets-r1; advisor-u4r-f3-plan, condition 7): the largest whole run of
+ * each kind, du -sb of its kept folder on 2026-11-14, rounded up to 0.1 MB (MB = 10^6 B). The five run folders:
+ * .gate/netcode-proof-test/runs/u4r-P3-0f066338dd8d, u4r-B1-64f3307d5c7f, u4r-P2-ab10f058a828,
+ * u4r-P0-051995db9cea/measured and u4r-P0-051995db9cea/bites. A run whose header lists PM-0001-57 writes -57's three
+ * series (the advisor's U4r build ruling, point 3), which grow through a run, so the builder's rates from 20 to 30 s
+ * runs understated them:
+ * - P0 603.7 MB: the bite run pos-4cm, the largest of P0's six -57 runs, which also sets the rate for P0's measured
+ *   runs (514.0 to 520.3 MB; the other two -57 bites 518.8 and 567.5 MB);
+ * - P2 272.9 MB (its runs 271.2 to 272.8 MB), P3 183.3 MB (178.9 to 183.3), B1 291.4 MB (283.1 to 291.3).
+ * Any other run: 56 MB, the builder's figure (about 3,050 B a measured tick), kept: P0's three -17 bite runs, the only
+ * such runs, came to 55.6 to 55.84 MB. The cross-check: each set's measured bytes over its old projection were P3 1.44,
+ * B1 1.504, P2 1.238 and P0 1.057, and at these rates each set's projection covers its measured bytes.
  */
-export const BYTES_10MIN_57 = { P0: 509_100_000, P2: 219_800_000, P3: 125_800_000, B1: 190_600_000 };
+export const BYTES_10MIN_57 = { P0: 603_700_000, P2: 272_900_000, P3: 183_300_000, B1: 291_400_000 };
 export const BYTES_10MIN_OTHER = 56_000_000;
 /**
  * One -30 pre-check pair's output (its lines, kept for runs.txt), at most 25,164 B in the builder's pre-check runs
@@ -131,8 +160,8 @@ export const PAIR_BYTES = 25_164;
 /** The late-command pair's one expected result line (precheck.rs, the late-command bite's test). */
 export const LATE_COMMAND_LINE = "result: VOID (L1 late_count 1)";
 /**
- * The one fixed line above a set's two judge lines in runs.txt when the set has bites (U4r-F2: advisor-u4r-f2-plan,
- * condition 3 (b)); it never parses the judge's output.
+ * The one fixed line above a set's two judge blocks in runs.txt when the set has bites (U4r-F2: advisor-u4r-f2-plan,
+ * condition 3 (b); its place: advisor-u4r-f3-plan, condition 5); it never parses the judge's output.
  */
 export const SPLIT_LINE = "the set is judged in two calls, each at most 10 GiB (U4r-F2); verdict.json holds the measured runs' verdicts (read its L1 P0 parts; its bites read 'no run yet' by design); verdict-bites.json holds the bite runs' verdicts (read its bites; every part reads '0 of n valid runs' by design)";
 /**
@@ -140,6 +169,13 @@ export const SPLIT_LINE = "the set is judged in two calls, each at most 10 GiB (
  * (18,300 ticks at 60.1 ticks/s, about 304 s); re-checked against the judge's measured time before the P0 set.
  */
 export const RUN_LIMIT_MS = 3_600_000;
+/**
+ * The judge's projected peak memory, MiB, from the MiB of logs a call reads: a + b x MiB (advisor-u4r-sets-r2, RR3-L6's
+ * figures: the six-point fit over U4r's judge measurements apart, peak.py's ru_maxrss; residuals -90 to +70 MiB).
+ */
+export const JUDGE_FIT = { a: 302.2, b: 2.3403 };
+/** The judge's memory line, MiB (advisor-u4r-sets-r1, Q2: a call projected over 10 GiB waits for the advisor). */
+export const JUDGE_LINE_MIB = 10_240;
 
 /**
  * What changed in spikes/netcode-proof since the set started (advisor-u4r-r2, INF-R2-1): its tree hash and its tracked
@@ -191,6 +227,59 @@ export function roomFor(free, projected, what) {
     ok,
     line: `${what}: free ${mib(free)} MiB, projected ${mib(projected)} MiB, so ${mib(free - projected)} MiB after it against the 4 GiB floor (4096 MiB): ${ok ? "room" : "no room, stopped before it"}`,
   };
+}
+
+/** The judge's projected peak, MiB, for a call that reads `bytes` of logs (JUDGE_FIT). */
+export const judgePeakMiB = (bytes) => JUDGE_FIT.a + JUDGE_FIT.b * (bytes / 1024 ** 2);
+
+/**
+ * Whether a judge call that reads `bytes` of logs stays at or under JUDGE_LINE_MIB, with the line that names the call,
+ * its log MiB, the formula, the projected peak and the line (advisor-u4r-f3-plan, condition 4). Over the line, the
+ * start check stops the set before the builds; the line printed before a call from its logs on disk (`onDisk`) only
+ * prints.
+ */
+export function judgeRoom(bytes, what, onDisk = false) {
+  const peak = judgePeakMiB(bytes);
+  const ok = peak <= JUDGE_LINE_MIB;
+  const over = onDisk ? "over the line, printed only (advisor-u4r-sets-r1, Q2: to the advisor)" : "over the line: stopped before the builds (advisor-u4r-sets-r1, Q2: to the advisor)";
+  return {
+    ok,
+    line: `${what}: ${(bytes / 1024 ** 2).toFixed(1)} MiB of logs, so a projected peak of ${peak.toFixed(0)} MiB by ${JUDGE_FIT.a} + ${JUDGE_FIT.b} x MiB (the six-point fit: advisor-u4r-sets-r2) against the ${JUDGE_LINE_MIB} MiB line: ${ok ? "room" : over}`,
+  };
+}
+
+/** The bytes of every file under `dir`, at any depth (the judge reads its .jsonl files at any depth). */
+export function logBytes(dir) {
+  let sum = 0;
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) sum += logBytes(p);
+    else if (e.isFile()) sum += statSync(p).size;
+  }
+  return sum;
+}
+
+/**
+ * The set's own parts and bites in a parsed verdict file (RUNS-LINE: advisor-u4r-sets-r1): each part and each bite that
+ * holds a run of this call, with its verdict or status, each run's validity and the part's why lines, all copied from
+ * the file's fields; nothing is judged here. The file must be a list of marks (anything else throws, for the caller's
+ * guard to name); a missing parts, bites, runs or why array reads as empty (advisor-u4r-f3-plan, condition 3).
+ */
+export function setParts(verdict) {
+  if (!Array.isArray(verdict)) throw new Error(`the file holds ${verdict === null ? "null" : typeof verdict}, not a list of marks`);
+  const list = (x) => (Array.isArray(x) ? x : []);
+  const validity = (r) => (r?.valid === true ? "valid" : r?.valid === false ? "invalid" : `valid ${JSON.stringify(r?.valid) ?? "missing"}`);
+  const runsOf = (runs) => list(runs).map((r) => `${r?.run} ${validity(r)}`).join(", ");
+  const out = [];
+  for (const m of verdict) {
+    for (const p of list(m?.parts)) {
+      if (!list(p?.runs).length) continue;
+      out.push(`  ${m.mark} ${p.name}: ${p.verdict} (${runsOf(p.runs)})`);
+      for (const w of list(p.why)) out.push(`    ${w}`);
+    }
+    for (const b of list(m?.bites)) if (list(b?.runs).length) out.push(`  ${b.id}: ${b.status} (${runsOf(b.runs)})`);
+  }
+  return out;
 }
 
 /**
@@ -250,10 +339,11 @@ export function planPrecheck(entry) {
   ];
 }
 
-function sh(cmd, args, cwd = ROOT) {
+function sh(cmd, args, cwd = ROOT, keepLead = false) {
   const r = spawnSync(cmd, args, { cwd, encoding: "utf8", maxBuffer: 1 << 28 });
   if (r.status !== 0) throw new Error(`${cmd} ${args.join(" ")}: exit ${r.status}\n${r.stdout}${r.stderr}`);
-  return r.stdout.trim();
+  // keepLead: the re-check's readings keep the status's first column (INF-F1-5: " M" is an unstaged change).
+  return keepLead ? r.stdout.trimEnd() : r.stdout.trim();
 }
 
 const sha256 = (path) => createHash("sha256").update(readFileSync(path)).digest("hex");
@@ -320,7 +410,7 @@ function main(argv) {
     );
   }
   const commit = sh("git", ["rev-parse", "HEAD"]);
-  const reading = () => spikeReading((args) => sh("git", args));
+  const reading = () => spikeReading((args) => sh("git", args, ROOT, true));
   const start = { commit, ...reading(), machine: machineNow() };
   const short = commit.slice(0, 12);
   const name = set === "precheck" ? "u4r-precheck-30" : `u4r-${profile}`;
@@ -348,6 +438,13 @@ function main(argv) {
     return r.line;
   };
   const before = room("before the builds");
+  // The judge's projected peak for each call, from the plan's bytes for that call's runs (advisor-u4r-f3-plan,
+  // condition 4): the set stops here, before the builds and with nothing made, if any call projects over the line.
+  const judgeGroups = set !== "judged" ? [] : plan.some((r) => r.group === "bites") ? [["the judge (measured runs)", "measured"], ["the judge (bite runs)", "bites"]] : [["the judge", null]];
+  const judgeAhead = judgeGroups.map(([what, group]) => judgeRoom(projectedBytes(plan.filter((r) => group === null || r.group === group)), `${name}: ${what}, from the plan's bytes before the builds`));
+  for (const j of judgeAhead) console.log(j.line);
+  const overLine = judgeAhead.find((j) => !j.ok);
+  if (overLine) throw new Error(overLine.line);
 
   // Both builds of npt-lab, each copied out before the next build replaces it, and the judge.
   const bin = join(GATE, "bin", `${name}-${short}`);
@@ -379,6 +476,7 @@ function main(argv) {
     `raw logs: .gate/netcode-proof-test/runs/${name}-${short}/ (${split ? "measured/ and bites/; " : ""}not committed: plan §7.2)`,
     `projection: ${before}`,
     `projection: ${after}`,
+    ...judgeAhead.map((j) => `projection: ${j.line}`),
     `start: ${start.machine}`,
   ];
   const common = ["--set", name, "--date", date, "--commit", commit];
@@ -441,26 +539,50 @@ function main(argv) {
   // The judge, bounded too (INF-R2-4). Whatever its end, runs.txt is written; a verdict file only on its call's exit 0:
   // a stopped run's log is cut (written through a buffer flushed at its footer), and the judge refuses a cut log
   // (advisor-u4r-f1-plan, condition 1). A set with bites is judged in two calls, measured/ then bites/, each after its
-  // own re-check; both always run, and results/ is made only after both (U4r-F2: advisor-u4r-f2-plan, conditions 2, 3).
-  const judgeCall = (what, dir, file) => {
+  // own re-check; both calls run whatever the first's end; a re-check stop before either call ends the set there, with
+  // no results/; and results/ is made only after both (U4r-F2: advisor-u4r-f2-plan, conditions 2, 3). Each call's block
+  // in runs.txt: its projection from its logs on disk, its judge line, then (on exit 0 only) its parts and bites
+  // (advisor-u4r-f3-plan, condition 5).
+  const judgeCall = (label, what, dir, file) => {
     unchanged(what);
     const out = join(logs, file);
+    const block = [];
+    // U4r-F3's lines go through this one guard: an error adds one line naming it, and nothing here can throw out of
+    // judgeCall or stop runs.txt being written (advisor-u4r-f3-plan, condition 3).
+    const guarded = (heading, make) => {
+      try {
+        for (const l of make()) {
+          console.log(l);
+          block.push(l);
+        }
+      } catch (e) {
+        const l = `${heading}: not printed (${e?.message ?? e})`;
+        console.log(l);
+        block.push(l);
+      }
+    };
+    guarded(`${label}, projected from its logs on disk`, () => [judgeRoom(logBytes(dir), `${label}, projected from its logs on disk`, true).line]);
     const t0 = Date.now();
     const j = run(judge, ["--marks", marksCopy, "--logs", dir, "--only", listedOf(profile).join(","), "--out", out], ROOT, process.env, RUN_LIMIT_MS);
     const secs = ((Date.now() - t0) / 1000).toFixed(1);
     const ok = !j.timedOut && j.status === 0;
     const line = ok ? j.stdout.trim() : j.timedOut ? `stopped at ${secs} s (no verdict)` : `exit ${j.status ?? "by a signal"} (no verdict): ${j.out.trim()}`;
     console.log(line);
-    return { what, out, file, ok, line, end: j.timedOut ? `stopped at ${secs} s` : `exited ${j.status ?? "by a signal"}` };
+    block.push(`${label}: ${line}`);
+    if (ok) {
+      guarded(`${label}, the set's parts and bites (${file})`, () => [
+        `${label}, the set's parts and bites (${file}: each part and bite that holds a run of this call, as the file gives them):`,
+        ...setParts(JSON.parse(readFileSync(out, "utf8"))),
+      ]);
+    }
+    return { what, out, file, ok, line, block, end: j.timedOut ? `stopped at ${secs} s` : `exited ${j.status ?? "by a signal"}` };
   };
   const calls = split
-    ? [judgeCall("the judge (measured runs)", join(logs, "measured"), "verdict.json"), judgeCall("the judge (bite runs)", join(logs, "bites"), "verdict-bites.json")]
-    : [judgeCall("the judge", logs, "verdict.json")];
+    ? [judgeCall("judge (measured runs)", "the judge (measured runs)", join(logs, "measured"), "verdict.json"), judgeCall("judge (bite runs)", "the judge (bite runs)", join(logs, "bites"), "verdict-bites.json")]
+    : [judgeCall("judge", "the judge", logs, "verdict.json")];
   mkdirSync(results, { recursive: true });
   for (const c of calls) if (c.ok) copyFileSync(c.out, join(results, c.file));
-  const judgeLines = split
-    ? [SPLIT_LINE, `judge (measured runs): ${calls[0].line}`, `judge (bite runs): ${calls[1].line}`]
-    : [`judge: ${calls[0].line}`];
+  const judgeLines = split ? [SPLIT_LINE, ...calls[0].block, ...calls[1].block] : calls[0].block;
   const top = [
     `# ${name}: -17's, -57's${profile === "B1" ? " and -18's" : ""} L1 ${profile} part(s), run in this container on ${date} (u4r-brief.md 7.1)`,
     ...head,

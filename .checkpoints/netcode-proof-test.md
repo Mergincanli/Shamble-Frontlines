@@ -74,13 +74,27 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
   - **One slip in the agent's own text:** its return and notes give HEAD's c-u4r-runs.mjs as "c5cd4d9c…".
     sources.log:5 records 18c1dcf6…, and `git show HEAD:…` gives 18c1dcf6…, so the slip is in the summary only.
   - **Leftovers:** /dev/shm/u4r-f3 holds a few MB.
-- **Running: infra-engineer's one round** (workflow wf_f1a61ab6-984, task wnmdsg7df; from its agent file), notes
-  u4r-f3-review-infra.md. When it returns, run u4r_f3_review_full.py (ready). Then:
-  1. one commit (both scripts, unchanged since the stagings, plus the card);
+- **infra-engineer's one round: APPROVE WITH FINDINGS, two Lows, no push** (u4r-f3-review-full.md, 24 lines, sha256
+  76ab8825…, written word for word by u4r_f3_review_full.py; workflow wf_f1a61ab6-984).
+  - **What it checked:**
+    - the tested copies equal the working copies, and its own re-run of 12 stagings exits 0;
+    - the start check's place, the one guard, the block order, and the exit lines, re-checks and process groups as
+      HEAD's;
+    - INF-F1-5 in both scripts;
+    - du -sb matches the rates to the byte;
+    - free space is 13,212 MiB against P0's 7,711.
+  - **INF-F3-1 (Low):** V8's JSON.parse message can carry raw newlines, so the "one error line" can span lines (cosmetic,
+    malformed files only). Fix: collapse whitespace in guarded()'s catch, at the runner's next change. It is a
+    follow-up, with INF-F1-3.
+  - **INF-F3-2 (Low):** the stagings show the on-disk line only on tiny logs. Its value is proven by the reviewer's own
+    check, .gate/u4r-f3-review/logbytes-check.mjs: logBytes equals `find -printf %s`'s sum to the byte on the five kept
+    folders, and its lines reproduce the six-point fit's points. That check is cited as the evidence. No code change.
+- **Then:**
+  1. one commit (both scripts, unchanged since the stagings: 99dd070e and 4e007500, checked again; plus the card);
   2. push;
-  3. CI;
-  4. the advisor's review of the head.
-  No set runs before that review (condition 10). Any wording fix after the stagings re-runs the cmp stagings.
+  3. CI green on the pushed head;
+  4. the advisor's review of the head (condition 10).
+  No set runs before that review.
 - **For BRAWL-1's disk plan (condition 7):** the runner's new start figures are P3 524.4, P2 780.8 and P0 3,614.6 MiB,
   each plus the 4,096 MiB floor, not the measured 519 / 779 / 3,248.
 - **BRAWL-1's plan is WITH THE ADVISOR** (about 23:50 UTC): brawl1-plan.md, sections 1-13, choices Q1-Q8.
