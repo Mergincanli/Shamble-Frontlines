@@ -22,7 +22,8 @@ advisor rules on its findings (workflow u4r-review-r1-ruling, notes advisor-u4r-
   card's writing; do it first after a compact, from u4r-review-r1-full.md.
 - **The ruling** runs as a one-agent workflow: **wf_549d69bf-7f3** (task wqca7d14y; script
   u4r-review-r1-ruling-wf_549d69bf-7f3.js; agent advisor-u4r-r1). **If cut:** `resumeFromRunId: "wf_549d69bf-7f3"`.
-  The saver is stopped at this card's writing: restart it (run_in_background, timeout 7200000). **On return:**
+  The saver bn7dtt86b runs until about 08:50 UTC (its 110-minute window from 07:00); restart it after that
+  (run_in_background, timeout 7200000). The check-in stays (next 08:34 UTC). **On return:**
   write it word for word by script (advisor-u4r-r1-full.md); read it; then a builder copy (copy 6, a fresh copy from
   u4r-copy5-prompt.md's form, its resume part brought up to date: notes 1,586 lines, snapshot 572c4f69…, the round-1
   findings and the ruling's fix list) for the fix pass, then round 2 on what changed, as the ruling says.
