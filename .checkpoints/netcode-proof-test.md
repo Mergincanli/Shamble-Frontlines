@@ -21,6 +21,10 @@ ad3631d9… (24 files).**
   -x run **PASS, 200.5 s**, non-cargo calls 190.9 s, under 240 s; W 3.1 s); C4d (carry 85 (a) to (e), loader.mjs's
   header sentence; 76 of 76; `check.mjs --only deps,self` PASS; five plants failing by name). Left: carry 83 (d)'s
   Rust test; then B12; r5 and the end checks wait for the third ruling.
+- **Resumed about 01:22 UTC:** copy 4 by SendMessage (agent a033afc8d5205b476; told of the restart and the checks);
+  the third ruling by `resumeFromRunId: "wf_345cc3c9-ca1"` (task w5rwxf34m). The saver restarted as **be48e72em**
+  (01:22 UTC, after b2fc5ea). The check-in stays (next 02:34 UTC). The earlier NOW block's "If cut" and "On the
+  ruling" lines still hold.
 
 **Earlier NOW (2026-11-14 about 01:00 UTC): U4r copy 3 ended at its context limit (00:50), r2 and the second ruling
 done; snapshot 987946cc…; copy 4 builds on (point 1 (4)-(7), B12); the advisor's third ruling on copy 3's findings
