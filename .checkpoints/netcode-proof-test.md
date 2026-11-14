@@ -14,8 +14,34 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 13:25 UTC; read this first after a compact or a cut): U4r's ROUND 2 RETURNED; the advisor
-rules on it.**
+**NOW (2026-11-14 about 13:45 UTC; read this first after a compact or a cut): the advisor's ROUND-2 RULING IS IN
+(advisor-u4r-r2-full.md, 126 lines, sha256 6dcc0a81…, by u4r_ruling_r2_full.py word for word); next: U4r's merge into
+the spike branch, M1 to M9, as its steps 2-10 say.**
+- **Its "For Mustafa" (copied here at once):** nothing to decide or do. Two heads-ups, neither a decision now: (1) the
+  judged runs need about 4 GiB more free space than today; the approved cache cleans should cover it, else it goes
+  to him under LEFTOVER-DELETE; (2) one Low security weakness stays open as a follow-up (SEC-U4R-R2-1, the spike's
+  code checker), listed in PR #40's report. The merge into the spike branch needs no go of his.
+- **Rulings:** no round 3 (no Critical or High). INF-R2-1 (Medium) → **U4r-F1**, its own small change-set right after
+  the merge, carrying INF-R2-3 and -4 (the two run scripts only): plan, the advisor's plan review, build,
+  infra-engineer's one round, the advisor's review of its head, commit — **before any c-u4r-runs.mjs set** (the
+  pre-check or a judged set). Until F1: only c-u4r-r2.mjs's short record run may run, with the card pushed right
+  before, the saver stopped, no agent writing in the main folder, no commit and no tracked edit in the main folder
+  until r2.txt is written. INF-R2-2 → report words and `uptime` first at M5 (non-cargo over 240 s stops the merge).
+  The check.mjs follow-up (SEC-U4R-R2-1, -2, TE-R2-3, INF-R2-5, INF-U4R-10 (2)): check.mjs's next change, before PR
+  #40 is marked ready at the latest. The next npt-lab lane: N2-1 = TE-R2-1, TE-R2-2, RR4-L2, RR4-L1 (before U4h's
+  carry-87 entry at the latest). Copy 6's two deviations: accepted as made; the "stop and report" line stays for
+  later copies.
+- **Next, in order (the ruling's steps 2-18):** M1 bytes (21ca46be unchanged since 450af1a; snap2 = worktree; the
+  fingerprint 63713cf3…); M2 base (`git diff --quiet 2fbec77 HEAD -- spikes/`; main still 4460ef5); M3 apply (card
+  pushed, saver stopped, `git apply --check` then `git apply`; 26 files); M4 cmp against snap2 and the fingerprint;
+  M5 one main-run.sh call (uptime; the six builds; check.mjs; det-u4.mjs; the pre-check regeneration), log under
+  .gate/u4r-merge/; M6 TE2-5; M7 the gate --no-smoke; M8 one commit (26 files, `git rm` wip/u4r.patch, u4r-build.md's
+  "Merge into the spike branch", u4r-report.md new in u4d2-report.md's form, the card); M9 saver, CI, card. Then r2's
+  record run (step 11, the interim rule), carry 62 (h) (step 12), U4r-F1 (13), D4 (14), the disk plan (15), the
+  pre-check set (16), the judged sets P3, B1, P2, then P0 (17).
+- **COMPACT-WAIT:** /compact was asked at about 13:27; this block is the refresh; work carries on.
+
+**Earlier NOW (2026-11-14 about 13:25 UTC): U4r's ROUND 2 RETURNED; the advisor rules on it.**
 - **Round 2** (wf_5e07787a-ae9, five seats, 310 tool uses, done about 13:22): **u4r-review-r2-full.md** (173 lines,
   sha256 1ea6fc44…; by u4r_review_r2_full.py, word for word from the journal). All five APPROVE WITH FINDINGS; every
   round-1 finding confirmed fixed as ruled or deferred as ruled. **1 Medium, 12 Low, no Critical or High** (no round
