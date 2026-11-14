@@ -19,6 +19,10 @@ advisor's second ruling at 22:02 (see "Cuts by the spend limit"); both resumed a
   its unit tests), ran r2 suite 1 (-17 L1 P0, 48 clients, 10 s + 20 s; measured incomplete 0; judged by hand: every
   check of PM-0001-2, -17 and -57 resolves, none a gap; each mark NOT-RUN "1 of 3 valid runs" as a short run must be),
   and was adding SERIES.md's rows for r2 (b) when cut.
+- **Resumed about 00:16 UTC:** copy 3 by SendMessage (agent a5d1a2ea28e8704c8, its context intact; told to check its
+  SERIES.md rows and that no plant is in place); the ruling by `resumeFromRunId: "wf_083df555-757"` (task wfdl0093n).
+  The saver restarted as **boxdca04m** (00:16 UTC, after 29d86ed). The check-in stays (next 00:34 UTC). Everything in
+  the earlier NOW block below still holds (copy 3's prompt, the ruling's points, "On the ruling").
 
 **Earlier NOW (2026-11-13 about 22:00 UTC): U4r copy 2 ended at its context limit (21:51 UTC), about three quarters
 built; snapshot re-cut (48fa2959…); copy 3 resumes; the advisor rules on copy 2's two pre-check findings and its
