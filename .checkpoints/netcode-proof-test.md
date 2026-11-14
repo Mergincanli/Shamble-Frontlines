@@ -14,8 +14,47 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 23:15 UTC; read this first after a compact or a cut): STEP (3), U4r-F3's PLAN IS WITH THE
-ADVISOR.** Mustafa typed /compact at about 22:50; the chat resumed from this card.
+**NOW (2026-11-14 about 23:40 UTC; read this first after a compact or a cut): U4r-F3 IS BUILT; ITS EVIDENCE RUNS.**
+- **The plan review: APPROVE WITH CONDITIONS 1-10** (advisor-u4r-f3-plan-full.md, 68 lines, sha256 9182a09c…, written
+  word for word by u4r_f3_plan_review_full.py). Its one Medium, F3P-2, was read in full: every new line in judgeCall sits
+  behind one guard, so nothing new can throw after a 70-minute set. The choices: Q1 (b), Q2 (a), Q3 (b), Q4 (a), Q5 (a),
+  Q6 (a). The Lows:
+  - F3P-1: the six-point fit gives 7.7 GiB for one P0 call, not 8.2. Fixed in u4r-report.md :521 and in the header
+    clause by condition 2's words.
+  - F3P-3: more evidence, condition 6.
+  - F3P-4: the pre-check sentence's numbers, condition 8. The folder is 297,145 B over the projection; carry those words
+    wherever the sentence goes.
+  - F3P-5: lines left unspecified, conditions 4, 5 and 9.
+  - For Mustafa: nothing.
+- **Built by Edit** (uncommitted in the main folder), under conditions 1-5 and 7:
+  - c-u4r-runs.mjs, sha256 99dd070e…, 608 lines;
+  - c-u4r-r2.mjs, sha256 4e007500…, 236 lines;
+  - node --check passes on both;
+  - my own sanity check gave condition 6 (c)'s counts exactly (P3 3/6, B1 4/9, P2 3/4, P0 3/2/0, P0-bites 0/0/6), the
+    projections 524.4 / 833.7 / 780.8 / 3,614.6 MiB, and the line between 4,246 and 4,247 MiB.
+  - **Two readings of the conditions,** for the head review:
+    - "one guard" is one helper, `guarded`, used twice: before the call (the on-disk projection) and after it (the
+      parts). A single try block around both would also wrap the judge call.
+    - The on-disk line's over-the-line ending reads "over the line, printed only (…)", because that call is not stopped.
+- **SIZE-CHECK:** planned about 100 insertions and 25 deletions; the advisor expected 100-130 and 20-30. The actual
+  `git diff --numstat` is 157 insertions and 34 deletions: c-u4r-runs.mjs 153/31 and c-u4r-r2.mjs 4/3.
+  - That is about 1.5 times the plan, under the "well past" line of more than twice (more than about 250 changed lines).
+  - The excess is the conditions' text: condition 2's clause, condition 7's comment, condition 3's guard, condition 5's
+    block order and the two new header bullets.
+- **Running:**
+  - the evidence agent, workflow wf_6ecf285f-2eb (task wpjin5bxn; Opus, effort high: condition 9). Notes
+    u4r-f3-evidence-notes.md; harness and logs under .gate/u4r-f3/; scratch in /dev/shm/u4r-f3/.
+  - the BRAWL-1 facts workflow wf_d24f7a9b-8fe (task wr6edj0nd; two readers).
+  That makes 3 agents.
+- **Next for F3:** read the evidence's return.
+  - All PASS: infra-engineer's one round (from its agent file), then one commit (both scripts plus the card), push, CI,
+    and the advisor's review of the head. No set runs before that review (condition 10).
+  - A FAIL: find whether the script or the harness is at fault before any change. Any change re-runs the cmp stagings.
+- **For BRAWL-1's disk plan (condition 7):** the runner's new start figures are P3 524.4, P2 780.8 and P0 3,614.6 MiB,
+  each plus the 4,096 MiB floor, not the measured 519 / 779 / 3,248.
+
+**Earlier NOW (2026-11-14 about 23:15 UTC): STEP (3), U4r-F3's PLAN IS WITH THE ADVISOR.** Mustafa typed /compact at
+about 22:50; the chat resumed from this card.
 - **The plan:** u4r-f3-plan.md (sections 1-10, choices Q1-Q6). It covers the list of the P0 ruling's step 3:
   - INF-F2-1's sentence and INF-F2-2's wordings; Q1 flags "before either" in the second wording;
   - INF-F1-5 in both scripts (keepLead);

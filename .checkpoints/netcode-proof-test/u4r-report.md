@@ -518,7 +518,8 @@ advisor-u4r-r2-full.md:32).
        and the runner change's projection handle it.
      - The fits: the four-point fit (212.3 + 2.5062 x MiB) over-predicted P0's halves by 85 and 294 MiB, so it is
        conservative. The six-point fit is 302.2 + 2.3403 x MiB, with residuals of -90 to +70 MiB.
-     - A single call at P0's actual bytes would have projected about 8.2 GiB. The split was needed only because F was
+     - A single call at P0's actual bytes would have projected about 8.2 GiB (by the four-point fit; about 7.7 GiB by
+       the six-point fit: advisor-u4r-f3-plan-full.md, F3P-1). The split was needed only because F was
        1.504, and it changed no verdict (U4r-F2's proof that one call equals two).
      - RR3-L6 is closed; it leaves "Round 1's others", and no STATUS line is needed.
    - **Byte ratios, RATES-1's inputs** (Q3 (5)): P3 1.44, B1 1.504, P2 1.238, P0 1.057.
