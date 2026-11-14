@@ -161,7 +161,31 @@ bytes and the judge's peak (over 10 GiB: P0 does not start; plan the smallest ch
     steps without one 3,792) and bite-client-rounding. bite-whole-as-lost was running, with pos-4cm, yaw-12bit and
     pitch-8bit to follow. Raw logs 1,605 MiB so far; free space 14,878 MiB.
   - **COMPACT-WAIT:** /compact was asked for at 21:29 UTC; the reminder fired at 21:51 with no /compact typed. The card
-    was refreshed and the work goes on. **If cut:** follow item (6)'s P0 sentence and item (7) (orphans first). A set stopped by a cut is not a
+    was refreshed and the work goes on.
+- **P0 IS DONE (21:28:45-22:07 UTC, exit 0; peak.py 2,316.2 s, 4,356.9 MiB); its results are committed at 930d2a6**
+  (results/u4r/051995db9cea/P0/: runs.txt, verdict.json and verdict-bites.json; redact-check 287 items, 0 findings).
+  - **Both judge calls exited 0.** The head's sha256s equal the other sets'. The fixed line, the two judge lines and
+    the raw-logs line are right.
+  - **-57:** L1 P0 PASS, and all three bites shown (pos-4cm 34,830, yaw-12bit 46,692, pitch-8bit 440,312).
+  - **-17:** L1 P0 INVALID (s1 by pre:PM-0001-2 at 0.861889; s2 and s3 valid), and its three bites invalid by the same
+    rule at the same value (seed 1). **These go to the advisor whole, per step 7: P0 runs a command every tick, so
+    this is a second cause.**
+  - **The fingerprint** (.gate/u4r-sets/fingerprint-P0-051995db9cea.log):
+    - s1: onset at tick 77,476, 13,440 measured ticks in; slot 21; the others at 0 for phases 60-240 of the door cycle
+      and 47 otherwise, so the re-adds are instant at P0.
+    - s2: no onset.
+    - The seed-1 bite runs repeat s1's onset exactly.
+  - **The tick16 bite run:** flagged, as expected (overflow resyncs 48; rewinds refused 960; steps without one 3,792).
+  - **The judge, measured apart on each half:**
+    - measured (1,477.4 MiB): 27.2 s and 3,829.8 MiB; reading alone 15.3 s and 3,002.5 MiB (56 %);
+    - bites (1,770.9 MiB): 21.7 s and 4,356.7 MiB; reading alone 17.1 s and 3,579.2 MiB (79 %).
+    - The fit gave 3,915 and 4,650 MiB at these bytes.
+  - **Bytes and disk:** P0's logs 3,248.3 MiB against 3,073.3 projected (1.057). Free space 13,233 MiB.
+- **THE ADVISOR'S P0 RULING RUNS:** workflow **wf_d49add99-31f** (task wqp44ckqz; notes advisor-u4r-sets-r2.md): Q1
+  (-17 L1 P0 INVALID: the cause, its bites, BRAWL-1's scope), Q2 (the tick16 flag), Q3 (closing U4r's judged runs).
+  **If cut:** `resumeFromRunId: "wf_d49add99-31f"`. **On return:** write it word for word by script; put its "For
+  Mustafa" here at once.
+- **The saver restarted as bi9cwf4dz** at about 22:15 UTC; the previous window (bxs0uzskj) ended. **If cut:** follow item (6)'s P0 sentence and item (7) (orphans first). A set stopped by a cut is not a
   result: ask the advisor before any re-run.
 - **THE CLEANS FOR R ARE DONE (the sets ruling's Q3 (B) and (C), with no lane running; one main-run.sh call each,
   lock exclusive, test guards all exit 0):**
