@@ -14,7 +14,60 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 17:45 UTC; read this first after a compact or a cut): U4r-F1 IS DONE AND APPROVED. The
+**NOW (2026-11-14 about 18:55 UTC; read this first after a compact or a cut): THE SETS' FIRST RULING IS IN:
+advisor-u4r-sets-r1-full.md** (66 lines, sha256 8e45f9a5…, written word for word by u4r_sets_r1_ruling_full.py; two
+Mediums read in full). The sets so far: pre-check (d666aeb), P3 (5afd4e7) and B1 (73060fd) are done. **Next, in the
+ruling's order:** (3) judge-apart on the whole P3 and B1 folders, then (A) remove the merged copies by CHECKPOINTS
+section 10, U4r's three first, with df before and after; (4) P2; (5) judge-apart on the whole P2 folder, then F, P0's
+bytes and the judge's peak (over 10 GiB: P0 does not start; plan the smallest change and take it to the advisor); (6) R
+= 4,096 + F x 3,073.3 + 500 MiB, then (B) and (C) only if short, then P0; (7) P0's expected lines.
+- **Step 3, done (18:52-18:58 UTC):**
+  - **judge-apart on whole folders** (logs in .gate/u4r-judge-apart/):
+    - P3: 543,608,417 B (518.4 MiB). Full judging 7.6 s and 1,507.8 MiB; reading alone 5.8 s and 1,284.8 MiB
+      (read_log share 76 %).
+    - B1: 859,984,524 B (820.2 MiB), with -18 among the marks. Full judging 12.2 s and 2,260.6 MiB; reading alone 8.6 s
+      and 1,851.4 MiB (70 %).
+    - Three judge-only points, with one P3 run (641.1 MiB), give **about 215 MiB plus 2.49 times the log MiB.**
+    - B1's byte ratio: 820.2 / 545.3 = 1.50. **P0 at F of at least 1.504 is about 4,622 MiB of logs, so about 11.5
+      GiB of judge memory, over 10 GiB. So P0 will not start until a smallest change is planned and taken to the
+      advisor** (after P2's measurement settles F).
+  - **(A) the merged copies, by CHECKPOINTS section 10:** every copy's HEAD is on the pushed spike branch.
+    - **Removed** by plain `git worktree remove`, then prune: .gate/u4d2-prefix, .gate/u4df-prefix and
+      .gate/u4e-prefix, the only three with an empty `status --short --ignored`. **df: 8,881 to 8,937 MiB.**
+    - **Kept, and listed, because git refuses a copy with changed or untracked files and --force is never used:** the
+      other 23. That includes U4r's copy 6 (28 entries) and .gate/u4r-snap1 and -snap2 (26 each); their work is in
+      the branch through the merged patches. Two copies also hold evidence logs as ignored files:
+      wf_2c76ec82-8fc-1 (u3d-fix-bite-*.log) and wf_f54246ff-e0d-2 (u4c-fix/*.log).
+    - So (A) gave 56 MiB, not the ruling's estimated 710. **Before P0, (B) and then (C) will be needed for R.**
+- **Its "For Mustafa" (copied here at once):** nothing to decide or do now. Three things to know:
+  - (1) Under P3, the test bots wander into buildings. When a door shuts, the server rightly hides that bot, which
+    breaks "everyone in view". That is a bot flaw (BRAWL-1), not netcode. The result is recorded INVALID, never
+    counted, and moves to a later step with the bot fix. The accuracy check passed.
+  - (2) The P0 judge's memory is measured on the smaller sets first. Over 10 GB, a small fix comes before P0.
+  - (3) The logs are about 1.5 times bigger than planned. After U4r's last set the disk sits near its floor, so a
+    decision about kept logs comes to him before the next unit's test runs (his LEFTOVER-DELETE).
+- **Its rulings, in short:**
+  - **Q1:** -17 L1 P3 is INVALID, not as expected. It is recorded, never counted, never re-run at 0f066338dd8d, and
+    moves to BRAWL-1's fix: re-run at that fix's commit, before U4g's judged B1 runs. -57 L1 P3 PASS counts. -2's SS
+    part at P3 is recorded FAIL. **P2 runs as planned:** -17 L1 P2 counts if PASS. If INVALID with BRAWL-1's
+    fingerprint (one slot at 0 from an onset; the others folded on (t - 63,736) mod 360 near 0 for about 180 ticks;
+    overflow resyncs 0; very large units in at least 0.95 of sets), it is recorded and moves, with no stop. Anything
+    else goes to the advisor. Nothing goes to Mustafa to decide.
+  - **Q2:** P0 does not start yet; see the next steps above.
+  - **Q3:** (A) now; (B) and then (C) only if free space is below R; (D) P0 to Mustafa only if A, B and C cannot meet
+    R. No runner code change before P0.
+- **Follow-ups with their homes:**
+  - **BRAWL-1 (Medium):** the next npt-lab lane, before U4g's judged B1 runs. A leash or a closing walk with no
+    rate-derived constant; a figure naming soldiers outside the cluster; a unit test under skipped steps; a 10-minute SS
+    P3 run at least 0.99; then -17 L1 P3 (and P2 if INVALID) re-run.
+  - **RATES-1 (Medium):** the runner's next change, before the next judged set after U4r's: rates from these sets'
+    whole-run bytes.
+  - **RUNS-LINE (Low):** the runner's next change: runs.txt also prints the set's own part per mark. Until then the
+    report reads verdict.json part by part.
+  - **FACTS-1 (Low):** the P3 ratio is 1.44 (518.8 over 359.9 MiB), not 1.42. The "216 + 2.49 x" line is one judge
+    point plus whole-call peaks (builds, npt-lab and the judge), to be replaced by the whole-folder measurements.
+
+**Earlier NOW (2026-11-14 about 17:45 UTC): U4r-F1 IS DONE AND APPROVED. The
 advisor's review of the pushed head f1f131b says APPROVE (advisor-u4r-f1-head-full.md, 69 lines, sha256 8a9d0704…,
 written word for word by u4r_f1_head_review_full.py). Next: the disk plan's part-clean, then D4, then the pre-check set,
 then the judged sets P3, B1, P2 and P0.**

@@ -366,10 +366,25 @@ advisor-u4r-r2-full.md:32).
      .gate/u4r-sets/P3-0f066338dd8d.log; peak.py 1,018.1 s, 1,507.9 MiB):**
      - -57's L1 P3 part: PASS (3 valid runs).
      - -2: FAIL on everyone in view only (least per-slot share 0.352778, 0.085444 and 0.203556 against 0.99; its other
-       ten checks pass). So -17's L1 P3 part is INVALID by pre:PM-0001-2. That is not among the ruled INVALIDs (only
-       B1's), so it went to the advisor before it counts (advisor-u4r-sets-r1).
-     - Overflow resyncs 0; measured incomplete 43,117, 43,210 and 43,441 of 864,000 client-ticks.
-     - Raw logs 519 MiB, against the runner's 359.9 MiB projection.
+       ten checks pass on every run). So -17's L1 P3 part is INVALID by pre:PM-0001-2. That is not among the ruled
+       INVALIDs (only B1's), so it went to the advisor before it counts.
+     - **The advisor's ruling (advisor-u4r-sets-r1-full.md, Q1):** not as expected, and not a netcode fault. The
+       cause is BRAWL-1. Under P3's loss, 1,026 to 5,172 of each client's roughly 18,300 ticks re-run a command, so
+       the brawl's 16-step circle never closes and every soldier random-walks (bots/src/lib.rs:31-51, :206-215;
+       room/src/input.rs take()). Within 60 to 210 s, one soldier reaches one of the six buildings. Its door shuts 6
+       s of every 12 (world.rs:1203-1208; greybox.rs:89-99), and the room correctly drops it from every other
+       client's set (room.rs:906-935). The onsets: ticks 70,336 (s1), 65,536 (s2) and 67,696 (s3). r2's 30 s suite
+       and D4's 50 s runs were too short to reach one. The mirror (0 breaches) and an overflow resync (0) are ruled
+       out.
+     - **What follows:** -17's L1 P3 part stays INVALID: recorded, never counted, never re-run at this commit. It
+       moves to BRAWL-1's fix and is re-run at that fix's commit, before U4g's judged B1 runs. -57's L1 P3 PASS
+       counts. -2's SS part at P3 is recorded as FAIL. The 99 % bar stays.
+     - Overflow resyncs 0, nothing flagged. Measured incomplete 43,117, 43,210 and 43,441 of 864,000 client-ticks
+       (5.0 %, which is P3's loss).
+     - Raw logs 518.8 MiB (du -sb), against the runner's 359.9 MiB projection: **1.44 times** (FACTS-1). The cause:
+       lab.jsonl's -57 series grow through a run (P3 s1: 3,949 B a tick in minute 1, about 7,800 by minute 7), while
+       the rates came from 20 to 30 s runs (RATES-1).
+     - runs.txt's line "PM-0001-57 NOT-RUN L1 P0" is the mark's overall verdict, not this set's part (RUNS-LINE).
    - **B1 (18:29:45-18:46:14 UTC, exit 0; results at 73060fd: results/u4r/64f3307d5c7f/B1/; kept log
      .gate/u4r-sets/B1-64f3307d5c7f.log; peak.py 983.8 s, 2,260.5 MiB):**
      - -57's L1 B1 part: PASS (6,984, 2,750 and 88,063 on each run).
@@ -381,9 +396,27 @@ advisor-u4r-r2-full.md:32).
      178,922,504 B):
      - Full judging: 2.7 s and 641.1 MiB. Reading alone: 1.9 s and 426.2 MiB, so RR3-L6's read_log share is about
        70 %.
-     - Across the three readings (that run, the P3 set's call and the B1 set's call), memory is about 216 MiB plus 2.49
-       times the log MiB. P0's projection at 1.42 to 1.51 times the runner's bytes is 10.8 to 11.5 GiB, over the
-       advisor's 10 GiB line, so it went to the advisor before P0.
+     - A first line, about 216 MiB plus 2.49 times the log MiB, was drawn through one judge point and two whole-call
+       peaks. Those peaks are not the judge's alone: peak.py measures the whole set call, with cargo's builds, the
+       npt-lab runs and the judge (FACTS-1). It gave 10.8 to 11.5 GiB for P0, over the advisor's 10 GiB line. The
+       ruling (Q2) is to measure the judge on whole set folders apart (P3, B1, then P2) and project P0 at F x
+       3,073.3 MiB, with F the largest byte ratio and at least 1.5. Those measurements are below.
+   - **The judge on whole set folders, apart** (judge-apart.sh with no run; lane lock; scratch output;
+     .gate/u4r-judge-apart/*-all.log):
+     - P3: 518.4 MiB of logs. Full judging 7.6 s and 1,507.8 MiB; reading alone 5.8 s and 1,284.8 MiB (read_log
+       share 76 %).
+     - B1: 820.2 MiB, with -18 among the marks. Full judging 12.2 s and 2,260.6 MiB; reading alone 8.6 s and 1,851.4
+       MiB (70 %).
+     - With the one-run point (170.6 MiB: 641.1 MiB, 70 %), the three judge-only points fit about 215 MiB plus 2.49
+       times the log MiB.
+     - B1's byte ratio is 1.50, so F is at least 1.504 and P0's logs come to about 4,622 MiB. That projects about
+       11.5 GiB of judge memory, over the 10 GiB line, so P0 needs the ruling's smallest change before it runs.
+   - **The merged copies (the ruling's (A), by CHECKPOINTS.md section 10):** all 26 copies' HEADs are on the pushed
+     spike branch. Three have an empty `git status --short --ignored` and were removed by plain `git worktree
+     remove`: .gate/u4d2-prefix, .gate/u4df-prefix and .gate/u4e-prefix (free space 8,881 to 8,937 MiB). The other
+     23 hold changed or untracked files, so git refuses them without --force, which is never used. They stay, listed
+     on the card. They include U4r's copy 6 and .gate/u4r-snap1 and -snap2, whose work is in the branch through the
+     merged patches.
 
 ## Decisions needed
 None.
