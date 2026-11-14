@@ -169,8 +169,18 @@
 
 19. Step 7 DONE (the verifier: PASS WITH NOTES on 922cadf), after consultation 13.
 
+20. Plan revision 2f (asked 2026-11-14 01:06 UTC): APPROVE F1 to F7; F6's Low condition taken (#40's times as read
+   times). The final edits applied (`fp5-final.py`; report-appendix.mjs's intro: the skill's second load, "agents and
+   background tasks"): the report from report-body.md ({{C14}} still to fill), STATUS (120 lines), ROADMAP. The full
+   battery passed on that tree (words 43 entries no problem; report-appendix 4 blocks 2 quotes; decisions 4 entries 7
+   controls; pointers; fixes 11 edits; quotes 15 spans; scope; 2.2's 13 entries), the gate PASS, the repo map OK; the
+   keyword screen: 26 chat texts, the six known lines only. The worker restarted (2026-11-14 08:31 UTC); the saver had
+   stopped at 01:57:36 ("time is up"), its last autosave c4f275c (01:07:44) holding every notes change.
+
 ## Current step
-Step 8: revision 2f asked of the advisor agent; then the final edits (see consultation 13's list).
+Consultation 14 (moment 5 for the task, before the final commit); then entry 14, the report re-copied and its appendix
+re-written, the last notes commit (its SHA = the header's), the header SHA, the --check runs, the deletion, the gate,
+the commit (no [skip ci]), the push, CI, the advisor agent's review, the re-scan, the PR body, ready.
 
 ## Next steps
 1. Scripts (consultation 10's items 1 to 6 block the commit): grep every "before" string of D2 to D4 in the notes'
