@@ -35,6 +35,14 @@ third ruling on copy 3's findings (u4r-build3-questions.md), with a fact check a
 - **Copy 4** (prompt u4r-copy4-prompt.md: the first prompt verbatim, checked, plus a copy-4 resume part): copy 3's
   items 1 and 2 (point 1 (4) to (7) with r10's check.mjs half and det-u4.mjs's run; B12's scripts); it holds item 3 (r5
   and the end checks) and everything the third ruling's points touch.
+- **Launched about 00:55 UTC:** copy 4 (agent a033afc8d5205b476, general-purpose, opus, xhigh, background) and the
+  third rulings workflow **wf_345cc3c9-ca1** (task wl2aqoae4; script u4r-build3-rulings-wf_345cc3c9-ca1.js): u4r-facts-3
+  (notes u4r-build3-facts.md) and u4r-arch-3 (netcode-architect, notes u4r-build3-arch.md) in parallel, then
+  advisor-u4r-build3 (notes advisor-u4r-build3.md), all opus, xhigh, read-only but their notes, on the fixed copy.
+  Three agents at a time now, the most allowed. **If cut:** `Workflow({scriptPath, resumeFromRunId:
+  "wf_345cc3c9-ca1"})`; copy 4 by SendMessage if cut by the limit (its context intact), else a fresh copy from the
+  latest prompt. **On the ruling:** write it word for word by script (as advisor-u4r-build2-full.md), read it in full,
+  send copy 4 its parts; anything for Mustafa goes in "Decisions needed". The check-in stays (next 02:34 UTC).
 
 **Earlier NOW (2026-11-14 about 00:15 UTC): the spend limit cut copy 3 and the advisor's second ruling at 22:02;
 both resumed about 00:15; snapshot 585a8639….**
