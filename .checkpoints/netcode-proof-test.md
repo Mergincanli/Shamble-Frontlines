@@ -40,6 +40,16 @@ the spike branch, M1 to M9, as its steps 2-10 say.**
   record run (step 11, the interim rule), carry 62 (h) (step 12), U4r-F1 (13), D4 (14), the disk plan (15), the
   pre-check set (16), the judged sets P3, B1, P2, then P0 (17).
 - **COMPACT-WAIT:** /compact was asked at about 13:27; this block is the refresh; work carries on.
+- **The merge, as it stands (about 13:55 UTC):** M1 and M2 hold (patch 21ca46be unchanged since 450af1a; snap2's
+  spikes/ = the worktree's; fingerprint 63713cf3… from the copy's root; spikes/ unchanged since 2fbec77, only
+  .checkpoints/ commits since; main 4460ef5). **M3 done: the patch is applied in the main folder** (13 M, 13 new,
+  nothing else; uncommitted until M8). M4 holds (26 files cmp-equal to snap2; fingerprint 63713cf3… from the main
+  folder's root). **The saver is stopped (M3) until M9.** **M5 runs** as background shell **b9jwactpx** (main-run.sh,
+  log .gate/u4r-merge/m5.log; uptime, the six builds, check.mjs, det-u4.mjs, the measured npt-lab build, the
+  pre-check regeneration into .gate/u4r-merge/regen/). **If cut:** the patch stays applied; read m5.log; a run cut
+  mid-way is re-run whole at the same tree (a cut is not a failure), a FAIL or mismatch goes to the advisor whole.
+  **The report's draft:** agent **af204d32e54d80ee6** writes u4r-report.md (notes u4r-report-notes.md) with
+  `{{M5}}`, `{{M6}}`, `{{M7}}` and `{{MERGE_SHA}}` left for the main session.
 
 **Earlier NOW (2026-11-14 about 13:25 UTC): U4r's ROUND 2 RETURNED; the advisor rules on it.**
 - **Round 2** (wf_5e07787a-ae9, five seats, 310 tool uses, done about 13:22): **u4r-review-r2-full.md** (173 lines,
