@@ -108,6 +108,13 @@ bytes and the judge's peak (over 10 GiB: P0 does not start; plan the smallest ch
     names the old scratch folder. Housekeeping only, no push.
   - **Next:** one commit (the script exactly as tested, sha256 18c1dcf6…), push, CI, and the advisor's review of the
     head, with ADV-Q and P2's fingerprint question.
+- **U4r-F2 IS COMMITTED at 791bc55 and pushed (about 21:18 UTC):** the script as tested, plus the card and the review
+  files. **The advisor's review of the head runs:** workflow **wf_af1fbc08-0bd** (task wbldum5ar; notes
+  advisor-u4r-f2-head.md), with ADV-Q, FP-P2 (P2's fingerprint) and PRE-P0. **If cut:** `resumeFromRunId:
+  "wf_af1fbc08-0bd"`. **On return:** write it word for word by script; put its "For Mustafa" here at once. Then, if
+  APPROVE and CI is green: (B), then (C) only if free space is below R (9,218.6 MiB), with df before and after each,
+  then P0 by the run procedure. P0 is a split set: two judge lines, verdict-bites.json, and INF-F2-1's stop order.
+  - The harness's NOTES path now points at .gate/u4r-f2/scratch/ (INF-F2-3's second half; scratch, not tracked).
 - **R at P0's start = 4,096 + 1.504 x 3,073.3 + 500 = 9,218.6 MiB.** Free space is 8,147 MiB, so (B) (about 480
   MiB) and then (C) (7.7 GiB) are needed, done right before P0 with df on the card.
 - **The evidence agent runs:** workflow **wf_ada59e1b-2f4** (task wmg28j1r6; Opus at high effort; notes
