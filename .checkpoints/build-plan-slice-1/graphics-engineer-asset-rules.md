@@ -98,3 +98,87 @@ Task: asset-rules (first reading for the Slice 1 build plan: the rules a model f
 - r3:343-346 R3-LOOK-F5 toonOutlinePass hull pushed out along normals (norm.mul(thickness)); 0003:601 "gaps at hard corners without smoothed normals (CL7)".
 - SCALE: no ADR (0001-0006) states "1 unit = 1 metre" (grep: no hit). STATUS.md:76 lists it as a point "For the decision drafts' next revision: ... the scale, "1 unit = 1 metre"". EDITOR_V2.md:63-65 (Written by Mustafa and the Advisor) `[DECIDED]`: "all the basic primitives ..., with one consistent scale across the engine. Principles: 1 unit = 1 metre; textures tile in world space (they repeat per metre and never stretch)". GLOSSARY: no "1 unit"/"metre" hit (only "Modes and scale" = player counts).
 - next: B6 web glTF spec
+
+### B6 glTF 2.0 spec (done) — source: https://github.com/KhronosGroup/glTF/blob/main/specification/2.0/Specification.adoc (fetched raw from raw.githubusercontent.com/KhronosGroup/glTF/main/specification/2.0/Specification.adoc, 205509 bytes, 2026-11-14; line numbers = that file)
+- Spec:730 "glTF uses a right-handed coordinate system." :732 "glTF defines +Y as up; the front side of a glTF asset faces +Z, the left side of a glTF asset faces +X." :737 "The units for all linear distances are meters." :739 "All angles are in radians." [sure: verbatim]
+- Spec:2180 "After applying the node's global transform, mesh vertex position values are meters."
+- Spec:725 names: "Any top-level glTF object **MAY** have a `name` string property for this purpose. These property values are not guaranteed to be unique as they are intended to contain values created when the asset was authored." Schema glTFChildOfRootProperty.schema.json: name = "The user-defined name of this object. This is not necessarily unique". [sure]
+- Schema extras.schema.json: "Application-specific data." "`extras` **SHOULD** be a JSON object rather than a primitive value for best portability." (https://github.com/KhronosGroup/glTF/blob/main/specification/2.0/schema/extras.schema.json) [sure]
+- Spec:1578-1584 "A _mesh_ is defined as an array of _primitives_." primitive = attributes, topology, connectivity, "and an optional material"; "If the `material` property is not defined, then a default material is used." :1589 note: "Splitting one mesh into several primitives can be useful ... to assign different materials to different parts of the mesh." => one material per primitive in the format itself. [sure]
+- Spec:2925-2930 default material: "a material with no properties specified"; note "will be black unless some lighting is present". 
+- Spec:1646-1660 attribute table: POSITION VEC3 float32 "Unitless XYZ vertex positions"; NORMAL; TANGENT VEC4; TEXCOORD_n; COLOR_n VEC3/VEC4 float32/unorm8/unorm16; JOINTS_n VEC4 uint8/uint16; WEIGHTS_n VEC4 float32/unorm8/unorm16.
+- Spec:1685 "client implementations **SHOULD** support at least `TEXCOORD_0` and `TEXCOORD_1`, `COLOR_0`, and `JOINTS_0` with `WEIGHTS_0`."
+- Spec:2009 "Each attribute pair provides up to four joint indices and their weights per vertex." :2014 note: more than four influences => JOINTS_1/WEIGHTS_1 "and so on". :2074 "Client implementations **MAY** support only a single set of up to four weights and joints, however not supporting all weight and joint sets present in the file may have an impact on the asset's appearance." => CORE SPEC HAS NO HARD 4-INFLUENCE LIMIT; clients may support only 4. [sure]
+- Spec:2019 joint indices with non-zero weights unique per vertex; unused SHOULD be zero. :2044 unorm weights MUST sum exactly 1.0; :2064 float weights SHOULD sum close to 1.0.
+- Spec:2084 skins: REQUIRED `joints`, OPTIONAL `inverseBindMatrices`; :2088 absent => identity. :2118 `skeleton` root. :2129 joint hierarchy = node hierarchy.
+- Spec:2242 "A skinned mesh primitive does not use the global transform of the node that instantiates the mesh."; :2231 skin on node w/o skinning attributes SHOULD NOT.
+- Spec:3681 GLB: "a container format, _Binary glTF_ ... enables a glTF asset, including JSON, buffers, and images, to be stored in a single binary blob." :3688 ".glb"; :3690 media type `model/gltf-binary`. :994 GLB file at most 2^32-4 bytes.
+- Spec:2918-2920 doubleSided false => back-face culling.
+- next: B7 Blender exporter docs
+
+### B7a Blender exporter docs (done) — source: https://github.com/KhronosGroup/glTF-Blender-IO/blob/main/docs/blender_docs/scene_gltf2.rst (raw fetched 2026-11-14, 49584 bytes; line numbers = that file). Option DEFAULTS are not in this doc (see B7b, source __init__.py).
+- rst:46-53 Meshes: "quads and n-gons are automatically converted to triangles when exporting to glTF. Discontinuous UVs and flat-shaded edges may result in moderately higher vertex counts in glTF compared to Blender, as such vertices are separated for export. Likewise, curves and other non-mesh data are not preserved, and must be converted to meshes prior to export."
+- rst:112-119 exported materials: "Metal/Rough PBR (core glTF) and Shadeless (`KHR_materials_unlit`)"; "glTF requires that images be in PNG or JPEG format".
+- rst:125-127 Base Color from Principled BSDF Base Color input; unconnected => its default colour is the glTF base colour.
+- rst:250-264 Emissive: Emission input; "If any component of emissiveFactor is > 1.0, `KHR_materials_emissive_strength` extension will be used."
+- rst:497-505 Backface Culling setting (EEVEE material Settings) -> inverse is glTF DoubleSided.
+- rst:511-543 alpha modes Opaque/Mask/Blend determined automatically from Alpha socket.
+- rst:686-707 export extensions list incl. KHR_draco_mesh_compression, EXT_meshopt_compression, KHR_meshopt_compression, KHR_texture_basisu, EXT_texture_webp, KHR_materials_emissive_strength, KHR_texture_transform, EXT_mesh_gpu_instancing.
+- rst:721-726 Custom Properties: "Custom properties are always imported, and will be exported from most objects if the Include → Custom Properties option is selected before export. These are stored in the `extras` field on the corresponding object in the glTF file."
+- rst:732 animation changes "the transforms of objects or pose bones, or the values of shape keys". rst:792-795 Actions mode: only active/stashed actions exported.
+- rst:884-885 GLB: "a single `.glb` file with all mesh data, image textures, and related information packed into a single binary file."
+- rst:1026-1027 Include > Custom Properties "Export custom properties as glTF extras."
+- rst:1037-1038 Transform > Y Up "Export using glTF convention, +Y up."
+- rst:1061-1078 Data - Mesh: Apply Modifiers ("Export objects using the evaluated mesh, meaning the resulting mesh after all Modifiers have been calculated."); UVs; Normals ("Export vertex normals with meshes."); Tangents; Attributes ("when the name starts with underscore"); Loose Edges/Points ("using the material from the first material slot"); Shared Accessor.
+- rst:1084-1099 Vertex Color: Material (default: "Export vertex color when used in material node tree as Base Color multiplier"), Active, Name, None ("Do not export vertex color.").
+- rst:1105-1114 Materials: Export ("full materials, including all textures and shaders from node tree"), Placeholder ("Export only the material placeholder, without any texture or shader. Primitives are not merged, so material slot information is kept."), Viewport ("Base Color, Roughness, and Metalness"), No Export ("Does not export materials. Primitives are merged, losing material slot information."). => KEY: material slots become separate primitives unless No Export.
+- rst:1115-1119 Images: PNG/JPEG/WebP/None ("If None is chosen, materials are exported without textures.").
+- rst:1159-1167 Data - Armature: Use Rest Position Armature ("Export Armatures using rest position as joint rest pose. When Off, the current frame pose is used as rest pose."); Export Deformation Bones only; Remove Armature Object; Flatten Bone Hierarchy.
+- rst:1173-1180 Data - Skinning: "Bone influences: How many joint vertex influences will be exported. Models may appear incorrectly in many viewers with value different to 4 or 8." "Include All Bone Influences: Export all joint vertex influences. Models may appear incorrectly in many viewers."
+- rst:1193-1209 Draco: "Compress meshes using Google Draco." rst:1212-1218 Meshopt.
+- rst:1224-1260 animation mode / bake / rest & ranges / armature actions.
+- NOT in the doc: how node/mesh/material names are written; option defaults. -> B7b source check.
+- next: B7b exporter source __init__.py defaults + name writing
+
+### B7b Blender exporter SOURCE (done) — https://github.com/KhronosGroup/glTF-Blender-IO (branch main, fetched raw 2026-11-14; main may be ahead of Mustafa's Blender release [unsure which version he runs]; files saved as text only in session scratchpad, not in repo)
+- addons/io_scene_gltf2/__init__.py option DEFAULTS (line: name='UI label', default):
+  - 335-342 export_format default=0 -> first item 'GLB' "glTF Binary (.glb)" (147-151: "Exports a single file, with all data packed in binary form. Most efficient and portable").
+  - 361-378 export_image_format 'AUTO' (NONE = "Don't export images").
+  - 456-460 export_texcoords 'UVs' True; 462-466 export_normals 'Normals' True; 548-552 export_tangents 'Tangents' False.
+  - 474-478 export_meshopt_compression_enable False; 494-498 export_draco_mesh_compression_enable False.
+  - 554-570 export_materials default 'EXPORT'; PLACEHOLDER = "Do not export materials, but write multiple primitive groups per mesh, keeping material slot information"; NONE = "Do not export materials, and combine mesh primitive groups, losing material slot information".
+  - 585-598 export_vertex_color default 'MATERIAL'.
+  - 622-626 export_attributes False. 656-660 use_selection 'Selected Objects' False.
+  - 722-726 export_extras 'Custom Properties' False.
+  - 728-732 export_yup '+Y Up' True.
+  - 734-739 export_apply 'Apply Modifiers' False: "Apply modifiers (excluding Armatures) to mesh objects -WARNING: prevents exporting shape keys".
+  - 747-751 export_animations True; 789-805 export_animation_mode 'ACTIONS'.
+  - 816-820 export_def_bones False; 834-841 export_armature_object_remove False; 843-850 export_leaf_bone 'Add Leaf Bones' False.
+  - 957-964 export_rest_position_armature 'Use Rest Position Armature' True ("Export armatures using rest position as joints' rest pose").
+  - 975-979 export_skins 'Skinning' True; 981-986 export_influence_nb 'Bone Influences' default=4 min=1; 988-992 export_all_influences False.
+  - 994-998 export_morph 'Shape Keys' True. 1046-1052 export_gpu_instances False.
+- NAMES (source): blender/exp/nodes.py:486-488 node name = `blender_object.name`; blender/exp/obj_data.py:144-149 mesh name = `blender_data.name` (mesh datablock name); blender/exp/material/material_utils.py:24-25 material name = `blender_material.name`; material extras only if gltf_extras (18-21); blender/exp/joints.py:102-103 joint node name = `blender_bone.name` (leaf bones "+ '_leaf'"); blender/exp/skins.py:153-154 skin name = armature object name. [sure: read in source]
+- PRIMITIVE SPLIT: blender/exp/primitive_extract.py:428-444: "if self.use_materials == "NONE": # Only for None. For placeholder and export, keep primitives" -> one primitive; else "Bucket by material index" -> one primitive per material index USED by triangles (np.unique of triangle material indices; an unused slot gives no primitive). [sure]
+- SKIN WEIGHTS: primitive_extract.py:1650-1651 vertex groups mapped to joints BY NAME (vertex group name = bone name; non-matching groups skipped 1668-1669); 1662 weights <= 0.0001 dropped; 1671 sorted by weight desc; 1672-1675 a vertex with no bone weight is assigned to a "neutral bone" created at the armature root (need_neutral_bone) => export check: no neutral bone / every vertex weighted; 1681 joint sets = ceil(max influences / 4). Where the cap to `export_influence_nb` and any renormalisation happen: NOT found in files read [unsure].
+- next: B8 three.js GLTFLoader docs
+
+### B8 three.js GLTFLoader (done)
+- Docs page https://threejs.org/docs/pages/GLTFLoader.html (via fetch tool summary, 2026-11-14): result object fields animations ("An array of animation clips."), asset, cameras, parser, scene ("The default scene."), scenes, userData ("Additional data."). Built-in extensions list includes KHR_draco_mesh_compression, KHR_mesh_quantization, KHR_meshopt_compression, KHR_texture_basisu, KHR_texture_transform, KHR_materials_emissive_strength, KHR_materials_unlit, EXT_meshopt_compression, EXT_mesh_gpu_instancing, EXT_texture_webp, EXT_texture_avif. setDRACOLoader "Required for decoding assets compressed with the `KHR_draco_mesh_compression` extension."; setMeshoptDecoder "Required for decoding assets compressed with the `EXT_meshopt_compression` extension."; setKTX2Loader "Required for loading KTX2 compressed textures." Page says NOTHING about WebGPURenderer, names, extras, skinned or multi-material meshes. [summary by fetch model; quotes as returned]
+- Source https://github.com/mrdoob/three.js/blob/dev/examples/jsm/loaders/GLTFLoader.js (dev = REVISION '188dev', fetched 2026-11-14); every line below also present in r186 (r186 line in brackets):
+  - 2330-2341 ATTRIBUTES map: POSITION position, NORMAL normal, TANGENT tangent, TEXCOORD_0..3 uv..uv3, COLOR_0 color, WEIGHTS_0 skinWeight, JOINTS_0 skinIndex [r186 2286-2287]. 4952 other attributes -> `gltfAttributeName.toLowerCase()` [r186 4871] => JOINTS_1/WEIGHTS_1 become 'joints_1'/'weights_1', unused by skinning => three.js skins with at most 4 influences per vertex [inferred from source; sure].
+  - 3992-4004 a primitive becomes `new SkinnedMesh( geometry, material )` when the mesh is skinned and has skinIndex+skinWeight, else `new Mesh`; 3997 warns "Missing skinIndex or skinWeight attributes. Skinning disabled."; 4009 `mesh.normalizeSkinWeights()` "normalize skin weights to fix malformed assets" [r186 3928].
+  - 4041 each primitive's mesh named `parser.createUniqueName( meshDef.name || ( 'mesh_' + meshIndex ) )`; 4062-4066 one primitive => that mesh returned; 4070-4080 several primitives => `new Group()` with one mesh per primitive [r186 3989]. => a Blender mesh with 3 material slots = Group of 3 (Skinned)Mesh, names "Body", "Body_1", "Body_2".
+  - 4374-4378 every SkinnedMesh under the skinned node is bound to the same Skeleton (`mesh.bind( skeleton, _identityMatrix )`) [r186 4297] => all slot meshes of a soldier share one Skeleton.
+  - 4133-4192 loadSkin: bones = joint nodes, boneInverses from inverseBindMatrices (identity if absent); warns 'Joint "%s" could not be found.'
+  - 4479-4481 joint nodes become `new Bone()`.
+  - 3838-3852 createUniqueName: `PropertyBinding.sanitizeNodeName(originalName)` then suffix `_1`, `_2` on collision [r186 3759]. PropertyBinding.js (dev) 178-188: "Replaces spaces with underscores and removes unsupported characters from node names"; 3-4 reserved chars `[ ] . : /` removed. => Blender names like "hand.L" -> "handL", "Bone.001" -> "Bone001", "Upper Arm" -> "Upper_Arm" on node/bone/mesh objects.
+  - 4507-4510 node: `node.userData.name = nodeDef.name; node.name = nodeName;` (original kept in userData.name) [r186 4428].
+  - 3817 `if ( materialDef.name ) material.name = materialDef.name;` (material names NOT sanitized) [r186 3736]; 3819 material extras -> userData.
+  - 2413-2423 assignExtrasToUserData: object extras -> `Object.assign( object.userData, gltfDef.extras )`; non-object extras ignored with a warning [r186 2366]. Applied to nodes (4514), meshes (4043), materials (3819), geometries (4979).
+  - 2370-2386 default material MeshStandardMaterial (color 0xFFFFFF, metalness 1, roughness 1) when a primitive has no material.
+  - 3579-3640 assignFinalMaterial: no normal attribute => cloned material with flatShading=true; COLOR_0 => vertexColors=true; no tangent => derivative tangents.
+  - 4973-4975 warns converting vertex colours from srgb-linear to a non-linear working colour space is not supported.
+  - loader creates MeshStandardMaterial/MeshPhysicalMaterial (not node materials); no WebGPU-specific code in the loader (grep: no "webgpu"/"NodeMaterial").
+- Examples (dev): examples/webgpu_loader_gltf.html (GLTFLoader + `new THREE.WebGPURenderer`), examples/webgpu_skinning.html (loads models/gltf/Michelle.glb, AnimationMixer, WebGPURenderer). => official examples load glTF/GLB incl. skinned GLB under WebGPURenderer; WebGL 2 fallback path NOT shown.
+- Skinning node (dev 188dev) https://github.com/mrdoob/three.js/blob/dev/src/nodes/accessors/Skinning.js 50-51: "Skeletons that fit within the uniform buffer limit use a uniform buffer, larger skeletons fall back to a bone texture." 61-65 uniformBufferSize = bones × 16 × 4 vs builder.getUniformBufferLimit(); 102-117 four influences (skinIndex.x..w, skinWeight.x..w). => partly answers R3-CHAR-OQ1 for dev: no hard bone cap, a path switch; the limit value per backend not read [unsure]; r186 file not checked.
+- next: B9 write result file

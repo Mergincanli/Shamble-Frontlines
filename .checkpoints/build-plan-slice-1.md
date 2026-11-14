@@ -6,7 +6,7 @@
   yet)
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/build-plan-slice-1) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-14 15:20 Amsterdam
+- **Last update:** 2026-11-14 15:39 Amsterdam
 
 ## Steps done
 1. Orientation · the session's model read with get_session at 2026-11-14 13:58 UTC: `session_context.model` and
@@ -20,16 +20,20 @@
    `marks-0001.md` (netcode-architect: the local path, what the proof test may change, the slice 1 and 60 Hz marks).
    All four ended DONE and handed back between 14:07 and 14:14 UTC (the notes files' times).
 
+4. `marks-0005.md` (test-engineer, 46 ids; DONE, handed back about 14:36 UTC) read with the other four digests.
+5. Plan revision 1 written at `.checkpoints/build-plan-slice-1/plan.md`: Parts 0 to 10, 12, 13, the decisions and
+   "For Mustafa"; Part 3's tables counted by `count-marks.mjs` (201 marks expected, 201 placed, none missing, none
+   twice; the asset spike's 7 in Part 12).
+
 ## Current step
-4. Two more reading agents running (launched after his addition): test-engineer on ADR 0005's marks, PM-0005-1 to -46
-   (`marks-0005.md`), and graphics-engineer, effort max, on the model-file rules, from the drafts and official
-   documentation (`asset-rules.md`). Meanwhile the main session reads the digests and writes the plan.
+6. Part 11 (the model-file rules) waits for graphics-engineer's `asset-rules.md` (effort max; reading official
+   documentation; still running at 14:38 UTC). Then the advisor agent's plan review.
 
 ## Next steps
-1. Read `marks-0003.md`, `marks-0004.md`, `marks-0001.md`, then `marks-0005.md` and `asset-rules.md` when they end.
-2. Write the plan (his items 1 to 13) at `.checkpoints/build-plan-slice-1/plan.md`.
-3. The advisor agent's plan review (Opus 5.5, effort max; no review rounds, no verifier, by his words).
-4. Stop for his go.
+1. Read `asset-rules.md` when its agent ends; write Part 11 from it.
+2. The advisor agent's plan review (Opus 5.5, effort max; no review rounds, no verifier, by his words); fold what it
+   finds; record its verdict in Part 14.
+3. Stop for his go, with the summary he asked for.
 
 ## Open findings
 - The PR Advisor's merge places are `docs/`, `tools/`, `README.md` and `FIRST_PROMPTS.md` only
