@@ -998,7 +998,7 @@ index 2ff8533..278db8c 100644
    ]
  }
 diff --git a/spikes/netcode-proof/crates/lab/src/hash.rs b/spikes/netcode-proof/crates/lab/src/hash.rs
-index 6bb355d..7ec5179 100644
+index 6bb355d..7a4a92f 100644
 --- a/spikes/netcode-proof/crates/lab/src/hash.rs
 +++ b/spikes/netcode-proof/crates/lab/src/hash.rs
 @@ -195,10 +195,27 @@ pub(crate) fn parse(argv: &[String]) -> Result<Mode, String> {
@@ -1311,6 +1311,117 @@ index 6bb355d..7ec5179 100644
      #[test]
      fn h6_usage_errors_are_refused() {
          let base = "--manifest m --dir d --out o";
+@@ -1439,6 +1644,110 @@ mod tests {
+         );
+     }
+ 
++    /// Carry 83 (d) (EA-9's one default, the legs'): `hash compare` with a bite and no `--on`, over two recordings,
++    /// arms only the first its lists hold. The hash-map bite's field is in a World's dump only once the bite is armed
++    /// and its tick reached (npt-sim's world.rs `write_state`), so `--digest-field`, which replays the first given
++    /// dump's recording to that dump's tick as `compare` arms it, finds the field on the first recording and not on the
++    /// second. A `compare` that armed every recording would find it on both, and read the second's clean dump as
++    /// another layout.
++    #[cfg(feature = "bites")]
++    #[test]
++    fn r10_carry_83_d_compare_with_a_bite_and_no_on_arms_only_the_first_recording_listed() {
++        const FIELD: &str = "bite[0].hash_map_order";
++        let dir = crate::scenario::tests::scratch("hash-83d");
++        std::fs::create_dir_all(&*dir).expect("the folder");
++        let d = dir.to_str().expect("a UTF-8 path").to_owned();
++        let path = |f: &str| format!("{d}/{f}");
++        let (first, first_bytes) = short();
++        let second_bytes =
++            Recording::synthetic(&Scene::targets(), 9, u32::MAX - 20, 60, 2_000).encode();
++        let second = Entry {
++            name: "TC-s9".to_owned(),
++            seed: 9,
++            bytes: second_bytes.len() as u64,
++            sha256: sha256_hex(&second_bytes),
++            ..first.clone()
++        };
++        // Both recordings in the folder, their manifest, and one clean list of both (ours and theirs alike).
++        let mut lines = String::new();
++        let mut entries = Vec::new();
++        for (e, bytes) in [(&first, &first_bytes), (&second, &second_bytes)] {
++            std::fs::write(rec_path(&d, &e.name), bytes).expect("the recording");
++            let mut rp = Replayer::new();
++            for w in le_words(bytes) {
++                rp.feed(w);
++            }
++            while let Step::Stepped(tick) = rp.step() {
++                let hash = rp.state_hash().expect("a hash after a step");
++                let h = TickHash {
++                    recording: e.name.clone(),
++                    tick,
++                    hash,
++                };
++                lines.push_str(&format!("{}\n", hash_line(&h)));
++            }
++            entries.push(format!(
++                "{{\"name\": \"{}\", \"kind\": \"synthetic\", \"scene\": {}, \"seed\": {}, \"first_tick\": {}, \
++                 \"ticks\": {}, \"span_ms\": {}, \"generator\": {}, \"bytes\": {}, \"sha256\": \"{}\"}}",
++                e.name, e.scene, e.seed, e.first_tick, e.ticks, e.span_ms, e.generator, e.bytes, e.sha256
++            ));
++        }
++        std::fs::write(
++            path("m.json"),
++            format!("{{\"recordings\": [{}]}}", entries.join(", ")),
++        )
++        .expect("the manifest");
++        std::fs::write(path("ours.lines"), &lines).expect("ours");
++        std::fs::write(path("theirs.lines"), &lines).expect("theirs");
++        let arm = Arm {
++            id: "PM-0004-21/hash-map".to_owned(),
++            tick: first.first_tick.wrapping_add(5),
++            on: None,
++        };
++        let at = first.first_tick.wrapping_add(10);
++        // The first recording's dump with the bite armed, the second's clean, each at that tick.
++        for (e, a, f) in [
++            (&first, Some(&arm), "first.dump"),
++            (&second, None, "second.dump"),
++        ] {
++            let own = replay_to(&d, e, at, a).expect("a replay");
++            std::fs::write(path(f), dump_text(&e.name, at, own.hash(), own.words()))
++                .expect("a dump");
++        }
++        let digest = |dump: &str| {
++            let (out, equal) = run(&argv(&format!(
++                "compare --ours {} --theirs {} --manifest {} --dir {d} --ours-dump {} --digest-field {FIELD} \
++                 --ours-name ours --theirs-name theirs --bite {} --arm {}",
++                path("ours.lines"),
++                path("theirs.lines"),
++                path("m.json"),
++                path(dump),
++                arm.id,
++                arm.tick
++            )))
++            .expect("compare runs");
++            assert!(equal, "the two lists are equal: {out:?}");
++            out.into_iter()
++                .find(|l| l.starts_with("ours digest "))
++                .expect("a digest line")
++        };
++        let armed = digest("first.dump");
++        let clean = digest("second.dump");
++        println!("83 (d): {armed}\n83 (d): {clean}");
++        let word = armed.split(' ').nth(2).unwrap_or("");
++        assert!(
++            word.len() == 16
++                && word.bytes().all(|b| b.is_ascii_hexdigit())
++                && armed.contains(&format!("of its dump at TC-s8 tick {at})")),
++            "the first recording listed is armed: {armed}"
++        );
++        assert_eq!(
++            clean,
++            format!("ours digest none ({FIELD} at words [] of its dump at TC-s9 tick {at})"),
++            "the second is not"
++        );
++    }
++
+     #[test]
+     fn a_digest_field_of_a_dump_of_another_length_says_the_layouts_differ() {
+         // RR-L3: the field's indexes are this build's own dump's, so a dump of another layout (P6's word-size plant
 diff --git a/spikes/netcode-proof/crates/lab/src/lib.rs b/spikes/netcode-proof/crates/lab/src/lib.rs
 index dbfd0d5..8bc3479 100644
 --- a/spikes/netcode-proof/crates/lab/src/lib.rs
@@ -7569,6 +7680,209 @@ index 0000000..1bfc26c
 +        println!("p4 bite: measured incomplete {sum} of 16 clients");
 +        assert_eq!(sum, 16);
 +    }
++}
+diff --git a/spikes/netcode-proof/ops/runs/c-u4r-runs.mjs b/spikes/netcode-proof/ops/runs/c-u4r-runs.mjs
+new file mode 100644
+index 0000000..997278f
+--- /dev/null
++++ b/spikes/netcode-proof/ops/runs/c-u4r-runs.mjs
+@@ -0,0 +1,197 @@
++#!/usr/bin/env node
++// U4r's judged runs and the -30 pre-check, in this container (u4r-brief.md 2.3 and section 7; c-u2-pm-0001-3.mjs's
++// model). One script for every set, the set named first:
++//   node spikes/netcode-proof/ops/runs/c-u4r-runs.mjs precheck --date YYYY-MM-DD
++//   node spikes/netcode-proof/ops/runs/c-u4r-runs.mjs judged --profile P0|P2|P3|B1 --date YYYY-MM-DD
++// - precheck (set u4r-precheck-30; 7.2): SS P0 seed 4's recording made again by `npt-lab scenario --record` at its
++//   crates/lab/precheck-recordings.json entry's settings (the set stops if that run's rewinds refused are above 0: 7.1),
++//   then three pairs by `npt-lab precheck`, each checking the file against that entry first: clean (the measured
++//   build), PM-0001-30/wallclock and PM-0001-30/late-command (the bites build), each bite on the L1 leg. runs.txt holds
++//   every pair's lines whole (both legs' records, the comparer's output and the result) and no verdict: the judge
++//   never reads these runs.
++// - judged (set u4r-<profile>; 7.1): the profile's three measured runs (seeds 1 to 3; SS, 48 clients, L1, a 10 s
++//   warm-up, 600 s measured, tick_start 63,736; B1 with 10 bursts, every 60 s from 30 s into the measured phase), their
++//   headers listing PM-0001-2 (every L1 part's pre:PM-0001-2), PM-0001-17 and PM-0001-57 (-57's parts are on -17's
++//   runs), and PM-0001-18 on B1; then, in the bites build at seed 1 with the same settings, one run per bite of those
++//   marks (marks.json's lists, read at run time) whose part has this profile: -17's and -57's on P0, -18's no-fallback
++//   on B1 (its ws-budget-x2 is L2's), each header listing PM-0001-2 and the bite's own mark; then `npt-judge --only` on
++//   the set's folder. One profile per call keeps each set's logs and the judge's memory to one profile's (the advisor's
++//   U4r build ruling, point 3: the main session plans the disk and judges each set's folder apart).
++// - It refuses uncommitted changes to tracked files (every log names its commit); raw logs go under
++//   .gate/netcode-proof-test/runs/<set>-<commit12>/ (one folder per run), results under results/u4r/<commit12>/<profile>/
++//   or results/u4r-precheck-30/<commit12>/; neither is ever overwritten. It stops before a run when less than 4 GB is
++//   free (u4r-brief.md section 4 rule 6's floor).
++// - Both npt-lab builds and npt-judge are built --release --locked, each artifact's path read from cargo's
++//   --message-format=json messages (check.mjs's builtArtifact, as the wasm step reads its builds) and copied out before
++//   the next build replaces it: so it is right under the main folder's own cache (CARGO_TARGET_DIR unset, as plan §7.1
++//   item 6 has judged runs) and under the shared target alike.
++// - Each npt-lab process is timed (the wall time around the call) and its seconds go on its runs.txt line beside its
++//   ticks (npt-lab's summary line), for the ticks-per-second figure (2.4 r5, 7.3).
++// - No run logs its clients' bytes (`scenario --bytes`): no part these sets judge reads a replay log (only an x86_64
++//   replay log of an L2 Arm run is read: judge/src/figures.rs:222-233).
++
++import { spawnSync } from "node:child_process";
++import { createHash } from "node:crypto";
++import { copyFileSync, existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from "node:fs";
++import { dirname, join } from "node:path";
++import { fileURLToPath } from "node:url";
++import { builtArtifact } from "../../check.mjs";
++
++const SPIKE = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
++const ROOT = join(SPIKE, "..", "..");
++const GATE = join(ROOT, ".gate", "netcode-proof-test");
++const SEEDS = [1, 2, 3];
++const PROFILES = ["P0", "P2", "P3", "B1"];
++/** -17's L1 runs start here, clean and bitten (U4R-Q7 (a)): tick16's run crosses the 16-bit wrap 1,800 ticks in. */
++const TICK_START = 63_736;
++/** Each judged run's warm-up and measured lengths, s (plan :767: 10 minutes measured). */
++const WARMUP_S = 10;
++const MEASURED_S = 600;
++/** The bites of these marks that only L2 plants (marks.json: -18's ws-budget-x2 is the L2 B1 ws part's). */
++const L2_ONLY = ["PM-0001-18/ws-budget-x2"];
++/** The free space below which no run starts, bytes (section 4 rule 6's 4 GB floor). */
++const FLOOR = 4 * 1024 ** 3;
++/** precheck-recordings.json's scene ids (Scene::by_id). */
++const SCENES = { 1: "SS", 2: "ES", 3: "CO", 4: "TC" };
++
++function sh(cmd, args, cwd = ROOT) {
++  const r = spawnSync(cmd, args, { cwd, encoding: "utf8", maxBuffer: 1 << 28 });
++  if (r.status !== 0) throw new Error(`${cmd} ${args.join(" ")}: exit ${r.status}\n${r.stdout}${r.stderr}`);
++  return r.stdout.trim();
++}
++
++const sha256 = (path) => createHash("sha256").update(readFileSync(path)).digest("hex");
++
++/** One release build, its artifact's path read from cargo's JSON messages and copied to `to`. */
++function build(args, target, to) {
++  const out = sh("cargo", ["build", "--release", "--locked", ...args, "--message-format=json"], SPIKE);
++  const path = builtArtifact(out, { target, kind: "bin" });
++  if (!path) throw new Error(`cargo build ${args.join(" ")} names no ${target} executable in its JSON messages`);
++  copyFileSync(path, to);
++  return to;
++}
++
++/** Stops before a run when less than FLOOR bytes are free where the logs go. */
++function floor(what) {
++  const s = statfsSync(ROOT);
++  const free = s.bavail * s.bsize;
++  if (free < FLOOR) throw new Error(`${what}: ${(free / 1024 ** 3).toFixed(1)} GB free, below the 4 GB floor: stopped before it`);
++}
++
++/** One npt-lab process, timed: its summary line with the wall seconds. */
++function timed(exe, args) {
++  const t0 = Date.now();
++  const out = sh(exe, args);
++  const secs = ((Date.now() - t0) / 1000).toFixed(1);
++  return { out, secs };
++}
++
++function main(argv) {
++  const set = argv[0];
++  const opt = (k) => (argv.includes(k) ? argv[argv.indexOf(k) + 1] : undefined);
++  const date = opt("--date");
++  const profile = opt("--profile");
++  const usage = "usage: c-u4r-runs.mjs precheck --date YYYY-MM-DD | judged --profile P0|P2|P3|B1 --date YYYY-MM-DD";
++  if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? "") || !["precheck", "judged"].includes(set)) throw new Error(usage);
++  if (set === "judged" && !PROFILES.includes(profile)) throw new Error(usage);
++  if (sh("git", ["status", "--porcelain", "--untracked-files=no"])) {
++    throw new Error("tracked files have uncommitted changes: commit first, since every log names its commit");
++  }
++  const commit = sh("git", ["rev-parse", "HEAD"]);
++  const short = commit.slice(0, 12);
++  const name = set === "precheck" ? "u4r-precheck-30" : `u4r-${profile}`;
++  const logs = join(GATE, "runs", `${name}-${short}`);
++  const results = set === "precheck" ? join(SPIKE, "results", "u4r-precheck-30", short) : join(SPIKE, "results", "u4r", short, profile);
++  for (const d of [logs, results]) if (existsSync(d)) throw new Error(`${d} exists: a run set is never overwritten`);
++
++  // Both builds of npt-lab, each copied out before the next build replaces it, and the judge.
++  const bin = join(GATE, "bin", `${name}-${short}`);
++  mkdirSync(bin, { recursive: true });
++  const lab = build(["-p", "npt-lab"], "npt-lab", join(bin, "npt-lab"));
++  const labBites = build(["-p", "npt-lab", "--features", "bites"], "npt-lab", join(bin, "npt-lab-bites"));
++  const judge = set === "judged" ? build(["-p", "npt-judge"], "npt-judge", join(bin, "npt-judge")) : null;
++  mkdirSync(logs, { recursive: true });
++  const head = [
++    `commit ${commit}`,
++    `npt-lab (measured build) sha256 ${sha256(lab)}`,
++    `npt-lab (bites build) sha256 ${sha256(labBites)}`,
++    ...(judge ? [`npt-judge sha256 ${sha256(judge)}`] : []),
++    `raw logs: .gate/netcode-proof-test/runs/${name}-${short}/ (not committed: plan §7.2)`,
++  ];
++  const common = ["--set", name, "--date", date, "--commit", commit];
++  const lines = [];
++
++  if (set === "precheck") {
++    const manifest = join(SPIKE, "crates", "lab", "precheck-recordings.json");
++    const [e] = JSON.parse(readFileSync(manifest, "utf8")).recordings;
++    const rec = join(logs, `${e.name}.rec`);
++    floor(`the recording ${e.name}`);
++    const made = timed(lab, [
++      "scenario", "--run", `record-${e.name}`, ...common, "--out", join(logs, `record-${e.name}`), "--scene", SCENES[e.scene],
++      "--profile", e.profile, "--seed", String(e.seed), "--clients", String(e.clients), "--tick-start", String(e.first_tick),
++      "--warmup-s", String(e.warmup_s), "--measured-s", String(e.measured_s), "--logs", "0", "--suite", "record", "--record", rec,
++    ]);
++    console.log(made.out);
++    lines.push(`# the recording (npt-lab scenario --record at the manifest entry's settings; wall ${made.secs} s)`, made.out, `${e.name} sha256 ${sha256(rec)}`);
++    const refused = Number(made.out.match(/rewinds refused (\d+)/)?.[1] ?? Number.NaN);
++    if (refused !== 0) throw new Error(`${e.name}'s run refused ${refused} rewinds: the set stops before the pre-check (7.1; carry 40)`);
++    const pairs = [
++      { pair: "clean", exe: lab, extra: [], expected: "PASS" },
++      { pair: "wallclock", exe: labBites, extra: ["--bite", "PM-0001-30/wallclock", "--bite-leg", "L1"], expected: "FAIL" },
++      { pair: "late-command", exe: labBites, extra: ["--bite", "PM-0001-30/late-command", "--bite-leg", "L1"], expected: "VOID" },
++    ];
++    for (const p of pairs) {
++      floor(`the ${p.pair} pair`);
++      const r = timed(p.exe, ["precheck", "--manifest", manifest, "--recording", rec, "--commit", commit, ...p.extra]);
++      const result = r.out.match(/^result: (\S+)/m)?.[1] ?? "none";
++      const said = `## pair ${p.pair} (wall ${r.secs} s): result ${result}, expected ${p.expected}${result === p.expected ? "" : " (NOT as expected: to the advisor)"}`;
++      console.log(said);
++      lines.push(said, r.out);
++    }
++    mkdirSync(results, { recursive: true });
++    const top = [`# u4r-precheck-30: the -30 pre-check (u4r-brief.md 7.2), run in this container on ${date}; no verdict (no judged id)`];
++    writeFileSync(join(results, "runs.txt"), `${[...top, ...head, "", ...lines].join("\n")}\n`);
++    console.log(`written: ${join("spikes", "netcode-proof", "results", "u4r-precheck-30", short)}/runs.txt`);
++    return;
++  }
++
++  const marks = JSON.parse(readFileSync(join(SPIKE, "marks", "marks.json"), "utf8"));
++  const listed = ["PM-0001-2", "PM-0001-17", "PM-0001-57", ...(profile === "B1" ? ["PM-0001-18"] : [])];
++  const settings = ["--scene", "SS", "--profile", profile, "--tick-start", String(TICK_START), "--warmup-s", String(WARMUP_S), "--measured-s", String(MEASURED_S), "--suite", name];
++  const one = (exe, run, seed, extra) => {
++    floor(run);
++    const r = timed(exe, ["scenario", "--run", run, ...common, "--out", join(logs, run), "--seed", String(seed), ...settings, ...extra]);
++    const said = `${r.out} (wall ${r.secs} s)`;
++    console.log(said);
++    lines.push(said);
++  };
++  for (const s of SEEDS) one(lab, `l1-${profile.toLowerCase()}-s${s}`, s, ["--role", "measured", "--marks", listed.join(",")]);
++  // The bites: one run each at seed 1 on the profile of a part that reads it (-17's and -57's on P0, -18's on B1).
++  const bitesOn = (mark) => (mark === "PM-0001-18" ? "B1" : "P0");
++  for (const m of marks.marks.filter((x) => listed.includes(x.id) && x.id !== "PM-0001-2" && bitesOn(x.id) === profile)) {
++    for (const b of (m.bites ?? []).filter((x) => !L2_ONLY.includes(x.id))) {
++      one(labBites, `bite-${b.id.split("/")[1]}`, 1, ["--role", "bite", "--bite", b.id, "--marks", `PM-0001-2,${m.id}`]);
++    }
++  }
++  const verdict = join(logs, "verdict.json");
++  const judged = sh(judge, ["--marks", join(SPIKE, "marks", "marks.json"), "--logs", logs, "--only", listed.join(","), "--out", verdict]);
++  console.log(judged);
++  mkdirSync(results, { recursive: true });
++  copyFileSync(verdict, join(results, "verdict.json"));
++  const top = [
++    `# ${name}: -17's, -57's${profile === "B1" ? " and -18's" : ""} L1 ${profile} part(s), run in this container on ${date} (u4r-brief.md 7.1)`,
++    ...head,
++    `judge: ${judged}`,
++    "",
++    "# one line per run (npt-lab's own summary line and its wall time; the judge reads the logs, never these lines)",
++  ];
++  writeFileSync(join(results, "runs.txt"), `${[...top, ...lines].join("\n")}\n`);
++  console.log(`written: ${join("spikes", "netcode-proof", "results", "u4r", short, profile)}/verdict.json and runs.txt`);
++}
++
++try {
++  main(process.argv.slice(2));
++} catch (e) {
++  console.error(`c-u4r-runs: ${e.message}`);
++  process.exit(1);
 +}
 diff --git a/spikes/netcode-proof/ops/runs/det-u4.mjs b/spikes/netcode-proof/ops/runs/det-u4.mjs
 new file mode 100644

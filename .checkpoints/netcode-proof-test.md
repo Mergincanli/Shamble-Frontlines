@@ -12,9 +12,29 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 01:22 UTC; read this first after a compact or a cut): a container restart at about 01:18
-stopped copy 4, the third ruling and the saver (see "Cuts by the spend limit"); all resumed about 01:22; snapshot
-ad3631d9… (24 files).**
+**NOW (2026-11-14 about 01:40 UTC; read this first after a compact or a cut): U4r copy 4 finished items 1 and 2 and
+stopped at a clean point (01:37); snapshot e40449a7… (25 files); only item 3 (r5 and section 5's end checks) is left,
+held for the third ruling (task w5rwxf34m, its advisor running). No builder runs now; copy 5 follows the ruling.**
+- **Copy 4's part report** (agent a033afc8d5205b476; notes "## Copy 4" and "Copy 4: state and what is next", the notes
+  now 1,171 lines, copied here, equal): item 1 done (point 1 (4) to (7): `wasmStep`'s options; carries 83 (b) to (d),
+  84 and 85; det-u4.mjs PASS 200.5 s, non-cargo 190.9 s, W 3.1 s; 13 plants, each failing by name and restored); item 2
+  done (B12: ops/runs/c-u4r-runs.mjs, one script: `precheck --date D` remakes SS-P0-s4, stops on rewinds refused, runs
+  the three pairs into results/u4r-precheck-30/<commit12>/runs.txt; `judged --profile P0|P2|P3|B1 --date D`: three
+  measured seeds, one bites-build run per bite of the listed marks, `npt-judge --only`, results/u4r/<commit12>/<profile>/;
+  refuses to start under 4 GB free; every line form run by hand on a short setting: precheck PASS, FAIL at index 3,
+  VOID (L1 late_count 1), as planned). Regression green in both builds (npt-lab bin 46 and 53, 1 ignored each). New
+  check.mjs exports for 2.7's count: `run`, `cargoConfigDirs`.
+- **Copy 4's findings:** (1) **every judge call must list PM-0001-2:** `--only PM-0001-17` alone gives INVALID
+  "pre:PM-0001-2: not in marks.json"; the script always lists it, and **the main session's own judge calls must too**
+  (the whole-as-lost demonstration: `--only PM-0001-2,PM-0001-17`); (2) carry 83 (c)'s re-show has not run on real
+  binaries (only in check.mjs's full wasm step, with the end checks); (3) carry 84 (b)'s limits as documented (Ctrl-C
+  does not reach a running timed call; killed grandchildren stay zombies until reaped); (4) B12's stated choices: one
+  profile per judged call, one bite run per bite id, no `--bytes`, whole-as-lost only once marks.json lists it; the B1,
+  tick16 and -18 no-fallback lines built as the brief says, may change with the third ruling (tick16 and no-fallback
+  not run by hand: held); (5) disk is tight (4.9 GB free; a judged P0 set needs the disk plan).
+
+**Earlier NOW (2026-11-14 about 01:22 UTC): a container restart at about 01:18 stopped copy 4, the third ruling and
+the saver; all resumed about 01:22; snapshot ad3631d9… (24 files).**
 - **Copy 4 before the restart** (00:54-01:18 UTC; its notes "## Copy 4", :908 on): read its notes and the diff whole;
   C4a (`wasmStep`'s two options), C4b (carry 84: one shared 300 s deadline, a stopped call's whole group killed), C4c
   (carry 83 (b) and (c)), each with plants failing by name, check.test.mjs 75 of 75; C4e (ops/runs/det-u4.mjs; its one

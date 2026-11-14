@@ -1062,3 +1062,110 @@ changes; point 32 comes before the next full run.
   ok 56 - npt-tcpinfo and npt-hash-wasm, the deny-level exceptions ..."; (c) the metavariable pattern unmatchable
   (c4-plant-85c2.log): test 56 fails; (d) `env.CARGO_HOME ?? ...` (c4-plant-85d.log): test 38 fails at "an empty
   CARGO_HOME is unset".
+
+### The container restart (about 01:18 UTC) and the re-check (01:22 UTC)
+
+- The coordinator's message: the container restarted at about 01:18 UTC and stopped me; its snapshot re-cut at 01:21
+  (wip/u4r.patch, 24 files, sha256 ad3631d9...). My re-check: HEAD 2fbec77; check.mjs 7297ca9d..., check.test.mjs
+  24563ff3..., loader.mjs a0507d1e..., det-u4.mjs dcffd94d... (the notes' values after the last restore); no plant marker
+  in check.mjs; no npt-lab, cargo or rustc process; df 4.9G. The last block (carry 85's plants) is whole in these notes.
+- Next: carry 83 (d)'s Rust test, then B12. The third ruling still holds item 3 and its points.
+
+### Carry 83 (d): the npt-lab bin test (done; .gate/u4r/c4-83d-1.log, c4-plant-83d.log, c4-83d-reg.log, 01:23-01:26 UTC)
+
+- hash.rs tests, bites build: `r10_carry_83_d_compare_with_a_bite_and_no_on_arms_only_the_first_recording_listed`.
+  Two synthetic TC recordings (TC-s8 = `short()`, TC-s9 seed 9, both 60 ticks from u32::MAX - 20) written with their
+  manifest and one clean list of both into a scratch folder (scenario.rs `tests::scratch`, removed on pass); dumps at
+  first tick + 10: TC-s8's with PM-0004-21/hash-map armed at first tick + 5, TC-s9's clean. `run(compare ... --ours-dump
+  <dump> --digest-field bite[0].hash_map_order --bite PM-0004-21/hash-map --arm <t>)` with no `--on`, once per dump.
+  Why it can see the arming: the bite's field is in a dump only once the bite is armed and its tick reached
+  (sim/src/world.rs:2018-2020 and :2091-2097), and `--digest-field` replays the given dump's recording as compare
+  arms it (hash.rs:1153-1170). Output (clean): "ours digest da456c9a16818d15 (bite[0].hash_map_order at words [344,
+  345] of its dump at TC-s8 tick 4294967285)" and "ours digest none (bite[0].hash_map_order at words [] of its dump at
+  TC-s9 tick 4294967285)"; 1 passed.
+- Plant (-x, one call; compare's `armed` closure `.or(arm.as_ref())`, i.e. every recording armed; restored by Edit,
+  hash.rs sha256 e590aa2a... before and after): FAILED at hash.rs:1744, left "ours digest layouts differ (342 and 340
+  words) (... at words [340, 341] of its dump at TC-s9 ...)", right "... none ...". (The armed digest's value differs
+  between processes, 37a9a0ce... there: the bite folds a process-seeded HashMap order; the test asserts its form only.)
+- After: `cargo fmt --all --check` exit 0; `cargo clippy --locked -p npt-lab --all-targets -- -D warnings` exit 0, and
+  with `--all-features` exit 0.
+- **Item 1 (copy 3's state section) is done:** ruling 1 point 1 (4)-(7) and r10's check.mjs half (carries 83 (b)-(d),
+  84, 85). Point 1 (7)'s report words: check.mjs's wasm step on the three synthetic recordings (its time comes with
+  section 5's end checks, held), det-u4.mjs's 200.5 s (non-cargo 190.9 s, W 3.1 s) beside it, ruling 1's route (c).
+
+### B12: ops/runs/c-u4r-runs.mjs (written, `node --check` ok; its lines by hand next)
+
+- One script for every set (2.3 leaves the choice): `c-u4r-runs.mjs precheck --date D` (set u4r-precheck-30: SS P0
+  seed 4's recording by `scenario --record` at precheck-recordings.json's entry settings, read from the file; the set
+  stops if its "rewinds refused" is not 0 (7.1); then three `precheck` pairs: clean (measured build), wallclock and
+  late-command on the L1 leg (bites build), each line "## pair <p> (wall s): result X, expected PASS|FAIL|VOID" plus
+  the pair's lines whole; results/u4r-precheck-30/<commit12>/runs.txt, no verdict) and `c-u4r-runs.mjs judged --profile
+  P0|P2|P3|B1 --date D` (set u4r-<p>: 3 measured runs, seeds 1-3, SS 48 L1, 10 s + 600 s, tick_start 63,736, marks
+  PM-0001-2,-17,-57 (+ -18 on B1); then one bites-build run per bite of those marks from marks.json at run time, seed
+  1, on P0 for -17's and -57's and B1 for -18's (ws-budget-x2 skipped: L2's), each header PM-0001-2 and its mark; then
+  `npt-judge --only` on the set's folder; results/u4r/<commit12>/<p>/{verdict.json, runs.txt}).
+- c-u2's rules kept: `--date`, refuses uncommitted tracked changes, never overwrites (logs or results), raw logs
+  .gate/netcode-proof-test/runs/<set>-<commit12>/ (one folder per run: npt-judge reads every *.jsonl under --logs,
+  recursively: judge/src/lib.rs:18-27), runs.txt with the commit, the three binaries' SHA-256s, the raw-log path, the
+  judge's line and one line per run (npt-lab's summary + wall seconds). Builds' paths from cargo's
+  `--message-format=json` through check.mjs's exported `builtArtifact` (no copy), copied out before the next build.
+  A 4 GB free-space floor before every run (statfsSync).
+- Choices to report: one profile per judged call (the judge's memory and the disk: ruling 1 point 3); bite runs per
+  mark, one each, since the judge matches a bite run to any part it fits by id (judge/src/eval.rs:1386-1396; marks.json
+  lists bites per mark); no `--bytes` (no part these sets judge reads a replay log). Held by the third ruling and built
+  as the brief says: the B1 runs (point 1), the tick16 run's length and cap (points 3, 7 (a)), -18's no-fallback run
+  (point 4); whole-as-lost runs once the main session adds it to -17's bites in marks.json (ruling 1 point 4).
+
+### B12: the script's lines run by hand on short settings (done; .gate/u4r/c4-b12-1.log, -2.log, -3.log, 01:30-01:33 UTC)
+
+- The script itself cannot run here (it refuses uncommitted tracked changes); each line form it issues, through the
+  runner (-x -k, df 4.9G), binaries from the shared target's release folder, logs under .gate/u4r/b12/, `--commit`
+  2fbec77... (point 33's label: tree 2fbec77 plus the uncommitted U4r changes; the headers' build.binary_sha256 name
+  the binary). Every command exit 0.
+  1. judged, measured (P0): `npt-lab scenario --run l1-p0-s1 --set u4r-P0 --date 2026-11-14 --commit <c> --out <d> --seed 1
+     --scene SS --profile P0 --tick-start 63736 --warmup-s 10 --measured-s 20 (the script: 600) --suite u4r-P0 --role
+     measured --marks PM-0001-2,PM-0001-17,PM-0001-57`: 900 ticks, late 0, rewinds refused 0, measured incomplete 0,
+     shots 700 a measured second.
+  2. judged, measured (B1, -18 listed): the same with `--profile B1 --measured-s 30 --bursts 2 --burst-first-s 5
+     --burst-every-s 15` (the script: 600 s and its defaults 10, 30, 60) `--marks PM-0001-2,PM-0001-17,PM-0001-57,PM-0001-18`:
+     1,233 ticks (33 after), heals 96, late 297, measured incomplete 3,697 (as r2's b1 suite).
+  3. precheck's recording: `npt-lab scenario --run record-SS-P0-s4 --set u4r-precheck-30 ... --scene SS --profile P0
+     --seed 4 --clients 48 --tick-start 0 --warmup-s 4 --measured-s 0 (the script: the entry's 10 and 290) --logs 0
+     --suite record --record <file>`: 120 ticks, rewinds refused 0 (the line the script reads); 220,524 B, sha256
+     6decf613....
+  4. the judge: `npt-judge --marks marks/marks.json --logs <l1-p0-s1> --only PM-0001-2,PM-0001-17,PM-0001-57 --out ..`:
+     each NOT-RUN "1 of 3 valid runs" (one seed).
+  5. judged, bite (bites build): `... --run bite-client-rounding ... --role bite --bite PM-0001-17/client-rounding
+     --marks PM-0001-2,PM-0001-17`: 900 ticks. Its judge line: with `--only PM-0001-17` alone (my first by-hand call,
+     not the script's form) INVALID "pre:PM-0001-2: not in marks.json" (the precondition's mark not loaded); with the
+     script's form `--only PM-0001-2,PM-0001-17` (c4-b12-2.log): the bite **shown**, -17 NOT-RUN "0 of 3 valid runs".
+  6. precheck pairs on a scratch manifest for the short recording (.gate/u4r/b12/precheck-short.json, written by Write,
+     never committed; the script passes crates/lab/precheck-recordings.json), `npt-lab precheck --manifest <m>
+     --recording <file> --commit <c>` [`--bite PM-0001-30/wallclock --bite-leg L1` | `--bite PM-0001-30/late-command
+     --bite-leg L1`]: clean (measured build, binary a8f19f7c...) **PASS (120 ticks, every World hash equal)**; wallclock
+     (bites build be6593d3...) **FAIL (first differing index 3 ...; 117 of 120 differ)**; late-command **VOID (L1
+     late_count 1)**. The measured build rebuilt last (section 4 rule 8).
+- Not run by hand (held by the third ruling): the tick16 bite line (point 3) and -18's no-fallback line (point 4); the
+  -57 bite lines (pos-4cm, yaw-12bit, pitch-8bit) have the bite line's form of item 5.
+
+## Copy 4: state and what is next (a fresh copy resumes here; updated at each block)
+
+- `git status` (26 entries) holds copies 1-3's files plus copy 4's: check.mjs, check.test.mjs,
+  crates/hash-wasm/loader.mjs (header sentence only), crates/lab/src/hash.rs (83 (d)'s test), ops/runs/det-u4.mjs and
+  ops/runs/c-u4r-runs.mjs (new). No plant in place (last restore: hash.rs e590aa2a... at 01:25 UTC); nothing committed;
+  no run going; the measured release build is the last one built.
+- Clean at: .gate/u4r/c4-reg.log (01:33-01:37 UTC: `cargo test --locked -p npt-lab -p npt-bots` exit 0, npt-lab bin 46
+  passed, 1 ignored, lib 5, npt-bots 5; the same with `--features npt-lab/bites` exit 0, npt-lab bin 53 passed, 1
+  ignored: 52 + 83 (d)'s test); c4-83d-reg.log (fmt exit 0, npt-lab clippy both builds exit 0); c4-self3.log and
+  c4-deps.log (check.test.mjs 76 of 76; deps PASS on this container).
+- Point 32: .gate/shared-target/debug/npt-lab-tests/ holds one folder, hash-83d-3588, the 83 (d) plant run's (a test
+  that panics keeps its folder by design); /tmp/npt-lab-tests untouched.
+- Done in copy 4: item 1 whole (ruling 1 point 1 (4)-(7); carries 83 (b)-(d), 84, 85; det-u4.mjs's one run PASS) and
+  item 2 (B12: c-u4r-runs.mjs and its lines by hand).
+- **Next (held for the advisor's third ruling, u4r-build3-questions.md):** item 3, r5 (seeds 1-3 per scene and profile,
+  the slowest kept; 7.3's estimate redone) and section 5's end checks twice (check.mjs whole, each step passing, with
+  section 4 rule 3's provenance builds in the same -x call), and whatever the ruling's points 1-8 change (the brawl,
+  the bite runs' after-phase cap, the mirror's tick keying, contract.rs, precheck.rs's depth assertion, the -18 and
+  tick16 bite runs, and c-u4r-runs.mjs's B1, tick16 and -18 lines with them). Nothing else is open.
+- check.mjs's names newly exported for its self-tests (2.7's count): `run`, `cargoConfigDirs`. The new scripts export
+  nothing.
