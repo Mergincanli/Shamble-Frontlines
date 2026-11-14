@@ -59,6 +59,33 @@ bytes and the judge's peak (over 10 GiB: P0 does not start; plan the smallest ch
   LEFTOVER-DELETE expected). The saver restarted as **bxs0uzskj** at about 20:24. P2's results commit 1eacb60 was made
   just after the restart. **Resumed 20:23 UTC.**
 - **Condition 1 is met** (P2's results committed): **NEXT, U4r-F2's build by Edit, then its evidence and checks.**
+- **U4r-F2 IS BUILT (about 20:25 UTC), uncommitted in the main folder:** c-u4r-runs.mjs only.
+  - **What changed:**
+    - planJudged's runs carry a group;
+    - `split` is true when a set has bites;
+    - a split set's runs go to measured/ and bites/, and the raw-logs line names both;
+    - judgeCall runs a re-check and then a bounded call, once or twice; results/ is made only after both calls;
+    - the SPLIT_LINE constant (condition 3 (b)) and the exit line (3 (d)) are in;
+    - INF-F1-1's header sentence (condition 8) and a new header paragraph are in.
+  - **SIZE-CHECK: 52 insertions, 22 deletions in one file** (planned 40 to 60 added; the advisor expected 50 to 70
+    insertions and 10 to 15 deletions).
+  - **Checks so far:** node --check passes on both scripts; redact-check 284 items, 0 findings
+    (.gate/u4r-f2/logs/redact.log); **gate --no-smoke PASS** (.gate/u4r-f2/logs/gate-no-smoke.log).
+- **Condition 7's figures:**
+  - judge-apart on P2's whole folder (816,387,689 B = 778.6 MiB): full judging 23.0 s (page cache cold after the
+    restart) and 2,173.4 MiB; reading alone 9.1 s and 1,760.0 MiB.
+  - **The four-point fit: 212.5 MiB + 2.5059 x log MiB** (residuals 10 MiB or less).
+  - **F = 1.504** (B1). P3 is 1.440 and P2 1.238.
+  - **The measured call: 2,190.9 MiB of logs, so 5.57 GiB (break-even F 2.75). The bites call: 2,431.9 MiB, so 6.16
+    GiB (break-even F 2.48). Both are at most 10 GiB.** One call would have been 11.52 GiB.
+- **R at P0's start = 4,096 + 1.504 x 3,073.3 + 500 = 9,218.6 MiB.** Free space is 8,147 MiB, so (B) (about 480
+  MiB) and then (C) (7.7 GiB) are needed, done right before P0 with df on the card.
+- **The evidence agent runs:** workflow **wf_ada59e1b-2f4** (task wmg28j1r6; Opus at high effort; notes
+  u4r-f2-evidence-notes.md; harness .gate/u4r-f2/harness/; logs .gate/u4r-f2/logs/; real-judge check
+  .gate/u4r-f2/real/). **If cut:** `resumeFromRunId: "wf_ada59e1b-2f4"` with its script in the workflow scripts
+  folder, or a fresh agent that reads its notes and the diff first. The script stays uncommitted: nothing runs from it
+  until the commit. **On return:** read its result whole. Then infra-engineer's one round (Q5), one commit (the
+  script; the card), push, CI, and the advisor's review of the head. Ask it then about P2's fingerprint difference.
 - **U4r-F2's PLAN IS APPROVED WITH CONDITIONS 1-9 (about 19:10 UTC): advisor-u4r-f2-plan-full.md** (72 lines,
   sha256 56ee4aba…, written word for word by u4r_f2_plan_review_full.py). Its three Mediums (F2-1, F2-2, F2-3) were read
   in full, and its conditions answer them.
