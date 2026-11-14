@@ -1,15 +1,19 @@
-# Plan: foundation steps 2.4 and 2.5 and Slice 1, move and shoot (revision 1)
+# Plan: foundation steps 2.4 and 2.5 and Slice 1, move and shoot (revision 2)
 
 _Written by the build chat (session_019YNMUV9LFhASseJ9EP12kL, Mustafa's personal account, main model Fable 5.2) on
 2026-11-14, for Mustafa and the Advisor. Base: main 4460ef5. His task and his addition of 15:03 stand word for word in
 `mustafa-2026-11-14-task.md` and `mustafa-2026-11-14-addition.md` beside this file (copied by script from the
-transcript). This is a plan: nothing is built, and no file outside `.checkpoints/` is edited._
+transcript). This is a plan: nothing is built, and no file outside `.checkpoints/` is edited. Revision 2 folds in the
+advisor agent's review of revision 1 (Part 14) and the three Art sheets he sent during it (Part 4)._
 
 ## In one screen
 - **The cut.** Twelve change-sets from step 2.4 to the end of Slice 1, plus two that stand beside them: a short
   research unit first (the rules a model file must follow, for the Art project's Blender brief), and the change-set in
   which the first Blender model replaces the code-built soldier, which takes its place as soon as the model exists.
   Each merges on its own, one pull request at a time, on your go.
+- **The Art project's first three sheets are in** (the Conscript in three factions, the Conscript as a code-built
+  stand-in with its sizes and four materials, the street-corner test scene): Part 4 says what the plan takes from
+  them and what is still needed.
 - **What you can open, and when.** Change-set 1 has nothing to open (shared data descriptions only). Change-set 2 is
   the first thing you open in Brave: an empty lit ground that names its graphics backend and counts ticks. From
   change-set 4 on you play: walk (with the live camera panel), then twelve soldiers, the comic look, fake lag, shooting,
@@ -38,6 +42,8 @@ transcript). This is a plan: nothing is built, and no file outside `.checkpoints
   5.5: they follow my change-sets from the 2.3 chat (decision GATE-FOLLOW).
 - **Every merge needs your go.** `crates/` and `packages/` are outside the places the PR Advisor may merge
   (`.claude/hooks/routine-guard.mjs:84`), and from change-set 2 on each change-set also has a Brave check.
+- **How a build reaches your laptop before preview links exist** is the one step not proven yet: a zip through this
+  chat's file tool, and one command (Part 8). This plan comes to you as a file to try that route.
 - **Estimate.** About 28,000 lines of hand-written code and tests, about 190 hours of session work (building plus
   reviews at effort max), in 14 units. With your checks and gos between them: four to six weeks. These are estimates,
   good to about half as much again either way; each change-set stops and tells you if it passes twice its planned size.
@@ -70,6 +76,7 @@ transcript). This is a plan: nothing is built, and no file outside `.checkpoints
 - **Evidence by kind of change** (CLAUDE.md, protocol step 4): logic by tests on the real code; netcode by
   deterministic tests with injected delay, jitter and loss (L1); performance by numbers with their method; anything
   visible by screenshots that name their backend, then your eyes in Brave.
+- **Every change-set ends** with its report and with docs-keeper's pass over STATUS, ROADMAP and the repository map.
 - **Models and effort.** This chat and every builder agent it starts: Fable 5.2. Every other agent: Opus 5.5. Agents
   that review, verify or design game and engine code: effort max, passed by the caller (the agent files still say
   high). The advisor tool stays off. At most 3 agents at a time; the saver runs; a checkpoint after every step.
@@ -88,15 +95,15 @@ transcript). This is a plan: nothing is built, and no file outside `.checkpoints
 | 1 | Types (step 2.4) | Nothing to open: the page and the simulation share one generated description of their data, and a test fails when they drift | 600 | about 7 h | no | your go |
 | 2 | First page (step 2.5, first half) | An empty lit ground with a metre grid; a corner label names WebGPU or WebGL 2, counts ticks at 30 a second and shows your frame rate | 2,000 | about 13 h | yes | your go |
 | 3 | The loop closes (step 2.5, second half) | The same page, alive: press keys and a small key diagram lights up, echoed back by the local server through the real messages; counters show ticks, messages and zero lost presses | 2,700 | about 15 h | yes | your go |
-| 4 | Walk | You walk and jump a plain stand-in soldier around a grey test yard, aim with the mouse, and tune the camera live with sliders and five presets | 3,900 | about 18 h | yes | your go |
+| 4 | Walk | You walk and jump a plain stand-in soldier around the test scene (the Art sheet's street corner, in plain shapes, with a training yard beside it), aim with the mouse, and tune the camera live with sliders and five presets | 3,900 | about 18 h | yes | your go |
 | 5 | Twelve | Eleven stand-in soldiers walk patrol loops around you; a bench button prints what the hand-off between page and simulation costs on your laptop, at 12 and at 48 | 1,500 | about 9 h | yes | your go |
-| 6 | Look | The same yard and squad in the comic look: cel shading, black ink outlines, sun and soft shadows, a slimmer soldier built in code from the Art sheets; a switch between the two outline methods and a frame-time readout | 2,300 | 17 to 21 h | yes (the look) | your go |
+| 6 | Look | The same scene and squad in the comic look: cel shading, black ink outlines, sun and soft shadows, the Conscript of the Art sheets built in code; a switch between the two outline methods and a frame-time readout | 2,300 | 17 to 21 h | yes (the look) | your go |
 | 7 | Lag | A "fake lag" switch: at 100 ms of lag your own soldier still answers at once, and the others move smoothly a moment behind | 2,200 | about 15 h | yes | your go |
 | 8 | Shoot | You shoot the SMG and the rifle at the walking dummies: tracers, a hit marker when the hit is confirmed, health bars, deaths and respawns, an ammo counter and reload | 4,400 | about 23 h | yes | your go |
 | 9 | Throw | You throw the frag grenade and fire the bow and the shotgun: arcs, bounces, blasts that hurt by distance | 2,100 | about 13 h | yes | your go |
 | 10 | Body | The soldiers move like soldiers: steps, the body reacting to strafing, an aim pose, recoil, the death fall | 1,800 | 13 to 16 h | yes | your go |
 | 11 | Feel | The guns get their punch: comic muzzle flashes, tracers, impact puffs, the hit marker and kill confirm, dummies that flinch, camera kick, gun and grenade sounds, fragments and the concussion shake | 2,500 | 17 to 21 h | yes (sight, sound, feel) | your go |
-| 12 | Close | A two-minute target course on the yard with a timer and a score, to judge moving and shooting as a whole; the slice's marks measured with everything on | 1,000 | about 10 h | yes | your go |
+| 12 | Close | A two-minute target course through the scene with a timer and a score, to judge moving and shooting as a whole; the slice's marks measured with everything on | 1,000 | about 10 h | yes | your go |
 | M | The first model | The Blender soldier stands where the code-built one stood, in each faction colour | 1,200 | about 12 h | yes (the look) | your go |
 
 Sum: about 28,200 lines and 188 to 199 hours.
@@ -174,7 +181,7 @@ when and what. No code.
 
 **4. Walk.** Slice 1 begins: the first playable build, with your camera panel.
 - The `content` crate enters: JSON read and validated by one loader with one canonical writer, a format name and
-  version per file, the movement table from the legacy tuning import, the yard as a small greybox map document; its
+  version per file, the movement table from the legacy tuning import, the test scene as small greybox map documents; its
   schema and TypeScript types generated like the rest; in development a saved content file reaches the Worker within
   a second.
 - `sim`: the soldier table with its ids, the tick's loops, our own movement on parry3d's queries (walk, sprint,
@@ -183,10 +190,12 @@ when and what. No code.
   legacy's reach: which reach v2 keeps is an open rule question (OQ-0002-6), for the game-designer and you.
 - The path: the command with its aim point (the Worker casts the page's cursor ray), soldier fields in the snapshot,
   the block's soldier section, interpolation between the two newest blocks on the page.
-- The page: a plain stand-in figure (it shows facing and aim; the Look change-set replaces it), the yard, the follow
-  camera at legacy's framing, and **the live camera tuning panel** (Part 5).
-- The yard is built from the marks' own fixtures, so the tests and the play share one scene: a step of 0.55 m and one
-  of 0.56 m, ledges and platforms with ramps, thin walls, a lane with range posts.
+- The page: a plain stand-in figure at the Art sheet's sizes (it shows facing and aim; the Look change-set replaces
+  it), the scene, the follow camera at legacy's framing, and **the live camera tuning panel** (Part 5).
+- The test scene has two parts. The street corner of the Art sheet (two houses, an alley, a wall for cover, a
+  street, at the sheet's sizes) is where you play; here its houses are plain solid shapes. Beside it a training yard
+  is built from the marks' own shapes, so the tests and the play share them: a step of 0.55 m and one of 0.56 m,
+  ledges and platforms with ramps, thin walls, a 50 m lane with range posts.
 - Two rules must start somewhere before their design questions are answered: the jump's reach and what happens when
   two soldiers meet (decision START-RULES).
 - Measured here: identical hashes natively, in Node and in Chromium on a movement recording; movement against its data
@@ -204,11 +213,12 @@ when and what. No code.
 - Three small separate tests ride here, because the game builds one of each pair: the block's two layouts (per
   entity against per field), the shared ring against the transferred block, and the two-instance Worker of
   change-set 3 at 12 and 48 soldiers. Each is kept as a build you can run later on the named machines (Part 3.2).
-- Reviewers: engine-architect, perf-auditor, test-engineer, rust-reviewer.
+- Reviewers: engine-architect, perf-auditor, test-engineer; then rust-reviewer, security-auditor (the bench table's
+  text and its copy button).
 
 **6. Look.** The look's techniques on the real game, measured on the weakest machine.
 - Toon materials with shared ramps per material class; both ink families behind a switch (screen-space and hull), for
-  your pick; the sun with soft shadows, a warm sun and cool shadows; the value hierarchy on the yard; glow only on
+  your pick; the sun with soft shadows, a warm sun and cool shadows; the value hierarchy on the scene; glow only on
   emissive slots; the shared scene pass every effect reads; the quality tiers as data (Low and High); every material
   variant compiled behind the loading screen, so nothing stutters at first sight; the same look on WebGPU and on the
   WebGL 2 fallback.
@@ -218,7 +228,7 @@ when and what. No code.
 - The measurement harness gets its GPU side (timestamp queries).
 - Measured here: each technique's cost alone; both ink families at 12, 24 and 48 soldiers; the Low frame; draw calls;
   the same pixels on both backends; no compile after the loading screen.
-- You judge: the look checklist's steps that a soldier, a yard and a weapon can show (Part 5 lists them).
+- You judge: the look checklist's steps that a soldier, the scene and a weapon can show (Part 5 lists them).
 - Reviewers: graphics-engineer, art-director, perf-auditor; then test-engineer.
 
 **7. Lag.** Prediction and reconciliation, against the local server.
@@ -269,7 +279,7 @@ when and what. No code.
 - Reviewers: graphics-engineer, art-director, perf-auditor; then game-designer, test-engineer.
 
 **12. Close.** Slice 1's marks with everything on.
-- The target course as yard content; the slice's recordings for the determinism check; the hand-off marks at 12
+- The target course as content of the scene; the slice's recordings for the determinism check; the hand-off marks at 12
   players again with every section in the block; a match that ends, restarts and leaves nothing behind; STATUS,
   ROADMAP and the repository map.
 - Its report lists, mark by mark, what of Slice 1's done-when is met and what is still only shown or still waits
@@ -343,7 +353,29 @@ or CI check of the 2.3 chat that follows my change-set n (decision GATE-FOLLOW).
 | ADR 0005: content item 6 | a stale or altered bundle is refused or fetched again (3 cases); a repeat visit loads it from the cache; the Rust hash equals WebCrypto's | 8 | 8 in local play; its record half with the match record (Slice 4) |
 | ADR 0005: ability item 2 | per shot, each legacy weapon equals the legacy tables (integers exactly, floats within 1e-6) | 8 (single-ray weapons), 9 (pellets, the bow, the grenade) | 9 |
 
+### What is still open when change-set 12 merges
+Change-set 12 ends the building of Slice 1. It does not by itself make Slice 1's done-when lines true. Its report
+lists every row above with its state, so that "Slice 1 is done" is not said early. By this plan the open ones will be:
+- **Waiting for the 2.3 chat's CI jobs:** every "in CI" clause for WebAssembly and for Firefox and WebKit: the
+  determinism suite on every target, PM-0002-64, the gate on render counts, the goldens' planted moves, and the gate
+  forms of the type marks.
+- **Waiting for named machines:** every timed clause: the hand-off marks inside PM-0002-70 (marks 4, 7, 8 and 13),
+  PM-0001-43, the comparisons of Part 3.2; Safari on the Mac; Windows on the minimum laptop for the determinism suite.
+- **Waiting for a later slice, by the mark's own nouns:** the real-network halves of PM-0001-20, -41 and -42 (Slice
+  3); snapshot times and the movement cost in the stress scene (Slice 6); the bots-only match and the bot shots
+  (Slice 2); the vehicle clauses; content item 2's later kinds (Slices 2 and 4); content item 6's mode id, real join
+  and match record (Slices 2, 3 and 4); ability item 2's "a bot equals a human" (Slice 2).
+- **Waiting for you:** your picks from change-set 6, and the first model if it has not landed.
+
+Slice 2 may start with these written down: by your rule, a mark that fails later sends back the code that rests on it.
+
 ## Part 3. Every question and pass mark of the tests you named (your item 3)
+
+**One rule for every row below.** A mark keeps all of its own clauses: its machines, its browsers, its run counts,
+its "in CI", its nightly run. A row names the change-set that first shows the mark here (natively, in Node, in
+Chromium) and, under "later clauses", what is special to it. The clauses that name CI's three browser engines join
+when the 2.3 chat's CI job runs them; those that name the minimum laptop, the desktop or the Mac join when the
+machine is named and on hand. Until every clause holds, the mark is shown or read, not met.
 
 ### 3.1 What is measured first, and why
 Each of these would cost the most to learn late. Each is placed at the first build that can show it honestly.
@@ -362,22 +394,26 @@ Each of these would cost the most to learn late. Each is placed at the first bui
 
 ### 3.2 Questions the real game cannot answer: the separate tests that stay
 Your rule: a test is built separately only where the plan shows a question the real game cannot answer. These marks
-compare the game against a second version it will not contain. Each stays a small throwaway test on a scratch copy,
-never merged, at the change-set that gives it its subject.
+compare the game against a second version it will not contain. Each stays a small separate test at the change-set
+that gives it its subject. None is merged into the game, and none is thrown away before its mark is judged: each is
+kept two ways, as a patch file in its change-set's report (text, so it can be rebuilt) and as a build with the bench
+page, which runs unchanged on the named machines later. Until a comparison is judged on the machine its mark names,
+the side the game builds is provisional.
 
-| Mark | The question | Where | Size |
-|---|---|---|---|
-| PM-0002-25 | one Wasm instance or two in a local match | 3 | half a day |
-| PM-0002-10 | the block laid out per entity or per field | 5 (48 walkers) | half a day |
-| PM-0002-11 | the transferred block or the shared ring | 5 | one day |
-| PM-0002-27 | the fallback pacing (`Atomics.wait`): by its own words only if PM-0002-26's jitter fails | then | one day |
-| PM-0004-33's comparison builds | the size of our Wasm against the same with rapier3d and against an ECS stub | 4 | half a day |
-| PM-0004-34 | Rapier's own character controller against our movement | after 4 | one day (decision COMPARE) |
-| PM-0004-26 | native AArch64 added to the determinism suite: by its own words only before an ARM host may be picked | then | an ARM machine |
-| PM-0004-40, -44 | both navigation generators | Slice 2's plan | |
-| PM-0003-27 | two other ways to draw soldiers against the chosen one | Slice 2's plan | |
-| PM-0003-31 | two ways to draw a field of props | Slice 5's plan | |
-| PM-0003-40 | occlusion rays for sound: by its own words only if ever proposed | then | |
+| Mark | The question | Built | Judged | Size |
+|---|---|---|---|---|
+| PM-0002-25 | one Wasm instance or two in a local match | 3 (does a trap in the client endpoint leave the authority running); 5 (calls, time and memory at 12 and 48 soldiers) | counts here; time and memory on the minimum laptop in Chrome, when named. Reported, as the mark says | half a day, twice |
+| PM-0002-10 | the block laid out per entity or per field | 5 (48 walkers); again in 12, with the event and projectile sections | reported: every cell on the minimum laptop (Chrome, Edge, Firefox) and on the Mac (Safari), when named | half a day |
+| PM-0002-11 | the transferred block or the shared ring | 5 | on the minimum laptop, when named (Safari reported). Until then the transferred block is provisional | one day |
+| PM-0002-27 | the fallback pacing (`Atomics.wait`): by its own words only if PM-0002-26's jitter fails | then | as PM-0002-26 | one day |
+| PM-0004-33's comparison builds | the size of our Wasm against the same with rapier3d and against an ECS stub | 4 | sizes are the same on every machine: recorded at 4, and by CI when its job exists | half a day |
+| PM-0004-34 | Rapier's own character controller against our movement | after 4 (parity on the ledge block, size) | its cost clause on the reference server, with PM-0004-31, at Slice 6, on the kept build | one day (decision COMPARE) |
+| PM-0005-16's size half | the bytes content adds: the Wasm with the loader against a build with a stub loader | 4 | recorded at 4 | an hour |
+| PM-0004-26 | native AArch64 added to the determinism suite: by its own words only before an ARM host may be picked | then | an ARM machine | |
+| PM-0004-40, -44 | both navigation generators | Slice 2's plan | | |
+| PM-0003-27 | two other ways to draw soldiers against the chosen one | Slice 2's plan | | |
+| PM-0003-31 | two ways to draw a field of props | Slice 5's plan | | |
+| PM-0003-40 | occlusion rays for sound: by its own words only if ever proposed | then | | |
 
 ### 3.3 The boundary spike: PM-0002-1 to -34, -77, -78; PM-0004-8, -28, -61, -68 to -70; PM-0006-28 to -31
 | Mark | Where on the real game | Later clauses |
@@ -391,7 +427,7 @@ never merged, at the change-set that gives it its subject.
 | PM-0002-7 | 2 (the method), 5 | |
 | PM-0002-8 | 2 (a first reading), 5 | judged on the minimum laptop's 60 Hz screen |
 | PM-0002-9 | 8, again in 12 | 48 soldiers at Slice 2 |
-| PM-0002-10, -11 | separate tests at 5 (3.2) | |
+| PM-0002-10, -11 | separate tests at 5, -10 again in 12 (3.2) | each judged on the minimum laptop and the Mac, when named |
 | PM-0002-12 | 3 | |
 | PM-0002-13 | 3 (a first reading), 5 | judged on the minimum laptop |
 | PM-0002-14 | 4 (the aim in the post), 8 (shooting) | |
@@ -400,7 +436,7 @@ never merged, at the change-set that gives it its subject.
 | PM-0002-20 | 2 | three engines in CI: 2.3 after 3 |
 | PM-0002-21 | step 2.6, and by its own words only if production turns isolation on | |
 | PM-0002-22, -23, -24 | Slice 3 (they need the online client) | |
-| PM-0002-25 | separate test at 3 (3.2) | |
+| PM-0002-25 | separate test: the trap clause at 3, the numbers at 12 and 48 soldiers at 5 (3.2) | time and memory on the minimum laptop |
 | PM-0002-78 | 5 (48 walkers, reported) | bots at Slice 2, online at Slice 3 |
 | PM-0002-26 | 2 and 3 (jitter, the hidden tab), 4 (smoothness) | 48 soldiers at 5 and Slice 2; online at Slice 3; the named machines |
 | PM-0002-27 | conditional (3.2) | |
@@ -423,7 +459,7 @@ never merged, at the change-set that gives it its subject.
 | PM-0004-2, -3, -4, -5 | Slice 6 (the stress scene on the reference server) | |
 | PM-0004-6 | 4 (zero allocations in the step, counted), 9 (the projectile pool's burst) | the effect pool at Slice 4; the full form at Slice 6 |
 | PM-0004-7 | 5 (a reading at 12) | judged in the stress scene on the minimum laptop (Slice 6) |
-| PM-0004-9 | 8 | |
+| PM-0004-9 | 8 (the 13 legacy intervals) | its duel clause (the Warrior kills the Conscript in 0.86 s) with the units' data, at Slice 2, as PM-0005-25 |
 | PM-0004-10 | 3 | |
 | PM-0004-11 | 4, read again in 8 | |
 | PM-0004-12 | 7 (the zero-allocation count) | its times at Slice 6 |
@@ -433,13 +469,13 @@ never merged, at the change-set that gives it its subject.
 | PM-0004-16 | 7 | the bots-only match form at Slice 2 |
 | PM-0004-17 | 3, meaningful from 4 | Slice 2's form |
 | PM-0004-18 | 3 | the stress scene's form at Slice 6 |
-| PM-0004-19 | 3, then every recording from 4 on | Firefox and WebKit in CI; Safari on the Mac; Windows on the minimum laptop once; the six bot matches at Slice 2 |
+| PM-0004-19 | 3, then every recording from 4 on | Firefox and WebKit in CI, with its nightly run; Safari on the Mac; Windows on the minimum laptop once; the six bot matches at Slice 2 |
 | PM-0004-20 | 4 | the stress scene's form at Slice 6 |
 | PM-0004-21 | 3 (the same digest and bytes on 64 and 32 bits), 4 (the three planted divergences) | |
 | PM-0004-22 | 3, run again whenever a function joins (4, 9) | Safari on the Mac |
 | PM-0004-23 | 3 (the scan test) | the lints: 2.3 |
 | PM-0004-24 | 3, 4 | with PM-0004-60's fuzzing |
-| PM-0004-25 | 4 (the suite with SIMD on decides whether it may be on) | again at Slice 2 |
+| PM-0004-25 | 4 (a reading: the slice's recordings with SIMD on) | SIMD stays off until the mark's whole suite passes with it on: the bot matches of Slice 2, Firefox and WebKit in CI, Safari on the Mac |
 | PM-0004-26 | conditional (3.2) | |
 | PM-0004-27 | 3 (the vectors) | the cost at Slice 6 |
 | PM-0004-29 | laid out from 8; shown at Slice 3, where the draft places it | |
@@ -447,7 +483,7 @@ never merged, at the change-set that gives it its subject.
 | PM-0004-31 | 5 (a reading) | Slice 6 |
 | PM-0004-32 | 4 | its build time on the reference server |
 | PM-0004-33 | 4 (our own size and the rebuild time); the comparison builds as a separate test (3.2) | |
-| PM-0004-34 | separate test (3.2) | |
+| PM-0004-34 | separate test after 4 (3.2) | its cost clause on the reference server at Slice 6 |
 | PM-0004-35 | 4 (soldier pairs), 9 (the grenade's) | hull pairs when vehicles exist |
 | PM-0004-36 | 8 (the 20,000 rays) | bot shots at Slice 2 |
 | PM-0004-37 | 9 | |
@@ -469,8 +505,11 @@ never merged, at the change-set that gives it its subject.
 ### 3.5 The 60 Hz run: PM-0001-39, -40, -63; PM-0004-71, -72
 All five decide at Slice 6, on the real simulation in the stress scene, as the drafts already say ("slice 6 decides").
 The early signal of wave 1 ran on the sim core spike's throwaway simulation, which is no longer built; no mark is
-lost with it, because it decided nothing. One part can be read early: the 12-tick replay of PM-0001-40 is timed from
-change-set 7 on. The tick rate stays one constant and every duration is data, so 60 Hz stays possible.
+lost with it, because it decided nothing. Three parts are shown earlier, as readings, in a 60 Hz build of the real
+simulation: PM-0004-72's shot counts (every legacy interval fires the same number of shots at 30 and at 60 Hz) at
+change-set 8, which also shows that change-set 4's time unit holds at 60 Hz; PM-0004-72's tunnelling clause at
+change-set 9; and the 12-tick replay of PM-0001-40 from change-set 7 on. The tick rate stays one constant and every
+duration is data, so 60 Hz stays possible.
 
 ### 3.6 The look proof test: PM-0003-1 to -17 (PM-0005-33 to -37 are in 3.8)
 | Mark | Where on the real game | Later clauses |
@@ -483,9 +522,9 @@ change-set 7 on. The tick rate stays one constant and every duration is data, so
 | PM-0003-6 | 6 (the harness's GPU side) | |
 | PM-0003-7 | 6, 11, 12 | complete at Slice 5 (damage stages, the roof fade) |
 | PM-0003-8 | 6 (the soldier), 11 (effects) | complete at Slice 5 |
-| PM-0003-9 | 6 (toon, both inks, ambient occlusion, glow, the shadow map, multisampling), 11 (effects) | the roof fade at Slice 5; halftone and line boil with the first big moment |
+| PM-0003-9 | 6 (toon, both inks, ambient occlusion, glow, the shadow map, multisampling), 11 (effects) | the roof fade at Slice 5; halftone and line boil with the first big moment the server recognizes (Slice 4) |
 | PM-0003-10, -11 | 6 | |
-| PM-0003-12 | 6 (times at 12, 24 and 48 soldiers) | the whole-frame draw count at Slice 6 |
+| PM-0003-12 | 6 (times at 12, 24 and 48 soldiers; the draw count with 48 stand-ins, as a reading, beside your pick of the ink family), 12 (the count again with health bars, effects and projectiles in) | the gated whole-frame draw count at Slice 6 |
 | PM-0003-13 | 6 (a reading) | as written at Slice 6 |
 | PM-0003-14 | 6 | |
 | PM-0003-15 | Slice 5 (the lush patch; Slice 2 if its map holds one) | |
@@ -519,11 +558,11 @@ change-set 7 on. The tick rate stays one constant and every duration is data, so
 | PM-0003-39 | 11 | the cap under load at Slice 2 |
 | PM-0003-40 | conditional (3.2) | |
 | PM-0003-41 | 11 | |
-| PM-0003-42 | 4 (smoothness per frame-cap option) | battery drain on a heavier scene |
+| PM-0003-42 | 4 (smoothness per frame-cap option) | battery drain in a full local match (Slice 2) |
 | PM-0003-43 | at each three.js upgrade after the pin | |
 | PM-0003-44 | Slice 6 | |
 | PM-0003-45 | 12 | the faction swap at Slice 2 |
-| PM-0003-46 | 2 on: every render-path change-set carries a WebGPU smoke run, which is your Brave check on your PC until the minimum laptop is named | |
+| PM-0003-46 | 2 on: every render-path change-set carries a 60-second WebGPU smoke run. Until the minimum laptop is named it is your Brave check on your PC, as a reading: the page's report carries the errors, the counts against the baseline and the backend's name | the same run on the minimum laptop, when named; CI's own WebGPU run if a CI engine gets WebGPU |
 | PM-0003-47 | 8 | |
 
 ### 3.8 The content and ability spike: PM-0005-1 to -32; PM-0004-62 to -66, -75. And the look proof test's share: PM-0005-33 to -37
@@ -540,7 +579,7 @@ change-set 7 on. The tick rate stays one constant and every duration is data, so
 | PM-0005-9 | Slice 2 (the maps migrate there) | |
 | PM-0005-10 | 4 (local play: a saved change checked within a second, the next match runs on it), 8 (with the SMG's damage, as the mark words it), 11 (a feel-kit change shows within a second) | the development server's half at Slice 3 |
 | PM-0005-11 | conditional: only if a running match may take changed content (OQ-0005-CD4 (b)); Slice 3 | |
-| PM-0005-12 | 8 (the three tampering cases, the hash against WebCrypto, the repeat visit from the cache) | the mode id at Slice 2; the hash at a real join at Slice 3 |
+| PM-0005-12 | 8 (the three tampering cases, the hash against WebCrypto, the repeat visit from the cache) | the mode id at Slice 2; the hash at a real join at Slice 3; the hash in the match record at Slice 4 |
 | PM-0005-13 | Slice 3 (the server's check of overrides) | the editor's half at Slice 5 |
 | PM-0005-14 | 4 (the walk over every leaf from its first run; movement mapped; the look values listed), 8 (weapons) | every kind imported: Slices 2 and 4 |
 | PM-0005-15 | 8 (weapon entries), 11 (the feel kit), M (the asset list and slot classes) | the full scenario with abilities at Slice 4 |
@@ -583,50 +622,63 @@ change-set's report; the drafts themselves are edited only in docs change-sets t
 | Slice 2 | R4-NAV-OQ1 to OQ3; R4-LOS-OQ5; R3-CHAR-OQ2; R3-AUDIO-OQ1 and OQ6; OQ-0003-19; OQ-0005-AP2; R1-ABL-OQ6 |
 | Slices 3 to 5 | R6-OBS-OQ3 and OQ4 (Sentry, Slice 3); OQ-0005-CD1 and ABL-PREDICT (Slice 4); OQ-0003-6, -8 and -9, R3-LOOK-OQ3, R3-CHAR-OQ4 (Slice 5) |
 | Slice 6 | R1-ECS-OQ4; R1-TICK-OQ5 and OQ9; R4-OBST-OQ4; R3-BUDGET-OQ6; R3-CHAR-OQ6; OQ-0005-AS1, AS2 and AS5 on the full scene |
-| No build answers these; they are decisions | OQ-0003-1 (which machines: yours); R1-TICK-OQ7 (the player count PM-0004-8 is judged at: a design question); OQ-0004-11 (which row gives way in a full pool); OQ-0005-AP1 (where the asset step runs: the rest of the asset research) |
+| No build answers these; they are decisions | OQ-0003-1 (which machines: yours, decision MACHINES); R1-TICK-OQ7 (the player count PM-0004-8 is judged at: a design question in the register, for the game-designer and you, due before Slice 2 judges that mark; until then the mark is reported); OQ-0004-11 (which row gives way in a full pool: the game-designer, and you where a player would notice, before Slice 4); OQ-0005-AP1 (where the asset step runs: the rest of the asset research, Part 12) |
 
 **Count** (checked by a script over this part's tables): 201 marks belong to the six tests of your decision (ADR 0002:
 36; ADR 0006: 4; ADR 0004: 74; ADR 0003: 47; ADR 0005: 37; ADR 0001: 3), and every one has a row. PM-0004-67 belongs to
 the netcode proof test and stays with it. The asset spike's seven marks are in Part 12.
 
 ## Part 4. What Slice 1 needs from the Art project (your item 4)
-Paste the block below into the Art project. Sheets are enough for Slice 1. The rules for a model file are Part 11's
-list, which goes into the Blender brief.
+**Three sheets arrived while this plan was being finished** (you sent them into this chat on 2026-11-14; their text
+and numbers are typed out in `art-sheets-2026-11-14.md` beside this file):
+- **The soldier:** the Conscript's shared tier-one uniform as a stand-in "built in code from simple shapes", with its
+  heights and widths in metres, front, side and in the game's camera, what must read at game size and what may be
+  left out, and the same uniform in the three factions' colours with each faction's marking.
+- **Its materials:** four per soldier, the rifle included: Coat, Top, Trim and Dark. That already fits the drafts'
+  cap (Part 11, rule 16).
+- **The test scene:** a small street corner: a street, grass, two houses with an alley between them and a wall for
+  cover, with sizes, "palette A" as colour values, a sun and a shadow colour, and a line rule.
+
+**What the plan takes from them.**
+- The first soldier is the sheet's Conscript (decision FIRST-SOLDIER now only asks you to confirm it). The code-built
+  stand-in follows the sheet's sizes; the enemy dummies are the same soldier in another faction's colours.
+- The scene you play in is the sheet's street corner. Beside it stands a training yard built from the tests' own
+  shapes (a step of 0.55 m and one of 0.56 m, ledges and platforms with ramps, thin walls, a 50 m lane with range
+  posts), because the marks need those exact shapes. Its colours are the Art project's to say (the block below asks).
+- The sheets call themselves blockouts, "not the design": that agrees with decision STAND-IN-LOOK's recommendation.
+- **One point is not mine to settle.** The sheet's line rule draws units thicker than buildings and says it is final
+  in the look proof test; `docs/LOOK_V2.md` on main says "thick black outlines, especially strong on buildings". The
+  carry of your look decisions settles which stands, and change-set 6 waits for it (Part 5).
+- **One point for the model rules.** The marking changes shape per faction (star, chevron, flower). A shape is not a
+  colour, so the model needs a rule for it (Part 11, "Still open"). The sheet says its shape may be left out at game
+  size, so the stand-in can leave it out.
+
+**Still needed.** Paste the block below into the Art project. The rules for a model file are Part 11's list, which
+goes into the Blender brief.
 
 ```
-For the Art project: what Slice 1 (move and shoot) needs from you.
-Slice 1 needs sheets, not models. Its first soldier is built in code from these sheets; the Blender model replaces
-it later. Give every colour as a hex value and every size in metres.
+For the Art project: what Slice 1 (move and shoot) still needs, after the three sheets of 2026-11-14
+(the Conscript in three factions; the Conscript as a stand-in; the street corner in palette A).
+Sheets are enough: Slice 1's soldier is built in code from them, and the Blender model replaces it later.
+Give every colour as a hex value and every size in metres. Where anything below differs from Mustafa's look
+decisions of 13 and 14 November, those win.
 
-A. The soldier (one sheet)
-1. Which soldier: the first unit of the game (Mustafa names it), in one faction's colours.
-2. Three flat views at one scale: front, side, and from above at the game camera's angle. The camera looks down
-   from far away, so the view from above matters most.
-3. Proportions in numbers: total height; the heights of knee, hip, shoulder, chin and top of head; shoulder width;
-   head size. (Look brief: slimmer, serious proportions; references XIII and Valiant Hearts.)
-4. The parts that make the silhouette, in order of importance from above: headgear first, then the weapon, the
-   shoulders, the coat's shape, the pack.
-5. The colour areas: which parts take the faction's colour and which stay neutral (cloth, metal, skin). The game's
-   drafts allow at most 4 colour areas on a soldier, counting body, headgear and held weapon together: say which
-   four, and which you would add if more became possible.
-6. The uniform details that must survive at small size, each marked "must read from the game camera" or "close-up
-   only".
-7. How he holds the gun at rest and when aiming.
+A. The soldier: three small things
+1. How he holds the gun when aiming and when running (the sheets show it across the chest).
+2. Where the marking sits when its shape is left out at game size: is the plain shoulder board enough?
+3. Whether the hat and the rifle are parts of the body's model or models of their own.
 
-B. The weapons (one sheet per gun; the first gun first, the others can follow)
+B. The guns (one sheet per gun: the rifle of the sheets and the SMG first; shotgun, grenade and bow can follow)
 1. Side view and top view at the soldier's scale, with the length.
 2. The three or four shapes that make its silhouette (never a plain tube).
 3. Where the hands grip, where the muzzle is, where shells leave.
-4. Its colour areas, as for the soldier.
+4. Its colours: the stand-in sheet draws the rifle in the Dark material. Does every gun stay Dark?
 
-C. The test yard (one sheet). Its shapes are fixed by the tests: plain blocks, a step, ledges, ramps, thin walls and
-   a shooting lane with range posts. It needs colour and light:
-1. A palette for plain blocks: ground, low blocks, high blocks (higher is lighter), walls, range posts, backdrop.
-   The yard sits one step calmer than soldiers and effects.
-2. The light: the sun's direction and colour, the shadows' colour (warm sun, cool shadows), how dark shadows are.
-3. The ink: the line colour, and how thick an outline is on a soldier and on a block, as a share of the soldier's
-   height on screen (thick on silhouettes, thinner inside).
-4. The target dummies: how an enemy differs from the player at a glance (a second faction's colours).
+C. The scene: two small things
+1. The training yard beside the street corner is plain blocks, ledges, ramps and range posts: which of palette A's
+   colours do they take? (The loop spec's rule for greybox maps reads height through brightness, higher is
+   lighter; say if the yard should follow it.)
+2. How the ground looks where the street meets the grass, if it should be more than two flat colours.
 
 D. Effects (one sheet per gun, one for the grenade). For each: a small drawing or a reference, its colours, its size
    beside the soldier, and how long it lasts.
@@ -640,7 +692,7 @@ D. Effects (one sheet per gun, one for the grenade). For each: a small drawing o
 
 E. HUD pieces (one sheet): the ammo counter and reload, health bars over soldiers, the cursor, the hit marker.
 
-F. Not needed for Slice 1: buildings, trees, vehicles, the three factions' full uniforms, the map.
+F. Not needed for Slice 1: trees, vehicles, more buildings, other units.
 ```
 
 ## Part 5. Your queued words for Slice 1, and the look (your item 5)
@@ -662,13 +714,17 @@ CD5)."
 and 14 November are not in it).
 - **Wait for the carry:** 6 Look, 11 Feel and M (the first model). 10 Body waits only if the carry changes how
   soldiers move.
-- **Do not wait:** 1 to 5, 7, 8, 9 and 12. Their figures and yard are plain on purpose and are judged for nothing
+- **The Art sheets and the brief.** The sheets you sent today hold look choices that the brief on main does not hold
+  yet: the factions' colours, palette A, and a line rule that draws units thicker than buildings, where LOOK_V2 §2
+  says "thick black outlines, especially strong on buildings". For v2 work the brief wins (CLAUDE.md), so the carry
+  brings them into it before change-set 6 is built. Until then the plan takes only sizes and layout from the sheets.
+- **Do not wait:** 1 to 5, 7, 8, 9 and 12. Their figures and scene are plain on purpose and are judged for nothing
   but play.
 - **What you judge in Brave, by change-set** (the look checklist of ADR 0003, PM-0003-17; step numbers are the draft's):
   - 2: step 1 (the page loads; the backend named).
   - 6: steps 2 and 3 (the whole frame: comic rendering, bold ink, not a children's game), 4 (the two ink families,
     your pick), 5 (colours as authored or tone-mapped, your pick), 6 (soft shadows), 7 (ink and corner shading on and
-    off), 9 (one unit far and near), 16 (the yard one step calmer), 18 (warm sun, cool shadows), 28 (pixel ratio on
+    off), 9 (one unit far and near), 16 (the scene one step calmer), 18 (warm sun, cool shadows), 28 (pixel ratio on
     Low, your pick), 31 (the Low frame beside High), and 29 in part (the legacy touches the brief does not name).
   - 9 and 11: steps 24 and 25 (the grenade: fragments, the shake), 26 (the SMG's whole feel kit), 17 in part (muzzle
     flashes glow).
@@ -736,11 +792,16 @@ Tools run by their path: the settings deny `npx`, `npm run` and `npm test` in se
 **What these cannot show**, said in every report: Firefox and WebKit (the container has Chromium only); Safari; any
 timed mark on a named machine; the gate's planted-defect runs (`--prove`).
 
+**The sim's rules, until the lints exist.** The advisor agent ruled in this plan's review (Part 14): the scan test in
+the sim crate may stand in for the 2.3 chat's float ban until that lint merges, on three conditions. It checks exactly
+ADR 0004 part 7's allow-list; it runs in today's CI test job; and change-set 3's report calls it interim and names the
+ruling it replaces (the 2.3 plan's ruling that the float ban merges before any float arithmetic enters `sim`).
+
 **The netcode proof test's rules, kept while its spike is in the tree** (as steps 2.2 and 2.3 keep them): no tracked
 file that is not Markdown names the spike's folder; no root `.cargo/config.toml`; no `"type"` in the root
-`package.json`. Each change-set that adds a manifest or a config checks them with the spike's own check on a throwaway
-local merge with PR #40's head, never pushed, as step 2.2 did. That run reads the spike's folder and writes nothing in
-it; if you would rather I only search my own files for the three rules, say so.
+`package.json`. Each change-set that adds a manifest or a config checks the three rules by a search of its own files.
+I do not put the netcode chat's branch on disk and I do not run its check: your words are "never touch spikes/". Its
+check runs in its own chat when it next takes main; a breach it finds there is mine to fix.
 
 **Which of step 2.3's change-sets I need merged first.**
 - **Needed: its docs change-set (CS-A),** which records your decision of today, with your addition of 15:03. Your
@@ -757,18 +818,32 @@ it; if you would rather I only search my own files for the three rules, say so.
   text, with the chat in Accept edits. I expect one such ask in most change-sets (serde, wasm-bindgen, parry3d, and so
   on). By its option (a) the root `package.json` and both lockfiles ask too, so every dependency change would.
 - **Follow my change-sets** (decision GATE-FOLLOW): the gate and CI checks the 2.3 plan lets ride steps 2.4 and 2.5.
-  That plan was written before your decision of today and ties them to spike reports that no longer come first: its
-  later parts need your word to follow my change-sets instead. In my order: after 1, G4 (generated types in step);
-  after 2, the wasm-bindgen install and the Wasm tests in CI; after 3, the browser jobs, the determinism step, the
-  network step, and the float ban from change-set 3's vectors.
+  That plan was written before your decision of today. It ties some of them to reports of the six tests, which no
+  longer come first: those need your word to follow my change-sets instead. In my order: after 1, G4 (generated types
+  in step); after 2, the wasm-bindgen install and the Wasm tests in CI; after 3, the browser jobs, the determinism
+  step, and the float ban from change-set 3's vectors.
+- **One check is tied to the netcode proof test, which is not one of the six and still runs:** the gate's network
+  step (G11) re-proves the link simulator that test builds. Your words of 2026-11-13 still stand for it: "Every gate
+  check that needs a result joins later, when that result is in." So the network step waits for the proof test's
+  report unless you say otherwise (GATE-FOLLOW asks). My own L1 tests run in the plain test job from change-set 3
+  either way, because step 2.5's done-when asks for L1 behind the loopback.
 
 ## Part 8. How you open each build in Brave, and when links come (your item 8)
 **Until previews exist: a zip and one command.** A built game is a small folder of files. A browser will not run it
-from a double-click (change-set 2 measures exactly what Brave says), so the zip carries a 40-line server of its own.
+from a double-click (change-set 2 measures exactly what Brave says), so the zip carries a small server of its own:
+one reviewed file of the repository, built in change-set 2, which serves that folder to your own computer only.
+
+**How the zip reaches you: this is the one step not proven yet.** The route is this session's file tool, which puts
+a file with a download button into the chat in the Claude app. Whether that download works on your laptop is not
+shown by any record. Two proofs come before anything rests on it: this plan reaches you as such a file with the
+message that ends this turn, and change-set 1's report carries a small test archive, so a zip is proven before
+change-set 2 needs one. A zip is never committed to the repository: its public history would keep it for good. If
+the route fails, decision BRAVE-ROUTE names the others.
 
 Once, on your Windows laptop:
-1. Open PowerShell and type `node --version`. If it prints `v22` and more, you are done.
-2. If not: install Node.js 22 (the LTS installer from nodejs.org), then repeat step 1.
+1. Open PowerShell and type `node --version`. Any version from 18 on will do. Your Windows run of 2026-11-11 used
+   Node v24, so it is probably there already.
+2. If it prints nothing: install Node.js from nodejs.org (the current LTS installer), then repeat step 1.
 
 For every build:
 1. In this chat I post a file, `shamble-v2-<number>-<name>.zip`, with the commit it was built from. Download it.
@@ -788,9 +863,14 @@ so by your words of 2026-11-12 it belongs in an Opus chat, not here. Its rows th
 
 **When step 2.6 can run:** when four things hold: the hosting check has ended; change-set 2 is merged (there is a page
 to deploy); the 2.3 chat's CI change-set is merged (the build job the deploy job hangs on); and your deploy token sits
-in the `preview` environment, with the question of how production stays out of that token's reach answered
-(OQ-0006-13). If the hosting check starts this week, links can arrive around change-sets 4 to 6. From then on every
-pull request has a link and the zip is no longer needed.
+in the `preview` environment, with the draft's interim position in place (production deployed only from main, a
+reviewer on previews: ADR 0006 part 13, item B9) and the question of how production stays out of that token's reach
+answered (OQ-0006-13). Its workflows are CI work, so an Opus chat builds step 2.6, not this one. If the hosting check
+starts this week, links can arrive around change-sets 4 to 6. From then on every pull request has a link and the zip
+is no longer needed.
+
+## Part 9. The decisions (your item 9)
+They stand at the end of this plan, under "Decisions needed", so that the asks come last.
 
 ## Part 10. What you do yourself (your item 10)
 **Now**
@@ -800,7 +880,8 @@ pull request has a link and the zip is no longer needed.
 3. Paste Part 4's block into the Art project. Paste Part 11's list into the Blender brief once change-set 0 has
    confirmed it (or now, marked as a draft).
 4. Have the docs chat carry your look decisions of 13 and 14 November into the repo, before change-set 6.
-5. Install Node.js 22 on your Windows laptop, once (Part 8).
+5. Say whether the file that comes with this message can be saved on your laptop (Part 8: it proves the route the
+   builds will take).
 
 **For every change-set**
 6. The Brave check, from change-set 2 on: the steps come with the zip; paste the page's report back.
@@ -809,8 +890,9 @@ pull request has a link and the zip is no longer needed.
    `Cargo.toml`, with the chat switched to Accept edits for that write.
 
 **Once, at their time**
-9. Name the minimum laptop and the recommended desktop (decision MACHINES), and run the bench page on each when a
-   change-set asks: 5 (the hand-off), 6 (the look), 7 (prediction), 12 (the closing run).
+9. Name the minimum laptop and the recommended desktop (decision MACHINES), and run the bench page on each: the
+   short re-run of every timed reading taken before they were named, then 6 (the look), 7 (prediction) and 12 (the
+   closing run) as they come.
 10. Start the preview hosting check in its own chat (decision PREVIEW-START): your Cloudflare account, a test project,
     its token. Later, for step 2.6: the deploy token in the `preview` environment.
 11. Bring the Art project's sheets back before change-set 6.
@@ -818,6 +900,8 @@ pull request has a link and the zip is no longer needed.
     Blender MCP, from the Art project's brief and Part 11's rules), export the GLB, and upload it to this chat.
 13. When a Mac is available: one visit for the Safari rows collected so far.
 14. Screens at 120 and 144 Hz, if you can reach one, for the smoothness rows of change-set 4.
+15. Two feel calls in Brave, as design questions that stay yours (decision START-RULES): how far the jump reaches
+    (change-set 4) and what happens when two soldiers meet (change-set 5).
 
 **Not yours in this work:** nothing on the netcode proof test changes. Its chat needs nothing from this one.
 
@@ -825,24 +909,28 @@ pull request has a link and the zip is no longer needed.
 **Who answers, and when.**
 - This is the export and slot-naming part of the asset research: which checks an export passes (OQ-0005-AS3) and how
   a model's materials are named into the colour areas (OQ-0005-AS4). SPIKE_PLAN gives it to graphics-engineer,
-  "verified like R3".
+  "verified like R3, in its own daytime session".
 - **A first reading is done, today, for this plan.** graphics-engineer (Opus 5.5, effort max) read the drafts, the
   glTF 2.0 specification, the Blender exporter's documentation and source, and the three.js loader's source. The list
   below comes from it; every source line and address is in `graphics-engineer-asset-rules.md` and `asset-rules.md`
   beside this file.
 - **Change-set 0 makes it firm, first after your go** (decision RULES-WHO), in about 6 hours of session work:
-  1. graphics-engineer closes the open points listed under the block;
-  2. one round trip proves the list: a cube and a small skinned figure go through the real exporter and the real
-     loader, on both backends. That needs Blender: headless in this chat's container if it installs there, otherwise
-     one export from your PC;
-  3. the verifier spot-checks the key claims against their sources;
-  4. one docs pull request records it: a research file, and the two open questions marked answered in ADR 0005. That
-     is a decision doc, so it merges on your go.
+  1. graphics-engineer closes the open points listed under the block, as far as reading can close them;
+  2. the verifier spot-checks the key claims against their sources;
+  3. it writes this part's own pass marks, as SPIKE_PLAN asks of the research (the checks a file passes before it
+     enters the game), and places them at change-set M;
+  4. one docs pull request records it: a research file, the two open questions marked answered in ADR 0005 as rules
+     with their proof still to come, and the one line your words of 2026-11-03 give this part: LOOK_V2 §8 says
+     "Spline or Blender". That is a decision doc, so it merges on your go. If the docs chat that carries your look
+     decisions has already written that line, change-set 0 leaves it.
+- **The proof by a real export is not part of change-set 0.** It needs both ends: your Blender (one export of a cube
+  and a small skinned figure, which the Blender session makes from rule 7's call) and the game's loader (change-set
+  2). It runs when both exist, at the latest as the first step of change-set M, and it settles the facing, the scale
+  and the names. Nothing is installed in this chat's container for it, so change-set 0 never waits for your PC and
+  cannot hold change-set 1.
 - **Until then the list is a draft.** It can go into the Blender brief today, marked as a draft: no rule in it is
   costly to change before the first model is made. The names in rules 12 and 21 are proposals of a naming convention,
   not of the look; they need your or the Advisor's OK, because the Art brief will use them.
-- One line of yours rides this part: on 2026-11-03 you said that when it reports, LOOK_V2 §8 says "Spline or Blender".
-  A docs chat is carrying your look decisions into that file, so I leave that line to it unless you say otherwise.
 
 **Does Slice 1's soldier need a skin? Yes.** ADR 0003's line for Slice 1 says "one skinned soldier", and ADR 0005
 says "Soldiers are skinned": one mesh, with joints and weights. Your words of 2026-11-03 set the bar: "blockouts with a
@@ -881,8 +969,9 @@ Scale, axes, origin
 Names
 11. Letters, digits and underscores only: no spaces, dots, colons, slashes or brackets, and no ".001" endings.
 12. One colour area is one material. The material's name is the area's name, and it starts with its class:
-    unit_ (for example unit_skin, unit_cloth, unit_metal), faction_ (for example faction_primary), emissive_,
-    structure_ or environment_.
+    faction_ for an area that changes colour with the faction, unit_ for one that does not, emissive_ for one that
+    glows (structure_ and environment_ are for buildings and ground). For the Conscript of the stand-in sheet:
+    faction_coat, faction_top, faction_trim, unit_dark.
 13. A faction_ area takes each faction's colour in the game: its colour in Blender is only a placeholder.
 14. Only emissive_ areas glow: give each its glow colour as the material's Emission.
 15. Every other area's colour is its material's base colour, set to the sheet's hex value.
@@ -926,11 +1015,14 @@ Not in the file
 | 21 | proposed by the engine: no draft gives a joint list. Its seed is what legacy's animation drives (LEGACY_INVENTORY GA2, GA7, GA8: two-bone arms and legs, spine, chest, head, hands on the gun) |
 | 24 | your item 13 of today; ADR 0006 (:1105-1106) |
 
-**Still open, for change-set 0.**
-- **Four colour areas are few.** The cap counts body, headgear and weapon together. If skin, cloth and metal each
-  take one, one faction area is left, while legacy has five palette roles. More areas need another way to carry colour
-  (a mask in vertex colours, or one texture), which nothing read so far researches (OQ-0005-AS4). How many faction
-  areas the soldier shows is a look question, so it is yours and the Advisor's; the research gives the counts.
+**Still open.**
+- **Four colour areas are few, and the stand-in sheet already fits them:** Coat, Top, Trim and Dark, the rifle
+  included; it folds skin, leather, wood and steel into Dark to get there. More areas would need another way to carry
+  colour (a mask in vertex colours, or one texture), which nothing read so far researches (OQ-0005-AS4). Whether four
+  stay enough is a look question, so it is yours and the Advisor's; the research gives the counts.
+- **The faction's marking is a shape, not a colour** (star, chevron, flower). The rules recolour one model per
+  faction; a shape that changes needs a rule of its own: a small part of its own per faction, or one model per
+  faction. The sheet lets the stand-in leave the shape out at game size, so nothing in Slice 1 waits for this.
 - The names: the class prefixes and the joint list are proposals of a naming convention, to confirm.
 - Sharp or smooth edges in the normals: it depends on the ink family, your pick at change-set 6.
 - Whether headgear is its own model, and the names of the weapon's grip points.
@@ -941,7 +1033,7 @@ Not in the file
 - The checks a file must pass before it enters the game (OQ-0005-AS3), with candidates from this reading: a named
   material from the slot table on every primitive, normals present, one set of joints only, the joint list equal to
   the game's, no images or animations, a known-size object measuring its size in metres, the caps, the file size.
-- The round trip itself, which settles the facing, the scale and the names.
+- The proof by a real export (above), which settles the facing, the scale and the names.
 
 ## Part 12. The first Blender model, and the asset spike's marks (your item 12)
 **The change-set: M, "The first model".** It replaces the code-built soldier with the Blender one. It takes the next
@@ -949,8 +1041,8 @@ free place after change-set 6 (Look) once three things hold: the model file exis
 you have answered MODEL-PUBLIC. After 10 (Body) the model also moves; before it, it stands in one pose.
 
 **What M builds.**
-- Loading: three.js's glTF loader on the page; the file is a plain GLB export (no compression, no LOD step, as your
-  words of 2026-11-03 and ADR 0005 put it for the first models).
+- Loading: three.js's glTF loader on the page; the file is a plain GLB export, with no compression and no LOD step,
+  as ADR 0005 and SPIKE_PLAN put it for the first models.
 - The asset list as client content: each model by id, with its file, its slots and their classes, and its counts; a
   definition that names a missing id, or a slot with an unknown class, is refused at load, naming the file and field.
 - Materials: each slot's name maps to a material class; the engine applies the look (the model carries none); one
@@ -958,6 +1050,9 @@ you have answered MODEL-PUBLIC. After 10 (Body) the model also moves; before it,
 - The skin, bound to the same joints the code-built soldier uses, so the animation of change-set 10 drives both.
 - An unlit debug view, to read a slot's colour back from the screen.
 - The simulation is untouched: an asset decides nothing (a test changes every client value and compares hashes).
+- Its first step is the proof of Part 11's rules on the real file, with the checks change-set 0 wrote.
+- Reviewers: graphics-engineer, art-director, security-auditor (a file from outside enters the game); then
+  perf-auditor, test-engineer.
 
 **How the file reaches the repository.** Under MODEL-PUBLIC (a): you upload the GLB to this chat; I commit it in M's
 pull request. Where model files live for good is an open question of the rest of the asset research (OQ-0005-AP1); M's
@@ -976,7 +1071,7 @@ later, none dropped or loosened.
 | PM-0005-39 | every asset file's name holds its hash; served immutable; a repeat visit costs 0 bytes; under 25 MiB | the hash in the name and the size, at M | the cache header and the repeat visit on a preview link: at step 2.6, or at M if previews exist by then |
 | PM-0005-40 | the gate fails an over-budget asset and a budget raised without the budget file | a test compares the soldier's entry with the two caps the drafts derive | the gate's own check with its planted defects: 2.3, after M; the budgets beyond the two caps come from the rest of the research (OQ-0005-AS5) |
 | PM-0005-41 | a glTF reader planted in `sim` or in `server` fails the dependency check; the asset tool imported from the client fails | nothing new at M (M adds no Rust glTF reader) | the `sim` half with 2.3's dependency check; the `server` half at Slice 3; the tool's halves when the tool exists |
-| PM-0005-42 | no slot without a class; every faction slot shows its faction's colour, read from the materials and probed on screen, on both backends | at M, for the soldier in the factions that exist as data (one, or the yard's two) | every faction at Slice 2; Edge, Firefox and Safari on the named machines |
+| PM-0005-42 | no slot without a class; every faction slot shows its faction's colour, read from the materials and probed on screen, on both backends | at M, for the soldier in the factions that exist as data by then | every faction at Slice 2; Edge, Firefox and Safari on the named machines |
 | PM-0005-43 | the frame-time, GPU-time and count marks pass in the full fight built from real models | not at M | Slice 6, once every family in the fight has its model |
 | PM-0005-44 | no flicker between detail levels; your verdict | conditional by its own words: only if the research proposes detail levels and a model carries them | with the first such model |
 
@@ -1003,9 +1098,52 @@ The look proof test's share of ADR 0005 lands here too (3.8): PM-0005-33 and -34
    largest is how commands are timed.
 9. **The newest three.js on WebGPU in Brave** is the first thing change-set 2 tries; if Brave falls back to WebGL 2
    on your PC, the label says so and the look work still holds, because every effect must exist on both.
+10. **How a build reaches your laptop is not proven** (Part 8). If the file route fails, every Brave check waits for
+    another route, and the cheapest of those needs the 2.3 chat's CI.
+11. **The Art block goes out before your look decisions of 13 and 14 November are in the repo.** It says that those
+    win; a sheet made from the older brief may still need a second pass.
+12. **The rules for a model file are proven late.** They rest on documentation and source until the first real export
+    (Part 11). A rule that the export disproves changes the stand-in (about a day) and the Blender brief.
 
 ## Part 14. This plan's review
-<!-- review -->
+Your rule: the advisor agent reviews the plan; no review rounds and no verifier.
+
+**The review of revision 1.** The advisor agent (Opus 5.5 by its agent file, effort max passed by this chat) was
+started after 14:43 UTC; its notes, `advisor-plan-r1.md` beside this file, were last written at 15:08 UTC and end
+with DONE. Verdict: **REVISE**, with 3 High, 11 Medium and a list of Low findings.
+- What it checked, by its notes: both of your messages; the plan in full; 49 pass-mark rows against the drafts' own
+  tables; the done-when lines of ADR 0001 to 0005; the count script (201 of 201) and its expected set against
+  SPIKE_PLAN's table; every quotation of yours against its source (none misquoted); LOOK_V2 in full; the guard's
+  merge places and the settings' deny lines; the 2.3 plan.
+- What it could not check, by its own words: whether a cloud chat can hand you a file; the Blender, glTF and three.js
+  claims of Part 11 (change-set 0's verifier covers them); the session's own model.
+
+| Its finding | Severity | Where revision 2 answers it |
+|---|---|---|
+| The route that brings a zip to your laptop has no evidence; the zip's server has no owner | High | Part 8 (the route named, two proofs before anything rests on it, never a committed zip); decision BRAVE-ROUTE (four routes); change-set 2 owns the server, with security-auditor |
+| The default check ran the netcode spike's own check on a local merge, against "never touch spikes/" | High | Part 7: this chat searches its own files only and puts nothing of that branch on disk |
+| Separate tests were thrown away before the machine their mark names exists; one stood before its subject | High | Part 3.2: each is kept as a patch and a build until judged; the side the game builds is provisional until then; the two-instance numbers move to change-set 5 |
+| PM-0002-16 and -19 called met where they are only shown | Medium | Part 2 |
+| SIMD decided on part of its suite | Medium | Part 3.4, PM-0004-25: a reading; off until the whole suite passes |
+| PM-0004-72's CI clauses can be shown earlier | Medium | Part 3.5: readings at change-sets 8 and 9 in a 60 Hz build |
+| PM-0001-20 runs under both ways of timing commands | Medium | change-set 7 builds both; Part 2 |
+| No list of what stays open after change-set 12 | Medium | Part 2, "What is still open when change-set 12 merges"; change-set 12's report |
+| The gate's network step is tied to the netcode proof test; option (b) of GATE-FOLLOW sets your words aside | Medium | Part 7 and decision GATE-FOLLOW (its own sub-question; option (b) says so) |
+| MACHINES ignored your standing words on timing | Medium | decision MACHINES, rewritten from them |
+| The Art block carried three look choices of the plan's own | Medium | Part 4, rewritten (also for the sheets that arrived): ranking left to the Art project, the cap worded as the drafts word it, the height rule cited to LOOP_V2 §9 and asked, your decisions of 13 and 14 November win |
+| Change-set 0 could wait for your PC, or install Blender unreviewed | Medium | Part 11: nothing is installed; the proof by a real export runs when both ends exist, at the latest at change-set M; decision RULES-WHO |
+| Words credited to you that are the drafts' | Medium | Part 12 |
+| The jump's reach and soldiers meeting are your design calls, taken silently | Medium | decision START-RULES; Part 10 |
+| Lows (a Part 9 heading; planted defects named; later clauses; reviewers for M and 5; risk tier 2; what is only for development; estimates of 3 and 4; step 2.6's conditions; Node; wording) | Low | folded where each stands |
+
+One finding is answered differently from what it asked: it found no source for "higher is lighter" and asked to
+delete it. The source is LOOP_V2 §9 ("height read through brightness (higher is lighter)", a default for greybox
+maps); Part 4 now cites it and asks the Art project instead of stating it.
+
+**Its ruling, inside its authority.** The scan test in the sim crate may stand in for the 2.3 chat's float ban until
+that lint merges, on the three conditions Part 7 states.
+
+**The re-read of revision 2.** <!-- reread -->
 
 ## Decisions needed
 1. **SPLIT-25: is step 2.5 built as two change-sets?**
@@ -1013,33 +1151,47 @@ The look proof test's share of ADR 0005 lands here too (3.8): PM-0005-33 and -34
      each review.
    - Options: (a) two: the first page, then the loop through the local server; (b) one.
    - Recommendation: (a).
-2. **FIRST-SOLDIER: which soldier and gun come first?**
-   - Why it matters: the Art sheets, the stand-in and the first playable gun follow from it.
-   - Options: (a) the Imperial Warrior with the SMG, LOOP_V2's reference gun for feel; (b) the Conscript with the AMK
-     rifle, whose rhythm LOOP_V2 says must be fixed first.
-   - Recommendation: (a). Either way the other gun is playable in change-set 8.
+2. **FIRST-SOLDIER: is the first soldier the Conscript of the Art sheets, and which gun is first?**
+   - Why it matters: the stand-in, the Blender model and the first playable gun follow from it. The sheets you sent
+     show the Conscript's shared tier-one uniform with a rifle; LOOP_V2's reference gun for feel is the Imperial
+     Warrior's SMG, and it says to fix the AMK rifle's rhythm (one shot, then a 3.5 s reload).
+   - Options: (a) the Conscript of the sheets, with the SMG and the rifle both playable in change-set 8, and the SMG
+     as the gun whose feel you judge first; (b) the same soldier, with the rifle as the gun you judge first; (c)
+     another soldier, with a sheet of its own.
+   - Recommendation: (a).
 3. **GATE-FOLLOW: who builds the gate and CI checks that follow steps 2.4 and 2.5, and when?**
-   - Why it matters: your words keep gate and CI work with Opus 5.5. The 2.3 plan ties these checks to spike reports
-     that no longer come first. Until they exist, Firefox, WebKit and Wasm in CI are unchecked, and marks stay "shown".
-   - Options: (a) the 2.3 chat builds each right after my change-set merges (after 1, 2 and 3; then the float ban from
-     change-set 3's numbers), and until its lints exist a test in the sim crate holds the float, hash-map and clock
-     rules; (b) this chat asks you for each gate and CI edit with its exact text: quicker for me, but a Fable chat then
-     writes CI files; (c) they wait until Slice 1 ends.
-   - Recommendation: (a).
-4. **MACHINES: which machines are the minimum laptop and the recommended desktop?**
-   - Why it matters: no timed mark can pass on a stand-in (your words of 2026-11-03: "for rough checks only"). The
-     naming was due "before the look proof test", which is no longer a separate test.
-   - Options: (a) name both before change-set 5, where the hand-off is measured; (b) before change-set 6, the look, at
-     the latest; (c) keep your laptop as the stand-in through Slice 1 and judge every timed mark in one session at its
-     end.
-   - Recommendation: (a), and (b) at the latest. The Mac: the Safari rows are collected and run in one visit when a
-     Mac is available.
-5. **BRAVE-ROUTE: how do you open builds before preview links exist?**
-   - Why it matters: every merge from change-set 2 on waits for your Brave check.
-   - Options: (a) a zip from this chat and one command, which needs Node.js once (Part 8); (b) you build from the
-     branch on your PC, which needs the Rust and Node toolchains, about half an hour once; (c) no Brave check until
-     step 2.6, which holds every merge until then.
-   - Recommendation: (a).
+   - Why it matters: your words of 2026-11-12: "The guard, the gate and CI work stays with Opus 5.5." The 2.3 plan
+     lets these checks ride steps 2.4 and 2.5 and ties them to test reports; for the six tests of your decision those
+     reports no longer come first. Until the checks exist, nothing in CI runs WebAssembly, Firefox or WebKit on the
+     new code: marks that need them are only shown (they passed in this chat's container), not met.
+   - Options: (a) the 2.3 chat builds each right after my change-set merges: after 1 (generated types in step),
+     after 2 (WebAssembly in CI), after 3 (the browser jobs, the determinism step, the float ban from change-set 3's
+     numbers); (b) this chat asks you for each gate and CI edit with its exact text: quicker, but for those edits it
+     sets aside your words of 2026-11-12; (c) they wait until Slice 1 ends.
+   - One check needs its own answer. The gate's network step re-proves the link simulator of the netcode proof test,
+     which is not one of the six, and your words of 2026-11-13 still stand for it: "Every gate check that needs a
+     result joins later, when that result is in." (i) It waits for the proof test's report, as those words say;
+     (ii) it follows change-set 3 like the others.
+   - Recommendation: (a), with (i).
+4. **MACHINES: when do you name the minimum laptop and the recommended desktop?**
+   - Why it matters: your words stand: "The laptop and desktop stay on my timing: rough checks first, then a short
+     re-run once they're named", and you name them before the look proof test. That test is no longer separate: its
+     first measurements on the real game are change-set 6. Until the naming, your laptop stands in "for rough checks
+     only", so no timed mark can pass.
+   - Options: (a) "before the look proof test" now reads "before change-set 6", and every timed reading taken earlier
+     gets its short re-run on the named machines; (b) earlier, before change-set 5, so the hand-off is judged once and
+     needs no re-run; (c) later than change-set 6, with the look's timed marks re-run too.
+   - Recommendation: (a): it is your own timing, mapped onto the real game. The Mac: the Safari rows are collected
+     and run in one visit when a Mac is available.
+5. **BRAVE-ROUTE: how do builds reach your laptop before preview links exist?**
+   - Why it matters: every merge from change-set 2 on waits for your Brave check, and the route in Part 8 is not
+     proven yet.
+   - Options: (a) a zip through this chat's file tool, and one command (Part 8); (b) a build made by CI and
+     downloaded from the pull request's page on GitHub, which needs a CI job from the 2.3 chat first; (c) you build
+     from the branch on your PC, which needs the Rust and Node toolchains, about half an hour once; (d) no Brave
+     check until step 2.6's links, which holds every merge from change-set 2 until then.
+   - Recommendation: (a), if you can save the file that comes with this message; if not, (c) until the CI exists,
+     then (b).
 6. **PREVIEW-START: does the preview hosting check start now, in its own Opus chat?**
    - Why it matters: its two-day wait decides when links arrive.
    - Options: (a) now; (b) after step 2.3's first part; (c) later.
@@ -1051,26 +1203,31 @@ The look proof test's share of ADR 0005 lands here too (3.8): PM-0005-33 and -34
    - Recommendation: (a).
 8. **COMPARE: do the comparisons against things the game will not build still run?**
    - Why it matters: your rule keeps a separate test where the real game cannot answer a question. These marks ask
-     such questions; inside Slice 1 they cost about four days in all: one Wasm instance or two (change-set 3), the
-     block's layout and the shared ring (5), our Wasm's size against two other libraries (4), and a library's
-     character controller against our own movement (after 4).
-   - Options: (a) all run, as small throwaway tests; (b) the character-controller comparison (one day) runs only if
-     our own movement misses its marks. That changes the wording of one mark (PM-0004-34), so it needs your word.
+     such questions; inside Slice 1 they cost about four days in all: one Wasm instance or two (change-sets 3 and 5),
+     the block's layout and the shared ring (5), our Wasm's size against two other libraries (4), and a library's
+     character controller against our own movement (after 4). Each build is kept, so it can be judged on the named
+     machines later.
+   - Options: (a) all run; (b) the character-controller comparison (one day) runs only if our own movement misses
+     its marks. That changes the wording of one mark (PM-0004-34), so it needs your word.
    - Recommendation: (a): no mark changes.
 9. **MODEL-PUBLIC: may a committed model be public?** (OQ-0006-18)
    - Why it matters: this repository is public. A model file pushed to it can be read by anyone, and its history
-     keeps it. Until Slice 3 the preview links are public too.
-   - Options, as the draft gives them: (a) yes: models are committed; (b) models live in a private store and the build
-     fetches them with a secret: the build is then no longer free of secrets, and the store is not researched; (c) the
-     repository becomes private: CI minutes are then counted against your plan, and the reviewer on previews needs a
-     paid plan.
-   - Recommendation: (a) for the first soldier and the other test models, and the question again before the first
-     model you would mind being seen early. Under (a) only the exported GLB is committed; the Blender file stays with
-     you until the asset research says where sources live. No model file is committed before your answer.
+     keeps it. The login on previews starts only with the first preview that reaches the test game server (Slice 3).
+   - Options, as the draft gives them: (a) a login on previews is enough: models are committed, and the wall covers
+     previews only; (b) models live in a private store outside the repository and the build fetches them with a
+     secret: the build is then no longer free of secrets, and the store is not researched; (c) the repository becomes
+     private: CI minutes are then counted against your plan, and the reviewer on previews needs a paid plan.
+   - Recommendation: (a) for the first soldier and the other test models, as the infra review recommends "until the
+     first model that must stay unseen", and the question again before such a model. Under (a) only the exported GLB
+     is committed; the Blender file stays with you until the asset research says where sources live. No model file is
+     committed before your answer.
 10. **RULES-WHO: who answers the model-file rules, and when?** (Part 11)
-    - Why it matters: the Blender brief waits for them.
-    - Options: (a) this chat, as change-set 0, first after your go; (b) a separate research chat beside this one: the
-      build starts a day earlier, and you steer one more chat.
+    - Why it matters: the Blender brief waits for them, and you asked for them early. The draft list is in Part 11
+      now; what is left is to confirm it and record it.
+    - Options: (a) this chat, as change-set 0, first after your go: about half a day before change-set 1 starts;
+      (b) this chat, after change-set 2: the first page comes half a day sooner, and the Blender brief works from the
+      draft list until then; (c) a separate research chat beside this one: no delay here, one more chat for you to
+      steer.
     - Recommendation: (a).
 11. **SCOPE-RELOAD: is the active reload part of Slice 1?**
     - Why it matters: LOOP_V2 decides the active reload, the sprint-to-fire delay and the AMK's new rhythm; no draft
@@ -1079,13 +1236,19 @@ The look proof test's share of ADR 0005 lands here too (3.8): PM-0005-33 and -34
     - Options: (a) Slice 1 has the plain reload; the three come with Slice 4's feel pass; (b) the active reload joins
       change-set 8: about 400 lines more, and its judging may be redone after the proof test.
     - Recommendation: (a).
+12. **START-RULES: what do the jump and two soldiers meeting start from?**
+    - Why it matters: both are open design questions that stay yours, with the game-designer: how far the jump
+      reaches (OQ-0002-6), and whether soldiers pass through each other, push softly or block (R2-SYNC-OQ5). Slice 1
+      must start from something, and you will feel both in Brave.
+    - Options: (a) start from legacy: the jump integrated at the tick from legacy's numbers, and soldiers treated as
+      legacy treats them (change-set 4's plan reads that rule from the legacy code); you judge the jump at change-set
+      4 and the meeting at change-set 5, and both questions stay open until you answer them; (b) you decide both now.
+    - Recommendation: (a).
 
 ## For Mustafa
-1. Answer the eleven decisions above.
+1. Answer the twelve decisions above.
 2. Give or refuse your go on this plan. With your go, and once your decision of today is on main, change-set 0
    starts; its pull request also carries this plan to main as a report, with your two messages in its appendix.
 3. Pass your decision of today, with the addition of 15:03, and your answer to GATE-FOLLOW to the 2.3 chat.
 4. Paste Part 4's block into the Art project.
-5. Install Node.js 22 on your Windows laptop (Part 8), before change-set 2.
-
-
+5. Say whether the file that comes with this message can be saved on your laptop (it proves the route of Part 8).
