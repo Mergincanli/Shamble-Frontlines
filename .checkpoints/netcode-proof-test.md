@@ -42,6 +42,18 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   p0 0, evstart 0, tick16-clean 0, forged 0, clamp 0, fast-clock 0, **lag-switch 300** (a -21 option-B stand-in): the
   ruling says any sum not 0 goes to the advisor first, before any marks.json change or -17 run. Next: the advisor's
   ruling on r2 and carry 62 (h); no marks.json edit before it. **The saver restarted as boscgjicj** (15:46).
+- **THE r2 RULING IS IN (about 16:00 UTC): advisor-u4r-r2run-full.md** (110 lines, sha256 d980904a…, by
+  u4r_r2run_ruling_full.py word for word): all 14 suites match their expected lines; r2 at e59ece9 is the record; the
+  three ruled fails recorded, never re-run. **Carry 62 (h)'s condition holds** (the six clean short L1 P0 suites p0,
+  forged, clamp, fast-clock, evstart, tick16-clean: 0 each; lag-switch is P1, its 300 is P1's designed 1 % loss,
+  outside -17's L1 P0 part). **Its "For Mustafa": nothing now**; the marks.json change reaches him on the readings-PR
+  list before R5. **Next (its steps 2-8):** the main session's own marks.json edit (PM-0001-17: the check "L1 P0 loses
+  no group (no client-tick left incomplete)" and the bite PM-0001-17/whole-as-lost, exactly as its carry62h says,
+  nothing else) plus one line in u4-build-plan.md §11's readings-PR list; SERIES.md unchanged now; then npt-judge
+  --check-marks (r2's binary) exit 0 and check.mjs whole through main-run.sh (all 11, 531/609, marks 81); commit and
+  push (crates unchanged since e59ece9); then the c62h record (r2's judge, --only PM-0001-17, on r2's whole-as-lost and
+  tick16 folders, into .gate/netcode-proof-test/c62h-<commit12>/: both bites shown, never INVALID); then the card and
+  u4r-report.md's r2 section with MRG-L1 to -L3; then U4r-F1 (RUN-L1 rides it).
 - **COMPACT-WAIT:** asked again at about 15:33; the reminder fired at 15:54 with no /compact typed; the card was
   current (3712306), the saver runs (boscgjicj); carried on.
 - **The advisor's ruling on r2 runs:** workflow **wf_ec319c2d-f45** (task wvtrfj4a9; agent advisor-u4r-r2run, notes

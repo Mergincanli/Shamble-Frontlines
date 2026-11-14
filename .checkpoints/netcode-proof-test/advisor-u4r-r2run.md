@@ -45,3 +45,23 @@
   Ruling 4's further finding already listed the same set (plus builder p0-s1c) and left lag-switch out.
 - lag-switch's 300: incomplete share 300/28800 = 1.04 % against P1's 1 % loss; p2 585/28800 = 2.03 % (2 %), p3
   1485/28800 = 5.16 % (5 %): loss-driven by design.
+- forged vs fast-clock: room.jsonl and client.jsonl equal line for line (headers aside); lab.jsonl differs only by one
+  counter_wrap event (press, tick 513) in forged. The presses script is wired; held fire makes press edges change no
+  state. Its expected line claims only -2: met. Note, no finding.
+- r2.txt's suite blocks (lines 9-278) equal r2.log lines 6-275 (diff empty). Commits: e59ece9 15:40:04 UTC, next
+  5164251 15:45:51: no commit inside the run window (INF-R2-1's interim rule held).
+- Judge: Rule::Pre reads the whole marks file (eval.rs:958-996), independent of --only and header marks; the check
+  schema accepts series/stat/window/op/value/parts without setup (marks.rs:274-283, :505-540); Bite {id, what}.
+  Tests that read the real marks.json (judge fixtures.rs on L1 P2, engine.rs -18, room/tests/bites.rs:22,
+  server/tests/schedule.rs:355) are one-directional or on other parts: the change should not move them; check.mjs
+  shows it. c-u4r-runs.mjs's bitesOf (:170-180) reads -17's bites at run time: P0 set gains bite-whole-as-lost
+  (marks -2,-17: runBytes 56 MB per 10 min).
+- SERIES.md:320's Marks cell says '-17 reports it': stale once -17 checks it; Low, at SERIES.md's next edit.
+
+## Ruling (summary)
+- Every suite matches its expected line (14 of 14). The three ruled fails (b1, es, b1-nofallback) came as ruled.
+- Step 12: clean short L1 P0 suites p0, forged, clamp, fast-clock, evstart, tick16-clean: measured sums 0 each. The
+  condition holds. lag-switch is P1, outside -17's L1 P0 part; its 300 is P1's 1 % loss. Main session: the marks.json
+  change in its own commit (read in full), check-marks and check.mjs, then npt-judge --only PM-0001-17 on r2's
+  whole-as-lost and tick16 into a new .gate folder: both bites shown.
+- Lows: RUN-L1 (no build provenance in r2.log: sh() swallows cargo's output; rides U4r-F1). Nothing for Mustafa now.
