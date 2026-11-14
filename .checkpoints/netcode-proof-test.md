@@ -35,6 +35,17 @@ section 6 return list, 06:58 UTC); final snapshot 572c4f69… (26 files on 2fbec
   against ruling 3 point 6 (:248-301, the new assertion); the mirror's last_acked keep; r6's assertion; the two fixes
   (scenario.rs:1034-1049, mirror.rs:396-414); tick16d's logs and c-u4r-r2.mjs's expect text; c-u4r-runs.mjs's live
   lines.
+- **The read copy .gate/u4r-snap1 now holds the final snapshot** (987946cc's reversed from 9d52acc's copy, 572c4f69's
+  applied; its 26 files equal the worktree's by cmp). The saver restarted as **bn7dtt86b** (07:00 UTC, after b084998).
+- **Review prep launched about 07:05 UTC:** workflow **wf_ee22efb7-46d** (task wdummfeus; script
+  u4r-review-prep-wf_ee22efb7-46d.js): advisor-u4r-panel (confirms the panel, its seats' lists and the two batches;
+  notes advisor-u4r-panel.md) and u4r-packet-drafter (writes u4r-packet.json for review_packet.py, facts and sources
+  only; notes u4r-packet-notes.md), in parallel, both opus, xhigh. **If cut:** `resumeFromRunId: "wf_ee22efb7-46d"`.
+  **On return:** read the panel; check the config (no forbidden name, no conclusion; every path exists), then run
+  `python3 -I .checkpoints/netcode-proof-test/review_packet.py .checkpoints/netcode-proof-test/u4r-packet.json` and
+  read the packet's head and its carries' tail; any ALLOWED addition the drafter asks for goes by review_packet.py's
+  rule (an advisor-written ruling file only, one at a time, noted in history.md); then batch 1 (three seats), then
+  batch 2.
 
 **Earlier NOW (2026-11-14 about 06:38 UTC): the spend limit cut copy 5 at 02:31 during its first end-check run, which
 finished anyway (all 11 steps PASS); copy 5 resumed to record it, run the second end check and report.**
