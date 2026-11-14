@@ -39,6 +39,14 @@ bytes and the judge's peak (over 10 GiB: P0 does not start; plan the smallest ch
       the branch through the merged patches. Two copies also hold evidence logs as ignored files:
       wf_2c76ec82-8fc-1 (u3d-fix-bite-*.log) and wf_f54246ff-e0d-2 (u4c-fix/*.log).
     - So (A) gave 56 MiB, not the ruling's estimated 710. **Before P0, (B) and then (C) will be needed for R.**
+- **P2 RUNS (started about 18:55 UTC; background task b9eoa0vup; kept log .gate/u4r-sets/P2-ab10f058a828.log).** Its
+  expected lines are in the ruling's next step 4. **If cut:** follow the run procedure's items (6) and (7).
+- **U4r-F2's PLAN IS WRITTEN (u4r-f2-plan.md):** the P0 set judged in two calls, measured runs and bite runs apart,
+  each at most 10 GiB (5.5 and 6.1 GiB at F = 1.5). Only c-u4r-runs.mjs changes. The planned size is about 40 to 60
+  lines. Choices Q1 to Q5 go to the advisor. **Its plan review runs:** workflow **wf_4b7d75ec-24c** (task wpki2oiw7;
+  notes advisor-u4r-f2-plan.md). **If cut:** `resumeFromRunId: "wf_4b7d75ec-24c"` with its script path in the
+  workflow scripts folder. **On return:** write it word for word by script; put its "For Mustafa" here at once. No
+  edit to the script before its verdict, and none while a set runs (a commit under spikes/ would stop the set).
 - **Its "For Mustafa" (copied here at once):** nothing to decide or do now. Three things to know:
   - (1) Under P3, the test bots wander into buildings. When a door shuts, the server rightly hides that bot, which
     breaks "everyone in view". That is a bot flaw (BRAWL-1), not netcode. The result is recorded INVALID, never
