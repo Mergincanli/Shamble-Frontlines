@@ -37,5 +37,43 @@ On a restart: read this file, continue after the last item marked done.
   moves to U4g with carry 78 widened (relevant soldiers the baseline lacks first; form is U4g's plan; target share
   >= 0.99 at 10 bursts in 600 s = at most 18 flag-0 ticks per client per burst on average). Readings PR gains Q22's
   share on -17/-18 (ADR's "for the downstream rows"). Not to Mustafa now.
-- Next: spot-check b1 logs; point 2 (ES owner of -12 runs; brawl aim); point 3 (figures.rs orphans; tick16c segments);
-  point 4 (scenario.rs heal record; b1-nofallback breaches); points 5-8.
+- [done] Own checks: b1 room.jsonl: least slot 246 of 900 (0.273333), window means 47.9 ... 46.3, 96 burst_eviction
+  (first t 64217 age 0). tick16c: flag 48 for 65,507-65,566, 0 from 65,567; segments as the fact check. lab class_audit
+  breaches: b1-nofallback 2,314 (first "tick 64218: client 23: its baseline frame (age 35) is not mirrored"), b1 0,
+  tick16c 0. judge figures.rs:236-266 slot_hashes reads every phase; :316-440 decoded() counts an orphan as a
+  mismatch; :542-554 mismatches before gap. scenario.rs:989-1012 heal record (h != 0, due >= return, not a FullState
+  tick since the burst start); :1034-1049 the cap exception for any run with a bite id. bots lib.rs:226-245 brawl aims
+  at the target's position. contract.rs:16 doc vs :140-147 code (carry 60 fails); :350-351 read errors exit 1.
+  room.rs:238 `ClientSlot::last_acked()` is public (the mirror can keep that frame). marks.json -17/tick16: "the bite
+  run must cross it". Plan U4f builds the cheats' Behaviours, U4h the TC shooter (both open npt-bots); ADR 0001:1600
+  -12's ES runs at P2.
+
+## Rulings (the result)
+- P1 High, not blocking, not Mustafa. Designed eviction + defaults (ADR part 6; plan §4.5, §4.14), carry 78's known
+  packing defect (premise now false), and a plan gap (no text on when the set is whole again; my Q22 checked shots
+  only). FAIL stands (condition 5). No bar moves: Q22 stays, share stays, the flag's input stays. Rejected: exempt or
+  window B1, read interest set, longer ring, full state now. Fix and -17/-18 L1 B1 passing evidence to U4g (carry 78
+  widened; target share >= 0.99 at 10 bursts in 600 s, at most 18 flag-0 ticks per client per burst on average; short
+  B1 suite of U4g's build first; form is U4g's plan, ADR words via U4g's plan and the readings PR). U4r: B1 judged runs
+  stay (for -57), -17/-18 B1 recorded INVALID, never counted; -18's bitten judged run moves to U4g. Readings PR gains
+  Q22's share on -17/-18 (ADR's "for the downstream rows").
+- P2 Medium, not blocking, not Mustafa. Band stays (9.5 his floor; 10.5 marks.json); SS's brawl unchanged; ES-only
+  seeded hit rule, value by advisor-u4d-close.md:90-105's form at P2, 3 seeds, 10-min window; owner U4h (opens
+  npt-bots; lag compensation changes hits). U4r: report only.
+- P3 Medium, blocking (r2's carry 73 item). Wrap inside the measured phase 15 ticks before its end: short bitten run
+  --tick-start 64651 (10 s + 20 s), clean partner --tick-start 64936 (measured build); judged bite run tick_start =
+  65,551 - (warm-up + measured ticks) (47,251); clean -17 runs and client-rounding stay at 63,736. No code, no bar.
+- P4 Medium, not blocking, not Mustafa. Brief's sentence wrong (contradicts carry 77 (b), which it cites). r2 reads:
+  bitten max fails (1.688 s), fast heals counted apart (14 age 0; 11 ages 33-34, a second case, derived), 71 slow after
+  FullStates; clean 96 of 96. U4g closes the hole (ack.rs; Low).
+- P5 Low. Copy 3's reading accepted (exception at the recording's last L - 1 ticks); two Lows on r6 (literal lead 2;
+  first-64 compare) ride the next precheck.rs edit.
+- P6 Medium, blocking. Design accepted (contract and precheck beyond 2.7's list, named). Conditions: breach check
+  (fail > 0 unless catalogue-5/owner-to-all; sixth doctored case); doc :16; read errors own exit; c-u4r-r2.mjs so the
+  main session re-makes r2 from the merge commit (the record) before -17's judged runs and carry 62 (h)'s decision.
+- P7 none. Both fixes accepted; carry 62 (e)'s reading for bite runs; point 3's clean partner shows (b) past the wrap.
+- P8 Medium (the mirror). Mirror keeps each client's frame at last_acked() beyond FRAMES_KEPT; short bitten B1 run 0
+  breaches; clean P0 equal record for record. Lows: baseline_age row words; 21 rows not 22; 65,715 not 65,746; 0.48 not
+  "as the clean b1"; regen/ labels; burst_spacing_ns written on B1 headers; bytes rounding; SERIES.md:368 writer.
+- Further: Medium, -18's heal reading passes a blind room (96 of 96 within 130 ms beside 0.273): readings PR, his go.
+- [done] Result returned by StructuredOutput.
