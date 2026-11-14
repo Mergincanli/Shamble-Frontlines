@@ -12,9 +12,48 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 01:40 UTC; read this first after a compact or a cut): U4r copy 4 finished items 1 and 2 and
-stopped at a clean point (01:37); snapshot e40449a7… (25 files); only item 3 (r5 and section 5's end checks) is left,
-held for the third ruling (task w5rwxf34m, its advisor running). No builder runs now; copy 5 follows the ruling.**
+**NOW (2026-11-14 about 02:00 UTC; read this first after a compact or a cut): U4r's third ruling is in (nothing for
+Mustafa now; three points block the merge until done: 3, 6, 8); copy 5 builds them, then r5 and the end checks.**
+- **The third ruling** (wf_345cc3c9-ca1 returned about 01:55 UTC): **advisor-u4r-build3-full.md** (235 lines, sha256
+  78ebb5af…; by script, word for word, from the journal; with the architect's read and the fact check). I read the
+  rulings whole. (1, High, not blocking) B1: the room's recovery after an eviction is a defect and a plan gap (carry
+  78's packing order; the set rebuilt from the defaults under the 1,000 B cap); no bar moves; the fix and -17's and
+  -18's L1 B1 parts go to **U4g**; the B1 judged runs stay for -57; -17's and -18's B1 verdicts INVALID, not counted;
+  -18's bitten judged run moves to U4g. (2, Medium) ES: the band stands (his 9.5 floor); the brawl's ES-only seeded
+  hit rule is **U4h's**; no change at U4r. (3, Medium, **blocks**) tick16: the wrap goes inside the measured phase, 15
+  ticks before its end (`--tick-start 64651` short), plus a clean partner across the wrap (`--tick-start 64936`).
+  (4, Medium) -18's bite: the brief's expectation corrected (25 fast heals counted apart by cause); the ack.rs hole a
+  Low carry for U4g. (5, Low) ruling 2's point 1 (4) amended for the recording's last L - 1 ticks; two precheck.rs
+  Lows. (6, Medium, **blocks**) r2's design accepted with four changes (the class audit's breaches fail a run; the doc;
+  exit codes; ops/runs/c-u4r-r2.mjs, run by the main session from the merge commit as the record). (7, none) both
+  fixes accepted; carry 62 (e)'s reading for bite runs. (8, Medium, **blocks**) the mirror keeps each client's frame at
+  `last_acked()` (2,314 breaches on the no-fallback run); burst_spacing_ns in B1 headers; seven Lows. Further: two
+  Mediums for the readings PR (Mustafa's go before R5), one Low (the clean run across the wrap, in point 3).
+- **The main session's tasks from it** (the full words in the file): (a) card lines for carry 78 (its premise no longer
+  holds; widened to the recovery after an eviction; the target: share at least 0.99 on B1 at 10 bursts in 600 s, at
+  most 18 flag-0 ticks per client per burst; -17's and -18's L1 B1 parts and -18's no-fallback run moved to U4g), carry
+  73 (the wrap inside the measured phase, 15 ticks before its end), carry 77 (b)'s second case, carry 62 (e)'s
+  bite-run reading, a U4h carry (the brawl's ES hit rule, set by advisor-u4d-close.md:90-105's step-4 form), a Low U4g
+  carry (ack.rs: the stale copy taken when a tick becomes last_acked), ruling 2's point 1 (4)'s new words; these go
+  into u4s-carries.md before U4g's and U4h's briefs. (b) The brief's readings (closed record, held here): 2.4 r2 (d)
+  for -18's B1, 7.1's -17 and -18 L1 B1 rows, 2.4 r2's carry 73 line and 7.1's -17 L1 P0 row (tick16's tick_start =
+  65,551 - (warm-up + measured ticks)), U4R-Q7 (a) "clean, and the client-rounding bite run", 2.4 r2's last bullet as
+  point 4 words it. (c) At the next plan edit: §5 U4r's judged runs and U4g's "Marks moved"; plan :767-768; §11's
+  readings-PR list gains Q22's share line and the heal-reading question (both for Mustafa's go before R5). (d) After
+  U4r's merge: run ops/runs/c-u4r-r2.mjs from the merge commit before -17's judged runs and before carry 62 (h)'s setup
+  check (the record; B1 and ES expected to fail as here, recorded under this ruling). (e) SERIES.md:368's writer at
+  the next SERIES.md edit. (f) U4r's report tells Mustafa the B1 story in plain words. (g) U4r's review reads the
+  tick16 runs' verdicts, contract.rs against point 6, the mirror's last_acked keep, r6's assertion, and the two fixes.
+  (h) When U4g's brief is sized, weigh his SIZE-CHECK (history.md:398-399).
+- **Copy 5 launched about 02:00 UTC** (agent a507d682db446aa0a, general-purpose, opus, xhigh, background; prompt
+  u4r-copy5-prompt.md: the first prompt verbatim, checked by script, plus a copy-5 resume part with the work order).
+  **If cut:** by the limit or a restart, SendMessage (its transcript intact) after checking the worktree for a plant or
+  a half edit and re-cutting the snapshot; if it ends at its context limit, a fresh copy from the latest prompt, its
+  resume part brought up to date. **On its report:** read its findings in full; snapshot; if the build is done, the
+  review panel (section 12 item 7: two batches, at most three agents).
+
+**Earlier NOW (2026-11-14 about 01:40 UTC): U4r copy 4 finished items 1 and 2 and stopped at a clean point (01:37);
+snapshot e40449a7… (25 files); only item 3 (r5 and section 5's end checks) left, held for the third ruling.**
 - **Copy 4's part report** (agent a033afc8d5205b476; notes "## Copy 4" and "Copy 4: state and what is next", the notes
   now 1,171 lines, copied here, equal): item 1 done (point 1 (4) to (7): `wasmStep`'s options; carries 83 (b) to (d),
   84 and 85; det-u4.mjs PASS 200.5 s, non-cargo 190.9 s, W 3.1 s; 13 plants, each failing by name and restored); item 2
