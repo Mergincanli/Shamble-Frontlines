@@ -290,7 +290,19 @@ advisor-u4r-r2-full.md:32).
 4. **D4:** the runner's ticks per second in the main folder's own cache, the set's wall time redone (:20). Pending.
 5. **The disk plan**, in writing: 4,681 MiB free; kept logs of about 162 + 16 + 360 + 545 + 629 + 3,020 MiB plus the
    4 GiB floor and builds leave it about 4.1 GiB short; space only from the approved part-cleans; never delete a log;
-   if P0 still cannot fit, it goes to Mustafa under Decisions needed (:21). Pending.
+   if P0 still cannot fit, it goes to Mustafa under Decisions needed (:21). **Done:** u4r-disk-plan.md, written before
+   D4 and before any set.
+   - **The projections:** taken from the runner's own planJudged and planPrecheck, with today's marks.json: pre-check
+     16.2, P3 359.9, B1 545.3, P2 628.9 and P0 3,073.3 MiB. P0 has whole-as-lost's bite run in addition to the ruling's
+     count, and the runner wants 7,169.3 MiB free at P0's start. On top come D4's 320 MiB, up to 400 MiB of release
+     builds and up to 100 MiB of bin copies.
+   - **The clean, done before D4:** with 4,470 MiB free, after D4 no set could start (the advisor's head review, next
+     step 4, foresaw this case). So the one approved part-clean ran first, with no lane running: the main folder's
+     cache's dev profile, `cargo clean --target-dir .gate/netcode-proof-test/target --profile dev`, with its test
+     guards, under the lane lock (.gate/u4r-sets/clean-main-dev.log, 17:42:27-17:42:34 UTC, exit 0). Cargo removed
+     29,079 files, and free space went from 4,467 to 10,592 MiB.
+   - **What stays:** the shared target, check.mjs's warm cache.
+   - **The projection with the clean:** about 5,090 MiB free after P0, so P0 fits without going to Mustafa.
 6. **The pre-check set** after F1 and D4; the late-command pair counts only on 'result: VOID (L1 late_count 1)' (:22).
    Pending.
 7. **The judged sets, one at a time: P3, then B1, then P2, then P0 last**; peak memory by getrusage (no /usr/bin/time

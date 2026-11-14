@@ -6,15 +6,15 @@
   **Base:** main, last merged in at 7685b2b (main 4d21c1a, PR #48, the toolchain). Main is now 4460ef5 (PR #52, eight
   files under docs/ only), **not merged in** (MAIN-52, Mustafa 2026-11-14: take main in when main changes code, CI or
   rules, and once before PR #40 is marked ready)
-- **Last update:** 2026-11-14 about 17:55 UTC (U4r-F1 done at f1f131b and approved by the advisor's review of the
-  head; the disk plan written; next the part-clean, D4 and the pre-check set; the NOW block below)
+- **Last update:** 2026-11-14 about 17:45 UTC (U4r-F1 done at f1f131b and approved by the advisor's review of the
+  head; the disk plan written and its part-clean done, 10,592 MiB free; D4 running; the NOW block below)
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 17:55 UTC; read this first after a compact or a cut): U4r-F1 IS DONE AND APPROVED. The
+**NOW (2026-11-14 about 17:45 UTC; read this first after a compact or a cut): U4r-F1 IS DONE AND APPROVED. The
 advisor's review of the pushed head f1f131b says APPROVE (advisor-u4r-f1-head-full.md, 69 lines, sha256 8a9d0704…,
 written word for word by u4r_f1_head_review_full.py). Next: the disk plan's part-clean, then D4, then the pre-check set,
 then the judged sets P3, B1, P2 and P0.**
@@ -35,9 +35,15 @@ then the judged sets P3, B1, P2 and P0.**
     .gate/u4r-sets/clean-main-dev.log cargo clean --target-dir <main cache> --profile dev :: <test guards> :: ls -A`,
     with no lane running.
   - **After it:** about 5,090 MiB stays free after P0. The shared target stays (check.mjs's warm cache).
-- **D4:** `bash .checkpoints/netcode-proof-test/d4.sh`, one exclusive cache-run.sh call: the release build with -v,
-  then r5's 15 timed runs into .gate/u4r-d4/r5/ (log .gate/u4r-d4/d4.log). Then R per scene and profile, and the sets'
-  wall time, go in u4r-report.md's item 4.
+  - **THE CLEAN IS DONE (17:42:27-17:42:34 UTC, exit 0; log .gate/u4r-sets/clean-main-dev.log):** cargo removed 29,079
+    files ("6.7GiB total"). All four guards passed: the tag stays, debug is gone, release stays, and `ls -A` lists
+    .rustc_info.json, .rustdoc_fingerprint.json, CACHEDIR.TAG, doc, release, tmp and wasm32-unknown-unknown. **Free
+    space went from 4,467 to 10,592 MiB.** No lane was running (pgrep empty at 17:42:15).
+- **D4 RUNS (started about 17:43 UTC):** `bash .checkpoints/netcode-proof-test/d4.sh` (background task bxx6l73i0),
+  one exclusive cache-run.sh call: the release build with -v, then r5's 15 timed runs into .gate/u4r-d4/r5/ (log
+  .gate/u4r-d4/d4.log). Then R per scene and profile, and the sets' wall time, go in u4r-report.md's item 4. **If
+  cut:** read d4.log. A D4 stopped by a cut is not a result. .gate/u4r-d4 is never overwritten (d4.sh refuses), so
+  ask the advisor before any re-run into a new folder.
 - **Session notes:**
   - Mustafa typed /compact at about 17:32 UTC. The chat resumed from this card.
   - A fourth folder slip at about 17:34: a `cd` into the notes folder inside a compound command. I went back at once.
