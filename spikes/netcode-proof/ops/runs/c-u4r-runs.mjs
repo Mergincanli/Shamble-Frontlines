@@ -3,10 +3,12 @@
 // model). One script for every set, the set named first:
 //   node spikes/netcode-proof/ops/runs/c-u4r-runs.mjs precheck --date YYYY-MM-DD
 //   node spikes/netcode-proof/ops/runs/c-u4r-runs.mjs judged --profile P0|P2|P3|B1 --date YYYY-MM-DD
-// - How it is run (advisor-u4r-r1, FP-5 (d): INF-U4R-8): in the main folder, with CARGO_TARGET_DIR unset (plan §7.1
-//   item 6: the judged runs build in the main folder's own cache), not through main-run.sh; it refuses a set
-//   CARGO_TARGET_DIR, since a shared-target run comes to the advisor first (u4r-brief.md section 12 item 8). The main
-//   session's notes say whether it held the lane lock (`flock -x` on .gate/shared-target/.lane.lock) for the set.
+// - How it is run (advisor-u4r-r1, FP-5 (d): INF-U4R-8; advisor-u4r-f1-plan, Q5): in the main folder, with
+//   CARGO_TARGET_DIR unset (plan §7.1 item 6: the judged runs build in the main folder's own cache), not through
+//   main-run.sh, which sets CARGO_TARGET_DIR: this script refuses it, since a shared-target run comes to the advisor
+//   first (u4r-brief.md section 12 item 8). The set runs under the lane lock, exclusive, from the repository root:
+//   `flock -x .gate/shared-target/.lane.lock node spikes/netcode-proof/ops/runs/c-u4r-runs.mjs …`. Each npt-lab call
+//   and the judge are bounded at RUN_LIMIT_MS (advisor-u4r-r2, INF-R2-4); the builds are not.
 // - precheck (set u4r-precheck-30; 7.2): SS P0 seed 4's recording made again by `npt-lab scenario --record` at its
 //   crates/lab/precheck-recordings.json entry's settings (the set stops if that run's rewinds refused are above 0: 7.1),
 //   then three pairs by `npt-lab precheck`, each checking the file against that entry first: clean (the measured
@@ -36,27 +38,36 @@
 //   file under spikes/netcode-proof/crates: every log names its commit); the CARGO_TARGET_DIR refusal; the names (the
 //   pre-check entry's name and each bite id's tail, each one or more of A-Z, a-z, 0-9 and -, before any use: FP-5 (h));
 //   the projection; each release build, with at least 4 GiB free before each (u4r-brief.md section 4 rule 6); the
-//   projection again; only then the set's folders. The binaries go to .gate/netcode-proof-test/bin/<set>-<commit12>/,
+//   projection again; marks.json copied into the bin folder and its sha256 checked there; the first run's floor; only
+//   then the set's folders (advisor-u4r-r2, INF-R2-3). The binaries go to .gate/netcode-proof-test/bin/<set>-<commit12>/,
 //   which no exists-check reads, so a stop before the first run leaves nothing that blocks a re-run at that commit.
 // - The projection (FP-5 (b), (c): INF-U4R-3): each run's log bytes from the builder's measured rates (BYTES_10MIN_57,
 //   BYTES_10MIN_OTHER, PAIR_BYTES), the set's total checked before the builds and after them: it starts only when free
 //   space minus the total is at least 4 GiB, printing both; before each run, free space minus that run's projected
 //   bytes must be at least 4 GiB, else it stops before that run.
 // - Raw logs go under .gate/netcode-proof-test/runs/<set>-<commit12>/ (one folder per run), results under
-//   results/u4r/<commit12>/<profile>/ or results/u4r-precheck-30/<commit12>/; neither is ever overwritten. Right after
-//   the raw-log folder is made, marks/marks.json is copied into it (its sha256 in runs.txt's head); the bite list is read
-//   from that copy and the judge is given it. Before the judge, HEAD and the tracked files' status are checked against
-//   their start values, and the set stops if either changed (FP-5 (e): INF-U4R-9). runs.txt's head names the target
-//   (the main folder's own cache) and the uptime and load average at the start and at the end.
-// - Both npt-lab builds and npt-judge are built --release --locked --offline, each artifact's path read from cargo's
+//   results/u4r/<commit12>/<profile>/ or results/u4r-precheck-30/<commit12>/; neither is ever overwritten. The bin
+//   folder's copy of marks/marks.json (its sha256 in runs.txt's head) gives the bite list, and the same bytes, copied into
+//   the raw-log folder, are the judge's. Before the judge (and the pre-check's runs.txt), spikes/netcode-proof's tree
+//   hash and tracked status, read from the repository root, are checked against their start values, and the set stops
+//   if either changed (FP-5 (e): INF-U4R-9; scoped by advisor-u4r-r2, INF-R2-1: a commit elsewhere, such as a
+//   .checkpoints/ save, stops nothing; a commit under spikes/netcode-proof, an earlier set's results/ included, does).
+//   runs.txt's head names the commit and the spike's tree, the target (the main folder's own cache) and the uptime and
+//   load average at the start and at the end.
+// - A stopped call (RUN_LIMIT_MS) is a result, never retried (condition 5): a judged run's or a pair's line says
+//   "stopped at <s> s" and the set goes on; a stopped recording stops the set before the pairs; when the judge stops or
+//   exits non-zero, runs.txt is written with the run lines and no verdict, and the script exits 1 (advisor-u4r-f1-plan,
+//   condition 1).
+// - Both npt-lab builds and npt-judge are built -v --release --locked --offline, each artifact's path read from cargo's
 //   --message-format=json messages (check.mjs's builtArtifact, as the wasm step reads its builds) and copied out before
-//   the next build replaces it.
+//   the next build replaces it; cargo's own "Compiling" or "Fresh" lines for the npt-* crates go to the runner log
+//   (advisor-u4r-r2run, RUN-L1; -v makes cargo print Fresh: advisor-u4r-f1-plan, Q6).
 // - Each npt-lab process is timed (the wall time around the call) and its seconds go on its runs.txt line beside its
 //   ticks (npt-lab's summary line), for the ticks-per-second figure (2.4 r5, 7.3).
 // - No run logs its clients' bytes (`scenario --bytes`): no part these sets judge reads a replay log (only an x86_64
 //   replay log of an L2 Arm run is read: judge/src/figures.rs:222-233).
-// - Its pure helpers are exported (the projection, the name check, the summary line's flag, the pairs' check); main
-//   runs only when this file is the entry module.
+// - Its pure helpers are exported (the projection, the name check, the summary line's flag, the pairs' check, and the
+//   spike's re-check, which c-u4r-r2.mjs imports); main runs only when this file is the entry module.
 
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -64,7 +75,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, statfsSync, writeFil
 import { loadavg, uptime } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { builtArtifact } from "../../check.mjs";
+import { builtArtifact, run } from "../../check.mjs";
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const ROOT = join(SPIKE, "..", "..");
@@ -110,6 +121,29 @@ export const BYTES_10MIN_OTHER = 56_000_000;
 export const PAIR_BYTES = 25_164;
 /** The late-command pair's one expected result line (precheck.rs, the late-command bite's test). */
 export const LATE_COMMAND_LINE = "result: VOID (L1 late_count 1)";
+/**
+ * Each npt-lab call's and the judge's limit, ms (advisor-u4r-r2, INF-R2-4): about 12 times r5's slowest judged run
+ * (18,300 ticks at 60.1 ticks/s, about 304 s); re-checked against the judge's measured time before the P0 set.
+ */
+export const RUN_LIMIT_MS = 3_600_000;
+
+/**
+ * What changed in spikes/netcode-proof since the set started (advisor-u4r-r2, INF-R2-1): its tree hash and its tracked
+ * status (spikeReading's two readings), "" when both are equal. A commit or an edit elsewhere (a .checkpoints/ save)
+ * changes neither; a commit under spikes/netcode-proof changes the tree, an uncommitted edit there the status.
+ */
+export function spikeChanged(start, now) {
+  const why = [];
+  if (now.tree !== start.tree) why.push(`tree ${start.tree.slice(0, 12)} is now ${now.tree.slice(0, 12)}`);
+  if (now.spike !== start.spike) why.push(`its tracked status now reads: ${now.spike ? now.spike.split("\n").join("; ") : "clean"}`);
+  return why.join("; ");
+}
+
+/** spikeChanged's two readings, through `git(args)`: a git call that must run from the repository root (the pathspec). */
+export const spikeReading = (git) => ({
+  tree: git(["rev-parse", "HEAD:spikes/netcode-proof"]),
+  spike: git(["status", "--porcelain", "--untracked-files=no", "--", "spikes/netcode-proof"]),
+});
 
 /** Whether `s` is a name (NAME). */
 export const nameOk = (s) => typeof s === "string" && NAME.test(s);
@@ -219,22 +253,33 @@ function floor(what, projected = 0) {
   if (!r.ok) throw new Error(r.line);
 }
 
-/** One release build, at least 4 GiB free before it, its artifact's path read from cargo's JSON messages and copied to `to`. */
+/**
+ * One release build, at least 4 GiB free before it, its artifact's path read from cargo's JSON messages and copied to
+ * `to`; cargo's "Compiling" or "Fresh" lines for the npt-* crates are printed as cargo wrote them (RUN-L1).
+ */
 function build(args, target, to) {
   floor(`the release build of ${target}${args.includes("bites") ? " (bites)" : ""}`);
-  const out = sh("cargo", ["build", "--release", "--locked", "--offline", ...args, "--message-format=json"], SPIKE);
-  const path = builtArtifact(out, { target, kind: "bin" });
+  const cargoArgs = ["build", "-v", "--release", "--locked", "--offline", ...args, "--message-format=json"];
+  const r = spawnSync("cargo", cargoArgs, { cwd: SPIKE, encoding: "utf8", maxBuffer: 1 << 28 });
+  if (r.status !== 0) throw new Error(`cargo ${cargoArgs.join(" ")}: exit ${r.status}\n${r.stdout}${r.stderr}`);
+  for (const l of r.stderr.split("\n")) if (/^\s*(Compiling|Fresh) npt-/.test(l)) console.log(l);
+  const path = builtArtifact(r.stdout.trim(), { target, kind: "bin" });
   if (!path) throw new Error(`cargo build ${args.join(" ")} names no ${target} executable in its JSON messages`);
   copyFileSync(path, to);
   return to;
 }
 
-/** One npt-lab process, timed: its summary line with the wall seconds. */
+/**
+ * One npt-lab process, timed and bounded (INF-R2-4): through check.mjs's run(), in its own process group, killed whole
+ * at RUN_LIMIT_MS; its summary line (stdout, as sh() gave it), the wall seconds and whether it was stopped. A non-zero
+ * exit that is not a stop throws sh()'s message: the tool's own refusal (advisor-u4r-f1-plan, Q2).
+ */
 function timed(exe, args) {
   const t0 = Date.now();
-  const out = sh(exe, args);
+  const r = run(exe, args, ROOT, process.env, RUN_LIMIT_MS);
   const secs = ((Date.now() - t0) / 1000).toFixed(1);
-  return { out, secs };
+  if (!r.timedOut && r.status !== 0) throw new Error(`${exe} ${args.join(" ")}: exit ${r.status}\n${r.out}`);
+  return { out: r.stdout.trim(), secs, stopped: r.timedOut };
 }
 
 /** The machine's uptime and load average now (runs.txt's head: FP-5 (d)). */
@@ -258,7 +303,8 @@ function main(argv) {
     );
   }
   const commit = sh("git", ["rev-parse", "HEAD"]);
-  const start = { commit, status: tracked(), machine: machineNow() };
+  const reading = () => spikeReading((args) => sh("git", args));
+  const start = { commit, ...reading(), machine: machineNow() };
   const short = commit.slice(0, 12);
   const name = set === "precheck" ? "u4r-precheck-30" : `u4r-${profile}`;
   const logs = join(GATE, "runs", `${name}-${short}`);
@@ -294,19 +340,24 @@ function main(argv) {
   const judge = set === "judged" ? build(["-p", "npt-judge"], "npt-judge", join(bin, "npt-judge")) : null;
   const after = room("after the builds");
 
-  // The set's folder, and its copy of marks.json, which the bite list and the judge read (FP-5 (e)).
+  // marks.json into the bin folder, checked there, and the bite list read from it; the first run's floor; only then the
+  // set's folder, with the same bytes as the judge's copy (FP-5 (e); INF-R2-3: a stop before the first run leaves no
+  // set folder).
+  const binMarks = join(bin, "marks.json");
+  copyFileSync(join(SPIKE, "marks", "marks.json"), binMarks);
+  if (sha256(binMarks) !== marksSha) throw new Error("marks/marks.json changed since the set started: stopped before the set's folder");
+  const runs = planOf(JSON.parse(readFileSync(binMarks, "utf8")));
+  floor(runs[0].what, runs[0].bytes);
   mkdirSync(logs, { recursive: true });
   const marksCopy = join(logs, "marks.json");
-  copyFileSync(join(SPIKE, "marks", "marks.json"), marksCopy);
-  if (sha256(marksCopy) !== marksSha) throw new Error("marks/marks.json changed since the set started: stopped before the first run");
-  const runs = planOf(JSON.parse(readFileSync(marksCopy, "utf8")));
+  copyFileSync(binMarks, marksCopy);
   const head = [
-    `commit ${commit}`,
+    `commit ${commit}, spikes/netcode-proof tree ${start.tree}`,
     "target: the main folder's own cache (CARGO_TARGET_DIR unset: plan §7.1 item 6)",
     `npt-lab (measured build) sha256 ${sha256(lab)}`,
     `npt-lab (bites build) sha256 ${sha256(labBites)}`,
     ...(judge ? [`npt-judge sha256 ${sha256(judge)}`] : []),
-    `marks.json sha256 ${marksSha} (copied into the raw-log folder at the set's start; the bite list and the judge read that copy)`,
+    `marks.json sha256 ${marksSha} (copied into the bin folder and checked there, then into the raw-log folder; the bite list and the judge read those copies)`,
     `raw logs: .gate/netcode-proof-test/runs/${name}-${short}/ (not committed: plan §7.2)`,
     `projection: ${before}`,
     `projection: ${after}`,
@@ -315,9 +366,8 @@ function main(argv) {
   const common = ["--set", name, "--date", date, "--commit", commit];
   const lines = [];
   const unchanged = (what) => {
-    if (sh("git", ["rev-parse", "HEAD"]) !== start.commit || tracked() !== start.status) {
-      throw new Error(`HEAD or the tracked files changed since the set started: stopped before ${what} (FP-5 (e))`);
-    }
+    const why = spikeChanged(start, reading());
+    if (why) throw new Error(`spikes/netcode-proof changed since the set started (${why}): stopped before ${what} (INF-R2-1)`);
   };
 
   if (set === "precheck") {
@@ -328,6 +378,7 @@ function main(argv) {
       "--profile", entry.profile, "--seed", String(entry.seed), "--clients", String(entry.clients), "--tick-start", String(entry.first_tick),
       "--warmup-s", String(entry.warmup_s), "--measured-s", String(entry.measured_s), "--logs", "0", "--suite", "record", "--record", rec,
     ]);
+    if (made.stopped) throw new Error(`${entry.name}'s recording run stopped at ${made.secs} s: the set stops before the pre-check (INF-R2-4; as carry 40's stop)`);
     console.log(made.out);
     lines.push(`# the recording (npt-lab scenario --record at the manifest entry's settings; wall ${made.secs} s)`, made.out, `${entry.name} sha256 ${sha256(rec)}`);
     const refused = Number(made.out.match(/rewinds refused (\d+)/)?.[1] ?? Number.NaN);
@@ -340,8 +391,14 @@ function main(argv) {
     for (const [i, p] of pairs.entries()) {
       floor(runs[i + 1].what, runs[i + 1].bytes);
       const r = timed(p.exe, ["precheck", "--manifest", manifest, "--recording", rec, "--commit", commit, ...p.extra]);
-      const result = r.out.match(/^result: (\S+)/m)?.[1] ?? "none";
       const expected = p.pair === "late-command" ? `${p.expected}, the whole line "${LATE_COMMAND_LINE}"` : p.expected;
+      if (r.stopped) {
+        const said = `## pair ${p.pair}: stopped at ${r.secs} s, expected ${expected} (NOT as expected: to the advisor)`;
+        console.log(said);
+        lines.push(said);
+        continue;
+      }
+      const result = r.out.match(/^result: (\S+)/m)?.[1] ?? "none";
       const said = `## pair ${p.pair} (wall ${r.secs} s): result ${result}, expected ${expected}${pairAsExpected(p.pair, p.expected, r.out) ? ", as expected" : " (NOT as expected: to the advisor)"}`;
       console.log(said);
       lines.push(said, r.out);
@@ -359,16 +416,23 @@ function main(argv) {
     floor(r.what, r.bytes);
     const exe = r.exe === "lab" ? lab : labBites;
     const t = timed(exe, ["scenario", "--run", r.run, ...common, "--out", join(logs, r.run), "--seed", String(r.seed), ...settings(r.tickStart), ...r.extra]);
-    const said = `${t.out} (wall ${t.secs} s)${overflowFlag(t.out, r.marks)}`;
+    const said = t.stopped ? `${r.run}: stopped at ${t.secs} s (a result, never retried: condition 5)` : `${t.out} (wall ${t.secs} s)${overflowFlag(t.out, r.marks)}`;
     console.log(said);
     lines.push(said);
   }
   unchanged("the judge");
+  // The judge, bounded too (INF-R2-4). Whatever its end, runs.txt is written; verdict.json only on exit 0: a stopped
+  // run's log is cut (written through a buffer flushed at its footer), and the judge refuses a cut log
+  // (advisor-u4r-f1-plan, condition 1).
   const verdict = join(logs, "verdict.json");
-  const judged = sh(judge, ["--marks", marksCopy, "--logs", logs, "--only", listedOf(profile).join(","), "--out", verdict]);
+  const t0 = Date.now();
+  const j = run(judge, ["--marks", marksCopy, "--logs", logs, "--only", listedOf(profile).join(","), "--out", verdict], ROOT, process.env, RUN_LIMIT_MS);
+  const jSecs = ((Date.now() - t0) / 1000).toFixed(1);
+  const judgedOk = !j.timedOut && j.status === 0;
+  const judged = judgedOk ? j.stdout.trim() : j.timedOut ? `stopped at ${jSecs} s (no verdict)` : `exit ${j.status ?? "by a signal"} (no verdict): ${j.out.trim()}`;
   console.log(judged);
   mkdirSync(results, { recursive: true });
-  copyFileSync(verdict, join(results, "verdict.json"));
+  if (judgedOk) copyFileSync(verdict, join(results, "verdict.json"));
   const top = [
     `# ${name}: -17's, -57's${profile === "B1" ? " and -18's" : ""} L1 ${profile} part(s), run in this container on ${date} (u4r-brief.md 7.1)`,
     ...head,
@@ -378,6 +442,7 @@ function main(argv) {
     "# one line per run (npt-lab's own summary line and its wall time; the judge reads the logs, never these lines)",
   ];
   writeFileSync(join(results, "runs.txt"), `${[...top, ...lines].join("\n")}\n`);
+  if (!judgedOk) throw new Error(`the judge ${j.timedOut ? `stopped at ${jSecs} s` : `exited ${j.status ?? "by a signal"}`}: runs.txt written with no verdict (to the advisor)`);
   console.log(`written: ${join("spikes", "netcode-proof", "results", "u4r", short, profile)}/verdict.json and runs.txt`);
 }
 

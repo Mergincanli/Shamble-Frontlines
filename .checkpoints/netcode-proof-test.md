@@ -54,6 +54,28 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   push (crates unchanged since e59ece9); then the c62h record (r2's judge, --only PM-0001-17, on r2's whole-as-lost and
   tick16 folders, into .gate/netcode-proof-test/c62h-<commit12>/: both bites shown, never INVALID); then the card and
   u4r-report.md's r2 section with MRG-L1 to -L3; then U4r-F1 (RUN-L1 rides it).
+- **U4r-F1's ONE ROUND IS IN (about 17:30 UTC): infra-engineer APPROVE WITH FINDINGS, no code defect**
+  (u4r-f1-review-full.md, 45 lines, sha256 f65027a2…, by u4r_f1_review_full.py word for word; committed at 7e9d707).
+  **INF-F1-1 (Medium, read in full): the card's lock rule was wrong**; fixed in the run procedure below, no code
+  change (one optional header sentence is the advisor's call, at its review of the head). Lows: INF-F1-2 (the sets'
+  kept log and condition 6 (a) in a written procedure: below); INF-F1-3 (a signal-killed judge's signal is not named:
+  record the judge's peak memory at step 17, as the round-2 ruling already says, and a report line); INF-F1-4 (the
+  stagings' count: corrected below); INF-F1-5 (A3's message shows the first status line trimmed: a report line).
+  **Next:** one commit (the two scripts and this card), push, CI, the advisor's review of the head; then the saver.
+- **THE SETS' RUN PROCEDURE (steps 16 and 17; condition 6 as INF-F1-1 corrects it; INF-F1-2):** (1) before a set:
+  the card committed and pushed; `pgrep -a npt-lab; pgrep -af npt-judge` empty; HEAD's tree clean. (2) The command,
+  from the repository root, with a kept log: `flock -x .gate/shared-target/.lane.lock node
+  spikes/netcode-proof/ops/runs/c-u4r-runs.mjs <precheck | judged --profile P> --date <date> >
+  .gate/u4r-sets/<set>-<commit12>.log 2>&1` (run in the background; condition 5's Compiling/Fresh lines are read
+  from that log at the pre-check set). (3) During a set: no commit under spikes/ (the tree hash covers results/);
+  .checkpoints/ saves are fine (the saver commits through a private index). (4) After each set: commit its results/
+  before the next set starts. (5) **The lock, as it really works:** Node marks the lock's descriptor close-on-exec,
+  so no npt-lab or npt-judge call holds the lane lock; flock holds it only while the script lives. If the script dies
+  mid-call, the lock is freed at once and a waiting lane starts, while the call (its own session, its limit gone with
+  the script) runs on. (6) **To stop a set by hand:** end the call's group first (`pgrep -a npt-lab; pgrep -af
+  npt-judge`, then `kill -9 -- -<pid>`, since the call leads its own group), and only then the script. (7) **After
+  any killed set or session cut:** check `pgrep -a npt-lab` and `pgrep -af npt-judge` at once and kill any orphan;
+  any lane that held the lock in that window sends its timed or measured results from it to the advisor.
 - **U4r-F1 BUILT by the main session (about 16:49 UTC), uncommitted in the main folder:** c-u4r-runs.mjs and
   c-u4r-r2.mjs edited with Edit (A: spikeChanged and spikeReading exported from runs, imported by r2, both read from the
   repository root, start.status gone; B: marks.json into the bin folder and checked there, the first run's floor, then
@@ -66,7 +88,8 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
   in .gate/u4r-f1/harness/, logs in .gate/u4r-f1/logs/, scratch trees on /dev/shm/u4r-f1/; notes
   u4r-f1-evidence-notes.md). **If cut:** SendMessage to it (its transcript is kept) or a fresh agent that reads its
   notes first; the two scripts stay as edited (not committed: nothing runs from them until the commit). **Its
-  evidence (about 17:20 UTC): every condition PASS** (48 stagings; the helper test 9 of 9; the argv compare equal but
+  evidence (about 17:20 UTC): every condition PASS on its last run** (42 stagings, 47 runs: cmp-P0 run twice, the four
+  lim-* stagings re-run once after the harness's liveness check was fixed: INF-F1-4; the helper test 9 of 9; the argv compare equal but
   whole-as-lost's two lines; condition 1 with the shim and the real judge (exit 1 on a cut client.jsonl, line 451);
   condition 2 on real git 18 of 18; condition 3 on both scripts, HEAD's leaving folders, F1's none; condition 4's four
   stop lines in the 2,000 ms copy; the sleeper gone by the group kill, a control without it shows it survives). Logs:

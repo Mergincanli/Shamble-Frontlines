@@ -26,14 +26,17 @@
 //   record): `bash <runner> -x <copy> <log> node ops/runs/c-u4r-r2.mjs --date ...` or the main folder's own runner.
 // - Its order (FP-5 (a): INF-U4R-2): the usage and git checks (no uncommitted change to a tracked file, and no untracked
 //   file under spikes/netcode-proof/crates: every log names its commit); each suite's key checked as a name (one or more
-//   of A-Z, a-z, 0-9 and -: FP-5 (h)); the projection; each release build (--release --locked --offline), with at least
-//   4 GiB free before each (section 4 rule 6); the projection again; only then the output folder,
+//   of A-Z, a-z, 0-9 and -: FP-5 (h)); the projection; each release build (-v --release --locked --offline, cargo's
+//   Compiling or Fresh lines for the npt-* crates printed: advisor-u4r-r2run, RUN-L1), with at least 4 GiB free before
+//   each (section 4 rule 6); the projection again; the first suite's floor; only then the output folder (INF-R2-3),
 //   .gate/netcode-proof-test/r2-<commit12>/ (gitignored, never overwritten): one folder per suite (its three logs),
 //   <suite>-verdict.json beside it, the copies of marks/marks.json and marks/SERIES.md (their sha256s in r2.txt's head:
 //   FP-5 (e)), and r2.txt (the commit, the binaries' SHA-256s, then per suite each command, its exit line and its
 //   output). The binaries go to .gate/netcode-proof-test/bin/r2-<commit12>/, which no exists-check reads, so a stop
-//   before the first suite leaves nothing that blocks a re-run at that commit. Before r2.txt is written, HEAD and the
-//   tracked files' status are checked against their start values (FP-5 (e)).
+//   before the first suite leaves nothing that blocks a re-run at that commit. Before r2.txt is written,
+//   spikes/netcode-proof's tree hash and tracked status, read from the repository root, are checked against their start
+//   values (FP-5 (e); scoped by advisor-u4r-r2, INF-R2-1, through c-u4r-runs.mjs's spikeChanged: a .checkpoints/ save
+//   stops nothing, a commit or an edit under spikes/netcode-proof does).
 // - The projection (FP-5 (b), (c)): the builder's own 13 suites took about 145 MB (u4r-build.md, copy 5's state: the
 //   r2 folder; their 13 folders sum to 115,746,371 B, du -sb in copy 6), plus whole-as-lost at the p0 suite's size
 //   (24,813,722 B); it starts only when free space minus that total is at least 4 GiB, printing both; before each suite,
@@ -48,6 +51,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, statfsSync, writeFil
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { builtArtifact, run } from "../../check.mjs";
+import { spikeChanged, spikeReading } from "./c-u4r-runs.mjs";
 
 const SPIKE = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const ROOT = join(SPIKE, "..", "..");
@@ -84,7 +88,7 @@ export const SUITES = [
   { key: "tick16", build: "bites", run: "u4r-r2-tick16-4", args: "--scene SS --profile P0 --seed 1 --tick-start 64651 --warmup-s 10 --measured-s 20 --after-max-s 5 --role bite --bite PM-0001-17/tick16", marks: "PM-0001-2,PM-0001-17", suite: "r2-tick16", bytes: 2_937_440, expect: "contract PASS (0 mirror breaches); PM-0001-2 passes; -17's bite run FAILs by decoded_hash_mismatch_count with at least 48 mismatches; after_capped as it comes (false when the room's overflow resync resolves the measured ticks before the cap, true when the cap path of ruling 3, point 7 (a) ends the run); carry 62 (h)'s measured sum is the bite's own (tick16d: 720 = 48 x 15 post-wrap measured ticks) (ruling 3, point 3, as ruling 4, point 1 reads it; carry 73)" },
   { key: "tick16-clean", build: "lab", run: "u4r-r2-tick16-clean-1", args: "--scene SS --profile P0 --seed 1 --tick-start 64936 --warmup-s 10 --measured-s 20 --after-max-s 5", marks: MARKS_17, suite: "r2-tick16-clean", bytes: 24_813_880, expect: "contract PASS (0 mirror breaches); PM-0001-2, -17 (0 mismatches) and -57 pass; the after phase resolves without the cap (ruling 3, point 3)" },
   { key: "b1-nofallback", build: "bites", run: "u4r-r2-b1-nofallback-1", args: `--scene SS ${B1} --role bite --bite PM-0001-18/no-fallback`, marks: `${MARKS_17},PM-0001-18`, suite: "r2-b1", bytes: 14_647_138, expect: "contract PASS (0 mirror breaches, ruling 3, point 8 (A)); -18's max check FAILs (a heal later than 500 ms); INVALID by pre:PM-0001-2 is expected while npt-room is unfixed (ruling 3, points 4 and 8 (A))" },
-  { key: "whole-as-lost", build: "bites", run: "u4r-r2-whole-as-lost-1", args: `${P0} --role bite --bite PM-0001-17/whole-as-lost`, marks: "PM-0001-17", suite: "r2-whole-as-lost", bytes: P0_SUITE_BYTES, expect: "carry 62 (h)'s bite: measured incomplete equal to the client count (48), as in the builder's .gate/u4r/whole-as-lost/ dry check; -17's verdict as it comes until marks.json holds ruling 4's plain check" },
+  { key: "whole-as-lost", build: "bites", run: "u4r-r2-whole-as-lost-1", args: `${P0} --role bite --bite PM-0001-17/whole-as-lost`, marks: "PM-0001-2,PM-0001-17", suite: "r2-whole-as-lost", bytes: P0_SUITE_BYTES, expect: "contract PASS; bite PM-0001-17/whole-as-lost shown: mismatches 0 pass, L1 P0 loses no group 48 FAIL; the run valid" },
 ];
 
 /** The set's projected bytes (FP-5 (b)): the 13 suites' figure plus whole-as-lost's, or the suites' own sum if larger. */
@@ -126,11 +130,17 @@ function floor(what, projected = 0) {
   if (!r.ok) throw new Error(r.line);
 }
 
-/** One release build, at least 4 GiB free before it, its artifact's path read from cargo's JSON messages and copied to `to`. */
+/**
+ * One release build, at least 4 GiB free before it, its artifact's path read from cargo's JSON messages and copied to
+ * `to`; cargo's "Compiling" or "Fresh" lines for the npt-* crates are printed as cargo wrote them (RUN-L1).
+ */
 function build(args, target, to) {
   floor(`the release build of ${target}${args.includes("bites") ? " (bites)" : ""}`);
-  const out = sh("cargo", ["build", "--release", "--locked", "--offline", ...args, "--message-format=json"]);
-  const path = builtArtifact(out, { target, kind: "bin" });
+  const cargoArgs = ["build", "-v", "--release", "--locked", "--offline", ...args, "--message-format=json"];
+  const r = spawnSync("cargo", cargoArgs, { cwd: SPIKE, encoding: "utf8", maxBuffer: 1 << 28 });
+  if (r.status !== 0) throw new Error(`cargo ${cargoArgs.join(" ")}: exit ${r.status}\n${r.stdout}${r.stderr}`);
+  for (const l of r.stderr.split("\n")) if (/^\s*(Compiling|Fresh) npt-/.test(l)) console.log(l);
+  const path = builtArtifact(r.stdout.trim(), { target, kind: "bin" });
   if (!path) throw new Error(`cargo build ${args.join(" ")} names no ${target} executable in its JSON messages`);
   copyFileSync(path, to);
   return to;
@@ -156,7 +166,9 @@ function main(argv) {
   const untracked = sh("git", ["status", "--porcelain", "--untracked-files=all", "--", "crates"]);
   if (untracked) throw new Error(`files under spikes/netcode-proof/crates are not committed (${untracked.split("\n").join("; ")}): commit first, since every log names its commit`);
   const commit = sh("git", ["rev-parse", "HEAD"]);
-  const start = { commit, status: tracked() };
+  // From the repository root: this script's sh() runs in the spike, where the pathspec would match nothing (INF-R2-1).
+  const reading = () => spikeReading((args) => sh("git", args, ROOT));
+  const start = { commit, ...reading() };
   const out = join(GATE, `r2-${commit.slice(0, 12)}`);
   if (existsSync(out)) throw new Error(`${out} exists: a run set is never overwritten`);
   const bad = keyProblems();
@@ -177,6 +189,7 @@ function main(argv) {
   };
   const judge = build(["-p", "npt-judge"], "npt-judge", join(bin, "npt-judge"));
   const after = room("after the builds");
+  floor(`suite ${SUITES[0].key}`, SUITES[0].bytes);
   mkdirSync(out, { recursive: true });
   const copies = {};
   for (const f of ["marks.json", "SERIES.md"]) {
@@ -184,7 +197,7 @@ function main(argv) {
     copyFileSync(join(SPIKE, "marks", f), copies[f]);
   }
   const lines = [
-    `# U4r's r2, re-made from commit ${commit} on ${date} (the advisor's U4r build ruling 3, point 6 (4))`,
+    `# U4r's r2, re-made from commit ${commit}, spikes/netcode-proof tree ${start.tree}, on ${date} (the advisor's U4r build ruling 3, point 6 (4))`,
     `npt-lab (measured build) sha256 ${sha256(exe.lab)}`,
     `npt-lab (bites build) sha256 ${sha256(exe.bites)}`,
     `npt-judge sha256 ${sha256(judge)}`,
@@ -206,9 +219,8 @@ function main(argv) {
     console.log(said.join("\n"));
     lines.push(...said);
   }
-  if (sh("git", ["rev-parse", "HEAD"]) !== start.commit || tracked() !== start.status) {
-    throw new Error("HEAD or the tracked files changed since the set started: stopped before r2.txt is written (FP-5 (e))");
-  }
+  const why = spikeChanged(start, reading());
+  if (why) throw new Error(`spikes/netcode-proof changed since the set started (${why}): stopped before r2.txt is written (INF-R2-1)`);
   writeFileSync(join(out, "r2.txt"), `${lines.join("\n")}\n`);
   console.log(`written: ${join(".gate", "netcode-proof-test", `r2-${commit.slice(0, 12)}`, "r2.txt")}`);
 }
