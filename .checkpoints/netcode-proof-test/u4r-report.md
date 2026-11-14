@@ -5,7 +5,8 @@ pre-check and the run scripts, merged after review round 2": advisor-u4r-r2-full
 u4r-brief.md rev 3.2 (sha256 59d570b8…, 1,909 lines: u4r-build.md:20-21; the advisor's check of rev 3.1,
 advisor-u4r-brief.md:10-11: APPROVE WITH CONDITIONS on L1 to L5), built on 2fbec77 (the spike head, whose spikes/ is
 the brief's `<base>` 614823c's: u4r-build.md:5-14). The bytes merged: wip/u4r.patch, sha256 21ca46be…, 26 files. The
-runs after this merge: the r2 record run and carry 62 (h) are done, the judged sets pending (last section). For U4's
+runs after this merge: the r2 record run, carry 62 (h) and U4r-F1 (f1f131b) are done; the judged sets are pending
+(last section). For U4's
 report, which folds this one
 (advisor-u4r-r2-full.md:23).
 
@@ -168,7 +169,11 @@ copy 6's by-hand node --test at 73 of 76, re-pinned in the same step, recorded u
 advisor-u4r-r2-full.md:32).
 
 ## Follow-ups (each with its home; none triggers a push)
-- **U4r-F1** (before any c-u4r-runs.mjs set; plan first, infra-engineer as its one round): INF-R2-1 (compare only the
+- **The run scripts' next change** (c-u4r-runs.mjs, c-u4r-r2.mjs; from U4r-F1's round and head review): INF-F1-1's
+  header sentence, in the advisor's words (advisor-u4r-f1-head-full.md); INF-F1-5's untrimmed status read; and
+  INF-F1-3's signal name, once check.mjs's run() returns the signal (INF-R2-5, below).
+- **U4r-F1, done at f1f131b** (the judged runs, item 3) (before any c-u4r-runs.mjs set; plan first, infra-engineer as
+  its one round): INF-R2-1 (compare only the
   spike's tree hash and its own status before the judge or r2.txt), INF-R2-3 (no set folder before the first floor),
   INF-R2-4 (a 3,600 s limit on each npt-lab and judge call) (advisor-u4r-r2-full.md:19, :38-41, :108-118). Until then
   only r2's record run may run, with saves paused (:40). Two Lows ride it: RUN-L1 (r2.log's provenance block is empty:
@@ -243,7 +248,45 @@ advisor-u4r-r2-full.md:32).
    shown, run valid, mismatches 0 (pass), the new check 48 (FAIL); tick16: bite shown, run valid, mismatches 2,880
    (FAIL), the new check 720 (FAIL); PM-0001-2 NOT-RUN with no runs, as expected; each verdict cmp-equal to the labelled
    diagnostic (per the README). Carry 62 (h) stands as committed (advisor-u4r-c62h-full.md:36-38).
-3. **U4r-F1** (above; advisor-u4r-r2-full.md:19). Pending.
+3. **U4r-F1** (above; advisor-u4r-r2-full.md:19). **Done at f1f131b**, approved by the advisor's review of that head
+   (advisor-u4r-f1-head-full.md, APPROVE, three Lows, no push). The details:
+   - **Size:** 125 insertions and 48 deletions in the two run scripts, against the plan's "about 100" and the advisor's
+     expected 110 to 125.
+   - **The plan:** the advisor approved it with conditions 1 to 8 and choices Q1 to Q6 (advisor-u4r-f1-plan-full.md).
+   - **The evidence:** 42 stagings and 47 runs, all PASS on their last run (.gate/u4r-f1/logs/summary.log; the harness
+     is in .gate/u4r-f1/harness/). The first lim-* runs failed only the harness's own liveness check: kill(pid, 0)
+     succeeds on a zombie. The fix reads the process state from /proc. That is not a loosened check: `pgrep -f` was
+     empty in both runs (advisor-u4r-f1-head-full.md, check 11).
+   - **The one round:** infra-engineer, APPROVE WITH FINDINGS (u4r-f1-review-full.md).
+     - INF-F1-1 (Medium): the card's lock rule was wrong. It is fixed in the card's run procedure, items (5) to (7),
+       with no code change. The wrong premise in condition 6 (b) was the advisor's own error (its head review, check
+       17).
+     - INF-F1-2 is fixed in the card's items (2) to (4). INF-F1-4's count is corrected on the card.
+     - INF-F1-3 (Low): a call killed by a signal is reported "by a signal", without the signal's name. Its home: once
+       check.mjs's run() returns the signal (INF-R2-5, below), both scripts name it. Step 17's peak-memory reading
+       covers the memory side.
+     - INF-F1-5 (Low): the quoted first status line loses its leading space (sh() trims it). Its home: an untrimmed
+       read at the run scripts' next change.
+   - **The advisor's three Lows on the head:**
+     - ADV-F1H-1: fixed in the card's run procedure (`mkdir -p .gate/u4r-sets`; the getrusage wrapper for the judged
+       sets).
+     - ADV-F1H-2: the main session's own redact-check on the real tree and its gate --no-smoke run left no kept log.
+       The redact claim holds by composition. F1's two files give 0 findings (redact.log), and spikes/ differs from
+       5e563b9 only in those two files, where check.mjs's redact step gave 277 items and 0 findings
+       (.gate/u4r-merge/c62h-check.log:17). The gate claim holds through CI: gate, smoke and toolchain were green on
+       f1f131b (17:30 UTC). From now on, such runs' output is kept under .gate/<slug>/.
+     - ADV-F1H-3: condition 6's two risks are in the card's run procedure but not in the plan's risks section (the plan
+       stays as it was). Here they are, with the corrected lock mechanism:
+       (a) The spike's tree hash covers results/. So a commit under spikes/netcode-proof while a set runs (an earlier
+       set's results/ included) stops that set before the judge. Commit each set's results/ before the next set
+       starts, and never commit under spikes/ during a set.
+       (b) Node marks the lock's descriptor close-on-exec, so no npt-lab or npt-judge call holds the lane lock. If the
+       script dies mid-call, the lock is freed at once, while the call runs on in its own session with no limit. So
+       after any stopped or killed set, `pgrep -a npt-lab; pgrep -af npt-judge` must be empty before another lane
+       takes the lock. Kill an orphan's group first (`kill -9 -- -<pid>`), then the script.
+   - **INF-F1-1's optional header sentence:** deferred to the run scripts' next change, in the advisor's words
+     (advisor-u4r-f1-head-full.md, "INF-F1-1's optional header sentence"). A comment-only push now would be a push for
+     a Low.
 4. **D4:** the runner's ticks per second in the main folder's own cache, the set's wall time redone (:20). Pending.
 5. **The disk plan**, in writing: 4,681 MiB free; kept logs of about 162 + 16 + 360 + 545 + 629 + 3,020 MiB plus the
    4 GiB floor and builds leave it about 4.1 GiB short; space only from the approved part-cleans; never delete a log;
