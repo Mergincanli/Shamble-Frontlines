@@ -53,7 +53,15 @@
   that review, verify or design game and engine code; never push to another chat's branch; never touch spikes/.
 
 ## Advisor tool consultations (his words of 2026-11-11: when, the question, what changed)
-- (none yet)
+1. 2026-11-15 15:49:20 UTC (called; answer 15:51:36 UTC; transcript times), moment 1 · Q: is the approach sound (a
+   separate test repository; one Pages Edit token in `preview` only, a reviewer with self-review off; probes and
+   browser rows on GitHub runners; no custom domain)? · Changed: the test repository's place, the runner stand-ins and
+   the one-token choice become decisions with both branches costed (the `spikes/` tension put to the advisor agent by
+   name); a mark-by-mark table (as drafted / as planned / departure and who decides); every click read from a cited
+   page first (else "if your screen differs, stop and tell me"); the reviewer gate's clicks and sittings counted and the
+   close-time vs close-job time both recorded; the 24 h reading not on cron alone; asks listed (push to named branches
+   there, his merges and branch deletion, the token straight from Cloudflare into GitHub's secret box); the saver
+   before agents; no action toward the test repository this turn.
 
 ## Running work
 - saver: not started yet.
