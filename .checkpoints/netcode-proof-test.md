@@ -52,10 +52,16 @@ conditions 1-5 and ADV-NP-7 to -10 (the verifier's Lows, the record line) go bac
 issue #16 links the plan by the fixed file's SHA. Mustafa checked in about 15:32 UTC (asked for the open decisions in
 one place): answered in chat. **Slip 10:** times written ahead of the clock twice (15:35/15:38, then 15:40/15:41;
 corrected). Lesson: run `date -u` before writing a time.
-**Running since about 15:34 UTC: workflow wf_6df5140c-eeb (task wrerdp1zt), the advisor's check of the fix pass**
-(condition 6; diff 5afc772..7812127; notes advisor-night-plan-fixes.md; keys verdict, summary, conditions_met,
-other_changes, findings, to_mustafa). **If cut:** resume by run id. **Then:** its result word for word, read in full;
-on APPROVE, issue #16's body gains item 7 linking night-2026-11-16.md at the fixed file's SHA.
+**NIGHT ITEM 7 POSTED (issue #16 body, about 15:44 UTC).** The advisor's check of the fix pass (wf_6df5140c-eeb,
+about 15:34-15:40 UTC): **APPROVE**, conditions 1-5 met, ADV-NP-7 to -10 folded as meant, every other change right;
+six Lows (ADV-FX-1 to -6), none needing a change; word for word in advisor-night-plan-fixes-full.md (80 lines,
+881e114c…, by night_plan_fixes_full.py), read in full. Issue #16: "Last updated" and the item 7 block (plan link at
+781212774986118183a7c6521c34cca31b5fe2a0; "Mustafa's rule, 2026-11-09" linked to the card's record at L3390-L3394;
+his 16:35 answers named as history.md lines 2131-2146 at 2156e494…, plain text, per ADV-FX-6) added; every other line
+read back equal. **Slip 11:** the first update's history.md link came back wrapped in stray backticks (the MCP write);
+a second update replaced it with plain text, read back right. **Morning (2026-11-16):** fold cs/npt-u4f-brief's notes
+(rev 2 draft, the test-engineer's and the security-auditor's checks), run the recheck at HEAD with his 16:35 answers,
+fill the placeholders by script, then the advisor's brief check.
 **Was running from about 15:22 UTC: workflow wf_6e5acbfd-5c3 (task wkxc0tfqn), the night plan's check** (script
 npt-night-plan-check-wf_6e5acbfd-5c3.js): the verifier on every reference (notes night-plan-verify.md; keys
 refs_checked, wrong, spot_checks, verdict, summary) and the advisor from main's file on fit with NIGHT_SHIFT.md, scope,
