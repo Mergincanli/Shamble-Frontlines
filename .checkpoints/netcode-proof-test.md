@@ -597,8 +597,11 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
               Chromium could not start (the tools want chromium_headless_shell-1194; the container's build differs:
               gate.log), `--no-smoke` GATE PASS (gate-no-smoke.log), as on the card's earlier runs; CI runs the full
               gate; the node_modules link used for it removed. kit step running (18:45).
-            - **Done 18:45-19:05 UTC** (kit 18:45:50; the evidence save e10e1de 18:47:41; the PR just before the
-              workflow at 19:05:45): kit counts at the head equal main's (27, 127, 1107: kit PASS). Committed in the
+            - **Done 18:45-18:50 UTC** (kit 18:45:50; the push's CI started 18:47:10; the evidence save e10e1de
+              18:47:41; PR #53 opened and subscribed 18:49:41, its CI started 18:49:45): kit counts at the head equal
+              main's (27, 127, 1107: kit PASS). **CI green on a637c7a** (checked 19:09 UTC): gate, smoke (the full
+              gate's smoke, which this container cannot run) and toolchain, success on both runs (43748694216 push,
+              43748934361 PR). No steward or babysit skill on the head branch. Committed in the
               worktree and pushed: **head a637c7a357e79614f896ddddf7488e08b5fc9180** on claude/kept-logs-rule (4 files,
               +671 −0). `kl_evidence.py compare a637c7a…` PASS (the pushed commit's four files equal the rebuilt ones;
               `git diff --name-status 4460ef5 a637c7a` = exactly those four). quotes, guard and full re-run into
