@@ -46,7 +46,9 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
 - **Slip 8 (about 04:18 UTC):** a `cd <worktree> && git diff` moved the session's folder into the builder's worktree for
   one call, and the next command returned it. It was read-only; nothing changed (the worktree's HEAD is 352a245, with 10
   entries).
-- **RUNNING since about 04:40 UTC: workflow wf_bbfeece0-4c7 (task wpp4xx1x6), "brawl1-r1".**
+- **RUNNING since about 04:25 UTC: workflow wf_bbfeece0-4c7 (task wpp4xx1x6), "brawl1-r1".** The workflow runs at
+  most 2 agents at once on this machine, so netcode-architect starts when the advisor or test-engineer ends. The writer
+  for its results is ready: brawl1_r1_full.py (syntax checked).
   - Batch 1: the advisor on the points (general-purpose, notes advisor-brawl1-points.md), test-engineer and
     netcode-architect. Batch 2: rust-reviewer and engine-architect. Everyone opus at xhigh; all on snapshot ee2973aa.
   - The points file (facts and options, no option preferred): brawl1-points.md.
