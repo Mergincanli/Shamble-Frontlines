@@ -14,11 +14,22 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**LATEST (2026-11-15 about 13:00 UTC): BRAWL-1 is closed. Nothing runs but the saver. Three answers are with
-Mustafa: KL-YES (the KEPT-LOGS kit lines, posted whole about 12:50), C62H-KEEP and C62H-BOUND (posted about 13:00).
-Read the blocks "KEPT-LOGS ANSWERED" and "C62H-REVIEW ANSWERED" below first, then "NEXT (task #74)".** **The saver:** bt42fk8u5 ended at 14:33:54 UTC on its
-own time limit ("watch stopped: time is up", exit 0; its last save df2e977); restarted at 14:34 UTC as **bugi27gbf**.
-Check-in 12:41 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5): nothing stopped. 14:34 UTC: no answer from Mustafa yet.
+**LATEST (2026-11-15 about 14:50 UTC): BRAWL-1 is closed. Nothing runs but the saver. Three answers are with
+Mustafa: KL-YES (the KEPT-LOGS kit lines, posted whole about 12:50), C62H-KEEP and C62H-BOUND (posted about 13:00);
+none in at 14:50. Read the blocks "KEPT-LOGS ANSWERED" and "C62H-REVIEW ANSWERED" below first, then "NEXT (task
+#74)".** **The saver:** bt42fk8u5 ended at 14:33:54 UTC on its own time limit ("watch stopped: time is up", exit 0;
+its last save df2e977); restarted at 14:34 UTC as **bugi27gbf**. Check-in 12:41 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5):
+nothing stopped. **While waiting (about 14:50 UTC):** the chat is about 35 % (343,897 tokens at 14:35 by
+get_session, before this turn's reads), so the card is refreshed and Mustafa is told, for his /compact (his rule,
+history.md:298-299). **Tonight's night item: U4f's brief draft**, under his rule of 2026-11-09 (card :3337-3341, the
+next unit's plan drafts each evening). Issue #16's queue was empty the nights of 11-13 and 11-14 (the night shift's
+comments 6868224448 and 6885698159). The plan file night-2026-11-15.md takes night-2026-11-10.md's form: its rules 1-6,
+and the item shaped like items 2 and 4 (netcode-architect drafts, test-engineer checks, one revision). It names carries
+46, 80 (a)-(e) and 86, the U4f lines at u4s-carries.md:226 and :345, the card's :1936-1937 note, and C62H-BOUND as open
+where carry 80 (b) and (d) touch how the client files lost ticks. Push it, then add item 7 to issue #16's body by
+about 21:00 UTC (the night starts 23:10 UTC); his rule's words are copied by script from night-2026-11-10.md:4-8.
+**Not now:** step (7) is PR #40's report (advisor-u4r-sets-r2-full.md:135); JDG-ONLY-1 and the check.mjs follow-up
+ride the next npt-judge and check.mjs change (U4h at the latest; before PR #40 is marked ready).
 
 **NOW (2026-11-15 about 04:25 UTC; read this first after a compact or a cut): BRAWL-1 IS BUILT (copy 1, agent
 a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVISOR'S RULING AND THE REVIEW ROUND.**
@@ -483,12 +494,15 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
           - **Slip 9 (about 12:36 UTC):** a `cd <notes folder> && grep` moved the session's folder for one call; the next
             command returned it. Read-only; nothing changed.
         - **NEXT (task #74):**
-          - KEPT-LOGS: answered (c); the advisor's review of the drafted lines is running. When it is in, post the exact
-            lines to Mustafa; he answers after his Advisor has read them. Nothing is built before his yes.
-          - C62H-REVIEW: done; waiting for C62H-KEEP and C62H-BOUND (above). KEPT-LOGS: waiting for KL-YES.
-          - Then step (7): U4's report folds U4r's. Then U4f, U4g (its brief with u4g-brief-carry.md and EVQ-LOAD) and
-            U4h, each with its brief to the advisor first.
-          - Before PR #40 is marked ready: the check.mjs follow-up (now also ADV-PT-L3), JDG-ONLY-1, and taking main in.
+          - KEPT-LOGS: answered (c); the advisor reviewed the drafted lines and the exact lines were posted to Mustafa
+            (about 12:50 UTC); he answers after his Advisor has read them. Nothing is built before his yes (KL-YES).
+          - C62H-REVIEW: done; waiting for C62H-KEEP and C62H-BOUND (above).
+          - Tonight: U4f's brief draft as night item 7 (LATEST above): night-2026-11-15.md, then issue #16 by about
+            21:00 UTC; folded in the morning, then to the advisor.
+          - Step (7), U4's report folding U4r's, is PR #40's report (advisor-u4r-sets-r2-full.md:135). Then U4f, U4g
+            (its brief with u4g-brief-carry.md and EVQ-LOAD) and U4h, each with its brief to the advisor first.
+          - Before PR #40 is marked ready: the check.mjs follow-up (now also ADV-PT-L3), JDG-ONLY-1 (both ride the next
+            check.mjs and npt-judge change), and taking main in.
         - **Then:** commit the report, the card and the advisor's notes together, push, and record BRAWL-1 CLOSED.
         - **Then task #74:**
           1. TE-B1-R2-2's runner edit (u4r-run.sh:67 and main-run.sh:42, in the ruled form, each with a .diff and a
