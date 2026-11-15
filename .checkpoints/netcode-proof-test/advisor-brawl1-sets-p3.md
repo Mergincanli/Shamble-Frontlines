@@ -38,3 +38,32 @@
 - N9 other verdicts: -2 SS runs FAIL (0.352778/0.085444/0.203556) -> PASS (1/1/1); -2 mark FAIL -> NOT-RUN; -17 L1 P3
   INVALID (pre:PM-0001-2) -> PASS (0 mismatches; compared 835,238/835,419/835,088; judge incomplete 44,395/44,253/
   44,535 whole-run); -17 mark INVALID -> NOT-RUN; -17 bites not_run both. All as plan section 9 expects.
+- N10 snapshots: snap_datagram_bytes mean 999.2, max 1,000, share >= 990 B 1.0000 (s1, s2); U4r s1 992.9 / 0.9933.
+  s1 has 863,772 snapshot client-ticks of 864,000: 228 missing = the forced full states in flight (about 8.4 a resync).
+- N11 -57 sample counts (lab.jsonl, measured, s1): positions 3,517,033 now vs 13,882,157 U4r (before t 70,336:
+  1,785,967 vs 3,739,269); yaw 2,839,717 vs 8,925,831; pitch 2,347,291 vs 5,647,454. lab.jsonl 42.6-46.9 MB vs
+  122.9-127.2 MB: the byte drop. Cause not established (fewer moving entities, or less room in the full 1,000 B window).
+- N12 bytes: raw-log folder du -sb 304,793,576 B = 290.7 MiB (runner's on-disk line) vs projection 524.4 MiB: 0.554.
+  U4r P3 543,998,603 B = 518.8 MiB. Per run 98,642,608 / 102,899,955 / 102,859,801 B. Evidence P3 98,642,683 B.
+  Judge peak 973.2 MiB vs projected 982 (on-disk line): -8.8 MiB, inside the fit's -90..+70 residuals. Free now
+  12,327,985,152 B = 11,757 MiB.
+- N13 deterministic: evidence brawl1-ev-p3-s1's resyncs are at the same ticks and slots (27; first 76,910 slot 44); its
+  -17 report equals l1-p3-s1's (835,238 compared, 44,395 incomplete). -2 shots 693.18/693.26/693.37 (U4r 695.02/
+  695.09/695.22).
+- N14 tree: b30314a, fd46120 and HEAD (50088c4) all give spikes/netcode-proof ebbfeb40; `git diff --name-only b30314a
+  HEAD` has no line outside .checkpoints/; `git diff --quiet b30314a HEAD -- spikes/netcode-proof
+  ':!spikes/netcode-proof/results'` exit 0; porcelain under spikes/netcode-proof = only the two untracked P3 files.
+  Runner 99dd070e. runs.txt sha256 5361fd53..., verdict.json 21c9abbf... (= the raw-log folder's copy); set log
+  cc2f626c.... The runner (c-u4r-runs.mjs:401-414) refuses any tracked change and any untracked file under crates/ at
+  start, and re-checks the spike tree and tracked status before the judge (:181-196): no stop printed.
+- N15 M7-3 as I wrote it cannot hold for set logs: the sets run outside main-run.sh (plan §7.1 item 6; runner header
+  :53-84), so no set log has a diff/untracked header; and "tree ebbfeb40" conflicts with plan §7 :235 / r1 M7 / cond 15
+  (results committed before the next set). My error.
+- N16 TICK16-WORDING: P3 has no tick16 run (bites are P0's); not applicable. P0 tick16 (U4r: wrap at 65,536, measured
+  ends 65,550, resyncs 65,615 = wrap + 79): at 17-19 events a client a tick the cap fills about wrap + 54-60 (computed),
+  still after 65,550; the wording has no fixed offset, so it stands.
+- RULING drafted: P3 counts (carry 58: s1, s3 count for -17 L1 P3); commit P3's two files; M7-3 amended; P2 GO; P0 GO
+  after P2 with its expected lines; ADV-P3-1 (Medium, the flags not raised), ADV-P3-2 (Low, mine, M7-3); EVQ-LOAD to
+  U4f/U4g briefs. For Mustafa: nothing.
+- DONE: result returned in StructuredOutput. I changed nothing in any tree; `git status` shows only this notes file and
+  the two untracked P3 result files.

@@ -1,0 +1,26 @@
+# u4r-P3: -17's, -57's L1 P3 part(s), run in this container on 2026-11-15 (u4r-brief.md 7.1)
+commit fd4612050cd621d574522e169699eeda2ea50db7, spikes/netcode-proof tree ebbfeb40369397baf3cc6867b3284a27810bbbe5
+target: the main folder's own cache (CARGO_TARGET_DIR unset: plan §7.1 item 6)
+npt-lab (measured build) sha256 c0da790559a366d969c22e7d65a440d9ccb86d6ae046ba3613e020682c56218d
+npt-lab (bites build) sha256 7c0e67147f8b932442c89fead195511db3c6c2f0aaf4f0c1d273122d608fd1b9
+npt-judge sha256 65acacfefa22ff0aea1e43778d8aecf339d966a41681e961ea95f01452406d82
+marks.json sha256 9fb5be578b27d4c378a890d297c5ba636af0ac239bb6d50eae157ed44884a3c5 (copied into the bin folder and checked there, then into the raw-log folder; the bite list and the judge read those copies)
+raw logs: .gate/netcode-proof-test/runs/u4r-P3-fd4612050cd6/ (not committed: plan §7.2)
+projection: u4r-P3: the set's 3 runs' projected logs, before the builds: free 12057 MiB, projected 524 MiB, so 11533 MiB after it against the 4 GiB floor (4096 MiB): room
+projection: u4r-P3: the set's 3 runs' projected logs, after the builds: free 12050 MiB, projected 524 MiB, so 11526 MiB after it against the 4 GiB floor (4096 MiB): room
+projection: u4r-P3: the judge, from the plan's bytes before the builds: 524.4 MiB of logs, so a projected peak of 1530 MiB by 302.2 + 2.3403 x MiB (the six-point fit: advisor-u4r-sets-r2) against the 10240 MiB line: room
+start: uptime 3163 s, load average 0.35 0.72 0.81
+end: uptime 4183 s, load average 1.00 1.00 1.00
+judge, projected from its logs on disk: 290.7 MiB of logs, so a projected peak of 982 MiB by 302.2 + 2.3403 x MiB (the six-point fit: advisor-u4r-sets-r2) against the 10240 MiB line: room
+judge: PM-0001-2    NOT-RUN   ES runs: 0 of 3 valid runs
+PM-0001-17   NOT-RUN   L1 P0: 0 of 3 valid runs
+PM-0001-57   NOT-RUN   L1 P0: 0 of 3 valid runs
+judge, the set's parts and bites (verdict.json: each part and bite that holds a run of this call, as the file gives them):
+  PM-0001-2 SS runs: PASS (l1-p3-s1 valid, l1-p3-s2 valid, l1-p3-s3 valid)
+  PM-0001-17 L1 P3: PASS (l1-p3-s1 valid, l1-p3-s2 valid, l1-p3-s3 valid)
+  PM-0001-57 L1 P3: PASS (l1-p3-s1 valid, l1-p3-s2 valid, l1-p3-s3 valid)
+
+# one line per run (npt-lab's own summary line and its wall time; the judge reads the logs, never these lines)
+l1-p3-s1 SS P3 seed 1: 18334 ticks (34 after); lead 7; commands 700663 (steps without one 178860, duplicate stamps 0); late 1118; press refused 0; buffer full 0; rewinds refused 0; stale 0; overflow resyncs 27; heals 0; client hashes 835238 (sentinels 0); measured incomplete 43295; decided lost at the stop 87; shots per measured second 693; carry 49: measured client sets 864000, holding every very large unit 864000 (1.0000), projectiles per set 285.77; audit 2501236 owner, 3613975 spatial checked against the radius, 151257 spatial not checked, 0 breaches; fate log b99096c62a5c51dd; connect order digest e826cbd37d20d3ae; in a building: 0 slot-ticks (slots none) (wall 321.1 s) (overflow resyncs: to the advisor before it counts, carry 58)
+l1-p3-s2 SS P3 seed 2: 18335 ticks (35 after); lead 7; commands 724309 (steps without one 155292, duplicate stamps 0); late 1136; press refused 0; buffer full 0; rewinds refused 0; stale 0; overflow resyncs 0; heals 0; client hashes 835419 (sentinels 0); measured incomplete 43210; decided lost at the stop 62; shots per measured second 693; carry 49: measured client sets 864000, holding every very large unit 864000 (1.0000), projectiles per set 284.29; audit 2500951 owner, 3965365 spatial checked against the radius, 151733 spatial not checked, 0 breaches; fate log 7dbd92ec2098f6da; connect order digest e826cbd37d20d3ae; in a building: 0 slot-ticks (slots none) (wall 329.2 s)
+l1-p3-s3 SS P3 seed 3: 18334 ticks (34 after); lead 7; commands 715622 (steps without one 163892, duplicate stamps 0); late 1210; press refused 0; buffer full 0; rewinds refused 0; stale 0; overflow resyncs 1; heals 0; client hashes 835088 (sentinels 0); measured incomplete 43454; decided lost at the stop 59; shots per measured second 693; carry 49: measured client sets 864000, holding every very large unit 864000 (1.0000), projectiles per set 287.36; audit 2504247 owner, 4074240 spatial checked against the radius, 153767 spatial not checked, 0 breaches; fate log f167ce6f8dfc3c09; connect order digest e826cbd37d20d3ae; in a building: 0 slot-ticks (slots none) (wall 324.5 s) (overflow resyncs: to the advisor before it counts, carry 58)

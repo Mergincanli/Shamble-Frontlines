@@ -265,6 +265,10 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
       of each client's snapshots: **1** at P0 and **1** at P3 (U4r's P0 s1 had 0.861889). Every stress-scene check
       passes; shots 693.09 and 693.18 a second. Both runs are valid.
     - The bytes: P0 538,353,013 B (rate 603.7 MB); P3 98,642,683 B (rate 183.3 MB). Both within.
+    - **ADV-P3-1 (Medium, my miss, now added):** the P3 evidence run equals l1-p3-s1, with 27 overflow resyncs on 25
+      clients at ticks 76,910-77,844 (m7-ev.log:125), and P3's incomplete count was 43,295 measured and 44,395
+      whole-run. Lesson: check every runs.txt flag and every summary-line figure against U4r's same-seed line, not
+      only the verdict lines.
     - -17's facts: 0 mismatches in both runs; P0 loses no group (0 incomplete). The parts read NOT-RUN because one run
       is not three seeds; that is expected for evidence runs.
     - -57 (facts): positions max 6,984 at P0 and 6,952 at P3 (bar 10,000); yaw 2,750 in both.
@@ -284,7 +288,27 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
         .checkpoints/ commits after b30314a), but committing each set's results under
         spikes/netcode-proof/results/u4r/<c12>/<P>/ before the next set changes that tree;
       - (3) whether P2 may start.
-    - **RUNNING since about 09:46 UTC: that ruling, workflow wf_04e44b32-d5e (task wweyhb48z),** notes
+    - **THE RULING (advisor-brawl1-sets-p3-full.md, 213 lines, sha256 1bc5889c…): P3 STANDS AND COUNTS.**
+      - -2 SS went from FAIL to PASS (everyone in view 1/1/1; U4r's was 0.35/0.09/0.20). -17 L1 P3 went from INVALID
+        to PASS. -57 is unchanged; its largest change is -0.46 % (s1 position max, 6,984 to 6,952).
+      - Carry 58: the s1 (27) and s3 (1) resyncs count. No client was kicked, and there are 0 mismatches.
+      - M7-3 is amended: a set is valid when `git diff --quiet b30314a HEAD -- spikes/netcode-proof
+        ':!spikes/netcode-proof/results'` exits 0, b30314a..HEAD touches only .checkpoints/ and BRAWL-1's results
+        folders, and the results show only A lines.
+      - P3's results (runs.txt 5361fd53…, verdict.json 21c9abbf…) are committed as their own commit, with the card.
+      - **Before each set:** one read-only main-run.sh call, logged as .gate/u4r-sets/pre-<P>.log:
+        1. the header reads e3b0/e3b0;
+        2. `git rev-parse HEAD HEAD:spikes/netcode-proof`;
+        3. the three (a) checks;
+        4. sha256 of c-u4r-runs.mjs (99dd070e), main-run.sh (f0b7a3d0) and u4r-run.sh (2f754d12);
+        5. pgrep;
+        6. df at least the start figure plus 4,096 MiB (P2 4,877, P0 7,711).
+        Then launch exactly as P3 was launched.
+      - **P2: GO. P0 (split): GO after P2.** The expected lines and the stops are in the ruling's "The next sets". At
+        P2, a flagged resync run gets print-only reads (count, ticks, phases, slots, no kick, 0 mismatches); if those
+        hold, P0 follows without waiting, and the flagged runs go to the advisor with P0's verdict.
+      - The EVQ-LOAD carry line goes into u4r-report.md and onto the card, word for word from the ruling's next_sets.
+    - **Was running, about 09:46-09:58 UTC: that ruling, workflow wf_04e44b32-d5e (task wweyhb48z),** notes
       advisor-brawl1-sets-p3.md. Its result has the keys summary, condition15, conflict, next_sets, report_figures
       and to_mustafa.
       - **If cut:** resume by run id.
