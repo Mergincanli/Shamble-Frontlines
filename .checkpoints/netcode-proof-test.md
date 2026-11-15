@@ -14,7 +14,8 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**C62H-BOUND WORKFLOW DONE (about 16:42 UTC; wf_dd5ce188-bb6, 3 agents, 978,677 tokens):** the design and both
+**C62H-BOUND WORKFLOW DONE (about 16:15 UTC; wf_dd5ce188-bb6, 3 agents, 978,677 tokens; the advisor and the
+test-engineer both APPROVE WITH CONDITIONS; saved at ca95ca1):** the design and both
 reads saved word for word as JSON by c62h_bound_full.py: c62h-bound-design-full.json, advisor-c62h-bound-full.json,
 c62h-bound-test-full.json (verdicts printed in the save's log). **NOT YET READ IN FULL** (usage at 96 %: saved first).
 **Next:** read all three in full (a pass bar); apply the readers' conditions; then post the exact wording and planned
