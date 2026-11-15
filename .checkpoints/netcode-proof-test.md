@@ -77,8 +77,20 @@ CI GREEN, THE ADVISOR'S HEAD REVIEW RUNS; BRAWL-1's PLAN REVIEW RUNS.**
        on main (4460ef5) by the workflow's isolation, and its start check caught that (the cuts block, 2026-11-15
        00:00).
        - **Relaunched at about 02:40** by the Agent tool: general-purpose, opus, effort xhigh, `isolation: "worktree"`.
-         `<base>` is 352a245 (spike tree abad0635, equal to 926a6cb's). The run is agent a66cee8b8170d816f, launched
-         02:40 UTC; continue it by SendMessage. Notes brawl1-build.md; its worktree path goes in the notes.
+         `<base>` is 352a245 (spike tree abad0635, equal to 926a6cb's).
+       - **That launch, agent a66cee8b8170d816f, also got a worktree on main (4460ef5).** It stopped at its start
+         check, changed nothing and wrote no notes. Its worktree was auto-removed. So the Agent tool's isolation now
+         bases on main too.
+       - **The fix:** the main session made the worktree itself: `git worktree add --detach .claude/worktrees/brawl1
+         352a245c3018…`.
+         - The guard leaves `.claude/worktrees/<name>` unprotected (routine-guard.mjs:44), and u4r-run.sh accepts only
+           worktrees under .claude/worktrees/.
+         - Checked: HEAD 352a245, status empty, spike tree abad0635.
+       - **RUNNING since about 02:45 UTC: the builder in .claude/worktrees/brawl1,** agent a4be43b1f756e45dd (Agent
+         tool, no isolation; general-purpose, opus, effort xhigh); continue it by SendMessage. Notes brawl1-build.md.
+         A later copy is pointed at the same worktree path.
+       - **Lesson, on the cuts block too:** neither the workflow's nor the Agent tool's worktree isolation bases on the
+         spike branch now. A builder's worktree is made by hand at the spike head, under .claude/worktrees/.
        - **If it stops or is cut:** launch a fresh copy WITHOUT isolation, told the existing worktree's path from the
          notes. It reads the notes and that worktree's diff before it changes anything (as U4r's copy 6). Never launch a
          new worktree for a later copy.
@@ -2065,6 +2077,10 @@ the cut and the time of the resume; UTC, read from the session's transcript):
     - The builder was relaunched by the Agent tool with `isolation: "worktree"`. That route gave U4r's builders
       spike-branch worktrees. Its start check (HEAD equal to `<base>`) stays.
     - **Lesson:** never give a builder a workflow `agent()` with `isolation: 'worktree'`: it bases on main.
+    - **The Agent tool's relaunch** (agent a66cee8b8170d816f, about 02:40) also got a worktree on main (4460ef5). It
+      stopped at its start check, with nothing written. The main session then made the worktree by hand
+      (.claude/worktrees/brawl1 at 352a245) and launched the builder there with no isolation, agent a4be43b1f756e45dd,
+      at about 02:45.
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188
