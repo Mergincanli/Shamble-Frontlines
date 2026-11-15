@@ -41,13 +41,18 @@ marks.json and the judge only; NC-U4R-5 :78-81, EA-U4R-7 :200-204) in night-plan
 **the advisor APPROVE WITH CONDITIONS 1-6** (ADV-NP-1 to -3 Medium: review and launch, tests/bites/twins, no hand
 copying; -4 to -10 Low) in advisor-night-plan-full.md (109 lines, 4a8fad58…). **Slip (the advisor's own, recorded for
 Mustafa):** it saved main's routine-guard.mjs to its scratchpad with one shell redirect; nothing in the repo changed.
-**Fix pass done about 15:40 UTC:** conditions 1-5 met (each check run by grep: rust-reviewer, engine-architect, "at
+**Fix pass done about 15:33 UTC (7812127):** conditions 1-5 met (each check run by grep: rust-reviewer, engine-architect, "at
 launch", §4.14, Q16, advisor-u4.md:78-89, @@WORDS-, no "home's words", advisor-te-m3.md, "about 15:21 UTC", "06:45
 Amsterdam (05:45 UTC)"); ADV-NP-7 to -10 folded; the verifier's five Lows folded; a "Checked before posting" line;
 161 lines, none over 120; his 2026-11-09 words still equal the card's record. **Next (condition 6):** the changes beyond
 conditions 1-5 and ADV-NP-7 to -10 (the verifier's Lows, the record line) go back to the advisor before posting; then
-issue #16 links the plan by the fixed file's SHA. Mustafa checked in about 15:41 UTC (asked for the open decisions in
-one place): answered in chat.
+issue #16 links the plan by the fixed file's SHA. Mustafa checked in about 15:32 UTC (asked for the open decisions in
+one place): answered in chat. **Slip 10:** times written ahead of the clock twice (15:35/15:38, then 15:40/15:41;
+corrected). Lesson: run `date -u` before writing a time.
+**Running since about 15:34 UTC: workflow wf_6df5140c-eeb (task wrerdp1zt), the advisor's check of the fix pass**
+(condition 6; diff 5afc772..7812127; notes advisor-night-plan-fixes.md; keys verdict, summary, conditions_met,
+other_changes, findings, to_mustafa). **If cut:** resume by run id. **Then:** its result word for word, read in full;
+on APPROVE, issue #16's body gains item 7 linking night-2026-11-16.md at the fixed file's SHA.
 **Was running from about 15:22 UTC: workflow wf_6e5acbfd-5c3 (task wkxc0tfqn), the night plan's check** (script
 npt-night-plan-check-wf_6e5acbfd-5c3.js): the verifier on every reference (notes night-plan-verify.md; keys
 refs_checked, wrong, spot_checks, verdict, summary) and the advisor from main's file on fit with NIGHT_SHIFT.md, scope,
