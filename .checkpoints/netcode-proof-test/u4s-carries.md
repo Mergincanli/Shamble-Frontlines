@@ -314,6 +314,11 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     **(h) amended (the advisor's U4r build ruling, point 4; advisor-u4r-build1-full.md):** the bite's wording now reads
     "(a client writer that files a tick it decoded whole as lost: null and incomplete 1)", its id
     PM-0001-17/whole-as-lost; the check's JSON stays word for word. U4r's brief 2.5 row (:643) reads this way.
+    **(h) amended again (the advisor's U4r build ruling 4, Medium, advisor-u4r-build4-full.md:32; its r2-run ruling,
+    advisor-u4r-r2run-full.md:9):** the check is a plain check, with no "setup" and no "setup: " prefix, as committed at
+    5e563b9: {"name": "L1 P0 loses no group (no client-tick left incomplete)", "series": "tick.s.snap_incomplete",
+    "stat": "sum", "window": "measured", "op": "==", "value": 0, "parts": ["L1 P0"]}. Mustafa's answer to C62H-KEEP
+    decides whether it stays.
 63. **FU-3 and FU-7's log half, the next change to npt-log (the advisor's U4j ruling, FU-3: SEC-F10; its round-2
     ruling, B3: SEC-R2-N2):** "The next change to npt-log (U4r's, if its brief takes crates/log; else the unit that
     next edits it) adds two refusals, each with a test that fails before it: `read_log` refuses a JSON object with a

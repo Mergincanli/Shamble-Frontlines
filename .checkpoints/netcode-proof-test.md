@@ -14,9 +14,9 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**LATEST (2026-11-15 about 12:40 UTC): BRAWL-1 is closed. Two things run: the KEPT-LOGS kit rule's advisor review
-(wf_0f69bce5-688) and C62H-REVIEW's read and ruling (wf_4ce9b8cd-ad2). Read the blocks "KEPT-LOGS ANSWERED" and
-"C62H-REVIEW ANSWERED" below first, then "NEXT (task #74)".** **The saver:** b6isx9us1 ended at 12:43:43 UTC on its
+**LATEST (2026-11-15 about 13:00 UTC): BRAWL-1 is closed. Nothing runs but the saver. Three answers are with
+Mustafa: KL-YES (the KEPT-LOGS kit lines, posted whole about 12:50), C62H-KEEP and C62H-BOUND (posted about 13:00).
+Read the blocks "KEPT-LOGS ANSWERED" and "C62H-REVIEW ANSWERED" below first, then "NEXT (task #74)".** **The saver:** b6isx9us1 ended at 12:43:43 UTC on its
 own time limit ("watch stopped: time is up", exit 0; its last save cd18707); restarted at 12:43 UTC as **bt42fk8u5**.
 Check-in 12:41 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5): nothing stopped.
 
@@ -276,7 +276,8 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
       clients at ticks 76,910-77,844 (m7-ev.log:125), and P3's incomplete count was 43,295 measured and 44,395
       whole-run. Lesson: check every runs.txt flag and every summary-line figure against U4r's same-seed line, not
       only the verdict lines.
-    - -17's facts: 0 mismatches in both runs; P0 loses no group (0 incomplete). The parts read NOT-RUN because one run
+    - -17's facts: 0 mismatches in both runs; P0 loses no group (0 incomplete; that check is built on the advisor's
+      rulings, awaiting his answer: C62H-KEEP). The parts read NOT-RUN because one run
       is not three seeds; that is expected for evidence runs.
     - -57 (facts): positions max 6,984 at P0 and 6,952 at P3 (bar 10,000); yaw 2,750 in both.
     - The judge: P0 wall 8.6 s, peak 1,856.3 MiB; P3 2.3 s, 392.9 MiB.
@@ -407,7 +408,8 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
             Keep it small and in one place: step 2.3's guard change (branch claude/sweet-mayer-grsukw) is planned
             elsewhere.
           - **His question:** the pass-bar change of 2026-11-14 16:14 UTC, commit 5e563b9 (carry 62 (h): marks.json +15,
-            -17's "L1 P0 loses no group" check and the bite PM-0001-17/whole-as-lost). It was covered by the advisor's
+            -17's "L1 P0 loses no group" check and the bite PM-0001-17/whole-as-lost; built on the advisor's rulings,
+            awaiting his answer: C62H-KEEP). It was covered by the advisor's
             carry-62 (h) ruling (advisor-u4r-c62h-full.md: "Carry 62 (h) stands as committed at 5e563b9") and by
             check.mjs (c62h-check.log: all 11 steps, marks 81). No reviewer seat reviewed it in a round.
           - **RUNNING since about 12:05 UTC: workflow wf_0f69bce5-688 (task wp3trnw0g).** A drafter writes the exact kit
@@ -444,7 +446,29 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
             could hide). It changes no file; its one write is its notes file c62h-review-test.md.
           - **Then:** its findings go to the advisor for a ruling. A new bar, or a change to one, goes to him under
             Decisions needed; nothing is built on the ruling alone.
-          - **RUNNING since 12:38 UTC: workflow wf_4ce9b8cd-ad2 (task wmrdd9nxr).** The test-engineer's read (agent
+          - **DONE (about 12:55 UTC): the read and the ruling** (word for word by c62h_review_full.py):
+            c62h-review-test-full.md (121 lines, sha256 d6ff3ee3…) and advisor-c62h-review-full.md (142 lines, sha256
+            7d2dd26b…). Read in full. The advisor agrees with all three answers: Q1 partly (equal to its rulings and the
+            readings line; two fields differ from carry 62 (h)'s text, changed on purpose by build ruling 4; ADR 0001's
+            row has no such words, so a stricter reading awaiting his answer); Q2 yes (whole-as-lost: the check 48 FAIL,
+            mismatches 0 pass, on the record and on the judged P0 set); Q3 not bounded (P2 17,260 / 17,089 / 17,532
+            against about 17,280; P3 43,295 / 43,210 / 43,454 against about 43,200; B1 npt-lab 31,346 / 31,279 /
+            31,635 against about 31,400; the advisor's estimates; stale and sentinels 0).
+            - TE-C62H-1 Medium → **C62H-BOUND** for Mustafa; its report lines now (u4r-report.md's -17 L1 P3 and P2
+              lines, by c62h_review_apply.py); B1's line with U4g's judged B1 runs.
+            - TE-C62H-2 Low, fixed: the carries line under 62 (h) (c62h_review_apply.py; u4s-carries.md sha256
+              c9d0887e…).
+            - TE-C62H-3 Low, fixed → **C62H-KEEP** for Mustafa; "built on the advisor's rulings, awaiting his answer"
+              added at u4r-report.md's four namings and the card's three.
+            - ADV-C62H-1 Low, recorded (B1's counts; -58's L1 P0 wrap part). ADV-C62H-2 Medium, recorded: PB-1's
+              wording has three flaws (a client-counted stale excuse; ticks the room sent nothing for; no tick field in
+              the fate log), carried as design conditions in C62H-BOUND (a).
+            - **Units ahead owing a read** (its list): JDG-ONLY-1's judge fix; C62H-BOUND (a)/(b); C62H-KEEP (b); U4f if
+              marks change; U4g (likely); U4h (certain, judge figures); the readings PR if a pinned ADR row changes.
+              Recommended too: marks/SERIES.md and marks/README.md. The test at a unit's close: `git diff --stat
+              <base>..<head> -- spikes/netcode-proof/marks/marks.json spikes/netcode-proof/crates/judge`.
+            - **Reported to Mustafa about 13:00 UTC; WAITING for C62H-KEEP and C62H-BOUND** (recommended (a) and (a)).
+          - Was running 12:38-12:55 UTC: workflow wf_4ce9b8cd-ad2 (task wmrdd9nxr). The test-engineer's read (agent
             abf53f94b7f3b2543)
             (result keys seat, marks_sha256, q1_word_for_word, q2_can_it_fail, q3_bound_off_p0, findings, proposed_bars),
             then the advisor's ruling (notes advisor-c62h-review.md; keys summary, answers, each_finding, bars,
@@ -461,7 +485,7 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
         - **NEXT (task #74):**
           - KEPT-LOGS: answered (c); the advisor's review of the drafted lines is running. When it is in, post the exact
             lines to Mustafa; he answers after his Advisor has read them. Nothing is built before his yes.
-          - C62H-REVIEW: the read and the ruling are running (above).
+          - C62H-REVIEW: done; waiting for C62H-KEEP and C62H-BOUND (above). KEPT-LOGS: waiting for KL-YES.
           - Then step (7): U4's report folds U4r's. Then U4f, U4g (its brief with u4g-brief-carry.md and EVQ-LOAD) and
             U4h, each with its brief to the advisor first.
           - Before PR #40 is marked ready: the check.mjs follow-up (now also ADV-PT-L3), JDG-ONLY-1, and taking main in.
@@ -1446,7 +1470,8 @@ word for word); next: the r2 record run (the round-2 ruling's step 11).**
 - **Carry 62 (h)'s edit: check.mjs PASSED on it** (.gate/u4r-merge/c62h-check.log, 15:59:43-16:14:08, uptime first:
   up 5:24, load 0.16; all 11 steps; 531 and 609, 0 failed; marks 81, ADR rows unchanged); committed in the commit that
   carries this line; next the c62h record (the r2-run ruling's step 5). Its details, as made (about 16:02 UTC): marks.json +15 lines exactly
-  (PM-0001-17's checks gain the "L1 P0 loses no group" check; its bites gain PM-0001-17/whole-as-lost; nothing else);
+  (PM-0001-17's checks gain the "L1 P0 loses no group" check; its bites gain PM-0001-17/whole-as-lost; nothing else;
+  built on the advisor's rulings, awaiting his answer: C62H-KEEP);
   u4-build-plan.md §11 gains the readings-PR lines (the r2-run ruling's step 2, and build ruling 3's main-session item
   4, both in the advisor's words, at this plan edit). Build ruling 3 item 3's plan changes (§5's U4r judged-runs line
   and U4g's "Marks moved" line) still wait for a plan edit that drafts them. `npt-judge --check-marks` with r2's binary
