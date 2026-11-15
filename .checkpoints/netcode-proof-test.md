@@ -284,6 +284,12 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
         .checkpoints/ commits after b30314a), but committing each set's results under
         spikes/netcode-proof/results/u4r/<c12>/<P>/ before the next set changes that tree;
       - (3) whether P2 may start.
+    - **RUNNING since about 09:46 UTC: that ruling, workflow wf_04e44b32-d5e (task wweyhb48z),** notes
+      advisor-brawl1-sets-p3.md. Its result has the keys summary, condition15, conflict, next_sets, report_figures
+      and to_mustafa.
+      - **If cut:** resume by run id.
+      - **Then:** write it word for word by a small script, as brawl1_m6_full.py; commit P3's results as it rules; P2
+        follows.
   - **Was running, about 09:29-09:46 UTC: the P3 re-run set,** background shell bduei0sla:
     `python3 -I .checkpoints/netcode-proof-test/peak.py flock -x .gate/shared-target/.lane.lock node
     spikes/netcode-proof/ops/runs/c-u4r-runs.mjs judged --profile P3 --date 2026-11-15 >
