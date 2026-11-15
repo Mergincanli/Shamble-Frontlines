@@ -97,6 +97,24 @@ c62h-bound-brief.md (notes c62h-bound-brief-notes.md), then the advisor (notes a
 test-engineer (notes c62h-bound-brief-test.md) check it in parallel, read only. **If cut:** resume by run id
 (`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-brief-wf_10401164-b44.js", resumeFromRunId: "wf_10401164-b44"})`).
 **Then:** the results word for word by script, read in full; fixes; the build.
+**DONE 22:37 UTC (wf_10401164-b44; 3 agents, 1,053,228 tokens, 48 min):** the brief **c62h-bound-brief.md (540
+lines, sha256 ba6bdeb0…)** by the netcode-architect, base 442a284, with three points for the advisor: **B-1** commit 1
+must carry SERIES.md's tick.s.snap_link_lost_count row and the (18)→(19) header (the lab's contract test r2,
+contract.rs:465-513); **B-2** four judge-fixture files outside the approved 11 rows change in commit 3
+(fixtures/pm-0001-17/base/p2-room.jsonl, a new lost-group/p2-room.jsonl, tests/fixtures.rs, fixtures/README.md; ~40
+lines); **B-3** "the kept P0 set" = 93509dfd7fd1 (BRAWL-1's re-run, "P0 STANDS AND COUNTS"), 051995db9cea kept too until
+Mustafa reads the report; and a disk plan (pack U4r's closed non-P0 folders u4r-P2-ab10f058a828, u4r-B1-64f3307d5c7f,
+u4r-P3-0f066338dd8d citing advisor-u4r-sets-r2-full.md:45; the first before the build if free < 6,000 MiB). Its
+expected built hashes: marks.json c1935a5b…, SERIES.md 89295b57… (after commit 1) and 6898e119… (after commit 3),
+README.md f3c3c804… (word diff = the 73-word sentence); 11 planted bugs CB-P1 to CB-P11; size about 620-800 (stop 1,050).
+**The checks, saved word for word** (an inline script of c62h_bound_full.py's form): **the advisor APPROVE WITH
+CONDITIONS** (advisor-c62h-bound-brief-full.json, 66 lines, 9e7b7f86…: Medium 3, Low 4, conditions 9; it recomputed every
+hash and ran the insert algorithm in memory: all four "after" hashes equal); **the test-engineer APPROVE WITH
+CONDITIONS** (c62h-bound-brief-test-full.json, 98 lines, 09a3d9bc…: Medium 4, Low 8, conditions 6); the draft's own
+return c62h-bound-brief-draft-full.json. **NEXT (after a compact if he types it): read both checks in full; apply
+their conditions to the brief by Edit (the advisor's rulings on B-1 to B-3 and the disk plan are in its result);
+anything beyond them back to the advisor; then the build per the brief; report B-3's choice to Mustafa.** Chat about
+80 % at 22:34 UTC.
 **Worker restart 3** (not the spend limit) during the merge: continued at once; nothing lost. **Next, in order (the
 ruling's order):** (1) DONE; (2) the merge commit alone: `git merge --no-ff
 --no-commit origin/main`, `python3 -I .checkpoints/netcode-proof-test/merge_main_53.py --apply`, check.mjs whole (refs
