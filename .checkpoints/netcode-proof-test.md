@@ -34,7 +34,7 @@ card's verbatim record (asserted equal to night-2026-11-10.md's copy) into the p
 ride the next npt-judge and check.mjs change (U4h at the latest; before PR #40 is marked ready).
 **Check-in 14:39 UTC:** nothing stopped. **No /compact by 15:00 UTC** (COMPACT-WAIT's 20 minutes; reminder
 trig_011EMvFfmFaKNwfWXLawWBEo fired), so the night plan goes ahead.
-**Running since about 15:38 UTC: workflow wf_6e5acbfd-5c3 (task wkxc0tfqn), the night plan's check** (script
+**Running since about 15:22 UTC: workflow wf_6e5acbfd-5c3 (task wkxc0tfqn), the night plan's check** (script
 npt-night-plan-check-wf_6e5acbfd-5c3.js): the verifier on every reference (notes night-plan-verify.md; keys
 refs_checked, wrong, spot_checks, verdict, summary) and the advisor from main's file on fit with NIGHT_SHIFT.md, scope,
 completeness and approval (notes advisor-night-plan.md; keys verdict, summary, findings, conditions,
@@ -43,7 +43,8 @@ word by script, read in full; fix the plan by Edit; save; post item 7 to issue #
 - **The plan: night-2026-11-16.md** (127 lines; sha256 e529ba0d… after night_1116_rule_words.py put his 2026-11-09
   words in, from the card's record at :3362-3366, asserted equal to night-2026-11-10.md:4-8). Worktree pinned at
   11fd190 (the scout's map committed; no file but the card changed since 0ad41a6). Item 7: netcode-architect drafts;
-  test-engineer and security-auditor check in parallel; one revision.
+  test-engineer and security-auditor check in parallel; one revision. **Fix pass also:** its header says "about 15:35
+  UTC"; it was written about 15:21 UTC (the times were written ahead of the clock; the card's 15:38 corrected to 15:22).
 - **Done, about 15:18 UTC: the night-u4f scout** (wf_24144405-900; one agent, 116 tool uses, 393,484 tokens): its
   result word for word in night-u4f-scout-full.md (265 lines, sha256 8191e8ff…), read in full. Its gaps: no U4f file
   lane in the plan; no size or time figure for U4f's runs; §4.7 is Events (the window is §4.5); F104 only at
