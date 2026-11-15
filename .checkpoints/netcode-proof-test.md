@@ -238,8 +238,26 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
     - **The evidence runs' bars** (condition 14): everyone in view at 0.99 or more; a building total of 0; bytes within
       U4r-F3's rates (P0 603.7 MB, P3 183.3 MB); never named u4r-*. A miss stops the re-run sets and goes to the advisor
       whole.
+  - **M7 step 1 DONE (about 09:13-09:15 UTC):**
+    - m7-df-0.log: 8,318,758,912 B. This is also the post-M3 figure (ADV-M6-L2); the advisor's own reading was
+      8,320,163,840 B at 09:06:48.
+    - m7-clean-B.log: 15 commands, exit 0, run lines identical to M2's. m7-df-1.log: 8,722,419,712 B.
+    - m7-clean-C.log: 6 commands, exit 0, identical. m7-df-2.log: 13,556,895,744 B (12,929 MiB).
+    - Every header reads `diff e3b0…; untracked e3b0…`.
+  - **THE EVIDENCE RUNS' COMMAND** (plan 4.3: "the judged sets' measured-run command, with
+    `--out .gate/brawl1-evidence/<run>`"), as c-u4r-runs.mjs builds it:
+    - `<exe> scenario --run <run> --set <name> --date <date> --commit <commit> --out <dir> --seed 1 --scene SS --profile
+      <P0|P3> --tick-start <tickStart> --warmup-s <WARMUP_S> --measured-s <MEASURED_S> --suite <name> <the measured run's
+      extra>`.
+    - The parts: `common` is :482, `settings` is :530 and the call is :534. Still to read: the measured runs' `extra`
+      and tickStart (about :300-330), WARMUP_S and MEASURED_S, which binary `exe` is (the measured build), and the judge
+      call with `--only PM-0001-2,PM-0001-17,PM-0001-57` and peak.py.
+    - **The run names must not start with u4r-:** e.g. run `brawl1-ev-P0-s1`, set `brawl1-evidence`.
+    - Each run goes through main-run.sh in the main folder (M7-3: header e3b0/e3b0, HEAD with tree ebbfeb40), log
+      .gate/brawl1-merge/m7-ev-<P>.log. Then the judge into scratch under the lock. Record each run's bytes against
+      P0 603.7 MB and P3 183.3 MB.
   - **NEXT (M7):**
-    1. df, clean (B), df, clean (C), df, as above.
+    1. DONE: df, clean (B), df, clean (C), df.
     2. The merge record in u4r-report.md's BRAWL-1 section, by Edit: M1-M6 with each figure, ADV-M6-L1's times, L2's
        figure and L3's pointer line.
     3. The two 10-minute evidence runs (the commands are in brawl1-plan.md section 4.3), through main-run.sh in the main
