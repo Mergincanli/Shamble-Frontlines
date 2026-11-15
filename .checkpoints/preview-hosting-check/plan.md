@@ -51,17 +51,20 @@ base main 4460ef5. Line numbers are main's at 4460ef5. Written 2026-11-15 by the
 - **The test project (CF):** a new Cloudflare Pages project in Mustafa's account, proposed name
   `shamble-preview-check`, address `https://shamble-preview-check.pages.dev` (Cloudflare may add a suffix if the name
   is taken; Part 3 says what to do then).
-- **A deploy:** one upload of the built test site to the test project, on a named "branch" of the project. The branch
-  `main` is production; every other branch is a preview with a stable link `https://<branch>.shamble-preview-check.pages.dev`,
-  and every single upload also gets its own one-off link `https://<8 characters>.shamble-preview-check.pages.dev`.
+- **A deploy:** one upload of the built test site to the test project, on a named "branch" of the project. The
+  project's production branch is production: whatever name Cloudflare gives it, which the workflows read from
+  Cloudflare rather than assume. Every other branch is a preview with a stable link
+  `https://<branch>.shamble-preview-check.pages.dev`, and every single upload also gets its own one-off link
+  `https://<8 characters>.shamble-preview-check.pages.dev`.
 - **The three links** (the hosting checklist's): production, the preview built with the isolation flag off (Pages
   branch `iso-off`), the preview built with it on (Pages branch `iso-on`).
 - **An approval:** Mustafa's click on GitHub's "Review deployments", then "Approve and deploy", for a run that waits for
   the `preview` environment (decision REVIEWER).
 - **A probe:** a script that fetches a link the way a stranger would (no login, no cookies) and records what came back.
 - **ML, MAC, MP:** the minimum laptop, the Mac with Safari, Mustafa's PC in Brave (ADR 0006's key, :1306-1310).
-- **The draft:** ADR 0006 (Proposed) unless another is named; "the infra draft as proposed" is Mustafa's answer to
-  PREVIEW-START (his task, 2026-11-15): the check runs on the draft as it stands, interim positions included.
+- **The draft:** ADR 0006 (Proposed) unless another is named. "On the infra draft as proposed" is Mustafa's answer to
+  PREVIEW-START: given on 2026-11-14 (his note 1: every "today" in the task means 2026-11-14) and sent with the task on
+  2026-11-15. The check runs on the draft as it stands, its interim positions included.
 
 ## Part 1. What the check proves, and the pass marks it must meet (your item 1)
 
@@ -100,16 +103,16 @@ Kept unchanged unless the row says otherwise: every number, count, timing, case,
 | Mark | Machines: the draft → planned | Method, counts, bites, controls: the draft → planned | Departure, and who decides |
 |---|---|---|---|
 | PM-0006-1 | CF, TR, ML, MAC → CF, TR, GitHub's runners | the results-log header, as drafted, with each runner's image name and version where the draft records ML's and MAC's systems; checked again before the 24 h reading, as drafted | the machines: decision MACHINES |
-| PM-0006-2 | the script runs on ML ("a header check, not a hardware result", :1367) → on GitHub's Linux runner, as the deploy workflow's last job, right after each deploy | as drafted: one test site deployed three ways (production; a preview with the flag off; a preview with it on), each read on its stable branch link and on its one-off link; the page lists every resource it and its worker loaded (Resource Timing in both); a cookie-less fetch compares every response with expected sets written by hand into the script from GLOSSARY §5; the bites as drafted (COEP removed from the worker's rule in the flag-on build; a `noindex` rule added to production). Added: the script also fetches every file in the build's file list, so no file escapes the check; and a test-only header, `X-Check-Rule`, on the two host rules answers R5-PREV-OQ6 | the machine: MACHINES; the `X-Check-Rule` header changes no mark: for the advisor agent to rule |
-| PM-0006-3 | ML: Chrome, Edge, Firefox; MAC: Safari; MP: Brave → GitHub's Windows runner (Chrome, Edge, Firefox); GitHub's macOS runners (Safari, on two images); you in Brave | as drafted: WebdriverIO opens each link and reads what the page and its worker print, 3 loads per browser and link; the bite as drafted (PM-0006-2's missing COEP must give false) | the machines: MACHINES |
+| PM-0006-2 | the script runs on ML ("a header check, not a hardware result", :1367) → on GitHub's Linux runner, as the deploy workflow's last job, right after each deploy | as drafted: one test site deployed three ways (production; a preview with the flag off; a preview with it on), each read on its stable branch link and on its one-off link; the page lists every resource it and its worker loaded (Resource Timing in both); a cookie-less fetch compares every response with expected sets written by hand into the script from GLOSSARY §5; the bites as drafted (COEP removed from the worker's rule in the flag-on build; a `noindex` rule added to production). Each link form is recorded on its own. **Production's one-off link:** if the host sends `noindex` there (it adds `noindex` "if requesting the asset over a preview URL", and a one-off link may count as one), the row as written is not met. That is reported and goes to the draft's author (:1409-1414), never read as a pass, and it holds the check's end, and with it step 2.6, until the draft is revised (:1401: every mark that applies must pass). Added: the script also fetches every file in the build's file list, so no file escapes the check; and a test-only header, `X-Check-Rule`, on the two host rules answers R5-PREV-OQ6 (the script tolerates that extra header) | the machine: MACHINES; the advisor agent ruled the `X-Check-Rule` header an addition that changes no mark (its review of revision 1) |
+| PM-0006-3 | ML: Chrome, Edge, Firefox; MAC: Safari; MP: Brave → GitHub's Windows runner (Chrome, Edge, Firefox); GitHub's macOS 26 runner (Safari 27.2 on the image read 2026-11-15; the version is recorded on the day); you in Brave | as drafted: WebdriverIO opens each link and reads what the page and its worker print, 3 loads per browser and link; the bite as drafted (PM-0006-2's missing COEP must give false): the browser run also opens the missing-COEP preview (Pages branch `bite-coep`) | the machines: MACHINES |
 | PM-0006-4 | ML: Chrome → GitHub's Windows runner: Chrome | as drafted: first visit, tab closed, second visit; the bundle's `transferSize` read on the second; 3 repeats, each from a fresh profile; the bite as drafted (`no-cache`), on a preview branch of its own | the machine: MACHINES |
 | PM-0006-5 | CF; ML → CF; GitHub's Linux runner (in the build job, before each deploy) | as drafted: every upload's largest file; the bite as drafted (a planted 26 MiB file, flagged, and what Wrangler or the host does with it written down) | the machine: MACHINES |
-| PM-0006-6 | CF, TR; the probe from ML → CF, TR; the probe on GitHub's Linux runner | as drafted: cases (a) `cs/pd-one`, (b) `cs/pd-three`, (c) the open control, (d) the bite with the close workflow switched off; the throwaway close workflow deletes every deployment of the branch with the force option; a cookie-less probe every hour from the close to 24 h after; the access policy off; the tombstone if (a) or (b) fails. Changed: (1) the hourly probe runs on GitHub's schedule, and the session also starts one probe itself just after the 24 h mark, so the reading never rests on the schedule alone (GitHub may delay or skip a scheduled run); (2) under TOMBSTONE (a), the tombstone runs from the start on two more cases, (a') `cs/pdt-one` and (b') `cs/pdt-three`, built like (a) and (b), and counts only if (a) or (b) fails | the machine: MACHINES; the tombstone's timing: decision TOMBSTONE; the session's own 24 h run: an addition, for the advisor agent to rule |
+| PM-0006-6 | CF, TR; the probe from ML → CF, TR; the probe on GitHub's Linux runner | as drafted: cases (a) `cs/pd-one`, (b) `cs/pd-three`, (c) the open control, (d) the bite with the close workflow switched off; the throwaway close workflow deletes every deployment of the branch with the force option; a cookie-less probe every hour from the close to 24 h after; the access policy off; the tombstone if (a) or (b) fails. Changed: (1) the hourly probe runs on GitHub's schedule, and the session also starts one probe itself just after the 24 h mark, so the reading never rests on the schedule alone (GitHub may delay or skip a scheduled run); (2) under TOMBSTONE (a), the tombstone runs from the start on two more cases, (a') `cs/pdt-one` and (b') `cs/pdt-three`, built like (a) and (b), and counts only if (a) or (b) fails | the machine: MACHINES; the tombstone's timing: decision TOMBSTONE; the session's own 24 h run: ruled an addition that changes no mark (the advisor agent) |
 | PM-0006-7 | CF; MP → as drafted | as drafted: your two readings around 10 uploads by the throwaway deploy workflow (one run that uploads 10 times) | none |
 | PM-0006-8 | CF; the probe from ML → CF; the probe on GitHub's Linux runner | as drafted: you switch the access policy on; sweeps 10 minutes and 1 hour later, the 1-hour sweep counts; the control as drafted. No custom domain (CF has none) | the machine: MACHINES |
 | PM-0006-9 | MP, Brave on Windows → as drafted | as drafted: the hosting checklist's 8 steps; steps 5 to 8 only after PM-0006-6's 24 h reading | none |
-| PM-0006-10 | TR → as drafted | as drafted: the deploy job sets its environment's `url` to the preview's stable link, and the pull request's page is read after a deploy. The picture: the session takes it from the public page while logged out, and you say whether your own logged-in page shows the link too | the picture's route: an addition, for the advisor agent to rule |
-| PM-0006-32 | TR, CF; MP → as drafted | as drafted: the rewritten deploy job; the job that names `production`; the reported production deploy with the preview token; each run's log and the environment's deployment history pasted into the results log; the control and the bite as drafted. Added: ADR 0002's PM-0002-66 bite (the `production` rule removed: the job must then print "present"), since PM-0002-66 names the test repository for these tests (0002:1332) and the draft calls them "the same test" (:1222). Under TOKENS (a) the reported production deploy with the preview token is the test project's ordinary production deploy | the extra bite: an addition, for the advisor agent to rule; one token: decision TOKENS |
+| PM-0006-10 | TR → as drafted | as drafted: the deploy job sets its environment's `url` to the preview's stable link, and the pull request's page is read after a deploy. The picture: the session takes it from the public page while logged out, and you say whether your own logged-in page shows the link too | the picture's route: ruled an addition that changes no mark (the advisor agent) |
+| PM-0006-32 | TR, CF; MP → as drafted | as drafted: the rewritten deploy job; the job that names `production`; the reported production deploy with the preview token; each run's log and the environment's deployment history pasted into the results log; the control and the bite as drafted. Added: ADR 0002's PM-0002-66 bite (the `production` rule removed: the job must then print "present"), since PM-0002-66 names the test repository for these tests (0002:1332) and the draft calls them "the same test" (:1222). Under TOKENS (a) the reported production deploy with the preview token is the test project's ordinary production deploy. A job refused by the branch rule most likely runs no step at all (rules "must pass before a job ... is sent to a runner"), so its result and error note are recorded rather than a printed "absent". The report claims only this bite of PM-0002-66, never that mark as a whole | the extra bite: ruled an addition that changes no mark (the advisor agent); one token: decision TOKENS |
 
 ## Part 2. What I build (your item 2)
 Everything is built in the test repository (TR). In this repository the check adds only its checkpoint, its results
@@ -577,15 +580,152 @@ changes in this repository's `.github/`. No such file is written before your yes
 comes back to you as an exact diff. The test repository's files are outside this repository, so the guard asks nothing
 when they are written: your yes in this chat is the only gate.
 
-Every one follows `gate.yml`'s conventions: `permissions: contents: read` at the top, actions pinned to full commit
-SHAs (actions/checkout v7.0.1 and actions/setup-node v7.0.0 as `gate.yml` pins them; actions/upload-artifact v7.0.2,
-cf430e03, and actions/download-artifact v8.0.2, 9000827c, both released 2026-10-07, read with `git ls-remote` and
-their release pages today), `persist-credentials: false` on every checkout. Wrangler is pinned to 4.156.0, published
-2026-10-29: the newest version at least 14 days old (npm, read today). The runners are named, not `-latest`:
-`ubuntu-24.04`, `windows-2025`, `macos-26`. Each file below parses as YAML (checked with PyYAML 6.0.1). Its sha256 is
-given, so the file written later can be checked byte for byte against this plan.
+Every one follows `gate.yml`'s conventions:
+- `permissions: contents: read` at the top;
+- actions pinned to full commit SHAs: actions/checkout v7.0.1 and actions/setup-node v7.0.0 as `gate.yml` pins them;
+  actions/upload-artifact v7.0.2 (cf430e03) and actions/download-artifact v8.0.2 (9000827c), both released
+  2026-10-07, read with `git ls-remote` and their release pages on 2026-11-15;
+- `persist-credentials: false` on every checkout.
 
-### 7.1 `.github/workflows/deploy.yml` (172 lines; sha256 71dfb700a7cec92c739ffd141e1321caf3e3b43640beb2ee5d856cfd44e4a8c4)
+Wrangler is pinned to 4.156.0, published 2026-10-29: the newest version at least 14 days old (npm, read 2026-11-15).
+It is installed in a step that holds no secret, and only the installed program runs in the step that holds the token.
+Node 22 comes from setup-node in every job that runs a script without the token. The two token jobs use the runner's
+own Node and print its version. The runners are named, not `-latest`: `ubuntu-24.04`, `windows-2025`, `macos-26`.
+
+Each file below parses as YAML (checked with PyYAML 6.0.1), and its sha256 is given, so the file written later can be
+checked byte for byte against this plan. The draft copies sit in this chat's notes folder on the public branch
+(`tr-draft/`), as text that nothing runs.
+
+### 7.0 What changed after the advisor agent's review (revision 1 at 27e9f50, then revision 2)
+The advisor agent approved revision 1 on conditions; its findings A1, A2, A3 and A7 changed these lines. A1: Wrangler is
+installed in a step without the token, so install scripts never see it. A2: the browser job runs in bash on Windows, so
+its browser list reaches the script. A3: the comment names the missing-COEP preview the job also opens. A7: Node 22 is
+pinned in the jobs that run scripts. The two token-test variants change only in their shared first part, which now
+carries the same setup-node lines. security-auditor, infra-engineer and the advisor agent read these lines again at
+the build's review (Part 8, steps 4 and 6), before anything runs.
+
+**`deploy.yml`**
+```diff
+@@ -41,6 +41,9 @@
+       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+         with:
+           persist-credentials: false
++      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
++        with:
++          node-version: 22
+       - id: legs
+         env:
+           EVENT: ${{ github.event_name }}
+@@ -59,6 +62,9 @@
+       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+         with:
+           persist-credentials: false
++      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
++        with:
++          node-version: 22
+       - name: Build the test site and report its file sizes (PM-0006-5)
+         env:
+           MODE: ${{ matrix.mode }}
+@@ -99,6 +105,10 @@
+           if [ -e dist/_worker.js ] || [ -e dist/_routes.json ] || [ -e dist/functions ]; then
+             echo "The build holds server code; nothing is deployed."; exit 1
+           fi
++      - name: Install Wrangler (this step holds no secret)
++        run: |
++          node --version
++          npm install --prefix "$RUNNER_TEMP/wrangler" --no-audit --no-fund "$WRANGLER"
+       - id: upload
+         name: Upload to Cloudflare Pages
+         env:
+@@ -128,7 +138,7 @@
+           mkdir -p records
+           for i in $(seq 1 "$COUNT"); do
+             : > "$WRANGLER_OUTPUT_FILE_PATH"
+-            npx --yes "$WRANGLER" pages deploy dist --project-name "$PROJECT" --branch "$BRANCH" \
++            "$RUNNER_TEMP/wrangler/node_modules/.bin/wrangler" pages deploy dist --project-name "$PROJECT" --branch "$BRANCH" \
+               --commit-hash "$MARKER" --commit-message "preview-check run $RUN $LEG $i" --commit-dirty=true
+             jq -c 'select(.type == "pages-deploy-detailed")' "$WRANGLER_OUTPUT_FILE_PATH" > detailed.ndjson
+             test "$(wc -l < detailed.ndjson)" -eq 1
+@@ -157,6 +167,9 @@
+       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+         with:
+           persist-credentials: false
++      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
++        with:
++          node-version: 22
+       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+         with:
+           pattern: deployment-record-${{ github.run_id }}-*
+```
+
+**`close.yml`**
+```diff
+@@ -24,6 +24,11 @@
+     timeout-minutes: 15
+     environment: preview
+     steps:
++      - name: Tombstone cases only (cs/pdt-*) - install Wrangler (this step holds no secret)
++        if: startsWith(github.event.pull_request.head.ref, 'cs/pdt-')
++        run: |
++          node --version
++          npm install --prefix "$RUNNER_TEMP/wrangler" --no-audit --no-fund "$WRANGLER"
+       - id: tomb
+         name: Tombstone cases only (cs/pdt-*) - upload a page without a build marker
+         if: startsWith(github.event.pull_request.head.ref, 'cs/pdt-')
+@@ -39,7 +44,7 @@
+           mkdir -p tombstone records
+           printf '<!doctype html>\n<meta charset="utf-8">\n<title>Preview gone</title>\n<p>This preview is gone.</p>\n' \
+             > tombstone/index.html
+-          npx --yes "$WRANGLER" pages deploy tombstone --project-name "$PROJECT" --branch "$BRANCH" \
++          "$RUNNER_TEMP/wrangler/node_modules/.bin/wrangler" pages deploy tombstone --project-name "$PROJECT" --branch "$BRANCH" \
+             --commit-hash "$GITHUB_SHA" --commit-message "tombstone run $RUN" --commit-dirty=true
+           jq -c 'select(.type == "pages-deploy-detailed")' "$WRANGLER_OUTPUT_FILE_PATH" > detailed.ndjson
+           test "$(wc -l < detailed.ndjson)" -eq 1
+```
+
+**`probe.yml`**
+```diff
+@@ -34,6 +34,9 @@
+       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+         with:
+           persist-credentials: false
++      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
++        with:
++          node-version: 22
+       - name: Gather every upload's record and every pull request's state
+         env:
+           GH_TOKEN: ${{ github.token }}
+```
+
+**`browsers.yml`**
+```diff
+@@ -1,9 +1,9 @@
+ # THROWAWAY: the preview hosting check for SHAMBLE FRONTLINES (ADR 0006, spike 1). Plan and results live in
+ # Mergincanli/Shamble-Frontlines. This file is deleted with this test repository.
+-# Started by hand: opens the three links (and the planted no-cache preview) in the branded browsers of GitHub's own
+-# machines through WebdriverIO, and records what the page and its worker report: crossOriginIsolated (PM-0006-3) and
+-# the content file's second-visit transfer size (PM-0006-4, Chrome). Every result names the runner image and each
+-# browser's version. It holds no secret.
++# Started by hand: opens the three links, the planted missing-COEP preview and the planted no-cache preview in the
++# branded browsers of GitHub's own machines through WebdriverIO, and records what the page and its worker report:
++# crossOriginIsolated (PM-0006-3) and the content file's second-visit transfer size (PM-0006-4, Chrome). Every result
++# names the runner image and each browser's version. It holds no secret. Every step runs in bash, on Windows too.
+ name: browsers
+ 
+ on:
+@@ -24,6 +24,9 @@
+             browsers: safari
+     runs-on: ${{ matrix.os }}
+     timeout-minutes: 30
++    defaults:
++      run:
++        shell: bash
+     steps:
+       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+         with:
+```
+
+### 7.1 `.github/workflows/deploy.yml` (185 lines; sha256 333e5a592a05764137c129857d087236f2e1131f49c74dcd36c320d336614291)
 ```yaml
 # THROWAWAY: the preview hosting check for SHAMBLE FRONTLINES (ADR 0006, spike 1). Plan and results live in
 # Mergincanli/Shamble-Frontlines. This file is deleted with this test repository.
@@ -630,6 +770,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
       - id: legs
         env:
           EVENT: ${{ github.event_name }}
@@ -648,6 +791,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
       - name: Build the test site and report its file sizes (PM-0006-5)
         env:
           MODE: ${{ matrix.mode }}
@@ -688,6 +834,10 @@ jobs:
           if [ -e dist/_worker.js ] || [ -e dist/_routes.json ] || [ -e dist/functions ]; then
             echo "The build holds server code; nothing is deployed."; exit 1
           fi
+      - name: Install Wrangler (this step holds no secret)
+        run: |
+          node --version
+          npm install --prefix "$RUNNER_TEMP/wrangler" --no-audit --no-fund "$WRANGLER"
       - id: upload
         name: Upload to Cloudflare Pages
         env:
@@ -717,7 +867,7 @@ jobs:
           mkdir -p records
           for i in $(seq 1 "$COUNT"); do
             : > "$WRANGLER_OUTPUT_FILE_PATH"
-            npx --yes "$WRANGLER" pages deploy dist --project-name "$PROJECT" --branch "$BRANCH" \
+            "$RUNNER_TEMP/wrangler/node_modules/.bin/wrangler" pages deploy dist --project-name "$PROJECT" --branch "$BRANCH" \
               --commit-hash "$MARKER" --commit-message "preview-check run $RUN $LEG $i" --commit-dirty=true
             jq -c 'select(.type == "pages-deploy-detailed")' "$WRANGLER_OUTPUT_FILE_PATH" > detailed.ndjson
             test "$(wc -l < detailed.ndjson)" -eq 1
@@ -746,6 +896,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: deployment-record-${{ github.run_id }}-*
@@ -761,7 +914,7 @@ jobs:
           retention-days: 30
 ```
 
-### 7.2 `.github/workflows/close.yml` (93 lines; sha256 245bffe00095b08f1f99165e905c92a329f5bf2553e23d777529072c4377a058)
+### 7.2 `.github/workflows/close.yml` (98 lines; sha256 98b42b8e59cf1c36bd2e9b035627d7e56b2dac246e3831e15674c1d20f51dc3b)
 ```yaml
 # THROWAWAY: the preview hosting check for SHAMBLE FRONTLINES (ADR 0006, spike 1). Plan and results live in
 # Mergincanli/Shamble-Frontlines. This file is deleted with this test repository.
@@ -789,6 +942,11 @@ jobs:
     timeout-minutes: 15
     environment: preview
     steps:
+      - name: Tombstone cases only (cs/pdt-*) - install Wrangler (this step holds no secret)
+        if: startsWith(github.event.pull_request.head.ref, 'cs/pdt-')
+        run: |
+          node --version
+          npm install --prefix "$RUNNER_TEMP/wrangler" --no-audit --no-fund "$WRANGLER"
       - id: tomb
         name: Tombstone cases only (cs/pdt-*) - upload a page without a build marker
         if: startsWith(github.event.pull_request.head.ref, 'cs/pdt-')
@@ -804,7 +962,7 @@ jobs:
           mkdir -p tombstone records
           printf '<!doctype html>\n<meta charset="utf-8">\n<title>Preview gone</title>\n<p>This preview is gone.</p>\n' \
             > tombstone/index.html
-          npx --yes "$WRANGLER" pages deploy tombstone --project-name "$PROJECT" --branch "$BRANCH" \
+          "$RUNNER_TEMP/wrangler/node_modules/.bin/wrangler" pages deploy tombstone --project-name "$PROJECT" --branch "$BRANCH" \
             --commit-hash "$GITHUB_SHA" --commit-message "tombstone run $RUN" --commit-dirty=true
           jq -c 'select(.type == "pages-deploy-detailed")' "$WRANGLER_OUTPUT_FILE_PATH" > detailed.ndjson
           test "$(wc -l < detailed.ndjson)" -eq 1
@@ -858,7 +1016,7 @@ jobs:
           retention-days: 7
 ```
 
-### 7.3 `.github/workflows/probe.yml` (63 lines; sha256 ea2ec68dc93a90a38e0fa2e59a9203690273e3a74bbf84c8e2aaabe281c6d01e)
+### 7.3 `.github/workflows/probe.yml` (66 lines; sha256 f24ad6e81daff7b20798c57d7a6a7982c2a6a5bb0e0f89e51459a4d279a84154)
 ```yaml
 # THROWAWAY: the preview hosting check for SHAMBLE FRONTLINES (ADR 0006, spike 1). Plan and results live in
 # Mergincanli/Shamble-Frontlines. This file is deleted with this test repository.
@@ -896,6 +1054,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
       - name: Gather every upload's record and every pull request's state
         env:
           GH_TOKEN: ${{ github.token }}
@@ -925,14 +1086,14 @@ jobs:
           retention-days: 30
 ```
 
-### 7.4 `.github/workflows/browsers.yml` (48 lines; sha256 2199d6bb6770e631a5f3410e38efd9f60373e496fef125cef31e72a306e9113b)
+### 7.4 `.github/workflows/browsers.yml` (51 lines; sha256 6791076916ae67191e3a4c6e194cde48dc0db7bb1f95f2da21b7ddb814e773f5)
 ```yaml
 # THROWAWAY: the preview hosting check for SHAMBLE FRONTLINES (ADR 0006, spike 1). Plan and results live in
 # Mergincanli/Shamble-Frontlines. This file is deleted with this test repository.
-# Started by hand: opens the three links (and the planted no-cache preview) in the branded browsers of GitHub's own
-# machines through WebdriverIO, and records what the page and its worker report: crossOriginIsolated (PM-0006-3) and
-# the content file's second-visit transfer size (PM-0006-4, Chrome). Every result names the runner image and each
-# browser's version. It holds no secret.
+# Started by hand: opens the three links, the planted missing-COEP preview and the planted no-cache preview in the
+# branded browsers of GitHub's own machines through WebdriverIO, and records what the page and its worker report:
+# crossOriginIsolated (PM-0006-3) and the content file's second-visit transfer size (PM-0006-4, Chrome). Every result
+# names the runner image and each browser's version. It holds no secret. Every step runs in bash, on Windows too.
 name: browsers
 
 on:
@@ -953,6 +1114,9 @@ jobs:
             browsers: safari
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -982,7 +1146,7 @@ Each is `deploy.yml` above with everything from the line `  deploy:` to the end 
 byte-identical (checked by script).
 
 **On branch `cs/b9-edit`** (the deploy job rewritten to print a marker; the verify job dropped, since it needs the
-deploy's records). The whole file's sha256 is df5cdfcbe70e46a363b66076fe4f5f8bd09a4906946ac27f56afc93d7a79f196. The replacement:
+deploy's records). The whole file's sha256 is fd3dc4c6029b2d6a0e0bb311bc97dafe11ab2966f61258668ef782d0786d357f. The replacement:
 ```yaml
   deploy:
     needs: build
@@ -999,7 +1163,7 @@ deploy's records). The whole file's sha256 is df5cdfcbe70e46a363b66076fe4f5f8bd0
 ```
 
 **On branch `cs/b9-prod`** (a pull-request job that names `production`; the deploy and verify jobs dropped, so nothing
-waits for you). The whole file's sha256 is 65f52535bdfb2e4f144af45850430cda41953911e59a70b40b71f5cd01e8b73d. The replacement:
+waits for you). The whole file's sha256 is 8b745631a278813d7d5dc80c87bbfcaedeec0651111f5a54784c05f04d2d964d. The replacement:
 ```yaml
   b9-production:
     runs-on: ubuntu-24.04

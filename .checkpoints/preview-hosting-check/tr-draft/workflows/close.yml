@@ -24,6 +24,11 @@ jobs:
     timeout-minutes: 15
     environment: preview
     steps:
+      - name: Tombstone cases only (cs/pdt-*) - install Wrangler (this step holds no secret)
+        if: startsWith(github.event.pull_request.head.ref, 'cs/pdt-')
+        run: |
+          node --version
+          npm install --prefix "$RUNNER_TEMP/wrangler" --no-audit --no-fund "$WRANGLER"
       - id: tomb
         name: Tombstone cases only (cs/pdt-*) - upload a page without a build marker
         if: startsWith(github.event.pull_request.head.ref, 'cs/pdt-')
@@ -39,7 +44,7 @@ jobs:
           mkdir -p tombstone records
           printf '<!doctype html>\n<meta charset="utf-8">\n<title>Preview gone</title>\n<p>This preview is gone.</p>\n' \
             > tombstone/index.html
-          npx --yes "$WRANGLER" pages deploy tombstone --project-name "$PROJECT" --branch "$BRANCH" \
+          "$RUNNER_TEMP/wrangler/node_modules/.bin/wrangler" pages deploy tombstone --project-name "$PROJECT" --branch "$BRANCH" \
             --commit-hash "$GITHUB_SHA" --commit-message "tombstone run $RUN" --commit-dirty=true
           jq -c 'select(.type == "pages-deploy-detailed")' "$WRANGLER_OUTPUT_FILE_PATH" > detailed.ndjson
           test "$(wc -l < detailed.ndjson)" -eq 1

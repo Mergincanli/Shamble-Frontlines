@@ -41,6 +41,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
       - id: legs
         env:
           EVENT: ${{ github.event_name }}
@@ -59,6 +62,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
       - name: Build the test site and report its file sizes (PM-0006-5)
         env:
           MODE: ${{ matrix.mode }}
@@ -99,6 +105,10 @@ jobs:
           if [ -e dist/_worker.js ] || [ -e dist/_routes.json ] || [ -e dist/functions ]; then
             echo "The build holds server code; nothing is deployed."; exit 1
           fi
+      - name: Install Wrangler (this step holds no secret)
+        run: |
+          node --version
+          npm install --prefix "$RUNNER_TEMP/wrangler" --no-audit --no-fund "$WRANGLER"
       - id: upload
         name: Upload to Cloudflare Pages
         env:
@@ -128,7 +138,7 @@ jobs:
           mkdir -p records
           for i in $(seq 1 "$COUNT"); do
             : > "$WRANGLER_OUTPUT_FILE_PATH"
-            npx --yes "$WRANGLER" pages deploy dist --project-name "$PROJECT" --branch "$BRANCH" \
+            "$RUNNER_TEMP/wrangler/node_modules/.bin/wrangler" pages deploy dist --project-name "$PROJECT" --branch "$BRANCH" \
               --commit-hash "$MARKER" --commit-message "preview-check run $RUN $LEG $i" --commit-dirty=true
             jq -c 'select(.type == "pages-deploy-detailed")' "$WRANGLER_OUTPUT_FILE_PATH" > detailed.ndjson
             test "$(wc -l < detailed.ndjson)" -eq 1
@@ -157,6 +167,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: deployment-record-${{ github.run_id }}-*

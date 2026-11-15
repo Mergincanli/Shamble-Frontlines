@@ -41,6 +41,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
       - id: legs
         env:
           EVENT: ${{ github.event_name }}
@@ -59,6 +62,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
       - name: Build the test site and report its file sizes (PM-0006-5)
         env:
           MODE: ${{ matrix.mode }}
@@ -74,15 +80,14 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
-  deploy:
-    needs: build
+  b9-production:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
-    environment: preview
+    environment: production
     steps:
-      - name: B9 marker (the deploy job, rewritten by this pull request)
+      - name: B9 marker (a pull-request job that names production)
         env:
-          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CANARY: ${{ secrets.CANARY }}
         run: |
-          echo "B9-MARKER: the rewritten deploy job ran at $(date -u +%FT%TZ)"
-          if [ -n "$TOKEN" ]; then echo "secret: present"; else echo "secret: absent"; fi
+          echo "B9-MARKER: the production job ran at $(date -u +%FT%TZ)"
+          if [ -n "$CANARY" ]; then echo "secret: present"; else echo "secret: absent"; fi

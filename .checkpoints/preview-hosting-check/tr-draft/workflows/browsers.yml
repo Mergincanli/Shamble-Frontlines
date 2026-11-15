@@ -1,9 +1,9 @@
 # THROWAWAY: the preview hosting check for SHAMBLE FRONTLINES (ADR 0006, spike 1). Plan and results live in
 # Mergincanli/Shamble-Frontlines. This file is deleted with this test repository.
-# Started by hand: opens the three links (and the planted no-cache preview) in the branded browsers of GitHub's own
-# machines through WebdriverIO, and records what the page and its worker report: crossOriginIsolated (PM-0006-3) and
-# the content file's second-visit transfer size (PM-0006-4, Chrome). Every result names the runner image and each
-# browser's version. It holds no secret.
+# Started by hand: opens the three links, the planted missing-COEP preview and the planted no-cache preview in the
+# branded browsers of GitHub's own machines through WebdriverIO, and records what the page and its worker report:
+# crossOriginIsolated (PM-0006-3) and the content file's second-visit transfer size (PM-0006-4, Chrome). Every result
+# names the runner image and each browser's version. It holds no secret. Every step runs in bash, on Windows too.
 name: browsers
 
 on:
@@ -24,6 +24,9 @@ jobs:
             browsers: safari
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
