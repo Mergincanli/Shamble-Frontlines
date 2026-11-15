@@ -34,7 +34,21 @@ card's verbatim record (asserted equal to night-2026-11-10.md's copy) into the p
 ride the next npt-judge and check.mjs change (U4h at the latest; before PR #40 is marked ready).
 **Check-in 14:39 UTC:** nothing stopped. **No /compact by 15:00 UTC** (COMPACT-WAIT's 20 minutes; reminder
 trig_011EMvFfmFaKNwfWXLawWBEo fired), so the night plan goes ahead.
-**Running since about 15:22 UTC: workflow wf_6e5acbfd-5c3 (task wkxc0tfqn), the night plan's check** (script
+**DONE about 15:31 UTC: the night plan's check** (wf_6e5acbfd-5c3; both results word for word by
+night_plan_check_full.py, read in full): **the verifier PASS** (105 references; 5 Lows: §7 has no "offline" and no df
+floor; "met by number" is advisor-u4.md:334-335; the Write/Edit sentence is U4d-F R6, not R1; his read rule names
+marks.json and the judge only; NC-U4R-5 :78-81, EA-U4R-7 :200-204) in night-plan-verify-full.md (81 lines, bb26615b…);
+**the advisor APPROVE WITH CONDITIONS 1-6** (ADV-NP-1 to -3 Medium: review and launch, tests/bites/twins, no hand
+copying; -4 to -10 Low) in advisor-night-plan-full.md (109 lines, 4a8fad58…). **Slip (the advisor's own, recorded for
+Mustafa):** it saved main's routine-guard.mjs to its scratchpad with one shell redirect; nothing in the repo changed.
+**Fix pass done about 15:40 UTC:** conditions 1-5 met (each check run by grep: rust-reviewer, engine-architect, "at
+launch", §4.14, Q16, advisor-u4.md:78-89, @@WORDS-, no "home's words", advisor-te-m3.md, "about 15:21 UTC", "06:45
+Amsterdam (05:45 UTC)"); ADV-NP-7 to -10 folded; the verifier's five Lows folded; a "Checked before posting" line;
+161 lines, none over 120; his 2026-11-09 words still equal the card's record. **Next (condition 6):** the changes beyond
+conditions 1-5 and ADV-NP-7 to -10 (the verifier's Lows, the record line) go back to the advisor before posting; then
+issue #16 links the plan by the fixed file's SHA. Mustafa checked in about 15:41 UTC (asked for the open decisions in
+one place): answered in chat.
+**Was running from about 15:22 UTC: workflow wf_6e5acbfd-5c3 (task wkxc0tfqn), the night plan's check** (script
 npt-night-plan-check-wf_6e5acbfd-5c3.js): the verifier on every reference (notes night-plan-verify.md; keys
 refs_checked, wrong, spot_checks, verdict, summary) and the advisor from main's file on fit with NIGHT_SHIFT.md, scope,
 completeness and approval (notes advisor-night-plan.md; keys verdict, summary, findings, conditions,
