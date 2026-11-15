@@ -14,6 +14,15 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
+**CUT-READY (about 16:10 UTC; Mustafa: "we're at 96% usage, make sure to save your progress but also of the
+Agents").** If a cut stops work, resume per SPEND-LIMIT (a), in this order: (1) **C62H-BOUND design, workflow
+wf_dd5ce188-bb6** (task wfjwf2l8d; netcode-architect design → advisor + test-engineer reads): resume with
+`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-c62h-bound-design-wf_dd5ce188-bb6.js", resumeFromRunId: "wf_dd5ce188-bb6"})`;
+its agents' notes (c62h-bound-design.md, then advisor-c62h-bound.md, c62h-bound-test.md) are committed as they
+grow; a restarted agent reads its notes first and continues after the last complete block. (2) **KL-CHANGE:
+posted to Mustafa about 16:08 UTC (kl-change-v2.diff, 102 lines, c80dbbb346459d46…); WAITING for KL-CHANGE-YES**;
+nothing built. (3) Night item 7 is on issue #16 (nothing to resume). (4) The saver bugi27gbf ends about 16:24
+UTC: restart it if stopped. Record the cut notice's exact text and times under "Cuts by the spend limit".
 **LATEST (2026-11-15 about 15:40 UTC): HIS THREE ANSWERS ARE IN (16:35 Amsterdam; history.md:2131-2146; Rules in
 force): KL-YES with one change (KL-CHANGE: the changed lines to him for a yes first); C62H-KEEP (a); C62H-BOUND (a)
 (the exact wording and planned size to him for a yes first). Work now: the night plan's fix check (running), the
