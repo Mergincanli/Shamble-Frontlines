@@ -30,7 +30,16 @@ approved text goes back to him and the runs.txt marks sha256 equals the approved
 size 590-630). **Next (after PR #53's review workflow frees the agent slots):** one advisor run rules the
 test-engineer's read (C11) and checks the main session's paste draft (exact texts by script from the design JSON with
 C1, C2, C4, C8 applied word for word; the size; C3's blocks; C9's freeze); then post to Mustafa and WAIT for
-C62H-BOUND-YES. Nothing is built. The design in short (its plain_words): two new -17 checks on
+C62H-BOUND-YES. Nothing is built.
+**C62H-BOUND RULED AND POSTED (19:34 UTC):** c62h_bound_texts_v2.py (the advisor's C1, C2, C4, C8 word for word) →
+the advisor's ruling r2 (wf_7885e774-38d, 19:23-19:33 UTC; READY AFTER THE CHANGES BELOW; all ten TE-CB findings
+taken, none declined; 4 replacements; size about 650, 545-755, stop 1,050; the paste's blocks given word for word;
+advisor-c62h-bound-r2-full.json, 190 lines, 7921d63e…, read in full) → c62h_bound_texts_v3.py (the 4 replacements;
+every block's sha256 printed) → c62h_bound_paste.py → **c62h-bound-paste.md (133 lines, sha256 cfac7502b4a4ba9e…)**,
+posted to Mustafa in chat whole and as a file. **WAITING for C62H-BOUND-YES.** At his yes: record his words by script;
+the freeze records v3's block hashes (check-objects cea24dd8…, bite-object d5945f92…, rows 57279093… / f9822480… /
+cc1b3c74… / 8086ff4d…, readme-sentence 02bd0368…); then the build brief (C5-C7, C9-C11 and the r2 rulings as build
+items, other_changes 6), the lane on this branch before U4f's build. JDG-ONLY-1 is its own change-set (C5). The design in short (its plain_words): two new -17 checks on
 L1 P2, P3 and B1 (snap_lost_unexplained_count == 0; snap_whole_despite_link_loss_count == 0), a new lab series
 tick.s.snap_link_lost_count from npt-l1's fate log, two judge figures, one new bite (PM-0001-17/link-lost-overstated).
 **CUT-READY (refreshed 19:07 UTC).** If a cut stops work, resume per SPEND-LIMIT (a), in this order: (1) **PR #53's
