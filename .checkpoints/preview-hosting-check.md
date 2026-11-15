@@ -231,6 +231,8 @@
    every change to an approved text batched into one diff for one new yes; get_session read after `setup` is pushed.
 
 ## Running work
+- saver (task bkmmk2e8i, started 20:58 UTC): stopped by itself at 22:48:20 UTC ("time is up", 110 minutes); no agent or
+  workflow runs now, so it stays off until the next agents start (CHECKPOINTS.md §5).
 - saver: background task bc4g68il4 · output /tmp/claude-0/-home-user-Shamble-Frontlines/a7e7f150-3195-52bd-a549-73b27426198b/tasks/bc4g68il4.output ·
   started 15:52 UTC · stops by 17:42 UTC (110 min) · last check: just started.
 - agent infra-engineer (Opus by its file, effort high by its file): C1-C8 and the follow-up C9 · DONE.
