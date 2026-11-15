@@ -439,7 +439,16 @@ For Mustafa: nothing (spike code: nothing a player sees, hears or feels).
 - FP-3: written, not yet compiled: `brawl1_the_building_figure_counts_a_soldier_in_a_building_in_measured_ticks_only`
   at the end of logs.rs's tests (Placement imported; `Some(dir.as_path())` for Logs::open, the same path as the
   ruling's `Some(&dir)`); EA-B1-4's words at logs.rs:6-7, the paragraph rewrapped from line 4 (it held a short line).
-- FP-4 (a)-(d): pending.
+- FP-4 (a)-(d): written, not yet compiled. (a) the tick-105 sentinel case in brawl1_own_soldier_... (its doc names
+  it); (b) `brawl1_own_soldier_compares_ticks_by_the_endpoint_s_wrap_rule` (also asserts each tick filed); (c) and (d)
+  the ruled doc words in client lib.rs. (d) moved the client constants to lib.rs:250-251, so soldiers()'s ruled sentence
+  names "client lib.rs:250-251" in place of the ruling's "247-248" (the pre-edit lines): one deliberate deviation,
+  flagged in the report.
+- FP-6 (a)-(d): written, not yet compiled. (a) Server::new private (one caller, scenario.rs:390); (b) build's doc
+  rewrapped, words unchanged; (c) both comments reworded as ruled, the two B1 cases after the after-max case (with a
+  two-line comment naming RR-B1-4 and the arithmetic); (d) hash.rs 359,993 / 29,999 with the ruled comment.
+- 06:49 UTC: every FP-1 to FP-6 edit written; numstat 1,084 added, 127 deleted, 1,211 changed (under 1,400). No new
+  line of mine passes 120 characters (one rewrapped).
 - FP-5 (a)-(c): written (bots lib.rs:57-62, :128-130, the leash doc). Note: the ruled "x² + y² stays below 2^31" is
   exact but for one point: (-32,768, -32,768) gives 2^31 itself (POSITION_XY min -32,768, sim grid.rs:106-113); no
   overflow either way. Written as ruled; flagged in the report.
