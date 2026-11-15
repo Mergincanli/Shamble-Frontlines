@@ -14,7 +14,7 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**LATEST (2026-11-15 about 12:45 UTC): BRAWL-1 is closed. Two things run: the KEPT-LOGS kit rule's advisor review
+**LATEST (2026-11-15 about 12:40 UTC): BRAWL-1 is closed. Two things run: the KEPT-LOGS kit rule's advisor review
 (wf_0f69bce5-688) and C62H-REVIEW's read and ruling (wf_4ce9b8cd-ad2). Read the blocks "KEPT-LOGS ANSWERED" and
 "C62H-REVIEW ANSWERED" below first, then "NEXT (task #74)".**
 
@@ -423,7 +423,8 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
             could hide). It changes no file; its one write is its notes file c62h-review-test.md.
           - **Then:** its findings go to the advisor for a ruling. A new bar, or a change to one, goes to him under
             Decisions needed; nothing is built on the ruling alone.
-          - **RUNNING since about 12:45 UTC: workflow wf_4ce9b8cd-ad2 (task wmrdd9nxr).** The test-engineer's read
+          - **RUNNING since 12:38 UTC: workflow wf_4ce9b8cd-ad2 (task wmrdd9nxr).** The test-engineer's read (agent
+            abf53f94b7f3b2543)
             (result keys seat, marks_sha256, q1_word_for_word, q2_can_it_fail, q3_bound_off_p0, findings, proposed_bars),
             then the advisor's ruling (notes advisor-c62h-review.md; keys summary, answers, each_finding, bars,
             decisions_for_mustafa, units_ahead, report_words, to_mustafa). **If cut:** resume by run id. **Then:** write
@@ -431,10 +432,10 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
           - **NEW STANDING RULE** (verbatim in history.md, his 13:35 words, the paragraph that starts "From now on"): every
             marks.json or judge change gets a reviewer's read before its unit closes, and each report names it in its
             own line with what covered it. No commit since 5e563b9 has changed marks.json or crates/judge/ (git log,
-            12:44 UTC).
+            about 12:37 UTC).
           - **The kit rule:** post its exact lines once the advisor has reviewed them; he answers after his Advisor has
             read them.
-          - **Slip 9 (about 12:40 UTC):** a `cd <notes folder> && grep` moved the session's folder for one call; the next
+          - **Slip 9 (about 12:36 UTC):** a `cd <notes folder> && grep` moved the session's folder for one call; the next
             command returned it. Read-only; nothing changed.
         - **NEXT (task #74):**
           - KEPT-LOGS: answered (c); the advisor's review of the drafted lines is running. When it is in, post the exact
