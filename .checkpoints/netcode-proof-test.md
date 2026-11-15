@@ -46,7 +46,42 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
 - **Slip 8 (about 04:18 UTC):** a `cd <worktree> && git diff` moved the session's folder into the builder's worktree for
   one call, and the next command returned it. It was read-only; nothing changed (the worktree's HEAD is 352a245, with 10
   entries).
-- **RUNNING since about 04:25 UTC: workflow wf_bbfeece0-4c7 (task wpp4xx1x6), "brawl1-r1".** The workflow runs at
+- **ROUND 1 DONE (workflow wf_bbfeece0-4c7 ended about 05:10 UTC; 5 of 5 agents, 0 errors).**
+  - **Written word for word** by brawl1_r1_full.py:
+    - advisor-brawl1-points-full.md (82 lines, sha256 0c1f6f5d…);
+    - brawl1-review-r1-full.md (189 lines, sha256 fc979c63…).
+  - **The advisor's points ruling: no diff change.**
+    - Point 1: MAX_ENTRY_TICK_COUNT stands (RR4-L1's name was its error: ADV-BP-4).
+    - Point 2: proof (e) is accepted with its two differences (ADV-BP-3; future captures mask only the L1 leg's hash
+      values).
+    - Point 3: r10_carry_82's move is accepted.
+    - The recorded items and the size (998, under 1,400) are accepted.
+    - **ADV-PT-M1 (Medium, read in full):** pattern (iii)'s 1,832 cm is the leash's own reach under a 30-tick re-run,
+      past the 1,800 cm door entry. So "area 0 in three seeds" does not bound B1. This goes into U4g's brief, labelled as
+      computed; U4g's plan says how a B1 building entry reads in -17 before its judged B1 runs.
+    - Lows: ADV-PT-L1 (the Bursts print) and ADV-PT-L2 (359,993 bytes) ride a push that is needed anyway; ADV-PT-L3 goes
+      to the check.mjs follow-up; ADV-BP-3 and ADV-BP-4 go in the report.
+  - **The four reviews: all APPROVE WITH FINDINGS. 3 Medium and 20 Low; no Critical or High.**
+    - **The Mediums, read in full:**
+      - TE-B1-1: no plant shows the sim-only test can fail (leash off), and there is no check that 48 Soldier records
+        are seen.
+      - TE-B1-2 and RR-B1-1 (the same gap): no positive control shows the lab's building figure can read non-zero. It is
+        the stop bar of conditions 14 and 15.
+    - **The Lows read in full** (they touch -17, the judge or the marks):
+      - TE-B1-3: the unit test's blocked checks cannot fail, and condition 1's bounds are pinned nowhere;
+      - NA-B1-2: the docs' margins, and pattern (iii) for U4g;
+      - EA-B1-4: logs.rs's module doc.
+    - Four seats name the same Low: the dead bit's copied private constants (TE-B1-6, NA-B1-3, RR-B1-3, EA-B1-1).
+  - **RUNNING since about 05:11 UTC: the advisor's round-1 ruling, workflow wf_59e64b31-fa2 (task wx15hfedw), one
+    agent (general-purpose, opus, xhigh), notes advisor-brawl1-r1.md, logs .gate/u4r/brawl1-advisor-r1/.**
+    - It rules on: the fix pass in order; the pins; round 2's seats; the merge step's clean question (may clean (B)
+      come right before the counted run?); U4g's brief words (ADV-PT-M1 and NA-B1-2 (c)); the expected size; Mustafa.
+    - **If cut:** `Workflow({scriptPath: ".../workflows/scripts/brawl1-r1-ruling-wf_59e64b31-fa2.js",
+      resumeFromRunId: "wf_59e64b31-fa2"})`.
+    - **Then:** write it word for word by script (brawl1_r1_ruling_full.py), read it in full, and launch the fix pass:
+      a fresh builder copy in the same worktree (no isolation) that reads brawl1-build.md and the worktree's diff
+      first. SIZE-CHECK after it, against 1,400.
+- **Was running, about 04:25-05:10 UTC: workflow wf_bbfeece0-4c7 (task wpp4xx1x6), "brawl1-r1".** The workflow runs at
   most 2 agents at once on this machine, so netcode-architect starts when the advisor or test-engineer ends. The writer
   for its results is ready: brawl1_r1_full.py (syntax checked).
   - Batch 1: the advisor on the points (general-purpose, notes advisor-brawl1-points.md), test-engineer and

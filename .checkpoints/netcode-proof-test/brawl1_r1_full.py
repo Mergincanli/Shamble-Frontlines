@@ -36,7 +36,7 @@ def save(path, out):
 
 
 a = res["advisor-points"]
-assert a["snapshot"].startswith(SNAP), a["snapshot"][:80]
+assert SNAP in a["snapshot"], a["snapshot"][:120]  # the field may say more than the sha256: kept whole below
 out = ["# Advisor: the ruling on BRAWL-1's builder points (workflow wf_bbfeece0-4c7), 2026-11-15", "",
        "Written by script, word for word, from the workflow's journal (advisor-points' StructuredOutput result). The "
        "points: brawl1-points.md. Its notes: advisor-brawl1-points.md. Nothing below is the main session's.", "",
@@ -69,8 +69,8 @@ out = ["# BRAWL-1 review round 1: the four seats' results (workflow wf_bbfeece0-
 sev = {}
 for k, t in SEATS:
     v = res[f"review-{k}"]
-    assert v["snapshot"].startswith(SNAP), (k, v["snapshot"][:80])
-    out += [f"## review-{k} ({v['verdict']}; snapshot {v['snapshot'][:12]})", "", f"**Seat:** {v['seat']}", ""]
+    assert SNAP in v["snapshot"], (k, v["snapshot"][:120])
+    out += [f"## review-{k} ({v['verdict']}; snapshot {SNAP[:12]})", "", f"**Seat:** {v['seat']}", ""]
     if v["snapshot"] != SNAP:
         out += [f"**Its snapshot field, whole:** {v['snapshot']}", ""]
     if not v["findings"]:
