@@ -55,7 +55,33 @@ lines, a04a71ac…, saved word for word from the journal by an inline script of 
 the two refs tests on all four copies and reproduced the counted run's diff hash 56351922…; RK-H-L1 Low: the exception
 has not yet run on the real kit files: step 2's run must show refs PASS with both tracked; its conditions: step 2 as
 written, then check.mjs whole, the gate, push, its check of that head, and no list/pack before; it read CI with `gh
-api` (read only; this session keeps gh for search): a process note). **Next, in order (the ruling's order):** (1) DONE; (2) the merge commit alone: `git merge --no-ff
+api` (read only; this session keeps gh for search): a process note). **STEP 2 (20:53-20:57 UTC): the merge of main
+53272a1 COMMITTED LOCALLY as 2bd44a5ef60482f868b82a9c5c8fcd0958ea7a00 (NOT PUSHED; the card is not saved while it is
+unpushed, because a checkpoint save pushes the branch)**: saver btg6vlymf stopped first; one conflict (STATUS.md) by
+merge_main_53.py --apply; staged exactly main's 12 files; on 2bd44a5 the gate --no-smoke PASS (gate-merge.log),
+repo-map-check OK (131 entries, 110 paths), kept-logs tests 9 pass 1 skipped. **check.mjs whole through main-run.sh
+STOPPED at its start: "STOP: under 4 GB free" (2,866 MiB; counted-merge.log)**: the 20:34 run refilled the shared
+target (5,020 MiB). A deadlock: freeing space by the kit rule waits for the merged head's check. **Running from about
+21:00 UTC: the advisor's ruling on the order** (wf_5a91de9c-f92, task w8ny1vkod; notes advisor-disk-deadlock.md):
+(1) kept-logs.mjs cache now, (2) a shared-target part-clean, (3) check.mjs outside main-run.sh, or another way.
+**THE RULING (21:01 UTC; advisor-disk-deadlock-full.json, 14 lines, fa299155…; notes advisor-disk-deadlock.md):
+option (1), the merge pushed first.** The cache removal is his KEPT-LOGS item 2 (PR #53 on main; the branch has taken
+main in); the advisor's earlier "no list or pack before the check" named list and pack for their spikes/ commits; the
+cache removal touches no spikes/ path and commits nothing; doing it before the head check is the advisor's own change of
+order, said openly in the report. (2) refused (the live warm cache refills at once); (3) refused (no lock, no floor, no
+crate touch, no diff-hash line: not the counted run; a full disk could damage git objects). Its correction: the shared
+target is only partly warm (main-run.sh:48 touches every crate file, so the workspace crates rebuild). **Steps:** the
+checks (HEAD 2bd44a5, only .checkpoints/ changed, nothing running, the saver stopped: all true at 21:01:46); this
+save pushes 2bd44a5; then `node .claude/scripts/kept-logs.mjs cache` from the repository root into
+.gate/refs-kit/kl-cache.log (expected exit 0: free before about 2,866 MiB, removed, free after about 6,900 MiB; a
+refusal or a failure stops for the advisor); its two free lines into Key numbers; save; check.mjs whole through
+main-run.sh into .gate/refs-kit/counted-merge-2.log (pass bar: the floor passes; HEAD the merge plus card commits only;
+empty diff and untracked hashes; all 11 PASS; refs PASS on 1,273 tracked files naming §4.9's exception with both kit
+files tracked; self and redact PASS); free after the run; save and push; CI on that head; the advisor's head check;
+only then the first real list/pack (one folder at a time; P0's raw logs stay until C62H-BOUND's re-judge; free space
+against each folder's size first); then C62H-BOUND's build from the checked head.
+**Worker restart 3** (not the spend limit) during the merge: continued at once; nothing lost. **Next, in order (the
+ruling's order):** (1) DONE; (2) the merge commit alone: `git merge --no-ff
 --no-commit origin/main`, `python3 -I .checkpoints/netcode-proof-test/merge_main_53.py --apply`, check.mjs whole (refs
 PASS naming the exception), the gate, commit, push, the advisor checks that head (stop the saver during the merge:
 a checkpoint save would conclude it); (3) the first real list/pack per §11, reporting free space before and after (not
