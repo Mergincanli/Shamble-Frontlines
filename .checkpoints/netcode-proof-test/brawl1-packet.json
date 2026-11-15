@@ -1,0 +1,46 @@
+{
+  "title": "BRAWL-1 round 1 (the bots' leash toward the cluster centre, from each client's own decoded position: npt-bots' crate-private decision function and its tests; npt-client's own-soldier read item and its test; npt-lab's in-building figure; the homed items: Part 1's refactors (the Sim alias, the shared constructor, the wake step), N2-1's fourth check, parse()'s bounds, the manifest's entry-ticks cap and the no-log flag; the three re-pinned manifest entries; marks/SERIES.md's new row)",
+  "out": ".checkpoints/netcode-proof-test/brawl1-packet.md",
+  "heads": [
+    "The build's `<base>`: 352a245 on the spike branch claude/netcode-proof-test-plan-hcky5g (spike tree abad0635). Its spikes/ equals the branch head's: in the main folder, `git diff --stat 352a245 HEAD -- spikes/` and `git status --porcelain -- spikes/` are both empty.",
+    "Counts at `<base>`: the last counted check.mjs run on these crates is `.gate/u4r-merge/c62h-check.log` (HEAD a36babd; `git diff --stat a36babd 352a245 -- spikes/netcode-proof/crates spikes/netcode-proof/check.mjs spikes/netcode-proof/check.test.mjs` is empty). Its lines: all 11 steps pass; measured build 531 tests passed, bites build 609; self 77 of 77.",
+    "The read copy is the builder's worktree `/home/user/Shamble-Frontlines/.claude/worktrees/brawl1` (detached at 352a245; no builder runs there now). The change is uncommitted there: 10 modified files under spikes/netcode-proof, none new. Change nothing in it.",
+    "The same change as a patch: `.checkpoints/netcode-proof-test/wip/brawl1.patch` (10 files, 1,482 lines; sha256 ee2973aa8ad8c453b5720099c27b37cb9980820da74f33ad9c78ddd7ad591dc7; committed at 0e2bf9a). It equals the read copy's `git diff HEAD`, re-cut and compared by cmp when this packet was cut.",
+    "The diffs below compare the main folder's copy of each file (equal to `<base>`'s) with the read copy's.",
+    "The build's end checks, run in the read copy through the lane's runner `.checkpoints/netcode-proof-test/u4r-run.sh` (sha256 6efb9157…): `.gate/u4r/brawl1/final-check.log` (check.mjs), `.gate/u4r/brawl1/final-det.log` (det-u4.mjs at the new pins) and `.gate/u4r/brawl1/final-regen-tests.log`. The build's other logs are in the same folder: Part 1's p1-*.log, Part 2's p2-*.log and the re-pin's repin*.log."
+  ],
+  "diffs": [
+    {"label": "npt-bots' library (crates/bots/src/lib.rs: the decision function, the leash and their #[cfg(test)] module)", "a": "spikes/netcode-proof/crates/bots/src/lib.rs", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/crates/bots/src/lib.rs"},
+    {"label": "npt-client's library (crates/client/src/lib.rs: the own-soldier read item)", "a": "spikes/netcode-proof/crates/client/src/lib.rs", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/crates/client/src/lib.rs"},
+    {"label": "npt-client's endpoint tests (crates/client/tests/endpoint.rs)", "a": "spikes/netcode-proof/crates/client/tests/endpoint.rs", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/crates/client/tests/endpoint.rs"},
+    {"label": "npt-lab: scenario.rs", "a": "spikes/netcode-proof/crates/lab/src/scenario.rs", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/crates/lab/src/scenario.rs"},
+    {"label": "npt-lab: logs.rs", "a": "spikes/netcode-proof/crates/lab/src/logs.rs", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/crates/lab/src/logs.rs"},
+    {"label": "npt-lab: precheck.rs", "a": "spikes/netcode-proof/crates/lab/src/precheck.rs", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/crates/lab/src/precheck.rs"},
+    {"label": "npt-lab: hash.rs", "a": "spikes/netcode-proof/crates/lab/src/hash.rs", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/crates/lab/src/hash.rs"},
+    {"label": "npt-lab's runner recordings manifest for det-u4.mjs (crates/lab/det-recordings.json)", "a": "spikes/netcode-proof/crates/lab/det-recordings.json", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/crates/lab/det-recordings.json"},
+    {"label": "npt-lab's pre-check recordings manifest (crates/lab/precheck-recordings.json)", "a": "spikes/netcode-proof/crates/lab/precheck-recordings.json", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/crates/lab/precheck-recordings.json"},
+    {"label": "marks/SERIES.md", "a": "spikes/netcode-proof/marks/SERIES.md", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/marks/SERIES.md"}
+  ],
+  "docs": [
+    {"label": "The approved plan: sections 1 to 7 (goal, the steering, the figure, the evidence, the recordings that move, the homed items, who builds and the order) (brawl1-plan.md)", "path": ".checkpoints/netcode-proof-test/brawl1-plan.md", "lines": [10, 236]},
+    {"label": "The approved plan: sections 11 and 12 (change type, tier, reviewers; planned size) (brawl1-plan.md)", "path": ".checkpoints/netcode-proof-test/brawl1-plan.md", "lines": [288, 306]},
+    {"label": "The advisor's plan review: APPROVE WITH CONDITIONS 1-18, the choices, the findings and the size (advisor-brawl1-plan-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-brawl1-plan-full.md", "lines": [1, 109]},
+    {"label": "The advisor's sets ruling, Q1: -17 L1 P0 INVALID and BRAWL-1's scope (advisor-u4r-sets-r2-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4r-sets-r2-full.md", "heading": "^### Q1\\. -17 L1 P0 INVALID"},
+    {"label": "The advisor's sets ruling, finding BRAWL-1 with its Fixes (a) to (d) (advisor-u4r-sets-r2-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4r-sets-r2-full.md", "heading": "^### BRAWL-1 \\(Medium\\)"},
+    {"label": "U4r's round-2 ruling: the main session's next steps (condition 18 homes N2-1, TE-R2-2, RR4-L1, RR4-L2 and round 1's EA-U4R-1/-2 and RR3-L2 (a) here) (advisor-u4r-r2-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4r-r2-full.md", "heading": "^## The main session's next steps, in order"},
+    {"label": "U4r's round-2 ruling: TE-R2-1 (advisor-u4r-r2-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4r-r2-full.md", "heading": "^### TE-R2-1 "},
+    {"label": "U4r's round-2 ruling: N2-1 (advisor-u4r-r2-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4r-r2-full.md", "heading": "^### N2-1 "},
+    {"label": "U4r's round-2 ruling: TE-R2-2 (advisor-u4r-r2-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4r-r2-full.md", "heading": "^### TE-R2-2 "},
+    {"label": "U4r's round-2 ruling: RR4-L1 (advisor-u4r-r2-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4r-r2-full.md", "heading": "^### RR4-L1 "},
+    {"label": "U4r's round-2 ruling: RR4-L2 (advisor-u4r-r2-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4r-r2-full.md", "heading": "^### RR4-L2 "},
+    {"label": "U4r's round-1 ruling: EA-U4R-1 (advisor-u4r-r1-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4r-r1-full.md", "heading": "^### EA-U4R-1 "},
+    {"label": "U4r's round-1 ruling: EA-U4R-2 (advisor-u4r-r1-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4r-r1-full.md", "heading": "^### EA-U4R-2 "},
+    {"label": "U4r's round-1 ruling: EA-U4R-5 (the single route to commands) (advisor-u4r-r1-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4r-r1-full.md", "heading": "^### EA-U4R-5 "},
+    {"label": "U4r's round-1 ruling: RR3-L2 (advisor-u4r-r1-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4r-r1-full.md", "heading": "^### RR3-L2 "},
+    {"label": "U4r's build ruling 1, point 1 (the determinism route; det-u4.mjs at merges on the scenario path) (advisor-u4r-build1-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4r-build1-full.md", "heading": "^### Point 1 \\(severity"},
+    {"label": "U4r's build ruling 1, point 7 (the brawl's view; an npt-client read item, R16) (advisor-u4r-build1-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4r-build1-full.md", "heading": "^### Point 7 \\(severity"},
+    {"label": "The proof test's plan: §4.2, narrow public surfaces (plan.md)", "path": ".checkpoints/netcode-proof-test/plan.md", "lines": [454, 454]},
+    {"label": "marks.json: PM-0001-17 (spikes/netcode-proof/marks/marks.json)", "path": "spikes/netcode-proof/marks/marks.json", "lines": [3844, 4021]}
+  ],
+  "carries": {"path": ".checkpoints/netcode-proof-test/u4s-carries.md", "include": "^(18|39|74|75|82|87)\\. \\*\\*"}
+}

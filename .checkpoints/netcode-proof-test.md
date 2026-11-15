@@ -46,14 +46,24 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
 - **Slip 8 (about 04:18 UTC):** a `cd <worktree> && git diff` moved the session's folder into the builder's worktree for
   one call, and the next command returned it. It was read-only; nothing changed (the worktree's HEAD is 352a245, with 10
   entries).
-- **NEXT:**
-  - (5a) The advisor's ruling on the three points, in one workflow with review batch 1 (test-engineer and
-    netcode-architect). Then batch 2 (rust-reviewer and engine-architect). Everyone at xhigh.
-  - The packet is cut by review_packet.py from brawl1-packet.json.
-  - The reviewers run tests only in the builder's worktree, through u4r-run.sh (plan section 8: no reviewer builds a
-    target of its own), with logs under .gate/u4r/brawl1-review-<seat>/.
-  - (6) The merge step.
-- **Chat size:** about 20 %, after the system's own compact (about 04:12).
+- **RUNNING since about 04:40 UTC: workflow wf_bbfeece0-4c7 (task wpp4xx1x6), "brawl1-r1".**
+  - Batch 1: the advisor on the points (general-purpose, notes advisor-brawl1-points.md), test-engineer and
+    netcode-architect. Batch 2: rust-reviewer and engine-architect. Everyone opus at xhigh; all on snapshot ee2973aa.
+  - The points file (facts and options, no option preferred): brawl1-points.md.
+  - The packet: brawl1-packet.md (943 lines, sha256 16eab462…, cut by review_packet.py from brawl1-packet.json; 6
+    carries in, 83 ids left out). The recut patch cmp-equals wip/brawl1.patch.
+  - Reviewer notes: brawl1-review-<test|netcode|rust|arch>.md. Logs: .gate/u4r/brawl1-review-<seat>/ and
+    .gate/u4r/brawl1-advisor/. Tests run only in the builder's worktree, through u4r-run.sh (plan section 8).
+  - **If cut:** `Workflow({scriptPath: ".../workflows/scripts/brawl1-r1-wf_bbfeece0-4c7.js", resumeFromRunId:
+    "wf_bbfeece0-4c7"})`.
+  - **When it returns:**
+    1. write the advisor's ruling and the four reviews word for word by script;
+    2. read every Medium or higher in full;
+    3. the fix pass (a fresh builder copy in the same worktree, no isolation) for what the advisor and the round say to
+       fix now; below High a finding becomes a follow-up;
+    4. then (6) the merge step.
+- **Saver:** b28v0pzzk (restarted 04:21 UTC).
+- **Chat size:** about 25 %, after the system's own compact (about 04:12).
 
 **Earlier NOW (2026-11-14 about 23:50 UTC): U4r-F3 COMMITTED AND PUSHED (493b3d7), CI GREEN, THE ADVISOR'S HEAD
 REVIEW RUNS; BRAWL-1's PLAN REVIEW RUNS.**
