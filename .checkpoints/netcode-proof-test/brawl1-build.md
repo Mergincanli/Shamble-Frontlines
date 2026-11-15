@@ -513,7 +513,66 @@ For Mustafa: nothing (spike code: nothing a player sees, hears or feels).
   --exact --nocapture` exit 101, panicked at logs.rs:924, "assertion `left == right` failed: measured: one slot-tick /
   left: 0 / right: 1". It bites as ruled: the warm-up asserts before it (count 0, no slot) assert absence, so they hold
   under any plant that removes the figure; the first assert that can fail, the measured count, fails.
-- FP-7 P3-P4: pending.
+- FP-7 P3, TE-B1-4 (a) (the Hash filter): done, restored. client lib.rs sha256 before
+  2aca00c87822526a891de6d1c5e78ce4161f37de2de453dd01c94e28500e2d1c; planted: ` && matches!(t.filed, Filed::Hash(_))`
+  removed from own_soldier's filter (lib.rs:359), sha256 planted 7a77c71aaeb9772cf79cbfeab53ab14a441169655c7bc2040185d66b18a4530a;
+  restored by Edit at 07:18:07 UTC, sha256 after 2aca00c87822526a891de6d1c5e78ce4161f37de2de453dd01c94e28500e2d1c (equal).
+  Log .gate/u4r/brawl1/fp-plant-3.log (header diff 683b28fa1d08ea537b0efa2a0268f4d65146dc28fd5d771866b3198385001705):
+  `cargo test --locked -p npt-client --test endpoint -- brawl1 --nocapture` exit 101: the wrap test ok; the read test
+  panicked at endpoint.rs:446, "assertion `left == right` failed: a complete tick turned sentinel is not read: tick 101
+  again / left: Some(([-700, 700, 150], false)) / right: Some(([1234, -1234, 150], true))". Bites as ruled.
+- FP-7 P4, TE-B1-4 (b) = NA-B1-1 = RR-B1-5 = EA-B1-3 (b) (the wrap rule): done, restored. client lib.rs sha256 before
+  2aca00c87822526a891de6d1c5e78ce4161f37de2de453dd01c94e28500e2d1c; planted: own_soldier's `.reduce(|a, b| { if
+  self.wrap.after32("tick", a.tick, b.tick) { b } else { a } })?` (lib.rs:360-366, seven lines) replaced by
+  `.max_by_key(|t| t.tick)?`, sha256 planted 6aeeec0a0c6dee9ab393bd03683a6163e9e806ea607b5f0e17d17ce7ae632151; restored by
+  Edit at 07:18:37 UTC, sha256 after 2aca00c87822526a891de6d1c5e78ce4161f37de2de453dd01c94e28500e2d1c (equal). Log
+  .gate/u4r/brawl1/fp-plant-4.log (header diff fbea0f371cb5b26d96ca68dbacdf30db74572a3b392a848e515546eaafc5e8b5): `cargo
+  test --locked -p npt-client --test endpoint -- brawl1 --nocapture` exit 101: the read test ok; the wrap test panicked
+  at endpoint.rs:483, "assertion `left == right` failed: tick 0 comes after u32::MAX by the endpoint's wrap rule / left:
+  Some(([11, -11, 150], false)) / right: Some(([22, -22, 150], false))", its last assert. Bites as ruled.
+- **FP-7 complete, no plant in place:** bots lib.rs 83a8541b..., logs.rs 83008fce..., client lib.rs 2aca00c8... (each
+  equal to its pre-plant value), and the tree's `git diff HEAD -- . | sha256sum` is c2561b6c... again (fp-check-2's).
+  Next: FP-8.
+- FP-8 (1) started 07:19 UTC: `node check.mjs` through the runner (-x), log .gate/u4r/brawl1/final-fp-check.log, on the
+  final code (diff c2561b6c...). If cut mid-run: the log's end line says whether it finished; a run cut short is not a
+  result and is run again whole (not a retry of a failure).
+
+### FP-9: report words (no code)
+
+1. **The plants:** P1 to P4 are recorded above (FP-7), each with its three sha256 values, log, exit codes and failing
+   message. All four bit as ruled. **The door-entry bar was not added,** because P1's bite rule held on area alone: the
+   short copy failed in both builds and the full test listed Skips for all three seeds (EveryTick too for seeds 1
+   and 2). The ruling adds the bar only "if the bite rule does not hold on area".
+2. **Pattern (iii), a correction to copy 1's report:** I withdraw "a fixed radius stops it" and the 14 m vehicle
+   candidate. sim_run runs with stand-ins off (bots lib.rs:541; the ruling's :496 before this pass's lines). No solid
+   lies within 1.6 m of (1734, -592), (1671, -751) or (1586, -917): building 0's corner (1770, -430) is 166 cm from the
+   first point (I re-computed: (36, 162), 165.95 cm), the crates lie within 950 cm of the centre, and the wall stand-in
+   is at y 1,180-1,220. The reading for U4g is the advisor's U4g words (advisor-brawl1-r1-full.md, "U4g's brief").
+3. **TE-B1-8, in the ruling's words:** "No test drives Behaviour::step with an own soldier past the outer radius. The
+   glue at bots lib.rs:223 is shown only by the moved pins (own_soldier returns Some and changes commands) and by the
+   two 10-minute evidence runs (condition 14)." (That glue line is lib.rs:228 after FP-5's doc lines.)
+4. **The advisor's corrections, in its words** (beside ADV-BP-1 and ADV-BP-2, condition 18):
+   - ADV-BP-1: "N2-1's 'all four checks fail' was wrong; under the leave plant two fail (Q5)."
+   - ADV-BP-2: "my sets-r2 figure of 'about 4.2 GiB free after the refill' mixed units."
+   - ADV-BP-3: "Condition 6 (ii)'s identical-diff test could not hold at <base>, because the wallclock bite's L1 hash
+     varies with wall-clock ns (pump.rs:236-243); and 'comes to me whole' did not say stop." With the masking rule from
+     the points ruling's Point 2: "Future captures of these tests mask exactly the L1 leg's hash values in the
+     wallclock bite's comparer and result lines ('theirs ... hash' and the L1 hex). They keep the index, the loopback
+     hash, compared and mismatching, and they explain libtest's 'filtered out' count by the binary's test count.
+     Nothing else is masked."
+   - ADV-BP-4: "RR4-L1's ruled name MAX_ENTRY_TICKS falls under check.mjs's TICK_NAMED rule and is refused as a
+     literal; I did not check it; the name is MAX_ENTRY_TICK_COUNT."
+5. **RR4-L1's constant:** MAX_ENTRY_TICK_COUNT stands (points ruling, Point 1). RR-B1-6 and EA-B1-5 are answered
+   there, and ADV-PT-L3 carries the point to the check.mjs follow-up. No change in this pass.
+6. **The follow-ups, with their homes** (the ruling's "Each finding"):
+   - RR-B1-7 (1), the `s as u8` loop rewrite in room_tick's building block: the next lane that edits logs.rs's
+     room_tick.
+   - EA-B1-1's pub constants (npt-sim exposes the flags index and the dead bit), with NA-B1-3's npt-client half: the
+     next lane that opens crates/sim (beside EA-U4R-4), U6 at the latest.
+   - ADV-PT-L3 (TICK_NAMED gains `_TICK_COUNT$`, NOT_TICK_COUNTS gains MAX_ENTRY_TICK_COUNT, one check.test.mjs case):
+     the check.mjs follow-up, at check.mjs's next change, before PR #40 is marked ready at the latest.
+   - TE-B1-8's optional glue test (Behaviour::step with an own soldier past the outer radius): U6's bots'-view item
+     (EA-U4R-5's home).
 - FP-8 (1)-(6): pending.
 - FP-9 items 1-6: pending.
 
