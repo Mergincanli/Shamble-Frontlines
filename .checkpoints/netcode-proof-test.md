@@ -3571,6 +3571,10 @@ free:
     stays.
 
 ## Key numbers
+- **KEPT-LOGS, the first real use (his rule's item 2, the one old build cache; the advisor's disk ruling, option
+  (1); after the merge 2bd44a5 was pushed): 2026-11-15 21:02:20-21:02:25 UTC, `node .claude/scripts/kept-logs.mjs
+  cache` from the repository root, exit 0 (.gate/refs-kit/kl-cache.log):** "kept-logs: free before: 2863 MiB";
+  "kept-logs: removed: .gate/u3c-review-target"; "kept-logs: free after: 6914 MiB". Nothing packed yet.
 - Hetzner, excl. VAT, read 2026-11-05 (infra digest D): CCX23 EUR 0.1386/h, CAX21 EUR 0.0176/h (plan prices include
   IPv4); 1 RS + 1 LG = 0.1562/h; each VM rounds up per session; RS<->LG traffic internal and free.
 - Rust stable 1.99.1 (2026-10-13; static.rust-lang.org answers 200); container has 1.97.0, x86_64 target only.
