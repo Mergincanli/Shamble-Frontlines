@@ -172,6 +172,30 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
        ops/runs/det-u4.mjs; df -B1; cargo build --locked --release -p npt-lab; npt-lab hash --manifest
        crates/lab/precheck-recordings.json --dir/--out under .gate/brawl1-merge/; the full test by name in release.
     7. M4 the gate; M5 push (the saver restarted) and CI; M6 the advisor's head review; M7.
+  - **M1 DONE (08:09 UTC):**
+    - The base held: `git diff --quiet 352a245 HEAD -- spikes/` and no spikes/ change.
+    - The patch applied: `git apply --check`, then `git apply`.
+    - All 10 files are cmp-equal to the builder's worktree, and the fingerprint `git diff HEAD --binary -- spikes/ |
+      sha256sum` is c2561b6c.
+    - **The merge commit b30314a** (11 files: the 10 plus `git rm` wip/brawl1.patch; no [skip ci]) is UNPUSHED, and the
+      tree is clean.
+  - **M2 DONE (08:38-08:40 UTC):**
+    - No cargo, rustc, npt-lab, npt-judge or loader process, and no agent.
+    - (B): .gate/brawl1-merge/m2-clean-B.log, 15 commands, each exit 0. It removed 258.4, 12.4, 37.3, 130.4 and 8.4
+      MiB.
+    - (C): m2-clean-C.log, 6 commands, each exit 0. It removed 26,812 files, 6.8 GiB.
+    - Both logs' "run:" lines are identical to 2026-11-14's clean-shared-B.log and clean-shared-C.log.
+    - Free disk: 6,911,565,824 B before (B), 7,367,524,352 after (B), 13,579,448,320 after (C) (12,950 MiB; the
+      advisor's projection was about 12,955).
+    - The headers read `diff e3b0c442…; untracked e3b0c442…`.
+  - **M3 RUNNING since about 08:41 UTC:** background shell bvnxdsfea, one main-run.sh call. Its log is
+    .gate/brawl1-merge/m3.log, and the regeneration writes to .gate/brawl1-merge/m3/{rec,out}.
+    - It builds cold, so its timings are cold (INF-U4R-7's labels).
+    - **If it is cut by a restart:** an interrupted run is not a result, so run it again whole, with the same command
+      (the card's step 6, plus `df -B1` after check.mjs and after det-u4).
+    - **A failure is a stop:** no retry; it goes to the advisor whole.
+    - **Then:** A3's figures against the log; M4 the gate; M5 push with the saver restarted, then CI; M6 the advisor;
+      the report words by script.
   - **Was running, about 07:58-08:10 UTC: the advisor's round-2 ruling, workflow wf_d32decd1-87b (task wnrpyufkm),** one
     agent (general-purpose, opus, xhigh), notes advisor-brawl1-r2.md, logs .gate/u4r/brawl1-advisor-r2/.
     - It rules on: the 4 Lows' homes and round 3; copy 2's deviations (LOGS0-RECORD); my two resume-part errors; the go
@@ -2327,6 +2351,22 @@ the cut and the time of the resume; UTC, read from the session's transcript):
       10 modified files.
     - Copy 2 was continued by SendMessage. It re-reads its notes, confirms no plant, re-runs rustfmt's check for the
       hunks that remain, fixes its state list (:447 against :455), then goes on with FP-7 to FP-9.
+- 2026-11-15 08:10-08:35 (not the spend limit: an unanswered approval, then a worker restart). The notice, at 08:35:45
+  in the transcript: "This session's worker process was restarted. If your previous turn was already complete, take
+  no action and wait for the next event. Otherwise, continue from where you left off."
+  - **Cut:** the merge's M2. The call holding cleans (B) and (C) waited for an approval from about 08:10, and was
+    closed unrun at the restart. Its command lists were built at run time from the 2026-11-14 logs by a shell function,
+    so the permission check could not see what would run.
+  - **State at the cut:** the merge commit b30314a was made at about 08:09, is unpushed (one ahead of origin) and the
+    tree is clean. No clean ran: .gate/brawl1-merge/ does not exist, and the shared target holds 6,360 MiB with 6,592
+    MiB free. The saver was stopped on purpose (from M1 to M5).
+  - **My slip, the second today:** at the restart notice I again answered "No response requested." with my turn
+    incomplete. The 08:34 check-in picked it up at 08:36. **Lesson:** after a restart notice, check the last tool
+    result. If it says "not completed", the turn was not complete: continue.
+  - **Resumed 08:37,** at the check-in. The cleans are re-run with their commands written out literally, as the
+    2026-11-14 call had them. The new logs' "run:" lines are compared with the old logs' to prove the copy exact.
+  - **The card is not pushed now:** a push would carry the unpushed merge commit ahead of M3 and M4, and the order is
+    M3, then M4, then M5's push (A5). So the card waits for M5, as the saver does.
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188
