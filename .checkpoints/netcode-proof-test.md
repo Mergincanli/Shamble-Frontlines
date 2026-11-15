@@ -31,8 +31,9 @@ grow; a restarted agent reads its notes first and continues after the last compl
 posted to Mustafa about 16:08 UTC (kl-change-v2.diff, 102 lines, c80dbbb346459d46…); WAITING for KL-CHANGE-YES**;
 nothing built. (3) Night item 7 is on issue #16 (nothing to resume). (4) The saver bugi27gbf ends about 16:24
 UTC: restart it if stopped. Record the cut notice's exact text and times under "Cuts by the spend limit".
-**Saver:** bugi27gbf stopped by hand at about 16:15 UTC (last autosave 2b8acec); restarted as **bc6rnao9l** (window
-to about 18:05 UTC) so the readers' notes keep being committed through a cut. State at 16:14 UTC: the design is done
+**Saver:** bc6rnao9l ended on its own time limit at 18:04:35 UTC ("watch stopped: time is up", exit 0; the last save
+52c0276); restarted at 18:04 UTC as **bfz6oq1an** (window to about 19:55 UTC). Before: bugi27gbf stopped by hand at
+about 16:15 UTC (last autosave 2b8acec); bc6rnao9l kept the readers' notes committed through the 16:23 cut. State at 16:14 UTC: the design is done
 (c62h-bound-design.md); the advisor and the test-engineer are reading it; all notes committed at 21109bf.
 **LATEST (2026-11-15 about 15:40 UTC): HIS THREE ANSWERS ARE IN (16:35 Amsterdam; history.md:2131-2146; Rules in
 force): KL-YES with one change (KL-CHANGE: the changed lines to him for a yes first); C62H-KEEP (a); C62H-BOUND (a)
