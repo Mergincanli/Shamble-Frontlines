@@ -30,3 +30,21 @@ Runs only through u4r-run.sh, logs under .gate/u4r/brawl1-advisor/.
   make at+1 = 30,001 read OK and fail expect_err, so the replace is self-checking. Cap boundary itself in r10_fp3
   (:1655-1668: 36,001 refused exact text; synthetic 36,000 reads). Ruling: ACCEPT. Facts gap (facts-full:113-116 named
   only r10_fp3) caught by p1-a-check.log:47. No diff change.
+- Point 1 checked: RR4-L1 (advisor-u4r-r2-full.md:92-97) ruled MAX_ENTRY_TICKS = 36_000; check.mjs:755 TICK_NAMED
+  /_TICKS$|CATCHUP/, :839-846 refuses a literal; p1-a-check.log:50 shows it. Built hash.rs:239 MAX_ENTRY_TICK_COUNT,
+  doc :236-238 says why (size bound like MAX_ENTRY_BYTES). Message :338-343 equals the ruled text; r10_fp3
+  :1655-1668 asserts it exactly. The cap is a per-tick resource bound (replay.rs:296 reserves ticks x 1,900 B; the
+  runner check :358-361 already scales with TICK_HZ), so it should NOT follow the rate: (b) and (d) would double it at
+  60 Hz; (d) also puts npt-lab's manifest policy into npt-sim and changes check.mjs TICK_DERIVED + s1 + ticks.rs
+  (carry 18, u4s-carries.md:129-132). (c) changes check.mjs -> step 18 pulls the check.mjs follow-up bundle (SEC items)
+  into this lane. Ruling: (a), RR4-L1's name amended (my error, ADV-BP-4). Low follow-up for the check.mjs follow-up:
+  TICK_NAMED reads `_TICK_COUNT$` too and NOT_TICK_COUNTS registers MAX_ENTRY_TICK_COUNT with its reason. No diff
+  change. No other const ends in _TICK_COUNT (grep of crates/).
+- Also-recorded: zero-test runs confirmed (p1-before-1 "running 0 tests" x2, --lib, 5 filtered; p2-full-release 0, 3
+  filtered; reruns 3 passed/1 passed). check2 all 11 PASS 532/610; final all 11 PASS 535/613. Size: numstat 998 < 1,400:
+  no stop. Pattern (iii): final-regen-tests.log positions (1734,-592), (1671,-751), (1586,-917): three angles, one
+  1 cm band (isqrt 1832) -> a radius, not a face. My reading (computed, not run): walk circle 16 x 4 commands x 20 cm
+  (radius ~205 cm); a circle kept inside R_OUT (centre ~1,195) re-running one walk command 30 ticks (600 cm) ends at
+  most ~1,195 + sqrt(205^2+600^2) ~ 1,829. So within condition 1's bounds B1 reach > 1,800 door entry at every angle:
+  area 0 in 3 seeds is not a bound. For U4g's brief. Print nit: Bursts prints "skipped 14400 of 0 chances (0 per
+  1000)" (bots lib.rs:612-626; chances counted only in Skips :559): Low.
