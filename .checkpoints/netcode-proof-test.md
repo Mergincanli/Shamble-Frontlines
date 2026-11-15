@@ -270,6 +270,17 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
     - -57 (facts): positions max 6,984 at P0 and 6,952 at P3 (bar 10,000); yaw 2,750 in both.
     - The judge: P0 wall 8.6 s, peak 1,856.3 MiB; P3 2.3 s, 392.9 MiB.
     - df: 13,556,174,848 B, then 12,643,663,872.
+  - **RUNNING since about 09:29 UTC: the P3 re-run set,** background shell bduei0sla:
+    `python3 -I .checkpoints/netcode-proof-test/peak.py flock -x .gate/shared-target/.lane.lock node
+    spikes/netcode-proof/ops/runs/c-u4r-runs.mjs judged --profile P3 --date 2026-11-15 >
+    .gate/u4r-sets/P3-fd4612050cd6.log 2>&1`.
+    - Checked before: pgrep empty, porcelain 0, HEAD fd46120 (tree ebbfeb40), free 12,058 MiB, c-u4r-runs.mjs 99dd070e.
+    - **After it:**
+      - commit results/u4r/fd4612050cd6/P3/;
+      - record condition 15's lines: TICK16-WORDING's line, the building figure at 0 on every run, the raw-log bytes
+        against the projection, and -57's values beside U4r's with the largest relative change named;
+      - a verdict difference or a change in whether a bite is shown goes to the advisor whole;
+      - then P2, then P0 (split), each with its start figure checked against df first.
   - **NEXT: the re-run sets P3, then P2, then P0 (split),** on c-u4r-runs.mjs 99dd070e (condition 15). Each set's
     results are committed before the next.
     - Use the same invocation as U4r's judged sets (task #65; the card's history of 2026-11-14), with this date.
