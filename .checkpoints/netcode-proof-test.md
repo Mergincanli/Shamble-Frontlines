@@ -316,7 +316,16 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
       - name-only lists only .checkpoints/ and P3's two files, and name-status shows only A lines;
       - c-u4r-runs.mjs 99dd070e, main-run.sh f0b7a3d0 and u4r-run.sh 2f754d12;
       - pgrep finds nothing; df 12,326,227,968 B.
-    - **RUNNING since about 09:58 UTC: the P2 re-run set,** background shell b9rsf422l, log
+    - **THE P2 SET IS DONE AND MEETS EVERY EXPECTED LINE** (peak.py exit 0, wall 1046.7 s, 1,760.3 MiB):
+      - -2 SS, -17 L1 P2 and -57 L1 P2 PASS, each with three valid runs;
+      - -57's nine values equal U4r's P2 (6,984 / 2,750 / 88,063 on every run), so the largest change is 0.0 %;
+      - the building figure is 0 on every run;
+      - overflow resyncs 0, so no flags;
+      - every summary figure (late, stale, heals, sentinels, measured incomplete) equals U4r's same-seed line;
+      - the logs are 622.2 MiB on disk, against the 780.8 MiB projection;
+      - runs.txt's commit fc411116c1f1 and tree 079ffffc equal pre-P2's.
+      - The results are committed with this card. Then pre-P0, and P0 (split).
+    - **Was running, about 09:58-10:16 UTC: the P2 re-run set,** background shell b9rsf422l, log
       .gate/u4r-sets/P2-fc411116c1f1.log, launched as P3 was.
       - **After it:**
         1. check runs.txt's commit and tree against pre-P2's;
