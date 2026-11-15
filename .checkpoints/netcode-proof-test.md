@@ -33,7 +33,7 @@ C1, C2, C4, C8 applied word for word; the size; C3's blocks; C9's freeze); then 
 C62H-BOUND-YES. Nothing is built. The design in short (its plain_words): two new -17 checks on
 L1 P2, P3 and B1 (snap_lost_unexplained_count == 0; snap_whole_despite_link_loss_count == 0), a new lab series
 tick.s.snap_link_lost_count from npt-l1's fate log, two judge figures, one new bite (PM-0001-17/link-lost-overstated).
-**CUT-READY (refreshed 19:08 UTC).** If a cut stops work, resume per SPEND-LIMIT (a), in this order: (1) **PR #53's
+**CUT-READY (refreshed 19:07 UTC).** If a cut stops work, resume per SPEND-LIMIT (a), in this order: (1) **PR #53's
 review round + the advisor on head a637c7a, workflow wf_a9e04f3e-df7** (task w7kr5itsz; security-auditor notes
 kl-pr-security.md, test-engineer kl-pr-test.md, advisor advisor-kl-pr-head1.md): resume with `Workflow({scriptPath:
 "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/kl-pr53-review-wf_a9e04f3e-df7.js",
