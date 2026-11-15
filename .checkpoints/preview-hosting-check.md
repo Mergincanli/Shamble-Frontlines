@@ -72,7 +72,10 @@
      bite-nocache; on bite-coep Chromium refuses the worker's script, so the bite is caught).
 
 ## Current step
-14. Before the review round (U4): get_session for the chat's fullness (consultation 4's point 7).
+14. The review round (U4): get_session at about 21:12 UTC read 717,475 of 1,000,000 tokens (72%; automatic compaction
+   at 901,600), so the review goes ahead and he is asked to compact before Day 1's runs. The round runs as one workflow
+   of three agents (ultracode is on; CLAUDE.md's cap of 3): infra-engineer, security-auditor (his condition 2 on
+   `deployments: write`), test-engineer, each at effort high, notes `<agent>-review.md` in this folder.
    - At his request ("Clone the repository Mergincanli/shamble-preview-check into this session"), the session attached
      it with add_repo (push access, as plan A3 step 4 says) and cloned it shallowly to /home/user/shamble-preview-check
      (outside this repository's folder), add_repo at 20:01 UTC and the clone right after (transcript times). The repository is empty: no commit, no branch (`git ls-remote`
@@ -207,6 +210,9 @@
 - saver last check 16:27 UTC: the process is alive (pid 1609); its log shows "saved and pushed" at 16:02 and 16:12
   UTC and nothing for the cycle due about 16:22 (the session's own save of 16:21:42 UTC came just before it); to be
   checked again at the next update.
+- workflow wf_c4580fcf-ece (task wbgd5v14u) · script as launched `workflow-runs/review-round-run1.js` · no arguments ·
+  notes `infra-engineer-review.md`, `security-auditor-review.md`, `test-engineer-review.md` · launched about 21:13 UTC ·
+  running. On a usage limit: resume with resumeFromRunId and the same script.
 - agent advisor (Opus by its file, effort high by its file): the plan review of revision 1 at 27e9f50 · DONE
   (APPROVE with conditions).
 - saver: stopped with TaskStop at about 16:48 UTC after the plan was saved as done (its log: "saved and pushed" at
