@@ -46,10 +46,11 @@ tick.s.snap_link_lost_count from npt-l1's fate log, two judge figures, one new b
 19:49 (main 53272a1) on his KL-MERGE (a); C62H-BOUND-YES (a) recorded and its texts frozen (c62h-bound-freeze.txt).
 Taking main in hit check.mjs's refs step (the kit files name spikes/): merge aborted; the advisor's REFS-KIT ruling
 (advisor-refs-clash-full.json) fixed it without his word; **REFS-KIT committed and pushed at 914798a**. **Running:**
-the counted check.mjs on that content (task bdc3gq790, main-run.sh, .gate/refs-kit/counted.log; if cut, re-run
-`bash .checkpoints/netcode-proof-test/main-run.sh /home/user/Shamble-Frontlines/.gate/refs-kit/counted.log node check.mjs`
-after checking no cargo runs); the saver btg6vlymf (to about 22:25 UTC). **Next, in order (the ruling's order):**
-(1) the counted run PASS, then the advisor checks head 914798a; (2) the merge commit alone: `git merge --no-ff
+the counted check.mjs on that content **PASSED, all 11 steps** (20:34:34-20:48:30 UTC: test 684.2 s, measured 538,
+bites 616, 0 failed; refs PASS naming the exception; marks 81; self 78 of 78; redact 0; .gate/refs-kit/counted.log);
+CI on 914798a: no failed suite (20:39 UTC). **Running from 20:49 UTC: the advisor's check of head 914798a** (workflow
+wf_16d162f4-156, task wb2xcnzyq; notes advisor-refs-kit-head.md; if cut: resume by run id). The saver btg6vlymf (to
+about 22:25 UTC). **Next, in order (the ruling's order):** (1) DONE but the advisor's check of 914798a; (2) the merge commit alone: `git merge --no-ff
 --no-commit origin/main`, `python3 -I .checkpoints/netcode-proof-test/merge_main_53.py --apply`, check.mjs whole (refs
 PASS naming the exception), the gate, commit, push, the advisor checks that head (stop the saver during the merge:
 a checkpoint save would conclude it); (3) the first real list/pack per §11, reporting free space before and after (not
