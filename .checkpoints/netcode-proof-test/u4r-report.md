@@ -653,3 +653,15 @@ Process slips, none with an effect:
 - The advisor appended three lines to its own notes file with a shell redirect, against its write rule. Content unaffected.
 
 The merge step goes ahead on c2561b6c, M1 to M7 with amendments A1 to A6 (the ruling's merge step). The counted run must show the empty-input sha256 e3b0c442... for both diff and untracked, and must reproduce all three pins."
+
+### EVQ-LOAD, the carry line for U4f's and U4g's briefs
+
+_Copied by brawl1_carry_lines.py, word for word, from advisor-brawl1-sets-p3-full.md line 158 (sha256 1bc5889c...)._
+
+"With everyone in view, every client queues every hit and kill. The stress scene's room-wide reliable gameplay events run at about 460-560 a second at P3 (30 s bins), about 17.3 queued per client per tick, against the provisional cap of 1,024 (events.rs:23). Plan §4.7 sized the cap from about 350 a second (net F121). Every snapshot sits at the 1,000 B window (mean 999.2 B). In BRAWL-1's P3 set, the cap overflowed inside the measured window: s1 had 27 forced resyncs on 25 clients at ticks 76,910-77,844, where the room's rate peaked at 554-561 a second; s3 had one at 76,803; s2 none. There was no kick and 0 mismatches. B1 adds 1 s of total loss on P2's backlog, about 520-570 more events per client. So net F121's warning is live for U4g's judged B1 runs: a cap too low resyncs every client on every burst and changes -18's heal path. U4f's cap measurement (§4.7) uses this full-view rate. U4g's plan reads carry 58's per-burst high-water marks from a short B1 run before -18's judged B1 runs count."
+
+### TICK16-WORDING, corrected (it replaces the line at :562-564)
+
+_Copied by brawl1_carry_lines.py, word for word, from advisor-brawl1-sets-p0-full.md line 135 (sha256 4b16dab5...)._
+
+"tick16's run is valid and the bite shown, failing both -17 checks. Its measured incomplete is 720: 48 clients times the 15 measured ticks from the wrap (65,536) to the window's end (65,550). Every client has at least one overflow resync, all in the after phase, none in the measured window, and no kick. The count and the ticks are not fixed: the run ends only when every client's last measured ticks resolve, and while one client's queue fills slowly, the others can resync again, each after its forced full state was acknowledged."

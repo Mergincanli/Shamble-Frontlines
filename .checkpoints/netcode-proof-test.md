@@ -354,8 +354,9 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
       - P0's results (runs.txt ada5a58a…, verdict.json e926b812…, verdict-bites.json b472784f…) are committed with this
         card.
     - **NEXT, before BRAWL-1 closes** (the ruling's "The commit and the close", item 3):
-      - a. On the card: EVQ-LOAD and the corrected TICK16-WORDING, copied by script from the rulings into
-        u4r-report.md, with a pointer here.
+      - a. DONE: EVQ-LOAD (advisor-brawl1-sets-p3-full.md:158) and the corrected TICK16-WORDING
+        (advisor-brawl1-sets-p0-full.md:135) were copied by brawl1_carry_lines.py into u4r-report.md's BRAWL-1 section
+        (sha256 baed0445…). The old TICK16 line at u4r-report.md:562-564 is still to be replaced by Edit in b.
       - b. u4r-report.md's BRAWL-1 section, in full, per item 3b:
         - the plan and the build: the size 1,266, the pins, pattern (iii);
         - round 1 and its ruling; M1-M7 and M6;
