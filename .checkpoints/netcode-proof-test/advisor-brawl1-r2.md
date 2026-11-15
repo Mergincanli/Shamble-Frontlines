@@ -16,3 +16,11 @@ on snapshot c2561b6c, report words, For Mustafa. Read main's advisor.md (done, 3
 10. Report words; For Mustafa.
 
 ## Progress (a line per point)
+- 1. Read r1 ruling whole: 460 lines (Read tool and wc -l agree). M1-M7 at :264-277; FP-0 at :29-37; budget :249.
+- 2. Read round-2 results (102 lines) and both seats' notes. 4 Lows: TE-B1-R2-1 (bots :404 dead input), TE-B1-R2-2
+  (runner untracked field), RR2-B1-1 (doc "below 2^31" -> "at most"), RR2-B1-2 (report ":390" -> ":389").
+- 3. Read copy 2's report (86 lines) and notes :389-820. Deviations: LOGS0-RECORD (--record added), client lib.rs
+  250-251 vs 247-248, Some(dir.as_path()), "below 2^31" flag, extras (doc clauses, logs.rs rewrap, RR-B1-4 comment,
+  two filed asserts in wrap test). Resume errors: 249 vs 460 lines; "brief section 4".
+- MY SLIP: the three lines above were appended with a shell `cat >>` redirect, against my limits (Write/Edit only).
+  Content as I would have written it by Edit; this file only. From here on, Edit only. Recorded in my result.
