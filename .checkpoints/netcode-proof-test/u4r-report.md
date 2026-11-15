@@ -264,12 +264,15 @@ advisor-u4r-r2-full.md:32).
 - **The check.mjs follow-up** (check.mjs's next change; before PR #40 is marked ready at the latest): SEC-U4R-R2-1,
   SEC-U4R-R2-2, TE-R2-3 (a TERM-trapping child in the real-process test), INF-R2-5 (`run()` returns the signal) and
   round 1's INF-U4R-10 (2) (a group kill after a timed call that did not exit 0) (advisor-u4r-r2-full.md:24, :52-62,
-  :87-90, :122-125; advisor-u4r-r1-full.md:17). It also carries three items in c-u4r-runs.mjs, since it edits
+  :87-90, :122-125; advisor-u4r-r1-full.md:17), and BRAWL-1's ADV-PT-L3 (TICK_NAMED becomes
+  /_TICKS$|_TICK_COUNT$|CATCHUP/, NOT_TICK_COUNTS gains MAX_ENTRY_TICK_COUNT with its reason, and check.test.mjs gains
+  one case; advisor-brawl1-points-full.md:87-91). It also carries three items in c-u4r-runs.mjs, since it edits
   judgeCall's "by a signal" phrases anyway (advisor-u4r-f3-head-full.md, next step 3):
   - INF-F1-3: both scripts name the signal;
   - INF-F3-1: collapse whitespace in guarded()'s catch (`String(e?.message ?? e).replace(/\s+/g, " ")`);
   - ADV-F3H-1: the RATES-1 comment reads "the builder's rates from 30 to 50 s runs (u4r-build.md:739-751)".
-- **The next npt-lab lane:** N2-1 = TE-R2-1 (the roster check in closed_checks), TE-R2-2 (the untested overflow
+- **The next npt-lab lane, done in BRAWL-1's Part 1** (merged at b30314a; EA-U4R-1 in the narrow form the plan ruled,
+  with no one-loop driver; the record is this report's BRAWL-1 section, "Part 1, the refactors and N2-1"): N2-1 = TE-R2-1 (the roster check in closed_checks), TE-R2-2 (the untested overflow
   refusals), RR4-L2 (bounds on a run's last tick and the bursts), RR4-L1 (a 36,000-tick manifest cap, before U4h adds its
   carry-87 entry at the latest), with round 1's EA-U4R-1's shared loop, EA-U4R-2's `Sim` type and one server
   constructor (before the pre-check's re-run after U4h) and RR3-L2 (a) (advisor-u4r-r2-full.md:24, :66-104;
@@ -641,13 +644,13 @@ count (advisor-brawl1-sets-p0-full.md, Summary)._
   - -57 passes everywhere.
 - Two lines go forward: EVQ-LOAD, the event queue's cap under full view, for U4f and U4g; and a corrected
   TICK16-WORDING.
-- Still open: the advisor reads this section against the files before BRAWL-1 is recorded closed. That read is not a
-  review round (advisor-brawl1-sets-p0-full.md, The commit and the close, 3c). PR #40 stays a draft, and nothing here
-  merges to main (the same section, "Unchanged").
+- Closed: the advisor read this section against the files (item 3c of advisor-brawl1-sets-p0-full.md; not a review
+  round) and found it true once the corrections in advisor-brawl1-close.md were made. BRAWL-1 is recorded closed.
+  PR #40 stays a draft, and nothing here merges to main (advisor-brawl1-sets-p0-full.md, "Unchanged").
 
 ### The plan and the build
 
-- **The plan:** brawl1-plan.md, written by the main session on 2026-11-14 at about 23:45 UTC.
+- **The plan:** brawl1-plan.md, written by the main session on 2026-11-14 and committed at 9658c10 at 23:30 UTC (its own first line says 'about 23:45 UTC').
   - The advisor's plan review: APPROVE WITH CONDITIONS 1-18 (advisor-brawl1-plan-full.md, workflow wf_533068a9-b2b,
     sha256 a7e68b90…).
   - Its four Mediums:
@@ -791,7 +794,9 @@ count (advisor-brawl1-sets-p0-full.md, Summary)._
 - **FP-0, the main session's runner line (TE-B1-7)** (the card, "FP-0 DONE"; advisor-brawl1-r1-full.md:29-37):
   - Both runners' headers gained the `diff …; untracked …` line: u4r-run.sh is now sha256 2f754d12…, and main-run.sh
     f0b7a3d0….
-  - Committed at 7402dac, with u4r-run.sh.te-b1-7.diff and main-run.sh.te-b1-7.diff, and `bash -n` silent on both.
+  - The two lines were committed at 7402dac (the 05:41 autosave). The .diff files u4r-run.sh.te-b1-7.diff and
+    main-run.sh.te-b1-7.diff were cut from 7402dac's own diff by fp0_diffs.py and committed at ab3b7d7 (06:41 UTC).
+    `bash -n` prints nothing for both.
 - **The fix pass, copy 2** (agent a2e54bc7201dcffed, in the same worktree). It was cut by the spend limit at 06:53:13
   UTC and resumed at 07:13, with no plant in place (brawl1-copy2-report.md:10).
   - **Three new tests, +3 per build (538 and 616)** (:34-37):
@@ -807,7 +812,8 @@ count (advisor-brawl1-sets-p0-full.md, Summary)._
     - check.mjs: all 11 steps pass, 538 and 616 tests (final-fp-check.log);
     - det-u4.mjs: PASS in 227.3 s, non-cargo sum 213.3 s, reproducing 1ec25de7 and 6abf7643 (final-fp-det.log);
     - the regeneration reproduces 1f00d2d5 (final-fp-regen-tests.log);
-    - the full test's 13 printed lines are identical to round 1's;
+    - the sim-only test's 13 printed lines (the short copy's 4 and the full test's 9) are identical to round 1's, once
+      the new dead figure is set aside and the old skip text is mapped to the new wording (:61);
     - both manifests are unchanged.
   - Its deviations, LOGS0-RECORD and three more, were all accepted at round 2 (below).
 - **TE-B1-8, in the ruling's words** (FP-9 item 3, advisor-brawl1-r1-full.md:188): "No test drives Behaviour::step
@@ -887,7 +893,7 @@ _The steps are the round-1 ruling's M1-M7 (advisor-brawl1-r1-full.md, The merge 
   - The headers read `diff e3b0…; untracked e3b0…`.
 - **M3, the counted run** (m3.log; 08:38:44-08:59:43 UTC; built cold, so its timings are cold):
   - The header: HEAD b30314a, free 12,950 MiB, `diff e3b0c442…; untracked e3b0c442…` (A2; m3.log:1-3).
-  - `cat /proc/uptime`: 227.41 s (:5). uptime: "08:53:06 up 18 min, load average: 2.31, 2.21, 1.54" (:26).
+  - `cat /proc/uptime`: 227.41 s (:5). uptime: "08:53:06 up 18 min, 0 user, load average: 2.31, 2.21, 1.54" (:26, spaces folded).
   - check.mjs: "check: all 11 steps pass" (:8-19):
     - test 691.2 s, cold: measured build 538 passed, bites build 616 passed, 0 failed, 0 skips;
     - self 77 of 77; marks 81; redact 287 items, 0 findings.
@@ -1040,7 +1046,7 @@ _Copied by brawl1_carry_lines.py, word for word, from advisor-brawl1-sets-p3-ful
 
 "With everyone in view, every client queues every hit and kill. The stress scene's room-wide reliable gameplay events run at about 460-560 a second at P3 (30 s bins), about 17.3 queued per client per tick, against the provisional cap of 1,024 (events.rs:23). Plan §4.7 sized the cap from about 350 a second (net F121). Every snapshot sits at the 1,000 B window (mean 999.2 B). In BRAWL-1's P3 set, the cap overflowed inside the measured window: s1 had 27 forced resyncs on 25 clients at ticks 76,910-77,844, where the room's rate peaked at 554-561 a second; s3 had one at 76,803; s2 none. There was no kick and 0 mismatches. B1 adds 1 s of total loss on P2's backlog, about 520-570 more events per client. So net F121's warning is live for U4g's judged B1 runs: a cap too low resyncs every client on every burst and changes -18's heal path. U4f's cap measurement (§4.7) uses this full-view rate. U4g's plan reads carry 58's per-burst high-water marks from a short B1 run before -18's judged B1 runs count."
 
-### TICK16-WORDING, corrected (it replaces the line at :562-564)
+### TICK16-WORDING, corrected (it replaces the sets-r2 line under "The judged runs", Corrections (Q3 (7)), above)
 
 _Copied by brawl1_carry_lines.py, word for word, from advisor-brawl1-sets-p0-full.md line 135 (sha256 4b16dab5...)._
 
@@ -1179,6 +1185,9 @@ _In plain words, the advisor's, copied from advisor-brawl1-sets-p0-full.md, "For
 - What remains is paperwork: committing the last results and finishing the write-up. Nothing to check in a browser and nothing to merge.
 
 1. Answer KEPT-LOGS (a, b or c) before U4g's build needs the disk. The bot fix's remaining steps do not wait for it.
+
+_Since the P0 ruling: P0's results are committed (be41ce6), and this section was read against the files
+(advisor-brawl1-close.md). BRAWL-1 is closed; KEPT-LOGS stays open._
 
 _The numbered item is the advisor's (the same file, line 287). Nothing here needs a Brave check: this is spike code on
 the test branch, nothing a player sees, hears or feels changes, and nothing merges to main._

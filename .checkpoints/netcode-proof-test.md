@@ -374,8 +374,11 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
         - The advisor's close check (advisor-brawl1-close-full.md, sha256 1ca738a8…): TRUE TO THE FILES, with seven
           Low corrections C1-C7 (C8 and C9 optional). **BRAWL-1 may be recorded closed once C1-C7 are made.** ADV-CL-1:
           the card's pointers for EVQ-LOAD and TICK16 are accepted.
-        - **RUNNING: C1-C9 applied by an agent, workflow wf_adc526e1-faf (task wdpl5yvuh),** with a print-only diff
-          check.
+        - C1-C9 were applied by an agent (workflow wf_adc526e1-faf), with the advisor's exact words. The print-only
+          diff against f691559 shows 9 hunks, one per correction, +19/-10, and nothing else (re-checked by the main
+          session: numstat 19/10, 9 hunks). u4r-report.md now has 1,193 lines.
+        - **ITEM 3c DONE. ADV-CL-1 recorded. BRAWL-1 IS CLOSED (2026-11-15, about 11:52 UTC)**, with the report, this
+          card and the advisor's notes committed together.
         - **Then:** commit the report, the card and the advisor's notes together, push, and record BRAWL-1 CLOSED.
         - **Then task #74:**
           1. TE-B1-R2-2's runner edit (u4r-run.sh:67 and main-run.sh:42, in the ruled form, each with a .diff and a
