@@ -127,7 +127,9 @@ C5. §11 is the final text below (F1-F3, F5): it names the netcode proof test's 
 C6. The message to Mustafa is the final text below: KIT-FREEZE-2 as one statement his yes confirms (no separate
     question); it says plainly that the tests pack and delete copies only, in a temp folder, and that the three places
     where the rule is narrower than his words are shown; it names 5e563b95 and the review that covered it (his words:
-    "In your next report").
+    "In your next report"). Before sending, the session checks that paragraph against its own C62H-REVIEW task
+    (the session's task list shows a test-engineer read of 5e563b9's lines in progress) and updates it if that read
+    has reported.
 C7. Build evidence (after his yes, in `git worktree add .gate/kept-logs-wt -b <branch> origin/main`, never switching the
     main folder; the `.claude/` writes ask him first, in Accept edits mode): the draft's (c) steps 1-6, with
       - the mutation table M1-M11, each mutation's failing test names recorded;
@@ -195,7 +197,8 @@ Your last line: the pass-bar file's change of 2026-11-14, 16:14 UTC, was commit 
 check and one planted bug (whole-as-lost) to PM-0001-17 in `marks.json`. Two things covered it:
 - the advisor's carry-62 (h) review (advisor-u4r-c62h: "right as committed"), after the r2-run ruling that ordered it;
 - `check.mjs`, all 11 steps.
-No reviewer seat reviewed it in a round.
+No reviewer seat reviewed it in a round. A test-engineer read of those lines is under way now; its result comes in its
+own report.
 
 ### 1. `.claude/CHECKPOINTS.md`: appended after line 229, one blank line before it
 
