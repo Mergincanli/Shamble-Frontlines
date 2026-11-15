@@ -103,7 +103,42 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
       ruled line): u4r-run.sh.te-b1-7.diff a458c9e4… and main-run.sh.te-b1-7.diff 910a3e04….
     - `bash -n` prints nothing for both.
     - The worker restart cut this step (the cuts block, 2026-11-15 05:41-05:51); it was finished at 06:40.
-  - **RUNNING since about 06:45 UTC: copy 2, the fix pass,** agent a2e54bc7201dcffed (Agent tool, general-purpose,
+  - **COPY 2 DONE (about 07:40 UTC): the fix pass, steps 3-11, no stop.**
+    - Its report, word for word: brawl1-copy2-report.md (86 lines, sha256 b089826a…, by brawl1_copy2_report.py).
+    - The plants: all four bit as ruled, each file back to its exact sha256. P1 (the leash off) bit on area alone, so
+      no door-entry bar was added.
+    - FP-8:
+      - check.mjs all 11 PASS, 538/616 (+3 per build);
+      - det-u4.mjs PASS in 227.3 s (non-cargo 213.3 s), reproducing 1ec25de7 and 6abf7643;
+      - the regeneration reproduces 1f00d2d5;
+      - the full test's 13 printed lines equal round 1's;
+      - both manifests unchanged.
+    - **Its deviations, for the advisor's round-2 ruling:**
+      - LOGS0-RECORD: `--logs 0` is refused without `--record`, so the figure test adds `--record <scratch>`;
+      - "client lib.rs:250-251" in place of "247-248";
+      - `Some(dir.as_path())`;
+      - "below 2^31" is exact but for one point;
+      - small doc additions.
+    - **Two errors of mine in its resume part:** the ruling file has 460 lines, not 249 (249 was the writer's list count);
+      and "the brief's section 4" repeats the ruling's step 1, but the rules are in brief sections 1, 2 and 5.
+  - **The new snapshot:** wip/brawl1.patch, sha256 c2561b6c… (equal to the worktree's `git diff HEAD | sha256sum`),
+    1,757 lines, 10 files, committed at 888ecbb. It was cut with the saver stopped; `git apply --check` exits 0.
+  - **SIZE-CHECK:** 1,139 insertions and 127 deletions, so 1,266 changed lines. That is about 1.8 times the ~700
+    planned, under the "well past" line (more than 1,400). Not a stop.
+  - **Round 1's read copy:** .gate/brawl1-snap1, a detached worktree at 352a245 plus 0e2bf9a's patch, giving
+    ee2973aa…. The fix pass changed 6 files.
+  - **RUNNING since about 07:47 UTC: round 2, workflow wf_19a5485a-e64 (task ws5husfn6).**
+    - The seats: test-engineer and rust-reviewer, one batch, opus at xhigh.
+    - The packet: brawl1-r2-packet.md (1,002 lines, sha256 e50a22f7…, from brawl1-r2-packet.json).
+    - Notes: brawl1-review2-<test|rust>.md. Logs: .gate/u4r/brawl1-review2-<seat>/.
+    - **If cut:** `Workflow({scriptPath: ".../workflows/scripts/brawl1-r2-wf_19a5485a-e64.js", resumeFromRunId:
+      "wf_19a5485a-e64"})`.
+    - **When it returns:**
+      1. write it word for word (brawl1_r2_full.py);
+      2. read every Medium or higher in full;
+      3. the advisor's round-2 ruling (with copy 2's deviations and my two resume-part errors);
+      4. the merge step M1-M7.
+  - **Was running, about 06:45-07:40 UTC: copy 2, the fix pass,** agent a2e54bc7201dcffed (Agent tool, general-purpose,
     opus, xhigh, no isolation), in .claude/worktrees/brawl1. Continue it by SendMessage. It was cut by the spend limit
     at 06:53 and continued by SendMessage at about 07:14 (the cuts block); at the cut FP-1 to FP-6 were written and
     being formatted, no plant was in place, and the size was 1,266.
@@ -121,7 +156,7 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
       4. round 2 (test-engineer and rust-reviewer);
       5. the advisor's ruling on round 2;
       6. the merge step M1-M7.
-- **Saver:** bwr6pge3b (restarted 06:38 UTC after the worker restart).
+- **Saver:** bzl1sciu3 (restarted 07:44 UTC after the snapshot cut; bwr6pge3b before).
 - **COMPACT-WAIT:** asked at about 05:12 UTC; the reminder fired at 05:33 (read 06:36). No /compact came, so I carry on
   from this card. The chat is at about 50 %.
 - **Was running, about 04:25-05:10 UTC: workflow wf_bbfeece0-4c7 (task wpp4xx1x6), "brawl1-r1".** The workflow runs at
