@@ -610,3 +610,46 @@ fix pass, against about 3,000 for its size M; your answer (a) covers it. Two hea
 judged runs need about 4 GiB more free disk than today; the approved cache cleans should cover it, and if they do not, it
 comes to you under your LEFTOVER-DELETE rule; (2) one Low security weakness in the spike's own code checker
 (SEC-U4R-R2-1) stays open as a follow-up and will be listed in PR #40's report, which needs your go anyway.
+
+## BRAWL-1 (the bots' leash toward the centre, from the client's own decoded position)
+
+### Review round 2 and the advisor's round-2 ruling
+
+_Copied by brawl1_report_words.py, word for word, from advisor-brawl1-r2-full.md lines 131-166 (sha256 64e361ab...)._
+
+"Review round 2 (workflow wf_19a5485a-e64; test-engineer and rust-reviewer at effort xhigh, in one batch) reviewed snapshot c2561b6c (wip/brawl1.patch, 1,266 changed lines; packet e50a22f7). Both seats: APPROVE WITH FINDINGS. Every round-1 finding is fixed as ruled or deferred as ruled: TE-B1-1 to TE-B1-8, RR-B1-1 to RR-B1-7, and EA-B1-2 checked by rust-reviewer.
+
+What the seats checked:
+- They rebuilt each plant's planted sha256 without writing anything: P1 77be9b00, P2 b902a7ee, P3 7a77c71a, P4 6aeeec0a.
+- Outside the test modules, the library diff is comments plus one visibility change (scenario.rs:396).
+- Their own runs (r2-tests.log, lint-tests.log; header c2561b6c): every command exited 0. fmt and clippy are clean in both builds.
+
+Round 2 found four Lows and no Critical, High or Medium, so round 3 did not open. Two rounds were used; the second was the last.
+- TE-B1-R2-1: the kept-state check cannot catch a leash that updates its state from a dead soldier's position. Follow-up, test only: move the dead input from (1450, 0) to (0, 0) at bots lib.rs:404.
+- RR2-B1-1: toward_centre's doc should say 'x² + y² is at most 2^31', not 'stays below' (bots lib.rs:132; the words were the advisor's). Follow-up, riding with TE-B1-R2-1. Home for both: the next lane that edits npt-bots' lib.rs, U6's bots'-view item at the latest.
+- TE-B1-R2-2: the runners' 'untracked' field hashes the whole porcelain status list, modified files included. Follow-up, a runner edit outside the change set, after BRAWL-1's last re-run set and before U4g's first run, in the form `untracked $(git ls-files -z --others --exclude-standard -- . | xargs -0 -r sha256sum | sha256sum | cut -d' ' -f1)`, with a .diff and `bash -n`. Until then, every BRAWL-1 log's 'untracked' value is the porcelain list's hash: e3b0 means no modified and no untracked file under spikes/netcode-proof, and 17cf51d7 is the builder's ten modified files.
+- RR2-B1-2: Server::new's only caller is scenario.rs:389, not :390. Corrected in this report.
+
+The advisor's round-2 ruling (advisor-brawl1-r2.md):
+- It checked every finding and every deviation in the code.
+- It read the interdiff whole and counted +3 tests with none removed.
+- It diffed the sim-only test's 13 printed lines against round 1's itself, after the stated normalisation: identical.
+- It hashed det-u4's regenerated recordings (1ec25de7, 6abf7643) and both manifests (a2faf3ea, 5ccf57f0).
+- Its own run (.gate/u4r/brawl1-advisor-r2/adv-r2-tests.log, header c2561b6c): fmt clean, and the BRAWL-1 tests pass in both builds.
+
+Copy 2's deviations are all accepted:
+- LOGS0-RECORD, option (a): the no-log case keeps `--record <scratch>/brawl1.rec`, because parse refuses `--logs 0` alone and summary_line reads only `s.logs`.
+- soldiers()'s doc names client lib.rs:250-251.
+- Logs::open gets `Some(dir.as_path())`.
+- The extra doc and test lines.
+
+The advisor's corrections, in its words, beside ADV-BP-1 to ADV-BP-4:
+- ADV-R1-1: 'Two lines in FP-3 could not run as I wrote them: `--logs 0` without `--record` cannot parse, and `Some(&dir)` would not compile; copy 2's repairs are right.'
+- ADV-R1-2: 'Step 1 named the brief's section 4 for the rules; they are in sections 1, 2 and 5.'
+
+Process slips, none with an effect:
+- The main session's resume part for copy 2 gave the round-1 ruling as 249 lines; it has 460, and its sha256 was right.
+- The resume part repeated ADV-R1-2's 'section 4' twice: at :16, and at :19 as 'section 4 rule 6'.
+- The advisor appended three lines to its own notes file with a shell redirect, against its write rule. Content unaffected.
+
+The merge step goes ahead on c2561b6c, M1 to M7 with amendments A1 to A6 (the ruling's merge step). The counted run must show the empty-input sha256 e3b0c442... for both diff and untracked, and must reproduce all three pins."

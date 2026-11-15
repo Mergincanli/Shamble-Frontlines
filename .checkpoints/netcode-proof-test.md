@@ -207,8 +207,20 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
       PASS).
     - `node tools/gate.mjs --no-smoke`: "GATE PASS (5a smoke skipped: --no-smoke)" (m4-gate-no-smoke.log, exit 0).
       CI's smoke job covers 5a.
-  - **M5:** the merge commit b30314a was pushed ALONE at 09:02:06 UTC (f7dff4b..b30314a), so CI reads that commit (A5).
-    The card commits stay local until its CI ends. Then they are pushed, and the saver is restarted.
+  - **M5 DONE:** the merge commit b30314a was pushed ALONE at 09:02:06 UTC (f7dff4b..b30314a), so CI reads that
+    commit (A5).
+    - **CI GREEN on b30314a:** gate run 43697261383 (jobs gate and smoke, both success; the smoke's check 5a passed in
+      CI) and toolchain run 43697261438 (success).
+    - Then the card commits were pushed. Every commit after b30314a touches only .checkpoints/ (`git diff --name-only
+      b30314a HEAD`). The saver was restarted.
+    - BRAWL-1's section in u4r-report.md now holds the advisor's round-2 report words (copied by
+      brawl1_report_words.py from advisor-brawl1-r2-full.md:131-166). The merge record follows there after M6.
+  - **NEXT:**
+    - M6: the advisor's review of the pushed head, as a workflow with one agent. It is given the merge record above,
+      the logs under .gate/brawl1-merge/ and the two CI runs.
+    - Then M7: (B) and (C) again, with df before and after; the two 10-minute evidence runs (condition 14, never named
+      u4r-*); then the re-run sets P3, P2 and P0 (split) on c-u4r-runs.mjs 99dd070e (condition 15), each set
+      committed before the next.
   - **Was running, about 08:38-09:00 UTC: M3,** background shell bvnxdsfea, one main-run.sh call. Its log is
     .gate/brawl1-merge/m3.log, and the regeneration writes to .gate/brawl1-merge/m3/{rec,out}.
     - It builds cold, so its timings are cold (INF-U4R-7's labels).
