@@ -387,8 +387,29 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
             (cb831ae3…).
           - `bash -n` prints nothing for both. On today's clean tree the field reads e3b0.
           - **Any later brief names the new runner sha256s.**
+        - **KEPT-LOGS ANSWERED: (c)** (Mustafa's words of 2026-11-15 08:20 Amsterdam, typed into this chat 12:01 UTC;
+          verbatim in history.md's last "## Decision", copied by mustafa_kept_logs_words.py).
+          - **Scope, only:** (1) a run set's raw-log folder, once its results are committed and its ruling closed; (2)
+            .gate/u3c-review-target.
+          - **Before a folder goes:** its file list (sizes, sha256) committed; one compressed archive; every hash read
+            back from the archive equal to the list; df before and after. One differing hash: the folder stays and he
+            is told.
+          - **Route:**
+            1. show him, in chat, the exact text of every kit line, and WAIT for his yes;
+            2. build it as its own reviewed kit PR to main, and STOP for his go on the merge;
+            3. nothing is packed or deleted before that PR is on main and this branch has taken main in.
+            Keep it small and in one place: step 2.3's guard change (branch claude/sweet-mayer-grsukw) is planned
+            elsewhere.
+          - **His question:** the pass-bar change of 2026-11-14 16:14 UTC, commit 5e563b9 (carry 62 (h): marks.json +15,
+            -17's "L1 P0 loses no group" check and the bite PM-0001-17/whole-as-lost). It was covered by the advisor's
+            carry-62 (h) ruling (advisor-u4r-c62h-full.md: "Carry 62 (h) stands as committed at 5e563b9") and by
+            check.mjs (c62h-check.log: all 11 steps, marks 81). No reviewer seat reviewed it in a round.
+          - **RUNNING since about 12:05 UTC: workflow wf_0f69bce5-688 (task wp3trnw0g).** A drafter writes the exact kit
+            lines (kept-logs-rule-draft.md); then the advisor reviews them as a plan (advisor-kept-logs-rule.md; result
+            keys verdict, summary, conditions, final_text_for_mustafa, pr_reviewers, to_mustafa). **Then:** show
+            Mustafa final_text_for_mustafa in chat and WAIT for his yes.
         - **NEXT (task #74):**
-          - KEPT-LOGS is with Mustafa; it is needed before U4g's build.
+          - KEPT-LOGS: answered (c); the rule is drafted above, and it waits for Mustafa's yes on its exact lines.
           - Then step (7): U4's report folds U4r's. Then U4f, U4g (its brief with u4g-brief-carry.md and EVQ-LOAD) and
             U4h, each with its brief to the advisor first.
           - Before PR #40 is marked ready: the check.mjs follow-up (now also ADV-PT-L3), JDG-ONLY-1, and taking main in.

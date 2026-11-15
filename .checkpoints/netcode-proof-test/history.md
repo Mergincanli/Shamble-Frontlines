@@ -2084,3 +2084,28 @@ From "Next steps, in order" (as it was):
       Main is merged in when main changes code, CI or rules (the kit, gate or CI files, a CLAUDE.md, .claude/ or
       .github/), and once before PR #40 is marked ready; each snapshot's card update looks at what main's new commits
       change. The card's Base line says so.
+
+## Decision: Mustafa, 2026-11-15 08:20 Amsterdam (07:20 UTC), KEPT-LOGS (c) and the kit-rule route
+- **Mustafa, typed into this chat (transcript 2026-11-15T12:01:41.136Z), verbatim:**
+
+  My words of 2026-11-15, 08:20 (Amsterdam time), for the netcode chat.
+
+  KEPT-LOGS: (c), with the old build cache named in the same rule, as your advisor recommends.
+
+  What the rule may cover, and nothing else:
+  1. The raw-log folder of a run set whose results are committed and whose ruling is closed.
+  2. The one old build cache, .gate/u3c-review-target.
+
+  Before a raw-log folder goes:
+  - a list of its files with their sizes and sha256 hashes is committed;
+  - the folder is packed into one compressed file, and every file's hash read back from that archive equals the list;
+  - free space is recorded before and after.
+  If one hash differs, the folder stays and you tell me.
+
+  How it comes: this is the narrow kit rule of my words of 2026-11-09 ("if it's ever needed, it becomes a narrow kit rule instead"). It is its own reviewed kit pull request to main. First show me, in chat, the exact text of every kit line you want to add or change, and wait for my yes. Then build it and stop for my go on the merge. Nothing is packed or deleted before that pull request is on main and this branch has taken main in.
+
+  Keep the edit small and in one place: step 2.3's plan (another chat, branch claude/sweet-mayer-grsukw) plans its own guard change, not built yet.
+
+  Meanwhile the bot fix goes on with the two approved cleans only. SIZE-CHECK stays: past 1,400 changed lines the bot fix stops and tells me in three lines.
+
+  In your next report, name the pass-bar file's change of 2026-11-14, 16:14 UTC (commit 5e563b95: one check and one planted bug added to PM-0001-17) and say which review covered it.
