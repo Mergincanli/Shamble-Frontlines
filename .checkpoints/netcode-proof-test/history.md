@@ -2127,3 +2127,20 @@ From "Next steps, in order" (as it was):
   From now on: every change to marks.json or to the judge gets a reviewer's read before its unit closes, and your report to me names it in its own line with what covered it.
 
   The kit rule's exact lines: post them when the advisor has reviewed them. I answer after my Advisor has read them.
+
+## Decision: Mustafa, 2026-11-15 16:35 Amsterdam (15:35 UTC), KL-YES with one change (KIT-FREEZE-2 for this rule), C62H-KEEP (a), C62H-BOUND (a)
+- **Mustafa, typed into this chat (transcript 2026-11-15T15:34:42.893Z), verbatim:**
+
+  My words of 2026-11-15, 16:35 (Amsterdam time), for the netcode chat. Three answers.
+
+  KL-YES: yes to the kit lines as you posted them (kept-logs-final-text.md, sha256 starting 97c81656), with one change. My yes also confirms the exception to the kit freeze (KIT-FREEZE-2) for this one rule.
+  - The change, in pack: after the read-back equals the list and before the folder is removed, walk the folder once more. If its files or sizes differ from the list, the folder stays and the script exits 1, as for a mismatch. Add a test and a planted bug for it. Post the changed lines here and wait for my yes to them; then build.
+  - Keep all three narrowings.
+  - In the pull request's evidence: the test in which GNU tar unpacks the archive ran and was not skipped, and the dry run's result for the two real folders.
+
+  C62H-KEEP: (a). The check stays as built.
+
+  C62H-BOUND: (a), the exact limit.
+  - Its exact wording and its planned size come to me for a yes before anything is built.
+  - The wording is fixed before its judged runs. If those runs show ticks that nothing explains, the bar is not reworded to fit them: stop and tell me.
+  - The report lines of (c) stay in until it is built.

@@ -14,9 +14,12 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**LATEST (2026-11-15 about 14:50 UTC): BRAWL-1 is closed. Nothing runs but the saver. Three answers are with
-Mustafa: KL-YES (the KEPT-LOGS kit lines, posted whole about 12:50), C62H-KEEP and C62H-BOUND (posted about 13:00);
-none in at 14:50. Read the blocks "KEPT-LOGS ANSWERED" and "C62H-REVIEW ANSWERED" below first, then "NEXT (task
+**LATEST (2026-11-15 about 15:40 UTC): HIS THREE ANSWERS ARE IN (16:35 Amsterdam; history.md:2131-2146; Rules in
+force): KL-YES with one change (KL-CHANGE: the changed lines to him for a yes first); C62H-KEEP (a); C62H-BOUND (a)
+(the exact wording and planned size to him for a yes first). Work now: the night plan's fix check (running), the
+C62H-BOUND design (netcode-architect), the KL-CHANGE draft (main session, then the advisor), the C62H-KEEP wording.**
+Before 15:35 UTC: three answers were with Mustafa: KL-YES (posted whole about 12:50), C62H-KEEP and C62H-BOUND (posted
+about 13:00). Read the blocks "KEPT-LOGS ANSWERED" and "C62H-REVIEW ANSWERED" below first, then "NEXT (task
 #74)".** **The saver:** bt42fk8u5 ended at 14:33:54 UTC on its own time limit ("watch stopped: time is up", exit 0;
 its last save df2e977); restarted at 14:34 UTC as **bugi27gbf**. Check-in 12:41 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5):
 nothing stopped. **While waiting (about 14:50 UTC):** the chat is about 35 % (343,897 tokens at 14:35 by
@@ -483,9 +486,16 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
           - **The final text** (§11 18 lines, kept-logs.mjs 313, kept-logs.test.mjs 292, 2 REPO_MAP rows):
             kept-logs-final-text.md (711 lines, sha256 97c81656…, by kept_logs_final_text.py, checked equal to the notes'
             final-message block). Its 5e563b95 paragraph checked: still accurate (the read is under way); its quote
-            "right as committed" is advisor-u4r-c62h.md:27 (C14). **Posted to Mustafa in chat, whole, about 12:50 UTC;
-            WAITING for his yes (KL-YES), which he gives after his Advisor has read it.**
-          - **After his yes (C7, C9):** a worktree `git worktree add .gate/kept-logs-wt -b claude/kept-logs-rule
+            "right as committed" is advisor-u4r-c62h.md:27 (C14). Posted to Mustafa in chat, whole, about 12:50 UTC.
+          - **KL-YES ANSWERED, 2026-11-15 16:35 Amsterdam: yes, with one change** (history.md:2131-2146; Rules in
+            force). **NOW (KL-CHANGE):** (1) the main session drafts the changed lines in kl-change-draft.md: in pack,
+            after the read-back equals the list and before the folder is removed, a second walk of the folder; any file
+            or size not equal to the list keeps the folder and exits 1, as a mismatch does; one test of it, and one
+            planted bug (M12: the second walk removed, the test fails), plus any §11 line that names pack's steps;
+            (2) the advisor reviews the changed lines; (3) post them to Mustafa in chat and WAIT for his yes to them;
+            (4) then build as below, with the change. The PR's evidence must show the GNU tar unpack test ran and was
+            not skipped, and the dry run's result for the two real folders. All three narrowings stay.
+          - **After his yes to the changed lines (C7, C9):** a worktree `git worktree add .gate/kept-logs-wt -b claude/kept-logs-rule
             origin/main` (never switch the main folder); the three kit files extracted by script from the text he said
             yes to and compared by cmp; the `.claude/` writes ask him first (Accept edits mode); the draft's (c) steps
             1-6 with mutations M1-M11; the kit tests' counts equal to main's; repo-map-check and the gate; one review
@@ -522,7 +532,17 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
               marks change; U4g (likely); U4h (certain, judge figures); the readings PR if a pinned ADR row changes.
               Recommended too: marks/SERIES.md and marks/README.md. The test at a unit's close: `git diff --stat
               <base>..<head> -- spikes/netcode-proof/marks/marks.json spikes/netcode-proof/crates/judge`.
-            - **Reported to Mustafa about 13:00 UTC; WAITING for C62H-KEEP and C62H-BOUND** (recommended (a) and (a)).
+            - Reported to Mustafa about 13:00 UTC (recommended (a) and (a)).
+            - **ANSWERED, 2026-11-15 16:35 Amsterdam (history.md:2131-2146): C62H-KEEP (a)**, the check stays as built
+              (the "awaiting his answer" words in u4r-report.md, u4s-carries.md and this card become "kept by his
+              C62H-KEEP (a)"); **C62H-BOUND (a)**, the exact limit. **NOW (C62H-BOUND design):** the netcode-architect
+              designs the exact wording and the planned size (the lab change recording which client and tick each
+              snapshot packet carries, the check, the series, the bites, the judged re-runs of P2 and P3 and B1's
+              home) under ADV-C62H-2's three design conditions (advisor-c62h-review-full.md); then the advisor and the
+              test-engineer read it; then it goes to Mustafa word for word for his yes. Nothing is built before his
+              yes. The wording is fixed before its judged runs; ticks that nothing explains stop the unit for him, never
+              a reworded bar. (c)'s report lines stay in until it is built. Its build owes the reviewer's read (marks.json
+              and the judge).
           - Was running 12:38-12:55 UTC: workflow wf_4ce9b8cd-ad2 (task wmrdd9nxr). The test-engineer's read (agent
             abf53f94b7f3b2543)
             (result keys seat, marks_sha256, q1_word_for_word, q2_can_it_fail, q3_bound_off_p0, findings, proposed_bars),
@@ -3045,6 +3065,16 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
 
 **Rules in force** (his words verbatim in history.md "Decisions taken" unless marked; from 2026-11-12 on, each
 decision is appended at history.md's end under its own heading "## Decision: …", so no cited line moves)
+- **Mustafa, 2026-11-15 16:35 Amsterdam** (history.md:2131-2146, "## Decision: Mustafa, 2026-11-15 16:35 Amsterdam
+  (15:35 UTC)"; recorded by mustafa_kl_c62h_answers_words.py). In short: **KL-YES** to the kit lines as posted
+  (kept-logs-final-text.md, 97c81656…) with one change, and it confirms KIT-FREEZE-2 for this one rule: pack walks the
+  folder once more after the read-back equals the list and before removal; differing files or sizes keep the folder
+  and exit 1; a test and a planted bug for it; the changed lines posted to him and WAIT for his yes, then build; all
+  three narrowings kept; the PR's evidence shows the GNU tar unpack test ran (not skipped) and the dry run's result for
+  the two real folders. **C62H-KEEP (a):** the check stays as built. **C62H-BOUND (a), the exact limit:** its exact
+  wording and planned size to him for a yes before anything is built; **the wording is fixed before its judged runs,
+  and if those runs show ticks that nothing explains, the bar is never reworded to fit them: stop and tell him**;
+  (c)'s report lines stay in until it is built.
 - **Mustafa, 2026-11-15 13:35 Amsterdam** (history.md, "## Decision: Mustafa, 2026-11-15 13:35 Amsterdam (12:35 UTC)";
   recorded by mustafa_c62h_review_words.py). In short: C62H-REVIEW (a), a short test-engineer read of 5e563b9's 15
   marks.json lines (three questions), changing no file, its findings to the advisor for a ruling, any new or changed
