@@ -143,3 +143,22 @@
   build npt-lab 9.5, build wasm 1.2, npt-lab hash 218.5, Wasm SS-P2-s1 2.6, Wasm ES-P3-s2 0.9, compare and h2 0.0.
   Non-cargo sum 222.0 s (under 240). Regenerated files: SS-P2-s1 16,937,652 B sha256 5b79abb2a2cba55b...a29a32e3,
   ES-P3-s2 16,929,501 B fad8f67ded2a220e...0045953b: the old pins. PASS.
+- (c) and (d) in one call: .gate/u4r/brawl1/p1-cd.log, every command exit 0 (free 7,074 MiB after).
+  - (c) `npt-lab hash --manifest crates/lab/precheck-recordings.json` (release, measured): "regenerated SS-P0-s4: 16950444
+    bytes, sha256 6933b56a619197c719439ff0c16eed3b8927645c3a0bb66910568c6ccf83bab3, as the manifest's"; native leg 1 vs
+    leg 2 9,000 ticks equal; real 2m8.958s. PASS (byte-equal at the old pin).
+  - (d) SS-P0-s4 recorded at its entry's settings (`scenario --run record-SS-P0-s4 ... --scene SS --profile P0 --seed 4
+    --clients 48 --tick-start 0 --warmup-s 10 --measured-s 290 --logs 0 --suite record --record <file>`, real
+    2m4.470s; rewinds refused 0; file sha256 6933b56a..., the old pin), then `npt-lab precheck --manifest
+    crates/lab/precheck-recordings.json --recording <file> --commit 352a245c...` with no bite (real 3m3.950s): its 109
+    output lines against results/u4r-precheck-30/faf42aeb034c/runs.txt:17-125 ("## pair clean"): 108 identical, the
+    build line differs only in commit (352a245c... vs faf42aeb...) and binary sha256 (e4e6a258d4609a15... vs
+    b3b4a60da4cfb4b3...); the machine part equal. result: PASS (9000 ticks, every World hash equal). PASS.
+- (e) was captured before the check.mjs fixes (the hash.rs rename, r10_carry_82, comment wrapping): captured again on
+  the final Part 1 code as .gate/u4r/brawl1/p1-after-e2.log, so all five proofs stand on one code state.
+- (e) again: p1-after-e2.log, exit 0 (measured r6 1 passed 40.27 s; bites 3 passed 102.94 s). Normalised diff against
+  A: the same two kinds only: the wallclock L1 hash (now 4e64789de1560c6a; varies at <base> itself) and the +1 test in
+  "filtered out" (52->53, 58->59). Every printed line of the three tests otherwise identical.
+- **Part 1 complete; its proofs (a)-(e) recorded above, all on one code state.** Next: Part 2.
+
+## Part 2
