@@ -16,3 +16,6 @@ F-cand3 (Low/Med): Sitting 3 reviewer-off window: any other preview run (PR sync
 F-cand4 (Low): probe.yml (main context, read-only token, no secret) unzips PR-run artifacts; data only; unzip traversal; Low.
 Note: deploy job no checkout, functions dir check harmless (cwd has no functions/). Plan job output from PR code -> matrix -> env only. OK.
 B2 done (plan read in full). Next B3 checkpoint.
+F-cand5 (Low): checkpoint header "Last update 16:47 Amsterdam (15:47 UTC)" stale vs entries to 16:28 UTC; step 8 says plan 1,183 lines, file is 1,223 after consultation-2 fixes (27e9f50). Records otherwise consistent: slip recorded honestly with times (0290625 16:16:22, d8451dc 16:21:42, consultation 2 16:22:00).
+F-cand6 (Low): plan Part 8 "advisor tool ... always before a step is saved as done" silent on the recorded slip; closing message must carry it (checkpoint says it will).
+B3 done. Next B4 sources.
