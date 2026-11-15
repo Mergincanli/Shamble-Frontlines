@@ -1441,6 +1441,12 @@ stays playable throughout: frozen, critical fixes only, guarded by today's gate,
    2026-11-10 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-10: the second account may plan and build
    foundation steps 2.1 and 2.2 now"); for the rest, his words there: "Steps 2.3 to 2.6 keep their order and wait for
    their results."_
+   _Pointer (2026-11-13, foundation 2.3's first docs pass): for foundation step 2.3 only, his words of 2026-11-10 quoted
+   above are changed by his decision of 2026-11-13 (`docs/DECISIONS.md`, the entry "Taken by Mustafa, 2026-11-13,
+   18:47:55 UTC: his decision on step 2.3 (step 2.3 may be planned now), and step 2.3's task"): "Step 2.3 may be planned
+   now. The parts of step 2.3 that need no proof test's result may be built before the proof tests report, after my go
+   on the plan. Every gate check that needs a result joins later, when that result is in, with its pass marks unchanged.
+   Steps 2.4 to 2.6 still wait for their results."_
 2. **The foundation** ([GLOSSARY §8](../research/GLOSSARY.md#the-foundation)), one change-set per step:
    1. *The restructure.* The five legacy files move to `legacy/` (OQ-0002-2 places the tools). *Done when:* today's
       gate passes on `legacy/`, the four Phase 0 mutation proofs (a deleted function, an unguarded editor call, a syntax

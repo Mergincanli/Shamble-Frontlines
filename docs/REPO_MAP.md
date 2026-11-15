@@ -119,6 +119,8 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `.claude/scripts/` | Kit scripts (below) |
 | `.claude/scripts/checkpoint.mjs` | Commits and pushes `.checkpoints/` only: `save`, and `watch` (background saver) |
 | `.claude/scripts/checkpoint.test.mjs` | Its tests: `node --test .claude/scripts/checkpoint.test.mjs` |
+| `.claude/scripts/kept-logs.mjs` | KEPT-LOGS (`CHECKPOINTS.md` §11): `list` writes a closed run set's raw-log list beside its results; `pack` packs the folder, reads every file's hash back and removes the folder only if all equal the committed list; `cache` removes the one old build cache, `.gate/u3c-review-target`; it refuses everything else |
+| `.claude/scripts/kept-logs.test.mjs` | Its tests: `node --test .claude/scripts/kept-logs.test.mjs`; `KEPT_LOGS_DRY_RUN=<a real run-set folder>` adds the dry run on a copy |
 | `.claude/scripts/repo-map-check.mjs` | Checks this map against the repository |
 
 ## tools/ (legacy verification toolkit; setup and commands in `tools/README.md`)
