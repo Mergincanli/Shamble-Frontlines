@@ -533,9 +533,26 @@ For Mustafa: nothing (spike code: nothing a player sees, hears or feels).
 - **FP-7 complete, no plant in place:** bots lib.rs 83a8541b..., logs.rs 83008fce..., client lib.rs 2aca00c8... (each
   equal to its pre-plant value), and the tree's `git diff HEAD -- . | sha256sum` is c2561b6c... again (fp-check-2's).
   Next: FP-8.
-- FP-8 (1) started 07:19 UTC: `node check.mjs` through the runner (-x), log .gate/u4r/brawl1/final-fp-check.log, on the
-  final code (diff c2561b6c...). If cut mid-run: the log's end line says whether it finished; a run cut short is not a
-  result and is run again whole (not a retry of a failure).
+- FP-8 (1) check.mjs: .gate/u4r/brawl1/final-fp-check.log (-x, 07:19:13-07:32:35 UTC, free 6,596 MiB at start and
+  6,637 after; header diff c2561b6ca54c8cde994fcdad5954c63d332df73f2db038c12aba3d71a0daa49f, untracked 17cf51d7...), exit
+  0. **All 11 steps PASS:** fmt 0.6 s; clippy 4.5 s; clippy-wasm32 9.7 s; doc 14.4 s; test 715.8 s "measured build:
+  538 tests passed, 0 failed, 0 reported a skip; bites build: 616 tests passed, 0 failed, 0 reported a skip"; deps
+  2.7 s; wasm 45.4 s (27,000 ticks native/native and native/Wasm equal, h2 equal, hash-map caught at SS-s1 tick
+  1234); refs 0.3 s; marks 5.5 s (81 marks); self 1.8 s (77 of 77); redact 0.8 s (10 of 10, 287 items, 0 findings).
+  Counts: +3 in each build (535 -> 538, 613 -> 616), as the ruling expected. The three new tests (check.mjs prints only
+  totals; each ran by name in fp-check-2): bots/src/lib.rs `tests::brawl1_a_soldier_teleported_into_building_0_reads_area_1`,
+  lab/src/logs.rs `logs::tests::brawl1_the_building_figure_counts_a_soldier_in_a_building_in_measured_ticks_only`,
+  client/tests/endpoint.rs `brawl1_own_soldier_compares_ticks_by_the_endpoint_s_wrap_rule`. The full sim-only test is
+  #[ignore]d and not counted.
+- FP-8 (2) det-u4.mjs: .gate/u4r/brawl1/final-fp-det.log (-x, 07:33:02-07:36:51 UTC, header diff c2561b6c..., free
+  6,636 MiB), exit 0. No other lane building or running (pgrep for cargo, rustc, npt-lab, check.mjs, det-u4 and
+  loader.mjs empty just before). `uptime` first, in the same call: "07:33:02 up 57 min, 0 user, load average: 1.26,
+  1.93, 1.42". "PASS det-u4 227.3 s": native/native and native/Wasm 18,000 ticks equal (SS-P2-s1 9000, ES-P3-s2 9000), h2
+  equal; seconds: build npt-lab 12.3, build npt-hash-wasm.wasm 1.5, npt-lab hash 210.0, Wasm SS-P2-s1 2.4, Wasm ES-P3-s2
+  0.9, compare 0.0, h2 0.0 x4; "check: all 2 steps pass". **Non-cargo sum 213.3 s** (210.0 + 2.4 + 0.9 + 0.0; copy 1's
+  method; under 240). Both pins reproduced, by the files det-u4 regenerated (worktree .gate/netcode-proof-test/det-u4/
+  recordings/): SS-P2-s1.rec 16,937,652 B sha256 1ec25de7c9ce8ea869ed9a8b343746ba131593e1de5c65bc9c1c626ce01cc76d;
+  ES-P3-s2.rec 16,929,501 B sha256 6abf7643982b5970a630c97daa4d0815ceb2022958b18e18116397dcad9c893e.
 
 ### FP-9: report words (no code)
 
