@@ -77,3 +77,44 @@
   - roster.leave deleted (room.rs:691; room.rs sha256 8fbe015c659515d67995f60ea4d86a30306b41368de4d946287116c6d8472c33
     before, restored by Edit, equal after; room.rs not in git status): .gate/u4r/brawl1/p1-plant-roster.log, exit 101,
     both cases ["the roster still holds slot 0: a rejoin would be a replacement"]: the new check alone.
+- Part 1 item 4, TE-R2-2 with RR4-L2, done (scenario.rs parse()). Order: the 64-bit checks first, messages unchanged
+  (ticks_of's products, the sum, the after phase: now bound as `last_tick`); then on every profile the run's last tick
+  bound; then, where bursts are used (B1 with bursts > 0, as today's guard): the 64-bit last-burst check (message
+  unchanged, now bound as `last_burst`), the last burst's u32 bound, the bursts cap, every-s 0. The messages (mine):
+  - "--warmup-s, --measured-s and --after-max-s: the run's last tick, {last_tick} ticks from its first, is above
+    4294967295 (32 bits)";
+  - "--bursts {n}, --burst-first-s {f} and --burst-every-s {e}: the last burst's tick, {t} ticks from the run's first,
+    is above 4294967295 (32 bits)";
+  - "--bursts {n}: above 1000";
+  - "--burst-every-s 0 with --bursts {n}: more than one burst needs an interval above 0 s".
+  The :1442 comment now says what is bounded: the last burst's tick boundary from the run's first tick, ((bursts - 1) x
+  every_s + first_s) x TICK_HZ + the warm-up's ticks, in 64 bits then 32, --bursts <= 1,000, every-s > 0 with more than
+  one burst. fp3's cases (each exact): the old --measured-s case; TE-R2-2 (1) B1 line starts_with the ruled prefix; (2)
+  equals the ruled message; (3) full digits, equals "--after-max-s: the run's last tick overflows 64 bits"; RR4-L2's
+  ruled case contains "--burst-every-s 600000000000" and equals the last-burst message with 18000000001200; --bursts
+  1001 refused, 1000 accepted; --bursts 2 --burst-every-s 0 refused, --bursts 1 --burst-every-s 0 accepted;
+  --after-max-s 143165507 refused (4294967310), 143165506 accepted.
+- Part 1 item 5, RR4-L1, done (hash.rs): `const MAX_ENTRY_TICKS: u32 = 36_000;` after MAX_ENTRY_BYTES; the refusal right
+  after the bytes cap, before `if let Kind::Runner`, with the ruled message; manifest()'s doc names it. r10_fp3: 36,001
+  refused, equal to "manifest entry SS-P2-s1: ticks 36001 is above 36000 (four times today's largest entry): a longer
+  recording comes to the advisor first"; `one("TC-s3", 36_000, synthetic)` reads; the three committed manifests still
+  read (the test's existing loop).
+- Part 1 item 6, RR3-L2 (a), done (logs.rs): `logging: bool` in Logs from open's `dir.is_some()`; on a no-log run filed()
+  calls `resolved` only (hashes and each lost tick), never `entry`; `last` kept. New test
+  `rr3_l2_a_a_run_with_no_log_folder_keeps_no_per_tick_resolution`: Logs::open(None, ..), admit slot 3, 9,000 ticks of
+  filings (hashes, sentinels, lost runs), then `res` empty, started(3) true, first/last = first tick, first + 8,999.
+- Check after items 1-6 (.gate/u4r/brawl1/p1-check-2.log): clippy -D warnings npt-lab --all-targets both builds exit
+  0; fp1_, fp3_, r10_fp3, rr3_l2: 4 passed in each build; fmt --check found three diffs (hash.rs r10 case, logs.rs test,
+  scenario.rs fp3 line), applied by Edit.
+
+## Part 1's proofs (condition 6), at the old pins
+
+- (e) after Part 1: .gate/u4r/brawl1/p1-after-e.log, exit 0: measured r6 1 passed (38.92 s); bites build 3 passed
+  (102.32 s). Normalised diff against A (and against B): every line the three tests print is identical, but for
+  (i) the wallclock bite's L1 hash in its comparer and result lines (after: theirs 3393553388473618463, L1 hex
+  2f1852d3b64b101f; A 9375924675163200265 / 821df9d0f7ec1b09; B 1388086141469307493 / 134378fdc3ebb265): the same two
+  values that differ between A and B at <base> itself, with index 3, loopback hash, compared 120 and mismatching 117
+  equal in all three; and (ii) libtest's summary counts "52 filtered out" -> "53" (measured) and "58" -> "59" (bites):
+  the npt-lab binary holds one more test, RR3-L2 (a)'s new logs.rs unit test that the brief requires. No line of r6's,
+  the late-command bite's or the wallclock bite's own output moved. Both differences go to the advisor whole in the
+  report (item 7); I read them as not a behaviour change and go on.
