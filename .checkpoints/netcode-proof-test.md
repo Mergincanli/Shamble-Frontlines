@@ -21,13 +21,15 @@ none in at 14:50. Read the blocks "KEPT-LOGS ANSWERED" and "C62H-REVIEW ANSWERED
 its last save df2e977); restarted at 14:34 UTC as **bugi27gbf**. Check-in 12:41 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5):
 nothing stopped. **While waiting (about 14:50 UTC):** the chat is about 35 % (343,897 tokens at 14:35 by
 get_session, before this turn's reads), so the card is refreshed and Mustafa is told, for his /compact (his rule,
-history.md:298-299). **Tonight's night item: U4f's brief draft**, under his rule of 2026-11-09 (card :3337-3341, the
-next unit's plan drafts each evening). Issue #16's queue was empty the nights of 11-13 and 11-14 (the night shift's
-comments 6868224448 and 6885698159). The plan file night-2026-11-15.md takes night-2026-11-10.md's form: its rules 1-6,
+history.md:298-299). **Tonight's night item: U4f's brief draft**, under his rule of 2026-11-09 (this card's record
+"Mustafa, 2026-11-09 (verbatim, the adjusted version)": the next unit's plan drafts each evening). Issue #16's queue
+was empty the nights of 11-13 and 11-14 (the night shift's comments 6868224448 and 6885698159). The plan file
+**night-2026-11-16.md** (named for the night's morning, as night-2026-11-10.md and -12.md) takes night-2026-11-10.md's form: its rules 1-6,
 and the item shaped like items 2 and 4 (netcode-architect drafts, test-engineer checks, one revision). It names carries
 46, 80 (a)-(e) and 86, the U4f lines at u4s-carries.md:226 and :345, the card's :1936-1937 note, and C62H-BOUND as open
 where carry 80 (b) and (d) touch how the client files lost ticks. Push it, then add item 7 to issue #16's body by
-about 21:00 UTC (the night starts 23:10 UTC); his rule's words are copied by script from night-2026-11-10.md:4-8.
+about 21:00 UTC (the night starts 23:10 UTC); his rule's words are copied by night_1116_rule_words.py from this
+card's verbatim record (asserted equal to night-2026-11-10.md's copy) into the plan's placeholder @@RULE-2026-11-09@@.
 **Not now:** step (7) is PR #40's report (advisor-u4r-sets-r2-full.md:135); JDG-ONLY-1 and the check.mjs follow-up
 ride the next npt-judge and check.mjs change (U4h at the latest; before PR #40 is marked ready).
 **Check-in 14:39 UTC:** nothing stopped. **No /compact by 15:00 UTC** (COMPACT-WAIT's 20 minutes; reminder
@@ -36,7 +38,7 @@ wf_24144405-900 (task w9wwkmmhl), the night-u4f scout** (netcode-architect, xhig
 night-u4f-scout.md; script npt-night-u4f-scout-wf_24144405-900.js under the session's workflows/scripts/). It maps
 every input of U4f's brief with line ranges at HEAD (result keys head_sha, sections, carries, rulings, card_lines,
 mustafa_rules, open_items, brief_shape, disk, lane_files, gaps). **If cut:** resume by run id. **Then:** write its
-result word for word by script (night_u4f_scout_full.py → night-u4f-scout-full.md); write night-2026-11-15.md from it
+result word for word by script (night_u4f_scout_full.py → night-u4f-scout-full.md); write night-2026-11-16.md from it
 (the main session); one check agent verifies every reference and the fit with NIGHT_SHIFT.md on main; push; issue
 #16's body gains item 7 (by about 21:00 UTC).
 
@@ -506,7 +508,7 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
           - KEPT-LOGS: answered (c); the advisor reviewed the drafted lines and the exact lines were posted to Mustafa
             (about 12:50 UTC); he answers after his Advisor has read them. Nothing is built before his yes (KL-YES).
           - C62H-REVIEW: done; waiting for C62H-KEEP and C62H-BOUND (above).
-          - Tonight: U4f's brief draft as night item 7 (LATEST above): night-2026-11-15.md, then issue #16 by about
+          - Tonight: U4f's brief draft as night item 7 (LATEST above): night-2026-11-16.md, then issue #16 by about
             21:00 UTC; folded in the morning, then to the advisor.
           - Step (7), U4's report folding U4r's, is PR #40's report (advisor-u4r-sets-r2-full.md:135). Then U4f, U4g
             (its brief with u4g-brief-carry.md and EVQ-LOAD) and U4h, each with its brief to the advisor first.
