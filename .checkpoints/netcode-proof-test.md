@@ -643,6 +643,27 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
               KL-MERGE in Decisions needed). The worktree is clean at a637c7a. **STOP: waiting for Mustafa's go on the
               merge of #53 for head a637c7a (KL-MERGE).** Then: merge from this session with a637c7a as the expected
               head (gate and smoke green); this branch takes main in; only then may the first real list/pack run.
+            - **HIS ANSWERS (2026-11-15 20:50 Amsterdam; history.md:2163-2175, by mustafa_klmerge_c62hb_yes_words.py):
+              KL-MERGE (a) and C62H-BOUND-YES (a).** The body listed KLT-1 to -8 by id and his acceptance (read back;
+              links intact). **PR #53 MERGED at 19:49 UTC as a merge commit: main 53272a11024dcec8349e67bd8c70a8db337e85bb**
+              (expected head a637c7a passed; CI green; mergeable clean).
+            - **TAKING MAIN IN: BLOCKED, merge aborted (20:00 UTC).** The saver was stopped (bfz6oq1an, by hand);
+              `git merge --no-ff --no-commit origin/main` (base 4d21c1a) gave one conflict, docs/STATUS.md's In-flight
+              rows, resolved by merge_main_53.py (dry run, then applied: one #40 row with its state brought up to date,
+              main's #52 row, #48's row dropped; 120 lines). **Then `check.mjs --only refs` FAILED** on the merged
+              tree: `.claude/scripts/kept-logs.mjs` and `kept-logs.test.mjs` reference spikes/ (plan §4.9: "Nothing
+              outside spikes/ references it (the grep of §4.2)"; referenceProblems, check.mjs:1840, skips only spikes/,
+              docs/, .checkpoints/ and *.md). No review saw it (the kit PR went to main, where no spike exists). So
+              `git merge --abort`: the tree is clean at bedca79 (= origin); nothing real packed. **Next:** the advisor
+              rules the clash (an exemption for the two kit files in the refs step, with its test and planted bug and a
+              §4.9 line, or another way; whether it needs Mustafa's word: it changes a rule of his approved plan);
+              Mustafa told at once. Then redo the merge (merge_main_53.py is ready) with the ruled fix, check.mjs whole,
+              the gate, push; only then any real pack.
+            - **Worker restart (not the spend limit), about 19:52 UTC:** "This session's worker process was restarted.
+              If your previous turn was already complete, take no action and wait for the next event. Otherwise,
+              continue from where you left off." My turn was not complete (taking main in); continued at once. Nothing
+              was lost: no agent ran, the saver was already stopped by hand. **Slip 13:** one more plain `cd X &&` (into
+              the notes folder) at 19:59; moved back at once; nothing changed by it.
             - **KEPT-LOGS follow-ups (deferred in writing in PR #53's report; to STATUS in docs-keeper's next pass):**
               SA-KL-1 (re-check realpath and lstat right before each rmSync), SA-KL-2 (git without GIT_* in the
               environment, script and tests), SA-KL-3 (ctime or .rustc_info.json for the cache bound), SA-KL-4 (link
