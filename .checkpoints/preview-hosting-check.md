@@ -5,7 +5,7 @@
   secret, no edit outside this checkpoint. · plan: `.checkpoints/preview-hosting-check/plan.md` (not yet written)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-15 16:47 Amsterdam (15:47 UTC)
+- **Last update:** 2026-11-15 17:46 Amsterdam (16:46 UTC)
 
 ## Steps done
 1. Orientation · the session's model read with get_session at 2026-11-15 15:36:35 UTC: `session_context.model`,
@@ -36,24 +36,32 @@
    16:13 UTC) and security-auditor (G1-G10, notes `security-auditor-docs.md`, hand-back before 16:10 UTC).
 7. Draft workflows in `tr-draft/` (not a build: text for the plan's Part 7), each parsed as YAML with PyYAML 6.0.1:
    deploy.yml (172 lines; the pull-request and by-hand deploys merged into one file), close.yml (93), probe.yml (63),
-   browsers.yml (48); the two token-test variants under `tr-draft/b9-edit/` and `tr-draft/b9-prod/`.
+   browsers.yml (48); the two token-test variants (since moved: `tr-draft/workflows/` and `tr-draft/b9/`, finding A12).
 
-8. plan.md revision 1 written (1,183 lines; every embedded workflow block checked byte for byte against its draft file
-   and its sha256): Parts 0-9, seven decisions, For Mustafa, the summary.
+8. plan.md revision 1 written (1,183 lines at d8451dc, 1,223 after consultation 2's fixes at 27e9f50; every embedded
+   workflow block checked byte for byte against its draft file and its sha256): Parts 0-9, seven decisions, For
+   Mustafa, the summary.
+
+9. The advisor agent's plan review of revision 1 at 27e9f50 (launched about 16:28 UTC; hand-back 16:39:16 UTC; notes
+   `advisor-plan-r1.md`, ending DONE): **APPROVE with conditions**, no Critical or High; Medium A1-A6 (A1 Wrangler
+   installed outside the token step; A2 bash on Windows; A3 the bite-coep link and the browser run's place; A4 the
+   preview builds write noindex; A5 production's one-off link; A6 his answers into DECISIONS.md), Low A7-A13. Rulings:
+   TR-WHERE (a) breaks no rule (SPIKE_PLAN :12 is about where spike code lives in this repository), the four additions
+   change no mark, the check is risk tier 2 (its tier-3 acts are his), the closing docs PR tier 1.
+10. Revision 2 written (not yet saved as done): all of A1-A13 folded in; tr-draft moved to `tr-draft/workflows/` and
+   `tr-draft/b9/`; Part 7 regenerated from the files (deploy.yml 185 lines, close.yml 98, probe.yml 66, browsers.yml 51;
+   every block byte-equal to its file, every sha256 and both variants' hashes checked, all parsed with PyYAML); Part
+   7.0 lists the lines changed since 27e9f50 as diffs.
 
 ## Current step
-9. The advisor agent's plan review of revision 1 (the `spikes/` tension named for its ruling).
+11. The advisor tool's consultation 3 (moment 5) on revision 2, before it is saved as done.
 
 ## Next steps
-1. Fold its findings (revision 2 if REVISE), together with the session's own re-read fixes, held back so the review
-   reads a fixed text: Part 0 (production is the branch Cloudflare names, not `main`); Part 0 and Part 1's PREVIEW-START
-   date (his answer of 2026-11-14, sent 2026-11-15: his note 1); Table 1.1 PM-0006-3 (one macOS image, not two:
-   browsers.yml runs macos-26 only); "read today" → "read 2026-11-15"; Part 5 "your note of today" → "of 2026-11-15";
-   PM-0006-2 on production's one-off link (the host may send `noindex` on every one-off link, production's included:
-   record per link form, and name the reading for the advisor agent).
-2. Consultation 3 (moment 5) before the plan is saved as done; then the closing message: the plan's path, the summary,
-   his steps in order, the decisions, the chat's fullness from get_session, the advisor-model line, the slip once with
-   its save times, and that the draft workflow texts sit in the public notes folder as text nothing runs.
+1. After consultation 3: save revision 2 as done; stop the saver (TaskStop) and make the last save.
+2. The closing message: the plan's path and commit, the summary, his steps in order, the decisions, the Part 7 lines
+   changed after the review, the chat's fullness from get_session, the advisor-model line, the slip once with its save
+   times, the refusals, ultracode's handling, and that the draft workflow texts sit in the public notes folder as text
+   nothing runs. Then stop for his go.
 
 ## Open findings
 - Refused by the guard, 2026-11-15 15:54:02 UTC: `git -C <dir> fetch ...` ("git: no option before the subcommand (run
@@ -64,6 +72,13 @@
   after"): steps 5-7 were saved as done in the save of 16:16:22 UTC (0290625) and step 8 in the save of 16:21:42 UTC
   (d8451dc), with no consultation before them; consultation 2 followed at 16:22:00 UTC. From here on, each step is
   saved as done only after its consultation. To be told to him once, in the closing message.
+
+- Refused by the guard while the advisor agent wrote its notes (its hand-back): a relative path, then a variable target;
+  its route: a literal absolute path.
+- Ultracode: switched on at 16:39:16 UTC (the "ultra_effort_enter" notice in the transcript, delivered with the advisor
+  agent's hand-back). Revision 2 was made without a workflow: his task says "The plan gets no review rounds and no
+  verifier", the fixes were the advisor agent's exact lines, and CLAUDE.md caps agents at 3. The build will use
+  workflows where they fit (e.g. U4's review round of three).
 
 ## Facts for the plan (read by the session)
 - Action pins: actions/checkout v7.0.1 3d3c42e5aac5ba805825da76410c181273ba90b1 and actions/setup-node v7.0.0
@@ -114,8 +129,10 @@
 - saver last check 16:27 UTC: the process is alive (pid 1609); its log shows "saved and pushed" at 16:02 and 16:12
   UTC and nothing for the cycle due about 16:22 (the session's own save of 16:21:42 UTC came just before it); to be
   checked again at the next update.
-- agent advisor (Opus by its file, effort high by its file): the plan review of revision 1 at 27e9f50 · notes
-  `.checkpoints/preview-hosting-check/advisor-plan-r1.md` · launched about 16:28 UTC · running.
+- agent advisor (Opus by its file, effort high by its file): the plan review of revision 1 at 27e9f50 · DONE
+  (APPROVE with conditions).
+- saver check 16:44 UTC: ok ("saved and pushed" at 16:32:51 and 16:42:54 UTC; the cycle due about 16:22 printed
+  nothing and the next ones did: no action needed).
 - Facts read by the session meanwhile: read_documentation `github.access` (15:52 UTC: a repository becomes attachable
   once the Claude GitHub App can reach it; add_repo attaches it); list_repos (15:52 UTC: five public repositories of
   his, all `can_push: true`; the app's repository-access mode is not shown).
