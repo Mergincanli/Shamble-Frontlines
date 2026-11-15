@@ -543,6 +543,13 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
               yes. The wording is fixed before its judged runs; ticks that nothing explains stop the unit for him, never
               a reworded bar. (c)'s report lines stay in until it is built. Its build owes the reviewer's read (marks.json
               and the judge).
+            - **Running since about 15:37 UTC: workflow wf_dd5ce188-bb6 (task wfjwf2l8d)**, script
+              npt-c62h-bound-design-wf_dd5ce188-bb6.js: the netcode-architect's design (notes c62h-bound-design.md;
+              keys plain_words, exact_texts, explanations (the closed list), planned_size, bites, judged_runs,
+              conditions_met, lane, questions, risks, fallback_b), then the advisor (advisor-c62h-bound.md) and the
+              test-engineer (c62h-bound-test.md) in parallel (keys verdict, summary, findings, conditions, to_mustafa).
+              **If cut:** resume by run id. **Then:** the three results word for word by script, read in full (a pass
+              bar); post the exact wording and planned size to Mustafa; WAIT for his yes.
           - Was running 12:38-12:55 UTC: workflow wf_4ce9b8cd-ad2 (task wmrdd9nxr). The test-engineer's read (agent
             abf53f94b7f3b2543)
             (result keys seat, marks_sha256, q1_word_for_word, q2_can_it_fail, q3_bound_off_p0, findings, proposed_bars),
