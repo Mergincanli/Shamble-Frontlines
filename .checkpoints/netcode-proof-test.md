@@ -215,7 +215,8 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
       b30314a HEAD`). The saver was restarted.
     - BRAWL-1's section in u4r-report.md now holds the advisor's round-2 report words (copied by
       brawl1_report_words.py from advisor-brawl1-r2-full.md:131-166). The merge record follows there after M6.
-  - **Pushed head 8f0939f** (09:06 UTC). Saver bbavt4wl2, restarted 09:06.
+  - **Pushed head 8f0939f** (09:06 UTC). Saver bbavt4wl2, restarted 09:06; its window ended at about 10:56, and it was
+    restarted as b6isx9us1.
   - **M6 DONE: APPROVE WITH FINDINGS on head 8f0939f** (advisor-brawl1-m6-full.md, 88 lines, sha256 c2fc64c1…; 14
     checks, all PASS). **THE BRAWL-1 MERGE IS COMPLETE (M1-M6).**
     - **Its three Lows, record-keeping only (no push):**
