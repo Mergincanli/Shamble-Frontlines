@@ -137,7 +137,42 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
       - RR2-B1-1: "below 2^31" should read "at most 2^31";
       - RR2-B1-2: the report's caller line should be :389.
     - test-engineer finds LOGS0-RECORD (a) sound: summary_line reads only `s.logs`.
-  - **RUNNING since about 07:58 UTC: the advisor's round-2 ruling, workflow wf_d32decd1-87b (task wnrpyufkm),** one
+  - **THE ROUND-2 RULING (ended about 08:10 UTC): GO for the merge; round 3 does not open.** advisor-brawl1-r2-full.md
+    (181 lines, sha256 64e361ab…), written by brawl1_r2_ruling_full.py and read in full.
+    - **Follow-ups:**
+      - TE-B1-R2-1 and RR2-B1-1 go to the next lane that edits npt-bots' lib.rs, U6's bots'-view item at the latest;
+      - TE-B1-R2-2, the runners' untracked field: a runner edit after M7's last re-run set and before U4g's first run,
+        in its ruled form.
+    - **Recorded:** RR2-B1-2 (the caller is :389); ADV-R1-1 and ADV-R1-2, the advisor's corrections.
+    - **Copy 2's deviations:** all accepted, LOGS0-RECORD as (a).
+    - **My resume-part errors, recorded:**
+      - the lesson for line counts: take them from `wc -l`, or leave them out;
+      - future resume parts cite brief sections 1, 2 and 5 for the rules (section 4 is "What you hand over").
+    - **The merge: M1-M7 with A1-A6.**
+      - A1: nothing rides; the merged bytes equal c2561b6c.
+      - A2: M3 runs on the COMMITTED merge, and its header reads `diff e3b0c442…; untracked e3b0c442…`.
+      - A3: M3's figures: check.mjs 538/616 and self 77; uptime, then det-u4 PASS with 1ec25de7 and 6abf7643 and
+        non-cargo under 240 s; the regeneration giving 1f00d2d5; the full test's 9 lines byte-identical to
+        final-fp-regen-tests.log's; both manifests a2faf3ea and 5ccf57f0.
+      - A4: `df -B1 /home/user` after check.mjs and after det-u4, inside M3.
+      - A5: no [skip ci] in the merge commit, and CI read on it; later commits touch only .checkpoints/.
+      - A6: the runners stay as they are until M7's last set.
+    - **The report words** (the ruling's lines 131-166) go into BRAWL-1's section of u4r-report.md by script; the
+      merge record follows them.
+  - **THE MERGE, as I run it:**
+    1. Card saved; saver stopped (it stays stopped until M5's push, as at U4r).
+    2. `git apply --check`, then `git apply` of wip/brawl1.patch in the main folder.
+    3. M1: cmp of the 10 files against the builder's worktree; the fingerprint `git diff HEAD --binary -- spikes/ |
+       sha256sum` equals c2561b6c; the base check `git diff --quiet 352a245 HEAD -- spikes/`.
+    4. The merge commit: the 10 files, `git rm` wip/brawl1.patch and the card. No [skip ci]. Not pushed until M4
+       passes.
+    5. M2: pgrep checks; df; (B) in one main-run.sh call; df; (C) in one main-run.sh call; df. The commands are
+       exactly clean-shared-B.log's and clean-shared-C.log's (copied by script). Logs: .gate/brawl1-merge/.
+    6. M3, one main-run.sh call in the background: cat /proc/uptime; node check.mjs; df -B1; uptime; node
+       ops/runs/det-u4.mjs; df -B1; cargo build --locked --release -p npt-lab; npt-lab hash --manifest
+       crates/lab/precheck-recordings.json --dir/--out under .gate/brawl1-merge/; the full test by name in release.
+    7. M4 the gate; M5 push (the saver restarted) and CI; M6 the advisor's head review; M7.
+  - **Was running, about 07:58-08:10 UTC: the advisor's round-2 ruling, workflow wf_d32decd1-87b (task wnrpyufkm),** one
     agent (general-purpose, opus, xhigh), notes advisor-brawl1-r2.md, logs .gate/u4r/brawl1-advisor-r2/.
     - It rules on: the 4 Lows' homes and round 3; copy 2's deviations (LOGS0-RECORD); my two resume-part errors; the go
       for M1-M7 (with the "untracked" field's reading at M3); the report words; Mustafa.

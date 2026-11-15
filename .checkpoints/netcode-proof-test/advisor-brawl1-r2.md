@@ -60,3 +60,26 @@ on snapshot c2561b6c, report words, For Mustafa. Read main's advisor.md (done, 3
   My own diff of the 13 printed lines after the stated normalisation: IDENTICAL. My sha256sum: det-u4 outputs
   1ec25de7 / 6abf7643; manifests a2faf3ea / 5ccf57f0 (= before). Seats' logs r2-tests / lint-tests: header c2561b6c,
   every exit 0. Free 6,594 MiB; no cargo/rustc running.
+- 8. My run: .gate/u4r/brawl1-advisor-r2/adv-r2-tests.log (u4r-run.sh -x -k, 07:59:49-08:00:22 UTC, header diff
+  c2561b6c, free 6,593 MiB, runner exit 0): fmt --check 0; bots tests::brawl1 3 passed 1 ignored both builds (11.36 s,
+  10.93 s; short prints 1575/1629 cm, dead 1190/1334); client brawl1 2 passed; lab figure test passed both builds.
+  #[test] counts snap1 -> worktree: bots 3->4, endpoint 14->15, logs 2->3, others equal: +3, none removed.
+- 9. Resume errors: prompt :17 "advisor-brawl1-r1-full.md (sha256 86bec63b..., 249 lines)": file is 460 lines (wc -l,
+  Read), sha256 86bec63b correct. Prompt :16 "Read again the brief's section 4 (its rules hold throughout: the
+  ruling's step 1)" repeats MY step 1 (r1-full.md:16 "The rules of brawl1-brief.md section 4"); brief's §4 is "What
+  you hand over" (:216); the rules are §1 (runner, -x, rule 6 disk floors, :32-52), §2 (limits :54-67), §5 (stops
+  :230-241). Also prompt :19 "section 4 rule 6's floors" (rule 6 is §1 item 5): same slip, not reported by copy 2.
+  No effect: step 1 listed the rules; copy 2 read the brief whole (build.md:407-411) and followed the list.
+- 10. Merge step: base holds (spikes/netcode-proof tree abad0635 at both 352a245 and HEAD; 352a245..HEAD touches only
+  .checkpoints/). Main folder spikes: diff e3b0, porcelain e3b0 today. Shared target 6,360 MiB (debug 5,925, release
+  250, wasm32 172, doc 15, tmp ~0 (present since Nov 9, left by the 2026-11-14 cleans)); after (B)+(C) ~12,955 MiB
+  free. Full set as built now ~6.4 GiB; r1's estimate 8.2-9 GiB -> 3.9-6.6 GiB free at M3's end; release builds come
+  after check.mjs inside one call (runner checks only at start) -> amendment A4 (df readings). U4r precedent: m5.log
+  ran pre-builds + check + det-u4 + regen in one call from 4,679 MiB; det-u4 non-cargo 227.2 s there.
+  M1-M7 GO on c2561b6c with A1-A6 (in the result).
+- 11. Rulings: TE-B1-R2-1 follow-up (bots test, with RR2-B1-1: next lane editing npt-bots lib.rs, U6's bots'-view item
+  at the latest, beside TE-B1-8's glue test); TE-B1-R2-2 follow-up (runner edit after M7's last re-run set, before
+  U4g's first run; form: ls-files -z --others | xargs -0 -r sha256sum | sha256sum; .diff + bash -n); RR2-B1-1
+  follow-up (as TE-B1-R2-1); RR2-B1-2 recorded (report fold :389). No round 3. My errors: ADV-R1-1 (FP-3's two
+  lines could not run as written: --logs 0 without --record; Some(&dir)), ADV-R1-2 (step 1's "section 4"). Also
+  RR2-B1-1's "below" was my ruled wording. For Mustafa: nothing.
