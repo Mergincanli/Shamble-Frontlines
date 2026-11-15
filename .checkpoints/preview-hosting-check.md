@@ -42,7 +42,19 @@
    (moment 5) before the plan is saved as done; then the closing message.
 
 ## Open findings
-- (none yet)
+- Refused by the guard, 2026-11-15 15:54:02 UTC: `git -C <dir> fetch ...` ("git: no option before the subcommand (run
+  git from the folder, without -C, -c or --git-dir)"). Route taken: `cd` into each scratch folder under
+  `.gate/preview-hosting-check/tags/` and ran git there (a shallow fetch of two tags to read their dates; nothing run).
+
+## Facts for the plan (read by the session)
+- Action pins: actions/checkout v7.0.1 3d3c42e5aac5ba805825da76410c181273ba90b1 and actions/setup-node v7.0.0
+  820762786026740c76f36085b0efc47a31fe5020 (as gate.yml pins them); actions/upload-artifact v7.0.2
+  cf430e030ddbb5b0abf93d22962f4752f3646cd9 (commit 2026-10-07); actions/download-artifact v8.0.2
+  9000827ccba6bdab643e8b6fd33ac0654aef8333 (commit 2026-10-07): read with `git ls-remote` and a shallow tag fetch,
+  2026-11-15 15:54-15:56 UTC.
+- The deny list (.claude/settings.json) refuses `git push * main`, `git push --delete`, `gh api` with -X, --method,
+  -f, -F, --field, --raw-field or --input, `gh pr merge`, and `npx *`: a session here cannot push a test repository's
+  main, delete a remote branch, approve a pending deployment through gh, or run wrangler locally.
 
 ## Key numbers
 - (none yet)
@@ -64,4 +76,13 @@
    before agents; no action toward the test repository this turn.
 
 ## Running work
-- saver: not started yet.
+- saver: background task bc4g68il4 · output /tmp/claude-0/-home-user-Shamble-Frontlines/a7e7f150-3195-52bd-a549-73b27426198b/tasks/bc4g68il4.output ·
+  started 15:52 UTC · stops by 17:42 UTC (110 min) · last check: just started.
+- agent infra-engineer (Opus by its file, effort high by its file): Cloudflare and runner doc reads C1-C8 · notes
+  `.checkpoints/preview-hosting-check/infra-engineer-docs.md` · launched 15:53 UTC · running.
+- agent security-auditor (Opus by its file, effort high by its file): GitHub environments, events, artifacts,
+  settings, Cloudflare token reach, threat model G1-G10 · notes `.checkpoints/preview-hosting-check/security-auditor-docs.md`
+  · launched 15:53 UTC · running.
+- Facts read by the session meanwhile: read_documentation `github.access` (15:52 UTC: a repository becomes attachable
+  once the Claude GitHub App can reach it; add_repo attaches it); list_repos (15:52 UTC: five public repositories of
+  his, all `can_push: true`; the app's repository-access mode is not shown).
