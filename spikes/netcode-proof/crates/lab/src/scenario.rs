@@ -33,7 +33,7 @@ use std::path::PathBuf;
 use npt_bots::Behaviour;
 use npt_client::ClientEndpoint;
 use npt_l1::{L1Net, Profile};
-use npt_link::{Channel, Link, LinkState};
+use npt_link::{Channel, Link, LinkState, Listener};
 use npt_log::{Ended, EventRecord, Phase};
 use npt_proto::{Direction, Join, Kick, Message, Quant};
 use npt_room::Room;
@@ -45,6 +45,10 @@ use serde_json::Value;
 use crate::hash::Failure;
 use crate::logs::{Logs, Meta};
 use crate::mirror::{Mirror, Records, SetStats};
+
+/// The simulation the lab's rooms run (advisor-u4r-r1, EA-U4R-2; U4-SEAM: npt-lab names `npt_sim::World` once, here;
+/// hash.rs's bite list and dump checks name npt-sim's World as the tool they check, not a room's).
+pub(crate) type Sim = World;
 
 /// The protocol version and content hash the lab's room and clients share.
 pub(crate) const VERSION: u16 = 1;
@@ -209,7 +213,7 @@ impl Bites {
         let proto = npt_proto::BITES.contains(&id);
         let b = Bites {
             id: Some(id.to_owned()),
-            world: World::BITES.contains(&id),
+            world: Sim::BITES.contains(&id),
             room: npt_room::BITES.contains(&id) || proto,
             client: npt_client::BITES.contains(&id) || proto,
             decoder: proto,
@@ -265,19 +269,19 @@ impl Bites {
         Quant::default()
     }
 
-    fn world(&self, scene: &Scene, seed: u64, first_tick: u32, arm_tick: u32) -> World {
+    fn world(&self, scene: &Scene, seed: u64, first_tick: u32, arm_tick: u32) -> Sim {
         #[cfg(feature = "bites")]
         if self.world
             && let Some(id) = self.id.as_deref()
         {
-            return World::with_bite(scene, seed, first_tick, id, arm_tick)
+            return Sim::with_bite(scene, seed, first_tick, id, arm_tick)
                 .expect("Bites::of checked that this instance plants it");
         }
         let _ = arm_tick;
-        World::new(scene, seed, first_tick)
+        Sim::new(scene, seed, first_tick)
     }
 
-    fn room(&self, room: Room<World>) -> Room<World> {
+    fn room(&self, room: Room<Sim>) -> Room<Sim> {
         #[cfg(feature = "bites")]
         if self.room
             && let Some(id) = self.id.as_deref()
@@ -340,7 +344,7 @@ pub(crate) struct Session {
 
 /// The server half (the room behind one decoder per session), the same on L1 and on Loopback.
 pub(crate) struct Server {
-    pub(crate) room: Room<World>,
+    pub(crate) room: Room<Sim>,
     pub(crate) sessions: Vec<Option<Session>>,
     quant: Quant,
     rtt: RttSource,
@@ -360,7 +364,36 @@ pub(crate) struct Server {
 }
 
 impl Server {
-    pub(crate) fn new(room: Room<World>, quant: Quant, rtt: RttSource) -> Server {
+    /// The lab's one server (advisor-u4r-r1, EA-U4R-2), for `run` and the pre-check's `run_leg`: a room on a new
+    /// [`Sim`] of `scene` (the caller's, stand-ins off), `seed` and `first_tick`, with every slot's seeded token,
+    /// `clients` client slots, the lab's content hash and `event_start`, behind one decoder per session on `bites`'
+    /// `Quant`; `bites` plants its World bite (armed at `arm_tick`), its room bite and its pump bite. `run_leg` passes
+    /// `Bites::default()` and event start 0, then sets its own decoder bite.
+    pub(crate) fn build(
+        scene: &Scene,
+        seed: u64,
+        first_tick: u32,
+        clients: usize,
+        event_start: u32,
+        arm_tick: u32,
+        bites: &Bites,
+    ) -> Server {
+        let world = bites.world(scene, seed, first_tick, arm_tick);
+        let greybox = world.greybox().clone();
+        let tokens = (0..scene.slots())
+            .map(|slot| credentials(seed, slot).0)
+            .collect();
+        let room = Room::new(world, scene, &greybox, tokens, clients, npt_sim::TICK_HZ)
+            .with_hashes(CONTENT, [0; 32])
+            .with_event_start(event_start);
+        let mut server = Server::new(bites.room(room), bites.quant(), RttSource::Link);
+        if bites.pump {
+            server.decoder_bite = bites.id.clone();
+        }
+        server
+    }
+
+    fn new(room: Room<Sim>, quant: Quant, rtt: RttSource) -> Server {
         Server {
             room,
             sessions: Vec::new(),
@@ -548,6 +581,40 @@ impl Server {
             self.ended.push((slot, "kicked"));
         }
         Ok(())
+    }
+}
+
+/// What one instant's RQ8 steps 1 and 2 hand a loop, with step 3's due count (advisor-u4r-r1, EA-U4R-1, the narrow
+/// form): the admissions and the ended sessions since the last take, each for the caller's own sinks (the runner's
+/// `Logs::admit` and `Logs::gone`; the pre-check's maps and its outcome's `ended`), and the ticks due now.
+pub(crate) struct Wake {
+    pub(crate) admitted: Vec<(u8, u64, u32)>,
+    pub(crate) ended: Vec<(u8, &'static str)>,
+    pub(crate) to_run: u32,
+}
+
+/// RQ8's steps 1 and 2 at `now`, shared by [`run`] and the pre-check's `run_leg` (advisor-u4r-r1, EA-U4R-1, the narrow
+/// form): every new link's server end the listener hands out accepted (its `poll_accept` is the instant's first net
+/// call, which applies the packets due), the server's I/O step, and its admissions and ended sessions taken; then step
+/// 3's due count from `schedule`, which moves on. Each caller keeps its own per-tick body.
+pub(crate) fn wake(
+    server: &mut Server,
+    listener: &mut dyn Listener,
+    schedule: &mut Schedule,
+    now: u64,
+) -> Wake {
+    while let Some((link, _)) = listener.poll_accept(now) {
+        server.accept(link, now);
+    }
+    server.io(now);
+    let admitted = std::mem::take(&mut server.admitted);
+    let ended = std::mem::take(&mut server.ended);
+    let due = due_ticks(now, schedule);
+    *schedule = due.next;
+    Wake {
+        admitted,
+        ended,
+        to_run: due.to_run,
     }
 }
 
@@ -743,27 +810,16 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
     let fail = Failure::Failed;
     let scene = s.scene.clone().with_stand_ins(StandIns::OFF);
     let n = s.clients.min(scene.slots());
-    let world = s.bites.world(&scene, s.seed, s.tick_start, s.arm_tick);
-    let greybox = world.greybox().clone();
-    let tokens = (0..scene.slots())
-        .map(|slot| credentials(s.seed, slot).0)
-        .collect();
-    let room = Room::new(
-        world,
+    let mut server = Server::build(
         &scene,
-        &greybox,
-        tokens,
+        s.seed,
+        s.tick_start,
         usize::from(n),
-        npt_sim::TICK_HZ,
-    )
-    .with_hashes(CONTENT, [0; 32])
-    .with_event_start(s.event_start);
-    let room = s.bites.room(room);
+        s.event_start,
+        s.arm_tick,
+        &s.bites,
+    );
     let quant = s.bites.quant();
-    let mut server = Server::new(room, quant, RttSource::Link);
-    if s.bites.pump {
-        server.decoder_bite = s.bites.id.clone();
-    }
     let mut schedule = s.bites.schedule();
     let net = s.bites.net(s.seed);
     let mut listener = net.listener();
@@ -879,13 +935,9 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
     let mut stop = false;
     while !stop {
         let now = clock.now();
-        // (1) packets due, and each new link's server end.
-        while let Some((link, _)) = listener.poll_accept(now) {
-            server.accept(link, now);
-        }
-        // (2) the server's I/O step.
-        server.io(now);
-        for (slot, session, tick) in std::mem::take(&mut server.admitted) {
+        // (1) packets due, and each new link's server end; (2) the server's I/O step; then (3)'s due count.
+        let woke = wake(&mut server, listener.as_mut(), &mut schedule, now);
+        for (slot, session, tick) in woke.admitted {
             // Carry 75's bound is checked on logged runs only: `events_stamped` counts what `room_tick` returns, which
             // a no-log run (--logs 0, or `npt-lab hash`'s regeneration) does not call, so there it stays 0
             // (advisor-u4r-r1, FP-7 item 6: RR3-L2 (b)).
@@ -897,13 +949,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
             }
             logs.admit(slot, session, tick, phase(k)).map_err(fail)?;
         }
-        for (slot, _) in std::mem::take(&mut server.ended) {
+        for (slot, _) in woke.ended {
             logs.gone(slot);
         }
         // (3) the server tick, if due.
-        let due = due_ticks(now, &schedule);
-        schedule = due.next;
-        for _ in 0..due.to_run {
+        for _ in 0..woke.to_run {
             let ph = phase(k);
             let t = server.room.last_tick().wrapping_add(1);
             server.room.tick();
@@ -1376,9 +1426,19 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
     let measured_end = warmup_ticks
         .checked_add(measured_ticks)
         .ok_or("--warmup-s and --measured-s: their ticks' sum overflows 64 bits".to_owned())?;
-    measured_end
+    let last_tick = measured_end
         .checked_add(after_max_ticks)
         .ok_or("--after-max-s: the run's last tick overflows 64 bits".to_owned())?;
+    // advisor-u4r-r2, RR4-L2, after the run-length 64-bit checks (which keep their messages): the run's last tick,
+    // counted from its first (the warm-up, measured and after phases' ticks), fits 32 bits, on every profile. The
+    // burst block's own 64-bit check comes below it, then its 32-bit cap.
+    if last_tick > u64::from(u32::MAX) {
+        return Err(format!(
+            "--warmup-s, --measured-s and --after-max-s: the run's last tick, {last_tick} ticks from its first, is \
+             above {} (32 bits)",
+            u32::MAX
+        ));
+    }
     let behaviour = take("behaviour").unwrap_or_else(|| "brawl".to_owned());
     if !["brawl", "presses", "clamp", "steady"].contains(&behaviour.as_str()) {
         return Err(format!(
@@ -1439,9 +1499,12 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
                 .to_owned(),
         );
     }
-    // The last burst's tick, checked before `burst_starts` sums it (FP-3: RR3-L3), which bounds every sum there.
+    // Where bursts are used (B1 with at least one: `burst_starts` runs only there), what is bounded: the last burst's
+    // tick boundary counted from the run's first tick, ((bursts - 1) x every_s + first_s) x TICK_HZ + the warm-up's
+    // ticks, first in 64 bits, which bounds every sum `burst_starts` makes (FP-3: RR3-L3); then (advisor-u4r-r2,
+    // RR4-L2) that tick within 32 bits, --bursts at most 1,000, and --burst-every-s above 0 with more than one burst.
     if profile_name == "B1" && bursts > 0 {
-        (bursts - 1)
+        let last_burst = (bursts - 1)
             .checked_mul(burst_every_s)
             .and_then(|x| x.checked_add(burst_first_s))
             .and_then(|x| x.checked_mul(hz))
@@ -1450,6 +1513,21 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
                 "--bursts {bursts}, --burst-first-s {burst_first_s} and --burst-every-s {burst_every_s}: the last \
                  burst's tick overflows 64 bits"
             ))?;
+        if last_burst > u64::from(u32::MAX) {
+            return Err(format!(
+                "--bursts {bursts}, --burst-first-s {burst_first_s} and --burst-every-s {burst_every_s}: the last \
+                 burst's tick, {last_burst} ticks from the run's first, is above {} (32 bits)",
+                u32::MAX
+            ));
+        }
+        if bursts > 1_000 {
+            return Err(format!("--bursts {bursts}: above 1000"));
+        }
+        if bursts > 1 && burst_every_s == 0 {
+            return Err(format!(
+                "--burst-every-s 0 with --bursts {bursts}: more than one burst needs an interval above 0 s"
+            ));
+        }
     }
     let profile = match profile_name.as_str() {
         "B1" => Profile::b1(&burst_starts(
@@ -1546,7 +1624,7 @@ pub(crate) fn summary_line(s: &Settings, o: &Summary) -> String {
          client hashes {} (sentinels {}); measured incomplete {}; decided lost at the stop {}; shots per measured \
          second {}; carry 49: measured client sets {}, holding every very large unit {}, projectiles per set {}; \
          audit {} owner, {} spatial checked against the radius, {} spatial not checked, {} breaches; fate log {}; \
-         connect order digest {:016x}",
+         connect order digest {:016x}; in a building: {}",
         s.meta.run,
         s.scene.name(),
         s.profile.name,
@@ -1595,6 +1673,20 @@ pub(crate) fn summary_line(s: &Settings, o: &Summary) -> String {
         o.audit.breaches_count,
         &o.fate_log_sha256[..16.min(o.fate_log_sha256.len())],
         o.order_digest,
+        // BRAWL-1's figure: measured slot-ticks with feet in a building area, and their slots.
+        logged(format!(
+            "{} slot-ticks (slots {})",
+            c.in_building_measured,
+            if c.in_building_slots.is_empty() {
+                "none".to_owned()
+            } else {
+                c.in_building_slots
+                    .iter()
+                    .map(u8::to_string)
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            }
+        )),
     )
 }
 
@@ -2018,19 +2110,7 @@ pub(crate) mod tests {
 
     fn lab_room(n: u8) -> Server {
         let scene = Scene::stress().with_stand_ins(StandIns::OFF);
-        let world = World::new(&scene, 1, 0);
-        let greybox = world.greybox().clone();
-        let tokens = (0..scene.slots()).map(|s| credentials(1, s).0).collect();
-        let room = Room::new(
-            world,
-            &scene,
-            &greybox,
-            tokens,
-            usize::from(n),
-            npt_sim::TICK_HZ,
-        )
-        .with_hashes(CONTENT, [0; 32]);
-        Server::new(room, Quant::default(), RttSource::Link)
+        Server::build(&scene, 1, 0, usize::from(n), 0, 0, &Bites::default())
     }
 
     /// r8 (carry 76): a second endpoint joins with slot 0's token and bind while the first is live; the first is sent
@@ -2145,8 +2225,9 @@ pub(crate) mod tests {
         );
     }
 
-    /// FP-1's three checks of a session that ended closed on `slot`: the room's slot freed, no owner, and `(slot,
-    /// "closed")` in `ended`; each that fails, by name.
+    /// FP-1's four checks of a session that ended closed on `slot`: the room's slot freed, no owner, `(slot, "closed")`
+    /// in `ended`, and the roster's slot not live (advisor-u4r-r2, N2-1 = TE-R2-1: a rejoin then is no replacement);
+    /// each that fails, by name.
     fn closed_checks(server: &Server, slot: u8) -> Vec<String> {
         let mut failed = Vec::new();
         if server.room.client(slot).is_some() {
@@ -2160,13 +2241,20 @@ pub(crate) mod tests {
         if !server.ended.contains(&(slot, "closed")) {
             failed.push(format!("ended holds no ({slot}, \"closed\")"));
         }
+        if server.room.roster().is_live(slot) {
+            failed.push(format!(
+                "the roster still holds slot {slot}: a rejoin would be a replacement"
+            ));
+        }
         failed
     }
 
     /// Carry 76's boundary (advisor-u4r-r1, FP-1: NC-U4R-1 = SEC-U4R-1): a session whose decoder closes, (a) on a
     /// control-stream frame it refuses as malformed, or whose link closes, (b) its client end dropped, ends, and the
     /// room's slot is freed (`Room::leave`: "a closed link"); after (a) a new endpoint with that slot's token and bind is
-    /// admitted, and not as a replacement. Each case's checks are collected, so a failure names its case.
+    /// admitted. It is not a replacement because the roster freed the slot (`closed_checks`' roster check, read before
+    /// the rejoin: `Room::join` reports a replacement only for a slot the roster holds live). Each case's checks are
+    /// collected, so a failure names its case.
     #[test]
     fn fp1_a_closed_decoder_or_link_ends_the_session_and_frees_the_room_s_slot() {
         // (a) A frame the pump refuses with an error other than WrongChannel or WrongDirection: `close_malformed`.
@@ -2205,10 +2293,6 @@ pub(crate) mod tests {
             a.owner.get(&0),
             Some(&again),
             "(a): the new endpoint is admitted"
-        );
-        assert!(
-            !a.ended.contains(&(0, "replaced")),
-            "(a): the new endpoint is no replacement"
         );
     }
 
@@ -2418,16 +2502,109 @@ pub(crate) mod tests {
     }
 
     /// advisor-u4r-r1, FP-3 (SEC-U4R-3, RR3-L3): a length whose ticks overflow 64 bits is a usage error naming its
-    /// option, never a wrapped length.
+    /// option, never a wrapped length. advisor-u4r-r2, TE-R2-2: each 64-bit refusal's exact text (the last burst's
+    /// tick on a B1 line, the warm-up and measured sum, the after phase); RR4-L2: a run's last tick and the last
+    /// burst's tick above u32::MAX, more than 1,000 bursts and an interval of 0 s between bursts, each a usage error
+    /// naming its options, and each bound's own value accepted.
     #[test]
     fn fp3_a_length_whose_ticks_overflow_is_a_usage_error_naming_its_option() {
-        let line = format!(
-            "--run t --set t --date 2026-11-14 --commit {COMMIT} --out x --scene SS --seed 1 --profile P0 \
-             --measured-s 1000000000000000000"
-        );
-        let argv: Vec<String> = line.split_whitespace().map(str::to_owned).collect();
-        let e = parse(&argv).expect_err("--measured-s 10^18 x 30 overflows");
+        let parsed = |profile: &str, extra: &str| {
+            let line = format!(
+                "--run t --set t --date 2026-11-14 --commit {COMMIT} --out x --scene SS --seed 1 --profile {profile} \
+                 {extra}"
+            );
+            let argv: Vec<String> = line.split_whitespace().map(str::to_owned).collect();
+            parse(&argv)
+        };
+        let e = parsed("P0", "--measured-s 1000000000000000000")
+            .expect_err("--measured-s 10^18 x 30 overflows");
         assert!(e.starts_with("--measured-s 1000000000000000000: "), "{e}");
+        // TE-R2-2 (1), on a B1 line: the 64-bit check comes before RR4-L2's bounds.
+        let e = parsed(
+            "B1",
+            "--bursts 2 --burst-first-s 0 --burst-every-s 1000000000000000000",
+        )
+        .expect_err("the last burst's tick overflows");
+        assert!(
+            e.starts_with(
+                "--bursts 2, --burst-first-s 0 and --burst-every-s 1000000000000000000: the last burst's tick \
+                 overflows 64 bits"
+            ),
+            "{e}"
+        );
+        // TE-R2-2 (2): each product fits, their sum does not.
+        let e = parsed(
+            "P0",
+            "--warmup-s 310000000000000000 --measured-s 310000000000000000",
+        )
+        .expect_err("the sum overflows");
+        assert_eq!(
+            e,
+            "--warmup-s and --measured-s: their ticks' sum overflows 64 bits"
+        );
+        // TE-R2-2 (3), in full digits (`num` parses u64): the sum fits, the after phase's addition does not.
+        let e = parsed(
+            "P0",
+            "--warmup-s 300000000000000000 --measured-s 300000000000000000 --after-max-s 100000000000000000",
+        )
+        .expect_err("the run's last tick overflows");
+        assert_eq!(e, "--after-max-s: the run's last tick overflows 64 bits");
+        // RR4-L2's ruled case: the last burst's tick fits 64 bits, not 32.
+        let e = parsed("B1", "--bursts 2 --burst-every-s 600000000000")
+            .expect_err("the last burst's tick above 32 bits");
+        assert!(e.contains("--burst-every-s 600000000000"), "{e}");
+        assert_eq!(
+            e,
+            "--bursts 2, --burst-first-s 30 and --burst-every-s 600000000000: the last burst's tick, 18000000001200 \
+             ticks from the run's first, is above 4294967295 (32 bits)"
+        );
+        // RR4-L2: more than 1,000 bursts; 1,000 accepted.
+        let e = parsed("B1", "--bursts 1001").expect_err("1,001 bursts");
+        assert_eq!(e, "--bursts 1001: above 1000");
+        assert!(parsed("B1", "--bursts 1000").is_ok(), "1,000 bursts");
+        // RR4-L2: an interval of 0 s with more than one burst; one burst at 0 s accepted.
+        let e = parsed("B1", "--bursts 2 --burst-every-s 0").expect_err("two bursts 0 s apart");
+        assert_eq!(
+            e,
+            "--burst-every-s 0 with --bursts 2: more than one burst needs an interval above 0 s"
+        );
+        assert!(
+            parsed("B1", "--bursts 1 --burst-every-s 0").is_ok(),
+            "one burst"
+        );
+        // RR4-L2: a run's last tick past 32 bits that fits 64 (the defaults' 300 + 1,800 ticks, then the after phase);
+        // u32::MAX is odd, so never a whole-second length; the largest below it (4,294,967,280 ticks) accepted.
+        let e =
+            parsed("P0", "--after-max-s 143165507").expect_err("the run's last tick above 32 bits");
+        assert_eq!(
+            e,
+            "--warmup-s, --measured-s and --after-max-s: the run's last tick, 4294967310 ticks from its first, is \
+             above 4294967295 (32 bits)"
+        );
+        assert!(
+            parsed("P0", "--after-max-s 143165506").is_ok(),
+            "4,294,967,280 ticks"
+        );
+        // BRAWL-1 round 1, RR-B1-4: the last burst's 32-bit cap at its boundary, (1 x 143,165,566 + 0) x 30 + 300 =
+        // 4,294,967,280 ticks accepted (`burst_starts` has no in-run check), 30 ticks more refused.
+        assert!(
+            parsed(
+                "B1",
+                "--bursts 2 --burst-first-s 0 --burst-every-s 143165566"
+            )
+            .is_ok(),
+            "the last burst at 4,294,967,280 ticks"
+        );
+        let e = parsed(
+            "B1",
+            "--bursts 2 --burst-first-s 0 --burst-every-s 143165567",
+        )
+        .expect_err("the last burst's tick above 32 bits");
+        assert_eq!(
+            e,
+            "--bursts 2, --burst-first-s 0 and --burst-every-s 143165567: the last burst's tick, 4294967310 ticks from \
+             the run's first, is above 4294967295 (32 bits)"
+        );
     }
 
     /// advisor-u4r-r1, FP-6 items 1 and 2 (NC-U4R-2; EA-U4R-3 = RR3-L8; bites builds only): `scenario` refuses the

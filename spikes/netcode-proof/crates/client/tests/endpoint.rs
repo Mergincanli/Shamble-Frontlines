@@ -380,6 +380,113 @@ fn pm_0001_58_event_numbers_are_rebuilt_across_the_16_bit_wrap() {
     assert_eq!(wraps, ["event_seq"]);
 }
 
+/// A one-group snapshot of tick `t` (against the defaults) whose own section holds `own`.
+fn own_only(t: u32, groups: u8, own: Vec<EntityRecord>) -> Snapshot {
+    Snapshot {
+        tick: t,
+        groups,
+        own: own.into_iter().map(EntityDelta::Add).collect(),
+        ..Snapshot::default()
+    }
+}
+
+/// BRAWL-1's read item (the advisor's plan review, condition 5): `own_soldier` is `None` before the first complete
+/// tick; after a complete tick it is the own record's x, y, z and dead bit (flags bit 3); a newer incomplete, refused or
+/// sentinel tick changes nothing; a newer complete tick moves it; a complete tick that a second, different group 0
+/// turns into the sentinel is not read, and the older complete tick is read again (BRAWL-1 round 1, TE-B1-4 (a)); a
+/// complete tick with no own record gives `None`.
+#[test]
+fn brawl1_own_soldier_is_the_newest_complete_filed_tick_s_own_record() {
+    let mut e = endpoint();
+    assert_eq!(e.own_soldier(), None, "nothing received");
+    let accepted = bytes(&Message::JoinAccepted(JoinAccepted {
+        slot: 0,
+        tick: 100,
+        ..JoinAccepted::default()
+    }));
+    feed(&mut e, vec![(Channel::Control, accepted, 0)]);
+    assert_eq!(e.own_soldier(), None, "joined, no snapshot");
+    let mut dead = soldier(0, 1_234);
+    dead.grid[5] = 1 << 3;
+    let out = feed(&mut e, vec![datagram(own_only(100, 2, vec![dead]))]);
+    assert!(out.hashes.is_empty());
+    assert_eq!(e.own_soldier(), None, "one group of two: incomplete");
+    let out = feed(&mut e, vec![datagram(own_only(101, 1, vec![dead]))]);
+    assert_eq!(out.hashes.len(), 1, "tick 101 complete and filed");
+    let first = Some(([1_234, -1_234, 150], true));
+    assert_eq!(e.own_soldier(), first);
+    // Newer ticks that are incomplete (102), refused for a baseline it does not hold (103: the sentinel) and the
+    // sentinel by a corrupt datagram (104): no change.
+    feed(
+        &mut e,
+        vec![datagram(own_only(102, 2, vec![soldier(0, 9)]))],
+    );
+    let out = feed(&mut e, vec![datagram(moved(103, 12, 0, 1, 150))]);
+    assert_eq!(out.hashes, [(103, 0)]);
+    let mut b = bytes(&Message::Snapshot(own_only(104, 1, vec![soldier(0, 9)])));
+    b.push(0);
+    let out = feed(&mut e, vec![(Channel::Datagram, b, 0)]);
+    assert_eq!(out.hashes, [(104, 0)]);
+    assert_eq!(e.own_soldier(), first, "no change from ticks 102 to 104");
+    let out = feed(
+        &mut e,
+        vec![datagram(own_only(105, 1, vec![soldier(0, -700)]))],
+    );
+    assert_eq!(out.hashes.len(), 1);
+    assert_eq!(e.own_soldier(), Some(([-700, 700, 150], false)), "tick 105");
+    let out = feed(
+        &mut e,
+        vec![datagram(own_only(105, 1, vec![soldier(0, -701)]))],
+    );
+    assert_eq!(
+        out.hashes,
+        [(105, 0)],
+        "a second, different group 0 turns tick 105 into the sentinel (carry 61 (b))"
+    );
+    assert_eq!(
+        e.own_soldier(),
+        first,
+        "a complete tick turned sentinel is not read: tick 101 again"
+    );
+    let out = feed(
+        &mut e,
+        vec![datagram(own_only(106, 1, vec![soldier(1, 5)]))],
+    );
+    assert_eq!(out.hashes.len(), 1);
+    assert_eq!(e.own_soldier(), None, "tick 106: no record of soldier 0");
+}
+
+/// BRAWL-1 round 1 (TE-B1-4 (b), NA-B1-1, RR-B1-5, EA-B1-3 (b)): `own_soldier` compares ticks by the endpoint's wrap
+/// rule. Tick 0 comes after tick u32::MAX; with ACK_RING_TICKS at 32, u32::MAX sits in ring slot 31 and 0 in slot 0,
+/// so a plain maximum and a "last matching ring entry" read would both still return tick u32::MAX's record.
+#[test]
+fn brawl1_own_soldier_compares_ticks_by_the_endpoint_s_wrap_rule() {
+    let mut e = endpoint();
+    let accepted = bytes(&Message::JoinAccepted(JoinAccepted {
+        slot: 0,
+        tick: u32::MAX - 1,
+        ..JoinAccepted::default()
+    }));
+    feed(&mut e, vec![(Channel::Control, accepted, 0)]);
+    let out = feed(
+        &mut e,
+        vec![datagram(own_only(u32::MAX, 1, vec![soldier(0, 11)]))],
+    );
+    assert_eq!(out.hashes.len(), 1, "tick u32::MAX complete and filed");
+    assert_eq!(
+        e.own_soldier(),
+        Some(([11, -11, 150], false)),
+        "tick u32::MAX"
+    );
+    let out = feed(&mut e, vec![datagram(own_only(0, 1, vec![soldier(0, 22)]))]);
+    assert_eq!(out.hashes.len(), 1, "tick 0 complete and filed");
+    assert_eq!(
+        e.own_soldier(),
+        Some(([22, -22, 150], false)),
+        "tick 0 comes after u32::MAX by the endpoint's wrap rule"
+    );
+}
+
 /// npt-client's planted defects (bites builds only), each in wave 1's two parts: a bites-only twin asserting the clean
 /// test's check fails on the bitten endpoint.
 #[cfg(feature = "bites")]

@@ -242,6 +242,13 @@ pub struct ClientEndpoint {
     out: StepOut,
 }
 
+/// A Soldier record's flags field, the sixth of its layout (npt-sim seam.rs's `SOLDIER`: x, y, z, yaw, pitch, flags,
+/// health, weapon), and its dead bit (npt-sim world.rs's `FLAG_DEAD`, bit 3): both private there. npt-bots' sim-only
+/// test pins the same two literals against npt-sim's real deaths (its `soldiers()`: the bit set exactly when health is
+/// 0), so a change there fails that test; both copies change together until npt-sim exposes them (BRAWL-1 round 1,
+/// EA-B1-1).
+const SOLDIER_FLAGS: usize = 5;
+const SOLDIER_DEAD: i32 = 1 << 3;
 /// Pings the endpoint holds to answer at its next step, at most (the room sends a few a second).
 const PINGS_HELD: usize = 8;
 /// Bad headers' ticks the endpoint remembers, so each gets the sentinel once (the groups of one tick arrive together).
@@ -335,6 +342,34 @@ impl ClientEndpoint {
     /// The newest snapshot tick the client has read in a header.
     pub fn newest_tick(&self) -> Option<u32> {
         self.newest
+    }
+
+    /// The client's own decoded state of its own soldier (BRAWL-1; the advisor's plan review, condition 5): its grid
+    /// position [x, y, z] (1 cm steps, as decoded: no float) and whether its flags say dead (bit 3), by value, from the
+    /// newest tick that is complete and filed with a hash, ticks compared by the endpoint's wrap rule. `None` before
+    /// the slot or the first such tick, or when that tick's own section holds no record of the client's soldier. A
+    /// newer tick that is incomplete, refused or the sentinel changes nothing while the complete tick stays in the
+    /// ring (ACK_RING_TICKS ticks); a newer tick that takes its ring slot drops it, and then the newest complete tick
+    /// still held is read, else `None`. Never the room's state: only what this client decoded.
+    pub fn own_soldier(&self) -> Option<([i32; 3], bool)> {
+        let slot = u16::from(self.slot?);
+        let tick = self
+            .ring
+            .iter()
+            .filter(|t| t.used && t.complete() && matches!(t.filed, Filed::Hash(_)))
+            .reduce(|a, b| {
+                if self.wrap.after32("tick", a.tick, b.tick) {
+                    b
+                } else {
+                    a
+                }
+            })?;
+        let own = &tick.frame.own;
+        let i = own
+            .binary_search_by_key(&(EntityKind::Soldier, slot), key)
+            .ok()?;
+        let g = own[i].rec.grid;
+        Some(([g[0], g[1], g[2]], g[SOLDIER_FLAGS] & SOLDIER_DEAD != 0))
     }
 
     /// The command the header's last-run sequence names, rebuilt to the client's own 32-bit command counter (U4E-Q2

@@ -361,6 +361,12 @@ are written once at the run's end, after the measured phase. No mark reads them 
 | `event.run_lengths.warmup_ticks_count`, `.measured_ticks_count`, `.after_ticks_count`, `.order_digest`, `.after_capped` | count (ticks); 16 hex digits; flag (true or false) | npt-lab | the run's three phases in ticks; the digest of the order its clients connected in (r1's bite); true when a bite run's after phase reached its cap with measured ticks unresolved, so the stop decided them lost (carry 73's tick16 past the wrap; a measured run fails there instead) | none (recorded) |
 | `event.recording.ticks_count`, `.bytes`, `.sha256`, `.span_ms` | count; bytes; hex string; ms | npt-lab | a `--record` run's recording: its ticks, size, SHA-256 and the room's hit-volume span (carry 82) | none (recorded) |
 
+### Names added with BRAWL-1 (npt-lab `scenario`'s room log; advisor-u4r-sets-r2-full.md, BRAWL-1 Fix (b))
+
+| Name | Unit | Written by (crate) | Meaning | Marks |
+|---|---|---|---|---|
+| `tick.s.in_building_slot_area` | pairs (slot, area) | npt-lab (from npt-sim's Soldier records' `area`) | the room log, on every logged tick (any phase) where a soldier's feet are in a building area: each such soldier's slot, then its area (building i is area i + 1: the greybox's area rule, half-open on each footprint), in slot order; absent on a tick with none. The run's summary line prints the measured total as "in a building: N slot-ticks (slots ...)" | none (recorded) |
+
 ## Series read only by figures (18)
 
 | Name | Unit | Written by (crate) | Meaning | Figures |

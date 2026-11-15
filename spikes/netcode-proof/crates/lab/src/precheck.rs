@@ -43,15 +43,12 @@ use npt_client::ClientEndpoint;
 use npt_l1::{L1Net, Profile};
 use npt_lab::{HashCompare, TickHash};
 use npt_link::{Channel, Link};
-use npt_proto::{Direction, Input, Limits, Message, Quant};
-use npt_room::Room;
-use npt_server::{RttSource, Schedule, due_ticks};
+use npt_proto::{Direction, Input, Limits, Message};
+use npt_server::Schedule;
 use npt_sim::replay::Recording;
-use npt_sim::{Command, Scene, StandIns, World};
+use npt_sim::{Command, Scene, StandIns};
 
-use crate::scenario::{
-    Bites, CONTENT, MAX_DATAGRAM, Server, check_placements, credentials, join_of,
-};
+use crate::scenario::{Bites, MAX_DATAGRAM, Server, SimClock, check_placements, join_of, wake};
 
 /// The pre-check's suite name (7.2).
 pub(crate) const SUITE: &str = "precheck-30";
@@ -293,21 +290,15 @@ pub(crate) fn run_leg(
         .ok_or(format!("no scene {}", rec.scene))?
         .with_stand_ins(StandIns::OFF);
     let cmds = commands_of(rec)?;
-    let world = World::new(&scene, rec.seed, rec.first_tick);
-    let greybox = world.greybox().clone();
-    let tokens = (0..scene.slots())
-        .map(|slot| credentials(rec.seed, slot).0)
-        .collect();
-    let room = Room::new(
-        world,
+    let mut server = Server::build(
         &scene,
-        &greybox,
-        tokens,
+        rec.seed,
+        rec.first_tick,
         cmds.len(),
-        npt_sim::TICK_HZ,
-    )
-    .with_hashes(CONTENT, [0; 32]);
-    let mut server = Server::new(room, Quant::default(), RttSource::Link);
+        0,
+        rec.first_tick,
+        &Bites::default(),
+    );
     if let Some(id) = bite {
         let b = Bites::of(id)?;
         if b.pump {
@@ -369,24 +360,19 @@ pub(crate) fn run_leg(
     let mut first_take: BTreeMap<u8, u32> = BTreeMap::new();
     let t0 = rec.ticks.first().map_or(rec.first_tick, |t| t.tick);
     let mut last_seq: BTreeMap<u8, u16> = BTreeMap::new();
-    let mut now = 0u64;
+    let mut clock = SimClock::default();
     let mut idx = 0usize;
     while idx < rec.ticks.len() {
-        // (1) packets due, and each new link's server end (L1).
-        while let Some((link, _)) = listener.poll_accept(now) {
-            server.accept(link, now);
-        }
-        // (2) the server's I/O step.
-        server.io(now);
-        for (slot, _, tick) in std::mem::take(&mut server.admitted) {
+        let now = clock.now();
+        // (1) packets due, and each new link's server end (L1); (2) the server's I/O step; then (3)'s due count.
+        let woke = wake(&mut server, listener.as_mut(), &mut schedule, now);
+        for (slot, _, tick) in woke.admitted {
             admitted.entry(slot).or_insert(tick);
         }
-        o.ended.append(&mut server.ended);
+        o.ended.extend(woke.ended);
         // (3) the server tick, if due.
-        let due = due_ticks(now, &schedule);
-        schedule = due.next;
         let mut ran = None;
-        for _ in 0..due.to_run {
+        for _ in 0..woke.to_run {
             let Some(ti) = rec.ticks.get(idx) else { break };
             check_placements(&ti.spawns, &ti.teleports)?;
             o.scripted += ti.spawns.len() + ti.teleports.len() + ti.attributes.len();
@@ -472,7 +458,7 @@ pub(crate) fn run_leg(
         if let Some(e) = net.next_event_ns() {
             next = next.min(e.max(now + 1));
         }
-        now = next.max(now + 1);
+        clock.advance_to(next.max(now + 1));
     }
     for c in &clients {
         let k = server

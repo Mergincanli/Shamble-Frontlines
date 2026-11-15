@@ -1,9 +1,10 @@
 //! The scenario's three logs (u4-build-plan.md §4.12 :410-415; marks/README.md §1 and §4; u4r-brief.md 2.1): on L1
 //! one npt-lab process writes one log per process value the checks select on, each with its own header: `room` (the
-//! room's per-tick World hash `h`, `hs.server_hash`, PM-0001-2's series, the `admit` events, `burst_eviction`), `client`
-//! (every client's `hs.decoded_hash` and `tick.s.snap_incomplete`, one entry per slot) and `lab` (-57's errors,
-//! `burst_heal`, `counter_wrap`, the run's own records). Every tick and second record carries all its counters, 0
-//! included; every log ends with its footer.
+//! room's per-tick World hash `h`, `hs.server_hash`, PM-0001-2's series, BRAWL-1's `in_building_slot_area`, the
+//! `admit` events, `burst_eviction`), `client` (every client's `hs.decoded_hash` and `tick.s.snap_incomplete`, one
+//! entry per slot) and `lab` (-57's errors, `burst_heal`, `counter_wrap`, the run's own records). Every tick and
+//! second record carries all its counters, 0 included (BRAWL-1's `in_building_slot_area`, a list, is written only on
+//! ticks with one: the advisor's plan review, condition 10); every log ends with its footer.
 //!
 //! **The client writer** (carry 62 (a) to (f); carry 73; README §1's `hs` rules): each client's hashes are filed under
 //! the tick it rebuilt (a 32-bit tick, unwrapped forward from the room's first tick, so a wrong rebuild past the 16-bit
@@ -21,9 +22,10 @@ use std::io::BufWriter;
 
 use npt_log::{Ended, EventRecord, Header, Phase, SCHEMA, SecondRecord, TickRecord, Writer};
 use npt_room::Room;
-use npt_sim::{EntityKind, World};
+use npt_sim::EntityKind;
 
 use crate::mirror::{Errors, Records, SetStats};
+use crate::scenario::Sim;
 
 /// The fields every log of a run shares, and its params.
 #[derive(Clone, Debug)]
@@ -94,7 +96,7 @@ fn io(e: std::io::Error) -> String {
 /// and kills). `at` caches the section's index (the sections before it are fixed-size pools). The advisor's U4r build
 /// ruling, point 6, pins it against `SimCore::step`'s returned events (the test below).
 pub(crate) fn dump_events(
-    world: &World,
+    world: &Sim,
     at: &mut Option<usize>,
 ) -> Result<(usize, i64, i64), String> {
     let dump = world.dump();
@@ -142,6 +144,9 @@ pub(crate) struct Logs {
     room: Out,
     client: Out,
     lab: Out,
+    /// Whether the logs have a folder (`open`'s `dir`): a run with none keeps no client resolution (advisor-u4r-r1,
+    /// RR3-L2 (a): `filed` then keeps only what `started` and the stop read).
+    logging: bool,
     n: usize,
     first_tick: u32,
     phases: BTreeMap<u64, Phase>,
@@ -182,6 +187,9 @@ pub(crate) struct Counts {
     pub(crate) large_measured: u64,
     pub(crate) projectiles_measured: u64,
     pub(crate) sets_measured: u64,
+    /// BRAWL-1's figure: measured slot-ticks with feet in a building area, and the slots that had any.
+    pub(crate) in_building_measured: u64,
+    pub(crate) in_building_slots: std::collections::BTreeSet<u8>,
 }
 
 impl Logs {
@@ -199,6 +207,7 @@ impl Logs {
             room: open(dir, "room", meta)?,
             client: open(dir, "client", meta)?,
             lab: open(dir, "lab", meta)?,
+            logging: dir.is_some(),
             n,
             first_tick,
             phases: BTreeMap::new(),
@@ -321,10 +330,26 @@ impl Logs {
         as_lost
     }
 
-    /// What one client step filed: (tick, hash) pairs (0 the sentinel) and the runs of ticks it resolved lost.
+    /// What one client step filed: (tick, hash) pairs (0 the sentinel) and the runs of ticks it resolved lost. A run
+    /// with no log folder only resolves each tick (its first and last resolved ticks, which `started` and the stop
+    /// read) and keeps no per-tick resolution (advisor-u4r-r1, RR3-L2 (a)): nothing writes there, and with no room
+    /// tick logged no tick is ever written, so neither the conflict count nor the whole-as-lost bite can act.
     pub(crate) fn filed(&mut self, slot: u8, hashes: &[(u32, u64)], lost: &[(u32, u32)]) {
         let s = usize::from(slot);
         if s >= self.n {
+            return;
+        }
+        if !self.logging {
+            for &(t, _) in hashes {
+                let w = self.wide(t);
+                self.resolved(s, w);
+            }
+            for &(first, count) in lost {
+                for k in 0..count {
+                    let w = self.wide(first.wrapping_add(k));
+                    self.resolved(s, w);
+                }
+            }
             return;
         }
         for &(t, h) in hashes {
@@ -469,7 +494,7 @@ impl Logs {
     /// tick. Returns the events the World stamped at the tick.
     pub(crate) fn room_tick(
         &mut self,
-        room: &Room<World>,
+        room: &Room<Sim>,
         t: u32,
         ph: Phase,
         sets: &[SetStats],
@@ -556,6 +581,22 @@ impl Logs {
             .map(|s| i64::from(sets.get(s).is_some_and(|x| x.everyone)))
             .collect();
         rec.s.insert("everyone_in_view".into(), flags);
+        // BRAWL-1's figure (Fix (b)): each soldier whose feet are in a building area (its record's `area`, the sim's
+        // own: building i is area i + 1), as (slot, area) pairs, on every logged tick with one, in any phase.
+        let in_building: Vec<i64> = records
+            .iter()
+            .filter(|r| r.kind == EntityKind::Soldier && r.area != 0)
+            .flat_map(|r| [i64::from(r.index), i64::from(r.area)])
+            .collect();
+        if !in_building.is_empty() {
+            if ph == Phase::Measured {
+                self.counts.in_building_measured += in_building.len() as u64 / 2;
+                self.counts
+                    .in_building_slots
+                    .extend(in_building.iter().step_by(2).map(|&s| s as u8));
+            }
+            rec.s.insert("in_building_slot_area".into(), in_building);
+        }
         rec.s.insert(
             "snap_datagram_bytes".into(),
             datagrams.iter().flatten().map(|b| *b as i64).collect(),
@@ -592,7 +633,7 @@ impl Logs {
     /// list and records (the dump's `events` section: npt-sim's canonical state), portal changes from the doors.
     fn room_second(
         &mut self,
-        world: &World,
+        world: &Sim,
         t: u32,
         ph: Phase,
         records: &[npt_sim::EntityRecord],
@@ -735,7 +776,7 @@ impl Logs {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use npt_sim::{Command, HitHistory, Scene, SimCore, SimEvent, StandIns, TickInput};
+    use npt_sim::{Command, HitHistory, Placement, Scene, SimCore, SimEvent, StandIns, TickInput};
 
     /// The advisor's U4r build ruling, point 6: the dump reader's counts at each tick equal the shots, hits and kills
     /// in `SimCore::step`'s returned events, over a short seeded run of the stress scene in which every soldier fires
@@ -743,7 +784,7 @@ mod tests {
     #[test]
     fn p6_the_dump_reader_counts_the_shots_hits_and_kills_simcore_step_returns() {
         let scene = Scene::stress().with_stand_ins(StandIns::OFF);
-        let mut world = World::new(&scene, 3, 0);
+        let mut world = Sim::new(&scene, 3, 0);
         let history = HitHistory::for_ms(2_000).expect("a ring");
         let mut at = None;
         let (mut shots, mut hits, mut kills) = (0i64, 0i64, 0i64);
@@ -799,5 +840,129 @@ mod tests {
             "p6: 600 ticks; shots {shots}, hits {hits}, kills {kills}, each tick's counts equal"
         );
         assert!(shots > 0 && hits > 0 && kills > 0, "{shots} {hits} {kills}");
+    }
+
+    /// advisor-u4r-r1, RR3-L2 (a): a run with no log folder keeps no per-tick client resolution. After an admission
+    /// and one client's filings over 9,000 ticks (hashes, sentinels and lost runs), `res` is empty, the slot has
+    /// started, and its first and last resolved ticks are the filings' first and last.
+    #[test]
+    fn rr3_l2_a_a_run_with_no_log_folder_keeps_no_per_tick_resolution() {
+        let meta =
+            crate::scenario::tests::settings(std::path::Path::new("-"), "--profile P0 --seed 1")
+                .meta;
+        let first = 63_736u32;
+        let mut logs = Logs::open(None, &meta, first, false).expect("three sinks");
+        logs.admit(3, 0, first, Phase::Warmup)
+            .expect("the admission");
+        assert!(!logs.started(3), "admitted, nothing resolved yet");
+        for k in 0..9_000u32 {
+            let t = first.wrapping_add(k);
+            match k % 10 {
+                0 => logs.filed(3, &[], &[(t, 1)]),
+                1 => logs.filed(3, &[(t, 0)], &[]),
+                _ => logs.filed(3, &[(t, u64::from(k) + 1)], &[]),
+            }
+        }
+        assert!(logs.res.is_empty(), "{} ticks kept", logs.res.len());
+        assert!(logs.started(3), "admitted and resolved");
+        let w = u64::from(first);
+        assert_eq!((logs.first[3], logs.last[3]), (Some(w), Some(w + 8_999)));
+    }
+
+    /// BRAWL-1 round 1 (TE-B1-2 = RR-B1-1), the building figure's positive control: soldier 3, teleported to building
+    /// 0's centre (area 1) and given no command, stays there. A warm-up room tick writes its (slot, area) pair and
+    /// counts nothing; the next room tick, measured, counts one slot-tick for slot 3 (two ticks, because npt-log's
+    /// writer refuses a record at or before the last one: log lib.rs:467-474); both tick records hold the pair; the
+    /// summary line prints the count with its slot, and "not counted (--logs 0)" on a no-log run.
+    #[test]
+    fn brawl1_the_building_figure_counts_a_soldier_in_a_building_in_measured_ticks_only() {
+        let scene = Scene::stress().with_stand_ins(StandIns::OFF);
+        let first = 63_736u32;
+        let mut server = crate::scenario::Server::build(
+            &scene,
+            1,
+            first,
+            48,
+            0,
+            0,
+            &crate::scenario::Bites::default(),
+        );
+        server.room.script(
+            &[],
+            &[Placement {
+                slot: 3,
+                position: [2_200, 0, 0],
+            }],
+            &[],
+        );
+        server.room.tick();
+        let dir = crate::scenario::tests::scratch("brawl1-figure");
+        std::fs::create_dir_all(dir.as_path()).expect("the scratch folder");
+        let s = crate::scenario::tests::settings(&dir, "--profile P0 --seed 1");
+        let mut logs = Logs::open(Some(dir.as_path()), &s.meta, first, false).expect("three logs");
+        logs.room_tick(
+            &server.room,
+            server.room.last_tick(),
+            Phase::Warmup,
+            &[],
+            &[],
+            &[],
+        )
+        .expect("the warm-up tick");
+        assert_eq!(logs.counts.in_building_measured, 0, "warm-up: not counted");
+        assert!(logs.counts.in_building_slots.is_empty(), "warm-up: no slot");
+        server.room.tick();
+        logs.room_tick(
+            &server.room,
+            server.room.last_tick(),
+            Phase::Measured,
+            &[],
+            &[],
+            &[],
+        )
+        .expect("the measured tick");
+        assert_eq!(
+            logs.counts.in_building_measured, 1,
+            "measured: one slot-tick"
+        );
+        assert_eq!(
+            logs.counts.in_building_slots,
+            std::collections::BTreeSet::from([3]),
+            "measured: slot 3"
+        );
+        let counts = logs.finish(Ended::Clean, &[]).expect("the footers");
+        let room = crate::scenario::tests::read(&dir, "room");
+        assert_eq!(room.ticks.len(), 2, "the warm-up and the measured tick");
+        for t in &room.ticks {
+            assert_eq!(
+                t.s.get("in_building_slot_area"),
+                Some(&vec![3, 1]),
+                "tick {} ({:?}): written in any phase",
+                t.t,
+                t.ph
+            );
+        }
+        let o = crate::scenario::Summary {
+            counts: counts.clone(),
+            ..crate::scenario::Summary::default()
+        };
+        let line = crate::scenario::summary_line(&s, &o);
+        assert!(
+            line.ends_with("in a building: 1 slot-ticks (slots 3)"),
+            "{line}"
+        );
+        // parse takes --logs 0 only with --record ("a run keeps its logs"); the path is only stored, never written.
+        let quiet = crate::scenario::tests::settings(
+            &dir,
+            &format!(
+                "--profile P0 --seed 1 --logs 0 --record {}",
+                dir.join("brawl1.rec").display()
+            ),
+        );
+        let line = crate::scenario::summary_line(&quiet, &o);
+        assert!(
+            line.ends_with("in a building: not counted (--logs 0)"),
+            "{line}"
+        );
     }
 }

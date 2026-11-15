@@ -232,6 +232,11 @@ const TICK_HEADER_BYTES: u64 = 12;
 /// The most bytes an entry's recording may hold: 64 MiB, four times today's largest entry (SS-P0-s4, 16,950,444 B); a
 /// larger recording comes to the advisor first (advisor-u4r-r1, FP-3: RR3-L1).
 const MAX_ENTRY_BYTES: u64 = 64 * 1024 * 1024;
+/// The most ticks an entry's recording may hold: four times today's largest entry (9,000), the same rule as the bytes
+/// cap; a longer recording comes to the advisor first (advisor-u4r-r2, RR4-L1). Checked before the runner checks, so a
+/// runner entry above it is refused by this rule, not by its ticks' own check. A manifest's size bound, a literal as
+/// MAX_ENTRY_BYTES is, so not named `*_TICKS`: check.mjs reads that name as a rate-derived tick count (TICK_NAMED).
+const MAX_ENTRY_TICK_COUNT: u32 = 36_000;
 /// The profiles a runner entry may name (`npt-lab scenario --profile`'s), each checked by name before its settings
 /// reach `scenario::record` (advisor-u4r-r1, FP-3: RR3-M1 = SEC-U4R-2).
 const RUNNER_PROFILES: [&str; 6] = ["P0", "P1", "P2", "P3", "P4", "B1"];
@@ -242,9 +247,10 @@ fn name_ok(name: &str) -> bool {
     !name.is_empty() && name.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-')
 }
 
-/// The manifest's entries, in its order. Each entry's name, its `ticks` against its `bytes` and its `bytes` against 64
-/// MiB are checked here, before anything is generated (carry 82), and a runner entry's profile by name, its `ticks`
-/// against its warm-up and measured seconds, and its `span_ms` against the room's (advisor-u4r-r1, FP-3).
+/// The manifest's entries, in its order. Each entry's name, its `ticks` against its `bytes`, its `bytes` against 64
+/// MiB and its `ticks` against 36,000 (advisor-u4r-r2, RR4-L1) are checked here, before anything is generated (carry
+/// 82), and a runner entry's profile by name, its `ticks` against its warm-up and measured seconds, and its `span_ms`
+/// against the room's (advisor-u4r-r1, FP-3).
 pub(crate) fn manifest(text: &str) -> Result<Vec<Entry>, String> {
     let v: Value =
         serde_json::from_str(text).map_err(|e| format!("the manifest is not JSON: {e}"))?;
@@ -327,6 +333,13 @@ pub(crate) fn manifest(text: &str) -> Result<Vec<Entry>, String> {
                 "manifest entry {}: bytes {} is above {MAX_ENTRY_BYTES} (64 MiB, four times today's largest entry): a \
                  larger recording comes to the advisor first",
                 entry.name, entry.bytes
+            ));
+        }
+        if entry.ticks > MAX_ENTRY_TICK_COUNT {
+            return Err(format!(
+                "manifest entry {}: ticks {} is above {MAX_ENTRY_TICK_COUNT} (four times today's largest entry): a \
+                 longer recording comes to the advisor first",
+                entry.name, entry.ticks
             ));
         }
         if let Kind::Runner {
@@ -1545,12 +1558,15 @@ mod tests {
             let e = manifest(&one(bad, 9_000, k)).expect_err(bad);
             assert!(e.contains("is not one or more of"), "{bad:?}: {e}");
         }
-        let at = 799_693 / 12;
+        // At the rule's boundary below RR4-L1's 36,000-tick cap (advisor-u4r-r2): 359,993 bytes hold at most 29,999
+        // ticks; not a multiple of 12, so the rule's rounding down is checked (ADV-PT-L2).
+        let small = |text: String| text.replace("\"bytes\": 799693", "\"bytes\": 359993");
+        let at = 359_993 / 12;
         assert!(
-            manifest(&one("TC-s3", at, k)).is_ok(),
+            manifest(&small(one("TC-s3", at, k))).is_ok(),
             "ticks at bytes / 12"
         );
-        let e = manifest(&one("TC-s3", at + 1, k)).expect_err("ticks above bytes / 12");
+        let e = manifest(&small(one("TC-s3", at + 1, k))).expect_err("ticks above bytes / 12");
         assert!(e.contains("cannot fit"), "{e}");
         assert!(manifest(&one("TC-s3", 9_000, "")).is_err(), "no kind");
         assert!(
@@ -1589,7 +1605,8 @@ mod tests {
 
     /// advisor-u4r-r1, FP-3 (RR3-M1 = SEC-U4R-2, SEC-U4R-3, RR3-L1): before anything is generated, a runner entry's
     /// profile is checked by name, its ticks against (warmup_s + measured_s) x TICK_HZ and its span_ms against the room's,
-    /// and every entry's bytes against 64 MiB; each refusal names the entry and the value. The committed manifests read.
+    /// and every entry's bytes against 64 MiB and (advisor-u4r-r2, RR4-L1) its ticks against 36,000; each refusal names
+    /// the entry and the value. The committed manifests read.
     #[test]
     fn r10_fp3_a_runner_entry_s_profile_ticks_and_span_and_any_entry_s_bytes_are_checked() {
         let text = "{\"recordings\": [{\"name\": \"SS-P2-s1\", \"kind\": \"runner\", \"profile\": \"P2\", \
@@ -1634,6 +1651,18 @@ mod tests {
         assert!(
             manifest(&text.replace("\"bytes\": 999999", "\"bytes\": 67108864")).is_ok(),
             "bytes at 64 MiB"
+        );
+        // advisor-u4r-r2, RR4-L1: 36,001 ticks refused by name, by this rule before the runner's ticks check (999,999 /
+        // 12 = 83,333 ticks fit the bytes); a synthetic entry at 36,000 read (799,693 / 12 = 66,641 fit).
+        let e = refused("\"ticks\": 9000", "\"ticks\": 36001", "ticks 36,001");
+        assert_eq!(
+            e,
+            "manifest entry SS-P2-s1: ticks 36001 is above 36000 (four times today's largest entry): a longer \
+             recording comes to the advisor first"
+        );
+        assert!(
+            manifest(&one("TC-s3", 36_000, "\"kind\": \"synthetic\",")).is_ok(),
+            "a synthetic entry at 36,000 ticks"
         );
         for (name, committed) in [
             ("recordings.json", include_str!("../recordings.json")),
