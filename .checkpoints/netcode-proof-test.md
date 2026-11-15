@@ -17,7 +17,8 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
 **C62H-BOUND WORKFLOW DONE (about 16:15 UTC; wf_dd5ce188-bb6, 3 agents, 978,677 tokens; the advisor and the
 test-engineer both APPROVE WITH CONDITIONS; saved at ca95ca1):** the design and both
 reads saved word for word as JSON by c62h_bound_full.py: c62h-bound-design-full.json, advisor-c62h-bound-full.json,
-c62h-bound-test-full.json (verdicts printed in the save's log). **READ IN FULL about 19:10 UTC** (all three):
+c62h-bound-test-full.json (verdicts printed in the save's log). **READ IN FULL by 19:06 UTC** (all three; the
+first save of this line said "about 19:10", ahead of the clock: slip 10's kind again, corrected at once):
 the advisor APPROVE WITH CONDITIONS C1-C11 (Mediums ADV-C62HB-1 measured scope in the wording, -2 a room tick record
 without hs.server_hash must be a gap, -3 the paste must carry "How this differs from option (a) as you chose it" (i)-(v),
 the still-unbounded list and the ADR 0001 -17 row line; Lows -4 to -9; it rules Q1 (a), Q2 (a), Q3 (a), Q4 (a) now with
@@ -32,15 +33,16 @@ C1, C2, C4, C8 applied word for word; the size; C3's blocks; C9's freeze); then 
 C62H-BOUND-YES. Nothing is built. The design in short (its plain_words): two new -17 checks on
 L1 P2, P3 and B1 (snap_lost_unexplained_count == 0; snap_whole_despite_link_loss_count == 0), a new lab series
 tick.s.snap_link_lost_count from npt-l1's fate log, two judge figures, one new bite (PM-0001-17/link-lost-overstated).
-**CUT-READY (about 16:10 UTC; Mustafa: "we're at 96% usage, make sure to save your progress but also of the
-Agents").** If a cut stops work, resume per SPEND-LIMIT (a), in this order: (1) **C62H-BOUND design, workflow
-wf_dd5ce188-bb6** (task wfjwf2l8d; netcode-architect design → advisor + test-engineer reads): resume with
-`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/npt-c62h-bound-design-wf_dd5ce188-bb6.js", resumeFromRunId: "wf_dd5ce188-bb6"})`;
-its agents' notes (c62h-bound-design.md, then advisor-c62h-bound.md, c62h-bound-test.md) are committed as they
-grow; a restarted agent reads its notes first and continues after the last complete block. (2) **KL-CHANGE:
-posted to Mustafa about 16:08 UTC (kl-change-v2.diff, 102 lines, c80dbbb346459d46…); WAITING for KL-CHANGE-YES**;
-nothing built. (3) Night item 7 is on issue #16 (nothing to resume). (4) The saver bugi27gbf ends about 16:24
-UTC: restart it if stopped. Record the cut notice's exact text and times under "Cuts by the spend limit".
+**CUT-READY (refreshed 19:08 UTC).** If a cut stops work, resume per SPEND-LIMIT (a), in this order: (1) **PR #53's
+review round + the advisor on head a637c7a, workflow wf_a9e04f3e-df7** (task w7kr5itsz; security-auditor notes
+kl-pr-security.md, test-engineer kl-pr-test.md, advisor advisor-kl-pr-head1.md): resume with `Workflow({scriptPath:
+"/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/kl-pr53-review-wf_a9e04f3e-df7.js",
+resumeFromRunId: "wf_a9e04f3e-df7"})`; the worktree .gate/kept-logs-wt must still be at a637c7a with a clean status
+(check first: no reviewer edits there). (2) **C62H-BOUND:** read in full; next the advisor rules the test read and
+gives exact changes, then the paste goes to Mustafa (block "C62H-BOUND WORKFLOW DONE" above). (3) The saver
+bfz6oq1an ends about 19:55 UTC: restart it if stopped. (4) Night item 7 is on issue #16 (nothing to resume).
+Record the cut notice's exact text and times under "Cuts by the spend limit". Earlier (done): the C62H-BOUND design
+workflow wf_dd5ce188-bb6; KL-CHANGE posted at 16:08 and answered at 17:20.
 **Saver:** bc6rnao9l ended on its own time limit at 18:04:35 UTC ("watch stopped: time is up", exit 0; the last save
 52c0276); restarted at 18:04 UTC as **bfz6oq1an** (window to about 19:55 UTC). Before: bugi27gbf stopped by hand at
 about 16:15 UTC (last autosave 2b8acec); bc6rnao9l kept the readers' notes committed through the 16:23 cut. State at 16:14 UTC: the design is done
