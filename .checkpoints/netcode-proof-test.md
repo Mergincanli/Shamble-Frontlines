@@ -67,11 +67,25 @@ CI GREEN, THE ADVISOR'S HEAD REVIEW RUNS; BRAWL-1's PLAN REVIEW RUNS.**
   - **NEXT for BRAWL-1:**
     1. DONE: the builder's brief, brawl1-brief.md (about 23:55 UTC), sections 0-6, carrying the plan and conditions
        1-18. The runner is u4r-run.sh unchanged (6efb9157), with logs under .gate/u4r/brawl1/; notes in brawl1-build.md.
-    2. RUNNING: the advisor's conformance check (condition 17), workflow wf_12d3f66b-ca1 (task wx5pjc4uj), notes
-       advisor-brawl1-brief.md. When it returns, run brawl1_brief_check_full.py (ready) and apply any edits by Edit.
-    3. Then launch the builder copy: general-purpose, opus, xhigh, isolation worktree, building in .gate/shared-target,
-       with `<base>` = the spike branch's head at launch. Its prompt: "Read brawl1-brief.md whole, then start at section
-       1."
+    2. DONE: the conformance check, CONFORMS AFTER EDITS (advisor-brawl1-brief-full.md, 105 lines, sha256 e0cb1a99…;
+       23 edits, E1-E23; 6 new decisions, all "may stay").
+       - E1-E23 were applied word for word by Edit. The brief is now sha256 921c3243…, 261 lines, committed at 926a6cb.
+         No second check is needed, because the diff holds only those edits (56/27).
+       - **My reading of E13:** it replaces "`last` stays" and the unit-test line. It keeps "on a no-log run, filed()
+         resolves only and never grows `res`", which the brief's item 6 needs.
+    3. **RUNNING since 00:00 UTC: the builder, copy 1.** Workflow wf_1d4a86b9-79f (task wv23z8z35): general-purpose,
+       opus, xhigh, isolation worktree, `<base>` 926a6cb. Notes brawl1-build.md; its worktree path goes in the notes.
+       - **If it stops or is cut:** launch a fresh copy WITHOUT isolation, told the existing worktree's path from the
+         notes. It reads the notes and that worktree's diff before it changes anything (as U4r's copy 6). Never launch a
+         new worktree for a later copy.
+       - **When it finishes:**
+         1. write its report word for word;
+         2. save the worktree's diff as wip/brawl1.patch;
+         3. SIZE-CHECK (planned 700; "well past" is more than 1,400);
+         4. the SERIES.md rows by Edit;
+         5. one review round on the final diff: test-engineer, netcode-architect, rust-reviewer and engine-architect, in
+            two batches of at most 3, at xhigh (condition 11);
+         6. the merge step by condition 9's M-list.
     - Agent count while it runs: the builder plus at most 2 others (the cap is 3).
 - **COMPACT-WAIT:** at about 36 % of the chat (23:50 UTC), the card refreshed. I asked Mustafa for /compact and set a
   20-minute reminder. If no /compact comes by then, carry on from this card.
