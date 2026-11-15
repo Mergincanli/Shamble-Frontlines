@@ -42,16 +42,20 @@ cc1b3c74… / 8086ff4d…, readme-sentence 02bd0368…); then the build brief (C
 items, other_changes 6), the lane on this branch before U4f's build. JDG-ONLY-1 is its own change-set (C5). The design in short (its plain_words): two new -17 checks on
 L1 P2, P3 and B1 (snap_lost_unexplained_count == 0; snap_whole_despite_link_loss_count == 0), a new lab series
 tick.s.snap_link_lost_count from npt-l1's fate log, two judge figures, one new bite (PM-0001-17/link-lost-overstated).
-**CUT-READY (refreshed 19:07 UTC).** If a cut stops work, resume per SPEND-LIMIT (a), in this order: (1) **PR #53's
-review round + the advisor on head a637c7a, workflow wf_a9e04f3e-df7** (task w7kr5itsz; security-auditor notes
-kl-pr-security.md, test-engineer kl-pr-test.md, advisor advisor-kl-pr-head1.md): resume with `Workflow({scriptPath:
-"/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/kl-pr53-review-wf_a9e04f3e-df7.js",
-resumeFromRunId: "wf_a9e04f3e-df7"})`; the worktree .gate/kept-logs-wt must still be at a637c7a with a clean status
-(check first: no reviewer edits there). (2) **C62H-BOUND:** read in full; next the advisor rules the test read and
-gives exact changes, then the paste goes to Mustafa (block "C62H-BOUND WORKFLOW DONE" above). (3) The saver
-bfz6oq1an ends about 19:55 UTC: restart it if stopped. (4) Night item 7 is on issue #16 (nothing to resume).
-Record the cut notice's exact text and times under "Cuts by the spend limit". Earlier (done): the C62H-BOUND design
-workflow wf_dd5ce188-bb6; KL-CHANGE posted at 16:08 and answered at 17:20.
+**NOW / CUT-READY (refreshed 20:36 UTC; read this first after a compact or a cut).** PR #53 (KEPT-LOGS) MERGED at
+19:49 (main 53272a1) on his KL-MERGE (a); C62H-BOUND-YES (a) recorded and its texts frozen (c62h-bound-freeze.txt).
+Taking main in hit check.mjs's refs step (the kit files name spikes/): merge aborted; the advisor's REFS-KIT ruling
+(advisor-refs-clash-full.json) fixed it without his word; **REFS-KIT committed and pushed at 914798a**. **Running:**
+the counted check.mjs on that content (task bdc3gq790, main-run.sh, .gate/refs-kit/counted.log; if cut, re-run
+`bash .checkpoints/netcode-proof-test/main-run.sh /home/user/Shamble-Frontlines/.gate/refs-kit/counted.log node check.mjs`
+after checking no cargo runs); the saver btg6vlymf (to about 22:25 UTC). **Next, in order (the ruling's order):**
+(1) the counted run PASS, then the advisor checks head 914798a; (2) the merge commit alone: `git merge --no-ff
+--no-commit origin/main`, `python3 -I .checkpoints/netcode-proof-test/merge_main_53.py --apply`, check.mjs whole (refs
+PASS naming the exception), the gate, commit, push, the advisor checks that head (stop the saver during the merge:
+a checkpoint save would conclude it); (3) the first real list/pack per §11, reporting free space before and after (not
+during a build or run set; the P0 raw logs stay until C62H-BOUND's re-judge); (4) C62H-BOUND's build brief, then its
+build from step 2's head. Tell Mustafa the REFS-KIT ruling's to_mustafa line. Record any cut under "Cuts by the spend
+limit".
 **Saver:** bc6rnao9l ended on its own time limit at 18:04:35 UTC ("watch stopped: time is up", exit 0; the last save
 52c0276); restarted at 18:04 UTC as **bfz6oq1an** (window to about 19:55 UTC). Before: bugi27gbf stopped by hand at
 about 16:15 UTC (last autosave 2b8acec); bc6rnao9l kept the readers' notes committed through the 16:23 cut. State at 16:14 UTC: the design is done
