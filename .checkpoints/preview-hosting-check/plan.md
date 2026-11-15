@@ -30,12 +30,13 @@ base main 4460ef5. Line numbers are main's at 4460ef5. Written 2026-11-15 by the
 - **What you do:**
   - about 40 minutes of setup: a repository, a Cloudflare project, one token with a 10-day end date, two GitHub
     environments (Part 3 A);
-  - then four short sittings over two days: about 22 approvals, two merges, the Brave checklist, switching the wall
-    on, and revoking the token at the end.
+  - then four short sittings over two days, plus the setup pull request: about 24 approvals, three merges, the Brave
+    checklist, switching the wall on, and revoking the token at the end.
 - **Security in one line:** the token lives only in the test repository's `preview` environment, behind your approval.
-  It can do anything Pages can do in your account, and nothing outside Pages. Because sessions act as your GitHub
-  login, the approval holds against a session only as far as the sessions' tools and credential cannot approve. This
-  session's tools cannot; the credential is your read, SR-READ (Part 4).
+  It can do anything Pages can do in your account. As far as Cloudflare's permission list shows, it can do nothing
+  outside Pages; two questions about its reach stay open (Part 4). Because sessions act as your GitHub login, the
+  approval holds against a session only as far as the sessions' tools and credential cannot approve. This session's
+  tools cannot; the credential is your read, SR-READ (Part 4).
 - **Calendar:** each close is watched for 24 hours. The earliest end is the day after the runs, so about two days after
   your go: for example, go on Monday the 16th, end on Wednesday the 18th (Part 5).
 - **Laptop and Mac:** 7 marks name the laptop and 2 the Mac, but none is a timing. I recommend GitHub's own machines
@@ -314,11 +315,22 @@ review-deployments page). In the test repository:
 5. Tell me "setup done". Send neither the token nor the account ID.
 
 ### B. After the build, before any run
+I build on a branch `setup` of the test repository and push it **without opening a pull request**. No workflow listens
+to a plain push (deploy and close listen to pull requests, probe to the schedule on `main`, browsers to a start by hand),
+so nothing runs while the reviews read the branch. A pull request would run the workflows of its own merge commit at
+once. If `preview` did not exist yet, GitHub would even create it unprotected ("Running a workflow that references an
+environment that does not exist will create an environment with the referenced name": manage-environments page).
 1. If a review changes a workflow's text, I show you the exact change for a new yes (Part 7).
-2. The setup pull request in the test repository ("Setup: the test site and the throwaway workflows"): look over its
-   files, then "Merge pull request", then "Confirm merge". I cannot merge there: this repository's guard refuses a
-   session's merge without green `gate` and `smoke` checks, which the test repository does not have, and the deny list
-   refuses every push to a `main`.
+2. **Only after your "setup done" (A7) and your yes,** I open the setup pull request ("Setup: the test site and the
+   throwaway workflows"). Its first run waits on `preview`: **approve it.** It is the first deploy from end to end, on
+   the branch `setup`: it shows that the token, the upload, the verify job and the link on the pull request page
+   work before anything is measured.
+3. Look over its files, then "Merge pull request", then "Confirm merge". I cannot merge there: this repository's guard
+   refuses a session's merge without green `gate` and `smoke` checks, which the test repository does not have, and the
+   deny list refuses every push to a `main`.
+4. The merge starts the cleanup run for `setup`: **approve it.** It is a free rehearsal of what cases (b) and (b')
+   rely on. I record whether a merged pull request's cleanup run starts at all, and which branch it names: a security
+   note says a merged pull request's event may carry less data, and if so the case's cleanup would be skipped silently.
 
 ### C. Day 1: the runs (three sittings, about 1 h 20 min)
 **Approving** (review-deployments page): the test repository, then Actions, then the run marked "Waiting", then "Review
@@ -397,10 +409,11 @@ and infra-engineer's (`infra-engineer-docs.md`, C1-C9); the quotes are theirs, f
   10 days out. Cloudflare recommends account-owned tokens for CI.
 - **Where it lives:** in one place only, the secret box of the test repository's `preview` environment. You move it
   there from Cloudflare's screen (A5-A6), which shows it once. It never passes through this chat, a file or a note.
-- **Who can read it:** no person can read it back. A workflow job receives it only if the job names `preview`, and
-  only after you approve that job: "a job cannot access environment secrets until one of the required reviewers
-  approves it". It then lives in that one step's environment. GitHub hides the exact value if it is printed, but "this
-  redaction is not guaranteed" for transformed values, so no script ever prints it or anything made from it.
+- **Who can read it:** a workflow job receives it only if the job names `preview`, and only after you approve that job:
+  "a job cannot access environment secrets until one of the required reviewers approves it". It then lives in that one
+  step's environment. GitHub hides the exact value if it is printed, but "this redaction is not guaranteed" for
+  transformed values, so no script ever prints it or anything made from it. Whether GitHub's screens ever show a stored
+  secret again is not stated on the pages read ("not found" in the security notes).
 - **What it can do:** everything Pages allows in your account:
   - create, change and delete Pages projects and their uploads;
   - add custom domains;
@@ -411,9 +424,14 @@ and infra-engineer's (`infra-engineer-docs.md`, C1-C9); the quotes are theirs, f
   Every Pages call takes this one permission, and no narrower one for a single project was found.
 - **What it cannot do:** DNS records and Workers scripts need other permissions, so the token holds neither
   (security-auditor's reading of Cloudflare's permission list).
-- **Open:** whether it can bind other data of your account (KV, R2, D1, Workers) into a Pages project. **If your
-  account holds any Pages project, Worker, KV, R2 or D1 data besides the test project, tell me before you make the
-  token.**
+- **Open (not found either way):**
+  - whether it can bind other data of your account (KV, R2, D1, Workers) into a Pages project;
+  - whether a custom domain it adds on your own zone starts serving without a DNS permission. Cloudflare's dashboard
+    steps say the record "will be added automatically" for a zone in the same account; for a call made with a
+    Pages-only token, no page says.
+
+  **If your account holds any Pages project, Worker, KV, R2 or D1 data besides the test project, tell me before you
+  make the token.**
 - **When it dies:** at its end date at the latest. You delete it when the check ends (D5), and a last deploy must
   then fail, as proof (D6).
 
@@ -470,10 +488,15 @@ and infra-engineer's (`infra-engineer-docs.md`, C1-C9); the quotes are theirs, f
 **Day 0: your go, and the build**
 - You answer the decisions, give your go on this plan and your yes to Part 7's texts, then do the setup (Part 3 A,
   about 40 minutes) when it suits you.
-- I build the test repository's content (U1 to U3) on its `setup` branch. Then the review round (U4): infra-engineer,
-  security-auditor and test-engineer at once, then the fixes (any change to a workflow's text comes back to you as a
-  diff), then the advisor agent's review of the built content. About a day of session work.
-- You merge the setup pull request (Part 3 B). The workflows exist from then on.
+- I build the test repository's content (U1 to U3) on its `setup` branch, pushed without a pull request, so nothing
+  runs. Then:
+  - the review round (U4): infra-engineer, security-auditor and test-engineer at once;
+  - the fixes (any change to a workflow's text comes back to you as a diff);
+  - the advisor agent's review of the built content.
+
+  About a day of session work.
+- After your "setup done", I open the setup pull request: you approve its deploy, merge it, and approve its cleanup
+  (Part 3 B). The schedule and the by-hand runs exist on `main` from then on.
 
 **Day 1: the runs** (three sittings, about 1 h 20 min, best within one afternoon; Part 3 C). The closes happen in
 sitting 2: **the 24-hour clocks start there.**
@@ -497,14 +520,15 @@ deploy, which can start only after your go on its plan on Tuesday 2026-11-17 (yo
 
 | When | Approvals | Rejections |
 |---|---|---|
+| The setup pull request (Part 3 B) | 2 (its deploy, its merge's cleanup) | |
 | Sitting 1 | 5 runs (`round-a`, `uploads`, `bites`, `bite-production`, `restore-production`) | |
 | Sitting 2 | 14 (10 deploys of the test pull requests, 4 cleanups) | |
 | Sitting 3 | 1 | |
 | Day 2 | 2 ((c)'s cleanup, `revoked`) | 2 |
-| **All** | **22** | **2** |
+| **All** | **24** | **2** |
 
 That holds if one approval releases every job of a run waiting on `preview` at once. No GitHub page says so (G2:
-"not found"); if each job needs its own, `round-a` and `bites` take 3 each, 26 in all. The count is recorded either
+"not found"); if each job needs its own, `round-a` and `bites` take 3 each, 28 in all. The count is recorded either
 way. Under REVIEWER (b): about 2.
 
 **Your time in all:** about 40 minutes of setup, plus about 3 hours over Days 1 and 2, waits included.
@@ -1019,21 +1043,32 @@ The pull request (d), `cs/pd-off`, deletes `.github/workflows/close.yml` on its 
 1. **Plan:** this plan, then the advisor agent's review of it (no review rounds and no verifier on the plan, by your
    words).
 2. **Your go,** your yes to Part 7's texts, and the asks of "For Mustafa".
-3. **Build U1 to U3** in the test repository, on its branch `setup`. In this repository a draft pull request opens
-   from my branch, holding the checkpoint, so STATUS can list the work.
-4. **One review round** on the built content: infra-engineer (CI and hosting), security-auditor (the token and CI) and
-   test-engineer (are the marks proven, do the bites bite), at once. They run at their files' effort, high: your words
-   ask for max for the agents that review, verify or design game and engine code, and this is neither. Say if you want
-   max anyway.
+3. **Build U1 to U3** in the test repository, on its branch `setup`, pushed without a pull request, so no workflow
+   runs. In this repository a draft pull request opens from my branch, holding the checkpoint, so STATUS can list the
+   work.
+4. **One review round** on the built content, read from the branch: infra-engineer (CI and hosting), security-auditor
+   (the token and CI) and test-engineer (are the marks proven, do the bites bite), at once. They run at their files'
+   effort, high: your words ask for max for the agents that review, verify or design game and engine code, and this is
+   neither. Say if you want max anyway.
 5. **Fixes;** a workflow text that changes comes back to you.
 6. **The advisor agent's review** of the built head.
-7. **Your merge** of the setup pull request.
+7. **After your "setup done":** the setup pull request opened; you approve its deploy, merge it, and approve its
+   cleanup (Part 3 B).
 8. **The runs** (U5).
 9. **The verifier** on the evidence. Research and infrastructure claims cite their sources, and the verifier
    spot-checks the key ones.
 10. **The report** (`/advisor-report`, U6), then docs-keeper: STATUS, ROADMAP, and a dated pointer in SPIKE_PLAN entry 6.
-11. **This repository's pull request** marked ready, the advisor agent's review of its head, and your go (risk tier 1:
-    it records your words and your checklist verdicts).
+11. **This repository's pull request** marked ready, the advisor agent's review of its head, and your go.
+
+**Risk tier, for the advisor agent to rule:**
+- The check itself handles a secret and sets up infrastructure: a deploy token, two environments, a Pages project.
+  CLAUDE.md's table puts secrets and infrastructure in risk tier 2: the advisor agent and security-auditor review, and
+  you give the go. Both review the built content before you merge the setup pull request (steps 4 and 6), and nothing
+  runs before your merge.
+- The closing pull request in this repository changes docs only: the report, STATUS, ROADMAP, a SPIKE_PLAN pointer. It
+  records your words and checklist verdicts, so it is at least risk tier 1, with your go.
+- Whether the check's tier 2 carries over to that pull request ("A PR takes the highest tier any changed file or
+  effect reaches") is for the advisor agent to rule.
 
 **What the closing docs change-set carries:**
 - the report, with the results log in its appendix;
@@ -1095,6 +1130,11 @@ the preview token.
     not bite, and the case is redone with the workflow switched off in the Actions tab (your click).
 11. **The access policy has no documented off switch:** deleting the project ends it, and E2 removes the Access
     application.
+12. **A merged pull request's cleanup run might be skipped.** A security note quotes GitHub saying the event's data "is
+    empty for merged pull requests", while GitHub's own advice for merged pull requests reads that very data. If it is
+    empty, `close.yml`'s first check fails quietly and (b) and (b') keep their uploads. The setup pull request's merge
+    tests this first (Part 3 B, step 4). If it fails there, the fix comes back to you as a diff before (b) and (b')
+    are opened.
 
 ## Decisions needed (your item 8)
 1. **TR-WHERE: where does the check live?**
@@ -1128,8 +1168,8 @@ the preview token.
    - Why it matters: part 13's interim position (b) puts a reviewer on `preview`. That is "the infra draft as
      proposed", and it costs your clicks.
    - Options:
-     - (a) The reviewer on from the first deploy: about 22 approvals in four sittings, and the check measures what a
-       reviewer costs per pull request, an input for OQ-0006-13.
+     - (a) The reviewer on from the first deploy: about 24 approvals, over the setup pull request and four sittings,
+       and the check measures what a reviewer costs per pull request, an input for OQ-0006-13.
      - (b) The reviewer on only for sitting 3: about 2 approvals; deploys run unattended; no cost measured; the draft's
        interim position not exercised.
    - Recommendation: (a).

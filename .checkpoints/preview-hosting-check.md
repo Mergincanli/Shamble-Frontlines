@@ -53,6 +53,11 @@
   git from the folder, without -C, -c or --git-dir)"). Route taken: `cd` into each scratch folder under
   `.gate/preview-hosting-check/tags/` and ran git there (a shallow fetch of two tags to read their dates; nothing run).
 
+- Process slip (his words of 2026-11-15: consult the advisor tool "always before you save a step as done and never
+  after"): steps 5-7 were saved as done in the save of 16:16:22 UTC (0290625) and step 8 in the save of 16:21:42 UTC
+  (d8451dc), with no consultation before them; consultation 2 followed at 16:22:00 UTC. From here on, each step is
+  saved as done only after its consultation. To be told to him once, in the closing message.
+
 ## Facts for the plan (read by the session)
 - Action pins: actions/checkout v7.0.1 3d3c42e5aac5ba805825da76410c181273ba90b1 and actions/setup-node v7.0.0
   820762786026740c76f36085b0efc47a31fe5020 (as gate.yml pins them); actions/upload-artifact v7.0.2
@@ -86,6 +91,13 @@
    close-time vs close-job time both recorded; the 24 h reading not on cron alone; asks listed (push to named branches
    there, his merges and branch deletion, the token straight from Cloudflare into GitHub's secret box); the saver
    before agents; no action toward the test repository this turn.
+2. 2026-11-15 16:22:00 UTC (called; transcript time), moment 5 for plan revision 1 (late: see Open findings) · Q: is
+   revision 1 ready for the advisor agent? · Changed: the `setup` branch is pushed without a pull request and opened
+   only after "setup done" and his yes, so no workflow starts before `preview` is protected; the setup pull request's
+   deploy and its merge's cleanup become two named runs (a pre-flight of the merged-close path), added to the count;
+   Part 4's two over-claims hedged (reading a secret back; a custom domain on his zone) and the summary's "nothing
+   outside Pages"; the check's own risk tier stated for the advisor agent to rule; the agent's brief gives questions,
+   not conclusions; the saver checked first.
 
 ## Running work
 - saver: background task bc4g68il4 · output /tmp/claude-0/-home-user-Shamble-Frontlines/a7e7f150-3195-52bd-a549-73b27426198b/tasks/bc4g68il4.output ·
