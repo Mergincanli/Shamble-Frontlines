@@ -56,6 +56,12 @@
 ## Current step
 12. Waiting for him: the test repository ("repository ready") and SR-READ's answer, both from the setup (plan Part 3 A1
    to A3). Nothing is built before SR-READ is answered (his thing 1).
+   - At his request ("Clone the repository Mergincanli/shamble-preview-check into this session"), the session attached
+     it with add_repo (push access, as plan A3 step 4 says) and cloned it shallowly to /home/user/shamble-preview-check
+     (outside this repository's folder), about 18:50 UTC. The repository is empty: no commit, no branch (`git ls-remote`
+     lists nothing; the clone says "No commits yet"). Plan A1's "Add a README file" was not ticked, so there is no
+     `main` for pull requests; the deny list forbids the session to push any `main`, so he adds the README on GitHub.
+     register_repo_root waits for the first commit (its condition: `rev-parse HEAD` succeeds).
 
 ## Next steps
 1. On "repository ready": attach the repository (add_repo, push access), confirm I can see it; read his SR-READ answer.
