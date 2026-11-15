@@ -665,3 +665,140 @@ _Copied by brawl1_carry_lines.py, word for word, from advisor-brawl1-sets-p3-ful
 _Copied by brawl1_carry_lines.py, word for word, from advisor-brawl1-sets-p0-full.md line 135 (sha256 4b16dab5...)._
 
 "tick16's run is valid and the bite shown, failing both -17 checks. Its measured incomplete is 720: 48 clients times the 15 measured ticks from the wrap (65,536) to the window's end (65,550). Every client has at least one overflow resync, all in the after phase, none in the measured window, and no kick. The count and the ticks are not fixed: the run ends only when every client's last measured ticks resolve, and while one client's queue fills slowly, the others can resync again, each after its forced full state was acknowledged."
+
+_tick16's "shown" now rests on BRAWL-1's 10-minute P0 bite run (12,151 mismatches; the new check 720), not on r2's
+30 s record (advisor-brawl1-sets-p0-full.md, The tick16 bite, "Why it still counts as shown"). The U4r P0 record's
+line on this, in "The judged runs" above, now says so too._
+
+### The corrections
+
+- **ADV-BP-1 and ADV-BP-2**, the advisor's, recorded under condition 18 (advisor-brawl1-plan-full.md, Conditions, item
+  18): "ADV-BP-1: N2-1's 'all four checks fail' was wrong; under the leave plant two fail (Q5). ADV-BP-2: my sets-r2
+  figure of 'about 4.2 GiB free after the refill' mixed units."
+- **ADV-BP-3**, the advisor's (advisor-brawl1-points-full.md, Point 2, "The change"): "Condition 6 (ii)'s identical-diff
+  test could not hold at <base>, because the wallclock bite's L1 hash varies with wall-clock ns (pump.rs:236-243); and
+  'comes to me whole' did not say stop."
+  - Its masking rule (the same Point 2, "Ruling"): "Future captures of these tests mask exactly the L1 leg's hash values
+    in the wallclock bite's comparer and result lines ('theirs ... hash' and the L1 hex). They keep the index, the
+    loopback hash, compared and mismatching, and they explain libtest's 'filtered out' count by the binary's test count.
+    Nothing else is masked."
+- **ADV-BP-4**, the advisor's (advisor-brawl1-points-full.md, Point 1, "The change"): "RR4-L1's ruled name
+  MAX_ENTRY_TICKS falls under check.mjs's TICK_NAMED rule and is refused as a literal; I did not check it; the name is
+  MAX_ENTRY_TICK_COUNT."
+- **ADV-PT-M1's home** (Medium, the points ruling; advisor-brawl1-r1-full.md, ADV-PT-M1, "recorded"):
+  - The home is U4g's brief, through u4g-brief-carry.md (sha256 c3abeccb…). That file holds the round-1 ruling's U4g
+    words word for word (advisor-brawl1-r1-full.md:279-288), merged with NA-B1-2 (c) and TE-B1-5's kinematic bound.
+  - In short: B1's 1,832 cm is the leash's reach, not a stop, and it passes the 1,800 cm door entry. U4g's plan says how
+    a B1 building entry reads in -17, or measures how often it happens, before its judged B1 runs.
+  - This report's BRAWL-1 entry under Follow-ups points there.
+- **ADV-R1-1 and ADV-R1-2**, the advisor's, in its words (advisor-brawl1-r2-full.md, The report words; also quoted in
+  the round-2 subsection above):
+  - ADV-R1-1: 'Two lines in FP-3 could not run as I wrote them: `--logs 0` without `--record` cannot parse, and
+    `Some(&dir)` would not compile; copy 2's repairs are right.'
+  - ADV-R1-2: 'Step 1 named the brief's section 4 for the rules; they are in sections 1, 2 and 5.'
+- **ADV-M6-L1 to -L3** (Low, record-keeping; advisor-brawl1-m6-full.md, Findings). Each is done in this section:
+  - ADV-M6-L1: the card gave M2 as 08:38-08:40, but the logs give (B) at 08:37:41-08:37:47 and (C) at 08:38:04-08:38:09,
+    before M3 started at 08:38:44. M2's pgrep and df readings exist only on the card. Done: the merge record above.
+    From M7 on, every df reading is in a log (M7-2).
+  - ADV-M6-L2: m3.log ends with no free-space figure. Done: the post-M3 figures in M3 above, labelled "after M3 and M4,
+    not at M3's end".
+  - ADV-M6-L3: this section lacked a pointer to round 1's record. Done: the first item of "Round 1 and its ruling".
+- **ADV-P3-1 and -2, and ADV-P0-1 to -3**, in the P0 ruling's report words (advisor-brawl1-sets-p0-full.md, "The report
+  words", "Advisor corrections", lines 260-264):
+
+- ADV-P3-1 (Medium): the P3 flags were not raised.
+- ADV-P3-2 (Low, the advisor's): M7-3's wording.
+- ADV-P0-1 (Low, the advisor's): TICK16-WORDING's 'one per client' and the computed 'wrap + 54-60'.
+- ADV-P0-2 (Medium): P2's -57 p99 was left out of the card's record, so its '0.0 %' was wrong.
+- ADV-P0-3 (Low): no redact-check log was kept for the P3 and P2 commits. The advisor's own read-only run on all three folders found 0.
+
+  What each means and how it was closed:
+  - **ADV-P3-1** (advisor-brawl1-sets-p3-full.md, Summary, Findings):
+    - Carry 58's flags on P3's s1 and s3 were not raised to the advisor.
+    - The card's evidence record left out the P3 evidence run's resyncs and its incomplete count.
+    - No effect: nothing counted, and the set stopped for the ruling anyway.
+    - Closed: both figures are in the evidence subsection above.
+    - The lesson: check every runs.txt flag and every summary-line figure against U4r's same-seed line, not only the
+      verdict lines.
+  - **The same ruling's unnamed Low:** P3's pre-launch readings (pgrep, porcelain, df) exist only on the card. From P2
+    on, they are command output in pre-P2.log and pre-P0.log.
+  - **ADV-P3-2:** M7-3, as first written, could not hold, for two reasons:
+    - set logs carry no diff/untracked header;
+    - committing each set's results changes the spike tree.
+    - Closed: M7-3 is amended, (a) to (d) (advisor-brawl1-sets-p3-full.md, The M7-3 conflict). P2 and P0 met the
+      amended form (pre-P2.log, pre-P0.log).
+  - **ADV-P0-1:**
+    - "One overflow resync per client" holds only when every client's queue fills on the same tick.
+    - The computed "wrap + 54-60" used the measured event rate, which falls after the wrap. The first resync came at
+      wrap + 75.
+    - No effect.
+    - Closed: the corrected TICK16-WORDING (above). It replaces the old line in this report's U4r corrections
+      (advisor-brawl1-sets-p0-full.md, The tick16 bite).
+  - **ADV-P0-2:**
+    - P2's -57 position p99 went from 5,257 / 5,280 / 5,283 to 5,111 on all three runs (results/u4r/ab10f058a828/P2/
+      and results/u4r/fc411116c1f1/P2/, verdict.json, "positions: error p99").
+    - So the largest change at P2 is s3's position p99, -3.26 %, not 0.0 %.
+    - No verdict is affected. The re-run sets above carry the corrected figure.
+  - **ADV-P0-3:** the redact-check log is now kept: .gate/u4r-sets/redact-BRAWL1-sets.log, 7 items, 0 findings.
+
+### Follow-ups, each with its home (none triggers a push)
+
+- **TE-B1-R2-1 with RR2-B1-1** (Low, test and doc only; advisor-brawl1-r2-full.md:40-53):
+  - The change: the unit test's dead input moves from (1450, 0) to (0, 0) at bots lib.rs:404, and toward_centre's doc
+    reads "x² + y² is at most 2^31" (bots lib.rs:132).
+  - The home: the next lane that edits npt-bots' lib.rs, U6's bots'-view item at the latest, beside TE-B1-8's glue
+    test.
+- **TE-B1-R2-2** (Low; advisor-brawl1-r2-full.md:45-48):
+  - The change: the runners' "untracked" field becomes `untracked $(git ls-files -z --others --exclude-standard -- . |
+    xargs -0 -r sha256sum | sha256sum | cut -d' ' -f1)` at u4r-run.sh:67 and main-run.sh:42. Each gets a .diff and a
+    silent `bash -n` (INF2-4's form).
+  - The home: a main-session runner edit outside the change set, after BRAWL-1's last re-run set and before U4g's first
+    run.
+  - P0 was the last set, so it is now due (advisor-brawl1-sets-p0-full.md, The commit and the close, "Then, outside
+    BRAWL-1").
+  - Until then, every BRAWL-1 log's "untracked" value is the porcelain status list's hash.
+- **ADV-PT-L3** (Low; advisor-brawl1-points-full.md:87-91):
+  - The change: TICK_NAMED becomes /_TICKS$|_TICK_COUNT$|CATCHUP/, NOT_TICK_COUNTS gains MAX_ENTRY_TICK_COUNT with its
+    reason, and check.test.mjs gains one case.
+  - The home: the check.mjs follow-up (check.mjs's next change; before PR #40 is marked ready at the latest).
+- **EVQ-LOAD, for U4f and U4g** (the carry line above; advisor-brawl1-sets-p3-full.md, The next sets;
+  advisor-brawl1-sets-p0-full.md, The commit and the close):
+  - The home is U4f's and U4g's briefs.
+  - U4f's cap measurement (plan §4.7) uses the full-view rate.
+  - U4g's plan reads carry 58's per-burst high-water marks from a short B1 run, before -18's judged B1 runs count.
+  - U4g's brief also carries u4g-brief-carry.md (ADV-PT-M1, above).
+- **From round 1** (advisor-brawl1-r1-full.md, FP-9 item 6 and "Each finding"):
+  - RR-B1-7 (1), the room_tick loop rewrite: the next lane that edits logs.rs's room_tick (:402-405).
+  - EA-B1-1's later half, with NA-B1-3's npt-client half: npt-sim exposes the flags index and the dead bit as pub
+    items. The home: the next lane that opens crates/sim (beside EA-U4R-4), U6 at the latest (:372-375, :407-410).
+  - TE-B1-8's optional glue test: U6's bots'-view item, EA-U4R-5's home (:357-360).
+- **-17 L1 B1** stays with U4g's judged B1 runs (advisor-brawl1-sets-p0-full.md, The commit and the close, 2).
+- **KEPT-LOGS** is under Decisions needed, below.
+
+### Decisions needed
+
+_The advisor's words, copied from advisor-brawl1-sets-p0-full.md, "For Mustafa", lines 278-284. "Your" is Mustafa,
+and "my recommendation" is the advisor's._
+
+- **KEPT-LOGS** (your open question, unchanged; new numbers, and now in the next unit's way): should a narrow kit rule let a session clear out old test-run logs once their results are saved and their rulings closed?
+  - Why it matters now: kept raw run logs take about 11.4 GiB (U2 1.9, U4r 5.3, the bot fix's re-runs 4.2), plus 0.6 GiB of evidence runs. Free space is 7.5 GiB against the 4 GiB safety floor, and the next unit's (U4g's) build cache refills about 8-9 GiB. Its build cannot start until space is freed.
+  - Options:
+    - (a) Keep everything. U4g cannot build.
+    - (b) Delete each closed run set's raw-log folder. This frees up to about 11.4 GiB. Those runs could never be re-judged; their verdicts stay saved.
+    - (c) The same, but first pack each set into one compressed file, checked readable. Computed with the draft's measured ratio of about 3.5 to 1, this frees about 8 GiB and keeps about 3.3 GiB, and a re-judge stays possible.
+  - My recommendation: (c), with the same rule naming the old 4 GB build cache, as in the draft. It comes as its own reviewed kit pull request (advisor plus security review) and merges only on your go. Nothing is deleted before then.
+
+### For Mustafa
+
+_In plain words, the advisor's, copied from advisor-brawl1-sets-p0-full.md, "For Mustafa", lines 271-275:_
+
+- The bot fix has now passed all three re-run sets. Every bot stayed in view in every run, none walked into a building while the measurements ran, and the main snapshot check passes at every network level with zero errors.
+- Every planted fault was caught, including the one that tests the tick counter wrapping round. Its 10-minute run now counts.
+- That test sent more "resend the full game state" messages than I had predicted. I traced the cause in the logs: once the planted fault breaks the bots' commands, a few bots walk into buildings after the measurements end. While the run waits for one of them, the others are resent the state a second time. Nothing broke: no client was dropped, and no snapshot inside the measured part went wrong. I corrected my own wording of what that test should show.
+- I also corrected one figure in the record of the second set. One of the position-accuracy figures, the 99th-percentile error, improved by up to 3.3 %; the record had said nothing changed. It decides nothing.
+- What remains is paperwork: committing the last results and finishing the write-up. Nothing to check in a browser and nothing to merge.
+
+1. Answer KEPT-LOGS (a, b or c) before U4g's build needs the disk. The bot fix's remaining steps do not wait for it.
+
+_The numbered item is the advisor's (the same file, line 287). Nothing here needs a Brave check: this is spike code on
+the test branch, nothing a player sees, hears or feels changes, and nothing merges to main._
