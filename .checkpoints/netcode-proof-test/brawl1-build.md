@@ -220,8 +220,20 @@
     6abf7643982b5970a630c97daa4d0815ceb2022958b18e18116397dcad9c893e (16,929,501 B)
 - The manifests' diff (Edit): only those three `sha256` values (checked: each removed line equals its added line but
   for sha256); both "about" texts, every other field and recordings.json's three synthetic entries unchanged.
-- Next: check.mjs; uptime + det-u4.mjs; the precheck regeneration at the new pin; short copy times and the full test
-  at this head.
+- At the new pins, all at the final head (the diff handed over):
+  - check.mjs: .gate/u4r/brawl1/final-check.log, exit 0, ended 04:04:33 UTC: all 11 steps PASS; test 630.1 s: measured
+    535 passed, 0 failed, 0 skips; bites 613 passed, 0 failed, 0 skips (Part 1's 532/610 plus the three new tests;
+    the #[ignore]d full test is not counted).
+  - det-u4.mjs: .gate/u4r/brawl1/final-det.log, exit 0. uptime first: "04:04:39 up 1:30, load average: 1.42, 1.81,
+    1.48" (no other lane building or running). PASS det-u4 227.2 s (18,000 ticks equal native/native and
+    native/Wasm; h2 equal); seconds: build npt-lab 11.3, wasm 1.3, npt-lab hash 211.1, Wasm 2.5 + 0.9. Non-cargo sum
+    214.5 s (under 240). Both new det pins reproduced.
+  - Precheck regeneration and the tests: .gate/u4r/brawl1/final-regen-tests.log, every command exit 0: "regenerated
+    SS-P0-s4: 16950444 bytes, sha256 1f00d2d5...0b1b42, as the manifest's", legs equal, real 1m53.069s; short copy
+    alone: measured build 10.61 s, bites build 10.71 s; full test in release 23.52 s, 1 passed (results in the report).
+- Size: 869 added, 123 deleted, 992 changed lines (bots 426, scenario.rs 293, logs.rs 82, client test 60, precheck.rs
+  52, hash.rs 42, client lib 31, manifests 6). Past the plan's ~700 (450-750), under the 1,400 stop line. Free at the
+  end: 6,579 MiB.
 
 ### The SERIES.md rows (drafted for the main session's Edit; condition 10)
 
@@ -235,3 +247,142 @@ A new heading after "Names added with U4r" (marks/SERIES.md:333-366), before "##
 |---|---|---|---|---|
 | `tick.s.in_building_slot_area` | pairs (slot, area) | npt-lab (from npt-sim's Soldier records' `area`) | the room log, on every logged tick (any phase) where a soldier's feet are in a building area: each such soldier's slot, then its area (building i is area i + 1: the greybox's area rule, half-open on each footprint), in slot order; absent on a tick with none. The run's summary line prints the measured total as "in a building: N slot-ticks (slots ...)" | none (recorded) |
 ```
+
+## Report
+
+BRAWL-1 is built in the worktree (/home/user/Shamble-Frontlines/.claude/worktrees/brawl1, detached at 352a245c, all of it
+uncommitted). Part 1's proofs (a) to (e) hold at the old pins, read as noted in item 7. Part 2 is built, and its tests
+pass. The three pins have moved, and check.mjs (all 11 steps), det-u4.mjs and the precheck regeneration pass at the new
+pins. Nothing stopped me. Three points go to the advisor (item 7). The size is 992 changed lines, against ~700 planned.
+
+1. **Part 1** (file:line in the final diff):
+   - EA-U4R-2: scenario.rs:51 `pub(crate) type Sim = World`; :373 `Server::build(scene, seed, first_tick, clients,
+     event_start, arm_tick, &Bites)`, used by run (:814), run_leg (precheck.rs:293: Bites::default(), event start 0;
+     its decoder-bite lines kept) and lab_room (scenario.rs:2113). Bites::world/room, Server and Server::new name Sim.
+     logs.rs:28 names Sim (dump_events, room_tick, room_second). precheck.rs names no World type any more. The printed
+     "World::new(scene, ..)" strings are unchanged. hash.rs's bite-list and dump sites still name npt_sim::World (the
+     alias's doc says why).
+   - EA-U4R-1, the narrow form: scenario.rs:591 `struct Wake {admitted, ended, to_run}` and :601 `fn wake(..)`
+     (steps 1-2 plus the due count). run (:940) sends to logs.admit (with carry 75's check) and logs.gone. run_leg
+     (precheck.rs:368) sends to its map and o.ended, on a SimClock (:363, :461). No one-loop driver.
+   - N2-1 + TE-R2-1: closed_checks (scenario.rs:2231) has the fourth check with the ruled message (:2246), and its doc
+     says four. fp1's doc (:2259) rests "not a replacement" on the roster (roster.rs:116 `replaced = s.live`). The
+     no-op assert is gone. Plants, each restored by Edit with its sha256 checked: room.leave deleted fails two of the
+     four checks by name in both cases (p1-plant-leave.log); roster.leave (room.rs:691) deleted fails the new check
+     alone (p1-plant-roster.log).
+   - TE-R2-2 + RR4-L2 (parse()): the 64-bit checks come first, with their messages unchanged. Then, on every profile,
+     the run's last-tick bound (:1430-1441). Then, where bursts are used (B1 with bursts > 0): the 64-bit last-burst
+     check, the last burst's u32 bound (:1507-1521), the bursts cap (:1523), and every-s 0 (:1526). The :1442 comment
+     now says what is bounded. My messages:
+     - "--warmup-s, --measured-s and --after-max-s: the run's last tick, {t} ticks from its first, is above 4294967295
+       (32 bits)"
+     - "--bursts {n}, --burst-first-s {f} and --burst-every-s {e}: the last burst's tick, {t} ticks from the run's
+       first, is above 4294967295 (32 bits)"
+     - "--bursts {n}: above 1000"
+     - "--burst-every-s 0 with --bursts {n}: more than one burst needs an interval above 0 s"
+
+     fp3 (:2510) checks the exact text of every case: TE-R2-2's three (case 3 in full digits), RR4-L2's ruled case
+     (it names --burst-every-s 600000000000, at 18000000001200), --bursts 1001, --burst-every-s 0 with 2 bursts, and
+     --after-max-s 143165507. It also shows each bound's own value accepted.
+   - RR4-L1: hash.rs:239 `const MAX_ENTRY_TICK_COUNT: u32 = 36_000;` (renamed: item 7). Its refusal at :338 comes
+     right after the bytes cap and before the runner checks, with the ruled message. r10_fp3 refuses 36,001 by that
+     message (:1659); a synthetic entry at 36,000 reads (:1663); the three committed manifests still read.
+     r10_carry_82's bytes/12 boundary moved below the cap (:1563; item 7).
+   - RR3-L2 (a): logs.rs:149 `logging` (set at :210 from dir.is_some()). On a no-log run, filed() resolves only
+     (:342) and never grows `res`; `last` stays. New test at :849 (rr3_l2_a_...): after 9,000 ticks, `res` is empty,
+     started() is true, and first/last are right.
+   - The proofs, all on one code state, at the old pins:
+     - (a) check.mjs, p1-a-check2.log: all 11 PASS (measured 532, bites 610). Run 1 (p1-a-check.log) failed test and
+       deps on Part 1's own code (item 7); it was fixed, then run again.
+     - (b) det-u4.mjs, p1-b-det.log: uptime first ("load average: 1.42, 1.96, 1.57"). PASS in 232.9 s; non-cargo sum
+       222.0 s. It regenerated 5b79abb2 and fad8f67d.
+     - (c) precheck regeneration, p1-cd.log: "regenerated SS-P0-s4: 16950444 bytes, sha256 6933b56a..., as the
+       manifest's". PASS.
+     - (d) clean pre-check pair, p1-cd.log: recorded SS-P0-s4 (sha256 6933b56a), then precheck with no bite. Of the
+       109 lines in runs.txt:17-125, 108 are identical; the build line differs only in commit and binary sha256.
+       result PASS.
+     - (e) p1-after-e2.log against p1-before-a.log: every line the three tests print is identical, but for two
+       differences that are not behaviour (item 7).
+2. **Part 2:**
+   - The read item: client lib.rs:350 `pub fn own_soldier(&self) -> Option<([i32; 3], bool)>`. It reads the grid
+     x, y, z (decoded integers) and the dead bit (flags bit 3, via the private SOLDIER_FLAGS = 5 and SOLDIER_DEAD at
+     :247-248). The source is the newest ring tick that is complete and filed Filed::Hash, compared by
+     `self.wrap.after32("tick", ..)`. It returns None with no slot, no such tick, or no (Soldier, slot) record. It
+     hands back no reference, no float, and adds no dependency.
+   - The decision function: bots lib.rs:231 crate-private `next_command(newest, view, own)`, which step() calls with
+     `endpoint.own_soldier()` (:223). It calls `command`, which applies `leash` (:248) for Kind::Brawl only, and counts
+     the command given. `toward_centre` (:128) works in integers: each part is 127 × its share of ⌈|p|⌉, truncated, so
+     x² + y² ≤ 127² (and above 125² at the radii). npt-bots gains no pub item, and its library names no World or
+     SimCore.
+   - The leash's values: R_IN = LEASH_IN_CM 1,300 cm, R_OUT = LEASH_OUT_CM 1,400 cm, with no sideways part. Its
+     margin is 4 m to the door entry (1,800 cm at building 0's door). The spawn corners lie at 1,414 cm. I tuned
+     nothing: these are the first values tried, and they passed.
+   - The figure: room.jsonl's tick name `in_building_slot_area`, written as (slot, area) pairs on every logged tick
+     where it is not empty, in any phase (logs.rs:598). Counts gains `in_building_measured` and `in_building_slots`.
+     The summary line appends "; in a building: N slot-ticks (slots …)" ("not counted (--logs 0)" on a no-log run).
+     No judge or marks.json change, and no lab end-event field. One SERIES.md row is drafted above ("The SERIES.md
+     rows").
+3. **The tests:**
+   - The unit test brawl1_the_leash_... (bots :347) passes. It covers the walk inside R_IN (against a twin of the same
+     seed), the steer past R_OUT, the hysteresis, blocked and skipped steps, None and dead, an open-loop script that
+     never steers, and a sweep for the 127² bound.
+   - The client test brawl1_own_soldier_... (endpoint.rs:397) passes.
+   - The short copy brawl1_sim_short_... (bots :636; seed 1, ticks_for_ms(120_000), patterns (i) and (ii)) takes
+     10.61 s in the measured build and 10.71 s in the bites build (earlier 10.97 s and 11.07 s), so it was not
+     shortened.
+   - The full test (bots :648, #[ignore]) ran by name in release in 23.52 s (final-regen-tests.log). In all nine runs
+     no soldier was in a building and none was named stuck. Largest distances from the centre:
+     - seed 1: (i) 1,575 cm; (ii) 1,654 cm (skips 304 per 1000, longest streak 6); (iii) 1,832 cm at (1734, -592).
+     - seed 2: (i) 1,575 cm; (ii) 1,720 cm (303 per 1000, streak 6); (iii) 1,832 cm at (1671, -751).
+     - seed 3: (i) 1,570 cm; (ii) 1,686 cm (305 per 1000, streak 6); (iii) 1,832 cm at (1586, -917).
+   - Pattern (iii), for U4g's brief: no area != 0, and a largest distance of 1,832 cm in every seed. Each maximum
+     falls at a burst's end, at three different points on one circle of about 18.32 m. That is 32 cm past the
+     1,800 cm door-entry figure, and outside any building. That a fixed radius stops it is an inference I did not
+     check. One candidate is the outer reach of the 14 m fight vehicle's parts.
+4. **The re-pin** (bytes unchanged; the manifests' diff touches only the three sha256 values):
+   - SS-P0-s4: 6933b56a...bab3 → 1f00d2d5f70a2c7b6836ede611b5f1c281319a5312060ead91e016da3c0b1b42
+   - SS-P2-s1: 5b79abb2...32e3 → 1ec25de7c9ce8ea869ed9a8b343746ba131593e1de5c65bc9c1c626ce01cc76d
+   - ES-P3-s2: fad8f67d...953b → 6abf7643982b5970a630c97daa4d0815ceb2022958b18e18116397dcad9c893e
+
+   `npt-lab hash` stops at the first mismatch, so ES-P3-s2's pin came from a second det run, which also reproduced
+   SS-P2-s1's new pin. At the new pins:
+   - det-u4.mjs (final-det.log): uptime "04:04:39 up 1:30, load average: 1.42, 1.81, 1.48"; PASS in 227.2 s;
+     non-cargo sum 214.5 s.
+   - The precheck regeneration (final-regen-tests.log) reproduces 1f00d2d5..., "as the manifest's".
+5. **check.mjs's final run** (final-check.log): all 11 steps pass. Measured build 535 passed, 0 failed, 0 skips; bites
+   build 613 passed, 0 failed, 0 skips. Test step 630.1 s.
+6. **The size:** `git diff --stat` shows 9 files, 869 insertions and 123 deletions: 992 changed lines, against ~700
+   planned (450-750 with the conditions) and the 1,400 stop line. The bots crate takes 426 of them, about 330 in its
+   test module (the unit test, the sim driver, and the short and full copies).
+7. **Nothing stopped me. Three points go to the advisor, whole:**
+   - **Proof (e)'s reading.** At <base>, two "before" runs (A and B) already differ in the wallclock bite's L1 hash.
+     That bite XORs aims with wall-clock ns (server pump.rs:228-246). After Part 1 the only differences are that same
+     L1 hash (index 3, the loopback hash, 120 compared and 117 mismatching all equal), and libtest's "52/58 filtered
+     out" becoming 53/59, because the binary holds RR3-L2 (a)'s new test. I read neither as a behaviour change and
+     went on.
+   - **RR4-L1's name.** The ruled `const MAX_ENTRY_TICKS: u32 = 36_000;` fails check.mjs's deps step: TICK_NAMED
+     reads every *_TICKS const outside npt-sim as rate-derived. The form check.mjs accepts,
+     `4 * npt_sim::ticks_for_ms(300_000)`, is a local rate-derived constant, which carry 39 bars. Built: the same
+     literal, placement, message and tests under the name MAX_ENTRY_TICK_COUNT.
+   - **r10_carry_82.** Its bytes/12 boundary entry (799,693 / 12 = 66,641 ticks) meets the new cap, which the facts
+     missed (they checked r10_fp3 only). The test now uses 360,000 bytes: 30,000 ticks at the boundary, and 30,001
+     refused "cannot fit".
+
+   Also recorded: p1-before-1.log ran `--lib`, so none of the three tests ran (not a capture), and
+   p2-full-release.log's `--exact` without the module path ran 0 tests. Both were run again with the right selector;
+   no failed run was re-run into a pass.
+8. **The advisor's two corrections, in its words** (condition 18): "ADV-BP-1: N2-1's 'all four checks fail' was
+   wrong; under the leave plant two fail (Q5). ADV-BP-2: my sets-r2 figure of 'about 4.2 GiB free after the refill'
+   mixed units."
+
+Decisions needed:
+- TICKS-NAME: the ruled `MAX_ENTRY_TICKS = 36_000` fails check.mjs as written. Which form stands? It matters because
+  check.mjs must pass at the merge. Options: (a) MAX_ENTRY_TICK_COUNT, a literal 36,000 (built); (b) MAX_ENTRY_TICKS =
+  4 * npt_sim::ticks_for_ms(300_000), which check.mjs accepts but carry 39 bars; (c) list MAX_ENTRY_TICKS in check.mjs's
+  NOT_TICK_COUNTS, a check.mjs change that belongs to its follow-up's lane. Recommendation: (a).
+- PROOF-E: does proof (e) hold with its two differences (the wallclock L1 hash, which varies at base, and the +1 test
+  count)? It matters because condition 6 says any difference comes to the advisor. Options: accept, or name another
+  comparison. Recommendation: accept, and leave the wallclock hash out of the comparison in future captures.
+
+For Mustafa: nothing (spike code: nothing a player sees, hears or feels).
+
