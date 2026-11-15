@@ -64,7 +64,7 @@ avail=$(df -B1 --output=avail /home/user | tail -1 | tr -dc 0-9)
 {
   echo "lock $LOCK held ($mode) at $(date -u +%T) UTC; idle after ${i} s"
   echo "pwd $(pwd); free $((avail/1048576)) MiB; HEAD $(git rev-parse --short HEAD); CARGO_TARGET_DIR $CARGO_TARGET_DIR"
-  echo "diff $(git diff HEAD -- . | sha256sum | cut -d' ' -f1); untracked $(git status --porcelain --untracked-files=all -- . | sha256sum | cut -d' ' -f1)"
+  echo "diff $(git diff HEAD -- . | sha256sum | cut -d' ' -f1); untracked $(git ls-files -z --others --exclude-standard -- . | xargs -0 -r sha256sum | sha256sum | cut -d' ' -f1)"
 } > "$log"
 if [ "$avail" -lt $((4*1024*1024*1024)) ]; then
   echo "STOP: under 4 GB free" >> "$log"

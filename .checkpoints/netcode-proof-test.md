@@ -378,7 +378,20 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
           diff against f691559 shows 9 hunks, one per correction, +19/-10, and nothing else (re-checked by the main
           session: numstat 19/10, 9 hunks). u4r-report.md now has 1,193 lines.
         - **ITEM 3c DONE. ADV-CL-1 recorded. BRAWL-1 IS CLOSED (2026-11-15, about 11:52 UTC)**, with the report, this
-          card and the advisor's notes committed together.
+          card and the advisor's notes committed together (ec90bc3).
+        - **TE-B1-R2-2 DONE (about 11:55 UTC):**
+          - Both runners' untracked field is now in the ruled form: `git ls-files -z --others --exclude-standard -- . |
+            xargs -0 -r sha256sum | sha256sum`.
+          - u4r-run.sh is now e9437ae2… and main-run.sh 8df2dee3…. The .diff files (cut by te_b1_r2_2_diffs.py against
+            ec90bc3, one line each) are u4r-run.sh.te-b1-r2-2.diff (60112b47…) and main-run.sh.te-b1-r2-2.diff
+            (cb831ae3…).
+          - `bash -n` prints nothing for both. On today's clean tree the field reads e3b0.
+          - **Any later brief names the new runner sha256s.**
+        - **NEXT (task #74):**
+          - KEPT-LOGS is with Mustafa; it is needed before U4g's build.
+          - Then step (7): U4's report folds U4r's. Then U4f, U4g (its brief with u4g-brief-carry.md and EVQ-LOAD) and
+            U4h, each with its brief to the advisor first.
+          - Before PR #40 is marked ready: the check.mjs follow-up (now also ADV-PT-L3), JDG-ONLY-1, and taking main in.
         - **Then:** commit the report, the card and the advisor's notes together, push, and record BRAWL-1 CLOSED.
         - **Then task #74:**
           1. TE-B1-R2-2's runner edit (u4r-run.sh:67 and main-run.sh:42, in the ruled form, each with a .diff and a
