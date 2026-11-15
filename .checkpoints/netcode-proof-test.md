@@ -415,7 +415,26 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
             keys verdict, summary, conditions, final_text_for_mustafa, pr_reviewers, to_mustafa). **Then:** show
             Mustafa final_text_for_mustafa in chat and WAIT for his yes.
           - The drafter finished at 12:27 UTC (kept-logs-rule-draft.md, 1,036 lines); the advisor's review (agent
-            ab39d555493f4fab8) runs since 12:27.
+            ab39d555493f4fab8) ended about 12:44.
+          - **THE ADVISOR'S REVIEW IS IN: APPROVE WITH CONDITIONS C1-C9**, all applied in its final text. Word for word:
+            advisor-kept-logs-rule-full.md (892 lines, sha256 ae03ca60…, by kept_logs_rule_full.py). F1 Medium (the
+            unfinished .part was deleted: it now always stays) and F2 Medium (`cache` was a standing delete: now only while
+            nothing in it is newer than 2026-11-15 07:20 UTC), F3-F6 Low. KL-1 to KL-5 decided as technical choices
+            (the list beside the results; no allow line; KL-3 kept as a narrowing; KIT-FREEZE-2 a statement his yes
+            confirms; DECISIONS.md by docs-keeper's next pass). Its slip: one probe file by shell redirect in the
+            session scratchpad (outside the repo); nothing in the repository changed but its notes.
+          - **The final text** (§11 18 lines, kept-logs.mjs 313, kept-logs.test.mjs 292, 2 REPO_MAP rows):
+            kept-logs-final-text.md (711 lines, sha256 97c81656…, by kept_logs_final_text.py, checked equal to the notes'
+            final-message block). Its 5e563b95 paragraph checked: still accurate (the read is under way); its quote
+            "right as committed" is advisor-u4r-c62h.md:27 (C14). **Posted to Mustafa in chat, whole, about 12:50 UTC;
+            WAITING for his yes (KL-YES), which he gives after his Advisor has read it.**
+          - **After his yes (C7, C9):** a worktree `git worktree add .gate/kept-logs-wt -b claude/kept-logs-rule
+            origin/main` (never switch the main folder); the three kit files extracted by script from the text he said
+            yes to and compared by cmp; the `.claude/` writes ask him first (Accept edits mode); the draft's (c) steps
+            1-6 with mutations M1-M11; the kit tests' counts equal to main's; repo-map-check and the gate; one review
+            round of security-auditor and test-engineer (one batch); the advisor on every pushed head; then STOP for his
+            go on the merge. Nothing real is packed or deleted before that PR is on main and this branch has taken main
+            in.
         - **C62H-REVIEW ANSWERED: (a)** (Mustafa's words of 2026-11-15 13:35 Amsterdam, typed into this chat 12:34 UTC;
           verbatim in history.md's last "## Decision", copied by mustafa_c62h_review_words.py, 1,131 chars). In short
           (his words are the record, not this):
