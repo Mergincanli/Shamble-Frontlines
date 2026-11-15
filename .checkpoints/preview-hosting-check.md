@@ -125,19 +125,18 @@
      The screenshot itself stays out of the repository (a binary); its text is above.
 
 ## Next steps
-1. On "repository ready": attach the repository (add_repo, push access), confirm I can see it; read his SR-READ answer.
-   - If the Claude app lists Administration or Deployments with write access: stop before building and tell him in
-     three lines what that changes for this check and for the reviewer's worth (his thing 1).
-   - Otherwise: the advisor tool's consultation (moment 1) before the build's approach, then the build (plan Part 2,
-     U1 to U3) on the test repository's branch `setup`, pushed without a pull request; the saver running.
-2. The review round (U4), at most 3 agents: infra-engineer, security-auditor (with his thing 2: rule on the deploy
-   job's `deployments: write`: what needs it, or remove it and show him the changed line) and test-engineer; then the
-   advisor agent's review of the built head. Any changed line of the six approved texts goes back to him as an exact
-   diff and waits for a new yes.
-3. The results-log header (PM-0006-1) after his "setup done" and before the setup pull request opens; then, before
-   every sitting, one list for him: the runs that will wait, in approval order, and the sitting's length (his thing 3).
-4. No draft pull request in Shamble-Frontlines: his go covers only the checkpoint and, at the end, the report's pull
-   request, which stops for his go (this replaces plan Part 8 step 3's draft pull request).
+1. Round 2 (review budget: on what changed, 1b37fae..2df0112): infra-engineer and test-engineer, launched as a workflow
+   at about 21:46 UTC (see Running work). Fix what it finds in scripts only; any approved-text change joins the batch.
+2. His yes on the batched diff (`tr-draft/proposed/deploy.yml` sha256 29593af18d34..., `tr-draft/proposed/close.yml`
+   sha256 3afdf389d636...; the exact diff sent in chat at about 21:47 UTC). On his yes: copy both files byte for byte
+   into /home/user/shamble-preview-check/.github/workflows/, check the hashes, commit on `setup`, push.
+3. His answers: SA-R3 (accept the install-step residual risk for this check, or not), the screenshots of `preview`,
+   `production` and Actions → General, and the token's end date (asked at 20:56 UTC).
+4. The advisor agent's review of the final `setup` head (after 1 to 3).
+5. The results-log header (PM-0006-1), then the first list for him (his condition 3): the setup pull request's two
+   runs (its deploy, then its merge's cleanup), in order, with the sitting's length; then open the setup pull request.
+6. Then Day 1's sittings as plan Part 3 C, with sitting 3's two additions (SA-R4, SA-R8), each preceded by its list.
+   Before Day 1: ask him to compact if the chat is near full (it was 82% at 21:44 UTC).
 
 ## Open findings
 - Refused by the guard, 2026-11-15 15:54:02 UTC: `git -C <dir> fetch ...` ("git: no option before the subcommand (run
