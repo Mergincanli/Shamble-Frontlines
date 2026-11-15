@@ -78,9 +78,17 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
       come right before the counted run?); U4g's brief words (ADV-PT-M1 and NA-B1-2 (c)); the expected size; Mustafa.
     - **If cut:** `Workflow({scriptPath: ".../workflows/scripts/brawl1-r1-ruling-wf_59e64b31-fa2.js",
       resumeFromRunId: "wf_59e64b31-fa2"})`.
-    - **Then:** write it word for word by script (brawl1_r1_ruling_full.py), read it in full, and launch the fix pass:
-      a fresh builder copy in the same worktree (no isolation) that reads brawl1-build.md and the worktree's diff
-      first. SIZE-CHECK after it, against 1,400.
+    - **Then:** write it word for word by script (brawl1_r1_ruling_full.py, ready, syntax checked), read it in full,
+      and launch the fix pass: a fresh builder copy in the same worktree (no isolation) that reads brawl1-build.md and
+      the worktree's diff first. SIZE-CHECK after it, against 1,400.
+    - **Copy 2's prompt** is built by a script still to be written (brawl1_copy2_prompt.py, in u4r_copy6_prompt.py's
+      form):
+      - first, the first launch prompt word for word: the scratchpad's brawl1-launch-prompt.txt, 2,498 characters,
+        sha256 b3cb6f0e…, copied by script from agent a4be43b1f756e45dd's transcript;
+      - then the resume part;
+      - then the ruling's "The fix pass, in order", copied by line range.
+- **COMPACT-WAIT (about 05:20 UTC):** the chat is at about 40 %. The card is refreshed. I asked Mustafa for /compact and set
+  a 20-minute reminder. If no /compact comes, carry on from this card.
 - **Was running, about 04:25-05:10 UTC: workflow wf_bbfeece0-4c7 (task wpp4xx1x6), "brawl1-r1".** The workflow runs at
   most 2 agents at once on this machine, so netcode-architect starts when the advisor or test-engineer ends. The writer
   for its results is ready: brawl1_r1_full.py (syntax checked).
