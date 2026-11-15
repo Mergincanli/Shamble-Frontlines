@@ -77,8 +77,8 @@ CI GREEN, THE ADVISOR'S HEAD REVIEW RUNS; BRAWL-1's PLAN REVIEW RUNS.**
        on main (4460ef5) by the workflow's isolation, and its start check caught that (the cuts block, 2026-11-15
        00:00).
        - **Relaunched at about 02:40** by the Agent tool: general-purpose, opus, effort xhigh, `isolation: "worktree"`.
-         `<base>` is the main folder's HEAD at launch (the card's save just before; the launch line in the cuts block and
-         the notes give the sha). Notes brawl1-build.md; its worktree path goes in the notes.
+         `<base>` is 352a245 (spike tree abad0635, equal to 926a6cb's). The run is agent a66cee8b8170d816f, launched
+         02:40 UTC; continue it by SendMessage. Notes brawl1-build.md; its worktree path goes in the notes.
        - **If it stops or is cut:** launch a fresh copy WITHOUT isolation, told the existing worktree's path from the
          notes. It reads the notes and that worktree's diff before it changes anything (as U4r's copy 6). Never launch a
          new worktree for a later copy.
