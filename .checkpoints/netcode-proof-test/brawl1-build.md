@@ -472,7 +472,48 @@ For Mustafa: nothing (spike code: nothing a player sees, hears or feels).
   at 06:53:12). Resumed 07:13 UTC: no plant in place (checked in the worktree: `fn leash` starts with its let-else,
   logs.rs's filter and own_soldier's Hash filter and `.reduce` intact); numstat 1,139 added, 127 deleted, 1,266
   changed; free 6,531 MiB. Next: fmt --check again to see which hunks remain, then the check run again.
-- FP-7 P1-P4: pending.
+- fp-fmt-2.log (07:14:10 UTC; header diff c2561b6ca54c8cde994fcdad5954c63d332df73f2db038c12aba3d71a0daa49f): fmt --check
+  exit 0, so every hunk had landed (the scenario.rs Edit at 06:53:12 included); nothing left to apply.
+- fp-check-2.log (07:14:18-07:15:09 UTC, -x -k, the same diff hash, every command exit 0): fmt clean; clippy -D warnings
+  clean in both builds; bots `tests::brawl1` 3 passed, 1 ignored, in both builds (10.87 s; 10.82 s; the short copy's
+  prints unchanged from fp-check-1); client `brawl1` 2 passed in both builds; lab: the figure test, fp3,
+  r10_carry_82 (both), r10_fp3 passed in both builds (5 and 6 passed: the bites build also matches r10_carry_83_d).
+  **FP-1 to FP-6 compiled and pass. Next: FP-7.**
+- FP-7 P1, TE-B1-1 (the leash off): done, restored. bots lib.rs sha256 before
+  83a8541bbdb924bc4dec032330a6117d54d960cff0a01b8544bc1d7c0c0b6069; planted `return walk;` as the first line of `fn
+  leash`'s body (lib.rs:255), sha256 planted 77be9b00ea9e4e014960173248567af4f2600e724952bd3fa7da17f582f0c377; restored by
+  Edit (the line deleted) at 07:16:51 UTC, sha256 after 83a8541bbdb924bc4dec032330a6117d54d960cff0a01b8544bc1d7c0c0b6069
+  (equal). Log .gate/u4r/brawl1/fp-plant-1.log (header diff 4f0a5624c748a893417e662cabdd50bbb2ec984a25cf7c964f10f4c65b5f6b2b,
+  -x -k; the compiler warned "unreachable statement" and "unused variable: `own`", as a plant does).
+  - (1) short copy, measured build: exit 101, "assertion `left == right` failed: Skips: first Some((64395, 11, 1))"
+    (lib.rs:700, the area assert), 11.30 s.
+  - (2) short copy, bites build: exit 101, the same message, 11.93 s.
+  - (3) full test, release: exit 101 (lib.rs:750), "in a building: [(1, EveryTick, 11335, Some((70723, 16, 3))), (1,
+    Skips, 68964, Some((64395, 11, 1))), (2, EveryTick, 9032, Some((69788, 33, 6))), (2, Skips, 95212, Some((63787, 33,
+    5))), (3, Skips, 62107, Some((63950, 19, 3)))]", 24.05 s.
+  - Per seed and pattern (in_building soldier-ticks; first (tick, slot, area); largest distance cm (slot, tick, x, y)):
+    - short, seed 1, both builds alike: EveryTick 0; None; 2,175 (6, 65656, 2056, -710). Skips 7,728; (64395, 11, 1);
+      3,813 (8, 67219, 550, 3774).
+    - full seed 1: EveryTick 11,335; (70723, 16, 3); 2,205 (16, 70816, -1098, 1913). Skips 68,964; (64395, 11, 1);
+      6,161 (6, 79418, 5876, 1853). Bursts 48,302; (64978, 36, 4); 2,784 (17, 75838, -554, 2729).
+    - full seed 2: EveryTick 9,032; (69788, 33, 6); 2,328 (19, 73152, -1328, 1913). Skips 95,212; (63787, 33, 5);
+      9,078 (21, 82018, -1258, 8991). Bursts 37,865; (64974, 29, 2); 3,265 (29, 81180, 2478, 2127).
+    - full seed 3: EveryTick 0; None; 2,175 (0, 70156, 2056, -710). Skips 62,107; (63950, 19, 3); 7,432 (19, 80451,
+      4374, 6009). Bursts 6,265; (75771, 29, 2); 2,895 (2, 77588, 2666, -1130).
+  - The bite rule holds on area: the short copy fails in both builds and the full test lists Skips for all three seeds
+    (EveryTick too for seeds 1 and 2). **The door-entry bar was not needed, so it was not added.** EveryTick alone
+    shows the closed-circle reading the ruling expected: in a building 0 for seed 3 (and the short copy's seed 1), at
+    2,175 cm, because without skips the open-loop circle closes.
+- FP-7 P2, TE-B1-2 = RR-B1-1 (the figure cut): done, restored. logs.rs sha256 before
+  83008fce50552257ade01f112cfcfb37a18da3ed5a744080937442df50ab229b; planted `.filter(|_| false)` for room_tick's building
+  filter (logs.rs:588), sha256 planted b902a7ee16c00bf52105dc993aab63608cbb501f29a85941c5d121cda1f19f68; restored by Edit
+  at 07:17:34 UTC, sha256 after 83008fce50552257ade01f112cfcfb37a18da3ed5a744080937442df50ab229b (equal). Log
+  .gate/u4r/brawl1/fp-plant-2.log (header diff 59026680de997f2315a723bf40587f94b1d850c51fea517d1dc70a13bfc5a3a6, -x -k):
+  `cargo test --locked -p npt-lab --bin npt-lab -- logs::tests::brawl1_the_building_figure_counts_a_soldier_in_a_building_in_measured_ticks_only
+  --exact --nocapture` exit 101, panicked at logs.rs:924, "assertion `left == right` failed: measured: one slot-tick /
+  left: 0 / right: 1". It bites as ruled: the warm-up asserts before it (count 0, no slot) assert absence, so they hold
+  under any plant that removes the figure; the first assert that can fail, the measured count, fails.
+- FP-7 P3-P4: pending.
 - FP-8 (1)-(6): pending.
 - FP-9 items 1-6: pending.
 
