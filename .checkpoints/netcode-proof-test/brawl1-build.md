@@ -118,3 +118,18 @@
   the npt-lab binary holds one more test, RR3-L2 (a)'s new logs.rs unit test that the brief requires. No line of r6's,
   the late-command bite's or the wallclock bite's own output moved. Both differences go to the advisor whole in the
   report (item 7); I read them as not a behaviour change and go on.
+- (a) check.mjs, run 1: .gate/u4r/brawl1/p1-a-check.log, exit 1, 03:01:50-03:05:48 UTC (free after: 9,475 MiB).
+  PASS fmt, clippy, clippy-wasm32, doc, wasm (SS-s1/ES-s2/TC-s3 equal; hash-map caught at SS-s1 tick 1234), refs,
+  marks, self (77/77), redact (10/10). FAIL test: measured build 187 passed, 1 failed:
+  hash::tests::r10_carry_82_the_manifest_refuses_a_bad_name_and_ticks_above_bytes_over_12 (hash.rs:1561 "ticks at bytes
+  / 12": its boundary entry holds 799,693 / 12 = 66,641 ticks, which RR4-L1's 36,000 cap now refuses; the facts saw only
+  r10_fp3's 83,333). FAIL deps: "crates/lab/src/hash.rs:238 sets MAX_ENTRY_TICKS from `36_000`: a tick-counted value is a
+  const fn of npt_sim::TICK_HZ, never a literal (u4-build-plan.md §4.3)" (check.mjs's TICK_NAMED /_TICKS$|CATCHUP/ reads
+  every *_TICKS const outside npt-sim). Both failures are Part 1's own code against a check, not a behaviour change of the
+  refactors; fixed below, then check.mjs run again (a new run on changed code, not a retry of this one).
+- Fix 1 (deps): the ruled `const MAX_ENTRY_TICKS: u32 = 36_000;` cannot pass check.mjs as written, and the form
+  check.mjs accepts (`4 * npt_sim::ticks_for_ms(300_000)`) would be a local rate-derived constant, which carry 39 bars.
+  Chosen: the same literal 36,000, placement, message and tests under the name `MAX_ENTRY_TICK_COUNT` (a manifest size
+  bound like MAX_ENTRY_BYTES, the ruling's own analogy). For the advisor (report item 7), with the other option.
+- Fix 2 (test): r10_carry_82's ticks <= bytes / 12 boundary moved below the cap: its entry's bytes set to 360,000
+  (30,000 ticks at the boundary; 30,001 refused "cannot fit"), so it still tests that rule.
