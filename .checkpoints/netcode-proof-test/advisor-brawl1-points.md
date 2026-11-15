@@ -48,3 +48,20 @@ Runs only through u4r-run.sh, logs under .gate/u4r/brawl1-advisor/.
   most ~1,195 + sqrt(205^2+600^2) ~ 1,829. So within condition 1's bounds B1 reach > 1,800 door entry at every angle:
   area 0 in 3 seeds is not a bound. For U4g's brief. Print nit: Bursts prints "skipped 14400 of 0 chances (0 per
   1000)" (bots lib.rs:612-626; chances counted only in Skips :559): Low.
+- Proof (d) re-checked myself: p1-cd.log:38-150 (real/user/sys dropped) vs runs.txt:17-125: 109 vs 109 lines, only the
+  build line differs, and only in commit and binary sha256 (the rest of that line equal).
+- Manifests' diff: only the three sha256 values; ticks 9,000 and bytes unchanged (RR4-L1's "advisor checks the ticks").
+- r10_carry_82 extra: 360,000 / 12 is exact, so a ceil plant (bytes.div_ceil(12)) now passes; base's 799,693 caught
+  it. Low: 359,993 bytes (29,999 at the boundary) if a push happens anyway.
+- Precedent for point 1: advisor-u4r-r1-full.md:90-92 (NC-U4R-7): TURN_EVERY/RETARGET_EVERY kept as literal counts with
+  no time claim; a time claim would need carry 18's route.
+
+## Rulings (final)
+1. TICKS-NAME: (a) as built; RR4-L1's name amended to MAX_ENTRY_TICK_COUNT (ADV-BP-4, mine). No diff change.
+   Low follow-up to the check.mjs follow-up: `_TICK_COUNT$` in TICK_NAMED + register in NOT_TICK_COUNTS.
+2. PROOF-E: accept with the two differences; ADV-BP-3 (mine). Future captures mask only the wallclock L1 hash values and
+   explain the filtered-out count by the binary's test count. No diff change.
+3. r10_carry_82: accept. No diff change (Low 359,993 rides a push).
+4. Also-recorded: zero-test reruns accepted (selector, not a re-run into a pass); p1-a-check -> check2 is a fix of Part
+   1's own code, not a retry; size 998 < 1,400 no stop; pattern (iii) recorded, my reading for U4g's brief (Medium).
+For Mustafa: nothing.
