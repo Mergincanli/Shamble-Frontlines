@@ -6,7 +6,7 @@
   (after `git fetch origin claude/netcode-proof-test-plan-hcky5g`)
 - **Branch:** cs/npt-u4f-brief · **Base:** origin/main 53272a1
 - **Spike worktree (read only):** `.gate/npt-spike-1116` at 11fd190e9536702f0dcfc72d584b637ebc6184be
-- **Last update:** 2026-11-16 00:14 Amsterdam
+- **Last update:** 2026-11-16 00:39 Amsterdam
 
 ## Steps done
 1. Start checks (role night-shift, window 00:11, no other run tonight), status comment 6902964789 posted; spike
@@ -36,6 +36,8 @@
   `.checkpoints/npt-u4f-brief/netcode-architect-u4f.md`, draft `.checkpoints/npt-u4f-brief/u4f-brief-draft.md`
 - saver: run in 25-minute stints (`--every 10 --for 25`), so each stint's end wakes the run to refresh the status
   comment (a later hourly run reads a status older than 45 minutes as a cut-off). First saver b0yfndb40 stopped by
-  TaskStop at 00:13 for this. Now: background task bmctdoqdt · output
-  `/tmp/claude-0/-home-user-Shamble-Frontlines/2cc6b1c7-405a-556f-81c6-a85b5a29465f/tasks/bmctdoqdt.output` · started
-  00:13 · stops by 00:38 · last check 00:14: ok (watching)
+  TaskStop at 00:13 for this. Stint 1 bmctdoqdt 00:13-00:38: ok (saved 1e97978, 1279cab, 459e436; time is up). Now:
+  background task bmv14vtwd · output
+  `/tmp/claude-0/-home-user-Shamble-Frontlines/2cc6b1c7-405a-556f-81c6-a85b5a29465f/tasks/bmv14vtwd.output` · started
+  00:39 · stops by 01:04 · last check 00:39: restarted
+- drafter progress at 00:39: blocks B1-B10 of 13 done (sections 0-2 of the draft written); next B11 (sections 3-5)
