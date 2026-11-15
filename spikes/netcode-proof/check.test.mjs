@@ -1579,6 +1579,17 @@ test("only code outside spikes/ is read for references to it", () => {
   assert.deepEqual(referenceProblems(files, (f) => text[f]), ["index.html references spikes/"]);
 });
 
+test("the KEPT-LOGS kit files may name the spike's results folder and nothing else of it; no other file may", () => {
+  const kit = [".claude/scripts/kept-logs.mjs", ".claude/scripts/kept-logs.test.mjs"];
+  const names = "const RESULTS = 'spikes/netcode-proof/results/';\nconst RES = 'spikes/netcode-proof/results/u4r/0123456789ab/P3';";
+  const others = [".claude/scripts/checkpoint.mjs", ".claude/hooks/guard.mjs", "tools/kept-logs.mjs", ".claude/scripts/kept-logs.mjs.orig"];
+  const files = [...kit, ...others];
+  assert.deepEqual(referenceProblems(files, () => names), others.map((f) => `${f} references spikes/`));
+  for (const other of ["spikes/netcode-proof/check.mjs", "spikes/netcode-proof/crates/", "spikes/netcode-proof/results", "spikes/"]) {
+    assert.deepEqual(referenceProblems(kit, () => `${names}\n${other}`), kit.map((f) => `${f} references spikes/`), other);
+  }
+});
+
 /**
  * The tick grep's clean tree: npt-sim's constants each its own function at TICK_HZ, and outside it uses, asserts,
  * paths, tick counts derived from TICK_HZ or ticks_for_ms, CMD_CATCHUP and npt-net's own HANG_TICKS (U4s, §4.3).

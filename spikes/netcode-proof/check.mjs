@@ -1834,8 +1834,20 @@ function cargoConfigFiles(start, env) {
 }
 
 /**
+ * The two kit files of Mustafa's KEPT-LOGS rule (.claude/CHECKPOINTS.md §11, on main since PR #53), by full path.
+ * They list and pack the raw logs of this spike's run sets, so they name its committed results folder; they import no
+ * spike code and run none. They may name that folder and nothing else of the spike (plan §4.9; the advisor's REFS-KIT
+ * ruling, 2026-11-15): any other text spikes/ in them fails, as in every other file. A `..` after the folder's name
+ * is not read (kept-logs.test.mjs names one on purpose: a path the script refuses); the review of a kit change is
+ * the wall.
+ */
+const KEPT_LOGS_FILES = [".claude/scripts/kept-logs.mjs", ".claude/scripts/kept-logs.test.mjs"];
+const KEPT_LOGS_RESULTS = "spikes/netcode-proof/results/";
+
+/**
  * Files outside spikes/ that reference it (plan §4.2: nothing outside spikes/ may, until the foundation's G5 and G8
- * exist). Prose may name the folder: docs/, .checkpoints/ and Markdown files are not read.
+ * exist). Prose may name the folder: docs/, .checkpoints/ and Markdown files are not read. The KEPT-LOGS kit files are
+ * read with their results folder's name taken out (KEPT_LOGS_FILES, above).
  */
 export function referenceProblems(files, read) {
   const problems = [];
@@ -1847,6 +1859,7 @@ export function referenceProblems(files, read) {
     } catch {
       continue;
     }
+    if (KEPT_LOGS_FILES.includes(f)) text = text.replaceAll(KEPT_LOGS_RESULTS, "");
     if (text.includes("spikes/")) problems.push(`${f} references spikes/`);
   }
   return problems;
@@ -2614,7 +2627,7 @@ export const STEPS = {
     if (!r.ok) return r;
     const files = r.out.split("\0").filter(Boolean);
     const problems = referenceProblems(files, (f) => readFileSync(join(ROOT, f), "utf8"));
-    return { ok: problems.length === 0, out: problems.join("\n") || `${files.length} tracked files: none outside spikes/ references it` };
+    return { ok: problems.length === 0, out: problems.join("\n") || `${files.length} tracked files: none outside spikes/ references it (§4.9's one exception: the KEPT-LOGS kit files may name its results folder)` };
   },
   marks: () => {
     const c = run("cargo", ["run", "-q", "--locked", "-p", "npt-judge", "--", "--marks", "marks/marks.json", "--check-marks"], HERE);
