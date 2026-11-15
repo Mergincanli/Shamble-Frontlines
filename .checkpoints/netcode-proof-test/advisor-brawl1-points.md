@@ -16,3 +16,17 @@ Runs only through u4r-run.sh, logs under .gate/u4r/brawl1-advisor/.
 7. Further findings; StructuredOutput.
 
 ## Progress (a line per point)
+- Snapshot: patch sha256 ee2973aa... = `git diff` of the read copy (both plain and --binary), HEAD 352a245. numstat
+  10 files, 875+/123- (998).
+- Point 2 checked: my own normalised diffs (brawl1-build.md:52's normaliser). A vs B: lines 46-47 only (wallclock L1
+  hash 9375924675163200265/821df9d0 vs 1388086141469307493/134378fd). A vs e2: those two lines (L1 hash
+  5648772452115156074/4e64789d) + line 20 (52->53 filtered out) + line 66 (58->59). Index 3, loopback hash
+  6328158668484839173, compared 120, mismatching 117 equal in all four. pump.rs:228-246: aim[0] ^= 1|(ns&0xfe) from
+  SystemTime (bites only) -> L1 hash is wall-clock dependent by design. +1 test = logs.rs rr3_l2_a (patch line 884), the
+  only new #[test] in crates/lab. All four logs exit 0. Ruling: ACCEPT; condition 6 (ii) as written was unmeetable at
+  <base> (my wording): record as ADV-BP-3 in the report. No diff change.
+- Point 3 checked: base test `at = 799_693 / 12` (66,641) ok-assert now refused by cap (hash.rs:338 after bytes/12 at
+  :325). Built: replace bytes 799693->360000 (at 30,000; 30,001 "cannot fit"); a silent no-match of replace would
+  make at+1 = 30,001 read OK and fail expect_err, so the replace is self-checking. Cap boundary itself in r10_fp3
+  (:1655-1668: 36,001 refused exact text; synthetic 36,000 reads). Ruling: ACCEPT. Facts gap (facts-full:113-116 named
+  only r10_fp3) caught by p1-a-check.log:47. No diff change.
