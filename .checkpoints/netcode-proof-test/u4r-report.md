@@ -252,8 +252,8 @@ advisor-u4r-r2-full.md:32).
   the runner log; the record holds through r2.txt's clean-tree check, commit and sha256s: advisor-u4r-r2run-full.md:17);
   and c-u4r-r2.mjs's whole-as-lost suite (:87) gets marks "PM-0001-2,PM-0001-17" (header and --only, tick16's form) and
   the expect line "contract PASS; bite PM-0001-17/whole-as-lost shown: mismatches 0 pass, L1 P0 loses no group 48
-  FAIL; the run valid", for a future run only (advisor-u4r-c62h-full.md:45). The check itself is built on the
-  advisor's rulings, awaiting his answer (C62H-KEEP; advisor-c62h-review-full.md).
+  FAIL; the run valid", for a future run only (advisor-u4r-c62h-full.md:45). The check itself was built on the
+  advisor's rulings and is kept by Mustafa's C62H-KEEP (a) of 2026-11-15 16:35 Amsterdam (history.md:2131-2146).
 - **JDG-ONLY-1 (Medium; npt-judge's next change, with its own plan, the advisor's plan review and cli.rs fixtures,
   before PR #40 is marked ready at the latest and before any expect-invalid bite with a pre: rule enters marks.json):**
   the judge's --only drops every unnamed mark before judging (main.rs:94), so pre:PM-0001-2 cannot find PM-0001-2 and
@@ -314,8 +314,8 @@ advisor-u4r-r2-full.md:32).
 2. **Carry 62 (h): done.** The six clean short L1 P0 suites (p0, forged, clamp, fast-clock, evstart, tick16-clean) read
    0 each (advisor-u4r-r2run-full.md:7). marks.json changed at commit 5e563b9 (+15 lines): PM-0001-17 gains the check
    "L1 P0 loses no group (no client-tick left incomplete)" (measured sum of tick.s.snap_incomplete == 0 on L1 P0) and
-   the bite PM-0001-17/whole-as-lost (built on the advisor's rulings, awaiting his answer: C62H-KEEP,
-   advisor-c62h-review-full.md); the readings-PR line in u4-build-plan.md section 11 went in at a36babd (`git show
+   the bite PM-0001-17/whole-as-lost (built on the advisor's rulings; kept by his C62H-KEEP (a),
+   history.md:2131-2146); the readings-PR line in u4-build-plan.md section 11 went in at a36babd (`git show
    --stat` of both). On that tree: npt-judge --check-marks (r2's binary, sha256 65acacfe…) exit 0, 81 marks (5e563b9's
    message; the card); check.mjs all 11 steps, 531 and 609 tests, 0 failed, marks 81, ADR rows unchanged
    (.gate/u4r-merge/c62h-check.log, 15:59:43-16:14:08 UTC). The first try (.gate/netcode-proof-test/c62h-5e563b9589d3/
@@ -962,8 +962,8 @@ _The steps are the round-1 ruling's M1-M7 (advisor-brawl1-r1-full.md, The merge 
 - **Recorded as facts, not a verdict** (condition 14):
   - **P0:**
     - every stress-scene check passes, with 693.09 shots a second;
-    - -17: 0 mismatches of 878,352 compared, and 0 incomplete ("L1 P0 loses no group" passes; that check is built on
-      the advisor's rulings, awaiting his answer: C62H-KEEP);
+    - -17: 0 mismatches of 878,352 compared, and 0 incomplete ("L1 P0 loses no group" passes; that check was built on
+      the advisor's rulings and is kept by his C62H-KEEP (a));
     - overflow resyncs 0 (m7-ev.log:113);
     - -57: 6,984 / 2,750 / 88,063, position p99 5,737 (verdict-P0.json).
   - **P3:**
@@ -1011,7 +1011,7 @@ All three sets ran with c-u4r-runs.mjs 99dd070e, the runners unchanged (A6), eac
 
 **P0 (split):** commit 93509dfd7fd1, spike tree 07baa855. Log .gate/u4r-sets/P0-93509dfd7fd1.log (sha256 e07e882e…), exit 0, wall 2,566.1 s, peak 4,504.3 MiB. Results results/u4r/93509dfd7fd1/P0/ (runs.txt ada5a58a…, verdict.json e926b812…, verdict-bites.json b472784f…).
 - -2 SS runs: FAIL to PASS. Everyone in view went from 0.861889 / 1 / 1 to 1 / 1 / 1. Shots per second 693.09 / 692.97 / 693.06 (U4r 694.16 / 694.19 / 693.98).
-- -17 L1 P0: INVALID (s1 by pre:PM-0001-2) to PASS. 0 mismatches of 878,352 compared on each run; 0 incomplete; 0 overflow resyncs. ("L1 P0 loses no group" is built on the advisor's rulings, awaiting his answer: C62H-KEEP.)
+- -17 L1 P0: INVALID (s1 by pre:PM-0001-2) to PASS. 0 mismatches of 878,352 compared on each run; 0 incomplete; 0 overflow resyncs. ("L1 P0 loses no group" was built on the advisor's rulings and is kept by his C62H-KEEP (a).)
 - -17's bites: invalid in U4r's set, now shown.
   - tick16 fails both checks: 12,151 mismatches and 720 incomplete.
   - client-rounding fails mismatches (878,352); incomplete 0 passes.

@@ -319,6 +319,8 @@ with the ruling. Later rulings add entries 45 on, each marked; the briefs carry 
     5e563b9: {"name": "L1 P0 loses no group (no client-tick left incomplete)", "series": "tick.s.snap_incomplete",
     "stat": "sum", "window": "measured", "op": "==", "value": 0, "parts": ["L1 P0"]}. Mustafa's answer to C62H-KEEP
     decides whether it stays.
+    **C62H-KEEP answered (a)** (Mustafa, 2026-11-15 16:35 Amsterdam; his words in history.md:2131-2146): the check
+    stays as built.
 63. **FU-3 and FU-7's log half, the next change to npt-log (the advisor's U4j ruling, FU-3: SEC-F10; its round-2
     ruling, B3: SEC-R2-N2):** "The next change to npt-log (U4r's, if its brief takes crates/log; else the unit that
     next edits it) adds two refusals, each with a test that fails before it: `read_log` refuses a JSON object with a
