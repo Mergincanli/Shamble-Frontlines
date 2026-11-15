@@ -1,0 +1,48 @@
+# THROWAWAY: the preview hosting check for SHAMBLE FRONTLINES (ADR 0006, spike 1). Plan and results live in
+# Mergincanli/Shamble-Frontlines. This file is deleted with this test repository.
+# Started by hand: opens the three links (and the planted no-cache preview) in the branded browsers of GitHub's own
+# machines through WebdriverIO, and records what the page and its worker report: crossOriginIsolated (PM-0006-3) and
+# the content file's second-visit transfer size (PM-0006-4, Chrome). Every result names the runner image and each
+# browser's version. It holds no secret.
+name: browsers
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2025
+            browsers: chrome,MicrosoftEdge,firefox
+          - os: macos-26
+            browsers: safari
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+      - name: Allow WebDriver in Safari
+        if: runner.os == 'macOS'
+        run: sudo safaridriver --enable
+      - name: Install WebdriverIO from its lockfile, without install scripts
+        run: npm ci --prefix tools/wdio --ignore-scripts --no-audit --no-fund
+      - name: Isolation (PM-0006-3) and the content file's cache (PM-0006-4)
+        env:
+          BROWSERS: ${{ matrix.browsers }}
+        run: node tools/wdio/run.mjs --browsers "$BROWSERS" --links tools/links.json --out browser-results.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: browsers-${{ matrix.os }}
+          path: browser-results.json
+          retention-days: 30

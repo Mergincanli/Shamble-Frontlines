@@ -31,15 +31,19 @@
    4.162.0) and `git ls-remote` reads public GitHub repositories (actions/upload-artifact, download-artifact tags).
 4. Mustafa's task message saved byte for byte by script (the file above; 5830 bytes).
 
+5. The saver started (15:52 UTC) and the advisor tool's consultation 1 (15:49 UTC, below).
+6. Doc reads by two agents, both DONE: infra-engineer (C1-C9, notes `infra-engineer-docs.md`, last hand-back after
+   16:13 UTC) and security-auditor (G1-G10, notes `security-auditor-docs.md`, hand-back before 16:10 UTC).
+7. Draft workflows in `tr-draft/` (not a build: text for the plan's Part 7), each parsed as YAML with PyYAML 6.0.1:
+   deploy.yml (172 lines; the pull-request and by-hand deploys merged into one file), close.yml (93), probe.yml (63),
+   browsers.yml (48); the two token-test variants under `tr-draft/b9-edit/` and `tr-draft/b9-prod/`.
+
 ## Current step
-5. The checkpoint and the saver; then the advisor tool's consultation 1 (moment 1, before the approach is fixed).
+8. Writing plan.md (Parts 2-5, 7-9, decisions, For Mustafa, the summary).
 
 ## Next steps
-1. Consultation 1, recorded below in one line with its time.
-2. Doc reads for the exact steps and workflow texts (Cloudflare: token, project, `_headers`, deletion, access policy,
-   limits; GitHub: environments, reviewers, branch rules, events), by at most 2 agents with notes in this folder.
-3. Write `plan.md` (his 8 items, unit sizes, decisions); then the advisor agent's plan review; then consultation 2
-   (moment 5) before the plan is saved as done; then the closing message.
+1. Finish plan.md; save; then the advisor agent's plan review (from main's advisor.md; the `spikes/` tension named).
+2. Fold its findings; consultation 2 (moment 5) before the plan is saved as done; then the closing message.
 
 ## Open findings
 - Refused by the guard, 2026-11-15 15:54:02 UTC: `git -C <dir> fetch ...` ("git: no option before the subcommand (run
@@ -83,11 +87,9 @@
 ## Running work
 - saver: background task bc4g68il4 · output /tmp/claude-0/-home-user-Shamble-Frontlines/a7e7f150-3195-52bd-a549-73b27426198b/tasks/bc4g68il4.output ·
   started 15:52 UTC · stops by 17:42 UTC (110 min) · last check: just started.
-- agent infra-engineer (Opus by its file, effort high by its file): Cloudflare and runner doc reads C1-C8 · notes
-  `.checkpoints/preview-hosting-check/infra-engineer-docs.md` · launched 15:53 UTC · running.
-- agent security-auditor (Opus by its file, effort high by its file): GitHub environments, events, artifacts,
-  settings, Cloudflare token reach, threat model G1-G10 · notes `.checkpoints/preview-hosting-check/security-auditor-docs.md`
-  · launched 15:53 UTC · running.
+- agent infra-engineer (Opus by its file, effort high by its file): C1-C8 and the follow-up C9 · DONE.
+- agent security-auditor (Opus by its file, effort high by its file): G1-G10 · DONE.
+- saver last check 16:16 UTC: ok ("saved and pushed" at 16:02 and 16:12 UTC).
 - Facts read by the session meanwhile: read_documentation `github.access` (15:52 UTC: a repository becomes attachable
   once the Claude GitHub App can reach it; add_repo attaches it); list_repos (15:52 UTC: five public repositories of
   his, all `can_push: true`; the app's repository-access mode is not shown).

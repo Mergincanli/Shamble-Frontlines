@@ -1,0 +1,87 @@
+# THROWAWAY: the preview hosting check for SHAMBLE FRONTLINES (ADR 0006, spike 1). Plan and results live in
+# Mergincanli/Shamble-Frontlines. This file is deleted with this test repository.
+# Deploys the test site to the test project on Cloudflare Pages:
+#   - for every pull request from a branch of this repository: one preview of that branch;
+#   - when started by hand on `main`: one named set of deploys (tools/sets.json).
+# plan    turns the event into a list of deploys ("legs"); holds no secret
+# build   builds the test site for each leg and reports its file sizes (PM-0006-5); holds no secret
+# deploy  uploads each build; the Pages token reaches it only through the `preview` environment, whose jobs wait for
+#         Mustafa's approval; it checks out and runs nothing from this repository
+# verify  reads the headers of every file on both links of every upload (PM-0006-2); holds no secret
+name: deploy
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      set:
+        description: Which set of deploys to make (tools/sets.json)
+        required: true
+        type: choice
+        options: [round-a, bites, bite-production, restore-production, uploads, revoked]
+
+permissions:
+  contents: read
+
+env:
+  PROJECT: shamble-preview-check
+  WRANGLER: wrangler@4.156.0
+
+jobs:
+  plan:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      legs: ${{ steps.legs.outputs.legs }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - id: legs
+        env:
+          EVENT: ${{ github.event_name }}
+          SET: ${{ inputs.set }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: echo "legs=$(node tools/sets.mjs --event "$EVENT" --set "$SET" --branch "$BRANCH")" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        include: ${{ fromJSON(needs.plan.outputs.legs) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build the test site and report its file sizes (PM-0006-5)
+        env:
+          MODE: ${{ matrix.mode }}
+          MARKER: ${{ github.sha }}
+        run: |
+          node --version
+          node tools/build.mjs --mode "$MODE" --marker "$MARKER" --out dist
+          node tools/check-sizes.mjs dist
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: site-${{ matrix.leg }}
+          path: dist/
+          retention-days: 7
+          if-no-files-found: error
+
+  b9-production:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: production
+    steps:
+      - name: B9 marker (a pull-request job that names production)
+        env:
+          CANARY: ${{ secrets.CANARY }}
+        run: |
+          echo "B9-MARKER: the production job ran at $(date -u +%FT%TZ)"
+          if [ -n "$CANARY" ]; then echo "secret: present"; else echo "secret: absent"; fi
