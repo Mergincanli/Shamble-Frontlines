@@ -14,6 +14,10 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
+**LATEST (2026-11-15 about 12:45 UTC): BRAWL-1 is closed. Two things run: the KEPT-LOGS kit rule's advisor review
+(wf_0f69bce5-688) and C62H-REVIEW's read and ruling (wf_4ce9b8cd-ad2). Read the blocks "KEPT-LOGS ANSWERED" and
+"C62H-REVIEW ANSWERED" below first, then "NEXT (task #74)".**
+
 **NOW (2026-11-15 about 04:25 UTC; read this first after a compact or a cut): BRAWL-1 IS BUILT (copy 1, agent
 a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVISOR'S RULING AND THE REVIEW ROUND.**
 - **The builder's return:**
@@ -408,8 +412,34 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
             lines (kept-logs-rule-draft.md); then the advisor reviews them as a plan (advisor-kept-logs-rule.md; result
             keys verdict, summary, conditions, final_text_for_mustafa, pr_reviewers, to_mustafa). **Then:** show
             Mustafa final_text_for_mustafa in chat and WAIT for his yes.
+          - The drafter finished at 12:27 UTC (kept-logs-rule-draft.md, 1,036 lines); the advisor's review (agent
+            ab39d555493f4fab8) runs since 12:27.
+        - **C62H-REVIEW ANSWERED: (a)** (Mustafa's words of 2026-11-15 13:35 Amsterdam, typed into this chat 12:34 UTC;
+          verbatim in history.md's last "## Decision", copied by mustafa_c62h_review_words.py, 1,131 chars). In short
+          (his words are the record, not this):
+          - **The read:** a short test-engineer read of 5e563b9's 15 marks.json lines, answering his three questions
+            (word for word against the plan's -17 text and carry 62 (h); can it fail, shown from the c62h record; on P2,
+            P3 and B1, does anything bound the client-ticks filed as left incomplete, and if not, what such a client bug
+            could hide). It changes no file; its one write is its notes file c62h-review-test.md.
+          - **Then:** its findings go to the advisor for a ruling. A new bar, or a change to one, goes to him under
+            Decisions needed; nothing is built on the ruling alone.
+          - **RUNNING since about 12:45 UTC: workflow wf_4ce9b8cd-ad2 (task wmrdd9nxr).** The test-engineer's read
+            (result keys seat, marks_sha256, q1_word_for_word, q2_can_it_fail, q3_bound_off_p0, findings, proposed_bars),
+            then the advisor's ruling (notes advisor-c62h-review.md; keys summary, answers, each_finding, bars,
+            decisions_for_mustafa, units_ahead, report_words, to_mustafa). **If cut:** resume by run id. **Then:** write
+            both word for word by script, read both in full (they touch a pass bar), and report.
+          - **NEW STANDING RULE** (verbatim in history.md, his 13:35 words, the paragraph that starts "From now on"): every
+            marks.json or judge change gets a reviewer's read before its unit closes, and each report names it in its
+            own line with what covered it. No commit since 5e563b9 has changed marks.json or crates/judge/ (git log,
+            12:44 UTC).
+          - **The kit rule:** post its exact lines once the advisor has reviewed them; he answers after his Advisor has
+            read them.
+          - **Slip 9 (about 12:40 UTC):** a `cd <notes folder> && grep` moved the session's folder for one call; the next
+            command returned it. Read-only; nothing changed.
         - **NEXT (task #74):**
-          - KEPT-LOGS: answered (c); the rule is drafted above, and it waits for Mustafa's yes on its exact lines.
+          - KEPT-LOGS: answered (c); the advisor's review of the drafted lines is running. When it is in, post the exact
+            lines to Mustafa; he answers after his Advisor has read them. Nothing is built before his yes.
+          - C62H-REVIEW: the read and the ruling are running (above).
           - Then step (7): U4's report folds U4r's. Then U4f, U4g (its brief with u4g-brief-carry.md and EVQ-LOAD) and
             U4h, each with its brief to the advisor first.
           - Before PR #40 is marked ready: the check.mjs follow-up (now also ADV-PT-L3), JDG-ONLY-1, and taking main in.
@@ -2910,6 +2940,19 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
 
 **Rules in force** (his words verbatim in history.md "Decisions taken" unless marked; from 2026-11-12 on, each
 decision is appended at history.md's end under its own heading "## Decision: …", so no cited line moves)
+- **Mustafa, 2026-11-15 13:35 Amsterdam** (history.md, "## Decision: Mustafa, 2026-11-15 13:35 Amsterdam (12:35 UTC)";
+  recorded by mustafa_c62h_review_words.py). In short: C62H-REVIEW (a), a short test-engineer read of 5e563b9's 15
+  marks.json lines (three questions), changing no file, its findings to the advisor for a ruling, any new or changed
+  bar to him under Decisions needed and never built on the ruling alone. **From now on, every change to marks.json or
+  to the judge gets a reviewer's read before its unit closes, and each report names it in its own line with what
+  covered it.** The kit rule's exact lines go to him once the advisor has reviewed them; he answers after his Advisor
+  has read them.
+- **Mustafa, 2026-11-15 08:20 Amsterdam** (history.md, "## Decision: Mustafa, 2026-11-15 08:20 Amsterdam (07:20 UTC)";
+  recorded by mustafa_kept_logs_words.py). In short: KEPT-LOGS (c) as a narrow kit rule (his words of 2026-11-09),
+  covering only a closed run set's raw-log folder and .gate/u3c-review-target, with the list, archive, read-back and
+  df steps, and a differing hash keeps the folder; the exact kit lines to him first, then its own reviewed kit PR to
+  main, then his go on the merge; nothing packed or deleted before it is on main and this branch has taken main in.
+  The bot fix with the two approved cleans only; SIZE-CHECK past 1,400 stops it.
 - **Mustafa, 2026-11-14** (history.md, "## Decision: Mustafa, 2026-11-14 about 11:07 UTC"; recorded by words_1114.py):
   SIZE-U4R (a): U4r's fix pass as the advisor ruled it; one line with U4r's lines when it is done. SIZE-CHECK from now
   on: at every snapshot, the unit's size on the card beside its planned size; "well past its plan" = more than twice

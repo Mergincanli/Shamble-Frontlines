@@ -2109,3 +2109,21 @@ From "Next steps, in order" (as it was):
   Meanwhile the bot fix goes on with the two approved cleans only. SIZE-CHECK stays: past 1,400 changed lines the bot fix stops and tells me in three lines.
 
   In your next report, name the pass-bar file's change of 2026-11-14, 16:14 UTC (commit 5e563b95: one check and one planted bug added to PM-0001-17) and say which review covered it.
+
+## Decision: Mustafa, 2026-11-15 13:35 Amsterdam (12:35 UTC), C62H-REVIEW (a) and a reviewer's read for every marks.json or judge change
+- **Mustafa, typed into this chat (transcript 2026-11-15T12:34:01.309Z), verbatim:**
+
+  My words of 2026-11-15, 13:35 (Amsterdam time), for the netcode chat.
+
+  C62H-REVIEW: (a). A short test-engineer read of the 15 lines that commit 5e563b95 added to marks.json.
+
+  What the read answers:
+  1. Does the new check ("L1 P0 loses no group") say what the plan's text for PM-0001-17 and carry 62 (h) ask, word for word?
+  2. Can it fail? Show where the planted bug whole-as-lost makes it fail, from the record made under the advisor's carry-62 (h) ruling.
+  3. The check holds on the perfect network only. On P2, P3 and B1, does anything bound how many client-ticks may be filed as left incomplete? If nothing does, say what a client bug of that kind could hide there.
+
+  The read changes no file. Its findings go to the advisor for a ruling. A new bar, or a change to one, comes to me under Decisions needed; it is not built on the ruling alone.
+
+  From now on: every change to marks.json or to the judge gets a reviewer's read before its unit closes, and your report to me names it in its own line with what covered it.
+
+  The kit rule's exact lines: post them when the advisor has reviewed them. I answer after my Advisor has read them.
