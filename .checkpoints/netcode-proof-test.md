@@ -514,6 +514,11 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
             refuses, exit 2) each fail only the new test (actual 0 and 2, expected 1); M4 on the new first-walk line
             still fails test 4 (actual 1, expected 2). Nothing real packed or deleted; nothing under .claude/ written.
             **Next:** the advisor reviews kl-change.diff; then it is posted to Mustafa for his yes.
+          - **Running since about 15:55 UTC: workflow wf_d7fbca53-76d (task wld78w7am)**, the advisor's review of
+            KL-CHANGE (script npt-kl-change-review-wf_d7fbca53-76d.js; notes advisor-kl-change.md; keys verdict,
+            summary, meets_his_words, findings, conditions, build_plan_changes, to_mustafa). **If cut:** resume by run
+            id. **Then:** its result word for word by script, read in full; on APPROVE, post kl-change.diff to Mustafa
+            with what changes in the proof; WAIT for his yes to the changed lines; then build per C7/C9.
           - **After his yes to the changed lines (C7, C9):** a worktree `git worktree add .gate/kept-logs-wt -b claude/kept-logs-rule
             origin/main` (never switch the main folder); the three kit files extracted by script from the text he said
             yes to and compared by cmp; the `.claude/` writes ask him first (Accept edits mode); the draft's (c) steps
