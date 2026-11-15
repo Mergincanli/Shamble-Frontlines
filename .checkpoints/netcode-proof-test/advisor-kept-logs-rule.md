@@ -56,6 +56,10 @@ Branch claude/netcode-proof-test-plan-hcky5g at 4de29cf. Read-only except this f
   advisor's carry-62 (h) review (advisor-u4r-c62h.md C1, C14: "right as committed"), after the r2-run ruling that
   ordered it (advisor-u4r-r2run.md item 6); check.mjs all 11 steps (c62h-check.log); no reviewer seat in a round
   (the session's checkpoint, netcode-proof-test.md:403-406, says the same).
+- K20 the final blocks (below): both pass `node --input-type=module --check` from stdin (313 and 292 lines, widest
+  120; §11 18 lines, widest 117); `diff` against the draft's blocks shows only C1-C3 and C5's edits. C2's `newest()`
+  run read-only (node -e, the same code) on the real cache: 17,873 entries, newest 2026-11-08T22:40:32Z, passes, 77 ms.
+  Not run here (it writes files, which my seat may not): the test suite, the mutations, the dry run: build step (C7).
 - K19 my own slip: one probe file written by a shell redirect into the session scratchpad (outside the repository;
   rl-probe.txt, one line) before I re-read my limits. Nothing in the repository changed but this file.
 
@@ -69,7 +73,8 @@ from a day session on his go for its head.
 
 Shape: right. One appended section, one new script and its tests, no guard, settings, CLAUDE.md or agent-file line;
 clear of step 2.3. The script is the small place that makes "nothing else" and "every hash read back" true by code;
-a text-only rule would rest on care alone. Size after the conditions: about 21 + 318 + 296 lines, all new.
+a text-only rule would rest on care alone. Size after the conditions (measured on the final blocks below): §11 18 lines
+plus 1 blank, the script 313, the tests 292, widest 120; REPO_MAP 2 rows. All new: 625 lines added, none changed.
 
 ## Findings
 - F1 Medium (scope): the script removes its own unfinished archive (`.part`) on failure and at the next start: a third
@@ -154,10 +159,10 @@ This is the narrow kit rule of your words of 2026-11-15, 08:20. It covers your t
 - the raw-log folder of a run set whose results are committed and whose ruling is closed;
 - the one old build cache, `.gate/u3c-review-target`.
 
-Where it goes: one new section at the end of `.claude/CHECKPOINTS.md` (§11, 20 lines, no existing line changed) and one
-new script with its tests. The rule itself is short. The script makes "nothing else" and "every hash read back" hold by
-code, not by care. No change to the guard, `settings.json`, `CLAUDE.md` or any agent file, so it stays clear of step
-2.3's guard change. `rm -rf` stays denied.
+Where it goes: one new section at the end of `.claude/CHECKPOINTS.md` (§11, 18 lines, no existing line changed) and one
+new script (313 lines) with its tests (292 lines). The rule itself is short. The script makes "nothing else" and
+"every hash read back" hold by code, not by care. No change to the guard, `settings.json`, `CLAUDE.md` or any agent
+file, so it stays clear of step 2.3's guard change. `rm -rf` stays denied.
 
 Your three steps, in the script's order (`list`, then `pack`):
 1. `list` writes the folder's list (sha256, size, path per file) beside the set's committed results. I commit it,
