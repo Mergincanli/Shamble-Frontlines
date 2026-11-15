@@ -1,0 +1,99 @@
+--- a/.claude/CHECKPOINTS.md (§11) (as posted)
++++ b/.claude/CHECKPOINTS.md (§11) (with KL-CHANGE)
+@@ -11,5 +11,6 @@
+   ruling (file and line) in the message, and push it. `pack` then packs the folder into one compressed file under
+-  `.gate/netcode-proof-test/kept-logs/`, reads every file's hash back from it, and removes the folder only if every
+-  hash equals the list. If one differs, or the folder no longer matches its list, the folder stays: tell Mustafa, and
+-  pack nothing more until he answers.
++  `.gate/netcode-proof-test/kept-logs/`, reads every file's hash back from it, walks the folder once more, and removes
++  the folder only if every hash equals the list and the folder still holds exactly the list's files and sizes. If one
++  differs, or the folder no longer matches its list, the folder stays: tell Mustafa, and pack nothing more until he
++  answers.
+ - The cache: `cache` removes it only while nothing in it is newer than his words (2026-11-15 07:20 UTC); a later
+--- a/.claude/scripts/kept-logs.mjs (as posted)
++++ b/.claude/scripts/kept-logs.mjs (with KL-CHANGE)
+@@ -12,4 +12,5 @@
+ //        folder into .gate/netcode-proof-test/kept-logs/<set-folder>.tar.gz; reads every file back from that archive
+-//        and hashes it; and removes the folder only if every path, size and sha256 equals the list. If one differs,
+-//        the folder stays, and so does the unfinished archive (<archive>.part), and the script exits 1: tell Mustafa.
++//        and hashes it; walks the folder once more; and removes the folder only if every path, size and sha256 read
++//        back equals the list and the folder still holds exactly its files and sizes. If one differs, the folder
++//        stays, and so does the unfinished archive (<archive>.part), and the script exits 1: tell Mustafa.
+ // cache: removes .gate/u3c-review-target, the one old build cache (cargo refuses it: it has no CACHEDIR.TAG), only
+@@ -79,4 +80,5 @@
+ }
+-// Every file under the set folder as { path, bytes }, sorted by path. Anything but plain files and folders refuses.
+-function walk(dir, set) {
++// Every file under the set folder as { path, bytes }, sorted by path. Anything but plain files and folders goes to
++// `fail`: a refusal (exit 2) before any work; on pack's second walk, a mismatch (exit 1).
++function walk(dir, set, fail = refuse) {
+   const files = [];
+@@ -86,3 +88,3 @@
+       if (!PATH_OK.test(path) || `${set}/${path}`.length > 99) {
+-        refuse(`${set}/${path}: not a plain name of at most 99 characters`);
++        fail(`${set}/${path}: not a plain name of at most 99 characters`);
+       }
+@@ -91,3 +93,3 @@
+       else if (st.isFile() && st.size < 8 ** 11) files.push({ path, bytes: st.size });
+-      else refuse(`${set}/${path} is not a plain file under 8 GiB (a symbolic link, a device or a socket stays)`);
++      else fail(`${set}/${path} is not a plain file under 8 GiB (a symbolic link, a device or a socket stays)`);
+     }
+@@ -95,5 +97,8 @@
+   visit('');
+-  if (!files.length) refuse(`${set} holds no files`);
++  if (!files.length) fail(`${set} holds no files`);
+   return files.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+ }
++// True when a walk's files or sizes are not exactly the list's.
++const differs = (files, rows) => files.length !== rows.length ||
++  files.some((f, i) => f.path !== rows[i].path || f.bytes !== rows[i].bytes);
+ const listText = (set, rows) => `# ${RUNS}/${set}/: ${rows.length} files, ${total(rows)} bytes (sha256, bytes, path; ` +
+@@ -212,3 +217,3 @@
+   const now = walk(dir, set);
+-  if (now.length !== rows.length || now.some((f, i) => f.path !== rows[i].path || f.bytes !== rows[i].bytes)) {
++  if (differs(now, rows)) {
+     refuse(`the folder's files or sizes differ from ${listRel}: the folder stays; tell Mustafa (CHECKPOINTS.md §11)`);
+@@ -253,2 +258,7 @@
+     }
++    // The second walk, the last check before the folder goes: it must still hold exactly the list's files and sizes.
++    // Anything else is a mismatch: the folder and the unfinished archive stay, and the script exits 1.
++    if (differs(walk(dir, set, (msg) => { throw new Mismatch(msg); }), rows)) {
++      throw new Mismatch(`the folder changed while it was packed: its files or sizes now differ from ${listRel}`);
++    }
+     renameSync(part, archive);
+--- a/.claude/scripts/kept-logs.test.mjs (as posted)
++++ b/.claude/scripts/kept-logs.test.mjs (with KL-CHANGE)
+@@ -159,2 +159,33 @@
+   assert.ok(existsSync(join(repo, `${ARCHIVE}.part`)), 'and the next pack leaves it');
++});
++
++test('a folder that changes after the read-back, before it would go: the second walk fails (1) on a late file and on ' +
++  'a late link; the folder and the unfinished archive stay', (t) => {
++  // For the child process only: when pack opens the unfinished archive to read it back, `late` runs in the repository.
++  // The archive holds exactly the list, so the read-back passes and only the second walk can see the change.
++  const packWith = (late) => {
++    const { root, repo, set } = fixture(t);
++    assert.equal(list(repo).status, 0);
++    commit(repo, `${RES}/raw-logs.sha256`, 'raw-log list');
++    const hook = join(root, 'late.mjs');
++    writeFileSync(hook, "import fs from 'node:fs';\nimport { syncBuiltinESMExports } from 'node:module';\n" +
++      'const open = fs.createReadStream;\n' +
++      `fs.createReadStream = (path, ...rest) => { if (String(path).endsWith('.tar.gz.part')) { ${late}; } ` +
++      'return open(path, ...rest); };\nsyncBuiltinESMExports();\n');
++    const env = { ...process.env };
++    delete env.SHAMBLE_ROLE;
++    const p = spawnSync(process.execPath, ['--import', pathToFileURL(hook).href, SCRIPT, 'pack', SET, '--results', RES],
++      { cwd: repo, encoding: 'utf8', env });
++    assert.equal(p.status, 1, p.stderr + p.stdout);
++    assert.ok(existsSync(join(set, 'marks.json')), 'the folder stays');
++    assert.equal(existsSync(join(repo, ARCHIVE)), false);
++    assert.ok(existsSync(join(repo, `${ARCHIVE}.part`)), 'the unfinished archive stays for Mustafa to see');
++    return { p, set };
++  };
++  const a = packWith(`fs.writeFileSync(${JSON.stringify(`${RUNS}/${SET}/late.log`)}, 'late')`);
++  assert.match(a.p.stderr, /MISMATCH[\s\S]*changed while it was packed[\s\S]*the folder stays/);
++  assert.equal(readFileSync(join(a.set, 'late.log'), 'utf8'), 'late', 'the late file stays too');
++  const b = packWith(`fs.symlinkSync('marks.json', ${JSON.stringify(`${RUNS}/${SET}/late-link`)})`);
++  assert.match(b.p.stderr, /MISMATCH[\s\S]*late-link is not a plain file[\s\S]*the folder stays/);
++  assert.ok(lstatSync(join(b.set, 'late-link')).isSymbolicLink(), 'the link stays, never followed');
+ });
