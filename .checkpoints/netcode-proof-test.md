@@ -270,7 +270,21 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
     - -57 (facts): positions max 6,984 at P0 and 6,952 at P3 (bar 10,000); yaw 2,750 in both.
     - The judge: P0 wall 8.6 s, peak 1,856.3 MiB; P3 2.3 s, 392.9 MiB.
     - df: 13,556,174,848 B, then 12,643,663,872.
-  - **RUNNING since about 09:29 UTC: the P3 re-run set,** background shell bduei0sla:
+  - **THE P3 RE-RUN SET IS DONE (exit 0; peak.py wall 1020.5 s, 973.2 MiB):** .gate/u4r-sets/P3-fd4612050cd6.log.
+    - It wrote spikes/netcode-proof/results/u4r/fd4612050cd6/P3/{runs.txt,verdict.json}, which are UNTRACKED and not
+      yet committed.
+    - Verdicts: PM-0001-2 SS PASS; PM-0001-17 L1 P3 PASS; PM-0001-57 L1 P3 PASS (each with l1-p3-s1, -s2 and -s3
+      valid).
+    - The logs on disk were 290.7 MiB against the 524.4 MiB projection; the judge's projected peak was 982 MiB.
+    - **Open, for the advisor before P2:**
+      - (1) condition 15's comparison with U4r's P3 (results/u4r/0f066338dd8d/P3/verdict.json, from before
+        RUNS-LINE): any verdict or shown-bite difference, -57's values side by side with the largest relative change,
+        the building figure at 0 on every run, the bytes against the projection;
+      - (2) a rule conflict: M7-3 wants every set's HEAD to keep spikes/netcode-proof's tree ebbfeb40 (only
+        .checkpoints/ commits after b30314a), but committing each set's results under
+        spikes/netcode-proof/results/u4r/<c12>/<P>/ before the next set changes that tree;
+      - (3) whether P2 may start.
+  - **Was running, about 09:29-09:46 UTC: the P3 re-run set,** background shell bduei0sla:
     `python3 -I .checkpoints/netcode-proof-test/peak.py flock -x .gate/shared-target/.lane.lock node
     spikes/netcode-proof/ops/runs/c-u4r-runs.mjs judged --profile P3 --date 2026-11-15 >
     .gate/u4r-sets/P3-fd4612050cd6.log 2>&1`.
