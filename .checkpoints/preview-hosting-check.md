@@ -138,8 +138,8 @@
   checked again at the next update.
 - agent advisor (Opus by its file, effort high by its file): the plan review of revision 1 at 27e9f50 · DONE
   (APPROVE with conditions).
-- saver check 16:44 UTC: ok ("saved and pushed" at 16:32:51 and 16:42:54 UTC; the cycle due about 16:22 printed
-  nothing and the next ones did: no action needed).
+- saver: stopped with TaskStop at about 16:48 UTC after the plan was saved as done (its log: "saved and pushed" at
+  16:02, 16:12, 16:32 and 16:42 UTC). Start it again with the same command when agents run.
 - Facts read by the session meanwhile: read_documentation `github.access` (15:52 UTC: a repository becomes attachable
   once the Claude GitHub App can reach it; add_repo attaches it); list_repos (15:52 UTC: five public repositories of
   his, all `can_push: true`; the app's repository-access mode is not shown).
