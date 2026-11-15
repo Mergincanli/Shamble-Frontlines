@@ -585,10 +585,27 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
               Chromium could not start (the tools want chromium_headless_shell-1194; the container's build differs:
               gate.log), `--no-smoke` GATE PASS (gate-no-smoke.log), as on the card's earlier runs; CI runs the full
               gate; the node_modules link used for it removed. kit step running (18:45).
-            - **Next:** commit and push claude/kept-logs-rule; the PR (draft; body by script, kl_pr_body.py, his words
-              by line ranges); then one workflow: security-auditor + test-engineer (one batch; test-engineer asked
-              about test 5's preload and KLC-F2) + the advisor (main's advisor.md) on the pushed head; fix pass if
-              needed (the advisor on each new head); the ready report; STOP for his go.
+            - **Done 18:45-18:52 UTC:** kit counts at the head equal main's (27, 127, 1107: kit PASS). Committed in the
+              worktree and pushed: **head a637c7a357e79614f896ddddf7488e08b5fc9180** on claude/kept-logs-rule (4 files,
+              +671 −0). `kl_evidence.py compare a637c7a…` PASS (the pushed commit's four files equal the rebuilt ones;
+              `git diff --name-status 4460ef5 a637c7a` = exactly those four). quotes, guard and full re-run into
+              evidence-0.log (all PASS). kl_evidence_copy.py copied 22 evidence files into kl-evidence/ (saved at
+              e10e1de). **PR #53** opened as a draft
+              (https://github.com/Mergincanli/Shamble-Frontlines/pull/53; body written to the scratchpad's
+              kl-build/pr-body.md first; his words linked by line at e10e1de, not copied); subscribed to its activity.
+            - **RUNNING since about 18:53 UTC: workflow wf_a9e04f3e-df7 (task w7kr5itsz)**, one batch of three, read
+              only: security-auditor (notes kl-pr-security.md), test-engineer (notes kl-pr-test.md; asked about test
+              5's preload and KLC-F2), and the advisor from main's advisor.md on head a637c7a (notes
+              advisor-kl-pr-head1.md). **If cut:** resume with `Workflow({scriptPath:
+              "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/kl-pr53-review-wf_a9e04f3e-df7.js",
+              resumeFromRunId: "wf_a9e04f3e-df7"})`. **Then:** the three results word for word by script, read in full;
+              a fix pass if needed (the advisor on each new head); the PR body becomes the ready report (his three
+              items); mark it ready; STOP for his go on the merge.
+            - **Slip 12 (mine, for Mustafa):** three times this afternoon a Bash call began with a plain `cd X &&`
+              instead of a subshell (twice into the notes folder, once into the worktree), so the shell's folder moved;
+              each time it was moved back at once, and no file and no branch changed by it. Rule: subshells only. Also
+              a `py_compile` left one .pyc in the notes folder; deleted before any save (the older tracked .pyc there is
+              left, LEFTOVER-DELETE).
           - **After his yes to the changed lines (C7, C9):** a worktree `git worktree add .gate/kept-logs-wt -b claude/kept-logs-rule
             origin/main` (never switch the main folder); the three kit files extracted by script from the text he said
             yes to and compared by cmp; the `.claude/` writes ask him first (Accept edits mode); the draft's (c) steps
