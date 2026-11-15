@@ -34,5 +34,8 @@
 ## Running work
 - netcode-architect (draft rev 1), xhigh, launched 00:13 Amsterdam, running; notes
   `.checkpoints/npt-u4f-brief/netcode-architect-u4f.md`, draft `.checkpoints/npt-u4f-brief/u4f-brief-draft.md`
-- saver: background task b0yfndb40 · output `/tmp/claude-0/-home-user-Shamble-Frontlines/2cc6b1c7-405a-556f-81c6-a85b5a29465f/tasks/b0yfndb40.output`
-  · started 00:13 · stops by 02:03 (110 minutes on) · last check 00:14: ok (watching)
+- saver: run in 25-minute stints (`--every 10 --for 25`), so each stint's end wakes the run to refresh the status
+  comment (a later hourly run reads a status older than 45 minutes as a cut-off). First saver b0yfndb40 stopped by
+  TaskStop at 00:13 for this. Now: background task bmctdoqdt · output
+  `/tmp/claude-0/-home-user-Shamble-Frontlines/2cc6b1c7-405a-556f-81c6-a85b5a29465f/tasks/bmctdoqdt.output` · started
+  00:13 · stops by 00:38 · last check 00:14: ok (watching)

@@ -4,18 +4,23 @@ Authority: the approved plan at 781212774986118183a7c6521c34cca31b5fe2a0:.checkp
 
 ## Plan (blocks, in order)
 B1. Read the plan (done at start).
-B2. Read N/night-u4f-scout-full.md (the map): note Sections, Carries, Rulings, card lines, standing rules, Open items, latest brief headings, Disk, code lane, Gaps.
-B3. Read N/u4-build-plan.md sections the scout lists (U4f row 805-816, §4.8 338-341, §4.10 360-390, §4.11 392-407, §4.12 422-424, §4.14 453-476, §5 507-512, §7 909-932, §9 958-968, Q16/Q21 1042-1056, 882-883, 383-384).
-B4. Read N/u4s-carries.md entries 46, 80, 86, 57, 74, 21, 27, 18, 39, 50, 61, 58, 76, 77 (line ranges for placeholders; 63/64/67 checked conditionally).
-B5. Read rulings: N/advisor-u4.md (78-89, 112-124, 143-157, 334-335, 477-479), N/advisor-u4r-brief.md 289-359, N/advisor-u4-wave1.md 492-495, N/advisor-u4r-r1-full.md 61-81, 200-204, N/advisor-te-m3.md 126-127, N/advisor-u4df.md 317-318, 461-464, N/advisor-c62h-review-full.md 89-93, N/advisor-u4r-build2-full.md 28, others the scout lists.
-B6. Read the card (N/../netcode-proof-test.md): Rules in force, M6 line, DEPTH ruling, W1-TARGET, lane runner, C62H items.
-B7. Read ADR 0001 rows 239-251, 1610-1612, 1644; marks.json 4618-5202, 9046-9109; marks README 285-290; N/plan.md 617-628; N/u4-scout-netcode.md:122 (F104, F117).
-B8. Read N/u4r-brief.md rev 3.2 (form: headings, §0, §4, §12 1845-1909, 695-696, 940, 968-971).
-B9. Read the code lane at 11fd190 (crates the scout lists: InputBuffer option B, pump, counters, seam, runner FLOOR c-u4r-runs.mjs:131-132).
+B2. Read N/night-u4f-scout-full.md (the map).
+B3. Read N/u4-build-plan.md sections the scout lists.
+B4. Read N/u4s-carries.md entries (line ranges for placeholders).
+B5. Read rulings the scout lists.
+B6. Read the card (N/../netcode-proof-test.md) lines the scout lists.
+B7. Read ADR 0001 rows, marks.json blocks, marks README, N/plan.md, N/u4-scout-netcode.md lines.
+B8. Read N/u4r-brief.md rev 3.2 (form).
+B9. Read the code lane at 11fd190.
 B10-B22. Write draft sections 0-12 (one block per section, saving the draft whole after each).
 B23. Final counts and DONE.
 
 ## Findings (one line each: id, severity, file:line, scenario)
 
+## Key facts (kept as I read)
+- Scout map: N/night-u4f-scout-full.md (HEAD 0ad41a6 when it ran; line numbers hold at 11fd190 except the card).
+- Scout Gaps: no U4f file lane in plan; no run size/time figures for -47 1,000 connects, -21 suites+twins+bites, option A, never-acker; "window" is §4.5 not §4.7; F104 only at u4-scout-netcode.md:122; no U4F-Q ids exist yet.
+- Disk (scout): 7,689 MiB free; 4 GiB floor; 56 MB per 10-min run without -57; judged run 18,335 ticks (355.4 s longest); RUN_LIMIT_MS 3,600 s; judge memory 302.2 + 2.3403 x log MiB; D4 slowest tps SS P0 69.6, P2 51.6, P3 54.7, B1 58.4, ES P3 148.0.
+
 ## Block log
-- B1 done (plan read). Next: B2.
+- B1 done (plan read). B2 done (scout map read). Next: B3.
