@@ -71,7 +71,29 @@
      preview-isolated, the WebAssembly runs, the content file's second visit 0 bytes on production and 65,836 bytes on
      bite-nocache; on bite-coep Chromium refuses the worker's script, so the bite is caught).
 
+15. The review round (workflow wf_c4580fcf-ece, 3 of 3 returned; notes `infra-engineer-review.md`,
+   `security-auditor-review.md`, `test-engineer-review.md`): two Highs, the same fault found twice (F1/TE-1: Pages
+   redirects .html paths, so every link would have failed on /index.html and /404.html), Mediums F2, SA-R3, SA-R4,
+   TE-2 to TE-6, Lows. The security-auditor's ruling on his condition 2: remove `deployments: write`.
+   - Fix pass 2df0112 on `setup` (scripts and page only; the four approved workflows unchanged, hashes rechecked):
+     F1/TE-1, F4, SA-R7, TE-2, TE-3, TE-4, TE-5, TE-6, TE-8, TE-9, TE-10. Re-proven locally: proof.mjs 29 of 29 with a
+     server that redirects .html paths as Pages does; the old check-headers (1b37fae) fails there with 308 on
+     /index.html and /404.html (`.gate/preview-hosting-check/old-demo/demo.mjs`); browser-proof 5 of 5.
+   - Proposed for his yes, one batched diff (`tr-draft/proposed/`): deploy.yml without `deployments: write` (SA-R1) and
+     with the record artifact kept 14 days (F2), new sha256 29593af18d34...; close.yml's tombstone record kept 14 days,
+     new sha256 3afdf389d636...; the token-test variants unchanged (fd3dc4c6029b, 8b745631a278). Not proposed: SA-R2
+     (`actions: read`, deferred to step 2.6).
+   - For him: SA-R3 (the install step keeps the token out of the scripts' environment, not out of their reach, since
+     the runner has passwordless sudo: his acceptance asked); sitting 3 gains SA-R4 (after the reviewer is ticked
+     again, cs/b9-edit re-run once: it must wait, and he rejects it) and SA-R8 (a screenshot of the empty "Repository
+     secrets" list).
+   - Results-log procedures (no code): F3 and TE-7 (each close log's "Uploads found" against the records), TE-11 (each
+     SIZES line, the tombstone's size), TE-12 (the page's resource list against the manifest), TE-3's observed form of
+     the bite (Chromium refuses the worker), TE-13 (root-cause a non-zero second visit). Deferred: F5, F6, SA-R5, SA-R6.
+
 ## Current step
+16. Waiting for his yes on the batched diff and his SA-R3 answer; round 2 (on what changed, 1b37fae..2df0112) and the
+   advisor agent's review of the final head next. Earlier step, kept for the record:
 14. The review round (U4): get_session at about 21:12 UTC read 717,475 of 1,000,000 tokens (72%; automatic compaction
    at 901,600), so the review goes ahead and he is asked to compact before Day 1's runs. The round runs as one workflow
    of three agents (ultracode is on; CLAUDE.md's cap of 3): infra-engineer, security-auditor (his condition 2 on
