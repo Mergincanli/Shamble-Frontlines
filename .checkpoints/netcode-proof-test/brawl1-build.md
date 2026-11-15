@@ -404,4 +404,36 @@ For Mustafa: nothing (spike code: nothing a player sees, hears or feels).
 - FP-8's "before": det-recordings.json a2faf3ea81623c39a13b04f9a97cadb900d8ec482df4375173720f70dae95d99,
   precheck-recordings.json 5ccf57f059026e072cb000c0f9e66ca41ec81b9a02089fd6c26c699c21416881.
 - Size before the pass, numstat against 352a245 (SERIES.md included): 875 added, 123 deleted, 998 changed lines.
+- Read before any change: these notes whole (388 lines), `git status --short` and the whole `git diff` (10 files), the
+  brief whole, the ruling's fix pass (prompt lines 27-208 = ruling lines 11-192), its "The pins", "Round 2", "The merge
+  step", "U4g's brief", "The size" and "Each finding", and the points ruling's ADV-BP-3/ADV-BP-4 and Point 2 words.
+  Note: the resume part names "the brief's section 4" for the rules; the brief's section 4 is "What you hand over", and
+  the rules themselves are in its sections 1, 2 and 5. The ruling's step 1 lists them, and I follow that list.
+
+### Plan (copy 2)
+
+1. FP-0 evidence: a first runner log (fp-0-header.log) before any edit, its header showing diff ee2973aa.
+2. Edits, by Edit only: FP-1 (bots tests (a)-(d)), FP-2 (unit test (a)-(d)), FP-3 (logs.rs test + module doc), FP-4
+   (client test (a), wrap test (b), docs (c), (d)), FP-5 (bots docs (a)-(c)), FP-6 (scenario.rs (a)-(c), hash.rs (d)).
+3. One check run: fmt --check, clippy both builds, the new and changed tests by name, the short copy in both builds.
+4. FP-7: P1 (with the door-entry bar only if the bite rule fails on area), P2, P3, P4, one at a time, each sha256-checked.
+5. FP-8: check.mjs; uptime + det-u4.mjs; regeneration + short copy both builds + full test in release; manifests'
+   sha256; numstat.
+6. FP-9 words and the report, on disk.
+
+### Rulings (advisor-brawl1-r1): state
+
+- FP-0 (main session's): done at 7402dac. My first runner log, before any edit: .gate/u4r/brawl1/fp-0-header.log
+  (06:41:08 UTC, `git status --short`, exit 0), header "diff ee2973aa8ad8c453b5720099c27b37cb9980820da74f33ad9c78ddd7ad591dc7;
+  untracked 17cf51d7c16f37afb4247c27fc96ede8b439d461e6d55d1e55c141e0ccd4a90b" (the porcelain list of the 10 modified
+  files; nothing untracked). FP-0's evidence holds.
+- FP-1 (a) record check: pending. (b) dead-bit tie: pending. (c) area test: pending. (d) printed(): pending.
+- FP-2 (a)-(d): pending.
+- FP-3 test + EA-B1-4 doc: pending.
+- FP-4 (a)-(d): pending.
+- FP-5 (a)-(c): pending.
+- FP-6 (a)-(d): pending.
+- FP-7 P1-P4: pending.
+- FP-8 (1)-(6): pending.
+- FP-9 items 1-6: pending.
 
