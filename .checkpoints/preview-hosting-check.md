@@ -171,6 +171,17 @@
    requests, starting and re-running runs); revision 1's leftovers grepped (none: `npx` appears only in Part 7.0's
    removed lines); the advisor-model line and the fullness figure kept for the closing message.
 
+4. 2026-11-15 20:54:47 UTC (called; transcript time), moments 1 and 3, before the build · Q: is the build's approach
+   sound (branch `setup`, U1-U3, local checks, push without a pull request, the review round of three)? · Changed: commit
+   and push `setup` after each unit, recording each SHA (the saver does not cover that clone); git run from inside the
+   clone (no -C or -c); the scripts' interfaces taken from the six approved texts first (records flat in verify, one
+   folder deeper in probe; no records must not crash verify); every script keeps "no reading" apart from "measured and
+   failed" (retries after a deploy, transport errors and 5xx are no reading, an empty marker never matches); each bite
+   proven locally against a small `_headers` server and the page opened in the preinstalled Chromium (proves the
+   scripts, not Cloudflare); WebdriverIO's options read from the pinned package itself; "setup done" confirmed by
+   screenshots of both environments and the Actions page, plus the token's end date, before the setup pull request;
+   every change to an approved text batched into one diff for one new yes; get_session read after `setup` is pushed.
+
 ## Running work
 - saver: background task bc4g68il4 · output /tmp/claude-0/-home-user-Shamble-Frontlines/a7e7f150-3195-52bd-a549-73b27426198b/tasks/bc4g68il4.output ·
   started 15:52 UTC · stops by 17:42 UTC (110 min) · last check: just started.
