@@ -333,7 +333,21 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
       - `git diff --quiet` with results excluded exits 0;
       - only .checkpoints/ and the four A lines of P3's and P2's results;
       - the scripts unchanged; pgrep empty; df 11,665,391,616 B (11,125 MiB, against 7,711).
-    - **RUNNING since about 10:17 UTC: the P0 re-run set (split),** background shell b1q6ie594, log
+    - **THE P0 SET IS DONE (peak.py exit 0, wall 2566.1 s, 4,504.3 MiB):** runs.txt commit 93509df and tree 07baa855,
+      both equal to pre-P0's.
+      - -2 SS, -17 L1 P0 and -57 L1 P0 PASS, each with three valid runs. All six bites are shown.
+      - The measured runs: resyncs 0, measured incomplete 0, building 0. bite-whole-as-lost has measured incomplete 48.
+        Every bite run has building 0.
+      - **OUTSIDE THE LINES:** bite-tick16 is flagged (carry 58), with 94 resyncs and 720 measured incomplete;
+        TICK16-WORDING says one per client (U4r had 48).
+      - The results (runs.txt, verdict.json, verdict-bites.json under results/u4r/93509dfd7fd1/P0/) are UNTRACKED and
+        held for the advisor.
+    - **RUNNING since about 11:00 UTC: the advisor's P0 ruling, workflow wf_abd08482-f78 (task ws0688tin),** notes
+      advisor-brawl1-sets-p0.md. Its result has the keys summary, condition15, tick16, commit_and_close, report_words
+      and to_mustafa.
+      - **Then:** write it word for word (a script in brawl1_sets_p3_full.py's form); commit as ruled; record the report
+        words, EVQ-LOAD and TICK16-WORDING's correction if any.
+    - **Was running, about 10:17-10:59 UTC: the P0 re-run set (split),** background shell b1q6ie594, log
       .gate/u4r-sets/P0-93509dfd7fd1.log. U4r's P0 took about 39 minutes.
       - **After it:** the expected lines in advisor-brawl1-sets-p3-full.md "The next sets":
         - -2 SS PASS; -17 L1 P0 PASS with 0 mismatches and 0 measured incomplete;
