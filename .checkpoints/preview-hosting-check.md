@@ -231,9 +231,10 @@
 - saver last check 16:27 UTC: the process is alive (pid 1609); its log shows "saved and pushed" at 16:02 and 16:12
   UTC and nothing for the cycle due about 16:22 (the session's own save of 16:21:42 UTC came just before it); to be
   checked again at the next update.
-- workflow wf_c4580fcf-ece (task wbgd5v14u) · script as launched `workflow-runs/review-round-run1.js` · no arguments ·
-  notes `infra-engineer-review.md`, `security-auditor-review.md`, `test-engineer-review.md` · launched about 21:13 UTC ·
-  running. On a usage limit: resume with resumeFromRunId and the same script.
+- workflow wf_c4580fcf-ece (task wbgd5v14u, round 1) · script `workflow-runs/review-round-run1.js` · DONE, 3 of 3.
+- workflow wf_1f145f55-1c2 (task wo369ci0q, round 2) · script as launched `workflow-runs/review-round-2-run1.js` · no
+  arguments · notes `infra-engineer-review-2.md`, `test-engineer-review-2.md` · launched about 21:45 UTC · running. On a
+  usage limit or a cut: resume with resumeFromRunId wf_1f145f55-1c2 and the same script.
 - agent advisor (Opus by its file, effort high by its file): the plan review of revision 1 at 27e9f50 · DONE
   (APPROVE with conditions).
 - saver: stopped with TaskStop at about 16:48 UTC after the plan was saved as done (its log: "saved and pushed" at
