@@ -162,3 +162,48 @@
 - **Part 1 complete; its proofs (a)-(e) recorded above, all on one code state.** Next: Part 2.
 
 ## Part 2
+
+- Written (not yet compiled at this line): client lib.rs `pub fn own_soldier(&self) -> Option<([i32; 3], bool)>` (after
+  newest_tick) + private SOLDIER_FLAGS = 5, SOLDIER_DEAD = 1 << 3; client tests/endpoint.rs
+  `brawl1_own_soldier_is_the_newest_complete_filed_tick_s_own_record` + helper `own_only`. bots lib.rs: LEASH_OUT_CM
+  1_400, LEASH_IN_CM 1_300, `steering` field, crate-private `next_command(newest, view, own)` (step calls it with
+  `endpoint.own_soldier()`), `leash`, free fn `toward_centre`, `command` takes `own` (Kind::Brawl only); no sideways
+  part; #[cfg(test)] mod tests: unit test, `sim_run`/`printed`, short copy `brawl1_sim_short_no_soldier_enters_a_building`,
+  full `brawl1_sim_full_no_soldier_enters_a_building_seeds_1_to_3` (#[ignore]). logs.rs room_tick: tick name
+  `in_building_slot_area` (pairs slot, area; written when not empty, any phase); Counts.in_building_measured +
+  in_building_slots; summary_line appends "; in a building: N slot-ticks (slots …)" ("not counted (--logs 0)" on a
+  no-log run).
+- p2-check-1.log: fmt diffs (bots tests, client test) applied by Edit; clippy type_complexity on the test's VecDeque
+  type: `type Seen = (u8, [i32; 3], bool, u16)` added in the test module.
+- p2-check-2.log (exit 0): fmt clean; clippy -D warnings npt-bots, npt-client, npt-lab --all-targets, both builds,
+  clean; client `brawl1_own_soldier_...` 1 passed; bots unit test 1 passed; short copy alone by name: measured (dev)
+  build 10.97 s, bites (dev) build 11.07 s (under 60 s: not shortened). Short copy's prints (seed 1, 3,600 ticks):
+  EveryTick in a building 0, largest distance 1,575 cm (slot 27, tick 65928), stuck none; Skips in a building 0,
+  largest 1,629 cm (slot 39, tick 63768), skipped 53,039 of 172,752 chances (307 per 1000), longest streak 6, stuck
+  none.
+- Full test, release, by name: p2-full-release.log ran nothing (`--exact` needs the module path: 0 passed, 3 filtered
+  out); p2-full-release-2.log (`tests::brawl1_sim_full_...` --ignored --exact): exit 0, 1 passed, finished in 23.51 s.
+  Per seed and pattern (18,300 ticks each; in a building 0 soldier-ticks in all nine; stuck none in all nine):
+  - seed 1: EveryTick largest 1,575 cm (slot 27, tick 65928); Skips 1,654 cm (slot 32, tick 72749), 267,095 of 878,352
+    skipped (304 per 1000), longest streak 6; Bursts 1,832 cm (slot 7, tick 75766), longest streak 30.
+  - seed 2: EveryTick 1,575 cm (slot 16, tick 68589); Skips 1,720 cm (slot 36, tick 69092), 266,728 (303 per 1000),
+    streak 6; Bursts 1,832 cm (slot 7, tick 75766), streak 30.
+  - seed 3: EveryTick 1,570 cm (slot 31, tick 69585); Skips 1,686 cm (slot 30, tick 67741), 267,925 (305 per 1000),
+    streak 6; Bursts 1,832 cm (slot 5, tick 79366), streak 30.
+  - Pattern (iii) for U4g's brief: no area != 0 in three seeds; largest distance 1,832 cm in all three, each at a burst's
+    end (tick 75766 = k 12,030, burst 7's end; 79366 = k 15,630, burst 9's end): 32 cm past the nearest door entry's
+    1,800 cm figure, outside a building. The same figure three times suggests a soldier stopped by a fixed face; the
+    test now prints the soldier's x, y beside it, for the final run.
+
+### The SERIES.md rows (drafted for the main session's Edit; condition 10)
+
+One written name only: no lab end-event field carries the total (the summary line prints it; Counts is not logged).
+A new heading after "Names added with U4r" (marks/SERIES.md:333-366), before "## Series read only by figures":
+
+```
+### Names added with BRAWL-1 (npt-lab `scenario`'s room log; advisor-u4r-sets-r2-full.md, BRAWL-1 Fix (b))
+
+| Name | Unit | Written by (crate) | Meaning | Marks |
+|---|---|---|---|---|
+| `tick.s.in_building_slot_area` | pairs (slot, area) | npt-lab (from npt-sim's Soldier records' `area`) | the room log, on every logged tick (any phase) where a soldier's feet are in a building area: each such soldier's slot, then its area (building i is area i + 1: the greybox's area rule, half-open on each footprint), in slot order; absent on a tick with none. The run's summary line prints the measured total as "in a building: N slot-ticks (slots ...)" | none (recorded) |
+```
