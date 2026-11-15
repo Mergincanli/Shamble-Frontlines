@@ -73,8 +73,12 @@ CI GREEN, THE ADVISOR'S HEAD REVIEW RUNS; BRAWL-1's PLAN REVIEW RUNS.**
          No second check is needed, because the diff holds only those edits (56/27).
        - **My reading of E13:** it replaces "`last` stays" and the unit-test line. It keeps "on a no-log run, filed()
          resolves only and never grows `res`", which the brief's item 6 needs.
-    3. **RUNNING since 00:00 UTC: the builder, copy 1.** Workflow wf_1d4a86b9-79f (task wv23z8z35): general-purpose,
-       opus, xhigh, isolation worktree, `<base>` 926a6cb. Notes brawl1-build.md; its worktree path goes in the notes.
+    3. **Copy 1 (workflow wf_1d4a86b9-79f) was CUT at 00:00:39 by the spend limit.** It wrote nothing. Its worktree was
+       on main (4460ef5) by the workflow's isolation, and its start check caught that (the cuts block, 2026-11-15
+       00:00).
+       - **Relaunched at about 02:40** by the Agent tool: general-purpose, opus, effort xhigh, `isolation: "worktree"`.
+         `<base>` is the main folder's HEAD at launch (the card's save just before; the launch line in the cuts block and
+         the notes give the sha). Notes brawl1-build.md; its worktree path goes in the notes.
        - **If it stops or is cut:** launch a fresh copy WITHOUT isolation, told the existing worktree's path from the
          notes. It reads the notes and that worktree's diff before it changes anything (as U4r's copy 6). Never launch a
          new worktree for a later copy.
@@ -2044,6 +2048,23 @@ the cut and the time of the resume; UTC, read from the session's transcript):
   (U4r merged at 71ee13d, CI green), the saver b02nlg0ph still running, no run going (the review writes only its
   notes). The review resumed by `resumeFromRunId: "wf_ed59da85-818"` (its agent re-runs live and reads its notes
   advisor-u4r-merge.md first).
+- 2026-11-15 00:00: "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit
+  resets 1:50am (UTC)" (transcript 00:00:39.787).
+  - **Cut:** BRAWL-1's builder, copy 1 (wf_1d4a86b9-79f, agent ad7827dff8b2430be), after 39 s and 5 tool uses. It wrote
+    no notes and no code.
+  - **What copy 1 had found:** the workflow's `isolation: 'worktree'` had made its worktree from main, 4460ef5, not from
+    the spike branch's 926a6cb. Its start check caught the mismatch. That worktree, .claude/worktrees/wf_1d4a86b9-79f-1,
+    was auto-removed, unchanged.
+  - **Also stopped:** the saver bi9cwf4dz ended (exit 0), and the session's worker restarted twice. The COMPACT-WAIT
+    reminder (00:04) and the check-ins at 00:35 and 02:34 waited in the queue.
+  - **Resumed 02:36,** at the 02:34 check-in.
+    - Checked first: the tree clean at d40b25b; no npt, cargo or saver process; no notes; no worktree left.
+    - The saver was restarted (b2ohw2c8n).
+    - A .gate/brawl1-wt worktree made by `git worktree add` was removed again with plain `git worktree remove`, because
+      u4r-run.sh accepts only worktrees under .claude/worktrees/.
+    - The builder was relaunched by the Agent tool with `isolation: "worktree"`. That route gave U4r's builders
+      spike-branch worktrees. Its start check (HEAD equal to `<base>`) stays.
+    - **Lesson:** never give a builder a workflow `agent()` with `isolation: 'worktree'`: it bases on main.
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188
