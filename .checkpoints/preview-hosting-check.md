@@ -53,9 +53,26 @@
    every block byte-equal to its file, every sha256 and both variants' hashes checked, all parsed with PyYAML); Part
    7.0 lists the lines changed since 27e9f50 as diffs.
 
+13. The build, on the test repository's branch `setup` (pushed without a pull request; 0 workflow runs on the
+   repository after the last push, read with the GitHub MCP tool):
+   - U1 fe8116d: the test site and tools/build.mjs (223 lines; plan about 190); all seven modes built locally.
+   - U2 ba3946e: tools/lib.mjs, check-headers.mjs, check-sizes.mjs, probe.mjs, sets.mjs + sets.json, links.json,
+     wdio/run.mjs, wdio/package.json + package-lock.json (WebdriverIO 10.1.0, published 2026-10-18, the newest at least
+     14 days old; the lockfile made with --package-lock-only, 164 packages, all with integrity), README.md text (494
+     lines; plan about 520). WebdriverIO's option names read from its own type files (wdio:enforceWebDriverClassic,
+     wdio:chromedriverOptions.binary and the like; createWindow, switchToWindow, closeWindow).
+   - U3 1b37fae: the four workflows from the plan at 2a2f426, byte for byte; sha256 prefixes 333e5a592a05,
+     98b42b8e59cf, f24ad6e81daf, 6791076916ae, equal to his approved ones (checked by script before the commit).
+   - Local proofs (they prove the scripts, not Cloudflare; scripts in `local-proof/`): proof.mjs 20 of 20 as expected
+     (check-headers passes production, preview and preview-isolated on both links, and fails bite-coep only on
+     /worker.js's COEP, bite-nocache only on the content file's Cache-Control, bite-noindex on noindex, and production's
+     one-off link when the host's noindex is emulated; probe sorts 404, tombstone, wall, served, the 1010 block and a
+     503 as planned); browser-proof.mjs in the preinstalled Chromium 153.0.8010.12: 5 of 5 (isolation true/true only on
+     preview-isolated, the WebAssembly runs, the content file's second visit 0 bytes on production and 65,836 bytes on
+     bite-nocache; on bite-coep Chromium refuses the worker's script, so the bite is caught).
+
 ## Current step
-12. SR-READ answered (no write on administration or deployments) and "setup done" received at 20:53:10 UTC: the build
-   (U1 to U3) starts after the advisor tool's consultation (moments 1 and 3). Below, the record of the setup.
+14. Before the review round (U4): get_session for the chat's fullness (consultation 4's point 7).
    - At his request ("Clone the repository Mergincanli/shamble-preview-check into this session"), the session attached
      it with add_repo (push access, as plan A3 step 4 says) and cloned it shallowly to /home/user/shamble-preview-check
      (outside this repository's folder), add_repo at 20:01 UTC and the clone right after (transcript times). The repository is empty: no commit, no branch (`git ls-remote`
