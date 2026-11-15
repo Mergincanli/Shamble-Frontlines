@@ -188,7 +188,28 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
     - Free disk: 6,911,565,824 B before (B), 7,367,524,352 after (B), 13,579,448,320 after (C) (12,950 MiB; the
       advisor's projection was about 12,955).
     - The headers read `diff e3b0c442…; untracked e3b0c442…`.
-  - **M3 RUNNING since about 08:41 UTC:** background shell bvnxdsfea, one main-run.sh call. Its log is
+  - **M3 PASSED (08:38:44-08:59:43 UTC, cold):** .gate/brawl1-merge/m3.log.
+    - Header: HEAD b30314a, free 12,950 MiB, `diff e3b0c442…; untracked e3b0c442…`.
+    - All 9 commands exit 0. `cat /proc/uptime`; uptime "08:53:06 up 18 min, load average: 2.31, 2.21, 1.54".
+    - check.mjs: "check: all 11 steps pass"; test 691.2 s cold, measured 538 passed, bites 616 passed, 0 failed, 0
+      skips; self 77 of 77; marks 81; redact 0.
+    - df after check.mjs 8,342,093,824 B and after det-u4 8,342,081,536 B (A4: above 4 GiB).
+    - det-u4: "PASS det-u4 234.1 s". The clean half regenerates each runner entry and checks length and SHA-256
+      against det-recordings.json, which is unchanged, so 1ec25de7 and 6abf7643 are reproduced. Non-cargo sum 222.8 s
+      (npt-lab hash 219.4 + Wasm 2.5 + 0.9 + compare 0.0), under 240.
+    - The regeneration: "regenerated SS-P0-s4: 16950444 bytes, sha256 1f00d2d5…, as the manifest's".
+    - The full test (exit 0): its 9 printed lines are byte-identical to final-fp-regen-tests.log's 9, dead figures
+      included (compared by script).
+    - Both manifests: a2faf3ea… and 5ccf57f0…. The tree is clean.
+  - **M4 PASSED:**
+    - The full gate's 5a smoke could not start Chromium: "Executable doesn't exist at
+      /opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell" (m4-gate.log, exit 2; every other check
+      PASS).
+    - `node tools/gate.mjs --no-smoke`: "GATE PASS (5a smoke skipped: --no-smoke)" (m4-gate-no-smoke.log, exit 0).
+      CI's smoke job covers 5a.
+  - **M5:** the merge commit b30314a was pushed ALONE at 09:02:06 UTC (f7dff4b..b30314a), so CI reads that commit (A5).
+    The card commits stay local until its CI ends. Then they are pushed, and the saver is restarted.
+  - **Was running, about 08:38-09:00 UTC: M3,** background shell bvnxdsfea, one main-run.sh call. Its log is
     .gate/brawl1-merge/m3.log, and the regeneration writes to .gate/brawl1-merge/m3/{rec,out}.
     - It builds cold, so its timings are cold (INF-U4R-7's labels).
     - **If it is cut by a restart:** an interrupted run is not a result, so run it again whole, with the same command
