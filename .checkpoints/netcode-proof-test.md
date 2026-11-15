@@ -115,14 +115,15 @@ return c62h-bound-brief-draft-full.json. **NEXT (after a compact if he types it)
 their conditions to the brief by Edit (the advisor's rulings on B-1 to B-3 and the disk plan are in its result);
 anything beyond them back to the advisor; then the build per the brief; report B-3's choice to Mustafa.** Chat about
 80 % at 22:34 UTC.
-**Both read in full (22:40 UTC).** The advisor: conditions 1-9 (ADV-CBB-1 one route, W, its mechanics; -2 SIZE-CHECK
+**Both read in full (by 22:38 UTC; slip 14: first written "22:40" and "about 22:41" before reading the clock,
+corrected).** The advisor: conditions 1-9 (ADV-CBB-1 one route, W, its mechanics; -2 SIZE-CHECK
 excludes results/ and runs after the fix pass; -3 section 10 quotes the post's stop rules and size line word for word
 (paste :120-124, :89) with the advisor's reading under them; -4 to -7 Low; rulings B-1 yes, B-2 in (commit 3, 4 files,
 ~40 lines; hashed-and-incomplete INVALID→FAIL the only changed fixture answer), B-3 the kept P0 set = 93509dfd7fd1
 (both P0 folders stay until the report reaches Mustafa); the order stands; condition 9: the main session checks a word
 diff touching only these points). The test-engineer: conditions 1-6 (TE-CBB-1 each evidence script shown to FAIL on a
 planted input first; -2 each gap case asserts its own note; -3 the bite summary-line comparison written out; -4 the
-expected test-count changes per step; -5 to -12 carried or deferred in writing). **RUNNING from about 22:41 UTC:
+expected test-count changes per step; -5 to -12 carried or deferred in writing). **RUNNING from about 22:38 UTC:
 workflow wf_f603c2bc-068 (task wa78d03zk):** the netcode-architect revises the brief (notes c62h-bound-brief-rev-
 notes.md; a word diff against ba6bdeb0…), then the advisor checks the revision and rules the test-engineer's items
 (notes advisor-c62h-bound-brief-rev.md). **If cut:** resume by run id (script
