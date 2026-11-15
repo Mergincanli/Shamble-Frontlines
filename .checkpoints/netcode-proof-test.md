@@ -659,6 +659,29 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
               §4.9 line, or another way; whether it needs Mustafa's word: it changes a rule of his approved plan);
               Mustafa told at once. Then redo the merge (merge_main_53.py is ready) with the ruled fix, check.mjs whole,
               the gate, push; only then any real pack.
+            - **REFS-KIT (the advisor's ruling, wf_06df1520-0b9, 20:02-20:13 UTC; advisor-refs-clash-full.json, 44 lines,
+              6d176341…, read in full): FIX WITHOUT HIS WORD.** The clash is with the grep's letter, not §4.9's purpose
+              (ADR 0002:145-146): the kit files use `spikes/netcode-proof/results/` as data, import and run no spike
+              code. The fix: referenceProblems lets exactly the two full paths name that one folder (KEPT_LOGS_FILES,
+              KEPT_LOGS_RESULTS); any other spikes/ text still fails; the PASS line names §4.9's one exception; one new
+              check.test.mjs test; plants P1 (broad .claude/scripts/ skip), P2 (whole-file skip), P3 (no exception);
+              plan §4.2 and §4.9 lines. Mustafa told in the report, not asked (to_mustafa); one commit to undo. Order:
+              (1) REFS-KIT as its own commit, the advisor checks the pushed head; (2) the merge commit alone
+              (merge_main_53.py), check.mjs whole (refs PASS naming the exception), gate, push, the advisor checks it;
+              (3) the first real list/pack (never during a build or run set; the P0 raw logs stay until C62H-BOUND's
+              re-judge); (4) C62H-BOUND's build from step 2's head (its brief may be written now).
+              - **Applied (20:2x UTC):** refs_kit_expected.py built the expected files from HEAD plus the ruling's six
+                replacements (each matched once) and the plant copies; the six Edit-tool edits then compared byte for
+                byte equal (check.mjs 6dcc4752…, check.test.mjs 70389f86…, plan.md 3eecd281…). The saver's
+                terminated-autosave committed plan.md's lines at 63cc7c3 (20:14:58), so the REFS-KIT commit carries
+                check.mjs and check.test.mjs.
+              - **Evidence:** `check.mjs --only refs,self` PASS (refs: 1268 tracked files, the line naming §4.9's
+                exception; self 78 of 78); the two refs tests on scratch copies under .gate/refs-kit/: the fix 2 of 2;
+                P1, P2, P3 each fail the new test, the old test passes (P1.tap to P3.tap); the gate `--no-smoke` PASS
+                (.gate/refs-kit/gate-no-smoke.log). **Running (task bdc3gq790, from about 20:35 UTC): check.mjs whole,
+                counted through main-run.sh** (.gate/refs-kit/counted.log). Then commit, push, the advisor's check.
+            - **Worker restarts (not the spend limit), about 20:25 UTC as well:** the same notice; my turn was not
+              complete (the plant runs); continued at once; nothing lost.
             - **Worker restart (not the spend limit), about 19:52 UTC:** "This session's worker process was restarted.
               If your previous turn was already complete, take no action and wait for the next event. Otherwise,
               continue from where you left off." My turn was not complete (taking main in); continued at once. Nothing
