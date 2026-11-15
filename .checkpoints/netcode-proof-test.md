@@ -501,6 +501,19 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
             (2) the advisor reviews the changed lines; (3) post them to Mustafa in chat and WAIT for his yes to them;
             (4) then build as below, with the change. The PR's evidence must show the GNU tar unpack test ran and was
             not skipped, and the dry run's result for the two real folders. All three narrowings stay.
+          - **KL-CHANGE drafted and checked on scratch copies (about 15:50 UTC):** kl_change_apply.py takes the three
+            kit texts exactly as posted (97c81656…), applies eight exact replacements (each matched once) in the
+            session scratchpad (kl-change/before, after, mutants), and writes the diff to post: **kl-change.diff** (99
+            lines, c67c5322…). The change: walk() takes `fail` (refuse by default; a Mismatch thrower on the second
+            walk), a `differs` helper used by both walks, the second walk inside pack's try after the read-back check
+            and before the rename (a difference throws Mismatch: the folder and the .part stay, exit 1), the header
+            comment and §11 (18 → 19 lines) name the second walk; one new test (two cases: a late file, a late link;
+            a preload hook in the child only, no seam in the script). Script 313 → 323 lines, tests 292 → 323, widest
+            line 120. **Scratch runs** (node v22.23.4, GNU tar 1.35): before 8 pass, 1 skipped (the dry run); after 9
+            pass, 1 skipped (the dry run; the GNU tar test ran, `ok 2`); M12 (second walk removed) and M13 (second walk
+            refuses, exit 2) each fail only the new test (actual 0 and 2, expected 1); M4 on the new first-walk line
+            still fails test 4 (actual 1, expected 2). Nothing real packed or deleted; nothing under .claude/ written.
+            **Next:** the advisor reviews kl-change.diff; then it is posted to Mustafa for his yes.
           - **After his yes to the changed lines (C7, C9):** a worktree `git worktree add .gate/kept-logs-wt -b claude/kept-logs-rule
             origin/main` (never switch the main folder); the three kit files extracted by script from the text he said
             yes to and compared by cmp; the `.claude/` writes ask him first (Accept edits mode); the draft's (c) steps
