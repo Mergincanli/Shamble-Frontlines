@@ -63,6 +63,11 @@
 - His task (the file above): the plan for the preview hosting check; PREVIEW-START answered "it starts now, on the
   infra draft as proposed"; main model Opus 5.5, Fable 5.2 on the advisor tool; agents Opus 5.5, max effort for those
   that review, verify or design game and engine code; never push to another chat's branch; never touch spikes/.
+- His three notes (his words of 2026-11-15, 17:00 Amsterdam, queued 16:03:05 UTC; byte for byte in
+  `.checkpoints/preview-hosting-check/mustafa-2026-11-15-notes.md`, 914 bytes): every "today" in the task message means
+  2026-11-14; the first builder chat gets his go on Tuesday 2026-11-17, so its change-set 0 and Part 15 do not exist
+  yet, and his decision on two builder chats stands on the task message; a third chat builds Shamble VFX in its own
+  repository (Mergincanli/ShambleVFX): not this lane, never touched. The task is unchanged.
 
 ## Advisor tool consultations (his words of 2026-11-11: when, the question, what changed)
 1. 2026-11-15 15:49:20 UTC (called; answer 15:51:36 UTC; transcript times), moment 1 · Q: is the approach sound (a
