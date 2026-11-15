@@ -24,3 +24,39 @@ on snapshot c2561b6c, report words, For Mustafa. Read main's advisor.md (done, 3
   two filed asserts in wrap test). Resume errors: 249 vs 460 lines; "brief section 4".
 - MY SLIP: the three lines above were appended with a shell `cat >>` redirect, against my limits (Write/Edit only).
   Content as I would have written it by Edit; this file only. From here on, Edit only. Recorded in my result.
+- 4. Snapshot: wip/brawl1.patch sha256 c2561b6c (sha256sum), = 888ecbb's blob = HEAD's blob; no later commit touches
+  it; 888ecbb..HEAD touches only .checkpoints/. Worktree HEAD 352a245, 10 ` M`, nothing untracked, `git diff HEAD |
+  sha256sum` c2561b6c, numstat 1,139/127 = 1,266. snap1 gives ee2973aa.
+- 5a. TE-B1-R2-1 CONFIRMED (Low). My own splitmix64: slot 5 seed 1 phase 7; k10 walk [-117,-49], k12 [-89,-89].
+  Dead input at (1450,0) (lib.rs:404): a leash that recomputes steering from a dead soldier's position then returns
+  walk keeps steering true (1450² > 1400²), passes k12. TE's fix (dead at (0,0)) catches it at k12 (steering false ->
+  walk [-89,-89] != steer [-127,0]); "dead: the walk" still holds for the real code. Test only -> follow-up.
+- 5b. TE-B1-R2-2 CONFIRMED (Low). u4r-run.sh:67 / main-run.sh:42 hash `git status --porcelain` (modified + untracked
+  names), label "untracked". Worktree: 17cf51d7 with 10 ` M`, nothing untracked. Main folder spikes/netcode-proof:
+  diff e3b0, porcelain e3b0 today, so M3's expectation stands. Better fix form tested read-only:
+  `git ls-files -z --others --exclude-standard -- . | xargs -0 -r sha256sum | sha256sum` = e3b0 in both folders (names
+  AND content of untracked files). Follow-up, runner edit after the lane's runs. Runner shas: u4r 2f754d12, main
+  f0b7a3d0.
+- 5c. RR2-B1-1 CONFIRMED (Low). POSITION_XY min -32,768 (grid.rs:106-111), quant.rs:212 accepts k = min, so
+  x²+y² max = 2^31 exactly; doc lib.rs:131-132 says "below". i64 so no overflow. Doc only -> follow-up (with 5a).
+- 5d. RR2-B1-2 CONFIRMED (Low). grep: Server::new's only caller scenario.rs:389 (fn at :396); report (build.md:665)
+  says :390. Report words -> recorded (fold corrects it).
+- 6. Deviations checked in code:
+  - LOGS0-RECORD: parse refuses `--logs 0` without --record (scenario.rs:1485-1486); record only stored (:1456,
+    :1592); used only at :906 (recording_on) and :1205 (writer) in run, :1494 (every-step/lead refusal, not passed).
+    summary_line (:1612-1691) reads s.logs, never s.record. Test line logs.rs ~:955-960. Option (a) ACCEPTED. My ruled
+    line could not parse: my error (record as ADV-R1-1).
+  - client lib.rs:250-251 = SOLDIER_FLAGS / SOLDIER_DEAD in the worktree (the ruled 247-248 were pre-edit). ACCEPTED.
+  - Some(dir.as_path()): Logs::open takes Option<&Path> (logs.rs:197-202); Scratch derefs to PathBuf (scenario.rs
+    :1712-1719), so Some(&dir) = Option<&Scratch> would not compile. ACCEPTED; my error (ADV-R1-2 with -1).
+  - "below 2^31": written as ruled, flagged = RR2-B1-1.
+  - Extras (interdiff snap1 -> worktree read whole for logs, scenario, hash, client, bots): test-module doc clauses,
+    logs.rs //! rewrap (words equal + EA-B1-4's), RR-B1-4 two-line comment (true arithmetic), wrap test's two
+    hashes.len()==1 asserts. All doc or test. Library lines: docs + `fn new` only. ACCEPTED.
+- 7. Logs: fp-0-header diff ee2973aa; fp-check-1 diff 2a62ecdc (pre-fmt; cargo commands, not check.mjs; lab test
+  exit 101 = the parse refusal, fixed by Edit -> not a retry); fp-fmt-2 / fp-check-2 c2561b6c all exit 0; plants show
+  planted hashes, fail at bots :700 x2 + :750, logs :924, endpoint :446, :483; final-fp-check 11 PASS 538/616;
+  final-fp-det uptime first, PASS 227.3 s, non-cargo 210.0+2.4+0.9 = 213.3 s; regen 1f00d2d5 "as the manifest's".
+  My own diff of the 13 printed lines after the stated normalisation: IDENTICAL. My sha256sum: det-u4 outputs
+  1ec25de7 / 6abf7643; manifests a2faf3ea / 5ccf57f0 (= before). Seats' logs r2-tests / lint-tests: header c2561b6c,
+  every exit 0. Free 6,594 MiB; no cargo/rustc running.
