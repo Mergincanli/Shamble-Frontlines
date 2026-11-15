@@ -80,6 +80,13 @@ empty diff and untracked hashes; all 11 PASS; refs PASS on 1,273 tracked files n
 files tracked; self and redact PASS); free after the run; save and push; CI on that head; the advisor's head check;
 only then the first real list/pack (one folder at a time; P0's raw logs stay until C62H-BOUND's re-judge; free space
 against each folder's size first); then C62H-BOUND's build from the checked head.
+**DONE 21:02-21:16 UTC:** the merge pushed with the card (6db2d0c; CI on 6db2d0c: no failed suite, 21:05 UTC); the
+cache removed by `kept-logs.mjs cache` (exit 0; free 2,863 → 6,914 MiB; Key numbers); **check.mjs whole through
+main-run.sh on HEAD ea95701 (the merge plus card commits; empty diff and untracked hashes; free 6,913 MiB at start):
+all 11 steps PASS** (21:02:53-21:16:35 UTC; test 724.2 s, measured 538, bites 616, 0 failed; refs PASS on 1,275
+tracked files naming §4.9's exception (the advisor's 1,273 plus its two disk-ruling notes committed since), both kit
+files tracked; marks 81; self 78 of 78; redact 0; .gate/refs-kit/counted-merge-2.log); free after 5,891 MiB.
+**Next:** the advisor's check of this head; then the first real list/pack.
 **Worker restart 3** (not the spend limit) during the merge: continued at once; nothing lost. **Next, in order (the
 ruling's order):** (1) DONE; (2) the merge commit alone: `git merge --no-ff
 --no-commit origin/main`, `python3 -I .checkpoints/netcode-proof-test/merge_main_53.py --apply`, check.mjs whole (refs
