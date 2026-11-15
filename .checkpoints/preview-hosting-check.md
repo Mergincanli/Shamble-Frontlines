@@ -66,7 +66,7 @@
      (4a67b83b9ed672c81e1a6e3067f916841c02b4a9), fetched shallowly and fast-forwarded onto the empty local `main` (no
      reset); register_repo_root called for /home/user/shamble-preview-check. He asked for the rest of the setup in plain
      words; the steps sent: A2, A3 (SR-READ), A4, then wait for the session's reply, then A5 to A7.
-   - His answers (his message of about 20:15 UTC): A4 done, the test site is up at https://shamble-preview-check.pages.dev/;
+   - His answers (his message stamped 20:42:20 UTC, abaac228-81c6-4e33-808e-40fc63e8499f): A4 done, the test site is up at https://shamble-preview-check.pages.dev/;
      his Cloudflare account holds nothing besides the domain shamblefrontlines.com ("this is the first time that I've
      been using cloudflare"); on 1b: "I had to give proper access for read and write (confirm), and have done so for
      Claude", which names no permission, so SR-READ is still open. The app's public page
