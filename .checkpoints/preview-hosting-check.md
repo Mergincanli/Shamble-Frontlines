@@ -91,6 +91,14 @@
      SIZES line, the tombstone's size), TE-12 (the page's resource list against the manifest), TE-3's observed form of
      the bite (Chromium refuses the worker), TE-13 (root-cause a non-zero second visit). Deferred: F5, F6, SA-R5, SA-R6.
 
+17. Round 2 (workflow wf_1f145f55-1c2, 2 of 2 returned; notes `infra-engineer-review-2.md`, `test-engineer-review-2.md`):
+   both **APPROVE**, no Critical, High or Medium on 1b37fae..2df0112; F1/TE-1 confirmed fixed (both reran proof.mjs 29
+   of 29 and browser-proof 5 of 5). Lows: infra L1 to L5 and test R2-1 to R2-6, follow-ups by the review budget (a Low
+   triggers no push on its own). To ride the next push (with the approved workflow diff): R2-2 (done==='error' counts
+   as not as expected), R2-4 (no sleep after the last manifest try), R2-1 (a proof case for the marker half). For the
+   results log: L3 (index.html and 404.html not fetched, and why), L5 (an earlier run's verify reads a multi-push
+   branch link as stale: an expected red). Kept as STATUS follow-ups: L1, L2, L4, R2-3, R2-5, R2-6.
+
 ## Current step
 16. Waiting for his yes on the batched diff and his SA-R3 answer; round 2 (on what changed, 1b37fae..2df0112) and the
    advisor agent's review of the final head next. Earlier step, kept for the record:
@@ -125,8 +133,7 @@
      The screenshot itself stays out of the repository (a binary); its text is above.
 
 ## Next steps
-1. Round 2 (review budget: on what changed, 1b37fae..2df0112): infra-engineer and test-engineer, launched as a workflow
-   at about 21:46 UTC (see Running work). Fix what it finds in scripts only; any approved-text change joins the batch.
+1. Round 2: DONE, both APPROVE (step 17). Its three ride-along Lows go into the next push.
 2. His yes on the batched diff (`tr-draft/proposed/deploy.yml` sha256 29593af18d34..., `tr-draft/proposed/close.yml`
    sha256 3afdf389d636...; the exact diff sent in chat at about 21:47 UTC). On his yes: copy both files byte for byte
    into /home/user/shamble-preview-check/.github/workflows/, check the hashes, commit on `setup`, push.
@@ -232,9 +239,8 @@
   UTC and nothing for the cycle due about 16:22 (the session's own save of 16:21:42 UTC came just before it); to be
   checked again at the next update.
 - workflow wf_c4580fcf-ece (task wbgd5v14u, round 1) · script `workflow-runs/review-round-run1.js` · DONE, 3 of 3.
-- workflow wf_1f145f55-1c2 (task wo369ci0q, round 2) · script as launched `workflow-runs/review-round-2-run1.js` · no
-  arguments · notes `infra-engineer-review-2.md`, `test-engineer-review-2.md` · launched about 21:45 UTC · running. On a
-  usage limit or a cut: resume with resumeFromRunId wf_1f145f55-1c2 and the same script.
+- workflow wf_1f145f55-1c2 (task wo369ci0q, round 2) · script `workflow-runs/review-round-2-run1.js` · DONE, 2 of 2,
+  both APPROVE.
 - agent advisor (Opus by its file, effort high by its file): the plan review of revision 1 at 27e9f50 · DONE
   (APPROVE with conditions).
 - saver: stopped with TaskStop at about 16:48 UTC after the plan was saved as done (its log: "saved and pushed" at
