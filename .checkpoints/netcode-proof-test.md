@@ -308,6 +308,23 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
         P2, a flagged resync run gets print-only reads (count, ticks, phases, slots, no kick, 0 mismatches); if those
         hold, P0 follows without waiting, and the flagged runs go to the advisor with P0's verdict.
       - The EVQ-LOAD carry line goes into u4r-report.md and onto the card, word for word from the ruling's next_sets.
+    - **P3's results were committed at fc41111** (the two files plus the card) and pushed.
+    - **P2's pre-check PASSED** (.gate/u4r-sets/pre-P2.log, 09:58:11 UTC, every command exit 0):
+      - the header reads `diff e3b0…; untracked e3b0…`;
+      - HEAD fc411116c1f1, tree 079ffffc;
+      - `git diff --quiet b30314a HEAD -- . ':(exclude)results'` exits 0;
+      - name-only lists only .checkpoints/ and P3's two files, and name-status shows only A lines;
+      - c-u4r-runs.mjs 99dd070e, main-run.sh f0b7a3d0 and u4r-run.sh 2f754d12;
+      - pgrep finds nothing; df 12,326,227,968 B.
+    - **RUNNING since about 09:58 UTC: the P2 re-run set,** background shell b9rsf422l, log
+      .gate/u4r-sets/P2-fc411116c1f1.log, launched as P3 was.
+      - **After it:**
+        1. check runs.txt's commit and tree against pre-P2's;
+        2. read the expected lines (the ruling's "The next sets"), every runs.txt flag, and each summary-line figure
+           against U4r's P2 same-seed line (results/u4r/ab10f058a828/P2/);
+        3. a flagged resync run gets print-only reads (count, ticks, phases, slots, no kick, 0 mismatches);
+        4. commit P2's results (the two files) and push;
+        5. pre-P0 (floor 7,711 MiB), then P0 (split).
     - **Was running, about 09:46-09:58 UTC: that ruling, workflow wf_04e44b32-d5e (task wweyhb48z),** notes
       advisor-brawl1-sets-p3.md. Its result has the keys summary, condition15, conflict, next_sets, report_figures
       and to_mustafa.
