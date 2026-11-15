@@ -20,4 +20,19 @@ Task: night 2026-11-16 item 7 (npt-u4f-brief), security-auditor check of U4f bri
   - plan.md §4.4 :510-514: room column and server column (size limits, trailing+unknown fields, wrong channel, per-connection and new-session rate limits, ping rate and hold-time cap, ...). "Each check gets a home and a -21 counter" (:510).
   - §4.10 :360-390 (u4-build-plan); U4E-Q11 :492-495 (server checks size, trailing, wrong channel, bucket; U4f adds -21 counters + judged runs).
   - Scout map read; carry ranges: 46 :506-509, 80 :510-534, 86 :535-537, 57 :223-228, 74 :343-354, 21 :148-149, 27 :166-168, 18 :129-132, 39 :169-179, 50 :180-183, 61 :229-247, 58 :269-273, 76 :364-371, 77 :372-381.
-  Next B3 (carries).
+- B3 done (carries read at their ranges). Security-relevant content:
+  - 46 (:506-509): press twin removes exactly refused presses (slot, seq, kind), counter one lower; room-level hash test.
+  - 80 (a) (:513-518): canonical sort wrap-aware is no total order for ticks 2^31+ apart; Rust sorts may panic on a non-total order -> a forged-tick panic (DoS) is reachable once option A runs several commands of one slot per tick; U4f's lead bound refuses first or a total key, with a test 2^31 apart, carry 21's test made to fail without the sort. (b)-(e) client side.
+  - 76 (:364-371): room decides replacement and Kick(overflow) but sends old connection nothing; Decoder has no end-session call; Room::receive takes any message by slot alone -> caller's session handling is a security boundary; U4r lab sends Kick(replaced), drops Decoder and link; kicked or Leave'd session dropped; two tests (replacement; kicked session's later datagrams reach no room call).
+  - 74 (:343-354): lead default 1; U4r with_lead formula; late > 1 % to the advisor.
+  - 57 (:223-228) cap data, provisional 1,024; U4f measures; overflow resync counted per client. 58 (:269-273). 50 (:180-183) event older than 255 ticks never queued. 27 (:166-168) CMD_CATCHUP = REDUNDANCY_CAP. 39/18 tick-count route. 61 hs rules. 77 per-counter wraps, stale() sums.
+- B4 done (draft rev 1 read whole, 837 lines; drafter notes NA-6/7/8 at netcode-architect-u4f.md:15-17). Draft map for my half:
+  - 2.4 (:141-166) kinds table 1-11 + clamp row; counting rule :143-148 (by U4F-Q9); other room-column checks left to U4g/U4h/U4e :165-166.
+  - 2.5 (:168-176) pump counters too_large, trailing_bytes, unknown_field, wrong_channel, input_limited; "no forged kind of the 11 is theirs" for size and bucket (:174-175); U4f changes no pump code (:175).
+  - 2.6 (:178-193) cheats table; never-acker :193; forgers re-encode honest datagram :181-184.
+  - 2.10 tests f7-f23 (:262-278); f21 never-acker Kick + carry 76 (:276); f23 wrong channel (:278).
+  - 2.11 bites (:290-317), 17 bites; no-trailing/no-channel U4a's (:306, :308).
+  - 2.12 twins (:319-331). 3 carries (:352-377); 76 -> 2.6, f21 (:371).
+  - 4 netcode.md rule (:450-452). 10 Q8 lead bound (:705-713), Q9 counting (:715-724), Q11 (:735-745).
+  - 12 review: security-auditor scope (:776-777).
+  Next B5 (code at 11fd190: room input.rs, room.rs receive/receive_input/kick; server pump.rs; bots; lab scenario Kick routing).

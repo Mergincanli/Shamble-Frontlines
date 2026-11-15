@@ -3,35 +3,18 @@ Task: night 2026-11-16 item 7 (npt-u4f-brief), test-engineer check of rev 1 of U
 (No Edit tool in this agent: the notes file is rewritten whole with Write at each save.)
 
 ## Plan (blocks, in order)
-- B1: read the approved plan (git show 7812127:.checkpoints/netcode-proof-test/night-2026-11-16.md). DONE.
-- B2: read the draft u4f-brief-draft.md (rev 1, 837 lines) in full. DONE.
-- B3: read the drafter's notes netcode-architect-u4f.md (NA-1..NA-12, counts). DONE.
-- B4: read the scout's map N/night-u4f-scout-full.md. DONE.
-- B5: read U4f's sources in N/u4-build-plan.md. DONE.
-- B6: read the carries at N/u4s-carries.md (46, 80 a-e, 86, 57, 74, 21, 27, 18, 39, 50, 61, 58, 76, 77; 63/64/67 conditions).
-- B7: read marks.json's -20/-21/-22/-47 rows (bites, run counts) and marks/README.md:285-290, :317-326; ADR 0001 rows 1610-1612, 1644.
-- B8: read the advisor sources the draft leans on for tests and runs (advisor-u4.md:78-124, 147, 334-335, 477-479).
-- B9: cross-check: tests/negative cases/bites/runs/carries present and testable; counts and budgets add up; scope creep.
-- B10: write findings (TE-n) and summary; DONE.
+- B1-B8: DONE (plan, draft, drafter's notes, scout, build plan, carries, marks.json, README, ADR, plan.md, advisor rulings).
+- B9: code and table spot checks (Grep/Read only): SERIES.md rows DONE; room input.rs DONE; room.rs; client lib.rs; lab tests (carry 76's test); c-u4r-runs.mjs/c-u4r-r2.mjs numbers; l1 profiles.
+- B10: cross-check and write findings (TE-n) and summary; DONE.
 
 ## Notes (one line per finding / block)
-- B1 done.
-- B2 done (draft: 2.10 has f1-f30, claims measured +60 / bites +74 / neg 44; 2.11 17 bites, 14 new unit proofs; 5.1 36 measured + 12 twins + 17 bites = 65; 5.5 totals 65 + pre-runs, ~3,750 MB, 5.5-7 h).
-- B3 done (drafter: NA-1..NA-12; counts as the draft; drafter did not read client lib.rs:810-839, logs.rs:495, contract.rs, bots :404).
-- B4 done (scout: carries list incl. 62 (h) at :289-321; condition 5 at advisor-u4.md:119-124 asks the precondition pass on short runs of -20 P3 and EACH of -21's EIGHT suites; Disk: 7,689 MiB free, no figures for -47/-21 suites/option A/never-acker).
-- B5 done. Facts from plan at 11fd190:
-  - §9 :962-963 run counts: -20 6, -21 24 + 12 twins, -22 3, -47 3 (draft 5.1 measured 36 = 6+24+3+3: OK; twins 12 OK).
-  - §5 preamble :507-512: counts as deltas; bite must fail the named test or check; pub items listed.
-  - §7.1 :914-915 item 3: "a bite run shows its own test failing by name"; :916 touch after last bite.
-  - §4.11 :399-401: a test runs a bite instance and a clean instance on parallel threads (draft f30, 1 test for client+room).
-  - §4.11 :402-403: Send asserts Room<World>, Decoder, ClientEndpoint (draft: "kept, not new").
-  - §4.10 :389-390: twin test fate logs equal every flow + snapshot group counts every tick (draft f16: forged A, forged B, clamp A, clamp B = 4).
-  - §4.10 :365-366: unit test clamp-then-grid idempotent for every fire origin below TUNE-2 bound (U4d's? check whether exists; draft does not list it).
-  - §4.13 :437-447: shot band per suite; "U4r's contract test shows the band per suite on its short runs".
-  - §4.12 :412-415: contract test shows every check of every U4 L1 part resolves, every name has SERIES row, validity inputs exist (admit events, footer, tick.v.late_count wherever late-zero applies).
-  - §4.14 :462 not-older-than: fast-clock suite, option A; :463 no-catchup-cap: forged, option A, two datagrams in one tick; :475 -22/unbounded: full S30.
-  - §4.14 :467 -48/no-buffer-wait reads -20's logged depth at P3 option B (U4h's; depends on U4f's depth series).
-  - §5 U4f :810-815: -21's 8 parts with twins and 13 bites "each bite run in the suite and option §4.14 or marks.json's notes name".
-  - §5 U4r :758-761: contract test shows PM-0001-2 passing on short runs of -20's P3 and EACH of -21's eight suites with open-loop scripts.
-  - §4.7 :333: FullState unacked within ticks_for_ms(2_000) (60 ticks) or overflow again -> Kick(overflow).
-- Next: B6.
+- B1-B4 done (draft numbers: 2.10 f1-f30, claims measured +60 / bites +74 / neg 44; 2.11 17 bites, 14 new unit proofs; 5.1 36 + 12 twins + 17 bites = 65; 5.5 65 + pre-runs, ~3,750 MB, 5.5-7 h).
+- B5 done (plan §9 :962-963 counts OK in 5.1; §4.11 :399-403; §4.10 :389-390; §4.13 :437-447; §4.12 :412-415; §4.14 :462-475; §5 U4r :758-761; §4.7 :333).
+- B6 done. Carries: 80 (b) f24 no bound (FINDING); 80 (c) f25 no failing-encode route, no counter (FINDING Low); 80 (a)/(d)/(e), 46, 86 OK (NA-1 holds); 74 late share vacuous under A (FINDING) and controller not on a short B run (FINDING); 76 f21 maybe duplicate; 39 no 30/60 Hz pin (FINDING).
+- B7 done: not-older-than may not bite under U4F-Q7 (b) (FINDING); fast-clock under B excess <= 0 by construction (note); U4F-Q11 (iii)(a) looser than ADR 0001:1611 and an unflagged reading (FINDING); README §5 read right; tick-quantised can bite (plan.md :618-624).
+- B8 done: condition 5 (advisor-u4.md:119-124) and U4R-Q4 (r-check :198-205): -20 P3 B with its real suite and the controller shown by nothing; 5.2's note says "5.3 runs it" but 5.3 runs only -20 P3 A (FINDING). U4R-Q14 (b1) (r-check :315-321): strictly rising honest stamps rely on newest-relative stamps; under U4F-Q7 (b) no test pins them (FINDING). f6 cannot fail unless the endpoint reads cmd_timing (FINDING Low). f5 has no pass condition (FINDING).
+- B9 (part) SERIES.md: :34 lagswitch_excess_move = movement this tick minus CMD_CATCHUP ticks of top-speed movement; :33 lagswitch_cmds_count; :61 cmd_on_time "one per command due this tick: 1 when it arrived before its tick ran" (usable as the late signal under A); :155 excess_cmds = run minus (server ticks + lead bound) per episode; :156 excess_move = movement minus (honest movement + lead-bound ticks); :342 lead_ticks_count "the command lead every client of the run stamps with" (profile formula): stale under the controller (FINDING Low); :93 rss_bytes writer npt-server (NA-2 holds; it is a report, not a check).
+  - Lag-switch check cannot fail: a 200 ms hold holds about 6 commands (one per newest-tick move, 30 a second), fewer than CMD_CATCHUP = 8, so no tick can run more than the cap allows even with the cap removed; the -21 lag-switch parts have no bite of their own (no-catchup-cap runs in the forged suite) (FINDING Medium: the mark's design, routed to the advisor).
+- B9 (part) room/src/input.rs at 11fd190: offer() order today is seq (Repeat, :81-88) -> press (:90-106) -> late incl. duplicate stamp (:107-113) -> Full (:114-116); honest redundant copies are Repeat because the seq check runs first. The draft's 2.4 order puts kind 2 (not newer than the last run) 2nd and kind 3 (sequence, where U4F-Q9 (a) drops identical repeats uncounted) 3rd: every redundant copy of an already-run command (each Input carries up to 8 unacked) would be refused and counted under kind 2 before kind 3 can drop it, contradicting f12 and NA-7 (FINDING High). Also an honest reordered command (lost or delayed, arriving after a later one ran) is not newer and was never received: f11/f12 name no expected kind for it, and -20 requires reordering (FINDING Medium).
+  - -58's bites lt-cmd-seq and lt-press live in offer() (input.rs:10-13, :82, :98); the draft's recheck row 1 does not say they keep their sites and unit proofs through U4f's rewrite (FINDING Low).
+- Next: B9 rest (room.rs counters, client lib.rs, lab tests for carry 76, run-script numbers, l1 profiles).
