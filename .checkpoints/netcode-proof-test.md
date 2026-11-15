@@ -86,7 +86,11 @@ main-run.sh on HEAD ea95701 (the merge plus card commits; empty diff and untrack
 all 11 steps PASS** (21:02:53-21:16:35 UTC; test 724.2 s, measured 538, bites 616, 0 failed; refs PASS on 1,275
 tracked files naming §4.9's exception (the advisor's 1,273 plus its two disk-ruling notes committed since), both kit
 files tracked; marks 81; self 78 of 78; redact 0; .gate/refs-kit/counted-merge-2.log); free after 5,891 MiB.
-**Next:** the advisor's check of this head; then the first real list/pack.
+**The advisor's check of head 717b802: APPROVE** (21:17-21:22 UTC; advisor-merged-head-full.json, 30 lines,
+a4123506…; MH-L1 Low: both P0 folders stay until the re-judge; MH-L2 Low: its 1,273 named the wrong commit, the 1,275
+holds). **The first real list and pack DONE (u4r-precheck-30, 21:22 UTC; Key numbers).** **Next:** C62H-BOUND's build
+brief (the advisor's r2 other_changes 6; C5-C7, C9-C11; the P0 re-judge; the freeze), then its build from this head in
+its own worktree. Main is taken in (2bd44a5).
 **Worker restart 3** (not the spend limit) during the merge: continued at once; nothing lost. **Next, in order (the
 ruling's order):** (1) DONE; (2) the merge commit alone: `git merge --no-ff
 --no-commit origin/main`, `python3 -I .checkpoints/netcode-proof-test/merge_main_53.py --apply`, check.mjs whole (refs
@@ -3581,7 +3585,17 @@ free:
 - **KEPT-LOGS, the first real use (his rule's item 2, the one old build cache; the advisor's disk ruling, option
   (1); after the merge 2bd44a5 was pushed): 2026-11-15 21:02:20-21:02:25 UTC, `node .claude/scripts/kept-logs.mjs
   cache` from the repository root, exit 0 (.gate/refs-kit/kl-cache.log):** "kept-logs: free before: 2863 MiB";
-  "kept-logs: removed: .gate/u3c-review-target"; "kept-logs: free after: 6914 MiB". Nothing packed yet.
+  "kept-logs: removed: .gate/u3c-review-target"; "kept-logs: free after: 6914 MiB".
+- **KEPT-LOGS, the first real pack (his rule's item 1; the advisor's merged-head check APPROVE, its first_pack):
+  u4r-precheck-30-faf42aeb034c.** List 21:22:08 UTC (exit 0; 2 files, 17,323,081 bytes; redact-check 295 items, 0
+  findings), committed alone and pushed at b5cb253 (its message names the closed ruling advisor-u4r-sets-r2-full.md:45
+  and :63, closed at 6b22cab). Pack 21:22:31-21:22:32 UTC, exit 0 (.gate/refs-kit/kl-pack-precheck30.log): "kept-logs:
+  free before: 5888 MiB"; "kept-logs: archive: .gate/netcode-proof-test/kept-logs/u4r-precheck-30-faf42aeb034c.tar.gz,
+  3456457 bytes from 17323081; read back: 2 of 2 files equal the list (path, bytes, sha256)"; "kept-logs: removed:
+  .gate/netcode-proof-test/runs/u4r-precheck-30-faf42aeb034c"; "kept-logs: free after: 5901 MiB". The archive's size
+  equals PR #53's dry run (3,456,457). **Both P0 folders (051995db9cea, 93509dfd7fd1) stay unpacked until C62H-BOUND's
+  P0 re-judge has run (MH-L1).** Each later set: its own closed ruling (file and line) cited first; free space at least
+  its size + 1,024 MiB, and room for C62H-BOUND's run floors (4,983.6 / 4,620.4 MiB); never during a build or run set.
 - Hetzner, excl. VAT, read 2026-11-05 (infra digest D): CCX23 EUR 0.1386/h, CAX21 EUR 0.0176/h (plan prices include
   IPv4); 1 RS + 1 LG = 0.1562/h; each VM rounds up per session; RS<->LG traffic internal and free.
 - Rust stable 1.99.1 (2026-10-13; static.rust-lang.org answers 200); container has 1.97.0, x86_64 target only.
