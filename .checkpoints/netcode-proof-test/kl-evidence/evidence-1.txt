@@ -1,0 +1,34 @@
+=== mutants (18:43:36)
+M1 (the read-back compare removed (bad always empty)): BITES its tests [4]; fails test 4 (actual 0, expected 1)
+M2 (the folder removed before the read-back): BITES its tests [4]; fails test 1 (actual 1, expected 0); test 2 (actual 1, expected 0); test 4 (actual None, expected None); test 5 (actual false, expected true)
+M3 (the routine refusal removed): BITES its tests [6]; fails test 6 (actual 0, expected 2)
+M4 (the folder-equals-list check removed (first walk)): BITES its tests [4]; fails test 4 (actual 1, expected 2)
+M5 (realDir's link check removed): BITES its tests [7, 8]; fails test 7 (actual kept-logs: refused: .gate/netcode-proof-test/runs/u4r-P3-0123456789ab is not a folder\n, expected ); test 8 (actual kept-logs: refused: .gate/u3c-review-target is not a folder\n, expected )
+M6 (the pushed-ref check removed): BITES its tests [3]; fails test 3 (actual 0, expected 2)
+M7 (cache's worktree check removed): BITES its tests [8]; fails test 8 (actual kept-logs: refused: .gate/u3c-review-target holds something changed after 2026-11-15 07:20 UTC: not the one old build cache; it stays\n, expected )
+M8 (readBack's checksum check removed): BITES its tests [9]; fails test 9 (actual None, expected )
+M9 (the stale-.part refusal removed): BITES its tests [4]; fails test 4 (actual 1, expected 2)
+M10 (the catch removes the .part): BITES its tests [4]; fails test 4 (actual false, expected true); test 5 (actual false, expected true)
+M11 (cache's date bound removed): BITES its tests [8]; fails test 8 (actual 0, expected 2)
+M12 (the second walk removed): BITES its tests [5]; fails test 5 (actual 0, expected 1)
+M13 (the second walk refuses (exit 2) instead of a mismatch): BITES its tests [5]; fails test 5 (actual 2, expected 1)
+M14 (the second walk compares only the count): BITES its tests [5]; fails test 5 (actual 0, expected 1)
+mutants: PASS
+=== mutants exit 0 (18:44:38)
+=== dry (18:44:38)
+u4r-precheck-30-faf42aeb034c: fingerprint before 3ae12298e1fa5ea8fc61e2a05f2470645c7ec540145c27d1080f739f0f1c1ce3, after 3ae12298e1fa5ea8fc61e2a05f2470645c7ec540145c27d1080f739f0f1c1ce3: equal
+  ok 1 - dry run on a copy of a real run-set folder: listed, packed, read back, removed; GNU tar unpacks the same bytes
+  # u4r-precheck-30-faf42aeb034c: 2 files; list 96 ms, pack 539 ms
+  # kept-logs: free before: 7631 MiB\\nkept-logs: archive: .gate/netcode-proof-test/kept-logs/u4r-precheck-30-faf42aeb034c.tar.gz, 3456457 bytes from 17323081; read back: 2 of 2 files equal the list (path, bytes, sha256)\\nkept-logs: removed: .gate/netcode-proof-test/runs/u4r-precheck-30-faf42aeb034c\\nkept-logs: free after: 7644 MiB
+u4r-P3-fd4612050cd6: fingerprint before 113c4734bd7d72521927975d73d28ea11bf63140448a1d2e4898618e9315aafb, after 113c4734bd7d72521927975d73d28ea11bf63140448a1d2e4898618e9315aafb: equal
+  ok 1 - dry run on a copy of a real run-set folder: listed, packed, read back, removed; GNU tar unpacks the same bytes
+  # u4r-P3-fd4612050cd6: 11 files; list 383 ms, pack 12536 ms
+  # kept-logs: free before: 7357 MiB\\nkept-logs: archive: .gate/netcode-proof-test/kept-logs/u4r-P3-fd4612050cd6.tar.gz, 97249215 bytes from 304793576; read back: 11 of 11 files equal the list (path, bytes, sha256)\\nkept-logs: removed: .gate/netcode-proof-test/runs/u4r-P3-fd4612050cd6\\nkept-logs: free after: 7555 MiB
+dry: PASS
+=== dry exit 0 (18:44:58)
+=== kit (18:44:58)
+.claude/scripts/checkpoint.test.mjs: exit 0; head {'tests': 27, 'suites': 0, 'pass': 27, 'fail': 0, 'cancelled': 0, 'skipped': 0, 'todo': 0}; main {'tests': 27, 'suites': 0, 'pass': 27, 'fail': 0, 'cancelled': 0, 'skipped': 0, 'todo': 0}: equal
+.claude/hooks/settings.test.mjs: exit 0; head {'tests': 127, 'suites': 0, 'pass': 127, 'fail': 0, 'cancelled': 0, 'skipped': 0, 'todo': 0}; main {'tests': 127, 'suites': 0, 'pass': 127, 'fail': 0, 'cancelled': 0, 'skipped': 0, 'todo': 0}: equal
+.claude/hooks/routine-guard.test.mjs: exit 0; head {'tests': 1107, 'suites': 0, 'pass': 1107, 'fail': 0, 'cancelled': 0, 'skipped': 0, 'todo': 0}; main {'tests': 1107, 'suites': 0, 'pass': 1107, 'fail': 0, 'cancelled': 0, 'skipped': 0, 'todo': 0}: equal
+kit: PASS
+=== kit exit 0 (18:45:50)

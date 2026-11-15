@@ -1,0 +1,24 @@
+=== quotes (18:47:15)
+quote 1: equal to history.md:2095-2097 (186 chars)
+quote 2: in history.md:2105 (57 chars)
+quotes: PASS
+=== quotes exit 0
+=== guard (18:47:15)
+guard on `node .claude/scripts/kept-logs.mjs pack u4r-P3-fd4612050cd6 --results spikes/netcode-proof/results/u4r/fd4612050cd6/P3`: exit 0, stdout '', stderr ''
+guard: PASS
+=== guard exit 0
+=== full (18:47:16)
+tar (GNU tar) 1.35 | v22.23.4
+summary: {'tests': 10, 'suites': 0, 'pass': 9, 'fail': 0, 'cancelled': 0, 'skipped': 1, 'todo': 0}
+ok 1 - list, then pack: the list is right, every file is read back, the folder goes, free space is printed
+ok 2 - GNU tar unpacks the archive to the same bytes, and readBack reads an archive GNU tar wrote
+ok 3 - pack refuses a list that is not committed, or committed but not pushed; the folder stays, no archive
+ok 4 - a folder that changed after its list: an extra file or a new size refuses (2), the same size with other bytes fails on read-back (1); the folder and the unfinished archive stay, and the next pack refuses
+ok 5 - a folder that changes after the read-back, before it would go: the second walk fails (1) on a late file, a late link and a grown file; the folder and the unfinished archive stay
+ok 6 - refused before any work: a routine, the usage, a bad set name or results path, results not committed, not the root, a linked worktree
+ok 7 - odd entries refuse and stay: a symbolic link anywhere, a pipe, a long, spaced or hidden name
+ok 8 - cache removes the one old .gate/u3c-review-target and nothing else; it refuses a link, a tracked file, a worktree inside, anything changed after his words, more words
+ok 9 - readBack reads a plain archive and refuses a wrong checksum, another entry type, a short end and data after the end
+ok 10 - dry run on a copy of a real run-set folder: listed, packed, read back, removed; GNU tar unpacks the same bytes # SKIP set KEPT_LOGS_DRY_RUN=<a real run-set folder> (GNU tar needed)
+full: PASS
+=== full exit 0
