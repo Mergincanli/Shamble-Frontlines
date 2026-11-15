@@ -117,7 +117,7 @@ Kept unchanged unless the row says otherwise: every number, count, timing, case,
 
 | Mark | Machines: the draft → planned | Method, counts, bites, controls: the draft → planned | Departure, and who decides |
 |---|---|---|---|
-| PM-0006-1 | CF, TR, ML, MAC → CF, TR, GitHub's runners | the results-log header, as drafted, with each runner's image name and version where the draft records ML's and MAC's systems; checked again before the 24 h reading, as drafted | the machines: decision MACHINES |
+| PM-0006-1 | CF, TR, ML, MAC → CF, TR, GitHub's runners | the results-log header, as drafted, with each runner's image name and version where the draft records ML's and MAC's systems; written before the setup pull request opens, whose two runs are a rehearsal outside the marks (Part 3 B); checked again before the 24 h reading, as drafted | the machines: decision MACHINES |
 | PM-0006-2 | the script runs on ML ("a header check, not a hardware result", :1367) → on GitHub's Linux runner, as the deploy workflow's last job, right after each deploy | as drafted: one test site deployed three ways (production; a preview with the flag off; a preview with it on), each read on its stable branch link and on its one-off link; the page lists every resource it and its worker loaded (Resource Timing in both); a cookie-less fetch compares every response with expected sets written by hand into the script from GLOSSARY §5; the bites as drafted (COEP removed from the worker's rule in the flag-on build; a `noindex` rule added to production). Each link form is recorded on its own. **Production's one-off link:** if the host sends `noindex` there (it adds `noindex` "if requesting the asset over a preview URL", and a one-off link may count as one), the row as written is not met. That is reported and goes to the draft's author (:1409-1414), never read as a pass, and it holds the check's end, and with it step 2.6, until the draft is revised (:1401: every mark that applies must pass). Added: the script also fetches every file in the build's file list, so no file escapes the check; and a test-only header, `X-Check-Rule`, on the two host rules answers R5-PREV-OQ6 (the script tolerates that extra header) | the machine: MACHINES; the advisor agent ruled the `X-Check-Rule` header an addition that changes no mark (its review of revision 1) |
 | PM-0006-3 | ML: Chrome, Edge, Firefox; MAC: Safari; MP: Brave → GitHub's Windows runner (Chrome, Edge, Firefox); GitHub's macOS 26 runner (Safari 27.2 on the image read 2026-11-15; the version is recorded on the day); you in Brave | as drafted: WebdriverIO opens each link and reads what the page and its worker print, 3 loads per browser and link; the bite as drafted (PM-0006-2's missing COEP must give false): the browser run also opens the missing-COEP preview (Pages branch `bite-coep`) | the machines: MACHINES |
 | PM-0006-4 | ML: Chrome → GitHub's Windows runner: Chrome | as drafted: first visit, tab closed, second visit; the bundle's `transferSize` read on the second; 3 repeats, each from a fresh profile; the bite as drafted (`no-cache`), on a preview branch of its own | the machine: MACHINES |
@@ -365,6 +365,15 @@ environment that does not exist will create an environment with the referenced n
 4. The merge starts the cleanup run for `setup`: **approve it.** It is a free rehearsal of what cases (b) and (b')
    rely on. I record whether a merged pull request's cleanup run starts at all, and which branch it names: a security
    note says a merged pull request's event may carry less data, and if so the case's cleanup would be skipped silently.
+
+**The rehearsal and the marks** (my reading; yours to overrule):
+- The results-log header (PM-0006-1) is written after your "setup done" and before the setup pull request opens. It
+  names the reviewed commit of the `setup` branch; after the merge it adds `main`'s merge commit, which carries the
+  same files and is what every later run uses.
+- The setup pull request's two runs are a rehearsal outside the marks. Their data is kept and reported, but they count
+  toward no mark: PM-0006-10 is read on the test pull requests, and PREV-DELETE on cases (a) to (d).
+- So a fix found in the rehearsal is not a re-run of a failed mark (the draft: a failing run is never re-run until
+  green, :1404). The marks start with sitting 1.
 
 ### C. Day 1: the runs (three sittings, about 1 h 20 min)
 **Approving** (review-deployments page): the test repository, then Actions, then the run marked "Waiting", then "Review
@@ -1429,9 +1438,16 @@ the preview token.
 1. Answer the seven decisions above.
 2. Give or refuse your go on this plan, and your yes to Part 7's texts: the four workflows and the two token-test
    variants.
-3. Allow me to push these branches to the test repository, and only there: `setup`, `fix/*` for review fixes,
-   `cs/pd-one`, `cs/pd-three`, `cs/pd-open`, `cs/pd-off`, `cs/pdt-one`, `cs/pdt-three`, `cs/b9-edit` and `cs/b9-prod`.
-   My standing branch rule names only this repository's branch.
+3. Allow me these acts in the test repository, under your login, and only there. My standing permission names only
+   this repository and its branch.
+   - Push these branches: `setup`, `fix/*` for review fixes, `cs/pd-one`, `cs/pd-three`, `cs/pd-open`, `cs/pd-off`,
+     `cs/pdt-one`, `cs/pdt-three`, `cs/b9-edit` and `cs/b9-prod`.
+   - Open the setup pull request and the eight test pull requests, and close (a), (a'), (d), (c) and the two token-test
+     ones without merging.
+   - Start the by-hand runs (`deploy` with a named set, `probe`, `browsers`), and re-run the token-test jobs in sitting
+     3.
+
+   The merges, the approvals and every setting stay yours.
 4. SR-READ (Part 3, A3 step 3): tell me whether the Claude app's page lists "Administration" or "Deployments" with
    write access. Names only.
 5. Tell me if your Cloudflare account holds anything besides the domain: another Pages project, a Worker, or KV, R2 or

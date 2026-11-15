@@ -5,7 +5,7 @@
   secret, no edit outside this checkpoint. · plan: `.checkpoints/preview-hosting-check/plan.md` (not yet written)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-15 17:46 Amsterdam (16:46 UTC)
+- **Last update:** 2026-11-15 17:48 Amsterdam (16:48 UTC)
 
 ## Steps done
 1. Orientation · the session's model read with get_session at 2026-11-15 15:36:35 UTC: `session_context.model`,
@@ -48,13 +48,14 @@
    preview builds write noindex; A5 production's one-off link; A6 his answers into DECISIONS.md), Low A7-A13. Rulings:
    TR-WHERE (a) breaks no rule (SPIKE_PLAN :12 is about where spike code lives in this repository), the four additions
    change no mark, the check is risk tier 2 (its tier-3 acts are his), the closing docs PR tier 1.
-10. Revision 2 written (not yet saved as done): all of A1-A13 folded in; tr-draft moved to `tr-draft/workflows/` and
+10. Revision 2 written and, after consultation 3 and its two additions, saved as done: all of A1-A13 folded in; tr-draft moved to `tr-draft/workflows/` and
    `tr-draft/b9/`; Part 7 regenerated from the files (deploy.yml 185 lines, close.yml 98, probe.yml 66, browsers.yml 51;
    every block byte-equal to its file, every sha256 and both variants' hashes checked, all parsed with PyYAML); Part
    7.0 lists the lines changed since 27e9f50 as diffs.
 
 ## Current step
-11. The advisor tool's consultation 3 (moment 5) on revision 2, before it is saved as done.
+11. Done: the plan (revision 2) is approved by the advisor agent with its conditions folded in; the closing message
+   next; then stop for his go.
 
 ## Next steps
 1. After consultation 3: save revision 2 as done; stop the saver (TaskStop) and make the last save.
@@ -120,6 +121,12 @@
    Part 4's two over-claims hedged (reading a secret back; a custom domain on his zone) and the summary's "nothing
    outside Pages"; the check's own risk tier stated for the advisor agent to rule; the agent's brief gives questions,
    not conclusions; the saver checked first.
+3. 2026-11-15 16:45:35 UTC (called; transcript time), moment 5 for revision 2, before it was saved as done · Q: may
+   revision 2 be marked done? · Changed: the rehearsal (the setup pull request's two runs) declared outside the marks,
+   with the results-log header written before it (Part 3 B, Table 1.1 PM-0006-1), as the session's reading for him to
+   overrule; "For Mustafa" item 3 widened from pushes to every act in the test repository (opening and closing pull
+   requests, starting and re-running runs); revision 1's leftovers grepped (none: `npx` appears only in Part 7.0's
+   removed lines); the advisor-model line and the fullness figure kept for the closing message.
 
 ## Running work
 - saver: background task bc4g68il4 · output /tmp/claude-0/-home-user-Shamble-Frontlines/a7e7f150-3195-52bd-a549-73b27426198b/tasks/bc4g68il4.output ·
