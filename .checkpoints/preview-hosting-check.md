@@ -45,8 +45,15 @@
 9. The advisor agent's plan review of revision 1 (the `spikes/` tension named for its ruling).
 
 ## Next steps
-1. Fold its findings (revision 2 if REVISE); consultation 2 (moment 5) before the plan is saved as done.
-2. The closing message: the plan's path, the summary, his steps in order, the decisions, the chat's fullness.
+1. Fold its findings (revision 2 if REVISE), together with the session's own re-read fixes, held back so the review
+   reads a fixed text: Part 0 (production is the branch Cloudflare names, not `main`); Part 0 and Part 1's PREVIEW-START
+   date (his answer of 2026-11-14, sent 2026-11-15: his note 1); Table 1.1 PM-0006-3 (one macOS image, not two:
+   browsers.yml runs macos-26 only); "read today" → "read 2026-11-15"; Part 5 "your note of today" → "of 2026-11-15";
+   PM-0006-2 on production's one-off link (the host may send `noindex` on every one-off link, production's included:
+   record per link form, and name the reading for the advisor agent).
+2. Consultation 3 (moment 5) before the plan is saved as done; then the closing message: the plan's path, the summary,
+   his steps in order, the decisions, the chat's fullness from get_session, the advisor-model line, the slip once with
+   its save times, and that the draft workflow texts sit in the public notes folder as text nothing runs.
 
 ## Open findings
 - Refused by the guard, 2026-11-15 15:54:02 UTC: `git -C <dir> fetch ...` ("git: no option before the subcommand (run
@@ -104,7 +111,11 @@
   started 15:52 UTC · stops by 17:42 UTC (110 min) · last check: just started.
 - agent infra-engineer (Opus by its file, effort high by its file): C1-C8 and the follow-up C9 · DONE.
 - agent security-auditor (Opus by its file, effort high by its file): G1-G10 · DONE.
-- saver last check 16:16 UTC: ok ("saved and pushed" at 16:02 and 16:12 UTC).
+- saver last check 16:27 UTC: the process is alive (pid 1609); its log shows "saved and pushed" at 16:02 and 16:12
+  UTC and nothing for the cycle due about 16:22 (the session's own save of 16:21:42 UTC came just before it); to be
+  checked again at the next update.
+- agent advisor (Opus by its file, effort high by its file): the plan review of revision 1 at 27e9f50 · notes
+  `.checkpoints/preview-hosting-check/advisor-plan-r1.md` · launched about 16:28 UTC · running.
 - Facts read by the session meanwhile: read_documentation `github.access` (15:52 UTC: a repository becomes attachable
   once the Claude GitHub App can reach it; add_repo attaches it); list_repos (15:52 UTC: five public repositories of
   his, all `can_push: true`; the app's repository-access mode is not shown).
