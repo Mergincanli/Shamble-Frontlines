@@ -215,9 +215,16 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
       b30314a HEAD`). The saver was restarted.
     - BRAWL-1's section in u4r-report.md now holds the advisor's round-2 report words (copied by
       brawl1_report_words.py from advisor-brawl1-r2-full.md:131-166). The merge record follows there after M6.
+  - **Pushed head 8f0939f** (09:06 UTC). Saver bbavt4wl2, restarted 09:06.
+  - **RUNNING since about 09:07 UTC: M6, the advisor's head review, workflow wf_8067a67a-6fe (task w0euby9aq),** one
+    agent (general-purpose, opus, xhigh), notes advisor-brawl1-m6.md, logs .gate/brawl1-merge/advisor-m6/.
+    - It rules on: the pushed head's verdict with each check; any findings; the go for M7; Mustafa.
+    - **If cut:** `Workflow({scriptPath: ".../workflows/scripts/brawl1-m6-wf_8067a67a-6fe.js", resumeFromRunId:
+      "wf_8067a67a-6fe"})`.
+    - **Then:** write it word for word by script (brawl1_m6_full.py), read it in full, and add the merge record under
+      the round-2 words in u4r-report.md's BRAWL-1 section.
   - **NEXT:**
-    - M6: the advisor's review of the pushed head, as a workflow with one agent. It is given the merge record above,
-      the logs under .gate/brawl1-merge/ and the two CI runs.
+    - M6: see above.
     - Then M7: (B) and (C) again, with df before and after; the two 10-minute evidence runs (condition 14, never named
       u4r-*); then the re-run sets P3, P2 and P0 (split) on c-u4r-runs.mjs 99dd070e (condition 15), each set
       committed before the next.
