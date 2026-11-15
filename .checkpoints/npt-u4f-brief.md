@@ -29,6 +29,15 @@
 - Drafter's findings (rev 1, table at the draft's end; notes `netcode-architect-u4f.md`): NA-4 High (Pong carries
   only the next tick: ClockSync's server time known to one tick, -47's p99 ≤ 5 ms near 6 ms at P2; U4F-Q6);
   NA-3, NA-5, NA-6, NA-7, NA-8, NA-9, NA-12 Medium; NA-1, NA-2, NA-10, NA-11 Low · open (for the checks and rev 2)
+- SC-1 (the night session's own spot-check of NA-4, by reading): the code basis holds: the Pong carries `id`,
+  `echo_ns`, `tick` and `hold_us` only (spike server/src/pump.rs:461-466; `tick` = last_tick + 1, lab/src/scenario.rs:459).
+  My own arithmetic for D4's random-phase model also lands near 6 ms (tick floor: std 33.3/√12 = 9.6 ms, /√20 = 2.15
+  ms; one-way asymmetry U[-10,10] each way: std 4.08 ms, /√20 = 0.91 ms; combined 2.34 ms; p99 ≈ 2.576 × 2.34 ≈ 6.0
+  ms). But D4's "uniform phase" may not hold: TICK_HZ is 30 (sim/src/ticks.rs:12), so the draft's 10 pings a second is
+  exactly 3 ticks, and on L1's simulated clock the samples' tick phase moves only with the delay jitter (±10 ms of a
+  33.3 ms window); the floor error then averages less and leaves a phase-dependent bias, so NA-4 may be understated.
+  For rev 2: D4 should also model the phase-locked case (ping period a whole number of ticks), or the brief should say
+  the ping period must not be a whole number of ticks · open (passed to the reviser)
 
 ## Key numbers
 - rev 1: 837 lines; 9 field tables; tests ≥ +60 measured / ≥ +74 bites build; 44 negative cases; 17 bites; 65 judged
