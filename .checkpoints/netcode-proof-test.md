@@ -50,7 +50,12 @@ the counted check.mjs on that content **PASSED, all 11 steps** (20:34:34-20:48:3
 bites 616, 0 failed; refs PASS naming the exception; marks 81; self 78 of 78; redact 0; .gate/refs-kit/counted.log);
 CI on 914798a: no failed suite (20:39 UTC). **Running from 20:49 UTC: the advisor's check of head 914798a** (workflow
 wf_16d162f4-156, task wb2xcnzyq; notes advisor-refs-kit-head.md; if cut: resume by run id). The saver btg6vlymf (to
-about 22:25 UTC). **Next, in order (the ruling's order):** (1) DONE but the advisor's check of 914798a; (2) the merge commit alone: `git merge --no-ff
+about 22:25 UTC). **The advisor's check of 914798a: APPROVE** (20:49-20:52 UTC; advisor-refs-kit-head-full.json, 19
+lines, a04a71ac…, saved word for word from the journal by an inline script of refs_clash_full.py's form; it re-ran
+the two refs tests on all four copies and reproduced the counted run's diff hash 56351922…; RK-H-L1 Low: the exception
+has not yet run on the real kit files: step 2's run must show refs PASS with both tracked; its conditions: step 2 as
+written, then check.mjs whole, the gate, push, its check of that head, and no list/pack before; it read CI with `gh
+api` (read only; this session keeps gh for search): a process note). **Next, in order (the ruling's order):** (1) DONE; (2) the merge commit alone: `git merge --no-ff
 --no-commit origin/main`, `python3 -I .checkpoints/netcode-proof-test/merge_main_53.py --apply`, check.mjs whole (refs
 PASS naming the exception), the gate, commit, push, the advisor checks that head (stop the saver during the merge:
 a checkpoint save would conclude it); (3) the first real list/pack per §11, reporting free space before and after (not
