@@ -47,7 +47,7 @@ for (const mode of ['production', 'preview', 'preview-isolated', 'bite-coep', 'b
       return e ? e.transferSize : null;
     });
   }
-  if (mode === 'bite-coep') row.ok = row.coi !== 'true/true';
+  if (mode === 'bite-coep') row.ok = row.status === 'done' && seen.page === 'true' && seen.worker !== 'true';
   else row.ok = row.coi === WANT[mode] && row.wasm.startsWith('ran (2 + 3 = 5)') && row.status === 'done'
     && (mode !== 'production' || row.secondVisitTransfer === 0) && (mode !== 'bite-nocache' || row.secondVisitTransfer > 0);
   results.push(row);
