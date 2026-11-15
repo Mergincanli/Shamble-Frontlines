@@ -90,7 +90,13 @@ files tracked; marks 81; self 78 of 78; redact 0; .gate/refs-kit/counted-merge-2
 a4123506…; MH-L1 Low: both P0 folders stay until the re-judge; MH-L2 Low: its 1,273 named the wrong commit, the 1,275
 holds). **The first real list and pack DONE (u4r-precheck-30, 21:22 UTC; Key numbers).** **Next:** C62H-BOUND's build
 brief (the advisor's r2 other_changes 6; C5-C7, C9-C11; the P0 re-judge; the freeze), then its build from this head in
-its own worktree. Main is taken in (2bd44a5).
+its own worktree. Main is taken in (2bd44a5). **COMPACT-WAIT:** /compact asked at about 21:23 UTC (chat about 69
+%); the reminder (trig_01EnRrpDfj1D6He4pGGR2mrg) fired at 21:48 with no /compact, so carried on. **RUNNING from about
+21:49 UTC: workflow wf_10401164-b44 (task wk2jyknqn), C62H-BOUND's build brief:** the netcode-architect drafts
+c62h-bound-brief.md (notes c62h-bound-brief-notes.md), then the advisor (notes advisor-c62h-bound-brief.md) and the
+test-engineer (notes c62h-bound-brief-test.md) check it in parallel, read only. **If cut:** resume by run id
+(`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-brief-wf_10401164-b44.js", resumeFromRunId: "wf_10401164-b44"})`).
+**Then:** the results word for word by script, read in full; fixes; the build.
 **Worker restart 3** (not the spend limit) during the merge: continued at once; nothing lost. **Next, in order (the
 ruling's order):** (1) DONE; (2) the merge commit alone: `git merge --no-ff
 --no-commit origin/main`, `python3 -I .checkpoints/netcode-proof-test/merge_main_53.py --apply`, check.mjs whole (refs
