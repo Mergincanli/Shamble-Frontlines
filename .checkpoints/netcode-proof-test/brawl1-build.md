@@ -553,6 +553,30 @@ For Mustafa: nothing (spike code: nothing a player sees, hears or feels).
   method; under 240). Both pins reproduced, by the files det-u4 regenerated (worktree .gate/netcode-proof-test/det-u4/
   recordings/): SS-P2-s1.rec 16,937,652 B sha256 1ec25de7c9ce8ea869ed9a8b343746ba131593e1de5c65bc9c1c626ce01cc76d;
   ES-P3-s2.rec 16,929,501 B sha256 6abf7643982b5970a630c97daa4d0815ceb2022958b18e18116397dcad9c893e.
+- FP-8 (3) and (4): .gate/u4r/brawl1/final-fp-regen-tests.log (-x, no -k, 07:37:23-07:40:25 UTC, header diff
+  c2561b6c..., free 6,637 MiB before and 6,622 after), every command exit 0.
+  - (3) release npt-lab built (10 s), then `npt-lab hash --manifest crates/lab/precheck-recordings.json --dir
+    .gate/u4r/brawl1/final-fp/rec --out .gate/u4r/brawl1/final-fp/out` (new folders; final/ left as it was): "regenerated
+    SS-P0-s4: 16950444 bytes, sha256 1f00d2d5f70a2c7b6836ede611b5f1c281319a5312060ead91e016da3c0b1b42, as the
+    manifest's"; native leg 1 against leg 2 9,000 ticks equal; real 2m1.103s.
+  - (4) short copy: measured build 1 passed, 10.94 s; bites build 1 passed, 10.79 s (both under 60 s). Full test in
+    release, by name: 1 passed, 23.84 s. **Every figure round 1 printed is equal:** the 13 lines (short x2 builds x2
+    patterns, full 3 seeds x 3 patterns) diff identical against final-regen-tests.log:41-42, :62-63, :83-91 after only
+    (i) removing the new "; dead N soldier-ticks" and (ii) mapping round 1's EveryTick "skipped 0 of 0 chances (0 per
+    1000)" to "skipped 0" and Bursts "skipped 14400 of 0 chances (0 per 1000)" to "skipped 14400 in its bursts" (the
+    ADV-PT-L1 rewording); in a building, first, largest distance with slot, tick, x and y, skipped, Skips' chances and
+    rate, longest streak and stuck all equal. Dead figures (soldier-ticks): short seed 1 EveryTick 1,190, Skips 1,334
+    (both builds alike); full seed 1 8,178 / 8,091 / 8,091; seed 2 8,091 / 8,149 / 8,004; seed 3 8,447 / 8,265 / 7,917
+    (EveryTick / Skips / Bursts).
+- FP-8 (5): det-recordings.json a2faf3ea81623c39a13b04f9a97cadb900d8ec482df4375173720f70dae95d99 and
+  precheck-recordings.json 5ccf57f059026e072cb000c0f9e66ca41ec81b9a02089fd6c26c699c21416881: both equal to the values
+  taken before the first edit.
+- FP-8 (6): numstat against 352a245 (SERIES.md included): 1,139 added, 127 deleted, **1,266 changed lines** (998 at
+  the snapshot; under 1,400; the ruling expected about 1,270): bots lib.rs 512/5, client lib.rs 35/0, client test
+  107/0, det manifest 2/2, precheck manifest 1/1, hash.rs 36/7, logs.rs 176/11, precheck.rs 19/33, scenario.rs 245/68,
+  SERIES.md 6/0. The final tree: `git diff HEAD | sha256sum` c2561b6ca54c8cde994fcdad5954c63d332df73f2db038c12aba3d71a0daa49f,
+  the same 10 files modified, nothing untracked, no plant in place.
+- **FP-8 complete. No stop was met.** Next: the report.
 
 ### FP-9: report words (no code)
 
@@ -590,6 +614,207 @@ For Mustafa: nothing (spike code: nothing a player sees, hears or feels).
      the check.mjs follow-up, at check.mjs's next change, before PR #40 is marked ready at the latest.
    - TE-B1-8's optional glue test (Behaviour::step with an own soldier past the outer radius): U6's bots'-view item
      (EA-U4R-5's home).
-- FP-8 (1)-(6): pending.
-- FP-9 items 1-6: pending.
+- FP-8 (1)-(6): done (recorded above, 07:19-07:40 UTC).
+- FP-9 items 1-6: done (the section above, on disk before the report).
+
+## Fix pass, round 1: report
+
+Copy 2 has finished the fix pass (the ruling's steps 3 to 11, FP-1 to FP-9), all uncommitted, in the worktree
+/home/user/Shamble-Frontlines/.claude/worktrees/brawl1 (detached at 352a245c). Every edit was made with the Edit tool. All
+four plants bit as ruled, and each was restored to its exact pre-plant sha256. The end checks pass. check.mjs passes
+all 11 steps with +3 tests in each build. det-u4.mjs and the precheck regeneration reproduce all three pins, and every
+figure the full sim-only test printed in round 1 is unchanged. No stop was met. The size is 1,266 changed lines. A
+spend-limit cut stopped me at 06:53:13 UTC; I resumed at 07:13 UTC with no plant in place and lost no work. The final
+tree's `git diff HEAD | sha256sum` is c2561b6ca54c8cde994fcdad5954c63d332df73f2db038c12aba3d71a0daa49f (it was ee2973aa
+at the start). The start checks all held, and FP-0's first log shows `diff ee2973aa...`
+(.gate/u4r/brawl1/fp-0-header.log).
+
+**1. Each step, with file:line (paths under spikes/netcode-proof/crates/)**
+- FP-1, bots/src/lib.rs, test module only:
+  - (a) lib.rs:565 asserts 48 records ("tick {t}: one Soldier record per slot").
+  - (b) The dead-bit tie is in soldiers() (:513; the assert follows `let dead`), with the ruled message. Record.dead
+    (:502) is counted at :569. printed() prints "dead {n} soldier-ticks". The short copy asserts `r.dead > 0` (:700,
+    "the dead-bit tie is exercised"), which stays in the short copy because seed 1 has deaths in both patterns.
+    soldiers()'s doc carries the ruled sentence.
+  - (c) The new test `brawl1_a_soldier_teleported_into_building_0_reads_area_1` is at :709, with Placement imported.
+  - (d) printed() (:661) prints the chances and the rate only for Skips. EveryTick prints "skipped {n}", Bursts prints
+    "skipped {n} in its bursts", and all three print the streak.
+- FP-2, the unit test (:362):
+  - (a) The blocked loop checks at(1_450, 200) against toward_centre(1_450, 200) (:380).
+  - (b) The kept-state case is at :413.
+  - (c) The outer-radius cases are at :423 and :429.
+  - (d) The const bounds are at :338.
+  - The test's doc gained a clause for the new checks.
+- FP-3, lab/src/logs.rs:
+  - The new test `brawl1_the_building_figure_counts_a_soldier_in_a_building_in_measured_ticks_only` is at :878. Its
+    warm-up asserts are at :912, its measured count at :924, and it reads room.jsonl and checks both summary-line
+    cases.
+  - EA-B1-4's words are at :6-7. I rewrapped that module-doc paragraph from :4, which held a short line.
+  - The figure's own code (:586-598) is unchanged.
+- FP-4, npt-client:
+  - (a) The tick-105 sentinel case is at tests/endpoint.rs:438-450, and the test's doc names it.
+  - (b) The new test `brawl1_own_soldier_compares_ticks_by_the_endpoint_s_wrap_rule` is at endpoint.rs:463. Beyond the
+    ruling, it also asserts that each of its two ticks is filed.
+  - (c) The doc words are at client lib.rs:350-353.
+  - (d) The doc line is at client lib.rs:246-249.
+- FP-5, bots lib.rs, doc words only:
+  - (a) :59-62.
+  - (b) In the leash doc, :250-253, which also carries (c)'s "(x and y in toward_centre's domain)".
+  - (c) toward_centre's domain words are at :130-132.
+- FP-6:
+  - (a) Server::new is private (scenario.rs:396). Its only caller is :390.
+  - (b) Server::build's doc is rewrapped, with the words unchanged (:367-371).
+  - (c) The comments are reworded at scenario.rs:1432-1434 and :2576. The two B1 cases are at :2588-2606. I added a
+    two-line comment above them naming RR-B1-4 and the arithmetic.
+  - (d) hash.rs:1561-1564: 359,993 bytes, `at = 359_993 / 12`, with the ruled comment.
+
+**2. New tests and counts.** There are three new tests, each named with its file:
+- bots/src/lib.rs `tests::brawl1_a_soldier_teleported_into_building_0_reads_area_1`;
+- lab/src/logs.rs `logs::tests::brawl1_the_building_figure_counts_a_soldier_in_a_building_in_measured_ticks_only`;
+- client/tests/endpoint.rs `brawl1_own_soldier_compares_ticks_by_the_endpoint_s_wrap_rule`.
+
+The counts are measured 535 → 538 (+3) and bites 613 → 616 (+3). The unit test and the client read test are the same
+tests, extended.
+
+**3. The plants** (each log under .gate/u4r/brawl1/, each run through u4r-run.sh -x -k)
+- P1 (TE-B1-1; the leash off). The planted line, `return walk;`, was the first line of `fn leash`'s body (bots
+  lib.rs:255).
+  - sha256: before 83a8541bbdb924bc4dec032330a6117d54d960cff0a01b8544bc1d7c0c0b6069, planted
+    77be9b00ea9e4e014960173248567af4f2600e724952bd3fa7da17f582f0c377, after 83a8541b... (equal).
+  - Log fp-plant-1.log.
+  - (1) Short copy, measured build: exit 101. (2) Short copy, bites build: exit 101. Both failed with
+    "assertion `left == right` failed: Skips: first Some((64395, 11, 1))".
+  - (3) Full test in release: exit 101, "in a building: [(1, EveryTick, 11335, Some((70723, 16, 3))), (1, Skips, 68964,
+    Some((64395, 11, 1))), (2, EveryTick, 9032, Some((69788, 33, 6))), (2, Skips, 95212, Some((63787, 33, 5))), (3,
+    Skips, 62107, Some((63950, 19, 3)))]".
+  - Per seed and pattern. Each entry gives in_building, then first as (tick, slot, area), then the largest distance in
+    cm as (slot, tick, x, y):
+    - short, seed 1:
+      - EveryTick: 0; None; 2,175 (6, 65656, 2056, -710).
+      - Skips: 7,728; (64395, 11, 1); 3,813 (8, 67219, 550, 3774).
+    - full, seed 1:
+      - EveryTick: 11,335; (70723, 16, 3); 2,205 (16, 70816, -1098, 1913).
+      - Skips: 68,964; (64395, 11, 1); 6,161 (6, 79418, 5876, 1853).
+      - Bursts: 48,302; (64978, 36, 4); 2,784 (17, 75838, -554, 2729).
+    - full, seed 2:
+      - EveryTick: 9,032; (69788, 33, 6); 2,328 (19, 73152, -1328, 1913).
+      - Skips: 95,212; (63787, 33, 5); 9,078 (21, 82018, -1258, 8991).
+      - Bursts: 37,865; (64974, 29, 2); 3,265 (29, 81180, 2478, 2127).
+    - full, seed 3:
+      - EveryTick: 0; None; 2,175 (0, 70156, 2056, -710).
+      - Skips: 62,107; (63950, 19, 3); 7,432 (19, 80451, 4374, 6009).
+      - Bursts: 6,265; (75771, 29, 2); 2,895 (2, 77588, 2666, -1130).
+  - The bite rule held on area, so **the door-entry bar was not added.**
+- P2 (TE-B1-2 = RR-B1-1; the figure cut). The planted line was `.filter(|_| false)` (logs.rs:588).
+  - sha256: before 83008fce50552257ade01f112cfcfb37a18da3ed5a744080937442df50ab229b, planted
+    b902a7ee16c00bf52105dc993aab63608cbb501f29a85941c5d121cda1f19f68, after 83008fce... (equal).
+  - Log fp-plant-2.log: exit 101 at logs.rs:924, "assertion `left == right` failed: measured: one slot-tick / left: 0 /
+    right: 1".
+  - The warm-up asserts before it assert absence, so they hold under any plant that removes the figure. This is the
+    first figure assert that can fail.
+- P3 (TE-B1-4 (a); the Hash filter removed from client lib.rs:359).
+  - sha256: before 2aca00c87822526a891de6d1c5e78ce4161f37de2de453dd01c94e28500e2d1c, planted
+    7a77c71aaeb9772cf79cbfeab53ab14a441169655c7bc2040185d66b18a4530a, after 2aca00c8... (equal).
+  - Log fp-plant-3.log: exit 101. The wrap test passed. The read test failed at endpoint.rs:446, "a complete tick
+    turned sentinel is not read: tick 101 again / left: Some(([-700, 700, 150], false)) / right: Some(([1234, -1234,
+    150], true))".
+- P4 (the wrap rule: TE-B1-4 (b) = NA-B1-1 = RR-B1-5 = EA-B1-3 (b)). The `.reduce(...)` (client lib.rs:360-366) was
+  replaced with `.max_by_key(|t| t.tick)`.
+  - sha256: before 2aca00c8..., planted 6aeeec0a0c6dee9ab393bd03683a6163e9e806ea607b5f0e17d17ce7ae632151, after
+    2aca00c8... (equal).
+  - Log fp-plant-4.log: exit 101. The read test passed. The wrap test failed at its last assert (endpoint.rs:483),
+    "tick 0 comes after u32::MAX by the endpoint's wrap rule / left: Some(([11, -11, 150], false)) / right: Some(([22,
+    -22, 150], false))".
+- After P4, the tree's diff hash was c2561b6c... again, the same as before the plants.
+
+**4. FP-8's results** (each log carries FP-0's diff line, c2561b6c...)
+- (1) final-fp-check.log: all 11 steps PASS.
+  - "PASS test 715.8 s measured build: 538 tests passed, 0 failed, 0 reported a skip; bites build: 616 tests passed, 0
+    failed, 0 reported a skip".
+  - The other steps: fmt, clippy, clippy-wasm32, doc, deps, wasm (27,000 ticks equal; hash-map caught at SS-s1 tick
+    1234), refs, marks (81), self (77/77), redact (10/10).
+- (2) final-fp-det.log: `uptime` first gave "07:33:02 up 57 min, load average: 1.26, 1.93, 1.42". No other lane was
+  building or running (pgrep was empty).
+  - "PASS det-u4 227.3 s". Native/native and native/Wasm were equal over 18,000 ticks, and h2 was equal.
+  - The non-cargo sum is 213.3 s: hash 210.0 + Wasm 2.4 + 0.9 + 0.0.
+  - The regenerated files reproduce the pins: SS-P2-s1 1ec25de7c9ce8ea869ed9a8b343746ba131593e1de5c65bc9c1c626ce01cc76d
+    and ES-P3-s2 6abf7643982b5970a630c97daa4d0815ceb2022958b18e18116397dcad9c893e.
+- (3) final-fp-regen-tests.log: "regenerated SS-P0-s4: 16950444 bytes, sha256
+  1f00d2d5f70a2c7b6836ede611b5f1c281319a5312060ead91e016da3c0b1b42, as the manifest's". The legs were equal. Real time
+  2m1.103s.
+- (4) The same log:
+  - The short copy took 10.94 s in the measured build and 10.79 s in the bites build. Its dead figures are EveryTick
+    1,190 and Skips 1,334 in both builds.
+  - The full test in release passed in 23.84 s.
+  - All 13 printed lines diff identical against final-regen-tests.log:41-42, :62-63 and :83-91. Before the diff I only
+    took out the new "dead N" figure and mapped the old skip text to the ADV-PT-L1 wording.
+  - Full-test dead figures (EveryTick / Skips / Bursts): seed 1 8,178 / 8,091 / 8,091; seed 2 8,091 / 8,149 / 8,004;
+    seed 3 8,447 / 8,265 / 7,917.
+- (5) Both manifests keep their sha256: det a2faf3ea81623c39a13b04f9a97cadb900d8ec482df4375173720f70dae95d99 and precheck
+  5ccf57f059026e072cb000c0f9e66ca41ec81b9a02089fd6c26c699c21416881.
+- (6) Numstat against 352a245, SERIES.md included: 1,139 added and 127 deleted, **1,266 changed lines**. It was 998 at
+  the snapshot; the ruling expected about 1,270, and the stop line is 1,400. By file:
+  - bots lib.rs 512/5;
+  - logs.rs 176/11;
+  - scenario.rs 245/68;
+  - client test 107/0;
+  - client lib.rs 35/0;
+  - hash.rs 36/7;
+  - precheck.rs 19/33;
+  - manifests 3/3;
+  - SERIES.md 6/0.
+
+**5. FP-9, items 1 to 6** (the section "FP-9: report words" above, verbatim)
+1. All four plants bit as ruled. The door-entry bar was not added, because P1's bite rule held on area.
+2. A correction to copy 1's report on pattern (iii): I withdraw "a fixed radius stops it" and the 14 m vehicle.
+   - sim_run runs with stand-ins off (bots lib.rs:541).
+   - No solid lies within 1.6 m of (1734, -592), (1671, -751) or (1586, -917). Building 0's corner (1770, -430) is
+     166 cm from the first point. The crates lie within 950 cm of the centre, and the wall stand-in is at y 1,180 to
+     1,220.
+   - The reading for U4g is the advisor's U4g words.
+3. TE-B1-8, in the ruling's words: "No test drives Behaviour::step with an own soldier past the outer radius. The glue
+   at bots lib.rs:223 is shown only by the moved pins (own_soldier returns Some and changes commands) and by the two
+   10-minute evidence runs (condition 14)." That glue line is now lib.rs:228.
+4. ADV-BP-1 to ADV-BP-4 are recorded in the advisor's words, ADV-BP-3 with Point 2's masking rule.
+5. MAX_ENTRY_TICK_COUNT stands (Point 1). RR-B1-6 and EA-B1-5 are answered there. ADV-PT-L3 carries the point to the
+   check.mjs follow-up.
+6. The follow-ups and their homes:
+   - RR-B1-7 (1): the next lane that edits room_tick.
+   - EA-B1-1's pub constants, with NA-B1-3's npt-client half: the next lane that opens crates/sim, U6 at the latest.
+   - ADV-PT-L3: check.mjs's next change, before PR #40 is marked ready.
+   - TE-B1-8's glue test: U6's bots'-view item.
+
+**6. Deviations and flags for round 2 and the advisor** (none is a stop)
+- **Deviations from the ruled words:**
+  - FP-3 step 7: the ruled `settings(&dir, "--profile P0 --seed 1 --logs 0")` cannot parse. fp-check-1 failed on it:
+    "--logs 0 is for a recording run (--record): a run keeps its logs" (scenario.rs:1486). The test now adds
+    `--record <scratch>/brawl1.rec`, with a comment. parse only stores that path, and nothing writes it.
+  - FP-1 (b): soldiers()'s ruled sentence names "client lib.rs:250-251", not "247-248". FP-4 (d)'s added lines moved
+    the constants there, so the ruled numbers would have been stale.
+  - FP-3: `Logs::open(Some(dir.as_path()), ..)` in place of the ruling's `Some(&dir)`. It is the same path.
+- **Flags:**
+  - FP-5 (c)'s ruled words "x² + y² stays below 2^31" are exact except at one point: (-32,768, -32,768) gives 2^31
+    itself (POSITION_XY's minimum is -32,768). No overflow can happen either way. I wrote the words as ruled.
+  - P2's "first figure assert": as noted in section 3, the warm-up asserts check for absence, so the measured count is
+    the first that can fail.
+  - The ruling file has the right sha256, but `wc -l` gives 460 lines, not the 249 the resume part says. The resume
+    part also names "the brief's section 4" for the rules, which actually sit in its sections 1, 2 and 5. I followed
+    the ruling's own list.
+- **Doc and test lines beyond the ruling:**
+  - one doc clause each in the unit test and in two test docs;
+  - the logs.rs module-paragraph rewrap;
+  - the RR-B1-4 two-line comment;
+  - the wrap test's two "filed" asserts.
+- **Runs:** fp-check-1 was a pre-fix check. Its failures (fmt hunks, the parse refusal above) were fixed by Edit, and
+  fp-check-2 then passed on the changed code. Nothing that failed was re-run into a pass.
+
+**7. Left undone:** nothing of the ruling's steps 3 to 11. The SERIES.md edit, the snapshot, round 2, the merge step and
+the evidence runs are the main session's.
+
+Decisions needed:
+- LOGS0-RECORD: should FP-3's no-log summary case keep `--record <scratch path>`, which it needs because parse refuses
+  `--logs 0` alone? It matters because the ruled line cannot run as written. Options: (a) keep the added `--record`
+  (built); (b) the advisor names another form. Recommendation: (a).
+
+For Mustafa: nothing (spike code: nothing a player sees, hears or feels).
 
