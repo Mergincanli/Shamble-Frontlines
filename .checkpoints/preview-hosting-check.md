@@ -54,8 +54,8 @@
    7.0 lists the lines changed since 27e9f50 as diffs.
 
 ## Current step
-12. Waiting for him: the test repository ("repository ready") and SR-READ's answer, both from the setup (plan Part 3 A1
-   to A3). Nothing is built before SR-READ is answered (his thing 1).
+12. SR-READ answered (no write on administration or deployments) and "setup done" received at 20:53:10 UTC: the build
+   (U1 to U3) starts after the advisor tool's consultation (moments 1 and 3). Below, the record of the setup.
    - At his request ("Clone the repository Mergincanli/shamble-preview-check into this session"), the session attached
      it with add_repo (push access, as plan A3 step 4 says) and cloned it shallowly to /home/user/shamble-preview-check
      (outside this repository's folder), add_repo at 20:01 UTC and the clone right after (transcript times). The repository is empty: no commit, no branch (`git ls-remote`
@@ -72,6 +72,15 @@
      Claude", which names no permission, so SR-READ is still open. The app's public page
      (https://github.com/apps/claude, read by the web-fetch agent) lists no permissions. Asked him for the exact
      "Read and write access to ..." lines on the app's Configure page; he waits at A5 (step 3a, the token) until then.
+   - His next message (stamped 20:53:10 UTC, 0e69957a-4b89-452f-91ea-630a03b3a35a): "setup done" and a screenshot of
+     the Claude app's Configure page. Transcribed from the screenshot: "Read access to Dependabot alerts,
+     administration, commit statuses, merge queues, and metadata"; "Read and write access to actions, checks, code,
+     discussions, issues, pull requests, repository creation, repository hooks, and workflows"; Repository access:
+     "All repositories". **SR-READ: neither administration nor deployments has write access** (administration
+     read-only; deployments absent), so his thing 1 does not stop the build. Approving a pending deployment needs
+     Deployments write and changing an environment needs Administration write (security-auditor's G1b and G3 notes),
+     neither of which the app holds. His "setup done" is read as A2 and A5 to A7 done (to confirm in the reply).
+     The screenshot itself stays out of the repository (a binary); its text is above.
 
 ## Next steps
 1. On "repository ready": attach the repository (add_repo, push access), confirm I can see it; read his SR-READ answer.
