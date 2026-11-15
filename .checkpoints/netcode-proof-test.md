@@ -319,7 +319,9 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
       - pgrep finds nothing; df 12,326,227,968 B.
     - **THE P2 SET IS DONE AND MEETS EVERY EXPECTED LINE** (peak.py exit 0, wall 1046.7 s, 1,760.3 MiB):
       - -2 SS, -17 L1 P2 and -57 L1 P2 PASS, each with three valid runs;
-      - -57's nine values equal U4r's P2 (6,984 / 2,750 / 88,063 on every run), so the largest change is 0.0 %;
+      - CORRECTED (ADV-P0-2): -57's max-error values equal U4r's P2 (6,984 / 2,750 / 88,063), but its p99 moved from
+        5,257 / 5,280 / 5,283 to 5,111, so the largest change is -3.26 % (s3's position p99). My first line here said
+        0.0 %, from a script that read only the max-error checks;
       - the building figure is 0 on every run;
       - overflow resyncs 0, so no flags;
       - every summary figure (late, stale, heals, sentinels, measured incomplete) equals U4r's same-seed line;
@@ -367,7 +369,20 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
         - the follow-ups with their homes;
         - Decisions needed and For Mustafa.
         Then the BRAWL-1 entry at :215-239 is marked done.
-      - b is RUNNING since about 11:17 UTC: a drafting agent, workflow wf_634ed418-227 (task w555giuri), writes
+      - **b and c, RUNNING since about 11:33 UTC: workflow wf_631f7311-f96 (task w4fnri5du).**
+        - An assembler applies brawl1-report-draft.md into u4r-report.md by Edit: the INSERT blocks, :562-564, :215-216
+          and :525-526; notes brawl1-report-assemble-notes.md.
+        - Then the advisor reads the section against the files (item 3c); notes advisor-brawl1-close.md. Its result has
+          the keys verdict, true_to_files, corrections, close and to_mustafa.
+        - The drafter's card disagreements:
+          - P2's -57 line is corrected (ADV-P0-2);
+          - M7's cleans ran 09:12:50-09:13:10;
+          - the card's line counts came from the writers' list lengths, not `wc -l`, so they are off. Lesson: give
+            sha256 only, or `wc -l`.
+        - **If cut:** resume by run id.
+        - **Then:** write its result word for word, apply any corrections, commit u4r-report.md, and record BRAWL-1
+          closed if the advisor says so.
+      - The draft (done 11:32): workflow wf_634ed418-227 (task w555giuri) wrote
         brawl1-report-draft.md (the section, then the TICK16 :562-564 replacement and the :215-239 "done" marker), with
         notes brawl1-report-draft-notes.md. It uses ADV-P0-2's corrected P2 figure. Then I check it, move it into
         u4r-report.md by script and Edit, and save.
