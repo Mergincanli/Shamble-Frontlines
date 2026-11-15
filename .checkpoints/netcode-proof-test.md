@@ -17,9 +17,19 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
 **C62H-BOUND WORKFLOW DONE (about 16:15 UTC; wf_dd5ce188-bb6, 3 agents, 978,677 tokens; the advisor and the
 test-engineer both APPROVE WITH CONDITIONS; saved at ca95ca1):** the design and both
 reads saved word for word as JSON by c62h_bound_full.py: c62h-bound-design-full.json, advisor-c62h-bound-full.json,
-c62h-bound-test-full.json (verdicts printed in the save's log). **NOT YET READ IN FULL** (usage at 96 %: saved first).
-**Next:** read all three in full (a pass bar); apply the readers' conditions; then post the exact wording and planned
-size to Mustafa and WAIT for his yes. Nothing is built. The design in short (its plain_words): two new -17 checks on
+c62h-bound-test-full.json (verdicts printed in the save's log). **READ IN FULL about 19:10 UTC** (all three):
+the advisor APPROVE WITH CONDITIONS C1-C11 (Mediums ADV-C62HB-1 measured scope in the wording, -2 a room tick record
+without hs.server_hash must be a gap, -3 the paste must carry "How this differs from option (a) as you chose it" (i)-(v),
+the still-unbounded list and the ADR 0001 -17 row line; Lows -4 to -9; it rules Q1 (a), Q2 (a), Q3 (a), Q4 (a) now with
+(b) offered later, **Q5 (b): JDG-ONLY-1 leaves this lane** for its own change-set; size C62H-BOUND alone about 530,
+450-615; C9 the freeze by sha256 at his yes; C11 the test-engineer's read is ruled by the advisor BEFORE the paste). The
+test-engineer APPROVE WITH CONDITIONS (Mediums TE-CB-1 unit tests for each failure branch of the lab's join, TE-CB-2 a
+per-reason client-tick tally on npt-lab's summary line (E1, E2, neither; report only), TE-CB-3 any change to an
+approved text goes back to him and the runs.txt marks sha256 equals the approved build's; Lows TE-CB-4 to -10; its
+size 590-630). **Next (after PR #53's review workflow frees the agent slots):** one advisor run rules the
+test-engineer's read (C11) and checks the main session's paste draft (exact texts by script from the design JSON with
+C1, C2, C4, C8 applied word for word; the size; C3's blocks; C9's freeze); then post to Mustafa and WAIT for
+C62H-BOUND-YES. Nothing is built. The design in short (its plain_words): two new -17 checks on
 L1 P2, P3 and B1 (snap_lost_unexplained_count == 0; snap_whole_despite_link_loss_count == 0), a new lab series
 tick.s.snap_link_lost_count from npt-l1's fate log, two judge figures, one new bite (PM-0001-17/link-lost-overstated).
 **CUT-READY (about 16:10 UTC; Mustafa: "we're at 96% usage, make sure to save your progress but also of the
