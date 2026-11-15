@@ -325,6 +325,26 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
       - the logs are 622.2 MiB on disk, against the 780.8 MiB projection;
       - runs.txt's commit fc411116c1f1 and tree 079ffffc equal pre-P2's.
       - The results are committed with this card. Then pre-P0, and P0 (split).
+    - **P2's results were committed at 93509df and pushed.**
+    - **pre-P0 PASSED** (.gate/u4r-sets/pre-P0.log, 7 of 7 exit 0):
+      - header e3b0/e3b0;
+      - HEAD 93509dfd7fd1, tree 07baa855;
+      - `git diff --quiet` with results excluded exits 0;
+      - only .checkpoints/ and the four A lines of P3's and P2's results;
+      - the scripts unchanged; pgrep empty; df 11,665,391,616 B (11,125 MiB, against 7,711).
+    - **RUNNING since about 10:17 UTC: the P0 re-run set (split),** background shell b1q6ie594, log
+      .gate/u4r-sets/P0-93509dfd7fd1.log. U4r's P0 took about 39 minutes.
+      - **After it:** the expected lines in advisor-brawl1-sets-p3-full.md "The next sets":
+        - -2 SS PASS; -17 L1 P0 PASS with 0 mismatches and 0 measured incomplete;
+        - -17's three bites shown (tick16, client-rounding, whole-as-lost with incomplete 48);
+        - -57 L1 P0 PASS with its three bites shown, each failing only its own check; -57's values beside U4r's
+          (6,984 / 2,750 / 88,063; p99 5,719 / 5,718 / 5,715; bites 34,830 / 46,692 / 440,312);
+        - tick16 by TICK16-WORDING;
+        - 0 overflow resyncs on the measured runs;
+        - building 0 on every run, bite runs included;
+        - bytes against 3,614.6 MiB.
+      - Every flag and summary figure is checked against U4r's same-seed line.
+      - **Then:** commit the results, send P2's flags (none) and P0's verdict to the advisor, and record EVQ-LOAD.
     - **Was running, about 09:58-10:16 UTC: the P2 re-run set,** background shell b9rsf422l, log
       .gate/u4r-sets/P2-fc411116c1f1.log, launched as P3 was.
       - **After it:**
