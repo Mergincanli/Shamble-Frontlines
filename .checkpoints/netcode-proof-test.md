@@ -2933,6 +2933,14 @@ the cut and the time of the resume; UTC, read from the session's transcript):
     2026-11-14 call had them. The new logs' "run:" lines are compared with the old logs' to prove the copy exact.
   - **The card is not pushed now:** a push would carry the unpushed merge commit ahead of M3 and M4, and the order is
     M3, then M4, then M5's push (A5). So the card waits for M5, as the saver does.
+- 2026-11-15 16:23:35: "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit
+  resets 5:10pm (UTC)" (the same notice met the 16:35:01 check-in at 16:35:01.847). Mustafa had warned of 99 % at
+  16:21 and sent KL-CHANGE-YES with it; his words were recorded and the card saved first (65417c7, 16:22:17).
+  - **Cut:** the kept-logs build's preparation, after `git fetch origin main` (main still 4460ef5, unchanged since
+    KL-YES). No worktree was made yet, no script written, nothing under .claude/ touched; no agent or workflow ran.
+  - **Resumed 17:11:40,** on Mustafa's message ("I hit my usage limit while you were working, but it has reset now.
+    Please continue from where you left off.", 17:11:35), with the 16:35 check-in read first. Checked first: the tree
+    clean at 65417c7, pushed; the saver bc6rnao9l still running (its window to about 18:05). Nothing to restore.
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188
