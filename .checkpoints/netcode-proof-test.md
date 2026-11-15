@@ -571,12 +571,24 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
               **kl_evidence.py** written (steps compare, full, mutants M1-M14 with the advisor's homes, dry, kit,
               quotes, guard; writes only under .gate/kept-logs-rule/); its guard step PASS (main's guard prints nothing
               for the day-session pack command).
-            - **WAITING (17:28 UTC): Mustafa switches the session to Accept edits and says go** (the kit-write ask,
-              CLAUDE.md protocol step 3). Then ONE command copies the three expected kit files into the worktree's
-              .claude/ (his permission prompt); then kl_evidence.py compare, full, mutants, dry, kit, quotes; repo-map
-              check and the gate; commit and push claude/kept-logs-rule; the PR (draft); one review round
-              (security-auditor + test-engineer, one batch; test-engineer asked about test 5's preload and KLC-F2); the
-              advisor on the pushed head; then STOP for his go.
+            - **Mustafa's "go" (about 18:40 UTC; the session left auto mode):** ONE `cp` command copied the three
+              expected kit files into the worktree's .claude/ (18:41). Then, all under .gate/kept-logs-rule/:
+              **compare PASS** (the four files equal the rebuilt ones byte for byte; modes 644 as checkpoint.mjs);
+              **quotes PASS** (§11's quote 1 equal to history.md:2095-2097, quote 2 in :2105); **full PASS** (tar
+              (GNU tar) 1.35, node v22.23.4; 10 entries, 9 pass, 1 skipped = the dry run; `ok 2 - GNU tar unpacks…`
+              with no SKIP; `ok 5` the second walk); **mutants PASS** (18:43-18:44: M1-M14 each fail their named
+              tests; M4 test 4 actual 1 expected 2; M12 test 5 actual 0; M13 actual 2; M14 actual 0; details in
+              evidence-1.log and M<n>.tap); **dry PASS** (precheck-30: 2 files, list 96 ms, pack 539 ms, 3,456,457 bytes
+              from 17,323,081, 2 of 2 read back; P3: 11 files, list 383 ms, pack 12,536 ms, 97,249,215 bytes from
+              304,793,576, 11 of 11; each real folder's fingerprint equal before and after: 3ae12298… and 113c4734…);
+              **repo-map-check** OK (122 entries, 109 paths); **gate** 1-4 and 5b-5d PASS, 5a smoke FAIL only because
+              Chromium could not start (the tools want chromium_headless_shell-1194; the container's build differs:
+              gate.log), `--no-smoke` GATE PASS (gate-no-smoke.log), as on the card's earlier runs; CI runs the full
+              gate; the node_modules link used for it removed. kit step running (18:45).
+            - **Next:** commit and push claude/kept-logs-rule; the PR (draft; body by script, kl_pr_body.py, his words
+              by line ranges); then one workflow: security-auditor + test-engineer (one batch; test-engineer asked
+              about test 5's preload and KLC-F2) + the advisor (main's advisor.md) on the pushed head; fix pass if
+              needed (the advisor on each new head); the ready report; STOP for his go.
           - **After his yes to the changed lines (C7, C9):** a worktree `git worktree add .gate/kept-logs-wt -b claude/kept-logs-rule
             origin/main` (never switch the main folder); the three kit files extracted by script from the text he said
             yes to and compared by cmp; the `.claude/` writes ask him first (Accept edits mode); the draft's (c) steps

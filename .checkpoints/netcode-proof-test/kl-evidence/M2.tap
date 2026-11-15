@@ -1,0 +1,141 @@
+TAP version 13
+# Subtest: list, then pack: the list is right, every file is read back, the folder goes, free space is printed
+not ok 1 - list, then pack: the list is right, every file is read back, the folder goes, free space is printed
+  ---
+  duration_ms: 297.340619
+  type: 'test'
+  location: '/home/user/Shamble-Frontlines/.gate/kept-logs-wt/.claude/scripts/kept-logs.test.mjs:94:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    kept-logs: failed: ENOENT: no such file or directory, scandir '/tmp/kept-logs-test-lyLIt9/repo/.gate/netcode-proof-test/runs/u4r-P3-0123456789ab'
+    kept-logs: the folder stays (.gate/netcode-proof-test/runs/u4r-P3-0123456789ab), and so does any unfinished archive (.gate/netcode-proof-test/kept-logs/u4r-P3-0123456789ab.tar.gz.part); tell Mustafa (CHECKPOINTS.md §11)
+    kept-logs: free before: 7648 MiB
+    
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/Shamble-Frontlines/.gate/kept-logs-wt/.claude/scripts/kept-logs.test.mjs:105:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: GNU tar unpacks the archive to the same bytes, and readBack reads an archive GNU tar wrote
+not ok 2 - GNU tar unpacks the archive to the same bytes, and readBack reads an archive GNU tar wrote
+  ---
+  duration_ms: 266.760081
+  type: 'test'
+  location: '/home/user/Shamble-Frontlines/.gate/kept-logs-wt/.claude/scripts/kept-logs.test.mjs:114:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/Shamble-Frontlines/.gate/kept-logs-wt/.claude/scripts/kept-logs.test.mjs:119:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: pack refuses a list that is not committed, or committed but not pushed; the folder stays, no archive
+ok 3 - pack refuses a list that is not committed, or committed but not pushed; the folder stays, no archive
+  ---
+  duration_ms: 254.172955
+  type: 'test'
+  ...
+# Subtest: a folder that changed after its list: an extra file or a new size refuses (2), the same size with other bytes fails on read-back (1); the folder and the unfinished archive stay, and the next pack refuses
+not ok 4 - a folder that changed after its list: an extra file or a new size refuses (2), the same size with other bytes fails on read-back (1); the folder and the unfinished archive stay, and the next pack refuses
+  ---
+  duration_ms: 368.743855
+  type: 'test'
+  location: '/home/user/Shamble-Frontlines/.gate/kept-logs-wt/.claude/scripts/kept-logs.test.mjs:141:1'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, open '/tmp/kept-logs-test-0XiGnl/repo/.gate/netcode-proof-test/runs/u4r-P3-0123456789ab/marks.json'"
+  code: 'ENOENT'
+  stack: |-
+    readFileSync (node:fs:440:20)
+    TestContext.<anonymous> (file:///home/user/Shamble-Frontlines/.gate/kept-logs-wt/.claude/scripts/kept-logs.test.mjs:155:16)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a folder that changes after the read-back, before it would go: the second walk fails (1) on a late file, a late link and a grown file; the folder and the unfinished archive stay
+not ok 5 - a folder that changes after the read-back, before it would go: the second walk fails (1) on a late file, a late link and a grown file; the folder and the unfinished archive stay
+  ---
+  duration_ms: 238.505808
+  type: 'test'
+  location: '/home/user/Shamble-Frontlines/.gate/kept-logs-wt/.claude/scripts/kept-logs.test.mjs:162:1'
+  failureType: 'testCodeFailure'
+  error: 'the folder stays'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    packWith (file:///home/user/Shamble-Frontlines/.gate/kept-logs-wt/.claude/scripts/kept-logs.test.mjs:180:12)
+    TestContext.<anonymous> (file:///home/user/Shamble-Frontlines/.gate/kept-logs-wt/.claude/scripts/kept-logs.test.mjs:185:13)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: refused before any work: a routine, the usage, a bad set name or results path, results not committed, not the root, a linked worktree
+ok 6 - refused before any work: a routine, the usage, a bad set name or results path, results not committed, not the root, a linked worktree
+  ---
+  duration_ms: 882.055462
+  type: 'test'
+  ...
+# Subtest: odd entries refuse and stay: a symbolic link anywhere, a pipe, a long, spaced or hidden name
+ok 7 - odd entries refuse and stay: a symbolic link anywhere, a pipe, a long, spaced or hidden name
+  ---
+  duration_ms: 509.183
+  type: 'test'
+  ...
+# Subtest: cache removes the one old .gate/u3c-review-target and nothing else; it refuses a link, a tracked file, a worktree inside, anything changed after his words, more words
+ok 8 - cache removes the one old .gate/u3c-review-target and nothing else; it refuses a link, a tracked file, a worktree inside, anything changed after his words, more words
+  ---
+  duration_ms: 420.235069
+  type: 'test'
+  ...
+# Subtest: readBack reads a plain archive and refuses a wrong checksum, another entry type, a short end and data after the end
+ok 9 - readBack reads a plain archive and refuses a wrong checksum, another entry type, a short end and data after the end
+  ---
+  duration_ms: 14.246696
+  type: 'test'
+  ...
+# Subtest: dry run on a copy of a real run-set folder: listed, packed, read back, removed; GNU tar unpacks the same bytes
+ok 10 - dry run on a copy of a real run-set folder: listed, packed, read back, removed; GNU tar unpacks the same bytes # SKIP set KEPT_LOGS_DRY_RUN=<a real run-set folder> (GNU tar needed)
+  ---
+  duration_ms: 0.195885
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 5
+# fail 4
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 3308.19104
