@@ -618,6 +618,31 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
               resumeFromRunId: "wf_a9e04f3e-df7"})`. **Then:** the three results word for word by script, read in full;
               a fix pass if needed (the advisor on each new head); the PR body becomes the ready report (his three
               items); mark it ready; STOP for his go on the merge.
+            - **ROUND DONE (19:19 UTC, 3 agents, 409,732 tokens; results word for word by kl_pr53_review_full.py,
+              read in full):** security-auditor APPROVE WITH FINDINGS, SA-KL-1 to -4 Low (kl-pr-security-full.json);
+              test-engineer APPROVE WITH FINDINGS, KLT-1 to -8 Low, its answers: test 5's preload sound, KLC-F2 a
+              follow-up (kl-pr-test-full.json); **the advisor on a637c7a: APPROVE WITH CONDITIONS C1-C5**, KLH-1 Medium
+              (the five .log evidence files never committed: .gitignore:7 `*.log`), KLH-2 Low (13 body links came back
+              wrapped in backticks from the GitHub write: slip 11's kind again), KLH-3 to -7 Low
+              (advisor-kl-pr-head1-full.json; the advisor rebuilt the files with its own script: byte-equal). No push
+              needed. **Process notes:** the test-engineer read the PR body with `gh api` (read only; this session's
+              rule keeps gh for search); the reviewers' scratch files are under .gate/kept-logs-rule/review/.
+            - **C1-C3 DONE, PR #53 MARKED READY at 19:23 UTC:** kl_evidence_txt.py copied the five logs as .txt
+              (committed at c31a83f); the body became the ready report (his three items; his words cited by line at
+              c31a83f, not copied; folder links only, read back unwrapped; both reviewers' and the advisor's verdicts;
+              every finding deferred in writing; the settings.json:50-51 note; docs-keeper's pass after the merge;
+              KL-MERGE in Decisions needed). The worktree is clean at a637c7a. **STOP: waiting for Mustafa's go on the
+              merge of #53 for head a637c7a (KL-MERGE).** Then: merge from this session with a637c7a as the expected
+              head (gate and smoke green); this branch takes main in; only then may the first real list/pack run.
+            - **KEPT-LOGS follow-ups (deferred in writing in PR #53's report; to STATUS in docs-keeper's next pass):**
+              SA-KL-1 (re-check realpath and lstat right before each rmSync), SA-KL-2 (git without GIT_* in the
+              environment, script and tests), SA-KL-3 (ctime or .rustc_info.json for the cache bound), SA-KL-4 (link
+              instead of rename; fsync the kept-logs folder before rmSync); KLT-1 (test 5 case: a late bad name; a plant
+              making :89 refuse), KLT-2 (pack's routine refusal), KLT-3 (parseList :113 and the free-space refusal), KLT-4
+              (a link inside the cache), KLT-5 (mkfifo diagnostic), KLT-6 (kit tests in CI, infra-engineer), KLT-7
+              (pipefail in the fingerprint); KLH-6 (the REPO_MAP row names the second walk); KLH-7 (main's settings.json
+              :50-51 allows node .gate/*.mjs and *.js without a prompt: a kit follow-up after the freeze, his word).
+              Any change to the kit lines needs his yes first.
             - **Slip 12 (mine, for Mustafa):** three times this afternoon a Bash call began with a plain `cd X &&`
               instead of a subshell (twice into the notes folder, once into the worktree), so the shell's folder moved;
               each time it was moved back at once, and no file and no branch changed by it. Rule: subshells only. Also
