@@ -127,7 +127,24 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
     planned, under the "well past" line (more than 1,400). Not a stop.
   - **Round 1's read copy:** .gate/brawl1-snap1, a detached worktree at 352a245 plus 0e2bf9a's patch, giving
     ee2973aa…. The fix pass changed 6 files.
-  - **RUNNING since about 07:47 UTC: round 2, workflow wf_19a5485a-e64 (task ws5husfn6).**
+  - **ROUND 2 DONE (about 07:57 UTC): both seats APPROVE WITH FINDINGS, 4 Lows, no Medium or higher.**
+    - Written word for word by brawl1_r2_full.py: brawl1-review-r2-full.md (sha256 26856837…).
+    - Every round-1 finding is fixed as ruled or deferred as ruled. The seats re-checked the plants (each planted sha256
+      reproduced), FP-2's sequence, FP-8's pins and the 13 prints themselves.
+    - The Lows, none touching the judge, the marks or a pass bar:
+      - TE-B1-R2-1: the dead input should sit at (0, 0);
+      - TE-B1-R2-2: the runners' "untracked" field hashes the whole porcelain list;
+      - RR2-B1-1: "below 2^31" should read "at most 2^31";
+      - RR2-B1-2: the report's caller line should be :389.
+    - test-engineer finds LOGS0-RECORD (a) sound: summary_line reads only `s.logs`.
+  - **RUNNING since about 07:58 UTC: the advisor's round-2 ruling, workflow wf_d32decd1-87b (task wnrpyufkm),** one
+    agent (general-purpose, opus, xhigh), notes advisor-brawl1-r2.md, logs .gate/u4r/brawl1-advisor-r2/.
+    - It rules on: the 4 Lows' homes and round 3; copy 2's deviations (LOGS0-RECORD); my two resume-part errors; the go
+      for M1-M7 (with the "untracked" field's reading at M3); the report words; Mustafa.
+    - **If cut:** `Workflow({scriptPath: ".../workflows/scripts/brawl1-r2-ruling-wf_d32decd1-87b.js",
+      resumeFromRunId: "wf_d32decd1-87b"})`.
+    - **Then:** write it word for word (brawl1_r2_ruling_full.py), read it in full, and do the merge step M1-M7.
+  - **Was running, about 07:47-07:57 UTC: round 2, workflow wf_19a5485a-e64 (task ws5husfn6).**
     - The seats: test-engineer and rust-reviewer, one batch, opus at xhigh.
     - The packet: brawl1-r2-packet.md (1,002 lines, sha256 e50a22f7…, from brawl1-r2-packet.json).
     - Notes: brawl1-review2-<test|rust>.md. Logs: .gate/u4r/brawl1-review2-<seat>/.
