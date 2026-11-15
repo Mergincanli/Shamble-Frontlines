@@ -133,3 +133,13 @@
   bound like MAX_ENTRY_BYTES, the ruling's own analogy). For the advisor (report item 7), with the other option.
 - Fix 2 (test): r10_carry_82's ticks <= bytes / 12 boundary moved below the cap: its entry's bytes set to 360,000
   (30,000 ticks at the boundary; 30,001 refused "cannot fit"), so it still tests that rule.
+- Also rewrapped my comment and string lines that ran past 120 characters (no text change; the messages read the same).
+- (a) check.mjs, run 2: .gate/u4r/brawl1/p1-a-check2.log, exit 0, ended 03:20:12 UTC: all 11 steps PASS. test 635.8 s:
+  measured build 532 passed, 0 failed, 0 skips; bites build 610 passed, 0 failed, 0 skips. wasm 42.8 s (synthetic
+  three equal; hash-map caught). deps held. PASS.
+- (b) det-u4.mjs: .gate/u4r/brawl1/p1-b-det.log, exit 0. uptime first in the same call: "03:20:25 up 45 min, load
+  average: 1.42, 1.96, 1.57" (no other lane building or running: only the session's checkpoint saver). PASS deps; PASS
+  det-u4 232.9 s: native/native and native/Wasm 18,000 ticks equal (SS-P2-s1 9000, ES-P3-s2 9000), h2 equal; seconds:
+  build npt-lab 9.5, build wasm 1.2, npt-lab hash 218.5, Wasm SS-P2-s1 2.6, Wasm ES-P3-s2 0.9, compare and h2 0.0.
+  Non-cargo sum 222.0 s (under 240). Regenerated files: SS-P2-s1 16,937,652 B sha256 5b79abb2a2cba55b...a29a32e3,
+  ES-P3-s2 16,929,501 B fad8f67ded2a220e...0045953b: the old pins. PASS.
