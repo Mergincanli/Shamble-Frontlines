@@ -597,7 +597,8 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
               Chromium could not start (the tools want chromium_headless_shell-1194; the container's build differs:
               gate.log), `--no-smoke` GATE PASS (gate-no-smoke.log), as on the card's earlier runs; CI runs the full
               gate; the node_modules link used for it removed. kit step running (18:45).
-            - **Done 18:45-18:52 UTC:** kit counts at the head equal main's (27, 127, 1107: kit PASS). Committed in the
+            - **Done 18:45-19:05 UTC** (kit 18:45:50; the evidence save e10e1de 18:47:41; the PR just before the
+              workflow at 19:05:45): kit counts at the head equal main's (27, 127, 1107: kit PASS). Committed in the
               worktree and pushed: **head a637c7a357e79614f896ddddf7488e08b5fc9180** on claude/kept-logs-rule (4 files,
               +671 −0). `kl_evidence.py compare a637c7a…` PASS (the pushed commit's four files equal the rebuilt ones;
               `git diff --name-status 4460ef5 a637c7a` = exactly those four). quotes, guard and full re-run into
@@ -605,8 +606,9 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
               e10e1de). **PR #53** opened as a draft
               (https://github.com/Mergincanli/Shamble-Frontlines/pull/53; body written to the scratchpad's
               kl-build/pr-body.md first; his words linked by line at e10e1de, not copied); subscribed to its activity.
-            - **RUNNING since about 18:53 UTC: workflow wf_a9e04f3e-df7 (task w7kr5itsz)**, one batch of three, read
-              only: security-auditor (notes kl-pr-security.md), test-engineer (notes kl-pr-test.md; asked about test
+            - **RUNNING since 19:05:45 UTC (its journal; the card first said "about 18:53", written without reading
+              the clock, corrected): workflow wf_a9e04f3e-df7 (task w7kr5itsz)**, one batch of three, read only; the
+              workflow runs two agents at a time here, so the advisor starts when a reviewer returns: security-auditor (notes kl-pr-security.md), test-engineer (notes kl-pr-test.md; asked about test
               5's preload and KLC-F2), and the advisor from main's advisor.md on head a637c7a (notes
               advisor-kl-pr-head1.md). **If cut:** resume with `Workflow({scriptPath:
               "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/kl-pr53-review-wf_a9e04f3e-df7.js",
