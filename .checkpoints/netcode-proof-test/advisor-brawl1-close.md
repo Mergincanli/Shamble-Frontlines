@@ -27,3 +27,31 @@ A read against the files, not a review round. Nothing changed in any tree; only 
     committed at ab3b7d7 (06:41:33), cut from 7402dac's diff by fp0_diffs.py (card, FP-0 DONE).
   - F3 (Low): :810 "the full test's 13 printed lines": the 13 are the sim-only test's (short copy 4 + full test 9;
     m6 check 8), identical after the stated normalisation (copy 2 report :61).
+- Round 1, round 2, the corrections and follow-ups: every line, home and line citation checked (points :5, :36,
+  :87-91; r1 :29-37, :188, :190, :194-211, :279-288, :342-345, :357-360, :372-375, :402-405, :407-410, The size;
+  r2 :40-58; p3 :37, :158, :194; sets-r2 :30, :34; brawl1-build.md :251, :620). True.
+- Re-run sets (advisor's own report words): re-checked against the committed results by print-only python: P3, P2, P0
+  verdicts and bites, U4r's same-profile verdicts, set-log wall/peak/bytes lines, sha256 of the 3 set logs, pre-P0,
+  the 7 results files; raw lab.jsonl resync counts (tick16 94 = 47/46/1, after, 48 slots, 5 and 17 once; P3 s1 27 on
+  25 slots 76,910-77,844 measured; s3 1 at 76,803). All true. Kept logs now: U2 1.94, U4r 5.26, BRAWL-1 4.20,
+  evidence 0.59 GiB; free 8,089,780,224 B (7.5 GiB): KEPT-LOGS's numbers still hold.
+- Card (item 3a): P2's record corrected in place (:322-324). EVQ-LOAD and TICK16 are on the card as exact pointers,
+  not word for word (ADV-CL-1 below).
+- More found:
+  - F4 (Low): :1043's heading still says "(it replaces the line at :562-564)"; that line is now :566-575.
+  - F5 (Low): :644-646 "Still open: the advisor reads this section..." must say the read is done when BRAWL-1 is
+    recorded closed.
+  - F6 (Low, a home): ADV-PT-L3's home is "the check.mjs follow-up", but that list (:264-271) does not name it.
+  - F7 (Low): the "next npt-lab lane" entry (:272-276) still reads as open; BRAWL-1's Part 1 carried every item in it.
+  - F8 (Low, optional): plan time (see above).
+  - F9 (Low, optional): the quoted For Mustafa says "committing the last results" is still to do; done at be41ce6.
+  - ADV-CL-1 (Low, my wording): item 3a asked the card to record EVQ-LOAD word for word; an exact pointer to
+    advisor-brawl1-sets-p3-full.md:158 and u4r-report.md's script copy is accepted instead (a third copy risks drift).
+
+## Verdict
+TRUE TO THE FILES in every figure that decides anything: no verdict, count, hash or ruling is misstated. Three small
+slips of fact (F1-F3) and four record-keeping items (F4-F7), all Low. BRAWL-1 MAY BE RECORDED CLOSED once C1-C7 are
+applied as written (C8-C9 optional). No further check by me: the main session confirms by a print-only diff that
+only those lines changed, then commits with the card. Nothing for Mustafa beyond KEPT-LOGS, still open.
+
+## Step 3 done; step 4 (the result) returned to the workflow.

@@ -369,7 +369,21 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
         - the follow-ups with their homes;
         - Decisions needed and For Mustafa.
         Then the BRAWL-1 entry at :215-239 is marked done.
-      - **b and c, RUNNING since about 11:33 UTC: workflow wf_631f7311-f96 (task w4fnri5du).**
+      - **b and c DONE (about 11:50 UTC).**
+        - u4r-report.md went from 667 to 1,184 lines, with all three inserts and all three replacements applied.
+        - The advisor's close check (advisor-brawl1-close-full.md, sha256 1ca738a8…): TRUE TO THE FILES, with seven
+          Low corrections C1-C7 (C8 and C9 optional). **BRAWL-1 may be recorded closed once C1-C7 are made.** ADV-CL-1:
+          the card's pointers for EVQ-LOAD and TICK16 are accepted.
+        - **RUNNING: C1-C9 applied by an agent, workflow wf_adc526e1-faf (task wdpl5yvuh),** with a print-only diff
+          check.
+        - **Then:** commit the report, the card and the advisor's notes together, push, and record BRAWL-1 CLOSED.
+        - **Then task #74:**
+          1. TE-B1-R2-2's runner edit (u4r-run.sh:67 and main-run.sh:42, in the ruled form, each with a .diff and a
+             silent `bash -n`);
+          2. KEPT-LOGS before U4g's build;
+          3. U4g's brief with u4g-brief-carry.md and EVQ-LOAD.
+        - PR #40 stays a draft; main is taken in before it is marked ready.
+      - **Was running: b and c, about 11:33-11:50 UTC: workflow wf_631f7311-f96 (task w4fnri5du).**
         - An assembler applies brawl1-report-draft.md into u4r-report.md by Edit: the INSERT blocks, :562-564, :215-216
           and :525-526; notes brawl1-report-assemble-notes.md.
         - Then the advisor reads the section against the files (item 3c); notes advisor-brawl1-close.md. Its result has
