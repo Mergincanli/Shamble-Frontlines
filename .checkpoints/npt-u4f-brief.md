@@ -6,33 +6,39 @@
   (after `git fetch origin claude/netcode-proof-test-plan-hcky5g`)
 - **Branch:** cs/npt-u4f-brief · **Base:** origin/main 53272a1
 - **Spike worktree (read only):** `.gate/npt-spike-1116` at 11fd190e9536702f0dcfc72d584b637ebc6184be
-- **Last update:** 2026-11-16 00:39 Amsterdam
+- **Last update:** 2026-11-16 00:49 Amsterdam
 
 ## Steps done
 1. Start checks (role night-shift, window 00:11, no other run tonight), status comment 6902964789 posted; spike
    worktree added at 11fd190; branch created from origin/main 53272a1 · (this commit) · ok
 
+2. netcode-architect drafted rev 1 (`u4f-brief-draft.md`, 837 lines, sections 0-12 present; notes end DONE) · the
+   commit after this line's save (see git log: "step 2 done") · 11 findings (1 High, 7 Medium, 3 Low), 12 U4F-Q, 10 D
+
 ## Current step
-2. netcode-architect drafts `.checkpoints/npt-u4f-brief/u4f-brief-draft.md` (notes `netcode-architect-u4f.md`), xhigh.
+3. test-engineer and security-auditor check rev 1 in parallel, xhigh.
 
 ## Next steps
-2. netcode-architect: draft rev 1 (plan item 7, Agents 1).
 3. test-engineer (`test-engineer-u4f-check.md`) and security-auditor (`security-auditor-u4f-check.md`) check rev 1 in
    parallel, xhigh (plan item 7, Agents 2).
 4. netcode-architect revises once for both checks: rev 2 with a change list at its top (plan item 7, Agents 3).
 5. Commit and push everything; night report paragraph (branch, files, the checks' top findings); tick item 7.
 
 ## Open findings
-- none yet
+- Drafter's findings (rev 1, table at the draft's end; notes `netcode-architect-u4f.md`): NA-4 High (Pong carries
+  only the next tick: ClockSync's server time known to one tick, -47's p99 ≤ 5 ms near 6 ms at P2; U4F-Q6);
+  NA-3, NA-5, NA-6, NA-7, NA-8, NA-9, NA-12 Medium; NA-1, NA-2, NA-10, NA-11 Low · open (for the checks and rev 2)
 
 ## Key numbers
-- none yet
+- rev 1: 837 lines; 9 field tables; tests ≥ +60 measured / ≥ +74 bites build; 44 negative cases; 17 bites; 65 judged
+  runs (36 measured, 12 twins, 17 bite runs); 14 carry placeholders; 15 @@WORDS@@; 29 recheck rows; 15 open items
+  (12 routed, 3 left); 12 U4F-Q; 10 needs-a-run (D1-D10) (the drafter's counts)
 
 ## Decisions taken
 - Branch name cs/npt-u4f-brief, as the plan's rule 2 names it · the plan · 2026-11-15
 
 ## Running work
-- netcode-architect (draft rev 1), xhigh, launched 00:13 Amsterdam, running; notes
+- netcode-architect (draft rev 1), xhigh, launched 00:13 Amsterdam, done 00:48 (35 min, 117 tool uses); notes
   `.checkpoints/npt-u4f-brief/netcode-architect-u4f.md`, draft `.checkpoints/npt-u4f-brief/u4f-brief-draft.md`
 - saver: run in 25-minute stints (`--every 10 --for 25`), so each stint's end wakes the run to refresh the status
   comment (a later hourly run reads a status older than 45 minutes as a cut-off). First saver b0yfndb40 stopped by
