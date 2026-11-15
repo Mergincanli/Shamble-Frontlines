@@ -30,6 +30,15 @@ where carry 80 (b) and (d) touch how the client files lost ticks. Push it, then 
 about 21:00 UTC (the night starts 23:10 UTC); his rule's words are copied by script from night-2026-11-10.md:4-8.
 **Not now:** step (7) is PR #40's report (advisor-u4r-sets-r2-full.md:135); JDG-ONLY-1 and the check.mjs follow-up
 ride the next npt-judge and check.mjs change (U4h at the latest; before PR #40 is marked ready).
+**Check-in 14:39 UTC:** nothing stopped. **No /compact by 15:00 UTC** (COMPACT-WAIT's 20 minutes; reminder
+trig_011EMvFfmFaKNwfWXLawWBEo fired), so the night plan goes ahead. **Running since about 15:03 UTC: workflow
+wf_24144405-900 (task w9wwkmmhl), the night-u4f scout** (netcode-architect, xhigh, read only; notes
+night-u4f-scout.md; script npt-night-u4f-scout-wf_24144405-900.js under the session's workflows/scripts/). It maps
+every input of U4f's brief with line ranges at HEAD (result keys head_sha, sections, carries, rulings, card_lines,
+mustafa_rules, open_items, brief_shape, disk, lane_files, gaps). **If cut:** resume by run id. **Then:** write its
+result word for word by script (night_u4f_scout_full.py → night-u4f-scout-full.md); write night-2026-11-15.md from it
+(the main session); one check agent verifies every reference and the fit with NIGHT_SHIFT.md on main; push; issue
+#16's body gains item 7 (by about 21:00 UTC).
 
 **NOW (2026-11-15 about 04:25 UTC; read this first after a compact or a cut): BRAWL-1 IS BUILT (copy 1, agent
 a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVISOR'S RULING AND THE REVIEW ROUND.**
