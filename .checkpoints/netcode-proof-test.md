@@ -33,8 +33,21 @@ card's verbatim record (asserted equal to night-2026-11-10.md's copy) into the p
 **Not now:** step (7) is PR #40's report (advisor-u4r-sets-r2-full.md:135); JDG-ONLY-1 and the check.mjs follow-up
 ride the next npt-judge and check.mjs change (U4h at the latest; before PR #40 is marked ready).
 **Check-in 14:39 UTC:** nothing stopped. **No /compact by 15:00 UTC** (COMPACT-WAIT's 20 minutes; reminder
-trig_011EMvFfmFaKNwfWXLawWBEo fired), so the night plan goes ahead. **Running since about 15:03 UTC: workflow
-wf_24144405-900 (task w9wwkmmhl), the night-u4f scout** (netcode-architect, xhigh, read only; notes
+trig_011EMvFfmFaKNwfWXLawWBEo fired), so the night plan goes ahead.
+**Running since about 15:38 UTC: workflow wf_6e5acbfd-5c3 (task wkxc0tfqn), the night plan's check** (script
+npt-night-plan-check-wf_6e5acbfd-5c3.js): the verifier on every reference (notes night-plan-verify.md; keys
+refs_checked, wrong, spot_checks, verdict, summary) and the advisor from main's file on fit with NIGHT_SHIFT.md, scope,
+completeness and approval (notes advisor-night-plan.md; keys verdict, summary, findings, conditions,
+approved_under_rule, to_mustafa), in parallel, read only. **If cut:** resume by run id. **Then:** both results word for
+word by script, read in full; fix the plan by Edit; save; post item 7 to issue #16 with the plan's SHA.
+- **The plan: night-2026-11-16.md** (127 lines; sha256 e529ba0d… after night_1116_rule_words.py put his 2026-11-09
+  words in, from the card's record at :3362-3366, asserted equal to night-2026-11-10.md:4-8). Worktree pinned at
+  11fd190 (the scout's map committed; no file but the card changed since 0ad41a6). Item 7: netcode-architect drafts;
+  test-engineer and security-auditor check in parallel; one revision.
+- **Done, about 15:18 UTC: the night-u4f scout** (wf_24144405-900; one agent, 116 tool uses, 393,484 tokens): its
+  result word for word in night-u4f-scout-full.md (265 lines, sha256 8191e8ff…), read in full. Its gaps: no U4f file
+  lane in the plan; no size or time figure for U4f's runs; §4.7 is Events (the window is §4.5); F104 only at
+  u4-scout-netcode.md:122. Was (since about 15:03 UTC): the night-u4f scout** (netcode-architect, xhigh, read only; notes
 night-u4f-scout.md; script npt-night-u4f-scout-wf_24144405-900.js under the session's workflows/scripts/). It maps
 every input of U4f's brief with line ranges at HEAD (result keys head_sha, sections, carries, rulings, card_lines,
 mustafa_rules, open_items, brief_shape, disk, lane_files, gaps). **If cut:** resume by run id. **Then:** write its
