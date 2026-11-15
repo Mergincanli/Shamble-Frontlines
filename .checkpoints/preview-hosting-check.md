@@ -5,7 +5,7 @@
   secret, no edit outside this checkpoint. · plan: `.checkpoints/preview-hosting-check/plan.md` (not yet written)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-15 17:50 Amsterdam
+- **Last update:** 2026-11-15 16:47 Amsterdam (15:47 UTC)
 
 ## Steps done
 1. Orientation · the session's model read with get_session at 2026-11-15 15:36:35 UTC: `session_context.model`,
@@ -23,10 +23,10 @@
    the first builder chat's plan at 68addf9 (Part 8 :836-876, Part 10 :880-912, decisions :1165-1268) and checkpoint;
    the netcode chat's infra digest (macOS runner Safari versions, read 2026-11-05); .github/workflows/gate.yml (pins).
 3. Facts read for the plan (no commit): workflow runs started by sessions show `actor` and `triggering_actor`
-   `Mergincanli` (gate run 43576714278, toolchain runs 43576714298 and 43536148433, read 2026-11-15 ~16:45 UTC with
+   `Mergincanli` (gate run 43576714278, toolchain runs 43576714298 and 43536148433, read 2026-11-15 15:44:54 UTC with
    the GitHub MCP tool); the MCP tool `actions_run_trigger` offers run_workflow, rerun_workflow_run, rerun_failed_jobs,
-   cancel_workflow_run, delete_workflow_run_logs: no method approves a pending deployment (its schema, read
-   2026-11-15 ~16:44 UTC); the guard's merge check (routine-guard.mjs:1474-1491) refuses an MCP merge in any
+   cancel_workflow_run, delete_workflow_run_logs: no method approves a pending deployment (its schema, loaded
+   2026-11-15 15:44:43 UTC); the guard's merge check (routine-guard.mjs:1474-1491) refuses an MCP merge in any
    repository without green `gate` and `smoke` checks, for every session; npm's registry answers (wrangler latest
    4.162.0) and `git ls-remote` reads public GitHub repositories (actions/upload-artifact, download-artifact tags).
 4. Mustafa's task message saved byte for byte by script (the file above; 5830 bytes).
