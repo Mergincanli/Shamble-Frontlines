@@ -5,7 +5,7 @@
   secret, no edit outside this checkpoint. · plan: `.checkpoints/preview-hosting-check/plan.md` (not yet written)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-15 17:48 Amsterdam (16:48 UTC)
+- **Last update:** 2026-11-15 19:44 Amsterdam (18:44 UTC)
 
 ## Steps done
 1. Orientation · the session's model read with get_session at 2026-11-15 15:36:35 UTC: `session_context.model`,
@@ -54,15 +54,23 @@
    7.0 lists the lines changed since 27e9f50 as diffs.
 
 ## Current step
-11. Done: the plan (revision 2) is approved by the advisor agent with its conditions folded in; the closing message
-   next; then stop for his go.
+12. Waiting for him: the test repository ("repository ready") and SR-READ's answer, both from the setup (plan Part 3 A1
+   to A3). Nothing is built before SR-READ is answered (his thing 1).
 
 ## Next steps
-1. After consultation 3: save revision 2 as done; stop the saver (TaskStop) and make the last save.
-2. The closing message: the plan's path and commit, the summary, his steps in order, the decisions, the Part 7 lines
-   changed after the review, the chat's fullness from get_session, the advisor-model line, the slip once with its save
-   times, the refusals, ultracode's handling, and that the draft workflow texts sit in the public notes folder as text
-   nothing runs. Then stop for his go.
+1. On "repository ready": attach the repository (add_repo, push access), confirm I can see it; read his SR-READ answer.
+   - If the Claude app lists Administration or Deployments with write access: stop before building and tell him in
+     three lines what that changes for this check and for the reviewer's worth (his thing 1).
+   - Otherwise: the advisor tool's consultation (moment 1) before the build's approach, then the build (plan Part 2,
+     U1 to U3) on the test repository's branch `setup`, pushed without a pull request; the saver running.
+2. The review round (U4), at most 3 agents: infra-engineer, security-auditor (with his thing 2: rule on the deploy
+   job's `deployments: write`: what needs it, or remove it and show him the changed line) and test-engineer; then the
+   advisor agent's review of the built head. Any changed line of the six approved texts goes back to him as an exact
+   diff and waits for a new yes.
+3. The results-log header (PM-0006-1) after his "setup done" and before the setup pull request opens; then, before
+   every sitting, one list for him: the runs that will wait, in approval order, and the sitting's length (his thing 3).
+4. No draft pull request in Shamble-Frontlines: his go covers only the checkpoint and, at the end, the report's pull
+   request, which stops for his go (this replaces plan Part 8 step 3's draft pull request).
 
 ## Open findings
 - Refused by the guard, 2026-11-15 15:54:02 UTC: `git -C <dir> fetch ...` ("git: no option before the subcommand (run
@@ -103,6 +111,16 @@
   2026-11-14; the first builder chat gets his go on Tuesday 2026-11-17, so its change-set 0 and Part 15 do not exist
   yet, and his decision on two builder chats stands on the task message; a third chat builds Shamble VFX in its own
   repository (Mergincanli/ShambleVFX): not this lane, never touched. The task is unchanged.
+
+- **His answers and his go** (his words written 2026-11-15, 18:35 Amsterdam, user message
+  c7a8e93b-1b32-4886-8330-e14ada13e8a7 stamped 18:42:30 UTC; byte for byte in
+  `.checkpoints/preview-hosting-check/mustafa-2026-11-15-go.md`, 2589 bytes, sha256 a627d4bce60b...): TR-WHERE (a),
+  TOKENS (a), REVIEWER (a), MACHINES (a), TOMBSTONE (a), ACCESS-CARD (a), TR-END (a); his go on the plan as written,
+  the build once he has said "repository ready"; his yes to Part 7's six texts exactly as at 2a2f426 (sha256 prefixes
+  333e5a592a05, 98b42b8e59cf, f24ad6e81daf, 6791076916ae, fd3dc4c6029b, 8b745631a278: checked by script against the
+  files at 2a2f426 on 2026-11-15, all six match); the acts allowed in the test repository; merges, approvals and
+  settings his; nothing in Shamble-Frontlines beyond the checkpoint and the report's pull request; his three things
+  (SR-READ decides before the build; security-auditor rules on `deployments: write`; one list before every sitting).
 
 ## Advisor tool consultations (his words of 2026-11-11: when, the question, what changed)
 1. 2026-11-15 15:49:20 UTC (called; answer 15:51:36 UTC; transcript times), moment 1 · Q: is the approach sound (a
