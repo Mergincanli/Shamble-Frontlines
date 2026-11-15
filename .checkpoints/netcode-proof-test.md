@@ -216,7 +216,36 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
     - BRAWL-1's section in u4r-report.md now holds the advisor's round-2 report words (copied by
       brawl1_report_words.py from advisor-brawl1-r2-full.md:131-166). The merge record follows there after M6.
   - **Pushed head 8f0939f** (09:06 UTC). Saver bbavt4wl2, restarted 09:06.
-  - **RUNNING since about 09:07 UTC: M6, the advisor's head review, workflow wf_8067a67a-6fe (task w0euby9aq),** one
+  - **M6 DONE: APPROVE WITH FINDINGS on head 8f0939f** (advisor-brawl1-m6-full.md, 88 lines, sha256 c2fc64c1…; 14
+    checks, all PASS). **THE BRAWL-1 MERGE IS COMPLETE (M1-M6).**
+    - **Its three Lows, record-keeping only (no push):**
+      - ADV-M6-L1: M2 ran 08:37:41-08:38:09, not "08:38-08:40". The pgrep and df readings are only on the card.
+      - ADV-M6-L2: there is no free-space figure at M3's end. Use the advisor's post-M3 reading, 8,320,163,840 B at
+        09:06:48, labelled "after M3 and M4, not at M3's end", with M7's first df.
+      - ADV-M6-L3: u4r-report.md's BRAWL-1 section needs one line pointing to round 1's record: brawl1-build.md:251 and
+        :620, and advisor-brawl1-r1-full.md.
+    - **M7: GO, with M7-1 to M7-4:**
+      - M7-1: the cleans start only after M6 returned, with pgrep empty and no agent; the commands are written out
+        literally; the new logs' "run:" lines must equal m2-clean-B.log's and m2-clean-C.log's.
+      - M7-2: every df reading is command output in a log under .gate/brawl1-merge/. MY FORM: separate main-run.sh
+        calls holding only `df -B1 /home/user` (m7-df-0.log, m7-df-1.log, m7-df-2.log) around the two clean calls
+        (m7-clean-B.log, m7-clean-C.log), so the clean logs' run lines stay identical.
+      - M7-3: every evidence and set log header shows `diff e3b0…; untracked e3b0…` and a HEAD whose spikes/netcode-proof
+        tree is ebbfeb40 (b30314a, or a later .checkpoints/-only commit); any other value voids that run. The runners
+        stay as they are (A6).
+      - M7-4: on the card for disk planning: the main folder's cold full set refilled about 5.0 GiB, not 8.2-9; free
+        after M3 was about 7.9 GiB. The floors stay as they are (P0 needs 7,711 MiB). KEPT-LOGS stays open.
+    - **The evidence runs' bars** (condition 14): everyone in view at 0.99 or more; a building total of 0; bytes within
+      U4r-F3's rates (P0 603.7 MB, P3 183.3 MB); never named u4r-*. A miss stops the re-run sets and goes to the advisor
+      whole.
+  - **NEXT (M7):**
+    1. df, clean (B), df, clean (C), df, as above.
+    2. The merge record in u4r-report.md's BRAWL-1 section, by Edit: M1-M6 with each figure, ADV-M6-L1's times, L2's
+       figure and L3's pointer line.
+    3. The two 10-minute evidence runs (the commands are in brawl1-plan.md section 4.3), through main-run.sh in the main
+       folder.
+    4. The re-run sets P3, P2 and P0 (split), on c-u4r-runs.mjs 99dd070e, each set committed before the next.
+  - **Was running, about 09:07-09:15 UTC: M6, the advisor's head review, workflow wf_8067a67a-6fe (task w0euby9aq),** one
     agent (general-purpose, opus, xhigh), notes advisor-brawl1-m6.md, logs .gate/brawl1-merge/advisor-m6/.
     - It rules on: the pushed head's verdict with each check; any findings; the go for M7; Mustafa.
     - **If cut:** `Workflow({scriptPath: ".../workflows/scripts/brawl1-m6-wf_8067a67a-6fe.js", resumeFromRunId:
