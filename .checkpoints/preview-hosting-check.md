@@ -62,6 +62,10 @@
      lists nothing; the clone says "No commits yet"). Plan A1's "Add a README file" was not ticked, so there is no
      `main` for pull requests; the deny list forbids the session to push any `main`, so he adds the README on GitHub.
      register_repo_root waits for the first commit (its condition: `rev-parse HEAD` succeeds).
+   - He then added README.md ("I have pushed the readme.md file"): `main` is 4a67b83 "Create README.md"
+     (4a67b83b9ed672c81e1a6e3067f916841c02b4a9), fetched shallowly and fast-forwarded onto the empty local `main` (no
+     reset); register_repo_root called for /home/user/shamble-preview-check. He asked for the rest of the setup in plain
+     words; the steps sent: A2, A3 (SR-READ), A4, then wait for the session's reply, then A5 to A7.
 
 ## Next steps
 1. On "repository ready": attach the repository (add_repo, push access), confirm I can see it; read his SR-READ answer.
