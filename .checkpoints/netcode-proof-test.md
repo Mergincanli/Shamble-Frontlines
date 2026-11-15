@@ -514,11 +514,24 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
             refuses, exit 2) each fail only the new test (actual 0 and 2, expected 1); M4 on the new first-walk line
             still fails test 4 (actual 1, expected 2). Nothing real packed or deleted; nothing under .claude/ written.
             **Next:** the advisor reviews kl-change.diff; then it is posted to Mustafa for his yes.
-          - **Running since about 15:55 UTC: workflow wf_d7fbca53-76d (task wld78w7am)**, the advisor's review of
-            KL-CHANGE (script npt-kl-change-review-wf_d7fbca53-76d.js; notes advisor-kl-change.md; keys verdict,
-            summary, meets_his_words, findings, conditions, build_plan_changes, to_mustafa). **If cut:** resume by run
-            id. **Then:** its result word for word by script, read in full; on APPROVE, post kl-change.diff to Mustafa
-            with what changes in the proof; WAIT for his yes to the changed lines; then build per C7/C9.
+          - **The advisor's review of KL-CHANGE (wf_d7fbca53-76d, about 15:55-16:04 UTC): APPROVE WITH CONDITIONS
+            C1-C4**, word for word in advisor-kl-change-full.md (159 lines, f0e3e02a…), read in full. KLC-F1 Medium
+            (no case changes a size; his words say "files or sizes"): C1 adds a third case (a listed file grown after
+            the read-back) and planted bug M14 (the second walk compares only the count). KLC-F2 Low (two branches of
+            the second walk unexercised; the folder stays on every branch): no change, named for the test-engineer at
+            build. Its build-plan changes (tests renumbered 1-10, M1-M14 with homes, the PR evidence (a)-(c), the
+            report quoting history.md:2136-2139) bind the build. Its own slip: one command used "> /dev/stdout" (no
+            file written).
+          - **C1-C2 DONE (about 16:08 UTC):** kl_change_v2.py re-extracted the posted blocks (equal to before/), took
+            v1's checked after/ files, applied C1's lines (each asserted word for word against the condition text in
+            the journal), wrote kl-change-v2/ (before, after, mutants M4, M12, M13, M14) and **kl-change-v2.diff (102
+            lines, sha256 c80dbbb346459d46…)**; v2 differs from v1's diff only by C1's lines and one hunk header. §11
+            19 lines, the script 323, the tests 326, widest 120. **C1's check:** the suite 9 pass, 1 skipped (the dry
+            run; GNU tar `ok 2`, test 5 `ok 5`); M14, M12 and M13 fail only test 5 (actual 0, 0 and 2; expected 1); M4
+            fails only test 4 (actual 1, expected 2). TAP files in the scratchpad's kl-change-v2/.
+          - **NOW (C3): posted to Mustafa** (kl-change-v2.diff whole, its sha256, the new numbers, the limits: no
+            same-size rewrite, the moment between the last walk and the removal, an empty new folder). **WAIT for his
+            yes (KL-CHANGE-YES).** Then build per C4 (build_plan_changes) on C7-C9.
           - **After his yes to the changed lines (C7, C9):** a worktree `git worktree add .gate/kept-logs-wt -b claude/kept-logs-rule
             origin/main` (never switch the main folder); the three kit files extracted by script from the text he said
             yes to and compared by cmp; the `.claude/` writes ask him first (Accept edits mode); the draft's (c) steps
