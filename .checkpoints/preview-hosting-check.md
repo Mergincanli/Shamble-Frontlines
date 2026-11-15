@@ -38,12 +38,15 @@
    deploy.yml (172 lines; the pull-request and by-hand deploys merged into one file), close.yml (93), probe.yml (63),
    browsers.yml (48); the two token-test variants under `tr-draft/b9-edit/` and `tr-draft/b9-prod/`.
 
+8. plan.md revision 1 written (1,183 lines; every embedded workflow block checked byte for byte against its draft file
+   and its sha256): Parts 0-9, seven decisions, For Mustafa, the summary.
+
 ## Current step
-8. Writing plan.md (Parts 2-5, 7-9, decisions, For Mustafa, the summary).
+9. The advisor agent's plan review of revision 1 (the `spikes/` tension named for its ruling).
 
 ## Next steps
-1. Finish plan.md; save; then the advisor agent's plan review (from main's advisor.md; the `spikes/` tension named).
-2. Fold its findings; consultation 2 (moment 5) before the plan is saved as done; then the closing message.
+1. Fold its findings (revision 2 if REVISE); consultation 2 (moment 5) before the plan is saved as done.
+2. The closing message: the plan's path, the summary, his steps in order, the decisions, the chat's fullness.
 
 ## Open findings
 - Refused by the guard, 2026-11-15 15:54:02 UTC: `git -C <dir> fetch ...` ("git: no option before the subcommand (run
