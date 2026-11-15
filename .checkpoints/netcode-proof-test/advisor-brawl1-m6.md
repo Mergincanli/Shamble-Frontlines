@@ -17,3 +17,10 @@ Started 2026-11-15. Agent file: origin/main:.claude/agents/advisor.md (read).
 9. Rule: verdict, findings, M7, for Mustafa.
 
 ## Checks (a line each as I go)
+- C1 range: HEAD = origin branch = 8f0939fb. b30314a's parent f7dff4bf. Later commits 5b00f44, 8043264, 8f0939f touch only
+  .checkpoints/ (git diff --name-only per commit, nothing else). b30314a: the 10 spikes files M + the patch file D.
+  b30314a's message has no [skip ci]. spikes/netcode-proof tree ebbfeb40 at b30314a and at 8f0939f. PASS.
+- C2 M1 base: spikes tree 63de1632 at b30314a^ and at 352a245 (netcode-proof abad0635 both). PASS.
+- C3 M1 bytes: patch at 888ecbb and at b30314a^ both sha256 c2561b6c...; `git diff b30314a^ b30314a [--binary] -- spikes/`
+  sha256 c2561b6c (identical to the reviewed patch). 10 files: sha256 equal at b30314a, in the builder worktree
+  (HEAD 352a245, 10 M, git diff HEAD c2561b6c) and in the main folder. numstat 1139/127 = 1,266. PASS.
