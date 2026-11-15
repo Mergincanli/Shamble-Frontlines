@@ -1,0 +1,356 @@
+[
+  {
+    "mark": "PM-0001-2",
+    "title": "The load is the stress scene",
+    "verdict": "NOT-RUN",
+    "why": [
+      "SS runs: 0 of 3 valid runs",
+      "ES runs: 0 of 3 valid runs",
+      "SS N=24 (PM-0001-10's scale step): 0 of 3 valid runs",
+      "SS N=36 (PM-0001-10's scale step): 0 of 3 valid runs",
+      "bite PM-0001-2/fire-stops: no run yet"
+    ],
+    "parts": [
+      {
+        "name": "SS runs",
+        "verdict": "NOT-RUN",
+        "why": [
+          "SS runs: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "ES runs",
+        "verdict": "NOT-RUN",
+        "why": [
+          "ES runs: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "SS N=24 (PM-0001-10's scale step)",
+        "verdict": "NOT-RUN",
+        "why": [
+          "SS N=24 (PM-0001-10's scale step): 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "SS N=36 (PM-0001-10's scale step)",
+        "verdict": "NOT-RUN",
+        "why": [
+          "SS N=36 (PM-0001-10's scale step): 0 of 3 valid runs"
+        ],
+        "runs": []
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-2/fire-stops",
+        "status": "not_run",
+        "runs": []
+      }
+    ]
+  },
+  {
+    "mark": "PM-0001-17",
+    "title": "Every decoded snapshot is the server's state",
+    "verdict": "NOT-RUN",
+    "why": [
+      "L1 P0: 0 of 3 valid runs",
+      "L1 P2: 0 of 3 valid runs",
+      "L1 P3: 0 of 3 valid runs",
+      "L1 B1: 0 of 3 valid runs",
+      "L2 P0: 0 of 1 valid runs",
+      "L2 P2: 0 of 1 valid runs",
+      "L2 P3: 0 of 1 valid runs",
+      "L2 B1: 0 of 1 valid runs",
+      "every S30: 0 of 3 valid runs"
+    ],
+    "parts": [
+      {
+        "name": "L1 P0",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 P0: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L1 P2",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 P2: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L1 P3",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 P3: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L1 B1",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 B1: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L2 P0",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 P0: 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L2 P2",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 P2: 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L2 P3",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 P3: 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L2 B1",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 B1: 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "every S30",
+        "verdict": "NOT-RUN",
+        "why": [
+          "every S30: 0 of 3 valid runs"
+        ],
+        "runs": []
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-17/tick16",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-tick16",
+            "valid": true,
+            "checks": [
+              {
+                "name": "100 % of decoded snapshots rebuild the server's quantised state (0 mismatches; on L2 under the Arm rule)",
+                "outcome": "fail",
+                "value": "12151",
+                "needs": "== 0"
+              },
+              {
+                "name": "L1 P0 loses no group (no client-tick left incomplete)",
+                "outcome": "fail",
+                "value": "720",
+                "needs": "== 0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-17/client-rounding",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-client-rounding",
+            "valid": true,
+            "checks": [
+              {
+                "name": "100 % of decoded snapshots rebuild the server's quantised state (0 mismatches; on L2 under the Arm rule)",
+                "outcome": "fail",
+                "value": "878352",
+                "needs": "== 0"
+              },
+              {
+                "name": "L1 P0 loses no group (no client-tick left incomplete)",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-17/whole-as-lost",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-whole-as-lost",
+            "valid": true,
+            "checks": [
+              {
+                "name": "100 % of decoded snapshots rebuild the server's quantised state (0 mismatches; on L2 under the Arm rule)",
+                "outcome": "pass",
+                "value": "0",
+                "needs": "== 0"
+              },
+              {
+                "name": "L1 P0 loses no group (no client-tick left incomplete)",
+                "outcome": "fail",
+                "value": "48",
+                "needs": "== 0"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "mark": "PM-0001-57",
+    "title": "Decoded values keep the protocol's precision",
+    "verdict": "NOT-RUN",
+    "why": [
+      "L1 P0: 0 of 3 valid runs",
+      "L1 P2: 0 of 3 valid runs",
+      "L1 P3: 0 of 3 valid runs",
+      "L1 B1: 0 of 3 valid runs"
+    ],
+    "parts": [
+      {
+        "name": "L1 P0",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 P0: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L1 P2",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 P2: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L1 P3",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 P3: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L1 B1",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1 B1: 0 of 3 valid runs"
+        ],
+        "runs": []
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-57/pos-4cm",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-pos-4cm",
+            "valid": true,
+            "checks": [
+              {
+                "name": "positions: max error at most 1 cm",
+                "outcome": "fail",
+                "value": "34856",
+                "needs": "<= 10000"
+              },
+              {
+                "name": "yaw: max error at most 0.01 degree",
+                "outcome": "pass",
+                "value": "2750",
+                "needs": "<= 10000"
+              },
+              {
+                "name": "pitch: max error at most one 0.18 degree step",
+                "outcome": "pass",
+                "value": "88063",
+                "needs": "<= 180000"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-57/yaw-12bit",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-yaw-12bit",
+            "valid": true,
+            "checks": [
+              {
+                "name": "positions: max error at most 1 cm",
+                "outcome": "pass",
+                "value": "6984",
+                "needs": "<= 10000"
+              },
+              {
+                "name": "yaw: max error at most 0.01 degree",
+                "outcome": "fail",
+                "value": "46692",
+                "needs": "<= 10000"
+              },
+              {
+                "name": "pitch: max error at most one 0.18 degree step",
+                "outcome": "pass",
+                "value": "88063",
+                "needs": "<= 180000"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-57/pitch-8bit",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-pitch-8bit",
+            "valid": true,
+            "checks": [
+              {
+                "name": "positions: max error at most 1 cm",
+                "outcome": "pass",
+                "value": "6984",
+                "needs": "<= 10000"
+              },
+              {
+                "name": "yaw: max error at most 0.01 degree",
+                "outcome": "pass",
+                "value": "2750",
+                "needs": "<= 10000"
+              },
+              {
+                "name": "pitch: max error at most one 0.18 degree step",
+                "outcome": "fail",
+                "value": "440313",
+                "needs": "<= 180000"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

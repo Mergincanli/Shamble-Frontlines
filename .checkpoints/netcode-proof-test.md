@@ -342,7 +342,34 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
         TICK16-WORDING says one per client (U4r had 48).
       - The results (runs.txt, verdict.json, verdict-bites.json under results/u4r/93509dfd7fd1/P0/) are UNTRACKED and
         held for the advisor.
-    - **RUNNING since about 11:00 UTC: the advisor's P0 ruling, workflow wf_abd08482-f78 (task ws0688tin),** notes
+    - **THE P0 RULING (advisor-brawl1-sets-p0-full.md, 288 lines, sha256 4b16dab5…): P0 STANDS AND COUNTS. BRAWL-1's
+      RE-RUN SETS ARE COMPLETE: P3, P2 and P0 all count.**
+      - tick16 is SHOWN, and its carry-58 flag clears. The cause of the 94 resyncs: 47 + 46 + 1, all in the after phase
+        (65,611, 65,729, 65,791); no kick. TICK16-WORDING is corrected in the ruling's "The tick16 bite".
+      - **ADV-P0-2 (Medium, my error):** the P2 record above is WRONG on -57. Its reported p99 went from 5,257 / 5,280 /
+        5,283 to 5,111 on all three runs, so the largest change at P2 is s3's position p99, -3.26 %. My script read only
+        the max-error checks. No verdict is affected.
+      - ADV-P0-1 (Low): the advisor's own TICK16 figures. ADV-P0-3 (Low): the redact log, now kept as
+        .gate/u4r-sets/redact-BRAWL1-sets.log (7 items, 0 findings).
+      - P0's results (runs.txt ada5a58a…, verdict.json e926b812…, verdict-bites.json b472784f…) are committed with this
+        card.
+    - **NEXT, before BRAWL-1 closes** (the ruling's "The commit and the close", item 3):
+      - a. On the card: EVQ-LOAD and the corrected TICK16-WORDING, copied by script from the rulings into
+        u4r-report.md, with a pointer here.
+      - b. u4r-report.md's BRAWL-1 section, in full, per item 3b:
+        - the plan and the build: the size 1,266, the pins, pattern (iii);
+        - round 1 and its ruling; M1-M7 and M6;
+        - the evidence runs, with ADV-P3-1's figures;
+        - the re-run sets, in report_words;
+        - EVQ-LOAD and the TICK16 correction;
+        - the ADV-* corrections;
+        - the follow-ups with their homes;
+        - Decisions needed and For Mustafa.
+        Then the BRAWL-1 entry at :215-239 is marked done.
+      - c. The advisor checks that section against the files. That is a read, not a review round.
+      - **Then, outside BRAWL-1:** TE-B1-R2-2's runner edit (now due, before U4g); KEPT-LOGS; U4g's brief with
+        u4g-brief-carry.md and EVQ-LOAD.
+    - **Was running, about 11:00-11:15 UTC: the advisor's P0 ruling, workflow wf_abd08482-f78 (task ws0688tin),** notes
       advisor-brawl1-sets-p0.md. Its result has the keys summary, condition15, tick16, commit_and_close, report_words
       and to_mustafa.
       - **Then:** write it word for word (a script in brawl1_sets_p3_full.py's form); commit as ruled; record the report
