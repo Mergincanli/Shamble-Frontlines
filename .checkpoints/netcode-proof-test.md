@@ -14,8 +14,49 @@
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
 
-**NOW (2026-11-14 about 23:50 UTC; read this first after a compact or a cut): U4r-F3 COMMITTED AND PUSHED (493b3d7),
-CI GREEN, THE ADVISOR'S HEAD REVIEW RUNS; BRAWL-1's PLAN REVIEW RUNS.**
+**NOW (2026-11-15 about 04:25 UTC; read this first after a compact or a cut): BRAWL-1 IS BUILT (copy 1, agent
+a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVISOR'S RULING AND THE REVIEW ROUND.**
+- **The builder's return:**
+  - Its report, word for word: brawl1-build-report.md (170 lines, sha256 f8df429d…, written by brawl1_build_report.py
+    from its transcript). Its notes, brawl1-build.md, end with their own "## Report". Logs: .gate/u4r/brawl1/.
+  - Part 1's proofs (a)-(e) hold at the old pins. Part 2 is built and its tests pass.
+  - The three pins moved: SS-P0-s4 1f00d2d5…, SS-P2-s1 1ec25de7… and ES-P3-s2 6abf7643….
+  - At the new pins: check.mjs all 11 pass (measured 535, bites 613); det-u4 PASS in 227.2 s (non-cargo sum 214.5 s);
+    the precheck regeneration reproduces 1f00d2d5.
+  - Pattern (iii), for U4g's brief: no area != 0; the largest distance is 1,832 cm in every seed, each at a burst's end.
+  - **Three points for the advisor:**
+    - TICKS-NAME: RR4-L1's ruled `MAX_ENTRY_TICKS = 36_000` fails check.mjs's TICK_NAMED rule; it is built as
+      MAX_ENTRY_TICK_COUNT.
+    - PROOF-E: the wallclock bite's L1 hash already varies at base, and the test count rises by 1.
+    - r10_carry_82's boundary: it moved to 360,000 bytes.
+    - Also two runs that ran 0 tests (selector slips); both were run again with the right selector.
+- **Done:**
+  - (1) the report, recorded as above;
+  - (4) the SERIES.md row, applied by Edit in the worktree: the builder's draft word for word (checked by script: 5
+    lines, one match);
+  - (2) wip/brawl1.patch: 10 files, 1,482 lines, sha256 ee2973aa…. It was cut with the saver stopped, and
+    `git apply --check` exits 0 on the branch head; spikes/ is unchanged since 352a245.
+- **(3) SIZE-CHECK:** 875 insertions and 123 deletions, so 998 changed lines in 10 files (SERIES.md's 6 included).
+  - That is about 1.4 times the ~700 planned (450-750 with the conditions), under the "well past" line of more than
+    1,400. Not a stop.
+  - bots/src/lib.rs takes 426, about 330 of them its test module.
+- **Disk:** free 6,578 MiB (the shared target 6,445 MiB; .gate/u4r 953 MiB).
+  - For the merge step: main-run.sh builds from the main folder's path into the shared target, so the workspace crates
+    rebuild there beside the worktree's. Plan the clean before the counted run.
+- **Slip 8 (about 04:18 UTC):** a `cd <worktree> && git diff` moved the session's folder into the builder's worktree for
+  one call, and the next command returned it. It was read-only; nothing changed (the worktree's HEAD is 352a245, with 10
+  entries).
+- **NEXT:**
+  - (5a) The advisor's ruling on the three points, in one workflow with review batch 1 (test-engineer and
+    netcode-architect). Then batch 2 (rust-reviewer and engine-architect). Everyone at xhigh.
+  - The packet is cut by review_packet.py from brawl1-packet.json.
+  - The reviewers run tests only in the builder's worktree, through u4r-run.sh (plan section 8: no reviewer builds a
+    target of its own), with logs under .gate/u4r/brawl1-review-<seat>/.
+  - (6) The merge step.
+- **Chat size:** about 20 %, after the system's own compact (about 04:12).
+
+**Earlier NOW (2026-11-14 about 23:50 UTC): U4r-F3 COMMITTED AND PUSHED (493b3d7), CI GREEN, THE ADVISOR'S HEAD
+REVIEW RUNS; BRAWL-1's PLAN REVIEW RUNS.**
 - **U4r-F3:**
   - The commit 493b3d7 carries both scripts. `git show HEAD:…` gives 99dd070e and 4e007500, the tested copies. With them:
     the card, u4r-f3-review-full.md, the infra notes and the BRAWL-1 advisor's notes then in progress.
