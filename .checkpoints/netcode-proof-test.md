@@ -72,23 +72,56 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
       - NA-B1-2: the docs' margins, and pattern (iii) for U4g;
       - EA-B1-4: logs.rs's module doc.
     - Four seats name the same Low: the dead bit's copied private constants (TE-B1-6, NA-B1-3, RR-B1-3, EA-B1-1).
-  - **RUNNING since about 05:11 UTC: the advisor's round-1 ruling, workflow wf_59e64b31-fa2 (task wx15hfedw), one
-    agent (general-purpose, opus, xhigh), notes advisor-brawl1-r1.md, logs .gate/u4r/brawl1-advisor-r1/.**
-    - It rules on: the fix pass in order; the pins; round 2's seats; the merge step's clean question (may clean (B)
-      come right before the counted run?); U4g's brief words (ADV-PT-M1 and NA-B1-2 (c)); the expected size; Mustafa.
-    - **If cut:** `Workflow({scriptPath: ".../workflows/scripts/brawl1-r1-ruling-wf_59e64b31-fa2.js",
-      resumeFromRunId: "wf_59e64b31-fa2"})`.
-    - **Then:** write it word for word by script (brawl1_r1_ruling_full.py, ready, syntax checked), read it in full,
-      and launch the fix pass: a fresh builder copy in the same worktree (no isolation) that reads brawl1-build.md and
-      the worktree's diff first. SIZE-CHECK after it, against 1,400.
-    - **Copy 2's prompt** is built by a script still to be written (brawl1_copy2_prompt.py, in u4r_copy6_prompt.py's
-      form):
-      - first, the first launch prompt word for word: the scratchpad's brawl1-launch-prompt.txt, 2,498 characters,
-        sha256 b3cb6f0e…, copied by script from agent a4be43b1f756e45dd's transcript;
-      - then the resume part;
-      - then the ruling's "The fix pass, in order", copied by line range.
-- **COMPACT-WAIT (about 05:20 UTC):** the chat is at about 40 %. The card is refreshed. I asked Mustafa for /compact and set
-  a 20-minute reminder. If no /compact comes, carry on from this card.
+  - **THE ROUND-1 RULING (workflow wf_59e64b31-fa2, ended about 05:31 UTC): advisor-brawl1-r1-full.md (249 lines,
+    sha256 86bec63b…), written by brawl1_r1_ruling_full.py and read in full (lines 1-314).**
+    - The three Mediums are confirmed and fixed now. 16 of the 20 Lows ride the push (tests and doc words, no
+      behaviour). RR-B1-7 and EA-B1-1 ride only in part. TE-B1-5, TE-B1-8, ADV-BP-3, ADV-BP-4 and ADV-PT-M1 are
+      recorded; RR-B1-6 and EA-B1-5 need no action; ADV-PT-L3 is a follow-up.
+    - The fix pass is steps 1-11:
+      - FP-0, the runners' diff line, is the main session's;
+      - FP-1 to FP-6 are tests and docs;
+      - FP-7 is plants P1 to P4. P1 takes the leash off; if it does not bite on area, a 1,800 cm door-entry bar is
+        added and must bite;
+      - FP-8 is the end checks: check.mjs +3 per build, det-u4.mjs and the regeneration reproducing the three pins,
+        and the full test's round-1 figures equal;
+      - FP-9 is the report words.
+    - **The pins must not move:** the recording path changes only doc comments and Server::new's visibility.
+    - **Round 2:** test-engineer and rust-reviewer, one batch, at xhigh, on what changed only.
+    - **The merge step:** M1 bytes; M2 the part-cleans (B) (release, doc and wasm32 roots) and (C) (dev profile), in
+      main-run.sh calls with no lane or agent running and df before and after, right before M3. The folder-level
+      `cargo clean --target-dir .gate/shared-target` is NOT approved (W1-TARGET item 3, advisor-u4d2-m9.md:252-257).
+      M3 is the one counted run (cat /proc/uptime; check.mjs; uptime then det-u4.mjs; the regeneration; the full test
+      in release); its header's diff and untracked hashes should read the empty-input sha256. Then M4 the gate, M5 push
+      and CI, M6 the advisor's head review, M7 (B) and (C) again, then the evidence runs, then the re-run sets.
+    - **U4g's brief:** the ruling's words are copied by u4g_brief_carry.py into u4g-brief-carry.md (15 lines, sha256
+      c3abeccb…). u4r-report.md's BRAWL-1 entry points there.
+    - **Size:** about 1,270 lines expected (1,200-1,340), under 1,400. For Mustafa: nothing.
+  - **FP-0 DONE** (the main session):
+    - Both runners gained the ruled line, made by Edit at 05:33 and committed at 7402dac (05:41 autosave). u4r-run.sh
+      is now sha256 2f754d12…, and main-run.sh f0b7a3d0….
+    - The .diff files were cut by fp0_diffs.py from 7402dac's own diff (exactly one added line each, equal to the
+      ruled line): u4r-run.sh.te-b1-7.diff a458c9e4… and main-run.sh.te-b1-7.diff 910a3e04….
+    - `bash -n` prints nothing for both.
+    - The worker restart cut this step (the cuts block, 2026-11-15 05:41-05:51); it was finished at 06:40.
+  - **RUNNING since about 06:45 UTC: copy 2, the fix pass,** agent a2e54bc7201dcffed (Agent tool, general-purpose,
+    opus, xhigh, no isolation), in .claude/worktrees/brawl1. Continue it by SendMessage.
+    - Its prompt is brawl1-copy2-prompt.md (208 lines, sha256 e89905c1…), built by brawl1_copy2_prompt.py: the launch
+      prompt word for word, the resume part, and the ruling's fix pass (lines 11-192) word for word. The agent's own
+      message points to that file and its sha256.
+    - Its notes: brawl1-build.md, a new section "## Fix pass, round 1 (copy 2)". Its logs: .gate/u4r/brawl1/fp-*.
+    - **If it stops or is cut:** a fresh copy 3 from the same prompt, with a resume line added, in the same worktree;
+      it reads the notes and the diff first. Check any plant left in place first (FP-7's sha256 values in the notes).
+    - **When it finishes:**
+      1. write its report word for word (a script, as brawl1_build_report.py);
+      2. cut the new snapshot (wip/brawl1.patch, the saver stopped) and run SIZE-CHECK by numstat against 352a245;
+      3. cut round 2's packet: the diff from ee2973aa to the new snapshot, the plant records, FP-8's logs, FP-0's two
+         diffs and the copy's report section;
+      4. round 2 (test-engineer and rust-reviewer);
+      5. the advisor's ruling on round 2;
+      6. the merge step M1-M7.
+- **Saver:** bwr6pge3b (restarted 06:38 UTC after the worker restart).
+- **COMPACT-WAIT:** asked at about 05:12 UTC; the reminder fired at 05:33 (read 06:36). No /compact came, so I carry on
+  from this card. The chat is at about 50 %.
 - **Was running, about 04:25-05:10 UTC: workflow wf_bbfeece0-4c7 (task wpp4xx1x6), "brawl1-r1".** The workflow runs at
   most 2 agents at once on this machine, so netcode-architect starts when the advisor or test-engineer ends. The writer
   for its results is ready: brawl1_r1_full.py (syntax checked).
@@ -2177,6 +2210,22 @@ the cut and the time of the resume; UTC, read from the session's transcript):
       stopped at its start check, with nothing written. The main session then made the worktree by hand
       (.claude/worktrees/brawl1 at 352a245) and launched the builder there with no isolation, agent a4be43b1f756e45dd,
       at about 02:45.
+- 2026-11-15 between 05:41 and 05:51 (not the spend limit: the session's worker was restarted). The notice, at 06:35:56
+  in the transcript: "This session's worker process was restarted. If your previous turn was already complete, take no
+  action and wait for the next event. Otherwise, continue from where you left off."
+  - **Cut:** the main session's FP-0 step (advisor-brawl1-r1-full.md, step 2). Both runner Edits had been made (05:33),
+    and the autosave at 05:41 (7402dac) committed them. The call that saves their .diff files and runs `bash -n` was
+    closed unrun (transcript 05:32:59: "[Tool call not completed: an approval request was still unanswered when the
+    message that follows arrived and was closed, so the action awaiting approval did not run. Nobody refused it, so
+    this is not the user's decision; ask again if it is still needed.]"). Its shell redirect into .checkpoints/ had asked
+    for approval.
+  - **Also stopped:** the saver b28v0pzzk. Its last commit was 7402dac at 05:41, and no process was left. The
+    COMPACT-WAIT reminder (05:33) and the 06:35 check-in waited in the queue.
+  - **My slip:** at the restart notice I answered "No response requested." and ended the turn, although my turn was not
+    complete. The check-in picked the work up 22 s later.
+  - **Resumed 06:36,** at the 06:35 check-in.
+    - Checked first: the tree clean at 7402dac; both runners hold the new line once; no agent or workflow was running.
+    - Then: the saver restarted; FP-0's .diff files cut by script from 7402dac's own diff; `bash -n` on both runners.
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188

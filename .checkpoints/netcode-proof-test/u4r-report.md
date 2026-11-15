@@ -214,6 +214,12 @@ advisor-u4r-r2-full.md:32).
   - **Its follow-ups**, on the check.mjs follow-up's list below: INF-F3-1, ADV-F3H-1 and INF-F1-3.
 - **BRAWL-1, widened (Medium; the next npt-lab lane with N2-1, before U4g's judged B1 runs and before U4 closes;
   advisor-u4r-sets-r2-full.md, finding BRAWL-1, which replaces the sets-r1 fix line):**
+  - **For U4g's brief (BRAWL-1's round-1 ruling, 2026-11-15):** the advisor's words on B1's bursts are in
+    u4g-brief-carry.md. They merge ADV-PT-M1, NA-B1-2 (c) and TE-B1-5's bound, copied by script from
+    advisor-brawl1-r1-full.md:279-288 (sha256 c3abeccb…). In short:
+    - "area 0 in three seeds" is no bound under B1, and a B1 judged run can carry a soldier into a door gap;
+    - U4g's plan says how a B1 building entry reads in -17, or measures how often it happens, before its judged B1
+      runs.
   - **The cause:** the brawl's walk is open loop. It closes only if every step moves its full length. A re-run command
     (P2, P3, B1) or a step cut short by collide() leaves a net offset that nothing corrects. collide() cuts steps on
     crates, the wall stand-in, closed doors and the fight vehicles' parts, at every profile, P0 included.

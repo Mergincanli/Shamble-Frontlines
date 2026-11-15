@@ -386,3 +386,22 @@ Decisions needed:
 
 For Mustafa: nothing (spike code: nothing a player sees, hears or feels).
 
+## Fix pass, round 1 (copy 2)
+
+### Start checks (2026-11-15, 06:39 UTC)
+
+- Prompt brawl1-copy2-prompt.md sha256 e89905c169af935524b38d8ec6b009ec86e11e4eff00eb8389e6d1dc005c0ac6 (equal), 208
+  lines, 33,105 bytes (the launch line says 33,103 characters: multi-byte characters such as ² and ×, not a mismatch).
+- HEAD 352a245c3018c50843f62dcb90e91973ea56d9da (equal). Brief sha256 921c3243958a09dd5f914fb7eb247f07333558d0905b3d849d2f13222d6d2a50
+  (equal). Runner u4r-run.sh sha256 2f754d125b10b6bde06a980f46cb4e078a582ca277ec8828bc48e8aacb064e50 (equal); its one-line
+  change read in u4r-run.sh.te-b1-7.diff (the header's new `diff ...; untracked ...` line after the pwd line).
+- `git diff HEAD | sha256sum` in the worktree: ee2973aa8ad8c453b5720099c27b37cb9980820da74f33ad9c78ddd7ad591dc7 (equal
+  to wip/brawl1.patch's). `git status --short`: the 10 files, all ` M`, nothing untracked.
+- `df -h /home/user`: 6.5G available (6,565 MiB).
+- Ruling advisor-brawl1-r1-full.md sha256 86bec63bfffbd676efbc09e09c35a952e63abc7865e89b20b5aebec11bee75c5 (equal), but
+  `wc -l` gives 460 lines, not the 249 the resume part names: the hash is the identity, so it holds; noted for the main
+  session. Findings file brawl1-review-r1-full.md sha256 fc979c63...3305 (equal).
+- FP-8's "before": det-recordings.json a2faf3ea81623c39a13b04f9a97cadb900d8ec482df4375173720f70dae95d99,
+  precheck-recordings.json 5ccf57f059026e072cb000c0f9e66ca41ec81b9a02089fd6c26c699c21416881.
+- Size before the pass, numstat against 352a245 (SERIES.md included): 875 added, 123 deleted, 998 changed lines.
+

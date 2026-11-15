@@ -1,0 +1,12 @@
+diff --git a/.checkpoints/netcode-proof-test/main-run.sh b/.checkpoints/netcode-proof-test/main-run.sh
+index 9901cf6..d2bb744 100644
+--- a/.checkpoints/netcode-proof-test/main-run.sh
++++ b/.checkpoints/netcode-proof-test/main-run.sh
+@@ -39,6 +39,7 @@ avail=$(df -B1 --output=avail /home/user | tail -1 | tr -dc 0-9)
+ {
+   echo "lock $LOCK held exclusively at $(date -u +%T) UTC; idle after ${i} s"
+   echo "pwd $(pwd); free $((avail/1048576)) MiB; HEAD $(cd "$M" && git rev-parse --short HEAD)"
++  echo "diff $(git diff HEAD -- . | sha256sum | cut -d' ' -f1); untracked $(git status --porcelain --untracked-files=all -- . | sha256sum | cut -d' ' -f1)"
+ } > "$log"
+ if [ "$avail" -lt $((4*1024*1024*1024)) ]; then
+   echo "STOP: under 4 GB free" >> "$log"
