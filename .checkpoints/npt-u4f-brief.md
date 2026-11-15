@@ -6,14 +6,15 @@
   (after `git fetch origin claude/netcode-proof-test-plan-hcky5g`)
 - **Branch:** cs/npt-u4f-brief · **Base:** origin/main 53272a1
 - **Spike worktree (read only):** `.gate/npt-spike-1116` at 11fd190e9536702f0dcfc72d584b637ebc6184be
-- **Last update:** 2026-11-16 00:49 Amsterdam
+- **Last update:** 2026-11-16 00:51 Amsterdam
 
 ## Steps done
 1. Start checks (role night-shift, window 00:11, no other run tonight), status comment 6902964789 posted; spike
    worktree added at 11fd190; branch created from origin/main 53272a1 · (this commit) · ok
 
 2. netcode-architect drafted rev 1 (`u4f-brief-draft.md`, 837 lines, sections 0-12 present; notes end DONE) · the
-   commit after this line's save (see git log: "step 2 done") · 11 findings (1 High, 7 Medium, 3 Low), 12 U4F-Q, 10 D
+   828e2f4 (the saver's autosave holds the finished draft and notes) · 11 findings (1 High, 7 Medium, 3 Low),
+   12 U4F-Q, 10 D
 
 ## Current step
 3. test-engineer and security-auditor check rev 1 in parallel, xhigh.
@@ -46,4 +47,5 @@
   background task bmv14vtwd · output
   `/tmp/claude-0/-home-user-Shamble-Frontlines/2cc6b1c7-405a-556f-81c6-a85b5a29465f/tasks/bmv14vtwd.output` · started
   00:39 · stops by 01:04 · last check 00:39: restarted
-- drafter progress at 00:39: blocks B1-B10 of 13 done (sections 0-2 of the draft written); next B11 (sections 3-5)
+- test-engineer (check, `test-engineer-u4f-check.md`) and security-auditor (check, `security-auditor-u4f-check.md`),
+  both xhigh, launched 00:50 Amsterdam in parallel, running (2 agents at a time)
