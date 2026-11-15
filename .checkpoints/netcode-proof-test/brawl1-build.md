@@ -195,6 +195,34 @@
     1,800 cm figure, outside a building. The same figure three times suggests a soldier stopped by a fixed face; the
     test now prints the soldier's x, y beside it, for the final run.
 
+## The re-pin (Q3 (a); conditions 7 and 8)
+
+- After Part 1's proofs and Part 2's tests passed (above). Regeneration: .gate/u4r/brawl1/repin-regen.log (release
+  npt-lab built at 03:43:11):
+  - SS-P0-s4 (`hash --manifest crates/lab/precheck-recordings.json`, exit 1 by the mismatch, real 2m5.524s): regenerated
+    16,950,444 bytes, sha256 1f00d2d5f70a2c7b6836ede611b5f1c281319a5312060ead91e016da3c0b1b42; old 16,950,444 B
+    6933b56a619197c719439ff0c16eed3b8927645c3a0bb66910568c6ccf83bab3.
+  - SS-P2-s1 (`hash --manifest crates/lab/det-recordings.json`, exit 1, real 2m27.782s): regenerated 16,937,652 bytes,
+    sha256 1ec25de7c9ce8ea869ed9a8b343746ba131593e1de5c65bc9c1c626ce01cc76d; old 16,937,652 B
+    5b79abb2a2cba55b06a8916b235aea1766960867f09a038aed146805a29a32e3. `hash` stops at the first mismatch, so ES-P3-s2
+    was not regenerated in that call: SS-P2-s1 and SS-P0-s4 pinned by Edit first, then the det manifest run again
+    (which reproduces SS-P2-s1's new pin and prints ES-P3-s2's).
+  - repin-regen2.log (det manifest with SS-P2-s1's new pin; exit 1 by ES-P3-s2's mismatch, real 3m49.476s): SS-P2-s1
+    regenerated again equal to 1ec25de7... (its file kept: sha256 1ec25de7c9ce8ea8...ce01cc76d); ES-P3-s2: regenerated
+    16,929,501 bytes, sha256 6abf7643982b5970a630c97daa4d0815ceb2022958b18e18116397dcad9c893e; old 16,929,501 B
+    fad8f67ded2a220e42d7e4d42a3d3f2f76e980d4c55abb4fbcd01c550045953b.
+- The pins, old -> new (bytes unchanged in all three):
+  - SS-P0-s4 (precheck-recordings.json): 6933b56a619197c719439ff0c16eed3b8927645c3a0bb66910568c6ccf83bab3 ->
+    1f00d2d5f70a2c7b6836ede611b5f1c281319a5312060ead91e016da3c0b1b42 (16,950,444 B)
+  - SS-P2-s1 (det-recordings.json): 5b79abb2a2cba55b06a8916b235aea1766960867f09a038aed146805a29a32e3 ->
+    1ec25de7c9ce8ea869ed9a8b343746ba131593e1de5c65bc9c1c626ce01cc76d (16,937,652 B)
+  - ES-P3-s2 (det-recordings.json): fad8f67ded2a220e42d7e4d42a3d3f2f76e980d4c55abb4fbcd01c550045953b ->
+    6abf7643982b5970a630c97daa4d0815ceb2022958b18e18116397dcad9c893e (16,929,501 B)
+- The manifests' diff (Edit): only those three `sha256` values (checked: each removed line equals its added line but
+  for sha256); both "about" texts, every other field and recordings.json's three synthetic entries unchanged.
+- Next: check.mjs; uptime + det-u4.mjs; the precheck regeneration at the new pin; short copy times and the full test
+  at this head.
+
 ### The SERIES.md rows (drafted for the main session's Edit; condition 10)
 
 One written name only: no lab end-event field carries the total (the summary line prints it; Counts is not logged).
