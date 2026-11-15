@@ -2159,3 +2159,17 @@ From "Next steps, in order" (as it was):
   In that pull request's ready report: its head, the files it changes, and that the three kit files equal the text I said yes to with this diff applied, compared by script.
 
   Nothing real is packed or deleted before that pull request is on main and this branch has taken main in.
+
+## Decision: Mustafa, 2026-11-15 20:50 Amsterdam (19:50 UTC), KL-MERGE (a) (merge #53 at a637c7a) and C62H-BOUND-YES (a) (texts v3, cfac7502...; the planned size)
+- **Mustafa, typed into this chat (transcript 2026-11-15T19:46:36.849Z), verbatim:**
+
+  My words of 2026-11-15, 20:50 (Amsterdam time), for the netcode chat. Two answers.
+
+  KL-MERGE: (a). Merge #53, the kept-logs rule, at head a637c7a357e79614f896ddddf7488e08b5fc9180, as a merge commit. If the head is anything else, stop and tell me.
+  - The security reviewer's four Low findings (SA-KL-1 to SA-KL-4) and the test-engineer's eight stay open as follow-ups. I accept them as left open for this pull request. Keep them listed in the pull request's description and on your card; the kit's next change after the freeze takes them.
+  - After the merge this branch takes main in. Only then may anything real be packed. Report what was packed, with the free space before and after.
+
+  C62H-BOUND-YES: (a). Yes to the exact wording of texts v3 as posted (c62h-bound-paste.md, sha256 starting cfac7502) and to the planned size: about 650 changed lines, and the build stops and tells me past 1,050.
+  - Record the sha256 of each exact text now, as your post says. Any change after this yes comes back to me before the judged runs.
+  - One addition: after the build, judge the kept P0 set's logs again with the new judge and the new marks.json (a judge call, no new runs), and report its verdicts beside the earlier ones. A changed judge must give the same answers on a set it was not changed for.
+  - The stop rules of your post stand. The check is never reworded to fit.
