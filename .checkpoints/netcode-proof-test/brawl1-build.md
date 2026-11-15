@@ -452,7 +452,26 @@ For Mustafa: nothing (spike code: nothing a player sees, hears or feels).
 - FP-5 (a)-(c): written (bots lib.rs:57-62, :128-130, the leash doc). Note: the ruled "x² + y² stays below 2^31" is
   exact but for one point: (-32,768, -32,768) gives 2^31 itself (POSITION_XY min -32,768, sim grid.rs:106-113); no
   overflow either way. Written as ruled; flagged in the report.
-- FP-6 (a)-(d): pending.
+- (The line "FP-6 (a)-(d): pending" that stood here was stale: FP-6 is written, as above. Corrected at 07:14 UTC.)
+- fp-check-1 (.gate/u4r/brawl1/fp-check-1.log, -x -k, 06:49:41-06:52:01 UTC, free 6,563 MiB at start):
+  - fmt --check exit 1: 10 hunks (bots lib.rs x4, client test x1, logs.rs x4, scenario.rs x1), applied by Edit after.
+  - clippy --workspace --all-targets -D warnings: exit 0 in both builds (the const bounds, Server::new private and
+    `counts.clone()` raise nothing).
+  - bots `tests::brawl1`: 3 passed, 1 ignored, in both builds (10.84 s; 10.74 s). Short copy's prints equal round 1's
+    (EveryTick 1575 cm slot 27 tick 65928 at 550, 1476; Skips 1629 cm slot 39 tick 63768 at -966, -1312, 53039 of
+    172752 chances, 307 per 1000, streak 6; in a building 0; stuck none); new: dead 1190 (EveryTick) and 1334 (Skips)
+    soldier-ticks, so the `r.dead > 0` assert stays in the short copy.
+  - client `brawl1`: 2 passed in both builds.
+  - lab `logs::tests::brawl1 scenario::tests::fp3_ hash::tests::r10_`: exit 101 in both builds, 4 (5) passed and the
+    figure test FAILED at scenario.rs:1707 (settings()'s parse): "--logs 0 is for a recording run (--record): a run
+    keeps its logs". The ruled `settings(&dir, "--profile P0 --seed 1 --logs 0")` cannot parse. Fix: that one line adds
+    `--record <scratch>/brawl1.rec` (parse only stores the path; nothing writes it), with a comment saying why: the
+    smallest line that gives a no-log Settings. A deviation from the ruled words, flagged in the report. fp3 and
+    r10_carry_82 passed in both builds.
+- 06:53:13 UTC: the session's spend limit cut copy 2 while the fmt hunks were being applied (the last Edit, scenario.rs,
+  at 06:53:12). Resumed 07:13 UTC: no plant in place (checked in the worktree: `fn leash` starts with its let-else,
+  logs.rs's filter and own_soldier's Hash filter and `.reduce` intact); numstat 1,139 added, 127 deleted, 1,266
+  changed; free 6,531 MiB. Next: fmt --check again to see which hunks remain, then the check run again.
 - FP-7 P1-P4: pending.
 - FP-8 (1)-(6): pending.
 - FP-9 items 1-6: pending.

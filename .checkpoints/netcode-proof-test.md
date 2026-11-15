@@ -104,7 +104,9 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
     - `bash -n` prints nothing for both.
     - The worker restart cut this step (the cuts block, 2026-11-15 05:41-05:51); it was finished at 06:40.
   - **RUNNING since about 06:45 UTC: copy 2, the fix pass,** agent a2e54bc7201dcffed (Agent tool, general-purpose,
-    opus, xhigh, no isolation), in .claude/worktrees/brawl1. Continue it by SendMessage.
+    opus, xhigh, no isolation), in .claude/worktrees/brawl1. Continue it by SendMessage. It was cut by the spend limit
+    at 06:53 and continued by SendMessage at about 07:14 (the cuts block); at the cut FP-1 to FP-6 were written and
+    being formatted, no plant was in place, and the size was 1,266.
     - Its prompt is brawl1-copy2-prompt.md (208 lines, sha256 e89905c1…), built by brawl1_copy2_prompt.py: the launch
       prompt word for word, the resume part, and the ruling's fix pass (lines 11-192) word for word. The agent's own
       message points to that file and its sha256.
@@ -2226,6 +2228,18 @@ the cut and the time of the resume; UTC, read from the session's transcript):
   - **Resumed 06:36,** at the 06:35 check-in.
     - Checked first: the tree clean at 7402dac; both runners hold the new line once; no agent or workflow was running.
     - Then: the saver restarted; FP-0's .diff files cut by script from 7402dac's own diff; `bash -n` on both runners.
+- 2026-11-15 06:53: "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit
+  resets 7:10am (UTC)" (the agent's failure notice; its transcript's last entry 06:53:13.302).
+  - **Cut:** BRAWL-1's copy 2, the fix pass (agent a2e54bc7201dcffed), after 14 minutes (06:39-06:53).
+    - It had written FP-1 to FP-6, not yet compiled, and was applying rustfmt's diffs by Edit. Its last Edit was to
+      scenario.rs at 06:53:12, so that file's diff may be partly applied.
+    - FP-7 had not started, so no plant was in place.
+    - numstat 1,139/127, so 1,266 changed lines.
+  - **Resumed about 07:14,** on Mustafa's message ("Usage was hit continue where you left off").
+    - Checked first: the saver still running; copy 2's notes (state list at brawl1-build.md:424-458); the worktree's
+      10 modified files.
+    - Copy 2 was continued by SendMessage. It re-reads its notes, confirms no plant, re-runs rustfmt's check for the
+      hunks that remain, fixes its state list (:447 against :455), then goes on with FP-7 to FP-9.
 
 **The current step: U4 wave 2.** U4e in review round 2; U4d2's launch being prepared. Plan files: plan.md (rev 3.3, sha256 2bef127b…), u4-build-plan.md (rev 2 with the U4e brief ruling's
 L2 edits, L3's §4.1 line at 1e8c188 and the U4d2 brief check's L2 edits at 85c08df: 3f58ff0d…; 686a583c… from 1e8c188
