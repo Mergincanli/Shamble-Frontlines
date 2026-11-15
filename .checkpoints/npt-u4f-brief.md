@@ -6,7 +6,7 @@
   (after `git fetch origin claude/netcode-proof-test-plan-hcky5g`)
 - **Branch:** cs/npt-u4f-brief · **Base:** origin/main 53272a1
 - **Spike worktree (read only):** `.gate/npt-spike-1116` at 11fd190e9536702f0dcfc72d584b637ebc6184be
-- **Last update:** 2026-11-16 00:20 Amsterdam
+- **Last update:** 2026-11-16 00:14 Amsterdam
 
 ## Steps done
 1. Start checks (role night-shift, window 00:11, no other run tonight), status comment 6902964789 posted; spike
@@ -32,4 +32,7 @@
 - Branch name cs/npt-u4f-brief, as the plan's rule 2 names it · the plan · 2026-11-15
 
 ## Running work
-- none yet
+- netcode-architect (draft rev 1), xhigh, launched 00:13 Amsterdam, running; notes
+  `.checkpoints/npt-u4f-brief/netcode-architect-u4f.md`, draft `.checkpoints/npt-u4f-brief/u4f-brief-draft.md`
+- saver: background task b0yfndb40 · output `/tmp/claude-0/-home-user-Shamble-Frontlines/2cc6b1c7-405a-556f-81c6-a85b5a29465f/tasks/b0yfndb40.output`
+  · started 00:13 · stops by 02:03 (110 minutes on) · last check 00:14: ok (watching)
