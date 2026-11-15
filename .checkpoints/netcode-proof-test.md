@@ -367,6 +367,10 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
         - the follow-ups with their homes;
         - Decisions needed and For Mustafa.
         Then the BRAWL-1 entry at :215-239 is marked done.
+      - b is RUNNING since about 11:17 UTC: a drafting agent, workflow wf_634ed418-227 (task w555giuri), writes
+        brawl1-report-draft.md (the section, then the TICK16 :562-564 replacement and the :215-239 "done" marker), with
+        notes brawl1-report-draft-notes.md. It uses ADV-P0-2's corrected P2 figure. Then I check it, move it into
+        u4r-report.md by script and Edit, and save.
       - c. The advisor checks that section against the files. That is a read, not a review round.
       - **Then, outside BRAWL-1:** TE-B1-R2-2's runner edit (now due, before U4g); KEPT-LOGS; U4g's brief with
         u4g-brief-carry.md and EVQ-LOAD.
