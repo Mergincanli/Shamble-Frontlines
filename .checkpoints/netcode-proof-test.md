@@ -549,9 +549,16 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
             19 lines, the script 323, the tests 326, widest 120. **C1's check:** the suite 9 pass, 1 skipped (the dry
             run; GNU tar `ok 2`, test 5 `ok 5`); M14, M12 and M13 fail only test 5 (actual 0, 0 and 2; expected 1); M4
             fails only test 4 (actual 1, expected 2). TAP files in the scratchpad's kl-change-v2/.
-          - **NOW (C3): posted to Mustafa** (kl-change-v2.diff whole, its sha256, the new numbers, the limits: no
-            same-size rewrite, the moment between the last walk and the removal, an empty new folder). **WAIT for his
-            yes (KL-CHANGE-YES).** Then build per C4 (build_plan_changes) on C7-C9.
+          - **C3 done: posted to Mustafa** (kl-change-v2.diff whole, its sha256, the new numbers, the limits: no
+            same-size rewrite, the moment between the last walk and the removal, an empty new folder).
+          - **KL-CHANGE-YES ANSWERED (a), 2026-11-15 17:20 Amsterdam (16:20 UTC; history.md:2148-2161, copied by
+            mustafa_kl_change_yes_words.py):** yes to kl-change-v2.diff (102 lines, c80dbbb346459d46…, checked) on top
+            of kept-logs-final-text.md (97c81656…, checked). Build as set out: own branch from main, the checks, the dry
+            runs, the 14 planted bugs, one review round (security-auditor, test-engineer), the advisor on every pushed
+            head; then STOP for his go on the merge. **The ready report names:** its head, the files it changes, and
+            that the three kit files equal the approved text with this diff applied, compared by script. Nothing real
+            is packed or deleted before that PR is on main and this branch has taken main in.
+          - **NOW (about 16:25 UTC): BUILD per C4 (build_plan_changes) on C7-C9**, steps below.
           - **After his yes to the changed lines (C7, C9):** a worktree `git worktree add .gate/kept-logs-wt -b claude/kept-logs-rule
             origin/main` (never switch the main folder); the three kit files extracted by script from the text he said
             yes to and compared by cmp; the `.claude/` writes ask him first (Accept edits mode); the draft's (c) steps

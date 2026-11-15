@@ -2144,3 +2144,18 @@ From "Next steps, in order" (as it was):
   - Its exact wording and its planned size come to me for a yes before anything is built.
   - The wording is fixed before its judged runs. If those runs show ticks that nothing explains, the bar is not reworded to fit them: stop and tell me.
   - The report lines of (c) stay in until it is built.
+
+## Decision: Mustafa, 2026-11-15 17:20 Amsterdam (16:20 UTC), KL-CHANGE-YES (a): yes to kl-change-v2.diff; build the kept-logs rule as set out
+- **Mustafa, typed into this chat (transcript 2026-11-15T16:21:11.362Z), verbatim:**
+
+  You have just been /compact-ed, we are at 99% usage right now, this is for once usage has been reset:
+
+  My words of 2026-11-15, 17:20 (Amsterdam time), for the netcode chat.
+
+  KL-CHANGE-YES: (a). Yes to the changed lines exactly as posted (kl-change-v2.diff, 102 lines, sha256 starting c80dbbb346459d46), on top of the text I said yes to (kept-logs-final-text.md, sha256 starting 97c81656).
+
+  Build it as you set out: its own branch from main, the checks, the dry runs and the 14 planted bugs, one review round of security-auditor and test-engineer, the advisor on every pushed head. Then stop for my go on the merge.
+
+  In that pull request's ready report: its head, the files it changes, and that the three kit files equal the text I said yes to with this diff applied, compared by script.
+
+  Nothing real is packed or deleted before that pull request is on main and this branch has taken main in.
