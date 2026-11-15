@@ -129,6 +129,20 @@ notes.md; a word diff against ba6bdeb0…), then the advisor checks the revision
 (notes advisor-c62h-bound-brief-rev.md). **If cut:** resume by run id (script
 /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-brief-rev-wf_f603c2bc-068.js).
 **Then:** save the results word for word; the new brief sha256 on the card; the build (route W).
+**DONE 23:07 UTC: THE BRIEF IS APPROVED.** The revision (wf_f603c2bc-068; 2 agents, 475,489 tokens): the reviser's
+return c62h-bound-brief-rev-full.json (39 lines, 56c66bfa…; 662 lines, cffbe065…; route W only; SIZE-CHECK excluding
+results/; section 10 quoting the post's stop rules and size line word for word (checked with grep -nxF); TE-CBB-1 to -10
+and -12 carried, -11 deferred; plants CB-P1 to CB-P18; expected test counts final 552/632; size about 650-875; it had no
+Edit tool, so it rewrote the brief whole with Write three times, each checked by hashing the unchanged lines). The
+advisor's check: **APPROVE WITH CONDITIONS** (advisor-c62h-bound-brief-rev-full.json, 33 lines, d9b8cc4f…): ADV-REV-1
+(Low) one Edit at :662 replacing the stale "The plan's total holds" sentence; **applied exactly by Edit (23:07 UTC)**:
+word diff against cffbe065… shows only that sentence; no line over 120. **The approved brief: c62h-bound-brief.md, 663
+lines, sha256 7936074c15c5eb49ed3d8e0e130eaf0d75ce6f30067f650072caa764c3414857.** No new advisor run needed (its
+condition 2). **NEXT (the day session; his night rule keeps building and testing with the day): C62H-BOUND's build
+per the brief, route W from base 442a284 (or the head with only .checkpoints/ changes since): the insert script's part 1
+by the main session, then one builder launch per commit step, the main session committing each; then the review round,
+the merge, the advisor's head check, the P0 re-judge (93509dfd7fd1), P2, P3, the report.** Morning first: fold night item
+7 (cs/npt-u4f-brief) as the card's earlier block says.
 **Worker restart 3** (not the spend limit) during the merge: continued at once; nothing lost. **Next, in order (the
 ruling's order):** (1) DONE; (2) the merge commit alone: `git merge --no-ff
 --no-commit origin/main`, `python3 -I .checkpoints/netcode-proof-test/merge_main_53.py --apply`, check.mjs whole (refs

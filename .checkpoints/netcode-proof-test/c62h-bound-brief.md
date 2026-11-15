@@ -659,4 +659,5 @@ context runs low or a cut comes (stop at a clean point: no plant in place, no ha
   fixture's first case (section 3.2) shows the same reading (room logs without the series: INVALID on both figures,
   with gap 1's phrase); the report says the claim is shown by that fixture, not by old logs.
 - **Noted, no ruling:** README's numstat is 27 (the reflow rewrites 11 lines), not "about +4 to +8"; marks.json's is
-  +26 -0, not "2 changed"; the eighth gap fixture adds about 8 lines. The plan's total holds (section 4).
+  +26 -0, not "2 changed"; the eighth gap fixture adds about 8 lines. The estimate, about 650-875 (section 4), stays
+  under the 1,050 stop; its top passes the plan's range (545-755), and the report states the final total against both.
