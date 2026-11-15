@@ -427,11 +427,22 @@ For Mustafa: nothing (spike code: nothing a player sees, hears or feels).
   (06:41:08 UTC, `git status --short`, exit 0), header "diff ee2973aa8ad8c453b5720099c27b37cb9980820da74f33ad9c78ddd7ad591dc7;
   untracked 17cf51d7c16f37afb4247c27fc96ede8b439d461e6d55d1e55c141e0ccd4a90b" (the porcelain list of the 10 modified
   files; nothing untracked). FP-0's evidence holds.
-- FP-1 (a) record check: pending. (b) dead-bit tie: pending. (c) area test: pending. (d) printed(): pending.
-- FP-2 (a)-(d): pending.
-- FP-3 test + EA-B1-4 doc: pending.
+- FP-1 (a)-(d): written, not yet compiled (07:0x UTC). (a) the 48-record assert after `let now = soldiers(&world);`.
+  (b) the tie in soldiers() with the ruled message, Record.dead counted in sim_run's loop (dead bound there),
+  printed() prints "dead {n} soldier-ticks", the short copy asserts `r.dead > 0` ("the dead-bit tie is exercised"),
+  soldiers()'s doc carries the ruled sentence. (c) `brawl1_a_soldier_teleported_into_building_0_reads_area_1`
+  (Placement imported). (d) printed(): Skips "skipped {n} of {c} chances ({rate} per 1000)", EveryTick "skipped {n}",
+  Bursts "skipped {n} in its bursts", streak for all three.
+- FP-2 (a)-(d): written, not yet compiled. (a) blocked loop on at(1_450, 200) against toward_centre(1_450, 200);
+  (b) after the None case; (c) after "not past the outer since"; (d) the const bounds after `use super::*;`. The unit
+  test's doc gained one clause each for the kept state, the outer radius and TE-B1-3 (doc only).
+- FP-3: written, not yet compiled: `brawl1_the_building_figure_counts_a_soldier_in_a_building_in_measured_ticks_only`
+  at the end of logs.rs's tests (Placement imported; `Some(dir.as_path())` for Logs::open, the same path as the
+  ruling's `Some(&dir)`); EA-B1-4's words at logs.rs:6-7, the paragraph rewrapped from line 4 (it held a short line).
 - FP-4 (a)-(d): pending.
-- FP-5 (a)-(c): pending.
+- FP-5 (a)-(c): written (bots lib.rs:57-62, :128-130, the leash doc). Note: the ruled "x² + y² stays below 2^31" is
+  exact but for one point: (-32,768, -32,768) gives 2^31 itself (POSITION_XY min -32,768, sim grid.rs:106-113); no
+  overflow either way. Written as ruled; flagged in the report.
 - FP-6 (a)-(d): pending.
 - FP-7 P1-P4: pending.
 - FP-8 (1)-(6): pending.
