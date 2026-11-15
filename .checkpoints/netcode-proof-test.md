@@ -558,7 +558,24 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
             head; then STOP for his go on the merge. **The ready report names:** its head, the files it changes, and
             that the three kit files equal the approved text with this diff applied, compared by script. Nothing real
             is packed or deleted before that PR is on main and this branch has taken main in.
-          - **NOW (about 16:25 UTC): BUILD per C4 (build_plan_changes) on C7-C9**, steps below.
+          - **BUILD per C4 (build_plan_changes) on C7-C9 (started 16:25, cut 16:23-17:11, resumed 17:12 UTC).**
+            - **Done by 17:28 UTC:** worktree `.gate/kept-logs-wt` on branch claude/kept-logs-rule from main 4460ef5
+              (main unchanged). **kl_build.py** rebuilt the files from the approved text (97c81656…, checked) plus
+              kl-change-v2.diff (c80dbbb3…, checked), every hunk matching once at its header's line (§11 1 hunk, the
+              script 7, the tests 1), and wrote them to the scratchpad's kl-build/expected/: CHECKPOINTS.md 249 lines
+              (main's 229, one blank, §11's 19) 320c7f25…; kept-logs.mjs 323 lines c9109ab4…; kept-logs.test.mjs 326
+              lines 20de2081…; REPO_MAP.md 148 lines d26ef252…; each equal to kl-change-v2/after/. The REPO_MAP.md
+              (not kit) copied into the worktree (+2 rows after checkpoint.test.mjs). **Main's kit tests in the
+              worktree (base):** checkpoint 27/27, settings 127/127, routine-guard 1107/1107 (.gate/kept-logs-rule/base/).
+              **kl_evidence.py** written (steps compare, full, mutants M1-M14 with the advisor's homes, dry, kit,
+              quotes, guard; writes only under .gate/kept-logs-rule/); its guard step PASS (main's guard prints nothing
+              for the day-session pack command).
+            - **WAITING (17:28 UTC): Mustafa switches the session to Accept edits and says go** (the kit-write ask,
+              CLAUDE.md protocol step 3). Then ONE command copies the three expected kit files into the worktree's
+              .claude/ (his permission prompt); then kl_evidence.py compare, full, mutants, dry, kit, quotes; repo-map
+              check and the gate; commit and push claude/kept-logs-rule; the PR (draft); one review round
+              (security-auditor + test-engineer, one batch; test-engineer asked about test 5's preload and KLC-F2); the
+              advisor on the pushed head; then STOP for his go.
           - **After his yes to the changed lines (C7, C9):** a worktree `git worktree add .gate/kept-logs-wt -b claude/kept-logs-rule
             origin/main` (never switch the main folder); the three kit files extracted by script from the text he said
             yes to and compared by cmp; the `.claude/` writes ask him first (Accept edits mode); the draft's (c) steps
