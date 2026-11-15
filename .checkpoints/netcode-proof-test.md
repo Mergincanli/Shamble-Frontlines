@@ -256,6 +256,27 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
     - Each run goes through main-run.sh in the main folder (M7-3: header e3b0/e3b0, HEAD with tree ebbfeb40), log
       .gate/brawl1-merge/m7-ev-<P>.log. Then the judge into scratch under the lock. Record each run's bytes against
       P0 603.7 MB and P3 183.3 MB.
+  - **RUNNING since about 09:17 UTC: the two evidence runs and their judge calls, in one main-run.sh call,**
+    background shell bv08m1wjd, log .gate/brawl1-merge/m7-ev.log. The commands, in order:
+    - df -B1;
+    - cargo build --locked --release -p npt-lab, then -p npt-judge;
+    - `.gate/shared-target/release/npt-lab scenario --run brawl1-ev-p0-s1 --set brawl1-evidence --date 2026-11-15
+      --commit <HEAD at launch> --out .gate/brawl1-evidence/P0/brawl1-ev-p0-s1 --seed 1 --scene SS --profile P0
+      --tick-start 63736 --warmup-s 10 --measured-s 600 --suite brawl1-evidence --role measured --marks
+      PM-0001-2,PM-0001-17,PM-0001-57`;
+    - du -sb .gate/brawl1-evidence/P0;
+    - `python3 -I peak.py npt-judge --marks spikes/netcode-proof/marks/marks.json --logs .gate/brawl1-evidence/P0
+      --only PM-0001-2,PM-0001-17,PM-0001-57 --out .gate/brawl1-evidence/verdict-P0.json`;
+    - the same three steps for P3 (run brawl1-ev-p3-s1);
+    - df -B1.
+    - **When it ends, check:**
+      - M7-3's header: e3b0/e3b0, and a HEAD whose tree is ebbfeb40;
+      - each exit code;
+      - each run's summary "in a building: 0 slot-ticks";
+      - each verdict's PM-0001-2 everyone_in_view_min_share at 0.99 or more;
+      - the bytes (du) within P0 603.7 MB and P3 183.3 MB;
+      - -17's mismatches and incomplete count, recorded as facts, not a verdict.
+    - **A miss of any bar stops the re-run sets and goes to the advisor whole.**
   - **NEXT (M7):**
     1. DONE: df, clean (B), df, clean (C), df.
     2. The merge record in u4r-report.md's BRAWL-1 section, by Edit: M1-M6 with each figure, ADV-M6-L1's times, L2's
