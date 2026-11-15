@@ -450,7 +450,8 @@ fall under `.claude/rules/netcode.md`.
   never ship), except for "nothing depends on npt-lab", which counts every kind.
 - **No reference into `spikes/`** from outside it: a grep in the test command, until the foundation's G5 and G8 exist.
   It skips docs/, .checkpoints/ and Markdown, whose prose may name the folder; W-PR's workflow file, which runs the
-  Safari leg, gets an exception that names it by path, in the same change (C11).
+  Safari leg, gets an exception that names it by path, in the same change (C11); the KEPT-LOGS kit files have one
+  (§4.9).
 - **Narrow public surfaces:** each crate's public items are those in §4.7; everything else is `pub(crate)`.
 
 ### 4.3 Components, each traced to the marks that need it (netcode digest E gives each one's design part)
@@ -658,6 +659,12 @@ PM-0002-* is judged here.
   and record their own SHAs.
 - **Nothing outside `spikes/` references it** (the grep of §4.2). The foundation writes its crates fresh and reads
   the spike only as a reference.
+- **One exception, by full path: the KEPT-LOGS kit files**, `.claude/scripts/kept-logs.mjs` and `kept-logs.test.mjs`
+  (Mustafa's KEPT-LOGS rule, `.claude/CHECKPOINTS.md` §11, on main since PR #53). They list and pack the raw logs of
+  this spike's run sets, so they name its committed results folder, `spikes/netcode-proof/results/`; they import and
+  run no spike code, and nothing in `crates/` or `packages/` uses them. The refs step lets these two paths name that
+  folder and nothing else of the spike (the advisor's REFS-KIT ruling, 2026-11-15). When the spike is deleted, the
+  deleting change-set also proposes to Mustafa what becomes of §11's raw-log part (a kit change: his yes).
 - **When it is deleted:** once no spike in SPIKE_PLAN still names it. Today that is after the render budget bench,
   which still uses the boundary spike's Worker built on this harness. The advisor confirms the deleting change-set
   when it comes.
