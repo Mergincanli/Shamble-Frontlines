@@ -16,7 +16,9 @@ limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.
 
 **LATEST (2026-11-15 about 12:40 UTC): BRAWL-1 is closed. Two things run: the KEPT-LOGS kit rule's advisor review
 (wf_0f69bce5-688) and C62H-REVIEW's read and ruling (wf_4ce9b8cd-ad2). Read the blocks "KEPT-LOGS ANSWERED" and
-"C62H-REVIEW ANSWERED" below first, then "NEXT (task #74)".**
+"C62H-REVIEW ANSWERED" below first, then "NEXT (task #74)".** **The saver:** b6isx9us1 ended at 12:43:43 UTC on its
+own time limit ("watch stopped: time is up", exit 0; its last save cd18707); restarted at 12:43 UTC as **bt42fk8u5**.
+Check-in 12:41 UTC (trig_01EKqNqwZrQTVJ6caAyRrug5): nothing stopped.
 
 **NOW (2026-11-15 about 04:25 UTC; read this first after a compact or a cut): BRAWL-1 IS BUILT (copy 1, agent
 a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVISOR'S RULING AND THE REVIEW ROUND.**
