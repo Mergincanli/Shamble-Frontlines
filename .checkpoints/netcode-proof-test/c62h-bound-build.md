@@ -384,3 +384,30 @@
   l1 lib.rs 33, l1 tests.rs 98, logs.rs 54, scenario.rs 311, marks README 27, SERIES.md 9, marks.json 26,
   c-u4r-runs.mjs 47) = 920 + 47; under the 1,050 stop. Step 4 is 47 against the brief's "about 10-20": the two
   bullets' refill at 120 is 33 of it (:29-:35 13, :36-:45 20); bitesOf 12, SPLIT_LINE 2.
+- 14:49 check.mjs whole, the last run on the staged bytes (.gate/u4r/c62h-bound/step4-check.log, 14:34:29-14:49:56):
+  exit 0, "check: all 11 steps pass" (fmt first: PASS); test step "measured build: 552 tests passed, 0 failed, 0
+  reported a skip; bites build: 632 tests passed, 0 failed, 0 reported a skip" (0 / 0 from 552 / 632, as expected);
+  marks 81, self 78 of 78, refs 1291 files, redact 297 items. Header: diff 7b775057e44df9d7…, untracked
+  e3b0c44298fc1c14… (none). After the run: nothing unstaged, no untracked file, the staged blob still f2002890….
+- Not edited (outside section 3.4's items): :14-15 "In a set with bites (P0), ending the measured judge call's group
+  ..." is now stale (P2 has bites too): for the main session and the review round.
+
+## State (launch 4, step 4, 14:50 UTC: a clean point; nothing in flight, no plant in place)
+- Staged in the worktree (branch c62h-bound-build at b01d3ac, nothing committed): spikes/netcode-proof/ops/runs/
+  c-u4r-runs.mjs (+25 -22), sha256 f2002890e297b2df02eea5d3524953f0170ff6de6d85fad6ad345773610644ee (the sets run on
+  it). Step 47; lane 967 of 1,050.
+- Check: step4-check.log, exit 0, all 11 PASS, diff hash
+  7b775057e44df9d78a7930ac3d37064715c917e5a1d45cf18120981891367fc7, untracked hash
+  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.
+- Counts: 552 measured / 632 bites (0 / 0, as expected; no new test in step 4).
+- The dry print: plan-dry.log exit 0, 22 of 22 asserts (harness sha256 693bcf3f006e1322…, in sources.txt before its
+  run, never edited). CB-P11: plant-CB-P11.log exit 1, 17 passed 5 failed, P0 7 bites; restored, sha equal.
+- Stop rules: none met. Points: the width read as 120 (two bullets refilled whole), step 4's 47 lines against the
+  brief's 10-20, the quoted `(only P0: bitesOf)` at :35 not :34, the stale "(P0)" at :15, runs.txt will print P2's
+  projection rounded ("projected 888 MiB") beside the brief's 887.6.
+- Deviations: two read-only `node -e` calls ran outside the lane runner at the start (reading marks.json's bite lists
+  and the file's line lengths; nothing written); the harness asserts more than item 4 lists (marks.json's sha256,
+  P0's judge figures as 93509dfd7fd1's runs.txt:11-12, P2's bite settings from section 8.3, runBytes per run,
+  SPLIT_LINE equal to LANE_BASE's with the one phrase changed), every one passing.
+- Next (the main session): commit 4 in the worktree (message from brief section 1); `git diff HEAD^ HEAD -- . |
+  sha256sum` from spikes/netcode-proof = 7b775057…; the committed SIZE-CHECK = 967; then the review round.
