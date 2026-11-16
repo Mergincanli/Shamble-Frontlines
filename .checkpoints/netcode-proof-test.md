@@ -153,8 +153,17 @@ it asks nothing; REFS-KIT stays.
   mismatches 0, gaps [] on each run; each line equal to fd4612050cd6's without the phrase and wall time; **S / L / B:
   863772 / 43094 / 0, 864000 / 43210 / 0, 863994 / 43449 / 0; E1 / E2 / N: 201 / 43094 / 0, 0 / 43210 / 0, 5 / 43449 / 0
   (each = measured incomplete 43295 / 43210 / 43454); N = A 0**; s1's E1 201 above 0: condition 2 shown on a real run.
-  **s1 (overflow resyncs 27) and s3 (1) carry the carry-58 flag: to the advisor before they count.** Next: the
-  advisor's ruling on them; then section 9's (c) lines by script and the report; NS-STATUS's pull request. **Mustafa's 21:50
+  **s1 (overflow resyncs 27) and s3 (1) carry the carry-58 flag: to the advisor before they count.** **The advisor's
+  P3 ruling (21:38-21:48 UTC; advisor-c62h-bound-p3-full.json, 71 lines, facf298e…, read in full): P3 COUNTS AND P2
+  COUNTS** (s1 and s3 under carry 58: their E1 ticks are wholly the unacknowledged forced full states; ADV-CBP3-1 to -5
+  Low; conditions P1-P7). **The (c) lines replaced (21:58 UTC)** by c62h_bound_c_lines.py with its exact texts and
+  note line, every number checked against the files first (u4r-report.md 76680d3a… → 777ee782…). **RUNNING from 21:59
+  UTC: the report's draft and its verification** (workflow wf_a1cd7d1b-556: a drafter writes c62h-bound-report-draft.md
+  from the ruling's order_to_the_report and brief section 9; then the verifier checks every claim). **Then:** the
+  section into u4r-report.md by script; save; CI; the advisor's check of that head (P6); the report to Mustafa.
+  **NS-STATUS: PR #54 (draft) opened 21:57 UTC** (claude/night-shift-stints, commit 20f9d599…, NIGHT_SHIFT.md +3 -0,
+  the lines' sha256 4e3d1565… = his yes; the worktree .gate/ns-stints-wt; subscribed); **RUNNING: its review round**
+  (workflow wf_9f3bfdf9-76a: the advisor and the security-auditor). Then: stop for his go. **Mustafa's 21:50
   words (NS-STATUS (a); approval-free forms) are recorded; the NIGHT_SHIFT.md lines go to him in chat, the pull
   request after P2 and P3.** **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
