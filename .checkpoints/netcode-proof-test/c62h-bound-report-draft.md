@@ -6,7 +6,9 @@ c62h-bound-brief.md (663 lines, sha256 7936074c15c5eb49ed3d8e0e130eaf0d75ce6f300
 C8). This report is a section of u4r-report.md, as BRAWL-1's is, so it sits beside the two lines it replaced under
 "The re-run sets" (:997 and :1008). It carries brief section 9 item by item, each marked PASS or FAIL, and the
 advisor's P3 ruling's order_to_the_report items 4-9 (advisor-c62h-bound-p3-full.json, sha256 facf298e…, conditions
-P1-P7). Times are UTC, 2026-11-16 unless named._
+P1-P7). Times are UTC, 2026-11-16 unless named, except Mustafa's own word times, which are Amsterdam time as his
+messages give them: his 16:35 and 20:50 of 2026-11-15 (15:35 and 19:50 UTC), his 13:35 rule (12:35 UTC), his 21:50
+and 22:09 words of 2026-11-16 (20:50 and 21:09 UTC). Card line numbers are those of the card at 67de11e._
 
 **In short:**
 - **What was built.** The test lab now records, for each client and each tick, how many snapshot packets the simulated
@@ -43,7 +45,7 @@ datagrams, so bursts B are inside L (the netcode-architect's point (a), confirme
   044fab188419e8859dbca699d851563c44c078c9; each commit's diff hash equals its check log's header):
   - 1/4 npt-l1's server_datagrams_since and npt-lab's link record: **54046d4a83e445a212670dd548d5a5c1b9dd00ef**
     (11:01), cherry-picked as **eb2bebfb712e8e8a40da3a3f306702d10039075c**; diff hash 0b41121e…; size 499.
-  - 2/4 npt-judge's two figures and one shared reader: **b423a7d9231f68c87a1af9004dc1f2c218b43948** (11:54), as
+  - 2/4 npt-judge's two figures and one shared reader: **b423a7d9231f68c87a1af9004dc1f2c218b43948** (12:18), as
     **b06991e1328f06a2f4c12ab8f18762b1eadf1cf3**; diff hash f88bf7d5…; size 322.
   - 3/4 PM-0001-17's two checks and one planted bug, SERIES.md and README.md, B-2's four files:
     **b01d3ac0c42701002a2239ad0a89a841f56464a1** (14:23), as **15102d1242afb37d686e624fa10dad2d481b476d**; diff hash
@@ -108,8 +110,9 @@ Every count came out as expected. Pass or fail is the exit code and the test run
 
 ### 3. The planted bugs CB-P1 to CB-P18: PASS (all 18 bit)
 
-Each was one temporary Edit, run through u4r-run.sh -x as `cargo test` of its home test, then restored by Edit with
-the file's sha256 checked equal to the record. Each failed its home test at the cause brief section 4 names. Times
+Each was a temporary Edit (one each, except CB-P6, which took two: a `prev_link` vector, and room_tick passed
+`std::mem::replace(...)`; c62h-bound-build.md:79-81), run through u4r-run.sh -x as `cargo test` of its home test, then
+restored by Edit with the file's sha256 checked equal to the record. Each failed its home test at the cause brief section 4 names. Times
 are the logs' own (the test-engineer asked for these; the notes' "11:0x" and "11:1x" for CB-P5 to -P7 were wrong).
 - **Step 1** (10:43:01-10:46:00; record step1-sha-before-plants.txt):
   - CB-P1, CB-P12, CB-P13 (server_datagrams_since counts up-direction entries / drops the datagram filter / ignores
@@ -203,10 +206,11 @@ are the logs' own (the test-engineer asked for these; the notes' "11:0x" and "11
 
 - **The cherry-picks** (16:05, main folder): eb2bebf, b06991e, 15102d1, 561bf42; each lane commit touches only
   spikes/netcode-proof/; the merged bytes equal the reviewed bytes (exit 0).
-- **The first counted call: FAIL** (.gate/u4r/c62h-bound/merge.log, 16:06:04-16:16:23, exit 1; C1). check.mjs
-  stopped at its test step: the measured build 552 passed, 0 failed; the bites build 429 passed, **1 failed**:
-  npt-net's l2::delay::tests::under_loss_the_held_bytes_stay_within_64_kb_and_the_front_records_acknowledged_prefix.
-  Every other check.mjs step passed; det-u4, the release build and the hash never ran. The lane stopped as the brief
+- **The first counted call: FAIL** (.gate/u4r/c62h-bound/merge.log, 16:06:04-16:16:23, exit 1; C1). check.mjs's
+  test step failed: the measured build 552 passed, 0 failed; the bites build 429 passed, **1 failed**: npt-net's
+  l2::delay::tests::under_loss_the_held_bytes_stay_within_64_kb_and_the_front_records_acknowledged_prefix. check.mjs
+  ran its later steps (deps, wasm, refs, marks, self, redact: all PASS; every other step passed too) and ended "check:
+  1 step(s) failed". The main-run.sh call stopped there, so det-u4, the release build and the hash never ran. The lane stopped as the brief
   says ("a check.mjs step fails that no edit of this lane explains"), retried nothing, ran no gate and pushed nothing.
   - **Where the failure is kept (H3):** merge.log:51-52 (the test's name), c62h-bound-build.md:428-435 (the
     assertion, "held <= 64 KB + the front record's acknowledged prefix", left [1, 0], right [0, 0]) and the merge-stop
@@ -235,13 +239,13 @@ are the logs' own (the test-engineer asked for these; the notes' "11:0x" and "11
   shown-to-fail runs first). **C6 met:** P2 had its two judge calls (measured, then bites), and no stop by hand was
   needed. C7 met: the pre-flight ran exactly as H2 replaced it (section 9). C8: the brief unchanged (7936074c…), and
   with it the brief's section 8 order, its expected lines and its section 10 stops.
-- **U3C-HELD-1** (Medium; the card's Open findings :3746-3759): "G-NC2's held-bound check (delay.rs:528-543) counts a
+- **U3C-HELD-1** (Medium; the card's Open findings :3760-3773): "G-NC2's held-bound check (delay.rs:528-543) counts a
   release transient as over the bound". Taker: the main session, as its own planned change (plan first with the
   advisor; netcode-architect and test-engineer), merged before another lane's counted check.mjs run, at the latest
   U4f's merge. Never a looser bound: the fix still checks the bound at every write and shows by a planted bug (for
   example, drop released_model from down_free) that it still catches a real overflow. Its first step, a by-name loop
   of the bites build's npt-net tests, also captures the failure's output again.
-- **CHECK-NFF-1** (Low; card :3760-3761; taker: check.mjs's next owner, outside this lane): the bites build's `cargo
+- **CHECK-NFF-1** (Low; card :3774-3775; taker: check.mjs's next owner, outside this lane): the bites build's `cargo
   test` gains --no-fail-fast (or a second pass), so one failure no longer hides the rest; here it hid 202 of 632.
 
 ### 7. The advisor's check of the pushed head ddd38ba: APPROVE WITH CONDITIONS H1-H6, all met
@@ -435,7 +439,7 @@ the one note line (ADV-CBP3-4), and left B1's lines unchanged (now :1035 and :11
 ### 15. The deferred Lows (STATUS follow-ups; none triggers a push)
 
 Ten Lows, nine distinct issues (TE-CBH-5 and NA-CBB-1 are one), deferred in writing and accepted by the merge-stop
-ruling. Taker for each (the card's Open findings, :3762-3765): the next npt-judge or npt-lab change, U4f, U4g or
+ruling. Taker for each (the card's Open findings, :3776-3779): the next npt-judge or npt-lab change, U4f, U4g or
 JDG-ONLY-1. Paths are under spikes/netcode-proof/; lines are at 42b9646, whose bytes 561bf42 carries.
 - **TE-CBH-3**, crates/judge/tests/engine.rs:1680-1682: c62hb_eight_gaps_read_on_both_figures asserts "no other
   gap's phrase" for its first case only; fix by counting the phrases in each note.
@@ -487,12 +491,12 @@ JDG-ONLY-1. Paths are under spikes/netcode-proof/; lines are at 42b9646, whose b
 
 ### 18. Process notes
 
-- **12:44-14:22, a worker restart** (not the spend limit; card :3198-3203): the call to commit step 3, sent at
+- **12:44-14:22, a worker restart** (not the spend limit; card :3212-3217): the call to commit step 3, sent at
   12:44:13, ran only after the notice at 14:22:42 (commit 3 at 14:23). Nothing lost: launch 3 had ended at 12:43; the
   saver had ended on its time limit at 13:12:34 and was restarted at 14:24.
 - **14:52-15:36, a wait with no notice:** the call that made commit 4, sent at 14:52:04, ran at 15:36:16; the machine
   had booted at about 14:22 (uptime 1:15 at 15:37; card :55-56, c62h-bound-build.md:416).
-- **17:09-20:36, an unanswered approval, then a worker restart** (card :3184-3197): the call holding the rejudge.txt
+- **17:09-20:36, an unanswered approval, then a worker restart** (card :3198-3211): the call holding the rejudge.txt
   quote check and the redact step, sent at 17:09:35, waited for an approval nobody answered; the saver ended on its
   time limit at 18:39:55; the notice at 20:36:11 closed the call unrun, and the machine had rebooted. Resumed at
   20:37: the saver restarted, the step re-run in two simple calls. Nothing lost: the re-judge had ended at 17:08:39,
@@ -500,9 +504,9 @@ JDG-ONLY-1. Paths are under spikes/netcode-proof/; lines are at 42b9646, whose b
   need no approval, one per call, and a call that must ask him is named first.
 - **Slips 15-17:** (15) a `python3 -I -m py_compile` of the set-check script left a .pyc file; removed at once
   (c62h-bound-build.md:422-423). (16) the re-judge's redact step ran as `cd spikes/netcode-proof && node check.mjs
-  --only redact` without a subshell; the shell was returned to the repository root at once (card :3195-3197). (17)
+  --only redact` without a subshell; the shell was returned to the repository root at once (card :3209-3211). (17)
   the record script's heading for his 22:09 words first said "about 21:52 Amsterdam", written before the
-  transcript's time was read; corrected by Edit (card :3587-3588).
+  transcript's time was read; corrected by Edit (card :3601-3602).
 - **Launch 4's calls outside the runner:** two read-only `node -e` calls (marks.json's bite ids; the runner's line
   lengths) and two read-only `python3 -I -c` text-fill computations ran directly, not through u4r-run.sh; they wrote
   nothing and are not evidence. Every recorded run went through the runner (c62h-bound-step4-full.json, deviations).
