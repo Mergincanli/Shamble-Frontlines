@@ -174,3 +174,16 @@
 - CB-P18 (bound's `l.len() != clients` check of tick.s.snap_link_lost_count dropped; plant-CB-P18.log): "1 failed",
   the same test at :1677, case "a list that does not hold the run's clients entries" (tick 2's list [0]): valid,
   Pass 0 / Pass 0 where Gap is wanted. Restored; both files equal the record; no plant in place; no untracked file.
+- 11:22 New tests by name, measured build (step2-new-measured.log, `cargo test --locked --workspace c62hb`, -x): exit 0;
+  engine "6 passed": c62hb_a_bite_with_an_unexplained_tick_is_shown, c62hb_each_explanation_alone_reads_0,
+  c62hb_an_unexplained_tick_reads_1, c62hb_warmup_and_after_phase_ticks_are_not_read,
+  c62hb_eight_gaps_read_on_both_figures, c62hb_the_converse_and_the_sentinel; step 1's l1 "1 passed", lab "6 passed".
+- 11:23 Bites build (step2-new-bites.log, `--all-features`): exit 0; engine the same six, "6 passed"; l1 "1 passed";
+  lab "8 passed" (step 1's, the two short P2 bites among them).
+- 11:24 Staged: crates/judge/src/figures.rs (+170 -0), crates/judge/tests/engine.rs (+149 -1); step numstat 320 (plan
+  255-355). check.mjs whole started (step2-check.log, -x).
+- 11:25 Review of the staged diff: the frozen row counts "the (slot, tick) pairs" (brief 3.2 item 2: "each measured
+  (slot, tick)"); `lost` was a Vec, so one pair filed lost by two client logs would count twice (`whole` comes from
+  slot_hashes' map, already one per pair). Not reachable on a valid L1 run (one client log), but the row is exact:
+  `lost` becomes a BTreeSet after this check.mjs run ends; then fmt, the eight plants again on the final code, the
+  named tests in both builds, re-stage, and check.mjs whole again as the last run (step2-check-2.log).
