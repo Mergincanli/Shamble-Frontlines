@@ -2173,3 +2173,15 @@ From "Next steps, in order" (as it was):
   - Record the sha256 of each exact text now, as your post says. Any change after this yes comes back to me before the judged runs.
   - One addition: after the build, judge the kept P0 set's logs again with the new judge and the new marks.json (a judge call, no new runs), and report its verdicts beside the earlier ones. A changed judge must give the same answers on a set it was not changed for.
   - The stop rules of your post stand. The check is never reworded to fit.
+
+## Decision: Mustafa, 2026-11-16 21:50 Amsterdam (20:50 UTC), NS-STATUS (a) (a NIGHT_SHIFT.md change after C62H-BOUND's P2 and P3 runs) and the approval-free command forms
+- **Mustafa, typed into this chat (transcript 2026-11-16T20:48:10.683Z), verbatim:**
+
+  My words of 2026-11-16, 21:50 (Amsterdam time), for the netcode chat.
+
+  NS-STATUS: (a). A small kit change to .claude/NIGHT_SHIFT.md, as its own pull request, after C62H-BOUND's P2 and P3 runs.
+  - What it says: while a night run waits on agents, the saver runs in stints under 30 minutes, and the run refreshes its status comment at each stint's end, as last night's run did.
+  - Only that file, and only the lines this needs. No guard, hook, settings or script change.
+  - First show me the exact lines in chat and wait for my yes. My yes will also be the exception to the kit freeze (KIT-FREEZE-2) for this one change. Then one review round, then stop for my go on the merge.
+
+  On today's stall (17:09 to 20:36 UTC, a call that waited for my approval): write commands in the simple forms that need no approval, one per call, as you did when you redid that step. When a call has to ask me, name it in your message before you send it.

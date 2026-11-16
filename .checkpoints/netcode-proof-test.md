@@ -132,7 +132,14 @@ it asks nothing; REFS-KIT stays.
   5,500 before P2: no pack; 8.2 the pre-set check, pre-P2-c62h.log; the P2 set in the background, its log
   .gate/u4r-sets/P2-<c12>.log; then the results committed with the card, the set check's shown-to-fail runs, the set
   check; then P3). **P2's operating note (C6): two judge calls (measured, then bites); a stop by hand waits until no
-  npt-lab or npt-judge call is left.** **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
+  npt-lab or npt-judge call is left.** **8.2 done (20:47 UTC, pre-P2-c62h.log):** header e3b0…; HEAD 8ee453c, spike
+  tree 25c5b760…; the spike tree equals ddd38ba's (exit 0); name-status only .checkpoints/ and A under results/; the
+  four runner sha256s as the brief's (c-u4r-runs.mjs f2002890…); no cargo, rustc, npt-lab or npt-judge (the pgrep line
+  "FOUND c-u4r-runs" matched the check's own command line, which names the file; no node c-u4r-runs process ran:
+  checked apart); free 6,057 MiB. **RUNNING from 20:48 UTC: the P2 set** (task bgjoh2wpd; log
+  .gate/u4r-sets/P2-8ee453c22882.log; projected 888 MiB, so 5169 after, against the 4 GiB floor). **Mustafa's 21:50
+  words (NS-STATUS (a); approval-free forms) are recorded; the NIGHT_SHIFT.md lines go to him in chat, the pull
+  request after P2 and P3.** **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver:** b1gec2y1v ended on its time limit at 11:08:33 UTC ("watch stopped: time is up", exit 0; not a
   cut); restarted at 11:22 UTC as **bp40lga8l** (to about 13:12). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
@@ -3539,6 +3546,14 @@ Carries 40, 51 and 52 were rewrapped within the entry, his words' label lines un
 
 **Rules in force** (his words verbatim in history.md "Decisions taken" unless marked; from 2026-11-12 on, each
 decision is appended at history.md's end under its own heading "## Decision: …", so no cited line moves)
+- **Mustafa, 2026-11-16 21:50 Amsterdam** (history.md:2177-2187, "## Decision: Mustafa, 2026-11-16 21:50 Amsterdam
+  (20:50 UTC)"; recorded by mustafa_ns_status_words.py). In short: **NS-STATUS (a)**: a small kit change to
+  .claude/NIGHT_SHIFT.md, as its own pull request, after C62H-BOUND's P2 and P3 runs (while a night run waits on
+  agents, the saver runs in stints under 30 minutes and the run refreshes its status comment at each stint's end);
+  only that file and only the lines it needs, no guard, hook, settings or script change; the exact lines to him in
+  chat first and wait for his yes, which is also KIT-FREEZE-2's exception for this one change; then one review round;
+  then a stop for his go on the merge. **APPROVAL-FREE FORMS:** write commands in the simple forms that need no
+  approval, one per call; when a call has to ask him, name it in the message before sending it.
 - **Mustafa, 2026-11-15 16:35 Amsterdam** (history.md:2131-2146, "## Decision: Mustafa, 2026-11-15 16:35 Amsterdam
   (15:35 UTC)"; recorded by mustafa_kl_c62h_answers_words.py). In short: **KL-YES** to the kit lines as posted
   (kept-logs-final-text.md, 97c81656…) with one change, and it confirms KIT-FREEZE-2 for this one rule: pack walks the
