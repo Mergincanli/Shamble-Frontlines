@@ -232,14 +232,6 @@
 - Next (the main session): commit 2 in the worktree; check `git diff HEAD^ HEAD -- . | sha256sum` (spikes/netcode-
   proof) = f88bf7d5…; the committed SIZE-CHECK = 821; then insert part 3 and the built check before step 3's launch.
 
-## Launch 3 (step 3)
-- 12:21 Start. Read brief sections 0, 1, 3.2, 3.3, 4, 10, 11 (sha256 7936074c… checked); runner u4r-run.sh e9437ae2…
-  checked (header read). Worktree at b423a7d (commit 2), unstaged ` M` marks.json c1935a5b…, SERIES.md 6898e119…,
-  README.md f3c3c804… (the main session's part 3; equal to the expected). Plan: (1) the judge's tests before any edit
-  in both builds, and each -17 L1 P2 case's reading by the judge's own CLI on scratch copies under
-  .gate/u4r/c62h-bound/b2-before/; (2) B-2's four files; (3) the judge's tests again and the readings again; (4) stage;
-  (5) check.mjs whole; (6) SIZE-CHECK.
-
 ## Main session after launch 2
 - 11:53 Launch 2's return saved word for word: c62h-bound-step2-full.json (123 lines, sha256 366a2910…; status done).
   Read in full: 6 new engine.rs tests in each build (551 / 631 = +6 / +6, as expected); 8 plants bitten (re-run on
@@ -261,3 +253,56 @@
   nothing); marks.json after c1935a5b996fb0aa….
 - 12:20 Step 3's launch (wf_009969c7-069): B-2's four files with the real marks.json, judge tests before and after,
   check.mjs, expected +1 / +1 → 552 / 632; the lane about 880 before B-2.
+
+## Launch 3 (step 3)
+- 12:21 Start. Read brief sections 0, 1, 3.2, 3.3, 4, 10, 11 (sha256 7936074c… checked); runner u4r-run.sh e9437ae2…
+  checked (header read). Worktree at b423a7d (commit 2), unstaged ` M` marks.json c1935a5b…, SERIES.md 6898e119…,
+  README.md f3c3c804… (the main session's part 3; equal to the expected). Plan: (1) the judge's tests before any edit
+  in both builds, and each named case's reading by the judge's own CLI on scratch copies (written with Write, each
+  `cmp`-equal to its fixture) under .gate/u4r/c62h-bound/b2-before/; (2) B-2's four files; (3) the judge's tests and
+  the readings again; (4) stage; (5) check.mjs whole; (6) SIZE-CHECK.
+- 12:23 Item 1, the judge's tests before any edit (.gate/u4r/c62h-bound/step3-judge-before.log, -x -k, `cargo test
+  --locked -p npt-judge` then `--all-features`): exit 101 in both builds; lib 14, cli 2, engine 49 passed; fixtures
+  "test result: FAILED. 18 passed; 1 failed" in each build, the one failure
+  pm_0001_17_equal_hashes_pass_and_the_lost_group_is_not_compared at fixtures.rs:229 on `base`: INVALID, "a gap in the
+  record: run p2-1: no room log gives tick.s.snap_link_lost_count" on both new checks (its room log has no series).
+  No other test fails. (Cargo stops after the failing target, so the doc-tests did not run before; the judge has none
+  of note: the after-run shows them.)
+- 12:24 Item 1, the readings by the CLI (step3-readings-before.log, exit 0; verdicts b2-before/*.json): base INVALID
+  (both new checks gap 1); lost-group INVALID (both gap 1; the brief's "FAIL (A 1)" is its reading once base's room
+  log carries the series: computed A 1 with zero links, shown after the edits); hashed-and-incomplete INVALID (its
+  coverage gap, plus gap 1 on both new checks; its test still passes before the edits; FAIL (A 1) is again the reading
+  with the series); none-compared FAIL, valid, the empty comparison, both new checks gap 1 beside (A 6 with the
+  series). A read-only scan of every -17 case (base files plus the case's): every measured client record holds
+  `snap_incomplete`, every entry 0 or 1, every incomplete tick at a room tick (1 to 3): launch 2's gaps 6 and 8 meet
+  no fixture. With zero links, A is 0 on every case but hashed-and-incomplete (1), lost-group (1) and none-compared
+  (6); B 0 on all. So nothing beyond B-2's named cases moves: edits go ahead.
+- 12:26 Item 2, B-2's four files (Edit and Write only): fixtures/pm-0001-17/base/p2-room.jsonl:2-4, each tick record's
+  `s` gains `"snap_link_lost_count"` with 48 zeros (one replace_all Edit; checked 48 entries, all 0, on ticks 1-3; +3
+  -3); lost-group/p2-room.jsonl (new, 7 lines): base's new room log with slot 1's entry at tick 2 set to 1 (diff
+  against base: that one entry only); tests/fixtures.rs: `hashed-and-incomplete` out of
+  pm_0001_17_every_server_hash_is_resolved_on_the_client_side's INVALID list (-4), its doc line :390-391 "Each case is
+  INVALID (both at once: the next test)" (+1), and the new test
+  pm_0001_17_hashed_and_incomplete_fails_with_its_coverage_gap_beside at :425-437 (L1 P2 FAIL; a why line holding
+  "(0 unexplained) = 1, needs == 0"; the run's `gaps` holding "slot 1, tick 2: a client hash and
+  tick.s.snap_incomplete 1 at once"); fixtures/README.md rows :22 (base: the room log's series 0 on every slot), :23
+  (lost-group: its own room log, the link lost a datagram of it, E2) and :32 (hashed-and-incomplete: FAIL, A 1, the
+  coverage gap beside, INVALID before). numstat: fixtures.rs +16 -5, README +3 -3, base room +3 -3, lost-group +7.
+- 12:27 Item 2, the judge's tests after (step3-judge-after.log, -x -k): `cargo fmt --all --check` exit 0 (no diff);
+  `cargo test --locked -p npt-judge` exit 0 and `--all-features` exit 0: lib 14, cli 2, engine 49, fixtures "test
+  result: ok. 20 passed; 0 failed" (19 + the new one, named in both builds), doc-tests 0, in each build.
+- 12:28 Item 2, the readings after (step3-readings-after.log, exit 0; verdicts b2-after/*.json; scratch inputs
+  `cmp`-equal to the fixtures): base NOT-RUN, the run valid, 0 mismatches, 6 compared, 0 incomplete, A 0, B 0 (as
+  before this lane); lost-group NOT-RUN, valid, 0 mismatches, 5 compared, 1 incomplete, A 0, B 0 (as before this
+  lane); hashed-and-incomplete FAIL, valid, A fail 1, B 0, `gaps` = the coverage gap; none-compared FAIL, valid, the
+  empty comparison, A fail 6, B 0. Also lost-group's client log on base's new room log (no room log of its own): FAIL,
+  A 1, which is why it needs its own (the brief's "FAIL (slot 1's tick 2: A 1)").
+- 12:29 Item 3, staged (from a subshell in the worktree): marks/marks.json, marks/SERIES.md, marks/README.md (the main
+  session's part 3, untouched) and B-2's four. sha256 after staging, of the files and of the staged blobs alike:
+  marks.json c1935a5b996fb0aa…, SERIES.md 6898e119109a794a…, README.md f3c3c804c4e4d078… (all three as expected).
+  Nothing unstaged, nothing untracked; `git diff --cached HEAD -- . | sha256sum` from spikes/netcode-proof =
+  a1238e901f4a5885… (equal to step3-check.log's header).
+- 12:29 Item 6, SIZE-CHECK on the staged work (results excluded): step vs HEAD 99 (+75 -24: fixtures README 6, base
+  room 6, lost-group room 7, fixtures.rs 21, marks.json 26, SERIES.md 6, marks README 27); B-2's four files 40 (the
+  brief's "about 40"); lane vs 044fab1 920 (+879 -41), under the 1,050 stop. Item 4, check.mjs whole started 12:29:32
+  (step3-check.log, -x).
