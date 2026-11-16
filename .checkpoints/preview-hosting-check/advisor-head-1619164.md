@@ -19,3 +19,13 @@ Started 2026-11-16. Seat: day-session subagent, verdict only (no GitHub writes).
 - F-D Low (record): plan.md:524 and :649 still say install scripts "never see" the token; SA-R3 and his own words correct it. Fix: the report quotes the corrected wording.
 - F-E Low (condition): open security Lows SA-R2, SA-R5, SA-R6 (and accepted SA-R3) should be named on his merge list for the setup PR so his merge is informed.
 - links.json address = his A4 answer (https://shamble-preview-check.pages.dev/), so no suffix change is needed.
+- Correction to F-A (verified git): no step 11 ever existed (5132c3f..fadc101 jump 10 -> 12). Step 12's headline ("SR-READ answered ... setup done received at 20:53:10 UTC") was last at 326f5cb; its bullets (incl. "SR-READ: neither administration nor deployments has write access") survived under step 14 through 5ac8586 and are gone at 856f0a5. The phrase on record is "setup done", read by the session as "repository ready" ("to confirm in the reply"): the process account must say so.
+- F-F Medium (condition, token safety): the app holds write on code and workflows (recovered step 12), so a repository-level secret would be reachable without his click; the repo-secrets list is checked only at sitting 3 (SA-R8), after token runs, and next step 2's screenshots omit it. Fix: his screenshot of the empty "Repository secrets" list before the setup PR opens. My REST read of actions/secrets: refused by the proxy (unverified).
+- SA-R7 read myself: lib.mjs originAndPath keeps origin + path; check-headers saves only 6 named headers; probe saves location only. Fixed.
+- F-B widened: line 8 "Last update 2026-11-15 19:44" (git: 2026-11-16 08:49 UTC); Goal line "The plan only: no build ... plan.md (not yet written)"; "Key numbers: (none yet)".
+- F-C's "harmless" is inferred: drivers come from the runner only if EDGEWEBDRIVER/GECKOWEBDRIVER are set; nothing has run on windows-2025; a miss shows as "no reading", never a false pass.
+- Verified: 0 pull requests and 0 workflow runs on the test repository (gh api REST, 2026-11-16). Saver running (pgrep: checkpoint.mjs watch preview-hosting-check, pid 412). Gate/smoke do not apply (the test repository has none); my reruns of the local proofs stand in and prove scripts only.
+- Risk tier 2 (CI workflows holding a secret; infrastructure). Merges, approvals and settings are his.
+## Verdict
+APPROVE head 1619164900553ee3e32339447b30865347711156, with conditions: (1) F-F before the setup PR opens; (2) F-A and F-B record fixes before the report folds the checkpoint; (3) F-E on his setup-PR list. No change to the head; no push, so no new review or new yes.
+DONE
