@@ -3979,6 +3979,28 @@
           "parts": [
             "L1 P0"
           ]
+        },
+        {
+          "name": "L1 P2, P3 and B1: every measured client-tick left incomplete is one the room sent that client nothing for, or one the link lost a snapshot datagram of (0 unexplained)",
+          "figure": "snap_lost_unexplained_count",
+          "op": "==",
+          "value": 0,
+          "parts": [
+            "L1 P2",
+            "L1 P3",
+            "L1 B1"
+          ]
+        },
+        {
+          "name": "L1 P2, P3 and B1: no measured client-tick filed whole is one the link lost a snapshot datagram of (0; the link's record is not overstated)",
+          "figure": "snap_whole_despite_link_loss_count",
+          "op": "==",
+          "value": 0,
+          "parts": [
+            "L1 P2",
+            "L1 P3",
+            "L1 B1"
+          ]
         }
       ],
       "report": [
@@ -4009,6 +4031,10 @@
         {
           "id": "PM-0001-17/whole-as-lost",
           "what": "a client writer that files a tick it decoded whole as lost: null and incomplete 1"
+        },
+        {
+          "id": "PM-0001-17/link-lost-overstated",
+          "what": "a lab record of the link's losses that counts a delivered snapshot datagram as lost: on each client, its first measured tick whose datagrams all arrived"
         }
       ],
       "stand_in": false,

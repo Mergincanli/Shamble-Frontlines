@@ -64,17 +64,22 @@ header; tick, second and event records follow in time order. Every record has a 
     `npt_sim::ACK_RING_TICKS` ticks old), or at the stop (on L1 the runner may decide it there). A group of a tick older
     than one the client has already decoded (L1's reorder step delivers such groups) is decoded and hashed under its own
     tick like any other, or, if the client drops it as stale, it is never acknowledged, the drop is counted, and that
-    tick is lost (`null`, `tick.s.snap_incomplete` 1), never the sentinel. That covers the ticks from the client's first
-    snapshot on: a snapshot group or full state whose header names a tick before the client's first snapshot and at
-    least `npt_sim::ACK_RING_TICKS` ticks behind the newest tick it holds names a tick it was never sent (a bad header),
-    so the client files the sentinel under that tick once while it remembers that tick (the last
-    `npt_sim::ACK_RING_TICKS` such ticks; a repeat past them is one hash met twice, written once), never acknowledged,
-    and `decoded_hash_mismatch_count` counts it as a client hash at a tick the server never logged (the advisor's U4e
-    round-1 ruling, R1, and round-2 ruling, Q2). Every tick from a client's first snapshot to the end of its log is
-    resolved for that client: a hash, or `null` with `tick.s.snap_incomplete` 1 (a tick none of whose groups arrived
-    counts too, known from a later header's tick); every client is admitted, and its first snapshot resolved, in the
-    warm-up (a client admitted later is -19's join, built with U6); after the measured phase the clients keep logging
-    until every measured tick is resolved, and a tick still in flight at the stop is not written;
+    tick is lost (`null`, `tick.s.snap_incomplete` 1), never the sentinel. On L1's P2, P3 and B1 a measured tick filed
+    lost must have a reason in the room's or the link's record, never the client's own: the room sent that client
+    nothing then (`hs.server_hash` `null`), or npt-l1 lost a snapshot datagram of it (`tick.s.snap_link_lost_count`, the
+    room log); a stale drop is no reason there, since L1 delivers every snapshot datagram well inside the ring
+    (PM-0001-17's `snap_lost_unexplained_count`; `snap_whole_despite_link_loss_count` checks the record the other way).
+    That covers the ticks from the client's first snapshot on: a snapshot group or full state whose header names a tick
+    before the client's first snapshot and at least `npt_sim::ACK_RING_TICKS` ticks behind the newest tick it holds
+    names a tick it was never sent (a bad header), so the client files the sentinel under that tick once while it
+    remembers that tick (the last `npt_sim::ACK_RING_TICKS` such ticks; a repeat past them is one hash met twice,
+    written once), never acknowledged, and `decoded_hash_mismatch_count` counts it as a client hash at a tick the server
+    never logged (the advisor's U4e round-1 ruling, R1, and round-2 ruling, Q2). Every tick from a client's first
+    snapshot to the end of its log is resolved for that client: a hash, or `null` with `tick.s.snap_incomplete` 1 (a
+    tick none of whose groups arrived counts too, known from a later header's tick); every client is admitted, and its
+    first snapshot resolved, in the warm-up (a client admitted later is -19's join, built with U6); after the measured
+    phase the clients keep logging until every measured tick is resolved, and a tick still in flight at the stop is not
+    written;
   - `replay_hash` (only in a `replay` log on x86_64, the x86-64 re-decode of an L2 client's logged bytes, R-8): the
     same as `decoded_hash`, decoded again natively, for the Arm rule.
 - **Events the judge reads for validity** (§4): `admit` (`session`, `in_roster`), `control` (`source`: `socket` or

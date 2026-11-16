@@ -387,7 +387,8 @@ fn pm_0001_17_the_arm_rule_holds_on_lg_only() {
 /// README §1's `null` rule, checked (the advisor's FX-10 on U4j; the test-engineer's probe S and R2): every `hs` and
 /// `tick.s.snap_incomplete` list holds the run's `clients` entries; a (slot, tick) is resolved by a client hash or by
 /// `snap_incomplete` 1, never both; every tick inside a slot's resolved span at which the room logged that slot's
-/// hash is resolved, and the span covers the room's measured ticks for the slot. Each case is INVALID.
+/// hash is resolved, and the span covers the room's measured ticks for the slot. Each case is INVALID (both at once:
+/// the next test).
 #[test]
 fn pm_0001_17_every_server_hash_is_resolved_on_the_client_side() {
     let mut wrong = Vec::new();
@@ -405,10 +406,6 @@ fn pm_0001_17_every_server_hash_is_resolved_on_the_client_side() {
             "slot 1: the room logged its hash at measured ticks 1 to 3, and no client log resolves any tick of it",
         ),
         (
-            "hashed-and-incomplete",
-            "slot 1, tick 2: a client hash and tick.s.snap_incomplete 1 at once",
-        ),
-        (
             "short-lists",
             "hs.server_hash lists hold 2 entries, not the run's 48 clients",
         ),
@@ -423,6 +420,20 @@ fn pm_0001_17_every_server_hash_is_resolved_on_the_client_side() {
         }
     }
     assert!(wrong.is_empty(), "{wrong:#?}");
+}
+
+/// C62H-BOUND (B-2): slot 1's tick 2 is filed lost while the room sent it a snapshot and the link lost none of it, so
+/// `snap_lost_unexplained_count` reads 1 and the part FAILs (INVALID before), the coverage gap listed beside it.
+#[test]
+fn pm_0001_17_hashed_and_incomplete_fails_with_its_coverage_gap_beside() {
+    let v = verdict("PM-0001-17", "hashed-and-incomplete");
+    let p = part_of(&v, "L1 P2");
+    assert_eq!(p.verdict, VerdictKind::Fail, "{:?}", p.why);
+    let why = "(0 unexplained) = 1, needs == 0";
+    assert!(p.why.iter().any(|w| w.contains(why)), "{:?}", p.why);
+    let gap = "slot 1, tick 2: a client hash and tick.s.snap_incomplete 1 at once";
+    let gaps = &part_run(&v, "L1 P2").gaps;
+    assert!(gaps.iter().any(|g| g.contains(gap)), "{gaps:?}");
 }
 
 /// C4's cases (the advisor's U2 ruling): a measured run built with the bites, a measured run naming a bite, and a bite

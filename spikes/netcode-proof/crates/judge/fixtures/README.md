@@ -19,8 +19,8 @@ each case with the real `marks/marks.json` and checks the verdict and its reason
 | PM-0001-4 | `measured-bites-build` | C4: run 1's room log comes from a bites build, naming no bite | INVALID |
 | PM-0001-4 | `measured-names-bite` | C4: run 2 is a measured run that names the B-S bite | INVALID |
 | PM-0001-4 | `bite-measured-build` | C4: the B-S bite run's room comes from the measured build (no log of it lists `bites`) | INVALID |
-| PM-0001-17 | `base` | one L1 P2 run in the stress scene (its precondition held): every client hash equals the server's at its tick (6 compared); every `hs` and `snap_incomplete` list holds the header's 48 entries (slots 2 to 47 not connected: `null` in both logs); the other parts and the bites not run | NOT-RUN, the part's run valid, 0 mismatches |
-| PM-0001-17 | `lost-group` | slot 1's tick 2 incomplete (`null`, `snap_incomplete` 1): not compared, not a mismatch (5 compared) | NOT-RUN, the part's run valid, 0 mismatches |
+| PM-0001-17 | `base` | one L1 P2 run in the stress scene (its precondition held): every client hash equals the server's at its tick (6 compared); every `hs` and `snap_incomplete` list holds the header's 48 entries (slots 2 to 47 not connected: `null` in both logs); the room log's `tick.s.snap_link_lost_count` 0 on every slot (C62H-BOUND); the other parts and the bites not run | NOT-RUN, the part's run valid, 0 mismatches |
+| PM-0001-17 | `lost-group` | slot 1's tick 2 incomplete (`null`, `snap_incomplete` 1): not compared, not a mismatch (5 compared); its own room log has the link losing a snapshot datagram of it (`tick.s.snap_link_lost_count` 1 there: the link's explanation, E2), so it is explained | NOT-RUN, the part's run valid, 0 mismatches |
 | PM-0001-17 | `differ` | slot 1's tick 2 hash differs from the server's | FAIL |
 | PM-0001-17 | `refused-group` | slot 1's tick 2 is the sentinel 0 (a refused group) | FAIL |
 | PM-0001-17 | `orphan` | slot 0 logs a hash at tick 65,539, which the server never logged (a wrong tick rebuild) | FAIL |
@@ -29,7 +29,7 @@ each case with the real `marks/marks.json` and checks the verdict and its reason
 | PM-0001-17 | `sparse` | one client hash of six, the rest `null` with `snap_incomplete` 0: the span misses the room's measured ticks | INVALID |
 | PM-0001-17 | `sampled` | the client log has no tick 2 record: a server hash inside the span that no client log resolves | INVALID |
 | PM-0001-17 | `slot-unlogged` | slot 1 `null` everywhere with `snap_incomplete` 0, while the room logged its hashes | INVALID |
-| PM-0001-17 | `hashed-and-incomplete` | slot 1's tick 2 has a hash and `snap_incomplete` 1 at once | INVALID |
+| PM-0001-17 | `hashed-and-incomplete` | slot 1's tick 2 has a hash and `snap_incomplete` 1 at once: filed lost though the room sent it a snapshot and the link lost none of it (`snap_lost_unexplained_count` 1), the coverage gap listed beside the failure (INVALID before C62H-BOUND) | FAIL |
 | PM-0001-17 | `short-lists` | 2-entry lists under the header's 48 clients | INVALID |
 | PM-0001-17 | `l1-aarch64-claim` | the L1 client (role C) says aarch64 and logs a hash at tick 9, which the server never logged; an x86-64 replay agrees elsewhere: its only mismatch is that orphan, which counts on every machine (FX-5 (c)); this row does not show the Arm rule's LG key (TE2-1: carry 64 (a)) | FAIL |
 | PM-0001-17 | `lg-cross-arch` | an L2 P2 run (run `l2-p2-1`: RS's room on x86_64, LG's bots on aarch64, a `replay` log on x86_64; 2 clients): slot 1's tick 2 differs on LG and the x86-64 re-decode equals the server's | the L2 P2 part's run valid, 0 mismatches, aarch64-only 1 |
