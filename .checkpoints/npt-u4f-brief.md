@@ -6,7 +6,7 @@
   (after `git fetch origin claude/netcode-proof-test-plan-hcky5g`)
 - **Branch:** cs/npt-u4f-brief · **Base:** origin/main 53272a1
 - **Spike worktree (read only):** `.gate/npt-spike-1116` at 11fd190e9536702f0dcfc72d584b637ebc6184be
-- **Last update:** 2026-11-16 01:29 Amsterdam
+- **Last update:** 2026-11-16 01:48 Amsterdam
 
 ## Steps done
 1. Start checks (role night-shift, window 00:11, no other run tonight), status comment 6902964789 posted; spike
@@ -20,13 +20,24 @@
    (`security-auditor-u4f-check.md`, 339 lines, DONE) checked rev 1 in parallel, xhigh · f394af0 (test-engineer's)
    and the save after this line (security-auditor's) · TE: 1 High, 14 Medium, 9 Low; SA: 3 High, 8 Medium, 6 Low
 
-## Current step
-4. netcode-architect revises once for both checks (rev 2 at the same path; notes `netcode-architect-u4f-rev2.md`,
-   a new part file, since `netcode-architect-u4f.md` ends DONE for the drafting part), xhigh, launched 01:09.
+4. netcode-architect revised once for both checks: rev 2 at the same path (1,117 lines; change list and counts table
+   at the top; sections 0-12 and the NA-1..NA-13 table), notes `netcode-architect-u4f-rev2.md` (a new part file,
+   since `netcode-architect-u4f.md` ends DONE for the drafting part) · the save after this line · TE 24: 17 fixed,
+   6 questions, 1 needs a run; SA 17: 10 fixed, 7 questions; SC-1 accepted; 0 declined; NA-13 new (Medium)
 
-## Next steps
-4. netcode-architect revises once for both checks: rev 2 with a change list at its top (plan item 7, Agents 3).
-5. Commit and push everything; night report paragraph (branch, files, the checks' top findings); tick item 7.
+## Current step
+5. Night report and housekeeping (status comment, report comment, tick item 7). The item's plan is done.
+
+## Next steps (for the day session; the night's part is done)
+1. Fold the results into PR #40 (the plan's rule 2) and bring rev 2 up to date (its section 12, "Left for the main
+   session at launch": `<base>`, counts, stamps, the placeholder fill by script), then take it to the advisor with
+   its 16 questions (U4F-Q1 to Q16).
+2. Fold in Mustafa's answers recorded after the plan (the plan's header: history.md 2131-2146 at 2156e49), and main's
+   KEPT-LOGS rule (CHECKPOINTS.md §11, merged in PR #53, main 53272a1), which bears on rev 2's disk margin (5.5,
+   U4F-Q2): the brief at 11fd190 still marks KL-YES open.
+3. Run the 15 "needs a run (day)" items (rev 2 section 11, D1-D15).
+4. One call for the advisor (the reviser's own flag): 2.3 takes carry 80 (a)'s total-key route, not the lead-bound
+   route the carry also allows; it is written as a requirement, not ruled.
 
 ## Open findings
 - Drafter's findings (rev 1, table at the draft's end; notes `netcode-architect-u4f.md`): NA-4 High (Pong carries
@@ -61,7 +72,18 @@
   PressRefused, Late and Full returns (:98-115), and room.rs:1322 sends `newest_received`. Whether Rust's sort panics
   was not read (no web): it rests on carry 80 (a)'s own words.
 
+- Rev 2's own new finding NA-13 Medium (room/src/input.rs:110): under option B a forged command with a new sequence
+  whose stamp equals a buffered command's stamp is counted `Late`, never as forged kind 2 · open (f13 in rev 2)
+- Placeholder check by the session (Grep on rev 2): 14 `@@CARRY-n@@` at :488-501 (46, 80, 86, 57, 74, 21, 27, 18,
+  39, 50, 61, 58, 76, 77: the plan's list exactly) and 15 `@@WORDS-…@@`; the other matches are format templates
+  (:112-113, :1072-1073). Mustafa's words appear only as cites or a WORDS placeholder (:573, history 292-293).
+
 ## Key numbers
+- rev 2: 1,117 lines; tests +100 measured / +115 bites build (Δ on `<base>`), conditional +3/+1/+1/+1/+5; 60 negative
+  cases; 17 bites; 65 judged runs (36 + 12 twins + 17 bite runs); 14 short pre-runs; 14 carry placeholders; 15
+  @@WORDS@@; 33 recheck rows; 17 open items; 16 U4F-Q; 15 needs-a-run (D1-D15); disk about 3,596-3,667 MiB against
+  3,593 MiB above the 4,096 MiB floor (no margin, estimate); -21 judge memory about 6,427 MiB under 10,240 MiB
+  (the reviser's counts; placeholders counted by the session)
 - rev 1: 837 lines; 9 field tables; tests ≥ +60 measured / ≥ +74 bites build; 44 negative cases; 17 bites; 65 judged
   runs (36 measured, 12 twins, 17 bite runs); 14 carry placeholders; 15 @@WORDS@@; 29 recheck rows; 15 open items
   (12 routed, 3 left); 12 U4F-Q; 10 needs-a-run (D1-D10) (the drafter's counts)
@@ -81,8 +103,9 @@
 - test-engineer (check, `test-engineer-u4f-check.md`) and security-auditor (check, `security-auditor-u4f-check.md`),
   both xhigh, launched 00:50 Amsterdam in parallel. test-engineer done 01:05 (16 min, 60 tool uses);
   security-auditor done 01:08 (19 min, 76 tool uses)
-- netcode-architect (rev 2), xhigh, launched 01:09, running; notes `netcode-architect-u4f-rev2.md`; at 01:29: blocks
-  B1-B8 done (disposition), B9 writing (header, change list, sections 0-2 are rev 2; sections 3-12 next)
+- netcode-architect (rev 2), xhigh, launched 01:09, done 01:47 (38 min, 62 tool uses); notes
+  `netcode-architect-u4f-rev2.md` (DONE)
+- No agent runs now. The saver is stopped (TaskStop) before the last save: the item is done.
 - saver stint 3 bbeygeuzo 01:04-01:29: ok (saved 328c2a7, 376a8b3, 37185e4; time is up). Stint 4: background task
   b33enq46s · output `/tmp/claude-0/-home-user-Shamble-Frontlines/2cc6b1c7-405a-556f-81c6-a85b5a29465f/tasks/b33enq46s.output`
   · started 01:29 · stops by 01:54 · last check 01:29: restarted
