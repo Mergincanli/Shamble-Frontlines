@@ -33,12 +33,16 @@ it asks nothing; REFS-KIT stays.
   brief's hashes); worktree `.claude/worktrees/c62h-bound` (branch c62h-bound-build); the scripts c62h_bound_insert.py
   and c62h_bound_built_check.py; **the built check shown to fail** (12 PASS on texts/freeze, 13 FAIL, exit 1); **part 1
   done** (SERIES.md 89295b57…, +2 -1, unstaged for step 1); part 3 dry-run on a scratch copy reproduced all three
-  expected hashes. **RUNNING from 10:28 UTC: step 1's launch** (workflow wf_8790c02a-955, task ws9bstt3o; one
-  general-purpose builder, xhigh, no isolation, in the worktree; it stages and commits nothing). **If cut:** resume by
-  run id (`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-step1-wf_8790c02a-955.js", resumeFromRunId: "wf_8790c02a-955"})`),
-  after reading the notes' "## State". **Then:** the main session commits step 1 in the worktree (message from brief
-  section 1), checks the diff hash against step1-check.log's header and SIZE-CHECK, then step 2's launch. Saver
-  b1gec2y1v (from 09:18 UTC, to about 11:08). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
+  expected hashes. **Step 1 DONE** (launch 1, wf_8790c02a-955, 10:28-10:59 UTC; its return word for word in
+  c62h-bound-step1-full.json, read in full): **commit 1 = 54046d4a83e445a212670dd548d5a5c1b9dd00ef** in the worktree;
+  check.mjs all 11 PASS on the staged bytes (545 / 625 = +7 / +9 as expected); 9 plants bitten; the commit's diff hash
+  equals step1-check.log's (0b41121e…); SIZE-CHECK 499 (plan 285-400; the stop is 1,050). Open for the review round:
+  Summary's L counts lost + burst (B part of L; B 0 on P2 and P3); one lint allow on Logs::room_tick (the only
+  deviation). **RUNNING from 11:02 UTC: step 2's launch** (workflow wf_4f7f49a2-b56, task wj4ioy4ah; the judge's two
+  figures, plants CB-P8-P10 and CB-P14-P18, expected 551 / 631). **If cut:** resume by run id
+  (`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-step2-wf_4f7f49a2-b56.js", resumeFromRunId: "wf_4f7f49a2-b56"})`),
+  after reading the notes' "## State" and the worktree's diff. **Then:** commit 2 the same way; insert part 3 and the
+  built check; step 3's launch. Saver b1gec2y1v (from 09:18 UTC, to about 11:08: restart it then). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
   c62h_bound_rejudge_compare.py (section 7; --self-test 4 of 4 as required, .gate/u4r/c62h-bound/rejudge-compare-dry.log;
   the real self-test runs into rejudge-compare-negative.log before the comparison) and c62h_bound_set_check.py
   (sections 8.3-8.4; on the old results/u4r/fc411116c1f1/P2: all 29 lines naming the new phrase or checks FAIL, the 12

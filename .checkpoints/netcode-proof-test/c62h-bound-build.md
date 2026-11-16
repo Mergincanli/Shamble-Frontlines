@@ -86,3 +86,42 @@
   unchanged). Staged numstat vs LANE_BASE (results excluded): lib.rs +33 -0, tests.rs +98 -0, logs.rs +47 -7,
   scenario.rs +303 -8, SERIES.md +2 -1; total 499 (plan for step 1 about 285-400; under the 1,050 stop). check.mjs
   whole started (step1-check.log, -x).
+- 10:58 check.mjs whole on the staged bytes (.gate/u4r/c62h-bound/step1-check.log): exit 0, "check: all 11 steps
+  pass"; test step "measured build: 545 tests passed, 0 failed, 0 reported a skip; bites build: 625 tests passed, 0
+  failed, 0 reported a skip" (+7 / +9 from 538 / 616, as expected). Header: diff 0b41121e5cb1b569…, untracked
+  e3b0c44298fc1c14… (none). `git diff --cached HEAD -- . | sha256sum` from spikes/netcode-proof = 0b41121e…; no
+  unstaged change, no untracked file after the run.
+- 10:59 SIZE-CHECK (staged, `git diff --cached --numstat 044fab1 -- spikes/netcode-proof/ ':(exclude)…/results'`):
+  499 (+483 -16), as at 11:1x above.
+
+## State (launch 1, step 1, 10:59 UTC: a clean point; nothing in flight, no plant in place)
+- Staged in the worktree (branch c62h-bound-build at 044fab1, nothing committed): crates/l1/src/lib.rs (+33 -0),
+  crates/l1/src/tests.rs (+98 -0), crates/lab/src/scenario.rs (+303 -8), crates/lab/src/logs.rs (+47 -7),
+  marks/SERIES.md (+2 -1, B-1, 89295b57…, the main session's). Total 499 against the plan's 285-400 for step 1.
+- Check: step1-check.log, exit 0, all 11 steps PASS, diff hash 0b41121e5cb1b5692b7f0a6ea3eb223e8fed5fa7d9b0df4c85f635b372c3267f,
+  untracked hash e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.
+- Counts: 545 measured / 625 bites (+7 / +9). New tests by name, from the runner's own output (step1-new-measured.log,
+  step1-new-bites.log; check.mjs prints no per-test lines): both builds: tests::c62hb_server_datagrams_since_counts_
+  down_datagrams_by_fate (npt-l1), scenario::tests::c62hb_join_one_datagram_too_many, _too_few,
+  c62hb_join_groups_with_a_null_server_hash, c62hb_join_groups_with_no_session, c62hb_join_ok_counts_lost_and_burst,
+  c62hb_p2_short_every_measured_lost_tick_is_explained; bites only: c62hb_p2_short_bite_whole_as_lost_gives_16_
+  unexplained, c62hb_p2_short_bite_link_lost_overstated_gives_16_whole_despite_loss.
+- Plants: CB-P1, -P12, -P13 (l1 test), -P2 (2 failed), -P3, -P4 (join tests), -P5, -P6, -P7 (short P2 test): each bit
+  as section 4 says, each restored, each file's sha256 equal to the record (logs plant-CB-*.log).
+- Stop rules: none met. Clean short P2: N 0 = the join's 0; E1 + E2 + N = measured incomplete (0 + 29 + 0 = 29); no
+  join Err; no floor stop; counts as expected. The lab-vs-judge comparison is not reachable in step 1 (no figure yet).
+- Next (the main session): commit 1 in the worktree; check `git diff HEAD^ HEAD -- . | sha256sum` (spikes/netcode-
+  proof) = 0b41121e…; the committed SIZE-CHECK = 499; then step 2's launch.
+
+## Main session after launch 1
+- 11:00 Launch 1's return saved word for word: c62h-bound-step1-full.json (150 lines, sha256 80b28a16…; status done).
+  Read in full: 7 measured and 9 bites new tests by name (+7 / +9: 545 / 625, as expected); 9 plants bitten; points:
+  (1) Summary's L counts c.lost + c.burst and B c.burst (B is part of L; on P2 and P3 B is 0): for the review round
+  (netcode-architect) to confirm; (2) size 499 against the plan's 285-400; (3) one lint allow on Logs::room_tick
+  (logs.rs:520-523), the only deviation; (4) the clean short P2 run: incomplete 29 = E1 0 + E2 29 + N 0, S 1920, L 29.
+- 11:01 **Commit 1: 54046d4a83e445a212670dd548d5a5c1b9dd00ef** in the worktree (message from brief section 1).
+  `git diff HEAD^ HEAD -- . | sha256sum` from its spikes/netcode-proof = 0b41121e5cb1b569… = step1-check.log's
+  header diff hash; untracked e3b0… (none); nothing unstaged. SIZE-CHECK from LANE_BASE: 499 (+483 -16; lib.rs 33,
+  tests.rs 98, logs.rs 54, scenario.rs 311, SERIES.md 3), equal to the launch's staged count.
+- 11:02 Step 2's launch next (section 3.2; plants CB-P8 to -P10, CB-P14 to -P18; expected +6 / +6 → 551 / 631). The
+  size: 499 of 1,050 used after step 1; the launch is asked to keep to the brief's tests and asserts, never weaker.
