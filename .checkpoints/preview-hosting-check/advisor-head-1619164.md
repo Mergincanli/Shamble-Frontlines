@@ -1,0 +1,21 @@
+# Advisor: review of setup head 1619164900553ee3e32339447b30865347711156 (shamble-preview-check)
+Started 2026-11-16. Seat: day-session subagent, verdict only (no GitHub writes).
+## Plan
+1. Hashes: the four placed workflows and the two token-test variants vs the approved prefixes.
+2. Commits: what each changed (stat), 1619164 = exactly the approved diff (two files), 2df0112 touches no workflow.
+3. Round-1 findings: each disposition vs the review budget (Critical/High fixed and confirmed in round 2).
+4. Safety with the owner's token: triggers, permissions, secret scope, pull_request_target, untrusted input, pins.
+5. Marks measurable: any script/workflow path that hides a failure or makes a reading impossible.
+6. Process account: the checkpoint's claims vs git and the notes.
+## Findings
+- 1 Hashes (verified, sha256 of git show HEAD:<file>): deploy 29593af18d34, close 3afdf389d636, probe f24ad6e81daf, browsers 6791076916ae; byte-equal (cmp) to tr-draft/proposed/{deploy,close}.yml and tr-draft/workflows/{probe,browsers}.yml; at 2a2f426 the six approved files hash 333e5a592a05, 98b42b8e59cf, f24ad6e81daf, 6791076916ae, fd3dc4c6029b, 8b745631a278; variants unchanged now and still share deploy.yml lines 1-82 with the head (cmp). 1b37fae's deploy/close equal the 2a2f426 drafts; 2df0112 left deploy.yml unchanged.
+- 2 Commits (git show --stat): 1619164 = 2 files, 3 changed lines, exactly the approved diff (deployments: write removed; retention 7 -> 14 twice). 2df0112 touches 6 script/page files, no .github. diff --raw from 4a67b83: all mode 100644, no symlink or submodule. origin/setup = 1619164; origin main = 4a67b83.
+- 3 Local proofs reproduced by me on a git-archive export of 1619164 (.gate/preview-hosting-check/adv-1619164): proof.mjs 29 of 29, exit 0; browser-proof 5 of 5 (Chromium 153.0.8010.12); node --check passes on every tools script. Proves scripts, not Cloudflare or GitHub runners.
+- 4 Round-1 dispositions: every High (F1/TE-1, one fault) fixed and confirmed by both round-2 reviewers with reruns; Mediums: F2 -> approved text change applied; SA-R3 -> accepted in his words; SA-R4 -> sitting 3 procedure; TE-2..TE-6 fixed (TE-2 partly per infra, fixed per its owner); Lows fixed, results-log or follow-up. Within the budget (2 rounds; no third needed).
+- 5 Safety with his token: token only in preview-environment jobs, only in the upload / tomb / delete steps' env; no checkout or repo code in token jobs; matrix and event values pass via env, never ${{ }} in run; repo-wide permissions contents: read; no pull_request_target; forks skipped; actions pinned to full SHAs. Known accepted: SA-R3 (npm install of wrangler, unlocked, install scripts on, in the token job). Nothing new found that is unsafe.
+- F-A Medium (process record, verified git): the live checkpoint lost steps 11-12 (setup record: repo attach, README 4a67b83, his A4 answer with the address, SR-READ answered from his screenshot, "setup done" at 20:53:10 UTC) and steps 14/16 (get_session 72% at ~21:12 UTC) when the Current-step section was overwritten (present at 326f5cb / d2006a9, gone at 856f0a5). His go needed SR-READ and "repository ready" before the build; the record now lives only in git history. Fix: restore those steps verbatim from d2006a9 into Steps done before the report folds the checkpoint.
+- F-B Low (record): step 17 still says R2-1, R2-2, R2-4 "ride the next push"; step 18 reversed that. Fix: list R2-1, R2-2, R2-4 explicitly with the STATUS follow-ups.
+- F-C Low (record, verified lockfile): infra round 1 wrote "Lock: no hasInstallScript"; edgedriver 8.0.0 and geckodriver declare install scripts. Harmless: npm ci --ignore-scripts skips their driver downloads and run.mjs passes the runner's drivers via EDGEWEBDRIVER/GECKOWEBDRIVER. Fix: results-log line.
+- F-D Low (record): plan.md:524 and :649 still say install scripts "never see" the token; SA-R3 and his own words correct it. Fix: the report quotes the corrected wording.
+- F-E Low (condition): open security Lows SA-R2, SA-R5, SA-R6 (and accepted SA-R3) should be named on his merge list for the setup PR so his merge is informed.
+- links.json address = his A4 answer (https://shamble-preview-check.pages.dev/), so no suffix change is needed.
