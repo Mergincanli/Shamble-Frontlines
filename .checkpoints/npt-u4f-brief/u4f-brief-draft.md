@@ -477,4 +477,224 @@ kind and under both options, before the judged sets; f17 proves carry 46.
 
 ---
 
-(Sections 3-12 and the findings: being rewritten for rev 2; until this line is gone, take them from rev 1 at 828e2f4.)
+## 3. The carries
+
+**The rule** (word for word): @@WORDS-N/u4s-carries.md:9-10@@. U4f's report lists each carry below as met (file:line,
+test), not met (why) or not applicable (why), by number (advisor :334-335; U4r's wording, N/u4r-brief.md:695-696).
+
+| Entry | Placeholder (filled word for word) | carries lines | Where U4f meets it |
+|---|---|---|---|
+| 46 | @@CARRY-46@@ | :506-509 | 2.12, f17 |
+| 80 (a)-(e) | @@CARRY-80@@ | :510-534 ((a) :513-518, (b) :518-520, (c) :520-522, (d) :522-529, (e) :529-534) | (a) 2.3 (the total key: SA-1 refines it), f8, f9; (b) 2.9 by U4F-Q16, f24; (c)-(e) 2.9, f25-f27 |
+| 86 | @@CARRY-86@@ | :535-537 (its text has no quotation marks: NA-1; the fill takes the three lines whole) | 5.3 |
+| 57 | @@CARRY-57@@ | :223-228 | 2.8 |
+| 74 | @@CARRY-74@@ | :343-354 | 2.2; 5.3's late share, both readings (TE-4) |
+| 21 | @@CARRY-21@@ | :148-149 | 2.3 (option A's several commands per slot); f9 |
+| 27 | @@CARRY-27@@ | :166-168 | 2.3 (`CMD_CATCHUP` and its const assert, input.rs:59-61, :155, kept; option A's per-tick cap reads it) |
+| 18 | @@CARRY-18@@ | :129-132 | only by U4F-Q8 (a): the lead bound's tick constant by carry 18's route (advisor :463-465) |
+| 39 | @@CARRY-39@@ | :169-179 | every rate-derived value U4f adds takes the rate as an argument and is pinned at 30 and 60 Hz by a test (f31); the lab's 60 s and 200 ms stay in ns; no local tick constant (TE-10) |
+| 50 | @@CARRY-50@@ | :180-183 | 2.8 item 4 (the cap's upper bound, NA-12); no code change |
+| 61 | @@CARRY-61@@ | :229-247 | 2.9 ((b) is the case carry 80 (e) completes) |
+| 58 | @@CARRY-58@@ | :269-273 | 2.8 item 3 (high-water marks); no -17 or -18 run is U4f's; U4f's runs report their overflow resyncs beside them (`overflow_resyncs_count`, scenario.rs:1186) |
+| 76 | @@CARRY-76@@ | :364-371 | 2.6's never-acker (the Kick path), f21 and U4r's r9 (kept); no forged kind closes a session (2.4 kinds 9 and 11) |
+| 77 | @@CARRY-77@@ | :372-381 | (a) wraps per counter name in U4f's runs; (c) `stale()` sums reported on 5.3's short runs |
+
+Not met by this brief, each by its own condition: 63 (carries :322-327) only if U4f opens crates/log; 64 (:447-473)
+only if it opens crates/judge (it adds round 2's judge follow-ups first); 67 (:476-493) only if U4f moves ES's
+synthetic recording or the World's outcome on it. U4f opens none of these by section 4's proposed lane; a ruling that
+opens one adds its placeholder here. Carry 62 (h) (:305-321) is not U4f's: its stay is C62H-KEEP (section 9).
+
+---
+
+## 4. Build rules
+
+**The shared target** (Mustafa's rule: history :411-420; plan §7.1 :909-922; W1-TARGET), on every cargo, rustc and
+rustdoc call in your worktree, as U4r's section 4 rules 1-9 give them (N/u4r-brief.md:938-992):
+1. `CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/shared-target` and `CARGO_NET_OFFLINE=true` on every call
+   (N/u4r-brief.md:940; the runner sets both); checked once after the first build: no `target/` in your worktree.
+2. The lock: every such call through the runner (shared for a plain build, `-x` for a counted run, a bite run, a
+   plant, `--list` and clippy confirmations); a plant's commands go in one call, restored and its sha256 checked
+   before the next.
+3. Provenance from the builds run before check.mjs inside the same exclusive runner call (N/u4r-brief.md:951-957's
+   form); a missing line means "not counted".
+4. Touch before each build (plan :913); the runner does it.
+5. **Counts are deltas** (plan :914-915, :884-885): `<base>`'s counts plus the tests you added (2.10), on check.mjs's
+   measure; a mismatch means another copy's artifact ran: touch, rebuild, never report that run; `--list` only names.
+6. **Disk** (N/u4r-brief.md:968-971): `df -h /home/user` before each build, in your notes; at least 4 GB free before
+   any wasm32 or release build and every check.mjs run, 2 GB before every other build; the runner's floor is 4 GiB
+   (4,096 MiB: c-u4r-runs.mjs:131-132); below it, stop and report; never clean anything (plan :920).
+7. **Cleans and cargo probes are not yours.** The main session's cleans: @@WORDS-N/advisor-u4d2-m9.md:252-256@@; the
+   two lessons: @@WORDS-N/advisor-u4d2-m9.md:259-264@@; the probe lesson: @@WORDS-N/advisor-u4d2-r2.md:304-308@@.
+8. After the last bite or plant, touch and rebuild before any further claim (plan :916).
+9. Cargo's own lock serializes builds: expected (plan :917). The main folder's cache is not yours (plan :918-919).
+
+**§4.11's bans** (plan :392-407), which bind ClockSync, the 1.5x host clock and the lag switch, all on simulated time
+(plan.md:524-525, :617-628): no HashMap or HashSet in room, client, server, lab or bots (each crate's clippy.toml at
+11fd190: room, client, server, lab and bots hold one); no clock read in server, lab or bots (`std::time::Instant`,
+`std::time::SystemTime`, `tokio::time::Instant` and their `now`: plan :393-396); the client reads no clock (ADR
+0001:245-247); npt-room float-free (plan :397-398; check.mjs's grep), so every room check is in integers; bites per
+instance, never a static (plan :399-401).
+
+**Your files: the proposed lane (U4F-Q1; the plan names none: plan :805-816 and Lanes :851-889 give only "they share
+the room's and the client's files", :882-883):**
+- crates/room/src/ (input.rs, room.rs, lib.rs's `BITES`) and crates/room/tests/;
+- crates/client/src/ and crates/client/tests/;
+- crates/bots/src/lib.rs (but src/bin/) and crates/bots/tests/;
+- crates/lab/src/ (scenario.rs, logs.rs, contract.rs if 5.3 needs it, their tests) and crates/lab/tests/;
+- ops/runs/c-u4f-*.mjs (new: the r2 extension, the cap measurement's short runs and the judged-set runner, on
+  c-u4r-r2.mjs's and c-u4r-runs.mjs's models);
+- by U4F-Q1 only: crates/sim/src/world.rs for the two bites' sites and ids (bites builds only: NA-9);
+  marks/SERIES.md, new rows only (U4R-Q2 (c)'s precedent: r-check :189-196); crates/proto and the catalogue if
+  U4F-Q6 (b) rules a wire change; crates/sim's carry 18 places if U4F-Q8 (a); crates/server if U4F-Q14 (a) or U4F-Q6
+  (d) needs a pump change.
+- **Not yours:** every Cargo.toml and Cargo.lock (the main session's commit); marks.json and crates/judge (5.6);
+  crates/log, crates/l1, crates/link, crates/net, crates/tcpinfo, crates/hash-wasm; check.mjs and check.test.mjs (but
+  by U4F-Q8 (a)); docs/ (but by U4F-Q6 (b)); results/ (the main session's runs write it: plan :928-929). A part that
+  needs anything more stops, goes in your report, and the rest is built.
+
+**Files:** @@WORDS-N/advisor-u4df.md:462-464@@ (the sentence inside T4 item 1's quotation marks, word for word: the
+advisor's U4d-F ruling). **Plants:** @@WORDS-N/advisor-u4j-r2.md:298-298@@ (the words after "From now on: "), then
+restored and the sha256 checked against the clean file. A `cp`, `mv` or `tee`, and a `>` or `2>` into a file, are
+shell writes too, in any folder (N/u4r-brief.md:1016-1019). An agent that slips says so at the top of its notes
+(df-ruling :317-319).
+
+**Git** only in your worktree, never `git -C` or `git -c`; commit nothing and push nothing; the main session merges
+(plan :925-927). **Bite ids:** no crate's sources spell another crate's bite id as a string literal (check.mjs's
+`biteHomeProblems`; N/u4r-brief.md:1023-1026).
+
+**The stop clause.** TE2-5's rule ended at U4r's merge (the card's M6 line, card :1553 at 11fd190; TE-Q2, te-m3
+:119-126). Its after-clause stands: @@WORDS-N/advisor-te-m3.md:127-128@@ (NA-10: the night plan's cite :126-127 is
+one line early). Whether the U4d-F ruling's stop clause (the card's "Rules in force", its U4d-F item 2; df-ruling
+:465-468) still applies now that TE2-5's rule has ended is U4F-Q5; if it does, it reads
+@@WORDS-N/advisor-u4df.md:465-468@@ with its first `<crate>` replaced by "npt-room, npt-client, npt-bots or npt-lab
+(and each crate U4F-Q1 opens)" and "<crate>'s files" by "their files" (section 12 item 3).
+
+**The builders' limits** (Mustafa's words, by script): @@WORDS-N/history.md:292-293@@.
+
+**SIZE-CHECK:** U4f is size M (plan :805); his rule is history :398-399 and :2039-2087 (the card's "Rules in force"
+line gives what M means, card :3028-3035 at 11fd190): the main session sets U4f's measured size beside its plan on the
+card at every snapshot, and past his threshold the build stops for his three lines. The builder puts its diff size
+(`git diff --stat <base>`) in each block's notes line.
+
+**.claude/rules/netcode.md** binds the proto, room, client and server code U4f writes or feeds (plan :921-922): inputs
+only, never state; every inbound value validated; no unbounded buffer keyed by client data (ClockSync's samples, the
+room's refusal records and kept window, the cheats' held datagrams all capped); the catalogue updated with any protocol
+change. **Hostile input in the logs** (catalogue :120-121: a log holds a length or a hash of client data, never the
+data): U4f's logs of forged input hold kinds, counts, sequences and the clamp points SERIES.md rows name, never a
+datagram's bytes, debugging included (results/ is committed) (SA-17).
+
+---
+
+## 5. The judged runs (the main session's, after the merge, in the main folder: plan :766, :928-929)
+
+### 5.1 The run list, with counts (plan §9 :958-968; marks.json)
+
+| Mark | Part (marks.json) | Select beyond layer L1 | Measured | Twins | Bites (one run each) |
+|---|---|---|---|---|---|
+| -20 | L1 P3 option A (:4632) | SS, P3, 48 clients, `cmd_timing` A | 3 | | redundancy-1 (option by U4F-Q10) |
+| -20 | L1 P3 option B (:4646) | the same, B | 3 | | |
+| -21 | forged, option A / B (:4792, :4806) | SS, 48, suite `forged` | 3 + 3 | 3 + 3 | the 11 no-* bites (option by U4F-Q10; no-catchup-cap A) |
+| -21 | clamp, option A / B (:4820, :4834) | SS, 48, suite `clamp` | 3 + 3 | 3 + 3 | refuse-not-clamp |
+| -21 | fast-clock, option A / B (:4848, :4862) | SS, 48, suite `fast-clock` | 3 + 3 | | not-older-than (option A) |
+| -21 | lag-switch, option A / B (:4876, :4890) | SS, 48, suite `lag-switch`, P1 | 3 + 3 | | (no-catchup-cap only by U4F-Q15 (b)) |
+| -22 | L1, one never-acker among 48 (:5133) | SS, 48, suite `never-ack` | 3 | | unbounded (a full S30) |
+| -47 | L1 P2, 1,000 connects (:9059) | P2, suite `clock` | 3 | | newest-sample, tick-quantised |
+| | **Totals** | | **36** | **12** | **17** (65 runs) |
+
+Against plan §9 (:962-963): -20 6, -21 24 plus 12 twins, -22 3, -47 3 (48 measured and twin runs), plus 17 bite runs
+(-20 1, -21 13, -22 1, -47 2). Conditional: +1 bite run by U4F-Q15 (b); +13 by U4F-Q10 (c). Each measured run of -20,
+-21 and -22 is 10 minutes (marks.json's notes), seeds 1 to 3 (plan.md:765-775); each bite run seed 1
+(c-u4r-runs.mjs:326-329's pattern). -20's runs need 10,000 scripted presses (marks.json:4712-4721: the brawl makes none,
+bots/src/lib.rs:279-281, so the suite's behaviour is U4F-Q11's) and a reorder share above 0 (marks.json:4680-4682;
+README :276-277; D3). The forged, clamp, fast-clock and never-ack parts select no profile: U4F-Q11.
+
+### 5.2 The precondition table (plan §4.12 :422-424; advisor conditions 4 and 5, :112-124; README :285-290)
+
+| Mark | `pre:PM-0001-2` | Shown passing first by | Note |
+|---|---|---|---|
+| -20, option B | yes | U4r's r2 showed it with the brawl at a fixed lead of 7 (c-u4r-r2.mjs:80; U4R-Q4, r-check :198-205); U4f changes both the suite (U4F-Q11 (i)) and the lead (the controller), so 5.3's p6 shows it again with them (TE-3) | |
+| -20, option A | yes | 5.3's p5 (carry 86) | |
+| -21, option B (4 parts) | yes | U4r's r2 with open-loop stand-ins (c-u4r-r2.mjs:82-85), their own checks not resolved (r-check :198-201) | whether 5.3 re-runs them with the real cheats: U4F-Q11 (iv) (NA-8 shows the stand-ins differ) |
+| -21, option A (4 parts) | yes | 5.3's p1-p4 (carry 86) | |
+| -22 | **no** (README :285-290's exception) | none needed | its runs still log PM-0001-2's series (shots, projectiles, vehicles, teams, portals); the load each run carried is stated in the main session's -22 set report (advisor condition 4, :116-117; TE-22), with each run's `overflow_resyncs_count` per client (scenario.rs:1186; SA-16) |
+| -47 | no (its part selects no scene) | none | |
+
+A bite run keeps its part's validity rules, the precondition included (README :323-324).
+
+### 5.3 The short pre-runs (carry 86; U4R-Q4, r-check :198-205; TE-3, TE-4, TE-6, TE-13, TE-24)
+
+Run by c-u4f-r2.mjs on c-u4r-r2.mjs's model (SUITES :77-92; its short bitten runs as :88-91), from the merge commit
+(r2's record rule, c-u4r-r2.mjs:2-4), seed 1, before -20's and -21's judged sets. Lengths: r2's 10 s warm-up and 20 s
+measured (c-u4r-r2.mjs:8-9), except the fast clock's 70 s measured, which holds one whole 60 s episode and its settling
+(TE-13); a lag-switch run at the suite's spacing (100 bursts in 600 s, one per 6 s) holds 3 bursts; a clock run holds a
+round of 48 connects (about 2.5 s).
+
+| # | Suite | Option, profile | Bite | Shows | Why |
+|---|---|---|---|---|---|
+| p1 | forged | A (profile by U4F-Q11 (ii)) | | every PM-0001-2 check passing and the shot band | carry 86 |
+| p2 | clamp | A | | the same; the clamp-cheat reruns (0 expected) | carry 86; SA-10 |
+| p3 | fast-clock | A | | the same; the episode's excess, lead-bound and not-newer refusals | carry 86; SA-6 |
+| p4 | lag-switch | A, P1 | | the same | carry 86 |
+| p5 | -20 | A, P3 | | the same | carry 86 |
+| p6 | -20 | B, P3 | | the same, with U4f's suite and controller | TE-3 |
+| p7 | forged | A | no-lead-bound | the forged check fails by name | TE-6 |
+| p8 | clamp | A | refuse-not-clamp | the clamp check fails by name | TE-6 |
+| p9 | fast-clock | A | not-older-than | excess above 0 | TE-5, TE-6; D12 |
+| p10 | clock | P2 | newest-sample | -47's check fails | TE-6; D12 |
+| p11 | clock | P2 | tick-quantised | -47's check fails, or it is reported as not failing (D4) | TE-6; D12 |
+| p12 | -20 | U4F-Q10's option, P3 | redundancy-1 | -20's check fails, PM-0001-2 passing | TE-6; D12 |
+| p13 | lag-switch | A, P1 | no-catchup-cap | the lag-switch checks still pass (expected: TE-7), `tick.v.lagswitch_cmds_count`'s max | TE-7, SA-7; D13 |
+| p14 | forged | as p1 | | p1 again at seed 1: fate-log and per-tick hashes equal to p1's | TE-24; D11 |
+| p15-p18 | forged, clamp, fast-clock, lag-switch | B | | as p1-p4 | only by U4F-Q11 (iv) |
+
+Each run also reports carry 74's late share in both readings (option B: the room's `late` count against the commands
+sent, as carry 74 words it; option A: the commands that arrived after their stamped tick ran, 1 - `tick.s.cmd_on_time`'s
+share, SERIES.md:61) (TE-4; D15); carry 77 (c)'s `stale()` sum; the per-session refusal counters (2.5); each cheat's
+`input_limited` (0 expected). A suite that fails, a late share above 1 %, or a bitten run whose check does not fail
+(README :320-321) comes to the advisor before its set (carry 86). One no-* bite of the forged suite's 11 runs short
+(p7); the other 10 rest on their unit proofs until the judged set.
+
+### 5.4 Each judge call (JDG-ONLY-1's interim rule)
+
+The rule, word for word: @@WORDS-N/advisor-u4r-c62h-full.md:20-20@@ (the sentence from "Until the fix lands" to its
+end; the card's JDG-ONLY-1 block, :1467-1474 at 11fd190). So: `npt-judge --only PM-0001-2,PM-0001-20` and `--only
+PM-0001-2,PM-0001-21` (both carry `pre:PM-0001-2`); `--only PM-0001-22` and `--only PM-0001-47` (neither does). Each
+-20 and -21 bite run's header lists PM-0001-2 and its own mark (c-u4r-runs.mjs:328's rule; c62h :44-46); a -22 or -47
+bite run lists its own mark; 5.3's bitten runs are judged the same way. The judge's memory by c-u4r-runs.mjs:176's fit
+(302.2 + 2.3403 x MiB of logs) against the 10,240 MiB line (:178): -21's 49 runs at about 2,617.0 MiB (2,744 MB) give
+about 6,427 MiB (estimate), under the line; a set projected over it is judged in two calls, measured and bites
+(U4r-F2's split, :163-166).
+
+### 5.5 Time and disk per set (each an estimate, in MiB; the run that measures it named)
+
+| Set | Runs | Disk (MiB, estimate) | Wall time (estimate) | Measured by |
+|---|---|---|---|---|
+| -20 | 7 | 373.9 (7 x 53.4: 56 MB a run, c-u4r-runs.mjs:153; -20's per-command series may add) | about 39 min (18,335 ticks at P3's 54.7 ticks/s: about 335 s a run) | the first -20 run |
+| -21 | 49 | 2,617.0 (49 x 53.4) | 3.6 to 4.8 h (263 s a run at P0's 69.6 ticks/s, up to 355.4 s, the longest judged run) | the first run of each suite, and 5.3 |
+| -22 | 4 | 320.4 (3 x 53.4, plus the S30 bite, three 10-minute runs' worth, 160.2) | about 34 min (the S30 bite about 1,015 s) | the bite run |
+| -47 | 5 | no figure (1,000 connects in about 21 rounds of about 2.5 s: under 1 min of simulated time a run) | no figure | f29's short run; p10, p11 |
+| pre-runs (5.3) | 14 (18 by U4F-Q11 (iv)) | about 190 (14) or 250 (18): r2's 13 suites took about 138.3 (145 MB: c-u4r-r2.mjs:40-43), about 10.6 a run; the two 70 s fast-clock runs about 2.7 times that | about 1 to 1.5 h | the runs themselves |
+| the cap measurement (2.8) | 9 | about 95 (9 x 10.6) | under 1 h | the runs themselves |
+| **Total** | **65 + 14 + 9 (+ 4)** | **about 3,596 (3,656 with U4F-Q11 (iv))** | **about 6 to 8 h** | |
+
+No figure exists for -47's connects, -21's suites with twins and bites, option A or a never-acker run (the scout's
+Disk entry). At 11fd190's reading, 7,689 MiB free less the 4,096 MiB floor leaves 3,593 MiB: the estimate lands at or
+just over it before builds, -47's runs and -20's extra series, so there is **no margin** (TE-16; NA-5 as corrected).
+The sets can be counted on to run only if they measure smaller, or KEPT-LOGS' kit route (Mustafa's KL-YES, open; his
+KEPT-LOGS (c) rule, history :2088-2111) or an approved clean frees room first. U4F-Q2 asks the run budget; KL-YES stays
+his. D2 re-reads the free space at `<base>`.
+
+### 5.6 marks.json and the judge
+
+U4f changes neither marks.json nor crates/judge by this brief: its runs fit marks.json's parts as they stand, and the
+figure -21 needs, `twin_hash_mismatch_count`, exists (marks.json:4944-4953). U4F-Q15 (b) would change marks.json (the
+lag switch's part and notes). If a ruling or the build needs such a change (a bite entry, a note, a value), the build
+stops and reports; the change then owes a reviewer's read before U4f closes, named in the report's own line (Mustafa's
+rule, history :2127; c62h-review :84, :89), and the test at close is
+`git diff --stat <base>..<head> -- spikes/netcode-proof/marks/marks.json spikes/netcode-proof/crates/judge`
+(c62h-review :84). A read of a SERIES.md change (U4F-Q1's new rows) is the advisor's recommendation, not his rule
+(c62h-review :93).
+
+---
+
+(Sections 6-12 and the findings: being rewritten for rev 2; until this line is gone, take them from rev 1 at 828e2f4.)
