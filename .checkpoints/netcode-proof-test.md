@@ -38,7 +38,12 @@ it asks nothing; REFS-KIT stays.
   run id (`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-step1-wf_8790c02a-955.js", resumeFromRunId: "wf_8790c02a-955"})`),
   after reading the notes' "## State". **Then:** the main session commits step 1 in the worktree (message from brief
   section 1), checks the diff hash against step1-check.log's header and SIZE-CHECK, then step 2's launch. Saver
-  b1gec2y1v (from 09:18 UTC, to about 11:08).
+  b1gec2y1v (from 09:18 UTC, to about 11:08). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
+  c62h_bound_rejudge_compare.py (section 7; --self-test 4 of 4 as required, .gate/u4r/c62h-bound/rejudge-compare-dry.log;
+  the real self-test runs into rejudge-compare-negative.log before the comparison) and c62h_bound_set_check.py
+  (sections 8.3-8.4; on the old results/u4r/fc411116c1f1/P2: all 29 lines naming the new phrase or checks FAIL, the 12
+  others PASS, .gate/u4r-sets/set-check-dry.log; the real negative run and --self-test go into set-check-negative.log
+  after P2's set).
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".

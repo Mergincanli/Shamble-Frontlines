@@ -32,3 +32,9 @@
 - 10:2x Part 3 dry run on a scratch copy only (.gate/u4r/c62h-bound/dry-p3/, log insert-part3-dry.log; not the
   worktree): all three expected hashes reproduced (marks.json c1935a5b…, SERIES.md 6898e119…, README.md f3c3c804…;
   json.loads check equal; README refilled into 16 lines, the longest 120). The real part 3 runs before step 3's launch.
+
+## Launch 1 (step 1)
+- 10:29 Start. Read brief sections 0, 1, 3.1, 4, 10 (brief sha256 7936074c… checked; texts v3 3f21c9b7… checked);
+  runner u4r-run.sh e9437ae2… checked. Worktree at 044fab1, only ` M marks/SERIES.md` (89295b57…, +2 -1). Plan: items
+  1-11 of 3.1 in order (l1 read + test; lab join + tests; call; totals; plant; record; tally; summary phrase; short P2
+  tests; module texts); then plants CB-P1..P7, P12, P13; stage; check.mjs whole; SIZE-CHECK.
