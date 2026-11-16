@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-16 11:40 Amsterdam (10:40 UTC)
+- **Last update:** 2026-11-16 12:37 Amsterdam (11:37 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -182,6 +182,15 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
 20. Waiting for his screenshots (his message of 2026-11-16: "they follow in my next message"): `preview`, `production`,
    Actions → General and the token's end date, plus (F-F) the empty "Repository secrets" list, asked for in the
    message sent after this update. The checks: Next steps 1.
+   - His screenshot (user message 2026-11-16 11:34:31 UTC, d92b5874-6e77-4c4c-b2c5-e720aa9b2222), transcribed: the
+     test repository's Settings, "Actions secrets and variables", Secrets tab. "Environment secrets": CANARY
+     (production), CLOUDFLARE_ACCOUNT_ID (preview), CLOUDFLARE_API_TOKEN (preview), each "14 hours ago". "Repository
+     secrets": "This repository has no secrets." So F-F (the advisor agent's condition 1) is met: the repository
+     secrets list is empty, and the three names sit in the right environments. The screenshot stays out of the
+     repository (a binary); its text is here.
+   - Still due from him: the `preview` and `production` environment pages, Actions → General (plan A2: the pinning
+     tick, approval for all external contributors, the read-only workflow permissions with "Allow GitHub Actions to
+     create and approve pull requests" unticked), and the token's end date (plan A5: 10 days from the start).
 
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
