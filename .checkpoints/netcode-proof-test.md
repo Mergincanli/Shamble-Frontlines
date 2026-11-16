@@ -117,8 +117,14 @@ it asks nothing; REFS-KIT stays.
   when merge-2's test step began; the failure is kept in merge.log:51-52, c62h-bound-build.md:428-435 and the
   merge-stop ruling (U3C-HELD-1 corrected). **H4 (ADV-CBH-4):** the report says npt-lab links npt-net through
   npt-server and npt-bots, whose sources never name DelayStream or l2::delay (not "not at all"). H5-H6: report items.
-  **Next (H1): the P0 re-judge** (section 7): the compare script's --self-test (rejudge-compare-negative.log); one
-  main-run.sh call (p0-rejudge.log); the comparison; SAME ANSWERS, or a stop to Mustafa whole. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
+  **The P0 re-judge (H1, section 7), started 17:07 UTC:** the compare script's --self-test first: **SELF-TEST PASS, 4
+  of 4** (.gate/u4r/c62h-bound/rejudge-compare-negative.log); the kept set u4r-P0-93509dfd7fd1 on disk (measured/
+  1,547 MiB, bites/ 1,846 MiB); the earlier verdicts e926b812… / b472784f… byte-equal to the raw folder's copies.
+  **RUNNING: one main-run.sh call** (p0-rejudge.log; task b5vp9pzjw): the judge's release build, its sha256 and
+  marks.json's, then the two judge calls under peak.py, measured/ then bites/, --only PM-0001-2,PM-0001-17,PM-0001-57,
+  into results/c62h-bound/p0-rejudge-93509dfd7fd1/a87c7ec39b96/ (HEAD a87c7ec, spike tree = ddd38ba's). **Then:** the
+  comparison (SAME ANSWERS, or every difference to Mustafa whole), rejudge.txt (Write tool), the redact step, the
+  commit of the folder; then the pre-flight (the advisor's commands, word for word). **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver:** b1gec2y1v ended on its time limit at 11:08:33 UTC ("watch stopped: time is up", exit 0; not a
   cut); restarted at 11:22 UTC as **bp40lga8l** (to about 13:12). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
