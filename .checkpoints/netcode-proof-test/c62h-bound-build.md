@@ -306,3 +306,32 @@
   room 6, lost-group room 7, fixtures.rs 21, marks.json 26, SERIES.md 6, marks README 27); B-2's four files 40 (the
   brief's "about 40"); lane vs 044fab1 920 (+879 -41), under the 1,050 stop. Item 4, check.mjs whole started 12:29:32
   (step3-check.log, -x).
+- 12:42 Item 4, check.mjs whole on the staged bytes (.gate/u4r/c62h-bound/step3-check.log): exit 0, "check: all 11
+  steps pass" (fmt first: PASS, no diff); test step "measured build: 552 tests passed, 0 failed, 0 reported a skip;
+  bites build: 632 tests passed, 0 failed, 0 reported a skip" (+1 / +1 from 551 / 631, as expected); marks "81 marks
+  read and checked"; refs 1291 tracked files and redact 297 items (each +1: the new lost-group room log). Header:
+  diff a1238e901f4a5885…, untracked e3b0c44298fc1c14… (none). After the run: nothing unstaged, no untracked file, the
+  staged hash and the three marks hashes unchanged.
+- Item 5, the new test by name from the test runner's own output (step3-judge-after.log :102 measured, :228
+  `--all-features`; check.mjs prints no per-test lines): pm_0001_17_hashed_and_incomplete_fails_with_its_coverage_gap_
+  beside, in both builds.
+
+## State (launch 3, step 3, 12:43 UTC: a clean point; nothing in flight, no plant in place)
+- Staged in the worktree (branch c62h-bound-build at b423a7d, nothing committed): marks/marks.json (+26 -0,
+  c1935a5b…), marks/SERIES.md (+4 -2, 6898e119…), marks/README.md (+16 -11, f3c3c804…) as part 3 left them; B-2's
+  crates/judge/fixtures/pm-0001-17/base/p2-room.jsonl (+3 -3), .../lost-group/p2-room.jsonl (new, +7),
+  crates/judge/tests/fixtures.rs (+16 -5), crates/judge/fixtures/README.md (+3 -3). Step 99 (B-2's four 40); lane 920
+  of 1,050.
+- Check: step3-check.log, exit 0, all 11 PASS, diff hash
+  a1238e901f4a5885ed12391c3988b535171021a5e8d57aab295ce8191c0e215c, untracked hash
+  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.
+- Counts: 552 measured / 632 bites (+1 / +1); the new test pm_0001_17_hashed_and_incomplete_fails_with_its_coverage_
+  gap_beside in both builds.
+- Answers: before the edits only pm_0001_17_equal_hashes_pass_and_the_lost_group_is_not_compared failed (base INVALID,
+  gap 1), in both builds; after them base and lost-group read as before this lane, hashed-and-incomplete FAIL (A 1, the
+  coverage gap beside), none-compared FAIL (A 6). No other answer moved. Scratch inputs and verdicts:
+  .gate/u4r/c62h-bound/b2-before/, b2-after/ (outside the worktree).
+- Stop rules: none met.
+- Next (the main session): commit 3 in the worktree (message from brief section 1); `git diff HEAD^ HEAD -- . |
+  sha256sum` from spikes/netcode-proof = a1238e90…; the committed SIZE-CHECK = 920; the built check again; then step
+  4's launch.
