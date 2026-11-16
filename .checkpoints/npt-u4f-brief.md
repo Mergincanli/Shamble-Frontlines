@@ -6,7 +6,7 @@
   (after `git fetch origin claude/netcode-proof-test-plan-hcky5g`)
 - **Branch:** cs/npt-u4f-brief · **Base:** origin/main 53272a1
 - **Spike worktree (read only):** `.gate/npt-spike-1116` at 11fd190e9536702f0dcfc72d584b637ebc6184be
-- **Last update:** 2026-11-16 01:04 Amsterdam
+- **Last update:** 2026-11-16 01:09 Amsterdam
 
 ## Steps done
 1. Start checks (role night-shift, window 00:11, no other run tonight), status comment 6902964789 posted; spike
@@ -16,12 +16,15 @@
    828e2f4 (the saver's autosave holds the finished draft and notes) · 11 findings (1 High, 7 Medium, 3 Low),
    12 U4F-Q, 10 D
 
+3. test-engineer (`test-engineer-u4f-check.md`, 293 lines, DONE) and security-auditor
+   (`security-auditor-u4f-check.md`, 339 lines, DONE) checked rev 1 in parallel, xhigh · f394af0 (test-engineer's)
+   and the save after this line (security-auditor's) · TE: 1 High, 14 Medium, 9 Low; SA: 3 High, 8 Medium, 6 Low
+
 ## Current step
-3. test-engineer and security-auditor check rev 1 in parallel, xhigh.
+4. netcode-architect revises once for both checks (rev 2 at the same path; notes `netcode-architect-u4f-rev2.md`,
+   a new part file, since `netcode-architect-u4f.md` ends DONE for the drafting part), xhigh, launched 01:09.
 
 ## Next steps
-3. test-engineer (`test-engineer-u4f-check.md`) and security-auditor (`security-auditor-u4f-check.md`) check rev 1 in
-   parallel, xhigh (plan item 7, Agents 2).
 4. netcode-architect revises once for both checks: rev 2 with a change list at its top (plan item 7, Agents 3).
 5. Commit and push everything; night report paragraph (branch, files, the checks' top findings); tick item 7.
 
@@ -47,6 +50,16 @@
   REDUNDANCY_CAP (spike client/src/lib.rs:442-443); today the sequence check runs first and returns `Repeat` for those
   copies (room/src/input.rs:81-84), before the late rule (:107-113). Under the draft's order an honest copy of a
   command already run has a tick at or before the last run, so kind 2 would refuse and count it as forged.
+- security-auditor's check (`security-auditor-u4f-check.md`, 339 lines, DONE): 3 High, 8 Medium, 6 Low. SA-1 High:
+  under option A the guard as worded lets a first Input carry ticks spread over more than 2^31, and the room's
+  wrap-aware sort (room.rs:363-369) then has no total order (Rust's sort may panic: the room stops for all clients;
+  refines carry 80 (a)). SA-2 High = TE-1. SA-3 High: a refused command still moves the sequence reference
+  (input.rs:89), the snapshot acknowledges it (room.rs:1322), the client never resends it, so the catch-up kind's
+  twin fails on a correct build. Confirmed NA-2, -6, -7 (corrected), -8, -9, -12; none refuted · open (for rev 2)
+- SC-3 (the session's spot-check of SA-1 and SA-3, by reading): both hold as argued. SA-1: for ticks a = T-2^31+1,
+  b = T-2^30, c = T+1 the comparator at room.rs:367 gives a<b, b<c and c<a. SA-3: input.rs:89 runs before the
+  PressRefused, Late and Full returns (:98-115), and room.rs:1322 sends `newest_received`. Whether Rust's sort panics
+  was not read (no web): it rests on carry 80 (a)'s own words.
 
 ## Key numbers
 - rev 1: 837 lines; 9 field tables; tests ≥ +60 measured / ≥ +74 bites build; 44 negative cases; 17 bites; 65 judged
@@ -66,8 +79,9 @@
   `/tmp/claude-0/-home-user-Shamble-Frontlines/2cc6b1c7-405a-556f-81c6-a85b5a29465f/tasks/bmv14vtwd.output` · started
   00:39 · stops by 01:04 · last check 00:39: restarted
 - test-engineer (check, `test-engineer-u4f-check.md`) and security-auditor (check, `security-auditor-u4f-check.md`),
-  both xhigh, launched 00:50 Amsterdam in parallel. test-engineer done 01:06 (16 min, 60 tool uses);
-  security-auditor running
+  both xhigh, launched 00:50 Amsterdam in parallel. test-engineer done 01:05 (16 min, 60 tool uses);
+  security-auditor done 01:08 (19 min, 76 tool uses)
+- netcode-architect (rev 2), xhigh, launched 01:09, running; notes `netcode-architect-u4f-rev2.md`
 - saver stint 2 bmv14vtwd 00:39-01:04: ok (saved 828e2f4, 8e619ce, 8fb15f9; time is up). Stint 3: background task
   bbeygeuzo · output `/tmp/claude-0/-home-user-Shamble-Frontlines/2cc6b1c7-405a-556f-81c6-a85b5a29465f/tasks/bbeygeuzo.output`
   · started 01:04 · stops by 01:29 · last check 01:04: restarted
