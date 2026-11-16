@@ -41,12 +41,21 @@ it asks nothing; REFS-KIT stays.
   deviation). **Step 2 DONE** (launch 2, wf_4f7f49a2-b56, 11:02-11:53 UTC; c62h-bound-step2-full.json, read in full):
   **commit 2 = b423a7d9231f68c87a1af9004dc1f2c218b43948**; check.mjs 11/11 (551 / 631 = +6 / +6); 8 plants bitten; no
   existing judge answer moved; diff hash equal (f88bf7d5…); SIZE-CHECK **821** (step 322). **Part 3 inserted (12:19
-  UTC)**: the three expected hashes; **the built check 25 PASS, 0 FAIL**. **RUNNING from 12:20 UTC: step 3's launch**
-  (workflow wf_009969c7-069, task wj7lg76ur; B-2's four fixture files, judge tests before and after, check.mjs,
-  expected 552 / 632). **If cut:** resume by run id
-  (`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-step3-wf_009969c7-069.js", resumeFromRunId: "wf_009969c7-069"})`),
-  after reading the notes' "## State" and the worktree's diff (the three marks files must still hash c1935a5b… /
-  6898e119… / f3c3c804…). **Then:** commit 3, the built check on it, step 4's launch. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
+  UTC)**: the three expected hashes; **the built check 25 PASS, 0 FAIL**. **Step 3 DONE** (launch 3, wf_009969c7-069,
+  12:20-12:43 UTC; c62h-bound-step3-full.json, read in full): **commit 3 = b01d3ac0c42701002a2239ad0a89a841f56464a1**
+  (made 14:23, after the worker restart: the cuts block); check.mjs 11/11 (552 / 632 = +1 / +1); the diff hash equals
+  step3-check.log's (a1238e90…); **the built check on b01d3ac: 25 PASS, 0 FAIL**; SIZE-CHECK **920** (step 99, B-2's
+  four files 40); patch c62h-bound-commit3.patch (249 lines, 97f8496e…). B-2's answers as ruled: hashed-and-incomplete
+  INVALID → FAIL (A 1, its coverage gap kept); base and lost-group unchanged; none-compared FAIL, now A 6; no other
+  answer moved. **For the review round (test-engineer):** before B-2's edits only base's test failed (lost-group and
+  hashed-and-incomplete read INVALID by gap 1, not the brief's "FAIL (A 1)", which is their reading once base's room
+  log carries the series; shown after the edits: step3-readings-*.log); one doc-comment line in fixtures.rs:390-391
+  beyond the brief's list. **RUNNING from 14:26 UTC: step 4's launch** (workflow wf_dc2b1bf5-0d4, task wjnfscivf;
+  section 3.4: bitesOf, SPLIT_LINE, the header comment, the recorded dry print .gate/u4r/c62h-bound/harness/, plant
+  CB-P11; expected 552 / 632). **If cut:** resume by run id
+  (`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-step4-wf_dc2b1bf5-0d4.js", resumeFromRunId: "wf_dc2b1bf5-0d4"})`),
+  after reading the notes' "## State" and the worktree's diff. **Then:** commit 4, its patch; the review round
+  (test-engineer, netcode-architect, rust-reviewer, xhigh: brief section 5) on LANE_BASE..commit 4. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver:** b1gec2y1v ended on its time limit at 11:08:33 UTC ("watch stopped: time is up", exit 0; not a
   cut); restarted at 11:22 UTC as **bp40lga8l** (to about 13:12). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
@@ -3062,6 +3071,12 @@ re-run the same call if no failure was caught. Then the cause → te-m3-plan.md 
 
 **Cuts by the spend limit** (SPEND-LIMIT (a), Mustafa 2026-11-12: at every cut, the notice's exact text, the time of
 the cut and the time of the resume; UTC, read from the session's transcript):
+- **2026-11-16 12:44-14:22 UTC, a worker restart (not the spend limit; no spend-limit notice):** my Bash call to
+  commit step 3 was sent at 12:44:13 (the transcript) and nothing ran until the notice at 14:22:42: "This session's
+  worker process was restarted. If your previous turn was already complete, take no action and wait for the next
+  event. Otherwise, continue from where you left off." The queued call then ran at 14:23 (commit 3 b01d3ac, its
+  built check, its patch). Nothing lost: no agent was running (launch 3 had ended at 12:43); the saver bp40lga8l had
+  ended on its time limit at 13:12:34 ("watch stopped: time is up"), restarted at 14:24 as bnqufp0e8.
 - 2026-11-12 02:02: "You've hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit
   resets 2:10am (UTC)". Cut: U4e's first build run (wf_0fa6595a-3e2, after 49 s, no code). Resumed 03:52, when the
   saver's end woke the session; the build relaunched at 03:53 (wf_1e3b5232-26a).
