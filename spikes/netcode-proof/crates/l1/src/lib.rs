@@ -326,6 +326,18 @@ pub struct FateLog {
     entries: Vec<Fate>,
 }
 
+/// A span of the fate log's server-to-client datagrams, by the fate decided at each one's send
+/// ([`FateLog::server_datagrams_since`]; C62H-BOUND's link record).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct DatagramCounts {
+    /// Every server-to-client datagram entry in the span.
+    pub sent: u32,
+    /// Of them, each lost by its loss draw (`Outcome::Lost`).
+    pub lost: u32,
+    /// Of them, each lost in a burst (`Outcome::Burst`); never also counted in `lost`.
+    pub burst: u32,
+}
+
 /// The canonical form's first bytes: the format and its version (v2 since U4c).
 const CANONICAL_TAG: &[u8] = b"npt-l1 fate log v2\n";
 
@@ -395,6 +407,27 @@ impl FateLog {
             };
             f(&b[..n]);
         }
+    }
+
+    /// The server-to-client datagrams among the entries from index `from` to the end (none when `from` is past the
+    /// end): `sent` each, `lost` each lost by its loss draw, `burst` each lost in a burst, as decided at its send.
+    /// Stream pieces, acknowledgements and client-to-server datagrams are not counted; nor is a datagram sent on a link
+    /// that is not up, or one too large, since neither pushes an entry. Read only: it draws nothing and changes no
+    /// entry, so the canonical form is the same before and after.
+    pub fn server_datagrams_since(&self, from: usize) -> DatagramCounts {
+        let mut c = DatagramCounts::default();
+        for e in self.entries.get(from..).unwrap_or_default() {
+            if e.carries != Carries::Datagram || e.dir != Dir::Down {
+                continue;
+            }
+            c.sent += 1;
+            match e.outcome {
+                Outcome::Lost => c.lost += 1,
+                Outcome::Burst => c.burst += 1,
+                Outcome::Delivered { .. } => {}
+            }
+        }
+        c
     }
 
     /// Per direction (`[0]` up, client to server; `[1]` down): (datagrams delivered, of them reordered). A datagram is

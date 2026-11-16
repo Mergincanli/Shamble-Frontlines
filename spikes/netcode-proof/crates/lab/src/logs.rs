@@ -1,10 +1,10 @@
 //! The scenario's three logs (u4-build-plan.md §4.12 :410-415; marks/README.md §1 and §4; u4r-brief.md 2.1): on L1
 //! one npt-lab process writes one log per process value the checks select on, each with its own header: `room` (the
-//! room's per-tick World hash `h`, `hs.server_hash`, PM-0001-2's series, BRAWL-1's `in_building_slot_area`, the
-//! `admit` events, `burst_eviction`), `client` (every client's `hs.decoded_hash` and `tick.s.snap_incomplete`, one
-//! entry per slot) and `lab` (-57's errors, `burst_heal`, `counter_wrap`, the run's own records). Every tick and
-//! second record carries all its counters, 0 included (BRAWL-1's `in_building_slot_area`, a list, is written only on
-//! ticks with one: the advisor's plan review, condition 10); every log ends with its footer.
+//! room's per-tick World hash `h`, `hs.server_hash`, C62H-BOUND's `tick.s.snap_link_lost_count`, PM-0001-2's series,
+//! BRAWL-1's `in_building_slot_area`, the `admit` events, `burst_eviction`), `client` (every client's `hs.decoded_hash`
+//! and `tick.s.snap_incomplete`, one entry per slot) and `lab` (-57's errors, `burst_heal`, `counter_wrap`, the run's
+//! own records). Every tick and second record carries all its counters, 0 included (BRAWL-1's `in_building_slot_area`,
+//! a list, is written only on ticks with one: the advisor's plan review, condition 10); every log ends with its footer.
 //!
 //! **The client writer** (carry 62 (a) to (f); carry 73; README §1's `hs` rules): each client's hashes are filed under
 //! the tick it rebuilt (a 32-bit tick, unwrapped forward from the room's first tick, so a wrong rebuild past the 16-bit
@@ -159,6 +159,8 @@ pub(crate) struct Logs {
     errors: BTreeMap<(u64, u8), Errors>,
     /// Per slot, the ticks the room logged a hash for it, beyond the written mark (for the stop's decision).
     logged: BTreeMap<u64, Vec<bool>>,
+    /// Per room tick beyond the written mark, each slot's written `tick.s.snap_link_lost_count` (for the tally).
+    link_lost: BTreeMap<u64, Vec<u32>>,
     written: Option<u64>,
     track: RoomTrack,
     wraps: BTreeMap<&'static str, u64>,
@@ -176,6 +178,13 @@ pub(crate) struct Logs {
 #[derive(Clone, Debug, Default)]
 pub(crate) struct Counts {
     pub(crate) incomplete_measured: u64,
+    /// C62H-BOUND's tally of `incomplete_measured` (TE-CB-2; report only, never judged): each measured client-tick
+    /// filed lost goes to exactly one of these. E1: the room logged no server hash for that slot then (it sent it
+    /// nothing). E2: it did, and the written link record is 1 or more. N: it did, and the record is 0 (the judge's
+    /// `snap_lost_unexplained_count` counts these).
+    pub(crate) lost_room_sent_nothing: u64,
+    pub(crate) lost_link: u64,
+    pub(crate) lost_unexplained: u64,
     pub(crate) hashes: u64,
     pub(crate) sentinels: u64,
     pub(crate) lost_decided_at_stop: u64,
@@ -218,6 +227,7 @@ impl Logs {
             gone: vec![false; n],
             errors: BTreeMap::new(),
             logged: BTreeMap::new(),
+            link_lost: BTreeMap::new(),
             written: None,
             track: RoomTrack::default(),
             wraps: BTreeMap::new(),
@@ -417,7 +427,8 @@ impl Logs {
             .res
             .remove(&w)
             .unwrap_or_else(|| vec![Res::Open; self.n]);
-        self.logged.remove(&w);
+        let logged = self.logged.remove(&w);
+        let link_lost = self.link_lost.remove(&w);
         let mut errs = Errors::default();
         for (s, r) in list.iter().enumerate() {
             if let Res::Hash(h) = r
@@ -444,6 +455,18 @@ impl Logs {
             self.counts.sentinels += hashes.iter().flatten().filter(|h| **h == 0).count() as u64;
             if ph == Phase::Measured {
                 self.counts.incomplete_measured += incomplete.iter().sum::<i64>() as u64;
+                for (s, r) in list.iter().enumerate() {
+                    if *r != Res::Lost {
+                        continue;
+                    }
+                    let sent = logged.as_ref().is_some_and(|l| l.get(s) == Some(&true));
+                    let lost = link_lost.as_ref().and_then(|l| l.get(s).copied());
+                    match (sent, lost.unwrap_or(0)) {
+                        (false, _) => self.counts.lost_room_sent_nothing += 1,
+                        (true, 0) => self.counts.lost_unexplained += 1,
+                        (true, _) => self.counts.lost_link += 1,
+                    }
+                }
             }
             rec.set_hashes("decoded_hash", &hashes);
             rec.s.insert("snap_incomplete".to_owned(), incomplete);
@@ -491,7 +514,13 @@ impl Logs {
     /// The room ran tick `t` in phase `ph`: its record (the World hash, `hs.server_hash`, PM-0001-2's series, the
     /// sizes), from the room after the tick; `sets` is each slot's set as the mirror rebuilt it; `datagrams` each
     /// slot's snapshot datagrams' payload sizes; `inputs` the `Input` datagrams' sizes the clients sent since the last
-    /// tick. Returns the events the World stamped at the tick.
+    /// tick; `link_lost` each slot's link record (C62H-BOUND: of its snapshot datagrams, how many npt-l1 lost), written
+    /// as `tick.s.snap_link_lost_count` with one entry per slot, 0 where absent. Returns the events the World stamped
+    /// at the tick.
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "the tick's inputs, each from its own source"
+    )]
     pub(crate) fn room_tick(
         &mut self,
         room: &Room<Sim>,
@@ -500,6 +529,7 @@ impl Logs {
         sets: &[SetStats],
         datagrams: &[Vec<usize>],
         inputs: &[i64],
+        link_lost: &[u32],
     ) -> Result<u64, String> {
         let w = self.wide(t);
         self.phases.insert(w, ph);
@@ -609,6 +639,14 @@ impl Logs {
                 .collect(),
         );
         rec.s.insert("input_payload_bytes".into(), inputs.to_vec());
+        let link: Vec<u32> = (0..n)
+            .map(|s| link_lost.get(s).copied().unwrap_or(0))
+            .collect();
+        rec.s.insert(
+            "snap_link_lost_count".into(),
+            link.iter().map(|&x| i64::from(x)).collect(),
+        );
+        self.link_lost.insert(w, link);
         if ph == Phase::Measured {
             for s in sets.iter().take(n) {
                 self.counts.sets_measured += 1;
@@ -907,6 +945,7 @@ mod tests {
             &[],
             &[],
             &[],
+            &[],
         )
         .expect("the warm-up tick");
         assert_eq!(logs.counts.in_building_measured, 0, "warm-up: not counted");
@@ -916,6 +955,7 @@ mod tests {
             &server.room,
             server.room.last_tick(),
             Phase::Measured,
+            &[],
             &[],
             &[],
             &[],

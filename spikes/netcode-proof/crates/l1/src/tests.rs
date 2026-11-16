@@ -371,6 +371,104 @@ fn reorder_counts_follow_rfc_4737_and_count_only_datagrams() {
     assert_eq!(log.reorder_counts(), [(6, 2), (0, 0)]);
 }
 
+/// The independent count for `server_datagrams_since`: over the canonical form's entries from index `from` (the first
+/// call is the tag), those with direction 1 (byte 4) and flow code 0 (byte 5), by kind (byte 6: 1 lost, 2 burst).
+fn down_datagrams_in_canonical(net: &L1Net, from: usize) -> DatagramCounts {
+    let mut c = DatagramCounts::default();
+    let mut i = 0usize;
+    net.with_fate_log(|l| {
+        l.for_each_canonical(|b| {
+            if i > from && b[4] == 1 && b[5] == 0 {
+                c.sent += 1;
+                c.lost += u32::from(b[6] == 1);
+                c.burst += u32::from(b[6] == 2);
+            }
+            i += 1;
+        });
+    });
+    c
+}
+
+/// C62H-BOUND (c62h-bound-brief.md 3.1 item 2; TE-CBB-7 (a)): one link on B1 (its 2 % loss draw and a 1 s burst at
+/// 2 s) and a planted loss of down datagram 45 (1.5 s). 1 s of datagrams both ways before the window; in the window
+/// (1 s to 4 s), down datagrams delivered, lost and lost in the burst, up datagrams, stream pieces both ways and their
+/// acknowledgements. `server_datagrams_since` gives the independent count of the down datagrams alone; a window with
+/// no down datagram, and one past the log's end, give 0.
+#[test]
+fn c62hb_server_datagrams_since_counts_down_datagrams_by_fate() {
+    let net = L1Net::new(1);
+    net.force(
+        0,
+        Forced::Datagram {
+            dir: Dir::Down,
+            seq: 45,
+        },
+    );
+    let mut rig = Rig::new(net, &[Profile::b1(&[2 * SEC])]);
+    for k in 0..30 {
+        let t = MS + k * TICK;
+        rig.poll(t);
+        rig.tick(0, t);
+    }
+    let from = rig.net.with_fate_log(FateLog::len);
+    for k in 30..120 {
+        let t = MS + k * TICK;
+        rig.poll(t);
+        rig.tick(0, t);
+        if k % 10 == 0 {
+            rig.send_on(0, CLIENT, Channel::Control, &[3; 50], t);
+            rig.send_on(0, SERVER, Channel::FullState, &[4; 2_500], t);
+        }
+    }
+    rig.poll(5 * SEC);
+    let want = down_datagrams_in_canonical(&rig.net, from);
+    let canonical = |net: &L1Net| {
+        let mut v = Vec::new();
+        net.with_fate_log(|l| l.for_each_canonical(|b| v.extend_from_slice(b)));
+        v
+    };
+    let before = canonical(&rig.net);
+    let got = rig.net.with_fate_log(|l| l.server_datagrams_since(from));
+    // A statement, not a test: `&self` cannot change the log.
+    assert_eq!(before, canonical(&rig.net), "read only");
+    println!("c62hb l1: from index {from}: independent count {want:?}, the read {got:?}");
+    assert!(
+        want.sent == 90 && want.lost > 0 && want.burst > 0,
+        "the window's 90 down datagrams, some lost and some lost in the burst: {want:?}"
+    );
+    assert_eq!(
+        got, want,
+        "the down datagrams from index {from} only, by fate"
+    );
+    // A window with no down datagram: up datagrams and a control message, and the down acknowledgements they draw.
+    let quiet = rig.net.with_fate_log(FateLog::len);
+    for k in 150..180 {
+        let t = MS + k * TICK;
+        rig.poll(t);
+        rig.send(0, CLIENT, &[1; 100], t);
+        if k == 150 {
+            rig.send_on(0, CLIENT, Channel::Control, &[5; 50], t);
+        }
+    }
+    rig.poll(8 * SEC);
+    let len = rig.net.with_fate_log(FateLog::len);
+    assert!(len > quiet, "the quiet window holds entries");
+    assert_eq!(
+        down_datagrams_in_canonical(&rig.net, quiet),
+        DatagramCounts::default()
+    );
+    assert_eq!(
+        rig.net.with_fate_log(|l| l.server_datagrams_since(quiet)),
+        DatagramCounts::default(),
+        "no down datagram from index {quiet}"
+    );
+    assert_eq!(
+        rig.net.with_fate_log(|l| l.server_datagrams_since(len + 1)),
+        DatagramCounts::default(),
+        "past the end"
+    );
+}
+
 /// L-c1 (C1' (b), (f)): P2's delays with no loss but the planted ones, 30 Hz datagrams both ways, and from 3 s a control
 /// message every half second right after the client's datagram, its first packet lost. Each is declared lost by the loss
 /// rules (a later packet's acknowledgement, the time threshold), never by the PTO, and resent then; the next datagram is

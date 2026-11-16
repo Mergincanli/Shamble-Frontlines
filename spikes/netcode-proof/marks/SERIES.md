@@ -367,12 +367,13 @@ are written once at the run's end, after the measured phase. No mark reads them 
 |---|---|---|---|---|
 | `tick.s.in_building_slot_area` | pairs (slot, area) | npt-lab (from npt-sim's Soldier records' `area`) | the room log, on every logged tick (any phase) where a soldier's feet are in a building area: each such soldier's slot, then its area (building i is area i + 1: the greybox's area rule, half-open on each footprint), in slot order; absent on a tick with none. The run's summary line prints the measured total as "in a building: N slot-ticks (slots ...)" | none (recorded) |
 
-## Series read only by figures (18)
+## Series read only by figures (19)
 
 | Name | Unit | Written by (crate) | Meaning | Figures |
 |---|---|---|---|---|
 | `tick.s.everyone_in_view` | flag | npt-room | one per client per snapshot: 1 when its set holds all 47 other soldiers (ES: and all 15 vehicles) | everyone_in_view_min_share |
 | `tick.s.relevant_count` | count | npt-room | one per client: entities in its relevant set this tick | sync_cost_ratio, sync_unit_cost, r2_down_formula_bits |
+| `tick.s.snap_link_lost_count` | count | npt-lab (from npt-l1's fate log; L1 only) | the room log, one per client slot on every room tick record (the run's `clients` entries, 0 included): of the snapshot datagrams (groups) the room sent that client at this tick, how many npt-l1's fate log records as lost by its loss draw or lost in a burst; read at the send, from the fate-log datagram entries that slot's send pushed, which must be exactly its groups (else the run fails) | snap_lost_unexplained_count, snap_whole_despite_link_loss_count |
 | `second.v.app_rtt_ns` | ns | web | browser: the app-level (ping) RTT, each second | rtt_agreement_p99_ns |
 | `second.v.one_shots_received_count` | count | npt-room | one-shot actions the room received this second | one_shot_dropped_count |
 | `second.v.quinn_rtt_ns` | ns | npt-server | room: quinn's rtt() for the session, each second | rtt_agreement_p99_ns |

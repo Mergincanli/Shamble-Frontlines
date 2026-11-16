@@ -25,6 +25,12 @@
 //! and frees the room's slot (`Room::leave`, as its doc has it: "a closed link"). **Reliable messages' channel:** each
 //! is decoded on both stream channels with the `Quant` it was coded with, and exactly one must take it (never a silent
 //! fall-back to Control). **Tokens** are seeded per slot and never logged.
+//!
+//! **The link record** (C62H-BOUND): at every room tick, around each slot's send, the lab reads npt-l1's fate log
+//! (`FateLog::server_datagrams_since` from the log's length before the send). The server-to-client datagram fates the
+//! send pushed must be exactly one per snapshot group the room coded that slot, and a slot with groups must have a
+//! session and a server hash (`link_lost`); otherwise the run fails. How many of them the link lost, by its loss draw
+//! or in a burst, is the room log's `tick.s.snap_link_lost_count` for that slot.
 
 use std::collections::BTreeMap;
 use std::io::Write;
@@ -32,7 +38,7 @@ use std::path::PathBuf;
 
 use npt_bots::Behaviour;
 use npt_client::ClientEndpoint;
-use npt_l1::{L1Net, Profile};
+use npt_l1::{DatagramCounts, L1Net, Profile};
 use npt_link::{Channel, Link, LinkState, Listener};
 use npt_log::{Ended, EventRecord, Phase};
 use npt_proto::{Direction, Join, Kick, Message, Quant};
@@ -189,6 +195,10 @@ pub(crate) struct Bites {
     pub(crate) whole_as_lost: bool,
     /// npt-lab's own: the -30 pre-check's late-command replay client (one leg's, one client's: precheck.rs).
     pub(crate) late_command: bool,
+    /// npt-lab's own: C62H-BOUND's link record, PM-0001-17/link-lost-overstated: on every slot, its first measured room
+    /// tick at which the room sent it a snapshot datagram and the link lost none written
+    /// `tick.s.snap_link_lost_count` 1 (the summary's totals keep the fate log's counts).
+    pub(crate) link_lost_overstated: bool,
     /// npt-lab's model bite, chosen by its unit tests only (r1): the clients connect in a hash map's order.
     #[cfg_attr(
         not(all(test, feature = "bites")),
@@ -198,10 +208,15 @@ pub(crate) struct Bites {
 }
 
 /// npt-lab's own bite ids (bites builds only): carry 62 (h)'s client writer (U4R-Q2 (c); its form and id the advisor's
-/// U4r build ruling, point 4: "a client writer that files a tick it decoded whole as lost: null and incomplete 1"), and
-/// the -30 pre-check's late-command replay client (u4r-brief.md 2.5, 7.2; marks.json:6567).
+/// U4r build ruling, point 4: "a client writer that files a tick it decoded whole as lost: null and incomplete 1"),
+/// the -30 pre-check's late-command replay client (u4r-brief.md 2.5, 7.2; marks.json:6567), and C62H-BOUND's link
+/// record that overstates the link's loss (appended: precheck.rs reads index 1).
 #[cfg(feature = "bites")]
-pub(crate) const LAB_BITES: [&str; 2] = ["PM-0001-17/whole-as-lost", "PM-0001-30/late-command"];
+pub(crate) const LAB_BITES: [&str; 3] = [
+    "PM-0001-17/whole-as-lost",
+    "PM-0001-30/late-command",
+    "PM-0001-17/link-lost-overstated",
+];
 /// npt-lab's model bite (r1's), chosen only by its unit tests (l1's `with_model_bite` form).
 #[cfg(all(test, feature = "bites"))]
 pub(crate) const CLIENT_ORDER_BITE: &str = "npt-lab/client-order";
@@ -233,6 +248,7 @@ impl Bites {
             .is_some(),
             whole_as_lost: LAB_BITES[0] == id,
             late_command: LAB_BITES[1] == id,
+            link_lost_overstated: LAB_BITES[2] == id,
             client_order: false,
         };
         let any = b.world
@@ -242,7 +258,8 @@ impl Bites {
             || b.schedule
             || b.pump
             || b.whole_as_lost
-            || b.late_command;
+            || b.late_command
+            || b.link_lost_overstated;
         if !any {
             return Err(format!(
                 "--bite {id:?}: no instance of this build plants it"
@@ -584,6 +601,35 @@ impl Server {
     }
 }
 
+/// C62H-BOUND's join (TE-CB-1, C7; the module text): one slot's send at one room tick against npt-l1's fate log.
+/// `groups` is how many snapshot datagrams the room coded that slot, `has_session` whether a session held the slot
+/// at the send, `server_hash` the room's hash for it at the tick, and `c` the server-to-client datagram fates the send
+/// pushed. The link's loss of them (lost by the draw or in a burst), or why the record cannot be joined: groups for a
+/// slot with no session, fates other than one per group (with no session, groups is 0 here: other than none), or
+/// groups with no server hash.
+pub(crate) fn link_lost(
+    groups: usize,
+    has_session: bool,
+    server_hash: Option<u64>,
+    c: DatagramCounts,
+) -> Result<u32, String> {
+    if !has_session && groups > 0 {
+        return Err(format!(
+            "{groups} snapshot groups for a slot with no session"
+        ));
+    }
+    if c.sent as usize != groups {
+        return Err(format!(
+            "{groups} snapshot groups, but the send pushed {} server-to-client datagram fates",
+            c.sent
+        ));
+    }
+    if groups > 0 && server_hash.is_none() {
+        return Err(format!("{groups} snapshot groups with no server hash"));
+    }
+    Ok(c.lost + c.burst)
+}
+
 /// What one instant's RQ8 steps 1 and 2 hand a loop, with step 3's due count (advisor-u4r-r1, EA-U4R-1, the narrow
 /// form): the admissions and the ended sessions since the last take, each for the caller's own sinks (the runner's
 /// `Logs::admit` and `Logs::gone`; the pre-check's maps and its outcome's `ended`), and the ticks due now.
@@ -751,6 +797,12 @@ pub(crate) struct Summary {
     pub(crate) stale: u64,
     pub(crate) overflow_resyncs: u64,
     pub(crate) heals: u64,
+    /// C62H-BOUND's measured totals, from npt-l1's fate-log counts at each send (never the written record): the
+    /// snapshot datagrams the room sent, those the link lost (by its loss draw or in a burst) and, of those, the ones
+    /// lost in a burst.
+    pub(crate) link_sent: u64,
+    pub(crate) link_lost: u64,
+    pub(crate) link_burst: u64,
     pub(crate) audit: crate::mirror::Audit,
     pub(crate) counts: crate::logs::Counts,
     pub(crate) recording: Option<(usize, String)>,
@@ -918,6 +970,9 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
     let last_measured = logs.wide(s.tick_start.wrapping_add((measured_end.max(1) - 1) as u32));
     let mut events_stamped: u64 = 0;
     let mut inputs: Vec<i64> = Vec::new();
+    // The link-lost-overstated bite: the slots whose record it has written (bites builds only).
+    #[cfg(feature = "bites")]
+    let mut overstated = vec![false; usize::from(n)];
     let mut view = Vec::new();
     let mut summary = Summary {
         order_digest: digest,
@@ -964,6 +1019,7 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
             let index = Records::new(&records);
             let mut sizes = vec![Vec::new(); usize::from(n)];
             let mut sets = vec![SetStats::default(); usize::from(n)];
+            let mut link = vec![0u32; usize::from(n)];
             for slot in 0..n {
                 let datagrams = server.room.take_datagrams(slot);
                 let control = server.room.take_control(slot);
@@ -986,7 +1042,35 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                 }
                 sizes[usize::from(slot)] = datagrams.iter().map(Vec::len).collect();
                 sets[usize::from(slot)] = mirror.latest(slot);
+                // C62H-BOUND's link record: the fate-log entries this send pushes, joined one to one to its groups.
+                let from = net.with_fate_log(|l| l.len());
+                let has_session = server.session(slot).is_some();
+                let hash = server.room.client(slot).and_then(|c| c.server_hash());
                 server.send(slot, &datagrams, &control, now).map_err(fail)?;
+                let c = net.with_fate_log(|l| l.server_datagrams_since(from));
+                let lost = link_lost(datagrams.len(), has_session, hash, c).map_err(|e| {
+                    fail(format!(
+                        "slot {slot}, tick {t}: {e} (C62H-BOUND's link record cannot be joined)"
+                    ))
+                })?;
+                if ph == Phase::Measured {
+                    summary.link_sent += u64::from(c.sent);
+                    summary.link_lost += u64::from(c.lost + c.burst);
+                    summary.link_burst += u64::from(c.burst);
+                }
+                #[cfg(feature = "bites")]
+                let lost = if s.bites.link_lost_overstated
+                    && ph == Phase::Measured
+                    && c.sent >= 1
+                    && c.lost + c.burst == 0
+                    && !overstated[usize::from(slot)]
+                {
+                    overstated[usize::from(slot)] = true;
+                    1
+                } else {
+                    lost
+                };
+                link[usize::from(slot)] = lost;
                 if let Some(c) = server.room.client(slot) {
                     for w in c.wraps() {
                         logs.wrapped(w, t, ph).map_err(fail)?;
@@ -1020,7 +1104,7 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
             }
             if s.logs {
                 events_stamped += logs
-                    .room_tick(&server.room, t, ph, &sets, &sizes, &inputs)
+                    .room_tick(&server.room, t, ph, &sets, &sizes, &inputs, &link)
                     .map_err(fail)?;
             }
             inputs.clear();
@@ -1621,8 +1705,10 @@ pub(crate) fn summary_line(s: &Settings, o: &Summary) -> String {
     format!(
         "{} {} {} seed {}: {} ticks ({} after{}); lead {}; commands {} (steps without one {}, duplicate stamps {}); \
          late {}; press refused {}; buffer full {}; rewinds refused {}; stale {}; overflow resyncs {}; heals {}; \
-         client hashes {} (sentinels {}); measured incomplete {}; decided lost at the stop {}; shots per measured \
-         second {}; carry 49: measured client sets {}, holding every very large unit {}, projectiles per set {}; \
+         client hashes {} (sentinels {}); measured incomplete {}; decided lost at the stop {}; measured snapshot \
+         datagrams {}, lost by the link {} (in bursts {}); measured client-ticks filed lost: the room sent nothing \
+         {}, the link lost a datagram {}, neither {}; shots per measured second {}; carry 49: measured client sets \
+         {}, holding every very large unit {}, projectiles per set {}; \
          audit {} owner, {} spatial checked against the radius, {} spatial not checked, {} breaches; fate log {}; \
          connect order digest {:016x}; in a building: {}",
         s.meta.run,
@@ -1651,6 +1737,12 @@ pub(crate) fn summary_line(s: &Settings, o: &Summary) -> String {
         logged(c.sentinels.to_string()),
         logged(c.incomplete_measured.to_string()),
         logged(c.lost_decided_at_stop.to_string()),
+        o.link_sent,
+        o.link_lost,
+        o.link_burst,
+        logged(c.lost_room_sent_nothing.to_string()),
+        logged(c.lost_link.to_string()),
+        logged(c.lost_unexplained.to_string()),
         logged(
             c.shots_measured
                 .checked_div(c.measured_seconds)
@@ -2691,5 +2783,208 @@ pub(crate) mod tests {
         let (sum, _) = incomplete_and_57(&dir);
         println!("p4 bite: measured incomplete {sum} of 16 clients");
         assert_eq!(sum, 16);
+    }
+
+    fn fates(sent: u32, lost: u32, burst: u32) -> DatagramCounts {
+        DatagramCounts { sent, lost, burst }
+    }
+
+    /// C62H-BOUND's join (c62h-bound-brief.md 3.1 item 3), each check alone: a send that pushed one fate more than its
+    /// groups.
+    #[test]
+    fn c62hb_join_one_datagram_too_many() {
+        assert_eq!(
+            link_lost(2, true, Some(7), fates(3, 0, 0)),
+            Err(
+                "2 snapshot groups, but the send pushed 3 server-to-client datagram fates"
+                    .to_owned()
+            )
+        );
+    }
+
+    #[test]
+    fn c62hb_join_one_datagram_too_few() {
+        assert_eq!(
+            link_lost(2, true, Some(7), fates(1, 0, 0)),
+            Err(
+                "2 snapshot groups, but the send pushed 1 server-to-client datagram fates"
+                    .to_owned()
+            )
+        );
+    }
+
+    #[test]
+    fn c62hb_join_groups_with_a_null_server_hash() {
+        assert_eq!(
+            link_lost(2, true, None, fates(2, 0, 0)),
+            Err("2 snapshot groups with no server hash".to_owned())
+        );
+    }
+
+    #[test]
+    fn c62hb_join_groups_with_no_session() {
+        assert_eq!(
+            link_lost(2, false, Some(7), fates(2, 0, 0)),
+            Err("2 snapshot groups for a slot with no session".to_owned())
+        );
+    }
+
+    #[test]
+    fn c62hb_join_ok_counts_lost_and_burst() {
+        assert_eq!(link_lost(3, true, Some(7), fates(3, 1, 1)), Ok(2));
+        // Nothing sent: a slot with no session, and a session the room sent no snapshot datagram (a full state, or
+        // nothing).
+        assert_eq!(link_lost(0, false, None, fates(0, 0, 0)), Ok(0));
+        assert_eq!(link_lost(0, true, None, fates(0, 0, 0)), Ok(0));
+    }
+
+    /// C62H-BOUND's short P2 run (3.1 item 10): R1_ARGS' form, 4 s measured, its header listing -17.
+    const P2_SHORT: &str = "--seed 1 --profile P2 --clients 16 --warmup-s 6 --measured-s 4 --after-max-s 10 \
+                            --marks PM-0001-17";
+
+    fn c62hb_p2_short(name: &str, bite: &str) -> (Scratch, Summary) {
+        let dir = scratch(name);
+        let s = settings(&dir, &format!("{P2_SHORT} {bite}"));
+        let o = run(&s).unwrap_or_else(|e| panic!("{name}: {e:?}"));
+        println!("{name}: {}", summary_line(&s, &o));
+        (dir, o)
+    }
+
+    /// The two C62H-BOUND figures as the two frozen SERIES.md rows word them, read the test's own way from a run's
+    /// client and room logs (npt-lab does not depend on the judge): (unexplained, whole despite the link's loss). Over
+    /// the client log's measured tick records, a (slot, tick) filed lost (`snap_incomplete` 1) whose room record gives
+    /// that slot a non-null `hs.server_hash` and `snap_link_lost_count` 0 is unexplained; one with a whole
+    /// `hs.decoded_hash` (not null, not the sentinel 0) whose room record gives it `snap_link_lost_count` 1 or more is
+    /// whole despite the link's loss. What the rows call a gap panics here.
+    fn c62hb_join(dir: &Path) -> (u64, u64) {
+        let room = read(dir, "room");
+        let client = read(dir, "client");
+        let n = client.header.clients as usize;
+        let at: BTreeMap<u64, &npt_log::TickRecord> = room.ticks.iter().map(|r| (r.t, r)).collect();
+        let (mut unexplained, mut whole) = (0, 0);
+        for c in client.ticks.iter().filter(|c| c.ph == Phase::Measured) {
+            let filed = c.s.get("snap_incomplete").expect("gap: no snap_incomplete");
+            assert_eq!(filed.len(), n, "client tick {}: snap_incomplete", c.t);
+            let r = at.get(&c.t).map(|r| {
+                let l =
+                    r.s.get("snap_link_lost_count")
+                        .expect("gap: no link record");
+                let h = r.hs.get("server_hash").expect("gap: no server hash");
+                assert!(l.len() == n && h.len() == n, "room tick {}: entries", c.t);
+                (l, h)
+            });
+            for (s, &f) in filed.iter().enumerate() {
+                assert!(f == 0 || f == 1, "client tick {}: snap_incomplete {f}", c.t);
+                if f == 1 {
+                    let (link, server) =
+                        r.unwrap_or_else(|| panic!("gap: tick {} has no room record", c.t));
+                    unexplained += u64::from(server[s].is_some() && link[s] == 0);
+                }
+                let hash =
+                    c.hs.get("decoded_hash")
+                        .and_then(|d| d.get(s))
+                        .cloned()
+                        .flatten();
+                if let (Some(h), Some((link, _))) = (hash, r)
+                    && u64::from_str_radix(&h, 16).expect("a hash") != 0
+                    && link[s] >= 1
+                {
+                    whole += 1;
+                }
+            }
+        }
+        (unexplained, whole)
+    }
+
+    /// C62H-BOUND's short P2 test (3.1 item 10): every room tick record holds the link record, its measured sum is above
+    /// 0, the test-side join gives 0 unexplained and 0 whole despite the link's loss, and the lab's own tally splits the
+    /// measured incomplete count into E1 + E2 + N with E2 above 0 and N the join's 0. An unexplained tick here is a stop
+    /// rule (the brief's section 10), never a test to adjust.
+    #[test]
+    fn c62hb_p2_short_every_measured_lost_tick_is_explained() {
+        let (dir, o) = c62hb_p2_short("c62hb-p2", "");
+        let room = read(&dir, "room");
+        let mut sum = 0i64;
+        for r in &room.ticks {
+            let l = r.s.get("snap_link_lost_count");
+            let l = l.unwrap_or_else(|| panic!("room tick {}: no snap_link_lost_count", r.t));
+            assert!(
+                l.len() == 16 && l.iter().all(|&x| x >= 0),
+                "room tick {}: {l:?}",
+                r.t
+            );
+            if r.ph == Phase::Measured {
+                sum += l.iter().sum::<i64>();
+            }
+        }
+        let (a, b) = c62hb_join(&dir);
+        let c = &o.counts;
+        println!(
+            "c62hb p2: {} room tick records; measured link-lost sum {sum}; the join: unexplained {a}, whole despite \
+             the link's loss {b}; E1 {}, E2 {}, N {} of measured incomplete {}",
+            room.ticks.len(),
+            c.lost_room_sent_nothing,
+            c.lost_link,
+            c.lost_unexplained,
+            c.incomplete_measured
+        );
+        assert!(sum > 0, "the measured link-lost sum is {sum}");
+        assert_eq!(
+            (a, b),
+            (0, 0),
+            "the join: (unexplained, whole despite the link's loss)"
+        );
+        assert_eq!(
+            c.lost_room_sent_nothing + c.lost_link + c.lost_unexplained,
+            c.incomplete_measured,
+            "E1 + E2 + N against the measured incomplete count"
+        );
+        assert!(c.lost_link > 0, "E2 is {}", c.lost_link);
+        assert_eq!(
+            c.lost_unexplained, a,
+            "N against the join's unexplained count"
+        );
+        assert_eq!(c.lost_unexplained, 0, "N");
+    }
+
+    /// C62H-BOUND's first bite on the short P2 run (bites builds only): whole-as-lost files each client's first whole
+    /// measured tick lost, which the room sent and the link lost none of: 16 unexplained, by the join and by the lab.
+    #[cfg(feature = "bites")]
+    #[test]
+    fn c62hb_p2_short_bite_whole_as_lost_gives_16_unexplained() {
+        let bite = "--role bite --bite PM-0001-17/whole-as-lost";
+        let (dir, o) = c62hb_p2_short("c62hb-p2-whole-as-lost", bite);
+        let (a, b) = c62hb_join(&dir);
+        println!(
+            "c62hb p2 whole-as-lost: the join {a} unexplained, {b} whole despite the link's loss; N {}",
+            o.counts.lost_unexplained
+        );
+        assert_eq!((a, b, o.counts.lost_unexplained), (16, 0, 16));
+    }
+
+    /// C62H-BOUND's second bite (bites builds only): link-lost-overstated writes each slot's first measured tick whose
+    /// datagrams all arrived as lost by the link: 16 whole despite the link's loss, none unexplained, and the summary's
+    /// link loss L, from the fate log's counts, equal to a clean run's with the same arguments.
+    #[cfg(feature = "bites")]
+    #[test]
+    fn c62hb_p2_short_bite_link_lost_overstated_gives_16_whole_despite_loss() {
+        let (_clean_dir, clean) = c62hb_p2_short("c62hb-p2-overstated-clean", "");
+        let bite = "--role bite --bite PM-0001-17/link-lost-overstated";
+        let (dir, o) = c62hb_p2_short("c62hb-p2-overstated", bite);
+        let (a, b) = c62hb_join(&dir);
+        println!(
+            "c62hb p2 link-lost-overstated: the join {a} unexplained, {b} whole despite the link's loss; N {}; L {} \
+             (the clean run's {})",
+            o.counts.lost_unexplained, o.link_lost, clean.link_lost
+        );
+        assert_eq!((a, b, o.counts.lost_unexplained), (0, 16, 0));
+        assert_eq!(
+            o.fate_log_sha256, clean.fate_log_sha256,
+            "the clean run's link fates"
+        );
+        assert_eq!(
+            o.link_lost, clean.link_lost,
+            "L from the counts, never the written record"
+        );
     }
 }
