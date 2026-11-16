@@ -6,7 +6,7 @@
   (after `git fetch origin claude/netcode-proof-test-plan-hcky5g`)
 - **Branch:** cs/npt-u4f-brief · **Base:** origin/main 53272a1
 - **Spike worktree (read only):** `.gate/npt-spike-1116` at 11fd190e9536702f0dcfc72d584b637ebc6184be
-- **Last update:** 2026-11-16 00:51 Amsterdam
+- **Last update:** 2026-11-16 01:04 Amsterdam
 
 ## Steps done
 1. Start checks (role night-shift, window 00:11, no other run tonight), status comment 6902964789 posted; spike
@@ -57,4 +57,8 @@
   `/tmp/claude-0/-home-user-Shamble-Frontlines/2cc6b1c7-405a-556f-81c6-a85b5a29465f/tasks/bmv14vtwd.output` · started
   00:39 · stops by 01:04 · last check 00:39: restarted
 - test-engineer (check, `test-engineer-u4f-check.md`) and security-auditor (check, `security-auditor-u4f-check.md`),
-  both xhigh, launched 00:50 Amsterdam in parallel, running (2 agents at a time)
+  both xhigh, launched 00:50 Amsterdam in parallel, running (2 agents at a time); at 01:04 both check files are being
+  written (blocks in progress)
+- saver stint 2 bmv14vtwd 00:39-01:04: ok (saved 828e2f4, 8e619ce, 8fb15f9; time is up). Stint 3: background task
+  bbeygeuzo · output `/tmp/claude-0/-home-user-Shamble-Frontlines/2cc6b1c7-405a-556f-81c6-a85b5a29465f/tasks/bbeygeuzo.output`
+  · started 01:04 · stops by 01:29 · last check 01:04: restarted
