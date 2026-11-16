@@ -369,3 +369,18 @@
   none of P0, P2, P3, B1 and equals LANE_BASE's with the one phrase changed; overflowFlag on fd4612050cd6's l1-p3-s1
   line with the new phrase (made-up S/L/B/E1/E2/N) gives the flag at 27 and "" at 0. Header: diff 7b775057… (the
   unstaged edit), untracked e3b0… (none).
+- 14:34 CB-P11 (bitesOf's `on`, link-lost-overstated `["P2"]` as `["P0", "P2"]`; sha256 before f2002890… recorded in
+  .gate/u4r/c62h-bound/step4-sha-before-plant.txt; run -x, plant-CB-P11.log): exit 1, "plan-dry: 22 asserts, 17
+  passed, 5 failed", the five all P0's: "FAIL P0's bites (bitesOf): 7 (want 6)", the run names (bite-link-lost-
+  overstated after bite-whole-as-lost), "P0 plans no link-lost-overstated: true", projection 3668 MiB (want 3615), the
+  bite call's judge 4844 MiB (want 4719); P2, P3, B1, SPLIT_LINE and overflowFlag passed. Restored by Edit; `sha256sum
+  -c` of the record OK (f2002890… equal); no plant in place.
+- 14:35 Staged (from a subshell in the worktree): spikes/netcode-proof/ops/runs/c-u4r-runs.mjs only; the file and its
+  staged blob both sha256 f2002890e297b2df02eea5d3524953f0170ff6de6d85fad6ad345773610644ee (the sets run on it);
+  `git diff --cached HEAD -- . | sha256sum` from spikes/netcode-proof = 7b775057e44df9d7… (= plan-dry.log's header).
+  Nothing unstaged, nothing untracked. check.mjs whole started (step4-check.log, -x, in the background).
+- 14:35 SIZE-CHECK on the staged work (results excluded): step vs HEAD 47 (c-u4r-runs.mjs +25 -22); lane vs 044fab1
+  967 (+904 -63: figures.rs 172, engine.rs 150, fixtures.rs 21, fixtures README 6, base room 6, lost-group room 7,
+  l1 lib.rs 33, l1 tests.rs 98, logs.rs 54, scenario.rs 311, marks README 27, SERIES.md 9, marks.json 26,
+  c-u4r-runs.mjs 47) = 920 + 47; under the 1,050 stop. Step 4 is 47 against the brief's "about 10-20": the two
+  bullets' refill at 120 is 33 of it (:29-:35 13, :36-:45 20); bitesOf 12, SPLIT_LINE 2.
