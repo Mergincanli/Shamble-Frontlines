@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-16 13:38 Amsterdam (12:38 UTC)
+- **Last update:** 2026-11-16 13:40 Amsterdam (12:40 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -216,6 +216,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    bypass unticked); `production` (Selected branches and tags: main; bypass unticked); Actions → General (pin to full
    SHA; approval for all external contributors); the end date after Day 2; **the "Repository secrets" list empty (F-F):
    no setup pull request opens until a screenshot shows it empty.** Any fault: his fix first.
+   F-F met (his screenshot of 11:34:31 UTC). **Two hard gates remain before the setup pull request (consultation 7):**
+   (a) a new screenshot of `preview` with "Allow administrators to bypass configured protection rules" unticked and
+   saved; (b) one screenshot of the token's edit or summary screen showing the permission (Account, Cloudflare Pages,
+   Edit, nothing else, his account only) and the end date 2026-11-25, with no token value on screen. If no screen shows
+   the date after saving, the record says so; nothing is assumed.
 2. Then: the results-log header (PM-0006-1) naming head 1619164; his first list (the setup pull request: approve its
    deploy, merge it, approve its cleanup; about 10 minutes), naming the open security findings (F-E): SA-R2, SA-R5 and
    SA-R6 deferred, SA-R3 accepted in his words; then open the setup pull request.
@@ -233,6 +238,10 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   until the browser run: a missing driver shows as "no reading", never as a pass.
 - F-D: the report quotes SA-R3's corrected words (the install step keeps the token out of the scripts' environment,
   not out of their reach), not plan.md:524 and :649 ("install scripts never see it").
+- Input for step 2.6's setup instructions: two setup steps that needed a change from a default were missed and caught
+  only by his screenshots (2026-11-16): `preview`'s administrator bypass left ticked (GitHub's default; plan A6 step
+  4), and the token's end date (plan A5 step 5; he asked where to set it, 12:34:49 UTC). Instructions for such steps
+  should end with a screenshot of the result.
 - The process account (his rule: only what a record shows, with its time): the process slip of 2026-11-15 and F-A
   (Open findings); the "repository ready" record (step 12's added bullet); the effort not passed to the web-fetch
   agent (Running work).
@@ -368,6 +377,18 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    identical); step 19 lists its three conditions as open; F-F a hard gate before the setup pull request; Key numbers
    with sources and times (the lockfile count corrected; the 72% labelled as before compaction); the message to him
    leads with the extra screenshot, its click path from GitHub's docs page.
+
+7. 2026-11-16 12:37:51 UTC (called; transcript time), moment 4 (more than one defensible answer: edit the token or make
+   a new one) · Q: which route for the token's end date, and what to send him? · Changed: edit first, framed as a look
+   (his rule on the token: editing keeps the value where it is; a new token goes through his clipboard and leaves the
+   old one alive with no documented delete clicks); where to look (Manage account, Account API tokens; else My Profile,
+   API Tokens, and he says which list, since a user token departs from the plan); the docs' gap said plainly (editing
+   confirmed, no clicks shown); one end date with its basis (2026-11-25: plan A5 step 5's ten days from 2026-11-15,
+   dates at 00:00 UTC, so Day 2 by 2026-11-24); guards (only the expiration, no "Roll", a new value only into the
+   preview secret); evidence, not a typed date (one screenshot of the permission and the end date, no token value);
+   the fallback is his own setup step again (A5 with the date, A6 step 6, the old token removed), no decision entry,
+   and no offer to run without an end date (his SA-R3 acceptance says ten days); no record that the token lacks an end
+   date until he has looked; two hard gates in Next steps 1; both setup misses into For the report.
 
 ## Running work
 - saver boyrmgcz1 (started 2026-11-16 08:49:17 UTC): stopped by itself at 10:39:17 UTC ("time is up", 110 minutes;
