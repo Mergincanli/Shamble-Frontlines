@@ -204,3 +204,30 @@
   6) and step2-new-bites-2.log (exit 0; engine the six, "6 passed"; l1 1; lab 8).
 - 11:40 Re-staged; step numstat figures.rs +172 -0, engine.rs +149 -1 = 322; lane against 044fab1 = 821. check.mjs
   whole started on these staged bytes (step2-check-2.log).
+- 11:52 check.mjs whole, the last run on the staged bytes (.gate/u4r/c62h-bound/step2-check-2.log): exit 0, "check: all
+  11 steps pass"; test step "measured build: 551 tests passed, 0 failed, 0 reported a skip; bites build: 631 tests
+  passed, 0 failed, 0 reported a skip" (+6 / +6 from 545 / 625, as expected). Header: diff f88bf7d56b845c33…, untracked
+  e3b0c44298fc1c14… (none). `git diff --cached HEAD -- . | sha256sum` from spikes/netcode-proof = f88bf7d5… (equal);
+  nothing unstaged, no untracked file.
+- 11:53 SIZE-CHECK (staged, results excluded): step vs HEAD 322 (figures.rs +172 -0, engine.rs +149 -1); lane vs
+  044fab1 821 (+804 -17: figures.rs 172, engine.rs 150, l1 lib.rs 33, l1 tests.rs 98, logs.rs 54, scenario.rs 311,
+  SERIES.md 3). Under the 1,050 stop; step 2 inside its plan (255-355).
+
+## State (launch 2, step 2, 11:53 UTC: a clean point; nothing in flight, no plant in place)
+- Staged in the worktree (branch c62h-bound-build at 54046d4, nothing committed): crates/judge/src/figures.rs (+172 -0)
+  and crates/judge/tests/engine.rs (+149 -1). Step 322; lane 821 of 1,050.
+- Check: step2-check-2.log, exit 0, all 11 steps PASS, diff hash
+  f88bf7d56b845c33dd4ea7e659150aeb267f86ca2c53148ed0c0bf8c3381f5ec, untracked hash
+  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855. (step2-check.log, the Vec version, also all 11
+  PASS, 551 / 631; superseded.)
+- Counts: 551 measured / 631 bites (+6 / +6). New tests by name, both builds (step2-new-measured-2.log,
+  step2-new-bites-2.log): c62hb_each_explanation_alone_reads_0, c62hb_an_unexplained_tick_reads_1,
+  c62hb_warmup_and_after_phase_ticks_are_not_read, c62hb_the_converse_and_the_sentinel,
+  c62hb_eight_gaps_read_on_both_figures, c62hb_a_bite_with_an_unexplained_tick_is_shown.
+- Plants: CB-P8, -P9, -P10, -P14, -P15, -P16, -P17, -P18 each bit as section 4 says, twice (first on the Vec version,
+  logs plant-CB-*.log; then on the final code, plant-CB-*-2.log); each restored, sha256 equal to its record
+  (step2-sha-before-plants.txt, step2-sha-before-plants-2.txt).
+- Existing judge answers: none moved (engine 43 old tests and fixtures 19 pass unchanged; no assertion edited).
+- Stop rules: none met.
+- Next (the main session): commit 2 in the worktree; check `git diff HEAD^ HEAD -- . | sha256sum` (spikes/netcode-
+  proof) = f88bf7d5…; the committed SIZE-CHECK = 821; then insert part 3 and the built check before step 3's launch.
