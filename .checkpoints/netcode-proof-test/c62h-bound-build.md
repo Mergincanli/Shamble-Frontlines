@@ -487,3 +487,28 @@ After the call, before reading the verdict: npt-judge's sha256 must equal p0-rej
   snap_lost_unexplained_count 0 pass; snap_whole_despite_link_loss_count 0 pass.** The lab's N 0 = the judge's A 0.
 - **Reading (the advisor's rule): NOT-RUN ("1 of 3 valid runs") with both figures 0 and no gap note: PROCEED.** No
   stop rule met. Nothing committed; nothing under results/ (.gate/u4r/c62h-bound/preflight/, 2 MiB).
+
+## Section 8: the judged sets
+- 8.1 before P2: free 6,057 MiB (at least 5,500: no pack).
+- 8.2 before P2 (20:47 UTC; .gate/u4r-sets/pre-P2-c62h.log, one main-run.sh call): header diff and untracked e3b0…;
+  HEAD 8ee453c228825ec85308d83589c86159736bb4be, spike tree 25c5b7602bd912fb6e710ac5e25e3bad6f56e9ba; `git diff --quiet
+  ddd38ba HEAD -- . ':(exclude)results'` exit 0; name-status: .checkpoints/ (M, A) and A under results/ only; sha256
+  c-u4r-runs.mjs f2002890…, main-run.sh 8df2dee3…, u4r-run.sh e9437ae2…, peak.py dfacdcc0… (all as the brief's);
+  no cargo, rustc, npt-lab or npt-judge; its pgrep -f line matched the call's own command line (it names
+  c-u4r-runs.mjs), and `pgrep -af "node .*c-u4r-run[s]"` apart found none; free 6,351,163,392 B.
+- **P2 (20:48:07-21:17:23 UTC; .gate/u4r-sets/P2-8ee453c22882.log; peak.py 1755.5 s, 1799.0 MiB): exit 0**; the
+  runner's projections: before the builds 888 MiB, so 5169 after; the judge 2129 and 552 MiB from the plan, 1772 and
+  564 from the logs on disk. Its parts: -2 SS runs, -17 L1 P2, -57 L1 P2 PASS (l1-p2-s1, -s2, -s3 valid); -17's
+  whole-as-lost and link-lost-overstated shown (valid). Results committed at **daec788** (results/u4r/8ee453c22882/P2/;
+  the redact step 303 items, 0 findings).
+- The set check's shown-to-fail runs (.gate/u4r-sets/set-check-negative.log): on results/u4r/fc411116c1f1/P2: 12 PASS,
+  29 FAIL, all 29 lines naming the new phrase or checks FAIL; --self-test on the new P2: SELF-TEST PASS (the rule passes
+  as the file is and fails with the planted gap; each bite line passes as the file is and fails with "late" bumped).
+- **The P2 set check (.gate/u4r-sets/set-check-P2.log): 46 PASS, 0 FAIL, 0 on Mustafa's stop rules; 34 lines naming
+  the new, 0 FAIL.** S / L / B: 864000 / 17260 / 0, 864000 / 17089 / 0, 864000 / 17532 / 0; E1 / E2 / N: 0 / 17260 / 0,
+  0 / 17089 / 0, 0 / 17532 / 0; N = A 0 on each; whole-as-lost N 48 = A 48; link-lost-overstated N 0 = A 0. P2 counts.
+- 8.1 before P3: free 5,307 MiB (at least 5,100: no pack). 8.2 before P3 (21:19 UTC; pre-P3-c62h.log): HEAD
+  d66e23cd78f2c75673224109228a5014a0d20a52, spike tree 14d78602cbe0647c55356c5eec15dd603c5f7fec; the spike-tree check
+  exit 0; name-status .checkpoints/ and A under results/ only; the four sha256s as before; no process found; free
+  5,563,871,232 B. **P3 launched about 21:20 UTC** (.gate/u4r-sets/P3-d66e23cd78f2.log; projected 524 MiB, so 4782
+  after).
