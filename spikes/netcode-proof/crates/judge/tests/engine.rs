@@ -1,8 +1,9 @@
 //! The judge's engine on logs built here, one test per verdict path of `marks/README.md` §3 to §6. The committed
 //! fixtures (tests/fixtures.rs) prove the same paths on files and on the real marks.json.
 
-use npt_judge::eval::BiteStatus;
+use npt_judge::eval::{BiteStatus, RunOut};
 use npt_judge::{VerdictKind, judge, parse_marks};
+use npt_log::Phase::{After, Measured, Warmup};
 use npt_log::{
     Build, Ended, EventRecord, Header, Log, Machine, Phase, SCHEMA, SecondRecord, TickRecord,
     Writer, read_log,
@@ -1549,6 +1550,153 @@ fn u4j_an_empty_comparison_fails_the_run_and_shows_no_bite() {
     let v = judge(&marks_file(&[hash_mark()]), &logs);
     assert_eq!(v[0].verdict, VerdictKind::Pass, "{:?}", v[0].why);
     assert_eq!(v[0].bites[0].status, BiteStatus::Shown);
+}
+
+// C62H-BOUND's two figures (SERIES.md's frozen rows): A, snap_lost_unexplained_count; B, the link record's converse.
+
+/// A -17 mark with the two C62H-BOUND checks (== 0) on one L1 part, and the whole-as-lost bite.
+fn bound_mark() -> Value {
+    json!({
+        "id": "PM-0001-17", "title": "bound", "draft": draft(), "verdict": "pass",
+        "parts": [{"name": "L1", "select": {"layer": "L1"}, "min": 1}],
+        "checks": [{"name": "A", "figure": "snap_lost_unexplained_count", "op": "==", "value": 0},
+                   {"name": "B", "figure": "snap_whole_despite_link_loss_count", "op": "==", "value": 0}],
+        "bites": [{"id": "PM-0001-17/whole-as-lost", "what": "a whole tick filed lost"}]
+    })
+}
+
+/// One tick of both logs: its phase, then the room's `hs.server_hash` and `tick.s.snap_link_lost_count` and the
+/// client's `hs.decoded_hash` and `tick.s.snap_incomplete`, 2 slots each (a hash of -1: `null`).
+type BoundTick = (Phase, [[i64; 2]; 4]);
+
+/// Run c1's room and client logs (`hash_log`'s), one record per tick on each.
+fn bound_run(ticks: &[BoundTick]) -> Vec<Log> {
+    let none: Vec<&[Option<u64>]> = vec![&[][..]; ticks.len()];
+    let phases = |s: &mut LogSpec| s.ticks = ticks.iter().map(|t| (t.0, vec![])).collect();
+    let mut room = hash_log("c1", "room", "server_hash", &none, &phases);
+    let mut client = hash_log("c1", "client", "decoded_hash", &none, &phases);
+    let hashes = |l: [i64; 2]| l.map(|h| u64::try_from(h).ok());
+    for (i, (_, [server, link, decoded, lost])) in ticks.iter().enumerate() {
+        let (r, c) = (&mut room.ticks[i], &mut client.ticks[i]);
+        r.set_hashes("server_hash", &hashes(*server));
+        r.s.insert("snap_link_lost_count".into(), link.to_vec());
+        c.set_hashes("decoded_hash", &hashes(*decoded));
+        c.s.insert("snap_incomplete".into(), lost.to_vec());
+    }
+    vec![room, client]
+}
+
+/// The L1 part's run, judged on `logs` with `bound_mark`.
+fn bound_out(logs: &[Log]) -> RunOut {
+    judge(&marks_file(&[bound_mark()]), logs)[0].parts[0].runs[0].clone()
+}
+
+/// The checks' outcomes and values, A then B (`-`: no value).
+fn ab(o: &RunOut) -> Vec<String> {
+    o.checks
+        .iter()
+        .map(|c| format!("{:?} {}", c.outcome, c.value.as_deref().unwrap_or("-")))
+        .collect()
+}
+
+/// A measured tick at which slot 0 is filed lost though the room sent it a snapshot and the link lost none of it.
+const UNEXPLAINED: BoundTick = (Measured, [[1, 2], [0, 0], [-1, 2], [1, 0]]);
+
+#[test]
+fn c62hb_each_explanation_alone_reads_0() {
+    // Slot 0: the room sent it nothing, the link lost none (E1 alone); slot 1: sent, the link lost one (E2 alone).
+    let t = (Measured, [[-1, 2], [0, 1], [-1, -1], [1, 1]]);
+    let o = bound_out(&bound_run(&[t]));
+    assert_eq!(ab(&o), ["Pass 0", "Pass 0"], "{o:?}");
+}
+
+#[test]
+fn c62hb_an_unexplained_tick_reads_1() {
+    let o = bound_out(&bound_run(&[UNEXPLAINED]));
+    assert_eq!(ab(&o), ["Fail 1", "Pass 0"], "{o:?}");
+}
+
+#[test]
+fn c62hb_warmup_and_after_phase_ticks_are_not_read() {
+    // In each phase: slot 0 an unexplained tick; slot 1 a whole hash at a tick the link lost a datagram of.
+    let odd = |ph| (ph, [[1, 2], [0, 1], [-1, 2], [1, 0]]);
+    let o = bound_out(&bound_run(&[odd(Warmup), odd(After)]));
+    assert_eq!(ab(&o), ["Pass 0", "Pass 0"], "(A, B): {o:?}");
+}
+
+#[test]
+fn c62hb_the_converse_and_the_sentinel() {
+    let whole = |h| bound_run(&[(Measured, [[1, 2], [1, 0], [h, 2], [0, 0]])]);
+    assert_eq!(ab(&bound_out(&whole(1))), ["Pass 0", "Fail 1"]);
+    // The sentinel 0 (a refused group) is not a whole hash.
+    assert_eq!(ab(&bound_out(&whole(0))), ["Pass 0", "Pass 0"]);
+    // The only such tick is at a tick the room has no record of: not read here (the frozen row).
+    let mut logs = whole(1);
+    logs[1].ticks[0].t = 2;
+    let o = bound_out(&logs);
+    assert!(o.valid && o.gaps.is_empty(), "{o:?}");
+    assert_eq!(ab(&o), ["Pass 0", "Pass 0"], "{o:?}");
+}
+
+#[test]
+fn c62hb_eight_gaps_read_on_both_figures() {
+    const LINK: &str = "snap_link_lost_count";
+    const FLAGS: &str = "snap_incomplete";
+    // Tick 1: slot 1 filed lost, the room sent it nothing (E1); tick 2: both whole.
+    let base = [
+        (Measured, [[1, -1], [0, 0], [1, -1], [0, 1]]),
+        (Measured, [[3, 4], [0, 0], [3, 4], [0, 0]]),
+    ];
+    // The cases: the series in no room log; one room tick without it; one without hs.server_hash, where slot 1 is
+    // filed lost; its list one entry short; a negative entry; a measured client record without snap_incomplete; a
+    // measured incomplete tick with no room record; a snap_incomplete entry of 2.
+    let edits: [fn(&mut [Log]); 8] = [
+        |l| l[0].ticks.iter_mut().for_each(|t| drop(t.s.remove(LINK))),
+        |l| drop(l[0].ticks[0].s.remove(LINK)),
+        |l| drop(l[0].ticks[0].hs.remove("server_hash")),
+        |l| drop(l[0].ticks[1].s.insert(LINK.into(), vec![0])),
+        |l| drop(l[0].ticks[1].s.insert(LINK.into(), vec![0, -1])),
+        |l| drop(l[1].ticks[1].s.remove(FLAGS)),
+        |l| drop(l[0].ticks.remove(0)),
+        |l| drop(l[1].ticks[1].s.insert(FLAGS.into(), vec![0, 2])),
+    ];
+    let phrases = [
+        "no room log gives tick.s.snap_link_lost_count",
+        "a room tick record without tick.s.snap_link_lost_count",
+        "a room tick record without hs.server_hash",
+        "a list that does not hold the run's clients entries",
+        "an entry below 0",
+        "a measured client tick record without tick.s.snap_incomplete",
+        "a measured incomplete tick the room log has no record of",
+        "a snap_incomplete entry other than 0 or 1",
+    ];
+    for (i, (edit, phrase)) in edits.iter().zip(phrases).enumerate() {
+        let mut logs = bound_run(&base);
+        edit(&mut logs);
+        let o = bound_out(&logs);
+        assert!(!o.valid && ab(&o) == ["Gap -", "Gap -"], "{phrase}: {o:?}");
+        for c in &o.checks {
+            let note = c.note.as_deref().unwrap_or("");
+            assert!(note.contains(phrase), "{phrase}: {note}");
+            // The shadowing pair split: one room tick without the series is not "no room log gives" it.
+            assert!(i != 1 || !note.contains(phrases[0]), "{note}");
+        }
+    }
+}
+
+#[test]
+fn c62hb_a_bite_with_an_unexplained_tick_is_shown() {
+    let mut logs = bound_run(&[UNEXPLAINED]);
+    for l in &mut logs {
+        l.header.role = "bite".to_owned();
+        l.header.bite = Some("PM-0001-17/whole-as-lost".to_owned());
+        l.header.build.features = vec!["bites".to_owned()];
+    }
+    let v = judge(&marks_file(&[bound_mark()]), &logs);
+    let b = &v[0].bites[0];
+    assert_eq!(b.status, BiteStatus::Shown, "{:?}", b.runs);
+    assert!(b.runs[0].valid && b.runs[0].gaps.is_empty(), "{:?}", b.runs);
+    assert_eq!(ab(&b.runs[0]), ["Fail 1", "Pass 0"], "{:?}", b.runs);
 }
 
 /// A twin-hash mark like PM-0001-21's forged part.

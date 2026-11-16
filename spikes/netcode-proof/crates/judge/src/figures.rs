@@ -535,6 +535,166 @@ fn coverage(
     None
 }
 
+/// C62H-BOUND's one room-side reader, shared by its two figures (SERIES.md's `snap_lost_unexplained_count` and
+/// `snap_whole_despite_link_loss_count` rows): the room's record per tick, and the clients' measured tick records.
+struct Bound {
+    /// Each room tick's `tick.s.snap_link_lost_count`, one entry per client slot.
+    link: BTreeMap<u64, Vec<i64>>,
+    /// The room's `hs.server_hash`: a non-null entry is a snapshot or a full state it sent that slot.
+    server: SlotHashes,
+    /// The measured (slot, tick) pairs filed lost: `tick.s.snap_incomplete` 1.
+    lost: BTreeSet<(usize, u64)>,
+    /// The measured (slot, tick) pairs filed whole: an `hs.decoded_hash` neither null nor the sentinel 0.
+    whole: Vec<(usize, u64)>,
+}
+
+impl Bound {
+    /// Whether the room sent `slot` a snapshot or a full state at tick `t`: a non-null `hs.server_hash` there.
+    fn sent(&self, slot: usize, t: u64) -> bool {
+        let entry = self.server.get(&t).and_then(|l| l.get(slot));
+        entry.is_some_and(Option::is_some)
+    }
+
+    /// `slot`'s `tick.s.snap_link_lost_count` at tick `t`; `None` where the room has no record of `t`.
+    fn link(&self, slot: usize, t: u64) -> Option<i64> {
+        self.link.get(&t)?.get(slot).copied()
+    }
+}
+
+/// [`Bound`]'s gaps, in the frozen row's order and words (SERIES.md's `snap_lost_unexplained_count` row).
+const LINK_GAPS: [&str; 8] = [
+    "no room log gives tick.s.snap_link_lost_count",
+    "a room tick record without tick.s.snap_link_lost_count",
+    "a room tick record without hs.server_hash",
+    "a list that does not hold the run's clients entries",
+    "an entry below 0",
+    "a measured client tick record without tick.s.snap_incomplete",
+    "a snap_incomplete entry other than 0 or 1",
+    "a measured incomplete tick the room log has no record of",
+];
+
+/// Reads [`Bound`] from every room tick record and the clients' (`source`) measured ones, or a gap: `slot_hashes`'
+/// own refusals and room logs that disagree on `clients` (as `decoded`'s), then the first of [`LINK_GAPS`] in the
+/// row's order, at its first tick and slot. A list's length is the room logs' header `clients`.
+fn bound(run: &Run<'_>) -> Result<Bound, Lack> {
+    const LINK: &str = "snap_link_lost_count";
+    let server = slot_hashes(run, "server_hash")?;
+    let decoded = slot_hashes(run, "decoded_hash")?;
+    let ((_, room), (_, client)) = (source("server_hash"), source("decoded_hash"));
+    let rooms: Vec<_> = run.logs.iter().filter(|l| room(&l.header)).collect();
+    let counts: BTreeSet<u32> = rooms.iter().map(|l| l.header.clients).collect();
+    if counts.len() > 1 {
+        let why = format!("run {}: its room logs disagree on clients", run.id);
+        return Err(Lack::Gap(why));
+    }
+    let clients = counts.first().map_or(0, |c| *c as usize);
+    let mut gaps: [Option<String>; 8] = Default::default();
+    let mut gap = |i: usize, at: String| {
+        gaps[i].get_or_insert(format!("{at}{}", LINK_GAPS[i]));
+    };
+    for (name, h) in [("hs.server_hash", &server), ("hs.decoded_hash", &decoded)] {
+        if let Some((n, _)) = h.as_ref().filter(|(n, _)| *n != clients) {
+            gap(3, format!("{name} lists hold {n} entries, not {clients}: "));
+        }
+    }
+    let mut link = BTreeMap::new();
+    for t in rooms.iter().flat_map(|l| &l.ticks) {
+        if !t.hs.contains_key("server_hash") {
+            gap(2, format!("tick {}: ", t.t));
+        }
+        let Some(l) = t.s.get(LINK) else {
+            gap(1, format!("tick {}: ", t.t));
+            continue;
+        };
+        if l.len() != clients {
+            let at = format!("tick {}'s tick.s.{LINK} holds {} entries: ", t.t, l.len());
+            gap(3, at);
+        }
+        if let Some((slot, v)) = l.iter().enumerate().find(|(_, v)| **v < 0) {
+            let at = format!("tick {}'s tick.s.{LINK} gives slot {slot} {v}: ", t.t);
+            gap(4, at);
+        }
+        link.insert(t.t, l.clone());
+    }
+    if link.is_empty() {
+        gap(0, String::new());
+    }
+    let (mut lost, mut ticks) = (BTreeSet::new(), BTreeSet::new());
+    let client_logs = run.logs.iter().filter(|l| client(&l.header));
+    for t in client_logs.flat_map(|l| &l.ticks) {
+        if t.ph != Phase::Measured {
+            continue;
+        }
+        ticks.insert(t.t);
+        let Some(f) = t.s.get("snap_incomplete") else {
+            gap(5, format!("tick {}: ", t.t));
+            continue;
+        };
+        if f.len() != clients {
+            let at = format!(
+                "tick {}'s tick.s.snap_incomplete holds {} entries: ",
+                t.t,
+                f.len()
+            );
+            gap(3, at);
+        }
+        for (slot, v) in f.iter().enumerate() {
+            match v {
+                0 => {}
+                1 => {
+                    lost.insert((slot, t.t));
+                }
+                _ => gap(6, format!("tick {}, slot {slot} holds {v}: ", t.t)),
+            }
+        }
+    }
+    if let Some((slot, t)) = lost.iter().find(|(_, t)| !link.contains_key(t)) {
+        gap(7, format!("slot {slot}, tick {t}: "));
+    }
+    if let Some(g) = gaps.into_iter().flatten().next() {
+        return Err(Lack::Gap(format!("run {}: {g}", run.id)));
+    }
+    let mut whole = Vec::new();
+    for (t, list) in decoded.map(|(_, m)| m).unwrap_or_default() {
+        for (slot, h) in list.into_iter().enumerate() {
+            if ticks.contains(&t) && h.is_some_and(|(h, _)| h != 0) {
+                whole.push((slot, t));
+            }
+        }
+    }
+    let server = server.map(|(_, m)| m).unwrap_or_default();
+    Ok(Bound {
+        link,
+        server,
+        lost,
+        whole,
+    })
+}
+
+/// PM-0001-17 (C62H-BOUND (a)): the measured client-ticks filed lost that neither the room's record explains (a null
+/// `hs.server_hash`: it sent that slot nothing) nor the link's (`tick.s.snap_link_lost_count` 1 or more: npt-l1 lost
+/// a snapshot datagram of it). Never empty: 0 incomplete is a real 0.
+fn snap_lost_unexplained_count(run: &Run<'_>, _set: &[&Run<'_>]) -> Result<Ratio, Lack> {
+    let b = bound(run)?;
+    let mut n = 0;
+    for &(slot, t) in &b.lost {
+        n += i128::from(b.sent(slot, t) && b.link(slot, t) == Some(0));
+    }
+    Ok(Ratio::int(n))
+}
+
+/// PM-0001-17, the link record's own check (C62H-BOUND (a)): the measured client-ticks filed whole at which the room's
+/// record gives that slot `tick.s.snap_link_lost_count` 1 or more. A tick the room has no record of is not read here
+/// (`decoded_hash_mismatch_count` counts it). Never empty.
+fn snap_whole_despite_link_loss_count(run: &Run<'_>, _set: &[&Run<'_>]) -> Result<Ratio, Lack> {
+    let b = bound(run)?;
+    let mut n = 0;
+    for &(slot, t) in &b.whole {
+        n += i128::from(b.link(slot, t).is_some_and(|l| l >= 1));
+    }
+    Ok(Ratio::int(n))
+}
+
 /// PM-0001-17, -19 and -58: the (client, tick) mismatches `decoded` counts, in the advisor's FX-10 (f) order: the
 /// structural gaps first (`decoded` returns them), then any counted mismatch gives its count (a FAIL), then 0 compared
 /// is `empty` (fails, never passes), then a coverage gap or an incomplete re-decode, then an Arm-rule mismatch waiting
@@ -653,6 +813,18 @@ pub const FIGURES: &[Figure] = &[
         compute: Some(decoded_hash_compared_count),
         unit: "U4j",
         what: "the (client, tick) pairs compared (-17)",
+    },
+    Figure {
+        name: "snap_lost_unexplained_count",
+        compute: Some(snap_lost_unexplained_count),
+        unit: "C62H-BOUND",
+        what: "client-ticks filed lost that neither the room's record (no snapshot sent) nor the link's (a snapshot datagram lost) explains (-17)",
+    },
+    Figure {
+        name: "snap_whole_despite_link_loss_count",
+        compute: Some(snap_whole_despite_link_loss_count),
+        unit: "C62H-BOUND",
+        what: "client-ticks filed whole at which the link's record lost a snapshot datagram: the record overstated (-17)",
     },
     Figure {
         name: "twin_hash_mismatch_count",
