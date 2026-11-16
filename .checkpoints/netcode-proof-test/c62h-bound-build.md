@@ -232,6 +232,14 @@
 - Next (the main session): commit 2 in the worktree; check `git diff HEAD^ HEAD -- . | sha256sum` (spikes/netcode-
   proof) = f88bf7d5…; the committed SIZE-CHECK = 821; then insert part 3 and the built check before step 3's launch.
 
+## Launch 3 (step 3)
+- 12:21 Start. Read brief sections 0, 1, 3.2, 3.3, 4, 10, 11 (sha256 7936074c… checked); runner u4r-run.sh e9437ae2…
+  checked (header read). Worktree at b423a7d (commit 2), unstaged ` M` marks.json c1935a5b…, SERIES.md 6898e119…,
+  README.md f3c3c804… (the main session's part 3; equal to the expected). Plan: (1) the judge's tests before any edit
+  in both builds, and each -17 L1 P2 case's reading by the judge's own CLI on scratch copies under
+  .gate/u4r/c62h-bound/b2-before/; (2) B-2's four files; (3) the judge's tests again and the readings again; (4) stage;
+  (5) check.mjs whole; (6) SIZE-CHECK.
+
 ## Main session after launch 2
 - 11:53 Launch 2's return saved word for word: c62h-bound-step2-full.json (123 lines, sha256 366a2910…; status done).
   Read in full: 6 new engine.rs tests in each build (551 / 631 = +6 / +6, as expected); 8 plants bitten (re-run on
