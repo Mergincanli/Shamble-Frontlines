@@ -187,3 +187,20 @@
   slot_hashes' map, already one per pair). Not reachable on a valid L1 run (one client log), but the row is exact:
   `lost` becomes a BTreeSet after this check.mjs run ends; then fmt, the eight plants again on the final code, the
   named tests in both builds, re-stage, and check.mjs whole again as the last run (step2-check-2.log).
+- 11:35 The first check.mjs (step2-check.log, on the Vec version): exit 0, "check: all 11 steps pass"; test step
+  "measured build: 551 tests passed, 0 failed, 0 reported a skip; bites build: 631 tests passed, 0 failed, 0 reported a
+  skip"; header diff 7845b463…, untracked e3b0c442… (none). Superseded by the run below (the staged bytes changed).
+- 11:36 figures.rs: Bound.lost `BTreeSet<(usize, u64)>`, `lost` built as a BTreeSet, `1 => { lost.insert(..); }`
+  (+2 lines). step2-judge-final.log: fmt, clippy (both builds, all targets) exit 0; `cargo test -p npt-judge` exit 0
+  (engine 49 passed, fixtures 19 passed).
+- 11:37-11:39 The eight plants again on the final code (record step2-sha-before-plants-2.txt: figures.rs 338fa93d…,
+  engine.rs ec03cf04…), same edits, logs plant-CB-P8-2, -P9-2, -P10-2, -P14-2, -P15-2, -P16-2, -P17-2, -P18-2.log:
+  each "test result: FAILED. 0 passed; 1 failed" naming its home test at the same line and cause as the first round
+  (P8 :1624 ["Fail 1", "Fail 1"]; P9 :1677 valid Pass 0 / Pass 0; P10 :1632 ["Pass 0", "Fail 1"]; P14 and P15 :1610
+  ["Fail 1", "Pass 0"]; P16 :1680 case 1's note gap 2's words; P17 :1680 case 2's note gap 8's words; P18 :1677 valid
+  Pass 0 / Pass 0). Each restored by Edit, `sha256sum -c` OK after each (CB-P9 was once planted before P8's check; it
+  was undone, P8's restore checked OK, then P9 planted again). No plant in place.
+- 11:39-11:40 Named tests on the final code: step2-new-measured-2.log (exit 0; engine the six, "6 passed"; l1 1; lab
+  6) and step2-new-bites-2.log (exit 0; engine the six, "6 passed"; l1 1; lab 8).
+- 11:40 Re-staged; step numstat figures.rs +172 -0, engine.rs +149 -1 = 322; lane against 044fab1 = 821. check.mjs
+  whole started on these staged bytes (step2-check-2.log).
