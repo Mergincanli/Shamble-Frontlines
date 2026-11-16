@@ -470,3 +470,20 @@ Use these commands instead, in this order, in one main-run.sh call from the main
 (6) `T/npt-judge --marks marks/marks.json --logs P/logs --only PM-0001-2,PM-0001-17 --out P/verdict.json`
 (7) `df -B1 /home/user`
 After the call, before reading the verdict: npt-judge's sha256 must equal p0-rejudge.log's npt-judge line, and marks.json must be c1935a5b996fb0aaff82b0b3c1c604255e1534f6ca7e8d2e55a9f472cd3b22a9; any difference stops for the advisor. Record npt-lab's sha256 and the build's provenance count. What counts and what stops stay as my ruling wrote them. In addition: if the run is INVALID through pre:PM-0001-2 (a load check failing on the short run), record it, quoting the judge's why line, as 'not informative', and the P2 set runs as planned. A part verdict of NOT-RUN ('1 of 3 valid runs') with both figures reading 0 and no gap note means proceed. Nothing is committed, and nothing goes under results/. If the commands are written exactly as above, they need no second advisor read. Any other change comes back to me.
+
+## The pre-flight's run (20:44-20:45 UTC; exactly the commands above)
+- (0) at 20:44:40: `git diff --quiet ddd38bace3c63050d2087a1acf3a6e74c1d2ecb9 HEAD -- spikes/netcode-proof
+  ':(exclude)spikes/netcode-proof/results'` exit 0; HEAD ea08f89298f32bb6561c81a5333346af416ec0a3 (<H>); the tree clean.
+- The call (.gate/u4r/c62h-bound/preflight.log): header free 6058 MiB, HEAD ea08f89, diff and untracked e3b0…; every
+  command exit 0. The npt-lab rebuild compiled 12 npt crates (46.04 s); **npt-lab 98c3967e04e4260985d24173b1fb2126ea14
+  44636f4725e12cf76333d90b5113; npt-judge d8b8c91eccc2fdf9aeb3d2f29e77103635e6ca3161b2752e14a3bb1ed7073f6e = the
+  re-judge's (p0-rejudge.log:16); marks.json c1935a5b… as built.**
+- The lab run preflight-p2 (48 clients, P2, 10 s + 4 s): 454 ticks (34 after); measured incomplete 111; client hashes
+  20958 (sentinels 0); overflow resyncs 0; decided lost at the stop 30; **measured snapshot datagrams 5760, lost by
+  the link 111 (in bursts 0); filed lost: the room sent nothing 0, the link lost a datagram 111, neither 0** (E1 + E2
+  + N = 0 + 111 + 0 = 111 = measured incomplete).
+- The judge (--only PM-0001-2,PM-0001-17; P/verdict.json): PM-0001-2 "SS runs: 1 of 3 valid runs"; **-17's L1 P2
+  part NOT-RUN ("1 of 3 valid runs"); the run preflight-p2 valid, gaps []; decoded_hash_mismatch_count 0 pass;
+  snap_lost_unexplained_count 0 pass; snap_whole_despite_link_loss_count 0 pass.** The lab's N 0 = the judge's A 0.
+- **Reading (the advisor's rule): NOT-RUN ("1 of 3 valid runs") with both figures 0 and no gap note: PROCEED.** No
+  stop rule met. Nothing committed; nothing under results/ (.gate/u4r/c62h-bound/preflight/, 2 MiB).

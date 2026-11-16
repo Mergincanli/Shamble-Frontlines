@@ -125,9 +125,14 @@ it asks nothing; REFS-KIT stays.
   bite with a run as before, PM-0001-2 SS runs PASS, -17 L1 P0 PASS, -57 L1 P0 PASS, six bites shown, only the two
   additions). Results committed at the re-judge folder's commit (results/c62h-bound/p0-rejudge-93509dfd7fd1/
   a87c7ec39b96/: verdict.json e5ed24e2…, verdict-bites.json 13b6b107…, rejudge.txt with both outputs whole; redact
-  300 items, 0 findings). **Next: the pre-flight**, exactly the advisor's commands (c62h-bound-build.md's pre-flight
-  section; npt-judge's sha256 must equal d8b8c91e…), then section 8 (8.1 disk: free at least 5,500 MiB before P2,
-  else pack u4r-B1-64f3307d5c7f; 8.2 the pre-set check; the P2 set; the set check, its shown-to-fail runs first). **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
+  300 items, 0 findings). **THE PRE-FLIGHT: PROCEED** (20:44-20:45 UTC, exactly the advisor's commands; preflight.log;
+  c62h-bound-build.md "## The pre-flight's run"): npt-judge d8b8c91e… = the re-judge's, marks.json c1935a5b…, npt-lab
+  98c3967e…; the short 48-client P2 run valid with no gap; A 0 pass, B 0 pass, mismatches 0; the lab: S 5760, L 111,
+  B 0, E1 0, E2 111, N 0 (= measured incomplete 111; N = A). **Next: section 8** (8.1 disk: free 6,058 MiB, at least
+  5,500 before P2: no pack; 8.2 the pre-set check, pre-P2-c62h.log; the P2 set in the background, its log
+  .gate/u4r-sets/P2-<c12>.log; then the results committed with the card, the set check's shown-to-fail runs, the set
+  check; then P3). **P2's operating note (C6): two judge calls (measured, then bites); a stop by hand waits until no
+  npt-lab or npt-judge call is left.** **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver:** b1gec2y1v ended on its time limit at 11:08:33 UTC ("watch stopped: time is up", exit 0; not a
   cut); restarted at 11:22 UTC as **bp40lga8l** (to about 13:12). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
