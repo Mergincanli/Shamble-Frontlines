@@ -136,8 +136,17 @@ it asks nothing; REFS-KIT stays.
   tree 25c5b760…; the spike tree equals ddd38ba's (exit 0); name-status only .checkpoints/ and A under results/; the
   four runner sha256s as the brief's (c-u4r-runs.mjs f2002890…); no cargo, rustc, npt-lab or npt-judge (the pgrep line
   "FOUND c-u4r-runs" matched the check's own command line, which names the file; no node c-u4r-runs process ran:
-  checked apart); free 6,057 MiB. **RUNNING from 20:48 UTC: the P2 set** (task bgjoh2wpd; log
-  .gate/u4r-sets/P2-8ee453c22882.log; projected 888 MiB, so 5169 after, against the 4 GiB floor). **Mustafa's 21:50
+  checked apart); free 6,057 MiB. **THE P2 SET (20:48-21:17 UTC, 1755.5 s, exit 0; P2-8ee453c22882.log): results
+  committed at daec788** (results/u4r/8ee453c22882/P2/: runs.txt, verdict.json, verdict-bites.json; redact 303 items, 0
+  findings; raw logs .gate/netcode-proof-test/runs/u4r-P2-8ee453c22882/). The judge: -2 SS runs, -17 L1 P2, -57 L1 P2
+  PASS (3 valid each); both -17 bites shown. **The set check's shown-to-fail runs** (set-check-negative.log): on
+  fc411116c1f1/P2 29 of 29 new lines FAIL; --self-test PASS (the planted-bug rule passes as is and fails with a
+  planted gap; each bite line passes as is and fails with "late" bumped). **THE P2 SET CHECK: 46 PASS, 0 FAIL, 0 on
+  Mustafa's stop rules** (set-check-P2.log): marks c1935a5b… in runs.txt; on s1 / s2 / s3 A 0, B 0, mismatches 0, gaps
+  []; each line equal to fc411116c1f1's without the phrase and wall time; **S 864000 each; L 17260 / 17089 / 17532, B 0;
+  E1 0, E2 = L, N 0; N = A**; whole-as-lost A 48 fail (every other check pass, gaps []), its line differs from s1's in
+  exactly hashes -48 (861948) and incomplete +48 (17308), N 48 = A 48; link-lost-overstated B 48 fail, its line equal to
+  s1's, N 0 = A 0. **P2 counts.** Free 5,307 MiB before P3 (at least 5,100: no pack). **Mustafa's 21:50
   words (NS-STATUS (a); approval-free forms) are recorded; the NIGHT_SHIFT.md lines go to him in chat, the pull
   request after P2 and P3.** **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
