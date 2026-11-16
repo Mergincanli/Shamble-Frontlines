@@ -6,7 +6,7 @@
   (after `git fetch origin claude/netcode-proof-test-plan-hcky5g`)
 - **Branch:** cs/npt-u4f-brief · **Base:** origin/main 53272a1
 - **Spike worktree (read only):** `.gate/npt-spike-1116` at 11fd190e9536702f0dcfc72d584b637ebc6184be
-- **Last update:** 2026-11-16 01:09 Amsterdam
+- **Last update:** 2026-11-16 01:29 Amsterdam
 
 ## Steps done
 1. Start checks (role night-shift, window 00:11, no other run tonight), status comment 6902964789 posted; spike
@@ -81,7 +81,11 @@
 - test-engineer (check, `test-engineer-u4f-check.md`) and security-auditor (check, `security-auditor-u4f-check.md`),
   both xhigh, launched 00:50 Amsterdam in parallel. test-engineer done 01:05 (16 min, 60 tool uses);
   security-auditor done 01:08 (19 min, 76 tool uses)
-- netcode-architect (rev 2), xhigh, launched 01:09, running; notes `netcode-architect-u4f-rev2.md`
+- netcode-architect (rev 2), xhigh, launched 01:09, running; notes `netcode-architect-u4f-rev2.md`; at 01:29: blocks
+  B1-B8 done (disposition), B9 writing (header, change list, sections 0-2 are rev 2; sections 3-12 next)
+- saver stint 3 bbeygeuzo 01:04-01:29: ok (saved 328c2a7, 376a8b3, 37185e4; time is up). Stint 4: background task
+  b33enq46s · output `/tmp/claude-0/-home-user-Shamble-Frontlines/2cc6b1c7-405a-556f-81c6-a85b5a29465f/tasks/b33enq46s.output`
+  · started 01:29 · stops by 01:54 · last check 01:29: restarted
 - saver stint 2 bmv14vtwd 00:39-01:04: ok (saved 828e2f4, 8e619ce, 8fb15f9; time is up). Stint 3: background task
   bbeygeuzo · output `/tmp/claude-0/-home-user-Shamble-Frontlines/2cc6b1c7-405a-556f-81c6-a85b5a29465f/tasks/bbeygeuzo.output`
   · started 01:04 · stops by 01:29 · last check 01:04: restarted
