@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-16 10:12 Amsterdam (09:12 UTC)
+- **Last update:** 2026-11-16 11:40 Amsterdam (10:40 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -335,8 +335,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    leads with the extra screenshot, its click path from GitHub's docs page.
 
 ## Running work
-- saver: background task boyrmgcz1, started 2026-11-16 08:49:17 UTC (its log); stops by itself at 10:39 UTC (110
-  minutes); its last "saved and pushed": 0d21f48 at 08:59:20 UTC.
+- saver boyrmgcz1 (started 2026-11-16 08:49:17 UTC): stopped by itself at 10:39:17 UTC ("time is up", 110 minutes;
+  its last cycle: "nothing to save"); no agent runs now, so it stays off until the next agents start (CHECKPOINTS.md
+  §5).
 - agent web-fetch (model opus passed; effort not passed, while CLAUDE.md says "Effort is always stated": a slip,
   recorded): GitHub's docs on Actions secrets, for the click path in the message to him · launched 2026-11-16 09:10:14
   UTC · DONE, hand-back 09:13:16 UTC (transcript times); its answers under Facts.
