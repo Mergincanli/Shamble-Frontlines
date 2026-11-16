@@ -48,3 +48,41 @@
   too_many_arguments allow, 8 inputs now), the tally in write_client_tick, the two test call sites `&[]`.
   Reading taken (to the main session): Summary.link_lost = sum of c.lost + c.burst (link_lost()'s own value, so the
   phrase "lost by the link L (in bursts B)" has B inside L); link_burst = sum of c.burst; link_sent = sum of c.sent.
+- 10:39 cargo fmt --all --check: a diff in scenario.rs's new tests (step1-fmt-1.log, exit 1); applied by Edit;
+  step1-fmt-2.log exit 0.
+- 10:40 New tests, measured build (step1-new-measured.log, `cargo test --locked --workspace c62hb`): exit 0; l1
+  "1 passed" (independent count = read = {sent 90, lost 5, burst 30} from index 115); lab "6 passed" (5 join tests,
+  the short P2 test: measured incomplete 29 = E1 0 + E2 29 + N 0; join unexplained 0, whole despite loss 0; measured
+  link-lost sum 29; S 1920, L 29, B 0; fate log ca5edd4bde19b9bd).
+- 10:42 New tests, bites build (step1-new-bites.log, `--all-features`, -x): exit 0; l1 "1 passed", lab "8 passed";
+  whole-as-lost: join 16 / 0, N 16 (measured incomplete 45 = 29 + 16); link-lost-overstated: join 0 / 16, N 0, L 29 =
+  the clean run's 29, fate logs equal (ca5edd4bde19b9bd). No unexplained tick in any clean run; no join Err.
+- 10:43 sha256 before the plants (.gate/u4r/c62h-bound/step1-sha-before-plants.txt): lib.rs 5a7b81dd…, tests.rs
+  99ed3c27…, scenario.rs c75440f6…, logs.rs d54f7c8e….
+- 10:4x CB-P1 (l1 lib.rs:420, `|| e.dir != Dir::Down` dropped; plant-CB-P1.log, -x, measured build): "test result:
+  FAILED. 0 passed; 1 failed" naming tests::c62hb_server_datagrams_since_counts_down_datagrams_by_fate; left {sent 180,
+  lost 5, burst 60} against the independent {90, 5, 30}: sent above. Restored by Edit; sha 5a7b81dd… equal.
+- 10:4x CB-P12 (lib.rs:420, `e.carries != Carries::Datagram ||` dropped; plant-CB-P12.log): "1 failed", same test;
+  left {sent 202, lost 5, burst 40}: sent above. Restored; sha equal.
+- 10:4x CB-P13 (lib.rs:419, `get(from..)` as `get(0..)`; plant-CB-P13.log): "1 failed", same test; left {sent 120,
+  lost 5, burst 30}: sent above. Restored; sha equal.
+- 10:5x CB-P2 (scenario.rs link_lost, the `c.sent as usize != groups` block dropped; plant-CB-P2.log): "test result:
+  FAILED. 0 passed; 2 failed" naming c62hb_join_one_datagram_too_many and _too_few, each left Ok(0) right its Err.
+  Restored; sha c75440f6… equal.
+- 10:5x CB-P3 (link_lost's server-hash check dropped; plant-CB-P3.log): "1 failed",
+  c62hb_join_groups_with_a_null_server_hash, Ok(0) where Err. Restored; sha equal.
+- 10:5x CB-P4 (link_lost's no-session check dropped; plant-CB-P4.log): "1 failed", c62hb_join_groups_with_no_session,
+  Ok(0) where Err. Restored; sha equal.
+- 11:0x CB-P5 (run's `link[usize::from(slot)] = lost` as `= 0`; plant-CB-P5.log): "1 failed",
+  c62hb_p2_short_every_measured_lost_tick_is_explained, at "the measured link-lost sum is 0" (its print: join 29
+  unexplained, E2 0, N 29). Restored; sha equal.
+- 11:0x CB-P6 (run: a `prev_link` vector and room_tick passed `&std::mem::replace(&mut prev_link, link.clone())`, the
+  record one room tick late; plant-CB-P6.log): "1 failed", same test, at the join assert: left (28, 29) right (0, 0)
+  (unexplained 28, whole despite loss 29). Both edits restored; sha equal.
+- 11:0x CB-P7 (logs.rs tally: `self.logged.get(&w)` after its removal in place of the kept `logged`; plant-CB-P7.log):
+  "1 failed", same test, at "E2 is 0" (E1 29, E2 0, N 0). Restored; sha d54f7c8e… equal. All four files equal the
+  pre-plant record (diff against step1-sha-before-plants.txt: none). No plant in place.
+- 11:1x Staged: l1/src/lib.rs, l1/src/tests.rs, lab/src/scenario.rs, lab/src/logs.rs, marks/SERIES.md (89295b57…,
+  unchanged). Staged numstat vs LANE_BASE (results excluded): lib.rs +33 -0, tests.rs +98 -0, logs.rs +47 -7,
+  scenario.rs +303 -8, SERIES.md +2 -1; total 499 (plan for step 1 about 285-400; under the 1,050 stop). check.mjs
+  whole started (step1-check.log, -x).
