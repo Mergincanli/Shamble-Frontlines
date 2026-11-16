@@ -1,0 +1,764 @@
+From 54046d4a83e445a212670dd548d5a5c1b9dd00ef Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Mon, 16 Nov 2026 11:01:06 +0000
+Subject: [PATCH] C62H-BOUND 1/4: npt-l1's server_datagrams_since and npt-lab's
+ link record (tick.s.snap_link_lost_count)
+
+The approved build brief (.checkpoints/netcode-proof-test/c62h-bound-brief.md, sha256 7936074c..., section 3.1;
+Mustafa's C62H-BOUND-YES (a), 2026-11-15 20:50 Amsterdam), route W's launch 1. npt-l1 gains DatagramCounts and
+FateLog::server_datagrams_since (read only: down datagrams from an index, by fate); npt-lab joins it one to one with
+each slot's snapshot groups at the send (link_lost: the run fails on a mismatch), writes the room log's new series
+tick.s.snap_link_lost_count, tallies each measured client-tick filed lost as E1 / E2 / N, and prints them in the summary
+line; the bites build adds the PM-0001-17/link-lost-overstated plant. B-1: SERIES.md's (18) to (19) header and the
+frozen tick.s.snap_link_lost_count row, put in by the main session's c62h_bound_insert.py --part 1 (89295b57...).
+
+Evidence (.gate/u4r/c62h-bound/): check.mjs whole on the staged content, all 11 steps PASS (step1-check.log; measured
+545, bites 625: +7 / +9 as the brief expects); planted bugs CB-P1 to CB-P7, CB-P12 and CB-P13 each bit its home test
+(plant-CB-*.log), each file restored to its recorded sha256; SIZE-CHECK from LANE_BASE 044fab1: 499 lines.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A
+---
+ spikes/netcode-proof/crates/l1/src/lib.rs     |  33 ++
+ spikes/netcode-proof/crates/l1/src/tests.rs   |  98 ++++++
+ spikes/netcode-proof/crates/lab/src/logs.rs   |  54 ++-
+ .../netcode-proof/crates/lab/src/scenario.rs  | 311 +++++++++++++++++-
+ spikes/netcode-proof/marks/SERIES.md          |   3 +-
+ 5 files changed, 483 insertions(+), 16 deletions(-)
+
+diff --git a/spikes/netcode-proof/crates/l1/src/lib.rs b/spikes/netcode-proof/crates/l1/src/lib.rs
+index 546fcd3..53e9bdd 100644
+--- a/spikes/netcode-proof/crates/l1/src/lib.rs
++++ b/spikes/netcode-proof/crates/l1/src/lib.rs
+@@ -326,6 +326,18 @@ pub struct FateLog {
+     entries: Vec<Fate>,
+ }
+ 
++/// A span of the fate log's server-to-client datagrams, by the fate decided at each one's send
++/// ([`FateLog::server_datagrams_since`]; C62H-BOUND's link record).
++#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
++pub struct DatagramCounts {
++    /// Every server-to-client datagram entry in the span.
++    pub sent: u32,
++    /// Of them, each lost by its loss draw (`Outcome::Lost`).
++    pub lost: u32,
++    /// Of them, each lost in a burst (`Outcome::Burst`); never also counted in `lost`.
++    pub burst: u32,
++}
++
+ /// The canonical form's first bytes: the format and its version (v2 since U4c).
+ const CANONICAL_TAG: &[u8] = b"npt-l1 fate log v2\n";
+ 
+@@ -397,6 +409,27 @@ impl FateLog {
+         }
+     }
+ 
++    /// The server-to-client datagrams among the entries from index `from` to the end (none when `from` is past the
++    /// end): `sent` each, `lost` each lost by its loss draw, `burst` each lost in a burst, as decided at its send.
++    /// Stream pieces, acknowledgements and client-to-server datagrams are not counted; nor is a datagram sent on a link
++    /// that is not up, or one too large, since neither pushes an entry. Read only: it draws nothing and changes no
++    /// entry, so the canonical form is the same before and after.
++    pub fn server_datagrams_since(&self, from: usize) -> DatagramCounts {
++        let mut c = DatagramCounts::default();
++        for e in self.entries.get(from..).unwrap_or_default() {
++            if e.carries != Carries::Datagram || e.dir != Dir::Down {
++                continue;
++            }
++            c.sent += 1;
++            match e.outcome {
++                Outcome::Lost => c.lost += 1,
++                Outcome::Burst => c.burst += 1,
++                Outcome::Delivered { .. } => {}
++            }
++        }
++        c
++    }
++
+     /// Per direction (`[0]` up, client to server; `[1]` down): (datagrams delivered, of them reordered). A datagram is
+     /// reordered when it arrives after a later-sent datagram of its flow (RFC 4737's reordered packet), in the order
+     /// `poll_recv` hands them out.
+diff --git a/spikes/netcode-proof/crates/l1/src/tests.rs b/spikes/netcode-proof/crates/l1/src/tests.rs
+index d7b83d7..281fba7 100644
+--- a/spikes/netcode-proof/crates/l1/src/tests.rs
++++ b/spikes/netcode-proof/crates/l1/src/tests.rs
+@@ -371,6 +371,104 @@ fn reorder_counts_follow_rfc_4737_and_count_only_datagrams() {
+     assert_eq!(log.reorder_counts(), [(6, 2), (0, 0)]);
+ }
+ 
++/// The independent count for `server_datagrams_since`: over the canonical form's entries from index `from` (the first
++/// call is the tag), those with direction 1 (byte 4) and flow code 0 (byte 5), by kind (byte 6: 1 lost, 2 burst).
++fn down_datagrams_in_canonical(net: &L1Net, from: usize) -> DatagramCounts {
++    let mut c = DatagramCounts::default();
++    let mut i = 0usize;
++    net.with_fate_log(|l| {
++        l.for_each_canonical(|b| {
++            if i > from && b[4] == 1 && b[5] == 0 {
++                c.sent += 1;
++                c.lost += u32::from(b[6] == 1);
++                c.burst += u32::from(b[6] == 2);
++            }
++            i += 1;
++        });
++    });
++    c
++}
++
++/// C62H-BOUND (c62h-bound-brief.md 3.1 item 2; TE-CBB-7 (a)): one link on B1 (its 2 % loss draw and a 1 s burst at
++/// 2 s) and a planted loss of down datagram 45 (1.5 s). 1 s of datagrams both ways before the window; in the window
++/// (1 s to 4 s), down datagrams delivered, lost and lost in the burst, up datagrams, stream pieces both ways and their
++/// acknowledgements. `server_datagrams_since` gives the independent count of the down datagrams alone; a window with
++/// no down datagram, and one past the log's end, give 0.
++#[test]
++fn c62hb_server_datagrams_since_counts_down_datagrams_by_fate() {
++    let net = L1Net::new(1);
++    net.force(
++        0,
++        Forced::Datagram {
++            dir: Dir::Down,
++            seq: 45,
++        },
++    );
++    let mut rig = Rig::new(net, &[Profile::b1(&[2 * SEC])]);
++    for k in 0..30 {
++        let t = MS + k * TICK;
++        rig.poll(t);
++        rig.tick(0, t);
++    }
++    let from = rig.net.with_fate_log(FateLog::len);
++    for k in 30..120 {
++        let t = MS + k * TICK;
++        rig.poll(t);
++        rig.tick(0, t);
++        if k % 10 == 0 {
++            rig.send_on(0, CLIENT, Channel::Control, &[3; 50], t);
++            rig.send_on(0, SERVER, Channel::FullState, &[4; 2_500], t);
++        }
++    }
++    rig.poll(5 * SEC);
++    let want = down_datagrams_in_canonical(&rig.net, from);
++    let canonical = |net: &L1Net| {
++        let mut v = Vec::new();
++        net.with_fate_log(|l| l.for_each_canonical(|b| v.extend_from_slice(b)));
++        v
++    };
++    let before = canonical(&rig.net);
++    let got = rig.net.with_fate_log(|l| l.server_datagrams_since(from));
++    // A statement, not a test: `&self` cannot change the log.
++    assert_eq!(before, canonical(&rig.net), "read only");
++    println!("c62hb l1: from index {from}: independent count {want:?}, the read {got:?}");
++    assert!(
++        want.sent == 90 && want.lost > 0 && want.burst > 0,
++        "the window's 90 down datagrams, some lost and some lost in the burst: {want:?}"
++    );
++    assert_eq!(
++        got, want,
++        "the down datagrams from index {from} only, by fate"
++    );
++    // A window with no down datagram: up datagrams and a control message, and the down acknowledgements they draw.
++    let quiet = rig.net.with_fate_log(FateLog::len);
++    for k in 150..180 {
++        let t = MS + k * TICK;
++        rig.poll(t);
++        rig.send(0, CLIENT, &[1; 100], t);
++        if k == 150 {
++            rig.send_on(0, CLIENT, Channel::Control, &[5; 50], t);
++        }
++    }
++    rig.poll(8 * SEC);
++    let len = rig.net.with_fate_log(FateLog::len);
++    assert!(len > quiet, "the quiet window holds entries");
++    assert_eq!(
++        down_datagrams_in_canonical(&rig.net, quiet),
++        DatagramCounts::default()
++    );
++    assert_eq!(
++        rig.net.with_fate_log(|l| l.server_datagrams_since(quiet)),
++        DatagramCounts::default(),
++        "no down datagram from index {quiet}"
++    );
++    assert_eq!(
++        rig.net.with_fate_log(|l| l.server_datagrams_since(len + 1)),
++        DatagramCounts::default(),
++        "past the end"
++    );
++}
++
+ /// L-c1 (C1' (b), (f)): P2's delays with no loss but the planted ones, 30 Hz datagrams both ways, and from 3 s a control
+ /// message every half second right after the client's datagram, its first packet lost. Each is declared lost by the loss
+ /// rules (a later packet's acknowledgement, the time threshold), never by the PTO, and resent then; the next datagram is
+diff --git a/spikes/netcode-proof/crates/lab/src/logs.rs b/spikes/netcode-proof/crates/lab/src/logs.rs
+index 50fc356..c26fccd 100644
+--- a/spikes/netcode-proof/crates/lab/src/logs.rs
++++ b/spikes/netcode-proof/crates/lab/src/logs.rs
+@@ -1,10 +1,10 @@
+ //! The scenario's three logs (u4-build-plan.md §4.12 :410-415; marks/README.md §1 and §4; u4r-brief.md 2.1): on L1
+ //! one npt-lab process writes one log per process value the checks select on, each with its own header: `room` (the
+-//! room's per-tick World hash `h`, `hs.server_hash`, PM-0001-2's series, BRAWL-1's `in_building_slot_area`, the
+-//! `admit` events, `burst_eviction`), `client` (every client's `hs.decoded_hash` and `tick.s.snap_incomplete`, one
+-//! entry per slot) and `lab` (-57's errors, `burst_heal`, `counter_wrap`, the run's own records). Every tick and
+-//! second record carries all its counters, 0 included (BRAWL-1's `in_building_slot_area`, a list, is written only on
+-//! ticks with one: the advisor's plan review, condition 10); every log ends with its footer.
++//! room's per-tick World hash `h`, `hs.server_hash`, C62H-BOUND's `tick.s.snap_link_lost_count`, PM-0001-2's series,
++//! BRAWL-1's `in_building_slot_area`, the `admit` events, `burst_eviction`), `client` (every client's `hs.decoded_hash`
++//! and `tick.s.snap_incomplete`, one entry per slot) and `lab` (-57's errors, `burst_heal`, `counter_wrap`, the run's
++//! own records). Every tick and second record carries all its counters, 0 included (BRAWL-1's `in_building_slot_area`,
++//! a list, is written only on ticks with one: the advisor's plan review, condition 10); every log ends with its footer.
+ //!
+ //! **The client writer** (carry 62 (a) to (f); carry 73; README §1's `hs` rules): each client's hashes are filed under
+ //! the tick it rebuilt (a 32-bit tick, unwrapped forward from the room's first tick, so a wrong rebuild past the 16-bit
+@@ -159,6 +159,8 @@ pub(crate) struct Logs {
+     errors: BTreeMap<(u64, u8), Errors>,
+     /// Per slot, the ticks the room logged a hash for it, beyond the written mark (for the stop's decision).
+     logged: BTreeMap<u64, Vec<bool>>,
++    /// Per room tick beyond the written mark, each slot's written `tick.s.snap_link_lost_count` (for the tally).
++    link_lost: BTreeMap<u64, Vec<u32>>,
+     written: Option<u64>,
+     track: RoomTrack,
+     wraps: BTreeMap<&'static str, u64>,
+@@ -176,6 +178,13 @@ pub(crate) struct Logs {
+ #[derive(Clone, Debug, Default)]
+ pub(crate) struct Counts {
+     pub(crate) incomplete_measured: u64,
++    /// C62H-BOUND's tally of `incomplete_measured` (TE-CB-2; report only, never judged): each measured client-tick
++    /// filed lost goes to exactly one of these. E1: the room logged no server hash for that slot then (it sent it
++    /// nothing). E2: it did, and the written link record is 1 or more. N: it did, and the record is 0 (the judge's
++    /// `snap_lost_unexplained_count` counts these).
++    pub(crate) lost_room_sent_nothing: u64,
++    pub(crate) lost_link: u64,
++    pub(crate) lost_unexplained: u64,
+     pub(crate) hashes: u64,
+     pub(crate) sentinels: u64,
+     pub(crate) lost_decided_at_stop: u64,
+@@ -218,6 +227,7 @@ impl Logs {
+             gone: vec![false; n],
+             errors: BTreeMap::new(),
+             logged: BTreeMap::new(),
++            link_lost: BTreeMap::new(),
+             written: None,
+             track: RoomTrack::default(),
+             wraps: BTreeMap::new(),
+@@ -417,7 +427,8 @@ impl Logs {
+             .res
+             .remove(&w)
+             .unwrap_or_else(|| vec![Res::Open; self.n]);
+-        self.logged.remove(&w);
++        let logged = self.logged.remove(&w);
++        let link_lost = self.link_lost.remove(&w);
+         let mut errs = Errors::default();
+         for (s, r) in list.iter().enumerate() {
+             if let Res::Hash(h) = r
+@@ -444,6 +455,18 @@ impl Logs {
+             self.counts.sentinels += hashes.iter().flatten().filter(|h| **h == 0).count() as u64;
+             if ph == Phase::Measured {
+                 self.counts.incomplete_measured += incomplete.iter().sum::<i64>() as u64;
++                for (s, r) in list.iter().enumerate() {
++                    if *r != Res::Lost {
++                        continue;
++                    }
++                    let sent = logged.as_ref().is_some_and(|l| l.get(s) == Some(&true));
++                    let lost = link_lost.as_ref().and_then(|l| l.get(s).copied());
++                    match (sent, lost.unwrap_or(0)) {
++                        (false, _) => self.counts.lost_room_sent_nothing += 1,
++                        (true, 0) => self.counts.lost_unexplained += 1,
++                        (true, _) => self.counts.lost_link += 1,
++                    }
++                }
+             }
+             rec.set_hashes("decoded_hash", &hashes);
+             rec.s.insert("snap_incomplete".to_owned(), incomplete);
+@@ -491,7 +514,13 @@ impl Logs {
+     /// The room ran tick `t` in phase `ph`: its record (the World hash, `hs.server_hash`, PM-0001-2's series, the
+     /// sizes), from the room after the tick; `sets` is each slot's set as the mirror rebuilt it; `datagrams` each
+     /// slot's snapshot datagrams' payload sizes; `inputs` the `Input` datagrams' sizes the clients sent since the last
+-    /// tick. Returns the events the World stamped at the tick.
++    /// tick; `link_lost` each slot's link record (C62H-BOUND: of its snapshot datagrams, how many npt-l1 lost), written
++    /// as `tick.s.snap_link_lost_count` with one entry per slot, 0 where absent. Returns the events the World stamped
++    /// at the tick.
++    #[allow(
++        clippy::too_many_arguments,
++        reason = "the tick's inputs, each from its own source"
++    )]
+     pub(crate) fn room_tick(
+         &mut self,
+         room: &Room<Sim>,
+@@ -500,6 +529,7 @@ impl Logs {
+         sets: &[SetStats],
+         datagrams: &[Vec<usize>],
+         inputs: &[i64],
++        link_lost: &[u32],
+     ) -> Result<u64, String> {
+         let w = self.wide(t);
+         self.phases.insert(w, ph);
+@@ -609,6 +639,14 @@ impl Logs {
+                 .collect(),
+         );
+         rec.s.insert("input_payload_bytes".into(), inputs.to_vec());
++        let link: Vec<u32> = (0..n)
++            .map(|s| link_lost.get(s).copied().unwrap_or(0))
++            .collect();
++        rec.s.insert(
++            "snap_link_lost_count".into(),
++            link.iter().map(|&x| i64::from(x)).collect(),
++        );
++        self.link_lost.insert(w, link);
+         if ph == Phase::Measured {
+             for s in sets.iter().take(n) {
+                 self.counts.sets_measured += 1;
+@@ -907,6 +945,7 @@ mod tests {
+             &[],
+             &[],
+             &[],
++            &[],
+         )
+         .expect("the warm-up tick");
+         assert_eq!(logs.counts.in_building_measured, 0, "warm-up: not counted");
+@@ -919,6 +958,7 @@ mod tests {
+             &[],
+             &[],
+             &[],
++            &[],
+         )
+         .expect("the measured tick");
+         assert_eq!(
+diff --git a/spikes/netcode-proof/crates/lab/src/scenario.rs b/spikes/netcode-proof/crates/lab/src/scenario.rs
+index 08efd8f..311e0a9 100644
+--- a/spikes/netcode-proof/crates/lab/src/scenario.rs
++++ b/spikes/netcode-proof/crates/lab/src/scenario.rs
+@@ -25,6 +25,12 @@
+ //! and frees the room's slot (`Room::leave`, as its doc has it: "a closed link"). **Reliable messages' channel:** each
+ //! is decoded on both stream channels with the `Quant` it was coded with, and exactly one must take it (never a silent
+ //! fall-back to Control). **Tokens** are seeded per slot and never logged.
++//!
++//! **The link record** (C62H-BOUND): at every room tick, around each slot's send, the lab reads npt-l1's fate log
++//! (`FateLog::server_datagrams_since` from the log's length before the send). The server-to-client datagram fates the
++//! send pushed must be exactly one per snapshot group the room coded that slot, and a slot with groups must have a
++//! session and a server hash (`link_lost`); otherwise the run fails. How many of them the link lost, by its loss draw
++//! or in a burst, is the room log's `tick.s.snap_link_lost_count` for that slot.
+ 
+ use std::collections::BTreeMap;
+ use std::io::Write;
+@@ -32,7 +38,7 @@ use std::path::PathBuf;
+ 
+ use npt_bots::Behaviour;
+ use npt_client::ClientEndpoint;
+-use npt_l1::{L1Net, Profile};
++use npt_l1::{DatagramCounts, L1Net, Profile};
+ use npt_link::{Channel, Link, LinkState, Listener};
+ use npt_log::{Ended, EventRecord, Phase};
+ use npt_proto::{Direction, Join, Kick, Message, Quant};
+@@ -189,6 +195,10 @@ pub(crate) struct Bites {
+     pub(crate) whole_as_lost: bool,
+     /// npt-lab's own: the -30 pre-check's late-command replay client (one leg's, one client's: precheck.rs).
+     pub(crate) late_command: bool,
++    /// npt-lab's own: C62H-BOUND's link record, PM-0001-17/link-lost-overstated: on every slot, its first measured room
++    /// tick at which the room sent it a snapshot datagram and the link lost none written
++    /// `tick.s.snap_link_lost_count` 1 (the summary's totals keep the fate log's counts).
++    pub(crate) link_lost_overstated: bool,
+     /// npt-lab's model bite, chosen by its unit tests only (r1): the clients connect in a hash map's order.
+     #[cfg_attr(
+         not(all(test, feature = "bites")),
+@@ -198,10 +208,15 @@ pub(crate) struct Bites {
+ }
+ 
+ /// npt-lab's own bite ids (bites builds only): carry 62 (h)'s client writer (U4R-Q2 (c); its form and id the advisor's
+-/// U4r build ruling, point 4: "a client writer that files a tick it decoded whole as lost: null and incomplete 1"), and
+-/// the -30 pre-check's late-command replay client (u4r-brief.md 2.5, 7.2; marks.json:6567).
++/// U4r build ruling, point 4: "a client writer that files a tick it decoded whole as lost: null and incomplete 1"),
++/// the -30 pre-check's late-command replay client (u4r-brief.md 2.5, 7.2; marks.json:6567), and C62H-BOUND's link
++/// record that overstates the link's loss (appended: precheck.rs reads index 1).
+ #[cfg(feature = "bites")]
+-pub(crate) const LAB_BITES: [&str; 2] = ["PM-0001-17/whole-as-lost", "PM-0001-30/late-command"];
++pub(crate) const LAB_BITES: [&str; 3] = [
++    "PM-0001-17/whole-as-lost",
++    "PM-0001-30/late-command",
++    "PM-0001-17/link-lost-overstated",
++];
+ /// npt-lab's model bite (r1's), chosen only by its unit tests (l1's `with_model_bite` form).
+ #[cfg(all(test, feature = "bites"))]
+ pub(crate) const CLIENT_ORDER_BITE: &str = "npt-lab/client-order";
+@@ -233,6 +248,7 @@ impl Bites {
+             .is_some(),
+             whole_as_lost: LAB_BITES[0] == id,
+             late_command: LAB_BITES[1] == id,
++            link_lost_overstated: LAB_BITES[2] == id,
+             client_order: false,
+         };
+         let any = b.world
+@@ -242,7 +258,8 @@ impl Bites {
+             || b.schedule
+             || b.pump
+             || b.whole_as_lost
+-            || b.late_command;
++            || b.late_command
++            || b.link_lost_overstated;
+         if !any {
+             return Err(format!(
+                 "--bite {id:?}: no instance of this build plants it"
+@@ -584,6 +601,35 @@ impl Server {
+     }
+ }
+ 
++/// C62H-BOUND's join (TE-CB-1, C7; the module text): one slot's send at one room tick against npt-l1's fate log.
++/// `groups` is how many snapshot datagrams the room coded that slot, `has_session` whether a session held the slot
++/// at the send, `server_hash` the room's hash for it at the tick, and `c` the server-to-client datagram fates the send
++/// pushed. The link's loss of them (lost by the draw or in a burst), or why the record cannot be joined: groups for a
++/// slot with no session, fates other than one per group (with no session, groups is 0 here: other than none), or
++/// groups with no server hash.
++pub(crate) fn link_lost(
++    groups: usize,
++    has_session: bool,
++    server_hash: Option<u64>,
++    c: DatagramCounts,
++) -> Result<u32, String> {
++    if !has_session && groups > 0 {
++        return Err(format!(
++            "{groups} snapshot groups for a slot with no session"
++        ));
++    }
++    if c.sent as usize != groups {
++        return Err(format!(
++            "{groups} snapshot groups, but the send pushed {} server-to-client datagram fates",
++            c.sent
++        ));
++    }
++    if groups > 0 && server_hash.is_none() {
++        return Err(format!("{groups} snapshot groups with no server hash"));
++    }
++    Ok(c.lost + c.burst)
++}
++
+ /// What one instant's RQ8 steps 1 and 2 hand a loop, with step 3's due count (advisor-u4r-r1, EA-U4R-1, the narrow
+ /// form): the admissions and the ended sessions since the last take, each for the caller's own sinks (the runner's
+ /// `Logs::admit` and `Logs::gone`; the pre-check's maps and its outcome's `ended`), and the ticks due now.
+@@ -751,6 +797,12 @@ pub(crate) struct Summary {
+     pub(crate) stale: u64,
+     pub(crate) overflow_resyncs: u64,
+     pub(crate) heals: u64,
++    /// C62H-BOUND's measured totals, from npt-l1's fate-log counts at each send (never the written record): the
++    /// snapshot datagrams the room sent, those the link lost (by its loss draw or in a burst) and, of those, the ones
++    /// lost in a burst.
++    pub(crate) link_sent: u64,
++    pub(crate) link_lost: u64,
++    pub(crate) link_burst: u64,
+     pub(crate) audit: crate::mirror::Audit,
+     pub(crate) counts: crate::logs::Counts,
+     pub(crate) recording: Option<(usize, String)>,
+@@ -918,6 +970,9 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+     let last_measured = logs.wide(s.tick_start.wrapping_add((measured_end.max(1) - 1) as u32));
+     let mut events_stamped: u64 = 0;
+     let mut inputs: Vec<i64> = Vec::new();
++    // The link-lost-overstated bite: the slots whose record it has written (bites builds only).
++    #[cfg(feature = "bites")]
++    let mut overstated = vec![false; usize::from(n)];
+     let mut view = Vec::new();
+     let mut summary = Summary {
+         order_digest: digest,
+@@ -964,6 +1019,7 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+             let index = Records::new(&records);
+             let mut sizes = vec![Vec::new(); usize::from(n)];
+             let mut sets = vec![SetStats::default(); usize::from(n)];
++            let mut link = vec![0u32; usize::from(n)];
+             for slot in 0..n {
+                 let datagrams = server.room.take_datagrams(slot);
+                 let control = server.room.take_control(slot);
+@@ -986,7 +1042,35 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+                 }
+                 sizes[usize::from(slot)] = datagrams.iter().map(Vec::len).collect();
+                 sets[usize::from(slot)] = mirror.latest(slot);
++                // C62H-BOUND's link record: the fate-log entries this send pushes, joined one to one to its groups.
++                let from = net.with_fate_log(|l| l.len());
++                let has_session = server.session(slot).is_some();
++                let hash = server.room.client(slot).and_then(|c| c.server_hash());
+                 server.send(slot, &datagrams, &control, now).map_err(fail)?;
++                let c = net.with_fate_log(|l| l.server_datagrams_since(from));
++                let lost = link_lost(datagrams.len(), has_session, hash, c).map_err(|e| {
++                    fail(format!(
++                        "slot {slot}, tick {t}: {e} (C62H-BOUND's link record cannot be joined)"
++                    ))
++                })?;
++                if ph == Phase::Measured {
++                    summary.link_sent += u64::from(c.sent);
++                    summary.link_lost += u64::from(c.lost + c.burst);
++                    summary.link_burst += u64::from(c.burst);
++                }
++                #[cfg(feature = "bites")]
++                let lost = if s.bites.link_lost_overstated
++                    && ph == Phase::Measured
++                    && c.sent >= 1
++                    && c.lost + c.burst == 0
++                    && !overstated[usize::from(slot)]
++                {
++                    overstated[usize::from(slot)] = true;
++                    1
++                } else {
++                    lost
++                };
++                link[usize::from(slot)] = lost;
+                 if let Some(c) = server.room.client(slot) {
+                     for w in c.wraps() {
+                         logs.wrapped(w, t, ph).map_err(fail)?;
+@@ -1020,7 +1104,7 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+             }
+             if s.logs {
+                 events_stamped += logs
+-                    .room_tick(&server.room, t, ph, &sets, &sizes, &inputs)
++                    .room_tick(&server.room, t, ph, &sets, &sizes, &inputs, &link)
+                     .map_err(fail)?;
+             }
+             inputs.clear();
+@@ -1621,8 +1705,10 @@ pub(crate) fn summary_line(s: &Settings, o: &Summary) -> String {
+     format!(
+         "{} {} {} seed {}: {} ticks ({} after{}); lead {}; commands {} (steps without one {}, duplicate stamps {}); \
+          late {}; press refused {}; buffer full {}; rewinds refused {}; stale {}; overflow resyncs {}; heals {}; \
+-         client hashes {} (sentinels {}); measured incomplete {}; decided lost at the stop {}; shots per measured \
+-         second {}; carry 49: measured client sets {}, holding every very large unit {}, projectiles per set {}; \
++         client hashes {} (sentinels {}); measured incomplete {}; decided lost at the stop {}; measured snapshot \
++         datagrams {}, lost by the link {} (in bursts {}); measured client-ticks filed lost: the room sent nothing \
++         {}, the link lost a datagram {}, neither {}; shots per measured second {}; carry 49: measured client sets \
++         {}, holding every very large unit {}, projectiles per set {}; \
+          audit {} owner, {} spatial checked against the radius, {} spatial not checked, {} breaches; fate log {}; \
+          connect order digest {:016x}; in a building: {}",
+         s.meta.run,
+@@ -1651,6 +1737,12 @@ pub(crate) fn summary_line(s: &Settings, o: &Summary) -> String {
+         logged(c.sentinels.to_string()),
+         logged(c.incomplete_measured.to_string()),
+         logged(c.lost_decided_at_stop.to_string()),
++        o.link_sent,
++        o.link_lost,
++        o.link_burst,
++        logged(c.lost_room_sent_nothing.to_string()),
++        logged(c.lost_link.to_string()),
++        logged(c.lost_unexplained.to_string()),
+         logged(
+             c.shots_measured
+                 .checked_div(c.measured_seconds)
+@@ -2692,4 +2784,207 @@ pub(crate) mod tests {
+         println!("p4 bite: measured incomplete {sum} of 16 clients");
+         assert_eq!(sum, 16);
+     }
++
++    fn fates(sent: u32, lost: u32, burst: u32) -> DatagramCounts {
++        DatagramCounts { sent, lost, burst }
++    }
++
++    /// C62H-BOUND's join (c62h-bound-brief.md 3.1 item 3), each check alone: a send that pushed one fate more than its
++    /// groups.
++    #[test]
++    fn c62hb_join_one_datagram_too_many() {
++        assert_eq!(
++            link_lost(2, true, Some(7), fates(3, 0, 0)),
++            Err(
++                "2 snapshot groups, but the send pushed 3 server-to-client datagram fates"
++                    .to_owned()
++            )
++        );
++    }
++
++    #[test]
++    fn c62hb_join_one_datagram_too_few() {
++        assert_eq!(
++            link_lost(2, true, Some(7), fates(1, 0, 0)),
++            Err(
++                "2 snapshot groups, but the send pushed 1 server-to-client datagram fates"
++                    .to_owned()
++            )
++        );
++    }
++
++    #[test]
++    fn c62hb_join_groups_with_a_null_server_hash() {
++        assert_eq!(
++            link_lost(2, true, None, fates(2, 0, 0)),
++            Err("2 snapshot groups with no server hash".to_owned())
++        );
++    }
++
++    #[test]
++    fn c62hb_join_groups_with_no_session() {
++        assert_eq!(
++            link_lost(2, false, Some(7), fates(2, 0, 0)),
++            Err("2 snapshot groups for a slot with no session".to_owned())
++        );
++    }
++
++    #[test]
++    fn c62hb_join_ok_counts_lost_and_burst() {
++        assert_eq!(link_lost(3, true, Some(7), fates(3, 1, 1)), Ok(2));
++        // Nothing sent: a slot with no session, and a session the room sent no snapshot datagram (a full state, or
++        // nothing).
++        assert_eq!(link_lost(0, false, None, fates(0, 0, 0)), Ok(0));
++        assert_eq!(link_lost(0, true, None, fates(0, 0, 0)), Ok(0));
++    }
++
++    /// C62H-BOUND's short P2 run (3.1 item 10): R1_ARGS' form, 4 s measured, its header listing -17.
++    const P2_SHORT: &str = "--seed 1 --profile P2 --clients 16 --warmup-s 6 --measured-s 4 --after-max-s 10 \
++                            --marks PM-0001-17";
++
++    fn c62hb_p2_short(name: &str, bite: &str) -> (Scratch, Summary) {
++        let dir = scratch(name);
++        let s = settings(&dir, &format!("{P2_SHORT} {bite}"));
++        let o = run(&s).unwrap_or_else(|e| panic!("{name}: {e:?}"));
++        println!("{name}: {}", summary_line(&s, &o));
++        (dir, o)
++    }
++
++    /// The two C62H-BOUND figures as the two frozen SERIES.md rows word them, read the test's own way from a run's
++    /// client and room logs (npt-lab does not depend on the judge): (unexplained, whole despite the link's loss). Over
++    /// the client log's measured tick records, a (slot, tick) filed lost (`snap_incomplete` 1) whose room record gives
++    /// that slot a non-null `hs.server_hash` and `snap_link_lost_count` 0 is unexplained; one with a whole
++    /// `hs.decoded_hash` (not null, not the sentinel 0) whose room record gives it `snap_link_lost_count` 1 or more is
++    /// whole despite the link's loss. What the rows call a gap panics here.
++    fn c62hb_join(dir: &Path) -> (u64, u64) {
++        let room = read(dir, "room");
++        let client = read(dir, "client");
++        let n = client.header.clients as usize;
++        let at: BTreeMap<u64, &npt_log::TickRecord> = room.ticks.iter().map(|r| (r.t, r)).collect();
++        let (mut unexplained, mut whole) = (0, 0);
++        for c in client.ticks.iter().filter(|c| c.ph == Phase::Measured) {
++            let filed = c.s.get("snap_incomplete").expect("gap: no snap_incomplete");
++            assert_eq!(filed.len(), n, "client tick {}: snap_incomplete", c.t);
++            let r = at.get(&c.t).map(|r| {
++                let l =
++                    r.s.get("snap_link_lost_count")
++                        .expect("gap: no link record");
++                let h = r.hs.get("server_hash").expect("gap: no server hash");
++                assert!(l.len() == n && h.len() == n, "room tick {}: entries", c.t);
++                (l, h)
++            });
++            for (s, &f) in filed.iter().enumerate() {
++                assert!(f == 0 || f == 1, "client tick {}: snap_incomplete {f}", c.t);
++                if f == 1 {
++                    let (link, server) =
++                        r.unwrap_or_else(|| panic!("gap: tick {} has no room record", c.t));
++                    unexplained += u64::from(server[s].is_some() && link[s] == 0);
++                }
++                let hash =
++                    c.hs.get("decoded_hash")
++                        .and_then(|d| d.get(s))
++                        .cloned()
++                        .flatten();
++                if let (Some(h), Some((link, _))) = (hash, r)
++                    && u64::from_str_radix(&h, 16).expect("a hash") != 0
++                    && link[s] >= 1
++                {
++                    whole += 1;
++                }
++            }
++        }
++        (unexplained, whole)
++    }
++
++    /// C62H-BOUND's short P2 test (3.1 item 10): every room tick record holds the link record, its measured sum is above
++    /// 0, the test-side join gives 0 unexplained and 0 whole despite the link's loss, and the lab's own tally splits the
++    /// measured incomplete count into E1 + E2 + N with E2 above 0 and N the join's 0. An unexplained tick here is a stop
++    /// rule (the brief's section 10), never a test to adjust.
++    #[test]
++    fn c62hb_p2_short_every_measured_lost_tick_is_explained() {
++        let (dir, o) = c62hb_p2_short("c62hb-p2", "");
++        let room = read(&dir, "room");
++        let mut sum = 0i64;
++        for r in &room.ticks {
++            let l = r.s.get("snap_link_lost_count");
++            let l = l.unwrap_or_else(|| panic!("room tick {}: no snap_link_lost_count", r.t));
++            assert!(
++                l.len() == 16 && l.iter().all(|&x| x >= 0),
++                "room tick {}: {l:?}",
++                r.t
++            );
++            if r.ph == Phase::Measured {
++                sum += l.iter().sum::<i64>();
++            }
++        }
++        let (a, b) = c62hb_join(&dir);
++        let c = &o.counts;
++        println!(
++            "c62hb p2: {} room tick records; measured link-lost sum {sum}; the join: unexplained {a}, whole despite \
++             the link's loss {b}; E1 {}, E2 {}, N {} of measured incomplete {}",
++            room.ticks.len(),
++            c.lost_room_sent_nothing,
++            c.lost_link,
++            c.lost_unexplained,
++            c.incomplete_measured
++        );
++        assert!(sum > 0, "the measured link-lost sum is {sum}");
++        assert_eq!(
++            (a, b),
++            (0, 0),
++            "the join: (unexplained, whole despite the link's loss)"
++        );
++        assert_eq!(
++            c.lost_room_sent_nothing + c.lost_link + c.lost_unexplained,
++            c.incomplete_measured,
++            "E1 + E2 + N against the measured incomplete count"
++        );
++        assert!(c.lost_link > 0, "E2 is {}", c.lost_link);
++        assert_eq!(
++            c.lost_unexplained, a,
++            "N against the join's unexplained count"
++        );
++        assert_eq!(c.lost_unexplained, 0, "N");
++    }
++
++    /// C62H-BOUND's first bite on the short P2 run (bites builds only): whole-as-lost files each client's first whole
++    /// measured tick lost, which the room sent and the link lost none of: 16 unexplained, by the join and by the lab.
++    #[cfg(feature = "bites")]
++    #[test]
++    fn c62hb_p2_short_bite_whole_as_lost_gives_16_unexplained() {
++        let bite = "--role bite --bite PM-0001-17/whole-as-lost";
++        let (dir, o) = c62hb_p2_short("c62hb-p2-whole-as-lost", bite);
++        let (a, b) = c62hb_join(&dir);
++        println!(
++            "c62hb p2 whole-as-lost: the join {a} unexplained, {b} whole despite the link's loss; N {}",
++            o.counts.lost_unexplained
++        );
++        assert_eq!((a, b, o.counts.lost_unexplained), (16, 0, 16));
++    }
++
++    /// C62H-BOUND's second bite (bites builds only): link-lost-overstated writes each slot's first measured tick whose
++    /// datagrams all arrived as lost by the link: 16 whole despite the link's loss, none unexplained, and the summary's
++    /// link loss L, from the fate log's counts, equal to a clean run's with the same arguments.
++    #[cfg(feature = "bites")]
++    #[test]
++    fn c62hb_p2_short_bite_link_lost_overstated_gives_16_whole_despite_loss() {
++        let (_clean_dir, clean) = c62hb_p2_short("c62hb-p2-overstated-clean", "");
++        let bite = "--role bite --bite PM-0001-17/link-lost-overstated";
++        let (dir, o) = c62hb_p2_short("c62hb-p2-overstated", bite);
++        let (a, b) = c62hb_join(&dir);
++        println!(
++            "c62hb p2 link-lost-overstated: the join {a} unexplained, {b} whole despite the link's loss; N {}; L {} \
++             (the clean run's {})",
++            o.counts.lost_unexplained, o.link_lost, clean.link_lost
++        );
++        assert_eq!((a, b, o.counts.lost_unexplained), (0, 16, 0));
++        assert_eq!(
++            o.fate_log_sha256, clean.fate_log_sha256,
++            "the clean run's link fates"
++        );
++        assert_eq!(
++            o.link_lost, clean.link_lost,
++            "L from the counts, never the written record"
++        );
++    }
+ }
+diff --git a/spikes/netcode-proof/marks/SERIES.md b/spikes/netcode-proof/marks/SERIES.md
+index e7ae680..eab7706 100644
+--- a/spikes/netcode-proof/marks/SERIES.md
++++ b/spikes/netcode-proof/marks/SERIES.md
+@@ -367,12 +367,13 @@ are written once at the run's end, after the measured phase. No mark reads them
+ |---|---|---|---|---|
+ | `tick.s.in_building_slot_area` | pairs (slot, area) | npt-lab (from npt-sim's Soldier records' `area`) | the room log, on every logged tick (any phase) where a soldier's feet are in a building area: each such soldier's slot, then its area (building i is area i + 1: the greybox's area rule, half-open on each footprint), in slot order; absent on a tick with none. The run's summary line prints the measured total as "in a building: N slot-ticks (slots ...)" | none (recorded) |
+ 
+-## Series read only by figures (18)
++## Series read only by figures (19)
+ 
+ | Name | Unit | Written by (crate) | Meaning | Figures |
+ |---|---|---|---|---|
+ | `tick.s.everyone_in_view` | flag | npt-room | one per client per snapshot: 1 when its set holds all 47 other soldiers (ES: and all 15 vehicles) | everyone_in_view_min_share |
+ | `tick.s.relevant_count` | count | npt-room | one per client: entities in its relevant set this tick | sync_cost_ratio, sync_unit_cost, r2_down_formula_bits |
++| `tick.s.snap_link_lost_count` | count | npt-lab (from npt-l1's fate log; L1 only) | the room log, one per client slot on every room tick record (the run's `clients` entries, 0 included): of the snapshot datagrams (groups) the room sent that client at this tick, how many npt-l1's fate log records as lost by its loss draw or lost in a burst; read at the send, from the fate-log datagram entries that slot's send pushed, which must be exactly its groups (else the run fails) | snap_lost_unexplained_count, snap_whole_despite_link_loss_count |
+ | `second.v.app_rtt_ns` | ns | web | browser: the app-level (ping) RTT, each second | rtt_agreement_p99_ns |
+ | `second.v.one_shots_received_count` | count | npt-room | one-shot actions the room received this second | one_shot_dropped_count |
+ | `second.v.quinn_rtt_ns` | ns | npt-server | room: quinn's rtt() for the session, each second | rtt_agreement_p99_ns |
+-- 
+2.43.0
+

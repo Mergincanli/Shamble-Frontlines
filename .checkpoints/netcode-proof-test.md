@@ -42,7 +42,10 @@ it asks nothing; REFS-KIT stays.
   figures, plants CB-P8-P10 and CB-P14-P18, expected 551 / 631). **If cut:** resume by run id
   (`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-step2-wf_4f7f49a2-b56.js", resumeFromRunId: "wf_4f7f49a2-b56"})`),
   after reading the notes' "## State" and the worktree's diff. **Then:** commit 2 the same way; insert part 3 and the
-  built check; step 3's launch. Saver b1gec2y1v (from 09:18 UTC, to about 11:08: restart it then). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
+  built check; step 3's launch. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
+  c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
+  the same. **Saver:** b1gec2y1v ended on its time limit at 11:08:33 UTC ("watch stopped: time is up", exit 0; not a
+  cut); restarted at 11:22 UTC as **bp40lga8l** (to about 13:12). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
   c62h_bound_rejudge_compare.py (section 7; --self-test 4 of 4 as required, .gate/u4r/c62h-bound/rejudge-compare-dry.log;
   the real self-test runs into rejudge-compare-negative.log before the comparison) and c62h_bound_set_check.py
   (sections 8.3-8.4; on the old results/u4r/fc411116c1f1/P2: all 29 lines naming the new phrase or checks FAIL, the 12

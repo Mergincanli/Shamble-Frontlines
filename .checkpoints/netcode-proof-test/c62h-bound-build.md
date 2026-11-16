@@ -125,3 +125,52 @@
   tests.rs 98, logs.rs 54, scenario.rs 311, SERIES.md 3), equal to the launch's staged count.
 - 11:02 Step 2's launch next (section 3.2; plants CB-P8 to -P10, CB-P14 to -P18; expected +6 / +6 → 551 / 631). The
   size: 499 of 1,050 used after step 1; the launch is asked to keep to the brief's tests and asserts, never weaker.
+
+## Launch 2 (step 2)
+- Start. Read brief sections 0, 1, 3.1, 3.2, 4, 10 (sha256 7936074c… checked); texts v3's three series rows; TE-CBB-2,
+  -7, -8; runner u4r-run.sh e9437ae2… checked (header read). Worktree at 54046d4, clean. Plan: figures.rs: one reader
+  `bound` (struct Bound) after decoded's `coverage`, its eight gaps in the frozen row's order (slot_hashes' own
+  refusals first), the two figures and their FIGURES entries after decoded_hash_compared_count; engine.rs: shared
+  builders (bound_mark, bound_run on hash_log, bound_out, ab) and the six tests after the u4j hash tests; then fmt,
+  the new tests in both builds, plants CB-P8, -P9, -P10, -P14 to -P18, stage, check.mjs whole, SIZE-CHECK.
+- 11:1x Items 1-4 (figures.rs): struct Bound (link map, server SlotHashes, measured lost and whole pairs; methods
+  sent, link) and const LINK_GAPS (the eight phrases, the row's order) after `coverage`; fn bound: slot_hashes'
+  refusals (server_hash, decoded_hash), the room logs' clients (one value, else "its room logs disagree on clients"),
+  then one walk that keeps each gap's first occurrence and returns the first by index (row order, each note its own
+  phrase only); the measured window is `t.ph != Phase::Measured => continue` on the clients' (source) records; figures
+  A (`sent && link == Some(0)` over lost) and B (`link >= 1` over whole; no room record skipped; the sentinel left out
+  where whole is built), never Empty; two FIGURES entries after decoded_hash_compared_count, unit C62H-BOUND, `what`
+  as the brief's item 4. Item 5 (engine.rs): bound_mark, BoundTick, bound_run (on hash_log), bound_out, ab,
+  UNEXPLAINED; the six tests after u4j_an_empty_comparison_fails_the_run_and_shows_no_bite; import line gains RunOut
+  and a `use npt_log::Phase::{After, Measured, Warmup}` line (no assertion touched).
+- 11:11-11:18 cargo fmt --all --check: diffs (step2-fmt-1..3.log) applied by Edit (and the code reshaped to rustfmt's
+  60-column call/chain widths); step2-fmt-4.log exit 0. The new tests, measured build (step2-fmt-4.log, `cargo test
+  -p npt-judge --test engine c62hb`): "test result: ok. 6 passed; 0 failed".
+- 11:18 clippy -D warnings flagged `[&dyn Fn(&mut [Log]); 8]` (type_complexity, step2-judge-pre.log); now
+  `[fn(&mut [Log]); 8]`. step2-judge-pre-2.log: fmt, clippy (measured and --all-features, all targets) exit 0;
+  `cargo test -p npt-judge` exit 0: engine "49 passed; 0 failed" (43 + 6), fixtures "19 passed", the rest unchanged.
+  No existing judge test or fixture answer moved (none in existing_judge_answers_moved).
+- 11:20 sha256 before the plants (.gate/u4r/c62h-bound/step2-sha-before-plants.txt): figures.rs 555a8fe1…,
+  engine.rs ec03cf04…. Each plant: one Edit, `cargo test --locked -p npt-judge --test engine <home>` through the
+  runner (-x, measured build), restore by Edit, `sha256sum -c` of the record (both OK each time).
+- CB-P8 (figures.rs bound's client loop, `t.ph != Phase::Measured` as `t.ph == Phase::Warmup`; plant-CB-P8.log):
+  "test result: FAILED. 0 passed; 1 failed", c62hb_warmup_and_after_phase_ticks_are_not_read at engine.rs:1624, its
+  pair assert left ["Fail 1", "Fail 1"] right ["Pass 0", "Pass 0"]: (A, B) = (1, 1). Restored; sha equal.
+- CB-P9 (bound's `!t.hs.contains_key("server_hash")` gap dropped; plant-CB-P9.log): "1 failed",
+  c62hb_eight_gaps_read_on_both_figures at :1677, case "a room tick record without hs.server_hash": valid, A Pass 0,
+  B Pass 0 where both Gap are wanted. Restored; sha equal.
+- CB-P10 (where whole is built, `h.is_some_and(|(h, _)| h != 0)` as `h.is_some()`; plant-CB-P10.log): "1 failed",
+  c62hb_the_converse_and_the_sentinel at :1632 (the sentinel's assert): left ["Pass 0", "Fail 1"]: B 1. Restored.
+- CB-P14 (figure A `b.sent(slot, t) &&` dropped; plant-CB-P14.log): "1 failed", c62hb_each_explanation_alone_reads_0
+  at :1610, left ["Fail 1", "Pass 0"]: A 1 (the plant's own dead-code warnings: `sent`, `server` unused). Restored.
+- CB-P15 (figure A `&& b.link(slot, t) == Some(0)` dropped; plant-CB-P15.log): "1 failed", the same test at :1610,
+  left ["Fail 1", "Pass 0"]: A 1. Restored; sha equal.
+- CB-P16 (bound's `if link.is_empty() { gap(0, ..) }` dropped; plant-CB-P16.log): "1 failed",
+  c62hb_eight_gaps_read_on_both_figures at :1680 (the phrase assert), case 1's note "run c1: tick 1: a room tick
+  record without tick.s.snap_link_lost_count" lacks "no room log gives tick.s.snap_link_lost_count". Restored.
+- CB-P17 (bound's `gap(1, ..)` in the let-else dropped; plant-CB-P17.log): "1 failed", the same test at :1680, case
+  2's note "run c1: slot 1, tick 1: a measured incomplete tick the room log has no record of" lacks its phrase.
+  Restored; sha equal.
+- CB-P18 (bound's `l.len() != clients` check of tick.s.snap_link_lost_count dropped; plant-CB-P18.log): "1 failed",
+  the same test at :1677, case "a list that does not hold the run's clients entries" (tick 2's list [0]): valid,
+  Pass 0 / Pass 0 where Gap is wanted. Restored; both files equal the record; no plant in place; no untracked file.
