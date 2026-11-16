@@ -101,10 +101,16 @@ it asks nothing; REFS-KIT stays.
   advisor. **MERGE-2 PASSED WHOLE (16:31-16:48 UTC):** check.mjs 11/11 (552 / 632, 0 failed), det-u4 PASS (non-cargo
   204.2 s), the release build, SS-P0-s4 regenerated as the manifest's (1f00d2d5…), 9000 ticks equal; **the gate
   --no-smoke PASS; the built check on 561bf42 25/25.** This save pushes the branch (the four cherry-picks with the
-  card, the ruling, c62h_bound_set_check.py e9eb9b2363a587c6…, the follow-ups). **Next:** the saver restarted; CI on
-  the pushed head; **the advisor's check of the pushed head** (full SHA; it reads merge.log's FAIL by name, merge-2,
-  the gate, the built check, CI and the pre-flight's written commands in c62h-bound-build.md); then the P0 re-judge
-  (section 7), the pre-flight, section 8. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
+  card, the ruling, c62h_bound_set_check.py e9eb9b2363a587c6…, the follow-ups). **Pushed at 16:49 UTC: head
+  ddd38bace3c63050d2087a1acf3a6e74c1d2ecb9** (its save commit carries no [skip ci]: the script adds it only when every
+  pushed commit is .checkpoints/ alone). **CI on ddd38ba: all six check runs success** (gate, smoke, toolchain on
+  runs 43911726413 / 43911714149 / 43911727938 / 43911713654; check-suite event 16:53:09 UTC). Saver restarted 16:49
+  as **b7fx6m5gq**. **RUNNING from 16:54 UTC: the advisor's check of ddd38ba** (workflow wf_d05af909-29b, task
+  wr7hsgqcl; notes advisor-c62h-bound-head.md; it also rules on the pre-flight's written commands). **If cut:**
+  resume by run id (script
+  /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-head-check-wf_d05af909-29b.js).
+  **Then:** the P0 re-judge (section 7: the compare script's --self-test first, rejudge-compare-negative.log; one
+  main-run.sh call p0-rejudge.log; the comparison; SAME ANSWERS or a stop to Mustafa), the pre-flight, section 8. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver:** b1gec2y1v ended on its time limit at 11:08:33 UTC ("watch stopped: time is up", exit 0; not a
   cut); restarted at 11:22 UTC as **bp40lga8l** (to about 13:12). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
