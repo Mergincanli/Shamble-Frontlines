@@ -411,3 +411,73 @@
   SPLIT_LINE equal to LANE_BASE's with the one phrase changed), every one passing.
 - Next (the main session): commit 4 in the worktree (message from brief section 1); `git diff HEAD^ HEAD -- . |
   sha256sum` from spikes/netcode-proof = 7b775057…; the committed SIZE-CHECK = 967; then the review round.
+
+## Main session after launch 4: commit 4, the review round, the merge step
+- 15:36 **Commit 4: 42b964618eed741f65ac04c1e5a06da0a82524d0** (the Bash call sent at 14:52:04 ran only at 15:36:16;
+  no notice). Diff hash = step4-check.log's (7b775057…); SIZE-CHECK **967** (+904 -63; step 47); c-u4r-runs.mjs
+  f2002890…; patch c62h-bound-commit4.patch.
+- 15:38-16:03 Review round 1 (wf_9b7db829-7cd): all three APPROVE WITH FINDINGS, 12 Lows, none on a frozen text or a
+  figure's computation; saved word for word (c62h-bound-review-*-full.json), read in full. No lane fix pass: the ten
+  lane Lows deferred in writing (the card's NOW block lists them); TE-CBH-1 and TE-CBH-2 fixed in
+  c62h_bound_set_check.py (dry run set-check-dry-2.log: 12 PASS, 29 of 29 new lines FAIL, as before). Slip 15: a
+  `python3 -I -m py_compile` of the script left __pycache__/c62h_bound_set_check.cpython-313.pyc; removed at once.
+- 16:05 The saver bnqufp0e8 stopped (TaskStop) for the merge. Each lane commit touches only spikes/netcode-proof/
+  (5, 2, 7 and 1 files). `git cherry-pick 54046d4 b423a7d b01d3ac 42b9646` in the main folder: **eb2bebf, b06991e,
+  15102d1, 561bf42** (HEAD 561bf42b8996bbc2ad798cfc27c39c05222524c8; not pushed; origin at efe8401).
+  `git diff --quiet c62h-bound-build HEAD -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results'` exit 0.
+- 16:06-16:16 **The counted main-run.sh call (merge.log): STOPPED at check.mjs's test step.** Header: free 6131 MiB,
+  HEAD 561bf42, diff and untracked e3b0…. fmt, clippy, clippy-wasm32, doc, deps, wasm, refs (1310 tracked files),
+  marks (81), self (78 of 78), redact PASS; **test FAIL: the measured build 552 passed, 0 failed; the bites build 429
+  passed, 1 failed: npt-net's l2::delay::tests::under_loss_the_held_bytes_stay_within_64_kb_and_the_front_records_
+  acknowledged_prefix** (delay_tests.rs:2300: "held <= 64 KB + the front record's acknowledged prefix", left [1, 0],
+  right [0, 0]; .gate/netcode-proof-test/failed-steps/test.log:1407, :1476-1532; the same test passed in the
+  measured build of the same run, :510). det-u4, the release build and the hash did not run. The lane changed no file
+  under crates/net/. Of every *.log under .gate/, this test FAILED in this run's only; "... ok" in 96.
+- 16:17 **The brief's stop (section 10, the advisor's: "a check.mjs step fails that no edit of this lane explains"):
+  stopped and reported whole; no retry, no gate, no push.** The advisor rules (wf_7ef92184-199; notes
+  advisor-c62h-bound-merge-stop.md). The card and these notes stay unsaved until the advisor rules (a save would push
+  the four unverified cherry-picks).
+- 16:30 **The advisor's ruling: CONTINUE WITH CONDITIONS C1-C8** (advisor-c62h-bound-merge-stop-full.json, 42 lines,
+  55ad3561…, read in full): a timing false positive in U3c's test-only held-bound check, not this lane's; one second
+  counted call on 561bf42 (merge-2.log) with its pass bar written before it ran (the card's NOW block); the same test
+  failing again stops the lane until U3C-HELD-1 is fixed; the first call stays recorded as FAIL (C1). Lows' deferral and
+  the two script fixes accepted (c62h_bound_set_check.py e9eb9b2363a587c6…, to be committed with the push). U3C-HELD-1
+  (Medium) and CHECK-NFF-1 (Low) written into the card's Open findings. P2's operating note (C6) on the card.
+- 16:31 The second counted call started (merge/rec and merge/out empty before it, as the first call left them).
+- 16:31-16:48 **merge-2.log: the pass bar holds, every item.** Header free 5278 MiB, HEAD 561bf42, diff and untracked
+  e3b0…; check.mjs exit 0, "check: all 11 steps pass", test "measured build: 552 tests passed, 0 failed, 0 reported a
+  skip; bites build: 632 tests passed, 0 failed, 0 reported a skip" (622.2 s; the npt-net test passed in both
+  builds); det-u4 PASS 215.5 s, non-cargo 204.2 s (npt-lab hash 200.8, Wasm 2.5 and 0.9; builds 10.0 and 1.2) under
+  240; the release build exit 0 (9.36 s); "regenerated SS-P0-s4: 16950444 bytes, sha256
+  1f00d2d5f70a2c7b6836ede611b5f1c281319a5312060ead91e016da3c0b1b42, as the manifest's"; "9000 ticks compared, 0
+  mismatching, equal (SS-P0-s4 9000)"; real 1m55.935s.
+- 16:48 **The gate --no-smoke on 561bf42: GATE PASS** (.gate/u4r/c62h-bound/gate-merge.log; 5a smoke skipped).
+- 16:48 **The built check on 561bf42 (main folder): 25 PASS, 0 FAIL** (built-check-561bf42b8996.log; marks.json after
+  c1935a5b996fb0aa…). Free 6066 MiB after.
+- 16:49 Next: save the card (pushes the branch: the four cherry-picks, these notes, the ruling, the script e9eb9b23…);
+  restart the saver; CI on the pushed head; the advisor's check of the pushed head.
+
+## The pre-flight (NA-CBB-2), its commands written before it runs (the advisor's ruling, C7)
+When: once, after the P0 re-judge's SAME ANSWERS and before section 8.1. Untracked and not counted; nothing
+committed; nothing under spikes/netcode-proof/results. One main-run.sh call from the main folder (it runs each command
+from spikes/netcode-proof, with the shared target, under the lane lock), log
+/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/preflight.log, its commands in order (P = /home/user/Shamble-
+Frontlines/.gate/u4r/c62h-bound/preflight, T = /home/user/Shamble-Frontlines/.gate/shared-target/release):
+1. `df -B1 /home/user`
+2. `sha256sum T/npt-lab T/npt-judge marks/marks.json` (npt-lab from merge-2's release build at the pushed head;
+   npt-judge from the re-judge's release build, the same file the re-judge hashed; marks.json c1935a5b…)
+3. `mkdir -p P/logs`
+4. `T/npt-lab scenario --run preflight-p2 --set c62h-preflight --date 2026-11-16 --commit <the pushed head, full> --out
+   P/logs/preflight-p2 --seed 1 --scene SS --profile P2 --clients 48 --tick-start 63736 --warmup-s 6 --measured-s 4
+   --after-max-s 10 --suite c62h-preflight --role measured --marks PM-0001-2,PM-0001-17` (the short lab test's
+   arguments, P2_SHORT at scenario.rs:2842-2843, with 48 clients, PM-0001-2 in the header list, and the set runner's
+   scene, tick_start and role flags, c-u4r-runs.mjs:329, :485, :533)
+5. `T/npt-judge --marks marks/marks.json --logs P/logs --only PM-0001-17 --out P/verdict.json`
+6. `df -B1 /home/user`
+What counts (the ruling's words): read -17's L1 P2 part for preflight-p2. Proceed if snap_lost_unexplained_count and
+snap_whole_despite_link_loss_count both read 0 with no gap note from the new reader. Any of the reader's eight gap
+phrases: stop for the advisor, whole. A above 0, the lab's N above 0, or N not equal to A: Mustafa's stop rules, as
+for any clean run (stop and tell him; being uncounted never hides a stop). B above 0: the advisor. The part INVALID
+for a reason outside the two figures (the short run's length or header): recorded, and the two figures' own readings
+decide as above; if the judge gives no reading of the two figures at all, the pre-flight is recorded as not
+informative and the P2 set runs as planned.

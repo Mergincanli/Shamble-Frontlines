@@ -75,10 +75,36 @@ it asks nothing; REFS-KIT stays.
   first, RR-CB-2 three docs): the next npt-judge and npt-lab change takes them (U4f/U4g, JDG-ONLY-1). **TE-CBH-1 and
   TE-CBH-2 are in the main session's c62h_bound_set_check.py (not lane code, not counted): fixed now** (the bite rule
   reads every check of the run; the self-test plants a third differing field and one field for link-lost-overstated).
-  **Next: the merge step (brief section 6)**: the saver stopped; each lane commit spikes/netcode-proof/ only;
-  `git cherry-pick 54046d4 b423a7d b01d3ac 42b9646` in the main folder; the diff against c62h-bound-build empty; one
-  counted main-run.sh call (log .gate/u4r/c62h-bound/merge.log); the gate --no-smoke; the built check; push (no card
-  save before the push: a save pushes the branch); CI; the advisor's check of the pushed head. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
+  **The merge step (16:05-16:16 UTC; c62h-bound-build.md has every line):** the saver stopped; the cherry-picks
+  **eb2bebf, b06991e, 15102d1, 561bf42** in the main folder (HEAD 561bf42b8996bbc2ad798cfc27c39c05222524c8, **NOT
+  PUSHED**; origin efe8401); merged bytes = reviewed bytes (diff exit 0). **The counted main-run.sh call STOPPED at
+  check.mjs's test step** (merge.log): the bites build's npt-net test l2::delay::tests::under_loss_the_held_bytes_
+  stay_within_64_kb_and_the_front_records_acknowledged_prefix failed once (held_over_bound [1, 0]; U3c's L2
+  DelayStream, a crate this lane did not touch; it passed in the same run's measured build, in the four worktree
+  check runs and in 96 logged runs); every other step PASS; det-u4 and the hash did not run. **The brief's stop
+  (section 10): no retry, no gate, no push; reported whole to the advisor.** **The advisor's ruling (16:17-16:30 UTC;
+  advisor-c62h-bound-merge-stop-full.json, 42 lines, 55ad3561…, read in full): CONTINUE WITH CONDITIONS C1-C8.** A
+  timing false positive in U3c's test-only held-bound check (a release leaves held unchanged while the bound drops;
+  the pump samples there), not C62H-BOUND's (crates/net unchanged; no manifest or lockfile changed); Medium on U3c's
+  code (U3C-HELD-1 in Open findings), Low on check.mjs (CHECK-NFF-1). **The first call stays recorded as FAIL** by
+  name and panic (C1). The ten Lows' deferral and both script fixes ACCEPTED (c62h_bound_set_check.py sha256
+  **e9eb9b2363a587c6…**, committed with the push; its 8.3 shown-to-fail runs first). The NA-CBB-2 pre-flight ruled IN,
+  once, after SAME ANSWERS and before section 8.1 (commands written in these notes first, read by the head check).
+  **P2's operating note (C6): P2 has two judge calls (measured, then bites); a stop by hand waits until no npt-lab or
+  npt-judge call is left.** **RUNNING from 16:31 UTC: the second and last counted call on 561bf42** (merge-2.log;
+  task bkcogp2ip; section 6 item 2's commands; merge/rec and merge/out empty before it). **Its pass bar (whole):**
+  header HEAD 561bf42, diff and untracked e3b0…; check.mjs exit 0, all 11, test "552 passed, 0 failed; 632 passed, 0
+  failed"; det-u4 PASS, no non-cargo sum over 240 s; the release build exit 0; "regenerated SS-P0-s4: 16950444 bytes,
+  sha256 1f00d2d5…, as the manifest's" and "9000 ticks compared, 0 mismatching, equal". **The same test failing
+  again: stop; save the card at once (the cherry-picks go with it, the head marked "merge step not passed, not for
+  the re-judge"); U3C-HELD-1 first. Any other failure: stop whole for the advisor.** Never a third call without the
+  advisor. **MERGE-2 PASSED WHOLE (16:31-16:48 UTC):** check.mjs 11/11 (552 / 632, 0 failed), det-u4 PASS (non-cargo
+  204.2 s), the release build, SS-P0-s4 regenerated as the manifest's (1f00d2d5…), 9000 ticks equal; **the gate
+  --no-smoke PASS; the built check on 561bf42 25/25.** This save pushes the branch (the four cherry-picks with the
+  card, the ruling, c62h_bound_set_check.py e9eb9b2363a587c6…, the follow-ups). **Next:** the saver restarted; CI on
+  the pushed head; **the advisor's check of the pushed head** (full SHA; it reads merge.log's FAIL by name, merge-2,
+  the gate, the built check, CI and the pre-flight's written commands in c62h-bound-build.md); then the P0 re-judge
+  (section 7), the pre-flight, section 8. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver:** b1gec2y1v ended on its time limit at 11:08:33 UTC ("watch stopped: time is up", exit 0; not a
   cut); restarted at 11:22 UTC as **bp40lga8l** (to about 13:12). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
@@ -3627,6 +3653,23 @@ free:
    the guard can't follow cd, so such writes ask him); run commands from the main folder without cd.
 
 ## Open findings
+- **From C62H-BOUND (2026-11-16; the advisor's merge-stop ruling advisor-c62h-bound-merge-stop-full.json, C3-C4):**
+  - **U3C-HELD-1 (Medium; taker: the main session, as its own planned change, plan first with the advisor, reviewed by
+    netcode-architect and test-engineer; planned and merged before another lane's counted check.mjs run, U4f's merge
+    at the latest):** "G-NC2's held-bound check (delay.rs:528-543) counts a release transient as over the bound". It
+    failed once in C62H-BOUND's first counted merge run (merge.log; failed-steps/test.log:1407, :1476-1532: bites
+    build, npt-net l2::delay::tests::under_loss_the_held_bytes_stay_within_64_kb_and_the_front_records_acknowledged_
+    prefix, held_over_bound [1, 0]). Its first step: a by-name loop of the bites build's npt-net library tests, to
+    confirm the release-transient cause. Never a looser bound without its cause: the fix still checks the bound
+    wherever held can grow (every write) and shows by a planted bug that it still catches a real overflow (for
+    example: drop released_model from down_free; the check must then fail). If NC-U3c-2's bound is written elsewhere
+    as "held <= 64 KB + the front record's acknowledged prefix", the follow-up corrects that sentence too.
+  - **CHECK-NFF-1 (Low; taker: check.mjs's next owner, outside this lane):** the bites build's `cargo test` gains
+    --no-fail-fast (or a second pass), so one failure no longer hides the rest of the build (here it hid 202 of 632).
+  - **C62H-BOUND's ten deferred Lows (the review round, deferred in writing; takers: the next npt-judge or npt-lab
+    change, U4f, U4g or JDG-ONLY-1; to STATUS with the report):** TE-CBH-3, TE-CBH-4, TE-CBH-5 = NA-CBB-1 (the runner's
+    stop note at c-u4r-runs.mjs:14-15 still says only P0 has bites), TE-CBH-6, TE-CBH-7, NA-CBB-3 (the report's one-line
+    note), RR-CB-1, RR-CB-2; NA-CBB-2 ruled in as the pre-flight.
 - **From the advisor's U2 review (advisor-u2.md), each with the unit that fixes it:**
   - **C1 (U4, before PM-0001-18's L1 leg counts):** L1's stream retries back off (each waits twice the last timeout:
     RFC 6298 §5.5, RFC 9002 §6.2.1); loss drawn per 1,448 B segment, any lost segment delaying the message one timeout

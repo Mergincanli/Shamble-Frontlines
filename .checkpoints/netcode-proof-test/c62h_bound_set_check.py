@@ -110,12 +110,50 @@ def bite_rule(bites, bid, own, other, mm, label):
         line(f"{label}: one run", False, f"{len(runs)} runs", "mustafa", True)
         return False
     r = runs[0]
+    rest = sorted((n, c.get("outcome")) for n, c in run_checks(r).items() if n != own)
     got = (r.get("valid"), reading(r, own), reading(r, other), reading(r, mm), r.get("gaps", []))
     want = (True, ("48", "fail"), ("0", "pass"), ("0", "pass"), [])
-    ok = got == want
-    line(f"{label}: valid; its own figure 48 fail; the other figure 0 pass; mismatches 0 pass; gaps []", ok,
-         f"got valid {got[0]}, own {got[1]}, other {got[2]}, mismatches {got[3]}, gaps {got[4]}", "mustafa", True)
+    ok = got == want and all(o == "pass" for _, o in rest)  # TE-CBH-1: "with every other check passing"
+    line(f"{label}: valid; its own figure 48 fail; every other check pass (the other figure and the mismatches 0); "
+         f"gaps []", ok, f"got valid {got[0]}, own {got[1]}, other {got[2]}, mismatches {got[3]}, gaps {got[4]}; every "
+         f"other check {rest}", "mustafa", True)
     return ok
+
+
+def bite_lines(lines_new, s1, judge_a):
+    """The bite runs' summary lines against l1-p2-s1's (TE-CBB-3), as rows (name, ok, detail, who, new)."""
+    out, s1l = [], lines_new.get("l1-p2-s1")
+    for run in ("bite-whole-as-lost", "bite-link-lost-overstated"):
+        l = lines_new.get(run)
+        if l is None or s1 is None or s1l is None:
+            out.append((f"summary {run}: compared with l1-p2-s1", False, "a line or s1's phrase is missing", "advisor",
+                        True))
+            continue
+        st, p, nf = strip(l)
+        f1 = strip(s1l)[0].split(" ", 1)[1].split("; ")
+        fb = st.split(" ", 1)[1].split("; ")
+        diff = [n for n in range(max(len(f1), len(fb))) if (f1[n:n + 1] or [None]) != (fb[n:n + 1] or [None])]
+        if run == "bite-whole-as-lost":
+            h1, hb = field(f1, r"client hashes (\d+) \(sentinels 0\)"), field(fb, r"client hashes (\d+) \(sentinels 0\)")
+            i1, ib = field(f1, r"measured incomplete (\d+)"), field(fb, r"measured incomplete (\d+)")
+            ok = (len(f1) == len(fb) and len(diff) == 2 and None not in (h1, hb, i1, ib) and hb == h1 - 48
+                  and ib == i1 + 48 and all(fb[n].startswith(("client hashes", "measured incomplete")) for n in diff))
+            out.append((f"summary {run}: differs from s1 in exactly client hashes (s1's - 48) and measured incomplete "
+                        f"(s1's + 48)", ok, f"differing fields {sorted(fb[n] for n in diff if n < len(fb))}", "advisor",
+                        True))
+            out.append((f"summary {run}: its new phrase's S, L, B, E1 and E2 equal s1's", p is not None and nf == 1
+                        and p[:5] == s1[:5], f"{p} vs s1 {s1}", "advisor", True))
+            out.append((f"summary {run}: N is 48", p is not None and p[5] == 48, f"{p[5] if p else None}", "mustafa",
+                        True))
+        else:
+            out.append((f"summary {run}: differs from s1 in no field", len(f1) == len(fb) and not diff,
+                        f"differing fields {[fb[n] for n in diff if n < len(fb)]}", "advisor", True))
+            out.append((f"summary {run}: its new phrase's S, L, B, E1, E2 and N (0) equal s1's", p is not None
+                        and nf == 1 and p == s1 and p[5] == 0, f"{p} vs s1 {s1}", "advisor", True))
+        if p is not None:
+            out.append((f"summary {run}: the lab's N equals the judge's figure A", str(p[5]) == judge_a.get(run),
+                        f"N {p[5]}, A {judge_a.get(run)}", "mustafa", True))
+    return out
 
 
 def main():
@@ -128,14 +166,36 @@ def main():
     if args[0] == "--self-test":
         vb = json.load(open(os.path.join(d, "verdict-bites.json"), encoding="utf-8"))
         bites = [b for m in vb for b in m.get("bites", [])]
-        print(f"self-test on {d}/verdict-bites.json: the planted-bug rule, as the file is, then with one gap planted")
+        print(f"self-test on {d}: the planted-bug rule and the bite lines, as the files are, then each planted")
         as_is = bite_rule(bites, WAL, a, w, mm, "as the file is: whole-as-lost")
         planted = copy.deepcopy(bites)
         [b for b in planted if b.get("id") == WAL][0]["runs"][0]["gaps"] = ["a planted gap (the set check's self-test)"]
         p = bite_rule(planted, WAL, a, w, mm, "planted: whole-as-lost with one gap")
-        ok = as_is and not p
-        print(f"SELF-TEST {'PASS' if ok else 'FAIL'}: the rule passes on the file as it is ({as_is}) and fails with the "
-              f"planted gap ({not p})")
+        _, ln = summary_lines(os.path.join(d, "runs.txt"))
+        s1 = strip(ln.get("l1-p2-s1", ""))[1]
+        fields_of = lambda rs, run: [t for t in rs if "differs from s1" in t[0] and run in t[0]]
+
+        def show(tag, rs):
+            for t in rs:
+                print(f"{'PASS' if t[1] else 'FAIL'}  ({tag}) {t[0]}: {t[2]}")
+            return [t[1] for t in rs]
+
+        def bump(l):  # TE-CBH-2: one more field changed (late N becomes N + 1)
+            new, k = re.subn(r"; late (\d+);", lambda m: f"; late {int(m.group(1)) + 1};", l, count=1)
+            return new if k == 1 else None
+
+        as_lines, planted_lines = {}, {}
+        for run in ("bite-whole-as-lost", "bite-link-lost-overstated"):
+            as_lines[run] = show("as the file is", fields_of(bite_lines(ln, s1, {}), run))
+            b = bump(ln.get(run, ""))
+            if b is not None:
+                planted_lines[run] = show(f"planted: {run}'s late field changed",
+                                          fields_of(bite_lines(dict(ln, **{run: b}), s1, {}), run))
+        ok = (as_is and not p and all(v == [True] for v in as_lines.values()) and len(planted_lines) == 2
+              and all(v == [False] for v in planted_lines.values()))
+        print(f"SELF-TEST {'PASS' if ok else 'FAIL'}: the planted-bug rule passes as the file is ({as_is}) and fails with "
+              f"the planted gap ({not p}); each bite line's comparison passes as the file is ({as_lines}) and fails with "
+              f"one more field changed ({planted_lines})")
         sys.exit(0 if ok else 1)
     P = args[0]
     seeds = [f"l1-{P.lower()}-s{k}" for k in (1, 2, 3)]
@@ -215,37 +275,8 @@ def main():
         if "(overflow resyncs: to the advisor before it counts, carry 58)" in l:
             print(f"      note: {s} carries the carry-58 flag: to the advisor before it counts")
     if P == "P2":
-        s1 = ph.get(seeds[0])
-        s1l = lines_new.get(seeds[0])
-        for run in ("bite-whole-as-lost", "bite-link-lost-overstated"):
-            l = lines_new.get(run)
-            if l is None or s1 is None or s1l is None:
-                line(f"summary {run}: compared with l1-p2-s1", False, "a line or s1's phrase is missing", new=True)
-                continue
-            st, p, nf = strip(l)
-            f1 = strip(s1l)[0].split(" ", 1)[1].split("; ")
-            fb = st.split(" ", 1)[1].split("; ")
-            diff = [n for n in range(max(len(f1), len(fb))) if (f1[n:n + 1] or [None]) != (fb[n:n + 1] or [None])]
-            if run == "bite-whole-as-lost":
-                h1, hb = field(f1, r"client hashes (\d+) \(sentinels 0\)"), field(fb, r"client hashes (\d+) \(sentinels 0\)")
-                i1, ib = field(f1, r"measured incomplete (\d+)"), field(fb, r"measured incomplete (\d+)")
-                names = sorted(fb[n] for n in diff if n < len(fb))
-                ok = (len(f1) == len(fb) and len(diff) == 2 and None not in (h1, hb, i1, ib) and hb == h1 - 48
-                      and ib == i1 + 48 and all(fb[n].startswith(("client hashes", "measured incomplete")) for n in diff))
-                line(f"summary {run}: differs from s1 in exactly client hashes (s1's - 48) and measured incomplete "
-                     f"(s1's + 48)", ok, f"differing fields {names}", new=True)
-                ok2 = p is not None and nf == 1 and p[:5] == s1[:5]
-                line(f"summary {run}: its new phrase's S, L, B, E1 and E2 equal s1's", ok2, f"{p} vs s1 {s1}", new=True)
-                line(f"summary {run}: N is 48", p is not None and p[5] == 48, f"{p[5] if p else None}", "mustafa", True)
-            else:
-                line(f"summary {run}: differs from s1 in no field", len(f1) == len(fb) and not diff,
-                     f"differing fields {[fb[n] for n in diff if n < len(fb)]}", new=True)
-                ok2 = p is not None and nf == 1 and p == s1 and p[5] == 0
-                line(f"summary {run}: its new phrase's S, L, B, E1, E2 and N (0) equal s1's", ok2, f"{p} vs s1 {s1}",
-                     new=True)
-            if p is not None:
-                line(f"summary {run}: the lab's N equals the judge's figure A", str(p[5]) == judge_a.get(run),
-                     f"N {p[5]}, A {judge_a.get(run)}", "mustafa", True)
+        for t in bite_lines(lines_new, ph.get(seeds[0]), judge_a):
+            line(*t)
     nf = [r for r in rows if not r[0]]
     named = [r for r in rows if r[2]]
     print(f"c62h_bound_set_check {P}: {len(rows) - len(nf)} PASS, {len(nf)} FAIL "
