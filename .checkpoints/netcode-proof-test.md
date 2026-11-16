@@ -38,11 +38,15 @@ it asks nothing; REFS-KIT stays.
   check.mjs all 11 PASS on the staged bytes (545 / 625 = +7 / +9 as expected); 9 plants bitten; the commit's diff hash
   equals step1-check.log's (0b41121e…); SIZE-CHECK 499 (plan 285-400; the stop is 1,050). Open for the review round:
   Summary's L counts lost + burst (B part of L; B 0 on P2 and P3); one lint allow on Logs::room_tick (the only
-  deviation). **RUNNING from 11:02 UTC: step 2's launch** (workflow wf_4f7f49a2-b56, task wj4ioy4ah; the judge's two
-  figures, plants CB-P8-P10 and CB-P14-P18, expected 551 / 631). **If cut:** resume by run id
-  (`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-step2-wf_4f7f49a2-b56.js", resumeFromRunId: "wf_4f7f49a2-b56"})`),
-  after reading the notes' "## State" and the worktree's diff. **Then:** commit 2 the same way; insert part 3 and the
-  built check; step 3's launch. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
+  deviation). **Step 2 DONE** (launch 2, wf_4f7f49a2-b56, 11:02-11:53 UTC; c62h-bound-step2-full.json, read in full):
+  **commit 2 = b423a7d9231f68c87a1af9004dc1f2c218b43948**; check.mjs 11/11 (551 / 631 = +6 / +6); 8 plants bitten; no
+  existing judge answer moved; diff hash equal (f88bf7d5…); SIZE-CHECK **821** (step 322). **Part 3 inserted (12:19
+  UTC)**: the three expected hashes; **the built check 25 PASS, 0 FAIL**. **RUNNING from 12:20 UTC: step 3's launch**
+  (workflow wf_009969c7-069, task wj7lg76ur; B-2's four fixture files, judge tests before and after, check.mjs,
+  expected 552 / 632). **If cut:** resume by run id
+  (`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-step3-wf_009969c7-069.js", resumeFromRunId: "wf_009969c7-069"})`),
+  after reading the notes' "## State" and the worktree's diff (the three marks files must still hash c1935a5b… /
+  6898e119… / f3c3c804…). **Then:** commit 3, the built check on it, step 4's launch. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver:** b1gec2y1v ended on its time limit at 11:08:33 UTC ("watch stopped: time is up", exit 0; not a
   cut); restarted at 11:22 UTC as **bp40lga8l** (to about 13:12). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**

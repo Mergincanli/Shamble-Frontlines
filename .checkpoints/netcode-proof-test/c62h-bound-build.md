@@ -231,3 +231,25 @@
 - Stop rules: none met.
 - Next (the main session): commit 2 in the worktree; check `git diff HEAD^ HEAD -- . | sha256sum` (spikes/netcode-
   proof) = f88bf7d5…; the committed SIZE-CHECK = 821; then insert part 3 and the built check before step 3's launch.
+
+## Main session after launch 2
+- 11:53 Launch 2's return saved word for word: c62h-bound-step2-full.json (123 lines, sha256 366a2910…; status done).
+  Read in full: 6 new engine.rs tests in each build (551 / 631 = +6 / +6, as expected); 8 plants bitten (re-run on
+  the final code after a lost-set fix: the (slot, tick) pairs are a BTreeSet, so a pair is counted once, as the frozen
+  row counts pairs); no existing judge answer moved. For the review round: the gap order (slot_hashes' own refusals
+  and decoded's "room logs disagree on clients" before the row's eight; figures.rs:565-655); "an entry below 0" read
+  on the link lists only; the notes carry the phrases without the row's backticks; deviations: the reader sits after
+  decoded's helper `coverage`, engine.rs's imports gained RunOut and Phase's three names.
+- 11:54 **Commit 2: b423a7d9231f68c87a1af9004dc1f2c218b43948.** `git diff HEAD^ HEAD -- . | sha256sum` =
+  f88bf7d56b845c33… = step2-check-2.log's header; nothing unstaged; untracked none. SIZE-CHECK from LANE_BASE: **821**
+  (+804 -17; step 2 alone 322: figures.rs 172, engine.rs 150). Patch: c62h-bound-commit2.patch (387 lines, addbe9d9…).
+- 12:19 **Insert part 3 on the worktree** (.gate/u4r/c62h-bound/insert-part3.log): exit 0; marks.json 9fb5be57… →
+  c1935a5b…, SERIES.md 89295b57… → 6898e119…, README.md b49f3441… → f3c3c804… (all three the brief's expected; the
+  json.loads check equal; README refilled into 16 lines, the longest 120); numstat marks.json +26 -0, SERIES.md +4 -2,
+  README.md +16 -11 (59).
+- 12:19 **The built check after part 3** (HEAD b423a7d plus part 3, unstaged; built-check-b423a7d9231f.log): exit 0,
+  **25 PASS, 0 FAIL** (texts v3, freeze, paste, 8 blocks; both marks blocks once; the four rows as whole lines; both
+  headers; the sentence; the three hashes; the README word diff adds the sentence's 73 words in order, removes
+  nothing); marks.json after c1935a5b996fb0aa….
+- 12:20 Step 3's launch (wf_009969c7-069): B-2's four files with the real marks.json, judge tests before and after,
+  check.mjs, expected +1 / +1 → 552 / 632; the lane about 880 before B-2.
