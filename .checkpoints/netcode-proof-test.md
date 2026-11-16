@@ -50,12 +50,21 @@ it asks nothing; REFS-KIT stays.
   answer moved. **For the review round (test-engineer):** before B-2's edits only base's test failed (lost-group and
   hashed-and-incomplete read INVALID by gap 1, not the brief's "FAIL (A 1)", which is their reading once base's room
   log carries the series; shown after the edits: step3-readings-*.log); one doc-comment line in fixtures.rs:390-391
-  beyond the brief's list. **RUNNING from 14:26 UTC: step 4's launch** (workflow wf_dc2b1bf5-0d4, task wjnfscivf;
-  section 3.4: bitesOf, SPLIT_LINE, the header comment, the recorded dry print .gate/u4r/c62h-bound/harness/, plant
-  CB-P11; expected 552 / 632). **If cut:** resume by run id
-  (`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-step4-wf_dc2b1bf5-0d4.js", resumeFromRunId: "wf_dc2b1bf5-0d4"})`),
-  after reading the notes' "## State" and the worktree's diff. **Then:** commit 4, its patch; the review round
-  (test-engineer, netcode-architect, rust-reviewer, xhigh: brief section 5) on LANE_BASE..commit 4. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
+  beyond the brief's list. **Step 4 DONE** (launch 4, wf_dc2b1bf5-0d4, from about 14:25 to 14:51 UTC; the card first
+  said "14:26", written before the clock was read; c62h-bound-step4-full.json, read in full): **commit 4 =
+  42b964618eed741f65ac04c1e5a06da0a82524d0** (made 15:36:16: the Bash call sent at 14:52:04 ran only then, no notice;
+  the machine had booted at about 14:22, uptime 1:15 at 15:37); the dry print harness/plan-dry.mjs (693bcf3f…) 22 of
+  22 asserts PASS; CB-P11 bit (P0 7 bites, 5 asserts fail); check.mjs 11/11 (552 / 632, no change); the diff hash
+  equals step4-check.log's (7b775057…); the runner for the sets c-u4r-runs.mjs **f2002890…**; SIZE-CHECK **967** (step
+  47: both header bullets refilled to 120 columns); patch c62h-bound-commit4.patch (104 lines, 4fd376ae…). For the
+  review: the stale comment c-u4r-runs.mjs:14-15; roomFor prints 888 / 524 MiB beside 887.6 / 524.4; launch 4 ran two
+  read-only `node -e` and two `python3 -I -c` calls outside the runner (wrote nothing; recorded for the report).
+  **RUNNING from 15:38 UTC: review round 1** (workflow wf_9b7db829-7cd, task w1kihj933: test-engineer with the 13:35
+  read and the main session's four scripts, netcode-architect, rust-reviewer; xhigh; read only; notes
+  c62h-bound-review-test.md, -netcode.md, -rust.md). **If cut:** resume by run id
+  (`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-review-wf_9b7db829-7cd.js", resumeFromRunId: "wf_9b7db829-7cd"})`).
+  **Then:** the three results word for word, read in full; the fix pass (one launch; 83 lines of room to 1,050);
+  anything touching a frozen text or a figure's computation goes to Mustafa before the judged runs. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver:** b1gec2y1v ended on its time limit at 11:08:33 UTC ("watch stopped: time is up", exit 0; not a
   cut); restarted at 11:22 UTC as **bp40lga8l** (to about 13:12). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
