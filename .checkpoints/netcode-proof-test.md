@@ -161,11 +161,24 @@ it asks nothing; REFS-KIT stays.
   UTC: the report's draft and its verification** (workflow wf_a1cd7d1b-556: a drafter writes c62h-bound-report-draft.md
   from the ruling's order_to_the_report and brief section 9; then the verifier checks every claim). **Then:** the
   section into u4r-report.md by script; save; CI; the advisor's check of that head (P6); the report to Mustafa.
-  **NS-STATUS: PR #54 (draft) opened 21:57 UTC** (claude/night-shift-stints, commit 20f9d599…, NIGHT_SHIFT.md +3 -0,
-  the lines' sha256 4e3d1565… = his yes; the worktree .gate/ns-stints-wt; subscribed); **RUNNING: its review round**
-  (workflow wf_9f3bfdf9-76a: the advisor and the security-auditor). Then: stop for his go. **Mustafa's 21:50
-  words (NS-STATUS (a); approval-free forms) are recorded; the NIGHT_SHIFT.md lines go to him in chat, the pull
-  request after P2 and P3.** **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
+  **NS-STATUS: PR #54 opened 21:57 UTC** (claude/night-shift-stints, commit 20f9d599…, NIGHT_SHIFT.md +3 -0, the
+  lines' sha256 4e3d1565… = his yes; the worktree .gate/ns-stints-wt; subscribed). **Its review round DONE**
+  (wf_9f3bfdf9-76a; both saved word for word and read in full): **the advisor APPROVE WITH FINDINGS**
+  (advisor-ns-stints-full.json a684c2ce…: 5 Lows ADV-NS-L1 to -L5, merge conditions C1-C4) and **the
+  security-auditor APPROVE WITH FINDINGS** (security-ns-stints-full.json 725657538e…: SA-NS-1, SA-NS-2 Low). **C1
+  met:** all seven Lows deferred in writing, no push. ADV-NS-L1 (the command shows no --trailer) and SA-NS-1 (the
+  first stint is not tied to a refresh) would reword his lines: his decisions NS-TRAILER and NS-FIRST (recommend (a),
+  as is). ADV-NS-L2 = SA-NS-2 (a foreground agent call is not woken), -L3 (§5's 110-minute figures), -L4 (KIT_LINES
+  lacks the stint line): the kit's next change after the freeze. -L5: docs-keeper records his words on main after the
+  merge. **C2 met (logs 22:05-22:10 UTC, .gate/ns-stints-tests/):** the four kit test files on the head and on
+  main's files: 1271 tests, 1270 pass, 0 fail, 1 skipped, both. The gate --no-smoke on 20f9d59 in the worktree PASS
+  (the main folder's modules by NODE_PATH: the lockfiles byte-equal; acorn 8.18.0, acorn-walk 8.3.5, eslint-scope
+  9.1.2 as locked), its log identical to the gate on main's legacy/ and tools/ (diff empty). Smoke: CI's, green on
+  20f9d59 (6 check runs success). **C3 holds:** origin/main 53272a1 (fetched about 22:09), the PR's diff to it
+  NIGHT_SHIFT.md +3 only. **Next (C4): ready for review, then stop for his go** on head
+  20f9d59918eea1e3431ae830f72510f83f6424c7 (a merge commit, as #53; that SHA as the expected head). His 21:50 and
+  22:09 words are recorded (Rules in force).
+  **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver:** b1gec2y1v ended on its time limit at 11:08:33 UTC ("watch stopped: time is up", exit 0; not a
   cut); restarted at 11:22 UTC as **bp40lga8l** (to about 13:12). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
