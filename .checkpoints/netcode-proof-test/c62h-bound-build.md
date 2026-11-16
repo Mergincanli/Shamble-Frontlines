@@ -335,3 +335,37 @@
 - Next (the main session): commit 3 in the worktree (message from brief section 1); `git diff HEAD^ HEAD -- . |
   sha256sum` from spikes/netcode-proof = a1238e90…; the committed SIZE-CHECK = 920; the built check again; then step
   4's launch.
+
+## Launch 4 (step 4)
+- 14:31 Start. Read brief sections 0, 1, 3.4, 4, 8, 10 whole (sha256 7936074c… checked); runner u4r-run.sh e9437ae2…
+  checked (header lines 1-16 read). Worktree at b01d3ac (commit 3), clean; marks.json c1935a5b… (built);
+  c-u4r-runs.mjs 99dd070e… (LANE_BASE's; its blob 4b5a07f8… equal at 044fab1 and HEAD). The quoted texts, each found
+  exactly once: `-17's and -57's on P0,` at :29; `(only P0: bitesOf)` at :35 (the brief says :34; the text is there
+  exactly, one line lower); `(read its L1 P0 parts;` at :166. Nothing else reads bitesOf or SPLIT_LINE (grep: only
+  the file itself). Plan: (1) items 1-3 by Edit; (2) the harness plan-dry.mjs by Write, its sha256 into sources.txt
+  by Write before its first run, run -x (plan-dry.log); (3) CB-P11, run -x (plant-CB-P11.log), restore, sha equal;
+  (4) stage; (5) check.mjs whole (step4-check.log); (6) counts 552 / 632 unchanged; (7) SIZE-CHECK.
+- 14:31 The file's width read as 120 columns: 41 of its comment lines sit at 119-120 and 6 at 121-123 (:19, :29,
+  :49, :53, :58, :78 at LANE_BASE: drift); the brief's own README refill is width 120. At 120, item 3's two edits
+  refill both bullets to their ends: :29-:34 (6 lines become 7) and :35-:44 (10 lines; `(P0 and P2: bitesOf)` puts
+  :35 at 121, so every line after it shifts). Greedy fill and push-down-only give the same lines for each bullet
+  (computed read-only by python3 -I, no writes). So step 4 comes to about 45 lines, not the brief's "about 10-20".
+- 14:3x Items 1-3 by Edit in c-u4r-runs.mjs. (1) bitesOf (now :307-322): doc comment "one run each at seed 1 on the
+  profiles its part reads. -17's whole-as-lost runs on P0 and P2 and link-lost-overstated on P2 only, never P0
+  (C62H-BOUND); every other -17 and -57 bite on P0, as before; -18's none ..."; code: `on` = {whole-as-lost: [P0, P2],
+  link-lost-overstated: [P2]}, `bitesOn(mark, bite)` = -18 → [], else on[bite] ?? [P0], the profile test moved from
+  the mark filter to the bite filter. (2) SPLIT_LINE (now :167): `(read its L1 P0 parts;` → `(read the set's parts;`
+  only. (3) :29 and :35 as item 3 says, both bullets refilled at 120 (:29-:35 and :36-:45 now). Word diff: only those
+  words (plus `advisor-u4r-f2-plan):`, moved across a line break); no new line over 120 but SPLIT_LINE's and the
+  bite filter's code lines (the file's code lines run to 314). numstat +25 -22 = 47. sha256 after: f2002890e297b2df….
+- 14:33 Item 4, the recorded dry print. Harness .gate/u4r/c62h-bound/harness/plan-dry.mjs (Write; sha256
+  693bcf3f006e1322…), its sha256 with the runner's (f2002890…) and marks.json's (c1935a5b…) written into sources.txt
+  (Write) before its first run; `sha256sum -c` of sources.txt OK just before it. Run -x (plan-dry.log): exit 0,
+  "plan-dry: 22 asserts, 22 passed, 0 failed". P0 the nine runs in order (6 bites, no link-lost-overstated), 3,790.2 MB
+  = 3,614.6 MiB, roomFor "projected 3615 MiB", judge 4344 / 4719 MiB (= 93509dfd7fd1's runs.txt:9-12); P2 the five
+  runs in order, 930.7 MB = 887.6 MiB (roomFor prints it rounded, "projected 888 MiB"), judge 2129 / 552 MiB, both
+  bites seed 1, tick_start 63,736, the bites build, marks PM-0001-2,PM-0001-17; P3 3 runs, no bites, 549.9 MB = 524.4
+  MiB, judge 1530 MiB; B1 3 runs, no bites, 874.2 MB, judge 2253 MiB; all 6 calls under 10,240 MiB; SPLIT_LINE names
+  none of P0, P2, P3, B1 and equals LANE_BASE's with the one phrase changed; overflowFlag on fd4612050cd6's l1-p3-s1
+  line with the new phrase (made-up S/L/B/E1/E2/N) gives the flag at 27 and "" at 0. Header: diff 7b775057… (the
+  unstaged edit), untracked e3b0… (none).
