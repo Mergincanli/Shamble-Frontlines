@@ -59,12 +59,26 @@ it asks nothing; REFS-KIT stays.
   47: both header bullets refilled to 120 columns); patch c62h-bound-commit4.patch (104 lines, 4fd376ae…). For the
   review: the stale comment c-u4r-runs.mjs:14-15; roomFor prints 888 / 524 MiB beside 887.6 / 524.4; launch 4 ran two
   read-only `node -e` and two `python3 -I -c` calls outside the runner (wrote nothing; recorded for the report).
-  **RUNNING from 15:38 UTC: review round 1** (workflow wf_9b7db829-7cd, task w1kihj933: test-engineer with the 13:35
-  read and the main session's four scripts, netcode-architect, rust-reviewer; xhigh; read only; notes
-  c62h-bound-review-test.md, -netcode.md, -rust.md). **If cut:** resume by run id
-  (`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-review-wf_9b7db829-7cd.js", resumeFromRunId: "wf_9b7db829-7cd"})`).
-  **Then:** the three results word for word, read in full; the fix pass (one launch; 83 lines of room to 1,050);
-  anything touching a frozen text or a figure's computation goes to Mustafa before the judged runs. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
+  **Review round 1 DONE** (wf_9b7db829-7cd, 15:38-16:03 UTC; 3 agents, 785,434 tokens; saved word for word:
+  c62h-bound-review-test-full.json 144 lines 3bf8888c…, -netcode-full.json 71 lines 5adfdf18…, -rust-full.json 57
+  lines 3f39ade6…; **all read in full**): **all three APPROVE WITH FINDINGS; 12 findings, all Low; none touches a
+  frozen text or what a figure computes.** The test-engineer's 13:35 read line is in its JSON (read_line: marks.json
+  :3983-4004 the two checks, :4035-4038 the bite; figures.rs :538-698, :805-830; engine.rs :1555-1700; B-2's files;
+  9fb5be57… → c1935a5b…; diff --stat 7 files +376 -12; hashed-and-incomplete INVALID → FAIL the only changed answer; no
+  other assertion moved). Rulings on the builders' points: all accepted (L includes B: confirmed, the report says so
+  where it quotes S / L / B; B-2's before-edit readings: within B-2's ruling, the report gives them as recorded).
+  **Decision (the review budget: a Low never triggers a push; brief section 5: "Each finding is fixed or deferred in
+  writing"): no lane fix pass; the lane's ten Lows are deferred in writing as follow-ups** (TE-CBH-3 one-phrase-only
+  assert, -4 bound's own length checks untested, -5 = NA-CBB-1 the runner's stale "(P0)" stop note, -6 wording, -7 a
+  negative snap_incomplete's phrase; NA-CBB-2 no npt-lab log judged before the P2 set (its pre-flight call goes to the
+  advisor's head check), NA-CBB-3 the rows' "process client" vs the code's client-or-bots; RR-CB-1 gap 7 names slot
+  first, RR-CB-2 three docs): the next npt-judge and npt-lab change takes them (U4f/U4g, JDG-ONLY-1). **TE-CBH-1 and
+  TE-CBH-2 are in the main session's c62h_bound_set_check.py (not lane code, not counted): fixed now** (the bite rule
+  reads every check of the run; the self-test plants a third differing field and one field for link-lost-overstated).
+  **Next: the merge step (brief section 6)**: the saver stopped; each lane commit spikes/netcode-proof/ only;
+  `git cherry-pick 54046d4 b423a7d b01d3ac 42b9646` in the main folder; the diff against c62h-bound-build empty; one
+  counted main-run.sh call (log .gate/u4r/c62h-bound/merge.log); the gate --no-smoke; the built check; push (no card
+  save before the push: a save pushes the branch); CI; the advisor's check of the pushed head. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver:** b1gec2y1v ended on its time limit at 11:08:33 UTC ("watch stopped: time is up", exit 0; not a
   cut); restarted at 11:22 UTC as **bp40lga8l** (to about 13:12). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
