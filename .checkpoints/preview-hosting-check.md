@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-16 12:37 Amsterdam (11:37 UTC)
+- **Last update:** 2026-11-16 13:38 Amsterdam (12:38 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -191,6 +191,24 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - Still due from him: the `preview` and `production` environment pages, Actions → General (plan A2: the pinning
      tick, approval for all external contributors, the read-only workflow permissions with "Allow GitHub Actions to
      create and approve pull requests" unticked), and the token's end date (plan A5: 10 days from the start).
+   - His four screenshots (user message 2026-11-16 12:34:49 UTC, 9326670f-a038-4031-8d77-64dc5e94a570), transcribed
+     against plan A2, A6 and A7:
+     - "Configure production": "Required reviewers" unticked, "Wait timer" unticked, "Allow administrators to bypass
+       configured protection rules" unticked; "Deployment branches and tags": "Selected branches and tags", "1 branch
+       and 0 tags allowed", rule `main` ("Currently applies to 1 branch"); secret CANARY ("15 hours ago"). As planned.
+     - "Configure preview": "Required reviewers" ticked with Mergincanli; "Prevent self-review" unticked; "Wait timer"
+       unticked; **"Allow administrators to bypass configured protection rules" ticked**; "Deployment branches and
+       tags": "No restriction"; secrets CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN ("15 hours ago"). **A fault
+       against plan A6 step 4 ("Untick ... It is on by default, and it would give your login a one-click way around
+       the reviewer"): his fix first** (untick, "Save protection rules", a new screenshot).
+     - Actions → General: "Allow all actions and reusable workflows"; "Require actions to be pinned to a full-length
+       commit SHA" ticked; retention 90 days (the default; the plan sets none); "Require approval for all external
+       contributors" chosen. "Workflow permissions": "Read repository contents and packages permissions" chosen;
+       "Allow GitHub Actions to create and approve pull requests" unticked. As planned.
+     - He asked "Aren't these the screenshots of everything I have done yesterday? did you want visual confirmation?"
+       and "where do I set the tokens end date, tell me and I'll do it real quick". Cloudflare's restrict-tokens page
+       (infra-engineer-docs.md, C2): "By default, tokens do not expire". Whether an existing token's end date can be
+       changed: a web-fetch agent reads Cloudflare's docs (launched after his message; model opus, effort high).
 
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
