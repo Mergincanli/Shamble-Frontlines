@@ -1,0 +1,57 @@
+{
+  "verdict": "APPROVE WITH FINDINGS",
+  "summary": "I read the lane's Rust (npt-l1's new read and its test, npt-lab's join, record and tally, npt-judge's reader, its two figures and the engine.rs and fixtures.rs tests) at 42b9646 against LANE_BASE 044fab18. I ran nothing: no cargo, no build, no test. Every item in section 5 of the brief holds.\n\n- **Clippy and docs:** clippy runs with warnings as errors over the whole workspace and all targets, first on the measured build and then with every feature (check.mjs:2014-2019, :2618). The wasm32 lint run covers npt-l1 (check.mjs:39, :1970). It passed in all four logs: step1-check.log:6-7, step2-check-2.log:6-7, step3-check.log:6-7 and step4-check.log:6-7. rustdoc also passed with warnings as errors, in both builds.\n- **No hash map, no float:** none in any added line; the new code uses only ordered maps and sets.\n- **No reachable overflow, even though release builds of these three crates wrap silently** (overflow checks are on only for npt-sim and npt-proto, Cargo.toml:116-120):\n  - the lost and burst counts are separate match arms (l1 lib.rs:424-428), so their sum is at most the datagrams sent, which the join has already checked equals the groups;\n  - the totals are u64 and the judge counts in i128.\n- **No bite code in the measured build:** the planted-bug code is cfg(feature = \"bites\") (scenario.rs:973-975, :1061-1072, :214, :226). The one new field is plain data in both builds, as whole_as_lost already is.\n- **The join's Err fails the run (TE-CBB-7 (d)):** at scenario.rs:1051-1055 the error goes straight up through `?` to an exit code 1 (main.rs:242-245). No unwrap_or, no default value. The logs are dropped without their footers, since no log type has a Drop impl.\n- **Docs on public items:** the only new public items are DatagramCounts with its three fields and server_datagrams_since; all are documented.\n- **No panic from log or run data, no target-dependent code, no change to simulated behaviour.** The new reads take no mutable access and draw nothing.\n- **Wasm size:** unchanged by construction. The only shipped Wasm module (npt-hash-wasm) depends on npt-sim alone, and the lane touches no npt-sim file. I did not measure bytes.\n- **Speed:** not measured.\n  - The join scans only the fate-log entries the send itself added, and makes three 48-entry allocations per room tick.\n  - The merge step's timed `npt-lab hash --manifest crates/lab/precheck-recordings.json` does run the join. Earlier timings at the same pin (1f00d2d5) are 113.1 s, 121.1 s and 123.8 s, from .gate/u4r/brawl1/final-regen-tests.log:23, final-fp-regen-tests.log:24 and .gate/brawl1-merge/m3.log:57. Compare the merge step's time against those.\n  - The \"npt-lab hash\" seconds in check.mjs's wasm step are not evidence: that manifest is synthetic (hash.rs:396-397), so it never runs the join.\n\nThe four builder points are ruled below. Two Low findings, neither touching a frozen text; both are below the push bar.",
+  "findings": [
+    {
+      "id": "RR-CB-1",
+      "severity": "Low",
+      "where": "spikes/netcode-proof/crates/judge/src/figures.rs:651 (against the doc at :578)",
+      "what": "Gap 7 ('a measured incomplete tick the room log has no record of') can name a different place than the doc says. `lost` is a BTreeSet<(usize, u64)> ordered by slot first, so `lost.iter().find(..)` reports the lowest slot's first unmatched tick, not the earliest tick. bound's doc says 'at its first tick and slot'. Example: with (0, 100) and (5, 10) both unmatched, the note names slot 0, tick 100.",
+      "why": "Only the location at the front of the note differs. The phrase, the gap order, INVALID and both figures' values are unchanged, and the engine.rs gap test asserts only the phrase. A reader of a gap note could look at a later tick than the first one missing.",
+      "fix": "Either reword the doc for gap 7 to 'at its first slot and tick', or pick the earliest tick with `.filter(|(_, t)| !link.contains_key(t)).min_by_key(|&&(s, t)| (t, s))`. About 1 line.",
+      "fix_lines_estimate": 1,
+      "touches_frozen_text_or_figure_computation": false
+    },
+    {
+      "id": "RR-CB-2",
+      "severity": "Low",
+      "where": "spikes/netcode-proof/crates/lab/src/scenario.rs:800-805 and :198-200; spikes/netcode-proof/crates/lab/src/logs.rs:181-187",
+      "what": "Two docs each cover three fields but are attached to the first field only. Summary's doc describes link_sent, link_lost and link_burst but sits on link_sent. Counts' doc describes E1, E2 and N but sits on lost_room_sent_nothing. Separately, the doc of Bites.link_lost_overstated reads 'and the link lost none written `tick.s.snap_link_lost_count` 1': a comma or an 'is' is missing.",
+      "why": "Only crate-internal fields, so no lint fires and the doc step passes. rustdoc shows the shared text under one field, and the bite's sentence is hard to read.",
+      "fix": "Add one /// line to each of link_lost, link_burst, lost_link and lost_unexplained, and add 'is' before 'written' at scenario.rs:199. About 5 lines.",
+      "fix_lines_estimate": 5,
+      "touches_frozen_text_or_figure_computation": false
+    }
+  ],
+  "points": [
+    {
+      "point": "(a) The lint allow `#[allow(clippy::too_many_arguments, reason = ...)]` on Logs::room_tick (logs.rs:520-523)",
+      "reading": "Accept. room_tick now takes 8 inputs, past clippy's limit of 7 under warnings-as-errors. The allow carries a reason and copies the only precedent in the workspace (mirror.rs:353-356). Bundling the inputs into a struct would cost about 15 lines and touch both test call sites (logs.rs:941, :954). `#[expect]` would be stricter (it fires if the lint stops applying), but nothing in the workspace uses it, so no change."
+    },
+    {
+      "point": "(b) The BTreeSet of lost (slot, tick) pairs (figures.rs:546, :622, :645)",
+      "reading": "Accept.\n- It is ordered, so deterministic, and it counts each pair once, as the frozen row words it ('the (slot, tick) pairs').\n- A duplicate can only come from two client logs: read_log refuses ticks that do not increase within one log (npt-log lib.rs:443, :560). So the builder's 'not reachable on a valid L1 run' holds.\n- `whole` can stay a Vec: slot_hashes refuses two logs at one (slot, tick) (figures.rs:268-273), so it cannot hold a duplicate.\n- Cost is negligible (about 17k inserts per run).\n- The one side effect is RR-CB-1 (gap 7 reports by slot first)."
+    },
+    {
+      "point": "(c) engine.rs's test encoding: a null hash as -1 in BoundTick, and the edits as [fn(&mut [Log]); 8] (engine.rs:1567-1588, :1653)",
+      "reading": "Accept.\n- `u64::try_from(h).ok()` maps any negative number to null. This applies to the two hash columns only and is documented in the type's doc. The link and incomplete columns keep their literal values.\n- The array of plain function pointers is the right fix for clippy's type_complexity error on `[&dyn Fn(&mut [Log]); 8]`: closures that capture nothing convert to function pointers.\n- Wrapping each removed value in `drop(..)` is a fine way to discard it.\n- All of this is test code, with nothing reachable at run time."
+    },
+    {
+      "point": "(d) DatagramCounts and the read-only claim of server_datagrams_since (l1 lib.rs:329-339, :412-431)",
+      "reading": "Accept; the claim holds.\n- It takes `&self` over a plain Vec<Fate> with no interior mutability (lib.rs:306-327).\n- Each datagram's fate (delivered, lost, burst) is decided when it is logged (lib.rs:1130-1138). The only later write to an entry (lib.rs:1174-1176) changes a delivered datagram's arrival time and its 'overtaken' flag, never its fate.\n- A send on a link that is not up, or a datagram too large, returns before anything is logged (lib.rs:1117-1122), as the doc says.\n- Only datagram(), called from send_datagram (lib.rs:1103, :1140-1143), logs datagram entries. So the event processing that runs during a send adds only acknowledgement and stream entries, which the filter drops.\n- The derives and per-field docs match the brief, and `get(from..).unwrap_or_default()` gives the brief's 'none when from is past the end'.\n- It does not filter by link. That is correct today for the reason above, and any extra entry would fail the run through the join's equality check (scenario.rs:621-626)."
+    },
+    {
+      "point": "The call site's Err handling (TE-CBB-7 (d)) and the measured totals",
+      "reading": "It holds: no unwrap_or and no default value at the join; the error message names the slot and tick (scenario.rs:1051-1055). The totals come from the fate-log counts, never the written value (:1056-1060). L sums lost plus burst and B sums burst alone, so B is a subset of L, which matches the frozen phrase 'lost by the link {L} (in bursts {B})' (builder step 1, point 1). Two `unwrap_or(0)` in logs.rs are not the join:\n- the padding at :643 is what brief item 7 asks for;\n- the one in the tally at :464 cannot fire, because both maps are filled in the same room_tick call (:570, :649). If it ever did, it would count the tick as N, the cautious side that triggers the stop rule."
+    },
+    {
+      "point": "Speed and Wasm size numbers, with method",
+      "reading": "Not measured (this read runs no cargo).\n- Cost by reading the code: the join scans only the entries the send added. The record makes three 48-entry allocations per room tick (scenario.rs:1022, logs.rs:642-648), like the loop's existing per-tick vectors. The judge builds its reader once per figure, so twice per run, cloning each room tick's 48-entry list (figures.rs:617, :678, :690). That is tens of MB transient on a 48-client 10-minute run, far under the 10,240 MiB call bound that peak.py checks at the sets.\n- Baseline for the merge step's timed `npt-lab hash --manifest crates/lab/precheck-recordings.json` (it re-runs a recorded scenario, so it exercises the join), same pin 1f00d2d5: 113.1 s, 121.1 s and 123.8 s, about ±5 %. I recommend the report put the merge step's time beside these.\n- Wasm: unchanged by construction (the deps step shows npt-hash-wasm ships npt-sim only); bytes not measured.\n- No dependency change (no Cargo.toml or Cargo.lock in the diff)."
+    },
+    {
+      "point": "Size",
+      "reading": "The lane holds 967 changed lines against the 1,050 stop. Neither Low requires a change. If both are folded into a fix pass for other reviewers' findings, they add about 6 lines (1 for RR-CB-1, 5 for RR-CB-2). RR-CB-1 can also be fixed by rewording the doc alone."
+    }
+  ],
+  "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/c62h-bound-review-rust.md"
+}

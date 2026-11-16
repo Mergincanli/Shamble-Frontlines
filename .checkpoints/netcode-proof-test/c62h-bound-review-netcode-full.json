@@ -1,0 +1,71 @@
+{
+  "verdict": "APPROVE WITH FINDINGS",
+  "summary": "I found nothing in my field above Low. All the work is spike code with its tests and marks; no frozen text changes, and neither figure computes anything different from what its row says. I read the diff 044fab1..42b9646 (14 files, 967 changed lines), the brief's sections 0-5, 8.4 and 10-11, texts v3, the freeze, the design, the three rulings, the four builder returns and the lane notes. I ran no build and no test.\n\nHashes: the brief (7936074c...), texts v3 (3f21c9b7...) and the freeze (9cb8be17...) match. The built marks.json (c1935a5b...), SERIES.md (6898e119...) and README.md (f3c3c804...) match the brief's \"after\" values.\n\n**The join.** The three checks in link_lost (scenario.rs:610-631) are the brief's, in the brief's order. The datagram count (server_datagrams_since, l1/src/lib.rs:412-431) reads only server-to-client datagram entries, from the given index on. Only one L1 function adds datagram entries (lib.rs:1103, :1143), and reading the fate log changes nothing (lib.rs:1918-1920). So the entries counted around server.send(slot) are exactly that slot's datagrams, and a missing or extra one fails the run.\n\nA join error comes back through `?` with the slot and tick named. No Drop writes footers, so the run's logs end without them and the judge reads the run INVALID. The measured totals are summed from the counts, never from the written record. The planted bug sits behind the bites feature, fires once per slot, and changes only the written value.\n\n**The tally.** The two per-tick maps are removed together, once per room tick (logs.rs:427-431, flush :500-512), so the new one stays bounded. E1, E2 and N split the measured lost ticks, so E1 + E2 + N equals the measured incomplete count by construction. On a valid run, N equals figure A.\n\n**The figures.** Both match their frozen rows: what they count, the measured window, and the eight gaps returned in the row's order (figures.rs:579-667).\n\n**The runner.** bitesOf plans P0 as before minus link-lost-overstated, P2 two bites, P3 and B1 none. SPLIT_LINE names no profile. The header edits are as the brief gives them.\n\n**The expected lines (section 8.4).** The summary phrase (scenario.rs:1708-1710) is word for word, and the set check's regex matches it. overflowFlag is unaffected, and no other ops script reads the summary line. The dry print passed 22 of 22 asserts.\n\n**Size.** 967 changed lines, under the 1,050 stop. Of step 4's 47 lines, 33 are the header comment re-wrapped to 120 columns. An insert-only edit would have been about 6 lines. Not a defect, but it would be the cheaper way if the lane ever approaches the stop.\n\nFixes: the only edit worth making is NA-CBB-1's one or two comment lines, and only if a fix pass happens for another reason. NA-CBB-2 is a scratch judge call that adds no tracked lines. NA-CBB-3 needs no change.",
+  "findings": [
+    {
+      "id": "NA-CBB-1",
+      "severity": "Low",
+      "where": "spikes/netcode-proof/ops/runs/c-u4r-runs.mjs:13-14 (builder point g)",
+      "what": "The operator's instructions for stopping a set still say \"In a set with bites (P0), ending the measured judge call's group starts the bite-runs call at once\". bitesOf (:312-322) now gives P2 two bite runs and two judge calls.",
+      "why": "Someone stopping a P2 set by hand could take it to have one judge call, end only the first call's group, and leave the bite-runs call running. Nothing judged is affected.",
+      "fix": "Change \"(P0)\" to \"(P0 and P2: bitesOf)\" and refill the one or two lines within 120 columns. Not a frozen text. Only in a fix pass made for another reason, never a push on its own.",
+      "fix_lines_estimate": 2,
+      "touches_frozen_text_or_figure_computation": false
+    },
+    {
+      "id": "NA-CBB-2",
+      "severity": "Low",
+      "where": "spikes/netcode-proof/crates/judge/src/figures.rs:579-667 (bound); crates/lab/src/scenario.rs:2859-2897 (the lab test's own join, c62hb_join)",
+      "what": "The shared reader has only read logs built in engine.rs and B-2's hand-written fixture files. No log written by npt-lab has been judged with the two new checks: the short P2 lab test uses its own join, since npt-lab does not depend on the judge. The first real read is the judged P2 set.",
+      "why": "Any surprise in a real log shows up as a gap, so the run reads INVALID, never a wrong PASS (both figures share the gap list). But it would cost a full P2 set (about 29 minutes) and a stop for the advisor. The keys and series line up in everything I read (room_tick writes both series on every room record; error records go to the lab log, logs.rs:485), so the risk is small.",
+      "fix": "Before the P2 set, one scratch call: the built npt-judge with the built marks.json, --only PM-0001-17, on the logs of one short P2 npt-lab run (the short test's arguments plus PM-0001-2 in its header list) written under .gate/u4r/c62h-bound/. Read -17's L1 P2 checks: A 0, B 0, no gap notes. Untracked and not counted; log it under .gate/u4r/c62h-bound/.",
+      "fix_lines_estimate": 0,
+      "touches_frozen_text_or_figure_computation": false
+    },
+    {
+      "id": "NA-CBB-3",
+      "severity": "Low",
+      "where": "spikes/netcode-proof/crates/judge/src/figures.rs:583, :623 (source(\"decoded_hash\"): process client or bots, :224-233); the frozen rows snap_lost_unexplained_count and snap_whole_despite_link_loss_count (\"over the run's client logs (process `client`)\")",
+      "what": "The rows say process client. The reader takes the decoded_hash writers, process client or bots, as brief 3.2 item 1 and the design's judge text named them.",
+      "why": "Every run the two checks read (-17's L1 P2, P3 and B1 parts) has only a client log, so the value is the same on every run either way. Only an L2 run would differ, and no check applies these figures to an L2 part.",
+      "fix": "None needed: the row is frozen, the code follows the brief, and both give the same value on every run they read. The report can carry it as a one-line note.",
+      "fix_lines_estimate": 0,
+      "touches_frozen_text_or_figure_computation": false
+    }
+  ],
+  "points": [
+    {
+      "point": "(a) Summary's L adds lost + burst and B adds burst, so B is part of L in \"lost by the link L (in bursts B)\" (scenario.rs:1058-1059, phrase at :1709)",
+      "reading": "Confirmed. It matches the per-tick record, which link_lost returns as c.lost + c.burst and the frozen link-record row defines as lost by the loss draw or in a burst. It also matches the Summary doc comment. On P2 and P3, B is 0. On U4g's B1 runs, reading B as separate would double-count bursts, so the report should say once, where it quotes S / L / B, that L includes B. No code change."
+    },
+    {
+      "point": "(b) link_lost runs the no-session check before comparing c.sent with groups (scenario.rs:610-631)",
+      "reading": "Confirmed. This is the brief's own order (3.1 item 3): no session with groups; then c.sent against groups, which with no session means against 0; then groups with no server hash. With no session and groups, Server::send returns early, so c.sent is 0 and both of the first two checks would fire; putting the no-session check first gives the more specific error. Each of the five tests passes every check except its own, so CB-P2, P3 and P4 each read Ok where Err was expected."
+    },
+    {
+      "point": "(c) The pre-check's run_leg sends without the join (precheck.rs:438), as the brief puts the join only in run's loop",
+      "reading": "Confirmed. The pre-check writes no room log and no link record, and no -17 figure reads its runs (the runner header: the judge never reads them). A join there would check something nothing records, it falls outside the brief's 3.1 item 4, and it would add lines. The join does run on every run() call, logs or not, including the SS-P0-s4 regeneration of the merge check, and does so on P0."
+    },
+    {
+      "point": "(d) The reader's gap order: slot_hashes' own refusals and \"room logs disagree on clients\" come before the frozen row's eight gaps, and the earliest of the eight in the row's order is returned (figures.rs:565-655)",
+      "reading": "Confirmed. Those refusals are preconditions: without them there is no single client count for the row's gaps to refer to. The brief keeps slot_hashes' texts (3.2 item 1), and the clients error is decoded's own text. Each of the eight is kept at its first occurrence and the first in the row's order is returned, so a run with several gaps names the earliest row gap. With no room log at all, the reader returns gap 1 (\"no room log gives tick.s.snap_link_lost_count\"), the row's own words, where decoded would report the clients error. Either way the run is INVALID."
+    },
+    {
+      "point": "(e) \"An entry below 0\" is read on the link lists only; a snap_incomplete entry below 0 reads as gap 7 (figures.rs:613-616)",
+      "reading": "Confirmed. The design's judge text ties \"an entry below 0\" to the tick.s.snap_link_lost_count read, and a snap_incomplete of -1 is \"other than 0 or 1\". Hash lists cannot be negative. Both readings make the run INVALID on both figures; only the note's phrase differs."
+    },
+    {
+      "point": "(f) The (slot, tick) pairs are a BTreeSet, so a pair filed lost by two client logs counts once (figures.rs:546, :622, :645)",
+      "reading": "Confirmed. The row counts pairs, and decoded keeps its own lost pairs in a BTreeSet the same way. The whole-hash list needs no set, because slot_hashes refuses two logs giving one slot and tick a hash (:264-269). An L1 run has one client log, so a duplicate cannot happen there. The set also keeps the counting order deterministic."
+    },
+    {
+      "point": "(g) The stale comment at c-u4r-runs.mjs:14-15 (\"In a set with bites (P0)\")",
+      "reading": "Real but Low (NA-CBB-1). It is an operator instruction for stopping a set, and P2 now has two judge calls. The fix is one or two comment lines, \"(P0 and P2: bitesOf)\", and touches no frozen text. Make it in the fix pass if one happens for another reason; never push for it alone."
+    },
+    {
+      "point": "(h) E1 is never above 0 on the short P2 test; condition 2 is shown by the fixtures until P3's s1 (brief section 8.4)",
+      "reading": "Accepted, as the advisor ruled (r2, TE-CB-2: not a stop). The short run has no overflow resync and no kick, so the room sends every client a snapshot each measured tick and E1 must be 0. On the judge side, E1 is pinned by c62hb_each_explanation_alone_reads_0 (slot 0) and plant CB-P14. The lab tally's E1 branch has no lab test that makes it non-zero, but the stop rules bound it: a tick wrongly filed as N makes N non-zero (a stop), and an unexplained tick wrongly filed as E1 leaves figure A above 0 (a stop) and A unequal to N. Only an E1/E2 swap in the report-only split would go unseen. P3 s1's 27 overflow resyncs should show E1 above 0 on a real run; if not, the report says the fixtures alone show condition 2, as section 8.4 provides."
+    }
+  ],
+  "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/c62h-bound-review-netcode.md"
+}
