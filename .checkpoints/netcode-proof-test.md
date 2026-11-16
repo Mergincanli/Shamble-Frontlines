@@ -175,9 +175,10 @@ it asks nothing; REFS-KIT stays.
   (the main folder's modules by NODE_PATH: the lockfiles byte-equal; acorn 8.18.0, acorn-walk 8.3.5, eslint-scope
   9.1.2 as locked), its log identical to the gate on main's legacy/ and tools/ (diff empty). Smoke: CI's, green on
   20f9d59 (6 check runs success). **C3 holds:** origin/main 53272a1 (fetched about 22:09), the PR's diff to it
-  NIGHT_SHIFT.md +3 only. **Next (C4): ready for review, then stop for his go** on head
-  20f9d59918eea1e3431ae830f72510f83f6424c7 (a merge commit, as #53; that SHA as the expected head). His 21:50 and
-  22:09 words are recorded (Rules in force).
+  NIGHT_SHIFT.md +3 only. **C4: ready for review at 22:11 UTC (body updated, head unchanged); stopped for his go**
+  on head 20f9d59918eea1e3431ae830f72510f83f6424c7 (a merge commit, as #53; that SHA as the expected head). His
+  21:50 and 22:09 words are recorded (Rules in force). A safety-net check-in on the PR at 23:04 UTC (send_later
+  trig_01LYv1nTavGw7z2NxKqLadrC; the subscription rules: stop it if nothing changed and he has not written).
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver:** b1gec2y1v ended on its time limit at 11:08:33 UTC ("watch stopped: time is up", exit 0; not a
