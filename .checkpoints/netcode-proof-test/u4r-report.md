@@ -987,13 +987,14 @@ _The steps are the round-1 ruling's M1-M7 (advisor-brawl1-r1-full.md, The merge 
 _Copied word for word from advisor-brawl1-sets-p0-full.md, "The report words", lines 212-253 (sha256 4b16dab5…). One
 change is made, as the ruling's own "NOTE TO THE MAIN SESSION" (:266) orders: the P3 carry-58 line reads "U4r 0 / 0 /
 0"._
+_The two sub-lines under -17 L1 P3 and -17 L1 P2 are not the ruling's words: C62H-REVIEW added them (c5238f5), and C62H-BOUND replaced them (the advisor's P3 ruling, advisor-c62h-bound-p3-full.json)._
 
 All three sets ran with c-u4r-runs.mjs 99dd070e, the runners unchanged (A6), each set's results committed before the next set started, and the amended M7-3 met at each start (pre-P2.log, pre-P0.log). Figures are for runs s1 / s2 / s3; "U4r" means U4r's same-profile set.
 
 **P3:** commit fd4612050cd6, spike tree ebbfeb40. Log .gate/u4r-sets/P3-fd4612050cd6.log (sha256 cc2f626c…), exit 0, wall 1,020.5 s, peak 973.2 MiB. Results results/u4r/fd4612050cd6/P3/ (runs.txt 5361fd53…, verdict.json 21c9abbf…), committed at fc41111.
 - -2 SS runs: FAIL to PASS. Everyone in view went from 0.352778 / 0.085444 / 0.203556 to 1 / 1 / 1.
 - -17 L1 P3: INVALID to PASS, with 0 mismatches of 835,238 / 835,419 / 835,088 compared. The judge counts 44,395 / 44,253 / 44,535 incomplete over the whole run; npt-lab counts 43,295 / 43,210 / 43,454 in the measured window.
-  - Against the profile's loss (C62H-REVIEW; the advisor's report words, advisor-c62h-review-full.md): P3: 43,295 / 43,210 / 43,454, against 43,200 (5 %). These are the advisor's estimates, assuming one datagram per client-tick; no check makes the comparison. Stale = 0 and sentinels = 0 on every run. -17 does not limit this count off P0, and neither do -58's two wrap parts.
+  - Bounded by C62H-BOUND (his words of 2026-11-15, 16:35 and 20:50): snap_lost_unexplained_count 0 / 0 / 0 and snap_whole_despite_link_loss_count 0 / 0 / 0 (results/u4r/d66e23cd78f2/P3/verdict.json); the lab's tally E1 / E2 / N per run: 201 / 43,094 / 0, 0 / 43,210 / 0 and 5 / 43,449 / 0, each summing to the measured incomplete count (results/u4r/d66e23cd78f2/P3/runs.txt; s1's and s3's E1 are the ticks after carry 58's 27 and 1 overflow resyncs, while each forced full state was unacknowledged); the planted bugs 48 and 48 (P2's verdict-bites.json, results/u4r/8ee453c22882/P2/). Still unbounded: -58's two wrap parts and the other items of the C62H-BOUND report's 'Still unbounded' list.
 - -57 L1 P3: PASS, as in U4r's. Position max 6,952 / 6,963 / 6,970 against 6,984; p99 5,111; yaw 2,750 and pitch 88,063, unchanged. Largest change: s1's position max, -0.46 %.
 - Carry 58: overflow resyncs 27 / 0 / 1 (U4r 0 / 0 / 0).
   - s1: 25 clients at ticks 76,910-77,844. s3: slot 35 at 76,803.
@@ -1004,7 +1005,7 @@ All three sets ran with c-u4r-runs.mjs 99dd070e, the runners unchanged (A6), eac
 **P2:** commit fc411116c1f1, spike tree 079ffffc. Log .gate/u4r-sets/P2-fc411116c1f1.log (sha256 a24d5856…), exit 0, wall 1,046.7 s, peak 1,760.3 MiB. Results results/u4r/fc411116c1f1/P2/ (runs.txt c2995379…, verdict.json 1d2ff9e5…), committed at 93509df.
 - -2 SS runs: FAIL to PASS. Everyone in view went from 1 / 0.5875 / 0.7295 to 1 / 1 / 1.
 - -17 L1 P2: INVALID (s2 and s3 by pre:PM-0001-2) to PASS, with 0 mismatches of 861,996 / 862,011 / 861,731 compared. The judge counts 17,739 / 17,566 / 18,027 incomplete over the whole run; npt-lab counts 17,260 / 17,089 / 17,532 in the measured window.
-  - Against the profile's loss (C62H-REVIEW; the advisor's report words, advisor-c62h-review-full.md): P2: 17,260 / 17,089 / 17,532, against the 17,280 that 2 % predicts. These are the advisor's estimates, assuming one datagram per client-tick; no check makes the comparison. Stale = 0 and sentinels = 0 on every run. -17 does not limit this count off P0, and neither do -58's two wrap parts.
+  - Bounded by C62H-BOUND (his words of 2026-11-15, 16:35 and 20:50): snap_lost_unexplained_count 0 / 0 / 0 and snap_whole_despite_link_loss_count 0 / 0 / 0 (results/u4r/8ee453c22882/P2/verdict.json); the lab's tally E1 / E2 / N per run: 0 / 17,260 / 0, 0 / 17,089 / 0 and 0 / 17,532 / 0, each summing to the measured incomplete count (results/u4r/8ee453c22882/P2/runs.txt); the planted bugs 48 and 48 (P2's verdict-bites.json, results/u4r/8ee453c22882/P2/). Still unbounded: -58's two wrap parts and the other items of the C62H-BOUND report's 'Still unbounded' list.
 - -57 L1 P2: PASS, as in U4r's. Max 6,984 / 2,750 / 88,063 on every run, equal to U4r's. Position p99 5,111 on every run, against 5,257 / 5,280 / 5,283. Largest change: s3's position p99, -3.26 % (ADV-P0-2 corrects the card's '0.0 %').
 - Overflow resyncs 0, so no flag. Every other summary figure equals U4r's same-seed line.
 - Building figure 0. Bytes 622.2 MiB against 780.8 projected (0.797); U4r's P2 had 778.9.
