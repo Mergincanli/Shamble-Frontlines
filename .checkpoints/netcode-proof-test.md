@@ -146,7 +146,15 @@ it asks nothing; REFS-KIT stays.
   []; each line equal to fc411116c1f1's without the phrase and wall time; **S 864000 each; L 17260 / 17089 / 17532, B 0;
   E1 0, E2 = L, N 0; N = A**; whole-as-lost A 48 fail (every other check pass, gaps []), its line differs from s1's in
   exactly hashes -48 (861948) and incomplete +48 (17308), N 48 = A 48; link-lost-overstated B 48 fail, its line equal to
-  s1's, N 0 = A 0. **P2 counts.** Free 5,307 MiB before P3 (at least 5,100: no pack). **Mustafa's 21:50
+  s1's, N 0 = A 0. **P2 counts.** Free 5,307 MiB before P3 (at least 5,100: no pack). **THE P3 SET (about
+  21:20-21:37 UTC, 1029.4 s, exit 0; P3-d66e23cd78f2.log; pre-P3-c62h.log all as P2's): results committed** (results/u4r/
+  d66e23cd78f2/P3/: runs.txt, verdict.json; redact 305 items, 0 findings). The judge: -2 SS runs, -17 L1 P3, -57 L1 P3
+  PASS (3 valid each). **THE P3 SET CHECK: 32 PASS, 0 FAIL, 0 on Mustafa's stop rules** (set-check-P3.log): A 0, B 0,
+  mismatches 0, gaps [] on each run; each line equal to fd4612050cd6's without the phrase and wall time; **S / L / B:
+  863772 / 43094 / 0, 864000 / 43210 / 0, 863994 / 43449 / 0; E1 / E2 / N: 201 / 43094 / 0, 0 / 43210 / 0, 5 / 43449 / 0
+  (each = measured incomplete 43295 / 43210 / 43454); N = A 0**; s1's E1 201 above 0: condition 2 shown on a real run.
+  **s1 (overflow resyncs 27) and s3 (1) carry the carry-58 flag: to the advisor before they count.** Next: the
+  advisor's ruling on them; then section 9's (c) lines by script and the report; NS-STATUS's pull request. **Mustafa's 21:50
   words (NS-STATUS (a); approval-free forms) are recorded; the NIGHT_SHIFT.md lines go to him in chat, the pull
   request after P2 and P3.** **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
