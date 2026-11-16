@@ -38,3 +38,13 @@
   runner u4r-run.sh e9437ae2… checked. Worktree at 044fab1, only ` M marks/SERIES.md` (89295b57…, +2 -1). Plan: items
   1-11 of 3.1 in order (l1 read + test; lab join + tests; call; totals; plant; record; tally; summary phrase; short P2
   tests; module texts); then plants CB-P1..P7, P12, P13; stage; check.mjs whole; SIZE-CHECK.
+- 10:5x Items 1-11 written (not yet compiled): l1 lib.rs DatagramCounts (after FateLog) and
+  FateLog::server_datagrams_since (after for_each_canonical); l1 tests.rs down_datagrams_in_canonical +
+  c62hb_server_datagrams_since_counts_down_datagrams_by_fate (after reorder_counts' test); scenario.rs module paragraph
+  (link record), link_lost (after impl Server), LAB_BITES [&str; 3], Bites::link_lost_overstated, Summary
+  link_sent/link_lost/link_burst, the call + totals + plant in run's per-slot loop, the summary phrase, the 5 join
+  tests, c62hb_join, the short P2 test and the 2 bite tests; logs.rs module text, Logs::link_lost map, Counts
+  lost_room_sent_nothing/lost_link/lost_unexplained, room_tick's link_lost parameter (+ the house-style
+  too_many_arguments allow, 8 inputs now), the tally in write_client_tick, the two test call sites `&[]`.
+  Reading taken (to the main session): Summary.link_lost = sum of c.lost + c.burst (link_lost()'s own value, so the
+  phrase "lost by the link L (in bursts B)" has B inside L); link_burst = sum of c.burst; link_sent = sum of c.sent.
