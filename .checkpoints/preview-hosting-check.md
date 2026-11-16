@@ -241,6 +241,15 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   -f, -F, --field, --raw-field or --input, `gh pr merge`, and `npx *`: a session here cannot push a test repository's
   main, delete a remote branch, approve a pending deployment through gh, or run wrangler locally.
 
+- GitHub's docs, read by the web-fetch agent (hand-back 2026-11-16 09:13:16 UTC), page
+  https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets, "Creating secrets for
+  a repository": "On GitHub, navigate to the main page of the repository." / "Under your repository name, click
+  Settings." / "In the "Security" section of the sidebar, select Secrets and variables, then click Actions." / "Click
+  the Secrets tab."; and "If your repository has environment secrets [...] then those secrets are also listed on this
+  page." How they are listed (names, counts or links) the docs do not say. An environment's own secrets: Settings, "In
+  the left sidebar, click Environments.", "Click on the environment that you want to add a secret to.", "Under
+  Environment secrets, ...".
+
 ## Key numbers
 - Test repository Mergincanli/shamble-preview-check (public): main 4a67b83 (his README); `setup` head 1619164 (U1
   fe8116d at 2026-11-15 21:01:07 UTC, U2 ba3946e, U3 1b37fae, fix pass 2df0112, his approved diff 1619164); 0 pull
@@ -330,7 +339,7 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   minutes); its last "saved and pushed": 0d21f48 at 08:59:20 UTC.
 - agent web-fetch (model opus passed; effort not passed, while CLAUDE.md says "Effort is always stated": a slip,
   recorded): GitHub's docs on Actions secrets, for the click path in the message to him · launched 2026-11-16 09:10:14
-  UTC (transcript time) · running.
+  UTC · DONE, hand-back 09:13:16 UTC (transcript times); its answers under Facts.
 - Ended: savers bc4g68il4 (2026-11-15 15:52 to about 16:48 UTC, TaskStop) and bkmmk2e8i (20:58 to 22:48:20 UTC, time
   up); agents infra-engineer and security-auditor (doc reads, DONE), advisor (the plan review, DONE; the review of head
   1619164, DONE 2026-11-16 09:02:47 UTC); workflows wf_c4580fcf-ece (round 1, 3 of 3) and wf_1f145f55-1c2 (round 2, 2
