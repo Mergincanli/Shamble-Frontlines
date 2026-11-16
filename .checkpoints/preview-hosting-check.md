@@ -100,50 +100,29 @@
    branch link as stale: an expected red). Kept as STATUS follow-ups: L1, L2, L4, R2-3, R2-5, R2-6.
 
 ## Current step
-16. Waiting for his yes on the batched diff and his SA-R3 answer; round 2 (on what changed, 1b37fae..2df0112) and the
-   advisor agent's review of the final head next. Earlier step, kept for the record:
-14. The review round (U4): get_session at about 21:12 UTC read 717,475 of 1,000,000 tokens (72%; automatic compaction
-   at 901,600), so the review goes ahead and he is asked to compact before Day 1's runs. The round runs as one workflow
-   of three agents (ultracode is on; CLAUDE.md's cap of 3): infra-engineer, security-auditor (his condition 2 on
-   `deployments: write`), test-engineer, each at effort high, notes `<agent>-review.md` in this folder.
-   - At his request ("Clone the repository Mergincanli/shamble-preview-check into this session"), the session attached
-     it with add_repo (push access, as plan A3 step 4 says) and cloned it shallowly to /home/user/shamble-preview-check
-     (outside this repository's folder), add_repo at 20:01 UTC and the clone right after (transcript times). The repository is empty: no commit, no branch (`git ls-remote`
-     lists nothing; the clone says "No commits yet"). Plan A1's "Add a README file" was not ticked, so there is no
-     `main` for pull requests; the deny list forbids the session to push any `main`, so he adds the README on GitHub.
-     register_repo_root waits for the first commit (its condition: `rev-parse HEAD` succeeds).
-   - He then added README.md ("I have pushed the readme.md file"): `main` is 4a67b83 "Create README.md"
-     (4a67b83b9ed672c81e1a6e3067f916841c02b4a9), fetched shallowly and fast-forwarded onto the empty local `main` (no
-     reset); register_repo_root called for /home/user/shamble-preview-check. He asked for the rest of the setup in plain
-     words; the steps sent: A2, A3 (SR-READ), A4, then wait for the session's reply, then A5 to A7.
-   - His answers (his message stamped 20:42:20 UTC, abaac228-81c6-4e33-808e-40fc63e8499f): A4 done, the test site is up at https://shamble-preview-check.pages.dev/;
-     his Cloudflare account holds nothing besides the domain shamblefrontlines.com ("this is the first time that I've
-     been using cloudflare"); on 1b: "I had to give proper access for read and write (confirm), and have done so for
-     Claude", which names no permission, so SR-READ is still open. The app's public page
-     (https://github.com/apps/claude, read by the web-fetch agent) lists no permissions. Asked him for the exact
-     "Read and write access to ..." lines on the app's Configure page; he waits at A5 (step 3a, the token) until then.
-   - His next message (stamped 20:53:10 UTC, 0e69957a-4b89-452f-91ea-630a03b3a35a): "setup done" and a screenshot of
-     the Claude app's Configure page. Transcribed from the screenshot: "Read access to Dependabot alerts,
-     administration, commit statuses, merge queues, and metadata"; "Read and write access to actions, checks, code,
-     discussions, issues, pull requests, repository creation, repository hooks, and workflows"; Repository access:
-     "All repositories". **SR-READ: neither administration nor deployments has write access** (administration
-     read-only; deployments absent), so his thing 1 does not stop the build. Approving a pending deployment needs
-     Deployments write and changing an environment needs Administration write (security-auditor's G1b and G3 notes),
-     neither of which the app holds. His "setup done" is read as A2 and A5 to A7 done (to confirm in the reply).
-     The screenshot itself stays out of the repository (a binary); its text is above.
+18. His yes (2026-11-16, user message stamped 08:46:16 UTC; byte for byte in `mustafa-2026-11-16-yes.md`, 929 bytes) to
+   the batched diff, and SA-R3 accepted in his words. Applied as commit 1619164 on `setup` (two files only, `git show
+   --stat`: close.yml 2 +-, deploy.yml 3 +--); placed hashes 29593af18d34 (deploy.yml) and 3afdf389d636 (close.yml)
+   equal his yes; probe.yml f24ad6e81daf and browsers.yml 6791076916ae unchanged; both token-test variants still share
+   deploy.yml's first part (fd3dc4c6029b, 8b745631a278). The plan's Part 7.1 and 7.2 texts (deploy.yml, close.yml) are
+   superseded by these approved ones. The round-2 Lows stay follow-ups (none applied: no unreviewed script change).
+   Next: the advisor agent's review of head 1619164.
 
 ## Next steps
-1. Round 2: DONE, both APPROVE (step 17). Its three ride-along Lows go into the next push.
-2. His yes on the batched diff (`tr-draft/proposed/deploy.yml` sha256 29593af18d34..., `tr-draft/proposed/close.yml`
-   sha256 3afdf389d636...; the exact diff sent in chat at about 21:47 UTC). On his yes: copy both files byte for byte
-   into /home/user/shamble-preview-check/.github/workflows/, check the hashes, commit on `setup`, push.
-3. His answers: SA-R3 (accept the install-step residual risk for this check, or not), the screenshots of `preview`,
-   `production` and Actions → General, and the token's end date (asked at 20:56 UTC).
-4. The advisor agent's review of the final `setup` head (after 1 to 3).
-5. The results-log header (PM-0006-1), then the first list for him (his condition 3): the setup pull request's two
-   runs (its deploy, then its merge's cleanup), in order, with the sitting's length; then open the setup pull request.
-6. Then Day 1's sittings as plan Part 3 C, with sitting 3's two additions (SA-R4, SA-R8), each preceded by its list.
-   Before Day 1: ask him to compact if the chat is near full (it was 82% at 21:44 UTC).
+1. The advisor agent's review of the final `setup` head 1619164 (the saver restarted first; a short reply asked).
+2. His screenshots of `preview`, `production` and Actions → General, and the token's end date (his next message):
+   check the secret names (CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CANARY), `preview` (him as reviewer,
+   self-review unticked, admin bypass unticked), `production` (Selected branches and tags: main; bypass unticked),
+   Actions (pin to full SHA; approval for all external contributors), the end date after Day 2. Any fault: his fix first.
+3. Then: the results-log header (PM-0006-1) naming head 1619164 (after the advisor agent's approval); his first list
+   (the setup pull request: approve its deploy, merge it, approve its cleanup; about 10 minutes); then open the setup
+   pull request.
+4. Day 1's sittings as plan Part 3 C (sitting 3 with SA-R4 and SA-R8), each preceded by its list (his condition 3).
+
+## For the report (the checkpoint is deleted at the end)
+- His point 3 of 2026-11-16, to carry into step 2.6's plan: "For step 2.6, not for this check: plan a locked install (a
+  committed lockfile, install scripts off) and bring it to me with step 2.6's plan."
+- SA-R3 accepted in his words (point 2 of the same message).
 
 ## Open findings
 - Refused by the guard, 2026-11-15 15:54:02 UTC: `git -C <dir> fetch ...` ("git: no option before the subcommand (run
