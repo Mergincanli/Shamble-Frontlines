@@ -779,7 +779,10 @@ a4be43b1f756e45dd, ended about 04:10); AFTER-BUILD STEPS 1-4 DONE; NEXT THE ADVI
                 P1, P2, P3 each fail the new test, the old test passes (P1.tap to P3.tap); the gate `--no-smoke` PASS
                 (.gate/refs-kit/gate-no-smoke.log). **Running (task bdc3gq790, from about 20:35 UTC): check.mjs whole,
                 counted through main-run.sh** (.gate/refs-kit/counted.log). Then commit, push, the advisor's check.
-            - **Worker restart (not the spend limit), 20:33:58 UTC (the transcript):** the same notice; my turn was not
+            - **Worker restart (not the spend limit), 2026-11-16 between 02:36 and 04:36 UTC:** it cut only the 02:35 check-in's
+  reply (its notification read at 02:36:27); nothing ran (no agent, workflow, runner or saver; the tree clean at bf9079d,
+  equal to the remote); the check-in finished at 04:36. Nothing lost.
+- **Worker restart (not the spend limit), 20:33:58 UTC (the transcript):** the same notice; my turn was not
               complete (the plant runs); continued at once; nothing lost.
             - **Worker restart (not the spend limit), 19:57:19 UTC (the transcript; the card first said "about 19:52"):** "This session's worker process was restarted.
               If your previous turn was already complete, take no action and wait for the next event. Otherwise,
