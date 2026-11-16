@@ -209,6 +209,12 @@
    screenshots of both environments and the Actions page, plus the token's end date, before the setup pull request;
    every change to an approved text batched into one diff for one new yes; get_session read after `setup` is pushed.
 
+5. 2026-11-16 08:47:00 UTC (called; transcript time), moment 3, before the approved CI change was written · Q: may the
+   approved diff go in now, and with what? · Changed: the approved change as a commit of its own (two files, checked
+   with `git show --stat`), hashes checked before and after; the round-2 Lows kept out (no unreviewed script change);
+   the checkpoint updated before anything launched (Part 7.1 and 7.2 superseded; his step-2.6 item recorded for the
+   report); the saver restarted before the advisor agent; the screenshots' checks listed before any list goes to him.
+
 ## Running work
 - saver (task bkmmk2e8i, started 20:58 UTC): stopped by itself at 22:48:20 UTC ("time is up", 110 minutes); no agent or
   workflow runs now, so it stays off until the next agents start (CHECKPOINTS.md §5).
