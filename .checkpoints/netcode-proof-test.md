@@ -3,13 +3,34 @@
   (`.checkpoints/netcode-proof-test/plan.md`, revision 3.3; approved by the advisor and Mustafa, 2026-11-06) · verdict:
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
-  **Base:** main, last merged in at 7685b2b (main 4d21c1a, PR #48, the toolchain). Main is now 4460ef5 (PR #52, eight
-  files under docs/ only), **not merged in** (MAIN-52, Mustafa 2026-11-14: take main in when main changes code, CI or
-  rules, and once before PR #40 is marked ready)
-- **Last update:** 2026-11-14 about 17:45 UTC (U4r-F1 done at f1f131b and approved by the advisor's review of the
-  head; the disk plan written and its part-clean done, 10,592 MiB free; D4 running; the NOW block below)
+  **Base:** main, last merged in at 2bd44a5 (main 53272a1, PR #53 the kept-logs rule and PR #52 the docs pass; Mustafa's
+  KL-MERGE (a), 2026-11-15 20:50). Take main in again when main changes code, CI or rules, and once before PR #40 is
+  marked ready (MAIN-52, 2026-11-14)
+- **Last update:** 2026-11-16 09:17 UTC (the day session: night item 7 taken in by reference; the second pack done;
+  C62H-BOUND's build starting: the block "NOW (2026-11-16)" below)
 
 ## Resume card (read this first; open the rest only when a step needs it)
+**NOW (2026-11-16, the day session; read this first after a compact or a cut).** Mustafa typed /compact about 09:00
+UTC and pasted the Advisor's confirmation of the repo state (main 53272a1, his 20:50 words whole, the first uses, the
+REFS-KIT exception "my lean is to leave it", C62H-BOUND's freeze and approved brief, B-2's one changed fixture answer):
+it asks nothing; REFS-KIT stays.
+- **Night item 7 DONE by the night shift** (issue #16 item 7 ticked; its report comment 6904274561, 00:50 UTC; status
+  comment 6902964789): `cs/npt-u4f-brief` at **34a2e55** (6 files, all under .checkpoints/npt-u4f-brief*): U4f's
+  brief rev 2 `git show 34a2e55:.checkpoints/npt-u4f-brief/u4f-brief-draft.md` (1,117 lines; rev 1 at 828e2f4), the
+  test-engineer's check (1 High, 14 Medium, 9 Low) and the security-auditor's (3 High, 8 Medium, 6 Low), the
+  reviser's notes, the night card. Highs: TE-1 = SA-2 (check order counts honest re-sent commands as forged; U4F-Q9),
+  SA-1 (option A's sort without a total order; f8, D14), SA-3 (a refused command still acknowledged; U4F-Q13), NA-4
+  (Pong's tick-only time against -47's 5 ms; U4F-Q6, D4). 16 questions U4F-Q1-Q16, 15 day runs D1-D15. **Taken in
+  by reference, as U4r's night brief was (ed973c9):** rev 3 is written on this branch AFTER C62H-BOUND's merge (C11:
+  C62H-BOUND goes before U4f's build; rev 3's recheck rows read lab/l1/judge files this lane changes), with his 16:35
+  answers, KEPT-LOGS §11 (U4F-Q2's disk), placeholders by script, then the advisor with U4F-Q1-Q16. The night
+  report's decision **NS-STATUS** (a NIGHT_SHIFT.md kit change: saver stints under 30 minutes while agents work) is
+  relayed to Mustafa in "Decisions needed".
+- **The second pack DONE (09:10-09:16 UTC; Key numbers):** u4r-P2-ab10f058a828, list committed alone and pushed at
+  **6c8c7cf**, pack exit 0, free 5,883 → 6,455 MiB. The brief's start condition (free at least 6,000) holds.
+- **Next: C62H-BOUND's build per the approved brief** (c62h-bound-brief.md, 7936074c…; notes c62h-bound-build.md):
+  base check from 442a284, runner sha256s, the worktree `.claude/worktrees/c62h-bound` (branch c62h-bound-build), the
+  insert and built-check scripts, the built check shown to fail, part 1, then step 1's launch (route W).
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
@@ -3651,6 +3672,15 @@ free:
   equals PR #53's dry run (3,456,457). **Both P0 folders (051995db9cea, 93509dfd7fd1) stay unpacked until C62H-BOUND's
   P0 re-judge has run (MH-L1).** Each later set: its own closed ruling (file and line) cited first; free space at least
   its size + 1,024 MiB, and room for C62H-BOUND's run floors (4,983.6 / 4,620.4 MiB); never during a build or run set.
+- **KEPT-LOGS, the second pack (C62H-BOUND's brief section 1: free under 6,000 MiB before the build; section 8.1's
+  procedure): u4r-P2-ab10f058a828.** No process running (pgrep 0). List 09:10:51 UTC (exit 0; 11 files, 816,778,012
+  bytes; .gate/c62h-bound-pre/kl-list-p2.log); the spike's redact step 296 items, 0 findings; committed alone and
+  pushed at 6c8c7cf (its message names advisor-u4r-sets-r2-full.md:45, the set's results at 1eacb60, closed at 6b22cab).
+  Pack 09:16:12-09:16:47 UTC, exit 0 (.gate/c62h-bound-pre/kl-pack-p2.log): "kept-logs: free before: 5883 MiB";
+  "kept-logs: archive: .gate/netcode-proof-test/kept-logs/u4r-P2-ab10f058a828.tar.gz, 217268267 bytes from 816778012;
+  read back: 11 of 11 files equal the list (path, bytes, sha256)"; "kept-logs: removed:
+  .gate/netcode-proof-test/runs/u4r-P2-ab10f058a828"; "kept-logs: free after: 6455 MiB" (572 MiB back; the brief said
+  about 560).
 - Hetzner, excl. VAT, read 2026-11-05 (infra digest D): CCX23 EUR 0.1386/h, CAX21 EUR 0.0176/h (plan prices include
   IPv4); 1 RS + 1 LG = 0.1562/h; each VM rounds up per session; RS<->LG traffic internal and free.
 - Rust stable 1.99.1 (2026-10-13; static.rust-lang.org answers 200); container has 1.97.0, x86_64 target only.
