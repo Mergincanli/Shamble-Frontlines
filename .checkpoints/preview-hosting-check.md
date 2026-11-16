@@ -277,6 +277,14 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   the left sidebar, click Environments.", "Click on the environment that you want to add a secret to.", "Under
   Environment secrets, ...".
 
+- Cloudflare's docs on changing a token, read by a web-fetch agent (model opus, effort high; hand-back 2026-11-16
+  12:36:46 UTC): "You can also edit a token after creation." (create-token page, last updated 2026-11-06), but no page
+  gives the clicks for editing or says the edit form holds "Token expiration"; "Not setting the end date or `notAfter`
+  means the token does not expire." (restrict-tokens page, 2026-04-20); the API's "Update Token" (`PUT
+  /accounts/{account_id}/tokens/{token_id}`) takes `expires_on` and `not_before` and needs "Account API Tokens Write";
+  where the dashboard shows a token's expiry, whether "Roll" keeps it, and the dashboard steps to delete an Account API
+  token: not found (the create-token and account-owned-tokens pages name the menu differently).
+
 ## Key numbers
 - Test repository Mergincanli/shamble-preview-check (public): main 4a67b83 (his README); `setup` head 1619164 (U1
   fe8116d at 2026-11-15 21:01:07 UTC, U2 ba3946e, U3 1b37fae, fix pass 2df0112, his approved diff 1619164); 0 pull
@@ -368,6 +376,8 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
 - agent web-fetch (model opus passed; effort not passed, while CLAUDE.md says "Effort is always stated": a slip,
   recorded): GitHub's docs on Actions secrets, for the click path in the message to him · launched 2026-11-16 09:10:14
   UTC · DONE, hand-back 09:13:16 UTC (transcript times); its answers under Facts.
+- agent web-fetch (model opus, effort high, both passed): Cloudflare's docs on an existing token's end date · launched
+  2026-11-16 12:36:03 UTC · DONE, hand-back 12:36:46 UTC (transcript times); its answers under Facts.
 - Ended: savers bc4g68il4 (2026-11-15 15:52 to about 16:48 UTC, TaskStop) and bkmmk2e8i (20:58 to 22:48:20 UTC, time
   up); agents infra-engineer and security-auditor (doc reads, DONE), advisor (the plan review, DONE; the review of head
   1619164, DONE 2026-11-16 09:02:47 UTC); workflows wf_c4580fcf-ece (round 1, 3 of 3) and wf_1f145f55-1c2 (round 2, 2
