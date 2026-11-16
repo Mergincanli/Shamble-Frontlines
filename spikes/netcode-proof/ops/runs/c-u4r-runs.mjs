@@ -26,22 +26,23 @@
 //   warm-up, 600 s measured, tick_start 63,736; B1 with 10 bursts, every 60 s from 30 s into the measured phase), their
 //   headers listing PM-0001-2 (every L1 part's pre:PM-0001-2), PM-0001-17 and PM-0001-57 (-57's parts are on -17's
 //   runs), and PM-0001-18 on B1; then, in the bites build at seed 1 with the same settings, one run per bite of those
-//   marks (marks.json's lists, read from the set's copy) whose part has this profile: -17's and -57's on P0, each header
-//   listing PM-0001-2 and the bite's own mark; then `npt-judge --only` on the set's folder. One profile per call keeps
-//   each set's logs and the judge's memory to one profile's (the advisor's U4r build ruling, point 3: the main session
-//   plans the disk and judges each set's folder apart). A run whose summary line counts an overflow resync above 0 and
-//   whose header lists -17 or -18 is marked on its runs.txt line: it goes to the advisor before it counts (carry 58;
-//   FP-5 (g)).
-// - A set with bites (only P0: bitesOf) is judged in two calls (U4r-F2: advisor-u4r-sets-r1, Q2; advisor-u4r-f2-plan):
-//   its measured runs write under <logs>/measured/<run> and its bite runs under <logs>/bites/<run>; npt-judge reads
-//   measured/ into verdict.json, then bites/ into verdict-bites.json, each call at most 10 GiB of judge memory where
-//   one call over the whole folder projected about 11.5 GiB before the set (the four-point fit at F 1.504); at P0's
-//   measured bytes (3,248.3 MiB of logs), one call projects about 7.7 GiB by the six-point fit (8.2 GiB by the
-//   four-point fit: advisor-u4r-sets-r2). No run's verdict reads another run for -2's, -17's and -57's checks (no
-//   against threshold, no ws-practice rule, figures that read one run); a mark that compares runs (a twin figure) needs
-//   one call. Both calls run whatever the first's end; a re-check stop before either call ends the set there, with no
-//   results/. Each call runs after its own re-check; results/ is made only after both, each file copied on its own
-//   exit 0. A set without bites keeps one call and its <logs>/<run> layout.
+//   marks (marks.json's lists, read from the set's copy) whose part has this profile: -17's and -57's on P0, and -17's
+//   whole-as-lost and link-lost-overstated on P2 (C62H-BOUND; link-lost-overstated never on P0), each header listing
+//   PM-0001-2 and the bite's own mark; then `npt-judge --only` on the set's folder. One profile per call keeps each
+//   set's logs and the judge's memory to one profile's (the advisor's U4r build ruling, point 3: the main session plans
+//   the disk and judges each set's folder apart). A run whose summary line counts an overflow resync above 0 and whose
+//   header lists -17 or -18 is marked on its runs.txt line: it goes to the advisor before it counts (carry 58; FP-5
+//   (g)).
+// - A set with bites (P0 and P2: bitesOf) is judged in two calls (U4r-F2: advisor-u4r-sets-r1, Q2;
+//   advisor-u4r-f2-plan): its measured runs write under <logs>/measured/<run> and its bite runs under
+//   <logs>/bites/<run>; npt-judge reads measured/ into verdict.json, then bites/ into verdict-bites.json, each call at
+//   most 10 GiB of judge memory where one call over the whole folder projected about 11.5 GiB before the set (the
+//   four-point fit at F 1.504); at P0's measured bytes (3,248.3 MiB of logs), one call projects about 7.7 GiB by the
+//   six-point fit (8.2 GiB by the four-point fit: advisor-u4r-sets-r2). No run's verdict reads another run for -2's,
+//   -17's and -57's checks (no against threshold, no ws-practice rule, figures that read one run); a mark that compares
+//   runs (a twin figure) needs one call. Both calls run whatever the first's end; a re-check stop before either call
+//   ends the set there, with no results/. Each call runs after its own re-check; results/ is made only after both, each
+//   file copied on its own exit 0. A set without bites keeps one call and its <logs>/<run> layout.
 // - The tick16 bite run (the advisor's U4r build ruling 3, point 3): its tick_start is computed from its own lengths,
 //   65,551 - (warm-up ticks + measured ticks) (47,251 for 300 + 18,000), so the 16-bit wrap falls 15 ticks before the
 //   measured phase's end and the measured window ends before the bitten room evicts; every other -17 run, clean and the
@@ -163,7 +164,7 @@ export const LATE_COMMAND_LINE = "result: VOID (L1 late_count 1)";
  * The one fixed line above a set's two judge blocks in runs.txt when the set has bites (U4r-F2: advisor-u4r-f2-plan,
  * condition 3 (b); its place: advisor-u4r-f3-plan, condition 5); it never parses the judge's output.
  */
-export const SPLIT_LINE = "the set is judged in two calls, each at most 10 GiB (U4r-F2); verdict.json holds the measured runs' verdicts (read its L1 P0 parts; its bites read 'no run yet' by design); verdict-bites.json holds the bite runs' verdicts (read its bites; every part reads '0 of n valid runs' by design)";
+export const SPLIT_LINE = "the set is judged in two calls, each at most 10 GiB (U4r-F2); verdict.json holds the measured runs' verdicts (read the set's parts; its bites read 'no run yet' by design); verdict-bites.json holds the bite runs' verdicts (read its bites; every part reads '0 of n valid runs' by design)";
 /**
  * Each npt-lab call's and the judge's limit, ms (advisor-u4r-r2, INF-R2-4): about 12 times r5's slowest judged run
  * (18,300 ticks at 60.1 ticks/s, about 304 s); re-checked against the judge's measured time before the P0 set.
@@ -304,15 +305,17 @@ export function pairAsExpected(pair, expected, out) {
 const listedOf = (profile) => ["PM-0001-2", "PM-0001-17", "PM-0001-57", ...(profile === "B1" ? ["PM-0001-18"] : [])];
 
 /**
- * The bites a judged set runs, from marks.json's lists: one run each at seed 1 on P0, the profile of a part that reads
- * it (-17's and -57's); -18's none at U4r (ruling 3, point 1: to U4g), so a B1 set runs no bite.
+ * The bites a judged set runs, from marks.json's lists: one run each at seed 1 on the profiles its part reads. -17's
+ * whole-as-lost runs on P0 and P2 and link-lost-overstated on P2 only, never P0 (C62H-BOUND); every other -17 and -57
+ * bite on P0, as before; -18's none at U4r (ruling 3, point 1: to U4g), so a B1 set runs no bite.
  */
 export function bitesOf(profile, marks) {
   const listed = listedOf(profile);
-  const bitesOn = (mark) => (mark === "PM-0001-18" ? null : "P0");
+  const on = { "PM-0001-17/whole-as-lost": ["P0", "P2"], "PM-0001-17/link-lost-overstated": ["P2"] };
+  const bitesOn = (mark, bite) => (mark === "PM-0001-18" ? [] : (on[bite] ?? ["P0"]));
   const out = [];
-  for (const m of marks.marks.filter((x) => listed.includes(x.id) && x.id !== "PM-0001-2" && bitesOn(x.id) === profile)) {
-    for (const b of (m.bites ?? []).filter((x) => !L2_ONLY.includes(x.id) && !NOT_AT_U4R.includes(x.id))) out.push({ id: b.id, mark: m.id });
+  for (const m of marks.marks.filter((x) => listed.includes(x.id) && x.id !== "PM-0001-2")) {
+    for (const b of (m.bites ?? []).filter((x) => !L2_ONLY.includes(x.id) && !NOT_AT_U4R.includes(x.id) && bitesOn(m.id, x.id).includes(profile))) out.push({ id: b.id, mark: m.id });
   }
   return out;
 }
