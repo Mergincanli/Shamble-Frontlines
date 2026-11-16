@@ -3554,6 +3554,12 @@ decision is appended at history.md's end under its own heading "## Decision: …
   chat first and wait for his yes, which is also KIT-FREEZE-2's exception for this one change; then one review round;
   then a stop for his go on the merge. **APPROVAL-FREE FORMS:** write commands in the simple forms that need no
   approval, one per call; when a call has to ask him, name it in the message before sending it.
+- **Mustafa, 2026-11-16 22:09 Amsterdam (21:09 UTC)** (history.md:2189-2199, "## Decision: Mustafa, 2026-11-16 22:09
+  Amsterdam (21:09 UTC)"; recorded by mustafa_ns_lines_yes_words.py): **"yes" to NS-LINES (a)**: the three
+  NIGHT_SHIFT.md lines exactly as posted (sha256 4e3d15658c0afaf4…, copied by the script from the question's block);
+  his yes is also KIT-FREEZE-2's exception for this one change. Any change to the lines goes back to him. The pull
+  request comes after C62H-BOUND's P2 and P3 runs (his 21:50 words). **Slip 17:** the script's heading first said
+  "about 21:52 Amsterdam", written before the transcript's time was read (21:09:27 UTC = 22:09); corrected by Edit.
 - **Mustafa, 2026-11-15 16:35 Amsterdam** (history.md:2131-2146, "## Decision: Mustafa, 2026-11-15 16:35 Amsterdam
   (15:35 UTC)"; recorded by mustafa_kl_c62h_answers_words.py). In short: **KL-YES** to the kit lines as posted
   (kept-logs-final-text.md, 97c81656…) with one change, and it confirms KIT-FREEZE-2 for this one rule: pack walks the

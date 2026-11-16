@@ -2185,3 +2185,13 @@ From "Next steps, in order" (as it was):
   - First show me the exact lines in chat and wait for my yes. My yes will also be the exception to the kit freeze (KIT-FREEZE-2) for this one change. Then one review round, then stop for my go on the merge.
 
   On today's stall (17:09 to 20:36 UTC, a call that waited for my approval): write commands in the simple forms that need no approval, one per call, as you did when you redid that step. When a call has to ask me, name it in your message before you send it.
+
+## Decision: Mustafa, 2026-11-16 22:09 Amsterdam (21:09 UTC), NS-LINES (a) (the three NIGHT_SHIFT.md lines)
+- **Mustafa, typed into this chat (transcript 2026-11-16T21:09:27.492Z), verbatim:** "yes"
+- **What he said yes to** (the assistant's question at 2026-11-16T20:50:16.246Z: "**NS-LINES:** yes or no to the three lines above, exactly as written."): these three lines, copied by this script from that message's first fenced block, sha256 4e3d15658c0afaf40d922cdce9559a8dc2d1079ea04a8fc96e327798b3639223:
+
+```
+   While the run waits on agents, nothing else wakes it: run the background saver in stints under 30 minutes
+   (`node .claude/scripts/checkpoint.mjs watch <slug> --every 10 --for 25`, in the background), and at each
+   stint end refresh the status comment, then start the next stint.
+```
