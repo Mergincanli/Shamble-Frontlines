@@ -457,27 +457,16 @@
 - 16:49 Next: save the card (pushes the branch: the four cherry-picks, these notes, the ruling, the script e9eb9b23…);
   restart the saver; CI on the pushed head; the advisor's check of the pushed head.
 
-## The pre-flight (NA-CBB-2), its commands written before it runs (the advisor's ruling, C7)
-When: once, after the P0 re-judge's SAME ANSWERS and before section 8.1. Untracked and not counted; nothing
-committed; nothing under spikes/netcode-proof/results. One main-run.sh call from the main folder (it runs each command
-from spikes/netcode-proof, with the shared target, under the lane lock), log
-/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/preflight.log, its commands in order (P = /home/user/Shamble-
-Frontlines/.gate/u4r/c62h-bound/preflight, T = /home/user/Shamble-Frontlines/.gate/shared-target/release):
-1. `df -B1 /home/user`
-2. `sha256sum T/npt-lab T/npt-judge marks/marks.json` (npt-lab from merge-2's release build at the pushed head;
-   npt-judge from the re-judge's release build, the same file the re-judge hashed; marks.json c1935a5b…)
-3. `mkdir -p P/logs`
-4. `T/npt-lab scenario --run preflight-p2 --set c62h-preflight --date 2026-11-16 --commit <the pushed head, full> --out
-   P/logs/preflight-p2 --seed 1 --scene SS --profile P2 --clients 48 --tick-start 63736 --warmup-s 6 --measured-s 4
-   --after-max-s 10 --suite c62h-preflight --role measured --marks PM-0001-2,PM-0001-17` (the short lab test's
-   arguments, P2_SHORT at scenario.rs:2842-2843, with 48 clients, PM-0001-2 in the header list, and the set runner's
-   scene, tick_start and role flags, c-u4r-runs.mjs:329, :485, :533)
-5. `T/npt-judge --marks marks/marks.json --logs P/logs --only PM-0001-17 --out P/verdict.json`
-6. `df -B1 /home/user`
-What counts (the ruling's words): read -17's L1 P2 part for preflight-p2. Proceed if snap_lost_unexplained_count and
-snap_whole_despite_link_loss_count both read 0 with no gap note from the new reader. Any of the reader's eight gap
-phrases: stop for the advisor, whole. A above 0, the lab's N above 0, or N not equal to A: Mustafa's stop rules, as
-for any clean run (stop and tell him; being uncounted never hides a stop). B above 0: the advisor. The part INVALID
-for a reason outside the two figures (the short run's length or header): recorded, and the two figures' own readings
-decide as above; if the judge gives no reading of the two figures at all, the pre-flight is recorded as not
-informative and the P2 set runs as planned.
+## The pre-flight (NA-CBB-2), its commands (the advisor's head check H2: replaced word for word)
+The first version (written 16:3x UTC, committed at ddd38ba) is replaced, by the advisor's head check of ddd38ba (advisor-c62h-bound-head-full.json, conditions H2; findings ADV-CBH-1 Medium: `--only PM-0001-17` drops PM-0001-2, so -17's L1 P2 part fails its pre:PM-0001-2 rule and no figure is read; ADV-CBH-2 Low: the npt-lab rebuild, the hash checks, --commit, --date, --warmup-s 10). Its preflight_commands_ruling, from "Use these commands instead" to its end, copied by script, word for word:
+
+Use these commands instead, in this order, in one main-run.sh call from the main folder, log /home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/preflight.log, every path written out whole (main-run.sh runs commands without a shell); T is /home/user/Shamble-Frontlines/.gate/shared-target/release and P is /home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/preflight:
+(0) Before the call, after the re-judge: `git diff --quiet ddd38bace3c63050d2087a1acf3a6e74c1d2ecb9 HEAD -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results'` exits 0, and `git rev-parse HEAD` gives <H> (40 hex).
+(1) `df -B1 /home/user`
+(2) `cargo build --locked --release -p npt-lab`
+(3) `sha256sum T/npt-lab T/npt-judge marks/marks.json`
+(4) `mkdir -p P/logs`
+(5) `T/npt-lab scenario --run preflight-p2 --set c62h-preflight --date <the UTC day it runs> --commit <H> --out P/logs/preflight-p2 --seed 1 --scene SS --profile P2 --clients 48 --tick-start 63736 --warmup-s 10 --measured-s 4 --after-max-s 10 --suite c62h-preflight --role measured --marks PM-0001-2,PM-0001-17`
+(6) `T/npt-judge --marks marks/marks.json --logs P/logs --only PM-0001-2,PM-0001-17 --out P/verdict.json`
+(7) `df -B1 /home/user`
+After the call, before reading the verdict: npt-judge's sha256 must equal p0-rejudge.log's npt-judge line, and marks.json must be c1935a5b996fb0aaff82b0b3c1c604255e1534f6ca7e8d2e55a9f472cd3b22a9; any difference stops for the advisor. Record npt-lab's sha256 and the build's provenance count. What counts and what stops stay as my ruling wrote them. In addition: if the run is INVALID through pre:PM-0001-2 (a load check failing on the short run), record it, quoting the judge's why line, as 'not informative', and the P2 set runs as planned. A part verdict of NOT-RUN ('1 of 3 valid runs') with both figures reading 0 and no gap note means proceed. Nothing is committed, and nothing goes under results/. If the commands are written exactly as above, they need no second advisor read. Any other change comes back to me.

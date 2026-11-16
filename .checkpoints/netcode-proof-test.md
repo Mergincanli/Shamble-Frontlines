@@ -105,12 +105,20 @@ it asks nothing; REFS-KIT stays.
   ddd38bace3c63050d2087a1acf3a6e74c1d2ecb9** (its save commit carries no [skip ci]: the script adds it only when every
   pushed commit is .checkpoints/ alone). **CI on ddd38ba: all six check runs success** (gate, smoke, toolchain on
   runs 43911726413 / 43911714149 / 43911727938 / 43911713654; check-suite event 16:53:09 UTC). Saver restarted 16:49
-  as **b7fx6m5gq**. **RUNNING from 16:54 UTC: the advisor's check of ddd38ba** (workflow wf_d05af909-29b, task
-  wr7hsgqcl; notes advisor-c62h-bound-head.md; it also rules on the pre-flight's written commands). **If cut:**
-  resume by run id (script
-  /root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-head-check-wf_d05af909-29b.js).
-  **Then:** the P0 re-judge (section 7: the compare script's --self-test first, rejudge-compare-negative.log; one
-  main-run.sh call p0-rejudge.log; the comparison; SAME ANSWERS or a stop to Mustafa), the pre-flight, section 8. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
+  as **b7fx6m5gq**. **The advisor's check of ddd38ba: APPROVE WITH CONDITIONS H1-H6** (16:54-17:06 UTC;
+  advisor-c62h-bound-head-full.json, 64 lines, a64259f5…, read in full): the chain, the merged bytes (patch-ids equal
+  pair by pair), merge-2's pass bar, the gate, the built check, the size 967 and C1-C8 all hold. **H1: the P0
+  re-judge may run now, exactly as written.** **H2 (ADV-CBH-1 Medium, the advisor's own wording): the pre-flight's
+  `--only PM-0001-17` drops PM-0001-2, so -17's L1 P2 part fails pre:PM-0001-2 and no figure is read; its commands are
+  replaced word for word by its list** (c62h-bound-build.md, the pre-flight section, copied by script: `--only
+  PM-0001-2,PM-0001-17`, the npt-lab rebuild in the call, npt-judge's sha256 against p0-rejudge.log's and marks.json
+  against c1935a5b… with a stop on any difference, --commit the full HEAD after the spike-tree check against ddd38ba,
+  --date the day it runs, --warmup-s 10; ADV-CBH-2). **H3 (ADV-CBH-3):** failed-steps/test.log was deleted by design
+  when merge-2's test step began; the failure is kept in merge.log:51-52, c62h-bound-build.md:428-435 and the
+  merge-stop ruling (U3C-HELD-1 corrected). **H4 (ADV-CBH-4):** the report says npt-lab links npt-net through
+  npt-server and npt-bots, whose sources never name DelayStream or l2::delay (not "not at all"). H5-H6: report items.
+  **Next (H1): the P0 re-judge** (section 7): the compare script's --self-test (rejudge-compare-negative.log); one
+  main-run.sh call (p0-rejudge.log); the comparison; SAME ANSWERS, or a stop to Mustafa whole. **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver:** b1gec2y1v ended on its time limit at 11:08:33 UTC ("watch stopped: time is up", exit 0; not a
   cut); restarted at 11:22 UTC as **bp40lga8l** (to about 13:12). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
@@ -3663,9 +3671,13 @@ free:
   - **U3C-HELD-1 (Medium; taker: the main session, as its own planned change, plan first with the advisor, reviewed by
     netcode-architect and test-engineer; planned and merged before another lane's counted check.mjs run, U4f's merge
     at the latest):** "G-NC2's held-bound check (delay.rs:528-543) counts a release transient as over the bound". It
-    failed once in C62H-BOUND's first counted merge run (merge.log; failed-steps/test.log:1407, :1476-1532: bites
-    build, npt-net l2::delay::tests::under_loss_the_held_bytes_stay_within_64_kb_and_the_front_records_acknowledged_
-    prefix, held_over_bound [1, 0]). Its first step: a by-name loop of the bites build's npt-net library tests, to
+    failed once in C62H-BOUND's first counted merge run (bites build, npt-net l2::delay::tests::under_loss_the_held_
+    bytes_stay_within_64_kb_and_the_front_records_acknowledged_prefix, held_over_bound [1, 0]). **Where it is kept
+    (the head check's H3, ADV-CBH-3):** .gate/u4r/c62h-bound/merge.log:51-52 (the name), c62h-bound-build.md:428-435
+    (the assertion and values) and advisor-c62h-bound-merge-stop-full.json; the whole test output
+    (.gate/netcode-proof-test/failed-steps/test.log, 1,577 lines) was deleted by design when merge-2's check.mjs
+    started its test step (check.mjs:2655-2657, FX-10), so it is no longer on disk. Its first step: a by-name loop of
+    the bites build's npt-net library tests (it captures the output again), to
     confirm the release-transient cause. Never a looser bound without its cause: the fix still checks the bound
     wherever held can grow (every write) and shows by a planted bug that it still catches a real overflow (for
     example: drop released_model from down_free; the check must then fail). If NC-U3c-2's bound is written elsewhere
