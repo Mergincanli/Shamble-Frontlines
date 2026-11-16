@@ -120,11 +120,14 @@ it asks nothing; REFS-KIT stays.
   **The P0 re-judge (H1, section 7), started 17:07 UTC:** the compare script's --self-test first: **SELF-TEST PASS, 4
   of 4** (.gate/u4r/c62h-bound/rejudge-compare-negative.log); the kept set u4r-P0-93509dfd7fd1 on disk (measured/
   1,547 MiB, bites/ 1,846 MiB); the earlier verdicts e926b812… / b472784f… byte-equal to the raw folder's copies.
-  **RUNNING: one main-run.sh call** (p0-rejudge.log; task b5vp9pzjw): the judge's release build, its sha256 and
-  marks.json's, then the two judge calls under peak.py, measured/ then bites/, --only PM-0001-2,PM-0001-17,PM-0001-57,
-  into results/c62h-bound/p0-rejudge-93509dfd7fd1/a87c7ec39b96/ (HEAD a87c7ec, spike tree = ddd38ba's). **Then:** the
-  comparison (SAME ANSWERS, or every difference to Mustafa whole), rejudge.txt (Write tool), the redact step, the
-  commit of the folder; then the pre-flight (the advisor's commands, word for word). **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
+  **THE P0 RE-JUDGE: SAME ANSWERS** (one main-run.sh call, p0-rejudge.log, 17:06:52-17:08:39 UTC; npt-judge
+  **d8b8c91e…**, marks.json c1935a5b…; peaks 3920.3 / 4504.6 MiB; the comparison rejudge-compare.log: every part and
+  bite with a run as before, PM-0001-2 SS runs PASS, -17 L1 P0 PASS, -57 L1 P0 PASS, six bites shown, only the two
+  additions). Results committed at the re-judge folder's commit (results/c62h-bound/p0-rejudge-93509dfd7fd1/
+  a87c7ec39b96/: verdict.json e5ed24e2…, verdict-bites.json 13b6b107…, rejudge.txt with both outputs whole; redact
+  300 items, 0 findings). **Next: the pre-flight**, exactly the advisor's commands (c62h-bound-build.md's pre-flight
+  section; npt-judge's sha256 must equal d8b8c91e…), then section 8 (8.1 disk: free at least 5,500 MiB before P2,
+  else pack u4r-B1-64f3307d5c7f; 8.2 the pre-set check; the P2 set; the set check, its shown-to-fail runs first). **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver:** b1gec2y1v ended on its time limit at 11:08:33 UTC ("watch stopped: time is up", exit 0; not a
   cut); restarted at 11:22 UTC as **bp40lga8l** (to about 13:12). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
@@ -3140,6 +3143,20 @@ re-run the same call if no failure was caught. Then the cause → te-m3-plan.md 
 
 **Cuts by the spend limit** (SPEND-LIMIT (a), Mustafa 2026-11-12: at every cut, the notice's exact text, the time of
 the cut and the time of the resume; UTC, read from the session's transcript):
+- **2026-11-16 17:09-20:36 UTC, an unanswered approval, then a worker restart (not the spend limit; no spend-limit
+  notice):** my Bash call (the rejudge.txt quote check and the redact step) was sent at 17:09:35 and waited for an
+  approval nobody answered; the 18:34 check-in queued behind it; the saver b7fx6m5gq ended on its time limit at
+  18:39:55 ("watch stopped: time is up"); at 20:36:11 the notice "This session's worker process was restarted. If your
+  previous turn was already complete, take no action and wait for the next event. Otherwise, continue from where you
+  left off." came, the pending call closed unrun ("Tool call not completed: an approval request was still unanswered
+  when the message that follows arrived and was closed, so the action awaiting approval did not run. Nobody refused
+  it, so this is not the user's decision; ask again if it is still needed."), and "[Request interrupted by user for
+  tool use]"; the machine had rebooted (uptime 2 min at 20:37). Resumed at 20:37 by the check-ins of 18:34 and 20:34:
+  the saver restarted as b00b7pd9e; the step re-run split in two (the quote check: both logs whole in rejudge.txt; the
+  redact step: 300 items, 0 findings); the re-judge folder committed. Nothing lost: the re-judge had ended at 17:08:39
+  (SAME ANSWERS), rejudge.txt was written at 17:09:32. **Slip 16:** the redact step ran as `cd spikes/netcode-proof
+  && node check.mjs --only redact` without a subshell (the rule: subshells, never `cd X &&`); the shell was returned
+  to the repository root at once.
 - **2026-11-16 12:44-14:22 UTC, a worker restart (not the spend limit; no spend-limit notice):** my Bash call to
   commit step 3 was sent at 12:44:13 (the transcript) and nothing ran until the notice at 14:22:42: "This session's
   worker process was restarted. If your previous turn was already complete, take no action and wait for the next
