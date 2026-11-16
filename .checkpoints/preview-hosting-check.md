@@ -1,13 +1,19 @@
 # Checkpoint: preview-hosting-check
-- **Goal:** the plan for the preview hosting check (docs/SPIKE_PLAN.md entry 6; ADR 0006 parts 1-3 and 13; pass marks
-  PM-0006-1 to -10 and -32), by Mustafa's task (his words of 2026-11-14, sent 2026-11-15 15:33:37 UTC; byte for byte in
-  `.checkpoints/preview-hosting-check/mustafa-2026-11-15-task.md`, sha256 e86c6b53...4009). The plan only: no build, no
-  secret, no edit outside this checkpoint. · plan: `.checkpoints/preview-hosting-check/plan.md` (not yet written)
+- **Goal:** the preview hosting check (docs/SPIKE_PLAN.md entry 6; ADR 0006 parts 1-3 and 13; pass marks PM-0006-1 to
+  -10 and -32). Task 1, by Mustafa's task (his words of 2026-11-14, sent 2026-11-15 15:33:37 UTC; byte for byte in
+  `.checkpoints/preview-hosting-check/mustafa-2026-11-15-task.md`, sha256 e86c6b53...4009): the plan, done (step 11)
+  and given his go (Decisions taken). Task 2, by his go (`mustafa-2026-11-15-go.md`): build and run the check in the
+  test repository Mergincanli/shamble-preview-check; in Shamble-Frontlines only this checkpoint and, at the end, the
+  report's pull request. · plan: `.checkpoints/preview-hosting-check/plan.md` (revision 2; Part 7.1 and 7.2 superseded
+  by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-15 19:44 Amsterdam (18:44 UTC)
+- **Last update:** 2026-11-16 10:12 Amsterdam (09:12 UTC)
 
 ## Steps done
+Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
+all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last stood in "Current step" (11 at 2a2f426,
+12 at 326f5cb, 14 and 16 at 5ac8586, 18 at 9f86da2) and diffed against that source. No other step missed this list.
 1. Orientation · the session's model read with get_session at 2026-11-15 15:36:35 UTC: `session_context.model`,
    `configured_model` and `external_metadata.last_served_model` all `claude-opus-5-5`; effort max; the branch at main
    4460ef5. The advisor tool's model, from the transcript: `/advisor fable` -> "Advisor set to Fable 5.2" (event
@@ -53,6 +59,49 @@
    every block byte-equal to its file, every sha256 and both variants' hashes checked, all parsed with PyYAML); Part
    7.0 lists the lines changed since 27e9f50 as diffs.
 
+11. Done: the plan (revision 2) is approved by the advisor agent with its conditions folded in; the closing message
+   next; then stop for his go.
+12. SR-READ answered (no write on administration or deployments) and "setup done" received at 20:53:10 UTC: the build
+   (U1 to U3) starts after the advisor tool's consultation (moments 1 and 3). Below, the record of the setup.
+   - At his request ("Clone the repository Mergincanli/shamble-preview-check into this session"), the session attached
+     it with add_repo (push access, as plan A3 step 4 says) and cloned it shallowly to /home/user/shamble-preview-check
+     (outside this repository's folder), add_repo at 20:01 UTC and the clone right after (transcript times). The repository is empty: no commit, no branch (`git ls-remote`
+     lists nothing; the clone says "No commits yet"). Plan A1's "Add a README file" was not ticked, so there is no
+     `main` for pull requests; the deny list forbids the session to push any `main`, so he adds the README on GitHub.
+     register_repo_root waits for the first commit (its condition: `rev-parse HEAD` succeeds).
+   - He then added README.md ("I have pushed the readme.md file"): `main` is 4a67b83 "Create README.md"
+     (4a67b83b9ed672c81e1a6e3067f916841c02b4a9), fetched shallowly and fast-forwarded onto the empty local `main` (no
+     reset); register_repo_root called for /home/user/shamble-preview-check. He asked for the rest of the setup in plain
+     words; the steps sent: A2, A3 (SR-READ), A4, then wait for the session's reply, then A5 to A7.
+   - His answers (his message stamped 20:42:20 UTC, abaac228-81c6-4e33-808e-40fc63e8499f): A4 done, the test site is up at https://shamble-preview-check.pages.dev/;
+     his Cloudflare account holds nothing besides the domain shamblefrontlines.com ("this is the first time that I've
+     been using cloudflare"); on 1b: "I had to give proper access for read and write (confirm), and have done so for
+     Claude", which names no permission, so SR-READ is still open. The app's public page
+     (https://github.com/apps/claude, read by the web-fetch agent) lists no permissions. Asked him for the exact
+     "Read and write access to ..." lines on the app's Configure page; he waits at A5 (step 3a, the token) until then.
+   - His next message (stamped 20:53:10 UTC, 0e69957a-4b89-452f-91ea-630a03b3a35a): "setup done" and a screenshot of
+     the Claude app's Configure page. Transcribed from the screenshot: "Read access to Dependabot alerts,
+     administration, commit statuses, merge queues, and metadata"; "Read and write access to actions, checks, code,
+     discussions, issues, pull requests, repository creation, repository hooks, and workflows"; Repository access:
+     "All repositories". **SR-READ: neither administration nor deployments has write access** (administration
+     read-only; deployments absent), so his thing 1 does not stop the build. Approving a pending deployment needs
+     Deployments write and changing an environment needs Administration write (security-auditor's G1b and G3 notes),
+     neither of which the app holds. His "setup done" is read as A2 and A5 to A7 done (to confirm in the reply).
+     The screenshot itself stays out of the repository (a binary); its text is above.
+   - Added 2026-11-16 from the records (F-A): his go builds "once I have told you "repository ready""
+     (`mustafa-2026-11-15-go.md`:18); plan Part 3 A asks for "repository ready" (plan.md:295, A1 item 4: "I attach it
+     with push access and check that I can see it, nothing more") and "setup done" (plan.md:349, A7). A scan of his 32
+     messages in this chat's transcript (queued ones included; 2026-11-16 09:08:55 UTC, transcript time) finds
+     "repository ready" only in the go itself. His setup messages (2026-11-15, transcript times, UTC): "Clone the
+     repository Mergincanli/shamble-preview-check into this session." (20:01:22; the session then attached it, A1 item
+     4's act); "I made the repo, that is what you needed right?" (queued, 20:01:58); "I have pushed the readme.md file,
+     ..." (20:09:20); "regarding 1b: ..." (20:42:20); "setup done" (20:53:10). Step 12 at 5132c3f waited for "the test
+     repository ("repository ready") and SR-READ's answer"; at 966fb85 (20:54:27) it read "setup done" as "A2 and A5 to
+     A7 done (to confirm in the reply)". No checkpoint of the time names the message taken as "repository ready". The
+     build's first commit, U1 fe8116d, came at 21:01:07, after consultation 4 (20:54:47). The advisor agent's notes say
+     "setup done" was "read by the session as "repository ready""; no record of the time says that. They also say no
+     step 11 existed; the sweep found step 11 in "Current step" from dd5d3a3 to 2a2f426 (restored above).
+
 13. The build, on the test repository's branch `setup` (pushed without a pull request; 0 workflow runs on the
    repository after the last push, read with the GitHub MCP tool):
    - U1 fe8116d: the test site and tools/build.mjs (223 lines; plan about 190); all seven modes built locally.
@@ -70,6 +119,12 @@
      503 as planned); browser-proof.mjs in the preinstalled Chromium 153.0.8010.12: 5 of 5 (isolation true/true only on
      preview-isolated, the WebAssembly runs, the content file's second visit 0 bytes on production and 65,836 bytes on
      bite-nocache; on bite-coep Chromium refuses the worker's script, so the bite is caught).
+
+14. The review round (U4): get_session at about 21:12 UTC read 717,475 of 1,000,000 tokens (72%; automatic compaction
+   at 901,600), so the review goes ahead and he is asked to compact before Day 1's runs. The round runs as one workflow
+   of three agents (ultracode is on; CLAUDE.md's cap of 3): infra-engineer, security-auditor (his condition 2 on
+   `deployments: write`), test-engineer, each at effort high, notes `<agent>-review.md` in this folder.
+   (Its bullets, as at 5ac8586, were step 12's bullets word for word: diffed by script on 2026-11-16, identical.)
 
 15. The review round (workflow wf_c4580fcf-ece, 3 of 3 returned; notes `infra-engineer-review.md`,
    `security-auditor-review.md`, `test-engineer-review.md`): two Highs, the same fault found twice (F1/TE-1: Pages
@@ -91,6 +146,10 @@
      SIZES line, the tombstone's size), TE-12 (the page's resource list against the manifest), TE-3's observed form of
      the bite (Chromium refuses the worker), TE-13 (root-cause a non-zero second visit). Deferred: F5, F6, SA-R5, SA-R6.
 
+16. Waiting for his yes on the batched diff and his SA-R3 answer; round 2 (on what changed, 1b37fae..2df0112) and the
+   advisor agent's review of the final head next.
+   (Its last words, "Earlier step, kept for the record:", introduced step 14 and are left out.)
+
 17. Round 2 (workflow wf_1f145f55-1c2, 2 of 2 returned; notes `infra-engineer-review-2.md`, `test-engineer-review-2.md`):
    both **APPROVE**, no Critical, High or Medium on 1b37fae..2df0112; F1/TE-1 confirmed fixed (both reran proof.mjs 29
    of 29 and browser-proof 5 of 5). Lows: infra L1 to L5 and test R2-1 to R2-6, follow-ups by the review budget (a Low
@@ -98,8 +157,9 @@
    as not as expected), R2-4 (no sleep after the last manifest try), R2-1 (a proof case for the marker half). For the
    results log: L3 (index.html and 404.html not fetched, and why), L5 (an earlier run's verify reads a multi-push
    branch link as stale: an expected red). Kept as STATUS follow-ups: L1, L2, L4, R2-3, R2-5, R2-6.
+   Superseded by step 18 (2026-11-16): none rode a push; R2-1, R2-2 and R2-4 are STATUS follow-ups too, with L1, L2,
+   L4, R2-3, R2-5 and R2-6.
 
-## Current step
 18. His yes (2026-11-16, user message stamped 08:46:16 UTC; byte for byte in `mustafa-2026-11-16-yes.md`, 929 bytes) to
    the batched diff, and SA-R3 accepted in his words. Applied as commit 1619164 on `setup` (two files only, `git show
    --stat`: close.yml 2 +-, deploy.yml 3 +--); placed hashes 29593af18d34 (deploy.yml) and 3afdf389d636 (close.yml)
@@ -108,23 +168,53 @@
    superseded by these approved ones. The round-2 Lows stay follow-ups (none applied: no unreviewed script change).
    Next: the advisor agent's review of head 1619164.
 
+19. The advisor agent's review of head 1619164 (launched 2026-11-16 08:49:36 UTC, after the saver restarted at 08:49:17
+   UTC; hand-back 09:02:47 UTC; transcript times; notes `advisor-head-1619164.md`, ending DONE): **APPROVE** head
+   1619164900553ee3e32339447b30865347711156 with three conditions, open until each is discharged: (1) F-F, his
+   screenshot of the empty "Repository secrets" list before the setup pull request opens (Next steps 1, a hard gate);
+   (2) F-A and F-B, the record repairs, before the report folds the checkpoint (made in the update of 2026-11-16 that
+   wrote this step; F-A widened by the sweep); (3) F-E, the open security findings named on his setup-PR list (Next
+   steps 2). It reran the local proofs on a git-archive export of 1619164 (proof.mjs 29 of 29; browser-proof 5 of 5,
+   Chromium 153.0.8010.12) and read 0 pull requests and 0 workflow runs on the test repository. Lows for the record:
+   F-C and F-D (For the report). No change to the head, so no new review and no new yes.
+
+## Current step
+20. Waiting for his screenshots (his message of 2026-11-16: "they follow in my next message"): `preview`, `production`,
+   Actions → General and the token's end date, plus (F-F) the empty "Repository secrets" list, asked for in the
+   message sent after this update. The checks: Next steps 1.
+
 ## Next steps
-1. The advisor agent's review of the final `setup` head 1619164 (the saver restarted first; a short reply asked).
-2. His screenshots of `preview`, `production` and Actions → General, and the token's end date (his next message):
-   check the secret names (CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CANARY), `preview` (him as reviewer,
-   self-review unticked, admin bypass unticked), `production` (Selected branches and tags: main; bypass unticked),
-   Actions (pin to full SHA; approval for all external contributors), the end date after Day 2. Any fault: his fix first.
-3. Then: the results-log header (PM-0006-1) naming head 1619164 (after the advisor agent's approval); his first list
-   (the setup pull request: approve its deploy, merge it, approve its cleanup; about 10 minutes); then open the setup
-   pull request.
-4. Day 1's sittings as plan Part 3 C (sitting 3 with SA-R4 and SA-R8), each preceded by its list (his condition 3).
+1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
+   CLOUDFLARE_ACCOUNT_ID; in `production`: CANARY); `preview` (him as required reviewer, self-review unticked, admin
+   bypass unticked); `production` (Selected branches and tags: main; bypass unticked); Actions → General (pin to full
+   SHA; approval for all external contributors); the end date after Day 2; **the "Repository secrets" list empty (F-F):
+   no setup pull request opens until a screenshot shows it empty.** Any fault: his fix first.
+2. Then: the results-log header (PM-0006-1) naming head 1619164; his first list (the setup pull request: approve its
+   deploy, merge it, approve its cleanup; about 10 minutes), naming the open security findings (F-E): SA-R2, SA-R5 and
+   SA-R6 deferred, SA-R3 accepted in his words; then open the setup pull request.
+3. Day 1's sittings as plan Part 3 C (sitting 3 with SA-R4 and SA-R8), each preceded by its list (his condition 3).
+4. Day 2 (the 24-hour reading, the wall, Brave steps 5-8, revoke, the revoked proof); then the report and the closing
+   docs pull request; step 2.6's plan with the locked install (For the report).
 
 ## For the report (the checkpoint is deleted at the end)
 - His point 3 of 2026-11-16, to carry into step 2.6's plan: "For step 2.6, not for this check: plan a locked install (a
   committed lockfile, install scripts off) and bring it to me with step 2.6's plan."
 - SA-R3 accepted in his words (point 2 of the same message).
+- F-C (a results-log line): the lockfile's edgedriver 8.0.0 and geckodriver 8.0.0 declare install scripts (round 1's
+  infra notes said "no hasInstallScript"); `npm ci --ignore-scripts` skips their driver downloads, and run.mjs passes
+  the runner's drivers through CHROMEWEBDRIVER, EDGEWEBDRIVER and GECKOWEBDRIVER. That this is harmless is inferred
+  until the browser run: a missing driver shows as "no reading", never as a pass.
+- F-D: the report quotes SA-R3's corrected words (the install step keeps the token out of the scripts' environment,
+  not out of their reach), not plan.md:524 and :649 ("install scripts never see it").
+- The process account (his rule: only what a record shows, with its time): the process slip of 2026-11-15 and F-A
+  (Open findings); the "repository ready" record (step 12's added bullet); the effort not passed to the web-fetch
+  agent (Running work).
 
 ## Open findings
+- The advisor agent's F-A (2026-11-16): rewriting "Current step" at each update lost steps 11, 12, 14 and 16 from this
+  file (18 was next); restored by script on 2026-11-16 (Steps done). From here on, a finished step moves to "Steps
+  done" before "Current step" is rewritten.
+
 - Refused by the guard, 2026-11-15 15:54:02 UTC: `git -C <dir> fetch ...` ("git: no option before the subcommand (run
   git from the folder, without -C, -c or --git-dir)"). Route taken: `cd` into each scratch folder under
   `.gate/preview-hosting-check/tags/` and ran git there (a shallow fetch of two tags to read their dates; nothing run).
@@ -152,7 +242,18 @@
   main, delete a remote branch, approve a pending deployment through gh, or run wrangler locally.
 
 ## Key numbers
-- (none yet)
+- Test repository Mergincanli/shamble-preview-check (public): main 4a67b83 (his README); `setup` head 1619164 (U1
+  fe8116d at 2026-11-15 21:01:07 UTC, U2 ba3946e, U3 1b37fae, fix pass 2df0112, his approved diff 1619164); 0 pull
+  requests and 0 workflow runs (the advisor agent's read, 2026-11-16, before 09:02:47 UTC).
+- Placed workflows' sha256 prefixes (checked by script, step 18): deploy.yml 29593af18d34, close.yml 3afdf389d636,
+  probe.yml f24ad6e81daf, browsers.yml 6791076916ae; the token-test variants (not placed) fd3dc4c6029b, 8b745631a278.
+- Local proofs (they prove the scripts, not Cloudflare): proof.mjs 29 of 29 and browser-proof 5 of 5 in Chromium
+  153.0.8010.12 (the session at 2df0112, step 15; the advisor agent again on 1619164, step 19).
+- The WebdriverIO lockfile (tools/wdio/package-lock.json, read by script 2026-11-16 09:06:46 UTC and after): 164
+  entries, the root and 163 packages, all 163 with integrity (step 13's "164 packages" counted the root); two declare
+  install scripts (F-C).
+- The chat's fullness: 717,475 of 1,000,000 tokens (72%) by get_session at about 21:12 UTC on 2026-11-15, before this
+  chat was compacted (the summary's transcript time: 2026-11-16 09:04:41 UTC); no reading since.
 
 ## Decisions taken
 - His task (the file above): the plan for the preview hosting check; PREVIEW-START answered "it starts now, on the
@@ -215,23 +316,25 @@
    the checkpoint updated before anything launched (Part 7.1 and 7.2 superseded; his step-2.6 item recorded for the
    report); the saver restarted before the advisor agent; the screenshots' checks listed before any list goes to him.
 
+6. 2026-11-16 09:07:06 UTC (called; transcript time), moments 1 and 5, before the record repair and before steps 18
+   and 19 were saved as done · Q: is the repair plan right? · Changed: a scan of all his messages for "repository
+   ready" before any note, which then states only the records (the go, plan Part 3 A, his messages with times, the
+   checkpoint's words of the time) and where the advisor agent's wording differs; a sweep of every commit of this file
+   (it found step 11 too); the restore done by script and diffed against git (step 12's and step 14's bullets: diffed,
+   identical); step 19 lists its three conditions as open; F-F a hard gate before the setup pull request; Key numbers
+   with sources and times (the lockfile count corrected; the 72% labelled as before compaction); the message to him
+   leads with the extra screenshot, its click path from GitHub's docs page.
+
 ## Running work
-- saver (task bkmmk2e8i, started 20:58 UTC): stopped by itself at 22:48:20 UTC ("time is up", 110 minutes); no agent or
-  workflow runs now, so it stays off until the next agents start (CHECKPOINTS.md §5).
-- saver: background task bc4g68il4 · output /tmp/claude-0/-home-user-Shamble-Frontlines/a7e7f150-3195-52bd-a549-73b27426198b/tasks/bc4g68il4.output ·
-  started 15:52 UTC · stops by 17:42 UTC (110 min) · last check: just started.
-- agent infra-engineer (Opus by its file, effort high by its file): C1-C8 and the follow-up C9 · DONE.
-- agent security-auditor (Opus by its file, effort high by its file): G1-G10 · DONE.
-- saver last check 16:27 UTC: the process is alive (pid 1609); its log shows "saved and pushed" at 16:02 and 16:12
-  UTC and nothing for the cycle due about 16:22 (the session's own save of 16:21:42 UTC came just before it); to be
-  checked again at the next update.
-- workflow wf_c4580fcf-ece (task wbgd5v14u, round 1) · script `workflow-runs/review-round-run1.js` · DONE, 3 of 3.
-- workflow wf_1f145f55-1c2 (task wo369ci0q, round 2) · script `workflow-runs/review-round-2-run1.js` · DONE, 2 of 2,
-  both APPROVE.
-- agent advisor (Opus by its file, effort high by its file): the plan review of revision 1 at 27e9f50 · DONE
-  (APPROVE with conditions).
-- saver: stopped with TaskStop at about 16:48 UTC after the plan was saved as done (its log: "saved and pushed" at
-  16:02, 16:12, 16:32 and 16:42 UTC). Start it again with the same command when agents run.
+- saver: background task boyrmgcz1, started 2026-11-16 08:49:17 UTC (its log); stops by itself at 10:39 UTC (110
+  minutes); its last "saved and pushed": 0d21f48 at 08:59:20 UTC.
+- agent web-fetch (model opus passed; effort not passed, while CLAUDE.md says "Effort is always stated": a slip,
+  recorded): GitHub's docs on Actions secrets, for the click path in the message to him · launched 2026-11-16 09:10:14
+  UTC (transcript time) · running.
+- Ended: savers bc4g68il4 (2026-11-15 15:52 to about 16:48 UTC, TaskStop) and bkmmk2e8i (20:58 to 22:48:20 UTC, time
+  up); agents infra-engineer and security-auditor (doc reads, DONE), advisor (the plan review, DONE; the review of head
+  1619164, DONE 2026-11-16 09:02:47 UTC); workflows wf_c4580fcf-ece (round 1, 3 of 3) and wf_1f145f55-1c2 (round 2, 2
+  of 2), both DONE.
 - Facts read by the session meanwhile: read_documentation `github.access` (15:52 UTC: a repository becomes attachable
   once the Claude GitHub App can reach it; add_repo attaches it); list_repos (15:52 UTC: five public repositories of
   his, all `can_push: true`; the app's repository-access mode is not shown).
