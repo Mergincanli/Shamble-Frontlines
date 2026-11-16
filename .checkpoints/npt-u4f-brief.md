@@ -38,6 +38,15 @@
   33.3 ms window); the floor error then averages less and leaves a phase-dependent bias, so NA-4 may be understated.
   For rev 2: D4 should also model the phase-locked case (ping period a whole number of ticks), or the brief should say
   the ping period must not be a whole number of ticks · open (passed to the reviser)
+- test-engineer's check (`test-engineer-u4f-check.md`, 293 lines, DONE; verdict for the day session REVISE): 0
+  Critical, 1 High, 14 Medium, 9 Low. TE-1 High: the draft's order (kind 2 "not newer than the last run" before kind 3
+  "sequence not forward", draft :143-154) refuses and counts every honest redundant copy as forged before kind 3 can
+  drop it as a repeat. Confirmed NA-1, -2, -6, -8, -11, -12; NA-7 in part; NA-3 and NA-5 partly refuted (TE-16: the
+  disk rows sum to 3,617 MB, MB and MiB mixed); NA-4, NA-10 not checked · open (for rev 2)
+- SC-2 (the session's spot-check of TE-1, by reading): holds. The client re-sends every unacknowledged command, up to
+  REDUNDANCY_CAP (spike client/src/lib.rs:442-443); today the sequence check runs first and returns `Repeat` for those
+  copies (room/src/input.rs:81-84), before the late rule (:107-113). Under the draft's order an honest copy of a
+  command already run has a tick at or before the last run, so kind 2 would refuse and count it as forged.
 
 ## Key numbers
 - rev 1: 837 lines; 9 field tables; tests ≥ +60 measured / ≥ +74 bites build; 44 negative cases; 17 bites; 65 judged
@@ -57,8 +66,8 @@
   `/tmp/claude-0/-home-user-Shamble-Frontlines/2cc6b1c7-405a-556f-81c6-a85b5a29465f/tasks/bmv14vtwd.output` · started
   00:39 · stops by 01:04 · last check 00:39: restarted
 - test-engineer (check, `test-engineer-u4f-check.md`) and security-auditor (check, `security-auditor-u4f-check.md`),
-  both xhigh, launched 00:50 Amsterdam in parallel, running (2 agents at a time); at 01:04 both check files are being
-  written (blocks in progress)
+  both xhigh, launched 00:50 Amsterdam in parallel. test-engineer done 01:06 (16 min, 60 tool uses);
+  security-auditor running
 - saver stint 2 bmv14vtwd 00:39-01:04: ok (saved 828e2f4, 8e619ce, 8fb15f9; time is up). Stint 3: background task
   bbeygeuzo · output `/tmp/claude-0/-home-user-Shamble-Frontlines/2cc6b1c7-405a-556f-81c6-a85b5a29465f/tasks/bbeygeuzo.output`
   · started 01:04 · stops by 01:29 · last check 01:04: restarted
