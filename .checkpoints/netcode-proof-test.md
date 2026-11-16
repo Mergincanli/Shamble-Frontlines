@@ -28,9 +28,17 @@ it asks nothing; REFS-KIT stays.
   relayed to Mustafa in "Decisions needed".
 - **The second pack DONE (09:10-09:16 UTC; Key numbers):** u4r-P2-ab10f058a828, list committed alone and pushed at
   **6c8c7cf**, pack exit 0, free 5,883 → 6,455 MiB. The brief's start condition (free at least 6,000) holds.
-- **Next: C62H-BOUND's build per the approved brief** (c62h-bound-brief.md, 7936074c…; notes c62h-bound-build.md):
-  base check from 442a284, runner sha256s, the worktree `.claude/worktrees/c62h-bound` (branch c62h-bound-build), the
-  insert and built-check scripts, the built check shown to fail, part 1, then step 1's launch (route W).
+- **C62H-BOUND's build per the approved brief** (c62h-bound-brief.md, 7936074c…; notes **c62h-bound-build.md**, its
+  log has every line): LANE_BASE **044fab1** (base check exit 0; runners, texts, freeze, paste and targets all equal the
+  brief's hashes); worktree `.claude/worktrees/c62h-bound` (branch c62h-bound-build); the scripts c62h_bound_insert.py
+  and c62h_bound_built_check.py; **the built check shown to fail** (12 PASS on texts/freeze, 13 FAIL, exit 1); **part 1
+  done** (SERIES.md 89295b57…, +2 -1, unstaged for step 1); part 3 dry-run on a scratch copy reproduced all three
+  expected hashes. **RUNNING from 10:28 UTC: step 1's launch** (workflow wf_8790c02a-955, task ws9bstt3o; one
+  general-purpose builder, xhigh, no isolation, in the worktree; it stages and commits nothing). **If cut:** resume by
+  run id (`Workflow({scriptPath: "/root/.claude/projects/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/workflows/scripts/c62h-bound-step1-wf_8790c02a-955.js", resumeFromRunId: "wf_8790c02a-955"})`),
+  after reading the notes' "## State". **Then:** the main session commits step 1 in the worktree (message from brief
+  section 1), checks the diff hash against step1-check.log's header and SIZE-CHECK, then step 2's launch. Saver
+  b1gec2y1v (from 09:18 UTC, to about 11:08).
 **The HOLD is lifted** (Mustafa, 2026-11-11 about 16:45 UTC, verbatim in history.md "Decisions taken": "The hold
 lifts when the save is pushed."): the save of both work folders is 4ad80a9. USAGE-SAVINGS (a) is in force with his
 limits (Rules in force). The card's blocks of 2026-11-11 morning are in history.md, "Running work, U4 wave 1 (2)".
