@@ -512,3 +512,22 @@ After the call, before reading the verdict: npt-judge's sha256 must equal p0-rej
   exit 0; name-status .checkpoints/ and A under results/ only; the four sha256s as before; no process found; free
   5,563,871,232 B. **P3 launched about 21:20 UTC** (.gate/u4r-sets/P3-d66e23cd78f2.log; projected 524 MiB, so 4782
   after).
+- **P3 (about 21:20-21:37 UTC; P3-d66e23cd78f2.log; peak.py wall 1029.4 s, exit 0, 995.8 MiB):** the runner's
+  projections: before the builds 524 MiB (4782 after), after the builds free 5300 MiB (4775 after); the judge 1530 MiB
+  from the plan, 997 MiB from the logs on disk (297.0 MiB). Its parts: -2 SS runs, -17 L1 P3, -57 L1 P3 PASS
+  (l1-p3-s1, -s2, -s3 valid); no bites. The summary lines (runs.txt): s1 overflow resyncs 27, measured incomplete
+  43295, stop 87, client hashes 835238, fate log b99096c62a5c51dd, S 863772, L 43094, B 0, E1 201, E2 43094, N 0; s2
+  overflow resyncs 0, incomplete 43210, stop 62, hashes 835419, fate log 7dbd92ec2098f6da, S 864000, L 43210, B 0, E1 0,
+  E2 43210, N 0; s3 overflow resyncs 1, incomplete 43454, stop 59, hashes 835088, fate log f167ce6f8dfc3c09, S 863994,
+  L 43449, B 0, E1 5, E2 43449, N 0. s1 and s3 carry the carry-58 flag. Results committed at **8ca774a**
+  (results/u4r/d66e23cd78f2/P3/: runs.txt, verdict.json; the redact step 305 items, 0 findings).
+- **The P3 set check (.gate/u4r-sets/set-check-P3.log): 32 PASS, 0 FAIL, 0 on Mustafa's stop rules; 19 lines naming
+  the new, 0 FAIL;** notes: s1's E1 201 above 0 (condition 2 shown on a real run); s1 and s3 to the advisor (carry 58).
+  The P3 path has no "B 0" line (brief 8.4 names none; B reads 0 on all three runs: ADV-CBP3-5).
+- **The advisor's P3 ruling (advisor-c62h-bound-p3-full.json, 71 lines, facf298e…, read in full): P3 COUNTS AND P2
+  COUNTS;** l1-p3-s1 and l1-p3-s3 count under carry 58 (the precedent advisor-brawl1-sets-p3-full.md:18-22; s1's 201
+  E1 ticks and s3's 5 are wholly the unacknowledged forced full states, by its raw-log read; 864000 - S = 228 = 201 +
+  27 full-state ticks, and 6 = 5 + 1, refining its earlier "recorded as incomplete": ADV-CBP3-2). Five Lows
+  (ADV-CBP3-1 to -5), conditions P1-P7: the (c) lines replaced by script exactly as its the_c_lines gives them, with
+  one note line (ADV-CBP3-3, -4); the report carries its order_to_the_report items; both P0 folders stay unpacked until
+  the report reaches Mustafa; its check of the report's head, the spike tree still equal to ddd38ba's.
