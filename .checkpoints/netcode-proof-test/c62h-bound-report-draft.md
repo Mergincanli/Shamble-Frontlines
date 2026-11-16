@@ -57,7 +57,7 @@ datagrams, so bursts B are inside L (the netcode-architect's point (a), confirme
   - **No fix pass:** the review round's Lows were deferred in writing (section 15), so commit 4 is the last code
     commit.
 - **SIZE-CHECK** (`git diff --numstat 044fab1 <step> -- spikes/netcode-proof/`, results excluded), per step against
-  the brief's plan per commit (section 4): step 1 **499** (about 285-400); step 2 **322** (about 255-355); step 3
+  the brief's plan per commit (brief section 4): step 1 **499** (about 285-400); step 2 **322** (about 255-355); step 3
   **99** (about 100); step 4 **47** (about 10-20). Lane total after each step: 499, 821, 920, 967.
 - **The total: 967 changed lines (+904 -63) at 42b9646 / 561bf42** (`efe8401..561bf42` gives the same +904 -63).
   - Against the plan Mustafa said yes to (about 650, range 545-755; history.md:2172): above its top by 212.
@@ -76,7 +76,8 @@ datagrams, so bursts B are inside L (the netcode-architect's point (a), confirme
   results/c62h-bound/p0-rejudge-93509dfd7fd1/a87c7ec39b96/: verdicts, runs.txt, rejudge.txt); and the main session's
   scripts, which are not lane code (the head check's H6; the merge-stop ruling's script condition (iii)):
   c62h_bound_insert.py, c62h_bound_built_check.py, c62h_bound_rejudge_compare.py, c62h_bound_set_check.py and
-  c62h_bound_c_lines.py in the notes folder, and the dry-print harness .gate/u4r/c62h-bound/harness/plan-dry.mjs.
+  c62h_bound_c_lines.py in the notes folder. Also outside the count: launch 4's dry-print harness
+  .gate/u4r/c62h-bound/harness/plan-dry.mjs (an evidence harness under .gate/, outside spikes/).
 
 ### 2. Each step's check.mjs counts and each new test by name: PASS
 
@@ -108,8 +109,8 @@ Every count came out as expected. Pass or fail is the exit code and the test run
 ### 3. The planted bugs CB-P1 to CB-P18: PASS (all 18 bit)
 
 Each was one temporary Edit, run through u4r-run.sh -x as `cargo test` of its home test, then restored by Edit with
-the file's sha256 checked equal to the record. Each failed its home test at the cause section 4 names. Times are the
-logs' own (the test-engineer asked for these; the notes' "11:0x" and "11:1x" for CB-P5 to -P7 were wrong).
+the file's sha256 checked equal to the record. Each failed its home test at the cause brief section 4 names. Times
+are the logs' own (the test-engineer asked for these; the notes' "11:0x" and "11:1x" for CB-P5 to -P7 were wrong).
 - **Step 1** (10:43:01-10:46:00; record step1-sha-before-plants.txt):
   - CB-P1, CB-P12, CB-P13 (server_datagrams_since counts up-direction entries / drops the datagram filter / ignores
     `from`): "1 failed", c62hb_server_datagrams_since_counts_down_datagrams_by_fate; sent 180, 202 and 120 against the
@@ -160,7 +161,7 @@ logs' own (the test-engineer asked for these; the notes' "11:0x" and "11:1x" for
   - its --self-test on the new P2: **SELF-TEST PASS** (the planted-bug rule passes as the file is and fails with one
     planted gap; each bite line passes as the file is and fails with its "late" field bumped).
 
-### 5. The review round and the marks.json and judge read (his 13:35 rule)
+### 5. The review round and the marks.json and judge read (his 13:35 rule): PASS
 
 - **Review round 1** (15:38-16:03; test-engineer, netcode-architect, rust-reviewer, each at xhigh, on
   044fab1..42b9646): all three **APPROVE WITH FINDINGS**, 12 findings, all Low, none touching a frozen text or what a
@@ -198,7 +199,7 @@ logs' own (the test-engineer asked for these; the notes' "11:0x" and "11:1x" for
     hashed-and-incomplete INVALID by gap 1 and none-compared FAIL with gap 1 beside; only base's test failed
     (fixtures.rs:229), in both builds.
 
-### 6. The merge step: both counted calls, U3C-HELD-1 and CHECK-NFF-1 (C1-C8)
+### 6. The merge step (C1-C8): PASS on the second counted call; the first stays FAIL
 
 - **The cherry-picks** (16:05, main folder): eb2bebf, b06991e, 15102d1, 561bf42; each lane commit touches only
   spikes/netcode-proof/; the merged bytes equal the reviewed bytes (exit 0).
@@ -215,7 +216,7 @@ logs' own (the test-engineer asked for these; the notes' "11:0x" and "11:1x" for
     CONTINUE WITH CONDITIONS C1-C8. A timing false positive in U3c's test-only held-bound check, not this lane's.
     **npt-lab links npt-net through npt-server and npt-bots, whose sources never name DelayStream or l2::delay;
     crates/net is byte-equal to LANE_BASE.** (H4, ADV-CBH-4.) No manifest or lockfile changed; the same test passed
-    in the same run's measured build and in 96 earlier logged runs.
+    in the same run's measured build and reads "... ok" in 96 other logs under .gate/.
 - **The second counted call: PASS, whole** (merge-2.log, 16:31:00-16:48:07, exit 0), every pass-bar item:
   - header: free 5,278 MiB, HEAD 561bf42, diff and untracked e3b0c442… (none): PASS;
   - check.mjs exit 0, "check: all 11 steps pass"; test "measured build: 552 tests passed, 0 failed, 0 reported a
@@ -233,7 +234,7 @@ logs' own (the test-engineer asked for these; the notes' "11:0x" and "11:1x" for
   fail again). C3 and C4 met on the card (below). C5 met (the set check's sha256 above, committed at ddd38ba, its
   shown-to-fail runs first). **C6 met:** P2 had its two judge calls (measured, then bites), and no stop by hand was
   needed. C7 met: the pre-flight ran exactly as H2 replaced it (section 9). C8: the brief unchanged (7936074c…), and
-  with it section 8's order, its expected lines and section 10's stops.
+  with it the brief's section 8 order, its expected lines and its section 10 stops.
 - **U3C-HELD-1** (Medium; the card's Open findings :3746-3759): "G-NC2's held-bound check (delay.rs:528-543) counts a
   release transient as over the bound". Taker: the main session, as its own planned change (plan first with the
   advisor; netcode-architect and test-engineer), merged before another lane's counted check.mjs run, at the latest
@@ -243,7 +244,7 @@ logs' own (the test-engineer asked for these; the notes' "11:0x" and "11:1x" for
 - **CHECK-NFF-1** (Low; card :3760-3761; taker: check.mjs's next owner, outside this lane): the bites build's `cargo
   test` gains --no-fail-fast (or a second pass), so one failure no longer hides the rest; here it hid 202 of 632.
 
-### 7. The advisor's check of the pushed head ddd38ba: APPROVE WITH CONDITIONS H1-H6
+### 7. The advisor's check of the pushed head ddd38ba: APPROVE WITH CONDITIONS H1-H6, all met
 
 (16:54-17:06; advisor-c62h-bound-head-full.json, sha256 a64259f5…, read in full.) It checked the commit chain, the
 merged bytes (patch-ids pair by pair), merge.log's FAIL by name, merge-2's pass bar item by item, the gate, the built
@@ -257,8 +258,8 @@ H3 and H4 carried in section 6; H5 the merge-stop conditions stand; H6 the size 
 His addition: a judge call, no new runs, its verdicts beside the earlier ones (history.md:2174).
 - **The kept P0 set is 93509dfd7fd1** (B-3): it is the P0 set that counts (BRAWL-1's re-run set; "P0 STANDS AND
   COUNTS", advisor-brawl1-sets-p0-full.md); 051995db9cea is U4r's P0, whose -17 L1 P0 part is recorded and never
-  counted and whose -2 SS part failed (advisor-u4r-sets-r2-full.md:10). 051995db9cea is still on disk; its re-judge
-  would be one more judge call, which Mustafa can name.
+  counted (advisor-u4r-sets-r2-full.md:10) and whose -2 SS part failed at 0.861889 (brief section 7).
+  051995db9cea is still on disk; its re-judge would be one more judge call, which Mustafa can name.
 - **The calls:** the kept set's two judge calls, measured/ then bites/, as that set was judged (U4r-F2's memory
   split), **with no new runs**. One main-run.sh call (.gate/u4r/c62h-bound/p0-rejudge.log, 17:06:52-17:08:39, every
   command exit 0) at head a87c7ec39b966f83cc927b627d8f0e83104ac572, whose spike tree equals ddd38ba's. npt-judge
@@ -299,10 +300,11 @@ the spike-tree check, --date the day it ran, --warmup-s 10.
 
 - **Disk (8.1), no pack needed:** free 6,057 MiB before P2 (at least 5,500) and 5,307 MiB before P3 (at least 5,100).
 - **Before each set (8.2), one main-run.sh call:** pre-P2-c62h.log (20:47:14; HEAD
-  8ee453c228825ec85308d83589c86159736bb4be, spike tree 25c5b760…) and pre-P3-c62h.log (21:19:05; HEAD d66e23cd78f2c75673224109228a5014a0d20a52, spike tree
-  14d78602…): the spike tree equals ddd38ba's (exit 0); name-status only .checkpoints/ and new files under results/;
-  the four runner sha256s as the brief's (section 14); no cargo, rustc, npt-lab or npt-judge. (Before P2 the
-  `pgrep -f` line matched the check's own command line, which names the runner; checked apart, no runner ran.)
+  8ee453c228825ec85308d83589c86159736bb4be, spike tree 25c5b760…) and pre-P3-c62h.log (21:19:05; HEAD
+  d66e23cd78f2c75673224109228a5014a0d20a52, spike tree 14d78602…): the spike tree equals ddd38ba's (exit 0);
+  name-status only .checkpoints/ and new files under results/; the four runner sha256s as the brief's (section 14);
+  no cargo, rustc, npt-lab or npt-judge. (Before P2 the `pgrep -f` line matched the check's own command line, which
+  names the runner; checked apart, no runner ran.)
 - **P2** (20:48:07-21:17:23; .gate/u4r-sets/P2-8ee453c22882.log; peak.py wall 1,755.5 s, exit 0, 1,799.0 MiB):
   results committed at **daec788fca8b2601c74511dbc84f0fc5b0a712d2** (results/u4r/8ee453c22882/P2/: runs.txt,
   verdict.json, verdict-bites.json; redact 303 items, 0 findings). Set check (set-check-P2.log): **46 PASS, 0 FAIL, 0
@@ -378,7 +380,7 @@ resync is the designed recovery path, triggered by the event queue's cap, never 
   resync.
 - Equal across both build caches: npt-judge d8b8c91e… and npt-lab 98c3967e….
 - Its five Lows: ADV-CBP3-1 (the notes gained P3's lines: c62h-bound-build.md:515-533), -3 and -4 (done by the (c)
-  script, section 12), -2 and -5 (carried in this section and section 10). Nothing at Medium or above.
+  script, section 13), -2 and -5 (carried in this section and section 10). Nothing at Medium or above.
 - **Carry 58's capacity side stays open** (P7): EVQ-LOAD, U4f's measurement of the cap, and the per-burst
   high-water marks before -18's judged B1 runs (U4g).
 
@@ -387,7 +389,7 @@ resync is the designed recovery path, triggered by the event queue's cap, never 
 - **Mustafa's** (the paste's stop rules, c62h-bound-paste.md:120-124, adopted by him at history.md:2175; read as the
   advisor's condition 3 reads them):
   - a lost tick nothing explains on any clean run or test: not met. A 0 and N 0 on the six clean judged runs and the
-    pre-flight; the short P2 lab test's join reads 0 unexplained in every check.mjs run.
+    pre-flight; the short P2 lab test, which asserts the join's 0 unexplained, passed in every check.mjs run.
   - the lab's count of unexplained ticks differing from the judge's: not met. N equals A on every run, the bite runs
     included (48 = 48 and 0 = 0).
   - a planted-bug run reading other than 48 on its own check with everything else passing and no gap: not met. Both
@@ -410,7 +412,7 @@ texts the ruling gives (its the_c_lines), after checking every number in them ag
 the one note line (ADV-CBP3-4), and left B1's lines unchanged (now :1035 and :1167). Committed at
 7526ffe89f954cf781d480c43eaffe4452dae939 (u4r-report.md +3 -2; sha256 76680d3a… to 777ee782…).
 
-### 14. Kept logs, the P0 folders, the deferred brief items, the runners' sha256s
+### 14. Kept logs, the P0 folders, the deferred brief items, the runners' sha256s: PASS
 
 - **The kept logs packed:** one folder, before the build (09:10-09:16): **u4r-P2-ab10f058a828** (U4r's P2, closed by
   advisor-u4r-sets-r2-full.md:45). Its list was committed alone and pushed at 6c8c7cf; the pack exited 0, the archive
@@ -504,8 +506,8 @@ JDG-ONLY-1. Paths are under spikes/netcode-proof/; lines are at 42b9646, whose b
 - **Launch 4's calls outside the runner:** two read-only `node -e` calls (marks.json's bite ids; the runner's line
   lengths) and two read-only `python3 -I -c` text-fill computations ran directly, not through u4r-run.sh; they wrote
   nothing and are not evidence. Every recorded run went through the runner (c62h-bound-step4-full.json, deviations).
-- **Recorded times corrected here:** the plant times in section 3 are the logs' (the notes' "11:0x"/"11:1x" were
-  wrong); launch 4 started at about 14:25, not the card's first "14:26".
+- **Recorded times corrected here:** the plant times in section 3 are the logs' own; the notes' "11:0x" and "11:1x"
+  for CB-P5 to CB-P7 and step 1's staging were wrong (the test-engineer's point).
 
 ### Decisions needed
 
