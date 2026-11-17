@@ -81,3 +81,24 @@ B11. DONE + answer.
   chat facts, rules/joint list, answers 98->96, and the five open items "for Follow-ups once merged"); Next item 2 (3
   lines: 2.3 quote, build plan's change-sets #56 first, Slice 3 quote; "one heavy spike" clause gone); Waiting: #56 go
   + Part 15 (2 lines, ea851a8 + path, six codes, change-set 1 waits). No Phase bullet (cap). Next: B7 (ROADMAP).
+- B7 DONE (ROADMAP numstat +13 -4; Recent work 12 entries). Fold by script docs-keeper-fold.mjs: #42's entry (old
+  l.239) moved verbatim as "- " line after the #39 fold (now l.88); its blank line before dropped. New cs0 entry (4
+  lines + blank) on top; #55 entry: header "[2026-11-17, MERGED]" + closing sentence (advisor agent's APPROVE WITH
+  FINDINGS of aea6f5b, verifier's PASS; merged PR #55, c94c81b, 17:09:33 UTC merged_at, merge commit, his go); dated
+  pointer bullet (4 lines) under "v2, next" (his decision changes "wave 1 runs one heavy spike at a time"; his go's
+  2.3 quote). Only added line >120 cols: the folded #42 entry (moved, not written). Branch = docs only (checked).
+  Next: B8 (REPO_MAP).
+- B8 DONE (REPO_MAP numstat +5 -0): rows for docs/research/asset-export-rules.md and soldier-joint-list.md (after
+  UNREAD_SOURCES), and for the three reports (after the decision drafts appendix). repo-map-check: "in the map but not
+  in the repository: docs/reports/2026-11-17-cs0-model-rules.md" (exit 1) - only the report written last. The research
+  files are already committed (cacea55, 21:38:23 UTC) and docs/research/README.md already lists both (l.29-30): my
+  B4 finding about it is resolved. Review round 1 under way (f61f43c 21:46:56; checkpoint 4fe1cfa): #56 row's state
+  updated (cacea55; round 1 under way; report next). Next: B9 (reports/README: no index -> unchanged) then B10.
+- B9 DONE: docs/reports/README.md left unchanged (2 lines, no index; 46 files in the folder; a 3-entry list would be a
+  partial index). Report to caller as their call.
+- B10 DONE: numstat STATUS +8 -8, ROADMAP +13 -4, REPO_MAP +5 -0, README 0 -> TOTAL added 26 (<= 30), deleted 12.
+  STATUS 120 lines. Added lines > 120 cols outside tables: only ROADMAP's folded #42 entry (moved byte for byte).
+  ROADMAP cs0 entry's last sentence now "Review round 1 under way; then his go." (118 cols). repo-map-check last line:
+  "in the map but not in the repository: docs/reports/2026-11-17-cs0-model-rules.md". Nothing opened under
+  /root/.claude/uploads/. Not checked: CI on main c94c81b (STATUS still says "CI green on 82c605e", left as is).
+DONE
