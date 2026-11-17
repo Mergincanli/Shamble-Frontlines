@@ -296,9 +296,11 @@ it asks nothing; REFS-KIT stays.
   the stops. Findings ADV-UH1-1 (Medium, met by C6) and -2 to -7 (Low, met by C3-C5, C9). **Step 1 DONE:
   L1 CONFIRMED THE CAUSE** (09:47:43 UTC, loop 1 run 94 of 189: G-NC2 alone failed, left [1, 0]; D-1: the one
   over-sample had a released record waiting [1, 0], none at a write [0, 0]; excess 14,326 B; the plan's Confirmed line
-  whole; u3c-held-1/build.md). L2 not needed. **D-1 OUT** (both files' hashes as HEAD; git diff quiet). **NOW: step
-  2, the fix by Edit** (the plan's diff, the design notes' doc texts), then step 3's evidence (E3 loops, plants P1-P5,
-  E5, the gate), C4's light pre-check, the review round (C8).
+  whole; u3c-held-1/build.md). L2 not needed. **D-1 OUT** (both files' hashes as HEAD; git diff quiet). **Step 2
+  DONE: the fix is in the main folder, uncommitted until step 6** (116 spike lines; its hashes in build.md); C4's
+  light pre-check PASS (fmt, clippy, doc); the gate PASS. **E3a RUNNING from 09:54 UTC** (task b3ndcpaff; G-NC2 alone,
+  600 runs under 6 busy loops; log .gate/u3c-held-1/e3a.log). Next: E3b (the stalled-client test, 600), E3c (the whole
+  binary, 20), E4 (plants P1-P5, each restored by hash), E5 (the lab's hash), then the review round (C8).
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver: none running** (bvg19b3fy ran 2026-11-17 07:55:49-09:45:50 UTC and stopped on its time limit; not

@@ -119,10 +119,13 @@ Sources:
     wrapper's path caps the request at 8,192 B.
 
 **Held bytes.**
-- Down: at most 64 KB plus the acknowledged prefix of the front record. The budget covers released-but-untaken bytes,
-  and a record's plaintext stays held until the record is delivered whole, so its acknowledged part no longer counts
+- Down: at each write at most 64 KB plus the acknowledged prefix of the front record then unreleased; between writes
+  the held bytes only fall (corrected 2026-11-17, U3C-HELD-1). The budget covers released-but-untaken bytes, and a
+  record's plaintext stays held until the record is delivered whole, so its acknowledged part no longer counts
   against the budget (NC-U3c-2, corrected 2026-11-08; tested at P2 with loss, G-NC2).
-- Up: at most 64 KB in all, plus one frame in parsing (513 + 14 B) and the request cap [C2].
+- Up: at each write at most 64 KB plus the acknowledged prefix of its front unreleased record, plus one frame in
+  parsing (513 + 14 B) and the request cap [C2] (the up prefix added 2026-11-17, U3C-HELD-1, as delay.rs's module doc
+  states it).
 - A counter keeps the current and largest held bytes per direction. Nothing grows with client data beyond these.
 
 **Join deadline (§4.4).** The accept path passes in the TCP accept stamp, `accepted_ns`, on DelayStream's clock,

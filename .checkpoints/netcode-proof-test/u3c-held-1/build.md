@@ -42,3 +42,20 @@ saves after 18b139c; the spike unchanged since ddd38ba.
   L2").
 - 09:48-09:49 D-1 out by Edit (its four edits reversed): delay.rs aaa6a5887085…, delay_tests.rs 74d49de77004… (as
   before D-1, as HEAD); `git diff --quiet HEAD -- spikes/netcode-proof` exit 0. Next: step 2, the fix.
+- 09:50-09:52 **Step 2, the fix, by Edit** (the plan's diff and the design notes' doc texts, C1): delay.rs (module doc
+  :46-53; Life's doc and held_at_write, held_grew; held_now calls check_held_falls; check_held_bound(d) with its new
+  doc and `held_at_write[d] = held`; the new check_held_falls; model_write's doc and its `#[cfg(test)]
+  self.check_held_bound(dir);`), delay_tests.rs (the stalled-client test's doc sentence, its whole-record post-hold
+  write and three asserts; G-NC2's doc, println, message and held_grew assert), marks/SERIES.md (each old phrase
+  counted 2 before, replaced in both rows), u3c-plan.md :122-128 in place with dated notes, :125's up prefix too
+  (HELD-Q6). `git diff --stat`: delay.rs 73, delay_tests.rs 39, SERIES.md 4: **116 changed spike lines** (the plan:
+  about 130; SIZE-CHECK holds), u3c-plan.md 9. Fixed: delay.rs 3dbbccf73d9c5735d61c107b6d2ab7bf67b3bd620fba0db4c84465b78231e3d7,
+  delay_tests.rs 8f8c0f9ab42c17ed7f0c7df47505f5f50b8d876e32092925505dac03799685d2, SERIES.md
+  1dd67e2f2db8e3c569a23fa0580dd2fc47c240d94526d6440348df7dcc41725c (each plant's restore must give these).
+- Next: C4's light pre-check first (fmt, clippy, doc: a lint or rustfmt diff now costs no loop), then E3, E4, E5,
+  the gate.
+- 09:52-09:53 **C4's light pre-check PASS** (.gate/u3c-held-1/light.log: header free 4,919 MiB, HEAD 801d284; fmt
+  PASS (no diff), clippy PASS (both builds), doc PASS (host and wasm32, warnings as errors); "check: all 3 steps pass";
+  exit 0, 09:53:06 UTC). **The gate --no-smoke: GATE PASS** (09:53 UTC; legacy/ unchanged). The stalled-client test's
+  name checked: delay_tests.rs:747 `a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded`.
+- 09:54 E3a started in the background (G-NC2 alone, `one 300 2 6`; log .gate/u3c-held-1/e3a.log).
