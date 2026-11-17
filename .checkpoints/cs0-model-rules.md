@@ -15,15 +15,15 @@
      checkpoints (`build-plan-slice-1*`, `cs0-model-rules*`) in its last commit before the PR is marked ready.
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs0-model-rules) · **Base:** main
   c94c81b440c77f7979e0f944a5341319f9a57d1b (to take in first; the branch still sits on 4460ef5 plus checkpoint commits)
-- **Last update:** 2026-11-17 20:35 Amsterdam
+- **Last update:** 2026-11-17 21:00 CET (from the clock)
 
 ## Steps done
 1. His go received (user message of 2026-11-17T19:10:44Z, saved by script, 10,544 bytes). The session's model read
    with get_session at the start of the turn: `session_context.model` and `last_served_model` both `claude-fable-5-2`.
 2. The three Art briefs he attached copied byte for byte into `.checkpoints/build-plan-slice-1/inputs/` (the
    Conscript's first blockout, 2026-11-14 16:35; its addition of 2026-11-15; the SMG brief of 2026-11-15 17:35). The
-   two pictures his block names (Sheet 16, his SMG line drawing) did not arrive: the upload folder holds five text
-   files, among them `Advisor_log_2.md` (104 KB, not read by the main session, not copied: an agent digests it).
+   two pictures his block names (Sheet 16, his SMG line drawing) did not arrive with it. `Advisor_log_2.md` came along
+   by mistake (his words of 2026-11-17, 20:20): it is not an input, it is not read and no part of it goes in the repo.
 3. `git fetch origin main`: main is c94c81b (PRs #53, #54, #55): `.claude/CHECKPOINTS.md` (+20: §11, kept logs),
    `.claude/NIGHT_SHIFT.md` (+3), `.claude/scripts/kept-logs.mjs` and its test (new), docs: DECISIONS (+218), STATUS,
    ROADMAP, STATUS_ARCHIVE, REPO_MAP. No game file.
@@ -32,30 +32,24 @@
    changed no kit file; it changed only `.checkpoints/`). Told him in three lines: nothing in the plan breaks from
    #53, #54, #55; STATUS's Next is corrected by this change-set; the changes come from his own message.
 5. Change-set 0's plan written (`.checkpoints/cs0-model-rules/plan.md`); `decisions-insert.mjs` written (not run).
-6. The Advisor log he attached digested by an agent (not copied: it holds private notes). Work-relevant points: the
-   second builder chat carries his look decisions as a docs change-set before change-set 6; change-set 0 writes
-   LOOK_V2 section 8's Blender line unless the carry wrote it first; the Art lead's numbers never enter the repo as
-   decided; the Advisor noted three fixes to the SMG brief (the socket_ prefix; the magazine's curve gives 0.025 or
-   0.049 m, not 0.035; the side magazine swings into the left forearm); he expects Part 15 and change-set 0's report.
+6. The Advisor chat's log: one read-only agent was started on it at 19:16:35 UTC (the transcript's record) and
+   returned a digest into this chat; it wrote no file. Five lines of that digest stood in this card from commit
+   8ea40cd (19:44:56 UTC). On his words of 20:20 Amsterdam they are removed here (this update) and nothing of the
+   digest is used; the lines stay in the branch's history (no history is rewritten: CLAUDE.md, "Never").
 7. The advisor agent's review of change-set 0's plan (effort max; notes `cs0-model-rules/advisor-plan-r1.md`, DONE):
    **REVISE**: 1 High, 10 Medium, 5 Low. It needs to see 1 to 11 fixed.
 8. Shamble VFX cloned read-only to /home/user/mergincanli/shamblevfx (head 92ec2dc) for Part 15. A guard refusal on
    the way: `git -C <dir> ...` ("no option before the subcommand"); route: cd into the folder, then git.
 
 ## Current step
-9. Fixing the plan (revision 2, an addendum in plan.md) for the advisor agent's findings:
-   1 (High) the joint list must carry change-set 10's animation port (legacy rows GA1 to GA15: knees, spine, coat
-     panels): engine-architect rules on one engine list for Slice 1, with the brief's rigid parts mapped onto it;
-   2 say whether `root` is a skin joint or the parent node; 3 fix each socket's local axes; 4 `marking_` parts:
-     "off at game size" is the Art lead's proposal, the call is his; 5 quote his sentence on sockets word for word;
-   6 marks 6, 7, 9 rewritten (an asymmetric box; exact tests with tolerances; a named result), one planted defect
-     each; 7 the script-written rifle file cannot prove the Blender export settings; 8 add test-engineer, state the
-     writing agent's model and effort; 9 DECISIONS pointers (SPIKE-ORDER (b); his model words of 2026-11-12 twice; the
-     queued model item; not LOOK-TEST-INPUTS); 10 SPIKE_PLAN's three pointer places; 11 the register's rows
-     (OQ-0006-18, OQ-0002-6, soldiers blocking, OQ-0003-1) and pointers or a named carrier for the draft lines;
-   Lows 12 to 16 (size 150 approved; marks placed with the asset spike group; LOOK_V2's owner after the merge; STATUS
-     and the report's "since the plan"; the hand at socket_grip and the soldier's origin check).
-   graphics-engineer is writing the research draft into `cs0-model-rules/asset-export-rules.draft.md` (started 19:15 UTC).
+9. The plan's revision 2 (an addendum in `cs0-model-rules/plan.md`, written 19:46 UTC) answers the advisor agent's
+   findings 2 to 16. Finding 1 (High, the joint list) waits for engine-architect's ruling
+   (`cs0-model-rules/joint-list.md`; its notes `engine-architect-joint-list.md`). graphics-engineer's research draft
+   is finished (`asset-export-rules.draft.md`, 349 lines) and is updated to the ruling and to revision 2 next.
+   `pointers-insert.mjs` written (not run on the docs): the dated pointers of findings 9 and 10, each quote of his
+   words checked against the saved messages. Then: the advisor agent's re-read; APPROVE before any edit outside
+   `.checkpoints/`.
+   For Part 15: graphics-engineer reads Shamble VFX into `.checkpoints/part-15/shamble-vfx-digest.md`.
 
 ## Next steps
 1. Change-set 0's own short plan at `.checkpoints/cs0-model-rules/plan.md`; the advisor agent's review of it (effort
@@ -91,7 +85,16 @@
 ## Open findings
 - The chat is 79 % full (get_session at the start of this turn: 794,185 of 1,000,000 tokens; automatic compaction at
   901,600). Asked him to compact; work goes on. Heavy reading goes to agents; the main session keeps outputs small.
-- The two pictures of his block did not arrive (Sheet 16 `s16_engine_soldier.jpg`; his SMG line drawing).
+- The pictures: Sheet 16 arrived with his message of 19:59:06 UTC (his label 20:20; saved byte for byte in
+  `cs0-model-rules/mustafa-2026-11-17-2020.md`): one image, seen in the chat, not copied into the repo. Its numbers
+  match the soldier brief's where checked (1.80 m; shoulders 0.49; waist 0.33; hem 0.61 by 0.46; markings 0.022 and
+  0.03). His SMG line drawing still did not arrive: the message carried one image only.
+- His words of 20:20: stamp times from the clock, never ahead of it (the card of commit cb0fd7b9, 20:13:23, said
+  20:25). From now on "Last update" is written from `TZ=Europe/Amsterdam date`.
+- Refusals and routes: (1) 19:2x UTC, the guard refused `git -C <dir> ...`; route: cd into the folder, then git.
+  (2) about 19:58 UTC, a Bash call was denied (a dry run of the two insert scripts on a scratch copy of the docs, one
+  long command that began with `rm -rf` of a scratch folder); route: the same dry run as short commands in a new
+  scratch folder, nothing removed.
 - Plan changes his answers bring (to fold into the plan's record in the report, not silently): GATE-FOLLOW (b) with
   (i): this chat asks him for each gate and CI edit with its exact text; MACHINES: desktop RTX 2070 with i7-9700K,
   laptop class Intel Iris Xe or the AMD equivalent, the actual machines named before change-set 6, the look built
@@ -121,3 +124,4 @@
 
 ## Running work
 - saver: background task bfulbfi1o, started 19:14 UTC, stops by 21:04 UTC; check its output file at each update.
+- agents (2 of 3): engine-architect on the joint list; graphics-engineer on the Shamble VFX digest (Part 15).
