@@ -251,6 +251,15 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      next screen. A web-fetch agent (model opus, effort high, launched 20:09:13 UTC) reads Cloudflare's docs on this
      form.
 
+   - His next screenshot (queued while I worked, 2026-11-17 20:10:38 UTC, transcript time): "Permission policies",
+     "Edit policy": a scope dropdown "Entire Account", a box "Search for permission groups..." with "Bulk Select",
+     groups with counters all at 0 ("Developer Platform" 0/62, "AI & Machine Learning" 0/17, "DNS & Zones" 0/10, "App
+     Security" 0/38, ..., "Account & Billing" 0/18, "Other" 0/5), and "+ Add policy". Sent to him (matching the docs'
+     order: policy, resource, permission, expiration): leave "Entire Account"; search `Pages`; choose Cloudflare Pages,
+     Edit only; no "Bulk Select", no "Add policy"; one permission in all; end date 27 November 2026 (presets only:
+     screenshot first); IP filtering empty; "Continue to summary", screenshot, and **wait for my OK before "Create
+     Token"** (a wait I must lift in words).
+
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
    CLOUDFLARE_ACCOUNT_ID; in `production`: CANARY); `preview` (him as required reviewer, self-review unticked, admin
