@@ -273,7 +273,9 @@ it asks nothing; REFS-KIT stays.
   not typed /compact by then: refresh the card and carry on (his COMPACT-WAIT words, history.md:2052-2054).
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
-  the same. **Saver: b2f2ov1so** (started 2026-11-17 07:31:41 UTC for the advisor's head check, to about 09:21;
+  the same. **Saver: none running** (b2f2ov1so ran 2026-11-17 07:31:41-07:38:55 UTC for the advisor's head check and
+  was stopped by TaskStop when it returned: "nothing to save", "watch stopped: terminated"; start it with the next
+  agent run;
   beoc3blfv ran 07:09:57 until C1's TaskStop at about 07:28, its output ending "[killed]" with its last commit 3c65d14
   made and on the remote; bp6oaduw2 ran 04:31:59-06:22:00 UTC, had nothing to save, and stopped on its time limit,
   not restarted while nothing ran; ba732d9co, restarted 02:39:41 after the spend-limit cut, saved 8c72ab7,
