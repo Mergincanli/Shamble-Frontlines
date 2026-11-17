@@ -1,0 +1,127 @@
+{
+  "verdict": "PASS",
+  "checked": 75,
+  "head_seen": "a5baab8c3c5ef2a57670c0f94b93679f68bd3bae",
+  "p6_exit_code": 0,
+  "round1_items": [
+    {
+      "item": "W1 commit 2's time",
+      "status": "RESOLVED",
+      "evidence": "git log -1 --format='%ad | %cd' b423a7d gives 2026-11-16 12:18:58 +0000 for both. Draft :48 now says (12:18), cut to the minute the same way as 11:01 (11:01:06). Build notes :243 now say '12:18 (git's time, 12:18:58; first written here as 11:54)'. No '11:54' is left in the draft."
+    },
+    {
+      "item": "W2 card line numbers",
+      "status": "RESOLVED",
+      "evidence": "Key :11 pins the card's line numbers to 67de11e. In git show 67de11e (4129 lines): U3C-HELD-1 :3760-3773, CHECK-NFF-1 :3774-3775, the ten Lows :3776-3779, the 17:09-20:36 entry :3198-3211, slip 16 :3209-3211, the 12:44-14:22 restart :3212-3217, slip 17 :3601-3602, commit 4 and the boot :55-56. Every draft ref (:242, :248, :454, :506, :510, :511, :519, :521) matches. No old ref is left (grep for 3746/3184/3587/3762 exits 1)."
+    },
+    {
+      "item": "W3 time key",
+      "status": "RESOLVED",
+      "evidence": "Key :9-11 now says Mustafa's word times are Amsterdam time and gives the UTC time for each. 16:35 and 20:50 on 2026-11-15 are 15:35 and 19:50 UTC (history.md:2131, :2163). 13:35 is 12:35 UTC (:2113). 21:50 and 22:09 on 2026-11-16 are 20:50 and 21:09 UTC (:2177, :2189). All match. One Low is left: the 13:35 rule has no date (listed under wrong)."
+    },
+    {
+      "item": "W4 CB-P6's two edits",
+      "status": "RESOLVED",
+      "evidence": "Draft :113-114 now reads 'one each, except CB-P6, which took two: a `prev_link` vector, and room_tick passed `std::mem::replace(...)`; c62h-bound-build.md:79-81'. That matches build notes :79-81 ('a `prev_link` vector and room_tick passed `&std::mem::replace(&mut prev_link, link.clone())` ... Both edits restored')."
+    },
+    {
+      "item": "W5 first counted call's wording",
+      "status": "RESOLVED",
+      "evidence": "merge.log: fmt, clippy, clippy-wasm32 and doc PASS at :8-11; test FAIL at :12; deps, wasm, refs, marks, self and redact PASS at :54-59; 'check: 1 step(s) failed' at :60; 'exit 1: node check.mjs' at :61; '--- end 16:16:23 UTC, exit 1' at :77; no det-u4 or build lines. Draft :209-213 now says check.mjs's test step failed, check.mjs ran its later steps (all PASS) and ended 'check: 1 step(s) failed', and the main-run.sh call stopped there. The call is main-run.sh (build notes :428, brief :424)."
+    },
+    {
+      "item": "M1 condition P6 with its check and result",
+      "status": "RESOLVED",
+      "evidence": "Draft :396-399 now carries P6: the advisor checks the head that carries the report, naming its full SHA, before the report goes to Mustafa, and the spike-tree command appears exactly as in the ruling's P6. The draft gives exit 0 at e2d06ec, which I re-ran: exit 0. At HEAD a5baab8c3c5ef2a57670c0f94b93679f68bd3bae, git diff --quiet ddd38ba HEAD -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results' also exits 0. One Low is left about the 'branch head when this was written' wording (listed under wrong)."
+    }
+  ],
+  "wrong": [
+    {
+      "where": "Key, draft :10 ('his 13:35 rule (12:35 UTC)')",
+      "severity": "Low",
+      "says": "The 13:35 rule has no date, and the key's default date is '2026-11-16 unless named'.",
+      "record_says": "The 13:35 rule is from 2026-11-15 (13:35 Amsterdam, 12:35 UTC). No claim in the draft depends on that date; :174 cites history.md:2127.",
+      "source": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/history.md:2113"
+    },
+    {
+      "where": "Section 11, P6, draft :398-399",
+      "severity": "Low",
+      "says": "exit 0 at e2d06ec, the branch head when this was written",
+      "record_says": "The P6 line was written after the spend-limit cut (02:37-02:45 UTC on 2026-11-17; git diff e0fd859 67718a7 adds it). At that time the head was e0fd859 or 40dcbb7. e2d06ec is the head that holds the round-1 text. The check exits 0 at e2d06ec and at a5baab8, so the result itself holds.",
+      "source": "git log; git diff e0fd859 67718a7 -- .checkpoints/netcode-proof-test/c62h-bound-report-draft.md; git diff --quiet ddd38ba e2d06ec / HEAD -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results' (both exit 0)"
+    },
+    {
+      "where": "Section 11, P5, draft :395",
+      "severity": "Low",
+      "says": "both P0 folders and the reference sets stay unpacked until this report has reached Mustafa: section 14",
+      "record_says": "The ruling's P5 also names the c-u2 folders. Section 14 (:437-438), which this line points to, does name them.",
+      "source": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-c62h-bound-p3-full.json:65 (P5)"
+    },
+    {
+      "where": "For Mustafa item 4, draft :557-558",
+      "severity": "Low",
+      "says": "PR #54 (... you said yes to at 22:09) came to you on its own for your go on its merge: ... ready since 22:11 UTC on 2026-11-16",
+      "record_says": "The card says 'C4: ready for review at 22:11 UTC ... stopped for his go on head 20f9d59918eea1e3431ae830f72510f83f6424c7'. No line records a message to him about PR #54, so 'waits for your go' would be exact. Also, 22:09 is Amsterdam time (per the key) and 22:11 is UTC, so the two times read as two minutes apart when they are 1 h 2 min apart. The ready time and 'review round done' are correct.",
+      "source": "git show 67de11e:.checkpoints/netcode-proof-test.md:164-180; card now :3217-3218"
+    },
+    {
+      "where": "Section 10, draft :305 (round-1 text, outside the diff)",
+      "severity": "Low",
+      "says": "5,307 MiB before P3",
+      "record_says": "The figure appears in the notes (:510) and in the ruling's order item 9, but no log holds it. pre-P3-c62h.log :2 reads 'free 5306 MiB', and 5,563,871,232 B is 5,306.1 MiB. The 1 MiB gap changes nothing against the 5,100 bar. Round 1 did not count it.",
+      "source": "/home/user/Shamble-Frontlines/.gate/u4r-sets/pre-P3-c62h.log:2; c62h-bound-build.md:510-513"
+    },
+    {
+      "where": "Draft :115 and :213; build notes :243",
+      "severity": "Low",
+      "says": "The rewrapped lines in the CB-P6 and first-call hunks, and the build-notes time line, run past 120 characters.",
+      "record_says": "Polish only: the Markdown renders the same.",
+      "source": "git diff e2d06ec -- the two files"
+    }
+  ],
+  "missing_items": [],
+  "drafter_gaps": [
+    {
+      "gap": "Takers per deferred Low: one shared taker for all ten (card :3762-3765)",
+      "handled": true,
+      "note": "Draft :454 gives the shared taker, as the merge-stop ruling words it. Its card ref now reads :3776-3779, which is correct at 67de11e. Acceptable."
+    },
+    {
+      "gap": "C62HB-Q4 (b): the recommendation is the drafter's; whether the L1 P0 wrap runs also need a re-run is not recorded",
+      "handled": true,
+      "note": "The recommendation '(b), with U4g' is stated as the report's own. The P0 point is labelled '(this report's reading)' next to the design's P3-only text, and it follows from the gaps fixture's first case: a room log without tick.s.snap_link_lost_count reads INVALID on both figures."
+    },
+    {
+      "gap": "the_c_lines cites history.md:2133; the words are at :2146",
+      "handled": true,
+      "note": "The draft cites :2143-2146 for C62H-BOUND (a) and :2146 in section 13. I checked: those lines hold his (a) and 'The report lines of (c) stay in until it is built.'"
+    },
+    {
+      "gap": "No run log for c62h_bound_c_lines.py",
+      "handled": true,
+      "note": "Section 13 rests on commit 7526ffe (+3 -2, 76680d3a to 777ee782) and claims no log. u4r-report.md's lines match the_c_lines byte for byte, and their numbers match runs.txt (round 1). Acceptable."
+    },
+    {
+      "gap": "Free space before P3: 5,307 recorded vs the log's 5306 MiB",
+      "handled": true,
+      "note": "Unchanged since round 1, which did not count it. The figure comes from the notes and the ruling; no log holds 5,307, and the logs read 5,306.1 MiB. Listed as a Low: the draft could name the logs' 5,306. No outcome changes against 5,100."
+    },
+    {
+      "gap": "CI on ddd38ba is the main session's relay",
+      "handled": true,
+      "note": "Section 17 :501 says so. Round 1 read the six check runs (all success) read-only. Acceptable."
+    },
+    {
+      "gap": "PR #54's current state not checked",
+      "handled": true,
+      "note": "Item 4 now says the review round is done and the PR has been ready since 22:11 UTC on 2026-11-16, which matches the card at 67de11e (:164-180) and the card now (:3217-3218, unchanged, head 20f9d59). The Low on 'came to you on its own' and the 22:09/22:11 pairing still stands."
+    },
+    {
+      "gap": "u4r-report.md line numbers :997, :1008, :1035, :1167 hold only if the section is inserted after them",
+      "handled": true,
+      "note": "u4r-report.md is 1199 lines, sha256 777ee782 (the (c) script's result). :997 is -17 L1 P3's Bounded line (under :996, in 'The re-run sets' at :985). :1008 is -17 L1 P2's Bounded line (under :1007). :1035 is '- -17 L1 B1 stays with U4g's judged B1 runs.' and :1167 is '- **-17 L1 B1** stays with U4g's judged B1 runs (...)'. All match the draft's header (:7) and section 13 (:428). BRAWL-1's section (from :630) ends at :1199, the end of the file, and the insert script appends there, bound to 777ee782 and to the draft's sha256. The refs hold."
+    }
+  ],
+  "outside_the_diff_unchanged": true,
+  "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/verifier-c62h-bound-report-r2.md"
+}

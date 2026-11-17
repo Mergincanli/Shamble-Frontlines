@@ -166,12 +166,19 @@ it asks nothing; REFS-KIT stays.
   missing (P6); no figure, verdict or pass bar wrong. **Fix pass:** ten fixes made by Edit (saved e0fd859; card
   line numbers now pinned to 67de11e); then the spend-limit cut (the cuts block). **Next:** the rest of the fixes
   (the conditions P1-P7 with P6, the decision's code explained and its options, For Mustafa item 4, -58's parts as
-  marks.json gives them, the notes' :243): **all made by 02:44 UTC** (the draft now sha256 5d8fb338…; diff to the
-  round-1 version e2d06ec +47 -27); **RUNNING from 02:45 UTC: the verifier's round 2** (workflow wf_bfde2f03-00d,
-  verifier at xhigh, notes verifier-c62h-bound-report-r2.md); the insert script c62h_bound_report_insert.py is
-  written (appends the draft at u4r-report.md's end, bound to the draft's sha256; shown to refuse a wrong hash, nothing
-  written). Then: the verifier until PASS; the section into u4r-report.md by that script;
-  save; CI; the advisor's check of that head (P6); the report to Mustafa. P6's spike-tree check exits 0 at e2d06ec.
+  marks.json gives them, the notes' :243): **all made by 02:44 UTC** (the draft then sha256 5d8fb338…; diff to the
+  round-1 version e2d06ec +47 -27). **The verifier's round 2: PASS** (wf_bfde2f03-00d, 02:45-02:55 UTC; saved word
+  for word by c62h_bound_report_r2_full.py: c62h-bound-report-verify-r2-full.json f463ef0c…, read in full): 75
+  checked; the six round-1 items RESOLVED; nothing missing; nothing outside the diff changed; P6's check exit 0 at
+  a5baab8. **Its six Lows applied after the PASS, as it states them** (the 13:35 rule's date; P6's wording; P5's c-u2
+  folders; For Mustafa item 4; 5,306 MiB, the log's figure; three lines rewrapped; the notes' :243 stays one line,
+  since rewrapping it would move the lines the report cites): the draft 5d8fb338… → **e4af2d54…** (+18 -12; 564
+  lines), for the advisor's head check. **The section is in u4r-report.md** (c62h_bound_report_insert.py with
+  e4af2d54…, about 02:56 UTC: 1199 → 1764 lines, 777ee782… → **c5dee3fa…**, the section from line 1201; the script
+  shown first to refuse a wrong hash). The push is checkpoint-only, so the script marks it [skip ci] (CHECKPOINTS.md
+  §5); CI last ran on a59e0ee77534… (21:37 UTC): gate and toolchain success, push and pull_request (runs
+  43961950359, 43961950485, 43961962912, 43961962919). **Next:** the advisor's check of the pushed head (P6, full
+  SHA); then the report to Mustafa. P6's spike-tree check exits 0 at e2d06ec and a5baab8.
   **NS-STATUS: PR #54 opened 21:57 UTC** (claude/night-shift-stints, commit 20f9d599…, NIGHT_SHIFT.md +3 -0, the
   lines' sha256 4e3d1565… = his yes; the worktree .gate/ns-stints-wt; subscribed). **Its review round DONE**
   (wf_9f3bfdf9-76a; both saved word for word and read in full): **the advisor APPROVE WITH FINDINGS**

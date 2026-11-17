@@ -7,8 +7,9 @@ C8). This report is a section of u4r-report.md, as BRAWL-1's is, so it sits besi
 "The re-run sets" (:997 and :1008). It carries brief section 9 item by item, each marked PASS or FAIL, and the
 advisor's P3 ruling's order_to_the_report items 4-9 (advisor-c62h-bound-p3-full.json, sha256 facf298e…, conditions
 P1-P7). Times are UTC, 2026-11-16 unless named, except Mustafa's own word times, which are Amsterdam time as his
-messages give them: his 16:35 and 20:50 of 2026-11-15 (15:35 and 19:50 UTC), his 13:35 rule (12:35 UTC), his 21:50
-and 22:09 words of 2026-11-16 (20:50 and 21:09 UTC). Card line numbers are those of the card at 67de11e._
+messages give them: his 16:35 and 20:50 of 2026-11-15 (15:35 and 19:50 UTC), his 13:35 rule of 2026-11-15 (12:35
+UTC), his 21:50 and 22:09 words of 2026-11-16 (20:50 and 21:09 UTC). Card line numbers are those of the card at
+67de11e._
 
 **In short:**
 - **What was built.** The test lab now records, for each client and each tick, how many snapshot packets the simulated
@@ -112,8 +113,9 @@ Every count came out as expected. Pass or fail is the exit code and the test run
 
 Each was a temporary Edit (one each, except CB-P6, which took two: a `prev_link` vector, and room_tick passed
 `std::mem::replace(...)`; c62h-bound-build.md:79-81), run through u4r-run.sh -x as `cargo test` of its home test, then
-restored by Edit with the file's sha256 checked equal to the record. Each failed its home test at the cause brief section 4 names. Times
-are the logs' own (the test-engineer asked for these; the notes' "11:0x" and "11:1x" for CB-P5 to -P7 were wrong).
+restored by Edit with the file's sha256 checked equal to the record. Each failed its home test at the cause brief
+section 4 names. Times are the logs' own (the test-engineer asked for these; the notes' "11:0x" and "11:1x" for CB-P5
+to -P7 were wrong).
 - **Step 1** (10:43:01-10:46:00; record step1-sha-before-plants.txt):
   - CB-P1, CB-P12, CB-P13 (server_datagrams_since counts up-direction entries / drops the datagram filter / ignores
     `from`): "1 failed", c62hb_server_datagrams_since_counts_down_datagrams_by_fate; sent 180, 202 and 120 against the
@@ -210,8 +212,9 @@ are the logs' own (the test-engineer asked for these; the notes' "11:0x" and "11
   test step failed: the measured build 552 passed, 0 failed; the bites build 429 passed, **1 failed**: npt-net's
   l2::delay::tests::under_loss_the_held_bytes_stay_within_64_kb_and_the_front_records_acknowledged_prefix. check.mjs
   ran its later steps (deps, wasm, refs, marks, self, redact: all PASS; every other step passed too) and ended "check:
-  1 step(s) failed". The main-run.sh call stopped there, so det-u4, the release build and the hash never ran. The lane stopped as the brief
-  says ("a check.mjs step fails that no edit of this lane explains"), retried nothing, ran no gate and pushed nothing.
+  1 step(s) failed". The main-run.sh call stopped there, so det-u4, the release build and the hash never ran. The
+  lane stopped as the brief says ("a check.mjs step fails that no edit of this lane explains"), retried nothing, ran
+  no gate and pushed nothing.
   - **Where the failure is kept (H3):** merge.log:51-52 (the test's name), c62h-bound-build.md:428-435 (the
     assertion, "held <= 64 KB + the front record's acknowledged prefix", left [1, 0], right [0, 0]) and the merge-stop
     ruling. The step's whole output (.gate/netcode-proof-test/failed-steps/test.log, 1,577 lines) is gone:
@@ -302,7 +305,8 @@ the spike-tree check, --date the day it ran, --warmup-s 10.
 
 ### 10. The judged sets P2 and P3: every expected line PASS
 
-- **Disk (8.1), no pack needed:** free 6,057 MiB before P2 (at least 5,500) and 5,307 MiB before P3 (at least 5,100).
+- **Disk (8.1), no pack needed:** free 6,057 MiB before P2 (at least 5,500) and 5,306 MiB before P3 (at least 5,100;
+  pre-P3-c62h.log reads 5,306, where the notes and the ruling give 5,307).
 - **Before each set (8.2), one main-run.sh call:** pre-P2-c62h.log (20:47:14; HEAD
   8ee453c228825ec85308d83589c86159736bb4be, spike tree 25c5b760…) and pre-P3-c62h.log (21:19:05; HEAD
   d66e23cd78f2c75673224109228a5014a0d20a52, spike tree 14d78602…): the spike tree equals ddd38ba's (exit 0);
@@ -392,11 +396,12 @@ resync is the designed recovery path, triggered by the event queue's cap, never 
   - P2: the (c) replacement ran only as the_c_lines gives it: section 13.
   - P3: every item of brief section 9 and the carries of the ruling's order_to_the_report: sections 1-18.
   - P4: c62h-bound-build.md's section 8 gained P3's lines before this report was written (ADV-CBP3-1, :515-533).
-  - P5: both P0 folders and the reference sets stay unpacked until this report has reached Mustafa: section 14.
+  - P5: both P0 folders, the reference sets and the c-u2 folders stay unpacked until this report has reached
+    Mustafa: section 14.
   - P6: the head that carries this report gets the advisor's check, naming its full SHA, before the report goes to
     Mustafa; nothing in spikes/netcode-proof outside results/ changes from ddd38ba to that head (`git diff --quiet
-    ddd38ba HEAD -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results'`: exit 0 at e2d06ec, the branch
-    head when this was written; run again on the head that carries this report).
+    ddd38ba HEAD -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results'`: exit 0 at e2d06ec, the head that
+    holds the round-1 text, and at a5baab8 in the verifier's round 2; run again on the head that carries this report).
   - P7: every other bar and stop in the brief stands unchanged (C8, section 6); carry 58's capacity side stays open
     (above).
 
@@ -554,5 +559,6 @@ JDG-ONLY-1. Paths are under spikes/netcode-proof/; lines are at 42b9646, whose b
    runs. Both P0 folders stay unpacked until you have read this report.
 3. Nothing to check in Brave: this is spike code on PR #40's test branch, nothing a player sees, hears or feels
    changes, and nothing merges to main.
-4. Separately, not this lane: PR #54 (the three NIGHT_SHIFT.md lines you said yes to at 22:09) came to you on its own
-   for your go on its merge: its review round is done, and it has been ready since 22:11 UTC on 2026-11-16.
+4. Separately, not this lane: PR #54 (the three NIGHT_SHIFT.md lines you said yes to at 22:09 Amsterdam time) waits
+   for your go on its merge: its review round is done, and it has been ready since 22:11 UTC (23:11 Amsterdam) on
+   2026-11-16.
