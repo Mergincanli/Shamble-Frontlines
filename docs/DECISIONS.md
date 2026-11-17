@@ -38,6 +38,13 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     - _Pointer: the foundation chat's own record of FREEZE-FDN (a), SPLIT (a) and SCOPE (a), in his words, under
       "Decisions, newest first": the entry "Taken by Mustafa, 2026-11-10: FREEZE-FDN (a), SPLIT (a), SCOPE (a) and
       the build go for 2.1a, in the foundation chat"._
+    - _Pointer, 2026-11-17 (DOCS-54; a pointer, not his words): his two one-change exceptions to KIT-FREEZE-2 since,
+      each in his words under "Decisions, newest first": the kept-logs rule, PR #53 (`.claude/CHECKPOINTS.md` §11),
+      in the entry "Taken by Mustafa, 2026-11-15, 15:34:42 UTC: KL-YES with one change, and the exception to the kit
+      freeze (KIT-FREEZE-2) for the kept-logs rule"; and the night-shift lines, PR #54 (`.claude/NIGHT_SHIFT.md` step
+      6), his terms in the entry "Taken by Mustafa, 2026-11-16, 20:48:10 UTC: NS-STATUS (a) and the approval-free
+      command forms" and his yes in the entry "Taken by Mustafa, 2026-11-16, 21:09:27 UTC: NS-LINES (a), his yes to
+      the three night-shift lines"._
   - His unit walk (2026-11-09 18:22:39 UTC, sent while kit-v3-5 was starting; a docs change-set after the guard fix,
     plan first, recording UNITS.md §0 and LOOP_V2):
     > Queue after the guard fix, a docs change-set, plan first (Mustafa's unit walk): record in UNITS.md §0 and LOOP_V2,
@@ -89,6 +96,13 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     script from `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A9):
     > - This replaces the sentence "The main model and every agent stay Opus 5.5" in my LANE-RULES of 2026-11-10. From the moment these words are in docs/DECISIONS.md they are the rule, also where CLAUDE.md still says otherwise.
     > - I allow the rule change in the kit for this. Step 2.3 changes CLAUDE.md's "Models and effort" section and the agent files to match, each edit asked of me in chat with its exact text. List it as a finding for 2.3. Do not edit the kit for it in this PR.
+  - The kit's next change after the freeze (a pointer, 2026-11-17, DOCS-54; his words are in the entries named, under
+    "Decisions, newest first"): it takes the kept-logs rule's follow-ups SA-KL-1 to SA-KL-4 and KLT-1 to KLT-8, which
+    he accepted as left open for #53 (the entry "Taken by Mustafa, 2026-11-15, 19:46:36 UTC: KL-MERGE (a), merge #53,
+    and the security and test findings accepted as left open"), and NS-TRAILER and NS-FIRST, his (b) for both (the
+    entry "Taken by Mustafa, 2026-11-17, 10:43:48 UTC: RECS-1043, his answer to the session's recommendations; for
+    main: DOCS-54 (a), NS-TRAILER (b) and NS-FIRST (b)", the question shown under it as the session's text). This
+    item leaves "Queued" when the change-set that carries it out merges.
   - The entries below are pointers to items carried out.
   - STATUS-DIET and LANE-RULES, with his Models addition and ACCOUNTS (his queue of 2026-11-10, items 2 and 3, his
     answers of 07:08:14 UTC and his second message, item 1): carried out by status-diet, so moved from here to
@@ -107,6 +121,207 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-17, 10:43:48 UTC: RECS-1043, his answer to the session's recommendations; for main:
+  DOCS-54 (a), NS-TRAILER (b) and NS-FIRST (b)** (his message typed into the netcode proof test's day session,
+  session_0173vVo6igCNyQYBWPvhH36A, on his university account; no time label of his own; the primary source is that
+  session's transcript, message 90173405-9d31-4247-8d81-4a46d2902961, stamped 2026-11-17T10:43:48.016Z). It answers the
+  session's Decisions-needed block as last posed at 08:54:58 UTC and repeated at 10:35:38 UTC; the lines for main are
+  shown under it as the session's text, not his words. DOCS-54 (a) is carried out by the docs pass that added this
+  entry; NS-TRAILER and NS-FIRST are queued above. PACK-READ and C62HB-Q4, which it also answered (history.md:2209-2214,
+  :2216, :2222 and :2224), and the session's reading (:2227) are the netcode test's and stay with PR #40. Copied by
+  script from the transcript and checked byte for byte against `.checkpoints/netcode-proof-test/history.md` at
+  110c3031a5145c675f25d320068df0368476771c (PR #40's branch), line 2205 (his words, inside the quote marks behind its
+  prefix) and lines 2215, 2217, 2223 and 2225:
+> I agree with all your recommendations, continue
+- _The session's text, not his words: the questions it answers for main, as last posed (the assistant's message at
+  2026-11-17T08:54:58.700Z, transcript message a5b19b89-9a18-4259-9f64-4cbdc7d7abfd, two lines of its Decisions-needed
+  block):_
+```text
+- **DOCS-54:** may this chat open one docs-only branch and pull request to update main's dashboard and decision record for #52, #53 and #54? Main still says the last merge was #48, and it has none of your words since 2026-11-14. Options: (a) yes; (b) the foundation chat's next docs pass does it; (c) wait for PR #40's final docs step. I recommend (a).
+```
+- _[history.md:2216 left out: C62HB-Q4, the netcode test's; it stays with PR #40]_
+```text
+- **NS-TRAILER and NS-FIRST:** should the kit's next change after the freeze add two things to your merged night-shift lines: the attribution option on the save command, and a status refresh before the first saver stint? Options: (a) keep your lines as they are; (b) add them then, with your yes to the exact text. I recommend (b) for both.
+```
+- _The session's text, not his words: the same two as last repeated before his message (the assistant's message at
+  2026-11-17T10:35:38.816Z, transcript message dc526fb2-bca6-4e03-8f03-f17d983d1f95):_
+```text
+- DOCS-54: I recommend (a).
+```
+- _[history.md:2224 left out: C62HB-Q4, the netcode test's; it stays with PR #40]_
+```text
+- NS-TRAILER and NS-FIRST: I recommend (b) for both.
+```
+- **Taken by Mustafa, 2026-11-17, 07:00:54 UTC: MERGE-54, his go for #54** (his message typed into the netcode proof
+  test's day session, session_0173vVo6igCNyQYBWPvhH36A, on his university account; no time label of his own; the primary
+  source is that session's transcript, message 50b71aa0-f12b-4f33-b170-1fe80a5ee722, stamped 2026-11-17T07:00:54.917Z).
+  It answers the session's "For Mustafa" line of 06:34:50 UTC, shown under it as the session's text, not his words.
+  Carried out by the merge 82c605e (a merge commit, expected head 20f9d59918eea1e3431ae830f72510f83f6424c7; GitHub's
+  merged_at 2026-11-17T07:03:03Z). Copied by script from the transcript and checked byte for byte against
+  `.checkpoints/netcode-proof-test/history.md` at 110c3031a5145c675f25d320068df0368476771c (PR #40's branch), line 2200
+  (inside the quote marks behind its prefix) and line 2201:
+> Merge #54
+- _The session's text, not his words: the line it answers (the assistant's message at 2026-11-17T06:34:50.318Z,
+  transcript message 345259cd-922b-4a94-ba72-d498af6889fe, its "For Mustafa" line):_
+```text
+2. When you're ready, type "merge #54" in this chat; its version is 20f9d59918eea1e3431ae830f72510f83f6424c7.
+```
+- **Taken by Mustafa, 2026-11-16, 21:09:27 UTC: NS-LINES (a), his yes to the three night-shift lines** (his message
+  typed into the netcode proof test's day session, session_0173vVo6igCNyQYBWPvhH36A, on his university account; no time
+  label of his own; the primary source is that session's transcript, message dcec7506-366c-4214-a0a5-1c6ccdae9a8e,
+  stamped 2026-11-16T21:09:27.492Z). By his words of 20:48:10 UTC (the entry below), this yes is also the exception to
+  the kit freeze (KIT-FREEZE-2) for that one change. Carried out by PR #54 (merged at 82c605e): the three lines stand in
+  `.claude/NIGHT_SHIFT.md` :45-47. It answers the session's question of 20:50:16 UTC; the question and the three lines
+  are shown under it as the session's text, not his words. Copied by script from the transcript and checked byte for
+  byte against `.checkpoints/netcode-proof-test/history.md` at 110c3031a5145c675f25d320068df0368476771c (PR #40's
+  branch), line 2190 (inside the quote marks behind its prefix) and lines 2191 and 2194-2196; the three lines also equal
+  `.claude/NIGHT_SHIFT.md` :45-47 at main 82c605e2e8a7f284e6925718368d3fe569f89ae9 (sha256
+  4e3d15658c0afaf40d922cdce9559a8dc2d1079ea04a8fc96e327798b3639223, taken without the final newline):
+> yes
+- _The session's text, not his words: the question it answers (the assistant's message at 2026-11-16T20:50:16.246Z,
+  transcript message 85c33559-9cfa-4834-b019-02a57b82b7e6) and the three lines (that message's first fenced block):_
+```text
+**NS-LINES:** yes or no to the three lines above, exactly as written.
+```
+```text
+   While the run waits on agents, nothing else wakes it: run the background saver in stints under 30 minutes
+   (`node .claude/scripts/checkpoint.mjs watch <slug> --every 10 --for 25`, in the background), and at each
+   stint end refresh the status comment, then start the next stint.
+```
+- **Taken by Mustafa, 2026-11-16, 20:48:10 UTC: NS-STATUS (a) and the approval-free command forms** (his label: "My
+  words of 2026-11-16, 21:50 (Amsterdam time)"; his message typed into the netcode proof test's day session,
+  session_0173vVo6igCNyQYBWPvhH36A, on his university account, sent while a turn ran; the primary source is that
+  session's transcript, its queued-command record 8840e0b5-3b64-4365-9f3d-b4967eb136b0, stamped
+  2026-11-16T20:48:10.683Z). Its NS-STATUS was carried out by PR #54 (merged at 82c605e); his yes that it names as the
+  exception to the kit freeze is the entry above. Copied by script from the transcript and checked byte for byte against
+  `.checkpoints/netcode-proof-test/history.md` at 110c3031a5145c675f25d320068df0368476771c (PR #40's branch), lines
+  2180-2187; whole:
+> My words of 2026-11-16, 21:50 (Amsterdam time), for the netcode chat.
+>
+> NS-STATUS: (a). A small kit change to .claude/NIGHT_SHIFT.md, as its own pull request, after C62H-BOUND's P2 and P3 runs.
+> - What it says: while a night run waits on agents, the saver runs in stints under 30 minutes, and the run refreshes its status comment at each stint's end, as last night's run did.
+> - Only that file, and only the lines this needs. No guard, hook, settings or script change.
+> - First show me the exact lines in chat and wait for my yes. My yes will also be the exception to the kit freeze (KIT-FREEZE-2) for this one change. Then one review round, then stop for my go on the merge.
+>
+> On today's stall (17:09 to 20:36 UTC, a call that waited for my approval): write commands in the simple forms that need no approval, one per call, as you did when you redid that step. When a call has to ask me, name it in your message before you send it.
+- **Taken by Mustafa, 2026-11-15, 19:46:36 UTC: KL-MERGE (a), merge #53, and the security and test findings accepted as
+  left open** (his label: "My words of 2026-11-15, 20:50 (Amsterdam time)"; his message typed into the netcode proof
+  test's day session, session_0173vVo6igCNyQYBWPvhH36A, on his university account; the primary source is that session's
+  transcript, message 63954cb4-7747-4dc6-86a8-6e72c97e81e9, stamped 2026-11-15T19:46:36.849Z). Carried out by the merge
+  53272a1 (PR #53); the follow-ups it accepts as left open (SA-KL-1 to SA-KL-4, KLT-1 to KLT-8) are queued above for the
+  kit's next change after the freeze. Partial: history.md:2172-2175 (C62H-BOUND-YES) are the netcode test's and stay
+  with PR #40. Copied by script from the transcript and checked byte for byte against
+  `.checkpoints/netcode-proof-test/history.md` at 110c3031a5145c675f25d320068df0368476771c (PR #40's branch), lines
+  2166-2170:
+> My words of 2026-11-15, 20:50 (Amsterdam time), for the netcode chat. Two answers.
+>
+> KL-MERGE: (a). Merge #53, the kept-logs rule, at head a637c7a357e79614f896ddddf7488e08b5fc9180, as a merge commit. If the head is anything else, stop and tell me.
+> - The security reviewer's four Low findings (SA-KL-1 to SA-KL-4) and the test-engineer's eight stay open as follow-ups. I accept them as left open for this pull request. Keep them listed in the pull request's description and on your card; the kit's next change after the freeze takes them.
+> - After the merge this branch takes main in. Only then may anything real be packed. Report what was packed, with the free space before and after.
+- _[history.md:2172-2175 left out: C62H-BOUND-YES, the netcode test's; it stays with PR #40]_
+- **Taken by Mustafa, 2026-11-15, 18:42:53 UTC: his go for the copy of the kept-logs kit files (PR #53)** (his message
+  typed into the netcode proof test's day session, session_0173vVo6igCNyQYBWPvhH36A, on his university account; no time
+  label of his own; the primary source is that session's transcript, message 420bc186-1912-44ee-9d6e-652637b753e2,
+  stamped 2026-11-15T18:42:53.995Z). It answers the session's ask of 18:04:58 UTC, shown under it as the session's text,
+  not his words. Not in history.md: found by the transcript sweep that DOCS-54's plan review asked for; copied by script
+  from the transcript, its only source:
+> go
+- _The session's text, not his words: the ask it answers (the assistant's message at 2026-11-15T18:04:58.542Z,
+  transcript message d95dd5a3-457b-4893-969b-2d627afdc934, its last paragraph):_
+```text
+The kept-logs build is still waiting for you. Please switch the session to Accept edits and type "go", so I can copy the three kit files into `.claude/` in the worktree. You'll get one permission prompt for that copy.
+```
+- **Taken by Mustafa, 2026-11-15, 16:21:11 UTC: KL-CHANGE-YES (a), yes to kl-change-v2.diff; build the kept-logs rule as
+  set out** (his label: "My words of 2026-11-15, 17:20 (Amsterdam time)"; his message typed into the netcode proof
+  test's day session, session_0173vVo6igCNyQYBWPvhH36A, on his university account; the primary source is that session's
+  transcript, message 513dc802-6ed8-4f23-b620-02df87f8d996, stamped 2026-11-15T16:21:11.362Z). Carried out by PR #53
+  (merged at 53272a1). Copied by script from the transcript and checked byte for byte against
+  `.checkpoints/netcode-proof-test/history.md` at 110c3031a5145c675f25d320068df0368476771c (PR #40's branch), lines
+  2151-2161; whole, with one known difference: the transcript's first line ends in a space that history.md:2151 lacks,
+  and the copy keeps the transcript's space:
+> You have just been /compact-ed, we are at 99% usage right now, this is for once usage has been reset: 
+>
+> My words of 2026-11-15, 17:20 (Amsterdam time), for the netcode chat.
+>
+> KL-CHANGE-YES: (a). Yes to the changed lines exactly as posted (kl-change-v2.diff, 102 lines, sha256 starting c80dbbb346459d46), on top of the text I said yes to (kept-logs-final-text.md, sha256 starting 97c81656).
+>
+> Build it as you set out: its own branch from main, the checks, the dry runs and the 14 planted bugs, one review round of security-auditor and test-engineer, the advisor on every pushed head. Then stop for my go on the merge.
+>
+> In that pull request's ready report: its head, the files it changes, and that the three kit files equal the text I said yes to with this diff applied, compared by script.
+>
+> Nothing real is packed or deleted before that pull request is on main and this branch has taken main in.
+- **Taken by Mustafa, 2026-11-15, 15:34:42 UTC: KL-YES with one change, and the exception to the kit freeze
+  (KIT-FREEZE-2) for the kept-logs rule** (his label: "My words of 2026-11-15, 16:35 (Amsterdam time)"; his message
+  typed into the netcode proof test's day session, session_0173vVo6igCNyQYBWPvhH36A, on his university account; the
+  primary source is that session's transcript, message 37f2d715-08cd-4120-9f49-5e2f4c99c274, stamped
+  2026-11-15T15:34:42.893Z). Carried out by PR #53 (merged at 53272a1): the rule stands in `.claude/CHECKPOINTS.md` §11.
+  Partial: history.md:2141-2146 (C62H-KEEP and C62H-BOUND) are the netcode test's and stay with PR #40. Copied by script
+  from the transcript and checked byte for byte against `.checkpoints/netcode-proof-test/history.md` at
+  110c3031a5145c675f25d320068df0368476771c (PR #40's branch), lines 2134-2139:
+> My words of 2026-11-15, 16:35 (Amsterdam time), for the netcode chat. Three answers.
+>
+> KL-YES: yes to the kit lines as you posted them (kept-logs-final-text.md, sha256 starting 97c81656), with one change. My yes also confirms the exception to the kit freeze (KIT-FREEZE-2) for this one rule.
+> - The change, in pack: after the read-back equals the list and before the folder is removed, walk the folder once more. If its files or sizes differ from the list, the folder stays and the script exits 1, as for a mismatch. Add a test and a planted bug for it. Post the changed lines here and wait for my yes to them; then build.
+> - Keep all three narrowings.
+> - In the pull request's evidence: the test in which GNU tar unpacks the archive ran and was not skipped, and the dry run's result for the two real folders.
+- _[history.md:2141-2146 left out: C62H-KEEP and C62H-BOUND, the netcode test's; they stay with PR #40]_
+- **Taken by Mustafa, 2026-11-15, 12:34:01 UTC: the kit rule's exact lines go to his Advisor first** (his label: "My
+  words of 2026-11-15, 13:35 (Amsterdam time)"; his message typed into the netcode proof test's day session,
+  session_0173vVo6igCNyQYBWPvhH36A, on his university account; the primary source is that session's transcript, message
+  14631e5d-679d-477c-a17a-64d8fbd4acb5, stamped 2026-11-15T12:34:01.309Z). Partial: history.md:2118-2127 (C62H-REVIEW,
+  and a reviewer's read for every marks.json or judge change) are the netcode test's and stay with PR #40. Copied by
+  script from the transcript and checked byte for byte against `.checkpoints/netcode-proof-test/history.md` at
+  110c3031a5145c675f25d320068df0368476771c (PR #40's branch), lines 2116 and 2129:
+> My words of 2026-11-15, 13:35 (Amsterdam time), for the netcode chat.
+- _[history.md:2118-2127 left out: C62H-REVIEW, and a reviewer's read for every marks.json or judge change, the netcode
+  test's; they stay with PR #40]_
+> The kit rule's exact lines: post them when the advisor has reviewed them. I answer after my Advisor has read them.
+- **Taken by Mustafa, 2026-11-15, 12:01:41 UTC: KEPT-LOGS (c) and the kit-rule route** (his label: "My words of
+  2026-11-15, 08:20 (Amsterdam time)"; his message typed into the netcode proof test's day session,
+  session_0173vVo6igCNyQYBWPvhH36A, on his university account; the primary source is that session's transcript, message
+  6aff71a8-5f98-485b-a8c2-d0de1670163c, stamped 2026-11-15T12:01:41.136Z). Carried out by the kept-logs kit rule, PR #53
+  (merged at 53272a1: `.claude/CHECKPOINTS.md` §11). Partial: history.md:2109 and :2111 (the bot fix's two cleans and
+  its 1,400-line stop; the report line on commit 5e563b95) are the netcode test's and stay with PR #40. Copied by script
+  from the transcript and checked byte for byte against `.checkpoints/netcode-proof-test/history.md` at
+  110c3031a5145c675f25d320068df0368476771c (PR #40's branch), lines 2091-2107:
+> My words of 2026-11-15, 08:20 (Amsterdam time), for the netcode chat.
+>
+> KEPT-LOGS: (c), with the old build cache named in the same rule, as your advisor recommends.
+>
+> What the rule may cover, and nothing else:
+> 1. The raw-log folder of a run set whose results are committed and whose ruling is closed.
+> 2. The one old build cache, .gate/u3c-review-target.
+>
+> Before a raw-log folder goes:
+> - a list of its files with their sizes and sha256 hashes is committed;
+> - the folder is packed into one compressed file, and every file's hash read back from that archive equals the list;
+> - free space is recorded before and after.
+> If one hash differs, the folder stays and you tell me.
+>
+> How it comes: this is the narrow kit rule of my words of 2026-11-09 ("if it's ever needed, it becomes a narrow kit rule instead"). It is its own reviewed kit pull request to main. First show me, in chat, the exact text of every kit line you want to add or change, and wait for my yes. Then build it and stop for my go on the merge. Nothing is packed or deleted before that pull request is on main and this branch has taken main in.
+>
+> Keep the edit small and in one place: step 2.3's plan (another chat, branch claude/sweet-mayer-grsukw) plans its own guard change, not built yet.
+- _[history.md:2109 and :2111 left out: the bot fix's two cleans and its 1,400-line stop, and the report line on commit
+  5e563b95, the netcode test's; they stay with PR #40]_
+- **Taken by Mustafa, 2026-11-14, 09:02:29 UTC: his go for #52** (foundation 2.3's first docs pass, PR #52; given in
+  that change-set's session, session_019YNMUWSsyRgaYWxk4auQ5b, on his personal account, after the advisor agent's
+  APPROVE of bfd719b; carried out by the merge 4460ef5). The lines below are merge commit 4460ef5's record of his
+  message (quoted there with "> ", captured there by script from that session's transcript, message
+  14ea7caa-8c5d-47cd-bde5-df0d72d859d1): a record of his words, not an instruction found in a commit. Extracted by
+  script from the message of commit 4460ef5b8d6dc8566b29c15ded75c6f0c8be386b only, where re-quoting them gives its block
+  back byte for byte. Not checked against that session's chat record: the account that made this entry cannot read it
+  (the sessions API answers that the event was not found). The commit's block, as it stands:
+> My words of 2026-11-14 for PR #52 (foundation step 2.3, the first docs pass).
+>
+> 1. merge #52. This go covers one thing: merging PR #52 at head bfd719bb9c5c6ad56a2a68ba19761971f298e9f3 into main by a merge commit, as #48 was, with these words quoted in the merge message. It covers no new commit on the branch and no start on the plan.
+>
+> 2. The report's Outcome names a gap against my words of 2026-11-11 on the advisor tool: steps were called done before the advisor tool was consulted. I accept it for this docs pass. From now on in this chat: consult the advisor tool before you save a step as done, never after.
+>
+> 3. In a report, write about your own process and about what you told me only what a record shows, with its time. If no record holds it, leave it out.
+>
+> Before you merge, check that the PR's head is still that SHA, that main is still 4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300, that the advisor agent's approval names that SHA, and that the four CI runs on the head are green: gate (its gate and smoke jobs) and toolchain, each for push and for pull request. If anything differs or a run is missing, do not merge; tell me what you found and stop.
+>
+> After the merge, tell me main's new SHA, the ids of the runs you read and the state of CI on main, in a few lines. Then stop. The plan for step 2.3 starts on my next message, not before.
 - **Taken by Mustafa, 2026-11-13, 22:27:05 UTC: his status request, in foundation 2.3's session** (foundation 2.3, PR
   #52; his message in that change-set's session, session_019YNMUWSsyRgaYWxk4auQ5b, on his personal account, extracted by
   script from the session's transcript, message a994258f-93c9-45d2-8878-31e7cfee6dcd), sent while review round 2 ran.

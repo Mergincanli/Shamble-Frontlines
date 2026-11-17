@@ -2,7 +2,7 @@
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
 next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
 `docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
-_Last updated: 2026-11-14 (step 2.3's first docs pass, PR #52; main 4d21c1a)._
+_Last updated: 2026-11-17 (DOCS-54: main's docs after #52, #53 and #54; main 82c605e)._
 
 ## Phase
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
@@ -10,37 +10,36 @@ _Last updated: 2026-11-14 (step 2.3's first docs pass, PR #52; main 4d21c1a)._
   `docs/ENGINE_OVERVIEW.md` and `docs/SPIKE_PLAN.md`) are the basis for the spikes and stay Proposed (the stop's
   answers, 2026-11-03: `docs/DECISIONS.md`), but for his SCOPE (a) of 2026-11-10: "I accept ADR 0002's part 1 alone
   (the repository layout, with the legacy constraints applying to legacy/ only)", recorded in ADR 0002 by 2.1b (#51).
-- **Last merged:** foundation 2.2, the toolchain (PR #48, 4d21c1a, 2026-11-13 16:20:12 UTC, by merge commit, on his go,
-  quoted in its message, after the advisor agent's APPROVE of 9b20b67). Every merge: ROADMAP; the archive's "In flight".
-- **The kit:** KIT-FREEZE-2, what he meant by it (FREEZE-FDN) and his exceptions: `docs/DECISIONS.md`, "Queued"; his two
-  additions of 2026-11-11 for the foundation chat: `docs/DECISIONS.md`. His words of 2026-11-13 for step 2.3:
+- **Last merged:** the night-shift lines (PR #54, 82c605e, 2026-11-17 07:03:03 UTC by `merged_at`, by merge commit, on
+  his go after the advisor's and the security-auditor's APPROVE WITH FINDINGS and the PR Advisor's APPROVE of 20f9d59);
+  before it #53 (53272a1) and #52 (4460ef5). Every merge: ROADMAP; the archive's "In flight".
+- **The kit:** KIT-FREEZE-2, what he meant by it (FREEZE-FDN) and his exceptions (two more since, for #53 and #54):
+  `docs/DECISIONS.md`, "Queued"; his two additions of 2026-11-11 for the foundation chat: `docs/DECISIONS.md`. His words
+  of 2026-11-13 for step 2.3:
   "The kit's freeze (KIT-FREEZE-2) ends with this step. That makes no edit unasked: every edit to a kit, gate or CI file
   is asked of me in chat with its exact text and written only after my yes, with the chat in Accept edits. A guard
   prompt alone is not my yes. No such edit happens in the docs pass or while planning."
 - **The legacy game is frozen** (critical fixes only). Legacy phase 0 stays PARTIAL until his Windows run.
 - **main** is protected (a pull request with the `gate` and `smoke` checks green); `toolchain` runs on every push and
-  pull request but is not a required check (REQUIRED-CHECK, a finding for step 2.3); CI green on 4d21c1a (gate run
-  43461710700, toolchain run 43461710673). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16).
+  pull request but is not a required check (REQUIRED-CHECK, a finding for step 2.3); CI green on 82c605e (gate run
+  44035715175, toolchain run 44035715349). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16).
 
 ## In flight (one line per PR)
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| #52 | the foundation, 2.3: its first docs pass (his words for #48 and of 2026-11-13 in `docs/DECISIONS.md`, by script; dated pointers in SPIKE_PLAN, ADR 0002, DECISIONS (SLICE-ORDER condition 3) and ROADMAP, the decision quoted in STATUS; the 2.2 report's fixes M1, L1, L2 (worded as the CI logs read), L3 and L5, the archive's lines on the same claims, on #48's merge and on his go for it, and two pointing clauses; STATUS, ROADMAP and the archive true for main 4d21c1a) | `claude/sweet-mayer-grsukw` (his personal account; for `cs/foundation-2-3-docs`) | final (marked ready after the advisor agent's review) | the advisor agent's review of its final head; then his go (risk tier 1, decision docs) |
+| DOCS-54 | main's docs after #52, #53 and #54 (his words since #52 in `docs/DECISIONS.md` by script, from the netcode test's transcript, only his typed text inside the quotes, the netcode test's own words left with #40; two pointers in "Queued"; STATUS, ROADMAP, the archive and REPO_MAP true for main 82c605e) | `claude/docs-after-54` (the netcode test's session, his DOCS-54 (a)) | draft; its review round | the advisor agent's review of its final head; then his go (risk tier 1, decision docs) |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10), after status-diet (merged, #49): his unit walk of 2026-11-09 (a docs
    change-set: UNITS.md §0 and LOOP_V2), then the Slice 1 note of 2026-11-10, each in a fresh chat. His words:
    `docs/DECISIONS.md`, "Queued".
-2. v2: the netcode proof test (#40); the foundation in his order of 2026-11-11: #49, 2.1a (#50), 2.1b (#51) and 2.2
-   (#48) merged; step 2.3: its first docs pass (#52), then its plan after #52 merges, by his decision of 2026-11-13:
-   "Step 2.3 may be planned now. The parts of step 2.3 that need no proof test's result may be built before the proof
-   tests report, after my go on the plan. Every gate check that needs a result joins later, when that result is in, with
-   its pass marks unchanged. Steps 2.4 to 2.6 still wait for their results."
+2. v2: the netcode proof test (#40); the foundation (his order of 2026-11-11): #49, #50, #51, #48 and #52 merged; step
+   2.3's plan waits for his go (`claude/sweet-mayer-grsukw`, 5f7f682; his decision of 2026-11-13: `docs/DECISIONS.md`).
    Wave 1: one heavy spike at a time (SPIKE_PLAN); then phase 1 and the slices (SLICE-ORDER, `docs/DECISIONS.md`).
 
 ## Waiting on Mustafa
-- His go for #52 (2.3's first docs pass; risk tier 1, decision docs) once the advisor agent approves its final head.
+- His go for DOCS-54 (main's docs; risk tier 1, decision docs) once the advisor agent approves its final head.
 - The netcode proof test's items (its plan in #40; the older list: the archive's "Phase", "Next (v2)"): OK each run's
   plan and cost cap; name the laptop and desktop; the Mac when one is available; the Safari workflow's own PR.
 - Legacy, frozen (the archive's "In flight" and "Phase"): his Windows run ("Check a new machine", `tools/README.md`);
@@ -72,7 +71,8 @@ A finding below the review budget's bar becomes a follow-up: its id goes here, i
   W1-W3 and the limits: its "Open bugs and risks", kit-v3-5).
 - **Kit, after the foundation's gate step (KIT-FREEZE-2):** F2 and F5 (kit-v3-4); F-1; L12, L14, L9 / SA-9, L13, L1's
   runners, A-4, FU-P3a, FU-P4a, FU-P4b, FU-P4c and FU-P4d (kit-v3-3); A3's plan readers; A3's cuts; CHECKPOINTS.md §7's
-  cap line; E9's untested cases; KIT-ALIGN; the kit-v3-1 Windows test (its own change-set).
+  cap line; E9's untested cases; KIT-ALIGN; the kit-v3-1 Windows test (its own change-set). For the kit's next change
+  after the freeze: SA-KL-1 to -4 and KLT-1 to -8 (#53); ADV-NS-L2 (= SA-NS-2), -L3 and -L4 (#54); NS-TRAILER, NS-FIRST.
 - **For the decision drafts' next revision:** "B3" means three things; the scale, "1 unit = 1 metre"; editing while
   the match runs (OQ-0005-CD4); OQ-0006-21's pointer; VISION_V2's line ranges in ADR 0005; and, from status-diet,
   the STATUS citations in the ADRs, the register, LOOP_V2 (:202, :214, :227) and ENGINE_OVERVIEW (:140).

@@ -3,7 +3,7 @@
 Read this instead of exploring. It says which file answers which question; `MODULE_MAP.md` maps the inside of the
 engine files, and `START_HERE.md` explains how they work and why. docs-keeper keeps this map current and checks it with
 `node .claude/scripts/repo-map-check.mjs`. `.checkpoints/` holds in-progress task checkpoints
-(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-11-12.
+(`.claude/CHECKPOINTS.md`); they are deleted before a PR is ready, so they are not listed. Last checked: 2026-11-17.
 
 ## Top level
 | Path | What it is |
@@ -77,7 +77,7 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 ## .claude/
 | Path | What it is |
 |---|---|
-| `.claude/CHECKPOINTS.md` | The checkpoint system: never lose work to a usage limit. For every session: at most 3 agents at a time, workflow agents included (§4, §7); each agent writes its plan first and saves each block as it goes, and a restart trusts the blocks its notes mark done (§4); scratch text and small scripts in the notes folder, builds and binaries under `.gate/<task-slug>/` (§4); the background saver checked at every update while agents run, and restarted if it has stopped (§3, §5); disk hygiene (§10) |
+| `.claude/CHECKPOINTS.md` | The checkpoint system: never lose work to a usage limit. For every session: at most 3 agents at a time, workflow agents included (§4, §7); each agent writes its plan first and saves each block as it goes, and a restart trusts the blocks its notes mark done (§4); scratch text and small scripts in the notes folder, builds and binaries under `.gate/<task-slug>/` (§4); the background saver checked at every update while agents run, and restarted if it has stopped (§3, §5); disk hygiene (§10); kept raw logs and the old build cache, removed only by `kept-logs.mjs` (§11) |
 | `.claude/NIGHT_SHIFT.md` | The night shift's rules (window 00:10–07:30 Amsterdam) |
 | `.claude/settings.json` | Permissions (allow, deny, empty ask), `effortLevel: "high"` (the cloud routines run at the effort set on the routine instead: STATUS_ARCHIVE, Routines), the syntax hook and the routine guard (PreToolUse / PermissionRequest / ConfigChange; each of the three handlers starts `guard.mjs` through a one-line `node -e` bootstrap) |
 | `.claude/claude-security-guidance.md` | Security guidance for the security plugin |
