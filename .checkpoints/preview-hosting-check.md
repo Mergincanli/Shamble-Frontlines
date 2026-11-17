@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 23:37 Amsterdam (22:37 UTC)
+- **Last update:** 2026-11-17 23:39 Amsterdam (22:39 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -381,6 +381,23 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      page" (link https://dash.cloudflare.com/?to=/:account/configurations); "For **Account Name**, select **Change
      Name**."; "Enter a new account name."; "Select **Save**." Who may rename and any limits on the name: not on the page.
      After the rename, Wrangler's whoami could still print the account ID in the "wrong ID" case (not a credential).
+
+   - The advisor agent's verdict (notes `advisor-check-token.md`, ending DONE): **APPROVE** sending the yes request for
+     sha256 0ad66aa0f2b36f7469bc3bdd57a4a05b7945e0037f96b19059000e0ca9b5aa71 (hash checked at a4d8ae1 and on disk;
+     YAML, `bash -n`, ASCII; `main` holds only README.md; its own stub runs: no token, last 4, e-mail or full ID in any
+     output). Conditions, all in the request's wording (the hash stands): the table read in order, the ID first ("A and B
+     refused" decides nothing: B may refuse a valid account token; a valid token with another account's ID also gets
+     10000, #13590), so "A refused, first and last 4 match → the token's own page: disabled, expired or revoked → a new
+     token, made not rolled; active → the stored value is not that token → a new token, made and pasted"; "token shape
+     wrong" = no cfat_, any whitespace, or length below 46; "D fails → first a daytime look for a matching Wrangler
+     changelog or issue entry, then a change naming it for his yes"; "C refused, both pages look right → a new token";
+     "all green → the deploy re-run waits for the deploy.yml gate, and the five failures stay unexplained (a report
+     finding)"; acts: the six listed cover this one run, plus any re-run or push to `check-token` on a new list, the
+     branch kept until the repository is deleted unless he says otherwise, only the run whose head is the commit with
+     this hash approved, no `[skip ci]` in its commit message; one line that this check carries the SA-R3 install
+     exposure he accepted; ID-ENDS its own yes entry (compared on Account Details; GitHub hides only the whole value).
+     Point 5: the deploy.yml gap is Medium (personal data in a public log), a gate before the next deploy run of any
+     kind; his decision (rename) answers it, the ID can still print in that case.
 
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
