@@ -75,3 +75,7 @@ No cut run found (no notes file existed).
 - B10: fold anchors counted by u4f-r3/adv_phrases.py (read only): 21 of 22 found once; "after U4f's merge and before
   its first set," is bold in the brief ("2. **After U4f's merge and before its first set,**"), cited that way. HEAD
   b40ba07; `git diff --stat 0ad9661 HEAD -- spikes/netcode-proof` prints nothing. Writing advisor-u4f-brief.md now.
+- B11 done: advisor-u4f-brief.md written (APPROVE WITH CONDITIONS; A1-A3 Medium, A4-A7 Low; A7 found late: three
+  netcode.md cites off by its 6-line front matter, :15 -> :17, :13-14 -> :14-15). Q11 (iv)'s disk corrected to about
+  60 MiB (5.5's 195 -> 255). u4f-r3/adv_words_ruling.py (read only) on the ruling: 5 history hits, all the session's
+  own text (seat and launch lines :1498, :1921, :1979, :2032; PACK-READ's option :2212), none his words. DONE: hand back.
