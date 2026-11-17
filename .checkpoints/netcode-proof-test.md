@@ -388,8 +388,11 @@ it asks nothing; REFS-KIT stays.
   report in its description (the six Lows met there; no push). The saver b70ygknng stopped (no agent running).
   **Waiting for his go: "merge #55" for head aea6f5bd67a4da400613cc24919e3e93e7c8dc21** (a merge commit, that SHA as
   the expected head; re-check first: head unchanged, CI green, mergeable, the advisor's approval of that head). After
-  the merge: unsubscribe #55, remove the worktree .gate/docs-after-54-wt, cancel the safety-net check-in
-  trig_019e3hj14eRSQcm9Ja4bEtJM, note the merge here, and MAIN-52: take main in (keep this branch's #40 row in STATUS).
+  the merge: unsubscribe #55, remove the worktree .gate/docs-after-54-wt, note the merge here, and MAIN-52: take main
+  in (keep this branch's #40 row in STATUS). The safety-net check-in trig_019e3hj14eRSQcm9Ja4bEtJM fired at 14:20:07
+  UTC and found nothing new (CI 6 of 6 green on aea6f5b, no reviews or comments, main still 82c605e); he has not
+  written since the PR went up, so check-ins stopped there (not re-armed); the next GitHub event or his message wakes
+  this session.
   **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
