@@ -34,3 +34,8 @@ F10 Medium (security) L175-176: LANE-REQUESTS (a) public issue: add NIGHT_SHIFT.
 F11 Low batch: L123-124 "editor camera's scale" wrong (evaluate.ts:64 game camera, drawing board v7); L121-122 compile and L191 "no way to move" overstated (digest:34,:89,:90); L147 "stays near 2,500" unsupported (digest:64,:97); L65 omits conditional PM-0002-27, PM-0004-34 (plan.md:410,:412) + bare ids; L154-155 pointer: add source + repo, list EDITOR_V2.md in carry row; L149 omits ~3,300 test lines (digest:75); L125 "private" = npm flag (VFX repo public); add "needed by" per question (none holds CS0/CS1); L47 "doubles the moments" -> same count, twice as often; 2.6 "tested artifact" (ADR 0002:133-134) needs lane 1's CI to hand it the artifact.
 Verdict: REVISE (no Critical/High; Mediums F1-F10 in what he asked).
 - B6 done. Next: B7 answer.
+
+## B7 answer (as sent)
+Verdict REVISE; findings F1-F10 Medium (F10 security; LANE-REQUESTS mine to settle: (a) + author rule), F11 Low batch; sound: quotes exact, conditions additions, nothing holds CS0/CS1, numbers and order check out, 15.4 fits GATE-FOLLOW, merge practice a3398d2, VFX 9 claims vs digest (7 hold, 2 overstated), 3 digest claims vs clone hold, line 116 right; could not check: 0.187 newest (no web), VFX tests/lint (nothing run), lane 2 branch/container, stopped 2.3 chat's plan.
+- B7 done.
+DONE

@@ -15,7 +15,7 @@
      checkpoints (`build-plan-slice-1*`, `cs0-model-rules*`) in its last commit before the PR is marked ready.
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs0-model-rules) · **Base:** main
   c94c81b440c77f7979e0f944a5341319f9a57d1b (to take in first; the branch still sits on 4460ef5 plus checkpoint commits)
-- **Last update:** 2026-11-17 21:25 CET (from the clock)
+- **Last update:** 2026-11-17 21:35 CET (from the clock)
 
 ## Steps done
 1. His go received (user message of 2026-11-17T19:10:44Z, saved by script, 10,544 bytes). The session's model read
@@ -78,6 +78,12 @@
     **The size stop (his rule, plan point 21):** change-set 0 has passed twice its planned size (about 150 lines of
     docs planned; about 900 written lines now, besides about 1,700 copied). He is told in three lines; the docs
     build waits for the advisor agent's APPROVE and for his word. Review of what exists goes on.
+
+17. (20:35 UTC) Part 15: the advisor agent's first review came back REVISE (10 Medium, a batch of Low; notes
+    `part-15/advisor-part-15-r1.md`). Revision 2 written (250 lines, six questions: LANE-SPLIT, RECORD-FILES,
+    VFX-ROUTE, VFX-FIX, VFX-MOMENTS, GUN-FILES; its quotes re-checked by script, 9 spans found) and sent back to the
+    same agent for a check of what changed (notes `part-15/advisor-part-15-r2.md`).
+    He was told the size stop in three lines at about 20:25 UTC (question SIZE-0), with LOG-HISTORY.
 
 ## Next steps
 1. Change-set 0's own short plan at `.checkpoints/cs0-model-rules/plan.md`; the advisor agent's review of it (effort

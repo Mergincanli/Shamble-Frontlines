@@ -89,3 +89,32 @@ advisor's plan review (plan.md revision 2, points 1-22) and engine-architect's j
   sentences named in point 17; 0.62 and all pose numbers stay out); line 43 socket names "socket_grip, socket_support,
   socket_muzzle and socket_sight, as in the rifle file, plus socket_eject."; line 47 "the muzzle socket is where the
   flash and the tracer start. The simulation's shot origin is its own data and is not read from the model." Next: B6.
+- B6 done (citation targets, lines re-grepped 2026-11-17 on this branch): 0003:247-248 "Each material class
+  (environment, structures, units, faction colours, visual effects)"; 0005:1761-1762 "Every slot's name maps to one
+  class from a small fixed list (for example environment, structure, unit, faction colour, emissive;"; 0005:1579 AP-3
+  the same example list; 0005:1771 one skinned mesh; 0005:1778-1781 soldier as drawn 4 materials per pass, derived from
+  C-B "one per material per soldier" + ADR 0003's 4 draw calls per pass; 0005:2311 PM-0005-36 counts draws (shown minus
+  hidden), bites on 5 slots (10 > 8); 0003:1200 PM-0003-25 "at most 4 draw calls per soldier per pass (before the ink)",
+  bites "a soldier split into 5 meshes" (way (c) changes it too); 0005:1552 sockets cosmetic; PM-0005-46 last (2323) ->
+  new marks PM-0005-47+. BP (build plan, carried verbatim in docs/reports/2026-11-17-build-plan-slice-1.md): Part 1
+  table row M at BP:108; Part 11 (BP:914-1046): rules 1-24 incl. rule 21's 16 joints, "The proof by a real export is
+  not part of change-set 0", "Until then the list is a draft"; Part 12 (BP:1047-1088): change-set M "The first model",
+  "Its first step is the proof of Part 11's rules on the real file, with the checks change-set 0 wrote"; PM-0005-36 "in
+  part" at M. Appendix: not built (docs/reports has no 2026-11-17 files); cite A-codes by section heading: A3 sections
+  "CHANGE 3" (go file 40-52) and numbered answers 1-12 (MODEL-PUBLIC = item 9); A4 headings WHAT IT IS 4, AXES AND SIZE
+  10, MATERIALS 20, PARTS 29, MARKINGS 55, MUST READ 60, SEND BACK 63; A6 CONVENTIONS 10, SOCKETS 35, HOW THE CONSCRIPT
+  HOLDS IT 42 (replaced by A10); A5 A1 4 (replaced by A10), A2 12, A3 15; A10 THE RULE 22, TWO LINES 42, ONE WORDING 46.
+  Quotes: A3 CHANGE 3 intro "Everything in them is the Art lead's proposal unless a line says it is mine."; A9 item 3
+  "Like the other three it is the Art lead's proposal." and "For change-set 0 take only its rule and the socket names.
+  The pose numbers are for the body step (change-set 10)."; go:49 and go:50 exact (50 continues after "data of its own"
+  with ": docs/adr/0005-content-abilities-assets.md says no shot origin is ever read from a model." - quote whole).
+  A8 (20:20): nothing for this draft. quotes-check.mjs flattens white space, so wrapped quotes pass; it only knows his
+  messages and the Art texts (spec/ADR quotes need --source or the verifier).
+- Format decision: every docs/research file keeps table rows over 120 columns (r3: 177 such rows); the old draft did
+  too. Prose at most 120, tables stay tables; say so in the answer.
+- ID plan (the ruling cites GD lines that the main session repoints to ids): keep AX-F11, AX-R10, AX-R11, AX-R14,
+  AX-R15 stable; hands go inside AX-R11; draw cap becomes open point O1 with ways (a), (b), (c); fifth class O2.
+  Ruling's GD cites: 26 & 58 GD:228-231 -> AX-R15; 27 GD:321 -> part "Not read" (uniform buffer); 32 GD:201-206 ->
+  removed text (old root reading; flag to main session), GD:249 -> mark 3 row, GD:316-317 -> "Not read"; 35 & 38
+  GD:224-227 -> AX-R14; 38 GD:201-206 (vertex groups) -> AX-R10; 58 & 70 GD:290-295 -> O1 (b); 64 GD:207-213 -> AX-R11,
+  GD:264-267 -> AX-R11 (per-gun list); 66 GD:119-121 -> AX-F11.
