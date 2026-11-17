@@ -26,3 +26,19 @@ saves after 18b139c; the spike unchanged since ddd38ba.
   binary npt_net-ed8673eeeaf4db12 as required (sha256 04c76dc44aea9dbc9f11a67272df98fbd532274ec490554e234f88662d4541c0);
   the two files' hashes as D-1's above. 182 of 300 runs done by 09:46:04 UTC, every one exit 0, 169 passed, G-NC2 ok
   (about 33 s a run; the end about 10:19).
+- **09:47:43 L1 CAUGHT IT: loop 1 run 94, exit 101** (l1.log:202-232; the run's log .gate/u3c-held-1/l1-1-94.log):
+  "test result: FAILED. 168 passed; 1 failed; 12 ignored", the one failing test G-NC2
+  (l2::delay::tests::under_loss_the_held_bytes_stay_within_64_kb_and_the_front_records_acknowledged_prefix); its stdout:
+  "100 writes of 16 KB at P2: largest down excess over 64 KB 14326 B; samples above the bound [1, 0]; first losses
+  28, stalls 28; D-1: over-samples with a released record waiting [1, 0], at writes [0, 0]"; "panicked at
+  crates/net/src/l2/delay_tests.rs:2302:5" (HEAD's :2300, two lines down by D-1's println), "left: [1, 0]", "right:
+  [0, 0]". Loop 2 stopped at its next check; "end 09:48:12 UTC; ... first failure: 1-94"; main-run.sh exit 101 (the
+  last df did not run). 189 runs in all: 188 exit 0, 1 exit 101.
+- **The plan's Confirmed line holds, every item:** the only failing test is G-NC2, at its held_over_bound assert;
+  left [k, 0] with k = 1 (UP 0); over_waiting [1, 0] = held_over_bound [1, 0]; over_at_write [0, 0]; excess 14,326 B
+  under 16,406; first losses 28 above 0. No stop line met (BIN ed8673; no other test; not :2283 or :2305; UP 0; no
+  over-sample at a write; main-run.sh not exit 3). **The cause is confirmed by a run:** the one sample over the bound
+  had a released record waiting and none was at a write, the release transient. L2 is not needed (the plan: "If none:
+  L2").
+- 09:48-09:49 D-1 out by Edit (its four edits reversed): delay.rs aaa6a5887085…, delay_tests.rs 74d49de77004… (as
+  before D-1, as HEAD); `git diff --quiet HEAD -- spikes/netcode-proof` exit 0. Next: step 2, the fix.
