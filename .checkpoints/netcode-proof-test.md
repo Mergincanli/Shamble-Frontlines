@@ -7,9 +7,9 @@
   #53 the kept-logs rule and PR #52 the docs pass; Mustafa's KL-MERGE (a), 2026-11-15 20:50). Take main in again when main changes code, CI or rules, and once before PR #40 is
   marked ready (MAIN-52, 2026-11-14). Main is now c94c81b (PR #55, DOCS-54, merged 2026-11-17 17:09:32 UTC: five
   files under docs/ only, so not taken in by MAIN-52; at the next take-in, Open findings "From DOCS-54" applies)
-- **Last update:** 2026-11-17 19:00 UTC (U4f's brief rev 3.1 DONE, both checks answered; D2 read; round 2 and an
-  independent D4 model RUNNING, workflow wf_997ea01f-b4f, while the main session writes its own D4 model: the block
-  "NOW (2026-11-16)")
+- **Last update:** 2026-11-17 19:06 UTC (U4f's brief rev 3.1 DONE, both checks answered; D2 read; the main session's
+  D4 model DONE (u4f-r3/d4/d4-output.md); round 2 and an independent D4 model RUNNING, workflow wf_997ea01f-b4f; chat
+  about 40 %, /compact asked: the block "NOW (2026-11-16)")
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **NOW (2026-11-16, the day session; read this first after a compact or a cut).** Mustafa typed /compact about 09:00
@@ -426,8 +426,13 @@ it asks nothing; REFS-KIT stays.
   npt-u4f-r31-round2-d4b-wf_997ea01f-b4f.js): the test-engineer and the security-auditor re-check what rev 3 to 3.1
   changed (notes u4f-brief-r31-check-te.md, u4f-brief-r31-check-sa.md; the review budget's round 2), and a
   netcode-architect writes and runs an independent second D4 model (u4f-r3/d4b/), all xhigh, read only, three at
-  once. Meanwhile the main session writes its own D4 model (u4f-r3/d4/d4_model.py, read only, its output saved), to
-  be compared with d4b's. **If cut:** `Workflow({scriptPath, resumeFromRunId: "wf_997ea01f-b4f"})`; each agent
+  once. **The main session's own D4 model: DONE** (u4f-r3/d4/d4_model.py, sha256 9fdf285e…, read only; its output
+  u4f-r3/d4/d4-output.md, its `--check` MATCH byte for byte): with the Pong as built (U4F-Q6 (a)) none of D4's three
+  estimators passes -47's p99 of 5 ms (best, the mean: 6.06 ms with random phases, 8.69 ms with one phase per
+  connect; the lowest-RTT about 18 ms; (e) 12.85 ms, its half-lowest-RTT delay biased -7.3 ms); with an exact sub-tick
+  stamp (U4F-Q6 (b)'s reference) the mean passes (2.32 ms; 2.34 with P2's 2 % loss) and the tick-quantised bite then
+  shows (11.8 ms); the lowest-RTT with an exact stamp sits on the bar (4.94; 5.02 with loss). So D4 supports U4F-Q6
+  (b) and an averaging estimator. To be compared with d4b's before the advisor. **If cut:** `Workflow({scriptPath, resumeFromRunId: "wf_997ea01f-b4f"})`; each agent
   continues after its notes' last complete block. **On return:** save the three results word for word (a script like
   u4f-r3/r3_results_full.py); read every Medium or higher in full; compare the two D4 models (any difference above
   0.1 ms in a p99 explained before the advisor); a fix pass if round 2 leaves a Medium or higher; then the advisor's
