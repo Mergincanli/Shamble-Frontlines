@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 21:41 Amsterdam (20:41 UTC)
+- **Last update:** 2026-11-17 21:58 Amsterdam (20:58 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -307,6 +307,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    merge: list the branches (if `setup` is gone, "Automatically delete head branches" is on: fix before sitting 1);
    run ids and approval times from the run data.
 
+   - Rehearsal run 1 (deploy #1, id 44171977539) failed at Cloudflare's authentication (results log). The fix sent to
+     him per consultation 10; the end date surviving a roll is this chat's inference (Cloudflare's roll API takes no
+     body and returns only the new value; the roll page says "the access and permissions will be the same"), shown on
+     no screen.
+
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
    CLOUDFLARE_ACCOUNT_ID; in `production`: CANARY); `preview` (him as required reviewer, self-review unticked, admin
@@ -525,6 +530,19 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    approve clicks and the time, one line each for SA-R3, SA-R2, SA-R5, SA-R6, what starts without him (the probe's
    result checked first), and "a rehearsal: a red run is a finding, not a redo"; Sunday's token value not asked again
    (unanswered, in For the report); SA-R3's loop closed in one line; after the merge, the branches listed.
+
+10. 2026-11-17 20:53:18 UTC (called; transcript time), moment 2 (a token problem a second time) · Q: the rehearsal's
+   deploy failed at Cloudflare's authentication: what fix, and what to send him? · Changed: both values replaced, each
+   from its own fresh copy (the log cannot tell a bad token from a bad account ID); first, the artifact name: verify
+   uploads `headers-<run id>` with overwrite off, so attempt 1's artifact is deleted first (his bin icon; its content
+   saved in the results log first), and only "Re-run failed jobs" (not "Re-run all jobs", which would upload `site-pr`
+   again); a screenshot of each page as he arrives, before any change (the secrets list's times; the token list's
+   "Last used", a hint only); the token by Roll if the row's menu offers it, else he stops and sends the menu; copy then
+   paste at once, token first, then the account ID from Account Details; a self-check before saving (the token starts
+   with "cfat", the account ID does not); one screenshot of the secrets list after; the end date surviving a roll
+   recorded as an inference, not told as fact; the re-run is his click (not among my allowed acts), on a new list (his
+   condition 3), said plainly as two clicks again; a stop rule: if it fails the same way again, no third paste, options
+   instead (such as a user token, a plan departure).
 
 ## Running work
 - saver boyrmgcz1 (started 2026-11-16 08:49:17 UTC): stopped by itself at 10:39:17 UTC ("time is up", 110 minutes;
