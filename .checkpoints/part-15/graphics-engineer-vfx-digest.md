@@ -127,3 +127,9 @@ B6 done; next B7 (build plan card 11 + PM rows).
 - ADR 0005:431-436 CD-8 "Content reaches the browser as one hashed, cached bundle"; file name holds its hash, immutable; room names hash at join. VFX manifest has no hash fields (export.md:98-118, B2); loader fetches fixed names under a folder URL with an injectable fetch (B3 load.ts:34-45). [inferred] hash can go in the folder path, or the injected fetch can serve from a game bundle; whether client-only presentation files join the join-checked bundle is not settled by anything read (open).
 - ADR 0005:410-416 CD-7: dev server watches content; Vite plugin pushes changed files; "Client content applies live, since presentation decides nothing" (Feel Lab). [inferred] a VFX re-export would need the page to re-run loadExport + setAtlas; no reload hook exists in the runtime (B3).
 B7 done; next B8 (write digest sections 1-7, each to disk at once).
+B8: section 1 written to shamble-vfx-digest.md (lines 1-28); next section 2.
+B8: section 2 written (digest now 42 lines); next section 3.
+B8: section 3 written (digest now 49 lines); next section 4.
+B8: section 4 written (digest now 59 lines); next section 5.
+B8: section 5 written (digest now 73 lines); next sections 6 and 7.
+B8 done: sections 1-7 written (digest 95 lines, limit 150); next B9 (answer into notes, then DONE).
