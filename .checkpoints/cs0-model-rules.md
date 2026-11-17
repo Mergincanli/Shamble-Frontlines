@@ -15,7 +15,7 @@
      checkpoints (`build-plan-slice-1*`, `cs0-model-rules*`) in its last commit before the PR is marked ready.
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs0-model-rules) · **Base:** main
   c94c81b440c77f7979e0f944a5341319f9a57d1b (to take in first; the branch still sits on 4460ef5 plus checkpoint commits)
-- **Last update:** 2026-11-17 22:39 CET (from the clock)
+- **Last update:** 2026-11-17 22:47 CET (from the clock)
 
 ## Steps done
 1. His go received (user message of 2026-11-17T19:10:44Z, saved by script, 10,544 bytes). The session's model read
@@ -145,6 +145,16 @@
     One question passed on for the advisor agent's review of the final head: mark 10's line 6 (PM-0005-56) checks
     the loaded scene graph where its ruling said "on both backends ... the file's height".
 
+27. (21:47 UTC) Review round 1, test-engineer: REVISE, 2 Medium and 4 Low, all word changes in rows (notes: block 2
+    of `test-engineer-adr0005-marks.md`). All six applied and pushed: f61f43c (PM-0005-55's probe under a root
+    scaled 1.2; planted defects for PM-0005-53's position checks and for check lines of -47, -48, -51, -56 that had
+    none; "a copy of the passing file, entry or test set-up"; PM-0005-56's scale line within 0.5 mm; two wordings in
+    the rules file). No line added. Its confirmations: the rows sit verbatim in ADR 0005, "When a mark fails" changed
+    only by its three changes, the rules file holds all 21 items, SPIKE_PLAN's two lines are right.
+    Mustafa asked where Part 15's six questions are (21:4x UTC): answered in chat with the file's place and the six
+    questions in short.
+    Running: the verifier; engine-architect's review; docs-keeper (29 lines so far by its notes).
+
 ## Next steps
 1. Change-set 0's own short plan at `.checkpoints/cs0-model-rules/plan.md`; the advisor agent's review of it (effort
    max; APPROVE before any edit outside `.checkpoints/`).
@@ -219,4 +229,4 @@
 ## Running work
 - saver: background task brf1n425m, started 20:03 UTC (the first one, bfulbfi1o, was killed at 19:55 UTC); check
   its output file at each update.
-- agents (3 of 3): docs-keeper, the verifier, test-engineer (review).
+- agents (3 of 3): docs-keeper, the verifier, engine-architect (review).

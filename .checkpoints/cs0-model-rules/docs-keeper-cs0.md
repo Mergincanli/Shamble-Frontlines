@@ -67,3 +67,17 @@ B11. DONE + answer.
   Next/open l.100 dated pointer:1); REPO_MAP 4 (2 research rows; plan report row naming its appendix; cs0 report row);
   reports/README 0 (no index). Total 29. Left alone on purpose: STATUS l.23-25 CI on 82c605e; l.108 asset-pipeline
   risk (still true in the main: only the export part is on paper); Routines.
+- FINDING (B6, STATUS cap): main's STATUS is exactly 120 lines = STATUS-DIET's cap ("at most 120 lines"); my first
+  pass made it 127 (+7: build bullet 4, Next +1, Part 15 +2). The archive is outside my 4 files and his words limit
+  cs0 to lines his decision changed, so no unrelated line may be cut to make room. Neither STATUS nor ROADMAP says who
+  records the 2026-11-14 decision or names builder chats (grep): those are new facts, not untrue lines. Rework: net 0
+  in STATUS: Last merged -> 1 line (-2); build carried in Next item 2 (no Phase bullet); Part 15 compact. Left out
+  (report to caller): the Phase bullet, the second builder chat line, the five follow-ups (their text is in the rules
+  file O1/O2 and the plan report "Since the plan"); the archive's "In flight" row for #55.
+- B6 DONE (STATUS: 120 lines, numstat +8 -8; only wide non-table line is l.23, unchanged from main). Final: l.5 Last
+  updated (cs0, #56, main c94c81b); Last merged -> 1 line (DOCS-54, PR #55, c94c81b, 17:09:33 UTC merged_at, his go;
+  every merge: ROADMAP; dropped "the archive's In flight" since #55 has no archive row); #55 row -> #56 row (table,
+  carries: the build + plan path, "No game code is built before change-set 0 is on main.", CHANGE 2 quote + second
+  chat facts, rules/joint list, answers 98->96, and the five open items "for Follow-ups once merged"); Next item 2 (3
+  lines: 2.3 quote, build plan's change-sets #56 first, Slice 3 quote; "one heavy spike" clause gone); Waiting: #56 go
+  + Part 15 (2 lines, ea851a8 + path, six codes, change-set 1 waits). No Phase bullet (cap). Next: B7 (ROADMAP).
