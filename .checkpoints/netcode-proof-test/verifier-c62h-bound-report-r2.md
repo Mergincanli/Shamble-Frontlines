@@ -12,3 +12,11 @@
 - 4. Drafter's gaps list in order; the last one: u4r-report.md :997, :1008, :1035, :1167, section ends :1199.
 
 ## Results (one line per check)
+- Setup: e2d06ec draft sha256 9397900330ce…296c77, 538 lines (equal to the brief). Working draft 558 lines, sha256
+  5d8fb338…94c3. HEAD = 40dcbb761a789f2a2287dc5f4428d31d2388c806 (two checkpoint commits after e2d06ec: e0fd859,
+  40dcbb7; the draft changed in both committed and uncommitted text, all inside `git diff e2d06ec`).
+- W1 RESOLVED: `git log -1 --format='%ad | %cd' b423a7d` = 2026-11-16 12:18:58 +0000 both; draft :48 "(12:18)";
+  build notes :243 "12:18 (git's time, 12:18:58; first written here as 11:54)". 12:18 truncates like 11:01 (11:01:06).
+- W2 RESOLVED: key :11 pins card lines to 67de11e. Card at 67de11e (4129 lines): U3C-HELD-1 :3760-3773, CHECK-NFF-1
+  :3774-3775, ten Lows :3776-3779, 17:09-20:36 entry :3198-3211, slip 16 :3209-3211, 12:44-14:22 :3212-3217, slip 17
+  :3601-3602, commit 4 / boot :55-56: every draft ref (:242, :248, :454, :506, :510, :511, :519, :521) equals them.
