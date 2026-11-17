@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 20:21 Amsterdam (19:21 UTC)
+- **Last update:** 2026-11-17 20:22 Amsterdam (19:22 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -223,9 +223,15 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      build may go ahead", with no words lifting the wait at 3a. Step 12 read "setup done" as "A2 and A5 to A7 done (to
      confirm in the reply)"; no reply confirmed it. The three environment secrets exist (his screenshot of 2026-11-16
      11:34:31 UTC); what value CLOUDFLARE_API_TOKEN holds is not known: asked of him, without the value.
-   - **Gate (b) now:** the token made by plan A5 today, end date 2026-11-27 (ten days from 2026-11-17; dates at 00:00
-     UTC, so Day 2 by 2026-11-26); a screenshot of Cloudflare's summary page before "Create Token" (no token value
-     exists then) showing the permission and the dates; the value pasted over CLOUDFLARE_API_TOKEN in `preview`.
+   - **Gate (b) now (consultation 8):** first his screenshot of My Profile, API Tokens, pressing nothing (a token there
+     would be live, outside the plan, and missed by his Day 2 delete): if it lists a token, he stops and sends its name;
+     if none, he goes straight on. Then the token by plan A5, end date the day he makes it plus ten (2026-11-27 if made
+     2026-11-17; dates at 00:00 UTC, so Day 2 by 2026-11-26); a screenshot of Cloudflare's summary page before "Create
+     Token" (no token value exists then) showing the permission and the dates, or, if it shows no dates, of the form
+     after "Back"; the value pasted over CLOUDFLARE_API_TOKEN in `preview` (the pencil icon, seen in his screenshot of
+     2026-11-16 12:34:49 UTC); a screenshot of `preview`'s secrets list with a fresh "Last updated" on it; and where he
+     copied both secrets' values from on 2026-11-15 (source only; the account ID re-pasted from Account Details if it
+     came from anywhere else).
 
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
@@ -257,8 +263,8 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   not out of their reach), not plan.md:524 and :649 ("install scripts never see it").
 - Input for step 2.6's setup instructions: two setup steps that needed a change from a default were missed and caught
   only by his screenshots (2026-11-16): `preview`'s administrator bypass left ticked (GitHub's default; plan A6 step
-  4), and the token's end date (plan A5 step 5; he asked where to set it, 12:34:49 UTC). Then (2026-11-17): the token
-  itself was never made, after my wait at step 3a was never lifted. Instructions for such steps should end with a
+  4), and the token's end date (plan A5 step 5; he asked where to set it, 12:34:49 UTC). Then (2026-11-17): no Account API
+  token exists (his words: the page is empty), after my wait at step 3a was never lifted. Instructions for such steps should end with a
   screenshot of the result, and every "wait" needs its own "go ahead" in words.
 - The process account (his rule: only what a record shows, with its time): the process slip of 2026-11-15 and F-A
   (Open findings); the "repository ready" record (step 12's added bullet); the effort not passed to the web-fetch
@@ -270,9 +276,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   done" before "Current step" is rewritten.
 
 - Process miss (records above, Current step): my wait at step 3a (2026-11-15 20:44:03 UTC) was never lifted in words,
-  and "setup done" (20:53:10 UTC) was read as A5 done "to confirm in the reply" without that confirmation; the token
-  was never made (his words of 2026-11-17 19:17:53 UTC). Nothing ran meanwhile (0 workflow runs). To be told to him
-  plainly now and in the report.
+  and "setup done" (20:53:10 UTC) was read as A5 done "to confirm in the reply" without that confirmation. His words
+  of 2026-11-17 19:17:53 UTC: he "had never received instructions to create them", and the Account API tokens page is
+  empty. Whether a user token exists (My Profile, API Tokens) and what the secret holds are not known (asked of him).
+  The save message of 7c8c648 says "the token was never made": more than the records show (corrected here). Nothing
+  ran meanwhile (0 workflow runs). To be told to him plainly now and in the report.
 - Refused by the guard, 2026-11-15 15:54:02 UTC: `git -C <dir> fetch ...` ("git: no option before the subcommand (run
   git from the folder, without -C, -c or --git-dir)"). Route taken: `cd` into each scratch folder under
   `.gate/preview-hosting-check/tags/` and ran git there (a shallow fetch of two tags to read their dates; nothing run).
@@ -411,6 +419,16 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    the fallback is his own setup step again (A5 with the date, A6 step 6, the old token removed), no decision entry,
    and no offer to run without an end date (his SA-R3 acceptance says ten days); no record that the token lacks an end
    date until he has looked; two hard gates in Next steps 1; both setup misses into For the report.
+
+8. 2026-11-17 19:20:12 UTC (called; transcript time), moments 2, 3 and 4 (a third setup miss; the token's handling;
+   what to ask about the unknown secret) · Q: what to send him on the token? · Changed: the record says no more than
+   his words (no user-token look yet; the secret's value unknown; the save message of 7c8c648 corrected); one look
+   first (My Profile, API Tokens, pressing nothing, no "View"), with both branches in words, so no "wait" stays open;
+   the miss told by the records (the steps were in Part 3 of 20:11 UTC; the wait at 3a; no "go ahead"), not his
+   "never received" taken as fact; both secrets' sources asked (source only); the end date as a rule plus today's
+   value; gate (b)'s evidence without a token value (the summary page, or the form after "Back"; then `preview`'s
+   secrets list with a fresh "Last updated"); no guess to him about the old value (a Global API Key answer would
+   become a "Decisions needed" entry).
 
 ## Running work
 - saver boyrmgcz1 (started 2026-11-16 08:49:17 UTC): stopped by itself at 10:39:17 UTC ("time is up", 110 minutes;
