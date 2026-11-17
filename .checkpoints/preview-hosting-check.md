@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 23:29 Amsterdam (22:29 UTC)
+- **Last update:** 2026-11-17 23:32 Amsterdam (22:32 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -354,6 +354,10 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      with a recognised token could print the account name and ID in the public log. Not hit so far (every attempt's
      whoami failed at /accounts with 9109). To raise with him as its own decision after the check.
 
+   - v3 of the check (consultation 13): A and C skipped when the ID box lacks an ID's shape (an error message may repeat
+     the path); sha256 0ad66aa0f2b3...; stub tests: good shapes ask A, B and C; a token in the ID box asks only B; no
+     file left behind. Waiting on Cloudflare's token-formats page before the hash is final, then the two reviews.
+
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
    CLOUDFLARE_ACCOUNT_ID; in `production`: CANARY); `preview` (him as required reviewer, self-review unticked, admin
@@ -631,6 +635,18 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    re-runs until the check, and an offer to stop tonight (nothing runs; the token holds until the 27th); not blocking:
    how he turned debug logging on (a repository secret or variable would break the empty-secrets condition); whether
    Read stays: decided after the cause is known.
+
+13. 2026-11-17 22:29:55 UTC (called; transcript time), moments 3 and 5 (a CI text holding the token, before it is
+   called ready) · Q: may the yes request go out? · Changed: not yet. Reviews on the final hash: the security-auditor's
+   second round on what changed, and the advisor agent (tier 2: the text, the acts outside his list, the account-ID
+   line's departure from the plan); A and C skipped when the ID box lacks an ID's shape (an error message may repeat
+   the path); the row "A and B refused, shapes right" judged against Cloudflare's token-formats page, its next action
+   the token's own page (status, the orange dot), not a third token; the deploy.yml follow-up told to him now and made
+   a gate before any deploy re-run (and whether he can rename the account, which needs no workflow change); the yes
+   request names the checkpoint commit and sha256 (checked with `git show`), in two entries (the text and its acts;
+   the ID's first and last 4 with where he compares them); the run's output copied word for word into the results log
+   before any deletion, and deletion his choice; after his yes: push, check the placed hash, check only this workflow
+   started and waits, then a one-item list with the run link and head SHA.
 
 ## Running work
 - saver boyrmgcz1 (started 2026-11-16 08:49:17 UTC): stopped by itself at 10:39:17 UTC ("time is up", 110 minutes;

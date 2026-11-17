@@ -54,9 +54,17 @@ jobs:
             fi
             rm -f "$RUNNER_TEMP/answer.json"
           }
-          ask "A. the token, for this account" "/accounts/$a/tokens/verify" '{status, expires_on, not_before}'
+          if [ "$h" = yes ]; then
+            ask "A. the token, for this account" "/accounts/$a/tokens/verify" '{status, expires_on, not_before}'
+          else
+            echo "== A. skipped: the account ID box does not hold an ID's shape"
+          fi
           ask "B. the token, without an account" "/user/tokens/verify" '{status, expires_on, not_before}'
-          ask "C. the project the upload asks for" "/accounts/$a/pages/projects/$PROJECT" '{name}'
+          if [ "$h" = yes ]; then
+            ask "C. the project the upload asks for" "/accounts/$a/pages/projects/$PROJECT" '{name}'
+          else
+            echo "== C. skipped: the account ID box does not hold an ID's shape"
+          fi
           rm -f "$RUNNER_TEMP/auth"
       - name: D. The pinned Wrangler with the same values (only its exit code and error codes are printed)
         env:
