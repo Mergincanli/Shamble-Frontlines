@@ -12,15 +12,15 @@ Each point names where it is written up and who decides it. None is decided here
   (`docs/research/soldier-joint-list.md`, section 1). Whether the coat keeps that motion is Mustafa's call at
   change-set 10's pictures. If it does not, the four joints go; a Blender model exported before then would have to
   be rigged and exported again.
-- **`root` is the node above the skeleton and the mesh, not a bone** (engine-architect's ruling; the advisor agent
-  upheld it against the first draft of the rules). The first real Blender export must show what mark 10 lists. If it
-  shows otherwise, the 20 names stand, and only marks 3 and 10 and the Blender recipe change.
+- **`root` is the node above the skeleton and the mesh, not a bone** (engine-architect's ruling, upheld by the advisor
+  agent against the rules' first draft); no node in a model file may be named `root`. The first real Blender export
+  must show what marks 3 and 10 list; if not, the 20 names stand and only those marks and the Blender recipe change.
 - **Sockets.** Each gun's entry lists its own sockets: the rifle prototype has four, the SMG five. The reload's
   targets (the gun's reload point and the pouch) have no socket among the five: change-set 10 proposes data or a
   socket, and a sixth socket name would be Mustafa's.
 - **What only a real Blender export can prove:** how the armature object is written, the neutral bone, the cut to
   four influences, a turned socket read back within 0.5 degrees, the test box's sizes and front, and the soldier's
-  origin, facing and scaling. The script-written rifle can test marks 1, 2, 5, 7 and 8 only.
+  origin, facing and scaling. The script-written rifle can test marks 1, 2, 5, 7, 8 and parts of 3 and 9.
 - **For the Art lead**, judged by Mustafa on the Blender model: where the joints sit that the brief does not place
   (hips, spine, chest, head, hip, knee, ankle, the coat's pivots), and painted weights beyond the rigid ones.
 - **For change-set 10's plan:** three traps of the animation port (`docs/research/soldier-joint-list.md`, section 7),

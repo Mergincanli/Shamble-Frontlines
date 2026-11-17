@@ -15,7 +15,7 @@
      checkpoints (`build-plan-slice-1*`, `cs0-model-rules*`) in its last commit before the PR is marked ready.
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs0-model-rules) · **Base:** main
   c94c81b440c77f7979e0f944a5341319f9a57d1b (to take in first; the branch still sits on 4460ef5 plus checkpoint commits)
-- **Last update:** 2026-11-17 22:47 CET (from the clock)
+- **Last update:** 2026-11-17 22:55 CET (from the clock)
 
 ## Steps done
 1. His go received (user message of 2026-11-17T19:10:44Z, saved by script, 10,544 bytes). The session's model read
@@ -155,6 +155,19 @@
     questions in short.
     Running: the verifier; engine-architect's review; docs-keeper (29 lines so far by its notes).
 
+28. (21:55 UTC) Pushed: 94aaae8 (commits 4 and 5: docs-keeper's pass on STATUS, ROADMAP and the repository map, 26
+    lines added, STATUS still 120 lines; this change-set's report `docs/reports/2026-11-17-cs0-model-rules.md`, 67
+    lines, the verifier's and the advisor agent's verdicts still pending in it; engine-architect's review APPROVE
+    with 5 Low, four applied, the fifth ("the model's entry") deferred to change-set M's plan).
+    docs-keeper left the reports index alone (it has no list of reports) and could not move lines to the status
+    archive (outside its four files): a follow-up for the docs pass at #56's merge.
+    Size: 1,195 written lines (`size-count.mjs`), 5 under his stop line of 1,200. A verifier fix that adds more than
+    5 lines stops the change-set: tell him in three lines.
+    The saver was stopped by its time limit at about 21:53 UTC and restarted (task b97h3rkxv).
+    Still running: the verifier (first pass). Then: its short second look at f61f43c and 94aaae8; the advisor agent
+    on the final head; the report completed; the checkpoints deleted in the last commit; the pull request marked
+    ready; stop for his go.
+
 ## Next steps
 1. Change-set 0's own short plan at `.checkpoints/cs0-model-rules/plan.md`; the advisor agent's review of it (effort
    max; APPROVE before any edit outside `.checkpoints/`).
@@ -227,6 +240,5 @@
   cannot fast-forward (checkpoint commits). His words "Take main in first" cover the act.
 
 ## Running work
-- saver: background task brf1n425m, started 20:03 UTC (the first one, bfulbfi1o, was killed at 19:55 UTC); check
-  its output file at each update.
-- agents (3 of 3): docs-keeper, the verifier, engine-architect (review).
+- saver: background task b97h3rkxv, started about 21:55 UTC (the second one, brf1n425m, reached its time limit).
+- agents (1 of 3): the verifier.
