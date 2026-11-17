@@ -247,3 +247,19 @@ Edit u4f-brief.md in place; a "rev 3.1" block in its change list. Read the check
   (1) (no sockets, section 4), (3) (Q4 (a)'s key a lab counter), (4) (Q6 (b) +1 negative case: +4); SA3-7 (the fast
   clock's `ping_limited` expected above 0, reported); SA3-8 (option A's cap on arrival; f7's flood case). None left.
 - DONE.
+
+## Revision for round 2 (rev 3.2)
+
+Task: the review budget's last fix pass, rev 3.1 to rev 3.2: round 2's findings (TE31-1..TE31-11, SA31-1..SA31-4;
+TE31-4 = SA31-2), D2 (the main session's reading, 18:54 UTC) and D4 (d4-output.md, d4b-notes.md, d4-compare.md).
+Edit u4f-brief.md in place; a first change-list block "rev 3.1 to rev 3.2" with rows R11 on. Fresh run of this section.
+
+### Plan (blocks; a line after each)
+- S1 Read both round-2 result files whole and the two checkers' notes; list each finding with its asked fix.
+- S2 Read D4's three files (d4-output.md, d4b-notes.md, d4-compare.md) and the d4b result JSON; the figures to carry.
+- S3 Read the brief's sites each finding names (rev 3.1 at the working tree), the code cites any rejection needs.
+- S4 Edits: change list block R11+, counts paragraph; per-finding edits; D2 (11 D2 row, 5.5 room, Q2, 12 item 6);
+  D4 (11 D4 row, Q6 status/why, NA-4, 2.1 filter row, f1 by U4F-Q6).
+- S5 r31_check.py read-only run; sha256 and line count; notes per finding; handback.
+
+### Block log

@@ -7,9 +7,9 @@
   #53 the kept-logs rule and PR #52 the docs pass; Mustafa's KL-MERGE (a), 2026-11-15 20:50). Take main in again when main changes code, CI or rules, and once before PR #40 is
   marked ready (MAIN-52, 2026-11-14). Main is now c94c81b (PR #55, DOCS-54, merged 2026-11-17 17:09:32 UTC: five
   files under docs/ only, so not taken in by MAIN-52; at the next take-in, Open findings "From DOCS-54" applies)
-- **Last update:** 2026-11-17 19:06 UTC (U4f's brief rev 3.1 DONE, both checks answered; D2 read; the main session's
-  D4 model DONE (u4f-r3/d4/d4-output.md); round 2 and an independent D4 model RUNNING, workflow wf_997ea01f-b4f; chat
-  about 40 %, /compact asked: the block "NOW (2026-11-16)")
+- **Last update:** 2026-11-17 19:30 UTC (U4f's brief: rev 3.1 DONE, round 2 DONE (no High), D2 read, D4 DONE by two
+  models and compared; the last fix pass (rev 3.2) and the advisor's check RUNNING, workflow wf_b2a20e74-6aa; chat
+  about 45 %, /compact asked at 19:05: the block "NOW (2026-11-16)")
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **NOW (2026-11-16, the day session; read this first after a compact or a cut).** Mustafa typed /compact about 09:00
@@ -435,23 +435,28 @@ it asks nothing; REFS-KIT stays.
   u4f-r3/d4/d4_noise.py daa4545c…, 99,000 more connects): every verdict of the two models agrees; 13 of 14 gaps within
   ±2.2 sd of chance, the 14th (exact-stamp lowest-RTT, 2.63) model B's draws low, no modelling difference; the value to
   carry 4.856 ms (on the bar); the exact-stamp mean 2.35 ms.
-  **Fix pass and the advisor's check: RUNNING from about 19:32 UTC, workflow (its id on the line below)**: one
-  general-purpose agent acting as the netcode-architect revises rev 3.1 to rev 3.2 for round 2's 7 Medium and 10 Low,
-  and folds D2's reading and D4's results into sections 5.5, 11, U4F-Q6 and NA-4 (the review budget's last fix pass);
-  then the advisor (general-purpose, reading main's advisor.md) checks rev 3.2 and rules on U4F-Q1 to Q18: ruling
-  advisor-u4f-brief.md, notes advisor-u4f-brief-notes.md. Both xhigh, one at a time. **The main session's own D4 model: DONE** (u4f-r3/d4/d4_model.py, sha256 9fdf285e…, read only; its output
+  **The main session's own D4 model: DONE** (u4f-r3/d4/d4_model.py, sha256 9fdf285e…, read only; its output
   u4f-r3/d4/d4-output.md, its `--check` MATCH byte for byte): with the Pong as built (U4F-Q6 (a)) none of D4's three
   estimators passes -47's p99 of 5 ms (best, the mean: 6.06 ms with random phases, 8.69 ms with one phase per
   connect; the lowest-RTT about 18 ms; (e) 12.85 ms, its half-lowest-RTT delay biased -7.3 ms); with an exact sub-tick
   stamp (U4F-Q6 (b)'s reference) the mean passes (2.32 ms; 2.34 with P2's 2 % loss) and the tick-quantised bite then
   shows (11.8 ms); the lowest-RTT with an exact stamp sits on the bar (4.94; 5.02 with loss). So D4 supports U4F-Q6
-  (b) and an averaging estimator. To be compared with d4b's before the advisor. **If cut:** `Workflow({scriptPath, resumeFromRunId: "wf_997ea01f-b4f"})`; each agent
-  continues after its notes' last complete block. **On return:** save the three results word for word (a script like
-  u4f-r3/r3_results_full.py); read every Medium or higher in full; compare the two D4 models (any difference above
-  0.1 ms in a p99 explained before the advisor); a fix pass if round 2 leaves a Medium or higher; then the advisor's
-  check with U4F-Q1-Q18 (its own workflow, as U4r's wf_95beab47-c57), with D2's and D4's figures; then B3 (and
-  KL-U4F if needed) to him under Decisions needed. The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (next
-  20:34 UTC). The saver **b7nfcyliw** from 18:58 UTC (stop it by TaskStop when no agent runs).
+  (b) and an averaging estimator; model B agrees (above).
+  **Fix pass and the advisor's check: RUNNING from about 19:29 UTC (launched between the 19:28 and 19:30 clock
+  reads), workflow wf_b2a20e74-6aa** (task w6afqym93; script
+  npt-u4f-r32-fix-advisor-wf_b2a20e74-6aa.js under the session's workflows/scripts/): Fix pass, one general-purpose
+  agent acting as the netcode-architect, revises rev 3.1 to rev 3.2 for round 2's 7 Medium and 10 Low and folds D2's
+  reading and D4's results into 5.5, section 11, U4F-Q6 and NA-4 (the review budget's last fix pass; notes appended to
+  u4f-brief-r3-notes.md, "Revision for round 2"); then Advisor, general-purpose reading main's advisor.md, checks rev
+  3.2 and rules on U4F-Q1 to Q18 (ruling advisor-u4f-brief.md, notes advisor-u4f-brief-notes.md). Both xhigh, one at a
+  time; nothing built or run. **If cut:** `Workflow({scriptPath, resumeFromRunId: "wf_b2a20e74-6aa"})`; each agent
+  continues after its notes' last complete block. **On return:** save both results word for word (a script like
+  u4f-r3/r31_round2_full.py); read the ruling whole (USAGE-SAVINGS (a)), the fix pass's summary and every finding
+  rated Medium or higher; then, by the ruling: the bar texts (B3 LEAD-BOUND, and KL-U4F only if needed) drafted in
+  c62hb-paste's form for the advisor's and the test-engineer's read, then to him under Decisions needed with the
+  planned size, before anything is built; the launch steps of the brief's section 12 after his yes. The 2-hour check-in
+  trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (next 20:34 UTC). The saver **b7nfcyliw** from 18:58 UTC (110 minutes, so it
+  ends about 20:48: restart it if agents still run; stop it by TaskStop when none runs).
   **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
