@@ -67,3 +67,37 @@ saves after 18b139c; the spike unchanged since ddd38ba.
 - **11:13:04-11:20:49 E3b PASS: 600 of 600 exit 0**, each "test result: ok. 1 passed; 0 failed" (the name matched:
   one test each run); none non-zero; the fixed hashes in its header; "first failure: none"; main-run.sh exit 0.
 - 11:21 E3c started in the background (the whole binary, `all 10 2 4`; log e3c.log).
+- **E3c PASS: 20 of 20 exit 0**, each "test result: ok. 169 passed; 0 failed"; the fixed hashes; "end 11:28:05 UTC;
+  ... first failure: none"; main-run.sh exit 0. E3 whole: 1,220 runs on the fixed tree, none failed.
+- 11:28 E4, P1 (the finding's example: down_free without `.saturating_sub(self.released_model[DOWN])`) in by Edit.
+- **P1 (p1.log; header delay.rs 091957eb…, the plant in): exit 101, "167 passed; 2 failed"**. The stalled-client test
+  at delay_tests.rs:782: "held <= 64 KB + the front record's acknowledged prefix, at every write", left [1, 0], right
+  [0, 0], as the table predicts. G-NC2 at :2308, the same message, left [1, 0], right [0, 0]: the table predicted a
+  PASS; under C3 a G-NC2 FAIL at "...at every write" under P1 is evidence, not a stop. No other test failed. Restored
+  by Edit: the three fixed hashes again (3dbbccf7…, 8f8c0f9a…, 1dd67e2f…).
+- 11:30 P2 (the old bite: `if held > budget + prefix {` → `if held > budget {`) in by Edit.
+- **P2 (p2.log; header delay.rs 0e65d301…): exit 101, "168 passed; 1 failed"**: G-NC2 alone, at :2308, "held <= 64 KB
+  + the front record's acknowledged prefix, at every write", left [121, 0], right [0, 0] ([k >= 1, 0] as the table
+  predicts: the prefix term is reached). Restored by Edit: delay.rs 3dbbccf7… again.
+- 11:31 P3 (growth outside the write: the down write's `c.bytes[DOWN].extend(data);` moved after its
+  `c.model_write(DOWN, n, t, false);`) in by two Edits.
+- **P3 (p3.log; header delay.rs dfbf8d2d…): exit 101, "167 passed; 2 failed"**: the stalled-client test at :787,
+  "held only falls between writes", left [134, 0] (the table: [k >= 8, 0]); G-NC2 at :2313, the same message, left
+  [1144, 0] (the table: "G-NC2 too"). Restored by two Edits: delay.rs 3dbbccf7… again.
+- 11:32 P4 (the at-write call gone: model_write's `#[cfg(test)] self.check_held_bound(dir);` deleted) in by Edit.
+- **P4 (p4.log; header delay.rs 7b41e90a…): exit 101, "167 passed; 2 failed" (39.31 s)**: the stalled-client test
+  at :787, "held only falls between writes", left [137, 129] (the table: [k >= 1, k' >= 1]); G-NC2 at :2290, its hang
+  guard: "hang guard: 186 records, largest excess 0 B, 48 first losses" (the table: its hang guard after 30 s).
+  Restored by Edit: delay.rs 3dbbccf7… again.
+- 11:33 P5 (the up room forgets released bytes: up_room without `.saturating_sub(self.released_model[UP])`) in by Edit.
+- **P5 (p5.log; header delay.rs 09e3fb98…): exit 101, "168 passed; 1 failed"**: the stalled-client test alone, at
+  :782, "held <= 64 KB + the front record's acknowledged prefix, at every write", left [0, 172] (the table: [0, k >=
+  1]); G-NC2 ok. Restored by Edit. **All five plants failed as the table says** (P1's G-NC2 FAIL at "...at every
+  write" is evidence under C3); after the last restore the three fixed hashes hold and `git diff --stat -- spikes/
+  netcode-proof` is the fix alone (3 files, 74 + 42).
+- 11:34 E5 (the lab binary's sha256 against preflight.log's 98c3967e…).
+- **E5 PASS** (e5.log, 11:33:54-11:34:23 UTC: header free 4,955 MiB, HEAD 1df9072; `cargo build --locked --release -p
+  npt-lab` exit 0; npt-lab 98c3967e04e4260985d24173b1fb2126ea1444636f4725e12cf76333d90b5113, equal to preflight.log's):
+  the lab binary is unaffected. **The gate --no-smoke: GATE PASS** (11:34 UTC). Step 3 done.
+- 11:35 Step 4: the review round (C8): netcode-architect, test-engineer, rust-reviewer, xhigh, three at once, on the
+  final working-tree diff; notes u3c-held-1/<agent>-review.md.

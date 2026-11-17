@@ -304,10 +304,14 @@ it asks nothing; REFS-KIT stays.
   DONE: the fix is in the main folder, uncommitted until step 6** (116 spike lines; its hashes in build.md); C4's
   light pre-check PASS (fmt, clippy, doc); the gate PASS. **E3a PASS** (G-NC2 alone under 6 busy loops: 600 of 600
   exit 0, 09:53:52-11:12:33 UTC; the fixed hashes in its header). **E3b PASS** (the stalled-client test alone: 600 of 600 exit
-  0, 11:13:04-11:20:49 UTC). **E3c RUNNING from 11:21 UTC** (task bugt7dtal; the whole binary, 20 runs under 4 busy
-  loops; log .gate/u3c-held-1/e3c.log). Then E4's plants P1-P5 one at a time (sites found: down_free :481, up_room
-  :488, the bound's `if` :546, model_write's call :635, the down write's extend :1597 and model_write :1615), each
-  restored by Edit and shown by the fixed hashes. **DOCS-54's
+  0, 11:13:04-11:20:49 UTC). **E3c PASS** (the whole binary: 20 of 20 exit 0, 169 passed each, to 11:28:05). **E4 DONE: all
+  five plants fail as the table says** (P1 the stalled-client test [1, 0] "...at every write", G-NC2 too, evidence
+  under C3; P2 G-NC2 [121, 0]; P3 "held only falls" [134, 0] and G-NC2 [1144, 0]; P4 [137, 129] and G-NC2's hang
+  guard; P5 [0, 172]), each restored, the three fixed hashes after the last. **E5 PASS** (npt-lab 98c3967e…, as
+  before). The gate PASS (11:34). **RUNNING from 11:35 UTC: the review round (C8)** (workflow wf_88c44554-26a, task
+  w8oeb98g2: netcode-architect, test-engineer, rust-reviewer at xhigh, read only; notes u3c-held-1/*-review.md).
+  Next: save the three results word for word, read them in full, one fix pass, then step 5 (disk: free 4,955 MiB is
+  below the 5,220 bar, so pack B1 by brief 8.1 under PACK-READ (a)), step 6 the commit, step 7 the counted run. **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
   full; the plan docs-54/docs-54-plan-draft.md, 134 lines, 2d3bb7a9…). ADV-D54-1 High: the copy method would quote the
