@@ -15,7 +15,7 @@
      checkpoints (`build-plan-slice-1*`, `cs0-model-rules*`) in its last commit before the PR is marked ready.
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs0-model-rules) · **Base:** main
   c94c81b440c77f7979e0f944a5341319f9a57d1b (to take in first; the branch still sits on 4460ef5 plus checkpoint commits)
-- **Last update:** 2026-11-17 21:07 CET (from the clock)
+- **Last update:** 2026-11-17 21:16 CET (from the clock)
 
 ## Steps done
 1. His go received (user message of 2026-11-17T19:10:44Z, saved by script, 10,544 bytes). The session's model read
@@ -54,6 +54,16 @@
 12. Both record scripts dry-run on a scratch copy of the docs (20:07 UTC): `decisions-insert.mjs` (three entries equal
     to his words byte for byte, the appendix A1 to A10) and `pointers-insert.mjs` (DECISIONS 4 pointers, SPIKE_PLAN 3,
     ADR 0002 1; no line over 120). Not yet run on the repo's docs.
+
+13. Drafts written in the notes while the joint-list ruling runs (20:16 UTC): the report's "since the plan" section
+    (`cs0-model-rules/since-the-plan.md`; 44 quoted spans checked against his saved messages by `quotes-check.mjs`,
+    all found), `report-build.mjs` (the plan copied from commit 68addf9 below that section, checked byte for byte).
+14. Part 15, "The second lane": the Shamble VFX reading is done (`part-15/shamble-vfx-digest.md`, 97 lines,
+    graphics-engineer, second run finished about 20:12 UTC); Part 15 is drafted
+    (`part-15/part-15-the-second-lane.md`, 209 lines, six questions for him) and is with the advisor agent (effort
+    max; notes `part-15/advisor-part-15-r1.md`). It is sent to him as a file after that review. It is not carried by
+    change-set 0's pull request: it goes to main once he has answered it (a docs change of its own or change-set 1's
+    docs pass); if `.checkpoints/part-15*` is deleted before that, the report and STATUS name the commit that holds it.
 
 ## Current step
 9. The plan's revision 2 (an addendum in `cs0-model-rules/plan.md`, written 19:46 UTC) answers the advisor agent's
@@ -139,5 +149,5 @@
 ## Running work
 - saver: background task brf1n425m, started 20:03 UTC (the first one, bfulbfi1o, was killed at 19:55 UTC); check
   its output file at each update.
-- agents (2 of 3), second runs since about 20:05 UTC: engine-architect on the joint list; graphics-engineer on the
-  Shamble VFX digest (Part 15).
+- agents (2 of 3): engine-architect on the joint list (second run, since about 20:05 UTC); the advisor agent on
+  Part 15 (since about 20:16 UTC).

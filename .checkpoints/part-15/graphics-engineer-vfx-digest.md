@@ -133,3 +133,25 @@ B8: section 3 written (digest now 49 lines); next section 4.
 B8: section 4 written (digest now 59 lines); next section 5.
 B8: section 5 written (digest now 73 lines); next sections 6 and 7.
 B8 done: sections 1-7 written (digest 95 lines, limit 150); next B9 (answer into notes, then DONE).
+B8 fix pass: header now names clone vs game paths; clone docs cited as export.md etc. (not docs/...); 4 package-file refs made explicit. Digest 97 lines.
+### B9 answer (from these notes)
+Digest: /home/user/Shamble-Frontlines/.checkpoints/part-15/shamble-vfx-digest.md (97 lines, sections 1-7); notes: /home/user/Shamble-Frontlines/.checkpoints/part-15/graphics-engineer-vfx-digest.md. Nothing built, run, installed or fetched; nothing committed.
+Three facts that matter most for Part 15:
+1. The runtime fits the drafts' shape: three.js only (three/webgpu, three/tsl), 4 TSL node materials (MeshBasicNodeMaterial), nothing ADR 0003 part 1 rules out, one source for both backends, at most 4 draw calls for all effects together, randomness from the caller's seed, time from the caller, Low/Medium/High tiers.
+2. It does not yet meet the marks change-set 11 must meet: its CPU side allocates every frame (PM-0003-29 is met at 11, plan.md:349); it has no caps or pools; each blend group compiles at its first draw unless the game's warm-up shows it (PM-0003-7); its main cost is CPU triangle building, which lands in the main-thread row, not only the GPU effects row; line widths assume a fixed 100.7 px/m.
+3. It cannot be installed as it stands and holds nothing for the slice yet: every package is private and UNLICENSED and exports TypeScript source; the peer three ^0.187.0 ties the game's exact pin to r187; no export is in the repo (git-ignored); event names are proposals; sound, camera shake and hit-stop are "Not yet".
+Route to weigh first: a vendored, read-only copy of the runtime plus vfx-format's main entry (about 4,250 lines) in a game workspace package, pinned to an upstream commit, fixes made upstream first and then re-copied. Why: it needs no upstream change (npm publish needs a licence and dropping private; a git dependency cannot select a subfolder [inferred, unchecked]; a submodule brings the whole repo and its dependencies into the lockfile), keeps one lockfile and an offline npm ci, and puts every line under the game's review and lint. Against: drift and manual syncs.
+Checks (digest section 4):
+C1 same picture: one event at a fixed seed and time, game page vs the test page's renderAt, same camera, pixel ratio and colour setup; difference under a bar written before the run; post chain off, then on.
+C2 cost: effects GPU ms within 2 ms p99 at Low on the minimum laptop (timestamp queries, both backends; gated at Slice 6), plus their CPU ms reported inside the main-thread row.
+C3 no compile: PM-0003-7's program and pipeline counts unchanged after every exported event at every tier.
+C4 no allocation: PM-0003-29's heap sampling shows 0 bytes per frame in the runtime's calls (fails today [inferred]).
+C5 both backends: C1 between WebGPU and forceWebGL on real hardware (upstream's check is headless software).
+C6 export as content: hashed, immutable, a stale or altered file refused or refetched (3 cases); checkExport runs in the game's build.
+C7 event names: every event the game sends maps to exactly one exported effect, and back (a Node test).
+C8 (from card 11): a re-export reaches the running page within 1 s with no new pipeline.
+Could not find out: the bundle size; whether upstream's 536 tests and 181 browser checks pass; any real-hardware cost; whether the source passes the game's strict lint; a way to move a playing effect's inputs (tracer correction); effects for the slice's weapons; Brave; the licence intent and npm scope; upstream's "Part B" timing; the effects' share of the 2,500 lines.
+EDITOR_V2.md: line 116 (the [LATER] entry, Mustafa 2026-11-06) needs the dated pointer; his words stay; the one-sentence text is in digest section 6.
+Decisions needed: none decided here; for Part 15 to frame: the code route; upstream's licence and publishing; whether effects draw before or after the post chain (OQ-0003-7).
+For Mustafa: nothing from this reading task.
+DONE
