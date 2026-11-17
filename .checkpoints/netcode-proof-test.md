@@ -179,9 +179,23 @@ it asks nothing; REFS-KIT stays.
   §5); CI last ran on a59e0ee77534… (21:37 UTC): gate and toolchain success, push and pull_request (runs
   43961950359, 43961950485, 43961962912, 43961962919). **Pushed at 02:57 UTC: head
   3626a377f95c0a9dc0edb3bce49227f73caf733d** (P6's spike-tree check exit 0 there, as at e2d06ec and a5baab8).
-  **RUNNING from 02:58 UTC: the advisor's check of that head** (P6, order item 11; workflow wf_f820dccd-fb8, xhigh,
-  notes advisor-c62h-bound-report.md; it rules on CI's [skip ci] head and on C62HB-Q4 (b)'s recommendation). Then
-  the report to Mustafa (item 12); the P0 folders stay unpacked until it has reached him.
+  **The advisor's check of that head: APPROVE WITH CONDITIONS R1-R4** (wf_f820dccd-fb8, 02:58-03:12 UTC; saved
+  word for word by c62h_bound_report_head_full.py: advisor-c62h-bound-report-head-full.json 303859b8…, 129 lines,
+  read in full): order items 4-11 and P1-P7 met; the append clean (lines 1201-1764 hash e4af2d54…); the (c) diff
+  exactly the ruling's three texts; the six post-PASS edits right; P6 exit 0. **CI: item 10 met** (a59e0ee's
+  checked tree equals the head's; CI must run on the real final head, the commit that deletes .checkpoints/ before
+  PR #40 is marked ready, CHECKPOINTS.md §9). **C62HB-Q4: (b), with U4g, confirmed**, with one more reason
+  (ADV-CBR-1). Four Lows, no push: ADV-CBR-1 (the two figures read only measured ticks, while -58's wraps fall in
+  the first seconds of its runs: the caveat goes in the chat and in U4g's brief carry, Open findings), -2 (the code
+  named plainly in the chat), -3 (section 17's CI line is out of date: the advisor has now read CI on ddd38ba and on
+  a59e0ee), -4 (6,057 comes from the runner's start line; pre-P2-c62h.log reads 6,056; no outcome changes).
+  **R1** the chat carries to_mustafa's C62HB-Q4 entry (the code named plainly, the caveat); u4r-report.md is not
+  edited for these. **R2** the chat names 3626a377f95c0a9dc0edb3bce49227f73caf733d; checked at 03:12 UTC: the head
+  sent from (df4634f) has u4r-report.md c5dee3fa… and P6 exit 0, and since 3626a37 only the card and the advisor's
+  notes changed. **R3** any change to u4r-report.md, or to spikes/netcode-proof outside results/, before the report
+  reaches Mustafa goes back to the advisor. **R4** P5 holds until then; after that, pack only by brief 8.1, never
+  both P0 folders, fc411116c1f1, fd4612050cd6 or the c-u2 folders without his word. **The report goes to Mustafa
+  in chat at about 03:14 UTC.**
   **NS-STATUS: PR #54 opened 21:57 UTC** (claude/night-shift-stints, commit 20f9d599…, NIGHT_SHIFT.md +3 -0, the
   lines' sha256 4e3d1565… = his yes; the worktree .gate/ns-stints-wt; subscribed). **Its review round DONE**
   (wf_9f3bfdf9-76a; both saved word for word and read in full): **the advisor APPROVE WITH FINDINGS**
@@ -3809,6 +3823,11 @@ free:
     change, U4f, U4g or JDG-ONLY-1; to STATUS with the report):** TE-CBH-3, TE-CBH-4, TE-CBH-5 = NA-CBB-1 (the runner's
     stop note at c-u4r-runs.mjs:14-15 still says only P0 has bites), TE-CBH-6, TE-CBH-7, NA-CBB-3 (the report's one-line
     note), RR-CB-1, RR-CB-2; NA-CBB-2 ruled in as the pre-flight.
+  - **ADV-CBR-1 (Low; for U4g's brief carry, the advisor's R1 on the report head, advisor-c62h-bound-report-head-full.json):**
+    if -58's two wrap parts get C62H-BOUND's two checks, note that the two figures read only measured ticks, while
+    -58's wraps fall in the first seconds of its runs (marks.json PM-0001-58's notes: the whole run is read). A real
+    bound needs the wraps inside the measured window, or a whole-run reading of the figures; the second changes what a
+    figure computes, so it goes to Mustafa as exact wording for a yes. ADV-CBR-2 to -4: Lows, no push (the NOW block).
 - **From the advisor's U2 review (advisor-u2.md), each with the unit that fixes it:**
   - **C1 (U4, before PM-0001-18's L1 leg counts):** L1's stream retries back off (each waits twice the last timeout:
     RFC 6298 §5.5, RFC 9002 §6.2.1); loss drawn per 1,448 B segment, any lost segment delaying the message one timeout
