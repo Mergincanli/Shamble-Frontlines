@@ -205,3 +205,47 @@ U 1.39. The file wins, by the correction's own rule."); "in the rifle's aiming p
 **18. The Advisor chat's log** (his words of 20:20 and 20:58: not an input; not read; no part of it in the repo).
 Nothing in this plan rests on it: the LOOK_V2 §8 line comes from the build plan's Part 11 and his words of
 2026-11-03, and "the Art lead's proposal unless a line says it is mine" from his go.
+
+**19. The ruling on the joints is in** (`joint-list.md`, engine-architect, effort max, 98 lines; it answers findings
+1, 2, 3 and 16).
+- One engine joint list for Slice 1's soldier, 20 joints: the build plan's 16 (Part 11, rule 21), names unchanged,
+  plus four coat joints (`coat_front_l`, `coat_front_r`, `coat_back_l`, `coat_back_r`, on `hips`). They are the 20
+  things legacy already moves (its 14 joints, the 2 ankles it adds at load, its 4 coat panels), so change-set 10
+  ports the animation by name. The spine stays (legacy splits the aim twist between spine and chest).
+- `root` is not a skin joint: it is the one node above skeleton and mesh that the game places, turns and scales with
+  one number (his words: "hang the soldier on one root so it scales with one number"); `hips` is the top joint.
+  graphics-engineer's draft read `root` as the armature's top bone; the ruling disagrees and says why. The research
+  file takes the ruling; graphics-engineer may answer it with a sourced point; how Blender writes the armature object
+  is settled by the first real export. **The advisor agent is asked to rule on this point in its re-read.**
+- Sockets: a socket's local +Z is where it points and +Y its up (in Blender: local -Y and +Z); grip, support, muzzle
+  and sight carry no rotation; each gun's entry lists its own sockets, with grip, support and muzzle required. The
+  Blender half of this rule is inferred for rotations, so a real export of a turned socket must prove it.
+- Hands: the right arm reaches `socket_grip`, the left `socket_support`; the fist's point lies `palm` metres beyond
+  the wrist, one number in the soldier's entry.
+- The soldier's origin and facing: five lines a file passes or fails (mark 10), with four planted files.
+- The brief's 17 parts are mapped onto the joints (the stand-in's weights). The tolerances the ruling marks
+  "[proposal]" become the marks' numbers through test-engineer's review.
+- Left open, for the report and for change-set 10's plan: whether the coat keeps legacy's motion (Mustafa, at change-set
+  10's pictures; if not, the four coat joints go before the Blender model is exported); where the joints the brief
+  does not place sit, and painted weights (the Art lead, judged by Mustafa); the reload's targets have no socket.
+
+**20. Two research files, not one.** `docs/research/asset-export-rules.md` (graphics-engineer: the export rules, the
+names, the marks) and `docs/research/soldier-joint-list.md` (engine-architect: the ruling, as it stands, with its
+citations repointed from the notes to the plan's report and its appendix, and from the draft's lines to the rules'
+ids). The second lane's change-sets 6 and 10 build from the second file. Both get rows in `docs/research/README.md`
+and in the repository map.
+
+**21. The size has passed twice the build plan's figure, so Mustafa is told and the docs build waits for his word**
+(his rule: "when one passes twice its plan while it is built, stop and tell me in three lines"). Planned: about 150
+lines of docs. Now: about 900 written lines (the rules file about 380, the joint ruling about 100, the plan's report
+with "since the plan" about 280, entry headers, pointers, register and draft rows about 120), besides about 1,700
+copied lines (his three messages, the plan, the appendix). Why: his CHANGE 1 put the record of his decisions and the
+plan's carry into this change-set; the rules need their sources and marks; finding 1 needed the ruling. The cheaper
+option: change-set 0 keeps his records, the plan's carry and a short list of the rules (names and export settings),
+and the sources, the marks and the ruling follow in a change-set 0b beside change-set 1. Review of what exists goes
+on meanwhile (the re-read of this plan, the draft's update to the ruling); no file outside `.checkpoints/` is edited.
+
+**22. Part 15 is not carried by this change-set.** It is sent to him as a file after the advisor agent's review and
+goes to main once he has answered it. If `.checkpoints/part-15*` is deleted with this change-set's last commit, the
+report and STATUS name the commit that holds it.
+

@@ -15,7 +15,7 @@
      checkpoints (`build-plan-slice-1*`, `cs0-model-rules*`) in its last commit before the PR is marked ready.
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs0-model-rules) · **Base:** main
   c94c81b440c77f7979e0f944a5341319f9a57d1b (to take in first; the branch still sits on 4460ef5 plus checkpoint commits)
-- **Last update:** 2026-11-17 21:16 CET (from the clock)
+- **Last update:** 2026-11-17 21:25 CET (from the clock)
 
 ## Steps done
 1. His go received (user message of 2026-11-17T19:10:44Z, saved by script, 10,544 bytes). The session's model read
@@ -65,15 +65,19 @@
     change-set 0's pull request: it goes to main once he has answered it (a docs change of its own or change-set 1's
     docs pass); if `.checkpoints/part-15*` is deleted before that, the report and STATUS name the commit that holds it.
 
+15. engine-architect's ruling on the joints is in (`cs0-model-rules/joint-list.md`, 98 lines; its second run ended
+    before 20:25 UTC): 20 joints (the build plan's 16 plus four coat joints), `root` is the node above the skeleton
+    and not a joint (against graphics-engineer's draft: the advisor agent rules), the sockets' axes, the hands'
+    rule, the origin and facing check, the brief's 17 parts on the joints. Folded into the plan as points 19 to 22.
+
 ## Current step
-9. The plan's revision 2 (an addendum in `cs0-model-rules/plan.md`, written 19:46 UTC) answers the advisor agent's
-   findings 2 to 16. Finding 1 (High, the joint list) waits for engine-architect's ruling
-   (`cs0-model-rules/joint-list.md`; its notes `engine-architect-joint-list.md`). graphics-engineer's research draft
-   is finished (`asset-export-rules.draft.md`, 349 lines) and is updated to the ruling and to revision 2 next.
-   `pointers-insert.mjs` written (not run on the docs): the dated pointers of findings 9 and 10, each quote of his
-   words checked against the saved messages. Then: the advisor agent's re-read; APPROVE before any edit outside
-   `.checkpoints/`.
-   For Part 15: graphics-engineer reads Shamble VFX into `.checkpoints/part-15/shamble-vfx-digest.md`.
+16. (20:25 UTC) Three agents run: graphics-engineer updates the research draft to the ruling and to revision 2 (its
+    brief: `cs0-model-rules/graphics-engineer-update-brief.md`; notes `graphics-engineer-export-update.md`); the
+    advisor agent re-reads the plan (notes `advisor-plan-r2.md`); the advisor agent reviews Part 15
+    (`part-15/advisor-part-15-r1.md`).
+    **The size stop (his rule, plan point 21):** change-set 0 has passed twice its planned size (about 150 lines of
+    docs planned; about 900 written lines now, besides about 1,700 copied). He is told in three lines; the docs
+    build waits for the advisor agent's APPROVE and for his word. Review of what exists goes on.
 
 ## Next steps
 1. Change-set 0's own short plan at `.checkpoints/cs0-model-rules/plan.md`; the advisor agent's review of it (effort
@@ -149,5 +153,4 @@
 ## Running work
 - saver: background task brf1n425m, started 20:03 UTC (the first one, bfulbfi1o, was killed at 19:55 UTC); check
   its output file at each update.
-- agents (2 of 3): engine-architect on the joint list (second run, since about 20:05 UTC); the advisor agent on
-  Part 15 (since about 20:16 UTC).
+- agents (3 of 3): graphics-engineer (the draft's update), the advisor agent twice (the plan's re-read; Part 15).
