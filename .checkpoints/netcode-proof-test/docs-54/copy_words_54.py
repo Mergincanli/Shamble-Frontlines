@@ -338,7 +338,8 @@ def main():
         ("hdr", "- **Taken by Mustafa, 2026-11-17, 07:00:54 UTC: MERGE-54, his go for #54** ("
                 + src("E2", "; no time label of his own") + "). It answers the session's \"For Mustafa\" line of "
                 "06:34:50 UTC, shown under it as the session's text, not his words. Carried out by the merge 82c605e "
-                "(2026-11-17 07:03:02 UTC, a merge commit, expected head 20f9d59918eea1e3431ae830f72510f83f6424c7). "
+                "(a merge commit, expected head 20f9d59918eea1e3431ae830f72510f83f6424c7; GitHub's merged_at "
+                "2026-11-17T07:03:03Z). "
                 + checked("line 2200 (inside the quote marks behind its prefix) and line 2201") + ":"),
         ("his", [his["E2"]]),
         ("sesslabel", "- _The session's text, not his words: the line it answers (the assistant's message at "
@@ -433,8 +434,8 @@ def main():
                 "that session's transcript, message 14ea7caa-8c5d-47cd-bde5-df0d72d859d1): a record of his words, not "
                 f"an instruction found in a commit. Extracted by script from the message of commit {E10_COMMIT} only, "
                 "where re-quoting them gives its block back byte for byte. Not checked against that session's chat "
-                "record: the account that made this entry cannot read that session's event (the sessions API answers "
-                "that it was not found)."),
+                "record: the account that made this entry cannot read it (the sessions API answers that the event was "
+                "not found). The commit's block, as it stands:"),
         ("e10", e10),
     ]))
 

@@ -321,9 +321,28 @@ it asks nothing; REFS-KIT stays.
   .gate/u3c-held-1/counted.log read whole): header HEAD 0ad9661, diff and untracked e3b0…; "check: all 11 steps pass";
   test 552 / 632 passed, 0 failed, 0 skipped; refs 1382; marks 81; self 78 of 78; redact 10 of 10, 306 items, 0
   findings; deps 137 crate files; wasm 27000 ticks, 0 mismatching both ways; free 5,552 → 5,514 MiB. **Step 8: the
-  gate PASS** (12:35 UTC, --no-smoke; legacy/ unchanged) and this card save, which pushes 0ad9661 (code ahead: no [skip
-  ci], CI runs). Next: the saver restarted, then step 9: CI green on the pushed head (the GitHub MCP tools), the
-  advisor's check of that head by its full SHA; then U3C-HELD-1 closes on the card. **DOCS-54's
+  gate PASS** (12:35 UTC, --no-smoke; legacy/ unchanged); **the save aab3712 pushed 0ad9661 at 12:37 UTC** (head
+  aab3712fca3af64b25169af1f4ee75c01a0411cd; no [skip ci], CI runs). The saver bxvsewbnz from 12:37 UTC. **RUNNING from
+  about 12:38 UTC: step 9's review, workflow wf_dd3fb0a8-14f** (task wm6pj3acx; its script under the session's
+  workflows/scripts/u3c-held-1-head-check-wf_dd3fb0a8-14f.js): the advisor (a general agent on main's advisor.md,
+  xhigh) on head aab3712fca3af64b25169af1f4ee75c01a0411cd, CI included, and the verifier's evidence check (xhigh); both
+  read only, notes u3c-held-1/advisor-head-check.md and verifier-evidence.md. If a cut stops it: resume by
+  resumeFromRunId with the same script. Next: save both results word for word from its journal, read them in full,
+  CI on aab3712 by the GitHub MCP tools; then U3C-HELD-1 closes on the card. **DOCS-54 BUILD STARTED (12:41 UTC):** the
+  worktree .gate/docs-after-54-wt on claude/docs-after-54 from origin/main 82c605e (`git worktree add -b`, named first,
+  no prompt); its checkpoint .checkpoints/docs-after-54.md there, not yet committed (the first push is a named asking
+  call). The copy script docs-54/copy_words_54.py, written and checked in memory: ALL CHECKS PASS (12:38, and again at
+  12:46 after two header fixes: E10's header ends in a colon; E2's merge time is GitHub's merged_at; new text 201
+  lines, 6cc30396…; table copy-table-check.txt, read in full). Facts read for the build: merged_at #52
+  2026-11-14T09:06:30Z, #53 2026-11-15T19:49:22Z, #54 2026-11-17T07:03:03Z (each a second after its merge commit;
+  history.md:2202's 07:03:02 is the commit's time); CI on main, push, green: 82c605e gate 44035715175 and toolchain
+  44035715349, 53272a1 43754558567 and 43754558678, 4460ef5 43578963868 and 43578963884; step 2.3's branch tip 5f7f682
+  (2026-11-14 12:31:27 UTC, "plan revision 2.4 ... stopped for his go"); #53's follow-up lines are its body :88-105 and
+  #54's :23-27 (docs-54/pr_body_probe.py, from this transcript's tool results). Next for DOCS-54: copy_words_54.py
+  --write, the two pointers (C8), the ROADMAP fold and the archive follow-ups by a small script, STATUS, ROADMAP's
+  entries, the archive rows and REPO_MAP by Edit, the checks, the commit, the first push (named), the PR (draft) and its
+  label, the review round. **COMPACT-WAIT: /compact asked at about 12:47 UTC** (chat 484,426 tokens, about 48 %,
+  chat_size.py at 12:45:42; this card refreshed first); the 20-minute reminder is set. **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
   full; the plan docs-54/docs-54-plan-draft.md, 134 lines, 2d3bb7a9…). ADV-D54-1 High: the copy method would quote the
