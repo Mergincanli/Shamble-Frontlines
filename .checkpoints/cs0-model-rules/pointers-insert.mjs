@@ -13,7 +13,7 @@ const GAME = 'the entry "Taken by Mustafa, 2026-11-14, 13:58:05 UTC: the game is
 const GO = 'the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan"';
 // his words, each quoted in a pointer below, each checked against the message files
 const Q = {
-  rule: 'Foundation steps 2.4 and 2.5 and Slice 1 may be planned now and built after my go on the plan, on the decision drafts as proposed. They do not wait for the tests that docs/SPIKE_PLAN.md places before Slice 1 (the sim core spike, the 60 Hz run, the boundary spike, the look proof test, the content and ability spike and the render budget bench), nor for the end of step 2.3. Those tests are not built as separate tests unless the plan shows a question the real game cannot answer. No pass mark and no open question of theirs is dropped or loosened: each is measured on the real game, at the first build that can show it, and a draft is accepted only when its marks are met.',
+  rule: 'Foundation steps 2.4 and 2.5 and Slice 1 may be planned now and built after my go on the plan, on the decision drafts as proposed. They do not wait for the tests that docs/SPIKE_PLAN.md places before Slice 1 (the sim core spike, the 60 Hz run, the boundary spike, the look proof test, the content and ability spike and the render budget bench), nor for the end of step 2.3. Those tests are not built as separate tests unless the plan shows a question the real game cannot answer. No pass mark and no open question of theirs is dropped or loosened: each is measured on the real game, at the first build that can show it, and a draft is accepted only when its marks are met. If a mark fails, the code that rests on it is redone.',
   rest: 'Slice 3, online, still waits for the netcode proof test\'s result. Step 2.6, the previews, follows the preview hosting check as planned.',
   compare: 'The comparison against a library\'s character controller runs only if our own movement misses its marks.',
   keep: 'Steps 2.3 to 2.6 keep their order and wait for their results',
@@ -78,9 +78,13 @@ if (!process.argv.includes('--check')) {
 const want = { [SP]: 3, [A2]: 1, [DEC]: 5 + 1 }; // DECISIONS: five pointers here, one from decisions-insert.mjs (SLICE-ORDER's condition 3)
 for (const f of [DEC, SP, A2]) {
   const t = readFileSync(f, 'utf8'); const n = count(t, TAG);
-  const lines = t.split('\n'); let long = 0;
-  lines.forEach((l, i) => { if (l.includes('change-set 0 of the build plan')) for (let j = i; j < Math.min(i + 14, lines.length); j++) if (!lines[j].startsWith('>') && !lines[j].startsWith('    >') && lines[j].length > 120) long++; });
-  console.log(f, 'pointers:', n, n === want[f] ? 'ok' : `WANTED ${want[f]}`, 'lines over 120 near a pointer:', long);
-  if (n !== want[f] || long) ok = false;
+  let whole = 0, long = 0;
+  for (const e of edits.filter((x) => x.file === f)) { // every pointer stands in the file word for word, as built here
+    const text = e.add ?? e.replace; if (count(t, text) === e.n) whole += e.n;
+    long += text.split('\n').filter((l) => l.length > 120).length;
+  }
+  const mine = edits.filter((x) => x.file === f).reduce((s, x) => s + x.n, 0);
+  console.log(f, 'pointers:', n, n === want[f] ? 'ok' : `WANTED ${want[f]}`, '| word for word as built:', whole, 'of', mine, '| their lines over 120:', long);
+  if (n !== want[f] || whole !== mine || long) ok = false;
 }
 process.exit(ok ? 0 : 1);
