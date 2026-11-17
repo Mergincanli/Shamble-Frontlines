@@ -282,3 +282,8 @@ D4 checks (<= 400 lines, 120 columns, quotes, ids); D5 notes + DONE + answer (<=
   for joints + mesh node (skinned vertices follow joints), backend-independent (CPU transforms), drawing on both
   backends covered by mark 9's probe: apply, flag for the advisor (its ruling said "on both backends"). No item wrong
   against a source.
+- ML = "the minimum laptop" (0003:1083). Part 15 is a file of its own (an addition to the build plan, not in the BP
+  report): cite as "the build plan's Part 15, a file of its own (GUN-FILES)", never as "BP Part 15".
+- D3 applying now: items 1-21 + PM ids in the # column + test-engineer's loosening point + AX-R1 GUN-FILES. Room:
+  AX-F13 rewrap -1, part 6 bullet 2 to one line -1, not-read exporter bullet -1 (mirror-tools side note dropped),
+  part 8 Gap rows -2.

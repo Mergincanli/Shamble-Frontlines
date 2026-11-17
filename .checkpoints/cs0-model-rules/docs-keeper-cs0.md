@@ -27,3 +27,12 @@ B11. DONE + answer.
   "No game code before change-set 0 is on main: that stands."; 2026-11-14 decision changes SPIKE-ORDER (b) "wave 1 runs
   one heavy spike at a time" for steps 2.4, 2.5, Slice 1. 2026-11-14 block: record "by step 2.3's first docs
   change-set" -> changed by CHANGE 1 to change-set 0. Next: B2.
+- B2 DONE (STATUS.md, 120 lines; branch claude/wonderful-hamilton-jdmlnf, tree clean; HEAD 323db1b). Facts: #55
+  merged_at 2026-11-17T17:09:33Z, merge c94c81b (gh REST); #56 open draft, head claude/wonderful-hamilton-jdmlnf,
+  base c94c81b. Archive has no #55/#56 row (archive outside my 4 files: tell caller). Untrue lines: l.5 Last updated
+  (DOCS-54, main 82c605e); l.13-15 Last merged #54 -> #55; l.31 In-flight #55 row -> #56 row; l.37-39 Next item 2
+  (2.3 plan waits for go; "Wave 1: one heavy spike at a time"); l.42 Waiting "His go for #55" -> #56 + Part 15's six
+  questions; Phase l.8-12 lacks the build (2.4, 2.5, Slice 1 now); second builder chat nowhere; l.43-44 "name the
+  laptop and desktop" still true (classes named, machines before cs 6) - optional precision. Follow-ups section
+  exists (ids here, text in archive; I can't edit archive -> short text + pointer to rules file / plan report).
+  Routines: nothing his words change (leave). Next: B3.

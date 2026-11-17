@@ -12,18 +12,18 @@
 **TL;DR.**
 1. Names in lower case, digits and underscores pass Blender's exporter and three.js's loader unchanged (part 3).
 2. The rules (part 4) fix the export, axes, names, the 20 joints (`root` is a node above them) and the sockets.
-3. Ten marks, each with a planted defect, answer AS3 on paper; the rifle file can test five, a Blender export the rest.
+3. Ten marks (PM-0005-47 to -56) answer AS3; the rifle file can prove five, a real Blender export the rest (part 5).
 4. Open for Mustafa (part 7): with a gun from its own file a soldier exceeds 4 draws per pass; the fifth class's name.
 5. Nothing here was proven by an export; part 8 says what the first real export must prove.
 
 **How to read this file.** *Confirmed*: the source's own words or code, cited by line; *inferred*: my reading or
-arithmetic; *[from memory, unverified]*: no source read; *[proposal]*: a number offered for a mark, for test-engineer.
-Rules are marked *from a draft* (an ADR, SPIKE_PLAN or EDITOR_V2 line), *from a source* (specification, exporter,
-loader), *change-set 0's naming* (Mustafa: "The brief's names for colour areas and bones are working names; the names of
-your change-set 0 win.", A3) or *the engine's convention (proposed)*. The briefs' sizes, colours, poses and part lists
-are never decided here ("Everything in them is the Art lead's proposal unless a line says it is mine.", A3), nor is the
-look (Mustafa's and the Advisor's). Against the README's shape (`docs/research/README.md`:36-48), rules and marks stand
-for recommendations, options appear in parts 6 and 7, and the verifier adds its spot-check table.
+arithmetic; *[from memory, unverified]*: no source read. Numbers once marked [proposal] stand as test-engineer ruled them
+(ADR 0005, PM-0005-47 to -56). Rules are marked *from a draft* (an ADR, SPIKE_PLAN or EDITOR_V2 line), *from a source*
+(specification, exporter, loader), *change-set 0's naming* (Mustafa: "The brief's names for colour areas and bones are
+working names; the names of your change-set 0 win.", A3) or *the engine's convention (proposed)*. The briefs' sizes,
+colours, poses and part lists are never decided here ("Everything in them is the Art lead's proposal unless a line says
+it is mine.", A3), nor is the look (Mustafa's and the Advisor's). Rules and marks stand for the README's recommendations
+(`docs/research/README.md`:36-48), options are in parts 6 and 7, and the verifier adds its spot-check table.
 
 **Abbreviations.** Repository lines are this branch's on 2026-11-17. **0003**, **0005**: `docs/adr/0003-rendering.md`
 and `docs/adr/0005-content-abilities-assets.md`; **SP**: `docs/SPIKE_PLAN.md`; **r3**: `docs/research/r3-rendering.md`;
@@ -129,8 +129,7 @@ files in the repository (MODEL-PUBLIC, A3, answer 9), the joints' reasons, parts
   are only lower-cased (4952), so `JOINTS_1` arrives unused, and the skinning node reads four (SK:102-117). A skinned
   primitive with both attributes becomes a `SkinnedMesh`, otherwise a `Mesh` with "Skinning disabled." (3992-4004);
   weights are normalised at load "to fix malformed assets" (4009); joints become `Bone`s (2836, 4479-4481); a missing
-  joint warns (4186); all SkinnedMeshes of the node bind one Skeleton (4374-4378) · confirmed (the limit of four
-  inferred).
+  joint warns (4186); a node's SkinnedMeshes bind one Skeleton (4374-4378) · confirmed (the limit of four inferred).
 - **AX-F14. Several materials.** One primitive gives one mesh; several give a `Group` with one mesh per primitive, named
   from the mesh's name plus `_1`, `_2` (loader:4041-4080) · confirmed. A four-slot body arrives as four SkinnedMeshes
   sharing one Skeleton: C-B's "one per material per soldier" (r3:825).
@@ -151,8 +150,9 @@ files in the repository (MODEL-PUBLIC, A3, answer 9), the joints' reasons, parts
 ## 4. The rules
 
 ### 4.1 The file and the export
-- **AX-R1.** One model, one `.glb` file, written by Blender's built-in glTF 2.0 exporter. [from a draft: 0005:1803-1804,
-  SP:537-539; from a source: rst:881-885]
+- **AX-R1.** One model, one `.glb` file, written by Blender's built-in glTF 2.0 exporter [from a draft: 0005:1803-1804,
+  SP:537-539; from a source: rst:881-885]. Whether a script-written gun file may enter the game is asked of Mustafa in
+  the build plan's Part 15, a file of its own (GUN-FILES); until he answers, the rifle is used only to try the checks.
 - **AX-R2.** Export with AX-F7's "Rule" column: in a Blender script (the MCP route), one call, after selecting every
   object of the model: BP Part 11's rule 7 plus `filepath` and `use_selection` (what `use_selection` takes along was not
   read; `filepath` is [from memory, unverified]). [the engine's convention (proposed); option names: src `__init__.py`]
@@ -222,8 +222,8 @@ bpy.ops.export_scene.gltf(filepath=PATH, export_format='GLB', use_selection=True
   proposal) gives +Z = (-0.940, 0.342, 0) and +Y = (0.342, 0.940, 0). In Blender (Z up, muzzle -Y) a socket's direction
   is its local -Y and its up its local +Z: the four keep identity rotation, and the SMG's eject empty is turned until
   its -Y points along (-0.940, 0, 0.342) and its +Z along (0.342, 0, 0.940). The exporter's axis change is confirmed
-  for locations and inferred for rotations (AX-F11): a real export of a turned empty must read back within 0.5 degrees
-  (mark 7) before Blender files rely on it.
+  for locations and inferred for rotations (AX-F11): a real export of a turned empty must read back its whole frame,
+  forward and up, within 0.5 degrees (mark 7) before Blender files rely on it.
 - **The hands on the gun (AX-R11).** Mustafa, 2026-11-17: "The poses. Where the addition's hand points and a gun's
   sockets disagree, the sockets win: the right hand's point and the gun's direction set the pose; the left hand, the
   butt and the muzzle follow from the gun model's sockets, as the SMG brief already does." (A3, CHANGE 3). The Art
@@ -231,8 +231,8 @@ bpy.ops.export_scene.gltf(filepath=PATH, export_format='GLB', use_selection=True
   and the muzzle follow from the gun's file." (A10:5). So the right arm's chain (`upper_arm_r`, `lower_arm_r`, `hand_r`)
   reaches `socket_grip` and the left one `socket_support`. The fist, not the wrist, meets the socket: the hand's point
   lies `palm` metres beyond the hand joint on the lower arm's line, one number per soldier in the model's entry, not a
-  bone; checking it against the centre of the vertices weighted to `hand_r`, within 1 cm [proposal], is a check no mark
-  carries yet. No pose number is here: "For change-set 0 take only its rule and the socket names. The pose numbers are
+  bone; mark 10's line 7 checks it for both hands within 1 cm, once the entry holds it (ruled by test-engineer,
+  PM-0005-56). No pose number is here: "For change-set 0 take only its rule and the socket names. The pose numbers are
   for the body step (change-set 10)." (Mustafa, A9).
 - **The muzzle (AX-R11).** "The muzzle is where the flash and the tracer start. In the simulation a shot's start is
   data of its own: docs/adr/0005-content-abilities-assets.md says no shot origin is ever read from a model." (Mustafa,
@@ -265,11 +265,13 @@ bpy.ops.export_scene.gltf(filepath=PATH, export_format='GLB', use_selection=True
 
 ## 5. The checks a file passes (OQ-0005-AS3)
 Each of the ten marks has a defect of its own that a test plants and the check must catch. The main session carries
-them into ADR 0005's pass-mark table as PM-0005-47 onward, placed at change-set M, whose first step is "the proof of
-Part 11's rules on the real file, with the checks change-set 0 wrote" (BP Part 12); until a real export exists they are
-written, not run (BP Part 11). **J** is a script over the GLB (header and first chunk, AX-F6; the binary chunk for
-vertices and weights); **L** is the game's loader in a test on both backends (AX-F12 to AX-F17). The Khronos glTF
-Validator might do part of J; not read. Numbers marked [proposal] go to test-engineer's review.
+them into ADR 0005's pass-mark table as PM-0005-47 to PM-0005-56 (each row names its id), placed at change-set M, whose
+first step is "the proof of Part 11's rules on the real file, with the checks change-set 0 wrote" (BP Part 12); until
+a real export exists they are written, not run (BP Part 11). **J** is a script over the GLB (header and first chunk,
+AX-F6; the binary chunk for vertices and weights); **L** is the game's loader in a test on both backends (AX-F12 to
+AX-F17). CI's headless Chromium probably gets no WebGPU adapter (ADR 0002 part 9), so its two runs are WebGL 2, and the
+WebGPU halves of marks 8 and 9 run on the minimum laptop (ML, 0003:1083), as PM-0005-36 and PM-0003-46 do. The Khronos
+glTF Validator might do part of J; not read. Every number is test-engineer's ruling, in the row of its PM id.
 
 | # | Mark | Planted defect | Run by | Proven on |
 |---|---|---|---|---|
