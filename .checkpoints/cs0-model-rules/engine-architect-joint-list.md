@@ -156,3 +156,10 @@ SMG brief (ART_BRIEF_2026-11-15_1735_smg_stage1.md, "SB"):
 - CR:14 (Advisor's check): the rifle aim uses 96% of the arm: a cs10 risk (reach left for recoil and walk), not a joint matter.
 - Hold structure: the pose gives the gun's transform in the soldier frame; the gun can ride `chest` as in legacy (C:453) with the pose converted at its own chest turn [inferred fit; cs10's call]; legacy GA8's rail slide (CC9 rail [zMin,zMax]) becomes the single socket_support point (SB:42, CR:23).
 - Next: B8b (build plan .checkpoints/build-plan-slice-1/plan.md: cs10 row l.271-272, Part 11 rule 21, Part 12 l.1059), then B9.
+
+## B8b DONE: build plan (.checkpoints/build-plan-slice-1/plan.md, "BP")
+- BP:270-272 cs10 "Body. The procedural animation port ... steps, the reaction to strafing, the aim pose, recoil, the death fall, with legacy's animation metrics as goldens." BP:273 reviewers graphics-engineer, art-director, perf-auditor; then test-engineer.
+- BP:996-998 rule 21: "The bones are exactly the game's joint list, with no helper or IK bones in the file. Proposed list: hips, spine, chest, head, upper_arm_l, lower_arm_l, hand_l, upper_arm_r, lower_arm_r, hand_r, upper_leg_l, lower_leg_l, foot_l, upper_leg_r, lower_leg_r, foot_r." (16; no root; no coat joints).
+- BP:1020 rows 19-20: rigid weights, one bone per part, is the baseline (R3-CHAR-REC1); an unweighted vertex gets a stray extra joint. BP:1021 row 21: seed = what legacy drives (GA2, GA7, GA8). BP:1059 "The skin, bound to the same joints the code-built soldier uses, so the animation of change-set 10 drives both."
+- Decision for the ruling: keep rule 21's 16 names exactly (hips, not legacy pelvis: fewer renames across docs; cs10 maps legacy names) + 4 coat joints = 20; no root joint (disagree with GD AX-R10, reasons in section 2); palm as entry data (rule 21: no helper bones).
+- Next: B9 write joint-list.md in blocks: B9a header + s1; B9b s2; B9c s3; B9d s4; B9e s5-s7.

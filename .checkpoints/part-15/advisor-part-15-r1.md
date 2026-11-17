@@ -10,3 +10,4 @@ B6. Checks 1-10 -> findings with severity, draft line, evidence, fix.
 B7. Answer (<=40 lines), then DONE.
 
 ## Notes
+- B1 done (draft read, 210 lines). Leads to check: quotes at L9-12 and L19-21; "51 hours" L26; "188 to 199 hours" L46; lane 1 list L51-55 misses packages/e2e?, tools/, most of docs/, interface file's folder, plain-tracer folder after CS5; hit marker split L39 vs L69; camera L53 vs L66; 15.4 L104-105 gives gate/CI to lane 1 (Fable 5.2 main) vs his 2026-11-12 "gate and CI work stays with Opus 5.5" (L106 implies they hold only for lane 2); L91 "plain merge of main" vs CLAUDE.md Never (merge counts as switching; only --ff-only allowed); L126 three.js 0.187 "would pin"; L187 sixth package = ADR 0002 change (his); VFX-ROUTE (a) may publish private code into a public repo (check visibility); L154 pointer text "export folder ... played by event name" vs L127 "no exported folder ... names are proposals"; GUN-FILES vs his 2026-11-14 words. Next: B2.
