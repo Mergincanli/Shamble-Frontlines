@@ -7,8 +7,8 @@
   #53 the kept-logs rule and PR #52 the docs pass; Mustafa's KL-MERGE (a), 2026-11-15 20:50). Take main in again when main changes code, CI or rules, and once before PR #40 is
   marked ready (MAIN-52, 2026-11-14). Main is now c94c81b (PR #55, DOCS-54, merged 2026-11-17 17:09:32 UTC: five
   files under docs/ only, so not taken in by MAIN-52; at the next take-in, Open findings "From DOCS-54" applies)
-- **Last update:** 2026-11-17 17:24 UTC (DOCS-54 DONE: PR #55 merged at c94c81b on his go "merge #55", main's CI
-  green, his go recorded at history.md:2228-2232; U4f's brief rev 3 RUNNING, workflow wf_e78b24a2-736: the block
+- **Last update:** 2026-11-17 19:00 UTC (U4f's brief rev 3.1 DONE, both checks answered; D2 read; round 2 and an
+  independent D4 model RUNNING, workflow wf_997ea01f-b4f, while the main session writes its own D4 model: the block
   "NOW (2026-11-16)")
 
 ## Resume card (read this first; open the rest only when a step needs it)
@@ -400,21 +400,40 @@ it asks nothing; REFS-KIT stays.
   triggered:** #55 changed five files under docs/ only (DECISIONS, REPO_MAP, ROADMAP, STATUS, STATUS_ARCHIVE; no
   code, CI or rules by history.md:2084-2085's list), so main is not taken in now; the line written here before ("take
   main in") was wrong and is corrected. At the next take-in, Open findings "From DOCS-54" applies.
-  **U4f's brief rev 3: RUNNING from 17:23 UTC, workflow wf_e78b24a2-736** (task wmf27fxdc; script
-  npt-u4f-brief-r3-wf_e78b24a2-736.js under the session's workflows/scripts/; the night's rev 2 at 34a2e55, cites at
-  11fd190): Draft (general-purpose acting as netcode-architect, xhigh: u4f-brief.md in the notes folder, notes
-  u4f-brief-r3-notes.md), Check (test-engineer and security-auditor in parallel, xhigh, read only:
-  u4f-brief-r3-check-te.md and u4f-brief-r3-check-sa.md; scratch scripts under u4f-r3/), one Revise (rev 3.1). The
-  brief folds his words since the night plan by placeholder (history.md:2131-2232), his 13:35 rule (:2125 a new or
-  changed bar comes to him under Decisions needed before it is built; :2127 the reviewer's read), the command-forms
-  rule (:2187), KEPT-LOGS §11, C62H-BOUND and U3C-HELD-1 as merged, and the deferred Lows (U4f takes one only where it
-  opens that file). Agents build and run nothing; at most two run at once. **If cut:** `Workflow({scriptPath,
-  resumeFromRunId: "wf_e78b24a2-736"})`; each agent continues after its notes' last complete block. **On return:** read
-  the change list, every finding rated Medium or higher, the open questions and the bar changes in full (USAGE-SAVINGS
-  (a)); then the D-items that must run before the advisor; then the advisor's check of the brief with U4F-Q1-Q16 (its
-  own workflow, as U4r's wf_95beab47-c57); any new or changed bar goes to him under Decisions needed. The 2-hour
-  check-in trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (next 18:34 UTC). The saver **bry6ih3zs** from 17:25 UTC (stop it
-  by TaskStop when no agent runs).
+  **U4f's brief rev 3 and 3.1: DONE** (workflow wf_e78b24a2-736, 17:23-18:51 UTC; 4 agents, none failed; script
+  npt-u4f-brief-r3-wf_e78b24a2-736.js under the session's workflows/scripts/). The four results saved word for word by
+  u4f-r3/r3_results_full.py (u4f-r3/draft-r3-full.md e0ef8acb…, check-te-r3-full.json 52e516a7…, check-sa-r3-full.json
+  db8f3b33…, revise-r3-full.md aa4c6169…), all read in full, and the whole of rev 3.1 read in full (USAGE-SAVINGS (a)).
+  Rev 3 at e1508bc (1,407 lines, efedb237…); both checks FAIL: the test-engineer's 2 High (TE3-1: -20 cannot pass at P3
+  with the bots' "only when the newest moved" rule, about 20 % of P3's ticks with no stamped command; TE3-2: -21's
+  forged check fails for kinds 3 and 7 as worded), 7 Medium, 6 Low; the security-auditor's 1 High (SA3-1: option A has
+  no lower bound on a stamp, so a fresh slot or an idle client banks commands and runs 8 a tick), 2 Medium, 5 Low. Rev
+  3.1 at 9f76a02 (u4f-brief.md, 1,624 lines, sha256 738dc680…): all 23 answered (22 done; SA3-2 in part, its twin
+  variant rejected on sim/src/world.rs:1979, :1995-2009, the state hash carrying each command's sequence): contiguous
+  stamps under the controller (U4F-Q7 (iii)), per-kind forging and "rejected and counted" rules, the join anchor and
+  new **U4F-Q18** (option A's past window W = CMD_CATCHUP), the lab tests' scale rule, the build phase in the disk
+  budget, packing only u4r-P3 (a U4f set's own folder only after his yes to KL-U4F). Now: tests +107 / +122, 63
+  negative cases, 18 questions, 50 recheck rows, 15 pre-runs, planned size about 4,750 lines (stop past 6,000). Bars
+  for him: **B3, the lead bound's value (400 ms = 12 ticks), recommended for his yes** (LEAD-BOUND, draft in the
+  brief's section 12 item 6; after the advisor's ruling on U4F-Q8, in c62hb-paste's form); B5-B7 only if a ruling picks
+  them; **KL-U4F** only if D2 shows the room short after the launch pack and part-cleans. **D2 read** at 18:54 UTC:
+  `df -BM` 5,468 MiB free (1,372 above the floor); runs/: u4r-P3-0f066338dd8d 519, u4r-P3-d66e23cd78f2 298,
+  u4r-P3-fd4612050cd6 291, u4r-P2-8ee453c22882 741, u4r-P2-fc411116c1f1 623, u4r-P0-051995db9cea 3,249,
+  u4r-P0-93509dfd7fd1 3,393, c-u2 x2 998 each; .gate/shared-target 6,346; the main folder's target 776 (MiB). So
+  KL-U4F is not sent now: whether the room is short is known only after the launch pack (about 380 back) and the shared
+  target's part-clean (unmeasured; the last dev part-clean gave back 6,125 MiB).
+  **Round 2 and D4b: RUNNING from 18:58 UTC, workflow wf_997ea01f-b4f** (task w51fogoyl; script
+  npt-u4f-r31-round2-d4b-wf_997ea01f-b4f.js): the test-engineer and the security-auditor re-check what rev 3 to 3.1
+  changed (notes u4f-brief-r31-check-te.md, u4f-brief-r31-check-sa.md; the review budget's round 2), and a
+  netcode-architect writes and runs an independent second D4 model (u4f-r3/d4b/), all xhigh, read only, three at
+  once. Meanwhile the main session writes its own D4 model (u4f-r3/d4/d4_model.py, read only, its output saved), to
+  be compared with d4b's. **If cut:** `Workflow({scriptPath, resumeFromRunId: "wf_997ea01f-b4f"})`; each agent
+  continues after its notes' last complete block. **On return:** save the three results word for word (a script like
+  u4f-r3/r3_results_full.py); read every Medium or higher in full; compare the two D4 models (any difference above
+  0.1 ms in a p99 explained before the advisor); a fix pass if round 2 leaves a Medium or higher; then the advisor's
+  check with U4F-Q1-Q18 (its own workflow, as U4r's wf_95beab47-c57), with D2's and D4's figures; then B3 (and
+  KL-U4F if needed) to him under Decisions needed. The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (next
+  20:34 UTC). The saver **b7nfcyliw** from 18:58 UTC (stop it by TaskStop when no agent runs).
   **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
