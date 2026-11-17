@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 22:16 Amsterdam (21:16 UTC)
+- **Last update:** 2026-11-17 23:19 Amsterdam (22:19 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -583,6 +583,20 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    `close`, all on a new list; meanwhile the next step prepared (a verify method for account tokens in Cloudflare's API
    reference, a by-hand check that needs his yes; or a user token, a plan departure); on green, step 2.6 notes that
    "Edit only" does not hold in the new form.
+
+12. 2026-11-17 22:15:05 UTC (called; transcript time), moments 2 and 4 (the same failure after the Read test) · Q:
+   the next step? · Changed: no more fixing by trial; the next step is the measurement (the drafted check), not a user
+   token (it would explain nothing; why the account token fails is a finding for step 2.6); the record says "ruled out
+   if Read was saved"; the check made decisive before he sees it (a call to the same project path Wrangler fails on,
+   printing only success, errors and the project name; his yes/no on whether the Account ID he copies matches the
+   dashboard's address bar, once a source shows the address bar holds it; outcome → next action for every result, no
+   row ending in "look further"; its error paths tested locally: a null result, a non-JSON body, a trailing newline);
+   where it runs: GitHub's docs on a by-hand start from a non-default branch first, else a pull_request trigger on its
+   own branch with the fork guard, never on `setup`; the order: trigger, then the security-auditor's review, then his
+   yes on the reviewed hash, covering the branch, the pull request, its one approval and its close; to him now: no more
+   re-runs until the check, and an offer to stop tonight (nothing runs; the token holds until the 27th); not blocking:
+   how he turned debug logging on (a repository secret or variable would break the empty-secrets condition); whether
+   Read stays: decided after the cause is known.
 
 ## Running work
 - saver boyrmgcz1 (started 2026-11-16 08:49:17 UTC): stopped by itself at 10:39:17 UTC ("time is up", 110 minutes;
