@@ -44,10 +44,11 @@ and 2026-11-17) and, byte for byte with the Art lead's texts, in the appendix
    on my personal account."). "Every file has one owner: the first builder chat's plan says which change-sets and
    folders belong to the second chat, and neither chat edits the other's files." That is **Part 15, "The second lane"**:
    it was sent to him as a file on 2026-11-17 at 20:46 UTC (revision 2, approved by the advisor agent at 20:39 UTC, with
-   six questions for him). It is not in this report: it goes to main once he has answered it. His proposal for it: the
-   second chat takes the preview hosting check and step 2.6, the carry of his look decisions into `docs/LOOK_V2.md`, the
-   comparisons that stay (Part 3.2), and from change-set 6 on the picture track (6 Look, 10 Body, 11 Feel, and M); this
-   chat keeps 0 to 5, 7 Lag, 8 Shoot, 9 Throw and 12.
+   six questions for him). It is not in this report: it goes to main once he has answered it. _Pointer (2026-11-17): it
+   is on main with his answers: `2026-11-17-build-plan-slice-1-part-15.md`._ His proposal for it: the second chat takes
+   the preview hosting check and step 2.6, the carry of his look decisions into `docs/LOOK_V2.md`, the comparisons that
+   stay (Part 3.2), and from change-set 6 on the picture track (6 Look, 10 Body, 11 Feel, and M); this chat keeps 0 to
+   5, 7 Lag, 8 Shoot, 9 Throw and 12.
 3. **The soldier and the guns follow the Art lead's briefs** (appendix A4 to A6, and the correction, A10).
    "Everything in them is the Art lead's proposal unless a line says it is mine."
    - "The soldier brief replaces the sturdier sizes you typed into your notes on 2026-11-14 at 15:18 UTC." So Part 4's
@@ -105,7 +106,9 @@ and 2026-11-17) and, byte for byte with the Art lead's texts, in the appendix
   the two sets of line widths. **Change-set 11** is weighed again in Part 15 (Shamble VFX).
 - **The comparisons** (Part 3.2): all run but the character-controller one, which runs only if our own movement
   misses its marks.
-- **Who builds what** follows Part 15 once he has answered it. Until then nothing but change-set 0 is built.
+- **Who builds what** follows Part 15 once he has answered it. Until then nothing but change-set 0 is built. _Pointer
+  (2026-11-17): he has answered it (LANE-SPLIT (a)). Who builds what now follows Part 15, and "one pull request at a
+  time" in the plan below (its "In one screen") reads one at a time per lane._
 - **The plan's notes.** The plan cites working notes under `.checkpoints/build-plan-slice-1/`. They are deleted with
   this change-set, as `.claude/CHECKPOINTS.md` says; what a later reader needs is here or in the appendix, and the
   notes stay readable in the branch's history at the last commit before the deletion (named in this change-set's

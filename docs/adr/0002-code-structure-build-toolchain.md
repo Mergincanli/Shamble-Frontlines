@@ -199,6 +199,11 @@ built from the tested artifact. Each part says what, why, its research ids and t
    transport interface, WebTransport and WebSocket, which R2-TRN-REC4 puts in TypeScript), `types` (generated types, part 5) and `e2e`
    (Playwright tests). The lobby gets a crate when ADR 0006 decides where it runs (OQ-0006-3: inside the supervisor's
    binary or as its own service); until then no lobby crate is created.
+   _Pointer (2026-11-17, Part 15 of the build plan to main): by Mustafa's answer VFX-ROUTE (a) of 2026-11-17
+   (`docs/DECISIONS.md`, the entry of 22:10:34 UTC) a seventh package joins these six: "a copy in a package here, pinned
+   to a commit of the VFX repository and re-copied by a script. This is also my word on a seventh package beside the six
+   the structure draft names." And: "Nobody edits the copy by hand." Where it stands in this list is for the draft's
+   next revision._
    The rules, each a gate check (G5, G8, part 9): `sim` depends on `content` only, with no transport, no async runtime
    and no clock, checked with cargo-deny's `deny` plus `wrappers` and with `cargo tree`; `room` and `client-endpoint`
    build for `wasm32-unknown-unknown` and natively, with no async runtime, no transport crate and no wasm-bindgen (the
