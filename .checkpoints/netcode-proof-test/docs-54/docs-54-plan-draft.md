@@ -2,6 +2,38 @@
 Branch `claude/docs-after-54` from origin/main 82c605e, in a worktree; his DOCS-54 (a) (history.md:2204-2227).
 Docs only, risk tier 1 (it records his words): `needs-mustafa`, his go to merge. No kit, gate, CI, spike or code file.
 
+## As approved (the main session, 2026-11-17 11:14 UTC)
+The advisor's plan review (wf_11d3eb2e-5f0; docs-54/advisor-plan-review-full.json, 136 lines, 78f6b5a5…, read in full):
+**APPROVE WITH CONDITIONS C1-C9** on this draft's first text (sha256 2d3bb7a9…). The conditions' own words govern
+wherever this plan says otherwise; in short:
+- C1: only his typed text goes inside "> " (for :2205, :2200 and :2190 the quoted substring behind an asserted prefix);
+  the assistant's text stays outside, labelled; the script prints its in/out table for the verifier.
+- C2: the transcript is the primary source, copied byte for byte (E6's trailing space kept, history.md:2151's one
+  difference named in the hash table); the transform and its inverse check are exact; E3 keeps its three-space indent
+  and equals origin/main NIGHT_SHIFT.md:45-47 (4e3d1565…).
+- C3: the STATUS clash with PR #40's :28 edit is named, checked by `git merge-tree --write-tree` before ready, and its
+  resolution put on #40's card; R4's line numbers corrected (archive :109-110, :292-293, after :988, :1043, after
+  :1201; DECISIONS :896-897).
+- C4: E10 (his #52 go) is copied from 4460ef5's message only, and its header says it was not checked against that
+  chat's record.
+- C5: a sweep of his typed messages from 2026-11-14 09:02 UTC classifies each as main, lane or operational, and adds
+  his "go" of 2026-11-15 18:42:53Z (transcript line 42437; #53's kit write) as its own entry, the ask labelled as the
+  session's text.
+- C6: each copied run is its own "> " block; each cut is named in place, outside any quote, and in the header.
+- C7: headers name the transcript message id and stamp, session_0173vVo6igCNyQYBWPvhH36A, history.md's lines at
+  110c303 as the copy checked, and his own time label; the build commit carries the hash table and history.md's blob
+  id at 110c303.
+- C8: the KIT-FREEZE-2 pointers cite E4 and E3 for #54 and E7 for #53; the Queued pointer for the kit's next change
+  covers NS-TRAILER and NS-FIRST (E1) and SA-KL-1 to -4 and KLT-1 to -8 (E5); #54's follow-ups were deferred in writing
+  by the session; nothing claims DECISIONS.md is complete to date.
+- C9: agents' model and effort named (opus, high, passed explicitly); the 3-agent cap shared with the netcode lane;
+  each asking call named in the chat before it is sent (`git worktree add`, the first push, the PR and its label, the
+  NODE_PATH gate); the ROADMAP fold after :84; this fold, then the plan's new sha256, before the copy script is written.
+- Rulings: his "I agree with all your recommendations" answers DOCS-54 as posed at 08:54:58 (history.md:2215,
+  repeated :2223); the branch name and the method are the session's proposal (shown 07:33:20 and 07:39:46), never
+  quoted as his; Q1 history.md:2039-2086 stays with PR #40; Q2 STATUS :28 left as it is; Q3 the PR description only;
+  Q4 REPO_MAP :80 in scope; partial copies, cuts shown in place.
+
 ## 0. What his word covers (read this first)
 - His words (history.md:2205): "I agree with all your recommendations, continue". DOCS-54 as last posed to him
   (:2215): "may this chat open one docs-only branch and pull request to update main's dashboard and decision record for
