@@ -1,0 +1,102 @@
+{
+  "verdict": "APPROVE",
+  "head_sha": "20048a53aca06e17c630f1f570854363623cfae1",
+  "conditions_met": [
+    {
+      "id": "C1",
+      "met": true,
+      "evidence": "Met in substance. The literal 'wait for its last line' was not met: the output ends '[killed]'. But checkpoint.mjs:192-200 shows that the commit subject 'autosave (terminated)' only comes from the SIGTERM handler's save. The reflogs show that 3c65d14 was committed at 07:28:05 (HEAD reflog), that origin/claude/netcode-proof-test-plan-hcky5g was 'update by push' to 3c65d14 at 07:28:23 (`git log -g --date=iso origin/...`), and that the next HEAD move is the merge at 07:28:47, whose first parent is 3c65d14. No other saver commit came in between. C1 existed so that the last save had finished and been pushed before the pre-checks, and git proves that it had. Re-run on 3c65d14: `git merge-base 3c65d14 82c605e` = 53272a1; `git diff --stat 53272a1 82c605e` = `.claude/NIGHT_SHIFT.md | 3 +++` only; (6) exit 0; (7) exit 0; (8) the three-dot protected list is empty. (1) clean tree and (2) HEAD = origin rest on the record, and are consistent with the reflog."
+    },
+    {
+      "id": "C2",
+      "met": true,
+      "evidence": "HEAD reflog: 3f2fa21 'merge origin/main: Merge made by the 'ort' strategy.' at 07:28:47. `git diff --stat 3f2fa21^1 3f2fa21` = `.claude/NIGHT_SHIFT.md | 3 +++`, 1 file. No conflict, and nothing else changed. 'No prompt' is in the chat, not in git: the record says so (card 20048a5:248-249)."
+    },
+    {
+      "id": "C3",
+      "met": true,
+      "evidence": "`git cat-file -p 3f2fa21`: parents 3c65d14702bc… and 82c605e2e8a7…, and git's own message 'Merge remote-tracking branch 'origin/main' into claude/netcode-proof-test-plan-hcky5g'. The patch-ids show an exact union: 53272a1..3c65d14 = 82c605e..3f2fa21 = 41b3c456…, and 53272a1..82c605e = 3c65d14..3f2fa21 = 2867deb1…. Kit equality (`git diff --quiet origin/main 20048a5 -- .claude .github CLAUDE.md tools/gate.mjs …`) exits 0, and so does the extra glob list (shrinkwrap, **/CLAUDE.md, AGENTS.md, .npmrc, .mcp.json). `git log -1 --format=%B 20048a5` carries MAIN-52: his words at history.md:2055-2057 (checked: the sentence is at :2056-2057) and the reading at :2082-2086 (checked). It also names merge base 53272a1, says no conflict, nothing else changed, and why the merge keeps git's message. Both attribution lines are there, with no [skip ci]. The chat's one line is not visible to me."
+    },
+    {
+      "id": "C4",
+      "met": true,
+      "evidence": "I checked every line of .gate/main-54/light.log against the bar. Header: HEAD 3f2fa21; diff and untracked are both e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; free 4951 MiB (at least 4096). 'refs 1350 tracked files: none outside spikes/ references it (§4.9's one exception: the KEPT-LOGS kit files may name its results folder)'. marks matches exactly. 'self 78 of 78 tests passed'. 'redact 10 of 10 tests passed; redact-check: 305 item(s) checked, 0 finding(s)'. 'check: all 4 steps pass'. '=== exit 0', then '--- end 07:30:36 UTC, exit 0', which is main-run.sh's own exit code (main-run.sh:86-88). The provenance section is empty, as expected: check.mjs:2633 runs `cargo run -q` with its output captured. N and M are right: `git ls-tree -r 3f2fa21` gives 1350 files, 305 of them under spikes/netcode-proof. main54_counts.py is read-only. The spike folder's ignored status is empty now."
+    },
+    {
+      "id": "C5",
+      "met": true,
+      "evidence": ".gate/main-54/gate.log shows GATE PASS on HEAD 3f2fa21: base 82c605e, symbols +0 -0, 5a skipped (--no-smoke), 5b-5d PASS. repo-map-check gives 'repo map OK: 131 entries cover 110 required paths'. The header says it was saved by the Write tool, and the gate's 'base merge-base = 82c605e' proves it ran after the merge (07:28:47-07:29:45)."
+    },
+    {
+      "id": "C6",
+      "met": true,
+      "evidence": "(1) 20048a5 has no [skip ci], and origin's reflog shows the push at 07:31:33. (2) CI is green on 20048a5 (below). Both gate runs have a gate job and a smoke job, both success, and the toolchain job is success. (3) The Base line (card 20048a5:6-7) reads 'main, last merged in at 3f2fa21 (main 82c605e, PR #54; MAIN-52)', which is C6.3's words, followed by the earlier history. (4) Saver b2f2ov1so started at 07:31:41 (card e6925c1:268), before this check (about 07:33). Its command form cannot be seen in git, so I could not check it."
+    },
+    {
+      "id": "C7",
+      "met": true,
+      "evidence": "main-54-plan.md: the 'As approved' section is at :3-10. His words are cited at :2055-2057, with the reading at :2082-2086 (:13-15). The stale facts are fixed: HEAD 2a32497 and saver beoc3blfv (:26-27). The tier line says no security-auditor run is needed, and why (:68-71). ADV-M54-8 is recorded as a kit follow-up (:77-80). The working tree equals 20048a5 for this file."
+    },
+    {
+      "id": "LATER-COMMITS",
+      "met": true,
+      "evidence": "Four commits came after 20048a5: a62d64a, ad971ac, e6925c1 and 0b6de87 (07:32:37-07:35:34, all [skip ci]). `git diff --name-only 20048a5 0b6de87` lists only .checkpoints/ paths (the card and these notes)."
+    },
+    {
+      "id": "SPIKE-TREE",
+      "met": true,
+      "evidence": "`git diff --quiet ddd38ba 20048a5 -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results'` exits 0. `git diff --stat 3f2fa21 20048a5` lists only .checkpoints/netcode-proof-test.md (+14 -3) and main54_counts.py (+18, new)."
+    }
+  ],
+  "ci": [
+    {
+      "run_id": "44039377701",
+      "name": "gate (jobs: gate success, smoke success)",
+      "event": "push",
+      "conclusion": "success"
+    },
+    {
+      "run_id": "44039383909",
+      "name": "gate (jobs: gate success, smoke success)",
+      "event": "pull_request",
+      "conclusion": "success"
+    },
+    {
+      "run_id": "44039377819",
+      "name": "toolchain (job toolchain success)",
+      "event": "push",
+      "conclusion": "success"
+    },
+    {
+      "run_id": "44039383884",
+      "name": "toolchain (job toolchain success)",
+      "event": "pull_request",
+      "conclusion": "success"
+    }
+  ],
+  "findings": [
+    {
+      "id": "ADV-M54H-1",
+      "severity": "Low",
+      "where": ".checkpoints/netcode-proof-test.md:9-10 at 20048a5, unchanged at e6925c1",
+      "what": "The card's 'Last update' line still reads '2026-11-17 07:06 UTC … next MAIN-52, this branch takes main 82c605e in'. The merge was made and pushed at 07:28-07:31, so the line is wrong for a reader resuming from the top.",
+      "fix": "Update the line in the next card save (no push of its own)."
+    },
+    {
+      "id": "ADV-M54H-2",
+      "severity": "Low",
+      "where": ".checkpoints/netcode-proof-test.md:247-248 at 20048a5 (the MAIN-54 BUILT block)",
+      "what": "The block says only 'C1 the saver stopped (its last save 3c65d14, pushed)'. It does not say that the saver's last line never came ('[killed]'), or how the finished save was proven instead. The later Saver line (card e6925c1:268-270) gives the '[killed]' fact, but not the proof: the commit at 07:28:05, the push at 07:28:23 and the merge at 07:28:47.",
+      "fix": "Add one line in the next card save: C1's last-line wait was replaced by the reflog proof (`git log -g --date=iso` of HEAD and origin/<branch>). Take that proof as the stand-in whenever a stopped saver's output ends without its last line."
+    },
+    {
+      "id": "ADV-M54H-3",
+      "severity": "Low",
+      "where": "PR #40 get_check_runs on head e6925c1: total_count 0; 0b6de87 is now newer",
+      "what": "PR #40's head has moved past 20048a5 on [skip ci] checkpoint saves, so the PR page shows no check runs. CI's green belongs to 20048a5, and the later commits change only .checkpoints/. A record that says 'CI green on the PR head' without the SHA would mislead, and the head that is finally marked ready needs its own CI run.",
+      "fix": "Record CI as 'green on 20048a5' (runs 44039377701, 44039383909, 44039377819, 44039383884). Before PR #40 is marked ready, make sure its last head runs CI."
+    }
+  ],
+  "to_mustafa": "The netcode branch now includes main's three new night-shift lines (#54) exactly as they are on main, and nothing else changed: the merge's checks, the gate and all four CI runs (gate, smoke, toolchain) passed on head 20048a5. There is nothing for you to check or approve for this step; the only open question is still DOCS-54 (a small separate docs pull request to update main's status pages for #52-#54), and I still recommend yes.",
+  "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-main-54-head.md"
+}

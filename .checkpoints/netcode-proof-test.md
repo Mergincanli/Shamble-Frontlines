@@ -6,8 +6,9 @@
   **Base:** main, last merged in at 3f2fa21 (main 82c605e, PR #54; MAIN-52); before that at 2bd44a5 (main 53272a1, PR
   #53 the kept-logs rule and PR #52 the docs pass; Mustafa's KL-MERGE (a), 2026-11-15 20:50). Take main in again when main changes code, CI or rules, and once before PR #40 is
   marked ready (MAIN-52, 2026-11-14)
-- **Last update:** 2026-11-17 07:06 UTC (PR #54 merged at 82c605e on his go; C62H-BOUND's report with him since
-  03:14:03 UTC; waiting for his answers; next MAIN-52, this branch takes main 82c605e in: the block "NOW (2026-11-16)")
+- **Last update:** 2026-11-17 07:38 UTC (PR #54 merged at 82c605e on his go; MAIN-54 done: main taken in at 3f2fa21,
+  head 20048a5, the advisor APPROVE, CI green on 20048a5; waiting for his answers (DOCS-54, C62HB-Q4, NS-TRAILER,
+  NS-FIRST) and his /compact: the block "NOW (2026-11-16)")
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **NOW (2026-11-16, the day session; read this first after a compact or a cut).** Mustafa typed /compact about 09:00
@@ -257,9 +258,16 @@ it asks nothing; REFS-KIT stays.
   pass bar holds, every line. **C6: pushed at 07:31:33 UTC with the card: head
   20048a53aca06e17c630f1f570854363623cfae1** (its message carries the MAIN-52 record and both attribution lines, no
   [skip ci]; CI started: gate 44039377701 push and 44039383909 pull_request, toolchain 44039377819 and 44039383884);
-  the saver restarted (b2f2ov1so). **RUNNING from about 07:33 UTC: the advisor's check of head 20048a5** (workflow
-  wf_910a6598-efe, task wa6b2w8hc; notes advisor-main-54-head.md; it reads CI's conclusions itself). On return: save
-  the result word for word, read it in full; then DOCS-54 and the next work wait as the card says.
+  the saver restarted (b2f2ov1so). **The advisor's check of head 20048a5: APPROVE** (wf_910a6598-efe,
+  07:33-07:38 UTC; saved word for word by advisor_main_54_head_full.py: advisor-main-54-head-full.json, 102 lines,
+  de913235…, read in full; notes advisor-main-54-head.md): C1-C7 met; **CI green on 20048a5** (gate 44039377701 push
+  and 44039383909 pull_request, each with its gate and smoke jobs; toolchain 44039377819 and 44039383884: all
+  success); the later commits change only .checkpoints/. Three Lows, taken into this save (no push of their own):
+  ADV-M54H-1 the Last update line (done); ADV-M54H-2: C1's wait for the saver's last line was met by the reflog
+  instead (the commit 3c65d14 at 07:28:05, its push at 07:28:23, the merge at 07:28:47; `git log -g --date=iso` of
+  HEAD and origin/<branch>), and that proof stands in whenever a stopped saver's output ends without its last line;
+  ADV-M54H-3: CI is green on 20048a5, not on the later checkpoint-only heads ([skip ci]), and PR #40's last head
+  before ready runs CI (CHECKPOINTS.md §9). **MAIN-54 DONE.**
   **COMPACT-WAIT: /compact asked at about 07:33 UTC** (chat 414,906 tokens, about 41 % of 1M, chat_size.py at
   07:32:46; the card refreshed first, a62d64a); the one-time reminder is set for 20 minutes after the ask. If he has
   not typed /compact by then: refresh the card and carry on (his COMPACT-WAIT words, history.md:2052-2054).
