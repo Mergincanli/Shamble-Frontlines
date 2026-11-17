@@ -2,7 +2,9 @@
 
 _Made by `decisions-insert.mjs` (change-set 0) from the files that were copied by script from the build chat's
 transcript (session_019YNMUV9LFhASseJ9EP12kL) and from his attachments. Nothing inside a fence was retyped. Under
-each block stand its sha256 and its size, counted without the file's last line end. Everything in A4 to A7 and A10 is the Art lead's proposal unless a
+each block stand its sha256 and its size, counted without the file's last line end. The repository stores LF line
+ends only (`.gitattributes`): a text that arrived with Windows line ends (CR LF) stands here with LF line ends,
+and the line under its block also gives the size and sha256 of the file as it was attached. Everything in A4 to A7 and A10 is the Art lead's proposal unless a
 line of Mustafa's says otherwise (his words of 2026-11-17, A3, CHANGE 3)._
 
 ## A1. His message of 2026-11-14, 13:58:05 UTC: the build plan's task, with his decision of that day
@@ -36,7 +38,7 @@ What this block covers: the plan. It covers no build and no merge. My decision a
 
 End with: the plan's path, a one-screen summary in plain words, the table of change-sets with what I see after each and your estimates, the decisions you need from me, and how full this chat is. Then stop for my go.
 ````
-sha256 of the block: `cbe41d9e2bd7ec1f65468f94ff6f6f4e9cc9c07a955304940665afc2c18a1c9c` (7538 bytes)
+sha256 of the block: `cbe41d9e2bd7ec1f65468f94ff6f6f4e9cc9c07a955304940665afc2c18a1c9c` (7538 bytes).
 
 ## A2. His addition of 2026-11-14, 14:12:13 UTC (his label: 15:03)
 ````text
@@ -53,7 +55,7 @@ Add to the plan:
 12. The change-set in which the first Blender model replaces the stand-in. The spike plan places the asset spike "before the first authored model enters the game". Treat it as the tests named in my decision: say which of its pass marks (PM-0005-38 to PM-0005-44) are measured on the real game at that change-set and which later, with none dropped or loosened.
 13. In your list of decisions for me: whether a committed model may be public (OQ-0006-18), with options and your recommendation. No model file is committed before I have answered it.
 ````
-sha256 of the block: `be95e64501c5c96d5ccb2594636e43ad8c251677d16e31e7059cf898c1eef00d` (2340 bytes)
+sha256 of the block: `be95e64501c5c96d5ccb2594636e43ad8c251677d16e31e7059cf898c1eef00d` (2340 bytes).
 
 ## A3. His message of 2026-11-17, 19:10:44 UTC (his label: 20:10): his go, his answers, four changes
 ````text
@@ -110,7 +112,7 @@ A third Claude Code chat has built Shamble VFX, my effects editor, in its own re
 
 End each change-set as your plan says. In every report, write about your own process only what a record shows, with its time.
 ````
-sha256 of the block: `dbc486cafd1a356896115842be683a4cecccf51e15ecd9cbb0d9229e52bc856f` (10544 bytes)
+sha256 of the block: `dbc486cafd1a356896115842be683a4cecccf51e15ecd9cbb0d9229e52bc856f` (10544 bytes).
 
 ## A4. The Art lead's brief as he attached it on 2026-11-17: ART_BRIEF_2026-11-14_1635_conscript_stand_in.md
 ````text
@@ -188,7 +190,7 @@ DO NOT
 IF THIS IS BUILT IN BLENDER LATER
 Z up, the soldier faces -Y, his left is +X, so (L, F, U) is (X, -Y, Z). Parent all parts to one empty at the origin, apply scale, one object per part, four materials with the working names. Game camera: vertical field of view 15 degrees, at (23.50, -23.50, 24.44), aimed at (0, 0, 0.9), 1920 by 1080. No export until the export settings are decided.
 ````
-sha256 of the block: `455a3f5a368aefaff504705ce8149a4099fe8a2d22795a1c2a809d9b8de17d8c` (7803 bytes)
+sha256 of the block: `cea9998e79aac473950561e06c3f2a3c6f73602c557cf54fc35da78707420bb1` (7731 bytes). As attached, with CR LF line ends: `455a3f5a368aefaff504705ce8149a4099fe8a2d22795a1c2a809d9b8de17d8c` (7803 bytes).
 
 ## A5. The Art lead's brief as he attached it on 2026-11-17: ART_BRIEF_ADDITION_2026-11-15_poses_yard.md. Its section A1 is replaced by A10
 ````text
@@ -228,7 +230,7 @@ A little more than two flat colours:
 - a worn strip about 0.25 m wide runs along the street's edge in a tone between the two: #B0B194;
 - no black line on the ground.
 ````
-sha256 of the block: `0ffe3f1989124a1798a643d6d837b3511c9417628bb9ab2299ff4644baf2d887` (3499 bytes)
+sha256 of the block: `0ffe3f1989124a1798a643d6d837b3511c9417628bb9ab2299ff4644baf2d887` (3499 bytes).
 
 ## A6. The Art lead's brief as he attached it on 2026-11-17: ART_BRIEF_2026-11-15_1735_smg_stage1.md. Its section "How the Conscript holds it" is replaced, and its socket names and magazine corrected, by A10
 ````text
@@ -290,7 +292,7 @@ The Art lead answers "pass" or a numbered list of fixes.
 DO NOT
 No holes in the jacket, no textures, no second colour, no bevels or smoothing, no parts that are not listed, before the check passes.
 ````
-sha256 of the block: `dec3c832abdf9bacba99990d18a9bcdffc3da2e1e30718ac83eebdffbfe89c23` (5744 bytes)
+sha256 of the block: `8355194d13fa08ec8eba1d52b4d9f24108ed004645a585c9f6c3add9c5feff62` (5688 bytes). As attached, with CR LF line ends: `dec3c832abdf9bacba99990d18a9bcdffc3da2e1e30718ac83eebdffbfe89c23` (5744 bytes).
 
 ## A7. The three Art sheets of 2026-11-14 (images sent into the chat), as this session typed their text. Its soldier sizes are replaced by the brief in A4 (his words of 2026-11-17, A3, CHANGE 3); kept because the plan's Part 4 cites them
 ````text
@@ -363,7 +365,7 @@ the sheets' own labels ("mine" is the Art lead's proposal)._
   decisions settles which text stands; change-set 6 waits for it.
 - Not yet received (from Part 4's list): a sheet per gun, the effects, the HUD pieces.
 ````
-sha256 of the block: `2d541381b4d5053d0253d3448683273f948a1730159cdf9e91200afb1c388374` (5623 bytes)
+sha256 of the block: `2d541381b4d5053d0253d3448683273f948a1730159cdf9e91200afb1c388374` (5623 bytes).
 
 ## A8. His message of 2026-11-17, 19:59:06 UTC (his label: 20:20): three small things. Re-sent with one more item as A9
 ````text
@@ -373,7 +375,7 @@ My words of 2026-11-17, 20:20 (Amsterdam time): three small things. None of them
 2. Advisor_log_2.md came along by mistake. It is the Advisor chat's working record, not an input for you. Do not read it, do not have an agent digest it, and put no part of it in the repo. If an agent has already started on it, stop that agent and delete its notes before the next push.
 3. Your card's "Last update" says 20:25 Amsterdam, and its commit (cb0fd7b9) is from 20:13:23. Stamp times from the clock, never ahead of it.
 ````
-sha256 of the block: `be3e892271c3984972953aa6cc7382d91e030ddc4d25ddb52f3f410541e5929d` (683 bytes)
+sha256 of the block: `be3e892271c3984972953aa6cc7382d91e030ddc4d25ddb52f3f410541e5929d` (683 bytes).
 
 ## A9. His message of 2026-11-17, 20:03:57 UTC (his label: 20:58): four small things
 ````text
@@ -392,7 +394,7 @@ My words of 2026-11-17, 20:58 (Amsterdam time): four small things. None of them 
 
 4. Your first card's "Last update" said 20:25 Amsterdam, and its commit (cb0fd7b9) is from 20:13:23. Stamp times from the clock, never ahead of it.
 ````
-sha256 of the block: `dbc58ec975052e3ab3a200b438a6ab0d601993e9e5f21a430a7d14c40cd780c5` (2028 bytes)
+sha256 of the block: `dbc58ec975052e3ab3a200b438a6ab0d601993e9e5f21a430a7d14c40cd780c5` (2028 bytes).
 
 ## A10. The Art lead's correction of 2026-11-15, 18:40, "The gun poses, restated from the sockets": the Art lead's text alone, the copy of 3,244 bytes (his words of 2026-11-17, A11)
 ````text
@@ -426,7 +428,7 @@ TWO LINES OF THE SMG BRIEF, CORRECTED
 ONE WORDING
 Where I wrote "shots leave from there": the muzzle socket is where the flash and the tracer start. The simulation's shot origin is its own data and is not read from the model.
 ````
-sha256 of the block: `d685d08bd487caa5fc238af1d16e14bc9f57f45808ceb54f4b1d4537d601899b` (3243 bytes)
+sha256 of the block: `d685d08bd487caa5fc238af1d16e14bc9f57f45808ceb54f4b1d4537d601899b` (3243 bytes).
 
 ## A11. His message of 2026-11-17, 20:39:23 UTC (his label: 21:33): his answers to SIZE-0 and LOG-HISTORY, the correction file, the SMG line drawing
 ````text
@@ -448,5 +450,5 @@ Two copies came with my message of 20:58. In the appendix, A10 is the copy of 3,
 THE SMG LINE DRAWING
 It follows in a message of its own. It is needed at change-set 8, not before. Until it arrives the SMG brief's numbers stand; they win over the drawing in any case.
 ````
-sha256 of the block: `bc1c0a9fc96b6182c4bad312cbe957ccc975d8e89dfd216177b146c7f71586e0` (1754 bytes)
+sha256 of the block: `bc1c0a9fc96b6182c4bad312cbe957ccc975d8e89dfd216177b146c7f71586e0` (1754 bytes).
 
