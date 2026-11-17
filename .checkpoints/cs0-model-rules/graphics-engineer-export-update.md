@@ -226,3 +226,12 @@ AR:272-278 -> AX-F15.
   mark 7's up axis; the palm check's home; mark 8 now repeats PM-0005-36's count (test-engineer may merge them).
   Size: under 400 per the brief (plan rev 2 point 12 had 300 for this file; point 21 estimated about 380).
 DONE
+
+## Pass 3 (coordinator, after engine-architect's final ruling): M1 to M5
+Plan (blocks): C1 read soldier-joint-list.draft.md, only what M1-M5 need (§2 root and its ruling on P1, §4 socket axes
+and required sockets, §5 mark 10, §6 the coat joints); C2 edit the draft: M1 (no file node named `root`; marks 3/10
+fail it; engine never looks root up by name; armature object's name follows AX-R7, else free), M2 (AX-R10 allows the
+coat change at change-set 10's pictures, at the cost of a re-rig and re-export), M3 + M4 (part 8: mark 7's up axis and
+the palm check await test-engineer's ruling; mark 7's numbers unchanged), M5 (mark 7 checks that a held gun's entry
+lists grip, support and muzzle); C3 checks (<= 400 lines, 120 columns, quotes, ids); C4 notes + DONE + answer (<= 10
+lines). P2 and P3 are taken in the ruling: no draft change (AX-F5 already cites spec:2238).
