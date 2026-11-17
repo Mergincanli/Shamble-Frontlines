@@ -59,3 +59,8 @@ saves after 18b139c; the spike unchanged since ddd38ba.
   exit 0, 09:53:06 UTC). **The gate --no-smoke: GATE PASS** (09:53 UTC; legacy/ unchanged). The stalled-client test's
   name checked: delay_tests.rs:747 `a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded`.
 - 09:54 E3a started in the background (G-NC2 alone, `one 300 2 6`; log .gate/u3c-held-1/e3a.log).
+- **09:53:52-11:12:33 E3a PASS: 600 of 600 exit 0**, each "test result: ok. 1 passed; 0 failed" (count 600; none
+  non-zero); the binary npt_net-ed8673eeeaf4db12; the fixed hashes in its header (delay.rs 3dbbccf7…, delay_tests.rs
+  8f8c0f9a…); "end 11:12:33 UTC; ... first failure: none"; main-run.sh exit 0.
+- 11:13 E3b started in the background (the stalled-client test alone, `one 300 2 6
+  l2::delay::tests::a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded`; log e3b.log).

@@ -302,8 +302,9 @@ it asks nothing; REFS-KIT stays.
   over-sample had a released record waiting [1, 0], none at a write [0, 0]; excess 14,326 B; the plan's Confirmed line
   whole; u3c-held-1/build.md). L2 not needed. **D-1 OUT** (both files' hashes as HEAD; git diff quiet). **Step 2
   DONE: the fix is in the main folder, uncommitted until step 6** (116 spike lines; its hashes in build.md); C4's
-  light pre-check PASS (fmt, clippy, doc); the gate PASS. **E3a RUNNING from 09:54 UTC** (task b3ndcpaff; G-NC2 alone,
-  600 runs under 6 busy loops; log .gate/u3c-held-1/e3a.log; 400 of 600 exit 0 at 10:46, none failed). **DOCS-54's
+  light pre-check PASS (fmt, clippy, doc); the gate PASS. **E3a PASS** (G-NC2 alone under 6 busy loops: 600 of 600
+  exit 0, 09:53:52-11:12:33 UTC; the fixed hashes in its header). **E3b RUNNING from 11:13 UTC** (task be0orehpc; the
+  stalled-client test alone, 600 runs; log .gate/u3c-held-1/e3b.log). **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
   full; the plan docs-54/docs-54-plan-draft.md, 134 lines, 2d3bb7a9…). ADV-D54-1 High: the copy method would quote the
