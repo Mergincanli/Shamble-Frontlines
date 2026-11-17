@@ -6,7 +6,7 @@
   for this merge."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/part-15-second-lane) · **Base:** main
   d7dad976f1ea7170d597b51e3861f1ee74f980e4 (the merge of #56; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 00:37 CET (from the clock)
+- **Last update:** 2026-11-18 00:54 CET (from the clock)
 
 ## Steps done
 1. Pull request #56 (change-set 0) merged on his go of 22:59:16 UTC: merge commit d7dad97, 2026-11-17 23:00:12 UTC,
@@ -32,13 +32,22 @@
    `part-15-to-main/quotes-check.mjs`: all found.
 6. The draft pull request is open: #57.
 
+7. docs-keeper's pass, 23:52 UTC: STATUS (+8 -8, 120 lines), the archive (+22: #56's row moved by script), ROADMAP
+   (+11 -2), the repository map (+2); only this lane's own lines changed (its proof by blame in
+   `part-15-to-main/docs-keeper.md`). Left as found, being another lane's: ROADMAP's 13 recent entries, #55's missing
+   archive row, STATUS's CI line naming 82c605e.
+8. This change-set's report written (`docs/reports/2026-11-17-part-15-second-lane.md`, the two verdicts pending) and
+   pushed with the docs pass: 1aaa067. Checks: `build.mjs --check` passes; quotes found; `gate.mjs --no-smoke` PASS;
+   repo map OK (129 entries). Size: 204 written lines (stop line 300); 339 copied.
+
 ## Current step
-7. (23:37 UTC) docs-keeper's pass on STATUS, ROADMAP, the repository map and the archive (its brief names the other
-   lanes' lines that must stay byte for byte; notes `part-15-to-main/docs-keeper.md`).
+9. (23:54 UTC) The reviews on the final diff, in parallel: the verifier (`part-15-to-main/verifier.md`) and the advisor
+   agent (`part-15-to-main/advisor-final.md`).
 
 ## Next steps
-8. This change-set's report (`docs/reports/2026-11-17-part-15-second-lane.md`); the verifier; the advisor agent on the
-   final head; delete this checkpoint in the last commit; mark #57 ready; stop for his go. Then change-set 1.
+10. Their findings fixed; the report completed; this checkpoint deleted in the last commit (it stays readable at the
+    commit before, which the report names); the advisor agent's word on the last head; #57's description updated and
+    the pull request marked ready; CI read on that head; stop for his go. Then change-set 1.
 
 ## Open findings
 - none yet
@@ -52,4 +61,4 @@
 
 ## Running work
 - saver: background task bj0ni7syc, started about 23:03 UTC.
-- agents (1 of 3): docs-keeper.
+- agents (2 of 3): the verifier, the advisor agent (final content).
