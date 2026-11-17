@@ -156,3 +156,10 @@ saves after 18b139c; the spike unchanged since ddd38ba.
 - 12:35 **Step 8, the gate on 0ad9661: "GATE PASS (5a smoke skipped: --no-smoke)"** (`node tools/gate.mjs --no-smoke`,
   about 12:35 UTC; base merge-base 82c605e; [1]-[4], [5b]-[5d] PASS; legacy/ unchanged; smoke is CI's job). Next: the
   card save (it pushes 0ad9661 with the notes; code ahead, so no [skip ci] and CI runs), the saver restarted, step 9.
+- 12:37 **The card save aab3712 pushed 0ad9661** (head aab3712fca3af64b25169af1f4ee75c01a0411cd, no [skip ci]); the saver
+  restarted as bxvsewbnz. About 12:38 **step 9's review started**: workflow wf_dd3fb0a8-14f (the advisor on main's
+  advisor.md and the verifier, both xhigh, read only).
+- 12:48 **CI green on aab3712** (read by the GitHub MCP tools, list_workflow_runs for the branch; the check_suite event
+  of 12:41:05 UTC said nothing ran or failed): gate push 44084854535 and pull_request 44084863595 (each with its gate
+  and smoke jobs), toolchain push 44084854552 and pull_request 44084863752; all four completed, success. The later card
+  saves 3eef0e1 and 8354a8e touch .checkpoints/ only ([skip ci]).
