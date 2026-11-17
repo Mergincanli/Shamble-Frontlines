@@ -303,7 +303,10 @@ it asks nothing; REFS-KIT stays.
   whole; u3c-held-1/build.md). L2 not needed. **D-1 OUT** (both files' hashes as HEAD; git diff quiet). **Step 2
   DONE: the fix is in the main folder, uncommitted until step 6** (116 spike lines; its hashes in build.md); C4's
   light pre-check PASS (fmt, clippy, doc); the gate PASS. **E3a RUNNING from 09:54 UTC** (task b3ndcpaff; G-NC2 alone,
-  600 runs under 6 busy loops; log .gate/u3c-held-1/e3a.log). Next: E3b (the stalled-client test, 600), E3c (the whole
+  600 runs under 6 busy loops; log .gate/u3c-held-1/e3a.log; 400 of 600 exit 0 at 10:46, none failed). **Also
+  RUNNING from 10:46 UTC: DOCS-54's plan** (workflow wf_11d3eb2e-5f0, task wa6pl97xq: docs-keeper drafts
+  docs-54/docs-54-plan-draft.md, then the advisor reviews it; notes in .checkpoints/netcode-proof-test/docs-54/; read
+  only, no branch yet). Saver bzkwerbtb from 10:45:53 UTC (to about 12:35). Next: E3b (the stalled-client test, 600), E3c (the whole
   binary, 20), E4 (plants P1-P5, each restored by hash), E5 (the lab's hash), then the review round (C8).
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
