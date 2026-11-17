@@ -128,3 +128,57 @@ Head read: 8afcc11b63906d3660b21613deb0729bdd8937bc (2026-11-17 17:15 UTC). Fres
 - DONE.
 - Planned size estimate (B6 input): client ~700, room ~950, bots ~650, lab ~1,400, sim bites ~40, SERIES rows ~25,
   run scripts ~600: about 4,400 added lines (range 3,500-5,500); his SIZE-CHECK stop for an M unit: past 6,000.
+
+## Revision for the checks (rev 3.1)
+
+Task: one revision of rev 3 for the test-engineer's (TE3-1..TE3-15) and the security-auditor's (SA3-1..SA3-8) checks.
+Edit u4f-brief.md in place; a "rev 3.1" block in its change list. Read the checks' notes first (done: te 82 lines, sa
+96 lines). Fresh run of this section (no earlier part of it existed).
+
+### Plan (blocks; a line after each)
+- R1 TE3-1: bots/src/lib.rs:14-21; results/u4r/0f066338dd8d/P3/runs.txt; marks.json -20 checks; SERIES.md:61, :63;
+  decide the honest-client rule for controller runs, f5's bounds, p5/p6's named checks.
+- R2 TE3-2, SA3-2, TE3-4 (one construction): proto/src/input.rs (codec rules), client/src/lib.rs (redundancy, encode
+  fail path, rebuild_sequences), room input.rs (repeat path), sim world.rs (kind 7); per-kind "rejected and counted",
+  per-kind forging and twin rows; f15/f16/f33 cases.
+- R3 SA3-1: input.rs ran_through and option A's lower anchor; ADR 0001:231-233; the join anchor; U4F-Q18 (past window);
+  f13 (iii), f19, p20; Q8 and 12 item 6 text.
+- R4 TE3-3, TE3-5, TE3-6, TE3-7: marks.json -21/-47 check names; l1 fate log form; fast-clock schedule; lab test scales.
+- R5 TE3-8, SA3-5, TE3-10: 5.5 and Q2 (build-phase row, pack only u4r-P3, net figures, KL-U4F ask).
+- R6 TE3-9 and the Lows (TE3-10..15, SA3-3, -4, -6, -7, -8): one-line fixes applied, others listed.
+- R7 Change list rev 3.1 block, counts table, NA rows if any; self-check script (anchors, 7-word runs).
+- R8 Notes per finding; handback.
+
+### Block log
+- R1 read: bots/src/lib.rs:14-21 (the rule), :224-227 (skip when newest unmoved); P3 runs.txt:18-20 (700,948 commands,
+  178,595 steps without one = 20.3 %; late 1,112 = 0.16 % at lead 7); P0 runs.txt:22 (878,352, 0 without one, late 0);
+  marks.json -20 checks :4710-4737 (names "at least 99.9 % of commands reach the server before their tick runs",
+  "missing inputs at most 0.1 % of player-ticks"). TE3-1 holds. Fix: contiguous stamps for controller runs (each step
+  gives the commands for every stamp from previous + 1 to the controller's target, at most 2; none = a hold); the old
+  rule kept for `with_lead` runs; f5 restated; new f36 (client + bots: the P3 bars on a seeded trace); p5/p6 by name.
+- R2 read: proto/src/input.rs:19-21, :140-198 (seq consecutive :155-157, NotCanonical; tick step 0..255 :158-159,
+  OutOfRange; view offset u16 :92-95); client lib.rs:425-444 (stamp newest+lead :429, unacked :442-443), :458-470 (an
+  Input every step with ack or unacked; encode fail -> nothing sent :467), :671-688 (acked dropped); room.rs:744-801
+  (kind 8 returns before offer :783-788, so the forged datagram's commands are resent: both runs delay them equally);
+  input.rs:80-125 (newest_seq set before refusals :89). **Code against SA3-2's fix:** the state hash DOES carry command
+  sequences: world.rs:1979 (projectile seq), :1995-2009 (Shot{slot, seq}, Hit{shooter, seq}); world.rs:1922-1925 leaves
+  out only the press counters. So a twin whose sequences shift by one fails on the forger's first shot: SA3-2's
+  "no command at that step, sequences consecutive" is rejected; the twin keeps the forged run's sequence numbers (the
+  skipped index, U4F-Q13 (b)) and leaves out of each Input the commands older than a skipped index (consecutive per
+  Input); at P0 (U4F-Q11 (ii) (a)) the ack returns within a step, so none is left out (P0 runs.txt:22). Per-kind
+  construction: 1, 2, 4, 5, 6 forge the newest copy only, endpoint keeps the honest one (SA3-2); later copies of a
+  refused sequence are repeats whatever their content (SA3-2); kind 1 within the codec's 255-tick step; kind 2 at an
+  equal tick (step 0); kind 3 an added older copy of an accepted sequence with changed content (not the tick), its twin
+  the same datagram with the honest copy (TE3-2); kind 7 and the clamp forged as stored (accepted by the room: every
+  copy equal, SA-3); kind 10 stamped within [t - W, t + bound]; fast clock's stamps never decrease (TE3-4).
+- R3 read: input.rs:23, :107-113, :129-131 (ran_through set by take, every tick, every joined slot: room.rs:841-846, so
+  option B's old stamps are Late); room.rs:681 (JoinAccepted.tick = next_tick); ADR 0001:231-239, :1159-1162. SA3-1
+  holds. Fix: join anchor under both options (2.4 item 4; f13 (iii)); new U4F-Q18 (option A's past window W =
+  CMD_CATCHUP, rec. (a)); f38 conditional (idle then fast, option A); p20 conditional; Q8 and 12 item 6 "bound plus W
+  after an idle" under (a). Q17 (a) stays (the no-lead-bound bite run can still hold ticks 2^31 apart).
+- R4 read: l1 lib.rs:353-362 (size in the canonical form), :1125-1150 (fate by flow index; size only in TooLarge and
+  the entry); marks.json -21 checks :4934-5073 (names), -47 :9096-9111; c-u4r-r2.mjs:77-92 (expect lines);
+  scenario.rs:2841-2843 (P2_SHORT 16 clients, 6 s + 4 s). TE3-3, -5, -6, -7 hold. -21 notes :5144 name no length.
+- R5 read: card KEPT-LOGS packs (P2 572 of 779 MiB back, B1 603 of 820.5: about 73 %); card R4 (:198-199) and RECS-1043
+  reading (:203-205: "B1 first, then P3"); history :2212 (PACK-READ (a): one or two closed, older folders; B1 used one);
+  §11 :231-249; held-review :37, :89 ("the pack to do before U4f's counted run"). TE3-8, SA3-5, TE3-10 hold.
