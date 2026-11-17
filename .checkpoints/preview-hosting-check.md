@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 23:32 Amsterdam (22:32 UTC)
+- **Last update:** 2026-11-17 23:34 Amsterdam (22:34 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -357,6 +357,14 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - v3 of the check (consultation 13): A and C skipped when the ID box lacks an ID's shape (an error message may repeat
      the path); sha256 0ad66aa0f2b3...; stub tests: good shapes ask A, B and C; a token in the ID box asks only B; no
      file left behind. Waiting on Cloudflare's token-formats page before the hash is final, then the two reviews.
+
+   - Docs (web-fetch agent, hand-back 2026-11-17 after 22:30 UTC): token-formats page (now at
+     /fundamentals/api/get-started/token-formats/, 2026-10-23): Account API token "`cfat_[40 characters][checksum]`";
+     the characters allowed, the checksum's length and the total length: not found (so a printed length below 46 is
+     wrong; above it, the page cannot judge). Renaming an account: no Cloudflare page found. Codes 7000/7003 and
+     whether an error message repeats the path: not found (the A/C skip stands). The check's hash stays 0ad66aa0f2b3...
+     (`git show a4d8ae1:` gives the same). Launched on it: the security-auditor's round 2 and the advisor agent (tier
+     2), both in the background; the saver b491gaova runs.
 
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
