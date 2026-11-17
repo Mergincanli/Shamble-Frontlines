@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 23:34 Amsterdam (22:34 UTC)
+- **Last update:** 2026-11-17 23:37 Amsterdam (22:37 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -373,6 +373,14 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      and C ("exactly 32 hex digits: no" shows it). Low, optional: line 4's comment (L5) not updated. L4 applies to the
      run: the branch from `main`, only the run on the commit with this hash approved, the logs deleted after reading
      (his choice, per consultation 13). Waiting: the advisor agent's verdict.
+
+   - His decision on the deploy.yml follow-up (user message 2026-11-17 22:35:52 UTC, 4f8140d3-f419-49e2-bea8-1bd105232a66), word for word:
+     "yes we can change the account name, just give me digestable step by step instructions once you're ready". For DECISIONS.md. The steps sent from Cloudflare's "Create account" page, section "Account name"
+     (https://developers.cloudflare.com/fundamentals/account/create-account/, last updated 2026-09-17, read by a
+     web-fetch agent): "Your account name defaults to `<<YOUR_EMAIL_ADDRESS>>'s Account`."; "go to the **Configurations**
+     page" (link https://dash.cloudflare.com/?to=/:account/configurations); "For **Account Name**, select **Change
+     Name**."; "Enter a new account name."; "Select **Save**." Who may rename and any limits on the name: not on the page.
+     After the rename, Wrangler's whoami could still print the account ID in the "wrong ID" case (not a credential).
 
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
