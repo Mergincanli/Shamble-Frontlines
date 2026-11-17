@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 23:19 Amsterdam (22:19 UTC)
+- **Last update:** 2026-11-17 23:21 Amsterdam (22:21 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -319,6 +319,25 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      expires_on, not_before; API reference read by a web-fetch agent, 2026-11-17) for the token's status and dates.
      Parsed with PyYAML; its script tested locally against a stubbed curl (both cases right; the auth file removed);
      a first draft's `[[`-as-argument bug found and fixed in that test. Placing it needs a security review and his yes.
+
+   - The check rewritten per consultation 12 (`tr-draft/diag/check-token.yml`, sha256 88b1e5999400...; it replaces the deleted
+     `verify-token.yml`): on its own pull request (GitHub: "To trigger the `workflow_dispatch` event, your workflow
+     must be in the default branch", manually-run page; `main` holds only the README), with the fork guard and
+     `environment: preview`; it prints the values' shapes and, of the account ID (not a password), its first and last 4
+     characters (a departure from the plan's "keep it out of the public logs", flagged for his yes); A verify for the
+     account, B verify without an account, C the project path the upload fails on, D the pinned Wrangler's `pages
+     project list`. Tested locally against stubs: success; refused with a null result; a non-JSON body (not printed); no
+     answer (network); a token with a trailing newline and a malformed ID (both shapes flagged); D ok and failing; no
+     auth or answer file left behind. Next: the security-auditor's review, then his yes on the reviewed hash, covering
+     the branch, the pull request, its one approval and its close.
+   - Outcome → next action (to go with the yes request): token shape wrong → a new token value, pasted with care; ID
+     shape wrong or its 4+4 characters differ from Account Details → the ID copied again from Account Details; A active,
+     C the project, D answers → both values and the tool work → the deploy re-run once (one approval); A active, C the
+     project, D fails → the pinned Wrangler is at fault → a newer pinned Wrangler (a change for his yes); A active, C
+     refused → the token works for the account but not for the project (Read not saved, or the project elsewhere) →
+     screenshots of the token's page and the project's page; A refused, B active → the token is recognised, the account
+     ID is wrong → the ID copied again; A and B refused with the shapes right → the token is not recognised → a new token
+     (made, not rolled); no answer → the check re-run once.
 
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
