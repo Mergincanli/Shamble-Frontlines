@@ -6,9 +6,8 @@
   **Base:** main, last merged in at 3f2fa21 (main 82c605e, PR #54; MAIN-52); before that at 2bd44a5 (main 53272a1, PR
   #53 the kept-logs rule and PR #52 the docs pass; Mustafa's KL-MERGE (a), 2026-11-15 20:50). Take main in again when main changes code, CI or rules, and once before PR #40 is
   marked ready (MAIN-52, 2026-11-14)
-- **Last update:** 2026-11-17 07:38 UTC (PR #54 merged at 82c605e on his go; MAIN-54 done: main taken in at 3f2fa21,
-  head 20048a5, the advisor APPROVE, CI green on 20048a5; waiting for his answers (DOCS-54, C62HB-Q4, NS-TRAILER,
-  NS-FIRST) and his /compact: the block "NOW (2026-11-16)")
+- **Last update:** 2026-11-17 10:45 UTC (his RECS-1043 answers recorded; U3C-HELD-1 building: the cause confirmed
+  by L1, the fix in and uncommitted, E3a running; DOCS-54's plan next: the block "NOW (2026-11-16)")
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **NOW (2026-11-16, the day session; read this first after a compact or a cut).** Mustafa typed /compact about 09:00
@@ -198,10 +197,15 @@ it asks nothing; REFS-KIT stays.
   both P0 folders, fc411116c1f1, fd4612050cd6 or the c-u2 folders without his word. **The report went to Mustafa
   in chat at 03:14:03 UTC** (this session's transcript, line 47324, found by report_sent_time.py, read only), sent
   from head 35be45d (committed 03:13:19 UTC; R2 re-checked there; u4r-report.md still c5dee3fa… at 04:31 UTC).
-  **WAITING for his answers:** C62HB-Q4 (recommended (b), with U4g), NS-TRAILER and NS-FIRST (both (a)), and the
-  optional re-judge of 051995db9cea (his go on PR #54 came at 07:00:54 UTC: merged, the NS-STATUS block). Nothing is
-  packed before he has read it (R4; the chat's For Mustafa item 2). Then MAIN-52 (main 82c605e taken in, plan first),
-  U3C-HELD-1 (plan first, before U4f's merge) and U4f rev 3.
+  **HIS ANSWERS, RECS-1043** (2026-11-17 10:43:48 UTC: "I agree with all your recommendations, continue";
+  recorded word for word with the blocks it answers by record_recs_1043.py, history.md:2204-2227): **PACK-READ (a),
+  DOCS-54 (a), C62HB-Q4 (b), NS-TRAILER (b), NS-FIRST (b)**. So: packing opens by brief 8.1 under R4 (U3C-HELD-1's
+  step 5: B1 first, then P3; never both P0 folders, fc411116c1f1, fd4612050cd6 or the c-u2 folders without his word);
+  DOCS-54 is its own docs change-set on the branch claude/docs-after-54 from main (plan first with the advisor, his
+  words by script, one review round, his go to merge); -58's two checks go with U4g (the wording yes first; ADV-CBR-1's
+  caveat in U4g's carry); NS-TRAILER and NS-FIRST go to the kit's next change after the freeze, each with his yes to
+  the exact text. The optional P0 re-judge (051995db9cea) carried no recommendation: not covered. MAIN-54 done;
+  U3C-HELD-1 building; then U4f rev 3.
   **NS-STATUS: PR #54 opened 21:57 UTC** (claude/night-shift-stints, commit 20f9d599…, NIGHT_SHIFT.md +3 -0, the
   lines' sha256 4e3d1565… = his yes; the worktree .gate/ns-stints-wt; subscribed). **Its review round DONE**
   (wf_9f3bfdf9-76a; both saved word for word and read in full): **the advisor APPROVE WITH FINDINGS**

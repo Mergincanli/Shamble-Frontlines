@@ -2200,3 +2200,28 @@ From "Next steps, in order" (as it was):
 - **Mustafa, typed into this chat (transcript 2026-11-17T07:00:54.917Z), verbatim:** "Merge #54"
 - **What it answered** (the assistant's message at 2026-11-17T06:34:50.318Z, its "For Mustafa" line, copied by this script): 2. When you're ready, type "merge #54" in this chat; its version is 20f9d59918eea1e3431ae830f72510f83f6424c7.
 - **The merge** (the day session, after its checks: head 20f9d59 unchanged, the advisor's and the security-auditor's APPROVE WITH FINDINGS and the PR Advisor routine's APPROVE on that head, six check runs green, main still 53272a1): 82c605e2e8a7f284e6925718368d3fe569f89ae9, a merge commit, 2026-11-17 07:03:02 UTC, expected head 20f9d59918eea1e3431ae830f72510f83f6424c7; main's tree equals that head's; CI on main green (gate run 44035715175, toolchain run 44035715349).
+
+## Decision: Mustafa, 2026-11-17 11:43 Amsterdam (10:43 UTC), RECS-1043 (PACK-READ, DOCS-54, C62HB-Q4, NS-TRAILER and NS-FIRST, as recommended)
+- **Mustafa, typed into this chat (transcript 2026-11-17T10:43:48.016Z), verbatim:** "I agree with all your recommendations, continue"
+- **The recommendations as last posed in full** (the assistant's message at 2026-11-17T08:54:58.700Z, its Decisions-needed block, copied by this script):
+
+  **Decisions needed:**
+  - **PACK-READ (new, optional):** have you read the C62H-BOUND report I sent at 04:14 Amsterdam time?
+    - Why it matters: disk is tight. After this fix's full check, about 3.6 GB may be left, under the 4 GB that U4f's check run will need.
+    - Options:
+      - (a) Yes. I may pack one or two closed, older log folders by the kept-logs rule, never the P0 folders, the reference sets or the c-u2 folders.
+      - (b) Not yet. Nothing is packed and this fix goes ahead anyway; packing waits until just before U4f's run.
+    - Recommendation: (a), whenever you have read it.
+  - **DOCS-54:** may this chat open one docs-only branch and pull request to update main's dashboard and decision record for #52, #53 and #54? Main still says the last merge was #48, and it has none of your words since 2026-11-14. Options: (a) yes; (b) the foundation chat's next docs pass does it; (c) wait for PR #40's final docs step. I recommend (a).
+  - **C62HB-Q4:** should the counter-wrap test (PM-0001-58) get the two new lost-tick checks? Until it does, a client bug that files snapshots as lost around a counter wrap goes unseen there. Options: (a) now, as its own small lane; (b) with U4g; (c) not now. I recommend (b).
+  - **NS-TRAILER and NS-FIRST:** should the kit's next change after the freeze add two things to your merged night-shift lines: the attribution option on the save command, and a status refresh before the first saver stint? Options: (a) keep your lines as they are; (b) add them then, with your yes to the exact text. I recommend (b) for both.
+
+- **As last repeated before his message** (the assistant's message at 2026-11-17T10:35:38.816Z, copied by this script):
+
+  **Decisions needed:** unchanged:
+  - PACK-READ: I recommend (a).
+  - DOCS-54: I recommend (a).
+  - C62HB-Q4: I recommend (b).
+  - NS-TRAILER and NS-FIRST: I recommend (b) for both.
+
+- **Read as** (the main session's reading, not his words): PACK-READ (a), DOCS-54 (a), C62HB-Q4 (b), NS-TRAILER (b), NS-FIRST (b). The optional re-judge of U4r's own P0 set (051995db9cea) carried no recommendation, so it is not covered.
