@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-16 13:40 Amsterdam (12:40 UTC)
+- **Last update:** 2026-11-17 20:21 Amsterdam (19:21 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -210,6 +210,23 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
        (infra-engineer-docs.md, C2): "By default, tokens do not expire". Whether an existing token's end date can be
        changed: a web-fetch agent reads Cloudflare's docs (launched after his message; model opus, effort high).
 
+   - His message of 2026-11-17 19:17:53 UTC (0b3d751b-92de-4a62-b1fb-0d536c5f95a4), word for word: "unticked the allow
+     administrators.. for preview" / "Regarding the API token, I had never received instructions to create them" /
+     "When I open account api tokens page, its empty and asks me tocreate". His screenshot: the banner "Environment
+     "preview" updated."; "Configure preview": "Required reviewers" ticked with Mergincanli, "Prevent self-review"
+     unticked, "Wait timer" unticked, "Allow administrators to bypass configured protection rules" unticked, "No
+     restriction". **Gate (a) met.**
+   - The records on the token (transcript times, 2026-11-15 UTC): my message of 20:11:10 held Part 3 step 3a (make the
+     token: Manage account, Account API tokens, Create Token, Account · Cloudflare Pages · Edit, "end 10 days from
+     today"); my message of 20:44:03 asked him to "keep waiting at 3a (the token) until I answer" ("If neither does, you
+     go ahead with step 3a"); his "setup done" came at 20:53:10; my reply of 20:54:12 settled SR-READ and said "the
+     build may go ahead", with no words lifting the wait at 3a. Step 12 read "setup done" as "A2 and A5 to A7 done (to
+     confirm in the reply)"; no reply confirmed it. The three environment secrets exist (his screenshot of 2026-11-16
+     11:34:31 UTC); what value CLOUDFLARE_API_TOKEN holds is not known: asked of him, without the value.
+   - **Gate (b) now:** the token made by plan A5 today, end date 2026-11-27 (ten days from 2026-11-17; dates at 00:00
+     UTC, so Day 2 by 2026-11-26); a screenshot of Cloudflare's summary page before "Create Token" (no token value
+     exists then) showing the permission and the dates; the value pasted over CLOUDFLARE_API_TOKEN in `preview`.
+
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
    CLOUDFLARE_ACCOUNT_ID; in `production`: CANARY); `preview` (him as required reviewer, self-review unticked, admin
@@ -240,8 +257,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   not out of their reach), not plan.md:524 and :649 ("install scripts never see it").
 - Input for step 2.6's setup instructions: two setup steps that needed a change from a default were missed and caught
   only by his screenshots (2026-11-16): `preview`'s administrator bypass left ticked (GitHub's default; plan A6 step
-  4), and the token's end date (plan A5 step 5; he asked where to set it, 12:34:49 UTC). Instructions for such steps
-  should end with a screenshot of the result.
+  4), and the token's end date (plan A5 step 5; he asked where to set it, 12:34:49 UTC). Then (2026-11-17): the token
+  itself was never made, after my wait at step 3a was never lifted. Instructions for such steps should end with a
+  screenshot of the result, and every "wait" needs its own "go ahead" in words.
 - The process account (his rule: only what a record shows, with its time): the process slip of 2026-11-15 and F-A
   (Open findings); the "repository ready" record (step 12's added bullet); the effort not passed to the web-fetch
   agent (Running work).
@@ -251,6 +269,10 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   file (18 was next); restored by script on 2026-11-16 (Steps done). From here on, a finished step moves to "Steps
   done" before "Current step" is rewritten.
 
+- Process miss (records above, Current step): my wait at step 3a (2026-11-15 20:44:03 UTC) was never lifted in words,
+  and "setup done" (20:53:10 UTC) was read as A5 done "to confirm in the reply" without that confirmation; the token
+  was never made (his words of 2026-11-17 19:17:53 UTC). Nothing ran meanwhile (0 workflow runs). To be told to him
+  plainly now and in the report.
 - Refused by the guard, 2026-11-15 15:54:02 UTC: `git -C <dir> fetch ...` ("git: no option before the subcommand (run
   git from the folder, without -C, -c or --git-dir)"). Route taken: `cd` into each scratch folder under
   `.gate/preview-hosting-check/tags/` and ran git there (a shallow fetch of two tags to read their dates; nothing run).
