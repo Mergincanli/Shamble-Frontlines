@@ -182,3 +182,11 @@ Edit u4f-brief.md in place; a "rev 3.1" block in its change list. Read the check
 - R5 read: card KEPT-LOGS packs (P2 572 of 779 MiB back, B1 603 of 820.5: about 73 %); card R4 (:198-199) and RECS-1043
   reading (:203-205: "B1 first, then P3"); history :2212 (PACK-READ (a): one or two closed, older folders; B1 used one);
   §11 :231-249; held-review :37, :89 ("the pack to do before U4f's counted run"). TE3-8, SA3-5, TE3-10 hold.
+- R7 (part) edits DONE in the brief: title and header; the rev 3.1 change-list block (R1-R10, counts at rev 3.1); 0.5
+  (P24 key); 2.2 (contiguous stamps row, bounds, pass marks, bots' rules); 2.3 (tick with none, Late under Q18 (a),
+  join anchor row, per-tick cap on arrival, carry 80 (a) row note); 2.4 items 2, 3, 4, 6, kind 2 and kind 4 rows; 2.6
+  (codec rules + per-kind table; catch-up row; fast-clock row: schedule, 610 s, ping_limited); 2.7 (settings, f29
+  line); 2.10 (counts +107/+122/63, conditionals, generator rule, lab scale rule; f5, f12 (v), f13 (iii), f15, f16, f28,
+  f29, f33; new f36, f37, f38); 2.12 (kinds 1, 2, 4-6 row with sequence-number reason; kind 3 row; open-loop note);
+  2.13; section 4 no-sockets; 5.1 lengths; 5.3 (how a short run is read; named checks p1-p13; p20, p21; reports and
+  stop sentence). Next: 5.5, 7, 9.1, Q2, Q4, Q6, Q7, Q8, Q11 (v), Q13, Q17, Q18 new, D3, D12, D15, 12 items 3, 6, 13.
