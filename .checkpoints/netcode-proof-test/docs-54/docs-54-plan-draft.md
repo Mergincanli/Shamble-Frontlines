@@ -2,7 +2,7 @@
 Branch `claude/docs-after-54` from origin/main 82c605e, in a worktree; his DOCS-54 (a) (history.md:2204-2227).
 Docs only, risk tier 1 (it records his words): `needs-mustafa`, his go to merge. No kit, gate, CI, spike or code file.
 
-## As approved (the main session, 2026-11-17 11:14 UTC)
+## As approved (the main session, 2026-11-17 about 11:13 UTC)
 The advisor's plan review (wf_11d3eb2e-5f0; docs-54/advisor-plan-review-full.json, 136 lines, 78f6b5a5…, read in full):
 **APPROVE WITH CONDITIONS C1-C9** on this draft's first text (sha256 2d3bb7a9…). The conditions' own words govern
 wherever this plan says otherwise; in short:

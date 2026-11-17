@@ -315,8 +315,9 @@ it asks nothing; REFS-KIT stays.
   Rulings: his "I agree with all your recommendations" answers DOCS-54 as posed at 08:54:58; the branch name
   claude/docs-after-54 and the method are the session's proposal (shown 07:33:20 and 07:39:46), never quoted as his.
   (The main session's brief to the drafter had said history.md:2204-2227 held the long option text: wrong; the record
-  holds the 08:54:58 form; the drafter caught it.) **C1-C9 folded into the plan** (11:14 UTC, its "As approved"
-  section; the plan now sha256 61af1b1699e7f14510f81d9ffccb47a83b77bc54e0477790c10f3e93b38cbc01). Next for DOCS-54:
+  holds the 08:54:58 form; the drafter caught it.) **C1-C9 folded into the plan** (about 11:13 UTC, its "As
+  approved" section; the plan now sha256 62b5ae673ad443dd5a99c3725045a1a98df2d2bdce885e06cb4243f34e620549, after the
+  header's time was corrected from an unread "11:14"). Next for DOCS-54:
   the build in the worktree .gate/docs-after-54-wt, each asking call named first (C9), after U3C-HELD-1's commit (so
   the two lanes do not crowd the 3-agent cap). Saver bzkwerbtb from 10:45:53 UTC (to about 12:35). Next: E3b (the stalled-client test, 600), E3c (the whole
   binary, 20), E4 (plants P1-P5, each restored by hash), E5 (the lab's hash), then the review round (C8).
