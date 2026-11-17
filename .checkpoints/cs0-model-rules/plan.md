@@ -105,3 +105,89 @@ which are carried, not written. If the written part passes 1,000 lines, stop and
 - Two chats and LOOK_V2: this change-set edits one line of §8; the carry of his look decisions (second lane) owns the
   rest of the file. Part 15 says so.
 - The chat is 79 % full: the checkpoint is written so that a compacted or restarted session continues from it.
+
+---
+
+# Revision 2: changes after the advisor agent's review (REVISE, 2026-11-17; its notes: `advisor-plan-r1.md`)
+Where this part and the text above differ, this part stands. Numbers are the review's findings.
+
+**1 (High). The joints.** The 13-joint list above is withdrawn, and so is the sentence that a list "belongs to the
+model's entry". There is one engine joint list for Slice 1's soldier. engine-architect rules on it against the legacy
+animation rows GA1 to GA15 and ADR 0003 lines 794 to 797 (knees, the spine, the coat's panels), with the brief's
+rigid parts mapped onto it (boot and trouser follow the lower leg): `joint-list.md` beside this plan. The research
+file and the rules take that list word for word; this plan does not restate it.
+
+**2. `root`.** Settled by the same ruling (a skin joint, or the parent node the game scales), with what it means in
+glTF and in Blender. The joint-list mark (mark 3 below) follows it.
+
+**3. Sockets have axes.** Each socket's own axes are part of the rule, so that a direction survives export (the SMG's
+eject direction, "right and 20 degrees up"): the ruling states them in glTF's and in Blender's axes.
+
+**4. `marking_` parts.** The engine's rule is only this: a node whose name starts with `marking_` is an optional part
+the game can show or hide, and it uses one of the model's own materials. That the marking is "off at game size and on
+in close views" is the Art lead's proposal (the addition, A2); the call is Mustafa's. How a marking's shape and
+colour change with the faction stays open.
+
+**5. His sentence on sockets is quoted whole,** wherever a doc of this change-set states the rule: "The poses. Where
+the addition's hand points and a gun's sockets disagree, the sockets win: the right hand's point and the gun's
+direction set the pose; the left hand, the butt and the muzzle follow from the gun model's sockets, as the SMG brief
+already does." (2026-11-17).
+
+**6. The marks, rewritten where they did not work.** Every mark has a planted defect of its own.
+- Mark 6 (scale and axes): an asymmetric test box, 1.0 m wide, 2.0 m high and 0.5 m deep, with a small named marker
+  on its front face. After export and load it measures 2.0 m along +Y, 1.0 m along X and 0.5 m along Z, each within
+  1 mm, and the marker's centre has the greatest Z. Planted defects: "+Y Up" off; a scale of 0.01 left unapplied.
+- Mark 7 (sockets): all five named nodes exist; `socket_grip` lies within 1 mm of the origin; `socket_muzzle` has a
+  positive Z and lies within 1 mm of the gun's centre plane (X = 0); each socket's forward axis points as the ruling
+  says, within 0.5 degrees. Planted defects: one socket renamed; the muzzle socket turned by 5 degrees.
+- Mark 9 (both backends): on WebGPU and with `forceWebGL` the loaded model has the same node names, the same count
+  of meshes and materials, the same material on each mesh and the same bounding box within 1 mm. Planted defect: a
+  loader option that differs between the two runs.
+- Mark 4's defect is its own: a vertex with five influences (mark 3 keeps the exporter's neutral bone).
+
+**7. What the rifle file can prove.** `AMK9_v4_stage1.glb` was "written by a script", so it never went through
+Blender's exporter. It can pass or fail marks 1, 2, 5, 7 and 8. Marks 3, 4 and 6 need a real Blender export: the
+test box and a small skinned figure of Part 11.
+
+**8. Reviewers and models.** graphics-engineer writes the research file (Opus 5.5, effort max, passed by this chat).
+Reviewers, each at effort max: engine-architect (the names, the joint list it ruled on is checked by graphics-engineer
+in turn), test-engineer (the new marks: it owns ADR 0005's pass marks), the verifier (claims against sources; his
+words byte for byte), docs-keeper's pass; then the advisor agent on the final head.
+
+**9. DECISIONS.md: the pointers that were missing.** Dated pointers of 2026-11-17, each naming the new entry that
+changes the line: SPIKE-ORDER (b), "wave 1 runs one heavy spike at a time" (changed for these steps by his decision
+of 2026-11-14); his words of 2026-11-12 on Fable 5.2 for every chat that writes game or engine code (changed for the
+second builder chat only by his CHANGE 2); his words of 2026-11-12 "The guard, the gate and CI work stays with Opus
+5.5." (set aside for the gate and CI edits this chat asks of him, by his answer GATE-FOLLOW (b)); the queued model
+item in "Queued" (the same two pointers). LOOK-TEST-INPUTS gets no pointer: his addition keeps it.
+
+**10. SPIKE_PLAN.** The earlier pointers stand in three places and each still says "Steps 2.4 to 2.6 still wait for
+their results": the new pointer is added at all three. ADR 0002 has one place: one pointer.
+
+**11. The register (`docs/adr/README.md`), with its count line.** OQ-0006-18: answered by MODEL-PUBLIC (a), his words
+quoted. OQ-0002-6: answered, the formula's value, a reach of 3.07 m. The rows that ask whether soldiers block each
+other: answered, "they push each other softly and never block". OQ-0003-1: answered further in part (the desktop is
+an RTX 2070 with an i7-9700K; the laptop's class; the actual machines before change-set 6). The draft lines these
+answers touch: PM-0004-34's row in ADR 0004 gets a dated pointer here (his word for the change to that mark). The
+others are carried later, and the report names the carrier of each: ADR 0002's "one change-set per step" against
+SPLIT-25 with change-set 2's docs pass; the machine lines in ADR 0001, ADR 0003 and SPIKE_PLAN with change-set 6's,
+when the actual machines are named.
+
+**12. Size.** The build plan's row for change-set 0 says about 150 lines of docs. This plan's work is larger because
+his CHANGE 1 added the record of his decisions: about 500 lines written, besides what is carried (the plan, the
+appendix). Stop lines: the research file at 300 lines, the written total at 1,000.
+
+**13. ADR 0005's new marks** go into the pass-mark table with the asset spike's group, in the table's own columns,
+and the group's count line is updated; nothing is added to "What this section decides".
+
+**14. LOOK_V2.** The §8 line cites its source (his words of 2026-11-03, SPIKE_PLAN's research entry). When this
+change-set merges, `docs/LOOK_V2.md` belongs to the second lane's carry (one owner per file; Part 15). No doc of this
+change-set cites line 30's "no plain tubes or cylinders" as decided.
+
+**15. STATUS and the report.** STATUS also says: the 2.3 chat is stopped and its docs change-set no longer records the
+decision of 2026-11-14; the second builder chat exists; #55 is merged. The report's "since the plan" also says: the
+Art lead's brief replaces Part 4's sizes; both line widths are switchable at change-set 6; change-set 8 grows by
+about 400 lines (the simple active reload); the plan's text is copied by script from commit 68addf9.
+
+**16. Two more rules for the research file:** how the hand meets `socket_grip` (from the ruling), and a check of the
+soldier's origin and facing (mark 10, placed with mark 6's export).

@@ -63,7 +63,7 @@ the repository (his answer MODEL-PUBLIC of 2026-11-17, go:24).
 
 ## 3. What the sources say
 
-### 3.1 The glTF 2.0 specification
+### 3.1 The glTF 2.0 specification (lines as read 2026-11-17)
 - **AX-F1. Axes and units.** "glTF uses a right-handed coordinate system." (spec:730) "glTF defines +Y as up; the front
   side of a glTF asset faces +Z, the left side of a glTF asset faces +X." (spec:732) "The units for all linear distances
   are meters." (spec:737); positions are metres "After applying the node's global transform" (spec:2180) · confirmed.
