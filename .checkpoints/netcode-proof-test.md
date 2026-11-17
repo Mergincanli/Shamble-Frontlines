@@ -6,8 +6,8 @@
   **Base:** main, last merged in at 2bd44a5 (main 53272a1, PR #53 the kept-logs rule and PR #52 the docs pass; Mustafa's
   KL-MERGE (a), 2026-11-15 20:50). Take main in again when main changes code, CI or rules, and once before PR #40 is
   marked ready (MAIN-52, 2026-11-14)
-- **Last update:** 2026-11-17 04:32 UTC (C62H-BOUND done and checked; its report reached Mustafa in chat at 03:14:03
-  UTC; waiting for his answers and his go on PR #54: the block "NOW (2026-11-16)" below)
+- **Last update:** 2026-11-17 07:06 UTC (PR #54 merged at 82c605e on his go; C62H-BOUND's report with him since
+  03:14:03 UTC; waiting for his answers; next MAIN-52, this branch takes main 82c605e in: the block "NOW (2026-11-16)")
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **NOW (2026-11-16, the day session; read this first after a compact or a cut).** Mustafa typed /compact about 09:00
@@ -197,9 +197,10 @@ it asks nothing; REFS-KIT stays.
   both P0 folders, fc411116c1f1, fd4612050cd6 or the c-u2 folders without his word. **The report went to Mustafa
   in chat at 03:14:03 UTC** (this session's transcript, line 47324, found by report_sent_time.py, read only), sent
   from head 35be45d (committed 03:13:19 UTC; R2 re-checked there; u4r-report.md still c5dee3fa… at 04:31 UTC).
-  **WAITING for his answers:** C62HB-Q4 (recommended (b), with U4g), NS-TRAILER and NS-FIRST (both (a)), the
-  optional re-judge of 051995db9cea, and his go on PR #54 (head 20f9d59). Nothing is packed before he has read it
-  (R4; the chat's For Mustafa item 2). Then U3C-HELD-1 (plan first, before U4f's merge) and U4f rev 3.
+  **WAITING for his answers:** C62HB-Q4 (recommended (b), with U4g), NS-TRAILER and NS-FIRST (both (a)), and the
+  optional re-judge of 051995db9cea (his go on PR #54 came at 07:00:54 UTC: merged, the NS-STATUS block). Nothing is
+  packed before he has read it (R4; the chat's For Mustafa item 2). Then MAIN-52 (main 82c605e taken in, plan first),
+  U3C-HELD-1 (plan first, before U4f's merge) and U4f rev 3.
   **NS-STATUS: PR #54 opened 21:57 UTC** (claude/night-shift-stints, commit 20f9d599…, NIGHT_SHIFT.md +3 -0, the
   lines' sha256 4e3d1565… = his yes; the worktree .gate/ns-stints-wt; subscribed). **Its review round DONE**
   (wf_9f3bfdf9-76a; both saved word for word and read in full): **the advisor APPROVE WITH FINDINGS**
@@ -218,6 +219,17 @@ it asks nothing; REFS-KIT stays.
   on head 20f9d59918eea1e3431ae830f72510f83f6424c7 (a merge commit, as #53; that SHA as the expected head). His
   21:50 and 22:09 words are recorded (Rules in force). A safety-net check-in on the PR at 23:04 UTC (send_later
   trig_01LYv1nTavGw7z2NxKqLadrC; the subscription rules: stop it if nothing changed and he has not written).
+  **PR #54 MERGED 2026-11-17 07:03:02 UTC: 82c605e2e8a7f284e6925718368d3fe569f89ae9** (his go "Merge #54" at 07:00:54
+  UTC, recorded word for word by record_merge54.py: history.md:2199-2202, block sha256 bd9a913a…). Checked first: head
+  20f9d59 unchanged, mergeable clean, the six check runs green, main still 53272a1, the PR Advisor routine's APPROVE
+  for 20f9d59 (comment 6941066272, 06:54 UTC; its six findings are the seven Lows above, ADV-NS-L2 and SA-NS-2 as one; nothing
+  above Low). A merge commit,
+  that SHA as the expected head. After: main's tree = 20f9d59's (git diff --quiet, exit 0), the merge's only change
+  NIGHT_SHIFT.md +3, CI on main green (gate 44035715175, toolchain 44035715349, by 07:04:20 UTC); unsubscribed from
+  #54. **Next for it:** ADV-NS-L5 (docs-keeper records his words and the merge on main, "in a separate docs change":
+  plan first, and it needs a branch other than this one, his call, DOCS-54); the kit's next change after the freeze
+  takes ADV-NS-L2/-L3/-L4 and SA-NS-2; NS-TRAILER and NS-FIRST stay with him. **MAIN-52:** main changed a rules
+  file, so this branch takes main 82c605e in (plan first, as at 2bd44a5).
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver: none running** (bp6oaduw2 ran 2026-11-17 04:31:59-06:22:00 UTC, had nothing to save, and stopped
