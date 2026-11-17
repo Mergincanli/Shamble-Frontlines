@@ -379,7 +379,18 @@ it asks nothing; REFS-KIT stays.
   deleted. The ready report in #55's description (title updated). **RUNNING from 14:00:01 UTC (its journal's start;
   first written "about 13:41" without reading the clock, corrected; the PR's steps table likewise): the final-head
   review, wf_1ea0a6c1-69d** (task whljeo5bx; the advisor on aea6f5b and the verifier's re-check, effort high, read only).
-  Next: its results; C3's merge-tree re-run; mark ready; ask his go for #55 at the approved head. **DOCS-54's
+  **The final-head review DONE** (14:00:01-14:04:51 by its journal; saved word for word by docs-54/docs54_final_full.py,
+  read in full): **the advisor APPROVE WITH FINDINGS of aea6f5bd67a4da400613cc24919e3e93e7c8dc21**
+  (advisor-docs54-final-full.json, cf25caf8…; CI green on it, 6 of 6: gate 44098114555 and 44098123943, toolchain
+  44098114570 and 44098124840; ADV-D54F-1 to -3, Low, description only) and **the verifier PASS**
+  (verifier-docs54-final-full.json, 01f3c272…; VER-D54F-1 to -3, the same three points). C3 re-run about 14:05 UTC
+  against #40's head 5d4d73a: STATUS.md only (tree d469f17e…). **#55 MARKED READY** (about 14:06 UTC) with the final
+  report in its description (the six Lows met there; no push). The saver b70ygknng stopped (no agent running).
+  **Waiting for his go: "merge #55" for head aea6f5bd67a4da400613cc24919e3e93e7c8dc21** (a merge commit, that SHA as
+  the expected head; re-check first: head unchanged, CI green, mergeable, the advisor's approval of that head). After
+  the merge: unsubscribe #55, remove the worktree .gate/docs-after-54-wt, cancel the safety-net check-in
+  trig_019e3hj14eRSQcm9Ja4bEtJM, note the merge here, and MAIN-52: take main in (keep this branch's #40 row in STATUS).
+  **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
   full; the plan docs-54/docs-54-plan-draft.md, 134 lines, 2d3bb7a9…). ADV-D54-1 High: the copy method would quote the
