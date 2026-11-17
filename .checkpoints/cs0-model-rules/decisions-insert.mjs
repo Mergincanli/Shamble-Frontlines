@@ -44,23 +44,34 @@ const BEFORE52 = '- **Taken by Mustafa, 2026-11-14, 09:02:29 UTC: his go for #52
 const COND3_END = `     still wait for their results."_\n- **Taken by Mustafa 2026-10-31 (in the v2 day session's chat`;
 const POINTER = wrap(`_Pointer (2026-11-17, change-set 0 of the build plan): for foundation steps 2.4 and 2.5 and Slice 1, changed by his decision of 2026-11-14: the entry "Taken by Mustafa, 2026-11-14, 13:58:05 UTC: the game is built now", above. His words there: "Slice 3, online, still waits for the netcode proof test's result."_`, '     ', '     ') + '\n';
 const once = (t, s) => { const n = t.split(s).length - 1; if (n !== 1) throw new Error(`anchor found ${n} times: ${s.slice(0, 60)}`); };
+const APPENDIX_ONLY = process.argv.includes('--appendix');
 if (!process.argv.includes('--check')) {
   let t = readFileSync(DEC, 'utf8');
-  if (t.includes('2026-11-17, 19:10:44 UTC: his go on the build plan')) throw new Error('already inserted');
+  const has = t.includes('2026-11-17, 19:10:44 UTC: his go on the build plan');
+  if (has && !APPENDIX_ONLY) throw new Error('already inserted (use --appendix to rebuild the appendix alone)');
+  if (!has && APPENDIX_ONLY) throw new Error('--appendix needs the entries in DECISIONS first');
+  if (!APPENDIX_ONLY) {
   for (const a of [TOP, BEFORE52, COND3_END]) once(t, a);
   const entry = (m) => `${m.head}\n${quote(words(m.file))}\n`;
   t = t.replace(TOP, TOP + entry(msgs[0]) + entry(msgs[1]) + entry(msgs[2]));
   t = t.replace(BEFORE52, entry(msgs[3]) + entry(msgs[4]) + BEFORE52);
   t = t.replace(COND3_END, COND3_END.replace('\n- **', `\n${POINTER}- **`));
   writeFileSync(DEC, t);
+  }
   const fence = (s) => '````text\n' + s + '\n````\n';
   let a = `# Appendix to the build plan's report: his words and the inputs, byte for byte\n\n` +
     `_Made by \`decisions-insert.mjs\` (change-set 0) from the files that were copied by script from the build chat's\n` +
     `transcript (session_019YNMUV9LFhASseJ9EP12kL) and from his attachments. Nothing inside a fence was retyped. Under\n` +
-    `each block stand its sha256 and its size, counted without the file's last line end. Everything in A4 to A7 and A10 is the Art lead's proposal unless a\n` +
+    `each block stand its sha256 and its size, counted without the file's last line end. The repository stores LF line\n` +
+    `ends only (\`.gitattributes\`): a text that arrived with Windows line ends (CR LF) stands here with LF line ends,\n` +
+    `and the line under its block also gives the size and sha256 of the file as it was attached. Everything in A4 to A7 and A10 is the Art lead's proposal unless a\n` +
     `line of Mustafa's says otherwise (his words of 2026-11-17, A3, CHANGE 3)._\n\n`;
-  const sec = (id, title, body) => { a += `## ${id}. ${title}\n${fence(body)}sha256 of the block: \`${sha(body)}\` (${Buffer.byteLength(body)} bytes)\n\n`; };
-  const brief = (f) => readFileSync(N + 'inputs/' + f, 'utf8').replace(/\n$/, '');
+  const sec = (id, title, raw) => {
+    const body = raw.replace(/\r\n/g, '\n');
+    const note = body === raw ? '' : ` As attached, with CR LF line ends: \`${sha(raw)}\` (${Buffer.byteLength(raw)} bytes).`;
+    a += `## ${id}. ${title}\n${fence(body)}sha256 of the block: \`${sha(body)}\` (${Buffer.byteLength(body)} bytes).${note}\n\n`;
+  };
+  const brief = (f) => readFileSync(N + 'inputs/' + f, 'utf8').replace(/\r?\n$/, '');
   sec('A1', 'His message of 2026-11-14, 13:58:05 UTC: the build plan\'s task, with his decision of that day', words(msgs[4].file));
   sec('A2', 'His addition of 2026-11-14, 14:12:13 UTC (his label: 15:03)', words(msgs[3].file));
   sec('A3', 'His message of 2026-11-17, 19:10:44 UTC (his label: 20:10): his go, his answers, four changes', words(msgs[2].file));
@@ -86,5 +97,6 @@ for (const m of msgs) {
 }
 const long = t.split('\n').filter((l) => !l.startsWith('>') && l.length > 120 && /2026-11-1[47], (13|14|19|20):\d\d:\d\d UTC|session_019YNMUV9LFhASseJ9EP12kL/.test(l)).length;
 const a10 = ap.includes('(3243 bytes)') || ap.includes('(3244 bytes)');
-console.log('entry header lines over 120:', long, '| A10 is the copy of 3,244 bytes:', a10 ? 'yes' : 'NO');
-process.exit(ok && !long && a10 ? 0 : 1);
+const cr = ap.includes('\r') || t.includes('\r');
+console.log('entry header lines over 120:', long, '| A10 is the copy of 3,244 bytes:', a10 ? 'yes' : 'NO', '| CR characters in the two files:', cr ? 'YES' : 'none');
+process.exit(ok && !long && a10 && !cr ? 0 : 1);
