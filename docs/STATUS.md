@@ -38,8 +38,8 @@ _Last updated: 2026-11-17 (change-set 0 of the build plan, PR #56; main c94c81b)
 
 ## Waiting on Mustafa
 - His go for #56 (change-set 0; risk tier 1, decision docs; no Brave check), once the advisor approves its final head.
-- Answers to Part 15, "The second lane" (proposed; text: ea851a8, `.checkpoints/part-15/part-15-the-second-lane.md`):
-  LANE-SPLIT, RECORD-FILES, VFX-ROUTE, VFX-FIX, VFX-MOMENTS, GUN-FILES; then it goes to main; change-set 1 waits for it.
+- Part 15, "The second lane": answered 2026-11-17, 22:10 UTC, all six (a) (his words: 023e6f3, `.checkpoints/part-15/`
+  `mustafa-2026-11-17-2306.md`; text: ea851a8). It goes to main next, in a docs change of its own before change-set 1.
 - The netcode proof test's items (its plan in #40; the older list: the archive's "Phase", "Next (v2)"): OK each run's
   plan and cost cap; name the laptop and desktop; the Mac when one is available; the Safari workflow's own PR.
 - Legacy, frozen (the archive's "In flight" and "Phase"): his Windows run ("Check a new machine", `tools/README.md`);
