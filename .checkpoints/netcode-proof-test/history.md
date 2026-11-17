@@ -2230,3 +2230,53 @@ From "Next steps, in order" (as it was):
 - **Mustafa, typed into this chat (transcript 2026-11-17T17:08:17.302Z), verbatim:** "merge #55"
 - **What it answered** (the assistant's message at 2026-11-17T14:21:15.089Z, its "For Mustafa" line, copied by this script): 1. If you agree, type **merge #55**. I'll merge exactly head `aea6f5bd67a4da400613cc24919e3e93e7c8dc21`, after re-checking that the version, CI and approval haven't changed.
 - **The merge** (the day session, after its checks: head aea6f5b unchanged, the advisor agent's APPROVE WITH FINDINGS of that head in this session and the verifier's PASS, six check runs green, main still 82c605e): c94c81b440c77f7979e0f944a5341319f9a57d1b, a merge commit, 2026-11-17 17:09:32 UTC, expected head aea6f5bd67a4da400613cc24919e3e93e7c8dc21; main's tree equals that head's; CI on main green (gate run 44133861553, its gate and smoke jobs; toolchain run 44133861577).
+
+## Decision: Mustafa, 2026-11-17 20:20 Amsterdam by his own label (it reached this chat at 22:33:52 UTC), TEST-FIRST (how this chat works until the netcode proof test closes)
+- **Mustafa, typed into this chat (transcript 2026-11-17T22:33:52.187Z, uuid 39e47f18-8174-44d0-8a1a-65423b6020c4), verbatim** (the whole message, unchanged, in the fence below):
+
+```text
+My words of 2026-11-17, 20:20 (Amsterdam time): how this chat works from here until the netcode proof test closes. This message changes no pass mark, no judge rule and no number in marks.json. Take it as it stands: it needs no workflow, no review round and no advisor consultation.
+
+WHY
+The offline game comes first for me now, and it does not wait for this test. This test runs in the background. I want the same test with less around it, and I want it to need me less.
+
+WHAT I SEE ON THIS BRANCH (at 9024840d, 2026-11-17 19:04 UTC, counted against main)
+- Code: 72,678 lines of Rust and 7,688 lines of TypeScript and JavaScript, with 608 Rust tests. That is good work.
+- Working papers under .checkpoints/: 177,993 lines in 934 files. That is more than two lines of paper for every line of code.
+- 116 workflows are named in those papers, in 12 days.
+- The resume card (.checkpoints/netcode-proof-test.md) is 4,467 lines and 450,932 bytes; 3,992 of those lines are its "read this first" part. .claude/CHECKPOINTS.md says of the card: "Keep it short: it is a handoff, not a log."
+- Pull request #54 changed three lines of the night-shift rules. Pull request #55 changed five docs files and left 26 working files with 3,212 lines behind.
+- Your plan sizes unit U4 as M. Work on it began on 2026-11-09, and by your own count of 2026-11-17 it is about three quarters done.
+
+THE SETTING
+I switch Ultracode off for this chat. The effort level stays at max.
+
+RULE 1: THE TEST FIRST
+Until the test closes you do only what your approved plan (revision 3.3) asks. No other work on the kit, on main's docs or on tooling, and no pull request to main that the plan does not name. What you find on the way goes on one list in your checkpoint, for after the close.
+My kit freeze (KIT-FREEZE-2: no new kit rules until the gate step) stands. The two exceptions I gave, pull requests #53 (the kept-logs rule) and #54 (the night-shift lines), are used up.
+The one way out: something that stops a pass mark from being built or judged, or that would lose work. Then you tell me in three lines what is stuck and the smallest fix.
+
+RULE 2: FEWER QUESTIONS FOR ME
+Decisions reach me in one message a day at most, each with your lean. If you are stopped on me, say so in its first line.
+A choice goes by your lean, or by your advisor's ruling, without waiting for me when all four hold: it is inside your approved plan, it can be undone, it changes no pass mark, and it costs no money and touches nothing on main. You record it with its reason and name it in that day's message. I can reverse it.
+What still waits for me: any change to a pass mark, to the judge or to marks.json; money; anything on main; the stops and run days your plan gives me. Nothing here takes away a decision that CLAUDE.md or your approved plan gives to me.
+
+RULE 3: PAPER IN PROPORTION TO THE CHANGE
+- The resume card goes back to a handoff: at most 200 lines. Everything older moves to the history file.
+- A workflow is for the review rounds your rules ask for and for work that truly splits into parallel parts. Everything else you do yourself or with one agent.
+- A brief says what is built, how it is tested and what is still open. It points to the plan, the decision drafts and earlier briefs and does not repeat them.
+
+WHAT STAYS EXACTLY AS IT IS
+Every pass mark and its number. The judge and marks.json. The planted-bug checks. A reviewer's read on every change to marks.json or to the judge. The review budget: at most two review rounds per change, a third only for a Critical or High. Taking main in when main changes code, CI or rules. Every pull request your plan names still stops for my go, and I bring it to the Advisor before I say merge.
+
+WHAT I WANT BACK, IN THIS ORDER
+1. Finish the step you are on.
+2. Cut the resume card to the handoff it should be.
+3. One message of at most 30 lines:
+   - what you will stop writing or running under these rules, and what each cut risks;
+   - any rule in the kit that forces paper you think is not worth its cost, with its file and line. It goes on rule 1's list; nothing in the kit changes now;
+   - the units and run days still ahead with your sizes, and which of them need me at the laptop.
+4. Go on with U4f. You do not wait for my answer to that message.
+```
+
+- **Named** TEST-FIRST on the card (the main session's name for it, not his words).

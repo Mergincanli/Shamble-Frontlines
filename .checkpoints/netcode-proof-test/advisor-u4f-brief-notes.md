@@ -51,3 +51,27 @@ No cut run found (no notes file existed).
   SERIES.md:34/:156 says what "movement" is on a respawn tick; a respawn of the lag-switch or fast client (47 brawlers
   fire at it) moves it metres in one tick vs 8 x 20 = 160 cm -> the check fails a correct build; p3/p4 would catch it
   before the sets (Medium).** ADR 0001:1611 "moves no further in any tick": a reading. Next: B6 anchors/scripts.
+- B6 done: stamps_anchors.py run (read only): every stamp equals 0.2's; P1-P36 each found once (P24 by its key at
+  df-ruling :462). r31_check.py: brief e9f33e61… 1,734 lines; 7-word runs outside 12 item 3: 0. My own
+  u4f-r3/adv_words_check.py (8-word runs against ALL of history.md): 2 hits, neither his words: :414 (a path) and
+  :2212 (PACK-READ's option text, the session's, reused in the KL-U4F draft). Check 2 holds.
+- B7 done (rulings since rev 2): merge-stop C3 (U3C-HELD-1 before U4f's merge: closed), its pooled taker for the
+  deferred Lows (RR-CB-2 taken; judge ones left), head-check ADV-CBH-1/2, H2 (5.4), report-head R1 (U4g), R4 (8.1's
+  list), c62h :20 (P31), c62h-review :82-93 (5.6), U3C-HELD-1 plan review :37/:89 (pack before U4f's counted run),
+  r-b2 :26-28 (P33), r-check U4R-Q2 (c)/Q4/Q14: applied as ruled.
+- B8 done (more code): **Pong literals at server/tests/pump.rs:276, :310 and proto/tests/common/mod.rs:366; the room's
+  Pong is built in pump.rs:458-467: so Q6 (b) opens npt-server src AND tests (P33's trigger "manifest or tests") -> the
+  brief's lane and section 6 item 4 miss it (Medium).** Decoder::pump holds now_ns and tick, not the tick's due instant:
+  a server-ns field needs no signature change; a us-since-due field does. lab io(now) passes tick = last+1 (:475-480).
+  **cmd_on_time (SERIES.md:61 "one per command due this tick") is undefined for a command never arrived; per-arrived
+  counting makes p12's named check (redundancy-1 at P3) pass, against the bite's "fails the 99.9 %" (marks.json:4795)
+  (Medium).** 60 Hz pings every 3 steps = 20/s > 10/s limit unless the interval is ns or pinned (Low). Order: 5.3's
+  pre-runs build in the shared target via main-run.sh (c-u4r-r2.mjs:25-26), so 5.5 item 2's part-clean goes after them.
+- B9 (rulings, drafted): Q1 (a)+(d)+Q6(b)'s server files; Q2 (a), decide after item 2; Q3 (c); Q4 (b); Q5 (a);
+  Q6 (b) averaging, f1 4.0 ms with loss; Q7 (b)+(i)+(c); Q8 (b) 400 ms, (c), (e); Q9 (a) K=16; Q10 (a); Q11 (i)(a)
+  (ii)(a) (iii)(c) with A1 (iv)(a) (v)(b); Q12 (b); Q13 (b); Q14 (b); Q15 (c); Q16 (b); Q17 (a); Q18 (a)+(d).
+  Counts after: measured >= +118, bites >= +133, neg >= 67; pre-runs 21; disk 3,727. To him: LEAD-BOUND only (KL-U4F
+  only if short after item 2). Verdict: APPROVE WITH CONDITIONS. Next: write the ruling file.
+- B10: fold anchors counted by u4f-r3/adv_phrases.py (read only): 21 of 22 found once; "after U4f's merge and before
+  its first set," is bold in the brief ("2. **After U4f's merge and before its first set,**"), cited that way. HEAD
+  b40ba07; `git diff --stat 0ad9661 HEAD -- spikes/netcode-proof` prints nothing. Writing advisor-u4f-brief.md now.
