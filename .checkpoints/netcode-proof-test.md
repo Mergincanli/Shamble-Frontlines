@@ -352,8 +352,17 @@ it asks nothing; REFS-KIT stays.
   chat_size.py at 12:45:42; this card refreshed first, 3eef0e1); the 20-minute reminder trig_01MgobEkbANxK2ZaS6jzAQbW
   fires at 13:08 UTC: if he has not typed /compact by then, refresh the card and carry on. **The reminder fired at
   13:12:48 UTC with no /compact, so carried on** (chat 581,663 tokens, about 58 %, at 13:13:26; his question of about
-  12:58 on progress answered in chat: roughly half the build done, three to five more weeks at today's pace). Next:
-  DOCS-54's build, the steps above. **DOCS-54's
+  12:58 on progress answered in chat: roughly half the build done, three to five more weeks at today's pace). **DOCS-54
+  BUILT AND OPEN AS DRAFT PR #55** (13:13-13:25 UTC; its own checkpoint .checkpoints/docs-after-54.md on
+  claude/docs-after-54): copy_words_54.py --write ALL CHECKS PASS (DECISIONS 1260 lines; table
+  docs-54/copy-table-write.txt) and its second run refused (exit 1); the two pointers (C8) by Edit, the copied block
+  re-checked intact; move_lines_54.py ALL CHECKS PASS (the ROADMAP fold, the archive's #53 :88-105 and #54 :23-27
+  copies); STATUS (120 lines), ROADMAP, the archive's three In flight rows and REPO_MAP (§11; Last checked) by Edit;
+  repo-map-check OK (122 / 109); the gate --no-smoke PASS in the worktree (NODE_PATH, lockfiles byte-equal; no
+  prompt); the build commit 9660197 (its message carries the hash table, docs-54/commit_msg_54.py) and 36242ad (PR
+  #55's number), pushed (no prompt); draft PR #55 by the GitHub MCP tools, label needs-mustafa, subscribed. Head
+  36242ad0f6a3860cac35320b3dbdcf1e0dde0b60. Next: its review round (the verifier and the advisor, a workflow), one fix
+  pass, C3's merge-tree check, the report in the PR, the checkpoint deleted, ready, his go. **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
   full; the plan docs-54/docs-54-plan-draft.md, 134 lines, 2d3bb7a9…). ADV-D54-1 High: the copy method would quote the
