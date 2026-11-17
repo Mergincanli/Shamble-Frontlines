@@ -3,8 +3,8 @@
   (`.checkpoints/netcode-proof-test/plan.md`, revision 3.3; approved by the advisor and Mustafa, 2026-11-06) · verdict:
   `.checkpoints/netcode-proof-test/advisor-verdict.md` · PR #40 (draft)
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
-  **Base:** main, last merged in at 2bd44a5 (main 53272a1, PR #53 the kept-logs rule and PR #52 the docs pass; Mustafa's
-  KL-MERGE (a), 2026-11-15 20:50). Take main in again when main changes code, CI or rules, and once before PR #40 is
+  **Base:** main, last merged in at 3f2fa21 (main 82c605e, PR #54; MAIN-52); before that at 2bd44a5 (main 53272a1, PR
+  #53 the kept-logs rule and PR #52 the docs pass; Mustafa's KL-MERGE (a), 2026-11-15 20:50). Take main in again when main changes code, CI or rules, and once before PR #40 is
   marked ready (MAIN-52, 2026-11-14)
 - **Last update:** 2026-11-17 07:06 UTC (PR #54 merged at 82c605e on his go; C62H-BOUND's report with him since
   03:14:03 UTC; waiting for his answers; next MAIN-52, this branch takes main 82c605e in: the block "NOW (2026-11-16)")
@@ -244,7 +244,18 @@ it asks nothing; REFS-KIT stays.
   toolchain green, the Base line, the saver restarted before the advisor's head check; C7 the plan's text fixed (done:
   main-54-plan.md, "As approved"). Findings: ADV-M54-1 and -2 (Medium, met by C2 and C4), -9 (Medium: main's docs are
   three merges behind; DOCS-54), -3 to -8 (Low; -8 a kit follow-up after the freeze). **DOCS-54 is his call** (the
-  advisor's ruling; its question goes to him in chat, recommendation (a)). **NOW: MAIN-54 by C1-C7.**
+  advisor's ruling; its question goes to him in chat, recommendation (a)). **MAIN-54 BUILT (07:28-07:31 UTC):** C1
+  the saver stopped (its last save 3c65d14, pushed), the eight pre-checks all as expected (HEAD 3c65d14 = origin; main
+  82c605e; base 53272a1; NIGHT_SHIFT.md +3 only; (6) and (7) exit 0; (8) empty). C2 `git merge origin/main`: no
+  prompt, 'ort', NIGHT_SHIFT.md +3 only: **merge commit 3f2fa21d29a9e05c680e32459dd4012d69067d81** (git's own message,
+  without the attribution lines: -m, -F and --no-commit make the guard ask and amend is refused; this card commit
+  carries the MAIN-52 record and both lines). C3 parents 3c65d14 and 82c605e, the diff +3 only, the kit equal to
+  main's and the spike code unchanged (both exit 0). C5 the gate --no-smoke GATE PASS and repo-map OK (131 entries,
+  110 paths; .gate/main-54/gate.log). C4 N 1,350, M 305, the spike folder's status empty; light.log (07:29:45-07:30:36
+  UTC): header HEAD 3f2fa21, diff and untracked e3b0…, free 4,951 MiB; refs 1,350 tracked files with the exception
+  line, marks 81, self 78 of 78, redact 10 of 10 and 305 items, 0 findings; "check: all 4 steps pass"; exit 0: the
+  pass bar holds, every line. **Next (C6):** this save pushes the merge (CI runs; gate, smoke and toolchain green),
+  the saver restarted, then the advisor's check of the pushed head.
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver: beoc3blfv** (started 2026-11-17 07:09:57 UTC with the MAIN-54 plan review, to about 08:59; stop it
