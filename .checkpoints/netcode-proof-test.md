@@ -260,6 +260,9 @@ it asks nothing; REFS-KIT stays.
   the saver restarted (b2f2ov1so). **RUNNING from about 07:33 UTC: the advisor's check of head 20048a5** (workflow
   wf_910a6598-efe, task wa6b2w8hc; notes advisor-main-54-head.md; it reads CI's conclusions itself). On return: save
   the result word for word, read it in full; then DOCS-54 and the next work wait as the card says.
+  **COMPACT-WAIT: /compact asked at about 07:33 UTC** (chat 414,906 tokens, about 41 % of 1M, chat_size.py at
+  07:32:46; the card refreshed first, a62d64a); the one-time reminder is set for 20 minutes after the ask. If he has
+  not typed /compact by then: refresh the card and carry on (his COMPACT-WAIT words, history.md:2052-2054).
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver: b2f2ov1so** (started 2026-11-17 07:31:41 UTC for the advisor's head check, to about 09:21;
