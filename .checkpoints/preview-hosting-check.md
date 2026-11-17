@@ -690,7 +690,7 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    started and waits, then a one-item list with the run link and head SHA.
 
 ## Running work
-- saver b491gaova (started 2026-11-17 22:2x UTC with the security review): stopped by the harness's background time
+- saver b491gaova (started 2026-11-17 22:22:16 UTC, its log, with the security review): stopped by the harness's background time
   limit at 22:52:16 UTC ("watch stopped: terminated"; its last cycle: "nothing to save"); no agent runs now, so it
   stays off until the next agents start. The branch is clean at a66bcc0.
 - Waiting on him: the account rename (screenshot), CHECK-YES and ID-ENDS (the yes request sent after a66bcc0).
