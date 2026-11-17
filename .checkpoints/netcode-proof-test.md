@@ -422,11 +422,24 @@ it asks nothing; REFS-KIT stays.
   u4r-P0-93509dfd7fd1 3,393, c-u2 x2 998 each; .gate/shared-target 6,346; the main folder's target 776 (MiB). So
   KL-U4F is not sent now: whether the room is short is known only after the launch pack (about 380 back) and the shared
   target's part-clean (unmeasured; the last dev part-clean gave back 6,125 MiB).
-  **Round 2 and D4b: RUNNING from 18:58 UTC, workflow wf_997ea01f-b4f** (task w51fogoyl; script
-  npt-u4f-r31-round2-d4b-wf_997ea01f-b4f.js): the test-engineer and the security-auditor re-check what rev 3 to 3.1
-  changed (notes u4f-brief-r31-check-te.md, u4f-brief-r31-check-sa.md; the review budget's round 2), and a
-  netcode-architect writes and runs an independent second D4 model (u4f-r3/d4b/), all xhigh, read only, three at
-  once. **The main session's own D4 model: DONE** (u4f-r3/d4/d4_model.py, sha256 9fdf285e…, read only; its output
+  **Round 2 and D4b: DONE** (workflow wf_997ea01f-b4f, 18:58-19:24 UTC; 3 agents, none failed; results saved word for
+  word by u4f-r3/r31_round2_full.py: r2-te-r31-full.json 9e37c342…, r2-sa-r31-full.json 5cf6524f…, d4b-r31-full.json
+  e8404004…; every Medium read in full). Round 2: no Critical or High. The test-engineer PASS WITH FINDINGS (5 Medium:
+  TE31-1 the "stamps between unused" clause fails -20 at P3 under U4F-Q7 (a), carry them 2 a step instead; TE31-2 5.3
+  has no twins, so the twin checks are Gaps and the "every other check passes" rule fails a correct build; TE31-3 p19's
+  400 ms hold cannot show the cap under W and the bucket; TE31-4 = SA31-2 below; TE31-5 f16 and f29 can pass vacuously
+  at the short scale; 6 Low TE31-6 to -11). The security-auditor PASS WITH FINDINGS (2 Medium: SA31-1 under option A a
+  rejoin refills the bank, about 1.4x speed at one rejoin a second, fix a per-slot kept stamp across joins; SA31-2 an
+  honest command before the first snapshot is stamped 0 and would now count as forged kind 2; 2 Low SA31-3, -4; it
+  confirms the reviser's rejection of its SA3-2 twin variant). **D4 compared** (u4f-r3/d4/d4-compare.md; the noise run
+  u4f-r3/d4/d4_noise.py daa4545c…, 99,000 more connects): every verdict of the two models agrees; 13 of 14 gaps within
+  ±2.2 sd of chance, the 14th (exact-stamp lowest-RTT, 2.63) model B's draws low, no modelling difference; the value to
+  carry 4.856 ms (on the bar); the exact-stamp mean 2.35 ms.
+  **Fix pass and the advisor's check: RUNNING from about 19:32 UTC, workflow (its id on the line below)**: one
+  general-purpose agent acting as the netcode-architect revises rev 3.1 to rev 3.2 for round 2's 7 Medium and 10 Low,
+  and folds D2's reading and D4's results into sections 5.5, 11, U4F-Q6 and NA-4 (the review budget's last fix pass);
+  then the advisor (general-purpose, reading main's advisor.md) checks rev 3.2 and rules on U4F-Q1 to Q18: ruling
+  advisor-u4f-brief.md, notes advisor-u4f-brief-notes.md. Both xhigh, one at a time. **The main session's own D4 model: DONE** (u4f-r3/d4/d4_model.py, sha256 9fdf285e…, read only; its output
   u4f-r3/d4/d4-output.md, its `--check` MATCH byte for byte): with the Pong as built (U4F-Q6 (a)) none of D4's three
   estimators passes -47's p99 of 5 ms (best, the mean: 6.06 ms with random phases, 8.69 ms with one phase per
   connect; the lowest-RTT about 18 ms; (e) 12.85 ms, its half-lowest-RTT delay biased -7.3 ms); with an exact sub-tick
