@@ -270,12 +270,19 @@ it asks nothing; REFS-KIT stays.
   before ready runs CI (CHECKPOINTS.md §9). **MAIN-54 DONE.**
   **COMPACT-WAIT: /compact asked at about 07:33 UTC** (chat 414,906 tokens, about 41 % of 1M, chat_size.py at
   07:32:46; the card refreshed first, a62d64a); the one-time reminder is set for 20 minutes after the ask. If he has
-  not typed /compact by then: refresh the card and carry on (his COMPACT-WAIT words, history.md:2052-2054).
+  not typed /compact by then: refresh the card and carry on (his COMPACT-WAIT words, history.md:2052-2054). **The
+  reminder (trig_01XhiH6Uza8JerVtTb175j69) fired at 07:55:03 UTC with no /compact, so carried on.**
+  **RUNNING from about 07:56 UTC: U3C-HELD-1's plan draft** (workflow wf_5140889b-c32, task wpkvxshje; notes folder
+  .checkpoints/netcode-proof-test/u3c-held-1/): the netcode-architect (the cause from delay.rs, the fix as a diff, the
+  plant, NC-U3c-2's sentences) and the test-engineer (the diagnostic loop through main-run.sh, the fix's evidence,
+  the disk budget and packing by brief 8.1, never R4's folders) in parallel, read only, no builds or tests; then a
+  drafter writes u3c-held-1-plan-draft.md. On return: save the three results word for word, read the draft in full,
+  fix it, then the advisor's plan review (its own run). Nothing is built before the advisor approves.
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
-  the same. **Saver: none running** (b2f2ov1so ran 2026-11-17 07:31:41-07:38:55 UTC for the advisor's head check and
-  was stopped by TaskStop when it returned: "nothing to save", "watch stopped: terminated"; start it with the next
-  agent run;
+  the same. **Saver: bvg19b3fy** (started 2026-11-17 07:55:49 UTC for U3C-HELD-1's plan draft, to about 09:45; stop it
+  when the work returns and nothing runs; b2f2ov1so ran 07:31:41-07:38:55 UTC for the advisor's head
+  check and was stopped by TaskStop when it returned: "nothing to save", "watch stopped: terminated";
   beoc3blfv ran 07:09:57 until C1's TaskStop at about 07:28, its output ending "[killed]" with its last commit 3c65d14
   made and on the remote; bp6oaduw2 ran 04:31:59-06:22:00 UTC, had nothing to save, and stopped on its time limit,
   not restarted while nothing ran; ba732d9co, restarted 02:39:41 after the spend-limit cut, saved 8c72ab7,
