@@ -36,3 +36,34 @@ B11. DONE + answer.
   laptop and desktop" still true (classes named, machines before cs 6) - optional precision. Follow-ups section
   exists (ids here, text in archive; I can't edit archive -> short text + pointer to rules file / plan report).
   Routines: nothing his words change (leave). Next: B3.
+- B3 DONE (ROADMAP.md 239 lines; Recent work l.117-239 holds 12 entries: #55 (l.120-127, "[2026-11-17, PR #55: in
+  review]", ends "Next: the advisor agent's review of the final head, then his go."), #54, #53, #52, #48, #51, #50, #49,
+  #46, #44, #43 (l.237, one line), #42 (l.239, one long line) -> adding cs0 makes 13: fold #42 into Build history (its
+  newest entries l.81-87; form "- **Name (date):** slug (PR #n, sha, ...)"). Next / open l.100 says "step 2.3's ... plan
+  waits for his go; wave 1 runs one heavy spike at a time" (changed by his decision: add a dated pointer clause).
+  #55 merge facts (merge commit c94c81b msg): by merge commit, his go typed 17:08:17 UTC for head aea6f5b, after the
+  advisor agent's APPROVE WITH FINDINGS of aea6f5b and the verifier PASS; merged_at 17:09:33 UTC. CI on c94c81b not
+  checked (out of his decision's reach: leave STATUS l.23-25). Branch has not touched my 4 files (diff empty). Next: B4.
+- B4 DONE. REPO_MAP (148 lines): docs/ table rows l.61-75; research files one row each (l.62-69 after the folder row
+  l.61); reports: folder row l.71 + four individual rows (v2-research + appendix l.72-73, decision drafts + appendix
+  l.74-75). repo-map-check: entries must exist; docs/reports/ and docs/research/ required as folders only. FINDING:
+  docs/reports/README.md is 2 lines (naming rule + "paste the latest one"), NO index of reports (46 files in the
+  folder) -> "in the index's own form" has no form; adding 3 lines would make a partial index. Decision: leave it
+  unchanged, tell the caller. FINDING: docs/research/README.md has a topic table + "other files" list (GLOSSARY,
+  UNREAD_SOURCES, l.33-34) the two new research files would join: outside my 4 files, tell the caller. Next: B5.
+- B5 DONE. Plan report l.17-141 "Since the plan": carriers: ADR 0002 "one change-set per step" -> change-set 2's docs
+  pass (l.23); machine lines in ADR 0001, ADR 0003, SPIKE_PLAN -> change-set 6's docs pass (l.26); O1 draw cap "a
+  question for Mustafa with change-set M's plan" (l.116-120); O2 fifth material class two names (l.121-122); coat motion
+  "Mustafa's call at change-set 10's pictures" (l.125-126); first real Blender export proves the rest (l.134-136).
+  Verified: ADR 0005 l.2365-2366 PM-0005-54's "fail on the rifle file as reported (6 draws per pass: AER part 7, O1)";
+  register docs/adr/README.md l.23 "119 numbered open questions, 96 of them open" (was 98 on main); OQ-0002-6,
+  OQ-0006-18, OQ-0003-1, PM-0004-34 rows touched in the branch diff. Part 15 at ea851a8 (20:42:04 UTC):
+  `.checkpoints/part-15/part-15-the-second-lane.md`, title "Part 15. The second lane (proposed 2026-11-17, revision 2;
+  it waits for Mustafa's answers)", all six codes present; HEAD copy identical. Docs commits on branch: 3747bb3,
+  4a1b0d7, 212f55b, 5f356ef, 65c8fe8. Next: B6 (STATUS edits).
+- Budget plan (added lines by numstat, max 30): STATUS 18 (l.5:1; Phase "The build" bullet:4; Last merged:2 keeping
+  l.15; #56 row replacing #55 row:1; Next item 2:3; Waiting #56 go:1 + Part 15:2; Follow-ups "From change-set 0":4);
+  ROADMAP 7 (cs0 entry:3; #55 entry l.120+l.127 -> merged:2; fold #42 l.239 -> after l.87 by script, "- " prefix:1;
+  Next/open l.100 dated pointer:1); REPO_MAP 4 (2 research rows; plan report row naming its appendix; cs0 report row);
+  reports/README 0 (no index). Total 29. Left alone on purpose: STATUS l.23-25 CI on 82c605e; l.108 asset-pipeline
+  risk (still true in the main: only the export part is on paper); Routines.

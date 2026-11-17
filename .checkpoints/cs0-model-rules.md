@@ -15,7 +15,7 @@
      checkpoints (`build-plan-slice-1*`, `cs0-model-rules*`) in its last commit before the PR is marked ready.
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs0-model-rules) · **Base:** main
   c94c81b440c77f7979e0f944a5341319f9a57d1b (to take in first; the branch still sits on 4460ef5 plus checkpoint commits)
-- **Last update:** 2026-11-17 22:29 CET (from the clock)
+- **Last update:** 2026-11-17 22:39 CET (from the clock)
 
 ## Steps done
 1. His go received (user message of 2026-11-17T19:10:44Z, saved by script, 10,544 bytes). The session's model read
@@ -134,6 +134,17 @@
     His message of 21:15:31 UTC pasted the Art lead's correction once more: equal to the saved A10 (3,243 bytes
     without the last line end); nothing changes.
 
+26. (21:39 UTC) Commit 3's third part is pushed: cacea55 (`docs/research/asset-export-rules.md`, 397 lines, with
+    test-engineer's 21 changes and the five fixes M1 to M5; `docs/research/soldier-joint-list.md`, 224 lines; two
+    rows in the research index). Written lines now: 1,103, of which a few are docs-keeper's in-progress lines
+    (stop line 1,200; still to come: the rest of docs-keeper's pass, at most 30 lines in all, and the report, at
+    most 60).
+    Review round 1 on the final diff has started: the verifier (its brief: `cs0-model-rules/verifier-brief.md`;
+    notes `verifier-cs0.md`) and test-engineer (the marks as pasted; the rules' part 5 against its rows).
+    engine-architect's review follows when a slot is free. docs-keeper is still on its pass.
+    One question passed on for the advisor agent's review of the final head: mark 10's line 6 (PM-0005-56) checks
+    the loaded scene graph where its ruling said "on both backends ... the file's height".
+
 ## Next steps
 1. Change-set 0's own short plan at `.checkpoints/cs0-model-rules/plan.md`; the advisor agent's review of it (effort
    max; APPROVE before any edit outside `.checkpoints/`).
@@ -208,4 +219,4 @@
 ## Running work
 - saver: background task brf1n425m, started 20:03 UTC (the first one, bfulbfi1o, was killed at 19:55 UTC); check
   its output file at each update.
-- agents (3 of 3): graphics-engineer (the rules draft, last pass), engine-architect (the joint list, last pass), docs-keeper.
+- agents (3 of 3): docs-keeper, the verifier, test-engineer (review).

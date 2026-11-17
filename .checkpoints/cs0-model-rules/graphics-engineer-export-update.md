@@ -287,3 +287,17 @@ D4 checks (<= 400 lines, 120 columns, quotes, ids); D5 notes + DONE + answer (<=
 - D3 applying now: items 1-21 + PM ids in the # column + test-engineer's loosening point + AX-R1 GUN-FILES. Room:
   AX-F13 rewrap -1, part 6 bullet 2 to one line -1, not-read exporter bullet -1 (mirror-tools side note dropped),
   part 8 Gap rows -2.
+- D3 done: items 2-14, 16, 17, 19-21 applied as written; item 1 applied as one TL;DR line (README:38 allows five
+  lines; the full statement is part 5's "What a file can prove"); item 15 applied with ADR 0002's "probably" kept;
+  item 18 applied in short (mark 7's PM id stays in its row). PM ids 47-56 beside the mark numbers; legend: numbers once
+  marked [proposal] kept as test-engineer ruled; test-engineer's loosening point after the advisor's ruling; AX-R1 names
+  GUN-FILES (the build plan's Part 15, a file of its own) and the rifle "used only to try the checks". Room: AX-F13
+  rewrap, part 6 bullet 2 to one line, the exporter not-read bullet (mirror-tools side note dropped), mark 4 bullet,
+  the two Gap rows removed (item 20).
+- D4 done: 397 lines; prose <= 120; quotes 63 checked, 2 not found (the loader strings, as before); 34 ids resolve;
+  no `.checkpoints`, no "under `root`", no "[proposal]" tag left outside the legend.
+- For the advisor (flag, applied): mark 10 line 6 now checks the loaded scene graph (joints' and mesh node's world
+  positions x 0.5 and 1.2 within 1 mm, mesh node's world scale) instead of "on both backends ... the file's height";
+  test-engineer's reason: the scene graph's transforms are the renderer's input on both backends; drawing on both
+  backends is mark 9's pixel probe. Equivalent for the scaled height, since skinned vertices follow the joints.
+DONE (pass 4)
