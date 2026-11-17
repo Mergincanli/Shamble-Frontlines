@@ -98,3 +98,10 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   (one `headers-44171977539`, 311 bytes). Reading: the value in CLOUDFLARE_API_TOKEN (or the account ID beside it) is
   not what Cloudflare expects; which of the two, and why, is not known from the log (both values are masked).
   A rehearsal finding (plan Part 3 B: a fix found here is not a re-run of a failed mark).
+- Run data (read 2026-11-17 after the run): the deploy job was created 20:42:07 ("waiting") and started 20:49:39, so
+  his approval came between those times (the approvals endpoint is not among this session's tools); steps: download
+  20:49:42-45, "Refuse server code in the upload" passed, "Install Wrangler (this step holds no secret)" 20:49:46-55,
+  "Upload to Cloudflare Pages" 20:49:55-57 failure; job done 20:49:58. Verify 20:50:00-07; its artifact
+  `headers-44171977539` (id 14369645074, digest sha256:0073aac72dce..., equal to the downloaded zip) holds
+  `{"checked_at": "2026-11-17T20:50:04.604Z", ..., "records": [], "summary": {"records": 0, "pass": 0, "fail": 0,
+  "no_reading": 0}}` (saved here before its deletion for the re-run).
