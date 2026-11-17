@@ -342,7 +342,8 @@ it asks nothing; REFS-KIT stays.
   --write, the two pointers (C8), the ROADMAP fold and the archive follow-ups by a small script, STATUS, ROADMAP's
   entries, the archive rows and REPO_MAP by Edit, the checks, the commit, the first push (named), the PR (draft) and its
   label, the review round. **COMPACT-WAIT: /compact asked at about 12:47 UTC** (chat 484,426 tokens, about 48 %,
-  chat_size.py at 12:45:42; this card refreshed first); the 20-minute reminder is set. **DOCS-54's
+  chat_size.py at 12:45:42; this card refreshed first, 3eef0e1); the 20-minute reminder trig_01MgobEkbANxK2ZaS6jzAQbW
+  fires at 13:08 UTC: if he has not typed /compact by then, refresh the card and carry on. **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
   full; the plan docs-54/docs-54-plan-draft.md, 134 lines, 2d3bb7a9…). ADV-D54-1 High: the copy method would quote the
