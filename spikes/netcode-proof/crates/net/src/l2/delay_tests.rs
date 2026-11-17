@@ -741,7 +741,8 @@ async fn one_record_per_write_never_beyond_the_budget() {
 /// Pending at a full budget and woken when it frees; the held-bytes bounds under a client that never reads (down:
 /// S takes nothing, so released bytes stay untaken) and under a tungstenite that never reads (up: the client floods
 /// 150 KB of frames); and the pump does not spin while S owes it a wake (R1's guard: its runs over the hold, counted).
-/// Quiet P2, about 2 s.
+/// After the hold a whole record is offered: with the released records acknowledged and untaken, only down_free's
+/// released bytes keep it out (G-NC2's check at every write, U3C-HELD-1). Quiet P2, about 2 s.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded() {
     let (client, server) = tokio::io::duplex(1_024);
@@ -776,10 +777,15 @@ async fn a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded
     let polls = ds.life().polls;
     tokio::time::sleep(Duration::from_millis(1_500)).await;
     let polls = ds.life().polls - polls;
-    assert!(matches!(
-        Pin::new(&mut ds).poll_write(&mut noop(), &[0x82; 100]),
-        Poll::Pending
-    ));
+    let r = Pin::new(&mut ds).poll_write(&mut noop(), &[0x82; RECORD_MAX]);
+    let life = ds.life();
+    assert_eq!(
+        life.held_over_bound,
+        [0, 0],
+        "held <= 64 KB + the front record's acknowledged prefix, at every write"
+    );
+    assert_eq!(life.held_grew, [0, 0], "held only falls between writes");
+    assert!(matches!(r, Poll::Pending));
     let (_, _, held, max) = ds.probe();
     println!(
         "written {written} B before Pending; held now {held:?}, largest {max:?}; the pump ran {polls} times in the \
@@ -2256,13 +2262,14 @@ async fn tiny_frames_that_fill_the_up_room_drain_whole_and_in_order() {
     assert!(shifted > 0, "move_up shifted pending bounds (not vacuous)");
 }
 
-/// G-NC2 (NC-U3c-2's corrected bound, under loss): the down plaintext DelayStream holds never exceeds the 64 KB budget
-/// plus the acknowledged prefix of the front record not yet released, checked on every held-bytes sample
-/// (`Conn::check_held_bound`), and that prefix does carry it beyond 64 KB. P2 with its loss and jitter; the writer keeps
-/// the budget full with 16 KB records while the client drains S. It runs until 100 records are written, a first
-/// transmission was lost, and a sample held more than 64 KB (model state; a hang guard only). Then: no sample above the
-/// bound either way, the largest excess over 64 KB is below one record (16,406 B), and first transmissions were lost.
-/// A few seconds.
+/// G-NC2 (NC-U3c-2's corrected bound, under loss; U3C-HELD-1): at every write, where the held bytes grow
+/// (`Conn::check_held_bound`), the down plaintext DelayStream holds is at most the 64 KB budget plus the acknowledged
+/// prefix of the front record not yet released, and that prefix does carry it beyond 64 KB; between writes it only
+/// falls (`Conn::check_held_falls`, every held-bytes sample), since there a release can end the prefix while the bytes
+/// wait for S. P2 with its loss and jitter; the writer keeps the budget full with 16 KB records while the client
+/// drains S. It runs until 100 records are written, a first transmission was lost, and a write held more than 64 KB
+/// (model state; a hang guard only). Then: no write above the bound and no sample above the latest write either way,
+/// the largest excess over 64 KB is below one record (16,406 B), and first transmissions were lost. A few seconds.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn under_loss_the_held_bytes_stay_within_64_kb_and_the_front_records_acknowledged_prefix() {
     let (client, server) = tokio::io::duplex(1 << 20);
@@ -2290,18 +2297,20 @@ async fn under_loss_the_held_bytes_stay_within_64_kb_and_the_front_records_ackno
     let life = ds.life();
     let s = ds.snapshot();
     println!(
-        "{records} writes of 16 KB at P2: largest down excess over 64 KB {} B; samples above the bound {:?}; first \
-         losses {}, stalls {}",
+        "{records} writes of 16 KB at P2: largest down excess over 64 KB {} B; writes above the bound {:?}; samples \
+         above the latest write {:?}; first losses {}, stalls {}",
         life.held_beyond_budget[DOWN],
         life.held_over_bound,
+        life.held_grew,
         s.counters[DOWN].first_lost,
         s.counters[DOWN].stalls
     );
     assert_eq!(
         life.held_over_bound,
         [0, 0],
-        "held <= 64 KB + the front record's acknowledged prefix"
+        "held <= 64 KB + the front record's acknowledged prefix, at every write"
     );
+    assert_eq!(life.held_grew, [0, 0], "held only falls between writes");
     assert!(life.held_beyond_budget[DOWN] < RECORD_MAX as u64 + OVERHEAD);
     drop(ds);
     drain.await.expect("drained");

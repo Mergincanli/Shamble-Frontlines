@@ -43,10 +43,12 @@
 //! end: G-PRE-WAKE), wakes the pump too. A pump that panics ends the connection with an error, never a clean EOF or a
 //! clean shutdown.
 //!
-//! **Held bytes (NC-U3c-2).** Down at most the 64 KB budget (it covers released-but-untaken bytes) plus the
-//! acknowledged prefix of the front record not yet released: a loss inside a record lets the acknowledgement of its
-//! first segments free that prefix in the budget while the record waits to be delivered whole, so below 64 KB plus one
-//! record (16,406 B). Up likewise at most 64 KB plus the acknowledged prefix of its front unreleased record (below one
+//! **Held bytes (NC-U3c-2, U3C-HELD-1).** Down, at each write, at most the 64 KB budget (it covers released-but-
+//! untaken bytes) plus the acknowledged prefix of the front record then not yet released: a loss inside a record lets
+//! the acknowledgement of its first segments free that prefix in the budget while the record waits to be delivered
+//! whole. Between writes the held bytes only fall, so at every moment below 64 KB plus one record (16,406 B); the bound
+//! with the current front record is no invariant there, since a release ends its prefix while its bytes wait for S.
+//! Up likewise, at each write, at most 64 KB plus the acknowledged prefix of its front unreleased record (below one
 //! record: 549 B, or the request's 8,214 B), plus the scanner's buffer (one frame, 527 B, or the request cap). Counted,
 //! current and largest, per direction.
 //!
@@ -369,8 +371,9 @@ pub(crate) struct Snapshot {
 
 /// The pump's lifetime for the shutdown tests (W3, M1): its polls, those at or after the shutdown deadline, the
 /// deadline and the stamp it ended at (DelayStream's clock). And the tests' counts: move_up's compactions that shifted
-/// records still pending (G-F10's vacuity), and per direction the held-bytes samples above NC-U3c-2's bound and the
-/// largest excess of the records held over the 64 KB budget (G-NC2; `Conn::check_held_bound`).
+/// records still pending (G-F10's vacuity), and per direction (G-NC2, U3C-HELD-1): the writes that left the held
+/// bytes above NC-U3c-2's bound, the largest excess of the records held over the 64 KB budget, the held bytes the
+/// latest write left, and the samples above those (`Conn::check_held_bound`, `Conn::check_held_falls`).
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, Default)]
 pub(crate) struct Life {
@@ -381,6 +384,8 @@ pub(crate) struct Life {
     pub(crate) shifted: u64,
     pub(crate) held_over_bound: [u64; 2],
     pub(crate) held_beyond_budget: [u64; 2],
+    pub(crate) held_at_write: [u64; 2],
+    pub(crate) held_grew: [u64; 2],
 }
 
 /// One logged step (model axis).
@@ -516,29 +521,45 @@ impl Conn {
             self.held_max_run[d] = self.held_max_run[d].max(self.held[d]);
         }
         #[cfg(test)]
-        self.check_held_bound();
+        self.check_held_falls();
     }
 
-    /// NC-U3c-2's bound on every held-bytes sample (the tests; G-NC2): per direction the plaintext held in records (down:
-    /// all DelayStream holds; up: less the scanner's buffer) is at most the 64 KB budget plus the acknowledged prefix of
-    /// the front record not yet released (a loss inside it lets the acknowledgement of its first segments free that
-    /// prefix in the budget while it waits to be delivered whole). Counts the samples above it and keeps the largest
-    /// excess over the budget.
+    /// NC-U3c-2's bound where the held records grow (the tests; G-NC2, U3C-HELD-1): at each write of a record into
+    /// `d`'s end (model_write, the only place they grow), the plaintext held in records (down: all DelayStream holds;
+    /// up: less the scanner's buffer) is at most the 64 KB budget plus the acknowledged prefix of the front record not
+    /// yet released (a loss inside it lets the acknowledgement of its first segments free that prefix in the budget
+    /// while it waits to be delivered whole). The write's room makes it so: the step to the write's now released every
+    /// record delivered whole, and down_free and up_room count the released-but-untaken bytes. Between writes the bound
+    /// is no invariant: the front record's release ends its prefix while its bytes stay held until S takes them (down)
+    /// or tungstenite reads them (up), so a sample then can read above it with nothing grown (the release transient);
+    /// `check_held_falls` covers those samples. Counts the writes above the bound and keeps the largest excess over the
+    /// budget and the held bytes this write left.
     #[cfg(test)]
-    fn check_held_bound(&mut self) {
+    fn check_held_bound(&mut self, d: usize) {
         let budget = TcpConfig::default().write_budget;
+        let held = self.bytes[d].len() as u64;
+        let una = self.model_end[d] - self.model.outstanding(d);
+        let prefix = self.recs[d].get(self.released[d]).map_or(0, |r| {
+            let size = r.len as u64 + OVERHEAD;
+            una.saturating_sub(r.model_end - size).min(size)
+        });
+        if held > budget + prefix {
+            self.life.held_over_bound[d] += 1;
+        }
+        self.life.held_beyond_budget[d] =
+            self.life.held_beyond_budget[d].max(held.saturating_sub(budget));
+        self.life.held_at_write[d] = held;
+    }
+
+    /// G-NC2 between writes (U3C-HELD-1): the records' plaintext only falls there (S takes it down, tungstenite reads
+    /// it up), so every held-bytes sample is at most what the latest write left, which `check_held_bound` held to the
+    /// bound. Counts the samples above it: a growth outside model_write.
+    #[cfg(test)]
+    fn check_held_falls(&mut self) {
         for d in [DOWN, UP] {
-            let held = self.bytes[d].len() as u64;
-            let una = self.model_end[d] - self.model.outstanding(d);
-            let prefix = self.recs[d].get(self.released[d]).map_or(0, |r| {
-                let size = r.len as u64 + OVERHEAD;
-                una.saturating_sub(r.model_end - size).min(size)
-            });
-            if held > budget + prefix {
-                self.life.held_over_bound[d] += 1;
+            if self.bytes[d].len() as u64 > self.life.held_at_write[d] {
+                self.life.held_grew[d] += 1;
             }
-            self.life.held_beyond_budget[d] =
-                self.life.held_beyond_budget[d].max(held.saturating_sub(budget));
         }
     }
 
@@ -594,7 +615,7 @@ impl Conn {
     }
 
     /// One record of `len` plaintext bytes into the model at `t` from `dir`'s end. The caller checked the room, so the
-    /// model takes all of it.
+    /// model takes all of it, and put the record's plaintext into `bytes[dir]` first (G-NC2's check at every write).
     fn model_write(&mut self, dir: usize, len: usize, t: u64, message_end: bool) {
         let bytes = len as u64 + OVERHEAD;
         let took = self.model.write(dir, bytes, t);
@@ -610,6 +631,8 @@ impl Conn {
         });
         #[cfg(test)]
         self.logs.steps.push((t, Step::Write { end: dir, bytes }));
+        #[cfg(test)]
+        self.check_held_bound(dir);
     }
 
     /// Advances the model to `t` event by event (and through each burst's end), releasing what it delivers with each
