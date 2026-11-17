@@ -254,12 +254,17 @@ it asks nothing; REFS-KIT stays.
   110 paths; .gate/main-54/gate.log). C4 N 1,350, M 305, the spike folder's status empty; light.log (07:29:45-07:30:36
   UTC): header HEAD 3f2fa21, diff and untracked e3b0…, free 4,951 MiB; refs 1,350 tracked files with the exception
   line, marks 81, self 78 of 78, redact 10 of 10 and 305 items, 0 findings; "check: all 4 steps pass"; exit 0: the
-  pass bar holds, every line. **Next (C6):** this save pushes the merge (CI runs; gate, smoke and toolchain green),
-  the saver restarted, then the advisor's check of the pushed head.
+  pass bar holds, every line. **C6: pushed at 07:31:33 UTC with the card: head
+  20048a53aca06e17c630f1f570854363623cfae1** (its message carries the MAIN-52 record and both attribution lines, no
+  [skip ci]; CI started: gate 44039377701 push and 44039383909 pull_request, toolchain 44039377819 and 44039383884);
+  the saver restarted (b2f2ov1so). **RUNNING from about 07:33 UTC: the advisor's check of head 20048a5** (workflow
+  wf_910a6598-efe, task wa6b2w8hc; notes advisor-main-54-head.md; it reads CI's conclusions itself). On return: save
+  the result word for word, read it in full; then DOCS-54 and the next work wait as the card says.
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
-  the same. **Saver: beoc3blfv** (started 2026-11-17 07:09:57 UTC with the MAIN-54 plan review, to about 08:59; stop it
-  before the merge, step 1; bp6oaduw2 ran 04:31:59-06:22:00 UTC, had nothing to save, and stopped on its time limit,
+  the same. **Saver: b2f2ov1so** (started 2026-11-17 07:31:41 UTC for the advisor's head check, to about 09:21;
+  beoc3blfv ran 07:09:57 until C1's TaskStop at about 07:28, its output ending "[killed]" with its last commit 3c65d14
+  made and on the remote; bp6oaduw2 ran 04:31:59-06:22:00 UTC, had nothing to save, and stopped on its time limit,
   not restarted while nothing ran; ba732d9co, restarted 02:39:41 after the spend-limit cut, saved 8c72ab7,
   bf752f3 and df4634f and stopped on its time limit at 04:29:42; b00b7pd9e ended
   on its time limit at 22:28:10, then bqdaec008 ran until the container restart at 23:46:48; the cuts block).
