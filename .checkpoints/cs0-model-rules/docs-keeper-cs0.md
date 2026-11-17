@@ -14,3 +14,16 @@ B10. Checks: numstat (added <= 30 across the four), no line > 120 cols outside t
 B11. DONE + answer.
 
 ## Notes
+- B1 DONE (DECISIONS.md lines 129-248 and 434-493). Entry titles: "Taken by Mustafa, 2026-11-14, 13:58:05 UTC: the game
+  is built now" (l.453); addition "2026-11-14, 14:12:13 UTC" (l.434, label 15:03); "2026-11-17, 19:10:44 UTC: his go
+  on the build plan" (l.183); "2026-11-17, 20:03:57 UTC: four small things" (l.157); "2026-11-17, 20:39:23 UTC:
+  SIZE-0 (a)" (l.130). Quotable (exact): CHANGE 1 "No game code is built before change-set 0 is on main." and "The 2.3
+  chat stays stopped for now: I pass it nothing until its plan has been checked."; go: "build change-set 0 now, then
+  the change-sets in the plan's order, each as its own pull request that stops for my go on the merge. This go covers
+  no merge."; CHANGE 2: "That chat exists since 2026-11-15: branch claude/optimistic-albattani-mdoonz, main model Opus
+  5.5, Fable 5.2 on its advisor tool. It runs the preview hosting check in a separate test repository of mine and
+  touches nothing of yours."; "Before change-set 1 starts, add a short Part 15 to your plan, "The second lane"."; 6.
+  PREVIEW-START "(a). It has started, in the second builder chat"; SIZE-0 "(a). It goes on as one pull request." and
+  "No game code before change-set 0 is on main: that stands."; 2026-11-14 decision changes SPIKE-ORDER (b) "wave 1 runs
+  one heavy spike at a time" for steps 2.4, 2.5, Slice 1. 2026-11-14 block: record "by step 2.3's first docs
+  change-set" -> changed by CHANGE 1 to change-set 0. Next: B2.
