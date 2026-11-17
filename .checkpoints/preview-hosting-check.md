@@ -312,6 +312,14 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      body and returns only the new value; the roll page says "the access and permissions will be the same"), shown on
      no screen.
 
+   - Prepared for a third failure (consultation 11; not placed, not reviewed, not shown to him yet):
+     `tr-draft/diag/verify-token.yml` (sha256 b489c270f9b4...), a by-hand workflow in `preview` that prints the two values'
+     shapes (length, the "cfat_" prefix, whitespace, 32 hex digits; never the values) and asks Cloudflare's "Verify
+     Token" method (GET /accounts/{account_id}/tokens/verify, "Test whether a token works."; returns status,
+     expires_on, not_before; API reference read by a web-fetch agent, 2026-11-17) for the token's status and dates.
+     Parsed with PyYAML; its script tested locally against a stubbed curl (both cases right; the auth file removed);
+     a first draft's `[[`-as-argument bug found and fixed in that test. Placing it needs a security review and his yes.
+
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
    CLOUDFLARE_ACCOUNT_ID; in `production`: CANARY); `preview` (him as required reviewer, self-review unticked, admin
