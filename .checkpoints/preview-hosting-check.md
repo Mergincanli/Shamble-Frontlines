@@ -342,6 +342,16 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   where the dashboard shows a token's expiry, whether "Roll" keeps it, and the dashboard steps to delete an Account API
   token: not found (the create-token and account-owned-tokens pages name the menu differently).
 
+- Cloudflare's docs on the token form, read by a web-fetch agent (model opus, effort high; hand-back 2026-11-17 20:10:24
+  UTC): no page names the tiles; the create-token page (2026-11-06) gives the order "Select a template ... or start
+  from scratch." / "Create a policy to organize the token's permissions. Select a policy type (Account, User, or
+  Zone)" / "then select resource rules within the policy" / "Choose the permissions to grant within the policy." /
+  "(Optional) Restrict how a token is used in the Token expiration and Client IP Address Filtering fields."; the
+  permission's dashboard name "Cloudflare Pages Edit" (API name "Pages Write"; permissions page, 2026-11-15); the
+  Workers CI page (2026-10-18): "restrict the generated API token to only the account on which you will be
+  deploying"; the changelog of 2026-11-06 (user tokens redesigned like Account API tokens): "inline controls to add,
+  edit, and remove policy blocks", "Expiration presets and client IP address filtering".
+
 ## Key numbers
 - Test repository Mergincanli/shamble-preview-check (public): main 4a67b83 (his README); `setup` head 1619164 (U1
   fe8116d at 2026-11-15 21:01:07 UTC, U2 ba3946e, U3 1b37fae, fix pass 2df0112, his approved diff 1619164); 0 pull
@@ -457,6 +467,8 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   UTC · DONE, hand-back 09:13:16 UTC (transcript times); its answers under Facts.
 - agent web-fetch (model opus, effort high, both passed): Cloudflare's docs on an existing token's end date · launched
   2026-11-16 12:36:03 UTC · DONE, hand-back 12:36:46 UTC (transcript times); its answers under Facts.
+- agent web-fetch (model opus, effort high): Cloudflare's docs on the new token form · launched 2026-11-17 20:09:13
+  UTC · DONE, hand-back 20:10:24 UTC (transcript times); its answers under Facts.
 - Ended: savers bc4g68il4 (2026-11-15 15:52 to about 16:48 UTC, TaskStop) and bkmmk2e8i (20:58 to 22:48:20 UTC, time
   up); agents infra-engineer and security-auditor (doc reads, DONE), advisor (the plan review, DONE; the review of head
   1619164, DONE 2026-11-16 09:02:47 UTC); workflows wf_c4580fcf-ece (round 1, 3 of 3) and wf_1f145f55-1c2 (round 2, 2
