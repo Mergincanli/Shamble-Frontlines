@@ -99,10 +99,10 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   - The kit's next change after the freeze (a pointer, 2026-11-17, DOCS-54; his words are in the entries named, under
     "Decisions, newest first"): it takes the kept-logs rule's follow-ups SA-KL-1 to SA-KL-4 and KLT-1 to KLT-8, which
     he accepted as left open for #53 (the entry "Taken by Mustafa, 2026-11-15, 19:46:36 UTC: KL-MERGE (a), merge #53,
-    and the security and test findings accepted as left open"), and NS-TRAILER and NS-FIRST, his (b) for both (the
-    entry "Taken by Mustafa, 2026-11-17, 10:43:48 UTC: RECS-1043, his answer to the session's recommendations; for
-    main: DOCS-54 (a), NS-TRAILER (b) and NS-FIRST (b)", the question shown under it as the session's text). This
-    item leaves "Queued" when the change-set that carries it out merges.
+    and the security and test findings accepted as left open"), and NS-TRAILER and NS-FIRST, his (b) for both, each
+    added only with his yes to its exact text (the entry "Taken by Mustafa, 2026-11-17, 10:43:48 UTC: RECS-1043, his
+    answer to the session's recommendations; for main: DOCS-54 (a), NS-TRAILER (b) and NS-FIRST (b)", the question
+    shown under it as the session's text). This item leaves "Queued" when the change-set that carries it out merges.
   - The entries below are pointers to items carried out.
   - STATUS-DIET and LANE-RULES, with his Models addition and ACCOUNTS (his queue of 2026-11-10, items 2 and 3, his
     answers of 07:08:14 UTC and his second message, item 1): carried out by status-diet, so moved from here to
@@ -128,14 +128,15 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   session's Decisions-needed block as last posed at 08:54:58 UTC and repeated at 10:35:38 UTC; the lines for main are
   shown under it as the session's text, not his words. DOCS-54 (a) is carried out by the docs pass that added this
   entry; NS-TRAILER and NS-FIRST are queued above. PACK-READ and C62HB-Q4, which it also answered (history.md:2209-2214,
-  :2216, :2222 and :2224), and the session's reading (:2227) are the netcode test's and stay with PR #40. Copied by
-  script from the transcript and checked byte for byte against `.checkpoints/netcode-proof-test/history.md` at
-  110c3031a5145c675f25d320068df0368476771c (PR #40's branch), line 2205 (his words, inside the quote marks behind its
-  prefix) and lines 2215, 2217, 2223 and 2225:
+  :2216, :2222 and :2224), the blocks' lead lines (:2208, :2221) and the session's reading (:2227) are the netcode
+  test's and stay with PR #40. Copied by script from the transcript and checked byte for byte against
+  `.checkpoints/netcode-proof-test/history.md` at 110c3031a5145c675f25d320068df0368476771c (PR #40's branch), line
+  2205 (his words, inside the quote marks behind its prefix) and lines 2215, 2217, 2223 and 2225:
 > I agree with all your recommendations, continue
 - _The session's text, not his words: the questions it answers for main, as last posed (the assistant's message at
   2026-11-17T08:54:58.700Z, transcript message a5b19b89-9a18-4259-9f64-4cbdc7d7abfd, two lines of its Decisions-needed
   block):_
+- _[history.md:2208-2214 left out: the block's lead line and PACK-READ, the netcode test's; they stay with PR #40]_
 ```text
 - **DOCS-54:** may this chat open one docs-only branch and pull request to update main's dashboard and decision record for #52, #53 and #54? Main still says the last merge was #48, and it has none of your words since 2026-11-14. Options: (a) yes; (b) the foundation chat's next docs pass does it; (c) wait for PR #40's final docs step. I recommend (a).
 ```
@@ -145,6 +146,8 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 ```
 - _The session's text, not his words: the same two as last repeated before his message (the assistant's message at
   2026-11-17T10:35:38.816Z, transcript message dc526fb2-bca6-4e03-8f03-f17d983d1f95):_
+- _[history.md:2221-2222 left out: the block's lead line and PACK-READ's line, the netcode test's; they stay with PR
+  #40]_
 ```text
 - DOCS-54: I recommend (a).
 ```

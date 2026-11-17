@@ -117,12 +117,14 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**Main's docs after #52, #53 and #54 [2026-11-17, PR #55: in review]** — docs-after-54, by Mustafa's DOCS-54 (a) of 2026-11-17
-(docs only, no kit, gate or CI file; from the netcode proof test's session, its plan approved by the advisor agent with
-conditions C1-C9): his words since #52 go into `docs/DECISIONS.md` by script, copied from that session's transcript and
-checked byte for byte against its history.md, only his typed text inside the quotes, the netcode test's own words left
-with PR #40 and each cut named; his go for #52 from merge commit 4460ef5's message; two pointers in "Queued"; STATUS,
-ROADMAP, the archive and REPO_MAP made true for main 82c605e. Next: its review round, then his go.
+**Main's docs after #52, #53 and #54 [2026-11-17, PR #55: in review]** — docs-after-54, by Mustafa's DOCS-54 (a) of
+2026-11-17 (docs only, no kit, gate or CI file; from the netcode proof test's session, its plan approved by the advisor
+agent with conditions C1-C9): his words in that session since #52 go into `docs/DECISIONS.md` by script, copied from
+its transcript and checked byte for byte against its history.md, only his typed text inside the quotes, the netcode
+test's own words left with PR #40 and each cut named (the foundation chat's own words are that lane's to record); his go
+for #52 from merge commit 4460ef5's message; two pointers in "Queued"; STATUS, ROADMAP, the archive and REPO_MAP made
+true for main 82c605e. One review round (the verifier PASS; the advisor agent APPROVE WITH FINDINGS, Lows only) and one
+fix pass. Next: the advisor agent's review of the final head, then his go.
 
 **Kit: the saver in stints while a night run waits on agents [2026-11-16 to 11-17, MERGED]** — night-shift-stints (PR
 #54, 82c605e, 2026-11-17 07:03:03 UTC by `merged_at`, by merge commit, on his go after the advisor's and the
