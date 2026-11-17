@@ -115,3 +115,6 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   10000] on /accounts/***/pages/projects/shamble-preview-check; Invalid access token [code: 9109] on /accounts; his
   screenshot of the log). Verify job id 134368776685, 21:07:03-11, failure; its artifact upload succeeded (21:07:07-09).
   By the stop rule told to him: no third paste; the cause is looked for elsewhere.
+- Attempt 2's verify artifact `headers-44171977539` (id 14369802505, digest sha256:9a38c73cece4..., equal to the
+  downloaded zip): `{"checked_at": "2026-11-17T21:07:07.678Z", ..., "records": [], "summary": {"records": 0, "pass": 0,
+  "fail": 0, "no_reading": 0}}`. The same name uploaded again in attempt 2 after attempt 1's copy was deleted.

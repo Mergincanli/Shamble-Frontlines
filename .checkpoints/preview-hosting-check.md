@@ -416,6 +416,22 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   deploying"; the changelog of 2026-11-06 (user tokens redesigned like Account API tokens): "inline controls to add,
   edit, and remove policy blocks", "Expiration presets and client IP address filtering".
 
+- On the failed authentication (web-fetch agent, model opus, effort high; launched 2026-11-17 after attempt 2, two
+  hand-backs): no Cloudflare page explains codes 10000 or 9109 (troubleshooting page, 2026-04-20: not found). In
+  workers-sdk issues: #13590 (a maintainer, 2026-04-20): 10000 "means the token wasn't recognized at all" and "A token
+  that is valid but scoped to a different account will also return 10000" (causes listed: not yet propagated, wrong
+  account, copy-paste artifact, a Global API Key sent as a Bearer token); #16667 (2026-11-04): a valid token whose
+  permission does not cover the endpoint got 10000 ("D1 Read simply doesn't authorize that endpoint"). Account-owned
+  tokens: "Pages | ✅" (account-owned-tokens page, 2026-10-23; new tokens "`cfat_` prefixed"). Permissions page
+  (2026-11-15): "Cloudflare Pages Read | Grants access to view ... projects." and "Cloudflare Pages Edit | Grants
+  access to create, edit and delete ... projects."; no line says Edit includes Read. Workers authorization page
+  (2026-09-15), roles "available when creating account-owned API tokens": "Pages Metadata Read | View Pages metadata
+  and configuration. Does not include Pages content access.", "Pages Read | View Pages metadata and content.", "Pages
+  Write | Create, update, and delete Pages projects and Pages content." (Write's line names no viewing). Wrangler
+  4.156.0's bundle sends `Authorization: Bearer ${apiToken}` from CLOUDFLARE_API_TOKEN (read by this session from the
+  npm package, 2026-11-17); nothing in it names "cfat". Restrict-tokens page: "By default, if no filtering is applied,
+  all IP addresses can use the token." (the new form's "Allow" box: not described).
+
 ## Key numbers
 - Test repository Mergincanli/shamble-preview-check (public): main 4a67b83 (his README); `setup` head 1619164 (U1
   fe8116d at 2026-11-15 21:01:07 UTC, U2 ba3946e, U3 1b37fae, fix pass 2df0112, his approved diff 1619164); 0 pull
