@@ -190,3 +190,60 @@ Edit u4f-brief.md in place; a "rev 3.1" block in its change list. Read the check
   f29, f33; new f36, f37, f38); 2.12 (kinds 1, 2, 4-6 row with sequence-number reason; kind 3 row; open-loop note);
   2.13; section 4 no-sockets; 5.1 lengths; 5.3 (how a short run is read; named checks p1-p13; p20, p21; reports and
   stop sentence). Next: 5.5, 7, 9.1, Q2, Q4, Q6, Q7, Q8, Q11 (v), Q13, Q17, Q18 new, D3, D12, D15, 12 items 3, 6, 13.
+- R7 (rest) DONE: section 1 item 5 (three new stops); 4 (no sockets); 5.5 (net figures, build-phase row, items 1-4,
+  KL-U4F); 5.6 B2, B3; 6 item 1; 7 items 2-4, 12; 8 rows 46-50; 9.1 three rows; Q2 (d), Q4 (a), Q6 (b), Q7 (iii), Q8,
+  Q11 (v), Q13, Q17, Q18 new; D2, D3, D12, D15; 12 items 3 (P24 key), 6 (LEAD-BOUND + KL-U4F drafts), 7, 10, 13;
+  SIZE-CHECK +350 (4,750). Counts: measured +107, bites +122, neg 63 (f12 +1 neg, f13 +1 neg, f36 +2, f37 +1; f38
+  conditional by Q18 (a); Q6 (b) +4). Pre-runs 15 (p21) + (4, 1, 1). Disk 3,608 / 3,728 MiB.
+- R8 check: N/u4f-r3/r31_check.py (read only) at head e86cf88 (spikes/ = 0ad9661's: diff empty): brief 738dc680…,
+  1,624 lines; P24 key 1 (bare words 2); P1-P36 each used, no unknown id, no marker; section 12 item 3 at :1513-1556;
+  0 runs of 7 of his words outside it (punctuation ignored).
+
+### Per finding (done or rejected, with the reason)
+- **TE3-1 (High) DONE.** 2.2 new row "Stamps contiguous" (a command for every stamp up to the controller's target, at
+  most 2 a step, a hold when not above; `stamps_skipped`), "The bots' rules" split (controller vs `with_lead`), Bounds
+  (lead bound less a margin; <= 9 under B), Pass marks (-20's two shares; 0.16 % at lead 7 cited); U4F-Q7 (iii) asks it;
+  f5 restated; f36 (2 tests: the P3 trace bars; the bots' rule); p5/p6 by name; D15 0.1 %; stop in 1 item 5. The
+  SERIES.md:63 reading route not taken: it changes what a bar's series computes, a bar for him first (history :2125).
+- **TE3-2 (High) DONE.** 2.4 item 6 per-kind rules (1, 2, 4, 5, 6, 10; 3; 7; 8, 9, 11); 2.6 per-kind table (kind 3 an
+  added copy of an accepted sequence; SA-3 kept only for kind 7 and the clamp); 2.12 kind 3's own row; f33's kind-3 and
+  kind-7 cases named (count unchanged).
+- **TE3-3 (Medium) DONE.** 5.3 "How a short run is read": the five length-failing count checks named, each bitten run's
+  one named check with its clean partner, p21 (clean clock run) new, bars into c-u4f-r2.mjs's expect lines; D12
+  rewritten.
+- **TE3-4 (Medium) DONE, partly another way.** The two codec rules stated (2.6); kind 2 at an equal tick; kind 1
+  within the 255-tick step; fast clock's stamps never decrease (Q11 (v)); twins leave out commands older than a skip
+  (0 at P0); f15/f16 assert every Input encodes. Not taken: "kind 1's later copies dropped and counted through carry
+  80 (c)'s path": SA3-2's route (the endpoint keeps the honest command) makes every Input encode with nothing dropped.
+- **TE3-5 (Medium) DONE.** f16 compares entries without size/resends; `fate_log_sha256` only for same-run identity;
+  9.1 row for the advisor (plan :389-390's reading).
+- **TE3-6 (Medium) DONE.** 2.6 schedule (1.0 through warm-up, 1.5 from the measured start, back-to-back 60 s episodes,
+  no settling: a non-idling client starts each episode at most the bound ahead); measured 610 s, not "700 s plus
+  settling" (no settling is needed, so 10 s past the tenth end is enough); f37 asserts the schedule at the judged
+  settings; 5.1's cite corrected (-21's notes :5144 name no length; -20 :4803, -22 :5227).
+- **TE3-7 (Medium) DONE.** 2.10 scale rule (P2_SHORT's form; f16/f18 16 clients 2 s + 4 s; f19 2 s episode; f29 16
+  slots, 32 connects; f28 short scenarios); the episode length and connect count lab settings (2.7; B2 rows); the
+  wall-time stop (twice the short P2 test's time) and the test step's time per build (6 item 1).
+- **TE3-8 (Medium) DONE.** 5.5 build-phase row; item 1 at launch before the builder (pack u4r-P3 + part-clean, D2
+  before/after); Q2 (a) rewritten; 12 item 13.
+- **TE3-9 (Medium) DONE.** P24's start key `word for word: "Write files with the` (found once, :462; r31_check.py).
+- **SA3-1 (High) DONE.** Join anchor under both options (2.3 row, 2.4 item 4, kind 2 row; f13 (iii)); U4F-Q18 new,
+  recommending (a) W = CMD_CATCHUP; f38 (conditional) and p20 (conditional); Q8's allowances and 12 item 6's LEAD-BOUND
+  text carry "the bound plus W after an idle"; 7 item 2 reports the anchor and W; Q17 notes the fresh-slot route closed
+  and keeps (a) for the bite run.
+- **SA3-2 (Medium) DONE in part; one part REJECTED.** Done: kinds 1, 2, 4, 5, 6 forge the newest copy only (endpoint
+  keeps the honest one); later copies of a refused sequence are repeats; kind 3 forges a copy of an accepted sequence;
+  f15 asserts every Input encodes. Rejected: the twin "makes no command at that step, so its sequences stay
+  consecutive; the state hash excludes command bookkeeping (world.rs:1922-1925)". The code: world.rs:1922-1925 leaves
+  out only "the press counters of the last command run per slot"; the hash writes each projectile's seq (world.rs:1979:
+  `s.word("projectile", i, "seq", u32::from(p.seq))`) and each event's seq (:1995-2009: `SimEvent::Shot { slot, seq }`,
+  `SimEvent::Hit { shooter, seq, .. }`). A renumbered twin parts at the forger's first shot. Kept instead: U4F-Q13 (b)'s
+  skipped index (and stamp), each Input leaving out commands older than a skip (none at P0); 2.13 and Q13 reworded.
+- **SA3-5 (Medium) DONE.** 5.5 packs only u4r-P3 (8.1's last, PACK-READ's second: history :2212 is the option text he
+  agreed to; card R4); a U4f set's own folder only after KL-U4F (12 item 6's draft); Q2 (d).
+- **Lows applied:** TE3-10 (net figures, about 380 MiB from u4r-P3); TE3-11 (generator rule, case counts); TE3-12 =
+  SA3-6 (2) (D3 as a Grep-tool search); TE3-13 = SA3-4 (gap case, f12 (v), +1 neg); TE3-14 (plants in 7 item 4); TE3-15
+  (Q8's why reworded; r31_check.py 0 runs); SA3-3 (i32 before squaring, no abs; f10's [-128, -128], [-128, 0]); SA3-6
+  (1) (no sockets, section 4), (3) (Q4 (a)'s key a lab counter), (4) (Q6 (b) +1 negative case: +4); SA3-7 (the fast
+  clock's `ping_limited` expected above 0, reported); SA3-8 (option A's cap on arrival; f7's flood case). None left.
+- DONE.

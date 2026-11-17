@@ -25,18 +25,21 @@ head as rev 3's (0.1): spikes/ unchanged.
 | R3 | SA3-1 (High) | the join anchor (a fresh slot's kind-2 reference is its join's tick) under both options; new U4F-Q18: option A's past window W = `CMD_CATCHUP` (recommended (a)); f13 (iii); f38 and p20 by Q18 (a); under option A the fast-clock allowance after an idle is the bound plus W (Q8, section 12 item 6) | 2.3; 2.4; 2.10; 5.3; 7; Q8; Q17; Q18; 12 |
 | R4 | TE3-3 (Medium) | each short bitten run names the one check that must fail, read by name from its checks, and its clean partner passing that check; the count checks that fail by length on every short run listed; p21, a clean clock run, new; each bar in c-u4f-r2.mjs's expect line; D12 rewritten | 5.3; 11 D12 |
 | R5 | TE3-5 (Medium) | f16 compares the fate logs entry by entry without the datagram's size; `fate_log_sha256` only for same-run identity; the reading of plan :389-390 to the advisor | 2.10 f16; 9.1 |
-| R6 | TE3-6 (Medium) | the fast clock's schedule (one client, 1.5x from the measured start, ten back-to-back 60 s episodes); its suite's measured window 610 s, in the header; f19 asserts the schedule; 5.1's -21 cite corrected | 2.6; 2.7; 2.10 f19; 5.1; 5.5 |
+| R6 | TE3-6 (Medium) | the fast clock's schedule (one client, 1.5x from the measured start, ten back-to-back 60 s episodes); its suite's measured window 610 s, in the header; f37 asserts the schedule at the judged settings; 5.1's -21 cite corrected | 2.6; 2.7; 2.10 f37; 5.1; 5.5 |
 | R7 | TE3-7 (Medium) | each lab test's scale in P2_SHORT's form; the episode length and the connect count lab settings; a wall-time stop | 2.10 |
 | R8 | TE3-8, SA3-5 (Medium), TE3-10 (Low) | 5.5 gains the build phase; at launch, before the builder starts, the u4r-P3 pack and the shared target's part-cleans; packing only u4r-P3 (8.1's last folder, PACK-READ's second); a U4f set's own folder only after his yes to KL-U4F; net figures | 5.5; Q2; 12 items 6, 13 |
 | R9 | TE3-9 (Medium) | P24's start key made unique (found once) | 0.5; 12 item 3 |
 | R10 | the Lows: TE3-11, TE3-12 = SA3-6 (2), TE3-13 = SA3-4, TE3-14, TE3-15, SA3-3, SA3-6 (1), (3), (4), SA3-7, SA3-8 | each applied: 2.10's generator rule; D3 as a Grep-tool search; the gap case (f12 (v)); the plants in the return list; :1148's wording; kind 4's width; the no-socket rule; Q4 (a)'s key; Q6 (b)'s client-sent field (+1); the fast clock's `ping_limited`; option A's cap on arrival | 2.4; 2.6; 2.10; 4; 7; 11 D3; Q4; Q6; Q8 |
 
-**Counts at rev 3.1** (rev 3's in the table below): tests, measured build **+107** (f12 (v), f13 (iii), f19's
-schedule test, f36's two); bites build **+122**; negative cases **63** (f12 (v), f13 (iii)); conditional: U4F-Q6 (b)
-**+4** (SA3-6 (4)), **+1** by U4F-Q18 (a) (f38), the rest as rev 3; short pre-runs **15** (p21) (+4 by U4F-Q11 (iv),
-+1 by U4F-Q15 (c), +1 by U4F-Q18 (a)); questions **18** (Q18); disk about **3,608 MiB (up to about 3,728)** and the
-build phase (no figure) against 1,418 MiB of room plus about 380 MiB from the u4r-P3 pack plus the part-cleans (D2); bar changes for him: as rev 3 (B3
-recommended; B5-B7 only if ruled); one more entry for him only if D2 shows the room short: **KL-U4F** (12 item 6).
+**Counts at rev 3.1** (rev 3's in the table below): tests, measured build **+107** (f12 (v), f13 (iii), f36's two,
+f37); bites build **+122**; negative cases **63** (f12 (v), f13 (iii)); conditional: U4F-Q6 (b) **+4** (SA3-6 (4)),
+**+1** by U4F-Q18 (a) (f38), the rest as rev 3; short pre-runs **15** (p21) (+4 by U4F-Q11 (iv), +1 by U4F-Q15 (c),
++1 by U4F-Q18 (a)); questions **18** (Q18); recheck rows **50** (46-50 new: the codec, the hash's sequences, the fate
+log, the join tick, U4r's run lines); open items in 9.1 **19** (3 new); disk about **3,608 MiB (up to about 3,728)**
+and the build phase (no figure) against 1,418 MiB of room plus about 380 MiB from the u4r-P3 pack plus the
+part-cleans (D2); bar changes for him: as rev 3 (B3 recommended; B5-B7 only if ruled); one more entry for him only if
+D2 shows the room short: **KL-U4F** (12 item 6); planned size about **4,750** added lines (3,800 to 5,800; rev 3.1
+adds about 350), the stop past 6,000 as before.
 
 ## Change list (rev 2 to rev 3)
 
@@ -186,7 +189,9 @@ N/u3c-held-1/advisor-plan-review-full.json; `held-build` N/u3c-held-1/build.md; 
   P36 each found once (section 12 item 3 gives each span's lines); P24 by its start key, whose bare first words stand
   twice in df-ruling (rev 3.1, TE3-9; N/u4f-r3/r31_check.py counts the key once). Section 12 item 3's anchors (each span's first and
   last words, u4r-brief.md §12's form) are the only other place any of his words stand, as the fill script's keys:
-  N/u4f-r3/brief_check.py finds no run of 7 of his words anywhere else in this brief. Values: `<base>` (the spike
+  N/u4f-r3/brief_check.py finds no run of 7 of his words anywhere else in this brief, and at rev 3.1
+  N/u4f-r3/r31_check.py (punctuation ignored, section 12 item 3 found by its own text) finds none either, after
+  TE3-15's rewording of U4F-Q8's why. Values: `<base>` (the spike
   branch's head at launch) and `<<PV1>>` (u4f-run.sh's sha256).
 - **Units:** disk and memory in MiB (2^20 B); a source figure in MB (10^6 B, as c-u4r-runs.mjs:138-154 states its
   byte rates) is converted, its MB figure in brackets.
@@ -231,7 +236,9 @@ N/u3c-held-1/advisor-plan-review-full.json; `held-build` N/u3c-held-1/build.md; 
    comes to Mustafa first, `<<P15>>`); **the lab's short P2 C62H-BOUND test failing** on your build
    (`c62hb_p2_short_every_measured_lost_tick_is_explained`, lab/src/scenario.rs:2904: under the C62H-BOUND stop
    rules his yes adopted, `<<P21>>` with c62hb-paste :120-124, it stops the work for him); **your added lines past 6,000**
-   (SIZE-CHECK, section 4).
+   (SIZE-CHECK, section 4); rev 3.1: no controller lead within 2.2's bounds reaching -20's two shares on f36's P3 trace
+   (TE3-1); a new lab test slower than 2.10's scale rule allows (TE3-7); a forged or twin `Input` that does not encode, or
+   a twin that leaves a command out at P0 (2.6, 2.12).
 6. **Read before you build** (and nothing you do not need):
    - plan: §5 U4f (:805-816); §4.1's rows for npt-client, npt-room, npt-server and npt-bots (:193-197); §4.2's refusal
      rule (:239-249); §4.3 (:251-265); §4.4 (:267-290); §4.5's window (:301-303); §4.7 (:330-336); §4.8 (:338-341);
@@ -367,7 +374,7 @@ Each kind is one check of ADR 0001:231-239 (plus the wrong channel, plan.md:490)
 | 4 | move length above 1 | room, 3rd | none (the sim scales a long vector) | x² + y² ≤ 127², integers, each part widened to i32 before it is squared and no `abs()` on a wire value (move_xy is [i8; 2]: sim/src/seam.rs:35; release overflow checks are on for npt-sim and npt-proto only: Cargo.toml:116-120) (SA3-3; bots/src/lib.rs:30-31) | move refusals | PM-0001-21/no-move-length |
 | 5 | more press edges than ticks covered | room, 4th | `PressRefused` (input.rs:90-106), counted `press_refused` | kept; the counter is this kind's | `press_refused` | PM-0001-21/no-press-edge |
 | 6 | aim outside the map | room, 5th | none | x and y inside the greybox's extent (±12,800 cm: sim/src/greybox.rs:62, :151; the room's `extent`, room.rs:441); z left to the codec's range and the clamp by design (SA-14); beyond-reach points pass on to the sim's clamp | aim refusals | PM-0001-21/no-aim-bounds |
-| 10 | more commands in a tick than the catch-up cap | room, last | option B's `Full` (`buffer_full`) | option A's per-tick cap; both counted as this kind | catch-up refusals | PM-0001-21/no-catchup-cap |
+| 10 | more commands in a tick than the catch-up cap | room, last | option B's `Full` (`buffer_full`) | option A's per-tick cap, refused on arrival (SA3-8); both counted as this kind | catch-up refusals | PM-0001-21/no-catchup-cap |
 | 7 | fire or reload edge against the sim's state (cooldown, reload; ammunition cannot occur in SS: plan :434-435, sim/src/world.rs:1411-1419, so it stays with U4d's unit test per kind, advisor :87-88: SA-15) | npt-sim, in the step | the sim refuses and records (slot, seq, kind) in `reports()` (world.rs:1401-1420, :1445-1452; plan §4.2 :239-249) | the lab's attribution from `reports()`; the bite's site is npt-sim's (NA-9, U4F-Q1) | the sim's refusal counters | PM-0001-21/no-cooldown |
 | 9 | trailing bytes or an unknown field (a set reserved or pad bit: proto/src/quant.rs:115-122) | npt-server's pump (plan :287-290) | `trailing_bytes`, `unknown_field` (pump.rs:126-128, :172-173) | the -21 series only (U4E-Q11); forged on `Input` datagrams only, both forms (SA-12) | those two | PM-0001-21/no-trailing (npt-proto, quant.rs:40) |
 | 11 | a known type on the wrong channel | npt-server's pump | `wrong_channel` (pump.rs:124, :171); refused and counted, never closing a joined session (pump.rs:414-421; catalogue :87 against :99) | the -21 series only | `wrong_channel` | PM-0001-21/no-channel (npt-proto, quant.rs:41) |
@@ -567,10 +574,10 @@ the same build, stops for the advisor; the test step's wall time per build goes 
 | f4 | the ping rate never exceeds the room's limit (a faster rate is limited and counted by the pump) | client | neg | 1 |
 | f5 | the controller's settled lead per profile (P0-P4, B1) on a seeded trace: at least 1, at most the lead bound less 2.2's margin (and at most 9 under option B), reported beside U4R-Q14's lead for that profile, and at most 1 % of commands arriving after their stamped tick (carry 74; TE-15; rev 3.1: TE3-1 replaced "at most U4R-Q14's lead"; P3's own bar is f36's) | client | | 1 |
 | f6 | the lab builds both options' endpoints with one controller setting, and npt-client reads no `cmd_timing` (TE-14) | lab | | 1 |
-| f7 | option A runs several commands of one slot in a tick; the 9th is refused and counted (kind 10) | room | neg | 1 |
+| f7 | option A runs several commands of one slot in a tick; the 9th is refused on arrival and counted (kind 10), and the room's list for the coming tick never holds more than 8 under a flood of 3 datagrams of 8 (SA3-8) | room | neg | 1 |
 | f8 | carry 80 (a): one slot's commands 2^31 ticks apart; SA-1's triple on a fresh slot under option A; a property test over random u32 ticks: no panic and one order for every arrival order | room | neg | 3 |
 | f9 | carry 80 (a): carry 21's room test (room/tests/room.rs:235) fails with the sort removed (a plant, restored; the test itself changes, so +0) | room | | 0 |
-| f10 | kinds 1-6, 8 and 10 each refused and counted under its own kind, under both options | room | neg | 8 |
+| f10 | kinds 1-6, 8 and 10 each refused and counted under its own kind, under both options; kind 4's case includes the moves [-128, -128] and [-128, 0], both refused, with no panic in a debug or test build (SA3-3) | room | neg | 8 |
 | f11 | one kind per refusal: a command breaking two checks is counted once, under the first; an honest late command is counted `late`, never kind 2 | room | neg | 2 |
 | f12 | (i) an honest redundant copy is refused under no kind; (ii) a backward sequence with other content than the accepted command kept under it, inside the window, is refused under kind 3, and a later copy of a refused sequence with other content is a repeat; (iii) an honest P3-like trace with redundancy 8 and reordered datagrams gives 0 refusals of any kind; (iv) a sequence older than the window is dropped and counted `seq_outside_window`, never as forged; (v) a sequence inside the window with no command kept under it (an overtaken datagram carrying the one sequence the overtaking one lacked) is counted `seq_outside_window`, never kind 3 (TE3-13 = SA3-4) | room | neg | 5 |
 | f13 | (i) 8 far-ahead commands, then an honest command: the honest one runs (NA-7); (ii) under option B a command stamped equal to a buffered one is kind 2, never `late` (NA-13); (iii) the join anchor, under both options: a fresh slot whose first stamp is the join's tick - 1,000, and one at the join's tick - 2^31 + 1, each refused as kind 2, nothing run (SA3-1) | room | neg | 3 |
@@ -806,7 +813,8 @@ patch, into existing files plus new files' lines). This brief's estimate, by com
 | npt-sim (by U4F-Q1) | about 40 | two bite sites and ids |
 | SERIES.md (by U4F-Q1) | about 25 | new rows only |
 | ops/runs/c-u4f-*.mjs | about 600 | the r2 extension, the cap runs, the judged-set runner |
-| **Total** | **about 4,400 (3,500 to 5,500)** | 1.5 times M's 3,000 by this estimate; the stop stays his: past 6,000 |
+| rev 3.1's additions | about 350 | the contiguous-stamp rule and the commands-due accessor (client, bots), the join anchor and the past window (room), the per-kind forging and the twin's skip (bots, client), the two lab settings, f36-f38 |
+| **Total** | **about 4,750 (3,800 to 5,800)** | about 1.6 times M's 3,000 by this estimate; the stop stays his: past 6,000 |
 
 The builder puts `git diff --stat <base>`'s added lines in each block's notes line; past 6,000 the build stops and the
 main session tells Mustafa in three lines (what grew, why, the cheaper option), as his rule says.
@@ -1064,7 +1072,7 @@ the same way.
 14. The bars line: `git diff --stat <base>..<head> -- spikes/netcode-proof/marks/marks.json
     spikes/netcode-proof/crates/judge` and the SERIES.md rows added (5.6).
 15. Every stop-clause entry (by U4F-Q5) and every test failure, with its cause; no retry into green.
-16. The diff's size (SIZE-CHECK: added lines, against the plan's 3,000 and this brief's 4,400); what you did not verify;
+16. The diff's size (SIZE-CHECK: added lines, against the plan's 3,000 and this brief's 4,750); what you did not verify;
     what is left; who built it. (5.3's pre-runs and the judged sets are the main session's, after the merge.)
 
 ---
@@ -1122,8 +1130,14 @@ row only if its file moved between the head read and `<base>`.
 | 43 | the kept-logs lists under results/ | the main session (b5cb253, 6c8c7cf, 978202d) | refs and redact count them; a new pack list adds one each (5.5) | new: results/u4r-precheck-30/faf42aeb034c/, results/u4r/64f3307d5c7f/B1/, results/u4r/ab10f058a828/P2/ (raw-logs.sha256 each) |
 | 44 | `Room::leave` (and `Leave` in `receive`) | U4e | 2.5's read before a session's end (NA-15) | new: room.rs:689-695, :739 |
 | 45 | carry 75's admission bound in the runner | U4r | the -47 suite (NA-16) | new: scenario.rs:70 (`ADMIT_EVENTS_BOUND` 32,768), :995-1006 |
+| 46 | the `Input` codec's two rules and the view offset | U4a | 2.6's per-kind forging and twins (TE3-4, SA3-2) | new at rev 3.1: proto/src/input.rs:19-21, :92-95, :140-198 (`NotCanonical` :155-157, `OutOfRange` :158-159); the endpoint sends nothing when an `Input` fails to encode: client/src/lib.rs:466-469 |
+| 47 | the state hash's command sequences | U4d | 2.12's twin rule; U4F-Q13 (SA3-2's variant rejected) | new at rev 3.1: sim/src/world.rs:1922-1925 (only the press counters left out), :1979 (projectile seq), :1995-2009 (Shot and Hit carry seq) |
+| 48 | the fate log's canonical form and its draws | U2, U4c | f16's comparison (TE3-5) | new at rev 3.1: l1/src/lib.rs:353-362 (size in each entry), :1125-1150 (the fate by flow index; size only for `TooLarge` and the entry) |
+| 49 | `JoinAccepted`'s tick; `take` for every joined slot each tick; `ran_through` | U4e | the join anchor; U4F-Q18 (SA3-1) | new at rev 3.1: room.rs:681, :841-846; input.rs:23, :129-131 |
+| 50 | U4r's committed run lines at P3 and P0 | U4r's sets | 2.2's contiguous stamps (TE3-1) | new at rev 3.1: results/u4r/0f066338dd8d/P3/runs.txt:18-20; results/u4r/051995db9cea/P0/runs.txt:22 |
 
-**Tally:** rows 1-33: 25 hold, 8 changed (10, 19, 20, 22, 27, 28, 29, 31; row 10 in its cite only); rows 34-45 added.
+**Tally:** rows 1-33: 25 hold, 8 changed (10, 19, 20, 22, 27, 28, 29, 31; row 10 in its cite only); rows 34-45 added;
+rows 46-50 added at rev 3.1.
 
 ---
 
@@ -1173,7 +1187,8 @@ row only if its file moved between the head read and `<base>`.
 ## 10. Questions for the advisor (each where the plan or a ruling leaves a choice open)
 
 Status since rev 2: none of Q1-Q16 is fully answered by a ruling or by his words since 11fd190; each line says what
-changed. Q17 is new.
+changed. Q17 is new at rev 3, Q18 at rev 3.1 (SA3-1); rev 3.1 also changed Q2, Q4 (a), Q6 (b), Q7, Q8, Q11 (v), Q13
+and Q17.
 
 **U4F-Q1, the lane's files.** *Status:* open; (a) changed (no `rss_bytes` L1 writer: 2.7, NA-2), (d) new.
 *Question:* which files does U4f's lane hold? *Why it matters:* the plan names none (plan :805-816, :882-883); two of
@@ -1194,14 +1209,23 @@ KL-YES") is gone. *Question:* how are U4f's judged sets budgeted and ordered, gi
 for -47, -21's suites, option A or a never-acker run, and the estimated total (5.5: about 3,596 to 3,667 MiB) is more
 than twice the 1,418 MiB above the floor at the last reading (5,514 MiB free after E6)? *Why it matters:* the runner's
 floor stops a set part way (c-u4r-runs.mjs:225-229), and §11 allows only packing between runs, never during a set or a
-build (:236-238), never the protected folders without his word. *Options:* (a) the builder measures ticks per second
-and bytes per suite on its short runs (f28, f29); the main session restates 5.5 before the first set, packs
-u4r-P3-0f066338dd8d by 8.1, part-cleans the shared target after the merge (W1-TARGET item 3, `<<P27>>`; the sets
-build in the main folder's cache), runs the sets one at a time (-47, -22, -20, -21) with the floor projection, and packs
-each closed U4f set's folder before the next set if the projection is short; (b) a fixed budget now from 5.5's
-estimates; (c) as (a) but -21's set split by suite into four sets (forged, clamp, fast-clock, lag-switch), each with its
-twins, so each projection is about a quarter. *Recommendation:* (a), with (c) only if -21's projection does not fit
-after the part-cleans; evidence is never shrunk to fit (plan :940-941).
+build (:236-238), never the protected folders without his word. Rev 3.1 (TE3-8, SA3-5, TE3-10): the build phase
+also takes room (5.5's new row), U3C-HELD-1's plan ruling places the u4r-P3 pack before U4f's counted run (held-review
+:37, :89), the pack gives back about 380 MiB net (not its 519), and neither PACK-READ (a) (one or two closed, older
+folders: `<<P22>>`; B1 was the first) nor R4 (8.1's list, which ends with u4r-P3) covers a U4f set's own folder.
+*Options:* (a) the builder measures ticks per second and bytes per suite on its short runs (f28, f29) and the build
+phase's growth at its first builds (5.5); **at launch, before the builder starts and with no build running,** the main
+session packs u4r-P3-0f066338dd8d by 8.1 and part-cleans the shared target (W1-TARGET item 3, `<<P27>>`), with D2's
+readings before and after each; after the merge it part-cleans again (the sets build in the main folder's cache),
+restates 5.5 before the first set, and runs the sets one at a time (-47, -22, -20, -21) with the floor projection, no
+U4f set's own folder packed; (b) a fixed budget now from 5.5's estimates; (c) as (a) but -21's set split by suite into
+four sets (forged, clamp, fast-clock, lag-switch), each with its twins in its own judge call, so each projection is
+about a quarter; (d) as (a), and the advisor asks to widen R4 to each closed U4f set's own folder under §11's item 1,
+which goes beyond the folders his PACK-READ yes covered, so KL-U4F goes to him under Decisions needed (section 12 item 6)
+and nothing of it is packed before his yes in his own words. *Recommendation:* (a) if D2 shows the room after 5.5's
+items 1 and 2 above the sets' total (every set's raw logs stay on disk until packed, so splitting alone does not lower
+the total); else (d) with (c), each set's folder packed, after his yes, before the next starts; evidence is never
+shrunk to fit (plan :940-941).
 
 **U4F-Q3, option A's reading of `buffer_depth_ticks_count`.** *Status:* open, unchanged. *Question:* what do option A's
 runs record as the input buffer's depth? *Why it matters:* the card's DEPTH ruling reads the header's
@@ -1220,7 +1244,8 @@ rejoin? *Why it matters:* r-r1 :78-81 and :200-204 send the logs half to the fir
 slots about 21 times each per run, carry 62 (d)'s head rule allows no later admission before -19's join design
 (C-U6-11), and carry 75's bound (scenario.rs:70, :995-1006) refuses an admission once the room has stamped 32,768
 events past its start, about 30 s of SS's fighting (carries :357-365) against the suite's 52 s or more. *Options:* (a)
-U4f keys `ended` and `gone` by session and resets the slot in `Logs::admit`, with a design for a later join's ticks; (b)
+U4f keys `ended` and `gone` by session and resets the slot in `Logs::admit`, with a design for a later join's ticks;
+the session key is a lab counter, never the join token or bind value (catalogue :120-121; rev 3.1, SA3-6 (3)); (b)
 -47's suite writes no per-tick client hash records (its logs hold its connect events and the room's), so no slot files a
 second session's hashes, and NC-U4R-5 stays for U6; its clients run an open-loop script that never fires (an npt-bots
 behaviour: 2.13), so the room stamps no events and carry 75's bound is never met; (c) -47 measures 1,000 fresh ClockSync
@@ -1245,8 +1270,10 @@ jitter (P2: ±10 ms each way): the error leaves a per-connect bias, up to about 
 jitter window falls inside one tick period (estimate), against -47's p99 of 5 ms (marks.json:9104-9111). A filter tuned
 past it might also mask the tick-quantised bite. *Options:* (a) the Pong as built (D4 shows whether any estimator passes
 at one phase per connect); (b) the Pong gains a sub-tick server time (for example µs since its tick's due instant, 2 B,
-inside the Pong's 32 B limit, catalogue :92): a wire change with the catalogue's row and the codec's tests (+3 tests;
-the lane opens crates/proto and the catalogue); (c) snapshot arrivals (each leaves at its tick's due instant on L1,
+inside the Pong's 32 B limit, catalogue :92): a wire change with the catalogue's row and the codec's tests (+4 tests,
+one a negative case: the `Pong` travels both ways, pump.rs:461-466 and client/src/lib.rs:473-478, so the room ignores
+the field in a client's `Pong`, or refuses it as an unknown field, never reads it: rev 3.1, SA3-6 (4); the lane opens
+crates/proto and the catalogue); (c) snapshot arrivals (each leaves at its tick's due instant on L1,
 plan.md:623) with the ping RTT's floor: exact on L1 only; (d) the room answers each `Ping` at its next tick's due
 instant, with `hold_us` (pump.rs:460-465) from the ping's arrival to that instant: every ping gains up to one tick of
 hold (subtracted, capped at one tick: pump.rs:510), the lane opens crates/server, and ADR 0001:247-248's "answers pings
@@ -1258,28 +1285,38 @@ jitter uncancelled (±10 ms at P2), and ADR 0001:240's "from its own ping sample
 *Recommendation:* (b): it keeps ADR 0001:240's words, is exact off L1 too and needs no reading; D4 first, before the
 advisor's check, so the advisor sees (a)'s and (e)'s figures under both phase models.
 
-**U4F-Q7, the lead controller's form, and `with_lead`.** *Status:* open, unchanged. *Question:* how does the controller
-set a command's tick, and does `with_lead` stay? *Why it matters:* U4R-Q14's lead is newest-relative and profile-set
-(r-check :296-302); net F104 puts the controller on ClockSync's server-time estimate (u4-scout-netcode.md:122); in either
-form the stamps rise strictly (2.2), and `header.params.lead_ticks_count` (SERIES.md:344) names one lead per run, which a
-controller has not (TE-20). *Options:* (a) newest + L, L from the client's own RTT and jitter samples by U4R-Q14's
-arithmetic; (b) ClockSync's estimate of the server tick at arrival plus a jitter margin and the buffer target (ADR
-0001:250-251); for `with_lead`: (i) kept as a lab-only fixed setting (recorded as `lead_ticks_count`) for U4r's suites
-and the -30 pre-check, (ii) removed. *Recommendation:* (b) with (i), the settled lead per client reported (a new series
-by U4F-Q1) and `lead_ticks_count` written only where (i) fixes the lead.
+**U4F-Q7, the lead controller's form, `with_lead`, and the honest command rule.** *Status:* open; (iii) new (rev 3.1,
+TE3-1). *Question:* how does the controller set a command's tick, does `with_lead` stay, and when does an honest client
+give a command under the controller? *Why it matters:* U4R-Q14's lead is newest-relative and profile-set (r-check
+:296-302); net F104 puts the controller on ClockSync's server-time estimate (u4-scout-netcode.md:122); in either form the
+stamps rise strictly (2.2), and `header.params.lead_ticks_count` (SERIES.md:344) names one lead per run, which a
+controller has not (TE-20). The bots' rule as built gives a command only when the newest tick moved (bots/src/lib.rs:14-21,
+:224-227), which left about 20 % of P3's player-ticks with no command stamped for them (P3 runs.txt:18: 178,595 steps
+without one beside 700,948 commands), against -20's 0.1 % missing; and U4R-Q14's lead 7 left 0.16 % late, against -20's
+99.9 % on time. The other route, reading SERIES.md:63 to skip ticks no command was stamped for, changes what a bar's
+series computes, a bar for him first (`<<P15>>`), and is not taken. *Options:* (a) newest + L, L from the client's own
+RTT and jitter samples by U4R-Q14's arithmetic; (b) ClockSync's estimate of the server tick at arrival plus a jitter
+margin and the buffer target (ADR 0001:250-251); for `with_lead`: (i) kept as a lab-only fixed setting (recorded as
+`lead_ticks_count`) for U4r's suites and the -30 pre-check, (ii) removed; (iii) the honest command rule under the
+controller: (c) contiguous stamps, a command for every stamp up to the controller's target, at most 2 a step, a hold
+when the target is not above the last stamp (2.2), the old rule kept for `with_lead` runs only; (d) the old rule for
+both. *Recommendation:* (b) with (i) and (c): the settled lead per client reported (a new series by U4F-Q1),
+`lead_ticks_count` written only where (i) fixes the lead, and f36 shows -20's two shares on a P3 trace before any run.
 
 **U4F-Q8, the lead bound's form and value, a carry to U4h (SA-11), and his yes.** *Status:* open; (iii) new. *Question:*
 (i) is the lead bound a tick constant or a room setting, and what is it? (ii) does a carry go to U4h that the
 input-buffer wait in §4.9's view-time estimate (plan :351-352) is capped by the honest lead, not by the lead bound? (iii)
 does the value go to Mustafa for his yes before the build? *Why it matters:* the F2 ruling (advisor :463-465) names it
 the first case of carry 18's route; ADR 0001:231 makes every limit data; the value must exceed every honest lead (P4's 9
-by U4R-Q14's arithmetic) and let the catch-up kind be built under option B; under option B a client may stamp up to the
-bound ahead and §4.9's tolerance then adds that wait to the view time it accepts; and the fast clock's two -21 checks
-allow "the server's ticks plus the lead bound" (marks.json:5026-5049), so the value sets how loose they are, though it is
-no marks.json text: his 13:35 rule (`<<P15>>`) names a new bar or a change to one, and this is the first value of that
-allowance. The allowances per value: 400 ms = 12 ticks (up to 400 ms of rewind bought, 12 ticks of top-speed movement
-per episode); 600 ms = 18 ticks; 1,000 ms = 30 ticks. Under option B the catch-up kind needs only more commands than the
-buffer has room for (8 - (L - 1)), all inside the bound, so about 10 ticks suffice at P0's lead of 2 (input.rs:114-116).
+by U4R-Q14's arithmetic; the controller's P3 lead may settle above U4R-Q14's 7: 2.2) and let the catch-up kind be built
+under option B; under option B a client may stamp up to the bound ahead and §4.9's tolerance then adds that wait to the
+view time it accepts; and the fast clock's two -21 checks allow "the server's ticks plus the lead bound"
+(marks.json:5026-5049), so the value sets how loose they are, though it is no marks.json text: the first value of that
+allowance is the kind of change his 13:35 rule (`<<P15>>`) brings to him (TE3-15's rewording). The allowances per
+value: 400 ms = 12 ticks (up to 400 ms of rewind bought, 12 ticks of top-speed movement per episode); 600 ms = 18
+ticks; 1,000 ms = 30 ticks; under option A, after an idle, the bound plus W more (U4F-Q18 (a); without (a), no bound
+after an idle: SA3-1). Under option B the catch-up kind needs only more commands than the buffer has room for
+(8 - (L - 1)), all inside the bound, so about 10 ticks suffice at P0's lead of 2 (input.rs:114-116).
 *Options:* (a) `lead_bound_ticks_at(TICK_HZ)` in npt-sim by carry 18's route; (b) a room setting in ms turned into ticks
 at the room by `ticks_for_ms_at` with the rate passed (carry 39's pattern), recorded in the header: 400, 600 or 1,000 ms;
 for (ii): (c) yes, a carry to U4h; (d) no, U4h's brief decides; for (iii): (e) yes, the value and its allowance to him
@@ -1326,7 +1363,10 @@ P2; (iii) (a) the bound's arithmetic, a reworded row, (b) an honest client in th
 length on a path the builder shows collision-free, where a unit test shows (a) and (b) equal (+1 test), so the row's
 words hold as written; (iv) (a) yes, four more short runs (p15-p18), (b) no; (v) (a) the honest controller on the 1.5x
 host clock, (b) the cheat's own rule (2.6: each stamp one tick newer than its previous, held at its newest tick plus the
-lead bound, every 10th command one tick past it). *Recommendation:* (i) (a), the real load r2's P3 suite showed; (ii)
+lead bound, every 10th command one tick past it), its stamps never decreasing: a stamp is the larger of the previous
+stamp and min(previous + 1, newest + the bound), and every 10th the previous + 1, so a command one tick past the bound
+is followed only by stamps at or above it and every `Input` encodes (rev 3.1, TE3-4: a held stamp below a past-bound
+one would be a tick step of -1, proto/src/input.rs:158-159). *Recommendation:* (i) (a), the real load r2's P3 suite showed; (ii)
 (a), with no loss to confound the twins and no clamp reruns (SA-10); (iii) (c), no text changed once its test holds,
 else (b); (iv) (a); (v) (b), with p9's short bitten run (D12) before the set.
 
@@ -1338,7 +1378,8 @@ times a stated margin, checked below the never-acker's rate x 255 / 30 s; (c) a 
 figures to the advisor before -22's runs (carry 57), plan §4.7's text amended to state the measure and both bounds (the
 main session's commit). The cap is no bar (5.6, B4).
 
-**U4F-Q13, a refused command and the room's acknowledgement; the twins (SA-3).** *Status:* open, unchanged.
+**U4F-Q13, a refused command and the room's acknowledgement; the twins (SA-3).** *Status:* open; (b)'s construction
+made encodable at rev 3.1 (TE3-2, TE3-4, SA3-2), one variant rejected (below).
 *Question:* may a command the room refuses advance its sequence reference and the snapshot header's "newest received"
 acknowledgement, and how is each kind's twin built to match? *Why it matters:* today `offer` sets the reference before
 its press, late and full refusals (input.rs:89, :90-116), the header sends it (room.rs:1322), and the client then drops
@@ -1346,11 +1387,17 @@ every unacknowledged command at or below it (client/src/lib.rs:678-687), so a re
 0001:228-229 acknowledges "the newest one the server received". A twin that still made the refused commands would run
 them where the forged run ran nothing. *Options:* (a) only a command the buffer accepted moves the reference and the
 acknowledgement: a refused command is resent and refused again, counted once per (slot, seq) (+1 test); the twin leaves
-the command and every copy out; a reading of ADR 0001:228-229's "received"; (b) today's rule kept: the twin's script
-never makes a command the forged run's room refused whole (its sequence index skipped, a lab-side endpoint setting:
-2.13), and the catch-up kind's twin sends the accepted commands and then repeats only (2.12); no reading.
-*Recommendation:* (b): no wire or rule change, one refusal per command by construction; f16 shows every kind's twin
-under both options before the judged sets.
+the command and every copy out; a reading of ADR 0001:228-229's "received"; (b) today's rule kept: the twin's endpoint
+never makes a command the forged run's room refused whole (its sequence index and stamp used, nothing sent for them, a
+lab-side endpoint setting: 2.13), so the forged run's sequence numbers, which the state hash reads (each Shot and Hit
+event and each projectile carries its command's sequence: sim/src/world.rs:1979, :1995-2009), stay the same in both
+runs; each later `Input` leaves out any command older than a skipped index, so its commands stay consecutive
+(proto/src/input.rs:19-21, :155-157), counted, 0 at P0 (2.6, 2.12); the catch-up kind's twin sends the accepted
+commands and then repeats only (2.12); kind 3's twin sends the honest copy; no reading. Rejected at rev 3.1: SA3-2's
+variant, a twin with no command at that step and its sequences renumbered to stay consecutive: every later shot of
+the forger would carry a sequence one lower and the hashes would part at the first one. *Recommendation:* (b): no wire
+or rule change, one refusal per command by construction; f16 shows every kind's twin under both options, every
+`Input` encoding and none left out at P0, before the judged sets.
 
 **U4F-Q14, the refusal counters in the logs; U4E-Q11's size and bucket checks; the hold clamp (SA-5).** *Status:*
 open; (c) is now known to be new bars (5.6, B6). *Question:* which refusal counters do U4f's runs log, how do U4E-Q11's
@@ -1400,7 +1447,32 @@ tick being run), with the lead bound also built as kind 1; (b) the lead-bound ro
 command before it is buffered, and `canonical` is unchanged; (c) both, the total key and a debug assertion that no slot's
 ticks span 2^31. *Recommendation:* (a): the bound alone leaves SA-1's triple (ticks T-2^31+1, T-2^30 and T+1, none
 2^31 from T) reachable from a fresh slot with no last run to refuse against, and reachable in the no-lead-bound bite run;
-the total key costs one comparator line and f8's three tests.
+the total key costs one comparator line and f8's three tests. Rev 3.1: U4F-Q18's join anchor closes the fresh-slot
+route, and with its (a) every slot's ticks lie within W + the bound of the tick being run, so (b) would hold outside the
+bite run; the bite run's far-ahead stamps, strictly rising, can still span 2^31, so (a) stays the recommendation.
+
+**U4F-Q18, option A's lower bound: the join anchor and a past window (new at rev 3.1: SA3-1).** *Status:* new.
+*Question:* under option A, what ties a command's stamp to the room's tick from below? *Why it matters:* option A runs a
+strictly newer command whenever it arrives, up to 8 a tick (2.3), and kind 1 bounds a stamp from above only; option B's
+only lower anchor is `ran_through` (input.rs:23, :107-113), which every tick's `take` sets for every joined slot
+(room.rs:841-846), and option A has none. A client whose first stamp is far in the past (the join's tick - 100,000, or
+- 2^31 + 1) passes kind 1 (not ahead) and kind 2 (a fresh slot has no reference), then sends two datagrams of 8 a tick
+(the bucket: catalogue :87), each stamp one above the last: 8 commands run a tick, each one tick of movement, weapon
+clock and reload (sim/src/world.rs:1333-1345, :1389-1395), for as long as the bank lasts. A client that joined honestly
+gets the same after idling: 60 s of nothing, then 8 a tick for about 257 ticks. ADR 0001:231-233's claim that a fast
+clock never runs more commands than the server has ticked plus the lead bound holds only from an anchored stamp, and
+-21's cheats never build a bank (the fast clock starts at its newest tick plus the lead: U4F-Q11 (v); the lag switch
+holds 200 ms), so the judged checks would pass a build with the hole. *Options:* (a) both: the join anchor under both
+options (a fresh slot's kind-2 reference is the tick its `JoinAccepted` names, room.rs:681: 2.3, 2.4 item 4; f13 (iii))
+and, under option A, a past window W = `CMD_CATCHUP` (8; carry 27's constant, a count of commands, which at one stamp
+per tick is a count of ticks, with no rate in it), a command stamped more than W ticks before the tick it would run at
+dropped and counted `late` (not forged; it never runs): the bank is then at most W, an honest client's resent commands
+after a burst (at most `REDUNDANCY_CAP` = 8, the newest about the lead ahead: plan :439-441) fit, and so do the catch-up
+kind's 16 (2.6); f38 and p20 show it; (b) the anchor only, the idle bank written up as option A's speed-hack exposure
+for OQ-0001-6 and ADR 0001:231-233 read as "from join" (the readings PR: 9.1); (c) neither (rev 3). *Recommendation:*
+(a): it closes both banks with no new constant and no wire change; under it the fast-clock allowance after an idle is
+the bound plus W, which Q8 (iii)'s draft for him states (section 12 item 6); carry 39's tick-name rule (check.mjs's
+`TICK_NAMED`, :760) reads W as `CMD_CATCHUP` itself, so no new `*_TICKS` constant is made.
 
 ---
 
@@ -1414,8 +1486,8 @@ the advisor]** (it decides a question), **[at launch]**, **[after the build]** (
 | # | Claim | Now | Left: command and pass bar | When |
 |---|---|---|---|---|
 | D1 | `<base>`'s counts | **filled:** at 0ad9661, U3C-HELD-1's counted run E6 through main-run.sh (held-build; the card): check.mjs all 11 steps pass; test 552 measured, 632 bites build, 0 failed, 0 skipped; refs 1382; marks 81; self 78 of 78; redact 10 of 10, 306 items, 0 findings; deps 137 crate files; wasm 27000 ticks, 0 mismatching both ways; free 5,514 MiB after it. The head's spikes/netcode-proof is 0ad9661's (0.1) | they are `<base>`'s if `git diff --quiet 0ad9661 <base> -- spikes/netcode-proof` exits 0. A new kept-logs list under results/ breaks that exit 0 while the code holds: then `git diff --quiet 0ad9661 <base> -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results'` exiting 0, with every other change a raw-logs.sha256 file, keeps every count but refs and redact's items (each +1 per new list: read them from a light run, `node check.mjs --only refs,marks,self,redact`, as MAIN-54's C4); else a counted run: `bash <M>/.checkpoints/netcode-proof-test/main-run.sh <M>/.gate/u4f-launch/base-counted.log node check.mjs`, reading the test step's two counts, self's "K of K" and the step count | at launch |
-| D2 | the disk the sets need against what is free (NA-5; 5.5) | last reading 5,514 MiB free (E6, 12:34 UTC 2026-11-17); no reading since | `df -BM /home/user`, then `du -sm` of each folder under /home/user/Shamble-Frontlines/.gate/netcode-proof-test/runs/, of .gate/shared-target and of .gate/netcode-proof-test/target, each in its own call; 5.5 redone in MiB with the packs and part-cleans it plans | before the advisor, and at launch |
-| D3 | L1 P3's reorder share is above 0, so -20's runs meet the `reorder` rule | not in any committed record (`git grep -i reorder` under results/u4r/ finds none) | `grep -rhoE '"reorder_permille":[0-9]+' /home/user/Shamble-Frontlines/.gate/netcode-proof-test/runs/u4r-P3-0f066338dd8d` then the values read by hand (no pipe): above 0 on every run | before u4r-P3-0f066338dd8d is packed (5.5), else from -20's own first run |
+| D2 | the disk the sets need against what is free (NA-5; 5.5) | last reading 5,514 MiB free (E6, 12:34 UTC 2026-11-17); no reading since | `df -BM /home/user`, then `du -sm` of each folder under /home/user/Shamble-Frontlines/.gate/netcode-proof-test/runs/, of .gate/shared-target and of .gate/netcode-proof-test/target, each in its own call; 5.5 redone in MiB with the packs and part-cleans it plans, net of the archives (rev 3.1: about 73 % of a folder comes back); from it, whether KL-U4F goes to him (5.5 item 3) | before the advisor; at launch, before and after 5.5 item 1; after item 2 |
+| D3 | L1 P3's reorder share is above 0, so -20's runs meet the `reorder` rule | not in any committed record (`git grep -i reorder` under results/u4r/ finds none) | a Grep-tool search (rev 3.1, TE3-12 = SA3-6 (2): no shell grep): pattern `"reorder_permille":[0-9]+`, path /home/user/Shamble-Frontlines/.gate/netcode-proof-test/runs/u4r-P3-0f066338dd8d, output mode content with only the matches (`-o`), the values read by hand: above 0 on every run | before u4r-P3-0f066338dd8d is packed (5.5 item 1, at launch), else from -20's own first run |
 | D4 | NA-4 under both phase models (SC-1), U4F-Q6 (e)'s room-ping estimate, and the tick-quantised bite's reach (TE-6) | no script exists; nothing run | the main session's model, parameters fixed here: 1,000 connects x 3 seeds; per direction a one-way delay of 50 ms + U[-10, 10] ms (P2: l1/src/lib.rs:186-188, :214-221); 20 client samples in 2 s, one ping every 3 client steps; each sample's server stamp the next 33.333 ms tick; phase (i) uniform per sample, (ii) one seeded phase per connect, each send a whole number of tick periods from it (client/src/lib.rs:485-488); arrivals (1) as built, (2) bitten: each moved to the next client step; estimators: the mean of samples, the lowest-RTT, and (e) 8 room pings (every 250 ms, exact server ns) less half the lowest own-ping RTT; report the p99 of abs(error) for each, against 5 ms (marks.json:9104-9111). A read-only script under the notes folder, its output saved | **before the advisor** (U4F-Q6) |
 | D5 | NA-3: BRAWL-1's P3 load exceeds plan §4.7's formula | **filled:** `<<P32>>` records 27 forced resyncs on 25 clients in s1 at the provisional 1,024 (rate 554-561 a second), above the formula's about 1,008; no log writes the queue's length (no npt-lab writer of `second.s.event_queue_count`: `git grep` of crates/lab/src), so per-burst high-water marks exist only from 2.8's new runs (D8) | none | done |
 | D6 | every cite of this brief still points where it says (section 8) | **filled:** walked at the head (section 8; 0.4) | at launch: `git diff --stat 7cfae88 <base> -- spikes/netcode-proof docs/adr/0001-multiplayer-netcode.md docs/design/netcode-proof-messages.md .claude/rules/netcode.md .checkpoints/netcode-proof-test/u4-build-plan.md .checkpoints/netcode-proof-test/plan.md .checkpoints/netcode-proof-test/u4s-carries.md`; if it prints anything, each moved file's rows re-walked (section 12 item 10) | at launch |
@@ -1424,10 +1496,10 @@ the advisor]** (it decides a question), **[at launch]**, **[after the build]** (
 | D9 | `cargo test -p npt-server --all-features` compiles (only if a ruling opens npt-server) | **premise filled:** it still stops at E0425: server/Cargo.toml and tests/loopback.rs are unchanged since 2fbec77 (`git diff --stat 2fbec77 <head>` on them prints nothing; r-b2 :26-27) | `bash <u4f-run.sh> -x <worktree> <M>/.gate/u4f/server-all-features.log cargo test --locked -p npt-server --all-features`: exit 0 and the runner's summary line | after the build, only by the ruling |
 | D10 | marks.json and the judge unchanged at U4f's close (5.6) | - | `git diff --stat <base>..<head> -- spikes/netcode-proof/marks/marks.json spikes/netcode-proof/crates/judge`: empty, or the read owed (5.6) | at the close |
 | D11 | a new suite's honest streams are the same run to run, before its twin pairs (TE-24) | - | 5.3's p1 and p14 (forged, option A, seed 1, twice) through c-u4f-r2.mjs, then the two runs' `fate_log_sha256` (scenario.rs:1242, :1276) and per-tick hash series compared: equal | after the merge |
-| D12 | each suite's bite fails its check when run (TE-5, TE-6, SA-6) | - | 5.3's p7-p12, each judged in 5.4's form (`--only PM-0001-2,<mark>` for -20 and -21; `--only PM-0001-47`): each bite failing its check by name, every other check passing | after the merge |
+| D12 | each suite's bite fails its check when run (TE-5, TE-6, SA-6) | - | 5.3's p7-p12 with their clean partners (p1, p2, p3, p21, p5 or p6), each judged in 5.4's form (`--only PM-0001-2,<mark>` for -20 and -21; `--only PM-0001-47`): on each bitten run the check 5.3's table names fails, read by name from the verdict's checks (never from the bite's status: judge/src/eval.rs:1475-1478), and passes on its clean partner; every check but 5.3's length-failing list passes on both; each bar in c-u4f-r2.mjs's `expect` line (rev 3.1, TE3-3) | after the merge |
 | D13 | the lag switch's check cannot fail at 200 ms (TE-7, SA-7) | - | 5.3's p13 (lag switch, option A, P1, bite PM-0001-21/no-catchup-cap): `tick.v.lagswitch_cmds_count`'s max (at most 7 expected) and whether `tick.v.lagswitch_excess_move_um` stays at or below 0 | after the merge |
 | D14 | whether today's `canonical` panics or only misorders on SA-1's triple (toolchain 1.99.1) | not read (no std source on the machine was found to read) | f8's triple case against the old comparator as a plant: `bash <u4f-run.sh> -x -k <worktree> <M>/.gate/u4f/d14.log cargo test --locked -p npt-room --all-features <f8's name>`, then restored and its sha256 checked; the outcome (panic or order) recorded either way | after the build |
-| D15 | carry 74's late share under both readings (TE-3, TE-4) | - | 5.3's p5 and p6 (-20 P3, A and B), each reporting the room's `late` count against the commands sent and 1 - `tick.s.cmd_on_time`'s share: at most 1 % in both | after the merge |
+| D15 | carry 74's late share under both readings (TE-3, TE-4) | - | 5.3's p5 and p6 (-20 P3, A and B), each reporting the room's `late` count against the commands sent and 1 - `tick.s.cmd_on_time`'s share: at most 0.1 % in both, and -20's two share checks passing by name (rev 3.1, TE3-1: at P3 the bar the controller serves is -20's, carry 74's 1 % on the other runs); a miss goes to the advisor before -20's set | after the merge |
 
 ---
 
@@ -1466,7 +1538,9 @@ the advisor]** (it decides a question), **[at launch]**, **[after the build]** (
      fit." (:2175); `<<P22>>` the line beginning "      - (a) Yes. I may pack one or two closed" (:2212: the
      recommended option he agreed to, RECS-1043, quoted as the session's text he answered, never as his words);
      `<<P23>>` the line beginning "  - **C62HB-Q4:** should the counter-wrap test (PM-0001-58)" (:2216: the same).
-   - closed records: `<<P24>>` df-ruling :462-464, from "Write files with the" to "whole with Write."; `<<P25>>`
+   - closed records: `<<P24>>` df-ruling :462-464, its start key `word for word: "Write files with the` (found once, at
+     :462; the bare first words stand twice, :313 inside a quoted rule and :462: rev 3.1, TE3-9), the copy from that
+     key's "Write files with the" to "whole with Write."; `<<P25>>`
      df-ruling :465-468, from "a failure in <crate>" to "and go on.", with the first `<crate>` replaced by "npt-room,
      npt-client, npt-bots or npt-lab (and each crate U4F-Q1 opens)" and "<crate>'s files" by "their files", the script
      asserting both and no `<crate>` left, only if U4F-Q5 keeps it; `<<P26>>` j-r2 :298, the words after "From now
@@ -1491,11 +1565,19 @@ the advisor]** (it decides a question), **[at launch]**, **[after the build]** (
    planned size; nothing of it built before his yes; each text's sha256 recorded at it. Draft entry for the main
    session's report: **LEAD-BOUND:** may U4f's room refuse a command stamped more than 400 ms (12 ticks at 30 Hz) ahead
    of the server, which also lets a 1.5x-clock client run at most 12 more commands and 12 ticks more of movement per 60 s
-   than the server's ticks allow before -21's fast-clock checks fail? Why it matters: the value sets how loose those
-   checks are and how much rewind a stamp-ahead buys under option B. Options: (a) yes, 400 ms; (b) 600 ms; (c) 1,000 ms;
-   (d) another value. Recommendation: (a), the advisor's if U4F-Q8 rules so.
-7. **This brief's checks:** the test-engineer's and the security-auditor's checks of rev 3 and the revision (this
-   workflow), then the advisor's check, after D2 and D4 (the items marked before the advisor).
+   than the server's ticks allow before -21's fast-clock checks fail (under option A, after the client idles, up to 8
+   more again: the past window of U4F-Q18 (a), rev 3.1)? Why it matters: the value sets how loose those checks are and
+   how much rewind a stamp-ahead buys under option B. Options: (a) yes, 400 ms; (b) 600 ms; (c) 1,000 ms; (d) another
+   value. Recommendation: (a), the advisor's if U4F-Q8 rules so. Second draft (rev 3.1, SA3-5), **only if D2 shows the
+   room short** after 5.5's items 1 and 2: **KL-U4F:** may the main session pack each of U4f's judged sets' own raw-log
+   folders by the kept-logs rule, once that set's results are committed and its ruling closed, before the next U4f set
+   starts? Why it matters: U4f's sets need about 3.6 to 3.7 GB of logs against about 1.8 GB above the 4 GB floor after
+   the planned pack, and your PACK-READ yes covered one or two older folders. Options: (a) yes, each closed U4f set's own
+   folder, never the P0 folders, the reference sets or the c-u2 folders; (b) no: the sets wait for room from elsewhere.
+   Recommendation: (a). Nothing of it is packed before his yes in his own words.
+7. **This brief's checks:** the test-engineer's and the security-auditor's checks of rev 3 and the revision, rev 3.1
+   (this workflow: done), then the advisor's check with U4F-Q1 to Q18, after D2 and D4 (the items marked before the
+   advisor).
 8. **The review panel** (plan :816): netcode-architect, security-auditor (the hostile input: 2.4's kinds and order, the
    clamp points, the 1.5x clock, the lag switch, the never-acker and carry 76's Kick path, 2.5's counters),
    test-engineer, rust-reviewer; plus engine-architect on the public items (A19; plan :930-931; 2.13). Each at effort
@@ -1507,12 +1589,16 @@ the advisor]** (it decides a question), **[at launch]**, **[after the build]** (
 10. **Re-stamp and re-check at launch:** re-stamp 0.2's sha256 of the plan, plan.md, carries and history; if one moved,
     re-check every cite of this brief into it (the carries gain entries at merges; history gains decisions at its end)
     and fold the new lines in the main session's commit; run D6's diff and re-walk section 8's rows for each file it
-    names; re-run stamps_anchors.py and confirm each anchor still found once.
+    names; re-run stamps_anchors.py and r31_check.py and confirm each anchor (P24 by its key) still found once.
 11. **The two follow-ups of 9.1's last rows:** SA-16's variant to STATUS for U6's limits; SA-11's carry to U4h's section
     of carries if U4F-Q8 (ii) rules it.
 12. **The -22 set report** (the main session's, after its judged runs): the load each -22 run carried (advisor
     condition 4, :116-117; TE-22; 5.2's report call), each run's `overflow_resyncs_count` per client (SA-16), and
     `rss_bytes` read as "not available" on L1 by design (NA-2).
+13. **The disk at launch, before the builder starts** (rev 3.1, TE3-8, SA3-5; 5.5 items 1 and 2): D3 read first; then,
+    with no build and no set running, pack u4r-P3-0f066338dd8d by 8.1's procedure and part-clean the shared target
+    (`<<P27>>`), D2's readings before and after each on the card; the builder starts only after them. A U4f set's own
+    folder waits for KL-U4F (item 6).
 
 ---
 
