@@ -125,5 +125,7 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   attempt 5, deploy job 134402686180 created 22:02:34, started 22:08:53, upload failed 22:09:13-15, run with debug
   logging (his paste of the log: the secrets evaluate to '***', `github.sha` 64dcf68505f5..., the same two errors,
   Wrangler's log file named 2026-11-17_22-09-14). Verify failed in attempts 3, 4 and 5; each uploaded its artifact.
-  So, with Read added, the same two errors: the permission is ruled out as the cause (the test told to him, consultation
-  11); left: the account ID or the token itself.
+  So the permission is ruled out as the cause if Read was saved (only his words show it; no screen does): the test told
+  to him (consultation 11). Left: the account ID or the token itself. (Two workers-sdk issue comments describe this
+  pair of errors as a value Cloudflare does not recognise, and the second error is on a path without the account ID:
+  a lean toward the token's value, not a finding.)
