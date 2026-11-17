@@ -7,7 +7,8 @@
   #53 the kept-logs rule and PR #52 the docs pass; Mustafa's KL-MERGE (a), 2026-11-15 20:50). Take main in again when main changes code, CI or rules, and once before PR #40 is
   marked ready (MAIN-52, 2026-11-14). Main is now c94c81b (PR #55, DOCS-54, merged 2026-11-17 17:09:32 UTC: five
   files under docs/ only, so not taken in by MAIN-52; at the next take-in, Open findings "From DOCS-54" applies)
-- **Last update:** 2026-11-17 19:30 UTC (U4f's brief: rev 3.1 DONE, round 2 DONE (no High), D2 read, D4 DONE by two
+- **Last update:** 2026-11-17 22:17 UTC (the spend-limit cut of 19:46-22:16 recorded; U4f's advisor check RESUMED,
+  task wi34dn0qy, saver bnwkv7xyd; the rest as at 19:30: U4f's brief: rev 3.1 DONE, round 2 DONE (no High), D2 read, D4 DONE by two
   models and compared; the last fix pass (rev 3.2) and the advisor's check RUNNING, workflow wf_b2a20e74-6aa; chat
   about 45 %, /compact asked at 19:05: the block "NOW (2026-11-16)")
 
@@ -442,8 +443,11 @@ it asks nothing; REFS-KIT stays.
   stamp (U4F-Q6 (b)'s reference) the mean passes (2.32 ms; 2.34 with P2's 2 % loss) and the tick-quantised bite then
   shows (11.8 ms); the lowest-RTT with an exact stamp sits on the bar (4.94; 5.02 with loss). So D4 supports U4F-Q6
   (b) and an averaging estimator; model B agrees (above).
-  **Fix pass and the advisor's check: RUNNING from about 19:29 UTC (launched between the 19:28 and 19:30 clock
-  reads), workflow wf_b2a20e74-6aa** (task w6afqym93; script
+  **Cut 19:46-22:16 UTC by the spend limit (the block "Cuts by the spend limit"): the fix pass was DONE (rev 3.2,
+  u4f-brief.md sha256 e9f33e61…, 1,734 lines; its one rule slip, 7 files read with Bash `cat` and `sed -n` and nothing
+  written so, is in its notes), the advisor stopped two minutes in. RESUMED at about 22:17 UTC by resumeFromRunId
+  (task wi34dn0qy; the saver bnwkv7xyd).** The run as first launched: **Fix pass and the advisor's check, from about
+  19:29 UTC (launched between the 19:28 and 19:30 clock reads), workflow wf_b2a20e74-6aa** (task w6afqym93; script
   npt-u4f-r32-fix-advisor-wf_b2a20e74-6aa.js under the session's workflows/scripts/): Fix pass, one general-purpose
   agent acting as the netcode-architect, revises rev 3.1 to rev 3.2 for round 2's 7 Medium and 10 Low and folds D2's
   reading and D4's results into 5.5, section 11, U4F-Q6 and NA-4 (the review budget's last fix pass; notes appended to
@@ -455,8 +459,8 @@ it asks nothing; REFS-KIT stays.
   rated Medium or higher; then, by the ruling: the bar texts (B3 LEAD-BOUND, and KL-U4F only if needed) drafted in
   c62hb-paste's form for the advisor's and the test-engineer's read, then to him under Decisions needed with the
   planned size, before anything is built; the launch steps of the brief's section 12 after his yes. The 2-hour check-in
-  trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (next 20:34 UTC). The saver **b7nfcyliw** from 18:58 UTC (110 minutes, so it
-  ends about 20:48: restart it if agents still run; stop it by TaskStop when none runs).
+  trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (next 22:34 UTC). The saver **bnwkv7xyd** from 22:17 UTC (110 minutes, so it
+  ends about 00:07: restart it if agents still run; stop it by TaskStop when none runs); b7nfcyliw ended at 20:49.
   **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
@@ -3499,6 +3503,18 @@ re-run the same call if no failure was caught. Then the cause → te-m3-plan.md 
 
 **Cuts by the spend limit** (SPEND-LIMIT (a), Mustafa 2026-11-12: at every cut, the notice's exact text, the time of
 the cut and the time of the resume; UTC, read from the session's transcript):
+- **2026-11-17 19:46 to 22:16 UTC, the spend limit.** The notice, word for word, at 19:46:41.750 (the advisor agent's
+  transcript, agent a69a9c748b8ff12bf; the workflow's failure line the same at 19:46:41.763): "You've hit your org's
+  monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets 10:10pm (UTC)". The same notice
+  answered the main session at 19:46:42.199, 20:34:16 (the check-in) and 20:49:30-31 (the saver's end). The cut
+  stopped workflow wf_b2a20e74-6aa's second agent (the advisor's check of U4f's brief rev 3.2) two minutes in, after
+  it had saved 24 lines of notes (advisor-u4f-brief-notes.md, committed by the saver at 8ca5ede, 19:49:38); its first
+  agent, the fix pass, had finished at 19:44:49 (rev 3.2: u4f-brief.md sha256 e9f33e61…, 1,734 lines, unchanged after
+  the cut). The saver b7nfcyliw ran out its time at 20:49:30 ("watch stopped: time is up"; its last save 8ca5ede).
+  The worker restart notice at 22:14:02.114. **Resumed at 22:15:24 UTC** (the check-in of 20:34 read then): the
+  workflow by `resumeFromRunId: "wf_b2a20e74-6aa"` at about 22:17 (task wi34dn0qy; the fix pass from cache, the advisor
+  live, continuing after its notes), the saver restarted as bnwkv7xyd. Nothing was half done: the tree was clean at
+  8ca5ede and rev 3.2's sha256 matches the fix pass's report. Found with u4f-r3/cut_probe.py (read only).
 - **2026-11-17 11:57 to 12:13 UTC, the spend limit.** The notice, word for word, at 11:57:32.558: "You've hit your
   org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets 12:10pm (UTC)". The same
   notice answered at 11:59:56, 11:59:59 and 12:00:02. My turn stopped right after `git diff --cached --stat`
