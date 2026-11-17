@@ -324,14 +324,16 @@ it asks nothing; REFS-KIT stays.
   gate PASS** (12:35 UTC, --no-smoke; legacy/ unchanged); **the save aab3712 pushed 0ad9661 at 12:37 UTC** (head
   aab3712fca3af64b25169af1f4ee75c01a0411cd; no [skip ci], CI runs). The saver bxvsewbnz from 12:37 UTC. **Step 9
   DONE: CI green on aab3712** (gate 44084854535 push and 44084863595 pull request, each with gate and smoke jobs;
-  toolchain 44084854552 and 44084863752) and **the review, workflow wf_dd3fb0a8-14f (12:38-12:53 UTC; saved word for
+  toolchain 44084854552 and 44084863752) and **the review, workflow wf_dd3fb0a8-14f (12:38-12:54 UTC, its journal
+  last written 12:54:20; saved word for
   word by u3c_held_1_head_full.py and read in full): the advisor APPROVE WITH FINDINGS of
   aab3712fca3af64b25169af1f4ee75c01a0411cd** (advisor-head-check-full.json, 31 lines, a31ed50a…; C1-C10 met, C9's
   report half by the close report; three Lows, ADV-UH1H-1 to -3, all met at this close: the close report and the Open
   findings entry for the eight deferred Lows, the third pack's entry under Key numbers, the plan's hash after the fix
   pass d6801289… recorded) **and the verifier PASS** (verifier-evidence-full.json, 113 lines, 174ca715…; 15 claims
   checked, all backed; two Lows, VER-UH1-1 "loop 1's run 94 (two loops, 189 runs in all)" and VER-UH1-2 "no
-  commit's code holds D-1", worded in the report). **U3C-HELD-1 CLOSED (12:58 UTC):** the close report
+  commit's code holds D-1", worded in the report). **U3C-HELD-1 CLOSED (12:57 UTC, the close save b34b1d6 at
+  12:57:26; first written "12:58" without reading the clock, corrected):** the close report
   u3c-held-1/u3c-held-1-report.md; Open findings updated. **DOCS-54 BUILD STARTED (12:41 UTC):** the
   worktree .gate/docs-after-54-wt on claude/docs-after-54 from origin/main 82c605e (`git worktree add -b`, named first,
   no prompt); its checkpoint .checkpoints/docs-after-54.md there, not yet committed (the first push is a named asking

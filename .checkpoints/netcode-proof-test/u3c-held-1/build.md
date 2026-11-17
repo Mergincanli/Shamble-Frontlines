@@ -163,11 +163,13 @@ saves after 18b139c; the spike unchanged since ddd38ba.
   of 12:41:05 UTC said nothing ran or failed): gate push 44084854535 and pull_request 44084863595 (each with its gate
   and smoke jobs), toolchain push 44084854552 and pull_request 44084863752; all four completed, success. The later card
   saves 3eef0e1 and 8354a8e touch .checkpoints/ only ([skip ci]).
-- 12:53 **Step 9's review DONE** (wf_dd3fb0a8-14f; saved word for word by u3c_held_1_head_full.py and read in full):
+- 12:54 **Step 9's review DONE** (wf_dd3fb0a8-14f, its journal last written 12:54:20 UTC; saved word for word by
+  u3c_held_1_head_full.py and read in full):
   **the advisor APPROVE WITH FINDINGS of aab3712fca3af64b25169af1f4ee75c01a0411cd** (advisor-head-check-full.json,
   a31ed50a…; CI green, read by it too; C1-C10 met, C9's report half due at the close; ADV-UH1H-1 to -3, Low) and **the
   verifier PASS** (verifier-evidence-full.json, 174ca715…; VER-UH1-1 and -2, Low, report wording).
-- 12:58 **U3C-HELD-1 CLOSED.** The close report: u3c-held-1-report.md (C9's argument by the plan's lines :132-141, run
+- 12:57 **U3C-HELD-1 CLOSED** (the close save b34b1d6 at 12:57:26 UTC; first written "12:58" without reading the
+  clock, corrected). The close report: u3c-held-1-report.md (C9's argument by the plan's lines :132-141, run
   94 as "loop 1's run 94 (two loops, 189 runs in all)", the carried Lows TE-UH1-2, -3, -4, -5 and NA-UH1-2, the
   verifier's wording). The plan after the fix pass (C9's three dated edits only, as the advisor checked):
   d68012898843e04638de901da35b05110b6a273cf246e1251c404b1ddd591f9a (ADV-UH1H-3; approved as a53b2803…). The eight
