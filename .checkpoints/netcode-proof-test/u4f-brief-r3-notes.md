@@ -263,3 +263,35 @@ Edit u4f-brief.md in place; a first change-list block "rev 3.1 to rev 3.2" with 
 - S5 r31_check.py read-only run; sha256 and line count; notes per finding; handback.
 
 ### Block log
+- S1 done: both result files read whole; both checkers' notes read (te B1-B6 with its model figures; sa B1-B5).
+  Findings: TE31-1..5 Medium, TE31-6..11 Low; SA31-1, SA31-2 Medium (SA31-2 = TE31-4), SA31-3, SA31-4 Low (SA31-4 (a),
+  (b) = TE31-11).
+- S2 done: d4-compare.md (99,000-connect p99s: mean (i) 5.975, (ii) 8.867; lowest-RTT 18.3/18.4; (e) 12.781; exact
+  mean 2.346 (bitten 11.927); exact lowest-RTT 4.856 (bitten 9.900); gap reading: every verdict agrees),
+  d4-output.md (newest sample exact not in A; (e) half-mean-RTT 5.485; NA-4's per-connect bias confirmed: mean error
+  0.14, max 11.2), d4b-r31-full.json (B: newest-sample exact 8.904; (e) lowest-of-8 6.424; loss changes no verdict).
+- S3 (part): brief rev 3.1 read whole (1,624 lines) at the working tree. ADR 0001:239-242 names no lowest-RTT pick
+  ("from its own ping samples", drift, halving, reset): 2.1's "over the lowest-RTT samples" is the brief's own choice,
+  so an averaging filter needs no reading.
+- S3 done (code at the head, spikes/ = 0ad9661's): judge figures.rs:99-109 (no `params.twin` -> Lack::Gap),
+  eval.rs:346-347 (Gap: "the run is invalid"); pump.rs:20 (INPUT_BUCKET 8), :84 (refill 2 x tick_hz); l1 lib.rs:69-70
+  (P0 never in the instant sent), :146 (PART_13 10 permille), :173 (every profile); client lib.rs:425-429 (a stamp only
+  once `slot` is set; `newest.map_or(0, ..)`), :436-441 (view clamp), :496 (JoinAccepted sets only `slot`: the endpoint
+  keeps no join tick today); room.rs:439 (next_tick = sim tick + 1), :648-653 (a fresh InputBuffer every join), :681,
+  :689-695; proto wrap.rs:60-65 (after32 signed distance); bots lib.rs:14-16 (no command before a snapshot), :22-24
+  (view_tick = newest); scenario.rs:458-472 (a replacement kicks, no respawn); check.mjs:2678-2681 (each step's line
+  prints its seconds: the test step's time is read there). Notes slip: S1-S3 read 7 files with Bash `cat`/`sed -n`
+  instead of the Read tool (read only, nothing written); from S3 on, Read and Grep only.
+- Plan of edits (S4): E1 header; E2 the rev 3.2 change-list block and counts; E3 R3's wording (TE31-7); E4 2.1 filter
+  and bites rows (D4); E5 2.2 (TE31-1, TE31-4); E6 2.3 (SA31-1, SA31-3); E7 2.4 item 4 (SA31-3); E8 2.6 kinds 1, 3, 10
+  (SA31-4, TE31-11); E9 the forging interval setting (TE31-5); E10 2.10 (counts, scale rule, f1, f13, f16, f29, f32,
+  f36-f39); E11 2.12 kind 10; E12 2.13; E13 1 item 5; E14 SIZE-CHECK; E15 5.3 (TE31-2, -3, -6, D4); E16 5.5 (D2, TE31-8);
+  E17 5.6 B2, B3; E18 7 item 2; E19 8 rows 51-54; E20 9.1; E21 Q2; E22 Q6; E23 Q7; E24 Q8; E25 Q15; E26 Q17; E27 Q18;
+  E28 11 D2, D4, D12; E29 12 items 4, 6, 7; E30 NA-4, NA-5.
+- S4 (part) DONE: E1 (title, header, "Next"), E2 (the rev 3.2 block R11-R20 and its counts), E3 (R3), E4 (2.1 filter
+  and bites rows), E5 (2.2 catch-up and first stamp; bots' rule), E6 (2.3 kept stamp by Q18 (ii) (d); carry 80 (a)'s
+  triple), E7 (2.4 item 4: signed distance, tick-1 cases), E8 (2.6 kinds 1, 3, 10), E9 (`--forge-every` in 2.6 and
+  2.7), E10 (2.10: +109/+124/64; scale rule; f1 4.0 ms; f13 (iii) tick 1 and (iv); f16 per pair; f29; f32 (iii); f36
+  PART_13 and stamps_skipped; f37; f38 tick 1; f39 conditional), E11 (2.12 kind 10), E12 (2.13), E13 (1 item 5), E14
+  (SIZE-CHECK 4,850), 6 item 1 and 7 items 2, 3, 16. Next: E15 5.3, E16 5.5, E17 5.6, E19 8, E20 9.1, E21-E27 Q2, Q6,
+  Q7, Q8, Q15, Q17, Q18, E28 11, E29 12, E30 NA.
