@@ -28,7 +28,7 @@ _Last updated: 2026-11-17 (DOCS-54: main's docs after #52, #53 and #54; main 82c
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| DOCS-54 | main's docs after #52, #53 and #54 (his words since #52 in `docs/DECISIONS.md` by script, from the netcode test's transcript, only his typed text inside the quotes, the netcode test's own words left with #40; two pointers in "Queued"; STATUS, ROADMAP, the archive and REPO_MAP true for main 82c605e) | `claude/docs-after-54` (the netcode test's session, his DOCS-54 (a)) | draft; its review round | the advisor agent's review of its final head; then his go (risk tier 1, decision docs) |
+| #55 | DOCS-54, main's docs after #52, #53 and #54 (his words since #52 in `docs/DECISIONS.md` by script, from the netcode test's transcript, only his typed text inside the quotes, the netcode test's own words left with #40; two pointers in "Queued"; STATUS, ROADMAP, the archive and REPO_MAP true for main 82c605e) | `claude/docs-after-54` (the netcode test's session, his DOCS-54 (a)) | draft; its review round | the advisor agent's review of its final head; then his go (risk tier 1, decision docs) |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10), after status-diet (merged, #49): his unit walk of 2026-11-09 (a docs
@@ -39,7 +39,7 @@ _Last updated: 2026-11-17 (DOCS-54: main's docs after #52, #53 and #54; main 82c
    Wave 1: one heavy spike at a time (SPIKE_PLAN); then phase 1 and the slices (SLICE-ORDER, `docs/DECISIONS.md`).
 
 ## Waiting on Mustafa
-- His go for DOCS-54 (main's docs; risk tier 1, decision docs) once the advisor agent approves its final head.
+- His go for #55 (DOCS-54, main's docs; risk tier 1, decision docs) once the advisor agent approves its final head.
 - The netcode proof test's items (its plan in #40; the older list: the archive's "Phase", "Next (v2)"): OK each run's
   plan and cost cap; name the laptop and desktop; the Mac when one is available; the Safari workflow's own PR.
 - Legacy, frozen (the archive's "In flight" and "Phase"): his Windows run ("Check a new machine", `tools/README.md`);

@@ -117,7 +117,7 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**Main's docs after #52, #53 and #54 [2026-11-17, in review]** — docs-after-54, by Mustafa's DOCS-54 (a) of 2026-11-17
+**Main's docs after #52, #53 and #54 [2026-11-17, PR #55: in review]** — docs-after-54, by Mustafa's DOCS-54 (a) of 2026-11-17
 (docs only, no kit, gate or CI file; from the netcode proof test's session, its plan approved by the advisor agent with
 conditions C1-C9): his words since #52 go into `docs/DECISIONS.md` by script, copied from that session's transcript and
 checked byte for byte against its history.md, only his typed text inside the quotes, the netcode test's own words left

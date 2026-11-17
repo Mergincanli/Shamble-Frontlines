@@ -25,8 +25,10 @@
    8bfdf372..., the root package-lock.json 97ff5fc4... and tools/package.json a20134bf... byte-equal in both): GATE
    PASS (no prompt). `git diff --stat origin/main`: the five docs files only, 299 insertions and 27 deletions (the plan
    said about 230 changed lines: DECISIONS's labelled session-text blocks take more room than planned).
-5. NEXT: the commit (both attribution lines; the hash table and history.md's blob id at 110c303, C7), the first push
-   (named first), the PR (draft) by the GitHub MCP tools, label needs-mustafa.
+5. DONE. The build commit 9660197 (6 files, 337 insertions, 27 deletions; its message carries the hash table and
+   history.md's blob id, C7; built by docs-54/commit_msg_54.py, the rows copied word for word); the first push (named
+   first, no prompt); draft PR #55 by the GitHub MCP tools; label needs-mustafa; the session subscribed to #55. Then
+   the PR number into STATUS's row and Waiting line and ROADMAP's entry (this commit).
 6. One review round: the verifier and the advisor (opus, xhigh, passed explicitly; the 3-agent cap shared with the
    netcode lane). One fix pass.
 7. C3's merge-tree check against PR #40's head; the report in the PR description; this checkpoint deleted (last
