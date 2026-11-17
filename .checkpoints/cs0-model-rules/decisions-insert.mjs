@@ -56,8 +56,8 @@ if (!process.argv.includes('--check')) {
   const fence = (s) => '````text\n' + s + '\n````\n';
   let a = `# Appendix to the build plan's report: his words and the inputs, byte for byte\n\n` +
     `_Made by \`decisions-insert.mjs\` (change-set 0) from the files that were copied by script from the build chat's\n` +
-    `transcript (session_019YNMUV9LFhASseJ9EP12kL) and from his attachments. Nothing inside a fence was retyped. The\n` +
-    `sha256 of each block's bytes stands under it. Everything in A4 to A7 and A10 is the Art lead's proposal unless a\n` +
+    `transcript (session_019YNMUV9LFhASseJ9EP12kL) and from his attachments. Nothing inside a fence was retyped. Under\n` +
+    `each block stand its sha256 and its size, counted without the file's last line end. Everything in A4 to A7 and A10 is the Art lead's proposal unless a\n` +
     `line of Mustafa's says otherwise (his words of 2026-11-17, A3, CHANGE 3)._\n\n`;
   const sec = (id, title, body) => { a += `## ${id}. ${title}\n${fence(body)}sha256 of the block: \`${sha(body)}\` (${Buffer.byteLength(body)} bytes)\n\n`; };
   const brief = (f) => readFileSync(N + 'inputs/' + f, 'utf8').replace(/\n$/, '');

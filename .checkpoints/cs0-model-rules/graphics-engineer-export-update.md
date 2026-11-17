@@ -169,3 +169,60 @@ advisor's plan review (plan.md revision 2, points 1-22) and engine-architect's j
   scale 0.5/1.2, height within 1 mm, mesh and joints together), planted adds "a mesh node scaled 0.01 [proposal]";
   advisor's ruling sentence after the marks table; A10 cited by lines 5, 25, 29; sources renumbered 1-10 (3 and 9
   dropped). Next: B13 checks.
+- B13 done (checks on the final draft, 395 lines): prose lines all <= 120 columns (two fixed; 18 table rows exceed, as
+  in every docs/research file); 0 en/em dashes; 0 `.checkpoints` citations; 0 "under `root`"; 0 old cite forms (go:,
+  plan:, S:, G:, A:); 0 old joint names; 34 ids defined (AX-F1..F18, AX-R1..R16), all references resolve; quote marks
+  balanced; quotes-check.mjs: every quote of Mustafa and the Art lead found byte for byte (white space aside); with the
+  ADRs, SPIKE_PLAN, EDITOR_V2, r3, the build plan, the spec copy and the first-reading notes as sources: 63 spans, 2 not
+  found, both loader error strings ("Unsupported glTF-Binary header.", "Unknown extension": loader:1941-1948 and 547-549,
+  recorded in my 2026-11-17 notes). Label names in "How to read" set in italics (they are not quotes). Part 8 row on
+  [proposal] numbers fixed (mark 10, palm, O1 (b); marks 7 and 8 carry none).
+- B14 done: points for engine-architect written below. Next: DONE, answer.
+
+## Points for engine-architect (for the advisor agent to rule on)
+- P1 (Low; against the exporter's source). JL §2: the armature object's name "is free: it only names the skin". The
+  exporter names every object's node after the object (src blender/exp/nodes.py:486-488, AX-F8), and its option to
+  remove the armature object is off by default (src __init__.py:834-841), so by default the armature object is most
+  likely written as a node of its own, named after it [inferred; the option's description not re-read; the first real
+  export settles it, as JL §2 says]. Its name then also names a node in the file and in three.js's scene. A modeller
+  following the brief's "one root" may call it `root`, putting a second node named `root` under the client-made one:
+  harmless for the checks (they find non-joint nodes by structure), confusing for any lookup by name. Proposal, no list
+  change: AX-R7's characters apply to it, and either no node in the file is named `root`, or the engine never finds
+  `root` by name.
+- P2 (Low; stale citation). JL §2 cites "spec:2242 via AR:183-186" for "a skinned mesh ignores its node's transform";
+  on the specification as re-read 2026-11-17 (205,402 bytes) that sentence is at spec:2238 (lines after 2180 moved by
+  4 since 2026-11-14): repoint to AX-F5 or spec:2238.
+- P3 (confirmation, no disagreement). JL §2's inferred "a written skin.skeleton names hips or a node above it" holds:
+  spec:2118 "That node **MUST** be the root of all nodes listed in the `joints` array or their common ancestor."
+- No other conflict with the exporter or the loader: the neutral bone is an extra joint with a non-joint parent (marks
+  3 and 10 catch it); rest = bind holds under export_rest_position_armature=True (rst:1159-1160); JL §4's socket axes
+  match AX-F11 for locations, the rotation step inferred in both (mark 7's turned socket on a real export proves it).
+
+## For the main session: repointing JL's citations of the draft (point 20 of the plan's revision 2)
+JL line -> new target: 26, 58 GD:228-231 -> AX-R15; 27 GD:321 -> part 8 "Not read" (three.js; now 20 joints = 1,280
+bytes); 32 GD:201-206 -> removed text (the old AX-R10 reading of `root` as the top bone): cite "the draft before its
+update of 2026-11-17" or drop; 32 GD:249 -> mark 3 (part 5); 32, 92 GD:316-317 -> part 8 "Not read" (the exporter);
+35, 38 GD:224-227 -> AX-R14; 38 GD:201-206 (vertex groups) -> AX-R10; 58, 70 GD:290-295 -> O1, way (b); 64 GD:207-213
+-> AX-R11; 64 GD:264-267 -> AX-R11 and mark 7; 66 GD:119-121 -> AX-F11. JL's AR: cites (the first reading) map to:
+AR:160-161 -> AX-F1; AR:183-186 -> AX-F5 (spec:2238); AR:197 -> AX-F11; AR:223-224 -> AX-F8; AR:231-235 -> AX-F10;
+AR:272-278 -> AX-F15.
+
+## Answer (from these notes)
+- Draft 395 lines (prose <= 120; 18 table rows wider, as in every research file). Rules AX-R1..R9, R14..R16: content
+  kept, citations moved to BP Parts and A3..A10 (A10 by lines 5, 25, 29); R5 names the armature object as top object.
+- R10: 20 joints by count + pointer to JL §1 (no table); root = node above skeleton and mesh, JL §2's words; own-list
+  sentence gone. R11: five names (A3; A10:25), per-gun lists, axes glTF + Blender, hands (go:49 whole, A10:5, palm
+  [proposal] check without a mark), muzzle (go:50 whole, A10:29). R12: marking_ engine rule only; "off at game size" =
+  Art lead's proposal, Mustafa's call; faction change open. R13: draws per pass as PM-0005-36; unit_dark keeps four
+  materials, not four draws; body + rifle = 6, fails; O1.
+- Marks: 1, 2, 5 kept (5 adds a script-planted animations entry); 3 exactly JL's 20 (no armature joint, neutral bone,
+  _leaf); 4 five-joint vertex; 6 asymmetric box, two defects, J must catch the unapplied scale; 7 entry's sockets, 1 mm,
+  0.5 deg, rename + 5 deg turn; 8 draws as PM-0005-36 with the renderer, rifle + code-built stand-in (fails today, 6);
+  9 names/counts/materials/box within 1 mm, defect a loader option in one run; 10 new: JL §5 + advisor's scale line +
+  ruling and fallback. Proven on: rifle 1, 2, 5, 7, 8 (+9 unskinned); real export 3, 4, 6, 10, 7's Blender half.
+- O1 three ways (costs, proof), O2 both lines (0003's not "for example"): decided nowhere.
+- Points P1 (armature object's name also names a node), P2 (spec:2242 -> 2238), P3 (spec:2118 confirms JL).
+- Not settled: influence cut/renormalising; armature object form; neutral bone's name; Blender version vs 5.4.12;
+  mark 7's up axis; the palm check's home; mark 8 now repeats PM-0005-36's count (test-engineer may merge them).
+  Size: under 400 per the brief (plan rev 2 point 12 had 300 for this file; point 21 estimated about 380).
+DONE

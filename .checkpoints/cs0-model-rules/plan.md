@@ -197,7 +197,7 @@ saved as `inputs/ART_BRIEF_CORRECTION_2026-11-15_1840_gun_poses.md`; the appendi
 as A9). His words: "For change-set 0 take only its rule and the socket names. The pose numbers are for the body step
 (change-set 10)." So the research file takes two things from it, both as the Art lead's proposal that agrees with his
 go: the rule ("The right hand is on socket_grip and the left hand on socket_support. The butt and the muzzle follow
-from the gun's file.") and the five socket names. No pose number enters a doc of this change-set. The report's "since
+from the gun's file.") and the five socket names. No pose number enters a rule of this change-set. The report's "since
 the plan" passes three notes to change-set 10, in his words: the rifle's butt in the aiming pose ("its top edge is at
 U 1.39. The file wins, by the correction's own rule."); "in the rifle's aiming pose the left arm uses 0.59 of its
 0.62, so little is left for recoil and the walk"; "The SMG's side magazine has to stay clear of the left forearm".
@@ -248,4 +248,71 @@ on meanwhile (the re-read of this plan, the draft's update to the ruling); no fi
 **22. Part 15 is not carried by this change-set.** It is sent to him as a file after the advisor agent's review and
 goes to main once he has answered it. If `.checkpoints/part-15*` is deleted with this change-set's last commit, the
 report and STATUS name the commit that holds it.
+
+**23. His answers of 2026-11-17, 21:33** (`mustafa-2026-11-17-2133.md`; the appendix's A11; they close point 21).
+- SIZE-0: "(a). It goes on as one pull request." "The new stop line: 1,200 written lines; copied lines do not count."
+- "Build my records and the plan's carry in commits of their own, apart from the rules and the joint list, so a
+  split stays cheap if it is ever needed." So the build's commits are: (1) his records: DECISIONS (five entries, six
+  pointers), SPIKE_PLAN, the dated lines in ADR 0002, 0004 and 0006, the register's rows for his answers, the
+  appendix; (2) the plan's carry: the plan's report; (3) the rules and the joint list: the two research files, their
+  index rows, ADR 0005, the register's ADR 0005 row and row G1, LOOK_V2 section 8's line; (4) docs-keeper's pass;
+  (5) this change-set's report and the deletion of the checkpoints.
+- The split rule, his words: "If review round 1 returns a Critical or High on the rules or the joint list that one
+  fix pass cannot close, split at that point: my records and the plan's carry go first as change-set 0, the rules and
+  the joint list follow as change-set 0b. You need no new word from me for that; tell me in three lines when it
+  happens."
+- LOG-HISTORY: "(a). Leave the history; nothing is rebuilt." (The advisor agent's finding 17 asked the same question
+  and recommended a fresh branch; his answer decides it. The report says plainly that a merge commit brings the
+  branch's commits, that one included, into main's history.)
+- A10 is the Art lead's text alone (3,244 bytes); the notes' copy was replaced, and the ruling's citations of the
+  correction are repointed to its lines when the ruling moves to `docs/research/`.
+- DECISIONS gets five entries, not three: his messages of 20:58 and 21:33 are recorded too, as the foundation steps
+  recorded each message of his in their sessions; his 20:20 message, which the 20:58 one re-sends, is in the appendix
+  (A8).
+
+**24. The advisor agent's re-read: APPROVE with conditions** (`advisor-plan-r2.md`, 2026-11-17, about 20:45 UTC).
+Its conditions, each done before the build's first commit:
+- 18: two more pointers in DECISIONS (the entries of 2026-11-10 and 2026-11-13); the script now places five and
+  expects six with SLICE-ORDER's. 19: every pointer that says the marks stay also carries his one exception (COMPARE)
+  and his sentence "Those tests are not built as separate tests unless the plan shows a question the real game cannot
+  answer." Both in `pointers-insert.mjs`, dry-run clean.
+- 20: mark 8 counts what PM-0005-36 counts, draw calls per pass; the shared `unit_dark` name keeps four materials,
+  not four draws; the ways out go to him with change-set M's plan (the research file's O1; the report's section 5).
+- 21: a dated "Answered by Mustafa (2026-11-17)" line under OQ-0006-18 in ADR 0006 and under OQ-0002-6 in ADR 0002,
+  as OQ-0006-19 has one.
+- 22: the stop was told in three lines and is answered (point 23).
+- The Lows: point 17 reads "no pose number enters a rule"; the 20-joint table lives only in the joint-list file; no
+  "under `root`"; the research file's limit is 400 lines; the report's new section corrected; the go's entry header
+  names what GATE-FOLLOW and MACHINES change; no pointer says more than his words; the SLICE-ORDER pointer quotes
+  his sentence; the verifier spot-checks both research files; LOOK_V2's hand-over waits for his answer on Part 15; a
+  fix at change-set M that loosens a mark needs his word; the ruling's knee rule is marked as holding for rigid
+  weights only.
+- ROOT: the advisor agent rules for engine-architect: `root` is the node above skeleton and mesh. What the first
+  real export must show, and what changes if it shows otherwise, is written into mark 10.
+
+**The files, in one table (final).**
+
+| File | Change | Commit |
+|---|---|---|
+| `docs/DECISIONS.md` | five entries by script; six dated pointers | 1 |
+| `docs/SPIKE_PLAN.md` | three dated pointers | 1 |
+| `docs/adr/0002-code-structure-build-toolchain.md` | one dated pointer (migration step 1); a dated line under OQ-0002-6 | 1 |
+| `docs/adr/0004-simulation-core.md` | a dated pointer in PM-0004-34's row | 1 |
+| `docs/adr/0006-infrastructure-operations.md` | a dated line under OQ-0006-18 | 1 |
+| `docs/adr/README.md` | the rows of OQ-0006-18, OQ-0002-6, OQ-0003-1 and the three "do soldiers block" rows; the counts | 1 |
+| `docs/reports/2026-11-17-build-plan-slice-1-appendix.md` | new, by script (A1 to A11) | 1 |
+| `docs/reports/2026-11-17-build-plan-slice-1.md` | new, by script: "since the plan" and the plan from commit 68addf9 | 2 |
+| `docs/research/asset-export-rules.md` | new (graphics-engineer) | 3 |
+| `docs/research/soldier-joint-list.md` | new (engine-architect) | 3 |
+| `docs/research/README.md` | two rows | 3 |
+| `docs/adr/0005-content-abilities-assets.md` | OQ-0005-AS3 and AS4 answered in part (the entries and the table's rows); the new marks from PM-0005-47 in the asset spike's group; the count line | 3 |
+| `docs/adr/README.md` | ADR 0005's row; row G1 | 3 |
+| `docs/LOOK_V2.md` | section 8, flow step 2: one line | 3 |
+| `docs/STATUS.md`, `docs/ROADMAP.md`, `docs/REPO_MAP.md`, `docs/reports/README.md` | docs-keeper's pass | 4 |
+| `docs/reports/2026-11-17-cs0-model-rules.md` | new: this change-set's report | 5 |
+| `.checkpoints/build-plan-slice-1*`, `.checkpoints/cs0-model-rules*`, `.checkpoints/part-15*` | deleted | 5 |
+
+Risk tier 1 (decision docs): his go; no Brave check. Reviewers on the final diff, each at effort max: engine-architect,
+test-engineer, the verifier (both research files; his words byte for byte), docs-keeper's pass; then the advisor
+agent on the final head.
 

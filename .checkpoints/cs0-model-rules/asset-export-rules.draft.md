@@ -16,11 +16,11 @@
 4. Open for Mustafa (part 7): with a gun from its own file a soldier exceeds 4 draws per pass; the fifth class's name.
 5. Nothing here was proven by an export; part 8 says what the first real export must prove.
 
-**How to read this file.** "Confirmed": the source's own words or code, cited by line; "inferred": my reading or
-arithmetic; "[from memory, unverified]": no source read; "[proposal]": a number offered for a mark, for test-engineer.
-Rules are marked "from a draft" (an ADR, SPIKE_PLAN or EDITOR_V2 line), "from a source" (specification, exporter,
-loader), "change-set 0's naming" (Mustafa: "The brief's names for colour areas and bones are working names; the names of
-your change-set 0 win.", A3) or "the engine's convention (proposed)". The briefs' sizes, colours, poses and part lists
+**How to read this file.** *Confirmed*: the source's own words or code, cited by line; *inferred*: my reading or
+arithmetic; *[from memory, unverified]*: no source read; *[proposal]*: a number offered for a mark, for test-engineer.
+Rules are marked *from a draft* (an ADR, SPIKE_PLAN or EDITOR_V2 line), *from a source* (specification, exporter,
+loader), *change-set 0's naming* (Mustafa: "The brief's names for colour areas and bones are working names; the names of
+your change-set 0 win.", A3) or *the engine's convention (proposed)*. The briefs' sizes, colours, poses and part lists
 are never decided here ("Everything in them is the Art lead's proposal unless a line says it is mine.", A3), nor is the
 look (Mustafa's and the Advisor's). Against the README's shape (`docs/research/README.md`:36-48), rules and marks stand
 for recommendations, options appear in parts 6 and 7, and the verifier adds its spot-check table.
@@ -352,7 +352,7 @@ settled, and an ADR line that changes needs Mustafa's go.
 | O1 and O2 (part 7) | Mustafa, with change-set M's plan; the engine proposes (main session; engine-architect reviews) |
 | Whether a marking is off at game size (A5, A2); how a marking changes with the faction; names after `marking_` | Mustafa decides; the Art lead and the engine propose |
 | Which sockets each gun has, and its eject direction | the gun's entry, from its author (the Art lead), with the engine |
-| The [proposal] numbers of marks 7, 8 and 10, the `palm` check, mark 7's up axis | test-engineer's review |
+| The numbers marked [proposal] (mark 10, the `palm` check, O1's way (b)); mark 7's up axis | test-engineer's review |
 | Where the joints sit, weights beyond the rigid baseline, whether the coat keeps its four joints | JL §6 |
 | The bind pose; the soldier's vertex and bone counts (AS6) | the model's author |
 | How the exporter writes the armature object; the neutral bone's name; the influence cut; Mustafa's Blender version against add-on 5.4.12 | the first real export (the advisor agent's ruling, part 5) |

@@ -7,7 +7,7 @@ const args = process.argv.slice(2); const doc = args[0];
 const allow = new Set(); for (let i = 1; i < args.length; i++) if (args[i] === '--allow') allow.add(args[++i]);
 const N = '.checkpoints/build-plan-slice-1/', C = '.checkpoints/cs0-model-rules/';
 const sources = [N + 'mustafa-2026-11-14-task.md', N + 'mustafa-2026-11-14-addition.md', N + 'mustafa-2026-11-17-go.md',
-  C + 'mustafa-2026-11-17-2020.md', C + 'mustafa-2026-11-17-2058.md',
+  C + 'mustafa-2026-11-17-2020.md', C + 'mustafa-2026-11-17-2058.md', C + 'mustafa-2026-11-17-2133.md',
   N + 'inputs/ART_BRIEF_2026-11-14_1635_conscript_stand_in.md', N + 'inputs/ART_BRIEF_ADDITION_2026-11-15_poses_yard.md',
   N + 'inputs/ART_BRIEF_2026-11-15_1735_smg_stage1.md', N + 'inputs/ART_BRIEF_CORRECTION_2026-11-15_1840_gun_poses.md',
   ...args.filter((a, i) => i > 0 && args[i - 1] === '--source')];

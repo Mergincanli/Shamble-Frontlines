@@ -15,7 +15,7 @@
      checkpoints (`build-plan-slice-1*`, `cs0-model-rules*`) in its last commit before the PR is marked ready.
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs0-model-rules) · **Base:** main
   c94c81b440c77f7979e0f944a5341319f9a57d1b (to take in first; the branch still sits on 4460ef5 plus checkpoint commits)
-- **Last update:** 2026-11-17 21:35 CET (from the clock)
+- **Last update:** 2026-11-17 21:57 CET (from the clock)
 
 ## Steps done
 1. His go received (user message of 2026-11-17T19:10:44Z, saved by script, 10,544 bytes). The session's model read
@@ -70,20 +70,25 @@
     and not a joint (against graphics-engineer's draft: the advisor agent rules), the sockets' axes, the hands'
     rule, the origin and facing check, the brief's 17 parts on the joints. Folded into the plan as points 19 to 22.
 
-## Current step
-16. (20:25 UTC) Three agents run: graphics-engineer updates the research draft to the ruling and to revision 2 (its
-    brief: `cs0-model-rules/graphics-engineer-update-brief.md`; notes `graphics-engineer-export-update.md`); the
-    advisor agent re-reads the plan (notes `advisor-plan-r2.md`); the advisor agent reviews Part 15
-    (`part-15/advisor-part-15-r1.md`).
-    **The size stop (his rule, plan point 21):** change-set 0 has passed twice its planned size (about 150 lines of
-    docs planned; about 900 written lines now, besides about 1,700 copied). He is told in three lines; the docs
-    build waits for the advisor agent's APPROVE and for his word. Review of what exists goes on.
+18. Part 15: the advisor agent's re-check came back APPROVE with four Lows, folded in; sent to him as a file
+    (`part-15/part-15-the-second-lane.md`, 257 lines, six questions).
+19. His message of 20:39:23 UTC (his label 21:33; `cs0-model-rules/mustafa-2026-11-17-2133.md`, 1,754 bytes): SIZE-0
+    (a), one pull request, new stop line 1,200 written lines (copied lines do not count), his records and the plan's
+    carry in commits of their own, the split rule if round 1 returns a Critical or High on the rules or the joint
+    list that one fix pass cannot close; LOG-HISTORY (a), the history stays; A10 is the Art lead's text alone (the
+    notes' copy replaced by the 3,244-byte one); his SMG line drawing arrived with it (one image, not copied).
+20. The advisor agent's re-read of the plan: APPROVE with conditions (`cs0-model-rules/advisor-plan-r2.md`): its
+    findings 18 to 22 fixed in the plan (points 23, 24, one files table) and in the scripts; ROOT ruled for
+    engine-architect. graphics-engineer's update of the research draft is done (395 lines; mark 8 counts draws;
+    points P1 to P3 for engine-architect in its notes). Both record scripts dry-run clean again (20:57 UTC): five
+    entries equal byte for byte, appendix A1 to A11, six pointers in DECISIONS, three in SPIKE_PLAN, one in ADR 0002.
 
-17. (20:35 UTC) Part 15: the advisor agent's first review came back REVISE (10 Medium, a batch of Low; notes
-    `part-15/advisor-part-15-r1.md`). Revision 2 written (250 lines, six questions: LANE-SPLIT, RECORD-FILES,
-    VFX-ROUTE, VFX-FIX, VFX-MOMENTS, GUN-FILES; its quotes re-checked by script, 9 spans found) and sent back to the
-    same agent for a check of what changed (notes `part-15/advisor-part-15-r2.md`).
-    He was told the size stop in three lines at about 20:25 UTC (question SIZE-0), with LOG-HISTORY.
+## Current step
+21. The docs build, in his commit order (plan point 23): (1) his records; (2) the plan's carry; (3) the rules and the
+    joint list (engine-architect first repoints the ruling's citations and takes graphics-engineer's points P1 to
+    P3); (4) docs-keeper's pass; (5) the report and the deletion of the checkpoints. Then the reviews on the final
+    diff (engine-architect, test-engineer, the verifier), the advisor agent on the final head, the pull request.
+    Stop line: 1,200 written lines.
 
 ## Next steps
 1. Change-set 0's own short plan at `.checkpoints/cs0-model-rules/plan.md`; the advisor agent's review of it (effort
@@ -159,4 +164,4 @@
 ## Running work
 - saver: background task brf1n425m, started 20:03 UTC (the first one, bfulbfi1o, was killed at 19:55 UTC); check
   its output file at each update.
-- agents (3 of 3): graphics-engineer (the draft's update), the advisor agent twice (the plan's re-read; Part 15).
+- agents: none running at this update.
