@@ -118,3 +118,15 @@ advisor's plan review (plan.md revision 2, points 1-22) and engine-architect's j
   removed text (old root reading; flag to main session), GD:249 -> mark 3 row, GD:316-317 -> "Not read"; 35 & 38
   GD:224-227 -> AX-R14; 38 GD:201-206 (vertex groups) -> AX-R10; 58 & 70 GD:290-295 -> O1 (b); 64 GD:207-213 -> AX-R11,
   GD:264-267 -> AX-R11 (per-gun list); 66 GD:119-121 -> AX-F11.
+- Quote checks before writing: A5 A2 line 13 "off at game size and on in close views" exact; A5 A3 line 17 "The rifle
+  is a model of its own."; A6 CONVENTIONS line 14 "all transforms applied"; A6 SOCKETS line 40 "pointing right and 20
+  degrees up"; A4 IF THIS IS BUILT IN BLENDER LATER line 73 "one empty at the origin", "one object per part"; A4
+  MATERIALS line 27: some colour values are Mustafa's (so write "the briefs' sizes, colours, poses and part lists are
+  never decided here", not "colours are the Art lead's"). 0003:247-248 is NOT marked "for example" (old draft said both
+  lists are examples: fix in O2). PM-0003-25 (0003:1200) does not say whether its soldier holds a gun.
+- FINDING (mark 6 design): an unapplied 0.01 scale on a box modelled at 100x leaves the loaded world size right, so L's
+  bounding box alone can miss it; J must read POSITION min/max and require identity rotation and scale on every node.
+- FINDING (mark 4 design): with AX-R2's call a five-joint vertex is cut to four by the exporter; if it renormalises
+  (unread, AX-F10) the file passes and the fifth influence is lost silently; JOINTS_1 shows only with Include All Bone
+  Influences on. Say so.
+- Writing B7-B12 as one full rewrite of the draft (part 3 findings kept verbatim).

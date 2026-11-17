@@ -5,7 +5,8 @@ the first builder chat (session_019YNMUV9LFhASseJ9EP12kL) on Mustafa's words of 
 CHANGE 4; in `docs/DECISIONS.md` once change-set 0 is merged). Nothing here is decided until he answers; the six
 questions are at the end. Sources: the plan's Parts 1, 3.2, 7, 11 and 12; a reading of the Shamble VFX repository at
 commit 92ec2dc by graphics-engineer (Opus 5.5, effort max; nothing was built or run), cited as "the digest".
-Revision 2 folds in the advisor agent's review (ten Medium findings)._
+Revision 2 folds in the advisor agent's review (ten Medium findings); the advisor agent then approved it, and its
+four small points are folded in too._
 
 His decision, word for word: "Two chats build the game on my personal account. The first builder chat keeps Fable 5.2
 as its main model. A second builder chat has Opus 5.5 as its main model, with Fable 5.2 answering its advisor tool,
@@ -65,7 +66,7 @@ engine-architect reviews them there.
 | The carry of your look decisions | `docs/LOOK_V2.md` from the merge of change-set 0 on; the carry's own lines in the rendering draft; with your word, the one pointer in `docs/EDITOR_V2.md` (15.5) | change-set 0 merged (it changes one line of LOOK_V2's section 8) | the model-rules file until change-set 0 is merged |
 | The comparisons that stay (Part 3.2's rows inside Slice 1) | one report per comparison in `docs/reports/`, with its patch file; the kept builds | one Wasm instance or two (PM-0002-25): change-set 3, then 5 · our Wasm's size against two other libraries (PM-0004-33) and the bytes content adds (PM-0005-16): 4 · the block's two layouts (PM-0002-10) and the shared ring (PM-0002-11): 5, the layouts again after 12 · only if their own conditions come true: the fallback pacing (PM-0002-27), the library's character controller (PM-0004-34, your answer COMPARE) | `crates/` and `packages/` on main (condition 4) |
 | 6 Look | from the merge of change-set 5: `render/` (the renderer's set-up, passes, materials, ink, light and shadow, quality tiers, the warm-up), `soldier/` (the stand-in, then the code-built Conscript and both code-built guns), `camera/` with its tuning panel, the GPU half of the measurement harness, the data files in `content/look/`, the picture tests in `packages/e2e/tests/look/` with their reference pictures | 5 merged; change-set 0 (the names of colour areas and joints); the carry; the machines named (your answer MACHINES) | lane 1's list |
-| The VFX proof (new, about one day) | its report; its test page in `fx/proof/` | 6 merged; your answer VFX-ROUTE; the runtime's code brought in by a small pull request of lane 1 (a new package and the lockfile: condition 2); at least one exported effect folder from Shamble VFX (none is in its repository: exports are not committed there); a three.js version the runtime accepts (15.5) | lane 1's list |
+| The VFX proof (new, about one day) | its report; its test page in `fx/proof/` | 6 merged; your answer VFX-ROUTE; the runtime's code brought in by a small pull request of lane 1 (a new package and the lockfile: condition 2), after which the copied source and its re-copy script are lane 2's and the package's build file stays lane 1's; at least one exported effect folder from Shamble VFX (none is in its repository: exports are not committed there); a three.js version the runtime accepts (15.5) | lane 1's list |
 | M The first model | `assets/` (the loader, the model checks, the asset list), the model files and their entries, any asset tool it adds under `tools/`, the two model research files from the merge of change-set 0 on, `packages/e2e/tests/assets/` | 6 merged; change-set 0; a model file | lane 1's list |
 | 10 Body | `soldier/anim/` (the procedural animation port and its goldens) | 6 merged. Recoil and the death fall answer to change-set 8's shot and death events: its own plan says whether it waits for 8 or comes in two halves | lane 1's list |
 | 11 Feel | `fx/` (the bridge from events to effects), `audio/`, the data files in `content/feel/`, `packages/e2e/tests/feel/`; from the merge of change-set 9 also `plain/` (the plain tracers and flash it replaces) and the hit marker's and kill confirm's files | 8, 9 and 10 merged; the VFX proof; the effects for the slice's five weapons, made in Shamble VFX and exported | lane 1's list |
@@ -82,8 +83,10 @@ the flash and the tracer start" (your words); and a hook to draw lane 1's plain 
 of these in change-sets 2 to 5, on the plain stand-in, so that 7, 8 and 9 need nothing new from lane 2.
 
 **What each lane needs from the other.**
-- Lane 1 needs nothing from lane 2 for 7, 8 and 9: they run on the plain stand-in if 6 is not merged yet. Change-set
-  12 measures with everything on, so it needs 6, 10 and 11 merged.
+- Lane 1 needs nothing from lane 2 for 7, 8 and 9: they run on the plain stand-in if 6 is not merged yet. For that,
+  lane 1 builds into the stand-in, before its hand-over, how a dead and a respawned soldier show (change-set 8's
+  deaths), read from a field of the block. Change-set 12 measures with everything on, so it needs 6, 10 and 11
+  merged.
 - Lane 2's data files in `content/look/` and `content/feel/` are read and checked by lane 1's `content` crate, and
   their types are generated by lane 1's generators. A new field is a request to lane 1.
 - Body and Feel read fields and events that lane 1 puts in the block (how fast and which way a soldier moves against
@@ -92,7 +95,9 @@ of these in change-sets 2 to 5, on the plain stand-in, so that 7, 8 and 9 need n
   the start.
 
 **Files neither lane owns.** `spikes/` is the netcode lane's. The lint, format and type settings are the 2.3 chat's
-(Part 7): while it is stopped nobody writes them. `legacy/` and the legacy tools in `tools/` are frozen. The design
+(Part 7): while it is stopped nobody writes them. `legacy/` and the legacy tools in `tools/` are frozen, except the
+gate's own files there (`tools/gate.mjs` and what it runs, `tools/battery.js` among them), which are lane 1's (15.4).
+The design
 docs (`docs/LOOP_V2.md`, `docs/EDITOR_V2.md`, `docs/VISION_V2.md`) are yours and the Advisor's: a lane writes in them
 only on your word. The kit (`.claude/`, `CLAUDE.md`, the guard) is frozen.
 
@@ -114,14 +119,15 @@ Lane 1 never reads a gun model: in the simulation a shot's start is data of its 
 - **After every merge the other lane takes main in** (a plain merge of main into its branch), runs its checks again
   and has the advisor agent review the new head, before your go. That is today's rule for a later push.
 - **No game file is shared**, so the merges can only meet in the record files: `docs/DECISIONS.md`, `docs/STATUS.md`,
-  `docs/ROADMAP.md`, `docs/REPO_MAP.md`, the decision drafts with their register, `docs/SPIKE_PLAN.md`. Every
+  `docs/ROADMAP.md`, `docs/REPO_MAP.md`, the decision drafts with their register, `docs/SPIKE_PLAN.md`, the index
+  `docs/research/README.md`. Every
   change-set of both lanes, and of the netcode lane, writes its own lines there. They cannot have one owner
   (question RECORD-FILES).
 - **Asking the other lane** for something in its files (a field in the block, a dependency, a job in CI): one GitHub
   issue, "Lane requests", read by both chats at the start of each change-set. A request names its lane and what it
   needs, and the owner answers with a pull request. The repository is public, so the night shift's rule applies:
-  only comments posted by the `Mergincanli` account count; any other comment is named and linked in the report and
-  never acted on. A request is never your word.
+  only comments posted by the `Mergincanli` account count; any other comment is named and linked in the report, its
+  text never quoted and never acted on. A request is never your word.
 
 ## 15.4 Every CI and workflow file has one owner
 
@@ -222,11 +228,12 @@ lane 2's docs change-set for the look carry.
      keep running the same code; (b) lane 2 fixes the copy here: quicker, but the editor then no longer shows what
      the game draws.
    - Recommendation: (a). It needs you to pass the findings to the VFX chat.
-5. **VFX-MOMENTS: who builds camera shake, hit-stop and the sounds for Slice 1?**
+5. **VFX-MOMENTS: who builds camera kick, the shake and the sounds for Slice 1?**
    - Why it matters: `docs/EDITOR_V2.md` section 7 has, as decided: "one asset can bundle particles, sound, camera
      shake and hit-stop, timed together, so punch is authored in one place". Shamble VFX lists those three as "Not
-     yet", and change-set 11 as planned builds them in the game. Your lean is that the game builds no effect a
-     second time. Needed before change-set 11's plan.
+     yet". Change-set 11 as planned builds camera kick, the shake and the sounds in the game; hit-stop is in no
+     card of the plan. Your lean is that the game builds no effect a second time. Needed before change-set 11's
+     plan.
    - Options: (a) the game builds camera kick, the shake and the sounds for Slice 1, as planned, and they move into
      Shamble VFX when it has them: some work is then done twice; (b) the VFX chat adds them first and change-set 11
      waits for them.
