@@ -15,7 +15,7 @@
      checkpoints (`build-plan-slice-1*`, `cs0-model-rules*`) in its last commit before the PR is marked ready.
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs0-model-rules) · **Base:** main
   c94c81b440c77f7979e0f944a5341319f9a57d1b (to take in first; the branch still sits on 4460ef5 plus checkpoint commits)
-- **Last update:** 2026-11-17 22:55 CET (from the clock)
+- **Last update:** 2026-11-17 23:17 CET (from the clock)
 
 ## Steps done
 1. His go received (user message of 2026-11-17T19:10:44Z, saved by script, 10,544 bytes). The session's model read
@@ -94,7 +94,7 @@
     - commit 3, first part: the two open questions answered in part in ADR 0005 and the register, LOOK_V2 section
       8's line, one pointer in SPIKE_PLAN.
 
-## Current step
+## (earlier current step, done)
 22. Commit 3, second part: waits for two agents. engine-architect writes the docs version of the ruling
     (`cs0-model-rules/soldier-joint-list.draft.md`: citations repointed, graphics-engineer's points P1 to P3 ruled
     on, a consistency check of the rules draft). test-engineer writes the ten pass-mark rows PM-0005-47 to -56 for
@@ -168,6 +168,29 @@
     on the final head; the report completed; the checkpoints deleted in the last commit; the pull request marked
     ready; stop for his go.
 
+29. His message of 22:10:34 UTC (his label 23:06; saved by script, `part-15/mustafa-2026-11-17-2306.md`, 2,574 bytes,
+    commit 023e6f3): all six questions of Part 15 answered (a), with details (the copy of the VFX runtime is never
+    edited by hand and the re-copy script can check; no hit-stop now; every gun file through Blender); "Lines that a
+    finding of the verifier or of the advisor agent asks for do not count toward the 1,200. New scope still does.";
+    "Yes, watch it" for #56 (subscribed to its activity). His answers are NOT recorded in DECISIONS by change-set 0
+    (new scope): Part 15 with his answers goes to main in a docs change of its own, before change-set 1. STATUS's
+    waiting line says so (4f20643).
+30. The verifier's first pass: PASS at cacea55, 2 Medium and 6 Low (`cs0-model-rules/verifier-cs0.md`). All fixed and
+    pushed: d6b6b30 (seven pointers carry his rule's last sentence, by `pointers-fix1.mjs`; `pointers-insert.mjs`'s
+    own check fixed; the plan report's "since the plan": his sentence on the Art list, two times, measured sizes; the
+    research files' line citations renumbered to this branch by `renumber-cites.py`, run once; spot-check counts in
+    the research index) and a65d26f (the report tightened). Its spot-check: 71 of 72 key claims.
+    Size: 1,206 written lines, of which 6 were asked for by the verifier's findings and do not count: 1,200 counted.
+31. (22:17 UTC) The container restarted during the push of a65d26f (exit 137, a TLS error). Nothing lost: two local
+    commits (a65d26f and the saver's last autosave 4857f19) pushed on the second try; the saver restarted (task
+    bm929m5yy). `tools/node_modules` survived.
+
+## Current step
+32. Round 2, on what changed: the verifier's second look at the commits after cacea55, and the advisor agent on the
+    final head. Then: the report completed (Outcome, the two verdicts, CI), the checkpoints deleted
+    (`.checkpoints/build-plan-slice-1*`, `cs0-model-rules*`, `part-15*`) in the last commit, the advisor agent's
+    word on that last head, the pull request marked ready, stop for his go.
+
 ## Next steps
 1. Change-set 0's own short plan at `.checkpoints/cs0-model-rules/plan.md`; the advisor agent's review of it (effort
    max; APPROVE before any edit outside `.checkpoints/`).
@@ -240,5 +263,5 @@
   cannot fast-forward (checkpoint commits). His words "Take main in first" cover the act.
 
 ## Running work
-- saver: background task b97h3rkxv, started about 21:55 UTC (the second one, brf1n425m, reached its time limit).
-- agents (1 of 3): the verifier.
+- saver: background task bm929m5yy, started about 22:17 UTC (after the container restart).
+- agents: the verifier (second look) and the advisor agent (final head), started after this update.
