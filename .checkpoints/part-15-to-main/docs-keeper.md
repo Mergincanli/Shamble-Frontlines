@@ -23,3 +23,33 @@ Task: part-15-docs-keeper (docs-keeper pass for the merge of #56 and change-set 
   main in. It does not reword, re-wrap or move another lane's lines." VFX-ROUTE :173 seventh package. VFX-FIX :177 "I pass
   the findings on." Both entries already in DECISIONS (b75ec0d). Branch claude/wonderful-hamilton-jdmlnf at b75ec0d; main
   at d7dad97. STATUS=120 lines now (at the cap).
+- Coordinator message (mid-task): draft PR for this change-set exists: #57, draft, branch claude/wonderful-hamilton-jdmlnf,
+  base main d7dad97. Use "#57" in STATUS's row and ROADMAP's entry, state "draft; in review".
+- Block 2 DONE. STATUS lane 1 lines: L5 (Last updated), L13 (Last merged), L29 (#56 row), L35-37 (Next item 2), L40
+  (Waiting #56), L41-42 (Waiting Part 15) = 9 lines. Others (never touch): L28 (#40 row), L43-44 (netcode Waiting
+  bullet), all else incl. L21-23 (main/CI line, stale 82c605e: not mine), Follow-ups L66-100, Open risks. Follow-ups
+  form: ids in STATUS, text in archive's live "Follow-ups". Budget: 111 fixed lines + mine <= 120 -> mine <= 9 lines:
+  L5(1)+L13(1)+#57 row(1) leaves 6 for Next2 + Waiting + new Follow-ups bullet.
+- FINDING (git blame STATUS): L35 (Next item 2's first line, "2. v2: the netcode proof test (#40); ... #52 merged; step")
+  was written by DOCS-54 9660197 (the netcode lane's #55), NOT by cs0. cs0 (94aaae8/6a31650/4f20643) wrote only L5, L13,
+  L29, L36, L37, L40, L41, L42 = 8 lines. So keep L35 byte for byte; the tail must continue "step" -> "2.3...".
+  Budget: 112 fixed lines; my 8: L5, L13, #57 row, Next tail (>=1), Waiting (>=2), FU (>=1..2).
+- Block 3 (archive structure) DONE. Archive "In flight" = 4 cells: Work | merged: PR #N (`branch` ...), sha, date ... |
+  done: ... | none. Newest first, inserted after L158 (header L157-158). DOCS-54 wrote rows fresh (not line moves). #55
+  (DOCS-54) has NO row in the archive: cs0 replaced it in STATUS without archiving (not mine to fix: netcode lane's).
+  Live Follow-ups section L219-907; newest blocks at its end ("From KEPT-LOGS", "From the night-shift lines" ~L873-906),
+  each "- **From X** (PR #N, merged as sha on date; ...; copied by script from ...):" then sub-bullets.
+- Block 4 (ROADMAP) DONE. Recent work L122-248; cs0 entry L125-128 ("**Change-set 0 of the build plan [2026-11-17, PR
+  #56: ready for review]** — ..."; last line ends "Two review rounds done (the verifier: PASS); then his go." and is
+  135 cols, cs0's own). Form of merged: "[dates, MERGED]" + "Merged: PR #N, sha, date UTC ..., by merge commit, on his go
+  after the advisor agent's APPROVE of <sha>; CI green on main (...)". 12 entries now (cs0 ... #43 at L248); adding #57
+  makes 13 (>12) but brief says no fold: report it. "v2, next" pointer 2026-11-17 L102-105 is cs0's; still true, keep.
+- Block 5 (REPO_MAP) DONE. Reports rows L73-80; cs0's rows L70, L71, L78, L79, L80 (L80: "| `docs/reports/2026-11-17-
+  cs0-model-rules.md` | The report of change-set 0 of the build plan (PR #56) |"). Add two rows after L80. L6 "Last
+  checked: 2026-11-17" already today's date: leave.
+- Block 6 (Part 15 report) DONE. File docs/reports/2026-11-17-build-plan-slice-1-part-15.md (348 lines). L30-33 "Still
+  his, from the text's "For Mustafa":" giving lane 2 this Part 15 and asking it for its list of needs from the block
+  before change-set 4's plan is reviewed; telling lane 2 which chat on his PC makes the model files; having the VFX chat
+  export at least one effect folder for the VFX proof, and later the effects for the slice's five weapons; with VFX-FIX
+  (a), passing the digest's findings to the VFX chat ("I pass the findings on."). GUN-FILES: rule AX-R1 in
+  asset-export-rules.md. VFX-ROUTE seventh package.
