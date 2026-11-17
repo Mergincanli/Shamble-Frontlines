@@ -1066,6 +1066,9 @@ the client host, decided by the advisor on 2026-10-30, resolution 19).
     bug that a playtest or Mustafa's checks find.
   - Research ids: R5-XQ-OQ1, R5-TEST-OQ4.
 - **OQ-0002-6. Which jump reach do the golden tests pin?**
+  - Answered by Mustafa (2026-11-17): (a), the formula's value. His words: "The jump: the formula's value, a reach of
+    3.07 m (OQ-0002-6, its option (a))." and "Both are numbers and rules I can change after I have felt them in
+    Brave." (START-RULES; `docs/DECISIONS.md`, the entry of 2026-11-17, 19:10:44 UTC, answer 12)
   - Why it matters: the reach is 3.07 m by the formula and about 2.98 m as legacy integrates it at 60 Hz (rows GW14 and
     GN10, as R5-TEST-OQ3 cites them, r5 lines 1806–1808); with a fixed tick v2 gets one value, and bots and maps are tuned for it.
   - Options: (a) the formula's value (the intended behaviour); (b) legacy's integrated value; (c) whatever v2's
@@ -1447,6 +1450,20 @@ stays playable throughout: frozen, critical fixes only, guarded by today's gate,
    now. The parts of step 2.3 that need no proof test's result may be built before the proof tests report, after my go
    on the plan. Every gate check that needs a result joins later, when that result is in, with its pass marks unchanged.
    Steps 2.4 to 2.6 still wait for their results."_
+   _Pointer (2026-11-17, change-set 0 of the build plan): for foundation steps 2.4 and 2.5 and for Slice 1, his words of
+   2026-11-13 quoted above are changed by his decision of 2026-11-14 (`docs/DECISIONS.md`, the entry "Taken by Mustafa,
+   2026-11-14, 13:58:05 UTC: the game is built now"): "Foundation steps 2.4 and 2.5 and Slice 1 may be planned now and
+   built after my go on the plan, on the decision drafts as proposed. They do not wait for the tests that
+   docs/SPIKE_PLAN.md places before Slice 1 (the sim core spike, the 60 Hz run, the boundary spike, the look proof test,
+   the content and ability spike and the render budget bench), nor for the end of step 2.3. Those tests are not built as
+   separate tests unless the plan shows a question the real game cannot answer. No pass mark and no open question of
+   theirs is dropped or loosened: each is measured on the real game, at the first build that can show it, and a draft is
+   accepted only when its marks are met. If a mark fails, the code that rests on it is redone." One exception, his words
+   of 2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8, on
+   PM-0004-34): "The comparison against a library's character controller runs only if our own movement misses its
+   marks." His go on the plan for them: the same entry of 2026-11-17. Unchanged, his words of 2026-11-14: "Slice 3,
+   online, still waits for the netcode proof test's result. Step 2.6, the previews, follows the preview hosting check as
+   planned."_
 2. **The foundation** ([GLOSSARY §8](../research/GLOSSARY.md#the-foundation)), one change-set per step:
    1. *The restructure.* The five legacy files move to `legacy/` (OQ-0002-2 places the tools). *Done when:* today's
       gate passes on `legacy/`, the four Phase 0 mutation proofs (a deleted function, an unguarded editor call, a syntax

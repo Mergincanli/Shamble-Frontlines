@@ -67,12 +67,17 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/research/r6-infrastructure.md` | R6: infrastructure (hosting, costs, monitoring, telemetry); the security baseline goes into the ADR 0006 draft as open and is researched before the first online playtest (BASELINE-WHEN (b)) |
 | `docs/research/GLOSSARY.md` | One definition per term the six topics share, starting with the tick budgets; §8 the phase 1 terms (the foundation, the netcode proof test, the 60 Hz margin) |
 | `docs/research/UNREAD_SOURCES.md` | Every source R1–R6 could not read, with what each was needed for |
+| `docs/research/asset-export-rules.md` | The rules a model file follows so the engine loads it and colours it per faction (graphics-engineer; the build plan's change-set 0; OQ-0005-AS3 and AS4 answered in part): the file and its export, scale, axes and origin, names, joints and sockets, caps; ten checks, each with a planted defect (PM-0005-47 to -56); materials to slot classes; open points for Mustafa (O1, O2). On paper: no export has gone through them yet |
+| `docs/research/soldier-joint-list.md` | engine-architect's ruling on Slice 1's soldier (change-set 0): one list of 20 joints, `root` as the node above the skeleton, the sockets on a gun and how the hands meet them, the origin and facing check, what is left open and what it changes for change-set 10. On paper |
 | `docs/reference/` | Renegade X and Kane's Wrath reference: inspiration, not what's built |
 | `docs/reports/` | One advisor report per change-set (`YYYY-MM-DD-<slug>.md`): the decision trail |
 | `docs/reports/2026-10-31-v2-research.md` | The R1–R6 research report (PR #28): outcome, evidence, risks, decisions needed |
 | `docs/reports/2026-10-31-v2-research-appendix.md` | Its appendix: coverage table, the 12 resolutions and the advisor's rulings, fetch audit, check outputs |
 | `docs/reports/2026-11-01-v2-decision-drafts.md` | The v2 decision drafts report (PR #33): outcome, evidence, reviews, risks, decisions needed |
 | `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` | Its appendix: the drafts brief in full; Mustafa's decisions, the advisor's plan review and the plan's rules and steps, word for word; the steps and their commits; where each of the advisor's conditions is met; verification, the reviews and the final round; after the stop (2026-11-03): where each answer landed, and the advisor's reviews of plan revisions 4, 5 and 6; Mustafa's ten inputs files, byte for byte |
+| `docs/reports/2026-11-17-build-plan-slice-1.md` | The build plan for foundation steps 2.4 and 2.5 and Slice 1 (fourteen change-sets; his go of 2026-11-17), copied by script from commit 68addf9, with "Since the plan" on top: what his answers and changes do to it (PR #56) |
+| `docs/reports/2026-11-17-build-plan-slice-1-appendix.md` | Its appendix, A1 to A11: his messages of 2026-11-14 and 2026-11-17 and the Art lead's texts, byte for byte, and the three Art sheets' text as the build chat typed it |
+| `docs/reports/2026-11-17-cs0-model-rules.md` | The report of change-set 0 of the build plan (PR #56) |
 
 ## .claude/
 | Path | What it is |

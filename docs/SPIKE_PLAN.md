@@ -99,6 +99,19 @@ UTC: his decision on step 2.3 (step 2.3 may be planned now), and step 2.3's task
 parts of step 2.3 that need no proof test's result may be built before the proof tests report, after my go on the plan.
 Every gate check that needs a result joins later, when that result is in, with its pass marks unchanged. Steps 2.4 to
 2.6 still wait for their results."_
+_Pointer (2026-11-17, change-set 0 of the build plan): for foundation steps 2.4 and 2.5 and for Slice 1, his words of
+2026-11-13 quoted above are changed by his decision of 2026-11-14 (`docs/DECISIONS.md`, the entry "Taken by Mustafa,
+2026-11-14, 13:58:05 UTC: the game is built now"): "Foundation steps 2.4 and 2.5 and Slice 1 may be planned now and
+built after my go on the plan, on the decision drafts as proposed. They do not wait for the tests that
+docs/SPIKE_PLAN.md places before Slice 1 (the sim core spike, the 60 Hz run, the boundary spike, the look proof test,
+the content and ability spike and the render budget bench), nor for the end of step 2.3. Those tests are not built as
+separate tests unless the plan shows a question the real game cannot answer. No pass mark and no open question of theirs
+is dropped or loosened: each is measured on the real game, at the first build that can show it, and a draft is accepted
+only when its marks are met. If a mark fails, the code that rests on it is redone." One exception, his words of
+2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8, on PM-0004-34):
+"The comparison against a library's character controller runs only if our own movement misses its marks." His go on the
+plan for them: the same entry of 2026-11-17. Unchanged, his words of 2026-11-14: "Slice 3, online, still waits for the
+netcode proof test's result. Step 2.6, the previews, follows the preview hosting check as planned."_
 
 ```mermaid
 flowchart LR
@@ -143,6 +156,19 @@ UTC: his decision on step 2.3 (step 2.3 may be planned now), and step 2.3's task
 parts of step 2.3 that need no proof test's result may be built before the proof tests report, after my go on the plan.
 Every gate check that needs a result joins later, when that result is in, with its pass marks unchanged. Steps 2.4 to
 2.6 still wait for their results."_
+_Pointer (2026-11-17, change-set 0 of the build plan): for foundation steps 2.4 and 2.5 and for Slice 1, his words of
+2026-11-13 quoted above are changed by his decision of 2026-11-14 (`docs/DECISIONS.md`, the entry "Taken by Mustafa,
+2026-11-14, 13:58:05 UTC: the game is built now"): "Foundation steps 2.4 and 2.5 and Slice 1 may be planned now and
+built after my go on the plan, on the decision drafts as proposed. They do not wait for the tests that
+docs/SPIKE_PLAN.md places before Slice 1 (the sim core spike, the 60 Hz run, the boundary spike, the look proof test,
+the content and ability spike and the render budget bench), nor for the end of step 2.3. Those tests are not built as
+separate tests unless the plan shows a question the real game cannot answer. No pass mark and no open question of theirs
+is dropped or loosened: each is measured on the real game, at the first build that can show it, and a draft is accepted
+only when its marks are met. If a mark fails, the code that rests on it is redone." One exception, his words of
+2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8, on PM-0004-34):
+"The comparison against a library's character controller runs only if our own movement misses its marks." His go on the
+plan for them: the same entry of 2026-11-17. Unchanged, his words of 2026-11-14: "Slice 3, online, still waits for the
+netcode proof test's result. Step 2.6, the previews, follows the preview hosting check as planned."_
 
 | # | Spike | Size | Place | Pass marks |
 |---|---|---|---|---|
@@ -156,7 +182,7 @@ Every gate check that needs a result joins later, when that result is in, with i
 | 7 | The content and ability spike | L | wave 3 | PM-0005-1 to -32; PM-0004-62 to -66, -75 |
 | 8 | The render budget bench | L | wave 3 | PM-0003-18 to -42, -44 to -47 (PM-0003-1 again); PM-0003-43 at each later upgrade |
 | – | The asset-pipeline research (a research unit, not a spike) | one daytime session | its export and slot-naming part between two wave-1 spikes, before 5's models are made; the rest before 9 | its own marks, appended to 9 |
-| 9 | The asset spike | M (resized after the research) | before the first authored model | PM-0005-38 to -44, plus the research's marks |
+| 9 | The asset spike | M (resized after the research) | before the first authored model | PM-0005-38 to -44, plus the research's marks (its export part's are PM-0005-47 to -56, written 2026-11-17) |
 | 10 | The Feel Lab test (ABL-PREDICT) | M | after abilities are playable (slice 4) | PM-0005-45, -46 |
 
 ### 1. The netcode proof test
@@ -460,6 +486,19 @@ Every gate check that needs a result joins later, when that result is in, with i
   now. The parts of step 2.3 that need no proof test's result may be built before the proof tests report, after my go on
   the plan. Every gate check that needs a result joins later, when that result is in, with its pass marks unchanged.
   Steps 2.4 to 2.6 still wait for their results."_
+  _Pointer (2026-11-17, change-set 0 of the build plan): for foundation steps 2.4 and 2.5 and for Slice 1, his words of
+  2026-11-13 quoted above are changed by his decision of 2026-11-14 (`docs/DECISIONS.md`, the entry "Taken by Mustafa,
+  2026-11-14, 13:58:05 UTC: the game is built now"): "Foundation steps 2.4 and 2.5 and Slice 1 may be planned now and
+  built after my go on the plan, on the decision drafts as proposed. They do not wait for the tests that
+  docs/SPIKE_PLAN.md places before Slice 1 (the sim core spike, the 60 Hz run, the boundary spike, the look proof test,
+  the content and ability spike and the render budget bench), nor for the end of step 2.3. Those tests are not built as
+  separate tests unless the plan shows a question the real game cannot answer. No pass mark and no open question of
+  theirs is dropped or loosened: each is measured on the real game, at the first build that can show it, and a draft is
+  accepted only when its marks are met. If a mark fails, the code that rests on it is redone." One exception, his words
+  of 2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8, on
+  PM-0004-34): "The comparison against a library's character controller runs only if our own movement misses its marks."
+  His go on the plan for them: the same entry of 2026-11-17. Unchanged, his words of 2026-11-14: "Slice 3, online, still
+  waits for the netcode proof test's result. Step 2.6, the previews, follows the preview hosting check as planned."_
 - **Size:** L (six change-sets: restructure, toolchain, gate and CI, generated types, skeleton, previews).
 - **Research it carries:** R5-LAYOUT-REC1, REC2, REC6; R5-TSLINT-REC1–REC4; R5-RUSTLINT-REC1–REC6; R5-TEST-REC1,
   REC6; R5-CI-REC1–REC5; R5-PREV-REC1, REC4 (mark 1); R5-GATE-REC1–REC4; R1-BND-REC4's CI checks. It re-proves as gate
@@ -539,7 +578,9 @@ Every gate check that needs a result joins later, when that result is in, with i
   Blender (Spline's skins and named slots are unproven)."); Blender is the route for the look test's models and for this
   part's export, and LOOK_V2 is not edited; Mustafa (2026-11-03, LOOK_V2-§8): “yes, keep it as it is, with Blender for
   the test models only. When the asset research's export part reports, §8 says "Spline or Blender".” That edit belongs
-  to that part's change-set and goes to Mustafa for the merge (the advisor's reading, 2026-11-03). The part is agent
+  to that part's change-set and goes to Mustafa for the merge (the advisor's reading, 2026-11-03). _Pointer (2026-11-17,
+  change-set 0 of the build plan): the part has reported, on paper (`docs/research/asset-export-rules.md`,
+  `docs/research/soldier-joint-list.md`), and that change-set writes the line in LOOK_V2 §8._ The part is agent
   research, not a heavy spike, so it runs alongside none: it sits between two wave-1 spikes, early enough that its
   export and slot rules reach Mustafa before he makes the models (recommended: right after the netcode proof test); both
   are the advisor's reading, 2026-11-03. The rest of the research runs before the asset spike.
@@ -552,7 +593,9 @@ Every gate check that needs a result joins later, when that result is in, with i
   out of `sim`, `server` and the player build; every slot classed and every faction slot coloured on both backends; the
   stress scene's fight on screen from real models within ADR 0003's frame totals; LOD levels that keep the silhouette,
   if any; the asset-pipeline research's own marks for OQ-0005-AS1 to AS5.
-- **Pass marks:** PM-0005-38 to PM-0005-44 (PM-0005-44 only with its condition), plus the research's marks.
+- **Pass marks:** PM-0005-38 to PM-0005-44 (PM-0005-44 only with its condition), plus the research's marks. Its export
+  part's marks are PM-0005-47 to PM-0005-56 (written 2026-11-17 by change-set 0 of the build plan; first run at its
+  change-set M).
 - **Who judges what:** the scripts; Mustafa's LOD checklist (ADR 0005), only with PM-0005-44's condition.
 - **Depends on:** the asset-pipeline research, verified; the look proof test's results and Mustafa's family picks
   (OQ-0005-AP2); the render budget bench and its benchmark scene (PM-0005-43); ADR 0006's preview hosting (PM-0005-39);

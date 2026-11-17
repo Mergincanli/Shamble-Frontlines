@@ -2,7 +2,7 @@
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
 next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
 `docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
-_Last updated: 2026-11-17 (DOCS-54: main's docs after #52, #53 and #54; main 82c605e)._
+_Last updated: 2026-11-17 (change-set 0 of the build plan, PR #56; main c94c81b)._
 
 ## Phase
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
@@ -10,9 +10,7 @@ _Last updated: 2026-11-17 (DOCS-54: main's docs after #52, #53 and #54; main 82c
   `docs/ENGINE_OVERVIEW.md` and `docs/SPIKE_PLAN.md`) are the basis for the spikes and stay Proposed (the stop's
   answers, 2026-11-03: `docs/DECISIONS.md`), but for his SCOPE (a) of 2026-11-10: "I accept ADR 0002's part 1 alone
   (the repository layout, with the legacy constraints applying to legacy/ only)", recorded in ADR 0002 by 2.1b (#51).
-- **Last merged:** the night-shift lines (PR #54, 82c605e, 2026-11-17 07:03:03 UTC by `merged_at`, by merge commit, on
-  his go after the advisor's and the security-auditor's APPROVE WITH FINDINGS and the PR Advisor's APPROVE of 20f9d59);
-  before it #53 (53272a1) and #52 (4460ef5). Every merge: ROADMAP; the archive's "In flight".
+- **Last merged:** DOCS-54 (PR #55, c94c81b, 2026-11-17 17:09:33 UTC by `merged_at`, on his go); every merge: ROADMAP.
 - **The kit:** KIT-FREEZE-2, what he meant by it (FREEZE-FDN) and his exceptions (two more since, for #53 and #54):
   `docs/DECISIONS.md`, "Queued"; his two additions of 2026-11-11 for the foundation chat: `docs/DECISIONS.md`. His words
   of 2026-11-13 for step 2.3:
@@ -28,18 +26,20 @@ _Last updated: 2026-11-17 (DOCS-54: main's docs after #52, #53 and #54; main 82c
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| #55 | DOCS-54, main's docs after #52, #53 and #54 (his words in the netcode test's chat since #52, in `docs/DECISIONS.md` by script, from its transcript, only his typed text inside the quotes, the netcode test's own words left with #40; two pointers in "Queued"; STATUS, ROADMAP, the archive and REPO_MAP true for main 82c605e) | `claude/docs-after-54` (the netcode test's session, his DOCS-54 (a)) | draft; its review round | the advisor agent's review of its final head; then his go (risk tier 1, decision docs) |
+| #56 | change-set 0 of the build plan (foundation steps 2.4 and 2.5 and Slice 1, built now: his decision of 2026-11-14 and his go of 2026-11-17; the plan carried to main as `docs/reports/2026-11-17-build-plan-slice-1.md` with its appendix): his five messages of 2026-11-14 and 2026-11-17 in `docs/DECISIONS.md` by script (his go says: "No game code is built before change-set 0 is on main."; his CHANGE 2: "Two chats build the game on my personal account.", the second since 2026-11-15, `claude/optimistic-albattani-mdoonz`, Opus 5.5 with Fable 5.2 on its advisor tool, running the preview hosting check in a separate test repository); the model-file rules and the soldier's joint list, on paper, no export through them yet (`docs/research/asset-export-rules.md`, `docs/research/soldier-joint-list.md`; OQ-0005-AS3 and AS4 answered in part; ten new pass marks, PM-0005-47 to -56, first run at the plan's change-set M); his answers where the drafts ask (OQ-0002-6, OQ-0006-18, OQ-0003-1 further in part, the three "do soldiers block" rows, PM-0004-34's row; the register's open questions 98 to 96). Open after it, for "Follow-ups" once merged: the draw cap with a gun from its own file (the rules' O1; PM-0005-54 fails on the rifle file as reported: a question for him with change-set M's plan); the fifth material class's name (O2); the rules' proof by a first real Blender export (change-set M); whether the coat keeps the legacy motion (his call at change-set 10's pictures); the machine lines in ADR 0001, ADR 0003 and SPIKE_PLAN and ADR 0002's "one change-set per step", carried later (the plan report's "Since the plan" names each carrier) | `claude/wonderful-hamilton-jdmlnf` (stands in for `cs/cs0-model-rules`) | ready for review; 3747bb3, 4a1b0d7, 212f55b, 5f356ef, 65c8fe8, cacea55 (the two research files); two review rounds done (test-engineer, engine-architect, the verifier twice: PASS); the advisor agent approved its content at 47546e9, its conditions met in the last commits; report `docs/reports/2026-11-17-cs0-model-rules.md` | his go (risk tier 1, decision docs; no Brave check), after the advisor agent's word on the final head and green `gate` and `smoke` on it |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10), after status-diet (merged, #49): his unit walk of 2026-11-09 (a docs
    change-set: UNITS.md §0 and LOOP_V2), then the Slice 1 note of 2026-11-10, each in a fresh chat. His words:
    `docs/DECISIONS.md`, "Queued".
 2. v2: the netcode proof test (#40); the foundation (his order of 2026-11-11): #49, #50, #51, #48 and #52 merged; step
-   2.3's plan waits for his go (`claude/sweet-mayer-grsukw`, 5f7f682; his decision of 2026-11-13: `docs/DECISIONS.md`).
-   Wave 1: one heavy spike at a time (SPIKE_PLAN); then phase 1 and the slices (SLICE-ORDER, `docs/DECISIONS.md`).
+   2.3: "The 2.3 chat stays stopped for now: I pass it nothing until its plan has been checked." Then the build plan's
+   change-sets (#56 first); "Slice 3, online, still waits for the netcode proof test's result."
 
 ## Waiting on Mustafa
-- His go for #55 (DOCS-54, main's docs; risk tier 1, decision docs) once the advisor agent approves its final head.
+- His go for #56 (change-set 0; risk tier 1, decision docs; no Brave check), once the advisor approves its final head.
+- Part 15, "The second lane": answered 2026-11-17, 22:10 UTC, all six (a) (his words: 023e6f3, `.checkpoints/part-15/`
+  `mustafa-2026-11-17-2306.md`; text: ea851a8). It goes to main next, in a docs change of its own before change-set 1.
 - The netcode proof test's items (its plan in #40; the older list: the archive's "Phase", "Next (v2)"): OK each run's
   plan and cost cap; name the laptop and desktop; the Mac when one is available; the Safari workflow's own PR.
 - Legacy, frozen (the archive's "In flight" and "Phase"): his Windows run ("Check a new machine", `tools/README.md`);
