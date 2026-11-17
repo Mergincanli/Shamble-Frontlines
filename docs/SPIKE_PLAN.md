@@ -182,7 +182,7 @@ the preview hosting check as planned."_
 | 7 | The content and ability spike | L | wave 3 | PM-0005-1 to -32; PM-0004-62 to -66, -75 |
 | 8 | The render budget bench | L | wave 3 | PM-0003-18 to -42, -44 to -47 (PM-0003-1 again); PM-0003-43 at each later upgrade |
 | – | The asset-pipeline research (a research unit, not a spike) | one daytime session | its export and slot-naming part between two wave-1 spikes, before 5's models are made; the rest before 9 | its own marks, appended to 9 |
-| 9 | The asset spike | M (resized after the research) | before the first authored model | PM-0005-38 to -44, plus the research's marks |
+| 9 | The asset spike | M (resized after the research) | before the first authored model | PM-0005-38 to -44, plus the research's marks (its export part's are PM-0005-47 to -56, written 2026-11-17) |
 | 10 | The Feel Lab test (ABL-PREDICT) | M | after abilities are playable (slice 4) | PM-0005-45, -46 |
 
 ### 1. The netcode proof test
@@ -593,7 +593,9 @@ the preview hosting check as planned."_
   out of `sim`, `server` and the player build; every slot classed and every faction slot coloured on both backends; the
   stress scene's fight on screen from real models within ADR 0003's frame totals; LOD levels that keep the silhouette,
   if any; the asset-pipeline research's own marks for OQ-0005-AS1 to AS5.
-- **Pass marks:** PM-0005-38 to PM-0005-44 (PM-0005-44 only with its condition), plus the research's marks.
+- **Pass marks:** PM-0005-38 to PM-0005-44 (PM-0005-44 only with its condition), plus the research's marks. Its export
+  part's marks are PM-0005-47 to PM-0005-56 (written 2026-11-17 by change-set 0 of the build plan; first run at its
+  change-set M).
 - **Who judges what:** the scripts; Mustafa's LOD checklist (ADR 0005), only with PM-0005-44's condition.
 - **Depends on:** the asset-pipeline research, verified; the look proof test's results and Mustafa's family picks
   (OQ-0005-AP2); the render budget bench and its benchmark scene (PM-0005-43); ADR 0006's preview hosting (PM-0005-39);
