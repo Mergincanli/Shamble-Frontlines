@@ -3,42 +3,43 @@
 - **Topic:** the export and slot-naming part of the asset-pipeline research: OQ-0005-AS3, AS4
   (`docs/adr/0005-content-abilities-assets.md`:1874-1889; `docs/SPIKE_PLAN.md`:529-545: "graphics-engineer, verified
   like R3").
-- **Author agent:** graphics-engineer (Opus 5.5). **Date:** 2026-11-17; sources read 2026-11-14, and the glTF
-  specification and three.js's loader read again 2026-11-17.
+- **Author agent:** graphics-engineer (Opus 5.5). **Date:** 2026-11-17; sources read 2026-11-14, the glTF specification
+  and three.js's loader again 2026-11-17; updated that day for JL and the advisor agent's review of change-set 0's plan.
 - **Status:** draft, not verified. No export has gone through these rules yet.
 - **The questions:** "Which checks does an export pass before it enters the game?" (OQ-0005-AS3, 0005:1874); "How are a
   model's materials renamed into the slot classes and faction colour slots?" (OQ-0005-AS4, 0005:1881).
 
 **TL;DR.**
-1. Blender's exporter writes material and bone names as they are and makes one primitive per used material; three.js
-   keeps material names and changes node names only for spaces and `[ ] . : /`, so lower-case names survive both.
-2. The rules (part 4) fix the file and its one export call, scale, axes, origin, names, the skin and what stays out.
-3. Nine checks with a planted defect each answer AS3 on paper; three.js alone does not refuse an unknown extension.
-4. Three points speak against the plan's proposals (part 5.2): the draw cap, the rifle's sockets, the fifth class.
-5. Nothing here was proven by an export; the round trip in part 7 must prove it.
+1. Names in lower case, digits and underscores pass Blender's exporter and three.js's loader unchanged (part 3).
+2. The rules (part 4) fix the export, axes, names, the 20 joints (`root` is a node above them) and the sockets.
+3. Ten marks, each with a planted defect, answer AS3 on paper; the rifle file can test five, a Blender export the rest.
+4. Open for Mustafa (part 7): with a gun from its own file a soldier exceeds 4 draws per pass; the fifth class's name.
+5. Nothing here was proven by an export; part 8 says what the first real export must prove.
 
 **How to read this file.** "Confirmed": the source's own words or code, cited by line; "inferred": my reading or
-arithmetic; "[from memory, unverified]": no source read. Rules are marked "from a draft" (an ADR, SPIKE_PLAN, EDITOR_V2
-or LOOK_V2 line), "from a source" (specification, exporter, loader) or "the engine's convention (proposed)" (the main
-session proposes, engine-architect reviews). Names and file conventions are the engine's; shapes, colours, proportions
-and line widths are the look (Mustafa's and the Advisor's), and none is a rule here. Against the README's shape
-(`docs/research/README.md`:36-48), findings are grouped by source, rules and checks stand for recommendations, options
-appear only in part 6, and the verifier adds its spot-check table.
+arithmetic; "[from memory, unverified]": no source read; "[proposal]": a number offered for a mark, for test-engineer.
+Rules are marked "from a draft" (an ADR, SPIKE_PLAN or EDITOR_V2 line), "from a source" (specification, exporter,
+loader), "change-set 0's naming" (Mustafa: "The brief's names for colour areas and bones are working names; the names of
+your change-set 0 win.", A3) or "the engine's convention (proposed)". The briefs' sizes, colours, poses and part lists
+are never decided here ("Everything in them is the Art lead's proposal unless a line says it is mine.", A3), nor is the
+look (Mustafa's and the Advisor's). Against the README's shape (`docs/research/README.md`:36-48), rules and marks stand
+for recommendations, options appear in parts 6 and 7, and the verifier adds its spot-check table.
 
 **Abbreviations.** Repository lines are this branch's on 2026-11-17. **0003**, **0005**: `docs/adr/0003-rendering.md`
 and `docs/adr/0005-content-abilities-assets.md`; **SP**: `docs/SPIKE_PLAN.md`; **r3**: `docs/research/r3-rendering.md`;
-**plan**: `.checkpoints/cs0-model-rules/plan.md`; **go**: Mustafa's message of 2026-11-17 (`mustafa-2026-11-17-go.md`)
-and **S**, **G**, **A**: the Art lead's soldier brief (2026-11-14), SMG brief and addition (2026-11-15) (`inputs/`),
-both in `.checkpoints/build-plan-slice-1/`; in `docs/`, these five citations move to the report appendix's lines.
-**spec**, **rst**, **src**, **loader**, **PB**, **SK**: sources 1 and 4 to 8 (part 8).
+**JL**: engine-architect's joint ruling, `docs/research/soldier-joint-list.md`, by section; **BP**: the build plan as
+carried in `docs/reports/2026-11-17-build-plan-slice-1.md`, by Part; **A3** to **A10**: items of its appendix,
+`docs/reports/2026-11-17-build-plan-slice-1-appendix.md`, by the item's section heading (A10 by its own line): A3
+Mustafa's go of 2026-11-17, A4 the Art lead's soldier brief, A5 its addition, A6 the SMG brief, A9 Mustafa's message of
+2026-11-17, 20:58, A10 the Art lead's correction. **spec**, **rst**, **src**, **loader**, **PB**, **SK**: sources 1 and
+3 to 7 (part 9).
 
 ## 1. Scope
-Covered: the export settings and call, scale, axes and origin, names, caps, the skin and what stays out (part 4); the
-checks a file passes (AS3, part 5); how materials become slot classes and carry colour (AS4, part 6). Not covered, the
-rest of the asset research (SP:529-534): compression (OQ-0005-AS1), LOD tools and levels (AS2), per-unit budgets beyond
-the two derived caps (AS5), vertex and bone counts (AS6), where the automated step runs and who writes the asset list
-(OQ-0005-AP1), serving files (AP-4), very large units' part names (ADR 0004's records), and whether model files enter
-the repository (his answer MODEL-PUBLIC of 2026-11-17, go:24).
+Covered: the export, scale, axes and origin, names, joints and sockets, caps, the skin and what stays out (part 4); the
+checks a file passes (AS3, part 5); materials as slot classes, and colour (AS4, part 6). Not covered (SP:529-534):
+compression (OQ-0005-AS1), LOD (AS2), budgets beyond the two derived caps (AS5), vertex and bone counts (AS6), the
+automated step and the asset list (OQ-0005-AP1), serving files (AP-4), very large units' part names (ADR 0004), model
+files in the repository (MODEL-PUBLIC, A3, answer 9), the joints' reasons, parts and open points (JL §1, §3, §6, §7).
 
 ## 2. What the decision drafts already fix
 - Only glTF/GLB, through three.js's loader on both backends (0005:1803-1804); the models' route is Blender (SP:537-542);
@@ -46,20 +47,17 @@ the repository (his answer MODEL-PUBLIC of 2026-11-17, go:24).
 - A model carries no look: geometry, its skin, UVs and textures where it has them, and named material slots, but no
   baked lighting or ink; at load each slot gets a shared toon material of its class (0005:1748-1755).
 - Each slot's name maps to one class "from a small fixed list (for example environment, structure, unit, faction colour,
-  emissive" (0005:1761-1762), a content table (AP-3, 0005:1578-1585); ADR 0003 lists "(environment, structures, units,
-  faction colours, visual effects)" (0003:247-248). Faction slots take the faction's colour at load (0005:1764-1765);
-  only emissive slots glow (0005:1768-1769).
-- "A soldier model is one skinned mesh" (0005:1771-1772). "*A soldier as drawn* (body, headgear and held weapon) uses at
-  most 4 materials per pass", derived from C-B's "one per material per soldier" and a cap of "4 draw calls per pass
-  before the ink" (0005:1778-1781); PM-0005-36 counts draw calls with the soldier shown minus hidden and bites on "a
-  soldier with 5 material slots (10 draws over 2 passes, above 8)" (0005:2311). About 5.2k triangles per soldier as
-  drawn is a planning ceiling, not a budget (0005:1787-1792).
+  emissive" (0005:1761-1762), a content table (AP-3, 0005:1578-1585); ADR 0003 names the fifth differently (O2).
+  Faction slots take the faction's colour at load (0005:1764-1765); only emissive slots glow (0005:1768-1769).
+- "A soldier model is one skinned mesh" (0005:1771). A soldier as drawn (body, headgear and held weapon) uses at most 4
+  materials per pass, a cap derived from ADR 0003's 4 draw calls per pass (0005:1777-1781), and PM-0005-36 counts draws
+  (0005:2311): mark 8, O1. About 5.2k triangles per soldier as drawn is a planning ceiling, not a budget
+  (0005:1787-1792).
 - No collider, hit shape or shot origin comes from a model; "a weapon model's sockets are cosmetic" (0005:1550-1553).
 - 1 unit = 1 metre is `[DECIDED]` in `docs/EDITOR_V2.md`:63-65, not yet in an ADR (`docs/STATUS.md`:76); Mustafa,
-  2026-11-17: "Units stay as decided in docs/EDITOR_V2.md, "1 unit = 1 metre"." (go:45).
-- No draft fixes slot names, origin, facing, joints or sockets; the plan proposes them (plan:34-57), and Mustafa,
-  2026-11-17: "The brief's names for colour areas and bones are working names; the names of your change-set 0 win."
-  (go:46).
+  2026-11-17: "Units stay as decided in docs/EDITOR_V2.md, "1 unit = 1 metre"." (A3, CHANGE 3).
+- No draft fixes slot names, origin, facing, joints or sockets: BP Part 11 proposed them (rules 9 to 12 and 21);
+  change-set 0 fixes the names (A3, quoted above), and JL rules on the joints.
 
 ## 3. What the sources say
 
@@ -102,8 +100,7 @@ the repository (his answer MODEL-PUBLIC of 2026-11-17, go:24).
 | Skinning, Bone Influences, Include All Bone Influences (`export_skins`, `export_influence_nb`, `export_all_influences`) | True, 4, False | the same | rst:1173-1180; 975-992 |
 | Use Rest Position Armature, Add Leaf Bones (`export_rest_position_armature`, `export_leaf_bone`) | True, False | the same | rst:1159-1160; 957-964, 843-850 |
 | Animations, Shape Keys (`export_animations`, `export_morph`) | True, True | False, False | rst:732, 792-795, 1138; 747-751, 994-998 |
-| Custom Properties, Cameras, Punctual Lights (`export_extras`, `export_cameras`, `export_lights`) | False, False, False | the same | rst:721-723, 1028-1031; 722-726, 650-654, 1027-1032 |
-| Draco, Meshopt (`export_draco_mesh_compression_enable`, `export_meshopt_compression_enable`) | False, False | the same | rst:1193-1218; 494-498, 474-478 |
+| Custom Properties, Cameras, Punctual Lights, Draco, Meshopt (`export_extras`, `export_cameras`, `export_lights`, `export_draco_mesh_compression_enable`, `export_meshopt_compression_enable`) | all False | the same | rst:721-723, 1028-1031, 1193-1218; 722-726, 650-654, 1027-1032, 494-498, 474-478 |
 
 - **AX-F8. Names are written as they are.** Object to node: `blender_object.name` (src `blender/exp/nodes.py`:486-488);
   mesh data to mesh (`obj_data.py`:144-149); material to material (`material/material_utils.py`:24-25); bone to joint
@@ -127,8 +124,7 @@ the repository (his answer MODEL-PUBLIC of 2026-11-17, go:24).
   (loader:1941-1948), a missing JSON chunk (1983) and an `asset.version` below 2 (481-483) each fail. A required
   extension the loader does not know only logs "Unknown extension", and loading goes on (547-549). Draco throws without
   a DRACOLoader (533-534, 2000-2006); Meshopt and KTX2 throw without a decoder only when required (1528-1532,
-  1671-1677); the docs page calls each decoder "Required" (source 9) · confirmed 2026-11-17. Refusing a required
-  extension is the engine's own check (inferred).
+  1671-1677) · confirmed 2026-11-17. Refusing a required extension is the engine's own check (inferred).
 - **AX-F13. Skins.** `JOINTS_0` and `WEIGHTS_0` become `skinIndex` and `skinWeight` (loader:2339-2340); other attributes
   are only lower-cased (4952), so `JOINTS_1` arrives unused, and the skinning node reads four (SK:102-117). A skinned
   primitive with both attributes becomes a `SkinnedMesh`, otherwise a `Mesh` with "Skinning disabled." (3992-4004);
@@ -147,7 +143,7 @@ the repository (his answer MODEL-PUBLIC of 2026-11-17, go:24).
   shared default `MeshStandardMaterial` (2370-2386); missing normals give a flat-shaded clone; `COLOR_0` turns on vertex
   colours (3579-3640) · confirmed. Each fallback hides a defect on screen, so the checks read the file.
 - **AX-F17. Backends.** The loader has no WebGPU-specific code; official examples load glTF and a skinned GLB under
-  `WebGPURenderer` (sources 10, 11) · confirmed. A skinned GLB with `forceWebGL`: no example I read shows it.
+  `WebGPURenderer` (sources 8, 9) · confirmed. A skinned GLB with `forceWebGL`: no example I read shows it.
 - **AX-F18. Draw calls.** A separate mesh draws on its own: C-B merges a soldier's parts "into one geometry per
   material" (r3:825); legacy's merging cut the village from 398 to 202 draw calls (r3:303); `InstancedMesh` "will help
   you to reduce the number of draw calls" (r3:452-455) · inferred from these; the renderer's draw loop was not read.
@@ -158,8 +154,8 @@ the repository (his answer MODEL-PUBLIC of 2026-11-17, go:24).
 - **AX-R1.** One model, one `.glb` file, written by Blender's built-in glTF 2.0 exporter. [from a draft: 0005:1803-1804,
   SP:537-539; from a source: rst:881-885]
 - **AX-R2.** Export with AX-F7's "Rule" column: in a Blender script (the MCP route), one call, after selecting every
-  object of the model (what `use_selection` takes along was not read; the `filepath` parameter is
-  [from memory, unverified]). [the engine's convention (proposed); option names from a source, src `__init__.py`]
+  object of the model: BP Part 11's rule 7 plus `filepath` and `use_selection` (what `use_selection` takes along was not
+  read; `filepath` is [from memory, unverified]). [the engine's convention (proposed); option names: src `__init__.py`]
 
 ```python
 bpy.ops.export_scene.gltf(filepath=PATH, export_format='GLB', use_selection=True, export_yup=True,
@@ -172,178 +168,228 @@ bpy.ops.export_scene.gltf(filepath=PATH, export_format='GLB', use_selection=True
 ```
 
 - **AX-R3.** Before export, apply rotation and scale on every object; Apply Modifiers then bakes the other modifiers,
-  never the Armature (AX-F7). [the engine's convention (proposed), as G:14 asks; why a skin needs it: AX-F5]
+  never the Armature (AX-F7). [the engine's convention (proposed), as the SMG brief asks ("all transforms applied", A6,
+  CONVENTIONS); why a skin needs it: AX-F5]
 
 ### 4.2 Scale, axes and origin
-- **AX-R4.** One unit is one metre; build at real size. The soldier's 1.80 m is a placeholder:
-  "hang the soldier on one root so it scales with one number." (Mustafa, 2026-11-17, go:44). [from a draft:
-  `docs/EDITOR_V2.md`:63-65; from a source: spec:737]
+- **AX-R4.** One unit is one metre; build at real size. The soldier's 1.80 m is a placeholder: "hang the soldier on one
+  root so it scales with one number." (Mustafa, A3, CHANGE 3); that root is the engine's node above the file (AX-R10).
+  [from a draft: `docs/EDITOR_V2.md`:63-65; from a source: spec:737]
 - **AX-R5.** A soldier: +Y up, front +Z, his left +X (in Blender: Z up, front -Y, left +X); his origin on the ground
-  between his feet; every node of his under `root`. [axes from a source: spec:730-732, src `nodes.py`:611-616, and the
-  briefs agree, S:11 and S:73; the origin: the engine's convention (proposed), plan:51-52]
+  between his feet; in Blender the armature object, at the origin, is his one top object and the joined mesh its child
+  (JL §2); mark 10 checks it. [axes: spec:730-732, src `nodes.py`:611-616, as A4 has them (AXES AND SIZE); the origin
+  and the top object: JL §2, §5]
 - **AX-R6.** A gun: +Y up, +Z to the muzzle, +X to the gun's left, origin at `socket_grip` (in Blender: Z up, muzzle
-  -Y). [the engine's convention (proposed), plan:52-53, as G:11 and G:14 write it; the rifle matches (go:48); +X left
-  agrees with spec:732]
+  -Y). [change-set 0's convention, as the SMG brief has it (A6, CONVENTIONS); the rifle file matches ("+Y up, +Z to the
+  muzzle", A3); +X left agrees with spec:732]
 
-### 4.3 Names
+### 4.3 Names, joints and sockets
 - **AX-R7.** Every name in a file (objects, meshes, materials, bones, sockets) uses lower-case letters, digits and
   underscores only: no spaces, dots, colons, slashes or brackets, so no Blender ".001" ending (Blender adds one to a
-  duplicated name [from memory, unverified]). [the engine's convention (proposed), plan:37; from a source: AX-F15]
+  duplicated name [from memory, unverified]). [change-set 0's naming, after BP Part 11, rule 11; from a source: AX-F15]
 - **AX-R8.** A material's name is its slot name, and its prefix is its class: `faction_` (takes the faction's colour;
-  the faction's data holds one colour per such area), `unit_`, `emissive_`, `structure_`, `environment_`. [the engine's
-  convention (proposed), plan:37-41; the drafts give the classes only "for example" (0005:1761-1762) and differ on the
-  fifth (part 5.2, point 3)]
+  the faction's data holds one colour per such area), `unit_`, `emissive_`, `structure_`, `environment_`. [change-set
+  0's naming, after BP Part 11, rule 12; the drafts give the classes differently, and ADR 0005 only as examples: O2]
 - **AX-R9.** The Conscript's four areas are `faction_coat`, `faction_top`, `faction_trim` and `unit_dark`, for the
-  brief's Coat, Top, Trim and Dark (S:20-25), whose table varies the first three by faction and keeps Dark the same.
-  "No skin colour on this first stand-in: hands and face take the Dark material, so four materials hold, the rifle included."
-  (Mustafa, 2026-11-17, go:43). A gun's one material is `unit_dark` too (G:12, A:18). [the engine's convention
-  (proposed), plan:37-39]
-- **AX-R10.** The Conscript's 14 bones: `root`, `hips`, `chest`, `head`; `upper_arm_l`, `forearm_l`, `hand_l` and the
-  same three with `_r`; `leg_l`, `foot_l`, `leg_r`, `foot_r`. Parents: root > hips > chest > head; chest > upper arm >
-  forearm > hand; hips > leg > foot; the leg is one bone from hip to ankle (S:33). The list is the model's, not the
-  engine's. `root` is the armature's top bone, not the armature object and not an empty (S:73's "one empty at the
-  origin" becomes this bone); vertex groups carry the bone names exactly. [the engine's convention (proposed),
-  plan:42-46, after the brief's bone column (S:29-50); groups map to bones by name: from a source, AX-F10]
-- **AX-R11.** A gun's sockets are empty nodes (Blender empties under the gun) named `socket_grip`, `socket_support`,
-  `socket_muzzle`, `socket_sight` and `socket_eject` (names: go:51); `socket_grip` is the origin. The right hand holds
-  `socket_grip`, the left goes to `socket_support`, and where a pose disagrees, "the sockets win" (Mustafa, 2026-11-17,
-  go:49). Flash and tracer start at `socket_muzzle`; the simulation never reads it (0005:1550-1553; go:50). [empties:
-  G:35; a socket loads as a named Object3D: AX-F16; the rest: the engine's convention (proposed), plan:47-50] Open:
-  which sockets a gun has (point 2) and which local axis is a socket's direction (G:40's eject socket points "right and
-  20 degrees up"); proposed: the gun's entry lists them, and a socket points along its local +Z.
-- **AX-R12.** A node whose name starts with `marking_` is a part the game may hide, using one of the model's own
-  materials; since a marking differs per faction in shape and colour area (S:57), each faction's marking is its own node
-  (inferred). A shown marking adds draw calls (AX-F18); how it follows its bone was not read. [the engine's convention
-  (proposed), plan:54-55; "off at game size and on in close views", A:13]
+  soldier brief's Coat, Top, Trim and Dark (A4, MATERIALS: the first three vary by faction). "No skin colour on this
+  first stand-in: hands and face take the Dark material, so four materials hold, the rifle included." (Mustafa, A3,
+  CHANGE 3). A gun's one material is `unit_dark` too (A6, CONVENTIONS; A5, A3). [change-set 0's naming]
+- **AX-R10. The soldier's joints** are engine-architect's 20, named with their parents in JL §1; the list lives only
+  there. The file's skin holds exactly those names; the stand-in and the Blender model carry exactly these, and the list
+  changes only by a new ruling before the model is exported (JL §6). Each joint's name follows AX-R7, with `_l` and
+  `_r` the soldier's own left and right; its pivot (in Blender, the bone's head) is at the upper end of the segment it
+  moves; the order in the skin is free; the engine reads lengths and rest frames from the bind pose (JL §1). Vertex
+  groups carry the joint names exactly (groups map to bones by name: AX-F10). [JL §1, §2; groups: from a source]
+- **`root` is not a skin joint (AX-R10; JL §2).** It is the one node above both the skeleton and the mesh, which the
+  game moves, turns and scales with one number; `hips` is the skeleton's top joint. In the file: `skin.joints` holds
+  exactly the 20 names, in any order; `hips` is the only joint whose parent is not a joint; the mesh node and every
+  non-joint node above `hips` (the armature's node, if the exporter writes one) carry an identity transform; no node
+  named `root` is required. In Blender: the armature object is the one root (the brief's "one empty at the origin", A4,
+  becomes it), at the origin, transforms applied, top bone `hips`, no root bone; the joined mesh is its child (AX-R14).
+  In the engine: the client makes one `root` node per soldier and hangs the loaded file's top nodes under it.
+- **AX-R11. A gun's sockets** are empty nodes (Blender empties under the gun; each loads as a named `Object3D`,
+  AX-F16): `socket_grip`, `socket_support`, `socket_muzzle`, `socket_sight`, `socket_eject`. Mustafa: "Its sockets are
+  named as in the rifle file: socket_grip, socket_support, socket_muzzle, socket_sight, and the new socket_eject." (A3,
+  CHANGE 3); the Art lead's correction lists the same (A10:25). Each gun's entry lists the sockets its file has, and
+  mark 7 asks for those: the rifle file has "four sockets" (A3), the SMG five (A6, SOCKETS); every held gun lists grip,
+  support and muzzle. [names: Mustafa's, change-set 0's; the lists, the axes and the hands: JL §4]
+- **Socket axes (AX-R11).** In glTF, in the gun's frame (AX-R6), a socket's local +Z is the direction it points, its
+  local +Y its up at right angles to +Z, and +X completes a right-handed frame. Grip, support, muzzle and sight point
+  along the bore with the gun's up: rotation identity, only their positions differ. `socket_eject` points where the
+  case flies, as its gun's entry gives it: the SMG brief's "right and 20 degrees up" (A6, SOCKETS; the Art lead's
+  proposal) gives +Z = (-0.940, 0.342, 0) and +Y = (0.342, 0.940, 0). In Blender (Z up, muzzle -Y) a socket's direction
+  is its local -Y and its up its local +Z: the four keep identity rotation, and the SMG's eject empty is turned until
+  its -Y points along (-0.940, 0, 0.342) and its +Z along (0.342, 0, 0.940). The exporter's axis change is confirmed
+  for locations and inferred for rotations (AX-F11): a real export of a turned empty must read back within 0.5 degrees
+  (mark 7) before Blender files rely on it.
+- **The hands on the gun (AX-R11).** Mustafa, 2026-11-17: "The poses. Where the addition's hand points and a gun's
+  sockets disagree, the sockets win: the right hand's point and the gun's direction set the pose; the left hand, the
+  butt and the muzzle follow from the gun model's sockets, as the SMG brief already does." (A3, CHANGE 3). The Art
+  lead's correction proposes the same: "The right hand is on socket_grip and the left hand on socket_support. The butt
+  and the muzzle follow from the gun's file." (A10:5). So the right arm's chain (`upper_arm_r`, `lower_arm_r`, `hand_r`)
+  reaches `socket_grip` and the left one `socket_support`. The fist, not the wrist, meets the socket: the hand's point
+  lies `palm` metres beyond the hand joint on the lower arm's line, one number per soldier in the model's entry, not a
+  bone; checking it against the centre of the vertices weighted to `hand_r`, within 1 cm [proposal], is a check no mark
+  carries yet. No pose number is here: "For change-set 0 take only its rule and the socket names. The pose numbers are
+  for the body step (change-set 10)." (Mustafa, A9).
+- **The muzzle (AX-R11).** "The muzzle is where the flash and the tracer start. In the simulation a shot's start is
+  data of its own: docs/adr/0005-content-abilities-assets.md says no shot origin is ever read from a model." (Mustafa,
+  A3, CHANGE 3); the correction's wording agrees (A10:29); "a weapon model's sockets are cosmetic" (0005:1552).
+- **AX-R12.** A node whose name starts with `marking_` is an optional part the game can show or hide, and it uses one
+  of the model's own materials: that is the engine's whole rule. That a marking is "off at game size and on in close
+  views" is the Art lead's proposal (A5, A2); the call is Mustafa's. How a marking changes with the faction stays open
+  (part 8). A shown marking draws as a mesh of its own (AX-F14, AX-F18; inferred); how it follows its joint was not
+  read. [change-set 0's naming]
 
 ### 4.4 Caps, the skin, and what stays out
-- **AX-R13.** A soldier as drawn, his gun included, uses at most 4 materials per pass, and the draft's mark counts draw
-  calls (0005:1778-1781, 2311): a gun from its own file adds draws whatever its material is called (point 1). A very
-  large unit: parts × materials at most 25 per pass (0005:1784-1786). Triangles: no cap; about 5.2k per soldier as drawn
-  is a planning ceiling (0005:1787-1792), and the rifle alone has 2,596 (go:48). [from a draft]
-- **AX-R14.** A soldier is one mesh object: the parts are joined before export and parented to one armature, each part's
-  vertices weighted 1.0 to the bone the brief names for it (a rigid skin) until someone paints weights. The brief's "one
-  object per part" (S:73) is the modelling form; exported as it is, each part would be a node and a mesh of its own.
-  [from a draft: 0005:1771-1772, r3:825; joining: the engine's convention (proposed)]
-- **AX-R15.** Every vertex is weighted to one to four bones, summing to 1; an unweighted vertex makes the exporter add a
-  neutral bone. The armature's rest position is the bind pose (rst:1159-1160); the model's author chooses that pose. A
-  gun has no armature and no skin. [from a source: AX-F4, AX-F10, AX-F13; the gun: the engine's convention (proposed),
-  after A:17, "The rifle is a model of its own."]
+- **AX-R13.** A soldier as drawn, his gun included, stays within 4 draw calls per pass, as PM-0005-36 counts them
+  (0005:1777-1781, 2311), and mark 8 counts the same. The shared `unit_dark` name keeps four materials, not four draws:
+  a gun loaded from its own file draws on its own whatever its material is named (AX-F14, AX-F18), so the Conscript
+  with the rifle's "2 meshes" (A3) makes 6 per pass and fails. How to meet the cap is open (O1). A very large unit:
+  parts × materials at most 25 per pass (0005:1784-1786). Triangles: no cap; about 5.2k per soldier as drawn is a
+  planning ceiling (0005:1787-1792), and the rifle alone has 2,596 (A3). [from a draft]
+- **AX-R14.** A soldier is one mesh object: the parts are joined before export and parented to the armature, each
+  part's vertices weighted 1.0 to the joint JL §3 gives it (a rigid skin) until someone paints weights. The brief's
+  "one object per part" (A4, IF THIS IS BUILT IN BLENDER LATER) is the modelling form; exported as it is, each part
+  would be a node and a mesh of its own. [from a draft: 0005:1771, r3:825; joining: the engine's convention (proposed)]
+- **AX-R15.** Every vertex is weighted to one to four joints, summing to 1; an unweighted vertex makes the exporter add
+  a neutral bone, an extra joint (mark 3). The armature's rest position is the bind pose (rst:1159-1160); the model's
+  author chooses that pose. A gun has no armature and no skin. [from a source: AX-F4, AX-F10, AX-F13; the gun: the
+  engine's convention (proposed), after A5, A3: "The rifle is a model of its own."]
 - **AX-R16.** No images or textures, vertex colours, animations, shape keys, cameras, lights, custom properties,
   compression or LOD levels; no baked lighting, ink or toon shading; no collider, hit shape, shot origin or navigation
-  data. [from a draft: 0005:1748-1750, SP:390-391, 0005:1715, 0005:1550-1553; "No textures" is also S:69; no animations:
-  the engine's convention (proposed), since soldiers are animated in code (0003:306, 0003:797)]
+  data. [from a draft: 0005:1748-1750, SP:390-391, 0005:1715, 0005:1550-1553; no textures is also A4, DO NOT; no
+  animations: the engine's convention (proposed), since soldiers are animated in code (0003:306, 0003:797)]
 
 ## 5. The checks a file passes (OQ-0005-AS3)
+Each of the ten marks has a defect of its own that a test plants and the check must catch. The main session carries
+them into ADR 0005's pass-mark table as PM-0005-47 onward, placed at change-set M, whose first step is "the proof of
+Part 11's rules on the real file, with the checks change-set 0 wrote" (BP Part 12); until a real export exists they are
+written, not run (BP Part 11). **J** is a script over the GLB (header and first chunk, AX-F6; the binary chunk for
+vertices and weights); **L** is the game's loader in a test on both backends (AX-F12 to AX-F17). The Khronos glTF
+Validator might do part of J; not read. Numbers marked [proposal] go to test-engineer's review.
 
-### 5.1 Nine marks
-The plan's nine marks (plan:59-70), each with a defect a test plants and must see fail; they join ADR 0005 as PM-0005-47
-onward at change-set M (plan:21) and stay written, not run, until a real export exists (plan:71). **J** is a script over
-the GLB (the header and first chunk, AX-F6; the binary chunk only for weights); **L** is the game's loader in a test on
-both backends (AX-F12 to AX-F17). The Khronos glTF Validator might do part of J; not read.
-
-| # | Mark (plan:62-70) | Planted defect | Run by | Not confirmed |
+| # | Mark | Planted defect | Run by | Proven on |
 |---|---|---|---|---|
-| 1 | GLB, glTF 2, no required extension | `extensionsRequired: ["KHR_draco_mesh_compression"]`; an unknown name there | J: magic, version 2, JSON chunk first, `asset.version`, no `extensionsRequired` (spec:624, 3644, 3703-3714, 3773). L throws for Draco without a decoder but only warns on an unknown name (AX-F12) | none |
-| 2 | every primitive has a material named in the slot table | a primitive with no material; a material `unit_dark.001` | J: `primitives[].material` set, `materials[].name` in the table. L keeps the names (loader:3817) but draws the default material silently (2370-2386) | whether Blender ever writes a primitive with no material |
-| 3 | bone names equal the model's list; no extra joint | one unweighted vertex (the neutral bone); a leaf bone `_leaf` | J: `skins[0].joints` mapped to `nodes[].name`; L: bones by `userData.name` (loader:4509) | the neutral bone's name; whether the armature object becomes a joint |
-| 4 | one joint and weight set; every vertex weighted | Include All Bone Influences on and a vertex with five weights (`JOINTS_1` appears) | J: no `JOINTS_1` or `WEIGHTS_1`; weights from the binary chunk sum to 1. L alone cannot: it normalises weights at load (loader:4009) | the exporter's cut and renormalising (AX-F10) |
-| 5 | normals; no image, animation, morph target, camera or light | the defaults on a rig with an action (Animations and Shape Keys are on by default) | J: `NORMAL` in every primitive; no `images`, `animations`, `cameras`, `targets` or `KHR_lights_punctual` | none |
-| 6 | a 1 m test cube is 1.0 m along +Y and faces +Z | the cube built at 100 units; +Y Up off | J: `POSITION` min and max (spec:1689), node transforms identity; L: the bounding box | a cube has no front: the test object needs a marker on its +Z side; whether Blender's Unit Scale changes the export |
-| 7 | a gun's sockets by name; `socket_grip` at the origin, `socket_muzzle` on +Z | `socket_muzzle.001`; a gun exported muzzle to -Z | L: each socket by name and position (loader:4493); J: `nodes[].name`, `translation` | the rifle has four sockets (point 2), and its names, extensions and origin were not seen (go:48); the socket axis (AX-R11) |
-| 8 | counts inside the two derived caps | a fifth material; a soldier with gun above 4 draws per pass | J counts distinct materials; draws need the renderer: PM-0005-36's shown minus hidden (0005:2311) | what the mark counts (point 1) |
-| 9 | the same result on WebGPU and with `forceWebGL` | the plan names none; PM-0005-42's "a backend path that drops the slot's colour" fits (0005:2318) | L run twice in a browser; headless runs give structure and counts, never frame rates as hardware results | a skinned GLB with `forceWebGL` (AX-F17) |
+| 1 | GLB, glTF 2, no required extension | an unknown name in `extensionsRequired` (the loader only warns); `KHR_draco_mesh_compression` there | J: magic, version 2, JSON chunk first, `asset.version`, no `extensionsRequired` (spec:624, 3644, 3703-3714, 3773). L throws for Draco without a decoder but only warns on an unknown name (AX-F12) | the rifle file |
+| 2 | every primitive has a material named in the slot table | a primitive with no material; a material `unit_dark.001` | J: `primitives[].material` set, `materials[].name` in the table. L keeps the names (loader:3817) but draws the default material silently (2370-2386) | the rifle file |
+| 3 | `skin.joints` holds exactly JL §1's 20 names, each once: no armature joint, no neutral bone, no `_leaf` | one unweighted vertex, which makes the exporter add its neutral bone (AX-F10) | J: `skins[0].joints` mapped to `nodes[].name`; L: bones by `userData.name` (loader:4509) | a real Blender export (the skinned figure) |
+| 4 | one set of joints and weights; every vertex's weights sum to 1 | a vertex weighted to five joints, exported with Include All Bone Influences on (`JOINTS_1` appears) | J: no `JOINTS_1` or `WEIGHTS_1`; sums from the binary chunk. L alone cannot: it normalises weights at load (loader:4009) | a real Blender export (the skinned figure) |
+| 5 | normals; no image, animation, morph target, camera or light | the exporter's defaults on a rig with an action (Animations and Shape Keys are on by default); by script, an `animations` entry | J: `NORMAL` in every primitive; no `images`, `animations`, `cameras`, `targets` or `KHR_lights_punctual` | the rifle file |
+| 6 | scale and axes: an asymmetric test box, 1.0 m wide, 2.0 m high, 0.5 m deep, with a small named marker standing out of its front face, after export and load measures 2.0 m along +Y, 1.0 m along X and 0.5 m along Z, each within 1 mm, and the marker's centre has the greatest Z | "+Y Up" off; a scale of 0.01 left unapplied | J: `POSITION` min and max (spec:1689), and every node's rotation and scale identity: the unapplied scale shows there, since the node's scale can bring the world size back to 1 m (inferred); L: the bounding box | a real Blender export (the test box) |
+| 7 | sockets: every socket the gun's entry lists exists; `socket_grip` within 1 mm of the origin; `socket_muzzle` at a positive Z and within 1 mm of the gun's centre plane (X = 0); each socket's forward axis (+Z) as AX-R11 gives it, within 0.5 degrees | one socket renamed; the muzzle socket turned 5 degrees | J: `nodes[].name`, `translation`, `rotation`; L: each socket by name, world position and direction (loader:4493) | the rifle file, for its sockets as a script wrote them; AX-R11's Blender half needs a real export of a turned empty |
+| 8 | the soldier as drawn, gun included, makes at most 4 draw calls per pass, counted as PM-0005-36 counts them (shown minus hidden, at most 4 × the passes that draw it); a very large unit at most 25 × those passes | a body with a fifth material slot (10 draws over 2 passes, above 8: PM-0005-36's own bite) | L with the renderer on both backends: `renderer.info` draw calls with the soldier shown minus hidden; J cannot count draws (it lists each file's meshes and materials) | the rifle file with the code-built stand-in body (one skinned mesh per colour area: BP Part 11); as the rifle is, it fails with 6 per pass (O1) |
+| 9 | the same result on WebGPU and with `forceWebGL`: the same node names, the same count of meshes and materials, the same material on each mesh and the same bounding box within 1 mm | a loader option that differs between the two runs (for example a plugin registered in one run only) | L run twice in a browser; headless runs give structure and counts, never frame rates as hardware results | any file: the rifle for the unskinned path, the skinned figure for a skinned GLB with `forceWebGL` (AX-F17) |
+| 10 | the soldier's origin and facing, in the bind pose (JL §5): (1) `head` above `chest` above `hips` above both feet; (2) each foot's weighted vertices centred ahead of its joint (larger Z); (3) every `_l` joint at X > 0, every `_r` joint at X < 0; (4) the lowest vertex at Y = 0 within 1 mm [proposal], the foot joints' mid-point at X = 0 within 1 cm [proposal], Z = 0 between heel and toe; (5) `hips` the only joint without a joint parent, the mesh node and every node above `hips` identity, each joint's rest transform its bind pose within 0.5 degrees and 1 mm [proposal]; (6) hung under a client-made root on both backends, a root scale of 0.5 or 1.2 gives that multiple of the file's height within 1 mm, mesh and joints moving together | turned 180 degrees; mirrored; Z-up; origin moved 1 m; a mesh node scaled 0.01 [proposal] | J: lines 1 to 5, from the node transforms, the inverse bind matrices and the binary chunk; L: line 6, and the front along +Z after load | a real Blender export (the skinned figure, made with mark 6's box) |
 
-### 5.2 Where a source or a draft speaks against the plan's proposals
-- **Point 1, the draw cap.** The plan (plan:38-39) and the briefs (G:12, A:18) keep the soldier with his gun at 4
-  materials by naming the gun's material `unit_dark`, and Mustafa's words agree for materials (go:43). But the draft
-  derives the cap from 4 draw calls per pass, and PM-0005-36 counts draws (0005:1778-1781, 2311). A gun from its own
-  file is its own mesh whatever its material is called (AX-F14, AX-F18), and the rifle has "2 meshes" (go:48): 4 plus 2
-  is 6 draws per pass, 12 over the main and shadow passes, above PM-0005-36's 8. Mark 8 (plan:69) counts materials and
-  would pass what PM-0005-36 fails. Ways out: part 6.
-- **Point 2, five sockets.** Mark 7 asks for "a gun's five sockets" (plan:68), and the plan offers the rifle as the
-  first file (plan:71-72). The rifle has "four sockets" (go:48), "grip, support, muzzle and sight" (S:52), and
-  `socket_eject` is the SMG's new one (go:51), so the first file fails mark 7 as written. Proposed: mark 7 checks the
-  sockets the gun's entry lists, or the rifle gains an eject socket (its author decides).
-- **Point 3, the fifth class.** The plan's prefixes include `emissive_` (plan:40-41), from ADR 0005's example list
-  (0005:1761-1762); ADR 0003's list has "visual effects" in that place (0003:247-248). Both lists are examples, so the
-  prefixes stay a proposal, and the class table (AP-3, 0005:1578-1585) should settle which list holds.
-- Smaller points, not against a source: mark 6's cube has no front (row 6); the plan should say `root` is a bone.
+- **The advisor agent's ruling on the first real export** (its re-read of change-set 0's plan): it must show
+  `skin.joints` holding exactly the 20 names (mark 3), `hips` as the only joint without a joint parent, the mesh node
+  and every node above `hips` with identity transforms, and line 6's scaling (mark 10). If it shows otherwise, the 20
+  names stand, and only marks 3 and 10 and the Blender recipe (AX-R2, AX-R5, AX-R10's Blender lines) change.
+- **What a file can prove.** The rifle file `AMK9_v4_stage1.glb` is "a rifle prototype written by a script" (A3): it
+  never went through Blender's exporter, so it can pass or fail marks 1, 2, 5, 7 and 8 only (8 beside the stand-in
+  body), and mark 9's unskinned path, a loader test. Marks 3, 4, 6 and 10 need a real Blender export with AX-R2's
+  call: the test box and a small skinned figure with the 20 joints. The rifle "stays with me until you ask for it" (A3):
+  change-set M's plan asks. It was not seen here: its socket names, material name, extensions and origin are as A3 and
+  A10 report them.
+- **How marks can fail.** Mark 4 under AX-R2's call: the exporter cuts a five-joint vertex to four weights, and whether
+  it renormalises them was not found (AX-F10); if it does, the file passes and the fifth influence is lost unseen, so
+  `JOINTS_1` shows only with Include All Bone Influences on. Mark 7 checks the forward axis only; whether it also checks
+  the up axis (+Y, which a roll about +Z turns) is test-engineer's call.
 
 ## 6. Materials to slot classes, and colour (OQ-0005-AS4)
 - **The convention for the first models:** one plain material per colour area, named by its class prefix (AX-R8, AX-R9),
   with no renaming step. The names survive by the sources (AX-F8, AX-F9, AX-F15): that answers, not yet by an export,
   what the draft marks "not researched": "whether the glTF export keeps material names" (0005:1885-1886). The engine
-  finds a slot by its material's name, never a mesh's, since mesh names get `_1`, `_2` (AX-F14; inferred); LOOK_V2 §8's
-  renaming step is then not needed (inferred; whether it comes later is OQ-0005-AP1's). A `faction_` material's colour
-  in Blender is a placeholder; the faction's data gives it at load (0005:1764-1765, 1582-1583).
-- **The counts for the Conscript with his gun** (the draft allows 4 per pass, 8 over the main and shadow passes:
-  0005:1778-1781, 2311):
+  finds a slot by its material's name, never a mesh's, since mesh names get `_1`, `_2` (AX-F14; inferred). Whether
+  LOOK_V2 §8's automated renaming step comes later is OQ-0005-AP1's. A `faction_` material's colour in Blender is a
+  placeholder; the faction's data gives one colour per such area at load (0005:1764-1765, 1582-1583).
+- **More than four areas:** a vertex-colour mask in one material per class (rst:1084-1099; AX-F16) or one texture
+  (rst:1115-1119); how ADR 0003's toon material reads either was not researched. The Conscript needs neither.
+
+## 7. Open points for Mustafa (decided nowhere here)
+**O1. The draw cap when a gun comes from its own file.** ADR 0005's cap on a soldier as drawn (body, headgear and held
+weapon) reads "at most 4 materials per pass", derived from C-B's "one per material per soldier" and ADR 0003's cap of 4
+draw calls per soldier per pass (0005:1777-1781; r3:1044-1045); PM-0005-36 counts draws, the soldier shown minus hidden,
+at most 4 × the passes that draw it (0005:2311), and so does mark 8. A gun loaded from its own file is a mesh of its own
+and draws on its own, whatever its material is named (AX-F14, AX-F18; inferred, the renderer's draw loop not read):
 
 | What is drawn | Distinct materials | Draw calls per pass |
 |---|---|---|
 | the body, four areas (AX-F9, AX-F14) | 4 | 4 |
-| with the rifle: `unit_dark`, "2 meshes" (go:48) | 4 | 6 |
-| with the SMG: `unit_dark` (G:12), its mesh count not given | 4 | 4 + its meshes |
+| with the rifle: `unit_dark`, "2 meshes" (A3) | 4 | 6 (12 over the main and shadow passes, above PM-0005-36's 8) |
+| with the SMG: `unit_dark` (A6, CONVENTIONS), its mesh count not given | 4 | 4 + its meshes |
 | each shown `marking_` node (AX-R12) | 4 | + 1 |
 
-- **Ways to 4 draws per pass**, none researched (the engine proposes; an ADR line that changes needs Mustafa's go): (a)
-  merge each gun's meshes at load: 5 draws, still above 4; (b) at load, add the gun's geometry to the body's `unit_dark`
-  geometry, weighted 1.0 to `hand_r`: 4 draws, one merged geometry per body and gun pair, shared by every soldier with
-  that gun and swapped when he changes guns (memory and swap cost not measured); (c) count the cap in distinct materials
-  and allow more draws per soldier, changing ADR 0003's cap of 4 draw calls per soldier per pass (r3:1044-1045;
-  0005:1779-1780) and PM-0005-36. A per-object hull outline would double each count (r3:1021).
-- **More than four areas, routes left open:** a vertex-colour mask inside one material per class (the exporter writes
-  vertex colours, rst:1084-1099; the loader turns them on, AX-F16), or one texture (images exported, rst:1115-1119). How
-  ADR 0003's toon material reads either: not researched. The Conscript of the briefs needs neither.
+Three ways out, none researched further; each that changes an ADR line needs Mustafa's go, and the question goes to
+him with change-set M's plan.
+- **(a) Merge each gun's meshes into one at load.** Costs: one merge per gun type, shared by every soldier who carries
+  it (not measured). Gets: 5 draws per pass with any gun, still above 4, so it helps only beside (b) or (c). Needs
+  proven: the sockets survive the merge (separate nodes, AX-F16; inferred) and PM-0005-36's count on both backends.
+- **(b) At load, add the gun's geometry to the body's `unit_dark` geometry, weighted 1.0 to `hand_r`.** Gets: 4 draws
+  per pass with any gun. Costs: one merged geometry per body and gun pair, shared by every soldier with that pair
+  (memory not measured); a geometry swap when a soldier changes guns (time not measured); the gun then moves only with
+  `hand_r`, so the body step sets the hand's turn from the gun's direction (JL §4), and the sockets ride on `hand_r`.
+  Needs proven: memory per pair and the swap's frame time on the minimum machine; one draw per material on both
+  backends (PM-0005-36); flash and tracer still starting at `socket_muzzle`, within 1 mm [proposal].
+- **(c) Count the cap in distinct materials and allow more draws per soldier.** Costs: decision-doc lines change, ADR
+  0005's derived cap (0005:1777-1781), PM-0005-36 (0005:2311), ADR 0003's cap of 4 draw calls per soldier per pass
+  (r3:1044-1045; PM-0003-25, 0003:1200, which does not say whether its soldier holds a gun) and mark 8; with the rifle,
+  6 draws per soldier per pass, 288 per pass for 48 soldiers instead of 192 (arithmetic). Needs proven: the render
+  budget bench (BP Part 3, section 3.7: PM-0003-18 to -47) holds at that count on the minimum machine.
+- Either way, a per-object hull outline would double each count (r3:1021).
 
-## 7. What stays open
+**O2. The fifth class's name.** ADR 0005 lists the classes "for example environment, structure, unit, faction colour,
+emissive" (0005:1761-1762; the same list in AP-3, 0005:1579); ADR 0003 lists "(environment, structures, units, faction
+colours, visual effects)" (0003:247-248), not as an example. The prefix `emissive_` (AX-R8; BP Part 11, rule 12)
+follows ADR 0005. Nothing here decides which name holds; the class table (AP-3, 0005:1578-1585) is where it would be
+settled, and an ADR line that changes needs Mustafa's go.
+
+## 8. What stays open
 
 | Open point | Who decides |
 |---|---|
-| What mark 8 and PM-0005-36 count; route (a), (b) or (c) of part 6 (point 1) | the engine proposes (main session; engine-architect reviews); Mustafa for any ADR line |
-| Which sockets each gun has; an eject socket on the rifle (point 2) | the gun's author (the Art lead), with the engine |
-| The fifth class (point 3) and the class table (AP-3); a socket's axis; `marking_` names after the prefix | the engine (the class table reviewed with ADR 0003's material) |
+| O1 and O2 (part 7) | Mustafa, with change-set M's plan; the engine proposes (main session; engine-architect reviews) |
+| Whether a marking is off at game size (A5, A2); how a marking changes with the faction; names after `marking_` | Mustafa decides; the Art lead and the engine propose |
+| Which sockets each gun has, and its eject direction | the gun's entry, from its author (the Art lead), with the engine |
+| The [proposal] numbers of marks 7, 8 and 10, the `palm` check, mark 7's up axis | test-engineer's review |
+| Where the joints sit, weights beyond the rigid baseline, whether the coat keeps its four joints | JL §6 |
 | The bind pose; the soldier's vertex and bone counts (AS6) | the model's author |
-| Mustafa's Blender version against add-on 5.4.12; the not-read points below | this research, by the round trip |
+| How the exporter writes the armature object; the neutral bone's name; the influence cut; Mustafa's Blender version against add-on 5.4.12 | the first real export (the advisor agent's ruling, part 5) |
 | AS1, AS2, AS5, AP1 | the rest of the asset research (SP:529-545) |
 
 **Not read (and what for).**
 - Blender's manual (docs.blender.org) and the rendered specification (registry.khronos.org), not on the allow-list: the
-  exporter's repository documentation and the specification's source were read instead. That source changed between my
-  reads (205,509 bytes on 2026-11-14, 205,402 on 2026-11-17; lines after 2180 moved by 4; the GLB size header reworded):
-  a pinned release would be steadier.
-- The exporter: its influence cut and any renormalising; the neutral bone's name; whether the armature object becomes a
-  node or a joint; how an object parented to a bone is written; what `use_selection` takes along; `filepath` (AX-R2,
-  AX-R12, AX-R15; marks 3, 4). Blender: Unit Scale's effect on export; the ".001" ending; whether its mirror tools read
-  `_l` and `_r` (they do [from memory, unverified]) (AX-R7, AX-R10; mark 6).
-- three.js: the renderer's draw loop (AX-F18, cited through r3); `normalizeSkinWeights` on a vertex with no weight (mark
-  4); the uniform buffer limit per backend (14 bones need 14 × 64 = 896 bytes on SK:61-65's path; the limit was not
-  read). The Khronos glTF Validator (a candidate for J).
+  exporter's repository documentation and the specification's source were read instead; that source changed between
+  2026-11-14 and 2026-11-17 (lines after 2180 moved by 4), so a pinned release would be steadier.
+- The exporter: its influence cut and any renormalising (mark 4); the neutral bone's name (mark 3); how it writes the
+  armature object (a non-joint node is likely: objects become nodes, AX-F8, and the option that removes the armature
+  object is off by default, src `__init__.py`:834-841; inferred; JL §2); how an object parented to a bone is written
+  (AX-R12); what `use_selection` takes along; `filepath` (AX-R2). Blender: Unit Scale's effect on export (mark 6); the
+  ".001" ending (AX-R7); whether its mirror tools read `_l` and `_r` (they do [from memory, unverified]).
+- three.js: the renderer's draw loop (AX-F18, O1; cited through r3); `normalizeSkinWeights` on a vertex with no weight
+  (mark 4); the uniform buffer limit per backend (20 joints need 20 × 64 = 1,280 bytes on SK:61-65's path; the limit
+  was not read). The Khronos glTF Validator (a candidate for J).
 
-**What a real export must still prove (the round trip).** Export, with AX-R2's call from Mustafa's Blender through the
-MCP or a headless Blender (`blender --background --python` [from memory, unverified]), a 1 m cube marked on its +Z side,
-a skinned figure with the Conscript's four slots and 14 bones, and a gun with its sockets. Load each on WebGPU and with
-`forceWebGL`; check names as written, one mesh per slot, one bound Skeleton, no `JOINTS_1`, 1.0 m along +Y, front and
-muzzle on +Z; then plant each mark's defect and see it fail. Headless runs check structure and counts only. **Nothing in
-this file was proven by an export.**
+**What the first real export must prove.** Export with AX-R2's call, from Mustafa's Blender through the MCP or a
+headless Blender (`blender --background --python` [from memory, unverified]): mark 6's test box; a small skinned figure
+with the Conscript's four slots and the 20 joints (marks 3, 4, 10); a gun with a turned empty (mark 7's Blender half).
+Load each on WebGPU and with `forceWebGL` (mark 9), check names, one mesh per slot, one bound Skeleton, no `JOINTS_1`,
+the box's sizes and front, the soldier's origin, facing and scaling, and the muzzle on +Z; then plant each mark's defect
+and see it fail. Headless runs check structure and counts only. **Nothing in this file was proven by an export.**
 
-## 8. Sources
+## 9. Sources
 All official, none from shipped games; each URL once, with the date read.
 1. https://github.com/KhronosGroup/glTF/blob/main/specification/2.0/Specification.adoc · 2026-11-14, 2026-11-17.
 2. https://github.com/KhronosGroup/glTF/blob/main/specification/2.0/schema/extras.schema.json · 2026-11-14.
-3. https://github.com/KhronosGroup/glTF/blob/main/specification/2.0/schema/glTFChildOfRootProperty.schema.json ·
-   2026-11-14 (a name "is not necessarily unique").
-4. https://github.com/KhronosGroup/glTF-Blender-IO/blob/main/docs/blender_docs/scene_gltf2.rst · 2026-11-14.
-5. https://github.com/KhronosGroup/glTF-Blender-IO/tree/main/addons/io_scene_gltf2 · 2026-11-14: `__init__.py` and, in
+3. https://github.com/KhronosGroup/glTF-Blender-IO/blob/main/docs/blender_docs/scene_gltf2.rst · 2026-11-14.
+4. https://github.com/KhronosGroup/glTF-Blender-IO/tree/main/addons/io_scene_gltf2 · 2026-11-14: `__init__.py` and, in
    `blender/exp/`, `nodes.py`, `obj_data.py`, `material/material_utils.py`, `joints.py`, `skins.py`,
    `primitive_extract.py`.
-6. https://github.com/mrdoob/three.js/blob/dev/examples/jsm/loaders/GLTFLoader.js · 2026-11-14 (188dev), 2026-11-17.
-7. https://github.com/mrdoob/three.js/blob/dev/src/animation/PropertyBinding.js · 2026-11-14.
-8. https://github.com/mrdoob/three.js/blob/dev/src/nodes/accessors/Skinning.js · 2026-11-14.
-9. https://threejs.org/docs/pages/GLTFLoader.html · 2026-11-14, through the fetch tool's summary.
-10. https://github.com/mrdoob/three.js/blob/dev/examples/webgpu_loader_gltf.html · 2026-11-14.
-11. https://github.com/mrdoob/three.js/blob/dev/examples/webgpu_skinning.html · 2026-11-14.
-12. Repository files, this branch, 2026-11-17: ADR 0003 and 0005, SPIKE_PLAN, EDITOR_V2, STATUS, r3, and the five
-    checkpoint files
-under "Abbreviations".
+5. https://github.com/mrdoob/three.js/blob/dev/examples/jsm/loaders/GLTFLoader.js · 2026-11-14 (188dev), 2026-11-17.
+6. https://github.com/mrdoob/three.js/blob/dev/src/animation/PropertyBinding.js · 2026-11-14.
+7. https://github.com/mrdoob/three.js/blob/dev/src/nodes/accessors/Skinning.js · 2026-11-14.
+8. https://github.com/mrdoob/three.js/blob/dev/examples/webgpu_loader_gltf.html · 2026-11-14.
+9. https://github.com/mrdoob/three.js/blob/dev/examples/webgpu_skinning.html · 2026-11-14.
+10. Repository files, this branch, 2026-11-17: ADR 0003 and 0005, SPIKE_PLAN, EDITOR_V2, STATUS, r3, JL, the build plan
+    (BP) and the appendix's items A3 to A10, read as saved for the report before it was built.

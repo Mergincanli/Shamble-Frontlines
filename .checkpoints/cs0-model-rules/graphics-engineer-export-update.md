@@ -130,3 +130,42 @@ advisor's plan review (plan.md revision 2, points 1-22) and engine-architect's j
   (unread, AX-F10) the file passes and the fifth influence is lost silently; JOINTS_1 shows only with Include All Bone
   Influences on. Say so.
 - Writing B7-B12 as one full rewrite of the draft (part 3 findings kept verbatim).
+- B7-B12 done: draft rewritten in full (header/TL;DR/abbreviations with JL, BP, A3-A10; part 3 kept verbatim; AX-R10
+  = JL's 20-joint table + root (JL §2 wording) + joint rules; AX-R11 = names (go:51 quote), per-gun lists, axes in glTF
+  and Blender, hands (go:49 whole + A10 rule + palm [proposal]), muzzle (go:50 whole); AX-R12 marking_ engine rule only;
+  AX-R13 materials cap, draws -> O1; 5.1 ten marks with "Proven on" column; 5.2 what files prove + mark 4/6/7 failure
+  notes; part 7 O1 (three ways: costs, proof) and O2 (both lines); part 8 open table, not read, real export).
+  Next: B13 checks.
+- Spec re-read 2026-11-17 (raw.githubusercontent.com, scratchpad, grep only): 205402 bytes, sha256 prefix
+  093b740752a69612e3f3 = my earlier 2026-11-17 copy; every cited line unchanged; spec:1689 "Accessors for the `POSITION`
+  semantic **MUST** have their bounds, i.e., `min` and `max` properties, defined." (AX-F6 quote holds).
+- FINDING (for engine-architect, confirms JL §2's inferred claim): spec:2118 "The `skeleton` property (if present)
+  identifies the node that is the skeleton root of the skin. That node **MUST** be the root of all nodes listed in the
+  `joints` array or their common ancestor." So a written skin.skeleton names hips or a node above it: confirmed.
+  Side note spec:2231: a skinned primitive's winding order follows the determinant of the skeleton node's (or else the
+  instantiating node's) global transform: one more reason for identity non-joint nodes; a mirrored file flips it.
+- B13 first check: 433 lines (over 400), two prose lines at 121. Trim plan: TL;DR to 5 one-line items; fold 5.1/5.2 and
+  O1/O2 subheadings into bold paragraphs; drop sources 3 (uncited) and 9 (only AX-F12's docs-page clause), renumber
+  (rst 3, src 4, loader 5, PB 6, SK 7, examples 8 and 9, repo 10); tighten scope, abbreviations, part 2, R5, R9, R13,
+  axes, hands, O1, part 8. Rewriting the file once more.
+- COORDINATOR CHANGE 1 (Mustafa 21:33): the correction file now holds the Art lead's text alone (3,244 bytes, 29 lines);
+  A10 = that copy; cite A10 by its own lines: the rule line 5, the socket names line 25, the muzzle wording line 29;
+  cite nothing from the Advisor's check that stood above the line (my draft cites none of it: verify).
+- COORDINATOR CHANGE 2 (advisor finding 20, Medium): mark 8 counts what PM-0005-36 counts, draw calls per pass
+  (0005:1777-1781; row ~2311), not materials; the shared `unit_dark` keeps four materials, not four draws (say so in
+  AX-R13); body + rifle (2 meshes) = 6 fails; the three ways out stay the open point O1 for Mustafa with change-set M.
+- COORDINATOR CHANGE 3 (advisor Low): no table of the 20 joints in my draft (replaces the launch message): name the
+  count and point to JL §1 (docs/research/soldier-joint-list.md).
+- COORDINATOR CHANGE 4 (advisor Low): mark 10 and AX-R5 must not say "under `root`"; the advisor's ruling for the first
+  real Blender export: skin.joints exactly the 20 names (no armature joint, no neutral bone, no `_leaf`); hips the only
+  joint without a joint parent; mesh node and every node above hips identity; hung under a client-made root on both
+  backends, a scale of 0.5 or 1.2 gives that multiple of the file's height within 1 mm, mesh and joints moving
+  together. If otherwise: the 20 names stand; only marks 3 and 10 and the Blender recipe change. Write into the marks.
+  Size: under 400 lines.
+- B7-B12 redone (rewrite 2, with the coordinator's four changes and the trims): no joint table (AX-R10 names the 20,
+  points to JL §1); mark 8 counts draws as PM-0005-36 does, run by L + renderer.info, proven on the rifle + the
+  code-built stand-in body (fails today, 6/pass); AX-R13 says unit_dark keeps four materials, not four draws; mark 3 =
+  exactly the 20 (no armature joint, neutral bone, _leaf); mark 10 lines 1-5 (JL §5) + line 6 (client-made root,
+  scale 0.5/1.2, height within 1 mm, mesh and joints together), planted adds "a mesh node scaled 0.01 [proposal]";
+  advisor's ruling sentence after the marks table; A10 cited by lines 5, 25, 29; sources renumbered 1-10 (3 and 9
+  dropped). Next: B13 checks.
