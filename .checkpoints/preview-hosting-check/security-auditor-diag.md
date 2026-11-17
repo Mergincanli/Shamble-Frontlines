@@ -36,3 +36,12 @@ L5 Low 4,7 comments: update to match (ends only when shaped like an ID; D prints
 Info: legacy `##[cmd]` parsing anywhere in a line (runner ActionCommand.cs:132) applies to jq/Wrangler output, but the text comes from api.cloudflare.com over TLS; no fix. SA-R3 install class unchanged and accepted. Read-only on Cloudflare: confirmed (GETs, `pages project list`).
 Verdict: REVISE (M1 open). Stub tests must be re-run on the new text.
 DONE
+
+## Round 2 (final text sha256 0ad66aa0f2b36f7469bc3bdd57a4a05b7945e0037f96b19059000e0ca9b5aa71, a4d8ae1)
+- Hash: `git show a4d8ae1:<path> | sha256sum` and the working file both = 0ad66aa0...; diff vs my v2 (c0b0e8ab...) = only lines 57-61 and 63-67 (A and C wrapped in `if [ "$h" = yes ]`, else an echo with no value).
+- (1) Change correct: h (line 39) = exactly 32 lowercase hex, so with h=yes $a can only put hex into the path; with h=no no request path carries $a (B, line 62, has none). New exposure: none; the skip echoes print no value. Side benefit: $a can no longer steer the GET to another api.cloudflare.com path (no '/', '?', '..'). Step D still passes the raw ID secret to Wrangler, but its output goes to the 0600 file and only codes/flags print (76-80), so a token in the ID box stays out of the log there too. Info: an uppercase-hex ID would also skip A and C; "exactly 32 hex digits: no" is itself the diagnosis, and B and D still run. No fix.
+- My own stub run of step 2 (curl stubbed, URLs logged): 32-hex ID -> A, B, C asked, ends 0123...cdef; ID box = cfat_ value -> only B asked, ID ends "not shown", the token string appears in no output line; RUNNER_TEMP empty after both. permissions parses as {}.
+- (2) M1 fixed 69-80 (Wrangler output to 0600 file under umask 077 line 75, only exit code 77, project-named flag 78, `[code: N]` counts 79, file removed 80). L1 fixed 42 (ends only when h=yes). L2 fixed 47 (`--max-time 30`; worst case 3 x 30 s, inside timeout-minutes 10 at 24; trap not added, acceptable: job-timeout kill only, VM discarded). L3 fixed 14 (`permissions: {}`).
+- (3) Nothing blocks. Optional Low (L5 remnant, no push for it alone): header comment line 4 does not say the ends print only for an ID's shape, nor that A and C are skipped otherwise; line 7 "project names" fits C's {name}. L4 (procedure: branch from main only, approve only the run on the commit holding this hash, delete the run's logs after reading) still applies to the run, not the text.
+- Verdict: APPROVE on 0ad66aa0f2b3...
+DONE

@@ -366,6 +366,14 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      (`git show a4d8ae1:` gives the same). Launched on it: the security-auditor's round 2 and the advisor agent (tier
      2), both in the background; the saver b491gaova runs.
 
+   - The security-auditor's round 2 (notes `security-auditor-diag.md`, "Round 2", ending DONE): **APPROVE** on sha256
+     0ad66aa0f2b36f7469bc3bdd57a4a05b7945e0037f96b19059000e0ca9b5aa71 (hash checked at a4d8ae1 and in the working copy):
+     the A/C skip correct, no new exposure (only 32 lowercase hex digits reach a path; B has no ID in its path); M1
+     fixed (lines 69-80), L1 (42), L2 (47), L3 (14); its own stub run matched. Info: an uppercase-hex ID also skips A
+     and C ("exactly 32 hex digits: no" shows it). Low, optional: line 4's comment (L5) not updated. L4 applies to the
+     run: the branch from `main`, only the run on the commit with this hash approved, the logs deleted after reading
+     (his choice, per consultation 13). Waiting: the advisor agent's verdict.
+
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
    CLOUDFLARE_ACCOUNT_ID; in `production`: CANARY); `preview` (him as required reviewer, self-review unticked, admin
