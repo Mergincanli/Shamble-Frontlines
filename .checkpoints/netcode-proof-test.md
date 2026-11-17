@@ -229,12 +229,18 @@ it asks nothing; REFS-KIT stays.
   #54. **Next for it:** ADV-NS-L5 (docs-keeper records his words and the merge on main, "in a separate docs change":
   plan first, and it needs a branch other than this one, his call, DOCS-54); the kit's next change after the freeze
   takes ADV-NS-L2/-L3/-L4 and SA-NS-2; NS-TRAILER and NS-FIRST stay with him. **MAIN-52:** main changed a rules
-  file, so this branch takes main 82c605e in (plan first, as at 2bd44a5).
+  file, so this branch takes main 82c605e in (plan first, as at 2bd44a5). **The plan: main-54-plan.md** (07:09 UTC,
+  sha256 3b446794…): pre-checks; `git merge --no-ff --no-commit origin/main` in the main folder as at 2bd44a5; commit
+  by -F; before any push the gate --no-smoke, repo-map-check and check.mjs whole through main-run.sh (pass bar in
+  the plan; a U3C-HELD-1 FAIL still stops); then push with the card, CI, the advisor's head check. **RUNNING from
+  07:10 UTC: the advisor's review of it** (workflow wf_2dc5e65a-9f8, task wdwfezvng; notes advisor-main-54.md; it
+  also rules DOCS-54, whether a separate docs branch for ADV-NS-L5 needs his word). On return: save the result word
+  for word, read it in full, then build only on APPROVE.
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
-  the same. **Saver: none running** (bp6oaduw2 ran 2026-11-17 04:31:59-06:22:00 UTC, had nothing to save, and stopped
-  on its time limit; not restarted, since no agent or workflow runs and CHECKPOINTS.md §5 asks for it only while they
-  do: start it with the next agent run; ba732d9co, restarted 02:39:41 after the spend-limit cut, saved 8c72ab7,
+  the same. **Saver: beoc3blfv** (started 2026-11-17 07:09:57 UTC with the MAIN-54 plan review, to about 08:59; stop it
+  before the merge, step 1; bp6oaduw2 ran 04:31:59-06:22:00 UTC, had nothing to save, and stopped on its time limit,
+  not restarted while nothing ran; ba732d9co, restarted 02:39:41 after the spend-limit cut, saved 8c72ab7,
   bf752f3 and df4634f and stopped on its time limit at 04:29:42; b00b7pd9e ended
   on its time limit at 22:28:10, then bqdaec008 ran until the container restart at 23:46:48; the cuts block).
   **Check-in 04:34 UTC:** nothing stopped; chat 177,597 tokens, about 18 % of 1M (chat_size.py, read only).
