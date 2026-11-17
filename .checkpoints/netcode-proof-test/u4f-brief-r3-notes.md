@@ -119,5 +119,12 @@ Head read: 8afcc11b63906d3660b21613deb0729bdd8937bc (2026-11-17 17:15 UTC). Fres
 - B6 W3 DONE (s4 build rules with SIZE-CHECK table, s5.1-5.6 with the bar table B1-B7, s6, s7). Quote of the
   C62H-BOUND stop rule in 2.9 and s1 item 5 replaced by cites (no retyped adopted words). Next W4: s8 (45 rows), s9
   (9.1 open items, 9.2 deferred Lows), s10 Q1-Q17, s11 D1-D15, s12, NA table.
+- B6 W4 DONE (s8 45 rows: 25 hold, 8 changed, 12 added; s9.1 16 rows, s9.2 10 rows / 23 findings, 4 taken; s10
+  Q1-Q17; s11 D1-D15: 4 filled; s12 items 1-12; NA-1..NA-16). Counts rows fixed (25/8; 9.1 16 rows; 9.2 23 in 10).
+- B7 DONE: brief_check.py: P1-P36 each used, no unknown id, no marker left, `@@` only in C2's mention; his 7-word
+  runs appear only in s12 item 3's anchors (u4r form), so stated in 0.5; three retyped phrases rephrased (s3 C62H-KEEP,
+  5.6's read line, s4 commands, s1 item 4, 2.9, 5.6 "reworded"). Head moved by autosaves to 42e0912; cited files
+  unchanged since 7cfae88 (diff empty), noted in 0.1. Brief: u4f-brief.md, about 1,410 lines.
+- DONE.
 - Planned size estimate (B6 input): client ~700, room ~950, bots ~650, lab ~1,400, sim bites ~40, SERIES rows ~25,
   run scripts ~600: about 4,400 added lines (range 3,500-5,500); his SIZE-CHECK stop for an M unit: past 6,000.
