@@ -23,3 +23,13 @@ No cut run found (no notes file existed).
 - B1 done: brief rev 3.2 read whole (1,734 lines; sections 0-12, NA table). Counts at 3.2: +109/+124, 64 neg,
   18 questions, 54 recheck rows, planned size 4,850, disk 3,607-3,727 MiB vs 1,372 above floor. Next: plan §5 U4f.
 - (resumed after a cut, same day) B1 re-read into context whole (1,735 lines incl. NA table). Continuing at B2.
+- B2 done: plan §5 U4f :805-816 read (Builds; Marks moved: -47 1,000 connects P2 2 bites; -20 P3 both options bite
+  redundancy-1; -21 8 parts + twins + 13 bites; -22 one never-acker 10 min, no pre, load stated, bite unbounded S30;
+  reviewers netcode, security, test, rust); U4-BRIEFS :1054-1056; §9 run count (-20 6, -21 24+12, -22 3, -47 3);
+  §7.1/7.2. Brief 5.1 matches (36+12+17=65). Carries §U4f :507-539 (46, 80 (a)-(e), 86) read. Form of my brief checks
+  read (advisor-u4r-brief.md). Next: B3 round 1/2 findings + reviser's answers.
+- B3 done: round 1 (TE3-1..15 FAIL; SA3-1..8 FAIL; Highs TE3-1, TE3-2, SA3-1) and round 2 (TE31-1..11: 5 M, 6 L;
+  SA31-1..4: 2 M, 2 L) read from the JSONs; reviser's "Revision for round 2" read (each DONE; TE31-1's "f36 under both
+  while Q7 open" not taken: open Q stops the builder; TE31-11's anchor taken as SA31-4's). Slip in form: one
+  `python3 -I -c` print of the JSONs (read only, inline, not a Write-made script); from here on scripts by Write under
+  u4f-r3/. Next: B4 D4 files; B5 code cites.
