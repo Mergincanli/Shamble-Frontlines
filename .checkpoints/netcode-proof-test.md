@@ -157,10 +157,17 @@ it asks nothing; REFS-KIT stays.
   P3 ruling (21:38-21:48 UTC; advisor-c62h-bound-p3-full.json, 71 lines, facf298e…, read in full): P3 COUNTS AND P2
   COUNTS** (s1 and s3 under carry 58: their E1 ticks are wholly the unacknowledged forced full states; ADV-CBP3-1 to -5
   Low; conditions P1-P7). **The (c) lines replaced (21:58 UTC)** by c62h_bound_c_lines.py with its exact texts and
-  note line, every number checked against the files first (u4r-report.md 76680d3a… → 777ee782…). **RUNNING from 21:59
-  UTC: the report's draft and its verification** (workflow wf_a1cd7d1b-556: a drafter writes c62h-bound-report-draft.md
-  from the ruling's order_to_the_report and brief section 9; then the verifier checks every claim). **Then:** the
-  section into u4r-report.md by script; save; CI; the advisor's check of that head (P6); the report to Mustafa.
+  note line, every number checked against the files first (u4r-report.md 76680d3a… → 777ee782…). **The report's
+  draft and its verification DONE** (wf_a1cd7d1b-556, 21:59-22:12 UTC; saved word for word by
+  c62h_bound_report_full.py: c62h-bound-report-draft-full.json 824805d1…, -verify-full.json a5f5d62d…; read in
+  full): the draft 538 lines; **the verifier FAIL, 340 checked**, 5 wrong (commit 2's time 11:54 for git's 12:18:58,
+  the build notes :243 too; stale card line numbers; the time key, his times being Amsterdam's; CB-P6 took two
+  edits; the first call "stopped at its test step", where check.mjs ran on and the call stopped after it) and 1
+  missing (P6); no figure, verdict or pass bar wrong. **Fix pass:** ten fixes made by Edit (saved e0fd859; card
+  line numbers now pinned to 67de11e); then the spend-limit cut (the cuts block). **Next:** the rest of the fixes
+  (the conditions P1-P7 with P6, the decision's code explained and its options, For Mustafa item 4, -58's parts as
+  marks.json gives them, the notes' :243); the verifier again until PASS; the section into u4r-report.md by script;
+  save; CI; the advisor's check of that head (P6); the report to Mustafa. P6's spike-tree check exits 0 at e2d06ec.
   **NS-STATUS: PR #54 opened 21:57 UTC** (claude/night-shift-stints, commit 20f9d599…, NIGHT_SHIFT.md +3 -0, the
   lines' sha256 4e3d1565… = his yes; the worktree .gate/ns-stints-wt; subscribed). **Its review round DONE**
   (wf_9f3bfdf9-76a; both saved word for word and read in full): **the advisor APPROVE WITH FINDINGS**
@@ -181,8 +188,9 @@ it asks nothing; REFS-KIT stays.
   trig_01LYv1nTavGw7z2NxKqLadrC; the subscription rules: stop it if nothing changed and he has not written).
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
-  the same. **Saver:** b1gec2y1v ended on its time limit at 11:08:33 UTC ("watch stopped: time is up", exit 0; not a
-  cut); restarted at 11:22 UTC as **bp40lga8l** (to about 13:12). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
+  the same. **Saver: ba732d9co** (restarted 2026-11-17 02:39:41 UTC after the spend-limit cut, to about 04:29;
+  b00b7pd9e ended on its time limit at 22:28:10, then bqdaec008 ran until the container restart at 23:46:48; the
+  cuts block). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
   c62h_bound_rejudge_compare.py (section 7; --self-test 4 of 4 as required, .gate/u4r/c62h-bound/rejudge-compare-dry.log;
   the real self-test runs into rejudge-compare-negative.log before the comparison) and c62h_bound_set_check.py
   (sections 8.3-8.4; on the old results/u4r/fc411116c1f1/P2: all 29 lines naming the new phrase or checks FAIL, the 12
@@ -3195,6 +3203,16 @@ re-run the same call if no failure was caught. Then the cause → te-m3-plan.md 
 
 **Cuts by the spend limit** (SPEND-LIMIT (a), Mustafa 2026-11-12: at every cut, the notice's exact text, the time of
 the cut and the time of the resume; UTC, read from the session's transcript):
+- **2026-11-16 22:29 to 2026-11-17 02:37 UTC, the spend limit.** The notice, word for word, at 22:29:16.315: "You've
+  hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets 1:30am (UTC)". My
+  turn stopped right after a read-only look at marks.json (-58's parts), in the report draft's fix pass. The same
+  notice answered every wake until 00:35:25 (the 22:34 and 00:35 check-ins, PR #54's 23:04 safety net, the
+  restarts). The container restarted at 23:46:48 and stopped the saver bqdaec008 (its last autosave e0fd859 at
+  22:38:26 holds the draft's ten fixes); worker restarts at 23:46:49, 00:35:17 and 02:36:40 (the machine booted at
+  02:34:58). **Resumed at 02:37:33 UTC.** Nothing was half done: each Edit was whole and saved, no agent, workflow or
+  run was in flight, and the branch was clean at e0fd859. The saver restarted at 02:39:41 as ba732d9co. PR #54:
+  unchanged (no review, comment or label; head 20f9d59, mergeable clean); its safety net found nothing and is not
+  re-armed.
 - **2026-11-16 17:09-20:36 UTC, an unanswered approval, then a worker restart (not the spend limit; no spend-limit
   notice):** my Bash call (the rejudge.txt quote check and the redact step) was sent at 17:09:35 and waited for an
   approval nobody answered; the 18:34 check-in queued behind it; the saver b7fx6m5gq ended on its time limit at
