@@ -322,7 +322,8 @@ it asks nothing; REFS-KIT stays.
   test 552 / 632 passed, 0 failed, 0 skipped; refs 1382; marks 81; self 78 of 78; redact 10 of 10, 306 items, 0
   findings; deps 137 crate files; wasm 27000 ticks, 0 mismatching both ways; free 5,552 → 5,514 MiB. **Step 8: the
   gate PASS** (12:35 UTC, --no-smoke; legacy/ unchanged); **the save aab3712 pushed 0ad9661 at 12:37 UTC** (head
-  aab3712fca3af64b25169af1f4ee75c01a0411cd; no [skip ci], CI runs). The saver bxvsewbnz from 12:37 UTC. **Step 9
+  aab3712fca3af64b25169af1f4ee75c01a0411cd; no [skip ci], CI runs). The saver bxvsewbnz ran 12:37-12:58 UTC (stopped
+  by TaskStop when the review ended: no agent running; branch equal to the remote at bac0164). **Step 9
   DONE: CI green on aab3712** (gate 44084854535 push and 44084863595 pull request, each with gate and smoke jobs;
   toolchain 44084854552 and 44084863752) and **the review, workflow wf_dd3fb0a8-14f (12:38-12:54 UTC, its journal
   last written 12:54:20; saved word for
