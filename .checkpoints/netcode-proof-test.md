@@ -366,8 +366,18 @@ it asks nothing; REFS-KIT stays.
   and docs-54/advisor-docs54-head.md; a cut: resumeFromRunId with the same script). The saver b70ygknng from 13:25.
   #55's subscription rules read (13:27; no steward or babysit skill on its branch); CI on 9660197 finished with nothing
   failed; the safety-net check-in trig_019e3hj14eRSQcm9Ja4bEtJM fires at 14:18 UTC. C3's merge-tree check DONE (Open
-  findings, "From DOCS-54"). Next: the review's results saved word for word and read in full, one fix pass, the report
-  in the PR, the checkpoint deleted, ready, his go. **DOCS-54's
+  findings, "From DOCS-54"). **Round 1 DONE** (wf_e63b22c7-6b6, 13:25-13:33; saved word for word by
+  docs-54/docs54_review_full.py, read in full): the verifier PASS (verifier-docs54-full.json, 9ebc0b53…; VER-D54-1 to
+  -3, Low) and the advisor APPROVE WITH FINDINGS of 36242ad (advisor-docs54-head-full.json, 356cf270…; ADV-D54H-1 to
+  -4, Low; C1-C8 met, C9 partly). ADV-D54H-2 checked against the transcript: partly holds (the naming before the
+  worktree call and the first push is in thinking-type records 50467 and 51177; before the gate, 51130 names the call
+  but not as one that may ask; none asked). CI green on 36242ad (six runs). **The fix pass aea6f5b** (pushed; head
+  aea6f5bd67a4da400613cc24919e3e93e7c8dc21): ADV-D54H-1 (the Queued pointer's condition; STATUS kept short by the cap),
+  VER-D54-2 (E1's two leading cuts in place), VER-D54-3 ("in the netcode test's chat since #52"); his quotes unchanged
+  (the verifier's checker: 11 entries, FAILS: 0); STATUS 120 lines; the gate PASS; repo-map OK; the checkpoint
+  deleted. The ready report in #55's description (title updated). **RUNNING from about 13:41 UTC: the final-head review,
+  wf_1ea0a6c1-69d** (task whljeo5bx; the advisor on aea6f5b and the verifier's re-check, effort high, read only).
+  Next: its results; C3's merge-tree re-run; mark ready; ask his go for #55 at the approved head. **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
   full; the plan docs-54/docs-54-plan-draft.md, 134 lines, 2d3bb7a9…). ADV-D54-1 High: the copy method would quote the
