@@ -300,8 +300,8 @@ it asks nothing; REFS-KIT stays.
   if nothing fails, L2 (`l2 one 300 2 6`); then D-1 out by Edit (both hashes back, git diff quiet), then step 2.
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
-  the same. **Saver: bvg19b3fy** (started 2026-11-17 07:55:49 UTC for U3C-HELD-1's plan draft, to about 09:45; stop it
-  when the work returns and nothing runs; b2f2ov1so ran 07:31:41-07:38:55 UTC for the advisor's head
+  the same. **Saver: none running** (bvg19b3fy ran 2026-11-17 07:55:49-09:45:50 UTC and stopped on its time limit; not
+  restarted: no agent or workflow runs, and L1's logs go to .gate/; start it with the next agent run; b2f2ov1so ran 07:31:41-07:38:55 UTC for the advisor's head
   check and was stopped by TaskStop when it returned: "nothing to save", "watch stopped: terminated";
   beoc3blfv ran 07:09:57 until C1's TaskStop at about 07:28, its output ending "[killed]" with its last commit 3c65d14
   made and on the remote; bp6oaduw2 ran 04:31:59-06:22:00 UTC, had nothing to save, and stopped on its time limit,

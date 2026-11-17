@@ -22,3 +22,7 @@ saves after 18b139c; the spike unchanged since ddd38ba.
   /home/user/Shamble-Frontlines/.gate/u3c-held-1/l1.log df -B1 /home/user :: bash …/u3c-held-1/u3c_held_loop.sh l1 all
   150 2 0 :: df -B1 /home/user`. Read it against the plan's Confirmed and Stop lines (step 1; C2); if nothing fails,
   L2 (`l2 one 300 2 6`).
+- 09:46 L1's header: free 4,983 MiB, HEAD e85fdba, diff bdc5bba4… (D-1), untracked e3b0…; the build exit 0; the
+  binary npt_net-ed8673eeeaf4db12 as required (sha256 04c76dc44aea9dbc9f11a67272df98fbd532274ec490554e234f88662d4541c0);
+  the two files' hashes as D-1's above. 182 of 300 runs done by 09:46:04 UTC, every one exit 0, 169 passed, G-NC2 ok
+  (about 33 s a run; the end about 10:19).
