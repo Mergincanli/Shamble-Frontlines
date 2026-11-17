@@ -361,8 +361,13 @@ it asks nothing; REFS-KIT stays.
   repo-map-check OK (122 / 109); the gate --no-smoke PASS in the worktree (NODE_PATH, lockfiles byte-equal; no
   prompt); the build commit 9660197 (its message carries the hash table, docs-54/commit_msg_54.py) and 36242ad (PR
   #55's number), pushed (no prompt); draft PR #55 by the GitHub MCP tools, label needs-mustafa, subscribed. Head
-  36242ad0f6a3860cac35320b3dbdcf1e0dde0b60. Next: its review round (the verifier and the advisor, a workflow), one fix
-  pass, C3's merge-tree check, the report in the PR, the checkpoint deleted, ready, his go. **DOCS-54's
+  36242ad0f6a3860cac35320b3dbdcf1e0dde0b60. **RUNNING from 13:25 UTC: its review round, workflow wf_e63b22c7-6b6**
+  (task wn9tbj39t; the verifier and the advisor, effort high as C9 names it, read only; notes docs-54/verifier-docs54.md
+  and docs-54/advisor-docs54-head.md; a cut: resumeFromRunId with the same script). The saver b70ygknng from 13:25.
+  #55's subscription rules read (13:27; no steward or babysit skill on its branch); CI on 9660197 finished with nothing
+  failed; the safety-net check-in trig_019e3hj14eRSQcm9Ja4bEtJM fires at 14:18 UTC. C3's merge-tree check DONE (Open
+  findings, "From DOCS-54"). Next: the review's results saved word for word and read in full, one fix pass, the report
+  in the PR, the checkpoint deleted, ready, his go. **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
   full; the plan docs-54/docs-54-plan-draft.md, 134 lines, 2d3bb7a9…). ADV-D54-1 High: the copy method would quote the
