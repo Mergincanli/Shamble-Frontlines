@@ -235,3 +235,24 @@ coat change at change-set 10's pictures, at the cost of a re-rig and re-export),
 the palm check await test-engineer's ruling; mark 7's numbers unchanged), M5 (mark 7 checks that a held gun's entry
 lists grip, support and muzzle); C3 checks (<= 400 lines, 120 columns, quotes, ids); C4 notes + DONE + answer (<= 10
 lines). P2 and P3 are taken in the ruling: no draft change (AX-F5 already cites spec:2238).
+- C1 done (soldier-joint-list.draft.md, 223 lines): §2 lines 81, 87-93: "No node in the file may be named `root`";
+  armature object's name "follows AER AX-R7 and is never `root`"; ruling on P1: "the name belongs to the client's node
+  alone. No node in a file may be named `root` (the check fails such a file), and the engine never looks a soldier's
+  root up by name: it holds the node it made." §4 line 128: "Every held gun lists grip, support and muzzle"; §4 fixes +Y
+  (lines 130-132). §6 lines 195-197: coat motion is Mustafa's call at change-set 10's pictures; "a model exported before
+  change-set 10's pictures would have to be rigged and exported again." P2/P3 taken (spec:2238 line 80; spec:2118
+  line 77). Note: the ruling cites appendix items by their own lines (A3:46, A4:73, A10:5); my draft cites A3-A9 by
+  section heading, A10 by line: consistent enough, flag in the answer, not changed (not asked; no room).
+  Line plan: R10 +1, root bullet +1, part 8 rows +1, "How marks can fail" -1, "What a file can prove" -1, not-read
+  first bullet -1 -> about 395.
+- C2 done: M1 root bullet: no node in any model file named `root` (the client's alone; mark 3 fails such a file);
+  armature object's name free within AX-R7; client never looks root up by name; mark 3 adds the check (every
+  nodes[].name) and the defect "an armature object named `root`", proven on any file. M2 AX-R10: list changes only by a
+  new ruling; foreseen: coat joints go if Mustafa drops the coat's legacy motion at change-set 10's pictures, and a model
+  exported before then is rigged and exported again (JL §6). M3 + M4: part 8 rows "Gap in mark 7" (+Z only, +Y fixed by
+  AX-R11, rolled socket passes, numbers stay) and "Gap: no mark carries AX-R11's palm check", both test-engineer's
+  ruling, pending; the mark 7 sentence left part 5. M5 mark 7: "a held gun's entry lists grip, support and muzzle",
+  defect "an entry without `socket_support`". Paid for by tightening "What a file can prove", mark 4's note, the first
+  not-read bullet.
+- C3 done: 395 lines; prose <= 120; quotes 63 checked, 2 not found (the loader strings, as before); 34 ids resolve.
+DONE (pass 3)
