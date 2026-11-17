@@ -1,0 +1,133 @@
+{
+  "verdict": "APPROVE WITH CONDITIONS",
+  "plan_sha256": "3b446794b3f0c976235a887cf4510ad84c097d4697c37f7bf73a0a4870dad328",
+  "conditions": [
+    {
+      "id": "C1",
+      "text": "Step 1, order and pre-checks. First stop the saver beoc3blfv with TaskStop and wait for its last line ('saved and pushed' or 'nothing to save'): its last save moves HEAD, so the HEAD and clean-tree checks must come after it. Then run each check in its own call and stop on any difference, with nothing merged. (1) `git status --short` prints nothing. (2) `git rev-parse HEAD` equals `git rev-parse origin/claude/netcode-proof-test-plan-hcky5g`. (3) `git rev-parse origin/main` = 82c605e2e8a7f284e6925718368d3fe569f89ae9. (4) `git merge-base HEAD origin/main` = 53272a11024dcec8349e67bd8c70a8db337e85bb. (5) `git diff --stat 53272a1 origin/main` shows `.claude/NIGHT_SHIFT.md | 3 +++` and nothing else. (6) `git diff --quiet 53272a1 HEAD -- .claude/NIGHT_SHIFT.md` exits 0. (7) `git diff --quiet ddd38ba HEAD -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results'` exits 0. (8) The guard's no-ask condition: `git diff --name-only --no-renames origin/main...HEAD -- .claude .github tools/gate.mjs tools/smoke.mjs tools/battery.js tools/gate-globals.json tools/package.json tools/package-lock.json tools/npm-shrinkwrap.json ':(glob)**/CLAUDE.md' ':(glob)**/CLAUDE.local.md' ':(glob)**/AGENTS.md' ':(glob)**/.npmrc' ':(glob)**/.mcp.json'` prints nothing (it printed nothing at 2a32497)."
+    },
+    {
+      "id": "C2",
+      "text": "Step 2 is replaced. Run `git merge origin/main`, alone in its call: no flags and nothing else on the line. Main's guard lets this form through without a prompt when the branch has changed no protected path since the merge base (routine-guard.mjs:1347-1351, checked in C1 (8)). The plan's `git merge --no-ff --no-commit origin/main` has three arguments, so the guard asks Mustafa (routine-guard.mjs:1343-1346 and :1362). Expected output: a merge by the 'ort' strategy that changes only `.claude/NIGHT_SHIFT.md | 3 +++`. Stop and report to the advisor if git reports a conflict or any other file, or if the guard asks anyway. Do not leave a prompt waiting, and do not run `git merge --abort`: it asks too, because its one argument is not origin/main. If a later merge ever needs a hand-written message, the --no-ff --no-commit form must be named in the chat before it is sent (his words of 2026-11-16 21:50, history.md:2187)."
+    },
+    {
+      "id": "C3",
+      "text": "Step 3 is replaced: no separate commit. Git commits the merge itself with its own message ('Merge remote-tracking branch 'origin/main' into claude/netcode-proof-test-plan-hcky5g'), as at 1ea36a1. `commit --amend` is refused by the guard (routine-guard.mjs:323), and -m, -F and --no-commit make it ask. Step 5's card save commit carries the MAIN-52 record: his words at history.md:2055-2057, the reading at :2082-2086, merge base 53272a1, no conflict, nothing else changed, and both attribution lines. The chat says in one line that the merge commit itself has git's message without the attribution lines, and why. Then verify, each check in its own call: `git rev-parse HEAD^1` = the pre-merge head from C1; `git rev-parse HEAD^2` = 82c605e2e8a7f284e6925718368d3fe569f89ae9; `git diff --stat HEAD^1 HEAD` shows NIGHT_SHIFT.md +3 only; `git diff --quiet origin/main HEAD -- .claude .github CLAUDE.md tools/gate.mjs tools/smoke.mjs tools/battery.js tools/gate-globals.json tools/package.json tools/package-lock.json` exits 0 (the kit equals main's byte for byte); C1 (7) exits 0 again."
+    },
+    {
+      "id": "C4",
+      "text": "Step 4c is replaced: check.mjs whole does not run for this merge. Run `bash /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/main-run.sh /home/user/Shamble-Frontlines/.gate/main-54/light.log node check.mjs --only refs,marks,self,redact`. Just before it, read N (the tracked-file count from `git ls-files`) and M (the count from `git ls-files spikes/netcode-proof`; 305 today). Check that `git status --short --ignored -- spikes/netcode-proof` prints nothing. Pass bar, all of it:\n- main-run.sh exits 0.\n- The header names HEAD as the merge commit's short SHA, both diff and untracked as e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855, and at least 4,096 MiB free.\n- 'check: all 4 steps pass'.\n- refs PASS 'N tracked files: none outside spikes/ references it (§4.9's one exception: the KEPT-LOGS kit files may name its results folder)'.\n- marks PASS 'npt-judge: 81 marks read and checked (drafts at 626df678cae0835fb2ce62b8113f548697968406); rows in this branch's docs/adr/: all unchanged'.\n- self PASS '78 of 78 tests passed'.\n- redact PASS '10 of 10 tests passed; redact-check: M item(s) checked, 0 finding(s)'. This is merge-2.log's 297 plus the 8 results files committed since ddd38ba, not 'as at merge-2.log'.\nAny other line: stop for the advisor, nothing pushed. The full check of the unchanged spike code is .gate/u4r/c62h-bound/merge-2.log at 561bf42 (all 11 pass, 552 / 632, 0 failed), carried forward by C1 (7)."
+    },
+    {
+      "id": "C5",
+      "text": "Steps 4a and 4b run as planned: `node tools/gate.mjs --no-smoke` gives GATE PASS, and `node .claude/scripts/repo-map-check.mjs` gives OK. Save their output only in forms that need no approval: no shell redirect (the card's Rules item 4). The Write tool from the call's output is fine. main-run.sh writes its own log."
+    },
+    {
+      "id": "C6",
+      "text": "Steps 5 and 6 as planned, plus four things.\n1. The card save pushes the merge. It carries no [skip ci], because the merge commit is outside .checkpoints/, so CI runs.\n2. gate, smoke and toolchain must be green on that head.\n3. The card's Base line reads 'main, last merged in at <merge SHA> (main 82c605e, PR #54; MAIN-52)'.\n4. Restart the saver, in the same command form as beoc3blfv, before step 6's advisor run (CHECKPOINTS.md §5: it runs during any agent run)."
+    },
+    {
+      "id": "C7",
+      "text": "Fix the plan text before it is used as the record:\n- MAIN-52's quote: his words are history.md:2055-2057 ('Take main in when main changes code, CI or rules, and once before PR #40 is marked ready'); lines 2082-2086 are the session's reading.\n- The stale facts: HEAD is 2a32497, and the saver beoc3blfv is running.\n- The tier line: this merge adds no file to PR #40's diff to main (after it, that diff has no .claude/ path). The three lines were reviewed on #54 by the advisor and the security-auditor (security-ns-stints-full.json), so no security-auditor run is needed here.\n- Record ADV-M54-8 as a kit follow-up for after the freeze."
+    }
+  ],
+  "findings": [
+    {
+      "id": "ADV-M54-1",
+      "severity": "Medium",
+      "where": ".checkpoints/netcode-proof-test/main-54-plan.md:19-24; main's .claude/hooks/routine-guard.mjs:1308-1362",
+      "what": "Step 2's `git merge --no-ff --no-commit origin/main` in the main folder makes main's guard ask Mustafa. mainFolderMove passes silently only for `--ff-only origin/main` or a plain one-argument `git merge origin/main`; three arguments give t=null, which leads to ask(reason). The plan says its steps use 'the simple command forms' (plan:19) and does not name step 2 as a call that asks. His words of 2026-11-16 21:50 (history.md:2187) require the simple forms that need no approval, and an ask named before it is sent. The 2026-11-16 17:09-20:36 stall was exactly such an unanswered approval.",
+      "fix": "C2: `git merge origin/main` alone. The guard's R2 condition holds: none of the branch's 1,167 changed paths since 53272a1 is protected. The precedents are df8975b (card:4088-4092), 1ea36a1 and MAIN-48's text (card:2798)."
+    },
+    {
+      "id": "ADV-M54-2",
+      "severity": "Medium",
+      "where": ".checkpoints/netcode-proof-test/main-54-plan.md:32-40",
+      "what": "Step 4c runs check.mjs whole, which no rule requires here. plan.md §12.4 (:1349-1351) asks for the gate at every step and the spike's test command at every unit, and a main merge is not a unit. Only refs reads anything the merge changes, and the spike tree equals ddd38ba's, where merge-2.log passed whole. Running it costs disk: 4,954 MiB free now, and the last whole run used 1,022 MiB (6,913 to 5,891, card:324-328). That can leave the next counted run (U3C-HELD-1's) below main-run.sh's 4 GB floor while packing waits on R4 (card:196-197), which is the 2bd44a5 deadlock again. Its pass bar 'marks, self and redact as at merge-2.log' would also read a correct run as off: redact will count 305 items, not 297 (8 results files since ddd38ba), and refs will count about 1,348 tracked files, not 1,310.",
+      "fix": "C4: `node check.mjs --only refs,marks,self,redact` through main-run.sh, with the exact bar. This is not less evidence than the rules require: CLAUDE.md step 4 and plan §12.4 ask for the gate. It matches the kit-merge precedent df8975b (gate, `--only marks,refs,redact`, repo-map)."
+    },
+    {
+      "id": "ADV-M54-9",
+      "severity": "Medium",
+      "where": "origin/main docs/STATUS.md:5, :12, :15, :29; docs/DECISIONS.md:27-31, :110",
+      "what": "Main's docs record nothing after 2026-11-14. STATUS says it was last updated for main 4d21c1a, names #48 as the last merge, and lists #52 as waiting for review and a go, though it merged at 4460ef5. #53 and #54 appear nowhere (0 hits in STATUS, DECISIONS, ROADMAP and STATUS_ARCHIVE). DECISIONS.md's newest entry is 2026-11-13. KIT-FREEZE-2's record lists only 'a broken main, and items 2 and 3 below' as exceptions. His one-change exceptions for #53 (KL-YES, history.md:2136) and #54 (NS-STATUS, history.md:2185), NS-LINES (a) and 'Merge #54' are not on main. ADV-NS-L5 covers only #54's part of this.",
+      "fix": "One docs change-set for #52's merge, #53 and #54, with his words copied by script. Opening it is his call (DOCS-54)."
+    },
+    {
+      "id": "ADV-M54-3",
+      "severity": "Low",
+      "where": ".checkpoints/netcode-proof-test/main-54-plan.md:20-22",
+      "what": "Step 1 lists the HEAD = origin and clean-tree checks before 'the saver stopped'. The saver's last save on TaskStop makes and pushes a new checkpoint commit, so those checks would be stale.",
+      "fix": "C1: stop the saver first, then run the pre-checks."
+    },
+    {
+      "id": "ADV-M54-4",
+      "severity": "Low",
+      "where": ".checkpoints/netcode-proof-test/main-54-plan.md:4-5",
+      "what": "The plan quotes MAIN-52 as 'Mustafa's rule (history.md:2082-2086)'. Those lines are the session's 'Read as', which adds the bracketed list. His verbatim words are history.md:2055-2057. The meaning is the same, but the source is wrong.",
+      "fix": "C7: cite :2055-2057 for his words and :2082-2086 as the reading, in the plan and in step 5's card commit."
+    },
+    {
+      "id": "ADV-M54-5",
+      "severity": "Low",
+      "where": ".checkpoints/netcode-proof-test/main-54-plan.md:16-17",
+      "what": "Stale facts. The plan says HEAD is 4db26b2 and 'Nothing runs: no saver'. HEAD is now 2a32497 (07:10:43 UTC; only the card and the plan changed since 4db26b2), and the saver beoc3blfv is running.",
+      "fix": "C7. C1's checks re-read HEAD anyway."
+    },
+    {
+      "id": "ADV-M54-6",
+      "severity": "Low",
+      "where": ".checkpoints/netcode-proof-test/main-54-plan.md:41-44; .claude/CHECKPOINTS.md §5",
+      "what": "The plan stops the saver in step 1 and never says when it restarts. Step 6 is an agent run, and §5 wants the saver running during agent runs.",
+      "fix": "C6: restart it before step 6."
+    },
+    {
+      "id": "ADV-M54-7",
+      "severity": "Low",
+      "where": ".checkpoints/netcode-proof-test/main-54-plan.md:58-62",
+      "what": "The plan labels the merge 'risk tier 2' but names only the advisor as reviewer. A reader applying 'security-auditor on every risk-tier-2 change' would flag a missing reviewer. In PR terms the merge adds no tier: after it, PR #40's diff to main has no .claude/ path, and #54's bytes were already reviewed by the advisor and the security-auditor.",
+      "fix": "C7: state why no security-auditor run is needed."
+    },
+    {
+      "id": "ADV-M54-8",
+      "severity": "Low",
+      "where": "CLAUDE.md:297-302 (main) vs .claude/hooks/routine-guard.mjs:1347-1351",
+      "what": "CLAUDE.md's Never line names three forms as 'still allowed' in the main folder. The guard's R2 also allows a plain `git merge origin/main` when the branch changed no protected path, and every main merge on this branch has used that kind of merge (1ea36a1, df8975b, 7685b2b, 2bd44a5 and others). The kit text lags the code.",
+      "fix": "A kit follow-up for after KIT-FREEZE-2: word it for his yes. No edit now."
+    }
+  ],
+  "facts_checked": [
+    "Plan file sha256 = 3b446794b3f0c976235a887cf4510ad84c097d4697c37f7bf73a0a4870dad328 (matches the brief)",
+    "git rev-parse origin/main = 82c605e2e8a7f284e6925718368d3fe569f89ae9; parents 53272a1 and 20f9d59; tree c2b5dec = 20f9d59's tree",
+    "git merge-base HEAD origin/main = 53272a11024dcec8349e67bd8c70a8db337e85bb",
+    "git diff --stat 53272a1 origin/main: `.claude/NIGHT_SHIFT.md | 3 +++`, 1 file",
+    "git diff --quiet 53272a1 HEAD -- .claude/NIGHT_SHIFT.md: exit 0",
+    "git diff --quiet ddd38ba HEAD -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results': exit 0",
+    "git status --short: only `?? .checkpoints/netcode-proof-test/advisor-main-54.md` (my notes file)",
+    "HEAD = origin/claude/netcode-proof-test-plan-hcky5g = 2a32497 (07:10:43 UTC, the saver beoc3blfv's commit), not 4db26b2 as the plan says; 4db26b2..2a32497 changes only the card and main-54-plan.md",
+    "The branch's own changes since 53272a1: 1,167 paths, none protected (no .claude/, .github/, gate file, CLAUDE.md, AGENTS.md, .npmrc or .mcp.json); `git diff --quiet 53272a1 HEAD -- .claude CLAUDE.md .github <gate files>` exit 0",
+    "Main's guard, mainFolderMove (routine-guard.mjs:1308-1362): in the main folder `git merge --no-ff --no-commit origin/main` leads to ask; plain `git merge origin/main` passes when the branch changed no protected path (R2); `git merge --abort` also asks; `commit --amend` and every reset mode are refused (:323-324)",
+    "Repo and global git config: no merge.ff, mergeOptions, editor or autoedit; commit.gpgsign true; no local branch or tag named origin/main",
+    "MAIN-52, his words: history.md:2055-2057; the session's reading: :2082-2086. His go on #54: history.md:2199-2202 ('Merge #54', 07:00:54 UTC; merge 82c605e at 07:03:02 UTC; CI on main green). NS-STATUS 'its own pull request': :2182; the 21:50 approval-free rule: :2187",
+    "Precedent 2bd44a5: parents 98ffb08 + 53272a1; message written with -F, with both attribution lines; command `git merge --no-ff --no-commit origin/main` (card:990, :387-388); pushed before check.mjs whole by the disk ruling; whole ran on ea95701 (.gate/refs-kit/counted-merge-2.log: 11/11, 538/616, refs 1275, self 78, redact 294 items, 0 findings)",
+    "Kit-merge precedent df8975b (card:4088-4095): plain merge in the main folder 'allowed: the branch changed no kit file since the merge base'; checks were the gate --no-smoke, check.mjs --only marks,refs,redact and repo-map",
+    "1ea36a1: a plain `git merge origin/main` with git's own message and no attribution lines",
+    "Last full check.mjs: .gate/u4r/c62h-bound/merge-2.log at 561bf42: 11/11, 552/632, 0 failed; refs 1310; marks 81; self 78/78; redact 10/10, 297 items, 0 findings",
+    "Since ddd38ba, 8 results files were added under spikes/netcode-proof/results; the spike folder has 305 tracked files and nothing ignored or untracked on disk, so redact will count 305 items; the repository has 1,348 tracked files",
+    "redact-check walks the whole spike folder except .git, node_modules, target and .gate (redact-check.mjs:265-271, :369-373); refs reads `git ls-files` repo-wide (check.mjs:2625-2630); marks runs `cargo run -p npt-judge` (check.mjs:2632-2633)",
+    "main-run.sh (88 lines): usage `bash main-run.sh <log file> <command...> [:: ...]`; lock, idle wait, header (HEAD short SHA, diff and untracked hashes of the spike folder only), 4 GB floor (exit 3), touches crates/*. The plan's 4c command form is right",
+    "Free disk now 4,954 MiB; .gate/shared-target/CACHEDIR.TAG exists",
+    "U3C-HELD-1: c62h-bound-build.md:428-453 (first call FAIL, second call PASS whole under the ruling); merge-stop ruling C3: 'planned and merged before another lane's counted check.mjs run (U4f's merge)'; CHECK-NFF-1 is Low on check.mjs (card:3846)",
+    "CHECKPOINTS.md §5 (main): a background save commits locally and skips the push when code commits are ahead; a foreground save pushes (checkpoint.mjs:180-185)",
+    "plan.md §12.4 (:1349-1351): the gate at every step; the spike's test command at every unit",
+    "Main's docs: STATUS last updated 2026-11-14 (main 4d21c1a), lists #48 as last merged and #52 as in flight; 0 mentions of #53, #54, KEPT-LOGS, NS-STATUS or NS-LINES in STATUS, DECISIONS, ROADMAP and STATUS_ARCHIVE; DECISIONS' newest entry is 2026-11-13; KIT-FREEZE-2's exceptions (DECISIONS:27-31) do not include his #53 and #54 exceptions",
+    "ADV-NS-L5 (advisor-ns-stints-full.json): Low, 'docs-keeper records his words and the merge after #54 merges, in a separate docs change'"
+  ],
+  "docs54": {
+    "ruling": "It is his call. This session may not open a separate docs branch and pull request for ADV-NS-L5 without his explicit word.",
+    "why": "(1) This session's system instructions bind its pushes to claude/netcode-proof-test-plan-hcky5g and need explicit permission for any other branch. CLAUDE.md's standing permission gives a cloud session limited to a claude/ branch only that branch, as its stand-in. PR #54's own branch rested on his words 'as its own pull request' (history.md:2182), which covered that one change only. (2) The docs change would record his words and decisions in DECISIONS.md, which makes it a decision-doc record: risk tier 1, always needs-mustafa (advisor.md, Risk tiers). It merges on his go anyway. (3) Waiting breaks nothing (ADV-NS-L5 is Low). But main's docs are three merges behind, not one. STATUS was last updated for main 4d21c1a, still names #48 as the last merge and lists #52 as waiting. #53 and #54 are absent. DECISIONS.md has none of his words after 2026-11-13. KIT-FREEZE-2's record (DECISIONS:27-31, which STATUS:15 points to) lists only 'a broken main, and items 2 and 3' as exceptions, without his one-change exceptions for #53 (history.md:2136) and #54 (:2185). So the question should cover all three merges in one docs change. Riding PR #40 instead is a poor option: that branch already edits STATUS's #40 row, and the change would reach main only when #40 merges.",
+    "for_mustafa": "DOCS-54: may this chat open one more branch and pull request, docs only, to bring main's dashboard (docs/STATUS.md), roadmap (docs/ROADMAP.md) and decisions record (docs/DECISIONS.md) up to date for the last three merges (#52, #53 and #54)?\n\nWhy it matters: main's dashboard still says the last merge was #48 and still lists #52 as waiting. It also has no record of your words since 2026-11-14, including your two one-time exceptions to the kit freeze (the kept-logs rule in #53 and the night-shift lines in #54).\n\nOptions:\n(a) Yes. This chat opens one branch (claude/docs-after-54), plans first with the advisor, copies your words by script from its own records, runs one review round, then waits for your go to merge. It records your words, so it always waits for your go.\n(b) No. The next docs pass in the foundation chat does it, and this chat leaves the list and the sources on its card.\n(c) Wait for PR #40's own final docs step, which is days or weeks away. Main's dashboard stays out of date until then.\n\nRecommendation: (a)."
+  },
+  "to_mustafa": "Your rule says the netcode branch must take in main's new night-shift lines (#54), and the plan to do that is sound with two changes. First, its merge command would have stopped and waited for your approval, so it now uses the plain merge form that the repository's safety check allows without asking. Second, it now runs a few seconds of targeted checks instead of the 15-minute full spike check, because the spike's own code did not change and the full check would have left too little disk space for the next counted run. One question is yours (DOCS-54): may this chat open a small separate docs pull request so main's dashboard and decision record catch up on the last three merges (#52, #53, #54)? I recommend yes.",
+  "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-main-54.md"
+}

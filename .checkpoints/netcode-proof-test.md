@@ -232,10 +232,19 @@ it asks nothing; REFS-KIT stays.
   file, so this branch takes main 82c605e in (plan first, as at 2bd44a5). **The plan: main-54-plan.md** (07:09 UTC,
   sha256 3b446794…): pre-checks; `git merge --no-ff --no-commit origin/main` in the main folder as at 2bd44a5; commit
   by -F; before any push the gate --no-smoke, repo-map-check and check.mjs whole through main-run.sh (pass bar in
-  the plan; a U3C-HELD-1 FAIL still stops); then push with the card, CI, the advisor's head check. **RUNNING from
-  07:10 UTC: the advisor's review of it** (workflow wf_2dc5e65a-9f8, task wdwfezvng; notes advisor-main-54.md; it
-  also rules DOCS-54, whether a separate docs branch for ADV-NS-L5 needs his word). On return: save the result word
-  for word, read it in full, then build only on APPROVE.
+  the plan; a U3C-HELD-1 FAIL still stops); then push with the card, CI, the advisor's head check. **The advisor's
+  review: APPROVE WITH CONDITIONS C1-C7** (wf_2dc5e65a-9f8, 07:10-07:27 UTC; saved word for word by
+  advisor_main_54_full.py: advisor-main-54-full.json, 133 lines, feb808d0…, read in full; notes advisor-main-54.md).
+  C1 the saver stopped first, then eight pre-checks, each in its own call; C2 `git merge origin/main` alone (the
+  guard's no-ask form; --no-ff --no-commit would ask him; no `git merge --abort`); C3 git's own merge message (no
+  attribution lines: -m, -F and --no-commit ask, amend is refused), the MAIN-52 record in the card save's commit, then
+  the parent, diff and kit-equality checks; C4 `node check.mjs --only refs,marks,self,redact` through main-run.sh
+  into .gate/main-54/light.log with its exact pass bar (N and M read first), not check.mjs whole; C5 the gate
+  --no-smoke and repo-map-check, outputs saved by Write; C6 the push with the card (CI runs), gate, smoke and
+  toolchain green, the Base line, the saver restarted before the advisor's head check; C7 the plan's text fixed (done:
+  main-54-plan.md, "As approved"). Findings: ADV-M54-1 and -2 (Medium, met by C2 and C4), -9 (Medium: main's docs are
+  three merges behind; DOCS-54), -3 to -8 (Low; -8 a kit follow-up after the freeze). **DOCS-54 is his call** (the
+  advisor's ruling; its question goes to him in chat, recommendation (a)). **NOW: MAIN-54 by C1-C7.**
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver: beoc3blfv** (started 2026-11-17 07:09:57 UTC with the MAIN-54 plan review, to about 08:59; stop it
