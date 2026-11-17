@@ -70,7 +70,7 @@ and 2026-11-17) and, byte for byte with the Art lead's texts, in the appendix
    - "In your list for the Art project, read "(never a plain tube)" as struck. The words "no plain tubes or cylinders"
      in docs/LOOK_V2.md line 30 and in the rendering draft are not mine." and "Treat them as not decided; the carry of
      my look decisions removes them." Two copied texts still carry those words, because both were written before his:
-     the plan below (Part 4, item 2 of its list for the Art project) and the sheet notes in the appendix (A7). Nothing
+     the plan below (Part 4, item B2 of its list for the Art project) and the Art lead's addition in the appendix (A5). Nothing
      this change-set writes cites them as decided, and it does not edit that line of LOOK_V2.
 4. **Shamble VFX exists** (his effects editor, in its own repository). "In Part 15, say how change-set 11 (Feel) uses
    it. My lean: the game loads Shamble VFX's exported effects through its runtime and builds no effect a second

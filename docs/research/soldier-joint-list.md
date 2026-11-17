@@ -141,10 +141,10 @@ SMG's eject empty is turned until its -Y points along (-0.940, 0, 0.342) and its
 check is PM-0005-53: each socket's whole frame (up included) within 0.5 degrees. Because the rotation step is
 inferred, a real export of a gun with one empty turned must pass it before Blender files rely on this rule; the
 script-written rifle file cannot prove that (PM-0005-53).
-**How the hands meet the gun.** The rule is the correction's and Mustafa's: a pose sets where `socket_grip` sits,
-which way the gun points and how far the chest turns; the right hand is on `socket_grip`, the left on
-`socket_support`; the butt and the muzzle follow from the gun's file (A10:5; A3:44). The pose numbers are change-set
-10's.
+**How the hands meet the gun.** The rule is the correction's; Mustafa's go agrees with it on the hands and the gun's
+direction, and the chest's turn is the Art lead's alone: a pose sets where `socket_grip` sits, which way the gun points
+and how far the chest turns; the right hand is on `socket_grip`, the left on `socket_support`; the butt and the muzzle
+follow from the gun's file (A10:5; A3:44). The pose numbers are change-set 10's.
 - Right hand: `upper_arm_r` → `lower_arm_r` → `hand_r`, onto `socket_grip`. Left hand: `upper_arm_l` → `lower_arm_l`
   → `hand_l`, onto `socket_support` (A10:5), one point in place of legacy's rail slide (CC9, LI:139). Legacy solves
   both the same way (G:415-416).
@@ -222,3 +222,40 @@ planted defect of AER mark 3 (PM-0005-49).
   a Blender bone has a rest turn of its own [inferred], so change-set 10 turns joints through their bind-pose frames
   and the stand-in gets non-identity rest turns to prove it [proposal]. World-to-soldier sums must include the root's
   scale (legacy uses the facing turn only, G:357).
+
+## Verifier spot-check
+One verifier pass (Opus 5.5, effort max) checked this file on 2026-11-17 at commit cacea55, and took a second look
+at the commits after it the same day. Verdict: PASS. 36 of 36 key claims were checked at their sources: 36
+confirmed, 0 wrong, 0 unsupported. The lines below are the verifier's own, copied by script from its notes
+(`verifier-cs0.md`, in the commit that this change-set's report names): claim, source, verdict, place. They describe
+the file as it stood at cacea55.
+
+- JL1 legacy 14 joints, root outside the map · C:454 (14 entries), C:465 pelvis parent null · confirmed.
+- JL2 legacy joint names (pelvis, spine, neck, hipL/R, shR, elbowL/R) · C:465, 468-473, 478, 483, 492, 495-501 ·
+  confirmed.
+- JL3 coat panels hang on pelvis · C:589 (gc_skFR/BR/BL/FL parent 'pelvis') · confirmed.
+- JL4 GA13 gains 0.95/0.75, clamp -0.8..0.6, follow thigh · G:168, 441-443 · confirmed.
+- JL5 GA7 twist split 0.45 spine / 0.55 chest; flinch and death tip use spine/chest · G:364-365, 438, 474 · confirmed.
+- JL6 ankle built at load, "the rig has none"; LI:220 asks v2 to emit it · G:253-264; LI:220 ("should emit an ankle
+  joint and a hand socket") · confirmed.
+- JL7 palm measured (fist beyond wrist), IK second bone = lower arm + palm · G:243-247, G:415-416 · confirmed.
+- JL8 legacy gun on chest; R joints and gun at +X while facing +Z ("mirrored", [inferred]) · C:453 (parent chest, pos x
+  0.12), C:492 (shR x 0.6), C:697, G:2710 (rotation.y = atan2(fd.x, fd.z)) · confirmed (the inference is a fair one:
+  with +Y up and +Z front, glTF's +X is the left).
+- JL9 GA rows · LI:219 GA2 IK, :221 GA4 hip turn, :223 GA6 pelvis/legs/ankle, :224 GA7 upper body, :225-228 GA8-GA11,
+  :229 GA12 flinch whips head, :230 GA13 ("Prefer ... skinned panels"), :231 GA14 ("The root never tilts or sinks"),
+  LI:139 CC9 rail slide · confirmed.
+- JL10 legacy reload point · C:786 reload {style:'ram', at:[...]} · confirmed. World-to-soldier uses facing only · G:357
+  · confirmed. Lengths along -Y · G:250 · confirmed.
+- JL11 brief axes (L, F, U), origin between the feet; glTF (x,y,z) = (L,U,F); Blender = (L,-F,U); one root scales with
+  one number · A4:11, A4:12, A4:73 ("(L, F, U) is (X, -Y, Z)", "one empty at the origin", "one object per part") ·
+  confirmed.
+- JL12 part heights: skirt U 0.43-1.045 (A4:30), boot top U 0.50 (A4:33), foot heel F -0.08 toe F 0.20 (A4:34), trouser
+  U 0.36-0.50 (A4:35) · confirmed.
+- JL13 arm arithmetic from A4:36, 40: upper 0.3070, lower 0.2723, hand centre 0.0568 beyond the wrist (0.0566 along the
+  forearm), sum 0.6361 m · confirmed (0.307 + 0.272 + 0.057 = 0.636). Nit: the hand centre is 4.03 mm off the forearm
+  line; the file says "within 4 mm" (rounding; not a finding).
+- JL14 correction: "0.62 from the shoulder joint to the middle of the hand", right hand socket_grip / left
+  socket_support, butt and muzzle from the file (A10:5); chest 45/30 deg (A10:10, 16, 18); lean 10 deg (A10:12, 20);
+  socket names (A10:25); muzzle wording (A10:29) · confirmed. A10 input is 3,244 B, 0 CR (= appendix's 3,243-B block +
+  final LF).

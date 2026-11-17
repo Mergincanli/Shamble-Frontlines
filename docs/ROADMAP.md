@@ -122,10 +122,10 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**Change-set 0 of the build plan [2026-11-17, PR #56: draft]** — cs0-model-rules, on his go of 2026-11-17 (docs only):
+**Change-set 0 of the build plan [2026-11-17, PR #56: ready for review]** — cs0-model-rules, on his go of 2026-11-17 (docs only):
 his five messages of 2026-11-14 and 2026-11-17 into `docs/DECISIONS.md` by script; the plan and its appendix carried
 as reports; the model-file rules and the soldier's joint list, on paper (PM-0005-47 to -56); his answers in the drafts
-(open questions 98 to 96). Report `docs/reports/2026-11-17-cs0-model-rules.md`. Review round 1 under way; then his go.
+(open questions 98 to 96). Report `docs/reports/2026-11-17-cs0-model-rules.md`. Two review rounds done (the verifier: PASS); then his go.
 
 **Main's docs after #52, #53 and #54 [2026-11-17, MERGED]** — docs-after-54, by Mustafa's DOCS-54 (a) of
 2026-11-17 (docs only, no kit, gate or CI file; from the netcode proof test's session, its plan approved by the advisor

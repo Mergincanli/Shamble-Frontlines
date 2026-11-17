@@ -260,8 +260,8 @@ bpy.ops.export_scene.gltf(filepath=PATH, export_format='GLB', use_selection=True
   engine's convention (proposed), after A5, A3: "The rifle is a model of its own."]
 - **AX-R16.** No images or textures, vertex colours, animations, shape keys, cameras, lights, custom properties,
   compression or LOD levels; no baked lighting, ink or toon shading; no collider, hit shape, shot origin or navigation
-  data. [from a draft: 0005:1748-1750, SP:416-417, 5:1715, 0005:1550-1553; no textures is also A4, DO NOT; no
-  animations: the engine's convention (proposed), since soldiers are animated in code (0003:306, 3:797)]
+  data. [from a draft: 0005:1748-1750, SP:416-417, 0005:1715, 0005:1550-1553; no textures is also A4, DO NOT; no
+  animations: the engine's convention (proposed), since soldiers are animated in code (0003:306, 0003:797)]
 
 ## 5. The checks a file passes (OQ-0005-AS3)
 Each of the ten marks has a defect of its own that a test plants and the check must catch. The main session carries
@@ -379,6 +379,85 @@ Load each on WebGPU and with `forceWebGL` (mark 9), check names, one mesh per sl
 the box's sizes and front, the soldier's origin, facing and scaling, each socket's place and whole frame and, once the
 entry holds it, `palm`; then plant each mark's defect and see it fail. Headless runs check structure and counts only,
 and probably never get WebGPU (ADR 0002 part 9). **Nothing in this file was proven by an export.**
+
+## Verifier spot-check
+One verifier pass (Opus 5.5, effort max) checked this file on 2026-11-17 at commit cacea55, and took a second look
+at the commits after it the same day. Verdict: PASS. 35 of 36 key claims were checked at their sources: 35
+confirmed, 0 wrong, 0 unsupported; the one not checked is part 2's claim that no draft fixes slot names,
+origin, facing, joints or sockets. Its finding 5 came after: the citations of ADR 0005 and SPIKE_PLAN lines were
+renumbered to this branch. The lines below are the verifier's own, copied by script from its notes
+(`verifier-cs0.md`, in the commit that this change-set's report names): claim, source, verdict, place. They describe
+the file as it stood at cacea55.
+
+- AER-a ADR 0005 lines: AP-1 "a weapon model's sockets are cosmetic" 0005:1552; look test plain exports 0005:1715; no
+  look 0005:1748-1755; classes "for example environment, structure, unit, faction colour, emissive" 0005:1761-1762; "A
+  soldier model is one skinned mesh" 0005:1771; 4 materials per pass 0005:1777-1781; 25 per pass 0005:1784-1786; 5.2k
+  ceiling 0005:1787-1792; only glTF/GLB 0005:1803-1804 · confirmed at HEAD.
+- AER-b gun conventions: +Y up, +Z muzzle, +X gun's left, origin at grip (A6:11); Blender Z up, muzzle -Y, "all
+  transforms applied" (A6:14); eject "pointing right and 20 degrees up" (A6:40); rifle is a model of its own, uses Dark
+  (A5:17-18); hat follows head (A5:16) · confirmed. Eject vector: cos20 0.9397, sin20 0.3420 -> +Z (-0.940, 0.342, 0),
+  +Y (0.342, 0.940, 0): orthonormal, right-handed (X = Y x Z = (0,0,1)); Blender -Y (-0.940, 0, 0.342), +Z (0.342, 0,
+  0.940) by (x,y,z)->(x,z,-y) · confirmed by arithmetic.
+- A3 line refs (A3:17, 39, 43-46) = his go message's lines 17, 39, 43-46 · confirmed. Arithmetic 6x48 = 288, 4x48 = 192,
+  20x64 = 1,280 · confirmed.
+- glTF spec (KhronosGroup/glTF main, Specification.adoc, 4,278 lines): AX-F1 spec:730/732/737 exact; AX-F2 spec:725
+  exact; AX-F3 spec:1578, 1584 exact; AX-F4 spec:2009, 2014, 2044 (MUST exactly 1.0), 2064 (SHOULD), 2074 (MAY single
+  set of four) exact; AX-F5 spec:2084, 2129, 2238 exact; AX-F6 spec:624, 1689, 3644, 3677, 3684, magic at 3711 (in
+  3703-3714), 3714, 3764-3765, 3773 exact; JL spec:2118 ("MUST be the root of all nodes listed in the joints array or
+  their common ancestor") exact · all confirmed. Nit: source 2 reads "Application-specific data usually stored as a JSON
+  object."; the file quotes "Application-specific data." (a prefix).
+- Blender exporter (glTF-Blender-IO main): version (5,4,12), blender (5,3,0) at __init__.py:20-21; bl_idname
+  'export_scene.gltf' :1967; every default in AX-F7's table at its cited lines (GLB = item 0 of get_format_items;
+  use_selection F; yup T; apply F "excluding Armatures"; texcoords T, normals T, tangents F; materials EXPORT; images
+  AUTO; vertex colour MATERIAL; skins T, influences 4, all influences F; rest position T; leaf F; animations T; shape
+  keys T; extras/cameras/lights/draco/meshopt F); Remove Armature Object F :834-841 · confirmed. AX-F8 names:
+  nodes.py:488, obj_data.py:149, material_utils.py:25, joints.py:102-103 ("_leaf"), skins.py:154 · confirmed. AX-F9
+  bucketing by material, NONE merges: primitive_extract.py:428-444 + rst:1105-1114 · confirmed. AX-F10 min_influence
+  0.0001 (:1648, :1662), groups by name (:1650-1651, :1668-1669), unweighted vertex -> neutral joint (:1672-1675), "at
+  root of armature" (:193, outside the cited range) · confirmed. AX-F11 swizzle (x, z, -y) nodes.py:611-616; triangles
+  and splits rst:46-53; Principled base colour rst:125-127; emissive strength rst:263 (cited 264) · confirmed.
+- three.js (dev, REVISION 188dev): AX-F12 header magic/version :1941-1945, JSON chunk :1983, asset.version :481-483,
+  unknown required extension warns only :547-549, Draco :531-533 + :2004, KTX2 :1526-1532 and Meshopt :1669-1677 throw
+  only when required · confirmed. AX-F13 skinIndex/skinWeight :2339-2340, SkinnedMesh vs Mesh + "Skinning disabled."
+  :3992-4004, normalizeSkinWeights "to fix malformed assets" :4008-4009, Skinning.js reads 4 (x,y,z,w) :102-117, 64 B
+  per bone :61-65 · confirmed. AX-F14 one primitive -> one mesh, several -> Group; names via createUniqueName (sanitize
+  + "_N") :3838-3852, 4040-4080 · confirmed. AX-F15 sanitizeNodeName (spaces -> "_", strips [ ] . : /)
+  PropertyBinding.js:3-4, 184-186; userData.name :4508; material.name kept :3817 · confirmed. AX-F16 Object3D :4493,
+  default MeshStandardMaterial :2370-2386 · confirmed. AX-F17 webgpu_loader_gltf.html and webgpu_skinning.html
+  (Michelle.glb) use WebGPURenderer + GLTFLoader · confirmed.
+- Not reachable on the allow-list: registry.khronos.org (rendered spec) and docs.blender.org (manual); their GitHub
+  sources were read instead (same as the author did).
+- More sources: ADR 0003 unchanged by the change-set: 0003:247-248 class list, :306-312 padded sphere, :795 pose values
+  are tuning, :797 GA1-GA15 port, :798 GA14 Mustafa's call, :1083 ML, :1200 PM-0003-25 (no word on a held gun) ·
+  confirmed. EDITOR_V2:63-65 "1 unit = 1 metre" [DECIDED] · confirmed. A4:20-27 MATERIALS (Coat/Top/Trim by faction,
+  Dark shared) behind AX-R9 · confirmed. Mustafa's quotes in AER (A3 CHANGE 3 lines on names, skin colour, sockets,
+  poses, muzzle; A9 "For change-set 0 take only its rule and the socket names...") · present word for word in his saved
+  messages.
+- Agreement AER <-> JL: 20 joints (AX-R10 defers to JL §1), root (AX-R10 paragraph = JL §2 point by point), socket axes
+  (identical vectors and Blender mapping), hands (right socket_grip, left socket_support; fist not wrist), palm (one
+  number per soldier in the entry, not a bone; mark 10 line 7, 1 cm) · agree.
+- Agreement with ADR 0005 PM-0005-47..56 at cacea55: AER part 5's ten marks and the ten rows have the same bites per
+  mark and the same tolerances (1 mm, 0.5 degrees, 0.001, 1 cm, 0.5/1.2 scales); differences are wording and the rows'
+  "proposed" reasoning numbers. JL §5 lines 1-5 = PM-0005-56 lines 1-5. JL §5's planted list at cacea55 (7 files) is a
+  subset of PM-0005-56's bites (adds "upside down", "hips hung beside the root", "palm 2 cm longer") and reads as
+  complete; engine-architect's review fixed it after cacea55 (94aaae8: "include") — noted, not raised again.
+- [inferred]: 14 in JL, 15 in AER; each is a step no cited source states (blend skinning has no gain/limit; skirt below
+  knee from A4:30/33; culling by the mesh node's world matrix — true of three.js's frustum test; rotations through the
+  exporter; legacy sides mirrored; etc.). None contradicted where testable; two are conservative (AX-F13's "limit of
+  four inferred" — Skinning.js reads exactly four; AX-F10's neutral bone "at the armature root" is in the source at
+  primitive_extract.py:193). No mislabel found.
+- Nothing unproven stated as proven: TL;DR 5 and part 8 say no export proved anything; AX-R11 and JL §4 make the Blender
+  rotation rule wait for a real export; part 6 "not yet by an export"; AS3/AS4 entries likewise. Nit (not a finding):
+  AX-R13 says the rifle beside the body "makes 6 per pass and fails" without repeating that the draw count rests on
+  AX-F18 (inferred, renderer's draw loop not read); O1 and PM-0005-54 ("Known before the run") rest on the same
+  inference; harmless, since PM-0005-54 is still run and measured.
+- SPOT-CHECK COUNT. Key claims = each sourced fact or number a rule, mark or ruling rests on. AER: part 2's 7 draft
+  facts, AX-F1..F18 (18), part 4's 8 sourced points (gun frame A6; four areas A4; socket names; socket vector; hands;
+  muzzle; 6-per-pass math; AX-R16 bases), part 5's rifle claim (1), O1 arithmetic and O2 class lists (2) = 36; checked
+  35 (unverified: part 2's negative claim "No draft fixes slot names, origin, facing, joints or sockets"). JL: 11 table
+  rows, 6 §1 bullets, 4 §2 reasons, 2 §3 mappings, 8 §4 points, 1 §5 basis, 2 §6, 2 §7 = 36; checked 36. Index cells:
+  AER "spot-checked (35 of 36 key claims)"; JL "spot-checked (36 of 36 key claims)"; together 71 of 72 (>= 20 and >= 6
+  in JL: met).
 
 ## 9. Sources
 All official, none from shipped games; each URL once, with the date read.

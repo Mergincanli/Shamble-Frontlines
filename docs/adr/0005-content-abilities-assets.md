@@ -2273,14 +2273,14 @@ cited by section.
   planted defects are proposed unless cited. **Rule A**, for an allocation mark: one planted 64-byte heap allocation
   per tick in the path under test must be counted (ADR 0004's rule A).
 - **Export checks** (PM-0005-47 to -56; AER part 5). **J** is the export check script: it reads a GLB file's header,
-  JSON chunk and binary chunk (AX-F6), never the loader's output. **L** is the game's glTF loader in a Playwright
-  test that walks the loaded scene graph; it waits on the loader's promise and counts frames, never a timer. **The
-  rifle file** is `AMK9_v4_stage1.glb`, written by a script, not by Blender's exporter (AER part 5); **the first real
-  export** is the test box, the small skinned figure (the Conscript's four slots, JL §1's joints) and a gun with a
-  turned empty, written by AX-R2's call (AER part 8). Each bite is a copy of the passing file, entry or test set-up with that one defect
-  (made by the export setting the row names, else by a script edit of the file) and must fail naming its rule; the
-  passing file is the control. Until the gate v2 runs them, CI in these rows means the build chat's container and its
-  headless Chromium (build plan Part 7).
+  JSON chunk and binary chunk (AX-F6), never the loader's output. **L** is the game's glTF loader in a Playwright test
+  that walks the loaded scene graph; it waits on the loader's promise and counts frames, never a timer. **The rifle
+  file** is `AMK9_v4_stage1.glb`, written by a script, not by Blender's exporter (AER part 5); **the first real export**
+  is the test box, the small skinned figure (the Conscript's four slots, JL §1's joints) and a gun with a turned empty,
+  written by AX-R2's call (AER part 8). Each bite is a copy of the passing file, entry or test set-up with that one
+  defect (made by the export setting the row names, else by a script edit of the file) and must fail naming its rule;
+  the passing file is the control. Until the gate v2 runs them, CI in these rows means the build chat's container and
+  its headless Chromium (build plan Part 7).
 - **Tests that join the gate** give 20 identical verdicts in 20 runs on one commit (R5-TEST-REC6, r5 lines 1503–1504),
   with one fixed `PROPTEST_RNG_SEED` and a fixed generator seed for C in the gate, fresh seeds nightly (r5 lines
   1492–1494); a failing case found nightly is committed as a regression fixture with its fix. A failing run is a
