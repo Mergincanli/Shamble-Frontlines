@@ -6,8 +6,8 @@
   **Base:** main, last merged in at 2bd44a5 (main 53272a1, PR #53 the kept-logs rule and PR #52 the docs pass; Mustafa's
   KL-MERGE (a), 2026-11-15 20:50). Take main in again when main changes code, CI or rules, and once before PR #40 is
   marked ready (MAIN-52, 2026-11-14)
-- **Last update:** 2026-11-16 09:17 UTC (the day session: night item 7 taken in by reference; the second pack done;
-  C62H-BOUND's build starting: the block "NOW (2026-11-16)" below)
+- **Last update:** 2026-11-17 04:32 UTC (C62H-BOUND done and checked; its report reached Mustafa in chat at 03:14:03
+  UTC; waiting for his answers and his go on PR #54: the block "NOW (2026-11-16)" below)
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **NOW (2026-11-16, the day session; read this first after a compact or a cut).** Mustafa typed /compact about 09:00
@@ -194,8 +194,12 @@ it asks nothing; REFS-KIT stays.
   sent from (df4634f) has u4r-report.md c5dee3fa… and P6 exit 0, and since 3626a37 only the card and the advisor's
   notes changed. **R3** any change to u4r-report.md, or to spikes/netcode-proof outside results/, before the report
   reaches Mustafa goes back to the advisor. **R4** P5 holds until then; after that, pack only by brief 8.1, never
-  both P0 folders, fc411116c1f1, fd4612050cd6 or the c-u2 folders without his word. **The report goes to Mustafa
-  in chat at about 03:14 UTC.**
+  both P0 folders, fc411116c1f1, fd4612050cd6 or the c-u2 folders without his word. **The report went to Mustafa
+  in chat at 03:14:03 UTC** (this session's transcript, line 47324, found by report_sent_time.py, read only), sent
+  from head 35be45d (committed 03:13:19 UTC; R2 re-checked there; u4r-report.md still c5dee3fa… at 04:31 UTC).
+  **WAITING for his answers:** C62HB-Q4 (recommended (b), with U4g), NS-TRAILER and NS-FIRST (both (a)), the
+  optional re-judge of 051995db9cea, and his go on PR #54 (head 20f9d59). Nothing is packed before he has read it
+  (R4; the chat's For Mustafa item 2). Then U3C-HELD-1 (plan first, before U4f's merge) and U4f rev 3.
   **NS-STATUS: PR #54 opened 21:57 UTC** (claude/night-shift-stints, commit 20f9d599…, NIGHT_SHIFT.md +3 -0, the
   lines' sha256 4e3d1565… = his yes; the worktree .gate/ns-stints-wt; subscribed). **Its review round DONE**
   (wf_9f3bfdf9-76a; both saved word for word and read in full): **the advisor APPROVE WITH FINDINGS**
@@ -216,9 +220,9 @@ it asks nothing; REFS-KIT stays.
   trig_01LYv1nTavGw7z2NxKqLadrC; the subscription rules: stop it if nothing changed and he has not written).
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
-  the same. **Saver: ba732d9co** (restarted 2026-11-17 02:39:41 UTC after the spend-limit cut, to about 04:29;
-  b00b7pd9e ended on its time limit at 22:28:10, then bqdaec008 ran until the container restart at 23:46:48; the
-  cuts block). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
+  the same. **Saver: bp6oaduw2** (started 2026-11-17 04:31:59 UTC, to about 06:22; ba732d9co, restarted 02:39:41 after
+  the spend-limit cut, saved 8c72ab7, bf752f3 and df4634f and stopped on its time limit at 04:29:42; b00b7pd9e ended
+  on its time limit at 22:28:10, then bqdaec008 ran until the container restart at 23:46:48; the cuts block). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
   c62h_bound_rejudge_compare.py (section 7; --self-test 4 of 4 as required, .gate/u4r/c62h-bound/rejudge-compare-dry.log;
   the real self-test runs into rejudge-compare-negative.log before the comparison) and c62h_bound_set_check.py
   (sections 8.3-8.4; on the old results/u4r/fc411116c1f1/P2: all 29 lines naming the new phrase or checks FAIL, the 12
