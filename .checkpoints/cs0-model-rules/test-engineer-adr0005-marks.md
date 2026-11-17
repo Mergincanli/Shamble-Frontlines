@@ -81,3 +81,13 @@ For graphics-engineer: 21 items (lines 15, 225-226, 234-235, 268, 271, 272, 276-
 For Mustafa/advisor: O1-AT-M; MARKS-AFTER-EXPORT (advisor ruling AER 287-290 vs no-loosening); RIFLE-ROUTE (AX-R1 vs script rifle).
 Not settled: CI WebGPU / ML at M; exporter unread behaviours; draw counts per backend; palm field name; sources not re-read.
 DONE
+
+## Block 2 (new task from the coordinator): review of change-set 0's final diff as owner of ADR 0005's pass marks (one round)
+Plan:
+R1. ADR 0005 section as committed (65c8fe8) vs my file: `git diff c94c81b -- docs/adr/0005-content-abilities-assets.md`; rows whole, place, group sentence, How-to-read bullet, When-a-mark-fails (3 changes, rewrap only), no-measurable-mark bullet.
+R2. docs/research/asset-export-rules.md part 5 (+ other listed lines) vs my 21 items; rule on items 1, 15, 18 applied "in short".
+R3. docs/research/soldier-joint-list.md s4, s5 (+ s6 l91) vs my 3 items and rows.
+R4. Line 6 scene graph vs advisor ruling "on both backends ... the file's height"; does PM-0005-55's probe cover the rest.
+R5. docs/SPIKE_PLAN.md lines ~185 and ~596.
+R6. Provability + bites + nothing looser (vs research file and existing marks).
+R7. Verdict + answer (<= 20 lines). Limits: fixes change words, not add lines; edit only my notes; never commit.
