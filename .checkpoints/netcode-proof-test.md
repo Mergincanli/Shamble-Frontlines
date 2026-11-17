@@ -303,10 +303,19 @@ it asks nothing; REFS-KIT stays.
   whole; u3c-held-1/build.md). L2 not needed. **D-1 OUT** (both files' hashes as HEAD; git diff quiet). **Step 2
   DONE: the fix is in the main folder, uncommitted until step 6** (116 spike lines; its hashes in build.md); C4's
   light pre-check PASS (fmt, clippy, doc); the gate PASS. **E3a RUNNING from 09:54 UTC** (task b3ndcpaff; G-NC2 alone,
-  600 runs under 6 busy loops; log .gate/u3c-held-1/e3a.log; 400 of 600 exit 0 at 10:46, none failed). **Also
-  RUNNING from 10:46 UTC: DOCS-54's plan** (workflow wf_11d3eb2e-5f0, task wa6pl97xq: docs-keeper drafts
-  docs-54/docs-54-plan-draft.md, then the advisor reviews it; notes in .checkpoints/netcode-proof-test/docs-54/; read
-  only, no branch yet). Saver bzkwerbtb from 10:45:53 UTC (to about 12:35). Next: E3b (the stalled-client test, 600), E3c (the whole
+  600 runs under 6 busy loops; log .gate/u3c-held-1/e3a.log; 400 of 600 exit 0 at 10:46, none failed). **DOCS-54's
+  plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
+  docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
+  full; the plan docs-54/docs-54-plan-draft.md, 134 lines, 2d3bb7a9…). ADV-D54-1 High: the copy method would quote the
+  session's framing as his words (C1: only his typed text inside "> ", the script prints its in/out table for the
+  verifier); -2 to -5 Medium (C2 the transcript is the primary source, E6's trailing space named; C3 the STATUS clash
+  with #40's :28 named and checked by git merge-tree before ready; C4 E10, his #52 go, copied from 4460ef5's message
+  only; C5 the transcript sweep adds his "go" of 2026-11-15 18:42:53Z for #53's kit write); -6 to -10 Low (C6-C9).
+  Rulings: his "I agree with all your recommendations" answers DOCS-54 as posed at 08:54:58; the branch name
+  claude/docs-after-54 and the method are the session's proposal (shown 07:33:20 and 07:39:46), never quoted as his.
+  (The main session's brief to the drafter had said history.md:2204-2227 held the long option text: wrong; the record
+  holds the 08:54:58 form; the drafter caught it.) Next for DOCS-54: fold C1-C9 into the plan (its new sha256), then
+  the build in the worktree .gate/docs-after-54-wt, each asking call named first (C9). Saver bzkwerbtb from 10:45:53 UTC (to about 12:35). Next: E3b (the stalled-client test, 600), E3c (the whole
   binary, 20), E4 (plants P1-P5, each restored by hash), E5 (the lab's hash), then the review round (C8).
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
