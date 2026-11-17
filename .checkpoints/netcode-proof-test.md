@@ -7,8 +7,9 @@
   #53 the kept-logs rule and PR #52 the docs pass; Mustafa's KL-MERGE (a), 2026-11-15 20:50). Take main in again when main changes code, CI or rules, and once before PR #40 is
   marked ready (MAIN-52, 2026-11-14). Main is now c94c81b (PR #55, DOCS-54, merged 2026-11-17 17:09:32 UTC: five
   files under docs/ only, so not taken in by MAIN-52; at the next take-in, Open findings "From DOCS-54" applies)
-- **Last update:** 2026-11-17 17:14 UTC (DOCS-54 DONE: PR #55 merged at c94c81b on his go "merge #55", main's CI
-  green, his go recorded at history.md:2228-2232; next: U4f rev 3, the block "NOW (2026-11-16)")
+- **Last update:** 2026-11-17 17:24 UTC (DOCS-54 DONE: PR #55 merged at c94c81b on his go "merge #55", main's CI
+  green, his go recorded at history.md:2228-2232; U4f's brief rev 3 RUNNING, workflow wf_e78b24a2-736: the block
+  "NOW (2026-11-16)")
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **NOW (2026-11-16, the day session; read this first after a compact or a cut).** Mustafa typed /compact about 09:00
@@ -399,6 +400,20 @@ it asks nothing; REFS-KIT stays.
   triggered:** #55 changed five files under docs/ only (DECISIONS, REPO_MAP, ROADMAP, STATUS, STATUS_ARCHIVE; no
   code, CI or rules by history.md:2084-2085's list), so main is not taken in now; the line written here before ("take
   main in") was wrong and is corrected. At the next take-in, Open findings "From DOCS-54" applies.
+  **U4f's brief rev 3: RUNNING from 17:23 UTC, workflow wf_e78b24a2-736** (task wmf27fxdc; script
+  npt-u4f-brief-r3-wf_e78b24a2-736.js under the session's workflows/scripts/; the night's rev 2 at 34a2e55, cites at
+  11fd190): Draft (general-purpose acting as netcode-architect, xhigh: u4f-brief.md in the notes folder, notes
+  u4f-brief-r3-notes.md), Check (test-engineer and security-auditor in parallel, xhigh, read only:
+  u4f-brief-r3-check-te.md and u4f-brief-r3-check-sa.md; scratch scripts under u4f-r3/), one Revise (rev 3.1). The
+  brief folds his words since the night plan by placeholder (history.md:2131-2232), his 13:35 rule (:2125 a new or
+  changed bar comes to him under Decisions needed before it is built; :2127 the reviewer's read), the command-forms
+  rule (:2187), KEPT-LOGS §11, C62H-BOUND and U3C-HELD-1 as merged, and the deferred Lows (U4f takes one only where it
+  opens that file). Agents build and run nothing; at most two run at once. **If cut:** `Workflow({scriptPath,
+  resumeFromRunId: "wf_e78b24a2-736"})`; each agent continues after its notes' last complete block. **On return:** read
+  the change list, every finding rated Medium or higher, the open questions and the bar changes in full (USAGE-SAVINGS
+  (a)); then the D-items that must run before the advisor; then the advisor's check of the brief with U4F-Q1-Q16 (its
+  own workflow, as U4r's wf_95beab47-c57); any new or changed bar goes to him under Decisions needed. The 2-hour
+  check-in trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (next 18:34 UTC).
   **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
