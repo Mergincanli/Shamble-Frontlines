@@ -1,15 +1,12 @@
 // Checks that every quoted span in a doc is in the sources, word for word (white space aside).
-//   node .checkpoints/cs0-model-rules/quotes-check.mjs <doc.md> [--allow "<name>" ...]
+//   node .checkpoints/part-15-to-main/quotes-check.mjs <doc.md> [--allow "<name>" ...] [--source <file> ...]
 // A span is the text between two straight double quote marks (the odd pieces when the text is split at the marks;
 // a quote inside a quote keeps the count right). Spans shorter than 12 characters and the allowed names are skipped.
 import { readFileSync } from 'node:fs';
 const args = process.argv.slice(2); const doc = args[0];
 const allow = new Set(); for (let i = 1; i < args.length; i++) if (args[i] === '--allow') allow.add(args[++i]);
-const N = '.checkpoints/build-plan-slice-1/', C = '.checkpoints/cs0-model-rules/';
-const sources = [N + 'mustafa-2026-11-14-task.md', N + 'mustafa-2026-11-14-addition.md', N + 'mustafa-2026-11-17-go.md',
-  C + 'mustafa-2026-11-17-2020.md', C + 'mustafa-2026-11-17-2058.md', C + 'mustafa-2026-11-17-2133.md',
-  N + 'inputs/ART_BRIEF_2026-11-14_1635_conscript_stand_in.md', N + 'inputs/ART_BRIEF_ADDITION_2026-11-15_poses_yard.md',
-  N + 'inputs/ART_BRIEF_2026-11-15_1735_smg_stage1.md', N + 'inputs/ART_BRIEF_CORRECTION_2026-11-15_1840_gun_poses.md',
+const P = '.checkpoints/part-15-to-main/';
+const sources = [P + 'mustafa-2026-11-17-2306.md', P + 'mustafa-2026-11-17-2357-merge-56.md', P + 'part-15-the-second-lane.md',
   ...args.filter((a, i) => i > 0 && args[i - 1] === '--source')];
 const flat = (s) => s.replace(/\s+/g, ' ');
 const corpus = flat(sources.map((f) => readFileSync(f, 'utf8')).join('\n'));
