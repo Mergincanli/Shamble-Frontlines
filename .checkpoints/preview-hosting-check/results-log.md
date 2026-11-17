@@ -118,3 +118,12 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
 - Attempt 2's verify artifact `headers-44171977539` (id 14369802505, digest sha256:9a38c73cece4..., equal to the
   downloaded zip): `{"checked_at": "2026-11-17T21:07:07.678Z", ..., "records": [], "summary": {"records": 0, "pass": 0,
   "fail": 0, "no_reading": 0}}`. The same name uploaded again in attempt 2 after attempt 1's copy was deleted.
+- His words (22:12:28, ab54f723-7d7b-438b-bef8-02ccbfe60f9b): "I have also added read to the pages, and rerun the failed tasks, and its still
+  not working." (TOKEN-READ (a), done by him; no screenshot of the token's page.) Run data (get_workflow_run:
+  run_attempt 5, conclusion failure): attempt 3, deploy job 134390099209 created 21:41:38, started 21:42:05, upload
+  failed 21:42:18-20; attempt 4, deploy job 134400842206 created 21:59:30, cancelled 21:59:45 (never started);
+  attempt 5, deploy job 134402686180 created 22:02:34, started 22:08:53, upload failed 22:09:13-15, run with debug
+  logging (his paste of the log: the secrets evaluate to '***', `github.sha` 64dcf68505f5..., the same two errors,
+  Wrangler's log file named 2026-11-17_22-09-14). Verify failed in attempts 3, 4 and 5; each uploaded its artifact.
+  So, with Read added, the same two errors: the permission is ruled out as the cause (the test told to him, consultation
+  11); left: the account ID or the token itself.
