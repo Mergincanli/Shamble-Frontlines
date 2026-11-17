@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 (see the save log)
+- **Last update:** 2026-11-17 20:08 UTC (his message; the save log has the save time)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -239,6 +239,17 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      "View" (no value on screen); "Origin CA key (deprecated)". So no user token exists either: the branch "if none,
      he goes straight on" applies (steps 2 to 4 of my message of 2026-11-17 after consultation 8). The source of
      Sunday's CLOUDFLARE_API_TOKEN value is still unanswered (step 4); no guess is made to him.
+
+   - His message 2026-11-17 20:08:34 UTC (06cba839-a639-4123-b074-c064af987c52), word for word: "i'm stuck at step 2, I only have these options
+     for premissions". His screenshot: the token form with the name `shamble-preview-check-deploy`, the note
+     "Selectable permission groups are limited to actions based on your account membership roles.", and "Permission
+     policies" as template tiles ("Start from scratch" tagged "Custom", "Full account and zone access", "Create Account
+     Tokens", "Developer Services" 19 permissions, "Edit Cloudflare Workers" 11, "Read all resources" 200, "Write all
+     resources" 173, "Zone Administration" and others): not the plan's three boxes (A5 step 3). The Workers CI page
+     (Oct 18, 2026, infra-engineer-docs.md:77) says "Under Permission policies, open the Custom dropdown". He is told:
+     "Start from scratch" (Custom), no template (each gives more than the one permission), pick nothing more, send the
+     next screen. A web-fetch agent (model opus, effort high, launched 20:09:13 UTC) reads Cloudflare's docs on this
+     form.
 
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
