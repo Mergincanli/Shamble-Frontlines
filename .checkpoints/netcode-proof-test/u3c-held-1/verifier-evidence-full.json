@@ -1,0 +1,113 @@
+{
+ "result": "PASS. Every number, hash, count, assert message, left value and line number I checked is backed by the logs in /home/user/Shamble-Frontlines/.gate/u3c-held-1/ and by git. Two extra checks back it further. First, the fixed commit's spike diff hashes to a7199f7a, the same diff hash every fixed-tree evidence log shows in its header. Second, each of the five planted bugs, rebuilt from 0ad9661's delay.rs plus that one edit alone, hashes to the delay.rs hash in its plant log's header, and that proves every restore. There are two Low wording notes and no FAIL. I ran no cargo, no check.mjs, no main-run.sh and no git command that writes.",
+ "claims": [
+  {
+   "claim": "L1: 189 runs, 188 exit 0, 1 exit 101 at loop 1 run 94; G-NC2 the only failing test",
+   "where": ".gate/u3c-held-1/l1.log:202-232, :279-284; l1-1-94.log:116, :237-241",
+   "found": "grep -c counts: 189 run lines (loop 1 ran 94, loop 2 ran 95), 188 exit 0, 1 exit 101 at l1.log:202 (09:47:43). The run's summary: 'FAILED. 168 passed; 1 failed; 12 ignored'. l1-1-94.log has one FAILED line, G-NC2, plus 168 ok and 12 ignored. The log ends 'end 09:48:12 UTC ... first failure: 1-94' and 'exit 101', and the last df did not run. The header shows HEAD e85fdba, the binary npt_net-ed8673eeeaf4db12 (04c76dc4) and D-1's hashes (b70ab4e5 and 2ccaccc3).",
+   "holds": "yes"
+  },
+  {
+   "claim": "L1 stdout as build.md quotes it: samples above the bound [1, 0]; D-1 [1, 0] / at writes [0, 0]; largest excess 14326 B; panicked at :2302 (HEAD's :2300); left [1, 0], right [0, 0]",
+   "where": "l1-1-94.log:188-193; git show 0ad9661^:.../delay_tests.rs:2300",
+   "found": "The stdout line matches build.md word for word. The panic is at delay_tests.rs:2302:5 with left [1, 0] and right [0, 0]. In the parent commit, line 2300 is that assert_eq!(life.held_over_bound, [0, 0]). The parent's hashes (aaa6a588 and 74d49de7) equal build.md's restore facts.",
+   "holds": "yes"
+  },
+  {
+   "claim": "E3a: 600 of 600 exit 0, each '1 passed; 0 failed'; binary npt_net-ed8673eeeaf4db12; fixed hashes",
+   "where": "e3a.log (616 lines) and its 600 per-run logs",
+   "found": "600 run lines, 600 exit 0, 0 non-zero and 600 'ok. 1 passed; 0 failed'. Each loop ran its runs 1-300 with no repeats. Every per-run log shows 'running 1 test', the test is G-NC2 and the result is ok; there is no FAILED or panicked anywhere. The header shows delay.rs 3dbbccf7, delay_tests.rs 8f8c0f9a and diff a7199f7a. The log ends 'end 11:12:33 UTC; first failure: none', exit 0.",
+   "holds": "yes"
+  },
+  {
+   "claim": "E3b: 600 of 600 exit 0, the stalled-client test alone",
+   "where": "e3b.log (616 lines) and its 600 per-run logs",
+   "found": "600 of 600 exit 0, 0 non-zero, 600 '1 passed; 0 failed'. All 600 per-run logs ran a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded and nothing else. Same binary and hashes as E3a; start 11:13:04, end 11:20:49, first failure: none.",
+   "holds": "yes"
+  },
+  {
+   "claim": "E3c: 20 of 20, each '169 passed; 0 failed'",
+   "where": "e3c.log (36 lines)",
+   "found": "All 20 run lines read 'exit 0 ... ok. 169 passed; 0 failed; 12 ignored'. Same binary and fixed hashes; the test binary's sha256 is 2cf1e962 in E3a, E3b and E3c alike. The log ends at 11:28:05 UTC, first failure: none, exit 0.",
+   "holds": "yes"
+  },
+  {
+   "claim": "The tree tested is the tree committed",
+   "where": "E3 / E5 / light.log headers; git diff 0ad9661^ 0ad9661 -- . (run from spikes/netcode-proof)",
+   "found": "The commit's diff hashes to a7199f7aa9bfcf80..., equal to the diff hash in every fixed-tree log header. The test-time HEADs differ from 0ad9661^ under spikes/ only by one results list (978202d's raw-logs.sha256), which is not code.",
+   "holds": "yes"
+  },
+  {
+   "claim": "E4: P1-P5 each exit 101 with the failing tests, messages and left values in build.md; each restored by the fixed hashes",
+   "where": "p1.log-p5.log, p1-1-1.log-p5-1-1.log; fixed delay_tests.rs :782 :787 :2290 :2308 :2313",
+   "found": "P1: 167 passed / 2 failed; the stalled-client test at :782 ('...at every write') [1, 0] and G-NC2 at :2308 [1, 0]. P2: 168/1; G-NC2 alone at :2308 [121, 0]. P3: 167/2; the stalled-client test at :787 ('held only falls between writes') [134, 0] and G-NC2 at :2313 [1144, 0]. P4: 167/2, 39.31 s; the stalled-client test at :787 [137, 129] and G-NC2 at its hang guard :2290:9 ('186 records, largest excess 0 B, 48 first losses'). P5: 168/1; the stalled-client test alone at :782 [0, 172]. No other test failed in any run. Each plant's header hash equals 0ad9661's delay.rs plus that one edit (091957eb, 0e65d301, dfbf8d2d, 7b41e90a, 09e3fb98), which proves the restores after P1-P4. e5.log's header diff a7199f7a proves the restore after P5. The results match the plan's table (plan :154-158).",
+   "holds": "yes"
+  },
+  {
+   "claim": "E5: npt-lab sha256 98c3967e..., equal to the earlier log's",
+   "where": "e5.log (36 lines); .gate/u4r/c62h-bound/preflight.log:24",
+   "found": "The release build exited 0 (11:33:54-11:34:23) on header diff a7199f7a and gave npt-lab 98c3967e04e4260985d24173b1fb2126ea1444636f4725e12cf76333d90b5113. The earlier log is preflight.log:24 (2026-11-16 20:45:36 UTC, HEAD ea08f89, clean tree), with the same hash. A search of the *.log files under .gate/u4r, u3c-held-1, u4e and u4r-d4 finds only these two logs.",
+   "holds": "yes"
+  },
+  {
+   "claim": "E6: every item of build.md's 12:18 bar",
+   "where": "counted.log (29 lines, read whole)",
+   "found": "Header: HEAD 0ad9661, diff and untracked e3b0c442, free 5552 MiB. All 11 steps PASS: fmt, clippy, clippy-wasm32, doc; test 552 / 632 passed, 0 failed, 0 skips; deps '137 crate files and 1 cargo config'; wasm 27000 ticks, 0 mismatching, in both comparisons; refs 1382 tracked files (equal to git ls-tree at 0ad9661); marks 81; self 78 of 78; redact 10 of 10, 306 items, 0 findings. Then 'check: all 11 steps pass', 'exit 0: node check.mjs' at 12:34:46 and '--- end 12:34:46 UTC, exit 0'. Free after: 5,781,766,144 B, 38.4 MiB used net. The fix adds no #[test], and 552 / 632 equal the counts of C62H's second call.",
+   "holds": "yes"
+  },
+  {
+   "claim": "Fix commit: 3 files, 74 insertions, 42 deletions; every changed non-doc line under #[cfg(test)]",
+   "where": "git show --stat / git show 0ad9661",
+   "found": "delay.rs 73, delay_tests.rs 39, SERIES.md 4; 74 insertions and 42 deletions in all. In delay.rs the non-doc changes are: held_now's call, under its existing #[cfg(test)]; two new fields in Life, which is #[cfg(test)]; check_held_bound(d) and check_held_falls, both #[cfg(test)] fns; and the new '#[cfg(test)] self.check_held_bound(dir);' in model_write. Everything else is //! or /// doc. delay_tests.rs is a #[cfg(test)] module (delay.rs:1915-1917). SERIES.md: two table rows, doc only. The message equals fix-commit-msg.txt.",
+   "holds": "yes"
+  },
+  {
+   "claim": "The three files' sha256 at 0ad9661 equal build.md's fixed hashes",
+   "where": "git show 0ad9661:<path> | sha256sum",
+   "found": "delay.rs 3dbbccf73d9c5735..., delay_tests.rs 8f8c0f9ab42c17ed..., SERIES.md 1dd67e2f2db8e3c5...: all equal. The working tree has the same hashes, and aab3712 differs from 0ad9661 only in .checkpoints/.",
+   "holds": "yes"
+  },
+  {
+   "claim": "D-1's names (over_waiting, over_at_write) appear in no commit",
+   "where": "git log --all -S over_waiting / -S over_at_write; git grep at aab3712 -- spikes",
+   "found": "Each search lists 6 commits (3a28107, 43a6f1f, 801d284, ed15263, ec70096, 6d24666). Every one touches only .checkpoints/ notes and has 0 hits under spikes/. git grep at aab3712 under spikes/ finds nothing, and neither does the working tree. So D-1's code was never committed, as build.md and the commit message say; but the literal 'no commit' is false, since notes commits name the fields.",
+   "holds": "yes (as code); no (literally): see VER-UH1-2"
+  },
+  {
+   "claim": "The commit message's other claims: the first counted run of C62H-BOUND; 1,220 runs; reviews 1 Medium + 12 Low; C1-C10; lab hash unchanged; fmt/clippy/doc PASS; check in both directions",
+   "where": "c62h-bound-build.md:428-435; review JSONs; advisor-plan-review-full.json; light.log; delay.rs:829-830, :1597, :1615, :635",
+   "found": "All hold. 600+600+20 = 1,220 runs. NA-UH1-1 is the one Medium; there are 3 NA, 7 TE and 2 RR Lows; the review files hash 015aa739, 834bf936 and ac2cf470. The plan review is APPROVE WITH CONDITIONS C1-C10 (627bfc6c). light.log: fmt, clippy and doc PASS, exit 0. Both directions extend the held bytes, then call model_write, which calls check_held_bound. The one weak point is the wording 'run 94 of 189' (VER-UH1-1).",
+   "holds": "yes"
+  },
+  {
+   "claim": "build.md after aab3712: CI green on aab3712 (4 runs)",
+   "where": "build.md 12:48 line; gh run view",
+   "found": "gate push 44084854535 and gate pull_request 44084863595: success, each with its gate and smoke jobs. toolchain 44084854552 and 44084863752: success. All four ran on aab3712. The remote is now at 9f415dc; every commit after aab3712 touches only notes.",
+   "holds": "yes"
+  },
+  {
+   "claim": "Gate --no-smoke (this run)",
+   "where": "node tools/gate.mjs --no-smoke",
+   "found": "Base 82c605e. Checks 1-4 and 5b-5d PASS, 5a skipped. Symbols +0 -0; 51 editor-only references, all guarded.",
+   "holds": "yes"
+  }
+ ],
+ "findings": [
+  {
+   "id": "VER-UH1-1",
+   "severity": "Low",
+   "what": "'caught the failure in run 94 of 189' (in the fix commit's message and in 801d284's subject) reads as the 94th run overall. It was loop 1's run 94 out of two loops running side by side, and it finished 188th of the 189 runs.",
+   "evidence": "l1.log:202 '09:47:43 loop 1 run 94 exit 101'; l1.log:201 loop 2 run 94 finished at 09:47:42; loop 2 run 95 finished at 09:48:12 (l1.log:278).",
+   "fix": "In the report, write 'loop 1's run 94 (two loops, 189 runs in all)'. The commit stays as it is (no history rewrite)."
+  },
+  {
+   "id": "VER-UH1-2",
+   "severity": "Low",
+   "what": "'D-1's names appear in no commit' is literally false: six notes-only checkpoint commits name over_waiting and over_at_write. D-1's code was never committed.",
+   "evidence": "git log --all -S over_waiting and -S over_at_write: 3a28107, 43a6f1f, 801d284, ed15263, ec70096, 6d24666; each touches only .checkpoints/ and has 0 hits under spikes/; git grep at aab3712 under spikes/ finds nothing.",
+   "fix": "In the report, write 'no commit's code (nothing under spikes/) holds D-1', the build record's own wording, not 'no commit'."
+  }
+ ],
+ "gate_last_line": "GATE PASS (5a smoke skipped: --no-smoke)",
+ "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u3c-held-1/verifier-evidence.md"
+}

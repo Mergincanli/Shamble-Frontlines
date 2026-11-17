@@ -322,13 +322,17 @@ it asks nothing; REFS-KIT stays.
   test 552 / 632 passed, 0 failed, 0 skipped; refs 1382; marks 81; self 78 of 78; redact 10 of 10, 306 items, 0
   findings; deps 137 crate files; wasm 27000 ticks, 0 mismatching both ways; free 5,552 → 5,514 MiB. **Step 8: the
   gate PASS** (12:35 UTC, --no-smoke; legacy/ unchanged); **the save aab3712 pushed 0ad9661 at 12:37 UTC** (head
-  aab3712fca3af64b25169af1f4ee75c01a0411cd; no [skip ci], CI runs). The saver bxvsewbnz from 12:37 UTC. **RUNNING from
-  about 12:38 UTC: step 9's review, workflow wf_dd3fb0a8-14f** (task wm6pj3acx; its script under the session's
-  workflows/scripts/u3c-held-1-head-check-wf_dd3fb0a8-14f.js): the advisor (a general agent on main's advisor.md,
-  xhigh) on head aab3712fca3af64b25169af1f4ee75c01a0411cd, CI included, and the verifier's evidence check (xhigh); both
-  read only, notes u3c-held-1/advisor-head-check.md and verifier-evidence.md. If a cut stops it: resume by
-  resumeFromRunId with the same script. Next: save both results word for word from its journal, read them in full,
-  CI on aab3712 by the GitHub MCP tools; then U3C-HELD-1 closes on the card. **DOCS-54 BUILD STARTED (12:41 UTC):** the
+  aab3712fca3af64b25169af1f4ee75c01a0411cd; no [skip ci], CI runs). The saver bxvsewbnz from 12:37 UTC. **Step 9
+  DONE: CI green on aab3712** (gate 44084854535 push and 44084863595 pull request, each with gate and smoke jobs;
+  toolchain 44084854552 and 44084863752) and **the review, workflow wf_dd3fb0a8-14f (12:38-12:53 UTC; saved word for
+  word by u3c_held_1_head_full.py and read in full): the advisor APPROVE WITH FINDINGS of
+  aab3712fca3af64b25169af1f4ee75c01a0411cd** (advisor-head-check-full.json, 31 lines, a31ed50a…; C1-C10 met, C9's
+  report half by the close report; three Lows, ADV-UH1H-1 to -3, all met at this close: the close report and the Open
+  findings entry for the eight deferred Lows, the third pack's entry under Key numbers, the plan's hash after the fix
+  pass d6801289… recorded) **and the verifier PASS** (verifier-evidence-full.json, 113 lines, 174ca715…; 15 claims
+  checked, all backed; two Lows, VER-UH1-1 "loop 1's run 94 (two loops, 189 runs in all)" and VER-UH1-2 "no
+  commit's code holds D-1", worded in the report). **U3C-HELD-1 CLOSED (12:58 UTC):** the close report
+  u3c-held-1/u3c-held-1-report.md; Open findings updated. **DOCS-54 BUILD STARTED (12:41 UTC):** the
   worktree .gate/docs-after-54-wt on claude/docs-after-54 from origin/main 82c605e (`git worktree add -b`, named first,
   no prompt); its checkpoint .checkpoints/docs-after-54.md there, not yet committed (the first push is a named asking
   call). The copy script docs-54/copy_words_54.py, written and checked in memory: ALL CHECKS PASS (12:38, and again at
@@ -3969,6 +3973,15 @@ free:
 
 ## Open findings
 - **From C62H-BOUND (2026-11-16; the advisor's merge-stop ruling advisor-c62h-bound-merge-stop-full.json, C3-C4):**
+  - **U3C-HELD-1: CLOSED 2026-11-17 on aab3712fca3af64b25169af1f4ee75c01a0411cd** (the fix 0ad9661, test code only;
+    the advisor's APPROVE WITH FINDINGS of that head, the verifier's PASS, CI green; the close report
+    u3c-held-1/u3c-held-1-report.md). **Its deferred follow-ups (Low; taker: the next change to delay.rs,
+    delay_tests.rs or SERIES.md; deferred in writing at u3c-held-1/build.md:116-122):** NA-UH1-3 (the assert message
+    says "only falls", the check counts "above the latest write"), NA-UH1-4 (the up part's wording; Life's "largest
+    excess" kept at writes; check_held_bound's "the only place they grow"), RR-UH1-1 (a message on the post-hold
+    Pending assert), RR-UH1-2 (the same up wording in SERIES.md), TE-UH1-1's strict variant (`held_at_write[d] =
+    held_at_write[d].min(len)`), TE-UH1-6 (assert both counts again before drop, in a shared helper), TE-UH1-7 ("a few
+    seconds" is about 16 s), and the loop script's failure-list print (TE-UH1-2's reuse fix). The entry as opened:
   - **U3C-HELD-1 (Medium; taker: the main session, as its own planned change, plan first with the advisor, reviewed by
     netcode-architect and test-engineer; planned and merged before another lane's counted check.mjs run, U4f's merge
     at the latest):** "G-NC2's held-bound check (delay.rs:528-543) counts a release transient as over the bound". It
@@ -4110,6 +4123,15 @@ free:
   read back: 11 of 11 files equal the list (path, bytes, sha256)"; "kept-logs: removed:
   .gate/netcode-proof-test/runs/u4r-P2-ab10f058a828"; "kept-logs: free after: 6455 MiB" (572 MiB back; the brief said
   about 560).
+- **KEPT-LOGS, the third pack (U3C-HELD-1's step 5: free 4,951 MiB under its 5,220 MiB bar; Mustafa's PACK-READ (a)
+  of 2026-11-17 10:43 UTC, history.md:2204-2227; the C62H-BOUND brief's section 8.1 procedure): u4r-B1-64f3307d5c7f**
+  (ADV-UH1H-2). The set's closed ruling: advisor-u4r-sets-r2-full.md:45; its results at 73060fd. No process running
+  (pgrep exit 1). List: 11 files, 860,377,134 bytes; the spike's redact step on it 306 items, 0 findings; committed
+  alone and pushed at 978202d. Pack 11:56:19-11:56:59 UTC (the transcript's tool result at 11:56:59.737Z; no pack
+  log): "kept-logs: free before: 4950 MiB"; "kept-logs: archive:
+  .gate/netcode-proof-test/kept-logs/u4r-B1-64f3307d5c7f.tar.gz, 227889786 bytes from 860377134; read back: 11 of 11
+  files equal the list (path, bytes, sha256)"; "kept-logs: removed: .gate/netcode-proof-test/runs/u4r-B1-64f3307d5c7f";
+  "kept-logs: free after: 5553 MiB" (603 MiB back). P3 not packed: the 5,220 MiB bar held.
 - Hetzner, excl. VAT, read 2026-11-05 (infra digest D): CCX23 EUR 0.1386/h, CAX21 EUR 0.0176/h (plan prices include
   IPv4); 1 RS + 1 LG = 0.1562/h; each VM rounds up per session; RS<->LG traffic internal and free.
 - Rust stable 1.99.1 (2026-10-13; static.rust-lang.org answers 200); container has 1.97.0, x86_64 target only.
