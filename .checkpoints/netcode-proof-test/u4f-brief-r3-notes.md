@@ -106,5 +106,18 @@ Head read: 8afcc11b63906d3660b21613deb0729bdd8937bc (2026-11-17 17:15 UTC). Fres
   P1-P36 anchors each found once (lines in the script's output: P1 :507-540, P3 :223-228, P9 :180-183, P35
   :1138-1142, history P15 :2125, P16 :2127, P17 :2187, P18 :2048-2051, P19 :2141, P20 :2143-2146, P21 :2175, P22
   :2212, P23 :2216).
+- B6 plan: write u4f-brief.md in four parts (W1 header, change list, counts, s0, s1; W2 s2-s3; W3 s4-s7; W4 s8-s12 and
+  the NA table), each appended by Edit at the marker line `<!-- r3: next part -->`; a line here after each.
+  Decisions taken for rev 3: Q17 new (carry 80 (a)'s route); Q6 (e) room pings; Q8 (iii) lead bound to him; Q1 (d)
+  RR-UH1-2 leave (rec.); Q1 (a) drops rss writer; NA-14 (input_missing by stamp), NA-15 (Room::leave drops counters),
+  NA-16 (-47 vs carry 75's bound); new tests f34 (NA-14), f35 (NA-15, neg); f29 asserts no refused admission; f16 the
+  same tick set. Counts: measured +102, bites +117, neg 61. Bars for him: 0 by the recommendations; 1 recommended
+  (the lead bound's value, -21 fast clock); 3 conditional (-21: Q15 (b), Q14 (c), Q11 (iii) (a)). Judge: none.
+- B6 W1 DONE (header, change list C1-C28, counts, s0 0.1-0.5, s1). W2 DONE (s2.1-2.13, s3). Fix at the end: C24
+  and the counts row say "24 hold, 9 changed" but the walk is 25 hold, 8 changed (rows 10, 19, 20, 22, 27, 28, 29,
+  31 changed).
+- B6 W3 DONE (s4 build rules with SIZE-CHECK table, s5.1-5.6 with the bar table B1-B7, s6, s7). Quote of the
+  C62H-BOUND stop rule in 2.9 and s1 item 5 replaced by cites (no retyped adopted words). Next W4: s8 (45 rows), s9
+  (9.1 open items, 9.2 deferred Lows), s10 Q1-Q17, s11 D1-D15, s12, NA table.
 - Planned size estimate (B6 input): client ~700, room ~950, bots ~650, lab ~1,400, sim bites ~40, SERIES rows ~25,
   run scripts ~600: about 4,400 added lines (range 3,500-5,500); his SIZE-CHECK stop for an M unit: past 6,000.
