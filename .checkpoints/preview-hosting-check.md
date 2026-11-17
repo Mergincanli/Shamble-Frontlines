@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 20:22 Amsterdam (19:22 UTC)
+- **Last update:** 2026-11-17 (see the save log)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -232,6 +232,13 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      2026-11-16 12:34:49 UTC); a screenshot of `preview`'s secrets list with a fresh "Last updated" on it; and where he
      copied both secrets' values from on 2026-11-15 (source only; the account ID re-pasted from Account Details if it
      came from anywhere else).
+
+   - His screenshot (user message 2026-11-17 20:05:58 UTC, f8a6f32c-b1e7-43c2-84aa-02d5434d0427), with his words "the only key I see in Api
+     Tokens page is the Global API Key (showing you the screenshot, no worries it doesn't show the key)": Cloudflare's
+     "User API Tokens" page; under "API Tokens": "No API tokens"; under "API Keys": "Global API key" with "Change" and
+     "View" (no value on screen); "Origin CA key (deprecated)". So no user token exists either: the branch "if none,
+     he goes straight on" applies (steps 2 to 4 of my message of 2026-11-17 after consultation 8). The source of
+     Sunday's CLOUDFLARE_API_TOKEN value is still unanswered (step 4); no guess is made to him.
 
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
