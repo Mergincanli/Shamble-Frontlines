@@ -15,7 +15,7 @@
      checkpoints (`build-plan-slice-1*`, `cs0-model-rules*`) in its last commit before the PR is marked ready.
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs0-model-rules) · **Base:** main
   c94c81b440c77f7979e0f944a5341319f9a57d1b (to take in first; the branch still sits on 4460ef5 plus checkpoint commits)
-- **Last update:** 2026-11-17 22:04 CET (from the clock)
+- **Last update:** 2026-11-17 22:05 CET (from the clock)
 
 ## Steps done
 1. His go received (user message of 2026-11-17T19:10:44Z, saved by script, 10,544 bytes). The session's model read
@@ -103,6 +103,12 @@
     move to `docs/research/` with the index rows, the rows go into ADR 0005. Then commit 4 (docs-keeper), the
     reviews on the final diff (engine-architect, test-engineer, the verifier), commit 5 (the report, the deletion
     of the checkpoints), the advisor agent on the final head, the pull request.
+
+23. (21:05 UTC) The draft pull request is open: #56 (https://github.com/Mergincanli/Shamble-Frontlines/pull/56).
+    Checks run here: `node tools/gate.mjs --no-smoke` PASS (checks 1 to 4, 5b to 5d); the gate's browser smoke test
+    (5a) cannot start in this container (the gate's pinned Playwright looks for Chromium build 1194, the container
+    has 1243, and no other browser is installed here): CI's `smoke` job runs it. `repo-map-check.mjs`: OK before the
+    new files. `cd tools && npm ci` was run once for the gate's dependencies (nothing tracked changed).
 
 ## Next steps
 1. Change-set 0's own short plan at `.checkpoints/cs0-model-rules/plan.md`; the advisor agent's review of it (effort

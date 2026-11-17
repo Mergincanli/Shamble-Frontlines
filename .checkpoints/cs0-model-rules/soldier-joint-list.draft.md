@@ -121,3 +121,103 @@ armature before export (AER AX-R14), and vertex groups carry the joint names exa
 - The brief's (L, F, U) is glTF (x, y, z) = (L, U, F) (A4:11; spec:732, AER AX-F1) and Blender (x, y, z) = (L, -F,
   U) (A4:73): the left shoulder (0.19, 0, 1.44) is glTF (0.19, 1.44, 0). The brief's capital `_L`/`_R` are part
   names, gone once the parts are joined; only joint names follow section 1's rules.
+
+## 4. Sockets on a gun, and how the hands meet them
+**Names:** `socket_grip`, `socket_support`, `socket_muzzle`, `socket_sight`, `socket_eject` (A3:46; A10:25). Each
+gun's entry lists the sockets its file has, and the check asks for those (AER AX-R11, mark 7): the rifle file has
+four (A3:43), the SMG five (A3:46). Every held gun lists grip, support and muzzle, because the two hands and the flash
+need them (A10:5; A3:45). Sockets are cosmetic: a shot's start is simulation data (A10:29; AP-1, 0005:1549-1555).
+**Axes, one rule.** A socket is an empty node without a mesh. In glTF (the gun's frame: +Y up, +Z to the muzzle, +X
+the gun's left, origin at `socket_grip`: A6:11; AER AX-R6) a socket's local +Z is the direction it points, its local
++Y its up at right angles to +Z, and +X completes a right-handed frame. Grip, support, muzzle and sight point along
+the bore with the gun's up: rotation identity, only their positions differ (`socket_grip` at the origin: A6:11).
+`socket_eject` points where the case flies: for the SMG, "right and 20 degrees up" (A6:40) gives +Z =
+(-0.940, 0.342, 0) and +Y = (0.342, 0.940, 0) in the gun's axes [computed: cos 20° = 0.940, sin 20° = 0.342].
+**In Blender** (the gun modelled Z up, muzzle toward -Y, its left +X: A6:14) the exporter turns Blender -Y into glTF
++Z and +Z into +Y: confirmed for locations, inferred for rotations (AER AX-F11). So in Blender a socket's direction is
+its local -Y and its up its local +Z: the grip, support, muzzle and sight empties keep identity rotation, and the
+SMG's eject empty is turned until its -Y points along (-0.940, 0, 0.342) and its +Z along (0.342, 0, 0.940). Because
+the rotation step is inferred, a real Blender export of an empty turned 5 degrees must read back within 0.5 degrees
+(AER mark 7's planted defect) before Blender files rely on this rule; the script-written rifle file cannot prove it
+(AER mark 7, "Proven on").
+**How the hands meet the gun.** The rule is the correction's and Mustafa's: a pose sets where `socket_grip` sits,
+which way the gun points and how far the chest turns; the right hand is on `socket_grip`, the left on
+`socket_support`; the butt and the muzzle follow from the gun's file (A10:5; A3:44). The pose numbers are change-set
+10's.
+- Right hand: `upper_arm_r` → `lower_arm_r` → `hand_r`, onto `socket_grip`. Left hand: `upper_arm_l` → `lower_arm_l`
+  → `hand_l`, onto `socket_support` (A10:5), one point in place of legacy's rail slide (CC9, LI:139). Legacy solves
+  both the same way (G:415-416).
+- The fist, not the wrist, meets the socket (GA3, LI:220; G:243): the hand's point lies `palm` metres beyond the hand
+  joint (the wrist) on the lower arm's line, so the IK's second bone is lower arm + palm (G:415). `palm` is one number
+  per soldier for both hands (legacy measures one, G:247), kept in the soldier model's entry, not as a bone (BP Part
+  11, rule 21); the check compares it with the centre of the vertices weighted to `hand_r`, within 1 cm, GA8's own
+  hand target (LI:225) [proposal]. The brief's hand centre lies 0.057 m beyond the wrist, within 4 mm of the
+  forearm's line [computed from A4:36, 40], so the rule fits the brief; the correction's reach, "0.62 from the
+  shoulder joint to the middle of the hand" (A10:5), is upper arm + lower arm + palm: 0.307 + 0.272 + 0.057 = 0.636 m
+  for the brief's arm [computed from A4:36, 40].
+- The hand's turn: `hand_*` keeps its rest turn in the hold, as in legacy (G:413), unless change-set 10 aligns it to
+  the socket; under AER's O1, way (b), `hand_r` carries the gun, so change-set 10 sets its turn from the gun. The list
+  is the same either way.
+- What carries the gun: in legacy's default soldier, `chest` (C:453, 697), so breathing, recoil and the flinch move
+  gun and hands together (GA7, GA12: LI:224, 229); the correction's poses, given in the soldier's frame, convert into
+  the chest's frame at their own chest turn [inferred]. Change-set 10 may choose another joint of the list.
+- Change-set 10's pose needs and the joints that carry them: the chest turned against the hips by 45 and 30 degrees
+  with the head facing forward (A10:10, 16, 18): `spine` + `chest`, with `head` turning back; the body leaning 10
+  degrees forward (A10:12, 20): `spine` (legacy's lean, G:364), or `hips` if the whole body leans; the left hand
+  reaching `socket_support`: the left arm chain plus `palm`.
+
+## 5. The soldier's origin and facing: a check a file passes or fails
+Read in the file's bind pose; the file passes only if every line holds (axes: A4:11; AER AX-R5; spec:732, AER
+AX-F1). AER mark 10 runs these lines.
+1. Upright: `head` above `chest` above `hips` above both feet, by joint height (glTF y). A Z-up file read as Y-up
+   fails.
+2. Front +Z: for each foot, the centre of the vertices weighted to `foot_*` lies ahead of the foot joint (larger z):
+   the toes point forward (A4:34: heel F -0.08, toe F 0.20).
+3. Left +X: every `_l` joint has x > 0 and every `_r` joint x < 0. With line 2 this catches a file turned round
+   (both fail) and a mirrored one (line 3 fails).
+4. Origin on the ground between the feet: the lowest vertex at y = 0 within 1 mm [proposal]; the mid-point of the two
+   foot joints at x = 0 within 1 cm [proposal]; z = 0 lies between the heel's and the toe's z.
+5. One root: `hips` is the only joint without a joint parent; the mesh node and every non-joint node above `hips` are
+   identity, and each joint's rest transform equals its bind pose (from the inverse bind matrices), within 0.5
+   degrees (as in AER mark 7) and 1 mm [proposal], so the stand-in and the model hand the engine the same lengths and
+   frames.
+Planted files that must fail [proposal]: turned 180 degrees, mirrored, Z-up, origin moved 1 m; the unweighted vertex
+is AER mark 3's planted defect.
+
+## 6. Left open, and who decides
+- Where the joints the brief does not place sit (hips, spine, chest, head, hip, knee, ankle, coat pivots): the Art
+  lead (shapes: A4:2), judged by Mustafa on the Blender model (A3:17). The stand-in may take placeholders from the
+  brief's seams; the engine reads whatever the bind pose says. For rigid weights only, the knee must sit at or above
+  the boot's top for the whole boot to follow the lower leg [inferred from A4:33]; painted weights may blend the boot
+  across the knee instead.
+- Weights beyond the rigid baseline (the ankle seam, the coat's quarters, the torso between `spine` and `chest`, the
+  scarf): the Art lead; how they look, Mustafa in the pictures.
+- Whether the coat keeps GA13's thigh-following, flare and limits: Mustafa, at change-set 10's pictures. Dropping it
+  removes the four coat joints, a list change that should land before the Blender model is exported: a model
+  exported before change-set 10's pictures would have to be rigged and exported again.
+- Joint limits and turn budgets (knee range, spine and chest turn, GA4's twist budget): change-set 10's tuning (pose
+  values are tuning: 0003:795).
+- Twist joints, or any joint the Blender model's bending would need: none in Slice 1; if the Art lead asks,
+  engine-architect rules on a list change with the advisor agent, before export.
+- Bone roll (each joint's local axes): the Art lead's; the engine must not depend on it (section 7).
+- GA9's reload targets (the gun's reload point, legacy `reload.at` C:786, and the pouch): no socket among the five
+  (A3:46; A10:25). Change-set 10 proposes data or a socket; a new socket name is Mustafa's.
+- The name of the `palm` field and the [proposal] tolerances: change-set 0's entry schema and AER's marks. Mark 7 on
+  the script-written rifle file cannot prove the Blender case of section 4: that needs a real export (AER mark 7).
+- How Blender writes the armature object (a node, or a joint: AER mark 3; AER part 8, not read): the first real
+  export shows it (the advisor agent's ruling in AER, beside mark 10).
+- GA14's death fall: Mustafa's call (0003:798); the knee is needed anyway (GA2, GA6).
+- Whether legacy's sides are mirrored (section 7): change-set 10 confirms it with one legacy test.
+
+## 7. What this list changes for change-set 10
+- **Size:** smaller and more direct. The 20 joints are the 20 transforms legacy already moves, so change-set 10
+  ports GA1-GA15 one to one by name (legacy `pelvis` → `hips`, `neck` → `head`, `hipL` → `upper_leg_l`, `kneeL` →
+  `lower_leg_l`, `shL` → `upper_arm_l`, `elbowL` → `lower_arm_l`, `handL` → `hand_l`, the load-time ankle →
+  `foot_l`, the same on the right, `gc_skFL` → `coat_front_l` and so on), and drops legacy's two load-time fix-ups
+  (the ankle re-hang, G:253-264; the palm measure, G:243-247, now data): no knee, ankle or coat to rebuild.
+- **Risk:** three port traps, each tested on the stand-in. Legacy's sides look mirrored (its `R` joints and its gun
+  at +X while it faces +Z: C:453, 492; G:2710) [inferred], so its X-signed numbers and turn signs flip once, in one
+  place. Legacy sets angles on joints whose rest turn is identity and reads lengths along -Y (G:250, 364-366), while
+  a Blender bone has a rest turn of its own [inferred], so change-set 10 turns joints through their bind-pose frames
+  and the stand-in gets non-identity rest turns to prove it [proposal]. World-to-soldier sums must include the root's
+  scale (legacy uses the facing turn only, G:357).
