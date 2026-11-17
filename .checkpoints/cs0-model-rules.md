@@ -15,7 +15,7 @@
      checkpoints (`build-plan-slice-1*`, `cs0-model-rules*`) in its last commit before the PR is marked ready.
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs0-model-rules) · **Base:** main
   c94c81b440c77f7979e0f944a5341319f9a57d1b (to take in first; the branch still sits on 4460ef5 plus checkpoint commits)
-- **Last update:** 2026-11-17 22:05 CET (from the clock)
+- **Last update:** 2026-11-17 22:07 CET (from the clock)
 
 ## Steps done
 1. His go received (user message of 2026-11-17T19:10:44Z, saved by script, 10,544 bytes). The session's model read
@@ -109,6 +109,16 @@
     (5a) cannot start in this container (the gate's pinned Playwright looks for Chromium build 1194, the container
     has 1243, and no other browser is installed here): CI's `smoke` job runs it. `repo-map-check.mjs`: OK before the
     new files. `cd tools && npm ci` was run once for the gate's dependencies (nothing tracked changed).
+
+24. (21:07 UTC) engine-architect's docs version of the ruling is done (`cs0-model-rules/soldier-joint-list.draft.md`,
+    223 lines): citations repointed to the appendix and the report (its citations of the plan checked against the
+    report: Part 11's rules 19, 20, 21 exist), P1 ruled (no node in a model file may be named `root`), P2 and P3
+    taken. It found five mismatches in the rules draft (M1 to M5): sent to graphics-engineer, which is fixing them
+    (second pass on the draft). test-engineer is still writing the mark rows.
+    The size so far (`size-count.mjs`): 413 written lines in the pushed commits (2,201 added under docs/, of which
+    1,788 copied: his words 123, the appendix's blocks 390, the plan 1,275). Still to come: the rules about 395, the
+    joint list about 223, the mark rows, the report, docs-keeper's lines: about 1,150 in all, against his stop line
+    of 1,200. The two research files have hard limits (400 and 225 lines); fixes tighten, they do not add.
 
 ## Next steps
 1. Change-set 0's own short plan at `.checkpoints/cs0-model-rules/plan.md`; the advisor agent's review of it (effort
