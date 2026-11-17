@@ -87,3 +87,14 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   runner label ubuntu-24.04) started 20:41:41, success at 20:41:49. Job `build (pr, preview, setup, preview, 1)` (id
   134353302216) 20:41:51 to 20:42:07, success. Job `deploy (pr, preview, setup, preview, 1)` (id 134353491166):
   "waiting" on `preview` from 20:42:07 (read 2026-11-17 with the GitHub MCP tool). His list sent after that reading.
+- Approval: Mergincanli approved `preview` (the run page's "Deployment protection rules", his screenshot sent
+  20:50:58: "approved 1 minute ago"); the deploy job's log starts 20:49:39. Runner image ubuntu-24.04 version
+  20261111.127.1 (Ubuntu 24.04.5 LTS). The build marker (`github.sha`, the merge commit): 64dcf68505f503df3f32ab258ca4363f240088ed.
+- The deploy job failed (exit 1) at its first call to Cloudflare. Wrangler 4.156.0 (installed: "added 38 packages in
+  5s"; Node v22.23.4): "A request to the Cloudflare API (/accounts/***/pages/projects/shamble-preview-check) failed.
+  Authentication error [code: 10000]", then, on its own follow-up lookup, "A request to the Cloudflare API (/accounts)
+  failed. Invalid access token [code: 9109]". No record was written ("No files were found with the provided path:
+  records/"). The verify job then exited 3 (no records: "no reading"). Run status: failure, 8 min 28 s; artifacts 2
+  (one `headers-44171977539`, 311 bytes). Reading: the value in CLOUDFLARE_API_TOKEN (or the account ID beside it) is
+  not what Cloudflare expects; which of the two, and why, is not known from the log (both values are masked).
+  A rehearsal finding (plan Part 3 B: a fix found here is not a re-run of a failed mark).
