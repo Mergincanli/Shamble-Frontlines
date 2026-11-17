@@ -33,3 +33,21 @@ No cut run found (no notes file existed).
   while Q7 open" not taken: open Q stops the builder; TE31-11's anchor taken as SA31-4's). Slip in form: one
   `python3 -I -c` print of the JSONs (read only, inline, not a Write-made script); from here on scripts by Write under
   u4f-r3/. Next: B4 D4 files; B5 code cites.
+- B4 done: d4-compare.md read (99,000 connects; every verdict agrees; exact-stamp mean 2.346, its bite 11.927;
+  exact lowest-RTT 4.856 sd3k 0.100; as built mean 5.975/8.867; (e) 12.781). ADR 0001:239-251 read: "from its own
+  ping samples", no pick named; Pong fields not fixed by the ADR; catalogue :91-92 (Pong 16 B doubled to 32 B; status
+  Proposed, spike design doc, not an ADR) -> Q6 (b) is a spike wire change inside the plan, the advisor's call, the
+  catalogue updated first (.claude/rules/netcode.md). marks.json -47 :9095-9111 (count >= 1000; p99 <= 5,000,000 ns).
+  pump.rs: ping bucket cap 10 refill 10/s (D4's 10/s honest pings never limited); INPUT_BUCKET 8 refill 2xTICK_HZ.
+  Next: B5 code cites.
+- B5 done (code at the head): client lib.rs:414-490 (stamp newest.map_or(0)+lead :429; view clamp :436-441; unacked
+  truncate 8 :442-443; steps on the host grid :485-488; JoinAccepted keeps only slot :496; client sends no Ping today);
+  input.rs whole (offer order: seq :81-89, press :90-106, late :107-113 incl. equal-to-buffered :110, Full :114);
+  room.rs:637-695 (fresh InputBuffer :653, JoinAccepted.tick = next_tick :681, leave None :689-695), :744-801.
+  Soldiers collide with static boxes, doors, wall, vehicle parts (world.rs:1230-1264), not each other; respawn is a
+  teleport to a free team point (world.rs:1734-1742; respawn 1,000 ms; move 600 cm/s = 20 cm/tick, scene.rs:184-186).
+  marks.json -21 :4805-5145 read: lag switch "no tick moves further than the catch-up cap" max <= 0 of
+  tick.v.lagswitch_excess_move_um; fast clock movement max <= 0 per episode. **New finding (mine): neither the brief nor
+  SERIES.md:34/:156 says what "movement" is on a respawn tick; a respawn of the lag-switch or fast client (47 brawlers
+  fire at it) moves it metres in one tick vs 8 x 20 = 160 cm -> the check fails a correct build; p3/p4 would catch it
+  before the sets (Medium).** ADR 0001:1611 "moves no further in any tick": a reading. Next: B6 anchors/scripts.
