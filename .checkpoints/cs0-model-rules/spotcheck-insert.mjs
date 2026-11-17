@@ -16,7 +16,7 @@ const jl = pick(['- JL']);
 const aer = pick(['- AER-', '- A3 line refs', '- glTF spec', '- Blender exporter', '- three.js', '- Not reachable', '- More sources:',
   '- Agreement AER', '- Agreement with ADR', '- [inferred]:', '- Nothing unproven']);
 const count = pick(['- SPOT-CHECK COUNT.']);
-if (jl.length !== 14 || aer.length !== 11 || count.length !== 1) throw new Error(`lines found: ${jl.length}, ${aer.length}, ${count.length}`);
+if (jl.length !== 14 || aer.length !== 12 || count.length !== 1) throw new Error(`lines found: ${jl.length}, ${aer.length}, ${count.length}`);
 const head = (n, m, rest) => `## Verifier spot-check\nOne verifier pass (Opus 5.5, effort max) checked this file on 2026-11-17 at commit cacea55, and took a second look\nat the commits after it the same day. Verdict: PASS. ${n} of ${m} key claims were checked at their sources: ${n}\nconfirmed, 0 wrong, 0 unsupported${rest} The lines below are the verifier's own, copied by script from its notes\n(\`verifier-cs0.md\`, in the commit that this change-set's report names): claim, source, verdict, place. They describe\nthe file as it stood at cacea55.\n\n`;
 const section = (h, lines) => h + lines.map(wrap).join('\n') + '\n';
 const J = 'docs/research/soldier-joint-list.md', A = 'docs/research/asset-export-rules.md';
