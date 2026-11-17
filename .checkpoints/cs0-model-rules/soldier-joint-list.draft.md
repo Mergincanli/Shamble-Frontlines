@@ -11,8 +11,9 @@ blocks of `docs/reports/2026-11-17-build-plan-slice-1-appendix.md`, cited with t
 own line number): A3 Mustafa's go of 2026-11-17, A4 the Art lead's Conscript blockout, A5 the poses addition, A6 the
 SMG brief, A10 the gun-pose correction. BP is the build plan, `docs/reports/2026-11-17-build-plan-slice-1.md`, cited
 by Part and rule. AER is `docs/research/asset-export-rules.md`, cited by finding (AX-F), rule (AX-R), mark and open
-point (O); spec:N is a line of the glTF 2.0 specification as AER read it on 2026-11-17. "[inferred]" marks a step no
-source states; "[proposal]" a number offered for the marks to fix.
+point (O); PM-0005-N is a pass mark of ADR 0005 (the export checks are PM-0005-47 to -56); spec:N is a line of the
+glTF 2.0 specification as AER read it on 2026-11-17. "[inferred]" marks a step no source states; "[proposal]"
+something offered and not yet ruled.
 
 ## 1. The ruling: one engine joint list for Slice 1's soldier (20 joints)
 Build plan rule 21's 16 joints with their names unchanged (BP Part 11, rule 21), plus four coat joints. The stand-in
@@ -72,7 +73,7 @@ by name in the file, and under this ruling nothing does: the engine finds the sk
 non-joint nodes by structure. A root bone does not guard the unread case either: if the exporter made the armature
 object a joint, AER mark 3 would see an extra joint with or without it. So this ruling departs from that first
 reading; the advisor agent upheld it, and what the first real Blender export must show for it is the advisor agent's
-ruling in AER, beside mark 10.
+ruling in AER, beside mark 10 (PM-0005-56).
 **In glTF:** `skin.joints` holds exactly the 20 names, in any order; `hips` is the only joint whose parent is not a
 joint, so it is the skeleton root, and a written `skin.skeleton` names `hips` or a node above it (spec:2118: "That
 node **MUST** be the root of all nodes listed in the `joints` array or their common ancestor."). The mesh node and
@@ -89,7 +90,7 @@ AX-F8). An empty above it would add one identity node and pass the check, but is
 **The name `root` (graphics-engineer's point P1).** The exporter names every object's node after the object (AER
 AX-F8) and by default most likely writes the armature object as a node [inferred in AER], so an armature object
 called `root` would give the scene two nodes of that name, the client's and the file's. Ruling: the name belongs to
-the client's node alone. No node in a file may be named `root` (the check fails such a file), and the engine never
+the client's node alone. No node in a file may be named `root` (PM-0005-49 fails such a file), and the engine never
 looks a soldier's root up by name: it holds the node it made.
 
 ## 3. The brief's 17 parts on the joints (the stand-in's weights)
@@ -124,7 +125,7 @@ armature before export (AER AX-R14), and vertex groups carry the joint names exa
 
 ## 4. Sockets on a gun, and how the hands meet them
 **Names:** `socket_grip`, `socket_support`, `socket_muzzle`, `socket_sight`, `socket_eject` (A3:46; A10:25). Each
-gun's entry lists the sockets its file has, and the check asks for those (AER AX-R11, mark 7): the rifle file has
+gun's entry lists the sockets its file has, and the check asks for those (AER AX-R11; PM-0005-53): the rifle file has
 four (A3:43), the SMG five (A3:46). Every held gun lists grip, support and muzzle, because the two hands and the flash
 need them (A10:5; A3:45). Sockets are cosmetic: a shot's start is simulation data (A10:29; AP-1, 0005:1549-1555).
 **Axes, one rule.** A socket is an empty node without a mesh. In glTF (the gun's frame: +Y up, +Z to the muzzle, +X
@@ -136,10 +137,10 @@ the bore with the gun's up: rotation identity, only their positions differ (`soc
 **In Blender** (the gun modelled Z up, muzzle toward -Y, its left +X: A6:14) the exporter turns Blender -Y into glTF
 +Z and +Z into +Y: confirmed for locations, inferred for rotations (AER AX-F11). So in Blender a socket's direction is
 its local -Y and its up its local +Z: the grip, support, muzzle and sight empties keep identity rotation, and the
-SMG's eject empty is turned until its -Y points along (-0.940, 0, 0.342) and its +Z along (0.342, 0, 0.940). Because
-the rotation step is inferred, a real Blender export of an empty turned 5 degrees must read back within 0.5 degrees
-(AER mark 7's planted defect) before Blender files rely on this rule; the script-written rifle file cannot prove it
-(AER mark 7, "Proven on").
+SMG's eject empty is turned until its -Y points along (-0.940, 0, 0.342) and its +Z along (0.342, 0, 0.940). The
+check is PM-0005-53: each socket's whole frame (up included) within 0.5 degrees. Because the rotation step is
+inferred, a real export of a gun with one empty turned must pass it before Blender files rely on this rule; the
+script-written rifle file cannot prove that (PM-0005-53).
 **How the hands meet the gun.** The rule is the correction's and Mustafa's: a pose sets where `socket_grip` sits,
 which way the gun points and how far the chest turns; the right hand is on `socket_grip`, the left on
 `socket_support`; the butt and the muzzle follow from the gun's file (A10:5; A3:44). The pose numbers are change-set
@@ -150,9 +151,9 @@ which way the gun points and how far the chest turns; the right hand is on `sock
 - The fist, not the wrist, meets the socket (GA3, LI:220; G:243): the hand's point lies `palm` metres beyond the hand
   joint (the wrist) on the lower arm's line, so the IK's second bone is lower arm + palm (G:415). `palm` is one number
   per soldier for both hands (legacy measures one, G:247), kept in the soldier model's entry, not as a bone (BP Part
-  11, rule 21); the check compares it with the centre of the vertices weighted to `hand_r`, within 1 cm, GA8's own
-  hand target (LI:225) [proposal]. The brief's hand centre lies 0.057 m beyond the wrist, within 4 mm of the
-  forearm's line [computed from A4:36, 40], so the rule fits the brief; the correction's reach, "0.62 from the
+  11, rule 21); for each hand, the point `palm` beyond the hand joint lies within 1 cm of the centre of that hand's
+  weighted vertices (ruled: PM-0005-56, line 7). The brief's hand centre lies 0.057 m beyond the wrist, within 4 mm
+  of the forearm's line [computed from A4:36, 40], so the rule fits the brief; the correction's reach, "0.62 from the
   shoulder joint to the middle of the hand" (A10:5), is upper arm + lower arm + palm: 0.307 + 0.272 + 0.057 = 0.636 m
   for the brief's arm [computed from A4:36, 40].
 - The hand's turn: `hand_*` keeps its rest turn in the hold, as in legacy (G:413), unless change-set 10 aligns it to
@@ -168,21 +169,20 @@ which way the gun points and how far the chest turns; the right hand is on `sock
 
 ## 5. The soldier's origin and facing: a check a file passes or fails
 Read in the file's bind pose; the file passes only if every line holds (axes: A4:11; AER AX-R5; spec:732, AER
-AX-F1). AER mark 10 runs these lines.
-1. Upright: `head` above `chest` above `hips` above both feet, by joint height (glTF y). A Z-up file read as Y-up
-   fails.
+AX-F1). PM-0005-56 runs these lines, with its numbers ruled, and adds the root's scale (line 6) and `palm` (line 7).
+1. Upright: `head` above `chest` above `hips` above both feet, by joint height (y). A Z-up file read as Y-up fails.
 2. Front +Z: for each foot, the centre of the vertices weighted to `foot_*` lies ahead of the foot joint (larger z):
    the toes point forward (A4:34: heel F -0.08, toe F 0.20).
 3. Left +X: every `_l` joint has x > 0 and every `_r` joint x < 0. With line 2 this catches a file turned round
    (both fail) and a mirrored one (line 3 fails).
-4. Origin on the ground between the feet: the lowest vertex at y = 0 within 1 mm [proposal]; the mid-point of the two
-   foot joints at x = 0 within 1 cm [proposal]; z = 0 lies between the heel's and the toe's z.
+4. Origin on the ground between the feet: the lowest vertex at y = 0 within 1 mm; the mid-point of the two foot
+   joints at x = 0 within 1 cm; z = 0 lies between the least and greatest z of the feet's weighted vertices.
 5. One root: `hips` is the only joint without a joint parent; the mesh node and every non-joint node above `hips` are
    identity, and each joint's rest transform equals its bind pose (from the inverse bind matrices), within 0.5
-   degrees (as in AER mark 7) and 1 mm [proposal], so the stand-in and the model hand the engine the same lengths and
-   frames.
-Planted files that must fail [proposal]: turned 180 degrees, mirrored, Z-up, origin moved 1 m; the unweighted vertex
-is AER mark 3's planted defect.
+   degrees and 1 mm, so the stand-in and the model hand the engine the same lengths and frames.
+Planted files that must fail (PM-0005-56): turned 180 degrees, mirrored, Z-up, origin moved 1 m, the mesh node scaled
+0.01, exported in a pose, a joint other than `hips` left without a joint parent; the unweighted vertex is the planted
+defect of AER mark 3 (PM-0005-49).
 
 ## 6. Left open, and who decides
 - Where the joints the brief does not place sit (hips, spine, chest, head, hip, knee, ankle, coat pivots): the Art
@@ -202,10 +202,11 @@ is AER mark 3's planted defect.
 - Bone roll (each joint's local axes): the Art lead's; the engine must not depend on it (section 7).
 - GA9's reload targets (the gun's reload point, legacy `reload.at` C:786, and the pouch): no socket among the five
   (A3:46; A10:25). Change-set 10 proposes data or a socket; a new socket name is Mustafa's.
-- The name of the `palm` field and the [proposal] tolerances: change-set 0's entry schema and AER's marks. Mark 7 on
-  the script-written rifle file cannot prove the Blender case of section 4: that needs a real export (AER mark 7).
-- How Blender writes the armature object (a node, or a joint: AER mark 3; AER part 8, not read): the first real
-  export shows it (the advisor agent's ruling in AER, beside mark 10).
+- The name of the `palm` field stays the entry schema's; the tolerances are now ruled (PM-0005-53, -56). The
+  script-written rifle file cannot prove the Blender case of section 4: that needs a real export (PM-0005-53).
+- How Blender writes the armature object (a node, or a joint: AER part 8, not read): the first real export shows it
+  (the advisor agent's ruling in AER, beside mark 10). AER's mark 3 (PM-0005-49) now carries section 2's P1 ruling:
+  no node in a model file is named `root`.
 - GA14's death fall: Mustafa's call (0003:798); the knee is needed anyway (GA2, GA6).
 - Whether legacy's sides are mirrored (section 7): change-set 10 confirms it with one legacy test.
 
