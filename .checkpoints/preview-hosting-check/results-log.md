@@ -129,3 +129,7 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   to him (consultation 11). Left: the account ID or the token itself. (Two workers-sdk issue comments describe this
   pair of errors as a value Cloudflare does not recognise, and the second error is on a path without the account ID:
   a lean toward the token's value, not a finding.)
+- Debug logging (his message 22:26:24, 145c9f63-a900-411c-9e2b-80fc93926e9e): turned on through the "Re-run failed jobs" dialog's "Enable
+  debug logging" box (his screenshot of the dialog, not run); GitHub's re-run page: it applies to "the re-run". No
+  repository secret or variable ACTIONS_STEP_DEBUG (his words: "I have not done such thing"), so the empty "Repository
+  secrets" condition stands on his screenshot of 2026-11-16 and these words.
