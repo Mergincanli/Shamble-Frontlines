@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 21:58 Amsterdam (20:58 UTC)
+- **Last update:** 2026-11-17 22:16 Amsterdam (21:16 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -559,6 +559,22 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    recorded as an inference, not told as fact; the re-run is his click (not among my allowed acts), on a new list (his
    condition 3), said plainly as two clicks again; a stop rule: if it fails the same way again, no third paste, options
    instead (such as a user token, a plan departure).
+
+11. 2026-11-17 21:15:02 UTC (called; transcript time), moments 2 and 4 (the same failure a second time; adding a
+   permission departs from the plan's "nothing else") · Q: send the Pages Read change? · Changed: sent as a test and
+   as his decision (a "Decisions needed" entry with my recommendation; he decides by doing it; his words kept for
+   DECISIONS.md), not as the cause found: the evidence for (Pages Write's role line names no viewing; #16667: a valid
+   token lacking a permission gets 10000) and against (no page says Write excludes Read; Cloudflare's CI guide grants
+   Edit alone; #13590 reads 10000 as "not recognized at all") both told, the 9109 on /accounts left unexplained, and
+   both outcomes told before he clicks (green: the permission was the cause; the same error: it is ruled out, leaving
+   the account ID and the token itself); the strongest line: the approved workflows already read from Cloudflare (the
+   deploy fetches the project, the cleanup lists uploads), and Read stays inside Pages on his one account; one trip,
+   replacing the earlier "look" (screenshot of the Edit page first, tick Read, save, screenshot of the list; branches:
+   no Edit or anything unexpected such as an IP rule or a start date, he stops; a new value shown on save goes into the
+   token box only); then `headers-44171977539` deleted again, "Re-run failed jobs", approve, green, merge, approve
+   `close`, all on a new list; meanwhile the next step prepared (a verify method for account tokens in Cloudflare's API
+   reference, a by-hand check that needs his yes; or a user token, a plan departure); on green, step 2.6 notes that
+   "Edit only" does not hold in the new form.
 
 ## Running work
 - saver boyrmgcz1 (started 2026-11-16 08:49:17 UTC): stopped by itself at 10:39:17 UTC ("time is up", 110 minutes;
