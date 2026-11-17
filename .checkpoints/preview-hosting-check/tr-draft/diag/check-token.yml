@@ -11,8 +11,7 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
 
-permissions:
-  contents: read
+permissions: {}
 
 env:
   PROJECT: shamble-preview-check
@@ -40,11 +39,12 @@ jobs:
           if [[ $a =~ ^[0-9a-f]{32}$ ]]; then h=yes; else h=no; fi
           if [[ $a =~ [[:space:]] ]]; then aw=yes; else aw=no; fi
           echo "token: length ${#t}; starts with cfat_: $p; whitespace in or around it: $w"
-          echo "account id: length ${#a}; exactly 32 hex digits: $h; whitespace: $aw; first and last 4: ${a:0:4}...${a: -4}"
+          if [ "$h" = yes ]; then e="${a:0:4}...${a: -4}"; else e="not shown (not an ID's shape)"; fi
+          echo "account id: length ${#a}; exactly 32 hex digits: $h; whitespace: $aw; first and last 4: $e"
           printf 'Authorization: Bearer %s\n' "$t" > "$RUNNER_TEMP/auth"
           ask() {
             local code
-            code=$(curl -sS -o "$RUNNER_TEMP/answer.json" -w '%{http_code}' -H @"$RUNNER_TEMP/auth" \
+            code=$(curl -sS --max-time 30 -o "$RUNNER_TEMP/answer.json" -w '%{http_code}' -H @"$RUNNER_TEMP/auth" \
               "https://api.cloudflare.com/client/v4$2") || code="no answer"
             echo "== $1: HTTP $code"
             if jq -e . "$RUNNER_TEMP/answer.json" > /dev/null 2>&1; then
@@ -58,10 +58,15 @@ jobs:
           ask "B. the token, without an account" "/user/tokens/verify" '{status, expires_on, not_before}'
           ask "C. the project the upload asks for" "/accounts/$a/pages/projects/$PROJECT" '{name}'
           rm -f "$RUNNER_TEMP/auth"
-      - name: D. The pinned Wrangler with the same values
+      - name: D. The pinned Wrangler with the same values (only its exit code and error codes are printed)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          "$RUNNER_TEMP/wrangler/node_modules/.bin/wrangler" pages project list && echo "== D: Wrangler answered" \
-            || echo "== D: Wrangler failed (exit $?)"
+          set -uo pipefail
+          umask 077
+          if "$RUNNER_TEMP/wrangler/node_modules/.bin/wrangler" pages project list > "$RUNNER_TEMP/wrangler.txt" 2>&1; then r=0; else r=$?; fi
+          echo "== D: Wrangler exit $r"
+          if grep -qF "$PROJECT" "$RUNNER_TEMP/wrangler.txt"; then echo "D: $PROJECT named in its output: yes"; else echo "D: $PROJECT named in its output: no"; fi
+          grep -oE '\[code: [0-9]+\]' "$RUNNER_TEMP/wrangler.txt" | sort | uniq -c || echo "D: no error code in its output"
+          rm -f "$RUNNER_TEMP/wrangler.txt"

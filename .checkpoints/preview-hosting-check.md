@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 23:21 Amsterdam (22:21 UTC)
+- **Last update:** 2026-11-17 23:29 Amsterdam (22:29 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -338,6 +338,21 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      screenshots of the token's page and the project's page; A refused, B active → the token is recognised, the account
      ID is wrong → the ID copied again; A and B refused with the shapes right → the token is not recognised → a new token
      (made, not rolled); no answer → the check re-run once.
+
+   - The security-auditor's review of the check (hand-back 2026-11-17, notes `security-auditor-diag.md`, ending DONE):
+     REVISE on 88b1e5999400. M1 Medium: on code 10000 Wrangler runs its whoami routine, which, for a recognised token,
+     prints the account name (by default "<email>'s Account") and the real account ID, unmasked when it differs from the
+     secret (wrangler-dist/cli.js 370870-370892, 358620-358695) → step D now prints only Wrangler's exit code, whether
+     the project's name appears, and the error codes. L1: the ID's ends printed only when it has an ID's shape. L2:
+     curl `--max-time 30`. L3: `permissions: {}`. L4 (procedure): the branch made from `main`; only the run whose head
+     holds the approved hash is approved; the run's logs deleted after reading. L5 (comments) not applied. No line
+     prints the token; the ID's ends ruled acceptable (confidence medium). Its v2 adopted as the draft: sha256
+     c0b0e8abcfc2... (diffed against my draft: exactly those changes and step D's name), plain ASCII; every stub test
+     re-run on its exact text (all paths right; a stub whoami table with an e-mail and an ID printed nothing of either;
+     no file left behind).
+   - Follow-up from that review, for the approved deploy.yml (line 140, the same Wrangler error path): a failed upload
+     with a recognised token could print the account name and ID in the public log. Not hit so far (every attempt's
+     whoami failed at /accounts with 9109). To raise with him as its own decision after the check.
 
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and

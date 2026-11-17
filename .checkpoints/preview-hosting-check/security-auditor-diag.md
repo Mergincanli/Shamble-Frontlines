@@ -21,3 +21,18 @@ B4. Verdict + fixes; advisor; DONE.
 - (2) Cloudflare account ID sensitivity: no official Cloudflare statement found (search 2026-11-17: only "find account and zone IDs" docs page, which says where the ID appears, incl. dashboard URL and API section; third-party pages call it a public identifier). Ruling rests on: every Cloudflare API call also needs the token. Confidence medium.
 - (3) GitHub secure-use page (summarised in security-auditor-review.md B7): redaction is of the exact registered value; substrings are not masked. Basis of L1.
 - B4 verdict: APPROVE with Lows (none blocks); L1 recommended before his yes (cheap, one line).
+- Advisor check 1: look at step D's failure output. Done: npm pack wrangler@4.156.0 into scratchpad (not run), cli.js read.
+  Source summary (wrangler-dist/cli.js 4.156.0): AUTHENTICATION_ERROR_CODES = [9106, 1e4] (370999); handleError on such an error logs the API error, then `await whoami(...)` (370870-370892); whoami (358620-358660) -> getUserInfo calls /accounts etc.; printUserEmail (358672-358687) prints for an Account API Token "associated with the account <account name>", else the email; printAccountList (358688-358695) prints a table "Account Name" / "Account ID" (the real IDs from /accounts); printTokenPermissions prints https://dash.cloudflare.com/<accounts[0].id>/api-tokens. No token printed (user.apiToken kept, never logged). Confidence high (source read).
+  => M1 Medium: when the token is recognised but D hits 10000 (wrong ID, or missing permission), the public log gets the account name (Cloudflare's default name is "<email>'s Account": personal data) and the real account ID in full (unmasked whenever it differs from the stored secret: the "ID wrong" outcome). results-log.md:95-96,115 show the deploy run reached whoami but /accounts failed (9109), so nothing printed then. Same path exists in deploy.yml:140 (follow-up, not this review).
+- Patched draft: scratchpad check-token.v2.yml sha256 c0b0e8abcfc227a9079b1bbf8aa41c34c8fe378f334f550277597781da2e2846 (YAML parses; bash -n ok; my stub run: D failing -> "exit 1", "[code: 10000]" counted, account table not printed, file removed; D ok -> "named: yes"; ID line shows ends for a 32-hex ID, "not shown" for a cfat_ value).
+
+## Final findings
+M1 Medium 66-67: D prints Wrangler's whoami (account name, maybe the owner's email; full real account ID) in a public log. Fix: output to a 0600 file, print exit code, project-named flag, `[code: N]` counts, remove the file.
+L1 Low 43: ends printed for any value; mis-pasted token -> "cfat" + its last 4 unmasked. Fix: ends only when h=yes.
+L2 Low 47: curl has no --max-time; a hang skips 60 until the job timeout. Fix: --max-time 30.
+L3 Low 14-15: no step uses GITHUB_TOKEN. Fix: permissions: {}.
+L4 Low procedure: branch from main only (no other workflow fires); approve only the run whose head SHA holds the approved hash; delete the run's logs after reading.
+L5 Low 4,7 comments: update to match (ends only when shaped like an ID; D prints codes only). Optional.
+Info: legacy `##[cmd]` parsing anywhere in a line (runner ActionCommand.cs:132) applies to jq/Wrangler output, but the text comes from api.cloudflare.com over TLS; no fix. SA-R3 install class unchanged and accepted. Read-only on Cloudflare: confirmed (GETs, `pages project list`).
+Verdict: REVISE (M1 open). Stub tests must be re-run on the new text.
+DONE
