@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 23:39 Amsterdam (22:39 UTC)
+- **Last update:** 2026-11-17 23:52 Amsterdam (22:52 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -690,6 +690,10 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    started and waits, then a one-item list with the run link and head SHA.
 
 ## Running work
+- saver b491gaova (started 2026-11-17 22:2x UTC with the security review): stopped by the harness's background time
+  limit at 22:52:16 UTC ("watch stopped: terminated"; its last cycle: "nothing to save"); no agent runs now, so it
+  stays off until the next agents start. The branch is clean at a66bcc0.
+- Waiting on him: the account rename (screenshot), CHECK-YES and ID-ENDS (the yes request sent after a66bcc0).
 - saver boyrmgcz1 (started 2026-11-16 08:49:17 UTC): stopped by itself at 10:39:17 UTC ("time is up", 110 minutes;
   its last cycle: "nothing to save"); no agent runs now, so it stays off until the next agents start (CHECKPOINTS.md
   §5).
