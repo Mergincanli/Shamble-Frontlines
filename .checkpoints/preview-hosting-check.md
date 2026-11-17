@@ -260,6 +260,16 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      screenshot first); IP filtering empty; "Continue to summary", screenshot, and **wait for my OK before "Create
      Token"** (a wait I must lift in words).
 
+   - His screenshot of the filled form (user message 2026-11-17 20:13:53 UTC, cafc2a87-1799-4681-84b2-b909bf790b4a): "Entire Account";
+     search "pages"; "Developer Platform" 1/62 with "Pages" ("Grants write access to Cloudflare Pages"): "Read" unticked,
+     "Edit" ticked; "Account Custom Pages" and "Access: Custom Pages" unticked (0/14, 0/72); "Add policy" not used;
+     "Token expiration": the chips "No expiration", "7 days", "30 days", "90 days", "1 year" and the chosen "Nov 27
+     GMT+1"; "Client IP address filtering": "Allow" with the address box empty; buttons "Cancel" and "Review token".
+     As planned: one permission, Cloudflare Pages Edit, the end date 27 November. The form shows the date in GMT+1
+     (his time zone), where the restrict-tokens page (2026-04-20) said "00:00 UTC": the exact end time is not known,
+     so Day 2 stays on or before 2026-11-26 (Amsterdam). The wait before "Create Token" is lifted in words, on a
+     condition: the review page shows Pages Edit, his account, and 27 November; else he stops and sends it.
+
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
    CLOUDFLARE_ACCOUNT_ID; in `production`: CANARY); `preview` (him as required reviewer, self-review unticked, admin
