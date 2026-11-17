@@ -55,7 +55,7 @@ DONE: built, reviewed in two rounds and pushed; it waits for Mustafa's go. The r
   change-set); two research files, not one; the appendix gives two sizes for the two Art texts that arrived with Windows
   line ends. Part 15, "The second lane", is not in it: he answered its six questions at 22:10 UTC, all (a) (its text:
   commit ea851a8; his words: commit 023e6f3; both under `.checkpoints/part-15/`). The notes of this change-set and of
-  the plan are deleted in the last commit; the commit before it holds them.
+  the plan are deleted in the last commit; the commit before it holds them: d2c4caa6450cabc99af21746ecf352c50efcbb77.
 - The Advisor chat's log reached this chat by mistake. One read-only agent was started on it at 19:16:35 UTC, before
   his word at 19:59; five lines of its digest stood in the checkpoint card from 8ea40cd (19:44:56 UTC) to 9b31dad
   (20:01 UTC). His answer LOG-HISTORY: the history stays, so a merge commit brings those commits into main's history.
