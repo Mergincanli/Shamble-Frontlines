@@ -78,4 +78,10 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
 - After the setup pull request's deploy, Cloudflare's "Last used" for the token should show a time (a cross-check).
 
 ## Runs, readings and approvals
-(none yet)
+### The rehearsal: the setup pull request (outside the marks)
+- Pull request https://github.com/Mergincanli/shamble-preview-check/pull/1 ("Setup: the test site and the throwaway
+  workflows"), opened by this session at 2026-11-17 20:41 UTC (the run below was created 20:41:39); head `setup`
+  1619164900553ee3e32339447b30865347711156, base `main` 4a67b83.
+- Run 1: `deploy` #1, id 44171977539, event pull_request, actor and triggering actor Mergincanli, created 20:41:39
+  (https://github.com/Mergincanli/shamble-preview-check/actions/runs/44171977539). Job `plan` (id 134353201815,
+  runner label ubuntu-24.04) started 20:41:41; its steps passed by 20:41:45.
