@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 21:28 Amsterdam (20:28 UTC)
+- **Last update:** 2026-11-17 21:30 Amsterdam (20:30 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -276,6 +276,19 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      two values. Evidence so far for gate (b): the filled form of 20:13:53 UTC (the permission and the end date; the
      review page not shown) and his words. Asked for: the `preview` secrets list (a fresh "Last updated" on
      CLOUDFLARE_API_TOKEN), the "Account API tokens" list (the new token listed; nothing pressed), and both sources.
+
+   - His message 2026-11-17 20:29:51 UTC (d68b7548-f2e4-407f-ab1a-fadd8d58a3c7), word for word: "When I press the pen again, it doesn't show me
+     the key: is that normal?" / "I have copy and pasted the key and pressed save?" / "What sunday's values?". His two
+     screenshots: (1) "Configure preview": reviewers Mergincanli, self-review unticked, wait timer unticked,
+     administrator bypass unticked, "No restriction"; secrets CLOUDFLARE_ACCOUNT_ID "2 days ago" (Sunday's value) and
+     CLOUDFLARE_API_TOKEN "1 minute ago" (today's paste). (2) Cloudflare's "Account API tokens": one row,
+     `shamble-preview-check-deploy`, "Permissions: Pages Write", "Last used" empty, "Created 2m ago", "Modified 2m
+     ago", an orange dot before the name (its meaning not read); the "Value" column shows a shortened form (not
+     copied here), and the page header shows his account's e-mail (not copied here). So: the token exists with the
+     one permission, and the paste is saved. The end date shows on no screen after saving: only in the filled form of
+     20:13:53 UTC ("Nov 27 GMT+1"). Still open in gate (b): the sources of Sunday's two values (he did not follow the
+     question: asked again in plain words, with the option to paste the account ID again from Account Details).
+     Cross-check for the results log: after the setup pull request's deploy, "Last used" should show a time.
 
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
