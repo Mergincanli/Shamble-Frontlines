@@ -15,7 +15,7 @@
      checkpoints (`build-plan-slice-1*`, `cs0-model-rules*`) in its last commit before the PR is marked ready.
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs0-model-rules) · **Base:** main
   c94c81b440c77f7979e0f944a5341319f9a57d1b (to take in first; the branch still sits on 4460ef5 plus checkpoint commits)
-- **Last update:** 2026-11-17 21:57 CET (from the clock)
+- **Last update:** 2026-11-17 22:04 CET (from the clock)
 
 ## Steps done
 1. His go received (user message of 2026-11-17T19:10:44Z, saved by script, 10,544 bytes). The session's model read
@@ -83,12 +83,26 @@
     points P1 to P3 for engine-architect in its notes). Both record scripts dry-run clean again (20:57 UTC): five
     entries equal byte for byte, appendix A1 to A11, six pointers in DECISIONS, three in SPIKE_PLAN, one in ADR 0002.
 
+21. The docs build, his commit order (plan point 23). Done and pushed by 21:04 UTC:
+    - commit 1, his records: 3747bb3 (five entries in DECISIONS by script, six pointers there, three in SPIKE_PLAN,
+      one in ADR 0002; dated answers under OQ-0002-6 and OQ-0006-18, PM-0004-34's row, the register's rows and
+      counts, 98 open becomes 96; the appendix A1 to A11) and its fix 4a1b0d7 (two Art texts arrived with CR LF line
+      ends and the repository stores LF only: the appendix now gives the stored text's sha256 and, for A4 and A6, the
+      attached file's too; `appendix-verify.mjs` on HEAD: 11 blocks, 0 mismatches);
+    - commit 2, the plan's carry: 212f55b (`docs/reports/2026-11-17-build-plan-slice-1.md`, 1,421 lines: "since the
+      plan" plus the plan, equal to commit 68addf9 below the mark);
+    - commit 3, first part: the two open questions answered in part in ADR 0005 and the register, LOOK_V2 section
+      8's line, one pointer in SPIKE_PLAN.
+
 ## Current step
-21. The docs build, in his commit order (plan point 23): (1) his records; (2) the plan's carry; (3) the rules and the
-    joint list (engine-architect first repoints the ruling's citations and takes graphics-engineer's points P1 to
-    P3); (4) docs-keeper's pass; (5) the report and the deletion of the checkpoints. Then the reviews on the final
-    diff (engine-architect, test-engineer, the verifier), the advisor agent on the final head, the pull request.
-    Stop line: 1,200 written lines.
+22. Commit 3, second part: waits for two agents. engine-architect writes the docs version of the ruling
+    (`cs0-model-rules/soldier-joint-list.draft.md`: citations repointed, graphics-engineer's points P1 to P3 ruled
+    on, a consistency check of the rules draft). test-engineer writes the ten pass-mark rows PM-0005-47 to -56 for
+    ADR 0005 (`cs0-model-rules/adr0005-marks.draft.md`; notes `test-engineer-adr0005-marks.md`) and lists what the
+    research draft's part 5 must change. Then: graphics-engineer's file takes those changes, both research files
+    move to `docs/research/` with the index rows, the rows go into ADR 0005. Then commit 4 (docs-keeper), the
+    reviews on the final diff (engine-architect, test-engineer, the verifier), commit 5 (the report, the deletion
+    of the checkpoints), the advisor agent on the final head, the pull request.
 
 ## Next steps
 1. Change-set 0's own short plan at `.checkpoints/cs0-model-rules/plan.md`; the advisor agent's review of it (effort
@@ -164,4 +178,4 @@
 ## Running work
 - saver: background task brf1n425m, started 20:03 UTC (the first one, bfulbfi1o, was killed at 19:55 UTC); check
   its output file at each update.
-- agents: none running at this update.
+- agents (2 of 3): engine-architect (the ruling's docs version), test-engineer (ADR 0005's new mark rows).
