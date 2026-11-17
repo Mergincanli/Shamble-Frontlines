@@ -1,0 +1,52 @@
+@@STATUS_L5
+_Last updated: 2026-11-17 (Part 15 of the build plan to main, PR #57, after #56's merge; main d7dad97)._
+@@STATUS_L13
+- **Last merged:** change-set 0 (PR #56, d7dad97, 2026-11-17 23:00:12 UTC, on his go); every merge: ROADMAP.
+@@STATUS_ROW57
+| #57 | Part 15 of the build plan, "The second lane", to main with his six answers (all (a), with additions), a docs change of its own (his go for #56): his words of 2026-11-17, 22:10:34 and 22:59:16 UTC, in `docs/DECISIONS.md` by script; Part 15 as he read it, with his answers on top: `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`; dated pointers in ADR 0002 (a seventh package, VFX-ROUTE) and in the build plan report; the rules file's line on gun files (GUN-FILES, AX-R1); STATUS, ROADMAP, the archive and REPO_MAP after #56's merge. Then change-set 1, Types (foundation step 2.4), by lane 1; lane 2 (`claude/optimistic-albattani-mdoonz`) works by Part 15 from this merge on | `claude/wonderful-hamilton-jdmlnf` (stands in for `cs/part-15-second-lane`) | draft; in review; its report comes last: `docs/reports/2026-11-17-part-15-second-lane.md` | his go (risk tier 1, decision docs; no Brave check), after the advisor agent's word on the final head and green `gate` and `smoke` on it |
+@@STATUS_NEXT
+   2.3: the 2.3 chat stays stopped; then #57, change-set 1 (lane 1) and lane 2's work; Slice 3 waits for #40's result.
+@@STATUS_WAITING
+- His go for #57 (Part 15, no Brave check) when ready; from Part 15: give lane 2 Part 15 and ask for its needs from the
+  block; tell lane 2 which chat on his PC makes the model files; the VFX chat's exports; pass the VFX findings on.
+@@STATUS_FU
+- **From change-set 0 (PR #56) and Part 15:** the rules' O1 (PM-0005-54) and O2, his calls with change-set M's plan;
+  the first real export; the coat's motion; the carried lines; for the drafts' next revision, ADR 0002's package list.
+@@ARCH_MERGED_CELL
+merged: PR #56 ({BRANCH}, the build chat on his personal account), d7dad97, 2026-11-17 23:00:12 UTC (the merge commit's date; `merged_at` 23:00:13), by merge commit, on his go of 22:59:16 UTC for head cd61b28350c4407d2f19b1b3603ea4beca8b4e30, quoted whole in the merge commit's message (`docs/DECISIONS.md`, 2026-11-17, 22:59:16 UTC), after the advisor agent's APPROVE of that head; `gate`, `smoke` and `toolchain` green on the head before the merge; CI green on main (gate run 856 with smoke, id 44195404107; toolchain run 155, id 44195404068; push, on d7dad97)
+@@ARCH_DONE_TAIL
+; with the merge he accepted that PM-0005-54 stands as written (a fail with today's rifle prototype, not waived), the size as counted, the three things the verifier did not verify, and the checkpoint commits in main's history (his go, above); the open items: the Follow-ups, "From change-set 0 (PR #56) and Part 15 (PR #57)"; its merge recorded by #57
+@@ARCH_FU_HEADER
+- **From change-set 0 (PR #56) and Part 15 (PR #57)** (PR #56, merged as d7dad97 on 2026-11-17 on his go of 22:59:16
+  UTC, `docs/DECISIONS.md`; the first five items are copied by script from the end of #56's row in STATUS, each
+  followed by its source; the sixth comes from his answer VFX-ROUTE (a) of 2026-11-17, recorded by #57):
+@@ARCH_FU_SRC1
+His words of 22:59:16 UTC: "It is not waived. The way out is my call, with the plan for the first-model change-set." The three ways out, none researched further: `docs/research/asset-export-rules.md`, part 7, O1.
+@@ARCH_FU_SRC2
+ADR 0005 and ADR 0003 name the fifth class differently: the rules' part 7, O2; part 8 gives O1 and O2 to Mustafa, with change-set M's plan.
+@@ARCH_FU_SRC3
+The rules are on paper; the first real export may fail PM-0005-49 or -56 (how the armature is written): the change-set 0 report, risk 1.
+@@ARCH_FU_SRC4
+Dropping it removes the four coat joints, a list change that should land before the Blender model is exported: `docs/research/soldier-joint-list.md`, section 6.
+@@ARCH_FU_SRC5
+The machine lines go with change-set 6's docs pass, when the machines are named (MACHINES); "one change-set per step" with change-set 2's docs pass (SPLIT-25).
+@@ARCH_FU_ITEM6
+For the decision drafts' next revision: ADR 0002's package list and the seventh package. His answer VFX-ROUTE (a) of 2026-11-17 is "also my word on a seventh package beside the six the structure draft names" (`docs/DECISIONS.md`, 22:10:34 UTC); a dated pointer of 2026-11-17 marks the list (ADR 0002, part 3) and leaves where the package stands in it to the draft's next revision.
+@@ROADMAP_NEW
+**Part 15 of the build plan, the second lane, to main [2026-11-17, PR #57: draft; in review]** — part-15-second-lane, by
+his go of 2026-11-17 for #56 (docs only): Part 15 as he read it, with his six answers on top (all (a), with additions),
+in `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`; his two messages of 2026-11-17 in `docs/DECISIONS.md` by
+script; dated pointers in ADR 0002 (a seventh package, VFX-ROUTE) and in the build plan report; the rules' line on gun
+files (GUN-FILES); STATUS, ROADMAP, the archive and REPO_MAP after #56's merge. Then change-set 1, Types, by lane 1.
+
+@@ROADMAP_L125
+**Change-set 0 of the build plan [2026-11-17, MERGED]** — cs0-model-rules, on his go of 2026-11-17 (docs only):
+@@ROADMAP_L128
+(open questions 98 to 96). Report `docs/reports/2026-11-17-cs0-model-rules.md`. Two review rounds (the verifier: PASS).
+Merged: PR #56, d7dad97, 2026-11-17 23:00:12 UTC, by merge commit, on his go after the advisor agent's APPROVE of
+cd61b28; CI green on main (gate run 856 with smoke, toolchain run 155). With the merge he accepted that PM-0005-54
+stands as written (a fail with today's rifle prototype, not waived) and the checkpoint commits in main's history.
+@@REPOMAP_ROWS
+| `docs/reports/2026-11-17-build-plan-slice-1-part-15.md` | Part 15 of the build plan, "The second lane" (which change-sets, folders and files belong to the second builder chat, how the two chats' pull requests take turns, who owns each CI file, how change-set 11 uses Shamble VFX): revision 2, copied by script from commit ea851a8, with Mustafa's six answers of 2026-11-17 on top and his two messages byte for byte (P1, P2) (PR #57) |
+| `docs/reports/2026-11-17-part-15-second-lane.md` | The report of the change-set that carries Part 15 to main (PR #57) |
+@@END

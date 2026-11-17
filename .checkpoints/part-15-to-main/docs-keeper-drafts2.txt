@@ -1,0 +1,7 @@
+- His go for #57 (Part 15; no Brave check) when it is ready. Part 15's items, his: give lane 2 Part 15 and ask for its
+  needs from the block; tell it which chat on his PC makes the model files; the VFX chat's exports; pass the VFX findings on.
+- His go for #57 (Part 15; no Brave check), when it is ready. Part 15's items, his: give lane 2 Part 15 and ask for its
+  needs from the block; tell it which chat on his PC makes the model files; the VFX chat's exports; the VFX findings.
+- **From change-set 0 (PR #56) and Part 15:** the rules' O1 (PM-0005-54) and O2, his calls with change-set M's plan;
+  the first real export; the coat's motion; the carried lines; for the drafts' next revision, ADR 0002's package list.
+- **From #56 and #57:** O1 (PM-0005-54), O2, FIRST-EXPORT, COAT-MOTION, CARRIED-LINES; for the drafts: PACKAGE-LIST.

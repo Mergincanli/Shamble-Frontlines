@@ -53,3 +53,43 @@ Task: part-15-docs-keeper (docs-keeper pass for the merge of #56 and change-set 
   export at least one effect folder for the VFX proof, and later the effects for the slice's five weapons; with VFX-FIX
   (a), passing the digest's findings to the VFX chat ("I pass the findings on."). GUN-FILES: rule AX-R1 in
   asset-export-rules.md. VFX-ROUTE seventh package.
+- Sources for the six follow-ups: O1 = asset-export-rules.md:316-345 (part 7; part 8 :357 "O1 and O2: Mustafa, with
+  change-set M's plan"); O2 = :347-351; first real export = cs0 report risk 1 (:67, may fail PM-0005-49 or -56);
+  coat = soldier-joint-list.md:195-197 (section 6; dropping it removes the four coat joints, before export); machine
+  lines = build plan report "Since the plan" MACHINES row (:26, change-set 6's docs pass); "one change-set per step" =
+  SPLIT-25 row (:23, change-set 2's docs pass); package list = ADR 0002:202-204 dated pointer (Part 15 to main).
+- HEAD now 94c805c (checkpoint commit on b75ec0d). Main session commits checkpoints; my files untracked-modified only.
+- Design (STATUS, 8 lane-1 lines -> 8): L5', L13', #57 row, L36' (one line, replaces L36+L37; L35 kept), Waiting 2
+  lines (replace L40-42), new FU bullet 2 lines appended after L100. #56 row -> archive In flight top (after L158) by
+  script: cells Work + State copied, "ready for review; " prefix dropped, merged-cell and done-tail new text. Archive
+  Follow-ups: new block after L906 "From change-set 0 (PR #56)", items split by script from the row's "Open after it"
+  text + a sixth (VFX-ROUTE package list). #55 row missing from archive: not mine (flag in answer).
+- VERIFIED: d7dad97 committer date 2026-11-17 23:00:12 UTC (merged_at 23:00:13Z by REST); CI on main at d7dad97: gate
+  run 856 (id 44195404107; jobs gate + smoke success), toolchain run 155 (id 44195404068), push, branch main. Runs 857/156
+  are the branch claude/wonderful-hamilton-jdmlnf at the same SHA (not main). PR #57: draft, open, head
+  claude/wonderful-hamilton-jdmlnf, base main d7dad97. ADR 0002's package list + dated pointer: "## Decision", part 3
+  ("Crates, packages and who may depend on whom", :182; pointer :202-206). gh GraphQL refused (403): use gh api REST.
+- ROADMAP blame: cs0 wrote L102-105, L125-130 (L130 = first line of DOCS-54's entry, cs0 marked it MERGED; netcode
+  lane's entry: leave). REPO_MAP: cs0 rows L70, L71, L78-80.
+- This change-set so far (d7dad97..HEAD, excl. checkpoints): DECISIONS +69 (two entries), ADR 0002 +5 (pointer), Part 15
+  report (new, 348), build plan report (two pointers), asset-export-rules.md (AX-R1 gun-file line).
+- Chosen STATUS layout (B): L5', L13', #57 row, Next tail 1 line (replaces L36-37), Waiting 2 lines (replace L40-42),
+  FU 2 lines in words after L100. Widths measured in docs-keeper-drafts*.txt.
+- Script written: docs-keeper-apply.mjs (+ docs-keeper-newtext.txt). Asserts every replaced line, refuses a second run
+  (STATUS #57 row / archive "merged: PR #56 (" / REPO_MAP Part 15 row present). Dry run OK: STATUS 120 -> 120; archive
+  1250 -> 1272; ROADMAP 248 -> 257; REPO_MAP 153 -> 155; 0 wide added lines; both quotes in DECISIONS and unbroken.
+  Blocks 7-9 = running it (next).
+- Blocks 7, 8, 9 (edits) DONE: script run, WRITTEN. numstat: REPO_MAP 2/0, ROADMAP 11/2, STATUS 8/8, ARCHIVE 22/0.
+  STATUS 120 lines. Next: repo-map-check; block 10 proof (removed lines = lane 1's only; widths; review the diff).
+- repo-map-check: one line only, "in the map but not in the repository: docs/reports/2026-11-17-part-15-second-lane.md"
+  (exit 1; the report is written last). Expected.
+- Block 10 (proof) DONE. STATUS removed lines = exactly old L5, L13, L29, L36, L37, L40, L41, L42; blame at HEAD: 94aaae8,
+  94aaae8, 6a31650, 94aaae8, 94aaae8, 94aaae8, 4f20643, 4f20643 (all three commits in c94c81b..cd61b28 = #56). ROADMAP
+  removed = old L125, L128 (both 6a31650). REPO_MAP and archive: 0 removed. Other lines kept in order: STATUS 113/113,
+  ROADMAP 247/247; #40 row identical at L28; netcode Waiting bullet byte for byte at now L41-42; DOCS-54 entry byte for
+  byte at now L139-147; v2-next pointer L102-105 identical. Added non-table lines <= 120 code points (ROADMAP new L125
+  = 120 exactly). git diff --check clean. Paraphrases grounded: DECISIONS :282 (2.3 chat stopped), :536 (Slice 3).
+- Open notes for the answer: ROADMAP Recent work now 13 entries (>12), no fold per brief. #55 (DOCS-54) has no archive
+  "In flight" row (cs0 dropped it from STATUS in its pass; netcode lane's PR: not written by this lane). STATUS L22-23
+  CI line still names 82c605e (DOCS-54's line, not mine). "Last checked: 2026-11-17" in REPO_MAP unchanged (today).
+DONE
