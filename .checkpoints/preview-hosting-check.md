@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 20:08 UTC (his message; the save log has the save time)
+- **Last update:** 2026-11-17 21:28 Amsterdam (20:28 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -269,6 +269,13 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      (his time zone), where the restrict-tokens page (2026-04-20) said "00:00 UTC": the exact end time is not known,
      so Day 2 stays on or before 2026-11-26 (Amsterdam). The wait before "Create Token" is lifted in words, on a
      condition: the review page shows Pages Edit, his account, and 27 November; else he stops and sends it.
+
+   - His message 2026-11-17 20:27:37 UTC (d2ff28ba-ab0a-4536-b8cd-6370c665b4dc), word for word: "I'm fine with nov 27, and yea this is the
+     option for cloudflare pages." / "I have added the cloudflare api token and added into the preview page under
+     CLOUDFLARE_API_TOKEN". Not sent: the review-page screenshot, the `preview` secrets list, the sources of Sunday's
+     two values. Evidence so far for gate (b): the filled form of 20:13:53 UTC (the permission and the end date; the
+     review page not shown) and his words. Asked for: the `preview` secrets list (a fresh "Last updated" on
+     CLOUDFLARE_API_TOKEN), the "Account API tokens" list (the new token listed; nothing pressed), and both sources.
 
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
