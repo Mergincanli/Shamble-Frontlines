@@ -290,6 +290,14 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      question: asked again in plain words, with the option to paste the account ID again from Account Details).
      Cross-check for the results log: after the setup pull request's deploy, "Last used" should show a time.
 
+   - His message 2026-11-17 20:35:32 UTC (ed312d3e-c765-4cdb-9c16-c10f91862dd0), word for word: "It was indeed the account ID from account
+     details, thats where I got it from., I have repasted it." / "Can we finally progress? this process is a bit
+     hideous". Read as: CLOUDFLARE_ACCOUNT_ID came from Account Details and is pasted again. Whether it also answers
+     what went into CLOUDFLARE_API_TOKEN on 2026-11-15 is not clear (both readings recorded; that value is replaced and
+     no run ever used it, so it holds nothing up). Gate (b) is met on this evidence: the token listed with "Pages
+     Write" only, the paste saved ("1 minute ago"), the account ID from Account Details; the end date only in the
+     filled form. The results-log header is written (`results-log.md`, saved f37cb7a).
+
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
    CLOUDFLARE_ACCOUNT_ID; in `production`: CANARY); `preview` (him as required reviewer, self-review unticked, admin
