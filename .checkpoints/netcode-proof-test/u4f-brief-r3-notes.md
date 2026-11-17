@@ -88,3 +88,23 @@ Head read: 8afcc11b63906d3660b21613deb0729bdd8937bc (2026-11-17 17:15 UTC). Fres
   planJudged :327, --only listedOf :569. C62H-BOUND stop rule (c62h-bound-brief.md:599-607, his adoption
   history.md:2175): "the lab's short P2 test" shows a lost tick nothing explains -> stops for him: U4f's client
   edits (carry 80 (b), (d)) run that test in check.mjs (scenario.rs:2904).
+- B4 (end): sim HOLDS (ticks.rs:12, :25, :35, :56, :70; world.rs BITES :937-938, with_bite :944, clamp :1283-1312,
+  refusals :1401-1420, refuse :1445-1452; scene.rs reach :66). l1: Profile :149-163, profiles :177-202, one_way/
+  half_jitter :214-221 HOLD (insert after them); NEW DatagramCounts :332, server_datagrams_since :417, with_fate_log
+  :1918. check.mjs: LEAF :39 HOLDS; WASM_CRATES :1970 (rev 2 :1957: CHANGED by REFS-KIT +13); REFS-KIT
+  KEPT_LOGS_FILES :1841-1862; biteHomeProblems :936; cargoCounts :1943; testBothBuilds :2052; TICK_NAMED :760.
+  c-u4r-r2.mjs, contract.rs unchanged since 11fd190 (rows hold as cited). judge twin figure figures.rs:191-214
+  (twin_of profile, seed, bite; role twin; every phase; a tick hashed in one only counts). Room::leave drops the
+  ClientSlot whole (room.rs:689-695; Leave at :739): NEW NA-15 (2.5 must read room counters before routing a Leave).
+  -47 suite vs carry 75's admission bound (scenario.rs:70, :995-1006, ~30 s of SS events): NEW NA-16.
+- B5 DONE: stamps_anchors.py run at HEAD 7cfae88 (= 8afcc11 for every cited file: git diff --stat empty). plan
+  43ff74f2..., 1,100 lines; plan.md 3eecd281..., 1,525; carries 57600c9c..., 682; history 3bfe1aa2..., 2,232;
+  u4r-run.sh e9437ae2... (117); main-run.sh 8df2dee3... (88); u4r-report c5dee3fa... (1,764); df-ruling 842ec092...;
+  j-r2 7efa9410...; m9 f31f7876...; d2-r2 e776f0ba...; te-m3 5ecc3e23...; c62h 18dd3d20...; b1-p3 1bc5889c...;
+  r-b2 f4f5ac92...; r-r1 7b552e8c...; head-check a64259f5...; merge-stop 55ad3561...; c62h-review 7d2dd26b...;
+  marks.json c1935a5b...; SERIES.md 1dd67e2f...; c-u4r-runs.mjs f2002890...; c-u4r-r2.mjs 4e007500....
+  P1-P36 anchors each found once (lines in the script's output: P1 :507-540, P3 :223-228, P9 :180-183, P35
+  :1138-1142, history P15 :2125, P16 :2127, P17 :2187, P18 :2048-2051, P19 :2141, P20 :2143-2146, P21 :2175, P22
+  :2212, P23 :2216).
+- Planned size estimate (B6 input): client ~700, room ~950, bots ~650, lab ~1,400, sim bites ~40, SERIES rows ~25,
+  run scripts ~600: about 4,400 added lines (range 3,500-5,500); his SIZE-CHECK stop for an M unit: past 6,000.
