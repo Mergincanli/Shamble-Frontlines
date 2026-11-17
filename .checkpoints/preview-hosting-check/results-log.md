@@ -84,4 +84,6 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   1619164900553ee3e32339447b30865347711156, base `main` 4a67b83.
 - Run 1: `deploy` #1, id 44171977539, event pull_request, actor and triggering actor Mergincanli, created 20:41:39
   (https://github.com/Mergincanli/shamble-preview-check/actions/runs/44171977539). Job `plan` (id 134353201815,
-  runner label ubuntu-24.04) started 20:41:41; its steps passed by 20:41:45.
+  runner label ubuntu-24.04) started 20:41:41, success at 20:41:49. Job `build (pr, preview, setup, preview, 1)` (id
+  134353302216) 20:41:51 to 20:42:07, success. Job `deploy (pr, preview, setup, preview, 1)` (id 134353491166):
+  "waiting" on `preview` from 20:42:07 (read 2026-11-17 with the GitHub MCP tool). His list sent after that reading.
