@@ -1458,11 +1458,12 @@ stays playable throughout: frozen, critical fixes only, guarded by today's gate,
    the content and ability spike and the render budget bench), nor for the end of step 2.3. Those tests are not built as
    separate tests unless the plan shows a question the real game cannot answer. No pass mark and no open question of
    theirs is dropped or loosened: each is measured on the real game, at the first build that can show it, and a draft is
-   accepted only when its marks are met." One exception, his words of 2026-11-17 (the entry "Taken by Mustafa,
-   2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8, on PM-0004-34): "The comparison against a library's
-   character controller runs only if our own movement misses its marks." His go on the plan for them: the same entry of
-   2026-11-17. Unchanged, his words of 2026-11-14: "Slice 3, online, still waits for the netcode proof test's result.
-   Step 2.6, the previews, follows the preview hosting check as planned."_
+   accepted only when its marks are met. If a mark fails, the code that rests on it is redone." One exception, his words
+   of 2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8, on
+   PM-0004-34): "The comparison against a library's character controller runs only if our own movement misses its
+   marks." His go on the plan for them: the same entry of 2026-11-17. Unchanged, his words of 2026-11-14: "Slice 3,
+   online, still waits for the netcode proof test's result. Step 2.6, the previews, follows the preview hosting check as
+   planned."_
 2. **The foundation** ([GLOSSARY §8](../research/GLOSSARY.md#the-foundation)), one change-set per step:
    1. *The restructure.* The five legacy files move to `legacy/` (OQ-0002-2 places the tools). *Done when:* today's
       gate passes on `legacy/`, the four Phase 0 mutation proofs (a deleted function, an unguarded editor call, a syntax

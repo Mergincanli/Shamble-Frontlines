@@ -533,10 +533,11 @@ The kept-logs build is still waiting for you. Please switch the session to Accep
   proof test, the content and ability spike and the render budget bench), nor for the end of step 2.3. Those tests are
   not built as separate tests unless the plan shows a question the real game cannot answer. No pass mark and no open
   question of theirs is dropped or loosened: each is measured on the real game, at the first build that can show it, and
-  a draft is accepted only when its marks are met." One exception, his words of 2026-11-17 (the entry "Taken by Mustafa,
-  2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8, on PM-0004-34): "The comparison against a library's
-  character controller runs only if our own movement misses its marks." Unchanged: "Slice 3, online, still waits for the
-  netcode proof test's result. Step 2.6, the previews, follows the preview hosting check as planned."
+  a draft is accepted only when its marks are met. If a mark fails, the code that rests on it is redone." One exception,
+  his words of 2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8,
+  on PM-0004-34): "The comparison against a library's character controller runs only if our own movement misses its
+  marks." Unchanged: "Slice 3, online, still waits for the netcode proof test's result. Step 2.6, the previews, follows
+  the preview hosting check as planned."
   Copied by script from `docs/reports/2026-11-13-foundation-2-3-docs.md`, Appendix A2, and checked byte for byte
   against it:
   - His decision, word for word (A2, from inside its quote marks):
@@ -1059,10 +1060,11 @@ The kept-logs build is still waiting for you. Please switch the session to Accep
   the look proof test, the content and ability spike and the render budget bench), nor for the end of step 2.3. Those
   tests are not built as separate tests unless the plan shows a question the real game cannot answer. No pass mark and
   no open question of theirs is dropped or loosened: each is measured on the real game, at the first build that can show
-  it, and a draft is accepted only when its marks are met." One exception, his words of 2026-11-17 (the entry "Taken by
-  Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8, on PM-0004-34): "The comparison against a
-  library's character controller runs only if our own movement misses its marks." Unchanged: "Slice 3, online, still
-  waits for the netcode proof test's result. Step 2.6, the previews, follows the preview hosting check as planned."
+  it, and a draft is accepted only when its marks are met. If a mark fails, the code that rests on it is redone." One
+  exception, his words of 2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan",
+  answer 8, on PM-0004-34): "The comparison against a library's character controller runs only if our own movement
+  misses its marks." Unchanged: "Slice 3, online, still waits for the netcode proof test's result. Step 2.6, the
+  previews, follows the preview hosting check as planned."
   Copied by script from `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A1.1, A1.2 and A1.3, and checked byte
   for byte against them:
   - His decision (A1.1):
@@ -1265,9 +1267,10 @@ read them at its parent 6c6c91a (`git show 6c6c91a:<path>`; the same files as at
       and the render budget bench), nor for the end of step 2.3. Those tests are not built as separate tests unless the
       plan shows a question the real game cannot answer. No pass mark and no open question of theirs is dropped or
       loosened: each is measured on the real game, at the first build that can show it, and a draft is accepted only
-      when its marks are met." One exception, his words of 2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44
-      UTC: his go on the build plan", answer 8, on PM-0004-34): "The comparison against a library's character controller
-      runs only if our own movement misses its marks."_
+      when its marks are met. If a mark fails, the code that rests on it is redone." One exception, his words of
+      2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8, on
+      PM-0004-34): "The comparison against a library's character controller runs only if our own movement misses its
+      marks."_
   - TICK-60-HEADROOM, Mustafa: confirmed, "with one addition: 60 Hz also needs the goal budget to hold at the rooms per
     VM measured at 60 Hz."
   - TICK-60-SETUP (a), the Advisor: "as an early signal only. The final 60 Hz call is measured again with the real sim

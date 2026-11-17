@@ -43,11 +43,11 @@ and 2026-11-17) and, byte for byte with the Art lead's texts, in the appendix
 2. **A second builder chat.** His decision is in `docs/DECISIONS.md` word for word (it begins "Two chats build the game
    on my personal account."). "Every file has one owner: the first builder chat's plan says which change-sets and
    folders belong to the second chat, and neither chat edits the other's files." That is **Part 15, "The second lane"**:
-   it was sent to him as a file on 2026-11-17 (revision 2, approved by the advisor agent, with six questions for him).
-   It is not in this report: it goes to main once he has answered it. His proposal for it: the second chat takes the
-   preview hosting check and step 2.6, the carry of his look decisions into `docs/LOOK_V2.md`, the comparisons that stay
-   (Part 3.2), and from change-set 6 on the picture track (6 Look, 10 Body, 11 Feel, and M); this chat keeps 0 to 5, 7
-   Lag, 8 Shoot, 9 Throw and 12.
+   it was sent to him as a file on 2026-11-17 at 20:46 UTC (revision 2, approved by the advisor agent at 20:39 UTC, with
+   six questions for him). It is not in this report: it goes to main once he has answered it. His proposal for it: the
+   second chat takes the preview hosting check and step 2.6, the carry of his look decisions into `docs/LOOK_V2.md`, the
+   comparisons that stay (Part 3.2), and from change-set 6 on the picture track (6 Look, 10 Body, 11 Feel, and M); this
+   chat keeps 0 to 5, 7 Lag, 8 Shoot, 9 Throw and 12.
 3. **The soldier and the guns follow the Art lead's briefs** (appendix A4 to A6, and the correction, A10).
    "Everything in them is the Art lead's proposal unless a line says it is mine."
    - "The soldier brief replaces the sturdier sizes you typed into your notes on 2026-11-14 at 15:18 UTC." So Part 4's
@@ -67,9 +67,11 @@ and 2026-11-17) and, byte for byte with the Art lead's texts, in the appendix
    - "The muzzle is where the flash and the tracer start. In the simulation a shot's start is data of its own".
    - A first model file exists, a rifle prototype written by a script (`AMK9_v4_stage1.glb`): "It stays with me
      until you ask for it."
-   - "The words "no plain tubes or cylinders" in docs/LOOK_V2.md line 30 and in the rendering draft are not mine."
-     and "Treat them as not decided; the carry of my look decisions removes them." No doc of this change-set cites
-     them as decided, and this change-set does not edit that line.
+   - "In your list for the Art project, read "(never a plain tube)" as struck. The words "no plain tubes or cylinders"
+     in docs/LOOK_V2.md line 30 and in the rendering draft are not mine." and "Treat them as not decided; the carry of
+     my look decisions removes them." Two copied texts still carry those words, because both were written before his:
+     the plan below (Part 4, item 2 of its list for the Art project) and the sheet notes in the appendix (A7). Nothing
+     this change-set writes cites them as decided, and it does not edit that line of LOOK_V2.
 4. **Shamble VFX exists** (his effects editor, in its own repository). "In Part 15, say how change-set 11 (Feel) uses
    it. My lean: the game loads Shamble VFX's exported effects through its runtime and builds no effect a second
    time." Part 15 answers it; change-set 11's size may change there.
@@ -94,11 +96,11 @@ and 2026-11-17) and, byte for byte with the Art lead's texts, in the appendix
 
 ### 4. What changes in the plan's numbers and files
 
-- **Change-set 0** was planned at about 150 lines of docs, for the model rules alone. With the record of his
-  decisions, the plan's carry and the ruling on the joints it writes about 900 lines, besides about 1,700 copied
-  ones. It passed twice its plan, he was told in three lines, and he accepted the size (A11): his records and the
-  plan's carry are built in commits of their own, apart from the rules and the joint list, "so a split stays cheap if
-  it is ever needed".
+- **Change-set 0** was planned at about 150 lines of docs, for the model rules alone. With the record of his decisions,
+  the plan's carry and the ruling on the joints it writes about 1,200 lines, besides 1,788 copied ones (the measured
+  count is in this change-set's report). It passed twice its plan at about 900 written lines; he was told in three lines
+  at 20:25 UTC and accepted the size (A11): his records and the plan's carry are built in commits of their own, apart
+  from the rules and the joint list, "so a split stays cheap if it is ever needed".
 - **Change-set 8** grows by about 400 lines (the simple active reload). **Change-set 6** gains the switch between
   the two sets of line widths. **Change-set 11** is weighed again in Part 15 (Shamble VFX).
 - **The comparisons** (Part 3.2): all run but the character-controller one, which runs only if our own movement

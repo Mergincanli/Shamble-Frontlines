@@ -25,26 +25,36 @@ IN REVIEW (completed before the pull request is marked ready): built and pushed;
 - `docs/research/`: `asset-export-rules.md` (graphics-engineer) and `soldier-joint-list.md` (engine-architect):
   sixteen rules, ten checks, 20 joints, on paper (no export has gone through them). ADR 0005: OQ-0005-AS3 and AS4
   answered in part; ten new marks, PM-0005-47 to -56 (test-engineer). ADR 0002, 0004, 0006, the register, SPIKE_PLAN:
-  his answers and dated pointers (open questions 98 to 96). LOOK_V2 section 8: one line. STATUS, ROADMAP, the map.
+  his answers and dated pointers (open questions 98 to 96); SPIKE_PLAN's asset-spike lines also name the new marks and
+  one pointer there says section 8 is written. LOOK_V2 section 8: one line. STATUS, ROADMAP, the repository map.
 
 ## Evidence
 - His words: `decisions-insert.mjs --check`: five entries equal byte for byte; `appendix-verify.mjs HEAD`: 11 blocks,
   0 mismatches; every quote in the pointers and in "Since the plan" is in his saved messages (`quotes-check.mjs`).
 - Gate: `node tools/gate.mjs --no-smoke` PASS; `repo-map-check.mjs` OK. The browser smoke check cannot start in this
   container (the gate's Playwright wants Chromium build 1194; the container has 1243): CI's `smoke` job runs it.
-- Size: 1,195 written lines with this report (`size-count.mjs`; 1,788 copied lines are not counted).
+- The verifier: PASS at cacea55 on all six groups: his five messages extracted again from the transcript and equal;
+  71 of 72 key claims of the research files confirmed at their sources; ADR 0005's rows equal test-engineer's file. Not
+  verified by it: the smoke check; A10 against his attachment (its size matches his words); the renderer's draw loop
+  behind "6 draws per pass". Its second look at the commits after cacea55, and CI on the final head: pending.
+- Size (`size-count.mjs`): 1,195 written lines before the verifier's findings; the 6 lines they asked for do not
+  count (his words of 22:10 UTC); stop line 1,200. Counted as copied, 1,788: his words 123, the plan 1,275, the
+  appendix's blocks 390, of which 68 are sheet notes this session typed with the plan on 2026-11-14.
 
 ## Reviews
 - test-engineer: REVISE (2 Medium, 4 Low, all word changes in rows): all applied (f61f43c).
 - engine-architect: APPROVE (5 Low): four applied; the fifth ("the model's entry" as the one name for where socket
   lists and `palm` live, so none sits in content the simulation loads) is deferred to change-set M's plan.
-- The verifier, the advisor agent on the final head, and CI on that head: pending.
+- The verifier: PASS, 2 Medium and 6 Low, all fixed: seven pointers now carry his rule's last sentence ("If a mark
+  fails, the code that rests on it is redone."); the plan's report says which copied texts still carry "no plain
+  tubes"; its times and measured sizes; the research files' line citations renumbered to this branch; the pointer
+  script's own check. The advisor agent on the final head: pending.
 
 ## Decisions and deviations
 - Five entries in DECISIONS, not the three his CHANGE 1 named (his two later messages hold decisions for this
-  change-set); two research files, not one. Part 15, "The second lane", waits for his answers and is not in it (its
-  text: commit ea851a8, `.checkpoints/part-15/part-15-the-second-lane.md`). Two Art texts arrived with Windows line
-  ends; the repository stores LF, so the appendix gives both sizes.
+  change-set); two research files, not one. Part 15, "The second lane", is not in it: he answered its six questions at
+  22:10 UTC, all (a) (its text: commit ea851a8; his words: commit 023e6f3; both under `.checkpoints/part-15/`). Two Art
+  texts arrived with Windows line ends; the repository stores LF, so the appendix gives both sizes.
 - The Advisor chat's log reached this chat by mistake. One read-only agent was started on it at 19:16:35 UTC, before
   his word at 19:59; five lines of its digest stood in the checkpoint card from 8ea40cd (19:44:56 UTC) to 9b31dad
   (20:01 UTC). His answer LOG-HISTORY: the history stays, so a merge commit brings those commits into main's history.
@@ -54,14 +64,13 @@ IN REVIEW (completed before the pull request is marked ready): built and pushed;
 ## Risks
 1. The rules are on paper: the first real Blender export may fail PM-0005-49 or -56 (how the armature is written).
 2. PM-0005-54 fails with today's rifle prototype (6 draws per pass against 4): his call, with change-set M's plan.
-3. Change-set 1 waits for his answers to Part 15.
+3. Change-set 1 waits for Part 15 to be on main with his answers.
 
 ## Proposed next step
-Change-set 1, Types (foundation step 2.4), once Part 15 is answered.
+Part 15 with his answers to main, as a docs change of its own; then change-set 1, Types (foundation step 2.4).
 
 ## Decisions needed
-Nothing new here. Part 15's six questions are in the file sent to him on 2026-11-17 and were repeated in chat.
+Nothing. He answered Part 15's six questions on 2026-11-17 at 22:10 UTC.
 
 ## For Mustafa
 1. Your go on merging pull request #56, after the advisor agent's review of its final head. No Brave check.
-2. Answer Part 15's six questions.

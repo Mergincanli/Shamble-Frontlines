@@ -1,13 +1,13 @@
 # Asset export rules: the export and slot-naming part of the asset research
 
 - **Topic:** the export and slot-naming part of the asset-pipeline research: OQ-0005-AS3, AS4
-  (`docs/adr/0005-content-abilities-assets.md`:1874-1889; `docs/SPIKE_PLAN.md`:529-545: "graphics-engineer, verified
+  (`docs/adr/0005-content-abilities-assets.md`:1874-1899; `docs/SPIKE_PLAN.md`:568-586: "graphics-engineer, verified
   like R3").
 - **Author agent:** graphics-engineer (Opus 5.5). **Date:** 2026-11-17; sources read 2026-11-14, the glTF specification
   and three.js's loader again 2026-11-17; updated that day for JL and the advisor agent's review of change-set 0's plan.
-- **Status:** draft, not verified. No export has gone through these rules yet.
+- **Status:** draft; spot-checked by the verifier (35 of 36 key claims). No export has gone through these rules yet.
 - **The questions:** "Which checks does an export pass before it enters the game?" (OQ-0005-AS3, 0005:1874); "How are a
-  model's materials renamed into the slot classes and faction colour slots?" (OQ-0005-AS4, 0005:1881).
+  model's materials renamed into the slot classes and faction colour slots?" (OQ-0005-AS4, 0005:1886).
 
 **TL;DR.**
 1. Names in lower case, digits and underscores pass Blender's exporter and three.js's loader unchanged (part 3).
@@ -36,14 +36,14 @@ Mustafa's go of 2026-11-17, A4 the Art lead's soldier brief, A5 its addition, A6
 
 ## 1. Scope
 Covered: the export, scale, axes and origin, names, joints and sockets, caps, the skin and what stays out (part 4); the
-checks a file passes (AS3, part 5); materials as slot classes, and colour (AS4, part 6). Not covered (SP:529-534):
+checks a file passes (AS3, part 5); materials as slot classes, and colour (AS4, part 6). Not covered (SP:568-573):
 compression (OQ-0005-AS1), LOD (AS2), budgets beyond the two derived caps (AS5), vertex and bone counts (AS6), the
 automated step and the asset list (OQ-0005-AP1), serving files (AP-4), very large units' part names (ADR 0004), model
 files in the repository (MODEL-PUBLIC, A3, answer 9), the joints' reasons, parts and open points (JL §1, §3, §6, §7).
 
 ## 2. What the decision drafts already fix
-- Only glTF/GLB, through three.js's loader on both backends (0005:1803-1804); the models' route is Blender (SP:537-542);
-  test models are plain exports with no compression or LOD step (SP:390-391; 0005:1715).
+- Only glTF/GLB, through three.js's loader on both backends (0005:1803-1804); the models' route is Blender (SP:576-581);
+  test models are plain exports with no compression or LOD step (SP:416-417; 0005:1715).
 - A model carries no look: geometry, its skin, UVs and textures where it has them, and named material slots, but no
   baked lighting or ink; at load each slot gets a shared toon material of its class (0005:1748-1755).
 - Each slot's name maps to one class "from a small fixed list (for example environment, structure, unit, faction colour,
@@ -51,7 +51,7 @@ files in the repository (MODEL-PUBLIC, A3, answer 9), the joints' reasons, parts
   Faction slots take the faction's colour at load (0005:1764-1765); only emissive slots glow (0005:1768-1769).
 - "A soldier model is one skinned mesh" (0005:1771). A soldier as drawn (body, headgear and held weapon) uses at most 4
   materials per pass, a cap derived from ADR 0003's 4 draw calls per pass (0005:1777-1781), and PM-0005-36 counts draws
-  (0005:2311): mark 8, O1. About 5.2k triangles per soldier as drawn is a planning ceiling, not a budget
+  (0005:2334): mark 8, O1. About 5.2k triangles per soldier as drawn is a planning ceiling, not a budget
   (0005:1787-1792).
 - No collider, hit shape or shot origin comes from a model; "a weapon model's sockets are cosmetic" (0005:1550-1553).
 - 1 unit = 1 metre is `[DECIDED]` in `docs/EDITOR_V2.md`:63-65, not yet in an ADR (`docs/STATUS.md`:76); Mustafa,
@@ -151,7 +151,7 @@ files in the repository (MODEL-PUBLIC, A3, answer 9), the joints' reasons, parts
 
 ### 4.1 The file and the export
 - **AX-R1.** One model, one `.glb` file, written by Blender's built-in glTF 2.0 exporter [from a draft: 0005:1803-1804,
-  SP:537-539; from a source: rst:881-885]. Whether a script-written gun file may enter the game is asked of Mustafa in
+  SP:576-578; from a source: rst:881-885]. Whether a script-written gun file may enter the game is asked of Mustafa in
   the build plan's Part 15, a file of its own (GUN-FILES); until he answers, the rifle is used only to try the checks.
 - **AX-R2.** Export with AX-F7's "Rule" column: in a Blender script (the MCP route), one call, after selecting every
   object of the model: BP Part 11's rule 7 plus `filepath` and `use_selection` (what `use_selection` takes along was not
@@ -245,7 +245,7 @@ bpy.ops.export_scene.gltf(filepath=PATH, export_format='GLB', use_selection=True
 
 ### 4.4 Caps, the skin, and what stays out
 - **AX-R13.** A soldier as drawn, his gun included, stays within 4 draw calls per pass, as PM-0005-36 counts them
-  (0005:1777-1781, 2311), and mark 8 counts the same. The shared `unit_dark` name keeps four materials, not four draws:
+  (0005:1777-1781, 2334), and mark 8 counts the same. The shared `unit_dark` name keeps four materials, not four draws:
   a gun loaded from its own file draws on its own whatever its material is named (AX-F14, AX-F18), so the Conscript
   with the rifle's "2 meshes" (A3) makes 6 per pass and fails. How to meet the cap is open (O1). A very large unit:
   parts × materials at most 25 per pass (0005:1784-1786). Triangles: no cap; about 5.2k per soldier as drawn is a
@@ -260,8 +260,8 @@ bpy.ops.export_scene.gltf(filepath=PATH, export_format='GLB', use_selection=True
   engine's convention (proposed), after A5, A3: "The rifle is a model of its own."]
 - **AX-R16.** No images or textures, vertex colours, animations, shape keys, cameras, lights, custom properties,
   compression or LOD levels; no baked lighting, ink or toon shading; no collider, hit shape, shot origin or navigation
-  data. [from a draft: 0005:1748-1750, SP:390-391, 0005:1715, 0005:1550-1553; no textures is also A4, DO NOT; no
-  animations: the engine's convention (proposed), since soldiers are animated in code (0003:306, 0003:797)]
+  data. [from a draft: 0005:1748-1750, SP:416-417, 5:1715, 0005:1550-1553; no textures is also A4, DO NOT; no
+  animations: the engine's convention (proposed), since soldiers are animated in code (0003:306, 3:797)]
 
 ## 5. The checks a file passes (OQ-0005-AS3)
 Each of the ten marks has a defect of its own that a test plants and the check must catch. The main session carries
@@ -305,7 +305,7 @@ glTF Validator might do part of J; not read. Each number's final form is in the 
 ## 6. Materials to slot classes, and colour (OQ-0005-AS4)
 - **The convention for the first models:** one plain material per colour area, named by its class prefix (AX-R8, AX-R9),
   with no renaming step. The names survive by the sources (AX-F8, AX-F9, AX-F15): that answers, not yet by an export,
-  what the draft marks "not researched": "whether the glTF export keeps material names" (0005:1885-1886). The engine
+  what the draft marks "not researched": "whether the glTF export keeps material names" (0005:1895-1896). The engine
   finds a slot by its material's name, never a mesh's, since mesh names get `_1`, `_2` (AX-F14; inferred). Whether
   LOOK_V2 §8's automated renaming step comes later is OQ-0005-AP1's. A `faction_` material's colour in Blender is a
   placeholder; the faction's data gives one colour per such area at load (0005:1764-1765, 1582-1583).
@@ -315,7 +315,7 @@ glTF Validator might do part of J; not read. Each number's final form is in the 
 **O1. The draw cap when a gun comes from its own file.** ADR 0005's cap on a soldier as drawn (body, headgear and held
 weapon) reads "at most 4 materials per pass", derived from C-B's "one per material per soldier" and ADR 0003's cap of 4
 draw calls per soldier per pass (0005:1777-1781; r3:1044-1045); PM-0005-36 counts draws, the soldier shown minus hidden,
-at most 4 × the passes that draw it (0005:2311), and so does mark 8. A gun loaded from its own file is a mesh of its own
+at most 4 × the passes that draw it (0005:2334), and so does mark 8. A gun loaded from its own file is a mesh of its own
 and draws on its own, whatever its material is named (AX-F14, AX-F18; inferred, the renderer's draw loop not read):
 
 | What is drawn | Distinct materials | Draw calls per pass |
@@ -337,7 +337,7 @@ him with change-set M's plan.
   Needs proven: memory per pair and the swap's frame time on the minimum machine; one draw per material on both
   backends (PM-0005-36); flash and tracer still starting at `socket_muzzle`, within 1 mm (test-engineer's ruling).
 - **(c) Count the cap in distinct materials and allow more draws per soldier.** Costs: decision-doc lines change, ADR
-  0005's derived cap (0005:1777-1781), PM-0005-36 (0005:2311), ADR 0003's cap of 4 draw calls per soldier per pass
+  0005's derived cap (0005:1777-1781), PM-0005-36 (0005:2334), ADR 0003's cap of 4 draw calls per soldier per pass
   (r3:1044-1045; PM-0003-25, 0003:1200, which does not say whether its soldier holds a gun) and mark 8; with the rifle,
   6 draws per soldier per pass, 288 per pass for 48 soldiers instead of 192 (arithmetic). Needs proven: the render
   budget bench (BP Part 3, section 3.7: PM-0003-18 to -47) holds at that count on the minimum machine.
@@ -359,7 +359,7 @@ settled, and an ADR line that changes needs Mustafa's go.
 | Where the joints sit, weights beyond the rigid baseline, whether the coat keeps its four joints | JL §6 |
 | The bind pose; the soldier's vertex and bone counts (AS6) | the model's author |
 | How the exporter writes the armature object; the neutral bone's name; the influence cut; Mustafa's Blender version against add-on 5.4.12 | the first real export (the advisor agent's ruling, part 5) |
-| AS1, AS2, AS5, AP1 | the rest of the asset research (SP:529-545) |
+| AS1, AS2, AS5, AP1 | the rest of the asset research (SP:568-586) |
 
 **Not read (and what for).**
 - Blender's manual and the rendered specification, not on the allow-list: the exporter's repository documentation and

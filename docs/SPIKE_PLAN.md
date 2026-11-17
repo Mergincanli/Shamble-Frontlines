@@ -107,11 +107,11 @@ docs/SPIKE_PLAN.md places before Slice 1 (the sim core spike, the 60 Hz run, the
 the content and ability spike and the render budget bench), nor for the end of step 2.3. Those tests are not built as
 separate tests unless the plan shows a question the real game cannot answer. No pass mark and no open question of theirs
 is dropped or loosened: each is measured on the real game, at the first build that can show it, and a draft is accepted
-only when its marks are met." One exception, his words of 2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44
-UTC: his go on the build plan", answer 8, on PM-0004-34): "The comparison against a library's character controller runs
-only if our own movement misses its marks." His go on the plan for them: the same entry of 2026-11-17. Unchanged, his
-words of 2026-11-14: "Slice 3, online, still waits for the netcode proof test's result. Step 2.6, the previews, follows
-the preview hosting check as planned."_
+only when its marks are met. If a mark fails, the code that rests on it is redone." One exception, his words of
+2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8, on PM-0004-34):
+"The comparison against a library's character controller runs only if our own movement misses its marks." His go on the
+plan for them: the same entry of 2026-11-17. Unchanged, his words of 2026-11-14: "Slice 3, online, still waits for the
+netcode proof test's result. Step 2.6, the previews, follows the preview hosting check as planned."_
 
 ```mermaid
 flowchart LR
@@ -164,11 +164,11 @@ docs/SPIKE_PLAN.md places before Slice 1 (the sim core spike, the 60 Hz run, the
 the content and ability spike and the render budget bench), nor for the end of step 2.3. Those tests are not built as
 separate tests unless the plan shows a question the real game cannot answer. No pass mark and no open question of theirs
 is dropped or loosened: each is measured on the real game, at the first build that can show it, and a draft is accepted
-only when its marks are met." One exception, his words of 2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44
-UTC: his go on the build plan", answer 8, on PM-0004-34): "The comparison against a library's character controller runs
-only if our own movement misses its marks." His go on the plan for them: the same entry of 2026-11-17. Unchanged, his
-words of 2026-11-14: "Slice 3, online, still waits for the netcode proof test's result. Step 2.6, the previews, follows
-the preview hosting check as planned."_
+only when its marks are met. If a mark fails, the code that rests on it is redone." One exception, his words of
+2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8, on PM-0004-34):
+"The comparison against a library's character controller runs only if our own movement misses its marks." His go on the
+plan for them: the same entry of 2026-11-17. Unchanged, his words of 2026-11-14: "Slice 3, online, still waits for the
+netcode proof test's result. Step 2.6, the previews, follows the preview hosting check as planned."_
 
 | # | Spike | Size | Place | Pass marks |
 |---|---|---|---|---|
@@ -494,11 +494,11 @@ the preview hosting check as planned."_
   the content and ability spike and the render budget bench), nor for the end of step 2.3. Those tests are not built as
   separate tests unless the plan shows a question the real game cannot answer. No pass mark and no open question of
   theirs is dropped or loosened: each is measured on the real game, at the first build that can show it, and a draft is
-  accepted only when its marks are met." One exception, his words of 2026-11-17 (the entry "Taken by Mustafa,
-  2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8, on PM-0004-34): "The comparison against a library's
-  character controller runs only if our own movement misses its marks." His go on the plan for them: the same entry of
-  2026-11-17. Unchanged, his words of 2026-11-14: "Slice 3, online, still waits for the netcode proof test's result.
-  Step 2.6, the previews, follows the preview hosting check as planned."_
+  accepted only when its marks are met. If a mark fails, the code that rests on it is redone." One exception, his words
+  of 2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8, on
+  PM-0004-34): "The comparison against a library's character controller runs only if our own movement misses its marks."
+  His go on the plan for them: the same entry of 2026-11-17. Unchanged, his words of 2026-11-14: "Slice 3, online, still
+  waits for the netcode proof test's result. Step 2.6, the previews, follows the preview hosting check as planned."_
 - **Size:** L (six change-sets: restructure, toolchain, gate and CI, generated types, skeleton, previews).
 - **Research it carries:** R5-LAYOUT-REC1, REC2, REC6; R5-TSLINT-REC1–REC4; R5-RUSTLINT-REC1–REC6; R5-TEST-REC1,
   REC6; R5-CI-REC1–REC5; R5-PREV-REC1, REC4 (mark 1); R5-GATE-REC1–REC4; R1-BND-REC4's CI checks. It re-proves as gate
