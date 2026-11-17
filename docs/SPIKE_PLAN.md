@@ -578,7 +578,9 @@ the preview hosting check as planned."_
   Blender (Spline's skins and named slots are unproven)."); Blender is the route for the look test's models and for this
   part's export, and LOOK_V2 is not edited; Mustafa (2026-11-03, LOOK_V2-§8): “yes, keep it as it is, with Blender for
   the test models only. When the asset research's export part reports, §8 says "Spline or Blender".” That edit belongs
-  to that part's change-set and goes to Mustafa for the merge (the advisor's reading, 2026-11-03). The part is agent
+  to that part's change-set and goes to Mustafa for the merge (the advisor's reading, 2026-11-03). _Pointer (2026-11-17,
+  change-set 0 of the build plan): the part has reported, on paper (`docs/research/asset-export-rules.md`,
+  `docs/research/soldier-joint-list.md`), and that change-set writes the line in LOOK_V2 §8._ The part is agent
   research, not a heavy spike, so it runs alongside none: it sits between two wave-1 spikes, early enough that its
   export and slot rules reach Mustafa before he makes the models (recommended: right after the netcode proof test); both
   are the advisor's reading, 2026-11-03. The rest of the research runs before the asset spike.

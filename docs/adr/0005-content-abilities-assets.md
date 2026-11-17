@@ -1872,6 +1872,11 @@ spike then proves its answers.
   research, then the asset spike and Mustafa (silhouettes kept). What decides it: the levels keep the silhouette at
   the farthest framing, within the triangle row. Research ids: none.
 - **OQ-0005-AS3. Which checks does an export pass before it enters the game?**
+  Answered in part (2026-11-17, change-set 0 of the build plan), as rules and checks on paper:
+  `docs/research/asset-export-rules.md` (part 4, the rules; part 5, ten checks, each with a planted defect: PM-0005-47
+  to PM-0005-56 below) and `docs/research/soldier-joint-list.md` (the soldier's joints, the sockets' axes, the origin
+  and facing check). No export has gone through them yet: their proof on a real Blender export comes at the build
+  plan's change-set M, before the first authored model enters the game, and the question stays open until then.
   Why it matters: a model with unnamed slots, the wrong scale or a broken skin fails silently on screen, as legacy's
   unchecked tags did (CL14, `docs/LEGACY_INVENTORY.md` line 123). Options: none researched. Decider: the
   asset-pipeline research. What decides it: the failures the asset spike can plant and catch. Research ids: none.
@@ -1879,6 +1884,11 @@ spike then proves its answers.
   proof test" (LOOK-TEST-INPUTS, Mustafa, 2026-11-03), on Blender's export, the route of that test's models (the
   advisor's reading, 2026-11-03).
 - **OQ-0005-AS4. How are a model's materials renamed into the slot classes and faction colour slots?**
+  Answered in part (2026-11-17, change-set 0 of the build plan), for the first models: one plain material per colour
+  area, named by its class prefix in the modelling tool, with no renaming step (`docs/research/asset-export-rules.md`,
+  part 6; rules AX-R8 and AX-R9). That the names survive the export is read from the exporter's and the loader's
+  sources, not yet shown by an export (PM-0005-48). LOOK_V2 §8's automated step (its flow's step 4) stays as written:
+  whether and where it runs is OQ-0005-AP1's. The question stays open until a real export has passed.
   Why it matters: part 1 and part 2 depend on every slot carrying a class; and since part 1 makes one material per
   slot content, how an asset carries its colours sets how many materials it brings. Options: none researched (a
   manual convention in the modelling tool, or LOOK_V2 §8's automated step; for colour, each slot's material colour,
@@ -2086,8 +2096,8 @@ when.
 | OQ-0005-AP3 | May an AI-generated draft model ever ship? | Mustafa | The asset pipeline |
 | OQ-0005-AS1 | Which compression formats for textures and meshes? | the asset-pipeline research, then the asset spike | The asset pipeline: GPU rules |
 | OQ-0005-AS2 | Which tool builds the LOD levels, and how many levels? | the asset-pipeline research, then the asset spike and Mustafa | The asset pipeline: GPU rules |
-| OQ-0005-AS3 | Which checks does an export pass before it enters the game? | the asset-pipeline research | The asset pipeline: GPU rules |
-| OQ-0005-AS4 | How are a model's materials renamed into the slot classes and faction colour slots? | the asset-pipeline research | The asset pipeline: GPU rules |
+| OQ-0005-AS3 | Which checks does an export pass before it enters the game? Answered in part, on paper (2026-11-17) | the asset-pipeline research; its proof at the build plan's change-set M | The asset pipeline: GPU rules |
+| OQ-0005-AS4 | How are a model's materials renamed into the slot classes and faction colour slots? Answered in part, on paper (2026-11-17) | the asset-pipeline research; its proof at the build plan's change-set M | The asset pipeline: GPU rules |
 | OQ-0005-AS5 | What are the per-unit budgets beyond the two derived caps? | the asset-pipeline research, then the render budget bench | The asset pipeline: GPU rules |
 | OQ-0005-AS6 | How many vertices and bones does the authored soldier have? | the model's author, then the render budget bench | The asset pipeline: GPU rules |
 | OQ-0005-1 | Do presentation references sit on the simulation definitions or in client definitions keyed by the same id? (answered by the Advisor, 2026-11-03: client definitions keyed by the same id; an id of a presented kind with no client entry fails the content check (the advisor's reading, 2026-11-03), CD-2) | the Advisor, at the stop review | this frame |
