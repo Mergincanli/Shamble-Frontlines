@@ -3987,6 +3987,12 @@ free:
    the guard can't follow cd, so such writes ask him); run commands from the main folder without cd.
 
 ## Open findings
+- **From DOCS-54 (PR #55; its plan's C3, the advisor's plan review docs-54/advisor-plan-review-full.json):** when this
+  branch next takes main in after #55 merges, docs/STATUS.md conflicts at its In flight rows (:28-29): **keep this
+  branch's own #40 row and main's #55 row** (main has dropped the #52 row). Nothing else conflicts: `git merge-tree
+  --write-tree --name-only` of #55's head 36242ad against this branch's head 8c154f0 (2026-11-17 13:26 UTC, tree
+  1d0249fb…, exit 1) listed docs/STATUS.md only; DECISIONS.md, REPO_MAP.md and STATUS_ARCHIVE.md auto-merged. Re-check
+  at that merge (main may have moved).
 - **From C62H-BOUND (2026-11-16; the advisor's merge-stop ruling advisor-c62h-bound-merge-stop-full.json, C3-C4):**
   - **U3C-HELD-1: CLOSED 2026-11-17 on aab3712fca3af64b25169af1f4ee75c01a0411cd** (the fix 0ad9661, test code only;
     the advisor's APPROVE WITH FINDINGS of that head, the verifier's PASS, CI green; the close report
