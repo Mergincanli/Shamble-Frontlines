@@ -105,3 +105,13 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   `headers-44171977539` (id 14369645074, digest sha256:0073aac72dce..., equal to the downloaded zip) holds
   `{"checked_at": "2026-11-17T20:50:04.604Z", ..., "records": [], "summary": {"records": 0, "pass": 0, "fail": 0,
   "no_reading": 0}}` (saved here before its deletion for the re-run).
+- The fix (consultation 10), by his screenshots and words (user message 21:09:07, 53e93cb6-2a07-4ea3-b488-0ee4dc515901): before any change,
+  `preview`'s secrets showed CLOUDFLARE_ACCOUNT_ID "26 minutes ago" and CLOUDFLARE_API_TOKEN "34 minutes ago" (so the
+  token box was not overwritten by the account ID), and Cloudflare's list showed the token with "Pages Write", "Last
+  used" empty, created and modified "36m ago". Then (his words) the token rolled and pasted, the account ID pasted from
+  Account Details, `headers-44171977539` deleted; after: both secrets "now" ("Environment "preview" updated.").
+- Attempt 2 (his "Re-run failed jobs"): deploy job id 134368200375, created 21:06:06, started 21:06:47 (his approval
+  between), "Upload to Cloudflare Pages" 21:06:56-58 failure with the same two errors (Authentication error [code:
+  10000] on /accounts/***/pages/projects/shamble-preview-check; Invalid access token [code: 9109] on /accounts; his
+  screenshot of the log). Verify job id 134368776685, 21:07:03-11, failure; its artifact upload succeeded (21:07:07-09).
+  By the stop rule told to him: no third paste; the cause is looked for elsewhere.
