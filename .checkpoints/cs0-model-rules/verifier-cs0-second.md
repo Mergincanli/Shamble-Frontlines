@@ -11,3 +11,7 @@ Task: cs0-verifier-second-look (PR #56, branch claude/wonderful-hamilton-jdmlnf,
 - B7: answer drafted here, then DONE.
 
 ## Notes
+### B0 state — done
+- HEAD 47546e9 (branch claude/wonderful-hamilton-jdmlnf); base c94c81b = origin/main (local main stale at 44446a5: pass c94c81b explicitly). Docs commits after cacea55: f61f43c, 94aaae8, 4f20643, d6b6b30, a65d26f (the rest are checkpoint commits). Diff cacea55..HEAD -- docs: 12 files, +187 -95.
+- First pass's findings (notes F-ids -> caller's numbers, inferred from the brief: 1 = pointers, 5 = renumbered citations, 8 = already closed; Mediums first, then Lows in note order): 1 = F2 (Medium, pointers drop the redo sentence); 2 = F6 (Medium, struck "(never a plain tube)" left out of "Since the plan"); 3 = F1 (Low, pointers-insert --check exit 1 on old long lines); 4 = F3 (Low, SPIKE_PLAN edits not in the plan's file table: name them in the report/PR file list); 5 = F4 (Low, stale SP/0005 line citations in asset-export-rules.md); 6 = F7 (Low, two process statements without times); 7 = F8 (Low, "about 900 / about 1,700" sizes unmeasured); 8 = F5 (Low, rifle marks; fixed in 94aaae8).
+- Next: B1.
