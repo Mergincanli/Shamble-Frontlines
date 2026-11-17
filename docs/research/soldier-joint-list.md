@@ -180,9 +180,9 @@ AX-F1). PM-0005-56 runs these lines, with its numbers ruled, and adds the root's
 5. One root: `hips` is the only joint without a joint parent; the mesh node and every non-joint node above `hips` are
    identity, and each joint's rest transform equals its bind pose (from the inverse bind matrices), within 0.5
    degrees and 1 mm, so the stand-in and the model hand the engine the same lengths and frames.
-Planted files that must fail (PM-0005-56): turned 180 degrees, mirrored, Z-up, origin moved 1 m, the mesh node scaled
-0.01, exported in a pose, a joint other than `hips` left without a joint parent; the unweighted vertex is the planted
-defect of AER mark 3 (PM-0005-49).
+Planted files that must fail include (PM-0005-56): turned 180 degrees, mirrored, Z-up, origin moved 1 m, the mesh node
+scaled 0.01, exported in a pose, a joint other than `hips` left without a joint parent; the unweighted vertex is the
+planted defect of AER mark 3 (PM-0005-49).
 
 ## 6. Left open, and who decides
 - Where the joints the brief does not place sit (hips, spine, chest, head, hip, knee, ankle, coat pivots): the Art
