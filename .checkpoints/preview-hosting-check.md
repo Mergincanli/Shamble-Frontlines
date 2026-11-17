@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-17 21:30 Amsterdam (20:30 UTC)
+- **Last update:** 2026-11-17 21:41 Amsterdam (20:41 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -178,7 +178,6 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    Chromium 153.0.8010.12) and read 0 pull requests and 0 workflow runs on the test repository. Lows for the record:
    F-C and F-D (For the report). No change to the head, so no new review and no new yes.
 
-## Current step
 20. Waiting for his screenshots (his message of 2026-11-16: "they follow in my next message"): `preview`, `production`,
    Actions → General and the token's end date, plus (F-F) the empty "Repository secrets" list, asked for in the
    message sent after this update. The checks: Next steps 1.
@@ -298,6 +297,16 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      Write" only, the paste saved ("1 minute ago"), the account ID from Account Details; the end date only in the
      filled form. The results-log header is written (`results-log.md`, saved f37cb7a).
 
+## Current step
+21. The setup pull request (a rehearsal outside the marks, plan Part 3 B), after consultation 9: remote `setup`
+   1619164 with 0 pull requests and 0 runs (read 2026-11-17 before opening); open it, read run 1 until plan and build
+   are green and deploy waits on `preview`, then send his list (the workflows' names deploy and close, the pull
+   request's number and the run's link; approve the deploy, merge, approve the cleanup; the approve clicks of plan
+   Part 3 C; about 10 minutes; SA-R3 accepted, SA-R2, SA-R5, SA-R6 deferred; what starts without him: plan, build and
+   verify, and after the merge the hourly probe at :23, which exits 0 when every link gives a reading). After the
+   merge: list the branches (if `setup` is gone, "Automatically delete head branches" is on: fix before sitting 1);
+   run ids and approval times from the run data.
+
 ## Next steps
 1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
    CLOUDFLARE_ACCOUNT_ID; in `production`: CANARY); `preview` (him as required reviewer, self-review unticked, admin
@@ -331,6 +340,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   4), and the token's end date (plan A5 step 5; he asked where to set it, 12:34:49 UTC). Then (2026-11-17): no Account API
   token exists (his words: the page is empty), after my wait at step 3a was never lifted. Instructions for such steps should end with a
   screenshot of the result, and every "wait" needs its own "go ahead" in words.
+- Unanswered, not blocking: what went into CLOUDFLARE_API_TOKEN on 2026-11-15 (replaced on 2026-11-17; no run ever
+  used it). SA-R3's premise: the end date "Nov 27 GMT+1" was seen in the form before the token was made, and on no
+  screen since.
 - The process account (his rule: only what a record shows, with its time): the process slip of 2026-11-15 and F-A
   (Open findings); the "repository ready" record (step 12's added bullet); the effort not passed to the web-fetch
   agent (Running work).
@@ -504,6 +516,15 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    value; gate (b)'s evidence without a token value (the summary page, or the form after "Back"; then `preview`'s
    secrets list with a fresh "Last updated"); no guess to him about the old value (a Global API Key answer would
    become a "Decisions needed" entry).
+
+9. 2026-11-17 20:38:50 UTC (called; transcript time), moment 5 (before step 20 was saved as done) and moment 1 (before
+   the setup pull request) · Q: are both gates met, and may the pull request open now? · Changed: both gates met on the
+   recorded evidence; the remote `setup` checked first (1619164, 0 pull requests, 0 runs); the header's account-ID
+   line marked as his words, not a screenshot; open first and send the list only once plan and build are green and
+   deploy waits (a red run fixed before he sits); the list with the real names and links, the three acts in order, the
+   approve clicks and the time, one line each for SA-R3, SA-R2, SA-R5, SA-R6, what starts without him (the probe's
+   result checked first), and "a rehearsal: a red run is a finding, not a redo"; Sunday's token value not asked again
+   (unanswered, in For the report); SA-R3's loop closed in one line; after the merge, the branches listed.
 
 ## Running work
 - saver boyrmgcz1 (started 2026-11-16 08:49:17 UTC): stopped by itself at 10:39:17 UTC ("time is up", 110 minutes;

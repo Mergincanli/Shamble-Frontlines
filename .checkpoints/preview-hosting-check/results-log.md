@@ -35,7 +35,8 @@ To be checked again before the 24-hour reading.
   - `preview`: required reviewer Mergincanli; "Prevent self-review" unticked; "Wait timer" unticked; "Allow
     administrators to bypass configured protection rules" unticked (found ticked on 2026-11-16, his fix on 2026-11-17);
     "Deployment branches and tags": "No restriction"; secrets CLOUDFLARE_API_TOKEN (pasted again 2026-11-17, "1 minute
-    ago" at 20:29:51) and CLOUDFLARE_ACCOUNT_ID (from Cloudflare's Account Details, pasted again 2026-11-17).
+    ago" at 20:29:51) and CLOUDFLARE_ACCOUNT_ID ("2 days ago" in that screenshot; from Cloudflare's Account Details
+    and pasted again on 2026-11-17 by his words of 20:35:32, not by a screenshot).
   - `production`: no reviewer; "Wait timer" unticked; administrator bypass unticked; "Selected branches and tags",
     one rule, branch `main`; secret CANARY.
   - "Repository secrets": "This repository has no secrets."
