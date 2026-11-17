@@ -222,7 +222,9 @@ it asks nothing; REFS-KIT stays.
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver: bp6oaduw2** (started 2026-11-17 04:31:59 UTC, to about 06:22; ba732d9co, restarted 02:39:41 after
   the spend-limit cut, saved 8c72ab7, bf752f3 and df4634f and stopped on its time limit at 04:29:42; b00b7pd9e ended
-  on its time limit at 22:28:10, then bqdaec008 ran until the container restart at 23:46:48; the cuts block). **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
+  on its time limit at 22:28:10, then bqdaec008 ran until the container restart at 23:46:48; the cuts block).
+  **Check-in 04:34 UTC:** nothing stopped; chat 177,597 tokens, about 18 % of 1M (chat_size.py, read only).
+  **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
   c62h_bound_rejudge_compare.py (section 7; --self-test 4 of 4 as required, .gate/u4r/c62h-bound/rejudge-compare-dry.log;
   the real self-test runs into rejudge-compare-negative.log before the comparison) and c62h_bound_set_check.py
   (sections 8.3-8.4; on the old results/u4r/fc411116c1f1/P2: all 29 lines naming the new phrase or checks FAIL, the 12
