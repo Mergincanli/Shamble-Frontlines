@@ -6,8 +6,8 @@
   **Base:** main, last merged in at 3f2fa21 (main 82c605e, PR #54; MAIN-52); before that at 2bd44a5 (main 53272a1, PR
   #53 the kept-logs rule and PR #52 the docs pass; Mustafa's KL-MERGE (a), 2026-11-15 20:50). Take main in again when main changes code, CI or rules, and once before PR #40 is
   marked ready (MAIN-52, 2026-11-14)
-- **Last update:** 2026-11-17 10:45 UTC (his RECS-1043 answers recorded; U3C-HELD-1 building: the cause confirmed
-  by L1, the fix in and uncommitted, E3a running; DOCS-54's plan next: the block "NOW (2026-11-16)")
+- **Last update:** 2026-11-17 12:36 UTC (U3C-HELD-1: the fix committed at 0ad9661, E6 PASS, the gate PASS, pushed by
+  this save; next its step 9: CI and the advisor's head check; then DOCS-54's build: the block "NOW (2026-11-16)")
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **NOW (2026-11-16, the day session; read this first after a compact or a cut).** Mustafa typed /compact about 09:00
@@ -308,10 +308,22 @@ it asks nothing; REFS-KIT stays.
   five plants fail as the table says** (P1 the stalled-client test [1, 0] "...at every write", G-NC2 too, evidence
   under C3; P2 G-NC2 [121, 0]; P3 "held only falls" [134, 0] and G-NC2 [1144, 0]; P4 [137, 129] and G-NC2's hang
   guard; P5 [0, 172]), each restored, the three fixed hashes after the last. **E5 PASS** (npt-lab 98c3967e…, as
-  before). The gate PASS (11:34). **RUNNING from 11:35 UTC: the review round (C8)** (workflow wf_88c44554-26a, task
-  w8oeb98g2: netcode-architect, test-engineer, rust-reviewer at xhigh, read only; notes u3c-held-1/*-review.md).
-  Next: save the three results word for word, read them in full, one fix pass, then step 5 (disk: free 4,955 MiB is
-  below the 5,220 bar, so pack B1 by brief 8.1 under PACK-READ (a)), step 6 the commit, step 7 the counted run. **DOCS-54's
+  before). The gate PASS (11:34). **The review round (C8) DONE** (wf_88c44554-26a, 11:35-11:52 UTC; saved word for
+  word by u3c_held_1_reviews_full.py, read in full): netcode-architect, test-engineer and rust-reviewer all **APPROVE
+  WITH FINDINGS** (0 Critical, 0 High, 1 Medium NA-UH1-1, 12 Low). **The fix pass** (notes only, no spike file
+  changed, so no evidence re-run): NA-UH1-1 met in the plan's "Not looser" line (C9's difference-set argument); the
+  Lows carried into the report or deferred as follow-ups (u3c-held-1/build.md:108-122; the Open findings). **Step 5
+  DONE** (11:53-11:57 UTC): B1 packed by brief 8.1 under PACK-READ (a): the list commit 978202d (the redact step on it
+  306 items, 0 findings), pushed; free 4,950 → 5,553 MiB, above the 5,220 bar, so P3 not packed. **The spend limit cut
+  the session 11:57-12:13 UTC** (the block "Cuts by the spend limit"). **Step 6 DONE: the fix commit
+  0ad9661657715dfbb154eb77d8fd7abce0b891c4** (12:17 UTC; 3 files, 74 insertions, 42 deletions; not pushed until E6 and
+  the gate pass). **E6 PASS, every item of the bar** (12:18:37-12:34:46 UTC, task bs9tngfxi, exit 0;
+  .gate/u3c-held-1/counted.log read whole): header HEAD 0ad9661, diff and untracked e3b0…; "check: all 11 steps pass";
+  test 552 / 632 passed, 0 failed, 0 skipped; refs 1382; marks 81; self 78 of 78; redact 10 of 10, 306 items, 0
+  findings; deps 137 crate files; wasm 27000 ticks, 0 mismatching both ways; free 5,552 → 5,514 MiB. **Step 8: the
+  gate PASS** (12:35 UTC, --no-smoke; legacy/ unchanged) and this card save, which pushes 0ad9661 (code ahead: no [skip
+  ci], CI runs). Next: the saver restarted, then step 9: CI green on the pushed head (the GitHub MCP tools), the
+  advisor's check of that head by its full SHA; then U3C-HELD-1 closes on the card. **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
   full; the plan docs-54/docs-54-plan-draft.md, 134 lines, 2d3bb7a9…). ADV-D54-1 High: the copy method would quote the
@@ -326,8 +338,9 @@ it asks nothing; REFS-KIT stays.
   approved" section; the plan now sha256 62b5ae673ad443dd5a99c3725045a1a98df2d2bdce885e06cb4243f34e620549, after the
   header's time was corrected from an unread "11:14"). Next for DOCS-54:
   the build in the worktree .gate/docs-after-54-wt, each asking call named first (C9), after U3C-HELD-1's commit (so
-  the two lanes do not crowd the 3-agent cap). Saver bzkwerbtb from 10:45:53 UTC (to about 12:35). Next: E3b (the stalled-client test, 600), E3c (the whole
-  binary, 20), E4 (plants P1-P5, each restored by hash), E5 (the lab's hash), then the review round (C8).
+  the two lanes do not crowd the 3-agent cap); its first calls may ask him, so it starts once U3C-HELD-1 needs no
+  quick answer (after step 8's push). Saver: none running (bzkwerbtb stopped at step 5; its last save 3a28107,
+  pushed); it restarts at step 8.
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver: none running** (bvg19b3fy ran 2026-11-17 07:55:49-09:45:50 UTC and stopped on its time limit; not
@@ -3352,6 +3365,18 @@ re-run the same call if no failure was caught. Then the cause → te-m3-plan.md 
 
 **Cuts by the spend limit** (SPEND-LIMIT (a), Mustafa 2026-11-12: at every cut, the notice's exact text, the time of
 the cut and the time of the resume; UTC, read from the session's transcript):
+- **2026-11-17 11:57 to 12:13 UTC, the spend limit.** The notice, word for word, at 11:57:32.558: "You've hit your
+  org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets 12:10pm (UTC)". The same
+  notice answered at 11:59:56, 11:59:59 and 12:00:02. My turn stopped right after `git diff --cached --stat`
+  (11:57:32.256: 3 files changed, 74 insertions, 42 deletions), in U3C-HELD-1's step 6: the fix's three files staged
+  and its commit message written (.gate/u3c-held-1/fix-commit-msg.txt), not yet committed; build.md held step 5's
+  pack lines, not yet saved. Mustafa's resume message came at 12:13:14.810 (a queued command), the worker restart
+  notice at 12:13:15.983. **Resumed at 12:13:37 UTC** (his message taken in at 12:13:37.941); the context then ran
+  out and the session was compacted at 12:15:23. Nothing was half done: no agent, workflow or run was in flight, the
+  saver was stopped (by plan, for step 6), the branch's last commit 978202d (the B1 list) was pushed and its CI
+  finished with nothing failed, and after the resume the three staged files hash as fixed (delay.rs 3dbbccf7…,
+  delay_tests.rs 8f8c0f9a…, SERIES.md 1dd67e2f…). Found with `.checkpoints/netcode-proof-test/cut_notice_find.py`
+  (read-only).
 - **2026-11-16 22:29 to 2026-11-17 02:37 UTC, the spend limit.** The notice, word for word, at 22:29:16.315: "You've
   hit your org's monthly spend limit · ask your admin for a higher limit · your 5-hour limit resets 1:30am (UTC)". My
   turn stopped right after a read-only look at marks.json (-58's parts), in the report draft's fix pass. The same

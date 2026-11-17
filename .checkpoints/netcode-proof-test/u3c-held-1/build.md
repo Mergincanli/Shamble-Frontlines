@@ -120,3 +120,39 @@ saves after 18b139c; the spike unchanged since ddd38ba.
   held_at_write[d].min(len)`), TE-UH1-6 (assert both counts again before drop and in a shared helper), TE-UH1-7 ("A
   few seconds" is about 16 s), and the loop script's failure-list print (TE-UH1-2's reuse fix). Taker: the next change
   to delay.rs, delay_tests.rs or SERIES.md (on the card's Open findings).
+- **11:53-11:57 Step 5, the disk and the B1 pack** (PACK-READ (a); brief 8.1's procedure; the saver bzkwerbtb stopped
+  first, its last save 3a28107 on the remote): pgrep found no cargo, rustc, npt-lab, npt-judge, check.mjs or runner
+  (exit 1); free 5,191,479,296 B (4,951 MiB, above the folder's 821 + 1,024); `kept-logs.mjs list u4r-B1-64f3307d5c7f
+  --results spikes/netcode-proof/results/u4r/64f3307d5c7f/B1`: 11 files, 860,377,134 bytes; the spike's redact on it
+  (b1-redact.log): 306 items, 0 findings; **the list commit 978202d** (that one file, the message naming
+  advisor-u4r-sets-r2-full.md:45, B1's results at 73060fd and PACK-READ), pushed; **the pack: free 4,950 → 5,553 MiB**,
+  archive .gate/netcode-proof-test/kept-logs/u4r-B1-64f3307d5c7f.tar.gz (227,889,786 B), "read back: 11 of 11 files
+  equal the list (path, bytes, sha256)", the raw folder removed. The 5,220 MiB bar holds: P3 not packed.
+- 11:57-12:13 **The spend limit cut the session** between the staging and the commit (the three files staged, the
+  message written; the card's "Cuts by the spend limit" has the notice, word for word, and the times). After the
+  resume the three staged files hash as fixed (3dbbccf7…, 8f8c0f9a…, 1dd67e2f…), nothing else staged.
+- 12:17 **Step 6, the commit: 0ad9661657715dfbb154eb77d8fd7abce0b891c4** (`git commit -F
+  .gate/u3c-held-1/fix-commit-msg.txt`: 3 files changed, 74 insertions, 42 deletions). The saver stays stopped
+  (bzkwerbtb, stopped at step 5). Not pushed until E6 and the gate pass.
+- 12:18 **Step 7, E6's pass bar, every item, written before the call** (the plan's step 7 as C5 amends it): the
+  header's HEAD 0ad9661657715dfbb154eb77d8fd7abce0b891c4, diff and untracked e3b0c442…; check.mjs exit 0, "check: all
+  11 steps pass"; test "measured build: 552 tests passed, 0 failed, 0 reported a skip; bites build: 632 tests passed, 0
+  failed, 0 reported a skip" (no new test); refs 1382 (`git ls-files`, read at 0ad9661 just before the call by
+  main54_counts.py; M 306; `git status --short --ignored -- spikes/netcode-proof` empty); marks 81; self 78 of 78;
+  redact 10 of 10, 0 findings, 306 items (305 plus the one pack list since, B1's at 978202d); deps 137 crate files;
+  wasm 27000 ticks, 0 mismatching both ways (digests never pinned). Pass is the exit code and the runner's summary,
+  never a grep. One failed item: stop for the advisor, whole; never a second counted call without it. det-u4 and the
+  hash regeneration stay out (D11, E5). Disk at 12:18: free 5,822,124,032 B (5,552 MiB; floor 4,096; E6 up to 1,022
+  MiB net).
+- **12:18:37-12:34:46 E6 PASS, every item of the bar** (task bs9tngfxi; .gate/u3c-held-1/counted.log, 29 lines, read
+  whole: the long deps line at the 12:34 check-in, the rest after the run): header HEAD 0ad9661, diff and untracked
+  e3b0c442…, free 5552 MiB; fmt, clippy, clippy-wasm32, doc PASS; "PASS test 804.8 s measured build: 552 tests passed,
+  0 failed, 0 reported a skip; bites build: 632 tests passed, 0 failed, 0 reported a skip"; deps "(137 crate files and
+  1 cargo config file(s) read ...)"; wasm "native leg 1 against native leg 2: 27000 ticks compared, 0 mismatching,
+  equal ...; native leg 1 against Wasm leg 1: 27000 ticks compared, 0 mismatching, equal"; refs "1382 tracked files";
+  marks "81 marks read and checked"; self "78 of 78 tests passed"; redact "10 of 10 tests passed; redact-check: 306
+  item(s) checked, 0 finding(s)"; "check: all 11 steps pass"; "=== 12:34:46 UTC exit 0: node check.mjs"; "--- end
+  12:34:46 UTC, exit 0" (the task's exit code 0). Free after 5,781,766,144 B (5,514 MiB; 38 MiB used net).
+- 12:35 **Step 8, the gate on 0ad9661: "GATE PASS (5a smoke skipped: --no-smoke)"** (`node tools/gate.mjs --no-smoke`,
+  about 12:35 UTC; base merge-base 82c605e; [1]-[4], [5b]-[5d] PASS; legacy/ unchanged; smoke is CI's job). Next: the
+  card save (it pushes 0ad9661 with the notes; code ahead, so no [skip ci] and CI runs), the saver restarted, step 9.
