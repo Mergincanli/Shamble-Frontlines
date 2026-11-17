@@ -295,3 +295,81 @@ Edit u4f-brief.md in place; a first change-list block "rev 3.1 to rev 3.2" with 
   PART_13 and stamps_skipped; f37; f38 tick 1; f39 conditional), E11 (2.12 kind 10), E12 (2.13), E13 (1 item 5), E14
   (SIZE-CHECK 4,850), 6 item 1 and 7 items 2, 3, 16. Next: E15 5.3, E16 5.5, E17 5.6, E19 8, E20 9.1, E21-E27 Q2, Q6,
   Q7, Q8, Q15, Q17, Q18, E28 11, E29 12, E30 NA.
+- S4 (more) DONE: E15 (5.3: no twin, rule per run, p1-p6 spelled, p11 by D4, p19, p20, closing sentence), E16 (5.5:
+  373.8, 2,622.8, total 3,607/3,727; room from D2 1,372 -> about 1,752 after the pack, shared target 6,346; C62H-BOUND's
+  two sets named), E17 (B2, B3), E19 (rows 51-54, tally), E20 (9.1 SA3-1 row gains SA31-1). Next: Q2, Q6, Q7, Q8, Q15,
+  Q17, Q18; 11 D2, D4, D12; 12 items 4, 6, 7; NA-4, NA-5.
+- S4 (rest) DONE: Q2 (D2's figures; C62H-BOUND's sets only by KL-U4F (c)), Q6 (status, "What D4 shows", recommendation
+  restated, not ruled), Q7 (iii) (c) catch-up, (e) skip, Q8 (TE31-7, SA31-1), Q15 (c)'s why, Q17's triple, Q18 (rejoin
+  why; (i)/(ii); (d), (e); rec. (a) with (d); "f38 shows it"), 11 D2 and D4 filled, D12, 12 items 4 (Q18), 6 (LEAD-BOUND
+  reworded; KL-U4F in MiB with (c)), 7, NA-4 (confirmed), NA-5 (D2). Next: S5 checks.
+- S5 DONE: 0.1 gains rev 3.2's head (55c873ae66e8b5f0b4e9b6ab6b78cce8151faae5; `git diff --stat 0ad9661 HEAD --
+  spikes/netcode-proof` and `git diff --stat 9f76a02 HEAD -- spikes docs .claude` print nothing); section 10's status
+  line names rev 3.2's question changes. `python3 -I N/u4f-r3/r31_check.py` (read only) after the last edit, its whole
+  output:
+  ```
+  brief sha256 e9f33e61cffc5b229774000d9f6ac8ab1acc9567078caca14e3b2f14167a33ba lines 1734
+  P24 key count: 1 bare words count: 2
+  placeholder uses: {'P1': 8, 'P2': 2, 'P3': 3, 'P4': 2, 'P5': 1, 'P6': 2, 'P7': 2, 'P8': 3, 'P9': 2, 'P10': 1, 'P11': 2, 'P12': 1, 'P13': 2, 'P14': 3, 'P15': 12, 'P16': 7, 'P17': 5, 'P18': 4, 'P19': 4, 'P20': 3, 'P21': 8, 'P22': 6, 'P23': 5, 'P24': 2, 'P25': 3, 'P26': 2, 'P27': 5, 'P28': 2, 'P29': 2, 'P30': 3, 'P31': 4, 'P32': 8, 'P33': 3, 'P34': 3, 'P35': 2, 'P36': 4}
+  unknown <<P ids: []
+  PV1 6 base 34 @@ 4 r3 markers 0
+  section 12 item 3: lines 1618 to 1661
+  7-word runs outside section 12 item 3: 0
+  ```
+  (`@@` 4 = C2's one mention of rev 2's two marker forms, as before.) New read-only N/u4f-r3/r32_sums.py, its output:
+  2.10 39 rows f1-f39, measured sum 109, negatives 64, conditional rows 2 (f38, f39); section 8 54 rows; 9.1 19 rows;
+  18 questions; 5.3 p1-p21 (15 base); 5.5 -20 373.8, -21 2,622.8, -22 320.4, total 3,607.0 (15 pre-runs) and 3,727.0
+  (21); D2 room 1,372, +380 = 1,752, 1,855 short of 3,607; C62H-BOUND's two sets at 73 % about 758.
+
+### Per finding (done or rejected, with the reason)
+- **TE31-1 (Medium) DONE, by U4F-Q7 (iii) (c).** 2.2: the owed stamps carried at 2 a step while the target lies at most
+  `REDUNDANCY_CAP` ahead, the lead moving at most 1 a step, only a reset skipping (`stamps_skipped` expected 0); Q7 (iii)
+  (c) gains it, (e) keeps rev 3.1's skip as an option sound under (b) only; f36 asserts `stamps_skipped` at most 0.1 %.
+  Not taken as worded: f36 "under Q7 (a) and (b) both while Q7 is open": a U4F-Q left open at launch stops the builder
+  (section 1 item 5, rev 3.1 text "a part a U4F-Q leaves open at launch"), so f36 runs on the ruled form; with the
+  catch-up, (c) holds under either form (the checker's model: backlog at most 3).
+- **TE31-2 (Medium) DONE.** 5.3: no twin, the twin checks a Gap (figures.rs:99-109, eval.rs:346-347), listed beside the
+  length-failing ones; the rule per run; p1's twin bar dropped (not two twin runs added, so pre-runs and disk stay);
+  p2-p6 spelled; p13 named; D12 the same; the closing stop sentence matches.
+- **TE31-3 (Medium) DONE.** p19 reworded with P1's arithmetic and each count apart (late by W, `input_limited`, kind 10,
+  the max at most 8); Q15 (c)'s why restated; the cap shown by the forged suite's kind 10 (f22, p1).
+- **TE31-4 = SA31-2 (Medium) DONE.** 2.2's first stamp (snapshot, under Q7 (b) an estimate, a target above the kept
+  `JoinAccepted` tick; first stamp the target; `map_or(0)` unreachable under the controller); bots' row; 2.13 (0 before);
+  f32 (iii) (+1, honest) and f13 (iv) (+1, neg: equal refused, +1 accepted). The endpoint today keeps only the slot from
+  `JoinAccepted` (client/src/lib.rs:496), so keeping the tick is new code, named.
+- **TE31-5 (Medium) DONE.** f16 per pair (`sent_count` at least 1 in the window, kind 10 a whole episode, the clamp one
+  point; the twin's datagram present); `--forge-every` a lab setting with a header row (2.6, 2.7, B2); f29 under Q4 (a)
+  or (c): events per round at most 1,560 (32,768 / 21) and the 1,000 connects once in D7.
+- **TE31-6 (Low) DONE (text).** p20 reworded (every command late, excess at most 0, by Q11 (v) (b)); Q18 "f38 shows it;
+  p20 shows the window closing an idled fast clock". The other route (a banker behaviour) not taken: new cheat code for
+  a report-only run.
+- **TE31-7 (Low) DONE.** R3, B3, Q8, Q18's recommendation and the LEAD-BOUND draft: the room's limit after an idle is the
+  bound plus W (20), the checks' allowance the bound alone (12), the judged fast clock never idles.
+- **TE31-8 (Low) DONE with D2.** 5.5, Q2, KL-U4F in MiB (3,607-3,727 MiB = 3.5-3.6 GiB vs about 1,750 above the floor
+  after the pack); -21 2,622.8 and, the same nit, -20 373.8 (7 x 53.4; rev 3.1 had 373.9); total 3,607/3,727; the two
+  C62H-BOUND sets named in 5.5 as covered by no rule, and as KL-U4F's option (c).
+- **TE31-9 (Low) DONE.** 12 item 4: Q1 to Q18.
+- **TE31-10 (Low) DONE.** f36's model with PART_13 (l1/src/lib.rs:146, :173); the time rule on every new test (f8, f32,
+  f36 named); a stop at 1.5 times `<base>`'s test step, read from check.mjs's step line (:2678-2681); f37 on the lab's own
+  episode function; 1 item 5 lists both stops.
+- **TE31-11 (Low) DONE as SA31-4 (a), (b).** Kind 1 anchored at the forger's newest + 2 + the bound + k: the checker's
+  "honest stamp + bound + 1" fails at a controller lead of 1 (newest + 1 + bound + 1 = the highest arrival tick + bound,
+  accepted: l1/src/lib.rs:69-70 puts the arrival at newest + 1 or + 2), so SA31-4's anchor is used. Kind 3's copy changed
+  in place when it rides, added when alone.
+- **SA31-1 (Medium) DONE, by U4F-Q18 (ii) (d)** (a design choice the plan leaves open: built only "by U4F-Q18"): the
+  per-slot kept stamp across join, replace, leave and kick, the later of it and `JoinAccepted`'s tick by signed distance,
+  `rejoin_overlap` non-forged; (e) the exposure for OQ-0001-6 and "per session"; recommendation (a) with (d); f39
+  conditional (+1, neg); 2.3, 2.4 item 4, 2.13, B2, 9.1, Q8, LEAD-BOUND.
+- **SA31-3 (Low) DONE.** 2.4 item 4: every tick compare a signed distance (wrap.rs:60-65), never `t + bound`/`t - W` in
+  u32 (room.rs:439; Cargo.toml:116-120); f13 (iii) and f38 a case at room tick 1; Q17 and 2.3's carry 80 (a) row use the
+  reachable triple t-5, t+2^30, t+2^31-2; (a) stays recommended.
+- **SA31-4 (Low) DONE.** (a) kind 1's anchor; (b) kind 3 in place or added; (c) kind 10's view tick at most its own tick
+  (client/src/lib.rs:436-441), in 2.6 and in 2.12's twin row.
+- **D2 DONE.** 11 D2 filled with the reading (each folder's size), left for launch before/after 5.5 item 1 and after item
+  2; 5.5 room, Q2, KL-U4F and NA-5 from it; C62H-BOUND's two folders named.
+- **D4 DONE.** 11 D4 filled (three files, the 99,000-connect figures); Q6's status and "What D4 shows" (not ruled; the
+  options kept; recommendation (b) restated with the figures: an averaging filter has the margin, a lowest-RTT pick sits
+  on the bar); NA-4 confirmed; 2.1's filter row (by U4F-Q6 (b): averages; ADR 0001:239-242 names no pick, so no reading)
+  and bites row; f1 pins 4.0 ms by U4F-Q6 (b) (between D4's mean 2.35 and lowest-RTT 4.856, 1 ms under the bar); p11.
+- Rejected outright: none. Brief rev 3.2: e9f33e61cffc5b229774000d9f6ac8ab1acc9567078caca14e3b2f14167a33ba, 1,734 lines.
+- DONE.
