@@ -413,7 +413,8 @@ it asks nothing; REFS-KIT stays.
   the change list, every finding rated Medium or higher, the open questions and the bar changes in full (USAGE-SAVINGS
   (a)); then the D-items that must run before the advisor; then the advisor's check of the brief with U4F-Q1-Q16 (its
   own workflow, as U4r's wf_95beab47-c57); any new or changed bar goes to him under Decisions needed. The 2-hour
-  check-in trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (next 18:34 UTC).
+  check-in trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (next 18:34 UTC). The saver **bry6ih3zs** from 17:25 UTC (stop it
+  by TaskStop when no agent runs).
   **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
