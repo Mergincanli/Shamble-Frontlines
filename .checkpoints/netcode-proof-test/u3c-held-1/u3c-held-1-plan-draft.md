@@ -13,7 +13,7 @@ limit everywhere the held bytes can grow (every write), prove by planted bugs th
 and correct every sentence stating the old form. Merged before another lane's counted check.mjs run (U4f's at latest).
 
 ## 2. Why (the finding and its sources)
-- The card's U3C-HELD-1, Medium (netcode-proof-test.md:3877-3890); the advisor's merge-stop ruling C2-C3
+- The card's U3C-HELD-1, Medium (its Open findings entry "U3C-HELD-1"; C9); the advisor's merge-stop ruling C2-C3
   (advisor-c62h-bound-merge-stop-full.json: "a timing false positive in a test-only check from U3c").
 - C62H-BOUND's first counted call, bites build, binary npt_net-ed8673eeeaf4db12 (.gate/u4r/c62h-bound/merge.log:48-51):
   delay_tests.rs:2300-2304, "held <= 64 KB + the front record's acknowledged prefix", left [1, 0], right [0, 0]
@@ -37,7 +37,8 @@ and correct every sentence stating the old form. Merged before another lane's co
 ## 4. Steps, in order (one command per call, in the simple forms that need no approval: history.md:2187-2190)
 Every cargo call goes through main-run.sh (lane lock, idle wait, 4 GiB floor at start, crates touched: :21-53; main
 folder only, :13-14, :26). Logs: /home/user/Shamble-Frontlines/.gate/u3c-held-1/. The saver adds only its folder
-(checkpoint.mjs:155) but pushes the head (:132): stopped from step 6 to step 8 (as in c62h-bound-build.md:424).
+(checkpoint.mjs:155) and in watch mode never pushes unpushed code (checkpoint.mjs:9-11; C9's correction, 2026-11-17);
+it is still stopped from step 6 to step 8 (as in c62h-bound-build.md:424).
 
 **Step 0.** This plan → the advisor's plan review; it also rules HELD-Q1 to HELD-Q12 (section 9).
 
@@ -126,7 +127,18 @@ write {:?}; first losses {}, stalls {}", with `life.held_grew` after `life.held_
 Doc text exactly as the design notes write it: delay.rs:46-51 (notes :149-156), :370-373 (:163-165); delay_tests.rs:
 741-744 (:254-256), :2259-2265 (:285-292); SERIES.md:613 and :642, two phrases each, each old phrase matching exactly
 twice (:315-322). Then rustfmt clean (its diff applied by Edit). Not looser: the same formula at every growth; "held
-only falls between writes" becomes a counted fact (held_grew); the old bite still bites (P2).
+only falls between writes" becomes a counted fact (held_grew; what it counts exactly: no sample above what the latest
+write left, TE-UH1-1); the old bite still bites (P2).
+**The difference-set argument (C9; NA-UH1-1; added 2026-11-17 after the review round, line numbers at the fixed
+tree):** between writes una only rises, so for the same front record the prefix (delay.rs:541-545) never falls; the
+takes (:1530-1534, :1782-1785) leave the front unreleased record unchanged; the prefix falls only when harvest moves
+released[d] past the front record (:698-709). So a sample s that the old check flagged and the new pair passes has
+held(s) <= held(w) <= B + p(w) (w the latest write, checked at :635) and held(s) > B + p(s), so p(s) < p(w), which
+needs a release since w. No byte is admitted between writes (the held bytes grow only at :829 and :1597, each followed
+under the same lock by model_write and its check). So the fix is looser only on the release transient, which admits no
+byte, and every sample stays below 64 KB + 16,406 B. That the old flake is gone rests on this argument and on L1's run
+94 (D-1's over_at_write, the new formula, counted [0, 0] where the old check fired; l1.log:227), never on E3's pass
+counts (TE-UH1-3).
 
 **Step 3. The fix's evidence** (each its own main-run.sh call and log; plants by Edit in the main folder: HELD-Q10):
 - E3, loops on the fixed tree: `… u3c_held_loop.sh e3a one 300 2 6` (G-NC2, 600 of 600 exit 0); `… e3b one 300 2 6

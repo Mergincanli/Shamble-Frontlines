@@ -101,3 +101,22 @@ saves after 18b139c; the spike unchanged since ddd38ba.
   the lab binary is unaffected. **The gate --no-smoke: GATE PASS** (11:34 UTC). Step 3 done.
 - 11:35 Step 4: the review round (C8): netcode-architect, test-engineer, rust-reviewer, xhigh, three at once, on the
   final working-tree diff; notes u3c-held-1/<agent>-review.md.
+- **The review round (wf_88c44554-26a, 11:35-11:52 UTC): all three APPROVE WITH FINDINGS** (saved word for word by
+  u3c_held_1_reviews_full.py: netcode-architect-review-full.json 015aa739…, test-engineer-review-full.json 834bf936…,
+  rust-reviewer-review-full.json ac2cf470…, read in full). 0 Critical, 0 High, 1 Medium, 12 Low. The reviewers checked
+  the tree they read is the tree tested (the spike diff's hash a7199f7a… in every evidence log's header).
+- **The fix pass (notes only, no spike file changed, so no evidence re-runs):** NA-UH1-1 (Medium, C9 not yet met):
+  the difference-set argument written into the plan's "Not looser" line with its cites (dated), the card entry cited
+  by name, the saver sentence corrected; the report states it too and rests "the flake is gone" on it and on L1's run
+  94, never on E3's counts. Carried into the report: TE-UH1-3 (E3 shows no false failure; it cannot show the old one
+  gone), TE-UH1-4 and NA-UH1-2 (P1's G-NC2 catch is a timing one, the stalled-client test is P1's deterministic proof,
+  and the design notes' F15 / F11 premise is corrected: released records do wait untaken at G-NC2's writes),
+  TE-UH1-2 (cite the per-run logs p1-1-1.log:287-289 and p3-1-1.log:287-289 for "no other test failed"), TE-UH1-5 (the
+  gate's PASS lines quoted with their times), TE-UH1-1 (the counted fact as "no sample above what the latest write
+  left"). **Deferred as follow-ups** (spike text; a Low never triggers a push or a re-run): NA-UH1-3 (the assert message
+  says "only falls", the check counts "above the latest write"), NA-UH1-4 (the up part's wording; Life's "largest
+  excess" kept at writes; check_held_bound's "the only place they grow"), RR-UH1-2 (the same up wording in SERIES.md),
+  RR-UH1-1 (a message on the post-hold Pending assert), TE-UH1-1's strict variant (`held_at_write[d] =
+  held_at_write[d].min(len)`), TE-UH1-6 (assert both counts again before drop and in a shared helper), TE-UH1-7 ("A
+  few seconds" is about 16 s), and the loop script's failure-list print (TE-UH1-2's reuse fix). Taker: the next change
+  to delay.rs, delay_tests.rs or SERIES.md (on the card's Open findings).

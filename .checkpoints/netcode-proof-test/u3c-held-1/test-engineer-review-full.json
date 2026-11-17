@@ -1,0 +1,56 @@
+{
+  "verdict": "APPROVE WITH FINDINGS",
+  "summary": "The fix is proven. I found 7 Low findings and nothing at Medium or above, so none of them needs a push on its own.\n\nEvery planted bug failed where the table said it would. The fixed tree passed 1,220 runs with no failure. Each item below was checked against its log; the notes file has the full record.\n\n| Claim | Proof | Gap |\n|---|---|---|\n| The loop runs the right binary and prints every failing test (C3) | u3c_held_loop.sh:32-33 and :39 stop with exit 2 unless the binary is npt_net-ed8673eeeaf4db12. Each failing test's whole stdout block is printed (p1.log:54 and :103). | The printed list of failing test names is cut off (TE-UH1-2) |\n| L1 confirmed the cause | l1.log: 189 runs (188 exit 0, run 94 exit 101). Run 94: G-NC2 alone fails at :2302 (HEAD's :2300 plus D-1's 2 lines), [1, 0] against [0, 0]. Excess 14,326 B, first losses 28, over_waiting [1, 0] = held_over_bound, over_at_write [0, 0]. Every item of the plan's Confirmed line holds and no stop line is met. D-1's over_at_write is the same formula at the same place as the new check_held_bound(dir), so run 94 is also a direct positive control: where the old check fired, the new one counted 0. | none |\n| The new checks raise no false failure | e3a.log: G-NC2 alone, 600 of 600, each \"1 passed\", writes above [0, 0], samples above [0, 0]. e3b.log: the stalled-client test, 600 of 600. e3c.log: the whole binary, 20 of 20, 169 passed. All three logs show tree hash a7199f7a and binary hash 2cf1e962. | E3 cannot show the old flake is gone (TE-UH1-3) |\n| Each check still catches a real overflow | P1 to P5 in p1.log to p5.log: each plant has its own source and binary hash, and the first failing assert in each test matches the table. P1: stalled-client [1, 0] at :782. P2: G-NC2 [121, 0]. P3: [134, 0] and [1144, 0], both \"held only falls\". P4: [137, 129], plus G-NC2's hang guard at :2290. P5: [0, 172]. P1's G-NC2 failure [1, 0] is evidence under C3, not a stop. | P1's G-NC2 failure depends on timing (TE-UH1-4) |\n| The plants were taken out again | The final tree hash a7199f7a is the same in e5.log, light.log and E3. Today's diff contains no plant. Each plant's failure pattern also rules out the one before it. | The in-between restores rest on unlogged sha256 checks (build.md:77-95) |\n| The change is test-only | Every changed non-doc line is in a #[cfg(test)] item or statement (delay.rs Life struct cfg(test) at :377, then :523-524, :537-564, :634-635) or in delay_tests.rs. E5 rebuilt npt-net in release and npt-lab's hash is unchanged (98c3967e…). | none |\n| The test counts stay 552 / 632 (C5) | No test was added: 169 passed and 12 ignored in the bites npt_net binary, before (l1.log) and after (e3c.log). \"All 11 steps\" matches the 11 steps in check.mjs:2614-2649. | The pass bar still has to be written in the notes before the call (build.md stops at 11:35). refs must be read just before the call, because each committed reviewer notes file adds a tracked file. |\n\nThe new checks cannot flake:\n- **Growth sites:** the held bytes grow only at delay.rs:829→:830 and :1597→:1615, and no sample sits between the extend and the check.\n- **Pending assert:** poll_write is Pending only when free ≤ 22 B (:1584-1595), so asking for a whole record is exactly as strict as the old 100 B write.\n\nThe plan for what comes next is right. If the fix pass edits a held_grew assert or its message, re-run P3, P4, E3a, E3b and the light check on that change.\n\nThe report must say four things:\n- E3 shows only that the new checks never fail on a sound tree. That the old flake is gone rests on the code and on L1 run 94.\n- P1's G-NC2 failure is a timing one; P1's deterministic catch is the stalled-client test.\n- No plant moves an up-direction byte outside a write (P3 is down only). P4's up count of 129 shows the up branch of the between-writes check does count.\n- The gate passes have no log yet.",
+  "findings": [
+    {
+      "id": "TE-UH1-1",
+      "severity": "Low",
+      "where": "spikes/netcode-proof/crates/net/src/l2/delay_tests.rs:787, :2313 (the message); delay.rs:558-564 (check_held_falls); plan u3c-held-1-plan-draft.md:129 (\"becomes a counted fact\")",
+      "what": "The message \"held only falls between writes\" says more than the check tests. check_held_falls only counts a sample above what the latest write left; it does not check that the held bytes never rise. A growth outside model_write that follows an equal or larger drain would go uncounted. The bound claim itself still holds, since every sample is at most the latest write's held bytes, which check_held_bound held to the bound.",
+      "fix": "In the report and the card, state the counted fact as \"no sample above what the latest write left\". Follow-up for the advisor, since C1 fixed the message text: make the check strict by adding `self.life.held_at_write[d] = self.life.held_at_write[d].min(len)` after the comparison, and rename the field. P3 and P4 still catch it, and it adds no false failure, because no sample sits between the extend (:829, :1597) and model_write (:830, :1615)."
+    },
+    {
+      "id": "TE-UH1-2",
+      "severity": "Low",
+      "where": ".checkpoints/netcode-proof-test/u3c-held-1/u3c_held_loop.sh:70; .gate/u3c-held-1/p1.log:13-52 and p3.log:13-52 against p1-1-1.log:287-289 and p3-1-1.log:287-289",
+      "what": "The script's \"libtest's failures list\" takes every 4-space-indented line from the FIRST `failures:` line, which comes before the stdout blocks. With backtraces on, it picks up the backtrace \"at ...\" lines, and head -40 then cuts off the test names. The call logs of P1 and P3 hold 40 backtrace lines and neither failing test's name. The evidence still holds: the \"2 failed\" summary plus two whole stdout blocks, and the per-run logs list both names.",
+      "fix": "In the report, cite the per-run logs' lists (p1-1-1.log:287-289, p3-1-1.log:287-289) for \"no other test failed\". For reuse, print only the list after the LAST `failures:` line."
+    },
+    {
+      "id": "TE-UH1-3",
+      "severity": "Low",
+      "where": ".gate/u3c-held-1/e3a.log, e3b.log, e3c.log; l1.log:203-232; build.md:71",
+      "what": "E3 shows that the new checks raise no false failure. It does not show that the old one is gone. The old failure was only ever seen in whole-binary runs (1 in 189 here). E3a and E3b ran the tests one at a time, a mode never shown to reproduce it (L2 was not run). E3c's 20 whole-binary runs would catch a 1-in-100 failure only about 18 % of the time (1 - 0.99^20). By the rule of three, 0 failures bound the rate below 0.5 % in single-test mode and below 15 % for the whole binary, at 95 % confidence. That the transient is no longer counted rests on the code (the bound is checked only inside model_write, where admission guarantees it) and on L1 run 94, where D-1's over_at_write, the new formula, counted [0, 0].",
+      "fix": "The report states exactly this, citing l1.log:227 for the run-94 control. Never write \"600 of 600 shows the flake is gone\"."
+    },
+    {
+      "id": "TE-UH1-4",
+      "severity": "Low",
+      "where": ".gate/u3c-held-1/p1.log:103-109 (G-NC2 writes above the bound [1, 0]); netcode-architect-design.md F15; test-engineer-evidence.md:61-67 (F11)",
+      "what": "Under P1, G-NC2 failed at \"...at every write\" with a count of 1. This is a timing-dependent catch: it needs a write while a released record is still waiting to be taken. It also disproves the premise in the design notes' F15 and my own F11 that S drains at once in G-NC2. C3 pre-rules the failure as evidence, so this is not a stop.",
+      "fix": "The report counts only the stalled-client test (p1.log:56-59, [1, 0], deterministic) as P1's proof. It records G-NC2's failure as a timing catch, and notes that the premise is corrected: released records do sometimes wait untaken at G-NC2's writes."
+    },
+    {
+      "id": "TE-UH1-5",
+      "severity": "Low",
+      "where": ".checkpoints/netcode-proof-test/u3c-held-1/build.md:59, :101; .gate/u3c-held-1/ (no gate log)",
+      "what": "Both GATE PASS results (09:53 and 11:34 UTC) are recorded with no log, while every other evidence item has its log under .gate/u3c-held-1/.",
+      "fix": "When step 8 runs the gate on the commit, keep its output in a form that needs no approval, or quote its PASS summary line with the time in build.md. The report cites it."
+    },
+    {
+      "id": "TE-UH1-6",
+      "severity": "Low",
+      "where": "spikes/netcode-proof/crates/net/src/l2/delay_tests.rs:782-787 (asserts before the drain phase), :838 (final write_all), :842 (drop)",
+      "what": "held_over_bound and held_grew are now counted in every DelayStream test but asserted in only two. In the stalled-client test the asserts come before the drain phase, so the final woken write_all is never checked against the bound.",
+      "fix": "Follow-up for STATUS or the card, not this change-set: assert both counts again before drop(ds) at :842, and later in a shared helper used by every DelayStream test."
+    },
+    {
+      "id": "TE-UH1-7",
+      "severity": "Low",
+      "where": "spikes/netcode-proof/crates/net/src/l2/delay_tests.rs:2272 (\"A few seconds\"), :38 (HANG = 30 s); .gate/u3c-held-1/e3a.log (\"finished in 15.70s\" in 459 of 600 runs)",
+      "what": "Wording nit. G-NC2's rewritten doc keeps \"A few seconds\", but the test takes 15.67-15.72 s in all 600 E3a runs, about half its 30 s hang guard. The fix does not move the loop's exit: held bytes grow only at writes, so the first sample above 64 KB always follows a write above 64 KB.",
+      "fix": "Follow-up wording only, since C1 fixed this text exactly: \"about 16 s (half the hang guard)\"."
+    }
+  ],
+  "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u3c-held-1/test-engineer-review.md"
+}
