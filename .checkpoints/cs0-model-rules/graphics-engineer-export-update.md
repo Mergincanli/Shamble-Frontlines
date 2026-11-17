@@ -256,3 +256,29 @@ lines). P2 and P3 are taken in the ruling: no draft change (AX-F5 already cites 
   not-read bullet.
 - C3 done: 395 lines; prose <= 120; quotes 63 checked, 2 not found (the loader strings, as before); 34 ids resolve.
 DONE (pass 3)
+
+## Pass 4 (coordinator, after test-engineer's ADR 0005 rows PM-0005-47 to -56)
+Plan (blocks): D1 read adr0005-marks.draft.md §4 (21 items for my file), then §1 rows and §2 rulings for exact numbers
+and wording; D2 check each item against my draft and its sources (do not apply an item that is wrong against a source;
+report it); D3 apply: tags "[proposal]" -> "ruled by test-engineer, PM-0005-nn"; weights within 0.001; mark 7 whole
+frame + grip turned 5 deg about +Z (closes the M3 gap row); palm = line 7 of mark 10, both hands, 1 cm, from the first
+build whose entry holds it (closes M4); draw-count mark of its own, no number, PM-0005-36's count at change-set M, known
+fail written as a fail (6/pass), body alone the control (4/pass); rifle vs real export; PM ids beside mark numbers;
+after the advisor's ruling: test-engineer's loosening point; AX-R1: GUN-FILES in Part 15, rifle only to try the checks;
+D4 checks (<= 400 lines, 120 columns, quotes, ids); D5 notes + DONE + answer (<= 12 lines).
+- D1 done (adr0005-marks.draft.md, 251 lines): §1 rows PM-0005-47..56 (47 mark 1 ... 56 mark 10; 54 = mark 8, sets no
+  number, PM-0005-36's count at M, control body alone 4/pass, known fail 6/pass written as a fail); §2 rulings: all
+  [proposal] tolerances kept; weights within 0.001 (float), exactly 1 (unorm); mark 7 whole frame + grip rolled 5 deg;
+  palm = mark 10 line 7, both hands, 1 cm, from the first build whose entry holds palm; rifle proves 47, 48, 51, 53, 54
+  (beside the body), 49's root line, 55's unskinned path; 47, 48, 51, 49-root rerun on every real export. §4: 21 items.
+  §5 item 2 MARKS-AFTER-EXPORT (recipe changes first), item 3 RIFLE-ROUTE.
+- D2 done (items vs sources): ADR 0002:613-626 "every CI browser probably gets no WebGPU adapter and falls back to
+  WebGL 2" (items 5, 15, 21: keep "probably"; item 15's "gives WebGL 2" stated flat -> write "probably"); PM-0003-2
+  (0003:1176) "0 console errors and 0 device errors"; PM-0003-46 (0003:1220) the WebGPU route; spec ~2044 unorm sums
+  "MUST be exactly 1.0 after dequan[tization]", ~2064 float sums "SHOULD be as close as reasonably possible to 1.0"
+  (item 10 consistent); GUN-FILES = Part 15 (addition to the build plan) question 6, option (a) "the script-written
+  rifle is used only to try the checks". README:38 "TL;DR: at most five lines" -> item 1 applied in one line (full list
+  in part 5, item 17). Item 16 line (6): scene-graph positions replace "on both backends ... file's height"; equivalent
+  for joints + mesh node (skinned vertices follow joints), backend-independent (CPU transforms), drawing on both
+  backends covered by mark 9's probe: apply, flag for the advisor (its ruling said "on both backends"). No item wrong
+  against a source.

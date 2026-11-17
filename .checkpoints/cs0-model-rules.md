@@ -15,7 +15,7 @@
      checkpoints (`build-plan-slice-1*`, `cs0-model-rules*`) in its last commit before the PR is marked ready.
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs0-model-rules) · **Base:** main
   c94c81b440c77f7979e0f944a5341319f9a57d1b (to take in first; the branch still sits on 4460ef5 plus checkpoint commits)
-- **Last update:** 2026-11-17 22:07 CET (from the clock)
+- **Last update:** 2026-11-17 22:29 CET (from the clock)
 
 ## Steps done
 1. His go received (user message of 2026-11-17T19:10:44Z, saved by script, 10,544 bytes). The session's model read
@@ -120,6 +120,20 @@
     joint list about 223, the mark rows, the report, docs-keeper's lines: about 1,150 in all, against his stop line
     of 1,200. The two research files have hard limits (400 and 225 lines); fixes tighten, they do not add.
 
+25. (21:29 UTC) test-engineer wrote the ten mark rows (`cs0-model-rules/adr0005-marks.draft.md`: rows, its rulings,
+    the section's texts, 21 changes for the rules draft, 3 for the joint list). Pasted into ADR 0005 by script and
+    pushed: 65c8fe8 (PM-0005-47 to -56; the table now has 56 rows; SPIKE_PLAN's asset-spike lines point at them).
+    The first part of commit 3 was 5f356ef. Size now: 479 written lines.
+    Its three questions: O1-AT-M (ask Mustafa the draw-cap question in change-set M's plan, before M builds: taken,
+    it is the plan already); MARKS-AFTER-EXPORT (a change that loosens a mark needs his word, the Blender recipe
+    changes first: taken, written into ADR 0005's "When a mark fails"); RIFLE-ROUTE (may a script-written gun file
+    enter the game: it is Part 15's question GUN-FILES).
+    Running: graphics-engineer applies test-engineer's 21 changes to the rules draft; engine-architect its 3 to the
+    joint list; docs-keeper's pass (STATUS, ROADMAP, the repository map, the reports index; at most 30 added lines;
+    its brief: `cs0-model-rules/docs-keeper-brief.md`).
+    His message of 21:15:31 UTC pasted the Art lead's correction once more: equal to the saved A10 (3,243 bytes
+    without the last line end); nothing changes.
+
 ## Next steps
 1. Change-set 0's own short plan at `.checkpoints/cs0-model-rules/plan.md`; the advisor agent's review of it (effort
    max; APPROVE before any edit outside `.checkpoints/`).
@@ -194,4 +208,4 @@
 ## Running work
 - saver: background task brf1n425m, started 20:03 UTC (the first one, bfulbfi1o, was killed at 19:55 UTC); check
   its output file at each update.
-- agents (2 of 3): engine-architect (the ruling's docs version), test-engineer (ADR 0005's new mark rows).
+- agents (3 of 3): graphics-engineer (the rules draft, last pass), engine-architect (the joint list, last pass), docs-keeper.

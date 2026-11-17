@@ -207,3 +207,7 @@ Plan: B10a read GE update (points + map); B10b read CR replaced file (line map);
 ## B10 DONE
 Answer (from these notes): done, soldier-joint-list.draft.md, 224 lines. P1: the name `root` belongs to the client's node alone: no file node may be named `root` (the check fails it); the engine never looks a soldier's root up by name; the armature object's name follows AX-R7 and is otherwise free. Mismatches M1-M5 (B10f). Not repointed exactly: the two items above; A6:42 moved to A10:5 (replaced section); 0.636 now my own sum; one precision note added (hand centre within 4 mm of the forearm's line).
 DONE
+
+## B11 marks pass (new task after B10 DONE; coordinator message)
+Task: apply test-engineer's three items (adr0005-marks.draft.md, end of its section 4) to soldier-joint-list.draft.md: ruled numbers lose "[proposal]" and name their mark (PM-0005-53 sockets, whole frame checked; PM-0005-56 origin, facing, scale, with the palm check as its line 7, both hands within 1 cm); where its number differs from mine, take its number and say so in the answer; section 6 says the rules draft now carries P1 in its mark 3, PM-0005-49. File <= 225 lines, prose <= 120 columns. Edit only that draft. Answer <= 8 lines.
+Plan: B11a read adr0005-marks.draft.md sections 1, 2, 4 (rows, rulings, three items); B11b apply edits (python exact replacements, asserted); B11c checks (lines, widths); B11d DONE + answer.
