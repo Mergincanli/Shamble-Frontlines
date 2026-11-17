@@ -220,8 +220,10 @@ it asks nothing; REFS-KIT stays.
   trig_01LYv1nTavGw7z2NxKqLadrC; the subscription rules: stop it if nothing changed and he has not written).
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
-  the same. **Saver: bp6oaduw2** (started 2026-11-17 04:31:59 UTC, to about 06:22; ba732d9co, restarted 02:39:41 after
-  the spend-limit cut, saved 8c72ab7, bf752f3 and df4634f and stopped on its time limit at 04:29:42; b00b7pd9e ended
+  the same. **Saver: none running** (bp6oaduw2 ran 2026-11-17 04:31:59-06:22:00 UTC, had nothing to save, and stopped
+  on its time limit; not restarted, since no agent or workflow runs and CHECKPOINTS.md §5 asks for it only while they
+  do: start it with the next agent run; ba732d9co, restarted 02:39:41 after the spend-limit cut, saved 8c72ab7,
+  bf752f3 and df4634f and stopped on its time limit at 04:29:42; b00b7pd9e ended
   on its time limit at 22:28:10, then bqdaec008 ran until the container restart at 23:46:48; the cuts block).
   **Check-in 04:34 UTC:** nothing stopped; chat 177,597 tokens, about 18 % of 1M (chat_size.py, read only).
   **Written meanwhile (10:29-10:34 UTC), read only, dry-run only:**
