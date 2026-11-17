@@ -5,9 +5,10 @@
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`) ·
   **Base:** main, last merged in at 3f2fa21 (main 82c605e, PR #54; MAIN-52); before that at 2bd44a5 (main 53272a1, PR
   #53 the kept-logs rule and PR #52 the docs pass; Mustafa's KL-MERGE (a), 2026-11-15 20:50). Take main in again when main changes code, CI or rules, and once before PR #40 is
-  marked ready (MAIN-52, 2026-11-14)
-- **Last update:** 2026-11-17 12:36 UTC (U3C-HELD-1: the fix committed at 0ad9661, E6 PASS, the gate PASS, pushed by
-  this save; next its step 9: CI and the advisor's head check; then DOCS-54's build: the block "NOW (2026-11-16)")
+  marked ready (MAIN-52, 2026-11-14). Main is now c94c81b (PR #55, DOCS-54, merged 2026-11-17 17:09:32 UTC: five
+  files under docs/ only, so not taken in by MAIN-52; at the next take-in, Open findings "From DOCS-54" applies)
+- **Last update:** 2026-11-17 17:14 UTC (DOCS-54 DONE: PR #55 merged at c94c81b on his go "merge #55", main's CI
+  green, his go recorded at history.md:2228-2232; next: U4f rev 3, the block "NOW (2026-11-16)")
 
 ## Resume card (read this first; open the rest only when a step needs it)
 **NOW (2026-11-16, the day session; read this first after a compact or a cut).** Mustafa typed /compact about 09:00
@@ -386,13 +387,18 @@ it asks nothing; REFS-KIT stays.
   (verifier-docs54-final-full.json, 01f3c272…; VER-D54F-1 to -3, the same three points). C3 re-run about 14:05 UTC
   against #40's head 5d4d73a: STATUS.md only (tree d469f17e…). **#55 MARKED READY** (about 14:06 UTC) with the final
   report in its description (the six Lows met there; no push). The saver b70ygknng stopped (no agent running).
-  **Waiting for his go: "merge #55" for head aea6f5bd67a4da400613cc24919e3e93e7c8dc21** (a merge commit, that SHA as
-  the expected head; re-check first: head unchanged, CI green, mergeable, the advisor's approval of that head). After
-  the merge: unsubscribe #55, remove the worktree .gate/docs-after-54-wt, note the merge here, and MAIN-52: take main
-  in (keep this branch's #40 row in STATUS). The safety-net check-in trig_019e3hj14eRSQcm9Ja4bEtJM fired at 14:20:07
-  UTC and found nothing new (CI 6 of 6 green on aea6f5b, no reviews or comments, main still 82c605e); he has not
-  written since the PR went up, so check-ins stopped there (not re-armed); the next GitHub event or his message wakes
-  this session.
+  The safety-net check-in trig_019e3hj14eRSQcm9Ja4bEtJM fired at 14:20:07 UTC and found nothing new (CI 6 of 6 green
+  on aea6f5b, no reviews or comments, main still 82c605e); check-ins stopped there (not re-armed). **DOCS-54 DONE:
+  PR #55 MERGED at c94c81b440c77f7979e0f944a5341319f9a57d1b** (2026-11-17 17:09:32 UTC, a merge commit, expected head
+  aea6f5bd67a4da400613cc24919e3e93e7c8dc21) on his go **"merge #55"** (typed 17:08:17 UTC, transcript line 51838),
+  after the re-checks (head unchanged by ls-remote, CI 6 of 6 green, main still 82c605e, the advisor's approval of
+  that head in this session). Main's tree equals aea6f5b's (empty diff; parents 82c605e and aea6f5b); CI on main
+  green (gate run 44133861553, its gate and smoke jobs; toolchain run 44133861577). His go recorded word for word by
+  record_merge55.py (history.md:2228-2232; block sha256 0a3fb41a…). #55 unsubscribed; the worktree
+  .gate/docs-after-54-wt removed (clean; the local and remote branch claude/docs-after-54 left). **MAIN-52 not
+  triggered:** #55 changed five files under docs/ only (DECISIONS, REPO_MAP, ROADMAP, STATUS, STATUS_ARCHIVE; no
+  code, CI or rules by history.md:2084-2085's list), so main is not taken in now; the line written here before ("take
+  main in") was wrong and is corrected. At the next take-in, Open findings "From DOCS-54" applies.
   **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
@@ -4018,8 +4024,9 @@ free:
    the guard can't follow cd, so such writes ask him); run commands from the main folder without cd.
 
 ## Open findings
-- **From DOCS-54 (PR #55; its plan's C3, the advisor's plan review docs-54/advisor-plan-review-full.json):** when this
-  branch next takes main in after #55 merges, docs/STATUS.md conflicts at its In flight rows (:28-29): **keep this
+- **From DOCS-54 (PR #55, merged at c94c81b on 2026-11-17 17:09:32 UTC; its plan's C3, the advisor's plan review
+  docs-54/advisor-plan-review-full.json):** when this
+  branch next takes main in (c94c81b or later), docs/STATUS.md conflicts at its In flight rows (:28-29): **keep this
   branch's own #40 row and main's #55 row** (main has dropped the #52 row). Nothing else conflicts: `git merge-tree
   --write-tree --name-only` of #55's head 36242ad against this branch's head 8c154f0 (2026-11-17 13:26 UTC, tree
   1d0249fb…, exit 1) listed docs/STATUS.md only; DECISIONS.md, REPO_MAP.md and STATUS_ARCHIVE.md auto-merged. Re-check
