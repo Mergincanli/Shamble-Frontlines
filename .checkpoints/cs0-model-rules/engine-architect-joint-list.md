@@ -217,3 +217,7 @@ Plan: B11a read adr0005-marks.draft.md sections 1, 2, 4 (rows, rulings, three it
 
 ## B11 DONE
 DONE
+
+## B12 review of change-set 0's final diff (new task after B11 DONE; coordinator message)
+Task: one-round review as engine-architect, verdict APPROVE/REVISE, findings on CLAUDE.md's severity scale with file:line. Check (1) M1-M5 closed in docs/research/asset-export-rules.md (AX-R10 root rule + coat's foreseen change; marks 3, 7, 10); (2) the two research files and ADR 0005 rows PM-0005-47..56 agree on 20 joints, root, socket frames, hands/palm, origin/facing; (3) boundary: nothing lets a model/socket/skeleton decide in the sim (AP-1; shot start = sim data); no feature Slice 1 does not need; (4) report docs/reports/2026-11-17-build-plan-slice-1.md "### 5. Not yet in the plan" states my ruling and open points rightly; (5) my file's line 178 "within 1 mm" (lowest vertex) vs PM-0005-56 scale line 0.5 mm: confirm or name the word. Fixes change words, not lines (stop line 1,200). Edit nothing but notes. Answer <= 15 lines.
+Plan: B12a diff committed soldier-joint-list.md vs my draft; B12b rules file AX-R10, AX-R11, marks 3/7/9/10, ruling; B12c ADR 0005 rows; B12d report section 5; B12e findings + verdict; DONE.
