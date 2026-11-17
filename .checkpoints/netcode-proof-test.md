@@ -303,8 +303,11 @@ it asks nothing; REFS-KIT stays.
   whole; u3c-held-1/build.md). L2 not needed. **D-1 OUT** (both files' hashes as HEAD; git diff quiet). **Step 2
   DONE: the fix is in the main folder, uncommitted until step 6** (116 spike lines; its hashes in build.md); C4's
   light pre-check PASS (fmt, clippy, doc); the gate PASS. **E3a PASS** (G-NC2 alone under 6 busy loops: 600 of 600
-  exit 0, 09:53:52-11:12:33 UTC; the fixed hashes in its header). **E3b RUNNING from 11:13 UTC** (task be0orehpc; the
-  stalled-client test alone, 600 runs; log .gate/u3c-held-1/e3b.log). **DOCS-54's
+  exit 0, 09:53:52-11:12:33 UTC; the fixed hashes in its header). **E3b PASS** (the stalled-client test alone: 600 of 600 exit
+  0, 11:13:04-11:20:49 UTC). **E3c RUNNING from 11:21 UTC** (task bugt7dtal; the whole binary, 20 runs under 4 busy
+  loops; log .gate/u3c-held-1/e3c.log). Then E4's plants P1-P5 one at a time (sites found: down_free :481, up_room
+  :488, the bound's `if` :546, model_write's call :635, the down write's extend :1597 and model_write :1615), each
+  restored by Edit and shown by the fixed hashes. **DOCS-54's
   plan: APPROVE WITH CONDITIONS C1-C9** (wf_11d3eb2e-5f0, 10:46-11:06 UTC; saved word for word by docs_54_plan_full.py:
   docs-54/docs-keeper-draft-full.json 5be6dac7…, docs-54/advisor-plan-review-full.json 78f6b5a5…, 136 lines, read in
   full; the plan docs-54/docs-54-plan-draft.md, 134 lines, 2d3bb7a9…). ADV-D54-1 High: the copy method would quote the

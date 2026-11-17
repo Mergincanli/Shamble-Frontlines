@@ -64,3 +64,6 @@ saves after 18b139c; the spike unchanged since ddd38ba.
   8f8c0f9a…); "end 11:12:33 UTC; ... first failure: none"; main-run.sh exit 0.
 - 11:13 E3b started in the background (the stalled-client test alone, `one 300 2 6
   l2::delay::tests::a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded`; log e3b.log).
+- **11:13:04-11:20:49 E3b PASS: 600 of 600 exit 0**, each "test result: ok. 1 passed; 0 failed" (the name matched:
+  one test each run); none non-zero; the fixed hashes in its header; "first failure: none"; main-run.sh exit 0.
+- 11:21 E3c started in the background (the whole binary, `all 10 2 4`; log e3c.log).
