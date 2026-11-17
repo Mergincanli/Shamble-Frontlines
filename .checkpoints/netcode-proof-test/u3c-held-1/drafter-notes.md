@@ -83,5 +83,16 @@ Role: the plan drafter (read only; writes only this file and u3c-held-1-plan-dra
 - D19 The saver adds only its checkpoint folder (checkpoint.mjs:155) but pushes the branch head (:132), so a local fix
   commit is pushed by the next autosave: stop it from the fix commit to the card save (precedent
   c62h-bound-build.md:424).
+- D21 Lints: the workspace denies only unsafe_code (forbid) and clippy's disallowed_* (Cargo.toml [workspace.lints]);
+  dead_code stays a warning, so P4 (the call deleted) still compiles. A plant that fails to COMPILE also exits 101
+  (cargo), so each plant's bar must name the failing test and line, never exit 101 alone.
+- D22 Redact's item count moved 297 (merge-2.log:18, 561bf42) -> 305 (main-54/light.log:8, 3f2fa21): E6's bar names
+  305 plus one per pack list, any other count explained before the run is read.
+- D23 Writing the draft now (structure: goal, why, cause, steps 0-9, files, sentences, disk, risks, type/tier/size,
+  reviewers, stops, open questions HELD-Q1..Q12).
+- D24 DONE: the draft is written (u3c-held-1-plan-draft.md, 237 lines, sections 1-9, open questions HELD-Q1..Q12).
+  Over the ~220 target by about 17 lines: the exact code diff (about 45 lines) and D-1 (about 12) are kept whole; the
+  doc-text hunks are cited by line in the design notes (sha256 ae88c5cd… pinned in the draft's header). FX-10's lines
+  are check.mjs:2655-2660 (the doc) and :2677 (the removal), not :2655-2657 alone.
 - D20 Now: free 5,231,706,112 B = 4,989 MiB (df at about 08:40); `git ls-files | wc -l` 1357; delay.rs sha256
   aaa6a588…, delay_tests.rs 74d49de7…; architect notes ae88c5cd…, test-engineer notes 1c06246c….

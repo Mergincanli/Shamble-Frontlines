@@ -272,12 +272,17 @@ it asks nothing; REFS-KIT stays.
   07:32:46; the card refreshed first, a62d64a); the one-time reminder is set for 20 minutes after the ask. If he has
   not typed /compact by then: refresh the card and carry on (his COMPACT-WAIT words, history.md:2052-2054). **The
   reminder (trig_01XhiH6Uza8JerVtTb175j69) fired at 07:55:03 UTC with no /compact, so carried on.**
-  **RUNNING from about 07:56 UTC: U3C-HELD-1's plan draft** (workflow wf_5140889b-c32, task wpkvxshje; notes folder
-  .checkpoints/netcode-proof-test/u3c-held-1/): the netcode-architect (the cause from delay.rs, the fix as a diff, the
-  plant, NC-U3c-2's sentences) and the test-engineer (the diagnostic loop through main-run.sh, the fix's evidence,
-  the disk budget and packing by brief 8.1, never R4's folders) in parallel, read only, no builds or tests; then a
-  drafter writes u3c-held-1-plan-draft.md. On return: save the three results word for word, read the draft in full,
-  fix it, then the advisor's plan review (its own run). Nothing is built before the advisor approves.
+  **U3C-HELD-1's plan draft DONE** (wf_5140889b-c32, 07:56-08:33 UTC, 3 agents; saved word for word by
+  u3c_held_1_draft_full.py into u3c-held-1/: netcode-architect-design-full.json 70259114…, test-engineer-evidence-
+  full.json 690f7808…, drafter-full.json 482c0944…; the draft read in full): the cause read from the code (the
+  release transient: harvest moves released[DOWN] past the front record before the pump's take drains held; never at
+  a write), the fix test code only (the same bound at every write inside model_write, check_held_falls between
+  writes), the diagnostic loop L1/L2 with patch D-1, plants P1-P5, E3-E6, disk and packing, 12 open questions
+  HELD-Q1-Q12. The main session's edits (08:35 UTC): the commit form and the save with the attribution lines, CI by
+  the GitHub MCP tools (not gh), the disk re-measured (4,988 MiB at 08:34), a fact in HELD-Q7 (the report reached him
+  at 03:14:03). Draft sha256 a53b2803…. **RUNNING from about 08:36 UTC: the advisor's plan review** (workflow
+  wf_dd88a2c0-2ba, task w78u11col; notes u3c-held-1/advisor-plan-review.md; it rules HELD-Q1-Q12). On return: save it
+  word for word, read it in full; build only on APPROVE, by its conditions.
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver: bvg19b3fy** (started 2026-11-17 07:55:49 UTC for U3C-HELD-1's plan draft, to about 09:45; stop it
