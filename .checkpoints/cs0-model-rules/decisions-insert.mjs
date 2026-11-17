@@ -52,6 +52,15 @@ const msgs = [
   \`.claude/agents/advisor.md\`) are not edited: his words say they are the rule there too. Copied by script and checked
   byte for byte against \`${APP}\`, A1:` },
 ];
+const wrap = (text, first, rest) => { // greedy wrap at 120 columns
+  const out = []; let line = first; let empty = true;
+  for (const w of text.split(' ')) {
+    if (!empty && line.length + 1 + w.length > 120) { out.push(line); line = rest + w; }
+    else { line += (empty ? '' : ' ') + w; empty = false; }
+  }
+  out.push(line); return out.join('\n');
+};
+for (const m of msgs) m.head = wrap(m.head.replace(/\n\s+/g, ' '), '', '  ');
 const TOP = '## Decisions, newest first\n';
 const BEFORE52 = '- **Taken by Mustafa, 2026-11-14, 09:02:29 UTC: his go for #52**';
 const COND3_END = `     still wait for their results."_\n- **Taken by Mustafa 2026-10-31 (in the v2 day session's chat`;
@@ -79,7 +88,12 @@ if (!process.argv.includes('--check')) {
   sec('A2', 'His addition of 2026-11-14, 14:12:13 UTC (his label: 15:03)', words(msgs[1].file));
   sec('A3', 'His message of 2026-11-17, 19:10:44 UTC (his label: 20:10): his go, his answers, four changes', words(msgs[0].file));
   briefs.forEach((b, i) => sec(`A${4 + i}`, `The Art lead's brief as he attached it on 2026-11-17: ${b}`, readFileSync(N + 'inputs/' + b, 'utf8').replace(/\n$/, '')));
-  sec('A7', 'The three Art sheets of 2026-11-14 (images sent into the chat), as this session typed their text', readFileSync(N + 'art-sheets-2026-11-14.md', 'utf8').replace(/\n$/, ''));
+  sec('A7', 'The three Art sheets of 2026-11-14 (images sent into the chat), as this session typed their text. Its soldier sizes are replaced by the brief in A4 (his words of 2026-11-17, CHANGE 3); kept because the plan\'s Part 4 cites them', readFileSync(N + 'art-sheets-2026-11-14.md', 'utf8').replace(/\n$/, ''));
+  const m4 = readFileSync('.checkpoints/cs0-model-rules/mustafa-2026-11-17-2020.md', 'utf8');
+  sec('A8', 'His message of 2026-11-17, 19:59:06 UTC (his label: 20:20): three small things (the pictures, the Advisor chat\'s log, time stamps)', m4.slice(m4.indexOf('\n---\n') + 5).replace(/\n$/, ''));
+  const m5 = readFileSync('.checkpoints/cs0-model-rules/mustafa-2026-11-17-2058.md', 'utf8');
+  sec('A9', 'His message of 2026-11-17, 20:03:57 UTC (his label: 20:58): four small things (the pictures, the Advisor chat\'s log, the Art lead\'s correction, time stamps)', m5.slice(m5.indexOf('\n---\n') + 5).replace(/\n$/, ''));
+  sec('A10', 'The Art lead\'s correction of 2026-11-15, 18:40, as he attached it on 2026-11-17 (the Advisor\'s check stands above its line, the Art lead\'s text below it): ART_BRIEF_CORRECTION_2026-11-15_1840_gun_poses.md', readFileSync(N + 'inputs/ART_BRIEF_CORRECTION_2026-11-15_1840_gun_poses.md', 'utf8').replace(/\n$/, ''));
   writeFileSync(APP, a);
 }
 // checks: every quoted block in DECISIONS.md, unquoted, equals his words; the appendix holds the same bytes

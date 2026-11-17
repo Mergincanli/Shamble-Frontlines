@@ -191,3 +191,17 @@ about 400 lines (the simple active reload); the plan's text is copied by script 
 
 **16. Two more rules for the research file:** how the hand meets `socket_grip` (from the ruling), and a check of the
 soldier's origin and facing (mark 10, placed with mark 6's export).
+
+**17. The Art lead's correction of 2026-11-15, 18:40** (attached by Mustafa on 2026-11-17 with his message of 20:58;
+saved as `inputs/ART_BRIEF_CORRECTION_2026-11-15_1840_gun_poses.md`; the appendix carries it as A10 and his message
+as A9). His words: "For change-set 0 take only its rule and the socket names. The pose numbers are for the body step
+(change-set 10)." So the research file takes two things from it, both as the Art lead's proposal that agrees with his
+go: the rule ("The right hand is on socket_grip and the left hand on socket_support. The butt and the muzzle follow
+from the gun's file.") and the five socket names. No pose number enters a doc of this change-set. The report's "since
+the plan" passes three notes to change-set 10, in his words: the rifle's butt in the aiming pose ("its top edge is at
+U 1.39. The file wins, by the correction's own rule."); "in the rifle's aiming pose the left arm uses 0.59 of its
+0.62, so little is left for recoil and the walk"; "The SMG's side magazine has to stay clear of the left forearm".
+
+**18. The Advisor chat's log** (his words of 20:20 and 20:58: not an input; not read; no part of it in the repo).
+Nothing in this plan rests on it: the LOOK_V2 §8 line comes from the build plan's Part 11 and his words of
+2026-11-03, and "the Art lead's proposal unless a line says it is mine" from his go.

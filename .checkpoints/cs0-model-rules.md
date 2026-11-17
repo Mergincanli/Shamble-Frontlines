@@ -15,7 +15,7 @@
      checkpoints (`build-plan-slice-1*`, `cs0-model-rules*`) in its last commit before the PR is marked ready.
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs0-model-rules) · **Base:** main
   c94c81b440c77f7979e0f944a5341319f9a57d1b (to take in first; the branch still sits on 4460ef5 plus checkpoint commits)
-- **Last update:** 2026-11-17 21:00 CET (from the clock)
+- **Last update:** 2026-11-17 21:07 CET (from the clock)
 
 ## Steps done
 1. His go received (user message of 2026-11-17T19:10:44Z, saved by script, 10,544 bytes). The session's model read
@@ -40,6 +40,20 @@
    **REVISE**: 1 High, 10 Medium, 5 Low. It needs to see 1 to 11 fixed.
 8. Shamble VFX cloned read-only to /home/user/mergincanli/shamblevfx (head 92ec2dc) for Part 15. A guard refusal on
    the way: `git -C <dir> ...` ("no option before the subcommand"); route: cd into the folder, then git.
+
+10. His two later messages saved by script: 19:59:06 UTC (his label 20:20; `cs0-model-rules/mustafa-2026-11-17-2020.md`,
+    683 bytes) and 20:03:57 UTC (his label 20:58, sent while the turn ran; `mustafa-2026-11-17-2058.md`, 2,028 bytes).
+    The 20:58 message brings a fourth Art text: the Art lead's correction of 2026-11-15, 18:40 (the gun poses,
+    restated from the sockets), saved byte for byte as `build-plan-slice-1/inputs/ART_BRIEF_CORRECTION_2026-11-15_1840_gun_poses.md`
+    (5,878 bytes: the Advisor's check above its line, the Art lead's text below; a second attached copy, 3,244 bytes,
+    equals the text below the line). For change-set 0: only its rule and the socket names (plan, revision 2, point 17).
+11. When his message of 19:59 UTC arrived, the harness stopped the two running agents and the saver (their last
+    writes: 19:54 to 19:55 UTC; the saver's last line "[killed]"). The saver was restarted (task brf1n425m) and both
+    agents were started again from their notes at about 20:05 UTC, each with its first brief copied by script from
+    the transcript (`cs0-model-rules/engine-architect-brief.md`, `part-15/graphics-engineer-brief.md`).
+12. Both record scripts dry-run on a scratch copy of the docs (20:07 UTC): `decisions-insert.mjs` (three entries equal
+    to his words byte for byte, the appendix A1 to A10) and `pointers-insert.mjs` (DECISIONS 4 pointers, SPIKE_PLAN 3,
+    ADR 0002 1; no line over 120). Not yet run on the repo's docs.
 
 ## Current step
 9. The plan's revision 2 (an addendum in `cs0-model-rules/plan.md`, written 19:46 UTC) answers the advisor agent's
@@ -88,7 +102,7 @@
 - The pictures: Sheet 16 arrived with his message of 19:59:06 UTC (his label 20:20; saved byte for byte in
   `cs0-model-rules/mustafa-2026-11-17-2020.md`): one image, seen in the chat, not copied into the repo. Its numbers
   match the soldier brief's where checked (1.80 m; shoulders 0.49; waist 0.33; hem 0.61 by 0.46; markings 0.022 and
-  0.03). His SMG line drawing still did not arrive: the message carried one image only.
+  0.03). His SMG line drawing still did not arrive: the 19:59 message carried one image only and the 20:58 message none.
 - His words of 20:20: stamp times from the clock, never ahead of it (the card of commit cb0fd7b9, 20:13:23, said
   20:25). From now on "Last update" is written from `TZ=Europe/Amsterdam date`.
 - Refusals and routes: (1) 19:2x UTC, the guard refused `git -C <dir> ...`; route: cd into the folder, then git.
@@ -123,5 +137,7 @@
   cannot fast-forward (checkpoint commits). His words "Take main in first" cover the act.
 
 ## Running work
-- saver: background task bfulbfi1o, started 19:14 UTC, stops by 21:04 UTC; check its output file at each update.
-- agents (2 of 3): engine-architect on the joint list; graphics-engineer on the Shamble VFX digest (Part 15).
+- saver: background task brf1n425m, started 20:03 UTC (the first one, bfulbfi1o, was killed at 19:55 UTC); check
+  its output file at each update.
+- agents (2 of 3), second runs since about 20:05 UTC: engine-architect on the joint list; graphics-engineer on the
+  Shamble VFX digest (Part 15).

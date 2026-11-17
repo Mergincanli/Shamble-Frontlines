@@ -136,3 +136,8 @@ SMG brief (ART_BRIEF_2026-11-15_1735_smg_stage1.md, "SB"):
 - G:438 flinch: spine.x += fp*pitch; chest.x += fp*(1-pitch); chest.z += fr*roll; neck.x -= fp*head.
 - G:441-443 coat panel k: rotation.x from the angle of the THIGH on its side (hipL/hipR quaternion applied to down), front/back gains, flare at speed, clamped, spring.
 - Brief check (computed): forearm elbow (0.255,0,1.14) -> wrist (0.31,0.03,0.875) length 0.272, unit (0.202,0.110,-0.973); hand box centre (0.32,0.04,0.82) is 0.057 from the wrist and lies on the forearm's extended line (wrist + 0.057*unit = (0.3215,0.0363,0.8197)). => legacy's fist-on-forearm-line rule fits the brief's rest pose.
+
+## RESTART 2 (2026-11-17, after the cut at about 19:55 UTC)
+- Last block marked done: B7b. B8 was in progress (not marked done): redo it with bounded greps, written over. Then B8b (build plan: cs10 row l.271-272, Part 11 rule 21, Part 12 l.1059, for section 7), B9 write joint-list.md in blocks (one append per section), B10 DONE.
+- The restart message said the notes end at "B5 done; next B6"; the file shows B6, B7, B7b done: trusting the file.
+- Restart rules: open nothing under /root/.claude/uploads/; never commit or push; final answer at most 25 lines. No Edit tool in this run: notes and result file are written with shell appends.
