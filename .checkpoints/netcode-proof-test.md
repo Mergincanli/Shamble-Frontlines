@@ -280,9 +280,24 @@ it asks nothing; REFS-KIT stays.
   writes), the diagnostic loop L1/L2 with patch D-1, plants P1-P5, E3-E6, disk and packing, 12 open questions
   HELD-Q1-Q12. The main session's edits (08:35 UTC): the commit form and the save with the attribution lines, CI by
   the GitHub MCP tools (not gh), the disk re-measured (4,988 MiB at 08:34), a fact in HELD-Q7 (the report reached him
-  at 03:14:03). Draft sha256 a53b2803…. **RUNNING from about 08:36 UTC: the advisor's plan review** (workflow
-  wf_dd88a2c0-2ba, task w78u11col; notes u3c-held-1/advisor-plan-review.md; it rules HELD-Q1-Q12). On return: save it
-  word for word, read it in full; build only on APPROVE, by its conditions.
+  at 03:14:03). Draft sha256 a53b2803…. **The advisor's plan review: APPROVE WITH CONDITIONS C1-C10** (wf_dd88a2c0-2ba,
+  08:36-08:51 UTC; saved word for word by u3c_held_1_review_full.py: u3c-held-1/advisor-plan-review-full.json, 183
+  lines, 627bfc6c…, read in full; notes u3c-held-1/advisor-plan-review.md). Rulings: Q1 HEAD + D-1; Q2 no T-NEW; Q3
+  held_grew and check_held_falls kept (required); Q4 P4 alone; Q5 SERIES.md :613/:642 reworded here; Q6 u3c-plan.md in
+  place with a dated note, :125 too; Q7 **nothing packed until he has read the C62H-BOUND report** (the chat's
+  promise; PACK-READ to him, optional); Q8 rust-reviewer joins (three at xhigh, one round); Q9 no new Low; Q10 plants
+  by Edit in the main folder, the whole ed8673 binary; Q11 if L1 and L2 catch nothing, go ahead ("not reproduced in N
+  runs"); Q12 keep P5. Conditions: C1 build exactly the diff with the rulings; C2 the catch rule; C3 every failing
+  test's stdout block, each plant's assert and values; C4 `node check.mjs --only fmt,clippy,doc` through main-run.sh
+  (light.log) and the gate before step 6; C5 E6's bar 552 / 632, refs read just before, redact 305 (+1 per pack
+  list); C6 disk (no pack before PACK-READ; the bar 5,220 is unmet at 4,985; E6 above the floor; U4f's shortfall on
+  the card); C7 simple forms, any asking call named first; C8 one round of three reviewers, one fix pass; C9 the
+  difference-set argument in the plan line and the report, the entry cited by name, the saver sentence corrected; C10
+  the stops. Findings ADV-UH1-1 (Medium, met by C6) and -2 to -7 (Low, met by C3-C5, C9). **NOW: the build, step 1.
+  D-1 IS IN THE MAIN FOLDER** (delay.rs and delay_tests.rs, uncommitted and never committed; the restore facts and
+  hashes: u3c-held-1/build.md). **L1 RUNNING from 08:53 UTC** (task b7jyrgn37, about 90 min; log
+  .gate/u3c-held-1/l1.log; 300 whole-binary runs). Next: read L1 against the plan's Confirmed and Stop lines (C2);
+  if nothing fails, L2 (`l2 one 300 2 6`); then D-1 out by Edit (both hashes back, git diff quiet), then step 2.
   **Commit 1 kept as a patch on the branch** (the worktree's branch is local only):
   c62h-bound-commit1.patch (`git format-patch -1 --stdout 54046d4`, 764 lines, sha256 2cf71d4e…); each later commit
   the same. **Saver: bvg19b3fy** (started 2026-11-17 07:55:49 UTC for U3C-HELD-1's plan draft, to about 09:45; stop it

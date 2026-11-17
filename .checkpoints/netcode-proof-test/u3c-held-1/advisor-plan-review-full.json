@@ -1,0 +1,183 @@
+{
+  "verdict": "APPROVE WITH CONDITIONS",
+  "plan_sha256": "a53b2803278968cdc9624428b738b352cd72e1f1489251bc649f8947b0b2243f",
+  "rulings": [
+    {
+      "id": "HELD-Q1",
+      "ruling": "Run the loop on HEAD plus D-1, as the draft says.",
+      "why": "Unchanged code can only show the symptom [1, 0] again: the check keeps no state (test-engineer F7). D-1's two counters tell the cause apart from a real defect. over_at_write above 0 would be a real overflow at a write. An over-sample with released[d] == 0 cannot happen by the arithmetic (then held = U <= outstanding + p <= 64 KB + p), so over_waiting below held_over_bound would also mean a real defect. D-1 is counters under cfg(test) only and is never committed; sha256 and git diff prove the restore. The binary hash follows features and profile, not source (TE F2), so the ed8673 check still holds with D-1 in place."
+    },
+    {
+      "id": "HELD-Q2",
+      "ruling": "No T-NEW in this change-set.",
+      "why": "The finding's confirming step is the loop (card :3890-3892). The fix's overflow proof is already deterministic in the stalled-client test (P1, and P5 for up). T-NEW's premise is unverified (D6, D17): it needs either a forced-loss hook (tcp_model.rs:2049 is private: D5) or a quiet prefix whose timing nobody has checked. It would add a test and move the counts, and no claim of this change needs it."
+    },
+    {
+      "id": "HELD-Q3",
+      "ruling": "Keep held_grew, check_held_falls and both held_grew asserts. This is required, not optional.",
+      "why": "Checking only at writes is enough only if held never grows outside model_write. held_grew turns that premise into a counted fact on every sample, in every test that drives DelayStream. That is what keeps the fix from being looser than the finding's 'wherever held can grow'. P3 and P4 bite only through it."
+    },
+    {
+      "id": "HELD-Q4",
+      "ruling": "P4 alone; no coverage count.",
+      "why": "Without the call at the write, held_at_write stays 0, so held_grew counts every non-empty sample in the stalled-client test. G-NC2's loop exit needs beyond > 0, which is now set only at writes, so G-NC2 hits its 30 s hang guard (delay_tests.rs:38, :2283). That is two independent failures. A count would add a field and asserts and prove nothing more."
+    },
+    {
+      "id": "HELD-Q5",
+      "ruling": "Reword SERIES.md:613 and :642 in this change, as the design notes write them. Each old phrase must be replaced exactly twice.",
+      "why": "The rows are U3c's own description of NC-U3c-2, not Mustafa's words. They are not among C62H-BOUND's frozen rows (brief section 2; figures.rs:564 is the snap_lost_unexplained_count row). A reading at a second's end is a sample between writes, so the old phrase is wrong there. Tests read row names only (names.rs:143, delay_names.rs:449, socket_tests.rs:390; lab contract.rs:448 is under cfg(test) at :443). marks hashes only docs/adr rows (D18). grep -c gives 2 and 2 today."
+    },
+    {
+      "id": "HELD-Q6",
+      "ruling": "Correct u3c-plan.md:122-124 in place, with a dated note, the way the 2026-11-08 correction at :123 was done. Fix :125's up line in the same note by adding the up prefix.",
+      "why": "The paragraph already carries an in-place dated correction (:123, 'corrected 2026-11-08'). :125 ('Up: at most 64 KB in all') misstates the same bound, which delay.rs:49 already states correctly. It is one line in a checkpoint file and not counted in SIZE-CHECK."
+    },
+    {
+      "id": "HELD-Q7",
+      "ruling": "R4's literal precondition is met, and section 8.1's procedure covers this pack. But nothing is packed until Mustafa has read the C62H-BOUND report: he answers one of its questions, or says he read it. Until then, if the bar is not met, E6 runs above the 4,096 MiB floor and the card records U4f's shortfall, with the pack to do before U4f's counted run. The never-list stands.",
+      "why": "The report reached him at 03:14:03 UTC (card :198-199). R4 ('After that, pack only by brief section 8.1's rules', advisor-c62h-bound-report-head-full.json) makes 8.1's procedure the rule for any later pack, with this plan's bar in place of 8.1's 'Before each set'. However, the card records a stricter promise made to him in chat: 'Nothing is packed before he has read it (R4; the chat's For Mustafa item 2)' (card :202-203). He has answered none of the report's questions (card :10, :201). Keeping that promise costs nothing now, because every call of this change-set still starts above the floor."
+    },
+    {
+      "id": "HELD-Q8",
+      "ruling": "Yes: rust-reviewer joins netcode-architect and test-engineer, all three at xhigh, in one round.",
+      "why": "CLAUDE.md step 5 names rust-reviewer for Rust code, and this change is Rust: cfg(test) items in delay.rs and two tests. The two reviewers named by the card and by ruling C2 are a minimum, not a cap. Three agents at once is CHECKPOINTS section 4's cap, and it is still one round. The lane has done this before (RR-CB-1, RR-CB-2). xhigh because this is netcode (CLAUDE.md, Models and effort)."
+    },
+    {
+      "id": "HELD-Q9",
+      "ruling": "No new Low on the card.",
+      "why": "My head check already corrected that sentence (H4, ADV-CBH-4: card :119-120 and the report). The design notes' section 2 line is a notes file. The plan's E5 text is already right: the lab binary is unaffected, and npt-net's non-test code rests on the diff audit (D11)."
+    },
+    {
+      "id": "HELD-Q10",
+      "ruling": "Plant by Edit in the main folder, and run the whole ed8673 binary from the workspace bites build (cargo test --locked --workspace --all-features --no-run).",
+      "why": "-p npt-net builds a different binary, 301de27 (TE F3). main-run.sh runs only in the main folder (main-run.sh:13-14, :26). TE-M3's plants were done the same way (TE F9). E6's header (diff e3b0c442…) catches a restore that was missed."
+    },
+    {
+      "id": "HELD-Q11",
+      "ruling": "Pre-ruled: if L1 and L2 (900 runs) catch nothing, go ahead with the fix. The report and the card say 'not reproduced in N runs; D-1 never fired', never 'confirmed'. This is not a stop for Mustafa.",
+      "why": "The cause is shown by the code, not inferred from the failure rate. Three independent readings agree (netcode-architect F5-F13, drafter D3, my C2-C6), and the difference set makes it exact. The fixed pair of checks passes only those samples the old check flagged where held had not grown since a write that met the bound and the bound fell; the bound falls only at a release. So the fix is looser only on the release transient, which admits no byte. P2 shows the prefix term is still reached. 'Never a looser bound without its cause' is the advisor's rule (advisor-u4d2-r1.md; it is not in history.md), so this is mine to rule."
+    },
+    {
+      "id": "HELD-Q12",
+      "ruling": "Keep P5.",
+      "why": "It is the only plant on the up direction's at-write check (model_write's single call serves both ends). It is cheap (one whole-binary run). Its prediction holds by reading: tungstenite never reads, acknowledged up records free up_room once released_model is dropped, and the flood of about 150 KB carries held up past 64 KB at a write, so the bound assert fails with [0, k >= 1]."
+    }
+  ],
+  "conditions": [
+    {
+      "id": "C1",
+      "text": "Build exactly the plan's code diff and the design notes' doc texts, with the rulings above: HEAD + D-1 for the loop; no T-NEW; held_grew, check_held_falls and both held_grew asserts kept; no coverage count; SERIES.md :613/:642 reworded here, each old phrase replaced exactly twice; u3c-plan.md corrected in place with a dated note, :125 included; plants by Edit in the main folder on the whole ed8673 binary; P1-P5 all run."
+    },
+    {
+      "id": "C2",
+      "text": "If L1 and L2 catch nothing, go ahead (HELD-Q11). The report carries the cause as read, with the difference-set argument and P2, and says 'not reproduced in N runs'. A catch counts only if it meets the plan's Confirmed line whole. Any of the plan's stop lines goes to the advisor whole."
+    },
+    {
+      "id": "C3",
+      "text": "Plants. The loop script prints libtest's whole '---- <name> stdout ----' block into the call's log for every failing test, not only G-NC2's. Each plant's record names the failing test, its assert message and its left/right values. If the first failing assert differs from the table, it goes back to the advisor. P1's G-NC2 result is recorded whatever it is: a G-NC2 FAIL at '…at every write' under P1 is evidence, not a stop (design notes :365-367). Every other failing test is listed."
+    },
+    {
+      "id": "C4",
+      "text": "Before step 6, one main-run.sh call of `node check.mjs --only fmt,clippy,doc` (log .gate/u3c-held-1/light.log) must pass. clippy lints tests with -D warnings (check.mjs:2015-2017, :2618). rustfmt's diff comes from that fmt step (`cargo fmt --all --check`, check.mjs:2615) and is applied by Edit, never by cargo fmt writing files. Then `node tools/gate.mjs --no-smoke` must PASS."
+    },
+    {
+      "id": "C5",
+      "text": "E6's pass bar is written in the notes before the call: 552 / 632 tests (no new test; drop 'with T-NEW 553 / 633'). refs is `git ls-files | wc -l` read just before the call. redact is 305 items, plus 1 per pack list if any. Everything else stays as the plan writes it. Pass is the exit code and the runner's summary, never a grep."
+    },
+    {
+      "id": "C6",
+      "text": "Disk. No packing until Mustafa has read the C62H-BOUND report (HELD-Q7). Packing then follows brief 8.1's procedure under R4: B1 first, then P3, never R4's folders. The bar of 5,220 MiB is already unmet (4,985 MiB at this review). If packing is not yet open, E6 runs above the 4,096 floor (its header shows it), and the card records U4f's shortfall with the pack to do before U4f's counted run. The disk figures are corrected: main-run.sh:48 touches crates/, so there are about 10 bites test builds plus E5 and the light pre-check, not 7."
+    },
+    {
+      "id": "C7",
+      "text": "Every command is one per call, in the simple forms that need no approval (his words of 21:50, history.md:2187). A call that would ask Mustafa is named in the chat before it is sent; that includes `git commit -F` if the guard asks for it."
+    },
+    {
+      "id": "C8",
+      "text": "One review round on the final working-tree diff: netcode-architect, test-engineer and rust-reviewer, each at xhigh, three at once, each with its notes under u3c-held-1/. Then one fix pass, after which E3, E4, the light pre-check and the gate run again on what changed only. A second round covers only what changed; a third only for an open Critical or High."
+    },
+    {
+      "id": "C9",
+      "text": "The plan's 'Not looser' line and the report state the difference-set argument, with its code cites (C6b in my notes). The card entry is cited by name (it is now at :3882-3895). The sentence about the saver is corrected: watch never pushes unpushed code (checkpoint.mjs:9-11), and stopping the saver from step 6 to step 8 stays."
+    },
+    {
+      "id": "C10",
+      "text": "Stops as written. Never a re-run to get green. Each of these stops for the advisor, whole: any FAIL; a plant failing otherwise than C3 allows; one failure in a fixed-tree loop; exit 3; a SIZE-CHECK breach (well past about 130 changed spike lines: three lines to Mustafa). D-1 and the plants are never committed; every restore is shown by sha256 and by `git diff --quiet HEAD -- spikes/netcode-proof`. Never a second counted call without the advisor. U3C-HELD-1 closes only after the advisor's check of the pushed head, naming its full SHA, with CI green."
+    }
+  ],
+  "findings": [
+    {
+      "id": "ADV-UH1-1",
+      "severity": "Medium",
+      "what": "HELD-Q7 treats R4's 'until then' as passed and asks whether to pack now. The card records a stricter promise made to Mustafa in chat: 'Nothing is packed before he has read it (R4; the chat's For Mustafa item 2)'. He has not answered any of the report's questions yet. Packing on R4's literal words alone would break that promise.",
+      "where": ".checkpoints/netcode-proof-test.md:197-203, :10; advisor-c62h-bound-report-head-full.json conditions R4; plan :186-193, :229-233",
+      "fix": "C6: no packing until he has read the report. Otherwise E6 runs above the floor and the card records U4f's shortfall. One optional plain question to him (For Mustafa)."
+    },
+    {
+      "id": "ADV-UH1-2",
+      "severity": "Low",
+      "what": "E6's pass bar keeps '(with T-NEW 553 / 633)'. HELD-Q2 rules T-NEW out, and the fix adds no test.",
+      "where": "plan :162-163; merge-2.log:12",
+      "fix": "C5: the counts are 552 / 632."
+    },
+    {
+      "id": "ADV-UH1-3",
+      "severity": "Low",
+      "what": "The loop prints only the names of failing tests (te_m3_loop.sh's sed of the failures list) plus G-NC2's stdout block. P1, P3, P4 and P5 fail the stalled-client test, whose panic and left/right values would sit only in the per-run log.",
+      "where": ".checkpoints/netcode-proof-test/te_m3_loop.sh (FAILED block); plan :49-50, :135-146",
+      "fix": "C3: print every failing test's stdout block, and record each plant's assert and values."
+    },
+    {
+      "id": "ADV-UH1-4",
+      "severity": "Low",
+      "what": "Nothing runs clippy or doc before the counted E6, although check.mjs lints test targets with -D warnings, and 'rustfmt clean' names no command. A lint would then fail the counted run and cost an advisor stop.",
+      "where": "spikes/netcode-proof/check.mjs:2015-2017, :2615, :2618; plan :128",
+      "fix": "C4: one `node check.mjs --only fmt,clippy,doc` call through main-run.sh before the commit."
+    },
+    {
+      "id": "ADV-UH1-5",
+      "severity": "Low",
+      "what": "The disk figures undercount the builds. main-run.sh touches every crates/ file at start (:48), so each of about 10 loop and plant calls rebuilds, plus E5 and the pre-check: up to about 360 MiB. Free space is 4,985 MiB now (df at this review), already below the 5,220 bar. The outcome does not change: every call still starts above 4,096 (about 4,600 before E6).",
+      "where": "plan :186-189; .checkpoints/netcode-proof-test/main-run.sh:48; df -B1 /home/user = 5,227,540,480",
+      "fix": "C6: correct the figures; the bar is known to fail from the start."
+    },
+    {
+      "id": "ADV-UH1-6",
+      "severity": "Low",
+      "what": "The 'Not looser' line gives three reasons but not the exact one. The fixed checks pass only those samples the old check flagged where held had not grown since a write that met the bound and the bound fell, and the bound falls only at a release. That makes the fix looser only on the release transient.",
+      "where": "plan :128-129; delay.rs:675-696, :806, :1574",
+      "fix": "C9: state it in the plan's line and in the report, with cites."
+    },
+    {
+      "id": "ADV-UH1-7",
+      "severity": "Low",
+      "what": "Two wording slips. The card entry is cited at :3877-3890; it is now at :3882-3895. The saver's stated reason ('pushes the head') is wrong for watch mode, which never pushes unpushed code; stopping the saver is still right.",
+      "where": "plan :16, :39-40; .checkpoints/netcode-proof-test.md:3882-3895; .claude/scripts/checkpoint.mjs:9-11",
+      "fix": "C9: cite the entry by name and correct the sentence. No step changes."
+    }
+  ],
+  "claims_checked": [
+    "Plan sha256 a53b2803… read and matched; delay.rs sha256 aaa6a588… as the plan states; the spike has no diff against HEAD f4868f2.",
+    "Growth sites are complete: delay.rs extends bytes only at :806 (then model_write :807) and :1574 (then :1592); drains only at :1503 and :1748; model_write has exactly two callers; delay_tests.rs never changes the length (:1790 flips one byte).",
+    "The bound holds by construction at every write (F7), derived independently: free_budget = 64 KB − (write_seq − snd_una) (tcp_model.rs:2211-2214); model_end == write_seq (write_seq starts at 0, :600; it moves only in write, :2221); admission n+22 <= free_budget − released_model (delay.rs:473-484, :1561-1572, :803); released_model falls only when a record is taken whole (:1510, :1761); step_to harvests at every event (:618-641) and model.write's own advance(now) is a no-op at both sites (tcp_model.rs:2218; delay.rs:1571, :1813-1815). So held <= 64 KB + prefix at each write, both ways.",
+    "Between writes the bound falls only at a release (harvest :675-696) while held stays unchanged. Over-samples are therefore only the release transient, never at a write. G-NC2's only sample outside a write is the pump's closing block (:1879); poll_write's :1594 cannot trip (F10).",
+    "check_held_falls is sound: no held_now runs between the extend and model_write at either site, held never rises between writes in either direction, and parse_len is outside the check's held (:531 vs :512).",
+    "Plant predictions P1-P5 match my reading. Stalled-client test: phase 1 writes 65,360 B, released_model reaches 65,536, P1 gives 80,720 > 65,536 → [1, 0]; P3 ≥ 8 down; P4 counts both ways plus G-NC2's hang guard; P5 [0, k]. P2 → G-NC2 [k ≥ 1, 0]. All compile.",
+    "E5 is a valid witness only for the lab: SERIES.md enters npt-lab only under cfg(test) (contract.rs:443-448), and no lab/server/bots source names npt_net (D11).",
+    "SERIES.md: each old phrase occurs exactly twice; these are not C62H-BOUND's frozen rows.",
+    "R4's text, P5, the 03:14:03 send time and the card's stricter 'before he has read it' promise (card :197-203).",
+    "Brief 8.1 (c62h-bound-brief.md:485-501): its order, procedure and never-list as the plan cites them.",
+    "main-run.sh (lock, idle wait, 4 GiB floor at start only, touch of crates/ at :48) and te_m3_loop.sh (build, BIN taken by tail -1, failure print).",
+    "check.mjs: bites command :2057; FX-10 :2655-2660/:2677; clippy --all-targets -D warnings; the summary phrases. merge-2.log: 552/632, deps 137, wasm 27000; light.log: refs 1350, redact 305.",
+    "Mustafa's words quoted right: 21:50 command forms (history.md:2187) and SIZE-CHECK (history.md:398-399).",
+    "checkpoint.mjs: save pushes; watch never pushes unpushed code (:6, :9-11).",
+    "Free disk now 4,985 MiB (df).",
+    "'Never a looser bound without its cause' is the advisor's rule, not Mustafa's words (absent from history.md)."
+  ],
+  "for_mustafa": [
+    "Nothing to check in Brave and nothing to merge for this fix: it changes test code only, on the spike's draft branch.",
+    "Optional, one question (PACK-READ): have you read the C62H-BOUND report the session sent you at 04:14 Amsterdam time? Why it matters: the session promised to pack nothing before you have read it, and disk space is tight. After this fix's check run, about 3.6 GB may be left, under the 4 GB the next lane's (U4f's) check run needs. Options: (a) yes, I've read it: the session may pack one or two closed old log folders by the kept-logs rule (never the P0 folders, the reference sets or the c-u2 folders); (b) not yet: nothing is packed, this fix goes ahead anyway, and packing waits until before U4f's run. Recommendation: (a), whenever you have read it."
+  ],
+  "to_mustafa": "The fix for last night's one-off network test failure is approved with conditions. The code shows that the old check misread a short, harmless moment as an overflow (no extra byte was ever let in), and the new check still tests the limit at every write and must catch planted real overflows. Nothing needs you in a browser; the one optional question is whether you have read the C62H-BOUND report, so old log folders can be packed to keep disk room for U4f.",
+  "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u3c-held-1/advisor-plan-review.md"
+}
