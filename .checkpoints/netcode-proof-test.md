@@ -166,7 +166,11 @@ it asks nothing; REFS-KIT stays.
   missing (P6); no figure, verdict or pass bar wrong. **Fix pass:** ten fixes made by Edit (saved e0fd859; card
   line numbers now pinned to 67de11e); then the spend-limit cut (the cuts block). **Next:** the rest of the fixes
   (the conditions P1-P7 with P6, the decision's code explained and its options, For Mustafa item 4, -58's parts as
-  marks.json gives them, the notes' :243); the verifier again until PASS; the section into u4r-report.md by script;
+  marks.json gives them, the notes' :243): **all made by 02:44 UTC** (the draft now sha256 5d8fb338…; diff to the
+  round-1 version e2d06ec +47 -27); **RUNNING from 02:45 UTC: the verifier's round 2** (workflow wf_bfde2f03-00d,
+  verifier at xhigh, notes verifier-c62h-bound-report-r2.md); the insert script c62h_bound_report_insert.py is
+  written (appends the draft at u4r-report.md's end, bound to the draft's sha256; shown to refuse a wrong hash, nothing
+  written). Then: the verifier until PASS; the section into u4r-report.md by that script;
   save; CI; the advisor's check of that head (P6); the report to Mustafa. P6's spike-tree check exits 0 at e2d06ec.
   **NS-STATUS: PR #54 opened 21:57 UTC** (claude/night-shift-stints, commit 20f9d599…, NIGHT_SHIFT.md +3 -0, the
   lines' sha256 4e3d1565… = his yes; the worktree .gate/ns-stints-wt; subscribed). **Its review round DONE**

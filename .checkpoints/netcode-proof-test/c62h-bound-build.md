@@ -240,7 +240,7 @@
   and decoded's "room logs disagree on clients" before the row's eight; figures.rs:565-655); "an entry below 0" read
   on the link lists only; the notes carry the phrases without the row's backticks; deviations: the reader sits after
   decoded's helper `coverage`, engine.rs's imports gained RunOut and Phase's three names.
-- 11:54 **Commit 2: b423a7d9231f68c87a1af9004dc1f2c218b43948.** `git diff HEAD^ HEAD -- . | sha256sum` =
+- 12:18 (git's time, 12:18:58; first written here as 11:54) **Commit 2: b423a7d9231f68c87a1af9004dc1f2c218b43948.** `git diff HEAD^ HEAD -- . | sha256sum` =
   f88bf7d56b845c33… = step2-check-2.log's header; nothing unstaged; untracked none. SIZE-CHECK from LANE_BASE: **821**
   (+804 -17; step 2 alone 322: figures.rs 172, engine.rs 150). Patch: c62h-bound-commit2.patch (387 lines, addbe9d9…).
 - 12:19 **Insert part 3 on the worktree** (.gate/u4r/c62h-bound/insert-part3.log): exit 0; marks.json 9fb5be57… →

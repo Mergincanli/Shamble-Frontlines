@@ -387,6 +387,18 @@ resync is the designed recovery path, triggered by the event queue's cap, never 
   script, section 13), -2 and -5 (carried in this section and section 10). Nothing at Medium or above.
 - **Carry 58's capacity side stays open** (P7): EVQ-LOAD, U4f's measurement of the cap, and the per-burst
   high-water marks before -18's judged B1 runs (U4g).
+- **Its conditions, each met or carried in this report:**
+  - P1: P2 and P3 count, s1 and s3 under carry 58: this section; the card and c62h-bound-build.md's section 8 say so.
+  - P2: the (c) replacement ran only as the_c_lines gives it: section 13.
+  - P3: every item of brief section 9 and the carries of the ruling's order_to_the_report: sections 1-18.
+  - P4: c62h-bound-build.md's section 8 gained P3's lines before this report was written (ADV-CBP3-1, :515-533).
+  - P5: both P0 folders and the reference sets stay unpacked until this report has reached Mustafa: section 14.
+  - P6: the head that carries this report gets the advisor's check, naming its full SHA, before the report goes to
+    Mustafa; nothing in spikes/netcode-proof outside results/ changes from ddd38ba to that head (`git diff --quiet
+    ddd38ba HEAD -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results'`: exit 0 at e2d06ec, the branch
+    head when this was written; run again on the head that carries this report).
+  - P7: every other bar and stop in the brief stands unchanged (C8, section 6); carry 58's capacity side stays open
+    (above).
 
 ### 12. The stop rules: none was met
 
@@ -515,21 +527,25 @@ JDG-ONLY-1. Paths are under spikes/netcode-proof/; lines are at 42b9646, whose b
 
 ### Decisions needed
 
-- **C62HB-Q4 (b): should -58's two counter-wrap parts get this lane's bound, now that both sets pass?**
-  - The question: PM-0001-58 ("every counter survives its wrap") has two short L1 parts, at P0 and at P3 (three
-    seeds each, 48 clients). Neither has any check on how many ticks a client files as lost. Should they get the
-    same two checks as -17's P2 and P3 parts?
+- **C62HB-Q4 (b): should -58's two counter-wrap parts get this lane's bound, now that both sets pass?** (The code:
+  the design's question C62HB-Q4 kept these parts out of this lane and, as its option (b), offered you this decision
+  once both sets passed; c62h-bound-design-full.json, brief section 9.)
+  - The question: PM-0001-58 ("every counter survives its wrap") has two L1 parts, P0 and P3, read on the "wrap"
+    suite's runs (at least three valid runs each, marks.json). Neither has any check on how many ticks a client files
+    as lost. Should they get the same two checks as -17's P2 and P3 parts?
   - Why it matters: until they do, a client bug that files snapshots as lost around the wrap goes unseen there; it is
     the same hiding place this lane closed on -17 (c62h-bound-paste.md:102).
   - Options:
     - (a) Now, as a small lane of its own: the exact wording and size to you for a yes first; the two checks on
-      -58's two parts in marks.json, with a reviewer's read under your 13:35 rule; then -58's wrap runs re-run and
-      judged (the design names the L1 P3 wrap runs: c62h-bound-design-full.json, C62HB-Q4).
-    - (b) In U4g, which already takes -58 and is likely to change marks.json (advisor-c62h-review-full.md:90), and
-      whose judged B1 runs bring -17's B1 part under the same two checks: the same wording yes first.
+      -58's two parts in marks.json, with a reviewer's read under your 13:35 rule; then -58's wrap runs made again
+      with the new lab and judged, since runs logged before this lane lack the network's record and read INVALID on
+      the two checks (section 14 (ii)). The design names the L1 P3 wrap runs (C62HB-Q4); by the same reason (this
+      report's reading), the L1 P0 wrap runs would need it too.
+    - (b) With U4g, which already takes -58 and is likely to change marks.json (advisor-c62h-review-full.md:90), and
+      whose judged B1 runs bring -17's B1 part under the same two checks: the same wording yes from you first.
     - (c) Not now: the two parts stay on the "Still unbounded" list.
-  - Recommendation: (b). The two figures and their reader already exist, and U4g opens -58 and these checks anyway,
-    so one wording yes and one reviewer's read cover both, without a separate lane.
+  - Recommendation: (b), with U4g. The two figures and their reader already exist, and U4g opens -58 and these
+    checks anyway, so one wording yes and one reviewer's read cover both, without a separate lane.
 
 ### For Mustafa
 
@@ -538,5 +554,5 @@ JDG-ONLY-1. Paths are under spikes/netcode-proof/; lines are at 42b9646, whose b
    runs. Both P0 folders stay unpacked until you have read this report.
 3. Nothing to check in Brave: this is spike code on PR #40's test branch, nothing a player sees, hears or feels
    changes, and nothing merges to main.
-4. Separately, not this lane: PR #54 (the three NIGHT_SHIFT.md lines you said yes to at 22:09) comes to you for your
-   go on its merge after its review round.
+4. Separately, not this lane: PR #54 (the three NIGHT_SHIFT.md lines you said yes to at 22:09) came to you on its own
+   for your go on its merge: its review round is done, and it has been ready since 22:11 UTC on 2026-11-16.
