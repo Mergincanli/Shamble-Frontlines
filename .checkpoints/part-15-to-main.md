@@ -6,7 +6,7 @@
   for this merge."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/part-15-second-lane) · **Base:** main
   d7dad976f1ea7170d597b51e3861f1ee74f980e4 (the merge of #56; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 00:54 CET (from the clock)
+- **Last update:** 2026-11-18 01:13 CET (from the clock)
 
 ## Steps done
 1. Pull request #56 (change-set 0) merged on his go of 22:59:16 UTC: merge commit d7dad97, 2026-11-17 23:00:12 UTC,
@@ -40,14 +40,13 @@
    pushed with the docs pass: 1aaa067. Checks: `build.mjs --check` passes; quotes found; `gate.mjs --no-smoke` PASS;
    repo map OK (129 entries). Size: 204 written lines (stop line 300); 339 copied.
 
-## Current step
-9. (23:54 UTC) The reviews on the final diff, in parallel: the verifier (`part-15-to-main/verifier.md`) and the advisor
-   agent (`part-15-to-main/advisor-final.md`).
+9. The reviews, both at 00:11 UTC on 2026-11-18: the verifier PASS (seven Low), the advisor agent APPROVE of the
+   content at 3e4fea1 (five Low; one question for Mustafa that does not block: OLD-LINES). All Lows fixed and the
+   report completed in the commit before this card's last save. Size: 220 written lines (205 before the reviews).
 
-## Next steps
-10. Their findings fixed; the report completed; this checkpoint deleted in the last commit (it stays readable at the
-    commit before, which the report names); the advisor agent's word on the last head; #57's description updated and
-    the pull request marked ready; CI read on that head; stop for his go. Then change-set 1.
+## Current step
+10. The last commit: this checkpoint deleted, the report names the commit that holds it. Then the advisor agent's
+    word on the last head, #57's description updated and marked ready, CI read, stop for his go.
 
 ## Open findings
 - none yet
@@ -61,4 +60,4 @@
 
 ## Running work
 - saver: background task bj0ni7syc, started about 23:03 UTC.
-- agents (2 of 3): the verifier, the advisor agent (final content).
+- agents: none; the saver was stopped before the last commits.
