@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 20:12 Amsterdam (19:12 UTC)
+- **Last update:** 2026-11-18 20:14 Amsterdam (19:14 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -639,6 +639,10 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - get_session at about 19:02 UTC: 563,418 of 1,000,000 tokens (automatic compaction at 901,600).
    - Step 1 started (no "plan order" from him): cs/b9-edit 7f3a684 pushed 19:11:17 UTC; pull request #9; deploy run
      #17, id 44377870587 (created 19:11:34). Waiting for its deploy job's log ("secret: present" expected, no wait).
+   - **Row hit: the off run waits** (deploy job "waiting" from 19:12:20 UTC). Stopped; his preview page asked (a
+     screenshot). Window note: the reviewer may already be on (his tick after my list?), so the "reviewer off since
+     18:08" window may have closed before 19:12 UTC; read from his screenshot. If on: this run is the control, then
+     the off reading in the plan's order (untick, re-run without a wait, re-tick with a screenshot).
 
 ## Next steps
 1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.

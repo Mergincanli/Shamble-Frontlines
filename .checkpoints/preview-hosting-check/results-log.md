@@ -607,3 +607,10 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
 - Step 1 (the reviewer off since his untick, 18:08 UTC): cs/b9-edit 7f3a684 pushed at 19:11:17 UTC (deploy.yml = the
   approved variant fd3dc4c6029b; the other three workflows unchanged); pull request #9 "Token test: cs/b9-edit, the
   deploy job rewritten" opened right after.
+- **Step 1's outcome row hit: "the off run waits".** Run #17 (44377870587): plan green (19:11:37-19:11:54 UTC), build
+  green (19:11:58-19:12:20), then the deploy job (135062245511) "waiting" from 19:12:20 UTC, although the reviewer was
+  off at his untick (18:08 UTC) and every run since then ran without waiting (the last: close #5 for (b'), 18:50:47 to
+  18:51:11). So `preview` changed after 18:51 UTC; the likely reading (not yet shown by a record) is that he ticked
+  "Required reviewers" after my list of about 19:06 UTC (its step 2). Per the row: stop, his preview page read (a
+  screenshot asked). If it shows the reviewer on, this run is the control (approve; "secret: present") and the
+  reviewer-off reading is taken in the plan's order (untick, re-run, re-tick).
