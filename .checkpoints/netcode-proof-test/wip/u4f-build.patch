@@ -12,7 +12,7 @@ index 9c58b9a..b160e1a 100644
  | `JoinAccepted` | room → client | control stream | owner | Sender: the room only, once per accepted `Join`, to that client. npt-client: the size; each value in range; a `FullState` follows on a full-state stream | 256 B (proposed: 2 B length + 1 B type + 3 B slot, team and squad + 2 B mode id + 32 B mode hash + 32 B content hash + 4 B server tick + 4 B tick and snapshot rates = 80 B, rounded up) | built in U4 | row 671; part 11:506 (the room assigns team and squad) |
  | `JoinRejected` | room → client | control stream | owner | Sender: the room only; it then closes the connection. It carries a reason code and nothing else (proposed codes: bad token, bind mismatch, roster full, wrong version, wrong content hash). npt-client: the size | 16 B (proposed: 2 B length + 1 B type + 1 B reason = 4 B, rounded up) | built in U4 | row 671; plan §10.3 |
 diff --git a/spikes/netcode-proof/crates/bots/src/lib.rs b/spikes/netcode-proof/crates/bots/src/lib.rs
-index 47f91ef..63a4628 100644
+index 47f91ef..ad357cd 100644
 --- a/spikes/netcode-proof/crates/bots/src/lib.rs
 +++ b/spikes/netcode-proof/crates/bots/src/lib.rs
 @@ -23,6 +23,8 @@
@@ -24,7 +24,7 @@ index 47f91ef..63a4628 100644
  use npt_client::ClientEndpoint;
  use npt_link::Channel;
  use npt_sim::{Command, Scene};
-@@ -71,9 +73,11 @@ const LEASH_IN_CM: i64 = 1_300;
+@@ -71,9 +73,22 @@ const LEASH_IN_CM: i64 = 1_300;
  const AIM_ABOVE_FEET_CM: i32 = 100;
  /// Where an aim with no target in view goes: a seeded point within this many cm of the map's centre, in x and y.
  const BLIND_SPREAD_CM: u64 = 1_000;
@@ -36,19 +36,32 @@ index 47f91ef..63a4628 100644
 +/// inside the map's ±12,800 cm, so the room's kind 6 never refuses them (u4f-brief.md 2.6; U4r's stand-in at
 +/// 32,000 cm lay outside the map: NA-8).
 +const FAR_CM: i32 = 11_000;
++/// The fast clock's lane (U4F-Q11 (iii) (c)), cm: its line in y and its two ends in x, east of the fight past every
++/// fight vehicle's sweep (hulls 5 to 14 m out, parts within 3.71 m: npt-sim world.rs:801-812), south of building 0's
++/// wall (y above -460) and inside the outer vehicles' loops (from 48.3 m), so no box, door, wall or vehicle part lies
++/// within its band; npt-bots' lane test shows every live tick moving 20 cm there over a judged run's window.
++const LANE_Y_CM: i32 = -1_050;
++const LANE_X_CM: [i32; 2] = [2_600, 3_600];
++/// The lane's band, cm: inside it (in y, and in x within twice it of the ends) the walk runs along the lane, else it
++/// heads for the west end.
++const LANE_BAND_CM: i32 = 300;
++/// The fast clock's sequences whose stamps it keeps (its copies keep their stamp): twice the redundancy cap.
++const STAMPS_KEPT: usize = 16;
  
  /// What a behaviour does with each command it gives.
  #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-@@ -87,6 +91,8 @@ enum Kind {
+@@ -87,6 +102,10 @@ enum Kind {
      Clamp,
      /// Open loop: fire held, the walk, aimed at a seeded point near the centre.
      Steady,
 +    /// Open loop: the walk with fire never pressed or held (-47's clock suite, U4F-Q4 (b): no event is stamped).
 +    NoFire,
++    /// -21's fast clock: fire held at a seeded point, the lane's walk at full length ([`Behaviour::lane`]).
++    Lane,
  }
  
  /// One client's behaviour (the module text): the brawl or an open-loop script, seeded per slot.
-@@ -109,6 +115,28 @@ pub struct Behaviour {
+@@ -109,6 +128,61 @@ pub struct Behaviour {
      /// The leash's state (the brawl only): steering toward the centre, from past [`LEASH_OUT_CM`] until inside
      /// [`LEASH_IN_CM`].
      steering: bool,
@@ -62,6 +75,39 @@ index 47f91ef..63a4628 100644
 +    points: BTreeMap<u16, [i32; 3]>,
 +    /// -21's lag switch (`lag_switch`).
 +    lag: Option<Lag>,
++    /// -21's fast clock (`fast_clock`).
++    fast: Option<Fast>,
++}
++
++/// The fast clock's state: the lead bound in ticks, the commands stamped, the last stamp, each recent sequence's stamp
++/// (every copy keeps it, so no copy differs: kind 3), the copies left out of an `Input` that would not encode, and the
++/// lane's way (west).
++#[derive(Clone, Debug, Default)]
++struct Fast {
++    bound: u32,
++    stamped: u64,
++    last: Option<u32>,
++    stamps: std::collections::VecDeque<(u16, u32)>,
++    left_out: u64,
++    west: bool,
++}
++
++/// The later of two ticks, wrap-aware.
++fn later(a: u32, b: u32) -> u32 {
++    if (a.wrapping_sub(b) as i32) > 0 { a } else { b }
++}
++
++/// The fast clock's stamp for its `k`-th command (from 1) after `last`, at the endpoint's newest tick `newest`, under the
++/// lead bound `bound` (U4F-Q11 (v) (b) as the advisor's F1 amends it): every 10th the later of `last` and newest + 3 +
++/// the bound (past the bound on arrival at P0, where the room's next tick is at most newest + 2); every other the later
++/// of `last` and the earlier of last + 1 and newest + the bound; the first after none newest + 1. Never below `last`.
++fn fast_stamp(k: u64, last: Option<u32>, newest: u32, bound: u32) -> u32 {
++    let last = last.unwrap_or(newest);
++    if k.is_multiple_of(10) {
++        return later(newest.wrapping_add(3).wrapping_add(bound), last);
++    }
++    let (next, cap) = (last.wrapping_add(1), newest.wrapping_add(bound));
++    later(last, if later(next, cap) == next { cap } else { next })
 +}
 +
 +/// The lag switch's state (u4f-brief.md 2.6): its `Input` datagrams held for `hold_ns` at the start of every `every_ns`
@@ -77,7 +123,7 @@ index 47f91ef..63a4628 100644
  }
  
  /// splitmix64's step: the bots' one generator, seeded per slot (no clock, no hash map).
-@@ -128,8 +156,8 @@ fn below(word: u64, n: u64) -> u64 {
+@@ -128,8 +202,8 @@ fn below(word: u64, n: u64) -> u64 {
  /// A move vector from (x, y) toward the origin at about full command length, inside the room's x² + y² ≤ 127² check
  /// (so the sim never scales it: world.rs:494-498): each part is 127 times its share of ⌈|(x, y)|⌉, truncated toward 0,
  /// so the vector is never longer than 127 and, at the leash's radii, longer than 125. Integers only. Its inputs are
@@ -88,7 +134,7 @@ index 47f91ef..63a4628 100644
  fn toward_centre(x: i32, y: i32) -> [i8; 2] {
      let (x, y) = (i64::from(x), i64::from(y));
      let d2 = x * x + y * y;
-@@ -167,7 +195,111 @@ impl Behaviour {
+@@ -167,7 +241,181 @@ impl Behaviour {
              given: 0,
              skipped: 0,
              steering: false,
@@ -97,7 +143,45 @@ index 47f91ef..63a4628 100644
 +            never_acks: false,
 +            points: BTreeMap::new(),
 +            lag: None,
++            fast: None,
 +        }
++    }
++
++    /// -21's 1.5x clock (u4f-brief.md 2.6; U4F-Q11 (iii) (c) and (v) (b) as F1 amends it): fire held at a seeded point,
++    /// the lane's walk at full length, a command at every step once the endpoint holds a snapshot (its host clock's rate
++    /// is the lab's), each stamped by [`fast_stamp`] under the lead bound `bound` (ticks) in [`Behaviour::outgoing`].
++    pub fn fast_clock(scene: &Scene, slot: u8, seed: u64, bound: u32) -> Behaviour {
++        let mut b = Behaviour::new(Kind::Lane, scene, slot, seed).every_step();
++        b.fast = Some(Fast {
++            bound,
++            ..Fast::default()
++        });
++        b
++    }
++
++    /// The fast clock's copies left out of an `Input` whose rewritten stamps would not encode (0 expected at P0).
++    pub fn fast_left_out(&self) -> u64 {
++        self.fast.as_ref().map_or(0, |f| f.left_out)
++    }
++
++    /// The fast clock's walk (U4F-Q11 (iii) (c)): by its decoded position, toward the lane's west end until inside the
++    /// lane's band, then along the lane at full length (20 cm a tick), turning at each end; no complete tick yet, or a
++    /// dead soldier, stands (the sim moves no dead soldier).
++    fn lane(&mut self, own: Option<([i32; 3], bool)>) -> [i8; 2] {
++        let (Some(([x, y, _], false)), Some(f)) = (own, self.fast.as_mut()) else {
++            return [0, 0];
++        };
++        let [x0, x1] = LANE_X_CM;
++        let reach = 2 * LANE_BAND_CM;
++        if (y - LANE_Y_CM).abs() > LANE_BAND_CM || x < x0 - reach || x > x1 + reach {
++            return toward_centre(x - x0, y - LANE_Y_CM);
+         }
++        if x >= x1 {
++            f.west = true;
++        } else if x <= x0 {
++            f.west = false;
++        }
++        if f.west { [-127, 0] } else { [127, 0] }
 +    }
 +
 +    /// -21's lag switch (2.6; U4F-Q15 (c)): the same behaviour, its `Input` datagrams held `hold_ns` (200 ms in the
@@ -160,9 +244,10 @@ index 47f91ef..63a4628 100644
 +                l.bursts.push(now_ns - at);
 +            }
 +        }
-+        if !self.never_acks && self.points.is_empty() {
++        if !self.never_acks && self.points.is_empty() && self.fast.is_none() {
 +            return;
-         }
++        }
++        let newest = self.last_newest.unwrap_or(0);
 +        for d in datagrams.iter_mut() {
 +            if let Ok(Message::Input(mut i)) = decode(Direction::ClientToRoom, Channel::Datagram, d)
 +            {
@@ -174,8 +259,39 @@ index 47f91ef..63a4628 100644
 +                        c.aim = *p;
 +                    }
 +                }
++                // The fast clock: each new sequence, oldest first, takes its stamp; a copy keeps its sequence's; a view
++                // tick after the stamp is the stamp (the endpoint's rule, so the view offset encodes).
++                if let Some(f) = self.fast.as_mut() {
++                    for c in i.commands.iter_mut().rev() {
++                        let kept = f.stamps.iter().find(|(s, _)| *s == c.seq).map(|x| x.1);
++                        c.tick = kept.unwrap_or_else(|| {
++                            f.stamped += 1;
++                            let t = fast_stamp(f.stamped, f.last, newest, f.bound);
++                            f.last = Some(t);
++                            f.stamps.push_back((c.seq, t));
++                            if f.stamps.len() > STAMPS_KEPT {
++                                f.stamps.pop_front();
++                            }
++                            t
++                        });
++                        if later(c.view_tick, c.tick) != c.tick {
++                            (c.view_tick, c.view_fraction) = (c.tick, 0);
++                        }
++                    }
++                }
++                // Every rewritten `Input` encodes: an older copy a past-bound stamp leaves more than 255 ticks below
++                // (after an idle) is left out, oldest first, so the rest stay consecutive (the codec's two rules).
 +                let mut out = Vec::new();
-+                if encode(&Message::Input(i), &mut out).is_ok() {
++                let mut ok = encode(&Message::Input(i.clone()), &mut out).is_ok();
++                while !ok && i.commands.len() > 1 {
++                    i.commands.pop();
++                    out.clear();
++                    if let Some(f) = self.fast.as_mut() {
++                        f.left_out += 1;
++                    }
++                    ok = encode(&Message::Input(i.clone()), &mut out).is_ok();
++                }
++                if ok {
 +                    *d = out;
 +                }
 +            }
@@ -200,7 +316,7 @@ index 47f91ef..63a4628 100644
      }
  
      /// The brawl of `slot` in `scene`, from the run's `seed`.
-@@ -175,6 +307,12 @@ impl Behaviour {
+@@ -175,6 +423,12 @@ impl Behaviour {
          Behaviour::new(Kind::Brawl, scene, slot, seed)
      }
  
@@ -213,7 +329,7 @@ index 47f91ef..63a4628 100644
      /// The open-loop script named `script` (`presses`, `clamp` or `steady`) of `slot` in `scene`, from `seed`;
      /// `None` for another name.
      pub fn script(scene: &Scene, slot: u8, seed: u64, script: &str) -> Option<Behaviour> {
-@@ -221,6 +359,17 @@ impl Behaviour {
+@@ -221,6 +475,17 @@ impl Behaviour {
          let (Some(newest), Some(_)) = (endpoint.newest_tick(), endpoint.slot()) else {
              return false;
          };
@@ -231,7 +347,7 @@ index 47f91ef..63a4628 100644
          if !self.every_step && self.last_newest == Some(newest) {
              self.skipped += 1;
              return false;
-@@ -276,7 +425,12 @@ impl Behaviour {
+@@ -276,7 +541,12 @@ impl Behaviour {
          own: Option<([i32; 3], bool)>,
      ) -> Command {
          let k = self.given;
@@ -245,7 +361,11 @@ index 47f91ef..63a4628 100644
              self.presses[Command::PRESS_FIRE] = self.presses[Command::PRESS_FIRE].wrapping_add(1);
          }
          let aim = match self.kind {
-@@ -289,7 +443,11 @@ impl Behaviour {
+@@ -286,10 +556,15 @@ impl Behaviour {
+         let walk = MOVES[((k / TURN_EVERY + self.phase) % MOVES.len() as u64) as usize];
+         let walk = match self.kind {
+             Kind::Brawl => self.leash(own, walk),
++            Kind::Lane => self.lane(own),
              _ => walk,
          };
          Command {
@@ -258,7 +378,7 @@ index 47f91ef..63a4628 100644
              presses: self.presses,
              move_xy: if self.kind == Kind::Clamp {
                  [0, 0]
-@@ -401,7 +559,7 @@ mod tests {
+@@ -401,7 +676,7 @@ mod tests {
              steer,
              "still outside the inner radius"
          );
@@ -267,7 +387,7 @@ index 47f91ef..63a4628 100644
          assert_eq!(got, walk, "dead: the walk");
          let (got, walk) = give(None);
          assert_eq!(got, walk, "no complete tick: the walk");
-@@ -466,6 +624,117 @@ mod tests {
+@@ -466,6 +741,117 @@ mod tests {
          }
      }
  

@@ -688,3 +688,29 @@ a fresh worktree (builder 1's, agent-a856ba7c..., stays untouched as a backup); 
   `--twin-logs`, and its 13 bite runs). What they can build on: `Behaviour::outgoing` (the cheats' hook on the
   endpoint's datagrams, with the host time), `logs::moved_um` (A1's movement rule), the clamp twin's points route,
   `--event-cap`, the suite switch in `run`, and the room's checks and records (B1-B4 of builder 1).
+
+## Builder 3
+
+Task: U4f's third builder (general-purpose, opus, effort xhigh): finish U4f's build (clock and commands) from builder 2's
+partial build, by the advisor's 22 instruction lines (advisor-u4f-build1.md:162-246, sha256 da98295e...), u4f-brief.md
+rev 3.3 (sha256 135325a0...) and the main session's prompt (which wins where they differ). Commit nothing, push nothing.
+
+### Start (done)
+
+- Worktree: /home/user/Shamble-Frontlines/.claude/worktrees/agent-a0825a5a2491eb175 (made at origin/main 22c6afa0).
+  `git merge --ff-only 07289a4ec42bdc9adf2d236642cf0ea5148365fc`: exit 128 ("Diverging branches can't be
+  fast-forwarded"); `git switch -c u4f-build3 07289a4ec42bdc9adf2d236642cf0ea5148365fc`: "Switched to a new branch
+  'u4f-build3'"; `git log -1 --format=%H`: 07289a4ec42bdc9adf2d236642cf0ea5148365fc.
+- sha256: wip/u4f-build.patch 3d341c58e64b32442f3f70a02ef6764e84efc685f84512dae09c4f9220aff155, the ruling
+  da98295e0d0eae7c12e46f0a282dce3c452f75dc74346c3f55aec26baa84f7cb, the brief
+  135325a0bb524104bba9144b366b9ec52525851f5db140b1aca93ba4681a502f, the runner
+  70eb3da5b8ce9a8e2eda582536eeab93f96fb7fbe98e2a74a28e0492ccf6ddae: all four match the prompt. `git apply --check`
+  exit 0, `git apply` exit 0 (the one git write).
+- Line 2's checks: `git diff --stat 5b29296b -- spikes/ docs/`: 20 files, 2,813 insertions, 302 deletions; `git status
+  --short`: those 20 modified and 9 untracked new files, `wc -l`: clock.rs 348, carry80.rs 158, trace.rs 556,
+  bite_homes.rs 48, pong.rs 84, commands.rs 1,067, c-u4f-cap.mjs 140, c-u4f-r2.mjs 168, c-u4f-runs.mjs 133 = 2,702;
+  **5,515 added**. Equal to the prompt and to builder 2's notes (:529-531): no stop.
+- Notes read whole (:1-690). Builders 1's and 2's worktrees untouched (backups).
+- `df -h /home/user` at start: 252G size, 27G used, 12G avail (70 %).
+- Plan by the prompt's item 5: B8f, the fast clock (one block); then B9a, B9b, ... of at most about 400 added lines
+  each; SIZE-CHECK after each; at the first block end past 6,000: build nothing more, end checks twice, the stop record.

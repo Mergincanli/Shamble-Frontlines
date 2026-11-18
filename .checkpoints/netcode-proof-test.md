@@ -5,8 +5,9 @@
   **Base:** main last merged in at 3f2fa21 (main 82c605e, PR #54). Main is now 22c6afa (PRs #55, #56, #57: docs/ only,
   `git diff --stat HEAD origin/main -- .claude/ CLAUDE.md AGENTS.md .github/ tools/` empty, 2026-11-18 before 11:44 UTC):
   not taken in; MAIN-52 takes main in when main changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-18 18:11 UTC: builder 2 ENDED, PARTIAL (5,515 added; end checks x2 pass), checked here;
-  part-clean done; builder 3 RUNS from head 3 07289a4; the saver restarted.
+- **Last update:** 2026-11-18 18:24 UTC: Mustafa (18:2x): usage at 90%, save progress. Builder 3's worktree
+  snapshotted (wip/u4f-build.patch 5a709024…, 349,896 B, 29 files, base 07289a4) and its notes copied; builder 3 told
+  to keep its notes current after every step (a cut may come). Builder 2 ENDED, PARTIAL (5,515 added; checks pass).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -174,7 +175,7 @@
   (= d1b24c3 in spikes/ and docs/), the snapshot 3d341c58… applied and checked (29 files, 5,515 added) before any
   edit; its prompt points to the ruling's lines 2-22 (B8's fast clock, B9 in blocks of at most about 400 lines, B10,
   line 5's stop past 6,000); logs `.gate/u4f/w3-*`; worktree `.claude/worktrees/agent-a0825a5a2491eb175`, branch
-  u4f-build3. **At each check-in:** `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py <its worktree>
+  u4f-build3. Snapshot at 18:23 UTC: 5a7090248037c819…. **At each check-in:** `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py <its worktree>
   .checkpoints/netcode-proof-test/wip/u4f-build.patch u4f-build` (the one snapshot then stands for builder 3's worktree,
   builders 1 and 2 in it), then save the card; on a cut, check the worktree against its last snapshot first.
 - The saver bgig20ts2 runs from 18:11 UTC (bmhupn5a8 ran 16:38 to 18:11) (`node .claude/scripts/checkpoint.mjs watch
