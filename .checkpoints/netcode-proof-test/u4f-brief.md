@@ -265,7 +265,7 @@ N/u3c-held-1/advisor-plan-review-full.json; `held-build` N/u3c-held-1/build.md; 
    session's); a new external dependency; disk below section 4's floors; a part a U4F-Q leaves open at launch; a tick
    count or rate-derived constant you need (carry 39's rule, `<<P8>>`: record name, definition, values at 30 and 60 Hz
    and site, build the rest); a wire change beyond U4F-Q6's ruling (the catalogue and its tests move with it:
-   .claude/rules/netcode.md:15); **any edit to marks.json, an existing SERIES.md row or crates/judge** (5.6: a bar
+   .claude/rules/netcode.md:17); **any edit to marks.json, an existing SERIES.md row or crates/judge** (5.6: a bar
    comes to Mustafa first, `<<P15>>`); **the lab's short P2 C62H-BOUND test failing** on your build
    (`c62hb_p2_short_every_measured_lost_tick_is_explained`, lab/src/scenario.rs:2904: under the C62H-BOUND stop
    rules his yes adopted, `<<P21>>` with c62hb-paste :120-124, it stops the work for him); **your added lines past 6,000**

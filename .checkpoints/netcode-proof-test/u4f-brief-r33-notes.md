@@ -23,4 +23,34 @@ only as `<<Pn>>`. Add nothing the ruling does not ask (TEST-FIRST rule 3, histor
 8. Run once each, read-only: r31_check.py and adv_words_check.py; quote output here.
 9. Hand back: items folded, sent back, counts, sha256, lines.
 
+10. Added mid-run (the coordinator, from N/advisor-u4f-lead-bound.md E4's second bullet): U4F-Q11 (iii) (c)'s fixed
+    inputs walk, no sprint or crouch (the brawl bots hold fire, so never sprint: bots/src/lib.rs:292), in section 10 and
+    where 2.6 or 2.10 state the fast clock's fixed inputs; "top-speed movement" for the bound's 240 cm reads "full-speed
+    walking (600 cm/s)" (sprint 1.5x the walk: world.rs:484-486). Cites read: bots/src/lib.rs:292 `buttons:
+    Command::FIRE`; world.rs:484-486 sprint off when fire held, 3/2 speed. Grep: "top-speed" once (Q8's why, :1401);
+    2.6 states no fixed inputs; 2.10's +1 by Q11 (iii) (c) names "the fixed-input episode".
+
+## Site map (read whole at rev 3.2; Grep counts)
+- A7: netcode.md:15 once (:268); netcode.md:13-14 twice (:322 2.1 Bounds, :371 2.4 item 2).
+- A3 carry 74: "the commands that arrived after their stamped tick ran" twice: :340 (2.2's pass-marks row, NOT named by
+  the ruling) and :967 (5.3's closing paragraph, named). D15 (:1607, named) does not hold the phrase. So: fold :967
+  only; :340 and D15 go back to the advisor.
+- "at a 2 s episode" twice (:605 scale rule, :636 f19): f19's edit matched with its row's text.
+- f38/f39 "only by" and "1 (conditional)" at :655-656; p15-p18 :961, p19 :962, p20 :963.
+- KL-U4F's trigger: 9.1 :1234 ("after 5.5 items 1 and 2"), 12 item 6 :1678-1679, 5.5's room paragraph :1024-1025
+  ("read at launch (D2 after items 1 and 2)").
+- "(only if a ruling opens npt-server)" once (D9 :1601); its When "after the build, only by the ruling" once.
+
+## Decisions on placement (for the advisor's eye)
+- A1 Q11 (iii) (c)'s add: appended to option (iii) (c)'s text in section 10 (after "so the row's words hold as written").
+- A2's sentence "The fix moves or re-gates loopback.rs's use ...": placed at the end of section 6 item 4 (where the
+  E0425 stop is described), as the ruling's bullet names item 4 and D9 and gives no other place.
+- A3 option A cell: a ";" between "f34" and the appended text (punctuation only, so the cell parses).
+- A4 2.1 cell: appended with "; "; f31: after "ClockSync's tick period in ns" (the advisor's anchor ends there).
+- A5: B2's gain labelled "rev 3.3 (A5):" like the list's rev 3.1 and rev 3.2 labels.
+- Q5: P25's substitution (section 4 and 12 item 3) reads the ruling's words: "(and npt-proto, npt-server and npt-sim,
+  which U4F-Q1 opens)".
+- Q6: f1 gains "on a trace that carries P2's 2 % loss" (the ruling names f1).
+- Section 10's Ruled lines: the ruling's one-line rulings (:174-197), the advisor's words, with "(advisor-u4f-brief.md)".
+
 ## Progress (one line per item as done)
