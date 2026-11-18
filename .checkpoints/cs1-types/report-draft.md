@@ -1,5 +1,5 @@
 # Advisor report: cs1-types (2026-11-18, branch claude/wonderful-hamilton-jdmlnf, base main 22c6afa)
-Change-set 1 of the build plan, "Types" (foundation step 2.4); pull request <<PR>>; risk tier 1 (game code and tests);
+Change-set 1 of the build plan, "Types" (foundation step 2.4); pull request #58; risk tier 1 (game code and tests);
 the branch stands in for `cs/cs1-types`. The first builder chat (lane 1) built it.
 
 ## Goal
@@ -85,12 +85,13 @@ way. Both are told first.
 - **Planted defects, 30 runs, all as wanted** (a throwaway worktree with a build folder of its own, never committed,
   removed without force): a field renamed in Rust without regenerating fails and names `Snapshot.ts`; one character
   changed in `Join.ts` fails and names it; one offset changed in `layout.ts` fails and names it; an extra file in
-  either generated folder, or directly in `generated/`, fails; a doc comment that would end the generated comment
+  either generated folder, or directly in `generated/`, fails; a doc line that holds a comment end with other text
   fails; the control (the rename, regenerated) passes in Rust and in the type check of the shipped sources, and the
   package's own test fails the type check until it follows the rename; a header field added without regenerating
   fails only the layout's export test and shows the hash moving from 0x2df78c30 to 0x5d0e9efb; the hash without its
-  tag bytes, or skipping later sections, fails the hash test; a test binary run outside the copy it was built in
-  stops; write mode refuses a missing tree and a linked folder (a file planted outside survives); the page's check
+  tag bytes, or skipping later sections, fails the hash test (its known answers bite); `client-endpoint`'s test
+  binary run outside the copy it was built in stops (`protocol`'s was shown the same way by two reviewers' own
+  runs); write mode refuses a missing tree and a linked folder (a file planted outside survives); the page's check
   with a signed read fails in Vitest. Two earlier runs of the script are told under "Reviews".
 - **The 20 generator runs, redone on <<RUNS-SHA>>:** 20 runs of `SHAMBLE_WRITE_TYPES=1 cargo test --workspace --locked`
   with default threads; in each, all nine generated files were newer than the run's start; one set of files (set
@@ -110,11 +111,11 @@ way. Both are told first.
   - PM-0002-16 (a layout change without regeneration fails, or the page refuses the block): **shown in two halves.**
     Rust: the layout's export test fails on a stale file. Page: `checkLayoutHash` refuses a hash off by its lowest or
     highest bit, a block of zero bytes and a hash written the wrong way round. No test yet feeds a block written by
-    Rust into the page's check: that needs change-set 2's writer.
+    Rust into the page's check: the mark's own method needs change-set 2's writer.
   - PM-0002-17 (0 type errors with the strict flags): **shown**, with `-p` and scratch configs, not `-b` and not in CI.
   - PM-0002-19 (20 generator runs give 20 identical sets): **shown** by the redone runs; not in CI.
-  - PM-0002-63 (the marks above hold in CI with the three generators): **shown in part**: two of three generators
-    exist (wasm-bindgen's comes with change-set 2).
+  - PM-0002-63 (the marks above hold in CI with the three generators): **shown in part, not met**: two of three
+    generators exist (wasm-bindgen's comes with change-set 2).
   - Until the CI edit below lands, CI runs no type check: the package's type exports are checked by hand only.
 
 ## Reviews
@@ -133,7 +134,11 @@ way. Both are told first.
   export tests refused them (that refusal became two more planted defects). In a later one, 1 of 30: a new check for
   doc comments counted comment starts against comment ends, and the planted text held both; the check now looks at
   lines.
-- **Round 2** (on what changed, <<R2-TIMES>>): <<R2>>
+- **Round 2** (on what changed since round 1, 13:42 to <<R2-END>> UTC): engine-architect APPROVE (its Medium closes
+  with this report's sentence for PM-0002-15); rust-reviewer APPROVE (its six Lows closed); test-engineer APPROVE (its
+  High, three Mediums and four Lows closed; it re-derived every known answer with its own implementation and ran the
+  shared-build-folder case again: both trees now stop). <<R2-SA-NA>> Round 2 left Lows only; by the review budget they
+  are follow-ups, and the code is as reviewed (65a7b13).
 - **The verifier** (effort max, on <<VERIFIER-HEAD>>): <<VERIFIER>>
 - **The advisor agent on the final head:** its word is in the pull request's description.
 
@@ -205,6 +210,13 @@ from OSV and rustsec.org); Windows and macOS runs of the export tests; smoke in 
   a redacting `Debug` once its token is a credential.
 - **Change-set 4:** the header states each section's row count and byte offset; padding between sections has one
   owner; the page reads the hash as soon as its four bytes exist; content's export test shares the folder rules.
+- **From round 2 (Lows, not fixed here):** the fix pass's new guards have no committed test of their own (the planted
+  script that shows them is deleted with the checkpoint): they belong in the gate v2's planted set; the build-folder
+  check compares path strings, so an honest run through a second spelling of the same folder, or a moved clone that
+  kept its build folder, stops until a rebuild; the doc-comment check passes a comment end that stands alone on a
+  line (it takes a hand-written `#[doc]` attribute) and refuses a valid block doc; `generated/` may hold a link or a
+  third folder unnoticed; the tag-byte pair has no "must differ" line of its own; on a file system that ignores case,
+  a link named `X.TS` would survive write mode's delete loop (reasoned, not run).
 - **The 2.3 chat:** its formatter and linter must skip `packages/types/src/generated/**` (the files are compared byte
   for byte), while the type check still reads it; the gate's own regeneration builds into a build folder of its own.
 - **The drafts' next revision (his go):** name who reads the message types in TypeScript (the page sees only the
@@ -254,7 +266,7 @@ Recommendation: (a).
    unpack it, and say whether that worked. It holds `README.txt`, the nine generated files and `sha256.txt`; the
    README says how to compare one checksum on Windows.
 2. Answer DEP-HOLD, CI-TYPES, CI-CUT and LANE-ISSUE when it suits you; none blocks this merge.
-3. Your go on merging pull request <<PR>>, after the Advisor's check. No Brave check: nothing a player sees. It is
+3. Your go on merging pull request #58, after the Advisor's check. No Brave check: nothing a player sees. It is
    needs-mustafa also because two security findings stay open (miss 1 and CI-CUT).
 
 ## Appendix: the exact texts asked for

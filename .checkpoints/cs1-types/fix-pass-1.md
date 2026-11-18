@@ -43,8 +43,8 @@ NA = netcode-architect.
 - **RR 4, SA's nit.** The scratch folder's loop goes on only after `AlreadyExists`; any other error stops with the path
   and the reason; the temporary folder must be an absolute path.
 - **RR 6.** Every public item has a doc line (`-W missing_docs`: 0 warnings); the tag constants' doc says what holds.
-- **SA S2.** The export test of `protocol` fails when a generated file holds `*/` anywhere but on a comment's own last
-  line (a doc comment that would end the comment early). The first form, a count of `/**` against `*/`, was fooled by
+- **SA S2.** The export test of `protocol` fails a line of a generated file that holds `*/` with other text (a doc
+  comment that would end the comment early; a `*/` alone on a line still passes: round 2's follow-up). The first form, a count of `/**` against `*/`, was fooled by
   the planted run 2f (a glob that holds both); commit 65a7b13 looks at lines.
 - **SA S3.** `checkLayoutHash`'s doc: a drift check, not a security check; "never throws" holds for an `ArrayBuffer`.
 - **NA 1 to 6.** Doc lines in `messages.rs`: `AimPoint` is provisional as a whole (its step and widths are borrowed
