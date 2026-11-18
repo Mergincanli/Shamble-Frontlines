@@ -7,7 +7,7 @@
   15:38:13 UTC, his label 16:24 Amsterdam; `kit-hold-ci/mustafa-2026-11-18-1624-merge-58.md`, by script).
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/kit-hold-ci) · **Base:** main
   9b4b518f520aa2360a8007dc857ba74b343c8a40 (the merge of #58; the branch was fast-forwarded to it and pushed)
-- **Last update:** 2026-11-18 18:15 CET (from the clock)
+- **Last update:** 2026-11-18 18:21 CET (from the clock)
 
 ## What his words ask (read the file; these are pointers, not his words)
 - DEP-HOLD (a): "Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no
@@ -153,13 +153,36 @@
     - The kit's test counts before the write (16:54 UTC): routine-guard 1107 pass; settings 127 pass; kept-logs 10
       tests, 9 pass, 0 fail; checkpoint 27 pass.
 
+12. **The four files are written** (17:15 to 17:16 UTC; one copy command per file from the scratch copies; the
+    chat in "default" mode): `.claude/scripts/checkpoint.mjs`, `.claude/scripts/checkpoint.test.mjs`,
+    `.claude/CHECKPOINTS.md`, `.github/workflows/toolchain.yml`. Checked (17:16:30): exactly these four files
+    changed; each equals its scratch copy; their diff against main equals `kit-edit.diff` and `ci-edit.diff` hunk for
+    hunk; numstat 46+223+10+12 = 291 added, 2 removed; the workflow parses (`cache-mode: none` on the job).
+    - After the write (17:16:37 to 17:17:49): checkpoint tests 33 pass; routine-guard 1107 pass; settings 127 pass;
+      kept-logs 10 tests, 9 pass, 0 fail (all three equal to before the write); `node tools/gate.mjs --no-smoke`
+      PASS (5a skipped); the repository map check OK (139 entries, 109 paths).
+    - Commits by path: 8bf4bee (the three kit files), 94c197f (the workflow). Pushed 17:18:16 UTC; head
+      94c197fb0b9675251bd7d18ba1084f6b81df728c.
+    - The saver was stopped (bzuzw7uzy) and started again on the branch's script: task **bhcevffhf** (17:18 UTC,
+      2-hour limit: restart by about 19:15 UTC).
+13. The draft pull request is open: **#60** (about 17:18:55 UTC).
+14. **The clean run of the new CI lines** on 94c197f: `toolchain` for the push: run 44357176860, job 134988309631,
+    17:18:27 to 17:19:18 UTC, success; for the pull request: run 44357282401, 17:18:56 to 17:19:41, success. In the
+    push job's log (read whole, 581 lines): "Cache mode: none" at 17:18:27.9099464Z; inside the cut the plain test
+    run, then the write-mode run (all tests again, 17:19:05.42), no "writing the generated types again changed:"
+    line, the release tests, the wasm build, `npm ci --offline`, the workspace tests, "Version 6.0.3" (tsc), then
+    1.04 s with no output (the two type-check runs print nothing when they pass) and the step ends in success. **The
+    stop rule is not triggered.**
+15. **The plant**: commit 0c0e27194bead3be4dea394b9d1b6c2c19532e74 (`packages/types/src/generated/protocol/Join.ts`
+    mode 100644 to 100755, content unchanged), pushed 17:20:38 UTC. The `gate` run on 94c197f that was still running
+    is cancelled by this push (the workflow's own rule).
+
 ## Current step
-12. (17:15 UTC) Write the four files (three kit files and the workflow) as copies of the scratch files, one command
-    per file; each asks him (the guard; the chat is in "default" mode). Then: check that the four files equal the
-    scratch copies and that their diff against main equals `kit-edit.diff` and `ci-edit.diff`; the kit tests (33,
-    1107, 127, 10); the gate; commit by path; push; the draft pull request; the clean CI run (stop rule); the plant
-    (`packages/types/src/generated/protocol/Join.ts` with the executable bit) and its take-back after the plant's
-    run has ended; reviews (security-auditor, infra-engineer, test-engineer); the verifier; the docs; the report.
+16. (17:21 UTC) Read the plant's `toolchain` runs (push and pull request): they must end failed at the step "Build
+    and test with the network cut off", with the lines "writing the generated types again changed:" and
+    " M packages/types/src/generated/protocol/Join.ts". Only after both have ended: the take-back commit (a new
+    commit: the bit off again) and its clean run. Then reviews (security-auditor, infra-engineer, test-engineer; the
+    engine-architect drafting change-set 2's plan counts toward the three), the verifier, the docs, the report.
 
 ## Next steps
 4. Build (three edits), the script's tests, the real CI runs (a planted change that the compare step fails on; the
@@ -175,5 +198,6 @@
   review (his words on DEP-HOLD's option (c)); CI-CUT part 2.
 
 ## Running work
-- saver: background task bzuzw7uzy, started 15:41 UTC on 2026-11-18 (2-hour limit).
-- agents: none running.
+- saver: background task bhcevffhf, started 17:18 UTC on 2026-11-18 on the branch's script (2-hour limit).
+- agents: engine-architect drafts change-set 2's plan (started 17:20 UTC) into `kit-hold-ci/cs2-plan-draft.md`, its
+  notes in `kit-hold-ci/engine-architect-cs2-notes.md`; nothing of it is built.
