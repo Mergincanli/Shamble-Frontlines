@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-18 20:44 UTC (from the clock)
+- **Last update:** 2026-11-18 21:04 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -96,29 +96,37 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
    it equals the expected d6c6352c...fb2ef (compared by script, ignoring case). This answers the open point of #58
    (STATUS, "Waiting on Mustafa": to be taken out in this change-set's docs pass). Noted 2026-11-18 20:44 UTC.
 
-## Current step
-6. **Stopped for his compaction** (his words: "Then stop and tell me the path of its resume card: I compact this chat
-   before you go on."). Nothing of change-set 2 is started beyond this card.
+6. He compacted the chat (his message after it: read the card, continue from its next steps, do not redo finished
+   work, and "Before the first agent starts, tell me in two lines that the card and its notes folder are complete and
+   that the background saver runs."). Done at 20:54 UTC by the session's record: the card and the five notes files
+   present and pushed (8cb0bfd), the draft equal to f167f061's byte for byte, the model read (claude-fable-5-2, also
+   last served), the saver started (20:54:42 UTC, 110 minutes), issue #59 read (no comment), open pull requests read
+   (only #40, the netcode chat's draft). The two lines were given to him before any agent started.
+7. **The plan adopted:** `cs2-first-page/plan.md` (the draft's text with the main session's changes, each listed in
+   its section 20; built by a script of counted replacements, so `diff` against `plan-draft.md` shows every changed
+   line). Read for it: the build plan's card (:298-314), its Parts 0, 2, 3.1, 3.3, 7 and 8, `toolchain.yml`, the
+   crates and packages, ADR 0004 parts 4, 5 and 9, ADR 0002's OQ-0002-7, the archive's follow-ups. Found: CI's
+   `npm test --workspaces` would start the browser tests' server on a build CI never makes (now ruled out: plan 4.4);
+   the draft's wording of the random-number finding said more than its source (reworded from the sources, read
+   again: rand's changelog and crates.io directly, the pull request page through a fetch agent, because this
+   container's proxy refuses github.com pages of other repositories). Reachable by headers only (20:58 UTC): the
+   wasm-bindgen tool's tarball and its `.sha256sum`, the crates index, npm. Saved as ad4fc0b (21:04 UTC).
 
-## Next steps (after the compaction)
-1. Read this card, his message, the plan draft and issue #59. Check the session's model. Start the saver
-   (`node .claude/scripts/checkpoint.mjs watch cs2-first-page --trailer ... --trailer ...`, in the background, with
-   the longest timeout; restart it within two hours).
-2. Make the draft the plan (`cs2-first-page/plan.md`): the main session adopts or changes it. The draft's own
-   summary: new libraries wasm-bindgen `=0.2.130` (in `sim-wasm` only) and its command-line tool 0.2.130 (in no
-   manifest), `three` 0.187.0, `@types/three` 0.187.0 (pulls in six packages), `vite` 8.3.7 declared directly
-   (already in the lockfile); planned size about 2,900 hand-written lines against the build plan's 2,000; nine build
-   steps (0 to 8), with one dependency step and the security check before anything builds it; twelve points where
-   the build plan is wrong or out of date (its section 17); kit, gate and CI edits it needs, with exact text (its
-   section 18: each is asked of him first).
-3. Its four open questions go to Mustafa with the plan (each is written out in the draft's section 16, with options
-   and a recommendation): RNG-CRATE (which random-number crate, and in which change-set: the draft recommends none
-   in change-set 2), OVERFLOW-3P (overflow checks for the first third-party crate in the player's Wasm: keep
-   today's setting), CI-WASM (how CI starts building the new parts: a small pull request of its own after the
-   merge), SIZE-2 (which stop line holds: 4,000).
-4. The advisor agent's review of the plan (APPROVE before any edit); then the build by the plan's steps, with the
-   gate after each; the reviews the plan names; the verifier; the docs; the report; the pull request; stop for his
-   go and his Brave check.
+## Current step
+8. **The advisor agent's review of the plan** (Opus 5.5, effort max; its notes: `cs2-first-page/advisor-plan.md`).
+   No edit before its APPROVE.
+
+## Next steps
+1. On APPROVE: put the plan and its five questions to Mustafa (RNG-CRATE, OVERFLOW-3P, CI-WASM, SIZE-2, DEPART-2:
+   plan section 16, each with options and a recommendation), and start steps 0 and 1 of the plan, which are the same
+   under every answer (step 0: OQ-0002-7's reading; step 1: the Rust core with no new crate). On REVISE: fix the plan
+   and have it read again. On ESCALATE: to him.
+2. Step 2 (the one dependency step) only after his answers to RNG-CRATE, OVERFLOW-3P and DEPART-2, and nothing of it
+   committed or built before security-auditor's answer on exactly that content (plan section 7).
+3. Then steps 3 to 8 of the plan, the gate after each, a checkpoint after each; the reviews (six reviewers, three at
+   a time, one round); the verifier; the docs pass with the records of plan section 21; the report; the pull request
+   (draft, then ready); stop for his go and his Brave check (the zip through the chat's file tool).
+4. Restart the saver before 22:40 UTC (it stops after 110 minutes).
 
 ## Due in this change-set's docs pass (records of #60's merge; nothing of it is written yet)
 - `docs/DECISIONS.md`, by script: his message of 2026-11-18, 20:20:09 UTC (his go on #60; what he accepts;
@@ -155,5 +163,5 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
   `test-engineer-plant-target`; the classifier refused their removal).
 
 ## Running work
-- saver: none (stopped with #60's last commit; start it again when work goes on).
-- agents: none.
+- saver: running since 2026-11-18 20:54:42 UTC (task bdxyfa5ap; 10-minute interval, stops after 110 minutes).
+- agents: the advisor agent on the plan (started after this save).
