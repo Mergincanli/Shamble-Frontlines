@@ -109,6 +109,17 @@
    - Size by lines of `diff -u`: the script +46, its tests +203, the rules +10, the workflow +13: 272 added lines
      against 150 planned (stop line 300).
 
+   - The planted change tried locally first (16:51 to 16:52 UTC), in a worktree of its own (`.gate/plant-check`,
+     its own build folder `.gate/plant-check-target`; a local commit there, never pushed; the worktree is removed):
+     `packages/types/src/generated/protocol/Join.ts` committed with the executable bit; the plain
+     `cargo test --workspace --locked` passed; write mode passed; the compare step's two lines then printed
+     "writing the generated types again changed:" and " M packages/types/src/generated/protocol/Join.ts" (the step
+     would exit 1 there). So the plant is that file.
+   - A refused command and the route taken (16:51 UTC): the guard refused `git -c user.name=... commit` in that
+     worktree ("no option before the subcommand"); route: a plain `git commit` with the repository's own identity.
+   - `kit-hold-ci/decisions.mjs` is written (not run yet): it will put his two messages of today into
+     `docs/DECISIONS.md` in the docs pass, from the two files saved by script, with its checks.
+
 ## Current step
 10. (16:50 UTC) The advisor agent reads the changed lines once (`kit-change.diff`). Then the four files are written
     (three kit files and the workflow) so that their `git diff` equals `kit-edit.diff` and `ci-edit.diff`; each edit
