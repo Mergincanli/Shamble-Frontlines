@@ -219,7 +219,7 @@ One round, on the final text. PENDING: security-auditor, test-engineer, the veri
 - **Models:** this chat runs Fable 5.2 (checked 15:38 and 16:40). It wrote the kit edit under his DEP-HOLD ("my
   exception to the kit freeze, for this one change") and the two CI edits under his GATE-FOLLOW (b) with (i). The
   guard is not touched. Every agent ran on Opus 5.5 at effort max.
-- **Change-set 2's plan** was drafted beside it by engine-architect (17:20 to 18:09), as he allowed: a draft in the
+- **Change-set 2's plan** was drafted beside it by engine-architect (17:19 to about 18:09), as he allowed: a draft in the
   notes (`cs2-plan-draft.md`, 777 lines); nothing of it is built, no library is fetched, no manifest is touched. It
   is not part of this pull request's review. It is taken up from CHECKPOINT-COMMIT when change-set 2 starts.
 
