@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-18 23:10 UTC (from the clock)
+- **Last update:** 2026-11-18 23:14 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -253,8 +253,25 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     exactly six third-party crates (cfg-if, thiserror, ts-rs, unicode-ident, wasm-bindgen, wasm-bindgen-shared):
     the six with an overflow block.
 
+28. **Step 4, its first part: commit 6e76f30** (2026-11-18 23:14 UTC). `crates/sim-wasm/src/lib.rs` (`Sim`, `Sim::create`,
+    `CreateError`, `MODE_LOCAL`; 6 native tests); `packages/client/scripts/wasm-bindgen-tool.mjs` (the tool's exact
+    values, tracked, with his words); `scripts/build.mjs` (its Wasm part, `--wasm-only`; `buildWasm`); `.gitignore`
+    (`packages/sim-worker/pkg/`, `packages/e2e/playwright-report/`). **Risk 1 is settled: `unsafe_code = "deny"`
+    accepts the macro's expansion; no exception.** The tool's first run was through `build.mjs`, after its file was
+    compared. First build: `sim_wasm_bg.wasm` 29,206 bytes raw, 11,743 gzip -9, 9,970 Brotli 11; the glue 8,799. In
+    the glue `input` calls `wasm.sim_input` and `step` calls `wasm.sim_step`: one export each. Refused before any
+    run: the tool with one byte added, a stand-in printing the right version, no path, a bare name. Checks all exit
+    0 (fmt, both clippy runs, workspace tests: client-endpoint 17, sim 9, sim-wasm 6; release tests; the wasm32
+    build; the types written again; the client's tests; the legacy gate; the map check). Departures for the report:
+    `input` takes the sequence only; `newest_input` is added; `block_ptr` returns `*const u8`.
+
 ## Current step
-28. **Step 4 of the plan:** `packages/client/scripts/wasm-bindgen-tool.mjs` (the tool's expected values, tracked, with
+29. **Step 4, the rest:** the cost of the overflow overrides (the Wasm's size and the step's time with the six lines
+    and without, in a scratch worktree with its own build folder). Then step 5.
+    What step 4 still owes at step 6: the page's build in `build.mjs` (Vite's API, the commit and devtools flags,
+    `serve.mjs` copied in the development flavour only, the CSP scan, the 25 MiB check over every served file).
+    (The plan's text for the old step 4, kept for reference:)
+    **Step 4 of the plan:** `packages/client/scripts/wasm-bindgen-tool.mjs` (the tool's expected values, tracked, with
     his words); `crates/sim-wasm/src/lib.rs` (`Sim`: `new`, `block_ptr`, `block_len`, `input`, `step`, `rebase`
     returning the due time; the stub test goes); `scripts/build.mjs` (checks the tool's file by `checkCliFile`
     before any run, runs the exact path, `cargo build --locked --release --target wasm32-unknown-unknown -p
