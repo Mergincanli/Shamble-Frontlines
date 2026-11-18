@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 14:08 CET (from the clock)
+- **Last update:** 2026-11-18 14:16 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -129,8 +129,29 @@
      `Section::align()` for the block writer (cs2); decoders cap sender-sized fields, `Join` gets a redacting Debug
      (cs3); the export tests trap on wasm32 if a wasm32 test run is ever added. Its scratch copy `.gate/rr-cs1`
      (gitignored, 32 MB) can go.
-   - engine-architect started 13:08 UTC; test-engineer and security-auditor still running; netcode-architect waits
-     for a free slot.
+   - test-engineer, back 13:13 UTC: REVISE (`cs1-types/test-engineer-review1.md`). **High 1: the 20-runs record of
+     step 7 does not hold.** `plant.sh` pointed the worktree at the main folder's `target`; cargo then reused the
+     worktree's test binary in the main folder, and its compiled-in `CARGO_MANIFEST_DIR` pointed at the worktree. So
+     the 20 runs wrote into `.gate/cs1-types/plant/` (made again by write mode's `create_dir_all`) and hashed main's
+     files, which were never rewritten (their times: 12:44:41 and 12:22:50, before the runs' start at 12:49:38). The
+     main session checked the times and the leftover folder: true. The leftover folder is deleted (13:16 UTC, nine
+     files one by one, then the empty folders). Main-folder cargo results between 12:49:22 and 12:56:32 are suspect
+     (both `lib.rs` files were touched at 12:56:32, which forced a rebuild). The planted defects' record holds (each
+     ran with the worktree's own binaries). Its own 20 runs in its own tree: one set (81bd1a49…), all nine files
+     rewritten each run. Medium 2: write mode makes a missing tree again (`create_dir_all`): use the run-time
+     `CARGO_MANIFEST_DIR` and make no folder above `generated/`. Medium 3: `index.test.ts`'s second test cannot fail in
+     Vitest (types are stripped; only tsc sees it, and CI runs no tsc): rename it; the report says the type exports
+     go unchecked in CI until the CI edit lands. Medium 4: `hash_covers_every_value` never changes the second section
+     alone and never swaps, adds or removes a section; its last line cannot fail: add those tables and a pinned
+     value. Lows: 5 the overlap rule is tried one way only; 6 no test hash has bit 31 set (a signed read passes);
+     7 nothing checks `generated/` itself; 8 the advice "write mode" cannot remove a leftover non-`.ts` file. Its
+     own 13 defects: 8 caught, 5 missed (T1, T2, T3, T11, T13; T4 passes by design: a width change never reaches
+     TypeScript). Its CI edit text is in its notes (write mode over the workspace then `git status --porcelain`
+     through an assignment; two tsc calls, one without `--skipLibCheck`; `find` instead of a glob).
+   - engine-architect (since 13:08 UTC), security-auditor (since 12:51 UTC) and netcode-architect (since 13:14 UTC)
+     are running.
+   - **The fix pass, when all five are back** (then the planted defects and the 20 runs again, with a target folder
+     of their own, never shared with the main folder, and a check that every file is newer than each run's start).
 
 ## A process miss to report (records, with their times)
 - **CI built the new dependency once before the security check's answer.** The manifests' commit 566d1d1 carried
@@ -219,5 +240,5 @@
 ## Running work
 - saver: background task bafnij7xk, started 12:30 UTC on 2026-11-18 (2-hour limit; the earlier one, b98z35xsq, was
   stopped at 12:30:03 UTC for the code push).
-- agents (3 of 3): test-engineer, security-auditor (since 12:51 UTC), engine-architect (since 13:08 UTC), round 1;
-  netcode-architect follows.
+- agents (3 of 3): security-auditor (since 12:51 UTC), engine-architect (since 13:08 UTC), netcode-architect (since
+  13:14 UTC), round 1.
