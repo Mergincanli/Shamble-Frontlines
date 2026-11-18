@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-18 21:04 UTC (from the clock)
+- **Last update:** 2026-11-18 21:34 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -112,21 +112,40 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
    container's proxy refuses github.com pages of other repositories). Reachable by headers only (20:58 UTC): the
    wasm-bindgen tool's tarball and its `.sha256sum`, the crates index, npm. Saved as ad4fc0b (21:04 UTC).
 
+8. **Step 0 of the plan, the reading of wasm-bindgen's health (OQ-0002-7):** `cs2-first-page/oq-0002-7-reading.md`
+   (a fetch agent read the two pages between this session's saves of 21:04:49 and 21:07:52 UTC; the release dates
+   from the registry at 21:07:52). Maintainers: yes (three core members, a majority vote, reviews, about one release
+   a month). Release policy: none written. By the plan's own rule that goes to him before step 2: question
+   WB-HEALTH. **It ran before the advisor agent's APPROVE, as reading and notes only; the report says so.**
+9. **The advisor agent's plan review: APPROVE with eight conditions** (`cs2-first-page/advisor-plan.md`, its lines of
+   21:05 to 21:27 UTC; Opus 5.5 at effort max). Step 1 may start; nothing of step 2 before his answers and
+   conditions 1 to 4. Seven Mediums and twelve Lows; the plan's section 22 says where each condition is met.
+10. **The plan, revision 2** (21:34 UTC, by a script of counted replacements): the register row OVERFLOW-ALL is
+    followed (named overrides, cost measured), so OVERFLOW-3P is no longer a question; SIZE-2 is information;
+    WB-HEALTH is new; Part 15.2's interface members and `e2e` folders are kept; the tool's route; the lockfile rule;
+    netcode-architect in the round; the Brave checklist's pause line and two padded runs; the Lows.
+
 ## Current step
-8. **The advisor agent's review of the plan** (Opus 5.5, effort max; its notes: `cs2-first-page/advisor-plan.md`).
-   No edit before its APPROVE.
+11. Two agents are reading (both Opus 5.5 at effort max): **the verifier** on the web facts of RNG-CRATE and of the
+    wasm-bindgen reading (the advisor agent's condition 4; `cs2-first-page/verifier-claims.md`), and
+    **security-auditor** on what the wasm-bindgen tool's release offers as proof of origin and whether it can be
+    checked here before the first run (`cs2-first-page/security-auditor-tool.md`; if it cannot, a question on the
+    tool's source joins the list). Beside them the main session starts **step 1** (the Rust core, no new crate).
 
 ## Next steps
-1. On APPROVE: put the plan and its five questions to Mustafa (RNG-CRATE, OVERFLOW-3P, CI-WASM, SIZE-2, DEPART-2:
-   plan section 16, each with options and a recommendation), and start steps 0 and 1 of the plan, which are the same
-   under every answer (step 0: OQ-0002-7's reading; step 1: the Rust core with no new crate). On REVISE: fix the plan
-   and have it read again. On ESCALATE: to him.
-2. Step 2 (the one dependency step) only after his answers to RNG-CRATE, OVERFLOW-3P and DEPART-2, and nothing of it
-   committed or built before security-auditor's answer on exactly that content (plan section 7).
-3. Then steps 3 to 8 of the plan, the gate after each, a checkpoint after each; the reviews (six reviewers, three at
-   a time, one round); the verifier; the docs pass with the records of plan section 21; the report; the pull request
-   (draft, then ready); stop for his go and his Brave check (the zip through the chat's file tool).
-4. Restart the saver before 22:40 UTC (it stops after 110 minutes).
+1. When both agents have answered: work their results into the plan; the advisor agent reads the changed lines of
+   sections 4.1, 16 and 17 once (its own condition); then the questions go to Mustafa: RNG-CRATE, WB-HEALTH,
+   DEPART-2, CI-WASM, and the tool's source if security-auditor's reading makes it one.
+2. Step 1 of the plan (section 8): `sim` (world, authority step, canonical bytes, state hash) and `client-endpoint`
+   (`Section::align`, the lookups by name, the block writer, the local schedule) with their tests; the Rust checks of
+   section 9; commit by path; checkpoint.
+3. Step 2 (the one dependency step) only after his answers to RNG-CRATE, WB-HEALTH and DEPART-2, and nothing of it
+   committed or built before security-auditor's answer on exactly that content (plan section 7). During the wait:
+   the small server, the Worker's pure modules, the build script's checks.
+4. Then steps 3 to 8, the gate after each, a checkpoint after each; the reviews (seven reviewers: three, three, one;
+   one round); the verifier; the docs pass with the records of plan section 21; the report; the pull request (draft,
+   then ready); stop for his go and his Brave check (the zip through the chat's file tool).
+5. Restart the saver before 22:40 UTC (it stops after 110 minutes).
 
 ## Due in this change-set's docs pass (records of #60's merge; nothing of it is written yet)
 - `docs/DECISIONS.md`, by script: his message of 2026-11-18, 20:20:09 UTC (his go on #60; what he accepts;
@@ -164,4 +183,4 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
 
 ## Running work
 - saver: running since 2026-11-18 20:54:42 UTC (task bdxyfa5ap; 10-minute interval, stops after 110 minutes).
-- agents: the advisor agent on the plan (started after this save).
+- agents: the verifier (web facts) and security-auditor (the tool's proof of origin), both since about 21:10 UTC.

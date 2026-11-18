@@ -3,8 +3,9 @@
 _Adopted by the main session (lane 1, the first builder chat, Fable 5.2) on 2026-11-18 at 21:03 UTC (from the clock),
 from engine-architect's draft (`cs2-first-page/plan-draft.md`, Opus 5.5 at effort max, carried over byte for byte from
 the notes at commit f167f061; its sources: `cs2-first-page/engine-architect-plan-notes.md`). What the main session
-changed is listed in section 20; everything else is the draft's text. For the advisor agent's plan review, then the
-build. Nothing is built. No library was fetched, installed or built for this plan: documentation and registry pages
+changed is listed in section 20; everything else is the draft's text. **Revision 2, 2026-11-18 21:34 UTC (from the clock):** the
+advisor agent's plan review (APPROVE with eight conditions, `cs2-first-page/advisor-plan.md`) is worked in; section 22
+says where each condition is met. For the build. Nothing is built. No library was fetched, installed or built for this plan: documentation and registry pages
 were read, and four addresses were asked for their headers only (section 6). Base: main
 b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60); the branch is level with it. Line numbers are those of the
 working tree on 2026-11-18. His words that order this change-set: `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md`
@@ -21,15 +22,17 @@ working tree on 2026-11-18. His words that order this change-set: `cs2-first-pag
   which is not in any manifest; `three` 0.187.0; `@types/three` 0.187.0 and the six packages it pulls in; `vite`
   8.3.7, which becomes a direct dependency but is already in the lockfile. No random-number crate unless RNG-CRATE says
   so (section 16).
-- **Planned size.** About 2,900 hand-written lines, against the build plan's 2,000. Which stop line holds is SIZE-2.
+- **Planned size.** About 2,900 hand-written lines, against the build plan's 2,000. The stop line is 4,000, twice the
+  build plan's number (section 14).
 - **Steps.** 0 paper and preconditions · 1 the Rust core, with no new crate · 2 the one dependency step, and during
   its security wait the small server, the Worker's pure modules and the build script's checks · 3 the answer applied
   and the tool installed · 4 the bindings and the build · 5 the Worker's entry and the boundary tests · 6 the page ·
   7 the browser tests · 8 readings, planted defects, docs, the zip, reviews.
-- **Open questions for Mustafa:** RNG-CRATE, OVERFLOW-3P, CI-WASM, SIZE-2 and DEPART-2 (section 16).
-- **What holds which step.** Steps 0 and 1 need the advisor agent's APPROVE only: they are the same under every
-  answer. Step 2, the dependency step, waits for his answers to RNG-CRATE, OVERFLOW-3P and DEPART-2. CI-WASM and SIZE-2
-  hold no step; until SIZE-2 is answered the stop line is the build plan's, 4,000 lines.
+- **Open questions for Mustafa:** RNG-CRATE, WB-HEALTH, DEPART-2 and CI-WASM (section 16). OVERFLOW-3P and SIZE-2 are
+  no longer questions: the plan follows the register row and the build plan's stop line (section 16, at its end).
+- **What holds which step.** Steps 0 and 1 need the advisor agent's APPROVE only, which is given: step 1's code stands
+  under every answer, and RNG-CRATE (a) or (b) only adds to it. Step 2, the dependency step, waits for his answers to
+  RNG-CRATE, WB-HEALTH and DEPART-2. CI-WASM holds no step.
 - **Where the build plan is wrong or out of date for change-set 2:** twelve points (section 17). The largest: OQ-0002-7
   (is wasm-bindgen's new home healthy) must be read before wasm-bindgen enters, and the build plan places it nowhere;
   the project behind ADR 0004's random-number crate has itself moved to another crate, and one of its maintainers
@@ -63,14 +66,17 @@ The loopback and its four messages, every tick on the newest post, and the first
 ## 3. Before any edit
 1. **#60 is merged: met.** Merge commit b763ba3 (2026-11-18 20:30:46 UTC, on his go of 20:20:09 UTC). His limit "No
    new library of change-set 2 is committed before that pull request is merged" is met with it.
-2. **The advisor agent's APPROVE** on this plan: open. His go on the build plan covers each change-set "as long as a
+2. **The advisor agent's APPROVE** on this plan: given on 2026-11-18 (its notes end at 21:26:53 UTC), with eight
+   conditions (section 22). His go on the build plan covers each change-set "as long as a
    change-set's plan stays inside this one; a plan that leaves it comes back to you" (build plan Part 0, :215-218). So
    the questions of section 16 go to him with this plan, DEPART-2 among them: it lists every place where this plan
    leaves the build plan's text.
-3. **His answers to RNG-CRATE, OVERFLOW-3P and DEPART-2 before step 2.** The first two change what the manifests hold,
-   and the security answer covers exactly that content; DEPART-2 holds the address the small server prints. Steps 0
-   and 1 are the same under every answer and start on the advisor agent's APPROVE. CI-WASM and SIZE-2 hold no step;
-   until SIZE-2 is answered the stop line is the build plan's: 4,000 lines.
+3. **His answers to RNG-CRATE, WB-HEALTH and DEPART-2 before step 2.** RNG-CRATE changes what the manifests hold, and
+   the security answer covers exactly that content; WB-HEALTH is whether wasm-bindgen enters at all; DEPART-2 holds the
+   address the small server prints. Step 1's code stands under every answer (RNG-CRATE (a) or (b) adds the streams'
+   state to the world and its bytes after step 3) and starts on the advisor agent's APPROVE. Step 0's reading is done
+   (`cs2-first-page/oq-0002-7-reading.md`): it ran between 21:04:49 and 21:07:52 UTC, before the APPROVE, as reading
+   and notes only. CI-WASM holds no step.
 4. **main taken in: met.** The branch is main b763ba3 plus this checkpoint's commits.
 5. **The "Lane requests" issue (#59): read** on 2026-11-18 at 20:54 UTC with the GitHub tools: no comment. Only
    comments by the `Mergincanli` account count, and none is his word.
@@ -95,7 +101,7 @@ folders.
 |---|---|---|---|
 | `index.html`, `vite.config.mjs`, `serve.mjs`, `scripts/` | the page, the build configuration, the zip's small server, the build script | lane 1 (build files: 15.1, condition 2) | cs2 |
 | `src/main.ts`, `src/app/` | the app shell: boot order, the Worker link, the page's side of the hand-off, the frame loop, the error hook, the flags | lane 1 | cs2 |
-| `src/picture.ts` | the interface file between the tracks | lane 1; engine-architect reviews every change (15.2) | cs2: start, draw, counters, resize, stop. Later members join when a change-set needs them: the cursor ray (4), warm-up and quality (lane 2's need for 6), the muzzle's point and the plain-line hook (8) |
+| `src/picture.ts` | the interface file between the tracks | lane 1; engine-architect reviews every change (15.2) | cs2: start, draw, counters, resize, stop. The other members Part 15.2 names (warm up, set quality, the cursor's ray, the muzzle's point, the hook for lane 1's plain lines) are built by lane 1 in change-sets 3 to 5, on the plain stand-in, before `render/` passes to lane 2: "Lane 1 builds all of these in change-sets 2 to 5 [...] so that 7, 8 and 9 need nothing new from lane 2" (part-15 :120-121) |
 | `src/overlay/` | the HTML readout and counters, the copy report | lane 1 | cs2 |
 | `src/harness/` | the measurement harness's CPU side | lane 1 | cs2 |
 | `src/render/` | the renderer's set-up and the drawing | lane 1 until change-set 5 merges, then lane 2 (15.2's hand-over) | cs2 |
@@ -140,11 +146,11 @@ folder of its own. Lane 2 builds it after `render/` has passed to lane 2, so it 
 | `packages/client/src/harness/{frame-times,run-header}.ts` and tests | new | the harness's CPU side |
 | `packages/client/src/index.ts`, `index.test.ts` | removed | the stubs |
 | `packages/e2e/package.json` | edit | `test` runs the browser-free project only |
-| `packages/e2e/playwright.config.ts` | new | two projects (`node`, `chromium`); the small server as `webServer` only when `SHAMBLE_DIST` names a built folder (section 4.4) |
-| `packages/e2e/tests/stub.spec.ts` | kept | the browser-free test that CI's `npm test` runs today |
-| `packages/e2e/browser/{skeleton,isolation,clock,allocation,file-url}.spec.ts` | new | the browser tests |
-| `packages/e2e/browser/render-counts.json` | new (a fixture) | the empty scene's render counts per backend: ADR 0003's committed baseline (build plan :472) |
-| `.gitignore` | edit | `pkg/` (wasm-bindgen's output) and `playwright-report/`. Not a kit or gate file: CLAUDE.md's protected list does not name it |
+| `packages/e2e/playwright.config.ts` | new | two projects: `node` (`tests/node/`, no browser) and `chromium` (the rest of `tests/`); the small server as `webServer` only when `SHAMBLE_DIST` names a built folder (section 4.4) |
+| `packages/e2e/tests/node/stub.spec.ts` | moved from `tests/stub.spec.ts` | the browser-free test that CI's `npm test` runs today |
+| `packages/e2e/tests/skeleton/{skeleton,isolation,clock,allocation,file-url}.spec.ts` | new | lane 1's browser tests. Part 15.2 names lane 2's later folders beside it: `tests/look/`, `tests/assets/`, `tests/feel/` (part-15 :106, :108, :110) |
+| `packages/e2e/tests/skeleton/render-counts.json` | new (a fixture) | the empty scene's render counts per backend: ADR 0003's committed baseline (build plan :472) |
+| `.gitignore` | edit | `packages/sim-worker/pkg/` (wasm-bindgen's output) and `packages/e2e/playwright-report/`, each by its full path. Not a kit or gate file: CLAUDE.md's protected list does not name it |
 | `docs/reports/2026-11-DD-cs2-first-page.md`, `docs/STATUS.md`, `docs/ROADMAP.md`, `docs/REPO_MAP.md`, `docs/DECISIONS.md`, `docs/adr/0002-code-structure-build-toolchain.md` | docs pass | the report; docs-keeper's pass; his words by script; ADR 0002's dated pointer for SPLIT-25 ("change-set 2's docs pass carries that line", build plan :23) |
 
 Not touched: `crates/protocol`, `crates/room`, `crates/devtools`, `packages/net`, `packages/types/src/**`, `legacy/`,
@@ -176,8 +182,8 @@ network cut with loopback up. This change-set edits no line of it, so its own fi
 - `npm test --workspaces`: `types` and `net` are unchanged; `sim-worker` runs `vitest run --dir src` (the unit tests;
   the boundary tests need the built Wasm, which CI does not build before CI-WASM); `client` runs `vitest run` (its unit
   tests, the small server's tests on `127.0.0.1` and the build script's tests: none may need the built Wasm, a built
-  `dist/`, the wasm-bindgen tool or a browser); `e2e` runs `playwright test --project=node`, which must start no
-  server and need no build.
+  `dist/`, the wasm-bindgen tool or a browser); `e2e` runs `playwright test --project=node`, which reads `tests/node/`
+  only and must start no server and need no build.
 - The two `tsc` lines read `packages/types/src` only; those files do not change.
 - The rule that follows: **every file that CI's `npm test` loads resolves without build output.** `sim-worker`'s
   `index.ts` never imports `worker.ts` or the glue; the client's tested modules import `@shamble/sim-worker` for its
@@ -200,7 +206,9 @@ network cut with loopback up. This change-set edits no line of it, so its own fi
   the streams' state in the hash. FNV-1a is this change-set's pick for a world of 36 bytes, and it is provisional: ADR
   0004 part 9 leaves the pick to the build ("which function is picked in the sim core spike; the research names none"),
   and PM-0004-21's report at change-set 3 (the function picked and its cost per tick) confirms or replaces it before
-  the first recording is committed.
+  the first recording is committed. The state hash stays inside the Worker: it is not in the block, the readout, the
+  copy report or any log, because it covers the match seed and FNV-1a can be worked backwards (ADR 0004 part 8: the
+  seed never reaches the client's page or a log).
 - `client-endpoint::layout`: `Section::align(self) -> u32` (the largest field's size). `pub const fn section(name: &str)
   -> Section` and `pub const fn field(section: &str, field: &str) -> Field`, which panic on a missing name; used in a
   `const`, that panic fails the build (change-set 1's follow-up: "the block writer takes offsets through a by-name
@@ -314,8 +322,11 @@ answer; every cargo command takes `--locked`; the checkpoint script holds a push
    the change-set's only cargo commands without `--locked`, and they compile nothing. npm: the manifests are edited
    by hand with exact versions, then `npm install --package-lock-only --ignore-scripts --no-audit --no-fund` with no
    package named, which per npm's documentation uses "only the package-lock.json, ignoring node_modules". **The
-   lockfile rule:** both lockfile diffs may only add entries and change the lines of our own crates and packages. A
-   changed version, checksum or dependency list of an entry that is already there stops the step.
+   lockfile rule:** both lockfile diffs may add entries and change the lines of our own crates and packages. On an
+   entry that is already there, only npm's flags may change (`peer`, `dev`, `optional`, `devOptional`: declaring
+   `vite` directly is expected to drop `"peer": true` from it and from what it pulls in), and each such change is
+   listed for security-auditor. A changed version, `resolved` address, `integrity` or checksum value, or dependency
+   list of an entry that is already there stops the step.
 4. **What security-auditor answers on:** the text diff of every manifest the step changes (seven by this plan: two
    `Cargo.toml` and five `package.json`; eight with a generator crate) and of both lockfiles (saved as a `.diff` file in
    the notes, never as files named like manifests), the sha256 of each of those files, and the tool's
@@ -326,9 +337,18 @@ answer; every cargo command takes `--locked`; the checkpoint script holds a push
 5. **After the answer (step 3):** the same diff is applied in the main folder (sha256 compared with the reviewed files),
    `dependency-check.md` is written (one `<sha256>  <path>` line per file, naming the answer's notes file), the files are
    committed by path, and the checkpoint script pushes them, which releases its own hold. The record is written before
-   the manifests are committed, so the background saver never meets a held push without its record. Only then: `npm ci
-   --ignore-scripts`, the tool's download and unpacking (checked against the recorded sha256), and the first build that
-   holds the new crates. No push is made by hand: "a plain `git push` is not held".
+   the manifests are committed. Every push of this step goes through `checkpoint.mjs save` in the foreground and none
+   by hand: "a plain `git push` is not held" (the background saver does not push commits outside `.checkpoints/`:
+   `checkpoint.mjs:226`). Only then: `npm ci --ignore-scripts`, the tool's route below, and the first build that holds
+   the new crates.
+5a. **The tool's route** (the advisor agent's condition 5; it is code from the internet that no lockfile covers):
+   (1) the tarball is downloaded into a new empty folder under `.gate/`; (2) its sha256 is compared with the value
+   security-auditor's answer recorded, before anything else reads it; (3) its origin is proven against the release's
+   attestation before any run, `--version` included, by the procedure security-auditor's answer names; (4) the
+   archive's member list is read first, and an absolute path, a `..`, a link or a member the answer did not expect
+   stops the step; (5) it is unpacked into a new empty folder, `.gate/tools/wasm-bindgen-0.2.130/`, and the unpacked
+   binary's sha256 goes into `wasm-bindgen-cli-check.md`. **If the origin cannot be proven here, the step stops and
+   Mustafa is asked**; no other source is used without a security answer of its own.
 6. **No shared cargo target folder.** The planted-defect worktrees build into folders of their own
    (`CARGO_TARGET_DIR=.gate/cs2-plant-target`). Change-set 1's export tests also stop when they run outside the copy they
    were built in.
@@ -347,7 +367,8 @@ step that changes no manifest pushes normally; step 3's push goes through the ho
    two pages say about maintainers and release policy", ADR 0002 :1092). Its decider "comes before the step that adds
    wasm-bindgen" (EMPTY-SLOTS, STATUS_ARCHIVE :850-856), and the result goes into the report (build plan Part 3.9's
    rule). If the pages show no active maintainer or no release policy, the change-set stops before step 2 and tells
-   him. His answers to RNG-CRATE, OVERFLOW-3P and DEPART-2.
+   him. **Done on 2026-11-18:** maintainers yes, no written release policy, so it goes to him as WB-HEALTH (section
+   16). His answers to RNG-CRATE, WB-HEALTH and DEPART-2.
 1. **The Rust core, with no new crate.** `sim`: the world, the authority step, the canonical bytes and the state hash.
    `client-endpoint`: `Section::align()`, the lookups by name, the block writer and the local schedule. Tests: the hash
    against RFC 9923's FNV-1a 64-bit test values; the state bytes at fixed widths, with no `usize` and with a stated
@@ -371,15 +392,21 @@ step that changes no manifest pushes normally; step 3's push goes through the ho
    Nothing that imports `three`, its types or the Wasm glue is written before the answer: it could not be checked.
 3. **The answer applied.** The reviewed diff is applied in the main folder (each file's sha256 equal to the reviewed
    one), `dependency-check.md` is written, the files are committed by path, and the checkpoint script pushes them through
-   its hold. Then `npm ci --ignore-scripts`, and the tool's download into `.gate/tools/wasm-bindgen-0.2.130/`, checked
-   against the sha256 the answer recorded.
+   its hold. Then `npm ci --ignore-scripts`, and the tool by its route (section 7, item 5a): downloaded, its sha256
+   compared, its origin proven before any run, its member list read, unpacked into `.gate/tools/wasm-bindgen-0.2.130/`.
+   Then `cargo tree -e normal` names every third-party crate compiled into our libraries and tests, against the
+   overflow overrides of step 2 (section 16, at its end).
 4. **The bindings and the build.** `sim-wasm`'s `Sim`. The build path of `build.mjs`: it reads wasm-bindgen's version
    from `Cargo.lock`, refuses any other tool version before it generates bindings (PM-0002-18), runs `cargo build
    --locked --release --target wasm32-unknown-unknown -p sim-wasm`, then `wasm-bindgen --target web --out-dir
    packages/sim-worker/pkg`, records the sizes (raw, gzip at level 9 and Brotli at level 11, PM-0002-29's settings, from
    Node's own `zlib`), runs Vite's build through its JavaScript API with `VITE_SHAMBLE_COMMIT` and, unless
-   `--production`, `VITE_SHAMBLE_DEVTOOLS=1`, copies `serve.mjs` into `dist/`, and fails if any served file reaches
-   26,214,400 bytes (PM-0002-29's gated clause). It runs commands as argument arrays (`execFileSync`), never through a
+   `--production`, `VITE_SHAMBLE_DEVTOOLS=1`; in the development flavour only it copies `serve.mjs` into `dist/` (Part
+   0: the zip's small server "is kept out of the production build"); it fails if any served file reaches 26,214,400
+   bytes (PM-0002-29's gated clause), if the built `index.html` holds an inline script or style, or if a built file
+   loads the Worker or the Wasm from a `blob:` or `data:` URL (ADR 0002 :434-436, CSP-ready; a scan that stands in for
+   G8 until the gate v2 has it). Here the cost of the overflow overrides is read too: the Wasm's size and the step's
+   time with the lines and, in a scratch worktree with its own target folder, without them. It runs commands as argument arrays (`execFileSync`), never through a
    shell string. **Risk 1 is settled here:** whether the workspace's `unsafe_code = "deny"` accepts `#[wasm_bindgen]`'s
    expansion.
 5. **The Worker's entry and the boundary tests.** `worker.ts` and `index.ts`. Boundary tests on the built Wasm: a block
@@ -397,8 +424,9 @@ step that changes no manifest pushes normally; step 3's push goes through the ho
    tests: the report's text, the frame-time statistics, the flags, the Worker link against a fake Worker (the newest
    two blocks kept, the older ones returned on the next frame's post, the layout check refusing a block of another
    layout).
-7. **The browser tests.** `playwright.config.ts`: project `node` (`tests/`, no browser; this is what `npm test` runs)
-   and project `chromium` (`browser/`, run by path), the small server as `webServer` on the built `dist/` only when
+7. **The browser tests.** `playwright.config.ts`: project `node` (`tests/node/`, no browser; this is what `npm test`
+   runs) and project `chromium` (the rest of `tests/`; lane 1's specs in `tests/skeleton/`, as Part 15.2 lays the
+   folder out), the small server as `webServer` on the built `dist/` only when
    `SHAMBLE_DIST` names it (without it the `chromium` project stops with a line that says so, and the `node` project
    starts no server: section 4.4), retries 0, `forbidOnly` in CI, traces off, the browser's path from
    `SHAMBLE_CHROMIUM` when set. Specs:
@@ -414,10 +442,16 @@ step that changes no manifest pushes normally; step 3's push goes through the ho
      the boundary's page functions;
    - `file-url`: what Chromium does with the built `index.html` opened from `file://` (OQ-0002-1, first result).
    The visibility check drives the page's own handler (hidden, then shown) and asserts that the tick counter does not
-   move while hidden and that no wake runs more than 7 ticks. A real hidden tab is tested in Brave (section 13).
+   move while hidden and that no wake runs more than 7 ticks. The page records each pause itself (how long it was
+   hidden, and the ticks that ran meanwhile), and the readout and the copy report show the last one: that is what
+   makes the hidden tab checkable by eye. A real hidden tab is tested in Brave (section 13).
 8. **Readings, planted defects, docs, the zip, reviews.** The readings and planted defects of section 9. The production
    flavour is built once and shown to hold none of the development-only code (Part 0: each development tool "is kept
-   out of the production build"). Then the report, docs-keeper's pass, his words by script, ADR 0002's pointer for
+   out of the production build"): a scan of `dist-prod` for named markers of the readout, the copy report, the
+   harness, the `pad` flag and the report's test hook finds none, `serve.mjs` is not in it, and the same scan on the
+   development build finds each marker (the control). `?backend=webgl` stays in both flavours: it is one option
+   passed to the renderer, and the fallback must be testable on the build players get. The writer's padding is a
+   parameter of the one Wasm both flavours load (one feature set, PM-0004-74); the production page always passes 0. Then the report, docs-keeper's pass, his words by script, ADR 0002's pointer for
    SPLIT-25, and the zip, `shamble-v2-02-first-page.zip` (the built `dist/` with `serve.mjs`, a `README.txt` with the
    steps and the commit, and `SHA256SUMS.txt`), made with `python3 -I -m zipfile -c` from `.gate/`, never committed,
    sent through the chat's file tool. Then the reviews (section 12), the verifier until PASS, and the advisor agent on
@@ -457,9 +491,16 @@ wasm-bindgen = { workspace = true }
 // packages/e2e/package.json:
 "scripts": { "test": "playwright test --project=node" }
 ```
+```toml
+# Cargo.toml (root), after [profile.release.package."*"]: one block per third-party crate compiled into our libraries
+# and tests (register row OVERFLOW-ALL: "a named override for each such crate"); the list is read from the lockfile
+# in step 2. By this plan: wasm-bindgen and the runtime crates its lockfile entry lists, and ts-rs and thiserror.
+[profile.release.package.wasm-bindgen]
+overflow-checks = true
+```
 Under RNG-CRATE (a) or (b), `crates/sim/Cargo.toml` and the root `[workspace.dependencies]` gain the generator's
-line, with `default-features = false`. Under OVERFLOW-3P (b) or (c), the root `[profile.release.package…]` lines
-change. Both happen inside this same step, before the answer.
+line, with `default-features = false`, and the generator's crates join the overflow list. All of it happens inside
+this same step, before the answer.
 
 ## 9. Evidence, by kind (CLAUDE.md step 4), with the exact commands
 Tools run by their path: the session's settings deny `npx`, `npm run` and `npm test` (build plan Part 7, :925).
@@ -501,6 +542,7 @@ node node_modules/vitest/vitest.mjs run --root packages/client
 **The browser:**
 ```
 SHAMBLE_CHROMIUM=/opt/pw-browsers/chromium SHAMBLE_DIST="$PWD/packages/client/dist" node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off
+cargo tree --locked -e normal -p sim-wasm --target wasm32-unknown-unknown --prefix none    # every third-party name has its overflow block
 node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=node --trace off
 ```
 **The rest:**
@@ -529,13 +571,18 @@ each must fail the named check, and its control must pass:
 7. a 64-byte typed array allocated per frame in the page's block handler (PM-0002-7's bite) → `allocation` reports it;
 8. a Worker that runs the hidden gap instead of rebasing (PM-0004-70's bite) → the visibility check sees the counter
    move and more than 7 ticks in one wake;
-9. a `serve.mjs` that lets an encoded `..` through → its test fails.
+9. a `serve.mjs` that lets an encoded `..` through → its test fails;
+10. an isolation flag that sets COOP but not COEP (PM-0002-20's own bite, ADR 0002 :1292) → `isolation` reads
+    `crossOriginIsolated` false where the flag is on, and fails.
 
 **Readings** (reported, never judged; the machines are named before change-set 6, MACHINES (a)):
 - the hand-off as a curve over block sizes (8 bytes, the header alone; 1, 4, 16 and 64 KiB): the copy time in the
   Worker (p50, p99) and the delivery from the Worker's finished step to the page's bound views on a shared clock
-  (`performance.timeOrigin + performance.now()`; PM-0002-8's method, p95), in the container's Chromium and in Brave from
-  his reports;
+  (`performance.timeOrigin + performance.now()`; PM-0002-8's method, p95): all five sizes in the container's Chromium,
+  and three of them (8 bytes, 4 KiB, 64 KiB) in Brave on his laptop from his reports (section 13, step 10), which is
+  the build plan's "a reading on your laptop" (:540);
+- the cost of the overflow overrides: the Wasm's size and the step's time with the lines and without them (the
+  register row's "with its cost measured");
 - the Worker's pacing: tick start jitter p99 against its own schedule, the most ticks in one wake, rebases (PM-0002-26,
   PM-0004-68);
 - the Wasm file's size, raw, gzip and Brotli, after wasm-bindgen, without wasm-opt, on the default release profile
@@ -582,7 +629,7 @@ tests, the readout's `textContent`, the dev server's binding and file allow-list
 9. **three.js moves on.** r187 is the newest today and equals the only version the Shamble VFX runtime accepts (Part
    15.5), so nothing conflicts now. ADR 0003 part 2 pins "the newest when the look proof test starts", which is change-set
    6. If r188 is out by then, Part 15.5's question applies there.
-10. **The size** (SIZE-2). The change-set stops and tells him in three lines when it passes the stop line he picks.
+10. **The size.** The change-set stops and tells him in three lines when it passes 4,000 lines (section 14).
 11. **Every timed number is a reading** until the machines are named (MACHINES (a)).
 12. **The dev server and the isolation flag:** Vite serves the workspace root by default, which here is the whole
     repository, and COEP can block a resource the page needs. The allow-list is narrowed and the four Chromium cases run
@@ -602,20 +649,27 @@ lie outside the places the PR Advisor may merge (build plan Part 0). Under CI-WA
 tier 2.
 
 ## 12. Reviewers
-The build plan's list (Part 1, :313-314), each at effort max, at most three at a time; the six together are one round
-(CLAUDE.md's review budget):
+The build plan's list (Part 1, :313-314) and netcode-architect, each at effort max, at most three at a time; the
+seven together (three, three, one) are one round (CLAUDE.md's review budget):
 - engine-architect (module boundaries, the interface file, the folder cut, the Worker contract), graphics-engineer (the
   renderer's set-up, the backend report, the render counts), rust-reviewer (the world, the writer, the bindings, the
   `unsafe_code` outcome, the Wasm build);
 - then perf-auditor (the frame and tick paths, the pool, allocation, the readings' method), security-auditor (the new
-  dependencies, the page's text, the small server, the dev server's settings, the build script), test-engineer (is each
-  claim proven; the planted defects; the browser tests).
+  dependencies, the page's text, the small server, the dev server's settings, the build script, the overflow
+  overrides), test-engineer (is each claim proven; the planted defects; the browser tests);
+- then netcode-architect (CLAUDE.md step 5: "sim, server, protocol"): `sim` gets its first code here (the world, the
+  tick counter's overflow rule, the canonical bytes, the state hash), and the schedule is the one ADR 0004 part 5
+  shares with online play. The advisor agent set the same condition on change-set 1.
+- **art-director is not called,** on purpose: the scene is a placeholder that decides nothing of the look ("for v2
+  work, LOOK_V2.md is the look brief and wins; ART_DIRECTION.md describes the legacy game only", his LANE-RULES), the
+  readout is a development tool that no player sees, and his Brave check is the gate for what is visible. The look's
+  first review is change-set 6's, in lane 2.
 Outside the round: security-auditor's dependency answer at step 2 (a condition of building, not a review), the advisor
 agent's plan review, the verifier until PASS, and the advisor agent on the final head. Models: lane 1's main model is
 Fable 5.2 (his decision of 2026-11-17); every agent is Opus 5.5. The `advisor` agent type is main's file (section
 3, item 7).
 
-## 13. What Mustafa checks in Brave (about 15 minutes, and 6 more for step 7)
+## 13. What Mustafa checks in Brave (about 18 minutes, 9 of them waiting)
 Once, if not done: in PowerShell, `node --version` prints 18 or newer (Part 8; his Windows run of 2026-11-11 used
 Node 24).
 1. Download `shamble-v2-02-first-page.zip` from the chat; the message names the commit it was built from. Unzip it into
@@ -631,14 +685,18 @@ Node 24).
    the commit equals the one in the chat.
 5. Leave it for 2 minutes. Expected: errors still 0, blocks still equal to ticks (within 1), the tick rate still about
    30.
-6. Switch to another tab for 1 minute, then come back. Expected: the tick counter shows the number it had when you
-   left, then counts on from there, with no jump.
-7. The same with 6 minutes away. Expected: the same as in step 6.
+6. Switch to another tab for 1 minute, then come back. Expected: the readout's "last pause" line says about 60 s
+   hidden and "ticks while hidden: 0", and the tick counter counts on from where it stood. (A match that ran while
+   hidden would show about 1,800 ticks for the minute.)
+7. The same with 6 minutes away. Expected: about 360 s hidden, ticks while hidden 0.
 8. Press "Copy report" and paste the result into the chat.
 9. Open `http://127.0.0.1:4173/?backend=webgl`. Expected: the readout says "WebGL 2 fallback", with the same scene and 0
    errors. Press "Copy report" again and paste that too.
-10. Open `brave://version` in a new tab and paste its first line.
-11. Back in PowerShell, press Ctrl+C to stop the server.
+10. Open `http://127.0.0.1:4173/?pad=4096`, wait 30 seconds, press "Copy report" and paste it; then the same with
+    `?pad=65536`. Expected: the same scene, errors 0. These two runs read, on your laptop, what it costs to hand a
+    larger block to the page; they are readings, not judged.
+11. Open `brave://version` in a new tab and paste its first line.
+12. Back in PowerShell, press Ctrl+C to stop the server.
 
 ## 14. Planned size
 Hand-written lines added (Rust, TypeScript, configuration and tests; generated files, lockfiles, fixtures and docs left
@@ -658,8 +716,10 @@ checked against change-set 1's measure (940 lines against 600 planned, about 620
 | manifests and `.gitignore` | 40 | 0 | 40 |
 | **Total** | **1,570** | **1,340** | **about 2,900** |
 
-The build plan's row says 2,000. Its own estimates are "good to about half as much again either way" (:198-200). Which
-stop line holds is SIZE-2. Time: the build plan's "about 13 h", scaled by the line count, is about 19 h. That is
+The build plan's row says 2,000. Its own estimates are "good to about half as much again either way" (:198-200). The stop
+line is 4,000 lines, twice the build plan's number: the tighter of the two readings of his rule ("when one passes
+twice its plan while it is built, stop and tell me in three lines"), with about 2,900 as this plan's estimate, inside
+the build plan's own margin. Time: the build plan's "about 13 h", scaled by the line count, is about 19 h. That is
 arithmetic on the plan's estimate, not a measurement.
 
 ## 15. Not in it
@@ -699,21 +759,23 @@ arithmetic on the plan's estimate, not a measurement.
   keeps them, the state hash covers them). The generator enters in change-set 3 beside its 10,000-output test vectors
   (PM-0004-27), with (a) or (b) answered by then.
 - Recommendation: (c), with (b) for change-set 3. A generator nothing calls is code "for later", the proof of the
-  streams is change-set 3's anyway, and (b) is the crate that is maintained.
+  streams is change-set 3's anyway, and (b) is the crate the rand project itself now builds on.
 
-**OVERFLOW-3P: do the first third-party crates in a build players run get overflow checks?**
-- Why it matters: change-set 2 puts the first third-party crate into the player's Wasm, and your register row leaves
-  that choice to that moment.
-- What was found: your register row OVERFLOW-ALL keeps every dependency at Rust's release default (no overflow checks)
-  through the root profile's `"*"` line. Its follow-up says "the first third-party crate that any workspace crate uses
-  decides" between a named override per crate and dropping `"*"` (OVERFLOW-PER-CRATE, STATUS_ARCHIVE :817-831).
-- Options: (a) keep `"*"` as it is. wasm-bindgen's runtime code does none of the simulation's arithmetic, and the
-  player's Wasm stays at the release profile's optimisation level, where the reuse path the follow-up names (shared
-  generic code at opt-level 0, 1, "s" or "z") stays closed. The question comes back when an arithmetic or random-number
-  crate enters, or when the shipped build moves to "s" or "z" (change-set 3's size table may propose that); (b) a named
-  override for each such crate, measured for size and step time; (c) drop `"*"`, so that every dependency is checked,
-  with security-auditor reading it, measured the same way.
-- Recommendation: (a).
+**WB-HEALTH: wasm-bindgen's project has maintainers but no written release policy. Does the game still build on it?**
+- Why it matters: every call between the simulation and the browser goes through wasm-bindgen, for years, and the
+  engine draft left this question open until the day wasm-bindgen enters (OQ-0002-7). That day is step 2.
+- What was found (the reading of 2026-11-18, `cs2-first-page/oq-0002-7-reading.md`, each line with its source): the
+  project names three core maintainers, decides by a majority vote of that core team, requires a review on every
+  change, and has made about one release a month through 2026 (the newest, 0.2.130, on 2026-10-30). Its guide and its
+  maintenance issue hold no release schedule and no promise that a new release keeps working with older code; the one
+  policy found is a 2-year rule for the Rust version a release needs. The engine draft itself notes that
+  compatibility broke twice in 2026 (0.2.123 and 0.2.128).
+- Options: (a) go on, behind the exact pin (`=0.2.130`), with the build refusing a command-line tool of any other
+  version and every bump as its own change-set. This is the engine draft's option for this question, and the only one
+  it researched; (b) stop before step 2 and research another way to bind Rust to the browser first (none is researched;
+  it would be a research task of its own, and change-set 2 waits for it).
+- Recommendation: (a). The pin and the tool check are the guard for exactly this missing promise, and the project is
+  active.
 
 **CI-WASM: how does CI start building and testing the new parts (the Wasm bindings, the Worker's tests on the real
 Wasm, the type check of the two new packages)?**
@@ -726,14 +788,6 @@ Wasm, the type check of the two new packages)?**
   pinned by SHA). That puts one more JavaScript action into the job that runs the network cut, which part 2 of your
   CI-CUT answer moves away from.
 - Recommendation: (a).
-
-**SIZE-2: which stop line holds for change-set 2?**
-- Why it matters: your rule stops a change-set at twice its plan, and this plan counts about 2,900 lines against the
-  build plan's 2,000 (most of the difference is tests, as in change-set 1, which came in at 1.57 times its plan).
-- Options: (a) the stop line stays at 4,000, twice the build plan's number, with about 2,900 written down as this
-  plan's estimate; (b) the plan becomes 2,900 and the stop line 5,800; (c) cut scope toward 2,000 by moving the isolation
-  flag, the allocation method, the clock fact and the hidden-tab pause to change-set 3, which saves about 300 lines.
-- Recommendation: (a). Your control stays where the build plan put it.
 
 **DEPART-2: this plan leaves the build plan's text in six small places. Do you accept them?**
 - Why it matters: your go on the build plan covers a change-set's plan only "as long as a change-set's plan stays
@@ -755,6 +809,24 @@ Wasm, the type check of the two new packages)?**
 - Options: (a) yes, all six; (b) yes, except the ones you name; (c) no: the build plan's text stands, and I come back
   with what that costs.
 - Recommendation: (a).
+
+### No longer questions (the advisor agent's plan review, findings F1 and L12)
+- **OVERFLOW-3P is withdrawn: the plan follows the register row.** The row OVERFLOW-ALL (`docs/adr/README.md:234`; "the
+  advisor agent's rulings D1 and D1-R2 [...] never his decision; his go for this row: PR #48's merge") says: "`"*"` is
+  decided, with its cost measured, when the first third-party crate enters any workspace crate's dependency tree, and
+  again before such a profile moves to one of those opt-levels: a named override for each such crate (it beats `"*"`),
+  or dropping `"*"` (which checks every dependency)." The draft's recommendation, to keep `"*"` as it is, was a third
+  option the row does not offer. This plan takes the row's first: a named override for each third-party crate
+  compiled into our libraries and tests (not proc-macro crates and build scripts, which run on the build machine
+  only), with the cost read at step 4 (the Wasm's size and the step's time, with the lines and without) and reported.
+  The row's trigger was first reached by ts-rs in change-set 1, as a dev-dependency, and change-set 1's report does
+  not speak of it; ts-rs and thiserror are therefore on the list too (section 17, point 15). The row's other
+  option, dropping `"*"`, is weighed again when the next third-party crate enters. rust-reviewer and security-auditor
+  read the choice; the lines are part of step 2's manifest content.
+- **SIZE-2 is information, not a question.** The stop line stays at 4,000 lines, twice the build plan's number, and
+  about 2,900 is this plan's estimate, inside the build plan's own margin ("good to about half as much again either
+  way", :198-200). If he wants the scope cut toward 2,000 instead, the candidates are the isolation flag, the
+  allocation method, the clock fact and the hidden-tab pause (about 300 lines, moved to change-set 3).
 
 ## 17. Where the build plan is wrong or out of date for change-set 2
 1. **OQ-0002-7 is placed nowhere** (Part 3.9, :762-777). Its decider, "a by-day reading of its maintenance issue
@@ -779,8 +851,8 @@ Wasm, the type check of the two new packages)?**
    (CI-WASM).
 7. **Vite is not new:** 8.3.7 is in the lockfile as Vitest's peer. Only the direct declaration is new.
 8. **Two step 2.2 follow-ups bind this card without being in it:** WASM-ARTIFACT (the crate type; the expected
-   `unsafe_code` exception) and OVERFLOW-PER-CRATE (OVERFLOW-3P).
-9. **The planned size of 2,000 looks low** by change-set 1's measure (SIZE-2).
+   `unsafe_code` exception) and OVERFLOW-PER-CRATE (followed: section 16, at its end).
+9. **The planned size of 2,000 looks low** by change-set 1's measure (about 2,900 planned; the stop line stays 4,000).
 10. **Part 7's "Wasm tests" row puts "the unit vectors in Wasm" at change-set 2** (:939), but Part 3.4 places the maths and
     stream vectors at change-set 3 (PM-0004-22, -27). With no maths functions and no streams in change-set 2, they start in
     change-set 3.
@@ -788,6 +860,17 @@ Wasm, the type check of the two new packages)?**
     for now", his words of 2026-11-17). Change-set 2 reports `--ignoreConfig` times instead, as change-set 1 did.
 12. **Part 13's risk 9 and Part 15.5's version worry do not bite yet:** the newest three.js (0.187.0) equals the VFX
     runtime's only accepted version.
+13. **The control calls differ in two details from ADR 0002 part 5's text** (:330, :338: the step "returns where they
+    lie and when the next tick is due"): here the step returns only when the next tick is due, because the block's
+    place is read once after create (the buffer never moves), and a `rebase` call is added for a pause or a stall (ADR
+    0004 part 5's rule that a gap is dropped). Both stay inside PM-0002-3's count of calls per tick. For the draft's
+    next revision.
+14. **OVERFLOW-XCRATE-CI comes due "(or the first crate to depend on sim)"** (STATUS.md :95): `sim-wasm` depends on
+    `sim` from this change-set. Its counter test is PM-0002-53's, which the build plan places at change-set 3 (:475);
+    it moves there with this line, so it is not lost.
+15. **The register row OVERFLOW-ALL's trigger was first reached in change-set 1** (ts-rs, a dev-dependency), and
+    change-set 1's report does not speak of it. This change-set follows the row for ts-rs's crates and for
+    wasm-bindgen's (section 16, at its end).
 
 ## 18. Kit, gate and CI edits, with their exact text
 - **Kit:** none. **Gate files:** none (`node tools/gate.mjs` runs unchanged). **`.gitignore`:** not a protected file.
@@ -898,6 +981,14 @@ The draft stays beside this file, byte for byte (`cs2-first-page/plan-draft.md`)
    the build plan covers only a plan that stays inside it.
 10. **Section 17:** point 2 is reworded the same way. **Section 21 is new.**
 
+11. **Revision 2** (after the advisor agent's plan review): the header; section 0 and section 3 (what holds which
+    step; step 0's reading and when it ran); 4.1's interface row and 4.2's `e2e` rows (Part 15.2's folders); the
+    state hash kept off the page; the lockfile rule; the tool's route (7, item 5a); steps 3, 4, 7 and 8 (the
+    production check's method, the CSP scan, the pause record); the overflow overrides in the manifest text; planted
+    defect 10; the hand-off readings in Brave; reviewers (netcode-architect in, art-director out with its reason);
+    the Brave checklist (the pause line, two padded runs); section 16 (WB-HEALTH in; OVERFLOW-3P and SIZE-2 out, with
+    the reasons); section 17, points 13 to 15; section 22.
+
 ## 21. Records due with this change-set (beyond section 4.2's docs row)
 - `docs/DECISIONS.md`, by script, never retyped: his message of 2026-11-18, 20:20:09 UTC (his go on #60, WRITE-MODE
   (a), REC-OLD (a) with one limit, the order of work), then his answers to this plan's questions as they come. His
@@ -913,3 +1004,27 @@ The draft stays beside this file, byte for byte (`cs2-first-page/plan-draft.md`)
   and the security answer it names").
 - The checkpoint is folded into the report and deleted in the last commit before the pull request is marked ready
   (`.claude/CHECKPOINTS.md` §9); the report names the commit that still holds the notes.
+- The report says, with its times, that step 0's reading ran before the advisor agent's APPROVE (between 21:04:49 and
+  21:07:52 UTC on 2026-11-18, as reading and notes only), and that its result made WB-HEALTH.
+
+## 22. The advisor agent's plan review, and where each condition is met
+`cs2-first-page/advisor-plan.md` (Opus 5.5 at effort max; 2026-11-18, 21:05 to 21:27 UTC by its own lines): **APPROVE,
+with eight conditions.** Step 1 may start; nothing of step 2 before his answers and conditions 1 to 4.
+
+| Condition | When | Where it is met |
+|---|---|---|
+| 1. OVERFLOW-3P reworded, the register row quoted word for word, or the row followed with its cost measured and no question (F1) | before the questions go to him | the row is followed: section 16, at its end; the manifest text of step 2; steps 3 and 4; section 9; section 17, point 15 |
+| 2. WB-HEALTH in section 16 and in "what holds which step" | before the questions | section 16; section 0; section 3, item 3 |
+| 3. Part 15.2 kept, or both departures listed: the interface members (F3) and the `e2e` folders (F7) | before the questions | Part 15.2 is kept: 4.1's `picture.ts` row; 4.2's `e2e` rows; step 7; 4.4 |
+| 4. The verifier spot-checks the key claims of RNG-CRATE and of the wasm-bindgen reading at their sources (F6) | before the questions | `cs2-first-page/verifier-claims.md` (its result is written into the card) |
+| 5. The tool's route: sha256 before unpacking, the member list, a new empty folder, the origin proven before any run, stop and ask him if it cannot be (F2) | before step 3 | section 7, item 5a; step 3. security-auditor's reading on what the release offers as proof: `cs2-first-page/security-auditor-tool.md` |
+| 6. The lockfile rule allows npm's flag-only changes and lists them (L4) | before step 3 | section 7, item 3 |
+| 7. netcode-architect in the round; art-director called, or the reason written (F4, L9) | before the review round | section 12 |
+| 8. The padded runs in the Brave checklist, and hidden-tab steps he can check (F5, L8) | before the Brave check | section 13, steps 6, 7 and 10; step 7 of section 8 (the pause record); section 9's readings |
+
+Its Lows, each worked in or carried: L1 (step 1 "stands under every answer": sections 0 and 3); L2 (`.gitignore` by
+full path: 4.2); L3 (OVERFLOW-XCRATE-CI: section 17, point 14); L5 (the server copied in the development flavour
+only; the production check's method: steps 4 and 8); L6 (the CSP scan: step 4); L7 (the control calls: section 17,
+point 13); L10 (the state hash off the page: section 5); L11 (PM-0002-20's bite: planted defect 10); L12 (SIZE-2 as
+information: section 16, at its end). Its process note (step 0's reading before the APPROVE): section 21. Its note on
+the saver (it never pushes code commits): section 7, item 5.

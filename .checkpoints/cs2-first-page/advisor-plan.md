@@ -39,3 +39,54 @@ F6 Medium (CLAUDE.md step 4, research): RNG-CRATE's and the OQ-0002-7 reading's 
   PR #1658 merged 2026-01-23 + "Source moved", dhardy's sentence and date, chacha20 0.10.2 `rng`; #4533 maintainers, no written
   release policy) were read by a fetch agent / the main session only; no verifier spot-check before they go to him. I could not
   check them (no fetch by my brief).
+Wed Nov 18 21:24:52 UTC 2026
+F7 Medium (plan :143-146, :400-404): e2e layout departs from Part 15.2 (part-15 :106, :108, :110): lane 2's picture, asset and
+  feel tests are named `packages/e2e/tests/look/`, `tests/assets/`, `tests/feel/`; the plan makes `tests/` the browser-free `node`
+  project that CI's `npm test` runs and puts browser specs in `browser/`. Lane 2's browser tests would land in the node project.
+  Not in DEPART-2/section 17. Fix: keep Part 15.2's paths (chromium project = `tests/` minus a browser-free subfolder such as
+  `tests/node/`, which `--project=node` runs), or list it for his answer.
+Process note (Low): step 0's OQ-0002-7 reading ran 21:04-21:08 UTC, before this APPROVE (commits dd8077f, 1950f82). Notes are not
+  edits (CLAUDE.md Never line), so no breach; but plan :30-31 says steps 0 and 1 start on the APPROVE: the report must say so with
+  its times. Its result fired the plan's own stop rule (:349-350): no written release policy -> new question WB-HEALTH, not yet in
+  plan.md: it must enter section 16 (reporting rule) and "what holds which step" (step 2 waits for it too).
+L1 Low (:30, :72): step 1 is not "the same under every answer": under RNG-CRATE (a)/(b) World and write_state gain the stream state
+  after step 3. Say "its code stands under every answer; (a) or (b) adds to it".
+L2 Low (:132, :147): `.gitignore` `pkg/` matches any folder named pkg at any depth: use `packages/sim-worker/pkg/`.
+L3 Low: OVERFLOW-XCRATE-CI's anchor "(or the first crate to depend on sim)" (STATUS.md:95; archive :637-651) is reached here
+  (sim-wasm depends on sim); PM-0002-53's counter test is cs3's (build plan :475): name the deferral in section 17 (point 8 names
+  only WASM-ARTIFACT and OVERFLOW-PER-CRATE).
+L4 Low (:317-318): the lockfile rule's first sentence ("may only add entries and change the lines of our own crates and packages")
+  will stop the step on a predictable change: vite 8.3.7 and 36 other entries carry "peer": true today (package-lock); a direct
+  vite declaration likely drops that flag on them. Allow and list flag-only changes (peer, dev, optional, devOptional); keep the
+  stop for version, resolved, integrity, dependency lists.
+L5 Low (:381, Part 0 :223-226): build.mjs "copies serve.mjs into dist/" reads unconditional; Part 0 keeps the zip's server out
+  of the production build: copy it only in the development flavour; the production check shows it absent, and names its method
+  (a scan of dist-prod for named dev-only markers, with the dev build as control), with `padBytes` and `?backend=webgl` named
+  in that list or justified.
+L6 Low: ADR 0002 part 2/7 CSP-ready (no inline script or style; no blob:/data: Worker or Wasm, :436-437; G8 :582) is claimed
+  (:392) but not checked on the built output; add a scan of dist/ to build.mjs's checks or the evidence.
+L7 Low: ADR 0002 part 5's API text ("returns where they lie", :338; API list :330) differs from the plan's step (due time only;
+  block_ptr/len read once) and the added `rebase` export: technical and inside PM-0002-3's intent; list it in section 17 for the
+  draft's next revision.
+L8 Low (section 13 :634-637): the hidden-tab steps are not measurable as written ("the number it had when you left"): ask him to
+  note the count before leaving; expected within about 30 of it on return (no jump of ~1,800 per minute away).
+L9 Low (section 12): art-director (CLAUDE.md step 5: visuals, UI) not called and not explicitly deferred: state why (placeholder
+  scene that decides nothing, dev-only readout, his Brave check is the gate) or call it.
+L10 Low: keep the state hash off the page, readout, copy report and logs (it covers the seed; FNV-1a is not one-way; ADR 0004
+  part 8 forbids a client-derivable seed); a note for PM-0004-21's pick at cs3.
+L11 Low: PM-0002-20's own bite (COOP without COEP must read false, ADR 0002 :1292) is not among the planted defects/cases.
+L12 Low: SIZE-2 (a) is the status quo and 2,900 is inside the build plan's own tolerance (:198-200: "half as much again" = 3,000):
+  it can go to him as information, not a question; harmless if kept.
+Wed Nov 18 21:26:53 UTC 2026
+Corrections to refs above: ADR 0002 CSP-ready is :434-436 (not :436-437); G8 :582; Part 15.2's sentence :120-121.
+Spot-checks of the plan's own citations (all hold): build plan :215-218, :198-200, :27, :472, :925, :939, :941, :977-979,
+:1008; ADR 0002 :1086-1093, :1495-1500; toolchain.yml :93; routine-guard :38 (.npmrc) and :84 (MERGE_PLACES);
+archive :807-812, :817-831, :850-856; kit-hold-ci/plan.md :40-41 and M2 :112 at f167f061; PM-0004-21's text (ADR 0004
+:1142) matches the plan's "function picked and its cost per tick". Not checkable here (no fetch by my brief): the RNG-CRATE
+and OQ-0002-7 web claims, RFC 9923's 64-bit vectors, registry sizes and dates.
+Saver note: checkpoint.mjs:226 `if (background && codeAhead)` -> watch never pushes code commits; the plan's reason for the
+record-before-commit order is moot (the order is still right); pushes go through a foreground `save`.
+
+## Verdict: APPROVE, with conditions (see the hand-back). Step 1 may start now; step 2 waits for his answers (RNG-CRATE,
+OVERFLOW-3P, DEPART-2, WB-HEALTH) and for conditions 1-5; condition 6 before the download; 7 before the round; 8 before
+the Brave check.
