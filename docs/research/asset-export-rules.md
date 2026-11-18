@@ -153,7 +153,8 @@ files in the repository (MODEL-PUBLIC, A3, answer 9), the joints' reasons, parts
 - **AX-R1.** One model, one `.glb` file, written by Blender's built-in glTF 2.0 exporter [from a draft: 0005:1803-1804,
   SP:576-578; from a source: rst:881-885]. Whether a script-written gun file may enter the game was asked of Mustafa in
   the build plan's Part 15 (GUN-FILES). His answer of 2026-11-17: "(a), no. Every gun file that enters the game comes
-  through Blender. The script-written rifle is used only to try the checks."
+  through Blender. The script-written rifle is used only to try the checks." (in part; whole: `docs/DECISIONS.md`, the
+  entry of 2026-11-17, 22:10:34 UTC)
 - **AX-R2.** Export with AX-F7's "Rule" column: in a Blender script (the MCP route), one call, after selecting every
   object of the model: BP Part 11's rule 7 plus `filepath` and `use_selection` (what `use_selection` takes along was not
   read; `filepath` is [from memory, unverified]). [the engine's convention (proposed); option names: src `__init__.py`]

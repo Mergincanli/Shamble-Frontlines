@@ -10,7 +10,7 @@ _Last updated: 2026-11-17 (Part 15 of the build plan to main, PR #57, after #56'
   `docs/ENGINE_OVERVIEW.md` and `docs/SPIKE_PLAN.md`) are the basis for the spikes and stay Proposed (the stop's
   answers, 2026-11-03: `docs/DECISIONS.md`), but for his SCOPE (a) of 2026-11-10: "I accept ADR 0002's part 1 alone
   (the repository layout, with the legacy constraints applying to legacy/ only)", recorded in ADR 0002 by 2.1b (#51).
-- **Last merged:** change-set 0 (PR #56, d7dad97, 2026-11-17 23:00:12 UTC, on his go); every merge: ROADMAP.
+- **Last merged:** change-set 0 (PR #56, d7dad97, 2026-11-17 23:00:12 UTC, his go; CI green: gate 856, toolchain 155).
 - **The kit:** KIT-FREEZE-2, what he meant by it (FREEZE-FDN) and his exceptions (two more since, for #53 and #54):
   `docs/DECISIONS.md`, "Queued"; his two additions of 2026-11-11 for the foundation chat: `docs/DECISIONS.md`. His words
   of 2026-11-13 for step 2.3:
@@ -26,14 +26,14 @@ _Last updated: 2026-11-17 (Part 15 of the build plan to main, PR #57, after #56'
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| #57 | Part 15 of the build plan, "The second lane", to main with his six answers (all (a), with additions), a docs change of its own (his go for #56): his words of 2026-11-17, 22:10:34 and 22:59:16 UTC, in `docs/DECISIONS.md` by script; Part 15 as he read it, with his answers on top: `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`; dated pointers in ADR 0002 (a seventh package, VFX-ROUTE) and in the build plan report; the rules file's line on gun files (GUN-FILES, AX-R1); STATUS, ROADMAP, the archive and REPO_MAP after #56's merge. Then change-set 1, Types (foundation step 2.4), by lane 1; lane 2 (`claude/optimistic-albattani-mdoonz`) works by Part 15 from this merge on | `claude/wonderful-hamilton-jdmlnf` (stands in for `cs/part-15-second-lane`) | draft; in review; its report comes last: `docs/reports/2026-11-17-part-15-second-lane.md` | his go (risk tier 1, decision docs; no Brave check), after the advisor agent's word on the final head and green `gate` and `smoke` on it |
+| #57 | Part 15 of the build plan, "The second lane", to main with his six answers (all (a), with additions), a docs change of its own (his go for #56): his words of 2026-11-17, 22:10:34 and 22:59:16 UTC, in `docs/DECISIONS.md` by script; Part 15 as he read it, with his answers on top: `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`; dated pointers in ADR 0002 (a seventh package, VFX-ROUTE) and in the build plan report; the rules file's line on gun files (GUN-FILES, AX-R1); STATUS, ROADMAP, the archive and REPO_MAP after #56's merge. Then change-set 1, Types (foundation step 2.4), by lane 1; lane 2 (`claude/optimistic-albattani-mdoonz`) works by Part 15, each unit from the point its 15.2 names | `claude/wonderful-hamilton-jdmlnf` (stands in for `cs/part-15-second-lane`) | draft; in review; its report comes last: `docs/reports/2026-11-17-part-15-second-lane.md` | his go (risk tier 1, decision docs; no Brave check), after the advisor agent's word on the final head and green `gate` and `smoke` on it |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10), after status-diet (merged, #49): his unit walk of 2026-11-09 (a docs
    change-set: UNITS.md §0 and LOOP_V2), then the Slice 1 note of 2026-11-10, each in a fresh chat. His words:
    `docs/DECISIONS.md`, "Queued".
 2. v2: the netcode proof test (#40); the foundation (his order of 2026-11-11): #49, #50, #51, #48 and #52 merged; step
-   2.3: the 2.3 chat stays stopped; then #57, change-set 1 (lane 1) and lane 2's work; Slice 3 waits for #40's result.
+   2.3: the 2.3 chat stays stopped for now; then #57, change-set 1 (lane 1) and lane 2's work; Slice 3 waits for #40.
 
 ## Waiting on Mustafa
 - His go for #57 (Part 15, no Brave check) when ready; from Part 15: give lane 2 Part 15 and ask for its needs from the

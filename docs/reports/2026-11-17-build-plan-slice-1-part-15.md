@@ -10,9 +10,9 @@ it on 2026-11-17 (his CHANGE 2 and CHANGE 4, in `docs/DECISIONS.md`); it was sen
 commit ea851a8 and not edited. Where the two differ, his answers are the newer word. Two lines of the text are
 overtaken: its title's "it waits for Mustafa's answers" (he has answered), and VFX-ROUTE's option (a), where the text
 says the copy "may need changes" (his answer: nobody edits it by hand). His "as Part 15 has it" keeps the four
-conditions of 15.1 in full: his one-line summaries of them do not narrow them. His two messages stand at the end,
-byte for byte (P1, P2). Part 15 cites a reading of the Shamble VFX repository as "the digest": it stays readable at
-commit d2c4caa, `.checkpoints/part-15/shamble-vfx-digest.md`.
+conditions of 15.1 in full: his one-line summaries of them do not narrow them (this chat's reading). His two messages
+stand at the end, byte for byte (P1, P2). Part 15 cites a reading of the Shamble VFX repository as "the digest": it
+stays readable at commit d2c4caa, `.checkpoints/part-15/shamble-vfx-digest.md`.
 
 ## His answers (2026-11-17, 22:10 UTC; P1)
 
