@@ -14,6 +14,13 @@ use wasm_bindgen::prelude::*;
 /// Local play: the client endpoint and a local server in one Worker (ADR 0002 part 6). The only mode so far.
 pub const MODE_LOCAL: u8 = 0;
 
+/// Ticks per second, for the host's readout: the simulation's own build-time constant, asked once.
+#[wasm_bindgen]
+#[must_use]
+pub fn tick_hz() -> u32 {
+    TICK_HZ
+}
+
 /// Why a `Sim` was not created.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CreateError {
@@ -156,6 +163,7 @@ mod tests {
         assert_eq!(header(&sim), (0, LAYOUT_HASH));
         assert_eq!(sim.block_ptr(), sim.block().as_ptr());
         assert_eq!(sim.newest_input(), 0);
+        assert_eq!(tick_hz(), 30);
     }
 
     #[test]
