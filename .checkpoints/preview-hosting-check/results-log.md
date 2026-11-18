@@ -496,3 +496,18 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   (44364041726) and probe #1 (44355175073, started by hand, told him); all on `main` 2162db55d93f, actor and
   triggering actor Mergincanli. The other three runs are the rehearsal's and the token check's (before sitting 1).
   Nothing ran that was not on the list.
+
+### Day 1, sitting 2 (PREV-DELETE's cases; REVIEWER (b): no approvals)
+- His list sent at about 18:25 UTC (runs that will start; his two merges; the PR-page look); the go by this session's
+  scheduled check-in (fired 18:27:22 UTC).
+- The six branches pushed at 18:27:40 UTC (one `git push`, new branches): cs/pd-one a2cfef9, cs/pd-three d78dfb4
+  (push 1), cs/pd-open 236a6d7, cs/pd-off 683e8c0, cs/pdt-one 7370d4b, cs/pdt-three 9ebeeb6 (push 1). Each commit's
+  workflows hashed before the push: deploy 29593af18d34, close 3afdf389d636 (absent on 683e8c0, case (d), by design),
+  probe f24ad6e81daf, browsers 6791076916ae; each adds only `test-prs/<branch>.txt`.
+- The six pull requests opened right after with the GitHub MCP tool: #3 (a) cs/pd-one, #4 (b) cs/pd-three, #5 (c)
+  cs/pd-open, #6 (d) cs/pd-off, #7 (a') cs/pdt-one, #8 (b') cs/pdt-three.
+- Six deploy runs started on the pull_request event, none waiting (list read 18:28:28 UTC): #7 44370016948 (a) cs/pd-one
+  (head a2cfef9, PR 3, created 18:28:02), #8 44370024556 (b) cs/pd-three push 1 (d78dfb4, PR 4, 18:28:05), #9
+  44370034770 (c) cs/pd-open (236a6d7, PR 5, 18:28:08), #10 44370043893 (d) cs/pd-off (683e8c0, PR 6, 18:28:11), #11
+  44370054922 (a') cs/pdt-one (7370d4b, PR 7, 18:28:15), #12 44370062021 (b') cs/pdt-three push 1 (9ebeeb6, PR 8,
+  18:28:17). No other workflow started (no close run).

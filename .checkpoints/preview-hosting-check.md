@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 19:27 Amsterdam (18:27 UTC)
+- **Last update:** 2026-11-18 19:30 Amsterdam (18:30 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -580,6 +580,11 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      the Actions tab (his click) on a new branch (plan Risk 10). After his merges, `main` re-hashed. If the schedule
      stays silent: by-hand probes right after the last cleanup and about an hour later (a check-in), the 24-hour one
      on Day 2 (the mark).
+   - Started (results log): the six branches pushed 18:27:40 UTC; pull requests #3 (a), #4 (b), #5 (c), #6 (d), #7
+     (a'), #8 (b'); six deploy runs #7-#12 (44370016948, 44370024556, 44370034770, 44370043893, 44370054922,
+     44370062021), none waiting. Next: each run's records and verify; the PR-page picture after (a)'s deploy
+     (script `.../scratchpad/prpage/shot.js`, output under `.gate/preview-hosting-check/day1/pr-page/`); then push 2 of
+     (b) and (b') after their first verify.
 
 ## Next steps
 1. His answer: sitting 2 tonight or tomorrow; then his list (step 24) and sitting 2.
