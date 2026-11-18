@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 18:11 Amsterdam (17:11 UTC)
+- **Last update:** 2026-11-18 18:14 Amsterdam (17:14 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -493,6 +493,8 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      exit 1, summary pass 5, fail 1, no reading 0: **Risk 13 happened** (production's one-off link carries noindex on
      all 7 paths; production's own address clean); everything else as expected. The sitting continues: next, the three
      links to him (Brave steps 1-3) and his first build count; `uploads` starts only after that count.
+   - Brave steps 1-3: his three screenshots (17:12:23 UTC) show the expected values on all three links (results log);
+     his "achieved" words, the first build count and his click count for `round-a` asked.
 
 ## Next steps
 0. Sitting 1 (step 23): start `round-a`; once plan and build are green and deploy waits, send his list.

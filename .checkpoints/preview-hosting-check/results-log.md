@@ -347,3 +347,22 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   "gone"; production (main) stable 200 "serves", expected "serves"; production one-off (0354374e) 200 "serves",
   expected null; iso-off and iso-on, both links, 200 "serves", expected "serves". Every row 1 try. So the script works
   against Cloudflare, and the setup upload is gone from both links (step 22's first outcome: nothing to do).
+- **The hosting checklist, steps 1 to 3 (Brave, his PC)**: his message "all three opened and screenshotted for you"
+  (2026-11-18 17:12:23 UTC, 8fce8e5a-1ebc-4993-ae7b-0aef9f8339c8), three screenshots, transcribed (the images stay
+  out of the repository):
+  - iso-off.shamble-preview-check.pages.dev: Build marker 2162db55d93f59cf2ed7e371a3915409f0b5a587; Build mode
+    preview; crossOriginIsolated (page) false; crossOriginIsolated (worker) false; WebAssembly "ran (2 + 3 = 5)";
+    Content file "content.ef463692.bin (65536 bytes)"; Status done. Resources: page "/", "/page.css", "/page.js",
+    "/manifest.json", "/favicon.ico", "/content.ef463692.bin", "/worker.js"; worker "/worker.js", "/tiny.wasm".
+  - iso-on.shamble-preview-check.pages.dev: the same marker; Build mode preview-isolated; page true; worker true;
+    WebAssembly "ran (2 + 3 = 5)"; the same content file and size; Status done. Resources: page "/", "/page.css",
+    "/page.js", "/manifest.json", "/content.ef463692.bin", "/favicon.ico", "/worker.js"; worker "/worker.js",
+    "/tiny.wasm".
+  - shamble-preview-check.pages.dev: the same marker; Build mode production; page false; worker false; WebAssembly
+    "ran (2 + 3 = 5)"; the same content file and size; Status done. Resources: the same seven page paths as iso-on;
+    worker "/worker.js", "/tiny.wasm".
+  - No login screen appears in any screenshot; each shows the page itself. Every value is the expected one (ADR 0006
+    :1444-1447). His "achieved"/"not yet" words: asked of him (the checklist has him record them).
+  - TE-12 (the page's resource list against the manifest): the build's files the page and worker loaded are all
+    in the manifest; "/favicon.ico" is the one extra entry, Brave's own icon request (no such file in the build; not
+    fetched by check-headers, which reads the manifest's files).
