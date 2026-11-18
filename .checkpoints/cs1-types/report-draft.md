@@ -168,11 +168,14 @@ way; both come first.
   use it; wasm-bindgen's files are answered in change-set 2.
 - **The provisional fields, for change-set 3's plan** (each marked in its doc line): the join token's format; the
   widths of `protocol_version`, `slot`, `team`, `squad`, both rates, both `group` fields, `sequence`, `presses`,
-  `move_x` and `move_y`; what `mode_hash` hashes; which buttons exist (16 is a capacity); `AimPoint` as a whole (its
-  1 cm step and widths are borrowed from the snapshot encoding of positions); `ViewTime`'s fraction; the form of
-  `Snapshot`'s two command acknowledgements (a sequence or a tick); the order of `Input`'s commands. What settles
-  each, the checks the decoders must make, and an anti-cheat table per field are in netcode-architect's and
-  security-auditor's notes (in the commit named below).
+  `move_x` and `move_y`; the move vector's scale; how squads are numbered; what `mode_hash` hashes; which buttons
+  exist (16 is a capacity); `AimPoint` as a whole (its 1 cm step and widths are borrowed from the snapshot encoding of
+  positions; which axis is up); `ViewTime`'s fraction; the form and the width of `Snapshot`'s two command
+  acknowledgements (a sequence or a tick); the order of `Input`'s commands, and whether their sequence numbers must
+  be consecutive (the doc line says "consecutive"; the drafts say only that sequences move forward: netcode-architect,
+  round 2, a Low); the anchor of `Input`'s 16-bit tick offsets (the drafts give the full tick only to the snapshot
+  header). What settles each of 18 items and the checks the decoders must make: `netcode-architect-review2.md`, "For
+  change-set 3"; an anti-cheat table per field: `security-auditor-review1.md` (both in the commit named below).
 - **Size:** <<SIZE>> hand-written lines added against 600 planned (<<RATIO>> times; his stop line is twice the plan,
   1,200), by `git diff --numstat` against main, with generated files, the lockfile and docs left out. What grew: the
   export tests' folder checks (after round 1), the test tables of the layout rules and of the hash, a doc line per
