@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 20:14 Amsterdam (19:14 UTC)
+- **Last update:** 2026-11-18 20:58 Amsterdam (19:58 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -643,6 +643,8 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      screenshot). Window note: the reviewer may already be on (his tick after my list?), so the "reviewer off since
      18:08" window may have closed before 19:12 UTC; read from his screenshot. If on: this run is the control, then
      the off reading in the plan's order (untick, re-run without a wait, re-tick with a screenshot).
+   - Check-in 19:55 UTC: run #17 still waiting, no reply from him; the 19:23 slot silent too (five missed); probe #3
+     (44385645676, 19:56:45Z) all as expected at 1.1-1.4 h after the closes. Waiting on his preview screenshot.
 
 ## Next steps
 1. Sitting 3 (step 25): his list, then the go by a scheduled check-in; then step 25 saved as done after a consultation.

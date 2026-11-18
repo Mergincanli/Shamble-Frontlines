@@ -614,3 +614,14 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   "Required reviewers" after my list of about 19:06 UTC (its step 2). Per the row: stop, his preview page read (a
   screenshot asked). If it shows the reviewer on, this run is the control (approve; "secret: present") and the
   reviewer-off reading is taken in the plan's order (untick, re-run, re-tick).
+- Check-in (fired 19:55:21 UTC, read 19:55:47): run #17's deploy job still "waiting" (no message from him since my
+  question of about 19:13 UTC); the 19:23 UTC slot passed without a scheduled probe run (five slots missed:
+  15:23-19:23; 26 runs in all, the 26th being run #17). A probe started by hand (`purpose: deletion`) as the hourly
+  stand-in; it holds no secret and names no environment, so it does not touch the waiting run.
+- **The hourly stand-in probe**: probe run #3, id 44385645676 (by hand, head 347d5e0), created 19:56:06 UTC, success
+  19:56:56; probe-results-44385645676 (artifact 14466161509, zip sha256 5136260483b7..., equal to its digest),
+  probed_at 2026-11-18T19:56:45.076Z, read with jq from `.gate/preview-hosting-check/day1/probe-3/`. By case: (a) 2
+  rows gone (hours_since_close 1.4); (a') tombstone 3 rows gone (1.4); (b) 4 rows gone (1.1); (b') tombstone 5 rows
+  gone (1.1); (c) control 2 rows serves; (d) bite 2 rows serves (1.4); the by-hand previews 19 rows serves;
+  production 4 rows serves (its own address as expected; three one-off links unjudged); the rehearsal 2 rows gone
+  (4.99). No row "not as expected" (as_expected false: 0). Nothing to tell him (the check-in's rule).
