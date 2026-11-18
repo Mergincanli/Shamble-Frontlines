@@ -13,3 +13,7 @@ Rules: every cargo command --locked; no cargo update; no SHAMBLE_WRITE_TYPES in 
 - R7 Findings ranked; coverage table (n/a mostly: no network code yet); memory update; DONE.
 
 ## Notes
+### R0 Read: DONE
+- Code at HEAD 9b8c668 == 82142fa outside .checkpoints (git diff --stat empty); kit/CI/gate files, rust-toolchain.toml, .cargo, root and tools package files == main (empty diff). Diff: 23 files, +1022/-12 (Cargo.lock +90 = the nine reviewed entries).
+- Memory read: threat model for deps, ts-rs facts (Config::new reads no env; never deletes; follows links at write targets), CI sandbox facts and L4 residual.
+- advisor-security.md: A1 (B6), L3 closed per advisor (B5), Low on write-mode is_file (now changed to DirEntry::file_type in 82142fa). deps notes B11/B13/B14 read; job log copy present in my scratchpad ci/job168.log (sha256 d8cf58de..., 480 lines), same as job-134788575344.log.

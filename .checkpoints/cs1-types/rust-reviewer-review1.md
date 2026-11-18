@@ -21,3 +21,15 @@ No earlier rust-reviewer memory found (.claude/agent-memory-local has security-a
 
 ## Commands run (exit codes)
 
+- (info, checked right) RFC 9923 = "The FNV Non-Cryptographic Hash Algorithm" (Feb 2026, Informational): basis 0x811C9DC5,
+  prime 0x01000193, xor then multiply (rfc-editor.org/info/rfc9923, Tables 1-2 and pseudocode). layout.rs:63-64,98-105 match.
+  Independent Python FNV-1a over the stream the doc states (layout.rs:69-71) gives 0x2df78c30 = layout.ts's LAYOUT_HASH.
+- (info, checked right) Stream is prefix-decodable: tag byte (0x02/0x01) never occurs in a plain name, names end at the
+  first 0x00, numbers are fixed 4 bytes LE, type names have no 0x00 -> injective for tables that pass broken_rule.
+- (info) ts-rs 12.0.1: Config::new() == Config::default(), reads no env (ts-rs-12.0.1/src/lib.rs:593-609); only
+  from_env() reads TS_RS_* (lib.rs:618-640); the auto test exists only with #[ts(export)] and uses from_env()
+  (ts-rs-macros-12.0.1/src/lib.rs:41-43,189-210); imports sorted via BTreeMap (src/export.rs:336-377): deterministic.
+  export_and_merge keeps a process-global map path->types and SKIPS a type already written to that path in this process
+  (src/export.rs:20-24,142-167): safe here only because every run gets a new scratch path. File::create follows links
+  (export.rs:154): safe because the scratch folder is new and exclusive.
+- (info) cargo tree: protocol -e normal (host, wasm32, --target all) = protocol alone; -i ts-rs = dev-dependency of protocol only.
