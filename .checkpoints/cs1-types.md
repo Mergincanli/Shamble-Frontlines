@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 13:48 CET (from the clock)
+- **Last update:** 2026-11-18 13:50 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -86,11 +86,37 @@
    - Size, counted on 82142fa against main (generated files and the lockfile left out): 757 lines added, 12
      removed; 1.26 times the plan of 600; stop line 1,200.
 
+7. Evidence runs on 4d2338f (12:48 to 12:50 UTC; the code is 82142fa's):
+   - CI on the pushed head 4d2338f: `gate` run 870 success, `toolchain` run 169 success (the first CI build after the
+     ruling; it ran the export tests and Vitest inside the network cut).
+   - The planted defects (`cs1-types/plant.sh`, results `plant-results.txt`; throwaway worktree, removed by the
+     script without force): 20 runs, all as wanted. (1) `Snapshot::group` renamed, no regeneration: `cargo test -p
+     protocol --locked` exit 101, `generated_types_are_current` fails naming `Snapshot.ts`; (2) one character in
+     `Join.ts`: exit 101, names `Join.ts`; (2b) one offset in `layout.ts`: `cargo test -p client-endpoint --locked`
+     exit 101, names `layout.ts`; (2c), (2d) an extra file in each generated folder: exit 101; (3) the control:
+     rename plus write mode passes, the plain run passes, only `Snapshot.ts` changed, tsc on the shipped sources
+     passes, tsc with the package's own test fails at `index.test.ts(39,5)` TS2353 until the test follows the rename,
+     Vitest 6 passed; (4) a header field added and the stride grown: exit 101, only `generated_layout_is_current`
+     fails (4 passed, 1 failed), `LAYOUT_HASH` 0x2df78c30 becomes 0x5d0e9efb; PM-0002-17: a parameter property and an
+     `enum` each fail tsc with TS1294; `export declare enum` passes (recorded).
+   - **A first run of the script is kept as `plant-results-run1.txt`:** 3 of 18 runs were not as wanted, all from
+     the script's own backup copies (`X.kept` beside the planted file), which the export tests refused as files that
+     do not belong in a generated folder. The copies now live outside the worktree; that refusal became defects (2c)
+     and (2d).
+   - The 20 generator runs (`runs20.sh`, results `runs20-results.txt`): 20 runs of `SHAMBLE_WRITE_TYPES=1 cargo test
+     --workspace --locked`, 9 files each, one distinct set (set sha256 81bd1a49…d718c), no difference from the
+     committed files.
+   - A refusal, recorded with the route taken: Claude Code's built-in check refused `rm "$d"/*.ts` in a loop over
+     the leftover scratch folders in /tmp (a variable that could be empty); the whole command was not run. Route:
+     the form the check itself names, `rm "${d:?}"/*.ts`; the script uses it too.
+
 ## Current step
-7. (12:48 UTC) The push of 82142fa (this save: CI runs `gate` and `toolchain` on it, the first CI build after the
-   ruling). Then: the planted defects (`bash .checkpoints/cs1-types/plant.sh >
-   .checkpoints/cs1-types/plant-results.txt 2>&1`; worktree `.gate/cs1-types/plant`, removed by the script) and the
-   20 runs (`runs20.sh` beside it), then the reviews.
+8. (12:50 UTC) Round 1 of the reviews on the final diff (`git diff origin/main...HEAD -- . ':!.checkpoints'`), all
+   Opus 5.5 at effort max, at most 3 at a time: batch 1 rust-reviewer, test-engineer, security-auditor; batch 2
+   engine-architect, netcode-architect. Notes: `cs1-types/<agent>-review1.md`. Then one fix pass, the planted
+   defects and the 20 runs again if a fix touches an export test or the generator, round 2 on what changed only if
+   needed, the verifier, the docs pass, the report, the advisor agent on the final head, the pull request.
+   If an agent is lost: start it again with the brief in this step; its notes file says where it was.
 
 ## A process miss to report (records, with their times)
 - **CI built the new dependency once before the security check's answer.** The manifests' commit 566d1d1 carried
@@ -179,4 +205,4 @@
 ## Running work
 - saver: background task bafnij7xk, started 12:30 UTC on 2026-11-18 (2-hour limit; the earlier one, b98z35xsq, was
   stopped at 12:30:03 UTC for the code push).
-- agents: none running (security-auditor finished 12:27 UTC, the advisor agent 12:44 UTC).
+- agents (3 of 3 from 12:50 UTC): rust-reviewer, test-engineer, security-auditor, round 1 (batch 2 follows).
