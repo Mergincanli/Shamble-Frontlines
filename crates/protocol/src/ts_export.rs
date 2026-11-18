@@ -118,10 +118,13 @@ fn generated_types_are_current() {
     let generated = files_in(&scratch, "the scratch folder is this test's own");
     for (name, bytes) in &generated {
         // ts-rs copies a doc comment as it is: one that holds "*/" would end the comment and spill into the code.
+        // In its output a comment ends on a line of its own, so "*/" anywhere else comes from a doc comment.
         let text = String::from_utf8_lossy(bytes);
-        let (opened, closed) = (text.matches("/**").count(), text.matches("*/").count());
-        assert_eq!(
-            opened, closed,
+        let spills = text
+            .lines()
+            .any(|line| line.contains("*/") && line.trim() != "*/");
+        assert!(
+            !spills,
             "{name}: a doc comment of its Rust type holds \"*/\"; reword it"
         );
     }
