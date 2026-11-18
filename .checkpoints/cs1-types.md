@@ -313,6 +313,20 @@
       needs-mustafa); delete `.checkpoints/cs1-types*` in the last commit (the report names the commit before it;
       no skip mark on it); update #58's description, mark it ready; ask whether to watch it; stop for his go.
 
+    - netcode-architect round 2 (14:01:47 to 14:10:26 UTC): APPROVE; L1 to L6 closed, L7 accepted as not taken
+      (`cs1-types/netcode-architect-review2.md`, which now holds "For change-set 3": 18 provisional items with what
+      settles each, and the decoder checks). N1 Low: `messages.rs:56` "their sequence numbers consecutive" claims
+      more than the drafts; N2: five items were missing from the report's provisional list (added).
+    - security-auditor round 2 (13:59:40 to 14:18:44 UTC): nothing at Medium or above; S1, S2, S3 closed
+      (`cs1-types/security-auditor-review2.md`). New Lows: S1b a linked crate folder moves the root (its run T4: write
+      mode wrote outside the worktree; the doc line "never writes outside the repository" in both export tests
+      claims more than holds; fix: `ancestors().nth(2)` and `create_new`); S2b `#[doc = "…"]` and block docs pass
+      the doc check (an injected line can be valid TypeScript; fix: refuse `#[doc` and `/**` in `messages.rs`); S5
+      the "no file of its own" check misses links and extra folders. It accepts write mode in CI as the CI-TYPES
+      draft has it (keep the `git status` form). Its build folder `.gate/cs1-types/sa-target` can go.
+    - **Round 2 is complete (14:18 UTC): five answers, nothing at Medium or above. The code stays 65a7b13.**
+      All round-2 Lows are in the report's "Follow-ups" (draft) and go to STATUS.
+
 ## A process miss to report (records, with their times)
 - **CI built the new dependency once before the security check's answer.** The manifests' commit 566d1d1 carried
   "[skip ci]", but the checkpoint commit pushed on top of it (da22f96, 12:04:37 UTC) did not: `checkpoint.mjs` leaves
@@ -400,4 +414,4 @@
 ## Running work
 - saver: background task bx7rdhkl7, started 14:07 UTC on 2026-11-18 (2-hour limit; the one before it, bafnij7xk, ran
   from 12:30 and was stopped just before).
-- agents (3 of 3): security-auditor round 2, netcode-architect round 2, docs-keeper (times in step 10).
+- agents (1 of 3): docs-keeper (since 14:07:22 UTC). Round 2 is back.

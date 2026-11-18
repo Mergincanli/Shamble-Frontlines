@@ -133,10 +133,11 @@ way; both come first.
   18 runs failed for another reason than planned: the script's own backup copies sat in the generated folders and
   the export tests refused them (that refusal became two more planted defects). In a later one, 1 of 30: a new check
   for doc comments counted comment starts against comment ends and the planted text held both; it now looks at lines.
-- **Round 2** (on what changed since round 1, 13:42 to <<R2-END>> UTC): engine-architect APPROVE (its Medium closes
+- **Round 2** (on what changed since round 1, 13:42 to 14:18 UTC): engine-architect APPROVE (its Medium closes
   with this report's sentence for PM-0002-15); rust-reviewer APPROVE (its six Lows closed); test-engineer APPROVE (its
   High, three Mediums and four Lows closed; it re-derived every known answer with its own implementation and ran the
-  shared-build-folder case again: both trees now stop). <<R2-SA-NA>> Round 2 left Lows only; by the review budget they
+  shared-build-folder case again: both trees now stop). security-auditor: nothing at Medium or above, its three Lows closed (it tried
+  the linked-folder cases again: all refused); netcode-architect APPROVE (its Lows closed). Round 2 left Lows only; by the review budget they
   are follow-ups, and the code is as round 2 reviewed it.
 - **The verifier** (effort max): <<VERIFIER>>
 - **The advisor agent on the final head:** its word is in the pull request's description.
@@ -205,13 +206,21 @@ rustsec.org); the export tests on Windows and macOS; smoke in this container.
 - **From the security check:** ts-rs's packages ship no licence file (MIT is declared; no duty while it is
   test-only); the plan's draft said ts-rs needs Rust 1.88.0, its published manifest says 1.78.0 (both under our
   1.99.1); the network cut stops IP traffic only (for the gate v2's workflow).
-- **From round 2 (Lows, not fixed here):** the fix pass's new guards have no committed test of their own (the planted
-  script is deleted with the checkpoint): they belong in the gate v2's planted set; the build-folder check compares
-  path strings, so an honest run through a second spelling of the same folder, or a moved clone that kept its build
-  folder, stops until a rebuild; the doc-comment check passes a comment end that stands alone on a line (it takes a
-  hand-written `#[doc]` attribute) and refuses a valid block doc; `generated/` may hold a link or a third folder
-  unnoticed; the tag-byte pair has no "must differ" line of its own; on a file system that ignores case a link named
-  `X.TS` would survive write mode's delete loop (reasoned, not run).
+- **From round 2 (Lows, not fixed here; the code is as reviewed):**
+  - Two doc lines claim more than holds. Both export tests say write mode "never writes outside the repository":
+    true for a linked generated folder or parent (refused), not when a crate's own folder is a link (security-auditor
+    ran it: write mode then wrote outside the worktree). `Input.commands`'s doc says "consecutive" sequence numbers;
+    the drafts say only that sequences move forward. Each takes a committed link or is a wording matter; fix with the
+    next change to those files.
+  - The doc-comment check catches a comment end inside a `///` line (the only form the message types use). A
+    hand-written `#[doc = "…"]` attribute or a block doc can still put a line of valid TypeScript into a generated
+    file; the fix is to refuse those two forms in `messages.rs`.
+  - The fix pass's new guards have no committed test of their own (the planted script is deleted with the
+    checkpoint): they belong in the gate v2's planted set.
+  - The build-folder check compares path strings: an honest run through a second spelling of the same folder, or a
+    moved clone that kept its build folder, stops until a rebuild, and the message does not say so.
+  - `generated/` may hold a link or a third folder unnoticed; the tag-byte pair has no "must differ" line of its own;
+    on a file system that ignores case a link named `X.TS` would survive write mode's delete loop (reasoned, not run).
 - **Change-set 2:** an `exports` entry in `packages/types/package.json` before the first import by package name; the
   block writer takes offsets through a by-name handle that fails the build on a missing name; `Section::align()` in
   Rust only; the export tests stay native-only; run the layout check on the first block of every Worker start.

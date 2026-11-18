@@ -61,3 +61,11 @@ B10. DONE and the answer.
   rule: ts_export.rs:15-27 and layout_ts.rs:45-46 (CARGO_MANIFEST_DIR built vs run). Map check baseline: OK, 129 entries
   cover 109 required paths. HEAD moved to daf3d98 (main session's saver; the report committed in 5f1b58f, unchanged:
   309 lines). B3 done. Next B4 (moves).
+- B4 finding (GitHub REST, read-only): PR #57 merged_at 2026-11-18T11:09:31Z, merge 22c6afa, head f26ac5b, by
+  Mergincanli. Runs on SHA 22c6afa: gate 866 (id 44292101495; jobs gate + smoke success) and toolchain 165 (id
+  44292101705; success) are head_branch MAIN (push); gate 867 (44292137403) and toolchain 166 (44292137394) are
+  head_branch claude/wonderful-hamilton-jdmlnf (push of the same commit). The caller's "CI on main: gate 867,
+  toolchain 166" is off by one: record main's 866/165 and tell the caller.
+- B4 finding: #57's PR body :20 "The advisor agent: APPROVE of f26ac5b... (2026-11-18, about 00:17 UTC)"; the verifier
+  PASS (seven Low, all fixed); body :24-30 three Lows (1 size recount 223/18 vs 220/15; 2 Last merged pointer "every
+  merge: ROADMAP"; 3 Next "Slice 3 waits for #40" vs the proof test's result), "change-set 1's docs pass takes them".
