@@ -202,3 +202,52 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
 - After reading (his words of 2026-11-18): pull request #2 closed unmerged at 13:51:27 UTC (list_pull_requests:
   state closed, merged false); the run's logs deleted (delete_workflow_run_logs: "204 No Content"; get_job_logs for job
   134760377971 then answered 404). No run started on the close (the run list holds the same two runs).
+
+### The token check, second run (TOKEN-WINDOW and CHECK-RERUN done by him; ID-ENDS compared by him)
+- His words (2026-11-18 14:30:11 UTC, 8b31c945-c07d-4b1b-8b62-185f409e0a0e): "Step 1 done, the api token is still the same, I have also set it to 7 days expiration / The rerun went well tool  / ran the check a 2nd time, which also ran properly. / Yes, cloudflare account id begins with that and ends with d8e7". His screenshots: Cloudflare's
+  "Review token" page, NAME shamble-preview-check-deploy, EXPIRATION "November 25, 2026 (7 days)", "Entire Shamble
+  Frontlines account" with "Pages Read" and "Pages Write", "All IP addresses allowed", buttons "Back to edit" and
+  "Update token"; the check's run page, attempt "Latest #2", status Success, job "check" 12 s, "Mergincanli approved".
+- Run 44292323566 attempt 2: job 134871714885 created 14:27:17, started 14:27:28 (his approval between), done 14:27:40.
+  Its output, word for word (log lines 14:27:36 to 14:27:38 UTC):
+  ```
+  token: length 53; starts with cfat_: yes; whitespace in or around it: no
+  account id: length 32; exactly 32 hex digits: yes; whitespace: no; first and last 4: d17d...d8e7
+  == A. the token, for this account: HTTP 200
+  {
+    "success": true,
+    "errors": [],
+    "result": {
+      "status": "active",
+      "expires_on": "2026-11-25T22:59:59Z",
+      "not_before": null
+    }
+  }
+  == B. the token, without an account: HTTP 401
+  {
+    "success": false,
+    "errors": [
+      {
+        "code": 1000,
+        "message": "Invalid API Token"
+      }
+    ],
+    "result": null
+  }
+  == C. the project the upload asks for: HTTP 200
+  {
+    "success": true,
+    "errors": [],
+    "result": {
+      "name": "shamble-preview-check"
+    }
+  }
+  == D: Wrangler exit 0
+  D: shamble-preview-check named in its output: yes
+  D: no error code in its output
+  ```
+- Reading (outcome row 3): the token works now (not_before null) until 2026-11-25T22:59:59Z, the first record of its
+  end date after saving; C finds the project; the pinned Wrangler answers. B's 1000 stays as before (the user verify
+  method refuses an account token, consistent with both runs). The ID's ends d17d...d8e7 match Account Details (his
+  words). Day 2's last day: 2026-11-25 (Amsterdam), from expires_on. The deploy's "Re-run failed jobs" must come before
+  `site-pr` expires (2026-11-24T20:42:04Z).
