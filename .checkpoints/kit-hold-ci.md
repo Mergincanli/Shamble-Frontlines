@@ -7,7 +7,7 @@
   15:38:13 UTC, his label 16:24 Amsterdam; `kit-hold-ci/mustafa-2026-11-18-1624-merge-58.md`, by script).
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/kit-hold-ci) · **Base:** main
   9b4b518f520aa2360a8007dc857ba74b343c8a40 (the merge of #58; the branch was fast-forwarded to it and pushed)
-- **Last update:** 2026-11-18 17:11 CET (from the clock)
+- **Last update:** 2026-11-18 17:22 CET (from the clock)
 
 ## What his words ask (read the file; these are pointers, not his words)
 - DEP-HOLD (a): "Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no
@@ -65,21 +65,28 @@
    the kit's own 27 tests against the edited script pass. `kit-edit.diff` regenerated (script +40 -1, tests +120 -1,
    rules +8); `ci-edit.diff` unchanged (+13). Size 181 lines against 150 planned (stop line 300).
 
+7. The advisor agent on the revised kit diff (its line is appended to `kit-hold-ci/advisor-plan.md`): REVISE, one
+   step of the first new test never reached the hold (the flagged record was the save's only change, so the script
+   stopped at "nothing else to save"); "with that fix, and the check shown failing, it is APPROVE with no further
+   review". Fixed: the step now changes a second note and asserts the hold's line. Two short tests added on its
+   optional Low (the hold in front of the background saver's push; a lockfile moved into the notes under another
+   name, which pins `--no-renames`). Run on the scratch copies (16:22 UTC):
+   - `node --test .gate/kit-hold-ci/checkpoint.test.mjs`: 32 pass (27 existing, 5 new);
+   - the same file against today's script: 27 pass, the 5 new fail;
+   - against four broken copies of the edited script (`.gate/kit-hold-ci/broken-*.mjs`): the record read from the
+     working tree: the first new test fails (the check the advisor agent asked for); renames followed: 2 fail; the
+     hold in front of the foreground push only: 2 fail; the hold removed: 5 fail;
+   - the kit's own 27 tests against the edited script: 27 pass.
+   `kit-edit.diff` regenerated: by lines of `diff -u`: the script +41 -1, its tests +152 -1, the rules +8; the workflow
+   +13 (`ci-edit.diff`, unchanged): 214 added lines against 150 planned (stop line 300).
+
 ## Current step
-7. (16:11 UTC) The advisor agent gives one line on the revised kit diff (resumed by message). Then the message to
-   Mustafa: the kit edit's exact text (the script and the rules bullet in full; the tests summarised, with the diff
-   file named), how the hold is released, what it does not cover, the five names as a reading, the known costs, the
-   evidence run, why the CI plant is a mode change, the stop rule, how "nothing else in it" is read, his steps (his
-   yes; the chat in Accept edits; the guard's prompts). **Stop there for his yes.** Before it the main session does
-   not: copy the scratch files into `.claude/` or `.github/`; run the scratch script's `save` or `watch` here; move
-   the saver off main's script; push the plant commit; write the CI edits.
-   After his yes: write the four files (three kit, one workflow) so that `git diff` equals the two diff files byte
-   for byte; run the tests; commit by path; push; read the clean run (stop rule); the plant commit (a generated
-   file with the executable bit), its run must end at the compare step, then the take-back commit; reviews
-   (security-auditor, infra-engineer, test-engineer, one batch); the verifier; DECISIONS by script; docs-keeper;
-   the report (with the advisor agent's list); the advisor agent on the final head; the pull request; its ready
-   report goes to the Advisor before his go. Change-set 2's plan draft (engine-architect) may start once the edits
-   are written (it counts toward the three agents; no manifest-named file in the notes).
+8. (16:22 UTC) The message to Mustafa with the kit edit's exact text (the script's and the rules' diff in full; the
+   whole diff, tests included, sent as a file: `.gate/kit-hold-ci/kit-hold-exact-text.diff`, a copy of
+   `kit-edit.diff`) and how the hold is released. **Stop for his yes and for the chat in Accept edits.** Nothing in
+   `.claude/` or `.github/` is written before it. After his yes: as the list under step 7 of the plan's order says
+   (write the four files so that `git diff` equals the two diff files; tests; commit by path; push; the clean run
+   and the stop rule; the plant and its take-back; reviews; the verifier; the docs; the report; the pull request).
 
 ## Next steps
 4. Build (three edits), the script's tests, the real CI runs (a planted change that the compare step fails on; the
@@ -96,4 +103,4 @@
 
 ## Running work
 - saver: background task bzuzw7uzy, started 15:41 UTC on 2026-11-18 (2-hour limit).
-- agents (1 of 3): the advisor agent, resumed at 16:11 UTC for one line on the revised kit diff.
+- agents: none running.

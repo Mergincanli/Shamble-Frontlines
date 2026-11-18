@@ -90,7 +90,7 @@
    next.
  - **At every update, check the background saver** when agents or a workflow are running, and restart it if it has
 --- .claude/scripts/checkpoint.test.mjs	2026-11-09 23:55:15.009247589 +0000
-+++ .gate/kit-hold-ci/checkpoint.test.mjs	2026-11-18 16:09:27.274188451 +0000
++++ .gate/kit-hold-ci/checkpoint.test.mjs	2026-11-18 16:19:41.296382560 +0000
 @@ -4,7 +4,8 @@
  import { test } from 'node:test';
  import assert from 'node:assert/strict';
@@ -101,7 +101,7 @@
  import { tmpdir } from 'node:os';
  import { join, dirname } from 'node:path';
  import { fileURLToPath } from 'node:url';
-@@ -431,3 +432,133 @@
+@@ -431,3 +432,158 @@
    assert.match(leak.stdout, /NOT committed: \.checkpoints\/leak\.md looks like a API key/);
    assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/wt'), sh(wt, 'rev-parse', 'HEAD'));
  });
@@ -135,10 +135,13 @@
 +  assert.match(r.stdout, /no recorded check: crates\/a\/Cargo\.toml\. /);
 +  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), before);
 +
-+  // The right record, but in a note the save leaves out (it looks like a secret): the commit to push holds no record.
++  // The right record on disk, but in a note the save leaves out (it looks like a secret): the commit to push still
++  // holds step 2's record, and the hold reads the commit, not the working tree.
 +  depCheck(repo, `${sha256('one\n')}  Cargo.lock\n${sha256('two\n')}  crates/a/Cargo.toml\nghp_${'a'.repeat(36)}\n`);
++  note(repo, 'test.md', 'step 3\n');
 +  r = run(repo, 'save', 'test', '-m', 'step 3');
 +  assert.equal(r.status, 1, r.stderr + r.stdout);
++  assert.match(r.stdout, /no recorded check: crates\/a\/Cargo\.toml\. /);
 +  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), before);
 +
 +  // Both recorded with their content's sha256: released, and every local commit is pushed.
@@ -207,7 +210,7 @@
 +  assert.throws(() => sh(origin, 'rev-parse', '--verify', 'refs/heads/cs/new'));
 +});
 +
-+test('a lockfile that is a link, or that moves into .checkpoints/, is held whatever the record says', (t) => {
++test('a lockfile that is a link, or that moves into .checkpoints/ under another name, is held', (t) => {
 +  const { repo, origin } = fixture(t);
 +  const before = sh(origin, 'rev-parse', 'refs/heads/cs/test');
 +  writeFileSync(join(repo, 'real.lock'), 'one\n');
@@ -228,10 +231,32 @@
 +  sh(second.repo, 'push', '--quiet', 'origin', 'cs/test');
 +  const pushed = sh(second.origin, 'rev-parse', 'refs/heads/cs/test');
 +  note(second.repo);
-+  sh(second.repo, 'mv', 'package-lock.json', '.checkpoints/package-lock.json');
-+  sh(second.repo, 'commit', '--quiet', '-m', 'the lockfile moved into the notes');
++  sh(second.repo, 'mv', 'package-lock.json', '.checkpoints/moved.txt');
++  sh(second.repo, 'commit', '--quiet', '-m', 'the lockfile moved into the notes under another name');
++  note(second.repo, 'test.md', 'after the move\n');
 +  const moved = run(second.repo, 'save', 'test', '-m', 'moved');
 +  assert.equal(moved.status, 1, moved.stderr + moved.stdout);
-+  assert.match(moved.stdout, /no recorded check: /);
++  assert.match(moved.stdout, /no recorded check: package-lock\.json\. /);
 +  assert.equal(sh(second.origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
++});
++
++test('watch holds a dependency change too, also when only .checkpoints/ seems to be ahead', async (t) => {
++  const { repo, origin } = fixture(t);
++  writeFileSync(join(repo, 'Cargo.lock'), 'locked\n');
++  sh(repo, 'add', 'Cargo.lock');
++  sh(repo, 'commit', '--quiet', '-m', 'a lockfile');
++  sh(repo, 'push', '--quiet', 'origin', 'cs/test');
++  const pushed = sh(origin, 'rev-parse', 'refs/heads/cs/test');
++  note(repo);
++  sh(repo, 'mv', 'Cargo.lock', '.checkpoints/moved.txt');
++  sh(repo, 'commit', '--quiet', '-m', 'the lockfile moved into the notes under another name');
++  note(repo, 'test.md', 'after the move\n');
++  const child = spawn(process.execPath, [SCRIPT, 'watch', 'test', '--every', '0.01', '--for', '1'], { cwd: repo });
++  let out = '';
++  child.stdout.on('data', (d) => { out += d; });
++  t.after(() => child.kill('SIGKILL'));
++  const deadline = Date.now() + 15000;
++  while (!/saved (locally|and pushed)/.test(out) && Date.now() < deadline) await new Promise((r) => setTimeout(r, 200));
++  assert.match(out, /saved locally, NOT pushed .* no recorded check: Cargo\.lock\. /);
++  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
 +});
