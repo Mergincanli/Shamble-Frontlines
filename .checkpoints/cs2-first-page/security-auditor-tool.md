@@ -138,3 +138,38 @@ Plan: read plan.md s6-7 + advisor F2; read the 0.2.130 release page/assets via W
   "does not have a built-in expiration date"; keys rotate "a few times per year"; "You will not know if key material has
   been revoked since you last generated the trusted root file." Page says nothing on release attestations; it does not
   mention TUF. The release attestation here is GitHub's instance even though the repo is public (S9, S20).
+- 22:00 S22 GitHub changelog https://github.blog/changelog/2025-06-03-releases-now-expose-digests-for-release-assets/ :
+  "GitHub now automatically computes and displays SHA256 checksums (digests) for all uploaded release assets." "These
+  digests are generated at upload time, immutable," shown in the Releases UI, REST API, GraphQL API and gh CLI. So S2's
+  digest is GitHub's own server-side value, not the project's claim.
+- 22:00 S23 GNU tar as root defaults to --same-owner and --preserve-permissions (archive owners and setuid/setgid bits kept)
+  [GNU tar manual, from knowledge, not fetched today]; Python 3.13 tarfile filter='data' (PEP 706) refuses absolute paths,
+  "..", links leaving the target and device files, and clears setuid/setgid/sticky and group/other write.
+
+## Reproduce the S10 check (text, no network; derived files go to a new scratch folder <S>)
+  cd .gate/cs2-first-page/tool-check
+  sha256sum wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz.sha256sum            -> e7ae0bd6...93f8
+  python3 -I -c 'import base64,sys;p=base64.b64decode(open(sys.argv[1],"rb").read().strip());t=b"application/vnd.in-toto+json";open(sys.argv[2],"wb").write(b"DSSEv1 %d %s %d %s"%(len(t),t,len(p),p));open(sys.argv[4],"wb").write(base64.b64decode(open(sys.argv[3],"rb").read().strip()))' attestation-payload.webfetch.b64 <S>/pae.bin attestation-sig.webfetch.b64 <S>/sig.der
+  openssl x509 -inform DER -in attestation-cert.der -pubkey -noout > <S>/attester-pub.pem
+  openssl dgst -sha256 -verify <S>/attester-pub.pem -signature <S>/sig.der <S>/pae.bin   -> Verified OK
+
+## Answer summary (21:59 UTC)
+- Verifiable here: PARTLY. Proved: 3 statements agree on sha256 9687f3bb551b9f66f37ed32a40d7913a00f7962db653054e56857bc306c3227f
+  over 2 routes; the release attestation's DSSE signature verifies with its cert key; TSA imprint covers that signature
+  (06:16:01Z); attested commit c93b8ae = crates.io trusted-publishing sha of wasm-bindgen and wasm-bindgen-cli 0.2.130 (run
+  41011884567). Missing: GitHub's Sigstore trusted root (Fulcio Intermediate l1 + root, TSA chain; TUF tuf-repo.github.com,
+  root in gh), a byte-exact bundle (curl 403), and, beyond any tool, build provenance (none published).
+- Recommendation: (b) prebuilt binary pinned on that sha256 + size 11,860,397, with Mustafa's go on the unanchored chain
+  (advisor condition 5), and CI-WASM anchoring it with `gh release verify-asset` on a GitHub runner; (a) only if he wants
+  the pipeline risk removed (254-entry lock, 17 proc macros by name, ~30-40 build scripts; `--no-default-features` drops TLS).
+- Severities: Medium unanchored chain (condition 5 not completable here); Medium residual no-provenance (no repo lock, no
+  --locked, tag-pinned actions, name-only diff); Medium unpacking as root without --no-same-owner/--no-same-permissions,
+  allow-list, size bound, or a per-run binary hash; Low .sha256sum same-origin + "gh-release/" name prefix.
+- For memory (not written: the brief allows only this notes file): GitHub immutable-release attestations = Sigstore bundle
+  v0.3 from GitHub's own instance (cert "GitHub, Inc./Attester", SAN https://dotcom.releases.github.com, RFC 3161 TSA, no
+  Rekor), predicate https://in-toto.io/attestation/release/v0.2; here the attestation URL is 403 for curl but WebFetch reads
+  it; DSSE check works with python3 -I + openssl; anchoring needs GitHub's trusted root (not here).
+- Correction: the typed time labels from S11 on ran ahead of the clock by up to 4 minutes; the `date -u` line printed with
+  each write is the true time (S11 21:42:42 ... S22 21:57:30). S23 now CONFIRMED locally from `tar --help` (GNU tar 1.35):
+  "--same-owner ... (default for superuser)", "-p, --preserve-permissions ... (default for superuser)"; this container
+  runs as root, so the plan's extraction must pass --no-same-owner --no-same-permissions.

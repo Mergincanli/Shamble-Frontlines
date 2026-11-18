@@ -5,7 +5,9 @@ from engine-architect's draft (`cs2-first-page/plan-draft.md`, Opus 5.5 at effor
 the notes at commit f167f061; its sources: `cs2-first-page/engine-architect-plan-notes.md`). What the main session
 changed is listed in section 20; everything else is the draft's text. **Revision 2, 2026-11-18 21:34 UTC (from the clock):** the
 advisor agent's plan review (APPROVE with eight conditions, `cs2-first-page/advisor-plan.md`) is worked in; section 22
-says where each condition is met. For the build. Nothing is built. No library was fetched, installed or built for this plan: documentation and registry pages
+says where each condition is met. **Revision 3, 2026-11-18 22:00 UTC:** the verifier's check of the web facts (PASS after four
+corrections) and security-auditor's reading on the wasm-bindgen tool's proof of origin (provable here only in part:
+question TOOL-SOURCE) are worked in. For the build. Nothing is built. No library was fetched, installed or built for this plan: documentation and registry pages
 were read, and four addresses were asked for their headers only (section 6). Base: main
 b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60); the branch is level with it. Line numbers are those of the
 working tree on 2026-11-18. His words that order this change-set: `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md`
@@ -28,11 +30,12 @@ working tree on 2026-11-18. His words that order this change-set: `cs2-first-pag
   its security wait the small server, the Worker's pure modules and the build script's checks · 3 the answer applied
   and the tool installed · 4 the bindings and the build · 5 the Worker's entry and the boundary tests · 6 the page ·
   7 the browser tests · 8 readings, planted defects, docs, the zip, reviews.
-- **Open questions for Mustafa:** RNG-CRATE, WB-HEALTH, DEPART-2 and CI-WASM (section 16). OVERFLOW-3P and SIZE-2 are
+- **Open questions for Mustafa:** RNG-CRATE, WB-HEALTH, TOOL-SOURCE, DEPART-2 and CI-WASM (section 16). OVERFLOW-3P and SIZE-2 are
   no longer questions: the plan follows the register row and the build plan's stop line (section 16, at its end).
 - **What holds which step.** Steps 0 and 1 need the advisor agent's APPROVE only, which is given: step 1's code stands
   under every answer, and RNG-CRATE (a) or (b) only adds to it. Step 2, the dependency step, waits for his answers to
-  RNG-CRATE, WB-HEALTH and DEPART-2. CI-WASM holds no step.
+  RNG-CRATE, WB-HEALTH and DEPART-2. The tool's download and first run (steps 3 and 4) wait for TOOL-SOURCE. CI-WASM
+  holds no step.
 - **Where the build plan is wrong or out of date for change-set 2:** twelve points (section 17). The largest: OQ-0002-7
   (is wasm-bindgen's new home healthy) must be read before wasm-bindgen enters, and the build plan places it nowhere;
   rand itself no longer depends on ADR 0004's random-number crate (rand 0.10 uses `chacha20`); the crate keeps a home
@@ -76,7 +79,9 @@ The loopback and its four messages, every tick on the newest post, and the first
    address the small server prints. Step 1's code stands under every answer (RNG-CRATE (a) or (b) adds the streams'
    state to the world and its bytes after step 3) and starts on the advisor agent's APPROVE. Step 0's reading is done
    (`cs2-first-page/oq-0002-7-reading.md`): it ran between 21:04:49 and 21:07:52 UTC, before the APPROVE, as reading
-   and notes only. CI-WASM holds no step.
+   and notes only. **TOOL-SOURCE before the tool is downloaded or run** (steps 3 and 4): the advisor agent's condition 5
+   says "if it cannot be verified, stop and ask Mustafa", and security-auditor's reading is that the origin can be
+   proven here only in part. CI-WASM holds no step.
 4. **main taken in: met.** The branch is main b763ba3 plus this checkpoint's commits.
 5. **The "Lane requests" issue (#59): read** on 2026-11-18 at 20:54 UTC with the GitHub tools: no comment. Only
    comments by the `Mergincanli` account count, and none is his word.
@@ -264,8 +269,8 @@ network cut with loopback up. This change-set edits no line of it, so its own fi
 - `client/harness/frame-times.ts` (`FrameTimes`) and `harness/run-header.ts` (`runHeader`: machine, browser, display
   and commit for every result row, PM-0002-1).
 - `client/serve.mjs`: `createServer({ root, port })` and a `main()` that runs only when the file is executed.
-- `client/scripts/build.mjs`: `lockedWasmBindgenVersion(lockText)`, `checkCli(version, locked)`, `sizeTable(files)`,
-  `main()`.
+- `client/scripts/build.mjs`: `lockedWasmBindgenVersion(lockText)`, `checkCli(version, locked)`, `checkCliFile(path, sha256,
+  size)` (before any run of the tool), `sizeTable(files)`, `main()`.
 
 ## 6. New libraries
 Versions were read from the registries on 2026-11-18 (section 19). The exact set of new lockfile entries comes from the
@@ -341,14 +346,32 @@ answer; every cargo command takes `--locked`; the checkpoint script holds a push
    by hand: "a plain `git push` is not held" (the background saver does not push commits outside `.checkpoints/`:
    `checkpoint.mjs:226`). Only then: `npm ci --ignore-scripts`, the tool's route below, and the first build that holds
    the new crates.
-5a. **The tool's route** (the advisor agent's condition 5; it is code from the internet that no lockfile covers):
-   (1) the tarball is downloaded into a new empty folder under `.gate/`; (2) its sha256 is compared with the value
-   security-auditor's answer recorded, before anything else reads it; (3) its origin is proven against the release's
-   attestation before any run, `--version` included, by the procedure security-auditor's answer names; (4) the
-   archive's member list is read first, and an absolute path, a `..`, a link or a member the answer did not expect
-   stops the step; (5) it is unpacked into a new empty folder, `.gate/tools/wasm-bindgen-0.2.130/`, and the unpacked
-   binary's sha256 goes into `wasm-bindgen-cli-check.md`. **If the origin cannot be proven here, the step stops and
-   Mustafa is asked**; no other source is used without a security answer of its own.
+5a. **The tool's route** (the advisor agent's condition 5; it is code from the internet that no lockfile covers).
+   What the release offers and what can be checked here is in `cs2-first-page/security-auditor-tool.md`
+   (security-auditor, Opus 5.5 at effort max, 2026-11-18): the release is marked immutable by GitHub; the tarball's
+   sha256 is 9687f3bb551b9f66f37ed32a40d7913a00f7962db653054e56857bc306c3227f by three statements that agree (the
+   project's `.sha256sum`, the digest GitHub states for the file, and GitHub's signed release statement, whose
+   signature checks against the key in its own certificate); its size is 11,860,397 bytes. **Not provable here:**
+   that the statement's certificate chains to GitHub's root (the tool for that, `gh release verify-asset`, is not
+   usable in this container), and how the project built the binary (no build record exists). So the first run here
+   needs his answer to TOOL-SOURCE. Under its (a), the route is:
+   1. a new folder made with plain `mkdir` under `.gate/` (neither `.gate` nor `.gate/tools` a link); the download
+      with `curl --fail --proto '=https' --proto-redir '=https' --max-filesize 12000000`;
+   2. the size compared with 11860397, then the sha256 with the value above, before any `tar` call;
+   3. the member list read with `tar -tzf` and `tar -tvzf` and recorded: exactly the folder
+      `wasm-bindgen-0.2.130-x86_64-unknown-linux-musl/` with `README.md`, `LICENSE-MIT`, `LICENSE-APACHE`,
+      `wasm-bindgen`, `wasm-bindgen-test-runner` and `wasm2es6js`; regular files and folders only, no name twice, no
+      member above 64 MiB; anything else stops the step;
+   4. only the one member taken out, into the new empty folder `.gate/tools/wasm-bindgen-0.2.130/`, with
+      `--no-same-owner --no-same-permissions --strip-components=1` (this container runs as root, where `tar` would
+      keep owners and permission bits);
+   5. before any run: it is a regular file and no link; `chmod 0555` on the file and its folder; `readelf -h` and
+      `readelf -l` show an ELF64 x86-64 file with no interpreter (static);
+   6. the binary's sha256 and size go into `cs2-first-page/wasm-bindgen-cli-check.md`, and `build.mjs` compares them
+      before every run, `--version` included (a build script runs as the same user and could replace the file). The
+      expected values reach `build.mjs` through the environment (`SHAMBLE_WASM_BINDGEN_SHA256`), read from that notes
+      file here and written in the workflow in CI.
+   No other source is used without a security answer of its own.
 6. **No shared cargo target folder.** The planted-defect worktrees build into folders of their own
    (`CARGO_TARGET_DIR=.gate/cs2-plant-target`). Change-set 1's export tests also stop when they run outside the copy they
    were built in.
@@ -392,8 +415,9 @@ step that changes no manifest pushes normally; step 3's push goes through the ho
    Nothing that imports `three`, its types or the Wasm glue is written before the answer: it could not be checked.
 3. **The answer applied.** The reviewed diff is applied in the main folder (each file's sha256 equal to the reviewed
    one), `dependency-check.md` is written, the files are committed by path, and the checkpoint script pushes them through
-   its hold. Then `npm ci --ignore-scripts`, and the tool by its route (section 7, item 5a): downloaded, its sha256
-   compared, its origin proven before any run, its member list read, unpacked into `.gate/tools/wasm-bindgen-0.2.130/`.
+   its hold. Then `npm ci --ignore-scripts`, and, once TOOL-SOURCE is answered, the tool by its route (section 7, item
+   5a): downloaded, its size and sha256 compared, its member list read, the one binary taken out into
+   `.gate/tools/wasm-bindgen-0.2.130/`, checked without running it, its own sha256 recorded.
    Then `cargo tree -e normal` names every third-party crate compiled into our libraries and tests, against the
    overflow overrides of step 2 (section 16, at its end).
 4. **The bindings and the build.** `sim-wasm`'s `Sim`. The build path of `build.mjs`: it reads wasm-bindgen's version
@@ -518,7 +542,7 @@ git status --porcelain --untracked-files=all -- packages/types/src/generated    
 ```
 **The build (from step 4):**
 ```
-SHAMBLE_WASM_BINDGEN="$PWD/.gate/tools/wasm-bindgen-0.2.130/wasm-bindgen" node packages/client/scripts/build.mjs
+SHAMBLE_WASM_BINDGEN="$PWD/.gate/tools/wasm-bindgen-0.2.130/wasm-bindgen" SHAMBLE_WASM_BINDGEN_SHA256=<the binary's recorded sha256> node packages/client/scripts/build.mjs
 SHAMBLE_WASM_BINDGEN="$PWD/.gate/tools/wasm-bindgen-0.2.130/wasm-bindgen" node packages/client/scripts/build.mjs --production --out-dir .gate/cs2-first-page/dist-prod
 ```
 **TypeScript** (the strict flags of CI-TYPES, `toolchain.yml` :93, with each package's own `lib` and `types`, as ADR 0002
@@ -566,7 +590,8 @@ each must fail the named check, and its control must pass:
 4. a header field added in Rust without regenerating (PM-0002-16) → `generated_layout_is_current` fails, and the
    boundary test's `checkLayoutHash` refuses the Rust-written block as `layout-hash`;
 5. a tool one patch off: a stand-in printing `wasm-bindgen 0.2.129` (PM-0002-18) → the build script exits 1 before it
-   writes any binding; control: 0.2.130 passes;
+   writes any binding; control: 0.2.130 passes; and a tool file whose sha256 is not the recorded one → the build
+   script exits 1 before it runs the file at all;
 6. a misspelt field name in the writer's lookup → the build fails at compile time;
 7. a 64-byte typed array allocated per frame in the page's block handler (PM-0002-7's bite) → `allocation` reports it;
 8. a Worker that runs the hidden gap instead of rebasing (PM-0004-70's bite) → the visibility check sees the counter
@@ -789,6 +814,31 @@ arithmetic on the plan's estimate, not a measurement.
 - Recommendation: (a). The pin and the tool check are the guard for exactly this missing promise, and the project is
   active.
 
+**TOOL-SOURCE: the origin of wasm-bindgen's command-line tool can be proven in this container only in part. May it
+run here on that proof?**
+- Why it matters: the tool is a program from the internet that no lockfile covers, it runs with this container's
+  full rights at every build, and your rule is that no unreviewed code fetched from the internet is run. The advisor
+  agent's condition on this plan: if its origin cannot be verified before its first run, stop and ask you.
+- What was found (security-auditor's reading of 2026-11-18, `cs2-first-page/security-auditor-tool.md`): wasm-bindgen
+  publishes the tool as a ready-built program in its release 0.2.130, which GitHub marks as unchangeable. Three
+  statements agree on the file's checksum: the project's own checksum file, the checksum GitHub states for the file,
+  and a statement about the release that GitHub signed. Here I can check that the download equals that checksum, and
+  that the signature fits the key inside the statement. Here I cannot check that this key belongs to GitHub: the
+  program that does that check (`gh release verify-asset`) is not usable in this container. And nothing, anywhere,
+  records how the project built the program from its source. security-auditor rates what remains as Medium, and
+  compares it with how the Rust toolchain we already run is checked (a checksum from a list, over an encrypted
+  connection).
+- Options: (a) yes: the ready-built program, pinned by that checksum and by its size, unpacked by the careful route
+  of section 7 (item 5a), its own checksum compared before every run; and the full check against GitHub's key added
+  to CI when CI starts building the Wasm (CI-WASM), so that every later run there proves it; (b) build the tool here
+  from its published source instead. That removes the trust in the project's release machinery, but it needs a
+  security check of about 250 crates first (the library itself brings about 5), about 50 of which run code while
+  building; it costs days, and the same build again in CI; (c) wait: first a one-off CI job that runs GitHub's own
+  check on the file (a CI edit, which I ask of you with its exact text), and only after it has passed does the tool
+  run here.
+- Recommendation: (a), which is security-auditor's. (c) is the cautious middle if you want the full proof before
+  the first run; it costs one more round between us.
+
 **CI-WASM: how does CI start building and testing the new parts (the Wasm bindings, the Worker's tests on the real
 Wasm, the type check of the two new packages)?**
 - Why it matters: until a CI edit, CI runs none of these and they are checked by hand; each CI edit is yours to approve
@@ -815,7 +865,7 @@ Wasm, the type check of the two new packages)?**
      main.
   5. Two pieces of work are added that the build plan places nowhere: the reading of wasm-bindgen's health (OQ-0002-7)
      before wasm-bindgen enters, and the way its command-line tool reaches this container (one download from the
-     project's own release, after the security answer on it).
+     project's own release, by the route TOOL-SOURCE decides).
   6. Under RNG-CRATE (c), the card's "seeded random streams" move to change-set 3 and change-set 2 keeps the seed's
      path only. It is listed here for completeness: your answer to RNG-CRATE decides it.
 - Options: (a) yes, all six; (b) yes, except the ones you name; (c) no: the build plan's text stands, and I come back
@@ -923,7 +973,11 @@ and at the end of the single-quoted script, after the last `npx --no -- tsc` lin
               npx --no -- tsc --ignoreConfig $common --lib es2023,webworker --types vite/client $worker packages/sim-worker/pkg/sim_wasm.d.ts
               npx --no -- tsc --ignoreConfig $common --lib es2023,dom,dom.iterable --types vite/client $client
 ```
-To be confirmed on the scratch run before the text is put to him: the tarball's inner folder (`--strip-components=1`
+Since security-auditor's reading (section 7, item 5a) the final text also gets: `gh release verify-asset 0.2.130
+"$RUNNER_TEMP/$wb_file" --repo wasm-bindgen/wasm-bindgen` after the sha256 check and before any run (the full check
+against GitHub's key, which this container cannot make); the size check; the member list against the six expected
+names; only the one binary taken out; the binary's own sha256 given to `build.mjs`. To be confirmed on the scratch
+run before the text is put to him: the tarball's inner folder (`--strip-components=1`
 assumes one top folder), and whether `vite/client` resolves inside the cut. The lines that type-check the tests are
 added the same way once the scratch run shows which flags they need.
 
@@ -1002,6 +1056,11 @@ The draft stays beside this file, byte for byte (`cs2-first-page/plan-draft.md`)
     the Brave checklist (the pause line, two padded runs); section 16 (WB-HEALTH in; OVERFLOW-3P and SIZE-2 out, with
     the reasons); section 17, points 13 to 15; section 22.
 
+12. **Revision 3:** RNG-CRATE's finding as the verifier corrected it (the order of the comments; the three facts
+    that speak for `rand_chacha`'s home in the project; the default feature of `chacha20`; "at least twice"), and its
+    recommendation narrowed to (c), with the crate asked at change-set 3's plan; TOOL-SOURCE and the tool's fuller
+    route (section 7, item 5a; step 3; `checkCliFile`; planted defect 5; section 18's note).
+
 ## 21. Records due with this change-set (beyond section 4.2's docs row)
 - `docs/DECISIONS.md`, by script, never retyped: his message of 2026-11-18, 20:20:09 UTC (his go on #60, WRITE-MODE
   (a), REC-OLD (a) with one limit, the order of work), then his answers to this plan's questions as they come. His
@@ -1029,8 +1088,8 @@ with eight conditions.** Step 1 may start; nothing of step 2 before his answers 
 | 1. OVERFLOW-3P reworded, the register row quoted word for word, or the row followed with its cost measured and no question (F1) | before the questions go to him | the row is followed: section 16, at its end; the manifest text of step 2; steps 3 and 4; section 9; section 17, point 15 |
 | 2. WB-HEALTH in section 16 and in "what holds which step" | before the questions | section 16; section 0; section 3, item 3 |
 | 3. Part 15.2 kept, or both departures listed: the interface members (F3) and the `e2e` folders (F7) | before the questions | Part 15.2 is kept: 4.1's `picture.ts` row; 4.2's `e2e` rows; step 7; 4.4 |
-| 4. The verifier spot-checks the key claims of RNG-CRATE and of the wasm-bindgen reading at their sources (F6) | before the questions | `cs2-first-page/verifier-claims.md` (its result is written into the card) |
-| 5. The tool's route: sha256 before unpacking, the member list, a new empty folder, the origin proven before any run, stop and ask him if it cannot be (F2) | before step 3 | section 7, item 5a; step 3. security-auditor's reading on what the release offers as proof: `cs2-first-page/security-auditor-tool.md` |
+| 4. The verifier spot-checks the key claims of RNG-CRATE and of the wasm-bindgen reading at their sources (F6) | before the questions | `cs2-first-page/verifier-claims.md`: FAIL on the first read (two Mediums, two Lows), all four corrected in section 16 and the reading; PASS on the re-check (21:50 UTC), its three wording Lows fixed too |
+| 5. The tool's route: sha256 before unpacking, the member list, a new empty folder, the origin proven before any run, stop and ask him if it cannot be (F2) | before step 3 | section 7, item 5a; step 3. security-auditor's reading (`cs2-first-page/security-auditor-tool.md`): the origin is provable here only in part, so the condition's last clause applies and it goes to him as TOOL-SOURCE (section 16) |
 | 6. The lockfile rule allows npm's flag-only changes and lists them (L4) | before step 3 | section 7, item 3 |
 | 7. netcode-architect in the round; art-director called, or the reason written (F4, L9) | before the review round | section 12 |
 | 8. The padded runs in the Brave checklist, and hidden-tab steps he can check (F5, L8) | before the Brave check | section 13, steps 6, 7 and 10; step 7 of section 8 (the pause record); section 9's readings |
