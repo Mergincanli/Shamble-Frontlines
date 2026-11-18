@@ -1,4 +1,15 @@
-# MAIN-60: take main b763ba3 into the netcode branch (plan, 2026-11-18 23:4x UTC)
+# MAIN-60: take main b763ba3 into the netcode branch (plan, 2026-11-18 23:2x UTC)
+
+## As approved
+The advisor's review (advisor-main-60.md, 162 lines, read in full; 23:25-23:40 UTC): **APPROVE WITH CONDITIONS C1-C6**
+on this plan's first text (sha256 dc8a1e73…). Applied word for word, they need no new review. In short: C1 H0 read in
+step 1 (HEAD and the remote branch equal, after the saver's last save), and step 4 checks HEAD^1 = H0 and `git diff
+--quiet H0 HEAD -- spikes/`; C2 the card's resume line before TaskStop, the saver's end confirmed, and a foreground save
+with the pre-checks again if its last save left anything; C3 the guard's full pathspec on origin/main...HEAD in the
+pre-checks; C4 the merge exits 1 with STATUS.md its one CONFLICT and 49 status lines (UU 1, A 24, M 24), git's message
+carries "# Conflicts:" lines (cosmetic), three whole-tree checks after the commit, and the base run held to the light
+run's bar; C5 a save that does not push stops (nothing pushed by hand), and no save from step 2 to the push; C6 these
+fixes. The conditions' own words govern where this summary is shorter.
 
 ## Why
 MAIN-52, Mustafa's words (history.md:2055-2057; the reading :2082-2086): take main in when main changes code, CI or
@@ -9,8 +20,11 @@ ruling R4 (advisor-u4f-stop.md:167-190): now, before his answer on SIZE-U4F and 
 MAIN-54 (main-54-plan.md; its conditions C1-C7, history.md:2533-2541, kept here).
 
 ## Facts checked (23:2x-23:4x UTC, read only)
-- origin/main b763ba3e5f34c67fc4f875cfbd9266167fb095f3; HEAD = origin/claude/netcode-proof-test-plan-hcky5g =
-  4ec4a9e48d8dca08e9118eee5daf5656c846446a; merge base 82c605e2e8a7f284e6925718368d3fe569f89ae9.
+- origin/main b763ba3e5f34c67fc4f875cfbd9266167fb095f3; HEAD = the remote branch = 4ec4a9e at the plan, 20b3b33 at
+  the review (cf4eee5 and 20b3b33 are checkpoint-only commits); H0 is read at step 1 (C1); merge base
+  82c605e2e8a7f284e6925718368d3fe569f89ae9.
+- F15 (the review's): main edits ADR 0004 (the PM-0004-34 row) and ADR 0006 (+3 lines) and none of the 81 marks' rows
+  (each hashed on HEAD and on main, equal to marks.json's).
 - `git diff --shortstat 82c605e origin/main`: 49 files, +6,835 / -137; 24 added (`--diff-filter=A`), 0 deleted.
 - `git diff --name-only 82c605e origin/main -- spikes/ docs/design/`: empty (U4f's 29 files untouched).
 - `git diff --stat 82c605e HEAD -- .claude/ CLAUDE.md AGENTS.md .github/ tools/`: empty. So the guard lets a plain
@@ -41,8 +55,8 @@ MAIN-54 (main-54-plan.md; its conditions C1-C7, history.md:2533-2541, kept here)
    changes. Grep the file for `^<<<<<<<|^=======|^>>>>>>>`: none. Then `git add docs/STATUS.md`.
 4. (C3) `git commit --no-edit`: git's own merge message, no attribution lines (-m and -F are not used; amend is
    refused); the card save's commit at step 6 carries the MAIN-52 record and both attribution lines. Then, each
-   alone: `git rev-parse HEAD^1 HEAD^2` = 4ec4a9e and b763ba3; `git diff --stat origin/main HEAD -- .claude/ CLAUDE.md
-   AGENTS.md .github/ tools/` empty (the kit equals main's); `git diff --quiet 4ec4a9e HEAD -- spikes/` exit 0;
+   alone: `git rev-parse HEAD^1 HEAD^2` = H0 and b763ba3 (C1); `git diff --stat origin/main HEAD -- .claude/ CLAUDE.md
+   AGENTS.md .github/ tools/` empty (the kit equals main's); `git diff --quiet H0 HEAD -- spikes/` exit 0;
    `git diff origin/main HEAD -- docs/STATUS.md` shows the #40 row alone.
 5. Checks on the merge commit before any push; outputs under .gate/main-60/, saved by Write where a command prints:
    a. (C5) `node tools/gate.mjs --no-smoke`: GATE PASS (smoke: CI's, on the pushed head).
@@ -61,13 +75,19 @@ MAIN-54 (main-54-plan.md; its conditions C1-C7, history.md:2533-2541, kept here)
 ## Stop rules
 - Any conflict beyond docs/STATUS.md, any staged change beyond main's 49 files and the #40 row, any check FAIL, or a
   guard ask or refusal: stop; nothing pushed; the card states it; the advisor rules. A merge in progress stays as it is
-  (no `git merge --abort`) until that ruling; no save runs during it (the saver is stopped; a partial commit fails).
+  (no `git merge --abort`) until that ruling; no save runs from step 2 to the push, the card updated by Edit only
+  (C5 (b): `save` builds its commit with commit-tree on HEAD, so a save during the merge would succeed, move the
+  branch under MERGE_HEAD, and a foreground save would push it). A card save that prints "NOT pushed" or exits
+  non-zero stops; nothing is pushed by hand (C5 (a)).
 - A call that would ask Mustafa is named in the chat before it is sent (his words of 2026-11-16 21:50).
 
 ## Risks
 - Medium: from step 2 to step 4 the main folder holds a merge in progress; the steps run back to back.
 - Low: main's kit text lands in the main folder at once (CHECKPOINTS.md, checkpoint.mjs and its tests); no settings,
   hook or agent file changes, so the running session's rules do not move.
+- Low (C6): from the merge on, main's checkpoint.mjs holds any push of this lane that changes a spike `Cargo.toml`,
+  `Cargo.lock` or `package.json` until security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md`
+  exist (DEP-HOLD; on the card's Rules in force). U4f's snapshot has none (its 29 files).
 
 ## Change type, tier, size
 - A merge of main: main's reviewed and merged text (49 files, +6,835 / -137) and one hand-resolved conflict line (this

@@ -6861,3 +6861,16 @@ Build U4f. My size stop stays: past 6,000 added lines the build stops and I get 
 - **SIZE-CHECK at builder 2's end (P18):** 5,515 (builder 1 3,753, builder 2 +1,762) beside M's 3,000 and the 6,000
   stop; tests +67 / +84 against 2.10's +119 / +134 (6 of 67 negative cases): the rest in the unbuilt rows. Part-clean
   before builder 3 (P27): free 4,623 → 11,896 MiB (.gate/u4f-b3/clean-shared.log, 18:07:04 UTC, exit 0).
+
+## Card blocks moved 2026-11-19 before MAIN-60 (card_trim_1119b.py; from the card's 'Now: U4f')
+- **Builder 1 (11:46-13:13 UTC): a PARTIAL build, by its own stop** (notes u4f-build.md, here; return in the chat):
+  built and tested npt-room, npt-client (ClockSync, the controller, carry 80 (b)-(e)), the Pong's `server_ns`, P33's
+  fix, npt-sim's two bite sites, the lab's core; not built (notes :162-172): -21's cheats and suites, twins,
+  attribution, -47's suite, -22's series, the cap runs, c-u4f-*.mjs, 14 tests, 3 plants. Snapshot wip/u4f-build.patch
+  92fc99aa9f01aebf…, 224,208 bytes, 24 files, 3,753 added / 248 removed; end checks x2 (.gate/u4f/end-check-1.log,
+  -2.log): all 11 steps pass, 605 measured (+53), 701 bites (+69), redact 313 items; no marks.json or judge file;
+  SERIES.md +10 / -0 (5 report-only rows, read in full).
+- **Builder 2 (13:45-17:59 UTC; cut 14:06:57 to about 16:38): PARTIAL, by its own working room, not the size stop**
+  (notes u4f-build.md :310-690; return in the chat): B1 (the ruling's fixes), B2 (-20's rest; plants f26 x2, f27, D14),
+  B3 (the cap), B4 (-47), B5 (-22; 2.5's counts at every session end), B6 (c-u4f-r2.mjs, c-u4f-runs.mjs, their lines by
+  hand), B7 (-21's clamp), B8's lag switch; not built (notes :680-690): the fast clock, B9's forged suite, B10.

@@ -6,8 +6,8 @@
   #55-#57 docs; #58 cs1-types, the first v2 code; #60 kit-hold-ci: CHECKPOINTS.md's DEP-HOLD, checkpoint.mjs, a CI
   workflow): code, CI and rules changed, so MAIN-52 takes it in after U4f's end checks, before the panel. PR #40 shows
   a merge conflict since 20:40:46 UTC (expected: docs/STATUS.md :28-29; keep both rows).
-- **Last update:** 2026-11-18 23:20 UTC: U4f AT HIS SIZE STOP (6,213 added; end checks A2 and B pass; snapshot
-  74ae26aa); the advisor's stop ruling in (lean (a)); SIZE-U4F to him in the day's message; MAIN-60 next, plan first.
+- **Last update:** 2026-11-18 23:4x UTC: U4f AT HIS SIZE STOP (6,213 added; snapshot 74ae26aa); SIZE-U4F sent to him;
+  MAIN-60 APPROVED WITH CONDITIONS C1-C6 and running (its resume line in Running work).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -47,6 +47,9 @@
   most; Opus 5.5 at xhigh for netcode; the advisor is a general-purpose agent reading `git show
   origin/main:.claude/agents/advisor.md`; commits end with the Co-Authored-By and Claude-Session lines; the five U4
   briefs go to the advisor before their builds; carries word for word from u4s-carries.md, met by number in reports.
+- **DEP-HOLD (main's CHECKPOINTS.md §3, his of 2026-11-18; on this branch from MAIN-60's merge):** a save that changes a
+  `Cargo.toml`, `Cargo.lock` or `package.json` against the remote branch (unless equal to main's) is held until
+  security-auditor's answer and `.checkpoints/netcode-proof-test/dependency-check.md` exist; never push by hand.
 
 ## Now: U4f (clock and commands; u4-build-plan.md §5 :805-816; size M)
 - **The brief, filled for the build:** `.checkpoints/netcode-proof-test/u4f-brief.md`, sha256
@@ -67,13 +70,6 @@
   report names it in a line of its own with who reviewed it** (the advisor's A1; read by the advisor and the
   test-engineer); no marks.json, judge file or existing SERIES.md row may change: if the build needs one, stop and ask
   him; "Build U4f"; his size stop past 6,000 added lines stays.
-- **Builder 1 (11:46-13:13 UTC): a PARTIAL build, by its own stop** (notes u4f-build.md, here; return in the chat):
-  built and tested npt-room, npt-client (ClockSync, the controller, carry 80 (b)-(e)), the Pong's `server_ns`, P33's
-  fix, npt-sim's two bite sites, the lab's core; not built (notes :162-172): -21's cheats and suites, twins,
-  attribution, -47's suite, -22's series, the cap runs, c-u4f-*.mjs, 14 tests, 3 plants. Snapshot wip/u4f-build.patch
-  92fc99aa9f01aebf…, 224,208 bytes, 24 files, 3,753 added / 248 removed; end checks x2 (.gate/u4f/end-check-1.log,
-  -2.log): all 11 steps pass, 605 measured (+53), 701 bites (+69), redact 313 items; no marks.json or judge file;
-  SERIES.md +10 / -0 (5 report-only rows, read in full).
 - **The advisor's ruling** (advisor-u4f-build1.md, 283 lines, sha256 da98295e0d0eae7c…, read in full): **APPROVE the
   continuation with conditions.** R2 (g): the room counts from the tick it runs next, 2.4's anchor, so the frozen value
   and its meaning hold (nothing to him; the row quotes the frozen sentence, line 8). New Mediums: F1 the fast clock's
@@ -84,10 +80,6 @@
   at most about 400 lines. R4 build to his 6,000 stop; at the first block end past it, nothing more but the end checks;
   the three lines then, in that day's message, first line "stopped on you": (a) split U4f (close at -20, -47 and -22;
   -21 its own unit) or (b) go on; the advisor's provisional lean (a). Its 22 lines (:162-246) are builder 2's.
-- **Builder 2 (13:45-17:59 UTC; cut 14:06:57 to about 16:38): PARTIAL, by its own working room, not the size stop**
-  (notes u4f-build.md :310-690; return in the chat): B1 (the ruling's fixes), B2 (-20's rest; plants f26 x2, f27, D14),
-  B3 (the cap), B4 (-47), B5 (-22; 2.5's counts at every session end), B6 (c-u4f-r2.mjs, c-u4f-runs.mjs, their lines by
-  hand), B7 (-21's clamp), B8's lag switch; not built (notes :680-690): the fast clock, B9's forged suite, B10.
 - **Builder 3 (18:10-22:59 UTC): AT HIS SIZE STOP** (notes u4f-build.md :692-866; its stop record :827-866; return in
   the chat): built B8's fast clock (f19, f37, U4F-Q11 (iii) (c)'s test, p3, p9, p16, p20) and B9a (npt-bots' forgers
   of kinds 1, 2, 4, 5, 6; f15's five). **6,213 added**, 307 removed (final snapshot 74ae26aa…, `git apply --numstat`;
@@ -176,9 +168,12 @@
 - **Builder 3 ENDED 22:59 UTC at the stop** (agent a0825a5a2491eb175): worktree
   `.claude/worktrees/agent-a0825a5a2491eb175` (u4f-build3 at 07289a4, uncommitted), kept with builders 1's and 2's; its
   final snapshot wip/u4f-build.patch 74ae26aa29c229d6…, 380,276 B, 29 files: the one snapshot until the merge.
-- **The advisor's stop ruling ENDED 23:18 UTC** (agent ad617f46f49185e8c). **MAIN-60's plan** (main-60-plan.md) is
-  with the advisor from 23:25 UTC (agent a43d2f5b263b6c069; its review to advisor-main-60.md; on a cut: SendMessage);
-  then the take-in by its steps, then R3 (iii)'s four hand runs.
+- **MAIN-60 approved (advisor-main-60.md), running steps 1-7.** If `git rev-parse -q --verify MERGE_HEAD` prints
+  b763ba3, the merge is in progress: no save, no `git merge --abort`, no reset. If `git diff --name-only
+  --diff-filter=U` names docs/STATUS.md, resume at step 3; otherwise resume at step 4. If HEAD^2 is b763ba3 and HEAD
+  is not on the remote yet, resume at step 5. Anything else: the advisor rules. (The review: agent a43d2f5b263b6c069,
+  23:25-23:40 UTC, APPROVE WITH CONDITIONS C1-C6; the stop ruling's agent ad617f46f49185e8c ended 23:18.) Then R3
+  (iii)'s four hand runs.
 - The saver b4p5xbtmj runs from 22:39 UTC (bgig20ts2 ran 18:11 to about 20:01, its window) (`node
   .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Claude-Session: …"`, run_in_background, timeout
   7200000; its window ends about 00:29: restart it while agents run). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5
