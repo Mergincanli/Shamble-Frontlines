@@ -168,8 +168,10 @@
   `/home/user/Shamble-Frontlines/.claude/worktrees/agent-a856ba7ccb7d032c3`, branch u4f-build at 827518b, uncommitted
   (final snapshot wip/u4f-build.patch 92fc99aa…), kept as a backup. The advisor (agent ae182eb254c140632) ENDED about
   13:40 UTC with its ruling.
-- **Builder 2: launched after this save** (general-purpose, opus, xhigh, isolation worktree) by the ruling's 22 lines,
-  line 1's worktree replaced (above). **At each check-in:** snapshot its worktree, `python3 -I
+- **Builder 2 RUNS from about 13:45 UTC** (agent aa8301a8782f8f434; general-purpose, opus, xhigh, isolation worktree;
+  resume by SendMessage, or a fresh copy that reads its notes and `git diff` first), by the ruling's 22 lines with
+  line 1's worktree replaced: launch head 2 d1b24c3b21cfd6715bcc45231eed3e17f0a28b17, builder 1's snapshot applied and
+  checked (24 files, 3,753 added) before any edit; its logs `.gate/u4f/w2-*`. **At each check-in:** snapshot its worktree, `python3 -I
   .checkpoints/netcode-proof-test/worktree_patch.py <worktree> .checkpoints/netcode-proof-test/wip/u4f-build.patch
   u4f-build` (the one snapshot then stands for builder 2's worktree, builder 1's work included; WIP-CLEAN deletes it at
   the merge), then save the card; on a cut, check the worktree against its last snapshot first.
