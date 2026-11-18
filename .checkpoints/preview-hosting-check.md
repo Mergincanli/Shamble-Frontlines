@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 19:15 Amsterdam (18:15 UTC)
+- **Last update:** 2026-11-18 19:19 Amsterdam (18:19 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -432,7 +432,6 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      now equals the secret so GitHub masks it; a fix of deploy.yml left for step 2.6); the environment link on the pull
      request page not seen (only the log's "Evaluated environment url"): the first reading of sitting 1.
 
-## Current step
 22. The first `probe` run on `main` (schedule ":23"; none by 15:04:41 UTC), read by a check-in (send_later), then Day 1
    prepared. The probe's outcomes → next action (consultation 16): green with both setup links gone → nothing to do;
    green with a link still serving → a cleanup finding; red → its results file read; a fix needs a pull request to
@@ -537,21 +536,43 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      again; Risk 13 again on its one-off link. Production carried the bite about 2 minutes. All of sitting 1's runs
      are done (results log, "Sitting 1's readings in short"); step 23 is saved as done only after the next
      consultation (his rule).
+   - Closed 2026-11-18 after consultation 19 (18:15:12 UTC): step 22 on the by-hand run (the script works against
+     Cloudflare; the setup upload gone); the silent schedule stays an open finding. Step 23: every run of sitting 1
+     read and tallied against its list (results log); the link count corrected (15 preview links, 24 readings).
+
+## Current step
+24. Sitting 2 (plan Part 3 C) under REVIEWER (b), prepared after consultation 19; first his answer: tonight or
+   tomorrow (the last close fixes the earliest hour of Day 2). Before the first push, settled in writing:
+   - Pacing: deploy.yml has no concurrency group; a branch gets its next push only after its previous run's verify
+     has finished (else a stale branch link gives "no reading").
+   - His look, replaced: before each push, `.github/workflows/` on the branch hashed against the approved hashes and
+     recorded ((d) differs only by the deleted close.yml); after his two merges, `main` re-hashed; after the sitting,
+     every run of the repository tallied against the list.
+   - Case (d): plan Risk 10 (plan.md:1348 on) read and its outcome row written before (d) closes (a cleanup run for
+     (d) would now delete at once, not wait).
+   - The hourly series: if the schedule stays silent, by-hand probes stand in (right after the last cleanup, about an
+     hour later, and at 24 hours), said in the results log; the 24-hour reading is the mark.
+   - The pull-request page's environment link (PM-0006-10's reading): how it is read decided (his screenshot on the
+     list if it needs his eyes).
+   - His list before the first push ("runs that will start"; his two merges with "Delete branch"; the time).
+   - Polling by the artifact list or scheduled check-ins, not the jobs list.
+   - SAFARI-RUN (does not block sitting 2; must finish before Day 2's wall): after the closes; the cause confirmed in
+     the pinned packages first (the error string and whether ending a session clears it); the smallest change, the
+     judging lines untouched; the changed path forced for Chrome in a local run; a branch plus a by-hand start (no
+     pull request: it would upload with the token); head_branch and head_sha checked before reading; the first
+     Windows set counts (written before the run); one entry to him: the reviewed diff, the new branch, the one run.
+   - The 18:23 UTC probe slot read.
 
 ## Next steps
-0. Sitting 1 (step 23): start `round-a`; once plan and build are green and deploy waits, send his list.
-1. The probe's first run (step 22) read and recorded; one probe run read before sitting 2's closes (by hand if needed).
-2. Answered: TOKEN-SCOPE (a), Read stays; Day 1 today, 2026-11-18 (it must be by 2026-11-24: the token ends
-   2026-11-25T22:59:59Z; Day 2's 24-hour reading follows Day 1).
-3. A compaction before Day 1 (get_session at 2026-11-18 about 15:21 UTC: 705,327 of 1,000,000 tokens; automatic at
-   901,600).
-4. Day 1's three sittings as plan Part 3 C (plan.md:378-417; sitting 3 with SA-R4 and SA-R8), each with its list
-   first (his condition 3) and an advisor consultation before sitting 1's list; the environment link on a pull request
-   page read at sitting 2's first test pull request (sitting 1 has no pull request). Sitting 1: round-a (I start it,
-   he approves; then the three links), his Brave checklist steps 1-3 (ADR 0006 :1444-1447), the build count, uploads,
-   bites, then the browsers run (mine), bite-production and restore-production.
-5. Day 2 (the 24-hour reading, the wall, Brave steps 5-8, the revoke, the revoked proof) by 2026-11-25; then the report
-   and the closing docs pull request (DECISIONS.md: his answers word for word); step 2.6's plan with the locked install.
+1. His answer: sitting 2 tonight or tomorrow; then his list (step 24) and sitting 2.
+2. SAFARI-RUN's fix after the closes (step 24's bullet), one entry to him; the browser run on the fix branch before
+   Day 2's wall.
+3. Sitting 3: his re-tick of "Required reviewers" first (a screenshot: Mergincanli as reviewer, the administrator
+   bypass unticked; it blocks sitting 3), then plan Part 3 C sitting 3 with SA-R4 and SA-R8; the reviewer stays on
+   for Day 2.
+4. Day 2 (the 24-hour reading, the wall, Brave steps 5-8, the revoke, the revoked proof) by 2026-11-25 (the token ends
+   2026-11-25T22:59:59Z); then the report and the closing docs pull request (DECISIONS.md: his answers word for word,
+   REVIEWER (b) included); step 2.6's plan with the locked install and one line on a click-free preview design.
 
 ## For the report (the checkpoint is deleted at the end)
 - His point 3 of 2026-11-16, to carry into step 2.6's plan: "For step 2.6, not for this check: plan a locked install (a
@@ -921,6 +942,17 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    blocks sitting 3), Day 2 with the reviewer on (four clicks); his answer saved byte for byte for DECISIONS.md; his
    words on the approvals kept with times for OQ-0006-13; one line for a click-free preview design in step 2.6; the
    "Last update" fixed.
+
+19. 2026-11-18 18:15:12 UTC (called; transcript time), moment 5 (before steps 22 and 23 were saved as done) and moment 1
+   (before sitting 2 under REVIEWER (b)) · Q: may steps 22 and 23 close, and what does sitting 2 need now? · Changed:
+   the summary's link count recounted from the headers files (15 preview links, 24 readings, not 12); every run of the
+   repository tallied against sitting 1's list (10 runs; nothing off the list); step 22 closed on the by-hand run, the
+   silent schedule kept open, the 18:23 slot to read; sitting 2's seven points written before the first push (step
+   24): pacing per branch, the workflow hashes before each push and `main` after the merges, case (d)'s Risk 10 row,
+   the by-hand probes standing in for a silent schedule, the PR-page link's reading, his list after asking tonight or
+   tomorrow, polling by artifacts or check-ins; SAFARI-RUN after the closes (cause confirmed in the packages first,
+   the smallest change, a forced local run in Chrome, a branch and a by-hand start, the first Windows set counts, one
+   entry); to him now: short, the two open findings in a line each and the one question.
 
 ## Running work
 - saver b491gaova (started 2026-11-17 22:22:16 UTC, its log, with the security review): stopped by the harness's background time

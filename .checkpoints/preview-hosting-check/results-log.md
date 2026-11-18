@@ -480,8 +480,9 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   the one-off link https://de1c3e5e.shamble-preview-check.pages.dev/ fails on all 7 paths with "production carries
   X-Robots-Tag noindex": Risk 13 again, as round-a showed. Production carried the planted noindex from the bite's
   upload (between 18:11:02 and 18:11:13 UTC) to the restore's (by 18:13:27 UTC): about 2 minutes.
-- **Sitting 1's readings in short**: Brave steps 1-3 achieved (his word); PM-0006-2: every header as expected on 12
-  preview links and production's own address, the two planted mistakes caught (COEP on the worker; noindex on
+- **Sitting 1's readings in short**: Brave steps 1-3 achieved (his word); PM-0006-2: every header as expected on 15
+  preview links (24 readings: round-a 4, uploads 20; counted with jq from the headers files) and on production's own
+  address (round-a and restore-production), the two planted mistakes caught (COEP on the worker; noindex on
   production), Risk 13 on production's one-off link (twice); PM-0006-3: Chrome, Edge and Firefox as expected on all
   five links (bite caught), Safari 1 reading of 15 (script fault, open); PM-0006-4: Chrome 0 bytes on production's
   second visit, 300 on the no-cache bite (caught), and the header half caught on both links; PM-0006-5: the 26 MiB file
@@ -489,3 +490,9 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   Approvals clicked in sitting 1: 3 (round-a, uploads, bites), one per run whatever its legs; then REVIEWER (b).
 - The hourly probe: the 17:23 UTC slot passed without a scheduled run as well (list of probe.yml runs at about 18:14
   UTC: only run #1, started by hand). Three slots missed since the merge: 15:23, 16:23, 17:23.
+- **Sitting 1's runs against its list** (all runs of the repository, read at about 18:16 UTC: total_count 10): the
+  five listed deploy runs #2 round-a (44347351522), #3 uploads (44358217862), #4 bites (44360058220), #5
+  bite-production (44366750977), #6 restore-production (44367096948); the two that start without him, browsers #1
+  (44364041726) and probe #1 (44355175073, started by hand, told him); all on `main` 2162db55d93f, actor and
+  triggering actor Mergincanli. The other three runs are the rehearsal's and the token check's (before sitting 1).
+  Nothing ran that was not on the list.
