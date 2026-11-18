@@ -12,7 +12,7 @@ index 9c58b9a..b160e1a 100644
  | `JoinAccepted` | room → client | control stream | owner | Sender: the room only, once per accepted `Join`, to that client. npt-client: the size; each value in range; a `FullState` follows on a full-state stream | 256 B (proposed: 2 B length + 1 B type + 3 B slot, team and squad + 2 B mode id + 32 B mode hash + 32 B content hash + 4 B server tick + 4 B tick and snapshot rates = 80 B, rounded up) | built in U4 | row 671; part 11:506 (the room assigns team and squad) |
  | `JoinRejected` | room → client | control stream | owner | Sender: the room only; it then closes the connection. It carries a reason code and nothing else (proposed codes: bad token, bind mismatch, roster full, wrong version, wrong content hash). npt-client: the size | 16 B (proposed: 2 B length + 1 B type + 1 B reason = 4 B, rounded up) | built in U4 | row 671; plan §10.3 |
 diff --git a/spikes/netcode-proof/crates/bots/src/lib.rs b/spikes/netcode-proof/crates/bots/src/lib.rs
-index 47f91ef..7fc33b6 100644
+index 47f91ef..6f7a302 100644
 --- a/spikes/netcode-proof/crates/bots/src/lib.rs
 +++ b/spikes/netcode-proof/crates/bots/src/lib.rs
 @@ -23,6 +23,8 @@
@@ -183,7 +183,7 @@ index 47f91ef..7fc33b6 100644
  fn toward_centre(x: i32, y: i32) -> [i8; 2] {
      let (x, y) = (i64::from(x), i64::from(y));
      let d2 = x * x + y * y;
-@@ -167,14 +290,236 @@ impl Behaviour {
+@@ -167,14 +290,237 @@ impl Behaviour {
              given: 0,
              skipped: 0,
              steering: false,
@@ -222,7 +222,8 @@ index 47f91ef..7fc33b6 100644
 +
 +    /// -21's 1.5x clock (u4f-brief.md 2.6; U4F-Q11 (iii) (c) and (v) (b) as F1 amends it): fire held at a seeded point,
 +    /// the lane's walk at full length, a command at every step once the endpoint holds a snapshot (its host clock's rate
-+    /// is the lab's), each stamped by [`fast_stamp`] under the lead bound `bound` (ticks) in [`Behaviour::outgoing`].
++    /// is the lab's), each stamped by the crate's `fast_stamp` under the lead bound `bound` (ticks) in
++    /// [`Behaviour::outgoing`].
 +    pub fn fast_clock(scene: &Scene, slot: u8, seed: u64, bound: u32) -> Behaviour {
 +        let mut b = Behaviour::new(Kind::Lane, scene, slot, seed).every_step();
 +        b.fast = Some(Fast {
@@ -420,7 +421,7 @@ index 47f91ef..7fc33b6 100644
      /// The open-loop script named `script` (`presses`, `clamp` or `steady`) of `slot` in `scene`, from `seed`;
      /// `None` for another name.
      pub fn script(scene: &Scene, slot: u8, seed: u64, script: &str) -> Option<Behaviour> {
-@@ -221,6 +566,17 @@ impl Behaviour {
+@@ -221,6 +567,17 @@ impl Behaviour {
          let (Some(newest), Some(_)) = (endpoint.newest_tick(), endpoint.slot()) else {
              return false;
          };
@@ -438,7 +439,7 @@ index 47f91ef..7fc33b6 100644
          if !self.every_step && self.last_newest == Some(newest) {
              self.skipped += 1;
              return false;
-@@ -276,7 +632,12 @@ impl Behaviour {
+@@ -276,7 +633,12 @@ impl Behaviour {
          own: Option<([i32; 3], bool)>,
      ) -> Command {
          let k = self.given;
@@ -452,7 +453,7 @@ index 47f91ef..7fc33b6 100644
              self.presses[Command::PRESS_FIRE] = self.presses[Command::PRESS_FIRE].wrapping_add(1);
          }
          let aim = match self.kind {
-@@ -286,10 +647,15 @@ impl Behaviour {
+@@ -286,10 +648,15 @@ impl Behaviour {
          let walk = MOVES[((k / TURN_EVERY + self.phase) % MOVES.len() as u64) as usize];
          let walk = match self.kind {
              Kind::Brawl => self.leash(own, walk),
@@ -469,7 +470,7 @@ index 47f91ef..7fc33b6 100644
              presses: self.presses,
              move_xy: if self.kind == Kind::Clamp {
                  [0, 0]
-@@ -401,7 +767,7 @@ mod tests {
+@@ -401,7 +768,7 @@ mod tests {
              steer,
              "still outside the inner radius"
          );
@@ -478,7 +479,7 @@ index 47f91ef..7fc33b6 100644
          assert_eq!(got, walk, "dead: the walk");
          let (got, walk) = give(None);
          assert_eq!(got, walk, "no complete tick: the walk");
-@@ -466,6 +832,332 @@ mod tests {
+@@ -466,6 +833,332 @@ mod tests {
          }
      }
  

@@ -6842,3 +6842,13 @@ Build U4f. My size stop stays: past 6,000 added lines the build stops and I get 
   .checkpoints/netcode-proof-test/worktree_patch.py <worktree> .checkpoints/netcode-proof-test/wip/u4f-build.patch
   u4f-build` (the one snapshot then stands for builder 2's worktree, builder 1's work included; WIP-CLEAN deletes it at
   the merge), then save the card; on a cut, check the worktree against its last snapshot first.
+
+## Card blocks moved 2026-11-18 at builder 3's size stop (card_trim_1118c.py; from the card's 'Now: U4f' and 'Cuts')
+- **Checked here (18:01-18:05):** snapshot wip/u4f-build.patch 3d341c58e64b3244…, 343,493 B, 29 files (20 changed, 9
+  new), `git apply --numstat` 5,515 added / 302 removed (its count); the runner's tree hashes rebuilt from it equal end
+  checks A and B's (w2-end-check-a.log, -b.log: all 11 steps pass; measured 619 (+67), bites 716 (+84); test step 668.2
+  and 682.9 s against 1,207); no marks.json, README or judge file; SERIES.md +18 / -0 in U4f's new subsection, read in
+  full (13 report-only rows; the reorder row's rule unchanged, D3-1; the lead-bound row quotes the fence exactly).
+- **2026-11-17 19:46 to 22:16 UTC:** "You've hit your org's monthly spend limit · ask your admin for a higher limit ·
+  your 5-hour limit resets 10:10pm (UTC)" (19:46:41.750, the advisor agent's transcript). Resumed 22:15:24 (the
+  check-in); the workflow by resumeFromRunId at about 22:17. Nothing was half done.

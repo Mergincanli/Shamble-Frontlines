@@ -788,6 +788,15 @@ rev 3.3 (sha256 135325a0...) and the main session's prompt (which wins where the
   stop record.
 - End check A starting: `df -h /home/user` 11G avail (73 %); one `-x` runner call, log .gate/u4f/w3-end-check-a.log:
   the six provenance builds (as w2-end-check-a.log's), then `node check.mjs`.
+- **That run stopped by me at 18:35 UTC** (TaskStop, during its third provenance build; the two `--no-run` builds
+  exit 0; no check.mjs step ran; not one of the two counted checks): reading B8f's docs I found
+  `Behaviour::fast_clock`'s doc (public) linking the private `fast_stamp`, which check.mjs's doc step
+  (`RUSTDOCFLAGS=-D warnings`, check.mjs:2032) refuses as builder 2's check 0 showed. Fixed by Edit (plain code text);
+  no other public item of mine links a private one (Grep). No process left (`ps`). Next: `node check.mjs --only doc`
+  (`-x`), then end checks A and B anew.
+- w3-doc.log (`-x`, 18:35:50-18:36:20 UTC): `node check.mjs --only fmt,doc`: fmt PASS, doc PASS (both builds, host
+  and wasm32), exit 0. `df -h /home/user` before end check A: 6.4G avail (84 %). End check A (w3-end-check-a2.log)
+  starting.
 
 ### The stop record (line 5; his size stop past 6,000)
 
