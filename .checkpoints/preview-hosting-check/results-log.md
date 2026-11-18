@@ -410,3 +410,13 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
     digest): "summary: {"records":10,"pass":20,"fail":0,"no_reading":0}", exit 0: every upload passes on its one-off
     link and on the branch link (the branch link read once per record), X-Check-Rule "version-host" on all.
   - Run conclusion: success. The second build-count reading asked of him now.
+- **The build count, second reading**: his screenshot of the project's Deployments page (2026-11-18 17:33:15 UTC,
+  7442b908-6d1c-48ba-a65b-36944fd3247f; his words "When are we done with these hideous tasks"), transcribed:
+  Production main 0354374e "30 minutes ago"; "All deployments": ten Preview rows, branch `uploads`, "preview-check run
+  443582178...", 44dd439a, ff3ec055, 51e10edc, 37ac53a6, a845d2e3, 283bba70, f512e84d, 5b57fa5a ("4 minutes ago"),
+  deb45872, c28fc449 ("5 minutes ago"); then Production main 0354374e, Preview iso-off 6e61a4c4 ("31 minutes ago"), the
+  rest below the screenshot's edge. The ten uploads are listed, matching the records one for one. **No count of builds
+  is shown.** The overview was not read again: at the first reading it had no count field at all (only "Requests
+  today" and "Observability events today"), and he was not asked twice. So PM-0006-7 reads "no count shown" before
+  and after, on the places plan Part 3 C step 3 names; the deployments list shows the ten uploads.
+- `bites` started by the session right after (run_workflow, ref `main`, set `bites`; 204 at about 17:33:50 UTC).

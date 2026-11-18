@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 18:31 Amsterdam (17:31 UTC)
+- **Last update:** 2026-11-18 18:35 Amsterdam (17:35 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -506,6 +506,9 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      second reading; `bites` only after it.
    - `uploads` done (his approval just before 17:27:42 UTC): 10 uploads, verify 20 of 20 pass, run success (results
      log). Next: his second reading (Deployments page and overview); then `bites`.
+   - Second reading (17:33:15 UTC): the Deployments page lists the ten uploads, no count shown; the overview not read
+     again (no count field at the first reading). His words: "When are we done with these hideous tasks" (answered
+     with what remains). `bites` started at about 17:33:50 UTC: deploy run #4, id 44360058220.
 
 ## Next steps
 0. Sitting 1 (step 23): start `round-a`; once plan and build are green and deploy waits, send his list.
