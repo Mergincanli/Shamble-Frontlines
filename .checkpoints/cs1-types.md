@@ -40,7 +40,7 @@
 
 ## Current step
 6. Build. The work so far is committed as ef9741c (12:30 UTC, "work in progress", the head of its own push, with
-   the skip mark; pushed by its exact SHA with the saver stopped; checked at 12:31 UTC: no CI run started, the newest
+   the skip mark; pushed by its exact SHA with the saver stopped; checked right after the push, 12:30 UTC: no CI run started, the newest
    runs on the branch are still 168 and 869 on da22f96). It also holds `packages/types/src/index.ts`, `index.test.ts`
    (they wait for the generated message files) and the package's new description line. No "Lane requests" issue
    exists (12:28 UTC: the only open issue is the Night queue, #16). Earlier note, kept:
@@ -160,6 +160,6 @@
 
 ## Running work
 - saver: background task bafnij7xk, started 12:30 UTC on 2026-11-18 (2-hour limit; the earlier one, b98z35xsq, was
-  stopped at 12:29 UTC for the code push).
+  stopped at 12:30:03 UTC for the code push).
 - agents (1 of 3): the advisor agent on the security answer and the CI miss (started 12:28 UTC). security-auditor
   finished its notes at 12:27 UTC (DONE).
