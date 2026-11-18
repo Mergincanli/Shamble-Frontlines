@@ -7,7 +7,7 @@
   15:38:13 UTC, his label 16:24 Amsterdam; `kit-hold-ci/mustafa-2026-11-18-1624-merge-58.md`, by script).
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/kit-hold-ci) · **Base:** main
   9b4b518f520aa2360a8007dc857ba74b343c8a40 (the merge of #58; the branch was fast-forwarded to it and pushed)
-- **Last update:** 2026-11-18 18:47 CET (from the clock)
+- **Last update:** 2026-11-18 19:05 CET (from the clock)
 
 ## What his words ask (read the file; these are pointers, not his words)
 - DEP-HOLD (a): "Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no
@@ -206,13 +206,31 @@
     - It is a kit edit, so it is asked of him in chat with its exact text (question KIT-FIX); not written before
       his yes.
 
+19. **His answers** (2026-11-18, 18:01:08 UTC; his label 18:52 Amsterdam;
+    `kit-hold-ci/mustafa-2026-11-18-1852-kit-fix.md`, by script, 779 bytes): KIT-FIX "(a), yes, as shown: the text of
+    kit-fix2.diff as it stands in your notes at commit f7e232fb (45 lines, sha256 9197f070...). Write it into the two
+    kit files. With this fix the kit lines are final for this pull request. A later finding on them that is not
+    Critical or High becomes a follow-up." KIT-REMOVED "(a). A manifest that main removed stays held. Put the
+    question on the list for the quality gate v2's plan, together with the line of the approved text that still reads
+    a path beginning with ":" as a pattern." WATCH-60 "(b), no." "The size as you count it, 293 added lines against
+    the stop line of 300, is accepted."
+20. **The fix is written** (18:01 UTC; two copy commands, each asked him): the two files equal
+    `.gate/kit-hold-ci/fix2/`; their diff against the pushed head equals `kit-fix2.diff` hunk for hunk (checked
+    against the file at f7e232fb: 45 lines, sha256 9197f070...). Against main now: 47 + 224 + 10 + 12 = **293** added,
+    2 removed. After it (18:01:45 to 18:02:58): checkpoint tests 33 pass; routine-guard 1107; settings 127;
+    kept-logs 10 (9 pass, 0 fail); gate PASS (--no-smoke); map OK; the probe on the written script: held.
+    Commit 4877599a9b85cfcc10b147a69e44a5276df5837e, pushed 18:03:10 UTC.
+    - The saver stopped (bhcevffhf) and started again on the fixed script: task **b4bg0wkfu** (18:04 UTC; 2-hour
+      limit: restart by about 20:00 UTC).
+
 ## Current step
-19. (17:47 UTC) **Stopped on the kit lines for his answer to KIT-FIX.** Running meanwhile: infra-engineer reviews
-    the workflow edit (its text is final); engine-architect drafts change-set 2's plan. After his yes: write the
-    two kit files (copies of `.gate/kit-hold-ci/fix2/`), check against `kit-fix2.diff`, the tests, commit, push,
-    CI; then security-auditor and test-engineer on that head (one round with infra-engineer's), the advisor agent
-    on the pushed head, the verifier, the docs (DECISIONS by script: now three messages of his), the report, the
-    pull request ready.
+21. (18:05 UTC) Review round 1 on the final text: security-auditor (the kit hold and a security read of the CI
+    edits; `kit-hold-ci/security-auditor-review1.md`) and infra-engineer (the workflow;
+    `kit-hold-ci/infra-engineer-review1.md`) are running; test-engineer starts when a slot is free (engine-architect
+    still drafts change-set 2's plan: three agents at most). By his word a finding on the kit lines below High
+    becomes a follow-up. Meanwhile: read CI on 4877599; the record script for his three messages; the report's
+    draft. Then: the advisor agent on the final head, the verifier, docs-keeper (after taking main in), the report,
+    the checkpoint's deletion in the last commit, the pull request ready with the label needs-mustafa.
 
 ## Next steps
 4. Build (three edits), the script's tests, the real CI runs (a planted change that the compare step fails on; the
@@ -228,6 +246,13 @@
   review (his words on DEP-HOLD's option (c)); CI-CUT part 2.
 
 ## Running work
-- saver: background task bhcevffhf, started 17:18 UTC on 2026-11-18 on the branch's script (2-hour limit).
-- agents: engine-architect drafts change-set 2's plan (started 17:20 UTC) into `kit-hold-ci/cs2-plan-draft.md`, its
-  notes in `kit-hold-ci/engine-architect-cs2-notes.md`; nothing of it is built.
+- saver: background task b4bg0wkfu, started 18:04 UTC on 2026-11-18 on the fixed script (2-hour limit).
+- agents: engine-architect (change-set 2's plan draft, since 17:20 UTC); infra-engineer (review 1, since 17:47
+  UTC); security-auditor (review 1, since 18:04 UTC). To start when a slot is free: test-engineer (review 1).
+
+## For the list of the quality gate v2's plan (his words of 15:38 and 18:01 UTC)
+- A CI check that refuses to build when the lockfile gains an entry with no recorded review (DEP-HOLD's option (c)).
+- CI-CUT part 2.
+- KIT-REMOVED: should a manifest that main removed also pass when a branch takes main in (today it stays held).
+- The line of the approved text that still reads a path beginning with ":" as a pattern
+  (`const entry = git('ls-tree', rev, '--', f);`).
