@@ -55,3 +55,18 @@ B11. DONE and the answer.
 - B2 finding: archive "In flight" newest first at :159 (#57's row, own). Archive "Follow-ups" ends :929 with "From
   change-set 0 (PR #56) and Part 15 (PR #57)" (own, 1aaa067); NO block yet for #58's follow-ups (its STATUS row says
   "for Follow-ups once merged (their text: the report's "Follow-ups")"): add one now that #58 is merged.
+- B3 done (verified against the code at HEAD): checkpoint.mjs:17-24 the "Dependency hold" header paragraph, :26 exit 1
+  "a dependency change is held", :37 DEP_FILE (the five names, any folder), :120-141 heldDependencyFiles (remote
+  branch, else merge-base with origin/main; -z --no-renames; record at <rev>:.checkpoints/<slug>/dependency-check.md;
+  link/submodule held; equal blob on origin/main at the literal path not held), :219 called in save. Tests: 33 test()
+  calls in checkpoint.test.mjs (new ones :443, :492, :527, :540, :570, :591). CHECKPOINTS.md section 3 (:53-74): the
+  bullet "A dependency change is held" at :60-69. toolchain.yml diff vs main: +12 -0 (cache-mode: none after
+  timeout-minutes: 15; SHAMBLE_WRITE_TYPES=1 cargo test + git status compare after the first cargo test; strict tsc on
+  packages/types/src shipped files, then with tests and --skipLibCheck, after tsc --version).
+- B3 facts (gh api, read-only, 18:36 UTC): PR #58 merged_at 2026-11-18T15:39:29Z (commit date of 9b4b518: 15:39:28
+  UTC, 16:39:28+01:00), merge 9b4b518, head 1bfe462, by Mergincanli. Main's CI on 9b4b518 (push, head_branch main):
+  gate run 884 (id 44338178450; jobs gate and smoke success, 15:39:37-15:40:26) and toolchain run 182 (id
+  44338178455, success). Runs 885/183 = this branch's push of the same commit. PR #60: open, draft, created
+  2026-11-18T17:18:51Z, head 2dff689, no label yet. Issue #59 "Lane requests": open, created 2026-11-18T15:41:35Z by
+  Mergincanli. Code commits on the branch: 8bf4bee (kit, 17:18:10), 94c197f (workflow, 17:18:10), 0c0e271 (plant,
+  17:20:38), 415bd73 (take-back, 17:21:54), 4877599 (KIT-FIX, 18:03:10 committer date).

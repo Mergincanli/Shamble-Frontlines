@@ -64,6 +64,17 @@ All runs are on branch `claude/wonderful-hamilton-jdmlnf`, pull request #60, 202
 ```
 - `toolchain`, pull request: run 44357633651, job 134989932210: step 7 "Build and test with the network cut off"
   concluded failure, 17:21:17 to 17:21:21; the job ended 17:21:24.
+  The end of its log (read 18:41:05 UTC, the session's record):
+```
+2026-11-18T17:21:21.2883202Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-18T17:21:21.2883474Z 
+2026-11-18T17:21:21.3433224Z writing the generated types again changed:
+2026-11-18T17:21:21.3433717Z  M packages/types/src/generated/protocol/Join.ts
+2026-11-18T17:21:21.3454391Z ##[error]Process completed with exit code 1.
+2026-11-18T17:21:21.3562921Z Post job cleanup.
+2026-11-18T17:21:21.4243112Z [command]/usr/bin/git version
+2026-11-18T17:21:21.4274301Z git version 2.56.1
+```
 - Tried locally before it (16:51 to 16:52 UTC, a worktree of its own with its own build folder): the plain
   `cargo test --workspace --locked` passed, write mode passed, the two compare lines printed the same two lines.
 
