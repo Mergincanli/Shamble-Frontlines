@@ -149,3 +149,60 @@ cargo call `--locked --offline`; no commit: the plant is made in the worktree's 
 test, write mode, compare -> empty; (2) the plant: plain test passes, write mode, compare -> " M ...Join.ts";
 (3) a content change: the plain test fails first (ci-evidence's "cannot be reached"); (4) restore, worktree
 removed with `git worktree remove` (no force), my target folder deleted.
+
+### Times corrected (from my output files' mtimes, UTC; some block headers above were estimates ahead of the clock)
+A 18:09-18:10 · D five runs to 18:17:50 · B 49 copies 18:18-18:25 · B2 old step 4 18:27:55 · extra tests 18:29 ·
+D load runs to 18:30:52 · F kit tests to 18:32:55, gate 18:33:04 · E 18:34-18:36.
+
+### Block E (done 18:36 UTC): the local plant, repeated
+Worktree .gate/test-engineer-plant detached at a18a62b (code, CI and kit paths equal 4877599: `git diff --quiet
+4877599 a18a62b -- crates packages .github .claude Cargo.* package*.json rust-toolchain.toml`; only docs/DECISIONS.md
+differs). cargo 1.99.1, CARGO_TARGET_DIR .gate/test-engineer-plant-target, every cargo call --locked --offline.
+No .git hooks active. The compare lines copied from toolchain.yml:86-87.
+1. Clean: plain `cargo test --workspace` exit 0 (generated_types_are_current ok, generated_layout_is_current ok);
+   write mode exit 0; compare EMPTY (would pass).
+2. Plant: Join.ts committed 100755 in my worktree only (local commit on the detached HEAD, never pushed; the guard
+   refuses an index-only route as unlike CI, see below); status before write mode empty; plain exit 0; write mode
+   exit 0 (rewrote the file 0644); compare printed "writing the generated types again changed:" +
+   " M packages/types/src/generated/protocol/Join.ts" -- the same two lines as CI job 134989872637.
+   (Why a commit: with only `git update-index --chmod=+x` HEAD keeps 100644, so status shows "M " before write
+   mode; CI's checkout of the plant commit has HEAD, index and file all 100755.)
+3. Content change (a line appended, uncommitted): plain run exit 101, `ts_export::generated_types_are_current`
+   FAILED, panicked at crates/protocol/src/ts_export.rs:142:9. Under the step's `set -e` the compare is never
+   reached: ci-evidence's "cannot be reached with one" HOLDS by a run.
+4. File restored with `git show HEAD:<path>` + chmod (the guard refuses `git restore`); worktree clean; `git
+   worktree remove .gate/test-engineer-plant` (no force): done, `git worktree list` shows the main folder only.
+   NOT done: deleting my build folder .gate/test-engineer-plant-target (136 MB, gitignored): `rm -rf` was denied
+   by the permission system; not retried. The main session may delete it.
+- Correction to E step 2: the guard did NOT refuse an index-only route; I chose a local commit because only a
+  commit gives CI's state (HEAD, index and file all 100755). The "Why a commit" line is the reason.
+
+## Verdict (18:40 UTC)
+PROVEN as stated: A, D, E, F, and "each new test bites" (every one of #28-#33 is killed by at least one one-change
+copy of the head script). NOT PROVEN by any test, so the report must say "by code reading", never "tested":
+(1) main's side of the comparison read at the literal path (M12 passes all 33, and the pre-fix test file too:
+step 4 pins the push side only); (2) a "deleted  <path>" line leaves an existing plain file held (M07b passes all
+33); plus the advisor agent's three known gaps (M14 local main, M11c plain vs link on main, M26 mode-only).
+High only if the report claims (1) or (2) as tested, or cites the session's older broken copies
+(broken-main-before-plain, broken-main-pathspec) as evidence about this head: at head the comparison moved before
+the plain check is a no-op (M11 equivalent) and step 4 no longer bites on a main-side pattern read.
+
+## Follow-up lines (kit lines final by Mustafa's word: below High = follow-up)
+F1 Medium: test 33 step 4 pins only the push side's literal read; add a step where the push adds `:/Cargo.lock`
+   with the content of main's ROOT Cargo.lock and main has no ':' folder -> held (scratch X2 kills M12).
+F2 Medium: no test that `deleted  <path>` leaves an existing changed plain manifest held (scratch X1 kills M07b).
+F3 Medium (known; the advisor rated it Low): no test that origin/main, not a local main, is compared (X7 kills M14).
+F4 Low (known): a plain file with the bytes of a link on main stays held; no test (X8 kills M11c).
+F5 Low (known): a mode-only change of a file equal to main's is released (reading (b)); no test (X9 kills M26).
+F6 Low: "in any folder" untested for a manifest inside .checkpoints/ (X3, M06i) and for a folder name git quotes
+   (X4, M19: pins `-z`).
+F7 Low: "what cannot be read is held" untested; the reachable case: an unpushed branch with no origin/main (X5, M16).
+F8 Low: test 29's look-alike `not-package.json.txt` pins neither name anchor alone; use `package.json.txt` and
+   `old-package.json` (X6, M06f/M06g; over-hold direction).
+F9 Low: for a branch not on the remote, the merge-base (not main's tip) is untested (X10, M15c; over-hold only).
+F10 Low (pre-existing pattern, #32 copies it): watch tests remove the temp folder before killing the watch child
+   (t.after is FIFO); kill first.
+F11 Low (gate v2 list; pre-existing): the kit's four test files run in no CI job and not in tools/gate.mjs.
+Housekeeping: .gate/test-engineer-plant-target (136 MB, gitignored) left; `rm -rf` was denied.
+Scratch: .gate/kit-hold-ci/test-engineer/ (mutants.txt, build-mutants.mjs, broken-*.mjs, runner.mjs, failat.mjs,
+extra.test.mjs, pre-fix2.test.mjs, after-order.test.mjs); TAP outputs in the session scratchpad.

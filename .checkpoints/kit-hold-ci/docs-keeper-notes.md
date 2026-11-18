@@ -33,3 +33,25 @@ B11. DONE and the answer.
   merge-base(HEAD, origin/main). Remote branch head db445f6; local HEAD 8dedfcc (the main session's save, 18:33:57).
   The four record files: worktree = HEAD = main (STATUS f69be90a, archive 39792023, ROADMAP f944af37, REPO_MAP
   50ccc76b). DECISIONS.md: modified in the worktree (the main session's script; not mine to touch). Next B1.
+- B1 done: read the card (steps 1-26), report-draft.md (373 lines), DECISIONS (15:38:13, 16:39:23, 18:01:08 at
+  DECISIONS.md:130-213; RECORD-FILES :286; OLD-LINES :239; the main session committed DECISIONS as a18a62b at 18:34:30),
+  infra-engineer-review1.md (L1 :252, L5 :266, Q7 :228-237), security-auditor-review1.md (F1-F5 :143-181; Not covered
+  :208-226), #58's report (binding ruling :36-40; follow-ups :233-268; the two doc lines :244-248).
+- B1 finding: the two doc lines that claim more than the code (#58 report :244-248): "never writes outside the
+  repository" in crates/protocol/src/ts_export.rs:76 and crates/client-endpoint/src/layout_ts.rs:58; "consecutive" in
+  crates/protocol/src/messages.rs:56 (Input.commands). #60 touches none of the three (its diff: .claude/CHECKPOINTS.md,
+  .claude/scripts/checkpoint.mjs, .claude/scripts/checkpoint.test.mjs, .github/workflows/toolchain.yml, docs/DECISIONS.md).
+- B2 finding (blame on main 9b4b518): STATUS own lines (this lane = #56 c94c81b..cd61b28, #57 d7dad97..f26ac5b, #58
+  22c6afa..1bfe462): 5, 13, 29, 36-37, 40-45, 104-107, 120 (500757c, 95b67cc, 1aaa067, 07b58fc). Others: #52 (3f98c0b,
+  554face, bfd719b), #55 (9660197).
+- B2 finding: ROADMAP Recent work = 12 entries: #58 144-150 (own, 95b67cc), #57 152-160 (own), #56 162-168 (own),
+  #55 170-178, #54 180-185, #53 187-193, #52 195-203, #48 205-220, #51 222-231, #50 233-248, #49 250-257, #46 259-270
+  (3f98c0b, #52's). Adding #60 -> 13: fold #46 (259-270, merged 2d22b69) byte for byte into Build history after #44's
+  folded entry (:92-106), blank separators, as cs1's pass did.
+- B2 finding: REPO_MAP own lines: 19-22, 26-30, 79-80, 87-92. The kit and CI rows are other lanes': :97
+  CHECKPOINTS.md (9660197, #55, the netcode proof test's session), :135 checkpoint.mjs, :136 its tests, :165
+  toolchain.yml (550856a, #48, the foundation chat). RECORD-FILES: not reworded; precedent: Part 15's report :59 "Left as
+  found, because they are another lane's lines", cs1's pass left REPO_MAP :16/:18/:21. They go in the answer as left.
+- B2 finding: archive "In flight" newest first at :159 (#57's row, own). Archive "Follow-ups" ends :929 with "From
+  change-set 0 (PR #56) and Part 15 (PR #57)" (own, 1aaa067); NO block yet for #58's follow-ups (its STATUS row says
+  "for Follow-ups once merged (their text: the report's "Follow-ups")"): add one now that #58 is merged.

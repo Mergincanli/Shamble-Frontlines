@@ -159,23 +159,39 @@ infra-engineer).
 
 `node tools/gate.mjs --no-smoke`: PASS (the smoke check ran in CI). The repository map check: OK.
 
-**The new tests bite.** Each was shown failing on a broken copy of the script, at the step meant for it. The six new
-tests fail against main's script; main's 27 tests pass against the new script.
+**The new tests bite.** test-engineer made 49 broken copies of the script of this head, one change each, and ran
+the test file against each (its table, shortened; "#n" is the test that fails):
 
-| Broken copy | What fails |
+| Broken copy of this head's script | Result |
 |---|---|
-| the hold removed | the five tests of the hold (16:22) |
-| the record read from the working tree, not from the commit | test 28, step 3 (the check the advisor agent asked for) |
-| renames followed in the diff | tests 31 and 32 |
-| the hold in front of the foreground push only | tests 15 and 32 |
-| the text he first answered on (no rule for main) | test 33, step 1: a branch that took main in is held |
-| any plain file that main also has is released, whatever its content | test 33, step 2 |
-| the comparison with main before the plain-file check | test 33, step 3: a link that main holds too |
-| main read as a pattern (before the advisor agent's fix) | test 33, step 4 |
-| the push side read as a pattern (the script as first pushed) | test 33, step 4 |
+| the hold removed | #28, #29, #30, #31, #32, #33 fail |
+| the hold skipped for the background saver | #32 fails |
+| the record read from the working tree, not from the commit | #28 fails |
+| renames followed in the diff | #31, #32 fail |
+| the record accepts any line, or any hash for a path | #28, #29 fail |
+| the list of names emptied; each one of the five names dropped | all six fail; at least one fails for each name |
+| a link treated as a plain file | #31 fails (#33 too when both reads do it) |
+| the comparison with main dropped | #33 fails (step 1) |
+| any plain file that main also has is released, whatever its content | #33 fails (step 2) |
+| the push side, or both sides, read as a pattern in the comparison with main | #33 fails (step 4) |
+| the base always main, never the remote branch | #29, #31, #32, #33 fail |
+| "deleted" releases any entry that still exists | #31 fails |
+| **main's side alone read as a pattern** | **survived: no test fails** |
+| **"deleted" releases a plain file that still exists** | **survived** |
+| **a local `main` compared, not `origin/main`** | **survived** |
+| the hold moved below the saver's "code is ahead" branch; the comparison moved before the plain-file check | survived, and equal in behaviour (no difference to catch) |
 
-The first four copies were made from the text he first answered on; the last five from the later texts.
-test-engineer made its own broken copies from the final script: see "Reviews".
+- The six new tests fail against main's script (27 pass, 6 fail); main's 27 tests pass against the new script.
+- The three copies that survived are behaviours **no test pins**. They hold by code reading and by probes (the
+  advisor agent's and security-auditor's probes of ":" paths and of an unpushed local main were held); test-engineer
+  wrote a scratch test for each, which passes on this head and fails on its copy, so each is a real gap in the
+  tests, not in the script. They are follow-ups (his word of 18:01:08).
+- **What I showed on older texts is history, not evidence about this head.** While the text changed I showed each
+  new step failing on a broken copy of the text of that moment (16:22, 16:49, 17:13, 17:45). Two of those copies say
+  nothing about this head: after the fix, moving the comparison before the plain-file check changes nothing, and
+  the test's last step no longer catches a pattern read on main's side alone. The table above is the evidence.
+- No flake in 14 full runs (5 one at a time, 8 four at a time). The kit's tests run in no CI job and not in the
+  gate, so all kit evidence is local (Node 22.23.4, git 2.43.0).
 
 **The replay of change-set 1's miss** (18:12:10 to 18:12:16; `replay-miss.sh` and its results in the notes): a
 scratch clone with the remote branch at 55397c8, main at 22c6afa, the code commit 566d1d1 (three manifest and
@@ -215,7 +231,7 @@ endpoint; the excerpts stand in `ci-evidence.md` in the notes):
     same user and could silence both. They guard against honest mistakes.
 
 ## Reviews
-One round, on the final text. PENDING: test-engineer, the verifier, the advisor agent.
+One round, on the final text. PENDING: the verifier, the advisor agent.
 
 - **security-auditor** (the kit hold, and a security read of the CI edits; 18:03:55 to about 18:31; about 85 probe
   runs in scratch repositories): nothing Critical or High; two Mediums (under "Open findings"), two Lows and wording.
@@ -242,6 +258,15 @@ One round, on the final text. PENDING: test-engineer, the verifier, the advisor 
     branch not yet pushed" is the point where the branch left `origin/main`; "never pushes" does not hold in the
     two corners of open finding 1; a link, a submodule and a file that became a folder can never be released.
 
+- **test-engineer** (is it proven; 18:07:41 to about 18:39): proven for what is claimed, no High. Each of the six
+  new tests fails on at least one broken copy of this head's script. Three Mediums, each a missing test (the three
+  survivors in the table under "Evidence"); seven Lows (more missing tests; one test's look-alike file name pins
+  neither end of the name pattern; the two saver tests delete their folder before they stop the saver, never seen to
+  fail). It repeated the planted change in a worktree of its own: the clean tree is silent, the executable bit
+  gives CI's line, and a content change fails one line earlier at the plain test run, so "a content change cannot
+  reach the compare step" now rests on a run. Both of his asks on CI are proven as he worded them. Its warning,
+  taken: the report must not call the three unpinned behaviours tested, nor use my older broken copies as evidence
+  about this head.
 - **infra-engineer** (the workflow edit; 17:47 to 18:07): APPROVE, no finding above Low. The text is byte for byte
   the report's blocks 1 to 3; nothing that stood is weakened (permissions, the order "fetch, then cut", `--locked`,
   `--offline`, the timeout). Six Lows, none a push: they are the "do not prove" lines above and four lines for the
@@ -309,9 +334,16 @@ push and stay in history; the review of the pull request reads them.
 record for a path that begins with ":" never matches (the line he kept reads such a path as a pattern), so such a
 file stays held.
 
-**By code reading and a probe, not by a test** (a test for each would have passed the stop line): `origin/main` is
-compared, not a local `main` (the advisor agent's probe: an unpushed local main is held); a plain file whose content
-equals a link's on main is held; a change of the file mode alone is not held when the content equals main's.
+**By code reading and probes, not by a test** (test-engineer's list; the three in bold are its Mediums):
+- **main's side of the comparison is read at the exact path** (the advisor agent's fix; security-auditor's ":"
+  probes held);
+- **a `deleted  <path>` line does not release a plain file that still exists;**
+- **`origin/main` is compared, not a local `main`** (the advisor agent's probe: an unpushed local main is held);
+- a plain file whose content equals a link's on main is held; a change of the file mode alone is not held when the
+  content equals main's;
+- "in any folder" for a manifest inside `.checkpoints/` and for a folder name that git quotes;
+- "what cannot be read is held" in its one reachable case (an unpushed branch with no `origin/main`);
+- for a branch not yet on the remote, the comparison with the point where it left main (not main's newer tip).
 
 **His reason, "merged with my go":** it holds for every manifest on main today (they came in through #2, #5, #48
 and #58). The PR Advisor's merge allow-list would let it merge a manifest under `docs/` or a Cargo file under
@@ -339,7 +371,12 @@ runner for CI); what the hold does in a clone with a case-insensitive file syste
 7. For his choice when that plan is written (security-auditor's list): hold plain pushes in the guard; a longer
    list of watched files; branches still on the old script; where held notes are kept.
 
-**STATUS follow-ups:** PENDING (the Lows and Mediums of security-auditor and test-engineer; the tests not written).
+**STATUS follow-ups** (their text: `docs/STATUS_ARCHIVE.md`, "Follow-ups"):
+- security-auditor's two Mediums (under "Open findings"), its two Lows and its wording lines;
+- test-engineer's ten lines: tests to add for the three unpinned behaviours (Medium) and for five smaller ones; the
+  look-alike file name in test 29; the saver tests' clean-up order; and, for the quality gate v2's list, that the
+  kit's four test files run in no CI job;
+- infra-engineer's lines for the quality gate v2's list.
 
 **Carried from #58**, unchanged: round 2's Lows of change-set 1; the two doc lines that claim more than the code
 does (to be corrected in the next pull request that touches those files: this one does not).

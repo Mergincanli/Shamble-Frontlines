@@ -145,3 +145,76 @@ Scratch: `.gate/kit-hold-ci/verifier/` and the session scratchpad. I edit nothin
 - `git diff --stat origin/main 4877599 -- . ':!.checkpoints'`: exactly the four files, "4 files changed, 293 insertions(+),
   2 deletions(-)"; the same at the committed HEAD 54d72b9. The working tree's uncommitted `docs/DECISIONS.md` (the
   session's docs pass, begun about 18:30) is outside this check and not judged.
+
+### Check 9, part 1: facts behind the draft's sentences (draft pinned at 18:32:46 UTC, sha256 02f5ea7d..., 372 lines,
+### copy `.gate/kit-hold-ci/verifier/report-draft-judged.md`; not judged: what came from security-auditor's review)
+- Hole window 17:18:16-18:03:10: the script blob fae135bb is the same at 8bf4bee, 94c197f, 415bd73 (the hole is in it, check 7). OK.
+- Reach: main has 0 paths starting with ":", 0 links at all. OK.
+- "the advisor agent and I each tried a file in such a folder that main does not have": advisor-plan.md:61 (S5 ":/Cargo.lock
+  ... with content NOT on main"); the pre-fix step 4 (kit-fix2.diff "-" lines: main gains only the root Cargo.lock). OK.
+- 218 vs 219: main->as-shown numstat 41+157+8+12 = 218; `diff -u | grep -c '^+'` on the workflow gives 13 (the +++ line). OK.
+  "Told to him at 17:48": not in the card or notes (chat only): not verifiable by me.
+- Plan size 150, stop line 300: plan.md:103. OK.
+- Script table "one function, seven lines in save, the header's paragraph": 47 = 8 header + 2 exit-code (1 removed) +
+  1 import + 1 DEP_FILE + 28 function + 7 in save. OK (import and constant not named; not wrong).
+- Tests "six new tests (28 to 33); two imports; two helpers": createHash import + symlinkSync (the 1 removed line);
+  helpers sha256, depCheck; tests at :443 :492 :527 :540 :570 :591. OK.
+- CHECKPOINTS.md: one 10-line bullet in section 3 (§3 = lines 53-74); the quote "Until then build nothing ... not held." exact. OK.
+- Exit-code before/after quotes: exact (script diff). OK.
+- LOW: "a new paragraph, "Dependency hold", with the same content as the rule line": the header lacks the rule line's
+  "Until then build nothing that holds the change, and push nothing by hand: a plain `git push` is not held.", its
+  "on exactly that content" and "compared with the remote branch, or with main for a branch not yet pushed".
+- Broken copies, the head's tests run against all nine (`.gate/kit-hold-ci/verifier/broken/summary.txt`):
+  hold-removed 28-33 fail (6 today; the row says "five ... (16:22)": historical, OK); record-from-working-tree 28@471
+  (= step 3, :465-473) and 33@610; renames-followed 31, 32 and 33@610; foreground-only 15@228, 32 and 33@610;
+  main-rule-missing 33@610 (step 1); main-any-content 33@620 (step 2); main-before-plain 33@632 (step 3's list);
+  main-pathspec 33@653 (step 4); main-push-read-as-pattern 33@653 (step 4). Every row OK. The first four also fail 33
+  today at step 1 (they lack the main rule: built before it existed), not a contradiction.
+- LOW: "The first four copies were made from the text he first answered on; the last five from the later texts.":
+  broken-main-rule-missing.mjs IS the text he first answered on (cmp-equal to as-shown/checkpoint.mjs; advisor-plan.md:58
+  says the same). Rows 6-9 are the first pushed script with one or two lines changed (diffs checked); row 9 = that script.
+- Manifests on main came in through #2, #5, #48, #58 only (`git log --first-parent origin/main -- <the 17 files>`); each
+  merge message records his go or instruction ("Merged on Mustafa's instruction", "Merged on Mustafa's go", #48 and #58
+  quote him). OK (advisor-plan.md:66 had not re-checked the goes).
+- Allow-list: routine-guard.mjs:84-100 (MERGE_PLACES docs/, tools/; GATE_FILES refuse tools/package*.json and
+  npm-shrinkwrap.json, not Cargo names; docs/adr/ and decision docs refused). "a manifest under docs/ or a Cargo file
+  under tools/": OK. None exists on main: OK.
+- Advisor probes cited: S1 stale clone releases old main's content, S8 unpushed local main held, S3 plain file = main's
+  link held, S4 mode-only released (advisor-plan.md:60). OK.
+- "the plain test run ... fails first on a changed, missing, extra or non-plain file, and write mode rewrites the files
+  with mode 0644": ts_export.rs files_in (non-plain asserts), missing/content/extra asserts, write mode deletes .ts and
+  fs::write new files; infra-engineer-review1.md:152-160 for layout_ts.rs. OK.
+- "infra-engineer showed on a scratch repository" (untracked, deleted, new subfolder: cases 5-7) and "each run exits 2
+  on a type error planted in its own files" (2b, 2c): infra-engineer-review1.md:128-130, :192. OK.
+- LOW: "git 2.56.1 on the runner for CI": infra-engineer-review1.md:119 took it from main's run 44338178455, not from a run
+  of this PR; and CI runs none of the kit's tests (gate.yml runs only the gate and smoke), so "the tests ran on ... git
+  2.56.1 on the runner" must not be read as the hold's tests having run in CI.
+
+### Check 9, part 2: his words, word for word (DONE)
+- `.gate/kit-hold-ci/verifier/quotes.mjs` on the pinned draft: every "..." span (12+ chars) tested against his three
+  bodies (line wraps joined). Every span the draft gives as his stands verbatim: KIT-TEXT answer (:71, whole),
+  KIT-FIX (:80), KIT-REMOVED (:86-88, inner ":" quotes split the regex; checked by eye: verbatim), WATCH-60, the size
+  (:91, :112), "your reading is right." (:108), "a manifest or lockfile is not held when ..." (:23), "a manifest or a
+  lockfile" (:132), "merged with my go" (:316), "Keep it to that: no guard change and no longer watch list now" (:277),
+  "my exception to the kit freeze, for this one change" (:269), "Your ready report shows the changed lines" (:358),
+  "A later finding on them that is not Critical or High becomes a follow-up" (:18). The rest are the session's own
+  questions, code, log or rule lines. Older words of his, checked in main's DECISIONS.md (git show origin/main):
+  "with the chat in Accept edits" = :669, inside his words of 2026-11-13 (block from :640); OLD-LINES "Its report lists
+  each line it moved." = :155. No misquote.
+
+### Check 9, part 3: last points (DONE)
+- "Claude Code's automated review of the push then flagged the line beside it (17:21)": PR #60's public page shows "No
+  reviews" and no comment naming ls-tree or ":" (only 4877599's commit message). Card step 18 says it was Claude Code's
+  security plugin (likely shown in the session). Not verifiable by me.
+- LOW: "Not covered" > "The script trusts the record": "the review of the pull request reads them". Grep: the record
+  is named only in checkpoint.mjs, its test and CHECKPOINTS.md:64; no agent file, CI step, CLAUDE.md or START_HERE names
+  a reader; CHECKPOINTS.md §9 deletes the notes before ready. The draft's own "Open findings" 2 says nothing makes the
+  review read it: the two sentences contradict each other.
+
+## Summary (final)
+VERDICT: PASS WITH NOTES. Checks 1-8 pass (8: pages and ids confirmed, log lines not checked by me: sign-in). Check 9:
+no misquote of Mustafa, no High; six Low wording points (true record ":" "never matches"; 0c0e271 row's log lines for
+the PR run; "the last five from the later texts"; header "the same content as the rule line"; "git 2.56.1 on the
+runner for CI"; "the review of the pull request reads them"). Not verifiable from the record: "Told to him at 17:48",
+"He saw them as a reading (16:23:55)", the 17:21 automated review. Not judged (instructed): security-auditor's and
+test-engineer's reviews and what the draft took from them; the docs pass in the working tree.
