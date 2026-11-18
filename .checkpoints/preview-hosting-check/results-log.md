@@ -291,3 +291,6 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   (schedule ":23"; none had run at 15:04:41 UTC, the cleanup run's last update).
 - The first probe: none yet at 2026-11-18 15:39 UTC (list of probe.yml runs: total_count 0; the merge put probe.yml
   on `main` at 14:57:11, so the 15:23 slot was the first it could fill). Read again by a check-in at about 16:00 UTC.
+- Still no probe run at 2026-11-18 16:02 UTC (total_count 0). The workflow is registered: list_workflows shows
+  "probe", .github/workflows/probe.yml, state "active", created 2026-11-18T15:57:13+01:00 (14:57:13 UTC, the merge).
+  A last check-in is set for 16:31 UTC, after the 16:23 slot.
