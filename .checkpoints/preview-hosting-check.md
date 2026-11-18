@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 18:35 Amsterdam (17:35 UTC)
+- **Last update:** 2026-11-18 18:40 Amsterdam (17:40 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -509,6 +509,13 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - Second reading (17:33:15 UTC): the Deployments page lists the ten uploads, no count shown; the overview not read
      again (no count field at the first reading). His words: "When are we done with these hideous tasks" (answered
      with what remains). `bites` started at about 17:33:50 UTC: deploy run #4, id 44360058220.
+   - `bites`: plan and the three builds green (bite-coep, bite-oversize, bite-nocache; done by 17:34:40); the three
+     deploy legs "waiting" on `preview` from 17:34:40 UTC; the link sent to him with what remains.
+   - His question ("uuid":"249764c3-2f1e-4d10-aa6c-308ffde0b7f0" "timestamp":"2026-11-18T17:50:30.986Z"), word for word: "Why do I have to approve these things, can't we just
+     automate it?" It reopens REVIEWER (his (a) of 2026-11-15; plan.md:1392-1400; (b) = "You untick "Required
+     reviewers" on `preview` for everything but sitting 3", plan.md:1240). Case (d) switches its cleanup off by
+     deleting close.yml on its branch (plan.md:228), not by a rejection, so (b) does not touch it. Advisor consultation
+     before the answer (moment 4).
 
 ## Next steps
 0. Sitting 1 (step 23): start `round-a`; once plan and build are green and deploy waits, send his list.
