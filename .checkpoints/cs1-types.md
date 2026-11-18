@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 14:16 CET (from the clock)
+- **Last update:** 2026-11-18 14:21 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -148,8 +148,26 @@
      own 13 defects: 8 caught, 5 missed (T1, T2, T3, T11, T13; T4 passes by design: a width change never reaches
      TypeScript). Its CI edit text is in its notes (write mode over the workspace then `git status --porcelain`
      through an assignment; two tsc calls, one without `--skipLibCheck`; `find` instead of a glob).
-   - engine-architect (since 13:07:58 UTC), security-auditor (since 12:52:01 UTC) and netcode-architect (since 13:15:48 UTC)
-     are running.
+   - security-auditor (12:52:01 to 13:21:02 UTC): no finding at Medium or above on the change-set's own files
+     (`cs1-types/security-auditor-review1.md`). L3 closed; write mode inside its folder is safe (tried: links are
+     unlinked, never followed); CI cannot set write mode (`env -i`); the advisor agent's condition 2 met. Lows: S1
+     write mode follows a linked generated folder or parent (tried: it deleted and wrote outside the repo; needs a
+     committed link plus a manual write run): refuse unless the canonical folder is the canonical root plus the
+     folder's path, and refuse write mode when `CI` is set; S2 ts-rs does not escape `*/` in a doc comment (the rest
+     of the line leaks into the TypeScript): the export test can count `/**` against `*/`; S3 `layout-check.ts`'s
+     doc should say it is a drift check only and that "never throws" holds for ArrayBuffer inputs. Nits: an empty
+     TMPDIR puts the scratch folder under `crates/protocol`; an optional compile-time `LAYOUT_HASH != 0`.
+     **A1 confirmed, narrowed, Medium, in CI, outside this diff:** the checkout action's post step
+     (`_actions/actions/checkout/<sha>/dist/index.js`) runs after the cut with network and the job's cache-write
+     token, and the build (same user) can rewrite it; through it a hostile dependency could plant the smoke job's
+     Chromium cache key in this branch's scope. It withdraws its earlier line "nothing from the run can reach later
+     runs" (it held only because the code was clean). Fix text for a later risk-tier-2 pull request, in its notes:
+     no cache in the toolchain job now; in step 2.3's workflow no JavaScript action in the job that runs the cut.
+     Not tried on a runner. Its word on DEP-HOLD: option (a) points the right way; four things to add (what "ahead"
+     means; the guard for plain pushes; release by a recorded review of the exact lockfile; more files: the
+     toolchain file, `.cargo/config.toml`, `.npmrc`, workflow and action files, `.gitmodules`). An anti-cheat table
+     (one row per message field, for the codec step) is in its notes.
+   - engine-architect (since 13:07:58 UTC) and netcode-architect (since 13:15:48 UTC) are running.
    - **The fix pass, when all five are back** (then the planted defects and the 20 runs again, with a target folder
      of their own, never shared with the main folder, and a check that every file is newer than each run's start).
 
@@ -240,5 +258,5 @@
 ## Running work
 - saver: background task bafnij7xk, started 12:30 UTC on 2026-11-18 (2-hour limit; the earlier one, b98z35xsq, was
   stopped at 12:30:03 UTC for the code push).
-- agents (3 of 3): security-auditor (since 12:52:01 UTC), engine-architect (since 13:07:58 UTC), netcode-architect
-  (since 13:15:48 UTC), round 1. Times from the session record.
+- agents (2 of 3): engine-architect (since 13:07:58 UTC), netcode-architect (since 13:15:48 UTC), round 1. Times from
+  the session record.
