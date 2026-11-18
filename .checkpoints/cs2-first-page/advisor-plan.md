@@ -94,3 +94,40 @@ the Brave check.
 ## Changed lines, read once
 Wed Nov 18 22:00:59 UTC 2026
 Plan: read git diff 29da1ca HEAD -- plan.md, the verifier's table, security-auditor's tool notes, sections 16-17 whole; rule on (a) step 2's three manifest-free parts and (b) TOOL-SOURCE (c).
+Wed Nov 18 22:07:56 UTC 2026
+Read: git diff 29da1ca HEAD -- plan.md (287+/100-; HEAD 0d8a838, working tree = HEAD for plan.md), sections 16-17 whole
+(:766-936), verifier-claims.md (FAIL then PASS; row 10 says "frozen" holds as a fact), security-auditor-tool.md (S1-S23).
+Holds: C1 (row followed; "such crate" read as crates compiled into our libraries, binaries and tests is inside the row's own
+reasons, runtime arithmetic; proc macros and build scripts run on the build machine and a wrap there fails the dev build
+first: my reading as the row's author, D1/D1-R2); C2 (WB-HEALTH self-contained, honest, sourced, verifier rows 4-7);
+C3 (4.1 picture row = part-15 :120-121; e2e tests/node + tests/skeleton, chromium = rest of tests/; 4.4 updated);
+C4 (verifier PASS); C5-C8 as section 22 says. DEPART-2 complete as far as I can find; nothing of his worded as decided.
+Must change before the questions go (wording, no re-read needed):
+ Q-1 Medium :827-828 TOOL-SOURCE "nothing, anywhere, records how the project built the program" goes beyond its source:
+   S11 no build attestation; S18 no committed lockfile, no --locked, versions "recorded nowhere we can read"; the
+   workflow file does give the build steps.
+ Q-2 Low :826-827 say why `gh release verify-asset` cannot run here (proxy refuses GitHub pages/API of other projects:
+   S4 403; the session keeps gh to search), else it reads as a permission he could grant.
+ Q-3 Low :834-836 (b) "about 250 crates" is the published lock's whole count (31 other-OS, dev-only, vendored-openssl
+   entries in it: S15); fewer with TLS off (S16); exact count needs a fetch-only step.
+ Q-4 Low :836-838 (c) name its cost: a workflow file on lane 1's branch, tier 2 while present (his yes to exact text,
+   security-auditor), removed before ready; proof reaches here through the sha256 match on an immutable release.
+ Q-5 Low :846-852 CI-WASM (a) must name the GitHub check TOOL-SOURCE (a) promises (section 18's note :976); (c) too, or
+   say it does not.
+Before steps 3-4 (not before the questions):
+ S-1 Low :421, :569 `cargo tree -e normal -p sim-wasm` misses ts-rs and thiserror (dev-deps of protocol) and lists proc
+   macros the rule excludes: list runtime crates of libraries and tests workspace-wide (e.g. `cargo tree --locked
+   --workspace -e normal,dev,no-proc-macro --target all --prefix none`, members filtered out).
+ S-2 Low :546 the production build command has no SHAMBLE_WASM_BINDGEN_SHA256: build.mjs must refuse to run the tool
+   when it is unset (fail closed), and the command must pass it.
+ S-3 Low (step 8, see grep line below) `?backend=webgl` kept in production: not in Part 0's named list, so no departure; its reason (fallback
+   testable on the player build) can also be met by launching the browser without WebGPU. Note only.
+Ruling (a): YES, the three manifest-free parts may be built, tested, committed now (inside card :302-309 and Part 7 :940;
+ only the printed address hangs on DEPART-2 item 2). Limits: no import by package name of what step 2's manifests bring
+ (@shamble/types, @shamble/sim-worker, three, @types/three, the glue) nor Vite's API (build path = step 4); commit by
+ path; push via checkpoint.mjs save; CI npm test green. Correction: WB-HEALTH (b) would drop lockedWasmBindgenVersion,
+ checkCli, checkCliFile (wasm-bindgen only): waste risk, not a rule issue. Manifest edits + security request still wait
+ for RNG-CRATE, WB-HEALTH, DEPART-2; download and first run for TOOL-SOURCE.
+Ruling (b): YES, (c) is rightly an option (only route to the full proof before the first run here; a CI edit with exact
+ text is his: GATE-FOLLOW (b)), with its cost stated (Q-4).
+ (S-3's line: plan.md:476)

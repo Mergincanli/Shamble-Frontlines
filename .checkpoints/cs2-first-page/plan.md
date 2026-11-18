@@ -368,7 +368,8 @@ answer; every cargo command takes `--locked`; the checkpoint script holds a push
    5. before any run: it is a regular file and no link; `chmod 0555` on the file and its folder; `readelf -h` and
       `readelf -l` show an ELF64 x86-64 file with no interpreter (static);
    6. the binary's sha256 and size go into `cs2-first-page/wasm-bindgen-cli-check.md`, and `build.mjs` compares them
-      before every run, `--version` included (a build script runs as the same user and could replace the file). The
+      before every run, `--version` included (a build script runs as the same user and could replace the file), and
+      refuses to run the tool at all when the expected value is not given. The
       expected values reach `build.mjs` through the environment (`SHAMBLE_WASM_BINDGEN_SHA256`), read from that notes
       file here and written in the workflow in CI.
    No other source is used without a security answer of its own.
@@ -418,8 +419,9 @@ step that changes no manifest pushes normally; step 3's push goes through the ho
    its hold. Then `npm ci --ignore-scripts`, and, once TOOL-SOURCE is answered, the tool by its route (section 7, item
    5a): downloaded, its size and sha256 compared, its member list read, the one binary taken out into
    `.gate/tools/wasm-bindgen-0.2.130/`, checked without running it, its own sha256 recorded.
-   Then `cargo tree -e normal` names every third-party crate compiled into our libraries and tests, against the
-   overflow overrides of step 2 (section 16, at its end).
+   Then `cargo tree --workspace -e normal,dev` names every third-party crate compiled into our libraries and tests
+   (ts-rs and thiserror are dev-dependencies, so the `dev` edges are needed; proc-macro crates are left out, as the
+   rule says), against the overflow overrides of step 2 (section 16, at its end).
 4. **The bindings and the build.** `sim-wasm`'s `Sim`. The build path of `build.mjs`: it reads wasm-bindgen's version
    from `Cargo.lock`, refuses any other tool version before it generates bindings (PM-0002-18), runs `cargo build
    --locked --release --target wasm32-unknown-unknown -p sim-wasm`, then `wasm-bindgen --target web --out-dir
@@ -543,7 +545,7 @@ git status --porcelain --untracked-files=all -- packages/types/src/generated    
 **The build (from step 4):**
 ```
 SHAMBLE_WASM_BINDGEN="$PWD/.gate/tools/wasm-bindgen-0.2.130/wasm-bindgen" SHAMBLE_WASM_BINDGEN_SHA256=<the binary's recorded sha256> node packages/client/scripts/build.mjs
-SHAMBLE_WASM_BINDGEN="$PWD/.gate/tools/wasm-bindgen-0.2.130/wasm-bindgen" node packages/client/scripts/build.mjs --production --out-dir .gate/cs2-first-page/dist-prod
+SHAMBLE_WASM_BINDGEN="$PWD/.gate/tools/wasm-bindgen-0.2.130/wasm-bindgen" SHAMBLE_WASM_BINDGEN_SHA256=<the binary's recorded sha256> node packages/client/scripts/build.mjs --production --out-dir .gate/cs2-first-page/dist-prod
 ```
 **TypeScript** (the strict flags of CI-TYPES, `toolchain.yml` :93, with each package's own `lib` and `types`, as ADR 0002
 part 7 asks; no tsconfig is committed, since type settings are the 2.3 chat's; TS5112 is why `--ignoreConfig` is
@@ -566,7 +568,7 @@ node node_modules/vitest/vitest.mjs run --root packages/client
 **The browser:**
 ```
 SHAMBLE_CHROMIUM=/opt/pw-browsers/chromium SHAMBLE_DIST="$PWD/packages/client/dist" node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --trace off
-cargo tree --locked -e normal -p sim-wasm --target wasm32-unknown-unknown --prefix none    # every third-party name has its overflow block
+cargo tree --locked --workspace -e normal,dev --prefix none    # every third-party crate that is no proc macro has its overflow block (proc macros are told apart by cargo metadata)
 node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=node --trace off
 ```
 **The rest:**
@@ -824,18 +826,27 @@ run here on that proof?**
   statements agree on the file's checksum: the project's own checksum file, the checksum GitHub states for the file,
   and a statement about the release that GitHub signed. Here I can check that the download equals that checksum, and
   that the signature fits the key inside the statement. Here I cannot check that this key belongs to GitHub: the
-  program that does that check (`gh release verify-asset`) is not usable in this container. And nothing, anywhere,
-  records how the project built the program from its source. security-auditor rates what remains as Medium, and
-  compares it with how the Rust toolchain we already run is checked (a checksum from a list, over an encrypted
+  program that does that check (`gh release verify-asset`) needs GitHub's pages and API for another project, which
+  this container's network proxy refuses (the signed statement's download answered 403), and this session keeps the
+  `gh` program to code search; it is not a permission you could simply grant in chat. About how the program was
+  built: the project's workflow file gives the build steps, but it publishes no signed record of the build, and it
+  commits no lockfile and builds without `--locked`, so the versions of the libraries inside the release's program
+  are, in security-auditor's words, "recorded nowhere we can read". security-auditor rates what remains as Medium,
+  and compares it with how the Rust toolchain we already run is checked (a checksum from a list, over an encrypted
   connection).
 - Options: (a) yes: the ready-built program, pinned by that checksum and by its size, unpacked by the careful route
   of section 7 (item 5a), its own checksum compared before every run; and the full check against GitHub's key added
   to CI when CI starts building the Wasm (CI-WASM), so that every later run there proves it; (b) build the tool here
   from its published source instead. That removes the trust in the project's release machinery, but it needs a
-  security check of about 250 crates first (the library itself brings about 5; security-auditor: roughly 50 times
-  the library's review), about 50 of which run code while building, and the same build again in CI; (c) wait: first a one-off CI job that runs GitHub's own
-  check on the file (a CI edit, which I ask of you with its exact text), and only after it has passed does the tool
-  run here.
+  security check of the tool's own libraries first: its published lockfile has 254 entries, against about 5 new ones
+  for the library (security-auditor: roughly 50 times the library's review). That count includes crates for other
+  systems and test-only crates, and fewer would compile with the tool's network feature off; the exact number needs
+  a fetch-only step. An estimated 30 to 40 of them run code while building. The same build would run again in CI;
+  (c) wait: first a one-off CI job that runs GitHub's own check on the file, and only after it has passed does the
+  tool run here. Its costs: a workflow file on this branch, which makes the branch risk tier 2 while it is there
+  (your yes to its exact text, and security-auditor's read of it); it must be taken out again before the pull
+  request is marked ready; and the proof reaches this container only through the checksum match, which holds
+  because the release cannot change.
 - Recommendation: (a), which is security-auditor's. (c) is the cautious middle if you want the full proof before
   the first run; it costs one more round between us.
 
@@ -845,10 +856,12 @@ Wasm, the type check of the two new packages)?**
   with its exact text (GATE-FOLLOW (b)).
 - Options: (a) a small pull request of its own after change-set 2 merges, as #60 followed #58, with the exact text in
   change-set 2's report (draft in section 18) and the tool downloaded from wasm-bindgen's own release, checked against
-  a sha256 written in the workflow; (b) the same edit inside change-set 2's pull request, which makes it risk tier 2;
-  (c) as (a), but with the tool installed by the third-party action ADR 0002 part 2 names (`taiki-e/install-action`,
-  pinned by SHA). That puts one more JavaScript action into the job that runs the network cut, which part 2 of your
-  CI-CUT answer moves away from.
+  a sha256 written in the workflow and then by GitHub's own check of the release file (`gh release verify-asset`,
+  the full proof TOOL-SOURCE (a) promises for CI); (b) the same edit inside change-set 2's pull request, which makes
+  it risk tier 2; (c) as (a), but with the tool installed by the third-party action ADR 0002 part 2 names
+  (`taiki-e/install-action`, pinned by SHA). That puts one more JavaScript action into the job that runs the network
+  cut, which part 2 of your CI-CUT answer moves away from, and the action's own download would not carry GitHub's
+  check unless a step after it runs that check on the installed file.
 - Recommendation: (a).
 
 **DEPART-2: this plan leaves the build plan's text in six small places. Do you accept them?**
@@ -1060,6 +1073,15 @@ The draft stays beside this file, byte for byte (`cs2-first-page/plan-draft.md`)
     that speak for `rand_chacha`'s home in the project; the default feature of `chacha20`; "at least twice"), and its
     recommendation narrowed to (c), with the crate asked at change-set 3's plan; TOOL-SOURCE and the tool's fuller
     route (section 7, item 5a; step 3; `checkCliFile`; planted defect 5; section 18's note).
+
+13. **After the advisor agent read the changed lines** (2026-11-18, its notes under "Changed lines, read once"; "the
+    questions may go to him: yes, after the five wording fixes"): TOOL-SOURCE says exactly what security-auditor
+    found about the build, why GitHub's check cannot run here, what the count of 254 includes, and what option (c)
+    costs; CI-WASM's options name GitHub's check; the overflow check's command includes the dev edges; `build.mjs`
+    refuses to run the tool without its expected checksum. Its ruling: the three manifest-free parts of step 2 (the
+    small server, the Worker's pure modules, the build script's pure checks) may be built now, within four limits
+    (no import by package name of what step 2's manifests bring in; no use of Vite's API yet; commits by path and
+    pushes only through the checkpoint script; CI's `npm test` stays green).
 
 ## 21. Records due with this change-set (beyond section 4.2's docs row)
 - `docs/DECISIONS.md`, by script, never retyped: his message of 2026-11-18, 20:20:09 UTC (his go on #60, WRITE-MODE
