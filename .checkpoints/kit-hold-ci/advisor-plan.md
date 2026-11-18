@@ -35,3 +35,10 @@
 - Size counted: +150 -1 (script 36/1, tests 96, rules 6, workflow 12). Under 300.
 - Verdict: APPROVE with conditions (no Critical/High; the Mediums are wording in what goes to him, fixed before the ask).
 DONE
+
+# Revised kit text, one verdict (2026-11-18 16:18 UTC, date -u)
+- Verified: kit-edit.diff == scratch copies; kit/CI files == main; 31/31, 27 pass + 4 new fail on today's script, 27/27 existing on edited. Plants: hold removed 4 fail; gated on codeAhead 1; any mode 1; any line 2; hold skipped in background 0 (Low); --no-renames dropped 0 (Low); record read from working tree 0 (the defect below). Edge harness: link and gitlink held whatever the record; lockfile moved into notes held; E1/E4/E5 unchanged. No change for saves without a watched file except: a branch not yet pushed in a clone without origin/main is held as unreadable (fail-safe corner; name it). Within his words: "the checkpoint script" = save and watch; same five names; no guard change.
+- MUST CHANGE (High on the scale: evidence that does not hold): new test 1, step 3 (kit-edit.diff:138-142) never reaches the hold: the flagged record is the only change, so save stops at "nothing else to save". It passes with the record read from the working tree. Fix: add note(repo, 'test.md', 'step 3\n') after that depCheck; assert /no recorded check: crates\/a\/Cargo\.toml\. / (the commit still holds step 2's record); fix the comment. Checked in scratchpad/step3: fixed test holds on the real script, FAILS on the working-tree plant.
+- Low: no test pins the hold in front of the saver's push (q3) or --no-renames (q7): add short tests or say "by code reading" in the report. Size: 168 non-blank added lines = 181 by git diff --numstat; state the method.
+- Verdict: REVISE (one line + comment in the test file); with that fix and the plant shown failing, APPROVE without another pass from me.
+DONE
