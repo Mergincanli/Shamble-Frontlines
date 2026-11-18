@@ -34,3 +34,11 @@ Started 2026-11-18 (after 18:04 UTC). Memory read: .claude/agent-memory-local/se
 7. Findings with severity, then the handback.
 
 ## Findings (each written as found)
+- Block 2 done: the 33 tests pass at the head (node v22.23.4, git 2.43.0; kit and CI files at the working tree's HEAD
+  23e0547 equal 4877599). Scratch: /tmp/claude-0/-home-user-Shamble-Frontlines/f707c56b-26b4-5848-b1e1-237a99a6a881/scratchpad/sec-review1/
+  (head.mjs = 4877599's script, sha256 fc5a4f02...; main.mjs = 9b4b518's script, 6bf8696d...).
+- Lead F1 (to confirm end to end): run() (checkpoint.mjs:60-67, pre-existing helper) returns `out.trim()`. The new
+  names call (checkpoint.mjs:123) reads `git diff -z` through it, so a FIRST path that starts with whitespace loses it:
+  trimcheck.mjs printed raw " a/Cargo.lock\0.checkpoints/test.md\0" -> after trim+split ["a/Cargo.lock", ...]. JS trim()
+  strips U+0009-000D, U+0020, U+00A0, U+1680, U+2000-200A, U+2028/2029, U+202F, U+205F, U+3000, U+FEFF. The NUL at the
+  end protects the last path; only the first path (sorted by bytes) is hit.
