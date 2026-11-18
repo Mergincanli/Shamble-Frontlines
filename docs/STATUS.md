@@ -103,8 +103,8 @@ A finding below the review budget's bar becomes a follow-up: its id goes here, i
   each a CI edit that asks him); OVERFLOW-PANIC-RULE (with the first code in the room crate or a server crate).
 - **From change-set 0 (PR #56) and Part 15:** the rules' O1 (PM-0005-54) and O2, his calls with change-set M's plan;
   the first real export; the coat's motion; the carried lines; for the drafts' next revision, ADR 0002's package list.
-- **Binding this chat until his DEP-HOLD answer** (#58's report, "Two misses", 1): a new or bumped dependency stays
-  uncommitted and unbuilt, and other code is committed by path only, until security-auditor has answered.
+- **Binding this chat until his DEP-HOLD answer** (#58's report, "Two misses", 1): until security-auditor answers, a
+  new or bumped dependency stays uncommitted, unbuilt and unpushed, and other code is committed by path only.
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100
