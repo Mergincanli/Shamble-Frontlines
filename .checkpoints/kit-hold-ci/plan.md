@@ -21,10 +21,11 @@ and security-auditor; it merges on Mustafa's go from a day session. No Brave che
 1. **The kit hold** (his exception to the freeze): `.claude/scripts/checkpoint.mjs`, its tests
    `.claude/scripts/checkpoint.test.mjs`, one bullet in `.claude/CHECKPOINTS.md` section 3. Exact text:
    `kit-edit.diff` beside this file (made from scratch copies under `.gate/kit-hold-ci/`; no kit file is touched yet).
-   - What it does: `save` (the foreground form; the background saver already never pushes code) commits the notes
-     locally as before; then, when the commits it would push change a manifest or a lockfile (`Cargo.toml`,
-     `Cargo.lock`, `package.json`, `package-lock.json`, `npm-shrinkwrap.json`, in any folder: the list of the report's
-     option (a), no longer), it does not push, names the files, and exits 1.
+   - What it does: the script (`save` and the background saver alike) commits the notes locally as before; then,
+     while what it would push changes a manifest or a lockfile, it does not push, names the files, and `save` exits
+     1. "A manifest or a lockfile" is read as five file names, in any folder: `Cargo.toml`, `Cargo.lock`,
+     `package.json`, `package-lock.json`, `npm-shrinkwrap.json`. That list is this chat's reading for Cargo and npm
+     (the report's option (a) says only "a manifest or lockfile"); he is shown it as a reading. No longer list.
    - "Would push" is measured tree to tree against the remote branch, as the script's skip-mark rule already does;
      against main's merge-base while the branch is not on the remote yet. What cannot be read is held.
    - **How the hold is released:** by a record in the notes, `.checkpoints/<slug>/dependency-check.md`, in the commit
@@ -34,8 +35,14 @@ and security-auditor; it merges on Mustafa's go from a day session. No Brave che
      changes again, the hold is back.
    - What it does not do (his "Keep it to that"): no guard change, so a plain `git push` is not held (the rules' new
      bullet says so); no longer watch list; no CI check.
-   - A known cost, to tell him: a manifest edit that changes no dependency (a description line) is held too; its
-     record then simply says so.
+   - Held whatever the record says: an entry that is not a plain file (a link or a submodule named like a
+     lockfile), and what cannot be read. A lockfile moved into the notes folder counts as removed, so it is held too.
+   - Known costs, to tell him: (1) a manifest edit that changes no dependency (a description line) is held too: it
+     still takes a short answer of security-auditor first, then the record; (2) a branch that takes main in is held
+     when main gained a manifest change through another, already reviewed pull request, until a record names it;
+     (3) while a push is held the notes stay on this machine only.
+   - The script trusts the record: it cannot tell who wrote it. The record and the answer it names travel in the
+     same push and stay in history; the review reads them.
 2. **CI-TYPES** and 3. **CI-CUT part 1**: `.github/workflows/toolchain.yml`. Exact text: `ci-edit.diff` beside this
    file, built by script from the report at head 1bfe462 (its section "The exact texts asked for", blocks 1 to 3) and
    equal to it byte for byte. He has said yes to both texts.
@@ -62,9 +69,12 @@ and security-auditor; it merges on Mustafa's go from a day session. No Brave che
     history rewritten); both runs are named in the report with the failing step's log lines.
   - **passing on the clean tree:** the run on the head.
   - The type check lines: the same head's run; a second planted commit is not asked and not made.
-- CI-CUT part 1: the line "Cache mode: none" in the job's log of the head's run (read with the GitHub tools). **If
-  the workflow does not parse with `cache-mode`, or the log does not show that line: stop and tell him in three
-  lines; no other text is tried without his word** (the text was checked against the documentation only).
+- CI-CUT part 1: the line "Cache mode: none" in the job's log of the head's run (read with the GitHub tools).
+- **The stop rule for all new CI lines:** none of them has run on a runner (`cache-mode`, git inside the cut, the two
+  tsc lines). If the clean run fails on any of them, or the log does not show "Cache mode: none": stop and tell him
+  in three lines; no CI text is changed without his word.
+- The take-back commit of the plant is pushed only after the plant's run has ended at the compare step (the
+  workflow cancels a running job when a new push arrives).
 - The gate (`node tools/gate.mjs --no-smoke`), the repository map check, `gate`, `smoke` and `toolchain` green on the
   head.
 
@@ -90,9 +100,25 @@ that commit when change-set 2 starts.
 
 ## Size
 The build plan's count is for game code; this change is kit and CI. Planned: about 40 lines in the script, 90 in its
-tests, 6 in the rules, 13 in the workflow (150 in all). Twice that (300) is the stop line.
+tests, 6 in the rules, 13 in the workflow (150 in all). Twice that (300) is the stop line. As it stands after the
+advisor agent's review: 40, 120, 8 and 13: 181.
 
 ## What Mustafa must do
 1. Read the kit edit's exact text and how the hold is released; say yes or what to change.
 2. Put the chat in Accept edits for the three edits and answer the guard's prompts.
 3. After the Advisor's check of the ready report: his go on the merge.
+
+## After the advisor agent's review (2026-11-18, 16:07 UTC): APPROVE on eight conditions
+Its notes: `advisor-plan.md`. Taken: M1 (the five names are a reading), M2 (a manifest edit with no dependency change
+still takes security-auditor's short answer), M3 (the stop rule covers every new CI line), L5 (when the take-back
+commit is pushed), L6 (the rules bullet's wording). Folded into the kit text now, beyond its conditions, so it is
+asked again for one line on the changed diff: L2 (a link or a submodule named like a lockfile is held whatever the
+record says), L3 (the hold is computed for every save with `--no-renames`, so a lockfile moved into the notes folder is
+held; with it the hold also sits in front of the background saver's push), L4 (a test that the record is read from the
+commit to push). Its other conditions: the report's contents (a before/after table of every changed rule sentence; the
+kit test counts; the replay of today's miss; the known costs; that the script trusts the record; the model note);
+after the write, `git diff` of the four files equals the text he saw, byte for byte; engine-architect counts toward
+the three agents and puts no file with a manifest's name in the notes; LANE-ISSUE is outside this pull request.
+Before his yes the main session does not: copy the scratch files into `.claude/` or `.github/`; run the scratch
+script's `save` or `watch` in this repository; move the saver off main's script; push the plant commit; write the CI
+edits early.

@@ -7,7 +7,7 @@
   15:38:13 UTC, his label 16:24 Amsterdam; `kit-hold-ci/mustafa-2026-11-18-1624-merge-58.md`, by script).
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/kit-hold-ci) · **Base:** main
   9b4b518f520aa2360a8007dc857ba74b343c8a40 (the merge of #58; the branch was fast-forwarded to it and pushed)
-- **Last update:** 2026-11-18 16:46 CET (from the clock)
+- **Last update:** 2026-11-18 17:11 CET (from the clock)
 
 ## What his words ask (read the file; these are pointers, not his words)
 - DEP-HOLD (a): "Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no
@@ -54,11 +54,32 @@
    reading of "nothing else in it" (the report, the DECISIONS entry and the docs pass for #58's merge ride along);
    change-set 2's plan drafted beside it into this notes folder.
 
+6. The advisor agent on the plan (15:46 to 16:07 UTC by its clock; `kit-hold-ci/advisor-plan.md`): APPROVE on eight
+   conditions; no Critical or High; three Mediums, all wording (the five names are a reading; a manifest edit with no
+   dependency change still takes a security answer; the stop rule covers every new CI line). It replayed today's
+   miss in a scratch clone: the edited script held it, today's script pushed it. All taken into `plan.md` (its last
+   section). Folded into the kit text beyond its conditions: a link or submodule named like a lockfile is held; the
+   hold is computed for every save (so a lockfile moved into the notes folder is held, and the background saver's
+   push is held too); a test that the record is read from the commit to push. The scratch copies were rebuilt:
+   `node --test .gate/kit-hold-ci/checkpoint.test.mjs` 31 pass; against today's script 27 pass and the 4 new fail;
+   the kit's own 27 tests against the edited script pass. `kit-edit.diff` regenerated (script +40 -1, tests +120 -1,
+   rules +8); `ci-edit.diff` unchanged (+13). Size 181 lines against 150 planned (stop line 300).
+
 ## Current step
-6. (15:46 UTC) The advisor agent reviews the plan and both diffs (notes `kit-hold-ci/advisor-plan.md`). Then: show
-   Mustafa the kit edit's exact text with how the hold is released, and ask for his yes and for the chat in Accept
-   edits (the guard asks on every `.claude/` and `.github/` edit). **Stop there for his yes.** If the agent is lost:
-   start it again with the plan and the two diffs.
+7. (16:11 UTC) The advisor agent gives one line on the revised kit diff (resumed by message). Then the message to
+   Mustafa: the kit edit's exact text (the script and the rules bullet in full; the tests summarised, with the diff
+   file named), how the hold is released, what it does not cover, the five names as a reading, the known costs, the
+   evidence run, why the CI plant is a mode change, the stop rule, how "nothing else in it" is read, his steps (his
+   yes; the chat in Accept edits; the guard's prompts). **Stop there for his yes.** Before it the main session does
+   not: copy the scratch files into `.claude/` or `.github/`; run the scratch script's `save` or `watch` here; move
+   the saver off main's script; push the plant commit; write the CI edits.
+   After his yes: write the four files (three kit, one workflow) so that `git diff` equals the two diff files byte
+   for byte; run the tests; commit by path; push; read the clean run (stop rule); the plant commit (a generated
+   file with the executable bit), its run must end at the compare step, then the take-back commit; reviews
+   (security-auditor, infra-engineer, test-engineer, one batch); the verifier; DECISIONS by script; docs-keeper;
+   the report (with the advisor agent's list); the advisor agent on the final head; the pull request; its ready
+   report goes to the Advisor before his go. Change-set 2's plan draft (engine-architect) may start once the edits
+   are written (it counts toward the three agents; no manifest-named file in the notes).
 
 ## Next steps
 4. Build (three edits), the script's tests, the real CI runs (a planted change that the compare step fails on; the
@@ -75,4 +96,4 @@
 
 ## Running work
 - saver: background task bzuzw7uzy, started 15:41 UTC on 2026-11-18 (2-hour limit).
-- agents (1 of 3): the advisor agent on the plan (started 15:46 UTC).
+- agents (1 of 3): the advisor agent, resumed at 16:11 UTC for one line on the revised kit diff.
