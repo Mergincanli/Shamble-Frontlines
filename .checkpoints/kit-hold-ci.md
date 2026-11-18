@@ -7,7 +7,7 @@
   15:38:13 UTC, his label 16:24 Amsterdam; `kit-hold-ci/mustafa-2026-11-18-1624-merge-58.md`, by script).
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/kit-hold-ci) · **Base:** main
   9b4b518f520aa2360a8007dc857ba74b343c8a40 (the merge of #58; the branch was fast-forwarded to it and pushed)
-- **Last update:** 2026-11-18 20:03 CET (from the clock)
+- **Last update:** 2026-11-18 20:05 CET (from the clock)
 
 ## What his words ask (read the file; these are pointers, not his words)
 - DEP-HOLD (a): "Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no
@@ -332,12 +332,18 @@
     for word in his three messages or in DECISIONS; my four questions stand in the session's record at 16:23:55 and
     17:48:13 UTC. The map check: OK (140 entries, 109 paths). Main fetched again at 19:02 UTC: still 9b4b518.
 
+36. The docs pass and the report committed by path and pushed: e4156f1698d6c15fb0f56e3b4af3061c2906f2ad (19:04:07
+    UTC). Against main the pull request now changes ten files: the four kit and CI files, DECISIONS, STATUS, the
+    archive, ROADMAP, the map, the report.
+
 ## Current step
-36. (19:03 UTC, from the clock) Commit the docs pass and the report by path; push; read CI; the advisor agent on
-    that head (its notes: `kit-hold-ci/advisor-final.md`). Then save the notes a last time; the last commit deletes
+37. (19:05 UTC, from the clock) Running: the advisor agent on head e4156f1 (started 19:04 UTC; its notes:
+    `kit-hold-ci/advisor-final.md`). CI on e4156f1 at 19:05: both `gate` jobs success, the push's `toolchain`
+    success (run 44376519102); the pull request's `toolchain` (run 44376533634) and both `smoke` jobs still running:
+    read again and send the advisor agent the result. Then: save the notes a last time; the last commit deletes
     `.checkpoints/kit-hold-ci*` and writes the name of the notes' commit into the report ("Where the notes are");
     no skip mark; CI on it; the advisor agent's word on the final head into the pull request's description; "ready";
-    the label needs-mustafa. No agent is running.
+    the label needs-mustafa.
 
 ## Next steps
 4. Build (three edits), the script's tests, the real CI runs (a planted change that the compare step fails on; the
@@ -354,7 +360,7 @@
 
 ## Running work
 - saver: background task b4bg0wkfu, started 18:04 UTC on 2026-11-18 on the fixed script (2-hour limit).
-- agents: none running. Done: infra-engineer, engine-architect (change-set 2's plan draft), security-auditor,
+- agents: the advisor agent on head e4156f1 (since 19:04 UTC). Done: infra-engineer, engine-architect (change-set 2's plan draft), security-auditor,
   test-engineer, the verifier, docs-keeper.
 
 ## For the list of the quality gate v2's plan (his words of 15:38 and 18:01 UTC)
