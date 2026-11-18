@@ -54,3 +54,43 @@ only as `<<Pn>>`. Add nothing the ruling does not ask (TEST-FIRST rule 3, histor
 - Section 10's Ruled lines: the ruling's one-line rulings (:174-197), the advisor's words, with "(advisor-u4f-brief.md)".
 
 ## Progress (one line per item as done)
+- A7 done: section 1 item 5 netcode.md:15 -> :17; 2.1 Bounds and 2.4 item 2 netcode.md:13-14 -> :14-15.
+- A4 done: 2.1's Ping rate and phase cell gains the interval text ("; " join); f31 gains "; the honest ping interval (A4)"
+  after ClockSync's tick period.
+- A3 done in part: 2.3's Missing row, option A's cell (";" after f34) and option B's cell; f34's row; p12's row; 5.3's
+  closing paragraph's option-A reading (line rewrapped). SENT BACK: D15 holds no "the commands that arrived after their
+  stamped tick ran" (it reads "1 - `tick.s.cmd_on_time`'s share" only: nothing to replace); 2.2's pass-marks row
+  (:340) holds the same phrase but the ruling does not name 2.2: left as rev 3.2 wrote it, for the advisor to rule.
+- A1 done: the Movement paragraph before "### 2.7" (closing 2.6); f19 after "at a 2 s episode" (matched with its row);
+  f20's replacement; Q11 (iii) (c)'s add (appended to option (iii) (c)); 5.6's B8 row after B7.
+- E4 (the coordinator's added item) done: Q11 (iii) (c) gains "the fixed inputs walk, no sprint or crouch (the brawl bots
+  hold fire, so never sprint: bots/src/lib.rs:292; rev 3.3, advisor-u4f-lead-bound.md E4)"; Q8's why "12 ticks of
+  top-speed movement per episode" -> "12 ticks of full-speed walking (600 cm/s) per episode" (once; line rewrapped);
+  2.10's Q11 (iii) (c) test gets the walk words in the counts restatement (below). 2.6 states no fixed inputs: none.
+- A2 done: Q1 (a)'s replacement (rewrapped); section 4's lane replacement; 2.5's replacement; section 6 item 4's
+  heading replaced and A2's fix sentence ("The fix moves or re-gates ...") appended to item 4; D9's claim and its When
+  ("after the build"); 2.13's npt-server row and a new npt-proto row after it. 2.10's +1 goes in the counts step.
+- A5 done: B2's list gains "rev 3.3 (A5): U4F-Q3 (c)'s ticks ...; the lead bound's header param (U4F-Q8 (b)); A1's
+  dead and respawn ticks apart".
+- A6 done: 5.5 item 2's heading (capital "After" kept at the item's start; item rewrapped); D2's after-item-2 reading
+  appended to D2's "Left" cell, with "(A6)". KL-U4F's trigger at A6's place: 9.1's KL-U4F row and 12 item 6's second
+  draft ("after 5.5 item 2 (A6's place)"), and 5.5's room paragraph ("read by D2 after item 2 (A6's place)", which said
+  "read at launch (D2 after items 1 and 2)"). Not changed: Q2's own text (its Ruled line carries the trigger).
+- Conditionals made firm: f38 and f39 ("**by U4F-Q18 (a) (ruled)**", "**by U4F-Q18 (ii) (d) (ruled)**", Δ "1"); p15-p18,
+  p19, p20 kept ("by ... (ruled)"); 5.5's pre-runs row "21 (...ruled) | about 315" and Total "65 + 21 + 9", "about 3,727".
+- Counts restated: 2.10's paragraph (+118, +133, 67; made firm: f38, f39, Q6 (b) +4, A2 +1, Q9 (a) +1 neg, Q11 (iii)
+  (c) +1 with E4's walk words; still conditional T-6 +5, P33 -1 +1; struck Q13 (a)'s +1); section 6 item 1 (+118,
+  +133); section 7 items 3 (+118, +133, 67) and 16 (5,150).
+- SIZE-CHECK done: a row "the advisor's ruling (rev 3.3) | about 300 | ..." and the Total "about 5,150 (4,200 to
+  6,200)", "about 1.7 times M's 3,000" (5,150 / 3,000 = 1.72; was 1.6).
+- Q5 done: P25's substitution in section 4's stop clause and in 12 item 3 now reads "(and npt-proto, npt-server and
+  npt-sim, which U4F-Q1 opens)" (the ruling's Q5 reasoning, :222-223); both paragraphs rewrapped (whitespace only).
+- Q6 done: f1 gains ", on a trace that carries P2's 2 % loss (rev 3.3: U4F-Q6's ruling)".
+- Section 10 Ruled lines: Q1-Q18 done, 18 lines (Grep count 18), the ruling's lines :174-197 with
+  "(advisor-u4f-brief.md)" after each; one word changed: Q12's "come to me" reads "come to the advisor" (the brief is
+  not the advisor's voice).
+- Title "(rev 3.3, day draft)"; a rev 3.3 record paragraph above rev 3.2's (states every U4F-Q ruled and that rev 3.2's
+  "Next" and "Nothing here is ruled" are its own state); the first change-list block "Change list (rev 3.2 to rev 3.3:
+  the advisor's ruling)", rows R21-R33, and "Counts at rev 3.3". `git diff --stat 0ad9661 HEAD -- spikes/netcode-proof`
+  printed nothing at HEAD 5347170eddccac6c5798adf90f82f9af3288ba88.
+- Next: line-length scan of the new lines; then r31_check.py and adv_words_check.py once each.
