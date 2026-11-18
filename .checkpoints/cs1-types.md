@@ -53,4 +53,5 @@
   to Part 15, all (a), 22:10:34 UTC.
 
 ## Running work
-- none
+- saver: background task b98z35xsq, started 11:11 UTC on 2026-11-18.
+- agents (1 of 3): engine-architect drafts the plan (`cs1-types/plan-draft.md`; its notes `engine-architect-plan.md`).
