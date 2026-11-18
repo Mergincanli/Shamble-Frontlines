@@ -77,8 +77,8 @@
      working tree: the first new test fails (the check the advisor agent asked for); renames followed: 2 fail; the
      hold in front of the foreground push only: 2 fail; the hold removed: 5 fail;
    - the kit's own 27 tests against the edited script: 27 pass.
-   `kit-edit.diff` regenerated: by lines of `diff -u`: the script +41 -1, its tests +152 -1, the rules +8; the workflow
-   +13 (`ci-edit.diff`, unchanged): 214 added lines against 150 planned (stop line 300).
+   `kit-edit.diff` regenerated: by lines of `diff -u`: the script +41 -1, its tests +157 -1, the rules +8; the workflow
+   +13 (`ci-edit.diff`, unchanged): 219 added lines against 150 planned (stop line 300).
 
 ## Current step
 8. (16:22 UTC) The message to Mustafa with the kit edit's exact text (the script's and the rules' diff in full; the
