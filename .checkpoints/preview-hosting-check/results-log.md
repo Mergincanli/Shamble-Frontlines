@@ -465,3 +465,11 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   CLOUDFLARE_API_TOKEN, both "yesterday"; "This environment has no variables." Only the reviewer changed.
 - `bite-production` started by the session after that (run_workflow, ref `main`, set `bite-production`); it does not
   wait (no reviewer).
+- **`bite-production`** (PM-0006-2's noindex bite on production): deploy run #5, id 44366750977 (created 18:10:20 UTC).
+  plan green (18:10:23-18:10:28), build green (18:10:31-18:10:51), the deploy job ran at once, no wait (18:10:54-
+  18:11:16: the reviewer is off), deployment e9a37459-a342-4d33-ba73-32f5f3549ad7 (environment "production"). verify
+  (18:11:18-18:11:41; headers-44366750977, artifact 14458320188, zip sha256 d1ddcad0f8f2..., equal to the log's
+  digest): "summary: {"records":1,"pass":0,"fail":2,"no_reading":0}"; both production links
+  (https://shamble-preview-check.pages.dev/ and https://e9a37459.shamble-preview-check.pages.dev/) fail on all 7 paths
+  with "production carries X-Robots-Tag noindex", and on nothing else: the bite caught on production's own address.
+- `restore-production` started by the session right after (run_workflow, ref `main`, set `restore-production`).
