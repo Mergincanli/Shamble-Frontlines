@@ -832,8 +832,8 @@ run here on that proof?**
   of section 7 (item 5a), its own checksum compared before every run; and the full check against GitHub's key added
   to CI when CI starts building the Wasm (CI-WASM), so that every later run there proves it; (b) build the tool here
   from its published source instead. That removes the trust in the project's release machinery, but it needs a
-  security check of about 250 crates first (the library itself brings about 5), about 50 of which run code while
-  building; it costs days, and the same build again in CI; (c) wait: first a one-off CI job that runs GitHub's own
+  security check of about 250 crates first (the library itself brings about 5; security-auditor: roughly 50 times
+  the library's review), about 50 of which run code while building, and the same build again in CI; (c) wait: first a one-off CI job that runs GitHub's own
   check on the file (a CI edit, which I ask of you with its exact text), and only after it has passed does the tool
   run here.
 - Recommendation: (a), which is security-auditor's. (c) is the cautious middle if you want the full proof before
