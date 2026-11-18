@@ -1,6 +1,6 @@
 --- .claude/scripts/checkpoint.mjs	2026-11-09 23:55:15.008962386 +0000
-+++ .gate/kit-hold-ci/checkpoint.mjs	2026-11-18 16:09:27.273694004 +0000
-@@ -14,9 +14,17 @@
++++ .gate/kit-hold-ci/checkpoint.mjs	2026-11-18 16:44:33.856386331 +0000
+@@ -14,9 +14,19 @@
  // re-read right before each push; never a force push; a refused push is reported and left alone; staged notes that
  // look like a secret (tokens, keys, credentials in URLs) are not committed. The script alone decides "[skip ci]": only
  // when every commit it pushes touches .checkpoints/ alone; skip markers from the caller are refused.
@@ -10,6 +10,8 @@
 +// by .checkpoints/<slug>/dependency-check.md, written after security-auditor's answer and naming its notes file: one
 +// line per held file, "<sha256>  <path>" as sha256sum prints it from the repository root ("deleted  <path>" for a
 +// removed file); then save again. The script trusts that record; the review of the pull request reads it.
++// Not held: a manifest or lockfile whose content in the push equals its content on main (origin/main as this clone
++// last fetched it): that content was merged with Mustafa's go, so a branch that takes main in is not stopped by it.
  // Run from the repository root. Node 22, no dependencies.
 -// Exit codes: 0 saved or nothing to save · 1 a git step failed or a secret was found · 2 usage error or refused by a guard.
 +// Exit codes: 0 saved or nothing to save · 1 a git step failed, a secret was found or a dependency change is held ·
@@ -19,7 +21,7 @@
  import { existsSync, rmSync } from 'node:fs';
  import { resolve } from 'node:path';
  
-@@ -24,6 +32,7 @@
+@@ -24,6 +34,7 @@
  const BRANCH_OK = /^(cs|claude)\/[A-Za-z0-9._-]+(\/[A-Za-z0-9._-]+)*$/;
  const SLUG_OK = /^[a-z0-9][a-z0-9-]{0,63}$/;
  const SKIP_MARK = /\[(skip ci|ci skip|no ci|skip actions|actions skip)\]|^\s*skip-checks\s*:/im;
@@ -27,7 +29,7 @@
  // An escape that can stand just before a key in pasted text: %XX (also %25-chained: %252C), %uXXXX, quoted-printable
  // =XX, and backslash escapes (JSON's \b \f \n \r \t, \v \0, \xXX, \uXXXX). The patterns with a left boundary accept it
  // there, so "q=%20sk-..." or "a\nAKIA..." is still caught. Declared before SECRETS, which uses it at load.
-@@ -101,6 +110,30 @@
+@@ -101,6 +112,33 @@
    return d.ok && d.out.split('\n').filter(Boolean).every((f) => f.startsWith(DIR));
  }
  
@@ -35,6 +37,7 @@
 +// the remote branch (against main's merge-base while the branch is not on the remote yet) and not named, with the
 +// sha256 of their content in `rev`, in that commit's .checkpoints/<slug>/dependency-check.md. Held whatever the
 +// record says: what cannot be read, and an entry that is not a plain file (a link, a submodule).
++// Not held, with or without a record: a plain file whose content in `rev` equals its content on origin/main.
 +function heldDependencyFiles(o, branch, rev) {
 +  const remote = git('rev-parse', '--verify', '--quiet', `refs/remotes/origin/${branch}`);
 +  const base = remote.ok ? remote : git('merge-base', 'refs/remotes/origin/main', rev);
@@ -48,6 +51,8 @@
 +    if (!entry.out) return !released.has(`deleted  ${f}`);
 +    const plain = /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(entry.out);
 +    if (!plain) return true;
++    const onMain = /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(git('ls-tree', 'refs/remotes/origin/main', '--', f).out);
++    if (onMain && onMain[1] === plain[1]) return false;
 +    try {
 +      const blob = execFileSync('git', ['cat-file', 'blob', plain[1]], { stdio: ['ignore', 'pipe', 'ignore'], shell: false, maxBuffer: 64 << 20 });
 +      return !released.has(`${createHash('sha256').update(blob).digest('hex')}  ${f}`);
@@ -58,7 +63,7 @@
  // The notes staged in a private index that look like a secret: [path, kind] pairs. Names are read NUL-separated (never
  // quoted); a note that can't be read counts as a hit. The secret itself is never printed.
  function stagedSecrets(ig, head) {
-@@ -177,6 +210,13 @@
+@@ -177,6 +215,13 @@
    const sync = await withLockRetry(() => git('reset', '--quiet', 'HEAD', '--', DIR));
    if (!sync.ok) log(`WARNING: the index's ${DIR} entries are behind HEAD; run: git reset -q HEAD -- ${DIR}`);
    const sha = commit.out.slice(0, 7);
@@ -73,8 +78,8 @@
      log(`saved locally, NOT pushed ${sha} on ${branch}: the branch has unpushed commits outside ${DIR} (push them yourself)`);
      return 0;
 --- .claude/CHECKPOINTS.md	2026-11-17 19:13:43.914036769 +0000
-+++ .gate/kit-hold-ci/CHECKPOINTS.md	2026-11-18 16:09:27.274991732 +0000
-@@ -57,6 +57,14 @@
++++ .gate/kit-hold-ci/CHECKPOINTS.md	2026-11-18 16:44:33.857012574 +0000
+@@ -57,6 +57,16 @@
  - One command commits and pushes the checkpoint folder alone, leaving anything else you staged as it is:
    `node .claude/scripts/checkpoint.mjs save <task-slug> -m "<step>" --trailer "<attribution line>"` (one `--trailer` per
    attribution line the session's instructions give).
@@ -86,11 +91,13 @@
 +  naming that answer's notes file: one line per file, `<sha256>  <path>` as `sha256sum` prints it from the repository
 +  root (`deleted  <path>` for a removed file); then `save` again. Until then build nothing that holds the change, and
 +  push nothing by hand: a plain `git push` is not held.
++  A manifest or lockfile is not held when its content in the push equals its content on main (`origin/main` as last
++  fetched): that content was merged with Mustafa's go, so a branch that takes main in is not stopped by it.
  - Each step ends with a three-part summary for Mustafa (brief §6): what's done, what's checkpointed (where), what's
    next.
  - **At every update, check the background saver** when agents or a workflow are running, and restart it if it has
 --- .claude/scripts/checkpoint.test.mjs	2026-11-09 23:55:15.009247589 +0000
-+++ .gate/kit-hold-ci/checkpoint.test.mjs	2026-11-18 16:19:41.296382560 +0000
++++ .gate/kit-hold-ci/checkpoint.test.mjs	2026-11-18 16:44:33.859651790 +0000
 @@ -4,7 +4,8 @@
  import { test } from 'node:test';
  import assert from 'node:assert/strict';
@@ -101,7 +108,7 @@
  import { tmpdir } from 'node:os';
  import { join, dirname } from 'node:path';
  import { fileURLToPath } from 'node:url';
-@@ -431,3 +432,158 @@
+@@ -431,3 +432,203 @@
    assert.match(leak.stdout, /NOT committed: \.checkpoints\/leak\.md looks like a API key/);
    assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/wt'), sh(wt, 'rev-parse', 'HEAD'));
  });
@@ -258,5 +265,50 @@
 +  const deadline = Date.now() + 15000;
 +  while (!/saved (locally|and pushed)/.test(out) && Date.now() < deadline) await new Promise((r) => setTimeout(r, 200));
 +  assert.match(out, /saved locally, NOT pushed .* no recorded check: Cargo\.lock\. /);
++  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
++});
++
++test('a manifest or lockfile whose content in the push equals its content on main is not held', (t) => {
++  const { repo, origin } = fixture(t);
++  // Main gains files through another pull request, and the branch takes main in.
++  const mainGains = (names, write) => {
++    sh(repo, 'switch', '--quiet', 'main');
++    write();
++    sh(repo, 'add', ...names);
++    sh(repo, 'commit', '--quiet', '-m', `main gains ${names.join(', ')}`);
++    sh(repo, 'push', '--quiet', 'origin', 'main');
++    sh(repo, 'switch', '--quiet', 'cs/test');
++    sh(repo, 'merge', '--quiet', '--no-edit', 'main');
++  };
++  mainGains(['Cargo.lock', 'tools/package.json'], () => {
++    mkdirSync(join(repo, 'tools'), { recursive: true });
++    writeFileSync(join(repo, 'Cargo.lock'), 'merged\n');
++    writeFileSync(join(repo, 'tools', 'package.json'), 'merged too\n');
++  });
++  note(repo);
++  let r = run(repo, 'save', 'test', '-m', 'main taken in');
++  assert.equal(r.status, 0, r.stderr + r.stdout);
++  assert.match(r.stdout, /saved and pushed/);
++  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), sh(repo, 'rev-parse', 'HEAD'));
++
++  // One line more than main's content: held as before.
++  const pushed = sh(origin, 'rev-parse', 'refs/heads/cs/test');
++  writeFileSync(join(repo, 'Cargo.lock'), 'merged\nand one more\n');
++  sh(repo, 'commit', '--quiet', '-am', 'a dependency on top of main');
++  note(repo, 'test.md', 'on top of main\n');
++  r = run(repo, 'save', 'test', '-m', 'not main');
++  assert.equal(r.status, 1, r.stderr + r.stdout);
++  assert.match(r.stdout, /no recorded check: Cargo\.lock\. /);
++  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
++
++  // A lockfile that is a link stays held, also when main holds the same link.
++  mainGains(['sub/Cargo.lock'], () => {
++    mkdirSync(join(repo, 'sub'), { recursive: true });
++    symlinkSync('../Cargo.lock', join(repo, 'sub', 'Cargo.lock'));
++  });
++  note(repo, 'test.md', 'main taken in again\n');
++  r = run(repo, 'save', 'test', '-m', 'a link from main');
++  assert.equal(r.status, 1, r.stderr + r.stdout);
++  assert.match(r.stdout, /no recorded check: Cargo\.lock, sub\/Cargo\.lock\. /);
 +  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
 +});

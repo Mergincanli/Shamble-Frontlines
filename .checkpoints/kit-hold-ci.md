@@ -7,7 +7,7 @@
   15:38:13 UTC, his label 16:24 Amsterdam; `kit-hold-ci/mustafa-2026-11-18-1624-merge-58.md`, by script).
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/kit-hold-ci) · **Base:** main
   9b4b518f520aa2360a8007dc857ba74b343c8a40 (the merge of #58; the branch was fast-forwarded to it and pushed)
-- **Last update:** 2026-11-18 17:22 CET (from the clock)
+- **Last update:** 2026-11-18 17:50 CET (from the clock)
 
 ## What his words ask (read the file; these are pointers, not his words)
 - DEP-HOLD (a): "Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no
@@ -80,13 +80,41 @@
    `kit-edit.diff` regenerated: by lines of `diff -u`: the script +41 -1, its tests +157 -1, the rules +8; the workflow
    +13 (`ci-edit.diff`, unchanged): 219 added lines against 150 planned (stop line 300).
 
+8. His answer to KIT-TEXT (2026-11-18, 16:39:23 UTC; his label 17:30 Amsterdam;
+   `kit-hold-ci/mustafa-2026-11-18-1730-kit-text.md`, by script, 1,542 bytes): "(b), yes, with one change." The
+   change, in his words: "a manifest or lockfile is not held when its content in the push equals its content on main.
+   That content was merged with my go, so a branch that takes main in is not stopped by it. Say so in the rule line
+   too. Everything else stays exactly as in that file." Also: a test for it, shown failing on a broken copy; the
+   advisor agent reads the changed lines once; then write the four files; the ready report shows the changed lines
+   ("I do not need to see them before you write"). The planted change: yes as described. "Nothing else in it": the
+   reading is right. The stop rule for the new CI lines stands.
+   - His three checks after the compaction (16:39 to 16:41 UTC): the scratch copies gave `kit-edit.diff` (sha256
+     70756f3d...6ce5, 262 lines) and `ci-edit.diff` (9a3b2945...) byte for byte; nothing in `.claude/` or `.github/`
+     edited; the saver ran. Session (get_session, 16:40 UTC): model claude-fable-5-2 (configured and last served);
+     permission mode "default" (every edit asks him; not auto); context 120,520 of 1,000,000.
+9. The one change, on the scratch copies only (16:44 to 16:49 UTC), added lines only, no existing line touched:
+   - `checkpoint.mjs` +5: two comment lines in the header, one in the function's comment, and two code lines after
+     the plain-file check: the file's entry on `refs/remotes/origin/main` is read, and a plain file there with the
+     same blob id is not held. Read as his words say: content (the blob), not the file mode; a link or submodule in
+     the push stays held whatever main holds; a file removed in the push stays held until `deleted  <path>` is
+     recorded, also when main removed it too (no content to compare: his words speak of content; told in the report).
+   - `CHECKPOINTS.md` +2 (the rule line says it); `checkpoint.test.mjs` +46 (one new test, number 33, three steps).
+   - Run: the scratch tests against the scratch script 33 pass; against the text he saw (`broken-main-rule-missing`)
+     the new test fails at step 1 (held); against `broken-main-any-content` (any plain file that main also has is
+     released) at step 2; against `broken-main-before-plain` (the comparison before the plain-file check) at step 3;
+     against today's kit script 27 pass and the 6 new fail; the kit's own 27 tests against the scratch script pass.
+   - Notes: `kit-edit.diff` is now the final text (314 lines, sha256 425731d7...); `kit-edit-as-shown.diff` is the
+     text he answered on (70756f3d...); `kit-change.diff` is what changed between them (90 lines, 367137856...;
+     52 added lines, none removed). The scratch copies as he saw them: `.gate/kit-hold-ci/as-shown/`.
+   - Size by lines of `diff -u`: the script +46, its tests +203, the rules +10, the workflow +13: 272 added lines
+     against 150 planned (stop line 300).
+
 ## Current step
-8. (16:22 UTC) The message to Mustafa with the kit edit's exact text (the script's and the rules' diff in full; the
-   whole diff, tests included, sent as a file: `.gate/kit-hold-ci/kit-hold-exact-text.diff`, a copy of
-   `kit-edit.diff`) and how the hold is released. **Stop for his yes and for the chat in Accept edits.** Nothing in
-   `.claude/` or `.github/` is written before it. After his yes: as the list under step 7 of the plan's order says
-   (write the four files so that `git diff` equals the two diff files; tests; commit by path; push; the clean run
-   and the stop rule; the plant and its take-back; reviews; the verifier; the docs; the report; the pull request).
+10. (16:50 UTC) The advisor agent reads the changed lines once (`kit-change.diff`). Then the four files are written
+    (three kit files and the workflow) so that their `git diff` equals `kit-edit.diff` and `ci-edit.diff`; each edit
+    asks him (the guard; the chat is in "default" mode). Then: the kit tests (33), the other kit tests, the gate;
+    commit by path; push; the clean CI run (stop rule); the plant and its take-back; reviews; the verifier; the
+    docs; the report; the pull request.
 
 ## Next steps
 4. Build (three edits), the script's tests, the real CI runs (a planted change that the compare step fails on; the

@@ -1,0 +1,262 @@
+--- .claude/scripts/checkpoint.mjs	2026-11-09 23:55:15.008962386 +0000
++++ .gate/kit-hold-ci/checkpoint.mjs	2026-11-18 16:09:27.273694004 +0000
+@@ -14,9 +14,17 @@
+ // re-read right before each push; never a force push; a refused push is reported and left alone; staged notes that
+ // look like a secret (tokens, keys, credentials in URLs) are not committed. The script alone decides "[skip ci]": only
+ // when every commit it pushes touches .checkpoints/ alone; skip markers from the caller are refused.
++// Dependency hold (Mustafa's DEP-HOLD, 2026-11-18): save and watch never push while what they would push changes a
++// manifest or a lockfile (Cargo.toml, Cargo.lock, package.json, package-lock.json, npm-shrinkwrap.json, in any folder)
++// whose security check is not recorded: the notes are committed locally, the files are named, save exits 1. Released
++// by .checkpoints/<slug>/dependency-check.md, written after security-auditor's answer and naming its notes file: one
++// line per held file, "<sha256>  <path>" as sha256sum prints it from the repository root ("deleted  <path>" for a
++// removed file); then save again. The script trusts that record; the review of the pull request reads it.
+ // Run from the repository root. Node 22, no dependencies.
+-// Exit codes: 0 saved or nothing to save · 1 a git step failed or a secret was found · 2 usage error or refused by a guard.
++// Exit codes: 0 saved or nothing to save · 1 a git step failed, a secret was found or a dependency change is held ·
++// 2 usage error or refused by a guard.
+ import { execFileSync } from 'node:child_process';
++import { createHash } from 'node:crypto';
+ import { existsSync, rmSync } from 'node:fs';
+ import { resolve } from 'node:path';
+ 
+@@ -24,6 +32,7 @@
+ const BRANCH_OK = /^(cs|claude)\/[A-Za-z0-9._-]+(\/[A-Za-z0-9._-]+)*$/;
+ const SLUG_OK = /^[a-z0-9][a-z0-9-]{0,63}$/;
+ const SKIP_MARK = /\[(skip ci|ci skip|no ci|skip actions|actions skip)\]|^\s*skip-checks\s*:/im;
++const DEP_FILE = /(^|\/)(Cargo\.toml|Cargo\.lock|package\.json|package-lock\.json|npm-shrinkwrap\.json)$/;
+ // An escape that can stand just before a key in pasted text: %XX (also %25-chained: %252C), %uXXXX, quoted-printable
+ // =XX, and backslash escapes (JSON's \b \f \n \r \t, \v \0, \xXX, \uXXXX). The patterns with a left boundary accept it
+ // there, so "q=%20sk-..." or "a\nAKIA..." is still caught. Declared before SECRETS, which uses it at load.
+@@ -101,6 +110,30 @@
+   return d.ok && d.out.split('\n').filter(Boolean).every((f) => f.startsWith(DIR));
+ }
+ 
++// The manifests and lockfiles that pushing `rev` would publish with no recorded check: changed, tree to tree, against
++// the remote branch (against main's merge-base while the branch is not on the remote yet) and not named, with the
++// sha256 of their content in `rev`, in that commit's .checkpoints/<slug>/dependency-check.md. Held whatever the
++// record says: what cannot be read, and an entry that is not a plain file (a link, a submodule).
++function heldDependencyFiles(o, branch, rev) {
++  const remote = git('rev-parse', '--verify', '--quiet', `refs/remotes/origin/${branch}`);
++  const base = remote.ok ? remote : git('merge-base', 'refs/remotes/origin/main', rev);
++  const names = base.ok ? git('diff', '-z', '--name-only', '--no-renames', base.out, rev) : base;
++  if (!names.ok) return ['(what this push changes could not be read)'];
++  const record = git('show', `${rev}:${DIR}${o.slug}/dependency-check.md`);
++  const released = new Set(record.ok ? record.out.split('\n').map((l) => l.trim()) : []);
++  return names.out.split('\0').filter((f) => DEP_FILE.test(f)).filter((f) => {
++    const entry = git('ls-tree', rev, '--', f);
++    if (!entry.ok) return true;
++    if (!entry.out) return !released.has(`deleted  ${f}`);
++    const plain = /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(entry.out);
++    if (!plain) return true;
++    try {
++      const blob = execFileSync('git', ['cat-file', 'blob', plain[1]], { stdio: ['ignore', 'pipe', 'ignore'], shell: false, maxBuffer: 64 << 20 });
++      return !released.has(`${createHash('sha256').update(blob).digest('hex')}  ${f}`);
++    } catch { return true; }
++  });
++}
++
+ // The notes staged in a private index that look like a secret: [path, kind] pairs. Names are read NUL-separated (never
+ // quoted); a note that can't be read counts as a hit. The secret itself is never printed.
+ function stagedSecrets(ig, head) {
+@@ -177,6 +210,13 @@
+   const sync = await withLockRetry(() => git('reset', '--quiet', 'HEAD', '--', DIR));
+   if (!sync.ok) log(`WARNING: the index's ${DIR} entries are behind HEAD; run: git reset -q HEAD -- ${DIR}`);
+   const sha = commit.out.slice(0, 7);
++  const held = heldDependencyFiles(o, branch, commit.out);
++  if (held.length) {
++    log(`saved locally, NOT pushed ${sha} on ${branch}: the push would publish a dependency change with no recorded check: ${held.join(', ')}. ` +
++      `After security-auditor's answer on it, write ${DIR}${o.slug}/dependency-check.md (one line per file: "<sha256>  <path>" as sha256sum prints it ` +
++      `from the repository root, "deleted  <path>" for a removed file) and save again; until then build nothing that holds the change`);
++    return 1;
++  }
+   if (background && codeAhead) {
+     log(`saved locally, NOT pushed ${sha} on ${branch}: the branch has unpushed commits outside ${DIR} (push them yourself)`);
+     return 0;
+--- .claude/CHECKPOINTS.md	2026-11-17 19:13:43.914036769 +0000
++++ .gate/kit-hold-ci/CHECKPOINTS.md	2026-11-18 16:09:27.274991732 +0000
+@@ -57,6 +57,14 @@
+ - One command commits and pushes the checkpoint folder alone, leaving anything else you staged as it is:
+   `node .claude/scripts/checkpoint.mjs save <task-slug> -m "<step>" --trailer "<attribution line>"` (one `--trailer` per
+   attribution line the session's instructions give).
++- **A dependency change is held** (Mustafa's DEP-HOLD, 2026-11-18): the script (`save` and the saver alike) never
++  pushes while what it would push changes a manifest or a lockfile (`Cargo.toml`, `Cargo.lock`, `package.json`,
++  `package-lock.json`, `npm-shrinkwrap.json`, in any folder), compared with the remote branch, or with main for a
++  branch not yet pushed. It commits the notes locally, names the files, and `save` exits 1. The hold is released by
++  `.checkpoints/<task-slug>/dependency-check.md`, written after security-auditor's answer on exactly that content and
++  naming that answer's notes file: one line per file, `<sha256>  <path>` as `sha256sum` prints it from the repository
++  root (`deleted  <path>` for a removed file); then `save` again. Until then build nothing that holds the change, and
++  push nothing by hand: a plain `git push` is not held.
+ - Each step ends with a three-part summary for Mustafa (brief §6): what's done, what's checkpointed (where), what's
+   next.
+ - **At every update, check the background saver** when agents or a workflow are running, and restart it if it has
+--- .claude/scripts/checkpoint.test.mjs	2026-11-09 23:55:15.009247589 +0000
++++ .gate/kit-hold-ci/checkpoint.test.mjs	2026-11-18 16:19:41.296382560 +0000
+@@ -4,7 +4,8 @@
+ import { test } from 'node:test';
+ import assert from 'node:assert/strict';
+ import { spawnSync, spawn } from 'node:child_process';
+-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
++import { createHash } from 'node:crypto';
++import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync } from 'node:fs';
+ import { tmpdir } from 'node:os';
+ import { join, dirname } from 'node:path';
+ import { fileURLToPath } from 'node:url';
+@@ -431,3 +432,158 @@
+   assert.match(leak.stdout, /NOT committed: \.checkpoints\/leak\.md looks like a API key/);
+   assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/wt'), sh(wt, 'rev-parse', 'HEAD'));
+ });
++
++// The dependency hold (Mustafa's DEP-HOLD, 2026-11-18).
++const sha256 = (text) => createHash('sha256').update(text).digest('hex');
++const depCheck = (repo, text) => {
++  mkdirSync(join(repo, '.checkpoints', 'test'), { recursive: true });
++  writeFileSync(join(repo, '.checkpoints', 'test', 'dependency-check.md'), text);
++};
++
++test('a save holds a push that changes a lockfile until its check is recorded for that exact content', (t) => {
++  const { repo, origin } = fixture(t);
++  const before = sh(origin, 'rev-parse', 'refs/heads/cs/test');
++  mkdirSync(join(repo, 'crates', 'a'), { recursive: true });
++  writeFileSync(join(repo, 'Cargo.lock'), 'one\n');
++  writeFileSync(join(repo, 'crates', 'a', 'Cargo.toml'), 'two\n');
++  sh(repo, 'add', 'Cargo.lock', 'crates/a/Cargo.toml');
++  sh(repo, 'commit', '--quiet', '-m', 'a new dependency');
++  note(repo);
++  let r = run(repo, 'save', 'test', '-m', 'step 1');
++  assert.equal(r.status, 1, r.stderr + r.stdout);
++  assert.match(r.stdout, /saved locally, NOT pushed .* dependency change with no recorded check: Cargo\.lock, crates\/a\/Cargo\.toml\. /);
++  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), before);
++  assert.match(sh(repo, 'log', '-1', '--format=%s'), /^checkpoint\(test\): step 1$/);
++
++  // A record for one file only, with another content for the second: still held, and the line names what is left.
++  depCheck(repo, `checked\n${sha256('one\n')}  Cargo.lock\n${sha256('other\n')}  crates/a/Cargo.toml\n`);
++  r = run(repo, 'save', 'test', '-m', 'step 2');
++  assert.equal(r.status, 1, r.stderr + r.stdout);
++  assert.match(r.stdout, /no recorded check: crates\/a\/Cargo\.toml\. /);
++  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), before);
++
++  // The right record on disk, but in a note the save leaves out (it looks like a secret): the commit to push still
++  // holds step 2's record, and the hold reads the commit, not the working tree.
++  depCheck(repo, `${sha256('one\n')}  Cargo.lock\n${sha256('two\n')}  crates/a/Cargo.toml\nghp_${'a'.repeat(36)}\n`);
++  note(repo, 'test.md', 'step 3\n');
++  r = run(repo, 'save', 'test', '-m', 'step 3');
++  assert.equal(r.status, 1, r.stderr + r.stdout);
++  assert.match(r.stdout, /no recorded check: crates\/a\/Cargo\.toml\. /);
++  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), before);
++
++  // Both recorded with their content's sha256: released, and every local commit is pushed.
++  depCheck(repo, `checked\n${sha256('one\n')}  Cargo.lock\n${sha256('two\n')}  crates/a/Cargo.toml\n`);
++  r = run(repo, 'save', 'test', '-m', 'step 4');
++  assert.equal(r.status, 0, r.stderr + r.stdout);
++  assert.match(r.stdout, /saved and pushed/);
++  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), sh(repo, 'rev-parse', 'HEAD'));
++
++  // The lockfile changes again: the old record no longer releases it.
++  writeFileSync(join(repo, 'Cargo.lock'), 'three\n');
++  sh(repo, 'commit', '--quiet', '-am', 'another dependency');
++  note(repo, 'test.md', 'more\n');
++  const pushedHead = sh(origin, 'rev-parse', 'refs/heads/cs/test');
++  r = run(repo, 'save', 'test', '-m', 'step 5');
++  assert.equal(r.status, 1, r.stderr + r.stdout);
++  assert.match(r.stdout, /no recorded check: Cargo\.lock\. /);
++  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushedHead);
++});
++
++test('the hold covers npm files and a removed manifest, and leaves other code alone', (t) => {
++  const { repo, origin } = fixture(t);
++  const before = sh(origin, 'rev-parse', 'refs/heads/cs/test');
++  writeFileSync(join(repo, 'code.js'), '1;\n');
++  writeFileSync(join(repo, 'not-package.json.txt'), 'x\n');
++  sh(repo, 'add', 'code.js', 'not-package.json.txt');
++  sh(repo, 'commit', '--quiet', '-m', 'code only');
++  note(repo);
++  assert.equal(run(repo, 'save', 'test', '-m', 'code is not held').status, 0);
++  assert.notEqual(sh(origin, 'rev-parse', 'refs/heads/cs/test'), before);
++
++  for (const [i, name] of ['package.json', 'tools/package-lock.json', 'npm-shrinkwrap.json'].entries()) {
++    mkdirSync(join(repo, 'tools'), { recursive: true });
++    writeFileSync(join(repo, name), `${i}\n`);
++    sh(repo, 'add', name);
++    sh(repo, 'commit', '--quiet', '-m', `add ${name}`);
++    note(repo, 'test.md', `n${i}\n`);
++    const held = run(repo, 'save', 'test', '-m', `held ${i}`);
++    assert.equal(held.status, 1, name);
++    assert.ok(held.stdout.includes(`no recorded check: ${name}. `), held.stdout);
++    depCheck(repo, `${sha256(`${i}\n`)}  ${name}\n`);
++    assert.equal(run(repo, 'save', 'test', '-m', `released ${i}`).status, 0, name);
++  }
++
++  sh(repo, 'rm', '--quiet', 'package.json');
++  sh(repo, 'commit', '--quiet', '-m', 'remove a manifest');
++  note(repo, 'test.md', 'removed\n');
++  const r = run(repo, 'save', 'test', '-m', 'held');
++  assert.equal(r.status, 1);
++  assert.match(r.stdout, /no recorded check: package\.json\. /);
++  depCheck(repo, 'deleted  package.json\n');
++  assert.equal(run(repo, 'save', 'test', '-m', 'released').status, 0);
++  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), sh(repo, 'rev-parse', 'HEAD'));
++});
++
++test('a branch that is not on the remote yet is held against main', (t) => {
++  const { repo, origin } = fixture(t, null);
++  sh(repo, 'switch', '--quiet', '-c', 'cs/new');
++  writeFileSync(join(repo, 'Cargo.toml'), 'dep\n');
++  sh(repo, 'add', 'Cargo.toml');
++  sh(repo, 'commit', '--quiet', '-m', 'a dependency on a new branch');
++  note(repo);
++  const r = run(repo, 'save', 'test', '-m', 'first save');
++  assert.equal(r.status, 1, r.stderr + r.stdout);
++  assert.match(r.stdout, /no recorded check: Cargo\.toml\. /);
++  assert.throws(() => sh(origin, 'rev-parse', '--verify', 'refs/heads/cs/new'));
++});
++
++test('a lockfile that is a link, or that moves into .checkpoints/ under another name, is held', (t) => {
++  const { repo, origin } = fixture(t);
++  const before = sh(origin, 'rev-parse', 'refs/heads/cs/test');
++  writeFileSync(join(repo, 'real.lock'), 'one\n');
++  symlinkSync('real.lock', join(repo, 'Cargo.lock'));
++  sh(repo, 'add', 'real.lock', 'Cargo.lock');
++  sh(repo, 'commit', '--quiet', '-m', 'a lockfile that is a link');
++  note(repo);
++  depCheck(repo, `${sha256('one\n')}  Cargo.lock\n${sha256('real.lock')}  Cargo.lock\ndeleted  Cargo.lock\n`);
++  const r = run(repo, 'save', 'test', '-m', 'a link');
++  assert.equal(r.status, 1, r.stderr + r.stdout);
++  assert.match(r.stdout, /no recorded check: Cargo\.lock\. /);
++  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), before);
++
++  const second = fixture(t);
++  writeFileSync(join(second.repo, 'package-lock.json'), 'locked\n');
++  sh(second.repo, 'add', 'package-lock.json');
++  sh(second.repo, 'commit', '--quiet', '-m', 'a lockfile');
++  sh(second.repo, 'push', '--quiet', 'origin', 'cs/test');
++  const pushed = sh(second.origin, 'rev-parse', 'refs/heads/cs/test');
++  note(second.repo);
++  sh(second.repo, 'mv', 'package-lock.json', '.checkpoints/moved.txt');
++  sh(second.repo, 'commit', '--quiet', '-m', 'the lockfile moved into the notes under another name');
++  note(second.repo, 'test.md', 'after the move\n');
++  const moved = run(second.repo, 'save', 'test', '-m', 'moved');
++  assert.equal(moved.status, 1, moved.stderr + moved.stdout);
++  assert.match(moved.stdout, /no recorded check: package-lock\.json\. /);
++  assert.equal(sh(second.origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
++});
++
++test('watch holds a dependency change too, also when only .checkpoints/ seems to be ahead', async (t) => {
++  const { repo, origin } = fixture(t);
++  writeFileSync(join(repo, 'Cargo.lock'), 'locked\n');
++  sh(repo, 'add', 'Cargo.lock');
++  sh(repo, 'commit', '--quiet', '-m', 'a lockfile');
++  sh(repo, 'push', '--quiet', 'origin', 'cs/test');
++  const pushed = sh(origin, 'rev-parse', 'refs/heads/cs/test');
++  note(repo);
++  sh(repo, 'mv', 'Cargo.lock', '.checkpoints/moved.txt');
++  sh(repo, 'commit', '--quiet', '-m', 'the lockfile moved into the notes under another name');
++  note(repo, 'test.md', 'after the move\n');
++  const child = spawn(process.execPath, [SCRIPT, 'watch', 'test', '--every', '0.01', '--for', '1'], { cwd: repo });
++  let out = '';
++  child.stdout.on('data', (d) => { out += d; });
++  t.after(() => child.kill('SIGKILL'));
++  const deadline = Date.now() + 15000;
++  while (!/saved (locally|and pushed)/.test(out) && Date.now() < deadline) await new Promise((r) => setTimeout(r, 200));
++  assert.match(out, /saved locally, NOT pushed .* no recorded check: Cargo\.lock\. /);
++  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
++});
