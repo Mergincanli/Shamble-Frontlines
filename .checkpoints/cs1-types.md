@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 13:26 CET (from the clock)
+- **Last update:** 2026-11-18 13:28 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -48,18 +48,23 @@
      errors, with two scratch configs under `.gate/cs1-types/` (`tsconfig.json`: tests included, `skipLibCheck`,
      because Vitest's own `.d.ts` files need DOM names; `tsconfig.shipped.json`: shipped sources alone, library
      files checked). `npm ci --ignore-scripts` was run (46 packages, the locked ones).
-   - WRITTEN, NOT COMPILED (ts-rs waits for the security answer): `crates/protocol/src/messages.rs` (the eight types).
-   - LEFT: `crates/protocol/src/lib.rs` (modules `messages`, `#[cfg(test)] mod ts_export`), `ts_export.rs` (after the
-     security answer's hardening advice on the scratch folder; API facts are in its notes, block B11: `Config::new()
-     .with_out_dir(dir).with_import_extension(Some("ts"))`, `<T as ts_rs::TS>::export_all(&cfg)`, `[u8; 32]` becomes a
-     32-element tuple, ts-rs never deletes), write mode for `generated/protocol/`, `packages/types/src/index.ts` and
-     `index.test.ts` (the stub `PACKAGE` goes), the description line in `packages/types/package.json`, then section
-     6's checks, the planted defects, the 20 runs.
-   - security-auditor (task a273383fb79fd7d03; notes `cs1-types/security-auditor-deps.md`): blocks B0 to B12 and B14
-     are DONE in its notes (the nine entries clean so far; the early CI build rated Medium as a process miss, with a
-     fix: keep manifest edits uncommitted until the check answers); B13 (findings and the answer) is left. Until its
-     answer says CLEAR TO BUILD nothing that compiles ts-rs runs. Then: the answer and the CI miss go to the advisor
-     agent before the build goes on (the plan: a finding at Medium or above goes to the advisor agent).
+   - WRITTEN, NOT COMPILED (formatted only): `crates/protocol/src/messages.rs` (116 lines, the eight types),
+     `ts_export.rs` (106; scratch folder made with an exclusive `create_dir` under the temporary folder, pid plus a
+     counter, never reused or cleared; removed after a pass), `lib.rs` (modules; the overflow test kept).
+   - LEFT after the advisor agent's ruling: compile and test `protocol`; write mode for `generated/protocol/`;
+     `packages/types/src/index.ts` and `index.test.ts` (the stub `PACKAGE` goes); the description line in
+     `packages/types/package.json`; section 6's checks; the planted defects; the 20 runs.
+   - **The security answer is in (12:27 UTC; `cs1-types/security-auditor-deps.md`, block B13): CLEAR TO BUILD for the
+     nine crates.** One Medium, P1, a process finding: CI run 168 built them before the check (block B14: small
+     reach, the code that ran is reviewed clean; fix: dependency edits stay uncommitted until the check answers).
+     Lows: L1 ts-rs ships no licence file (MIT declared); L2 the draft's "MSRV 1.88.0" is 1.78.0 in the published
+     manifest (correct it in the report); L3 the scratch folder (taken into `ts_export.rs` as above); L4 the CI cut
+     stops IP traffic only (R6, later). Not checked by it: listed at the end of B13.
+   - **The advisor agent rules on it now** (started 12:28 UTC; notes `cs1-types/advisor-security.md`; the plan: a
+     finding at Medium or above stops the build and goes to the advisor agent). Until its APPROVE nothing that
+     compiles ts-rs runs and no code commit is made. If the agent is lost: start it again with the same five
+     points (does the answer meet condition 3; P1's severity and whether Mustafa's word is needed first; the fix
+     for dependency changes and a decision entry on the kit option; L3; the three deviations and the size).
 
 ## A process miss to report (records, with their times)
 - **CI built the new dependency once before the security check's answer.** The manifests' commit 566d1d1 carried
@@ -148,4 +153,5 @@
 
 ## Running work
 - saver: background task b98z35xsq, started 11:11 UTC on 2026-11-18.
-- agents (1 of 3): security-auditor on the nine lockfile entries (started 12:03 UTC).
+- agents (1 of 3): the advisor agent on the security answer and the CI miss (started 12:28 UTC). security-auditor
+  finished its notes at 12:27 UTC (DONE).
