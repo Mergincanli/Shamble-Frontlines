@@ -3,8 +3,9 @@
 _Written by the main session on 2026-11-18 21:08 UTC (from the clock). The plan's step 0 (`plan.md`, section 8). The question, its
 one researched option and its decider are ADR 0002's (`docs/adr/0002-code-structure-build-toolchain.md` :1085-1093):
 "Decider: a by-day reading of its maintenance issue (#4533) and the guide's governance page"; "What decides it: what
-those two pages say about maintainers and release policy." Read by a fetch agent (Opus 5.5) on 2026-11-18 between
-21:05 and 21:07 UTC; the release dates below it were read by the main session from the registry directly at 21:07 UTC.
+those two pages say about maintainers and release policy." Read by a fetch agent (Opus 5.5) on 2026-11-18, after
+this session's save of 21:04:49 UTC and before its registry read of 21:07:52 UTC (the agent ran for 116 seconds by
+the session's record); the release dates were read by the main session from the registry directly at 21:07:52 UTC.
 The agent's whole answer is in this session's record; the quotes here are the pages' words as it gave them._
 
 ## What was read
