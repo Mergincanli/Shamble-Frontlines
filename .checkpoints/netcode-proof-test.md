@@ -180,8 +180,9 @@
   `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py <worktree>
   .checkpoints/netcode-proof-test/wip/u4f-build.patch u4f-build` (one snapshot per live worktree; WIP-CLEAN deletes it
   when merged or replaced), then save the card; on a cut, check the worktree against its last snapshot first.
-- The saver bnvncmf4z runs from 11:44 UTC (`node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer
-  "Claude-Session: …"`, run_in_background, timeout 7200000: it ends by 13:44, restart it while agents run). The 2-hour
+- The saver bsacee7la runs from 13:35 UTC (bnvncmf4z ran 11:44 to 13:34) (`node .claude/scripts/checkpoint.mjs watch
+  netcode-proof-test --trailer "Claude-Session: …"`, run_in_background, timeout 7200000: its window ends by 15:25;
+  restart it while agents run). The 2-hour
   check-in trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (11:44 UTC; next 12:34); pause it when no agent runs.
 - The last workflow: wf_b2a20e74-6aa (the fix pass and the advisor's check), done before 22:43 UTC on 2026-11-17.
 
