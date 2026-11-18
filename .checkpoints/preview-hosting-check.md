@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 17:11 Amsterdam (16:11 UTC)
+- **Last update:** 2026-11-18 17:28 Amsterdam (16:28 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -441,9 +441,47 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      last one at 16:30 UTC if needed, after which "the schedule has not fired" is a finding.
    - Check-in 2 (fired 16:01:53 UTC): still none; probe.yml registered and active since 14:57:13 UTC. Check-in 3 (the
      last) set for 16:31 UTC.
+   - Read by the session at about 16:21 UTC (the GitHub MCP tool): 3 runs in the repository, none of them `probe`.
+   - It does not block sitting 1. It blocks sitting 2's closes (consultation 17): the 24-hour reading rests on a script
+     that has never run against Cloudflare, so one probe run is read before the clocks start, started by hand
+     (`purpose: deletion`) if the schedule still has not fired.
+
+23. Day 1, sitting 1 (plan Part 3 C), prepared after consultation 17; step 22 stays open. The marks start here: no run
+   is re-run until green (ADR 0006 :1404); a re-run is his click, on a new list (re-running a deploy run is not among my
+   acts).
+   - My gates (starting a run is my act): one run waiting at a time; the next run starts only after the previous run's
+     verify has finished (production is shared: an early restore would turn the bite's verify into a stale "no
+     reading"); `uploads` only after his first count, `bites` only after his second; `browsers` only once the records
+     show `bite-coep` and `bite-nocache` uploaded; `bite-production` only after both browser machines have finished.
+     Each "approve now" names the run's number, link and legs (from its job names): deploy.yml has no `run-name`, so all
+     five show as "deploy". `round-a` is started first and the list sent once plan and build are green and deploy waits
+     (as with the setup pull request); if `run_workflow` is refused, he starts it (Actions, deploy, Run workflow).
+   - Outcomes → next action (written before `round-a` starts):
+     - `round-a`: plan and build (3 legs) green; deploy waits on `preview` (one approval or three: asked of him and
+       cross-checked with the legs' start times); deploy green (3 uploads); verify green → the three links to him
+       (Brave steps 1-3). Verify red only on "production carries X-Robots-Tag noindex" on production's one-off link →
+       Risk 13 (plan.md:1358): recorded "not met as written", reported to the draft's author, never a pass; the sitting
+       continues (`restore-production` shows it again). Verify exit 3 → "no reading", neither pass nor fail. A deploy
+       leg red (no upload) → the sitting pauses; I read the log and tell him; no re-run without a new list. Any other
+       verify red → its reason read and recorded as that mark's reading; told to him before the next run starts.
+     - `uploads` (10 uploads to branch `uploads`): deploy green; verify green (10 records, 2 links each); exit 3 → no
+       reading.
+     - `bites`: red on purpose, twice: deploy red only on `bite-oversize` (Wrangler refuses the 26 MiB file; the build's
+       SIZES line flags it), verify red only on `/worker.js`'s COEP (bite-coep) and the content file's Cache-Control
+       (bite-nocache), nothing else. A green where a red is due → a missed bite (a finding against the mark). The
+       oversize leg's log is the first failed upload with a working token: read for the account printout, recorded.
+     - `browsers` (no wait): exit 0 → every row as expected or "bite caught"; exit 1 → a row not as expected or a bite
+       missed (browser-results.json read); exit 3 → no reading on some load.
+     - `bite-production`: deploy green; verify red only on "production carries X-Robots-Tag noindex" (both production
+       links) → the bite caught.
+     - `restore-production`: deploy green; verify green (or Risk 13 again on the one-off link).
+     - His two counts (PM-0006-7) recorded as he gives them, or "no count shown".
+   - Reading: headers.json, the records and browser-results.json downloaded to `.gate/preview-hosting-check/day1/` and
+     read with jq; log tails kept short.
 
 ## Next steps
-1. The probe's first run (step 22) read and recorded.
+0. Sitting 1 (step 23): start `round-a`; once plan and build are green and deploy waits, send his list.
+1. The probe's first run (step 22) read and recorded; one probe run read before sitting 2's closes (by hand if needed).
 2. Answered: TOKEN-SCOPE (a), Read stays; Day 1 today, 2026-11-18 (it must be by 2026-11-24: the token ends
    2026-11-25T22:59:59Z; Day 2's 24-hour reading follows Day 1).
 3. A compaction before Day 1 (get_session at 2026-11-18 about 15:21 UTC: 705,327 of 1,000,000 tokens; automatic at
@@ -790,6 +828,16 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    could come; before Day 1: a get_session reading and a compaction ask; the pull request page's environment link
    recorded as not seen, the first reading of sitting 1; the token-scope choice as one decision entry (removing Read
    needs a measured run on a new list first).
+
+17. 2026-11-18 16:22:58 UTC (called; transcript time), moment 1 (before sitting 1, where the marks start) · Q: is
+   sitting 1's approach sound (`round-a` started first, the list sent once it waits)? · Changed: sitting 1 a step of its
+   own, step 22 left open; the gates only I hold, since starting is my act (step 23); each "approve now" names the run's
+   number, link and legs (no `run-name`); the reds on purpose told before the failure mails, each red read for its
+   reason (a green where a red is due is a missed bite); rows written before `round-a` (exit 3 is no reading; Risk 13
+   "not met as written", the sitting continues; a re-run is his click, on a new list); "5 runs, 5 to 9 clicks", asked
+   and cross-checked with the legs' start times; his active time apart from the browser run's wait (he may step away;
+   4 and 5 back to back); the oversize leg's log read for the account printout; files read with jq from disk; the probe
+   blocks sitting 2's closes; the list kept short.
 
 ## Running work
 - saver b491gaova (started 2026-11-17 22:22:16 UTC, its log, with the security review): stopped by the harness's background time
