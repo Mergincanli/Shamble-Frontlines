@@ -1,2 +1,4 @@
 # security-auditor: dependency answer for cs2-first-page step 2 (notes started 2026-11-18 22:38:51 UTC)
 Plan: hash the nine files (start and end) -> read diffs/compare -> per new package: registry checksum/integrity, yanked/deprecated, publisher, licence (crates.io API + registry.npmjs.org, second route via WebFetch) -> build-time code (Rust build.rs / proc-macro read from published .crate in .gate/cs2-first-page/dep-check/; npm scripts/bin from packument + tarball) -> advisories (OSV querybatch with positive control, rustsec pages, GHSA) -> oddities -> 37 flag-only -> six overflow overrides -> tool route 5a vs Mustafa's words -> answer.
+## 22:39:06 UTC start hash check
+- All nine files in .gate/cs2-deps hash to deps-sha256.txt (diff empty). No target/, no node_modules/; git status shows only the nine modified files, nothing ignored or untracked.

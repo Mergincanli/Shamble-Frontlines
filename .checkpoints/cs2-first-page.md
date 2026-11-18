@@ -214,8 +214,15 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     `tests/node/`, the stub moved there, so the script `--project=node` finds its project the moment the manifests
     land. Run both ways: 1 passed.
 
+23. **CI on b6339d2** (the three manifest-free commits; read with the GitHub tools at 2026-11-18 22:39 UTC): `toolchain` run 201
+    (id 44412198394) and `gate` run 903 (id 44412198575, ended 22:38:11 UTC): success. On bc0bef1 (with the e2e
+    node project) `toolchain` run 202 and `gate` run 904 were still running. **A refusal, with the route taken:**
+    a hook refused `gh api -X GET repos/.../actions/runs` ("gh api is read-only here; GitHub writes go through the
+    GitHub MCP tools"); the runs were read with the GitHub tool for workflow runs instead. The scheduled check-in
+    for this read (22:40 UTC) was deleted as done.
+
 ## Current step
-23. **security-auditor's answer on exactly that content** (Opus 5.5, effort max; `cs2-first-page/security-auditor-deps.md`).
+24. **security-auditor's answer on exactly that content** (Opus 5.5, effort max; `cs2-first-page/security-auditor-deps.md`).
     Until it answers: nothing of the nine files is committed, nothing fetches or builds the new packages, no push by
     hand.
 
@@ -230,7 +237,7 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
    its expected sha256), the first Wasm build, the cost of the overflow overrides, `.gitignore`. Then steps 5 to 8.
 3. For change-set 3's plan (his words): the rand upgrade guide for 0.10 and the reason `chacha20` 0.10.0 and 0.10.1
    were withdrawn, read before the crate question goes to him.
-4. Read CI on the head the last save pushed. The saver: restart it within 110 minutes of the time under
+4. Read CI on bc0bef1 (`toolchain` run 202, `gate` run 904). The saver: restart it within 110 minutes of the time under
    "Running work".
 
 ## Due in this change-set's docs pass (records of #60's merge; nothing of it is written yet)
