@@ -234,16 +234,16 @@
     docs pass (docs-keeper; `node .checkpoints/cs1-types/decisions.mjs` first, after taking main in), the report,
     the advisor agent on the final head, the pull request, stop for his go.
 
-    State at 13:47 UTC:
+    State at 13:44 UTC:
     - Pushed as 6c3a24a (13:42:12 UTC). CI on it: `toolchain` run 170 success (the build-folder check passes inside
-      the cut: cargo sets `CARGO_MANIFEST_DIR` for the tests there too); `gate` run 871 was still running at 13:44.
-    - Round 2 started 13:43 to 13:44 UTC: test-engineer, engine-architect, rust-reviewer (3 of 3). To start when a
+      the cut: cargo sets `CARGO_MANIFEST_DIR` for the tests there too); `gate` run 871 was still running at 13:43.
+    - Round 2 started 13:42 to 13:43 UTC (the session record): test-engineer, engine-architect, rust-reviewer (3 of 3). To start when a
       slot frees: security-auditor (write mode's link refusal, the doc-comment check, S1 to S3 closed or not) and
       netcode-architect (the changed doc lines of `messages.rs` only; a short answer).
     - `docs/DECISIONS.md`: his go on #57 with OLD-LINES written by script and committed (d34cfc5, not pushed yet:
       the next foreground save pushes it); `decisions.mjs --check` exit 0 (his 1,554 bytes equal in DECISIONS and in
       merge commit 22c6afa's message; every other byte of main's file unchanged apart from one dated pointer in this
-      lane's RECORD-FILES entry). Main has not moved (22c6afa at 13:45 UTC).
+      lane's RECORD-FILES entry). Main has not moved (22c6afa, fetched just before d34cfc5).
     - For the report, from the records: commits 566d1d1 and da22f96 at 12:04:33 UTC; the push at 12:04:37; run
       44300471741 created 12:04:38, its step 7 from 12:04:55 to 12:05:07; the cancel sent at 12:05:01; the chat
       message that told Mustafa at 12:06:24.
@@ -346,5 +346,5 @@
 ## Running work
 - saver: background task bafnij7xk, started 12:30 UTC on 2026-11-18 (2-hour limit; the earlier one, b98z35xsq, was
   stopped at 12:30:03 UTC for the code push).
-- agents (3 of 3): round 2: test-engineer, engine-architect, rust-reviewer (started 13:43 to 13:44 UTC); then
+- agents (3 of 3): round 2: test-engineer, engine-architect, rust-reviewer (started 13:42 to 13:43 UTC); then
   security-auditor and netcode-architect.
