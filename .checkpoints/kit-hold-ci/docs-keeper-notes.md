@@ -77,3 +77,44 @@ B11. DONE and the answer.
   tests F4-F7, F9; F8 test 29's look-alike name; F10 the watch tests' clean-up order), F11 for the gate v2 list (the
   kit's four test files run in no CI job and not in the gate). Verdict :180-188: proven as stated; no High; nothing
   changes in the kit files. DECISIONS committed as a18a62b; still not mine.
+- Record times of the reviews (git log of the notes): infra-engineer committed 6544c83 18:08:01 UTC; security-auditor
+  54d72b9 18:31:54 UTC; test-engineer 50b0304 18:40:04 UTC (its file mtime 18:38:27: its "Verdict (18:40 UTC)" header
+  ran ahead of the clock; cite the commits, not the headers). The verifier and the advisor agent: not in yet.
+- B4 decision (line budget): STATUS = 120 = 104 lines of others + 16 own (5, 13, 29, 36-37, 40-45, 104-107, 120). No
+  STATUS line of another lane is about a merged PR and not an open id or current state (checked 7-118), so OLD-LINES
+  frees nothing. Fixed own needs: 5, 13, #60's row, Next (2, continuing #55's line 35), Waiting (#60's go + the zip: 1;
+  Part 15's items + #59: 2), the pointer = 9. Left for Follow-ups: 7 = cs0/Part 15 + #58 merged into one bullet (3),
+  his gate v2 list (2), the binding line (2). So #60's own review findings (security-auditor F1/F3 by name + Lows;
+  test-engineer's Mediums and Lows; infra-engineer's Lows) ride in #60's In flight row, "Open after it, for
+  Follow-ups once merged", as #56's and #58's rows did; their TEXT goes into the archive's Follow-ups now (block "From
+  the kit hold"). Tell the caller.
+- B4 decision: archive Follow-ups gets (a) "From change-set 1, Types (PR #58)": header of mine + the report's
+  "Follow-ups" lines 234-268 copied by script (indented two spaces) + a "Since" note of mine; (b) "From the kit hold
+  and two CI edits (PR #60)": his gate v2 list in his words (DECISIONS :201, :205, :146), the reviewers' lines for it,
+  security-auditor F1-F5, test-engineer F1-F11, infra-engineer L1-L6.
+- B4 pre-move blobs (worktree = HEAD = main, 18:50:09 UTC):
+  docs/STATUS.md worktree f69be90a0b183379e07c0c49bc67f86581bac43a head f69be90a0b183379e07c0c49bc67f86581bac43a main f69be90a0b183379e07c0c49bc67f86581bac43a
+  docs/STATUS_ARCHIVE.md worktree 3979202307c506c8a277a646ba9496b9793f96ac head 3979202307c506c8a277a646ba9496b9793f96ac main 3979202307c506c8a277a646ba9496b9793f96ac
+  docs/ROADMAP.md worktree f944af37c6ab4fa989eab56e340137d4a140b634 head f944af37c6ab4fa989eab56e340137d4a140b634 main f944af37c6ab4fa989eab56e340137d4a140b634
+  docs/REPO_MAP.md worktree 50ccc76b8d9a4c1516a6426003a8612cfd09cb1b head 50ccc76b8d9a4c1516a6426003a8612cfd09cb1b main 50ccc76b8d9a4c1516a6426003a8612cfd09cb1b
+- B4 done (docs-keeper-move.mjs --write): 10 checks ok; STATUS 120 -> 119, archive 1285 -> 1321, ROADMAP 270 -> 270.
+  Moved: STATUS:29 (#58's row, own) -> archive:159; ROADMAP:259-270 (#46, 3f98c0b) -> ROADMAP:108-119 (blank 258
+  removed, blank 107 added). Copied (not moved): report cs1-types :234-268 -> archive :931-965, indented two spaces.
+  Pure-move check: removed non-blank 13; added non-blank 48 = 13 moved + 35 copied; sorted equal; blanks -1 +1. The
+  one-liner: git diff -U0 -- docs/STATUS.md docs/STATUS_ARCHIVE.md docs/ROADMAP.md | node -e 'let rem=[],add=[];for(
+  const l of require("fs").readFileSync(0,"utf8").split("\n")){if(l.startsWith("---")||l.startsWith("+++"))continue;
+  if(l.startsWith("-"))rem.push(l.slice(1));else if(l.startsWith("+"))add.push(l.slice(1));}const ne=a=>a.filter(x=>
+  x!=="");const r=ne(rem).sort(),a=ne(add).sort();const copy=require("fs").readFileSync("docs/reports/2026-11-18-cs1-
+  types.md","utf8").split("\n").slice(233,268).map(l=>"  "+l);const a2=[...a];for(const c of copy){const i=a2.indexOf(
+  c);if(i>=0)a2.splice(i,1);}console.log(r.length,a.length,a2.length,JSON.stringify(r)===JSON.stringify(a2.sort()))'
+  List written: docs-keeper-moved-lines.md. Next B5 (STATUS own lines).
+- B5 done: STATUS own-line edits: :5 Last updated (PR #60, after #58's merge; main 9b4b518); :13 Last merged (Types,
+  PR #58, 9b4b518, 15:39:28 UTC, his go; CI green on main: gate 884 with smoke, toolchain 182); :29 #60's row (5
+  cells; its findings ride in the row "for Follow-ups once merged", as #56's and #58's did; F1/F3 by name; state words
+  that stay true whatever the verifier and the advisor agent say; review times from the commits of their notes);
+  :35-36 Next (change-set 2's drafted plan to the advisor agent after #60's merge); :39 Waiting (his go for #60 after
+  the Advisor's check of its ready report; #58's test zip, unanswered; #58's four decisions removed: answered 15:38:13);
+  :40-41 Part 15's items with the "Lane requests" issue #59; Follow-ups :100-102 (#56, Part 15 and #58 merged into one
+  bullet, the two doc lines' files named), :103-104 his gate v2 list, :105-106 the binding line (CHECKPOINTS.md §3's
+  hold + the advisor agent's ruling of #58: uncommitted, nothing builds the graph, --locked). STATUS = 120 lines; no
+  own prose line over 120 chars. Next B6 (archive).
