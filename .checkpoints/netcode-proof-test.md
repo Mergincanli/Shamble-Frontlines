@@ -79,8 +79,12 @@
   ruled: a `reorder` event at the run's end, its SERIES.md rows as B9, test f40**, not a bar change, a choice by its
   ruling named in the day's message); the words check passes on his words alone (the other hits are the archived
   card). Counts: at least +119 measured, +134 bites build, 67 negative cases; 21 pre-runs; disk about 3,727 MiB;
-  planned size about 5,150 lines. **The fill script RUNNING** (one agent: u4f_fill.py, dry run only, its output
-  u4f-fill-dryrun.md, notes u4f-fill-notes.md); `--apply` is the main session's at launch. **L4 item 2 DONE:**
+  planned size about 5,150 lines. **The fill script READY** (u4f_fill.py, sha256 20dbb02b7638b185…, 449 lines; notes
+  u4f-fill-notes.md; its last dry run u4f-fill-dryrun.md: every assert passes, nothing written). By the advisor's fill
+  ruling (advisor-u4f-fold-check.md section 4, on Mustafa's rule 3): each of the 36 copies once, under its name in
+  section 12 item 3's list, 102 pointers "Pn (copied in section 12 item 3)" elsewhere, the name-only mentions kept;
+  the result about 2,040 lines (its sha256 depends on `<base>`). `python3 -I .checkpoints/netcode-proof-test/u4f_fill.py
+  --apply` is the main session's, at launch, after his yes. **L4 item 2 DONE:**
   u4f-run.sh made by u4f_runner.py from u4r-run.sh (e9437ae2…): 117 lines, 6 changed (the header, the log folder
   .gate/u4f/, the usage line, the log check), sha256 70eb3da5b8ce9a8e2eda582536eeab93f96fb7fbe98e2a74a28e0492ccf6ddae
   (`<<PV1>>`), `bash -n` exit 0, its diff u4f-run.sh.diff.

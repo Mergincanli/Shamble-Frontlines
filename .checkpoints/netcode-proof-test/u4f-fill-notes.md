@@ -36,3 +36,12 @@ N/u4f-fill-dryrun.md. Never `--apply`.
 - for the main session: the fill puts every copy in every place (147 targets): P1 (3,582 characters) 7 times, among
   them the 2.9 heading (3,692 characters) and C2's "`<<P1>>` to `<<P36>>`" range name; P15 11 times; the brief grows
   1,835 -> 2,003 lines; `<base>` filled in C28's "`<base>` stays a placeholder" and 0.5's "Values:" line too.
+- block 4 done (the advisor's fold check, section 4, ACCEPT with conditions): each copy once, as "   - Pn's copy:
+  "..."" at the end of item 3's list (189 lines, before item 4); every other `<<Pn>>` -> "Pn (copied in section 12 item
+  3)" (102 pointers, the 2.9 and 5.6 headings now 140 characters each, in their line); C2's, C28's and 0.5's
+  "Values:" mentions kept, named by text; conditions 3 and 4's sentences edited, each old phrase found once; the new
+  asserts all pass; 7-word check 0. One development run failed (the pointer count read FINAL, where a pointer can
+  wrap: now read on the normalized text) and wrote nothing. The default output no longer prints the diff (50 hunks,
+  about 28k tokens, more than this agent can carry by Write): `--diff` prints it, `--full` whole. Final script
+  20dbb02b…, 449 lines; HEAD moved to f82866c (spikes still 0ad9661's); result 2,040 lines, 880ec8b1…; saved whole in
+  N/u4f-fill-dryrun.md (`git diff --no-index`: only the harness trailer differs).
