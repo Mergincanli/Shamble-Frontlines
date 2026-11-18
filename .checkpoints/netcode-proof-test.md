@@ -2,12 +2,11 @@
 - **Goal:** the netcode proof test (SPIKE_PLAN item 1) under its approved plan `.checkpoints/netcode-proof-test/plan.md`,
   rev 3.3 (the advisor and Mustafa, 2026-11-06; verdict advisor-verdict.md) · PR #40 (draft).
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`).
-  **Base:** main last merged in at 3f2fa21 (main 82c605e, PR #54). Main is now b763ba3 (fetched 2026-11-18 22:39 UTC:
-  #55-#57 docs; #58 cs1-types, the first v2 code; #60 kit-hold-ci: CHECKPOINTS.md's DEP-HOLD, checkpoint.mjs, a CI
-  workflow): code, CI and rules changed, so MAIN-52 takes it in after U4f's end checks, before the panel. PR #40 shows
-  a merge conflict since 20:40:46 UTC (expected: docs/STATUS.md :28-29; keep both rows).
-- **Last update:** 2026-11-18 23:4x UTC: U4f AT HIS SIZE STOP (6,213 added; snapshot 74ae26aa); SIZE-U4F sent to him;
-  MAIN-60 APPROVED WITH CONDITIONS C1-C6 and running (its resume line in Running work).
+  **Base:** main b763ba3 merged in at 0f12d9e (MAIN-60, 2026-11-18 23:41 UTC: #55-#60, the first v2 code, DEP-HOLD,
+  a CI workflow; one conflict, docs/STATUS.md: this branch's #40 row kept beside main's #60 row), which clears PR #40's
+  conflict. MAIN-52 takes main in when it changes code, CI or rules, and once before #40 is marked ready.
+- **Last update:** 2026-11-18 23:43 UTC: U4f AT HIS SIZE STOP (6,213 added; snapshot 74ae26aa); SIZE-U4F sent to him;
+  MAIN-60 BUILT: main b763ba3 merged in at 0f12d9e, every check passing; pushed with this save; CI and step 7 next.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -168,12 +167,13 @@
 - **Builder 3 ENDED 22:59 UTC at the stop** (agent a0825a5a2491eb175): worktree
   `.claude/worktrees/agent-a0825a5a2491eb175` (u4f-build3 at 07289a4, uncommitted), kept with builders 1's and 2's; its
   final snapshot wip/u4f-build.patch 74ae26aa29c229d6…, 380,276 B, 29 files: the one snapshot until the merge.
-- **MAIN-60 approved (advisor-main-60.md), running steps 1-7.** If `git rev-parse -q --verify MERGE_HEAD` prints
-  b763ba3, the merge is in progress: no save, no `git merge --abort`, no reset. If `git diff --name-only
-  --diff-filter=U` names docs/STATUS.md, resume at step 3; otherwise resume at step 4. If HEAD^2 is b763ba3 and HEAD
-  is not on the remote yet, resume at step 5. Anything else: the advisor rules. (The review: agent a43d2f5b263b6c069,
-  23:25-23:40 UTC, APPROVE WITH CONDITIONS C1-C6; the stop ruling's agent ad617f46f49185e8c ended 23:18.) Then R3
-  (iii)'s four hand runs.
+- **MAIN-60 BUILT (23:39-23:43 UTC; advisor-main-60.md's C1-C6 met):** H0 64a0e28 (HEAD = the remote, after C2 (c)'s
+  save); every pre-check as expected; light-base.log refs 1474, marks 81 unchanged, self 78/78, redact 307, all 4 pass;
+  `git merge origin/main` exit 1, STATUS.md its one CONFLICT, 49 status lines (UU 1, A 24, M 24); STATUS.md resolved
+  by Edit (1 line from main's: the #40 row); `git commit --no-edit`: **merge commit 0f12d9ec75f192d1…** (parents H0,
+  b763ba3); kit = main's, spikes/ unchanged, the rest = main's but the six docs, H0..HEAD = main's 49; gate PASS, repo
+  map OK, checkpoint tests 33/33, light.log refs 1498, redact 307, all 4 pass (.gate/main-60/). Pushed by this save;
+  then CI, the saver restarted, the advisor's head check (step 7); then R3 (iii)'s four hand runs.
 - The saver b4p5xbtmj STOPPED 23:39 UTC for MAIN-60 (C2; its last save 286d9d5 committed, not pushed: C2 (c)'s
   foreground save pushes it). Restart it after step 6 with both attribution lines as trailers (ADV-M60-8; `node
   .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Co-Authored-By: …" --trailer "Claude-Session: …"`,
