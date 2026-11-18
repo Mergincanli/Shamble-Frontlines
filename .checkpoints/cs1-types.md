@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 12:43 CET (from the clock)
+- **Last update:** 2026-11-18 13:01 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -25,18 +25,23 @@
    adopted it in `cs1-types/plan.md` with its decisions on O1 to O5 and seven additions (who builds, the CI edit
    drafted for him, the test archive, the docs pass, the report, the size, the rules kept).
 
+4. The advisor agent on the plan, 11:58 UTC: APPROVE on four conditions (a verifier run; netcode-architect as a
+   reviewer; security-auditor checks the new lockfile entries after `cargo fetch` and before the first build of
+   ts-rs; planted defect (2b), a hand edit of `layout.ts`) and nine Lows to fold in. All taken into `plan.md`
+   ("After the advisor agent's review"). O1 to O5 confirmed.
+
 ## Current step
-4. (11:43 UTC) The advisor agent reviews the plan (effort max; notes `cs1-types/advisor-plan.md`). No file outside
-   `.checkpoints/` is edited before its APPROVE.
+5. (12:05 UTC) Build, step A: the two manifest lines and `cargo fetch`; security-auditor on the new lockfile entries;
+   meanwhile the code that does not compile ts-rs (`client-endpoint`'s table, hash and generator).
 
 ## Next steps
-4. Build (Rust: the first message types of `protocol`, the block's layout table in `client-endpoint`, our own small
+6. Build (Rust: the first message types of `protocol`, the block's layout table in `client-endpoint`, our own small
    generator, ts-rs for the message types, an export test per crate; TypeScript: the generated files committed, the
    layout-hash check with its test; the mark's planted defects run once and shown). Checks by hand (the plan's Part
    7): cargo fmt, clippy host and wasm32 with -D warnings, cargo test, the wasm32 build, tsc and Vitest by path, the
    legacy gate. No root `.cargo/config.toml`, no "type" in the root package.json, no non-Markdown file naming the
    spike folder (the netcode proof test's rules).
-5. Reviews at effort max (engine-architect, rust-reviewer, test-engineer; the verifier; then the advisor agent on the
+7. Reviews at effort max (engine-architect, rust-reviewer, test-engineer, security-auditor, netcode-architect; the verifier; then the advisor agent on the
    final head), the report, the docs pass, the pull request, stop for his go.
 
 ## Open findings (to take into this change-set's docs pass)
@@ -62,4 +67,4 @@
 
 ## Running work
 - saver: background task b98z35xsq, started 11:11 UTC on 2026-11-18.
-- agents (1 of 3): the advisor agent on the plan.
+- agents (0 of 3).

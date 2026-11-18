@@ -51,3 +51,33 @@ and additions below. Where the two differ, this file holds.
 ## What Mustafa must check
 Nothing in Brave. After the report: whether the test archive saved and unpacked on his laptop; the drafted CI edit
 (yes or no to its exact text); his go on the merge.
+
+## After the advisor agent's review (2026-11-18, 11:58 UTC): APPROVE on conditions, each taken as written
+Its notes: `advisor-plan.md` (verdict, rulings, findings 1 to 5). O1 to O5 confirmed. What changes in the plan:
+1. **The verifier** (its finding 1, Medium): runs on the final head at effort max with section 4's symbol list; its
+   PASS comes before the report.
+2. **netcode-architect** (finding 2, Medium) joins round 1 (two batches of at most 3 agents are one round); it gets
+   the provisional list now; its brief says never to read `spikes/`.
+3. **The dependency before its first build** (finding 3, Medium): after the two manifest lines, `cargo fetch` only
+   (it writes the lockfile and downloads; no build script or proc macro runs). security-auditor then checks every new
+   lockfile entry (crates.io source and checksum, licence, advisories, the build-script and proc-macro code). Until its
+   answer nothing that compiles ts-rs runs; a finding at Medium or above stops the build and goes to the advisor agent.
+4. **Planted defect (2b)** (finding 4, Medium): one offset changed by hand in `generated/block/layout.ts`, hash line
+   untouched: `cargo test -p client-endpoint --locked` must fail and name `layout.ts`.
+5. **The Lows, folded in:** (a) defect (4) also grows the header's stride, so only `generated_layout_is_current`
+   fails; the report names the failing test and message of defects (1) and (4); the defects run again if a later fix
+   touches an export test or the generator. (b) PM-0002-17's bites sit in the worktree's `generated/` folder, read by
+   the same scratch config; the report says tsc ran with `-p`, not `-b`. (c) Write mode deletes only `*.ts` files
+   directly in its own subfolder, after checking the path, never recursively; a test clears its scratch folder first.
+   (d) The throwaway worktree is removed without `--force` or `rm -rf`: files restored, planted files deleted one by
+   one, then `git worktree remove`. (e) The spike-folder search uses `--diff-filter=d`. (f) The report names the
+   departure from ADR 0002 (A2:350-352: no `#[ts(export)]`), with a pointer in the ADR as a follow-up, and says
+   R5-LAYOUT-OQ4's answer holds only while one writer owns each folder. (g) Symbols completed: modules `messages`,
+   `ts_export` (test only), `layout`, `layout_ts` (test only); `stub_builds` goes (real tests replace it); `PACKAGE`
+   goes; `packages/types/package.json`'s description changes ("Empty until…" is stale). (h) The gate and the cargo and
+   Vitest checks run after every step; section 6 adds `node .claude/scripts/repo-map-check.mjs`; refusals are recorded
+   with the route taken; the size stop's three lines are his ("what grew, why, and the cheaper option"); the docs pass
+   takes main in first. (i) The report says what the test archive holds and how he checks it; the drafted CI edit
+   would be its own risk-tier-2 pull request and commits no tsconfig (type settings are the 2.3 chat's).
+6. **O1's additions:** the two acknowledgement fields of `Snapshot` are provisional too; the message module's doc line
+   names what may move the widths (OQ-0001-6, OQ-0001-7, R2-XU-OQ4, the mode hash, the join token's format).
