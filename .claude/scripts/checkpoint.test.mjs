@@ -4,7 +4,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync, spawn } from 'node:child_process';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -430,4 +431,226 @@ test('save works from a linked worktree', (t) => {
   assert.equal(leak.status, 1);
   assert.match(leak.stdout, /NOT committed: \.checkpoints\/leak\.md looks like a API key/);
   assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/wt'), sh(wt, 'rev-parse', 'HEAD'));
+});
+
+// The dependency hold (Mustafa's DEP-HOLD, 2026-11-18).
+const sha256 = (text) => createHash('sha256').update(text).digest('hex');
+const depCheck = (repo, text) => {
+  mkdirSync(join(repo, '.checkpoints', 'test'), { recursive: true });
+  writeFileSync(join(repo, '.checkpoints', 'test', 'dependency-check.md'), text);
+};
+
+test('a save holds a push that changes a lockfile until its check is recorded for that exact content', (t) => {
+  const { repo, origin } = fixture(t);
+  const before = sh(origin, 'rev-parse', 'refs/heads/cs/test');
+  mkdirSync(join(repo, 'crates', 'a'), { recursive: true });
+  writeFileSync(join(repo, 'Cargo.lock'), 'one\n');
+  writeFileSync(join(repo, 'crates', 'a', 'Cargo.toml'), 'two\n');
+  sh(repo, 'add', 'Cargo.lock', 'crates/a/Cargo.toml');
+  sh(repo, 'commit', '--quiet', '-m', 'a new dependency');
+  note(repo);
+  let r = run(repo, 'save', 'test', '-m', 'step 1');
+  assert.equal(r.status, 1, r.stderr + r.stdout);
+  assert.match(r.stdout, /saved locally, NOT pushed .* dependency change with no recorded check: Cargo\.lock, crates\/a\/Cargo\.toml\. /);
+  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), before);
+  assert.match(sh(repo, 'log', '-1', '--format=%s'), /^checkpoint\(test\): step 1$/);
+
+  // A record for one file only, with another content for the second: still held, and the line names what is left.
+  depCheck(repo, `checked\n${sha256('one\n')}  Cargo.lock\n${sha256('other\n')}  crates/a/Cargo.toml\n`);
+  r = run(repo, 'save', 'test', '-m', 'step 2');
+  assert.equal(r.status, 1, r.stderr + r.stdout);
+  assert.match(r.stdout, /no recorded check: crates\/a\/Cargo\.toml\. /);
+  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), before);
+
+  // The right record on disk, but in a note the save leaves out (it looks like a secret): the commit to push still
+  // holds step 2's record, and the hold reads the commit, not the working tree.
+  depCheck(repo, `${sha256('one\n')}  Cargo.lock\n${sha256('two\n')}  crates/a/Cargo.toml\nghp_${'a'.repeat(36)}\n`);
+  note(repo, 'test.md', 'step 3\n');
+  r = run(repo, 'save', 'test', '-m', 'step 3');
+  assert.equal(r.status, 1, r.stderr + r.stdout);
+  assert.match(r.stdout, /no recorded check: crates\/a\/Cargo\.toml\. /);
+  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), before);
+
+  // Both recorded with their content's sha256: released, and every local commit is pushed.
+  depCheck(repo, `checked\n${sha256('one\n')}  Cargo.lock\n${sha256('two\n')}  crates/a/Cargo.toml\n`);
+  r = run(repo, 'save', 'test', '-m', 'step 4');
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  assert.match(r.stdout, /saved and pushed/);
+  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), sh(repo, 'rev-parse', 'HEAD'));
+
+  // The lockfile changes again: the old record no longer releases it.
+  writeFileSync(join(repo, 'Cargo.lock'), 'three\n');
+  sh(repo, 'commit', '--quiet', '-am', 'another dependency');
+  note(repo, 'test.md', 'more\n');
+  const pushedHead = sh(origin, 'rev-parse', 'refs/heads/cs/test');
+  r = run(repo, 'save', 'test', '-m', 'step 5');
+  assert.equal(r.status, 1, r.stderr + r.stdout);
+  assert.match(r.stdout, /no recorded check: Cargo\.lock\. /);
+  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushedHead);
+});
+
+test('the hold covers npm files and a removed manifest, and leaves other code alone', (t) => {
+  const { repo, origin } = fixture(t);
+  const before = sh(origin, 'rev-parse', 'refs/heads/cs/test');
+  writeFileSync(join(repo, 'code.js'), '1;\n');
+  writeFileSync(join(repo, 'not-package.json.txt'), 'x\n');
+  sh(repo, 'add', 'code.js', 'not-package.json.txt');
+  sh(repo, 'commit', '--quiet', '-m', 'code only');
+  note(repo);
+  assert.equal(run(repo, 'save', 'test', '-m', 'code is not held').status, 0);
+  assert.notEqual(sh(origin, 'rev-parse', 'refs/heads/cs/test'), before);
+
+  for (const [i, name] of ['package.json', 'tools/package-lock.json', 'npm-shrinkwrap.json'].entries()) {
+    mkdirSync(join(repo, 'tools'), { recursive: true });
+    writeFileSync(join(repo, name), `${i}\n`);
+    sh(repo, 'add', name);
+    sh(repo, 'commit', '--quiet', '-m', `add ${name}`);
+    note(repo, 'test.md', `n${i}\n`);
+    const held = run(repo, 'save', 'test', '-m', `held ${i}`);
+    assert.equal(held.status, 1, name);
+    assert.ok(held.stdout.includes(`no recorded check: ${name}. `), held.stdout);
+    depCheck(repo, `${sha256(`${i}\n`)}  ${name}\n`);
+    assert.equal(run(repo, 'save', 'test', '-m', `released ${i}`).status, 0, name);
+  }
+
+  sh(repo, 'rm', '--quiet', 'package.json');
+  sh(repo, 'commit', '--quiet', '-m', 'remove a manifest');
+  note(repo, 'test.md', 'removed\n');
+  const r = run(repo, 'save', 'test', '-m', 'held');
+  assert.equal(r.status, 1);
+  assert.match(r.stdout, /no recorded check: package\.json\. /);
+  depCheck(repo, 'deleted  package.json\n');
+  assert.equal(run(repo, 'save', 'test', '-m', 'released').status, 0);
+  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), sh(repo, 'rev-parse', 'HEAD'));
+});
+
+test('a branch that is not on the remote yet is held against main', (t) => {
+  const { repo, origin } = fixture(t, null);
+  sh(repo, 'switch', '--quiet', '-c', 'cs/new');
+  writeFileSync(join(repo, 'Cargo.toml'), 'dep\n');
+  sh(repo, 'add', 'Cargo.toml');
+  sh(repo, 'commit', '--quiet', '-m', 'a dependency on a new branch');
+  note(repo);
+  const r = run(repo, 'save', 'test', '-m', 'first save');
+  assert.equal(r.status, 1, r.stderr + r.stdout);
+  assert.match(r.stdout, /no recorded check: Cargo\.toml\. /);
+  assert.throws(() => sh(origin, 'rev-parse', '--verify', 'refs/heads/cs/new'));
+});
+
+test('a lockfile that is a link, or that moves into .checkpoints/ under another name, is held', (t) => {
+  const { repo, origin } = fixture(t);
+  const before = sh(origin, 'rev-parse', 'refs/heads/cs/test');
+  writeFileSync(join(repo, 'real.lock'), 'one\n');
+  symlinkSync('real.lock', join(repo, 'Cargo.lock'));
+  sh(repo, 'add', 'real.lock', 'Cargo.lock');
+  sh(repo, 'commit', '--quiet', '-m', 'a lockfile that is a link');
+  note(repo);
+  depCheck(repo, `${sha256('one\n')}  Cargo.lock\n${sha256('real.lock')}  Cargo.lock\ndeleted  Cargo.lock\n`);
+  const r = run(repo, 'save', 'test', '-m', 'a link');
+  assert.equal(r.status, 1, r.stderr + r.stdout);
+  assert.match(r.stdout, /no recorded check: Cargo\.lock\. /);
+  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), before);
+
+  const second = fixture(t);
+  writeFileSync(join(second.repo, 'package-lock.json'), 'locked\n');
+  sh(second.repo, 'add', 'package-lock.json');
+  sh(second.repo, 'commit', '--quiet', '-m', 'a lockfile');
+  sh(second.repo, 'push', '--quiet', 'origin', 'cs/test');
+  const pushed = sh(second.origin, 'rev-parse', 'refs/heads/cs/test');
+  note(second.repo);
+  sh(second.repo, 'mv', 'package-lock.json', '.checkpoints/moved.txt');
+  sh(second.repo, 'commit', '--quiet', '-m', 'the lockfile moved into the notes under another name');
+  note(second.repo, 'test.md', 'after the move\n');
+  const moved = run(second.repo, 'save', 'test', '-m', 'moved');
+  assert.equal(moved.status, 1, moved.stderr + moved.stdout);
+  assert.match(moved.stdout, /no recorded check: package-lock\.json\. /);
+  assert.equal(sh(second.origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
+});
+
+test('watch holds a dependency change too, also when only .checkpoints/ seems to be ahead', async (t) => {
+  const { repo, origin } = fixture(t);
+  writeFileSync(join(repo, 'Cargo.lock'), 'locked\n');
+  sh(repo, 'add', 'Cargo.lock');
+  sh(repo, 'commit', '--quiet', '-m', 'a lockfile');
+  sh(repo, 'push', '--quiet', 'origin', 'cs/test');
+  const pushed = sh(origin, 'rev-parse', 'refs/heads/cs/test');
+  note(repo);
+  sh(repo, 'mv', 'Cargo.lock', '.checkpoints/moved.txt');
+  sh(repo, 'commit', '--quiet', '-m', 'the lockfile moved into the notes under another name');
+  note(repo, 'test.md', 'after the move\n');
+  const child = spawn(process.execPath, [SCRIPT, 'watch', 'test', '--every', '0.01', '--for', '1'], { cwd: repo });
+  let out = '';
+  child.stdout.on('data', (d) => { out += d; });
+  t.after(() => child.kill('SIGKILL'));
+  const deadline = Date.now() + 15000;
+  while (!/saved (locally|and pushed)/.test(out) && Date.now() < deadline) await new Promise((r) => setTimeout(r, 200));
+  assert.match(out, /saved locally, NOT pushed .* no recorded check: Cargo\.lock\. /);
+  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
+});
+
+test('a manifest or lockfile whose content in the push equals its content on main is not held', (t) => {
+  const { repo, origin } = fixture(t);
+  // Main gains files through another pull request, and the branch takes main in.
+  const mainGains = (names, write) => {
+    sh(repo, 'switch', '--quiet', 'main');
+    write();
+    sh(repo, 'add', ...names);
+    sh(repo, 'commit', '--quiet', '-m', `main gains ${names.join(', ')}`);
+    sh(repo, 'push', '--quiet', 'origin', 'main');
+    sh(repo, 'switch', '--quiet', 'cs/test');
+    sh(repo, 'merge', '--quiet', '--no-edit', 'main');
+  };
+  mainGains(['Cargo.lock', 'tools/package.json'], () => {
+    mkdirSync(join(repo, 'tools'), { recursive: true });
+    writeFileSync(join(repo, 'Cargo.lock'), 'merged\n');
+    writeFileSync(join(repo, 'tools', 'package.json'), 'merged too\n');
+  });
+  note(repo);
+  let r = run(repo, 'save', 'test', '-m', 'main taken in');
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  assert.match(r.stdout, /saved and pushed/);
+  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), sh(repo, 'rev-parse', 'HEAD'));
+
+  // One line more than main's content: held as before.
+  const pushed = sh(origin, 'rev-parse', 'refs/heads/cs/test');
+  writeFileSync(join(repo, 'Cargo.lock'), 'merged\nand one more\n');
+  sh(repo, 'commit', '--quiet', '-am', 'a dependency on top of main');
+  note(repo, 'test.md', 'on top of main\n');
+  r = run(repo, 'save', 'test', '-m', 'not main');
+  assert.equal(r.status, 1, r.stderr + r.stdout);
+  assert.match(r.stdout, /no recorded check: Cargo\.lock\. /);
+  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
+
+  // A lockfile that is a link stays held, also when main holds the same link.
+  mainGains(['sub/Cargo.lock'], () => {
+    mkdirSync(join(repo, 'sub'), { recursive: true });
+    symlinkSync('../Cargo.lock', join(repo, 'sub', 'Cargo.lock'));
+  });
+  note(repo, 'test.md', 'main taken in again\n');
+  r = run(repo, 'save', 'test', '-m', 'a link from main');
+  assert.equal(r.status, 1, r.stderr + r.stdout);
+  assert.match(r.stdout, /no recorded check: Cargo\.lock, sub\/Cargo\.lock\. /);
+  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
+
+  // A lockfile in a root folder named ':' is read at its own path on both sides, never as git's ':/' (the root
+  // Cargo.lock): main holds both with the same content, the push changes the one in the folder: held.
+  const magic = fixture(t);
+  const first = sh(magic.origin, 'rev-parse', 'refs/heads/cs/test');
+  sh(magic.repo, 'switch', '--quiet', 'main');
+  mkdirSync(join(magic.repo, ':'));
+  writeFileSync(join(magic.repo, 'Cargo.lock'), 'merged\n');
+  writeFileSync(join(magic.repo, ':', 'Cargo.lock'), 'merged\n');
+  sh(magic.repo, 'add', '--', 'Cargo.lock', ':(literal):/Cargo.lock');
+  sh(magic.repo, 'commit', '--quiet', '-m', 'main gains Cargo.lock twice');
+  sh(magic.repo, 'push', '--quiet', 'origin', 'main');
+  sh(magic.repo, 'switch', '--quiet', 'cs/test');
+  sh(magic.repo, 'merge', '--quiet', '--no-edit', 'main');
+  writeFileSync(join(magic.repo, ':', 'Cargo.lock'), 'not on main\n');
+  sh(magic.repo, 'add', '--', ':(literal):/Cargo.lock');
+  sh(magic.repo, 'commit', '--quiet', '-m', 'the lockfile in the folder named : changes');
+  note(magic.repo);
+  r = run(magic.repo, 'save', 'test', '-m', 'a folder named :');
+  assert.equal(r.status, 1, r.stderr + r.stdout);
+  assert.match(r.stdout, /no recorded check: :\/Cargo\.lock\. /);
+  assert.equal(sh(magic.origin, 'rev-parse', 'refs/heads/cs/test'), first);
 });

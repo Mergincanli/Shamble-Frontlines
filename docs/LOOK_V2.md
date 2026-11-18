@@ -66,7 +66,9 @@ decision (ADR 0003) and the asset pipeline (ADR 0005). Status tags as in LOOP_V2
 - `[DECIDED]` **v2 may use authored 3D models.** The legacy rule "no external assets" ends with the legacy engine.
 - `[DEFAULT]` **The flow:**
   1. a concept sketch;
-  2. a 3D model in Spline: AI-generated for drafts, or a clean model built by Claude;
+  2. a 3D model in Spline or Blender: AI-generated for drafts, or a clean model built by Claude ("Spline or Blender":
+     Mustafa's words of 2026-11-03, written here on 2026-11-17, when the asset research's export part reported:
+     `docs/SPIKE_PLAN.md`, "The asset-pipeline research"; `docs/research/asset-export-rules.md`);
   3. a glTF/GLB export;
   4. an automated step that compresses it, builds LODs and renames materials into the faction colour slots;
   5. the engine applies the comic look.

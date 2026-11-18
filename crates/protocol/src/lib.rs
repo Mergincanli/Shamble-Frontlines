@@ -1,5 +1,10 @@
 //! Message types, the codec, decoders that never panic and the loopback transport backend (ADR 0002 part 3;
-//! ADR 0001). Empty until the protocol's first messages.
+//! ADR 0001). So far it holds the first message types (`messages`, foundation step 2.4); the codec comes in the
+//! build plan's change-set 3.
+
+pub mod messages;
+#[cfg(test)]
+mod ts_export;
 
 #[cfg(test)]
 mod tests {

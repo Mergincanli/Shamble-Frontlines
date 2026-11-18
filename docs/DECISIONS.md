@@ -38,6 +38,13 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     - _Pointer: the foundation chat's own record of FREEZE-FDN (a), SPLIT (a) and SCOPE (a), in his words, under
       "Decisions, newest first": the entry "Taken by Mustafa, 2026-11-10: FREEZE-FDN (a), SPLIT (a), SCOPE (a) and
       the build go for 2.1a, in the foundation chat"._
+    - _Pointer, 2026-11-17 (DOCS-54; a pointer, not his words): his two one-change exceptions to KIT-FREEZE-2 since,
+      each in his words under "Decisions, newest first": the kept-logs rule, PR #53 (`.claude/CHECKPOINTS.md` §11),
+      in the entry "Taken by Mustafa, 2026-11-15, 15:34:42 UTC: KL-YES with one change, and the exception to the kit
+      freeze (KIT-FREEZE-2) for the kept-logs rule"; and the night-shift lines, PR #54 (`.claude/NIGHT_SHIFT.md` step
+      6), his terms in the entry "Taken by Mustafa, 2026-11-16, 20:48:10 UTC: NS-STATUS (a) and the approval-free
+      command forms" and his yes in the entry "Taken by Mustafa, 2026-11-16, 21:09:27 UTC: NS-LINES (a), his yes to
+      the three night-shift lines"._
   - His unit walk (2026-11-09 18:22:39 UTC, sent while kit-v3-5 was starting; a docs change-set after the guard fix,
     plan first, recording UNITS.md §0 and LOOP_V2):
     > Queue after the guard fix, a docs change-set, plan first (Mustafa's unit walk): record in UNITS.md §0 and LOOP_V2,
@@ -89,6 +96,19 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     script from `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A9):
     > - This replaces the sentence "The main model and every agent stay Opus 5.5" in my LANE-RULES of 2026-11-10. From the moment these words are in docs/DECISIONS.md they are the rule, also where CLAUDE.md still says otherwise.
     > - I allow the rule change in the kit for this. Step 2.3 changes CLAUDE.md's "Models and effort" section and the agent files to match, each edit asked of me in chat with its exact text. List it as a finding for 2.3. Do not edit the kit for it in this PR.
+    - _Pointer, 2026-11-17, change-set 0 of the build plan (a pointer, not his words): his words of 2026-11-17 (the
+      entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan", under "Decisions, newest first")
+      change the words this kit change is about, in two places. His CHANGE 2: "A second builder chat has Opus 5.5 as its
+      main model, with Fable 5.2 answering its advisor tool, and it also writes game and engine code." His answer 3
+      (GATE-FOLLOW): "You ask me for each gate and CI edit with its exact text"; for those edits he sets "The guard, the
+      gate and CI work stays with Opus 5.5." aside. Change-set 0 does not edit the kit._
+  - The kit's next change after the freeze (a pointer, 2026-11-17, DOCS-54; his words are in the entries named, under
+    "Decisions, newest first"): it takes the kept-logs rule's follow-ups SA-KL-1 to SA-KL-4 and KLT-1 to KLT-8, which
+    he accepted as left open for #53 (the entry "Taken by Mustafa, 2026-11-15, 19:46:36 UTC: KL-MERGE (a), merge #53,
+    and the security and test findings accepted as left open"), and NS-TRAILER and NS-FIRST, his (b) for both, each
+    added only with his yes to its exact text (the entry "Taken by Mustafa, 2026-11-17, 10:43:48 UTC: RECS-1043, his
+    answer to the session's recommendations; for main: DOCS-54 (a), NS-TRAILER (b) and NS-FIRST (b)", the question
+    shown under it as the session's text). This item leaves "Queued" when the change-set that carries it out merges.
   - The entries below are pointers to items carried out.
   - STATUS-DIET and LANE-RULES, with his Models addition and ACCOUNTS (his queue of 2026-11-10, items 2 and 3, his
     answers of 07:08:14 UTC and his second message, item 1): carried out by status-diet, so moved from here to
@@ -107,6 +127,567 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-18, 18:01:08 UTC: his answers to three questions of the build chat, and the size accepted:
+  KIT-FIX (may a fix to the checkpoint script's hold, in the lines changed after his first answer, be written with the
+  exact text shown: yes, as shown), KIT-REMOVED (should a manifest that main removed also pass the hold when a branch
+  takes main in: no, it stays held, and the question goes on the list for the quality gate v2's plan) and WATCH-60
+  (should the build chat watch pull request #60: no)** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his
+  personal account; his label: "My words of 2026-11-18, 18:52 (Amsterdam time)"; extracted by script from the session's
+  transcript, message 1eed5c8d-349d-471c-a9e3-106bfb012cc0, whole). The text he said yes to is
+  `.checkpoints/kit-hold-ci/kit-fix2.diff` at commit f7e232fbfb78d41ec06f72f6444a8973096a1685 (45 lines, sha256
+  9197f070e456ac628703f4211380174ccdc037e8bcd4eb1a950da252b7a4d7f9); the three questions as asked, and that text, stand
+  in `docs/reports/2026-11-18-kit-hold-ci.md`. Copied by script (779 bytes, sha256
+  9c9815fa59e1ea2cdea4cf0e044d27662af43df3514391dd7f86900d40607316):
+> My words of 2026-11-18, 18:52 (Amsterdam time): my answers to KIT-FIX, KIT-REMOVED and WATCH-60.
+>
+> KIT-FIX: (a), yes, as shown: the text of kit-fix2.diff as it stands in your notes at commit f7e232fb (45 lines, sha256 9197f070e456ac628703f4211380174ccdc037e8bcd4eb1a950da252b7a4d7f9). Write it into the two kit files.
+> With this fix the kit lines are final for this pull request. A later finding on them that is not Critical or High becomes a follow-up.
+>
+> KIT-REMOVED: (a). A manifest that main removed stays held. Put the question on the list for the quality gate v2's plan, together with the line of the approved text that still reads a path beginning with ":" as a pattern.
+>
+> WATCH-60: (b), no.
+>
+> The size as you count it, 293 added lines against the stop line of 300, is accepted.
+- **Taken by Mustafa, 2026-11-18, 16:39:23 UTC: his answer to the question KIT-TEXT (may the checkpoint script's hold on
+  a dependency change be written with the exact text shown to him): yes, with one change, a manifest or lockfile whose
+  content in the push equals its content on main is not held; and his yes to the planted change for CI's compare step,
+  to the reading of "nothing else in it" and to the stop rule for the new CI lines** (the build chat,
+  session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of 2026-11-18, 17:30 (Amsterdam
+  time)"; extracted by script from the session's transcript, message 5f5cb1d6-18bd-43d9-beb6-fd9953e6c260, whole: its
+  first paragraph is his instruction to the chat after a compaction). The text he answered on is
+  `.checkpoints/kit-hold-ci/kit-edit.diff` at commit 3ebe654ab0992b216842b3470fe938f31d83a9f7 (262 lines, sha256
+  70756f3db803e31acd79c290918c4a38ca8720b55145bd5354bba2cd72026ce5); the question, that text, the lines changed after
+  his answer, the planted change and the stop rule stand in `docs/reports/2026-11-18-kit-hold-ci.md`. Copied by script
+  (1542 bytes, sha256 1f3b95b4f4866da5a36ae16348d926d9b3c1b9d5b876b93f41236f3d04e227e7):
+> You were just compacted to cut usage. Nothing is lost: read the resume card .checkpoints/kit-hold-ci.md first, then the files in .checkpoints/kit-hold-ci/. Do not redo finished work. Before anything else, check three things and tell me the result in three lines: the scratch copies in .gate/kit-hold-ci/ still exist and give exactly kit-edit.diff and ci-edit.diff; no file in .claude/ or .github/ is edited; the background saver runs (start it again if it does not).
+>
+> My words of 2026-11-18, 17:30 (Amsterdam time): my answer to KIT-TEXT, on kit-edit.diff as it stands in your notes at commit 3ebe654a (262 lines, sha256 70756f3db803e31acd79c290918c4a38ca8720b55145bd5354bba2cd72026ce5).
+>
+> KIT-TEXT: (b), yes, with one change.
+> The change: a manifest or lockfile is not held when its content in the push equals its content on main. That content was merged with my go, so a branch that takes main in is not stopped by it. Say so in the rule line too. Everything else stays exactly as in that file.
+> Add a test for the change and show it failing on a broken copy, as you did for the others. Your advisor agent reads the changed lines once. Then write the four files. Your ready report shows the changed lines; I do not need to see them before you write.
+>
+> The planted change for the compare step: yes, as you describe it (one generated file committed with the executable bit, taken back in the next commit).
+> "Nothing else in it": your reading is right. The report and the records that are due ride along.
+> Your stop rule for the new CI lines stands.
+- **Taken by Mustafa, 2026-11-18, 15:38:13 UTC: his go on the merge of #58 (change-set 1, Types: the generated types,
+  the block's layout table and its hash), what he accepts with it, his answers to its five questions, and what comes
+  after** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of
+  2026-11-18, 16:24 (Amsterdam time)"; extracted by script from the session's transcript, message
+  12484c8a-3a90-425f-b2a3-fbd2ced44837, whole). The five questions stand in `docs/reports/2026-11-18-cs1-types.md`,
+  "Decisions needed": DEP-HOLD (how a dependency change is kept from being built before its security check), CI-TYPES (a
+  type check and a regenerate-and-compare step in CI), CI-CUT (no cache in the toolchain job), LANE-ISSUE (who opens the
+  "Lane requests" issue) and WATCH-58 (whether the build chat watches that pull request). The same words stand byte for
+  byte in the message of merge commit 9b4b518f520aa2360a8007dc857ba74b343c8a40 (2026-11-18, 15:39:28 UTC; parents
+  22c6afa and 1bfe462). Before the merge the session read the head again (1bfe462e339511cfae6b30a1015330d9ff2e718c) and
+  `gate`, `smoke` and `toolchain` on it, for the push and for the pull request: green. Copied by script and checked byte
+  for byte against that merge commit's message:
+> My words of 2026-11-18, 16:24 (Amsterdam time): my go on the merge of pull request #58, and my answers to its five questions.
+>
+> Merge pull request #58 (change-set 1, Types, foundation step 2.4: the generated types, the block's layout table and its hash) into main by a merge commit, at head 1bfe462e339511cfae6b30a1015330d9ff2e718c. Put these words in the merge message.
+>
+> Before you merge:
+> - Read gate, smoke and toolchain on that head once more. All three are green, or you stop and tell me.
+> - If the head is not 1bfe462e339511cfae6b30a1015330d9ff2e718c, stop. A later push needs the advisor agent's review and my go again.
+>
+> What I accept with this merge:
+> - Miss 1 stands as written: CI built the nine new packages before their security check, against my rule on unreviewed code from the internet. Rated Medium, found clean afterwards. It is written down, not waived.
+> - Miss 2 stands as written: one evidence record did not hold, your test reviewer caught it, and the runs were redone.
+> - The size as counted: 940 hand-written lines against 600 planned, under my stop line of 1,200.
+> - Round 2's Lows as follow-ups. The two doc lines that claim more than the code does are corrected in the next pull request that touches those files.
+> - What you did not verify: Firefox, WebKit and Safari; Windows and macOS.
+> - As before, the checkpoint commits enter main's history with this merge.
+>
+> DEP-HOLD: (a). The checkpoint script holds a push that changes a manifest or a lockfile until the security check of that change has answered. This is my exception to the kit freeze, for this one change. Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no longer watch list now. The check in CI that option (c) adds is not decided here: put it on the list for the quality gate v2's plan.
+>
+> CI-TYPES: (a), yes, with the exact text as it stands in the report at this head, in the section "The exact texts asked for". Its pull request shows two things from a real run: the compare step failing once on a planted change, and passing on the clean tree.
+>
+> CI-CUT: (a). Part 1 now, with the exact text of that same section; part 2 waits for the quality gate v2's workflow. Its pull request shows "Cache mode: none" in the job's log.
+>
+> LANE-ISSUE: (a). You open it. A comment there is never my word.
+>
+> WATCH-58: (b), no.
+>
+> After the merge:
+> - One small pull request with the kit hold and the two CI edits, nothing else in it. Its ready report goes to the Advisor before my go.
+> - You may write change-set 2's plan beside it. No new library of change-set 2 is committed before that pull request is merged.
+- **Taken by Mustafa, 2026-11-18, 11:08:25 UTC: his go on the merge of #57 (Part 15 of the build plan, "The second
+  lane", with his six answers), what he accepts with it, his answer OLD-LINES, and what comes after** (the build chat,
+  session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of 2026-11-18, 11:31 (Amsterdam
+  time)"; extracted by script from the session's transcript, message 16653b82-ec18-4cb3-acb1-73f6a294381e, whole). The
+  same words stand byte for byte in the message of merge commit 22c6afa0341c36c40479f671736a569adfdb2663 (2026-11-18,
+  11:09:31 UTC; parents d7dad97 and f26ac5b). Before the merge the session read the head again
+  (f26ac5b85396f4b280ba21e57f2a1ea177382d80) and `gate`, `smoke` and `toolchain` on it: green. The question OLD-LINES
+  stands in `docs/reports/2026-11-17-part-15-second-lane.md`, "Decisions needed"; his answer adds to his answer
+  RECORD-FILES (the entry of 2026-11-17, 22:10:34 UTC, below; a dated pointer marks it). Copied by script and checked
+  byte for byte against that merge commit's message:
+> My words of 2026-11-18, 11:31 (Amsterdam time): my go on the merge of pull request #57, and my answer to OLD-LINES.
+>
+> Merge pull request #57 (Part 15 of the build plan, "The second lane", with my six answers; docs only) into main by a merge commit, at head f26ac5b85396f4b280ba21e57f2a1ea177382d80. Put these words in the merge message.
+>
+> Before you merge:
+> - Read gate, smoke and toolchain on that head once more. All three are green, or you stop and tell me.
+> - If the head is not f26ac5b85396f4b280ba21e57f2a1ea177382d80, stop. A later push needs the advisor agent's review and my go again.
+>
+> What I accept with this merge:
+> - My go on the merge of #56 is recorded in docs/DECISIONS.md by this change, as you read my "Keep it to" sentence.
+> - Part 15's text stands as I read it, not edited. Where it differs from my answers, my answers hold.
+> - The size as counted: 220 written lines against the stop line of 300, and 339 copied.
+> - The lines you left as found because another lane wrote them.
+> - As with #56, the checkpoint commits enter main's history with this merge.
+>
+> OLD-LINES (who may fold old lines in the shared record files): (a), for lines about merged pull requests. A docs pass of either lane may move those lines by script, byte for byte, never reworded, also when another lane wrote them. Its report lists each line it moved. Every other line stays with the lane that wrote it, as my answer RECORD-FILES says.
+>
+> After the merge:
+> - Change-set 1, Types (foundation step 2.4): its plan, its review, the build and its pull request, then stop for my go.
+- **Taken by Mustafa, 2026-11-17, 22:59:16 UTC: his go on the merge of #56 (change-set 0 of the build plan), what he
+  accepts with it, and what comes after** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account;
+  his label: "My words of 2026-11-17, 23:57 (Amsterdam time)"; extracted by script from the session's transcript,
+  message 987dac5c-6911-41b9-9d8e-2f803893370a, whole). The same words stand byte for byte in the message of merge
+  commit d7dad976f1ea7170d597b51e3861f1ee74f980e4 (2026-11-17, 23:00:12 UTC; parents c94c81b and cd61b28). Before the
+  merge the session read the head again (cd61b28350c4407d2f19b1b3603ea4beca8b4e30) and `gate`, `smoke` and `toolchain`
+  on it: green. Copied by script and checked byte for byte against
+  `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`, P2:
+> My words of 2026-11-17, 23:57 (Amsterdam time): my go on the merge of pull request #56.
+>
+> Merge pull request #56 (change-set 0 of the build plan: my records, the plan's carry, the model-file rules and the soldier's joint list; docs only) into main by a merge commit, at head cd61b28350c4407d2f19b1b3603ea4beca8b4e30. Put these words in the merge message.
+>
+> Before you merge:
+> - Read gate, smoke and toolchain on that head once more. All three are green, or you stop and tell me.
+> - If the head is not cd61b28350c4407d2f19b1b3603ea4beca8b4e30, stop. A later push needs the advisor agent's review and my go again.
+>
+> What I accept with this merge:
+> - PM-0005-54 stands as written: a fail with today's rifle prototype (6 draws per pass against 4). It is not waived. The way out is my call, with the plan for the first-model change-set.
+> - The size as counted: 1,200 written lines, 129 asked for by review findings, 1,788 copied, the 68 lines of sheet notes among the copied.
+> - The three things your verifier did not verify. The Advisor compared A10 with the file I attached: equal. The draw-loop reading behind "6 draws per pass" is checked when PM-0005-54 first runs.
+> - By my answer LOG-HISTORY, the checkpoint commits enter main's history with this merge.
+>
+> After the merge:
+> - Part 15 with my six answers goes to main next, as a docs change of its own. Keep it to Part 15's text, my answers by script, the pointers they need and the rules file's line on gun files. It also brings the status page and the roadmap up to date for this merge.
+> - Then change-set 1.
+- **Taken by Mustafa, 2026-11-17, 22:10:34 UTC: his answers to the six questions of the build plan's Part 15, "The
+  second lane" (LANE-SPLIT, RECORD-FILES, VFX-ROUTE, VFX-FIX, VFX-MOMENTS, GUN-FILES: (a) each, with additions); the
+  stop line of change-set 0; pull request #56** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal
+  account; his label: "My words of 2026-11-17, 23:06 (Amsterdam time)"; extracted by script from the session's
+  transcript, message c4edbe94-57f5-451a-8778-59897cfd0cdf, whole). The questions stand in Part 15 as he read it:
+  `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`, "Decisions needed". Its answer LANE-SPLIT changes "one pull
+  request at a time" in his words of 2026-11-14 (the entry of 13:58:05 UTC, below) to one at a time per lane. Its answer
+  VFX-ROUTE is also his word on a seventh package beside the six that ADR 0002 names (a dated pointer marks that list).
+  Pointer, 2026-11-18, change-set 1 (not his words): his answer OLD-LINES of 2026-11-18 (the entry of 11:08:25 UTC,
+  above) adds to its answer RECORD-FILES: "(a), for lines about merged pull requests." Copied by script and checked byte
+  for byte against `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`, P1:
+> My words of 2026-11-17, 23:06 (Amsterdam time): my answers to Part 15's six questions, on revision 2 of the file you sent me, and two small things.
+>
+> 1. LANE-SPLIT (is the split of 15.2 to 15.4 the one the two chats work by): (a), as Part 15 has it. That is my yes to three things:
+>    - the four conditions of 15.1: the client package is cut into folders by owner from its first day; build files and dependencies stay with lane 1; lane 1 draws the plain tracers and counters of Shoot and Throw; a comparison is never merged;
+>    - one pull request at a time per lane, in place of the plan's one at a time;
+>    - the owners of 15.4: lane 1 owns gate.yml, toolchain.yml and the gate's files while the 2.3 chat is stopped; lane 2 owns the preview workflow it adds; the kit stays frozen.
+>
+> 2. RECORD-FILES (who writes the record files both lanes need): (a). Each pull request writes only its own lines there, in its docs pass, after taking main in. It does not reword, re-wrap or move another lane's lines.
+>
+> 3. VFX-ROUTE (how the Shamble VFX runtime's code reaches this repository): (a), a copy in a package here, pinned to a commit of the VFX repository and re-copied by a script. This is also my word on a seventh package beside the six the structure draft names.
+>    - Nobody edits the copy by hand. If the copy cannot pass the game's checks as it is, that is a finding for the VFX chat.
+>    - The re-copy script can also check: it fails when the copy differs from the pinned commit.
+>
+> 4. VFX-FIX (who fixes what the proofs find in the runtime): (a). The VFX chat fixes its repository and the copy here is renewed. I pass the findings on.
+>
+> 5. VFX-MOMENTS (who builds camera kick, the shake and the sounds for Slice 1): (a). The game builds them for Slice 1, as planned. They hang on the same event names as the effects and their numbers live in data files, so moving them into Shamble VFX later is a change of data. Hit-stop is in no card of the plan and I add none now.
+>
+> 6. GUN-FILES (may a gun file written by a script enter the game): (a), no. Every gun file that enters the game comes through Blender. The script-written rifle is used only to try the checks. Until the files exist, the code-built guns of change-set 6 stand in.
+>
+> THE STOP LINE OF CHANGE-SET 0
+> Lines that a finding of the verifier or of the advisor agent asks for do not count toward the 1,200. New scope still does.
+>
+> PULL REQUEST #56
+> Yes, watch it, for the CI results. A comment on GitHub is never my word, also when it is posted from my account. My go on the merge comes in this chat, after the Advisor's check.
+- **Taken by Mustafa, 2026-11-17, 20:39:23 UTC: SIZE-0 (a), change-set 0 of the build plan goes on as one pull request,
+  with a new stop line; LOG-HISTORY (a), the branch's history stays; and which copy of the Art lead's correction the
+  appendix holds** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of
+  2026-11-17, 21:33 (Amsterdam time)"; sent while the session's turn was running: the transcript holds it as an
+  attachment record of 2026-11-17T20:39:23.909Z and as the queued text taken from the queue at 20:39:36.464Z, from which
+  the script copied it). It answers two questions the build chat asked at about 20:25 UTC. SIZE-0: change-set 0 had
+  passed twice its planned size (about 150 lines of docs planned, about 900 written), and his rule of 2026-11-14 stops a
+  change-set there. LOG-HISTORY: five lines of a digest of the Advisor chat's log stand in the branch's history (the
+  entry below says how they got there). Copied by script and checked byte for byte against
+  `docs/reports/2026-11-17-build-plan-slice-1-appendix.md`, A11:
+> My words of 2026-11-17, 21:33 (Amsterdam time): my answers to SIZE-0 and LOG-HISTORY, and two small things.
+>
+> SIZE-0 (does change-set 0 go on at its present size, or is it split): (a). It goes on as one pull request.
+> - I accept the size. The 150 lines were planned for the model rules alone. My CHANGE 1 then put the record of my decisions and the plan's carry into this change-set, and the joint ruling answers a High.
+> - The new stop line: 1,200 written lines; copied lines do not count. Past it you stop and tell me in three lines, as you did now.
+> - Build my records and the plan's carry in commits of their own, apart from the rules and the joint list, so a split stays cheap if it is ever needed.
+> - If review round 1 returns a Critical or High on the rules or the joint list that one fix pass cannot close, split at that point: my records and the plan's carry go first as change-set 0, the rules and the joint list follow as change-set 0b. You need no new word from me for that; tell me in three lines when it happens.
+> - The review budget is unchanged: at most two review rounds, a third only for a Critical or High.
+> - No game code before change-set 0 is on main: that stands.
+>
+> LOG-HISTORY (the five lines of the Advisor log's digest in this branch's history): (a). Leave the history; nothing is rebuilt. The lines hold work points only.
+>
+> THE CORRECTION FILE
+> Two copies came with my message of 20:58. In the appendix, A10 is the copy of 3,244 bytes: the Art lead's text alone. The Advisor's check above the line is not the Art lead's and stays out of the appendix.
+>
+> THE SMG LINE DRAWING
+> It follows in a message of its own. It is needed at change-set 8, not before. Until it arrives the SMG brief's numbers stand; they win over the drawing in any case.
+- **Taken by Mustafa, 2026-11-17, 20:03:57 UTC: four small things for the build chat: the Art lead's correction of
+  2026-11-15, 18:40, is the fourth Art text, and change-set 0 takes only its rule and the socket names; the Advisor
+  chat's log is not an input; time stamps come from the clock** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on
+  his personal account; his label: "My words of 2026-11-17, 20:58 (Amsterdam time)"; sent while the session's turn was
+  running; extracted by script from the session's transcript, the queued user message stamped 2026-11-17T20:03:57.522Z).
+  It re-sends his message of 19:59:06 UTC (his label 20:20; `docs/reports/2026-11-17-build-plan-slice-1-appendix.md`,
+  A8) with item 3 new. What the record shows for its item 2: one read-only agent had been started on that log at
+  19:16:35 UTC and had returned a digest into the chat; it wrote no file. Five lines of the digest stood in the
+  session's checkpoint card from commit 8ea40cd (19:44:56 UTC) until commit 9b31dad (20:01 UTC) removed them; nothing of
+  the digest is used, and the log's second copy was not opened. Of the correction's two attached copies the appendix
+  holds the Art lead's text alone (his words of 21:33, the entry above). Copied by script and checked byte for byte
+  against `docs/reports/2026-11-17-build-plan-slice-1-appendix.md`, A9:
+> My words of 2026-11-17, 20:58 (Amsterdam time): four small things. None of them holds change-set 0.
+>
+> 1. The two pictures. Attached now: s16_engine_soldier.jpg (the redrawn Sheet 16) and my SMG line drawing. Your card says they did not arrive with my go.
+>
+> 2. Advisor_log_2.md came along by mistake. It is the Advisor chat's working record, not an input for you. Do not read it, do not have an agent digest it, and put no part of it in the repo. If an agent has already started on it, stop that agent and delete its notes before the next push.
+>
+> 3. A fourth Art text, attached: the Art lead's correction of 2026-11-15, 18:40, "The gun poses, restated from the sockets" (ART_BRIEF_CORRECTION_2026-11-15_1840_gun_poses.md). Save it with the other three.
+>    - It replaces section A1 of the addition of 2026-11-15 and the section "How the Conscript holds it" of the SMG brief of 2026-11-15, 17:35. It also corrects two lines of that brief: the socket names and the magazine. Like the other three it is the Art lead's proposal.
+>    - It agrees with my go: the right hand sits on socket_grip and the left hand on socket_support, the butt and the muzzle follow from the gun's file, and a shot's start is simulation data.
+>    - For change-set 0 take only its rule and the socket names. The pose numbers are for the body step (change-set 10).
+>    - Checked against the rifle file and the SMG brief: 14 of its 15 check points hold to 0.01 m. The one that differs: in the rifle's aiming pose the butt is given at U 1.44. By the file the butt end runs from 0.07 below to 0.03 above the grip socket, so its top edge is at U 1.39. The file wins, by the correction's own rule.
+>    - For the body step: in the rifle's aiming pose the left arm uses 0.59 of its 0.62, so little is left for recoil and the walk. The SMG's side magazine has to stay clear of the left forearm, as the correction says itself.
+>
+> 4. Your first card's "Last update" said 20:25 Amsterdam, and its commit (cb0fd7b9) is from 20:13:23. Stamp times from the clock, never ahead of it.
+- **Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan (foundation steps 2.4 and 2.5 and Slice 1), his
+  answers to its twelve decisions, and four changes** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal
+  account; his label: "My words of 2026-11-17, 20:10 (Amsterdam time)"; extracted by script from the session's
+  transcript, message 79197e10-3194-466e-b811-6b7ed65a3650, from its first words to its end; the five attachment
+  references before them are left out). It answers SPLIT-25, FIRST-SOLDIER, GATE-FOLLOW, MACHINES, BRAVE-ROUTE,
+  PREVIEW-START, STAND-IN-LOOK, COMPARE, MODEL-PUBLIC, RULES-WHO, SCOPE-RELOAD and START-RULES as the plan asks them
+  (`docs/reports/2026-11-17-build-plan-slice-1.md`, "Decisions needed"). Its answer 3 (GATE-FOLLOW) sets his words of
+  2026-11-12 on gate and CI work aside for the edits the build chat asks of him. Its answer 4 (MACHINES) names the
+  desktop of his words of 2026-11-03 and puts the naming of the actual machines before change-set 6. Its answer 8 is his
+  word for the change to PM-0004-34's wording. Its CHANGE 1 changes his words of 2026-11-14 on who records that day's
+  decision; its CHANGE 2 holds a decision he asks to be recorded word for word (two builder chats) and changes his words
+  of 2026-11-12 on models for the second builder chat only. The kit lines that still say otherwise (CLAUDE.md, "Models
+  and effort") are not edited by this change-set. Pointer, 2026-11-17, Part 15 to main (not his words): the plan part
+  its CHANGE 2 asks for, and the answer its CHANGE 4 asks for, are Part 15, on main with his answers of 2026-11-17 (the
+  entry of 22:10:34 UTC, above): `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`. Copied by script and checked
+  byte for byte against `docs/reports/2026-11-17-build-plan-slice-1-appendix.md`, A3:
+> My words of 2026-11-17, 20:10 (Amsterdam time): my go on your plan, with my answers and four changes. Where a line below carries a date, that is the day I said it.
+>
+> MY GO
+> Main has moved since your plan: it is c94c81b440c77f7979e0f944a5341319f9a57d1b. Three pull requests were merged: #53 (a kit rule for packing old test logs), #54 (three lines in the night-shift rules) and #55 (docs). None touches a game file. Take main in first, and tell me in three lines if anything in your plan no longer holds.
+> I give my go on the plan as written (revision 2, commit 68addf9): build change-set 0 now, then the change-sets in the plan's order, each as its own pull request that stops for my go on the merge. This go covers no merge. I could save the plan file you sent on my laptop, so the route works for a file; change-set 1's test archive proves it for a zip.
+>
+> MY ANSWERS TO THE TWELVE DECISIONS
+> 1. SPLIT-25: (a). Step 2.5 is built as two change-sets.
+> 2. FIRST-SOLDIER: (a). The Conscript of the sheets; the SMG and the rifle both in change-set 8; I judge the SMG's feel first.
+> 3. GATE-FOLLOW: (b), with (i). You ask me for each gate and CI edit with its exact text; for those edits I set my words of 2026-11-12 ("The guard, the gate and CI work stays with Opus 5.5.") aside. The gate's network step waits for the netcode proof test's report.
+> 4. MACHINES. My words: "it can be both: we can have a lower target for desktops: rtx 2070 and i7-9700k and lower level laptops with Intel Iris Xe graphics or the AMD equivalent, don't over complicate it for now. keep it simple. I would want to target higher level of quality game, I don't want to aim for a lower level fidelity because the hardware is bad, we just try to do our best to write and optimize the game as good as possible. So a higher floor doesn't sound bad."
+>    - The classes are named now. The recommended desktop is an RTX 2070 with an i7-9700K; this names the desktop of my words of 2026-11-03 ("a desktop with a mid-range card (RTX 3060/4060 class)"). The minimum laptop is of the class the rendering draft already names: Intel Iris Xe graphics or the AMD equivalent.
+>    - The actual machines I name before change-set 6, your option (a): on 2026-11-03 I said I name them before the look proof test, and change-set 6 is where that test now happens. Until then my words stand: "The laptop and desktop stay on my timing: rough checks first, then a short re-run once they're named."
+>    - On quality: the look is built for the desktop on High, and Low is what the laptop gets. My line in docs/VISION_V2.md ("Minimum: a laptop with integrated graphics runs the largest mode at 30+ fps on Low") stands for now. If Low cannot hold it on that laptop without hurting the look, bring me the numbers and I decide whether the floor rises. Do not lower the look on High to reach it.
+> 5. BRAVE-ROUTE: "A, if not possible: B".
+> 6. PREVIEW-START: (a). It has started, in the second builder chat (change 2 below).
+> 7. STAND-IN-LOOK: (a). I judge proportions and weapon shapes on the Blender model.
+> 8. COMPARE: (b). The comparison against a library's character controller runs only if our own movement misses its marks. This is my word for the change to PM-0004-34's wording. It is the one exception to "No pass mark and no open question of theirs is dropped or loosened" in my decision of 2026-11-14; the other comparisons run.
+> 9. MODEL-PUBLIC: (a), and my words: "A, once the game is up, I will look to make the repo private later on." The sheet notes you pushed may stay.
+> 10. RULES-WHO: (a), and my words: "A, but might eventually go with C with time depending on how it will go".
+> 11. SCOPE-RELOAD: my words: "Yes active reload will be a part of slice 1, but a more simplified version, hitting it will make the reload end faster. The additional depth will be added later." It joins change-set 8.
+> 12. START-RULES: (b), I decide both now. The jump: the formula's value, a reach of 3.07 m (OQ-0002-6, its option (a)). Two soldiers meeting: they push each other softly and never block. Both are numbers and rules I can change after I have felt them in Brave.
+>
+> CHANGE 1: CHANGE-SET 0 RECORDS MY DECISIONS
+> My first block left the record of my decision to step 2.3's docs change-set. That changes: your change-set 0 records it. Into docs/DECISIONS.md, by script from this chat's transcript: my block of 2026-11-14 with its decision, my addition of 15:03 that day, and this message. Pull request #55 brought docs/STATUS.md and docs/ROADMAP.md up to date for main on 2026-11-17; change-set 0 changes them only where my decision changes what they say. No game code is built before change-set 0 is on main.
+> The 2.3 chat stays stopped for now: I pass it nothing until its plan has been checked. So its lint and format settings will not be on main before your change-set 2; work as your Part 7 says for that case.
+>
+> CHANGE 2: A SECOND BUILDER CHAT
+> My words of 2026-11-14, 22:03: "I also decided to change my mind regarding building the game with Fable 5.2, the main builder can using fable but I also want an opus 5.5 bot work on it too, also work on other parts of the main game. I have seen how strong opus 5.5 is with a 5.3 fable advisor." The advisor I mean is Fable 5.2.
+> That chat exists since 2026-11-15: branch claude/optimistic-albattani-mdoonz, main model Opus 5.5, Fable 5.2 on its advisor tool. It runs the preview hosting check in a separate test repository of mine and touches nothing of yours.
+> My decision, to record word for word:
+> "Two chats build the game on my personal account. The first builder chat keeps Fable 5.2 as its main model. A second builder chat has Opus 5.5 as its main model, with Fable 5.2 answering its advisor tool, and it also writes game and engine code. This changes my words of 2026-11-12 ("On my personal account, Fable 5.2 is the main model of every chat that writes game or engine code, and of every builder agent that chat starts to write that code.") for the second builder chat only. Every file has one owner: the first builder chat's plan says which change-sets and folders belong to the second chat, and neither chat edits the other's files."
+> Before change-set 1 starts, add a short Part 15 to your plan, "The second lane". My proposal: the second chat takes the preview hosting check and step 2.6, the carry of my look decisions into docs/LOOK_V2.md, the comparisons that stay (Part 3.2), and from change-set 6 on the picture track: 6 Look, 10 Body, 11 Feel, and M. You keep 0 to 5, the simulation track (7 Lag, 8 Shoot, 9 Throw) and 12. Say where you agree and where you do not, with your reasons. For each unit of the second lane: the folders and files it owns, what it needs merged first, what it must not touch, and how the two chats' pull requests take turns. Every CI and workflow file also gets one owner there, and Part 15 says which chat builds the gun models. Send me Part 15 as a file when it is written; it does not hold change-set 0.
+>
+> CHANGE 3: THE SOLDIER AND THE GUNS FOLLOW THE ART LEAD'S BRIEFS
+> Attached, three texts and two pictures: the Art lead's build brief for the Conscript's first blockout (2026-11-14, 16:35), its addition (2026-11-15: the poses, the marking, the hat and the rifle, the yard, the ground), its SMG brief (2026-11-15, 17:35), the redrawn Sheet 16, and my SMG line drawing. The soldier brief replaces the sturdier sizes you typed into your notes on 2026-11-14 at 15:18 UTC. Everything in them is the Art lead's proposal unless a line says it is mine.
+> - The stand-in takes the artwork's proportions. My words to the Art lead on 2026-11-14: "A, lets see how you do it, if its not sufficient, we'll go for B (using MCP)".
+> - No skin colour on this first stand-in: hands and face take the Dark material, so four materials hold, the rifle included. My words on 2026-11-14: "Answer: go with A". This is about colour only: the soldier stays a skinned mesh, as your Part 11 says.
+> - Its size, 1.80 m to the top of the hat, is a placeholder: hang the soldier on one root so it scales with one number.
+> - Units stay as decided in docs/EDITOR_V2.md, "1 unit = 1 metre". When I speak of Unreal units I mean centimetres.
+> - The brief's names for colour areas and bones are working names; the names of your change-set 0 win.
+> - Line widths: docs/LOOK_V2.md stands until I decide otherwise. The Art sheet's widths, units thicker than buildings, are a proposal: make both switchable at change-set 6 so I judge them in Brave.
+> - A first model file exists: AMK9_v4_stage1.glb, a rifle prototype written by a script (glTF 2.0, 63 KB, 2 meshes, 2,596 triangles, 1 material, four sockets, 1.12 m long, +Y up, +Z to the muzzle). It stays with me until you ask for it.
+> - The poses. Where the addition's hand points and a gun's sockets disagree, the sockets win: the right hand's point and the gun's direction set the pose; the left hand, the butt and the muzzle follow from the gun model's sockets, as the SMG brief already does.
+> - The muzzle is where the flash and the tracer start. In the simulation a shot's start is data of its own: docs/adr/0005-content-abilities-assets.md says no shot origin is ever read from a model.
+> - The SMG: my drawing is the chosen design, and the brief's numbers win over the drawing. Its sockets are named as in the rifle file: socket_grip, socket_support, socket_muzzle, socket_sight, and the new socket_eject.
+> - The weapons line. In your list for the Art project, read "(never a plain tube)" as struck. The words "no plain tubes or cylinders" in docs/LOOK_V2.md line 30 and in the rendering draft are not mine. My words of 2026-11-15: "I never said those words." Treat them as not decided; the carry of my look decisions removes them.
+>
+> CHANGE 4: SHAMBLE VFX EXISTS
+> A third Claude Code chat has built Shamble VFX, my effects editor, in its own repo (github.com/Mergincanli/ShambleVFX): an editor, a small runtime made to ship in the game, and an export folder the game loads by event name. Your plan does not know it. In Part 15, say how change-set 11 (Feel) uses it. My lean: the game loads Shamble VFX's exported effects through its runtime and builds no effect a second time. Say what has to be proven for that (the same picture in the game as in the editor, its cost inside the frame budget, how the runtime's code reaches this repo) and what it changes in your sizes. docs/EDITOR_V2.md section 7 still calls the VFX editor a later tool (my words of 2026-11-06): say which line needs a dated pointer.
+>
+> End each change-set as your plan says. In every report, write about your own process only what a record shows, with its time.
+- **Taken by Mustafa, 2026-11-17, 10:43:48 UTC: RECS-1043, his answer to the session's recommendations; for main:
+  DOCS-54 (a), NS-TRAILER (b) and NS-FIRST (b)** (his message typed into the netcode proof test's day session,
+  session_0173vVo6igCNyQYBWPvhH36A, on his university account; no time label of his own; the primary source is that
+  session's transcript, message 90173405-9d31-4247-8d81-4a46d2902961, stamped 2026-11-17T10:43:48.016Z). It answers the
+  session's Decisions-needed block as last posed at 08:54:58 UTC and repeated at 10:35:38 UTC; the lines for main are
+  shown under it as the session's text, not his words. DOCS-54 (a) is carried out by the docs pass that added this
+  entry; NS-TRAILER and NS-FIRST are queued above. PACK-READ and C62HB-Q4, which it also answered (history.md:2209-2214,
+  :2216, :2222 and :2224), the blocks' lead lines (:2208, :2221) and the session's reading (:2227) are the netcode
+  test's and stay with PR #40. Copied by script from the transcript and checked byte for byte against
+  `.checkpoints/netcode-proof-test/history.md` at 110c3031a5145c675f25d320068df0368476771c (PR #40's branch), line
+  2205 (his words, inside the quote marks behind its prefix) and lines 2215, 2217, 2223 and 2225:
+> I agree with all your recommendations, continue
+- _The session's text, not his words: the questions it answers for main, as last posed (the assistant's message at
+  2026-11-17T08:54:58.700Z, transcript message a5b19b89-9a18-4259-9f64-4cbdc7d7abfd, two lines of its Decisions-needed
+  block):_
+- _[history.md:2208-2214 left out: the block's lead line and PACK-READ, the netcode test's; they stay with PR #40]_
+```text
+- **DOCS-54:** may this chat open one docs-only branch and pull request to update main's dashboard and decision record for #52, #53 and #54? Main still says the last merge was #48, and it has none of your words since 2026-11-14. Options: (a) yes; (b) the foundation chat's next docs pass does it; (c) wait for PR #40's final docs step. I recommend (a).
+```
+- _[history.md:2216 left out: C62HB-Q4, the netcode test's; it stays with PR #40]_
+```text
+- **NS-TRAILER and NS-FIRST:** should the kit's next change after the freeze add two things to your merged night-shift lines: the attribution option on the save command, and a status refresh before the first saver stint? Options: (a) keep your lines as they are; (b) add them then, with your yes to the exact text. I recommend (b) for both.
+```
+- _The session's text, not his words: the same two as last repeated before his message (the assistant's message at
+  2026-11-17T10:35:38.816Z, transcript message dc526fb2-bca6-4e03-8f03-f17d983d1f95):_
+- _[history.md:2221-2222 left out: the block's lead line and PACK-READ's line, the netcode test's; they stay with PR
+  #40]_
+```text
+- DOCS-54: I recommend (a).
+```
+- _[history.md:2224 left out: C62HB-Q4, the netcode test's; it stays with PR #40]_
+```text
+- NS-TRAILER and NS-FIRST: I recommend (b) for both.
+```
+- **Taken by Mustafa, 2026-11-17, 07:00:54 UTC: MERGE-54, his go for #54** (his message typed into the netcode proof
+  test's day session, session_0173vVo6igCNyQYBWPvhH36A, on his university account; no time label of his own; the primary
+  source is that session's transcript, message 50b71aa0-f12b-4f33-b170-1fe80a5ee722, stamped 2026-11-17T07:00:54.917Z).
+  It answers the session's "For Mustafa" line of 06:34:50 UTC, shown under it as the session's text, not his words.
+  Carried out by the merge 82c605e (a merge commit, expected head 20f9d59918eea1e3431ae830f72510f83f6424c7; GitHub's
+  merged_at 2026-11-17T07:03:03Z). Copied by script from the transcript and checked byte for byte against
+  `.checkpoints/netcode-proof-test/history.md` at 110c3031a5145c675f25d320068df0368476771c (PR #40's branch), line 2200
+  (inside the quote marks behind its prefix) and line 2201:
+> Merge #54
+- _The session's text, not his words: the line it answers (the assistant's message at 2026-11-17T06:34:50.318Z,
+  transcript message 345259cd-922b-4a94-ba72-d498af6889fe, its "For Mustafa" line):_
+```text
+2. When you're ready, type "merge #54" in this chat; its version is 20f9d59918eea1e3431ae830f72510f83f6424c7.
+```
+- **Taken by Mustafa, 2026-11-16, 21:09:27 UTC: NS-LINES (a), his yes to the three night-shift lines** (his message
+  typed into the netcode proof test's day session, session_0173vVo6igCNyQYBWPvhH36A, on his university account; no time
+  label of his own; the primary source is that session's transcript, message dcec7506-366c-4214-a0a5-1c6ccdae9a8e,
+  stamped 2026-11-16T21:09:27.492Z). By his words of 20:48:10 UTC (the entry below), this yes is also the exception to
+  the kit freeze (KIT-FREEZE-2) for that one change. Carried out by PR #54 (merged at 82c605e): the three lines stand in
+  `.claude/NIGHT_SHIFT.md` :45-47. It answers the session's question of 20:50:16 UTC; the question and the three lines
+  are shown under it as the session's text, not his words. Copied by script from the transcript and checked byte for
+  byte against `.checkpoints/netcode-proof-test/history.md` at 110c3031a5145c675f25d320068df0368476771c (PR #40's
+  branch), line 2190 (inside the quote marks behind its prefix) and lines 2191 and 2194-2196; the three lines also equal
+  `.claude/NIGHT_SHIFT.md` :45-47 at main 82c605e2e8a7f284e6925718368d3fe569f89ae9 (sha256
+  4e3d15658c0afaf40d922cdce9559a8dc2d1079ea04a8fc96e327798b3639223, taken without the final newline):
+> yes
+- _The session's text, not his words: the question it answers (the assistant's message at 2026-11-16T20:50:16.246Z,
+  transcript message 85c33559-9cfa-4834-b019-02a57b82b7e6) and the three lines (that message's first fenced block):_
+```text
+**NS-LINES:** yes or no to the three lines above, exactly as written.
+```
+```text
+   While the run waits on agents, nothing else wakes it: run the background saver in stints under 30 minutes
+   (`node .claude/scripts/checkpoint.mjs watch <slug> --every 10 --for 25`, in the background), and at each
+   stint end refresh the status comment, then start the next stint.
+```
+- **Taken by Mustafa, 2026-11-16, 20:48:10 UTC: NS-STATUS (a) and the approval-free command forms** (his label: "My
+  words of 2026-11-16, 21:50 (Amsterdam time)"; his message typed into the netcode proof test's day session,
+  session_0173vVo6igCNyQYBWPvhH36A, on his university account, sent while a turn ran; the primary source is that
+  session's transcript, its queued-command record 8840e0b5-3b64-4365-9f3d-b4967eb136b0, stamped
+  2026-11-16T20:48:10.683Z). Its NS-STATUS was carried out by PR #54 (merged at 82c605e); his yes that it names as the
+  exception to the kit freeze is the entry above. Copied by script from the transcript and checked byte for byte against
+  `.checkpoints/netcode-proof-test/history.md` at 110c3031a5145c675f25d320068df0368476771c (PR #40's branch), lines
+  2180-2187; whole:
+> My words of 2026-11-16, 21:50 (Amsterdam time), for the netcode chat.
+>
+> NS-STATUS: (a). A small kit change to .claude/NIGHT_SHIFT.md, as its own pull request, after C62H-BOUND's P2 and P3 runs.
+> - What it says: while a night run waits on agents, the saver runs in stints under 30 minutes, and the run refreshes its status comment at each stint's end, as last night's run did.
+> - Only that file, and only the lines this needs. No guard, hook, settings or script change.
+> - First show me the exact lines in chat and wait for my yes. My yes will also be the exception to the kit freeze (KIT-FREEZE-2) for this one change. Then one review round, then stop for my go on the merge.
+>
+> On today's stall (17:09 to 20:36 UTC, a call that waited for my approval): write commands in the simple forms that need no approval, one per call, as you did when you redid that step. When a call has to ask me, name it in your message before you send it.
+- **Taken by Mustafa, 2026-11-15, 19:46:36 UTC: KL-MERGE (a), merge #53, and the security and test findings accepted as
+  left open** (his label: "My words of 2026-11-15, 20:50 (Amsterdam time)"; his message typed into the netcode proof
+  test's day session, session_0173vVo6igCNyQYBWPvhH36A, on his university account; the primary source is that session's
+  transcript, message 63954cb4-7747-4dc6-86a8-6e72c97e81e9, stamped 2026-11-15T19:46:36.849Z). Carried out by the merge
+  53272a1 (PR #53); the follow-ups it accepts as left open (SA-KL-1 to SA-KL-4, KLT-1 to KLT-8) are queued above for the
+  kit's next change after the freeze. Partial: history.md:2172-2175 (C62H-BOUND-YES) are the netcode test's and stay
+  with PR #40. Copied by script from the transcript and checked byte for byte against
+  `.checkpoints/netcode-proof-test/history.md` at 110c3031a5145c675f25d320068df0368476771c (PR #40's branch), lines
+  2166-2170:
+> My words of 2026-11-15, 20:50 (Amsterdam time), for the netcode chat. Two answers.
+>
+> KL-MERGE: (a). Merge #53, the kept-logs rule, at head a637c7a357e79614f896ddddf7488e08b5fc9180, as a merge commit. If the head is anything else, stop and tell me.
+> - The security reviewer's four Low findings (SA-KL-1 to SA-KL-4) and the test-engineer's eight stay open as follow-ups. I accept them as left open for this pull request. Keep them listed in the pull request's description and on your card; the kit's next change after the freeze takes them.
+> - After the merge this branch takes main in. Only then may anything real be packed. Report what was packed, with the free space before and after.
+- _[history.md:2172-2175 left out: C62H-BOUND-YES, the netcode test's; it stays with PR #40]_
+- **Taken by Mustafa, 2026-11-15, 18:42:53 UTC: his go for the copy of the kept-logs kit files (PR #53)** (his message
+  typed into the netcode proof test's day session, session_0173vVo6igCNyQYBWPvhH36A, on his university account; no time
+  label of his own; the primary source is that session's transcript, message 420bc186-1912-44ee-9d6e-652637b753e2,
+  stamped 2026-11-15T18:42:53.995Z). It answers the session's ask of 18:04:58 UTC, shown under it as the session's text,
+  not his words. Not in history.md: found by the transcript sweep that DOCS-54's plan review asked for; copied by script
+  from the transcript, its only source:
+> go
+- _The session's text, not his words: the ask it answers (the assistant's message at 2026-11-15T18:04:58.542Z,
+  transcript message d95dd5a3-457b-4893-969b-2d627afdc934, its last paragraph):_
+```text
+The kept-logs build is still waiting for you. Please switch the session to Accept edits and type "go", so I can copy the three kit files into `.claude/` in the worktree. You'll get one permission prompt for that copy.
+```
+- **Taken by Mustafa, 2026-11-15, 16:21:11 UTC: KL-CHANGE-YES (a), yes to kl-change-v2.diff; build the kept-logs rule as
+  set out** (his label: "My words of 2026-11-15, 17:20 (Amsterdam time)"; his message typed into the netcode proof
+  test's day session, session_0173vVo6igCNyQYBWPvhH36A, on his university account; the primary source is that session's
+  transcript, message 513dc802-6ed8-4f23-b620-02df87f8d996, stamped 2026-11-15T16:21:11.362Z). Carried out by PR #53
+  (merged at 53272a1). Copied by script from the transcript and checked byte for byte against
+  `.checkpoints/netcode-proof-test/history.md` at 110c3031a5145c675f25d320068df0368476771c (PR #40's branch), lines
+  2151-2161; whole, with one known difference: the transcript's first line ends in a space that history.md:2151 lacks,
+  and the copy keeps the transcript's space:
+> You have just been /compact-ed, we are at 99% usage right now, this is for once usage has been reset: 
+>
+> My words of 2026-11-15, 17:20 (Amsterdam time), for the netcode chat.
+>
+> KL-CHANGE-YES: (a). Yes to the changed lines exactly as posted (kl-change-v2.diff, 102 lines, sha256 starting c80dbbb346459d46), on top of the text I said yes to (kept-logs-final-text.md, sha256 starting 97c81656).
+>
+> Build it as you set out: its own branch from main, the checks, the dry runs and the 14 planted bugs, one review round of security-auditor and test-engineer, the advisor on every pushed head. Then stop for my go on the merge.
+>
+> In that pull request's ready report: its head, the files it changes, and that the three kit files equal the text I said yes to with this diff applied, compared by script.
+>
+> Nothing real is packed or deleted before that pull request is on main and this branch has taken main in.
+- **Taken by Mustafa, 2026-11-15, 15:34:42 UTC: KL-YES with one change, and the exception to the kit freeze
+  (KIT-FREEZE-2) for the kept-logs rule** (his label: "My words of 2026-11-15, 16:35 (Amsterdam time)"; his message
+  typed into the netcode proof test's day session, session_0173vVo6igCNyQYBWPvhH36A, on his university account; the
+  primary source is that session's transcript, message 37f2d715-08cd-4120-9f49-5e2f4c99c274, stamped
+  2026-11-15T15:34:42.893Z). Carried out by PR #53 (merged at 53272a1): the rule stands in `.claude/CHECKPOINTS.md` §11.
+  Partial: history.md:2141-2146 (C62H-KEEP and C62H-BOUND) are the netcode test's and stay with PR #40. Copied by script
+  from the transcript and checked byte for byte against `.checkpoints/netcode-proof-test/history.md` at
+  110c3031a5145c675f25d320068df0368476771c (PR #40's branch), lines 2134-2139:
+> My words of 2026-11-15, 16:35 (Amsterdam time), for the netcode chat. Three answers.
+>
+> KL-YES: yes to the kit lines as you posted them (kept-logs-final-text.md, sha256 starting 97c81656), with one change. My yes also confirms the exception to the kit freeze (KIT-FREEZE-2) for this one rule.
+> - The change, in pack: after the read-back equals the list and before the folder is removed, walk the folder once more. If its files or sizes differ from the list, the folder stays and the script exits 1, as for a mismatch. Add a test and a planted bug for it. Post the changed lines here and wait for my yes to them; then build.
+> - Keep all three narrowings.
+> - In the pull request's evidence: the test in which GNU tar unpacks the archive ran and was not skipped, and the dry run's result for the two real folders.
+- _[history.md:2141-2146 left out: C62H-KEEP and C62H-BOUND, the netcode test's; they stay with PR #40]_
+- **Taken by Mustafa, 2026-11-15, 12:34:01 UTC: the kit rule's exact lines go to his Advisor first** (his label: "My
+  words of 2026-11-15, 13:35 (Amsterdam time)"; his message typed into the netcode proof test's day session,
+  session_0173vVo6igCNyQYBWPvhH36A, on his university account; the primary source is that session's transcript, message
+  14631e5d-679d-477c-a17a-64d8fbd4acb5, stamped 2026-11-15T12:34:01.309Z). Partial: history.md:2118-2127 (C62H-REVIEW,
+  and a reviewer's read for every marks.json or judge change) are the netcode test's and stay with PR #40. Copied by
+  script from the transcript and checked byte for byte against `.checkpoints/netcode-proof-test/history.md` at
+  110c3031a5145c675f25d320068df0368476771c (PR #40's branch), lines 2116 and 2129:
+> My words of 2026-11-15, 13:35 (Amsterdam time), for the netcode chat.
+- _[history.md:2118-2127 left out: C62H-REVIEW, and a reviewer's read for every marks.json or judge change, the netcode
+  test's; they stay with PR #40]_
+> The kit rule's exact lines: post them when the advisor has reviewed them. I answer after my Advisor has read them.
+- **Taken by Mustafa, 2026-11-15, 12:01:41 UTC: KEPT-LOGS (c) and the kit-rule route** (his label: "My words of
+  2026-11-15, 08:20 (Amsterdam time)"; his message typed into the netcode proof test's day session,
+  session_0173vVo6igCNyQYBWPvhH36A, on his university account; the primary source is that session's transcript, message
+  6aff71a8-5f98-485b-a8c2-d0de1670163c, stamped 2026-11-15T12:01:41.136Z). Carried out by the kept-logs kit rule, PR #53
+  (merged at 53272a1: `.claude/CHECKPOINTS.md` §11). Partial: history.md:2109 and :2111 (the bot fix's two cleans and
+  its 1,400-line stop; the report line on commit 5e563b95) are the netcode test's and stay with PR #40. Copied by script
+  from the transcript and checked byte for byte against `.checkpoints/netcode-proof-test/history.md` at
+  110c3031a5145c675f25d320068df0368476771c (PR #40's branch), lines 2091-2107:
+> My words of 2026-11-15, 08:20 (Amsterdam time), for the netcode chat.
+>
+> KEPT-LOGS: (c), with the old build cache named in the same rule, as your advisor recommends.
+>
+> What the rule may cover, and nothing else:
+> 1. The raw-log folder of a run set whose results are committed and whose ruling is closed.
+> 2. The one old build cache, .gate/u3c-review-target.
+>
+> Before a raw-log folder goes:
+> - a list of its files with their sizes and sha256 hashes is committed;
+> - the folder is packed into one compressed file, and every file's hash read back from that archive equals the list;
+> - free space is recorded before and after.
+> If one hash differs, the folder stays and you tell me.
+>
+> How it comes: this is the narrow kit rule of my words of 2026-11-09 ("if it's ever needed, it becomes a narrow kit rule instead"). It is its own reviewed kit pull request to main. First show me, in chat, the exact text of every kit line you want to add or change, and wait for my yes. Then build it and stop for my go on the merge. Nothing is packed or deleted before that pull request is on main and this branch has taken main in.
+>
+> Keep the edit small and in one place: step 2.3's plan (another chat, branch claude/sweet-mayer-grsukw) plans its own guard change, not built yet.
+- _[history.md:2109 and :2111 left out: the bot fix's two cleans and its 1,400-line stop, and the report line on commit
+  5e563b95, the netcode test's; they stay with PR #40]_
+- **Taken by Mustafa, 2026-11-14, 14:12:13 UTC: his addition to his decision of that day (Blender is the route for the
+  models), and items 11 to 13 of the build plan's task** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his
+  personal account; his label: "My words of 2026-11-14, 15:03"; sent while the session's turn was running; extracted by
+  script from the session's transcript, the queued user message stamped 2026-11-14T14:12:13.167Z). It replaces the
+  Blender sentences of his decision in the entry below, as it says, and leaves his words of 2026-11-03 on the route
+  (LOOK-TEST-INPUTS, "Route: Blender") unchanged. Copied by script and checked byte for byte against
+  `docs/reports/2026-11-17-build-plan-slice-1-appendix.md`, A2:
+> My words of 2026-11-14, 15:03, an addition to my block of today. Take it into the plan you are writing.
+>
+> On Blender, my words: "Okay, you have convinced me for the Blender usecase, I was not aware that there was a workflow possible from Blender to web, lets make use of it. Its especially nice because of the MCP <> Claude workflow".
+>
+> What this changes in my decision of today. Its sentences on Blender now read:
+> "Slice 1 waits for no model: its first soldier is a stand-in built in code from the Art project's sheets. The models themselves are made in Blender, as my words of 2026-11-03 say (LOOK-TEST-INPUTS, "Route: Blender"), by Claude through the Blender MCP on my PC from the Art project's brief, and exported as GLB. The first model replaces the stand-in when it is ready. This changes, for these steps: my words of 2026-11-03 (SPIKE-ORDER (b), "wave 1 runs one heavy spike at a time"), condition 3 of SLICE-ORDER, my words of 2026-11-10 ("Steps 2.3 to 2.6 keep their order and wait for their results") and my words of 2026-11-13 ("Steps 2.4 to 2.6 still wait for their results")."
+> So my words of 2026-11-03 on the route stand unchanged. Everything else in the decision stays as I wrote it.
+>
+> Add to the plan:
+> 11. The rules a model file must follow so that the engine loads it and colours it per faction: the file format and export settings, scale, axes and origin, the names of the colour areas, the caps for triangles and materials, and whether Slice 1's soldier needs a skin. This is the export and slot-naming part of the asset research (OQ-0005-AS3 and AS4 in docs/adr/0005-content-abilities-assets.md; its entry in docs/SPIKE_PLAN.md). Say who answers it and when. Put it early: the Art project's Blender brief waits for these rules, and I want them as a short list I can paste there.
+> 12. The change-set in which the first Blender model replaces the stand-in. The spike plan places the asset spike "before the first authored model enters the game". Treat it as the tests named in my decision: say which of its pass marks (PM-0005-38 to PM-0005-44) are measured on the real game at that change-set and which later, with none dropped or loosened.
+> 13. In your list of decisions for me: whether a committed model may be public (OQ-0006-18), with options and your recommendation. No model file is committed before I have answered it.
+- **Taken by Mustafa, 2026-11-14, 13:58:05 UTC: the game is built now: foundation steps 2.4 and 2.5 and Slice 1 may be
+  planned, and built after his go on the plan; with the build plan's task** (the build chat,
+  session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of 2026-11-14, for a fresh chat on my
+  personal account"; extracted by script from the session's transcript, message 55dc4ac7-b4f4-4f02-a83f-98adb1ba391d).
+  His decision stands inside it, between quote marks ("The game is built now, ..."). Its sentences on Blender are
+  replaced by his addition of the same day (the entry above); who records it is changed by his words of 2026-11-17
+  (CHANGE 1, in the entry of 19:10:44 UTC above): change-set 0 of the build plan records it, here. It changes, for these
+  steps, his words of 2026-11-03 (SPIKE-ORDER (b)), condition 3 of SLICE-ORDER, his words of 2026-11-10 ("Steps 2.3 to
+  2.6 keep their order and wait for their results") and his words of 2026-11-13 ("Steps 2.4 to 2.6 still wait for their
+  results"); dated pointers of 2026-11-17 mark those lines (in this file: SPIKE-ORDER (b), SLICE-ORDER's condition 3 and
+  the entries of 2026-11-10 and 2026-11-13, below; SPIKE_PLAN; ADR 0002's migration step 1). The kit lines that still
+  say otherwise (CLAUDE.md, `.claude/agents/advisor.md`) are not edited: his words say they are the rule there too.
+  Pointer, 2026-11-17, Part 15 to main (not his words): its "one pull request at a time" is changed by his answer
+  LANE-SPLIT of 2026-11-17 (the entry of 22:10:34 UTC, above): "one pull request at a time per lane, in place of the
+  plan's one at a time". Copied by script and checked byte for byte against
+  `docs/reports/2026-11-17-build-plan-slice-1-appendix.md`, A1:
+> My words of 2026-11-14, for a fresh chat on my personal account. We start building the game: foundation steps 2.4 and 2.5, then Slice 1, move and shoot.
+>
+> Where things stand. Main is 4460ef5b8d6dc8566b29c15ded75c6f0c8be386b, with gate, smoke and toolchain green on it. It holds the empty skeleton of the new game, six Rust crates and five TypeScript packages, and no game code. Two other chats work on this repo. The netcode proof test: PR #40, branch claude/netcode-proof-test-plan-hcky5g, my university account. Step 2.3, the gate v2 and CI: branch claude/sweet-mayer-grsukw, my personal account; its plan is written and waits for my go. Never push to their branches and never touch spikes/.
+>
+> Model. This chat plans and writes game and engine code, so by my words of 2026-11-12 its main model is Fable 5.2, and so is every builder agent you start to write that code. Check this session's model first and stop in one line if it is not Fable 5.2. Every other agent runs on Opus 5.5; the agents that review, verify or design game and engine code run at effort max. The advisor tool stays off in this chat: you are the model it would ask.
+>
+> My decision of 2026-11-14, to record word for word:
+> "The game is built now, on my personal account, while the netcode proof test goes on on my university account. Foundation steps 2.4 and 2.5 and Slice 1 may be planned now and built after my go on the plan, on the decision drafts as proposed. They do not wait for the tests that docs/SPIKE_PLAN.md places before Slice 1 (the sim core spike, the 60 Hz run, the boundary spike, the look proof test, the content and ability spike and the render budget bench), nor for the end of step 2.3. Those tests are not built as separate tests unless the plan shows a question the real game cannot answer. No pass mark and no open question of theirs is dropped or loosened: each is measured on the real game, at the first build that can show it, and a draft is accepted only when its marks are met. If a mark fails, the code that rests on it is redone. Slice 3, online, still waits for the netcode proof test's result. Step 2.6, the previews, follows the preview hosting check as planned. Blender is optional: Slice 1 waits for no model made in it, and its first soldier is a stand-in built in code from the Art project's sheets. This changes, for these steps: my words of 2026-11-03 (SPIKE-ORDER (b), "wave 1 runs one heavy spike at a time", and LOOK-TEST-INPUTS, "Route: Blender"), condition 3 of SLICE-ORDER, my words of 2026-11-10 ("Steps 2.3 to 2.6 keep their order and wait for their results") and my words of 2026-11-13 ("Steps 2.4 to 2.6 still wait for their results"). These words are the rule from now, also where CLAUDE.md, .claude/agents/advisor.md, docs/SPIKE_PLAN.md and the decision drafts still say otherwise."
+>
+> Read first: CLAUDE.md; .claude/CHECKPOINTS.md; docs/STATUS.md (behind by one merge: it still lists PR #52 as open); docs/ENGINE_OVERVIEW.md (the engine on one page); the migration plan in docs/adr/0002-code-structure-build-toolchain.md (steps 2.4, 2.5 and 2.6 and Slice 1, with their done-when lines) and every milestone it names in docs/adr/0001-multiplayer-netcode.md, 0003-rendering.md and 0004-simulation-core.md; docs/adr/0005-content-abilities-assets.md for weapons as data; docs/SPIKE_PLAN.md (the entries of the tests named in my decision: their questions and pass marks); docs/LOOP_V2.md (the game loop design; its section 7 is combat feel) and docs/LOOK_V2.md (the look brief); in docs/DECISIONS.md: SLICE-ORDER with its conditions, my words of 2026-11-12 on models, and "Queued" (my note for Slice 1 on the live camera tuning panel is there); and the plan for step 2.3 on branch claude/sweet-mayer-grsukw, .checkpoints/foundation-2-3-plan/plan.md, for the gate checks it lets ride steps 2.4 and 2.5.
+>
+> The task now: the plan. No build, and no edit outside your checkpoint. The plan gives me:
+> 1. The cut into change-sets that each merge on their own, in order, from step 2.4 to the end of Slice 1. Cut it so that the first thing I can open in Brave comes as early as the drafts allow, and so that every change-set after it ends in something I can open, play and judge. For each change-set: what I will see or feel in one plain line, its planned size, your estimate of its working time, and whether its merge needs my go.
+> 2. For every done-when line and pass mark of steps 2.4 and 2.5 and Slice 1: the change-set that meets it.
+> 3. For every question and pass mark of the tests named in my decision: where on the real game it is measured and at which change-set, or why it must stay a separate test. Name the few that must be measured before more code rests on them, and put those first. I expect among them: the same result natively and in WebAssembly from the first tick; the cost of the hand-off between the page and the simulation at 12 players; the frame time on the weakest target machine once the look is on.
+> 4. What Slice 1 needs from the Art project, as a list I can paste there: the soldier, the test scene, colours, effects. The soldier starts as a stand-in built in code.
+> 5. Where my queued words for Slice 1 land (the live camera tuning panel from its first playable build). My look decisions of 13 and 14 November are not in the repo yet; a docs chat carries them in. Plan the look work against docs/LOOK_V2.md as it stands and say which change-sets wait for that carry.
+> 6. What needs the netcode proof test's result and so stays out until Slice 3.
+> 7. How the code is checked while step 2.3's gate v2 is not built: the commands you run on every change-set (format, lint, type checks, tests) and show in its report, and which of step 2.3's change-sets you need merged first, if any.
+> 8. How I open each build in Brave on my Windows laptop, in steps one at a time, and when the preview hosting check and step 2.6 can run, so that I get a link for every build.
+> 9. The decisions you need from me, each with its options and your recommendation, in plain words.
+> 10. What I do myself.
+>
+> How to work. CLAUDE.md's change-set protocol. Your branch stands in for the cs/ branch; one pull request at a time. At most 3 agents, the saver running, a checkpoint after every step. Have the advisor agent review the plan. The plan gets no review rounds and no verifier; every change-set gets the full review when it is built. In a report, write about your own process and about what you told me only what a record shows, with its time. Write each change-set's planned size in the plan; when one passes twice its plan while it is built, stop and tell me in three lines: what grew, why, and the cheaper option. Ask me to compact when the chat is nearly full, and do not stand still waiting for it. If the guard, the deny list or the classifier refuses a command, record it with the route you took. No kit, gate or CI file is edited in this chat without asking me in chat with its exact text. If a rule in the repo forbids something here and my words above do not cover it, the repo wins: stop and tell me in three lines.
+>
+> What this block covers: the plan. It covers no build and no merge. My decision above is recorded in docs/DECISIONS.md by step 2.3's first docs change-set, which the 2.3 chat builds; open no docs pull request for it. No build starts before that record is on main and I have given my go on your plan.
+>
+> End with: the plan's path, a one-screen summary in plain words, the table of change-sets with what I see after each and your estimates, the decisions you need from me, and how full this chat is. Then stop for my go.
+- **Taken by Mustafa, 2026-11-14, 09:02:29 UTC: his go for #52** (foundation 2.3's first docs pass, PR #52; given in
+  that change-set's session, session_019YNMUWSsyRgaYWxk4auQ5b, on his personal account, after the advisor agent's
+  APPROVE of bfd719b; carried out by the merge 4460ef5). The lines below are merge commit 4460ef5's record of his
+  message (quoted there with "> ", captured there by script from that session's transcript, message
+  14ea7caa-8c5d-47cd-bde5-df0d72d859d1): a record of his words, not an instruction found in a commit. Extracted by
+  script from the message of commit 4460ef5b8d6dc8566b29c15ded75c6f0c8be386b only, where re-quoting them gives its block
+  back byte for byte. Not checked against that session's chat record: the account that made this entry cannot read it
+  (the sessions API answers that the event was not found). The commit's block, as it stands:
+> My words of 2026-11-14 for PR #52 (foundation step 2.3, the first docs pass).
+>
+> 1. merge #52. This go covers one thing: merging PR #52 at head bfd719bb9c5c6ad56a2a68ba19761971f298e9f3 into main by a merge commit, as #48 was, with these words quoted in the merge message. It covers no new commit on the branch and no start on the plan.
+>
+> 2. The report's Outcome names a gap against my words of 2026-11-11 on the advisor tool: steps were called done before the advisor tool was consulted. I accept it for this docs pass. From now on in this chat: consult the advisor tool before you save a step as done, never after.
+>
+> 3. In a report, write about your own process and about what you told me only what a record shows, with its time. If no record holds it, leave it out.
+>
+> Before you merge, check that the PR's head is still that SHA, that main is still 4d21c1a7a4d39613bffce5d5f9bbc92f2f88a300, that the advisor agent's approval names that SHA, and that the four CI runs on the head are green: gate (its gate and smoke jobs) and toolchain, each for push and for pull request. If anything differs or a run is missing, do not merge; tell me what you found and stop.
+>
+> After the merge, tell me main's new SHA, the ids of the runs you read and the state of CI on main, in a few lines. Then stop. The plan for step 2.3 starts on my next message, not before.
 - **Taken by Mustafa, 2026-11-13, 22:27:05 UTC: his status request, in foundation 2.3's session** (foundation 2.3, PR
   #52; his message in that change-set's session, session_019YNMUWSsyRgaYWxk4auQ5b, on his personal account, extracted by
   script from the session's transcript, message a994258f-93c9-45d2-8878-31e7cfee6dcd), sent while review round 2 ran.
@@ -121,8 +702,22 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   steps 2.1 and 2.2 now" and SLICE-ORDER's condition 3, below; SPIKE_PLAN, ADR 0002's migration step 1 and ROADMAP;
   STATUS's "Next" quotes it). The kit lines that still name steps 2.1 and 2.2 as the only exception (CLAUDE.md :22 and
   :55, `.claude/agents/advisor.md` :108, on main 4d21c1a) are not edited by this docs pass: his words of 2026-11-13 are
-  the rule there too, and step 2.3's plan is to list their edits. Copied by script from
-  `docs/reports/2026-11-13-foundation-2-3-docs.md`, Appendix A2, and checked byte for byte against it:
+  the rule there too, and step 2.3's plan is to list their edits.
+  Pointer, 2026-11-17, change-set 0 of the build plan (not his words): its sentence "Steps 2.4 to 2.6 still wait for
+  their results." is changed for foundation steps 2.4 and 2.5 and for Slice 1 by his decision of 2026-11-14 (the entry
+  "Taken by Mustafa, 2026-11-14, 13:58:05 UTC: the game is built now", above): "Foundation steps 2.4 and 2.5 and Slice 1
+  may be planned now and built after my go on the plan, on the decision drafts as proposed. They do not wait for the
+  tests that docs/SPIKE_PLAN.md places before Slice 1 (the sim core spike, the 60 Hz run, the boundary spike, the look
+  proof test, the content and ability spike and the render budget bench), nor for the end of step 2.3. Those tests are
+  not built as separate tests unless the plan shows a question the real game cannot answer. No pass mark and no open
+  question of theirs is dropped or loosened: each is measured on the real game, at the first build that can show it, and
+  a draft is accepted only when its marks are met. If a mark fails, the code that rests on it is redone." One exception,
+  his words of 2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8,
+  on PM-0004-34): "The comparison against a library's character controller runs only if our own movement misses its
+  marks." Unchanged: "Slice 3, online, still waits for the netcode proof test's result. Step 2.6, the previews, follows
+  the preview hosting check as planned."
+  Copied by script from `docs/reports/2026-11-13-foundation-2-3-docs.md`, Appendix A2, and checked byte for byte
+  against it:
   - His decision, word for word (A2, from inside its quote marks):
     > Step 2.3 may be planned now. The parts of step 2.3 that need no proof test's result may be built before the proof tests report, after my go on the plan. Every gate check that needs a result joins later, when that result is in, with its pass marks unchanged. Steps 2.4 to 2.6 still wait for their results. This changes my words of 2026-11-10 ("Steps 2.3 to 2.6 keep their order and wait for their results") for step 2.3 only. These words are the rule from now, also where CLAUDE.md and .claude/agents/advisor.md still name steps 2.1 and 2.2 as the only exception.
   - His whole message (A2):
@@ -231,8 +826,14 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   session_019YNMUSc7FA68ujhLgXfEJA, on his personal account, extracted by script from the session's transcript, message
   adb00970-7927-49f7-bfa5-5095981ab169); sent while the session's turn was running. It re-sends his message of 15:26:57
   UTC (the entry below) with item 3 changed and item 4 new, and its item 3 replaces that message's item 3. The kit
-  change item 3 allows waits in "Queued", above, for step 2.3. Copied by script from
-  `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A9, and checked byte for byte against it:
+  change item 3 allows waits in "Queued", above, for step 2.3.
+  Pointer, 2026-11-17, change-set 0 of the build plan (not his words): two lines of its item 3 are changed by his words
+  of 2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan", at the top of this
+  list). The line "On my personal account, Fable 5.2 is the main model of every chat that writes game or engine code,
+  and of every builder agent that chat starts to write that code." is changed "for the second builder chat only" (its
+  CHANGE 2). The line "The guard, the gate and CI work stays with Opus 5.5." is set aside for the gate and CI edits the
+  first builder chat asks of him, each with its exact text (its answer 3, GATE-FOLLOW).
+  Copied by script from `docs/reports/2026-11-12-foundation-2-2.md`, Appendix A9, and checked byte for byte against it:
 > My words of 2026-11-12 for foundation step 2.2 (PR #48).
 >
 > 1. 2.1b is merged. PR #51 landed on main as merge commit 2aa5e9ce03e9ab9ccfecd53e6aabf951abe705dd, and CI on it is green (run #705). LANE-RULES was already in. Step 5 no longer waits: start it as your card says. Each kit edit (K2a, K2b, K3, K4) still asks me in chat with its exact text and is written only after my yes.
@@ -628,8 +1229,22 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   16:25 (the entry "Taken by Mustafa, 2026-11-12, 15:35:17 UTC", above). Its sentence "Steps 2.3 to 2.6 keep their order
   and wait for their results." is changed for step 2.3 only by his decision of 2026-11-13 (the entry "Taken by Mustafa,
   2026-11-13, 18:47:55 UTC: his decision on step 2.3 (step 2.3 may be planned now), and step 2.3's task", above), and
-  the dated pointers of 2026-11-13 carry its limits. Copied by script from `docs/reports/2026-11-11-foundation-2-1a.md`,
-  Appendix A1.1, A1.2 and A1.3, and checked byte for byte against them:
+  the dated pointers of 2026-11-13 carry its limits.
+  Pointer, 2026-11-17, change-set 0 of the build plan (not his words): its sentence "Steps 2.3 to 2.6 keep their order
+  and wait for their results." is changed for foundation steps 2.4 and 2.5 and for Slice 1 by his decision of 2026-11-14
+  (the entry "Taken by Mustafa, 2026-11-14, 13:58:05 UTC: the game is built now", above): "Foundation steps 2.4 and 2.5
+  and Slice 1 may be planned now and built after my go on the plan, on the decision drafts as proposed. They do not wait
+  for the tests that docs/SPIKE_PLAN.md places before Slice 1 (the sim core spike, the 60 Hz run, the boundary spike,
+  the look proof test, the content and ability spike and the render budget bench), nor for the end of step 2.3. Those
+  tests are not built as separate tests unless the plan shows a question the real game cannot answer. No pass mark and
+  no open question of theirs is dropped or loosened: each is measured on the real game, at the first build that can show
+  it, and a draft is accepted only when its marks are met. If a mark fails, the code that rests on it is redone." One
+  exception, his words of 2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan",
+  answer 8, on PM-0004-34): "The comparison against a library's character controller runs only if our own movement
+  misses its marks." Unchanged: "Slice 3, online, still waits for the netcode proof test's result. Step 2.6, the
+  previews, follows the preview hosting check as planned."
+  Copied by script from `docs/reports/2026-11-11-foundation-2-1a.md`, Appendix A1.1, A1.2 and A1.3, and checked byte
+  for byte against them:
   - His decision (A1.1):
     > I now have a second account, so the reason for 'one heavy spike at a time' (usage cuts on one account) no longer holds for it. The second account may plan and build foundation steps 2.1 and 2.2 now. Steps 2.3 to 2.6 keep their order and wait for their results. On this account Fable 5.2 may advise through the advisor tool, which overrides CLAUDE.md's model rule here until that rule is updated; the main model and every agent stay Opus 5.5. One account per branch.
   - His follow-up in the same chat, after its first turn stopped on the model rule (A1.2):
@@ -844,6 +1459,18 @@ read them at its parent 6c6c91a (`git show 6c6c91a:<path>`; the same files as at
   `docs/reports/2026-11-01-v2-decision-drafts-appendix.md` §2; where each landed: §9):
   - SPIKE-ORDER (b), Mustafa: the six drafts are the basis for the spikes, in SPIKE_PLAN's order, "but wave 1 runs one
     heavy spike at a time"; "The preview hosting check may run alongside any of them."
+    - _Pointer, 2026-11-17, change-set 0 of the build plan (a pointer, not his words): for foundation steps 2.4 and 2.5
+      and Slice 1, changed by his decision of 2026-11-14 (the entry "Taken by Mustafa, 2026-11-14, 13:58:05 UTC: the
+      game is built now", above): "Foundation steps 2.4 and 2.5 and Slice 1 may be planned now and built after my go on
+      the plan, on the decision drafts as proposed. They do not wait for the tests that docs/SPIKE_PLAN.md places before
+      Slice 1 (the sim core spike, the 60 Hz run, the boundary spike, the look proof test, the content and ability spike
+      and the render budget bench), nor for the end of step 2.3. Those tests are not built as separate tests unless the
+      plan shows a question the real game cannot answer. No pass mark and no open question of theirs is dropped or
+      loosened: each is measured on the real game, at the first build that can show it, and a draft is accepted only
+      when its marks are met. If a mark fails, the code that rests on it is redone." One exception, his words of
+      2026-11-17 (the entry "Taken by Mustafa, 2026-11-17, 19:10:44 UTC: his go on the build plan", answer 8, on
+      PM-0004-34): "The comparison against a library's character controller runs only if our own movement misses its
+      marks."_
   - TICK-60-HEADROOM, Mustafa: confirmed, "with one addition: 60 Hz also needs the goal budget to hold at the rooms per
     VM measured at 60 Hz."
   - TICK-60-SETUP (a), the Advisor: "as an early signal only. The final 60 Hz call is measured again with the real sim
@@ -970,6 +1597,9 @@ read them at its parent 6c6c91a (`git show 6c6c91a:<path>`; the same files as at
      that need no proof test's result may be built before the proof tests report, after my go on the plan. Every gate
      check that needs a result joins later, when that result is in, with its pass marks unchanged. Steps 2.4 to 2.6
      still wait for their results."_
+     _Pointer (2026-11-17, change-set 0 of the build plan): for foundation steps 2.4 and 2.5 and Slice 1, changed by his
+     decision of 2026-11-14: the entry "Taken by Mustafa, 2026-11-14, 13:58:05 UTC: the game is built now", above. His
+     words there: "Slice 3, online, still waits for the netcode proof test's result."_
 - **Taken by Mustafa 2026-10-31 (in the v2 day session's chat (session_0173vVo5q59ameR6cnN9BENg), with his "merge
   #28"):**
   - MODES-3 (a) (do VISION_V2 §3's starting sizes count players in total or per team): totals; "the biggest match is
