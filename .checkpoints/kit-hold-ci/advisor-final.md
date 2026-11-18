@@ -34,3 +34,25 @@ Started 2026-11-18 19:04 UTC (date -u). Base main 9b4b518. Work from main's advi
 - 19:22 D-L3 (Low): "test-engineer's ten lines" (Follow-ups) lists 3 + 5 + 1 + 1 + 1 = 11 (its F1-F11).
 - 19:22 D-L4 (Low): Evidence, "the advisor agent's and security-auditor's probes of ':' paths and of an unpushed local main were held": mine ran on an older text (before KIT-FIX); the ones on this head's code are security-auditor's ':' family (4877599) and test-engineer's X2/X7 (4877599). Name those; mine as history.
 - 19:22 E-M1 (Medium): STATUS "Binding this chat" (l.106-107) cites "the advisor agent's ruling of #58" but drops two of its clauses: "other code is committed by path only" (cs1 report l.38; my ruling 12:44 item 3(c)) and "a dependency edit committed by mistake is not pushed" (3(d)); adds "cargo --locked". "By path only" is what keeps uncommitted manifest edits out of a code commit that the session then pushes by hand (a plain git push is not held). Restore it within the same two lines.
+- 19:27 Map check: OK in the main folder (tree == e4156f1 outside .checkpoints): 140 entries, 109 paths. (In my worktree it named tools/node_modules: my own link, which .gitignore's "node_modules/" does not match; not the PR.)
+- 19:27 REPO_MAP's changed own row (packages/types/src/generated/) true: layout_ts.rs:122-134 refuses plain files directly in generated/, folders and links pass; protocol/ and block/ compared; toolchain.yml compare step.
+- 19:27 D-L5 (Low): STATUS:29 #60's state cell says "the verifier's and the advisor agent's verdicts: the report"; the report puts the advisor's verdict on this head in the PR description.
+- 19:27 D-L6 (Low): REC-OLD (report :588-594) is self-contained and fair; option (a) should say "also a line another lane wrote" (the point RECORD-FILES settles) so his answer is unambiguous.
+- 19:27 D-L7 (Low): For Mustafa :601-602 could carry "As before, the checkpoint commits enter main's history with this merge" (his line in #58's go).
+- 19:27 Verifier scope: its PASS covers the code head 4877599 (= this head's kit/CI files) and the report's draft to 18:41; the docs pass, DECISIONS' insertion and the final report came after, by the protocol's order (step 6). I checked them myself (above). Ruling: no verifier re-run needed for docs-only changes; the final head's "no .checkpoints/" check is in my confirming read.
+
+## Ratings (B)
+- security-auditor F1: Medium (agree). Not "a rule loosened beyond his words": the rule line and header carry his words; the code falls short of them in two corners by a defect of an inherited helper (run() trims and decodes), not by a sentence or choice that grants more. No session would plausibly hit it; the escaping file is never one CI reads (not a workspace member; root lockfiles have plain ASCII names, always read right, held). Same class and reach as the ':' hole (Medium by me and the reviewer). A security finding left open: needs-mustafa (tier 2 anyway); follow-up by his word of 18:01:08.
+- security-auditor F3: Medium (agree). Process gap with a workaround (I read the manifest diff of every PR; security-auditor reviews deps per CLAUDE.md step 5; change-set 2's report quotes each record). Until a rule exists, I will read each dependency-check record from history for any PR that changes a manifest.
+- test-engineer F1 (main's side literal read untested; M12): Medium (agree). Right code (blobAt reads both sides with --literal-pathspecs), no test since KIT-FIX rewrote step 4; X2 kills M12.
+- test-engineer F2 ("deleted" vs an existing plain file untested; M07b): Medium (agree). Right code (:130 only on an empty entry); X1 kills M07b.
+- test-engineer F3 (origin/main over local main untested; M14): Medium as labelled (I had it Low at plan stage: the full ref is spelled at :122 and :135); no change of routing. X7 kills M14.
+- None Critical or High: all five are follow-ups by his word; the kit lines go to him as they are.
+
+## Rulings (C)
+- C1 mode: telling true, not enough. His rule (DEC:753) not met at either write; he was told "default" twice. Only he can accept a departure from his rule (escalation cat. 3). Needs his word with his go: a Decisions-needed entry WRITE-MODE (accept as written / rewrite in Accept edits), rec. accept, plus: read the mode right before each kit write; never state it unread.
+- C2 the tree delete: telling true and enough for the merge (own untracked scratch clone, 20 s old, nothing lost, nothing committed); it sidestepped a deny rule's purpose, so it is a lapse, not a decision: move it to "What went wrong" (Low, placement).
+
+## Verdict
+REVISE (report and STATUS only; the four kit/CI files are approved as they are): (1) WRITE-MODE in Decisions needed + For Mustafa; (2) STATUS binding line restores "other code is committed by path only". Lows ride along. APPROVE on a confirming read of the final head when its diff vs e4156f1 is exactly: .checkpoints/ deleted, the notes commit named, (1), (2), and any of the Lows.
+DONE 19:27

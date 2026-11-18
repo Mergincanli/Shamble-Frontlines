@@ -7,7 +7,7 @@
   15:38:13 UTC, his label 16:24 Amsterdam; `kit-hold-ci/mustafa-2026-11-18-1624-merge-58.md`, by script).
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/kit-hold-ci) · **Base:** main
   9b4b518f520aa2360a8007dc857ba74b343c8a40 (the merge of #58; the branch was fast-forwarded to it and pushed)
-- **Last update:** 2026-11-18 20:05 CET (from the clock)
+- **Last update:** 2026-11-18 20:30 CET (from the clock)
 
 ## What his words ask (read the file; these are pointers, not his words)
 - DEP-HOLD (a): "Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no
@@ -341,14 +341,33 @@
       pull request 44376533569: `gate` success, `smoke` still running then. Sent to the advisor agent; my message to
       it says "19:06", ten seconds ahead of the clock (noted 19:06:14 UTC).
 
+37. **The advisor agent on head e4156f1** (19:04:48 to about 19:28 UTC; `kit-hold-ci/advisor-final.md`): **REVISE,
+    two fixes in the records; the four kit and CI files are approved as they stand.** (1) A decision was missing in
+    the report: WRITE-MODE (does Mustafa accept the two kit writes made outside Accept edits; only he can accept a
+    departure from his rule of 2026-11-13). (2) STATUS's line "Binding this chat" had dropped "other code is committed
+    by path only" from its ruling of #58 and added "cargo `--locked`", which was not in it. Its Lows (eight): the
+    origin of open finding 1 said more exactly; the probes named that ran on this head; "ten lines" listed eleven;
+    the folder delete moved to "What went wrong"; REC-OLD's option (a) says "also a line another lane wrote"; "As
+    before, the checkpoint commits enter main's history with this merge" added for his go; STATUS's row points to
+    the pull request's description for the advisor agent's verdict; the summary line of the third DECISIONS entry
+    (it called WATCH-60 a question about the hold). It rated the five open findings Medium itself (F1: not "a rule
+    loosened beyond his words"); it rebuilt the four files from his texts byte for byte; it read all six check runs
+    on e4156f1: success (the pull request's `smoke` ended 19:14:02). Its verdict becomes APPROVE after a short
+    confirming read of the final head, if that head's diff against e4156f1 is exactly: `.checkpoints/` deleted, the
+    notes' commit named in the report, the two required fixes, any of the Lows, and nothing else.
+38. **All of it applied** (19:30 UTC): the report (WRITE-MODE added; "For Mustafa" item 2; the Lows; a paragraph on
+    the advisor agent's review), STATUS (lines 107 and 29), DECISIONS (the third entry's summary line, by
+    `decisions.mjs` on main's file again: 12 checks yes; his words untouched). Checked: 17 quotes of his words in the
+    report, word for word; the map check OK; STATUS 120 lines.
+
 ## Current step
-37. (19:05 UTC, from the clock) Running: the advisor agent on head e4156f1 (started 19:04 UTC; its notes:
-    `kit-hold-ci/advisor-final.md`). CI on e4156f1 at 19:05: both `gate` jobs success, the push's `toolchain`
-    success (run 44376519102); the pull request's `toolchain` (run 44376533634) and both `smoke` jobs still running:
-    read again and send the advisor agent the result. Then: save the notes a last time; the last commit deletes
-    `.checkpoints/kit-hold-ci*` and writes the name of the notes' commit into the report ("Where the notes are");
-    no skip mark; CI on it; the advisor agent's word on the final head into the pull request's description; "ready";
-    the label needs-mustafa.
+39. (19:30 UTC, from the clock) **This is the last save of the notes.** What follows, in this order: stop the saver
+    (b4bg0wkfu); write this save's commit name into the report ("Where the notes are"); `git rm` the checkpoint
+    file and its folder; ONE last commit by path (the report, STATUS, DECISIONS, the deletion; no skip mark); a plain
+    `git push`; CI on it (six check runs); the advisor agent's confirming read; the pull request's description;
+    "ready"; the label needs-mustafa; the message to Mustafa with WRITE-MODE and REC-OLD. If you resume and
+    `.checkpoints/kit-hold-ci.md` is gone from the branch's head, that commit is made: go on from "CI on it".
+    Nothing is merged without his go in chat for the head the pull request shows.
 
 ## Next steps
 4. Build (three edits), the script's tests, the real CI runs (a planted change that the compare step fails on; the
@@ -365,7 +384,7 @@
 
 ## Running work
 - saver: background task b4bg0wkfu, started 18:04 UTC on 2026-11-18 on the fixed script (2-hour limit).
-- agents: the advisor agent on head e4156f1 (since 19:04 UTC). Done: infra-engineer, engine-architect (change-set 2's plan draft), security-auditor,
+- agents: none running. Done: the advisor agent on head e4156f1, infra-engineer, engine-architect (change-set 2's plan draft), security-auditor,
   test-engineer, the verifier, docs-keeper.
 
 ## For the list of the quality gate v2's plan (his words of 15:38 and 18:01 UTC)
