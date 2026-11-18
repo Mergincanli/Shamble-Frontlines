@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-18 22:09 UTC (from the clock)
+- **Last update:** 2026-11-18 22:30 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -165,21 +165,48 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     CI-WASM, each with its options and recommendation ((c), (a), (a), (a), (a)). The first, second and fourth hold
     the dependency step; the third holds the tool's download and first run; the fifth holds nothing.
 
+18. **The container restarted** (seen at 22:11 UTC; the harness's notice). Nothing was lost: HEAD equalled the pushed
+    branch, the one uncommitted file (`serve.mjs`) was still there, `node_modules` and `target` too. The saver had
+    stopped and was started again.
+19. **The manifest-free parts of step 2**, on the advisor agent's ruling, each committed by path:
+    - **the small server, 784ae3e:** `packages/client/serve.mjs` (165 lines) and `serve.test.mjs` (14 tests): binds
+      127.0.0.1 only, the address in one place (`HOST`, `addressFor`); GET and HEAD only; only files inside its own
+      folder (twelve ways to write a path that leaves it, and a link that leads outside, are refused); a fixed table
+      of content types, nosniff, no-store; a Host header that is not its own address gets 421 with the right address
+      in the answer; a taken port stops it with a plain line. Also started by hand from a scratch folder.
+    - **the Worker's pure modules, 4c32a06:** `packages/sim-worker/src/` `pacing.ts` (`MAX_TICKS_PER_WAKE` 7, `Pacer`,
+      `PacedSim`), `block-pool.ts`, `read-block.ts` (`copyBlock`, `LinearMemory`), `stats.ts` (`Ring`, `percentile`),
+      `messages.ts` (`PageToWorker`, `WorkerToPage`, `WorkerStats`, `MODE_LOCAL`, `isPageToWorker`), 24 tests; tsc
+      with CI's strict flags and `--lib es2023,webworker`: exit 0. `index.ts` and its stub test stay until step 5.
+    - **the build script's checks, a7f785a:** `packages/client/scripts/build-checks.mjs` (`lockedWasmBindgenVersion`,
+      `checkCli`, `checkCliFile`, `sizeTable`, `formatSizeTable`, `tooLarge`, `MAX_SERVED_BYTES`), 13 tests.
+    Checks at 2026-11-18 22:30 UTC: every package's test script as CI's `npm test` runs it (types 7, net 1, sim-worker 25, client
+    28, e2e 1: all passed); `node tools/gate.mjs --no-smoke` (GATE PASS, smoke skipped); the map check.
+    **Size so far: 1880 added lines** in `crates/` and `packages/` by `git diff --numstat origin/main...HEAD`
+    (plan: about 2,900; stop line 4,000). The parts built so far ran over their rows (the Rust core 559 against 550,
+    the server 366 against 270, the Worker's pure modules 707 against 590 for the whole package, the build checks
+    248 against 240 for the whole script): the rest must stay tight, or the stop line comes into view.
+    Departures from the plan's lists, for the report: `BlockWriter::new` returns an `Option`; `SEED_BYTES` is public;
+    the paced simulation's `rebase` returns the next due time (so `Sim::rebase` will, in step 4); `isPageToWorker`
+    is added; the build checks have their own module (`build-checks.mjs`), with `build.mjs` to come in step 4;
+    `BlockPool.give` returns nothing and the pool counts `refused` beside `misses`.
+
 ## Current step
-18. **The manifest-free parts of step 2**, while his answers are awaited: the small server (`packages/client/serve.mjs`
-    and its tests), then the Worker's pure modules (`pacing`, `block-pool`, `read-block`, `stats`, `messages`, with
-    unit tests), then the build script's pure checks. Each tested with the Vitest already installed, as CI runs it;
-    committed by path; pushed through the checkpoint script.
+20. **Waiting for Mustafa's answers** (asked at 22:09 UTC): RNG-CRATE, WB-HEALTH and DEPART-2 hold step 2's manifest
+    part; TOOL-SOURCE holds the tool's download and first run; CI-WASM holds nothing. Everything the advisor agent's
+    ruling allowed before his answers is built.
 
 ## Next steps
 1. When he answers: copy his message by script into the notes (`words.mjs`), then step 2's manifest part (the scratch
-   worktree `.gate/cs2-deps`, the manifests, both lockfiles resolved and not built, the diffs to security-auditor);
-   nothing of it committed or built before the answer on exactly that content (plan section 7). The tool's download
-   and first run wait for TOOL-SOURCE.
+   worktree `.gate/cs2-deps`, the manifests with the overflow overrides, both lockfiles resolved and not built, the
+   diffs to security-auditor); nothing of it committed or built before the answer on exactly that content (plan
+   section 7). The tool's download and first run wait for TOOL-SOURCE. If DEPART-2 refuses the printed address,
+   `HOST`/`addressFor` in `serve.mjs` is the one place to change.
 2. Then steps 3 to 8, the gate after each, a checkpoint after each; the reviews (seven reviewers: three, three, one;
    one round); the verifier; the docs pass with the records of plan section 21; the report; the pull request (draft,
    then ready); stop for his go and his Brave check (the zip through the chat's file tool).
-3. The saver: restart it before 23:50 UTC (see "Running work").
+3. Read CI on the head this save pushes (`toolchain`, `gate` with `smoke`).
+4. The saver: restart it within 110 minutes of the time under "Running work".
 
 ## Due in this change-set's docs pass (records of #60's merge; nothing of it is written yet)
 - `docs/DECISIONS.md`, by script: his message of 2026-11-18, 20:20:09 UTC (his go on #60; what he accepts;
@@ -216,6 +243,5 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
   `test-engineer-plant-target`; the classifier refused their removal).
 
 ## Running work
-- saver: running since 2026-11-18T22:01:17.224Z (its own first line; task belkm5v73; 10-minute interval, stops after 110
-  minutes: restart it before 23:50 UTC).
+- saver: running since 2026-11-18T22:12:00.211Z (its own first line; task bpbviesk8; 10-minute interval, stops after 110 minutes).
 - agents: none.
