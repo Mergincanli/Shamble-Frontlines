@@ -29,3 +29,7 @@ B10. Checks: wc -l STATUS <= 120; widths <= 120 (own lines); blame proof (docs-k
 B11. DONE and the answer.
 
 ## Notes
+- B0 done (18:33:59 UTC, date -u): ls-remote main = 9b4b518f520aa2360a8007dc857ba74b343c8a40 = origin/main =
+  merge-base(HEAD, origin/main). Remote branch head db445f6; local HEAD 8dedfcc (the main session's save, 18:33:57).
+  The four record files: worktree = HEAD = main (STATUS f69be90a, archive 39792023, ROADMAP f944af37, REPO_MAP
+  50ccc76b). DECISIONS.md: modified in the worktree (the main session's script; not mine to touch). Next B1.
