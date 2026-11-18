@@ -2,10 +2,10 @@
 - **Goal:** the netcode proof test (SPIKE_PLAN item 1) under its approved plan `.checkpoints/netcode-proof-test/plan.md`,
   rev 3.3 (the advisor and Mustafa, 2026-11-06; verdict advisor-verdict.md) · PR #40 (draft).
 - **Branch:** `claude/netcode-proof-test-plan-hcky5g` (this cloud session's stand-in for `cs/netcode-proof-test`).
-  **Base:** main last merged in at 3f2fa21 (main 82c605e, PR #54). Main is now c94c81b (PR #55, five docs files only):
+  **Base:** main last merged in at 3f2fa21 (main 82c605e, PR #54). Main is now 22c6afa (PRs #55, #56, #57: docs/ only,
+  `git diff --stat HEAD origin/main -- .claude/ CLAUDE.md AGENTS.md .github/ tools/` empty, 2026-11-18 before 11:44 UTC):
   not taken in; MAIN-52 takes main in when main changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-17 22:44 UTC: the card cut to a handoff (TEST-FIRST); U4f's brief rev 3.2 approved with
-  conditions by the advisor (advisor-u4f-brief.md).
+- **Last update:** 2026-11-18 11:44 UTC: U4f's brief filled at launch; the builder next (below).
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -47,47 +47,17 @@
   briefs go to the advisor before their builds; carries word for word from u4s-carries.md, met by number in reports.
 
 ## Now: U4f (clock and commands; u4-build-plan.md §5 :805-816; size M)
-- **The brief:** `.checkpoints/netcode-proof-test/u4f-brief.md` rev 3.2 (sha256 e9f33e61…, 1,734 lines; committed at
-  8ca5ede). Its path: the night's rev 2 (34a2e55); rev 3 (e1508bc); round 1, both checks FAIL with 3 Highs; rev 3.1
-  (9f76a02); round 2, no High (7 Medium); rev 3.2, the last fix pass. Before the advisor: D2 (the disk, 18:54 UTC) and
-  D4 (two ClockSync models: u4f-r3/d4/d4-output.md, u4f-r3/d4b/d4b-notes.md, compared in u4f-r3/d4/d4-compare.md).
-- **The advisor's check: APPROVE WITH CONDITIONS** (`advisor-u4f-brief.md`, 439 lines, read in full where it matters:
-  the findings :65-172, the bars :325-367, the conditions :369-419). A1 Medium: "movement" on a death or respawn tick
-  (count only the sim's movement step); A2 Medium: U4F-Q6 (b) needs npt-server's `Pong` (pump.rs:458-467) and its two
-  test literals, so section 6 item 4 and D9 apply; A3 Medium: `tick.s.cmd_on_time` counted by stamp (a lost command is
-  not on time); A4-A7 Low. The 18 rulings at :173-198 (Q6 (b) with an averaging filter, f1 pinned at 4.0 ms; Q7 (b) with
-  (i) and (iii) (c); Q8 (b) at 400 ms; Q18 (a) with (ii) (d); the rest at :173-198). After the fold: at least +118
-  measured tests, +133 bites build, 67 negative cases, 21 pre-runs, disk about 3,727 MiB, planned size about 5,150
-  added lines (4,200 to 6,200; his stop past 6,000).
-- **Progress 2026-11-18 (from 00:41 UTC):** L2 DONE: u4f-lead-bound.md drafted, read once by the advisor and the
-  test-engineer (both SEND WITH EDITS: advisor-u4f-lead-bound.md, test-engineer-u4f-lead-bound.md), every edit applied
-  (the movement reading in its own section with the honest reference on the same live ticks; both check names quoted
-  from marks.json:5027, :5039; `ticks_for_ms_at(rate, 400)`; full-speed walking at 6 m/s; option A and B glossed), and
-  **posted to him in the day's message (2026-11-18); WAITING for his yes**. The advisor's walking-only line for the
-  fold sent to the fold agent. L1's fold RUNNING (one
-  agent acting as netcode-architect; notes u4f-brief-r33-notes.md); L3 DONE (carry 90 added to u4s-carries.md's U4h
-  section, quoting advisor-u4f-brief.md:258-259, checked equal by a read-only compare). **D3 DONE, with a finding
-  (D3-1, Medium, for the advisor):** U4r's P3 logs hold only `reorder_step_permille` (10, the step's setting), never
-  the measured `reorder_permille` that -20's `reorder` rule reads (judge/src/eval.rs:863-872; SERIES.md:245); only the
-  -3 probe writes it (lab/src/main.rs:131-139), the scenario runner does not (scenario.rs:1401). So -20's judged runs
-  would be INVALID on a build as briefed (the brief's 2.7 says "U4r's"). Fix (to the advisor with the fold's result):
-  U4f's lab writes the measured share for scenario runs (the header param or a `reorder` event, from npt-l1's fate log,
-  as the probe computes it), with a test; D3's bar then reads -20's first short run (p5, p6).
-- **L1 DONE: the brief is final at rev 3.3** (u4f-brief.md sha256 50530a825b5877d73aca479b55f7449bb1cf2e776a5b87e196da86efffa74ccb,
-  1,835 lines; notes u4f-brief-r33-notes.md). The advisor's fold check (advisor-u4f-fold-check.md): ACCEPT with 20
-  exact edits, all applied (A3 in 2.2 too; the disk figures restated at 3,727 MiB; 9.1's two rows; **D3-1 confirmed and
-  ruled: a `reorder` event at the run's end, its SERIES.md rows as B9, test f40**, not a bar change, a choice by its
-  ruling named in the day's message); the words check passes on his words alone (the other hits are the archived
-  card). Counts: at least +119 measured, +134 bites build, 67 negative cases; 21 pre-runs; disk about 3,727 MiB;
-  planned size about 5,150 lines. **The fill script READY** (u4f_fill.py, sha256 20dbb02b7638b185…, 449 lines; notes
-  u4f-fill-notes.md; its last dry run u4f-fill-dryrun.md: every assert passes, nothing written). By the advisor's fill
-  ruling (advisor-u4f-fold-check.md section 4, on Mustafa's rule 3): each of the 36 copies once, under its name in
-  section 12 item 3's list, 102 pointers "Pn (copied in section 12 item 3)" elsewhere, the name-only mentions kept;
-  the result about 2,040 lines (its sha256 depends on `<base>`). `python3 -I .checkpoints/netcode-proof-test/u4f_fill.py
-  --apply` is the main session's, at launch, after his yes. **L4 item 2 DONE:**
-  u4f-run.sh made by u4f_runner.py from u4r-run.sh (e9437ae2…): 117 lines, 6 changed (the header, the log folder
-  .gate/u4f/, the usage line, the log check), sha256 70eb3da5b8ce9a8e2eda582536eeab93f96fb7fbe98e2a74a28e0492ccf6ddae
-  (`<<PV1>>`), `bash -n` exit 0, its diff u4f-run.sh.diff.
+- **The brief, filled for the build:** `.checkpoints/netcode-proof-test/u4f-brief.md`, sha256
+  135325a0bb524104bba9144b366b9ec52525851f5db140b1aca93ba4681a502f, 2,040 lines: rev 3.3 (50530a82…, 1,835 lines) filled
+  by `u4f_fill.py --apply` (20dbb02b…, 449 lines) at 11:3x UTC with `<base>` 5b29296b03f4e116c0afac8b89d9bc15cc1adaf7.
+  Its path: rev 2 (34a2e55), rev 3 (e1508bc), round 1 (3 Highs), rev 3.1 (9f76a02), round 2 (7 Medium), rev 3.2
+  (8ca5ede), the advisor's APPROVE WITH CONDITIONS L1-L6 (advisor-u4f-brief.md: findings :65-172, rulings :173-198,
+  bars :325-367, conditions :369-419), rev 3.3 by the fold (u4f-brief-r33-notes.md) and its check
+  (advisor-u4f-fold-check.md: ACCEPT, 20 edits applied; D3-1 ruled: a `reorder` event at the run's end, SERIES.md rows
+  as B9, test f40; section 4: the fill's form). Counts: at least +119 measured, +134 bites build, 67 negative cases; 21
+  pre-runs; disk about 3,727 MiB; planned size about 5,150 added lines (his stop past 6,000). Runner u4f-run.sh
+  70eb3da5b8ce9a8e2eda582536eeab93f96fb7fbe98e2a74a28e0492ccf6ddae (u4f_runner.py from u4r-run.sh e9437ae2…; 6 lines
+  changed; `bash -n` exit 0; u4f-run.sh.diff). Carry 90 (SA-11, U4h's section, :598-601) added by L3.
 - **LEAD-BOUND ANSWERED: (a) 400 ms, frozen** (Mustafa, 2026-11-18 11:31 Amsterdam by his label; reached the chat
   11:10:41 UTC; word for word at history.md's end, "## Decision: Mustafa, 2026-11-18 11:31 Amsterdam", by
   record_lead_bound.py): the entry u4f-lead-bound.md equal to 9ad2effb's (sha256 57c588ec43bae7b7…), its fenced value's
@@ -95,36 +65,25 @@
   report names it in a line of its own with who reviewed it** (the advisor's A1; read by the advisor and the
   test-engineer); no marks.json, judge file or existing SERIES.md row may change: if the build needs one, stop and ask
   him; "Build U4f"; his size stop past 6,000 added lines stays.
-- **LAUNCH progress (2026-11-18):** (1) DONE: no process running (pgrep exit 1); D2 `df -BM` 5,434 MiB free; the list
-  (11 files, 543,998,603 bytes) committed alone and pushed at d4654df (its message names advisor-u4r-sets-r2-full.md:45;
-  a worker restart cut the first push, re-pushed at 11:34); pack 11:3x: "kept-logs: free before: 5433 MiB"; archive
-  .gate/netcode-proof-test/kept-logs/u4r-P3-0f066338dd8d.tar.gz, 149827571 bytes from 543998603; "read back: 11 of 11
-  files equal the list (path, bytes, sha256)"; folder removed; "free after: 5808 MiB" (375 back). (2) DONE: the six
-  part-cleans in one main-run.sh call (.gate/u4f-launch/clean-shared.log, 11:35:52, exit 0; the lock and both tags
-  stay, every profile gone), free 12,154 MiB after. (3) the light run (.gate/u4f-launch/base-light.log, 11:36:52, exit
-  0): refs PASS (1463 tracked files), marks 81, self 78 of 78, redact 10 of 10 and 307 items, 0 findings; the test
-  counts stay 0ad9661's (552 / 632: code unchanged, only results/'s new list). Next: (4) the fill, (5) check-in and
-  saver, (6) the builder.
-- **LAUNCH (L4, then L6), in this order, nothing yet done unless marked:** (1) D2 reading; the u4r-P3-0f066338dd8d pack
-  by c62h-bound-brief.md 8.1's procedure (its list committed alone and pushed, kept-logs.mjs pack, free before and after
-  here); (2) the shared target's part-clean by W1-TARGET item 3 as amended (P27: advisor-u4d2-m9.md:252-256), D2 after;
-  (3) `<base>` = the head then, D1's rule; (4) `python3 -I .checkpoints/netcode-proof-test/u4f_fill.py --apply`, then
-  r31_check.py, the brief committed; (5) the check-in re-enabled, the saver restarted; (6) the builder: one Agent
-  (general-purpose, opus, xhigh, isolation worktree), told to build U4f by u4f-brief.md as filled, his stops quoted
-  by placeholder in the brief (section 1 item 5; SIZE-CHECK; 5.6).
-- **Next, in the advisor's order (:411-419):**
-  1. **L2, LEAD-BOUND:** draft its entry by :336-361; the advisor and the test-engineer read it once (one agent each, no
-     round); then to him in the next daily message. Nothing that reads the bound is built before his yes.
-  2. **L3:** SA-11's carry to u4s-carries.md's U4h section; the readings PR's list gains A1's reading of ADR
-     0001:1611's "moves" (this card, Open findings); the hold-time cap's -21 counter (Q14 (b)) and SA-16's variant go
-     on "After the close" for STATUS (TEST-FIRST rule 1: no docs work on main's files now).
-  3. **L1:** fold the ruling into the brief as rev 3.3 by script (each old phrase found once, adv_phrases.py's method);
-     a phrase that fails to match goes back to the advisor.
-  4. **L4 (section 12):** `<base>` and D1; u4f-run.sh made from u4r-run.sh by script; the placeholders; re-stamp; D3 by
-     the Grep tool, then the u4r-P3 pack by 8.1 and the shared target's part-clean, D2 before and after each.
-  5. **L6, after his yes:** the launch: one builder (general-purpose, opus, xhigh) in its own worktree under
-     W1-TARGET's lock and u4f-run.sh; then the panel in two batches; merge; 5.3's pre-runs; the part-clean at A6's
-     place; the sets one at a time (-47, -22, -20, -21: about 6-8 h of runs); U4f's report.
+- **LAUNCH (2026-11-18), steps 1-4 DONE:** (1) no process running; the u4r-P3-0f066338dd8d list (11 files, 543,998,603
+  bytes) committed alone at d4654df, then packed by 8.1: archive 149,827,571 bytes, "read back: 11 of 11 files equal the
+  list", free 5,433 → 5,808 MiB; (2) the six part-cleans in one main-run.sh call (.gate/u4f-launch/clean-shared.log,
+  11:35:52, exit 0; the lock and both tags stay), free 12,154 MiB; (3) the light run at d4654df
+  (.gate/u4f-launch/base-light.log, 11:36:52, exit 0): refs 1463 tracked files, marks 81, self 78 of 78, redact 10 of
+  10 and 307 items, 0 findings; the test counts stay 0ad9661's (552 / 632: spikes/ unchanged but results/'s new list);
+  (4) the fill: every assert passes (36 copies once in 12 item 3's list, 102 pointers, his words in no 7-word run
+  outside item 3; the stamps re-checked: plan and plan.md unchanged, carries +entry 90 only, history appended only);
+  r31_check.py on the result: no unknown id, 0 rev-3 markers, the `<<P`, `<base>` and `@@` left are the name-only
+  mentions the fill lists (:125, :151, :164, :266, :275) and item 3's own list (its "P3 to P13" names P4-P12 as a
+  range, so the checker's "NOT USED" lines for them are its pre-fill meaning).
+- **Next: (5)** the check-in re-enabled, the saver restarted; **(6)** the builder: one Agent (general-purpose, opus,
+  xhigh, isolation worktree) by the filled brief. Its prompt names the launch head (the brief's commit) for section 1
+  item 1, as U4r's correction did (u4r-build.md:5-15): main's docs-only #55-#57 make origin/main no ancestor of this
+  branch, so a worktree made at origin/main cannot fast-forward and takes the brief's `git switch -c` form.
+- **After the build:** the panel in two batches (brief 12 item 8); merge; 5.3's 21 pre-runs; the part-clean at A6's
+  place; the sets one at a time (-47, -22, -20, -21: about 6-8 h of runs); U4f's report, with A1's movement reading in
+  a line of its own naming who reviewed it (the advisor's A1; read by the advisor and the test-engineer), and every
+  marks.json or judge change's reviewer named in its own line (his 13:35 rule).
 
 ## Choices taken without him (TEST-FIRST rule 2: inside the plan, undoable, no pass mark, no money, nothing on main)
 - **2026-11-17:** the advisor's rulings on U4F-Q1 to Q18 (advisor-u4f-brief.md:173-198), all but Q8 (iii), which
@@ -132,6 +91,12 @@
   the brief is not built yet, so each can be undone; none changes a marks.json text or a judge file.
 - **2026-11-17:** no second review round or second model by default from now on (one round; a second only where round
   1 leaves a High or a design change); a workflow only for parallel review rounds. Why: TEST-FIRST rule 3.
+- **2026-11-18 (named in that day's message):** D3-1's fix by the advisor's ruling (advisor-u4f-fold-check.md): U4f's
+  lab writes a `reorder` event at a run's end (B9, test f40) so -20's existing reorder rule can read the measured share.
+  Why: no bar text, judge file or marks.json changes; undone by dropping B9 before the build merges.
+- **2026-11-18 (to name in the next message):** the fill's form by the advisor's fill ruling (advisor-u4f-fold-check.md
+  section 4, on rule 3): each of his 36 quoted passages copied once, in the brief's 12 item 3 list, with 102 pointers
+  elsewhere. Why: rule 3's "does not repeat them"; the words are his, byte for byte; undone by refilling from rev 3.3.
 
 ## Next steps (plan rev 3.3; units ahead)
 1. U4f (above). 2. U4g (prediction, interpolation and events; M) and U4h (lag compensation and aim; M), each with a
@@ -164,28 +129,25 @@
 - The kit's paper costs I named to him on 2026-11-17 (my message after the card cut): for a decision after the close.
 
 ## Key numbers
-- `<base>` counts at 0ad9661 (U3C-HELD-1's counted run E6): check.mjs's 11 steps pass; tests 552 measured and 632 bites
-  build, 0 failed, 0 skipped; refs 1382; marks 81; self 78 of 78; redact 10 of 10, 306 items, 0 findings; deps 137 crate
-  files; wasm 27000 ticks, 0 mismatching. spikes/ is unchanged since 0ad9661.
-- Disk (D2, 2026-11-17 18:54 UTC): 5,468 MiB free (the floor 4,096); runs/ u4r-P3-0f066338dd8d 519 MiB (its pack gives
-  back about 380), u4r-P3-d66e23cd78f2 298, u4r-P3-fd4612050cd6 291, u4r-P2-8ee453c22882 741, u4r-P2-fc411116c1f1 623,
-  u4r-P0-051995db9cea 3,249, u4r-P0-93509dfd7fd1 3,393, the c-u2 folders 998 each; .gate/shared-target 6,346; the main
-  folder's target 776. U4f's sets and pre-runs need about 3,727 MiB.
+- U4f's `<base>` 5b29296b counts (D1): 0ad9661's E6 (check.mjs's 11 steps pass; tests 552 measured and 632 bites build,
+  0 failed, 0 skipped; marks 81; self 78 of 78; deps 137 crate files; wasm 27000 ticks, 0 mismatching) but refs 1463
+  tracked files and redact 307 items (the light run at d4654df; 0ad9661: 1382 and 306). spikes/ outside results/ is
+  unchanged since 0ad9661.
+- Disk (D2, 2026-11-18 11:35 UTC, after the pack and the part-cleans): 12,154 MiB free (the floor 4,096); still kept:
+  u4r-P3-d66e23cd78f2 298 MiB, u4r-P3-fd4612050cd6 291, u4r-P2-8ee453c22882 741, u4r-P2-fc411116c1f1 623,
+  u4r-P0-051995db9cea 3,249, u4r-P0-93509dfd7fd1 3,393, the c-u2 folders 998 each; the main folder's target 776. U4f's
+  sets and pre-runs need about 3,727 MiB.
 - The packs so far (history.md, the old card's Key numbers :6523-6554): u4r-precheck-30, u4r-P2-ab10f058a828,
-  u4r-B1-64f3307d5c7f; each gave back about 73 % of its folder.
+  u4r-B1-64f3307d5c7f, u4r-P3-0f066338dd8d (2026-11-18: 375 MiB back); each gave back about 72-73 % of its folder.
 - Mustafa's count at 9024840 (2026-11-17 19:04 UTC, against main): 72,678 Rust lines, 7,688 TypeScript and JavaScript,
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **2026-11-18 about 01:40 UTC: nothing runs.** U4f waits for his LEAD-BOUND answer (posted in the day's message);
-  then L4 at launch (`<base>` and D1, `u4f_fill.py --apply`, the u4r-P3 pack by 8.1 and the shared target's part-clean
-  with D2 before and after) and L6, the build. The saver bghd4yb3e (from 00:41) stopped at about 01:39. Earlier:
-- **Nothing ran at 22:44 UTC.** The saver bnwkv7xyd was stopped between 22:38 and 22:43 (no agent running); restart it
-  (`node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Claude-Session: …"`, run_in_background,
-  timeout 7200000) whenever an agent starts. The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5 was PAUSED at 04:38 UTC
-  on 2026-11-18 (his CHECK-IN rule: a check-in while agents run; none runs); re-enable it (update_trigger enabled=true)
-  when U4f's builder starts.
-- The last workflow: wf_b2a20e74-6aa (the fix pass and the advisor's check), done before 22:43 UTC.
+- **2026-11-18 11:44 UTC: nothing runs yet;** the builder starts after this save. The saver (`node
+  .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Claude-Session: …"`, run_in_background, timeout
+  7200000) restarts with it; the 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (PAUSED at 04:38 UTC, no agent running)
+  is re-enabled with it (update_trigger enabled=true).
+- The last workflow: wf_b2a20e74-6aa (the fix pass and the advisor's check), done before 22:43 UTC on 2026-11-17.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - Every cut until 2026-11-17 is in history.md from :5791 on (the old card's block, the latest first).
