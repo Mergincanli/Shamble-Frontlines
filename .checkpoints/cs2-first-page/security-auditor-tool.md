@@ -22,3 +22,22 @@ Plan: read plan.md s6-7 + advisor F2; read the 0.2.130 release page/assets via W
   server-computed asset digest. Note: name field carries a "gh-release/" prefix (sha256sum -c on the file as-is fails;
   the plan's printf form is right). Both values are SAME ORIGIN as the tarball (the release), proof of integrity, not origin.
   Saved: .gate/cs2-first-page/tool-check/wasm-bindgen-0.2.130-x86_64-unknown-linux-musl.tar.gz.sha256sum (+ headers).
+- 21:35 S4 release attestation href (from expanded_assets): https://github.com/wasm-bindgen/wasm-bindgen/attestations/61631161/download
+  curl through the proxy -> CONNECT ok, then 403 Forbidden, application/json, 249 B, Connection: close; proxy status shows
+  no relay failure (refusal is upstream: the egress policy or GitHub). Proxy README: do not retry 403 policy denials -> not
+  retried with curl. So the attestation cannot be fetched as a file here by curl.
+- 21:37 S5 GitHub docs, immutable releases https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/immutable-releases :
+  "Immutable releases are releases where the assets and associated Git tag cannot be changed after publication."; tag
+  "locked to a specific commit"; "creating an immutable release automatically generates a release attestation" "which is a
+  cryptographically verifiable record of a release containing the release tag, commit SHA, and release assets." Page says
+  nothing on format, signer, trust root or offline verification.
+- 21:37 S6 GitHub docs, verify release integrity https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/verify-release-integrity :
+  only `gh release verify RELEASE-TAG` and `gh release verify-asset RELEASE-TAG ARTIFACT-PATH` ("verify a local artifact is
+  an exact match for a release asset"); nothing on Sigstore, trusted root, offline, or without the GitHub CLI.
+- 21:37 S7 the attestation itself, read through WebFetch (a different route from the container's curl; fetch-model
+  answers, so structure only): mediaType "application/vnd.dev.sigstore.bundle.v0.3+json"; verificationMaterial has
+  `certificate` + `timestampVerificationData` (1 RFC 3161 timestamp), NO tlogEntries, no chain; dsseEnvelope payloadType
+  "application/vnd.in-toto+json", signature 96 b64 chars (~72 B: ECDSA P-256 DER size); payload starts
+  "eyJfdHlwZSI6Imh0dHBzOi8vaW4tdG90by5pby9TdGF0ZW1lbnQvdjEiLCAic3ViamVjdCI6W3sidXJpIjoicGtnOmdpdGh1Yi93YXNtLWJpbmRnZW4vd2"
+  = in-toto Statement v1, first subject uri "pkg:github/wasm-bindgen/w...". No Rekor entry + TSA timestamp = the shape of
+  GitHub's own Sigstore instance (as for private-repo attestations), not public-good Sigstore. To confirm from the cert.

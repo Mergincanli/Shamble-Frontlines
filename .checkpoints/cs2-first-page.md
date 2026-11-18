@@ -7,7 +7,7 @@
   then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs2-first-page; lane 1, the first builder chat) ·
   **Base:** main b763ba3e5f34c67fc4f875cfbd9266167fb095f3 (the merge of #60; the branch is level with it and pushed)
-- **Last update:** 2026-11-18 21:34 UTC (from the clock)
+- **Last update:** 2026-11-18 21:38 UTC (from the clock)
 
 ## His words that govern (read the file; the lines below are pointers and quotes, never a substitute)
 `cs2-first-page/mustafa-2026-11-18-2059-merge-60.md` (his message of 2026-11-18, 20:20:09 UTC, whole, by script;
@@ -125,8 +125,20 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
     WB-HEALTH is new; Part 15.2's interface members and `e2e` folders are kept; the tool's route; the lockfile rule;
     netcode-architect in the round; the Brave checklist's pause line and two padded runs; the Lows.
 
+11. **Step 1 of the plan, the Rust core with no new crate: commit 3833e3e** (2026-11-18 21:38 UTC). `sim`: `world.rs` (the
+    world, `authority_step` with `checked_add`, the canonical bytes: tick then seed, 36 bytes, `state_hash`),
+    `state_hash.rs` (`fnv1a_64`). `client-endpoint`: `layout.rs` (`Section::align`, `section`, `field`, used in
+    constants), `block.rs` (`BlockWriter`, `MAX_PAD_BYTES` 1 MiB, `new` gives `None` above it), `schedule.rs`
+    (`LocalSchedule`). 559 lines added by `git diff --numstat` and `wc -l` (planned 550). Checks, all exit 0
+    (21:38 UTC): `cargo fmt --check`; clippy natively and for wasm32 with `-D warnings`; `cargo test --workspace`
+    (client-endpoint 17, sim 9); the release tests of sim and protocol; the wasm32 build of the five crates; the
+    generated types written again with no change; `node tools/gate.mjs --no-smoke` (GATE PASS, smoke skipped);
+    the map check; the three netcode rules. Known answers come from a second implementation,
+    `cs2-first-page/known-answers.py`. Two departures from the plan's symbol list, for the report: `BlockWriter::new`
+    returns an `Option` (the padding is capped, because the number comes from outside), and `SEED_BYTES` is public.
+
 ## Current step
-11. Two agents are reading (both Opus 5.5 at effort max): **the verifier** on the web facts of RNG-CRATE and of the
+12. Two agents are reading (both Opus 5.5 at effort max): **the verifier** on the web facts of RNG-CRATE and of the
     wasm-bindgen reading (the advisor agent's condition 4; `cs2-first-page/verifier-claims.md`), and
     **security-auditor** on what the wasm-bindgen tool's release offers as proof of origin and whether it can be
     checked here before the first run (`cs2-first-page/security-auditor-tool.md`; if it cannot, a question on the
@@ -136,9 +148,9 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
 1. When both agents have answered: work their results into the plan; the advisor agent reads the changed lines of
    sections 4.1, 16 and 17 once (its own condition); then the questions go to Mustafa: RNG-CRATE, WB-HEALTH,
    DEPART-2, CI-WASM, and the tool's source if security-auditor's reading makes it one.
-2. Step 1 of the plan (section 8): `sim` (world, authority step, canonical bytes, state hash) and `client-endpoint`
-   (`Section::align`, the lookups by name, the block writer, the local schedule) with their tests; the Rust checks of
-   section 9; commit by path; checkpoint.
+2. Step 1 is done (3833e3e). While the answers are awaited, the parts of step 2 that need no new package and no
+   manifest edit may be built: the small server, the Worker's pure modules, the build script's checks (but the
+   server's printed address waits for DEPART-2: build it with the plan's `127.0.0.1` and change it if he says no).
 3. Step 2 (the one dependency step) only after his answers to RNG-CRATE, WB-HEALTH and DEPART-2, and nothing of it
    committed or built before security-auditor's answer on exactly that content (plan section 7). During the wait:
    the small server, the Worker's pure modules, the build script's checks.
@@ -183,4 +195,5 @@ his labelled words, 2,404 bytes, stand byte for byte in the message of merge com
 
 ## Running work
 - saver: running since 2026-11-18 20:54:42 UTC (task bdxyfa5ap; 10-minute interval, stops after 110 minutes).
-- agents: the verifier (web facts) and security-auditor (the tool's proof of origin), both since about 21:10 UTC.
+- agents: the verifier (web facts; started after this session's save of 21:08:39 UTC) and security-auditor (the
+  tool's proof of origin; started before the plan's revision of 21:34 UTC).
