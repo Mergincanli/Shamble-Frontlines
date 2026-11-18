@@ -6852,3 +6852,12 @@ Build U4f. My size stop stays: past 6,000 added lines the build stops and I get 
 - **2026-11-17 19:46 to 22:16 UTC:** "You've hit your org's monthly spend limit · ask your admin for a higher limit ·
   your 5-hour limit resets 10:10pm (UTC)" (19:46:41.750, the advisor agent's transcript). Resumed 22:15:24 (the
   check-in); the workflow by resumeFromRunId at about 22:17. Nothing was half done.
+
+## Card blocks moved 2026-11-19 after the advisor's stop ruling (card_trim_1119.py; from the card's 'Now: U4f')
+- **The cap (B3; U4F-Q12 (b): to the advisor before any -22 run):** 9 runs (SS, 48 clients, the brawl, the controller,
+  P2/P3/B1, seeds 1-3, cap 8,192, 0 overflow resyncs; .gate/u4f/w2-cap/cap.txt): high-water 1,045 (P3 s3) x 1.5 →
+  1,600 < carry 50's 4,328; now `EventQueue::CAP`, not provisional (room/tests/room.rs:1139 re-pinned); P0 and
+  10-minute windows not measured. With it: its order notes (B3 on a tree holding B4's inert code; B6's check on B1-B7).
+- **SIZE-CHECK at builder 2's end (P18):** 5,515 (builder 1 3,753, builder 2 +1,762) beside M's 3,000 and the 6,000
+  stop; tests +67 / +84 against 2.10's +119 / +134 (6 of 67 negative cases): the rest in the unbuilt rows. Part-clean
+  before builder 3 (P27): free 4,623 → 11,896 MiB (.gate/u4f-b3/clean-shared.log, 18:07:04 UTC, exit 0).

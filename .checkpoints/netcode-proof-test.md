@@ -6,8 +6,8 @@
   #55-#57 docs; #58 cs1-types, the first v2 code; #60 kit-hold-ci: CHECKPOINTS.md's DEP-HOLD, checkpoint.mjs, a CI
   workflow): code, CI and rules changed, so MAIN-52 takes it in after U4f's end checks, before the panel. PR #40 shows
   a merge conflict since 20:40:46 UTC (expected: docs/STATUS.md :28-29; keep both rows).
-- **Last update:** 2026-11-18 23:04 UTC: builder 3 ENDED AT HIS SIZE STOP (6,213 added; end checks A2 and B pass on
-  one tree; snapshot 74ae26aa); the advisor confirms the three lines; main moved to b763ba3 (MAIN-52).
+- **Last update:** 2026-11-18 23:20 UTC: U4f AT HIS SIZE STOP (6,213 added; end checks A2 and B pass; snapshot
+  74ae26aa); the advisor's stop ruling in (lean (a)); SIZE-U4F to him in the day's message; MAIN-60 next, plan first.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -88,14 +88,7 @@
   (notes u4f-build.md :310-690; return in the chat): B1 (the ruling's fixes), B2 (-20's rest; plants f26 x2, f27, D14),
   B3 (the cap), B4 (-47), B5 (-22; 2.5's counts at every session end), B6 (c-u4f-r2.mjs, c-u4f-runs.mjs, their lines by
   hand), B7 (-21's clamp), B8's lag switch; not built (notes :680-690): the fast clock, B9's forged suite, B10.
-- **The cap (B3; U4F-Q12 (b): to the advisor before any -22 run):** 9 runs (SS, 48 clients, the brawl, the controller,
-  P2/P3/B1, seeds 1-3, cap 8,192, 0 overflow resyncs; .gate/u4f/w2-cap/cap.txt): high-water 1,045 (P3 s3) x 1.5 →
-  1,600 < carry 50's 4,328; now `EventQueue::CAP`, not provisional (room/tests/room.rs:1139 re-pinned); P0 and
-  10-minute windows not measured. With it: its order notes (B3 on a tree holding B4's inert code; B6's check on B1-B7).
-- **SIZE-CHECK at builder 2's end (P18):** 5,515 (builder 1 3,753, builder 2 +1,762) beside M's 3,000 and the 6,000
-  stop; tests +67 / +84 against 2.10's +119 / +134 (6 of 67 negative cases): the rest in the unbuilt rows. Part-clean
-  before builder 3 (P27): free 4,623 → 11,896 MiB (.gate/u4f-b3/clean-shared.log, 18:07:04 UTC, exit 0).
-- **Builder 3 (18:10-22:59 UTC): AT HIS SIZE STOP** (notes u4f-build.md :692-841; its stop record :801-840; return in
+- **Builder 3 (18:10-22:59 UTC): AT HIS SIZE STOP** (notes u4f-build.md :692-866; its stop record :827-866; return in
   the chat): built B8's fast clock (f19, f37, U4F-Q11 (iii) (c)'s test, p3, p9, p16, p20) and B9a (npt-bots' forgers
   of kinds 1, 2, 4, 5, 6; f15's five). **6,213 added**, 307 removed (final snapshot 74ae26aa…, `git apply --numstat`;
   its 6,212 predates its one-line doc fix, bots lib.rs 700 → 701): M's 3,000 x 2.07. Not built: the forged suite's rest
@@ -103,8 +96,12 @@
   clamp and lag-switch B halves: about 1,400-1,550 more (U4f whole about 7,600-7,800). End checks A2 and B
   (w3-end-check-a2.log, -b.log, to 18:50:00 and 22:59:25 UTC): all 11 steps pass on one tree (diff 54cb6faa…),
   measured 630, bites 727, test step 692.1 and 685.6 s; SERIES.md +20 / -0 (its 2 new rows report-only, read in full).
-  Next: the advisor confirms the three lines with these numbers (R4) and rules on the cap (U4F-Q12) and builder 3's
-  notes; the lines go in the next day's message, "stopped on you" first; the panel waits for his answer (R4).
+  **The advisor's stop ruling** (advisor-u4f-stop.md, 247 lines, 38821ebd…, read in full): R1 the lean (a) confirmed
+  (the built -21 parts stay in U4f's merge; the forged suite's rest, f28's B halves and all of -21's runs to a new
+  unit); R2 the cap 1,600 APPROVED (condition: -20's set before -22's, read for honest overflow); R3 the fast clock's
+  no pings a recorded deviation, p3, p9, p16, p20 by hand before the panel, USAGE's two options in the fix pass; R4
+  MAIN-52 now, plan first; Lows S1-S7, note N1. SIZE-U4F sent to him in the day's message (2026-11-19, 00:2x
+  Amsterdam); the panel waits for his answer (R4).
 - **After the build:** the panel in two batches (brief 12 item 8); merge; 5.3's 21 pre-runs; the part-clean at A6's
   place; the sets one at a time (-47, -22, -20, -21: about 6-8 h of runs); U4f's report, with A1's movement reading in
   a line of its own naming who reviewed it (the advisor's A1; read by the advisor and the test-engineer), and every
@@ -114,15 +111,19 @@
 - **2026-11-18 (named in that day's message):** D3-1's fix by the advisor's ruling (advisor-u4f-fold-check.md): U4f's
   lab writes a `reorder` event at a run's end (B9, test f40) so -20's existing reorder rule can read the measured share.
   Why: no bar text, judge file or marks.json changes; undone by dropping B9 before the build merges.
-- **2026-11-18 (to name in the next message):** the fill's form by the advisor's fill ruling (advisor-u4f-fold-check.md
+- **2026-11-18 (named 2026-11-19):** the fill's form by the advisor's fill ruling (advisor-u4f-fold-check.md
   section 4, on rule 3): each of his 36 quoted passages copied once, in the brief's 12 item 3 list, with 102 pointers
   elsewhere. Why: rule 3's "does not repeat them"; the words are his, byte for byte; undone by refilling from rev 3.3.
-- **2026-11-18 (to name in the next message):** the advisor's build-1 rulings (advisor-u4f-build1.md): the lead bound
+- **2026-11-18 (named that day, 13:45 UTC; the worktrees 2026-11-19):** the advisor's build-1 rulings (advisor-u4f-build1.md): the lead bound
   counts from the tick the room runs next, 2.4's anchor (its one line :57-58; the value stays 400 ms); the fast clock's
   every 10th stamp at newest + 3 + the bound (F1); `--brawl-press-every` as a new setting with its own new row instead
   of a new value under SERIES.md:348's row (F4); f6 and f28 one test per option (R1). Why: inside the plan; no pass
   mark, bar text, judge file or existing SERIES.md row changes; each undone before the merge. Also builder 2's and
   builder 3's fresh worktrees (above), an operational choice.
+- **2026-11-19 (named in that day's message):** the advisor's stop rulings (advisor-u4f-stop.md R2-R4): the event cap
+  1,600, no longer provisional; -20's set before -22's (order -47, -20, -22, -21), its 10-minute P3 runs read for
+  honest overflow resyncs first; the fast-clock cheat sends no pings (a recorded deviation); main b763ba3 taken in now,
+  plan first (MAIN-60). Why: inside the plan, undoable, no pass mark, bar text, judge file or marks.json changes.
 
 ## Next steps (plan rev 3.3; units ahead)
 1. U4f (above). 2. U4g (prediction, interpolation and events; M) and U4h (lag compensation and aim; M), each with a
@@ -175,9 +176,9 @@
 - **Builder 3 ENDED 22:59 UTC at the stop** (agent a0825a5a2491eb175): worktree
   `.claude/worktrees/agent-a0825a5a2491eb175` (u4f-build3 at 07289a4, uncommitted), kept with builders 1's and 2's; its
   final snapshot wip/u4f-build.patch 74ae26aa29c229d6…, 380,276 B, 29 files: the one snapshot until the merge.
-- **The advisor RUNS from 23:04 UTC** (agent ad617f46f49185e8c; general-purpose, opus, xhigh; reads main's
-  advisor.md): the stop's three lines (R4), the cap (U4F-Q12), builder 3's notes, MAIN-52's timing; its ruling to
-  advisor-u4f-stop.md. On a cut: resume it by SendMessage.
+- **The advisor ENDED 23:18 UTC** (agent ad617f46f49185e8c, 23:04-23:18; general-purpose, opus, xhigh, on main's
+  advisor.md) with its stop ruling, advisor-u4f-stop.md. Next: MAIN-60's plan (main-60-plan.md, on main-54-plan.md
+  and its C1-C7, history.md:2533-2541) to the advisor before it runs; then R3 (iii)'s four hand runs.
 - The saver b4p5xbtmj runs from 22:39 UTC (bgig20ts2 ran 18:11 to about 20:01, its window) (`node
   .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Claude-Session: …"`, run_in_background, timeout
   7200000; its window ends about 00:29: restart it while agents run). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5
