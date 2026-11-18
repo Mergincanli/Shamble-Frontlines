@@ -122,10 +122,19 @@ Readability first (overhead cam) · class identity over loadout freedom · rock-
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**Change-set 0 of the build plan [2026-11-17, PR #56: ready for review]** — cs0-model-rules, on his go of 2026-11-17 (docs only):
+**Part 15 of the build plan, the second lane, to main [2026-11-17, PR #57: draft; in review]** — part-15-second-lane, by
+his go of 2026-11-17 for #56 (docs only): Part 15 as he read it, with his six answers on top (all (a), with additions),
+in `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`; his two messages of 2026-11-17 in `docs/DECISIONS.md` by
+script; dated pointers in ADR 0002 (a seventh package, VFX-ROUTE) and in the build plan report; the rules' line on gun
+files (GUN-FILES); STATUS, ROADMAP, the archive and REPO_MAP after #56's merge. Then change-set 1, Types, by lane 1.
+
+**Change-set 0 of the build plan [2026-11-17, MERGED]** — cs0-model-rules, on his go of 2026-11-17 (docs only):
 his five messages of 2026-11-14 and 2026-11-17 into `docs/DECISIONS.md` by script; the plan and its appendix carried
 as reports; the model-file rules and the soldier's joint list, on paper (PM-0005-47 to -56); his answers in the drafts
-(open questions 98 to 96). Report `docs/reports/2026-11-17-cs0-model-rules.md`. Two review rounds done (the verifier: PASS); then his go.
+(open questions 98 to 96). Report `docs/reports/2026-11-17-cs0-model-rules.md`. Two review rounds (the verifier: PASS).
+Merged: PR #56, d7dad97, 2026-11-17 23:00:12 UTC, by merge commit, on his go after the advisor agent's APPROVE of
+cd61b28; CI green on main (gate run 856 with smoke, toolchain run 155). With the merge he accepted that PM-0005-54
+stands as written (a fail with today's rifle prototype, not waived) and the checkpoint commits in main's history.
 
 **Main's docs after #52, #53 and #54 [2026-11-17, MERGED]** — docs-after-54, by Mustafa's DOCS-54 (a) of
 2026-11-17 (docs only, no kit, gate or CI file; from the netcode proof test's session, its plan approved by the advisor

@@ -127,6 +127,64 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-17, 22:59:16 UTC: his go on the merge of #56 (change-set 0 of the build plan), what he
+  accepts with it, and what comes after** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account;
+  his label: "My words of 2026-11-17, 23:57 (Amsterdam time)"; extracted by script from the session's transcript,
+  message 987dac5c-6911-41b9-9d8e-2f803893370a, whole). The same words stand byte for byte in the message of merge
+  commit d7dad976f1ea7170d597b51e3861f1ee74f980e4 (2026-11-17, 23:00:12 UTC; parents c94c81b and cd61b28). Before the
+  merge the session read the head again (cd61b28350c4407d2f19b1b3603ea4beca8b4e30) and `gate`, `smoke` and `toolchain`
+  on it: green. Copied by script and checked byte for byte against
+  `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`, P2:
+> My words of 2026-11-17, 23:57 (Amsterdam time): my go on the merge of pull request #56.
+>
+> Merge pull request #56 (change-set 0 of the build plan: my records, the plan's carry, the model-file rules and the soldier's joint list; docs only) into main by a merge commit, at head cd61b28350c4407d2f19b1b3603ea4beca8b4e30. Put these words in the merge message.
+>
+> Before you merge:
+> - Read gate, smoke and toolchain on that head once more. All three are green, or you stop and tell me.
+> - If the head is not cd61b28350c4407d2f19b1b3603ea4beca8b4e30, stop. A later push needs the advisor agent's review and my go again.
+>
+> What I accept with this merge:
+> - PM-0005-54 stands as written: a fail with today's rifle prototype (6 draws per pass against 4). It is not waived. The way out is my call, with the plan for the first-model change-set.
+> - The size as counted: 1,200 written lines, 129 asked for by review findings, 1,788 copied, the 68 lines of sheet notes among the copied.
+> - The three things your verifier did not verify. The Advisor compared A10 with the file I attached: equal. The draw-loop reading behind "6 draws per pass" is checked when PM-0005-54 first runs.
+> - By my answer LOG-HISTORY, the checkpoint commits enter main's history with this merge.
+>
+> After the merge:
+> - Part 15 with my six answers goes to main next, as a docs change of its own. Keep it to Part 15's text, my answers by script, the pointers they need and the rules file's line on gun files. It also brings the status page and the roadmap up to date for this merge.
+> - Then change-set 1.
+- **Taken by Mustafa, 2026-11-17, 22:10:34 UTC: his answers to the six questions of the build plan's Part 15, "The
+  second lane" (LANE-SPLIT, RECORD-FILES, VFX-ROUTE, VFX-FIX, VFX-MOMENTS, GUN-FILES: (a) each, with additions); the
+  stop line of change-set 0; pull request #56** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal
+  account; his label: "My words of 2026-11-17, 23:06 (Amsterdam time)"; extracted by script from the session's
+  transcript, message c4edbe94-57f5-451a-8778-59897cfd0cdf, whole). The questions stand in Part 15 as he read it:
+  `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`, "Decisions needed". Its answer LANE-SPLIT changes "one pull
+  request at a time" in his words of 2026-11-14 (the entry of 13:58:05 UTC, below) to one at a time per lane. Its answer
+  VFX-ROUTE is also his word on a seventh package beside the six that ADR 0002 names (a dated pointer marks that list).
+  Copied by script and checked byte for byte against `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`, P1:
+> My words of 2026-11-17, 23:06 (Amsterdam time): my answers to Part 15's six questions, on revision 2 of the file you sent me, and two small things.
+>
+> 1. LANE-SPLIT (is the split of 15.2 to 15.4 the one the two chats work by): (a), as Part 15 has it. That is my yes to three things:
+>    - the four conditions of 15.1: the client package is cut into folders by owner from its first day; build files and dependencies stay with lane 1; lane 1 draws the plain tracers and counters of Shoot and Throw; a comparison is never merged;
+>    - one pull request at a time per lane, in place of the plan's one at a time;
+>    - the owners of 15.4: lane 1 owns gate.yml, toolchain.yml and the gate's files while the 2.3 chat is stopped; lane 2 owns the preview workflow it adds; the kit stays frozen.
+>
+> 2. RECORD-FILES (who writes the record files both lanes need): (a). Each pull request writes only its own lines there, in its docs pass, after taking main in. It does not reword, re-wrap or move another lane's lines.
+>
+> 3. VFX-ROUTE (how the Shamble VFX runtime's code reaches this repository): (a), a copy in a package here, pinned to a commit of the VFX repository and re-copied by a script. This is also my word on a seventh package beside the six the structure draft names.
+>    - Nobody edits the copy by hand. If the copy cannot pass the game's checks as it is, that is a finding for the VFX chat.
+>    - The re-copy script can also check: it fails when the copy differs from the pinned commit.
+>
+> 4. VFX-FIX (who fixes what the proofs find in the runtime): (a). The VFX chat fixes its repository and the copy here is renewed. I pass the findings on.
+>
+> 5. VFX-MOMENTS (who builds camera kick, the shake and the sounds for Slice 1): (a). The game builds them for Slice 1, as planned. They hang on the same event names as the effects and their numbers live in data files, so moving them into Shamble VFX later is a change of data. Hit-stop is in no card of the plan and I add none now.
+>
+> 6. GUN-FILES (may a gun file written by a script enter the game): (a), no. Every gun file that enters the game comes through Blender. The script-written rifle is used only to try the checks. Until the files exist, the code-built guns of change-set 6 stand in.
+>
+> THE STOP LINE OF CHANGE-SET 0
+> Lines that a finding of the verifier or of the advisor agent asks for do not count toward the 1,200. New scope still does.
+>
+> PULL REQUEST #56
+> Yes, watch it, for the CI results. A comment on GitHub is never my word, also when it is posted from my account. My go on the merge comes in this chat, after the Advisor's check.
 - **Taken by Mustafa, 2026-11-17, 20:39:23 UTC: SIZE-0 (a), change-set 0 of the build plan goes on as one pull request,
   with a new stop line; LOG-HISTORY (a), the branch's history stays; and which copy of the Art lead's correction the
   appendix holds** (the build chat, session_019YNMUV9LFhASseJ9EP12kL, on his personal account; his label: "My words of
@@ -192,8 +250,10 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   word for the change to PM-0004-34's wording. Its CHANGE 1 changes his words of 2026-11-14 on who records that day's
   decision; its CHANGE 2 holds a decision he asks to be recorded word for word (two builder chats) and changes his words
   of 2026-11-12 on models for the second builder chat only. The kit lines that still say otherwise (CLAUDE.md, "Models
-  and effort") are not edited by this change-set. Copied by script and checked byte for byte against
-  `docs/reports/2026-11-17-build-plan-slice-1-appendix.md`, A3:
+  and effort") are not edited by this change-set. Pointer, 2026-11-17, Part 15 to main (not his words): the plan part
+  its CHANGE 2 asks for, and the answer its CHANGE 4 asks for, are Part 15, on main with his answers of 2026-11-17 (the
+  entry of 22:10:34 UTC, above): `docs/reports/2026-11-17-build-plan-slice-1-part-15.md`. Copied by script and checked
+  byte for byte against `docs/reports/2026-11-17-build-plan-slice-1-appendix.md`, A3:
 > My words of 2026-11-17, 20:10 (Amsterdam time): my go on your plan, with my answers and four changes. Where a line below carries a date, that is the day I said it.
 >
 > MY GO
@@ -462,7 +522,10 @@ The kept-logs build is still waiting for you. Please switch the session to Accep
   results"); dated pointers of 2026-11-17 mark those lines (in this file: SPIKE-ORDER (b), SLICE-ORDER's condition 3 and
   the entries of 2026-11-10 and 2026-11-13, below; SPIKE_PLAN; ADR 0002's migration step 1). The kit lines that still
   say otherwise (CLAUDE.md, `.claude/agents/advisor.md`) are not edited: his words say they are the rule there too.
-  Copied by script and checked byte for byte against `docs/reports/2026-11-17-build-plan-slice-1-appendix.md`, A1:
+  Pointer, 2026-11-17, Part 15 to main (not his words): its "one pull request at a time" is changed by his answer
+  LANE-SPLIT of 2026-11-17 (the entry of 22:10:34 UTC, above): "one pull request at a time per lane, in place of the
+  plan's one at a time". Copied by script and checked byte for byte against
+  `docs/reports/2026-11-17-build-plan-slice-1-appendix.md`, A1:
 > My words of 2026-11-14, for a fresh chat on my personal account. We start building the game: foundation steps 2.4 and 2.5, then Slice 1, move and shoot.
 >
 > Where things stand. Main is 4460ef5b8d6dc8566b29c15ded75c6f0c8be386b, with gate, smoke and toolchain green on it. It holds the empty skeleton of the new game, six Rust crates and five TypeScript packages, and no game code. Two other chats work on this repo. The netcode proof test: PR #40, branch claude/netcode-proof-test-plan-hcky5g, my university account. Step 2.3, the gate v2 and CI: branch claude/sweet-mayer-grsukw, my personal account; its plan is written and waits for my go. Never push to their branches and never touch spikes/.

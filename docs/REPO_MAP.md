@@ -78,6 +78,8 @@ engine files, and `START_HERE.md` explains how they work and why. docs-keeper ke
 | `docs/reports/2026-11-17-build-plan-slice-1.md` | The build plan for foundation steps 2.4 and 2.5 and Slice 1 (fourteen change-sets; his go of 2026-11-17), copied by script from commit 68addf9, with "Since the plan" on top: what his answers and changes do to it (PR #56) |
 | `docs/reports/2026-11-17-build-plan-slice-1-appendix.md` | Its appendix, A1 to A11: his messages of 2026-11-14 and 2026-11-17 and the Art lead's texts, byte for byte, and the three Art sheets' text as the build chat typed it |
 | `docs/reports/2026-11-17-cs0-model-rules.md` | The report of change-set 0 of the build plan (PR #56) |
+| `docs/reports/2026-11-17-build-plan-slice-1-part-15.md` | Part 15 of the build plan, "The second lane" (which change-sets, folders and files belong to the second builder chat, how the two chats' pull requests take turns, who owns each CI file, how change-set 11 uses Shamble VFX): revision 2, copied by script from commit ea851a8, with Mustafa's six answers of 2026-11-17 on top and his two messages byte for byte (P1, P2) (PR #57) |
+| `docs/reports/2026-11-17-part-15-second-lane.md` | The report of the change-set that carries Part 15 to main (PR #57) |
 
 ## .claude/
 | Path | What it is |
