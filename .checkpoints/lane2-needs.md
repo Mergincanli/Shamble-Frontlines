@@ -15,15 +15,22 @@
 1. His item 1: main b763ba3e merged into the branch (plain merge, no conflict: no file changed on both sides since
    4460ef5b), merge commit aa02297; pushed through the checkpoint script with this file.
 
+2. His item 2 done (2026-11-18 about 23:05 UTC): Part 15 read whole (348 lines; his six answers at its top: LANE-SPLIT,
+   RECORD-FILES, VFX-ROUTE, VFX-FIX, VFX-MOMENTS, GUN-FILES, each (a) with additions); DECISIONS.md RECORD-FILES (each
+   pull request writes only its own lines, in its docs pass, after taking main in; never rewords, re-wraps or moves
+   another lane's lines) and OLD-LINES (lines about merged pull requests may be moved by script, byte for byte, by
+   either lane's docs pass, each listed in its report); REC-OLD in b763ba3e's message (a docs pass may correct a line
+   that describes code when that code changed, old and new text in its report; a line recording what happened or
+   what he decided is never reworded: it gets a dated pointer). Lane 2's units by 15.2: the hosting check, step 2.6,
+   the look carry, the comparisons, 6 Look, the VFX proof, M, 10 Body, 11 Feel.
+
 ## Current step
-2. His item 2: read Part 15 whole (docs/reports/2026-11-17-build-plan-slice-1-part-15.md, his six answers at its top;
-   his answers hold where the text differs), DECISIONS.md RECORD-FILES (2026-11-17) and OLD-LINES (2026-11-18, 11:31),
-   and REC-OLD (2026-11-18, 20:59) in merge commit b763ba3e's message.
+3. The needs list: one agent (engine-architect, model opus, its file's effort xhigh) launched about 23:07 UTC, notes
+   `.checkpoints/lane2-needs/engine-architect-needs.md`, draft `.checkpoints/lane2-needs/needs-list-draft.md`; the
+   saver `watch lane2-needs` started (background task bvaxw5o8t). Then one advisor-tool consultation checks the list;
+   then one comment on issue #59 (naming lane 2, ending with the Claude Code footer), its link to him.
 
 ## Next steps
-3. One agent (model opus, effort high) reads the sources for units 6, M, 10 and 11 and drafts the list into
-   `.checkpoints/lane2-needs/`; then one advisor-tool consultation checks the list; then one comment on issue #59
-   (ending with the Claude Code footer), its link to him.
 4. His items 4-6 stand as rules: the hosting check to its report and closing pull request, then step 2.6's plan; no
    game code before change-set 5 is merged (then render/, soldier/ and camera/ pass to lane 2); no GLB made by a builder
    chat; with no pull request open here, take main in at the start of each unit and before opening one.
@@ -38,4 +45,5 @@
 - His lane-2 words of 2026-11-18, 23:37 (the file above): items 1-6.
 
 ## Running work
-- none
+- agent engine-architect (needs list), launched 2026-11-18 about 23:07 UTC; notes and draft in `.checkpoints/lane2-needs/`.
+- saver bvaxw5o8t (`watch lane2-needs`), started about 23:07 UTC.
