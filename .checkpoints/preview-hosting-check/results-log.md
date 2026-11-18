@@ -277,3 +277,15 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   "Automatically delete head branches" is off, as plan A2 step 4 needs). The merge's cleanup: run `close` #1, id
   44329986855, created 14:57:15, "waiting" on `preview` (read after his message). The question of plan step 4, whether
   a merged pull request's cleanup run starts at all: it does, and it names the branch `setup` (head_branch setup).
+- The cleanup (his message "done", 2026-11-18 15:19:18 UTC, 00e898e1-427c-4966-8be1-11ca0bce6610; his screenshot: run `close` #1 Success, job
+  "cleanup" 7 s, "Mergincanli approved ... preview"): job 134891480469 created 14:57:17, started 15:04:33 (his approval
+  between); the tombstone steps skipped (not a cs/pdt-* branch); "Delete every other upload of this branch (force),
+  oldest first" 15:04:36-38 success; its log, word for word: "Pull request closed at 2026-11-18T14:57:11Z (merged:
+  true); this job started at 2026-11-18T15:04:36Z." / "Uploads of setup found: 1" / "Delete
+  1f6487e4-0a85-43d1-8b1f-cd80c0e1d61c (https://1f6487e4.shamble-preview-check.pages.dev): HTTP 200
+  {"success":true,"errors":[]}" / "This job ended at 2026-11-18T15:04:38Z." "Uploads found: 1" equals the records (one
+  upload, 1f6487e4...: procedure F3/TE-7). The merged pull request's event carried the branch (BRANCH: setup, MERGED:
+  true, CLOSED_AT set). From the close (14:57:11) to the deletion (15:04:38): 7 min 27 s, most of it the wait for his
+  approval.
+- The rehearsal is complete: deploy, verify and cleanup ran end to end. Still to read: the first `probe` run on `main`
+  (schedule ":23"; none had run at 15:04:41 UTC, the cleanup run's last update).
