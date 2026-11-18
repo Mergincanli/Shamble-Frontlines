@@ -9,7 +9,7 @@
   `.checkpoints/preview-hosting-check/mustafa-2026-11-18-lane2.md`, 3318 bytes, sha256 765226cd4657...)
 - **Branch:** claude/optimistic-albattani-mdoonz (shared with the preview hosting check, which keeps the first place:
   whenever a step of sitting 3 or of Day 2 can move, it moves first) · **Base:** main b763ba3e, merged in at aa02297
-- **Last update:** 2026-11-19 00:21 Amsterdam (2026-11-18 23:21 UTC)
+- **Last update:** 2026-11-19 00:25 Amsterdam (2026-11-18 23:25 UTC)
 
 ## Steps done
 1. His item 1: main b763ba3e merged into the branch (plain merge, no conflict: no file changed on both sides since
@@ -25,6 +25,7 @@
    the look carry, the comparisons, 6 Look, the VFX proof, M, 10 Body, 11 Feel.
 
 ## Current step
+(none: the task is done; see step 3 below, kept here until he has the link)
 3. The needs list: one agent (engine-architect, model opus, its file's effort xhigh) launched 2026-11-18T23:00:26.326Z (transcript), notes
    `.checkpoints/lane2-needs/engine-architect-needs.md`, draft `.checkpoints/lane2-needs/needs-list-draft.md`; the
    saver `watch lane2-needs` started (background task bvaxw5o8t; its first line 23:00:26 UTC). Then one advisor-tool consultation checks the list;
@@ -36,6 +37,21 @@
      by a draft 1, new 1: where a shot ended, with the surface), 5 wishes, 10 gaps or questions. Read by the session
      in full; its Part 15 citations (lines 27, 109, 113-114, 117-121, 124-126, 130-131, 214) checked against the file.
      Next: one advisor-tool consultation, then the post.
+   - The advisor-tool consultation (his item 3's one; called 2026-11-18 23:19:10 UTC, transcript time): issue #59
+     read first (open, "Lane requests", no comment yet, no form: a request is a comment naming its lane); the lines the
+     Status column rests on printed (layout.ts: the header's `tick` and `layout_hash` only; the plan's cards 4, 8, 9,
+     10, 11 at lines 336-347 and 400-432; 0001:303-318; 0002:291-294; 0004:545-546; CS1:265-268): all as cited; every
+     noun of cards 10 and 11 mapped to a row; added: F14 (projectiles in flight, only if lane 2 draws them) and E1's
+     ask for the bow; gaps 4 and 6 labelled "For Mustafa, not a request to lane 1"; a top line asking lane 1 which rows
+     change-set 4 carries and which come with 8 and 9; "first list"; E1's own-shot timing made an ask; full paths in
+     the legend; totals recounted (16 fields, one conditional; 6 events; 5 wishes; 10 gaps). A grep of the legacy game
+     found no grenade bounce or bow-release sound (noted in the comment). The posted text:
+     `.checkpoints/lane2-needs/needs-list-comment.md` (sha256 b4bae8e35cd473c9...).
+   - **Posted: https://github.com/Mergincanli/Shamble-Frontlines/issues/59#issuecomment-6994614989**, created
+     2026-11-18T23:24:14Z by Mergincanli (author_association OWNER), read back: equal to the file, plus a second footer
+     line the tool appended. The saver bvaxw5o8t stopped with TaskStop after the post (its output ends "[killed]"; its last save 9c4dbd1 at 23:10:29 UTC).
+   - Before the hosting check's closing pull request is marked ready, this checkpoint and `.checkpoints/lane2-needs/`
+     must be gone too (CHECKPOINTS.md section 9), with this task's record folded into that report or the chat.
 
 ## Next steps
 4. His items 4-6 stand as rules: the hosting check to its report and closing pull request, then step 2.6's plan; no
@@ -53,4 +69,4 @@
 
 ## Running work
 - agent engine-architect (needs list), launched 2026-11-18T23:00:26.326Z (transcript): DONE (hand-back after 23:15 UTC).
-- saver bvaxw5o8t (`watch lane2-needs`), first line 2026-11-18 23:00:26 UTC.
+- saver bvaxw5o8t (`watch lane2-needs`), first line 2026-11-18 23:00:26 UTC; stopped by TaskStop after the post.
