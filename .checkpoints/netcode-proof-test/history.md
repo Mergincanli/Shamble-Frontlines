@@ -6787,3 +6787,20 @@ Moved to history.md (RESUME-CARD, 2026-11-10). The rules still in force are list
     resumeFromRunId: "wf_899b9cf1-c90", args: {head: "f985226"}}).
 - **Older entries (U3c and before)** moved to history.md (RESUME-CARD, 2026-11-10).
 ````
+
+## Decision: Mustafa, 2026-11-18 11:31 Amsterdam by his own label (it reached this chat at 11:10:41 UTC), LEAD-BOUND (a) 400 ms, A1's movement reading, build U4f
+- **Mustafa, typed into this chat (transcript 2026-11-18T11:10:41.303Z, uuid 1a8f832d-aa34-4e5e-9663-3017e86c9519), verbatim** (the whole message, unchanged, in the fence below):
+
+```text
+My words of 2026-11-18, 11:31 (Amsterdam time): my answer to LEAD-BOUND, the lead bound's first value for unit U4f, on your entry u4f-lead-bound.md as it stands at commit 9ad2effb.
+
+LEAD-BOUND: (a), 400 ms. The room refuses a command stamped more than 400 ms ahead of its tick (12 ticks at 30 Hz, 24 at 60 Hz), as the fenced text of your entry has it. The value is frozen with this yes, as your entry's freeze says. It is never changed to fit a run's result, and a change comes back to me.
+
+The reading of "movement" in the two movement checks (your advisor's A1): yes. Only the movement the simulation's step makes counts. A tick in which the soldier is dead at its start or end, or is placed by the respawn, is counted apart, and the honest reference counts the same live ticks. U4f's report names this reading in a line of its own, with who reviewed it.
+
+This yes changes no text in marks.json, no judge file and no existing SERIES.md row. If the build needs one of those to change, stop and ask me first.
+
+Build U4f. My size stop stays: past 6,000 added lines the build stops and I get three lines.
+```
+
+- **The freeze** (the main session's record): u4f-lead-bound.md equal to its text at 9ad2effb (sha256 57c588ec43bae7b7aecc6a9a061ec5b5c1f1ad7b5545d7fd43cd22c59410660c); its fenced value's sha256 4717cd895d9834154d3179f397859096b5a30f7ec290ea03f30148b912e53a2b.

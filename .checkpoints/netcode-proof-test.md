@@ -88,6 +88,20 @@
   u4f-run.sh made by u4f_runner.py from u4r-run.sh (e9437ae2…): 117 lines, 6 changed (the header, the log folder
   .gate/u4f/, the usage line, the log check), sha256 70eb3da5b8ce9a8e2eda582536eeab93f96fb7fbe98e2a74a28e0492ccf6ddae
   (`<<PV1>>`), `bash -n` exit 0, its diff u4f-run.sh.diff.
+- **LEAD-BOUND ANSWERED: (a) 400 ms, frozen** (Mustafa, 2026-11-18 11:31 Amsterdam by his label; reached the chat
+  11:10:41 UTC; word for word at history.md's end, "## Decision: Mustafa, 2026-11-18 11:31 Amsterdam", by
+  record_lead_bound.py): the entry u4f-lead-bound.md equal to 9ad2effb's (sha256 57c588ec43bae7b7…), its fenced value's
+  sha256 4717cd895d9834154d3179f397859096b5a30f7ec290ea03f30148b912e53a2b; A1's movement reading: yes, and **U4f's
+  report names it in a line of its own with who reviewed it** (the advisor's A1; read by the advisor and the
+  test-engineer); no marks.json, judge file or existing SERIES.md row may change: if the build needs one, stop and ask
+  him; "Build U4f"; his size stop past 6,000 added lines stays.
+- **LAUNCH (L4, then L6), in this order, nothing yet done unless marked:** (1) D2 reading; the u4r-P3-0f066338dd8d pack
+  by c62h-bound-brief.md 8.1's procedure (its list committed alone and pushed, kept-logs.mjs pack, free before and after
+  here); (2) the shared target's part-clean by W1-TARGET item 3 as amended (P27: advisor-u4d2-m9.md:252-256), D2 after;
+  (3) `<base>` = the head then, D1's rule; (4) `python3 -I .checkpoints/netcode-proof-test/u4f_fill.py --apply`, then
+  r31_check.py, the brief committed; (5) the check-in re-enabled, the saver restarted; (6) the builder: one Agent
+  (general-purpose, opus, xhigh, isolation worktree), told to build U4f by u4f-brief.md as filled, his stops quoted
+  by placeholder in the brief (section 1 item 5; SIZE-CHECK; 5.6).
 - **Next, in the advisor's order (:411-419):**
   1. **L2, LEAD-BOUND:** draft its entry by :336-361; the advisor and the test-engineer read it once (one agent each, no
      round); then to him in the next daily message. Nothing that reads the bound is built before his yes.
