@@ -6818,3 +6818,27 @@ Build U4f. My size stop stays: past 6,000 added lines the build stops and I get 
 - **2026-11-17:** no second review round or second model by default from now on (one round; a second only where round
   1 leaves a High or a design change); a workflow only for parallel review rounds. Why: TEST-FIRST rule 3.
 - The last workflow: wf_b2a20e74-6aa (the fix pass and the advisor's check), done before 22:43 UTC on 2026-11-17.
+
+## Card blocks moved 2026-11-18 at builder 2's end (card_trim_1118b.py; from the card's 'Now: U4f' and 'Running work')
+- **SIZE-CHECK (P18):** 3,753 added beside the plan's M 3,000 and his 6,000 stop; projected about 5,750 after B6 (the
+  advisor :274-275), so the stop likely lands at -21's start.
+- **Part-clean before builder 2** (P27, no lane running): free 5,143 → 12,064 MiB (.gate/u4f-b2/clean-shared.log,
+  13:42:23 UTC, exit 0; the shared target held 6,921 MiB).
+- **Builder 2 in a fresh worktree** (isolation) with builder 1's snapshot applied, not in builder 1's worktree (the
+  ruling's line 1): a subagent's working directory is only a worktree made for it (its `cd` does not carry; the guard
+  refuses `git -C`), as U3c's continuation did (history.md:722); builder 1's worktree stays untouched, a backup.
+- **Builder 1 ENDED 13:13 UTC** (agent a856ba7ccb7d032c3): its worktree
+  `/home/user/Shamble-Frontlines/.claude/worktrees/agent-a856ba7ccb7d032c3`, branch u4f-build at 827518b, uncommitted
+  (final snapshot wip/u4f-build.patch 92fc99aa…), kept as a backup. The advisor (agent ae182eb254c140632) ENDED about
+  13:40 UTC with its ruling.
+- **Builder 2 RUNS from about 13:45 UTC** (agent aa8301a8782f8f434; general-purpose, opus, xhigh, isolation worktree;
+  resume by SendMessage, or a fresh copy that reads its notes and `git diff` first), by the ruling's 22 lines with
+  line 1's worktree replaced: launch head 2 d1b24c3b21cfd6715bcc45231eed3e17f0a28b17, builder 1's snapshot applied and
+  checked (24 files, 3,753 added) before any edit; its logs `.gate/u4f/w2-*`. Its worktree
+  `/home/user/Shamble-Frontlines/.claude/worktrees/agent-aa8301a8782f8f434`, branch u4f-build2 at d1b24c3. Done by the
+  cut: B1 (the fixes: 3,841 lines after it), B2's -20 writers and f36 (ii), the plants f26 (two), f27 and D14 (it
+  misorders, no panic); B3 begun. **Cut 14:06:57, resumed about 16:38 UTC** (Cuts, below); snapshot at 16:37
+  wip/u4f-build.patch 310ee809b2dabf8f…, 259,563 bytes, 25 files, on d1b24c3. **At each check-in:** snapshot its worktree, `python3 -I
+  .checkpoints/netcode-proof-test/worktree_patch.py <worktree> .checkpoints/netcode-proof-test/wip/u4f-build.patch
+  u4f-build` (the one snapshot then stands for builder 2's worktree, builder 1's work included; WIP-CLEAN deletes it at
+  the merge), then save the card; on a cut, check the worktree against its last snapshot first.
