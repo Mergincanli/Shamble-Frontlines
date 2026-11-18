@@ -553,6 +553,15 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   settings his; nothing in Shamble-Frontlines beyond the checkpoint and the report's pull request; his three things
   (SR-READ decides before the build; security-auditor rules on `deployments: write`; one list before every sitting).
 
+- **His answers on the token check** (his words of 2026-11-18, 11:31 Amsterdam; user message
+  a0f3eeda-ce06-4801-ba28-f739b853c52d stamped 11:09:03 UTC; byte for byte in
+  `.checkpoints/preview-hosting-check/mustafa-2026-11-18-check-yes.md`, 762 bytes, sha256 9620f1e80f14...): CHECK-YES
+  yes, for one run, covering check-token.yml sha256 0ad66aa0f2b36f7469bc3bdd57a4a05b7945e0037f96b19059000e0ca9b5aa71 and
+  the acts the request lists for that one run, nothing else; he approves only the run whose head commit holds that file;
+  a re-run, or a push to `check-token` after that commit, needs a new list first; "Delete the run's logs after you have
+  read them." ID-ENDS yes (that run may print the ID's first and last 4; he compares them with Account Details). "No
+  deploy run of any kind starts before you have my screenshot of the renamed Cloudflare account."
+
 ## Advisor tool consultations (his words of 2026-11-11: when, the question, what changed)
 1. 2026-11-15 15:49:20 UTC (called; answer 15:51:36 UTC; transcript times), moment 1 · Q: is the approach sound (a
    separate test repository; one Pages Edit token in `preview` only, a reviewer with self-review off; probes and
