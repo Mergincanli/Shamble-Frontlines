@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 17:02 Amsterdam (16:02 UTC)
+- **Last update:** 2026-11-18 17:11 Amsterdam (16:11 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -444,12 +444,15 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
 
 ## Next steps
 1. The probe's first run (step 22) read and recorded.
-2. His decision on the token's scope (Read kept, or removed after a measured check run on a new list); his time for
-   Day 1, which must be by 2026-11-24 (the token ends 2026-11-25T22:59:59Z; Day 2's 24-hour reading follows Day 1).
+2. Answered: TOKEN-SCOPE (a), Read stays; Day 1 today, 2026-11-18 (it must be by 2026-11-24: the token ends
+   2026-11-25T22:59:59Z; Day 2's 24-hour reading follows Day 1).
 3. A compaction before Day 1 (get_session at 2026-11-18 about 15:21 UTC: 705,327 of 1,000,000 tokens; automatic at
    901,600).
-4. Day 1's three sittings as plan Part 3 C (sitting 3 with SA-R4 and SA-R8), each with its list first (his condition
-   3); sitting 1 begins by reading the environment link on a pull request page.
+4. Day 1's three sittings as plan Part 3 C (plan.md:378-417; sitting 3 with SA-R4 and SA-R8), each with its list
+   first (his condition 3) and an advisor consultation before sitting 1's list; the environment link on a pull request
+   page read at sitting 2's first test pull request (sitting 1 has no pull request). Sitting 1: round-a (I start it,
+   he approves; then the three links), his Brave checklist steps 1-3 (ADR 0006 :1444-1447), the build count, uploads,
+   bites, then the browsers run (mine), bite-production and restore-production.
 5. Day 2 (the 24-hour reading, the wall, Brave steps 5-8, the revoke, the revoked proof) by 2026-11-25; then the report
    and the closing docs pull request (DECISIONS.md: his answers word for word); step 2.6's plan with the locked install.
 
@@ -610,6 +613,10 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   that and ends with d8e7". So TOKEN-WINDOW (a) "7 days", done by him (Cloudflare: "November 25, 2026 (7 days)"; the
   check: expires_on 2026-11-25T22:59:59Z, not_before null); CHECK-RERUN done by him (the re-run is his act; the reading,
   the word-for-word copy and the log deletion followed as asked in the request); ID-ENDS compared: they match.
+
+- **His answers of 2026-11-18 16:10:04 UTC** (d9550773-d802-402d-b2ba-206267f46661), word for word: "1. A / 2. day 1 can be today if possible / 3. I'll do compact afterwards, do you want me to send you specific instructions after I have used /compact? so you know where to go from exactly". So
+  TOKEN-SCOPE (a): Read stays on the token for the rest of the check (the report notes that "write only" was never
+  measured); Day 1 today, 2026-11-18, if possible; the compaction: he asked whether to send instructions after it.
 
 ## Advisor tool consultations (his words of 2026-11-11: when, the question, what changed)
 1. 2026-11-15 15:49:20 UTC (called; answer 15:51:36 UTC; transcript times), moment 1 · Q: is the approach sound (a
