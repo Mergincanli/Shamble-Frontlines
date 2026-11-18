@@ -65,46 +65,36 @@
   report names it in a line of its own with who reviewed it** (the advisor's A1; read by the advisor and the
   test-engineer); no marks.json, judge file or existing SERIES.md row may change: if the build needs one, stop and ask
   him; "Build U4f"; his size stop past 6,000 added lines stays.
-- **LAUNCH (2026-11-18), steps 1-4 DONE:** (1) no process running; the u4r-P3-0f066338dd8d list (11 files, 543,998,603
-  bytes) committed alone at d4654df, then packed by 8.1: archive 149,827,571 bytes, "read back: 11 of 11 files equal the
-  list", free 5,433 → 5,808 MiB; (2) the six part-cleans in one main-run.sh call (.gate/u4f-launch/clean-shared.log,
-  11:35:52, exit 0; the lock and both tags stay), free 12,154 MiB; (3) the light run at d4654df
-  (.gate/u4f-launch/base-light.log, 11:36:52, exit 0): refs 1463 tracked files, marks 81, self 78 of 78, redact 10 of
-  10 and 307 items, 0 findings; the test counts stay 0ad9661's (552 / 632: spikes/ unchanged but results/'s new list);
-  (4) the fill: every assert passes (36 copies once in 12 item 3's list, 102 pointers, his words in no 7-word run
-  outside item 3; the stamps re-checked: plan and plan.md unchanged, carries +entry 90 only, history appended only);
-  r31_check.py on the result: no unknown id, 0 rev-3 markers, the `<<P`, `<base>` and `@@` left are the name-only
-  mentions the fill lists (:125, :151, :164, :266, :275) and item 3's own list (its "P3 to P13" names P4-P12 as a
-  range, so the checker's "NOT USED" lines for them are its pre-fill meaning).
-  L4 item 10 at launch: D6's diff (7cfae88..`<base>`) prints only carries (+4, entry 90; its cites re-walked by the
-  fill) and the new list under results/ (rows 43 and 50 still hold); stamps_anchors.py: P1-P36 each found once, plan
-  and plan.md unchanged; adv_words_check.py: 37 hit lines, all pass by the fold check's rule (§3): 34 outside his
-  quoted words, :2212 as ruled there, and :6797 and :6799 (his LEAD-BOUND answer) quote rev 3.3's own text back (brief
-  :1510 and :541-542, both in 06d419d4 at 01:17:17 UTC, before his message reached the chat at 11:10:41).
-- **(5) DONE 11:44 UTC:** the check-in re-enabled (next 12:34 UTC), the saver restarted. **(6) LAUNCHED 11:4x UTC
-  (before 11:49):** the builder, one Agent (general-purpose, opus, xhigh, isolation worktree), told to build by the
-  filled brief; its prompt names the launch head 827518bde465cf208e461da5fb605993c2bb3220 (`<base>` plus this card and
-  the filled brief only) for section 1 item 1, as U4r's correction did (u4r-build.md:5-15), since main's docs-only
-  #55-#57 make origin/main no ancestor of this branch; and points to his LEAD-BOUND yes and his two stops at
-  history.md:6801, :6803. SIZE-CHECK (brief :921-943): the plan's M is about 3,000 added lines; the brief's estimate
-  about 5,150 (4,200 to 6,200); his stop past 6,000.
-- **BUILDER 1 RETURNED 13:1x UTC (86.6 min): a PARTIAL build** (its notes u4f-build.md, copied here; return list in
-  the chat). Built and tested: npt-room (option A, the check order, kinds, records, `cmd_on_time` by stamp, the 400 ms
-  bound), npt-client (ClockSync, the controller, carry 80 (b)-(e), the twin's skip), the Pong's `server_ns`, P33's
-  fix, npt-sim's two bite sites (`World::CHECK_BITES`), the lab's core (`--cmd-timing`, `--controller`, -20's series,
-  the `reorder` event, client_counts). NOT built (notes :162-172): the 11 forgers, clamp cheat, 1.5x clock, lag switch,
-  never-acker and their suites; twins and attribution; -47's suite; -22's series; the cap runs (2.8); c-u4f-*.mjs;
-  tests f14-f16, f18-f23, f29, f33, f35, f36 (ii), f37; plants f26, f27, D14. Why: its working room and the size.
-  **Final snapshot** wip/u4f-build.patch 92fc99aa9f01aebf…, 224,208 bytes, 24 files: **3,753 added, 248 removed**
-  (`git apply --numstat`). **End checks** .gate/u4f/end-check-1.log (12:59:31) and -2 (13:14:59): "check: all 11
-  steps pass", exit 0 both; tests **605 measured (+53), 701 bites (+69)**; refs 1463; marks 81; self 78/78; redact
-  313 items, 0 findings. **Bars:** no marks.json or judge file in the patch; SERIES.md +10 / -0 (one new subsection,
-  5 report-only rows, read in full). **Stops and readings for the advisor:** the time rule (f6 23.86 s, f28 23.78 s
-  against the line 22.96 s; notes :221-228); refuse-not-clamp as `RefusalKind::Cooldown`; the late/window check
-  after kinds 4-6; `brawl-presses` as a new value under SERIES.md:348's row; `World::CHECK_BITES`; public items past
-  2.13; the lead-bound row's "the room's next tick" against the frozen fence's "the room's tick". **Size forecast:**
-  built parts came to about twice the brief's estimates (client 700 → about 1,421; room 950 → about 1,821), so the
-  rest (the builder's estimate 2,000 or more, plus the scripts and tests) likely takes U4f past his 6,000 stop.
+- **Launch DONE (11:3x-11:49 UTC; each step's figures in this card at a64c216):** the u4r-P3-0f066338dd8d pack (5,433
+  → 5,808 MiB), the six part-cleans (12,154 MiB), the light run (refs 1463, marks 81, self 78/78, redact 307 items), the
+  fill and every check on it (L4 item 10: D6, stamps_anchors.py, r31_check.py, adv_words_check.py's 37 hits all passing
+  by the fold check's §3), the check-in and the saver; builder 1 from the launch head
+  827518bde465cf208e461da5fb605993c2bb3220 (u4r-build.md:5-15's form: main's docs-only #55-#57 make origin/main no
+  ancestor of this branch).
+- **Builder 1 (11:46-13:13 UTC): a PARTIAL build, by its own stop** (notes u4f-build.md, here; return in the chat):
+  built and tested npt-room, npt-client (ClockSync, the controller, carry 80 (b)-(e)), the Pong's `server_ns`, P33's
+  fix, npt-sim's two bite sites, the lab's core; not built (notes :162-172): -21's cheats and suites, twins,
+  attribution, -47's suite, -22's series, the cap runs, c-u4f-*.mjs, 14 tests, 3 plants. Snapshot wip/u4f-build.patch
+  92fc99aa9f01aebf…, 224,208 bytes, 24 files, 3,753 added / 248 removed; end checks x2 (.gate/u4f/end-check-1.log,
+  -2.log): all 11 steps pass, 605 measured (+53), 701 bites (+69), redact 313 items; no marks.json or judge file;
+  SERIES.md +10 / -0 (5 report-only rows, read in full).
+- **The advisor's ruling** (advisor-u4f-build1.md, 283 lines, sha256 da98295e0d0eae7c…, read in full): **APPROVE the
+  continuation with conditions.** R2 (g): the room counts from the tick it runs next, 2.4's anchor, so the frozen value
+  and its meaning hold (nothing to him; the row quotes the frozen sentence, line 8). New Mediums: F1 the fast clock's
+  past-bound stamp never reaches kind 1 (every 10th at newest + 3 + the bound); F2 `World::CHECK_BITES` unrouted in
+  `Bites::of`; F3 f28 runs no contract check; F4 `brawl-presses` widens SERIES.md:348's closed list (`brawl` plus a new
+  `--brawl-press-every` with its own row). Lows F5-F11. R1 split f6 and f28 per option. R3 blocks B1 fixes, B2 -20's
+  rest, B3 the cap's measurement, B4 -47, B5 -22, B6 scripts and one counted check, B7-B9 -21, B10 end checks, each
+  at most about 400 lines. R4 build to his 6,000 stop; at the first block end past it, nothing more but the end checks;
+  the three lines then, in that day's message, first line "stopped on you": (a) split U4f (close at -20, -47 and -22;
+  -21 its own unit) or (b) go on; the advisor's provisional lean (a). Its 22 lines (:162-246) are builder 2's.
+- **SIZE-CHECK (P18):** 3,753 added beside the plan's M 3,000 and his 6,000 stop; projected about 5,750 after B6 (the
+  advisor :274-275), so the stop likely lands at -21's start.
+- **Part-clean before builder 2** (P27, no lane running): free 5,143 → 12,064 MiB (.gate/u4f-b2/clean-shared.log,
+  13:42:23 UTC, exit 0; the shared target held 6,921 MiB).
+- **Builder 2 in a fresh worktree** (isolation) with builder 1's snapshot applied, not in builder 1's worktree (the
+  ruling's line 1): a subagent's working directory is only a worktree made for it (its `cd` does not carry; the guard
+  refuses `git -C`), as U3c's continuation did (history.md:722); builder 1's worktree stays untouched, a backup.
 - **After the build:** the panel in two batches (brief 12 item 8); merge; 5.3's 21 pre-runs; the part-clean at A6's
   place; the sets one at a time (-47, -22, -20, -21: about 6-8 h of runs); U4f's report, with A1's movement reading in
   a line of its own naming who reviewed it (the advisor's A1; read by the advisor and the test-engineer), and every
@@ -122,6 +112,12 @@
 - **2026-11-18 (to name in the next message):** the fill's form by the advisor's fill ruling (advisor-u4f-fold-check.md
   section 4, on rule 3): each of his 36 quoted passages copied once, in the brief's 12 item 3 list, with 102 pointers
   elsewhere. Why: rule 3's "does not repeat them"; the words are his, byte for byte; undone by refilling from rev 3.3.
+- **2026-11-18 (to name in the next message):** the advisor's build-1 rulings (advisor-u4f-build1.md): the lead bound
+  counts from the tick the room runs next, 2.4's anchor (its one line :57-58; the value stays 400 ms); the fast clock's
+  every 10th stamp at newest + 3 + the bound (F1); `--brawl-press-every` as a new setting with its own new row instead
+  of a new value under SERIES.md:348's row (F4); f6 and f28 one test per option (R1). Why: inside the plan; no pass
+  mark, bar text, judge file or existing SERIES.md row changes; each undone before the merge. Also builder 2's fresh
+  worktree (above), an operational choice.
 
 ## Next steps (plan rev 3.3; units ahead)
 1. U4f (above). 2. U4g (prediction, interpolation and events; M) and U4h (lag compensation and aim; M), each with a
@@ -168,22 +164,18 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **13:17 UTC: builder 1 ENDED** (its return above); its worktree stays as it is (uncommitted) for the next builder.
-- **From 13:2x UTC: the advisor runs** (agent ae182eb254c140632, general-purpose reading main's advisor.md, xhigh) on
-  R1 the time rule, R2 the readings (a)-(g), R3 the second builder's order, R4 the size and his 6,000 stop (my lean:
-  build to the stop, three lines then); its verdict to advisor-u4f-build1.md. Then: the second builder by its ruling.
-- **2026-11-18 from 11:4x UTC: U4f's builder ran** (agent a856ba7ccb7d032c3; resume it by SendMessage, or a fresh copy
-  that reads its notes and `git diff` first). Its worktree: `/home/user/Shamble-Frontlines/.claude/worktrees/agent-a856ba7ccb7d032c3`,
-  branch u4f-build at 827518b (its notes: `.checkpoints/netcode-proof-test/u4f-build.md` there). **Check-in 12:35
-  UTC:** nothing stopped (its runner in block 4's fmt and clippy, logs .gate/u4f/b1-b4 from 12:06); snapshot
-  wip/u4f-build.patch 47ec4a9aecb4d398…, 200,122 bytes, 20 files, on 827518b; its notes copied. **At each check-in:** snapshot it,
-  `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py <worktree>
-  .checkpoints/netcode-proof-test/wip/u4f-build.patch u4f-build` (one snapshot per live worktree; WIP-CLEAN deletes it
-  when merged or replaced), then save the card; on a cut, check the worktree against its last snapshot first.
-- The saver bsacee7la runs from 13:35 UTC (bnvncmf4z ran 11:44 to 13:34) (`node .claude/scripts/checkpoint.mjs watch
-  netcode-proof-test --trailer "Claude-Session: …"`, run_in_background, timeout 7200000: its window ends by 15:25;
-  restart it while agents run). The 2-hour
-  check-in trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (11:44 UTC; next 12:34); pause it when no agent runs.
+- **Builder 1 ENDED 13:13 UTC** (agent a856ba7ccb7d032c3): its worktree
+  `/home/user/Shamble-Frontlines/.claude/worktrees/agent-a856ba7ccb7d032c3`, branch u4f-build at 827518b, uncommitted
+  (final snapshot wip/u4f-build.patch 92fc99aa…), kept as a backup. The advisor (agent ae182eb254c140632) ENDED about
+  13:40 UTC with its ruling.
+- **Builder 2: launched after this save** (general-purpose, opus, xhigh, isolation worktree) by the ruling's 22 lines,
+  line 1's worktree replaced (above). **At each check-in:** snapshot its worktree, `python3 -I
+  .checkpoints/netcode-proof-test/worktree_patch.py <worktree> .checkpoints/netcode-proof-test/wip/u4f-build.patch
+  u4f-build` (the one snapshot then stands for builder 2's worktree, builder 1's work included; WIP-CLEAN deletes it at
+  the merge), then save the card; on a cut, check the worktree against its last snapshot first.
+- The saver bsacee7la runs from 13:35 UTC (`node .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer
+  "Claude-Session: …"`, run_in_background, timeout 7200000; its window ends about 15:25: restart it while agents run).
+  The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (next 14:34 UTC); pause it when no agent runs.
 - The last workflow: wf_b2a20e74-6aa (the fix pass and the advisor's check), done before 22:43 UTC on 2026-11-17.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
