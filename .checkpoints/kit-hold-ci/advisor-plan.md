@@ -9,3 +9,6 @@
 6. Findings, one line each, below. Verdict at the end. DONE.
 
 ## Findings (one line each)
+- Block 1 done (read his words, plan, both diffs, the four files on main). Kit diff file == scratch copies vs main; worktree kit files == origin/main.
+- CI text: rebuilt from report@1bfe462 blocks 1-3 onto main's toolchain.yml by script: byte for byte equal to .gate copy (5665 B); anchors unique (L82, L90 last line, L31); ci-edit.diff == scratch. Nothing else changes. PASS.
+- Tests reproduced (node v22.23.4, git 2.43.0): edited 30/30 pass; edited tests vs today's script 27 pass, 3 fail (28,29,30); existing 27 vs edited script 27 pass.
