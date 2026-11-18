@@ -7,7 +7,7 @@
   2.4): its plan, its review, the build and its pull request, then stop for my go."
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/cs1-types) · **Base:** main
   22c6afa0341c36c40479f671736a569adfdb2663 (the merge of #57; the branch was fast-forwarded to it)
-- **Last update:** 2026-11-18 13:06 CET (from the clock)
+- **Last update:** 2026-11-18 13:26 CET (from the clock)
 
 ## Steps done
 1. Pull request #57 (Part 15 with his six answers) merged on his go of 11:08:25 UTC: merge commit 22c6afa,
@@ -39,16 +39,27 @@
    `cargo test` would compile ts-rs before the security check). NOTHING has been compiled yet.
 
 ## Current step
-6. (12:04 UTC) Two things at once:
-   - security-auditor (Opus 5.5, effort max; started 12:03 UTC; notes `cs1-types/security-auditor-deps.md`) checks
-     the nine lockfile entries: source and checksum, licence, advisories, build-script and proc-macro code, what
-     ts-rs writes at test time, its API facts (`Config`, `with_out_dir`, `with_import_extension`, `export_all`), reach
-     (`cargo tree -e normal`). Until its answer says CLEAR TO BUILD, no command that compiles ts-rs runs (so no
-     `cargo test/check/clippy` on `protocol` or on `--workspace`); a finding at Medium or above stops the build and
-     goes to the advisor agent. If the agent is lost, start a fresh one from its notes file with the same brief.
-   - the main session writes `client-endpoint` (no ts-rs there: `cargo test -p client-endpoint` is safe to run).
-   Mustafa, 12:03 UTC (two messages while this ran): "Save your progress I'm going to run the compact command" and
-   "Same for the agents": this save; the agent was told to save its notes at once and carry on.
+6. Build, in the working tree only (NO code commit before the security answer; see the rule below). State at 12:26 UTC:
+   - DONE, uncommitted: `crates/client-endpoint/src/layout.rs` (243 lines), `layout_ts.rs` (141), `lib.rs` (8);
+     `packages/types/src/generated/block/layout.ts` written by write mode (`LAYOUT_HASH = 0x2df78c30`);
+     `packages/types/src/layout-check.ts` and `layout-check.test.ts`. Checks run on them: `cargo fmt --all --check`
+     ok; `cargo test -p client-endpoint --locked` 5 passed; clippy `-p client-endpoint --all-targets -D warnings` clean
+     for host and wasm32; Vitest in `packages/types` 5 passed (2 files; the stub test still there); tsc by path, 0
+     errors, with two scratch configs under `.gate/cs1-types/` (`tsconfig.json`: tests included, `skipLibCheck`,
+     because Vitest's own `.d.ts` files need DOM names; `tsconfig.shipped.json`: shipped sources alone, library
+     files checked). `npm ci --ignore-scripts` was run (46 packages, the locked ones).
+   - WRITTEN, NOT COMPILED (ts-rs waits for the security answer): `crates/protocol/src/messages.rs` (the eight types).
+   - LEFT: `crates/protocol/src/lib.rs` (modules `messages`, `#[cfg(test)] mod ts_export`), `ts_export.rs` (after the
+     security answer's hardening advice on the scratch folder; API facts are in its notes, block B11: `Config::new()
+     .with_out_dir(dir).with_import_extension(Some("ts"))`, `<T as ts_rs::TS>::export_all(&cfg)`, `[u8; 32]` becomes a
+     32-element tuple, ts-rs never deletes), write mode for `generated/protocol/`, `packages/types/src/index.ts` and
+     `index.test.ts` (the stub `PACKAGE` goes), the description line in `packages/types/package.json`, then section
+     6's checks, the planted defects, the 20 runs.
+   - security-auditor (task a273383fb79fd7d03; notes `cs1-types/security-auditor-deps.md`): blocks B0 to B12 and B14
+     are DONE in its notes (the nine entries clean so far; the early CI build rated Medium as a process miss, with a
+     fix: keep manifest edits uncommitted until the check answers); B13 (findings and the answer) is left. Until its
+     answer says CLEAR TO BUILD nothing that compiles ts-rs runs. Then: the answer and the CI miss go to the advisor
+     agent before the build goes on (the plan: a finding at Medium or above goes to the advisor agent).
 
 ## A process miss to report (records, with their times)
 - **CI built the new dependency once before the security check's answer.** The manifests' commit 566d1d1 carried
@@ -90,6 +101,13 @@
   ("" 0x811c9dc5, "a" 0xe40c292c, "foobar" 0xbf9cf968; the RFC number comes from engine-architect's source S13, the
   datatracker page of draft-eastlake-fnv, "later published as RFC 9923"); in `layout_ts.rs`:
   `generated_layout_is_current`, `typescript_carries_the_hash`. `stub_builds` goes.
+- **Deviation 3 (the rules check is a test helper with its own bites):** `layout_rules_hold` calls a test-only
+  `broken_rule(sections) -> Option<String>` on `BLOCK_LAYOUT`, on one good fixture (U8 and U32) and on nine bad ones
+  (one per rule); added rule: a stride is a multiple of the section's largest field (ADR 0002 part 5: "each section is
+  aligned to its largest element type"). `hash_covers_every_value` has eight changed tables (also the order of two
+  fields). The shipped table uses `#[rustfmt::skip]` with one field per line.
+- **Size so far:** client-endpoint 392 lines against 213 planned (rustfmt's default widths and the bites); the whole
+  set is heading for about 700 against 600 planned (stop line 1,200).
 - Then `protocol` (after the security answer): `messages.rs` with the eight types of the draft's section 4 (doc lines
   mark every provisional field, the two acknowledgement fields of `Snapshot` included, and the module doc names
   OQ-0001-6, OQ-0001-7, R2-XU-OQ4, the mode hash and the join token's format); `ts_export.rs`
