@@ -28,7 +28,8 @@ To be checked again before the 24-hour reading.
 - Mergincanli/shamble-preview-check, public; `main` 4a67b83b9ed672c81e1a6e3067f916841c02b4a9 (his README).
 - The reviewed commit of `setup`: 1619164900553ee3e32339447b30865347711156 (the advisor agent's APPROVE, 2026-11-16,
   hand-back 09:02:47). After the merge, `main`'s merge commit is added here; it carries the same files and is what every
-  later run uses.
+  later run uses. Added 2026-11-18: `main`'s merge commit 2162db55d93f59cf2ed7e371a3915409f0b5a587 (pull request #1
+  merged by him at 14:57:11 UTC).
 - The workflows at that commit, sha256 prefixes (equal to his yes of 2026-11-15 and 2026-11-16): deploy.yml
   29593af18d34, close.yml 3afdf389d636, probe.yml f24ad6e81daf, browsers.yml 6791076916ae. The two token-test variants
   (placed only in sitting 3): fd3dc4c6029b and 8b745631a278.
@@ -256,3 +257,23 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
   `site-pr` expires (2026-11-24T20:42:04Z).
 - After reading: the run's logs deleted again (delete_workflow_run_logs, "204 No Content"); the run list unchanged (the
   deploy run still at attempt 5).
+
+### The rehearsal, completed (setup pull request #1)
+- His message (2026-11-18 14:58:02 UTC, 2e16e511-3a92-408e-b805-574dfb6c61e4): "It finally worked, nice." / "I have merged the pull request."
+  His screenshot: run 44171977539 "Latest #6", status Success, 53 s, artifacts 6, "Mergincanli approved ... preview".
+- Attempt 6 (his "Re-run failed jobs", started 14:55:09): deploy job 134890100614 created 14:55:13, started 14:55:29
+  (his approval between), "Upload to Cloudflare Pages" 14:55:38-46 success; its record, word for word:
+  `{"deployment_id":"1f6487e4-0a85-43d1-8b1f-cd80c0e1d61c","url":"https://1f6487e4.shamble-preview-check.pages.dev","alias":"https://setup.shamble-preview-check.pages.dev","environment":"preview","production_branch":"main","branch":"setup","marker":"64dcf68505f503df3f32ab258ca4363f240088ed","pr":"1","run":"44171977539","leg":"pr","upload":"1","mode":"preview","expect":"preview","made":"2026-11-18T14:55:46.818Z"}`
+  (artifact deployment-record-44171977539-pr, id 14438791220, 410 bytes; the environment URL set to the alias).
+- Verify job 134890518875, 14:55:52 to 14:56:02, success; headers.json (artifact 14438806696, digest
+  sha256:49e1998212c9..., equal to the downloaded zip): summary records 1, pass 2, fail 0, no_reading 0. Both links pass
+  (stable https://setup.shamble-preview-check.pages.dev/ and one-off https://1f6487e4.shamble-preview-check.pages.dev/):
+  every file 200 on the first try; `/tiny.wasm` as `application/wasm`; `X-Robots-Tag: noindex` on every response; no
+  COOP or COEP (the preview mode without isolation, as expected); `content.ef463692.bin` with "public,
+  max-age=31536000, immutable", the rest "public, max-age=0, must-revalidate"; `X-Check-Rule: version-host` on both
+  links, the stable branch link included (a rehearsal observation on R5-PREV-OQ6, not a mark). index.html and 404.html
+  not fetched, by design (L3).
+- The merge: pull request #1 merged 14:57:11 UTC; `main` now 2162db55d93f...; the branch `setup` still exists (so
+  "Automatically delete head branches" is off, as plan A2 step 4 needs). The merge's cleanup: run `close` #1, id
+  44329986855, created 14:57:15, "waiting" on `preview` (read after his message). The question of plan step 4, whether
+  a merged pull request's cleanup run starts at all: it does, and it names the branch `setup` (head_branch setup).
