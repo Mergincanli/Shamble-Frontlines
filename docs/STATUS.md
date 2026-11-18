@@ -2,7 +2,7 @@
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
 next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
 `docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
-_Last updated: 2026-11-18 (change-set 1 of the build plan, Types, PR #58, after #57's merge; main 22c6afa)._
+_Last updated: 2026-11-18 (the kit hold and two CI edits, PR #60, after #58's merge; main 9b4b518)._
 
 ## Phase
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
@@ -10,7 +10,7 @@ _Last updated: 2026-11-18 (change-set 1 of the build plan, Types, PR #58, after 
   `docs/ENGINE_OVERVIEW.md` and `docs/SPIKE_PLAN.md`) are the basis for the spikes and stay Proposed (the stop's
   answers, 2026-11-03: `docs/DECISIONS.md`), but for his SCOPE (a) of 2026-11-10: "I accept ADR 0002's part 1 alone
   (the repository layout, with the legacy constraints applying to legacy/ only)", recorded in ADR 0002 by 2.1b (#51).
-- **Last merged:** Part 15 (PR #57, 22c6afa, 2026-11-18 11:09:31 UTC, his go; CI green on main); every merge: ROADMAP.
+- **Last merged:** Types (PR #58, 9b4b518, 2026-11-18 15:39:28 UTC, his go; CI green on main); every merge: ROADMAP.
 - **The kit:** KIT-FREEZE-2, what he meant by it (FREEZE-FDN) and his exceptions (two more since, for #53 and #54):
   `docs/DECISIONS.md`, "Queued"; his two additions of 2026-11-11 for the foundation chat: `docs/DECISIONS.md`. His words
   of 2026-11-13 for step 2.3:
@@ -26,23 +26,20 @@ _Last updated: 2026-11-18 (change-set 1 of the build plan, Types, PR #58, after 
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| #58 | change-set 1 of the build plan, Types (foundation step 2.4), by lane 1: the first eight message types in `crates/protocol` (plain types, no codec), the output block's layout table and its hash in `crates/client-endpoint`, their TypeScript generated into `packages/types` (ts-rs 12.0.1 as a test-only dependency, and our own small generator), the page's layout-hash check; his go on #57 and his answer OLD-LINES (who may fold old lines in the shared record files) in `docs/DECISIONS.md` by script; report `docs/reports/2026-11-18-cs1-types.md`. Open after it, for "Follow-ups" once merged (their text: the report's "Follow-ups"): CI-CUT (security, Medium, in CI: build code in the `toolchain` job can rewrite the checkout action's file, which runs again after the network cut with the cache token); from the security check, L1 (ts-rs ships no licence file), L2 (its Rust version is 1.78.0, not the plan draft's 1.88.0) and L4 (the cut stops IP traffic only); for change-sets 2, 3 and 4 (among them the writer's by-name offsets, decoder caps before allocating, each section's row count in the header); round 2's Lows; for the 2.3 chat (its formatter and linter skip `packages/types/src/generated/**`); for the drafts' next revision (who reads the message types in TypeScript; ADR 0002's pointer on how ts-rs's folder is named) | `claude/wonderful-hamilton-jdmlnf` (stands in for `cs/cs1-types`) | ready for review; two review rounds; the verifier PASS (15:03 UTC); the advisor agent's APPROVE of the final head is in its description | his go (risk tier 1, needs-mustafa: outside the PR Advisor's allow-list, and two security findings stay open: CI built the new dependency before its security check, and CI-CUT); no Brave check |
+| #60 | the kit hold and two CI edits, by lane 1, on his words of 2026-11-18, 15:38:13 UTC ("One small pull request with the kit hold and the two CI edits, nothing else in it."): the checkpoint script holds a push that changes a manifest or a lockfile until its security check is recorded (`.claude/scripts/checkpoint.mjs`, six new tests, one rule line in `.claude/CHECKPOINTS.md` §3; his answer DEP-HOLD (a), written on his yes to its exact text: KIT-TEXT, yes with one change, then KIT-FIX, the fix of a hole in the changed lines); the `toolchain` job runs with no cache (his CI-CUT (a), part 1), writes the generated types again and compares them, and type-checks `packages/types` with strict flags (his CI-TYPES (a)); his three messages of the day in `docs/DECISIONS.md` by script; 293 added lines, accepted by his word of 18:01:08 UTC; report `docs/reports/2026-11-18-kit-hold-ci.md`. Meanwhile, in his words: "No new library of change-set 2 is committed before that pull request is merged." Open after it, for "Follow-ups" once merged (their text: the archive's "Follow-ups", "From the kit hold and two CI edits (PR #60)"), each below High and so a follow-up by his word of 18:01:08: security-auditor's two Mediums, F1 (in two corners the hold checks another path than the one it pushes: a root folder whose name begins with a blank character, or is not valid UTF-8) and F3 (no rule makes the review of a pull request read the hold's record; until a kit change, change-set 2's report quotes each record and the security answer it names), and its three Lows; test-engineer's three Mediums (behaviours no test pins: main's side of the "equal to main" comparison read at the exact path, a `deleted  <path>` line leaving an existing file held, `origin/main` over a local `main`) and seven Lows; infra-engineer's six Lows (two for his list for the quality gate v2's plan, four on the report's wording) | `claude/wonderful-hamilton-jdmlnf` (stands in for `cs/kit-hold-ci`) | the four files written on his yes at 17:15 UTC, two of them again at 18:01 UTC (commits 8bf4bee and 94c197f, pushed 17:18:16 UTC; 4877599, pushed 18:03:10 UTC); the new CI lines on real runs from 17:18 to 17:23 UTC ("Cache mode: none" in the job's log; the compare step failing on a planted change, then passing on the clean tree); one review round, its notes committed at 18:08:01 (infra-engineer), 18:31:54 (security-auditor) and 18:40:04 UTC (test-engineer): nothing Critical or High; the verifier's and the advisor agent's verdicts: the report | the Advisor's check of its ready report, then his go (risk tier 2: kit and CI files); no Brave check |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10), after status-diet (merged, #49): his unit walk of 2026-11-09 (a docs
    change-set: UNITS.md §0 and LOOP_V2), then the Slice 1 note of 2026-11-10, each in a fresh chat. His words:
    `docs/DECISIONS.md`, "Queued".
 2. v2: the netcode proof test (#40); the foundation (his order of 2026-11-11): #49, #50, #51, #48 and #52 merged; step
-   2.3: the 2.3 chat stays stopped for now; then change-set 2 (lane 1: the skeleton, foundation step 2.5; its plan
-   first, after his go on #58) and lane 2's work; Slice 3 waits for the netcode proof test's result.
+   2.3: the 2.3 chat stays stopped for now; then change-set 2 (lane 1, the skeleton, step 2.5: its drafted plan goes to
+   the advisor agent after #60's merge) and lane 2's work; Slice 3 waits for the netcode proof test's result.
 
 ## Waiting on Mustafa
-- His go for #58 (change-set 1, Types; no Brave check; verified, and approved by the advisor agent); did the
-  test zip save and unpack on his laptop; #58's four decisions: DEP-HOLD (should the checkpoint script hold a push
-  with a dependency change until its security check answers), CI-TYPES (a type check and a regenerate-and-compare step
-  in CI), CI-CUT (the fix for a CI gap, in #58's row) and LANE-ISSUE (who opens Part 15's "Lane requests" issue).
-- From Part 15: give lane 2 Part 15 and ask for its needs from the block; tell lane 2 which chat on his PC makes the
-  model files; the VFX chat's exports; pass the VFX findings on.
+- His go for #60 after the Advisor's check of its ready report; did #58's test zip save and unpack on his laptop?
+- From Part 15 (its "Lane requests" issue: #59): give lane 2 Part 15 and ask for its needs from the block; tell lane 2
+  which chat on his PC makes the model files; the VFX chat's exports; pass the VFX findings on.
 - The netcode proof test's items (its plan in #40; the older list: the archive's "Phase", "Next (v2)"): OK each run's
   plan and cost cap; name the laptop and desktop; the Mac when one is available; the Safari workflow's own PR.
 - Legacy, frozen (the archive's "In flight" and "Phase"): his Windows run ("Check a new machine", `tools/README.md`);
@@ -101,10 +98,13 @@ A finding below the review budget's bar becomes a follow-up: its id goes here, i
   NODE-26; later: OVERFLOW-PER-CRATE (with the first third-party crate), PACKAGE-ENTRIES, EMPTY-SLOTS, OQ-0002-8-TEST,
   BRIEF-STALE. Accepted as left open (his go for #48, item 5): SETPRIV-HARDEN, SETUP-NODE-CACHE, CUT-ESCAPE (step 2.3,
   each a CI edit that asks him); OVERFLOW-PANIC-RULE (with the first code in the room crate or a server crate).
-- **From change-set 0 (PR #56) and Part 15:** the rules' O1 (PM-0005-54) and O2, his calls with change-set M's plan;
-  the first real export; the coat's motion; the carried lines; for the drafts' next revision, ADR 0002's package list.
-- **Binding this chat until his DEP-HOLD answer** (#58's report, "Two misses", 1): until security-auditor answers, a
-  new or bumped dependency stays uncommitted, unbuilt and unpushed, and other code is committed by path only.
+- **From change-sets 0 and 1 (PRs #56, #58) and Part 15:** the rules' O1 (PM-0005-54) and O2, his calls with change-set
+  M's plan; the first real export; the coat's motion; the carried lines; ADR 0002's package list; #58's other follow-ups
+  and round 2 Lows, with two doc lines (`ts_export.rs`, `layout_ts.rs`, `messages.rs`) for the next PR touching them.
+- **His list for the quality gate v2's plan** (15:38:13 and 18:01:08 UTC): a CI check on unreviewed lockfile entries,
+  the CI cut's part 2, whether a manifest main removed may pass, a ":" path read as a pattern; the reviewers' lines.
+- **Binding this chat:** `.claude/CHECKPOINTS.md` §3's hold; the advisor agent's ruling of #58: manifest and lockfile
+  edits stay uncommitted and nothing builds the graph holding them until security-auditor answers; cargo `--locked`.
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100

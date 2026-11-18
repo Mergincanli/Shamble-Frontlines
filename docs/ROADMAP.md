@@ -105,6 +105,19 @@ and one fix pass; the verifier's H1 (the revert check ignored whitespace) fixed 
 the report `docs/reports/2026-11-08-kit-v3-4.md`. His GUARD-RENAME (c): the guard fix (F1, agent memory included) is the
 next change-set, kit-v3-5.
 
+**Kit v3.5, the guard's rename gap [2026-11-09 to 11-10, MERGED]** — kit-v3-5 (F1 from kit-v3-4, agent
+memory included: Mustafa's GUARD-RENAME (c); rules and kit code, symbols +0 −0; plan revisions 1-3 with the advisor's
+REVISE, then APPROVE with D1-D6, then APPROVE with E1-E5; his ORDER (b), SA5-RIDE (a) and allow-list direction of
+2026-11-10): the PR Advisor merges only from an allow-list (`mergeAllowed`: plain names in `docs/`, `tools/`,
+`README.md` and `FIRST_PROMPTS.md`, no rules, gate or decision-doc name in any letter case), read on both names of a
+renamed file with whole lists; `CLAUDE.local.md` and `AGENTS.md` protected anywhere; `tools/npm-shrinkwrap.json` a gate
+file (9bacf47). Tests red on main's guard (47 of 1086 fail), then green (1086/1086, settings 127, checkpoint 27); gate
+PASS. Docs: #44 merged, his queue word for word (KIT-FREEZE-2, STATUS-DIET, LANE-RULES, the unit walk, the Slice 1
+note), the known limits, the kit-v3-4 report's correction. The review round (three PASS WITH NOTES, nothing Critical or
+High) and its fix pass (08423ce: routine-guard 1107/1107); the verifier's re-check (PASS WITH NOTES); the report
+`docs/reports/2026-11-10-kit-v3-5.md`. Merged: PR #46, 2d22b69, 2026-11-10 16:05 UTC, by merge commit, on Mustafa's
+go after the advisor's APPROVE WITH NOTES of 0573db3; the PR Advisor routine re-enabled at 16:07 UTC.
+
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
 
@@ -141,13 +154,25 @@ next change-set, kit-v3-5.
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**Change-set 1 of the build plan, Types [2026-11-18, PR #58: ready, waits for his go]** — cs1-types (foundation step
+**The kit hold and two CI edits [2026-11-18, PR #60, in flight]** — kit-hold-ci, by lane 1, on his words of
+2026-11-18 with his go on #58 (risk tier 2, kit and CI): the checkpoint script holds a push that changes a manifest or
+a lockfile until its security check is recorded (his answer DEP-HOLD (a): `.claude/scripts/checkpoint.mjs`, six new
+tests, one rule line in `.claude/CHECKPOINTS.md` §3), written on his yes to its exact text, once with one change of
+his and once more for the fix of a hole in the changed lines; the `toolchain` job runs with no cache, writes the
+generated types again and compares them, and type-checks `packages/types` (his CI-CUT (a), part 1, and CI-TYPES (a)),
+shown on real runs; 293 added lines, accepted by his word. One review round, nothing Critical or High; report
+`docs/reports/2026-11-18-kit-hold-ci.md`. Next: the Advisor's check of its ready report, then his go.
+
+**Change-set 1 of the build plan, Types [2026-11-18, MERGED]** — cs1-types (foundation step
 2.4), by lane 1, on his words of 2026-11-18 with his go on #57: the first eight message types in `crates/protocol`
 (plain types, no codec), the output block's layout table and its hash in `crates/client-endpoint`, their TypeScript
 generated into `packages/types` (ts-rs 12.0.1 as a test-only dependency, and our own small generator), the page's
 layout-hash check. Two review rounds; report `docs/reports/2026-11-18-cs1-types.md`, which tells two misses first (CI
 built the new dependency before its security check; an evidence record withdrawn and redone). The verifier: PASS (15:03
-UTC); the advisor agent: APPROVE (its word on the final head is in #58's description). Next: his go.
+UTC); the advisor agent: APPROVE (its word on the final head is in #58's description). Merged: PR #58, 9b4b518,
+2026-11-18 15:39:28 UTC, by merge commit, on his go after that APPROVE; CI green on main (gate run 884 with smoke,
+toolchain run 182). With the merge he accepted the two misses as written and answered its five questions: the kit
+hold and the two CI edits (PR #60), the "Lane requests" issue (#59), no watch (`docs/DECISIONS.md`, 15:38:13 UTC).
 
 **Part 15 of the build plan, the second lane, to main [2026-11-17 to 11-18, MERGED]** — part-15-second-lane, by
 his go of 2026-11-17 for #56 (docs only): Part 15 as he read it, with his six answers on top (all (a), with additions),
@@ -255,16 +280,3 @@ risks stay live); every moved line byte for byte, no decision id lost. CLAUDE.md
 and the Fable 5.2 advisor-tool exception, his words quoted; docs-keeper.md follows the split; #46 recorded as merged.
 Report `docs/reports/2026-11-10-status-diet.md`. Merged: PR #49, bb2d817, 2026-11-11 09:03 UTC, by merge commit, on
 Mustafa's go after the advisor's APPROVE of 2e6e5d2; CI green on main (run 42991918886).
-
-**Kit v3.5, the guard's rename gap [2026-11-09 to 11-10, MERGED]** — kit-v3-5 (F1 from kit-v3-4, agent
-memory included: Mustafa's GUARD-RENAME (c); rules and kit code, symbols +0 −0; plan revisions 1-3 with the advisor's
-REVISE, then APPROVE with D1-D6, then APPROVE with E1-E5; his ORDER (b), SA5-RIDE (a) and allow-list direction of
-2026-11-10): the PR Advisor merges only from an allow-list (`mergeAllowed`: plain names in `docs/`, `tools/`,
-`README.md` and `FIRST_PROMPTS.md`, no rules, gate or decision-doc name in any letter case), read on both names of a
-renamed file with whole lists; `CLAUDE.local.md` and `AGENTS.md` protected anywhere; `tools/npm-shrinkwrap.json` a gate
-file (9bacf47). Tests red on main's guard (47 of 1086 fail), then green (1086/1086, settings 127, checkpoint 27); gate
-PASS. Docs: #44 merged, his queue word for word (KIT-FREEZE-2, STATUS-DIET, LANE-RULES, the unit walk, the Slice 1
-note), the known limits, the kit-v3-4 report's correction. The review round (three PASS WITH NOTES, nothing Critical or
-High) and its fix pass (08423ce: routine-guard 1107/1107); the verifier's re-check (PASS WITH NOTES); the report
-`docs/reports/2026-11-10-kit-v3-5.md`. Merged: PR #46, 2d22b69, 2026-11-10 16:05 UTC, by merge commit, on Mustafa's
-go after the advisor's APPROVE WITH NOTES of 0573db3; the PR Advisor routine re-enabled at 16:07 UTC.
