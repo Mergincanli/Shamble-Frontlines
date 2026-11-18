@@ -123,3 +123,102 @@ Memory: none (memory: local; .claude/agent-memory-local/engine-architect/ absent
   (grep) -> aim point axis names provisional.
 - Decision for draft: cs1 does NOT touch `sim` (tick counter is cs2, BP:299); protocol uses u32 for ticks (doc cites A4:185).
 - Next: B6 code as it is.
+### B6 code as it is (main 22c6afa) DONE
+- Cargo.toml:1-28: [workspace] members crates/*, resolver "3" (:4); [workspace.package] edition 2024, rust-version
+  "1.99.1", publish false (:6-9); [workspace.dependencies] EMPTY (:12); lints: rust unsafe_code deny (:15-16), clippy all
+  warn (:18-19); NO pedantic anywhere (A2:440 wants it on sim/protocol/content: 2.3's CS-C); [profile.release]
+  overflow-checks = true (:25-26) with "*" = false (:28). rust-toolchain.toml: 1.99.1, minimal, clippy+rustfmt, wasm32.
+- Every crate (6): Cargo.toml = package + [lints] workspace = true, NO dependencies; src/lib.rs = doc + stub test.
+  client-endpoint/src/lib.rs:1-4 doc names "the block writer and the block's layout table ... Empty until ... (2.4-2.5)".
+  protocol/src/lib.rs:4-13 keeps overflow test (release run in CI :83). No `content` crate yet (cs4).
+- No .cargo/ dir; no spikes/ on this tree; no tsconfig anywhere; no rustfmt.toml/clippy.toml.
+- package.json:1-17 root: no "type" (rule holds); engines node 22.x; devDeps @playwright/test 1.65.0, typescript 6.0.3,
+  vitest 5.1.0 (exact). packages/*/package.json: "type": "module", scripts test = "vitest run" (e2e: playwright test).
+  packages/types: package.json (6-line test script), src/index.ts = `export const PACKAGE = "@shamble/types";`,
+  src/index.test.ts imports "./index.ts" (extension) -> scratch tsconfig needs allowImportingTsExtensions + noEmit.
+- package-lock.json v3, 75 entries; packages/types entry = name, version, license only -> unchanged unless deps/meta change.
+- Cargo.lock v4: only the 6 workspace packages (no deps).
+- .gitignore: /target/, .gate/, dist/, node_modules/, test-results/ (no pkg/). .gitattributes: eol=lf.
+- toolchain.yml (CI today, no edit): cargo fetch --locked (:57); network cut; cargo test --workspace --locked (:82);
+  cargo test --release -p sim -p protocol (:83); cargo build wasm32 -p sim -p protocol -p room -p client-endpoint -p sim-wasm
+  (:84, no dev-deps -> ts-rs absent from wasm build); npm ci --offline (:85); npm test --workspaces (:86, Vitest per package);
+  npx tsc --version only (:87): NO type check, no clippy, no fmt, no 20-run, no planted defects. env -i: no TMPDIR set.
+  gate.yml: legacy gate + smoke only.
+- Guard: routine-guard protects tools/ manifests only; root Cargo.toml NOT protected (CS-D unmerged) -> tier 1, no ask.
+- Finding: Rust 2024 makes std::env::set_var unsafe + unsafe_code deny -> test cannot set TS_RS_EXPORT_DIR at runtime ->
+  needs an explicit-path export API (verify in B7).
+- Finding: reviewers: card BP:296 names 3; BP:221-222 + P15:73 + CLAUDE.md step 5: a new dependency gets security-auditor.
+- Next: B7 ts-rs docs.
+### B7 ts-rs (in progress; sources one by one)
+- S1 docs.rs/ts-rs/latest/ts_rs/ (read 2026-11-18): "ts-rs 12.0.1"; licence MIT; MSRV "1.88.0"; features: serde-compat
+  (default), format ("adds quite a few dependencies"), no-serde-warnings, *-impl for other crates; "When using
+  #[ts(export)] on a type, ts-rs generates a test which writes the bindings for it to disk"; TS_RS_EXPORT_DIR "Base
+  directory into which bindings will be exported", default ./bindings, recommended in .cargo/config.toml [env]; page does
+  NOT say compile time vs run time; programmatic: TS::export_all, TS::export, TS::export_to_string; TS_RS_LARGE_INT for
+  i64/u64/i128/u128 default bigint; TS_RS_IMPORT_EXTENSION default none; enums -> "union declarations"; structs ->
+  `export type User = { user_id: number, ... };`. Confidence: high (official crate docs).
+- S2 docs.rs/ts-rs/12.0.1/ts_rs/trait.TS.html (read 2026-11-18, first 100k chars): every method takes `cfg: &Config`:
+  export(cfg) "without its dependencies"; export_all(cfg) "this type and all its dependencies"; export_to_string(cfg) ->
+  Result<String, ExportError> (no formatting); decl(cfg), name(cfg), inline(cfg), dependencies(cfg); output_path() relative
+  to the out dir; NO export_all_to. Attributes: export (generates a test), export_to (needs export), rename, rename_all,
+  type, as, optional (t?: T; default Option -> `t: T | null`), inline, skip, concrete. Page silent on compile/run time of
+  TS_RS_EXPORT_DIR, thread safety, file header. Confidence: high (official).
+- S3 docs.rs/ts-rs/12.0.1/ts_rs/struct.Config.html (read 2026-11-18): Config "Configuration that affects the generation
+  of TypeScript bindings and how they are exported"; new() "default values"; from_env() "values read from environment
+  variables" (TS_RS_EXPORT_DIR, TS_RS_IMPORT_EXTENSION, TS_RS_LARGE_INT); with_out_dir(dir) "Sets the output directory into
+  which bindings will be exported" (default ./bindings); with_large_int (default "bigint"); with_import_extension (default
+  None); with_array_tuple_limit (default 64: [T; N] <= 64 -> TS tuple). => explicit folder without .cargo/config.toml and
+  without env::set_var: `Config::new().with_out_dir(scratch)` then `T::export_all(&cfg)`. Confidence: high (official).
+- S4 docs.rs/crate/ts-rs/12.0.1/source/Cargo.toml.orig (read 2026-11-18): name ts-rs, version 12.0.1, edition 2021,
+  rust-version "1.78.0" (crate page says MSRV 1.88.0: both below our 1.99.1), license MIT, repository
+  github.com/Aleph-Alpha/ts-rs; non-optional deps: ts-rs-macros "=12.0.1", thiserror "2"; default = ["serde-compat"];
+  all impl crates optional (dprint-plugin-typescript behind `format`); no build-dependencies. Confidence: high.
+- S5 docs.rs/crate/ts-rs-macros/12.0.1/source/Cargo.toml.orig (read 2026-11-18): license MIT; proc-macro = true; deps
+  proc-macro2 "1", quote "1", syn "2.0.28" (full, extra-traits), termcolor "1" optional; features serde-compat =
+  ["termcolor"], no-serde-warnings. => with default-features = false the new lock entries should be ts-rs, ts-rs-macros,
+  thiserror, thiserror-impl, proc-macro2, quote, syn, unicode-ident (thiserror's and proc-macro2's own deps NOT read:
+  inferred; the real list is read from Cargo.lock after the build). With serde-compat: + termcolor (+ its Windows deps).
+- S6 docs.rs/crate/ts-rs/12.0.1/source/src/export.rs (read 2026-11-18, two passes): NOTE header "// This file was generated
+  by [ts-rs](https://github.com/Aleph-Alpha/ts-rs). Do not edit this file manually.\n"; imports written as
+  `import type { ... } from "...";` (verbatimModuleSyntax-safe); imports collected in BTreeMap<String, BTreeSet<&str>> ->
+  sorted, deterministic; process-wide `static EXPORT_PATHS: OnceLock<Mutex<HashMap<PathBuf, HashSet<String>>>>`, lock
+  taken in export_and_merge and HELD during File::create/write_all/sync_all -> threads of one test process cannot race
+  (R5-LAYOUT-OQ4 mechanism, from source; the 20 runs prove it); a file already written IN THIS PROCESS is merged
+  (alphabetical), a file not yet written by this process is overwritten (File::create) -> regen must delete stale files
+  first (a removed type's file would otherwise stay); path = cfg.export_dir.join(T::output_path()) then path::absolute;
+  trailing '\n'; formatting only with feature `format` (dprint). Confidence: high (source of the pinned version).
+- S7 docs.rs/crate/ts-rs/12.0.1/source/src/lib.rs (read 2026-11-18): u8,i8,u16,i16,u32,i32,usize,isize,f32,f64 (+NonZero
+  below 64) -> "number"; u64,i64,u128,i128 -> cfg large int (default "bigint"); bool -> "boolean"; char/String/str ->
+  "string"; () -> "null"; Option<T> -> "T | null"; Vec<T> -> "Array<T>"; [T; N] -> tuple "[T, T, ...]" when N <= limit (64)
+  else Array<T>; /// docs -> JSDoc "/**\n * ...\n */". => no `enum` keyword anywhere for our types; [u8; 32] -> 32-tuple.
+  Confidence: high (source of the pinned version).
+- S8 raw.githubusercontent.com/Aleph-Alpha/ts-rs/main/README.md (read 2026-11-18): "To export bindings programmatically
+  without the use of tests, TS::export_all, TS::export, and TS::export_to_string can be used instead."; MSRV 1.88.0; MIT;
+  `ts-rs = "12.0"`; NO mention of cfg_attr or dev-dependency use -> that half rests on Rust/Cargo docs (S9, S10), not ts-rs's.
+- S9 doc.rust-lang.org/cargo/reference/specifying-dependencies.html (read 2026-11-18): "Dev-dependencies are not used when
+  compiling a package for building, but are used for compiling tests, examples, and benchmarks." "These dependencies are
+  not propagated to other packages which depend on this package." [dev-dependencies] may use workspace = true, with
+  optional/features/default-features (default-features override: Edition 2024, Rust 1.99+); no `version` key with it.
+- S10 doc.rust-lang.org/edition-guide/rust-2024/newly-unsafe-functions.html (read 2026-11-18): "The following functions are
+  now marked unsafe: std::env::set_var, std::env::remove_var, ..." (multithreaded unsoundness) -> with unsafe_code = deny a
+  test cannot set TS_RS_EXPORT_DIR; Config::with_out_dir is the way. Confidence: high.
+- S11 doc.rust-lang.org/reference/conditional-compilation.html (read 2026-11-18): `test` "Enabled when compiling the test
+  harness. Done with rustc by using the --test flag."; cfg_attr "When the configuration predicate is true, cfg_attr expands
+  out to the attributes listed after the predicate." (any attribute, so derive(TS) and ts(...) helpers).
+- S12 doc.rust-lang.org/cargo/commands/cargo-test.html (read 2026-11-18): "the lib target may be built twice (once as a
+  unittest, and once as a dependency for binaries, integration tests, etc.)"; each test target "is run serially"; tests
+  inside one executable run "in multiple threads"; "--jobs ... does not affect how many threads are used when running the
+  tests"; "Without this flag [--no-fail-fast], Cargo will exit after the first executable fails." => (S11+S12, inferred,
+  high confidence) cfg_attr(test) derives exist only in the crate's own unit-test build; export test = unit test in src/.
+  Cargo-targets page (read too) does not state the cfg(test)-for-integration-tests rule itself.
+- S13 datatracker.ietf.org/doc/html/draft-eastlake-fnv (rev -35, 6 June 2025; "later published as RFC 9923"; read
+  2026-11-18, first 100k chars): FNV-1a = for each octet: hash = hash xor octet; hash = hash * FNV_Prime mod 2**HashSize;
+  32-bit FNV_prime = 16,777,619 (0x01000193); offset_basis = 2,166,136,261 (0x811C9DC5); "No assertion of suitability for
+  cryptographic applications". No FNV-1a test vectors in the part read. Empty input -> offset basis (by the pseudo-code).
+- A4:343-349: state-hash rules (canonical bytes, fixed width, LE, no usize, no std Hasher; function picked later, cs3) ->
+  same byte rules for the layout hash input.
+- Computed (python, from S13's pseudo-code and constants): fnv1a32("")=0x811c9dc5, ("a")=0xe40c292c, ("foobar")=0xbf9cf968.
+- Not verified (no build run: CLAUDE.md never runs unreviewed internet code): with_import_extension's exact argument ("ts"
+  or ".ts"); resolved versions of thiserror/syn/proc-macro2/quote/unicode-ident; ts-rs compiling under clippy --all-targets
+  for wasm32; RustSec status (security-auditor); tsc -b with noEmit in TS 6.0.3 (plan uses -p); ambient enum result.
+### B7 DONE. Next: B8 write plan-draft.md.
