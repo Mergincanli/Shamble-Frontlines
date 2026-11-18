@@ -361,7 +361,7 @@ a fresh worktree (builder 1's, agent-a856ba7c..., stays untouched as a backup); 
 - SIZE-CHECK after B1: `git diff --shortstat 5b29296b -- spikes/ docs/` 1,683 insertions (18 files) + 2,158 lines in
   the 6 new files (commands.rs now 964) = **3,841**.
 
-### B2: -20's rest (line 16), with B3's lab writers (in progress)
+### B2: -20's rest (line 16), with B3's lab writers (done)
 
 - logs.rs: the room log's second records gain `second.s.buffer_depth_count` (each joined client's input buffer depth
   at the second's last tick, `ClientSlot::buffer_depth_ticks`: 0 under A by construction, input.rs:192-196) and
@@ -403,3 +403,288 @@ a fresh worktree (builder 1's, agent-a856ba7c..., stays untouched as a backup); 
     arrival orders sort ticks 0 and 2^31 two ways: left (0, 2^31), right (2^31, 0)), and the property test FAILED at
     room.rs:1755 on case 0 (its order is not by signed distance from the tick run); no panic message in either.
     Restored, sha256 8d7ad78f... (equal).
+- B2 done (its tree's tests above). The run was cut by the org's spend limit at 14:06:57 UTC and resumed at 16:3x UTC
+  (the coordinator's message: no plant left in place, room.rs 8d7ad78f... and lib.rs 1f932bd5..., the last Edit of
+  SERIES.md whole; the worktree snapshotted as wip/u4f-build.patch, 25 files). Before the cut, B3's script
+  (ops/runs/c-u4f-cap.mjs) and part of B4 (below) were already written, so B2's own count was not taken alone.
+- SIZE-CHECK at the resume (B1, B2, B3's script and lab writers, B4 in part): `git diff --shortstat 5b29296b --
+  spikes/ docs/` 1,949 insertions (18 files) + 2,298 lines in 7 new files (the 6, and c-u4f-cap.mjs 140) =
+  **4,247**.
+
+### B3: the event cap's measurement (line 17; 2.8 items 3-5; U4F-Q12 (b))
+
+- The series: `second.s.event_queue_max_count` (B2's logs.rs edit, its new row). The script:
+  ops/runs/c-u4f-cap.mjs (on c-u4r-r2.mjs's model; its doc states the method): one release build of npt-lab, then the
+  nine runs, SS, 48 clients, the brawl under U4f's controller (`--controller 1`, option B), a 10 s warm-up and 60 s
+  measured (two 30 s bins), B1 with 2 bursts (`--bursts 2 --burst-first-s 10 --burst-every-s 30`), seeds 1 to 3, each
+  with the cap opened (`--event-cap 8192`) so no overflow resync clears a queue: the high-water marks are the need, not
+  the provisional cap's (a run at 1,024 would cut them there). Per run: the room-wide reliable events a second (mean
+  and max per 30 s bin), each client's mean queued rate (`events_queued_count` over the run's seconds), the per-client
+  high-water mark per 30 s bin (`second.s.event_queue_max_count`) and per burst (`event.burst_heal.queue_max_count`).
+- The run: `bash <runner> -x <worktree> .gate/u4f/w2-b3-cap.log node ops/runs/c-u4f-cap.mjs --date 2026-11-18 --out
+  .gate/u4f/w2-cap` (16:44:12 UTC, exit 0; `df -h /home/user` 11G free before; HEAD d1b24c3, `git diff HEAD` sha256
+  fc1f11ba..., builder evidence on an uncommitted tree). Figures (.gate/u4f/w2-cap/cap.txt), every run exit 0, 0
+  overflow resyncs, about 35 s wall each:
+  | Run | rate a second, bin 0 / bin 1 (mean; max) | client queued rate (low-high) | high-water bin 0 / bin 1; bursts |
+  |---|---|---|---|
+  | P2 s1 | 559.0 / 553.3 (631; 615) | 543.1-547.9 | 161 / 156 |
+  | P2 s2 | 568.1 / 557.7 (631; 643) | 549.7-554.7 | 166 / 152 |
+  | P2 s3 | 572.5 / 550.2 (652; 644) | 545.4-550.5 | 157 / 188 |
+  | P3 s1 | 538.7 / 511.2 (610; 597) | 514.7-518.5 | 689 / 1,001 |
+  | P3 s2 | 529.8 / 503.4 (603; 563) | 509.2-513.4 | 683 / 449 |
+  | P3 s3 | 546.9 / 513.0 (598; 593) | 517.5-521.6 | **1,045** / 935 |
+  | B1 s1 | 542.3 / 545.7 (598; 607) | 533.7-538.6 | 747 / 651; bursts 727, 615 |
+  | B1 s2 | 547.5 / 537.6 (597; 613) | 532.6-537.6 | 669 / 695; bursts 628, 661 |
+  | B1 s3 | 560.6 / 536.2 (598; 596) | 534.7-539.8 | 739 / 633; bursts 706, 616 |
+- **The value:** the largest per-client high-water mark, 1,045 (P3 seed 3, bin 0: above the provisional 1,024, as
+  P32's 27 forced resyncs at P3 showed), times the stated margin 1.5, rounded up to a multiple of 64: **1,600**; carry
+  50's bound, the lowest client's mean queued rate (509.2 a second, P3 seed 2) x 255 / 30 = **4,328**: 1,600 is below
+  it, so a never-acker meets the cap before its events expire. Into the room's default (room/src/events.rs
+  `EventQueue::CAP` = 1,600, replacing `PROVISIONAL_CAP`; room.rs `Room::new`: `event_cap_provisional` false), its
+  derivation in the constant's doc; room/tests/room.rs:1139's default pin changed to (1,600, false) (the test's own
+  claim changed with the plan, its doc line says so). Plan §4.7's text is the main session's. The figures and the
+  value go to the advisor before any -22 run (U4F-Q12's ruling).
+- Not measured here: P0 (the -22 suite's profile) and 10-minute windows; the short runs' bins are 30 s, so a peak
+  later in a long run (P32's s1 overflow came about 7 minutes in) is outside them: the margin covers what they did not
+  see, by statement, not by measurement.
+
+### B4: -47's clock suite (line 18) (code and tests written before B3's runs; inert outside `--suite clock`)
+
+- An order note: B4's lab code went in before B3's nine runs (it was half written at the cut), so B3's runs are made
+  on a tree holding it; it acts only under `--suite clock` (each use is behind `s.suite == "clock"`), which no B3 run
+  names. Recorded as a deviation from line 4's order, with no effect on B3's figures.
+- npt-bots: `Behaviour::never_fires` (a new `Kind::NoFire`: the open-loop walk, `buttons` 0, no press), the clock
+  suite's script (U4F-Q4 (b); 2.13's "a no-fire clock-suite script").
+- npt-lab: `--suite clock --connects <n>` (each needs the other: a usage error otherwise); the clock suite turns the
+  controller on (ClockSync pings only under it); `params.connects_count` in its header and no `behaviour` param (the
+  never-firing script is a value SERIES.md:348's row does not list: F4's rule), a new row; each client's estimate read
+  at its first step at or after 2 s from its first sample (`event.connect_clock.offset_err_ns`, fields `slot` and
+  `seq`, |`clock().offset_ns()` - the seeded host offset|; row :149), then, while connects remain, the slot connects
+  again: a fresh L1 link (the old one dropped, so the room frees the slot: `Room::leave` on the closed link), a fresh
+  endpoint (`endpoint_of`, the bite as before) and a fresh seeded host offset. No client hash is filed (`logs.filed`
+  skipped) and each admitted slot is `gone` at once, so no tick waits on a client; the warm-up's carry 62 (d) check is
+  skipped for the suite. The endpoint's construction moved into `endpoint_of(s, slot)` (one place for both uses).
+- Tests (+2, measured): `f29_the_clock_suite_reads_each_connect_once_and_stamps_no_event` (16 slots, 32 connects, P2,
+  1 s + 8 s: 32 reads, connect numbers 0..32 once each, 32 admits, every second's shots and reliable events 0, no
+  client tick record) and `f28_the_clock_suite_writes_each_name_with_its_row` (the contract checker's (b): no name
+  failure; `connects_count` 32, no `behaviour`; its one-admit rule does not hold for a suite that reconnects), sharing
+  one run (`clock_short`). Log: .gate/u4f/w2-b4-test.log (fmt --check exit 0, then the bots and lab tests,
+  16:39:41-16:43:58 UTC, exit 0: bots lib 4 passed, 1 ignored; lab main.rs 67 passed, 1 ignored).
+
+### B5: -22, the never-acker and 2.5's counts at every session end (line 19) (written during B3's runs: see B3)
+
+- npt-bots: `Behaviour::never_acks()` and `Behaviour::outgoing(&mut [Vec<u8>])`, the cheats' hook on what the
+  endpoint sends at a step (2.6's form: the honest datagram decoded and re-encoded with only the cheat's change): the
+  never-acker's `Input`s get ack tick 0 and ack groups 0; an honest behaviour changes nothing. npt-lab calls it on every
+  client step's datagrams.
+- npt-lab, `--suite never-ack`: slot 0 brawls and never acknowledges, every other client brawls; the room log writes
+  `tick.v.ack_starved_headroom_count` on every room tick record (slot 0's `ClientSlot::headroom`, the cap while no slot
+  of its is held; row :21) and `event.ack_starved.dropped` (field `slot`; row :128) at each forced resync (0) and at the
+  kick (1); `Logs::starved` names the slot.
+- 2.5 (NA-15): `Server::session_ends` keeps each joined session's counts at its end, read before the room frees the
+  slot or the `Decoder` drops: a `Leave` before it is routed to the room; a closed link before `Room::leave`; a
+  replaced session's room counts read before the replacing join resets the slot (each held slot's, cloned before
+  `Room::join`) and its pump's before `drop_slot`; a kicked slot's at its kick in `Server::send` (its room counts
+  survive). The run writes each as a lab-log `session_end` event (fields `slot`, `ended`, and the counts), one new row.
+  `counts(e, room, pump)` writes the counts from two tables, `ROOM_COUNTS` (every refusal field of `ClientCounters`,
+  20: builder 1's 15 and kind 8's commands, the old acks, the `Resync`s dropped and limited, the kicks) and
+  `PUMP_COUNTS` (every refusal field of npt-server's `Counters`, 21: builder 1's 9 and 12 more), used by
+  `client_counts` too (its U4f rows gain the new names).
+- f39's kicked-slot rejoin case (F9; +0): room/tests/commands.rs `kicked_rejoin(timing)`, run inside f39 under both
+  options: a stress-scene room, slot 0 (never acknowledging, as every `Input` of those tests) firing at an enemy under
+  an event cap of 2, until the room kicks it (one forced resync, then the kick); it rejoins, and its commands after the
+  new join's tick up to its kept stamp count `rejoin_overlap`, none forged, the one past it run.
+- Tests: f21 `f21_the_never_acker_reaches_the_cap_resyncs_once_then_is_kicked`; f14 x3 (the two structs on `counts`
+  with hand-made counters, and the kicked session's `session_end` from f21's run, which also runs f28's -22 half: the
+  contract checker's (b)); f35 `f35_each_ended_sessions_counts_are_kept_once_before_its_slot_is_freed` (a Loopback
+  server: `Leave`, a closed link, a replacement).
+- The B3-B5 tree's check: .gate/u4f/w2-b5-test.log (`-k`: `cargo fmt --all -- --check` exit 1, 12 diffs, applied by
+  Edit after the run; `cargo test --locked -p npt-room -p npt-bots -p npt-lab` 16:51:00-16:53:35 UTC exit 0: lab
+  main.rs 72 passed, 1 ignored (f21, f14 x3, f35 new), room commands 25 (f39 with its kick case), room 19 (the cap pin
+  at 1,600), lib 23, bots 4; then the `--all-features` run, below).
+
+### The counted checks (B6's one, then B10's two)
+
+- **Check 0 (not one of the two: a step failed)**, .gate/u4f/w2-end-check-1.log (`-x`, 17:18 UTC on; `df -h` 8.6G
+  free before): the six provenance builds, then `node check.mjs`: fmt, clippy, clippy-wasm32 PASS; **doc FAIL**:
+  "public documentation for `EventQueue` links to private item `EventQueue::CAP`" (room/src/events.rs:23, B3's doc
+  line linked the crate-private constant; `-D rustdoc::private-intra-doc-links`); its whole output kept by check.mjs
+  at .gate/netcode-proof-test/failed-steps/doc.log in this worktree. Cause known; fixed by Edit (the link made plain
+  code text), so the two counted checks below are whole new runs. Its other steps all passed, the test step 679.5 s:
+  measured 619, bites 716, 0 failed, 0 skipped; refs 1466, marks 81, self 78 of 78, redact 316 items, 0 findings.
+- **End check A (B6's counted check and section 6's first)**, .gate/u4f/w2-end-check-a.log (`-x`, 17:33:14-17:45:55
+  UTC; free 4,785 MiB at the start, `df -h` 4.7G before; HEAD d1b24c3, diff 5c1ddd52..., untracked a3b69979...): the
+  six provenance builds exit 0, then `node check.mjs`: fmt 0.6 s, clippy 3.8 s, clippy-wasm32 1.2 s, doc 4.4 s,
+  **test 668.2 s: measured 619 passed (base 552: +67; builder 1's 605: +14), bites 716 (base 632: +84; builder 1's
+  701: +15), 0 failed, 0 reported a skip**; deps 1.4 s (143 crate files); wasm 41.8 s (27,000 ticks, 0 mismatching both
+  ways; hash-map and std-sin caught as before; warm); refs 1466 tracked files; marks 81; self 78 of 78; redact 10 of
+  10, 316 items, 0 findings; **"check: all 11 steps pass"**, exit 0. Provenance: npt-room, npt-client, npt-bots and
+  npt-lab each "Compiling ... (<this worktree>/spikes/netcode-proof/crates/...)" x 4. The test step 668.2 s against
+  1,207 s (1.5 x E6's 804.8 s): under. The short P2 C62H-BOUND test passed in it.
+- **End check B (section 6's second, the same tree)**, .gate/u4f/w2-end-check-b.log (`-x`, 17:46:09-17:59:06 UTC;
+  free 4,668 MiB at the start, `df -h` 4.6G before and after; HEAD d1b24c3, diff 5c1ddd52..., untracked a3b69979...:
+  equal to A's, no edit between): the six provenance builds exit 0; fmt 0.7 s, clippy 4.7 s, clippy-wasm32 0.9 s, doc
+  5.1 s, **test 682.9 s: 619 and 716 passed, 0 failed, 0 skipped**; deps; wasm 41.5 s (27,000 ticks, 0 mismatching);
+  refs 1466; marks 81; self 78 of 78; redact 316 items, 0 findings; **"check: all 11 steps pass"**, exit 0.
+- **Final SIZE-CHECK** (the notes' counting rule): `git diff --shortstat 5b29296b -- spikes/ docs/` 2,813 insertions
+  (20 files) + 2,702 lines in 9 new files (clock.rs 348, carry80.rs 158, trace.rs 556, bite_homes.rs 48, pong.rs 84,
+  commands.rs 1,067, c-u4f-cap.mjs 140, c-u4f-r2.mjs 168, c-u4f-runs.mjs 133) = **5,515 added lines**: M's 3,000 x
+  1.84, under the 6,000 stop (builder 1 3,753, builder 2 +1,762). Not reached, so line 5's stop record does not apply;
+  the build stopped by this builder's working room (B8's fast clock and B9 unbuilt, above).
+- Disk: 12G free at this builder's start, 4.6G at its end (the shared target's release, wasm32 and both debug builds,
+  cold after the main session's part-clean); never below the 4 GiB floor; nothing cleaned or packed.
+- Builder 2's test deltas (by the counts): measured +14 (lab +11: f6 and f28 split +2, f29, f28 clock, f21, f14 x3,
+  f35, f18 (ii), f20; bots +2: f36 (ii), f18 (i); room +1: f18 (iii)); bites +15 (those and f2's routing test).
+  Changed, +0: f11 (ii), f39 (its kick case), carry 57's room pin, U4r's b5 (the clamp point). Negative cases among the
+  new, by 2.10's table: f14 x3, f20, f21, f35 (6). Against 2.10's minimums (measured +119, bites +134, 67 negative):
+  measured +67, bites +84, not met: the unbuilt rows (f15, f16 x24, f19, f22, f23, f33 x13, f37, U4F-Q11 (iii) (c)'s
+  test) hold most of the rest.
+
+### Builder 2: carries, rulings and what goes to the main session
+
+- Carries moved by builder 2: **57 met** (2.8: the cap measured, 1,600, into the room's default, not provisional;
+  plan §4.7's text is the main session's); **58 met for the cap runs** (per-client high-water marks per 30 s bin and
+  per burst, c-u4f-cap.mjs, cap.txt; each run's overflow resyncs 0); **50** no code change (1,600 below its 4,328 bound,
+  checked by the script); **76** kept and widened (2.5's counts at every session end, the kick path through the
+  never-acker, r8 and r9 pass); **86 not met** (c-u4f-r2.mjs exists for 5.3's -20, -47 and the clamp and lag-switch
+  rows; -21's forged and fast-clock rows not, their suites unbuilt; the runs are the main session's after the merge);
+  **74** as builder 1's (f28's on-time share, the controller's leads). 46 and 80 as builder 1's (the plants of f26, f27
+  and D14 now run: B2).
+- Rulings: U4F-Q3 (c) built (`second.s.buffer_depth_count` 0 under A, `tick.s.cmd_ran_early_count`); Q4 (b) built
+  (the clock suite: no client hash, the never-firing script); Q11 (i) (a) by line 7 (`--brawl-press-every 2`), (ii)
+  (a) (the -21 rows at P0, the lag switch at P1), (iii) (c) and (v) (b) not built (the fast clock); Q12 (b) built;
+  Q14 (b) (every refusal counter written, the hold clamp uncounted: the named follow-up); Q15 (c) (p19's 400 ms row).
+- Deferred Lows (9.2): TE-B1-R2-1 with RR2-B1-1 rode (B2); **RR-CB-2's docs and RR-B1-7 (1)'s `room_tick` loop
+  rewrite left** (line 15: they ride only where cheap; the room_tick edits were additions inside the loop, and the
+  rewrite would touch C62H-BOUND's reviewed lines: for their next taker).
+- To the main session: the cap's value and figures go to the advisor before any -22 run (U4F-Q12); the order notes
+  (B3 on a tree with B4's code, B6's checks on B1-B7); the build stop (the fast clock and B9 unbuilt) and a next
+  builder; no marks.json, judge, README or existing SERIES.md row changed (D10 below); no manifest change; no wire
+  change beyond builder 1's `Pong.server_ns`.
+
+- D10, the bars line: `git diff --numstat 5b29296b -- spikes/netcode-proof/marks spikes/netcode-proof/crates/judge`
+  prints only `18 0 spikes/netcode-proof/marks/SERIES.md`: marks.json, README and the judge unchanged; SERIES.md 18
+  lines added, 0 removed (every row of U4f's subsection is new; no existing row touched).
+
+### Builder 2's public items (line 11; against 2.13)
+
+- npt-bots (2.13: the cheats' and the never-acker's constructors on `Behaviour`): `Behaviour::with_press_every`
+  (replaces builder 1's `brawl_presses`), `never_fires` (2.13's "a no-fire clock-suite script"), `never_acks`,
+  `with_points` (the clamp twin), `lag_switch`; **beyond 2.13's words:** `Behaviour::outgoing` (the cheats' hook on
+  the endpoint's datagrams, called by the lab at every step) and `Behaviour::take_bursts` (the lag switch's burst
+  record, which the lab writes as `event.lag_burst.held_ns`).
+- npt-room: none new (`EventQueue::CAP` is crate-private; `Room::set_cmd_timing` only gains its debug assertion).
+- npt-client: none new; `unknown_pongs()` stays public, now written as `event.client_counts.unknown_pongs_count`;
+  builder 1's `join_tick()` and `lead_now()` are **beyond 2.13's list** (2.13: "the endpoint keeps its `JoinAccepted`
+  tick, no new public item"; `lead_now` has no 2.13 line; its consumer is `event.client_counts.lead_now_count`), named
+  for the engine-architect.
+- npt-lab (binary settings only): `--brawl-press-every`, `--event-cap`, `--connects` (with `--suite clock`),
+  `--twin-logs` (the clamp twin), `--lag-hold-ms`, `--lag-every-ms`; the suites `clock`, `never-ack`, `clamp` and
+  `lag-switch` read by `run`.
+
+### B6: the run scripts and one counted check (line 20)
+
+- ops/runs/c-u4f-r2.mjs (5.3's pre-runs, on c-u4r-r2.mjs's model; its header states its order, reading and limits):
+  rows p5, p6 (-20 A and B, P3, the controller, `--brawl-press-every 2`), p10, p11 (-47's two bites, the clock suite
+  with one round of 48 connects), p12 (redundancy-1 under B), p21 (the clock suite clean); each row's scenario, then
+  `contract`, then the judge in 5.4's form (`--only PM-0001-2,PM-0001-20`, or `--only PM-0001-47`); exports its
+  helpers (`sh`, `sha256`, `floor`, `build`, `step`, `committed`) for c-u4f-runs.mjs.
+- ops/runs/c-u4f-runs.mjs (the judged sets 47, 22 and 20, on c-u4r-runs.mjs's model, ADV-CBH-2's hardenings:
+  binaries built in the call, marks.json's and npt-judge's sha256s re-checked before each judge call with the
+  spike's tree and status, the full HEAD as --commit, a 10 s warm-up; every set judged in two calls, measured/ then
+  bites/, STOP_NOTE at runs.txt's head; -22's 5.2 load report as a third call, `--only PM-0001-2`, never counted;
+  CARGO_TARGET_DIR refused). -21's sets join with its suites (B7-B9).
+- **Each npt-lab command line by hand on a short setting (section 6 item 5)**: .gate/u4f/w2-hand.log (`-x -k`,
+  17:09:40-17:14:14 UTC, every command exit 0), the release builds through `cargo run --release --locked -q`, each at
+  `--warmup-s 4 --measured-s 2` (48 clients, seed 1), outputs under .gate/u4f/w2-hand/: c-u4f-r2.mjs's forms p5, p6
+  (-20 A, B), p21 (clock, 48 connects), p2, p15 (clamp A, B), p4, p18, p19 (lag switch A, B, A with 400 ms), and the
+  bites build's p10, p11 (-47's two), p12 (redundancy-1), p8 (refuse-not-clamp), p13 (no-catchup-cap);
+  c-u4f-runs.mjs's forms 47 (1,000 connects, role measured), 22 (never-ack, role measured) and its bite
+  (PM-0001-22/unbounded), 20 (B, role measured); `contract` on p5 (PASS); the judge in 5.4's form on p5 (`--only
+  PM-0001-2,PM-0001-20`: -20 FAIL only by length, "10,000 scripted presses = 1446"), p21 (`--only PM-0001-47`: FAIL by
+  length, "1,000 connects ... = 48"), s22 (`--only PM-0001-22`: NOT-RUN, 1 of 3 runs, its two checks **pass**: headroom
+  min 0, ack_starved 2, at the room's new cap 1,600 in 6 s; and 5.2's `--only PM-0001-2`: FAIL, "a connected client on
+  every soldier = 47", the designed drop, never counted) and p2 (`--only PM-0001-2,PM-0001-21`: FAIL by length, "1,000
+  points beyond reach ... = 177"). The scripts themselves (`node ...`) need a committed tree and the main folder, so
+  they were not run whole; their command lines were.
+- **Section 6 item 4 (P33; F8)**: `cargo test --locked -p npt-server --all-features` on this tree (.gate/u4f/
+  w2-times.log, 17:14:15-17:15:17 UTC): exit 0, gap 6, loopback 6, pump 20, schedule 17 passed. The moved test, -1
+  npt-server and +1 npt-lab, by `--list`: npt-server `--all-features` lists 6 + 6 + 20 + 17 = 49 and no
+  `catalogue_5_owner_to_all_lives_in_npt_room_alone_and_no_id_is_in_two_lists`; npt-lab's `--test bite_homes --list`
+  names it, "1 test" (w2-times.log:186-205).
+- **The time rule, each new or changed test alone** (w2-times.log, `-x -k`, "finished in" lines): the reference
+  `c62hb_p2_short_every_measured_lost_tick_is_explained` 11.13 s, so the line is 22.26 s; f6 A 11.36, f6 B 11.47, f28 A
+  11.31, f28 B 11.34, f40 11.29, f29 9.34, f28 clock 9.42, f21 9.96, f14 kicked 9.91, f14 room 0.00, f14 pump 0.00, f35
+  0.01, f18 (ii) 14.76 (its two runs), f20 9.85, f2 routing (bites) 0.00; bots f36 (ii) 0.01, f18 (i) 0.00; room f18
+  (iii) 0.01, f39 0.29, f11 0.00 s. Every one under the line (R1's split holds: f6 and f28 near 1 times the reference).
+- An order note: B7's code (below) was written while B5's tests ran, before B6's hand runs and counted check, so
+  those run on B1-B7 (its code acts only under `--suite clamp`, and the clamp script's new point only under
+  `--behaviour clamp`, which no other test or run names). Recorded as a deviation from line 4's order.
+
+### B7: -21's clamp suite (line 21; 2.4's last row, 2.6, 2.12; line 12 of the ruling)
+
+- npt-bots: the clamp script's point (`FAR_CM`) moves from 32,000 cm (outside the map: kind 6 refuses it, NA-8) to
+  11,000 cm in x and y: inside ±12,800, beyond the 6,000 cm reach from anywhere near the fight; it holds fire with no
+  press edge and stands still (line 12: the clean sim refuses none of its commands). `Behaviour::with_points` (the
+  clamp twin: each listed sequence's aim replaced, in every `Input` carrying it, through `outgoing`).
+- npt-lab: `--suite clamp`: slot 0 runs the clamp script, every other client the run's `--behaviour` (the run
+  scripts pass `steady`, an open-loop script, 2.12); every run's room log writes each clamp report as
+  `event.clamp_report.x_um`, `.y_um`, `.z_um` (fields `slot`, `seq`; row :324), from `Room::reports()`; a clamp run
+  (not its twin) writes one lab-log `clamp_kind` (the sim has one weapon kind, hitscan): `sent_count` the cheat's
+  sequences run with a point beyond reach of its fire origin, `counted_count` of those with any sim refusal record
+  whatever its kind (line 12; refuse-not-clamp records Cooldown), `rerun_reports_count` (SA-10's reruns, a new row).
+  The twin: `--twin <run> --role twin --twin-logs <the clamp run's folder>` (the clamp suite only) reads that run's
+  slot-0 clamp reports into the cheat's `with_points` (µm / 10,000 = grid cm; a rerun's first).
+- Why the twin holds: npt-sim reads a command's aim only for its shot (world.rs:1298-1316, :1450: `clamp`), so a
+  command that did not shoot leaves no trace of its aim, and one that shot gets the clamp run's reported point, which
+  lies within the reach and is used as given.
+- Tests (+3): f18 (i) bots `f18_the_clamp_scripts_points_lie_beyond_reach_and_inside_the_map`; f18 (ii) lab
+  `f18_a_clamp_run_and_its_twin_give_equal_hashes_and_count_no_refusal` (the clamp run and its twin, 16 clients P0
+  2 s + 4 s, option A: equal per-tick hashes on the same ticks; `sent_count` above 0, `counted_count` 0, reruns 0, slot
+  0's reports above 0; f28's clamp half: no name without its row); f18 (iii) room
+  `f18_under_option_b_a_rerun_clamp_command_gives_two_reports_for_one_sequence`.
+- c-u4f-r2.mjs: 5.3's p2 (clamp A), p8 (refuse-not-clamp, A) and p15 (clamp B) rows.
+- SIZE-CHECK after B7's code (before its test run): 2,624 insertions (19 files: events.rs joined) + 2,696 lines in 9
+  new files = **5,320**.
+- Its check, .gate/u4f/w2-b7-test.log (`-k`, 16:58:25-17:02:45 UTC): fmt --check exit 1 (9 diffs, applied by Edit);
+  both clippy runs exit 101 on one finding, `clippy::type_complexity` on the two count tables (fixed: a `Field<T>`
+  alias); the measured test run exit 101 at bots/tests/behaviour.rs:230, U4r's b5 test's pin of the clamp script's
+  32,000 cm point (a pin this block re-pins, P25: the point moved by design, NA-8; re-pinned to 11,000 with a line
+  saying why); the `--all-features` run exit 0: lab main.rs 84 passed, 1 ignored (f18 (ii) among them), commands 38
+  (f18 (iii)), room 27, lib 23, bite_homes 1. The fixes are re-checked in B8's first run (below).
+
+### B8: -21's lag switch and fast clock (line 21)
+
+- Lag switch, npt-bots: `Behaviour::lag_switch(hold_ns, every_ns)` and `take_bursts()`; `outgoing` takes the step's
+  host time: in each hold window (the first `hold_ns` of every `every_ns` from its first send, the first window one
+  period in) the client's `Input` datagrams are held (`Vec::extract_if`), then sent in one burst ahead of the next
+  step's own, each burst's hold kept (`event.lag_burst.held_ns`, lab log, field `slot`; row :170).
+- Lag switch, npt-lab: `--suite lag-switch` makes slot 0 the lag switch (every other client the run's
+  `--behaviour`); `--lag-hold-ms` (200) and `--lag-every-ms` (6,000), in the header as `lag_hold_ns` and
+  `lag_every_ns` (a new row); the room log writes on every room tick record `tick.v.lagswitch_cmds_count` (row :33,
+  `ClientSlot::commands_run`), `tick.v.lagswitch_excess_move_um` (row :34: the lag soldier's movement this tick, µm,
+  less `CMD_CATCHUP` x 600 cm/s / TICK_HZ, the top speed a copy of npt-sim's private `Scene::move_speed`) and
+  `tick.v.lagswitch_move_apart` (A1: 1 when it is dead at the tick's start or end, its movement then 0; a new row);
+  `logs::moved_um` the movement rule (health 0 at either record: none).
+- f20 `f20_the_lag_switch_runs_at_most_the_cap_a_tick_and_moves_within_it` (+1): `moved_um` on hand-made records (a
+  walk, a respawn, a death) and a short lag-switch run (16 clients, P1, 2 s + 6 s, A, a hold every 2 s): at least 3
+  bursts each held at least 200 ms, the lag client's commands a tick at most 8, its excess at most 0, f28's names.
+- c-u4f-r2.mjs: 5.3's p4, p13 (no-catchup-cap), p18 and p19 (the 400 ms hold) rows.
+- The check of B7's fixes and B8's lag switch: .gate/u4f/w2-b8a-test.log (`-k`, 17:03:15 UTC on): fmt --check exit 1
+  (2 diffs, applied by Edit after its run started: formatting only); clippy host and `--all-features` exit 0; the
+  measured tests (room, bots, lab) exit 0: lab main.rs 74 passed, 1 ignored (f18 (ii), f20 among them), commands 26,
+  room 19, lib 23, bots lib 5 (f18 (i)), behaviour 5 (b5 re-pinned); the `--all-features` run below.
+- SIZE-CHECK after B8's lag switch: `git diff --shortstat 5b29296b -- spikes/ docs/` 2,813 insertions (20 files:
+  bots/tests/behaviour.rs joined) + 2,702 lines in 9 new files = **5,515** (M's 3,000; the brief's 5,150; the stop
+  6,000).
+- **The fast clock is not built, and B9 (the forged suite) is not started: this builder's working room.** The added
+  lines stay under 6,000 (line 5's stop is not reached), so this is a stop of the build by the builder, recorded as
+  builder 1's was, not the size stop: the rest goes to a next builder from these notes. Not built: the 1.5x host
+  clock and its stamp rule (line 13, as F1 amended), the episodes (`--fast-clock-episode-s`,
+  `params.fast_clock_episode_ns`, `event.fast_clock.excess_cmds_count` and `.excess_move_um` with each episode's
+  kind-1 and kind-2 refusals), the honest reference and U4F-Q11 (iii) (c)'s test, f19, f37; 5.3's p3, p9, p16, p20;
+  the 11 forgers, `--forge-every`, the twins and the twin's skip in the lab, `event.forged_kind.*`, f15, f16 (24), f22,
+  f23, f33 (13); 5.3's p1, p7, p14, p17; -21's set in c-u4f-runs.mjs (its measured runs, twins, the clamp twins'
+  `--twin-logs`, and its 13 bite runs). What they can build on: `Behaviour::outgoing` (the cheats' hook on the
+  endpoint's datagrams, with the host time), `logs::moved_um` (A1's movement rule), the clamp twin's points route,
+  `--event-cap`, the suite switch in `run`, and the room's checks and records (B1-B4 of builder 1).

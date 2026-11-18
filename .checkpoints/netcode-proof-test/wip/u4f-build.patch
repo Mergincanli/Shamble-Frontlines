@@ -12,10 +12,34 @@ index 9c58b9a..b160e1a 100644
  | `JoinAccepted` | room → client | control stream | owner | Sender: the room only, once per accepted `Join`, to that client. npt-client: the size; each value in range; a `FullState` follows on a full-state stream | 256 B (proposed: 2 B length + 1 B type + 3 B slot, team and squad + 2 B mode id + 32 B mode hash + 32 B content hash + 4 B server tick + 4 B tick and snapshot rates = 80 B, rounded up) | built in U4 | row 671; part 11:506 (the room assigns team and squad) |
  | `JoinRejected` | room → client | control stream | owner | Sender: the room only; it then closes the connection. It carries a reason code and nothing else (proposed codes: bad token, bind mismatch, roster full, wrong version, wrong content hash). npt-client: the size | 16 B (proposed: 2 B length + 1 B type + 1 B reason = 4 B, rounded up) | built in U4 | row 671; plan §10.3 |
 diff --git a/spikes/netcode-proof/crates/bots/src/lib.rs b/spikes/netcode-proof/crates/bots/src/lib.rs
-index 47f91ef..49952fb 100644
+index 47f91ef..63a4628 100644
 --- a/spikes/netcode-proof/crates/bots/src/lib.rs
 +++ b/spikes/netcode-proof/crates/bots/src/lib.rs
-@@ -87,6 +87,8 @@ enum Kind {
+@@ -23,6 +23,8 @@
+ //! `view_tick` = the endpoint's newest tick and `view_fraction` = 0, which the room's ring holds at every lead of 1 or
+ //! more.
+ 
++use std::collections::BTreeMap;
++
+ use npt_client::ClientEndpoint;
+ use npt_link::Channel;
+ use npt_sim::{Command, Scene};
+@@ -71,9 +73,11 @@ const LEASH_IN_CM: i64 = 1_300;
+ const AIM_ABOVE_FEET_CM: i32 = 100;
+ /// Where an aim with no target in view goes: a seeded point within this many cm of the map's centre, in x and y.
+ const BLIND_SPREAD_CM: u64 = 1_000;
+-/// The clamp script's points lie this far out in x and y, cm: beyond any weapon's reach from the fight, inside the
+-/// position grid's range (±32,767 cm).
+-const FAR_CM: i32 = 32_000;
++/// The clamp script's points lie this far out in x and y, cm: beyond the weapon's 6,000 cm reach from any soldier near
++/// the fight (the spawn grid within 1,414 cm of the centre, the script standing still: at least 14,142 cm away) yet
++/// inside the map's ±12,800 cm, so the room's kind 6 never refuses them (u4f-brief.md 2.6; U4r's stand-in at
++/// 32,000 cm lay outside the map: NA-8).
++const FAR_CM: i32 = 11_000;
+ 
+ /// What a behaviour does with each command it gives.
+ #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+@@ -87,6 +91,8 @@ enum Kind {
      Clamp,
      /// Open loop: fire held, the walk, aimed at a seeded point near the centre.
      Steady,
@@ -24,7 +48,7 @@ index 47f91ef..49952fb 100644
  }
  
  /// One client's behaviour (the module text): the brawl or an open-loop script, seeded per slot.
-@@ -109,6 +111,10 @@ pub struct Behaviour {
+@@ -109,6 +115,28 @@ pub struct Behaviour {
      /// The leash's state (the brawl only): steering toward the centre, from past [`LEASH_OUT_CM`] until inside
      /// [`LEASH_IN_CM`].
      steering: bool,
@@ -32,10 +56,28 @@ index 47f91ef..49952fb 100644
 +    controlled: bool,
 +    /// A fire press on every `press_every`-th command given (`with_press_every`); 0: the kind's own rule.
 +    press_every: u64,
++    /// -22's never-acker (`never_acks`): every `Input` it sends acknowledges nothing.
++    never_acks: bool,
++    /// -21's clamp twin (`with_points`): each sequence's aim point, from the clamp run's reports.
++    points: BTreeMap<u16, [i32; 3]>,
++    /// -21's lag switch (`lag_switch`).
++    lag: Option<Lag>,
++}
++
++/// The lag switch's state (u4f-brief.md 2.6): its `Input` datagrams held for `hold_ns` at the start of every `every_ns`
++/// of host time from its first send (the first hold one period in), then sent in one burst; each burst's hold.
++#[derive(Clone, Debug, Default)]
++struct Lag {
++    hold_ns: u64,
++    every_ns: u64,
++    first_ns: Option<u64>,
++    held: Vec<Vec<u8>>,
++    held_since: Option<u64>,
++    bursts: Vec<u64>,
  }
  
  /// splitmix64's step: the bots' one generator, seeded per slot (no clock, no hash map).
-@@ -128,8 +134,8 @@ fn below(word: u64, n: u64) -> u64 {
+@@ -128,8 +156,8 @@ fn below(word: u64, n: u64) -> u64 {
  /// A move vector from (x, y) toward the origin at about full command length, inside the room's x² + y² ≤ 127² check
  /// (so the sim never scales it: world.rs:494-498): each part is 127 times its share of ⌈|(x, y)|⌉, truncated toward 0,
  /// so the vector is never longer than 127 and, at the leash's radii, longer than 125. Integers only. Its inputs are
@@ -46,15 +88,100 @@ index 47f91ef..49952fb 100644
  fn toward_centre(x: i32, y: i32) -> [i8; 2] {
      let (x, y) = (i64::from(x), i64::from(y));
      let d2 = x * x + y * y;
-@@ -167,14 +173,39 @@ impl Behaviour {
+@@ -167,7 +195,111 @@ impl Behaviour {
              given: 0,
              skipped: 0,
              steering: false,
 +            controlled: false,
 +            press_every: 0,
++            never_acks: false,
++            points: BTreeMap::new(),
++            lag: None,
++        }
++    }
++
++    /// -21's lag switch (2.6; U4F-Q15 (c)): the same behaviour, its `Input` datagrams held `hold_ns` (200 ms in the
++    /// judged runs: about 6 datagrams, inside the bucket's 8) once every `every_ns` (6 s: 100 bursts in 600 s), then
++    /// sent in one burst at the first step after the hold, ahead of that step's own; on simulated host time only.
++    pub fn lag_switch(mut self, hold_ns: u64, every_ns: u64) -> Behaviour {
++        self.lag = Some(Lag {
++            hold_ns,
++            every_ns: every_ns.max(1),
++            ..Lag::default()
++        });
++        self
++    }
++
++    /// The lag switch's bursts sent since the last take, each its hold in ns (`event.lag_burst.held_ns`).
++    pub fn take_bursts(&mut self) -> Vec<u64> {
++        self.lag
++            .as_mut()
++            .map(|l| core::mem::take(&mut l.bursts))
++            .unwrap_or_default()
++    }
++
++    /// -21's clamp twin (2.12): the same behaviour with each listed sequence's aim replaced, in every `Input` that
++    /// carries it, by the point the clamp run's sim clamped that command's shot to (`event.clamp_report`): a point at
++    /// the reach, so the twin's shots are the clamp run's.
++    pub fn with_points(mut self, points: BTreeMap<u16, [i32; 3]>) -> Behaviour {
++        self.points = points;
++        self
++    }
++
++    /// -22's never-acker (u4f-brief.md 2.6): the same behaviour, its every `Input` re-encoded with no acknowledgement
++    /// (ack groups 0) by [`Behaviour::outgoing`], so the room never learns a snapshot or a full state arrived.
++    pub fn never_acks(mut self) -> Behaviour {
++        self.never_acks = true;
++        self
++    }
++
++    /// The cheats' hook on what the endpoint sends at its step at `now_ns` (host time; 2.6: the honest datagram, decoded
++    /// and re-encoded with only the cheat's change): the never-acker's `Input`s lose their acknowledgement, the clamp
++    /// twin's commands take their listed points, the lag switch holds its `Input`s and sends them in a burst; an honest
++    /// behaviour changes nothing. Every rewritten `Input` encodes (only the ack fields and aims inside the map change).
++    pub fn outgoing(&mut self, now_ns: u64, datagrams: &mut Vec<Vec<u8>>) {
++        use npt_proto::{Direction, Message, decode, encode};
++        if let Some(l) = self.lag.as_mut() {
++            let first = *l.first_ns.get_or_insert(now_ns);
++            let since = now_ns - first;
++            if since >= l.every_ns && since % l.every_ns < l.hold_ns {
++                let input = |d: &Vec<u8>| {
++                    matches!(
++                        decode(Direction::ClientToRoom, Channel::Datagram, d),
++                        Ok(Message::Input(_))
++                    )
++                };
++                l.held_since.get_or_insert(now_ns);
++                l.held.extend(datagrams.extract_if(.., |d| input(d)));
++            } else if let Some(at) = l.held_since.take() {
++                let mut burst = core::mem::take(&mut l.held);
++                burst.append(datagrams);
++                *datagrams = burst;
++                l.bursts.push(now_ns - at);
++            }
++        }
++        if !self.never_acks && self.points.is_empty() {
++            return;
          }
-     }
- 
++        for d in datagrams.iter_mut() {
++            if let Ok(Message::Input(mut i)) = decode(Direction::ClientToRoom, Channel::Datagram, d)
++            {
++                if self.never_acks {
++                    (i.ack_tick, i.ack_groups) = (0, 0);
++                }
++                for c in &mut i.commands {
++                    if let Some(p) = self.points.get(&c.seq) {
++                        c.aim = *p;
++                    }
++                }
++                let mut out = Vec::new();
++                if encode(&Message::Input(i), &mut out).is_ok() {
++                    *d = out;
++                }
++            }
++        }
++    }
++
 +    /// The same behaviour under U4f's tick-lead controller (`ClientEndpoint::with_clock`; u4f-brief.md 2.2): each step
 +    /// gives exactly the commands the endpoint says are due (none, one or two; none before its first stamp is due), so
 +    /// no tick goes without a stamped command but by loss. Each command still moves each press counter by at most one
@@ -70,10 +197,10 @@ index 47f91ef..49952fb 100644
 +    pub fn with_press_every(mut self, n: u64) -> Behaviour {
 +        self.press_every = n;
 +        self
-+    }
-+
+     }
+ 
      /// The brawl of `slot` in `scene`, from the run's `seed`.
-     pub fn brawl(scene: &Scene, slot: u8, seed: u64) -> Behaviour {
+@@ -175,6 +307,12 @@ impl Behaviour {
          Behaviour::new(Kind::Brawl, scene, slot, seed)
      }
  
@@ -86,7 +213,7 @@ index 47f91ef..49952fb 100644
      /// The open-loop script named `script` (`presses`, `clamp` or `steady`) of `slot` in `scene`, from `seed`;
      /// `None` for another name.
      pub fn script(scene: &Scene, slot: u8, seed: u64, script: &str) -> Option<Behaviour> {
-@@ -221,6 +252,17 @@ impl Behaviour {
+@@ -221,6 +359,17 @@ impl Behaviour {
          let (Some(newest), Some(_)) = (endpoint.newest_tick(), endpoint.slot()) else {
              return false;
          };
@@ -104,7 +231,7 @@ index 47f91ef..49952fb 100644
          if !self.every_step && self.last_newest == Some(newest) {
              self.skipped += 1;
              return false;
-@@ -276,7 +318,12 @@ impl Behaviour {
+@@ -276,7 +425,12 @@ impl Behaviour {
          own: Option<([i32; 3], bool)>,
      ) -> Command {
          let k = self.given;
@@ -118,7 +245,7 @@ index 47f91ef..49952fb 100644
              self.presses[Command::PRESS_FIRE] = self.presses[Command::PRESS_FIRE].wrapping_add(1);
          }
          let aim = match self.kind {
-@@ -289,7 +336,11 @@ impl Behaviour {
+@@ -289,7 +443,11 @@ impl Behaviour {
              _ => walk,
          };
          Command {
@@ -131,7 +258,7 @@ index 47f91ef..49952fb 100644
              presses: self.presses,
              move_xy: if self.kind == Kind::Clamp {
                  [0, 0]
-@@ -401,7 +452,7 @@ mod tests {
+@@ -401,7 +559,7 @@ mod tests {
              steer,
              "still outside the inner radius"
          );
@@ -140,7 +267,7 @@ index 47f91ef..49952fb 100644
          assert_eq!(got, walk, "dead: the walk");
          let (got, walk) = give(None);
          assert_eq!(got, walk, "no complete tick: the walk");
-@@ -466,6 +517,91 @@ mod tests {
+@@ -466,6 +624,117 @@ mod tests {
          }
      }
  
@@ -229,9 +356,53 @@ index 47f91ef..49952fb 100644
 +        }
 +    }
 +
++    /// f18 (i) (2.6; NA-8): for every slot of the stress scene the clamp script holds fire with no press edge and stands
++    /// still, its point inside the map's ±12,800 cm (kind 6's bounds) and beyond the weapon's reach from anywhere
++    /// within 1,500 cm of the centre (the spawn grid's corners lie at 1,414 cm).
++    #[test]
++    fn f18_the_clamp_scripts_points_lie_beyond_reach_and_inside_the_map() {
++        let scene = Scene::stress();
++        let far = i64::from(scene.weapon().reach_cm) + 1_500;
++        for slot in 0..scene.slots() {
++            let mut b = Behaviour::script(&scene, slot, 1, "clamp").expect("a script");
++            for _ in 0..4 {
++                let c = b.next_command(100, &[], None);
++                let [x, y, _] = c.aim.map(i64::from);
++                assert!(
++                    x.abs() <= 12_800 && y.abs() <= 12_800,
++                    "{slot}: {:?}",
++                    c.aim
++                );
++                assert!(x * x + y * y > far * far, "{slot}: {:?}", c.aim);
++                assert_eq!(
++                    (c.buttons, c.presses, c.move_xy),
++                    (Command::FIRE, [0; 4], [0, 0])
++                );
++            }
++        }
++    }
++
      /// The judged runs' first tick (the run scripts' `--tick-start 63736`).
      const FIRST: u32 = 63_736;
      /// The feed's delay, in World steps: each slot decides on its soldier as it was this many steps before, the
+diff --git a/spikes/netcode-proof/crates/bots/tests/behaviour.rs b/spikes/netcode-proof/crates/bots/tests/behaviour.rs
+index 6dbe069..834623f 100644
+--- a/spikes/netcode-proof/crates/bots/tests/behaviour.rs
++++ b/spikes/netcode-proof/crates/bots/tests/behaviour.rs
+@@ -226,11 +226,12 @@ fn b5_the_brawl_aims_at_an_enemy_in_view_never_a_teammate() {
+             "command {i} aims at slot 20, raised into its box"
+         );
+     }
++    // U4f's clamp cheat (u4f-brief.md 2.6, NA-8): beyond the reach yet inside the map (U4r's 32,000 cm lay outside).
+     let clamp = commands(Behaviour::script(&scene, 0, 9, "clamp").expect("clamp"), 5);
+     assert!(
+         clamp
+             .iter()
+-            .all(|c| c.aim[0].abs() == 32_000 && c.aim[1].abs() == 32_000),
++            .all(|c| c.aim[0].abs() == 11_000 && c.aim[1].abs() == 11_000),
+         "the clamp script aims far beyond the reach"
+     );
+ }
 diff --git a/spikes/netcode-proof/crates/client/src/lib.rs b/spikes/netcode-proof/crates/client/src/lib.rs
 index 74ed082..c3cec38 100644
 --- a/spikes/netcode-proof/crates/client/src/lib.rs
@@ -793,7 +964,7 @@ index 3540ec8..bd617c8 100644
      let bitten = npt_client::grid_with_bite(id).expect("the client plants -17's");
      assert_eq!(bitten, Config::floor_rounding());
 diff --git a/spikes/netcode-proof/crates/lab/src/logs.rs b/spikes/netcode-proof/crates/lab/src/logs.rs
-index c26fccd..ab450ab 100644
+index c26fccd..9f58745 100644
 --- a/spikes/netcode-proof/crates/lab/src/logs.rs
 +++ b/spikes/netcode-proof/crates/lab/src/logs.rs
 @@ -136,7 +136,18 @@ struct RoomTrack {
@@ -816,7 +987,45 @@ index c26fccd..ab450ab 100644
  }
  
  /// The run's logs (the module text).
-@@ -561,10 +572,32 @@ impl Logs {
+@@ -172,6 +183,26 @@ pub(crate) struct Logs {
+     #[cfg(feature = "bites")]
+     bitten_at: Vec<Option<u64>>,
+     pub(crate) counts: Counts,
++    /// -22's never-acker's slot (the never-ack suite), and whether its kick is written.
++    pub(crate) starved: Option<u8>,
++    starved_kicked: bool,
++    /// -21's lag-switch client's slot (the lag-switch suite), and its soldier's last record ([x, y, z, health]).
++    pub(crate) lag: Option<u8>,
++    lag_prev: Option<[i32; 4]>,
++}
++
++/// npt-sim's soldiers' walking speed, cm/s: a copy of its private `Scene::move_speed` (sim/src/scene.rs:184, :244); the
++/// test clients never sprint (bots/src/lib.rs:292).
++const MOVE_CM_S: i64 = 600;
++
++/// The movement the sim's step gave a soldier between two ticks' records ([x, y, z, health], grid cm), µm (the advisor's
++/// A1): `None` when it was dead at either (health 0), so a respawn's placement is never counted as movement.
++pub(crate) fn moved_um(before: [i32; 4], after: [i32; 4]) -> Option<u64> {
++    if before[3] == 0 || after[3] == 0 {
++        return None;
++    }
++    let d2: i64 = (0..3).map(|i| i64::from(after[i] - before[i]).pow(2)).sum();
++    Some((d2.unsigned_abs() * 100_000_000).isqrt())
+ }
+ 
+ /// The run's running totals, for its summary line and the lab log's last records.
+@@ -236,6 +267,10 @@ impl Logs {
+             #[cfg(feature = "bites")]
+             bitten_at: vec![None; n],
+             counts: Counts::default(),
++            starved: None,
++            starved_kicked: false,
++            lag: None,
++            lag_prev: None,
+         })
+     }
+ 
+@@ -561,10 +596,32 @@ impl Logs {
          self.track.late.resize(n, 0);
          self.track.refused.resize(n, [0; 4]);
          let mut refused_events = Vec::new();
@@ -849,7 +1058,7 @@ index c26fccd..ab450ab 100644
              *h = c.server_hash();
              if h.is_some() {
                  self.logged.entry(w).or_insert_with(|| vec![false; n])[s] = true;
-@@ -607,6 +640,12 @@ impl Logs {
+@@ -607,6 +664,51 @@ impl Logs {
              effects.values().copied().max().unwrap_or(0),
          );
          v.insert("late_count".into(), late as i64);
@@ -859,10 +1068,63 @@ index c26fccd..ab450ab 100644
 +        rec.s.insert("cmd_on_time".into(), on_time);
 +        rec.s.insert("input_missing".into(), missing);
 +        rec.s.insert("cmd_ran_early_count".into(), ran_early);
++        // -22 (2.7's row): the never-acker's queue headroom on every room tick record (the cap while no slot of its is
++        // held), and `ack_starved` each time the room resolves it: `dropped` 0 at a forced resync, 1 at its kick.
++        let mut starved = None;
++        if let Some(s) = self.starved {
++            let c = room.client(s);
++            rec.v.insert(
++                "ack_starved_headroom_count".into(),
++                c.map_or(cap, |c| c.headroom()),
++            );
++            if let Some(c) = c {
++                if c.kicked() && !self.starved_kicked {
++                    self.starved_kicked = true;
++                    starved = Some((s, 1));
++                } else if c.overflow_resync() {
++                    starved = Some((s, 0));
++                }
++            }
++        }
++        // -21's lag switch (2.7's row; A1): the lag client's commands run this tick, its movement by the sim's step less
++        // `CMD_CATCHUP` ticks of top-speed walking (signed: 0 or less passes), and a tick with a death or a respawn
++        // counted apart (`lagswitch_move_apart` 1, its movement 0).
++        if let Some(s) = self.lag {
++            let me = records
++                .iter()
++                .find(|r| r.kind == EntityKind::Soldier && r.index == u16::from(s))
++                .map(|r| [r.grid[0], r.grid[1], r.grid[2], r.grid[6]]);
++            let moved = self.lag_prev.zip(me).and_then(|(a, b)| moved_um(a, b));
++            self.lag_prev = me;
++            let top = MOVE_CM_S * 10_000 / i64::from(npt_sim::TICK_HZ)
++                * npt_room::InputBuffer::CMD_CATCHUP as i64;
++            let run = room.client(s).map_or(0, |c| c.commands_run());
++            rec.v.insert("lagswitch_cmds_count".into(), i64::from(run));
++            rec.v.insert(
++                "lagswitch_excess_move_um".into(),
++                moved.map_or(0, |m| m as i64) - top,
++            );
++            rec.v
++                .insert("lagswitch_move_apart".into(), i64::from(moved.is_none()));
++        }
          let flags: Vec<i64> = (0..n)
              .map(|s| i64::from(sets.get(s).is_some_and(|x| x.everyone)))
              .collect();
-@@ -664,7 +703,7 @@ impl Logs {
+@@ -656,6 +758,13 @@ impl Logs {
+             }
+         }
+         self.room.tick(&rec).map_err(io)?;
++        if let Some((s, dropped)) = starved {
++            let mut e = EventRecord::new("ack_starved", ph)
++                .with("slot", s)
++                .with("dropped", dropped);
++            e.t = Some(w);
++            self.room.event(&e).map_err(io)?;
++        }
+         for (s, kind) in refused_events {
+             let mut e = EventRecord::new("snap_refused", ph)
+                 .with("slot", s)
+@@ -664,7 +773,7 @@ impl Logs {
              e.t = Some(w);
              self.room.event(&e).map_err(io)?;
          }
@@ -871,7 +1133,7 @@ index c26fccd..ab450ab 100644
      }
  
      /// The per-second counts: shots, gameplay events (hits and kills) and projectile spawns from the World's own event
-@@ -675,6 +714,8 @@ impl Logs {
+@@ -675,6 +784,8 @@ impl Logs {
          t: u32,
          ph: Phase,
          records: &[npt_sim::EntityRecord],
@@ -880,7 +1142,7 @@ index c26fccd..ab450ab 100644
      ) -> Result<u64, String> {
          let (events, shots, reliable) = dump_events(world, &mut self.track.events_at)?;
          let mut portal = 0i64;
-@@ -723,24 +764,43 @@ impl Logs {
+@@ -723,24 +834,43 @@ impl Logs {
              stand_in_spawns,
          ];
          match &mut self.track.second {
@@ -932,7 +1194,7 @@ index c26fccd..ab450ab 100644
          for (name, v) in [
              "shots_count",
              "portal_changes_count",
-@@ -766,8 +826,8 @@ impl Logs {
+@@ -766,8 +896,8 @@ impl Logs {
      /// decided lost (the module text), every complete tick written, then the footers. `ended` is `Clean`, or `Crash`
      /// when a hash came after its tick was written (never silently dropped).
      pub(crate) fn finish(mut self, ended: Ended, last: &[EventRecord]) -> Result<Counts, String> {
@@ -944,22 +1206,24 @@ index c26fccd..ab450ab 100644
          let logged: Vec<(u64, Vec<bool>)> =
              self.logged.iter().map(|(w, l)| (*w, l.clone())).collect();
 diff --git a/spikes/netcode-proof/crates/lab/src/scenario.rs b/spikes/netcode-proof/crates/lab/src/scenario.rs
-index 311e0a9..05b0e5b 100644
+index 311e0a9..5c37b62 100644
 --- a/spikes/netcode-proof/crates/lab/src/scenario.rs
 +++ b/spikes/netcode-proof/crates/lab/src/scenario.rs
-@@ -42,7 +42,11 @@ use npt_l1::{DatagramCounts, L1Net, Profile};
+@@ -42,8 +42,12 @@ use npt_l1::{DatagramCounts, L1Net, Profile};
  use npt_link::{Channel, Link, LinkState, Listener};
  use npt_log::{Ended, EventRecord, Phase};
  use npt_proto::{Direction, Join, Kick, Message, Quant};
 -use npt_room::Room;
-+use npt_room::{CmdTiming, Room};
+-use npt_server::{Decoder, RttSource, Schedule, due_ticks};
++use npt_room::{ClientCounters, CmdTiming, Room};
 +
 +/// U4f's controller setting for every endpoint of a controller run (u4f-brief.md 2.2): the lead bound's 12 ticks less
 +/// a margin, and at most 9 so option B's buffer holds every command; one setting under both options (f6).
 +const CONTROLLER_MAX_LEAD: u32 = 9;
- use npt_server::{Decoder, RttSource, Schedule, due_ticks};
++use npt_server::{Counters, Decoder, RttSource, Schedule, due_ticks};
  use npt_sim::replay::Recording;
  use npt_sim::{Placement, Scene, StandIns, World};
+ use serde_json::Value;
 @@ -228,7 +232,6 @@ impl Bites {
          let proto = npt_proto::BITES.contains(&id);
          let b = Bites {
@@ -977,7 +1241,241 @@ index 311e0a9..05b0e5b 100644
              whole_as_lost: LAB_BITES[0] == id,
              late_command: LAB_BITES[1] == id,
              link_lost_overstated: LAB_BITES[2] == id,
-@@ -683,10 +688,23 @@ pub(crate) struct Settings {
+@@ -345,6 +350,89 @@ impl Bites {
+     }
+ }
+ 
++/// One counted field: its event name and its reader.
++type Field<T> = (&'static str, fn(&T) -> u64);
++
++/// The room's per-client counters a session's counts write (2.5; SA-5): every refusal field of `ClientCounters` (the
++/// kinds, the repeats, the late and the window's, the acknowledgement's, the resync and the kick's) and its queue's.
++const ROOM_COUNTS: [Field<ClientCounters>; 20] = [
++    ("late_count", |k| k.late),
++    ("press_refused_count", |k| k.press_refused),
++    ("buffer_full_count", |k| k.buffer_full),
++    ("rewinds_refused_count", |k| k.rewinds_refused),
++    ("events_queued_count", |k| k.events_queued),
++    ("overflow_resyncs_count", |k| k.overflow_resyncs),
++    ("lead_refused_count", |k| k.lead_refused),
++    ("not_newer_count", |k| k.not_newer),
++    ("seq_refused_count", |k| k.seq_refused),
++    ("move_refused_count", |k| k.move_refused),
++    ("aim_refused_count", |k| k.aim_refused),
++    ("ack_refused_count", |k| k.ack_refused),
++    ("ack_refused_commands_count", |k| k.ack_refused_commands),
++    ("acks_old_count", |k| k.acks_old),
++    ("seq_outside_window_count", |k| k.seq_outside_window),
++    ("rejoin_overlap_count", |k| k.rejoin_overlap),
++    ("commands_repeat_count", |k| k.commands_repeat),
++    ("resyncs_dropped_count", |k| k.resyncs_dropped),
++    ("resyncs_limited_count", |k| k.resyncs_limited),
++    ("kicked_count", |k| k.kicked),
++];
++
++/// Every refusal field of npt-server's per-session `Counters` (2.5), each written `pump_<field>_count`.
++const PUMP_COUNTS: [Field<Counters>; 21] = [
++    ("pump_too_large_count", |d| d.too_large),
++    ("pump_truncated_count", |d| d.truncated),
++    ("pump_bad_length_count", |d| d.bad_length),
++    ("pump_unknown_type_count", |d| d.unknown_type),
++    ("pump_wrong_direction_count", |d| d.wrong_direction),
++    ("pump_wrong_channel_count", |d| d.wrong_channel),
++    ("pump_trailing_bytes_count", |d| d.trailing_bytes),
++    ("pump_unknown_field_count", |d| d.unknown_field),
++    ("pump_out_of_range_count", |d| d.out_of_range),
++    ("pump_malformed_count", |d| d.malformed),
++    ("pump_before_join_count", |d| d.before_join),
++    ("pump_input_limited_count", |d| d.input_limited),
++    ("pump_ping_limited_count", |d| d.ping_limited),
++    ("pump_pong_unknown_count", |d| d.pong_unknown),
++    ("pump_first_not_join_count", |d| d.first_not_join),
++    ("pump_joining_dropped_count", |d| d.joining_dropped),
++    ("pump_stream_malformed_count", |d| d.stream_malformed),
++    ("pump_join_deadline_count", |d| d.join_deadline),
++    ("pump_wrong_version_count", |d| d.wrong_version),
++    ("pump_wrong_content_hash_count", |d| d.wrong_content_hash),
++    ("pump_join_again_count", |d| d.join_again),
++];
++
++/// `e` with a session's counts: the room slot's (`ROOM_COUNTS`) and the pump's (`PUMP_COUNTS`), each when given.
++pub(crate) fn counts(
++    mut e: EventRecord,
++    room: Option<&ClientCounters>,
++    pump: Option<&Counters>,
++) -> EventRecord {
++    for (name, get) in ROOM_COUNTS {
++        if let Some(k) = room {
++            e = e.with(name, get(k));
++        }
++    }
++    for (name, get) in PUMP_COUNTS {
++        if let Some(d) = pump {
++            e = e.with(name, get(d));
++        }
++    }
++    e
++}
++
++/// One session's counts at its end (2.5; NA-15), read before the room frees its slot or its `Decoder` drops: how it
++/// ended (`replaced`, `left`, `closed`, `kicked`), its room slot's counters (none when another session holds the slot)
++/// and its pump's.
++#[derive(Clone, Debug)]
++pub(crate) struct SessionEnd {
++    pub(crate) slot: u8,
++    pub(crate) ended: &'static str,
++    pub(crate) room: Option<ClientCounters>,
++    pub(crate) pump: Counters,
++}
++
+ /// One server-side session: its link, its decoder and, once joined, its slot.
+ pub(crate) struct Session {
+     pub(crate) id: u64,
+@@ -370,6 +458,8 @@ pub(crate) struct Server {
+     pub(crate) admitted: Vec<(u8, u64, u32)>,
+     /// Each session ended since the last take: (slot, why).
+     pub(crate) ended: Vec<(u8, &'static str)>,
++    /// Each joined session's counts at its end since the last take (2.5), for the lab log's `session_end`.
++    pub(crate) session_ends: Vec<SessionEnd>,
+     /// The sessions the room's slots are held by (r8 reads which).
+     pub(crate) owner: BTreeMap<u8, u64>,
+     /// The pump's planted defect every session's decoder takes (`Bites::pump`; bites builds only).
+@@ -419,6 +509,7 @@ impl Server {
+             next_id: 0,
+             admitted: Vec::new(),
+             ended: Vec::new(),
++            session_ends: Vec::new(),
+             owner: BTreeMap::new(),
+             decoder_bite: None,
+         }
+@@ -455,7 +546,16 @@ impl Server {
+         id
+     }
+ 
+-    fn drop_slot(&mut self, slot: u8, keep: u64, why: &'static str, now: u64) {
++    /// Drops every other session on `slot` (a replacement), its counts kept first (2.5): `room` is the slot's counters
++    /// read before the replacing join reset them.
++    fn drop_slot(
++        &mut self,
++        slot: u8,
++        keep: u64,
++        why: &'static str,
++        now: u64,
++        room: Option<ClientCounters>,
++    ) {
+         for s in &mut self.sessions {
+             let Some(x) = s else { continue };
+             if x.slot == Some(slot) && x.id != keep {
+@@ -465,6 +565,12 @@ impl Server {
+                         x.link.send_reliable(Channel::Control, &out, now);
+                     }
+                 }
++                self.session_ends.push(SessionEnd {
++                    slot,
++                    ended: why,
++                    room: room.clone(),
++                    pump: x.decoder.counters().clone(),
++                });
+                 *s = None;
+                 self.ended.push((slot, why));
+             }
+@@ -489,6 +595,14 @@ impl Server {
+                     match (&m, x.slot) {
+                         (Message::Join(j), _) => {
+                             joined = true;
++                            // A replacing join resets its slot's counters: each held slot's, read first (2.5).
++                            let held: Vec<(u8, ClientCounters)> = self
++                                .owner
++                                .keys()
++                                .filter_map(|&s| {
++                                    self.room.client(s).map(|c| (s, c.counters().clone()))
++                                })
++                                .collect();
+                             match self.room.join(j) {
+                                 Ok((slot, r)) => {
+                                     x.decoder.accept();
+@@ -496,7 +610,9 @@ impl Server {
+                                     self.admitted.push((slot, x.id, tick));
+                                     self.owner.insert(slot, x.id);
+                                     if r {
+-                                        replaced = Some((slot, x.id));
++                                        let old =
++                                            held.into_iter().find(|h| h.0 == slot).map(|h| h.1);
++                                        replaced = Some((slot, x.id, old));
+                                     }
+                                 }
+                                 Err(r) => x.decoder.reject(x.link.as_mut(), r, now),
+@@ -511,6 +627,15 @@ impl Server {
+                             }
+                             x.routed += 1;
+                             left = matches!(m, Message::Leave(_));
++                            if left {
++                                // 2.5: its counts before its `Leave` frees the room's slot.
++                                self.session_ends.push(SessionEnd {
++                                    slot,
++                                    ended: "left",
++                                    room: self.room.client(slot).map(|c| c.counters().clone()),
++                                    pump: x.decoder.counters().clone(),
++                                });
++                            }
+                             self.room.receive(slot, &m);
+                             if left {
+                                 break;
+@@ -519,9 +644,9 @@ impl Server {
+                         _ => {}
+                     }
+                 }
+-                if let Some((slot, keep)) = replaced {
++                if let Some((slot, keep, old)) = replaced {
+                     // Carry 76: the old session is told and dropped before anything else is routed.
+-                    self.drop_slot(slot, keep, "replaced", now);
++                    self.drop_slot(slot, keep, "replaced", now, old);
+                 }
+                 if left {
+                     let slot = self.sessions[i].as_ref().and_then(|x| x.slot);
+@@ -543,6 +668,18 @@ impl Server {
+             // the session, and the room's slot is freed when this session holds it (`Room::leave`: "a closed link").
+             if x.decoder.is_closed() || x.link.state() == LinkState::Closed {
+                 let (id, slot) = (x.id, x.slot);
++                if let Some(slot) = slot {
++                    // 2.5: its counts before `Room::leave` frees the slot and the `Decoder` drops.
++                    let holds = self.owner.get(&slot) == Some(&id);
++                    self.session_ends.push(SessionEnd {
++                        slot,
++                        ended: "closed",
++                        room: holds
++                            .then(|| self.room.client(slot).map(|c| c.counters().clone()))
++                            .flatten(),
++                        pump: x.decoder.counters().clone(),
++                    });
++                }
+                 self.sessions[i] = None;
+                 if let Some(slot) = slot {
+                     if self.owner.get(&slot) == Some(&id) {
+@@ -590,10 +727,18 @@ impl Server {
+             x.link.send_reliable(stream_of(b, quant)?, b, now);
+         }
+         if kicked {
+-            self.sessions
+-                .iter_mut()
+-                .filter(|s| s.as_ref().is_some_and(|x| x.slot == Some(slot)))
+-                .for_each(|s| *s = None);
++            // 2.5: a kicked slot keeps its `ClientSlot`, so its counts are read at the kick, with its pump's.
++            let room = self.room.client(slot).map(|c| c.counters().clone());
++            for s in &mut self.sessions {
++                if let Some(x) = s.take_if(|x| x.slot == Some(slot)) {
++                    self.session_ends.push(SessionEnd {
++                        slot,
++                        ended: "kicked",
++                        room: room.clone(),
++                        pump: x.decoder.counters().clone(),
++                    });
++                }
++            }
+             self.owner.remove(&slot);
+             self.ended.push((slot, "kicked"));
+         }
+@@ -683,10 +828,29 @@ pub(crate) struct Settings {
      /// profile.
      pub(crate) burst_spacing_ns: u64,
      pub(crate) behaviour: String,
@@ -998,10 +1496,16 @@ index 311e0a9..05b0e5b 100644
 +    pub(crate) suite: String,
 +    /// -47's connects (`--connects`, the clock suite's), counted over every slot's sessions.
 +    pub(crate) connects: u64,
++    /// The clamp twin's source (`--twin-logs`, with `--twin` and role twin): the clamp run's folder, whose room log's
++    /// clamp reports give the twin's points (2.12).
++    pub(crate) twin_logs: Option<PathBuf>,
++    /// The lag switch's hold and spacing, ms (`--lag-hold-ms`, 200; `--lag-every-ms`, 6,000: 100 bursts in 600 s).
++    pub(crate) lag_hold_ms: u64,
++    pub(crate) lag_every_ms: u64,
      pub(crate) record: Option<PathBuf>,
      pub(crate) bytes: Option<PathBuf>,
      /// Whether the run writes its logs (`false`: a runner recording regenerated inside `npt-lab hash`).
-@@ -767,6 +785,23 @@ struct Client {
+@@ -767,6 +931,23 @@ struct Client {
      last_stamp: Option<u32>,
      duplicates: u64,
      bytes_log: Option<std::io::BufWriter<std::fs::File>>,
@@ -1025,7 +1529,7 @@ index 311e0a9..05b0e5b 100644
  }
  
  /// One burst of B1 for one client: (start, return), its heal, and what -18's record carries beside it.
-@@ -871,6 +906,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -871,6 +1052,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
          s.arm_tick,
          &s.bites,
      );
@@ -1037,7 +1541,14 @@ index 311e0a9..05b0e5b 100644
      let quant = s.bites.quant();
      let mut schedule = s.bites.schedule();
      let net = s.bites.net(s.seed);
-@@ -896,12 +936,11 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -891,17 +1077,28 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+         s.bites.whole_as_lost,
+     )
+     .map_err(fail)?;
++    logs.starved = (s.suite == "never-ack").then_some(0);
++    logs.lag = (s.suite == "lag-switch").then_some(0);
+     let mut rng = s.seed ^ 0x6c61_622d_6f66_6673;
+     let order = connect_order(n, &s.bites);
      let mut clients: Vec<Client> = Vec::new();
      for &slot in &order {
          let link = net.connect(s.profile.clone(), MAX_DATAGRAM, 0);
@@ -1050,12 +1561,22 @@ index 311e0a9..05b0e5b 100644
 +        let endpoint = endpoint_of(s, slot);
 +        let behaviour = if s.suite == "clock" {
 +            Behaviour::never_fires(&scene, slot, s.seed)
++        } else if s.suite == "clamp" && slot == 0 {
++            // -21's clamp cheat (2.6): slot 0's open-loop script aims beyond reach inside the map; its twin takes the
++            // clamp run's reported points (2.12).
++            let points = match &s.twin_logs {
++                Some(dir) => twin_points(dir, slot).map_err(fail)?,
++                None => BTreeMap::new(),
++            };
++            Behaviour::script(&scene, slot, s.seed, "clamp")
++                .expect("a script")
++                .with_points(points)
 +        } else if s.behaviour == "brawl" {
 +            Behaviour::brawl(&scene, slot, s.seed).with_press_every(s.brawl_press_every)
          } else {
              Behaviour::script(&scene, slot, s.seed, &s.behaviour)
                  .ok_or_else(|| Failure::Usage(format!("--behaviour {:?}", s.behaviour)))?
-@@ -911,6 +950,12 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -911,6 +1108,21 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
          } else {
              behaviour
          };
@@ -1065,10 +1586,19 @@ index 311e0a9..05b0e5b 100644
 +        } else {
 +            behaviour
 +        };
++        // -22's suite: slot 0 brawls and never acknowledges (2.6), every other client brawls.
++        let behaviour = if s.suite == "never-ack" && slot == 0 {
++            behaviour.never_acks()
++        } else if s.suite == "lag-switch" && slot == 0 {
++            // -21's lag switch (2.6): slot 0's `Input`s held, then sent in a burst.
++            behaviour.lag_switch(s.lag_hold_ms * 1_000_000, s.lag_every_ms * 1_000_000)
++        } else {
++            behaviour
++        };
          let bytes_log = match &s.bytes {
              None => None,
              Some(dir) => {
-@@ -933,8 +978,13 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -933,8 +1145,13 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              last_stamp: None,
              duplicates: 0,
              bytes_log,
@@ -1082,7 +1612,15 @@ index 311e0a9..05b0e5b 100644
      clients.sort_by_key(|c| c.slot);
      let digest = order_digest(&order);
      let mut mirror = Mirror::new(scene.slots(), scene.effect_rows(), scene.name() == "ES");
-@@ -1003,6 +1053,10 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -969,6 +1186,7 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+     let measured_end = s.warmup_ticks + s.measured_ticks;
+     let last_measured = logs.wide(s.tick_start.wrapping_add((measured_end.max(1) - 1) as u32));
+     let mut events_stamped: u64 = 0;
++    let mut clamp = ClampTally::default();
+     let mut inputs: Vec<i64> = Vec::new();
+     // The link-lost-overstated bite: the slots whose record it has written (bites builds only).
+     #[cfg(feature = "bites")]
+@@ -1003,10 +1221,16 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                  )));
              }
              logs.admit(slot, session, tick, phase(k)).map_err(fail)?;
@@ -1093,7 +1631,66 @@ index 311e0a9..05b0e5b 100644
          }
          for (slot, _) in woke.ended {
              logs.gone(slot);
-@@ -1112,7 +1166,7 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+         }
++        let ends = std::mem::take(&mut server.session_ends);
++        session_ends(&mut logs, ends, server.room.last_tick(), phase(k)).map_err(fail)?;
+         // (3) the server tick, if due.
+         for _ in 0..woke.to_run {
+             let ph = phase(k);
+@@ -1017,6 +1241,43 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+             }
+             let records = npt_sim::SimCore::entity_records(server.room.sim()).to_vec();
+             let index = Records::new(&records);
++            // -21's clamp (2.4's last row): every clamp report in the room log; the clamp suite's cheat's tally.
++            let rep = server.room.reports();
++            for r in &rep.clamps {
++                if s.logs {
++                    let um = |cm: i32| i64::from(cm) * 10_000;
++                    let mut e = EventRecord::new("clamp_report", ph)
++                        .with("slot", r.slot)
++                        .with("seq", r.seq)
++                        .with("x_um", um(r.point[0]))
++                        .with("y_um", um(r.point[1]))
++                        .with("z_um", um(r.point[2]));
++                    e.t = Some(logs.wide(t));
++                    logs.room_event(&e).map_err(fail)?;
++                }
++                if s.suite == "clamp" && r.slot == 0 && !clamp.reported.insert(r.seq) {
++                    clamp.reruns += 1;
++                }
++            }
++            if s.suite == "clamp" {
++                let reach = i64::from(scene.weapon().reach_cm);
++                let me = records
++                    .iter()
++                    .find(|r| r.kind == npt_sim::EntityKind::Soldier && r.index == 0);
++                for (c, _) in server.room.tick_input().commands.iter() {
++                    // Beyond reach of slot 0's fire origin (140 cm above its feet: npt-sim's private CHEST_CM).
++                    let d = me.map(|m| [0, 1, 2].map(|i| i64::from(c.aim[i] - m.grid[i])));
++                    if c.slot == 0
++                        && let Some([x, y, z]) = d
++                        && x * x + y * y + (z - 140) * (z - 140) > reach * reach
++                    {
++                        clamp.sent.insert(c.seq);
++                    }
++                }
++                clamp
++                    .refused
++                    .extend(rep.refusals.iter().filter(|x| x.slot == 0).map(|x| x.seq));
++            }
+             let mut sizes = vec![Vec::new(); usize::from(n)];
+             let mut sets = vec![SetStats::default(); usize::from(n)];
+             let mut link = vec![0u32; usize::from(n)];
+@@ -1102,6 +1363,8 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+             for (slot, _) in std::mem::take(&mut server.ended) {
+                 logs.gone(slot);
+             }
++            session_ends(&mut logs, std::mem::take(&mut server.session_ends), t, ph)
++                .map_err(fail)?;
+             if s.logs {
+                 events_stamped += logs
+                     .room_tick(&server.room, t, ph, &sets, &sizes, &inputs, &link)
+@@ -1112,7 +1375,7 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                  .world_hashes
                  .push((t, npt_sim::SimCore::state_hash(server.room.sim())));
              k += 1;
@@ -1102,7 +1699,7 @@ index 311e0a9..05b0e5b 100644
                  for c in &clients {
                      if !logs.started(c.slot) {
                          return Err(fail(format!(
-@@ -1137,12 +1191,43 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+@@ -1137,19 +1400,58 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
                  write_step(w, host, &received).map_err(fail)?;
              }
              c.endpoint.input(None, &received, host);
@@ -1147,7 +1744,23 @@ index 311e0a9..05b0e5b 100644
                  let stamp = c.endpoint.newest_tick().map(|t| t.wrapping_add(s.lead));
                  if stamp.is_some() && stamp == c.last_stamp {
                      c.duplicates += 1;
-@@ -1162,7 +1247,9 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+                 }
+                 c.last_stamp = stamp;
+             }
+-            let out = c.endpoint.step();
++            let mut out = c.endpoint.step();
++            c.behaviour.outgoing(host, &mut out.datagrams);
++            for held in c.behaviour.take_bursts() {
++                let mut e = EventRecord::new("lag_burst", phase(k))
++                    .with("slot", c.slot)
++                    .with("held_ns", held);
++                e.ns = Some(now);
++                logs.lab_event(&e).map_err(fail)?;
++            }
+             for d in &out.datagrams {
+                 if matches!(
+                     npt_proto::decode(Direction::ClientToRoom, Channel::Datagram, d),
+@@ -1162,7 +1464,9 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
              for (ch, b) in &out.reliable {
                  c.link.send_reliable(*ch, b, now);
              }
@@ -1158,22 +1771,24 @@ index 311e0a9..05b0e5b 100644
              for w in &out.wraps {
                  let t = c.endpoint.newest_tick().unwrap_or(s.tick_start);
                  logs.wrapped(w, t, phase(k)).map_err(fail)?;
-@@ -1267,10 +1354,51 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
-             .with("rewinds_refused_count", k.rewinds_refused)
+@@ -1256,21 +1560,50 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+         summary.buffer_full += k.buffer_full;
+         summary.rewinds_refused += k.rewinds_refused;
+         summary.stale += c.endpoint.stale();
+-        let mut e = EventRecord::new("client_counts", Phase::After)
++        let e = EventRecord::new("client_counts", Phase::After)
+             .with("slot", c.slot)
+             .with("commands_count", c.behaviour.given())
+             .with("steps_without_command_count", c.behaviour.skipped())
+             .with("duplicate_stamps_count", c.duplicates)
+-            .with("late_count", k.late)
+-            .with("press_refused_count", k.press_refused)
+-            .with("buffer_full_count", k.buffer_full)
+-            .with("rewinds_refused_count", k.rewinds_refused)
              .with("stale_count", c.endpoint.stale())
-             .with("events_queued_count", k.events_queued)
+-            .with("events_queued_count", k.events_queued)
 -            .with("overflow_resyncs_count", k.overflow_resyncs);
-+            .with("overflow_resyncs_count", k.overflow_resyncs)
-+            // U4f (2.5; SA-5): the room's refusal fields by kind, and the endpoint's controller counts, at the stop.
-+            .with("lead_refused_count", k.lead_refused)
-+            .with("not_newer_count", k.not_newer)
-+            .with("seq_refused_count", k.seq_refused)
-+            .with("move_refused_count", k.move_refused)
-+            .with("aim_refused_count", k.aim_refused)
-+            .with("ack_refused_count", k.ack_refused)
-+            .with("seq_outside_window_count", k.seq_outside_window)
-+            .with("rejoin_overlap_count", k.rejoin_overlap)
-+            .with("commands_repeat_count", k.commands_repeat)
++            // U4f: the endpoint's controller counts, at the stop.
 +            .with("stamps_skipped_count", c.endpoint.stamps_skipped())
 +            .with(
 +                "unencodable_commands_count",
@@ -1181,22 +1796,25 @@ index 311e0a9..05b0e5b 100644
 +            )
 +            .with("lead_now_count", c.endpoint.lead_now().unwrap_or(-1))
 +            .with("unknown_pongs_count", c.endpoint.unknown_pongs());
-+        if let Some(d) = server.session(c.slot).map(|x| x.decoder.counters().clone()) {
-+            // The session's pump counters (2.5): every refusal field, 0 expected on an honest client.
-+            e = e
-+                .with("pump_too_large_count", d.too_large)
-+                .with("pump_trailing_bytes_count", d.trailing_bytes)
-+                .with("pump_unknown_field_count", d.unknown_field)
-+                .with("pump_wrong_channel_count", d.wrong_channel)
-+                .with("pump_input_limited_count", d.input_limited)
-+                .with("pump_ping_limited_count", d.ping_limited)
-+                .with("pump_pong_unknown_count", d.pong_unknown)
-+                .with("pump_join_again_count", d.join_again)
-+                .with("pump_before_join_count", d.before_join);
-+        }
++        // 2.5 (SA-5): the room's refusal fields, and the live session's pump counters, at the stop.
++        let d = server.session(c.slot).map(|x| x.decoder.counters().clone());
++        let mut e = counts(e, Some(&k), d.as_ref());
          e.t = Some(logs.wide(server.room.last_tick()));
          last.push(e);
      }
++    // -21's clamp kind (2.7; the sim's one weapon kind, hitscan): the cheat's points beyond reach run, of them those
++    // with any sim refusal record (0 expected: it holds fire, no press edge), and option B's rerun reports (SA-10).
++    if s.suite == "clamp" && s.meta.role != "twin" {
++        last.push(
++            EventRecord::new("clamp_kind", Phase::After)
++                .with("sent_count", clamp.sent.len())
++                .with(
++                    "counted_count",
++                    clamp.sent.intersection(&clamp.refused).count(),
++                )
++                .with("rerun_reports_count", clamp.reruns),
++        );
++    }
 +    // D3-1 (f40): the run's measured reorder share from npt-l1's fate log, as the -3 probe computes it (main.rs's
 +    // `permille`): each direction's reordered x 1000 / delivered, floored; `permille` the lower of the two.
 +    let [up, down] = net.with_fate_log(|l| l.reorder_counts());
@@ -1211,7 +1829,63 @@ index 311e0a9..05b0e5b 100644
      summary.audit = mirror.audit.clone();
      last.push(
          EventRecord::new("fate_log", Phase::After).with("sha256", summary.fate_log_sha256.clone()),
-@@ -1367,8 +1495,23 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
+@@ -1332,6 +1665,55 @@ pub(crate) fn run(s: &Settings) -> Result<Summary, Failure> {
+     Ok(summary)
+ }
+ 
++/// The clamp twin's points (2.12): each clamp report of `slot`'s in the clamp run's room log in `dir`, by its
++/// sequence, in grid cm (the report's µm / 10,000; a rerun's first).
++fn twin_points(dir: &std::path::Path, slot: u8) -> Result<BTreeMap<u16, [i32; 3]>, String> {
++    let path = dir.join("room.jsonl");
++    let file = std::fs::File::open(&path).map_err(|e| format!("{}: {e}", path.display()))?;
++    let log = npt_log::read_log(std::io::BufReader::new(file))
++        .map_err(|e| format!("{}: {e}", path.display()))?;
++    let mut out = BTreeMap::new();
++    for e in log.events.iter().filter(|e| e.ev == "clamp_report") {
++        let get = |k: &str| e.f.get(k).and_then(Value::as_i64);
++        if let (Some(s), Some(seq), Some(x), Some(y), Some(z)) = (
++            get("slot"),
++            get("seq"),
++            get("x_um"),
++            get("y_um"),
++            get("z_um"),
++        ) && s == i64::from(slot)
++        {
++            let cm = |um: i64| (um / 10_000) as i32;
++            out.entry(seq as u16).or_insert([cm(x), cm(y), cm(z)]);
++        }
++    }
++    Ok(out)
++}
++
++/// The clamp suite's tally of its cheat's commands (slot 0; 2.4's last row, line 12 of the advisor's ruling): the
++/// sequences run with a point beyond reach, those with any sim refusal record (whatever its kind), those the sim
++/// reported clamped, and the reports of a sequence already reported (option B's reruns: SA-10).
++#[derive(Default)]
++struct ClampTally {
++    sent: std::collections::BTreeSet<u16>,
++    refused: std::collections::BTreeSet<u16>,
++    reported: std::collections::BTreeSet<u16>,
++    reruns: u64,
++}
++
++/// The lab log's `session_end` records (2.5; SA-5): each ended session's counts, at the room's tick `t`.
++fn session_ends(logs: &mut Logs, ends: Vec<SessionEnd>, t: u32, ph: Phase) -> Result<(), String> {
++    for x in ends {
++        let e = EventRecord::new("session_end", ph)
++            .with("slot", x.slot)
++            .with("ended", x.ended);
++        let mut e = counts(e, x.room.as_ref(), Some(&x.pump));
++        e.t = Some(logs.wide(t));
++        logs.lab_event(&e)?;
++    }
++    Ok(())
++}
++
+ /// Which burst of the profile starts at `start` (its index, 0 to 9).
+ fn bursts_index(p: &Profile, start: u64) -> usize {
+     p.bursts_ns.iter().position(|b| b.0 == start).unwrap_or(0)
+@@ -1367,8 +1749,23 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
      let mut p: BTreeMap<String, Value> = BTreeMap::new();
      let w = s.scene.weapon();
      p.insert("suite".into(), suite.into());
@@ -1237,13 +1911,17 @@ index 311e0a9..05b0e5b 100644
      p.insert("tick_start".into(), s.tick_start.into());
      p.insert(
          "ticks_below_wrap".into(),
-@@ -1388,7 +1531,16 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
+@@ -1388,7 +1785,20 @@ pub(crate) fn params(s: &Settings, suite: &str, twin: Option<&str>) -> BTreeMap<
      p.insert("soldier_health_count".into(), s.scene.health().into());
      p.insert("warmup_ticks_count".into(), s.warmup_ticks.into());
      p.insert("measured_ticks_count".into(), s.measured_ticks.into());
 -    p.insert("behaviour".into(), s.behaviour.clone().into());
 +    // The clock suite's clients run npt-bots' never-firing script, which `behaviour`'s row does not list (F4's rule):
 +    // the suite and its connect count name it.
++    if s.suite == "lag-switch" {
++        p.insert("lag_hold_ns".into(), (s.lag_hold_ms * 1_000_000).into());
++        p.insert("lag_every_ns".into(), (s.lag_every_ms * 1_000_000).into());
++    }
 +    if s.suite == "clock" {
 +        p.insert("connects_count".into(), s.connects.into());
 +    } else {
@@ -1255,17 +1933,18 @@ index 311e0a9..05b0e5b 100644
      p.insert(
          "features".into(),
          Value::Array(if cfg!(feature = "bites") {
-@@ -1422,7 +1574,8 @@ pub(crate) const USAGE: &str = "npt-lab scenario --run <id> --set <set> --date <
+@@ -1422,7 +1832,9 @@ pub(crate) const USAGE: &str = "npt-lab scenario --run <id> --set <set> --date <
  [--twin <run>] [--suite <name>] [--clients <n>] [--tick-start <n>] [--event-start <n>] [--cmd-start <n>] \
  [--warmup-s <s>] [--measured-s <s>] [--after-max-s <s>] [--behaviour brawl|presses|clamp|steady] [--bursts <n>] \
  [--burst-first-s <s>] [--burst-every-s <s>] [--bite <id> [--arm-tick <n>]] [--record <file>] [--bytes <folder>] \
 -[--every-step 1] [--lead <1..8>] [--logs 0 (with --record)]";
 +[--every-step 1] [--lead <1..8>] [--logs 0 (with --record)] [--cmd-timing A|B] [--controller 0|1] \
-+[--brawl-press-every <n> (the brawl)] [--event-cap <n>] [--connects <n> (with --suite clock)]";
++[--brawl-press-every <n> (the brawl)] [--event-cap <n>] [--connects <n> (with --suite clock)] \
++[--twin-logs <folder> (the clamp twin)]";
  
  /// B1's burst starts (u4r-brief.md 7.1, -18's row): `count` bursts, the first `first_s` after the measured phase's
  /// first tick and one every `every_s`, each starting a seeded offset in [0, 1 tick) after its tick boundary.
-@@ -1529,6 +1682,10 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -1529,6 +1941,10 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
              "--behaviour {behaviour:?}: brawl, presses, clamp or steady"
          ));
      }
@@ -1276,7 +1955,7 @@ index 311e0a9..05b0e5b 100644
      let bursts = num(take("bursts"), "bursts", 10)?;
      let burst_first_s = num(take("burst-first-s"), "burst-first-s", 30)?;
      let burst_every_s = num(take("burst-every-s"), "burst-every-s", 60)?;
-@@ -1549,6 +1706,28 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -1549,6 +1965,40 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
          Some("0") => false,
          Some(v) => return Err(format!("--logs {v:?}: 0 or 1")),
      };
@@ -1290,6 +1969,18 @@ index 311e0a9..05b0e5b 100644
 +        Some("1") => true,
 +        Some(v) => return Err(format!("--controller {v:?}: 0 or 1")),
 +    };
++    let twin_logs = take("twin-logs").map(PathBuf::from);
++    if twin_logs.is_some() && (twin.is_none() || role.as_str() != "twin" || suite != "clamp") {
++        return Err(
++            "--twin-logs is the clamp twin's: with --suite clamp, --twin and --role twin"
++                .to_owned(),
++        );
++    }
++    let lag_hold_ms = num(take("lag-hold-ms"), "lag-hold-ms", 200)?;
++    let lag_every_ms = num(take("lag-every-ms"), "lag-every-ms", 6_000)?;
++    if lag_hold_ms >= lag_every_ms || lag_hold_ms.max(lag_every_ms) > 3_600_000 {
++        return Err("--lag-hold-ms below --lag-every-ms, each at most an hour".to_owned());
++    }
 +    let connects = num(take("connects"), "connects", 0)?;
 +    if (suite == "clock") != (connects > 0) {
 +        return Err("--suite clock and --connects <n> (from 1) go together".to_owned());
@@ -1305,7 +1996,7 @@ index 311e0a9..05b0e5b 100644
      let lead_override = take("lead")
          .map(|v| {
              v.parse::<u32>()
-@@ -1669,10 +1848,17 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
+@@ -1669,10 +2119,20 @@ pub(crate) fn parse(argv: &[String]) -> Result<Settings, String> {
          after_max_ticks,
          burst_spacing_ns,
          behaviour,
@@ -1320,10 +2011,13 @@ index 311e0a9..05b0e5b 100644
 +        event_cap,
 +        suite: suite.clone(),
 +        connects,
++        twin_logs,
++        lag_hold_ms,
++        lag_every_ms,
          record,
          bytes,
          logs,
-@@ -1722,7 +1908,12 @@ pub(crate) fn summary_line(s: &Settings, o: &Summary) -> String {
+@@ -1722,7 +2182,12 @@ pub(crate) fn summary_line(s: &Settings, o: &Summary) -> String {
          } else {
              ""
          },
@@ -1337,7 +2031,7 @@ index 311e0a9..05b0e5b 100644
          o.commands,
          o.skipped,
          o.duplicates,
-@@ -2987,4 +3178,156 @@ pub(crate) mod tests {
+@@ -2987,4 +3452,504 @@ pub(crate) mod tests {
              "L from the counts, never the written record"
          );
      }
@@ -1460,6 +2154,354 @@ index 311e0a9..05b0e5b 100644
 +        f28_20("B");
 +    }
 +
++    /// The clock suite's short run at f29's scale (2.10: 16 slots, 32 connects, two rounds) on P2, made once per test
++    /// process and read by f29 and f28's -47 half.
++    fn clock_short() -> &'static [npt_log::Log] {
++        static RUN: std::sync::OnceLock<Vec<npt_log::Log>> = std::sync::OnceLock::new();
++        RUN.get_or_init(|| {
++            let dir = scratch("u4f-clock-short");
++            let s = settings(
++                &dir,
++                "--seed 1 --profile P2 --clients 16 --warmup-s 1 --measured-s 8 --after-max-s 10 --suite clock \
++                 --connects 32",
++            );
++            let o = run(&s).unwrap_or_else(|e| panic!("clock: {e:?}"));
++            println!("u4f clock short: {}", summary_line(&s, &o));
++            crate::contract::read(&dir).expect("its logs")
++        })
++    }
++
++    /// f29 (-47; U4F-Q4 (b), NA-16): the clock suite at 16 slots and 32 connects writes one `connect_clock` event per
++    /// connect (each connect number once, its error read at 2 s), every connect admitted (32 `admit` events, the run
++    /// ends clean, so no admission met carry 75's bound), no event stamped (no shot, hit or kill in any second) and no
++    /// client hash filed.
++    #[test]
++    fn f29_the_clock_suite_reads_each_connect_once_and_stamps_no_event() {
++        let logs = clock_short();
++        let read: Vec<&npt_log::EventRecord> = logs[2]
++            .events
++            .iter()
++            .filter(|e| e.ev == "connect_clock")
++            .collect();
++        let seqs: std::collections::BTreeSet<u64> = read
++            .iter()
++            .filter_map(|e| e.f.get("seq").and_then(|v| v.as_u64()))
++            .collect();
++        let mut errs: Vec<u64> = read
++            .iter()
++            .filter_map(|e| e.f.get("offset_err_ns").and_then(|v| v.as_u64()))
++            .collect();
++        errs.sort_unstable();
++        println!("u4f f29: {} reads, errors (ns) {errs:?}", read.len());
++        assert_eq!((read.len(), seqs, errs.len()), (32, (0..32).collect(), 32));
++        let admits = logs[0].events.iter().filter(|e| e.ev == "admit").count();
++        assert_eq!(admits, 32);
++        assert!(logs[0].seconds.iter().all(|s| {
++            s.v.get("shots_count") == Some(&0) && s.v.get("reliable_events_count") == Some(&0)
++        }));
++        assert!(logs[1].ticks.is_empty(), "no client hash filed");
++    }
++
++    /// f28's -47 half: every name the clock suite's run writes has its SERIES.md row (the contract checker's (b); its
++    /// one-admit rule does not hold for a suite that reconnects), the header holds `connects_count` and no `behaviour`.
++    #[test]
++    fn f28_the_clock_suite_writes_each_name_with_its_row() {
++        let logs = clock_short();
++        let c = crate::contract::check(logs, include_str!("../../../marks/SERIES.md"));
++        let names: Vec<&String> = c.failures.iter().filter(|f| f.starts_with("(b)")).collect();
++        assert!(names.is_empty(), "{names:?}");
++        let p = &logs[0].header.params;
++        assert_eq!(p.get("connects_count").and_then(|v| v.as_u64()), Some(32));
++        assert!(!p.contains_key("behaviour"));
++    }
++
++    /// The never-ack suite's short run (2.10's scale: 16 clients, P0, 2 s + 8 s), its event cap 256 so the never-acker
++    /// (slot 0) meets it within seconds; made once per test process and read by f21, f14 (iii) and f28's -22 half.
++    fn never_ack_short() -> &'static [npt_log::Log] {
++        static RUN: std::sync::OnceLock<Vec<npt_log::Log>> = std::sync::OnceLock::new();
++        RUN.get_or_init(|| {
++            let dir = scratch("u4f-never-ack-short");
++            let s = settings(
++                &dir,
++                "--seed 1 --profile P0 --clients 16 --warmup-s 2 --measured-s 8 --after-max-s 10 \
++                 --suite never-ack --event-cap 256",
++            );
++            let o = run(&s).unwrap_or_else(|e| panic!("never-ack: {e:?}"));
++            println!("u4f never-ack short: {}", summary_line(&s, &o));
++            crate::contract::read(&dir).expect("its logs")
++        })
++    }
++
++    /// f21 (-22; TE-17): the never-acker's headroom, on every room tick record, reaches 0 and never goes below; the room
++    /// resolves it twice, one forced resync (`ack_starved` dropped 0) and then `Kick(overflow)` (dropped 1) within
++    /// `FULL_STATE_ACK_TICKS` of it (its later datagrams reaching no room call is r9's, kept).
++    #[test]
++    fn f21_the_never_acker_reaches_the_cap_resyncs_once_then_is_kicked() {
++        let room = &never_ack_short()[0];
++        let h: Vec<i64> = room
++            .ticks
++            .iter()
++            .map(|t| {
++                t.v.get("ack_starved_headroom_count")
++                    .copied()
++                    .expect("gap: headroom")
++            })
++            .collect();
++        assert_eq!(h.iter().min(), Some(&0), "{h:?}");
++        let starved: Vec<(u64, Option<u64>)> = room
++            .events
++            .iter()
++            .filter(|e| e.ev == "ack_starved")
++            .map(|e| {
++                (
++                    e.t.unwrap_or(0),
++                    e.f.get("dropped").and_then(|v| v.as_u64()),
++                )
++            })
++            .collect();
++        println!("u4f f21: ack_starved {starved:?}");
++        assert_eq!(starved.len(), 2, "{starved:?}");
++        assert_eq!((starved[0].1, starved[1].1), (Some(0), Some(1)));
++        assert!(starved[1].0 - starved[0].0 <= u64::from(npt_sim::FULL_STATE_ACK_TICKS));
++    }
++
++    /// f14 (SA-5), the room's struct: `counts` writes every refusal field of `ClientCounters` under its own name and with
++    /// its own value (each field set apart, 1 to 20, in `ROOM_COUNTS`' order).
++    #[test]
++    fn f14_every_refusal_field_of_client_counters_is_written() {
++        let k = ClientCounters {
++            late: 1,
++            press_refused: 2,
++            buffer_full: 3,
++            rewinds_refused: 4,
++            events_queued: 5,
++            overflow_resyncs: 6,
++            lead_refused: 7,
++            not_newer: 8,
++            seq_refused: 9,
++            move_refused: 10,
++            aim_refused: 11,
++            ack_refused: 12,
++            ack_refused_commands: 13,
++            acks_old: 14,
++            seq_outside_window: 15,
++            rejoin_overlap: 16,
++            commands_repeat: 17,
++            resyncs_dropped: 18,
++            resyncs_limited: 19,
++            kicked: 20,
++            ..ClientCounters::default()
++        };
++        let e = counts(EventRecord::new("t", Phase::After), Some(&k), None);
++        let got: Vec<u64> = ROOM_COUNTS
++            .iter()
++            .filter_map(|(n, _)| e.f.get(*n).and_then(|v| v.as_u64()))
++            .collect();
++        assert_eq!((got, e.f.len()), ((1..=20).collect(), 20));
++    }
++
++    /// f14 (SA-5), the pump's struct: `counts` writes every refusal field of npt-server's `Counters` (all but the pings
++    /// and pongs sent), each `pump_<field>_count` with its own value (1 to 21, in `PUMP_COUNTS`' order).
++    #[test]
++    fn f14_every_refusal_field_of_the_pumps_counters_is_written() {
++        let d = Counters {
++            too_large: 1,
++            truncated: 2,
++            bad_length: 3,
++            unknown_type: 4,
++            wrong_direction: 5,
++            wrong_channel: 6,
++            trailing_bytes: 7,
++            unknown_field: 8,
++            out_of_range: 9,
++            malformed: 10,
++            before_join: 11,
++            input_limited: 12,
++            ping_limited: 13,
++            pong_unknown: 14,
++            first_not_join: 15,
++            joining_dropped: 16,
++            stream_malformed: 17,
++            join_deadline: 18,
++            wrong_version: 19,
++            wrong_content_hash: 20,
++            join_again: 21,
++            ..Counters::default()
++        };
++        let e = counts(EventRecord::new("t", Phase::After), None, Some(&d));
++        let got: Vec<u64> = PUMP_COUNTS
++            .iter()
++            .filter_map(|(n, _)| e.f.get(*n).and_then(|v| v.as_u64()))
++            .collect();
++        assert_eq!((got, e.f.len()), ((1..=21).collect(), 21));
++    }
++
++    /// f14 (iii) (SA-5) and f28's -22 half: the kicked never-acker's counts are written once, at its kick (a
++    /// `session_end` of slot 0, `kicked`, its room counts with the kick and the forced resync); every name the run
++    /// writes has its SERIES.md row (the contract checker's (b)).
++    #[test]
++    fn f14_a_kicked_sessions_counts_are_written_at_its_kick() {
++        let logs = never_ack_short();
++        let ends: Vec<&npt_log::EventRecord> = logs[2]
++            .events
++            .iter()
++            .filter(|e| e.ev == "session_end")
++            .collect();
++        assert_eq!(ends.len(), 1, "{ends:?}");
++        let f = |k: &str| ends[0].f.get(k).cloned();
++        assert_eq!(f("slot"), Some(0.into()));
++        assert_eq!(f("ended"), Some("kicked".into()));
++        assert_eq!(
++            (f("kicked_count"), f("overflow_resyncs_count")),
++            (Some(1.into()), Some(1.into()))
++        );
++        let c = crate::contract::check(logs, include_str!("../../../marks/SERIES.md"));
++        let names: Vec<&String> = c.failures.iter().filter(|f| f.starts_with("(b)")).collect();
++        assert!(names.is_empty(), "{names:?}");
++    }
++
++    /// f35 (NA-15): a session that sends `Leave`, one whose link closes and one replaced: each one's counts are kept
++    /// once, at its end, with the room slot's counters as they were before the room freed the slot (its commands
++    /// buffered) and its pump's (its datagrams' `Input`s decoded), never after.
++    #[test]
++    fn f35_each_ended_sessions_counts_are_kept_once_before_its_slot_is_freed() {
++        let mut server = lab_room(4);
++        let mut now = 1_000;
++        let mut live = Vec::new();
++        for (slot, how) in [(0u8, "left"), (1, "closed"), (2, "replaced")] {
++            let (mut c, mut e, _) = joined(&mut server, slot, &mut now);
++            now += 33_000_000;
++            send_input(&mut c, &mut e, now);
++            server.io(now + 1);
++            let before = server.room.client(slot).map(|x| x.counters().clone());
++            assert!(
++                before.as_ref().is_some_and(|k| k.commands_buffered == 1),
++                "{how}"
++            );
++            now += 2;
++            match how {
++                "left" => {
++                    send_leave(&mut c, now);
++                    server.io(now + 1);
++                }
++                "closed" => {
++                    drop(c);
++                    server.io(now + 1);
++                }
++                _ => {
++                    live.push(join_only(&mut server, slot, &mut now));
++                    live.push((c, e, 0));
++                }
++            }
++            let ends: Vec<&SessionEnd> = server
++                .session_ends
++                .iter()
++                .filter(|x| x.slot == slot)
++                .collect();
++            assert_eq!(ends.len(), 1, "{how}");
++            assert_eq!((ends[0].ended, &ends[0].room), (how, &before), "{how}");
++            assert_eq!(ends[0].pump.too_large + ends[0].pump.malformed, 0, "{how}");
++            now += 1;
++        }
++        assert!(server.room.client(0).is_none() && server.room.client(1).is_none());
++        assert!(
++            server.room.client(2).is_some(),
++            "the replacing session holds slot 2"
++        );
++    }
++
++    /// f18 (ii), line 12 of the advisor's ruling and f28's clamp half: a short clamp run (16 clients, P0, 2 s + 4 s,
++    /// option A, slot 0 the cheat and the rest the steady script) counts its cheat's points beyond reach (`sent_count`
++    /// above 0) with no sim refusal on them (`counted_count` 0: it holds fire, no press edge) and no rerun report; every
++    /// name it writes has its row; its twin, sending the run's clamp reports' points (`--twin-logs`), hashes the same
++    /// ticks to the same state hashes.
++    #[test]
++    fn f18_a_clamp_run_and_its_twin_give_equal_hashes_and_count_no_refusal() {
++        let args = "--seed 1 --profile P0 --clients 16 --warmup-s 2 --measured-s 4 --after-max-s 10 \
++                    --controller 1 --cmd-timing A --suite clamp --behaviour steady";
++        let dir = scratch("u4f-clamp");
++        run(&settings(&dir, args)).expect("the clamp run");
++        let twin = scratch("u4f-clamp-twin");
++        let t = format!("{args} --role twin --twin t --twin-logs {}", dir.display());
++        run(&settings(&twin, &t)).expect("its twin");
++        let hashes = |d: &Path| -> Vec<(u64, Option<String>)> {
++            read(d, "room")
++                .ticks
++                .iter()
++                .map(|r| (r.t, r.h.clone()))
++                .collect()
++        };
++        assert_eq!(hashes(&dir), hashes(&twin), "the twin's state hashes");
++        let lab = read(&dir, "lab");
++        let k = lab
++            .events
++            .iter()
++            .find(|e| e.ev == "clamp_kind")
++            .expect("clamp_kind");
++        let f = |n: &str| k.f.get(n).and_then(|v| v.as_u64());
++        let reports = read(&dir, "room")
++            .events
++            .iter()
++            .filter(|e| {
++                e.ev == "clamp_report" && e.f.get("slot").and_then(|v| v.as_u64()) == Some(0)
++            })
++            .count();
++        println!("u4f f18: {:?}; slot 0's clamp reports {reports}", k.f);
++        assert!(f("sent_count") > Some(0) && reports > 0);
++        assert_eq!(
++            (f("counted_count"), f("rerun_reports_count")),
++            (Some(0), Some(0))
++        );
++        let logs = crate::contract::read(&dir).expect("its logs");
++        let c = crate::contract::check(&logs, include_str!("../../../marks/SERIES.md"));
++        let names: Vec<&String> = c.failures.iter().filter(|f| f.starts_with("(b)")).collect();
++        assert!(names.is_empty(), "{names:?}");
++    }
++
++    /// f20 (2.6; U4F-Q15 (c); A1) and f28's lag-switch half: a short lag-switch run at P1 (16 clients, 2 s + 6 s, option
++    /// A, a hold every 2 s) writes its bursts (each hold at least the 200 ms), runs at most `CMD_CATCHUP` commands a
++    /// tick for the lag client, whose movement stays within the catch-up cap's (excess at most 0), and every name it
++    /// writes has its row; a respawn's placement is no movement (`moved_um` on hand-made records: alive to alive 20 cm is
++    /// 200,000 µm, a death or a respawn none, so the tick is counted apart).
++    #[test]
++    fn f20_the_lag_switch_runs_at_most_the_cap_a_tick_and_moves_within_it() {
++        let alive = |x: i32, health: i32| [x, 0, 0, health];
++        assert_eq!(
++            crate::logs::moved_um(alive(0, 100), alive(20, 100)),
++            Some(200_000)
++        );
++        assert_eq!(crate::logs::moved_um(alive(0, 0), alive(5_000, 100)), None);
++        assert_eq!(crate::logs::moved_um(alive(0, 100), alive(10, 0)), None);
++        let dir = scratch("u4f-lag-switch");
++        let s = settings(
++            &dir,
++            "--seed 1 --profile P1 --clients 16 --warmup-s 2 --measured-s 6 --after-max-s 10 --controller 1 \
++             --cmd-timing A --suite lag-switch --behaviour steady --lag-every-ms 2000",
++        );
++        run(&s).expect("the run");
++        let held: Vec<u64> = read(&dir, "lab")
++            .events
++            .iter()
++            .filter(|e| e.ev == "lag_burst")
++            .filter_map(|e| e.f.get("held_ns").and_then(|v| v.as_u64()))
++            .collect();
++        let room = read(&dir, "room");
++        let most = |k: &str| room.ticks.iter().filter_map(|t| t.v.get(k).copied()).max();
++        println!(
++            "u4f f20: bursts held {held:?}; commands a tick at most {:?}; excess at most {:?}",
++            most("lagswitch_cmds_count"),
++            most("lagswitch_excess_move_um")
++        );
++        assert!(held.len() >= 3 && held.iter().all(|h| *h >= 200_000_000));
++        let cap = npt_room::InputBuffer::CMD_CATCHUP as i64;
++        assert!(most("lagswitch_cmds_count").is_some_and(|m| (1..=cap).contains(&m)));
++        assert!(most("lagswitch_excess_move_um").is_some_and(|m| m <= 0));
++        let logs = crate::contract::read(&dir).expect("its logs");
++        let c = crate::contract::check(&logs, include_str!("../../../marks/SERIES.md"));
++        let names: Vec<&String> = c.failures.iter().filter(|f| f.starts_with("(b)")).collect();
++        assert!(names.is_empty(), "{names:?}");
++    }
++
 +    /// F2: npt-sim's two -21 check bites (`World::CHECK_BITES`, a list apart from `World::BITES`) are accepted by
 +    /// `--bite` and routed to the world alone (bites builds only).
 +    #[cfg(feature = "bites")]
@@ -1537,6 +2579,38 @@ index fec3b41..5feb217 100644
              }),
              7 => Message::Join(Join {
                  token: self.bytes(),
+diff --git a/spikes/netcode-proof/crates/room/src/events.rs b/spikes/netcode-proof/crates/room/src/events.rs
+index 4812649..2398e73 100644
+--- a/spikes/netcode-proof/crates/room/src/events.rs
++++ b/spikes/netcode-proof/crates/room/src/events.rs
+@@ -20,8 +20,9 @@ pub(crate) struct Queued {
+ pub(crate) const MAX_EVENT_AGE: u32 = u8::MAX as u32;
+ 
+ /// One client's queue of unacknowledged gameplay events (u4-build-plan.md §4.7). Its cap is data: the room's setting,
+-/// provisional until U4f measures the rate (U4E-Q6 (a): 1,024 from net F121's example). An overflow is the room's
+-/// signal to force one resync; under PM-0001-22/unbounded (bites builds only) the queue keeps every event past its cap.
++/// `EventQueue::CAP` by U4f's measurement (it was a provisional 1,024 from net F121's example: U4E-Q6 (a)). An
++/// overflow is the room's signal to force one resync; under PM-0001-22/unbounded (bites builds only) the queue keeps
++/// every event past its cap.
+ #[derive(Clone, Debug)]
+ pub struct EventQueue {
+     cap: u32,
+@@ -35,9 +36,12 @@ pub struct EventQueue {
+ pub(crate) struct Overflow;
+ 
+ impl EventQueue {
+-    /// The provisional cap (U4E-Q6 (a): net F121's example, above the about 400 a B1 burst adds); U4f records §4.7's
+-    /// value before -22's runs.
+-    pub(crate) const PROVISIONAL_CAP: u32 = 1_024;
++    /// The cap, measured (u4f-brief.md 2.8; U4F-Q12 (b); carry 57): the largest per-client high-water mark of nine short
++    /// runs (SS, 48 clients, the brawl with U4f's controller, P2, P3 and B1 with 2 bursts, seeds 1 to 3, the cap opened
++    /// to 8,192), 1,045 at P3 seed 3, times a margin of 1.5, rounded up to 64: 1,600; below carry 50's bound, the
++    /// lowest client's mean queued rate (509.2 a second) x 255 / 30 = 4,328, so a never-acker meets it before its
++    /// events expire (ops/runs/c-u4f-cap.mjs; a design constant -22 reads, no bar: 5.6 B4).
++    pub(crate) const CAP: u32 = 1_600;
+ 
+     pub(crate) fn new(cap: u32, unbounded: bool) -> EventQueue {
+         EventQueue {
 diff --git a/spikes/netcode-proof/crates/room/src/input.rs b/spikes/netcode-proof/crates/room/src/input.rs
 index e16f4d2..01728f6 100644
 --- a/spikes/netcode-proof/crates/room/src/input.rs
@@ -2264,7 +3338,7 @@ index f66dce9..954d8d1 100644
 +    "PM-0001-21/not-older-than",
  ];
 diff --git a/spikes/netcode-proof/crates/room/src/room.rs b/spikes/netcode-proof/crates/room/src/room.rs
-index 83118b2..76dd45a 100644
+index 83118b2..e38ebdd 100644
 --- a/spikes/netcode-proof/crates/room/src/room.rs
 +++ b/spikes/netcode-proof/crates/room/src/room.rs
 @@ -18,7 +18,7 @@ use crate::encoder::{
@@ -2476,6 +3550,17 @@ index 83118b2..76dd45a 100644
      /// A room over `sim` running `scene`, its static graph read from `greybox` (`areas()` and `portals()`: the
      /// tests pass `World::greybox()`), a roster of `tokens` admitting at most `n` sessions, at `tick_hz` ticks a second
      /// (production callers pass `npt_sim::TICK_HZ`: the window's rate is an argument, the F2 ruling). Its first tick
+@@ -457,8 +560,8 @@ impl<S: SimCore> Room<S> {
+             tick_hz,
+             next_tick,
+             next_event: 0,
+-            event_cap: EventQueue::PROVISIONAL_CAP,
+-            event_cap_provisional: true,
++            event_cap: EventQueue::CAP,
++            event_cap_provisional: false,
+             cover: CoverVariant::Rewound,
+             grid: InterestGrid::new(extent, CELL_CM),
+             flood,
 @@ -472,10 +575,83 @@ impl<S: SimCore> Room<S> {
              stamped: Vec::new(),
              reports: InputReports::default(),
@@ -2909,7 +3994,7 @@ index 4bdfe08..ef751b6 100644
      );
      let marks = include_str!("../../../marks/marks.json");
 diff --git a/spikes/netcode-proof/crates/room/tests/room.rs b/spikes/netcode-proof/crates/room/tests/room.rs
-index 2161be2..f5bd0a3 100644
+index 2161be2..84df4d2 100644
 --- a/spikes/netcode-proof/crates/room/tests/room.rs
 +++ b/spikes/netcode-proof/crates/room/tests/room.rs
 @@ -230,13 +230,25 @@ fn e8_a_room_of_world_is_send() {
@@ -2941,7 +4026,21 @@ index 2161be2..f5bd0a3 100644
      for _ in 0..60 {
          let next = a.last_tick().wrapping_add(1);
          let inputs: Vec<(u8, Input)> = (0..48u8)
-@@ -1256,8 +1268,9 @@ fn wrap_case(mut room: Room<World>) -> (npt_room::ClientCounters, Vec<&'static s
+@@ -1123,10 +1135,11 @@ fn never_acker(
+ fn carry_57_a_never_acker_overflows_once_then_a_second_overflow_kicks() {
+     let scene = Scene::stress();
+     let script = recorded(&scene, 4, 400, 400);
++    // U4f's measured cap (2.8 item 5): the room's default, no longer provisional (it was 1,024, provisional).
+     assert_eq!(
+         world_room(&scene, 4, 400, 1).event_cap(),
+-        (1_024, true),
+-        "the provisional cap"
++        (1_600, false),
++        "the measured cap"
+     );
+     let mut room = room_with(World::new(&scene, 4, 400), &scene, 8, |r| {
+         r.with_event_cap(48)
+@@ -1256,8 +1269,9 @@ fn wrap_case(mut room: Room<World>) -> (npt_room::ClientCounters, Vec<&'static s
          let next = room.last_tick().wrapping_add(1);
          let mut presses = [0; 4];
          presses[Command::PRESS_MELEE] = 250u8.wrapping_add(k as u8);
@@ -2952,7 +4051,7 @@ index 2161be2..f5bd0a3 100644
              seq: 65_520u16.wrapping_add(k),
              presses,
              view_tick: next.wrapping_sub(1),
-@@ -1344,7 +1357,12 @@ mod bites {
+@@ -1344,7 +1358,12 @@ mod bites {
              1,
              "PM-0001-58/lt-cmd-seq",
          ));
@@ -3231,10 +4330,10 @@ index d3bddd8..8302434 100644
                  self.reports.ammunition += 1;
                  self.refuse(c, RefusalKind::Ammunition);
 diff --git a/spikes/netcode-proof/marks/SERIES.md b/spikes/netcode-proof/marks/SERIES.md
-index 34a0189..b45900b 100644
+index 34a0189..4d95789 100644
 --- a/spikes/netcode-proof/marks/SERIES.md
 +++ b/spikes/netcode-proof/marks/SERIES.md
-@@ -369,6 +369,20 @@ are written once at the run's end, after the measured phase. No mark reads them
+@@ -369,6 +369,24 @@ are written once at the run's end, after the measured phase. No mark reads them
  |---|---|---|---|---|
  | `tick.s.in_building_slot_area` | pairs (slot, area) | npt-lab (from npt-sim's Soldier records' `area`) | the room log, on every logged tick (any phase) where a soldier's feet are in a building area: each such soldier's slot, then its area (building i is area i + 1: the greybox's area rule, half-open on each footprint), in slot order; absent on a tick with none. The run's summary line prints the measured total as "in a building: N slot-ticks (slots ...)" | none (recorded) |
  
@@ -3246,8 +4345,12 @@ index 34a0189..b45900b 100644
 +| `header.params.connects_count` | count | npt-lab | present on a clock-suite run (`--suite clock --connects <n>`, -47: 1,000 in the judged runs; 2.7): its connects over all slots; each client runs npt-bots' never-firing script (`Behaviour::never_fires`, U4F-Q4 (b): no event stamped, no client hash filed, so that run's header has no `behaviour`), its estimate read once at 2 s (`event.connect_clock`, fields `slot` and `seq`, the connect's number), then, while connects remain, the slot connects again as a fresh endpoint with a fresh seeded host offset | none (recorded) |
 +| `header.params.brawl_press_every_count` | count (commands) | npt-lab | present on a run whose brawl presses fire (`--brawl-press-every <n>`, U4F-Q11 (i) (a): 2 in -20's runs): the brawl moves its fire press counter by one on every n-th command it gives; absent when off | none (recorded) |
 +| `header.params.controller_max_lead_count` | count (ticks) | npt-lab | present on a run whose endpoints run U4f's tick-lead controller (`--controller 1`; then no `lead_ticks_count`): the most ticks ahead of the server's estimated current tick a client stamps (9 under both options) | none (recorded) |
-+| `event.client_counts.lead_refused_count`, `.not_newer_count`, `.seq_refused_count`, `.move_refused_count`, `.aim_refused_count`, `.ack_refused_count`, `.seq_outside_window_count`, `.rejoin_overlap_count`, `.commands_repeat_count`, `.stamps_skipped_count`, `.unencodable_commands_count`, `.lead_now_count`, `.unknown_pongs_count` | count (`lead_now_count` ticks, signed; -1 when none) | npt-lab (from npt-room's and npt-client's counters) | per client at the run's end (field `slot`): the room's refusals by kind (1, 2, 3, 4, 6, 8 by datagram), the sequences outside the kept window, a rejoin's overlap, the redundant copies; the endpoint's skipped stamps, unencodable commands, the lead its controller set last and the `Pong`s naming none of its pings, dropped (`ClientEndpoint::unknown_pongs`) | none (reported) |
-+| `event.client_counts.pump_too_large_count`, `.pump_trailing_bytes_count`, `.pump_unknown_field_count`, `.pump_wrong_channel_count`, `.pump_input_limited_count`, `.pump_ping_limited_count`, `.pump_pong_unknown_count`, `.pump_join_again_count`, `.pump_before_join_count` | count | npt-lab (from npt-server's `Counters` of the client's session) | per client at the run's end (field `slot`), while its session lives: the pump's refusal counts (2.5; 0 expected on an honest client) | none (reported) |
++| `event.client_counts.lead_refused_count`, `.not_newer_count`, `.seq_refused_count`, `.move_refused_count`, `.aim_refused_count`, `.ack_refused_count`, `.ack_refused_commands_count`, `.acks_old_count`, `.resyncs_dropped_count`, `.resyncs_limited_count`, `.kicked_count`, `.seq_outside_window_count`, `.rejoin_overlap_count`, `.commands_repeat_count`, `.stamps_skipped_count`, `.unencodable_commands_count`, `.lead_now_count`, `.unknown_pongs_count` | count (`lead_now_count` ticks, signed; -1 when none) | npt-lab (from npt-room's and npt-client's counters) | per client at the run's end (field `slot`): the room's refusals by kind (1, 2, 3, 4, 6, 8 by datagram, and kind 8's commands), the old acknowledgements, the `Resync`s dropped and limited, the kicks, the sequences outside the kept window, a rejoin's overlap, the redundant copies; the endpoint's skipped stamps, unencodable commands, the lead its controller set last and the `Pong`s naming none of its pings, dropped (`ClientEndpoint::unknown_pongs`) | none (reported) |
++| `event.client_counts.pump_too_large_count`, `.pump_truncated_count`, `.pump_bad_length_count`, `.pump_unknown_type_count`, `.pump_wrong_direction_count`, `.pump_wrong_channel_count`, `.pump_trailing_bytes_count`, `.pump_unknown_field_count`, `.pump_out_of_range_count`, `.pump_malformed_count`, `.pump_before_join_count`, `.pump_input_limited_count`, `.pump_ping_limited_count`, `.pump_pong_unknown_count`, `.pump_first_not_join_count`, `.pump_joining_dropped_count`, `.pump_stream_malformed_count`, `.pump_join_deadline_count`, `.pump_wrong_version_count`, `.pump_wrong_content_hash_count`, `.pump_join_again_count` | count | npt-lab (from npt-server's `Counters` of the client's session) | per client at the run's end (field `slot`), while its session lives: every refusal count of the pump (each `Counters` field but the pings and pongs sent: 2.5; 0 expected on an honest client) | none (reported) |
++| `event.session_end.ended`, `.late_count`, `.press_refused_count`, `.buffer_full_count`, `.rewinds_refused_count`, `.events_queued_count`, `.overflow_resyncs_count`, `.lead_refused_count`, `.not_newer_count`, `.seq_refused_count`, `.move_refused_count`, `.aim_refused_count`, `.ack_refused_count`, `.ack_refused_commands_count`, `.acks_old_count`, `.seq_outside_window_count`, `.rejoin_overlap_count`, `.commands_repeat_count`, `.resyncs_dropped_count`, `.resyncs_limited_count`, `.kicked_count`, `.pump_too_large_count`, `.pump_truncated_count`, `.pump_bad_length_count`, `.pump_unknown_type_count`, `.pump_wrong_direction_count`, `.pump_wrong_channel_count`, `.pump_trailing_bytes_count`, `.pump_unknown_field_count`, `.pump_out_of_range_count`, `.pump_malformed_count`, `.pump_before_join_count`, `.pump_input_limited_count`, `.pump_ping_limited_count`, `.pump_pong_unknown_count`, `.pump_first_not_join_count`, `.pump_joining_dropped_count`, `.pump_stream_malformed_count`, `.pump_join_deadline_count`, `.pump_wrong_version_count`, `.pump_wrong_content_hash_count`, `.pump_join_again_count` | `ended` a name (`replaced`, `left`, `closed` or `kicked`); the rest count | npt-lab (from npt-room's `ClientCounters` and npt-server's `Counters`) | per session that ends before the stop (field `slot`), at its end: the same counts as `event.client_counts`' room and pump fields, read before the room frees its slot or its `Decoder` drops (2.5, NA-15: before its `Leave` reaches the room, before `Room::leave` on a closed link, before a replaced or kicked session is dropped; a kicked slot's room counts survive its kick); the room fields absent when another session holds the slot | none (reported) |
++| `tick.v.lagswitch_move_apart` | flag | npt-lab (from npt-sim's Soldier records) | the room log of a lag-switch run, every room tick: 1 when the lag client's soldier is dead at the tick's start or end (health 0; a respawn places it), so `tick.v.lagswitch_excess_move_um` counts no movement for that tick (the advisor's A1: only the sim's movement step moves a soldier) | none (reported) |
++| `header.params.lag_hold_ns`, `.lag_every_ns` | ns | npt-lab | present on a lag-switch run: how long the lag client holds its `Input` datagrams before it sends them in one burst (`--lag-hold-ms`: 200 ms in the judged runs, 400 in 5.3's p19), and how often (`--lag-every-ms`: 6 s, 100 bursts in 600 s) | none (recorded) |
++| `event.clamp_kind.rerun_reports_count` | count | npt-lab (from npt-sim's `reports()`) | once per clamp-suite run (not its twin), beside `sent_count` and `counted_count`: the clamp reports of the cheat's (slot 0's) sequences already reported, option B's reruns of a clamp command (SA-10; 0 expected at P0) | none (reported) |
 +| `tick.s.cmd_ran_early_count` | count (ticks), signed | npt-lab (from npt-room's `ClientSlot::ran_early`) | the room log, every room tick: under option A one entry per command run this tick (slot order, each slot's in its run order), its stamp less this tick (positive: run before its stamp; U4F-Q3 (c), reported beside `second.s.buffer_depth_count`, which is 0 under A); empty under option B | none (reported) |
 +| `second.s.event_queue_max_count` | count | npt-lab (from npt-room: the event cap less `ClientSlot::headroom`) | the room log, each second, one per client slot (the run's `clients` entries; 0 for a slot with no joined client): the most gameplay events queued for that client at once in the second, before an overflow resync cleared them (2.8's high-water marks, per 30 s bin and per burst: carry 58; read by ops/runs/c-u4f-cap.mjs) | none (reported) |
 +| `event.reorder.permille`, `.up_permille`, `.down_permille` | permille | npt-lab (L1, from npt-l1's fate log) | once per scenario run, at its end: the measured reorder share as the -3 probe computes it (each direction's RFC 4737 reordered datagrams per 1000 delivered; `permille` the lower), the event route the `reorder` rule already reads (the row `header.params.reorder_permille / event reorder (permille)` names it) | the `reorder` rule (no change to it) |
@@ -4481,10 +5584,10 @@ index 0000000..2b0738e
 +}
 diff --git a/spikes/netcode-proof/crates/room/tests/commands.rs b/spikes/netcode-proof/crates/room/tests/commands.rs
 new file mode 100644
-index 0000000..87e07ae
+index 0000000..ce423a8
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/room/tests/commands.rs
-@@ -0,0 +1,964 @@
+@@ -0,0 +1,1067 @@
 +//! U4f's room tests of the command checks (u4f-brief.md 2.3, 2.4, 2.10): option A beside option B, 2.4's order with
 +//! one kind per refusal, the kept window, the join anchor and the slot's kept stamp across joins, the signed-distance
 +//! compares at room tick 1, `tick.s.cmd_on_time` by stamp, and (bites builds) each -21 room bite's unit proof. Every
@@ -5182,7 +6285,110 @@ index 0000000..87e07ae
 +                "{timing:?} {how}: {ran:?}"
 +            );
 +        }
++        kicked_rejoin(timing);
 +    }
++}
++
++/// f39's kicked-slot case (the advisor's F9, line 19: +0): in the stress scene slot 0, which never acknowledges (these
++/// tests' `Input`s carry none: the never-acker's form), fires at an enemy under an event cap of 2, so the room forces a
++/// resync and then kicks it (`Kick(overflow)`); the kicked slot rejoins, and its commands after the new join's tick and
++/// at or before its kept stamp are counted `rejoin_overlap`, never forged, the one past it run.
++fn kicked_rejoin(timing: CmdTiming) {
++    let scene = Scene::stress();
++    let world = World::new(&scene, 1, 100);
++    let greybox = world.greybox().clone();
++    let mut r = Room::new(world, &scene, &greybox, vec![token(0)], 1, 30)
++        .with_cmd_timing(timing)
++        .with_event_cap(2);
++    assert_eq!(r.join(&join(0)).map(|j| j.0), Ok(0));
++    let (mut seq, mut kept) = (0u16, 0u32);
++    for _ in 0..600 {
++        let enemy = r
++            .sim()
++            .entity_records()
++            .iter()
++            .find(|e| {
++                e.kind == npt_sim::EntityKind::Soldier && scene.team(e.index as u8) != scene.team(0)
++            })
++            .map(|e| [e.grid[0], e.grid[1], e.grid[2] + 100])
++            .expect("an enemy");
++        seq += 1;
++        kept = r.last_tick().wrapping_add(3);
++        let fire = Command {
++            buttons: Command::FIRE,
++            aim: enemy,
++            view_tick: r.last_tick(),
++            ..cmd(seq, kept)
++        };
++        send(&mut r, &[fire]);
++        tick(&mut r);
++        if r.client(0).is_some_and(|c| c.kicked()) {
++            break;
++        }
++    }
++    let k = counters(&r);
++    assert!(
++        k.kicked == 1 && k.overflow_resyncs == 1,
++        "{timing:?}: {k:?}"
++    );
++    let at = r.last_tick().wrapping_add(1);
++    assert_eq!(
++        r.join(&join(0)).map(|j| j.0),
++        Ok(0),
++        "the kicked slot rejoins"
++    );
++    let fresh: Vec<Command> = (at + 1..=kept + 1)
++        .zip(seq + 50..)
++        .map(|(t, s)| cmd(s, t))
++        .collect();
++    let n = fresh.len() as u16;
++    send(&mut r, &fresh);
++    let mut ran = Vec::new();
++    for _ in 0..8 {
++        ran.extend(tick(&mut r));
++    }
++    let k = counters(&r);
++    assert_eq!(k.rejoin_overlap, u64::from(n - 1), "{timing:?} kick: {k:?}");
++    assert_eq!(forged(&k), [0; 8], "{timing:?} kick");
++    assert!(
++        ran.contains(&(seq + 50 + n - 1)),
++        "{timing:?} kick: {ran:?}"
++    );
++}
++
++/// f18 (iii) (SA-10): under option B a clamp command (fire held, a point beyond reach inside the map, a move) run again
++/// on the ticks with none stamped for them re-clamps from its moved fire origin: two or more clamp reports for its one
++/// sequence, at different points (a lossy profile's clamp twin needs a per-tick rule first: 2.6).
++#[test]
++fn f18_under_option_b_a_rerun_clamp_command_gives_two_reports_for_one_sequence() {
++    let scene = Scene::stress();
++    let world = World::new(&scene, 1, 100);
++    let greybox = world.greybox().clone();
++    let mut r =
++        Room::new(world, &scene, &greybox, vec![token(0)], 1, 30).with_cmd_timing(CmdTiming::B);
++    let j = r.last_tick().wrapping_add(1);
++    assert_eq!(r.join(&join(0)).map(|x| x.0), Ok(0));
++    let far = Command {
++        buttons: Command::FIRE,
++        aim: [11_000, 11_000, 100],
++        move_xy: [127, 0],
++        view_tick: r.last_tick(),
++        ..cmd(1, j + 1)
++    };
++    send(&mut r, &[far]);
++    let mut points = Vec::new();
++    for _ in 0..12 {
++        tick(&mut r);
++        points.extend(
++            r.reports()
++                .clamps
++                .iter()
++                .filter(|c| c.slot == 0 && c.seq == 1)
++                .map(|c| c.point),
++        );
++    }
++    points.dedup();
++    assert!(points.len() >= 2, "{points:?}");
 +}
 +
 +/// f31 (carry 39; U4F-Q8 (b)): the lead bound is a room setting in ms turned into ticks with the rate passed in,
@@ -5592,6 +6798,319 @@ index 0000000..d00fe9d
 +    main(process.argv.slice(2));
 +  } catch (e) {
 +    console.error(`c-u4f-cap: ${e.message}`);
++    process.exit(1);
++  }
++}
+diff --git a/spikes/netcode-proof/ops/runs/c-u4f-r2.mjs b/spikes/netcode-proof/ops/runs/c-u4f-r2.mjs
+new file mode 100644
+index 0000000..b1f4c74
+--- /dev/null
++++ b/spikes/netcode-proof/ops/runs/c-u4f-r2.mjs
+@@ -0,0 +1,168 @@
++#!/usr/bin/env node
++// U4f's short pre-runs (u4f-brief.md 5.3; carry 86; U4R-Q4), on c-u4r-r2.mjs's model, re-made from a commit (the merge
++// commit: r2's record rule, c-u4r-r2.mjs:2-4) before -20's, -21's and -47's judged sets:
++//   node spikes/netcode-proof/ops/runs/c-u4f-r2.mjs --date YYYY-MM-DD
++// - Each row of RUNS: `npt-lab scenario` (SS, 48 clients, seed 1, r2's 10 s warm-up and 20 s measured unless the row
++//   names other lengths; a clock run holds one round of 48 connects), then `npt-lab contract --logs <its folder>
++//   --series <SERIES.md's copy>`, then the judge in 5.4's form: `npt-judge --marks <marks.json's copy> --logs <its folder>
++//   --only <the row's marks>`, where every mark that carries pre:PM-0001-2 (-20, -21) is named beside PM-0001-2
++//   (P31's rule; ADV-CBH-1's lesson) and -47 alone. No twin runs here (TE31-2): a twin check reads a Gap, and the run is
++//   read by name.
++// - How a run is read (TE3-3): its verdict's checks by name, against the row's `expect`, which names the checks that
++//   fail by length on these lengths (-47's 1,000 connects); r2.txt holds each command, its exit line and its output, and
++//   the main session reads them (5.3's last paragraph: what comes to the advisor before its set).
++// - Every command runs whatever the one before gave (a FAIL is a result, never a stop and never re-run: carry 86), each
++//   through check.mjs's run() with a 600 s limit, in its own process group ("stopped at <s> s" is a result).
++// - Its order, as c-u4r-r2.mjs's: the usage and git checks (no uncommitted change to a tracked file, no untracked file
++//   under spikes/netcode-proof/crates: every log names its commit); the projection (ROW_BYTES a run, an estimate from
++//   r2's 13 suites' 145 MB, about 10.6 MiB a run: 5.5); the release builds (npt-lab measured and bites, npt-judge), at
++//   least 4 GiB free before each; the floor before each run; the output folder .gate/netcode-proof-test/u4f-r2-<commit12>/
++//   (never overwritten): one folder per row, <key>-verdict.json beside it, the copies of marks.json and SERIES.md (their
++//   sha256s in r2.txt's head), r2.txt; spikes/netcode-proof re-checked before r2.txt is written.
++// - B6 holds 5.3's p5, p6, p10, p11, p12 and p21, B7 the clamp's p2, p8 and p15, B8 the lag switch's p4, p13, p18
++//   and p19; -21's other rows (p1, p3, p7, p9, p14, p16, p17, p20) join with their suites.
++// - Its helpers are exported (c-u4f-runs.mjs reads them); main runs only when this file is the entry module.
++
++import { spawnSync } from "node:child_process";
++import { createHash } from "node:crypto";
++import { copyFileSync, existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from "node:fs";
++import { dirname, join, resolve } from "node:path";
++import { fileURLToPath } from "node:url";
++import { builtArtifact, run } from "../../check.mjs";
++import { roomFor, spikeChanged, spikeReading } from "./c-u4r-runs.mjs";
++
++export const SPIKE = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
++export const ROOT = join(SPIKE, "..", "..");
++export const GATE = join(ROOT, ".gate", "netcode-proof-test");
++const STEP_LIMIT_MS = 600_000;
++/** One row's projected log bytes: r2's 145 MB over its 13 suites, about 11.2 MB a run, rounded up (an estimate). */
++const ROW_BYTES = 12_000_000;
++const SHORT = "--scene SS --seed 1 --warmup-s 10 --measured-s 20";
++const P20 = `${SHORT} --profile P3 --controller 1 --brawl-press-every 2 --suite brawl`;
++const CLOCK = `${SHORT} --profile P2 --suite clock --connects 48`;
++const M20 = "PM-0001-2,PM-0001-20";
++const M21 = "PM-0001-2,PM-0001-21";
++/** -21's suites at P0 (U4F-Q11 (ii) (a)), the honest clients on the open-loop steady script under the controller. */
++const P21 = `${SHORT} --profile P0 --controller 1 --behaviour steady`;
++/** The lag switch at P1, slot 0 holding its `Input`s 200 ms every 6 s (3 bursts in 20 s: 5.3). */
++const LAG = `${SHORT} --profile P1 --controller 1 --behaviour steady --suite lag-switch`;
++const CLAMP_SAYS = "'clamp: 1,000 points beyond reach per weapon kind the sim has' fails by length and the twin check reads a Gap (no twin in 5.3)";
++
++/** 5.3's rows: `build` the npt-lab build (`lab` measured, `bites`), `args` the scenario's settings, `marks` its header's. */
++export const RUNS = [
++  { key: "p2", build: "lab", args: `${P21} --cmd-timing A --suite clamp`, marks: M21, expect: `every PM-0001-2 check and the shot band pass; 'clamp: never refused or counted' passes; the clamp reruns 0 (event.clamp_kind.rerun_reports_count; SA-10); ${CLAMP_SAYS}` },
++  { key: "p8", build: "bites", args: `${P21} --cmd-timing A --suite clamp --role bite --bite PM-0001-21/refuse-not-clamp`, marks: M21, expect: `'clamp: never refused or counted' FAILS (it passes on p2); ${CLAMP_SAYS}` },
++  { key: "p15", build: "lab", args: `${P21} --cmd-timing B --suite clamp`, marks: M21, expect: "as p2, under option B (U4F-Q11 (iv))" },
++  { key: "p4", build: "lab", args: `${LAG} --cmd-timing A`, marks: M21, expect: "every PM-0001-2 check and the shot band pass; 'lag switch: no tick moves further than the catch-up cap allows' passes; 'lag switch: 100 bursts' fails by length (3 bursts in 20 s)" },
++  { key: "p13", build: "bites", args: `${LAG} --cmd-timing A --role bite --bite PM-0001-21/no-catchup-cap`, marks: M21, expect: "'lag switch: no tick moves further than the catch-up cap allows' still PASSES (TE-7: it cannot fail at 200 ms); tick.v.lagswitch_cmds_count's max reported (at most 7 expected: D13)" },
++  { key: "p18", build: "lab", args: `${LAG} --cmd-timing B`, marks: M21, expect: "as p4, under option B (U4F-Q11 (iv))" },
++  { key: "p19", build: "lab", args: `${LAG} --cmd-timing A --lag-hold-ms 400`, marks: M21, expect: "unjudged (U4F-Q15 (c)): a 400 ms hold, about 12 commands; reported: the commands dropped late by W (about 3 or 4), the input_limited datagrams (about 4), kind-10 refusals 0, tick.v.lagswitch_cmds_count's max at most 8" },
++  { key: "p5", build: "lab", args: `${P20} --cmd-timing A`, marks: M20, expect: "every PM-0001-2 check and the shot band pass; -20's 'at least 99.9 % of commands reach the server before their tick runs' and 'missing inputs at most 0.1 % of player-ticks' pass by name (carry 86; TE3-1); the reorder rule holds (D3)" },
++  { key: "p6", build: "lab", args: `${P20} --cmd-timing B`, marks: M20, expect: "as p5, under option B (TE-3)" },
++  { key: "p10", build: "bites", args: `${CLOCK} --role bite --bite PM-0001-47/newest-sample`, marks: "PM-0001-47", expect: "'offset error at most 5 ms after 2 s of samples' FAILS; '1,000 connects' fails by length; it passes on p21" },
++  { key: "p11", build: "bites", args: `${CLOCK} --role bite --bite PM-0001-47/tick-quantised`, marks: "PM-0001-47", expect: "as p10 (D4: about 11.9 ms against the mean's 2.35 ms)" },
++  { key: "p12", build: "bites", args: `${P20} --cmd-timing B --role bite --bite PM-0001-20/redundancy-1`, marks: M20, expect: "'at least 99.9 % of commands reach the server before their tick runs' FAILS (about 95 %), every PM-0001-2 check passing; it passes on p6" },
++  { key: "p21", build: "lab", args: CLOCK, marks: "PM-0001-47", expect: "the p99 check passes (p10's and p11's clean partner); '1,000 connects' fails by length" },
++];
++
++export function sh(cmd, args, cwd = SPIKE, keepLead = false) {
++  const r = spawnSync(cmd, args, { cwd, encoding: "utf8", maxBuffer: 1 << 28 });
++  if (r.status !== 0) throw new Error(`${cmd} ${args.join(" ")}: exit ${r.status}\n${r.stdout}${r.stderr}`);
++  return keepLead ? r.stdout.trimEnd() : r.stdout.trim();
++}
++
++export const sha256 = (path) => createHash("sha256").update(readFileSync(path)).digest("hex");
++
++/** Stops unless free space minus `projected` bytes leaves the 4 GiB floor (section 4 rule 6). */
++export function floor(what, projected = 0) {
++  const s = statfsSync(ROOT);
++  const r = roomFor(s.bavail * s.bsize, projected, what);
++  if (!r.ok) throw new Error(r.line);
++  return r.line;
++}
++
++/** One release build (-v --release --locked --offline), its artifact copied to `to`; cargo's npt-* lines printed. */
++export function build(args, target, to) {
++  floor(`the release build of ${target}${args.includes("bites") ? " (bites)" : ""}`);
++  const cargoArgs = ["build", "-v", "--release", "--locked", "--offline", ...args, "--message-format=json"];
++  const r = spawnSync("cargo", cargoArgs, { cwd: SPIKE, encoding: "utf8", maxBuffer: 1 << 28 });
++  if (r.status !== 0) throw new Error(`cargo ${cargoArgs.join(" ")}: exit ${r.status}\n${r.stderr}`);
++  for (const l of r.stderr.split("\n")) if (/^\s*(Compiling|Fresh) npt-/.test(l)) console.log(l);
++  const path = builtArtifact(r.stdout.trim(), { target, kind: "bin" });
++  if (!path) throw new Error(`cargo build ${args.join(" ")} names no ${target} executable`);
++  copyFileSync(path, to);
++  return to;
++}
++
++/** One command whatever it gives, bounded: its line, its exit line and its output. */
++export function step(exe, args, limitMs = STEP_LIMIT_MS) {
++  const t0 = Date.now();
++  const r = run(exe, args, SPIKE, process.env, limitMs);
++  const secs = ((Date.now() - t0) / 1000).toFixed(1);
++  const exit = r.timedOut ? `stopped at ${secs} s` : `exit ${r.status ?? "by a signal"} (wall ${secs} s)`;
++  return [`$ ${[exe, ...args].join(" ")}`, exit, r.out.trimEnd()];
++}
++
++/** The usage's git checks (every log names its commit): the commit and the spike's start reading. */
++export function committed() {
++  if (sh("git", ["status", "--porcelain", "--untracked-files=no"])) throw new Error("tracked files have uncommitted changes: commit first, since every log names its commit");
++  const untracked = sh("git", ["status", "--porcelain", "--untracked-files=all", "--", "crates"]);
++  if (untracked) throw new Error(`files under spikes/netcode-proof/crates are not committed (${untracked.split("\n").join("; ")})`);
++  const commit = sh("git", ["rev-parse", "HEAD"]);
++  const reading = () => spikeReading((args) => sh("git", args, ROOT, true));
++  return { commit, reading, start: reading() };
++}
++
++function main(argv) {
++  const date = argv[0] === "--date" ? argv[1] : undefined;
++  if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? "") || argv.length !== 2) throw new Error("usage: c-u4f-r2.mjs --date YYYY-MM-DD");
++  const { commit, reading, start } = committed();
++  const out = join(GATE, `u4f-r2-${commit.slice(0, 12)}`);
++  if (existsSync(out)) throw new Error(`${out} exists: a run set is never overwritten`);
++  const before = floor(`u4f-r2: the ${RUNS.length} runs' projected logs, before the builds`, RUNS.length * ROW_BYTES);
++  const bin = join(GATE, "bin", `u4f-r2-${commit.slice(0, 12)}`);
++  mkdirSync(bin, { recursive: true });
++  const exe = {
++    lab: build(["-p", "npt-lab"], "npt-lab", join(bin, "npt-lab")),
++    bites: build(["-p", "npt-lab", "--features", "bites"], "npt-lab", join(bin, "npt-lab-bites")),
++  };
++  const judge = build(["-p", "npt-judge"], "npt-judge", join(bin, "npt-judge"));
++  const after = floor("u4f-r2: after the builds", RUNS.length * ROW_BYTES);
++  mkdirSync(out, { recursive: true });
++  const copy = (f) => (copyFileSync(join(SPIKE, "marks", f), join(out, f)), join(out, f));
++  const [marks, series] = [copy("marks.json"), copy("SERIES.md")];
++  const lines = [
++    `# U4f's 5.3 pre-runs from commit ${commit}, spikes/netcode-proof tree ${start.tree}, on ${date}`,
++    `npt-lab sha256 ${sha256(exe.lab)}; npt-lab (bites) sha256 ${sha256(exe.bites)}; npt-judge sha256 ${sha256(judge)}`,
++    `marks.json sha256 ${sha256(marks)}, SERIES.md sha256 ${sha256(series)} (the copies contract and the judge read)`,
++    `projection: ${before}`,
++    `projection: ${after}`,
++    "",
++  ];
++  for (const r of RUNS) {
++    floor(`run ${r.key}`, ROW_BYTES);
++    const logs = join(out, r.key);
++    const said = [
++      `## ${r.key} (the ${r.build === "lab" ? "measured" : "bites"} build); expected: ${r.expect}`,
++      ...step(exe[r.build], ["scenario", "--run", `u4f-r2-${r.key}-1`, "--set", "u4f-r2", "--date", date, "--commit", commit, "--out", logs, ...r.args.split(" "), "--marks", r.marks]),
++      ...step(exe[r.build], ["contract", "--logs", logs, "--series", series]),
++      ...step(judge, ["--marks", marks, "--logs", logs, "--only", r.marks, "--out", join(out, `${r.key}-verdict.json`)]),
++      "",
++    ];
++    console.log(said.join("\n"));
++    lines.push(...said);
++  }
++  const why = spikeChanged(start, reading());
++  if (why) throw new Error(`spikes/netcode-proof changed since the set started (${why}): stopped before r2.txt is written`);
++  writeFileSync(join(out, "r2.txt"), `${lines.join("\n")}\n`);
++  console.log(`written: ${join(".gate", "netcode-proof-test", `u4f-r2-${commit.slice(0, 12)}`, "r2.txt")}`);
++}
++
++if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
++  try {
++    main(process.argv.slice(2));
++  } catch (e) {
++    console.error(`c-u4f-r2: ${e.message}`);
++    process.exit(1);
++  }
++}
+diff --git a/spikes/netcode-proof/ops/runs/c-u4f-runs.mjs b/spikes/netcode-proof/ops/runs/c-u4f-runs.mjs
+new file mode 100644
+index 0000000..e393962
+--- /dev/null
++++ b/spikes/netcode-proof/ops/runs/c-u4f-runs.mjs
+@@ -0,0 +1,133 @@
++#!/usr/bin/env node
++// U4f's judged sets (u4f-brief.md 5.1, 5.4; U4F-Q2 (a)), on c-u4r-runs.mjs's model, one set per call:
++//   node spikes/netcode-proof/ops/runs/c-u4f-runs.mjs 47|22|20 --date YYYY-MM-DD
++// - How it is run (c-u4r-runs.mjs:6-17; 5.5 item 2; section 12 item 9): in the main folder, with CARGO_TARGET_DIR unset
++//   (the judged runs build in the main folder's own cache; a set run with it set stops here), under the lane lock,
++//   exclusive, from the repository root: `flock -x .gate/shared-target/.lane.lock node
++//   spikes/netcode-proof/ops/runs/c-u4f-runs.mjs …`; one set at a time, in U4F-Q2 (a)'s order (-47, -22, -20, then
++//   -21's), after D2's reading; each set's projection against the 4 GiB floor first, and before each run.
++// - The sets (5.1; marks.json's parts): 47: L1 P2, suite clock, 1,000 connects (a 10 s warm-up and 120 s measured: about
++//   21 rounds of 48), seeds 1 to 3, headers listing PM-0001-47; its bites newest-sample and tick-quantised at seed 1.
++//   22: SS, 48 clients, P0 (U4F-Q11 (ii) (a)), suite never-ack (slot 0 the never-acker), 600 s measured, seeds 1 to 3,
++//   headers listing PM-0001-2 and PM-0001-22 (PM-0001-2 for 5.2's load report only); its bite PM-0001-22/unbounded over a
++//   full S30 (1,800 s measured: marks.json:5218-5223). 20: SS, 48, P3, U4f's controller, the brawl with
++//   --brawl-press-every 2, 600 s measured, seeds 1 to 3 under each option (`--cmd-timing`), headers listing PM-0001-2 and
++//   PM-0001-20; its bite redundancy-1 under option B (U4F-Q10 (a)) at seed 1. Every run at the room's event cap (2.8's
++//   value, once B3 set it) and the frozen lead bound (LEAD-BOUND: the header's lead_bound_ms).
++// - Each judge call in 5.4's form (P31's rule; ADV-CBH-1's lesson: a mark carrying pre:PM-0001-2 is never judged without
++//   it): 20 `--only PM-0001-2,PM-0001-20`; 22 `--only PM-0001-22`, then 5.2's load report, `--only PM-0001-2` over the
++//   same measured folder, its verdict never counted (the designed drop leaves 47 clients: marks.json:5227); 47 `--only
++//   PM-0001-47`. A set with bites is judged in two calls, measured/ then bites/ (U4r-F2's split), and STOP_NOTE says so
++//   at the head of runs.txt (TE-CBH-5 = NA-CBB-1's lesson: every set judged in two calls is named).
++// - ADV-CBH-2's hardenings: npt-lab (both builds) and npt-judge built in this call; marks.json's and npt-judge's sha256s
++//   read when the set starts and checked again before each judge call (a difference stops the set there); `--commit` the
++//   full HEAD, with `git diff --quiet <HEAD> HEAD -- spikes/netcode-proof ':(exclude)spikes/netcode-proof/results'`
++//   exiting 0 before each judge call (spikeChanged's re-check: c-u4r-runs.mjs, INF-R2-1); `--date` the day it runs; a
++//   10 s warm-up for 48 clients.
++// - The rest as c-u4r-runs.mjs: the git checks (c-u4f-r2.mjs's `committed`); raw logs under
++//   .gate/netcode-proof-test/runs/u4f-<set>-<commit12>/ (measured/ and bites/), results under
++//   results/u4f/<commit12>/pm-0001-<set>/ (runs.txt and each call's verdict file), neither ever overwritten; each npt-lab
++//   call and the judge bounded at RUN_LIMIT_MS (a stopped call is a result, never retried); the judge's projected peak
++//   per call (judgeRoom) printed before the builds, the set stopping there over the 10 GiB line.
++// - The projection: BYTES_10MIN_OTHER (56 MB a 10-minute run: c-u4r-runs.mjs:149-154) scaled by the measured seconds,
++//   and 1.5 times that for -20 (its per-command series: an estimate until its first run measures it, 5.5).
++
++import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
++import { join, resolve } from "node:path";
++import { fileURLToPath } from "node:url";
++import { run } from "../../check.mjs";
++import { BYTES_10MIN_OTHER, judgeRoom, logBytes, RUN_LIMIT_MS, setParts, spikeChanged } from "./c-u4r-runs.mjs";
++import { build, committed, floor, GATE, ROOT, sha256, SPIKE } from "./c-u4f-r2.mjs";
++
++const SEEDS = [1, 2, 3];
++/** The line above a set's two judge blocks (5.4: U4f's stop note). */
++export const STOP_NOTE = "the set is judged in two calls (U4r-F2's split): verdict.json holds the measured runs' verdicts (read the set's parts; its bites read 'no run yet' by design); verdict-bites.json holds the bite runs' verdicts (read its bites; every part reads '0 of n valid runs' by design)";
++
++/** 5.1's sets: the marks each header lists, each judge call's --only, the settings, the options and the bites. */
++export const SETS = {
++  47: { listed: ["PM-0001-47"], only: ["PM-0001-47"], args: ["--profile", "P2", "--suite", "clock", "--connects", "1000"], measuredS: 120, options: [null], bites: [["PM-0001-47/newest-sample", null], ["PM-0001-47/tick-quantised", null]] },
++  22: { listed: ["PM-0001-2", "PM-0001-22"], only: ["PM-0001-22"], report: ["PM-0001-2"], args: ["--profile", "P0", "--suite", "never-ack"], measuredS: 600, options: [null], bites: [["PM-0001-22/unbounded", null, 1_800]] },
++  20: { listed: ["PM-0001-2", "PM-0001-20"], only: ["PM-0001-2", "PM-0001-20"], args: ["--profile", "P3", "--controller", "1", "--brawl-press-every", "2", "--suite", "brawl"], measuredS: 600, options: ["A", "B"], bites: [["PM-0001-20/redundancy-1", "B"]] },
++};
++
++/** One set's runs in order, each with its projected bytes and group (measured or bites). */
++export function plan(key) {
++  const set = SETS[key];
++  const bytes = (s) => Math.ceil(((BYTES_10MIN_OTHER * s) / 600) * (key === "20" ? 1.5 : 1));
++  const opt = (o) => (o ? ["--cmd-timing", o] : []);
++  const runs = set.options.flatMap((o) =>
++    SEEDS.map((seed) => ({ run: `l1-${key}${o ? `-${o.toLowerCase()}` : ""}-s${seed}`, exe: "lab", seed, group: "measured", extra: [...opt(o), "--role", "measured"], measuredS: set.measuredS })),
++  );
++  for (const [id, o, s] of set.bites) runs.push({ run: `bite-${id.split("/")[1]}`, exe: "labBites", seed: 1, group: "bites", extra: [...opt(o), "--role", "bite", "--bite", id], measuredS: s ?? set.measuredS });
++  return runs.map((r) => ({ ...r, bytes: bytes(r.measuredS) }));
++}
++
++function main(argv) {
++  const [key, flag, date] = argv;
++  if (!SETS[key] || flag !== "--date" || !/^\d{4}-\d{2}-\d{2}$/.test(date ?? "") || argv.length !== 3) throw new Error("usage: c-u4f-runs.mjs 47|22|20 --date YYYY-MM-DD");
++  if (process.env.CARGO_TARGET_DIR !== undefined) throw new Error("CARGO_TARGET_DIR is set: the judged sets build in the main folder's own cache (plan §7.1 item 6)");
++  const set = SETS[key];
++  const { commit, reading, start } = committed();
++  const short = commit.slice(0, 12);
++  const logs = join(GATE, "runs", `u4f-${key}-${short}`);
++  const results = join(SPIKE, "results", "u4f", short, `pm-0001-${key}`);
++  for (const d of [logs, results]) if (existsSync(d)) throw new Error(`${d} exists: a run set is never overwritten`);
++  const runs = plan(key);
++  const total = runs.reduce((s, r) => s + r.bytes, 0);
++  const head = [`commit ${commit}, spikes/netcode-proof tree ${start.tree}; target: the main folder's own cache`, `projection: ${floor(`u4f ${key}: the set's ${runs.length} runs, before the builds`, total)}`];
++  for (const g of ["measured", "bites"]) {
++    const j = judgeRoom(runs.filter((r) => r.group === g).reduce((s, r) => s + r.bytes, 0), `the judge (${g} runs), from the plan's bytes`);
++    head.push(`projection: ${j.line}`);
++    if (!j.ok) throw new Error(j.line);
++  }
++  const bin = join(GATE, "bin", `u4f-${key}-${short}`);
++  mkdirSync(bin, { recursive: true });
++  const exe = { lab: build(["-p", "npt-lab"], "npt-lab", join(bin, "npt-lab")), labBites: build(["-p", "npt-lab", "--features", "bites"], "npt-lab", join(bin, "npt-lab-bites")) };
++  const judge = build(["-p", "npt-judge"], "npt-judge", join(bin, "npt-judge"));
++  mkdirSync(logs, { recursive: true });
++  const marks = join(logs, "marks.json");
++  copyFileSync(join(SPIKE, "marks", "marks.json"), marks);
++  const sums = { marks: sha256(marks), judge: sha256(judge) };
++  head.push(`npt-lab sha256 ${sha256(exe.lab)}; npt-lab (bites) sha256 ${sha256(exe.labBites)}; npt-judge sha256 ${sums.judge}; marks.json sha256 ${sums.marks}`);
++  const lines = [];
++  for (const r of runs) {
++    floor(r.run, r.bytes);
++    const args = ["scenario", "--run", r.run, "--set", `u4f-${key}`, "--date", date, "--commit", commit, "--out", join(logs, r.group, r.run), "--scene", "SS", "--seed", String(r.seed), "--warmup-s", "10", "--measured-s", String(r.measuredS), ...set.args, ...r.extra, "--marks", (r.group === "bites" ? [...set.listed.filter((m) => m === "PM-0001-2"), r.extra.at(-1).split("/")[0]] : set.listed).join(",")];
++    const t0 = Date.now();
++    const x = run(exe[r.exe], args, ROOT, process.env, RUN_LIMIT_MS);
++    const secs = ((Date.now() - t0) / 1000).toFixed(1);
++    const said = x.timedOut ? `${r.run}: stopped at ${secs} s (a result, never retried)` : x.status === 0 ? `${x.stdout.trim()} (wall ${secs} s)` : `${r.run}: exit ${x.status} (wall ${secs} s): ${x.out.trim()}`;
++    console.log(said);
++    lines.push(said);
++  }
++  const call = (label, dir, only, file) => {
++    const why = spikeChanged(start, reading());
++    if (why) throw new Error(`spikes/netcode-proof changed since the set started (${why}): stopped before ${label}`);
++    if (sha256(marks) !== sums.marks || sha256(judge) !== sums.judge) throw new Error(`marks.json or npt-judge changed since the set started: stopped before ${label}`);
++    const block = [judgeRoom(logBytes(dir), `${label}, from its logs on disk`, true).line];
++    const out = join(logs, file);
++    const j = run(judge, ["--marks", marks, "--logs", dir, "--only", only.join(","), "--out", out], ROOT, process.env, RUN_LIMIT_MS);
++    const ok = !j.timedOut && j.status === 0;
++    block.push(`${label} (--only ${only.join(",")}): ${ok ? j.stdout.trim() : j.timedOut ? "stopped (no verdict)" : `exit ${j.status} (no verdict): ${j.out.trim()}`}`);
++    if (ok) block.push(...setParts(JSON.parse(readFileSync(out, "utf8"))));
++    console.log(block.join("\n"));
++    return { ok, out, file, block };
++  };
++  const calls = [call("the judge (measured runs)", join(logs, "measured"), set.only, "verdict.json"), call("the judge (bite runs)", join(logs, "bites"), set.only, "verdict-bites.json")];
++  if (set.report) calls.push(call("5.2's load report (never counted)", join(logs, "measured"), set.report, "verdict-load.json"));
++  mkdirSync(results, { recursive: true });
++  for (const c of calls) if (c.ok) copyFileSync(c.out, join(results, c.file));
++  const top = [`# u4f-${key}: PM-0001-${key}'s L1 set, run on ${date} (u4f-brief.md 5.1, 5.4)`, ...head, STOP_NOTE, ...calls.flatMap((c) => c.block), "", "# one line per run (npt-lab's summary line and its wall time)"];
++  writeFileSync(join(results, "runs.txt"), `${[...top, ...lines].join("\n")}\n`);
++  if (calls.some((c) => !c.ok)) throw new Error("a judge call gave no verdict: runs.txt written (to the advisor)");
++  console.log(`written: ${join("spikes", "netcode-proof", "results", "u4f", short, `pm-0001-${key}`)}/`);
++}
++
++if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
++  try {
++    main(process.argv.slice(2));
++  } catch (e) {
++    console.error(`c-u4f-runs: ${e.message}`);
 +    process.exit(1);
 +  }
 +}
