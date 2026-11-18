@@ -137,3 +137,172 @@ lines (untracked files do not show in `git diff`); the launch commit's .checkpoi
 - Added lines after B1-B4: 1,343 insertions (spikes/, docs/) + 2,069 in new files = 3,412 (against 6,000: the
   remaining bots, lab, SERIES.md and scripts must be lean).
 - Next: B5 npt-bots.
+
+## fmt and clippy after B1-B4 (done)
+
+- `cargo fmt --all -- --check` printed 27 diffs; each applied by Edit (no `cargo fmt` writing). clippy found: an unused
+  bites-only method (`ClockSync::with_newest_sample`, now `#[cfg(feature = "bites")]`), a misnamed getter (the room's
+  refusal buffers renamed `incoming` and `refusals`), and unequal hex digit groups in five test seeds (now
+  0x5eed_00f1, 0x5eed_0f32, 0x5eed_00f8, 0x5eed_0f12, 0x5eed_009f; the docs name them). Then fmt, clippy host and
+  clippy all-features each exit 0 (.gate/u4f/b4-fmt-clippy.log, 12:35 UTC).
+
+## Block 5 (npt-bots) and Block 6 (npt-lab): the core built, the cheats not (partial)
+
+- Built: `Behaviour::controlled()` (the controller runs' command rule: each step gives `commands_due()` commands, the
+  press rule kept), `Behaviour::brawl_presses` (U4F-Q11 (i) (a): a fire press every second command). npt-lab:
+  `--cmd-timing A|B` (the room's option via `Room::set_cmd_timing`, a new in-place setter), `--controller 0|1`
+  (endpoints `with_clock(9)`, behaviours `controlled()`), `--behaviour brawl-presses`; header `cmd_timing` from the
+  setting, `lead_ticks_count` only without the controller (TE-20), `controller_max_lead_count`, `lead_bound_ms`;
+  logs.rs `room_tick` writes `tick.s.cmd_on_time`, `tick.s.input_missing` (by stamp), `tick.v.press_count`,
+  `.press_lost_count`, `.press_doubled_count`; the stop's `client_counts` gains the room's refusal fields by kind, the
+  endpoint's controller counts and the session's pump counters (2.5); the run's `reorder` event (D3-1, f40).
+- SERIES.md: one new subsection "Names added with U4f" with 5 new rows (no existing row touched): the two header params,
+  the client_counts fields (room and endpoint), the client_counts pump fields, `event.reorder.*` (B9).
+- Lab tests added: f6, f28 (its -20 half), f40.
+- **Not built (goes to the main session and the advisor):** the 11 forgers, the clamp cheat (with its in-map
+  points), the 1.5x clock and its episodes, the lag switch, the never-acker, their suites (`forged`, `clamp`,
+  `fast-clock`, `lag-switch`, `never-ack`, `clock`), the twins and the twin's skip in the lab (the endpoint's
+  `skip_command` exists), the lab's per-kind attribution (`event.forged_kind.*`), the clamp, fast-clock and lag-switch
+  series, the -47 suite (connects, `event.connect_clock.offset_err_ns`), -22's series, the per-session counters at
+  mid-run session ends (only at the stop), `second.s.buffer_depth_count` and U4F-Q3 (c)'s ran-early series in the
+  logs (the room exposes `ran_early()`), the cap measurement's runs (2.8, D8), ops/runs/c-u4f-*.mjs, RR-B1-7 (1),
+  RR-CB-2's docs, TE-B1-R2-1. Tests not written: f14-f16, f18-f23, f29, f33, f35, f37; f36 (ii) (bots); the plants of
+  f9, f26, f27 and D14. Why: the size so far (about 3,600 added lines against the 6,000 stop, with the cheats and
+  their lab plumbing estimated at 2,000 or more) and this builder's remaining working room; a second builder can take
+  them from these notes (the room, client, proto, server and sim parts they depend on are built and tested).
+- Lab test figures (.gate/u4f/b6-lab-test.log): f28 at P3, 16 clients, 4 s measured: option A on time 1,920 of 1,920,
+  presses 961, lost 0; option B 1,920 of 1,920, presses 960, lost 0. f40: `reorder` permille 99 (up 164, down 99:
+  RFC 4737's count includes the jitter's reorders at P3, far above the step's 10).
+
+## Plants (procedure; P26: each by Edit in place, its diff in these notes, restored and its sha256 checked)
+
+- f9: room.rs `canonical`'s body replaced by nothing (no sort); `cargo test -p npt-room --test room carry_21` must fail
+  under option A; restore; sha256 of room.rs before and after equal.
+- **f9 done** (.gate/u4f/plant-f9.log, `-x -k`, 12:43:31 UTC): the plant, room.rs:387-389, was
+  `-    commands.sort_by_key(|(c, _)| (c.slot, c.tick.wrapping_sub(t) as i32));`
+  `+    let _ = (commands, t); // PLANT f9: the sort removed`; `carry_21_commands_received_in_two_orders_give_one_tick_input`
+  FAILED (it panics at npt-sim's canonical-order debug assert, world.rs:2129, under option A: the tick's list arrives
+  in arrival order); restored by Edit; room.rs sha256 ff28326061e47cca62c17720a2a45cdeb3f4999059bf1e37d11618c02818dd02
+  before and after (equal). Not done: f26's two plants, f27's, D14's old comparator (no time left; the comparator's
+  case is f8's property test, which runs the new key only).
+
+## Block 6 check (done)
+
+- `cargo test -p npt-lab -p npt-bots` (.gate/u4f/b6-lab-test.log, exit 0, 12:43:28 UTC): lab main.rs 63 passed, 1
+  ignored (140.5 s), the C62H-BOUND short P2 test among them; bots 3 + 5. fmt, clippy host and all-features exit 0
+  (.gate/u4f/b6-fmt-clippy.log, 12:44 UTC), after seven fmt diffs applied by Edit.
+- Base's test step for the time rule: E6's 804.8 s (u3c-held-1/build.md:149), so the stop line is 1,207 s.
+- Added lines at the counted run: 1,595 + 2,147 = 3,742 (git diff --stat spikes/ docs/, plus new files); the fmt edits
+  after it add about 20.
+- `df -h /home/user` before end check 1: 8.8G avail (78 %).
+
+## End check 1 (done: all 11 steps pass)
+
+- One `-x` runner call (.gate/u4f/end-check-1.log, 12:44:36-12:59:31 UTC; free 8,970 MiB at the start; HEAD 827518b;
+  diff 91ab1663..., untracked 13182a28...): the six provenance builds each exit 0 (test --no-run both builds, npt-lab
+  release both builds, npt-hash-wasm wasm32 release both builds), then `node check.mjs`: fmt 0.7 s; clippy 4.6 s;
+  clippy-wasm32 7.7 s; doc 7.5 s; **test 698.9 s, measured build 605 passed (base 552: +53), bites build 701 (base 632:
+  +69), 0 failed, 0 reported a skip**; deps 4.3 s (143 crate files: +6 new .rs files); wasm 47.8 s (27,000 ticks, 0
+  mismatching both ways; hash-map and std-sin bites caught as before); refs 1463 tracked files; marks 81; self 78 of
+  78; redact 10 of 10, 313 items (base 307: +6), 0 findings; "check: all 11 steps pass"; exit 0. Provenance: every
+  npt-* crate "Compiling ... (<my worktree>/spikes/netcode-proof/crates/...)".
+- The test step 698.9 s against base's 804.8 s (E6): under 1.5 times.
+
+## End check 2 (done: all 11 steps pass, the same tree)
+
+- .gate/u4f/end-check-2.log, `-x`, 13:01:53-13:14:59 UTC; free 5,179 MiB at the start; HEAD 827518b; diff 91ab1663...,
+  untracked 13182a28... (equal to end check 1's: no edit between); the six provenance builds exit 0; fmt 0.6 s, clippy
+  4.0 s, clippy-wasm32 1.0 s, doc 4.5 s, **test 693.8 s: 605 and 701 passed, 0 failed, 0 skipped**; deps 143 crate
+  files; wasm 27,000 ticks, 0 mismatching both ways; refs 1463; marks 81; self 78 of 78; redact 10 of 10, 313 items, 0
+  findings; "check: all 11 steps pass"; exit 0. `df -h /home/user` after: 5.1G avail (87 %).
+- The disk: 12G free at my start, 5.1G at my end (the shared target's debug, release and wasm32 builds of both
+  builds, cold at launch); above the 4 GB floor throughout. I cleaned and packed nothing.
+
+## Time rule, each new test alone (.gate/u4f/test-times.log, `-x -k`, 13:00-13:01 UTC; "finished in" lines)
+
+- c62hb_p2_short_every_measured_lost_tick_is_explained 11.48 s, so the line is 22.96 s.
+- **f6 23.86 s and f28 23.78 s: past the line (each runs two short scenarios, options A and B): a stop for the
+  advisor (section 1 item 5; 2.10's rule).** Not changed after end check 1 (splitting each into one test per option
+  would put each near 12 s; the advisor's call). f40 12.03 s.
+- Under 1.4 s each: f1 1.09, f36 1.32, f5 0.13, f32 (three) 1.10, f8 property 0.03, f38 0.02, commands.rs (25) 0.12,
+  its bites (12) 0.01, trace bites (4) 0.01, carry80 (4) 0.00, clock unit (6) 0.00.
+
+## Size, the bars line, what was not verified
+
+- SIZE-CHECK: `git diff --stat 5b29296b -- spikes/ docs/` 1,606 insertions (18 files) + 2,147 lines in 6 new files
+  (client/src/clock.rs 348, client/tests/carry80.rs 158, client/tests/trace.rs 556, lab/tests/bite_homes.rs 48,
+  proto/tests/pong.rs 84, room/tests/commands.rs 953) = **3,753 added lines** (the plan's M 3,000; the brief's 5,150;
+  the stop 6,000). About 60 % of it is tests.
+- D10, the bars line: `git diff --stat 5b29296b -- spikes/netcode-proof/marks/marks.json spikes/netcode-proof/crates/judge`
+  prints nothing. SERIES.md: 5 new rows in one new subsection, no existing row changed (the reviewer's read is
+  recommended: c62h-review :93).
+- `git diff --stat 5b29296b -- spikes/netcode-proof/crates/sim`: world.rs 48 insertions, 3 deletions (bites-only sites).
+- Not verified: any judged or 5.3 run (none exists for U4f's suites, which are not built); the controller under the
+  real lab at P3 for 10 minutes (f28 ran 4 s measured; f36 is the model's); ClockSync on the lab's L1 (f1 is the
+  model's, D4's parameters); the plants of f26, f27 and D14; f36 (ii) as its own bots test (f28's 100 % on time and 0
+  missing at P3 under both options shows the controller rule at the lab's level); a kicked slot's rejoin case of f39.
+
+## Rulings as applied (U4F-Q1 to Q18; return item 12)
+
+- Q1 (a)+(d): the lane plus crates/sim/src/world.rs (two bite sites, bites only), SERIES.md new rows only, and by Q6 (b)
+  crates/proto, the catalogue's Pong row, server/src/pump.rs's Pong, server/tests/pump.rs and loopback.rs. Beyond:
+  crates/lab/tests/bite_homes.rs (new: the moved test) and `ClientEndpoint::with_quant` (P33's second error).
+- Q2 (a): nothing packed or cleaned by me. Q3 (c): A's depth 0; `ClientSlot::ran_early()` built, its series not
+  written (not built). Q4 (b): the -47 suite not built. Q5 (a): the stop clause recorded; no failure outside the lane.
+- Q6 (b): `Pong.server_ns` (8 B, exact ns), the mean filter; f1 at 4.0 ms (measured 2.380 ms).
+- Q7 (b)+(i)+(iii)(c): the controller on ClockSync; `with_lead` kept as the fixed lab setting; contiguous stamps,
+  at most 2 a step, a skip only beyond REDUNDANCY_CAP owed; stamps_skipped 0 on f32 and f36.
+- Q8 (i)(b) at 400 ms (12/24 ticks: f31), (ii) (c) a carry to U4h (the main session's), (iii) (e) given (his yes).
+- Q9 (a) K = 16. Q10 (a): bite runs' options are the runner's (not built). Q11 (i) (a) `brawl_presses`; (ii)-(v) the
+  suites not built. Q12 (b): the cap measurement not run. Q13 (b): `skip_command` built, its lab use not built.
+- Q14 (b): the pump's counters reported at the stop; the hold-clamp counter not built (a follow-up as ruled).
+- Q15 (c), Q11 (v), the 400 ms hold (p19): not built (the lag switch). Q16 (b): ACK_RING_TICKS (f24). Q17 (a): the
+  total key (f8, f9). Q18 (i)(a) W = CMD_CATCHUP and (ii)(d) the kept stamp per slot (f13, f38, f39).
+
+## Carries (return item 8)
+
+- 46 met at the room's level: f17 (room/tests/commands.rs), a forged press stream and its twin give equal hashes;
+  the lab's -21 twins not built.
+- 80 (a) met: the total key (room.rs `canonical`), f8 (2^31 apart; SA-1's triple on a fresh slot; 10,000-triple
+  property), f9 (carry 21's test made to fail without the sort: the plant run). (b) met: client/src/lib.rs `receive`,
+  f24. (c) met: `drop_unencodable`, f25. (d) met: f26 as worded (its two plants not run). (e) met: `full_state`, f27
+  (its plant not run).
+- 86 not met: c-u4f-r2.mjs not written (5.3's pre-runs are the main session's after the merge, on a script that does
+  not exist yet).
+- 57 not met: the cap measurement (2.8, D8) not run; the room's cap stays provisional at 1,024.
+- 74 met for the endpoint: the controller replaces the fixed lead in controller runs; f5's settled leads beside
+  U4R-Q14's; the late share by stamp reported in f28 (0 late at P3 short).
+- 21 met (option A's several commands per slot sorted: f7, carry 21's test under A). 27 met (CMD_CATCHUP and its
+  const assert kept; option A's cap reads it; f7, f10 kind 10).
+- 18 not applicable (Q8 (b): no npt-sim constant). 39 met: no local tick constant; the clock's period and ping
+  interval, the lead bound's ticks pinned at 30 and 60 Hz (f31 x2); the margin is one period in ns.
+- 50 no code change (2.8 item 4's bound applies to a cap not yet measured). 61 (b) completed by 80 (e) (f27).
+- 58 not met (the cap runs' high-water marks). 76: kept (r8, r9 pass); no forged kind closes a session (no suite
+  built). 77 (a), (c): `stale()` in client_counts as before; not read on U4f runs (no 5.3 runs).
+
+## Public items by crate (return item 9; against 2.13's list)
+
+- npt-room: `CmdTiming`, `Refusal` (+ `kind()`), `InputBuffer::KEPT_WINDOW`; `Room::LEAD_BOUND_MS`, `with_cmd_timing`,
+  `set_cmd_timing` (beyond 2.13: an in-place form for the lab), `with_lead_bound_ms`, `cmd_timing`, `lead_bound`,
+  `refusals`, `refusals_dropped`; `ClientCounters` fields lead_refused, not_newer, seq_refused, move_refused,
+  aim_refused, seq_outside_window, rejoin_overlap; `ClientSlot::on_time`, `presses`, `ran_early`, `commands_run`
+  (the last four beyond 2.13's words: the per-tick values -20's series and Q3 (c) read); `BITES` 7 -> 16.
+- npt-client: `ClockSync`, `ClockSample` (plan.md:610); `ClientEndpoint::with_clock`, `with_quant` (beyond 2.13: P33),
+  `clock`, `join_tick`, `commands_due`, `lead_now`, `stamps_skipped`, `not_due` (beyond: a hold's dropped page
+  command), `unencodable_commands`, `twin_left_out`, `skip_command`; `unknown_pongs` now public; `BITES` 3 -> 6.
+- npt-bots: `Behaviour::controlled`, `Behaviour::brawl_presses` (the cheats' constructors not built).
+- npt-sim: `World::CHECK_BITES` (bites only; beyond 2.13's "two ids in World::BITES": a list apart, so the pins
+  outside the lane hold). npt-proto: `Pong::server_ns`. npt-server: none. npt-lab: binary settings `--cmd-timing`,
+  `--controller`, `--behaviour brawl-presses`.
+
+## What stops or goes to the main session (return item 10)
+
+- No manifest, Cargo.lock, marks.json, judge or existing SERIES.md row change; no tick constant needed (carry 39); no
+  wire change beyond U4F-Q6 (b)'s field; no file outside the lane but the two named under Q1 above.
+- The sim-side refusal for refuse-not-clamp uses RefusalKind::Cooldown (no new seam kind): a reading for the advisor;
+  a new RefusalKind variant would be a seam change.
+- The late/past-window check's place in the order (after kinds 4-6, before 10) for the advisor's read.
+- `header.params.behaviour`'s row (SERIES.md:348) lists its values; `brawl-presses` is a new value of that existing
+  row, written without touching the row's text: for the reviewer's read (a new row would duplicate the name).
+- The summary line's "lead N" prints `lead_for(profile)` even on a controller run (cosmetic; the header is right).
+- The unbuilt parts listed under Block 5/6 above, and the plants of f26, f27 and D14.

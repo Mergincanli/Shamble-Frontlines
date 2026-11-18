@@ -88,6 +88,23 @@
   #55-#57 make origin/main no ancestor of this branch; and points to his LEAD-BOUND yes and his two stops at
   history.md:6801, :6803. SIZE-CHECK (brief :921-943): the plan's M is about 3,000 added lines; the brief's estimate
   about 5,150 (4,200 to 6,200); his stop past 6,000.
+- **BUILDER 1 RETURNED 13:1x UTC (86.6 min): a PARTIAL build** (its notes u4f-build.md, copied here; return list in
+  the chat). Built and tested: npt-room (option A, the check order, kinds, records, `cmd_on_time` by stamp, the 400 ms
+  bound), npt-client (ClockSync, the controller, carry 80 (b)-(e), the twin's skip), the Pong's `server_ns`, P33's
+  fix, npt-sim's two bite sites (`World::CHECK_BITES`), the lab's core (`--cmd-timing`, `--controller`, -20's series,
+  the `reorder` event, client_counts). NOT built (notes :162-172): the 11 forgers, clamp cheat, 1.5x clock, lag switch,
+  never-acker and their suites; twins and attribution; -47's suite; -22's series; the cap runs (2.8); c-u4f-*.mjs;
+  tests f14-f16, f18-f23, f29, f33, f35, f36 (ii), f37; plants f26, f27, D14. Why: its working room and the size.
+  **Final snapshot** wip/u4f-build.patch 92fc99aa9f01aebf…, 224,208 bytes, 24 files: **3,753 added, 248 removed**
+  (`git apply --numstat`). **End checks** .gate/u4f/end-check-1.log (12:59:31) and -2 (13:14:59): "check: all 11
+  steps pass", exit 0 both; tests **605 measured (+53), 701 bites (+69)**; refs 1463; marks 81; self 78/78; redact
+  313 items, 0 findings. **Bars:** no marks.json or judge file in the patch; SERIES.md +10 / -0 (one new subsection,
+  5 report-only rows, read in full). **Stops and readings for the advisor:** the time rule (f6 23.86 s, f28 23.78 s
+  against the line 22.96 s; notes :221-228); refuse-not-clamp as `RefusalKind::Cooldown`; the late/window check
+  after kinds 4-6; `brawl-presses` as a new value under SERIES.md:348's row; `World::CHECK_BITES`; public items past
+  2.13; the lead-bound row's "the room's next tick" against the frozen fence's "the room's tick". **Size forecast:**
+  built parts came to about twice the brief's estimates (client 700 → about 1,421; room 950 → about 1,821), so the
+  rest (the builder's estimate 2,000 or more, plus the scripts and tests) likely takes U4f past his 6,000 stop.
 - **After the build:** the panel in two batches (brief 12 item 8); merge; 5.3's 21 pre-runs; the part-clean at A6's
   place; the sets one at a time (-47, -22, -20, -21: about 6-8 h of runs); U4f's report, with A1's movement reading in
   a line of its own naming who reviewed it (the advisor's A1; read by the advisor and the test-engineer), and every
@@ -151,7 +168,8 @@
   608 Rust tests; 177,993 lines of working papers in 934 files.
 
 ## Running work
-- **2026-11-18 from 11:4x UTC: U4f's builder runs** (agent a856ba7ccb7d032c3; resume it by SendMessage, or a fresh copy
+- **13:17 UTC: builder 1 ENDED** (its return above); its worktree stays as it is (uncommitted) for the next builder.
+- **2026-11-18 from 11:4x UTC: U4f's builder ran** (agent a856ba7ccb7d032c3; resume it by SendMessage, or a fresh copy
   that reads its notes and `git diff` first). Its worktree: `/home/user/Shamble-Frontlines/.claude/worktrees/agent-a856ba7ccb7d032c3`,
   branch u4f-build at 827518b (its notes: `.checkpoints/netcode-proof-test/u4f-build.md` there). **Check-in 12:35
   UTC:** nothing stopped (its runner in block 4's fmt and clippy, logs .gate/u4f/b1-b4 from 12:06); snapshot
