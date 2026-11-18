@@ -441,3 +441,27 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
     failed. Run conclusion: failure, as planned: all three bites caught.
 - `browsers` started by the session (run_workflow, ref `main`; 204 at about 17:55:39 UTC), after the records showed
   bite-coep and bite-nocache uploaded; production is still round-a's good build (0354374e).
+- **`browsers`** (PM-0006-3 and PM-0006-4): browsers run #1, id 44364041726, started by the session 17:55:38 UTC,
+  completed 17:59:13, conclusion failure (the macOS job). Artifacts read with jq from
+  `.gate/preview-hosting-check/day1/browsers/` (zip sha256: windows f52bfb919353..., macos 4ca00fa3669e..., each equal
+  to its digest).
+  - windows-2025 (image win25-vs2026 20261103.298.1, WebdriverIO 10.1.0, ran_at 17:59:08.392Z): "summary":
+    {"rows":51,"unexpected":0,"no_reading":0}. Chrome 156.0.8078.80, Edge 156.0.4314.58, Firefox 159.0.1, each link 3
+    loads: production false/false, iso-off false/false, iso-on true/true, bite-nocache false/false ("as expected");
+    bite-coep page true, worker "not reported (worker error: its script did not load)" ("bite caught", all 3 browsers,
+    all 3 loads). PM-0006-4 in Chrome: production's content file on the second visit transferSize 0 (3 of 3, "as
+    expected"); bite-nocache 300 (3 of 3, "bite caught"). Every page row: marker 2162db55d93f..., status done, "ran (2 +
+    3 = 5)"; the resource lists hold the build's files plus "/favicon.ico" (as in Brave).
+  - macos-26 (image macos26 20261102.0473.1, ran_at 17:56:16.077Z): "summary": {"rows":15,"unexpected":0,
+    "no_reading":14}, exit 3. Safari 27.2, production load 1: false/false, "as expected". The other 14 loads: "no
+    reading", error "There is already a Safaridriver instance running on port 49178!". Cause (read in tools/wdio/run.mjs
+    at 2162db5, lines 44-50): withSession() starts a new WebDriver session with remote() for every load and deletes it
+    afterwards; the second Safari session could not start while the first safaridriver still ran. A script fault, not a
+    Cloudflare reading: PM-0006-3's Safari row has 1 reading of 15 and stays open ("no reading" never passes).
+- His untick (REVIEWER (b)): his message "done" with a screenshot (2026-11-18 18:08:10 UTC,
+  a23e7d93-5eb1-4093-a99d-e64ebb1df1b8), transcribed: banner "Environment "preview" updated."; "Environments /
+  Configure preview": "Required reviewers" unticked; "Wait timer" unticked; "Allow administrators to bypass configured
+  protection rules" unticked; "Deployment branches and tags": "No restriction"; secrets CLOUDFLARE_ACCOUNT_ID and
+  CLOUDFLARE_API_TOKEN, both "yesterday"; "This environment has no variables." Only the reviewer changed.
+- `bite-production` started by the session after that (run_workflow, ref `main`, set `bite-production`); it does not
+  wait (no reviewer).

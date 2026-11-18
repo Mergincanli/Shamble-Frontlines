@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 19:05 Amsterdam (18:05 UTC)
+- **Last update:** 2026-11-18 19:11 Amsterdam (18:11 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -524,6 +524,12 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    - His answer (18:04:10 UTC): (b) (Decisions taken). No run waits; the link and the steps sent; next his screenshot
      after the untick, then my go in words; `bite-production` and `restore-production` then start without waiting,
      after both browser machines finish (the corrected list lines for #4 and #5 go with my go).
+   - The untick done (his screenshot 18:08:10 UTC: only "Required reviewers" changed). `browsers` read: windows 51 of
+     51 as expected (both bites caught); macOS: Safari 1 reading, 14 "no reading" ("There is already a Safaridriver
+     instance running on port 49178!": run.mjs starts a session per load). **Finding SAFARI-RUN**: PM-0006-3's Safari
+     row stays open; a fix (one Safari session for all its loads) needs its own review and his yes (a new branch or a
+     pull request to `main`), proposed after this sitting with an advisor consultation first. `bite-production`
+     started at about 18:10:28 UTC (no wait).
 
 ## Next steps
 0. Sitting 1 (step 23): start `round-a`; once plan and build are green and deploy waits, send his list.
