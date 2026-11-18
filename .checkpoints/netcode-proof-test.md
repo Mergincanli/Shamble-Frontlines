@@ -172,8 +172,12 @@
   `git merge origin/main` exit 1, STATUS.md its one CONFLICT, 49 status lines (UU 1, A 24, M 24); STATUS.md resolved
   by Edit (1 line from main's: the #40 row); `git commit --no-edit`: **merge commit 0f12d9ec75f192d1…** (parents H0,
   b763ba3); kit = main's, spikes/ unchanged, the rest = main's but the six docs, H0..HEAD = main's 49; gate PASS, repo
-  map OK, checkpoint tests 33/33, light.log refs 1498, redact 307, all 4 pass (.gate/main-60/). Pushed by this save;
-  then CI, the saver restarted, the advisor's head check (step 7); then R3 (iii)'s four hand runs.
+  map OK, checkpoint tests 33/33, light.log refs 1498, redact 307, all 4 pass (.gate/main-60/). Pushed 23:43 UTC with
+  the card (bb7a5ed); the saver restarted with both trailers (bpcoh9gqm); next CI, then the advisor's head check (7).
+- **R3 (iii)'s four hand runs DONE** (.gate/u4f/w3-hand.log, 23:44:39-23:45:53 UTC, `-x -k`, builder 3's tree, diff
+  54cb6faa…): p3, p9 (bites, not-older-than), p16 (B) and p20 (idle 2 s) at 4-6 s with 2 s episodes, 48 clients,
+  each exit 0; contract PASS on p3 (129 names) and p20 (130), none without a row; p16's 8 buffer-full, as builder 3
+  wrote.
 - The saver b4p5xbtmj STOPPED 23:39 UTC for MAIN-60 (C2; its last save 286d9d5 committed, not pushed: C2 (c)'s
   foreground save pushes it). Restart it after step 6 with both attribution lines as trailers (ADV-M60-8; `node
   .claude/scripts/checkpoint.mjs watch netcode-proof-test --trailer "Co-Authored-By: …" --trailer "Claude-Session: …"`,
