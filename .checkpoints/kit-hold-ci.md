@@ -7,7 +7,7 @@
   15:38:13 UTC, his label 16:24 Amsterdam; `kit-hold-ci/mustafa-2026-11-18-1624-merge-58.md`, by script).
 - **Branch:** claude/wonderful-hamilton-jdmlnf (stands in for cs/kit-hold-ci) · **Base:** main
   9b4b518f520aa2360a8007dc857ba74b343c8a40 (the merge of #58; the branch was fast-forwarded to it and pushed)
-- **Last update:** 2026-11-18 17:50 CET (from the clock)
+- **Last update:** 2026-11-18 18:15 CET (from the clock)
 
 ## What his words ask (read the file; these are pointers, not his words)
 - DEP-HOLD (a): "Show me its exact text first, with how the hold is released. Keep it to that: no guard change and no
@@ -120,12 +120,46 @@
    - `kit-hold-ci/decisions.mjs` is written (not run yet): it will put his two messages of today into
      `docs/DECISIONS.md` in the docs pass, from the two files saved by script, with its checks.
 
+10. The advisor agent read the changed lines once (16:51 to about 17:10 UTC; its notes: `kit-hold-ci/advisor-plan.md`,
+    "The one change after his KIT-TEXT answer"): **REVISE, one Medium**: git reads a path that starts with ":" as a
+    search pattern, so my new line compared a lockfile in a root folder named ":" with the root file on main and let
+    it through with no record (the text he saw held it). Its exact fix: the new line reads main with
+    `--literal-pathspecs`; and a fourth step for test 33 (21 lines, its text). "Once done and shown, APPROVE without
+    another read from me." Its rulings on my readings: main as last fetched: inside his words, keep, one line in the
+    report (a clone that has not fetched can release content main had at its last fetch); content is the blob, the
+    file mode is not compared, a link stays held: inside, keep; a file removed in the push stays held also when main
+    removed it too: inside his literal words, ask him as a decision of its own (its recommendation there: also pass
+    it); naming him in the comment: keep.
+    - Its Lows (report lines and STATUS follow-ups, no change here): the line he approved that reads the file from the
+      push has the same pattern reading, in the safe direction (a record for a ":" path never matches; "Everything else
+      stays exactly": not changed); the rule line says "a manifest or lockfile" while the code passes plain files
+      only (stricter than the words); no test pins `origin/main` over the local `main` (by code reading and its
+      probe; a test would pass the stop line); the count method (below).
+    - Its note for the report: his reason holds for every manifest on main today (#2, #5, #48, #58); the PR Advisor's
+      merge allow-list would let it merge a manifest under `docs/` or a Cargo file under `tools/` without his go
+      (none exists; no guard change here). A link named like a manifest on main would stop every branch that takes
+      main in (safe; none exists).
+11. Both required changes applied on the scratch copies and shown (17:12 to 17:13 UTC): the scratch tests against
+    the scratch script 33 pass; test 33 against the copy before the fix (`broken-main-pathspec.mjs`) fails at step
+    4's status line (:652, the push went out); against the three other broken copies it still fails at steps 1, 2
+    and 3 (:610, :620, :632); against today's kit script 27 pass and 6 fail; the kit's own 27 against the scratch
+    script pass. So the advisor agent's condition is met: APPROVE.
+    - Notes: `kit-edit.diff` is the final text (335 lines, sha256 fec3dcc5...); `kit-change.diff` is what changed
+      against the text he answered on (111 lines, 327f9106...; 73 added lines, none removed: script 5, rules 2,
+      tests 66); `kit-edit-as-shown.diff` is the text he answered on (70756f3d...); `ci-edit.diff` unchanged.
+    - **Size, one method (`git diff --no-index --numstat`, added lines):** the final text: script 46, tests 223, rules
+      10, workflow 12: **291** against 150 planned (stop line 300). The text he saw was 41 + 157 + 8 + 12 = 218 (I
+      told him 219: the workflow was counted as 13; it is 12).
+    - The kit's test counts before the write (16:54 UTC): routine-guard 1107 pass; settings 127 pass; kept-logs 10
+      tests, 9 pass, 0 fail; checkpoint 27 pass.
+
 ## Current step
-10. (16:50 UTC) The advisor agent reads the changed lines once (`kit-change.diff`). Then the four files are written
-    (three kit files and the workflow) so that their `git diff` equals `kit-edit.diff` and `ci-edit.diff`; each edit
-    asks him (the guard; the chat is in "default" mode). Then: the kit tests (33), the other kit tests, the gate;
-    commit by path; push; the clean CI run (stop rule); the plant and its take-back; reviews; the verifier; the
-    docs; the report; the pull request.
+12. (17:15 UTC) Write the four files (three kit files and the workflow) as copies of the scratch files, one command
+    per file; each asks him (the guard; the chat is in "default" mode). Then: check that the four files equal the
+    scratch copies and that their diff against main equals `kit-edit.diff` and `ci-edit.diff`; the kit tests (33,
+    1107, 127, 10); the gate; commit by path; push; the draft pull request; the clean CI run (stop rule); the plant
+    (`packages/types/src/generated/protocol/Join.ts` with the executable bit) and its take-back after the plant's
+    run has ended; reviews (security-auditor, infra-engineer, test-engineer); the verifier; the docs; the report.
 
 ## Next steps
 4. Build (three edits), the script's tests, the real CI runs (a planted change that the compare step fails on; the

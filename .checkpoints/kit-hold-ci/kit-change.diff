@@ -1,5 +1,5 @@
 --- .gate/kit-hold-ci/as-shown/checkpoint.mjs	2026-11-18 16:09:27.273694004 +0000
-+++ .gate/kit-hold-ci/checkpoint.mjs	2026-11-18 16:44:33.856386331 +0000
++++ .gate/kit-hold-ci/checkpoint.mjs	2026-11-18 17:12:27.588525381 +0000
 @@ -20,6 +20,8 @@
  // by .checkpoints/<slug>/dependency-check.md, written after security-auditor's answer and naming its notes file: one
  // line per held file, "<sha256>  <path>" as sha256sum prints it from the repository root ("deleted  <path>" for a
@@ -21,7 +21,7 @@
      if (!entry.out) return !released.has(`deleted  ${f}`);
      const plain = /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(entry.out);
      if (!plain) return true;
-+    const onMain = /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(git('ls-tree', 'refs/remotes/origin/main', '--', f).out);
++    const onMain = /^100(?:644|755) blob ([0-9a-f]{40,64})\t/.exec(git('--literal-pathspecs', 'ls-tree', 'refs/remotes/origin/main', '--', f).out);
 +    if (onMain && onMain[1] === plain[1]) return false;
      try {
        const blob = execFileSync('git', ['cat-file', 'blob', plain[1]], { stdio: ['ignore', 'pipe', 'ignore'], shell: false, maxBuffer: 64 << 20 });
@@ -38,8 +38,8 @@
    next.
  - **At every update, check the background saver** when agents or a workflow are running, and restart it if it has
 --- .gate/kit-hold-ci/as-shown/checkpoint.test.mjs	2026-11-18 16:19:41.296382560 +0000
-+++ .gate/kit-hold-ci/checkpoint.test.mjs	2026-11-18 16:44:33.859651790 +0000
-@@ -587,3 +587,48 @@
++++ .gate/kit-hold-ci/checkpoint.test.mjs	2026-11-18 17:12:27.589155539 +0000
+@@ -587,3 +587,69 @@
    assert.match(out, /saved locally, NOT pushed .* no recorded check: Cargo\.lock\. /);
    assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
  });
@@ -87,4 +87,25 @@
 +  assert.equal(r.status, 1, r.stderr + r.stdout);
 +  assert.match(r.stdout, /no recorded check: Cargo\.lock, sub\/Cargo\.lock\. /);
 +  assert.equal(sh(origin, 'rev-parse', 'refs/heads/cs/test'), pushed);
++
++  // A lockfile in a root folder named ':' is read at its own path, never as git's ':/' (the root Cargo.lock, whose
++  // content equals main's here): held.
++  const magic = fixture(t);
++  const first = sh(magic.origin, 'rev-parse', 'refs/heads/cs/test');
++  sh(magic.repo, 'switch', '--quiet', 'main');
++  writeFileSync(join(magic.repo, 'Cargo.lock'), 'merged\n');
++  sh(magic.repo, 'add', 'Cargo.lock');
++  sh(magic.repo, 'commit', '--quiet', '-m', 'main gains Cargo.lock');
++  sh(magic.repo, 'push', '--quiet', 'origin', 'main');
++  sh(magic.repo, 'switch', '--quiet', 'cs/test');
++  sh(magic.repo, 'merge', '--quiet', '--no-edit', 'main');
++  mkdirSync(join(magic.repo, ':'));
++  writeFileSync(join(magic.repo, ':', 'Cargo.lock'), 'not on main\n');
++  sh(magic.repo, 'add', '--', ':(literal):/Cargo.lock');
++  sh(magic.repo, 'commit', '--quiet', '-m', 'a lockfile in a folder named :');
++  note(magic.repo);
++  r = run(magic.repo, 'save', 'test', '-m', 'a folder named :');
++  assert.equal(r.status, 1, r.stderr + r.stdout);
++  assert.match(r.stdout, /no recorded check: :\/Cargo\.lock\. /);
++  assert.equal(sh(magic.origin, 'rev-parse', 'refs/heads/cs/test'), first);
 +});
