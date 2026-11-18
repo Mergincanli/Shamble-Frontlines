@@ -5,8 +5,8 @@
   **Base:** main last merged in at 3f2fa21 (main 82c605e, PR #54). Main is now 22c6afa (PRs #55, #56, #57: docs/ only,
   `git diff --stat HEAD origin/main -- .claude/ CLAUDE.md AGENTS.md .github/ tools/` empty, 2026-11-18 before 11:44 UTC):
   not taken in; MAIN-52 takes main in when main changes code, CI or rules, and once before #40 is marked ready.
-- **Last update:** 2026-11-18 18:09 UTC: builder 2 ENDED, PARTIAL (5,515 added; end checks x2 pass), checked here;
-  part-clean done; builder 3 next, from this save's head.
+- **Last update:** 2026-11-18 18:11 UTC: builder 2 ENDED, PARTIAL (5,515 added; end checks x2 pass), checked here;
+  part-clean done; builder 3 RUNS from head 3 07289a4; the saver restarted.
 - **The old card, whole and word for word:** history.md:2284-6789 (the card's line N is history.md's line 2287 + N).
   Every "card, block X" written before 2026-11-17 22:44 UTC points there: its Rules in force at :6216, Cuts at :5791,
   Next steps and PR #40's closing checklist at :6333 and :6350, Open findings at :6387, Key numbers at :6522.
@@ -169,11 +169,18 @@
 - **Builders 1 and 2 ENDED** (13:13 and 17:59 UTC): their worktrees `.claude/worktrees/agent-a856ba7ccb7d032c3`
   (u4f-build, 827518b) and `.claude/worktrees/agent-aa8301a8782f8f434` (u4f-build2, d1b24c3), uncommitted, kept as
   backups; builder 2's is the snapshot 3d341c58… (builder 1's work in it). The advisor ENDED about 13:40 UTC.
-- **Builder 3 launches after this save**, from its head (the entry follows at launch).
-- The saver bmhupn5a8 runs from 16:38 UTC (bsacee7la ran 13:35 to about 15:25) (`node .claude/scripts/checkpoint.mjs
-  watch netcode-proof-test --trailer "Claude-Session: …"`, run_in_background, timeout 7200000; its window ends about
-  18:28: restart it while agents run). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (next 18:34 UTC);
-  pause it when no agent runs.
+- **Builder 3 RUNS from about 18:10 UTC** (agent a0825a5a2491eb175; general-purpose, opus, xhigh, isolation
+  worktree; resume by SendMessage, or a fresh copy that reads its notes and `git diff` first): head 3 07289a4ec42bdc9a…
+  (= d1b24c3 in spikes/ and docs/), the snapshot 3d341c58… applied and checked (29 files, 5,515 added) before any
+  edit; its prompt points to the ruling's lines 2-22 (B8's fast clock, B9 in blocks of at most about 400 lines, B10,
+  line 5's stop past 6,000); logs `.gate/u4f/w3-*`; worktree `.claude/worktrees/agent-a0825a5a2491eb175`, branch
+  u4f-build3. **At each check-in:** `python3 -I .checkpoints/netcode-proof-test/worktree_patch.py <its worktree>
+  .checkpoints/netcode-proof-test/wip/u4f-build.patch u4f-build` (the one snapshot then stands for builder 3's worktree,
+  builders 1 and 2 in it), then save the card; on a cut, check the worktree against its last snapshot first.
+- The saver bgig20ts2 runs from 18:11 UTC (bmhupn5a8 ran 16:38 to 18:11) (`node .claude/scripts/checkpoint.mjs watch
+  netcode-proof-test --trailer "Claude-Session: …"`, run_in_background, timeout 7200000; its window ends about 20:01:
+  restart it while agents run). The 2-hour check-in trig_01EKqNqwZrQTVJ6caAyRrug5 is enabled (next 18:34 UTC); pause
+  it when no agent runs.
 
 ## Cuts by the spend limit (SPEND-LIMIT (a): each cut's notice, word for word, its cut and its resume time, UTC)
 - Every cut until 2026-11-17 is in history.md from :5791 on (the old card's block, the latest first).
