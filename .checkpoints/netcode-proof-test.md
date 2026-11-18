@@ -95,6 +95,16 @@
   report names it in a line of its own with who reviewed it** (the advisor's A1; read by the advisor and the
   test-engineer); no marks.json, judge file or existing SERIES.md row may change: if the build needs one, stop and ask
   him; "Build U4f"; his size stop past 6,000 added lines stays.
+- **LAUNCH progress (2026-11-18):** (1) DONE: no process running (pgrep exit 1); D2 `df -BM` 5,434 MiB free; the list
+  (11 files, 543,998,603 bytes) committed alone and pushed at d4654df (its message names advisor-u4r-sets-r2-full.md:45;
+  a worker restart cut the first push, re-pushed at 11:34); pack 11:3x: "kept-logs: free before: 5433 MiB"; archive
+  .gate/netcode-proof-test/kept-logs/u4r-P3-0f066338dd8d.tar.gz, 149827571 bytes from 543998603; "read back: 11 of 11
+  files equal the list (path, bytes, sha256)"; folder removed; "free after: 5808 MiB" (375 back). (2) DONE: the six
+  part-cleans in one main-run.sh call (.gate/u4f-launch/clean-shared.log, 11:35:52, exit 0; the lock and both tags
+  stay, every profile gone), free 12,154 MiB after. (3) the light run (.gate/u4f-launch/base-light.log, 11:36:52, exit
+  0): refs PASS (1463 tracked files), marks 81, self 78 of 78, redact 10 of 10 and 307 items, 0 findings; the test
+  counts stay 0ad9661's (552 / 632: code unchanged, only results/'s new list). Next: (4) the fill, (5) check-in and
+  saver, (6) the builder.
 - **LAUNCH (L4, then L6), in this order, nothing yet done unless marked:** (1) D2 reading; the u4r-P3-0f066338dd8d pack
   by c62h-bound-brief.md 8.1's procedure (its list committed alone and pushed, kept-logs.mjs pack, free before and after
   here); (2) the shared target's part-clean by W1-TARGET item 3 as amended (P27: advisor-u4d2-m9.md:252-256), D2 after;
