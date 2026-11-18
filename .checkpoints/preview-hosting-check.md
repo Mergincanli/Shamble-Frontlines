@@ -8,7 +8,7 @@
   by his yes of 2026-11-16, step 18)
 - **Branch:** claude/optimistic-albattani-mdoonz (stands in for cs/preview-hosting-check) · **Base:** main
   4460ef5b8d6dc8566b29c15ded75c6f0c8be386b
-- **Last update:** 2026-11-18 15:34 Amsterdam (14:34 UTC)
+- **Last update:** 2026-11-18 16:23 Amsterdam (15:23 UTC)
 
 ## Steps done
 Steps 11, 12, 14, 16 and 18 were moved here on 2026-11-16 by script (the advisor agent's F-A, widened by a sweep of
@@ -297,7 +297,6 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      Write" only, the paste saved ("1 minute ago"), the account ID from Account Details; the end date only in the
      filled form. The results-log header is written (`results-log.md`, saved f37cb7a).
 
-## Current step
 21. The setup pull request (a rehearsal outside the marks, plan Part 3 B), after consultation 9: remote `setup`
    1619164 with 0 pull requests and 0 runs (read 2026-11-17 before opening); open it, read run 1 until plan and build
    are green and deploy waits on `preview`, then send his list (the workflows' names deploy and close, the pull
@@ -425,24 +424,30 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
      he stops, I read headers.json and say in words whether to merge; deploy red → no merge, no re-run without a new
      list; no `close` run waiting after the merge → he stops and tells me (plan step 4's question); `close` red → a
      finding, the uploads that remain recorded. The go sent with the full list.
+   - Step 21 closed 2026-11-18 after consultation 16: the rehearsal's deploy (attempt 6), verify and cleanup ran end to
+     end (results log, "The rehearsal, completed"); `main`'s merge commit 2162db5 has the same tree as 1619164
+     (433ff32b82d4...; the four workflows re-hashed there: 29593af18d34, 3afdf389d636, f24ad6e81daf, 6791076916ae).
+     Open from it: the probe's first run (step 22); the token's scope wider than the plan (Pages Read; a decision for
+     him, removal only after a measured run); the upload tool's account printout (the rename answers the name, the ID
+     now equals the secret so GitHub masks it; a fix of deploy.yml left for step 2.6); the environment link on the pull
+     request page not seen (only the log's "Evaluated environment url"): the first reading of sitting 1.
+
+## Current step
+22. The first `probe` run on `main` (schedule ":23"; none by 15:04:41 UTC), read by a check-in (send_later), then Day 1
+   prepared. The probe's outcomes → next action (consultation 16): green with both setup links gone → nothing to do;
+   green with a link still serving → a cleanup finding; red → its results file read; a fix needs a pull request to
+   `main`, so he disables the workflow meanwhile. He is told a red "probe" mail could arrive before it is read.
 
 ## Next steps
-1. His screenshots and the token's end date. Check: the secret names (in `preview`: CLOUDFLARE_API_TOKEN and
-   CLOUDFLARE_ACCOUNT_ID; in `production`: CANARY); `preview` (him as required reviewer, self-review unticked, admin
-   bypass unticked); `production` (Selected branches and tags: main; bypass unticked); Actions → General (pin to full
-   SHA; approval for all external contributors); the end date after Day 2; **the "Repository secrets" list empty (F-F):
-   no setup pull request opens until a screenshot shows it empty.** Any fault: his fix first.
-   F-F met (his screenshot of 11:34:31 UTC). **Two hard gates remain before the setup pull request (consultation 7):**
-   (a) a new screenshot of `preview` with "Allow administrators to bypass configured protection rules" unticked and
-   saved; (b) one screenshot of the token's edit or summary screen showing the permission (Account, Cloudflare Pages,
-   Edit, nothing else, his account only) and the end date 2026-11-25, with no token value on screen. If no screen shows
-   the date after saving, the record says so; nothing is assumed.
-2. Then: the results-log header (PM-0006-1) naming head 1619164; his first list (the setup pull request: approve its
-   deploy, merge it, approve its cleanup; about 10 minutes), naming the open security findings (F-E): SA-R2, SA-R5 and
-   SA-R6 deferred, SA-R3 accepted in his words; then open the setup pull request.
-3. Day 1's sittings as plan Part 3 C (sitting 3 with SA-R4 and SA-R8), each preceded by its list (his condition 3).
-4. Day 2 (the 24-hour reading, the wall, Brave steps 5-8, revoke, the revoked proof); then the report and the closing
-   docs pull request; step 2.6's plan with the locked install (For the report).
+1. The probe's first run (step 22) read and recorded.
+2. His decision on the token's scope (Read kept, or removed after a measured check run on a new list); his time for
+   Day 1, which must be by 2026-11-24 (the token ends 2026-11-25T22:59:59Z; Day 2's 24-hour reading follows Day 1).
+3. A compaction before Day 1 (get_session at 2026-11-18 about 15:21 UTC: 705,327 of 1,000,000 tokens; automatic at
+   901,600).
+4. Day 1's three sittings as plan Part 3 C (sitting 3 with SA-R4 and SA-R8), each with its list first (his condition
+   3); sitting 1 begins by reading the environment link on a pull request page.
+5. Day 2 (the 24-hour reading, the wall, Brave steps 5-8, the revoke, the revoked proof) by 2026-11-25; then the report
+   and the closing docs pull request (DECISIONS.md: his answers word for word); step 2.6's plan with the locked install.
 
 ## For the report (the checkpoint is deleted at the end)
 - His point 3 of 2026-11-16, to carry into step 2.6's plan: "For step 2.6, not for this check: plan a locked install (a
@@ -549,18 +554,22 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
   all IP addresses can use the token." (the new form's "Allow" box: not described).
 
 ## Key numbers
-- Test repository Mergincanli/shamble-preview-check (public): main 4a67b83 (his README); `setup` head 1619164 (U1
-  fe8116d at 2026-11-15 21:01:07 UTC, U2 ba3946e, U3 1b37fae, fix pass 2df0112, his approved diff 1619164); 0 pull
-  requests and 0 workflow runs (the advisor agent's read, 2026-11-16, before 09:02:47 UTC).
-- Placed workflows' sha256 prefixes (checked by script, step 18): deploy.yml 29593af18d34, close.yml 3afdf389d636,
-  probe.yml f24ad6e81daf, browsers.yml 6791076916ae; the token-test variants (not placed) fd3dc4c6029b, 8b745631a278.
-- Local proofs (they prove the scripts, not Cloudflare): proof.mjs 29 of 29 and browser-proof 5 of 5 in Chromium
-  153.0.8010.12 (the session at 2df0112, step 15; the advisor agent again on 1619164, step 19).
-- The WebdriverIO lockfile (tools/wdio/package-lock.json, read by script 2026-11-16 09:06:46 UTC and after): 164
-  entries, the root and 163 packages, all 163 with integrity (step 13's "164 packages" counted the root); two declare
-  install scripts (F-C).
-- The chat's fullness: 717,475 of 1,000,000 tokens (72%) by get_session at about 21:12 UTC on 2026-11-15, before this
-  chat was compacted (the summary's transcript time: 2026-11-16 09:04:41 UTC); no reading since.
+- Test repository Mergincanli/shamble-preview-check (public): `main` 2162db55d93f... (pull request #1 merged
+  2026-11-18 14:57:11 UTC; tree 433ff32b82d4..., the same as `setup` 1619164); branches `setup` (1619164) and
+  `check-token` (863b639); pull request #2 closed unmerged.
+- Workflows at `main` (sha256 prefixes, re-hashed 2026-11-18): deploy.yml 29593af18d34, close.yml 3afdf389d636,
+  probe.yml f24ad6e81daf, browsers.yml 6791076916ae; token-test variants (not placed) fd3dc4c6029b, 8b745631a278;
+  check-token.yml 0ad66aa0f2b3 (on `check-token` only).
+- The token: Account API token `shamble-preview-check-deploy`, Pages Read and Pages Write, "Entire Shamble Frontlines
+  account", all IP addresses; measured 2026-11-18 14:27 UTC: status active, not_before null, expires_on
+  2026-11-25T22:59:59Z. The Cloudflare account renamed "Shamble Frontlines" (2026-11-18).
+- The rehearsal: deploy run 44171977539 (6 attempts; attempt 6 green 2026-11-18 14:55-14:56 UTC), verify pass 2 of 2
+  links, cleanup run 44329986855 (1 upload found, deleted HTTP 200 at 15:04:38 UTC). The check: run 44292323566 (2
+  attempts; logs deleted).
+- Local proofs (scripts only): proof.mjs 29 of 29, browser-proof 5 of 5 (Chromium 153.0.8010.12). WebdriverIO lockfile:
+  163 packages, all with integrity; two declare install scripts (F-C).
+- The chat's fullness: 705,327 of 1,000,000 tokens by get_session, 2026-11-18 about 15:21 UTC (automatic compaction at
+  901,600).
 
 ## Decisions taken
 - His task (the file above): the plan for the preview hosting check; PREVIEW-START answered "it starts now, on the
@@ -761,6 +770,15 @@ all 29 commits of this file at 09:09:18 UTC, transcript time): each as it last s
    basis; during the sitting: read each job as it finishes, list the branches after the merge, add `main`'s merge
    commit to the header, read the first probe run at :23; before sitting 1: the token wider than the plan (Read), Edit
    alone unmeasured, a choice for him with the rehearsal's result.
+
+16. 2026-11-18 15:20:36 UTC (called; transcript time), moment 5 (before step 21 was saved as done) · Q: may the
+   rehearsal step close? · Changed: yes, read from run data; first "Next steps" and "Key numbers" rewritten (stale since
+   2026-11-16, the F-B fault again); `main`'s claim checked (2162db5's tree equals 1619164's; the four workflows
+   re-hashed there); step 21's open items listed (the probe, the token's scope, the printout finding and its
+   disposition); the probe read by a scheduled check-in with its outcomes written first, and he is told a red mail
+   could come; before Day 1: a get_session reading and a compaction ask; the pull request page's environment link
+   recorded as not seen, the first reading of sitting 1; the token-scope choice as one decision entry (removing Read
+   needs a measured run on a new list first).
 
 ## Running work
 - saver b491gaova (started 2026-11-17 22:22:16 UTC, its log, with the security review): stopped by the harness's background time
