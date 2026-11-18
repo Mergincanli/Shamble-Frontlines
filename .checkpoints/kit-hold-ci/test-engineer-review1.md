@@ -50,3 +50,65 @@ never run `save`/`watch` of any copy in this working tree, never commit or push.
 - Tools: runner.mjs (runs a test file against N script copies, writes TAP per run), failat.mjs (failing test +
   the assertion's line from the stack), build-mutants.mjs + mutants.txt (49 one-change copies of the head script,
   every find matched exactly once, all pass `node --check`).
+
+### Block B (done 18:33 UTC): 49 broken copies of the head script, head test file, 3 runs in parallel
+Built by build-mutants.mjs from head.checkpoint.mjs (fc5a4f02...), one find/replace each (mutants.txt), all
+`node --check` clean. Each line: copy, what it breaks, then the failing tests with the failing assertion's line.
+The brief's list:
+- M01 hold removed: #28:453 #29:510 #30:535 #31:550 #32:587 #33:620 (6 fail)
+- M02 hold skipped when background: #32:587
+- M02b hold moved below the background branch: SURVIVED. Equivalent for publishing: when background && code
+  ahead both versions skip the push; only the log line differs (the held files are not named). No gap.
+- M03 record read from the working tree: #28:471 (step 3)
+- M04 renames followed (--no-renames dropped): #31:565 #32:587
+- M05 any record releases: #28:461 #29:510 · M05b path with any hash: #28:461 · M05d hash of the blob id:
+  #28:462 #29:513 · M05c record matched as a substring: SURVIVED (no claim beyond the line's text; harmless)
+- M06 names emptied: 6 fail · M06a Cargo.toml dropped: #28:454 #30:535 · M06b Cargo.lock dropped: #28:454
+  #31:550 #32:587 #33:620 · M06c package.json: #29:510 · M06d package-lock.json: #29:510 #31:565 ·
+  M06e npm-shrinkwrap.json: #29:510 · M06h root folder only: #28:454 #29:510 #33:632
+- M07a "deleted" releases any existing entry (before the plain check): #31:550 (only through the link case)
+- M07b "deleted" releases an existing PLAIN file: SURVIVED  <-- gap
+- M08a link as plain (plain check only): #31:550 · M08b link as plain (both regexes): #31:550 #33:632
+- M09 comparison with main dropped: #33:610 (step 1)
+- M10 any plain file main also has is released: #33:620 (step 2)
+- M11 comparison moved before the plain check (single move): SURVIVED, EQUIVALENT at head (blobAt re-checks the
+  plain mode on both sides, so a link never matches). The session's broken-main-before-plain was cut from an older
+  version where it bit. The double change M11b (moved + any mode): #33:632 (step 3).
+- M12 main read as a pattern (main side only, push side literal): SURVIVED  <-- gap (new)
+- M13 push side read as a pattern (inPush = plain[1]): #33:653 (step 4) · M13b both sides as pattern: #33:653
+- M14 local main instead of origin/main: SURVIVED (known: advisor)
+- M15 base always origin/main's merge-base: #29:513 #31:565 #32:587 #33:632
+Beyond the list:
+- M06f left anchor dropped, M06g right anchor dropped: SURVIVED (each alone; over-hold, safe direction; test 29's
+  `not-package.json.txt` needs BOTH anchors gone to be held, so it pins neither alone)
+- M06i notes folder excluded from the names: SURVIVED (a manifest created inside .checkpoints/ not held; "in any
+  folder")
+- M07c removed file held whatever the record: #29:523 · M07d removed released w/o record: #29:520 #31:565 #32:587 ·
+  M07e removed released when main lacks it too (KIT-REMOVED): #29:520 #31:565 #32:587
+- M11c comparison reads any mode/type on both sides (after plain check): SURVIVED (known: plain file vs link on main)
+- M15b base always the remote branch: #30:536 · M15c origin/main tip instead of merge-base: SURVIVED (over-hold
+  only)
+- M16 names unreadable -> released: SURVIVED · M17 entry unreadable -> released: SURVIVED · M18 content unreadable
+  -> released: SURVIVED (fail-closed paths; no test makes git fail there)
+- M19 names read without -z: SURVIVED (a path git quotes, e.g. a non-ASCII folder, would be missed: "in any folder")
+- M20 save exits 0 when held: #28:453 #29:510 #30:535 #31:550 #33:620
+- M21 hold computed on HEAD before the notes commit: #28:462 #29:513 · M24 record without the slug: #28:462 #29:513
+- M22 `inPush &&` dropped: SURVIVED (matters only for a ':' path that is a link while the pattern finds a plain
+  file; contrived) · M23 trim dropped: SURVIVED (no claim) · M26 mode compared too: SURVIVED (known: mode-only)
+Raw TAP: scratchpad B/<id>.txt.
+
+### Block B2 / C evidence (done 18:41 UTC): are the survivors real? (extra.test.mjs, scratch, 10 tests)
+- Old step 4 (test file at 94c197f, before the fix) vs head script: 33 pass; vs M12: 33 pass. So neither the old
+  nor the new step 4 pins main's literal read at this head. The old step 4 bit on a main-side pattern read only
+  while the push side was itself a pattern read (old code: plain[1]); fix2 made the push side literal and rewrote
+  step 4 for the push side. Main's side has had no test since fix2.
+- .gate/kit-hold-ci/test-engineer/extra.test.mjs (10 short tests, own fixture copy): head 10/10 pass; each
+  broken copy fails exactly its own test and no other:
+  X1 M07b "deleted" releases an existing plain lockfile · X2 M12 main read as a pattern (push adds `:/Cargo.lock`
+  with the content of main's ROOT Cargo.lock; main has no ':' folder) · X3 M06i manifest inside .checkpoints/ ·
+  X4 M19 non-ASCII folder `crates/ü/Cargo.toml` · X5 M16 no origin/main + unpushed branch ("could not be read") ·
+  X6 M06f and M06g look-alikes `package.json.txt`, `old-package.json` · X7 M14 unpushed local main ·
+  X8 M11c plain file with the bytes of main's link · X9 M26 mode-only change released (reading (b)) ·
+  X10 M15c unpushed branch vs main's newer tip (over-hold).
+- So M07b, M12, M06i, M19, M16, M06f/g, M14, M11c, M26, M15c are real gaps (not equivalent copies). M02b, M03b,
+  M11 are equivalent; M05c, M22, M23 carry no claim; M17, M18 cannot be reached without making git fail.

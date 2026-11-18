@@ -83,3 +83,60 @@ Scratch: `.gate/kit-hold-ci/verifier/` and the session scratchpad. I edit nothin
   415bd73 (parent 0c0e271): the reverse, same blob.
 - Modes: `git ls-files -s packages/types/src/generated`: 9 files, all 100644; `git ls-tree -r` at HEAD (2d1fa70) and at
   4877599: 9 x 100644; no executable file on disk.
+
+### Check 6: the replay of change-set 1's miss (DONE, PASS)
+- Read first: `replay-miss.sh` clones the repo twice into the scratchpad (`.../scratchpad/replay/run-<name>-XXXX`), points
+  the clone's origin at the scratch bare (`git remote get-url --push origin` = the scratch origin.git), sets the remote
+  branch to 55397c8 and main to 22c6afa, switches to 566d1d1, restores da22f96's notes, runs one foreground save.
+  The script writes only a temp index in the current repo's git dir (checkpoint.mjs:189). Premise checked: 566d1d1's
+  parent is 55397c8 and it changes exactly Cargo.lock, Cargo.toml, crates/protocol/Cargo.toml; cs1 report :18-21 says
+  566d1d1 and the checkpoint commit da22f96 on top of it were pushed together at 12:04:36.
+- This head's script (18:24:15-18:24:19 UTC): "[final] exit 1; remote branch unchanged (nothing pushed)"; "checkpoint:
+  saved locally, NOT pushed ce02d34 on claude/wonderful-hamilton-jdmlnf: the push would publish a dependency change with
+  no recorded check: Cargo.lock, Cargo.toml, crates/protocol/Cargo.toml. ..."; scratch remote branch still 55397c8,
+  566d1d1 not on it.
+- Main's script (scratch copy, blob ef8ca2be = origin/main's; 18:24:25-18:24:28): "[main] exit 0; remote branch MOVED to
+  b824ed8 (pushed)"; "checkpoint: saved and pushed b824ed8"; 566d1d1 is now on the scratch remote branch (published).
+- Matches `replay-miss-results.txt` (only the new commits' SHAs differ: commit times).
+
+### Check 7: the hole fixed by KIT-FIX (DONE, PASS)
+- Probe read first: builds its own scratch repo + bare origin under the system temp folder, deletes it after.
+- This head's script: "exit 1; held (not pushed); checkpoint: saved locally, NOT pushed ... no record...".
+- `git show 415bd73:.claude/scripts/checkpoint.mjs` (scratch `.gate/kit-hold-ci/verifier/s415/`, blob fae135bb = the same
+  blob at 94c197f): "exit 0; RELEASED (pushed); checkpoint: saved and pushed ...".
+- Extra: the text he answered on (`as-shown/checkpoint.mjs`): "exit 1; held". So the hole existed only in 8bf4bee..415bd73.
+
+### Finding (for check 9), probe of my own
+- Draft "Fail-safe corners": "A true record for a path that begins with ":" never matches (...), so such a file stays
+  held." Probe `.gate/kit-hold-ci/verifier/probe-true-record.mjs` on the head script (scratch repo in the temp folder):
+  A (root Cargo.lock and ":/Cargo.lock" both "X\n", the true record names both): "exit 0; RELEASED (pushed)";
+  B (root "Y\n"): "exit 1; held ... :/Cargo.lock". So a true record DOES match when the path git reads in its place
+  (checkpoint.mjs:128, the pattern read) holds the same bytes; it also matches a true "deleted" line when that path is
+  absent. Safe direction holds (only the recorded bytes pass). Low, wording.
+
+### Check 8: the CI claims (DONE; pages checked, log lines NOT checked by me)
+- WebFetch of the public pages (github.com; api.github.com refused: HTTP 403). Logs need sign-in on every page.
+  | run (job) | page shows | claim |
+  | 44357176860 (134988309631) | toolchain #184, push 17:18, 94c197f, success, run 55 s, job 51 s | 17:18:27-17:19:18 = 51 s: OK |
+  | 44357282401 | toolchain #185, pull_request (PR #60 opened) 17:18, 94c197f, success, 45 s | 17:18:56-17:19:41 = 45 s: OK |
+  | 44357616602 (134989872637) | toolchain #186, 0c0e271, failed in 38 s; annotation "Build and test with the network cut off": "Process completed with exit code 1." | failure at that step: OK |
+  | 44357633651 (134989932210) | toolchain #187 (PR title), 0c0e271, failed in 33 s; same annotation | step 7 failure: OK (step 7 = Set up job, checkout, setup-node, 3 named steps, then this one) |
+  | 44357864275 | toolchain, push 17:22, 415bd73, success, 44 s | 17:22:01-17:22:45: OK |
+  | 44357881263 | toolchain #189, pull_request synchronize #60, 415bd73, success, 44 s | 17:22:06-17:22:50: OK |
+  | 44357864589 | gate, push 17:22, 415bd73, success, 1 m 9 s (gate 22 s, smoke 50 s) | to 17:23:10: OK |
+  | 44357881162 | gate, pull_request synchronize #60, 415bd73, success, 9 m 21 s (smoke 9 m 18 s) | to 17:31:27: OK |
+  | 44365431438 | toolchain #190, push 18:03, 4877599, success, 39 s | 18:03:14-18:03:53: OK |
+  | 44365446199 | toolchain #191, pull_request synchronize #60, 4877599, success, 42 s | 18:03:18-18:04:00: OK |
+  | 44365431235 | gate #892, push 18:03, 4877599, success, 6 m 15 s (smoke 6 m 11 s) | 18:03:14-18:09:29: OK |
+  | 44365445961 | gate #893, pull_request synchronize #60, 4877599, success, 55 s | 18:03:18-18:04:13: OK |
+- Commits vs runs (`git log --format='%h %ci %s' origin/main..HEAD -- . ':!.checkpoints'`): 8bf4bee and 94c197f 17:18:10,
+  0c0e271 17:20:38, 415bd73 17:21:54, 4877599 18:03:10: every run starts after its commit; the take-back commit (17:21:54)
+  is after both plant jobs' last times (17:21:20 push log, 17:21:24 PR job end). Consistent.
+- Step 7's inner script runs under `bash --norc --noprofile -euo pipefail -c` (toolchain.yml), so the clean runs'
+  success alone proves `git status` and both type-check lines exit 0 inside the cut.
+- NOT checked by me (sign-in): the quoted log lines ("Cache mode: none" at 17:18:27.9099464Z; "writing the generated
+  types again changed:" and " M packages/types/src/generated/protocol/Join.ts" at 17:21:20; the 581-line count; the
+  absence of cache lines). They are consistent with the visible annotations and durations.
+- Draft table overclaim (Low): row 0c0e271 puts the push AND the pull-request run under "failed at the compare step:
+  <the two log lines> (17:21:20)". The record (card step 16, ci-evidence §2) quotes those lines from the push job only;
+  for the pull-request job it records only "step 7 ... failure, 17:21:17 to 17:21:21".

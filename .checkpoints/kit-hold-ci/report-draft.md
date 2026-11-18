@@ -14,7 +14,9 @@ Nothing a player sees, hears or feels.
 
 ## Outcome
 DONE: written with the texts he said yes to, reviewed in one round, verified. It waits for the Advisor's check of
-this report and then for Mustafa's go on the merge. One thing went wrong on the way; it comes first.
+this report and then for Mustafa's go on the merge. No finding is Critical or High. **Two Medium findings of the
+security review stay open as follow-ups**, by his word of 18:01:08 ("A later finding on them that is not Critical or
+High becomes a follow-up"): they stand under "Open findings". What went wrong on the way comes first.
 
 ## What went wrong on the way
 1. **A hole in my own changed lines stood on the pushed branch for 45 minutes** (17:18:16 to 18:03:10).
@@ -37,6 +39,29 @@ this report and then for Mustafa's go on the merge. One thing went wrong on the 
 2. **A count I gave him was off by one.** I told him the text he saw was 219 added lines; it was 218 (the
    workflow's 12 lines were counted as 13). Told to him at 17:48. Since then one method counts everything:
    `git diff --numstat`.
+
+## Open findings (they stay, as follow-ups, by his word of 18:01:08)
+1. **Medium (security-auditor): in two corners the hold checks another path than the one it pushes.** The script
+   reads the list of changed files through a helper that trims the text and decodes it as UTF-8. So a manifest in a
+   root folder whose name begins with a space (or a tab or another blank character), when it is the first changed
+   file, is checked under the name without the blank. Shown in a scratch repository: main holds `a/Cargo.lock`;
+   the push adds ` a/Cargo.lock` (a folder named " a") with new content and no record: "saved and pushed". The same
+   for a folder name that is not valid UTF-8 when main holds its look-alike with the same content.
+   - Its reach: tiny, and the same kind as the hole fixed by KIT-FIX. No such folder exists; the workspaces are
+     `crates/*` and `packages/*`, so CI would not build a manifest in such a folder unless a root manifest changed
+     too, and that change is held.
+   - It comes from my "equal to main" lines meeting an older line of the script; the text he first said yes to
+     would have held the first case with no record.
+   - The follow-up: read that list raw (no trim, no decoding), with a test for a root folder " a" beside main's
+     `a/Cargo.lock`.
+2. **Medium (security-auditor): nothing makes the review of a pull request read the record.** The script's comment
+   says "the review of the pull request reads it", but no rule names a reader, and the notes folder (the record
+   with it) is deleted before a pull request is marked ready. A record written too early, or for other content,
+   would go unchecked.
+   - The follow-up (a kit change, so with his word): the ready report of a pull request that changes a manifest or
+     a lockfile quotes each record (with the commit it was pushed in) and the security answer it names; the review
+     checks every changed manifest at the head against those lines or main.
+   - Until then, by practice and with no kit change: change-set 2's report does exactly that.
 
 ## His words, the questions put to him in chat, and his answers
 His three messages of today stand word for word in `docs/DECISIONS.md` (by script, this pull request's docs pass):
@@ -190,7 +215,32 @@ endpoint; the excerpts stand in `ci-evidence.md` in the notes):
     same user and could silence both. They guard against honest mistakes.
 
 ## Reviews
-One round, on the final text. PENDING: security-auditor, test-engineer, the verifier, the advisor agent.
+One round, on the final text. PENDING: test-engineer, the verifier, the advisor agent.
+
+- **security-auditor** (the kit hold, and a security read of the CI edits; 18:03:55 to about 18:31; about 85 probe
+  runs in scratch repositories): nothing Critical or High; two Mediums (under "Open findings"), two Lows and wording.
+  - What held in its probes: paths with ":" and pattern characters, spaces, quotes, a newline, non-ASCII names and
+    letter case; renames, copies and merges; a link, a folder and a submodule; a mode change, an empty file and a
+    65 MiB file; a file deleted and added again; a new branch; a missing `origin/main`; odd forms of the record;
+    another task's slug; 45 saves racing; a branch that changes between the commit and the push.
+  - Every git failure it injected ended held (seven places, and a hang killed after 5 s). Nothing fails open on an
+    error.
+  - For a push with no manifest change nothing changed against main's script (the outcome, the exit code, the skip
+    mark, the secret scan, the saver's exits and its last save), with one exception: a new branch in a clone with
+    no `origin/main`, or with unrelated history, is now held as unreadable.
+  - The CI edits open nothing new. `cache-mode: none` closes the cache as a way from one run to another; the new
+    lines run inside the cut on code that already runs there. What remains is CI-CUT part 2. One line it asked to
+    have said: an earlier accepted Low of its review of change-set 1 assumed write mode ran only by hand; CI now
+    runs it on every push, bounded by the throwaway machine and the cut.
+  - Its Lows: a record that is a link or a folder still releases (only on purpose); with the git setting
+    `push.followTags` on (unset here), a save would also push a tag on an in-between commit, and `toolchain` runs on
+    tag pushes; wording (below).
+  - Wording, where the rule line or the header says more or less than the code (the code errs towards holding in
+    each): the message for an unreadable push advises writing a record, which cannot release that case (the way
+    out is `git fetch origin main`); "as sha256sum prints it" is exactly `git show <commit>:<path> | sha256sum`
+    (the script hashes the committed file; a path with a backslash or a newline never matches); "with main for a
+    branch not yet pushed" is the point where the branch left `origin/main`; "never pushes" does not hold in the
+    two corners of open finding 1; a link, a submodule and a file that became a folder can never be released.
 
 - **infra-engineer** (the workflow edit; 17:47 to 18:07): APPROVE, no finding above Low. The text is byte for byte
   the report's blocks 1 to 3; nothing that stood is weakened (permissions, the order "fetch, then cut", `--locked`,
@@ -229,6 +279,18 @@ One round, on the final text. PENDING: security-auditor, test-engineer, the veri
 - any other file that can bring code in (a toolchain file, a workflow's action pin, another package manager's
   lockfile);
 - a check in CI (it goes on the quality gate v2's list).
+
+**What a session could still do by accident** (security-auditor's list; no design here):
+- push code by hand while a held checkpoint commit sits under it: the only sign is the script's one line, and for
+  the saver a line in a background log;
+- run the change before any push (`npm install`, `cargo build`, `npx`, `cargo install`): the hold only times the
+  push;
+- change files outside the five names that decide what CI fetches or runs (workflows, `rust-toolchain.toml`,
+  `.cargo/config.toml`, `.npmrc`, `.gitmodules`, vendored source), or drop `--locked` or `npm ci` in a workflow;
+- use another lockfile name or another letter case (not read by CI on Linux today);
+- add and remove a dependency within one push: the commit in between goes out unheld (CI builds only pushed heads);
+- rely on a stale view of the remote branch or of main;
+- work on a branch from before this merge, or with a saver started before it: both run the old script.
 
 **Known costs:**
 - A manifest edit that changes no dependency (a description line) is held too: it takes a short answer of
@@ -271,6 +333,11 @@ runner for CI); what the hold does in a clone with a case-insensitive file syste
    (`const entry = git('ls-tree', rev, '--', f);`).
 5. From infra-engineer: a guard for the case that `packages/types/src/generated` moves (the compare then checks
    nothing); a message when the type check's file list is empty; any workflow linter must accept `cache-mode`.
+6. From security-auditor: the two open findings above; `push()` passes `--no-follow-tags`; the record is read
+   only when it is a plain file; the wording lines (the exact hashing form, a fetch hint in the "could not be
+   read" message, the branch point named, the entries that can never be released).
+7. For his choice when that plan is written (security-auditor's list): hold plain pushes in the guard; a longer
+   list of watched files; branches still on the old script; where held notes are kept.
 
 **STATUS follow-ups:** PENDING (the Lows and Mediums of security-auditor and test-engineer; the tests not written).
 
