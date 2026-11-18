@@ -169,6 +169,9 @@
 
 ## Running work
 - **13:17 UTC: builder 1 ENDED** (its return above); its worktree stays as it is (uncommitted) for the next builder.
+- **From 13:2x UTC: the advisor runs** (agent ae182eb254c140632, general-purpose reading main's advisor.md, xhigh) on
+  R1 the time rule, R2 the readings (a)-(g), R3 the second builder's order, R4 the size and his 6,000 stop (my lean:
+  build to the stop, three lines then); its verdict to advisor-u4f-build1.md. Then: the second builder by its ruling.
 - **2026-11-18 from 11:4x UTC: U4f's builder ran** (agent a856ba7ccb7d032c3; resume it by SendMessage, or a fresh copy
   that reads its notes and `git diff` first). Its worktree: `/home/user/Shamble-Frontlines/.claude/worktrees/agent-a856ba7ccb7d032c3`,
   branch u4f-build at 827518b (its notes: `.checkpoints/netcode-proof-test/u4f-build.md` there). **Check-in 12:35
