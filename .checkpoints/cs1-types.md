@@ -327,7 +327,7 @@
     - **Round 2 is complete (14:18 UTC): five answers, nothing at Medium or above. The code stays 65a7b13.**
       All round-2 Lows are in the report's "Follow-ups" (draft) and go to STATUS.
 
-    - docs-keeper (14:07:22 to about 14:34 UTC; `cs1-types/docs-keeper-notes.md`): STATUS (120 lines), the archive,
+    - docs-keeper (14:07:22 to 14:33:46 UTC, from the session record; `cs1-types/docs-keeper-notes.md`): STATUS (120 lines), the archive,
       ROADMAP (12 recent entries) and REPO_MAP (139 entries, the check passes) are done and committed (500757c). 25
       lines moved under OLD-LINES by its script (`docs-keeper-move.mjs`; list `docs-keeper-moved-lines.md`); its
       blame check (`docs-keeper-blame-check.mjs`): 34 removed lines, 0 not this lane's and not moved. It corrected
@@ -432,4 +432,4 @@
 ## Running work
 - saver: background task bx7rdhkl7, started 14:07 UTC on 2026-11-18 (2-hour limit; the one before it, bafnij7xk, ran
   from 12:30 and was stopped just before).
-- agents (2 of 3): the verifier and the advisor agent on the final content (started 14:35 UTC).
+- agents (2 of 3): the verifier (since 14:36:07 UTC) and the advisor agent on the final content (since 14:36:33 UTC).
