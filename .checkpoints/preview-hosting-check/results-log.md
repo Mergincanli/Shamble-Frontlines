@@ -142,3 +142,57 @@ marks (plan Part 3 B): kept and reported, counted toward no mark. The marks star
 - Run: `check-token` #1, id 44292323566, event pull_request, head 863b639d128a..., actor and triggering actor
   Mergincanli, created 11:10:59; job `check` (id 134760377971) "waiting" on `preview` from 11:11:00. No other run
   started (the run list holds only this one and the setup pull request's deploy run).
+- His screenshots (user message 2026-11-18 13:49:17 UTC, 7ec06823-d86e-4e1f-ace6-22bde57d6101): Cloudflare's Configurations page, "Account
+  name": "Shamble Frontlines" (the dashboard's top-left shows the same): the rename is done, so his gate "No deploy run
+  of any kind starts before you have my screenshot of the renamed Cloudflare account" is met. The check's run page:
+  "The deployments have been approved."; status Success; job "check" 15 s; "Mergincanli approved ... preview".
+- The check's output, word for word (job 134760377971; log lines 2026-11-18 13:48:45 to 13:48:59 UTC; runner image
+  ubuntu-24.04 version 20261111.127.1; "added 38 packages in 5s"):
+  ```
+  token: length 53; starts with cfat_: yes; whitespace in or around it: no
+  account id: length 32; exactly 32 hex digits: yes; whitespace: no; first and last 4: d17d...d8e7
+  == A. the token, for this account: HTTP 200
+  {
+    "success": true,
+    "errors": [],
+    "result": {
+      "status": "active",
+      "expires_on": "2026-11-27T22:59:59Z",
+      "not_before": "2026-11-26T23:00:00Z"
+    }
+  }
+  == B. the token, without an account: HTTP 401
+  {
+    "success": false,
+    "errors": [
+      {
+        "code": 1000,
+        "message": "Invalid API Token"
+      }
+    ],
+    "result": null
+  }
+  == C. the project the upload asks for: HTTP 401
+  {
+    "success": false,
+    "errors": [
+      {
+        "code": 10000,
+        "message": "Authentication error"
+      }
+    ],
+    "result": null
+  }
+  == D: Wrangler exit 1
+  D: shamble-preview-check named in its output: no
+        1 [code: 10000]
+        1 [code: 9109]
+  ```
+- Reading: both values have the right shape (53 = "cfat_" + 40 + an 8-character checksum, by the token-formats page's
+  "cfat_[40 characters][checksum]"), and A answers 200 for this account, so the token is recognised and belongs to the
+  account in the ID box. But Cloudflare reports the token's window as not_before 2026-11-26T23:00:00Z and expires_on
+  2026-11-27T22:59:59Z: it may be used only on 27 November (Amsterdam time). Every call before then is refused: C and D
+  give 10000, D's lookup 9109, B 1000. That explains all five deploy attempts, the empty "Last used", and why rolling
+  the token (it keeps its settings) and adding Read did not help. The form's chip "Nov 27 GMT+1" (his screenshot of
+  2026-11-17 20:13:53) set both ends of the window to that one day; the session read that screenshot as "end date 27
+  November" and called the choices right: a miss of the session's.
